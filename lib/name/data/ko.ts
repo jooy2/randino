@@ -1,4 +1,4 @@
-import { romanMap, words } from './parse.js';
+import { romanMap, words } from '../../_internal/parse.js';
 import type { NameLanguageData } from './types.js';
 
 // Conventional romanization of the surnames below. Anything missing (including a

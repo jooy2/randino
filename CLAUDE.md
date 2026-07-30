@@ -7,11 +7,13 @@ Guidance for AI agents (and humans) working in this repository. Written in Engli
 **randnick** is a zero-dependency TypeScript library that generates random **person names** and **nicknames**, per language. Two separate concerns, deliberately:
 
 - **Names** should read like names a person actually carries (`김민준`, `Emma Clover`). Sample data for forms, seeds, mockups.
-- **Nicknames** (not implemented yet) are the handles someone would pick for a game or a website.
+- **Nicknames** are the handles someone would pick for a game or a website (`멋진사자`, `MistyOwl`). They are built from everyday words and **never from person names** — that rule is the whole point of keeping the two apart.
 
-Status: the name generator is done; the nickname generator is the next feature. Keep the two apart — a shared "generator" abstraction is not wanted, but shared _helpers_ (`lib/_internal`) are.
+Both generators are implemented. Keep them apart — a shared "generator" abstraction is not wanted, but shared _helpers_ (`lib/_internal`) are.
 
 The name generator is a port of the logic behind vutools' [Random Person Name Generator](https://www.vutools.com/tools/text/random-person-name-generator) (`client/src/app/[locale]/tools/text/random-person-name-generator` in the `www-vutools-com` repo), with the same options. Two deliberate differences: the web page's `es-hangul` dependency is replaced by an internal romanizer (see below), and length bounds are resolved per language so `language: 'all'` does not stretch a Korean name to fill a Spanish name's range.
+
+The nickname generator has no upstream — it is this repo's own. Its options mirror the name generator's where they mean the same thing (`language`, `count`, `style`, `minLength` / `maxLength`, `startsWith`, `unique`), and add `theme`, `includeModifier`, `baseWord` and the `uniqueSuffix*` group.
 
 ## Layout
 
@@ -19,7 +21,9 @@ The name generator is a port of the logic behind vutools' [Random Person Name Ge
 lib/
   index.ts                  # re-exports every category + the public types
   _types/global.ts          # ALL public types live here (options, results)
-  _internal/utils.ts        # shared random/string helpers, never exported
+  _internal/
+    utils.ts                # shared random/string helpers, never exported
+    parse.ts                # words() / tokens() / romanMap() dataset helpers
   name/
     index.ts                # the category's public surface
     randomName.ts           # public: string[]
@@ -32,11 +36,22 @@ lib/
     data/
       index.ts              # NAME_DATA, NAME_LANGUAGES, bounds
       types.ts              # internal dataset types
-      parse.ts              # words() / tokens() / romanMap() pool helpers
       syllables.ts          # syllable templates for invented names
       en.ts ko.ts ja.ts …   # one file per language
+  nickname/
+    index.ts
+    randomNickname.ts       # public: string[]
+    randomNicknameDetails.ts
+    nicknameLengthRange.ts  # public helper
+    nicknameGenerator.ts    # internal: shapes, length fitting, suffix
+    data/
+      index.ts              # NICKNAME_DATA, languages, themes, bounds
+      types.ts
+      en.ts ko.ts ja.ts zh.ts
 test/
+  base.test.ts              # the package's export surface
   name.test.ts              # one *.test.ts per category
+  nickname.test.ts
 ```
 
 ## Conventions
@@ -51,7 +66,7 @@ test/
 
 ### Datasets
 
-Pools are written as whitespace-separated strings inside a template literal and split by the helpers in `data/parse.ts`, so a 120-name pool stays a few lines instead of 120:
+Pools are written as whitespace-separated strings inside a template literal and split by the helpers in `_internal/parse.ts`, so a 120-name pool stays a few lines instead of 120:
 
 ```typescript
 male: words(`
@@ -88,6 +103,10 @@ Do not assert an exact generated name, and do not use a fixed seed — there is 
 
 Gender is the one option with no directly observable effect in most languages. It is verified through Russian, whose middle name and surname inflect for it (`…ович` / `…овна`, `Иванов` / `Иванова`).
 
+Nicknames are checked against the datasets themselves: `randomNicknameDetails` reports the `words` it used, so every word can be asserted to come from the language's pools, and the English pools are asserted to share nothing with the English person-name pools. Korean and Japanese cannot have that last invariant — `하늘`, `별` and `森` are everyday nouns that also happen to be names, and `아름다운하늘` is still nobody's name.
+
+Two coincidences are load-bearing and must not be asserted away: a word can be both a modifier and a noun (`무지개`, `Marble`, `自由`), and an invented word can spell a real one by accident (`나` + `비` -> `나비`, so `theme` comes back as `'animal'` at `style: 100`). Structural assertions survive both; "the first word is not a modifier" does not.
+
 ## Behavior worth knowing before changing it
 
 - **Structure beats length.** A length range too narrow for the requested parts is answered with the closest name the generator can build; it never drops a surname or middle name the caller asked for. For space-separated languages the range is satisfied by re-drawing up to `FIT_ATTEMPTS` times, so a very narrow range is best-effort. CJK hits it exactly.
@@ -96,7 +115,16 @@ Gender is the one option with no directly observable effect in most languages. I
 - **Length bounds are resolved per language** inside `generateOne`, not once per call. Keep it that way, or mixed-language output regresses.
 - **`givenLenWeights` stretching:** asking a CJK language for a range longer than its real names produces long invented given names on purpose. That is a deliberate ask, not a bug.
 
-## Adding a language
+Nicknames:
+
+- **Length picks the shape, not the words.** `PATTERNS` are filtered to the ones that can land inside the range, then each slot is given the room left after the slots behind it have reserved their minimum. That is why a narrow range drops the modifier instead of truncating a word.
+- **The default range is wide on purpose** (`nicknameLengthRange('ko')` is `[1, 12]`): it spans every shape, and the pattern weights — not the range — decide what output usually looks like.
+- **The unique suffix is outside the length range.** `minLength` / `maxLength` describe the readable part; the suffix is appended afterwards.
+- **`theme` is reported, not asserted.** A word drawn from a theme reports it, a given `baseWord` is looked up across all themes, and an invented word reports `null`.
+- **Two rough spots trigger a re-draw** rather than being shipped: a `startsWith` that no real word in the rolled theme matched (another theme probably has one), and a word ending on the character the next one starts with (`石霜` + `霜雨`). Both fall back to the closest attempt if every attempt is rough.
+- **Invented-word templates stay short.** Two or three syllables per word, because up to three words are joined; `en` is capped at two.
+
+## Adding a name language
 
 1. Add the code to `NameLanguage` in `lib/_types/global.ts`.
 2. Add `lib/name/data/<code>.ts` with a `NameLanguageData` object: name order, joiner (`''` for CJK, `' '` otherwise), `hasMiddle`, `roman` mode, `lengthSpec`, and the pools. CJK languages use `givenMale` / `givenFemale` plus `first*` / `rest*` syllables; other scripts use `male` / `female` / `last` plus a `syn` template.
@@ -104,6 +132,22 @@ Gender is the one option with no directly observable effect in most languages. I
 4. If it needs a new romanization mode, add it to `RomanMode` and handle it in `lib/name/romanize.ts`.
 5. `lengthSpec` must match reality — it is the default length range, and a wrong value shows up as padded or truncated names.
 6. Add the language to the README table and to the script regexes in `test/name.test.ts`; the existing per-language tests then cover it.
+
+## Adding a nickname language
+
+The four supported languages (`ko`, `en`, `ja`, `zh`) share one property: a modifier can sit in front of a noun exactly as it is written in the dictionary. **That is the bar for adding another one.** Italian, German, Russian, Spanish and Vietnamese are name languages but not nickname languages, and the reason is grammar, not effort:
+
+- Italian, Spanish, Russian and German inflect the modifier for the noun (`gatto azzurro` / `luna azzurra`, `blauer Wal` / `blaue Katze`). Supporting them means tagging every noun with its gender and storing every modifier once per gender — do that, or leave the language out. Half-agreement output is worse than none.
+- Vietnamese puts the modifier **after** the noun (`mèo xanh`) and reverses possessive compounds (`đuôi mèo`, not `mèo đuôi`), so it needs a word-order field on `NicknameLanguageData` before its pools are worth writing.
+
+To add one that clears the bar:
+
+1. Add the code to `NicknameLanguage` in `lib/_types/global.ts`.
+2. Add `lib/nickname/data/<code>.ts` with a `NicknameLanguageData` object: `joiner`, `capitalize`, `modifiers` in attributive form, `nouns` for all four themes, an optional `parts` pool, and a `syn` template (`kind: 'syllable'` for alphabetic scripts, `kind: 'pool'` where one character is one syllable).
+3. Register it in `NICKNAME_DATA` and `NICKNAME_LANGUAGES` in `lib/nickname/data/index.ts`.
+4. Leave `parts` out unless a bare noun-noun compound reads naturally — that is why `ja` and `zh` have none.
+5. Aim for 60+ nouns per theme; the pools are what make the output varied, and the combination count is roughly `modifiers × nouns × (1 + parts)`.
+6. No person names, and no word that is only a name. Add the language to the README tables and to `SCRIPT` in `test/nickname.test.ts`; the existing per-language tests then cover it.
 
 ## Commit conventions
 

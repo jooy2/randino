@@ -1,4 +1,4 @@
-import { words } from './parse.js';
+import { words } from '../../_internal/parse.js';
 import { GERMAN_SYLLABLES } from './syllables.js';
 import type { NameLanguageData } from './types.js';
 

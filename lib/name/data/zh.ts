@@ -1,4 +1,4 @@
-import { tokens } from './parse.js';
+import { tokens } from '../../_internal/parse.js';
 import type { NameLanguageData } from './types.js';
 
 export const ZH: NameLanguageData = {

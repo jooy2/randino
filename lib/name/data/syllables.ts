@@ -2,7 +2,7 @@
 // from these are invented rather than drawn from a pool, so they should read as
 // plausible for the language without matching anyone real.
 
-import { words } from './parse.js';
+import { words } from '../../_internal/parse.js';
 import type { SyllableSet } from './types.js';
 
 export const WESTERN_SYLLABLES: SyllableSet = {
