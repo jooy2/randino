@@ -1,0 +1,37 @@
+name: run-test-javascript
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+    paths:
+      - test/**
+      - lib/**
+      - package.json
+      - .github/workflows/run-test-javascript.yml
+  workflow_dispatch:
+
+jobs:
+  run-test-javascript:
+    runs-on: ${{ matrix.os }}
+    name: Test JavaScript ${{ matrix.node_version }} on ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        node_version: ['22', '24', '25']
+        os: [ubuntu-latest, windows-latest, macos-latest]
+
+    steps:
+      - uses: actions/checkout@v5
+        name: Setup Node.js ${{ matrix.node_version }}
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v6
+        with:
+          node-version: ${{ matrix.node_version }}
+          cache: npm
+          cache-dependency-path: '**/package-lock.json'
+      - run: npm ci
+      - name: Test module script (functions)
+        run: npm run test
