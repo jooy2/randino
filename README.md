@@ -21,7 +21,7 @@ npm install randnick
 import { randomName, randomNickname } from 'randnick';
 
 randomName({ language: 'ko', count: 3 });
-// ['변태윤', '원동혁', '조진우']
+// ['김태윤', '원동혁', '조진우']
 
 randomName({ language: 'en', gender: 'female', includeMiddleName: true });
 // ['Grace Amelia Bennett']
@@ -120,7 +120,7 @@ Whether `script: 'roman'` produces anything different from `script: 'native'`. O
 | Code | Language   | Name order   | Middle name      | Example                         |
 | ---- | ---------- | ------------ | ---------------- | ------------------------------- |
 | `en` | English    | given first  | yes              | Paisley Lewis                   |
-| `ko` | Korean     | family first | no               | 변태윤 → Byun Taeyun            |
+| `ko` | Korean     | family first | no               | 김태윤 → Kim Taeyun             |
 | `ja` | Japanese   | family first | no               | 山口直人 → Yamaguchi Naoto      |
 | `zh` | Chinese    | family first | no               | 赵勇轩 → Zhao Yongxuan          |
 | `it` | Italian    | given first  | yes              | Giorgia Mancini                 |
