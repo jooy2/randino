@@ -11,17 +11,22 @@ export const DE: NameLanguageData = {
 	male: words(`
 		Lukas Leon Finn Paul Jonas Elias Ben Noah Luis Felix Maximilian Julian Moritz
 		David Tim Jan Niklas Philipp Sebastian Alexander Michael Thomas Andreas Stefan
-		Martin Florian Matthias Daniel Christian Markus
+		Martin Florian Matthias Daniel Christian Markus Emil Anton Theo Oskar Jakob
+		Johannes Friedrich Wilhelm Heinrich Georg Konrad Ludwig Karl Otto Joachim Fabian
+		Linus Erik
 	`),
 	female: words(`
 		Mia Emma Hannah Emilia Sofia Lena Lea Marie Anna Laura Julia Sarah Lisa Katharina
 		Johanna Charlotte Clara Amelie Leonie Frida Greta Ida Melina Nele Paula Sophie
-		Antonia Helena Nora Maria
+		Antonia Helena Nora Maria Luisa Mathilda Theresa Elisabeth Ingrid Ursula Gisela
+		Renate Monika Petra Brigitte Christa Sabine Claudia Stefanie Franziska Magdalena
+		Annika
 	`),
 	last: words(`
 		Müller Schmidt Schneider Fischer Weber Meyer Wagner Becker Schulz Hoffmann Schäfer
 		Koch Bauer Richter Klein Wolf Schröder Neumann Schwarz Zimmermann Braun Krüger
-		Hofmann Hartmann Lange Werner Krause Lehmann Köhler Herrmann
+		Hofmann Hartmann Lange Werner Krause Lehmann Köhler Herrmann Schmitz Walter Meier
+		König Mayer Huber Kaiser Fuchs Peters Scholz Möller Jung Hahn Vogel Roth Berger
 	`),
 	syn: GERMAN_SYLLABLES
 };

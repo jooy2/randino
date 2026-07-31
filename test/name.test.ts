@@ -264,16 +264,18 @@ describe('Name', () => {
 
 		assert.strictEqual(new Set(names).size, names.length);
 		// Korean given names are a closed pool, so a request this large runs out of
-		// combinations and returns fewer names instead of looping forever.
+		// combinations and returns fewer names instead of looping forever. Keep the
+		// count comfortably above the pool, or growing the pool turns this into a
+		// failure that reads like a bug in `unique`.
 		const limited = randomName({
 			language: 'ko',
-			count: 400,
+			count: 800,
 			unique: true,
 			includeSurname: false
 		});
 
 		assert.strictEqual(new Set(limited).size, limited.length);
-		assert.ok(limited.length < 400, `expected the pool to run out: ${limited.length}`);
+		assert.ok(limited.length < 800, `expected the pool to run out: ${limited.length}`);
 	});
 
 	it('randomNameDetails reports both scripts and the choices made', () => {

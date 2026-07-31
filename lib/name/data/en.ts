@@ -19,6 +19,10 @@ export const EN: NameLanguageData = {
 		Blake Chase Drew Brett Colin Derek Eliot Finn Grant Hugh Ian Jared Kyle Lance
 		Mitchell Nash Perry Quentin Reid Seth Tyler Victor Walter Zachary Preston Spencer
 		Tristan Emmett Rowan Silas Declan Everett Beckett Rhys Callum Xavier Quinn
+		Anthony Joshua Brandon Emerson Dominic Cameron Austin Jordan Travis Douglas
+		Russell Raymond Philip Dennis Jerome Leonard Bernard Eugene Duncan Malcolm
+		Alistair Lachlan Rory Ronan Aidan Brendan Kieran Gavin Stuart Jonathan
+		Frederick Lawrence Wesley Garrett Ezra Sawyer Landon Easton Gideon Tobias
 	`),
 	female: words(`
 		Emma Olivia Ava Sophia Isabella Charlotte Amelia Mia Harper Evelyn Abigail Emily
@@ -31,6 +35,11 @@ export const EN: NameLanguageData = {
 		Nicole Amanda Melissa Jennifer Michelle Kimberly Amy Angela Heather Wendy Paula
 		Tessa Bonnie Sylvia Vera Nina Elsie Freya Maisie Rosie Edith Beatrix Gemma Imogen
 		Norah Opal Pearl Quinn Sienna Talia Ursula Verity Wren Ximena Yvonne Zara
+		Sophie Eleanor Natalie Kayla Brooke Danielle Stephanie Christina Veronica
+		Melanie Erica Joanna Beverly Marilyn Doris Gloria Irene Judith Louise Phoebe
+		Rosalie Matilda Harriet Florence Genevieve Cecilia Beatrice Miriam Marina
+		Sabrina Adelaide Arabella Bridget Cordelia Rosemary Holly Summer Autumn
+		Juniper Nadia
 	`),
 	last: words(`
 		Smith Johnson Williams Brown Jones Miller Davis Wilson Anderson Taylor Thomas
@@ -43,7 +52,10 @@ export const EN: NameLanguageData = {
 		Webb Simpson Stevens Tucker Porter Hunter Hicks Crawford Henry Boyd Mason Dixon
 		Fowler Grant Knight Lawson Newman Osborne Pearce Quinn Riley Sharp Todd Vaughn
 		Warren Barnes Chapman Dawson Freeman Gardner Holland Ingram Jennings Lambert
-		Mills Norton Owens Payne Reeves Shaw
+		Mills Norton Owens Payne Reeves Shaw Bryant Butler Coleman Doyle Ferguson
+		Fleming Gordon Hopkins Manning Mercer Nichols Norris Pearson Reynolds Sherman
+		Sutton Thornton Walton Whitaker Abbott Bradley Bishop Donovan Elliott Rhodes
+		Sinclair Walsh Yates Keller Tate
 	`),
 	syn: WESTERN_SYLLABLES
 };

@@ -133,7 +133,7 @@ Pass `'all'` (the default) to mix every language, one per name.
 
 ## How the name options behave
 
-**`style`** — At `0`, names are drawn from curated pools of real names. Toward `100` they are invented instead: Latin and Cyrillic scripts from syllable templates, Korean by combining given-name syllables freely. Values in between decide per name and per part, so `50` mixes real and invented names in one batch. Japanese and Chinese names are always composed from single characters, so `style` changes little for them.
+**`style`** — At `0`, names are drawn from curated pools of real names. Toward `100` they are invented instead: Latin and Cyrillic scripts from syllable templates, and Korean, Japanese and Chinese by combining given-name characters freely. Values in between decide per name and per part, so `50` mixes real and invented names in one batch.
 
 ```javascript
 randomName({ language: 'en', style: 100, count: 3 });
