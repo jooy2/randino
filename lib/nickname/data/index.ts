@@ -11,7 +11,17 @@ import { ZH } from './zh.js';
 export const NICKNAME_LANGUAGES: readonly NicknameLanguage[] = ['en', 'ko', 'ja', 'zh'];
 
 // What a nickname can be about. Person names are deliberately absent.
-export const NICKNAME_THEMES: readonly NicknameTheme[] = ['animal', 'object', 'nature', 'concept'];
+export const NICKNAME_THEMES: readonly NicknameTheme[] = [
+	'animal',
+	'object',
+	'nature',
+	'concept',
+	'place',
+	'food',
+	'sport',
+	'vehicle',
+	'product'
+];
 
 export const NICKNAME_DATA: Record<NicknameLanguage, NicknameLanguageData> = {
 	en: EN,

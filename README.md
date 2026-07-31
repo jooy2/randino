@@ -155,14 +155,14 @@ randomName({ language: 'ko', style: 100, count: 3 });
 
 # Nicknames
 
-A nickname is an everyday word with something added to it: a modifier in front (`멋진사자`), a second word behind (`고양이꼬리`), or both (`파란고양이발바닥`). The words are animals, things, nature and ideas — **person names are never used**, which is what keeps a nickname from reading like one.
+A nickname is an everyday word with something added to it: a modifier in front (`멋진사자`), a second word behind (`고양이꼬리`), or both (`파란고양이발바닥`). The words are animals, things, nature, ideas, places, food, sports, vehicles and products — **person names are never used**, which is what keeps a nickname from reading like one.
 
 ## `randomNickname(options?): string[]`
 
 | Option | Type | Default | Description |
 | --- | --- | --- | --- |
 | `language` | `NicknameLanguageOption` | `'all'` | Language of the generated nicknames. `'all'` mixes every supported language, picking one per nickname. |
-| `theme` | `NicknameThemeOption` | `'all'` | What the nickname is about: `'animal'`, `'object'`, `'nature'`, `'concept'`, or `'all'`. |
+| `theme` | `NicknameThemeOption` | `'all'` | What the nickname is about: `'animal'`, `'object'`, `'nature'`, `'concept'`, `'place'`, `'food'`, `'sport'`, `'vehicle'`, `'product'`, or `'all'`. |
 | `count` | `number` | `1` | How many nicknames to return. Clamped to `0` … `10000` (`NICKNAME_COUNT_MAX`). |
 | `style` | `number` | `0` | `0` uses real words, `100` invents words that only read like the language, and anything between mixes the two. |
 | `minLength` | `number` | _language_ | Minimum length in characters, the unique suffix **not** counted. Defaults to `nicknameLengthRange`. |
@@ -244,12 +244,17 @@ Nicknames cover fewer languages than names. Joining a modifier to a noun only re
 
 Japanese and Chinese use the modifier shapes only: a noun-noun compound in those languages needs a particle, or reads as garbled once the base word is abstract.
 
-| Theme       | What it holds                        | Korean       | English    |
-| ----------- | ------------------------------------ | ------------ | ---------- |
-| `'animal'`  | animals                              | 사자, 고양이 | Lion, Cat  |
-| `'object'`  | things within reach                  | 물병, 우산   | Bottle     |
-| `'nature'`  | nature and its phenomena             | 하늘, 노을   | Sky, Dawn  |
-| `'concept'` | terms, and ideas from the humanities | 철학, 자유   | Philosophy |
+| Theme       | What it holds                        | Korean         | English          |
+| ----------- | ------------------------------------ | -------------- | ---------------- |
+| `'animal'`  | animals                              | 사자, 고양이   | Lion, Cat        |
+| `'object'`  | things within reach                  | 물병, 우산     | Bottle           |
+| `'nature'`  | nature and its phenomena             | 하늘, 노을     | Sky, Dawn        |
+| `'concept'` | terms, and ideas from the humanities | 철학, 자유     | Philosophy       |
+| `'place'`   | places you can walk into or up to    | 등대, 골목     | Lighthouse       |
+| `'food'`    | food and drink                       | 떡볶이, 녹차   | Dumpling, Cocoa  |
+| `'sport'`   | sports, and what they are played for | 양궁, 트로피   | Archery, Trophy  |
+| `'vehicle'` | things that carry you                | 열기구, 전차   | Airship, Tramcar |
+| `'product'` | things you buy                       | 이어폰, 냉장고 | Earbuds, Toaster |
 
 ## How the nickname options behave
 

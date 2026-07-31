@@ -69,10 +69,12 @@ export type NicknameLanguageOption = NicknameLanguage | 'all';
 
 /**
  * What a nickname is about — animals (`사자`), everyday things (`물병`), nature
- * and its phenomena (`노을`), or ideas from the humanities and social world
- * (`철학`). Person names are never used.
+ * and its phenomena (`노을`), ideas from the humanities and social world (`철학`),
+ * places (`등대`), food (`떡볶이`), sports (`양궁`), things that carry you
+ * (`열기구`), or things you buy (`이어폰`). Person names are never used.
  */
-export type NicknameTheme = 'animal' | 'object' | 'nature' | 'concept';
+export type NicknameTheme =
+	'animal' | 'object' | 'nature' | 'concept' | 'place' | 'food' | 'sport' | 'vehicle' | 'product';
 
 /** `'all'` draws from every theme. */
 export type NicknameThemeOption = NicknameTheme | 'all';

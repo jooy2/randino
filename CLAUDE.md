@@ -143,11 +143,21 @@ The four supported languages (`ko`, `en`, `ja`, `zh`) share one property: a modi
 To add one that clears the bar:
 
 1. Add the code to `NicknameLanguage` in `lib/_types/global.ts`.
-2. Add `lib/nickname/data/<code>.ts` with a `NicknameLanguageData` object: `joiner`, `capitalize`, `modifiers` in attributive form, `nouns` for all four themes, an optional `parts` pool, and a `syn` template (`kind: 'syllable'` for alphabetic scripts, `kind: 'pool'` where one character is one syllable).
+2. Add `lib/nickname/data/<code>.ts` with a `NicknameLanguageData` object: `joiner`, `capitalize`, `modifiers` in attributive form, `nouns` for every theme in `NICKNAME_THEMES`, an optional `parts` pool, and a `syn` template (`kind: 'syllable'` for alphabetic scripts, `kind: 'pool'` where one character is one syllable).
 3. Register it in `NICKNAME_DATA` and `NICKNAME_LANGUAGES` in `lib/nickname/data/index.ts`.
 4. Leave `parts` out unless a bare noun-noun compound reads naturally — that is why `ja` and `zh` have none.
-5. Aim for 60+ nouns per theme; the pools are what make the output varied, and the combination count is roughly `modifiers × nouns × (1 + parts)`.
+5. Aim for 60+ nouns per theme; the pools are what make the output varied, and the combination count is roughly `modifiers × nouns × (1 + parts)`. `vehicle` and `product` are the exception — the world holds fewer of those words, and padding them with near-synonyms reads worse than a shorter pool.
 6. No person names, and no word that is only a name. Add the language to the README tables and to `SCRIPT` in `test/nickname.test.ts`; the existing per-language tests then cover it.
+
+## Adding a nickname theme
+
+A theme is a slice of everyday vocabulary that a modifier can sit in front of. Adding one touches every language at once, because `nouns` is a `Record<NicknameTheme, WordPool>` — the type will not let a language skip it.
+
+1. Add the name to `NicknameTheme` in `lib/_types/global.ts` and to `NICKNAME_THEMES` in `lib/nickname/data/index.ts`.
+2. Add the pool to **all four** languages. A theme that only one language can fill is not a theme.
+3. **Themes have to be disjoint.** A word in two of them makes `theme` ambiguous for `baseWord`, and it makes `randomNicknameDetails` report a theme the caller did not ask about. When a new theme claims a word an old one already holds, move it rather than copy it — `place` took the twelve places that were sitting in `concept`, and `vehicle` took 자전거 / 기차 / 배 out of `object`.
+4. Watch the word lengths. `nicknameLengthRange` is derived from the shortest and longest word in the pools, and `test/nickname.test.ts` pins three of its values, so a Chinese noun outside 2–3 characters or a Korean one outside 1–4 changes a number the tests assert by value.
+5. Update the theme table in `README.md` and the doc comment on `NicknameTheme`. The existing per-theme tests cover the new theme as soon as it is in `NICKNAME_THEMES`.
 
 ## Commit conventions
 
