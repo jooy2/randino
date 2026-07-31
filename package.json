@@ -1,7 +1,7 @@
 {
 	"name": "randnick",
 	"type": "module",
-	"version": "1.0.0",
+	"version": "1.0.1",
 	"description": "randnick generates random person names and nicknames in the language you ask for. Zero dependencies, ready for both Node and the browser.",
 	"author": "CDGet <jooy2.contact@gmail.com>",
 	"license": "MIT",

@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.1 (2026-07-31)
+
+- Add more names and nickname sets
+
 ## 1.0.0 (2026-07-30)
 
 - Initial release
