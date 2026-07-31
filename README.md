@@ -5,7 +5,7 @@
 **randnick** generates random person names and nicknames in the language you ask for.
 
 - **Person names** read like names people actually carry — 김민준, Emma Clover, Иванов Иван — and come with their English pronunciation. 9 languages.
-- **Nicknames** are the handles you would pick for a game or a website — 멋진사자, MistyOwl, 고양이꼬리. Built from everyday words, never from person names, with more than two million combinations before the unique suffix is added.
+- **Nicknames** are the handles you would pick for a game or a website — 멋진사자, MistyOwl, 고양이꼬리. Built from everyday words across nine themes, never from person names, with close to three million combinations in Korean and English before the unique suffix is added.
 - One options object per generator: language, length, count, and a style setting that runs from realistic to fully invented.
 - No runtime dependencies. Works in Node and in the browser.
 
@@ -250,7 +250,7 @@ Japanese and Chinese use the modifier shapes only: a noun-noun compound in those
 | `'object'`  | things within reach                  | 물병, 우산     | Bottle           |
 | `'nature'`  | nature and its phenomena             | 하늘, 노을     | Sky, Dawn        |
 | `'concept'` | terms, and ideas from the humanities | 철학, 자유     | Philosophy       |
-| `'place'`   | places you can walk into or up to    | 등대, 골목     | Lighthouse       |
+| `'place'`   | places you can walk into or up to    | 광장, 골목     | Lighthouse       |
 | `'food'`    | food and drink                       | 떡볶이, 녹차   | Dumpling, Cocoa  |
 | `'sport'`   | sports, and what they are played for | 양궁, 트로피   | Archery, Trophy  |
 | `'vehicle'` | things that carry you                | 열기구, 전차   | Airship, Tramcar |
@@ -306,7 +306,7 @@ randomNickname({ language: 'en', style: 100, count: 3 });
 
 **`startsWith`** — Applies to the first character of the nickname, which is the modifier when there is one. A character no real word starts with is answered with an invented word rather than nothing (`Z` → `ZeegrellSunflower`).
 
-**`unique`** — Off by default, so `randomNickname` returns exactly `count` nicknames. Korean and English have over a million word combinations each, so duplicates are rare either way; turn `unique` on to rule them out, or `uniqueSuffix` on to make collisions impossible.
+**`unique`** — Off by default, so `randomNickname` returns exactly `count` nicknames. Korean and English have close to three million word combinations each, so duplicates are rare either way; turn `unique` on to rule them out, or `uniqueSuffix` on to make collisions impossible.
 
 ---
 

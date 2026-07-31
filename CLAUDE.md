@@ -80,14 +80,16 @@ last: tokens('佐藤:Sato 鈴木:Suzuki')
 
 ## Commands
 
-| Command          | What it does                                                           |
-| ---------------- | ---------------------------------------------------------------------- |
-| `npm run test`   | `tsc` (type-check + emit to `dist`), then `node --test` over `test/**` |
-| `npm run build`  | `format` → `tsc` → `minify`                                            |
-| `npm run lint`   | ESLint (`lint:fix` to fix)                                             |
-| `npm run format` | Prettier, in place                                                     |
+| Command          | What it does                                                        |
+| ---------------- | ------------------------------------------------------------------- |
+| `npm run test`   | `tsc` (emit to `dist`), then `node --test` over `test/**` via `tsx` |
+| `npm run build`  | `format` → `tsc` → `minify`                                         |
+| `npm run lint`   | ESLint (`lint:fix` to fix)                                          |
+| `npm run format` | Prettier, in place                                                  |
 
-Tests import from `../dist`, so **they need a build** — that is what `npm run test` does first. Node >= 18.
+The tests are TypeScript but import from `../dist`, so they are run through `tsx` and **they need a build** — that is what `npm run test` does first. Node >= 18.
+
+Only `dist/` and the top-level `README.md` / `LICENSE` are published; `.npmignore` keeps `lib/`, `test/`, the config files and the remaining markdown out of the package.
 
 ## Testing a random generator
 
@@ -146,7 +148,7 @@ To add one that clears the bar:
 2. Add `lib/nickname/data/<code>.ts` with a `NicknameLanguageData` object: `joiner`, `capitalize`, `modifiers` in attributive form, `nouns` for every theme in `NICKNAME_THEMES`, an optional `parts` pool, and a `syn` template (`kind: 'syllable'` for alphabetic scripts, `kind: 'pool'` where one character is one syllable).
 3. Register it in `NICKNAME_DATA` and `NICKNAME_LANGUAGES` in `lib/nickname/data/index.ts`.
 4. Leave `parts` out unless a bare noun-noun compound reads naturally — that is why `ja` and `zh` have none.
-5. Aim for 60+ nouns per theme; the pools are what make the output varied, and the combination count is roughly `modifiers × nouns × (1 + parts)`. `vehicle` and `product` are the exception — the world holds fewer of those words, and padding them with near-synonyms reads worse than a shorter pool.
+5. Aim for 60+ nouns per theme; the pools are what make the output varied, and the combination count is roughly `modifiers × nouns × (1 + parts)` — around 2.9M for `ko` and `en`, 43K for `ja` and `zh`, which have no `parts`. `sport`, `vehicle` and `product` are the exception (roughly 48 / 43 / 36 words) — the world holds fewer of those, and padding them with near-synonyms reads worse than a shorter pool.
 6. No person names, and no word that is only a name. Add the language to the README tables and to `SCRIPT` in `test/nickname.test.ts`; the existing per-language tests then cover it.
 
 ## Adding a nickname theme
@@ -162,3 +164,5 @@ A theme is a slice of everyday vocabulary that a modifier can sit in front of. A
 ## Commit conventions
 
 `tag: message`, Udacity Git style tags: `feat`, `fix`, `docs`, `style`, `refactor`, `test`, `chore`, plus informal `package` (deps/config) and `typo`. Write in English, wrap identifiers and paths in backticks, one logical change per commit. Example: `feat: add \`randomNickname\` method`.
+
+A release is its own commit, `bump version to \`x.y.z\``, and touches `package.json`, the lockfiles and `CHANGELOG.md` — one bullet per user-visible change, newest version on top, dated. Nothing else belongs in it.
