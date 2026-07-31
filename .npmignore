@@ -13,6 +13,7 @@ CODE_OF_CONDUCT.md
 CONTRIBUTING.md
 CHANGELOG.md
 SECURITY.md
+CLAUDE.md
 
 .git/
 terser.config.json
