@@ -9,6 +9,29 @@
 - One options object per generator: language, length, count, and a style setting that runs from realistic to fully invented.
 - No runtime dependencies. Works in Node and in the browser.
 
+## Table of contents
+
+- [Installation](#installation)
+- [Quick start](#quick-start)
+- [Supported languages](#supported-languages)
+- [Person names](#person-names)
+  - [`randomName`](#randomnameoptions-string)
+  - [`randomNameDetails`](#randomnamedetailsoptions-namedetail)
+  - [`nameLengthRange`](#namelengthrangelanguage-includesurname-includemiddlename-number-number)
+  - [`nameSupportsMiddleName`](#namesupportsmiddlenamelanguage-boolean)
+  - [`nameSupportsRoman`](#namesupportsromanlanguage-boolean)
+  - [Name languages](#name-languages)
+  - [How the name options behave](#how-the-name-options-behave)
+- [Nicknames](#nicknames)
+  - [`randomNickname`](#randomnicknameoptions-string)
+  - [`randomNicknameDetails`](#randomnicknamedetailsoptions-nicknamedetail)
+  - [`nicknameLengthRange`](#nicknamelengthrangelanguage-includemodifier-number-number)
+  - [Nickname languages and themes](#nickname-languages-and-themes)
+  - [How the nickname options behave](#how-the-nickname-options-behave)
+- [Constants](#constants)
+- [Contributing](#contributing)
+- [License](#license)
+
 ## Installation
 
 ```bash
