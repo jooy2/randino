@@ -36,6 +36,37 @@ randomNickname({ baseWord: '고양이', count: 3 });
 // ['하얀고양이', '고양이바람', '귀여운고양이뿔']
 ```
 
+## Supported languages
+
+Every method takes a language code in its `language` option, or `'all'` (the default) to mix every language the method supports, picking one per result. The two generators do not cover the same set — see [Nickname languages and themes](#nickname-languages-and-themes) for why.
+
+| Code | Language   | Native     | Person names | Nicknames |
+| ---- | ---------- | ---------- | :----------: | :-------: |
+| `en` | English    | English    |      ✅      |    ✅     |
+| `ko` | Korean     | 한국어     |      ✅      |    ✅     |
+| `ja` | Japanese   | 日本語     |      ✅      |    ✅     |
+| `zh` | Chinese    | 中文       |      ✅      |    ✅     |
+| `it` | Italian    | Italiano   |      ✅      |    ❌     |
+| `de` | German     | Deutsch    |      ✅      |    ❌     |
+| `ru` | Russian    | Русский    |      ✅      |    ❌     |
+| `es` | Spanish    | Español    |      ✅      |    ❌     |
+| `vi` | Vietnamese | Tiếng Việt |      ✅      |    ❌     |
+
+Per method:
+
+| Method | Type | Supported languages |
+| --- | --- | --- |
+| [`randomName`](#randomnameoptions-string) | `NameLanguageOption` | `en` `ko` `ja` `zh` `it` `de` `ru` `es` `vi` — or `all` |
+| [`randomNameDetails`](#randomnamedetailsoptions-namedetail) | `NameLanguageOption` | `en` `ko` `ja` `zh` `it` `de` `ru` `es` `vi` — or `all` |
+| [`nameLengthRange`](#namelengthrangelanguage-includesurname-includemiddlename-number-number) | `NameLanguage` | `en` `ko` `ja` `zh` `it` `de` `ru` `es` `vi` |
+| [`nameSupportsMiddleName`](#namesupportsmiddlenamelanguage-boolean) | `NameLanguage` | `en` `ko` `ja` `zh` `it` `de` `ru` `es` `vi` |
+| [`nameSupportsRoman`](#namesupportsromanlanguage-boolean) | `NameLanguage` | `en` `ko` `ja` `zh` `it` `de` `ru` `es` `vi` |
+| [`randomNickname`](#randomnicknameoptions-string) | `NicknameLanguageOption` | `en` `ko` `ja` `zh` — or `all` |
+| [`randomNicknameDetails`](#randomnicknamedetailsoptions-nicknamedetail) | `NicknameLanguageOption` | `en` `ko` `ja` `zh` — or `all` |
+| [`nicknameLengthRange`](#nicknamelengthrangelanguage-includemodifier-number-number) | `NicknameLanguage` | `en` `ko` `ja` `zh` |
+
+The codes are also available at runtime as `NAME_LANGUAGES` and `NICKNAME_LANGUAGES`.
+
 ---
 
 # Person names
