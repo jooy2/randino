@@ -149,7 +149,7 @@ To add one that clears the bar:
 3. Register it in `NICKNAME_DATA` and `NICKNAME_LANGUAGES` in `lib/nickname/data/index.ts`.
 4. Leave `parts` out unless a bare noun-noun compound reads naturally — that is why `ja` and `zh` have none.
 5. Aim for 60+ nouns per theme; the pools are what make the output varied, and the combination count is roughly `modifiers × nouns × (1 + parts)` — around 2.9M for `ko` and `en`, 43K for `ja` and `zh`, which have no `parts`. `sport`, `vehicle` and `product` are the exception (roughly 48 / 43 / 36 words) — the world holds fewer of those, and padding them with near-synonyms reads worse than a shorter pool.
-6. No person names, and no word that is only a name. Add the language to the README tables and to `SCRIPT` in `test/nickname.test.ts`; the existing per-language tests then cover it.
+6. No person names, and no word that is only a name — for `en` this is enforced against the person-name pools, which is why `job` has no `Knight`, `Baker` or `Hunter` and `plant` no `Rose` or `Ivy`. Add the language to the README tables and to `SCRIPT` in `test/nickname.test.ts`; the existing per-language tests then cover it.
 
 ## Adding a nickname theme
 
@@ -157,7 +157,7 @@ A theme is a slice of everyday vocabulary that a modifier can sit in front of. A
 
 1. Add the name to `NicknameTheme` in `lib/_types/global.ts` and to `NICKNAME_THEMES` in `lib/nickname/data/index.ts`.
 2. Add the pool to **all four** languages. A theme that only one language can fill is not a theme.
-3. **Themes have to be disjoint.** A word in two of them makes `theme` ambiguous for `baseWord`, and it makes `randomNicknameDetails` report a theme the caller did not ask about. When a new theme claims a word an old one already holds, move it rather than copy it — `place` took the twelve places that were sitting in `concept`, and `vehicle` took 자전거 / 기차 / 배 out of `object`.
+3. **Themes have to be disjoint**, and `test/nickname.test.ts` asserts it. A word in two of them makes `theme` ambiguous for `baseWord`, and it makes `randomNicknameDetails` report a theme the caller did not ask about. When a new theme claims a word an old one already holds, move it rather than copy it — `place` took the twelve places that were sitting in `concept`, `vehicle` took 자전거 / 기차 / 배 out of `object`, `plant` took the flowers and trees out of `nature`, and `music` took the instruments out of `object` and 리듬 / 선율 / 화음 out of `concept`. Where the two senses are genuinely different words, rename instead of moving: the English toy became `Marbles` so `gem` could keep `Marble`.
 4. Watch the word lengths. `nicknameLengthRange` is derived from the shortest and longest word in the pools, and `test/nickname.test.ts` pins three of its values, so a Chinese noun outside 2–3 characters or a Korean one outside 1–4 changes a number the tests assert by value.
 5. Update the theme table in `README.md` and the doc comment on `NicknameTheme`. The existing per-theme tests cover the new theme as soon as it is in `NICKNAME_THEMES`.
 

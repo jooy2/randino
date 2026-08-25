@@ -5,7 +5,7 @@
 **randnick** generates random person names and nicknames in the language you ask for.
 
 - **Person names** read like names people actually carry — 김민준, Emma Clover, Иванов Иван — and come with their English pronunciation. 9 languages.
-- **Nicknames** are the handles you would pick for a game or a website — 멋진사자, MistyOwl, 고양이꼬리. Built from everyday words across nine themes, never from person names, with close to three million combinations in Korean and English before the unique suffix is added.
+- **Nicknames** are the handles you would pick for a game or a website — 멋진사자, MistyOwl, 고양이꼬리. Built from everyday words across fourteen themes, never from person names, with close to three million combinations in Korean and English before the unique suffix is added.
 - One options object per generator: language, length, count, and a style setting that runs from realistic to fully invented.
 - No runtime dependencies. Works in Node and in the browser.
 
@@ -216,7 +216,7 @@ A nickname is an everyday word with something added to it: a modifier in front (
 | Option | Type | Default | Description |
 | --- | --- | --- | --- |
 | `language` | `NicknameLanguageOption` | `'all'` | Language of the generated nicknames. `'all'` mixes every supported language, picking one per nickname. |
-| `theme` | `NicknameThemeOption` | `'all'` | What the nickname is about: `'animal'`, `'object'`, `'nature'`, `'concept'`, `'place'`, `'food'`, `'sport'`, `'vehicle'`, `'product'`, or `'all'`. |
+| `theme` | `NicknameThemeOption` | `'all'` | What the nickname is about: `'animal'`, `'object'`, `'nature'`, `'plant'`, `'gem'`, `'concept'`, `'myth'`, `'job'`, `'music'`, `'place'`, `'food'`, `'sport'`, `'vehicle'`, `'product'`, or `'all'`. |
 | `count` | `number` | `1` | How many nicknames to return. Clamped to `0` … `10000` (`NICKNAME_COUNT_MAX`). |
 | `style` | `number` | `0` | `0` uses real words, `100` invents words that only read like the language, and anything between mixes the two. |
 | `minLength` | `number` | _language_ | Minimum length in characters, the unique suffix **not** counted. Defaults to `nicknameLengthRange`. |
@@ -298,17 +298,22 @@ Nicknames cover fewer languages than names. Joining a modifier to a noun only re
 
 Japanese and Chinese use the modifier shapes only: a noun-noun compound in those languages needs a particle, or reads as garbled once the base word is abstract.
 
-| Theme       | What it holds                        | Korean         | English          |
-| ----------- | ------------------------------------ | -------------- | ---------------- |
-| `'animal'`  | animals                              | 사자, 고양이   | Lion, Cat        |
-| `'object'`  | things within reach                  | 물병, 우산     | Bottle           |
-| `'nature'`  | nature and its phenomena             | 하늘, 노을     | Sky, Dawn        |
-| `'concept'` | terms, and ideas from the humanities | 철학, 자유     | Philosophy       |
-| `'place'`   | places you can walk into or up to    | 광장, 골목     | Lighthouse       |
-| `'food'`    | food and drink                       | 떡볶이, 녹차   | Dumpling, Cocoa  |
-| `'sport'`   | sports, and what they are played for | 양궁, 트로피   | Archery, Trophy  |
-| `'vehicle'` | things that carry you                | 열기구, 전차   | Airship, Tramcar |
-| `'product'` | things you buy                       | 이어폰, 냉장고 | Earbuds, Toaster |
+| Theme       | What it holds                        | Korean           | English            |
+| ----------- | ------------------------------------ | ---------------- | ------------------ |
+| `'animal'`  | animals                              | 사자, 고양이     | Lion, Cat          |
+| `'object'`  | things within reach                  | 물병, 우산       | Bottle             |
+| `'nature'`  | nature and its phenomena             | 하늘, 노을       | Sky, Dawn          |
+| `'plant'`   | plants, and their parts              | 민들레, 솔방울   | Dandelion, Acorn   |
+| `'gem'`     | stones, metals and gems              | 흑요석, 청동     | Obsidian, Bronze   |
+| `'concept'` | terms, and ideas from the humanities | 철학, 자유       | Philosophy         |
+| `'myth'`    | creatures and things out of myth     | 구미호, 불사조   | Phoenix, Rune      |
+| `'job'`     | the trades and roles people hold     | 대장장이, 항해사 | Blacksmith, Archer |
+| `'music'`   | instruments, forms and terms         | 교향곡, 거문고   | Cello, Sonata      |
+| `'place'`   | places you can walk into or up to    | 광장, 골목       | Lighthouse         |
+| `'food'`    | food and drink                       | 떡볶이, 녹차     | Dumpling, Cocoa    |
+| `'sport'`   | sports, and what they are played for | 양궁, 트로피     | Archery, Trophy    |
+| `'vehicle'` | things that carry you                | 열기구, 전차     | Airship, Tramcar   |
+| `'product'` | things you buy                       | 이어폰, 냉장고   | Earbuds, Toaster   |
 
 ## How the nickname options behave
 

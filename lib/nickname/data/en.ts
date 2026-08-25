@@ -29,32 +29,78 @@ export const EN: NicknameLanguageData = {
 			Bottle Pencil Eraser Umbrella Lantern Lamp Clock Mirror Keyring Padlock Satchel
 			Cap Boot Glove Scarf Goggles Bangle Button Needle Thread Scissors Brush Paint
 			Paper Notebook Bookmark Letter Postcard Postage Compass Atlas Telescope
-			Microscope Camera Reel Radio Gramophone Piano Guitar Fiddle Drum Chime Balloon
-			Kite Spindle Marble Dice Card Puzzle Blocks Sail Anchor
+			Microscope Camera Reel Radio Gramophone Balloon
+			Kite Spindle Marbles Dice Card Puzzle Blocks Sail Anchor
 			Beacon Tent Backpack Bedroll Torch Matchbox Candle Flowerpot Kettle Teacup
 			Spoon Plate Saucepan Hatchet Shovel Handsaw Ladder Cogwheel Mainspring Magnet
 			Ribbon Envelope Cushion Quilt Basket Broom Whistle Knot Bucket Anvil Bellows
-			Chisel Easel Flask Goblet Hourglass Inkwell Mandolin Quiver Sundial Parasol
+			Chisel Easel Flask Goblet Hourglass Inkwell Quiver Sundial Parasol
 		`),
 		nature: words(`
 			Sky Cloud Breeze Rain Snow Frost Icicle Mist Dewdrop Rainbow Sunset Sunrise Dawn
 			Dusk Star Moon Galaxy Comet Meteor Lightning Thunder Downpour Monsoon Typhoon
 			Whirlwind Wave Tide Ocean River Lake Waterfall Ravine Mountain Hillside Meadow
-			Forest Treetop Leaf Blossom Petal Rootlet Seedling Berry Moss Fern Bamboo
-			Pinecone Maple Dandelion Sunflower Cavern Desert Sandbank Boulder Pebble
+			Forest Cavern Desert Sandbank Boulder Pebble
 			Volcano Earthquake Ember Cinder Glacier Reef Marshland Prairie Canyon Echo
 			Shadow Zephyr Squall Drizzle Snowdrift Avalanche Tundra Oasis Lagoon Geyser
-			Plateau Thicket Driftwood
+			Plateau Driftwood
+		`),
+		plant: words(`
+			Treetop Leaf Blossom Petal Rootlet Seedling Berry Moss Fern Bamboo Pinecone
+			Maple Dandelion Sunflower Thicket Lotus Orchid Tulip Peony Camellia Magnolia
+			Azalea Hyacinth Daffodil Snowdrop Bluebell Foxglove Marigold Lavender Primrose
+			Buttercup Cowslip Columbine Larkspur Wisteria Begonia Petunia Zinnia Dahlia
+			Anemone Crocus Freesia Gardenia Birch Cedar Pine Oak Elm Beech Alder Poplar
+			Aspen Cypress Sequoia Sycamore Hawthorn Acorn Chestnut Walnut Sprout Sapling
+			Stalk Stem Twig Bark Bud Pollen Nectar Frond Cactus Toadstool Lichen Seaweed
+			Kelp Bonsai Hedge Shrub Bramble Thistle Bulrush Sedge Vine Nettle
+		`),
+		gem: words(`
+			Gold Silver Copper Iron Steel Bronze Brass Tin Zinc Nickel Platinum Titanium
+			Quartz Amethyst Crystal Topaz Garnet Sapphire Emerald Jade Onyx Obsidian Marble
+			Granite Limestone Sandstone Slate Basalt Flint Amber Coral Ivory Agate Carnelian
+			Peridot Zircon Turquoise Malachite Lapis Mica Pyrite Gypsum Chalk Ore Nugget
+			Gemstone Geode Meteorite Diamond Prism Alloy Ingot
 		`),
 		concept: words(`
-			Freedom Peace Justice Truth Wisdom Courage Memory Daydream Story Poem Ballad
-			Waltz Sketch Grammar Logic Physics Chemistry Biology Philosophy Mathematics
+			Freedom Peace Justice Truth Wisdom Courage Memory Daydream Story Poem
+			Sketch Grammar Logic Physics Chemistry Biology Philosophy Mathematics
 			Geometry Algebra History Myth Legend Fable Proverb Riddle Secret Promise
 			Friendship Journey Adventure Voyage Discovery Experiment Question Answer Debate
 			Council Festival Holiday Season Moment Eternity Universe Dimension Balance
-			Harmony Rhythm Melody Chord Palette Contrast Ritual Custom Culture Language
+			Harmony Palette Contrast Ritual Custom Culture Language
 			Alphabet Cipher Archive Almanac Calendar Curiosity Solitude Nostalgia Reverie
-			Paradox Enigma Lullaby Odyssey Symmetry Spectrum Horizon Sanctuary
+			Paradox Enigma Odyssey Symmetry Spectrum Horizon Sanctuary
+		`),
+		myth: words(`
+			Dragon Wyvern Phoenix Griffin Chimera Hydra Golem Orc Goblin Troll Elf Dwarf
+			Fairy Pixie Sprite Nymph Siren Mermaid Kraken Basilisk Cockatrice Manticore
+			Minotaur Centaur Satyr Cyclops Titan Ogre Imp Demon Angel Seraph Wraith Ghost
+			Phantom Specter Banshee Vampire Werewolf Zombie Mummy Gargoyle Unicorn Pegasus
+			Sphinx Djinn Genie Leviathan Behemoth Thunderbird Yeti Spell Curse Hex Rune
+			Amulet Talisman Grimoire Potion Oracle Prophecy Sorcery Enchantment Revenant
+			Lich Witch
+		`),
+		job: words(`
+			Wizard Sorcerer Ranger Thief Rogue Pirate Sailor Captain Chef Gardener
+			Blacksmith Detective Poet Painter Dancer Jester Clown Wanderer Pilgrim Monk
+			Alchemist Archer Swordsman Warrior Soldier Guard Sentinel Warden Guardian Queen
+			Prince Princess Emperor Steward Servant Maid Merchant Trader Farmer Angler
+			Shepherd Woodcutter Ferryman Coachman Navigator Pilot Engineer Courier Janitor
+			Firefighter Officer Doctor Nurse Pharmacist Teacher Student Librarian Reporter
+			Writer Editor Translator Singer Actor Director Minstrel Miner Carpenter Potter
+			Tailor Weaver Seer Prophet Priest Shaman Scholar Inventor Explorer Traveler
+			Athlete Referee Juggler Acrobat Sculptor Paladin Cavalier Squire Crusader
+			Herald Scribe Barkeep Innkeeper Huntsman Stonecutter
+		`),
+		music: words(`
+			Piano Guitar Fiddle Drum Chime Mandolin Melody Rhythm Chord Ballad Waltz
+			Lullaby Flute Piccolo Clarinet Oboe Bassoon Trumpet Trombone Tuba Saxophone
+			Harp Cello Viola Violin Banjo Ukulele Accordion Harmonica Xylophone Marimba
+			Tambourine Maracas Cymbal Bagpipe Organ Kalimba Sitar Lute Lyre Zither Ocarina
+			Bugle Sonata Symphony Concerto Overture Prelude Interlude Refrain Chorus Anthem
+			Serenade Nocturne Rhapsody Etude Fugue Octave Tempo Cadence Crescendo Staccato
+			Encore Duet Trio Quartet Songbook
 		`),
 		place: words(`
 			Market Plaza Metropolis Village Alleyway Bridge Garden Library Museum Theater
@@ -79,7 +125,7 @@ export const EN: NicknameLanguageData = {
 			Golf Bowling Billiards Swimming Athletics Marathon Sprint Gymnastics Taekwondo
 			Judo Karate Kendo Boxing Wrestling Fencing Archery Shooting Equestrian Rowing
 			Canoeing Sailing Surfing Skiing Snowboard Hockey Rugby Cricket Cycling Climbing
-			Racket Goalpost Medal Trophy Podium Referee Athlete Playoff Overtime Champion
+			Racket Goalpost Medal Trophy Podium Playoff Overtime Champion
 		`),
 		vehicle: words(`
 			Bicycle Locomotive Boat Automobile Bus Taxi Truck Motorbike Scooter Skateboard
