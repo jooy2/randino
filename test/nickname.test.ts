@@ -170,6 +170,23 @@ describe('Nickname', () => {
 		assert.deepStrictEqual([...themes].sort(), [...NICKNAME_THEMES].sort());
 	});
 
+	it('a word belongs to exactly one theme', () => {
+		// Two themes claiming one word make `theme` ambiguous for `baseWord`, and
+		// make `randomNicknameDetails` report a theme the caller never asked about.
+		for (const language of NICKNAME_LANGUAGES) {
+			const owner = new Map<string, NicknameTheme>();
+
+			for (const theme of NICKNAME_THEMES) {
+				for (const word of nounsOf(language, theme)) {
+					const held = owner.get(word);
+
+					assert.ok(!held, `${language}: ${word} is in both ${held} and ${theme}`);
+					owner.set(word, theme);
+				}
+			}
+		}
+	});
+
 	it('nicknames stay inside the requested length range', () => {
 		const ranges: [NicknameLanguage, number, number][] = [
 			['ko', 2, 3],
