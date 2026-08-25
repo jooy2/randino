@@ -40,6 +40,15 @@ const ROMAN = joined('[A-Za-z]');
 
 const native = (item: string | { n: string }) => (typeof item === 'string' ? item : item.n);
 
+/** The CJK surname a name starts with, longest first so 山田 wins over 山. */
+function surnameOf(language: 'ko' | 'ja' | 'zh', name: string): string {
+	const pool = NAME_DATA[language].last
+		.map(native)
+		.sort((left, right) => right.length - left.length);
+
+	return pool.find((entry) => name.startsWith(entry)) ?? '';
+}
+
 describe('Name', () => {
 	it('randomName returns one name by default', () => {
 		const names = randomName();
@@ -261,6 +270,35 @@ describe('Name', () => {
 		const overlap = abstract.filter((name) => realistic.has(name)).length;
 
 		assert.ok(overlap < 10, `too many invented names look curated: ${overlap}`);
+	});
+
+	it('style: 0 stays inside the curated pools', () => {
+		// The realistic end promises names people actually carry, so a rolled given
+		// name length the pool cannot serve has to be re-rolled rather than invented.
+		// Ranges here are ones the pools can satisfy; asking for a length no real
+		// name has (a three-syllable Korean given name) is a different request.
+		const cases: [lang: 'ko' | 'ja' | 'zh', bounds: Record<string, number>][] = [
+			['ko', {}],
+			['ko', { minLength: 2, maxLength: 5 }],
+			['ja', {}],
+			['zh', {}],
+			['zh', { minLength: 2, maxLength: 3 }]
+		];
+
+		for (const [language, bounds] of cases) {
+			const data = NAME_DATA[language];
+			const given = new Set([...data.givenMale!, ...data.givenFemale!].map(native));
+
+			for (const name of randomName({ language, style: 0, count: 300, ...bounds })) {
+				const surname = surnameOf(language, name);
+
+				assert.ok(surname, `${language}: no curated surname leads ${name}`);
+				assert.ok(
+					given.has(name.slice(surname.length)),
+					`${language} @ ${JSON.stringify(bounds)}: ${name} is not a curated name`
+				);
+			}
+		}
 	});
 
 	it('surnames follow the frequency table of the languages that have one', () => {

@@ -193,11 +193,19 @@ function composeGiven(
 	return { n, r: capitalizeFirst(r) };
 }
 
-/** A real CJK given name of exactly `length` syllables, or null when none qualifies. */
+/**
+ * A real CJK given name that fits the length range, or null when the pool holds
+ * none. The length follows the language's own distribution, but only over the
+ * lengths the pool can actually serve: rolling a length first and then looking it
+ * up would drop through to an invented name at `style: 0` whenever the pool has
+ * no real name of that length — Korean lists three-syllable given names in its
+ * weights and holds none, so one name in twenty-five came out invented.
+ */
 function curatedGiven(
 	data: NameLanguageData,
 	isMale: boolean,
-	length: number,
+	min: number,
+	max: number,
 	prefix: string
 ): Entry | null {
 	const pool = isMale ? data.givenMale : data.givenFemale;
@@ -206,7 +214,11 @@ function curatedGiven(
 		return null;
 	}
 
-	let candidates: NamePool = pool.filter((item) => nativeOf(item).length === length);
+	let candidates: NamePool = pool.filter((item) => {
+		const length = nativeOf(item).length;
+
+		return length >= min && length <= max;
+	});
 
 	if (prefix) {
 		candidates = startingWith(candidates, prefix);
@@ -216,7 +228,11 @@ function curatedGiven(
 		return null;
 	}
 
-	return pickEntry(candidates, data, 'given');
+	const available = new Set(candidates.map((item) => nativeOf(item).length));
+	const length = pickGivenLength(data, min, max, available);
+	const fitting = candidates.filter((item) => nativeOf(item).length === length);
+
+	return pickEntry(fitting.length ? fitting : candidates, data, 'given');
 }
 
 /**
@@ -225,20 +241,40 @@ function curatedGiven(
  * a deliberate ask for names the language does not have — realism is gone either
  * way, so spread the draw over the whole range and leave the common lengths only
  * a bump, rather than capping at the longest length the table happens to list.
+ *
+ * `available` restricts the draw to the lengths a curated pool holds. Stretching
+ * is off in that case: the pool, not the range, is what the caller gets.
  */
-function pickGivenLength(data: NameLanguageData, min: number, max: number): number {
+function pickGivenLength(
+	data: NameLanguageData,
+	min: number,
+	max: number,
+	available?: ReadonlySet<number>
+): number {
 	const weights = data.givenLenWeights;
 
 	if (weights) {
-		const stretched = max > Math.max(...Object.keys(weights).map(Number));
+		const stretched = !available && max > Math.max(...Object.keys(weights).map(Number));
 		const options: [number, number][] = [];
 
 		for (let length = min; length <= max; length += 1) {
+			if (available && !available.has(length)) {
+				continue;
+			}
+
 			const natural = weights[length] ?? 0;
 			const weight = stretched ? Math.max(natural, STRETCHED_LEN_WEIGHT) : natural;
 
 			if (weight > 0) {
 				options.push([length, weight]);
+			}
+		}
+
+		// A pool can hold a length the weight table does not list. Draw evenly over
+		// what it holds rather than falling through to a fixed length outside it.
+		if (!options.length && available) {
+			for (const length of available) {
+				options.push([length, 1]);
 			}
 		}
 
@@ -314,11 +350,18 @@ function generateCjk(
 
 	max = Math.max(min, max);
 
-	const length = pickGivenLength(data, min, max);
 	const givenPrefix = leadsWithSurname ? '' : prefix;
-	const drawGiven = () =>
-		(chance(settings.style) ? null : curatedGiven(data, isMale, length, givenPrefix)) ??
-		composeGiven(data, isMale, length, givenPrefix);
+	const drawGiven = (): Entry => {
+		if (!chance(settings.style)) {
+			const real = curatedGiven(data, isMale, min, max, givenPrefix);
+
+			if (real) {
+				return real;
+			}
+		}
+
+		return composeGiven(data, isMale, pickGivenLength(data, min, max), givenPrefix);
+	};
 
 	// Re-draw when the given name repeats the surname syllable (서 + 서연 -> 서서연).
 	let given = drawGiven();
