@@ -148,7 +148,7 @@ To add one that clears the bar:
 2. Add `lib/nickname/data/<code>.ts` with a `NicknameLanguageData` object: `joiner`, `capitalize`, `modifiers` in attributive form, `nouns` for every theme in `NICKNAME_THEMES`, an optional `parts` pool, and a `syn` template (`kind: 'syllable'` for alphabetic scripts, `kind: 'pool'` where one character is one syllable).
 3. Register it in `NICKNAME_DATA` and `NICKNAME_LANGUAGES` in `lib/nickname/data/index.ts`.
 4. Leave `parts` out unless a bare noun-noun compound reads naturally — that is why `ja` and `zh` have none.
-5. Aim for 60+ nouns per theme; the pools are what make the output varied, and the combination count is roughly `modifiers × nouns × (1 + parts)` — around 2.9M for `ko` and `en`, 43K for `ja` and `zh`, which have no `parts`. `sport`, `vehicle` and `product` are the exception (roughly 48 / 43 / 36 words) — the world holds fewer of those, and padding them with near-synonyms reads worse than a shorter pool.
+5. Aim for 60+ nouns per theme; the pools are what make the output varied, and the combination count is roughly `modifiers × nouns × (1 + parts)` — around 9M for `ko` and `en`, 145K for `ja` and `zh`, which have no `parts`. `gem`, `sport`, `vehicle` and `product` are the exception (roughly 55 / 46 / 43 / 36 words) — the world holds fewer of those, and padding them with near-synonyms reads worse than a shorter pool.
 6. No person names, and no word that is only a name — for `en` this is enforced against the person-name pools, which is why `job` has no `Knight`, `Baker` or `Hunter` and `plant` no `Rose` or `Ivy`. Add the language to the README tables and to `SCRIPT` in `test/nickname.test.ts`; the existing per-language tests then cover it.
 
 ## Adding a nickname theme

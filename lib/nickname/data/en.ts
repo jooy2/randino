@@ -13,6 +13,17 @@ export const EN: NicknameLanguageData = {
 		Salty Bitter Spicy Fuzzy Silky Marble Copper Ivory Neon Polar Feral Noble Humble
 		Merry Grumpy Mellow Stormy Frosty Dusty Foggy Radiant Bronze Umber Cobalt Verdant
 		Fierce Nimble Prickly Restless Sturdy Tangled Vivid Whimsical Shimmering Wandering
+		Amber Indigo Jade Onyx Coral Teal Sable Ashen Auburn Maroon Russet Saffron Lilac
+		Ochre Slate Charcoal Pearly Witty Bold Timid Cheerful Jolly Bashful Placid Serene
+		Eager Earnest Steady Rowdy Sassy Snappy Zesty Breezy Dreamy Moody Cranky Perky
+		Quirky Spry Wily Cunning Valiant Regal Lofty Meek Stoic Solemn Somber Blithe
+		Genial Ardent Tender Sleeping Leaping Drifting Prowling Soaring Diving Gliding
+		Humming Laughing Dreaming Blooming Melting Twinkling Rustling Crackling Bouncing
+		Spinning Floating Climbing Chasing Lurking Roving Strolling Tumbling Glassy Wooden
+		Woolen Rubbery Crispy Chewy Creamy Buttery Syrupy Smoky Dewy Sandy Muddy Icy Wispy
+		Downy Plush Satin Linen Massive Petite Slender Chunky Stout Lanky Narrow Curved
+		Spiral Zigzag Twisted Pointed Blunt Oval Astral Stellar Nebular Orbital Twilight
+		Midnight Autumnal Wintry Vernal Timeless Antique
 	`),
 	nouns: {
 		animal: words(`

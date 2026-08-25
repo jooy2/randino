@@ -5,7 +5,7 @@
 **randnick** generates random person names and nicknames in the language you ask for.
 
 - **Person names** read like names people actually carry — 김민준, Emma Clover, Иванов Иван — and come with their English pronunciation. 9 languages.
-- **Nicknames** are the handles you would pick for a game or a website — 멋진사자, MistyOwl, 고양이꼬리. Built from everyday words across fourteen themes, never from person names, with close to three million combinations in Korean and English before the unique suffix is added.
+- **Nicknames** are the handles you would pick for a game or a website — 멋진사자, MistyOwl, 고양이꼬리. Built from everyday words across fourteen themes, never from person names, with over nine million combinations in Korean and English before the unique suffix is added.
 - One options object per generator: language, length, count, and a style setting that runs from realistic to fully invented.
 - No runtime dependencies. Works in Node and in the browser.
 
@@ -365,7 +365,7 @@ randomNickname({ language: 'en', style: 100, count: 3 });
 
 **`startsWith`** — Applies to the first character of the nickname, which is the modifier when there is one. A character no real word starts with is answered with an invented word rather than nothing (`Z` → `ZeegrellSunflower`).
 
-**`unique`** — Off by default, so `randomNickname` returns exactly `count` nicknames. Korean and English have close to three million word combinations each, so duplicates are rare either way; turn `unique` on to rule them out, or `uniqueSuffix` on to make collisions impossible.
+**`unique`** — Off by default, so `randomNickname` returns exactly `count` nicknames. Korean and English have over nine million word combinations each, so duplicates are rare either way; turn `unique` on to rule them out, or `uniqueSuffix` on to make collisions impossible.
 
 ---
 
