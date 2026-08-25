@@ -10,7 +10,7 @@
 //   and only padded with extra middle names when no draw can reach the minimum.
 // - Every name is produced in both scripts, native and romanized.
 
-import { capitalizeFirst, chance, clamp, pick, randInt } from '../_internal/utils.js';
+import { capitalizeFirst, chance, clamp, pick, pickWeighted, randInt } from '../_internal/utils.js';
 import type { NameDetail, NameGender, NameLanguage, RandomNameOptions } from '../_types/global.js';
 import {
 	NAME_COUNT_MAX,
@@ -51,6 +51,11 @@ const FIT_ATTEMPTS = 12;
 // ends up rarer than an invented one.
 const STRETCHED_LEN_WEIGHT = 40;
 
+// Draw weight for a surname the language's frequency table leaves out, on the
+// same tenths-of-a-percent scale the tables are written in. Only languages that
+// have a table are affected; the rest keep drawing surnames evenly.
+const LAST_WEIGHT_DEFAULT = 1;
+
 const nativeOf = (item: string | NameToken): string => (typeof item === 'string' ? item : item.n);
 
 /** Pool items whose native form begins with `prefix` (case-insensitive). */
@@ -60,9 +65,29 @@ function startingWith(pool: NamePool, prefix: string): NamePool {
 	return pool.filter((item) => nativeOf(item).toLowerCase().startsWith(lower));
 }
 
+/**
+ * Draw one pool item. Surnames follow the language's own frequency table where it
+ * has one, so 김 leads a fifth of the Korean names rather than a seventy-fifth,
+ * and Nguyễn two Vietnamese names in five. Given names stay an even draw — a
+ * curated pool is already a list of names in use, with no comparable skew.
+ */
+function pickPooled(
+	pool: NamePool,
+	data: NameLanguageData,
+	part: 'surname' | 'given'
+): string | NameToken {
+	const table = part === 'surname' ? data.lastWeights : undefined;
+
+	if (!table) {
+		return pick(pool);
+	}
+
+	return pickWeighted(pool, (item) => table[nativeOf(item)] ?? LAST_WEIGHT_DEFAULT);
+}
+
 /** Pick one pool item as a native + romanized entry. */
 function pickEntry(pool: NamePool, data: NameLanguageData, part: 'surname' | 'given'): Entry {
-	const item = pick(pool);
+	const item = pickPooled(pool, data, part);
 
 	if (typeof item !== 'string') {
 		return { n: item.n, r: item.r };
@@ -340,7 +365,7 @@ function drawParts(data: NameLanguageData, settings: Settings, isMale: boolean):
 		} else if (surnamePrefix) {
 			surname = leadEntry(data, data.last, 'surname', surnamePrefix);
 		} else {
-			let native = nativeOf(pick(data.last));
+			let native = nativeOf(pickPooled(data.last, data, 'surname'));
 
 			if (data.roman === 'translit' && !isMale) {
 				native = feminizeRu(native);

@@ -10,8 +10,10 @@ import {
 	randomNameDetails
 } from '../dist/index.js';
 import type { NameLanguage } from '../dist/index.js';
-// Internal, so it gets its own checks: everything else about a generated name is
-// random, but romanization is a pure function with known answers.
+// Internal, so they get their own checks: everything else about a generated name
+// is random, but romanization is a pure function with known answers, and the
+// pools are what the tests below hold the generator to.
+import { NAME_DATA } from '../dist/name/data/index.js';
 import { romanizeHangul } from '../dist/name/romanize.js';
 
 // Output is random by definition, so the tests assert the properties every name
@@ -35,6 +37,8 @@ const SCRIPT: Record<NameLanguage, RegExp> = {
 };
 
 const ROMAN = joined('[A-Za-z]');
+
+const native = (item: string | { n: string }) => (typeof item === 'string' ? item : item.n);
 
 describe('Name', () => {
 	it('randomName returns one name by default', () => {
@@ -257,6 +261,37 @@ describe('Name', () => {
 		const overlap = abstract.filter((name) => realistic.has(name)).length;
 
 		assert.ok(overlap < 10, `too many invented names look curated: ${overlap}`);
+	});
+
+	it('surnames follow the frequency table of the languages that have one', () => {
+		// A table entry that no longer matches the pool silently degrades to the
+		// default weight, which reads as "the weighting stopped working".
+		for (const language of NAME_LANGUAGES) {
+			const data = NAME_DATA[language];
+
+			if (!data.lastWeights) {
+				continue;
+			}
+
+			const pool = new Set(data.last.map(native));
+
+			for (const surname of Object.keys(data.lastWeights)) {
+				assert.ok(pool.has(surname), `${language}: ${surname} is weighted but not in the pool`);
+			}
+		}
+
+		// Shares the table aims for: 김 ~23%, Nguyễn ~41%, 王 ~11%. The thresholds sit
+		// far enough below to be unreachable by chance, and an even draw over the
+		// pool (1.3% / 3.3% / 2.2%) cannot come near any of them.
+		const share = (language: 'ko' | 'vi' | 'zh', surname: string) => {
+			const names = randomName({ language, style: 0, count: 2000 });
+
+			return names.filter((name) => name.startsWith(surname)).length / names.length;
+		};
+
+		assert.ok(share('ko', '김') > 0.12, 'Korean surnames are not weighted');
+		assert.ok(share('vi', 'Nguyễn') > 0.25, 'Vietnamese surnames are not weighted');
+		assert.ok(share('zh', '王') > 0.05, 'Chinese surnames are not weighted');
 	});
 
 	it('unique never repeats a name', () => {

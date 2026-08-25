@@ -1,4 +1,4 @@
-import { tokens } from '../../_internal/parse.js';
+import { tokens, weights } from '../../_internal/parse.js';
 import type { NameLanguageData } from './types.js';
 
 export const ZH: NameLanguageData = {
@@ -8,6 +8,15 @@ export const ZH: NameLanguageData = {
 	roman: 'token',
 	lengthSpec: { given: [1, 2], last: [1, 1], middle: [0, 0] },
 	givenLenWeights: { 1: 45, 2: 55 },
+	// Share of the population carrying each surname, in tenths of a percent. The
+	// pool is the top fifty and every entry is listed, because none of them is a
+	// rare surname: 王 and 李 each cover a twelfth of the country, 薛 a five-hundredth.
+	lastWeights: weights(`
+		王:79 李:79 张:71 刘:54 陈:45 杨:31 黄:22 赵:21 吴:21 周:20 徐:17 孙:15 马:14
+		胡:13 朱:13 高:12 林:12 何:12 郭:12 郑:9 罗:9 梁:9 宋:8 谢:8 韩:7 唐:7 冯:6
+		曹:6 萧:5 袁:5 邓:5 曾:5 彭:5 苏:5 蒋:5 蔡:5 于:4 董:4 程:4 沈:4 丁:4 魏:4
+		叶:4 傅:2 薛:2
+	`),
 	last: tokens(`
 		王:Wang 李:Li 张:Zhang 刘:Liu 陈:Chen 杨:Yang 赵:Zhao 黄:Huang 周:Zhou 吴:Wu
 		徐:Xu 孙:Sun 胡:Hu 朱:Zhu 高:Gao 林:Lin 何:He 郭:Guo 马:Ma 罗:Luo 梁:Liang 宋:Song

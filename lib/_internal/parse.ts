@@ -24,6 +24,21 @@ export function tokens(source: string): readonly { n: string; r: string }[] {
 	});
 }
 
+/**
+ * Split a whitespace-separated pool of `native:weight` pairs into a lookup, for
+ * pools whose entries are not equally likely (surname frequency). Entries left
+ * out of the source keep whatever default the caller falls back to.
+ */
+export function weights(source: string): Record<string, number> {
+	const map: Record<string, number> = {};
+
+	for (const { n, r } of tokens(source)) {
+		map[n] = Number(r);
+	}
+
+	return map;
+}
+
 /** Build a native -> romanization lookup from `native:roman` pairs. */
 export function romanMap(source: string): Record<string, string> {
 	const map: Record<string, string> = {};

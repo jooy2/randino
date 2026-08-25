@@ -1,4 +1,4 @@
-import { words } from '../../_internal/parse.js';
+import { weights, words } from '../../_internal/parse.js';
 import { VIETNAMESE_SYLLABLES } from './syllables.js';
 import type { NameLanguageData } from './types.js';
 
@@ -19,6 +19,15 @@ export const VI: NameLanguageData = {
 		Anh Chi Dung Hà Hoa Hương Lan Linh Mai Ngọc Nhung Phương Quỳnh Thảo Trang Uyên Vân
 		Yến Hạnh Ngân Diệp Giang Loan My Thu Trâm Nhi Như Vy Tuyết Trinh Hiền Huyền Nga
 		Oanh Phượng Thúy Tiên Hằng Châu
+	`),
+	// Share of the population carrying each surname, in tenths of a percent. No
+	// language in the set is more lopsided: two Vietnamese names in five are a
+	// Nguyễn, so drawing the thirty surnames evenly is the most visible skew there is.
+	// Hoàng / Huỳnh and Vũ / Võ are the northern and southern spelling of one
+	// surname each, so the share is split between the two entries.
+	lastWeights: weights(`
+		Nguyễn:380 Trần:110 Lê:95 Phạm:71 Phan:45 Hoàng:34 Vũ:26 Đặng:21 Bùi:20 Huỳnh:17
+		Đỗ:14 Hồ:13 Ngô:13 Võ:13 Dương:10 Lý:5 Trương:5 Đinh:4 Trịnh:3 Đoàn:3 Lâm:3
 	`),
 	last: words(`
 		Nguyễn Trần Lê Phạm Hoàng Huỳnh Phan Vũ Võ Đặng Bùi Đỗ Hồ Ngô Dương Lý Đinh Trịnh

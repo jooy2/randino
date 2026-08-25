@@ -39,6 +39,11 @@ export type NameLanguageData = {
 	roman: RomanMode;
 	lengthSpec: NameLengthSpec;
 	last: NamePool;
+	// How likely each surname is relative to the others, for languages whose
+	// surnames are steeply distributed (Korean, Chinese, Vietnamese). Written in
+	// tenths of a percent of the population; surnames the table leaves out keep
+	// `LAST_WEIGHT_DEFAULT`. Omit the field entirely to draw surnames evenly.
+	lastWeights?: Readonly<Record<string, number>>;
 	// Western realistic given-name pools.
 	male?: NamePool;
 	female?: NamePool;

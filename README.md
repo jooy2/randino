@@ -189,6 +189,8 @@ Pass `'all'` (the default) to mix every language, one per name.
 
 **`style`** — At `0`, names are drawn from curated pools of real names. Toward `100` they are invented instead: Latin and Cyrillic scripts from syllable templates, and Korean, Japanese and Chinese by combining given-name characters freely. Values in between decide per name and per part, so `50` mixes real and invented names in one batch.
 
+Surnames are drawn in proportion to how common they are wherever that matters — Korean, Chinese and Vietnamese, where a handful of surnames cover most of the population. About a fifth of the Korean names come back a 김, and two Vietnamese names in five a Nguyễn, the way a real roster reads. The other languages have a long enough tail that an even draw over the pool is already close to reality.
+
 ```javascript
 randomName({ language: 'en', style: 100, count: 3 });
 // ['Deder Kuvoun', 'Jaihil Brouvinn', 'Thoowoun Wiatou']

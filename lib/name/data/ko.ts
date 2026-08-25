@@ -1,4 +1,4 @@
-import { romanMap, words } from '../../_internal/parse.js';
+import { romanMap, weights, words } from '../../_internal/parse.js';
 import type { NameLanguageData } from './types.js';
 
 // Conventional romanization of the surnames below. Anything missing (including a
@@ -22,6 +22,16 @@ export const KO: NameLanguageData = {
 	// Weighted to reality: two-syllable given names dominate, one- and
 	// three-syllable ones are the exception.
 	givenLenWeights: { 1: 4, 2: 92, 3: 4 },
+	// Share of the population carrying each surname (2015 census), in tenths of a
+	// percent. Drawn evenly, 김 would lead one name in seventy-five instead of one
+	// in five, which is the single loudest way the output stops reading Korean.
+	// The tail below 변 is left out and keeps `LAST_WEIGHT_DEFAULT`.
+	lastWeights: weights(`
+		김:215 이:147 박:84 최:47 정:43 강:24 조:21 윤:21 장:20 임:17 오:14 한:14 신:13
+		서:13 권:13 황:13 안:12 송:12 전:11 홍:11 유:10 고:9 문:9 양:8 손:8 배:8 백:7
+		허:7 남:5 심:5 노:4 하:4 곽:4 성:4 차:4 주:4 우:4 구:4 진:3 지:3 엄:3 원:2 천:2
+		방:2 공:2 현:2 함:2 변:2 채:2 민:2 나:2 류:2
+	`),
 	last: words(`
 		김 이 박 최 정 강 조 윤 장 임 한 오 서 신 권 황 안 송 류 전 홍 고 문 양 손 배 백
 		허 유 남 심 노 하 곽 성 차 주 우 구 나 민 진 지 엄 채 원 천 방 공 현 함 변 염 여
