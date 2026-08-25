@@ -116,6 +116,13 @@ export interface RandomNicknameOptions {
 	/** Decorate the noun with a modifier (`멋진사자` rather than `사자`). Default `true`. */
 	includeModifier?: boolean;
 	/**
+	 * Placed between the words a nickname is built from (`'멋진 사자'`,
+	 * `'misty-owl'`), and counted toward `minLength` / `maxLength`. Defaults to the
+	 * way the language itself joins them, which is to run them together
+	 * (`멋진사자`, `MistyOwl`).
+	 */
+	wordSeparator?: string;
+	/**
 	 * Build every nickname around this word instead of a random one, adding only
 	 * the decoration — `'고양이'` gives `멋진고양이`, `고양이꼬리`, `파란고양이발바닥`.
 	 */

@@ -14,6 +14,8 @@ import { generateNicknameDetails } from './nicknameGenerator.js';
  * // ['MistyOwl']
  * randomNickname({ language: 'ko', uniqueSuffix: true, count: 2 });
  * // ['달리는표범_gDe2C', '조용한노을_nVtRC']
+ * randomNickname({ language: 'ko', wordSeparator: ' ', count: 2 });
+ * // ['멋진 사자', '고양이 꼬리']
  * randomNickname({ baseWord: '고양이', count: 3 });
  * // ['멋진고양이', '고양이발바닥', '파란고양이꼬리']
  */

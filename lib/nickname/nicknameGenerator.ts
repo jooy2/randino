@@ -9,6 +9,8 @@
 // - `style` decides per word whether it comes out of a pool or is invented.
 // - `minLength` / `maxLength` pick the shape first: a range too short for a
 //   modifier drops that pattern instead of truncating a word.
+// - `wordSeparator` decides what goes between the words, defaulting to the way
+//   the language joins them.
 // - `baseWord` pins the noun, so only the decoration varies.
 // - `uniqueSuffix` appends a random token, which is what makes a nickname
 //   collision-free rather than merely unlikely.
@@ -53,7 +55,8 @@ const SYNTH_ATTEMPTS = 8;
 type Bounds = Record<Slot, readonly [number, number]>;
 
 // Everything a single nickname needs, with defaults already applied. The length
-// bounds stay optional: left out, they are resolved per language and theme.
+// bounds stay optional: left out, they are resolved per language and theme. So
+// does the separator, which falls back to the language's own joiner.
 type Settings = {
 	theme: NicknameThemeOption;
 	style: number;
@@ -62,7 +65,17 @@ type Settings = {
 	includeModifier: boolean;
 	baseWord: string;
 	prefix: string;
+	separator?: string;
 };
+
+/**
+ * What goes between the words: the caller's separator, or the language's own
+ * joiner. Its length is part of the nickname's, so every length calculation has
+ * to go through here rather than reading `data.joiner` directly.
+ */
+function joinerOf(data: NicknameLanguageData, settings: Settings): string {
+	return settings.separator ?? data.joiner;
+}
 
 function poolBounds(pool: WordPool): readonly [number, number] {
 	let min = Infinity;
@@ -293,7 +306,7 @@ function buildWords(
 	min: number,
 	max: number
 ): { words: string[]; missed: boolean } {
-	const joiner = data.joiner.length;
+	const joiner = joinerOf(data, settings).length;
 	const words: string[] = [];
 	let missed = false;
 	let used = 0;
@@ -347,8 +360,9 @@ function themeOf(data: NicknameLanguageData, word: string): NicknameTheme | null
 
 /**
  * True when one word ends on the character the next one starts with (石霜 + 霜雨).
- * Only meaningful where words run together without a capital to separate them —
- * plenty of real words double a character inside themselves (씩씩한, Sunny).
+ * Only meaningful where words run together with neither a separator nor a
+ * capital between them — plenty of real words double a character inside
+ * themselves (씩씩한, Sunny).
  */
 function hasBoundaryRepeat(words: readonly string[]): boolean {
 	for (let i = 1; i < words.length; i += 1) {
@@ -374,7 +388,7 @@ function lengthBounds(
 	let naturalMax = 0;
 
 	for (const { slots } of patterns) {
-		const [low, high] = patternRange(slots, bounds, data.joiner.length);
+		const [low, high] = patternRange(slots, bounds, joinerOf(data, settings).length);
 
 		naturalMin = Math.min(naturalMin, low);
 		naturalMax = Math.max(naturalMax, high);
@@ -394,16 +408,20 @@ function lengthBounds(
  */
 export function naturalRange(
 	language: NicknameLanguage,
-	includeModifier: boolean
+	includeModifier: boolean,
+	separator?: string
 ): readonly [number, number] {
 	const data = NICKNAME_DATA[language];
-	const patterns = usablePatterns(data, {
+	const settings: Settings = {
 		theme: 'all',
 		style: 0,
 		includeModifier,
 		baseWord: '',
-		prefix: ''
-	});
+		prefix: '',
+		separator
+	};
+	const patterns = usablePatterns(data, settings);
+	const joiner = joinerOf(data, settings).length;
 	let min = Infinity;
 	let max = 0;
 
@@ -411,7 +429,7 @@ export function naturalRange(
 		const bounds = slotBounds(language, data, theme);
 
 		for (const { slots } of patterns) {
-			const [low, high] = patternRange(slots, bounds, data.joiner.length);
+			const [low, high] = patternRange(slots, bounds, joiner);
 
 			min = Math.min(min, low);
 			max = Math.max(max, high);
@@ -427,6 +445,7 @@ function generateOne(language: NicknameLanguage, settings: Settings): Built {
 	const data = NICKNAME_DATA[language];
 	const themes = themesOf(settings.theme);
 	const patterns = usablePatterns(data, settings);
+	const joiner = joinerOf(data, settings);
 	let best: Built | null = null;
 	let bestDistance = Infinity;
 
@@ -444,7 +463,7 @@ function generateOne(language: NicknameLanguage, settings: Settings): Built {
 		const [min, max] = lengthBounds(data, bounds, patterns, settings);
 		// Prefer a shape that can actually land inside the range.
 		const fitting = patterns.filter(({ slots }) => {
-			const [low, high] = patternRange(slots, bounds, data.joiner.length);
+			const [low, high] = patternRange(slots, bounds, joiner.length);
 
 			return high >= min && low <= max;
 		});
@@ -458,11 +477,11 @@ function generateOne(language: NicknameLanguage, settings: Settings): Built {
 			// one is found nowhere.
 			theme: nouns.includes(base) ? theme : themeOf(data, base)
 		};
-		const length = words.join(data.joiner).length;
+		const length = words.join(joiner).length;
 		// Worth spending another attempt on, but not worth failing over: a real word
 		// may well start with the requested character in one of the other themes,
 		// and another draw will not stutter across the word boundary.
-		const rough = missed || (!data.capitalize && hasBoundaryRepeat(words));
+		const rough = missed || (!joiner && !data.capitalize && hasBoundaryRepeat(words));
 
 		if (length >= min && length <= max && !rough) {
 			return built;
@@ -490,7 +509,8 @@ function resolveSettings(options: RandomNicknameOptions): Settings {
 		maxLength: options.maxLength === undefined ? undefined : Math.floor(options.maxLength),
 		includeModifier: options.includeModifier ?? true,
 		baseWord,
-		prefix: (options.startsWith ?? '').trim().slice(0, 1)
+		prefix: (options.startsWith ?? '').trim().slice(0, 1),
+		separator: options.wordSeparator
 	};
 }
 
@@ -535,7 +555,7 @@ export function generateNicknameDetails(options: RandomNicknameOptions = {}): Ni
 
 		const code = language === 'all' ? pick(NICKNAME_LANGUAGES) : language;
 		const { words, theme } = generateOne(code, settings);
-		const word = words.join(NICKNAME_DATA[code].joiner);
+		const word = words.join(joinerOf(NICKNAME_DATA[code], settings));
 
 		if (!word) continue;
 		if (prefix && !word.toLowerCase().startsWith(prefix)) continue;

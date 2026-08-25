@@ -25,7 +25,7 @@
 - [Nicknames](#nicknames)
   - [`randomNickname`](#randomnicknameoptions-string)
   - [`randomNicknameDetails`](#randomnicknamedetailsoptions-nicknamedetail)
-  - [`nicknameLengthRange`](#nicknamelengthrangelanguage-includemodifier-number-number)
+  - [`nicknameLengthRange`](#nicknamelengthrangelanguage-includemodifier-wordseparator-number-number)
   - [Nickname languages and themes](#nickname-languages-and-themes)
   - [How the nickname options behave](#how-the-nickname-options-behave)
 - [Constants](#constants)
@@ -86,7 +86,7 @@ Per method:
 | [`nameSupportsRoman`](#namesupportsromanlanguage-boolean) | `NameLanguage` | `en` `ko` `ja` `zh` `it` `de` `ru` `es` `vi` |
 | [`randomNickname`](#randomnicknameoptions-string) | `NicknameLanguageOption` | `en` `ko` `ja` `zh` — or `all` |
 | [`randomNicknameDetails`](#randomnicknamedetailsoptions-nicknamedetail) | `NicknameLanguageOption` | `en` `ko` `ja` `zh` — or `all` |
-| [`nicknameLengthRange`](#nicknamelengthrangelanguage-includemodifier-number-number) | `NicknameLanguage` | `en` `ko` `ja` `zh` |
+| [`nicknameLengthRange`](#nicknamelengthrangelanguage-includemodifier-wordseparator-number-number) | `NicknameLanguage` | `en` `ko` `ja` `zh` |
 
 The codes are also available at runtime as `NAME_LANGUAGES` and `NICKNAME_LANGUAGES`.
 
@@ -224,6 +224,7 @@ A nickname is an everyday word with something added to it: a modifier in front (
 | `minLength` | `number` | _language_ | Minimum length in characters, the unique suffix **not** counted. Defaults to `nicknameLengthRange`. |
 | `maxLength` | `number` | _language_ | Maximum length in characters, the unique suffix **not** counted. |
 | `includeModifier` | `boolean` | `true` | Decorate the word (`멋진사자` rather than `사자`). |
+| `wordSeparator` | `string` | _language_ | Placed between the words (`'멋진 사자'`, `'Misty-Owl'`). Counts toward the length range. Defaults to running them together. |
 | `baseWord` | `string` | — | Build every nickname around this word, varying only the decoration. |
 | `uniqueSuffix` | `boolean` | `false` | Append a random token so no two people end up with the same nickname (`멋진사자_nVtRC`). |
 | `uniqueSuffixLength` | `number` | `5` | Characters in the token. Clamped to `1` … `32` (`NICKNAME_SUFFIX_LENGTH_MAX`). |
@@ -277,14 +278,15 @@ randomNicknameDetails({ language: 'ko', uniqueSuffix: true });
 | `language` | `NicknameLanguage` | Language this nickname was generated in. |
 | `theme` | `NicknameTheme \| null` | Theme of the base word, or `null` when that word is invented or came from `baseWord`. |
 
-## `nicknameLengthRange(language?, includeModifier?): [number, number]`
+## `nicknameLengthRange(language?, includeModifier?, wordSeparator?): [number, number]`
 
-Every nickname length the language can produce, which is what `randomNickname` falls back to when `minLength` or `maxLength` is omitted. The lower end is a bare word and the upper end a modifier, a word and a trailing word together, so the range is wide on purpose — the shape of each nickname is chosen inside it.
+Every nickname length the language can produce, which is what `randomNickname` falls back to when `minLength` or `maxLength` is omitted. The lower end is a bare word and the upper end a modifier, a word and a trailing word together, so the range is wide on purpose — the shape of each nickname is chosen inside it. A `wordSeparator` widens it by what it adds between the words.
 
 ```javascript
 nicknameLengthRange('ko'); // [1, 12]
 nicknameLengthRange('ko', false); // [1, 8]
 nicknameLengthRange('zh'); // [2, 5]
+nicknameLengthRange('ko', true, '-'); // [1, 14]
 ```
 
 ## Nickname languages and themes
@@ -327,6 +329,26 @@ randomNickname({ baseWord: '고양이', count: 5 });
 
 randomNickname({ baseWord: 'Cat', count: 4 });
 // ['FlyingCat', 'DancingCatScale', 'MistyCatTail', 'WildCatScale']
+```
+
+**`wordSeparator`** — What goes between the words. Left out, each language joins them the way it writes them: Korean, Japanese and Chinese run them together, and English reads as CamelCase. Pass one and every shape uses it, the two-word ones and the three-word ones alike.
+
+```javascript
+randomNickname({ language: 'ko', wordSeparator: ' ', count: 4 });
+// ['역사 발톱', '하늘빛 상상', '차가운 기억', '불빛 돛']
+
+randomNickname({ language: 'en', wordSeparator: '-', count: 4 });
+// ['Headphone', 'Soft-Bat', 'Genial-Moose-Cove', 'Dreamy-Umbrella-Halo']
+
+randomNickname({ language: 'ja', wordSeparator: '・', count: 3 });
+// ['硝子の・トラック', '甘い・珠玉', '美しい・ヒツジ']
+```
+
+It is counted in `minLength` / `maxLength`, so a separator narrows the range the same way a longer word does — `nicknameLengthRange(language, includeModifier, wordSeparator)` reports what is left. It is also independent of `uniqueSuffixSeparator`; give both the same character and the suffix stops standing out.
+
+```javascript
+randomNickname({ language: 'ko', wordSeparator: '_', count: 3, uniqueSuffix: true });
+// ['상큼한_아연_9kZmb', '넓은_태블릿_Tfbaa', '스치는_악장_BfLMk']
 ```
 
 **`uniqueSuffix`** — A nickname built from words can always collide with someone else's; the suffix is what makes it unique. It is appended after `minLength` / `maxLength` have been satisfied, so those options describe the readable part and the suffix never eats into it.

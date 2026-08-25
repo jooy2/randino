@@ -229,6 +229,63 @@ describe('Nickname', () => {
 		}
 	});
 
+	it('wordSeparator goes between the words', () => {
+		for (const language of NICKNAME_LANGUAGES) {
+			for (const wordSeparator of ['', ' ', '-', '::']) {
+				for (const detail of randomNicknameDetails({ language, wordSeparator, count: SAMPLE })) {
+					assert.strictEqual(
+						detail.nickname,
+						detail.words.join(wordSeparator),
+						`${language} '${wordSeparator}': ${detail.nickname}`
+					);
+
+					for (const word of detail.words) {
+						assert.match(word, SCRIPT[language], `${language}: ${word}`);
+					}
+				}
+			}
+		}
+
+		// Omitted, it falls back to the way the language joins its words, which is
+		// to run them together.
+		for (const detail of randomNicknameDetails({ count: SAMPLE })) {
+			assert.strictEqual(detail.nickname, detail.words.join(''), detail.nickname);
+		}
+
+		// The separator is part of the nickname, so it counts toward the length.
+		assert.deepStrictEqual(nicknameLengthRange('ko', true, '-'), [1, 14]);
+		assert.deepStrictEqual(nicknameLengthRange('en', true, ' '), [3, 32]);
+
+		for (const [language, wordSeparator, minLength, maxLength] of [
+			['ko', ' ', 5, 8],
+			['en', '-', 8, 14],
+			['zh', '::', 6, 9]
+		] as [NicknameLanguage, string, number, number][]) {
+			for (const nickname of randomNickname({
+				language,
+				wordSeparator,
+				minLength,
+				maxLength,
+				count: SAMPLE
+			})) {
+				assert.ok(
+					nickname.length >= minLength && nickname.length <= maxLength,
+					`${language} '${wordSeparator}' ${minLength}-${maxLength}: ${nickname} (${nickname.length})`
+				);
+			}
+		}
+
+		// The unique suffix keeps its own separator.
+		for (const nickname of randomNickname({
+			language: 'en',
+			wordSeparator: '-',
+			uniqueSuffix: true,
+			count: 20
+		})) {
+			assert.match(nickname, /^[A-Za-z]+(-[A-Za-z]+)*_[0-9A-Za-z]{5}$/, nickname);
+		}
+	});
+
 	it('uniqueSuffix appends a token that the length options ignore', () => {
 		for (const detail of randomNicknameDetails({
 			language: 'ko',
