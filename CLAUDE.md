@@ -360,4 +360,21 @@ A theme is a slice of everyday vocabulary that a modifier can sit in front of. A
 
 `tag: message`, Udacity Git style tags: `feat`, `fix`, `docs`, `style`, `refactor`, `test`, `chore`, plus informal `package` (deps/config) and `typo`. Write in English, wrap identifiers and paths in backticks, one logical change per commit. Example: `feat: add \`randomNickname\` method`.
 
-A release is its own commit, `bump version to \`x.y.z\``, and touches `package.json`, the lockfiles and `CHANGELOG.md` — one bullet per user-visible change, newest version on top, dated. Nothing else belongs in it.
+A release is its own commit, `bump version to \`x.y.z\``, and touches the package's manifest, its lockfiles and its `CHANGELOG.md` — one bullet per user-visible change, newest version on top, dated. Nothing else belongs in it. The packages version independently, so a release commit touches one package.
+
+## Releasing
+
+**Publishing is manual, from a maintainer's machine.** No workflow publishes any of the three; CI only tests and deploys the documentation site. Every registry rejects a re-upload of a version that already exists, so the version number is the one thing that cannot be taken back.
+
+Before uploading anything, from the package's own directory:
+
+| Package      | Check it                                            | Then                          |
+| ------------ | --------------------------------------------------- | ----------------------------- |
+| `javascript` | `npm run lint && npm run test && npm run build`      | `npm publish`                 |
+| `dart`       | `dart analyze --fatal-infos && dart test` | `dart pub publish`  |
+| `python`     | `ruff check . && mypy && pytest`                     | `uv build && uv publish`      |
+
+Both `dart pub publish` and `uv publish` have a rehearsal worth using — `--dry-run` for the former, and TestPyPI (`uv publish --publish-url https://test.pypi.org/legacy/`) for the latter, which is the only way to see a first upload land without spending the real version. `twine check dist/*` reads the built metadata the way PyPI will.
+
+The credentials are the maintainer's own and belong in the tooling's own config, never in the repository.
+

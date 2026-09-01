@@ -60,6 +60,10 @@ packages = ["src/randino"]
 # The tests travel with the source distribution; nothing else outside the package
 # is worth shipping.
 include = ["src/randino", "tests", "README.md", "CHANGELOG.md", "LICENSE"]
+# Hatchling also ships the VCS ignore file it finds walking up, which here is the
+# repository's own. Neither `exclude` nor `ignore-vcs` suppresses it, so the
+# sdist carries a stray `.gitignore` describing `node_modules/`. Harmless, and
+# not worth dead configuration that does not actually remove it.
 
 [tool.ruff]
 line-length = 100
