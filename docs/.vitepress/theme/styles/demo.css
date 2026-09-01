@@ -1,0 +1,277 @@
+/**
+ * The demo page's controls and output.
+ *
+ * A handful of selectors carry a `.vp-doc` prefix. That is not decoration: the
+ * widget sits inside the Markdown body, so VitePress's own `.vp-doc ul`,
+ * `.vp-doc li` and `.vp-doc pre` rules would otherwise win on specificity and
+ * put list bullets down the side of the generated names.
+ *
+ * Drawn from VitePress's own variables, like the rest of the chrome. The one
+ * thing it does not inherit is `.vp-doc`'s typography — the widget sits inside a
+ * Markdown page but is not prose, and a generated name reading in the body
+ * font at body size is the point of the page rather than a paragraph about it.
+ */
+
+.randino-demo {
+	margin: 24px 0;
+	border: 1px solid var(--vp-c-divider);
+	border-radius: 12px;
+	background-color: var(--vp-c-bg-soft);
+	overflow: hidden;
+}
+
+/* --- the two generators -------------------------------------------------- */
+
+.randino-demo-tabs {
+	display: flex;
+	gap: 4px;
+	padding: 8px 8px 0;
+	border-bottom: 1px solid var(--vp-c-divider);
+}
+
+.randino-demo-tab {
+	padding: 8px 14px;
+	border-radius: 8px 8px 0 0;
+	color: var(--vp-c-text-2);
+	font-size: 13px;
+	font-weight: 600;
+	line-height: 1.4;
+	cursor: pointer;
+	transition:
+		color 0.16s,
+		background-color 0.16s;
+}
+
+.randino-demo-tab:hover {
+	color: var(--vp-c-text-1);
+}
+
+.randino-demo-tab[aria-selected='true'] {
+	background-color: var(--vp-c-bg);
+	color: var(--vp-c-brand-1);
+	box-shadow: inset 0 -2px 0 var(--vp-c-brand-1);
+}
+
+.randino-demo-body {
+	padding: 16px;
+}
+
+/* --- the options --------------------------------------------------------- */
+
+/*
+ * `auto-fill` rather than a column count: the widget sits in the docs' content
+ * column on a desktop and in a phone's width on a phone, and the same grid has
+ * to be four columns wide in one and one column in the other.
+ */
+.randino-demo-fields {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+	gap: 10px 12px;
+	align-items: end;
+}
+
+.randino-demo-affix {
+	margin-top: 14px;
+	padding-top: 14px;
+	border-top: 1px solid var(--vp-c-divider);
+}
+
+.randino-demo-field {
+	display: flex;
+	flex-direction: column;
+	gap: 5px;
+	font-size: 12px;
+	color: var(--vp-c-text-2);
+}
+
+/* A slider needs the room; a number box does not. */
+.randino-demo-wide {
+	grid-column: span 2;
+}
+
+.randino-demo-field > span code,
+.randino-demo-check code {
+	padding: 1px 5px;
+	border-radius: 4px;
+	background-color: var(--vp-c-default-soft);
+	color: var(--vp-c-text-1);
+	font-size: 11.5px;
+}
+
+.randino-demo-field select,
+.randino-demo-field input[type='number'],
+.randino-demo-field input[type='text'] {
+	width: 100%;
+	height: 32px;
+	padding: 0 8px;
+	border: 1px solid var(--vp-c-divider);
+	border-radius: 7px;
+	background-color: var(--vp-c-bg);
+	color: var(--vp-c-text-1);
+	font-size: 13px;
+	line-height: 1;
+	transition: border-color 0.16s;
+}
+
+.randino-demo-field select:hover,
+.randino-demo-field input:hover {
+	border-color: var(--vp-c-brand-1);
+}
+
+.randino-demo-field input[type='range'] {
+	width: 100%;
+	height: 32px;
+	accent-color: var(--vp-c-brand-1);
+}
+
+.randino-demo-check {
+	display: flex;
+	align-items: center;
+	gap: 7px;
+	height: 32px;
+	font-size: 12px;
+	color: var(--vp-c-text-2);
+	cursor: pointer;
+}
+
+.randino-demo-check input {
+	accent-color: var(--vp-c-brand-1);
+}
+
+/* An option the current language has nothing to do with — Korean has no middle
+   name — is left visible and dimmed rather than removed, so the grid does not
+   reflow every time the language changes. */
+.randino-demo-field.is-off,
+.randino-demo-check.is-off {
+	opacity: 0.45;
+}
+
+/* --- generate, and what came back ---------------------------------------- */
+
+.randino-demo-actions {
+	display: flex;
+	gap: 8px;
+	margin-top: 16px;
+}
+
+.randino-demo-run,
+.randino-demo-copy {
+	height: 34px;
+	padding: 0 16px;
+	border-radius: 8px;
+	font-size: 13px;
+	font-weight: 600;
+	line-height: 1;
+	cursor: pointer;
+	transition:
+		background-color 0.16s,
+		color 0.16s,
+		border-color 0.16s;
+}
+
+.randino-demo-run {
+	border: 1px solid var(--vp-c-brand-1);
+	background-color: var(--vp-c-brand-1);
+	color: var(--vp-c-bg);
+}
+
+.randino-demo-run:hover {
+	background-color: var(--vp-c-brand-2);
+	border-color: var(--vp-c-brand-2);
+}
+
+.randino-demo-copy {
+	border: 1px solid var(--vp-c-divider);
+	background-color: var(--vp-c-bg);
+	color: var(--vp-c-text-2);
+}
+
+.randino-demo-copy:hover:not(:disabled) {
+	border-color: var(--vp-c-brand-1);
+	color: var(--vp-c-text-1);
+}
+
+.randino-demo-copy:disabled {
+	opacity: 0.5;
+	cursor: default;
+}
+
+.vp-doc .randino-demo-output {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+	gap: 6px;
+	margin: 16px 0 0;
+	padding: 0;
+	list-style: none;
+}
+
+.vp-doc .randino-demo-output li {
+	margin: 0;
+	padding: 8px 10px;
+	border: 1px solid var(--vp-c-divider);
+	border-radius: 8px;
+	background-color: var(--vp-c-bg);
+}
+
+/* The generated string is the deliverable, so it is the only thing on the page
+   set larger than the prose around it. */
+.randino-demo-value {
+	display: block;
+	color: var(--vp-c-text-1);
+	font-size: 15px;
+	font-weight: 600;
+	line-height: 1.4;
+	word-break: break-word;
+}
+
+.randino-demo-meta {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 2px 10px;
+	margin-top: 5px;
+	color: var(--vp-c-text-3);
+	font-size: 11.5px;
+}
+
+.randino-demo-meta code {
+	color: var(--vp-c-text-2);
+	font-size: 11px;
+}
+
+.vp-doc .randino-demo-note {
+	margin: 12px 0 0;
+	color: var(--vp-c-text-3);
+	font-size: 12.5px;
+	line-height: 1.6;
+}
+
+.vp-doc .randino-demo-live {
+	margin-top: 14px;
+	padding-top: 12px;
+	border-top: 1px solid var(--vp-c-divider);
+}
+
+.randino-demo-code {
+	margin-top: 16px;
+}
+
+.randino-demo-code summary {
+	color: var(--vp-c-text-2);
+	font-size: 12.5px;
+	cursor: pointer;
+}
+
+.randino-demo-code summary:hover {
+	color: var(--vp-c-text-1);
+}
+
+.vp-doc .randino-demo-code pre {
+	margin: 10px 0 0;
+	padding: 12px 14px;
+	border-radius: 8px;
+	background-color: var(--vp-code-block-bg);
+	color: var(--vp-c-text-2);
+	font-size: 12.5px;
+	line-height: 1.6;
+	overflow-x: auto;
+}

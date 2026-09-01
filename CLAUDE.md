@@ -235,7 +235,7 @@ docs/
       language.ts           # the reader's choice, as one value the site shares
       sidebar.ts            # the menu, written out — two locale columns, one structure
       i18n.ts               # the few strings the site's own components render
-    theme/                  # the language switch, the packages menu, the CSS that displays one variant
+    theme/                  # the language switch, the packages menu, the demo, the CSS
   en/  ko/                  # the pages, mirrored
   scripts/
     copy-changelog.mjs      # every package's CHANGELOG.md -> docs/<locale>/changelog.md
@@ -268,6 +268,14 @@ Every variant is in the document and CSS hides all but one, which is what buys t
 **One page, one function**, which is why there is no `helpers` page holding three of them any more: a page that documents three functions can be named after none of them, so the menu names the page and the reader still has to open it to find out whether what they came for is inside.
 
 The navbar is the same list — its API dropdown is built out of `data/sidebar.ts` by `navGroupFor`, so the menu and the section it points into cannot drift. Its **Packages** dropdown is `PackageLinks.vue`, which is where npm, pub.dev and PyPI went when they stopped being three of the four icons in the navbar's right-hand corner; the registry URLs are still derived from the three manifests in `config.ts`, and GitHub is the one social link left. Its marks are `RegistryMark.vue` and not `LangMark.vue` — npm is not JavaScript and PyPI is not Python, and only pub.dev, which brands itself with the Dart logo, has the same drawing in both files.
+
+### The demo runs the real library
+
+`/demo` is not a description of `randName`; it calls it, in the reader's browser. The Vite alias in `config.ts` points the bare specifier `randino` at `packages/javascript/lib/index.ts`, and a four-line plugin rewrites the package's own `./x.js` imports to `./x.ts` — those extensions are deliberate (the built ESM needs them) and Vite cannot resolve them against source files by itself.
+
+**Depending on `randino` from npm would be the wrong shape.** The site documents this repository, so a page describing an option added since the last release would demo a build without it. The cost is that `.github/workflows/publish-documentation.yml` has to redeploy when `packages/javascript/lib/**` changes, which is in its path filter.
+
+`Demo.vue` generates nothing during SSR. A page of random text pre-rendered at build time and re-rendered on hydration is a guaranteed mismatch rather than a likely one, so the first batch is drawn in `onMounted`.
 
 ### Two traps
 

@@ -42,6 +42,7 @@ export const SIDEBAR: SidebarGroup[] = [
 		en: 'Guide',
 		ko: '가이드',
 		items: [
+			{ path: 'demo', en: 'Demo', ko: '데모' },
 			{ path: 'guide/getting-started', en: 'Getting started', ko: '시작하기' },
 			{ path: 'guide/languages', en: 'Supported languages', ko: '지원 언어' },
 			{ path: 'name/', en: 'Person names', ko: '사람 이름' },

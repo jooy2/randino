@@ -3,6 +3,7 @@ import { writeFile } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import container from 'markdown-it-container';
+import type { Plugin } from 'vite';
 import {
 	defineConfig,
 	type HeadConfig,
@@ -77,7 +78,8 @@ const packageLinks = [
  * looking for `randNickname` is looking for a function, not for the half of
  * the library it belongs to. `navGroupFor` is what keeps the two in step.
  */
-const navFor = (lang: string, labels: { guide: string; packages: string }) => [
+const navFor = (lang: string, labels: { demo: string; guide: string; packages: string }) => [
+	{ text: labels.demo, link: `${localeBase(lang, defaultLocale)}demo` },
 	{ text: labels.guide, link: `${localeBase(lang, defaultLocale)}guide/getting-started` },
 	{ text: 'API', items: navGroupFor('api', lang, defaultLocale) },
 	{
@@ -96,11 +98,11 @@ const vitePressI18nConfig: VitePressI18nOptions = {
 	},
 	themeConfig: {
 		en: {
-			nav: navFor('en', { guide: 'Guide', packages: 'Packages' }),
+			nav: navFor('en', { demo: 'Demo', guide: 'Guide', packages: 'Packages' }),
 			sidebar: { '/': { items: sidebarFor('en', defaultLocale) } }
 		},
 		ko: {
-			nav: navFor('ko', { guide: '가이드', packages: '패키지' }),
+			nav: navFor('ko', { demo: '데모', guide: '가이드', packages: '패키지' }),
 			sidebar: { '/ko/': { items: sidebarFor('ko', defaultLocale) } }
 		}
 	}
@@ -289,6 +291,38 @@ function transformHead({ pageData, siteData, title, description }: TransformCont
 	return head;
 }
 
+/* ---------------------------------------------------------------------------
+ * The demo page runs the real library
+ *
+ * `/demo` calls `randName` and `randNickname` in the reader's browser, and it
+ * calls **this repository's** copy of them rather than a published one. Two
+ * lines make that work, and both are here rather than in the component:
+ *
+ * - The alias points the bare specifier `randino` at the package's TypeScript
+ *   entry point. Depending on `randino` from npm instead would pin the demo to
+ *   the last release, so a page documenting an option added since would demo a
+ *   build that does not have it — the exact drift this site exists to avoid.
+ * - The plugin below rewrites the package's own `./x.js` imports to `./x.ts`.
+ *   Those extensions are deliberate (the built ESM needs them at run time) and
+ *   Vite cannot resolve them against source files on its own.
+ * ------------------------------------------------------------------------- */
+
+const packageSrc = resolve(rootDir, 'packages/javascript/lib');
+
+const randinoSource: Plugin = {
+	name: 'randino-source',
+	enforce: 'pre',
+	resolveId(source, importer) {
+		if (!importer || !source.startsWith('.') || !source.endsWith('.js')) {
+			return null;
+		}
+
+		return importer.split('?')[0].startsWith(packageSrc)
+			? resolve(dirname(importer.split('?')[0]), source.replace(/\.js$/, '.ts'))
+			: null;
+	}
+};
+
 // Ref: https://vitepress.dev/reference/site-config
 const vitePressConfig: UserConfig = {
 	title: 'randino',
@@ -339,6 +373,16 @@ const vitePressConfig: UserConfig = {
 	sitemap: {
 		hostname: siteUrl
 	},
+	vite: {
+		plugins: [randinoSource],
+		resolve: {
+			alias: { randino: resolve(packageSrc, 'index.ts') }
+		},
+		// The package sits outside `docs/`, which the dev server will not serve from
+		// unless it is told to.
+		server: { fs: { allow: [rootDir] } }
+	},
+
 	/**
 	 * `robots.txt`, written rather than committed. It exists to name the sitemap,
 	 * and the sitemap's own URL is already derived from the package manifest — a

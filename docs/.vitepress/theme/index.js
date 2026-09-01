@@ -1,10 +1,12 @@
 import DefaultTheme from 'vitepress/theme';
 import Layout from './components/Layout.vue';
 import Lang from './components/Lang.vue';
+import Demo from './components/Demo.vue';
 import PackageLinks from './components/PackageLinks.vue';
 import { syncCodeLanguage } from '../data/language';
 import './styles/lang.css';
 import './styles/nav.css';
+import './styles/demo.css';
 import './custom.css';
 
 export default {
@@ -19,6 +21,10 @@ export default {
 		// Named as a string by the navbar's Packages menu in `config.ts` — a nav
 		// item is JSON, so the component behind one has to be findable by name.
 		app.component('PackageLinks', PackageLinks);
+
+		// Used straight from `demo.md`, the same way `Lang` is used from every
+		// reference page.
+		app.component('Demo', Demo);
 
 		// Reads the stored choice into the reactive copy the components use, and
 		// writes it back onto `<html>`. No-op during SSR.

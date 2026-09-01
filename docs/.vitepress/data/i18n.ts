@@ -3,8 +3,12 @@
  *
  * Page content is localised by living in `docs/ko` or `docs/en`. This file is
  * only for the chrome that is drawn in Vue rather than in Markdown — today that
- * is the language switch above the sidebar: its label, the line inside it that
- * says how far the choice reaches, and the word its menu is opened by.
+ * is the language switch above the sidebar, and the demo page's own controls.
+ *
+ * Option names are **not** in here on purpose. `includeMiddleName` is what the
+ * reader will type, so the demo labels its controls with the identifier rather
+ * than with a translated noun — the same rule the reference pages follow for
+ * headings. What is left to translate is the chrome around them.
  */
 
 export type Locale = 'ko' | 'en';
@@ -36,7 +40,30 @@ const strings = {
 		en: 'The choice applies to every code sample on the site.'
 	},
 	/** On the button, for a reader who reaches it without seeing the label. */
-	languageSelect: { ko: '언어 선택', en: 'Select a language' }
+	languageSelect: { ko: '언어 선택', en: 'Select a language' },
+	/* The demo page. Its controls are labelled with the option names themselves,
+	   so these are only the parts that are not identifiers. */
+	demoNames: { ko: '사람 이름', en: 'Person names' },
+	demoNicknames: { ko: '닉네임', en: 'Nicknames' },
+	demoGenerate: { ko: '생성', en: 'Generate' },
+	demoCopy: { ko: '복사', en: 'Copy' },
+	demoCopied: { ko: '복사됨', en: 'Copied' },
+	demoDetails: { ko: '상세 정보 보기', en: 'Show details' },
+	demoAffix: { ko: '무작위 접사', en: 'Random affix' },
+	demoAffixNone: { ko: '없음', en: 'none' },
+	demoCall: { ko: '이 결과를 만든 호출', en: 'The call behind this' },
+	demoEmpty: {
+		ko: '조건에 맞는 결과가 없습니다. 길이 범위나 startsWith를 넓혀 보세요.',
+		en: 'Nothing came back. Widen the length range, or the startsWith filter.'
+	},
+	demoShort: {
+		ko: '요청한 개수보다 적게 나왔습니다. unique를 켜면 조합이 바닥났을 때 그렇게 됩니다.',
+		en: 'Fewer than asked for — that is what `unique` does once the pools run out.'
+	},
+	demoLive: {
+		ko: '이 페이지는 npm에 배포된 버전이 아니라 이 저장소의 JavaScript 패키지를 그대로 실행합니다.',
+		en: "This page runs the repository's own JavaScript package, not a published build."
+	}
 } satisfies Record<string, Record<Locale, string>>;
 
 export type StringKey = keyof typeof strings;

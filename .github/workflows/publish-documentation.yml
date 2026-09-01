@@ -5,8 +5,11 @@ on:
     branches: [main]
     paths:
       - docs/**
-      # The site reads every package's manifest and changelog, so a release on
-      # any side changes what it publishes. Nothing else in `packages/` does.
+      # The demo page bundles the JavaScript package from source rather than
+      # from npm, so a change to the library changes what the site serves.
+      - packages/javascript/lib/**
+      # The site also reads every package's manifest and changelog, so a release
+      # on any side changes what it publishes. Nothing else in `packages/` does.
       - packages/javascript/package.json
       - packages/javascript/CHANGELOG.md
       - packages/dart/pubspec.yaml
