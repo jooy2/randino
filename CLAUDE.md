@@ -138,6 +138,8 @@ test/
   affix_test.dart
   name_test.dart
   nickname_test.dart
+example/
+  randino_example.dart      # what pub.dev renders on the package's Example tab
 ```
 
 | Command                | What it does                       |
