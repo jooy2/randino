@@ -1,17 +1,17 @@
 {
-	"name": "randnick",
+	"name": "randino",
 	"type": "module",
 	"version": "1.1.0",
-	"description": "randnick generates random person names and nicknames in the language you ask for. Zero dependencies, ready for both Node and the browser.",
+	"description": "randino generates random person names and nicknames in the language you ask for. Zero dependencies, ready for both Node and the browser.",
 	"author": "CDGet <jooy2.contact@gmail.com>",
 	"license": "MIT",
-	"homepage": "https://github.com/jooy2/randnick",
+	"homepage": "https://github.com/jooy2/randino",
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/jooy2/randnick"
+		"url": "https://github.com/jooy2/randino"
 	},
 	"bugs": {
-		"url": "https://github.com/jooy2/randnick/issues"
+		"url": "https://github.com/jooy2/randino/issues"
 	},
 	"main": "dist/index.js",
 	"types": "dist/index.d.ts",

@@ -1,8 +1,8 @@
-# randnick
+# randino
 
-[![license](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/jooy2/randnick/blob/main/LICENSE) ![Commit Count](https://img.shields.io/github/commit-activity/y/jooy2/randnick) [![Followers](https://img.shields.io/github/followers/jooy2?style=social)](https://github.com/jooy2) ![Stars](https://img.shields.io/github/stars/jooy2/randnick?style=social)
+[![license](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/jooy2/randino/blob/main/LICENSE) ![Commit Count](https://img.shields.io/github/commit-activity/y/jooy2/randino) [![Followers](https://img.shields.io/github/followers/jooy2?style=social)](https://github.com/jooy2) ![Stars](https://img.shields.io/github/stars/jooy2/randino?style=social)
 
-**randnick** generates random person names and nicknames in the language you ask for.
+**randino** generates random person names and nicknames in the language you ask for.
 
 - **Person names** read like names people actually carry — 김민준, Emma Clover, Иванов Иван — and come with their English pronunciation. 9 languages.
 - **Nicknames** are the handles you would pick for a game or a website — 멋진사자, MistyOwl, 고양이꼬리. Built from everyday words across fourteen themes, never from person names, with over nine million combinations in Korean and English before the unique suffix is added.
@@ -35,13 +35,13 @@
 ## Installation
 
 ```bash
-npm install randnick
+npm install randino
 ```
 
 ## Quick start
 
 ```javascript
-import { randomName, randomNickname } from 'randnick';
+import { randomName, randomNickname } from 'randino';
 
 randomName({ language: 'ko', count: 3 });
 // ['김태윤', '원동혁', '조진우']
@@ -137,7 +137,7 @@ randomName({ count: 5 });
 Same options as `randomName` except `script`, because every name is returned in both scripts at once. Use it when you want to show a name next to its English pronunciation, or when `language` is `'all'` and you need to know what each name is.
 
 ```javascript
-import { randomNameDetails } from 'randnick';
+import { randomNameDetails } from 'randino';
 
 randomNameDetails({ language: 'ko' });
 // [{ native: '여미주', roman: 'Yeo Miju', language: 'ko', gender: 'female' }]
@@ -258,7 +258,7 @@ randomNickname({ count: 5 });
 Same options as `randomNickname`, plus the pieces each nickname was built from — for highlighting the base word, grouping by theme, or storing the unique suffix on its own.
 
 ```javascript
-import { randomNicknameDetails } from 'randnick';
+import { randomNicknameDetails } from 'randino';
 
 randomNicknameDetails({ language: 'ko', uniqueSuffix: true });
 // [{

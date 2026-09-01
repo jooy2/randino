@@ -2,9 +2,9 @@
 
 Guidance for AI agents (and humans) working in this repository. Written in English to match the repo's existing docs (`README.md`, `CONTRIBUTING.md`).
 
-## What randnick is
+## What randino is
 
-**randnick** is a zero-dependency TypeScript library that generates random **person names** and **nicknames**, per language. Two separate concerns, deliberately:
+**randino** is a zero-dependency TypeScript library that generates random **person names** and **nicknames**, per language. Two separate concerns, deliberately:
 
 - **Names** should read like names a person actually carries (`김민준`, `Emma Clover`). Sample data for forms, seeds, mockups.
 - **Nicknames** are the handles someone would pick for a game or a website (`멋진사자`, `MistyOwl`). They are built from everyday words and **never from person names** — that rule is the whole point of keeping the two apart.
