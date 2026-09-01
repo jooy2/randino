@@ -242,6 +242,10 @@ Every variant is in the document and CSS hides all but one, which is what buys t
 
 **Function and option names in headings, the sidebar and anchors stay in the JavaScript spelling**, and only the body carries all three. That is not laziness: VitePress builds its outline from the rendered heading and its sidebar from `config.ts`, so a per-package heading would either read as all three names run together or flash the wrong one before hydration — and a cross-page `#anchor` has to resolve for every reader, not just the one who picked JavaScript. The mapping is mechanical (`minLength` → `min_length`) and Getting started states it once.
 
+### The menu is not the folders
+
+`name/` and `nickname/` are two folders because the two generators are two things, and the sidebar deliberately does not repeat that split: the four generators and the two helper pages are one **API** group, and the prose explaining how the options behave sits under **Guide**. A reader looking for `randomNickname` is looking for a function, not for the half of the library it belongs to. The navbar's API dropdown is that same list, built out of `data/sidebar.ts` by `navGroupFor` so the menu and the section it points into cannot drift.
+
 ### Two traps
 
 **A Korean heading cannot be linked to by its text.** VitePress slugifies through `NFKD`, so a Hangul heading's id is *decomposed jamo* while anything typed into a Markdown link is composed — identical in an editor, in a diff and in review, and the link scrolls nowhere. Give any Korean heading that is a link target an explicit `{#ascii-anchor}`, matching the English page's anchor where there is one. `scripts/check-anchors.mjs` fails the build otherwise; it runs as part of `npm run build`.

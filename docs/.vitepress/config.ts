@@ -14,7 +14,7 @@ import {
 import { withI18n } from 'vitepress-i18n';
 import type { VitePressI18nOptions } from 'vitepress-i18n/types';
 import { CODE_LANGUAGE_HEAD_SCRIPT, CODE_LANGUAGE_IDS } from './data/languages';
-import { localeBase, sidebarFor } from './data/sidebar';
+import { localeBase, navGroupFor, sidebarFor } from './data/sidebar';
 
 const vitePressDir = dirname(fileURLToPath(import.meta.url));
 const srcDir = resolve(vitePressDir, '..');
@@ -91,11 +91,17 @@ const pypiIcon =
 	'-.41-.08-.41.08z"/>' +
 	'</svg>';
 
-/** The same three destinations in every locale, prefixed with its base. */
-const navFor = (lang: string, labels: [string, string, string]) => [
-	{ text: labels[0], link: `${localeBase(lang, defaultLocale)}guide/getting-started` },
-	{ text: labels[1], link: `${localeBase(lang, defaultLocale)}name/` },
-	{ text: labels[2], link: `${localeBase(lang, defaultLocale)}nickname/` }
+/**
+ * The navbar, in every locale: the prose, and then the functions.
+ *
+ * **API** is a dropdown over the same pages the sidebar's API group holds, and
+ * it is one list rather than a Person names menu and a Nicknames menu — a reader
+ * looking for `randomNickname` is looking for a function, not for the half of
+ * the library it belongs to. `navGroupFor` is what keeps the two in step.
+ */
+const navFor = (lang: string, guide: string) => [
+	{ text: guide, link: `${localeBase(lang, defaultLocale)}guide/getting-started` },
+	{ text: 'API', items: navGroupFor('api', lang, defaultLocale) }
 ];
 
 const vitePressI18nConfig: VitePressI18nOptions = {
@@ -108,11 +114,11 @@ const vitePressI18nConfig: VitePressI18nOptions = {
 	},
 	themeConfig: {
 		en: {
-			nav: navFor('en', ['Guide', 'Person names', 'Nicknames']),
+			nav: navFor('en', 'Guide'),
 			sidebar: { '/': { items: sidebarFor('en', defaultLocale) } }
 		},
 		ko: {
-			nav: navFor('ko', ['가이드', '사람 이름', '닉네임']),
+			nav: navFor('ko', '가이드'),
 			sidebar: { '/ko/': { items: sidebarFor('ko', defaultLocale) } }
 		}
 	}
