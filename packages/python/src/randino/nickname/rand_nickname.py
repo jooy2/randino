@@ -4,7 +4,7 @@ from randino._types import NicknameLanguageOption, NicknameThemeOption
 from randino.nickname._generator import generate_nickname_details
 
 
-def random_nickname(
+def rand_nickname(
     *,
     language: NicknameLanguageOption | None = None,
     theme: NicknameThemeOption = "all",
@@ -60,15 +60,15 @@ def random_nickname(
             nicknames once the pools run out of combinations.
 
     Example:
-        >>> random_nickname(language="ko", count=3)
+        >>> rand_nickname(language="ko", count=3)
         ['멋진사자', '파란물병', '고양이꼬리']
-        >>> random_nickname(language="en")
+        >>> rand_nickname(language="en")
         ['MistyOwl']
-        >>> random_nickname(language="ko", unique_suffix=True, count=2)
+        >>> rand_nickname(language="ko", unique_suffix=True, count=2)
         ['달리는표범_gDe2C', '조용한노을_nVtRC']
-        >>> random_nickname(language="ko", word_separator=" ", count=2)
+        >>> rand_nickname(language="ko", word_separator=" ", count=2)
         ['멋진 사자', '고양이 꼬리']
-        >>> random_nickname(base_word="고양이", count=3)
+        >>> rand_nickname(base_word="고양이", count=3)
         ['멋진고양이', '고양이발바닥', '파란고양이꼬리']
     """
     return [

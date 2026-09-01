@@ -57,23 +57,23 @@ void main() {
           'nicknameSuffixCharset',
           'nicknameSuffixLengthMax',
           'nicknameThemes',
-          'randomName',
-          'randomNameDetails',
-          'randomNickname',
-          'randomNicknameDetails',
+          'randName',
+          'randNameDetails',
+          'randNickname',
+          'randNicknameDetails',
         ]..sort(),
       );
     });
 
     test('every exported function answers', () {
-      expect(randomName(), hasLength(1));
-      expect(randomNameDetails()[0], isA<NameDetail>());
+      expect(randName(), hasLength(1));
+      expect(randNameDetails()[0], isA<NameDetail>());
       expect(nameLengthRange(), isA<LengthRange>());
       expect(nameSupportsMiddleName(), isA<bool>());
       expect(nameSupportsRoman(), isA<bool>());
 
-      expect(randomNickname(), hasLength(1));
-      expect(randomNicknameDetails()[0], isA<NicknameDetail>());
+      expect(randNickname(), hasLength(1));
+      expect(randNicknameDetails()[0], isA<NicknameDetail>());
       expect(nicknameLengthRange(), isA<LengthRange>());
     });
 

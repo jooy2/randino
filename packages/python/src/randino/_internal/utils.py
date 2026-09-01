@@ -58,6 +58,6 @@ def capitalize_first(value: str) -> str:
     return value[0].upper() + value[1:] if value else value
 
 
-def random_token(length: int, charset: str) -> str:
+def rand_token(length: int, charset: str) -> str:
     """Return a random string of `length` characters drawn from `charset`."""
     return "".join(charset[random.randrange(len(charset))] for _ in range(length))

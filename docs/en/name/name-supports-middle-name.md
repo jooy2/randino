@@ -60,6 +60,6 @@ Use it to hide a checkbox rather than to offer one that does nothing.
 
 ## See also
 
-- [`randomName`](./random-name) — the middle-name option this answers for.
+- [`randName`](./rand-name) — the middle-name option this answers for.
 - [`nameLengthRange`](./name-length-range) — which counts a middle name only where the language has one.
 - [Supported languages](../guide/languages) — the table that says which do.

@@ -22,14 +22,14 @@ describe('base test', () => {
 			'nameSupportsMiddleName',
 			'nameSupportsRoman',
 			'nicknameLengthRange',
-			'randomName',
-			'randomNameDetails',
-			'randomNickname',
-			'randomNicknameDetails'
+			'randName',
+			'randNameDetails',
+			'randNickname',
+			'randNicknameDetails'
 		]);
 
-		assert.strictEqual(typeof randino.randomName, 'function');
-		assert.strictEqual(typeof randino.randomNameDetails, 'function');
+		assert.strictEqual(typeof randino.randName, 'function');
+		assert.strictEqual(typeof randino.randNameDetails, 'function');
 		assert.strictEqual(typeof randino.nameLengthRange, 'function');
 		assert.strictEqual(typeof randino.nameSupportsMiddleName, 'function');
 		assert.strictEqual(typeof randino.nameSupportsRoman, 'function');
@@ -38,8 +38,8 @@ describe('base test', () => {
 		assert.strictEqual(randino.NAME_LENGTH_MAX, 30);
 		assert.strictEqual(randino.NAME_COUNT_MAX, 10000);
 
-		assert.strictEqual(typeof randino.randomNickname, 'function');
-		assert.strictEqual(typeof randino.randomNicknameDetails, 'function');
+		assert.strictEqual(typeof randino.randNickname, 'function');
+		assert.strictEqual(typeof randino.randNicknameDetails, 'function');
 		assert.strictEqual(typeof randino.nicknameLengthRange, 'function');
 		assert.ok(Array.isArray(randino.NICKNAME_LANGUAGES));
 		assert.ok(Array.isArray(randino.NICKNAME_THEMES));

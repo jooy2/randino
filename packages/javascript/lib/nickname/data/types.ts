@@ -1,5 +1,5 @@
 // Internal shape of the per-language nickname datasets. Not part of the public
-// API — consumers only ever see `RandomNicknameOptions` / `NicknameDetail`.
+// API — consumers only ever see `RandNicknameOptions` / `NicknameDetail`.
 
 import type { NicknameTheme } from '../../_types/global.js';
 

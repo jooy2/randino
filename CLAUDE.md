@@ -38,8 +38,8 @@ lib/
     parse.ts                # words() / tokens() / romanMap() dataset helpers
   name/
     index.ts                # the category's public surface
-    randomName.ts           # public: string[]
-    randomNameDetails.ts    # public: NameDetail[]
+    randName.ts           # public: string[]
+    randNameDetails.ts    # public: NameDetail[]
     nameLengthRange.ts      # public helper
     nameSupportsMiddleName.ts
     nameSupportsRoman.ts
@@ -52,8 +52,8 @@ lib/
       en.ts ko.ts ja.ts …   # one file per language
   nickname/
     index.ts
-    randomNickname.ts       # public: string[]
-    randomNicknameDetails.ts
+    randNickname.ts       # public: string[]
+    randNicknameDetails.ts
     nicknameLengthRange.ts  # public helper
     nicknameGenerator.ts    # internal: shapes, length fitting, suffix
     data/
@@ -72,7 +72,7 @@ test/
 - **Relative imports end in `.js`**, even though the source is `.ts` — the build emits ESM that Node has to resolve at runtime. Type-only imports may omit it.
 - **Public types go in `lib/_types/global.ts`** and are exported from `lib/index.ts` with `export type *`. Types that only describe internal data (pools, language datasets) stay next to that data.
 - **Internal modules are not exported** from any `index.ts`. Prefix-free names are fine; the `index.ts` files are the API boundary.
-- **Every public function takes a single optional options object** and has a JSDoc block with an `@example`. All options have defaults — `randomName()` with no arguments must work.
+- **Every public function takes a single optional options object** and has a JSDoc block with an `@example`. All options have defaults — `randName()` with no arguments must work.
 - **Prettier owns formatting** (tabs, single quotes, no trailing commas). Run `npm run format`; `npm run build` runs it first.
 - **Zero runtime dependencies.** This is a hard constraint, not a preference. It is why Hangul romanization is implemented in `lib/name/romanize.ts` instead of pulling in `es-hangul`.
 
@@ -121,7 +121,7 @@ lib/
       data/                 # one file per language, ported verbatim
       romanize.dart
       name_generator.dart
-      random_name.dart …
+      rand_name.dart …
     nickname/               # mirrors lib/nickname
 test/
   base_test.dart            # the barrel's export surface, read out of the source
@@ -138,7 +138,7 @@ test/
 
 ### Conventions
 
-- **Named parameters, not an options object.** `randomName(language: NameLanguage.ko, count: 3)`. Every parameter is optional and every one has the JavaScript default.
+- **Named parameters, not an options object.** `randName(language: NameLanguage.ko, count: 3)`. Every parameter is optional and every one has the JavaScript default.
 - **A null enum means "every one of them"** — that is how `'all'` crosses over. `NicknameDetail.theme` is the one nullable that means something else (the word is not one the generator knows), and it says so in its doc comment.
 - **`LengthRange` replaces `[number, number]`** and compares by value, so a test can assert one directly.
 - **File names are `snake_case`, one public function per file**, named after the function. `lib/randino.dart` re-exports them with an explicit `show`.
@@ -169,7 +169,7 @@ src/randino/
     data/                   # one file per language, ported verbatim
     _romanize.py
     _generator.py
-    random_name.py …
+    rand_name.py …
   nickname/                 # mirrors lib/nickname
   py.typed                  # PEP 561 — without it every annotation is ignored
 tests/
@@ -190,8 +190,8 @@ Set up with `uv venv && uv pip install -e ".[dev]"`, or the `pip` equivalent.
 
 ### Conventions
 
-- **Keyword-only arguments, not an options object.** `random_name(language="ko", count=3)`; the `*` in every generator's signature is deliberate, because `random_name("ja", "female", 5)` is both unreadable and a parameter order frozen into the API. The three `name_*` / `nickname_length_range` helpers are the exception — they take their arguments positionally as well, the way the JavaScript ones do, because they are short enough to read either way.
-- **`Literal`, not enums.** `language="ko"` is the same string the npm package takes, and `"all"` survives the crossing intact — which is why Python needs none of Dart's "a null enum means every one of them". The one `None` that means something is `random_nickname`'s `language`: omitted, a `base_word` picks the language it is written in. That is `undefined` vs `'all'` in the npm package too, not an invention.
+- **Keyword-only arguments, not an options object.** `rand_name(language="ko", count=3)`; the `*` in every generator's signature is deliberate, because `rand_name("ja", "female", 5)` is both unreadable and a parameter order frozen into the API. The three `name_*` / `nickname_length_range` helpers are the exception — they take their arguments positionally as well, the way the JavaScript ones do, because they are short enough to read either way.
+- **`Literal`, not enums.** `language="ko"` is the same string the npm package takes, and `"all"` survives the crossing intact — which is why Python needs none of Dart's "a null enum means every one of them". The one `None` that means something is `rand_nickname`'s `language`: omitted, a `base_word` picks the language it is written in. That is `undefined` vs `'all'` in the npm package too, not an invention.
 - **`tuple[int, int]` replaces `[number, number]`**, and the two details are frozen dataclasses with `slots=True`.
 - **File names are `snake_case`, one public function per file**, named after the function. `__init__.py` re-exports them and `__all__` is the contract.
 - **Imports are absolute** (`from randino.name.data import NAME_DATA`), even inside the package, so a moved file breaks loudly rather than silently.
@@ -233,7 +233,7 @@ docs/
 
 ### One page, every package
 
-A page says the same thing about `randomName` whichever package a reader installs; only the code, the option shape and the install line differ. So they are not three sites and not three folders:
+A page says the same thing about `randName` whichever package a reader installs; only the code, the option shape and the install line differ. So they are not three sites and not three folders:
 
 - **`::: lang js` … `:::`** wraps a block only one package sees. `::: lang js dart` is a block two of them want.
 - **`<Lang js="…" dart="…" py="…" code />`** is the inline form, for a phrase in the middle of a sentence that does not differ. It is what keeps an option table from being written three times, and what carries `min_length` next to `minLength`.
@@ -244,7 +244,7 @@ Every variant is in the document and CSS hides all but one, which is what buys t
 
 ### The menu is not the folders
 
-`name/` and `nickname/` are two folders because the two generators are two things, and the sidebar deliberately does not repeat that split: every public function is one entry in one **API** group, and the prose explaining how the options behave sits under **Guide**. A reader looking for `randomNickname` is looking for a function, not for the half of the library it belongs to.
+`name/` and `nickname/` are two folders because the two generators are two things, and the sidebar deliberately does not repeat that split: every public function is one entry in one **API** group, and the prose explaining how the options behave sits under **Guide**. A reader looking for `randNickname` is looking for a function, not for the half of the library it belongs to.
 
 **One page, one function**, which is why there is no `helpers` page holding three of them any more: a page that documents three functions can be named after none of them, so the menu names the page and the reader still has to open it to find out whether what they came for is inside.
 
@@ -298,7 +298,7 @@ Do not assert an exact generated name, and do not use a fixed seed — there is 
 
 Gender is the one option with no directly observable effect in most languages. It is verified through Russian, whose middle name and surname inflect for it (`…ович` / `…овна`, `Иванов` / `Иванова`).
 
-Nicknames are checked against the datasets themselves: `randomNicknameDetails` reports the `words` it used, so every word can be asserted to come from the language's pools, and the English pools are asserted to share nothing with the English person-name pools. Korean and Japanese cannot have that last invariant — `하늘`, `별` and `森` are everyday nouns that also happen to be names, and `아름다운하늘` is still nobody's name.
+Nicknames are checked against the datasets themselves: `randNicknameDetails` reports the `words` it used, so every word can be asserted to come from the language's pools, and the English pools are asserted to share nothing with the English person-name pools. Korean and Japanese cannot have that last invariant — `하늘`, `별` and `森` are everyday nouns that also happen to be names, and `아름다운하늘` is still nobody's name.
 
 Two coincidences are load-bearing and must not be asserted away: a word can be both a modifier and a noun (`무지개`, `Marble`, `自由`), and an invented word can spell a real one by accident (`나` + `비` -> `나비`, so `theme` comes back as `'animal'` at `style: 100`). Structural assertions survive both; "the first word is not a modifier" does not.
 
@@ -358,7 +358,7 @@ A theme is a slice of everyday vocabulary that a modifier can sit in front of. A
 
 1. Add the name to `NicknameTheme` in `lib/_types/global.ts` and to `NICKNAME_THEMES` in `lib/nickname/data/index.ts`.
 2. Add the pool to **all four** languages. A theme that only one language can fill is not a theme.
-3. **Themes have to be disjoint**, and `test/nickname.test.ts` asserts it. A word in two of them makes `theme` ambiguous for `baseWord`, and it makes `randomNicknameDetails` report a theme the caller did not ask about. When a new theme claims a word an old one already holds, move it rather than copy it — `place` took the twelve places that were sitting in `concept`, `vehicle` took 자전거 / 기차 / 배 out of `object`, `plant` took the flowers and trees out of `nature`, and `music` took the instruments out of `object` and 리듬 / 선율 / 화음 out of `concept`. Where the two senses are genuinely different words, rename instead of moving: the English toy became `Marbles` so `gem` could keep `Marble`.
+3. **Themes have to be disjoint**, and `test/nickname.test.ts` asserts it. A word in two of them makes `theme` ambiguous for `baseWord`, and it makes `randNicknameDetails` report a theme the caller did not ask about. When a new theme claims a word an old one already holds, move it rather than copy it — `place` took the twelve places that were sitting in `concept`, `vehicle` took 자전거 / 기차 / 배 out of `object`, `plant` took the flowers and trees out of `nature`, and `music` took the instruments out of `object` and 리듬 / 선율 / 화음 out of `concept`. Where the two senses are genuinely different words, rename instead of moving: the English toy became `Marbles` so `gem` could keep `Marble`.
 4. Watch the word lengths. `nicknameLengthRange` is derived from the shortest and longest word in the pools, and `test/nickname.test.ts` pins three of its values, so a Chinese noun outside 2–3 characters or a Korean one outside 1–4 changes a number the tests assert by value.
 5. Update the theme table in `README.md` and the doc comment on `NicknameTheme`. The existing per-theme tests cover the new theme as soon as it is in `NICKNAME_THEMES`.
 6. Do the same in `packages/dart` and `packages/python` — `NicknameTheme`, the theme list, and the pool in all four language files. Neither Dart's `Map` nor Python's `dict` complains about a missing theme the way the TypeScript `Record` does, which is why both ports' `test_nickname` asserts every language fills every theme.
@@ -366,7 +366,7 @@ A theme is a slice of everyday vocabulary that a modifier can sit in front of. A
 
 ## Commit conventions
 
-`tag: message`, Udacity Git style tags: `feat`, `fix`, `docs`, `style`, `refactor`, `test`, `chore`, plus informal `package` (deps/config) and `typo`. Write in English, wrap identifiers and paths in backticks, one logical change per commit. Example: `feat: add \`randomNickname\` method`.
+`tag: message`, Udacity Git style tags: `feat`, `fix`, `docs`, `style`, `refactor`, `test`, `chore`, plus informal `package` (deps/config) and `typo`. Write in English, wrap identifiers and paths in backticks, one logical change per commit. Example: `feat: add \`randNickname\` method`.
 
 A release is its own commit, `bump version to \`x.y.z\``, and touches the package's manifest, its lockfiles and its `CHANGELOG.md` — one bullet per user-visible change, newest version on top, dated. Nothing else belongs in it. The packages version independently, so a release commit touches one package.
 

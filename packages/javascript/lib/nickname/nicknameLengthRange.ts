@@ -5,7 +5,7 @@ import { naturalRange } from './nicknameGenerator.js';
 
 /**
  * Every nickname length the language can produce, in characters, which is what
- * `randomNickname` falls back to when `minLength` or `maxLength` is omitted. The
+ * `randNickname` falls back to when `minLength` or `maxLength` is omitted. The
  * lower end is a bare noun and the upper end a modifier, a noun and a trailing
  * word together, so the range is wide on purpose — the shape of each nickname is
  * picked inside it. A `baseWord` longer than this range widens it, and a

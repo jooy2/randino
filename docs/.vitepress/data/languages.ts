@@ -2,7 +2,7 @@
  * The programming languages randino ships for, and the one axis of this site
  * that is not a human language.
  *
- * A page says the same things about `randomName` whichever package a reader
+ * A page says the same things about `randName` whichever package a reader
  * installs — the same options, the same pools, the same reasons — and only the
  * code, the parameter shape and the install line differ. So they are not three
  * sites and not three folders: they are one page with the parts that differ

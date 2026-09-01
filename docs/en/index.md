@@ -47,18 +47,18 @@ features:
 ::: lang js
 
 ```javascript
-import { randomName, randomNickname } from 'randino';
+import { randName, randNickname } from 'randino';
 
-randomName({ language: 'ko', count: 3 });
+randName({ language: 'ko', count: 3 });
 // ['김태윤', '원동혁', '조진우']
 
-randomName({ language: 'ru', gender: 'female', includeMiddleName: true });
+randName({ language: 'ru', gender: 'female', includeMiddleName: true });
 // ['Людмила Николаевна Богданова']
 
-randomNickname({ language: 'ko', count: 3 });
+randNickname({ language: 'ko', count: 3 });
 // ['오래된곰', '영원한도마뱀', '귀여운신화다발']
 
-randomNickname({ language: 'en', uniqueSuffix: true, count: 2 });
+randNickname({ language: 'en', uniqueSuffix: true, count: 2 });
 // ['FoggyHillside_gDe2C', 'CraneVoyage_nVtRC']
 ```
 
@@ -69,20 +69,20 @@ randomNickname({ language: 'en', uniqueSuffix: true, count: 2 });
 ```dart
 import 'package:randino/randino.dart';
 
-randomName(language: NameLanguage.ko, count: 3);
+randName(language: NameLanguage.ko, count: 3);
 // ['김태윤', '원동혁', '조진우']
 
-randomName(
+randName(
   language: NameLanguage.ru,
   gender: NameGender.female,
   includeMiddleName: true,
 );
 // ['Людмила Николаевна Богданова']
 
-randomNickname(language: NicknameLanguage.ko, count: 3);
+randNickname(language: NicknameLanguage.ko, count: 3);
 // ['오래된곰', '영원한도마뱀', '귀여운신화다발']
 
-randomNickname(language: NicknameLanguage.en, uniqueSuffix: true, count: 2);
+randNickname(language: NicknameLanguage.en, uniqueSuffix: true, count: 2);
 // ['FoggyHillside_gDe2C', 'CraneVoyage_nVtRC']
 ```
 
@@ -91,18 +91,18 @@ randomNickname(language: NicknameLanguage.en, uniqueSuffix: true, count: 2);
 ::: lang py
 
 ```python
-from randino import random_name, random_nickname
+from randino import rand_name, rand_nickname
 
-random_name(language="ko", count=3)
+rand_name(language="ko", count=3)
 # ['김태윤', '원동혁', '조진우']
 
-random_name(language="ru", gender="female", include_middle_name=True)
+rand_name(language="ru", gender="female", include_middle_name=True)
 # ['Людмила Николаевна Богданова']
 
-random_nickname(language="ko", count=3)
+rand_nickname(language="ko", count=3)
 # ['오래된곰', '영원한도마뱀', '귀여운신화다발']
 
-random_nickname(language="en", unique_suffix=True, count=2)
+rand_nickname(language="en", unique_suffix=True, count=2)
 # ['FoggyHillside_gDe2C', 'CraneVoyage_nVtRC']
 ```
 

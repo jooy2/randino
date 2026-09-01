@@ -1,4 +1,4 @@
-// The name generator itself. Internal — `randomName` and `randomNameDetails`
+// The name generator itself. Internal — `randName` and `randNameDetails`
 // are the public entry points.
 //
 // - At the realistic end of `style`, names come out of the curated pools: whole
@@ -258,7 +258,7 @@ int _pickGivenLength(NameLanguageData data, int min, int max, [Set<int>? availab
     final total = options.fold<int>(0, (sum, option) => sum + option[1]);
 
     if (total > 0) {
-      var roll = randomDouble() * total;
+      var roll = randDouble() * total;
 
       for (final option in options) {
         roll -= option[1];
@@ -511,7 +511,7 @@ LengthRange _lengthBounds(NameLanguage language, _Settings settings) {
 
 NameDetail _generateOne(NameLanguage language, _Settings settings) {
   final data = nameData[language]!;
-  final gender = settings.gender ?? (randomDouble() < 0.5 ? NameGender.male : NameGender.female);
+  final gender = settings.gender ?? (randDouble() < 0.5 ? NameGender.male : NameGender.female);
   final isMale = gender == NameGender.male;
   final bounds = _lengthBounds(language, settings);
   final entry =
@@ -522,8 +522,8 @@ NameDetail _generateOne(NameLanguage language, _Settings settings) {
   return NameDetail(native: entry.n, roman: entry.r, language: language, gender: gender);
 }
 
-/// Generate names with every choice already resolved. `randomName` and
-/// `randomNameDetails` are the two public shapes over this.
+/// Generate names with every choice already resolved. `randName` and
+/// `randNameDetails` are the two public shapes over this.
 List<NameDetail> generateNameDetails({
   NameLanguage? language,
   NameGender? gender,

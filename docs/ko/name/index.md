@@ -5,9 +5,9 @@ randino는 실제로 쓰이는 이름을 생성합니다. 김민준, Emma Clover
 ::: lang js
 
 ```javascript
-import { randomName } from 'randino';
+import { randName } from 'randino';
 
-randomName({ language: 'ko', count: 3 });
+randName({ language: 'ko', count: 3 });
 // ['김태윤', '원동혁', '조진우']
 ```
 
@@ -18,7 +18,7 @@ randomName({ language: 'ko', count: 3 });
 ```dart
 import 'package:randino/randino.dart';
 
-randomName(language: NameLanguage.ko, count: 3);
+randName(language: NameLanguage.ko, count: 3);
 // ['김태윤', '원동혁', '조진우']
 ```
 
@@ -27,9 +27,9 @@ randomName(language: NameLanguage.ko, count: 3);
 ::: lang py
 
 ```python
-from randino import random_name
+from randino import rand_name
 
-random_name(language="ko", count=3)
+rand_name(language="ko", count=3)
 # ['김태윤', '원동혁', '조진우']
 ```
 
@@ -39,8 +39,8 @@ random_name(language="ko", count=3)
 
 | 함수 | 반환값 |
 | --- | --- |
-| [`randomName`](./random-name) | 하나의 문자 체계로 표기된 이름 문자열 |
-| [`randomNameDetails`](./random-name-details) | 두 문자 체계와 각 이름의 언어·성별 정보 |
+| [`randName`](./rand-name) | 하나의 문자 체계로 표기된 이름 문자열 |
+| [`randNameDetails`](./rand-name-details) | 두 문자 체계와 각 이름의 언어·성별 정보 |
 | [`nameLengthRange`](./name-length-range) | 해당 언어에서 전체 이름의 자연스러운 길이 범위 |
 | [`nameSupportsMiddleName`](./name-supports-middle-name) | 해당 언어에 중간 이름이 있는지 여부 |
 | [`nameSupportsRoman`](./name-supports-roman) | 로마자 표기가 결과를 바꾸는지 여부 |
@@ -58,10 +58,10 @@ random_name(language="ko", count=3)
 ::: lang js
 
 ```javascript
-randomName({ language: 'en', style: 100, count: 3 });
+randName({ language: 'en', style: 100, count: 3 });
 // ['Deder Kuvoun', 'Jaihil Brouvinn', 'Thoowoun Wiatou']
 
-randomName({ language: 'ko', style: 100, count: 3 });
+randName({ language: 'ko', style: 100, count: 3 });
 // ['송승완', '구상겸', '채진훈']
 ```
 
@@ -70,10 +70,10 @@ randomName({ language: 'ko', style: 100, count: 3 });
 ::: lang dart
 
 ```dart
-randomName(language: NameLanguage.en, style: 100, count: 3);
+randName(language: NameLanguage.en, style: 100, count: 3);
 // ['Deder Kuvoun', 'Jaihil Brouvinn', 'Thoowoun Wiatou']
 
-randomName(language: NameLanguage.ko, style: 100, count: 3);
+randName(language: NameLanguage.ko, style: 100, count: 3);
 // ['송승완', '구상겸', '채진훈']
 ```
 
@@ -82,10 +82,10 @@ randomName(language: NameLanguage.ko, style: 100, count: 3);
 ::: lang py
 
 ```python
-random_name(language="en", style=100, count=3)
+rand_name(language="en", style=100, count=3)
 # ['Deder Kuvoun', 'Jaihil Brouvinn', 'Thoowoun Wiatou']
 
-random_name(language="ko", style=100, count=3)
+rand_name(language="ko", style=100, count=3)
 # ['송승완', '구상겸', '채진훈']
 ```
 
@@ -119,4 +119,4 @@ random_name(language="ko", style=100, count=3)
 
 `gender`는 이름을 어느 풀에서 뽑을지 결정합니다. 대부분의 언어에서는 그게 전부이고, 결과만 봐서는 알 수 없습니다. 한국어 이름은 자기가 어느 풀에서 왔는지 드러내지 않으니까요. 러시아어가 예외입니다. 부칭과 성이 모두 굴절해서 `Иванов`는 `Иванова`가 되고 `Николаевич`는 `Николаевна`가 됩니다.
 
-생략하면 이름마다 성별을 하나씩 고릅니다. 어느 쪽이 쓰였는지는 <Lang js="randomNameDetails" dart="randomNameDetails" py="random_name_details" code />가 알려 줍니다.
+생략하면 이름마다 성별을 하나씩 고릅니다. 어느 쪽이 쓰였는지는 <Lang js="randNameDetails" dart="randNameDetails" py="rand_name_details" code />가 알려 줍니다.

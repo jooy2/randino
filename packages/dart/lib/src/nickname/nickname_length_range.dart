@@ -4,7 +4,7 @@ import 'package:randino/src/nickname/nickname_generator.dart';
 import 'package:randino/src/types.dart';
 
 /// Every nickname length the language can produce, in characters, which is what
-/// `randomNickname` falls back to when `minLength` or `maxLength` is omitted.
+/// `randNickname` falls back to when `minLength` or `maxLength` is omitted.
 ///
 /// The lower end is a bare noun and the upper end a modifier, a noun and a
 /// trailing word together, so the range is wide on purpose — the shape of each

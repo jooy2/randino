@@ -17,7 +17,7 @@ def nickname_length_range(
 ) -> tuple[int, int]:
     """Every nickname length the language can produce, in characters.
 
-    This is what `random_nickname` falls back to when `min_length` or `max_length` is
+    This is what `rand_nickname` falls back to when `min_length` or `max_length` is
     omitted. The lower end is a bare noun and the upper end a modifier, a noun and a
     trailing word together, so the range is wide on purpose — the shape of each
     nickname is picked inside it. A `base_word` longer than this range widens it, and

@@ -3,16 +3,16 @@ import 'package:randino/src/types.dart';
 
 /// Generate person names with both scripts and the choices behind each one.
 ///
-/// Takes the same parameters as `randomName` except `script` — every name is
+/// Takes the same parameters as `randName` except `script` — every name is
 /// returned in its native form and romanized at the same time. Useful when the
 /// language is mixed, where [NameDetail.language] tells you what each name is,
 /// or when you want to show a name next to its English pronunciation.
 ///
 /// ```dart
-/// randomNameDetails(language: NameLanguage.ko);
+/// randNameDetails(language: NameLanguage.ko);
 /// // [NameDetail(김민준, Kim Minjun, ko, male)]
 /// ```
-List<NameDetail> randomNameDetails({
+List<NameDetail> randNameDetails({
   NameLanguage? language,
   NameGender? gender,
   int count = 1,

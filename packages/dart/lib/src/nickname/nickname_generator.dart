@@ -1,5 +1,5 @@
-// The nickname generator itself. Internal — `randomNickname` and
-// `randomNicknameDetails` are the public entry points.
+// The nickname generator itself. Internal — `randNickname` and
+// `randNicknameDetails` are the public entry points.
 //
 // A nickname is a noun with something added to it: a modifier in front
 // (멋진사자), a second noun behind (고양이꼬리), or both (파란고양이발바닥). The
@@ -163,7 +163,7 @@ LengthRange _patternRange(List<_Slot> slots, _Bounds bounds, int joiner) {
 
 List<_Slot> _pickPattern(List<_Pattern> patterns) {
   final total = patterns.fold<int>(0, (sum, pattern) => sum + pattern.weight);
-  var roll = randomDouble() * total;
+  var roll = randDouble() * total;
 
   for (final pattern in patterns) {
     roll -= pattern.weight;
@@ -541,8 +541,8 @@ NicknameLanguage _detectLanguage(String word) {
   return NicknameLanguage.en;
 }
 
-/// Generate nicknames with every choice already resolved. `randomNickname` and
-/// `randomNicknameDetails` are the two public shapes over this.
+/// Generate nicknames with every choice already resolved. `randNickname` and
+/// `randNicknameDetails` are the two public shapes over this.
 List<NicknameDetail> generateNicknameDetails({
   NicknameLanguage? language,
   NicknameTheme? theme,
@@ -601,7 +601,7 @@ List<NicknameDetail> generateNicknameDetails({
     if (prefix.isNotEmpty && !word.toLowerCase().startsWith(prefix)) continue;
 
     final suffix =
-        suffixLength > 0 ? uniqueSuffixSeparator + randomToken(suffixLength, charset) : '';
+        suffixLength > 0 ? uniqueSuffixSeparator + randToken(suffixLength, charset) : '';
     final nickname = word + suffix;
 
     if (unique) {

@@ -40,10 +40,10 @@ def test_the_package_exports_exactly_its_public_api() -> None:
         "name_supports_middle_name",
         "name_supports_roman",
         "nickname_length_range",
-        "random_name",
-        "random_name_details",
-        "random_nickname",
-        "random_nickname_details",
+        "rand_name",
+        "rand_name_details",
+        "rand_nickname",
+        "rand_nickname_details",
     ]
 
     for name in randino.__all__:
@@ -51,8 +51,8 @@ def test_the_package_exports_exactly_its_public_api() -> None:
 
 
 def test_the_functions_are_callable_and_the_constants_are_what_they_claim() -> None:
-    assert callable(randino.random_name)
-    assert callable(randino.random_name_details)
+    assert callable(randino.rand_name)
+    assert callable(randino.rand_name_details)
     assert callable(randino.name_length_range)
     assert callable(randino.name_supports_middle_name)
     assert callable(randino.name_supports_roman)
@@ -61,8 +61,8 @@ def test_the_functions_are_callable_and_the_constants_are_what_they_claim() -> N
     assert randino.NAME_LENGTH_MAX == 30
     assert randino.NAME_COUNT_MAX == 10000
 
-    assert callable(randino.random_nickname)
-    assert callable(randino.random_nickname_details)
+    assert callable(randino.rand_nickname)
+    assert callable(randino.rand_nickname_details)
     assert callable(randino.nickname_length_range)
     assert isinstance(randino.NICKNAME_LANGUAGES, tuple)
     assert isinstance(randino.NICKNAME_THEMES, tuple)

@@ -9,7 +9,7 @@ from randino._types import (
 from randino.name._generator import generate_name_details
 
 
-def random_name(
+def rand_name(
     *,
     language: NameLanguageOption = "all",
     gender: NameGenderOption = "all",
@@ -26,7 +26,7 @@ def random_name(
     """Generate natural-looking person names.
 
     Returns `count` names as a list of strings, written in the script given by
-    `script`. Use `random_name_details` to get the native and romanized form of each
+    `script`. Use `rand_name_details` to get the native and romanized form of each
     name together.
 
     Args:
@@ -47,13 +47,13 @@ def random_name(
             names when the pool runs out of combinations.
 
     Example:
-        >>> random_name()
+        >>> rand_name()
         ['Emma Clover']
-        >>> random_name(language="ko", count=3)
+        >>> rand_name(language="ko", count=3)
         ['김민준', '이서연', '박지호']
-        >>> random_name(language="ko", script="roman")
+        >>> rand_name(language="ko", script="roman")
         ['Kim Minjun']
-        >>> random_name(language="en", gender="female", include_middle_name=True)
+        >>> rand_name(language="en", gender="female", include_middle_name=True)
         ['Grace Amelia Bennett']
     """
     details: list[NameDetail] = generate_name_details(

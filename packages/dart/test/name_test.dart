@@ -40,25 +40,25 @@ String surnameOf(NameLanguage language, String name) {
 
 void main() {
   group('Name', () {
-    test('randomName returns one name by default', () {
-      final names = randomName();
+    test('randName returns one name by default', () {
+      final names = randName();
 
       expect(names.length, 1);
       expect(names[0], isNotEmpty);
     });
 
-    test('randomName returns exactly `count` names', () {
-      expect(randomName(count: 25).length, 25);
-      expect(randomName(count: 1).length, 1);
+    test('randName returns exactly `count` names', () {
+      expect(randName(count: 25).length, 25);
+      expect(randName(count: 1).length, 1);
       // Out-of-range counts are clamped rather than rejected.
-      expect(randomName(count: 0).length, 0);
-      expect(randomName(count: -10).length, 0);
-      expect(randomName(count: nameCountMax + 500).length, nameCountMax);
+      expect(randName(count: 0).length, 0);
+      expect(randName(count: -10).length, 0);
+      expect(randName(count: nameCountMax + 500).length, nameCountMax);
     });
 
     test('every language writes names in its own script', () {
       for (final language in nameLanguages) {
-        for (final name in randomName(language: language, count: sample)) {
+        for (final name in randName(language: language, count: sample)) {
           expect(name, matches(script[language]!), reason: '${language.name}: $name');
         }
       }
@@ -67,7 +67,7 @@ void main() {
     test('the mixed language uses every language it knows', () {
       final used = <NameLanguage>{};
 
-      for (final detail in randomNameDetails(count: 600)) {
+      for (final detail in randNameDetails(count: 600)) {
         expect(detail.native, matches(script[detail.language]!), reason: detail.native);
         used.add(detail.language);
       }
@@ -77,7 +77,7 @@ void main() {
 
     test('script: roman romanizes every language into ASCII', () {
       for (final language in nameLanguages) {
-        for (final name in randomName(
+        for (final name in randName(
           language: language,
           count: sample,
           script: NameScript.roman,
@@ -88,7 +88,7 @@ void main() {
     });
 
     test('script: roman leaves English names as they are', () {
-      for (final detail in randomNameDetails(language: NameLanguage.en, count: sample)) {
+      for (final detail in randNameDetails(language: NameLanguage.en, count: sample)) {
         expect(detail.roman, detail.native);
       }
 
@@ -97,7 +97,7 @@ void main() {
     });
 
     test('Korean surnames use their conventional romanization', () {
-      for (final detail in randomNameDetails(
+      for (final detail in randNameDetails(
         language: NameLanguage.ko,
         count: sample,
         startsWith: '김',
@@ -110,7 +110,7 @@ void main() {
     test('includeSurname adds or drops the family name', () {
       // A generous length range keeps the generator from padding the name with
       // extra parts to reach a minimum length, which is what is being counted.
-      for (final name in randomName(
+      for (final name in randName(
         language: NameLanguage.en,
         minLength: 1,
         maxLength: 30,
@@ -119,7 +119,7 @@ void main() {
         expect(name.split(' ').length, 2, reason: name);
       }
 
-      for (final name in randomName(
+      for (final name in randName(
         language: NameLanguage.en,
         minLength: 1,
         maxLength: 30,
@@ -131,11 +131,11 @@ void main() {
 
       // Korean keeps its own default range: one syllable of surname plus two of
       // given name.
-      for (final name in randomName(language: NameLanguage.ko, count: sample)) {
+      for (final name in randName(language: NameLanguage.ko, count: sample)) {
         expect(name.length, 3, reason: name);
       }
 
-      for (final name in randomName(
+      for (final name in randName(
         language: NameLanguage.ko,
         count: sample,
         includeSurname: false,
@@ -145,7 +145,7 @@ void main() {
     });
 
     test('includeMiddleName adds a middle name where the language has one', () {
-      for (final name in randomName(
+      for (final name in randName(
         language: NameLanguage.en,
         count: sample,
         includeMiddleName: true,
@@ -160,7 +160,7 @@ void main() {
       expect(nameSupportsMiddleName(NameLanguage.ko), isFalse);
       expect(nameSupportsMiddleName(NameLanguage.en), isTrue);
 
-      for (final name in randomName(
+      for (final name in randName(
         language: NameLanguage.ko,
         count: sample,
         includeMiddleName: true,
@@ -172,7 +172,7 @@ void main() {
     test('gender picks the pools the name is drawn from', () {
       // Russian is the one language whose middle name and surname are inflected
       // for gender, which makes the choice verifiable.
-      for (final name in randomName(
+      for (final name in randName(
         language: NameLanguage.ru,
         minLength: 1,
         maxLength: 40,
@@ -183,7 +183,7 @@ void main() {
         expect(name.split(' ')[1], endsWith('ич'), reason: name);
       }
 
-      for (final name in randomName(
+      for (final name in randName(
         language: NameLanguage.ru,
         minLength: 1,
         maxLength: 40,
@@ -198,7 +198,7 @@ void main() {
       }
 
       final genders =
-          randomNameDetails(
+          randNameDetails(
             language: NameLanguage.ru,
             minLength: 1,
             maxLength: 40,
@@ -207,7 +207,7 @@ void main() {
 
       expect(genders, <NameGender>{NameGender.male, NameGender.female});
 
-      for (final detail in randomNameDetails(
+      for (final detail in randNameDetails(
         language: NameLanguage.ru,
         minLength: 1,
         maxLength: 40,
@@ -232,7 +232,7 @@ void main() {
       ];
 
       for (final (language, minLength, maxLength) in ranges) {
-        for (final name in randomName(
+        for (final name in randName(
           language: language,
           minLength: minLength,
           maxLength: maxLength,
@@ -271,7 +271,7 @@ void main() {
       for (final language in nameLanguages) {
         final range = nameLengthRange(language: language);
 
-        for (final name in randomName(language: language, count: sample)) {
+        for (final name in randName(language: language, count: sample)) {
           expect(
             name.length,
             inInclusiveRange(range.min, range.max),
@@ -282,16 +282,16 @@ void main() {
     });
 
     test('startsWith leads every name with the requested character', () {
-      for (final name in randomName(language: NameLanguage.en, count: sample, startsWith: 'k')) {
+      for (final name in randName(language: NameLanguage.en, count: sample, startsWith: 'k')) {
         expect(name, matches(RegExp('^[Kk]')), reason: name);
       }
 
-      for (final name in randomName(language: NameLanguage.ko, count: sample, startsWith: '김')) {
+      for (final name in randName(language: NameLanguage.ko, count: sample, startsWith: '김')) {
         expect(name, startsWith('김'), reason: name);
       }
 
       // The character leads the given name when there is no surname to lead with.
-      for (final name in randomName(
+      for (final name in randName(
         language: NameLanguage.ko,
         count: sample,
         includeSurname: false,
@@ -302,13 +302,13 @@ void main() {
 
       // A letter no real name starts with is answered with an invented name
       // rather than an empty result.
-      for (final name in randomName(language: NameLanguage.en, count: sample, startsWith: 'Q')) {
+      for (final name in randName(language: NameLanguage.en, count: sample, startsWith: 'Q')) {
         expect(name, startsWith('Q'), reason: name);
         expect(name, matches(roman), reason: name);
       }
 
       // Only the first character of a longer string is used.
-      for (final name in randomName(language: NameLanguage.en, count: 10, startsWith: 'Beck')) {
+      for (final name in randName(language: NameLanguage.en, count: 10, startsWith: 'Beck')) {
         expect(name, startsWith('B'), reason: name);
       }
     });
@@ -316,15 +316,15 @@ void main() {
     test('style invents names without breaking the script or the structure', () {
       for (final style in <int>[0, 50, 100, -20, 500]) {
         for (final language in nameLanguages) {
-          for (final name in randomName(language: language, style: style, count: 20)) {
+          for (final name in randName(language: language, style: style, count: 20)) {
             expect(name, matches(script[language]!), reason: '${language.name} @ $style: $name');
           }
         }
       }
 
       // The abstract end should mostly leave the curated pools behind.
-      final realistic = randomName(language: NameLanguage.en, style: 0, count: 400).toSet();
-      final abstract = randomName(language: NameLanguage.en, style: 100, count: 100);
+      final realistic = randName(language: NameLanguage.en, style: 0, count: 400).toSet();
+      final abstract = randName(language: NameLanguage.en, style: 100, count: 100);
       final overlap = abstract.where(realistic.contains).length;
 
       expect(overlap, lessThan(10), reason: 'too many invented names look curated: $overlap');
@@ -350,7 +350,7 @@ void main() {
           ...data.givenFemale!.map((entry) => entry.n),
         };
 
-        for (final name in randomName(
+        for (final name in randName(
           language: language,
           style: 0,
           count: 300,
@@ -395,7 +395,7 @@ void main() {
       // far enough below to be unreachable by chance, and an even draw over the
       // pool (1.3% / 3.3% / 2.2%) cannot come near any of them.
       double share(NameLanguage language, String surname) {
-        final names = randomName(language: language, style: 0, count: 2000);
+        final names = randName(language: language, style: 0, count: 2000);
 
         return names.where((name) => name.startsWith(surname)).length / names.length;
       }
@@ -418,14 +418,14 @@ void main() {
     });
 
     test('unique never repeats a name', () {
-      final names = randomName(language: NameLanguage.ko, count: 400, unique: true);
+      final names = randName(language: NameLanguage.ko, count: 400, unique: true);
 
       expect(names.toSet().length, names.length);
       // Korean given names are a closed pool, so a request this large runs out of
       // combinations and returns fewer names instead of looping forever. Keep the
       // count comfortably above the pool, or growing the pool turns this into a
       // failure that reads like a bug in `unique`.
-      final limited = randomName(
+      final limited = randName(
         language: NameLanguage.ko,
         count: 800,
         unique: true,
@@ -440,8 +440,8 @@ void main() {
       );
     });
 
-    test('randomNameDetails reports both scripts and the choices made', () {
-      for (final detail in randomNameDetails(language: NameLanguage.ja, count: sample)) {
+    test('randNameDetails reports both scripts and the choices made', () {
+      for (final detail in randNameDetails(language: NameLanguage.ja, count: sample)) {
         expect(detail.language, NameLanguage.ja);
         expect(detail.native, matches(script[NameLanguage.ja]!), reason: detail.native);
         expect(detail.roman, matches(roman), reason: detail.roman);

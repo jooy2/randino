@@ -1,4 +1,4 @@
-// The name generator itself. Internal — `randomName` and `randomNameDetails` are
+// The name generator itself. Internal — `randName` and `randNameDetails` are
 // the public entry points.
 //
 // - At the realistic end of `style`, names come out of the curated pools: whole
@@ -11,7 +11,7 @@
 // - Every name is produced in both scripts, native and romanized.
 
 import { capitalizeFirst, chance, clamp, pick, pickWeighted, randInt } from '../_internal/utils.js';
-import type { NameDetail, NameGender, NameLanguage, RandomNameOptions } from '../_types/global.js';
+import type { NameDetail, NameGender, NameLanguage, RandNameOptions } from '../_types/global.js';
 import {
 	NAME_COUNT_MAX,
 	NAME_DATA,
@@ -532,7 +532,7 @@ function generateOne(language: NameLanguage, settings: Settings): NameDetail {
 }
 
 /** Resolve the caller's options into the settings a single name is built from. */
-function resolveSettings(options: RandomNameOptions): Settings {
+function resolveSettings(options: RandNameOptions): Settings {
 	return {
 		gender: options.gender ?? 'all',
 		includeSurname: options.includeSurname ?? true,
@@ -544,7 +544,7 @@ function resolveSettings(options: RandomNameOptions): Settings {
 	};
 }
 
-export function generateNameDetails(options: RandomNameOptions = {}): NameDetail[] {
+export function generateNameDetails(options: RandNameOptions = {}): NameDetail[] {
 	const language = options.language ?? 'all';
 	const count = clamp(Math.floor(options.count ?? 1), 0, NAME_COUNT_MAX);
 	const unique = options.unique ?? false;

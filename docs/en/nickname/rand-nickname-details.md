@@ -1,13 +1,13 @@
-# randomNicknameDetails
+# randNicknameDetails
 
 Generates nicknames and reports the pieces each one was built from — the words in order, the unique suffix on its own, the language and the theme. Useful for highlighting the base word, grouping by theme, or storing the suffix in a column of its own.
 
 ::: lang js
 
 ```javascript
-import { randomNicknameDetails } from 'randino';
+import { randNicknameDetails } from 'randino';
 
-randomNicknameDetails({ language: 'ko', uniqueSuffix: true });
+randNicknameDetails({ language: 'ko', uniqueSuffix: true });
 // [{
 //   nickname: '오래된발견_zVShs',
 //   words: ['오래된', '발견'],
@@ -24,7 +24,7 @@ randomNicknameDetails({ language: 'ko', uniqueSuffix: true });
 ```dart
 import 'package:randino/randino.dart';
 
-randomNicknameDetails(language: NicknameLanguage.ko, uniqueSuffix: true);
+randNicknameDetails(language: NicknameLanguage.ko, uniqueSuffix: true);
 // [NicknameDetail(오래된발견_zVShs, [오래된, 발견], ko, concept)]
 ```
 
@@ -33,9 +33,9 @@ randomNicknameDetails(language: NicknameLanguage.ko, uniqueSuffix: true);
 ::: lang py
 
 ```python
-from randino import random_nickname_details
+from randino import rand_nickname_details
 
-random_nickname_details(language="ko", unique_suffix=True)
+rand_nickname_details(language="ko", unique_suffix=True)
 # [NicknameDetail(nickname='오래된발견_zVShs', words=('오래된', '발견'),
 #                 suffix='_zVShs', language='ko', theme='concept')]
 ```
@@ -44,7 +44,7 @@ random_nickname_details(language="ko", unique_suffix=True)
 
 ## Options
 
-Exactly the same options as [`randomNickname`](./random-nickname). Only the return type differs.
+Exactly the same options as [`randNickname`](./rand-nickname). Only the return type differs.
 
 ## What you get back
 
@@ -71,7 +71,7 @@ Two coincidences follow from that and are worth expecting rather than treating a
 ::: lang js
 
 ```javascript
-for (const { words, theme } of randomNicknameDetails({ language: 'ko', count: 3 })) {
+for (const { words, theme } of randNicknameDetails({ language: 'ko', count: 3 })) {
 	console.log(words.join(' + '), theme);
 }
 // 오래된 + 곰 animal
@@ -84,7 +84,7 @@ for (const { words, theme } of randomNicknameDetails({ language: 'ko', count: 3 
 ::: lang dart
 
 ```dart
-for (final detail in randomNicknameDetails(language: NicknameLanguage.ko, count: 3)) {
+for (final detail in randNicknameDetails(language: NicknameLanguage.ko, count: 3)) {
   print('${detail.words.join(' + ')} ${detail.theme?.name}');
 }
 // 오래된 + 곰 animal
@@ -97,7 +97,7 @@ for (final detail in randomNicknameDetails(language: NicknameLanguage.ko, count:
 ::: lang py
 
 ```python
-for detail in random_nickname_details(language="ko", count=3):
+for detail in rand_nickname_details(language="ko", count=3):
     print(" + ".join(detail.words), detail.theme)
 # 오래된 + 곰 animal
 # 영원한 + 도마뱀 animal
@@ -113,7 +113,7 @@ A sign-up flow usually wants the readable part and the collision-breaking part i
 ::: lang js
 
 ```javascript
-const [detail] = randomNicknameDetails({ language: 'en', uniqueSuffix: true });
+const [detail] = randNicknameDetails({ language: 'en', uniqueSuffix: true });
 
 await users.insert({
 	handle: detail.nickname,
@@ -127,7 +127,7 @@ await users.insert({
 ::: lang dart
 
 ```dart
-final detail = randomNicknameDetails(
+final detail = randNicknameDetails(
   language: NicknameLanguage.en,
   uniqueSuffix: true,
 ).first;
@@ -144,7 +144,7 @@ await users.insert(
 ::: lang py
 
 ```python
-detail = random_nickname_details(language="en", unique_suffix=True)[0]
+detail = rand_nickname_details(language="en", unique_suffix=True)[0]
 
 await users.insert(
     handle=detail.nickname,
@@ -162,7 +162,7 @@ await users.insert(
 ```javascript
 const byTheme = {};
 
-for (const detail of randomNicknameDetails({ language: 'en', count: 100 })) {
+for (const detail of randNicknameDetails({ language: 'en', count: 100 })) {
 	(byTheme[detail.theme] ??= []).push(detail.nickname);
 }
 ```
@@ -174,7 +174,7 @@ for (const detail of randomNicknameDetails({ language: 'en', count: 100 })) {
 ```dart
 final byTheme = <NicknameTheme?, List<String>>{};
 
-for (final detail in randomNicknameDetails(language: NicknameLanguage.en, count: 100)) {
+for (final detail in randNicknameDetails(language: NicknameLanguage.en, count: 100)) {
   byTheme.putIfAbsent(detail.theme, () => <String>[]).add(detail.nickname);
 }
 ```
@@ -188,7 +188,7 @@ from collections import defaultdict
 
 by_theme: defaultdict[NicknameTheme | None, list[str]] = defaultdict(list)
 
-for detail in random_nickname_details(language="en", count=100):
+for detail in rand_nickname_details(language="en", count=100):
     by_theme[detail.theme].append(detail.nickname)
 ```
 
@@ -196,5 +196,5 @@ for detail in random_nickname_details(language="en", count=100):
 
 ## See also
 
-- [`randomNickname`](./random-nickname) — the full option table, and the same nicknames as plain strings.
+- [`randNickname`](./rand-nickname) — the full option table, and the same nicknames as plain strings.
 - [Themes](./themes) — what each theme holds.

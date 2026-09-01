@@ -6,8 +6,8 @@ import {
 	nameLengthRange,
 	nameSupportsMiddleName,
 	nameSupportsRoman,
-	randomName,
-	randomNameDetails
+	randName,
+	randNameDetails
 } from '../dist/index.js';
 import type { NameLanguage } from '../dist/index.js';
 // Internal, so they get their own checks: everything else about a generated name
@@ -50,27 +50,27 @@ function surnameOf(language: 'ko' | 'ja' | 'zh', name: string): string {
 }
 
 describe('Name', () => {
-	it('randomName returns one name by default', () => {
-		const names = randomName();
+	it('randName returns one name by default', () => {
+		const names = randName();
 
 		assert.strictEqual(names.length, 1);
 		assert.strictEqual(typeof names[0], 'string');
 		assert.ok(names[0].length > 0);
 	});
 
-	it('randomName returns exactly `count` names', () => {
-		assert.strictEqual(randomName({ count: 25 }).length, 25);
-		assert.strictEqual(randomName({ count: 1 }).length, 1);
+	it('randName returns exactly `count` names', () => {
+		assert.strictEqual(randName({ count: 25 }).length, 25);
+		assert.strictEqual(randName({ count: 1 }).length, 1);
 		// Out-of-range counts are clamped rather than rejected.
-		assert.strictEqual(randomName({ count: 0 }).length, 0);
-		assert.strictEqual(randomName({ count: -10 }).length, 0);
-		assert.strictEqual(randomName({ count: 2.7 }).length, 2);
-		assert.strictEqual(randomName({ count: NAME_COUNT_MAX + 500 }).length, NAME_COUNT_MAX);
+		assert.strictEqual(randName({ count: 0 }).length, 0);
+		assert.strictEqual(randName({ count: -10 }).length, 0);
+		assert.strictEqual(randName({ count: 2.7 }).length, 2);
+		assert.strictEqual(randName({ count: NAME_COUNT_MAX + 500 }).length, NAME_COUNT_MAX);
 	});
 
 	it('every language writes names in its own script', () => {
 		for (const language of NAME_LANGUAGES) {
-			for (const name of randomName({ language, count: SAMPLE })) {
+			for (const name of randName({ language, count: SAMPLE })) {
 				assert.match(name, SCRIPT[language], `${language}: ${name}`);
 			}
 		}
@@ -78,7 +78,7 @@ describe('Name', () => {
 
 	it('the mixed language uses every language it knows', () => {
 		const used = new Set(
-			randomNameDetails({ count: 600 }).map((detail) => {
+			randNameDetails({ count: 600 }).map((detail) => {
 				assert.match(detail.native, SCRIPT[detail.language], detail.native);
 				return detail.language;
 			})
@@ -89,14 +89,14 @@ describe('Name', () => {
 
 	it('script: roman romanizes every language into ASCII', () => {
 		for (const language of NAME_LANGUAGES) {
-			for (const name of randomName({ language, count: SAMPLE, script: 'roman' })) {
+			for (const name of randName({ language, count: SAMPLE, script: 'roman' })) {
 				assert.match(name, ROMAN, `${language}: ${name}`);
 			}
 		}
 	});
 
 	it('script: roman leaves English names as they are', () => {
-		for (const detail of randomNameDetails({ language: 'en', count: SAMPLE })) {
+		for (const detail of randNameDetails({ language: 'en', count: SAMPLE })) {
 			assert.strictEqual(detail.native, detail.roman);
 		}
 
@@ -105,7 +105,7 @@ describe('Name', () => {
 	});
 
 	it('Korean surnames use their conventional romanization', () => {
-		for (const detail of randomNameDetails({ language: 'ko', count: SAMPLE, startsWith: '김' })) {
+		for (const detail of randNameDetails({ language: 'ko', count: SAMPLE, startsWith: '김' })) {
 			assert.match(detail.native, /^김/);
 			assert.match(detail.roman, /^Kim /);
 		}
@@ -116,27 +116,27 @@ describe('Name', () => {
 		// extra parts to reach a minimum length, which is what is being counted.
 		const spaced = { minLength: 1, maxLength: 30, count: SAMPLE } as const;
 
-		for (const name of randomName({ ...spaced, language: 'en' })) {
+		for (const name of randName({ ...spaced, language: 'en' })) {
 			assert.strictEqual(name.split(' ').length, 2, name);
 		}
 
-		for (const name of randomName({ ...spaced, language: 'en', includeSurname: false })) {
+		for (const name of randName({ ...spaced, language: 'en', includeSurname: false })) {
 			assert.strictEqual(name.split(' ').length, 1, name);
 		}
 
 		// Korean keeps its own default range: one syllable of surname plus two of
 		// given name.
-		for (const name of randomName({ language: 'ko', count: SAMPLE })) {
+		for (const name of randName({ language: 'ko', count: SAMPLE })) {
 			assert.strictEqual(name.length, 3, name);
 		}
 
-		for (const name of randomName({ language: 'ko', count: SAMPLE, includeSurname: false })) {
+		for (const name of randName({ language: 'ko', count: SAMPLE, includeSurname: false })) {
 			assert.strictEqual(name.length, 2, name);
 		}
 	});
 
 	it('includeMiddleName adds a middle name where the language has one', () => {
-		const names = randomName({
+		const names = randName({
 			language: 'en',
 			count: SAMPLE,
 			includeMiddleName: true,
@@ -153,7 +153,7 @@ describe('Name', () => {
 		assert.strictEqual(nameSupportsMiddleName('ko'), false);
 		assert.strictEqual(nameSupportsMiddleName('en'), true);
 
-		for (const name of randomName({ language: 'ko', count: SAMPLE, includeMiddleName: true })) {
+		for (const name of randName({ language: 'ko', count: SAMPLE, includeMiddleName: true })) {
 			assert.strictEqual(name.length, 3, name);
 		}
 	});
@@ -163,21 +163,21 @@ describe('Name', () => {
 
 		// Russian is the one language whose middle name and surname are inflected
 		// for gender, which makes the choice verifiable.
-		for (const name of randomName({ ...options, gender: 'male', includeMiddleName: true })) {
+		for (const name of randName({ ...options, gender: 'male', includeMiddleName: true })) {
 			const [, middle] = name.split(' ');
 			assert.match(middle, /(ич)$/, name);
 		}
 
-		for (const name of randomName({ ...options, gender: 'female', includeMiddleName: true })) {
+		for (const name of randName({ ...options, gender: 'female', includeMiddleName: true })) {
 			const [, middle, surname] = name.split(' ');
 			assert.match(middle, /(на)$/, name);
 			assert.match(surname, /а$/, name);
 		}
 
-		const genders = new Set(randomNameDetails({ ...options, count: 200 }).map((d) => d.gender));
+		const genders = new Set(randNameDetails({ ...options, count: 200 }).map((d) => d.gender));
 		assert.deepStrictEqual([...genders].sort(), ['female', 'male']);
 
-		for (const detail of randomNameDetails({ ...options, gender: 'female', count: SAMPLE })) {
+		for (const detail of randNameDetails({ ...options, gender: 'female', count: SAMPLE })) {
 			assert.strictEqual(detail.gender, 'female');
 		}
 	});
@@ -196,7 +196,7 @@ describe('Name', () => {
 		];
 
 		for (const [language, minLength, maxLength] of ranges) {
-			for (const name of randomName({ language, minLength, maxLength, count: SAMPLE })) {
+			for (const name of randName({ language, minLength, maxLength, count: SAMPLE })) {
 				assert.ok(
 					name.length >= minLength && name.length <= maxLength,
 					`${language} ${minLength}-${maxLength}: ${name} (${name.length})`
@@ -217,23 +217,23 @@ describe('Name', () => {
 		for (const language of NAME_LANGUAGES) {
 			const [min, max] = nameLengthRange(language);
 
-			for (const name of randomName({ language, count: SAMPLE })) {
+			for (const name of randName({ language, count: SAMPLE })) {
 				assert.ok(name.length >= min && name.length <= max, `${language}: ${name}`);
 			}
 		}
 	});
 
 	it('startsWith leads every name with the requested character', () => {
-		for (const name of randomName({ language: 'en', count: SAMPLE, startsWith: 'k' })) {
+		for (const name of randName({ language: 'en', count: SAMPLE, startsWith: 'k' })) {
 			assert.match(name, /^[Kk]/, name);
 		}
 
-		for (const name of randomName({ language: 'ko', count: SAMPLE, startsWith: '김' })) {
+		for (const name of randName({ language: 'ko', count: SAMPLE, startsWith: '김' })) {
 			assert.match(name, /^김/, name);
 		}
 
 		// The character leads the given name when there is no surname to lead with.
-		for (const name of randomName({
+		for (const name of randName({
 			language: 'ko',
 			count: SAMPLE,
 			includeSurname: false,
@@ -244,13 +244,13 @@ describe('Name', () => {
 
 		// A letter no real name starts with is answered with an invented name
 		// rather than an empty result.
-		for (const name of randomName({ language: 'en', count: SAMPLE, startsWith: 'Q' })) {
+		for (const name of randName({ language: 'en', count: SAMPLE, startsWith: 'Q' })) {
 			assert.match(name, /^Q/, name);
 			assert.match(name, ROMAN, name);
 		}
 
 		// Only the first character of a longer string is used.
-		for (const name of randomName({ language: 'en', count: 10, startsWith: 'Beck' })) {
+		for (const name of randName({ language: 'en', count: 10, startsWith: 'Beck' })) {
 			assert.match(name, /^B/, name);
 		}
 	});
@@ -258,15 +258,15 @@ describe('Name', () => {
 	it('style invents names without breaking the script or the structure', () => {
 		for (const style of [0, 50, 100, -20, 500]) {
 			for (const language of NAME_LANGUAGES) {
-				for (const name of randomName({ language, style, count: 20 })) {
+				for (const name of randName({ language, style, count: 20 })) {
 					assert.match(name, SCRIPT[language], `${language} @ ${style}: ${name}`);
 				}
 			}
 		}
 
 		// The abstract end should mostly leave the curated pools behind.
-		const realistic = new Set(randomName({ language: 'en', style: 0, count: 400 }));
-		const abstract = randomName({ language: 'en', style: 100, count: 100 });
+		const realistic = new Set(randName({ language: 'en', style: 0, count: 400 }));
+		const abstract = randName({ language: 'en', style: 100, count: 100 });
 		const overlap = abstract.filter((name) => realistic.has(name)).length;
 
 		assert.ok(overlap < 10, `too many invented names look curated: ${overlap}`);
@@ -289,7 +289,7 @@ describe('Name', () => {
 			const data = NAME_DATA[language];
 			const given = new Set([...data.givenMale!, ...data.givenFemale!].map(native));
 
-			for (const name of randomName({ language, style: 0, count: 300, ...bounds })) {
+			for (const name of randName({ language, style: 0, count: 300, ...bounds })) {
 				const surname = surnameOf(language, name);
 
 				assert.ok(surname, `${language}: no curated surname leads ${name}`);
@@ -322,7 +322,7 @@ describe('Name', () => {
 		// far enough below to be unreachable by chance, and an even draw over the
 		// pool (1.3% / 3.3% / 2.2%) cannot come near any of them.
 		const share = (language: 'ko' | 'vi' | 'zh', surname: string) => {
-			const names = randomName({ language, style: 0, count: 2000 });
+			const names = randName({ language, style: 0, count: 2000 });
 
 			return names.filter((name) => name.startsWith(surname)).length / names.length;
 		};
@@ -333,14 +333,14 @@ describe('Name', () => {
 	});
 
 	it('unique never repeats a name', () => {
-		const names = randomName({ language: 'ko', count: 400, unique: true });
+		const names = randName({ language: 'ko', count: 400, unique: true });
 
 		assert.strictEqual(new Set(names).size, names.length);
 		// Korean given names are a closed pool, so a request this large runs out of
 		// combinations and returns fewer names instead of looping forever. Keep the
 		// count comfortably above the pool, or growing the pool turns this into a
 		// failure that reads like a bug in `unique`.
-		const limited = randomName({
+		const limited = randName({
 			language: 'ko',
 			count: 800,
 			unique: true,
@@ -351,8 +351,8 @@ describe('Name', () => {
 		assert.ok(limited.length < 800, `expected the pool to run out: ${limited.length}`);
 	});
 
-	it('randomNameDetails reports both scripts and the choices made', () => {
-		for (const detail of randomNameDetails({ language: 'ja', count: SAMPLE })) {
+	it('randNameDetails reports both scripts and the choices made', () => {
+		for (const detail of randNameDetails({ language: 'ja', count: SAMPLE })) {
 			assert.strictEqual(detail.language, 'ja');
 			assert.match(detail.native, SCRIPT.ja, detail.native);
 			assert.match(detail.roman, ROMAN, detail.roman);

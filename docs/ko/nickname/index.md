@@ -5,9 +5,9 @@
 ::: lang js
 
 ```javascript
-import { randomNickname } from 'randino';
+import { randNickname } from 'randino';
 
-randomNickname({ language: 'ko', count: 3 });
+randNickname({ language: 'ko', count: 3 });
 // ['오래된곰', '영원한도마뱀', '귀여운신화다발']
 ```
 
@@ -18,7 +18,7 @@ randomNickname({ language: 'ko', count: 3 });
 ```dart
 import 'package:randino/randino.dart';
 
-randomNickname(language: NicknameLanguage.ko, count: 3);
+randNickname(language: NicknameLanguage.ko, count: 3);
 // ['오래된곰', '영원한도마뱀', '귀여운신화다발']
 ```
 
@@ -27,9 +27,9 @@ randomNickname(language: NicknameLanguage.ko, count: 3);
 ::: lang py
 
 ```python
-from randino import random_nickname
+from randino import rand_nickname
 
-random_nickname(language="ko", count=3)
+rand_nickname(language="ko", count=3)
 # ['오래된곰', '영원한도마뱀', '귀여운신화다발']
 ```
 
@@ -41,11 +41,11 @@ random_nickname(language="ko", count=3)
 
 ## 제공되는 기능
 
-| 함수                                                 | 반환값                             |
-| ---------------------------------------------------- | ---------------------------------- |
-| [`randomNickname`](./random-nickname)                | 닉네임 문자열                      |
-| [`randomNicknameDetails`](./random-nickname-details) | 사용된 단어, 접미사, 언어, 테마    |
-| [`nicknameLengthRange`](./nickname-length-range)     | 해당 언어가 만들 수 있는 모든 길이 |
+| 함수                                             | 반환값                             |
+| ------------------------------------------------ | ---------------------------------- |
+| [`randNickname`](./rand-nickname)                | 닉네임 문자열                      |
+| [`randNicknameDetails`](./rand-nickname-details) | 사용된 단어, 접미사, 언어, 테마    |
+| [`nicknameLengthRange`](./nickname-length-range) | 해당 언어가 만들 수 있는 모든 길이 |
 
 명사는 14개 [테마](./themes)에서 오고, 모든 닉네임은 그중 한 테마의 단어를 중심으로 만들어집니다.
 
@@ -60,10 +60,10 @@ random_nickname(language="ko", count=3)
 ::: lang js
 
 ```javascript
-randomNickname({ language: 'ko', count: 4, minLength: 4, maxLength: 6 });
+randNickname({ language: 'ko', count: 4, minLength: 4, maxLength: 6 });
 // ['엉뚱한진리춤', '엉뚱한가위별', '해바라기', '별빛안개열매']
 
-randomNickname({ language: 'en', count: 4, minLength: 4, maxLength: 9 });
+randNickname({ language: 'en', count: 4, minLength: 4, maxLength: 9 });
 // ['RustyBoot', 'DustyDuck', 'DustyMyth', 'RiddleEgg']
 ```
 
@@ -72,10 +72,10 @@ randomNickname({ language: 'en', count: 4, minLength: 4, maxLength: 9 });
 ::: lang dart
 
 ```dart
-randomNickname(language: NicknameLanguage.ko, count: 4, minLength: 4, maxLength: 6);
+randNickname(language: NicknameLanguage.ko, count: 4, minLength: 4, maxLength: 6);
 // ['엉뚱한진리춤', '엉뚱한가위별', '해바라기', '별빛안개열매']
 
-randomNickname(language: NicknameLanguage.en, count: 4, minLength: 4, maxLength: 9);
+randNickname(language: NicknameLanguage.en, count: 4, minLength: 4, maxLength: 9);
 // ['RustyBoot', 'DustyDuck', 'DustyMyth', 'RiddleEgg']
 ```
 
@@ -84,10 +84,10 @@ randomNickname(language: NicknameLanguage.en, count: 4, minLength: 4, maxLength:
 ::: lang py
 
 ```python
-random_nickname(language="ko", count=4, min_length=4, max_length=6)
+rand_nickname(language="ko", count=4, min_length=4, max_length=6)
 # ['엉뚱한진리춤', '엉뚱한가위별', '해바라기', '별빛안개열매']
 
-random_nickname(language="en", count=4, min_length=4, max_length=9)
+rand_nickname(language="en", count=4, min_length=4, max_length=9)
 # ['RustyBoot', 'DustyDuck', 'DustyMyth', 'RiddleEgg']
 ```
 
@@ -102,10 +102,10 @@ random_nickname(language="en", count=4, min_length=4, max_length=9)
 ::: lang js
 
 ```javascript
-randomNickname({ language: 'ko', wordSeparator: ' ', count: 4 });
+randNickname({ language: 'ko', wordSeparator: ' ', count: 4 });
 // ['역사 발톱', '하늘빛 상상', '차가운 기억', '불빛 돛']
 
-randomNickname({ language: 'en', wordSeparator: '-', count: 4 });
+randNickname({ language: 'en', wordSeparator: '-', count: 4 });
 // ['Headphone', 'Soft-Bat', 'Genial-Moose-Cove', 'Dreamy-Umbrella-Halo']
 ```
 
@@ -114,10 +114,10 @@ randomNickname({ language: 'en', wordSeparator: '-', count: 4 });
 ::: lang dart
 
 ```dart
-randomNickname(language: NicknameLanguage.ko, wordSeparator: ' ', count: 4);
+randNickname(language: NicknameLanguage.ko, wordSeparator: ' ', count: 4);
 // ['역사 발톱', '하늘빛 상상', '차가운 기억', '불빛 돛']
 
-randomNickname(language: NicknameLanguage.en, wordSeparator: '-', count: 4);
+randNickname(language: NicknameLanguage.en, wordSeparator: '-', count: 4);
 // ['Headphone', 'Soft-Bat', 'Genial-Moose-Cove', 'Dreamy-Umbrella-Halo']
 ```
 
@@ -126,10 +126,10 @@ randomNickname(language: NicknameLanguage.en, wordSeparator: '-', count: 4);
 ::: lang py
 
 ```python
-random_nickname(language="ko", word_separator=" ", count=4)
+rand_nickname(language="ko", word_separator=" ", count=4)
 # ['역사 발톱', '하늘빛 상상', '차가운 기억', '불빛 돛']
 
-random_nickname(language="en", word_separator="-", count=4)
+rand_nickname(language="en", word_separator="-", count=4)
 # ['Headphone', 'Soft-Bat', 'Genial-Moose-Cove', 'Dreamy-Umbrella-Halo']
 ```
 
@@ -144,7 +144,7 @@ random_nickname(language="en", word_separator="-", count=4)
 ::: lang js
 
 ```javascript
-randomNickname({ language: 'ko', count: 3, uniqueSuffix: true });
+randNickname({ language: 'ko', count: 3, uniqueSuffix: true });
 // ['달력_U7aNZ', '금빛독수리다발_AVcCV', '조용한바구니_RUKAP']
 ```
 
@@ -153,7 +153,7 @@ randomNickname({ language: 'ko', count: 3, uniqueSuffix: true });
 ::: lang dart
 
 ```dart
-randomNickname(language: NicknameLanguage.ko, count: 3, uniqueSuffix: true);
+randNickname(language: NicknameLanguage.ko, count: 3, uniqueSuffix: true);
 // ['달력_U7aNZ', '금빛독수리다발_AVcCV', '조용한바구니_RUKAP']
 ```
 
@@ -162,7 +162,7 @@ randomNickname(language: NicknameLanguage.ko, count: 3, uniqueSuffix: true);
 ::: lang py
 
 ```python
-random_nickname(language="ko", count=3, unique_suffix=True)
+rand_nickname(language="ko", count=3, unique_suffix=True)
 # ['달력_U7aNZ', '금빛독수리다발_AVcCV', '조용한바구니_RUKAP']
 ```
 
@@ -177,10 +177,10 @@ random_nickname(language="ko", count=3, unique_suffix=True)
 ::: lang js
 
 ```javascript
-randomNickname({ baseWord: '고양이', count: 5 });
+randNickname({ baseWord: '고양이', count: 5 });
 // ['하얀고양이', '고양이바람', '떠도는고양이', '귀여운고양이뿔', '검은고양이손길']
 
-randomNickname({ baseWord: 'Cat', count: 4 });
+randNickname({ baseWord: 'Cat', count: 4 });
 // ['FlyingCat', 'DancingCatScale', 'MistyCatTail', 'WildCatScale']
 ```
 
@@ -189,10 +189,10 @@ randomNickname({ baseWord: 'Cat', count: 4 });
 ::: lang dart
 
 ```dart
-randomNickname(baseWord: '고양이', count: 5);
+randNickname(baseWord: '고양이', count: 5);
 // ['하얀고양이', '고양이바람', '떠도는고양이', '귀여운고양이뿔', '검은고양이손길']
 
-randomNickname(baseWord: 'Cat', count: 4);
+randNickname(baseWord: 'Cat', count: 4);
 // ['FlyingCat', 'DancingCatScale', 'MistyCatTail', 'WildCatScale']
 ```
 
@@ -201,10 +201,10 @@ randomNickname(baseWord: 'Cat', count: 4);
 ::: lang py
 
 ```python
-random_nickname(base_word="고양이", count=5)
+rand_nickname(base_word="고양이", count=5)
 # ['하얀고양이', '고양이바람', '떠도는고양이', '귀여운고양이뿔', '검은고양이손길']
 
-random_nickname(base_word="Cat", count=4)
+rand_nickname(base_word="Cat", count=4)
 # ['FlyingCat', 'DancingCatScale', 'MistyCatTail', 'WildCatScale']
 ```
 
@@ -219,10 +219,10 @@ random_nickname(base_word="Cat", count=4)
 ::: lang js
 
 ```javascript
-randomNickname({ language: 'ko', style: 100, count: 3 });
+randNickname({ language: 'ko', style: 100, count: 3 });
 // ['토한조해한', '가파모토히', '리누채무애저차부']
 
-randomNickname({ language: 'en', style: 100, count: 3 });
+randNickname({ language: 'en', style: 100, count: 3 });
 // ['Duhusk', 'DresaelSlobru', 'BroureexGrosex']
 ```
 
@@ -231,10 +231,10 @@ randomNickname({ language: 'en', style: 100, count: 3 });
 ::: lang dart
 
 ```dart
-randomNickname(language: NicknameLanguage.ko, style: 100, count: 3);
+randNickname(language: NicknameLanguage.ko, style: 100, count: 3);
 // ['토한조해한', '가파모토히', '리누채무애저차부']
 
-randomNickname(language: NicknameLanguage.en, style: 100, count: 3);
+randNickname(language: NicknameLanguage.en, style: 100, count: 3);
 // ['Duhusk', 'DresaelSlobru', 'BroureexGrosex']
 ```
 
@@ -243,10 +243,10 @@ randomNickname(language: NicknameLanguage.en, style: 100, count: 3);
 ::: lang py
 
 ```python
-random_nickname(language="ko", style=100, count=3)
+rand_nickname(language="ko", style=100, count=3)
 # ['토한조해한', '가파모토히', '리누채무애저차부']
 
-random_nickname(language="en", style=100, count=3)
+rand_nickname(language="en", style=100, count=3)
 # ['Duhusk', 'DresaelSlobru', 'BroureexGrosex']
 ```
 

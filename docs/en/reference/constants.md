@@ -130,13 +130,13 @@ Narrow it or extend it through <Lang js="uniqueSuffixCharset" dart="uniqueSuffix
 ::: lang js
 
 ```javascript
-import { NICKNAME_SUFFIX_CHARSET, randomNickname } from 'randino';
+import { NICKNAME_SUFFIX_CHARSET, randNickname } from 'randino';
 
 // Digits only.
-randomNickname({ uniqueSuffix: true, uniqueSuffixCharset: '0123456789' });
+randNickname({ uniqueSuffix: true, uniqueSuffixCharset: '0123456789' });
 
 // The default, minus the upper case.
-randomNickname({
+randNickname({
 	uniqueSuffix: true,
 	uniqueSuffixCharset: NICKNAME_SUFFIX_CHARSET.replace(/[A-Z]/g, '')
 });
@@ -150,10 +150,10 @@ randomNickname({
 import 'package:randino/randino.dart';
 
 // Digits only.
-randomNickname(uniqueSuffix: true, uniqueSuffixCharset: '0123456789');
+randNickname(uniqueSuffix: true, uniqueSuffixCharset: '0123456789');
 
 // The default, minus the upper case.
-randomNickname(
+randNickname(
   uniqueSuffix: true,
   uniqueSuffixCharset: nicknameSuffixCharset.replaceAll(RegExp('[A-Z]'), ''),
 );
@@ -164,13 +164,13 @@ randomNickname(
 ::: lang py
 
 ```python
-from randino import NICKNAME_SUFFIX_CHARSET, random_nickname
+from randino import NICKNAME_SUFFIX_CHARSET, rand_nickname
 
 # Digits only.
-random_nickname(unique_suffix=True, unique_suffix_charset="0123456789")
+rand_nickname(unique_suffix=True, unique_suffix_charset="0123456789")
 
 # The default, minus the upper case.
-random_nickname(
+rand_nickname(
     unique_suffix=True,
     unique_suffix_charset="".join(c for c in NICKNAME_SUFFIX_CHARSET if not c.isupper()),
 )
@@ -197,11 +197,11 @@ import type {
 	NicknameLanguageOption,
 	NicknameTheme,
 	NicknameThemeOption,
-	RandomNameOptions,
-	RandomNicknameOptions
+	RandNameOptions,
+	RandNicknameOptions
 } from 'randino';
 
-const options: RandomNameOptions = { language: 'ko', count: 3 };
+const options: RandNameOptions = { language: 'ko', count: 3 };
 ```
 
 The `…Option` types are the union of a language or theme with `'all'` — `NameLanguageOption` is `NameLanguage | 'all'`. Use the narrower one wherever `'all'` is not a valid answer, which is what the helpers do.

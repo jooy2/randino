@@ -1,4 +1,4 @@
-import type { RandomNicknameOptions } from '../_types/global.js';
+import type { RandNicknameOptions } from '../_types/global.js';
 import { generateNicknameDetails } from './nicknameGenerator.js';
 
 /**
@@ -8,17 +8,17 @@ import { generateNicknameDetails } from './nicknameGenerator.js';
  * names are never used.
  *
  * @example
- * randomNickname({ language: 'ko', count: 3 });
+ * randNickname({ language: 'ko', count: 3 });
  * // ['멋진사자', '파란물병', '고양이꼬리']
- * randomNickname({ language: 'en' });
+ * randNickname({ language: 'en' });
  * // ['MistyOwl']
- * randomNickname({ language: 'ko', uniqueSuffix: true, count: 2 });
+ * randNickname({ language: 'ko', uniqueSuffix: true, count: 2 });
  * // ['달리는표범_gDe2C', '조용한노을_nVtRC']
- * randomNickname({ language: 'ko', wordSeparator: ' ', count: 2 });
+ * randNickname({ language: 'ko', wordSeparator: ' ', count: 2 });
  * // ['멋진 사자', '고양이 꼬리']
- * randomNickname({ baseWord: '고양이', count: 3 });
+ * randNickname({ baseWord: '고양이', count: 3 });
  * // ['멋진고양이', '고양이발바닥', '파란고양이꼬리']
  */
-export function randomNickname(options: RandomNicknameOptions = {}): string[] {
+export function randNickname(options: RandNicknameOptions = {}): string[] {
 	return generateNicknameDetails(options).map((detail) => detail.nickname);
 }

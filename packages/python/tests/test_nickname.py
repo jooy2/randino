@@ -1,6 +1,6 @@
 """Nicknames.
 
-Nicknames are checked against the datasets themselves: `random_nickname_details`
+Nicknames are checked against the datasets themselves: `rand_nickname_details`
 reports the words it used, so every word can be asserted to come from the language's
 pools, and the English pools are asserted to share nothing with the English
 person-name pools.
@@ -15,8 +15,8 @@ from randino import (
     NicknameLanguage,
     NicknameTheme,
     nickname_length_range,
-    random_nickname,
-    random_nickname_details,
+    rand_nickname,
+    rand_nickname_details,
 )
 
 # The datasets are internal, but a nickname is only as good as the words it is built
@@ -56,35 +56,35 @@ def nouns_of(language: NicknameLanguage, theme: NicknameTheme | None = None) -> 
     return [word for each in NICKNAME_THEMES for word in nouns[each]]
 
 
-def test_random_nickname_returns_one_nickname_by_default() -> None:
-    nicknames = random_nickname()
+def test_rand_nickname_returns_one_nickname_by_default() -> None:
+    nicknames = rand_nickname()
 
     assert len(nicknames) == 1
     assert isinstance(nicknames[0], str)
     assert nicknames[0]
 
 
-def test_random_nickname_returns_exactly_count_nicknames() -> None:
-    assert len(random_nickname(count=25)) == 25
-    assert len(random_nickname(count=0)) == 0
-    assert len(random_nickname(count=-10)) == 0
-    assert len(random_nickname(count=2.7)) == 2  # type: ignore[arg-type]
-    assert len(random_nickname(count=NICKNAME_COUNT_MAX + 500)) == NICKNAME_COUNT_MAX
+def test_rand_nickname_returns_exactly_count_nicknames() -> None:
+    assert len(rand_nickname(count=25)) == 25
+    assert len(rand_nickname(count=0)) == 0
+    assert len(rand_nickname(count=-10)) == 0
+    assert len(rand_nickname(count=2.7)) == 2  # type: ignore[arg-type]
+    assert len(rand_nickname(count=NICKNAME_COUNT_MAX + 500)) == NICKNAME_COUNT_MAX
 
 
 def test_every_language_writes_nicknames_in_its_own_script() -> None:
     for language in NICKNAME_LANGUAGES:
-        for nickname in random_nickname(language=language, count=SAMPLE):
+        for nickname in rand_nickname(language=language, count=SAMPLE):
             assert SCRIPT[language].fullmatch(nickname), f"{language}: {nickname}"
 
-        for nickname in random_nickname(language=language, count=SAMPLE, style=100):
+        for nickname in rand_nickname(language=language, count=SAMPLE, style=100):
             assert SCRIPT[language].fullmatch(nickname), f"{language} invented: {nickname}"
 
 
 def test_the_mixed_language_uses_every_language_it_knows() -> None:
     used = set()
 
-    for detail in random_nickname_details(count=400):
+    for detail in rand_nickname_details(count=400):
         assert SCRIPT[detail.language].fullmatch(detail.nickname), detail.nickname
         used.add(detail.language)
 
@@ -95,7 +95,7 @@ def test_nicknames_are_built_from_real_words_and_never_from_names() -> None:
     for language in NICKNAME_LANGUAGES:
         pool = set(all_words(language))
 
-        for detail in random_nickname_details(language=language, count=200):
+        for detail in rand_nickname_details(language=language, count=200):
             assert detail.words, detail.nickname
 
             for word in detail.words:
@@ -114,7 +114,7 @@ def test_nicknames_are_built_from_real_words_and_never_from_names() -> None:
 
 
 def test_every_nickname_is_a_word_with_something_added_to_it() -> None:
-    details = random_nickname_details(language="ko", count=200)
+    details = rand_nickname_details(language="ko", count=200)
     modifiers = set(NICKNAME_DATA["ko"].modifiers)
     decorated = [
         detail for detail in details if len(detail.words) > 1 or detail.words[0] in modifiers
@@ -132,7 +132,7 @@ def test_include_modifier_false_leaves_the_word_undecorated() -> None:
     for language in NICKNAME_LANGUAGES:
         parts = NICKNAME_DATA[language].parts or ()
 
-        for detail in random_nickname_details(
+        for detail in rand_nickname_details(
             language=language, count=SAMPLE, include_modifier=False
         ):
             # A noun, and at most one trailing word behind it. Note that a few words
@@ -150,19 +150,19 @@ def test_theme_decides_what_the_nickname_is_about() -> None:
         for language in NICKNAME_LANGUAGES:
             nouns = nouns_of(language, theme)
 
-            for detail in random_nickname_details(language=language, theme=theme, count=40):
+            for detail in rand_nickname_details(language=language, theme=theme, count=40):
                 assert detail.theme == theme, detail.nickname
                 assert any(word in nouns for word in detail.words), (
                     f"{detail.nickname} has no {theme} word"
                 )
 
-    themes = {detail.theme for detail in random_nickname_details(count=400)}
+    themes = {detail.theme for detail in rand_nickname_details(count=400)}
     assert themes == set(NICKNAME_THEMES)
 
 
 def test_a_word_belongs_to_exactly_one_theme() -> None:
     # Two themes claiming one word make `theme` ambiguous for `base_word`, and make
-    # `random_nickname_details` report a theme the caller never asked about.
+    # `rand_nickname_details` report a theme the caller never asked about.
     for language in NICKNAME_LANGUAGES:
         owner: dict[str, NicknameTheme] = {}
 
@@ -187,7 +187,7 @@ def test_nicknames_stay_inside_the_requested_length_range() -> None:
     ]
 
     for language, low, high in ranges:
-        for nickname in random_nickname(
+        for nickname in rand_nickname(
             language=language, min_length=low, max_length=high, count=SAMPLE
         ):
             assert low <= len(nickname) <= high, (
@@ -205,7 +205,7 @@ def test_omitted_length_bounds_fall_back_to_what_the_language_can_produce() -> N
         low, high = nickname_length_range(language)
 
         for style in (0, 100):
-            for nickname in random_nickname(language=language, style=style, count=SAMPLE):
+            for nickname in rand_nickname(language=language, style=style, count=SAMPLE):
                 assert low <= len(nickname) <= high, (
                     f"{language} @ {style}: {nickname} ({len(nickname)})"
                 )
@@ -214,7 +214,7 @@ def test_omitted_length_bounds_fall_back_to_what_the_language_can_produce() -> N
 def test_word_separator_goes_between_the_words() -> None:
     for language in NICKNAME_LANGUAGES:
         for separator in ("", " ", "-", "::"):
-            for detail in random_nickname_details(
+            for detail in rand_nickname_details(
                 language=language, word_separator=separator, count=SAMPLE
             ):
                 assert detail.nickname == separator.join(detail.words), (
@@ -226,7 +226,7 @@ def test_word_separator_goes_between_the_words() -> None:
 
     # Omitted, it falls back to the way the language joins its words, which is to run
     # them together.
-    for detail in random_nickname_details(count=SAMPLE):
+    for detail in rand_nickname_details(count=SAMPLE):
         assert detail.nickname == "".join(detail.words), detail.nickname
 
     # The separator is part of the nickname, so it counts toward the length.
@@ -240,7 +240,7 @@ def test_word_separator_goes_between_the_words() -> None:
     ]
 
     for language, separator, low, high in separated:
-        for nickname in random_nickname(
+        for nickname in rand_nickname(
             language=language,
             word_separator=separator,
             min_length=low,
@@ -252,14 +252,12 @@ def test_word_separator_goes_between_the_words() -> None:
             )
 
     # The unique suffix keeps its own separator.
-    for nickname in random_nickname(
-        language="en", word_separator="-", unique_suffix=True, count=20
-    ):
+    for nickname in rand_nickname(language="en", word_separator="-", unique_suffix=True, count=20):
         assert re.fullmatch(r"[A-Za-z]+(-[A-Za-z]+)*_[0-9A-Za-z]{5}", nickname), nickname
 
 
 def test_unique_suffix_appends_a_token_that_the_length_options_ignore() -> None:
-    for detail in random_nickname_details(
+    for detail in rand_nickname_details(
         language="ko", count=SAMPLE, unique_suffix=True, min_length=4, max_length=6
     ):
         assert re.fullmatch(r"_[0-9A-Za-z]{5}", detail.suffix), detail.nickname
@@ -270,12 +268,12 @@ def test_unique_suffix_appends_a_token_that_the_length_options_ignore() -> None:
         assert SCRIPT["ko"].fullmatch(word), detail.nickname
 
     # The token is what makes a nickname collision-free rather than unlikely.
-    many = random_nickname(language="ko", count=2000, unique_suffix=True)
+    many = rand_nickname(language="ko", count=2000, unique_suffix=True)
     assert len(set(many)) == 2000
 
 
 def test_the_unique_suffix_is_configurable() -> None:
-    for nickname in random_nickname(
+    for nickname in rand_nickname(
         language="en",
         count=20,
         unique_suffix=True,
@@ -284,7 +282,7 @@ def test_the_unique_suffix_is_configurable() -> None:
     ):
         assert re.fullmatch(r"[A-Za-z]+-[0-9A-Za-z]{8}", nickname), nickname
 
-    for nickname in random_nickname(
+    for nickname in rand_nickname(
         language="ko",
         count=20,
         unique_suffix=True,
@@ -294,7 +292,7 @@ def test_the_unique_suffix_is_configurable() -> None:
         assert re.fullmatch(r"[가-힣]+_[0-9]{4}", nickname), nickname
 
     # An empty separator is a valid choice, and lengths are clamped.
-    for nickname in random_nickname(
+    for nickname in rand_nickname(
         language="en",
         count=20,
         unique_suffix=True,
@@ -304,12 +302,12 @@ def test_the_unique_suffix_is_configurable() -> None:
         assert re.fullmatch(r"[A-Za-z]+[0-9A-Za-z]", nickname), nickname
 
     # No suffix unless it was asked for.
-    for detail in random_nickname_details(count=20, unique_suffix_length=8):
+    for detail in rand_nickname_details(count=20, unique_suffix_length=8):
         assert detail.suffix == ""
 
 
 def test_base_word_keeps_the_word_and_varies_only_the_decoration() -> None:
-    details = random_nickname_details(base_word="고양이", count=100)
+    details = rand_nickname_details(base_word="고양이", count=100)
 
     for detail in details:
         assert "고양이" in detail.nickname, detail.nickname
@@ -325,37 +323,37 @@ def test_base_word_keeps_the_word_and_varies_only_the_decoration() -> None:
     assert len({detail.nickname for detail in details}) > 20
 
     # A word the generator does not know belongs to no theme.
-    for detail in random_nickname_details(base_word="뿌꾸", count=20):
+    for detail in rand_nickname_details(base_word="뿌꾸", count=20):
         assert detail.theme is None
         assert "뿌꾸" in detail.nickname, detail.nickname
 
     # Each script picks the language that goes with it.
-    assert random_nickname_details(base_word="Cat")[0].language == "en"
-    assert random_nickname_details(base_word="ネコ")[0].language == "ja"
-    assert random_nickname_details(base_word="熊猫")[0].language == "zh"
+    assert rand_nickname_details(base_word="Cat")[0].language == "en"
+    assert rand_nickname_details(base_word="ネコ")[0].language == "ja"
+    assert rand_nickname_details(base_word="熊猫")[0].language == "zh"
     # An explicit language wins over the guess.
-    assert random_nickname_details(base_word="고양이", language="en")[0].language == "en"
+    assert rand_nickname_details(base_word="고양이", language="en")[0].language == "en"
 
     # A base word longer than the language's natural range is not truncated.
-    for nickname in random_nickname(base_word="고양이발바닥무늬", count=20):
+    for nickname in rand_nickname(base_word="고양이발바닥무늬", count=20):
         assert "고양이발바닥무늬" in nickname, nickname
 
 
 def test_starts_with_leads_every_nickname_with_the_requested_character() -> None:
-    for nickname in random_nickname(language="ko", count=SAMPLE, starts_with="파"):
+    for nickname in rand_nickname(language="ko", count=SAMPLE, starts_with="파"):
         assert nickname.startswith("파"), nickname
 
-    for nickname in random_nickname(language="en", count=SAMPLE, starts_with="b"):
+    for nickname in rand_nickname(language="en", count=SAMPLE, starts_with="b"):
         assert nickname[0] in "Bb", nickname
 
     # A character no real word starts with is answered with an invented one.
-    for nickname in random_nickname(language="en", count=20, starts_with="Z"):
+    for nickname in rand_nickname(language="en", count=20, starts_with="Z"):
         assert re.fullmatch(r"Z[A-Za-z]+", nickname), nickname
 
 
 def test_style_invents_words_instead_of_drawing_them() -> None:
     pool = set(all_words("ko"))
-    invented = random_nickname_details(language="ko", style=100, count=200)
+    invented = rand_nickname_details(language="ko", style=100, count=200)
     drawn = [detail for detail in invented if any(word in pool for word in detail.words)]
 
     assert len(drawn) < 20, f"{len(drawn)} of 200 still came from the pools"
@@ -370,22 +368,22 @@ def test_style_invents_words_instead_of_drawing_them() -> None:
             assert any(word in nouns for word in detail.words), detail.nickname
 
     # Halfway, both kinds of word show up.
-    mixed = random_nickname_details(language="ko", style=50, count=200)
+    mixed = rand_nickname_details(language="ko", style=50, count=200)
     assert any(all(word in pool for word in detail.words) for detail in mixed)
     assert any(all(word not in pool for word in detail.words) for detail in mixed)
 
     # Out-of-range values are clamped rather than rejected.
     for style in (-50, 500):
-        assert len(random_nickname(language="ko", style=style, count=5)) == 5
+        assert len(rand_nickname(language="ko", style=style, count=5)) == 5
 
 
 def test_unique_never_repeats_a_nickname() -> None:
-    nicknames = random_nickname(language="ko", count=2000, unique=True)
+    nicknames = rand_nickname(language="ko", count=2000, unique=True)
     assert len(set(nicknames)) == len(nicknames)
 
     # A single word plus one theme is a small pool, so the request runs out of
     # combinations and returns fewer instead of looping.
-    limited = random_nickname(
+    limited = rand_nickname(
         language="zh", theme="animal", include_modifier=False, count=400, unique=True
     )
 
@@ -393,8 +391,8 @@ def test_unique_never_repeats_a_nickname() -> None:
     assert len(limited) < 400, f"expected the pool to run out: {len(limited)}"
 
 
-def test_random_nickname_details_reports_the_pieces_it_used() -> None:
-    for detail in random_nickname_details(count=100, unique_suffix=True):
+def test_rand_nickname_details_reports_the_pieces_it_used() -> None:
+    for detail in rand_nickname_details(count=100, unique_suffix=True):
         joiner = NICKNAME_DATA[detail.language].joiner
 
         assert joiner.join(detail.words) + detail.suffix == detail.nickname

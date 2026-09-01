@@ -5,9 +5,9 @@ randino generates names people actually carry — 김민준, Emma Clover, Ива
 ::: lang js
 
 ```javascript
-import { randomName } from 'randino';
+import { randName } from 'randino';
 
-randomName({ language: 'ko', count: 3 });
+randName({ language: 'ko', count: 3 });
 // ['김태윤', '원동혁', '조진우']
 ```
 
@@ -18,7 +18,7 @@ randomName({ language: 'ko', count: 3 });
 ```dart
 import 'package:randino/randino.dart';
 
-randomName(language: NameLanguage.ko, count: 3);
+randName(language: NameLanguage.ko, count: 3);
 // ['김태윤', '원동혁', '조진우']
 ```
 
@@ -27,9 +27,9 @@ randomName(language: NameLanguage.ko, count: 3);
 ::: lang py
 
 ```python
-from randino import random_name
+from randino import rand_name
 
-random_name(language="ko", count=3)
+rand_name(language="ko", count=3)
 # ['김태윤', '원동혁', '조진우']
 ```
 
@@ -39,8 +39,8 @@ random_name(language="ko", count=3)
 
 | Function | Returns |
 | --- | --- |
-| [`randomName`](./random-name) | The names as strings, in one script |
-| [`randomNameDetails`](./random-name-details) | Both scripts plus the language and gender behind each name |
+| [`randName`](./rand-name) | The names as strings, in one script |
+| [`randNameDetails`](./rand-name-details) | Both scripts plus the language and gender behind each name |
 | [`nameLengthRange`](./name-length-range) | The natural length range of a full name in a language |
 | [`nameSupportsMiddleName`](./name-supports-middle-name) | Whether a language has a middle part at all |
 | [`nameSupportsRoman`](./name-supports-roman) | Whether romanizing changes anything |
@@ -58,10 +58,10 @@ Toward `100` names are invented instead: Latin and Cyrillic scripts from syllabl
 ::: lang js
 
 ```javascript
-randomName({ language: 'en', style: 100, count: 3 });
+randName({ language: 'en', style: 100, count: 3 });
 // ['Deder Kuvoun', 'Jaihil Brouvinn', 'Thoowoun Wiatou']
 
-randomName({ language: 'ko', style: 100, count: 3 });
+randName({ language: 'ko', style: 100, count: 3 });
 // ['송승완', '구상겸', '채진훈']
 ```
 
@@ -70,10 +70,10 @@ randomName({ language: 'ko', style: 100, count: 3 });
 ::: lang dart
 
 ```dart
-randomName(language: NameLanguage.en, style: 100, count: 3);
+randName(language: NameLanguage.en, style: 100, count: 3);
 // ['Deder Kuvoun', 'Jaihil Brouvinn', 'Thoowoun Wiatou']
 
-randomName(language: NameLanguage.ko, style: 100, count: 3);
+randName(language: NameLanguage.ko, style: 100, count: 3);
 // ['송승완', '구상겸', '채진훈']
 ```
 
@@ -82,10 +82,10 @@ randomName(language: NameLanguage.ko, style: 100, count: 3);
 ::: lang py
 
 ```python
-random_name(language="en", style=100, count=3)
+rand_name(language="en", style=100, count=3)
 # ['Deder Kuvoun', 'Jaihil Brouvinn', 'Thoowoun Wiatou']
 
-random_name(language="ko", style=100, count=3)
+rand_name(language="ko", style=100, count=3)
 # ['송승완', '구상겸', '채진훈']
 ```
 
@@ -119,4 +119,4 @@ So that the count you asked for is the count you get. Turn it on to deduplicate;
 
 `gender` picks which pools the given name is drawn from. In most languages that is all it does, and the result is not observable from the outside — a Korean given name does not announce which pool it came from. Russian is the exception: its patronymic and its surname both inflect, so `Иванов` becomes `Иванова` and `Николаевич` becomes `Николаевна`.
 
-Leave it out and a gender is picked per name. <Lang js="randomNameDetails" dart="randomNameDetails" py="random_name_details" code /> reports which one was used.
+Leave it out and a gender is picked per name. <Lang js="randNameDetails" dart="randNameDetails" py="rand_name_details" code /> reports which one was used.

@@ -14,7 +14,7 @@ Every option and every example, with **Dart** picked in the sidebar. This README
 
 - **Person names** read like names people actually carry — 김민준, Emma Clover, Иванов Иван — and come with their English pronunciation. 9 languages.
 - **Nicknames** are the handles you would pick for a game or a website — 멋진사자, MistyOwl, 고양이꼬리. Built from everyday words across fourteen themes, never from person names.
-- Every parameter is named and optional, and a **null enum means "every one of them"** — `randomName()` on its own works.
+- Every parameter is named and optional, and a **null enum means "every one of them"** — `randName()` on its own works.
 - **Pure Dart, no dependencies.** It imports nothing but `dart:math`, so it runs on the VM, on the web and inside Flutter on every platform.
 
 This is the Dart half. The [npm package](https://www.npmjs.com/package/randino) is the other one, and the two generate from the same datasets under the same rules. They version independently, so this package's number and the npm one's will not always agree.
@@ -32,23 +32,23 @@ Requires **Dart 3.7 or newer** (Flutter 3.29). There is nothing else to install.
 ```dart
 import 'package:randino/randino.dart';
 
-randomName();
+randName();
 // ['Emma Clover']
 
-randomName(language: NameLanguage.ko, count: 3);
+randName(language: NameLanguage.ko, count: 3);
 // ['김태윤', '원동혁', '조진우']
 
-randomName(language: NameLanguage.ko, script: NameScript.roman);
+randName(language: NameLanguage.ko, script: NameScript.roman);
 // ['Kim Minjun']
 
-randomName(
+randName(
   language: NameLanguage.en,
   gender: NameGender.female,
   includeMiddleName: true,
 );
 // ['Grace Amelia Bennett']
 
-randomNameDetails(language: NameLanguage.ko).first;
+randNameDetails(language: NameLanguage.ko).first;
 // NameDetail(여미주, Yeo Miju, ko, female)
 ```
 
@@ -65,27 +65,27 @@ randomNameDetails(language: NameLanguage.ko).first;
 | `startsWith`              | `String?`       | `null`              |
 | `unique`                  | `bool`          | `false`             |
 
-`randomNameDetails` takes the same parameters except `script`, and returns a `NameDetail` — `native`, `roman`, `language` and `gender` — for each name.
+`randNameDetails` takes the same parameters except `script`, and returns a `NameDetail` — `native`, `roman`, `language` and `gender` — for each name.
 
 ## Nicknames
 
 ```dart
-randomNickname(language: NicknameLanguage.ko, count: 3);
+randNickname(language: NicknameLanguage.ko, count: 3);
 // ['오래된곰', '영원한도마뱀', '귀여운신화다발']
 
-randomNickname(language: NicknameLanguage.en, count: 2);
+randNickname(language: NicknameLanguage.en, count: 2);
 // ['FoggyHillside', 'CraneVoyage']
 
-randomNickname(language: NicknameLanguage.ko, theme: NicknameTheme.animal, count: 2);
+randNickname(language: NicknameLanguage.ko, theme: NicknameTheme.animal, count: 2);
 // ['깊은연어', '하얀여우갈기']
 
-randomNickname(language: NicknameLanguage.ko, uniqueSuffix: true, count: 2);
+randNickname(language: NicknameLanguage.ko, uniqueSuffix: true, count: 2);
 // ['달력_U7aNZ', '조용한바구니_RUKAP']
 
-randomNickname(baseWord: '고양이', count: 3);
+randNickname(baseWord: '고양이', count: 3);
 // ['하얀고양이', '고양이바람', '귀여운고양이뿔']
 
-randomNicknameDetails(language: NicknameLanguage.ko, uniqueSuffix: true).first;
+randNicknameDetails(language: NicknameLanguage.ko, uniqueSuffix: true).first;
 // NicknameDetail(오래된발견_zVShs, [오래된, 발견], ko, concept)
 ```
 

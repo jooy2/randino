@@ -1,5 +1,5 @@
-// The nickname generator itself. Internal — `randomNickname` and
-// `randomNicknameDetails` are the public entry points.
+// The nickname generator itself. Internal — `randNickname` and
+// `randNicknameDetails` are the public entry points.
 //
 // A nickname is a noun with something added to it: a modifier in front
 // (멋진사자), a second noun behind (고양이꼬리), or both (파란고양이발바닥). The
@@ -15,13 +15,13 @@
 // - `uniqueSuffix` appends a random token, which is what makes a nickname
 //   collision-free rather than merely unlikely.
 
-import { capitalizeFirst, chance, clamp, pick, randInt, randomToken } from '../_internal/utils.js';
+import { capitalizeFirst, chance, clamp, pick, randInt, randToken } from '../_internal/utils.js';
 import type {
 	NicknameDetail,
 	NicknameLanguage,
 	NicknameTheme,
 	NicknameThemeOption,
-	RandomNicknameOptions
+	RandNicknameOptions
 } from '../_types/global.js';
 import {
 	NICKNAME_COUNT_MAX,
@@ -499,7 +499,7 @@ function generateOne(language: NicknameLanguage, settings: Settings): Built {
 }
 
 /** Resolve the caller's options into the settings a single nickname is built from. */
-function resolveSettings(options: RandomNicknameOptions): Settings {
+function resolveSettings(options: RandNicknameOptions): Settings {
 	const baseWord = (options.baseWord ?? '').trim();
 
 	return {
@@ -531,7 +531,7 @@ function detectLanguage(word: string): NicknameLanguage {
 	return 'en';
 }
 
-export function generateNicknameDetails(options: RandomNicknameOptions = {}): NicknameDetail[] {
+export function generateNicknameDetails(options: RandNicknameOptions = {}): NicknameDetail[] {
 	const settings = resolveSettings(options);
 	const language =
 		options.language ?? (settings.baseWord ? detectLanguage(settings.baseWord) : 'all');
@@ -560,7 +560,7 @@ export function generateNicknameDetails(options: RandomNicknameOptions = {}): Ni
 		if (!word) continue;
 		if (prefix && !word.toLowerCase().startsWith(prefix)) continue;
 
-		const suffix = suffixLength ? separator + randomToken(suffixLength, charset) : '';
+		const suffix = suffixLength ? separator + randToken(suffixLength, charset) : '';
 		const nickname = word + suffix;
 
 		if (unique) {

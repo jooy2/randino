@@ -45,7 +45,7 @@ int randInt(int min, int max) => max <= min ? min : min + _random.nextInt(max - 
 bool chance(num percent) => _random.nextDouble() * 100 < percent;
 
 /// Random double in `[0, 1)`, for the weighted draws that roll their own.
-double randomDouble() => _random.nextDouble();
+double randDouble() => _random.nextDouble();
 
 /// [value] held inside `[min, max]`.
 int clampInt(int value, int min, int max) => value < min ? min : (value > max ? max : value);
@@ -55,7 +55,7 @@ String capitalizeFirst(String value) =>
     value.isEmpty ? value : value[0].toUpperCase() + value.substring(1);
 
 /// Random string of [length] characters drawn from [charset].
-String randomToken(int length, String charset) {
+String randToken(int length, String charset) {
   final buffer = StringBuffer();
 
   for (var i = 0; i < length; i += 1) {

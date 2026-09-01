@@ -5,8 +5,8 @@ import {
 	NICKNAME_LANGUAGES,
 	NICKNAME_THEMES,
 	nicknameLengthRange,
-	randomNickname,
-	randomNicknameDetails
+	randNickname,
+	randNicknameDetails
 } from '../dist/index.js';
 import type { NicknameLanguage, NicknameTheme } from '../dist/index.js';
 // The datasets are internal, but a nickname is only as good as the words it is
@@ -41,32 +41,32 @@ function nounsOf(language: NicknameLanguage, theme?: NicknameTheme): string[] {
 }
 
 describe('Nickname', () => {
-	it('randomNickname returns one nickname by default', () => {
-		const nicknames = randomNickname();
+	it('randNickname returns one nickname by default', () => {
+		const nicknames = randNickname();
 
 		assert.strictEqual(nicknames.length, 1);
 		assert.strictEqual(typeof nicknames[0], 'string');
 		assert.ok(nicknames[0].length > 0);
 	});
 
-	it('randomNickname returns exactly `count` nicknames', () => {
-		assert.strictEqual(randomNickname({ count: 25 }).length, 25);
-		assert.strictEqual(randomNickname({ count: 0 }).length, 0);
-		assert.strictEqual(randomNickname({ count: -10 }).length, 0);
-		assert.strictEqual(randomNickname({ count: 2.7 }).length, 2);
+	it('randNickname returns exactly `count` nicknames', () => {
+		assert.strictEqual(randNickname({ count: 25 }).length, 25);
+		assert.strictEqual(randNickname({ count: 0 }).length, 0);
+		assert.strictEqual(randNickname({ count: -10 }).length, 0);
+		assert.strictEqual(randNickname({ count: 2.7 }).length, 2);
 		assert.strictEqual(
-			randomNickname({ count: NICKNAME_COUNT_MAX + 500 }).length,
+			randNickname({ count: NICKNAME_COUNT_MAX + 500 }).length,
 			NICKNAME_COUNT_MAX
 		);
 	});
 
 	it('every language writes nicknames in its own script', () => {
 		for (const language of NICKNAME_LANGUAGES) {
-			for (const nickname of randomNickname({ language, count: SAMPLE })) {
+			for (const nickname of randNickname({ language, count: SAMPLE })) {
 				assert.match(nickname, SCRIPT[language], `${language}: ${nickname}`);
 			}
 
-			for (const nickname of randomNickname({ language, count: SAMPLE, style: 100 })) {
+			for (const nickname of randNickname({ language, count: SAMPLE, style: 100 })) {
 				assert.match(nickname, SCRIPT[language], `${language} invented: ${nickname}`);
 			}
 		}
@@ -74,7 +74,7 @@ describe('Nickname', () => {
 
 	it('the mixed language uses every language it knows', () => {
 		const used = new Set(
-			randomNicknameDetails({ count: 400 }).map((detail) => {
+			randNicknameDetails({ count: 400 }).map((detail) => {
 				assert.match(detail.nickname, SCRIPT[detail.language], detail.nickname);
 				return detail.language;
 			})
@@ -87,7 +87,7 @@ describe('Nickname', () => {
 		for (const language of NICKNAME_LANGUAGES) {
 			const pool = new Set(allWords(language));
 
-			for (const detail of randomNicknameDetails({ language, count: 200 })) {
+			for (const detail of randNicknameDetails({ language, count: 200 })) {
 				assert.ok(detail.words.length > 0, detail.nickname);
 
 				for (const word of detail.words) {
@@ -114,7 +114,7 @@ describe('Nickname', () => {
 	});
 
 	it('every nickname is a word with something added to it', () => {
-		const details = randomNicknameDetails({ language: 'ko', count: 200 });
+		const details = randNicknameDetails({ language: 'ko', count: 200 });
 		const modifiers = new Set(NICKNAME_DATA.ko.modifiers);
 		const decorated = details.filter(
 			(detail) => detail.words.length > 1 || modifiers.has(detail.words[0])
@@ -133,7 +133,7 @@ describe('Nickname', () => {
 		for (const language of NICKNAME_LANGUAGES) {
 			const parts = NICKNAME_DATA[language].parts ?? [];
 
-			for (const detail of randomNicknameDetails({
+			for (const detail of randNicknameDetails({
 				language,
 				count: SAMPLE,
 				includeModifier: false
@@ -156,7 +156,7 @@ describe('Nickname', () => {
 			for (const language of NICKNAME_LANGUAGES) {
 				const nouns = nounsOf(language, theme);
 
-				for (const detail of randomNicknameDetails({ language, theme, count: 40 })) {
+				for (const detail of randNicknameDetails({ language, theme, count: 40 })) {
 					assert.strictEqual(detail.theme, theme, detail.nickname);
 					assert.ok(
 						detail.words.some((word) => nouns.includes(word)),
@@ -166,13 +166,13 @@ describe('Nickname', () => {
 			}
 		}
 
-		const themes = new Set(randomNicknameDetails({ count: 400 }).map((detail) => detail.theme));
+		const themes = new Set(randNicknameDetails({ count: 400 }).map((detail) => detail.theme));
 		assert.deepStrictEqual([...themes].sort(), [...NICKNAME_THEMES].sort());
 	});
 
 	it('a word belongs to exactly one theme', () => {
 		// Two themes claiming one word make `theme` ambiguous for `baseWord`, and
-		// make `randomNicknameDetails` report a theme the caller never asked about.
+		// make `randNicknameDetails` report a theme the caller never asked about.
 		for (const language of NICKNAME_LANGUAGES) {
 			const owner = new Map<string, NicknameTheme>();
 
@@ -200,7 +200,7 @@ describe('Nickname', () => {
 		];
 
 		for (const [language, minLength, maxLength] of ranges) {
-			for (const nickname of randomNickname({ language, minLength, maxLength, count: SAMPLE })) {
+			for (const nickname of randNickname({ language, minLength, maxLength, count: SAMPLE })) {
 				assert.ok(
 					nickname.length >= minLength && nickname.length <= maxLength,
 					`${language} ${minLength}-${maxLength}: ${nickname} (${nickname.length})`
@@ -219,7 +219,7 @@ describe('Nickname', () => {
 			const [min, max] = nicknameLengthRange(language);
 
 			for (const style of [0, 100]) {
-				for (const nickname of randomNickname({ language, style, count: SAMPLE })) {
+				for (const nickname of randNickname({ language, style, count: SAMPLE })) {
 					assert.ok(
 						nickname.length >= min && nickname.length <= max,
 						`${language} @ ${style}: ${nickname} (${nickname.length})`
@@ -232,7 +232,7 @@ describe('Nickname', () => {
 	it('wordSeparator goes between the words', () => {
 		for (const language of NICKNAME_LANGUAGES) {
 			for (const wordSeparator of ['', ' ', '-', '::']) {
-				for (const detail of randomNicknameDetails({ language, wordSeparator, count: SAMPLE })) {
+				for (const detail of randNicknameDetails({ language, wordSeparator, count: SAMPLE })) {
 					assert.strictEqual(
 						detail.nickname,
 						detail.words.join(wordSeparator),
@@ -248,7 +248,7 @@ describe('Nickname', () => {
 
 		// Omitted, it falls back to the way the language joins its words, which is
 		// to run them together.
-		for (const detail of randomNicknameDetails({ count: SAMPLE })) {
+		for (const detail of randNicknameDetails({ count: SAMPLE })) {
 			assert.strictEqual(detail.nickname, detail.words.join(''), detail.nickname);
 		}
 
@@ -261,7 +261,7 @@ describe('Nickname', () => {
 			['en', '-', 8, 14],
 			['zh', '::', 6, 9]
 		] as [NicknameLanguage, string, number, number][]) {
-			for (const nickname of randomNickname({
+			for (const nickname of randNickname({
 				language,
 				wordSeparator,
 				minLength,
@@ -276,7 +276,7 @@ describe('Nickname', () => {
 		}
 
 		// The unique suffix keeps its own separator.
-		for (const nickname of randomNickname({
+		for (const nickname of randNickname({
 			language: 'en',
 			wordSeparator: '-',
 			uniqueSuffix: true,
@@ -287,7 +287,7 @@ describe('Nickname', () => {
 	});
 
 	it('uniqueSuffix appends a token that the length options ignore', () => {
-		for (const detail of randomNicknameDetails({
+		for (const detail of randNicknameDetails({
 			language: 'ko',
 			count: SAMPLE,
 			uniqueSuffix: true,
@@ -303,12 +303,12 @@ describe('Nickname', () => {
 		}
 
 		// The token is what makes a nickname collision-free rather than unlikely.
-		const many = randomNickname({ language: 'ko', count: 2000, uniqueSuffix: true });
+		const many = randNickname({ language: 'ko', count: 2000, uniqueSuffix: true });
 		assert.strictEqual(new Set(many).size, 2000);
 	});
 
 	it('the unique suffix is configurable', () => {
-		for (const nickname of randomNickname({
+		for (const nickname of randNickname({
 			language: 'en',
 			count: 20,
 			uniqueSuffix: true,
@@ -318,7 +318,7 @@ describe('Nickname', () => {
 			assert.match(nickname, /^[A-Za-z]+-[0-9A-Za-z]{8}$/, nickname);
 		}
 
-		for (const nickname of randomNickname({
+		for (const nickname of randNickname({
 			language: 'ko',
 			count: 20,
 			uniqueSuffix: true,
@@ -329,7 +329,7 @@ describe('Nickname', () => {
 		}
 
 		// An empty separator is a valid choice, and lengths are clamped.
-		for (const nickname of randomNickname({
+		for (const nickname of randNickname({
 			language: 'en',
 			count: 20,
 			uniqueSuffix: true,
@@ -340,13 +340,13 @@ describe('Nickname', () => {
 		}
 
 		// No suffix unless it was asked for.
-		for (const detail of randomNicknameDetails({ count: 20, uniqueSuffixLength: 8 })) {
+		for (const detail of randNicknameDetails({ count: 20, uniqueSuffixLength: 8 })) {
 			assert.strictEqual(detail.suffix, '');
 		}
 	});
 
 	it('baseWord keeps the word and varies only the decoration', () => {
-		const details = randomNicknameDetails({ baseWord: '고양이', count: 100 });
+		const details = randNicknameDetails({ baseWord: '고양이', count: 100 });
 
 		for (const detail of details) {
 			assert.ok(detail.nickname.includes('고양이'), detail.nickname);
@@ -363,45 +363,45 @@ describe('Nickname', () => {
 		assert.ok(new Set(details.map((detail) => detail.nickname)).size > 20);
 
 		// A word the generator does not know belongs to no theme.
-		for (const detail of randomNicknameDetails({ baseWord: '뿌꾸', count: 20 })) {
+		for (const detail of randNicknameDetails({ baseWord: '뿌꾸', count: 20 })) {
 			assert.strictEqual(detail.theme, null);
 			assert.ok(detail.nickname.includes('뿌꾸'), detail.nickname);
 		}
 
 		// Each script picks the language that goes with it.
-		assert.strictEqual(randomNicknameDetails({ baseWord: 'Cat' })[0].language, 'en');
-		assert.strictEqual(randomNicknameDetails({ baseWord: 'ネコ' })[0].language, 'ja');
-		assert.strictEqual(randomNicknameDetails({ baseWord: '熊猫' })[0].language, 'zh');
+		assert.strictEqual(randNicknameDetails({ baseWord: 'Cat' })[0].language, 'en');
+		assert.strictEqual(randNicknameDetails({ baseWord: 'ネコ' })[0].language, 'ja');
+		assert.strictEqual(randNicknameDetails({ baseWord: '熊猫' })[0].language, 'zh');
 		// An explicit language wins over the guess.
 		assert.strictEqual(
-			randomNicknameDetails({ baseWord: '고양이', language: 'en' })[0].language,
+			randNicknameDetails({ baseWord: '고양이', language: 'en' })[0].language,
 			'en'
 		);
 
 		// A base word longer than the language's natural range is not truncated.
-		for (const nickname of randomNickname({ baseWord: '고양이발바닥무늬', count: 20 })) {
+		for (const nickname of randNickname({ baseWord: '고양이발바닥무늬', count: 20 })) {
 			assert.ok(nickname.includes('고양이발바닥무늬'), nickname);
 		}
 	});
 
 	it('startsWith leads every nickname with the requested character', () => {
-		for (const nickname of randomNickname({ language: 'ko', count: SAMPLE, startsWith: '파' })) {
+		for (const nickname of randNickname({ language: 'ko', count: SAMPLE, startsWith: '파' })) {
 			assert.match(nickname, /^파/, nickname);
 		}
 
-		for (const nickname of randomNickname({ language: 'en', count: SAMPLE, startsWith: 'b' })) {
+		for (const nickname of randNickname({ language: 'en', count: SAMPLE, startsWith: 'b' })) {
 			assert.match(nickname, /^[Bb]/, nickname);
 		}
 
 		// A character no real word starts with is answered with an invented one.
-		for (const nickname of randomNickname({ language: 'en', count: 20, startsWith: 'Z' })) {
+		for (const nickname of randNickname({ language: 'en', count: 20, startsWith: 'Z' })) {
 			assert.match(nickname, /^Z[A-Za-z]+$/, nickname);
 		}
 	});
 
 	it('style invents words instead of drawing them', () => {
 		const pool = new Set(allWords('ko'));
-		const invented = randomNicknameDetails({ language: 'ko', style: 100, count: 200 });
+		const invented = randNicknameDetails({ language: 'ko', style: 100, count: 200 });
 		const drawn = invented.filter((detail) => detail.words.some((word) => pool.has(word)));
 
 		assert.ok(drawn.length < 20, `${drawn.length} of 200 still came from the pools`);
@@ -420,23 +420,23 @@ describe('Nickname', () => {
 		}
 
 		// Halfway, both kinds of word show up.
-		const mixed = randomNicknameDetails({ language: 'ko', style: 50, count: 200 });
+		const mixed = randNicknameDetails({ language: 'ko', style: 50, count: 200 });
 		assert.ok(mixed.some((detail) => detail.words.every((word) => pool.has(word))));
 		assert.ok(mixed.some((detail) => detail.words.every((word) => !pool.has(word))));
 
 		// Out-of-range values are clamped rather than rejected.
 		for (const style of [-50, 500]) {
-			assert.strictEqual(randomNickname({ language: 'ko', style, count: 5 }).length, 5);
+			assert.strictEqual(randNickname({ language: 'ko', style, count: 5 }).length, 5);
 		}
 	});
 
 	it('unique never repeats a nickname', () => {
-		const nicknames = randomNickname({ language: 'ko', count: 2000, unique: true });
+		const nicknames = randNickname({ language: 'ko', count: 2000, unique: true });
 		assert.strictEqual(new Set(nicknames).size, nicknames.length);
 
 		// A single word plus one theme is a small pool, so the request runs out of
 		// combinations and returns fewer instead of looping.
-		const limited = randomNickname({
+		const limited = randNickname({
 			language: 'zh',
 			theme: 'animal',
 			includeModifier: false,
@@ -448,8 +448,8 @@ describe('Nickname', () => {
 		assert.ok(limited.length < 400, `expected the pool to run out: ${limited.length}`);
 	});
 
-	it('randomNicknameDetails reports the pieces it used', () => {
-		for (const detail of randomNicknameDetails({ count: 100, uniqueSuffix: true })) {
+	it('randNicknameDetails reports the pieces it used', () => {
+		for (const detail of randNicknameDetails({ count: 100, uniqueSuffix: true })) {
 			const joiner = NICKNAME_DATA[detail.language].joiner;
 
 			assert.strictEqual(detail.words.join(joiner) + detail.suffix, detail.nickname);

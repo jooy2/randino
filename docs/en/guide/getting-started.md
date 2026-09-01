@@ -59,9 +59,9 @@ pip install randino
 ::: lang js
 
 ```javascript
-import { randomName } from 'randino';
+import { randName } from 'randino';
 
-randomName();
+randName();
 // ['Emma Clover']
 ```
 
@@ -72,7 +72,7 @@ randomName();
 ```dart
 import 'package:randino/randino.dart';
 
-randomName();
+randName();
 // ['Emma Clover']
 ```
 
@@ -81,9 +81,9 @@ randomName();
 ::: lang py
 
 ```python
-from randino import random_name
+from randino import rand_name
 
-random_name()
+rand_name()
 # ['Emma Clover']
 ```
 
@@ -94,7 +94,7 @@ Every option has a default, so a call with nothing in it works. What it returns 
 ::: lang js
 
 ```javascript
-randomName({ language: 'ko', count: 3 });
+randName({ language: 'ko', count: 3 });
 // ['김태윤', '원동혁', '조진우']
 ```
 
@@ -103,7 +103,7 @@ randomName({ language: 'ko', count: 3 });
 ::: lang dart
 
 ```dart
-randomName(language: NameLanguage.ko, count: 3);
+randName(language: NameLanguage.ko, count: 3);
 // ['김태윤', '원동혁', '조진우']
 ```
 
@@ -112,7 +112,7 @@ randomName(language: NameLanguage.ko, count: 3);
 ::: lang py
 
 ```python
-random_name(language="ko", count=3)
+rand_name(language="ko", count=3)
 # ['김태윤', '원동혁', '조진우']
 ```
 
@@ -125,12 +125,12 @@ A nickname is not a name, and randino keeps the two apart on purpose: nicknames 
 ::: lang js
 
 ```javascript
-import { randomNickname } from 'randino';
+import { randNickname } from 'randino';
 
-randomNickname({ language: 'ko', count: 3 });
+randNickname({ language: 'ko', count: 3 });
 // ['오래된곰', '영원한도마뱀', '귀여운신화다발']
 
-randomNickname({ language: 'en', count: 3 });
+randNickname({ language: 'en', count: 3 });
 // ['FoggyHillside', 'CraneVoyage', 'TinyLeopardCloak']
 ```
 
@@ -141,10 +141,10 @@ randomNickname({ language: 'en', count: 3 });
 ```dart
 import 'package:randino/randino.dart';
 
-randomNickname(language: NicknameLanguage.ko, count: 3);
+randNickname(language: NicknameLanguage.ko, count: 3);
 // ['오래된곰', '영원한도마뱀', '귀여운신화다발']
 
-randomNickname(language: NicknameLanguage.en, count: 3);
+randNickname(language: NicknameLanguage.en, count: 3);
 // ['FoggyHillside', 'CraneVoyage', 'TinyLeopardCloak']
 ```
 
@@ -153,12 +153,12 @@ randomNickname(language: NicknameLanguage.en, count: 3);
 ::: lang py
 
 ```python
-from randino import random_nickname
+from randino import rand_nickname
 
-random_nickname(language="ko", count=3)
+rand_nickname(language="ko", count=3)
 # ['오래된곰', '영원한도마뱀', '귀여운신화다발']
 
-random_nickname(language="en", count=3)
+rand_nickname(language="en", count=3)
 # ['FoggyHillside', 'CraneVoyage', 'TinyLeopardCloak']
 ```
 
@@ -173,7 +173,7 @@ Every package takes the same options under the same names. What differs is the s
 Every function takes **one options object**, and every key in it is optional:
 
 ```javascript
-randomName({
+randName({
 	language: 'ja',
 	gender: 'female',
 	count: 5,
@@ -190,7 +190,7 @@ randomName({
 Every function takes **named parameters**, and every one of them is optional:
 
 ```dart
-randomName(
+randName(
   language: NameLanguage.ja,
   gender: NameGender.female,
   count: 5,
@@ -201,7 +201,7 @@ randomName(
 A **null enum is what means "every one of them"**, which is to say: leave the parameter out. There is no `NameLanguage.all` to pass, because a parameter you do not write is already the way Dart says "no preference".
 
 ```dart
-randomName(count: 5); // five names, each in one of the nine languages
+randName(count: 5); // five names, each in one of the nine languages
 ```
 
 The one nullable that means something else is `NicknameDetail.theme`, where null says the word is not one the generator knows — an invented one, or a `baseWord` of your own.
@@ -213,7 +213,7 @@ The one nullable that means something else is `NicknameDetail.theme`, where null
 Every function takes **keyword-only arguments**, and every one of them is optional:
 
 ```python
-random_name(
+rand_name(
     language="ja",
     gender="female",
     count=5,
@@ -221,17 +221,17 @@ random_name(
 )
 ```
 
-They are keyword-only on purpose. `random_name("ja", "female", 5)` would be shorter to write and impossible to read, and it would freeze the parameter order into the API — so there is no positional form to reach for.
+They are keyword-only on purpose. `rand_name("ja", "female", 5)` would be shorter to write and impossible to read, and it would freeze the parameter order into the API — so there is no positional form to reach for.
 
 The options are the same strings the npm package uses, typed as `Literal`, so a checker catches `language="kr"` before it runs. `"all"` is the value that means "every one of them", and it is the default for `language`, `gender` and `theme`.
 
 ```python
-random_name(count=5)  # five names, each in one of the nine languages
+rand_name(count=5)  # five names, each in one of the nine languages
 ```
 
 Names are `snake_case`: `includeMiddleName` is `include_middle_name`, `minLength` is `min_length`, `startsWith` is `starts_with`.
 
-`random_nickname`'s `language` is the one argument whose default is `None` rather than `"all"`, and the two are not the same request. Left out, a `base_word` picks the language it is written in, so `"고양이"` is never handed an English modifier; passing `"all"` mixes every language regardless.
+`rand_nickname`'s `language` is the one argument whose default is `None` rather than `"all"`, and the two are not the same request. Left out, a `base_word` picks the language it is written in, so `"고양이"` is never handed an English modifier; passing `"all"` mixes every language regardless.
 
 :::
 

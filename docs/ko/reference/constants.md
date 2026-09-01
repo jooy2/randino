@@ -130,13 +130,13 @@ from randino import (
 ::: lang js
 
 ```javascript
-import { NICKNAME_SUFFIX_CHARSET, randomNickname } from 'randino';
+import { NICKNAME_SUFFIX_CHARSET, randNickname } from 'randino';
 
 // 숫자만.
-randomNickname({ uniqueSuffix: true, uniqueSuffixCharset: '0123456789' });
+randNickname({ uniqueSuffix: true, uniqueSuffixCharset: '0123456789' });
 
 // 기본값에서 대문자만 뺀 것.
-randomNickname({
+randNickname({
 	uniqueSuffix: true,
 	uniqueSuffixCharset: NICKNAME_SUFFIX_CHARSET.replace(/[A-Z]/g, '')
 });
@@ -150,10 +150,10 @@ randomNickname({
 import 'package:randino/randino.dart';
 
 // 숫자만.
-randomNickname(uniqueSuffix: true, uniqueSuffixCharset: '0123456789');
+randNickname(uniqueSuffix: true, uniqueSuffixCharset: '0123456789');
 
 // 기본값에서 대문자만 뺀 것.
-randomNickname(
+randNickname(
   uniqueSuffix: true,
   uniqueSuffixCharset: nicknameSuffixCharset.replaceAll(RegExp('[A-Z]'), ''),
 );
@@ -164,13 +164,13 @@ randomNickname(
 ::: lang py
 
 ```python
-from randino import NICKNAME_SUFFIX_CHARSET, random_nickname
+from randino import NICKNAME_SUFFIX_CHARSET, rand_nickname
 
 # 숫자만.
-random_nickname(unique_suffix=True, unique_suffix_charset="0123456789")
+rand_nickname(unique_suffix=True, unique_suffix_charset="0123456789")
 
 # 기본값에서 대문자만 뺀 것.
-random_nickname(
+rand_nickname(
     unique_suffix=True,
     unique_suffix_charset="".join(c for c in NICKNAME_SUFFIX_CHARSET if not c.isupper()),
 )
@@ -197,11 +197,11 @@ import type {
 	NicknameLanguageOption,
 	NicknameTheme,
 	NicknameThemeOption,
-	RandomNameOptions,
-	RandomNicknameOptions
+	RandNameOptions,
+	RandNicknameOptions
 } from 'randino';
 
-const options: RandomNameOptions = { language: 'ko', count: 3 };
+const options: RandNameOptions = { language: 'ko', count: 3 };
 ```
 
 `…Option`으로 끝나는 타입은 언어나 테마에 `'all'`을 더한 유니온입니다. `NameLanguageOption`은 `NameLanguage | 'all'`입니다. `'all'`이 유효한 답이 아닌 곳에서는 더 좁은 쪽을 쓰면 되고, 헬퍼들이 그렇게 하고 있습니다.

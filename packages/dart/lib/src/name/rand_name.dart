@@ -4,7 +4,7 @@ import 'package:randino/src/types.dart';
 /// Generate natural-looking person names.
 ///
 /// Returns [count] names, written in the script given by [script]. Use
-/// `randomNameDetails` to get the native and romanized form of each name
+/// `randNameDetails` to get the native and romanized form of each name
 /// together.
 ///
 /// Every parameter is optional. A null [language] mixes every supported
@@ -13,16 +13,16 @@ import 'package:randino/src/types.dart';
 /// `nameLengthRange` reports.
 ///
 /// ```dart
-/// randomName(); // ['Emma Clover']
-/// randomName(language: NameLanguage.ko, count: 3); // ['김민준', '이서연', '박지호']
-/// randomName(language: NameLanguage.ko, script: NameScript.roman); // ['Kim Minjun']
-/// randomName(
+/// randName(); // ['Emma Clover']
+/// randName(language: NameLanguage.ko, count: 3); // ['김민준', '이서연', '박지호']
+/// randName(language: NameLanguage.ko, script: NameScript.roman); // ['Kim Minjun']
+/// randName(
 ///   language: NameLanguage.en,
 ///   gender: NameGender.female,
 ///   includeMiddleName: true,
 /// ); // ['Grace Amelia Bennett']
 /// ```
-List<String> randomName({
+List<String> randName({
   NameLanguage? language,
   NameGender? gender,
   int count = 1,

@@ -25,7 +25,7 @@ Every option, every language and every example — pick **JavaScript**, **Dart**
 | [`packages/dart`](packages/dart)             | [pub.dev: `randino`](https://pub.dev/packages/randino)    | Dart 3.7 or newer (Flutter 3.29)  | [README](packages/dart/README.md)       |
 | [`packages/python`](packages/python)         | [PyPI: `randino`](https://pypi.org/project/randino/)      | Python 3.10 or newer              | [README](packages/python/README.md)     |
 
-All three generate from **the same datasets and the same rules**, so `randomName({ language: 'ko' })`, `randomName(language: NameLanguage.ko)` and `random_name(language="ko")` draw from the same pools and honour the same options. They **version independently** and keep separate changelogs — [`packages/javascript/CHANGELOG.md`](packages/javascript/CHANGELOG.md), [`packages/dart/CHANGELOG.md`](packages/dart/CHANGELOG.md) and [`packages/python/CHANGELOG.md`](packages/python/CHANGELOG.md) — so a release on one side is not a release on the others and the numbers will not always agree.
+All three generate from **the same datasets and the same rules**, so `randName({ language: 'ko' })`, `randName(language: NameLanguage.ko)` and `rand_name(language="ko")` draw from the same pools and honour the same options. They **version independently** and keep separate changelogs — [`packages/javascript/CHANGELOG.md`](packages/javascript/CHANGELOG.md), [`packages/dart/CHANGELOG.md`](packages/dart/CHANGELOG.md) and [`packages/python/CHANGELOG.md`](packages/python/CHANGELOG.md) — so a release on one side is not a release on the others and the numbers will not always agree.
 
 ## Install
 
@@ -36,18 +36,18 @@ npm install randino
 ```
 
 ```javascript
-import { randomName, randomNickname } from 'randino';
+import { randName, randNickname } from 'randino';
 
-randomName({ language: 'ko', count: 3 });
+randName({ language: 'ko', count: 3 });
 // ['김태윤', '원동혁', '조진우']
 
-randomName({ language: 'en', gender: 'female', includeMiddleName: true });
+randName({ language: 'en', gender: 'female', includeMiddleName: true });
 // ['Grace Amelia Bennett']
 
-randomNickname({ language: 'ko', count: 3 });
+randNickname({ language: 'ko', count: 3 });
 // ['오래된곰', '영원한도마뱀', '귀여운신화다발']
 
-randomNickname({ baseWord: '고양이', count: 3 });
+randNickname({ baseWord: '고양이', count: 3 });
 // ['하얀고양이', '고양이바람', '귀여운고양이뿔']
 ```
 
@@ -62,16 +62,16 @@ dart pub add randino
 ```dart
 import 'package:randino/randino.dart';
 
-randomName(language: NameLanguage.ko, count: 3);
+randName(language: NameLanguage.ko, count: 3);
 // ['김태윤', '원동혁', '조진우']
 
-randomName(language: NameLanguage.en, gender: NameGender.female, includeMiddleName: true);
+randName(language: NameLanguage.en, gender: NameGender.female, includeMiddleName: true);
 // ['Grace Amelia Bennett']
 
-randomNickname(language: NicknameLanguage.ko, count: 3);
+randNickname(language: NicknameLanguage.ko, count: 3);
 // ['오래된곰', '영원한도마뱀', '귀여운신화다발']
 
-randomNickname(baseWord: '고양이', count: 3);
+randNickname(baseWord: '고양이', count: 3);
 // ['하얀고양이', '고양이바람', '귀여운고양이뿔']
 ```
 
@@ -84,18 +84,18 @@ pip install randino
 ```
 
 ```python
-from randino import random_name, random_nickname
+from randino import rand_name, rand_nickname
 
-random_name(language="ko", count=3)
+rand_name(language="ko", count=3)
 # ['김태윤', '원동혁', '조진우']
 
-random_name(language="en", gender="female", include_middle_name=True)
+rand_name(language="en", gender="female", include_middle_name=True)
 # ['Grace Amelia Bennett']
 
-random_nickname(language="ko", count=3)
+rand_nickname(language="ko", count=3)
 # ['오래된곰', '영원한도마뱀', '귀여운신화다발']
 
-random_nickname(base_word="고양이", count=3)
+rand_nickname(base_word="고양이", count=3)
 # ['하얀고양이', '고양이바람', '귀여운고양이뿔']
 ```
 
@@ -121,8 +121,8 @@ Every generator takes a language, or mixes every language it supports when you l
 
 | Generator    | JavaScript and Dart                       | Python                                         | Example             |
 | ------------ | ----------------------------------------- | ---------------------------------------------- | ------------------- |
-| Person names | `randomName`, `randomNameDetails`         | `random_name`, `random_name_details`           | 김민준 → Kim Minjun |
-| Nicknames    | `randomNickname`, `randomNicknameDetails` | `random_nickname`, `random_nickname_details`   | 멋진사자, MistyOwl  |
+| Person names | `randName`, `randNameDetails`         | `rand_name`, `rand_name_details`           | 김민준 → Kim Minjun |
+| Nicknames    | `randNickname`, `randNicknameDetails` | `rand_nickname`, `rand_nickname_details`   | 멋진사자, MistyOwl  |
 
 The full option tables, the fourteen nickname themes and the romanization rules are on the [documentation site](https://randino.cdget.com).
 

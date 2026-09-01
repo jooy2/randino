@@ -1,5 +1,5 @@
 // Internal shape of the per-language name datasets. These types are not part of
-// the public API — consumers only ever see `RandomNameOptions` / `NameDetail`.
+// the public API — consumers only ever see `RandNameOptions` / `NameDetail`.
 
 // A name part that carries its own romanization (Japanese kanji, Chinese hanzi).
 export type NameToken = { n: string; r: string };

@@ -16,7 +16,7 @@ export type NameGenderOption = NameGender | 'all';
  */
 export type NameScript = 'native' | 'roman';
 
-export interface RandomNameOptions {
+export interface RandNameOptions {
 	/** Language of the generated names. `'all'` mixes every language. Default `'all'`. */
 	language?: NameLanguageOption;
 	/** Gender the given name is drawn from. Default `'all'`. */
@@ -94,7 +94,7 @@ export type NicknameTheme =
 /** `'all'` draws from every theme. */
 export type NicknameThemeOption = NicknameTheme | 'all';
 
-export interface RandomNicknameOptions {
+export interface RandNicknameOptions {
 	/** Language of the generated nicknames. `'all'` mixes every language. Default `'all'`. */
 	language?: NicknameLanguageOption;
 	/** What the nickname should be about. Default `'all'`. */

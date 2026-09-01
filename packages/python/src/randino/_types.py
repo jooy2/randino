@@ -1,7 +1,7 @@
 """Every type randino's public API is described in.
 
-The options themselves are keyword arguments rather than a type: `randomName({ … })`
-in the npm package is `random_name(…)` here.
+The options themselves are keyword arguments rather than a type: `randName({ … })`
+in the npm package is `rand_name(…)` here.
 """
 
 from dataclasses import dataclass

@@ -12,7 +12,7 @@ def name_length_range(
 ) -> tuple[int, int]:
     """Natural length range of a full name, in characters of the native form.
 
-    This is what `random_name` falls back to when `min_length` or `max_length` is
+    This is what `rand_name` falls back to when `min_length` or `max_length` is
     omitted, and it describes only the parts that are switched on — so leaving the
     surname out relaxes the range instead of forcing the given name to stretch and
     fill it.

@@ -4,7 +4,7 @@ from randino._types import NicknameDetail, NicknameLanguageOption, NicknameTheme
 from randino.nickname._generator import generate_nickname_details
 
 
-def random_nickname_details(
+def rand_nickname_details(
     *,
     language: NicknameLanguageOption | None = None,
     theme: NicknameThemeOption = "all",
@@ -24,12 +24,12 @@ def random_nickname_details(
 ) -> list[NicknameDetail]:
     """Generate nicknames along with the pieces each one was built from.
 
-    Takes the same options as `random_nickname`. Useful when you need the words on
+    Takes the same options as `rand_nickname`. Useful when you need the words on
     their own — to highlight the base word, to group by theme, or to store the unique
     suffix separately from the nickname.
 
     Example:
-        >>> random_nickname_details(language="ko", unique_suffix=True)
+        >>> rand_nickname_details(language="ko", unique_suffix=True)
         [NicknameDetail(nickname='멋진사자_gDe2C', words=('멋진', '사자'), suffix='_gDe2C', language='ko', theme='animal')]
     """
     return generate_nickname_details(

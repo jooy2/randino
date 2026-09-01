@@ -1,6 +1,6 @@
 """The nickname generator itself.
 
-Internal — `random_nickname` and `random_nickname_details` are the public entry
+Internal — `rand_nickname` and `rand_nickname_details` are the public entry
 points.
 
 A nickname is a noun with something added to it: a modifier in front (멋진사자), a
@@ -30,7 +30,7 @@ from randino._internal.utils import (
     clamp,
     pick,
     rand_int,
-    random_token,
+    rand_token,
 )
 from randino._types import (
     NicknameDetail,
@@ -591,7 +591,7 @@ def generate_nickname_details(
             continue
 
         suffix = (
-            unique_suffix_separator + random_token(suffix_length, charset) if suffix_length else ""
+            unique_suffix_separator + rand_token(suffix_length, charset) if suffix_length else ""
         )
         nickname = word + suffix
 

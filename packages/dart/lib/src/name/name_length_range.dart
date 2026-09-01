@@ -5,7 +5,7 @@ import 'package:randino/src/types.dart';
 /// Natural length range of a full name in the given language, in characters of
 /// the native form.
 ///
-/// This is what `randomName` falls back to when `minLength` or `maxLength` is
+/// This is what `randName` falls back to when `minLength` or `maxLength` is
 /// omitted, and it describes only the parts that are switched on — so leaving
 /// the surname out relaxes the range instead of forcing the given name to
 /// stretch and fill it. A null [language] spans every language at once.

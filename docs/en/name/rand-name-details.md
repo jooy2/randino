@@ -1,13 +1,13 @@
-# randomNameDetails
+# randNameDetails
 
-사람 이름을 생성하되 각 이름을 **두 문자 체계로 동시에** 돌려주고, 그 이름의 언어와 성별까지 함께 알려 줍니다. 이름 옆에 영어 발음을 같이 보여 줄 때 유용하고, 여러 언어를 섞을 때는 각 이름이 어느 언어인지 알기 위해 필요합니다.
+Generates person names and returns each one in **both scripts** at once, along with the language and gender behind it. Useful when you want to show a name next to its English pronunciation, and necessary when the language is mixed and you need to know what each name is.
 
 ::: lang js
 
 ```javascript
-import { randomNameDetails } from 'randino';
+import { randNameDetails } from 'randino';
 
-randomNameDetails({ language: 'ko' });
+randNameDetails({ language: 'ko' });
 // [{ native: '여미주', roman: 'Yeo Miju', language: 'ko', gender: 'female' }]
 ```
 
@@ -18,7 +18,7 @@ randomNameDetails({ language: 'ko' });
 ```dart
 import 'package:randino/randino.dart';
 
-randomNameDetails(language: NameLanguage.ko);
+randNameDetails(language: NameLanguage.ko);
 // [NameDetail(여미주, Yeo Miju, ko, female)]
 ```
 
@@ -27,37 +27,53 @@ randomNameDetails(language: NameLanguage.ko);
 ::: lang py
 
 ```python
-from randino import random_name_details
+from randino import rand_name_details
 
-random_name_details(language="ko")
+rand_name_details(language="ko")
 # [NameDetail(native='여미주', roman='Yeo Miju', language='ko', gender='female')]
 ```
 
 :::
 
-## 옵션
+## Options
 
-[`randomName`](./random-name)과 같은 옵션을 받되 **`script`만 제외됩니다**. 모든 이름이 고유 표기와 로마자 표기로 동시에 반환되므로 고를 것이 없습니다.
+The same options as [`randName`](./rand-name), **except `script`** — every name is returned in its native form and romanized at the same time, so there is nothing to choose.
 
-## 반환값
+## What you get back
 
-각 항목은 `NameDetail`입니다.
+::: lang js
 
-| 필드 | 타입 | 설명 |
+Each entry is a `NameDetail`:
+
+:::
+
+::: lang dart
+
+Each entry is a `NameDetail`:
+
+:::
+
+::: lang py
+
+Each entry is a `NameDetail`, a frozen dataclass:
+
+:::
+
+| Field | Type | Description |
 | --- | --- | --- |
-| `native` | <Lang js="string" dart="String" py="str" code /> | 해당 언어의 문자로 쓴 이름. |
-| `roman` | <Lang js="string" dart="String" py="str" code /> | `native`의 영어 발음. 영어에서는 `native`와 동일합니다. |
-| `language` | `NameLanguage` | 이 이름이 생성된 언어. 여러 언어를 섞을 때 이 함수를 쓰는 이유입니다. |
-| `gender` | `NameGender` | 이름을 뽑은 풀. |
+| `native` | <Lang js="string" dart="String" py="str" code /> | The name in its own script. |
+| `roman` | <Lang js="string" dart="String" py="str" code /> | The English pronunciation of `native`. Identical to it for English. |
+| `language` | `NameLanguage` | The language this name was generated in — the reason to reach for this function when the draw is mixed. |
+| `gender` | `NameGender` | The pools the given name was drawn from. |
 
-## 예제
+## Examples
 
-### 이름과 발음을 나란히
+### A name next to its pronunciation
 
 ::: lang js
 
 ```javascript
-for (const { native, roman } of randomNameDetails({ language: 'ja', count: 3 })) {
+for (const { native, roman } of randNameDetails({ language: 'ja', count: 3 })) {
 	console.log(`${native} (${roman})`);
 }
 // 山崎愛菜 (Yamazaki Aina)
@@ -70,7 +86,7 @@ for (const { native, roman } of randomNameDetails({ language: 'ja', count: 3 }))
 ::: lang dart
 
 ```dart
-for (final detail in randomNameDetails(language: NameLanguage.ja, count: 3)) {
+for (final detail in randNameDetails(language: NameLanguage.ja, count: 3)) {
   print('${detail.native} (${detail.roman})');
 }
 // 山崎愛菜 (Yamazaki Aina)
@@ -83,7 +99,7 @@ for (final detail in randomNameDetails(language: NameLanguage.ja, count: 3)) {
 ::: lang py
 
 ```python
-for detail in random_name_details(language="ja", count=3):
+for detail in rand_name_details(language="ja", count=3):
     print(f"{detail.native} ({detail.roman})")
 # 山崎愛菜 (Yamazaki Aina)
 # 加藤楓乃 (Kato Kaeno)
@@ -92,12 +108,12 @@ for detail in random_name_details(language="ja", count=3):
 
 :::
 
-### 섞인 결과가 무엇인지 알기
+### Knowing what a mixed draw produced
 
 ::: lang js
 
 ```javascript
-randomNameDetails({ count: 3 });
+randNameDetails({ count: 3 });
 // [
 //   { native: '조동민', roman: 'Jo Dongmin', language: 'ko', gender: 'male' },
 //   { native: 'Anna Mariani', roman: 'Anna Mariani', language: 'it', gender: 'female' },
@@ -110,7 +126,7 @@ randomNameDetails({ count: 3 });
 ::: lang dart
 
 ```dart
-randomNameDetails(count: 3);
+randNameDetails(count: 3);
 // [
 //   NameDetail(조동민, Jo Dongmin, ko, male),
 //   NameDetail(Anna Mariani, Anna Mariani, it, female),
@@ -123,7 +139,7 @@ randomNameDetails(count: 3);
 ::: lang py
 
 ```python
-random_name_details(count=3)
+rand_name_details(count=3)
 # [
 #     NameDetail(native='조동민', roman='Jo Dongmin', language='ko', gender='male'),
 #     NameDetail(native='Anna Mariani', roman='Anna Mariani', language='it', gender='female'),
@@ -133,14 +149,14 @@ random_name_details(count=3)
 
 :::
 
-### 성별이 겉으로 드러나는 경우
+### Gender, where it is observable
 
-대부분의 언어는 이름이 어느 풀에서 왔는지 드러내지 않습니다. 러시아어는 예외입니다. 부칭과 성이 모두 굴절하기 때문에 선택 결과를 눈으로 확인할 수 있습니다.
+Most languages do not show which pool a given name came from. Russian does — its patronymic and its surname both inflect — which is what makes the choice verifiable there:
 
 ::: lang js
 
 ```javascript
-randomNameDetails({ language: 'ru', gender: 'female', includeMiddleName: true, count: 2 });
+randNameDetails({ language: 'ru', gender: 'female', includeMiddleName: true, count: 2 });
 // [
 //   { native: 'Людмила Николаевна Богданова', roman: 'Lyudmila Nikolaevna Bogdanova', … },
 //   { native: 'Марина Максимовна Богданова', roman: 'Marina Maksimovna Bogdanova', … }
@@ -152,7 +168,7 @@ randomNameDetails({ language: 'ru', gender: 'female', includeMiddleName: true, c
 ::: lang dart
 
 ```dart
-randomNameDetails(
+randNameDetails(
   language: NameLanguage.ru,
   gender: NameGender.female,
   includeMiddleName: true,
@@ -169,7 +185,7 @@ randomNameDetails(
 ::: lang py
 
 ```python
-random_name_details(language="ru", gender="female", include_middle_name=True, count=2)
+rand_name_details(language="ru", gender="female", include_middle_name=True, count=2)
 # [
 #     NameDetail(native='Людмила Николаевна Богданова', roman='Lyudmila Nikolaevna Bogdanova', …),
 #     NameDetail(native='Марина Максимовна Богданова', roman='Marina Maksimovna Bogdanova', …),
@@ -178,7 +194,7 @@ random_name_details(language="ru", gender="female", include_middle_name=True, co
 
 :::
 
-## 함께 보기
+## See also
 
-- [`randomName`](./random-name) — 전체 옵션 표와, 같은 이름을 문자열로만 받는 방법.
-- [지원 언어](../guide/languages#romanization) — 각 문자 체계가 영어 발음으로 옮겨지는 방식.
+- [`randName`](./rand-name) — the full option table, and the same names as plain strings.
+- [Supported languages](../guide/languages#romanization) — how each script becomes an English pronunciation.

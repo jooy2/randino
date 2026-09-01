@@ -35,27 +35,27 @@ List<String> nounsOf(NicknameLanguage language, [NicknameTheme? theme]) {
 
 void main() {
   group('Nickname', () {
-    test('randomNickname returns one nickname by default', () {
-      final nicknames = randomNickname();
+    test('randNickname returns one nickname by default', () {
+      final nicknames = randNickname();
 
       expect(nicknames.length, 1);
       expect(nicknames[0], isNotEmpty);
     });
 
-    test('randomNickname returns exactly `count` nicknames', () {
-      expect(randomNickname(count: 25).length, 25);
-      expect(randomNickname(count: 0).length, 0);
-      expect(randomNickname(count: -10).length, 0);
-      expect(randomNickname(count: nicknameCountMax + 500).length, nicknameCountMax);
+    test('randNickname returns exactly `count` nicknames', () {
+      expect(randNickname(count: 25).length, 25);
+      expect(randNickname(count: 0).length, 0);
+      expect(randNickname(count: -10).length, 0);
+      expect(randNickname(count: nicknameCountMax + 500).length, nicknameCountMax);
     });
 
     test('every language writes nicknames in its own script', () {
       for (final language in nicknameLanguages) {
-        for (final nickname in randomNickname(language: language, count: sample)) {
+        for (final nickname in randNickname(language: language, count: sample)) {
           expect(nickname, matches(script[language]!), reason: '${language.name}: $nickname');
         }
 
-        for (final nickname in randomNickname(language: language, count: sample, style: 100)) {
+        for (final nickname in randNickname(language: language, count: sample, style: 100)) {
           expect(
             nickname,
             matches(script[language]!),
@@ -68,7 +68,7 @@ void main() {
     test('the mixed language uses every language it knows', () {
       final used = <NicknameLanguage>{};
 
-      for (final detail in randomNicknameDetails(count: 400)) {
+      for (final detail in randNicknameDetails(count: 400)) {
         expect(detail.nickname, matches(script[detail.language]!), reason: detail.nickname);
         used.add(detail.language);
       }
@@ -96,7 +96,7 @@ void main() {
       for (final language in nicknameLanguages) {
         final pool = allWords(language).toSet();
 
-        for (final detail in randomNicknameDetails(language: language, count: 200)) {
+        for (final detail in randNicknameDetails(language: language, count: 200)) {
           expect(detail.words, isNotEmpty, reason: detail.nickname);
 
           for (final word in detail.words) {
@@ -127,7 +127,7 @@ void main() {
     });
 
     test('every nickname is a word with something added to it', () {
-      final details = randomNicknameDetails(language: NicknameLanguage.ko, count: 200);
+      final details = randNicknameDetails(language: NicknameLanguage.ko, count: 200);
       final modifiers = nicknameData[NicknameLanguage.ko]!.modifiers.toSet();
       final decorated =
           details
@@ -148,7 +148,7 @@ void main() {
       for (final language in nicknameLanguages) {
         final parts = nicknameData[language]!.parts ?? const <String>[];
 
-        for (final detail in randomNicknameDetails(
+        for (final detail in randNicknameDetails(
           language: language,
           count: sample,
           includeModifier: false,
@@ -171,7 +171,7 @@ void main() {
         for (final language in nicknameLanguages) {
           final nouns = nounsOf(language, theme);
 
-          for (final detail in randomNicknameDetails(language: language, theme: theme, count: 40)) {
+          for (final detail in randNicknameDetails(language: language, theme: theme, count: 40)) {
             expect(detail.theme, theme, reason: detail.nickname);
             expect(
               detail.words.any(nouns.contains),
@@ -182,14 +182,14 @@ void main() {
         }
       }
 
-      final themes = randomNicknameDetails(count: 400).map((detail) => detail.theme).toSet();
+      final themes = randNicknameDetails(count: 400).map((detail) => detail.theme).toSet();
 
       expect(themes, nicknameThemes.toSet());
     });
 
     test('a word belongs to exactly one theme', () {
       // Two themes claiming one word make `theme` ambiguous for `baseWord`, and
-      // make `randomNicknameDetails` report a theme the caller never asked about.
+      // make `randNicknameDetails` report a theme the caller never asked about.
       for (final language in nicknameLanguages) {
         final owner = <String, NicknameTheme>{};
 
@@ -221,7 +221,7 @@ void main() {
       ];
 
       for (final (language, minLength, maxLength) in ranges) {
-        for (final nickname in randomNickname(
+        for (final nickname in randNickname(
           language: language,
           minLength: minLength,
           maxLength: maxLength,
@@ -249,7 +249,7 @@ void main() {
         final range = nicknameLengthRange(language: language);
 
         for (final style in <int>[0, 100]) {
-          for (final nickname in randomNickname(language: language, style: style, count: sample)) {
+          for (final nickname in randNickname(language: language, style: style, count: sample)) {
             expect(
               nickname.length,
               inInclusiveRange(range.min, range.max),
@@ -263,7 +263,7 @@ void main() {
     test('wordSeparator goes between the words', () {
       for (final language in nicknameLanguages) {
         for (final wordSeparator in <String>['', ' ', '-', '::']) {
-          for (final detail in randomNicknameDetails(
+          for (final detail in randNicknameDetails(
             language: language,
             wordSeparator: wordSeparator,
             count: sample,
@@ -283,7 +283,7 @@ void main() {
 
       // Omitted, it falls back to the way the language joins its words, which is
       // to run them together.
-      for (final detail in randomNicknameDetails(count: sample)) {
+      for (final detail in randNicknameDetails(count: sample)) {
         expect(detail.nickname, detail.words.join(), reason: detail.nickname);
       }
 
@@ -304,7 +304,7 @@ void main() {
       ];
 
       for (final (language, wordSeparator, minLength, maxLength) in cases) {
-        for (final nickname in randomNickname(
+        for (final nickname in randNickname(
           language: language,
           wordSeparator: wordSeparator,
           minLength: minLength,
@@ -320,7 +320,7 @@ void main() {
       }
 
       // The unique suffix keeps its own separator.
-      for (final nickname in randomNickname(
+      for (final nickname in randNickname(
         language: NicknameLanguage.en,
         wordSeparator: '-',
         uniqueSuffix: true,
@@ -335,7 +335,7 @@ void main() {
     });
 
     test('uniqueSuffix appends a token that the length options ignore', () {
-      for (final detail in randomNicknameDetails(
+      for (final detail in randNicknameDetails(
         language: NicknameLanguage.ko,
         count: sample,
         uniqueSuffix: true,
@@ -352,13 +352,13 @@ void main() {
       }
 
       // The token is what makes a nickname collision-free rather than unlikely.
-      final many = randomNickname(language: NicknameLanguage.ko, count: 2000, uniqueSuffix: true);
+      final many = randNickname(language: NicknameLanguage.ko, count: 2000, uniqueSuffix: true);
 
       expect(many.toSet().length, 2000);
     });
 
     test('the unique suffix is configurable', () {
-      for (final nickname in randomNickname(
+      for (final nickname in randNickname(
         language: NicknameLanguage.en,
         count: 20,
         uniqueSuffix: true,
@@ -368,7 +368,7 @@ void main() {
         expect(nickname, matches(RegExp(r'^[A-Za-z]+-[0-9A-Za-z]{8}$')), reason: nickname);
       }
 
-      for (final nickname in randomNickname(
+      for (final nickname in randNickname(
         language: NicknameLanguage.ko,
         count: 20,
         uniqueSuffix: true,
@@ -379,7 +379,7 @@ void main() {
       }
 
       // An empty separator is a valid choice, and lengths are clamped.
-      for (final nickname in randomNickname(
+      for (final nickname in randNickname(
         language: NicknameLanguage.en,
         count: 20,
         uniqueSuffix: true,
@@ -390,13 +390,13 @@ void main() {
       }
 
       // No suffix unless it was asked for.
-      for (final detail in randomNicknameDetails(count: 20, uniqueSuffixLength: 8)) {
+      for (final detail in randNicknameDetails(count: 20, uniqueSuffixLength: 8)) {
         expect(detail.suffix, isEmpty);
       }
     });
 
     test('baseWord keeps the word and varies only the decoration', () {
-      final details = randomNicknameDetails(baseWord: '고양이', count: 100);
+      final details = randNicknameDetails(baseWord: '고양이', count: 100);
 
       for (final detail in details) {
         expect(detail.nickname, contains('고양이'), reason: detail.nickname);
@@ -413,29 +413,29 @@ void main() {
       expect(details.map((detail) => detail.nickname).toSet().length, greaterThan(20));
 
       // A word the generator does not know belongs to no theme.
-      for (final detail in randomNicknameDetails(baseWord: '뿌꾸', count: 20)) {
+      for (final detail in randNicknameDetails(baseWord: '뿌꾸', count: 20)) {
         expect(detail.theme, isNull);
         expect(detail.nickname, contains('뿌꾸'), reason: detail.nickname);
       }
 
       // Each script picks the language that goes with it.
-      expect(randomNicknameDetails(baseWord: 'Cat')[0].language, NicknameLanguage.en);
-      expect(randomNicknameDetails(baseWord: 'ネコ')[0].language, NicknameLanguage.ja);
-      expect(randomNicknameDetails(baseWord: '熊猫')[0].language, NicknameLanguage.zh);
+      expect(randNicknameDetails(baseWord: 'Cat')[0].language, NicknameLanguage.en);
+      expect(randNicknameDetails(baseWord: 'ネコ')[0].language, NicknameLanguage.ja);
+      expect(randNicknameDetails(baseWord: '熊猫')[0].language, NicknameLanguage.zh);
       // An explicit language wins over the guess.
       expect(
-        randomNicknameDetails(baseWord: '고양이', language: NicknameLanguage.en)[0].language,
+        randNicknameDetails(baseWord: '고양이', language: NicknameLanguage.en)[0].language,
         NicknameLanguage.en,
       );
 
       // A base word longer than the language's natural range is not truncated.
-      for (final nickname in randomNickname(baseWord: '고양이발바닥무늬', count: 20)) {
+      for (final nickname in randNickname(baseWord: '고양이발바닥무늬', count: 20)) {
         expect(nickname, contains('고양이발바닥무늬'), reason: nickname);
       }
     });
 
     test('startsWith leads every nickname with the requested character', () {
-      for (final nickname in randomNickname(
+      for (final nickname in randNickname(
         language: NicknameLanguage.ko,
         count: sample,
         startsWith: '파',
@@ -443,7 +443,7 @@ void main() {
         expect(nickname, startsWith('파'), reason: nickname);
       }
 
-      for (final nickname in randomNickname(
+      for (final nickname in randNickname(
         language: NicknameLanguage.en,
         count: sample,
         startsWith: 'b',
@@ -452,7 +452,7 @@ void main() {
       }
 
       // A character no real word starts with is answered with an invented one.
-      for (final nickname in randomNickname(
+      for (final nickname in randNickname(
         language: NicknameLanguage.en,
         count: 20,
         startsWith: 'Z',
@@ -463,7 +463,7 @@ void main() {
 
     test('style invents words instead of drawing them', () {
       final pool = allWords(NicknameLanguage.ko).toSet();
-      final invented = randomNicknameDetails(language: NicknameLanguage.ko, style: 100, count: 200);
+      final invented = randNicknameDetails(language: NicknameLanguage.ko, style: 100, count: 200);
       final drawn = invented.where((detail) => detail.words.any(pool.contains)).length;
 
       expect(drawn, lessThan(20), reason: '$drawn of 200 still came from the pools');
@@ -485,25 +485,25 @@ void main() {
       }
 
       // Halfway, both kinds of word show up.
-      final mixed = randomNicknameDetails(language: NicknameLanguage.ko, style: 50, count: 200);
+      final mixed = randNicknameDetails(language: NicknameLanguage.ko, style: 50, count: 200);
 
       expect(mixed.any((detail) => detail.words.every(pool.contains)), isTrue);
       expect(mixed.any((detail) => !detail.words.any(pool.contains)), isTrue);
 
       // Out-of-range values are clamped rather than rejected.
       for (final style in <int>[-50, 500]) {
-        expect(randomNickname(language: NicknameLanguage.ko, style: style, count: 5).length, 5);
+        expect(randNickname(language: NicknameLanguage.ko, style: style, count: 5).length, 5);
       }
     });
 
     test('unique never repeats a nickname', () {
-      final nicknames = randomNickname(language: NicknameLanguage.ko, count: 2000, unique: true);
+      final nicknames = randNickname(language: NicknameLanguage.ko, count: 2000, unique: true);
 
       expect(nicknames.toSet().length, nicknames.length);
 
       // A single word plus one theme is a small pool, so the request runs out of
       // combinations and returns fewer instead of looping.
-      final limited = randomNickname(
+      final limited = randNickname(
         language: NicknameLanguage.zh,
         theme: NicknameTheme.animal,
         includeModifier: false,
@@ -519,8 +519,8 @@ void main() {
       );
     });
 
-    test('randomNicknameDetails reports the pieces it used', () {
-      for (final detail in randomNicknameDetails(count: 100, uniqueSuffix: true)) {
+    test('randNicknameDetails reports the pieces it used', () {
+      for (final detail in randNicknameDetails(count: 100, uniqueSuffix: true)) {
         final joiner = nicknameData[detail.language]!.joiner;
 
         expect(detail.words.join(joiner) + detail.suffix, detail.nickname);

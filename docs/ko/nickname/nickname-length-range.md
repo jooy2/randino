@@ -1,6 +1,6 @@
 # nicknameLengthRange
 
-해당 언어가 만들 수 있는 모든 닉네임 길이를 글자 수로 알려 줍니다. [`randomNickname`](./random-nickname)이 <Lang js="minLength" dart="minLength" py="min_length" code />나 <Lang js="maxLength" dart="maxLength" py="max_length" code />를 생략했을 때 사용하는 값이 바로 이것입니다.
+해당 언어가 만들 수 있는 모든 닉네임 길이를 글자 수로 알려 줍니다. [`randNickname`](./rand-nickname)이 <Lang js="minLength" dart="minLength" py="min_length" code />나 <Lang js="maxLength" dart="maxLength" py="max_length" code />를 생략했을 때 사용하는 값이 바로 이것입니다.
 
 ::: lang js
 
@@ -76,7 +76,7 @@ nickname_length_range("ko", word_separator="-")  # (1, 14)
 
 ```javascript
 nicknameLengthRange('ko'); // [1, 12] — 모든 형태
-randomNickname({ language: 'ko', maxLength: 3, count: 3 });
+randNickname({ language: 'ko', maxLength: 3, count: 3 });
 // ['노을', '파란곰', '수달'] — 세 단어가 들어갈 자리가 없습니다
 ```
 
@@ -86,7 +86,7 @@ randomNickname({ language: 'ko', maxLength: 3, count: 3 });
 
 ```dart
 nicknameLengthRange(language: NicknameLanguage.ko); // LengthRange(1, 12) — 모든 형태
-randomNickname(language: NicknameLanguage.ko, maxLength: 3, count: 3);
+randNickname(language: NicknameLanguage.ko, maxLength: 3, count: 3);
 // ['노을', '파란곰', '수달'] — 세 단어가 들어갈 자리가 없습니다
 ```
 
@@ -96,7 +96,7 @@ randomNickname(language: NicknameLanguage.ko, maxLength: 3, count: 3);
 
 ```python
 nickname_length_range("ko")  # (1, 12) — 모든 형태
-random_nickname(language="ko", max_length=3, count=3)
+rand_nickname(language="ko", max_length=3, count=3)
 # ['노을', '파란곰', '수달'] — 세 단어가 들어갈 자리가 없습니다
 ```
 
@@ -136,11 +136,11 @@ nickname_length_range("en", word_separator=" ")  # (3, 32)
 
 :::
 
-**범위보다 긴 <Lang js="baseWord" dart="baseWord" py="base_word" code />는 범위를 넓힙니다.** 단어가 잘리지 않습니다. 이 함수는 언어 고유의 단어 풀만을 설명하므로 그 결과가 여기에 반영되지는 않지만, `randomNickname`은 넘겨받은 단어를 그렇게 다룹니다.
+**범위보다 긴 <Lang js="baseWord" dart="baseWord" py="base_word" code />는 범위를 넓힙니다.** 단어가 잘리지 않습니다. 이 함수는 언어 고유의 단어 풀만을 설명하므로 그 결과가 여기에 반영되지는 않지만, `randNickname`은 넘겨받은 단어를 그렇게 다룹니다.
 
 **고유 접미사는 범위 밖에 완전히 벗어나 있습니다.** <Lang js="minLength" dart="minLength" py="min_length" code />와 <Lang js="maxLength" dart="maxLength" py="max_length" code />는 읽는 부분만을 가리키고, 접미사는 그 조건을 만족한 뒤에 덧붙습니다.
 
 ## 함께 보기
 
-- [`randomNickname`](./random-nickname) — 길이 옵션이 쓰이는 곳.
+- [`randNickname`](./rand-nickname) — 길이 옵션이 쓰이는 곳.
 - [상수](../reference/constants) — 모든 길이 옵션이 제한되는 절대 범위.

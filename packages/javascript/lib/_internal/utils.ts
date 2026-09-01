@@ -53,7 +53,7 @@ export function capitalizeFirst(value: string): string {
 }
 
 /** Random string of `length` characters drawn from `charset`. */
-export function randomToken(length: number, charset: string): string {
+export function randToken(length: number, charset: string): string {
 	let out = '';
 
 	for (let i = 0; i < length; i += 1) {

@@ -1,13 +1,13 @@
-# randomNicknameDetails
+# randNicknameDetails
 
 닉네임을 생성하면서 각 닉네임을 이루는 조각들을 함께 알려 줍니다. 순서대로의 단어들, 고유 접미사, 언어, 테마입니다. 기준 단어를 강조하거나, 테마별로 묶거나, 접미사를 별도 컬럼에 저장할 때 유용합니다.
 
 ::: lang js
 
 ```javascript
-import { randomNicknameDetails } from 'randino';
+import { randNicknameDetails } from 'randino';
 
-randomNicknameDetails({ language: 'ko', uniqueSuffix: true });
+randNicknameDetails({ language: 'ko', uniqueSuffix: true });
 // [{
 //   nickname: '오래된발견_zVShs',
 //   words: ['오래된', '발견'],
@@ -24,7 +24,7 @@ randomNicknameDetails({ language: 'ko', uniqueSuffix: true });
 ```dart
 import 'package:randino/randino.dart';
 
-randomNicknameDetails(language: NicknameLanguage.ko, uniqueSuffix: true);
+randNicknameDetails(language: NicknameLanguage.ko, uniqueSuffix: true);
 // [NicknameDetail(오래된발견_zVShs, [오래된, 발견], ko, concept)]
 ```
 
@@ -33,9 +33,9 @@ randomNicknameDetails(language: NicknameLanguage.ko, uniqueSuffix: true);
 ::: lang py
 
 ```python
-from randino import random_nickname_details
+from randino import rand_nickname_details
 
-random_nickname_details(language="ko", unique_suffix=True)
+rand_nickname_details(language="ko", unique_suffix=True)
 # [NicknameDetail(nickname='오래된발견_zVShs', words=('오래된', '발견'),
 #                 suffix='_zVShs', language='ko', theme='concept')]
 ```
@@ -44,7 +44,7 @@ random_nickname_details(language="ko", unique_suffix=True)
 
 ## 옵션
 
-[`randomNickname`](./random-nickname)과 완전히 같은 옵션을 받습니다. 반환 타입만 다릅니다.
+[`randNickname`](./rand-nickname)과 완전히 같은 옵션을 받습니다. 반환 타입만 다릅니다.
 
 ## 반환값
 
@@ -71,7 +71,7 @@ random_nickname_details(language="ko", unique_suffix=True)
 ::: lang js
 
 ```javascript
-for (const { words, theme } of randomNicknameDetails({ language: 'ko', count: 3 })) {
+for (const { words, theme } of randNicknameDetails({ language: 'ko', count: 3 })) {
 	console.log(words.join(' + '), theme);
 }
 // 오래된 + 곰 animal
@@ -84,7 +84,7 @@ for (const { words, theme } of randomNicknameDetails({ language: 'ko', count: 3 
 ::: lang dart
 
 ```dart
-for (final detail in randomNicknameDetails(language: NicknameLanguage.ko, count: 3)) {
+for (final detail in randNicknameDetails(language: NicknameLanguage.ko, count: 3)) {
   print('${detail.words.join(' + ')} ${detail.theme?.name}');
 }
 // 오래된 + 곰 animal
@@ -97,7 +97,7 @@ for (final detail in randomNicknameDetails(language: NicknameLanguage.ko, count:
 ::: lang py
 
 ```python
-for detail in random_nickname_details(language="ko", count=3):
+for detail in rand_nickname_details(language="ko", count=3):
     print(" + ".join(detail.words), detail.theme)
 # 오래된 + 곰 animal
 # 영원한 + 도마뱀 animal
@@ -113,7 +113,7 @@ for detail in random_nickname_details(language="ko", count=3):
 ::: lang js
 
 ```javascript
-const [detail] = randomNicknameDetails({ language: 'en', uniqueSuffix: true });
+const [detail] = randNicknameDetails({ language: 'en', uniqueSuffix: true });
 
 await users.insert({
 	handle: detail.nickname,
@@ -127,7 +127,7 @@ await users.insert({
 ::: lang dart
 
 ```dart
-final detail = randomNicknameDetails(
+final detail = randNicknameDetails(
   language: NicknameLanguage.en,
   uniqueSuffix: true,
 ).first;
@@ -144,7 +144,7 @@ await users.insert(
 ::: lang py
 
 ```python
-detail = random_nickname_details(language="en", unique_suffix=True)[0]
+detail = rand_nickname_details(language="en", unique_suffix=True)[0]
 
 await users.insert(
     handle=detail.nickname,
@@ -162,7 +162,7 @@ await users.insert(
 ```javascript
 const byTheme = {};
 
-for (const detail of randomNicknameDetails({ language: 'en', count: 100 })) {
+for (const detail of randNicknameDetails({ language: 'en', count: 100 })) {
 	(byTheme[detail.theme] ??= []).push(detail.nickname);
 }
 ```
@@ -174,7 +174,7 @@ for (const detail of randomNicknameDetails({ language: 'en', count: 100 })) {
 ```dart
 final byTheme = <NicknameTheme?, List<String>>{};
 
-for (final detail in randomNicknameDetails(language: NicknameLanguage.en, count: 100)) {
+for (final detail in randNicknameDetails(language: NicknameLanguage.en, count: 100)) {
   byTheme.putIfAbsent(detail.theme, () => <String>[]).add(detail.nickname);
 }
 ```
@@ -188,7 +188,7 @@ from collections import defaultdict
 
 by_theme: defaultdict[NicknameTheme | None, list[str]] = defaultdict(list)
 
-for detail in random_nickname_details(language="en", count=100):
+for detail in rand_nickname_details(language="en", count=100):
     by_theme[detail.theme].append(detail.nickname)
 ```
 
@@ -196,5 +196,5 @@ for detail in random_nickname_details(language="en", count=100):
 
 ## 함께 보기
 
-- [`randomNickname`](./random-nickname) — 전체 옵션 표와, 같은 닉네임을 문자열로만 받는 방법.
+- [`randNickname`](./rand-nickname) — 전체 옵션 표와, 같은 닉네임을 문자열로만 받는 방법.
 - [테마](./themes) — 각 테마가 담고 있는 것.

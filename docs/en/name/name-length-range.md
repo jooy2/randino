@@ -1,6 +1,6 @@
 # nameLengthRange
 
-The natural length range of a full name in that language, in characters of the native form. This is what [`randomName`](./random-name) falls back to when <Lang js="minLength" dart="minLength" py="min_length" code /> or <Lang js="maxLength" dart="maxLength" py="max_length" code /> is omitted. It answers a question about a language rather than generating anything, so it is pure — and leaving the language out covers every one of them at once.
+The natural length range of a full name in that language, in characters of the native form. This is what [`randName`](./rand-name) falls back to when <Lang js="minLength" dart="minLength" py="min_length" code /> or <Lang js="maxLength" dart="maxLength" py="max_length" code /> is omitted. It answers a question about a language rather than generating anything, so it is pure — and leaving the language out covers every one of them at once.
 
 ::: lang js
 
@@ -97,6 +97,6 @@ name_length_range("ko", include_middle_name=True)
 
 ## See also
 
-- [`randomName`](./random-name) — where the length options are actually used.
+- [`randName`](./rand-name) — where the length options are actually used.
 - [`nameSupportsMiddleName`](./name-supports-middle-name) — whether there is a middle part to count in the first place.
 - [Constants](../reference/constants) — the hard bounds every length option is clamped to.

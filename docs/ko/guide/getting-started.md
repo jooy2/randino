@@ -59,9 +59,9 @@ pip install randino
 ::: lang js
 
 ```javascript
-import { randomName } from 'randino';
+import { randName } from 'randino';
 
-randomName();
+randName();
 // ['Emma Clover']
 ```
 
@@ -72,7 +72,7 @@ randomName();
 ```dart
 import 'package:randino/randino.dart';
 
-randomName();
+randName();
 // ['Emma Clover']
 ```
 
@@ -81,9 +81,9 @@ randomName();
 ::: lang py
 
 ```python
-from randino import random_name
+from randino import rand_name
 
-random_name()
+rand_name()
 # ['Emma Clover']
 ```
 
@@ -94,7 +94,7 @@ random_name()
 ::: lang js
 
 ```javascript
-randomName({ language: 'ko', count: 3 });
+randName({ language: 'ko', count: 3 });
 // ['김태윤', '원동혁', '조진우']
 ```
 
@@ -103,7 +103,7 @@ randomName({ language: 'ko', count: 3 });
 ::: lang dart
 
 ```dart
-randomName(language: NameLanguage.ko, count: 3);
+randName(language: NameLanguage.ko, count: 3);
 // ['김태윤', '원동혁', '조진우']
 ```
 
@@ -112,7 +112,7 @@ randomName(language: NameLanguage.ko, count: 3);
 ::: lang py
 
 ```python
-random_name(language="ko", count=3)
+rand_name(language="ko", count=3)
 # ['김태윤', '원동혁', '조진우']
 ```
 
@@ -125,12 +125,12 @@ random_name(language="ko", count=3)
 ::: lang js
 
 ```javascript
-import { randomNickname } from 'randino';
+import { randNickname } from 'randino';
 
-randomNickname({ language: 'ko', count: 3 });
+randNickname({ language: 'ko', count: 3 });
 // ['오래된곰', '영원한도마뱀', '귀여운신화다발']
 
-randomNickname({ language: 'en', count: 3 });
+randNickname({ language: 'en', count: 3 });
 // ['FoggyHillside', 'CraneVoyage', 'TinyLeopardCloak']
 ```
 
@@ -141,10 +141,10 @@ randomNickname({ language: 'en', count: 3 });
 ```dart
 import 'package:randino/randino.dart';
 
-randomNickname(language: NicknameLanguage.ko, count: 3);
+randNickname(language: NicknameLanguage.ko, count: 3);
 // ['오래된곰', '영원한도마뱀', '귀여운신화다발']
 
-randomNickname(language: NicknameLanguage.en, count: 3);
+randNickname(language: NicknameLanguage.en, count: 3);
 // ['FoggyHillside', 'CraneVoyage', 'TinyLeopardCloak']
 ```
 
@@ -153,12 +153,12 @@ randomNickname(language: NicknameLanguage.en, count: 3);
 ::: lang py
 
 ```python
-from randino import random_nickname
+from randino import rand_nickname
 
-random_nickname(language="ko", count=3)
+rand_nickname(language="ko", count=3)
 # ['오래된곰', '영원한도마뱀', '귀여운신화다발']
 
-random_nickname(language="en", count=3)
+rand_nickname(language="en", count=3)
 # ['FoggyHillside', 'CraneVoyage', 'TinyLeopardCloak']
 ```
 
@@ -173,7 +173,7 @@ random_nickname(language="en", count=3)
 모든 함수는 **옵션 객체 하나**를 받고, 그 안의 모든 키는 선택 사항입니다.
 
 ```javascript
-randomName({
+randName({
 	language: 'ja',
 	gender: 'female',
 	count: 5,
@@ -190,7 +190,7 @@ randomName({
 모든 함수는 **named parameter**를 받고, 모든 파라미터가 선택 사항입니다.
 
 ```dart
-randomName(
+randName(
   language: NameLanguage.ja,
   gender: NameGender.female,
   count: 5,
@@ -201,7 +201,7 @@ randomName(
 "전부"를 뜻하는 것은 **null인 enum**, 즉 파라미터를 아예 쓰지 않는 것입니다. `NameLanguage.all` 같은 값은 없습니다. 쓰지 않은 파라미터가 이미 Dart에서 "지정하지 않음"을 뜻하기 때문입니다.
 
 ```dart
-randomName(count: 5); // 9개 언어 중 하나씩, 이름 다섯 개
+randName(count: 5); // 9개 언어 중 하나씩, 이름 다섯 개
 ```
 
 null이 다른 뜻을 갖는 곳은 `NicknameDetail.theme` 하나뿐입니다. 여기서 null은 그 단어를 생성기가 모른다는 뜻으로, 새로 만들어낸 단어이거나 직접 넘긴 `baseWord`인 경우입니다.
@@ -213,7 +213,7 @@ null이 다른 뜻을 갖는 곳은 `NicknameDetail.theme` 하나뿐입니다. �
 모든 함수는 **키워드 전용 인자**를 받고, 모든 인자가 선택 사항입니다.
 
 ```python
-random_name(
+rand_name(
     language="ja",
     gender="female",
     count=5,
@@ -221,17 +221,17 @@ random_name(
 )
 ```
 
-키워드 전용인 것은 의도적입니다. `random_name("ja", "female", 5)`는 짧게 쓸 수는 있지만 읽을 수 없고, 파라미터 순서를 API에 고정시켜 버립니다. 그래서 위치 인자 형태는 아예 제공하지 않습니다.
+키워드 전용인 것은 의도적입니다. `rand_name("ja", "female", 5)`는 짧게 쓸 수는 있지만 읽을 수 없고, 파라미터 순서를 API에 고정시켜 버립니다. 그래서 위치 인자 형태는 아예 제공하지 않습니다.
 
 옵션 값은 npm 패키지가 쓰는 것과 같은 문자열이며 `Literal`로 타입이 지정되어 있어서, `language="kr"` 같은 실수는 실행 전에 타입 검사기가 잡아냅니다. "전부"를 뜻하는 값은 `"all"`이고, `language`, `gender`, `theme`의 기본값이 그것입니다.
 
 ```python
-random_name(count=5)  # 9개 언어 중 하나씩, 이름 다섯 개
+rand_name(count=5)  # 9개 언어 중 하나씩, 이름 다섯 개
 ```
 
 이름은 `snake_case`를 씁니다. `includeMiddleName`은 `include_middle_name`, `minLength`는 `min_length`, `startsWith`는 `starts_with`입니다.
 
-기본값이 `"all"`이 아니라 `None`인 인자는 `random_nickname`의 `language` 하나뿐이고, 둘은 같은 요청이 아닙니다. 생략하면 `base_word`가 쓰인 언어를 따라가므로 `"고양이"`에 영어 수식어가 붙는 일이 없고, `"all"`을 직접 넘기면 base word와 무관하게 모든 언어를 섞습니다.
+기본값이 `"all"`이 아니라 `None`인 인자는 `rand_nickname`의 `language` 하나뿐이고, 둘은 같은 요청이 아닙니다. 생략하면 `base_word`가 쓰인 언어를 따라가므로 `"고양이"`에 영어 수식어가 붙는 일이 없고, `"all"`을 직접 넘기면 base word와 무관하게 모든 언어를 섞습니다.
 
 :::
 

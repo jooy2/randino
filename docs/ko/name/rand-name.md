@@ -1,13 +1,13 @@
-# randomName
+# randName
 
-사람 이름을 생성해서 `count`개의 문자열로 돌려줍니다. 표기는 요청한 문자 체계를 따릅니다. 각 이름의 고유 표기와 로마자 표기를 함께 받고 싶다면 [`randomNameDetails`](./random-name-details)를 쓰세요.
+사람 이름을 생성해서 `count`개의 문자열로 돌려줍니다. 표기는 요청한 문자 체계를 따릅니다. 각 이름의 고유 표기와 로마자 표기를 함께 받고 싶다면 [`randNameDetails`](./rand-name-details)를 쓰세요.
 
 ::: lang js
 
 ```javascript
-import { randomName } from 'randino';
+import { randName } from 'randino';
 
-randomName();
+randName();
 // ['Emma Clover']
 ```
 
@@ -18,7 +18,7 @@ randomName();
 ```dart
 import 'package:randino/randino.dart';
 
-randomName();
+randName();
 // ['Emma Clover']
 ```
 
@@ -27,9 +27,9 @@ randomName();
 ::: lang py
 
 ```python
-from randino import random_name
+from randino import rand_name
 
-random_name()
+rand_name()
 # ['Emma Clover']
 ```
 
@@ -62,13 +62,13 @@ random_name()
 ::: lang js
 
 ```javascript
-randomName({ language: 'ko', count: 3 });
+randName({ language: 'ko', count: 3 });
 // ['김태윤', '원동혁', '조진우']
 
-randomName({ language: 'ja', count: 3 });
+randName({ language: 'ja', count: 3 });
 // ['山崎愛菜', '加藤楓乃', '吉田直人']
 
-randomName({ language: 'ru', count: 2 });
+randName({ language: 'ru', count: 2 });
 // ['Дмитрий Соколов', 'Полина Морозова']
 ```
 
@@ -77,13 +77,13 @@ randomName({ language: 'ru', count: 2 });
 ::: lang dart
 
 ```dart
-randomName(language: NameLanguage.ko, count: 3);
+randName(language: NameLanguage.ko, count: 3);
 // ['김태윤', '원동혁', '조진우']
 
-randomName(language: NameLanguage.ja, count: 3);
+randName(language: NameLanguage.ja, count: 3);
 // ['山崎愛菜', '加藤楓乃', '吉田直人']
 
-randomName(language: NameLanguage.ru, count: 2);
+randName(language: NameLanguage.ru, count: 2);
 // ['Дмитрий Соколов', 'Полина Морозова']
 ```
 
@@ -92,13 +92,13 @@ randomName(language: NameLanguage.ru, count: 2);
 ::: lang py
 
 ```python
-random_name(language="ko", count=3)
+rand_name(language="ko", count=3)
 # ['김태윤', '원동혁', '조진우']
 
-random_name(language="ja", count=3)
+rand_name(language="ja", count=3)
 # ['山崎愛菜', '加藤楓乃', '吉田直人']
 
-random_name(language="ru", count=2)
+rand_name(language="ru", count=2)
 # ['Дмитрий Соколов', 'Полина Морозова']
 ```
 
@@ -109,7 +109,7 @@ random_name(language="ru", count=2)
 ::: lang js
 
 ```javascript
-randomName({ count: 5 });
+randName({ count: 5 });
 // ['Nuria Ramírez', '조동민', 'Stella Reeves', 'Anna Mariani', 'Lê Phương']
 ```
 
@@ -118,7 +118,7 @@ randomName({ count: 5 });
 ::: lang dart
 
 ```dart
-randomName(count: 5);
+randName(count: 5);
 // ['Nuria Ramírez', '조동민', 'Stella Reeves', 'Anna Mariani', 'Lê Phương']
 ```
 
@@ -127,7 +127,7 @@ randomName(count: 5);
 ::: lang py
 
 ```python
-random_name(count=5)
+rand_name(count=5)
 # ['Nuria Ramírez', '조동민', 'Stella Reeves', 'Anna Mariani', 'Lê Phương']
 ```
 
@@ -138,13 +138,13 @@ random_name(count=5)
 ::: lang js
 
 ```javascript
-randomName({ language: 'en', count: 3, includeSurname: false });
+randName({ language: 'en', count: 3, includeSurname: false });
 // ['Rachel', 'Eliza', 'Tessa']
 
-randomName({ language: 'vi', count: 3, includeMiddleName: true });
+randName({ language: 'vi', count: 3, includeMiddleName: true });
 // ['Lý Thu Thảo', 'Phạm Quang Hùng', 'Dương Văn Phong']
 
-randomName({ language: 'ru', count: 2, gender: 'female', includeMiddleName: true });
+randName({ language: 'ru', count: 2, gender: 'female', includeMiddleName: true });
 // ['Людмила Николаевна Богданова', 'Марина Максимовна Богданова']
 ```
 
@@ -153,13 +153,13 @@ randomName({ language: 'ru', count: 2, gender: 'female', includeMiddleName: true
 ::: lang dart
 
 ```dart
-randomName(language: NameLanguage.en, count: 3, includeSurname: false);
+randName(language: NameLanguage.en, count: 3, includeSurname: false);
 // ['Rachel', 'Eliza', 'Tessa']
 
-randomName(language: NameLanguage.vi, count: 3, includeMiddleName: true);
+randName(language: NameLanguage.vi, count: 3, includeMiddleName: true);
 // ['Lý Thu Thảo', 'Phạm Quang Hùng', 'Dương Văn Phong']
 
-randomName(
+randName(
   language: NameLanguage.ru,
   count: 2,
   gender: NameGender.female,
@@ -173,13 +173,13 @@ randomName(
 ::: lang py
 
 ```python
-random_name(language="en", count=3, include_surname=False)
+rand_name(language="en", count=3, include_surname=False)
 # ['Rachel', 'Eliza', 'Tessa']
 
-random_name(language="vi", count=3, include_middle_name=True)
+rand_name(language="vi", count=3, include_middle_name=True)
 # ['Lý Thu Thảo', 'Phạm Quang Hùng', 'Dương Văn Phong']
 
-random_name(language="ru", count=2, gender="female", include_middle_name=True)
+rand_name(language="ru", count=2, gender="female", include_middle_name=True)
 # ['Людмила Николаевна Богданова', 'Марина Максимовна Богданова']
 ```
 
@@ -192,10 +192,10 @@ random_name(language="ru", count=2, gender="female", include_middle_name=True)
 ::: lang js
 
 ```javascript
-randomName({ language: 'ko', count: 3, script: 'roman' });
+randName({ language: 'ko', count: 3, script: 'roman' });
 // ['Kim Minjun', 'Won Donghyeok', 'Jo Jinu']
 
-randomName({ language: 'ja', count: 3, script: 'roman' });
+randName({ language: 'ja', count: 3, script: 'roman' });
 // ['Yamazaki Aina', 'Kato Kaeno', 'Yoshida Naoyato']
 ```
 
@@ -204,10 +204,10 @@ randomName({ language: 'ja', count: 3, script: 'roman' });
 ::: lang dart
 
 ```dart
-randomName(language: NameLanguage.ko, count: 3, script: NameScript.roman);
+randName(language: NameLanguage.ko, count: 3, script: NameScript.roman);
 // ['Kim Minjun', 'Won Donghyeok', 'Jo Jinu']
 
-randomName(language: NameLanguage.ja, count: 3, script: NameScript.roman);
+randName(language: NameLanguage.ja, count: 3, script: NameScript.roman);
 // ['Yamazaki Aina', 'Kato Kaeno', 'Yoshida Naoyato']
 ```
 
@@ -216,10 +216,10 @@ randomName(language: NameLanguage.ja, count: 3, script: NameScript.roman);
 ::: lang py
 
 ```python
-random_name(language="ko", count=3, script="roman")
+rand_name(language="ko", count=3, script="roman")
 # ['Kim Minjun', 'Won Donghyeok', 'Jo Jinu']
 
-random_name(language="ja", count=3, script="roman")
+rand_name(language="ja", count=3, script="roman")
 # ['Yamazaki Aina', 'Kato Kaeno', 'Yoshida Naoyato']
 ```
 
@@ -232,10 +232,10 @@ random_name(language="ja", count=3, script="roman")
 ::: lang js
 
 ```javascript
-randomName({ language: 'ko', count: 3, startsWith: '이' });
+randName({ language: 'ko', count: 3, startsWith: '이' });
 // ['이예빈', '이우진', '이서현']
 
-randomName({ language: 'en', count: 3, startsWith: 'k' });
+randName({ language: 'en', count: 3, startsWith: 'k' });
 // ['Kayla Morgan', 'Keith Doyle', 'Kimberly Vaughn']
 ```
 
@@ -244,10 +244,10 @@ randomName({ language: 'en', count: 3, startsWith: 'k' });
 ::: lang dart
 
 ```dart
-randomName(language: NameLanguage.ko, count: 3, startsWith: '이');
+randName(language: NameLanguage.ko, count: 3, startsWith: '이');
 // ['이예빈', '이우진', '이서현']
 
-randomName(language: NameLanguage.en, count: 3, startsWith: 'k');
+randName(language: NameLanguage.en, count: 3, startsWith: 'k');
 // ['Kayla Morgan', 'Keith Doyle', 'Kimberly Vaughn']
 ```
 
@@ -256,10 +256,10 @@ randomName(language: NameLanguage.en, count: 3, startsWith: 'k');
 ::: lang py
 
 ```python
-random_name(language="ko", count=3, starts_with="이")
+rand_name(language="ko", count=3, starts_with="이")
 # ['이예빈', '이우진', '이서현']
 
-random_name(language="en", count=3, starts_with="k")
+rand_name(language="en", count=3, starts_with="k")
 # ['Kayla Morgan', 'Keith Doyle', 'Kimberly Vaughn']
 ```
 
@@ -272,10 +272,10 @@ random_name(language="en", count=3, starts_with="k")
 ::: lang js
 
 ```javascript
-randomName({ language: 'ko', count: 3, minLength: 5, maxLength: 8 });
+randName({ language: 'ko', count: 3, minLength: 5, maxLength: 8 });
 // ['남궁하윤서', '김서연아린', '박도윤하람']
 
-randomName({ language: 'en', count: 2, minLength: 20, maxLength: 25 });
+randName({ language: 'en', count: 2, minLength: 20, maxLength: 25 });
 // ['Josephine Adelaide Sinclair', 'Christina Genevieve Whitaker']
 ```
 
@@ -284,10 +284,10 @@ randomName({ language: 'en', count: 2, minLength: 20, maxLength: 25 });
 ::: lang dart
 
 ```dart
-randomName(language: NameLanguage.ko, count: 3, minLength: 5, maxLength: 8);
+randName(language: NameLanguage.ko, count: 3, minLength: 5, maxLength: 8);
 // ['남궁하윤서', '김서연아린', '박도윤하람']
 
-randomName(language: NameLanguage.en, count: 2, minLength: 20, maxLength: 25);
+randName(language: NameLanguage.en, count: 2, minLength: 20, maxLength: 25);
 // ['Josephine Adelaide Sinclair', 'Christina Genevieve Whitaker']
 ```
 
@@ -296,10 +296,10 @@ randomName(language: NameLanguage.en, count: 2, minLength: 20, maxLength: 25);
 ::: lang py
 
 ```python
-random_name(language="ko", count=3, min_length=5, max_length=8)
+rand_name(language="ko", count=3, min_length=5, max_length=8)
 # ['남궁하윤서', '김서연아린', '박도윤하람']
 
-random_name(language="en", count=2, min_length=20, max_length=25)
+rand_name(language="en", count=2, min_length=20, max_length=25)
 # ['Josephine Adelaide Sinclair', 'Christina Genevieve Whitaker']
 ```
 
@@ -309,6 +309,6 @@ random_name(language="en", count=2, min_length=20, max_length=25)
 
 ## 함께 보기
 
-- [`randomNameDetails`](./random-name-details) — 같은 이름을 두 문자 체계와 선택 정보까지 함께.
+- [`randNameDetails`](./rand-name-details) — 같은 이름을 두 문자 체계와 선택 정보까지 함께.
 - [`nameLengthRange`](./name-length-range) — 이름이 기본값으로 쓰는 길이 범위.
 - [`nameSupportsMiddleName`](./name-supports-middle-name)과 [`nameSupportsRoman`](./name-supports-roman) — 언어에 대한 두 가지 질문.

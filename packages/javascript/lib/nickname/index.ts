@@ -8,5 +8,5 @@ export {
 	NICKNAME_THEMES
 } from './data/index.js';
 export { nicknameLengthRange } from './nicknameLengthRange.js';
-export { randomNickname } from './randomNickname.js';
-export { randomNicknameDetails } from './randomNicknameDetails.js';
+export { randNickname } from './randNickname.js';
+export { randNicknameDetails } from './randNicknameDetails.js';

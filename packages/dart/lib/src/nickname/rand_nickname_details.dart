@@ -3,15 +3,15 @@ import 'package:randino/src/types.dart';
 
 /// Generate nicknames along with the pieces each one was built from.
 ///
-/// Takes the same parameters as `randomNickname`. Useful when you need the words
+/// Takes the same parameters as `randNickname`. Useful when you need the words
 /// on their own — to highlight the base word, to group by theme, or to store the
 /// unique suffix separately from the nickname.
 ///
 /// ```dart
-/// randomNicknameDetails(language: NicknameLanguage.ko, uniqueSuffix: true);
+/// randNicknameDetails(language: NicknameLanguage.ko, uniqueSuffix: true);
 /// // [NicknameDetail(멋진사자_gDe2C, [멋진, 사자], ko, animal)]
 /// ```
-List<NicknameDetail> randomNicknameDetails({
+List<NicknameDetail> randNicknameDetails({
   NicknameLanguage? language,
   NicknameTheme? theme,
   int count = 1,

@@ -4,7 +4,7 @@ from randino._types import NameDetail, NameGenderOption, NameLanguageOption
 from randino.name._generator import generate_name_details
 
 
-def random_name_details(
+def rand_name_details(
     *,
     language: NameLanguageOption = "all",
     gender: NameGenderOption = "all",
@@ -19,13 +19,13 @@ def random_name_details(
 ) -> list[NameDetail]:
     """Generate person names with both scripts and the choices behind each one.
 
-    Takes the same options as `random_name`, except `script` — every name is
+    Takes the same options as `rand_name`, except `script` — every name is
     returned in its native form and romanized at the same time. Useful when the
     language is mixed (`"all"`), where `language` tells you what each name is, or
     when you want to show a name next to its English pronunciation.
 
     Example:
-        >>> random_name_details(language="ko")
+        >>> rand_name_details(language="ko")
         [NameDetail(native='김민준', roman='Kim Minjun', language='ko', gender='male')]
     """
     return generate_name_details(

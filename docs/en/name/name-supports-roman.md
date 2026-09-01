@@ -55,6 +55,6 @@ Returns `bool`.
 
 ## See also
 
-- [`randomName`](./random-name) — the script option this answers for.
-- [`randomNameDetails`](./random-name-details) — which returns both forms at once, so nothing has to be asked.
+- [`randName`](./rand-name) — the script option this answers for.
+- [`randNameDetails`](./rand-name-details) — which returns both forms at once, so nothing has to be asked.
 - [Supported languages](../guide/languages) — the romanization each language uses.

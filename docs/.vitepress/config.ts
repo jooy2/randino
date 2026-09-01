@@ -74,7 +74,7 @@ const packageLinks = [
  *
  * **API** is a dropdown over the same pages the sidebar's API group holds, and
  * it is one list rather than a Person names menu and a Nicknames menu — a reader
- * looking for `randomNickname` is looking for a function, not for the half of
+ * looking for `randNickname` is looking for a function, not for the half of
  * the library it belongs to. `navGroupFor` is what keeps the two in step.
  */
 const navFor = (lang: string, labels: { guide: string; packages: string }) => [
@@ -118,7 +118,7 @@ const vitePressI18nConfig: VitePressI18nOptions = {
  *   better sentence on nearly every page — the first paragraph under the title —
  *   so it is read out of the source.
  * - **Nothing says the two locales are the same page.** Without `hreflang` a
- *   crawler has no reason to connect `/name/random-name` to its Korean
+ *   crawler has no reason to connect `/name/rand-name` to its Korean
  *   counterpart, and treats them as two documents competing for one query.
  * ------------------------------------------------------------------------- */
 
@@ -127,7 +127,7 @@ function langTagOf(siteData: SiteData, lang: string): string {
 	return siteData.locales[lang === defaultLocale ? 'root' : lang]?.lang ?? lang;
 }
 
-/** `en/name/random-name.md` → `/name/random-name`. */
+/** `en/name/rand-name.md` → `/name/rand-name`. */
 function pathOf(filePath: string): string {
 	const [lang, ...rest] = filePath.split('/');
 	const page = rest

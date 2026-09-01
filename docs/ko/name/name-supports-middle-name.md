@@ -60,6 +60,6 @@ name_supports_middle_name()  # True — 섞인 결과에는 중간 이름이 있
 
 ## 함께 보기
 
-- [`randomName`](./random-name) — 이 함수가 답해 주는 중간 이름 옵션.
+- [`randName`](./rand-name) — 이 함수가 답해 주는 중간 이름 옵션.
 - [`nameLengthRange`](./name-length-range) — 중간 이름이 있는 언어에서만 그것을 세는 함수.
 - [지원 언어](../guide/languages) — 어떤 언어에 중간 이름이 있는지 정리한 표.

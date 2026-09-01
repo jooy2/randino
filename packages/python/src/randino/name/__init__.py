@@ -9,8 +9,8 @@ from randino.name.data import (
 from randino.name.name_length_range import name_length_range
 from randino.name.name_supports_middle_name import name_supports_middle_name
 from randino.name.name_supports_roman import name_supports_roman
-from randino.name.random_name import random_name
-from randino.name.random_name_details import random_name_details
+from randino.name.rand_name import rand_name
+from randino.name.rand_name_details import rand_name_details
 
 __all__ = [
     "NAME_COUNT_MAX",
@@ -20,6 +20,6 @@ __all__ = [
     "name_length_range",
     "name_supports_middle_name",
     "name_supports_roman",
-    "random_name",
-    "random_name_details",
+    "rand_name",
+    "rand_name_details",
 ]

@@ -1,6 +1,6 @@
 """The name generator itself.
 
-Internal — `random_name` and `random_name_details` are the public entry points.
+Internal — `rand_name` and `rand_name_details` are the public entry points.
 
 - At the realistic end of `style`, names come out of the curated pools: whole given
   names for CJK, given/surname pools for the other scripts.

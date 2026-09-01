@@ -1,6 +1,6 @@
 # nameLengthRange
 
-해당 언어에서 전체 이름의 자연스러운 길이 범위를, 고유 표기의 글자 수로 알려 줍니다. [`randomName`](./random-name)이 <Lang js="minLength" dart="minLength" py="min_length" code />나 <Lang js="maxLength" dart="maxLength" py="max_length" code />를 생략했을 때 사용하는 값이 바로 이것입니다. 무언가를 생성하는 대신 언어에 대한 질문에 답하는 순수 함수이며, 언어를 생략하면 모든 언어를 한꺼번에 다룬 답을 돌려줍니다.
+해당 언어에서 전체 이름의 자연스러운 길이 범위를, 고유 표기의 글자 수로 알려 줍니다. [`randName`](./rand-name)이 <Lang js="minLength" dart="minLength" py="min_length" code />나 <Lang js="maxLength" dart="maxLength" py="max_length" code />를 생략했을 때 사용하는 값이 바로 이것입니다. 무언가를 생성하는 대신 언어에 대한 질문에 답하는 순수 함수이며, 언어를 생략하면 모든 언어를 한꺼번에 다룬 답을 돌려줍니다.
 
 ::: lang js
 
@@ -97,6 +97,6 @@ name_length_range("ko", include_middle_name=True)
 
 ## 함께 보기
 
-- [`randomName`](./random-name) — 길이 옵션이 실제로 쓰이는 곳.
+- [`randName`](./rand-name) — 길이 옵션이 실제로 쓰이는 곳.
 - [`nameSupportsMiddleName`](./name-supports-middle-name) — 애초에 셀 중간 이름이 있는지 여부.
 - [상수](../reference/constants) — 모든 길이 옵션이 제한되는 절대 범위.

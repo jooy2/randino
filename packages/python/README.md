@@ -14,7 +14,7 @@ Every option and every example, with **Python** picked in the sidebar. This READ
 
 - **Person names** read like names people actually carry — 김민준, Emma Clover, Иванов Иван — and come with their English pronunciation. 9 languages.
 - **Nicknames** are the handles you would pick for a game or a website — 멋진사자, MistyOwl, 고양이꼬리. Built from everyday words across fourteen themes, never from person names.
-- Every argument is keyword-only and optional, so `random_name()` on its own works.
+- Every argument is keyword-only and optional, so `rand_name()` on its own works.
 - **Pure Python, no dependencies.** It imports nothing outside the standard library, and ships a `py.typed` marker so mypy and Pyright read the annotations.
 
 This is the Python half. The [npm package](https://www.npmjs.com/package/randino) and the [pub.dev package](https://pub.dev/packages/randino) are the others, and all three generate from the same datasets under the same rules. They version independently, so this package's number and the others' will not always agree.
@@ -30,21 +30,21 @@ Requires **Python 3.10 or newer**. There is nothing else to install.
 ## Person names
 
 ```python
-from randino import random_name, random_name_details
+from randino import rand_name, rand_name_details
 
-random_name()
+rand_name()
 # ['Emma Clover']
 
-random_name(language="ko", count=3)
+rand_name(language="ko", count=3)
 # ['김태윤', '원동혁', '조진우']
 
-random_name(language="ko", script="roman")
+rand_name(language="ko", script="roman")
 # ['Kim Minjun']
 
-random_name(language="en", gender="female", include_middle_name=True)
+rand_name(language="en", gender="female", include_middle_name=True)
 # ['Grace Amelia Bennett']
 
-random_name_details(language="ko")[0]
+rand_name_details(language="ko")[0]
 # NameDetail(native='여미주', roman='Yeo Miju', language='ko', gender='female')
 ```
 
@@ -61,29 +61,29 @@ random_name_details(language="ko")[0]
 | `starts_with`               | `str`                         | `""`       |
 | `unique`                    | `bool`                        | `False`    |
 
-`random_name_details` takes the same arguments except `script`, and returns a `NameDetail` — `native`, `roman`, `language` and `gender` — for each name.
+`rand_name_details` takes the same arguments except `script`, and returns a `NameDetail` — `native`, `roman`, `language` and `gender` — for each name.
 
 ## Nicknames
 
 ```python
-from randino import random_nickname, random_nickname_details
+from randino import rand_nickname, rand_nickname_details
 
-random_nickname(language="ko", count=3)
+rand_nickname(language="ko", count=3)
 # ['오래된곰', '영원한도마뱀', '귀여운신화다발']
 
-random_nickname(language="en", count=2)
+rand_nickname(language="en", count=2)
 # ['FoggyHillside', 'CraneVoyage']
 
-random_nickname(language="ko", theme="animal", count=2)
+rand_nickname(language="ko", theme="animal", count=2)
 # ['깊은연어', '하얀여우갈기']
 
-random_nickname(language="ko", unique_suffix=True, count=2)
+rand_nickname(language="ko", unique_suffix=True, count=2)
 # ['달력_U7aNZ', '조용한바구니_RUKAP']
 
-random_nickname(base_word="고양이", count=3)
+rand_nickname(base_word="고양이", count=3)
 # ['하얀고양이', '고양이바람', '귀여운고양이뿔']
 
-random_nickname_details(language="ko", unique_suffix=True)[0]
+rand_nickname_details(language="ko", unique_suffix=True)[0]
 # NicknameDetail(nickname='오래된발견_zVShs', words=('오래된', '발견'), suffix='_zVShs', language='ko', theme='concept')
 ```
 

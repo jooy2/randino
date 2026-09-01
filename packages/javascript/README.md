@@ -14,7 +14,7 @@ Every option and every example, with **JavaScript** picked in the sidebar. This 
 
 - **Person names** read like names people actually carry — 김민준, Emma Clover, Иванов Иван — and come with their English pronunciation. 9 languages.
 - **Nicknames** are the handles you would pick for a game or a website — 멋진사자, MistyOwl, 고양이꼬리. Built from everyday words across fourteen themes, never from person names.
-- One options object per generator, every option optional: `randomName()` on its own works.
+- One options object per generator, every option optional: `randName()` on its own works.
 - **No runtime dependencies.** ESM, typed, and it runs in Node and in the browser alike.
 
 This is the JavaScript half. The [Dart package](https://pub.dev/packages/randino) is the other one, and the two generate from the same datasets under the same rules. They version independently, so this package's number and the pub.dev one's will not always agree.
@@ -30,24 +30,24 @@ Requires **Node.js 18 or newer**, or any browser — the package ships ESM with 
 ## Person names
 
 ```javascript
-import { randomName, randomNameDetails } from 'randino';
+import { randName, randNameDetails } from 'randino';
 
-randomName();
+randName();
 // ['Emma Clover']
 
-randomName({ language: 'ko', count: 3 });
+randName({ language: 'ko', count: 3 });
 // ['김태윤', '원동혁', '조진우']
 
-randomName({ language: 'ko', script: 'roman' });
+randName({ language: 'ko', script: 'roman' });
 // ['Kim Minjun']
 
-randomName({ language: 'en', gender: 'female', includeMiddleName: true });
+randName({ language: 'en', gender: 'female', includeMiddleName: true });
 // ['Grace Amelia Bennett']
 
-randomName({ language: 'ja', count: 2, script: 'roman' });
+randName({ language: 'ja', count: 2, script: 'roman' });
 // ['Yamazaki Aina', 'Kato Kaeno']
 
-randomNameDetails({ language: 'ko' });
+randNameDetails({ language: 'ko' });
 // [{ native: '여미주', roman: 'Yeo Miju', language: 'ko', gender: 'female' }]
 ```
 
@@ -67,24 +67,24 @@ randomNameDetails({ language: 'ko' });
 ## Nicknames
 
 ```javascript
-import { randomNickname, randomNicknameDetails } from 'randino';
+import { randNickname, randNicknameDetails } from 'randino';
 
-randomNickname({ language: 'ko', count: 3 });
+randNickname({ language: 'ko', count: 3 });
 // ['오래된곰', '영원한도마뱀', '귀여운신화다발']
 
-randomNickname({ language: 'en', count: 2 });
+randNickname({ language: 'en', count: 2 });
 // ['FoggyHillside', 'CraneVoyage']
 
-randomNickname({ language: 'ko', theme: 'animal', count: 2 });
+randNickname({ language: 'ko', theme: 'animal', count: 2 });
 // ['깊은연어', '하얀여우갈기']
 
-randomNickname({ language: 'ko', uniqueSuffix: true, count: 2 });
+randNickname({ language: 'ko', uniqueSuffix: true, count: 2 });
 // ['달력_U7aNZ', '조용한바구니_RUKAP']
 
-randomNickname({ baseWord: '고양이', count: 3 });
+randNickname({ baseWord: '고양이', count: 3 });
 // ['하얀고양이', '고양이바람', '귀여운고양이뿔']
 
-randomNicknameDetails({ language: 'ko', uniqueSuffix: true });
+randNicknameDetails({ language: 'ko', uniqueSuffix: true });
 // [{
 //   nickname: '오래된발견_zVShs',
 //   words: ['오래된', '발견'],
