@@ -15,6 +15,8 @@ import {
 import { withI18n } from 'vitepress-i18n';
 import type { VitePressI18nOptions } from 'vitepress-i18n/types';
 import { CODE_LANGUAGE_HEAD_SCRIPT, CODE_LANGUAGE_IDS } from './data/languages';
+import { writeLlmsFiles } from './llms';
+import { inlineLang } from './data/markdown';
 import { localeBase, navGroupFor, sidebarFor } from './data/sidebar';
 
 const vitePressDir = dirname(fileURLToPath(import.meta.url));
@@ -88,12 +90,16 @@ const navFor = (lang: string, labels: { demo: string; guide: string; packages: s
 	}
 ];
 
+/** The site's own sentence. Read twice: once by a crawler, once by `llms.txt`. */
+const siteDescription =
+	'Random person names and nicknames in the language you ask for — Korean, English, Japanese, Chinese and five more. One library, shipped for JavaScript, Dart and Python, with no runtime dependencies.';
+
 const vitePressI18nConfig: VitePressI18nOptions = {
 	locales: supportLocales,
 	rootLocale: defaultLocale,
 	searchProvider: 'local',
 	description: {
-		en: 'Random person names and nicknames in the language you ask for — Korean, English, Japanese, Chinese and five more. One library, shipped for JavaScript, Dart and Python, with no runtime dependencies.',
+		en: siteDescription,
 		ko: '요청한 언어로 사람 이름과 닉네임을 무작위로 생성합니다. 한국어, 영어, 일본어, 중국어를 포함한 9개 언어를 지원하며, JavaScript, Dart, Python 패키지로 제공되고 런타임 의존성이 없습니다.'
 	},
 	themeConfig: {
@@ -145,13 +151,20 @@ function pageOf(filePath: string): string {
 	return filePath.split('/').slice(1).join('/');
 }
 
-/** Inline Markdown and HTML dropped: a `<meta>` carries text and nothing else. */
+/**
+ * Inline Markdown and HTML dropped: a `<meta>` carries text and nothing else.
+ *
+ * `<Lang>` is resolved rather than stripped — dropping it leaves a hole in the
+ * middle of the sentence, which is what a summary is made of. `_` is left alone
+ * for the same reason: it is a separator inside `멋진사자_nVtRC` far more often
+ * than it is emphasis, and the paragraphs this reads use `*` for that.
+ */
 function plainText(source: string): string {
-	return source
+	return inlineLang(source)
 		.replace(/<[^>]+>/g, ' ')
 		.replace(/!\[[^\]]*]\([^)]*\)/g, ' ')
 		.replace(/\[([^\]]*)]\([^)]*\)/g, '$1')
-		.replace(/[`*_]/g, '')
+		.replace(/[`*]/g, '')
 		.replace(/\s+/g, ' ')
 		.trim();
 }
@@ -382,18 +395,30 @@ const vitePressConfig: UserConfig = {
 		// unless it is told to.
 		server: { fs: { allow: [rootDir] } }
 	},
-
 	/**
-	 * `robots.txt`, written rather than committed. It exists to name the sitemap,
-	 * and the sitemap's own URL is already derived from the package manifest — a
-	 * copy of that host sitting in `public/` would be one more place to forget
-	 * when the site moves.
+	 * The three files that are written rather than committed.
+	 *
+	 * `robots.txt` exists to name the sitemap, and the sitemap's own URL is
+	 * already derived from the package manifest — a copy of that host sitting in
+	 * `public/` would be one more place to forget when the site moves. `llms.txt`
+	 * and `llms-full.txt` are generated for the same reason, at more length: see
+	 * the comment at the top of `llms.ts`.
 	 */
 	async buildEnd({ outDir }) {
 		await writeFile(
 			resolve(outDir, 'robots.txt'),
 			`User-agent: *\nAllow: /\n\nSitemap: ${siteUrl}/sitemap.xml\n`
 		);
+
+		await writeLlmsFiles({
+			outDir,
+			srcDir,
+			siteUrl,
+			repoUrl,
+			description: siteDescription,
+			summaryOf,
+			packages: packageLinks.map(({ registry, url }) => ({ registry, url }))
+		});
 	},
 	/**
 	 * A description that is about this page rather than about the library. Runs in

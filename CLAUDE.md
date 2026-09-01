@@ -235,6 +235,7 @@ docs/
       language.ts           # the reader's choice, as one value the site shares
       sidebar.ts            # the menu, written out — two locale columns, one structure
       i18n.ts               # the few strings the site's own components render
+    llms.ts                 # `llms.txt` and `llms-full.txt`, written at build time
     theme/                  # the language switch, the packages menu, the demo, the CSS
   en/  ko/                  # the pages, mirrored
   scripts/
@@ -276,6 +277,12 @@ The navbar is the same list — its API dropdown is built out of `data/sidebar.t
 **Depending on `randino` from npm would be the wrong shape.** The site documents this repository, so a page describing an option added since the last release would demo a build without it. The cost is that `.github/workflows/publish-documentation.yml` has to redeploy when `packages/javascript/lib/**` changes, which is in its path filter.
 
 `Demo.vue` generates nothing during SSR. A page of random text pre-rendered at build time and re-rendered on hydration is a guaranteed mismatch rather than a likely one, so the first batch is drawn in `onMounted`.
+
+### `llms.txt` is generated, not written
+
+`llms.ts` writes `llms.txt` and `llms-full.txt` into `docs-dist/` from `buildEnd`, the same place `robots.txt` is written. Both come out of `data/sidebar.ts` and the same first-paragraph summary the `<meta>` descriptions use, so a page added to the menu is in them without anyone remembering — a hand-written index is a second table of contents, and the second one goes stale.
+
+They are **English and JavaScript**: llms.txt has no notion of locales, and the `::: lang` blocks are flattened to the reference implementation's half with the mapping to Dart and Python stated once at the top. `data/markdown.ts` holds the one transform that flattening and the `<meta>` descriptions both need.
 
 ### Two traps
 
