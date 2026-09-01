@@ -9,3 +9,15 @@ indent_size = 2
 insert_final_newline = true
 max_line_length = 100
 trim_trailing_whitespace = true
+
+# `dart format` is not configurable about this: it indents with two spaces, and
+# a tab landing in a Dart file is a diff the formatter undoes on the next save.
+[*.dart]
+indent_style = space
+indent_size = 2
+
+# A tab is not valid indentation in YAML at all, so this one is a syntax error
+# rather than a style disagreement.
+[*.{yaml,yml}]
+indent_style = space
+indent_size = 2

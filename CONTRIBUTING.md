@@ -19,6 +19,20 @@ When creating an issue, keep the following in mind:
 - Please use English in all content.
 - You may need to describe the environment in which the issue occurs.
 
+## Project layout
+
+randino ships for more than one programming language, so there is no single package at the repository root:
+
+| Folder                 | What it is                                    | Where commands run     |
+| ---------------------- | --------------------------------------------- | ---------------------- |
+| `packages/javascript`  | The npm package. `npm run test`, `npm run build` | `packages/javascript`  |
+| `packages/dart`        | The pub.dev package. `dart test`, `dart analyze` | `packages/dart`        |
+| `docs`                 | The documentation site. `npm run dev`, `npm run build` | `docs`           |
+
+The **JavaScript package is the source of truth**: a behaviour change starts there and the Dart port follows it, and both test suites assert the same properties over the same data. A change that lands on only one side is a bug in the making, so please send both.
+
+Each package keeps its own `README.md` and `CHANGELOG.md`, because npm and pub.dev read those from the package root. The repository's `README.md` is the only one that describes all of them at once.
+
 ## How to contribute (Pull Requests)
 
 ### Write the code you want to change
