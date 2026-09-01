@@ -12,9 +12,10 @@
  * **The groups are not the folders.** `name/` and `nickname/` are two folders
  * because the two generators are two things, but a reader looking for the
  * function they are about to call does not care which folder it lives in. The
- * split here is by what a function *is*: **Generators** hand back names and
- * nicknames, **Utilities** decorate a string or answer a question about a
- * language, and the folder a page sits in decides nothing but its URL.
+ * split here is by what a function *is*, one level down inside **API**:
+ * **Generators** hand back names and nicknames, **Utilities** decorate a string
+ * or answer a question about a language. The folder a page sits in decides
+ * nothing but its URL.
  *
  * **Behaviour** holds the prose explaining how each generator's options behave.
  * It is a group of its own rather than two more entries under Guide, because it
@@ -32,12 +33,18 @@ export interface SidebarPage {
 	ko: string;
 }
 
+/** A section of the menu. Its `items` are pages, or — one level down — sections. */
 export interface SidebarGroup {
 	/** Only for a group the navbar also renders — see `navGroupsFor`. */
 	id?: string;
 	en: string;
 	ko: string;
-	items: SidebarPage[];
+	items: (SidebarPage | SidebarGroup)[];
+}
+
+/** The two are told apart by `path`, which only a page has. */
+function isPage(entry: SidebarPage | SidebarGroup): entry is SidebarPage {
+	return 'path' in entry;
 }
 
 export const SIDEBAR: SidebarGroup[] = [
@@ -51,32 +58,42 @@ export const SIDEBAR: SidebarGroup[] = [
 		]
 	},
 	{
-		id: 'generators',
-		en: 'Generators',
-		ko: '생성 함수',
+		en: 'API',
+		ko: 'API',
 		items: [
-			{ path: 'name/rand-name', en: 'randName', ko: 'randName' },
-			{ path: 'nickname/rand-nickname', en: 'randNickname', ko: 'randNickname' }
-		]
-	},
-	{
-		id: 'utilities',
-		en: 'Utilities',
-		ko: '유틸리티',
-		items: [
-			{ path: 'affix/rand-suffix', en: 'randSuffix', ko: 'randSuffix' },
-			{ path: 'affix/rand-prefix', en: 'randPrefix', ko: 'randPrefix' },
-			{ path: 'name/name-length-range', en: 'nameLengthRange', ko: 'nameLengthRange' },
 			{
-				path: 'name/name-supports-middle-name',
-				en: 'nameSupportsMiddleName',
-				ko: 'nameSupportsMiddleName'
+				id: 'generators',
+				en: 'Generators',
+				ko: '생성 함수',
+				items: [
+					{ path: 'name/rand-name', en: 'randName', ko: 'randName' },
+					{ path: 'nickname/rand-nickname', en: 'randNickname', ko: 'randNickname' }
+				]
 			},
-			{ path: 'name/name-supports-roman', en: 'nameSupportsRoman', ko: 'nameSupportsRoman' },
 			{
-				path: 'nickname/nickname-length-range',
-				en: 'nicknameLengthRange',
-				ko: 'nicknameLengthRange'
+				id: 'utilities',
+				en: 'Utilities',
+				ko: '유틸리티',
+				items: [
+					{ path: 'affix/rand-suffix', en: 'randSuffix', ko: 'randSuffix' },
+					{ path: 'affix/rand-prefix', en: 'randPrefix', ko: 'randPrefix' },
+					{ path: 'name/name-length-range', en: 'nameLengthRange', ko: 'nameLengthRange' },
+					{
+						path: 'name/name-supports-middle-name',
+						en: 'nameSupportsMiddleName',
+						ko: 'nameSupportsMiddleName'
+					},
+					{
+						path: 'name/name-supports-roman',
+						en: 'nameSupportsRoman',
+						ko: 'nameSupportsRoman'
+					},
+					{
+						path: 'nickname/nickname-length-range',
+						en: 'nicknameLengthRange',
+						ko: 'nicknameLengthRange'
+					}
+				]
 			}
 		]
 	},
@@ -111,13 +128,34 @@ function labelOf(entry: SidebarGroup | SidebarPage, lang: string): string {
 export function sidebarFor(lang: string, defaultLocale: string) {
 	const base = localeBase(lang, defaultLocale);
 
-	return SIDEBAR.map((group) => ({
-		text: labelOf(group, lang),
-		items: group.items.map((page) => ({
-			text: labelOf(page, lang),
-			link: `${base}${page.path}`
-		}))
-	}));
+	/** A page becomes a link, a group becomes a section holding more of both. */
+	const entryFor = (entry: SidebarPage | SidebarGroup): object =>
+		isPage(entry)
+			? { text: labelOf(entry, lang), link: `${base}${entry.path}` }
+			: { text: labelOf(entry, lang), items: entry.items.map(entryFor) };
+
+	return SIDEBAR.map(entryFor);
+}
+
+/** The group marked with this `id`, however deep it sits. */
+function groupById(entries: (SidebarPage | SidebarGroup)[], id: string): SidebarGroup | undefined {
+	for (const entry of entries) {
+		if (isPage(entry)) {
+			continue;
+		}
+
+		if (entry.id === id) {
+			return entry;
+		}
+
+		const nested = groupById(entry.items, id);
+
+		if (nested) {
+			return nested;
+		}
+	}
+
+	return undefined;
 }
 
 /**
@@ -131,7 +169,7 @@ export function navGroupsFor(ids: string[], lang: string, defaultLocale: string)
 	const base = localeBase(lang, defaultLocale);
 
 	return ids.map((id) => {
-		const group = SIDEBAR.find((entry) => entry.id === id);
+		const group = groupById(SIDEBAR, id);
 
 		if (!group) {
 			throw new Error(`No sidebar group is marked \`id: '${id}'\``);
@@ -139,7 +177,7 @@ export function navGroupsFor(ids: string[], lang: string, defaultLocale: string)
 
 		return {
 			text: labelOf(group, lang),
-			items: group.items.map((page) => ({
+			items: group.items.filter(isPage).map((page) => ({
 				text: labelOf(page, lang),
 				link: `${base}${page.path}`
 			}))

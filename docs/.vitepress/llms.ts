@@ -21,7 +21,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { writeFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import { inlineLang } from './data/markdown';
-import { SIDEBAR } from './data/sidebar';
+import { SIDEBAR, type SidebarGroup, type SidebarPage } from './data/sidebar';
 
 export interface LlmsOptions {
 	/** Where the built site is being written. */
@@ -105,6 +105,37 @@ const PREAMBLE = [
 	'Every page below also exists in Korean at the same path under `/ko/`.'
 ].join('\n');
 
+/**
+ * The menu flattened into `llms.txt`'s one level of sections.
+ *
+ * The sidebar nests — `API` holds `Generators` and `Utilities` — and llms.txt
+ * has no such thing, so a nested group becomes a section of its own named after
+ * both (`API: Generators`) rather than losing either half.
+ */
+function sectionsOf(
+	groups: (SidebarPage | SidebarGroup)[],
+	prefix = ''
+): [string, SidebarPage[]][] {
+	const sections: [string, SidebarPage[]][] = [];
+
+	for (const group of groups) {
+		if (!('items' in group)) {
+			continue;
+		}
+
+		const title = prefix ? `${prefix}: ${group.en}` : group.en;
+		const pages = group.items.filter((entry): entry is SidebarPage => 'path' in entry);
+
+		if (pages.length) {
+			sections.push([title, pages]);
+		}
+
+		sections.push(...sectionsOf(group.items, title));
+	}
+
+	return sections;
+}
+
 export async function writeLlmsFiles(options: LlmsOptions): Promise<void> {
 	const { outDir, srcDir, siteUrl, repoUrl, description, summaryOf, packages } = options;
 
@@ -118,10 +149,10 @@ export async function writeLlmsFiles(options: LlmsOptions): Promise<void> {
 		''
 	];
 
-	for (const group of SIDEBAR) {
-		index.push(`## ${group.en}`, '');
+	for (const [title, pages] of sectionsOf(SIDEBAR)) {
+		index.push(`## ${title}`, '');
 
-		for (const page of group.items) {
+		for (const page of pages) {
 			const source = sourceOf(page.path);
 			const url = urlOf(siteUrl, page.path);
 			const summary = summaryOf(source);
