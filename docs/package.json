@@ -12,7 +12,7 @@
 		"dev": "npm run changelog && vitepress dev",
 		"build": "npm run changelog && vitepress build && npm run check:anchors",
 		"serve": "npm run build && vitepress serve",
-		"format": "prettier .",
+		"format": "prettier . --check",
 		"format:fix": "prettier . --write",
 		"typecheck": "tsc --project tsconfig.json"
 	},

@@ -249,6 +249,7 @@ docs/
 | `npm run dev`           | The dev server                                      |
 | `npm run build`         | changelog → VitePress → anchor check, into `docs-dist/` |
 | `npm run typecheck`     | `tsc` over `.vitepress`                             |
+| `npm run format`        | Prettier, read-only — what CI runs                  |
 | `npm run format:fix`    | Prettier, in place                                  |
 
 ### One page, every package
