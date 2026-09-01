@@ -268,11 +268,15 @@ Every variant is in the document and CSS hides all but one, which is what buys t
 
 ### The menu is not the folders
 
-`name/` and `nickname/` are two folders because the two generators are two things, and the sidebar deliberately does not repeat that split: every public function is one entry in one **API** group, and the prose explaining how the options behave sits under **Guide**. A reader looking for `randNickname` is looking for a function, not for the half of the library it belongs to.
+`name/` and `nickname/` are two folders because the two generators are two things, and the sidebar deliberately does not repeat that split. A reader looking for `randNickname` is looking for a function, not for the half of the library it belongs to, so the groups are what a function **is**:
+
+- **Generators** — the two that hand back names and nicknames. This is the group that grows when a new kind of random text is added, and it is kept short so that growth is visible.
+- **Utilities** — everything else that is callable: what decorates a string (`randSuffix`, `randPrefix`) and what answers a question about a language (`nameLengthRange` and the two `nameSupports…`).
+- **Behaviour** — the prose explaining how each generator's options behave, one page per generator. Its own group rather than two more entries under Guide, because it grows alongside Generators and Guide does not.
 
 **One page, one function**, which is why there is no `helpers` page holding three of them any more: a page that documents three functions can be named after none of them, so the menu names the page and the reader still has to open it to find out whether what they came for is inside.
 
-The navbar is the same list — its API dropdown is built out of `data/sidebar.ts` by `navGroupFor`, so the menu and the section it points into cannot drift. Its **Packages** dropdown is `PackageLinks.vue`, which is where npm, pub.dev and PyPI went when they stopped being three of the four icons in the navbar's right-hand corner; the registry URLs are still derived from the three manifests in `config.ts`, and GitHub is the one social link left. Its marks are `RegistryMark.vue` and not `LangMark.vue` — npm is not JavaScript and PyPI is not Python, and only pub.dev, which brands itself with the Dart logo, has the same drawing in both files.
+The navbar is the same lists — its API dropdown is Generators and Utilities as two labelled sections, built out of `data/sidebar.ts` by `navGroupsFor`, so the menu and the sections it points into cannot drift. Its **Packages** dropdown is `PackageLinks.vue`, which is where npm, pub.dev and PyPI went when they stopped being three of the four icons in the navbar's right-hand corner; the registry URLs are still derived from the three manifests in `config.ts`, and GitHub is the one social link left. Its marks are `RegistryMark.vue` and not `LangMark.vue` — npm is not JavaScript and PyPI is not Python, and only pub.dev, which brands itself with the Dart logo, has the same drawing in both files.
 
 ### The demo runs the real library
 

@@ -11,11 +11,14 @@
  *
  * **The groups are not the folders.** `name/` and `nickname/` are two folders
  * because the two generators are two things, but a reader looking for the
- * function they are about to call does not care which folder it lives in — they
- * want the list of callable functions in one place. So the four generators and
- * the helper pages are one **API** group, the prose that explains how the
- * options behave is under **Guide**, and the folder a page sits in decides
- * nothing but its URL.
+ * function they are about to call does not care which folder it lives in. The
+ * split here is by what a function *is*: **Generators** hand back names and
+ * nicknames, **Utilities** decorate a string or answer a question about a
+ * language, and the folder a page sits in decides nothing but its URL.
+ *
+ * **Behaviour** holds the prose explaining how each generator's options behave.
+ * It is a group of its own rather than two more entries under Guide, because it
+ * grows by one page per generator and Guide does not.
  *
  * Every `path` here has to exist as `en/<path>.md` **and** `ko/<path>.md`, or
  * VitePress fails the build on a dead link. That is the check, and it is why
@@ -30,7 +33,7 @@ export interface SidebarPage {
 }
 
 export interface SidebarGroup {
-	/** Only for a group the navbar also renders — see `navGroupFor`. */
+	/** Only for a group the navbar also renders — see `navGroupsFor`. */
 	id?: string;
 	en: string;
 	ko: string;
@@ -44,18 +47,23 @@ export const SIDEBAR: SidebarGroup[] = [
 		items: [
 			{ path: 'demo', en: 'Demo', ko: '데모' },
 			{ path: 'guide/getting-started', en: 'Getting started', ko: '시작하기' },
-			{ path: 'guide/languages', en: 'Supported languages', ko: '지원 언어' },
-			{ path: 'name/', en: 'Person names', ko: '사람 이름' },
-			{ path: 'nickname/', en: 'Nicknames', ko: '닉네임' }
+			{ path: 'guide/languages', en: 'Supported languages', ko: '지원 언어' }
 		]
 	},
 	{
-		id: 'api',
-		en: 'API',
-		ko: 'API',
+		id: 'generators',
+		en: 'Generators',
+		ko: '생성 함수',
 		items: [
 			{ path: 'name/rand-name', en: 'randName', ko: 'randName' },
-			{ path: 'nickname/rand-nickname', en: 'randNickname', ko: 'randNickname' },
+			{ path: 'nickname/rand-nickname', en: 'randNickname', ko: 'randNickname' }
+		]
+	},
+	{
+		id: 'utilities',
+		en: 'Utilities',
+		ko: '유틸리티',
+		items: [
 			{ path: 'affix/rand-suffix', en: 'randSuffix', ko: 'randSuffix' },
 			{ path: 'affix/rand-prefix', en: 'randPrefix', ko: 'randPrefix' },
 			{ path: 'name/name-length-range', en: 'nameLengthRange', ko: 'nameLengthRange' },
@@ -64,16 +72,20 @@ export const SIDEBAR: SidebarGroup[] = [
 				en: 'nameSupportsMiddleName',
 				ko: 'nameSupportsMiddleName'
 			},
-			{
-				path: 'name/name-supports-roman',
-				en: 'nameSupportsRoman',
-				ko: 'nameSupportsRoman'
-			},
+			{ path: 'name/name-supports-roman', en: 'nameSupportsRoman', ko: 'nameSupportsRoman' },
 			{
 				path: 'nickname/nickname-length-range',
 				en: 'nicknameLengthRange',
 				ko: 'nicknameLengthRange'
 			}
+		]
+	},
+	{
+		en: 'Behaviour',
+		ko: '동작 방식',
+		items: [
+			{ path: 'name/', en: 'Person names', ko: '사람 이름' },
+			{ path: 'nickname/', en: 'Nicknames', ko: '닉네임' }
 		]
 	},
 	{
@@ -109,22 +121,28 @@ export function sidebarFor(lang: string, defaultLocale: string) {
 }
 
 /**
- * One group's pages again, as the items of a navbar dropdown.
+ * Some of the groups again, as the sections of one navbar dropdown.
  *
- * The navbar's API menu and the sidebar's API group are the same list, so they
- * are the same list — a menu that quietly stops matching the section it points
- * into is the kind of thing that is only noticed by the reader.
+ * The navbar's API menu and the sidebar's two function groups are the same
+ * lists, so they are the same lists — a menu that quietly stops matching the
+ * section it points into is the kind of thing only the reader notices.
  */
-export function navGroupFor(id: string, lang: string, defaultLocale: string) {
+export function navGroupsFor(ids: string[], lang: string, defaultLocale: string) {
 	const base = localeBase(lang, defaultLocale);
-	const group = SIDEBAR.find((entry) => entry.id === id);
 
-	if (!group) {
-		throw new Error(`No sidebar group is marked \`id: '${id}'\``);
-	}
+	return ids.map((id) => {
+		const group = SIDEBAR.find((entry) => entry.id === id);
 
-	return group.items.map((page) => ({
-		text: labelOf(page, lang),
-		link: `${base}${page.path}`
-	}));
+		if (!group) {
+			throw new Error(`No sidebar group is marked \`id: '${id}'\``);
+		}
+
+		return {
+			text: labelOf(group, lang),
+			items: group.items.map((page) => ({
+				text: labelOf(page, lang),
+				link: `${base}${page.path}`
+			}))
+		};
+	});
 }

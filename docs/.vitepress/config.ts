@@ -17,7 +17,7 @@ import type { VitePressI18nOptions } from 'vitepress-i18n/types';
 import { CODE_LANGUAGE_HEAD_SCRIPT, CODE_LANGUAGE_IDS } from './data/languages';
 import { writeLlmsFiles } from './llms';
 import { inlineLang } from './data/markdown';
-import { localeBase, navGroupFor, sidebarFor } from './data/sidebar';
+import { localeBase, navGroupsFor, sidebarFor } from './data/sidebar';
 
 const vitePressDir = dirname(fileURLToPath(import.meta.url));
 const srcDir = resolve(vitePressDir, '..');
@@ -75,15 +75,17 @@ const packageLinks = [
 /**
  * The navbar, in every locale: the prose, the functions, and where to get them.
  *
- * **API** is a dropdown over the same pages the sidebar's API group holds, and
- * it is one list rather than a Person names menu and a Nicknames menu — a reader
- * looking for `randNickname` is looking for a function, not for the half of
- * the library it belongs to. `navGroupFor` is what keeps the two in step.
+ * **API** is a dropdown over the same pages the sidebar's two function groups
+ * hold, split the same way: what generates a name or a nickname, and what
+ * decorates a string or answers a question about a language. Not split by
+ * `name/` versus `nickname/` — a reader looking for `randNickname` is looking
+ * for a function, not for the half of the library it belongs to.
+ * `navGroupsFor` is what keeps the menu and those sections in step.
  */
 const navFor = (lang: string, labels: { demo: string; guide: string; packages: string }) => [
 	{ text: labels.demo, link: `${localeBase(lang, defaultLocale)}demo` },
 	{ text: labels.guide, link: `${localeBase(lang, defaultLocale)}guide/getting-started` },
-	{ text: 'API', items: navGroupFor('api', lang, defaultLocale) },
+	{ text: 'API', items: navGroupsFor(['generators', 'utilities'], lang, defaultLocale) },
 	{
 		text: labels.packages,
 		items: [{ component: 'PackageLinks', props: { links: packageLinks } }]
