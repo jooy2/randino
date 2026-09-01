@@ -24,6 +24,17 @@ randomName(language: NameLanguage.ko, count: 3);
 
 :::
 
+::: lang py
+
+```python
+from randino import random_name
+
+random_name(language="ko", count=3)
+# ['김태윤', '원동혁', '조진우']
+```
+
+:::
+
 ## What is in the box
 
 | Function | Returns |
@@ -68,6 +79,18 @@ randomName(language: NameLanguage.ko, style: 100, count: 3);
 
 :::
 
+::: lang py
+
+```python
+random_name(language="en", style=100, count=3)
+# ['Deder Kuvoun', 'Jaihil Brouvinn', 'Thoowoun Wiatou']
+
+random_name(language="ko", style=100, count=3)
+# ['송승완', '구상겸', '채진훈']
+```
+
+:::
+
 ### Surnames are weighted where the distribution is steep
 
 Korean, Chinese and Vietnamese surnames are drawn **in proportion to how common they are**, because a handful of them cover most of the population. About a fifth of the Korean names come back a 김 and two Vietnamese names in five a Nguyễn, the way a real roster reads — an even draw over the pool would make 김 one name in seventy-five, which is the single loudest way the output stops reading Korean.
@@ -76,11 +99,11 @@ The other six languages have a long enough tail that an even draw is already wit
 
 ### Length is counted in the native form
 
-`minLength` and `maxLength` count **characters of the native form, spaces between parts included**. The structure you asked for always wins: a range too narrow for the requested parts is answered with the closest name the generator can build, never by dropping a surname or middle name you asked for.
+<Lang js="minLength" dart="minLength" py="min_length" code /> and <Lang js="maxLength" dart="maxLength" py="max_length" code /> count **characters of the native form, spaces between parts included**. The structure you asked for always wins: a range too narrow for the requested parts is answered with the closest name the generator can build, never by dropping a surname or middle name you asked for.
 
 For space-separated languages the range is satisfied by re-drawing from the pools, so a very narrow range is best-effort. Korean, Japanese and Chinese hit it exactly, because their given names are composed a syllable at a time.
 
-Leave both out and each language falls back to its own range, which is what `nameLengthRange` reports — and that fallback is resolved **per language**, so mixing languages does not stretch a Korean name to fill a Spanish name's range.
+Leave both out and each language falls back to its own range, which is what <Lang js="nameLengthRange" dart="nameLengthRange" py="name_length_range" code /> reports — and that fallback is resolved **per language**, so mixing languages does not stretch a Korean name to fill a Spanish name's range.
 
 ### `startsWith` applies to the whole name
 
@@ -96,4 +119,4 @@ So that the count you asked for is the count you get. Turn it on to deduplicate;
 
 `gender` picks which pools the given name is drawn from. In most languages that is all it does, and the result is not observable from the outside — a Korean given name does not announce which pool it came from. Russian is the exception: its patronymic and its surname both inflect, so `Иванов` becomes `Иванова` and `Николаевич` becomes `Николаевна`.
 
-Leave it out and a gender is picked per name. `randomNameDetails` reports which one was used.
+Leave it out and a gender is picked per name. <Lang js="randomNameDetails" dart="randomNameDetails" py="random_name_details" code /> reports which one was used.

@@ -1,6 +1,6 @@
 # nicknameLengthRange
 
-해당 언어가 만들 수 있는 모든 닉네임 길이를 글자 수로 알려 줍니다. [`randomNickname`](./random-nickname)이 `minLength`나 `maxLength`를 생략했을 때 사용하는 값이 바로 이것입니다.
+해당 언어가 만들 수 있는 모든 닉네임 길이를 글자 수로 알려 줍니다. [`randomNickname`](./random-nickname)이 <Lang js="minLength" dart="minLength" py="min_length" code />나 <Lang js="maxLength" dart="maxLength" py="max_length" code />를 생략했을 때 사용하는 값이 바로 이것입니다.
 
 ::: lang js
 
@@ -46,6 +46,28 @@ nicknameLengthRange(language: NicknameLanguage.ko, wordSeparator: '-'); // Lengt
 
 :::
 
+::: lang py
+
+```python
+from randino import nickname_length_range
+
+nickname_length_range("ko")  # (1, 12)
+nickname_length_range("ko", include_modifier=False)  # (1, 8)
+nickname_length_range("en")  # (3, 30)
+nickname_length_range("zh")  # (2, 5)
+nickname_length_range("ko", word_separator="-")  # (1, 14)
+```
+
+| 파라미터 | 타입 | 기본값 | 설명 |
+| --- | --- | --- | --- |
+| `language` | `NicknameLanguageOption` | `"all"` | 언어, 또는 `"all"`로 전체 |
+| `include_modifier` | `bool` | `True` | 수식어가 들어가는 형태를 포함 |
+| `word_separator` | `str \| None` | `None` | 구분자가 단어 사이에 더하는 길이를 포함 |
+
+`tuple[int, int]`를 반환합니다.
+
+:::
+
 ## 범위가 넓은 것은 의도된 것입니다
 
 아래쪽 끝은 명사 하나이고 위쪽 끝은 수식어와 명사와 뒤따르는 단어를 모두 더한 것입니다. 그래서 기본 범위는 **모든 형태**를 포함하며, 결과물의 일반적인 모습을 결정하는 것은 범위가 아니라 형태별 가중치입니다. 범위를 좁히는 것이 곧 형태를 빼는 방법입니다.
@@ -70,9 +92,19 @@ randomNickname(language: NicknameLanguage.ko, maxLength: 3, count: 3);
 
 :::
 
+::: lang py
+
+```python
+nickname_length_range("ko")  # (1, 12) — 모든 형태
+random_nickname(language="ko", max_length=3, count=3)
+# ['노을', '파란곰', '수달'] — 세 단어가 들어갈 자리가 없습니다
+```
+
+:::
+
 ## 범위를 넓히거나 좁히는 두 가지
 
-**구분자는 닉네임의 일부입니다.** 구분자의 길이도 `minLength` / `maxLength`에 포함되므로, 이 함수에 구분자를 넘겨 보면 남은 범위를 알 수 있습니다.
+**구분자는 닉네임의 일부입니다.** 구분자의 길이도 <Lang js="minLength" dart="minLength" py="min_length" code /> / <Lang js="maxLength" dart="maxLength" py="max_length" code />에 포함되므로, 이 함수에 구분자를 넘겨 보면 남은 범위를 알 수 있습니다.
 
 ::: lang js
 
@@ -94,11 +126,21 @@ nicknameLengthRange(language: NicknameLanguage.en, wordSeparator: ' '); // Lengt
 
 :::
 
-**범위보다 긴 `baseWord`는 범위를 넓힙니다.** 단어가 잘리지 않습니다. 이 함수는 언어 고유의 단어 풀만을 설명하므로 그 결과가 여기에 반영되지는 않지만, `randomNickname`은 넘겨받은 단어를 그렇게 다룹니다.
+::: lang py
 
-**고유 접미사는 범위 밖에 완전히 벗어나 있습니다.** `minLength`와 `maxLength`는 읽는 부분만을 가리키고, 접미사는 그 조건을 만족한 뒤에 덧붙습니다.
+```python
+nickname_length_range("ko")  # (1, 12)
+nickname_length_range("ko", word_separator="-")  # (1, 14) — 가장 긴 형태에는 구분자가 두 개
+nickname_length_range("en", word_separator=" ")  # (3, 32)
+```
+
+:::
+
+**범위보다 긴 <Lang js="baseWord" dart="baseWord" py="base_word" code />는 범위를 넓힙니다.** 단어가 잘리지 않습니다. 이 함수는 언어 고유의 단어 풀만을 설명하므로 그 결과가 여기에 반영되지는 않지만, `randomNickname`은 넘겨받은 단어를 그렇게 다룹니다.
+
+**고유 접미사는 범위 밖에 완전히 벗어나 있습니다.** <Lang js="minLength" dart="minLength" py="min_length" code />와 <Lang js="maxLength" dart="maxLength" py="max_length" code />는 읽는 부분만을 가리키고, 접미사는 그 조건을 만족한 뒤에 덧붙습니다.
 
 ## 함께 보기
 
-- [`randomNickname`](./random-nickname) — `minLength`와 `maxLength`가 쓰이는 곳.
+- [`randomNickname`](./random-nickname) — 길이 옵션이 쓰이는 곳.
 - [상수](../reference/constants) — 모든 길이 옵션이 제한되는 절대 범위.

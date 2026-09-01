@@ -3,12 +3,12 @@ layout: home
 
 title: randino
 titleTemplate: 원하는 언어로 만드는 무작위 이름과 닉네임
-description: 9개 언어로 사람 이름과 닉네임을 무작위로 생성합니다. 김민준, Emma Clover, 멋진사자, MistyOwl. JavaScript와 Dart 패키지로 제공되며 런타임 의존성이 없습니다.
+description: 9개 언어로 사람 이름과 닉네임을 무작위로 생성합니다. 김민준, Emma Clover, 멋진사자, MistyOwl. JavaScript, Dart, Python 패키지로 제공되며 런타임 의존성이 없습니다.
 
 hero:
   name: randino
   text: 그 언어답게 읽히는 무작위 텍스트
-  tagline: 실제로 쓰이는 사람 이름과, 사람이 실제로 고를 법한 닉네임. 9개 언어를 지원하고 JavaScript와 Dart로 제공되며 런타임 의존성이 없습니다.
+  tagline: 실제로 쓰이는 사람 이름과, 사람이 실제로 고를 법한 닉네임. 9개 언어를 지원하고 JavaScript, Dart, Python으로 제공되며 런타임 의존성이 없습니다.
   actions:
     - theme: brand
       text: 시작하기
@@ -32,8 +32,8 @@ features:
     details: 14개 테마의 명사에 수식어를 붙입니다. 사람 이름은 절대 쓰지 않으며, 그래서 닉네임이 이름처럼 읽히지 않습니다.
     link: /ko/nickname/
     linkText: 닉네임
-  - title: 두 개의 패키지, 하나의 라이브러리
-    details: JavaScript와 Dart가 같은 데이터셋과 같은 규칙을 씁니다. 문서 한 페이지가 둘 다 설명하며, 사이드바에서 원하는 쪽을 고르면 됩니다.
+  - title: 세 개의 패키지, 하나의 라이브러리
+    details: JavaScript, Dart, Python이 같은 데이터셋과 같은 규칙을 씁니다. 문서 한 페이지가 셋 모두를 설명하며, 사이드바에서 원하는 쪽을 고르면 됩니다.
     link: /ko/guide/getting-started
     linkText: 시작하기
   - title: 9개 언어
@@ -84,6 +84,26 @@ randomNickname(language: NicknameLanguage.ko, count: 3);
 
 randomNickname(language: NicknameLanguage.en, uniqueSuffix: true, count: 2);
 // ['FoggyHillside_gDe2C', 'CraneVoyage_nVtRC']
+```
+
+:::
+
+::: lang py
+
+```python
+from randino import random_name, random_nickname
+
+random_name(language="ko", count=3)
+# ['김태윤', '원동혁', '조진우']
+
+random_name(language="ru", gender="female", include_middle_name=True)
+# ['Людмила Николаевна Богданова']
+
+random_nickname(language="ko", count=3)
+# ['오래된곰', '영원한도마뱀', '귀여운신화다발']
+
+random_nickname(language="en", unique_suffix=True, count=2)
+# ['FoggyHillside_gDe2C', 'CraneVoyage_nVtRC']
 ```
 
 :::

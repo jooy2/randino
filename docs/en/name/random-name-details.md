@@ -24,6 +24,17 @@ randomNameDetails(language: NameLanguage.ko);
 
 :::
 
+::: lang py
+
+```python
+from randino import random_name_details
+
+random_name_details(language="ko")
+# [NameDetail(native='여미주', roman='Yeo Miju', language='ko', gender='female')]
+```
+
+:::
+
 ## Options
 
 The same options as [`randomName`](./random-name), **except `script`** — every name is returned in its native form and romanized at the same time, so there is nothing to choose.
@@ -42,10 +53,16 @@ Each entry is a `NameDetail`:
 
 :::
 
+::: lang py
+
+Each entry is a `NameDetail`, a frozen dataclass:
+
+:::
+
 | Field | Type | Description |
 | --- | --- | --- |
-| `native` | <Lang js="string" dart="String" code /> | The name in its own script. |
-| `roman` | <Lang js="string" dart="String" code /> | The English pronunciation of `native`. Identical to it for English. |
+| `native` | <Lang js="string" dart="String" py="str" code /> | The name in its own script. |
+| `roman` | <Lang js="string" dart="String" py="str" code /> | The English pronunciation of `native`. Identical to it for English. |
 | `language` | `NameLanguage` | The language this name was generated in — the reason to reach for this function when the draw is mixed. |
 | `gender` | `NameGender` | The pools the given name was drawn from. |
 
@@ -79,6 +96,18 @@ for (final detail in randomNameDetails(language: NameLanguage.ja, count: 3)) {
 
 :::
 
+::: lang py
+
+```python
+for detail in random_name_details(language="ja", count=3):
+    print(f"{detail.native} ({detail.roman})")
+# 山崎愛菜 (Yamazaki Aina)
+# 加藤楓乃 (Kato Kaeno)
+# 吉田直人 (Yoshida Naoto)
+```
+
+:::
+
 ### Knowing what a mixed draw produced
 
 ::: lang js
@@ -103,6 +132,19 @@ randomNameDetails(count: 3);
 //   NameDetail(Anna Mariani, Anna Mariani, it, female),
 //   NameDetail(Иванов Иван, Ivanov Ivan, ru, male),
 // ]
+```
+
+:::
+
+::: lang py
+
+```python
+random_name_details(count=3)
+# [
+#     NameDetail(native='조동민', roman='Jo Dongmin', language='ko', gender='male'),
+#     NameDetail(native='Anna Mariani', roman='Anna Mariani', language='it', gender='female'),
+#     NameDetail(native='Иванов Иван', roman='Ivanov Ivan', language='ru', gender='male'),
+# ]
 ```
 
 :::
@@ -136,6 +178,18 @@ randomNameDetails(
 //   NameDetail(Людмила Николаевна Богданова, Lyudmila Nikolaevna Bogdanova, ru, female),
 //   NameDetail(Марина Максимовна Богданова, Marina Maksimovna Bogdanova, ru, female),
 // ]
+```
+
+:::
+
+::: lang py
+
+```python
+random_name_details(language="ru", gender="female", include_middle_name=True, count=2)
+# [
+#     NameDetail(native='Людмила Николаевна Богданова', roman='Lyudmila Nikolaevna Bogdanova', …),
+#     NameDetail(native='Марина Максимовна Богданова', roman='Marina Maksimovna Bogdanova', …),
+# ]
 ```
 
 :::

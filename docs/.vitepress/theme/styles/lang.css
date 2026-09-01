@@ -10,12 +10,12 @@
  *   run before hydration.
  * - **No hydration mismatch.** The server renders both halves, which is what the
  *   client renders too.
- * - **Both halves are searchable.** VitePress builds its index from the rendered
+ * - **Every half is searchable.** VitePress builds its index from the rendered
  *   page, so a reader looking up `NameLanguage.ko` finds the page whichever
  *   package they had selected.
  *
- * `data-lang` on a block holds a space-separated list, because a block that both
- * packages want and a third would not is a real case — hence `~=` rather
+ * `data-lang` on a block holds a space-separated list, because a block two of
+ * the packages want and the third does not is a real case — hence `~=` rather
  * than `=`.
  */
 
@@ -29,7 +29,8 @@
  * One rule per package — there is no way to write this once for a list.
  */
 html[data-lang='js'] .randino-lang[data-lang]:not([data-lang~='js']),
-html[data-lang='dart'] .randino-lang[data-lang]:not([data-lang~='dart']) {
+html[data-lang='dart'] .randino-lang[data-lang]:not([data-lang~='dart']),
+html[data-lang='py'] .randino-lang[data-lang]:not([data-lang~='py']) {
 	display: none;
 }
 
@@ -87,13 +88,19 @@ html[data-lang='dart'] .randino-lang[data-lang]:not([data-lang~='dart']) {
 	text-transform: uppercase;
 }
 
-/* A track with the options laid side by side, so both are always readable and
-   the selected one is a position rather than a word you have to go and find. */
+/*
+ * The options stacked, one per row, so the selected one is a position rather
+ * than a word you have to go and find.
+ *
+ * They were side by side while there were two. Three does not fit: the sidebar's
+ * track is about 208px, which leaves each column ~65px, and `JavaScript` alone
+ * needs 65px before its mark and the padding are counted — so the label was
+ * being cut in half. Stacking is also what keeps a fourth package from having to
+ * relitigate this.
+ */
 .randino-lang-track {
 	display: grid;
-	grid-auto-columns: 1fr;
-	grid-auto-flow: column;
-	gap: 3px;
+	gap: 2px;
 	padding: 3px;
 	border: 1px solid var(--vp-c-divider);
 	border-radius: 10px;
@@ -103,9 +110,9 @@ html[data-lang='dart'] .randino-lang[data-lang]:not([data-lang~='dart']) {
 .randino-lang-option {
 	display: flex;
 	align-items: center;
-	justify-content: center;
-	gap: 6px;
-	height: 30px;
+	gap: 8px;
+	height: 28px;
+	padding: 0 8px;
 	border-radius: 7px;
 	color: var(--vp-c-text-2);
 	font-size: 12.5px;
@@ -141,10 +148,11 @@ html[data-lang='dart'] .randino-lang[data-lang]:not([data-lang~='dart']) {
  * `data-lang` is set before the first paint, and a class is set by Vue after
  * hydration. A pre-rendered page whose switch is drawn from a class shows the
  * *default* highlighted for as long as it takes the bundle to arrive, on the one
- * control whose whole job is to say which of the two you are reading.
+ * control whose whole job is to say which package you are reading.
  */
 html[data-lang='js'] .randino-lang-option[data-lang='js'],
-html[data-lang='dart'] .randino-lang-option[data-lang='dart'] {
+html[data-lang='dart'] .randino-lang-option[data-lang='dart'],
+html[data-lang='py'] .randino-lang-option[data-lang='py'] {
 	background-color: var(--vp-c-bg);
 	color: var(--vp-c-text-1);
 	box-shadow:
@@ -158,8 +166,8 @@ html[data-lang='dart'] .randino-lang-option[data-lang='dart'] {
 	outline-offset: 2px;
 }
 
-/* Quiet on the option that is not chosen, so the row reads as one selected thing
-   rather than two competing ones. */
+/* Quiet on the options that are not chosen, so the row reads as one selected
+   thing rather than several competing ones. */
 .randino-lang-mark {
 	flex: none;
 	opacity: 0.5;
@@ -168,6 +176,7 @@ html[data-lang='dart'] .randino-lang-option[data-lang='dart'] {
 
 html[data-lang='js'] .randino-lang-option[data-lang='js'] .randino-lang-mark,
 html[data-lang='dart'] .randino-lang-option[data-lang='dart'] .randino-lang-mark,
+html[data-lang='py'] .randino-lang-option[data-lang='py'] .randino-lang-mark,
 .randino-lang-option:hover .randino-lang-mark {
 	opacity: 1;
 }

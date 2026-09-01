@@ -24,11 +24,12 @@ const defaultLocale = 'en';
 const supportLocales: string[] = [defaultLocale, 'ko'];
 
 /**
- * The two packages, read off their own manifests rather than written out.
+ * The three packages, read off their own manifests rather than written out.
  *
- * They version independently and they are published to two registries under
+ * They version independently and they are published to three registries under
  * names that only happen to agree today; one of them being wrong in the footer
- * is exactly the kind of thing nobody notices. No YAML parser for one line.
+ * is exactly the kind of thing nobody notices. No YAML or TOML parser for one
+ * line each.
  */
 const npmPackage = JSON.parse(
 	readFileSync(resolve(rootDir, 'packages/javascript/package.json'), 'utf8')
@@ -39,10 +40,16 @@ const pubName =
 		/^name:\s*(\S+)/m
 	)?.[1] ?? 'randino';
 
+const pypiName =
+	readFileSync(resolve(rootDir, 'packages/python/pyproject.toml'), 'utf8').match(
+		/^name\s*=\s*"([^"]+)"/m
+	)?.[1] ?? 'randino';
+
 const siteUrl = npmPackage.homepage.replace(/\/+$/, '');
 const repoUrl = npmPackage.repository.url.replace(/\.git$/, '');
 const npmUrl = `https://www.npmjs.com/package/${npmPackage.name}`;
 const pubUrl = `https://pub.dev/packages/${pubName}`;
+const pypiUrl = `https://pypi.org/project/${pypiName}/`;
 const editLinkPattern = `${repoUrl}/edit/main/docs/:path`;
 const socialImage = `${siteUrl}/logo.svg`;
 
@@ -51,7 +58,7 @@ const socialImage = `${siteUrl}/logo.svg`;
  *
  * A social link's icon is either a name VitePress ships or an SVG string, and
  * there is no name for pub.dev. `currentColor` on the path is what lets the
- * navbar hover it like the two icons beside it.
+ * navbar hover it like the icons beside it.
  */
 const dartIcon =
 	'<svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">' +
@@ -60,6 +67,28 @@ const dartIcon =
 	'1.677.788 1.677.788L24 9.948v9.789h-4.263V24H9.789l-9-9C.303 14.5 0 13.795 0 13.105c0-.319.18-.818' +
 	'.316-1.105zm.679.679v11.787c.002.543.021 1.024.498 1.508L10.204 23h8.533v-4.263zm12.055-.678c-.899' +
 	'-.896-1.809-1.78-2.74-2.643c-.302-.267-.567-.468-1.07-.462c-.37.014-.87.195-.87.195L6.341 4.105z"/>' +
+	'</svg>';
+
+/** Python's own logo, for the PyPI link in the navbar — see `dartIcon`. */
+const pypiIcon =
+	'<svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">' +
+	'<title>PyPI</title>' +
+	'<path fill="currentColor" d="M14.25.18l.9.2.73.26.59.3.45.32.34.34.25.34.16.33.1.3.04.26.02.2' +
+	'-.01.13V8.5l-.05.63-.13.55-.21.46-.26.38-.3.31-.33.25-.35.19-.35.14-.33.1-.3.07-.26.04-.21.02H8' +
+	'.77l-.69.05-.59.14-.5.22-.41.27-.33.32-.27.35-.2.36-.15.37-.1.35-.07.32-.04.27-.02.21v3.06H3.17' +
+	'l-.21-.03-.28-.07-.32-.12-.35-.18-.36-.26-.36-.36-.35-.46-.32-.59-.28-.73-.21-.88-.14-1.05-.05' +
+	'-1.23.06-1.22.16-1.04.24-.87.32-.71.36-.57.4-.44.42-.33.42-.24.4-.16.36-.1.32-.05.24-.01h.16l.06' +
+	'.01h8.16v-.83H6.18l-.01-2.75-.02-.37.05-.34.11-.31.17-.28.25-.26.31-.23.38-.2.44-.18.51-.15.58' +
+	'-.12.64-.1.71-.06.77-.04.84-.02 1.27.05zm-6.3 1.98l-.23.33-.08.41.08.41.23.34.33.22.41.09.41-.09' +
+	'.33-.22.23-.34.08-.41-.08-.41-.23-.33-.33-.22-.41-.09-.41.09zm13.09 3.95l.28.06.32.12.35.18.36' +
+	'.27.36.35.35.47.32.59.28.73.21.88.14 1.04.05 1.23-.06 1.23-.16 1.04-.24.86-.32.71-.36.57-.4.45' +
+	'-.42.33-.42.24-.4.16-.36.09-.32.05-.24.02-.16-.01h-8.22v.82h5.84l.01 2.76.02.36-.05.34-.11.31' +
+	'-.17.29-.25.25-.31.24-.38.2-.44.17-.51.15-.58.13-.64.09-.71.07-.77.04-.84.01-1.27-.04-1.07-.14' +
+	'-.9-.2-.73-.25-.59-.3-.45-.33-.34-.34-.25-.34-.16-.33-.1-.3-.04-.25-.02-.2.01-.13v-5.34l.05-.64' +
+	'.13-.54.21-.46.26-.38.3-.32.33-.24.35-.2.35-.14.33-.1.3-.06.26-.04.21-.02.13-.01h5.84l.69-.05.59' +
+	'-.14.5-.21.41-.28.33-.32.27-.35.2-.36.15-.36.1-.35.07-.32.04-.28.02-.21V6.07h2.09l.14.01zm-6.47 ' +
+	'14.25l-.23.33-.08.41.08.41.23.33.33.23.41.08.41-.08.33-.23.23-.33.08-.41-.08-.41-.23-.33-.33-.23' +
+	'-.41-.08-.41.08z"/>' +
 	'</svg>';
 
 /** The same three destinations in every locale, prefixed with its base. */
@@ -74,8 +103,8 @@ const vitePressI18nConfig: VitePressI18nOptions = {
 	rootLocale: defaultLocale,
 	searchProvider: 'local',
 	description: {
-		en: 'Random person names and nicknames in the language you ask for — Korean, English, Japanese, Chinese and five more. One library, shipped for JavaScript and for Dart, with no runtime dependencies.',
-		ko: '요청한 언어로 사람 이름과 닉네임을 무작위로 생성합니다. 한국어, 영어, 일본어, 중국어를 포함한 9개 언어를 지원하며, JavaScript와 Dart 패키지로 제공되고 런타임 의존성이 없습니다.'
+		en: 'Random person names and nicknames in the language you ask for — Korean, English, Japanese, Chinese and five more. One library, shipped for JavaScript, Dart and Python, with no runtime dependencies.',
+		ko: '요청한 언어로 사람 이름과 닉네임을 무작위로 생성합니다. 한국어, 영어, 일본어, 중국어를 포함한 9개 언어를 지원하며, JavaScript, Dart, Python 패키지로 제공되고 런타임 의존성이 없습니다.'
 	},
 	themeConfig: {
 		en: {
@@ -198,7 +227,7 @@ function structuredData(description: string, url: string) {
 		programmingLanguage: ['TypeScript', 'Dart'],
 		license: 'https://opensource.org/licenses/MIT',
 		author: { '@type': 'Organization', name: 'CDGet', url: 'https://cdget.com' },
-		sameAs: [repoUrl, npmUrl, pubUrl]
+		sameAs: [repoUrl, npmUrl, pubUrl, pypiUrl]
 	};
 }
 
@@ -388,6 +417,7 @@ const vitePressConfig: UserConfig = {
 		socialLinks: [
 			{ icon: 'npm', link: npmUrl },
 			{ icon: { svg: dartIcon }, link: pubUrl, ariaLabel: 'pub.dev' },
+			{ icon: { svg: pypiIcon }, link: pypiUrl, ariaLabel: 'PyPI' },
 			{ icon: 'github', link: repoUrl }
 		],
 		footer: {

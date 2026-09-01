@@ -24,25 +24,36 @@ randomName();
 
 :::
 
+::: lang py
+
+```python
+from randino import random_name
+
+random_name()
+# ['Emma Clover']
+```
+
+:::
+
 ## Options
 
 Every option is optional, and the defaults are what the empty call above uses.
 
 | Option | Type | Default | Description |
 | --- | --- | --- | --- |
-| `language` | <Lang js="NameLanguageOption" dart="NameLanguage?" code /> | <Lang js="'all'" dart="null" code /> | Language of the generated names. <Lang js="'all'" dart="null" code /> mixes every supported language, picking one per name. |
-| `gender` | <Lang js="NameGenderOption" dart="NameGender?" code /> | <Lang js="'all'" dart="null" code /> | Which pools the given name is drawn from. Left out, a gender is picked per name. |
-| `count` | <Lang js="number" dart="int" code /> | `1` | How many names to return. Clamped to `0` … `10000`. |
-| `style` | <Lang js="number" dart="int" code /> | `0` | `0` draws names people actually carry, `100` invents new ones, and anything between mixes the two per name and per part. |
-| `minLength` | <Lang js="number" dart="int?" code /> | _language_ | Minimum length of the native form, in characters. |
-| `maxLength` | <Lang js="number" dart="int?" code /> | _language_ | Maximum length of the native form, in characters. |
-| `includeSurname` | <Lang js="boolean" dart="bool" code /> | `true` | Include the family name. |
-| `includeMiddleName` | <Lang js="boolean" dart="bool" code /> | `false` | Include a middle name. Ignored for languages that have none. |
-| `script` | <Lang js="NameScript" dart="NameScript" code /> | <Lang js="'native'" dart="NameScript.native" code /> | The script the returned strings are written in. |
-| `startsWith` | <Lang js="string" dart="String?" code /> | — | Keep only names whose native form starts with this character. Only the first character is used, and the match is case-insensitive. |
-| `unique` | <Lang js="boolean" dart="bool" code /> | `false` | Never return the same name twice. May return fewer than `count` once the pools run out of combinations. |
+| `language` | <Lang js="NameLanguageOption" dart="NameLanguage?" py="NameLanguageOption" code /> | <Lang js="'all'" dart="null" py="&quot;all&quot;" code /> | Language of the generated names. <Lang js="'all'" dart="null" py="&quot;all&quot;" code /> mixes every supported language, picking one per name. |
+| `gender` | <Lang js="NameGenderOption" dart="NameGender?" py="NameGenderOption" code /> | <Lang js="'all'" dart="null" py="&quot;all&quot;" code /> | Which pools the given name is drawn from. Left out, a gender is picked per name. |
+| `count` | <Lang js="number" dart="int" py="int" code /> | `1` | How many names to return. Clamped to `0` … `10000`. |
+| `style` | <Lang js="number" dart="int" py="int" code /> | `0` | `0` draws names people actually carry, `100` invents new ones, and anything between mixes the two per name and per part. |
+| <Lang js="minLength" dart="minLength" py="min_length" code /> | <Lang js="number" dart="int?" py="int &#124; None" code /> | _language_ | Minimum length of the native form, in characters. |
+| <Lang js="maxLength" dart="maxLength" py="max_length" code /> | <Lang js="number" dart="int?" py="int &#124; None" code /> | _language_ | Maximum length of the native form, in characters. |
+| <Lang js="includeSurname" dart="includeSurname" py="include_surname" code /> | <Lang js="boolean" dart="bool" py="bool" code /> | <Lang js="true" dart="true" py="True" code /> | Include the family name. |
+| <Lang js="includeMiddleName" dart="includeMiddleName" py="include_middle_name" code /> | <Lang js="boolean" dart="bool" py="bool" code /> | <Lang js="false" dart="false" py="False" code /> | Include a middle name. Ignored for languages that have none. |
+| `script` | `NameScript` | <Lang js="'native'" dart="NameScript.native" py="&quot;native&quot;" code /> | The script the returned strings are written in. |
+| <Lang js="startsWith" dart="startsWith" py="starts_with" code /> | <Lang js="string" dart="String?" py="str" code /> | <Lang js="—" dart="null" py="&quot;&quot;" code /> | Keep only names whose native form starts with this character. Only the first character is used, and the match is case-insensitive. |
+| `unique` | <Lang js="boolean" dart="bool" py="bool" code /> | <Lang js="false" dart="false" py="False" code /> | Never return the same name twice. May return fewer than `count` once the pools run out of combinations. |
 
-`minLength` and `maxLength` default to the language's own range, which [`nameLengthRange`](./helpers#namelengthrange) reports — and that fallback is resolved **per language**, so a mixed draw does not stretch a Korean name to fill a Spanish name's range.
+<Lang js="minLength" dart="minLength" py="min_length" code /> and <Lang js="maxLength" dart="maxLength" py="max_length" code /> default to the language's own range, which [`nameLengthRange`](./helpers#namelengthrange) reports — and that fallback is resolved **per language**, so a mixed draw does not stretch a Korean name to fill a Spanish name's range.
 
 ## Examples
 
@@ -78,6 +89,21 @@ randomName(language: NameLanguage.ru, count: 2);
 
 :::
 
+::: lang py
+
+```python
+random_name(language="ko", count=3)
+# ['김태윤', '원동혁', '조진우']
+
+random_name(language="ja", count=3)
+# ['山崎愛菜', '加藤楓乃', '吉田直人']
+
+random_name(language="ru", count=2)
+# ['Дмитрий Соколов', 'Полина Морозова']
+```
+
+:::
+
 Leave the language out and every name comes from one of the nine, picked per name:
 
 ::: lang js
@@ -94,6 +120,15 @@ randomName({ count: 5 });
 ```dart
 randomName(count: 5);
 // ['Nuria Ramírez', '조동민', 'Stella Reeves', 'Anna Mariani', 'Lê Phương']
+```
+
+:::
+
+::: lang py
+
+```python
+random_name(count=5)
+# ['Nuria Ramírez', '조동민', 'Stella Reeves', 'Anna Mariani', 'Lê Phương']
 ```
 
 :::
@@ -135,7 +170,22 @@ randomName(
 
 :::
 
-Korean, Japanese and Chinese have no middle part, so `includeMiddleName` is ignored for them rather than inventing one. [`nameSupportsMiddleName`](./helpers#namesupportsmiddlename) answers that directly.
+::: lang py
+
+```python
+random_name(language="en", count=3, include_surname=False)
+# ['Rachel', 'Eliza', 'Tessa']
+
+random_name(language="vi", count=3, include_middle_name=True)
+# ['Lý Thu Thảo', 'Phạm Quang Hùng', 'Dương Văn Phong']
+
+random_name(language="ru", count=2, gender="female", include_middle_name=True)
+# ['Людмила Николаевна Богданова', 'Марина Максимовна Богданова']
+```
+
+:::
+
+Korean, Japanese and Chinese have no middle part, so <Lang js="includeMiddleName" dart="includeMiddleName" py="include_middle_name" code /> is ignored for them rather than inventing one. [`nameSupportsMiddleName`](./helpers#namesupportsmiddlename) answers that directly.
 
 ### Romanized output
 
@@ -159,6 +209,18 @@ randomName(language: NameLanguage.ko, count: 3, script: NameScript.roman);
 
 randomName(language: NameLanguage.ja, count: 3, script: NameScript.roman);
 // ['Yamazaki Aina', 'Kato Kaeno', 'Yoshida Naoyato']
+```
+
+:::
+
+::: lang py
+
+```python
+random_name(language="ko", count=3, script="roman")
+# ['Kim Minjun', 'Won Donghyeok', 'Jo Jinu']
+
+random_name(language="ja", count=3, script="roman")
+# ['Yamazaki Aina', 'Kato Kaeno', 'Yoshida Naoyato']
 ```
 
 :::
@@ -191,6 +253,18 @@ randomName(language: NameLanguage.en, count: 3, startsWith: 'k');
 
 :::
 
+::: lang py
+
+```python
+random_name(language="ko", count=3, starts_with="이")
+# ['이예빈', '이우진', '이서현']
+
+random_name(language="en", count=3, starts_with="k")
+# ['Kayla Morgan', 'Keith Doyle', 'Kimberly Vaughn']
+```
+
+:::
+
 A character no real name starts with still returns names rather than nothing: Latin and Cyrillic scripts invent one (`Q` → `Qivu Railooth`), and CJK scripts use the character as a name part of its own.
 
 ### Length
@@ -215,6 +289,18 @@ randomName(language: NameLanguage.ko, count: 3, minLength: 5, maxLength: 8);
 
 randomName(language: NameLanguage.en, count: 2, minLength: 20, maxLength: 25);
 // ['Josephine Adelaide Sinclair', 'Christina Genevieve Whitaker']
+```
+
+:::
+
+::: lang py
+
+```python
+random_name(language="ko", count=3, min_length=5, max_length=8)
+# ['남궁하윤서', '김서연아린', '박도윤하람']
+
+random_name(language="en", count=2, min_length=20, max_length=25)
+# ['Josephine Adelaide Sinclair', 'Christina Genevieve Whitaker']
 ```
 
 :::

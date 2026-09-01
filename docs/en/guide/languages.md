@@ -41,6 +41,19 @@ nicknameLanguages; // [NicknameLanguage.en, .ko, .ja, .zh]
 
 :::
 
+::: lang py
+
+The codes are `Literal` types, so a checker rejects a code that does not exist, and the tuples are also available at runtime as `NAME_LANGUAGES` and `NICKNAME_LANGUAGES`.
+
+```python
+from randino import NAME_LANGUAGES, NICKNAME_LANGUAGES
+
+NAME_LANGUAGES  # ('en', 'ko', 'ja', 'zh', 'it', 'de', 'ru', 'es', 'vi')
+NICKNAME_LANGUAGES  # ('en', 'ko', 'ja', 'zh')
+```
+
+:::
+
 ## Person names
 
 Each language decides three things: which part of a name comes first, whether there is a middle part at all, and how the native form becomes an English pronunciation.

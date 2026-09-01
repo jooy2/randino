@@ -3,12 +3,12 @@ layout: home
 
 title: randino
 titleTemplate: Random names and nicknames, in the language you ask for
-description: Generate random person names and nicknames in nine languages — 김민준, Emma Clover, 멋진사자, MistyOwl. One library shipped for JavaScript and for Dart, with no runtime dependencies.
+description: Generate random person names and nicknames in nine languages — 김민준, Emma Clover, 멋진사자, MistyOwl. One library shipped for JavaScript, Dart and Python, with no runtime dependencies.
 
 hero:
   name: randino
   text: Random text that reads like the language
-  tagline: Person names people actually carry, and nicknames someone would actually pick. Nine languages, shipped for JavaScript and for Dart, with no runtime dependencies.
+  tagline: Person names people actually carry, and nicknames someone would actually pick. Nine languages, shipped for JavaScript, Dart and Python, with no runtime dependencies.
   actions:
     - theme: brand
       text: Get started
@@ -32,8 +32,8 @@ features:
     details: A modifier and a noun across fourteen themes — and never a person name, which is what keeps a handle from reading like one.
     link: /nickname/
     linkText: Nicknames
-  - title: Two packages, one library
-    details: The same datasets and the same rules for JavaScript and for Dart. One page documents both — pick yours in the sidebar.
+  - title: Three packages, one library
+    details: The same datasets and the same rules for JavaScript, Dart and Python. One page documents all of them — pick yours in the sidebar.
     link: /guide/getting-started
     linkText: Getting started
   - title: Nine languages
@@ -84,6 +84,26 @@ randomNickname(language: NicknameLanguage.ko, count: 3);
 
 randomNickname(language: NicknameLanguage.en, uniqueSuffix: true, count: 2);
 // ['FoggyHillside_gDe2C', 'CraneVoyage_nVtRC']
+```
+
+:::
+
+::: lang py
+
+```python
+from randino import random_name, random_nickname
+
+random_name(language="ko", count=3)
+# ['김태윤', '원동혁', '조진우']
+
+random_name(language="ru", gender="female", include_middle_name=True)
+# ['Людмила Николаевна Богданова']
+
+random_nickname(language="ko", count=3)
+# ['오래된곰', '영원한도마뱀', '귀여운신화다발']
+
+random_nickname(language="en", unique_suffix=True, count=2)
+# ['FoggyHillside_gDe2C', 'CraneVoyage_nVtRC']
 ```
 
 :::

@@ -24,6 +24,17 @@ randomName(language: NameLanguage.ko, count: 3);
 
 :::
 
+::: lang py
+
+```python
+from randino import random_name
+
+random_name(language="ko", count=3)
+# ['김태윤', '원동혁', '조진우']
+```
+
+:::
+
 ## 제공되는 기능
 
 | 함수 | 반환값 |
@@ -68,6 +79,18 @@ randomName(language: NameLanguage.ko, style: 100, count: 3);
 
 :::
 
+::: lang py
+
+```python
+random_name(language="en", style=100, count=3)
+# ['Deder Kuvoun', 'Jaihil Brouvinn', 'Thoowoun Wiatou']
+
+random_name(language="ko", style=100, count=3)
+# ['송승완', '구상겸', '채진훈']
+```
+
+:::
+
 ### 분포가 가파른 언어에서는 성씨에 가중치를 둡니다
 
 한국어, 중국어, 베트남어의 성씨는 **실제 사용 빈도에 비례해서** 뽑습니다. 소수의 성씨가 인구 대부분을 차지하기 때문입니다. 한국어 이름의 약 5분의 1이 김씨로, 베트남어 이름의 5분의 2가 Nguyễn으로 나오며 이는 실제 명단과 같은 모습입니다. 풀에서 균등하게 뽑으면 김씨는 75명 중 1명이 되는데, 이것이야말로 출력이 한국어처럼 읽히지 않게 만드는 가장 큰 요인입니다.
@@ -76,11 +99,11 @@ randomName(language: NameLanguage.ko, style: 100, count: 3);
 
 ### 길이는 고유 표기를 기준으로 셉니다 {#length}
 
-`minLength`와 `maxLength`는 **요소 사이의 공백을 포함한 고유 표기의 글자 수**를 셉니다. 요청한 구조가 항상 우선합니다. 요청한 요소를 담기에 범위가 너무 좁으면, 요청한 성이나 중간 이름을 빼는 대신 생성기가 만들 수 있는 가장 가까운 이름을 돌려줍니다.
+<Lang js="minLength" dart="minLength" py="min_length" code />와 <Lang js="maxLength" dart="maxLength" py="max_length" code />는 **요소 사이의 공백을 포함한 고유 표기의 글자 수**를 셉니다. 요청한 구조가 항상 우선합니다. 요청한 요소를 담기에 범위가 너무 좁으면, 요청한 성이나 중간 이름을 빼는 대신 생성기가 만들 수 있는 가장 가까운 이름을 돌려줍니다.
 
 공백으로 구분되는 언어에서는 풀에서 다시 뽑는 방식으로 범위를 맞추므로, 아주 좁은 범위는 최선의 근사치가 됩니다. 한국어, 일본어, 중국어는 이름을 음절 단위로 조합하기 때문에 범위를 정확히 맞춥니다.
 
-둘 다 생략하면 각 언어의 고유한 범위를 사용하며, 그 값은 `nameLengthRange`가 알려 줍니다. 이 기본값은 **언어별로** 결정되므로, 여러 언어를 섞어도 한국어 이름이 스페인어 이름의 길이에 맞춰 늘어나지 않습니다.
+둘 다 생략하면 각 언어의 고유한 범위를 사용하며, 그 값은 <Lang js="nameLengthRange" dart="nameLengthRange" py="name_length_range" code />가 알려 줍니다. 이 기본값은 **언어별로** 결정되므로, 여러 언어를 섞어도 한국어 이름이 스페인어 이름의 길이에 맞춰 늘어나지 않습니다.
 
 ### `startsWith`는 이름 전체의 첫 글자에 적용됩니다
 
@@ -96,4 +119,4 @@ randomName(language: NameLanguage.ko, style: 100, count: 3);
 
 `gender`는 이름을 어느 풀에서 뽑을지 결정합니다. 대부분의 언어에서는 그게 전부이고, 결과만 봐서는 알 수 없습니다. 한국어 이름은 자기가 어느 풀에서 왔는지 드러내지 않으니까요. 러시아어가 예외입니다. 부칭과 성이 모두 굴절해서 `Иванов`는 `Иванова`가 되고 `Николаевич`는 `Николаевна`가 됩니다.
 
-생략하면 이름마다 성별을 하나씩 고릅니다. 어느 쪽이 쓰였는지는 `randomNameDetails`가 알려 줍니다.
+생략하면 이름마다 성별을 하나씩 고릅니다. 어느 쪽이 쓰였는지는 <Lang js="randomNameDetails" dart="randomNameDetails" py="random_name_details" code />가 알려 줍니다.

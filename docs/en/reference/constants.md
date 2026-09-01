@@ -34,7 +34,22 @@ import 'package:randino/randino.dart';
 
 :::
 
-`minLength` and `maxLength` are clamped into `1 … 30`, counted in characters of the native form. `count` is clamped into `0 … 10000` — the upper bound is there because an unbounded count with `unique` on can spend a long time re-drawing from an exhausted pool.
+::: lang py
+
+```python
+from randino import NAME_COUNT_MAX, NAME_LANGUAGES, NAME_LENGTH_MAX, NAME_LENGTH_MIN
+```
+
+| Name              | Type                     | Value                         |
+| ----------------- | ------------------------ | ----------------------------- |
+| `NAME_LANGUAGES`  | `tuple[NameLanguage, …]` | Every supported name language |
+| `NAME_LENGTH_MIN` | `int`                    | `1`                           |
+| `NAME_LENGTH_MAX` | `int`                    | `30`                          |
+| `NAME_COUNT_MAX`  | `int`                    | `10000`                       |
+
+:::
+
+The length options are clamped into `1 … 30`, counted in characters of the native form. `count` is clamped into `0 … 10000` — the upper bound is there because an unbounded count with `unique` on can spend a long time re-drawing from an exhausted pool.
 
 ## Nicknames
 
@@ -82,9 +97,35 @@ import 'package:randino/randino.dart';
 
 :::
 
+::: lang py
+
+```python
+from randino import (
+    NICKNAME_COUNT_MAX,
+    NICKNAME_LANGUAGES,
+    NICKNAME_LENGTH_MAX,
+    NICKNAME_LENGTH_MIN,
+    NICKNAME_SUFFIX_CHARSET,
+    NICKNAME_SUFFIX_LENGTH_MAX,
+    NICKNAME_THEMES,
+)
+```
+
+| Name                         | Type                         | Value                             |
+| ---------------------------- | ---------------------------- | --------------------------------- |
+| `NICKNAME_LANGUAGES`         | `tuple[NicknameLanguage, …]` | Every supported nickname language |
+| `NICKNAME_THEMES`            | `tuple[NicknameTheme, …]`    | All fourteen themes               |
+| `NICKNAME_LENGTH_MIN`        | `int`                        | `1`                               |
+| `NICKNAME_LENGTH_MAX`        | `int`                        | `40`                              |
+| `NICKNAME_COUNT_MAX`         | `int`                        | `10000`                           |
+| `NICKNAME_SUFFIX_LENGTH_MAX` | `int`                        | `32`                              |
+| `NICKNAME_SUFFIX_CHARSET`    | `str`                        | The default suffix characters     |
+
+:::
+
 The suffix charset is alphanumerics **minus the pairs that misread**: no `0` or `O`, no `1`, `l` or `I`. A nickname is something somebody reads off a screen and types into another one, and those five characters are where that goes wrong.
 
-Narrow it or extend it through `uniqueSuffixCharset` — starting from the default rather than from the alphabet keeps that property:
+Narrow it or extend it through <Lang js="uniqueSuffixCharset" dart="uniqueSuffixCharset" py="unique_suffix_charset" code /> — starting from the default rather than from the alphabet keeps that property:
 
 ::: lang js
 
@@ -116,6 +157,23 @@ randomNickname(
   uniqueSuffix: true,
   uniqueSuffixCharset: nicknameSuffixCharset.replaceAll(RegExp('[A-Z]'), ''),
 );
+```
+
+:::
+
+::: lang py
+
+```python
+from randino import NICKNAME_SUFFIX_CHARSET, random_nickname
+
+# Digits only.
+random_nickname(unique_suffix=True, unique_suffix_charset="0123456789")
+
+# The default, minus the upper case.
+random_nickname(
+    unique_suffix=True,
+    unique_suffix_charset="".join(c for c in NICKNAME_SUFFIX_CHARSET if not c.isupper()),
+)
 ```
 
 :::
@@ -166,6 +224,34 @@ LengthRange, NameDetail, NicknameDetail
 ```
 
 There is no `…Option` type and no `all` member: **a null enum is what means "every one of them"**, so the parameter you do not write is already the mixed draw. That also means the helpers take the same type the generators do, rather than a narrower one.
+
+:::
+
+::: lang py
+
+Every public type is importable alongside the functions, and the package ships a `py.typed` marker so a checker reads them:
+
+```python
+from randino import (
+    NameDetail,
+    NameGender,
+    NameGenderOption,
+    NameLanguage,
+    NameLanguageOption,
+    NameScript,
+    NicknameDetail,
+    NicknameLanguage,
+    NicknameLanguageOption,
+    NicknameTheme,
+    NicknameThemeOption,
+)
+
+language: NameLanguageOption = "ko"
+```
+
+They are `Literal` types rather than classes, so `"kr"` is rejected where `NameLanguage` is expected. The `…Option` types add `"all"` — `NameLanguageOption` is `NameLanguage | Literal["all"]`. Use the narrower one wherever `"all"` is not a valid answer.
+
+There is no options type to import: the arguments are keyword-only rather than an object, so there is nothing to annotate.
 
 :::
 

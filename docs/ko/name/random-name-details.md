@@ -24,6 +24,17 @@ randomNameDetails(language: NameLanguage.ko);
 
 :::
 
+::: lang py
+
+```python
+from randino import random_name_details
+
+random_name_details(language="ko")
+# [NameDetail(native='여미주', roman='Yeo Miju', language='ko', gender='female')]
+```
+
+:::
+
 ## 옵션
 
 [`randomName`](./random-name)과 같은 옵션을 받되 **`script`만 제외됩니다**. 모든 이름이 고유 표기와 로마자 표기로 동시에 반환되므로 고를 것이 없습니다.
@@ -34,8 +45,8 @@ randomNameDetails(language: NameLanguage.ko);
 
 | 필드 | 타입 | 설명 |
 | --- | --- | --- |
-| `native` | <Lang js="string" dart="String" code /> | 해당 언어의 문자로 쓴 이름. |
-| `roman` | <Lang js="string" dart="String" code /> | `native`의 영어 발음. 영어에서는 `native`와 동일합니다. |
+| `native` | <Lang js="string" dart="String" py="str" code /> | 해당 언어의 문자로 쓴 이름. |
+| `roman` | <Lang js="string" dart="String" py="str" code /> | `native`의 영어 발음. 영어에서는 `native`와 동일합니다. |
 | `language` | `NameLanguage` | 이 이름이 생성된 언어. 여러 언어를 섞을 때 이 함수를 쓰는 이유입니다. |
 | `gender` | `NameGender` | 이름을 뽑은 풀. |
 
@@ -69,6 +80,18 @@ for (final detail in randomNameDetails(language: NameLanguage.ja, count: 3)) {
 
 :::
 
+::: lang py
+
+```python
+for detail in random_name_details(language="ja", count=3):
+    print(f"{detail.native} ({detail.roman})")
+# 山崎愛菜 (Yamazaki Aina)
+# 加藤楓乃 (Kato Kaeno)
+# 吉田直人 (Yoshida Naoto)
+```
+
+:::
+
 ### 섞인 결과가 무엇인지 알기
 
 ::: lang js
@@ -93,6 +116,19 @@ randomNameDetails(count: 3);
 //   NameDetail(Anna Mariani, Anna Mariani, it, female),
 //   NameDetail(Иванов Иван, Ivanov Ivan, ru, male),
 // ]
+```
+
+:::
+
+::: lang py
+
+```python
+random_name_details(count=3)
+# [
+#     NameDetail(native='조동민', roman='Jo Dongmin', language='ko', gender='male'),
+#     NameDetail(native='Anna Mariani', roman='Anna Mariani', language='it', gender='female'),
+#     NameDetail(native='Иванов Иван', roman='Ivanov Ivan', language='ru', gender='male'),
+# ]
 ```
 
 :::
@@ -126,6 +162,18 @@ randomNameDetails(
 //   NameDetail(Людмила Николаевна Богданова, Lyudmila Nikolaevna Bogdanova, ru, female),
 //   NameDetail(Марина Максимовна Богданова, Marina Maksimovna Bogdanova, ru, female),
 // ]
+```
+
+:::
+
+::: lang py
+
+```python
+random_name_details(language="ru", gender="female", include_middle_name=True, count=2)
+# [
+#     NameDetail(native='Людмила Николаевна Богданова', roman='Lyudmila Nikolaevna Bogdanova', …),
+#     NameDetail(native='Марина Максимовна Богданова', roman='Marina Maksimovna Bogdanova', …),
+# ]
 ```
 
 :::

@@ -41,6 +41,19 @@ nicknameLanguages; // [NicknameLanguage.en, .ko, .ja, .zh]
 
 :::
 
+::: lang py
+
+코드는 `Literal` 타입이므로 존재하지 않는 코드는 타입 검사기가 거부하며, 목록은 런타임에도 `NAME_LANGUAGES`와 `NICKNAME_LANGUAGES`로 확인할 수 있습니다.
+
+```python
+from randino import NAME_LANGUAGES, NICKNAME_LANGUAGES
+
+NAME_LANGUAGES  # ('en', 'ko', 'ja', 'zh', 'it', 'de', 'ru', 'es', 'vi')
+NICKNAME_LANGUAGES  # ('en', 'ko', 'ja', 'zh')
+```
+
+:::
+
 ## 사람 이름
 
 각 언어는 세 가지를 결정합니다. 이름의 어느 부분이 앞에 오는지, 중간 이름이 있는지, 그리고 고유 문자 표기를 영어 발음으로 어떻게 옮기는지입니다.

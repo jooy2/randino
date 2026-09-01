@@ -4,9 +4,9 @@
  *
  * A page says the same things about `randomName` whichever package a reader
  * installs — the same options, the same pools, the same reasons — and only the
- * code, the parameter shape and the install line differ. So the two are not two
- * sites and not two folders: they are one page with the parts that differ marked
- * up, and this file is what marks them.
+ * code, the parameter shape and the install line differ. So they are not three
+ * sites and not three folders: they are one page with the parts that differ
+ * marked up, and this file is what marks them.
  *
  * Adding a language is an entry here plus the `::: lang <id>` blocks on whatever
  * pages have something to say about it. Nothing else reads the list.
@@ -31,7 +31,8 @@ export interface CodeLanguage {
 
 export const CODE_LANGUAGES: CodeLanguage[] = [
 	{ id: 'js', label: 'JavaScript', pkg: 'randino', fence: 'javascript', tint: '#F7DF1E' },
-	{ id: 'dart', label: 'Dart', pkg: 'randino', fence: 'dart', tint: '#0175C2' }
+	{ id: 'dart', label: 'Dart', pkg: 'randino', fence: 'dart', tint: '#0175C2' },
+	{ id: 'py', label: 'Python', pkg: 'randino', fence: 'python', tint: '#3776AB' }
 ];
 
 export const CODE_LANGUAGE_IDS: string[] = CODE_LANGUAGES.map((language) => language.id);

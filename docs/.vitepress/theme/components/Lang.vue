@@ -6,7 +6,7 @@ import { CODE_LANGUAGES } from '../../data/languages';
  * The inline half of `::: lang` — a few words that differ, in the middle of a
  * sentence that does not.
  *
- * `<Lang js="options object" dart="named parameters" />`
+ * `<Lang js="options object" dart="named parameters" py="keyword arguments" />`
  *
  * A container cannot do this: `:::` is a block, and splitting a sentence into
  * two blocks to swap one phrase inside it would leave two paragraphs where there

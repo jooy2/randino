@@ -4,7 +4,7 @@ Three functions that answer a question about a language rather than generating a
 
 ## nameLengthRange
 
-The natural length range of a full name in that language, in characters of the native form. This is what [`randomName`](./random-name) falls back to when `minLength` or `maxLength` is omitted.
+The natural length range of a full name in that language, in characters of the native form. This is what [`randomName`](./random-name) falls back to when <Lang js="minLength" dart="minLength" py="min_length" code /> or <Lang js="maxLength" dart="maxLength" py="max_length" code /> is omitted.
 
 ::: lang js
 
@@ -48,6 +48,27 @@ Returns a `LengthRange`, which compares by value — `nameLengthRange(language: 
 
 :::
 
+::: lang py
+
+```python
+from randino import name_length_range
+
+name_length_range("ko")  # (3, 3)
+name_length_range("ko", include_surname=False)  # (2, 2)
+name_length_range("en")  # (8, 16)
+name_length_range("en", include_middle_name=True)  # (12, 24)
+```
+
+| Parameter | Type | Default | Description |
+| --- | --- | --- | --- |
+| `language` | `NameLanguageOption` | `"all"` | The language, or `"all"` for every one |
+| `include_surname` | `bool` | `True` | Count the family name |
+| `include_middle_name` | `bool` | `False` | Count a middle name, where the language has one |
+
+Returns a `tuple[int, int]`. The three helpers take their arguments positionally as well as by keyword — they are short enough to read either way, unlike the generators, which are keyword-only.
+
+:::
+
 The range **covers only the parts that are switched on**, which is the part worth knowing. Dropping the surname relaxes the range rather than making the given name stretch to fill it, and asking for a middle name a language does not have cannot widen it:
 
 ::: lang js
@@ -67,9 +88,18 @@ nameLengthRange(language: NameLanguage.ko, includeMiddleName: true);
 
 :::
 
+::: lang py
+
+```python
+name_length_range("ko", include_middle_name=True)
+# (3, 3) — Korean has no middle name
+```
+
+:::
+
 ## nameSupportsMiddleName
 
-Whether the language uses a middle name at all. Korean, Japanese and Chinese names have no middle part, so `includeMiddleName` is ignored for them.
+Whether the language uses a middle name at all. Korean, Japanese and Chinese names have no middle part, so <Lang js="includeMiddleName" dart="includeMiddleName" py="include_middle_name" code /> is ignored for them.
 
 ::: lang js
 
@@ -87,6 +117,16 @@ nameSupportsMiddleName(); // true — the mixed draw includes languages that hav
 nameSupportsMiddleName(NameLanguage.en); // true
 nameSupportsMiddleName(NameLanguage.ko); // false
 nameSupportsMiddleName(); // true — the mixed draw includes languages that have one
+```
+
+:::
+
+::: lang py
+
+```python
+name_supports_middle_name("en")  # True
+name_supports_middle_name("ko")  # False
+name_supports_middle_name()  # True — the mixed draw includes languages that have one
 ```
 
 :::
@@ -115,7 +155,16 @@ nameSupportsRoman(NameLanguage.en); // false
 
 :::
 
+::: lang py
+
+```python
+name_supports_roman("ko")  # True
+name_supports_roman("en")  # False
+```
+
+:::
+
 ## See also
 
-- [`randomName`](./random-name) — where `minLength`, `maxLength` and `includeMiddleName` are actually used.
+- [`randomName`](./random-name) — where the length and middle-name options are actually used.
 - [Constants](../reference/constants) — the hard bounds every length option is clamped to.

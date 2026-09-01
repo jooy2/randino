@@ -30,6 +30,18 @@ randomNicknameDetails(language: NicknameLanguage.ko, uniqueSuffix: true);
 
 :::
 
+::: lang py
+
+```python
+from randino import random_nickname_details
+
+random_nickname_details(language="ko", unique_suffix=True)
+# [NicknameDetail(nickname='오래된발견_zVShs', words=('오래된', '발견'),
+#                 suffix='_zVShs', language='ko', theme='concept')]
+```
+
+:::
+
 ## Options
 
 Exactly the same options as [`randomNickname`](./random-nickname). Only the return type differs.
@@ -38,19 +50,19 @@ Exactly the same options as [`randomNickname`](./random-nickname). Only the retu
 
 | Field | Type | Description |
 | --- | --- | --- |
-| `nickname` | <Lang js="string" dart="String" code /> | The finished nickname, unique suffix included. |
-| `words` | <Lang js="string[]" dart="List&lt;String&gt;" code /> | The words it is made of, in order, without the suffix. |
-| `suffix` | <Lang js="string" dart="String" code /> | The suffix, separator included. Empty when no suffix was asked for. |
+| `nickname` | <Lang js="string" dart="String" py="str" code /> | The finished nickname, unique suffix included. |
+| `words` | <Lang js="string[]" dart="List&lt;String&gt;" py="tuple[str, ...]" code /> | The words it is made of, in order, without the suffix. |
+| `suffix` | <Lang js="string" dart="String" py="str" code /> | The suffix, separator included. Empty when no suffix was asked for. |
 | `language` | `NicknameLanguage` | The language this nickname was generated in. |
-| `theme` | <Lang js="NicknameTheme &#124; null" dart="NicknameTheme?" code /> | Theme of the base word, or null when that word is not one the generator knows. |
+| `theme` | <Lang js="NicknameTheme &#124; null" dart="NicknameTheme?" py="NicknameTheme &#124; None" code /> | Theme of the base word, or null when that word is not one the generator knows. |
 
 Joining `words` with the language's own joiner and appending `suffix` reproduces `nickname` exactly — that is an invariant, and both test suites assert it.
 
 ### About `theme`
 
-The theme is **reported, not asserted**. A word drawn from a theme reports it; a `baseWord` of your own is looked up across every theme and reports the one that holds it; and an invented word is found nowhere and reports null.
+The theme is **reported, not asserted**. A word drawn from a theme reports it; a <Lang js="baseWord" dart="baseWord" py="base_word" code /> of your own is looked up across every theme and reports the one that holds it; and an invented word is found nowhere and reports null.
 
-Two coincidences follow from that and are worth expecting rather than treating as bugs. A word can be both a modifier and a noun — `무지개`, `Marble`, `自由` — and an invented word can spell a real one by accident: `나` + `비` is `나비`, so a nickname built at `style: 100` can come back with `theme` set to `animal`.
+Two coincidences follow from that and are worth expecting rather than treating as bugs. A word can be both a modifier and a noun — `무지개`, `Marble`, `自由` — and an invented word can spell a real one by accident: `나` + `비` is `나비`, so a nickname built at `style` 100 can come back with `theme` set to `animal`.
 
 ## Examples
 
@@ -78,6 +90,18 @@ for (final detail in randomNicknameDetails(language: NicknameLanguage.ko, count:
 // 오래된 + 곰 animal
 // 영원한 + 도마뱀 animal
 // 귀여운 + 신화 + 다발 myth
+```
+
+:::
+
+::: lang py
+
+```python
+for detail in random_nickname_details(language="ko", count=3):
+    print(" + ".join(detail.words), detail.theme)
+# 오래된 + 곰 animal
+# 영원한 + 도마뱀 animal
+# 귀여운 + 신화 + 다발 myth
 ```
 
 :::
@@ -117,6 +141,20 @@ await users.insert(
 
 :::
 
+::: lang py
+
+```python
+detail = random_nickname_details(language="en", unique_suffix=True)[0]
+
+await users.insert(
+    handle=detail.nickname,
+    display=detail.nickname[: -len(detail.suffix)],
+    discriminator=detail.suffix,
+)
+```
+
+:::
+
 ### Grouping by theme
 
 ::: lang js
@@ -139,6 +177,19 @@ final byTheme = <NicknameTheme?, List<String>>{};
 for (final detail in randomNicknameDetails(language: NicknameLanguage.en, count: 100)) {
   byTheme.putIfAbsent(detail.theme, () => <String>[]).add(detail.nickname);
 }
+```
+
+:::
+
+::: lang py
+
+```python
+from collections import defaultdict
+
+by_theme: defaultdict[NicknameTheme | None, list[str]] = defaultdict(list)
+
+for detail in random_nickname_details(language="en", count=100):
+    by_theme[detail.theme].append(detail.nickname)
 ```
 
 :::

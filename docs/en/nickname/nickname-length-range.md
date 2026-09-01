@@ -1,6 +1,6 @@
 # nicknameLengthRange
 
-Every nickname length the language can produce, in characters. This is what [`randomNickname`](./random-nickname) falls back to when `minLength` or `maxLength` is omitted.
+Every nickname length the language can produce, in characters. This is what [`randomNickname`](./random-nickname) falls back to when <Lang js="minLength" dart="minLength" py="min_length" code /> or <Lang js="maxLength" dart="maxLength" py="max_length" code /> is omitted.
 
 ::: lang js
 
@@ -46,6 +46,28 @@ Returns a `LengthRange`, which compares by value.
 
 :::
 
+::: lang py
+
+```python
+from randino import nickname_length_range
+
+nickname_length_range("ko")  # (1, 12)
+nickname_length_range("ko", include_modifier=False)  # (1, 8)
+nickname_length_range("en")  # (3, 30)
+nickname_length_range("zh")  # (2, 5)
+nickname_length_range("ko", word_separator="-")  # (1, 14)
+```
+
+| Parameter | Type | Default | Description |
+| --- | --- | --- | --- |
+| `language` | `NicknameLanguageOption` | `"all"` | The language, or `"all"` for every one |
+| `include_modifier` | `bool` | `True` | Count the modifier shapes |
+| `word_separator` | `str \| None` | `None` | Count what a separator adds between the words |
+
+Returns a `tuple[int, int]`.
+
+:::
+
 ## The range is wide on purpose
 
 The lower end is a bare noun and the upper end a modifier, a noun and a trailing word together, so the default range spans **every shape** — and it is the shape weights, not the range, that decide what output usually looks like. Narrowing the range is how you take a shape away:
@@ -70,9 +92,19 @@ randomNickname(language: NicknameLanguage.ko, maxLength: 3, count: 3);
 
 :::
 
+::: lang py
+
+```python
+nickname_length_range("ko")  # (1, 12) — every shape
+random_nickname(language="ko", max_length=3, count=3)
+# ['노을', '파란곰', '수달'] — no room for three words
+```
+
+:::
+
 ## Two things that widen or narrow it
 
-**A separator is part of the nickname.** Its length counts toward `minLength` / `maxLength`, so passing one to this function is how you find out what is left:
+**A separator is part of the nickname.** Its length counts toward <Lang js="minLength" dart="minLength" py="min_length" code /> / <Lang js="maxLength" dart="maxLength" py="max_length" code />, so passing one to this function is how you find out what is left:
 
 ::: lang js
 
@@ -94,11 +126,21 @@ nicknameLengthRange(language: NicknameLanguage.en, wordSeparator: ' '); // Lengt
 
 :::
 
-**A `baseWord` longer than the range widens it** rather than being truncated. That is not reported here — this function describes the language's own pools — but it is what `randomNickname` does with the word you gave it.
+::: lang py
 
-**The unique suffix is outside the range entirely.** `minLength` and `maxLength` describe the readable part; the suffix is appended after they have been satisfied.
+```python
+nickname_length_range("ko")  # (1, 12)
+nickname_length_range("ko", word_separator="-")  # (1, 14) — two separators in the longest shape
+nickname_length_range("en", word_separator=" ")  # (3, 32)
+```
+
+:::
+
+**A <Lang js="baseWord" dart="baseWord" py="base_word" code /> longer than the range widens it** rather than being truncated. That is not reported here — this function describes the language's own pools — but it is what `randomNickname` does with the word you gave it.
+
+**The unique suffix is outside the range entirely.** <Lang js="minLength" dart="minLength" py="min_length" code /> and <Lang js="maxLength" dart="maxLength" py="max_length" code /> describe the readable part; the suffix is appended after they have been satisfied.
 
 ## See also
 
-- [`randomNickname`](./random-nickname) — where `minLength` and `maxLength` are used.
+- [`randomNickname`](./random-nickname) — where the length options are used.
 - [Constants](../reference/constants) — the hard bounds every length option is clamped to.

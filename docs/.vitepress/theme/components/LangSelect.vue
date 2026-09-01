@@ -13,10 +13,10 @@ import { localeOf, t } from '../../data/i18n';
  * navigation: it does not take the reader anywhere, it changes what the page
  * they are already on says.
  *
- * A segmented control rather than a `<select>`, and the reason is not that a
- * select is ugly. There are exactly two options, both are always worth showing,
- * and the choice colours every page on the site — a popup list of two items is a
- * popup for nothing.
+ * A list of options rather than a `<select>`, and the reason is not that a
+ * select is ugly. There are a handful of them, every one is worth showing, and
+ * the choice colours every page on the site — a popup list this short is a popup
+ * for nothing.
  *
  * Built out of real radio inputs, hidden and labelled. That is what buys the
  * arrow keys, the group semantics and the focus behaviour for free; a row of
