@@ -1,6 +1,6 @@
 <script setup>
 import { inject } from 'vue';
-import LangMark from './LangMark.vue';
+import RegistryMark from './RegistryMark.vue';
 import { CODE_LANGUAGES } from '../../data/languages';
 
 /**
@@ -18,12 +18,14 @@ import { CODE_LANGUAGES } from '../../data/languages';
  * the screen passes `screen-menu`, which is the only thing the two need to
  * disagree about.
  *
- * The mark is the **language's**, not the registry's: it is the same mark the
- * sidebar's language switch uses, so the row a reader on Dart wants is the row
- * with the icon they already picked.
+ * The mark is the **registry's own** — `RegistryMark.vue`, not the language
+ * marks the sidebar switch uses. npm is not JavaScript and PyPI is not Python,
+ * and a row that says `npm` under the JavaScript logo names the wrong thing. The
+ * language it publishes is written out beside it instead, which a logo could
+ * only imply.
  */
 defineProps({
-	/** `{ id, registry, url }` per package — built in `config.ts` from the manifests. */
+	/** `{ id, registry, mark, url }` per package — built in `config.ts` from the manifests. */
 	links: { type: Array, required: true },
 	/** Set by VitePress when this renders inside the mobile nav screen. */
 	screenMenu: { type: Boolean, default: false }
@@ -52,7 +54,7 @@ function labelOf(id) {
 			rel="noopener"
 			@click="closeScreen?.()"
 		>
-			<LangMark :language="item.id" :size="16" />
+			<RegistryMark :registry="item.mark" :size="16" />
 			<span class="randino-pkg-registry">{{ item.registry }}</span>
 			<span class="randino-pkg-lang">{{ labelOf(item.id) }}</span>
 		</a>

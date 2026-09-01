@@ -59,13 +59,14 @@ const socialImage = `${siteUrl}/512x512.png`;
  * The navbar renders these as one **Packages** dropdown rather than as three
  * social-link icons beside GitHub: a registry is one destination, and four icons
  * in a row read as a toolbar rather than as the two or three places this site
- * actually sends a reader. `id` is the code language whose mark labels the row —
- * see `PackageLinks.vue`.
+ * actually sends a reader. `mark` is the logo the row is labelled with — the
+ * registry's own, not the language's, because npm is not JavaScript — and `id`
+ * is the code language it publishes. See `PackageLinks.vue`.
  */
 const packageLinks = [
-	{ id: 'js', registry: 'npm', url: npmUrl },
-	{ id: 'dart', registry: 'pub.dev', url: pubUrl },
-	{ id: 'py', registry: 'PyPI', url: pypiUrl }
+	{ id: 'js', registry: 'npm', mark: 'npm', url: npmUrl },
+	{ id: 'dart', registry: 'pub.dev', mark: 'pubdev', url: pubUrl },
+	{ id: 'py', registry: 'PyPI', mark: 'pypi', url: pypiUrl }
 ];
 
 /**

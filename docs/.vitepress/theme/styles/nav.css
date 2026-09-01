@@ -49,22 +49,19 @@
 	font-weight: 600;
 }
 
-/* Which package a registry is the registry for. The mark says it too, but a
-   reader who has not learned three logos should not have to. */
+/* Which language a registry publishes. The registry's own mark cannot say that,
+   which is exactly why it is written out. */
 .randino-pkg-lang {
 	color: var(--vp-c-text-3);
 	font-size: 11px;
 	font-weight: 500;
 }
 
-.randino-pkg .randino-lang-mark {
+/* Never dimmed, unlike the language marks in the sidebar's popup: there is no
+   selected row here to stand out from, and a registry's logo is what the reader
+   is scanning for. */
+.randino-pkg .randino-registry-mark {
 	flex: none;
-	opacity: 0.65;
-	transition: opacity 0.16s;
-}
-
-.randino-pkg-link:hover .randino-lang-mark {
-	opacity: 1;
 }
 
 /*
