@@ -41,9 +41,9 @@ random_name(language="ko", count=3)
 | --- | --- |
 | [`randomName`](./random-name) | The names as strings, in one script |
 | [`randomNameDetails`](./random-name-details) | Both scripts plus the language and gender behind each name |
-| [`nameLengthRange`](./helpers#namelengthrange) | The natural length range of a full name in a language |
-| [`nameSupportsMiddleName`](./helpers#namesupportsmiddlename) | Whether a language has a middle part at all |
-| [`nameSupportsRoman`](./helpers#namesupportsroman) | Whether romanizing changes anything |
+| [`nameLengthRange`](./name-length-range) | The natural length range of a full name in a language |
+| [`nameSupportsMiddleName`](./name-supports-middle-name) | Whether a language has a middle part at all |
+| [`nameSupportsRoman`](./name-supports-roman) | Whether romanizing changes anything |
 
 ## How the options behave
 

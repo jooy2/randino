@@ -53,7 +53,7 @@ Every option is optional, and the defaults are what the empty call above uses.
 | <Lang js="startsWith" dart="startsWith" py="starts_with" code /> | <Lang js="string" dart="String?" py="str" code /> | <Lang js="—" dart="null" py="&quot;&quot;" code /> | Keep only names whose native form starts with this character. Only the first character is used, and the match is case-insensitive. |
 | `unique` | <Lang js="boolean" dart="bool" py="bool" code /> | <Lang js="false" dart="false" py="False" code /> | Never return the same name twice. May return fewer than `count` once the pools run out of combinations. |
 
-<Lang js="minLength" dart="minLength" py="min_length" code /> and <Lang js="maxLength" dart="maxLength" py="max_length" code /> default to the language's own range, which [`nameLengthRange`](./helpers#namelengthrange) reports — and that fallback is resolved **per language**, so a mixed draw does not stretch a Korean name to fill a Spanish name's range.
+<Lang js="minLength" dart="minLength" py="min_length" code /> and <Lang js="maxLength" dart="maxLength" py="max_length" code /> default to the language's own range, which [`nameLengthRange`](./name-length-range) reports — and that fallback is resolved **per language**, so a mixed draw does not stretch a Korean name to fill a Spanish name's range.
 
 ## Examples
 
@@ -185,7 +185,7 @@ random_name(language="ru", count=2, gender="female", include_middle_name=True)
 
 :::
 
-Korean, Japanese and Chinese have no middle part, so <Lang js="includeMiddleName" dart="includeMiddleName" py="include_middle_name" code /> is ignored for them rather than inventing one. [`nameSupportsMiddleName`](./helpers#namesupportsmiddlename) answers that directly.
+Korean, Japanese and Chinese have no middle part, so <Lang js="includeMiddleName" dart="includeMiddleName" py="include_middle_name" code /> is ignored for them rather than inventing one. [`nameSupportsMiddleName`](./name-supports-middle-name) answers that directly.
 
 ### Romanized output
 
@@ -225,7 +225,7 @@ random_name(language="ja", count=3, script="roman")
 
 :::
 
-English is the one language where this changes nothing — the names are already in the Latin alphabet, which is what [`nameSupportsRoman`](./helpers#namesupportsroman) reports.
+English is the one language where this changes nothing — the names are already in the Latin alphabet, which is what [`nameSupportsRoman`](./name-supports-roman) reports.
 
 ### A starting character
 
@@ -310,4 +310,5 @@ The structure you asked for always wins. A range too narrow for the requested pa
 ## See also
 
 - [`randomNameDetails`](./random-name-details) — the same names with both scripts and the choices behind them.
-- [Helpers](./helpers) — the length range, and the two questions about a language.
+- [`nameLengthRange`](./name-length-range) — the range a name falls back to.
+- [`nameSupportsMiddleName`](./name-supports-middle-name) and [`nameSupportsRoman`](./name-supports-roman) — the two questions about a language.

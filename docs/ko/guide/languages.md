@@ -70,7 +70,7 @@ NICKNAME_LANGUAGES  # ('en', 'ko', 'ja', 'zh')
 | `es` | 이름 먼저 | 있음        | Gonzalo Martín → Gonzalo Martin |
 | `vi` | 성 먼저   | 있음        | Đặng Quân → Dang Quan           |
 
-한국어, 일본어, 중국어에는 중간 이름이 없으므로, 중간 이름 옵션은 없는 이름을 만들어내는 대신 그냥 무시됩니다. 이를 직접 확인하는 헬퍼가 있습니다: [`nameSupportsMiddleName`](../name/helpers#namesupportsmiddlename).
+한국어, 일본어, 중국어에는 중간 이름이 없으므로, 중간 이름 옵션은 없는 이름을 만들어내는 대신 그냥 무시됩니다. 이를 직접 확인하는 헬퍼가 있습니다: [`nameSupportsMiddleName`](../name/name-supports-middle-name).
 
 ### 로마자 표기 {#romanization}
 

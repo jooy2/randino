@@ -65,7 +65,17 @@ export const SIDEBAR: SidebarGroup[] = [
 				en: 'randomNicknameDetails',
 				ko: 'randomNicknameDetails'
 			},
-			{ path: 'name/helpers', en: 'Name helpers', ko: '이름 헬퍼' },
+			{ path: 'name/name-length-range', en: 'nameLengthRange', ko: 'nameLengthRange' },
+			{
+				path: 'name/name-supports-middle-name',
+				en: 'nameSupportsMiddleName',
+				ko: 'nameSupportsMiddleName'
+			},
+			{
+				path: 'name/name-supports-roman',
+				en: 'nameSupportsRoman',
+				ko: 'nameSupportsRoman'
+			},
 			{
 				path: 'nickname/nickname-length-range',
 				en: 'nicknameLengthRange',

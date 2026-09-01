@@ -53,7 +53,7 @@ random_name()
 | <Lang js="startsWith" dart="startsWith" py="starts_with" code /> | <Lang js="string" dart="String?" py="str" code /> | <Lang js="—" dart="null" py="&quot;&quot;" code /> | 고유 표기가 이 글자로 시작하는 이름만 반환합니다. 첫 글자만 사용하고 대소문자는 구분하지 않습니다. |
 | `unique` | <Lang js="boolean" dart="bool" py="bool" code /> | <Lang js="false" dart="false" py="False" code /> | 같은 이름을 두 번 반환하지 않습니다. 조합이 바닥나면 `count`보다 적게 반환할 수 있습니다. |
 
-<Lang js="minLength" dart="minLength" py="min_length" code />와 <Lang js="maxLength" dart="maxLength" py="max_length" code />의 기본값은 각 언어의 고유 범위이며, 그 값은 [`nameLengthRange`](./helpers#namelengthrange)가 알려 줍니다. 이 기본값은 **언어별로** 결정되므로, 여러 언어를 섞어도 한국어 이름이 스페인어 이름의 길이에 맞춰 늘어나지 않습니다.
+<Lang js="minLength" dart="minLength" py="min_length" code />와 <Lang js="maxLength" dart="maxLength" py="max_length" code />의 기본값은 각 언어의 고유 범위이며, 그 값은 [`nameLengthRange`](./name-length-range)가 알려 줍니다. 이 기본값은 **언어별로** 결정되므로, 여러 언어를 섞어도 한국어 이름이 스페인어 이름의 길이에 맞춰 늘어나지 않습니다.
 
 ## 예제
 
@@ -185,7 +185,7 @@ random_name(language="ru", count=2, gender="female", include_middle_name=True)
 
 :::
 
-한국어, 일본어, 중국어에는 중간 이름이 없으므로 <Lang js="includeMiddleName" dart="includeMiddleName" py="include_middle_name" code />은 없는 이름을 만들어내는 대신 무시됩니다. [`nameSupportsMiddleName`](./helpers#namesupportsmiddlename)이 이를 직접 알려 줍니다.
+한국어, 일본어, 중국어에는 중간 이름이 없으므로 <Lang js="includeMiddleName" dart="includeMiddleName" py="include_middle_name" code />은 없는 이름을 만들어내는 대신 무시됩니다. [`nameSupportsMiddleName`](./name-supports-middle-name)이 이를 직접 알려 줍니다.
 
 ### 로마자 표기
 
@@ -225,7 +225,7 @@ random_name(language="ja", count=3, script="roman")
 
 :::
 
-영어는 이미 라틴 알파벳으로 쓰이기 때문에 로마자 표기를 해도 아무것도 바뀌지 않는 유일한 언어입니다. 이를 알려 주는 것이 [`nameSupportsRoman`](./helpers#namesupportsroman)입니다.
+영어는 이미 라틴 알파벳으로 쓰이기 때문에 로마자 표기를 해도 아무것도 바뀌지 않는 유일한 언어입니다. 이를 알려 주는 것이 [`nameSupportsRoman`](./name-supports-roman)입니다.
 
 ### 시작 글자
 
@@ -310,4 +310,5 @@ random_name(language="en", count=2, min_length=20, max_length=25)
 ## 함께 보기
 
 - [`randomNameDetails`](./random-name-details) — 같은 이름을 두 문자 체계와 선택 정보까지 함께.
-- [헬퍼](./helpers) — 길이 범위, 그리고 언어에 대한 두 가지 질문.
+- [`nameLengthRange`](./name-length-range) — 이름이 기본값으로 쓰는 길이 범위.
+- [`nameSupportsMiddleName`](./name-supports-middle-name)과 [`nameSupportsRoman`](./name-supports-roman) — 언어에 대한 두 가지 질문.

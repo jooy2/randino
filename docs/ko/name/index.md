@@ -41,9 +41,9 @@ random_name(language="ko", count=3)
 | --- | --- |
 | [`randomName`](./random-name) | 하나의 문자 체계로 표기된 이름 문자열 |
 | [`randomNameDetails`](./random-name-details) | 두 문자 체계와 각 이름의 언어·성별 정보 |
-| [`nameLengthRange`](./helpers#namelengthrange) | 해당 언어에서 전체 이름의 자연스러운 길이 범위 |
-| [`nameSupportsMiddleName`](./helpers#namesupportsmiddlename) | 해당 언어에 중간 이름이 있는지 여부 |
-| [`nameSupportsRoman`](./helpers#namesupportsroman) | 로마자 표기가 결과를 바꾸는지 여부 |
+| [`nameLengthRange`](./name-length-range) | 해당 언어에서 전체 이름의 자연스러운 길이 범위 |
+| [`nameSupportsMiddleName`](./name-supports-middle-name) | 해당 언어에 중간 이름이 있는지 여부 |
+| [`nameSupportsRoman`](./name-supports-roman) | 로마자 표기가 결과를 바꾸는지 여부 |
 
 ## 옵션의 동작 방식
 

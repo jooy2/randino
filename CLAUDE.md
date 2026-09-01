@@ -244,7 +244,9 @@ Every variant is in the document and CSS hides all but one, which is what buys t
 
 ### The menu is not the folders
 
-`name/` and `nickname/` are two folders because the two generators are two things, and the sidebar deliberately does not repeat that split: the four generators and the two helper pages are one **API** group, and the prose explaining how the options behave sits under **Guide**. A reader looking for `randomNickname` is looking for a function, not for the half of the library it belongs to.
+`name/` and `nickname/` are two folders because the two generators are two things, and the sidebar deliberately does not repeat that split: every public function is one entry in one **API** group, and the prose explaining how the options behave sits under **Guide**. A reader looking for `randomNickname` is looking for a function, not for the half of the library it belongs to.
+
+**One page, one function**, which is why there is no `helpers` page holding three of them any more: a page that documents three functions can be named after none of them, so the menu names the page and the reader still has to open it to find out whether what they came for is inside.
 
 The navbar is the same list — its API dropdown is built out of `data/sidebar.ts` by `navGroupFor`, so the menu and the section it points into cannot drift. Its **Packages** dropdown is `PackageLinks.vue`, which is where npm, pub.dev and PyPI went when they stopped being three of the four icons in the navbar's right-hand corner; the registry URLs are still derived from the three manifests in `config.ts`, and GitHub is the one social link left.
 
