@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.1.0
+
+**2026-09-01**
+
+- **Breaking:** `random_name`, `random_name_details`, `random_nickname` and `random_nickname_details` are now `rand_name`, `rand_name_details`, `rand_nickname` and `rand_nickname_details`. The old names are gone; there are no aliases.
+
 ## 1.0.0
 
 **2026-09-01**
