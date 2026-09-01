@@ -221,7 +221,7 @@ docs/
   scripts/
     copy-changelog.mjs      # every package's CHANGELOG.md -> docs/<locale>/changelog.md
     check-anchors.mjs       # every `#fragment` link resolves (see below)
-  public/logo.svg
+  public/                   # the logo, one file per size (see below)
 ```
 
 | Command                 | What it does                                        |
@@ -247,6 +247,26 @@ Every variant is in the document and CSS hides all but one, which is what buys t
 **A Korean heading cannot be linked to by its text.** VitePress slugifies through `NFKD`, so a Hangul heading's id is *decomposed jamo* while anything typed into a Markdown link is composed — identical in an editor, in a diff and in review, and the link scrolls nowhere. Give any Korean heading that is a link target an explicit `{#ascii-anchor}`, matching the English page's anchor where there is one. `scripts/check-anchors.mjs` fails the build otherwise; it runs as part of `npm run build`.
 
 **Every page has to exist in both locales.** `data/sidebar.ts` is one structure with an `en` and a `ko` label per entry, and VitePress fails the build on a dead link — so a page added to one locale and not the other does not get committed by accident.
+
+### The logo
+
+The artwork lives at `assets/logo-master.png` — outside `docs/public/`, so VitePress does not serve it. `docs/public/` holds what is served, one size per job, all generated from that master:
+
+| File                   | Size    | Where it is used                                  |
+| ---------------------- | ------- | ------------------------------------------------- |
+| `logo-16.png`          | 16      | favicon                                           |
+| `logo-32.png`          | 32      | favicon, and the navbar mark at 24×24             |
+| `128x128.png`          | 128     | every `README.md`, displayed at 96×96             |
+| `256x256.png`          | 256     | spare, for anything asking for a mid-size mark    |
+| `512x512.png`          | 512     | the home page hero, and `og:image`                |
+| `apple-touch-icon.png` | 180     | iOS home screen — **opaque**, see below           |
+| `favicon.ico`          | 16/32/48 | the browsers and Windows surfaces that ask by name |
+
+Regenerating from the master takes two passes over the source before any resizing: the alpha is snapped (the artwork is painted at 254 rather than 255, and a fringe of alpha 1..8 runs to the left edge), then it is cropped to what is left.
+
+Two things a regeneration has to keep. The margin is **2%** of the master, not a generous one: the mark is a cube with dots on it, and at 16px every percent of the tile it does not fill is a dot that stops being a dot. And `apple-touch-icon.png` is the one that is **not transparent** — iOS composites a transparent home-screen icon on black, so its background is painted in.
+
+The repository's own `README.md` links the file by a relative path, which is what GitHub resolves; the three package `README.md`s link it by its `raw.githubusercontent.com` URL, because npm, pub.dev and PyPI resolve neither a relative path nor the docs site.
 
 ### Deployment
 

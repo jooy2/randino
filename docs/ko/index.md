@@ -20,7 +20,7 @@ hero:
       text: 닉네임
       link: /ko/nickname/
   image:
-    src: /logo.svg
+    src: /512x512.png
     alt: randino
 
 features:

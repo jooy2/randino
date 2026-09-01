@@ -51,7 +51,7 @@ const npmUrl = `https://www.npmjs.com/package/${npmPackage.name}`;
 const pubUrl = `https://pub.dev/packages/${pubName}`;
 const pypiUrl = `https://pypi.org/project/${pypiName}/`;
 const editLinkPattern = `${repoUrl}/edit/main/docs/:path`;
-const socialImage = `${siteUrl}/logo.svg`;
+const socialImage = `${siteUrl}/512x512.png`;
 
 /**
  * Dart's own logo, for the pub.dev link in the navbar.
@@ -321,14 +321,24 @@ const vitePressConfig: UserConfig = {
 		[`${defaultLocale}/:rest*`]: ':rest*'
 	},
 	head: [
-		['link', { rel: 'icon', type: 'image/svg+xml', href: '/logo.svg' }],
-		['meta', { name: 'theme-color', content: '#5b6cff' }],
+		// PNG first for anything modern, `favicon.ico` behind it for the browsers
+		// and the Windows surfaces that still ask for one by that name.
+		['link', { rel: 'icon', type: 'image/png', sizes: '32x32', href: '/logo-32.png' }],
+		['link', { rel: 'icon', type: 'image/png', sizes: '16x16', href: '/logo-16.png' }],
+		['link', { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }],
+		// Its own file rather than one of the square marks: iOS composites a
+		// transparent home-screen icon on black, so this one has its background
+		// painted in.
+		['link', { rel: 'apple-touch-icon', sizes: '180x180', href: '/apple-touch-icon.png' }],
+		['meta', { name: 'theme-color', content: '#0b173d' }],
 		// The half of the metadata that is the same on every page. The other half —
 		// the canonical URL, the title, the description, the locale alternates — is
 		// per page and lives in `transformHead`.
 		['meta', { property: 'og:type', content: 'website' }],
 		['meta', { property: 'og:site_name', content: 'randino' }],
 		['meta', { property: 'og:image', content: socialImage }],
+		['meta', { property: 'og:image:width', content: '512' }],
+		['meta', { property: 'og:image:height', content: '512' }],
 		['meta', { property: 'og:image:alt', content: 'randino' }],
 		// `summary` and not `summary_large_image`: the image is a square mark, and a
 		// wide card would letterbox it into a strip of background.
@@ -399,7 +409,7 @@ const vitePressConfig: UserConfig = {
 		}
 	},
 	themeConfig: {
-		logo: { src: '/logo.svg', width: 24, height: 24 },
+		logo: { src: '/logo-32.png', width: 24, height: 24 },
 		/**
 		 * `h2` and `h3`, nested. A reference page is one `h2` — Options — with a
 		 * dozen `h3`s under it, and at the default depth the outline lists four
