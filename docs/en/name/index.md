@@ -1,0 +1,99 @@
+# Person names
+
+randino generates names people actually carry — 김민준, Emma Clover, Иванов Иван — in nine languages, each in its own script and with its English pronunciation alongside. They are for sample data: forms, seeds, mockups, fixtures.
+
+::: lang js
+
+```javascript
+import { randomName } from 'randino';
+
+randomName({ language: 'ko', count: 3 });
+// ['김태윤', '원동혁', '조진우']
+```
+
+:::
+
+::: lang dart
+
+```dart
+import 'package:randino/randino.dart';
+
+randomName(language: NameLanguage.ko, count: 3);
+// ['김태윤', '원동혁', '조진우']
+```
+
+:::
+
+## What is in the box
+
+| Function                 | Returns                                                    |
+| ------------------------ | ---------------------------------------------------------- |
+| `randomName`             | The names as strings, in one script                        |
+| `randomNameDetails`      | Both scripts plus the language and gender behind each name |
+| `nameLengthRange`        | The natural length range of a full name in a language      |
+| `nameSupportsMiddleName` | Whether a language has a middle part at all                |
+| `nameSupportsRoman`      | Whether romanizing changes anything                        |
+
+## How the options behave
+
+The two generators share most of their options, and these are the ones whose behaviour is worth knowing before you reach for them.
+
+### `style` — real names, or invented ones
+
+At `0` — the default — every part is drawn from a curated pool of names in use, and **stays there**: when the length range leaves room for more than one given-name length, the length is chosen from the ones the pool can actually serve rather than rolled first and invented around.
+
+Toward `100` names are invented instead: Latin and Cyrillic scripts from syllable templates, and Korean, Japanese and Chinese by combining given-name characters freely. Values in between decide **per name and per part**, so `50` mixes real and invented parts inside one batch and sometimes inside one name.
+
+::: lang js
+
+```javascript
+randomName({ language: 'en', style: 100, count: 3 });
+// ['Deder Kuvoun', 'Jaihil Brouvinn', 'Thoowoun Wiatou']
+
+randomName({ language: 'ko', style: 100, count: 3 });
+// ['송승완', '구상겸', '채진훈']
+```
+
+:::
+
+::: lang dart
+
+```dart
+randomName(language: NameLanguage.en, style: 100, count: 3);
+// ['Deder Kuvoun', 'Jaihil Brouvinn', 'Thoowoun Wiatou']
+
+randomName(language: NameLanguage.ko, style: 100, count: 3);
+// ['송승완', '구상겸', '채진훈']
+```
+
+:::
+
+### Surnames are weighted where the distribution is steep
+
+Korean, Chinese and Vietnamese surnames are drawn **in proportion to how common they are**, because a handful of them cover most of the population. About a fifth of the Korean names come back a 김 and two Vietnamese names in five a Nguyễn, the way a real roster reads — an even draw over the pool would make 김 one name in seventy-five, which is the single loudest way the output stops reading Korean.
+
+The other six languages have a long enough tail that an even draw is already within the right order of magnitude, so they do not carry a frequency table.
+
+### Length is counted in the native form
+
+`minLength` and `maxLength` count **characters of the native form, spaces between parts included**. The structure you asked for always wins: a range too narrow for the requested parts is answered with the closest name the generator can build, never by dropping a surname or middle name you asked for.
+
+For space-separated languages the range is satisfied by re-drawing from the pools, so a very narrow range is best-effort. Korean, Japanese and Chinese hit it exactly, because their given names are composed a syllable at a time.
+
+Leave both out and each language falls back to its own range, which is what `nameLengthRange` reports — and that fallback is resolved **per language**, so mixing languages does not stretch a Korean name to fill a Spanish name's range.
+
+### `startsWith` applies to the whole name
+
+Which means the surname for family-first languages, and the given name otherwise — or whenever the surname is switched off. A character that no real name starts with still returns names rather than nothing: Latin and Cyrillic scripts invent one (`Q` → `Qivu Railooth`), and CJK scripts use the character as a name part of its own (`앙` + `지수` → `앙지수`).
+
+Only the first character of whatever you pass is used, and the match is case-insensitive.
+
+### `unique` is off by default
+
+So that the count you asked for is the count you get. Turn it on to deduplicate; because the pools are finite, a large count then returns **fewer** names rather than looping forever.
+
+### Gender
+
+`gender` picks which pools the given name is drawn from. In most languages that is all it does, and the result is not observable from the outside — a Korean given name does not announce which pool it came from. Russian is the exception: its patronymic and its surname both inflect, so `Иванов` becomes `Иванова` and `Николаевич` becomes `Николаевна`.
+
+Leave it out and a gender is picked per name. `randomNameDetails` reports which one was used.

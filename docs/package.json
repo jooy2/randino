@@ -1,0 +1,32 @@
+{
+	"name": "randino-docs",
+	"version": "0.0.1",
+	"description": "The documentation site for randino, shared by every language the library ships for.",
+	"private": true,
+	"type": "module",
+	"author": "CDGet <jooy2.contact@gmail.com>",
+	"license": "MIT",
+	"scripts": {
+		"changelog": "node scripts/copy-changelog.mjs",
+		"dev": "npm run changelog && vitepress dev",
+		"build": "npm run changelog && vitepress build",
+		"serve": "npm run build && vitepress serve",
+		"format": "prettier .",
+		"format:fix": "prettier . --write",
+		"typecheck": "tsc --project tsconfig.json"
+	},
+	"engines": {
+		"node": ">=20.19.0"
+	},
+	"dependencies": {
+		"vue": "^3.5.39"
+	},
+	"devDependencies": {
+		"@types/node": "^26.2.0",
+		"markdown-it-container": "^4.0.0",
+		"prettier": "^3.9.6",
+		"typescript": "^6.0.3",
+		"vitepress": "^1.6.4",
+		"vitepress-i18n": "^1.3.5"
+	}
+}
