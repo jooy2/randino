@@ -4,18 +4,29 @@ Guidance for AI agents (and humans) working in this repository. Written in Engli
 
 ## What randino is
 
-**randino** is a zero-dependency TypeScript library that generates random **person names** and **nicknames**, per language. Two separate concerns, deliberately:
+**randino** is a zero-dependency library that generates random **person names** and **nicknames**, per language. It ships for more than one programming language — TypeScript today, Dart alongside it — and every one of them generates from the same datasets under the same rules. Two separate concerns, deliberately:
 
 - **Names** should read like names a person actually carries (`김민준`, `Emma Clover`). Sample data for forms, seeds, mockups.
 - **Nicknames** are the handles someone would pick for a game or a website (`멋진사자`, `MistyOwl`). They are built from everyday words and **never from person names** — that rule is the whole point of keeping the two apart.
 
-Both generators are implemented. Keep them apart — a shared "generator" abstraction is not wanted, but shared _helpers_ (`lib/_internal`) are.
+Both generators are implemented. Keep them apart — a shared "generator" abstraction is not wanted, but shared _helpers_ (`_internal`) are.
 
 The name generator is a port of the logic behind vutools' [Random Person Name Generator](https://www.vutools.com/tools/text/random-person-name-generator) (`client/src/app/[locale]/tools/text/random-person-name-generator` in the `www-vutools-com` repo), with the same options. Two deliberate differences: the web page's `es-hangul` dependency is replaced by an internal romanizer (see below), and length bounds are resolved per language so `language: 'all'` does not stretch a Korean name to fill a Spanish name's range.
 
 The nickname generator has no upstream — it is this repo's own. Its options mirror the name generator's where they mean the same thing (`language`, `count`, `style`, `minLength` / `maxLength`, `startsWith`, `unique`), and add `theme`, `includeModifier`, `baseWord` and the `uniqueSuffix*` group.
 
-## Layout
+## Repository layout
+
+```
+packages/
+  javascript/   The npm package (`randino`) — the reference implementation
+  dart/         The pub.dev package (`randino`) — a port of it, same data, same rules
+docs/           The documentation site (VitePress), English and Korean
+```
+
+The **JavaScript package is the source of truth**. A behaviour change starts there, and the Dart port follows it; a change that lands only on one side is a bug in the making. Each package owns its own `README.md` and `CHANGELOG.md` because npm and pub.dev both read those from the package root — the repository's own `README.md` is the only one that describes all of them at once, and there is no changelog at the repository root.
+
+## The JavaScript package (`packages/javascript`)
 
 ```
 lib/
@@ -79,6 +90,8 @@ last: tokens('佐藤:Sato 鈴木:Suzuki')
 ```
 
 ## Commands
+
+Run from `packages/javascript`; there is no workspace root that forwards them.
 
 | Command          | What it does                                                        |
 | ---------------- | ------------------------------------------------------------------- |

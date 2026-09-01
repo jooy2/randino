@@ -6,11 +6,13 @@ on:
   push:
     branches: [main]
     paths:
-      - test/**
-      - lib/**
-      - package.json
+      - packages/javascript/**
       - .github/workflows/run-test-javascript.yml
   workflow_dispatch:
+
+defaults:
+  run:
+    working-directory: packages/javascript
 
 jobs:
   run-test-javascript:
