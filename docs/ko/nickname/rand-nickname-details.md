@@ -1,17 +1,16 @@
 # randNicknameDetails
 
-닉네임을 생성하면서 각 닉네임을 이루는 조각들을 함께 알려 줍니다. 순서대로의 단어들, 고유 접미사, 언어, 테마입니다. 기준 단어를 강조하거나, 테마별로 묶거나, 접미사를 별도 컬럼에 저장할 때 유용합니다.
+닉네임을 생성하면서 각 닉네임을 이루는 조각들을 함께 알려 줍니다. 순서대로의 단어들, 언어, 테마입니다. 기준 단어를 강조하거나, 테마별로 묶거나, 만들어진 닉네임 옆에 그 구성 단어를 함께 저장할 때 유용합니다.
 
 ::: lang js
 
 ```javascript
 import { randNicknameDetails } from 'randino';
 
-randNicknameDetails({ language: 'ko', uniqueSuffix: true });
+randNicknameDetails({ language: 'ko' });
 // [{
-//   nickname: '오래된발견_zVShs',
+//   nickname: '오래된발견',
 //   words: ['오래된', '발견'],
-//   suffix: '_zVShs',
 //   language: 'ko',
 //   theme: 'concept'
 // }]
@@ -24,8 +23,8 @@ randNicknameDetails({ language: 'ko', uniqueSuffix: true });
 ```dart
 import 'package:randino/randino.dart';
 
-randNicknameDetails(language: NicknameLanguage.ko, uniqueSuffix: true);
-// [NicknameDetail(오래된발견_zVShs, [오래된, 발견], ko, concept)]
+randNicknameDetails(language: NicknameLanguage.ko);
+// [NicknameDetail(오래된발견, [오래된, 발견], ko, concept)]
 ```
 
 :::
@@ -35,9 +34,9 @@ randNicknameDetails(language: NicknameLanguage.ko, uniqueSuffix: true);
 ```python
 from randino import rand_nickname_details
 
-rand_nickname_details(language="ko", unique_suffix=True)
-# [NicknameDetail(nickname='오래된발견_zVShs', words=('오래된', '발견'),
-#                 suffix='_zVShs', language='ko', theme='concept')]
+rand_nickname_details(language="ko")
+# [NicknameDetail(nickname='오래된발견', words=('오래된', '발견'),
+#                 language='ko', theme='concept')]
 ```
 
 :::
@@ -50,13 +49,12 @@ rand_nickname_details(language="ko", unique_suffix=True)
 
 | 필드 | 타입 | 설명 |
 | --- | --- | --- |
-| `nickname` | <Lang js="string" dart="String" py="str" code /> | 고유 접미사를 포함한 완성된 닉네임. |
-| `words` | <Lang js="string[]" dart="List&lt;String&gt;" py="tuple[str, ...]" code /> | 접미사를 뺀, 순서대로의 구성 단어들. |
-| `suffix` | <Lang js="string" dart="String" py="str" code /> | 구분자를 포함한 접미사. 접미사를 요청하지 않았으면 빈 문자열입니다. |
+| `nickname` | <Lang js="string" dart="String" py="str" code /> | 완성된 닉네임. |
+| `words` | <Lang js="string[]" dart="List&lt;String&gt;" py="tuple[str, ...]" code /> | 순서대로의 구성 단어들. |
 | `language` | `NicknameLanguage` | 이 닉네임이 생성된 언어. |
 | `theme` | <Lang js="NicknameTheme &#124; null" dart="NicknameTheme?" py="NicknameTheme &#124; None" code /> | 기준 단어의 테마. 생성기가 모르는 단어면 null입니다. |
 
-`words`를 그 언어의 연결 방식으로 이어 붙이고 `suffix`를 덧붙이면 정확히 `nickname`이 됩니다. 이는 불변 조건이며 두 테스트 스위트 모두 이를 검증합니다.
+`words`를 그 언어의 연결 방식으로 이어 붙이면 정확히 `nickname`이 됩니다. 이는 불변 조건이며 세 테스트 스위트 모두 이를 검증합니다.
 
 ### `theme`에 대하여 {#about-theme}
 
@@ -106,19 +104,20 @@ for detail in rand_nickname_details(language="ko", count=3):
 
 :::
 
-### 접미사를 따로 저장하기
+### 읽는 부분과 구분자를 따로 저장하기 {#storing-the-readable-part-and-the-discriminator}
 
-가입 절차에서는 읽는 부분과 충돌을 막는 부분을 각각 다른 컬럼에 두는 경우가 많습니다. 나중에 이름을 바꿀 때 한쪽은 유지하고 한쪽만 교체할 수 있기 때문입니다.
+가입 흐름에서는 보통 읽는 부분과 충돌을 막는 부분을 두 컬럼으로 나누어 둡니다. 나중에 이름을 바꿀 때 한쪽만 유지하고 다른 쪽을 갈아 끼울 수 있기 때문입니다. 두 번째 값을 만드는 것이 [`randSuffix`](../affix/rand-suffix)이며, 첫 번째 값에서 다시 잘라낼 일이 없습니다.
 
 ::: lang js
 
 ```javascript
-const [detail] = randNicknameDetails({ language: 'en', uniqueSuffix: true });
+const [detail] = randNicknameDetails({ language: 'en' });
+const discriminator = randSuffix('', { separator: '' });
 
 await users.insert({
-	handle: detail.nickname,
-	display: detail.nickname.slice(0, -detail.suffix.length),
-	discriminator: detail.suffix
+	handle: `${detail.nickname}_${discriminator}`,
+	display: detail.nickname,
+	discriminator
 });
 ```
 
@@ -127,15 +126,13 @@ await users.insert({
 ::: lang dart
 
 ```dart
-final detail = randNicknameDetails(
-  language: NicknameLanguage.en,
-  uniqueSuffix: true,
-).first;
+final detail = randNicknameDetails(language: NicknameLanguage.en).first;
+final discriminator = randSuffix('', separator: '');
 
 await users.insert(
-  handle: detail.nickname,
-  display: detail.nickname.substring(0, detail.nickname.length - detail.suffix.length),
-  discriminator: detail.suffix,
+  handle: '${detail.nickname}_$discriminator',
+  display: detail.nickname,
+  discriminator: discriminator,
 );
 ```
 
@@ -144,12 +141,13 @@ await users.insert(
 ::: lang py
 
 ```python
-detail = rand_nickname_details(language="en", unique_suffix=True)[0]
+detail = rand_nickname_details(language="en")[0]
+discriminator = rand_suffix("", separator="")
 
 await users.insert(
-    handle=detail.nickname,
-    display=detail.nickname[: -len(detail.suffix)],
-    discriminator=detail.suffix,
+    handle=f"{detail.nickname}_{discriminator}",
+    display=detail.nickname,
+    discriminator=discriminator,
 )
 ```
 

@@ -77,11 +77,7 @@ void main() {
 
     test('script: roman romanizes every language into ASCII', () {
       for (final language in nameLanguages) {
-        for (final name in randName(
-          language: language,
-          count: sample,
-          script: NameScript.roman,
-        )) {
+        for (final name in randName(language: language, count: sample, script: NameScript.roman)) {
           expect(name, matches(roman), reason: '${language.name}: $name');
         }
       }

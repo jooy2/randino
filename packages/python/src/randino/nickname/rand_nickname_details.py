@@ -15,22 +15,17 @@ def rand_nickname_details(
     include_modifier: bool = True,
     word_separator: str | None = None,
     base_word: str = "",
-    unique_suffix: bool = False,
-    unique_suffix_length: int = 5,
-    unique_suffix_separator: str = "_",
-    unique_suffix_charset: str = "",
     starts_with: str = "",
     unique: bool = False,
 ) -> list[NicknameDetail]:
     """Generate nicknames along with the pieces each one was built from.
 
     Takes the same options as `rand_nickname`. Useful when you need the words on
-    their own — to highlight the base word, to group by theme, or to store the unique
-    suffix separately from the nickname.
+    their own — to highlight the base word, or to group by theme.
 
     Example:
-        >>> rand_nickname_details(language="ko", unique_suffix=True)
-        [NicknameDetail(nickname='멋진사자_gDe2C', words=('멋진', '사자'), suffix='_gDe2C', language='ko', theme='animal')]
+        >>> rand_nickname_details(language="ko")
+        [NicknameDetail(nickname='멋진사자', words=('멋진', '사자'), language='ko', theme='animal')]
     """
     return generate_nickname_details(
         language=language,
@@ -42,10 +37,6 @@ def rand_nickname_details(
         include_modifier=include_modifier,
         word_separator=word_separator,
         base_word=base_word,
-        unique_suffix=unique_suffix,
-        unique_suffix_length=unique_suffix_length,
-        unique_suffix_separator=unique_suffix_separator,
-        unique_suffix_charset=unique_suffix_charset,
         starts_with=starts_with,
         unique=unique,
     )

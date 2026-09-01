@@ -35,15 +35,8 @@ export const NICKNAME_DATA: Record<NicknameLanguage, NicknameLanguageData> = {
 	zh: ZH
 };
 
-// Bounds for `minLength` / `maxLength`, in characters of the nickname itself —
-// the unique suffix is not counted.
+// Bounds for `minLength` / `maxLength`, in characters.
 export const NICKNAME_LENGTH_MIN = 1;
 export const NICKNAME_LENGTH_MAX = 40;
 
 export const NICKNAME_COUNT_MAX = 10000;
-
-// Bounds for `uniqueSuffixLength`.
-export const NICKNAME_SUFFIX_LENGTH_MAX = 32;
-
-// Suffix characters, minus the pairs that are easy to misread (0/O, 1/l/I).
-export const NICKNAME_SUFFIX_CHARSET = 'abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789';

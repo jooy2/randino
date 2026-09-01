@@ -12,10 +12,11 @@
 // - `wordSeparator` decides what goes between the words, defaulting to the way
 //   the language joins them.
 // - `baseWord` pins the noun, so only the decoration varies.
-// - `uniqueSuffix` appends a random token, which is what makes a nickname
-//   collision-free rather than merely unlikely.
+//
+// What used to be the fifth entry here, `uniqueSuffix`, is `randSuffix` now:
+// attaching a token to a string was never a thing about nicknames.
 
-import { capitalizeFirst, chance, clamp, pick, randInt, randToken } from '../_internal/utils.js';
+import { capitalizeFirst, chance, clamp, pick, randInt } from '../_internal/utils.js';
 import type {
 	NicknameDetail,
 	NicknameLanguage,
@@ -29,8 +30,6 @@ import {
 	NICKNAME_LANGUAGES,
 	NICKNAME_LENGTH_MAX,
 	NICKNAME_LENGTH_MIN,
-	NICKNAME_SUFFIX_CHARSET,
-	NICKNAME_SUFFIX_LENGTH_MAX,
 	NICKNAME_THEMES
 } from './data/index.js';
 import type { NicknameLanguageData, WordPool, WordSynthesis } from './data/types.js';
@@ -539,12 +538,6 @@ export function generateNicknameDetails(options: RandNicknameOptions = {}): Nick
 	const unique = options.unique ?? false;
 	const prefix = settings.prefix.toLowerCase();
 
-	const suffixLength = options.uniqueSuffix
-		? clamp(Math.floor(options.uniqueSuffixLength ?? 5), 1, NICKNAME_SUFFIX_LENGTH_MAX)
-		: 0;
-	const separator = options.uniqueSuffixSeparator ?? '_';
-	const charset = options.uniqueSuffixCharset || NICKNAME_SUFFIX_CHARSET;
-
 	const seen = new Set<string>();
 	const nicknames: NicknameDetail[] = [];
 	const maxAttempts = count * 50 + 500;
@@ -560,16 +553,13 @@ export function generateNicknameDetails(options: RandNicknameOptions = {}): Nick
 		if (!word) continue;
 		if (prefix && !word.toLowerCase().startsWith(prefix)) continue;
 
-		const suffix = suffixLength ? separator + randToken(suffixLength, charset) : '';
-		const nickname = word + suffix;
-
 		if (unique) {
-			if (seen.has(nickname)) continue;
+			if (seen.has(word)) continue;
 
-			seen.add(nickname);
+			seen.add(word);
 		}
 
-		nicknames.push({ nickname, words, suffix, language: code, theme });
+		nicknames.push({ nickname: word, words, language: code, theme });
 	}
 
 	return nicknames;

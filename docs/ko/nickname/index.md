@@ -44,7 +44,7 @@ rand_nickname(language="ko", count=3)
 | 함수                                             | 반환값                             |
 | ------------------------------------------------ | ---------------------------------- |
 | [`randNickname`](./rand-nickname)                | 닉네임 문자열                      |
-| [`randNicknameDetails`](./rand-nickname-details) | 사용된 단어, 접미사, 언어, 테마    |
+| [`randNicknameDetails`](./rand-nickname-details) | 사용된 단어, 언어, 테마            |
 | [`nicknameLengthRange`](./nickname-length-range) | 해당 언어가 만들 수 있는 모든 길이 |
 
 명사는 14개 [테마](./themes)에서 오고, 모든 닉네임은 그중 한 테마의 단어를 중심으로 만들어집니다.
@@ -137,14 +137,14 @@ rand_nickname(language="en", word_separator="-", count=4)
 
 이것은 장식이 아닙니다. **구분자의 길이도 닉네임 길이에 포함되므로**, 구분자를 넣으면 단어가 길어진 것과 똑같이 범위가 좁아집니다. `nicknameLengthRange`에 넘겨 보면 남은 범위를 확인할 수 있습니다.
 
-### 고유 접미사는 길이 범위 밖에 있습니다
+### 고유 접미사는 여기 옵션이 아닙니다 {#a-unique-suffix-is-not-an-option-here}
 
-<Lang js="minLength" dart="minLength" py="min_length" code />와 <Lang js="maxLength" dart="maxLength" py="max_length" code />는 읽는 부분만을 가리킵니다. 접미사는 그 조건을 만족한 뒤에 덧붙으므로 범위를 잠식하지 않습니다. 그리고 이 접미사야말로 닉네임 충돌을 "드물게"가 아니라 "불가능하게" 만드는 장치입니다.
+예전에는 옵션 네 개였습니다. 문자열에 무작위 토큰을 붙이는 일은 닉네임이 아니라 문자열에 대한 이야기여서, 지금은 [`randSuffix`](../affix/rand-suffix)가 맡습니다. 이 닉네임에도, 이름에도, 주문 번호에도 쓸 수 있습니다.
 
 ::: lang js
 
 ```javascript
-randNickname({ language: 'ko', count: 3, uniqueSuffix: true });
+randSuffix(randNickname({ language: 'ko', count: 3 }));
 // ['달력_U7aNZ', '금빛독수리다발_AVcCV', '조용한바구니_RUKAP']
 ```
 
@@ -153,7 +153,7 @@ randNickname({ language: 'ko', count: 3, uniqueSuffix: true });
 ::: lang dart
 
 ```dart
-randNickname(language: NicknameLanguage.ko, count: 3, uniqueSuffix: true);
+randSuffixAll(randNickname(language: NicknameLanguage.ko, count: 3));
 // ['달력_U7aNZ', '금빛독수리다발_AVcCV', '조용한바구니_RUKAP']
 ```
 
@@ -162,13 +162,13 @@ randNickname(language: NicknameLanguage.ko, count: 3, uniqueSuffix: true);
 ::: lang py
 
 ```python
-rand_nickname(language="ko", count=3, unique_suffix=True)
+rand_suffix(rand_nickname(language="ko", count=3))
 # ['달력_U7aNZ', '금빛독수리다발_AVcCV', '조용한바구니_RUKAP']
 ```
 
 :::
 
-접미사 구분자는 <Lang js="wordSeparator" dart="wordSeparator" py="word_separator" code />와 별개입니다. 둘을 같은 문자로 지정하면 접미사가 구분되어 보이지 않게 됩니다.
+토큰이 나중에 붙기 때문에, <Lang js="minLength" dart="minLength" py="min_length" code />와 <Lang js="maxLength" dart="maxLength" py="max_length" code />는 닉네임 전체를 가리키며 빼고 셀 것이 없습니다.
 
 ### `baseWord`는 단어를 고정하고 장식만 바꿉니다
 
@@ -252,6 +252,6 @@ rand_nickname(language="en", style=100, count=3)
 
 :::
 
-### `unique`, 그리고 대개는 접미사가 더 나은 이유
+### `unique`, 그리고 대개는 접미사가 더 나은 이유 {#unique-and-why-a-suffix-is-usually-better}
 
-한국어와 영어는 각각 900만 가지가 넘는 단어 조합을 가지므로 중복은 어느 쪽이든 드뭅니다. `unique`는 한 번의 호출 안에서 중복을 없애고, 조합이 바닥나면 더 적은 개수를 돌려줍니다. <Lang js="uniqueSuffix" dart="uniqueSuffix" py="unique_suffix" code />는 호출과 프로세스와 사용자를 가로질러 충돌을 불가능하게 만드는데, 가입 폼에 실제로 필요한 보장은 이쪽입니다.
+한국어와 영어는 각각 900만 가지가 넘는 단어 조합을 가지므로 중복은 어느 쪽이든 드뭅니다. `unique`는 한 번의 호출 안에서 중복을 없애고, 조합이 바닥나면 더 적은 개수를 돌려줍니다. [`randSuffix`](../affix/rand-suffix)는 호출과 프로세스와 사용자를 가로질러 충돌을 불가능하게 만드는데, 가입 폼에 실제로 필요한 보장은 이쪽입니다.

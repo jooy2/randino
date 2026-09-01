@@ -274,75 +274,6 @@ describe('Nickname', () => {
 				);
 			}
 		}
-
-		// The unique suffix keeps its own separator.
-		for (const nickname of randNickname({
-			language: 'en',
-			wordSeparator: '-',
-			uniqueSuffix: true,
-			count: 20
-		})) {
-			assert.match(nickname, /^[A-Za-z]+(-[A-Za-z]+)*_[0-9A-Za-z]{5}$/, nickname);
-		}
-	});
-
-	it('uniqueSuffix appends a token that the length options ignore', () => {
-		for (const detail of randNicknameDetails({
-			language: 'ko',
-			count: SAMPLE,
-			uniqueSuffix: true,
-			minLength: 4,
-			maxLength: 6
-		})) {
-			assert.match(detail.suffix, /^_[0-9A-Za-z]{5}$/, detail.nickname);
-			assert.strictEqual(detail.words.join('') + detail.suffix, detail.nickname);
-			// The range covers the nickname, not the suffix.
-			const word = detail.nickname.slice(0, -detail.suffix.length);
-			assert.ok(word.length >= 4 && word.length <= 6, detail.nickname);
-			assert.match(word, SCRIPT.ko, detail.nickname);
-		}
-
-		// The token is what makes a nickname collision-free rather than unlikely.
-		const many = randNickname({ language: 'ko', count: 2000, uniqueSuffix: true });
-		assert.strictEqual(new Set(many).size, 2000);
-	});
-
-	it('the unique suffix is configurable', () => {
-		for (const nickname of randNickname({
-			language: 'en',
-			count: 20,
-			uniqueSuffix: true,
-			uniqueSuffixLength: 8,
-			uniqueSuffixSeparator: '-'
-		})) {
-			assert.match(nickname, /^[A-Za-z]+-[0-9A-Za-z]{8}$/, nickname);
-		}
-
-		for (const nickname of randNickname({
-			language: 'ko',
-			count: 20,
-			uniqueSuffix: true,
-			uniqueSuffixLength: 4,
-			uniqueSuffixCharset: '0123456789'
-		})) {
-			assert.match(nickname, /^[가-힣]+_[0-9]{4}$/, nickname);
-		}
-
-		// An empty separator is a valid choice, and lengths are clamped.
-		for (const nickname of randNickname({
-			language: 'en',
-			count: 20,
-			uniqueSuffix: true,
-			uniqueSuffixSeparator: '',
-			uniqueSuffixLength: 0
-		})) {
-			assert.match(nickname, /^[A-Za-z]+[0-9A-Za-z]$/, nickname);
-		}
-
-		// No suffix unless it was asked for.
-		for (const detail of randNicknameDetails({ count: 20, uniqueSuffixLength: 8 })) {
-			assert.strictEqual(detail.suffix, '');
-		}
 	});
 
 	it('baseWord keeps the word and varies only the decoration', () => {
@@ -449,10 +380,10 @@ describe('Nickname', () => {
 	});
 
 	it('randNicknameDetails reports the pieces it used', () => {
-		for (const detail of randNicknameDetails({ count: 100, uniqueSuffix: true })) {
+		for (const detail of randNicknameDetails({ count: 100 })) {
 			const joiner = NICKNAME_DATA[detail.language].joiner;
 
-			assert.strictEqual(detail.words.join(joiner) + detail.suffix, detail.nickname);
+			assert.strictEqual(detail.words.join(joiner), detail.nickname);
 			assert.ok(NICKNAME_LANGUAGES.includes(detail.language));
 			assert.ok(detail.theme === null || NICKNAME_THEMES.includes(detail.theme));
 		}

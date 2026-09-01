@@ -88,13 +88,10 @@ class NicknameDetail:
     """A generated nickname with the pieces it was built from."""
 
     nickname: str
-    """The finished nickname, unique suffix included."""
+    """The finished nickname."""
 
     words: tuple[str, ...]
-    """The words the nickname is made of, in order, without the unique suffix."""
-
-    suffix: str
-    """The unique suffix, separator included. Empty when `unique_suffix` is off."""
+    """The words the nickname is made of, in order."""
 
     language: NicknameLanguage
     """The language this nickname was generated in."""

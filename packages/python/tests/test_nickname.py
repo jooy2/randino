@@ -251,60 +251,6 @@ def test_word_separator_goes_between_the_words() -> None:
                 f"{language} '{separator}' {low}-{high}: {nickname} ({len(nickname)})"
             )
 
-    # The unique suffix keeps its own separator.
-    for nickname in rand_nickname(language="en", word_separator="-", unique_suffix=True, count=20):
-        assert re.fullmatch(r"[A-Za-z]+(-[A-Za-z]+)*_[0-9A-Za-z]{5}", nickname), nickname
-
-
-def test_unique_suffix_appends_a_token_that_the_length_options_ignore() -> None:
-    for detail in rand_nickname_details(
-        language="ko", count=SAMPLE, unique_suffix=True, min_length=4, max_length=6
-    ):
-        assert re.fullmatch(r"_[0-9A-Za-z]{5}", detail.suffix), detail.nickname
-        assert "".join(detail.words) + detail.suffix == detail.nickname
-        # The range covers the nickname, not the suffix.
-        word = detail.nickname[: -len(detail.suffix)]
-        assert 4 <= len(word) <= 6, detail.nickname
-        assert SCRIPT["ko"].fullmatch(word), detail.nickname
-
-    # The token is what makes a nickname collision-free rather than unlikely.
-    many = rand_nickname(language="ko", count=2000, unique_suffix=True)
-    assert len(set(many)) == 2000
-
-
-def test_the_unique_suffix_is_configurable() -> None:
-    for nickname in rand_nickname(
-        language="en",
-        count=20,
-        unique_suffix=True,
-        unique_suffix_length=8,
-        unique_suffix_separator="-",
-    ):
-        assert re.fullmatch(r"[A-Za-z]+-[0-9A-Za-z]{8}", nickname), nickname
-
-    for nickname in rand_nickname(
-        language="ko",
-        count=20,
-        unique_suffix=True,
-        unique_suffix_length=4,
-        unique_suffix_charset="0123456789",
-    ):
-        assert re.fullmatch(r"[가-힣]+_[0-9]{4}", nickname), nickname
-
-    # An empty separator is a valid choice, and lengths are clamped.
-    for nickname in rand_nickname(
-        language="en",
-        count=20,
-        unique_suffix=True,
-        unique_suffix_separator="",
-        unique_suffix_length=0,
-    ):
-        assert re.fullmatch(r"[A-Za-z]+[0-9A-Za-z]", nickname), nickname
-
-    # No suffix unless it was asked for.
-    for detail in rand_nickname_details(count=20, unique_suffix_length=8):
-        assert detail.suffix == ""
-
 
 def test_base_word_keeps_the_word_and_varies_only_the_decoration() -> None:
     details = rand_nickname_details(base_word="고양이", count=100)
@@ -392,9 +338,9 @@ def test_unique_never_repeats_a_nickname() -> None:
 
 
 def test_rand_nickname_details_reports_the_pieces_it_used() -> None:
-    for detail in rand_nickname_details(count=100, unique_suffix=True):
+    for detail in rand_nickname_details(count=100):
         joiner = NICKNAME_DATA[detail.language].joiner
 
-        assert joiner.join(detail.words) + detail.suffix == detail.nickname
+        assert joiner.join(detail.words) == detail.nickname
         assert detail.language in NICKNAME_LANGUAGES
         assert detail.theme is None or detail.theme in NICKNAME_THEMES

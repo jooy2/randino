@@ -5,8 +5,6 @@ from randino.nickname.data import (
     NICKNAME_LANGUAGES,
     NICKNAME_LENGTH_MAX,
     NICKNAME_LENGTH_MIN,
-    NICKNAME_SUFFIX_CHARSET,
-    NICKNAME_SUFFIX_LENGTH_MAX,
     NICKNAME_THEMES,
 )
 from randino.nickname.nickname_length_range import nickname_length_range
@@ -18,8 +16,6 @@ __all__ = [
     "NICKNAME_LANGUAGES",
     "NICKNAME_LENGTH_MAX",
     "NICKNAME_LENGTH_MIN",
-    "NICKNAME_SUFFIX_CHARSET",
-    "NICKNAME_SUFFIX_LENGTH_MAX",
     "NICKNAME_THEMES",
     "nickname_length_range",
     "rand_nickname",

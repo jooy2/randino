@@ -12,7 +12,7 @@ import { generateNicknameDetails } from './nicknameGenerator.js';
  * // ['멋진사자', '파란물병', '고양이꼬리']
  * randNickname({ language: 'en' });
  * // ['MistyOwl']
- * randNickname({ language: 'ko', uniqueSuffix: true, count: 2 });
+ * randSuffix(randNickname({ language: 'ko', count: 2 }));
  * // ['달리는표범_gDe2C', '조용한노을_nVtRC']
  * randNickname({ language: 'ko', wordSeparator: ' ', count: 2 });
  * // ['멋진 사자', '고양이 꼬리']

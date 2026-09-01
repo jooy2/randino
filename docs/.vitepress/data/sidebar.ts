@@ -65,6 +65,8 @@ export const SIDEBAR: SidebarGroup[] = [
 				en: 'randNicknameDetails',
 				ko: 'randNicknameDetails'
 			},
+			{ path: 'affix/rand-suffix', en: 'randSuffix', ko: 'randSuffix' },
+			{ path: 'affix/rand-prefix', en: 'randPrefix', ko: 'randPrefix' },
 			{ path: 'name/name-length-range', en: 'nameLengthRange', ko: 'nameLengthRange' },
 			{
 				path: 'name/name-supports-middle-name',

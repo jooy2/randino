@@ -42,6 +42,10 @@ void main() {
           'NicknameDetail',
           'NicknameLanguage',
           'NicknameTheme',
+          'affixCharset',
+          'affixLengthDefault',
+          'affixLengthMax',
+          'affixSeparatorDefault',
           'nameCountMax',
           'nameLanguages',
           'nameLengthMax',
@@ -54,13 +58,15 @@ void main() {
           'nicknameLengthMax',
           'nicknameLengthMin',
           'nicknameLengthRange',
-          'nicknameSuffixCharset',
-          'nicknameSuffixLengthMax',
           'nicknameThemes',
           'randName',
           'randNameDetails',
           'randNickname',
           'randNicknameDetails',
+          'randPrefix',
+          'randPrefixAll',
+          'randSuffix',
+          'randSuffixAll',
         ]..sort(),
       );
     });
@@ -75,6 +81,11 @@ void main() {
       expect(randNickname(), hasLength(1));
       expect(randNicknameDetails()[0], isA<NicknameDetail>());
       expect(nicknameLengthRange(), isA<LengthRange>());
+
+      expect(randSuffix('a'), startsWith('a_'));
+      expect(randPrefix('a'), endsWith('_a'));
+      expect(randSuffixAll(const ['a', 'b']), hasLength(2));
+      expect(randPrefixAll(const ['a', 'b']), hasLength(2));
     });
 
     test('the bounds are the same numbers the JavaScript package uses', () {
@@ -88,8 +99,11 @@ void main() {
       expect(nicknameLengthMin, 1);
       expect(nicknameLengthMax, 40);
       expect(nicknameCountMax, 10000);
-      expect(nicknameSuffixLengthMax, 32);
-      expect(nicknameSuffixCharset, matches(RegExp(r'^[0-9A-Za-z]+$')));
+
+      expect(affixLengthDefault, 5);
+      expect(affixLengthMax, 32);
+      expect(affixSeparatorDefault, '_');
+      expect(affixCharset, matches(RegExp(r'^[0-9A-Za-z]+$')));
     });
 
     test('the enums list every code the datasets hold', () {

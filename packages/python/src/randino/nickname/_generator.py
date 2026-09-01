@@ -14,8 +14,9 @@ a nickname from reading like one.
 - `word_separator` decides what goes between the words, defaulting to the way the
   language joins them.
 - `base_word` pins the noun, so only the decoration varies.
-- `unique_suffix` appends a random token, which is what makes a nickname
-  collision-free rather than merely unlikely.
+
+What used to be the fifth entry here, `unique_suffix`, is `rand_suffix` now:
+attaching a token to a string was never a thing about nicknames.
 """
 
 import math
@@ -30,7 +31,6 @@ from randino._internal.utils import (
     clamp,
     pick,
     rand_int,
-    rand_token,
 )
 from randino._types import (
     NicknameDetail,
@@ -45,8 +45,6 @@ from randino.nickname.data import (
     NICKNAME_LANGUAGES,
     NICKNAME_LENGTH_MAX,
     NICKNAME_LENGTH_MIN,
-    NICKNAME_SUFFIX_CHARSET,
-    NICKNAME_SUFFIX_LENGTH_MAX,
     NICKNAME_THEMES,
 )
 from randino.nickname.data._types import (
@@ -542,10 +540,6 @@ def generate_nickname_details(
     include_modifier: bool = True,
     word_separator: str | None = None,
     base_word: str = "",
-    unique_suffix: bool = False,
-    unique_suffix_length: int = 5,
-    unique_suffix_separator: str = "_",
-    unique_suffix_charset: str = "",
     starts_with: str = "",
     unique: bool = False,
 ) -> list[NicknameDetail]:
@@ -566,13 +560,6 @@ def generate_nickname_details(
     wanted = clamp(math.floor(count), 0, NICKNAME_COUNT_MAX)
     prefix = settings.prefix.lower()
 
-    suffix_length = (
-        clamp(math.floor(unique_suffix_length), 1, NICKNAME_SUFFIX_LENGTH_MAX)
-        if unique_suffix
-        else 0
-    )
-    charset = unique_suffix_charset or NICKNAME_SUFFIX_CHARSET
-
     seen: set[str] = set()
     nicknames: list[NicknameDetail] = []
     max_attempts = wanted * 50 + 500
@@ -590,22 +577,16 @@ def generate_nickname_details(
         if prefix and not word.lower().startswith(prefix):
             continue
 
-        suffix = (
-            unique_suffix_separator + rand_token(suffix_length, charset) if suffix_length else ""
-        )
-        nickname = word + suffix
-
         if unique:
-            if nickname in seen:
+            if word in seen:
                 continue
 
-            seen.add(nickname)
+            seen.add(word)
 
         nicknames.append(
             NicknameDetail(
-                nickname=nickname,
+                nickname=word,
                 words=words,
-                suffix=suffix,
                 language=code,
                 theme=built_theme,
             )

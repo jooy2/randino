@@ -182,19 +182,15 @@ class NicknameDetail {
   const NicknameDetail({
     required this.nickname,
     required this.words,
-    required this.suffix,
     required this.language,
     required this.theme,
   });
 
-  /// The finished nickname, unique suffix included.
+  /// The finished nickname.
   final String nickname;
 
-  /// The words the nickname is made of, in order, without the unique suffix.
+  /// The words the nickname is made of, in order.
   final List<String> words;
-
-  /// The unique suffix, separator included. Empty when no suffix was asked for.
-  final String suffix;
 
   /// The language this nickname was generated in.
   final NicknameLanguage language;

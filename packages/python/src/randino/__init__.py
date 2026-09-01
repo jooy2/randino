@@ -26,6 +26,14 @@ from randino._types import (
     NicknameTheme,
     NicknameThemeOption,
 )
+from randino.affix import (
+    AFFIX_CHARSET,
+    AFFIX_LENGTH_DEFAULT,
+    AFFIX_LENGTH_MAX,
+    AFFIX_SEPARATOR_DEFAULT,
+    rand_prefix,
+    rand_suffix,
+)
 from randino.name import (
     NAME_COUNT_MAX,
     NAME_LANGUAGES,
@@ -42,8 +50,6 @@ from randino.nickname import (
     NICKNAME_LANGUAGES,
     NICKNAME_LENGTH_MAX,
     NICKNAME_LENGTH_MIN,
-    NICKNAME_SUFFIX_CHARSET,
-    NICKNAME_SUFFIX_LENGTH_MAX,
     NICKNAME_THEMES,
     nickname_length_range,
     rand_nickname,
@@ -51,6 +57,10 @@ from randino.nickname import (
 )
 
 __all__ = [
+    "AFFIX_CHARSET",
+    "AFFIX_LENGTH_DEFAULT",
+    "AFFIX_LENGTH_MAX",
+    "AFFIX_SEPARATOR_DEFAULT",
     "NAME_COUNT_MAX",
     "NAME_LANGUAGES",
     "NAME_LENGTH_MAX",
@@ -59,8 +69,6 @@ __all__ = [
     "NICKNAME_LANGUAGES",
     "NICKNAME_LENGTH_MAX",
     "NICKNAME_LENGTH_MIN",
-    "NICKNAME_SUFFIX_CHARSET",
-    "NICKNAME_SUFFIX_LENGTH_MAX",
     "NICKNAME_THEMES",
     "NameDetail",
     "NameGender",
@@ -81,4 +89,6 @@ __all__ = [
     "rand_name_details",
     "rand_nickname",
     "rand_nickname_details",
+    "rand_prefix",
+    "rand_suffix",
 ]

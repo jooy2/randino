@@ -47,19 +47,11 @@ final Map<NicknameLanguage, NicknameLanguageData> nicknameData =
       },
     );
 
-/// Lower bound for `minLength` / `maxLength`, in characters of the nickname
-/// itself — the unique suffix is not counted.
+/// Lower bound for `minLength` / `maxLength`, in characters.
 const int nicknameLengthMin = 1;
 
-/// Upper bound for `minLength` / `maxLength`, in characters of the nickname
-/// itself — the unique suffix is not counted.
+/// Upper bound for `minLength` / `maxLength`, in characters.
 const int nicknameLengthMax = 40;
 
 /// Upper bound for `count`.
 const int nicknameCountMax = 10000;
-
-/// Upper bound for `uniqueSuffixLength`.
-const int nicknameSuffixLengthMax = 32;
-
-/// Suffix characters, minus the pairs that are easy to misread (0/O, 1/l/I).
-const String nicknameSuffixCharset = 'abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789';

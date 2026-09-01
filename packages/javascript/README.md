@@ -78,17 +78,13 @@ randNickname({ language: 'en', count: 2 });
 randNickname({ language: 'ko', theme: 'animal', count: 2 });
 // ['깊은연어', '하얀여우갈기']
 
-randNickname({ language: 'ko', uniqueSuffix: true, count: 2 });
-// ['달력_U7aNZ', '조용한바구니_RUKAP']
-
 randNickname({ baseWord: '고양이', count: 3 });
 // ['하얀고양이', '고양이바람', '귀여운고양이뿔']
 
-randNicknameDetails({ language: 'ko', uniqueSuffix: true });
+randNicknameDetails({ language: 'ko' });
 // [{
-//   nickname: '오래된발견_zVShs',
+//   nickname: '오래된발견',
 //   words: ['오래된', '발견'],
-//   suffix: '_zVShs',
 //   language: 'ko',
 //   theme: 'concept'
 // }]
@@ -104,14 +100,33 @@ randNicknameDetails({ language: 'ko', uniqueSuffix: true });
 | `includeModifier`         | `boolean`                        | `true`     |
 | `wordSeparator`           | `string`                         | _language_ |
 | `baseWord`                | `string`                         | —          |
-| `uniqueSuffix`            | `boolean`                        | `false`    |
-| `uniqueSuffixLength`      | `number`                         | `5`        |
-| `uniqueSuffixSeparator`   | `string`                         | `'_'`      |
-| `uniqueSuffixCharset`     | `string`                         | _built-in_ |
 | `startsWith`              | `string`                         | —          |
 | `unique`                  | `boolean`                        | `false`    |
 
 Themes: `animal`, `object`, `nature`, `plant`, `gem`, `concept`, `myth`, `job`, `music`, `place`, `food`, `sport`, `vehicle`, `product`.
+
+## Prefixes and suffixes
+
+`randSuffix` and `randPrefix` attach a random token to a string, or to every string in an array — which is what turns a nickname that is merely unlikely to collide into one that cannot. They take anything, not just this library's output, which is why they are not an option on the generators.
+
+```javascript
+import { randNickname, randPrefix, randSuffix } from 'randino';
+
+randSuffix('멋진사자'); // '멋진사자_nVtRC'
+randSuffix(randNickname({ language: 'ko', count: 2 }));
+// ['달력_U7aNZ', '조용한바구니_RUKAP']
+
+randPrefix('order-4021', { length: 4, separator: '-' }); // 'k3Rm-order-4021'
+randSuffix('MistyOwl', { length: 8, charset: '0123456789' }); // 'MistyOwl_40218836'
+```
+
+| Option      | Type     | Default    |
+| ----------- | -------- | ---------- |
+| `length`    | `number` | `5`        |
+| `separator` | `string` | `'_'`      |
+| `charset`   | `string` | _built-in_ |
+
+A fresh token per value, never one for the batch. The default charset leaves out `0O1lI`, because these end up in names people read aloud and type back in.
 
 ## Helpers and constants
 
@@ -132,7 +147,7 @@ nameSupportsRoman('en'); // false
 nicknameLengthRange('ko'); // [1, 12]
 ```
 
-`NAME_LANGUAGES`, `NICKNAME_LANGUAGES` and `NICKNAME_THEMES` list what the generators accept; `NAME_COUNT_MAX`, `NAME_LENGTH_MIN` / `_MAX`, `NICKNAME_COUNT_MAX`, `NICKNAME_LENGTH_MIN` / `_MAX`, `NICKNAME_SUFFIX_LENGTH_MAX` and `NICKNAME_SUFFIX_CHARSET` are the bounds every option is clamped to.
+`NAME_LANGUAGES`, `NICKNAME_LANGUAGES` and `NICKNAME_THEMES` list what the generators accept; `NAME_COUNT_MAX`, `NAME_LENGTH_MIN` / `_MAX`, `NICKNAME_COUNT_MAX`, `NICKNAME_LENGTH_MIN` / `_MAX`, `AFFIX_LENGTH_DEFAULT` / `_MAX`, `AFFIX_SEPARATOR_DEFAULT` and `AFFIX_CHARSET` are the bounds and defaults every option is clamped to.
 
 ## Development
 

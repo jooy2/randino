@@ -44,7 +44,7 @@ Korean and Japanese cannot be held to that check — 하늘, 별 and 森 are eve
 | Function | Returns |
 | --- | --- |
 | [`randNickname`](./rand-nickname) | The nicknames as strings |
-| [`randNicknameDetails`](./rand-nickname-details) | The words, the suffix, the language and the theme behind each |
+| [`randNicknameDetails`](./rand-nickname-details) | The words, the language and the theme behind each |
 | [`nicknameLengthRange`](./nickname-length-range) | Every length a language can produce |
 
 The nouns come from fourteen [themes](./themes), and every nickname is built around a word from one of them.
@@ -137,14 +137,14 @@ rand_nickname(language="en", word_separator="-", count=4)
 
 It is not cosmetic: **its length is part of the nickname's**, so a separator narrows the range the same way a longer word does. Pass it to `nicknameLengthRange` to see what is left.
 
-### The unique suffix sits outside the length range
+### A unique suffix is not an option here
 
-<Lang js="minLength" dart="minLength" py="min_length" code /> and <Lang js="maxLength" dart="maxLength" py="max_length" code /> describe the readable part. The suffix is appended after they have been satisfied, so it never eats into them — and it is what makes a nickname collision-free rather than merely unlikely.
+It used to be four of them. Attaching a random token to a string is a thing about strings rather than about nicknames, so it is [`randSuffix`](../affix/rand-suffix) now — which takes these nicknames, or a name, or an order number.
 
 ::: lang js
 
 ```javascript
-randNickname({ language: 'ko', count: 3, uniqueSuffix: true });
+randSuffix(randNickname({ language: 'ko', count: 3 }));
 // ['달력_U7aNZ', '금빛독수리다발_AVcCV', '조용한바구니_RUKAP']
 ```
 
@@ -153,7 +153,7 @@ randNickname({ language: 'ko', count: 3, uniqueSuffix: true });
 ::: lang dart
 
 ```dart
-randNickname(language: NicknameLanguage.ko, count: 3, uniqueSuffix: true);
+randSuffixAll(randNickname(language: NicknameLanguage.ko, count: 3));
 // ['달력_U7aNZ', '금빛독수리다발_AVcCV', '조용한바구니_RUKAP']
 ```
 
@@ -162,13 +162,13 @@ randNickname(language: NicknameLanguage.ko, count: 3, uniqueSuffix: true);
 ::: lang py
 
 ```python
-rand_nickname(language="ko", count=3, unique_suffix=True)
+rand_suffix(rand_nickname(language="ko", count=3))
 # ['달력_U7aNZ', '금빛독수리다발_AVcCV', '조용한바구니_RUKAP']
 ```
 
 :::
 
-Its separator is independent of <Lang js="wordSeparator" dart="wordSeparator" py="word_separator" code />; give both the same character and the suffix stops standing out.
+Because the token is attached afterwards, <Lang js="minLength" dart="minLength" py="min_length" code /> and <Lang js="maxLength" dart="maxLength" py="max_length" code /> describe the whole nickname and have nothing to exclude.
 
 ### `baseWord` pins the word and varies the decoration
 
@@ -252,6 +252,6 @@ rand_nickname(language="en", style=100, count=3)
 
 :::
 
-### `unique`, and why the suffix is usually the better answer
+### `unique`, and why a suffix is usually the better answer
 
-Korean and English have over nine million word combinations each, so duplicates are rare either way. `unique` rules them out inside one call and returns fewer nicknames once the pools run out; <Lang js="uniqueSuffix" dart="uniqueSuffix" py="unique_suffix" code /> makes collisions impossible across calls, across processes and across users, which is the guarantee a sign-up form actually needs.
+Korean and English have over nine million word combinations each, so duplicates are rare either way. `unique` rules them out inside one call and returns fewer nicknames once the pools run out; [`randSuffix`](../affix/rand-suffix) makes collisions impossible across calls, across processes and across users, which is the guarantee a sign-up form actually needs.

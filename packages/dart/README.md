@@ -79,14 +79,11 @@ randNickname(language: NicknameLanguage.en, count: 2);
 randNickname(language: NicknameLanguage.ko, theme: NicknameTheme.animal, count: 2);
 // ['깊은연어', '하얀여우갈기']
 
-randNickname(language: NicknameLanguage.ko, uniqueSuffix: true, count: 2);
-// ['달력_U7aNZ', '조용한바구니_RUKAP']
-
 randNickname(baseWord: '고양이', count: 3);
 // ['하얀고양이', '고양이바람', '귀여운고양이뿔']
 
-randNicknameDetails(language: NicknameLanguage.ko, uniqueSuffix: true).first;
-// NicknameDetail(오래된발견_zVShs, [오래된, 발견], ko, concept)
+randNicknameDetails(language: NicknameLanguage.ko).first;
+// NicknameDetail(오래된발견, [오래된, 발견], ko, concept)
 ```
 
 | Parameter                 | Type                | Default                |
@@ -99,14 +96,31 @@ randNicknameDetails(language: NicknameLanguage.ko, uniqueSuffix: true).first;
 | `includeModifier`         | `bool`              | `true`                 |
 | `wordSeparator`           | `String?`           | _language_             |
 | `baseWord`                | `String?`           | `null`                 |
-| `uniqueSuffix`            | `bool`              | `false`                |
-| `uniqueSuffixLength`      | `int`               | `5`                    |
-| `uniqueSuffixSeparator`   | `String`            | `'_'`                  |
-| `uniqueSuffixCharset`     | `String?`           | _built-in_             |
 | `startsWith`              | `String?`           | `null`                 |
 | `unique`                  | `bool`              | `false`                |
 
 Themes: `animal`, `object`, `nature`, `plant`, `gem`, `concept`, `myth`, `job`, `music`, `place`, `food`, `sport`, `vehicle`, `product`.
+
+## Prefixes and suffixes
+
+`randSuffix` and `randPrefix` attach a random token to a string — which is what turns a nickname that is merely unlikely to collide into one that cannot. They take anything, not just this library's output, which is why they are not a parameter on the generators.
+
+```dart
+randSuffix('멋진사자'); // '멋진사자_nVtRC'
+randSuffixAll(randNickname(language: NicknameLanguage.ko, count: 2));
+// ['달력_U7aNZ', '조용한바구니_RUKAP']
+
+randPrefix('order-4021', length: 4, separator: '-'); // 'k3Rm-order-4021'
+randSuffix('MistyOwl', length: 8, charset: '0123456789'); // 'MistyOwl_40218836'
+```
+
+| Parameter   | Type      | Default    |
+| ----------- | --------- | ---------- |
+| `length`    | `int`     | `5`        |
+| `separator` | `String`  | `'_'`      |
+| `charset`   | `String?` | _built-in_ |
+
+A fresh token per value, never one for the batch. The default charset leaves out `0O1lI`, because these end up in names people read aloud and type back in. The `…All` forms are Dart's answer to a signature the other two packages write as `String | List<String>`.
 
 ## Helpers and constants
 
@@ -118,7 +132,7 @@ nameSupportsRoman(NameLanguage.en); // false
 nicknameLengthRange(language: NicknameLanguage.ko); // LengthRange(1, 12)
 ```
 
-`nameLanguages`, `nicknameLanguages` and `nicknameThemes` list what the generators accept; `nameCountMax`, `nameLengthMin` / `Max`, `nicknameCountMax`, `nicknameLengthMin` / `Max`, `nicknameSuffixLengthMax` and `nicknameSuffixCharset` are the bounds every parameter is clamped to.
+`nameLanguages`, `nicknameLanguages` and `nicknameThemes` list what the generators accept; `nameCountMax`, `nameLengthMin` / `Max`, `nicknameCountMax`, `nicknameLengthMin` / `Max`, `affixLengthDefault` / `Max`, `affixSeparatorDefault` and `affixCharset` are the bounds and defaults every parameter is clamped to.
 
 ## Differences from the npm package
 

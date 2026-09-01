@@ -318,81 +318,6 @@ void main() {
           );
         }
       }
-
-      // The unique suffix keeps its own separator.
-      for (final nickname in randNickname(
-        language: NicknameLanguage.en,
-        wordSeparator: '-',
-        uniqueSuffix: true,
-        count: 20,
-      )) {
-        expect(
-          nickname,
-          matches(RegExp(r'^[A-Za-z]+(-[A-Za-z]+)*_[0-9A-Za-z]{5}$')),
-          reason: nickname,
-        );
-      }
-    });
-
-    test('uniqueSuffix appends a token that the length options ignore', () {
-      for (final detail in randNicknameDetails(
-        language: NicknameLanguage.ko,
-        count: sample,
-        uniqueSuffix: true,
-        minLength: 4,
-        maxLength: 6,
-      )) {
-        expect(detail.suffix, matches(RegExp(r'^_[0-9A-Za-z]{5}$')), reason: detail.nickname);
-        expect(detail.words.join() + detail.suffix, detail.nickname);
-        // The range covers the nickname, not the suffix.
-        final word = detail.nickname.substring(0, detail.nickname.length - detail.suffix.length);
-
-        expect(word.length, inInclusiveRange(4, 6), reason: detail.nickname);
-        expect(word, matches(script[NicknameLanguage.ko]!), reason: detail.nickname);
-      }
-
-      // The token is what makes a nickname collision-free rather than unlikely.
-      final many = randNickname(language: NicknameLanguage.ko, count: 2000, uniqueSuffix: true);
-
-      expect(many.toSet().length, 2000);
-    });
-
-    test('the unique suffix is configurable', () {
-      for (final nickname in randNickname(
-        language: NicknameLanguage.en,
-        count: 20,
-        uniqueSuffix: true,
-        uniqueSuffixLength: 8,
-        uniqueSuffixSeparator: '-',
-      )) {
-        expect(nickname, matches(RegExp(r'^[A-Za-z]+-[0-9A-Za-z]{8}$')), reason: nickname);
-      }
-
-      for (final nickname in randNickname(
-        language: NicknameLanguage.ko,
-        count: 20,
-        uniqueSuffix: true,
-        uniqueSuffixLength: 4,
-        uniqueSuffixCharset: '0123456789',
-      )) {
-        expect(nickname, matches(RegExp(r'^[가-힣]+_[0-9]{4}$')), reason: nickname);
-      }
-
-      // An empty separator is a valid choice, and lengths are clamped.
-      for (final nickname in randNickname(
-        language: NicknameLanguage.en,
-        count: 20,
-        uniqueSuffix: true,
-        uniqueSuffixSeparator: '',
-        uniqueSuffixLength: 0,
-      )) {
-        expect(nickname, matches(RegExp(r'^[A-Za-z]+[0-9A-Za-z]$')), reason: nickname);
-      }
-
-      // No suffix unless it was asked for.
-      for (final detail in randNicknameDetails(count: 20, uniqueSuffixLength: 8)) {
-        expect(detail.suffix, isEmpty);
-      }
     });
 
     test('baseWord keeps the word and varies only the decoration', () {
@@ -520,10 +445,10 @@ void main() {
     });
 
     test('randNicknameDetails reports the pieces it used', () {
-      for (final detail in randNicknameDetails(count: 100, uniqueSuffix: true)) {
+      for (final detail in randNicknameDetails(count: 100)) {
         final joiner = nicknameData[detail.language]!.joiner;
 
-        expect(detail.words.join(joiner) + detail.suffix, detail.nickname);
+        expect(detail.words.join(joiner), detail.nickname);
         expect(nicknameLanguages, contains(detail.language));
         expect(detail.theme == null || nicknameThemes.contains(detail.theme), isTrue);
       }

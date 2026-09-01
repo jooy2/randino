@@ -12,8 +12,9 @@
 // - `wordSeparator` decides what goes between the words, defaulting to the way
 //   the language joins them.
 // - `baseWord` pins the noun, so only the decoration varies.
-// - `uniqueSuffix` appends a random token, which is what makes a nickname
-//   collision-free rather than merely unlikely.
+//
+// What used to be the fifth entry here, `uniqueSuffix`, is `randSuffix` now:
+// attaching a token to a string was never a thing about nicknames.
 
 import 'package:randino/src/internal/utils.dart';
 import 'package:randino/src/nickname/data/index.dart';
@@ -553,10 +554,6 @@ List<NicknameDetail> generateNicknameDetails({
   bool includeModifier = true,
   String? wordSeparator,
   String? baseWord,
-  bool uniqueSuffix = false,
-  int uniqueSuffixLength = 5,
-  String uniqueSuffixSeparator = '_',
-  String? uniqueSuffixCharset,
   String? startsWith,
   bool unique = false,
 }) {
@@ -577,12 +574,6 @@ List<NicknameDetail> generateNicknameDetails({
   final resolvedCount = clampInt(count, 0, nicknameCountMax);
   final prefix = settings.prefix.toLowerCase();
 
-  final suffixLength = uniqueSuffix ? clampInt(uniqueSuffixLength, 1, nicknameSuffixLengthMax) : 0;
-  final charset =
-      (uniqueSuffixCharset == null || uniqueSuffixCharset.isEmpty)
-          ? nicknameSuffixCharset
-          : uniqueSuffixCharset;
-
   final seen = <String>{};
   final nicknames = <NicknameDetail>[];
   final maxAttempts = resolvedCount * 50 + 500;
@@ -600,21 +591,16 @@ List<NicknameDetail> generateNicknameDetails({
     if (word.isEmpty) continue;
     if (prefix.isNotEmpty && !word.toLowerCase().startsWith(prefix)) continue;
 
-    final suffix =
-        suffixLength > 0 ? uniqueSuffixSeparator + randToken(suffixLength, charset) : '';
-    final nickname = word + suffix;
-
     if (unique) {
-      if (seen.contains(nickname)) continue;
+      if (seen.contains(word)) continue;
 
-      seen.add(nickname);
+      seen.add(word);
     }
 
     nicknames.add(
       NicknameDetail(
-        nickname: nickname,
+        nickname: word,
         words: List<String>.unmodifiable(built.words),
-        suffix: suffix,
         language: code,
         theme: built.theme,
       ),

@@ -138,7 +138,7 @@ nickname_length_range("en", word_separator=" ")  # (3, 32)
 
 **범위보다 긴 <Lang js="baseWord" dart="baseWord" py="base_word" code />는 범위를 넓힙니다.** 단어가 잘리지 않습니다. 이 함수는 언어 고유의 단어 풀만을 설명하므로 그 결과가 여기에 반영되지는 않지만, `randNickname`은 넘겨받은 단어를 그렇게 다룹니다.
 
-**고유 접미사는 범위 밖에 완전히 벗어나 있습니다.** <Lang js="minLength" dart="minLength" py="min_length" code />와 <Lang js="maxLength" dart="maxLength" py="max_length" code />는 읽는 부분만을 가리키고, 접미사는 그 조건을 만족한 뒤에 덧붙습니다.
+**무작위 접미사는 이 범위 밖에 있습니다.** [`randSuffix`](../affix/rand-suffix)는 닉네임이 완성된 뒤에 토큰을 붙이므로, <Lang js="minLength" dart="minLength" py="min_length" code />와 <Lang js="maxLength" dart="maxLength" py="max_length" code />는 닉네임 전체를 가리키며 빼고 셀 것이 없습니다.
 
 ## 함께 보기
 

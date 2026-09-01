@@ -77,14 +77,11 @@ rand_nickname(language="en", count=2)
 rand_nickname(language="ko", theme="animal", count=2)
 # ['깊은연어', '하얀여우갈기']
 
-rand_nickname(language="ko", unique_suffix=True, count=2)
-# ['달력_U7aNZ', '조용한바구니_RUKAP']
-
 rand_nickname(base_word="고양이", count=3)
 # ['하얀고양이', '고양이바람', '귀여운고양이뿔']
 
-rand_nickname_details(language="ko", unique_suffix=True)[0]
-# NicknameDetail(nickname='오래된발견_zVShs', words=('오래된', '발견'), suffix='_zVShs', language='ko', theme='concept')
+rand_nickname_details(language="ko")[0]
+# NicknameDetail(nickname='오래된발견', words=('오래된', '발견'), language='ko', theme='concept')
 ```
 
 | Argument                    | Type                              | Default    |
@@ -97,16 +94,35 @@ rand_nickname_details(language="ko", unique_suffix=True)[0]
 | `include_modifier`          | `bool`                            | `True`     |
 | `word_separator`            | `str \| None`                     | _language_ |
 | `base_word`                 | `str`                             | `""`       |
-| `unique_suffix`             | `bool`                            | `False`    |
-| `unique_suffix_length`      | `int`                             | `5`        |
-| `unique_suffix_separator`   | `str`                             | `"_"`      |
-| `unique_suffix_charset`     | `str`                             | _built-in_ |
 | `starts_with`               | `str`                             | `""`       |
 | `unique`                    | `bool`                            | `False`    |
 
 `language` is the one argument whose default is `None` rather than `"all"`, and the two are not the same thing: left out, a `base_word` picks the language it is written in, so `"고양이"` is never handed an English modifier. Passing `"all"` mixes every language regardless.
 
 Themes: `animal`, `object`, `nature`, `plant`, `gem`, `concept`, `myth`, `job`, `music`, `place`, `food`, `sport`, `vehicle`, `product`.
+
+## Prefixes and suffixes
+
+`rand_suffix` and `rand_prefix` attach a random token to a string, or to every string in a list — which is what turns a nickname that is merely unlikely to collide into one that cannot. They take anything, not just this library's output, which is why they are not an argument on the generators.
+
+```python
+from randino import rand_nickname, rand_prefix, rand_suffix
+
+rand_suffix("멋진사자")  # '멋진사자_nVtRC'
+rand_suffix(rand_nickname(language="ko", count=2))
+# ['달력_U7aNZ', '조용한바구니_RUKAP']
+
+rand_prefix("order-4021", length=4, separator="-")  # 'k3Rm-order-4021'
+rand_suffix("MistyOwl", length=8, charset="0123456789")  # 'MistyOwl_40218836'
+```
+
+| Argument    | Type  | Default    |
+| ----------- | ----- | ---------- |
+| `length`    | `int` | `5`        |
+| `separator` | `str` | `"_"`      |
+| `charset`   | `str` | _built-in_ |
+
+A fresh token per value, never one for the batch. The default charset leaves out `0O1lI`, because these end up in names people read aloud and type back in. `value` is positional, the rest keyword-only, and the overloads carry the shape through: a `str` in gives a `str`, a `list[str]` gives a `list[str]`.
 
 ## Helpers and constants
 
@@ -120,7 +136,7 @@ name_supports_roman("en")  # False
 nickname_length_range("ko")  # (1, 12)
 ```
 
-`NAME_LANGUAGES`, `NICKNAME_LANGUAGES` and `NICKNAME_THEMES` list what the generators accept; `NAME_COUNT_MAX`, `NAME_LENGTH_MIN` / `MAX`, `NICKNAME_COUNT_MAX`, `NICKNAME_LENGTH_MIN` / `MAX`, `NICKNAME_SUFFIX_LENGTH_MAX` and `NICKNAME_SUFFIX_CHARSET` are the bounds every argument is clamped to.
+`NAME_LANGUAGES`, `NICKNAME_LANGUAGES` and `NICKNAME_THEMES` list what the generators accept; `NAME_COUNT_MAX`, `NAME_LENGTH_MIN` / `MAX`, `NICKNAME_COUNT_MAX`, `NICKNAME_LENGTH_MIN` / `MAX`, `AFFIX_LENGTH_DEFAULT` / `MAX`, `AFFIX_SEPARATOR_DEFAULT` and `AFFIX_CHARSET` are the bounds and defaults every argument is clamped to.
 
 ## Differences from the npm package
 

@@ -61,21 +61,17 @@ import {
 	NICKNAME_LANGUAGES,
 	NICKNAME_LENGTH_MAX,
 	NICKNAME_LENGTH_MIN,
-	NICKNAME_SUFFIX_CHARSET,
-	NICKNAME_SUFFIX_LENGTH_MAX,
 	NICKNAME_THEMES
 } from 'randino';
 ```
 
-| 이름                         | 타입                 | 값                        |
-| ---------------------------- | -------------------- | ------------------------- |
-| `NICKNAME_LANGUAGES`         | `NicknameLanguage[]` | 지원하는 모든 닉네임 언어 |
-| `NICKNAME_THEMES`            | `NicknameTheme[]`    | 14개 테마 전체            |
-| `NICKNAME_LENGTH_MIN`        | `number`             | `1`                       |
-| `NICKNAME_LENGTH_MAX`        | `number`             | `40`                      |
-| `NICKNAME_COUNT_MAX`         | `number`             | `10000`                   |
-| `NICKNAME_SUFFIX_LENGTH_MAX` | `number`             | `32`                      |
-| `NICKNAME_SUFFIX_CHARSET`    | `string`             | 기본 접미사 문자 집합     |
+| 이름                  | 타입                 | 값                        |
+| --------------------- | -------------------- | ------------------------- |
+| `NICKNAME_LANGUAGES`  | `NicknameLanguage[]` | 지원하는 모든 닉네임 언어 |
+| `NICKNAME_THEMES`     | `NicknameTheme[]`    | 14개 테마 전체            |
+| `NICKNAME_LENGTH_MIN` | `number`             | `1`                       |
+| `NICKNAME_LENGTH_MAX` | `number`             | `40`                      |
+| `NICKNAME_COUNT_MAX`  | `number`             | `10000`                   |
 
 :::
 
@@ -85,15 +81,13 @@ import {
 import 'package:randino/randino.dart';
 ```
 
-| 이름                      | 타입                     | 값                        |
-| ------------------------- | ------------------------ | ------------------------- |
-| `nicknameLanguages`       | `List<NicknameLanguage>` | 지원하는 모든 닉네임 언어 |
-| `nicknameThemes`          | `List<NicknameTheme>`    | 14개 테마 전체            |
-| `nicknameLengthMin`       | `int`                    | `1`                       |
-| `nicknameLengthMax`       | `int`                    | `40`                      |
-| `nicknameCountMax`        | `int`                    | `10000`                   |
-| `nicknameSuffixLengthMax` | `int`                    | `32`                      |
-| `nicknameSuffixCharset`   | `String`                 | 기본 접미사 문자 집합     |
+| 이름                | 타입                     | 값                        |
+| ------------------- | ------------------------ | ------------------------- |
+| `nicknameLanguages` | `List<NicknameLanguage>` | 지원하는 모든 닉네임 언어 |
+| `nicknameThemes`    | `List<NicknameTheme>`    | 14개 테마 전체            |
+| `nicknameLengthMin` | `int`                    | `1`                       |
+| `nicknameLengthMax` | `int`                    | `40`                      |
+| `nicknameCountMax`  | `int`                    | `10000`                   |
 
 :::
 
@@ -105,41 +99,91 @@ from randino import (
     NICKNAME_LANGUAGES,
     NICKNAME_LENGTH_MAX,
     NICKNAME_LENGTH_MIN,
-    NICKNAME_SUFFIX_CHARSET,
-    NICKNAME_SUFFIX_LENGTH_MAX,
     NICKNAME_THEMES,
 )
 ```
 
-| 이름                         | 타입                         | 값                        |
-| ---------------------------- | ---------------------------- | ------------------------- |
-| `NICKNAME_LANGUAGES`         | `tuple[NicknameLanguage, …]` | 지원하는 모든 닉네임 언어 |
-| `NICKNAME_THEMES`            | `tuple[NicknameTheme, …]`    | 14개 테마 전체            |
-| `NICKNAME_LENGTH_MIN`        | `int`                        | `1`                       |
-| `NICKNAME_LENGTH_MAX`        | `int`                        | `40`                      |
-| `NICKNAME_COUNT_MAX`         | `int`                        | `10000`                   |
-| `NICKNAME_SUFFIX_LENGTH_MAX` | `int`                        | `32`                      |
-| `NICKNAME_SUFFIX_CHARSET`    | `str`                        | 기본 접미사 문자 집합     |
+| 이름                  | 타입                         | 값                        |
+| --------------------- | ---------------------------- | ------------------------- |
+| `NICKNAME_LANGUAGES`  | `tuple[NicknameLanguage, …]` | 지원하는 모든 닉네임 언어 |
+| `NICKNAME_THEMES`     | `tuple[NicknameTheme, …]`    | 14개 테마 전체            |
+| `NICKNAME_LENGTH_MIN` | `int`                        | `1`                       |
+| `NICKNAME_LENGTH_MAX` | `int`                        | `40`                      |
+| `NICKNAME_COUNT_MAX`  | `int`                        | `10000`                   |
 
 :::
 
-접미사 문자 집합은 영숫자에서 **헷갈리는 쌍을 뺀 것**입니다. `0`과 `O`가 없고 `1`, `l`, `I`도 없습니다. 닉네임은 누군가 화면에서 읽고 다른 화면에 입력하는 것이며, 그 다섯 글자가 바로 그 지점에서 문제를 일으킵니다.
-
-<Lang js="uniqueSuffixCharset" dart="uniqueSuffixCharset" py="unique_suffix_charset" code />으로 좁히거나 넓힐 수 있습니다. 알파벳 전체가 아니라 기본값에서 출발하면 이 성질이 유지됩니다.
+## 접미사와 접두사 {#affixes}
 
 ::: lang js
 
 ```javascript
-import { NICKNAME_SUFFIX_CHARSET, randNickname } from 'randino';
+import {
+	AFFIX_CHARSET,
+	AFFIX_LENGTH_DEFAULT,
+	AFFIX_LENGTH_MAX,
+	AFFIX_SEPARATOR_DEFAULT
+} from 'randino';
+```
+
+| 이름                      | 타입     | 값                    |
+| ------------------------- | -------- | --------------------- |
+| `AFFIX_LENGTH_DEFAULT`    | `number` | `5`                   |
+| `AFFIX_LENGTH_MAX`        | `number` | `32`                  |
+| `AFFIX_SEPARATOR_DEFAULT` | `string` | `'_'`                 |
+| `AFFIX_CHARSET`           | `string` | 토큰의 기본 문자 집합 |
+
+:::
+
+::: lang dart
+
+```dart
+import 'package:randino/randino.dart';
+```
+
+| 이름                    | 타입     | 값                    |
+| ----------------------- | -------- | --------------------- |
+| `affixLengthDefault`    | `int`    | `5`                   |
+| `affixLengthMax`        | `int`    | `32`                  |
+| `affixSeparatorDefault` | `String` | `'_'`                 |
+| `affixCharset`          | `String` | 토큰의 기본 문자 집합 |
+
+:::
+
+::: lang py
+
+```python
+from randino import (
+    AFFIX_CHARSET,
+    AFFIX_LENGTH_DEFAULT,
+    AFFIX_LENGTH_MAX,
+    AFFIX_SEPARATOR_DEFAULT,
+)
+```
+
+| 이름                      | 타입  | 값                    |
+| ------------------------- | ----- | --------------------- |
+| `AFFIX_LENGTH_DEFAULT`    | `int` | `5`                   |
+| `AFFIX_LENGTH_MAX`        | `int` | `32`                  |
+| `AFFIX_SEPARATOR_DEFAULT` | `str` | `"_"`                 |
+| `AFFIX_CHARSET`           | `str` | 토큰의 기본 문자 집합 |
+
+:::
+
+이 문자 집합은 영숫자에서 **헷갈리는 쌍을 뺀 것**입니다. `0`과 `O`가 없고 `1`, `l`, `I`도 없습니다. 접미사는 누군가 화면에서 읽고 다른 화면에 입력하는 값이며, 그 다섯 글자가 바로 그 지점에서 문제를 일으킵니다.
+
+<Lang js="charset" dart="charset" py="charset" code />으로 좁히거나 넓힐 수 있습니다. 알파벳 전체가 아니라 기본값에서 출발하면 이 성질이 유지됩니다.
+
+::: lang js
+
+```javascript
+import { AFFIX_CHARSET, randSuffix } from 'randino';
 
 // 숫자만.
-randNickname({ uniqueSuffix: true, uniqueSuffixCharset: '0123456789' });
+randSuffix('MistyOwl', { charset: '0123456789' });
 
-// 기본값에서 대문자만 뺀 것.
-randNickname({
-	uniqueSuffix: true,
-	uniqueSuffixCharset: NICKNAME_SUFFIX_CHARSET.replace(/[A-Z]/g, '')
-});
+// 기본값에서 대문자를 뺀 것.
+randSuffix('MistyOwl', { charset: AFFIX_CHARSET.replace(/[A-Z]/g, '') });
 ```
 
 :::
@@ -150,13 +194,10 @@ randNickname({
 import 'package:randino/randino.dart';
 
 // 숫자만.
-randNickname(uniqueSuffix: true, uniqueSuffixCharset: '0123456789');
+randSuffix('MistyOwl', charset: '0123456789');
 
-// 기본값에서 대문자만 뺀 것.
-randNickname(
-  uniqueSuffix: true,
-  uniqueSuffixCharset: nicknameSuffixCharset.replaceAll(RegExp('[A-Z]'), ''),
-);
+// 기본값에서 대문자를 뺀 것.
+randSuffix('MistyOwl', charset: affixCharset.replaceAll(RegExp('[A-Z]'), ''));
 ```
 
 :::
@@ -164,16 +205,13 @@ randNickname(
 ::: lang py
 
 ```python
-from randino import NICKNAME_SUFFIX_CHARSET, rand_nickname
+from randino import AFFIX_CHARSET, rand_suffix
 
 # 숫자만.
-rand_nickname(unique_suffix=True, unique_suffix_charset="0123456789")
+rand_suffix("MistyOwl", charset="0123456789")
 
-# 기본값에서 대문자만 뺀 것.
-rand_nickname(
-    unique_suffix=True,
-    unique_suffix_charset="".join(c for c in NICKNAME_SUFFIX_CHARSET if not c.isupper()),
-)
+# 기본값에서 대문자를 뺀 것.
+rand_suffix("MistyOwl", charset="".join(c for c in AFFIX_CHARSET if not c.isupper()))
 ```
 
 :::

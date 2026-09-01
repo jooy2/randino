@@ -45,15 +45,11 @@ Every option is optional, and the defaults are what the empty call above uses.
 | `theme` | <Lang js="NicknameThemeOption" dart="NicknameTheme?" py="NicknameThemeOption" code /> | <Lang js="'all'" dart="null" py="&quot;all&quot;" code /> | What the nickname is about. See [Themes](./themes). |
 | `count` | <Lang js="number" dart="int" py="int" code /> | `1` | How many nicknames to return. Clamped to `0` … `10000`. |
 | `style` | <Lang js="number" dart="int" py="int" code /> | `0` | `0` uses real words, `100` invents words that only read like the language, and anything between mixes the two. |
-| <Lang js="minLength" dart="minLength" py="min_length" code /> | <Lang js="number" dart="int?" py="int &#124; None" code /> | _language_ | Minimum length in characters, the unique suffix **not** counted. |
-| <Lang js="maxLength" dart="maxLength" py="max_length" code /> | <Lang js="number" dart="int?" py="int &#124; None" code /> | _language_ | Maximum length in characters, the unique suffix **not** counted. |
+| <Lang js="minLength" dart="minLength" py="min_length" code /> | <Lang js="number" dart="int?" py="int &#124; None" code /> | _language_ | Minimum length in characters. |
+| <Lang js="maxLength" dart="maxLength" py="max_length" code /> | <Lang js="number" dart="int?" py="int &#124; None" code /> | _language_ | Maximum length in characters. |
 | <Lang js="includeModifier" dart="includeModifier" py="include_modifier" code /> | <Lang js="boolean" dart="bool" py="bool" code /> | <Lang js="true" dart="true" py="True" code /> | Decorate the word — `멋진사자` rather than `사자`. |
 | <Lang js="wordSeparator" dart="wordSeparator" py="word_separator" code /> | <Lang js="string" dart="String?" py="str &#124; None" code /> | _language_ | Placed between the words. Counts toward the length range. Defaults to running them together. |
 | <Lang js="baseWord" dart="baseWord" py="base_word" code /> | <Lang js="string" dart="String?" py="str" code /> | <Lang js="—" dart="null" py="&quot;&quot;" code /> | Build every nickname around this word, varying only the decoration. |
-| <Lang js="uniqueSuffix" dart="uniqueSuffix" py="unique_suffix" code /> | <Lang js="boolean" dart="bool" py="bool" code /> | <Lang js="false" dart="false" py="False" code /> | Append a random token so no two people end up with the same nickname. |
-| <Lang js="uniqueSuffixLength" dart="uniqueSuffixLength" py="unique_suffix_length" code /> | <Lang js="number" dart="int" py="int" code /> | `5` | Characters in the token. Clamped to `1` … `32`. |
-| <Lang js="uniqueSuffixSeparator" dart="uniqueSuffixSeparator" py="unique_suffix_separator" code /> | <Lang js="string" dart="String" py="str" code /> | <Lang js="'_'" dart="'_'" py="&quot;_&quot;" code /> | Placed between the nickname and the token. An empty string joins them directly. |
-| <Lang js="uniqueSuffixCharset" dart="uniqueSuffixCharset" py="unique_suffix_charset" code /> | <Lang js="string" dart="String?" py="str" code /> | _built-in_ | Characters the token is drawn from. Defaults to alphanumerics without the pairs that misread (`0O`, `1lI`). |
 | <Lang js="startsWith" dart="startsWith" py="starts_with" code /> | <Lang js="string" dart="String?" py="str" code /> | <Lang js="—" dart="null" py="&quot;&quot;" code /> | Keep only nicknames whose first character is this one. |
 | `unique` | <Lang js="boolean" dart="bool" py="bool" code /> | <Lang js="false" dart="false" py="False" code /> | Never return the same nickname twice. May return fewer than `count` once the pools run out of combinations. |
 
@@ -243,19 +239,15 @@ Its length counts toward <Lang js="minLength" dart="minLength" py="min_length" c
 
 ### A unique suffix
 
+There is no option for one — [`randSuffix`](../affix/rand-suffix) attaches a random token to whatever you hand it, these nicknames included.
+
 ::: lang js
 
 ```javascript
-randNickname({ language: 'ko', count: 3, uniqueSuffix: true });
+randSuffix(randNickname({ language: 'ko', count: 3 }));
 // ['달력_U7aNZ', '금빛독수리다발_AVcCV', '조용한바구니_RUKAP']
 
-randNickname({
-	language: 'ko',
-	count: 2,
-	uniqueSuffix: true,
-	uniqueSuffixLength: 8,
-	uniqueSuffixSeparator: '-'
-});
+randSuffix(randNickname({ language: 'ko', count: 2 }), { length: 8, separator: '-' });
 // ['금빛앵무새여행-Qw9NND4j', '느린연필-uxscYCy6']
 ```
 
@@ -264,15 +256,13 @@ randNickname({
 ::: lang dart
 
 ```dart
-randNickname(language: NicknameLanguage.ko, count: 3, uniqueSuffix: true);
+randSuffixAll(randNickname(language: NicknameLanguage.ko, count: 3));
 // ['달력_U7aNZ', '금빛독수리다발_AVcCV', '조용한바구니_RUKAP']
 
-randNickname(
-  language: NicknameLanguage.ko,
-  count: 2,
-  uniqueSuffix: true,
-  uniqueSuffixLength: 8,
-  uniqueSuffixSeparator: '-',
+randSuffixAll(
+  randNickname(language: NicknameLanguage.ko, count: 2),
+  length: 8,
+  separator: '-',
 );
 // ['금빛앵무새여행-Qw9NND4j', '느린연필-uxscYCy6']
 ```
@@ -282,22 +272,16 @@ randNickname(
 ::: lang py
 
 ```python
-rand_nickname(language="ko", count=3, unique_suffix=True)
+rand_suffix(rand_nickname(language="ko", count=3))
 # ['달력_U7aNZ', '금빛독수리다발_AVcCV', '조용한바구니_RUKAP']
 
-rand_nickname(
-    language="ko",
-    count=2,
-    unique_suffix=True,
-    unique_suffix_length=8,
-    unique_suffix_separator="-",
-)
+rand_suffix(rand_nickname(language="ko", count=2), length=8, separator="-")
 # ['금빛앵무새여행-Qw9NND4j', '느린연필-uxscYCy6']
 ```
 
 :::
 
-The suffix is appended **after** <Lang js="minLength" dart="minLength" py="min_length" code /> / <Lang js="maxLength" dart="maxLength" py="max_length" code /> have been satisfied, so those options describe the readable part and the suffix never eats into it.
+Because it happens afterwards, <Lang js="minLength" dart="minLength" py="min_length" code /> / <Lang js="maxLength" dart="maxLength" py="max_length" code /> describe the whole nickname rather than the part in front of a suffix.
 
 ### A word of your own
 
@@ -379,6 +363,7 @@ rand_nickname(language="en", style=100, count=3)
 
 ## See also
 
-- [`randNicknameDetails`](./rand-nickname-details) — the same nicknames with the words, the suffix and the theme reported separately.
+- [`randNicknameDetails`](./rand-nickname-details) — the same nicknames with the words, the language and the theme reported separately.
+- [`randSuffix`](../affix/rand-suffix) — the random token, for when a nickname has to be collision-free.
 - [Themes](./themes) — the fourteen slices of vocabulary a nickname is built from.
 - [`nicknameLengthRange`](./nickname-length-range) — every length a language can produce.

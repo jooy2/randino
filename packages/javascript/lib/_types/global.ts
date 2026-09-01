@@ -106,12 +106,9 @@ export interface RandNicknameOptions {
 	 * like the language, and values in between mix the two. Default `0`.
 	 */
 	style?: number;
-	/**
-	 * Minimum length of the nickname, in characters, not counting the unique
-	 * suffix. Defaults to the language's own range.
-	 */
+	/** Minimum length of the nickname, in characters. Defaults to the language's own range. */
 	minLength?: number;
-	/** Maximum length of the nickname, in characters, not counting the unique suffix. */
+	/** Maximum length of the nickname, in characters. */
 	maxLength?: number;
 	/** Decorate the noun with a modifier (`멋진사자` rather than `사자`). Default `true`. */
 	includeModifier?: boolean;
@@ -127,17 +124,6 @@ export interface RandNicknameOptions {
 	 * the decoration — `'고양이'` gives `멋진고양이`, `고양이꼬리`, `파란고양이발바닥`.
 	 */
 	baseWord?: string;
-	/**
-	 * Append a random suffix so that two people asking at the same time do not end
-	 * up with the same nickname (`멋진사자_nVtRC`). Default `false`.
-	 */
-	uniqueSuffix?: boolean;
-	/** Characters in the unique suffix. Default `5`, maximum `32`. */
-	uniqueSuffixLength?: number;
-	/** Placed between the nickname and its unique suffix. Default `'_'`. */
-	uniqueSuffixSeparator?: string;
-	/** Characters the unique suffix is drawn from. Defaults to alphanumerics without `0O1lI`. */
-	uniqueSuffixCharset?: string;
 	/** Keep only nicknames whose first character is this one. */
 	startsWith?: string;
 	/**
@@ -147,14 +133,22 @@ export interface RandNicknameOptions {
 	unique?: boolean;
 }
 
+/** What `randSuffix` and `randPrefix` attach — the same three for both. */
+export interface RandAffixOptions {
+	/** Characters in the token. Default `5`, maximum `32`. */
+	length?: number;
+	/** Placed between the value and its token. Default `'_'`. */
+	separator?: string;
+	/** Characters the token is drawn from. Defaults to alphanumerics without `0O1lI`. */
+	charset?: string;
+}
+
 /** A generated nickname with the pieces it was built from. */
 export interface NicknameDetail {
-	/** The finished nickname, unique suffix included. */
+	/** The finished nickname. */
 	nickname: string;
-	/** The words the nickname is made of, in order, without the unique suffix. */
+	/** The words the nickname is made of, in order. */
 	words: string[];
-	/** The unique suffix, separator included. Empty when `uniqueSuffix` is off. */
-	suffix: string;
 	language: NicknameLanguage;
 	/**
 	 * Theme the nickname's base word belongs to, or `null` when that word is not

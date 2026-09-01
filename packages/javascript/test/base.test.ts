@@ -7,6 +7,10 @@ describe('base test', () => {
 		// The package entry point is the API contract: everything documented in the
 		// README has to be reachable from it, and nothing internal should leak.
 		assert.deepStrictEqual(Object.keys(randino).sort(), [
+			'AFFIX_CHARSET',
+			'AFFIX_LENGTH_DEFAULT',
+			'AFFIX_LENGTH_MAX',
+			'AFFIX_SEPARATOR_DEFAULT',
 			'NAME_COUNT_MAX',
 			'NAME_LANGUAGES',
 			'NAME_LENGTH_MAX',
@@ -15,8 +19,6 @@ describe('base test', () => {
 			'NICKNAME_LANGUAGES',
 			'NICKNAME_LENGTH_MAX',
 			'NICKNAME_LENGTH_MIN',
-			'NICKNAME_SUFFIX_CHARSET',
-			'NICKNAME_SUFFIX_LENGTH_MAX',
 			'NICKNAME_THEMES',
 			'nameLengthRange',
 			'nameSupportsMiddleName',
@@ -25,7 +27,9 @@ describe('base test', () => {
 			'randName',
 			'randNameDetails',
 			'randNickname',
-			'randNicknameDetails'
+			'randNicknameDetails',
+			'randPrefix',
+			'randSuffix'
 		]);
 
 		assert.strictEqual(typeof randino.randName, 'function');
@@ -46,7 +50,12 @@ describe('base test', () => {
 		assert.strictEqual(randino.NICKNAME_LENGTH_MIN, 1);
 		assert.strictEqual(randino.NICKNAME_LENGTH_MAX, 40);
 		assert.strictEqual(randino.NICKNAME_COUNT_MAX, 10000);
-		assert.strictEqual(randino.NICKNAME_SUFFIX_LENGTH_MAX, 32);
-		assert.match(randino.NICKNAME_SUFFIX_CHARSET, /^[0-9A-Za-z]+$/);
+
+		assert.strictEqual(typeof randino.randSuffix, 'function');
+		assert.strictEqual(typeof randino.randPrefix, 'function');
+		assert.strictEqual(randino.AFFIX_LENGTH_DEFAULT, 5);
+		assert.strictEqual(randino.AFFIX_LENGTH_MAX, 32);
+		assert.strictEqual(randino.AFFIX_SEPARATOR_DEFAULT, '_');
+		assert.match(randino.AFFIX_CHARSET, /^[0-9A-Za-z]+$/);
 	});
 });

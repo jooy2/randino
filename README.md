@@ -13,7 +13,7 @@ Every option, every language and every example — pick **JavaScript**, **Dart**
 **randino** generates random text in the language you ask for. Today that is person names and nicknames; the shape it is built in — one function per kind of text, one set of options, per-language datasets — is meant to hold whatever comes next.
 
 - **Person names** read like names people actually carry — 김민준, Emma Clover, Иванов Иван — and come with their English pronunciation. 9 languages.
-- **Nicknames** are the handles you would pick for a game or a website — 멋진사자, MistyOwl, 고양이꼬리. Built from everyday words across fourteen themes, never from person names, with over nine million combinations in Korean and English before the unique suffix is added.
+- **Nicknames** are the handles you would pick for a game or a website — 멋진사자, MistyOwl, 고양이꼬리. Built from everyday words across fourteen themes, never from person names, with over nine million combinations in Korean and English before a random suffix is added.
 - One options set per generator: language, length, count, and a style setting that runs from realistic to fully invented.
 - **No runtime dependencies**, in any of the packages.
 
@@ -36,7 +36,7 @@ npm install randino
 ```
 
 ```javascript
-import { randName, randNickname } from 'randino';
+import { randName, randNickname, randSuffix } from 'randino';
 
 randName({ language: 'ko', count: 3 });
 // ['김태윤', '원동혁', '조진우']
@@ -49,6 +49,9 @@ randNickname({ language: 'ko', count: 3 });
 
 randNickname({ baseWord: '고양이', count: 3 });
 // ['하얀고양이', '고양이바람', '귀여운고양이뿔']
+
+randSuffix(randNickname({ language: 'ko', count: 2 }));
+// ['달력_U7aNZ', '조용한바구니_RUKAP']
 ```
 
 ESM, typed, and no runtime dependencies. [**The JavaScript quick start**](packages/javascript/README.md) has the rest.
@@ -73,6 +76,9 @@ randNickname(language: NicknameLanguage.ko, count: 3);
 
 randNickname(baseWord: '고양이', count: 3);
 // ['하얀고양이', '고양이바람', '귀여운고양이뿔']
+
+randSuffixAll(randNickname(language: NicknameLanguage.ko, count: 2));
+// ['달력_U7aNZ', '조용한바구니_RUKAP']
 ```
 
 Pure Dart — it imports nothing but `dart:math`, so it runs on the VM, on the web and inside Flutter on every platform. Options are named parameters rather than an options object, which is the one deliberate difference from the JavaScript API. [**The Dart quick start**](packages/dart/README.md) has the rest.
@@ -84,7 +90,7 @@ pip install randino
 ```
 
 ```python
-from randino import rand_name, rand_nickname
+from randino import rand_name, rand_nickname, rand_suffix
 
 rand_name(language="ko", count=3)
 # ['김태윤', '원동혁', '조진우']
@@ -97,6 +103,9 @@ rand_nickname(language="ko", count=3)
 
 rand_nickname(base_word="고양이", count=3)
 # ['하얀고양이', '고양이바람', '귀여운고양이뿔']
+
+rand_suffix(rand_nickname(language="ko", count=2))
+# ['달력_U7aNZ', '조용한바구니_RUKAP']
 ```
 
 Pure Python — it imports nothing outside the standard library, and ships a `py.typed` marker so mypy and Pyright read its annotations. Options are keyword-only arguments in `snake_case`; the values are the same strings the JavaScript package takes, typed as `Literal`. [**The Python quick start**](packages/python/README.md) has the rest.
@@ -123,6 +132,7 @@ Every generator takes a language, or mixes every language it supports when you l
 | ------------ | ----------------------------------------- | ---------------------------------------------- | ------------------- |
 | Person names | `randName`, `randNameDetails`         | `rand_name`, `rand_name_details`           | 김민준 → Kim Minjun |
 | Nicknames    | `randNickname`, `randNicknameDetails` | `rand_nickname`, `rand_nickname_details`   | 멋진사자, MistyOwl  |
+| Random affixes | `randSuffix`, `randPrefix`              | `rand_suffix`, `rand_prefix`                 | 멋진사자_nVtRC      |
 
 The full option tables, the fourteen nickname themes and the romanization rules are on the [documentation site](https://randino.cdget.com).
 

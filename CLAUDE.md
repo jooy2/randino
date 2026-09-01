@@ -11,9 +11,11 @@ Guidance for AI agents (and humans) working in this repository. Written in Engli
 
 Both generators are implemented. Keep them apart — a shared "generator" abstraction is not wanted, but shared _helpers_ (`_internal`) are.
 
+Beside them sits **affix**, which generates nothing a person reads: `randSuffix` and `randPrefix` attach a random token to a string you already have (`멋진사자` → `멋진사자_nVtRC`). It used to be the nickname generator's `uniqueSuffix*` options, and it moved out because attaching a token to a string was never a thing about nicknames. The generators are about the words now, and any caller with a string can reach for it.
+
 The name generator is a port of the logic behind vutools' [Random Person Name Generator](https://www.vutools.com/tools/text/random-person-name-generator) (`client/src/app/[locale]/tools/text/random-person-name-generator` in the `www-vutools-com` repo), with the same options. Two deliberate differences: the web page's `es-hangul` dependency is replaced by an internal romanizer (see below), and length bounds are resolved per language so `language: 'all'` does not stretch a Korean name to fill a Spanish name's range.
 
-The nickname generator has no upstream — it is this repo's own. Its options mirror the name generator's where they mean the same thing (`language`, `count`, `style`, `minLength` / `maxLength`, `startsWith`, `unique`), and add `theme`, `includeModifier`, `baseWord` and the `uniqueSuffix*` group.
+The nickname generator has no upstream — it is this repo's own. Its options mirror the name generator's where they mean the same thing (`language`, `count`, `style`, `minLength` / `maxLength`, `startsWith`, `unique`), and add `theme`, `includeModifier` and `baseWord`.
 
 ## Repository layout
 
@@ -36,6 +38,12 @@ lib/
   _internal/
     utils.ts                # shared random/string helpers, never exported
     parse.ts                # words() / tokens() / romanMap() dataset helpers
+  affix/
+    index.ts                # the category's public surface
+    randSuffix.ts           # public: string | string[] -> the same, token attached
+    randPrefix.ts           # public: the mirror of it
+    attach.ts               # internal: the one line the two of them differ by
+    data/index.ts           # AFFIX_CHARSET, the length bounds, the separator
   name/
     index.ts                # the category's public surface
     randName.ts           # public: string[]
@@ -55,14 +63,15 @@ lib/
     randNickname.ts       # public: string[]
     randNicknameDetails.ts
     nicknameLengthRange.ts  # public helper
-    nicknameGenerator.ts    # internal: shapes, length fitting, suffix
+    nicknameGenerator.ts    # internal: shapes, length fitting
     data/
       index.ts              # NICKNAME_DATA, languages, themes, bounds
       types.ts
       en.ts ko.ts ja.ts zh.ts
 test/
   base.test.ts              # the package's export surface
-  name.test.ts              # one *.test.ts per category
+  affix.test.ts             # one *.test.ts per category
+  name.test.ts
   nickname.test.ts
 ```
 
@@ -117,6 +126,7 @@ lib/
     internal/
       utils.dart            # pick / randInt / chance / clamp, never exported
       parse.dart            # words() / pairs() / weightMap() / romanMap()
+    affix/                  # mirrors lib/affix, plus the `…All` list forms
     name/                   # mirrors lib/name in the JavaScript package
       data/                 # one file per language, ported verbatim
       romanize.dart
@@ -125,6 +135,7 @@ lib/
     nickname/               # mirrors lib/nickname
 test/
   base_test.dart            # the barrel's export surface, read out of the source
+  affix_test.dart
   name_test.dart
   nickname_test.dart
 ```
@@ -150,6 +161,10 @@ test/
 
 `String.normalize('NFD')` does not exist in Dart and there is no diacritic property to strip against, so `romanize.dart` folds Latin accents through a **written-out table** instead. It covers more than the pools hold on purpose, and `test/name_test.dart` folds every entry of every `RomanMode.fold` pool and asserts the result is ASCII — that test is what keeps a newly added `ư` from silently surviving into a supposedly romanized name. It has already caught one.
 
+### The second thing, and it is `randSuffix`
+
+Dart has neither overloads nor union types, so `String | List<String>` cannot be one function. `randSuffix` takes a `String` and `randSuffixAll` takes a `List<String>`, and the same for `randPrefix` — four functions where npm and PyPI have two. Do not try to fake it with `Object` or a generic: `T extends Object` would type-check `randSuffix(3)` and fail at run time, which is worse than a second name.
+
 ### Keeping the ports in step
 
 The JavaScript package is the source of truth. A behaviour change lands there first, then in each port, in the same commit where that is practical. Every suite asserts the same properties over the same pools, so a port that drifted shows up as a test that passes on one side and fails on another — which is the point of porting the tests rather than writing new ones.
@@ -165,6 +180,7 @@ src/randino/
   _internal/
     utils.py                # pick / rand_int / chance / clamp, never exported
     parse.py                # words() / tokens() / weights() / roman_map()
+  affix/                    # mirrors lib/affix; `@overload` carries the shape
   name/                     # mirrors lib/name in the JavaScript package
     data/                   # one file per language, ported verbatim
     _romanize.py
@@ -174,6 +190,7 @@ src/randino/
   py.typed                  # PEP 561 — without it every annotation is ignored
 tests/
   test_base.py              # the barrel's export surface, and the no-dependency rule
+  test_affix.py
   test_name.py
   test_nickname.py
 ```
@@ -317,7 +334,7 @@ Nicknames:
 - **Length picks the shape, not the words.** `PATTERNS` are filtered to the ones that can land inside the range, then each slot is given the room left after the slots behind it have reserved their minimum. That is why a narrow range drops the modifier instead of truncating a word.
 - **The default range is wide on purpose** (`nicknameLengthRange('ko')` is `[1, 12]`): it spans every shape, and the pattern weights — not the range — decide what output usually looks like.
 - **`wordSeparator` replaces the language's joiner, everywhere.** It is not cosmetic: its length is part of the nickname's, so `patternRange`, `buildWords`, `lengthBounds` and `naturalRange` all read it through `joinerOf` rather than touching `data.joiner`. Reading `data.joiner` directly again is how a separated nickname starts overshooting `maxLength`. It also turns off the boundary-repeat re-draw — `石-霜` does not stutter the way `石霜` does.
-- **The unique suffix is outside the length range.** `minLength` / `maxLength` describe the readable part; the suffix is appended afterwards.
+- **A unique suffix is not a nickname option.** `randSuffix` attaches one to any string, so `minLength` / `maxLength` describe the whole nickname and nothing has to be excluded from them.
 - **`theme` is reported, not asserted.** A word drawn from a theme reports it, a given `baseWord` is looked up across all themes, and an invented word reports `null`.
 - **Two rough spots trigger a re-draw** rather than being shipped: a `startsWith` that no real word in the rolled theme matched (another theme probably has one), and a word ending on the character the next one starts with (`石霜` + `霜雨`). Both fall back to the closest attempt if every attempt is rough.
 - **Invented-word templates stay short.** Two or three syllables per word, because up to three words are joined; `en` is capped at two.

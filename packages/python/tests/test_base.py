@@ -14,6 +14,10 @@ def test_the_package_exports_exactly_its_public_api() -> None:
     # `__all__` is the API contract: everything documented in the README has to be
     # reachable from it, and nothing internal should leak.
     assert sorted(randino.__all__) == [
+        "AFFIX_CHARSET",
+        "AFFIX_LENGTH_DEFAULT",
+        "AFFIX_LENGTH_MAX",
+        "AFFIX_SEPARATOR_DEFAULT",
         "NAME_COUNT_MAX",
         "NAME_LANGUAGES",
         "NAME_LENGTH_MAX",
@@ -22,8 +26,6 @@ def test_the_package_exports_exactly_its_public_api() -> None:
         "NICKNAME_LANGUAGES",
         "NICKNAME_LENGTH_MAX",
         "NICKNAME_LENGTH_MIN",
-        "NICKNAME_SUFFIX_CHARSET",
-        "NICKNAME_SUFFIX_LENGTH_MAX",
         "NICKNAME_THEMES",
         "NameDetail",
         "NameGender",
@@ -44,6 +46,8 @@ def test_the_package_exports_exactly_its_public_api() -> None:
         "rand_name_details",
         "rand_nickname",
         "rand_nickname_details",
+        "rand_prefix",
+        "rand_suffix",
     ]
 
     for name in randino.__all__:
@@ -69,8 +73,13 @@ def test_the_functions_are_callable_and_the_constants_are_what_they_claim() -> N
     assert randino.NICKNAME_LENGTH_MIN == 1
     assert randino.NICKNAME_LENGTH_MAX == 40
     assert randino.NICKNAME_COUNT_MAX == 10000
-    assert randino.NICKNAME_SUFFIX_LENGTH_MAX == 32
-    assert re.fullmatch(r"[0-9A-Za-z]+", randino.NICKNAME_SUFFIX_CHARSET)
+
+    assert callable(randino.rand_suffix)
+    assert callable(randino.rand_prefix)
+    assert randino.AFFIX_LENGTH_DEFAULT == 5
+    assert randino.AFFIX_LENGTH_MAX == 32
+    assert randino.AFFIX_SEPARATOR_DEFAULT == "_"
+    assert re.fullmatch(r"[0-9A-Za-z]+", randino.AFFIX_CHARSET)
 
 
 def test_the_package_imports_nothing_outside_the_standard_library() -> None:

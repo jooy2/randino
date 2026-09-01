@@ -47,7 +47,7 @@ features:
 ::: lang js
 
 ```javascript
-import { randName, randNickname } from 'randino';
+import { randName, randNickname, randSuffix } from 'randino';
 
 randName({ language: 'ko', count: 3 });
 // ['김태윤', '원동혁', '조진우']
@@ -58,7 +58,7 @@ randName({ language: 'ru', gender: 'female', includeMiddleName: true });
 randNickname({ language: 'ko', count: 3 });
 // ['오래된곰', '영원한도마뱀', '귀여운신화다발']
 
-randNickname({ language: 'en', uniqueSuffix: true, count: 2 });
+randSuffix(randNickname({ language: 'en', count: 2 }));
 // ['FoggyHillside_gDe2C', 'CraneVoyage_nVtRC']
 ```
 
@@ -82,7 +82,7 @@ randName(
 randNickname(language: NicknameLanguage.ko, count: 3);
 // ['오래된곰', '영원한도마뱀', '귀여운신화다발']
 
-randNickname(language: NicknameLanguage.en, uniqueSuffix: true, count: 2);
+randSuffixAll(randNickname(language: NicknameLanguage.en, count: 2));
 // ['FoggyHillside_gDe2C', 'CraneVoyage_nVtRC']
 ```
 
@@ -91,7 +91,7 @@ randNickname(language: NicknameLanguage.en, uniqueSuffix: true, count: 2);
 ::: lang py
 
 ```python
-from randino import rand_name, rand_nickname
+from randino import rand_name, rand_nickname, rand_suffix
 
 rand_name(language="ko", count=3)
 # ['김태윤', '원동혁', '조진우']
@@ -102,7 +102,7 @@ rand_name(language="ru", gender="female", include_middle_name=True)
 rand_nickname(language="ko", count=3)
 # ['오래된곰', '영원한도마뱀', '귀여운신화다발']
 
-rand_nickname(language="en", unique_suffix=True, count=2)
+rand_suffix(rand_nickname(language="en", count=2))
 # ['FoggyHillside_gDe2C', 'CraneVoyage_nVtRC']
 ```
 

@@ -61,21 +61,17 @@ import {
 	NICKNAME_LANGUAGES,
 	NICKNAME_LENGTH_MAX,
 	NICKNAME_LENGTH_MIN,
-	NICKNAME_SUFFIX_CHARSET,
-	NICKNAME_SUFFIX_LENGTH_MAX,
 	NICKNAME_THEMES
 } from 'randino';
 ```
 
-| Name                         | Type                 | Value                             |
-| ---------------------------- | -------------------- | --------------------------------- |
-| `NICKNAME_LANGUAGES`         | `NicknameLanguage[]` | Every supported nickname language |
-| `NICKNAME_THEMES`            | `NicknameTheme[]`    | All fourteen themes               |
-| `NICKNAME_LENGTH_MIN`        | `number`             | `1`                               |
-| `NICKNAME_LENGTH_MAX`        | `number`             | `40`                              |
-| `NICKNAME_COUNT_MAX`         | `number`             | `10000`                           |
-| `NICKNAME_SUFFIX_LENGTH_MAX` | `number`             | `32`                              |
-| `NICKNAME_SUFFIX_CHARSET`    | `string`             | The default suffix characters     |
+| Name                  | Type                 | Value                             |
+| --------------------- | -------------------- | --------------------------------- |
+| `NICKNAME_LANGUAGES`  | `NicknameLanguage[]` | Every supported nickname language |
+| `NICKNAME_THEMES`     | `NicknameTheme[]`    | All fourteen themes               |
+| `NICKNAME_LENGTH_MIN` | `number`             | `1`                               |
+| `NICKNAME_LENGTH_MAX` | `number`             | `40`                              |
+| `NICKNAME_COUNT_MAX`  | `number`             | `10000`                           |
 
 :::
 
@@ -85,15 +81,13 @@ import {
 import 'package:randino/randino.dart';
 ```
 
-| Name                      | Type                     | Value                             |
-| ------------------------- | ------------------------ | --------------------------------- |
-| `nicknameLanguages`       | `List<NicknameLanguage>` | Every supported nickname language |
-| `nicknameThemes`          | `List<NicknameTheme>`    | All fourteen themes               |
-| `nicknameLengthMin`       | `int`                    | `1`                               |
-| `nicknameLengthMax`       | `int`                    | `40`                              |
-| `nicknameCountMax`        | `int`                    | `10000`                           |
-| `nicknameSuffixLengthMax` | `int`                    | `32`                              |
-| `nicknameSuffixCharset`   | `String`                 | The default suffix characters     |
+| Name                | Type                     | Value                             |
+| ------------------- | ------------------------ | --------------------------------- |
+| `nicknameLanguages` | `List<NicknameLanguage>` | Every supported nickname language |
+| `nicknameThemes`    | `List<NicknameTheme>`    | All fourteen themes               |
+| `nicknameLengthMin` | `int`                    | `1`                               |
+| `nicknameLengthMax` | `int`                    | `40`                              |
+| `nicknameCountMax`  | `int`                    | `10000`                           |
 
 :::
 
@@ -105,41 +99,91 @@ from randino import (
     NICKNAME_LANGUAGES,
     NICKNAME_LENGTH_MAX,
     NICKNAME_LENGTH_MIN,
-    NICKNAME_SUFFIX_CHARSET,
-    NICKNAME_SUFFIX_LENGTH_MAX,
     NICKNAME_THEMES,
 )
 ```
 
-| Name                         | Type                         | Value                             |
-| ---------------------------- | ---------------------------- | --------------------------------- |
-| `NICKNAME_LANGUAGES`         | `tuple[NicknameLanguage, …]` | Every supported nickname language |
-| `NICKNAME_THEMES`            | `tuple[NicknameTheme, …]`    | All fourteen themes               |
-| `NICKNAME_LENGTH_MIN`        | `int`                        | `1`                               |
-| `NICKNAME_LENGTH_MAX`        | `int`                        | `40`                              |
-| `NICKNAME_COUNT_MAX`         | `int`                        | `10000`                           |
-| `NICKNAME_SUFFIX_LENGTH_MAX` | `int`                        | `32`                              |
-| `NICKNAME_SUFFIX_CHARSET`    | `str`                        | The default suffix characters     |
+| Name                  | Type                         | Value                             |
+| --------------------- | ---------------------------- | --------------------------------- |
+| `NICKNAME_LANGUAGES`  | `tuple[NicknameLanguage, …]` | Every supported nickname language |
+| `NICKNAME_THEMES`     | `tuple[NicknameTheme, …]`    | All fourteen themes               |
+| `NICKNAME_LENGTH_MIN` | `int`                        | `1`                               |
+| `NICKNAME_LENGTH_MAX` | `int`                        | `40`                              |
+| `NICKNAME_COUNT_MAX`  | `int`                        | `10000`                           |
 
 :::
 
-The suffix charset is alphanumerics **minus the pairs that misread**: no `0` or `O`, no `1`, `l` or `I`. A nickname is something somebody reads off a screen and types into another one, and those five characters are where that goes wrong.
-
-Narrow it or extend it through <Lang js="uniqueSuffixCharset" dart="uniqueSuffixCharset" py="unique_suffix_charset" code /> — starting from the default rather than from the alphabet keeps that property:
+## Affixes
 
 ::: lang js
 
 ```javascript
-import { NICKNAME_SUFFIX_CHARSET, randNickname } from 'randino';
+import {
+	AFFIX_CHARSET,
+	AFFIX_LENGTH_DEFAULT,
+	AFFIX_LENGTH_MAX,
+	AFFIX_SEPARATOR_DEFAULT
+} from 'randino';
+```
+
+| Name                      | Type     | Value                        |
+| ------------------------- | -------- | ---------------------------- |
+| `AFFIX_LENGTH_DEFAULT`    | `number` | `5`                          |
+| `AFFIX_LENGTH_MAX`        | `number` | `32`                         |
+| `AFFIX_SEPARATOR_DEFAULT` | `string` | `'_'`                        |
+| `AFFIX_CHARSET`           | `string` | The default token characters |
+
+:::
+
+::: lang dart
+
+```dart
+import 'package:randino/randino.dart';
+```
+
+| Name                    | Type     | Value                        |
+| ----------------------- | -------- | ---------------------------- |
+| `affixLengthDefault`    | `int`    | `5`                          |
+| `affixLengthMax`        | `int`    | `32`                         |
+| `affixSeparatorDefault` | `String` | `'_'`                        |
+| `affixCharset`          | `String` | The default token characters |
+
+:::
+
+::: lang py
+
+```python
+from randino import (
+    AFFIX_CHARSET,
+    AFFIX_LENGTH_DEFAULT,
+    AFFIX_LENGTH_MAX,
+    AFFIX_SEPARATOR_DEFAULT,
+)
+```
+
+| Name                      | Type  | Value                        |
+| ------------------------- | ----- | ---------------------------- |
+| `AFFIX_LENGTH_DEFAULT`    | `int` | `5`                          |
+| `AFFIX_LENGTH_MAX`        | `int` | `32`                         |
+| `AFFIX_SEPARATOR_DEFAULT` | `str` | `"_"`                        |
+| `AFFIX_CHARSET`           | `str` | The default token characters |
+
+:::
+
+The charset is alphanumerics **minus the pairs that misread**: no `0` or `O`, no `1`, `l` or `I`. An affix is something somebody reads off a screen and types into another one, and those five characters are where that goes wrong.
+
+Narrow it or extend it through <Lang js="charset" dart="charset" py="charset" code /> — starting from the default rather than from the alphabet keeps that property:
+
+::: lang js
+
+```javascript
+import { AFFIX_CHARSET, randSuffix } from 'randino';
 
 // Digits only.
-randNickname({ uniqueSuffix: true, uniqueSuffixCharset: '0123456789' });
+randSuffix('MistyOwl', { charset: '0123456789' });
 
 // The default, minus the upper case.
-randNickname({
-	uniqueSuffix: true,
-	uniqueSuffixCharset: NICKNAME_SUFFIX_CHARSET.replace(/[A-Z]/g, '')
-});
+randSuffix('MistyOwl', { charset: AFFIX_CHARSET.replace(/[A-Z]/g, '') });
 ```
 
 :::
@@ -150,13 +194,10 @@ randNickname({
 import 'package:randino/randino.dart';
 
 // Digits only.
-randNickname(uniqueSuffix: true, uniqueSuffixCharset: '0123456789');
+randSuffix('MistyOwl', charset: '0123456789');
 
 // The default, minus the upper case.
-randNickname(
-  uniqueSuffix: true,
-  uniqueSuffixCharset: nicknameSuffixCharset.replaceAll(RegExp('[A-Z]'), ''),
-);
+randSuffix('MistyOwl', charset: affixCharset.replaceAll(RegExp('[A-Z]'), ''));
 ```
 
 :::
@@ -164,16 +205,13 @@ randNickname(
 ::: lang py
 
 ```python
-from randino import NICKNAME_SUFFIX_CHARSET, rand_nickname
+from randino import AFFIX_CHARSET, rand_suffix
 
 # Digits only.
-rand_nickname(unique_suffix=True, unique_suffix_charset="0123456789")
+rand_suffix("MistyOwl", charset="0123456789")
 
 # The default, minus the upper case.
-rand_nickname(
-    unique_suffix=True,
-    unique_suffix_charset="".join(c for c in NICKNAME_SUFFIX_CHARSET if not c.isupper()),
-)
+rand_suffix("MistyOwl", charset="".join(c for c in AFFIX_CHARSET if not c.isupper()))
 ```
 
 :::

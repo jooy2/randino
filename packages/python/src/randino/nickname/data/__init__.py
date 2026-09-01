@@ -44,13 +44,7 @@ NICKNAME_LENGTH_MIN = 1
 """Lower bound for `min_length`, in characters of the nickname itself."""
 
 NICKNAME_LENGTH_MAX = 40
-"""Upper bound for `max_length`. The unique suffix is not counted."""
+"""Upper bound for `max_length`."""
 
 NICKNAME_COUNT_MAX = 10000
 """Upper bound for `count`."""
-
-NICKNAME_SUFFIX_LENGTH_MAX = 32
-"""Upper bound for `unique_suffix_length`."""
-
-NICKNAME_SUFFIX_CHARSET = "abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789"
-"""Suffix characters, minus the pairs that are easy to misread (0/O, 1/l/I)."""

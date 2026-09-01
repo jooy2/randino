@@ -45,15 +45,11 @@ rand_nickname()
 | `theme` | <Lang js="NicknameThemeOption" dart="NicknameTheme?" py="NicknameThemeOption" code /> | <Lang js="'all'" dart="null" py="&quot;all&quot;" code /> | 닉네임의 주제. [테마](./themes)를 참고하세요. |
 | `count` | <Lang js="number" dart="int" py="int" code /> | `1` | 반환할 닉네임의 개수. `0` … `10000` 범위로 제한됩니다. |
 | `style` | <Lang js="number" dart="int" py="int" code /> | `0` | `0`은 실제 단어를, `100`은 그 언어처럼 읽히기만 하는 단어를 만들어 씁니다. 중간값은 둘을 섞습니다. |
-| <Lang js="minLength" dart="minLength" py="min_length" code /> | <Lang js="number" dart="int?" py="int &#124; None" code /> | _언어별_ | 최소 글자 수. 고유 접미사는 **세지 않습니다**. |
-| <Lang js="maxLength" dart="maxLength" py="max_length" code /> | <Lang js="number" dart="int?" py="int &#124; None" code /> | _언어별_ | 최대 글자 수. 고유 접미사는 **세지 않습니다**. |
+| <Lang js="minLength" dart="minLength" py="min_length" code /> | <Lang js="number" dart="int?" py="int &#124; None" code /> | _언어별_ | 최소 글자 수. |
+| <Lang js="maxLength" dart="maxLength" py="max_length" code /> | <Lang js="number" dart="int?" py="int &#124; None" code /> | _언어별_ | 최대 글자 수. |
 | <Lang js="includeModifier" dart="includeModifier" py="include_modifier" code /> | <Lang js="boolean" dart="bool" py="bool" code /> | <Lang js="true" dart="true" py="True" code /> | 단어를 꾸밉니다. `사자`가 아니라 `멋진사자`. |
 | <Lang js="wordSeparator" dart="wordSeparator" py="word_separator" code /> | <Lang js="string" dart="String?" py="str &#124; None" code /> | _언어별_ | 단어 사이에 넣습니다. 길이 범위에 포함됩니다. 기본값은 붙여 쓰는 것입니다. |
 | <Lang js="baseWord" dart="baseWord" py="base_word" code /> | <Lang js="string" dart="String?" py="str" code /> | <Lang js="—" dart="null" py="&quot;&quot;" code /> | 모든 닉네임을 이 단어를 중심으로 만들고 장식만 바꿉니다. |
-| <Lang js="uniqueSuffix" dart="uniqueSuffix" py="unique_suffix" code /> | <Lang js="boolean" dart="bool" py="bool" code /> | <Lang js="false" dart="false" py="False" code /> | 무작위 토큰을 붙여서 두 사람이 같은 닉네임을 갖지 않게 합니다. |
-| <Lang js="uniqueSuffixLength" dart="uniqueSuffixLength" py="unique_suffix_length" code /> | <Lang js="number" dart="int" py="int" code /> | `5` | 토큰의 글자 수. `1` … `32` 범위로 제한됩니다. |
-| <Lang js="uniqueSuffixSeparator" dart="uniqueSuffixSeparator" py="unique_suffix_separator" code /> | <Lang js="string" dart="String" py="str" code /> | <Lang js="'_'" dart="'_'" py="&quot;_&quot;" code /> | 닉네임과 토큰 사이에 넣습니다. 빈 문자열이면 바로 이어 붙입니다. |
-| <Lang js="uniqueSuffixCharset" dart="uniqueSuffixCharset" py="unique_suffix_charset" code /> | <Lang js="string" dart="String?" py="str" code /> | _내장값_ | 토큰을 뽑을 문자 집합. 기본값은 헷갈리는 쌍(`0O`, `1lI`)을 뺀 영숫자입니다. |
 | <Lang js="startsWith" dart="startsWith" py="starts_with" code /> | <Lang js="string" dart="String?" py="str" code /> | <Lang js="—" dart="null" py="&quot;&quot;" code /> | 첫 글자가 이 글자인 닉네임만 반환합니다. |
 | `unique` | <Lang js="boolean" dart="bool" py="bool" code /> | <Lang js="false" dart="false" py="False" code /> | 같은 닉네임을 두 번 반환하지 않습니다. 조합이 바닥나면 `count`보다 적게 반환할 수 있습니다. |
 
@@ -241,21 +237,17 @@ rand_nickname(language="ja", word_separator="・", count=3)
 
 구분자의 길이도 <Lang js="minLength" dart="minLength" py="min_length" code /> / <Lang js="maxLength" dart="maxLength" py="max_length" code />에 포함됩니다. [`nicknameLengthRange`](./nickname-length-range)에 넘겨 보면 남은 범위를 확인할 수 있습니다.
 
-### 고유 접미사
+### 고유 접미사 {#a-unique-suffix}
+
+이를 위한 옵션은 없습니다. [`randSuffix`](../affix/rand-suffix)가 넘겨받은 무엇에든 무작위 토큰을 붙이며, 여기서 만든 닉네임도 그 대상입니다.
 
 ::: lang js
 
 ```javascript
-randNickname({ language: 'ko', count: 3, uniqueSuffix: true });
+randSuffix(randNickname({ language: 'ko', count: 3 }));
 // ['달력_U7aNZ', '금빛독수리다발_AVcCV', '조용한바구니_RUKAP']
 
-randNickname({
-	language: 'ko',
-	count: 2,
-	uniqueSuffix: true,
-	uniqueSuffixLength: 8,
-	uniqueSuffixSeparator: '-'
-});
+randSuffix(randNickname({ language: 'ko', count: 2 }), { length: 8, separator: '-' });
 // ['금빛앵무새여행-Qw9NND4j', '느린연필-uxscYCy6']
 ```
 
@@ -264,15 +256,13 @@ randNickname({
 ::: lang dart
 
 ```dart
-randNickname(language: NicknameLanguage.ko, count: 3, uniqueSuffix: true);
+randSuffixAll(randNickname(language: NicknameLanguage.ko, count: 3));
 // ['달력_U7aNZ', '금빛독수리다발_AVcCV', '조용한바구니_RUKAP']
 
-randNickname(
-  language: NicknameLanguage.ko,
-  count: 2,
-  uniqueSuffix: true,
-  uniqueSuffixLength: 8,
-  uniqueSuffixSeparator: '-',
+randSuffixAll(
+  randNickname(language: NicknameLanguage.ko, count: 2),
+  length: 8,
+  separator: '-',
 );
 // ['금빛앵무새여행-Qw9NND4j', '느린연필-uxscYCy6']
 ```
@@ -282,22 +272,16 @@ randNickname(
 ::: lang py
 
 ```python
-rand_nickname(language="ko", count=3, unique_suffix=True)
+rand_suffix(rand_nickname(language="ko", count=3))
 # ['달력_U7aNZ', '금빛독수리다발_AVcCV', '조용한바구니_RUKAP']
 
-rand_nickname(
-    language="ko",
-    count=2,
-    unique_suffix=True,
-    unique_suffix_length=8,
-    unique_suffix_separator="-",
-)
+rand_suffix(rand_nickname(language="ko", count=2), length=8, separator="-")
 # ['금빛앵무새여행-Qw9NND4j', '느린연필-uxscYCy6']
 ```
 
 :::
 
-접미사는 <Lang js="minLength" dart="minLength" py="min_length" code /> / <Lang js="maxLength" dart="maxLength" py="max_length" code />를 만족한 **뒤에** 덧붙습니다. 그래서 이 옵션들은 읽는 부분만을 가리키고, 접미사가 그 범위를 잠식하지 않습니다.
+토큰은 그 뒤에 붙기 때문에, <Lang js="minLength" dart="minLength" py="min_length" code /> / <Lang js="maxLength" dart="maxLength" py="max_length" code />는 접미사 앞부분이 아니라 닉네임 전체를 가리킵니다.
 
 ### 직접 지정한 단어
 
@@ -379,6 +363,7 @@ rand_nickname(language="en", style=100, count=3)
 
 ## 함께 보기
 
-- [`randNicknameDetails`](./rand-nickname-details) — 같은 닉네임을 단어, 접미사, 테마로 나누어 받기.
+- [`randNicknameDetails`](./rand-nickname-details) — 같은 닉네임을 단어, 언어, 테마로 나누어 받기.
+- [`randSuffix`](../affix/rand-suffix) — 닉네임이 절대 겹치지 않아야 할 때 붙이는 무작위 토큰.
 - [테마](./themes) — 닉네임을 만드는 14개 어휘 묶음.
 - [`nicknameLengthRange`](./nickname-length-range) — 각 언어가 만들 수 있는 모든 길이.
