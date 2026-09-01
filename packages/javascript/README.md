@@ -49,18 +49,18 @@ randomNameDetails({ language: 'ko' });
 // [{ native: '여미주', roman: 'Yeo Miju', language: 'ko', gender: 'female' }]
 ```
 
-| Option              | Type                          | Default    |
-| ------------------- | ----------------------------- | ---------- |
-| `language`          | `'all'` or a language code    | `'all'`    |
-| `gender`            | `'all' \| 'male' \| 'female'` | `'all'`    |
-| `count`             | `number`                      | `1`        |
-| `style`             | `number` (0 real … 100 invented) | `0`     |
-| `minLength` / `maxLength` | `number`                | _language_ |
-| `includeSurname`    | `boolean`                     | `true`     |
-| `includeMiddleName` | `boolean`                     | `false`    |
-| `script`            | `'native' \| 'roman'`         | `'native'` |
-| `startsWith`        | `string`                      | —          |
-| `unique`            | `boolean`                     | `false`    |
+| Option                    | Type                             | Default    |
+| ------------------------- | -------------------------------- | ---------- |
+| `language`                | `'all'` or a language code       | `'all'`    |
+| `gender`                  | `'all' \| 'male' \| 'female'`    | `'all'`    |
+| `count`                   | `number`                         | `1`        |
+| `style`                   | `number` (0 real … 100 invented) | `0`        |
+| `minLength` / `maxLength` | `number`                         | _language_ |
+| `includeSurname`          | `boolean`                        | `true`     |
+| `includeMiddleName`       | `boolean`                        | `false`    |
+| `script`                  | `'native' \| 'roman'`            | `'native'` |
+| `startsWith`              | `string`                         | —          |
+| `unique`                  | `boolean`                        | `false`    |
 
 ## Nicknames
 
@@ -92,22 +92,22 @@ randomNicknameDetails({ language: 'ko', uniqueSuffix: true });
 // }]
 ```
 
-| Option                  | Type                       | Default    |
-| ----------------------- | -------------------------- | ---------- |
-| `language`              | `'all'` or a language code | `'all'`    |
-| `theme`                 | `'all'` or a theme name    | `'all'`    |
-| `count`                 | `number`                   | `1`        |
-| `style`                 | `number` (0 real … 100 invented) | `0`  |
-| `minLength` / `maxLength` | `number`                 | _language_ |
-| `includeModifier`       | `boolean`                  | `true`     |
-| `wordSeparator`         | `string`                   | _language_ |
-| `baseWord`              | `string`                   | —          |
-| `uniqueSuffix`          | `boolean`                  | `false`    |
-| `uniqueSuffixLength`    | `number`                   | `5`        |
-| `uniqueSuffixSeparator` | `string`                   | `'_'`      |
-| `uniqueSuffixCharset`   | `string`                   | _built-in_ |
-| `startsWith`            | `string`                   | —          |
-| `unique`                | `boolean`                  | `false`    |
+| Option                    | Type                             | Default    |
+| ------------------------- | -------------------------------- | ---------- |
+| `language`                | `'all'` or a language code       | `'all'`    |
+| `theme`                   | `'all'` or a theme name          | `'all'`    |
+| `count`                   | `number`                         | `1`        |
+| `style`                   | `number` (0 real … 100 invented) | `0`        |
+| `minLength` / `maxLength` | `number`                         | _language_ |
+| `includeModifier`         | `boolean`                        | `true`     |
+| `wordSeparator`           | `string`                         | _language_ |
+| `baseWord`                | `string`                         | —          |
+| `uniqueSuffix`            | `boolean`                        | `false`    |
+| `uniqueSuffixLength`      | `number`                         | `5`        |
+| `uniqueSuffixSeparator`   | `string`                         | `'_'`      |
+| `uniqueSuffixCharset`     | `string`                         | _built-in_ |
+| `startsWith`              | `string`                         | —          |
+| `unique`                  | `boolean`                        | `false`    |
 
 Themes: `animal`, `object`, `nature`, `plant`, `gem`, `concept`, `myth`, `job`, `music`, `place`, `food`, `sport`, `vehicle`, `product`.
 
