@@ -5,12 +5,14 @@ on:
     branches: [main]
     paths:
       - docs/**
-      # The site reads both packages' manifests and changelogs, so a release on
-      # either side changes what it publishes. Nothing else in `packages/` does.
+      # The site reads every package's manifest and changelog, so a release on
+      # any side changes what it publishes. Nothing else in `packages/` does.
       - packages/javascript/package.json
       - packages/javascript/CHANGELOG.md
       - packages/dart/pubspec.yaml
       - packages/dart/CHANGELOG.md
+      - packages/python/pyproject.toml
+      - packages/python/CHANGELOG.md
       - .github/workflows/publish-documentation.yml
   # Deploy on demand — for a rollback, or after a DNS change that the site's
   # own content had no reason to trigger.

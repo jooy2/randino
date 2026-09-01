@@ -23,15 +23,16 @@ When creating an issue, keep the following in mind:
 
 randino ships for more than one programming language, so there is no single package at the repository root:
 
-| Folder                 | What it is                                    | Where commands run     |
-| ---------------------- | --------------------------------------------- | ---------------------- |
-| `packages/javascript`  | The npm package. `npm run test`, `npm run build` | `packages/javascript`  |
-| `packages/dart`        | The pub.dev package. `dart test`, `dart analyze` | `packages/dart`        |
-| `docs`                 | The documentation site. `npm run dev`, `npm run build` | `docs`           |
+| Folder                | What it is                                             | Where commands run    |
+| --------------------- | ------------------------------------------------------ | --------------------- |
+| `packages/javascript` | The npm package. `npm run test`, `npm run build`       | `packages/javascript` |
+| `packages/dart`       | The pub.dev package. `dart test`, `dart analyze`       | `packages/dart`       |
+| `packages/python`     | The PyPI package. `pytest`, `ruff check .`, `mypy`     | `packages/python`     |
+| `docs`                | The documentation site. `npm run dev`, `npm run build` | `docs`                |
 
-The **JavaScript package is the source of truth**: a behaviour change starts there and the Dart port follows it, and both test suites assert the same properties over the same data. A change that lands on only one side is a bug in the making, so please send both.
+The **JavaScript package is the source of truth**: a behaviour change starts there and the ports follow it, and every test suite asserts the same properties over the same data. A change that lands on only one side is a bug in the making, so please send all of them.
 
-Each package keeps its own `README.md` and `CHANGELOG.md`, because npm and pub.dev read those from the package root. The repository's `README.md` is the only one that describes all of them at once.
+Each package keeps its own `README.md` and `CHANGELOG.md`, because npm, pub.dev and PyPI read those from the package root. The repository's `README.md` is the only one that describes all of them at once.
 
 ## How to contribute (Pull Requests)
 

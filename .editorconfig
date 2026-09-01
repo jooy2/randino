@@ -16,6 +16,13 @@ trim_trailing_whitespace = true
 indent_style = space
 indent_size = 2
 
+# `ruff format` indents with four spaces and is not configurable about it, and
+# PEP 8 says the same. A tab landing in a Python file is a diff the formatter
+# undoes on the next save.
+[*.py]
+indent_style = space
+indent_size = 4
+
 # A tab is not valid indentation in YAML at all, so this one is a syntax error
 # rather than a style disagreement.
 [*.{yaml,yml}]

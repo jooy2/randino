@@ -4,7 +4,7 @@ Guidance for AI agents (and humans) working in this repository. Written in Engli
 
 ## What randino is
 
-**randino** is a zero-dependency library that generates random **person names** and **nicknames**, per language. It ships for more than one programming language — TypeScript today, Dart alongside it — and every one of them generates from the same datasets under the same rules. Two separate concerns, deliberately:
+**randino** is a zero-dependency library that generates random **person names** and **nicknames**, per language. It ships for more than one programming language — TypeScript, Dart and Python — and every one of them generates from the same datasets under the same rules. Two separate concerns, deliberately:
 
 - **Names** should read like names a person actually carries (`김민준`, `Emma Clover`). Sample data for forms, seeds, mockups.
 - **Nicknames** are the handles someone would pick for a game or a website (`멋진사자`, `MistyOwl`). They are built from everyday words and **never from person names** — that rule is the whole point of keeping the two apart.
@@ -21,10 +21,11 @@ The nickname generator has no upstream — it is this repo's own. Its options mi
 packages/
   javascript/   The npm package (`randino`) — the reference implementation
   dart/         The pub.dev package (`randino`) — a port of it, same data, same rules
+  python/       The PyPI package (`randino`) — likewise
 docs/           The documentation site (VitePress), English and Korean
 ```
 
-The **JavaScript package is the source of truth**. A behaviour change starts there, and the Dart port follows it; a change that lands only on one side is a bug in the making. Each package owns its own `README.md` and `CHANGELOG.md` because npm and pub.dev both read those from the package root — the repository's own `README.md` is the only one that describes all of them at once, and there is no changelog at the repository root.
+The **JavaScript package is the source of truth**. A behaviour change starts there, and the ports follow it; a change that lands only on one side is a bug in the making. Each package owns its own `README.md` and `CHANGELOG.md` because npm, pub.dev and PyPI all read those from the package root — the repository's own `README.md` is the only one that describes all of them at once, and there is no changelog at the repository root.
 
 ## The JavaScript package (`packages/javascript`)
 
@@ -149,27 +150,76 @@ test/
 
 `String.normalize('NFD')` does not exist in Dart and there is no diacritic property to strip against, so `romanize.dart` folds Latin accents through a **written-out table** instead. It covers more than the pools hold on purpose, and `test/name_test.dart` folds every entry of every `RomanMode.fold` pool and asserts the result is ASCII — that test is what keeps a newly added `ư` from silently surviving into a supposedly romanized name. It has already caught one.
 
-### Keeping the two in step
+### Keeping the ports in step
 
-The JavaScript package is the source of truth. A behaviour change lands there first, then here, in the same commit where that is practical. Both suites assert the same properties over the same pools, so a port that drifted shows up as a test that passes on one side and fails on the other — which is the point of porting the tests rather than writing new ones.
+The JavaScript package is the source of truth. A behaviour change lands there first, then in each port, in the same commit where that is practical. Every suite asserts the same properties over the same pools, so a port that drifted shows up as a test that passes on one side and fails on another — which is the point of porting the tests rather than writing new ones.
+
+## The Python package (`packages/python`)
+
+A port of the JavaScript package, not a second design. Same datasets, same rules, same numbers; what differs is the surface, which is Python's.
+
+```
+src/randino/
+  __init__.py               # the barrel — its `__all__` IS the public API
+  _types.py                 # ALL public types (Literals, the two details)
+  _internal/
+    utils.py                # pick / rand_int / chance / clamp, never exported
+    parse.py                # words() / tokens() / weights() / roman_map()
+  name/                     # mirrors lib/name in the JavaScript package
+    data/                   # one file per language, ported verbatim
+    _romanize.py
+    _generator.py
+    random_name.py …
+  nickname/                 # mirrors lib/nickname
+  py.typed                  # PEP 561 — without it every annotation is ignored
+tests/
+  test_base.py              # the barrel's export surface, and the no-dependency rule
+  test_name.py
+  test_nickname.py
+```
+
+| Command                | What it does                     |
+| ---------------------- | -------------------------------- |
+| `pytest`               | The suite. No build step         |
+| `ruff check .`         | Lint (`--fix` to fix)            |
+| `ruff format .`        | 4 spaces, double quotes, 100 columns |
+| `mypy`                 | Strict, over `src` and `tests`   |
+| `python -m build`      | What PyPI will receive           |
+
+Set up with `uv venv && uv pip install -e ".[dev]"`, or the `pip` equivalent.
+
+### Conventions
+
+- **Keyword-only arguments, not an options object.** `random_name(language="ko", count=3)`; the `*` in every generator's signature is deliberate, because `random_name("ja", "female", 5)` is both unreadable and a parameter order frozen into the API. The three `name_*` / `nickname_length_range` helpers are the exception — they take their arguments positionally as well, the way the JavaScript ones do, because they are short enough to read either way.
+- **`Literal`, not enums.** `language="ko"` is the same string the npm package takes, and `"all"` survives the crossing intact — which is why Python needs none of Dart's "a null enum means every one of them". The one `None` that means something is `random_nickname`'s `language`: omitted, a `base_word` picks the language it is written in. That is `undefined` vs `'all'` in the npm package too, not an invention.
+- **`tuple[int, int]` replaces `[number, number]`**, and the two details are frozen dataclasses with `slots=True`.
+- **File names are `snake_case`, one public function per file**, named after the function. `__init__.py` re-exports them and `__all__` is the contract.
+- **Imports are absolute** (`from randino.name.data import NAME_DATA`), even inside the package, so a moved file breaks loudly rather than silently.
+- **Everything public carries a docstring**, including inside `_internal`. Ruff's `D` rules are on, Google convention.
+- **`ruff format` owns formatting** — 4 spaces, double quotes, 100 columns. Double quotes rather than the repo's single because that is what the Python ecosystem's formatters emit; each package follows its own language's convention, which is the same reason Dart uses single.
+- **No dependencies.** `test_base.py` walks every module's imports and asserts each one is either stdlib or `randino`, because that promise is the one nothing else fails on.
+
+### Where the port is closer to JavaScript than Dart is
+
+`fold()` is `unicodedata.normalize("NFD")` with the combining marks dropped — exactly what the npm package does. Dart has no normalization and carries a written-out table instead, so the Dart-only fold-coverage test has no counterpart here.
 
 ## The documentation site (`docs/`)
 
-VitePress, in English and Korean, at [randino.cdget.com](https://randino.cdget.com). It documents both packages from one set of pages.
+VitePress, in English and Korean, at [randino.cdget.com](https://randino.cdget.com). It documents every package from one set of pages.
 
 ```
 docs/
   .vitepress/
     config.ts               # locales, sidebar wiring, SEO, the `::: lang` container
     data/
-      languages.ts          # the two packages, and the no-flash head script
+      languages.ts          # the packages, and the no-flash head script
       language.ts           # the reader's choice, as one value the site shares
-      sidebar.ts            # the menu, written out — two label columns, one structure
+      sidebar.ts            # the menu, written out — two locale columns, one structure
       i18n.ts               # the few strings the site's own components render
-    theme/                  # the package switch, and the CSS that displays one half
+    theme/                  # the package switch, and the CSS that displays one variant
   en/  ko/                  # the pages, mirrored
   scripts/
-    copy-changelog.mjs      # both packages' CHANGELOG.md -> docs/<locale>/changelog.md
+    copy-changelog.mjs      # every package's CHANGELOG.md -> docs/<locale>/changelog.md
     check-anchors.mjs       # every `#fragment` link resolves (see below)
   public/logo.svg
 ```
@@ -181,14 +231,16 @@ docs/
 | `npm run typecheck`     | `tsc` over `.vitepress`                             |
 | `npm run format:fix`    | Prettier, in place                                  |
 
-### One page, two packages
+### One page, every package
 
-A page says the same thing about `randomName` whichever package a reader installs; only the code, the option shape and the install line differ. So the two are not two sites and not two folders:
+A page says the same thing about `randomName` whichever package a reader installs; only the code, the option shape and the install line differ. So they are not three sites and not three folders:
 
-- **`::: lang js` … `:::`** wraps a block only one package sees. `::: lang js dart` is a block both want.
-- **`<Lang js="…" dart="…" code />`** is the inline form, for a phrase in the middle of a sentence that does not differ. It is what keeps an option table from being written twice.
+- **`::: lang js` … `:::`** wraps a block only one package sees. `::: lang js dart` is a block two of them want.
+- **`<Lang js="…" dart="…" py="…" code />`** is the inline form, for a phrase in the middle of a sentence that does not differ. It is what keeps an option table from being written three times, and what carries `min_length` next to `minLength`.
 
-Both halves are in the document and CSS hides one, which is what buys the no-flash switch, a hydration-safe render and a search index that carries both. Adding a third package is an entry in `data/languages.ts`, a branch in `LangMark.vue` for its logo, and the blocks on whatever pages have something to say about it.
+Every variant is in the document and CSS hides all but one, which is what buys the no-flash switch, a hydration-safe render and a search index that carries all of them. Adding a package is an entry in `data/languages.ts`, a branch in `LangMark.vue` for its logo, a line in each of the three hard-coded selector groups in `theme/styles/lang.css`, and the blocks on whatever pages have something to say about it.
+
+**Function and option names in headings, the sidebar and anchors stay in the JavaScript spelling**, and only the body carries all three. That is not laziness: VitePress builds its outline from the rendered heading and its sidebar from `config.ts`, so a per-package heading would either read as all three names run together or flash the wrong one before hydration — and a cross-page `#anchor` has to resolve for every reader, not just the one who picked JavaScript. The mapping is mechanical (`minLength` → `min_length`) and Getting started states it once.
 
 ### Two traps
 
@@ -198,7 +250,7 @@ Both halves are in the document and CSS hides one, which is what buys the no-fla
 
 ### Deployment
 
-`.github/workflows/publish-documentation.yml` builds the site and pushes `docs-dist/` to the `gh-pages` branch on every push to `main` that touches `docs/`, either package's manifest, or either package's `CHANGELOG.md`. Nothing else in `packages/` reaches the site, so nothing else triggers it. It is the only workflow that deploys, and it repeats `run-build-docs`' three checks — typecheck, format, build — because a commit landing on `main` directly never saw them.
+`.github/workflows/publish-documentation.yml` builds the site and pushes `docs-dist/` to the `gh-pages` branch on every push to `main` that touches `docs/`, any package's manifest, or any package's `CHANGELOG.md`. Nothing else in `packages/` reaches the site, so nothing else triggers it. It is the only workflow that deploys, and it repeats `run-build-docs`' three checks — typecheck, format, build — because a commit landing on `main` directly never saw them.
 
 Two things it does not hard-code. The custom domain is read out of the npm package's `homepage`, the same field `config.ts` derives the canonical links and the sitemap from, so the `CNAME` it writes cannot drift from the URL the pages claim. And `run-build-docs` is pull-request-only, so one commit never builds the site twice.
 
@@ -250,8 +302,9 @@ Nicknames:
 4. If it needs a new romanization mode, add it to `RomanMode` and handle it in `lib/name/romanize.ts`.
 5. `lengthSpec` must match reality — it is the default length range, and a wrong value shows up as padded or truncated names.
 6. Add the language to the README table and to the script regexes in `test/name.test.ts`; the existing per-language tests then cover it.
-7. Port all of it to `packages/dart`: the code goes in `NameLanguage`, the dataset in `lib/src/name/data/<code>.dart` and `index.dart`, the regex in `test/name_test.dart`. A language that exists in one package and not the other is the failure mode this repository has to avoid, and the two suites are what catch it.
-8. Add the row to the tables in `docs/en/guide/languages.md` and `docs/ko/guide/languages.md`, and to the one in the root `README.md`.
+7. Port all of it to `packages/dart`: the code goes in `NameLanguage`, the dataset in `lib/src/name/data/<code>.dart` and `index.dart`, the regex in `test/name_test.dart`.
+8. Port all of it to `packages/python`: the code goes in the `NameLanguage` `Literal` in `src/randino/_types.py`, the dataset in `src/randino/name/data/<code>.py` and `__init__.py`, the script check in `SCRIPT` in `tests/test_name.py`. A language that exists in one package and not another is the failure mode this repository has to avoid, and the three suites are what catch it.
+9. Add the row to the tables in `docs/en/guide/languages.md` and `docs/ko/guide/languages.md`, and to the one in the root `README.md`.
 
 ## Adding a nickname language
 
@@ -268,19 +321,19 @@ To add one that clears the bar:
 4. Leave `parts` out unless a bare noun-noun compound reads naturally — that is why `ja` and `zh` have none.
 5. Aim for 60+ nouns per theme; the pools are what make the output varied, and the combination count is roughly `modifiers × nouns × (1 + parts)` — around 9M for `ko` and `en`, 145K for `ja` and `zh`, which have no `parts`. `gem`, `sport`, `vehicle` and `product` are the exception (roughly 55 / 46 / 43 / 36 words) — the world holds fewer of those, and padding them with near-synonyms reads worse than a shorter pool.
 6. No person names, and no word that is only a name — for `en` this is enforced against the person-name pools, which is why `job` has no `Knight`, `Baker` or `Hunter` and `plant` no `Rose` or `Ivy`. Add the language to the README tables and to `SCRIPT` in `test/nickname.test.ts`; the existing per-language tests then cover it.
-7. Port all of it to `packages/dart`, the same way a name language is ported.
+7. Port all of it to `packages/dart` and `packages/python`, the same way a name language is ported.
 8. Add the row to the tables in `docs/*/guide/languages.md` and to the root `README.md`.
 
 ## Adding a nickname theme
 
-A theme is a slice of everyday vocabulary that a modifier can sit in front of. Adding one touches every language at once, because `nouns` is a `Record<NicknameTheme, WordPool>` — the type will not let a language skip it.
+A theme is a slice of everyday vocabulary that a modifier can sit in front of. Adding one touches every language at once, because `nouns` is a `Record<NicknameTheme, WordPool>` — the TypeScript type will not let a language skip it, and the ports assert it instead.
 
 1. Add the name to `NicknameTheme` in `lib/_types/global.ts` and to `NICKNAME_THEMES` in `lib/nickname/data/index.ts`.
 2. Add the pool to **all four** languages. A theme that only one language can fill is not a theme.
 3. **Themes have to be disjoint**, and `test/nickname.test.ts` asserts it. A word in two of them makes `theme` ambiguous for `baseWord`, and it makes `randomNicknameDetails` report a theme the caller did not ask about. When a new theme claims a word an old one already holds, move it rather than copy it — `place` took the twelve places that were sitting in `concept`, `vehicle` took 자전거 / 기차 / 배 out of `object`, `plant` took the flowers and trees out of `nature`, and `music` took the instruments out of `object` and 리듬 / 선율 / 화음 out of `concept`. Where the two senses are genuinely different words, rename instead of moving: the English toy became `Marbles` so `gem` could keep `Marble`.
 4. Watch the word lengths. `nicknameLengthRange` is derived from the shortest and longest word in the pools, and `test/nickname.test.ts` pins three of its values, so a Chinese noun outside 2–3 characters or a Korean one outside 1–4 changes a number the tests assert by value.
 5. Update the theme table in `README.md` and the doc comment on `NicknameTheme`. The existing per-theme tests cover the new theme as soon as it is in `NICKNAME_THEMES`.
-6. Do the same in `packages/dart` — `NicknameTheme`, `nicknameThemes`, and the pool in all four language files. Dart's `Map` will not complain about a missing theme the way the TypeScript `Record` does, which is why `test/nickname_test.dart` asserts every language fills every theme.
+6. Do the same in `packages/dart` and `packages/python` — `NicknameTheme`, the theme list, and the pool in all four language files. Neither Dart's `Map` nor Python's `dict` complains about a missing theme the way the TypeScript `Record` does, which is why both ports' `test_nickname` asserts every language fills every theme.
 7. Add the row to `docs/en/nickname/themes.md` and `docs/ko/nickname/themes.md`.
 
 ## Commit conventions

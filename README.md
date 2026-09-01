@@ -1,28 +1,29 @@
 # randino
 
-[![license](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/jooy2/randino/blob/main/LICENSE) [![npm latest package](https://img.shields.io/npm/v/randino/latest.svg)](https://www.npmjs.com/package/randino) [![npm downloads](https://img.shields.io/npm/dm/randino.svg)](https://www.npmjs.com/package/randino) [![pub package](https://img.shields.io/pub/v/randino.svg)](https://pub.dev/packages/randino) ![Commit Count](https://img.shields.io/github/commit-activity/y/jooy2/randino) ![Stars](https://img.shields.io/github/stars/jooy2/randino?style=social)
+[![license](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/jooy2/randino/blob/main/LICENSE) [![npm latest package](https://img.shields.io/npm/v/randino/latest.svg)](https://www.npmjs.com/package/randino) [![npm downloads](https://img.shields.io/npm/dm/randino.svg)](https://www.npmjs.com/package/randino) [![pub package](https://img.shields.io/pub/v/randino.svg)](https://pub.dev/packages/randino) [![pypi package](https://img.shields.io/pypi/v/randino.svg)](https://pypi.org/project/randino/) ![Commit Count](https://img.shields.io/github/commit-activity/y/jooy2/randino) ![Stars](https://img.shields.io/github/stars/jooy2/randino?style=social)
 
 ### 📘 [**randino.cdget.com**](https://randino.cdget.com)
 
-Every option, every language and every example — pick **JavaScript** or **Dart** in the sidebar. This README is the map; each package has a quick start of its own.
+Every option, every language and every example — pick **JavaScript**, **Dart** or **Python** in the sidebar. This README is the map; each package has a quick start of its own.
 
 ---
 
-**randino** generates random text in the language you ask for. Today that is person names and nicknames; the shape it is built in — one function per kind of text, one options object, per-language datasets — is meant to hold whatever comes next.
+**randino** generates random text in the language you ask for. Today that is person names and nicknames; the shape it is built in — one function per kind of text, one set of options, per-language datasets — is meant to hold whatever comes next.
 
 - **Person names** read like names people actually carry — 김민준, Emma Clover, Иванов Иван — and come with their English pronunciation. 9 languages.
 - **Nicknames** are the handles you would pick for a game or a website — 멋진사자, MistyOwl, 고양이꼬리. Built from everyday words across fourteen themes, never from person names, with over nine million combinations in Korean and English before the unique suffix is added.
 - One options set per generator: language, length, count, and a style setting that runs from realistic to fully invented.
-- **No runtime dependencies**, in either package.
+- **No runtime dependencies**, in any of the packages.
 
 ## Packages
 
-| Package                                      | Registry                                                | Requires                     | Quick start                            |
-| -------------------------------------------- | ------------------------------------------------------- | ---------------------------- | -------------------------------------- |
-| [`packages/javascript`](packages/javascript) | [npm: `randino`](https://www.npmjs.com/package/randino) | Node.js 18 or later, or a browser | [README](packages/javascript/README.md) |
-| [`packages/dart`](packages/dart)             | [pub.dev: `randino`](https://pub.dev/packages/randino)  | Dart 3.7 or newer (Flutter 3.29) | [README](packages/dart/README.md)      |
+| Package                                      | Registry                                                 | Requires                          | Quick start                             |
+| -------------------------------------------- | -------------------------------------------------------- | --------------------------------- | --------------------------------------- |
+| [`packages/javascript`](packages/javascript) | [npm: `randino`](https://www.npmjs.com/package/randino)   | Node.js 18 or later, or a browser | [README](packages/javascript/README.md) |
+| [`packages/dart`](packages/dart)             | [pub.dev: `randino`](https://pub.dev/packages/randino)    | Dart 3.7 or newer (Flutter 3.29)  | [README](packages/dart/README.md)       |
+| [`packages/python`](packages/python)         | [PyPI: `randino`](https://pypi.org/project/randino/)      | Python 3.10 or newer              | [README](packages/python/README.md)     |
 
-Both packages generate from **the same datasets and the same rules**, so `randomName(language: 'ko')` and `randomName(language: NameLanguage.ko)` draw from the same pools and honour the same options. They **version independently** and keep separate changelogs — [`packages/javascript/CHANGELOG.md`](packages/javascript/CHANGELOG.md) and [`packages/dart/CHANGELOG.md`](packages/dart/CHANGELOG.md) — so a release on one side is not a release on the other and the two numbers will not always agree.
+All three generate from **the same datasets and the same rules**, so `randomName({ language: 'ko' })`, `randomName(language: NameLanguage.ko)` and `random_name(language="ko")` draw from the same pools and honour the same options. They **version independently** and keep separate changelogs — [`packages/javascript/CHANGELOG.md`](packages/javascript/CHANGELOG.md), [`packages/dart/CHANGELOG.md`](packages/dart/CHANGELOG.md) and [`packages/python/CHANGELOG.md`](packages/python/CHANGELOG.md) — so a release on one side is not a release on the others and the numbers will not always agree.
 
 ## Install
 
@@ -74,6 +75,30 @@ randomNickname(baseWord: '고양이', count: 3);
 
 Pure Dart — it imports nothing but `dart:math`, so it runs on the VM, on the web and inside Flutter on every platform. Options are named parameters rather than an options object, which is the one deliberate difference from the JavaScript API. [**The Dart quick start**](packages/dart/README.md) has the rest.
 
+### Python
+
+```bash
+pip install randino
+```
+
+```python
+from randino import random_name, random_nickname
+
+random_name(language="ko", count=3)
+# ['김태윤', '원동혁', '조진우']
+
+random_name(language="en", gender="female", include_middle_name=True)
+# ['Grace Amelia Bennett']
+
+random_nickname(language="ko", count=3)
+# ['오래된곰', '영원한도마뱀', '귀여운신화다발']
+
+random_nickname(base_word="고양이", count=3)
+# ['하얀고양이', '고양이바람', '귀여운고양이뿔']
+```
+
+Pure Python — it imports nothing outside the standard library, and ships a `py.typed` marker so mypy and Pyright read its annotations. Options are keyword-only arguments in `snake_case`; the values are the same strings the JavaScript package takes, typed as `Literal`. [**The Python quick start**](packages/python/README.md) has the rest.
+
 ## Supported languages
 
 Every generator takes a language, or mixes every language it supports when you leave it out. The two generators do not cover the same set: a nickname joins a modifier to a noun, which only reads naturally where the language asks for no agreement between them.
@@ -92,10 +117,10 @@ Every generator takes a language, or mixes every language it supports when you l
 
 ## What it generates
 
-| Generator      | JavaScript                                 | Dart                                       | Example                      |
-| -------------- | ------------------------------------------ | ------------------------------------------ | ---------------------------- |
-| Person names   | `randomName`, `randomNameDetails`          | `randomName`, `randomNameDetails`          | 김민준 → Kim Minjun          |
-| Nicknames      | `randomNickname`, `randomNicknameDetails`  | `randomNickname`, `randomNicknameDetails`  | 멋진사자, MistyOwl           |
+| Generator    | JavaScript and Dart                       | Python                                         | Example             |
+| ------------ | ----------------------------------------- | ---------------------------------------------- | ------------------- |
+| Person names | `randomName`, `randomNameDetails`         | `random_name`, `random_name_details`           | 김민준 → Kim Minjun |
+| Nicknames    | `randomNickname`, `randomNicknameDetails` | `random_nickname`, `random_nickname_details`   | 멋진사자, MistyOwl  |
 
 The full option tables, the fourteen nickname themes and the romanization rules are on the [documentation site](https://randino.cdget.com).
 
@@ -105,10 +130,11 @@ The full option tables, the fourteen nickname themes and the romanization rules 
 packages/
   javascript/   The npm package — TypeScript source in lib/, tests in test/
   dart/         The pub.dev package — Dart source in lib/, tests in test/
+  python/       The PyPI package — Python source in src/, tests in tests/
 docs/           The documentation site (VitePress), English and Korean
 ```
 
-Each package owns its own `README.md` and `CHANGELOG.md`, because npm and pub.dev both read those from the package root. This file is the only one that describes all of them at once.
+Each package owns its own `README.md` and `CHANGELOG.md`, because npm, pub.dev and PyPI all read those from the package root. This file is the only one that describes all of them at once.
 
 ## Contributing
 
