@@ -1,0 +1,98 @@
+/**
+ * The navbar's Packages menu.
+ *
+ * npm, pub.dev and PyPI were three of the four icons in the navbar's right-hand
+ * corner, next to the locale switch and the appearance toggle. They are one
+ * dropdown now — `PackageLinks.vue`, rendered by VitePress through a nav item
+ * that names a component instead of a link — which leaves GitHub as the only
+ * icon and gives each registry its name instead of a logo to be recognised by.
+ *
+ * Drawn from VitePress's own variables, like everything else in the chrome. The
+ * marks are the exception, and they are the languages' own — see `LangMark.vue`.
+ */
+
+/*
+ * `VPMenu` already pads the popup by 12px. The rows pull back into it so that
+ * their text starts where a menu's text normally does rather than 24px in, and
+ * so the hover highlight is a row rather than a stripe down the middle.
+ */
+.randino-pkg {
+	display: grid;
+	gap: 2px;
+	min-width: 180px;
+	margin: 0 -4px;
+}
+
+.randino-pkg-link {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	height: 34px;
+	padding: 0 8px;
+	border-radius: 6px;
+	color: var(--vp-c-text-2);
+	font-size: 13px;
+	font-weight: 500;
+	line-height: 1;
+	transition:
+		color 0.16s,
+		background-color 0.16s;
+}
+
+.randino-pkg-link:hover {
+	background-color: var(--vp-c-default-soft);
+	color: var(--vp-c-text-1);
+}
+
+.randino-pkg-registry {
+	flex: 1;
+	font-weight: 600;
+}
+
+/* Which package a registry is the registry for. The mark says it too, but a
+   reader who has not learned three logos should not have to. */
+.randino-pkg-lang {
+	color: var(--vp-c-text-3);
+	font-size: 11px;
+	font-weight: 500;
+}
+
+.randino-pkg .randino-lang-mark {
+	flex: none;
+	opacity: 0.65;
+	transition: opacity 0.16s;
+}
+
+.randino-pkg-link:hover .randino-lang-mark {
+	opacity: 1;
+}
+
+/*
+ * The same three rows inside the mobile nav screen, where the group is an
+ * accordion rather than a popup and there is no `VPMenu` around them. Sized to
+ * `VPNavScreenMenuGroupLink`, which is what the rows beside them are.
+ */
+.randino-pkg-screen {
+	gap: 0;
+	min-width: 0;
+	margin: 0;
+}
+
+.randino-pkg-screen .randino-pkg-link {
+	height: 32px;
+	margin-left: 12px;
+	padding: 0;
+	border-radius: 0;
+	color: var(--vp-c-text-1);
+	font-size: 14px;
+	font-weight: 400;
+}
+
+.randino-pkg-screen .randino-pkg-link:hover {
+	background-color: transparent;
+	color: var(--vp-c-brand-1);
+}
+
+.randino-pkg-screen .randino-pkg-registry {
+	flex: none;
+}

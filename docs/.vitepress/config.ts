@@ -54,54 +54,35 @@ const editLinkPattern = `${repoUrl}/edit/main/docs/:path`;
 const socialImage = `${siteUrl}/512x512.png`;
 
 /**
- * Dart's own logo, for the pub.dev link in the navbar.
+ * Where each package is published, in the order the language switch lists them.
  *
- * A social link's icon is either a name VitePress ships or an SVG string, and
- * there is no name for pub.dev. `currentColor` on the path is what lets the
- * navbar hover it like the icons beside it.
+ * The navbar renders these as one **Packages** dropdown rather than as three
+ * social-link icons beside GitHub: a registry is one destination, and four icons
+ * in a row read as a toolbar rather than as the two or three places this site
+ * actually sends a reader. `id` is the code language whose mark labels the row —
+ * see `PackageLinks.vue`.
  */
-const dartIcon =
-	'<svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">' +
-	'<title>pub.dev</title>' +
-	'<path fill="currentColor" d="M4.105 4.105S9.158 1.58 11.684.316a3.1 3.1 0 0 1 1.481-.315c.766.047 ' +
-	'1.677.788 1.677.788L24 9.948v9.789h-4.263V24H9.789l-9-9C.303 14.5 0 13.795 0 13.105c0-.319.18-.818' +
-	'.316-1.105zm.679.679v11.787c.002.543.021 1.024.498 1.508L10.204 23h8.533v-4.263zm12.055-.678c-.899' +
-	'-.896-1.809-1.78-2.74-2.643c-.302-.267-.567-.468-1.07-.462c-.37.014-.87.195-.87.195L6.341 4.105z"/>' +
-	'</svg>';
-
-/** Python's own logo, for the PyPI link in the navbar — see `dartIcon`. */
-const pypiIcon =
-	'<svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">' +
-	'<title>PyPI</title>' +
-	'<path fill="currentColor" d="M14.25.18l.9.2.73.26.59.3.45.32.34.34.25.34.16.33.1.3.04.26.02.2' +
-	'-.01.13V8.5l-.05.63-.13.55-.21.46-.26.38-.3.31-.33.25-.35.19-.35.14-.33.1-.3.07-.26.04-.21.02H8' +
-	'.77l-.69.05-.59.14-.5.22-.41.27-.33.32-.27.35-.2.36-.15.37-.1.35-.07.32-.04.27-.02.21v3.06H3.17' +
-	'l-.21-.03-.28-.07-.32-.12-.35-.18-.36-.26-.36-.36-.35-.46-.32-.59-.28-.73-.21-.88-.14-1.05-.05' +
-	'-1.23.06-1.22.16-1.04.24-.87.32-.71.36-.57.4-.44.42-.33.42-.24.4-.16.36-.1.32-.05.24-.01h.16l.06' +
-	'.01h8.16v-.83H6.18l-.01-2.75-.02-.37.05-.34.11-.31.17-.28.25-.26.31-.23.38-.2.44-.18.51-.15.58' +
-	'-.12.64-.1.71-.06.77-.04.84-.02 1.27.05zm-6.3 1.98l-.23.33-.08.41.08.41.23.34.33.22.41.09.41-.09' +
-	'.33-.22.23-.34.08-.41-.08-.41-.23-.33-.33-.22-.41-.09-.41.09zm13.09 3.95l.28.06.32.12.35.18.36' +
-	'.27.36.35.35.47.32.59.28.73.21.88.14 1.04.05 1.23-.06 1.23-.16 1.04-.24.86-.32.71-.36.57-.4.45' +
-	'-.42.33-.42.24-.4.16-.36.09-.32.05-.24.02-.16-.01h-8.22v.82h5.84l.01 2.76.02.36-.05.34-.11.31' +
-	'-.17.29-.25.25-.31.24-.38.2-.44.17-.51.15-.58.13-.64.09-.71.07-.77.04-.84.01-1.27-.04-1.07-.14' +
-	'-.9-.2-.73-.25-.59-.3-.45-.33-.34-.34-.25-.34-.16-.33-.1-.3-.04-.25-.02-.2.01-.13v-5.34l.05-.64' +
-	'.13-.54.21-.46.26-.38.3-.32.33-.24.35-.2.35-.14.33-.1.3-.06.26-.04.21-.02.13-.01h5.84l.69-.05.59' +
-	'-.14.5-.21.41-.28.33-.32.27-.35.2-.36.15-.36.1-.35.07-.32.04-.28.02-.21V6.07h2.09l.14.01zm-6.47 ' +
-	'14.25l-.23.33-.08.41.08.41.23.33.33.23.41.08.41-.08.33-.23.23-.33.08-.41-.08-.41-.23-.33-.33-.23' +
-	'-.41-.08-.41.08z"/>' +
-	'</svg>';
+const packageLinks = [
+	{ id: 'js', registry: 'npm', url: npmUrl },
+	{ id: 'dart', registry: 'pub.dev', url: pubUrl },
+	{ id: 'py', registry: 'PyPI', url: pypiUrl }
+];
 
 /**
- * The navbar, in every locale: the prose, and then the functions.
+ * The navbar, in every locale: the prose, the functions, and where to get them.
  *
  * **API** is a dropdown over the same pages the sidebar's API group holds, and
  * it is one list rather than a Person names menu and a Nicknames menu — a reader
  * looking for `randomNickname` is looking for a function, not for the half of
  * the library it belongs to. `navGroupFor` is what keeps the two in step.
  */
-const navFor = (lang: string, guide: string) => [
-	{ text: guide, link: `${localeBase(lang, defaultLocale)}guide/getting-started` },
-	{ text: 'API', items: navGroupFor('api', lang, defaultLocale) }
+const navFor = (lang: string, labels: { guide: string; packages: string }) => [
+	{ text: labels.guide, link: `${localeBase(lang, defaultLocale)}guide/getting-started` },
+	{ text: 'API', items: navGroupFor('api', lang, defaultLocale) },
+	{
+		text: labels.packages,
+		items: [{ component: 'PackageLinks', props: { links: packageLinks } }]
+	}
 ];
 
 const vitePressI18nConfig: VitePressI18nOptions = {
@@ -114,11 +95,11 @@ const vitePressI18nConfig: VitePressI18nOptions = {
 	},
 	themeConfig: {
 		en: {
-			nav: navFor('en', 'Guide'),
+			nav: navFor('en', { guide: 'Guide', packages: 'Packages' }),
 			sidebar: { '/': { items: sidebarFor('en', defaultLocale) } }
 		},
 		ko: {
-			nav: navFor('ko', '가이드'),
+			nav: navFor('ko', { guide: '가이드', packages: '패키지' }),
 			sidebar: { '/ko/': { items: sidebarFor('ko', defaultLocale) } }
 		}
 	}
@@ -426,16 +407,12 @@ const vitePressConfig: UserConfig = {
 			pattern: editLinkPattern
 		},
 		/*
-		 * One per place the library is published, plus the source. VitePress knows
-		 * npm and GitHub by name and has never heard of pub.dev, so that one arrives
-		 * as a drawing.
+		 * The source, and only the source. The three registries used to sit here too,
+		 * which put four icons in a corner that also holds the locale switch and the
+		 * appearance toggle — they are in the navbar's Packages menu now, where each
+		 * one gets a name instead of being a logo the reader has to recognise.
 		 */
-		socialLinks: [
-			{ icon: 'npm', link: npmUrl },
-			{ icon: { svg: dartIcon }, link: pubUrl, ariaLabel: 'pub.dev' },
-			{ icon: { svg: pypiIcon }, link: pypiUrl, ariaLabel: 'PyPI' },
-			{ icon: 'github', link: repoUrl }
-		],
+		socialLinks: [{ icon: 'github', link: repoUrl }],
 		footer: {
 			message: 'Released under the MIT License',
 			copyright: '© <a href="https://cdget.com">CDGet</a>'

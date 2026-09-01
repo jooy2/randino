@@ -216,7 +216,7 @@ docs/
       language.ts           # the reader's choice, as one value the site shares
       sidebar.ts            # the menu, written out — two locale columns, one structure
       i18n.ts               # the few strings the site's own components render
-    theme/                  # the package switch, and the CSS that displays one variant
+    theme/                  # the package switch, the packages menu, the CSS that displays one variant
   en/  ko/                  # the pages, mirrored
   scripts/
     copy-changelog.mjs      # every package's CHANGELOG.md -> docs/<locale>/changelog.md
@@ -238,13 +238,15 @@ A page says the same thing about `randomName` whichever package a reader install
 - **`::: lang js` … `:::`** wraps a block only one package sees. `::: lang js dart` is a block two of them want.
 - **`<Lang js="…" dart="…" py="…" code />`** is the inline form, for a phrase in the middle of a sentence that does not differ. It is what keeps an option table from being written three times, and what carries `min_length` next to `minLength`.
 
-Every variant is in the document and CSS hides all but one, which is what buys the no-flash switch, a hydration-safe render and a search index that carries all of them. Adding a package is an entry in `data/languages.ts`, a branch in `LangMark.vue` for its logo, a line in each of the three hard-coded selector groups in `theme/styles/lang.css`, and the blocks on whatever pages have something to say about it.
+Every variant is in the document and CSS hides all but one, which is what buys the no-flash switch, a hydration-safe render and a search index that carries all of them. Adding a package is an entry in `data/languages.ts`, a branch in `LangMark.vue` for its logo, a line in each of the three hard-coded selector groups in `theme/styles/lang.css`, a row in `packageLinks` in `config.ts` for the registry it is published to, and the blocks on whatever pages have something to say about it.
 
 **Function and option names in headings, the sidebar and anchors stay in the JavaScript spelling**, and only the body carries all three. That is not laziness: VitePress builds its outline from the rendered heading and its sidebar from `config.ts`, so a per-package heading would either read as all three names run together or flash the wrong one before hydration — and a cross-page `#anchor` has to resolve for every reader, not just the one who picked JavaScript. The mapping is mechanical (`minLength` → `min_length`) and Getting started states it once.
 
 ### The menu is not the folders
 
 `name/` and `nickname/` are two folders because the two generators are two things, and the sidebar deliberately does not repeat that split: the four generators and the two helper pages are one **API** group, and the prose explaining how the options behave sits under **Guide**. A reader looking for `randomNickname` is looking for a function, not for the half of the library it belongs to. The navbar's API dropdown is that same list, built out of `data/sidebar.ts` by `navGroupFor` so the menu and the section it points into cannot drift.
+
+Its **Packages** dropdown is `PackageLinks.vue`, which is where npm, pub.dev and PyPI went when they stopped being three of the four icons in the navbar's right-hand corner; the registry URLs are still derived from the three manifests in `config.ts`, and GitHub is the one social link left.
 
 ### Two traps
 
