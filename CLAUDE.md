@@ -65,7 +65,7 @@ test/
   nickname.test.ts
 ```
 
-## Conventions
+### Conventions
 
 - **One public function per file**, named after the function; the category's `index.ts` re-exports them, and `lib/index.ts` re-exports the categories. This mirrors the author's other library, [qsu](https://github.com/jooy2/qsu).
 - **Relative imports end in `.js`**, even though the source is `.ts` — the build emits ESM that Node has to resolve at runtime. Type-only imports may omit it.
@@ -75,7 +75,7 @@ test/
 - **Prettier owns formatting** (tabs, single quotes, no trailing commas). Run `npm run format`; `npm run build` runs it first.
 - **Zero runtime dependencies.** This is a hard constraint, not a preference. It is why Hangul romanization is implemented in `lib/name/romanize.ts` instead of pulling in `es-hangul`.
 
-### Datasets
+#### Datasets
 
 Pools are written as whitespace-separated strings inside a template literal and split by the helpers in `_internal/parse.ts`, so a 120-name pool stays a few lines instead of 120:
 
@@ -89,7 +89,7 @@ last: words('Rossi Russo De_Luca'),
 last: tokens('佐藤:Sato 鈴木:Suzuki')
 ```
 
-## Commands
+### Commands
 
 Run from `packages/javascript`; there is no workspace root that forwards them.
 
@@ -103,6 +103,55 @@ Run from `packages/javascript`; there is no workspace root that forwards them.
 The tests are TypeScript but import from `../dist`, so they are run through `tsx` and **they need a build** — that is what `npm run test` does first. Node >= 18.
 
 Only `dist/` and the top-level `README.md` / `LICENSE` are published; `.npmignore` keeps `lib/`, `test/`, the config files and the remaining markdown out of the package.
+
+## The Dart package (`packages/dart`)
+
+A port of the JavaScript package, not a second design. Same datasets, same rules, same numbers; what differs is the surface, which is Dart's.
+
+```
+lib/
+  randino.dart              # the barrel — its `show` clauses ARE the public API
+  src/
+    types.dart              # ALL public types (enums, LengthRange, the two details)
+    internal/
+      utils.dart            # pick / randInt / chance / clamp, never exported
+      parse.dart            # words() / pairs() / weightMap() / romanMap()
+    name/                   # mirrors lib/name in the JavaScript package
+      data/                 # one file per language, ported verbatim
+      romanize.dart
+      name_generator.dart
+      random_name.dart …
+    nickname/               # mirrors lib/nickname
+test/
+  base_test.dart            # the barrel's export surface, read out of the source
+  name_test.dart
+  nickname_test.dart
+```
+
+| Command                | What it does                       |
+| ---------------------- | ---------------------------------- |
+| `dart test`            | The suite. No build step           |
+| `dart analyze`         | CI runs it with `--fatal-infos`    |
+| `dart format .`        | Tall style, 100 columns            |
+| `dart pub publish --dry-run` | What pub.dev will check      |
+
+### Conventions
+
+- **Named parameters, not an options object.** `randomName(language: NameLanguage.ko, count: 3)`. Every parameter is optional and every one has the JavaScript default.
+- **A null enum means "every one of them"** — that is how `'all'` crosses over. `NicknameDetail.theme` is the one nullable that means something else (the word is not one the generator knows), and it says so in its doc comment.
+- **`LengthRange` replaces `[number, number]`** and compares by value, so a test can assert one directly.
+- **File names are `snake_case`, one public function per file**, named after the function. `lib/randino.dart` re-exports them with an explicit `show`.
+- **Imports are `package:` imports**, even inside the package — `always_use_package_imports` is on, because a relative import breaks the moment a file moves.
+- **Everything public carries a doc comment**, including inside `lib/src`. `public_member_api_docs` is on.
+- **No dependencies.** `dart:math` is the only import from outside the package.
+
+### The one thing Dart cannot do the same way
+
+`String.normalize('NFD')` does not exist in Dart and there is no diacritic property to strip against, so `romanize.dart` folds Latin accents through a **written-out table** instead. It covers more than the pools hold on purpose, and `test/name_test.dart` folds every entry of every `RomanMode.fold` pool and asserts the result is ASCII — that test is what keeps a newly added `ư` from silently surviving into a supposedly romanized name. It has already caught one.
+
+### Keeping the two in step
+
+The JavaScript package is the source of truth. A behaviour change lands there first, then here, in the same commit where that is practical. Both suites assert the same properties over the same pools, so a port that drifted shows up as a test that passes on one side and fails on the other — which is the point of porting the tests rather than writing new ones.
 
 ## Testing a random generator
 
@@ -150,6 +199,7 @@ Nicknames:
 4. If it needs a new romanization mode, add it to `RomanMode` and handle it in `lib/name/romanize.ts`.
 5. `lengthSpec` must match reality — it is the default length range, and a wrong value shows up as padded or truncated names.
 6. Add the language to the README table and to the script regexes in `test/name.test.ts`; the existing per-language tests then cover it.
+7. Port all of it to `packages/dart`: the code goes in `NameLanguage`, the dataset in `lib/src/name/data/<code>.dart` and `index.dart`, the regex in `test/name_test.dart`. A language that exists in one package and not the other is the failure mode this repository has to avoid, and the two suites are what catch it.
 
 ## Adding a nickname language
 
@@ -166,6 +216,7 @@ To add one that clears the bar:
 4. Leave `parts` out unless a bare noun-noun compound reads naturally — that is why `ja` and `zh` have none.
 5. Aim for 60+ nouns per theme; the pools are what make the output varied, and the combination count is roughly `modifiers × nouns × (1 + parts)` — around 9M for `ko` and `en`, 145K for `ja` and `zh`, which have no `parts`. `gem`, `sport`, `vehicle` and `product` are the exception (roughly 55 / 46 / 43 / 36 words) — the world holds fewer of those, and padding them with near-synonyms reads worse than a shorter pool.
 6. No person names, and no word that is only a name — for `en` this is enforced against the person-name pools, which is why `job` has no `Knight`, `Baker` or `Hunter` and `plant` no `Rose` or `Ivy`. Add the language to the README tables and to `SCRIPT` in `test/nickname.test.ts`; the existing per-language tests then cover it.
+7. Port all of it to `packages/dart`, the same way a name language is ported.
 
 ## Adding a nickname theme
 
@@ -176,6 +227,7 @@ A theme is a slice of everyday vocabulary that a modifier can sit in front of. A
 3. **Themes have to be disjoint**, and `test/nickname.test.ts` asserts it. A word in two of them makes `theme` ambiguous for `baseWord`, and it makes `randomNicknameDetails` report a theme the caller did not ask about. When a new theme claims a word an old one already holds, move it rather than copy it — `place` took the twelve places that were sitting in `concept`, `vehicle` took 자전거 / 기차 / 배 out of `object`, `plant` took the flowers and trees out of `nature`, and `music` took the instruments out of `object` and 리듬 / 선율 / 화음 out of `concept`. Where the two senses are genuinely different words, rename instead of moving: the English toy became `Marbles` so `gem` could keep `Marble`.
 4. Watch the word lengths. `nicknameLengthRange` is derived from the shortest and longest word in the pools, and `test/nickname.test.ts` pins three of its values, so a Chinese noun outside 2–3 characters or a Korean one outside 1–4 changes a number the tests assert by value.
 5. Update the theme table in `README.md` and the doc comment on `NicknameTheme`. The existing per-theme tests cover the new theme as soon as it is in `NICKNAME_THEMES`.
+6. Do the same in `packages/dart` — `NicknameTheme`, `nicknameThemes`, and the pool in all four language files. Dart's `Map` will not complain about a missing theme the way the TypeScript `Record` does, which is why `test/nickname_test.dart` asserts every language fills every theme.
 
 ## Commit conventions
 

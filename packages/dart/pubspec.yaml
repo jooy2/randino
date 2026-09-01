@@ -1,0 +1,26 @@
+name: randino
+description: >-
+  Generates random person names and nicknames in the language you ask for —
+  Korean, English, Japanese, Chinese and six more. No dependencies, pure Dart.
+version: 1.0.0
+repository: https://github.com/jooy2/randino
+homepage: https://randino.cdget.com
+issue_tracker: https://github.com/jooy2/randino/issues
+topics:
+  - random
+  - name
+  - nickname
+  - generator
+  - mock
+
+environment:
+  # Records and sealed classes are the only Dart 3 features in here, and both
+  # landed in 3.0. The floor is 3.7 for a duller reason: that is where the
+  # formatter this package is written against arrived, and where the
+  # `page_width` in `analysis_options.yaml` starts being read. Flutter 3.29
+  # ships it.
+  sdk: ^3.7.0
+
+dev_dependencies:
+  lints: ^5.1.1
+  test: ^1.25.15

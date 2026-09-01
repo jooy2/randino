@@ -20,7 +20,7 @@ Every option, every language and every example — pick **JavaScript** or **Dart
 | Package                                      | Registry                                                | Requires                     | Quick start                            |
 | -------------------------------------------- | ------------------------------------------------------- | ---------------------------- | -------------------------------------- |
 | [`packages/javascript`](packages/javascript) | [npm: `randino`](https://www.npmjs.com/package/randino) | Node.js 18 or later, or a browser | [README](packages/javascript/README.md) |
-| [`packages/dart`](packages/dart)             | [pub.dev: `randino`](https://pub.dev/packages/randino)  | Dart 3.6 or newer (Flutter 3.27) | [README](packages/dart/README.md)      |
+| [`packages/dart`](packages/dart)             | [pub.dev: `randino`](https://pub.dev/packages/randino)  | Dart 3.7 or newer (Flutter 3.29) | [README](packages/dart/README.md)      |
 
 Both packages generate from **the same datasets and the same rules**, so `randomName(language: 'ko')` and `randomName(language: NameLanguage.ko)` draw from the same pools and honour the same options. They **version independently** and keep separate changelogs — [`packages/javascript/CHANGELOG.md`](packages/javascript/CHANGELOG.md) and [`packages/dart/CHANGELOG.md`](packages/dart/CHANGELOG.md) — so a release on one side is not a release on the other and the two numbers will not always agree.
 

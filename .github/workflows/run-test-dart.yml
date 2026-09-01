@@ -1,0 +1,43 @@
+name: run-test-dart
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+    paths:
+      - packages/dart/**
+      - .github/workflows/run-test-dart.yml
+  workflow_dispatch:
+
+defaults:
+  run:
+    working-directory: packages/dart
+
+jobs:
+  run-test-dart:
+    runs-on: ${{ matrix.os }}
+    name: Test Dart ${{ matrix.sdk }} on ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        # The floor `pubspec.yaml` declares, and whatever is current. A library
+        # that only ever runs on the newest SDK is a library whose constraint is
+        # a guess.
+        sdk: ['3.7', stable]
+        os: [ubuntu-latest, windows-latest, macos-latest]
+
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - uses: dart-lang/setup-dart@v1
+        with:
+          sdk: ${{ matrix.sdk }}
+      - run: dart pub get
+      - name: Verify formatting
+        run: dart format --output=none --set-exit-if-changed .
+      - name: Analyze
+        run: dart analyze --fatal-infos
+      - name: Test package (functions)
+        run: dart test

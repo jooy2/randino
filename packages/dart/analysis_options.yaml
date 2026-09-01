@@ -1,0 +1,30 @@
+# The analyser's settings for the Dart package.
+#
+# `package:lints/recommended.yaml` is the set pub.dev scores against, so the
+# baseline is the ecosystem's rather than a house style nobody else has read.
+#
+# What is added on top is only what this package would otherwise get wrong
+# quietly: an exported symbol without documentation, a relative import that
+# breaks the moment a file moves, and an implicit `dynamic` where a type was
+# meant.
+
+include: package:lints/recommended.yaml
+
+formatter:
+  page_width: 100
+
+linter:
+  rules:
+    # Every exported symbol is documentation for somebody. The JavaScript
+    # package holds itself to the same rule through its JSDoc blocks.
+    - public_member_api_docs
+    - always_declare_return_types
+    - always_use_package_imports
+    - prefer_single_quotes
+    - directives_ordering
+    - unawaited_futures
+
+analyzer:
+  errors:
+    unused_import: error
+    avoid_relative_lib_imports: error
