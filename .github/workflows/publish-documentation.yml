@@ -1,0 +1,76 @@
+name: publish-documentation
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - docs/**
+      # The site reads both packages' manifests and changelogs, so a release on
+      # either side changes what it publishes. Nothing else in `packages/` does.
+      - packages/javascript/package.json
+      - packages/javascript/CHANGELOG.md
+      - packages/dart/pubspec.yaml
+      - packages/dart/CHANGELOG.md
+      - .github/workflows/publish-documentation.yml
+  # Deploy on demand — for a rollback, or after a DNS change that the site's
+  # own content had no reason to trigger.
+  workflow_dispatch:
+
+defaults:
+  run:
+    working-directory: docs
+
+# A second push while a deploy is in flight would race it to `gh-pages`. Let the
+# newer one win, and do not cancel a deploy that has already started pushing.
+concurrency:
+  group: publish-documentation
+  cancel-in-progress: false
+
+jobs:
+  publish-documentation:
+    runs-on: ubuntu-latest
+    name: Build and deploy the documentation site
+
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          # Every commit, so VitePress can date each page from its git history.
+          fetch-depth: 0
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: docs/package-lock.json
+      - run: npm ci
+
+      # `run-build-docs` covers pull requests; this covers the pushes that land
+      # on `main` directly, which are the ones that would otherwise deploy
+      # unchecked.
+      - name: Type-check the site's own TypeScript
+        run: npm run typecheck
+      - name: Check formatting
+        run: npm run format
+      # Fails on a dead page link (VitePress) and on a dead heading anchor
+      # (`scripts/check-anchors.mjs`), which is the half VitePress does not check.
+      - name: Build
+        run: npm run build
+
+      # The site's URL lives in the npm package manifest — `config.ts` reads the
+      # same field for canonical links and the sitemap. The CNAME this deploy
+      # writes has to agree with it, and a hostname hard-coded here is one that
+      # can silently disagree.
+      - name: Resolve the site hostname
+        id: site
+        run: |
+          echo "fqdn=$(node -p "new URL(require('../packages/javascript/package.json').homepage).hostname")" >> "$GITHUB_OUTPUT"
+
+      # @see https://github.com/crazy-max/ghaction-github-pages
+      - name: Deploy to GitHub Pages
+        uses: crazy-max/ghaction-github-pages@v4
+        with:
+          target_branch: gh-pages
+          build_dir: docs-dist
+          jekyll: false
+          fqdn: ${{ steps.site.outputs.fqdn }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}

@@ -1,19 +1,11 @@
 name: run-build-docs
 
+# Pull requests only. A push to `main` runs `publish-documentation`, which
+# performs the same three checks before it deploys — running both would build
+# the site twice for one commit.
 on:
   pull_request:
     branches: [main]
-  push:
-    branches: [main]
-    paths:
-      - docs/**
-      # The site reads both packages' manifests and changelogs, so a release on
-      # either side changes what it builds.
-      - packages/javascript/package.json
-      - packages/javascript/CHANGELOG.md
-      - packages/dart/pubspec.yaml
-      - packages/dart/CHANGELOG.md
-      - .github/workflows/run-build-docs.yml
   workflow_dispatch:
 
 defaults:
