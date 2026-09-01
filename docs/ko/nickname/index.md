@@ -30,11 +30,13 @@ randomNickname(language: NicknameLanguage.ko, count: 3);
 
 ## 제공되는 기능
 
-| 함수                    | 반환값                             |
-| ----------------------- | ---------------------------------- |
-| `randomNickname`        | 닉네임 문자열                      |
-| `randomNicknameDetails` | 사용된 단어, 접미사, 언어, 테마    |
-| `nicknameLengthRange`   | 해당 언어가 만들 수 있는 모든 길이 |
+| 함수                                                 | 반환값                             |
+| ---------------------------------------------------- | ---------------------------------- |
+| [`randomNickname`](./random-nickname)                | 닉네임 문자열                      |
+| [`randomNicknameDetails`](./random-nickname-details) | 사용된 단어, 접미사, 언어, 테마    |
+| [`nicknameLengthRange`](./nickname-length-range)     | 해당 언어가 만들 수 있는 모든 길이 |
+
+명사는 14개 [테마](./themes)에서 오고, 모든 닉네임은 그중 한 테마의 단어를 중심으로 만들어집니다.
 
 ## 옵션의 동작 방식
 

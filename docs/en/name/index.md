@@ -26,13 +26,13 @@ randomName(language: NameLanguage.ko, count: 3);
 
 ## What is in the box
 
-| Function                 | Returns                                                    |
-| ------------------------ | ---------------------------------------------------------- |
-| `randomName`             | The names as strings, in one script                        |
-| `randomNameDetails`      | Both scripts plus the language and gender behind each name |
-| `nameLengthRange`        | The natural length range of a full name in a language      |
-| `nameSupportsMiddleName` | Whether a language has a middle part at all                |
-| `nameSupportsRoman`      | Whether romanizing changes anything                        |
+| Function | Returns |
+| --- | --- |
+| [`randomName`](./random-name) | The names as strings, in one script |
+| [`randomNameDetails`](./random-name-details) | Both scripts plus the language and gender behind each name |
+| [`nameLengthRange`](./helpers#namelengthrange) | The natural length range of a full name in a language |
+| [`nameSupportsMiddleName`](./helpers#namesupportsmiddlename) | Whether a language has a middle part at all |
+| [`nameSupportsRoman`](./helpers#namesupportsroman) | Whether romanizing changes anything |
 
 ## How the options behave
 

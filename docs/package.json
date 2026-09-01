@@ -8,8 +8,9 @@
 	"license": "MIT",
 	"scripts": {
 		"changelog": "node scripts/copy-changelog.mjs",
+		"check:anchors": "node scripts/check-anchors.mjs",
 		"dev": "npm run changelog && vitepress dev",
-		"build": "npm run changelog && vitepress build",
+		"build": "npm run changelog && vitepress build && npm run check:anchors",
 		"serve": "npm run build && vitepress serve",
 		"format": "prettier .",
 		"format:fix": "prettier . --write",

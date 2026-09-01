@@ -26,13 +26,13 @@ randomName(language: NameLanguage.ko, count: 3);
 
 ## 제공되는 기능
 
-| 함수                     | 반환값                                         |
-| ------------------------ | ---------------------------------------------- |
-| `randomName`             | 하나의 문자 체계로 표기된 이름 문자열          |
-| `randomNameDetails`      | 두 문자 체계와 각 이름의 언어·성별 정보        |
-| `nameLengthRange`        | 해당 언어에서 전체 이름의 자연스러운 길이 범위 |
-| `nameSupportsMiddleName` | 해당 언어에 중간 이름이 있는지 여부            |
-| `nameSupportsRoman`      | 로마자 표기가 결과를 바꾸는지 여부             |
+| 함수 | 반환값 |
+| --- | --- |
+| [`randomName`](./random-name) | 하나의 문자 체계로 표기된 이름 문자열 |
+| [`randomNameDetails`](./random-name-details) | 두 문자 체계와 각 이름의 언어·성별 정보 |
+| [`nameLengthRange`](./helpers#namelengthrange) | 해당 언어에서 전체 이름의 자연스러운 길이 범위 |
+| [`nameSupportsMiddleName`](./helpers#namesupportsmiddlename) | 해당 언어에 중간 이름이 있는지 여부 |
+| [`nameSupportsRoman`](./helpers#namesupportsroman) | 로마자 표기가 결과를 바꾸는지 여부 |
 
 ## 옵션의 동작 방식
 
@@ -74,7 +74,7 @@ randomName(language: NameLanguage.ko, style: 100, count: 3);
 
 나머지 여섯 언어는 성씨 분포의 꼬리가 충분히 길어서 균등 추출로도 실제와 자릿수가 맞습니다. 그래서 빈도표를 두지 않았습니다.
 
-### 길이는 고유 표기를 기준으로 셉니다
+### 길이는 고유 표기를 기준으로 셉니다 {#length}
 
 `minLength`와 `maxLength`는 **요소 사이의 공백을 포함한 고유 표기의 글자 수**를 셉니다. 요청한 구조가 항상 우선합니다. 요청한 요소를 담기에 범위가 너무 좁으면, 요청한 성이나 중간 이름을 빼는 대신 생성기가 만들 수 있는 가장 가까운 이름을 돌려줍니다.
 

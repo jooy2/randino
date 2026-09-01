@@ -1,0 +1,227 @@
+# randomName
+
+Generates person names and returns `count` of them as strings, written in the script you asked for. Use [`randomNameDetails`](./random-name-details) when you want the native and romanized form of each name together.
+
+::: lang js
+
+```javascript
+import { randomName } from 'randino';
+
+randomName();
+// ['Emma Clover']
+```
+
+:::
+
+::: lang dart
+
+```dart
+import 'package:randino/randino.dart';
+
+randomName();
+// ['Emma Clover']
+```
+
+:::
+
+## Options
+
+Every option is optional, and the defaults are what the empty call above uses.
+
+| Option | Type | Default | Description |
+| --- | --- | --- | --- |
+| `language` | <Lang js="NameLanguageOption" dart="NameLanguage?" code /> | <Lang js="'all'" dart="null" code /> | Language of the generated names. <Lang js="'all'" dart="null" code /> mixes every supported language, picking one per name. |
+| `gender` | <Lang js="NameGenderOption" dart="NameGender?" code /> | <Lang js="'all'" dart="null" code /> | Which pools the given name is drawn from. Left out, a gender is picked per name. |
+| `count` | <Lang js="number" dart="int" code /> | `1` | How many names to return. Clamped to `0` … `10000`. |
+| `style` | <Lang js="number" dart="int" code /> | `0` | `0` draws names people actually carry, `100` invents new ones, and anything between mixes the two per name and per part. |
+| `minLength` | <Lang js="number" dart="int?" code /> | _language_ | Minimum length of the native form, in characters. |
+| `maxLength` | <Lang js="number" dart="int?" code /> | _language_ | Maximum length of the native form, in characters. |
+| `includeSurname` | <Lang js="boolean" dart="bool" code /> | `true` | Include the family name. |
+| `includeMiddleName` | <Lang js="boolean" dart="bool" code /> | `false` | Include a middle name. Ignored for languages that have none. |
+| `script` | <Lang js="NameScript" dart="NameScript" code /> | <Lang js="'native'" dart="NameScript.native" code /> | The script the returned strings are written in. |
+| `startsWith` | <Lang js="string" dart="String?" code /> | — | Keep only names whose native form starts with this character. Only the first character is used, and the match is case-insensitive. |
+| `unique` | <Lang js="boolean" dart="bool" code /> | `false` | Never return the same name twice. May return fewer than `count` once the pools run out of combinations. |
+
+`minLength` and `maxLength` default to the language's own range, which [`nameLengthRange`](./helpers#namelengthrange) reports — and that fallback is resolved **per language**, so a mixed draw does not stretch a Korean name to fill a Spanish name's range.
+
+## Examples
+
+### One language at a time
+
+::: lang js
+
+```javascript
+randomName({ language: 'ko', count: 3 });
+// ['김태윤', '원동혁', '조진우']
+
+randomName({ language: 'ja', count: 3 });
+// ['山崎愛菜', '加藤楓乃', '吉田直人']
+
+randomName({ language: 'ru', count: 2 });
+// ['Дмитрий Соколов', 'Полина Морозова']
+```
+
+:::
+
+::: lang dart
+
+```dart
+randomName(language: NameLanguage.ko, count: 3);
+// ['김태윤', '원동혁', '조진우']
+
+randomName(language: NameLanguage.ja, count: 3);
+// ['山崎愛菜', '加藤楓乃', '吉田直人']
+
+randomName(language: NameLanguage.ru, count: 2);
+// ['Дмитрий Соколов', 'Полина Морозова']
+```
+
+:::
+
+Leave the language out and every name comes from one of the nine, picked per name:
+
+::: lang js
+
+```javascript
+randomName({ count: 5 });
+// ['Nuria Ramírez', '조동민', 'Stella Reeves', 'Anna Mariani', 'Lê Phương']
+```
+
+:::
+
+::: lang dart
+
+```dart
+randomName(count: 5);
+// ['Nuria Ramírez', '조동민', 'Stella Reeves', 'Anna Mariani', 'Lê Phương']
+```
+
+:::
+
+### The parts of a name
+
+::: lang js
+
+```javascript
+randomName({ language: 'en', count: 3, includeSurname: false });
+// ['Rachel', 'Eliza', 'Tessa']
+
+randomName({ language: 'vi', count: 3, includeMiddleName: true });
+// ['Lý Thu Thảo', 'Phạm Quang Hùng', 'Dương Văn Phong']
+
+randomName({ language: 'ru', count: 2, gender: 'female', includeMiddleName: true });
+// ['Людмила Николаевна Богданова', 'Марина Максимовна Богданова']
+```
+
+:::
+
+::: lang dart
+
+```dart
+randomName(language: NameLanguage.en, count: 3, includeSurname: false);
+// ['Rachel', 'Eliza', 'Tessa']
+
+randomName(language: NameLanguage.vi, count: 3, includeMiddleName: true);
+// ['Lý Thu Thảo', 'Phạm Quang Hùng', 'Dương Văn Phong']
+
+randomName(
+  language: NameLanguage.ru,
+  count: 2,
+  gender: NameGender.female,
+  includeMiddleName: true,
+);
+// ['Людмила Николаевна Богданова', 'Марина Максимовна Богданова']
+```
+
+:::
+
+Korean, Japanese and Chinese have no middle part, so `includeMiddleName` is ignored for them rather than inventing one. [`nameSupportsMiddleName`](./helpers#namesupportsmiddlename) answers that directly.
+
+### Romanized output
+
+::: lang js
+
+```javascript
+randomName({ language: 'ko', count: 3, script: 'roman' });
+// ['Kim Minjun', 'Won Donghyeok', 'Jo Jinu']
+
+randomName({ language: 'ja', count: 3, script: 'roman' });
+// ['Yamazaki Aina', 'Kato Kaeno', 'Yoshida Naoyato']
+```
+
+:::
+
+::: lang dart
+
+```dart
+randomName(language: NameLanguage.ko, count: 3, script: NameScript.roman);
+// ['Kim Minjun', 'Won Donghyeok', 'Jo Jinu']
+
+randomName(language: NameLanguage.ja, count: 3, script: NameScript.roman);
+// ['Yamazaki Aina', 'Kato Kaeno', 'Yoshida Naoyato']
+```
+
+:::
+
+English is the one language where this changes nothing — the names are already in the Latin alphabet, which is what [`nameSupportsRoman`](./helpers#namesupportsroman) reports.
+
+### A starting character
+
+::: lang js
+
+```javascript
+randomName({ language: 'ko', count: 3, startsWith: '이' });
+// ['이예빈', '이우진', '이서현']
+
+randomName({ language: 'en', count: 3, startsWith: 'k' });
+// ['Kayla Morgan', 'Keith Doyle', 'Kimberly Vaughn']
+```
+
+:::
+
+::: lang dart
+
+```dart
+randomName(language: NameLanguage.ko, count: 3, startsWith: '이');
+// ['이예빈', '이우진', '이서현']
+
+randomName(language: NameLanguage.en, count: 3, startsWith: 'k');
+// ['Kayla Morgan', 'Keith Doyle', 'Kimberly Vaughn']
+```
+
+:::
+
+A character no real name starts with still returns names rather than nothing: Latin and Cyrillic scripts invent one (`Q` → `Qivu Railooth`), and CJK scripts use the character as a name part of its own.
+
+### Length
+
+::: lang js
+
+```javascript
+randomName({ language: 'ko', count: 3, minLength: 5, maxLength: 8 });
+// ['남궁하윤서', '김서연아린', '박도윤하람']
+
+randomName({ language: 'en', count: 2, minLength: 20, maxLength: 25 });
+// ['Josephine Adelaide Sinclair', 'Christina Genevieve Whitaker']
+```
+
+:::
+
+::: lang dart
+
+```dart
+randomName(language: NameLanguage.ko, count: 3, minLength: 5, maxLength: 8);
+// ['남궁하윤서', '김서연아린', '박도윤하람']
+
+randomName(language: NameLanguage.en, count: 2, minLength: 20, maxLength: 25);
+// ['Josephine Adelaide Sinclair', 'Christina Genevieve Whitaker']
+```
+
+:::
+
+The structure you asked for always wins. A range too narrow for the requested parts is answered with the closest name the generator can build, never by dropping the surname or middle name — see [how the options behave](./#length-is-counted-in-the-native-form).
+
+## See also
+
+- [`randomNameDetails`](./random-name-details) — the same names with both scripts and the choices behind them.
+- [Helpers](./helpers) — the length range, and the two questions about a language.

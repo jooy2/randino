@@ -153,6 +153,49 @@ test/
 
 The JavaScript package is the source of truth. A behaviour change lands there first, then here, in the same commit where that is practical. Both suites assert the same properties over the same pools, so a port that drifted shows up as a test that passes on one side and fails on the other — which is the point of porting the tests rather than writing new ones.
 
+## The documentation site (`docs/`)
+
+VitePress, in English and Korean, at [randino.cdget.com](https://randino.cdget.com). It documents both packages from one set of pages.
+
+```
+docs/
+  .vitepress/
+    config.ts               # locales, sidebar wiring, SEO, the `::: lang` container
+    data/
+      languages.ts          # the two packages, and the no-flash head script
+      language.ts           # the reader's choice, as one value the site shares
+      sidebar.ts            # the menu, written out — two label columns, one structure
+      i18n.ts               # the few strings the site's own components render
+    theme/                  # the package switch, and the CSS that displays one half
+  en/  ko/                  # the pages, mirrored
+  scripts/
+    copy-changelog.mjs      # both packages' CHANGELOG.md -> docs/<locale>/changelog.md
+    check-anchors.mjs       # every `#fragment` link resolves (see below)
+  public/logo.svg
+```
+
+| Command                 | What it does                                        |
+| ----------------------- | --------------------------------------------------- |
+| `npm run dev`           | The dev server                                      |
+| `npm run build`         | changelog → VitePress → anchor check, into `docs-dist/` |
+| `npm run typecheck`     | `tsc` over `.vitepress`                             |
+| `npm run format:fix`    | Prettier, in place                                  |
+
+### One page, two packages
+
+A page says the same thing about `randomName` whichever package a reader installs; only the code, the option shape and the install line differ. So the two are not two sites and not two folders:
+
+- **`::: lang js` … `:::`** wraps a block only one package sees. `::: lang js dart` is a block both want.
+- **`<Lang js="…" dart="…" code />`** is the inline form, for a phrase in the middle of a sentence that does not differ. It is what keeps an option table from being written twice.
+
+Both halves are in the document and CSS hides one, which is what buys the no-flash switch, a hydration-safe render and a search index that carries both. Adding a third package is an entry in `data/languages.ts`, a branch in `LangMark.vue` for its logo, and the blocks on whatever pages have something to say about it.
+
+### Two traps
+
+**A Korean heading cannot be linked to by its text.** VitePress slugifies through `NFKD`, so a Hangul heading's id is *decomposed jamo* while anything typed into a Markdown link is composed — identical in an editor, in a diff and in review, and the link scrolls nowhere. Give any Korean heading that is a link target an explicit `{#ascii-anchor}`, matching the English page's anchor where there is one. `scripts/check-anchors.mjs` fails the build otherwise; it runs as part of `npm run build`.
+
+**Every page has to exist in both locales.** `data/sidebar.ts` is one structure with an `en` and a `ko` label per entry, and VitePress fails the build on a dead link — so a page added to one locale and not the other does not get committed by accident.
+
 ## Testing a random generator
 
 The return value is random, so tests assert the **properties every result must have**, over a sample large enough (`SAMPLE = 60`) that a broken option cannot pass by luck:
@@ -200,6 +243,7 @@ Nicknames:
 5. `lengthSpec` must match reality — it is the default length range, and a wrong value shows up as padded or truncated names.
 6. Add the language to the README table and to the script regexes in `test/name.test.ts`; the existing per-language tests then cover it.
 7. Port all of it to `packages/dart`: the code goes in `NameLanguage`, the dataset in `lib/src/name/data/<code>.dart` and `index.dart`, the regex in `test/name_test.dart`. A language that exists in one package and not the other is the failure mode this repository has to avoid, and the two suites are what catch it.
+8. Add the row to the tables in `docs/en/guide/languages.md` and `docs/ko/guide/languages.md`, and to the one in the root `README.md`.
 
 ## Adding a nickname language
 
@@ -217,6 +261,7 @@ To add one that clears the bar:
 5. Aim for 60+ nouns per theme; the pools are what make the output varied, and the combination count is roughly `modifiers × nouns × (1 + parts)` — around 9M for `ko` and `en`, 145K for `ja` and `zh`, which have no `parts`. `gem`, `sport`, `vehicle` and `product` are the exception (roughly 55 / 46 / 43 / 36 words) — the world holds fewer of those, and padding them with near-synonyms reads worse than a shorter pool.
 6. No person names, and no word that is only a name — for `en` this is enforced against the person-name pools, which is why `job` has no `Knight`, `Baker` or `Hunter` and `plant` no `Rose` or `Ivy`. Add the language to the README tables and to `SCRIPT` in `test/nickname.test.ts`; the existing per-language tests then cover it.
 7. Port all of it to `packages/dart`, the same way a name language is ported.
+8. Add the row to the tables in `docs/*/guide/languages.md` and to the root `README.md`.
 
 ## Adding a nickname theme
 
@@ -228,6 +273,7 @@ A theme is a slice of everyday vocabulary that a modifier can sit in front of. A
 4. Watch the word lengths. `nicknameLengthRange` is derived from the shortest and longest word in the pools, and `test/nickname.test.ts` pins three of its values, so a Chinese noun outside 2–3 characters or a Korean one outside 1–4 changes a number the tests assert by value.
 5. Update the theme table in `README.md` and the doc comment on `NicknameTheme`. The existing per-theme tests cover the new theme as soon as it is in `NICKNAME_THEMES`.
 6. Do the same in `packages/dart` — `NicknameTheme`, `nicknameThemes`, and the pool in all four language files. Dart's `Map` will not complain about a missing theme the way the TypeScript `Record` does, which is why `test/nickname_test.dart` asserts every language fills every theme.
+7. Add the row to `docs/en/nickname/themes.md` and `docs/ko/nickname/themes.md`.
 
 ## Commit conventions
 

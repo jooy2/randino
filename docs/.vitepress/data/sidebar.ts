@@ -39,12 +39,43 @@ export const SIDEBAR: SidebarGroup[] = [
 	{
 		en: 'Person names',
 		ko: '사람 이름',
-		items: [{ path: 'name/', en: 'Overview', ko: '개요' }]
+		items: [
+			{ path: 'name/', en: 'Overview', ko: '개요' },
+			{ path: 'name/random-name', en: 'randomName', ko: 'randomName' },
+			{
+				path: 'name/random-name-details',
+				en: 'randomNameDetails',
+				ko: 'randomNameDetails'
+			},
+			{ path: 'name/helpers', en: 'Helpers', ko: '헬퍼' }
+		]
 	},
 	{
 		en: 'Nicknames',
 		ko: '닉네임',
-		items: [{ path: 'nickname/', en: 'Overview', ko: '개요' }]
+		items: [
+			{ path: 'nickname/', en: 'Overview', ko: '개요' },
+			{ path: 'nickname/random-nickname', en: 'randomNickname', ko: 'randomNickname' },
+			{
+				path: 'nickname/random-nickname-details',
+				en: 'randomNicknameDetails',
+				ko: 'randomNicknameDetails'
+			},
+			{
+				path: 'nickname/nickname-length-range',
+				en: 'nicknameLengthRange',
+				ko: 'nicknameLengthRange'
+			},
+			{ path: 'nickname/themes', en: 'Themes', ko: '테마' }
+		]
+	},
+	{
+		en: 'Reference',
+		ko: '레퍼런스',
+		items: [
+			{ path: 'reference/constants', en: 'Constants', ko: '상수' },
+			{ path: 'changelog', en: 'Changelog', ko: '변경 내역' }
+		]
 	}
 ];
 

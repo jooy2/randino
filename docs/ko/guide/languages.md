@@ -57,9 +57,9 @@ nicknameLanguages; // [NicknameLanguage.en, .ko, .ja, .zh]
 | `es` | 이름 먼저 | 있음        | Gonzalo Martín → Gonzalo Martin |
 | `vi` | 성 먼저   | 있음        | Đặng Quân → Dang Quan           |
 
-한국어, 일본어, 중국어에는 중간 이름이 없으므로, 중간 이름 옵션은 없는 이름을 만들어내는 대신 그냥 무시됩니다. 이를 직접 확인하는 헬퍼가 있으며, 다른 헬퍼들과 함께 [사람 이름](../name/)에 정리되어 있습니다.
+한국어, 일본어, 중국어에는 중간 이름이 없으므로, 중간 이름 옵션은 없는 이름을 만들어내는 대신 그냥 무시됩니다. 이를 직접 확인하는 헬퍼가 있습니다: [`nameSupportsMiddleName`](../name/helpers#namesupportsmiddlename).
 
-### 로마자 표기
+### 로마자 표기 {#romanization}
 
 로마자 표기는 번역이 아니라 **고유 표기의 영어 발음**이며, 문자 체계마다 방식이 다릅니다.
 

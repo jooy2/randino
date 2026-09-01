@@ -30,11 +30,13 @@ Korean and Japanese cannot be held to that check — 하늘, 별 and 森 are eve
 
 ## What is in the box
 
-| Function                | Returns                                                       |
-| ----------------------- | ------------------------------------------------------------- |
-| `randomNickname`        | The nicknames as strings                                      |
-| `randomNicknameDetails` | The words, the suffix, the language and the theme behind each |
-| `nicknameLengthRange`   | Every length a language can produce                           |
+| Function | Returns |
+| --- | --- |
+| [`randomNickname`](./random-nickname) | The nicknames as strings |
+| [`randomNicknameDetails`](./random-nickname-details) | The words, the suffix, the language and the theme behind each |
+| [`nicknameLengthRange`](./nickname-length-range) | Every length a language can produce |
+
+The nouns come from fourteen [themes](./themes), and every nickname is built around a word from one of them.
 
 ## How the options behave
 

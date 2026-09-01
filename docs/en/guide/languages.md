@@ -57,7 +57,7 @@ Each language decides three things: which part of a name comes first, whether th
 | `es` | given first  | yes              | Gonzalo Martín → Gonzalo Martin |
 | `vi` | family first | yes              | Đặng Quân → Dang Quan           |
 
-Korean, Japanese and Chinese have no middle part, so the middle-name option is ignored for them rather than inventing one. There is a helper that answers that question directly, listed with the others on [Person names](../name/).
+Korean, Japanese and Chinese have no middle part, so the middle-name option is ignored for them rather than inventing one. There is a helper that answers that question directly: [`nameSupportsMiddleName`](../name/helpers#namesupportsmiddlename).
 
 ### Romanization
 

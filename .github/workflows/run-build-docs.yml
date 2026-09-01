@@ -1,0 +1,45 @@
+name: run-build-docs
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+    paths:
+      - docs/**
+      # The site reads both packages' manifests and changelogs, so a release on
+      # either side changes what it builds.
+      - packages/javascript/package.json
+      - packages/javascript/CHANGELOG.md
+      - packages/dart/pubspec.yaml
+      - packages/dart/CHANGELOG.md
+      - .github/workflows/run-build-docs.yml
+  workflow_dispatch:
+
+defaults:
+  run:
+    working-directory: docs
+
+jobs:
+  run-build-docs:
+    runs-on: ubuntu-latest
+    name: Build the documentation site
+
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: docs/package-lock.json
+      - run: npm ci
+      - name: Type-check the site's own TypeScript
+        run: npm run typecheck
+      - name: Check formatting
+        run: npm run format
+      # Fails on a dead page link (VitePress) and on a dead heading anchor
+      # (`scripts/check-anchors.mjs`), which is the half VitePress does not check.
+      - name: Build
+        run: npm run build

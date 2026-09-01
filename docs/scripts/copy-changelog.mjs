@@ -35,7 +35,7 @@ const STRINGS = {
 	ko: {
 		title: '변경 내역',
 		lede: '두 패키지는 각각 독립적으로 버전을 관리하므로 아래 두 목록의 버전 번호는 서로 일치하지 않습니다. 한쪽의 릴리스가 다른 쪽의 릴리스를 의미하지는 않습니다. 사이드바에서 패키지를 선택하면 해당 패키지의 변경 내역이 표시됩니다.',
-		source: (registry, name) => `${registry}에 \`${name}\`(으)로 배포됩니다.`
+		source: (registry, name) => `${registry} 패키지 이름은 \`${name}\`입니다.`
 	}
 };
 
