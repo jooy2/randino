@@ -1,0 +1,111 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "randino"
+version = "1.0.0"
+description = "Generates random person names and nicknames in the language you ask for — Korean, English, Japanese, Chinese and six more. No dependencies, pure Python."
+readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE"]
+# 3.10 is where `X | Y` in annotations and `dataclass(slots=True)` both landed,
+# and 3.9 reached end of life in October 2025.
+requires-python = ">=3.10"
+authors = [{ name = "CDGet", email = "jooy2.contact@gmail.com" }]
+keywords = [
+    "random",
+    "name",
+    "nickname",
+    "username",
+    "name-generator",
+    "nickname-generator",
+    "mock",
+    "dummy",
+    "i18n",
+    "romanize",
+]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Topic :: Software Development :: Testing",
+    "Topic :: Text Processing :: Linguistic",
+    "Typing :: Typed",
+]
+# No runtime dependencies. This is a hard constraint, not a preference — it is
+# why the Hangul romanizer is written out in `name/_romanize.py`.
+dependencies = []
+
+[project.urls]
+Homepage = "https://randino.cdget.com"
+Documentation = "https://randino.cdget.com"
+Repository = "https://github.com/jooy2/randino"
+Issues = "https://github.com/jooy2/randino/issues"
+Changelog = "https://randino.cdget.com/changelog"
+
+[project.optional-dependencies]
+dev = ["mypy>=1.15", "pytest>=8.3", "ruff>=0.9"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/randino"]
+
+[tool.hatch.build.targets.sdist]
+# The tests travel with the source distribution; nothing else outside the package
+# is worth shipping.
+include = ["src/randino", "tests", "README.md", "CHANGELOG.md", "LICENSE"]
+
+[tool.ruff]
+line-length = 100
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = [
+    "E",   # pycodestyle
+    "W",   # pycodestyle warnings
+    "F",   # pyflakes
+    "I",   # import sorting
+    "N",   # pep8-naming
+    "UP",  # pyupgrade
+    "B",   # bugbear
+    "SIM", # flake8-simplify
+    "RUF", # ruff's own
+    "D",   # pydocstyle — everything public carries a docstring
+]
+ignore = [
+    # The datasets are whitespace-separated pools inside a triple-quoted string.
+    # Their line lengths follow the JavaScript package's, and reflowing them by
+    # hand to a column count would make the two harder to diff.
+    "E501",
+    # A one-line summary is what these modules and functions have; a blank line
+    # before a closing `"""` and a mandated period are noise.
+    "D203",
+    "D213",
+    # Homoglyph detection, aimed at a Cyrillic `а` smuggled into an identifier.
+    # Half of what this package ships is Cyrillic, Hangul and kana pools, and the
+    # romanizer's comments quote them — every hit here is the data doing its job.
+    "RUF001",
+    "RUF002",
+    "RUF003",
+]
+
+[tool.ruff.lint.per-file-ignores]
+# Tests describe themselves in their names; `data/` files are pools, not prose.
+"tests/*" = ["D103"]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[tool.ruff.format]
+docstring-code-format = true
+
+[tool.mypy]
+files = ["src", "tests"]
+python_version = "3.10"
+strict = true

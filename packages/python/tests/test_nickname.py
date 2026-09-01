@@ -1,0 +1,402 @@
+"""Nicknames.
+
+Nicknames are checked against the datasets themselves: `random_nickname_details`
+reports the words it used, so every word can be asserted to come from the language's
+pools, and the English pools are asserted to share nothing with the English
+person-name pools.
+"""
+
+import re
+
+from randino import (
+    NICKNAME_COUNT_MAX,
+    NICKNAME_LANGUAGES,
+    NICKNAME_THEMES,
+    NicknameLanguage,
+    NicknameTheme,
+    nickname_length_range,
+    random_nickname,
+    random_nickname_details,
+)
+
+# The datasets are internal, but a nickname is only as good as the words it is built
+# from — these checks are what keep person names out of them.
+from randino.name.data import NAME_DATA
+from randino.nickname.data import NICKNAME_DATA
+from tests.test_name import pool_natives
+
+SAMPLE = 60
+
+SCRIPT: dict[NicknameLanguage, re.Pattern[str]] = {
+    "en": re.compile(r"[A-Za-z]+"),
+    "ko": re.compile(r"[가-힣]+"),
+    "ja": re.compile(r"[々぀-ヿ一-鿿]+"),
+    "zh": re.compile(r"[々一-鿿]+"),
+}
+
+
+def all_words(language: NicknameLanguage) -> list[str]:
+    """Every word the language can put in a nickname."""
+    data = NICKNAME_DATA[language]
+
+    return [
+        *data.modifiers,
+        *(data.parts or ()),
+        *(word for theme in NICKNAME_THEMES for word in data.nouns[theme]),
+    ]
+
+
+def nouns_of(language: NicknameLanguage, theme: NicknameTheme | None = None) -> list[str]:
+    """Every noun of one theme, or of all of them."""
+    nouns = NICKNAME_DATA[language].nouns
+
+    if theme is not None:
+        return list(nouns[theme])
+
+    return [word for each in NICKNAME_THEMES for word in nouns[each]]
+
+
+def test_random_nickname_returns_one_nickname_by_default() -> None:
+    nicknames = random_nickname()
+
+    assert len(nicknames) == 1
+    assert isinstance(nicknames[0], str)
+    assert nicknames[0]
+
+
+def test_random_nickname_returns_exactly_count_nicknames() -> None:
+    assert len(random_nickname(count=25)) == 25
+    assert len(random_nickname(count=0)) == 0
+    assert len(random_nickname(count=-10)) == 0
+    assert len(random_nickname(count=2.7)) == 2  # type: ignore[arg-type]
+    assert len(random_nickname(count=NICKNAME_COUNT_MAX + 500)) == NICKNAME_COUNT_MAX
+
+
+def test_every_language_writes_nicknames_in_its_own_script() -> None:
+    for language in NICKNAME_LANGUAGES:
+        for nickname in random_nickname(language=language, count=SAMPLE):
+            assert SCRIPT[language].fullmatch(nickname), f"{language}: {nickname}"
+
+        for nickname in random_nickname(language=language, count=SAMPLE, style=100):
+            assert SCRIPT[language].fullmatch(nickname), f"{language} invented: {nickname}"
+
+
+def test_the_mixed_language_uses_every_language_it_knows() -> None:
+    used = set()
+
+    for detail in random_nickname_details(count=400):
+        assert SCRIPT[detail.language].fullmatch(detail.nickname), detail.nickname
+        used.add(detail.language)
+
+    assert used == set(NICKNAME_LANGUAGES)
+
+
+def test_nicknames_are_built_from_real_words_and_never_from_names() -> None:
+    for language in NICKNAME_LANGUAGES:
+        pool = set(all_words(language))
+
+        for detail in random_nickname_details(language=language, count=200):
+            assert detail.words, detail.nickname
+
+            for word in detail.words:
+                assert word in pool, f"{language}: {word} is not in the word pools"
+
+    # English person names are distinct words from English common nouns, so the two
+    # sets must not meet — this is what stops an `Emma` or a `Bennett` from being
+    # added to a nickname pool by accident. Korean and Japanese cannot be held to
+    # that: 하늘, 별 and 森 are everyday nouns that also happen to be names, and
+    # `아름다운하늘` is still nobody's name.
+    en = NAME_DATA["en"]
+    names = set(pool_natives(en.male or ()) + pool_natives(en.female or ()) + pool_natives(en.last))
+
+    for word in all_words("en"):
+        assert word not in names, f"{word} is a person name, not a nickname word"
+
+
+def test_every_nickname_is_a_word_with_something_added_to_it() -> None:
+    details = random_nickname_details(language="ko", count=200)
+    modifiers = set(NICKNAME_DATA["ko"].modifiers)
+    decorated = [
+        detail for detail in details if len(detail.words) > 1 or detail.words[0] in modifiers
+    ]
+
+    # A bare word is allowed, but a decorated one is the point.
+    assert len(decorated) > len(details) * 0.5, (
+        f"only {len(decorated)} of {len(details)} were decorated"
+    )
+    assert any(detail.words[0] in modifiers for detail in details)
+    assert any(len(detail.words) == 3 for detail in details)
+
+
+def test_include_modifier_false_leaves_the_word_undecorated() -> None:
+    for language in NICKNAME_LANGUAGES:
+        parts = NICKNAME_DATA[language].parts or ()
+
+        for detail in random_nickname_details(
+            language=language, count=SAMPLE, include_modifier=False
+        ):
+            # A noun, and at most one trailing word behind it. Note that a few words
+            # serve as both modifier and noun (무지개, Marble), so the check has to be
+            # structural rather than "is not a modifier".
+            assert len(detail.words) <= 2, detail.nickname
+            assert detail.words[0] in nouns_of(language), detail.nickname
+
+            if len(detail.words) == 2:
+                assert detail.words[1] in parts, detail.nickname
+
+
+def test_theme_decides_what_the_nickname_is_about() -> None:
+    for theme in NICKNAME_THEMES:
+        for language in NICKNAME_LANGUAGES:
+            nouns = nouns_of(language, theme)
+
+            for detail in random_nickname_details(language=language, theme=theme, count=40):
+                assert detail.theme == theme, detail.nickname
+                assert any(word in nouns for word in detail.words), (
+                    f"{detail.nickname} has no {theme} word"
+                )
+
+    themes = {detail.theme for detail in random_nickname_details(count=400)}
+    assert themes == set(NICKNAME_THEMES)
+
+
+def test_a_word_belongs_to_exactly_one_theme() -> None:
+    # Two themes claiming one word make `theme` ambiguous for `base_word`, and make
+    # `random_nickname_details` report a theme the caller never asked about.
+    for language in NICKNAME_LANGUAGES:
+        owner: dict[str, NicknameTheme] = {}
+
+        for theme in NICKNAME_THEMES:
+            for word in nouns_of(language, theme):
+                held = owner.get(word)
+
+                assert held is None, f"{language}: {word} is in both {held} and {theme}"
+                owner[word] = theme
+
+
+def test_nicknames_stay_inside_the_requested_length_range() -> None:
+    ranges: list[tuple[NicknameLanguage, int, int]] = [
+        ("ko", 2, 3),
+        ("ko", 4, 6),
+        ("ko", 8, 10),
+        ("en", 4, 8),
+        ("en", 10, 16),
+        ("en", 18, 24),
+        ("ja", 2, 4),
+        ("zh", 2, 4),
+    ]
+
+    for language, low, high in ranges:
+        for nickname in random_nickname(
+            language=language, min_length=low, max_length=high, count=SAMPLE
+        ):
+            assert low <= len(nickname) <= high, (
+                f"{language} {low}-{high}: {nickname} ({len(nickname)})"
+            )
+
+
+def test_omitted_length_bounds_fall_back_to_what_the_language_can_produce() -> None:
+    assert nickname_length_range("zh") == (2, 5)
+    assert nickname_length_range("ko") == (1, 12)
+    # Without a modifier the upper end drops to a noun plus a trailing word.
+    assert nickname_length_range("ko", False) == (1, 8)
+
+    for language in NICKNAME_LANGUAGES:
+        low, high = nickname_length_range(language)
+
+        for style in (0, 100):
+            for nickname in random_nickname(language=language, style=style, count=SAMPLE):
+                assert low <= len(nickname) <= high, (
+                    f"{language} @ {style}: {nickname} ({len(nickname)})"
+                )
+
+
+def test_word_separator_goes_between_the_words() -> None:
+    for language in NICKNAME_LANGUAGES:
+        for separator in ("", " ", "-", "::"):
+            for detail in random_nickname_details(
+                language=language, word_separator=separator, count=SAMPLE
+            ):
+                assert detail.nickname == separator.join(detail.words), (
+                    f"{language} '{separator}': {detail.nickname}"
+                )
+
+                for word in detail.words:
+                    assert SCRIPT[language].fullmatch(word), f"{language}: {word}"
+
+    # Omitted, it falls back to the way the language joins its words, which is to run
+    # them together.
+    for detail in random_nickname_details(count=SAMPLE):
+        assert detail.nickname == "".join(detail.words), detail.nickname
+
+    # The separator is part of the nickname, so it counts toward the length.
+    assert nickname_length_range("ko", True, "-") == (1, 14)
+    assert nickname_length_range("en", True, " ") == (3, 32)
+
+    separated: list[tuple[NicknameLanguage, str, int, int]] = [
+        ("ko", " ", 5, 8),
+        ("en", "-", 8, 14),
+        ("zh", "::", 6, 9),
+    ]
+
+    for language, separator, low, high in separated:
+        for nickname in random_nickname(
+            language=language,
+            word_separator=separator,
+            min_length=low,
+            max_length=high,
+            count=SAMPLE,
+        ):
+            assert low <= len(nickname) <= high, (
+                f"{language} '{separator}' {low}-{high}: {nickname} ({len(nickname)})"
+            )
+
+    # The unique suffix keeps its own separator.
+    for nickname in random_nickname(
+        language="en", word_separator="-", unique_suffix=True, count=20
+    ):
+        assert re.fullmatch(r"[A-Za-z]+(-[A-Za-z]+)*_[0-9A-Za-z]{5}", nickname), nickname
+
+
+def test_unique_suffix_appends_a_token_that_the_length_options_ignore() -> None:
+    for detail in random_nickname_details(
+        language="ko", count=SAMPLE, unique_suffix=True, min_length=4, max_length=6
+    ):
+        assert re.fullmatch(r"_[0-9A-Za-z]{5}", detail.suffix), detail.nickname
+        assert "".join(detail.words) + detail.suffix == detail.nickname
+        # The range covers the nickname, not the suffix.
+        word = detail.nickname[: -len(detail.suffix)]
+        assert 4 <= len(word) <= 6, detail.nickname
+        assert SCRIPT["ko"].fullmatch(word), detail.nickname
+
+    # The token is what makes a nickname collision-free rather than unlikely.
+    many = random_nickname(language="ko", count=2000, unique_suffix=True)
+    assert len(set(many)) == 2000
+
+
+def test_the_unique_suffix_is_configurable() -> None:
+    for nickname in random_nickname(
+        language="en",
+        count=20,
+        unique_suffix=True,
+        unique_suffix_length=8,
+        unique_suffix_separator="-",
+    ):
+        assert re.fullmatch(r"[A-Za-z]+-[0-9A-Za-z]{8}", nickname), nickname
+
+    for nickname in random_nickname(
+        language="ko",
+        count=20,
+        unique_suffix=True,
+        unique_suffix_length=4,
+        unique_suffix_charset="0123456789",
+    ):
+        assert re.fullmatch(r"[가-힣]+_[0-9]{4}", nickname), nickname
+
+    # An empty separator is a valid choice, and lengths are clamped.
+    for nickname in random_nickname(
+        language="en",
+        count=20,
+        unique_suffix=True,
+        unique_suffix_separator="",
+        unique_suffix_length=0,
+    ):
+        assert re.fullmatch(r"[A-Za-z]+[0-9A-Za-z]", nickname), nickname
+
+    # No suffix unless it was asked for.
+    for detail in random_nickname_details(count=20, unique_suffix_length=8):
+        assert detail.suffix == ""
+
+
+def test_base_word_keeps_the_word_and_varies_only_the_decoration() -> None:
+    details = random_nickname_details(base_word="고양이", count=100)
+
+    for detail in details:
+        assert "고양이" in detail.nickname, detail.nickname
+        assert "고양이" in detail.words, detail.nickname
+        # Something is always added, or the answer would be the input.
+        assert len(detail.words) > 1, detail.nickname
+        # The word decides the language when none was given.
+        assert detail.language == "ko"
+        # 고양이 is one of the generator's own animal words, so its theme is known.
+        assert detail.theme == "animal"
+        assert SCRIPT["ko"].fullmatch(detail.nickname), detail.nickname
+
+    assert len({detail.nickname for detail in details}) > 20
+
+    # A word the generator does not know belongs to no theme.
+    for detail in random_nickname_details(base_word="뿌꾸", count=20):
+        assert detail.theme is None
+        assert "뿌꾸" in detail.nickname, detail.nickname
+
+    # Each script picks the language that goes with it.
+    assert random_nickname_details(base_word="Cat")[0].language == "en"
+    assert random_nickname_details(base_word="ネコ")[0].language == "ja"
+    assert random_nickname_details(base_word="熊猫")[0].language == "zh"
+    # An explicit language wins over the guess.
+    assert random_nickname_details(base_word="고양이", language="en")[0].language == "en"
+
+    # A base word longer than the language's natural range is not truncated.
+    for nickname in random_nickname(base_word="고양이발바닥무늬", count=20):
+        assert "고양이발바닥무늬" in nickname, nickname
+
+
+def test_starts_with_leads_every_nickname_with_the_requested_character() -> None:
+    for nickname in random_nickname(language="ko", count=SAMPLE, starts_with="파"):
+        assert nickname.startswith("파"), nickname
+
+    for nickname in random_nickname(language="en", count=SAMPLE, starts_with="b"):
+        assert nickname[0] in "Bb", nickname
+
+    # A character no real word starts with is answered with an invented one.
+    for nickname in random_nickname(language="en", count=20, starts_with="Z"):
+        assert re.fullmatch(r"Z[A-Za-z]+", nickname), nickname
+
+
+def test_style_invents_words_instead_of_drawing_them() -> None:
+    pool = set(all_words("ko"))
+    invented = random_nickname_details(language="ko", style=100, count=200)
+    drawn = [detail for detail in invented if any(word in pool for word in detail.words)]
+
+    assert len(drawn) < 20, f"{len(drawn)} of 200 still came from the pools"
+
+    for detail in invented:
+        assert SCRIPT["ko"].fullmatch(detail.nickname), detail.nickname
+
+        # An invented word can spell a real one by accident (나 + 비 -> 나비), and the
+        # theme is then reported rather than hidden — but it has to be true.
+        if detail.theme:
+            nouns = nouns_of("ko", detail.theme)
+            assert any(word in nouns for word in detail.words), detail.nickname
+
+    # Halfway, both kinds of word show up.
+    mixed = random_nickname_details(language="ko", style=50, count=200)
+    assert any(all(word in pool for word in detail.words) for detail in mixed)
+    assert any(all(word not in pool for word in detail.words) for detail in mixed)
+
+    # Out-of-range values are clamped rather than rejected.
+    for style in (-50, 500):
+        assert len(random_nickname(language="ko", style=style, count=5)) == 5
+
+
+def test_unique_never_repeats_a_nickname() -> None:
+    nicknames = random_nickname(language="ko", count=2000, unique=True)
+    assert len(set(nicknames)) == len(nicknames)
+
+    # A single word plus one theme is a small pool, so the request runs out of
+    # combinations and returns fewer instead of looping.
+    limited = random_nickname(
+        language="zh", theme="animal", include_modifier=False, count=400, unique=True
+    )
+
+    assert len(set(limited)) == len(limited)
+    assert len(limited) < 400, f"expected the pool to run out: {len(limited)}"
+
+
+def test_random_nickname_details_reports_the_pieces_it_used() -> None:
+    for detail in random_nickname_details(count=100, unique_suffix=True):
+        joiner = NICKNAME_DATA[detail.language].joiner
+
+        assert joiner.join(detail.words) + detail.suffix == detail.nickname
+        assert detail.language in NICKNAME_LANGUAGES
+        assert detail.theme is None or detail.theme in NICKNAME_THEMES
