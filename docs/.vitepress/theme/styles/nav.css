@@ -93,3 +93,28 @@
 .randino-pkg-screen .randino-pkg-registry {
 	flex: none;
 }
+
+/* ---------------------------------------------------------------------------
+ * The API menu's section titles
+ *
+ * VitePress sets a menu group's title at 14px/600 in `--vp-c-text-2` and its
+ * links at 14px/500 in `--vp-c-text-1`, which makes the heading a slightly
+ * bolder, slightly paler link — and in a menu of `randName` and `randSuffix`,
+ * `Generators` reads as one more of them.
+ *
+ * Set as a label instead: smaller, tracked out, upper case. The same treatment
+ * the sidebar's own `LANGUAGES` label gets, so the two read as the same kind of
+ * thing — and the same rule covers the mobile nav screen, where the accordion
+ * shows those sections as headings too.
+ * ------------------------------------------------------------------------- */
+
+.VPMenu .VPMenuGroup > .title,
+.VPNavScreenMenuGroupSection > .title {
+	margin-bottom: 2px;
+	line-height: 20px;
+	color: var(--vp-c-text-3);
+	font-size: 11px;
+	font-weight: 700;
+	letter-spacing: 0.06em;
+	text-transform: uppercase;
+}
