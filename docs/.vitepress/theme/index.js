@@ -9,7 +9,7 @@ import './custom.css';
 
 export default {
 	extends: DefaultTheme,
-	// Adds the package switch to the sidebar; everything else is the default theme.
+	// Adds the language switch to the sidebar; everything else is the default theme.
 	Layout,
 	enhanceApp({ app }) {
 		// Used straight from Markdown, so it is registered globally rather than

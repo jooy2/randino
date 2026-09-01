@@ -33,7 +33,7 @@ features:
     link: /nickname/
     linkText: Nicknames
   - title: Three packages, one library
-    details: The same datasets and the same rules for JavaScript, Dart and Python. One page documents all of them — pick yours in the sidebar.
+    details: The same datasets and the same rules for JavaScript, Dart and Python. One page documents all of them — pick your language in the sidebar.
     link: /guide/getting-started
     linkText: Getting started
   - title: Nine languages

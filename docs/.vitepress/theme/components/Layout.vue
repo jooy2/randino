@@ -6,10 +6,10 @@ import LangSelect from './LangSelect.vue';
 import { codeLanguage } from '../../data/language';
 
 /**
- * The default layout with one addition: the package switch above the sidebar
+ * The default layout with one addition: the language switch above the sidebar
  * menu.
  *
- * The rest of this file is the outline, filtered to the selected package. A
+ * The rest of this file is the outline, filtered to the selected language. A
  * heading inside a `::: lang` block is hidden with the block it belongs to, but
  * VitePress builds "On this page" from the Markdown rather than from the DOM —
  * so without this a reader on Dart is offered a link to a JavaScript-only

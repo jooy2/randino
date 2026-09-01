@@ -30,12 +30,12 @@ const PACKAGES = [
 const STRINGS = {
 	en: {
 		title: 'Changelog',
-		lede: 'Each package versions on its own, so the lists below do not line up — a release on one side is not a release on the others. Pick a package in the sidebar to read its changelog.',
+		lede: 'Each package versions on its own, so the lists below do not line up — a release on one side is not a release on the others. Pick a language in the sidebar to read its changelog.',
 		source: (registry, name) => `Released as \`${name}\` on ${registry}.`
 	},
 	ko: {
 		title: '변경 내역',
-		lede: '각 패키지는 독립적으로 버전을 관리하므로 아래 목록들의 버전 번호는 서로 일치하지 않습니다. 한쪽의 릴리스가 다른 쪽의 릴리스를 의미하지는 않습니다. 사이드바에서 패키지를 선택하면 해당 패키지의 변경 내역이 표시됩니다.',
+		lede: '각 패키지는 독립적으로 버전을 관리하므로 아래 목록들의 버전 번호는 서로 일치하지 않습니다. 한쪽의 릴리스가 다른 쪽의 릴리스를 의미하지는 않습니다. 사이드바에서 언어를 선택하면 해당 패키지의 변경 내역이 표시됩니다.',
 		source: (registry, name) => `${registry} 패키지 이름은 \`${name}\`입니다.`
 	}
 };

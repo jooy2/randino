@@ -3,8 +3,8 @@
  *
  * Page content is localised by living in `docs/ko` or `docs/en`. This file is
  * only for the chrome that is drawn in Vue rather than in Markdown — today that
- * is the package switch above the sidebar and the note a page shows when it has
- * nothing to say for the selected package.
+ * is the language switch above the sidebar: its label, the line inside it that
+ * says how far the choice reaches, and the word its menu is opened by.
  */
 
 export type Locale = 'ko' | 'en';
@@ -24,11 +24,19 @@ export function localeOf(lang: string | undefined): Locale {
 }
 
 const strings = {
-	languageLabel: { ko: '패키지', en: 'Package' },
+	/*
+	 * "Languages" rather than "Packages", which is what this said while the switch
+	 * was three stacked options. The control offers JavaScript, Dart and Python —
+	 * the languages randino ships for — and the registry each one is published to
+	 * is a different question, answered by the navbar's Packages menu.
+	 */
+	languageLabel: { ko: '언어', en: 'Languages' },
 	languageHint: {
 		ko: '이 선택은 사이트 전체의 코드 예제에 적용됩니다.',
 		en: 'The choice applies to every code sample on the site.'
-	}
+	},
+	/** On the button, for a reader who reaches it without seeing the label. */
+	languageSelect: { ko: '언어 선택', en: 'Select a language' }
 } satisfies Record<string, Record<Locale, string>>;
 
 export type StringKey = keyof typeof strings;

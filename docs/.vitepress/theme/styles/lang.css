@@ -65,15 +65,22 @@ html[data-lang='py'] .randino-lang[data-lang]:not([data-lang~='py']) {
  * under the navbar — its own 12px is the gap. It needs the sidebar's background
  * to be opaque, and a z-index over VitePress's `.curtain`, which is the sticky
  * band already masking that padding.
+ *
+ * It is also the menu's containing block, which is what `--randino-lang-gap` is
+ * for: the strip's bottom padding is what separates the switch from the menu
+ * below it, and the popup has to be placed back up through it rather than
+ * hanging that far off the button.
  */
 .randino-lang-select {
+	--randino-lang-gap: 20px;
+
 	position: sticky;
 	z-index: 2;
 	top: 0;
 	/* The gap below the rule is padding rather than margin, because a margin is
      transparent — and 4px of transparency on a pinned strip is 4px of the menu
      sliding through it. */
-	padding: 12px 0 24px;
+	padding: 12px 0 var(--randino-lang-gap);
 	border-bottom: 1px solid var(--vp-c-divider);
 	background-color: var(--vp-sidebar-bg-color);
 }
@@ -89,100 +96,210 @@ html[data-lang='py'] .randino-lang[data-lang]:not([data-lang~='py']) {
 }
 
 /*
- * The options stacked, one per row, so the selected one is a position rather
- * than a word you have to go and find.
+ * One row that names the choice, rather than the three stacked options this was.
  *
- * They were side by side while there were two. Three does not fit: the sidebar's
- * track is about 208px, which leaves each column ~65px, and `JavaScript` alone
- * needs 65px before its mark and the padding are counted — so the label was
- * being cut in half. Stacking is also what keeps a fourth package from having to
- * relitigate this.
+ * Every language's label is inside it and CSS displays the chosen one — see the
+ * comment at the top of `LangSelect.vue`. That is what lets a pre-rendered page
+ * show the right answer before any JavaScript has run, which a button whose text
+ * came from a ref could not.
  */
-.randino-lang-track {
-	display: grid;
-	gap: 2px;
-	padding: 3px;
+.randino-lang-button {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	width: 100%;
+	height: 34px;
+	padding: 0 10px;
+	border: 1px solid var(--vp-c-divider);
+	border-radius: 8px;
+	background-color: var(--vp-c-bg-alt);
+	color: var(--vp-c-text-1);
+	font-size: 13px;
+	font-weight: 600;
+	line-height: 1;
+	cursor: pointer;
+	transition:
+		color 0.16s,
+		border-color 0.16s,
+		background-color 0.16s;
+}
+
+.randino-lang-button:hover {
+	border-color: var(--vp-c-brand-1);
+	background-color: var(--vp-c-bg);
+}
+
+.randino-lang-button:focus-visible {
+	outline: 2px solid var(--vp-c-brand-1);
+	outline-offset: 2px;
+}
+
+.randino-lang-current {
+	display: flex;
+	flex: 1;
+	min-width: 0;
+}
+
+.randino-lang-face {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	min-width: 0;
+}
+
+/* A label is one word and the track is ~208px, so this only ever bites in a
+   narrow sidebar — but a clipped `JavaScript` is worse than an ellipsis. */
+.randino-lang-face > span {
+	overflow: hidden;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+}
+
+.randino-lang-chevron {
+	flex: none;
+	width: 14px;
+	height: 14px;
+	color: var(--vp-c-text-3);
+	transition:
+		color 0.16s,
+		transform 0.18s;
+}
+
+.randino-lang-button[aria-expanded='true'] .randino-lang-chevron {
+	color: var(--vp-c-text-2);
+	transform: rotate(180deg);
+}
+
+/*
+ * The popup, over the menu rather than pushing it down — the sidebar's entries
+ * are what the reader is on their way to, and a control that displaces them
+ * every time it is opened moves the link they were reaching for.
+ */
+.randino-lang-menu {
+	position: absolute;
+	z-index: 10;
+	top: calc(100% - var(--randino-lang-gap) + 6px);
+	right: 0;
+	left: 0;
+	padding: 6px;
 	border: 1px solid var(--vp-c-divider);
 	border-radius: 10px;
-	background-color: var(--vp-c-bg-alt);
+	background-color: var(--vp-c-bg-elv);
+	box-shadow: var(--vp-shadow-3);
+	animation: randino-lang-menu-in 0.14s ease-out;
+}
+
+@keyframes randino-lang-menu-in {
+	from {
+		opacity: 0;
+		transform: translateY(-4px);
+	}
+
+	to {
+		opacity: 1;
+		transform: none;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.randino-lang-menu {
+		animation: none;
+	}
+}
+
+.randino-lang-list {
+	display: grid;
+	gap: 2px;
 }
 
 .randino-lang-option {
 	display: flex;
 	align-items: center;
 	gap: 8px;
-	height: 28px;
+	width: 100%;
+	height: 30px;
 	padding: 0 8px;
-	border-radius: 7px;
+	border-radius: 6px;
 	color: var(--vp-c-text-2);
-	font-size: 12.5px;
-	font-weight: 600;
+	font-size: 13px;
+	font-weight: 500;
 	line-height: 1;
-	white-space: nowrap;
 	cursor: pointer;
-	user-select: none;
 	transition:
 		color 0.16s,
-		background-color 0.16s,
-		box-shadow 0.16s;
-}
-
-/* Present to every other kind of reader, and to the arrow keys, but not drawn:
-   the `<label>` around it is the control as far as the eye is concerned. */
-.randino-lang-option input {
-	position: absolute;
-	width: 1px;
-	height: 1px;
-	overflow: hidden;
-	white-space: nowrap;
-	clip-path: inset(50%);
+		background-color 0.16s;
 }
 
 .randino-lang-option:hover {
+	background-color: var(--vp-c-default-soft);
 	color: var(--vp-c-text-1);
 }
 
-/*
- * The chosen option, read off `<html>` rather than off a class the component
- * writes — the same detour the top of this file takes, for the same reason:
- * `data-lang` is set before the first paint, and a class is set by Vue after
- * hydration. A pre-rendered page whose switch is drawn from a class shows the
- * *default* highlighted for as long as it takes the bundle to arrive, on the one
- * control whose whole job is to say which package you are reading.
- */
-html[data-lang='js'] .randino-lang-option[data-lang='js'],
-html[data-lang='dart'] .randino-lang-option[data-lang='dart'],
-html[data-lang='py'] .randino-lang-option[data-lang='py'] {
-	background-color: var(--vp-c-bg);
-	color: var(--vp-c-text-1);
-	box-shadow:
-		0 0 0 1px var(--vp-c-divider),
-		0 1px 2px rgb(0 0 0 / 0.06);
+/* The focus ring is inset rather than an outline, because the option is flush
+   against the popup's own 6px of padding and an outline would sit on its edge. */
+.randino-lang-option:focus-visible {
+	outline: none;
+	box-shadow: inset 0 0 0 2px var(--vp-c-brand-1);
 }
 
-/* On the label, because the input it belongs to has no box to draw one on. */
-.randino-lang-option:has(input:focus-visible) {
-	outline: 2px solid var(--vp-c-brand-1);
-	outline-offset: 2px;
+.randino-lang-option[aria-selected='true'] {
+	color: var(--vp-c-brand-1);
+	font-weight: 600;
 }
 
-/* Quiet on the options that are not chosen, so the row reads as one selected
-   thing rather than several competing ones. */
-.randino-lang-mark {
+.randino-lang-option-label {
+	flex: 1;
+	text-align: left;
+}
+
+/* Reserved rather than conditional, so the three rows line up whichever one is
+   currently answering. */
+.randino-lang-check {
 	flex: none;
-	opacity: 0.5;
-	transition: opacity 0.16s;
+	width: 14px;
+	height: 14px;
+	opacity: 0;
 }
 
-html[data-lang='js'] .randino-lang-option[data-lang='js'] .randino-lang-mark,
-html[data-lang='dart'] .randino-lang-option[data-lang='dart'] .randino-lang-mark,
-html[data-lang='py'] .randino-lang-option[data-lang='py'] .randino-lang-mark,
-.randino-lang-option:hover .randino-lang-mark {
+.randino-lang-option[aria-selected='true'] .randino-lang-check {
 	opacity: 1;
 }
 
 /*
- * An outline entry for a heading the selected package cannot see. Set by
+ * What the control actually does, which is the one thing collapsing it into a
+ * button took away — the three visible options used to say "these are what this
+ * page can be written in" by standing there.
+ */
+.randino-lang-hint {
+	margin: 6px 8px 2px;
+	padding-top: 8px;
+	border-top: 1px solid var(--vp-c-divider);
+	font-size: 11px;
+	line-height: 1.5;
+	color: var(--vp-c-text-3);
+	white-space: normal;
+}
+
+.randino-lang-mark {
+	flex: none;
+}
+
+/* Quiet on the options that are not chosen, so the popup reads as one selected
+   thing rather than three competing ones. The button's own mark is never dimmed:
+   it is the answer. */
+.randino-lang-option .randino-lang-mark {
+	opacity: 0.55;
+	transition: opacity 0.16s;
+}
+
+.randino-lang-option:hover .randino-lang-mark,
+.randino-lang-option:focus-visible .randino-lang-mark,
+.randino-lang-option[aria-selected='true'] .randino-lang-mark {
+	opacity: 1;
+}
+
+/*
+ * An outline entry for a heading the selected language cannot see. Set by
  * `Layout.vue`, which is the only thing that can match an outline link to the
  * block its heading sits in — the outline is built from the Markdown, and the
  * blocks only exist in the DOM.

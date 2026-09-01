@@ -33,7 +33,7 @@ features:
     link: /ko/nickname/
     linkText: 닉네임
   - title: 세 개의 패키지, 하나의 라이브러리
-    details: JavaScript, Dart, Python이 같은 데이터셋과 같은 규칙을 씁니다. 문서 한 페이지가 셋 모두를 설명하며, 사이드바에서 원하는 쪽을 고르면 됩니다.
+    details: JavaScript, Dart, Python이 같은 데이터셋과 같은 규칙을 씁니다. 문서 한 페이지가 셋 모두를 설명하며, 사이드바에서 원하는 언어를 고르면 됩니다.
     link: /ko/guide/getting-started
     linkText: 시작하기
   - title: 9개 언어

@@ -1,6 +1,6 @@
 # Getting started
 
-randino ships as three packages from one set of datasets. Pick yours in the sidebar — every code sample on this site follows that choice, including the ones below.
+randino ships as three packages from one set of datasets. Pick your language in the sidebar — every code sample on this site follows that choice, including the ones below.
 
 ::: lang js
 
