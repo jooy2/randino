@@ -83,8 +83,8 @@ const packageLinks = [
  * `navGroupsFor` is what keeps the menu and those sections in step.
  */
 const navFor = (lang: string, labels: { demo: string; guide: string; packages: string }) => [
-	{ text: labels.demo, link: `${localeBase(lang, defaultLocale)}demo` },
 	{ text: labels.guide, link: `${localeBase(lang, defaultLocale)}guide/getting-started` },
+	{ text: labels.demo, link: `${localeBase(lang, defaultLocale)}demo` },
 	{ text: 'API', items: navGroupsFor(['generators', 'utilities'], lang, defaultLocale) },
 	{
 		text: labels.packages,
