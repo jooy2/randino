@@ -17,7 +17,6 @@ from randino import (
     name_supports_middle_name,
     name_supports_roman,
     rand_name,
-    rand_name_details,
 )
 from randino._internal.parse import NameToken
 
@@ -97,7 +96,7 @@ def test_rand_name_returns_exactly_count_names() -> None:
     assert len(rand_name(count=0)) == 0
     assert len(rand_name(count=-10)) == 0
     # A fractional count is floored rather than raising, the way the npm package does.
-    assert len(rand_name(count=2.7)) == 2  # type: ignore[arg-type]
+    assert len(rand_name(count=2.7)) == 2  # type: ignore[call-overload]
     assert len(rand_name(count=NAME_COUNT_MAX + 500)) == NAME_COUNT_MAX
 
 
@@ -110,7 +109,7 @@ def test_every_language_writes_names_in_its_own_script() -> None:
 def test_the_mixed_language_uses_every_language_it_knows() -> None:
     used = set()
 
-    for detail in rand_name_details(count=600):
+    for detail in rand_name(output="detail", count=600):
         assert SCRIPT[detail.language](detail.native), detail.native
         used.add(detail.language)
 
@@ -124,7 +123,7 @@ def test_script_roman_romanizes_every_language_into_ascii() -> None:
 
 
 def test_script_roman_leaves_english_names_as_they_are() -> None:
-    for detail in rand_name_details(language="en", count=SAMPLE):
+    for detail in rand_name(output="detail", language="en", count=SAMPLE):
         assert detail.native == detail.roman
 
     assert name_supports_roman("en") is False
@@ -132,7 +131,7 @@ def test_script_roman_leaves_english_names_as_they_are() -> None:
 
 
 def test_korean_surnames_use_their_conventional_romanization() -> None:
-    for detail in rand_name_details(language="ko", count=SAMPLE, starts_with="김"):
+    for detail in rand_name(output="detail", language="ko", count=SAMPLE, starts_with="김"):
         assert detail.native.startswith("김")
         assert detail.roman.startswith("Kim ")
 
@@ -142,10 +141,10 @@ def test_include_surname_adds_or_drops_the_family_name() -> None:
     # parts to reach a minimum length, which is what is being counted.
     spaced = {"min_length": 1, "max_length": 30, "count": SAMPLE}
 
-    for name in rand_name(language="en", **spaced):  # type: ignore[arg-type]
+    for name in rand_name(language="en", **spaced):  # type: ignore[call-overload]
         assert len(name.split(" ")) == 2, name
 
-    for name in rand_name(language="en", include_surname=False, **spaced):  # type: ignore[arg-type]
+    for name in rand_name(language="en", include_surname=False, **spaced):  # type: ignore[call-overload]
         assert len(name.split(" ")) == 1, name
 
     # Korean keeps its own default range: one syllable of surname plus two of given name.
@@ -178,22 +177,24 @@ def test_gender_picks_the_pools_the_name_is_drawn_from() -> None:
 
     # Russian is the one language whose middle name and surname are inflected for
     # gender, which makes the choice verifiable.
-    for name in rand_name(gender="male", include_middle_name=True, **options):  # type: ignore[arg-type]
+    for name in rand_name(gender="male", include_middle_name=True, **options):  # type: ignore[call-overload]
         middle = name.split(" ")[1]
         assert middle.endswith("ич"), name
 
-    for name in rand_name(gender="female", include_middle_name=True, **options):  # type: ignore[arg-type]
+    for name in rand_name(gender="female", include_middle_name=True, **options):  # type: ignore[call-overload]
         _, middle, surname = name.split(" ")
         assert middle.endswith("на"), name
         assert surname.endswith("а"), name
 
     genders = {
         detail.gender
-        for detail in rand_name_details(language="ru", min_length=1, max_length=40, count=200)
+        for detail in rand_name(
+            output="detail", language="ru", min_length=1, max_length=40, count=200
+        )
     }
     assert genders == {"female", "male"}
 
-    for detail in rand_name_details(gender="female", **options):  # type: ignore[arg-type]
+    for detail in rand_name(output="detail", gender="female", **options):  # type: ignore[call-overload]
         assert detail.gender == "female"
 
 
@@ -285,7 +286,7 @@ def test_style_zero_stays_inside_the_curated_pools() -> None:
         assert data.given_male is not None and data.given_female is not None
         given = set(pool_natives(data.given_male) + pool_natives(data.given_female))
 
-        for name in rand_name(language=language, style=0, count=300, **bounds):  # type: ignore[arg-type]
+        for name in rand_name(language=language, style=0, count=300, **bounds):  # type: ignore[call-overload]
             surname = surname_of(language, name)
 
             assert surname, f"{language}: no curated surname leads {name}"
@@ -335,8 +336,10 @@ def test_unique_never_repeats_a_name() -> None:
     assert len(limited) < 800, f"expected the pool to run out: {len(limited)}"
 
 
-def test_rand_name_details_reports_both_scripts_and_the_choices_made() -> None:
-    for detail in rand_name_details(language="ja", count=SAMPLE):
+def test_output_detail_reports_both_scripts_and_the_choices_made() -> None:
+    # Written out rather than going through the helper, so that the overload
+    # itself is what a type checker sees.
+    for detail in rand_name(language="ja", count=SAMPLE, output="detail"):
         assert detail.language == "ja"
         assert SCRIPT["ja"](detail.native), detail.native
         assert roman(detail.roman), detail.roman

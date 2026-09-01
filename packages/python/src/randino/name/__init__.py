@@ -10,7 +10,6 @@ from randino.name.name_length_range import name_length_range
 from randino.name.name_supports_middle_name import name_supports_middle_name
 from randino.name.name_supports_roman import name_supports_roman
 from randino.name.rand_name import rand_name
-from randino.name.rand_name_details import rand_name_details
 
 __all__ = [
     "NAME_COUNT_MAX",
@@ -21,5 +20,4 @@ __all__ = [
     "name_supports_middle_name",
     "name_supports_roman",
     "rand_name",
-    "rand_name_details",
 ]

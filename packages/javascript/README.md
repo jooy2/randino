@@ -30,7 +30,7 @@ Requires **Node.js 18 or newer**, or any browser — the package ships ESM with 
 ## Person names
 
 ```javascript
-import { randName, randNameDetails } from 'randino';
+import { randName } from 'randino';
 
 randName();
 // ['Emma Clover']
@@ -47,7 +47,7 @@ randName({ language: 'en', gender: 'female', includeMiddleName: true });
 randName({ language: 'ja', count: 2, script: 'roman' });
 // ['Yamazaki Aina', 'Kato Kaeno']
 
-randNameDetails({ language: 'ko' });
+randName({ language: 'ko', output: 'detail' });
 // [{ native: '여미주', roman: 'Yeo Miju', language: 'ko', gender: 'female' }]
 ```
 
@@ -61,13 +61,14 @@ randNameDetails({ language: 'ko' });
 | `includeSurname`          | `boolean`                        | `true`     |
 | `includeMiddleName`       | `boolean`                        | `false`    |
 | `script`                  | `'native' \| 'roman'`            | `'native'` |
+| `output`                  | `'value' \| 'detail'`            | `'value'`  |
 | `startsWith`              | `string`                         | —          |
 | `unique`                  | `boolean`                        | `false`    |
 
 ## Nicknames
 
 ```javascript
-import { randNickname, randNicknameDetails } from 'randino';
+import { randNickname } from 'randino';
 
 randNickname({ language: 'ko', count: 3 });
 // ['오래된곰', '영원한도마뱀', '귀여운신화다발']
@@ -81,7 +82,7 @@ randNickname({ language: 'ko', theme: 'animal', count: 2 });
 randNickname({ baseWord: '고양이', count: 3 });
 // ['하얀고양이', '고양이바람', '귀여운고양이뿔']
 
-randNicknameDetails({ language: 'ko' });
+randNickname({ language: 'ko', output: 'detail' });
 // [{
 //   nickname: '오래된발견',
 //   words: ['오래된', '발견'],
@@ -102,6 +103,7 @@ randNicknameDetails({ language: 'ko' });
 | `baseWord`                | `string`                         | —          |
 | `startsWith`              | `string`                         | —          |
 | `unique`                  | `boolean`                        | `false`    |
+| `output`                  | `'value' \| 'detail'`            | `'value'`  |
 
 Themes: `animal`, `object`, `nature`, `plant`, `gem`, `concept`, `myth`, `job`, `music`, `place`, `food`, `sport`, `vehicle`, `product`.
 

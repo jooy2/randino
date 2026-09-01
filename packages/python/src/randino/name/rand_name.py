@@ -1,12 +1,51 @@
-"""Generating person names as plain strings."""
+"""Generating person names, as strings or as details."""
+
+from typing import Literal, overload
 
 from randino._types import (
     NameDetail,
     NameGenderOption,
     NameLanguageOption,
     NameScript,
+    RandOutput,
 )
 from randino.name._generator import generate_name_details
+
+
+@overload
+def rand_name(
+    *,
+    language: NameLanguageOption = ...,
+    gender: NameGenderOption = ...,
+    count: int = ...,
+    style: int = ...,
+    min_length: int | None = ...,
+    max_length: int | None = ...,
+    include_surname: bool = ...,
+    include_middle_name: bool = ...,
+    script: NameScript = ...,
+    starts_with: str = ...,
+    unique: bool = ...,
+    output: Literal["value"] = ...,
+) -> list[str]: ...
+
+
+@overload
+def rand_name(
+    *,
+    language: NameLanguageOption = ...,
+    gender: NameGenderOption = ...,
+    count: int = ...,
+    style: int = ...,
+    min_length: int | None = ...,
+    max_length: int | None = ...,
+    include_surname: bool = ...,
+    include_middle_name: bool = ...,
+    script: NameScript = ...,
+    starts_with: str = ...,
+    unique: bool = ...,
+    output: Literal["detail"],
+) -> list[NameDetail]: ...
 
 
 def rand_name(
@@ -22,12 +61,13 @@ def rand_name(
     script: NameScript = "native",
     starts_with: str = "",
     unique: bool = False,
-) -> list[str]:
+    output: RandOutput = "value",
+) -> list[str] | list[NameDetail]:
     """Generate natural-looking person names.
 
-    Returns `count` names as a list of strings, written in the script given by
-    `script`. Use `rand_name_details` to get the native and romanized form of each
-    name together.
+    Returns `count` names as a list of strings written in the script given by
+    `script` — or, with `output="detail"`, a `NameDetail` per name, carrying both
+    scripts at once along with the language and gender behind it.
 
     Args:
         language: Language of the generated names. `"all"` mixes every language.
@@ -41,10 +81,16 @@ def rand_name(
             the language's own range.
         include_surname: Include a surname.
         include_middle_name: Include a middle name, for languages that use one.
-        script: Script of the returned strings.
+        script: Script of the returned strings. Ignored when `output` is
+            `"detail"`, which carries both.
         starts_with: Keep only names whose native form starts with this character.
         unique: Never return the same name twice. May return fewer than `count`
             names when the pool runs out of combinations.
+        output: `"value"` for strings, `"detail"` for a `NameDetail` per name.
+
+    Returns:
+        A `list[str]`, or a `list[NameDetail]` when `output="detail"` — the
+        overloads carry that through, so a type checker knows which one it got.
 
     Example:
         >>> rand_name()
@@ -55,6 +101,8 @@ def rand_name(
         ['Kim Minjun']
         >>> rand_name(language="en", gender="female", include_middle_name=True)
         ['Grace Amelia Bennett']
+        >>> rand_name(language="ko", output="detail")
+        [NameDetail(native='김민준', roman='Kim Minjun', language='ko', gender='male')]
     """
     details: list[NameDetail] = generate_name_details(
         language=language,
@@ -68,5 +116,8 @@ def rand_name(
         starts_with=starts_with,
         unique=unique,
     )
+
+    if output == "detail":
+        return details
 
     return [detail.roman if script == "roman" else detail.native for detail in details]

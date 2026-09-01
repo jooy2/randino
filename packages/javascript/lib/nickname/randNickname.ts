@@ -1,4 +1,4 @@
-import type { RandNicknameOptions } from '../_types/global.js';
+import type { NicknameDetail, RandNicknameOptions } from '../_types/global.js';
 import { generateNicknameDetails } from './nicknameGenerator.js';
 
 /**
@@ -19,6 +19,26 @@ import { generateNicknameDetails } from './nicknameGenerator.js';
  * randNickname({ baseWord: '고양이', count: 3 });
  * // ['멋진고양이', '고양이발바닥', '파란고양이꼬리']
  */
-export function randNickname(options: RandNicknameOptions = {}): string[] {
-	return generateNicknameDetails(options).map((detail) => detail.nickname);
+export function randNickname(options?: RandNicknameOptions & { output?: 'value' }): string[];
+/**
+ * Generate nicknames along with the pieces each one was built from.
+ *
+ * `output: 'detail'` returns a `NicknameDetail` per nickname instead of a
+ * string — the words in order, the language and the theme. Useful when you need
+ * the words on their own, to highlight the base word or to group by theme.
+ *
+ * @example
+ * randNickname({ language: 'ko', output: 'detail' });
+ * // [{
+ * //   nickname: '멋진사자',
+ * //   words: ['멋진', '사자'],
+ * //   language: 'ko',
+ * //   theme: 'animal'
+ * // }]
+ */
+export function randNickname(options: RandNicknameOptions & { output: 'detail' }): NicknameDetail[];
+export function randNickname(options: RandNicknameOptions = {}): string[] | NicknameDetail[] {
+	const details = generateNicknameDetails(options);
+
+	return options.output === 'detail' ? details : details.map((detail) => detail.nickname);
 }

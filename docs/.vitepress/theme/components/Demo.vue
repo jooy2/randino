@@ -9,9 +9,7 @@ import {
 	nameSupportsMiddleName,
 	nicknameLengthRange,
 	randName,
-	randNameDetails,
 	randNickname,
-	randNicknameDetails,
 	randPrefix,
 	randSuffix
 } from 'randino';
@@ -132,15 +130,19 @@ const options = computed(() => {
 /**
  * What the generator is actually called with.
  *
- * `script` is dropped in details mode because `randNameDetails` returns both
- * forms and ignores it — leaving it in the code block would show the reader an
- * option that does nothing in the call they are looking at.
+ * `script` is dropped in detail mode: the detail form carries both scripts and
+ * ignores the option, so leaving it in the code block would show the reader
+ * something that does nothing in the call they are looking at.
  */
 const generatorOptions = computed(() => {
 	const out = { ...options.value };
 
-	if (tab.value === 'name' && details.value) {
-		delete out.script;
+	if (details.value) {
+		if (tab.value === 'name') {
+			delete out.script;
+		}
+
+		out.output = 'detail';
 	}
 
 	return out;
@@ -176,7 +178,7 @@ function generate() {
 
 	if (tab.value === 'name') {
 		if (details.value) {
-			const drawn = randNameDetails(config);
+			const drawn = randName({ ...config, output: 'detail' });
 
 			items = drawn.map((detail) => (name.script === 'roman' ? detail.roman : detail.native));
 			meta = drawn.map((detail) => [
@@ -189,7 +191,7 @@ function generate() {
 			items = randName(config);
 		}
 	} else if (details.value) {
-		const drawn = randNicknameDetails(config);
+		const drawn = randNickname({ ...config, output: 'detail' });
 
 		items = drawn.map((detail) => detail.nickname);
 		meta = drawn.map((detail) => [
@@ -241,13 +243,7 @@ function objectLiteral(source) {
 
 const code = computed(() => {
 	const isName = tab.value === 'name';
-	const generator = isName
-		? details.value
-			? 'randNameDetails'
-			: 'randName'
-		: details.value
-			? 'randNicknameDetails'
-			: 'randNickname';
+	const generator = isName ? 'randName' : 'randNickname';
 
 	const call = `${generator}(${objectLiteral(generatorOptions.value)})`;
 

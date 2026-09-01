@@ -1,7 +1,6 @@
 """The nickname generator itself.
 
-Internal — `rand_nickname` and `rand_nickname_details` are the public entry
-points.
+Internal — `rand_nickname` is the public entry point, in both of its output forms.
 
 A nickname is a noun with something added to it: a modifier in front (멋진사자), a
 second noun behind (고양이꼬리), or both (파란고양이발바닥). The nouns are everyday

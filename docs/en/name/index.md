@@ -39,8 +39,7 @@ rand_name(language="ko", count=3)
 
 | Function | Returns |
 | --- | --- |
-| [`randName`](./rand-name) | The names as strings, in one script |
-| [`randNameDetails`](./rand-name-details) | Both scripts plus the language and gender behind each name |
+| [`randName`](./rand-name) | The names as strings, or [a detail per name](./rand-name#the-detail-output) |
 | [`nameLengthRange`](./name-length-range) | The natural length range of a full name in a language |
 | [`nameSupportsMiddleName`](./name-supports-middle-name) | Whether a language has a middle part at all |
 | [`nameSupportsRoman`](./name-supports-roman) | Whether romanizing changes anything |
@@ -119,4 +118,4 @@ So that the count you asked for is the count you get. Turn it on to deduplicate;
 
 `gender` picks which pools the given name is drawn from. In most languages that is all it does, and the result is not observable from the outside — a Korean given name does not announce which pool it came from. Russian is the exception: its patronymic and its surname both inflect, so `Иванов` becomes `Иванова` and `Николаевич` becomes `Николаевна`.
 
-Leave it out and a gender is picked per name. <Lang js="randNameDetails" dart="randNameDetails" py="rand_name_details" code /> reports which one was used.
+Leave it out and a gender is picked per name. [The detail output](./rand-name#the-detail-output) reports which one was used.

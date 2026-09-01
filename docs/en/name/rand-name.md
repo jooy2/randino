@@ -1,6 +1,6 @@
 # randName
 
-Generates person names and returns `count` of them as strings, written in the script you asked for. Use [`randNameDetails`](./rand-name-details) when you want the native and romanized form of each name together.
+Generates person names and returns `count` of them as strings, written in the script you asked for — or, with [`output: 'detail'`](#the-detail-output), the native and romanized form of each name together with the language and gender behind it.
 
 ::: lang js
 
@@ -52,8 +52,77 @@ Every option is optional, and the defaults are what the empty call above uses.
 | `script` | `NameScript` | <Lang js="'native'" dart="NameScript.native" py="&quot;native&quot;" code /> | The script the returned strings are written in. |
 | <Lang js="startsWith" dart="startsWith" py="starts_with" code /> | <Lang js="string" dart="String?" py="str" code /> | <Lang js="—" dart="null" py="&quot;&quot;" code /> | Keep only names whose native form starts with this character. Only the first character is used, and the match is case-insensitive. |
 | `unique` | <Lang js="boolean" dart="bool" py="bool" code /> | <Lang js="false" dart="false" py="False" code /> | Never return the same name twice. May return fewer than `count` once the pools run out of combinations. |
+| `output` | <Lang js="RandOutput" py="RandOutput" code /> | <Lang js="'value'" py="&quot;value&quot;" code /> | Strings, or a `NameDetail` per name. Dart has no such parameter — see [the detail output](#the-detail-output). |
 
 <Lang js="minLength" dart="minLength" py="min_length" code /> and <Lang js="maxLength" dart="maxLength" py="max_length" code /> default to the language's own range, which [`nameLengthRange`](./name-length-range) reports — and that fallback is resolved **per language**, so a mixed draw does not stretch a Korean name to fill a Spanish name's range.
+
+## The detail output
+
+`output: 'detail'` returns each name in **both scripts** at once, with the language and gender behind it, instead of a string. Useful for showing a name next to its English pronunciation, and necessary when the draw is mixed and you need to know what each name is. `script` has nothing left to choose there, so it is ignored.
+
+::: lang dart
+
+Dart spells this as a **second function**, `randNameDetails`, because it has no way to make one function's return type depend on an argument. It takes the same parameters as `randName` except `script`.
+
+:::
+
+::: lang js
+
+```javascript
+import { randName } from 'randino';
+
+randName({ language: 'ko', output: 'detail' });
+// [{ native: '여미주', roman: 'Yeo Miju', language: 'ko', gender: 'female' }]
+```
+
+:::
+
+::: lang dart
+
+```dart
+import 'package:randino/randino.dart';
+
+randNameDetails(language: NameLanguage.ko);
+// [NameDetail(여미주, Yeo Miju, ko, female)]
+```
+
+:::
+
+::: lang py
+
+```python
+from randino import rand_name
+
+rand_name(language="ko", output="detail")
+# [NameDetail(native='여미주', roman='Yeo Miju', language='ko', gender='female')]
+```
+
+:::
+
+::: lang js
+
+Each entry is a `NameDetail`:
+
+:::
+
+::: lang dart
+
+Each entry is a `NameDetail`:
+
+:::
+
+::: lang py
+
+Each entry is a `NameDetail`, a frozen dataclass:
+
+:::
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `native` | <Lang js="string" dart="String" py="str" code /> | The name in its own script. |
+| `roman` | <Lang js="string" dart="String" py="str" code /> | The English pronunciation of `native`. Identical to it for English. |
+| `language` | `NameLanguage` | The language this name was generated in — the reason to reach for this function when the draw is mixed. |
+| `gender` | `NameGender` | The pools the given name was drawn from. |
 
 ## Examples
 
@@ -307,8 +376,134 @@ rand_name(language="en", count=2, min_length=20, max_length=25)
 
 The structure you asked for always wins. A range too narrow for the requested parts is answered with the closest name the generator can build, never by dropping the surname or middle name — see [how the options behave](./#length-is-counted-in-the-native-form).
 
+### A name next to its pronunciation
+
+::: lang js
+
+```javascript
+for (const { native, roman } of randName({ language: 'ja', count: 3, output: 'detail' })) {
+	console.log(`${native} (${roman})`);
+}
+// 山崎愛菜 (Yamazaki Aina)
+// 加藤楓乃 (Kato Kaeno)
+// 吉田直人 (Yoshida Naoto)
+```
+
+:::
+
+::: lang dart
+
+```dart
+for (final detail in randNameDetails(language: NameLanguage.ja, count: 3)) {
+  print('${detail.native} (${detail.roman})');
+}
+// 山崎愛菜 (Yamazaki Aina)
+// 加藤楓乃 (Kato Kaeno)
+// 吉田直人 (Yoshida Naoto)
+```
+
+:::
+
+::: lang py
+
+```python
+for detail in rand_name(language="ja", count=3, output="detail"):
+    print(f"{detail.native} ({detail.roman})")
+# 山崎愛菜 (Yamazaki Aina)
+# 加藤楓乃 (Kato Kaeno)
+# 吉田直人 (Yoshida Naoto)
+```
+
+:::
+
+### Knowing what a mixed draw produced
+
+::: lang js
+
+```javascript
+randName({ count: 3, output: 'detail' });
+// [
+//   { native: '조동민', roman: 'Jo Dongmin', language: 'ko', gender: 'male' },
+//   { native: 'Anna Mariani', roman: 'Anna Mariani', language: 'it', gender: 'female' },
+//   { native: 'Иванов Иван', roman: 'Ivanov Ivan', language: 'ru', gender: 'male' }
+// ]
+```
+
+:::
+
+::: lang dart
+
+```dart
+randNameDetails(count: 3);
+// [
+//   NameDetail(조동민, Jo Dongmin, ko, male),
+//   NameDetail(Anna Mariani, Anna Mariani, it, female),
+//   NameDetail(Иванов Иван, Ivanov Ivan, ru, male),
+// ]
+```
+
+:::
+
+::: lang py
+
+```python
+rand_name(count=3, output="detail")
+# [
+#     NameDetail(native='조동민', roman='Jo Dongmin', language='ko', gender='male'),
+#     NameDetail(native='Anna Mariani', roman='Anna Mariani', language='it', gender='female'),
+#     NameDetail(native='Иванов Иван', roman='Ivanov Ivan', language='ru', gender='male'),
+# ]
+```
+
+:::
+
+### Gender, where it is observable
+
+Most languages do not show which pool a given name came from. Russian does — its patronymic and its surname both inflect — which is what makes the choice verifiable there:
+
+::: lang js
+
+```javascript
+randName({ language: 'ru', gender: 'female', includeMiddleName: true, count: 2, output: 'detail' });
+// [
+//   { native: 'Людмила Николаевна Богданова', roman: 'Lyudmila Nikolaevna Bogdanova', … },
+//   { native: 'Марина Максимовна Богданова', roman: 'Marina Maksimovna Bogdanova', … }
+// ]
+```
+
+:::
+
+::: lang dart
+
+```dart
+randNameDetails(
+  language: NameLanguage.ru,
+  gender: NameGender.female,
+  includeMiddleName: true,
+  count: 2,
+);
+// [
+//   NameDetail(Людмила Николаевна Богданова, Lyudmila Nikolaevna Bogdanova, ru, female),
+//   NameDetail(Марина Максимовна Богданова, Marina Maksimovna Bogdanova, ru, female),
+// ]
+```
+
+:::
+
+::: lang py
+
+```python
+rand_name(language="ru", gender="female", include_middle_name=True, count=2, output="detail")
+# [
+#     NameDetail(native='Людмила Николаевна Богданова', roman='Lyudmila Nikolaevna Bogdanova', …),
+#     NameDetail(native='Марина Максимовна Богданова', roman='Marina Maksimovna Bogdanova', …),
+# ]
+```
+
+:::
+
 ## See also
 
-- [`randNameDetails`](./rand-name-details) — the same names with both scripts and the choices behind them.
+- [Supported languages](../guide/languages#romanization) — how each script becomes an English pronunciation.
 - [`nameLengthRange`](./name-length-range) — the range a name falls back to.
 - [`nameSupportsMiddleName`](./name-supports-middle-name) and [`nameSupportsRoman`](./name-supports-roman) — the two questions about a language.

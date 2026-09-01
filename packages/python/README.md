@@ -30,7 +30,7 @@ Requires **Python 3.10 or newer**. There is nothing else to install.
 ## Person names
 
 ```python
-from randino import rand_name, rand_name_details
+from randino import rand_name
 
 rand_name()
 # ['Emma Clover']
@@ -44,7 +44,7 @@ rand_name(language="ko", script="roman")
 rand_name(language="en", gender="female", include_middle_name=True)
 # ['Grace Amelia Bennett']
 
-rand_name_details(language="ko")[0]
+rand_name(language="ko", output="detail")[0]
 # NameDetail(native='여미주', roman='Yeo Miju', language='ko', gender='female')
 ```
 
@@ -60,13 +60,14 @@ rand_name_details(language="ko")[0]
 | `script`                    | `NameScript`                  | `"native"` |
 | `starts_with`               | `str`                         | `""`       |
 | `unique`                    | `bool`                        | `False`    |
+| `output`                    | `RandOutput`                  | `"value"`  |
 
-`rand_name_details` takes the same arguments except `script`, and returns a `NameDetail` — `native`, `roman`, `language` and `gender` — for each name.
+`output="detail"` returns a `NameDetail` — `native`, `roman`, `language` and `gender` — for each name instead of a string, and makes `script` moot because both forms are already there. The two shapes are `@overload`ed, so a type checker knows which one a call returns.
 
 ## Nicknames
 
 ```python
-from randino import rand_nickname, rand_nickname_details
+from randino import rand_nickname
 
 rand_nickname(language="ko", count=3)
 # ['오래된곰', '영원한도마뱀', '귀여운신화다발']
@@ -80,7 +81,7 @@ rand_nickname(language="ko", theme="animal", count=2)
 rand_nickname(base_word="고양이", count=3)
 # ['하얀고양이', '고양이바람', '귀여운고양이뿔']
 
-rand_nickname_details(language="ko")[0]
+rand_nickname(language="ko", output="detail")[0]
 # NicknameDetail(nickname='오래된발견', words=('오래된', '발견'), language='ko', theme='concept')
 ```
 
@@ -96,6 +97,9 @@ rand_nickname_details(language="ko")[0]
 | `base_word`                 | `str`                             | `""`       |
 | `starts_with`               | `str`                             | `""`       |
 | `unique`                    | `bool`                            | `False`    |
+| `output`                    | `RandOutput`                      | `"value"`  |
+
+`output="detail"` returns a `NicknameDetail` — `nickname`, `words`, `language` and `theme` — for each nickname instead of a string.
 
 `language` is the one argument whose default is `None` rather than `"all"`, and the two are not the same thing: left out, a `base_word` picks the language it is written in, so `"고양이"` is never handed an English modifier. Passing `"all"` mixes every language regardless.
 

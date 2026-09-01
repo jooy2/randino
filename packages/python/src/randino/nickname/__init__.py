@@ -9,7 +9,6 @@ from randino.nickname.data import (
 )
 from randino.nickname.nickname_length_range import nickname_length_range
 from randino.nickname.rand_nickname import rand_nickname
-from randino.nickname.rand_nickname_details import rand_nickname_details
 
 __all__ = [
     "NICKNAME_COUNT_MAX",
@@ -19,5 +18,4 @@ __all__ = [
     "NICKNAME_THEMES",
     "nickname_length_range",
     "rand_nickname",
-    "rand_nickname_details",
 ]

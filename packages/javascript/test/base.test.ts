@@ -25,15 +25,16 @@ describe('base test', () => {
 			'nameSupportsRoman',
 			'nicknameLengthRange',
 			'randName',
-			'randNameDetails',
 			'randNickname',
-			'randNicknameDetails',
 			'randPrefix',
 			'randSuffix'
 		]);
 
 		assert.strictEqual(typeof randino.randName, 'function');
-		assert.strictEqual(typeof randino.randNameDetails, 'function');
+		// One function, two return shapes — the option is the API, so it is asserted
+		// here rather than only in the category's own suite.
+		assert.strictEqual(typeof randino.randName({ output: 'detail' })[0].roman, 'string');
+		assert.ok(Array.isArray(randino.randNickname({ output: 'detail' })[0].words));
 		assert.strictEqual(typeof randino.nameLengthRange, 'function');
 		assert.strictEqual(typeof randino.nameSupportsMiddleName, 'function');
 		assert.strictEqual(typeof randino.nameSupportsRoman, 'function');
@@ -43,7 +44,6 @@ describe('base test', () => {
 		assert.strictEqual(randino.NAME_COUNT_MAX, 10000);
 
 		assert.strictEqual(typeof randino.randNickname, 'function');
-		assert.strictEqual(typeof randino.randNicknameDetails, 'function');
 		assert.strictEqual(typeof randino.nicknameLengthRange, 'function');
 		assert.ok(Array.isArray(randino.NICKNAME_LANGUAGES));
 		assert.ok(Array.isArray(randino.NICKNAME_THEMES));

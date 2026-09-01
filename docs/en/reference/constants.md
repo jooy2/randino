@@ -236,7 +236,8 @@ import type {
 	NicknameTheme,
 	NicknameThemeOption,
 	RandNameOptions,
-	RandNicknameOptions
+	RandNicknameOptions,
+	RandOutput
 } from 'randino';
 
 const options: RandNameOptions = { language: 'ko', count: 3 };
@@ -282,6 +283,7 @@ from randino import (
     NicknameLanguageOption,
     NicknameTheme,
     NicknameThemeOption,
+    RandOutput,
 )
 
 language: NameLanguageOption = "ko"

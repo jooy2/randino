@@ -39,8 +39,7 @@ rand_name(language="ko", count=3)
 
 | 함수 | 반환값 |
 | --- | --- |
-| [`randName`](./rand-name) | 하나의 문자 체계로 표기된 이름 문자열 |
-| [`randNameDetails`](./rand-name-details) | 두 문자 체계와 각 이름의 언어·성별 정보 |
+| [`randName`](./rand-name) | 이름 문자열, 또는 [이름마다 상세 정보](./rand-name#the-detail-output) |
 | [`nameLengthRange`](./name-length-range) | 해당 언어에서 전체 이름의 자연스러운 길이 범위 |
 | [`nameSupportsMiddleName`](./name-supports-middle-name) | 해당 언어에 중간 이름이 있는지 여부 |
 | [`nameSupportsRoman`](./name-supports-roman) | 로마자 표기가 결과를 바꾸는지 여부 |
@@ -119,4 +118,4 @@ rand_name(language="ko", style=100, count=3)
 
 `gender`는 이름을 어느 풀에서 뽑을지 결정합니다. 대부분의 언어에서는 그게 전부이고, 결과만 봐서는 알 수 없습니다. 한국어 이름은 자기가 어느 풀에서 왔는지 드러내지 않으니까요. 러시아어가 예외입니다. 부칭과 성이 모두 굴절해서 `Иванов`는 `Иванова`가 되고 `Николаевич`는 `Николаевна`가 됩니다.
 
-생략하면 이름마다 성별을 하나씩 고릅니다. 어느 쪽이 쓰였는지는 <Lang js="randNameDetails" dart="randNameDetails" py="rand_name_details" code />가 알려 줍니다.
+생략하면 이름마다 성별을 하나씩 고릅니다. 어느 쪽이 쓰였는지는 [상세 출력](./rand-name#the-detail-output)이 알려 줍니다.

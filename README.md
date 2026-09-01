@@ -130,9 +130,11 @@ Every generator takes a language, or mixes every language it supports when you l
 
 | Generator    | JavaScript and Dart                       | Python                                         | Example             |
 | ------------ | ----------------------------------------- | ---------------------------------------------- | ------------------- |
-| Person names | `randName`, `randNameDetails`         | `rand_name`, `rand_name_details`           | 김민준 → Kim Minjun |
-| Nicknames    | `randNickname`, `randNicknameDetails` | `rand_nickname`, `rand_nickname_details`   | 멋진사자, MistyOwl  |
+| Person names | `randName`                            | `rand_name`                                | 김민준 → Kim Minjun |
+| Nicknames    | `randNickname`                        | `rand_nickname`                            | 멋진사자, MistyOwl  |
 | Random affixes | `randSuffix`, `randPrefix`              | `rand_suffix`, `rand_prefix`                 | 멋진사자_nVtRC      |
+
+Each generator returns strings by default, or one detail object per result with <code>output: 'detail'</code> — both scripts of a name, or the words a nickname was built from. The Dart package spells that as a second function (`randNameDetails`), because Dart has no way to make one function's return type depend on an argument.
 
 The full option tables, the fourteen nickname themes and the romanization rules are on the [documentation site](https://randino.cdget.com).
 

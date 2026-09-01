@@ -43,9 +43,7 @@ def test_the_package_exports_exactly_its_public_api() -> None:
         "name_supports_roman",
         "nickname_length_range",
         "rand_name",
-        "rand_name_details",
         "rand_nickname",
-        "rand_nickname_details",
         "rand_prefix",
         "rand_suffix",
     ]
@@ -56,7 +54,10 @@ def test_the_package_exports_exactly_its_public_api() -> None:
 
 def test_the_functions_are_callable_and_the_constants_are_what_they_claim() -> None:
     assert callable(randino.rand_name)
-    assert callable(randino.rand_name_details)
+    # One function, two return shapes — the option is the API, so it is asserted
+    # here rather than only in the category's own suite.
+    assert isinstance(randino.rand_name(output="detail")[0].roman, str)
+    assert isinstance(randino.rand_nickname(output="detail")[0].words, tuple)
     assert callable(randino.name_length_range)
     assert callable(randino.name_supports_middle_name)
     assert callable(randino.name_supports_roman)
@@ -66,7 +67,6 @@ def test_the_functions_are_callable_and_the_constants_are_what_they_claim() -> N
     assert randino.NAME_COUNT_MAX == 10000
 
     assert callable(randino.rand_nickname)
-    assert callable(randino.rand_nickname_details)
     assert callable(randino.nickname_length_range)
     assert isinstance(randino.NICKNAME_LANGUAGES, tuple)
     assert isinstance(randino.NICKNAME_THEMES, tuple)

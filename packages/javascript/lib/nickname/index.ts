@@ -7,4 +7,3 @@ export {
 } from './data/index.js';
 export { nicknameLengthRange } from './nicknameLengthRange.js';
 export { randNickname } from './randNickname.js';
-export { randNicknameDetails } from './randNicknameDetails.js';

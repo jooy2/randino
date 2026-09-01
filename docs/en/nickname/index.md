@@ -43,8 +43,7 @@ Korean and Japanese cannot be held to that check — 하늘, 별 and 森 are eve
 
 | Function | Returns |
 | --- | --- |
-| [`randNickname`](./rand-nickname) | The nicknames as strings |
-| [`randNicknameDetails`](./rand-nickname-details) | The words, the language and the theme behind each |
+| [`randNickname`](./rand-nickname) | The nicknames as strings, or [a detail per nickname](./rand-nickname#the-detail-output) |
 | [`nicknameLengthRange`](./nickname-length-range) | Every length a language can produce |
 
 The nouns come from fourteen [themes](./themes), and every nickname is built around a word from one of them.

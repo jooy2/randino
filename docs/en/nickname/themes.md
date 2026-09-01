@@ -66,7 +66,7 @@ Leave the theme out and each nickname draws from one theme picked at random, so 
 
 ## The rules a theme follows
 
-**Themes are disjoint.** A word in two of them would make the reported theme ambiguous for a <Lang js="baseWord" dart="baseWord" py="base_word" code />, and would make `randNicknameDetails` name a theme the caller never asked about. When a new theme claims a word an older one already held, the word **moves** rather than being copied: `place` took the twelve places that were sitting in `concept`, `vehicle` took the bicycle and the train out of `object`, `plant` took the flowers and the trees out of `nature`, and `music` took the instruments out of `object`. Where the two senses are genuinely different words, the word is renamed instead — the English toy became `Marbles` so that `gem` could keep `Marble`.
+**Themes are disjoint.** A word in two of them would make the reported theme ambiguous for a <Lang js="baseWord" dart="baseWord" py="base_word" code />, and would make the detail output name a theme the caller never asked about. When a new theme claims a word an older one already held, the word **moves** rather than being copied: `place` took the twelve places that were sitting in `concept`, `vehicle` took the bicycle and the train out of `object`, `plant` took the flowers and the trees out of `nature`, and `music` took the instruments out of `object`. Where the two senses are genuinely different words, the word is renamed instead — the English toy became `Marbles` so that `gem` could keep `Marble`.
 
 **No person names, and no word that is only a name.** For English this is enforced against the person-name pools automatically, which is why `job` has no `Knight`, `Baker` or `Hunter` and `plant` no `Rose` or `Ivy`. Korean and Japanese cannot be held to the same check — 하늘, 별 and 森 are everyday nouns that happen also to be names — but a modifier in front of one is still nobody's name.
 
@@ -80,7 +80,7 @@ Leave the theme out and each nickname draws from one theme picked at random, so 
 | Given as <Lang js="baseWord" dart="baseWord" py="base_word" code /> | The theme that holds it, looked up across all fourteen |
 | Invented at a high `style` | Null — unless it happens to spell a real word |
 
-That last row is a real coincidence rather than a bug: `나` + `비` spells `나비`, so an invented Korean nickname can come back with `theme` set to `animal`. See [`randNicknameDetails`](./rand-nickname-details#about-theme).
+That last row is a real coincidence rather than a bug: `나` + `비` spells `나비`, so an invented Korean nickname can come back with `theme` set to `animal`. See [About `theme`](./rand-nickname#about-theme).
 
 ## See also
 

@@ -1,7 +1,50 @@
-"""Generating nicknames as plain strings."""
+"""Generating nicknames, as strings or as details."""
 
-from randino._types import NicknameLanguageOption, NicknameThemeOption
+from typing import Literal, overload
+
+from randino._types import (
+    NicknameDetail,
+    NicknameLanguageOption,
+    NicknameThemeOption,
+    RandOutput,
+)
 from randino.nickname._generator import generate_nickname_details
+
+
+@overload
+def rand_nickname(
+    *,
+    language: NicknameLanguageOption | None = ...,
+    theme: NicknameThemeOption = ...,
+    count: int = ...,
+    style: int = ...,
+    min_length: int | None = ...,
+    max_length: int | None = ...,
+    include_modifier: bool = ...,
+    word_separator: str | None = ...,
+    base_word: str = ...,
+    starts_with: str = ...,
+    unique: bool = ...,
+    output: Literal["value"] = ...,
+) -> list[str]: ...
+
+
+@overload
+def rand_nickname(
+    *,
+    language: NicknameLanguageOption | None = ...,
+    theme: NicknameThemeOption = ...,
+    count: int = ...,
+    style: int = ...,
+    min_length: int | None = ...,
+    max_length: int | None = ...,
+    include_modifier: bool = ...,
+    word_separator: str | None = ...,
+    base_word: str = ...,
+    starts_with: str = ...,
+    unique: bool = ...,
+    output: Literal["detail"],
+) -> list[NicknameDetail]: ...
 
 
 def rand_nickname(
@@ -17,7 +60,8 @@ def rand_nickname(
     base_word: str = "",
     starts_with: str = "",
     unique: bool = False,
-) -> list[str]:
+    output: RandOutput = "value",
+) -> list[str] | list[NicknameDetail]:
     """Generate nicknames — the kind of handle someone would pick for a game or a website.
 
     Each one is an everyday word (an animal, a thing, something in nature, an idea)
@@ -47,6 +91,12 @@ def rand_nickname(
         starts_with: Keep only nicknames whose first character is this one.
         unique: Never return the same nickname twice. May return fewer than `count`
             nicknames once the pools run out of combinations.
+        output: `"value"` for strings, `"detail"` for a `NicknameDetail` per
+            nickname — the words in order, the language and the theme.
+
+    Returns:
+        A `list[str]`, or a `list[NicknameDetail]` when `output="detail"` — the
+        overloads carry that through, so a type checker knows which one it got.
 
     Example:
         >>> rand_nickname(language="ko", count=3)
@@ -59,20 +109,24 @@ def rand_nickname(
         ['멋진 사자', '고양이 꼬리']
         >>> rand_nickname(base_word="고양이", count=3)
         ['멋진고양이', '고양이발바닥', '파란고양이꼬리']
+        >>> rand_nickname(language="ko", output="detail")
+        [NicknameDetail(nickname='멋진사자', words=('멋진', '사자'), language='ko', theme='animal')]
     """
-    return [
-        detail.nickname
-        for detail in generate_nickname_details(
-            language=language,
-            theme=theme,
-            count=count,
-            style=style,
-            min_length=min_length,
-            max_length=max_length,
-            include_modifier=include_modifier,
-            word_separator=word_separator,
-            base_word=base_word,
-            starts_with=starts_with,
-            unique=unique,
-        )
-    ]
+    details: list[NicknameDetail] = generate_nickname_details(
+        language=language,
+        theme=theme,
+        count=count,
+        style=style,
+        min_length=min_length,
+        max_length=max_length,
+        include_modifier=include_modifier,
+        word_separator=word_separator,
+        base_word=base_word,
+        starts_with=starts_with,
+        unique=unique,
+    )
+
+    if output == "detail":
+        return details
+
+    return [detail.nickname for detail in details]

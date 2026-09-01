@@ -66,7 +66,7 @@ rand_nickname(theme="food", language="ko", count=3)
 
 ## 테마가 지키는 규칙
 
-**테마는 서로 겹치지 않습니다.** 한 단어가 두 테마에 있으면 <Lang js="baseWord" dart="baseWord" py="base_word" code />가 보고할 테마가 모호해지고, `randNicknameDetails`가 호출자가 요청한 적 없는 테마를 알려 주게 됩니다. 새 테마가 기존 테마의 단어를 가져갈 때는 복사가 아니라 **이동**합니다. `place`는 `concept`에 있던 장소 열두 개를 가져갔고, `vehicle`은 `object`에서 자전거와 기차를, `plant`는 `nature`에서 꽃과 나무를, `music`은 `object`에서 악기를 가져갔습니다. 두 뜻이 정말 다른 단어일 때는 이동 대신 이름을 바꿉니다. 영어에서 장난감 구슬을 `Marbles`로 바꾼 덕분에 `gem`이 `Marble`을 유지할 수 있었습니다.
+**테마는 서로 겹치지 않습니다.** 한 단어가 두 테마에 있으면 <Lang js="baseWord" dart="baseWord" py="base_word" code />가 보고할 테마가 모호해지고, 상세 출력이 호출자가 요청한 적 없는 테마를 알려 주게 됩니다. 새 테마가 기존 테마의 단어를 가져갈 때는 복사가 아니라 **이동**합니다. `place`는 `concept`에 있던 장소 열두 개를 가져갔고, `vehicle`은 `object`에서 자전거와 기차를, `plant`는 `nature`에서 꽃과 나무를, `music`은 `object`에서 악기를 가져갔습니다. 두 뜻이 정말 다른 단어일 때는 이동 대신 이름을 바꿉니다. 영어에서 장난감 구슬을 `Marbles`로 바꾼 덕분에 `gem`이 `Marble`을 유지할 수 있었습니다.
 
 **사람 이름은 쓰지 않고, 이름으로만 쓰이는 단어도 쓰지 않습니다.** 영어는 사람 이름 풀과 자동으로 대조하므로 `job`에 `Knight`, `Baker`, `Hunter`가 없고 `plant`에 `Rose`나 `Ivy`가 없습니다. 한국어와 일본어는 같은 검사를 적용할 수 없습니다. 하늘, 별, 森은 이름으로도 쓰이는 일상 명사이기 때문입니다. 그래도 그 앞에 수식어가 붙으면 누구의 이름도 아닙니다.
 
@@ -80,7 +80,7 @@ rand_nickname(theme="food", language="ko", count=3)
 | <Lang js="baseWord" dart="baseWord" py="base_word" code />로 직접 지정 | 14개 테마 전체에서 찾아낸, 그 단어의 테마 |
 | 높은 `style`로 만들어냄 | null — 우연히 실제 단어를 이루지 않는 한 |
 
-마지막 줄은 버그가 아니라 실제로 일어나는 우연입니다. `나` + `비`는 `나비`가 되므로, 만들어낸 한국어 닉네임이 `theme`을 `animal`로 보고할 수 있습니다. [`randNicknameDetails`](./rand-nickname-details#about-theme)를 참고하세요.
+마지막 줄은 버그가 아니라 실제로 일어나는 우연입니다. `나` + `비`는 `나비`가 되므로, 만들어낸 한국어 닉네임이 `theme`을 `animal`로 보고할 수 있습니다. [`theme`에 대하여](./rand-nickname#about-theme)를 참고하세요.
 
 ## 함께 보기
 

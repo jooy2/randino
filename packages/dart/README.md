@@ -145,6 +145,10 @@ The two generate the same output from the same data, and only the surface is Dar
 | `language: 'all'` (the default)    | `language` left out, or `null`                 |
 | `[number, number]`                 | `LengthRange`, which compares by value         |
 | `NameDetail` / `NicknameDetail` interfaces | The same two names, as classes         |
+| `output: 'detail'`                 | `randNameDetails` / `randNicknameDetails`      |
+| `randSuffix(['a', 'b'])`           | `randSuffixAll(['a', 'b'])`                    |
+
+The last two are the same limitation twice: Dart has neither overloads nor union types, so one function cannot return `List<String>` for one argument and `List<NameDetail>` for another. Where npm and PyPI pick the shape with an option, pub.dev picks it with a second function.
 
 ## Development
 

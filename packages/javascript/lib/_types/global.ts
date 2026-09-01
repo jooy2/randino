@@ -16,6 +16,17 @@ export type NameGenderOption = NameGender | 'all';
  */
 export type NameScript = 'native' | 'roman';
 
+/**
+ * What a generator hands back:
+ * - `value`: the finished strings, which is what most callers want.
+ * - `detail`: an object per result, with the pieces it was built from.
+ *
+ * One option rather than a second function. `randNameDetails` used to be that
+ * second function, and splitting one generator into two over its return type
+ * meant every option had to be documented twice.
+ */
+export type RandOutput = 'value' | 'detail';
+
 export interface RandNameOptions {
 	/** Language of the generated names. `'all'` mixes every language. Default `'all'`. */
 	language?: NameLanguageOption;
@@ -36,8 +47,10 @@ export interface RandNameOptions {
 	includeSurname?: boolean;
 	/** Include a middle name, for languages that use one. Default `false`. */
 	includeMiddleName?: boolean;
-	/** Script of the returned strings. Default `'native'`. */
+	/** Script of the returned strings. Ignored when `output` is `'detail'`, which carries both. Default `'native'`. */
 	script?: NameScript;
+	/** Strings, or a `NameDetail` per name. Default `'value'`. */
+	output?: RandOutput;
 	/** Keep only names whose native form starts with this character. */
 	startsWith?: string;
 	/**
@@ -131,6 +144,8 @@ export interface RandNicknameOptions {
 	 * nicknames once the pools run out of combinations. Default `false`.
 	 */
 	unique?: boolean;
+	/** Strings, or a `NicknameDetail` per nickname. Default `'value'`. */
+	output?: RandOutput;
 }
 
 /** What `randSuffix` and `randPrefix` attach — the same three for both. */

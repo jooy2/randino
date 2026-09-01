@@ -26,6 +26,17 @@ NameScript = Literal["native", "roman"]
 - `roman`: the English pronunciation of the native form (Kim Minjun).
 """
 
+RandOutput = Literal["value", "detail"]
+"""What a generator hands back.
+
+- `value`: the finished strings, which is what most callers want.
+- `detail`: an object per result, with the pieces it was built from.
+
+One option rather than a second function. `rand_name_details` used to be that
+second function, and splitting one generator into two over its return type meant
+every option had to be documented twice.
+"""
+
 NicknameLanguage = Literal["en", "ko", "ja", "zh"]
 """A language the nickname generator can build nicknames in.
 

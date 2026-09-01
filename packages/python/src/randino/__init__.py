@@ -43,7 +43,6 @@ from randino.name import (
     name_supports_middle_name,
     name_supports_roman,
     rand_name,
-    rand_name_details,
 )
 from randino.nickname import (
     NICKNAME_COUNT_MAX,
@@ -53,7 +52,6 @@ from randino.nickname import (
     NICKNAME_THEMES,
     nickname_length_range,
     rand_nickname,
-    rand_nickname_details,
 )
 
 __all__ = [
@@ -86,9 +84,7 @@ __all__ = [
     "name_supports_roman",
     "nickname_length_range",
     "rand_name",
-    "rand_name_details",
     "rand_nickname",
-    "rand_nickname_details",
     "rand_prefix",
     "rand_suffix",
 ]

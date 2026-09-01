@@ -1,6 +1,6 @@
 # randName
 
-사람 이름을 생성해서 `count`개의 문자열로 돌려줍니다. 표기는 요청한 문자 체계를 따릅니다. 각 이름의 고유 표기와 로마자 표기를 함께 받고 싶다면 [`randNameDetails`](./rand-name-details)를 쓰세요.
+사람 이름을 생성해서 `count`개의 문자열로 돌려줍니다. 표기는 요청한 문자 체계를 따릅니다. [`output: 'detail'`](#the-detail-output)을 주면 문자열 대신 각 이름의 고유 표기와 로마자 표기를, 그 이름의 언어·성별과 함께 돌려줍니다.
 
 ::: lang js
 
@@ -52,8 +52,61 @@ rand_name()
 | `script` | `NameScript` | <Lang js="'native'" dart="NameScript.native" py="&quot;native&quot;" code /> | 반환되는 문자열의 문자 체계. |
 | <Lang js="startsWith" dart="startsWith" py="starts_with" code /> | <Lang js="string" dart="String?" py="str" code /> | <Lang js="—" dart="null" py="&quot;&quot;" code /> | 고유 표기가 이 글자로 시작하는 이름만 반환합니다. 첫 글자만 사용하고 대소문자는 구분하지 않습니다. |
 | `unique` | <Lang js="boolean" dart="bool" py="bool" code /> | <Lang js="false" dart="false" py="False" code /> | 같은 이름을 두 번 반환하지 않습니다. 조합이 바닥나면 `count`보다 적게 반환할 수 있습니다. |
+| `output` | <Lang js="RandOutput" py="RandOutput" code /> | <Lang js="'value'" py="&quot;value&quot;" code /> | 문자열, 또는 이름마다 하나의 `NameDetail`. Dart에는 이 파라미터가 없습니다. [상세 출력](#the-detail-output)을 참고하세요. |
 
 <Lang js="minLength" dart="minLength" py="min_length" code />와 <Lang js="maxLength" dart="maxLength" py="max_length" code />의 기본값은 각 언어의 고유 범위이며, 그 값은 [`nameLengthRange`](./name-length-range)가 알려 줍니다. 이 기본값은 **언어별로** 결정되므로, 여러 언어를 섞어도 한국어 이름이 스페인어 이름의 길이에 맞춰 늘어나지 않습니다.
+
+## 상세 출력 {#the-detail-output}
+
+`output: 'detail'`은 문자열 대신 각 이름을 **두 문자 체계로 한 번에** 돌려주고, 그 이름의 언어와 성별도 함께 알려 줍니다. 이름과 영어 발음을 나란히 보여 줄 때 유용하며, 여러 언어를 섞어 뽑을 때는 각 이름이 무엇인지 알기 위해 필요합니다. 이 형태에서는 고를 것이 없으므로 `script`는 무시됩니다.
+
+::: lang dart
+
+Dart에는 인자에 따라 반환 타입이 달라지는 함수를 만들 방법이 없어서, 이 기능은 **별도 함수** `randNameDetails`로 되어 있습니다. `script`를 제외하면 `randName`과 같은 파라미터를 받습니다.
+
+:::
+
+::: lang js
+
+```javascript
+import { randName } from 'randino';
+
+randName({ language: 'ko', output: 'detail' });
+// [{ native: '여미주', roman: 'Yeo Miju', language: 'ko', gender: 'female' }]
+```
+
+:::
+
+::: lang dart
+
+```dart
+import 'package:randino/randino.dart';
+
+randNameDetails(language: NameLanguage.ko);
+// [NameDetail(여미주, Yeo Miju, ko, female)]
+```
+
+:::
+
+::: lang py
+
+```python
+from randino import rand_name
+
+rand_name(language="ko", output="detail")
+# [NameDetail(native='여미주', roman='Yeo Miju', language='ko', gender='female')]
+```
+
+:::
+
+각 항목은 `NameDetail`입니다.
+
+| 필드 | 타입 | 설명 |
+| --- | --- | --- |
+| `native` | <Lang js="string" dart="String" py="str" code /> | 해당 언어의 문자로 쓴 이름. |
+| `roman` | <Lang js="string" dart="String" py="str" code /> | `native`의 영어 발음. 영어에서는 `native`와 동일합니다. |
+| `language` | `NameLanguage` | 이 이름이 생성된 언어. 여러 언어를 섞을 때 이 함수를 쓰는 이유입니다. |
+| `gender` | `NameGender` | 이름을 뽑은 풀. |
 
 ## 예제
 
@@ -307,8 +360,134 @@ rand_name(language="en", count=2, min_length=20, max_length=25)
 
 요청한 구조가 항상 우선합니다. 요청한 요소를 담기에 범위가 너무 좁으면, 성이나 중간 이름을 빼는 대신 생성기가 만들 수 있는 가장 가까운 이름을 돌려줍니다. 자세한 내용은 [옵션의 동작 방식](./#length)을 참고하세요.
 
+### 이름과 발음을 나란히
+
+::: lang js
+
+```javascript
+for (const { native, roman } of randName({ language: 'ja', count: 3, output: 'detail' })) {
+	console.log(`${native} (${roman})`);
+}
+// 山崎愛菜 (Yamazaki Aina)
+// 加藤楓乃 (Kato Kaeno)
+// 吉田直人 (Yoshida Naoto)
+```
+
+:::
+
+::: lang dart
+
+```dart
+for (final detail in randNameDetails(language: NameLanguage.ja, count: 3)) {
+  print('${detail.native} (${detail.roman})');
+}
+// 山崎愛菜 (Yamazaki Aina)
+// 加藤楓乃 (Kato Kaeno)
+// 吉田直人 (Yoshida Naoto)
+```
+
+:::
+
+::: lang py
+
+```python
+for detail in rand_name(language="ja", count=3, output="detail"):
+    print(f"{detail.native} ({detail.roman})")
+# 山崎愛菜 (Yamazaki Aina)
+# 加藤楓乃 (Kato Kaeno)
+# 吉田直人 (Yoshida Naoto)
+```
+
+:::
+
+### 섞인 결과가 무엇인지 알기
+
+::: lang js
+
+```javascript
+randName({ count: 3, output: 'detail' });
+// [
+//   { native: '조동민', roman: 'Jo Dongmin', language: 'ko', gender: 'male' },
+//   { native: 'Anna Mariani', roman: 'Anna Mariani', language: 'it', gender: 'female' },
+//   { native: 'Иванов Иван', roman: 'Ivanov Ivan', language: 'ru', gender: 'male' }
+// ]
+```
+
+:::
+
+::: lang dart
+
+```dart
+randNameDetails(count: 3);
+// [
+//   NameDetail(조동민, Jo Dongmin, ko, male),
+//   NameDetail(Anna Mariani, Anna Mariani, it, female),
+//   NameDetail(Иванов Иван, Ivanov Ivan, ru, male),
+// ]
+```
+
+:::
+
+::: lang py
+
+```python
+rand_name(count=3, output="detail")
+# [
+#     NameDetail(native='조동민', roman='Jo Dongmin', language='ko', gender='male'),
+#     NameDetail(native='Anna Mariani', roman='Anna Mariani', language='it', gender='female'),
+#     NameDetail(native='Иванов Иван', roman='Ivanov Ivan', language='ru', gender='male'),
+# ]
+```
+
+:::
+
+### 성별이 겉으로 드러나는 경우
+
+대부분의 언어는 이름이 어느 풀에서 왔는지 드러내지 않습니다. 러시아어는 예외입니다. 부칭과 성이 모두 굴절하기 때문에 선택 결과를 눈으로 확인할 수 있습니다.
+
+::: lang js
+
+```javascript
+randName({ language: 'ru', gender: 'female', includeMiddleName: true, count: 2, output: 'detail' });
+// [
+//   { native: 'Людмила Николаевна Богданова', roman: 'Lyudmila Nikolaevna Bogdanova', … },
+//   { native: 'Марина Максимовна Богданова', roman: 'Marina Maksimovna Bogdanova', … }
+// ]
+```
+
+:::
+
+::: lang dart
+
+```dart
+randNameDetails(
+  language: NameLanguage.ru,
+  gender: NameGender.female,
+  includeMiddleName: true,
+  count: 2,
+);
+// [
+//   NameDetail(Людмила Николаевна Богданова, Lyudmila Nikolaevna Bogdanova, ru, female),
+//   NameDetail(Марина Максимовна Богданова, Marina Maksimovna Bogdanova, ru, female),
+// ]
+```
+
+:::
+
+::: lang py
+
+```python
+rand_name(language="ru", gender="female", include_middle_name=True, count=2, output="detail")
+# [
+#     NameDetail(native='Людмила Николаевна Богданова', roman='Lyudmila Nikolaevna Bogdanova', …),
+#     NameDetail(native='Марина Максимовна Богданова', roman='Marina Maksimovna Bogdanova', …),
+# ]
+```
+
+:::
+
 ## 함께 보기
 
-- [`randNameDetails`](./rand-name-details) — 같은 이름을 두 문자 체계와 선택 정보까지 함께.
+- [지원 언어](../guide/languages#romanization) — 각 문자 체계가 영어 발음으로 바뀌는 방식.
 - [`nameLengthRange`](./name-length-range) — 이름이 기본값으로 쓰는 길이 범위.
 - [`nameSupportsMiddleName`](./name-supports-middle-name)과 [`nameSupportsRoman`](./name-supports-roman) — 언어에 대한 두 가지 질문.

@@ -46,8 +46,7 @@ lib/
     data/index.ts           # AFFIX_CHARSET, the length bounds, the separator
   name/
     index.ts                # the category's public surface
-    randName.ts           # public: string[]
-    randNameDetails.ts    # public: NameDetail[]
+    randName.ts             # public: string[], or NameDetail[] on `output: 'detail'`
     nameLengthRange.ts      # public helper
     nameSupportsMiddleName.ts
     nameSupportsRoman.ts
@@ -60,8 +59,7 @@ lib/
       en.ts ko.ts ja.ts …   # one file per language
   nickname/
     index.ts
-    randNickname.ts       # public: string[]
-    randNicknameDetails.ts
+    randNickname.ts         # public: string[], or NicknameDetail[] likewise
     nicknameLengthRange.ts  # public helper
     nicknameGenerator.ts    # internal: shapes, length fitting
     data/
@@ -163,9 +161,14 @@ example/
 
 `String.normalize('NFD')` does not exist in Dart and there is no diacritic property to strip against, so `romanize.dart` folds Latin accents through a **written-out table** instead. It covers more than the pools hold on purpose, and `test/name_test.dart` folds every entry of every `RomanMode.fold` pool and asserts the result is ASCII — that test is what keeps a newly added `ư` from silently surviving into a supposedly romanized name. It has already caught one.
 
-### The second thing, and it is `randSuffix`
+### The second thing, and it is every return type that depends on an argument
 
-Dart has neither overloads nor union types, so `String | List<String>` cannot be one function. `randSuffix` takes a `String` and `randSuffixAll` takes a `List<String>`, and the same for `randPrefix` — four functions where npm and PyPI have two. Do not try to fake it with `Object` or a generic: `T extends Object` would type-check `randSuffix(3)` and fail at run time, which is worse than a second name.
+Dart has neither overloads nor union types, so a function cannot hand back one type for one argument and another type for another. That costs two things, and both are the same limitation:
+
+- `randSuffix` takes a `String` and `randSuffixAll` takes a `List<String>`, where npm and PyPI have one function taking either.
+- `randNameDetails` and `randNicknameDetails` still exist here. In the other two packages they are `output: 'detail'` on the generator itself; in Dart, `randName` returns `List<String>` and that is the end of it.
+
+Do not try to fake either with `Object` or a generic: `T extends Object` would type-check `randSuffix(3)` and fail at run time, which is worse than a second name. **A new option that changes a return type lands as a second Dart function**, and the `::: lang` blocks on the docs page are where the two shapes are shown side by side.
 
 ### Keeping the ports in step
 
@@ -333,7 +336,7 @@ Do not assert an exact generated name, and do not use a fixed seed — there is 
 
 Gender is the one option with no directly observable effect in most languages. It is verified through Russian, whose middle name and surname inflect for it (`…ович` / `…овна`, `Иванов` / `Иванова`).
 
-Nicknames are checked against the datasets themselves: `randNicknameDetails` reports the `words` it used, so every word can be asserted to come from the language's pools, and the English pools are asserted to share nothing with the English person-name pools. Korean and Japanese cannot have that last invariant — `하늘`, `별` and `森` are everyday nouns that also happen to be names, and `아름다운하늘` is still nobody's name.
+Nicknames are checked against the datasets themselves: `randNickname({ output: 'detail' })` reports the `words` it used, so every word can be asserted to come from the language's pools, and the English pools are asserted to share nothing with the English person-name pools. Korean and Japanese cannot have that last invariant — `하늘`, `별` and `森` are everyday nouns that also happen to be names, and `아름다운하늘` is still nobody's name.
 
 Two coincidences are load-bearing and must not be asserted away: a word can be both a modifier and a noun (`무지개`, `Marble`, `自由`), and an invented word can spell a real one by accident (`나` + `비` -> `나비`, so `theme` comes back as `'animal'` at `style: 100`). Structural assertions survive both; "the first word is not a modifier" does not.
 
@@ -393,7 +396,7 @@ A theme is a slice of everyday vocabulary that a modifier can sit in front of. A
 
 1. Add the name to `NicknameTheme` in `lib/_types/global.ts` and to `NICKNAME_THEMES` in `lib/nickname/data/index.ts`.
 2. Add the pool to **all four** languages. A theme that only one language can fill is not a theme.
-3. **Themes have to be disjoint**, and `test/nickname.test.ts` asserts it. A word in two of them makes `theme` ambiguous for `baseWord`, and it makes `randNicknameDetails` report a theme the caller did not ask about. When a new theme claims a word an old one already holds, move it rather than copy it — `place` took the twelve places that were sitting in `concept`, `vehicle` took 자전거 / 기차 / 배 out of `object`, `plant` took the flowers and trees out of `nature`, and `music` took the instruments out of `object` and 리듬 / 선율 / 화음 out of `concept`. Where the two senses are genuinely different words, rename instead of moving: the English toy became `Marbles` so `gem` could keep `Marble`.
+3. **Themes have to be disjoint**, and `test/nickname.test.ts` asserts it. A word in two of them makes `theme` ambiguous for `baseWord`, and it makes the detail output report a theme the caller did not ask about. When a new theme claims a word an old one already holds, move it rather than copy it — `place` took the twelve places that were sitting in `concept`, `vehicle` took 자전거 / 기차 / 배 out of `object`, `plant` took the flowers and trees out of `nature`, and `music` took the instruments out of `object` and 리듬 / 선율 / 화음 out of `concept`. Where the two senses are genuinely different words, rename instead of moving: the English toy became `Marbles` so `gem` could keep `Marble`.
 4. Watch the word lengths. `nicknameLengthRange` is derived from the shortest and longest word in the pools, and `test/nickname.test.ts` pins three of its values, so a Chinese noun outside 2–3 characters or a Korean one outside 1–4 changes a number the tests assert by value.
 5. Update the theme table in `README.md` and the doc comment on `NicknameTheme`. The existing per-theme tests cover the new theme as soon as it is in `NICKNAME_THEMES`.
 6. Do the same in `packages/dart` and `packages/python` — `NicknameTheme`, the theme list, and the pool in all four language files. Neither Dart's `Map` nor Python's `dict` complains about a missing theme the way the TypeScript `Record` does, which is why both ports' `test_nickname` asserts every language fills every theme.

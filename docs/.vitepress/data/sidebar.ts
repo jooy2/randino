@@ -55,17 +55,7 @@ export const SIDEBAR: SidebarGroup[] = [
 		ko: 'API',
 		items: [
 			{ path: 'name/rand-name', en: 'randName', ko: 'randName' },
-			{
-				path: 'name/rand-name-details',
-				en: 'randNameDetails',
-				ko: 'randNameDetails'
-			},
 			{ path: 'nickname/rand-nickname', en: 'randNickname', ko: 'randNickname' },
-			{
-				path: 'nickname/rand-nickname-details',
-				en: 'randNicknameDetails',
-				ko: 'randNicknameDetails'
-			},
 			{ path: 'affix/rand-suffix', en: 'randSuffix', ko: 'randSuffix' },
 			{ path: 'affix/rand-prefix', en: 'randPrefix', ko: 'randPrefix' },
 			{ path: 'name/name-length-range', en: 'nameLengthRange', ko: 'nameLengthRange' },

@@ -4,10 +4,11 @@
 
 **2026-09-01**
 
-- **Breaking:** `random_name`, `random_name_details`, `random_nickname` and `random_nickname_details` are now `rand_name`, `rand_name_details`, `rand_nickname` and `rand_nickname_details`. The old names are gone; there are no aliases.
+- **Breaking:** `random_name` and `random_nickname` are now `rand_name` and `rand_nickname`. The old names are gone; there are no aliases.
+- **Breaking:** `random_name_details` and `random_nickname_details` are gone entirely. `rand_name` and `rand_nickname` take `output="detail"` instead and return the same `list[NameDetail]` / `list[NicknameDetail]`, with `@overload` carrying the return type so a checker knows which one it got.
 - **Breaking:** the nickname generator's `unique_suffix`, `unique_suffix_length`, `unique_suffix_separator` and `unique_suffix_charset` arguments are gone, and so are `NicknameDetail.suffix`, `NICKNAME_SUFFIX_LENGTH_MAX` and `NICKNAME_SUFFIX_CHARSET`. `min_length` / `max_length` now describe the whole nickname, with nothing excluded from them.
-- Added `rand_suffix` and `rand_prefix`, which attach a random token to a `str` or to every `str` in a `list` — a fresh one per value — with `length`, `separator` and `charset`. `@overload` carries the shape through, so a `str` in gives a `str` out.
-- Added `AFFIX_LENGTH_DEFAULT`, `AFFIX_LENGTH_MAX`, `AFFIX_SEPARATOR_DEFAULT` and `AFFIX_CHARSET`, the bounds and defaults those two are clamped to.
+- Added `rand_suffix` and `rand_prefix`, which attach a random token to a `str` or to every `str` in a `list` — a fresh one per value — with `length`, `separator` and `charset`.
+- Added `AFFIX_LENGTH_DEFAULT`, `AFFIX_LENGTH_MAX`, `AFFIX_SEPARATOR_DEFAULT` and `AFFIX_CHARSET`, the bounds and defaults those two are clamped to, and `RandOutput` for the new `output` argument.
 
 ## 1.0.0
 

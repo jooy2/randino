@@ -6,10 +6,9 @@ import {
 	nameLengthRange,
 	nameSupportsMiddleName,
 	nameSupportsRoman,
-	randName,
-	randNameDetails
+	randName
 } from '../dist/index.js';
-import type { NameLanguage } from '../dist/index.js';
+import type { NameDetail, NameLanguage, RandNameOptions } from '../dist/index.js';
 // Internal, so they get their own checks: everything else about a generated name
 // is random, but romanization is a pure function with known answers, and the
 // pools are what the tests below hold the generator to.
@@ -49,6 +48,16 @@ function surnameOf(language: 'ko' | 'ja' | 'zh', name: string): string {
 	return pool.find((entry) => name.startsWith(entry)) ?? '';
 }
 
+/**
+ * `randName`'s detail form, which most of the assertions below read.
+ *
+ * It used to be `randNameDetails`, a second function; it is one option now, and
+ * a local alias keeps that from being spelled out on forty call sites.
+ */
+function nameDetails(options: RandNameOptions = {}): NameDetail[] {
+	return randName({ ...options, output: 'detail' });
+}
+
 describe('Name', () => {
 	it('randName returns one name by default', () => {
 		const names = randName();
@@ -78,7 +87,7 @@ describe('Name', () => {
 
 	it('the mixed language uses every language it knows', () => {
 		const used = new Set(
-			randNameDetails({ count: 600 }).map((detail) => {
+			nameDetails({ count: 600 }).map((detail) => {
 				assert.match(detail.native, SCRIPT[detail.language], detail.native);
 				return detail.language;
 			})
@@ -96,7 +105,7 @@ describe('Name', () => {
 	});
 
 	it('script: roman leaves English names as they are', () => {
-		for (const detail of randNameDetails({ language: 'en', count: SAMPLE })) {
+		for (const detail of nameDetails({ language: 'en', count: SAMPLE })) {
 			assert.strictEqual(detail.native, detail.roman);
 		}
 
@@ -105,7 +114,7 @@ describe('Name', () => {
 	});
 
 	it('Korean surnames use their conventional romanization', () => {
-		for (const detail of randNameDetails({ language: 'ko', count: SAMPLE, startsWith: '김' })) {
+		for (const detail of nameDetails({ language: 'ko', count: SAMPLE, startsWith: '김' })) {
 			assert.match(detail.native, /^김/);
 			assert.match(detail.roman, /^Kim /);
 		}
@@ -174,10 +183,10 @@ describe('Name', () => {
 			assert.match(surname, /а$/, name);
 		}
 
-		const genders = new Set(randNameDetails({ ...options, count: 200 }).map((d) => d.gender));
+		const genders = new Set(nameDetails({ ...options, count: 200 }).map((d) => d.gender));
 		assert.deepStrictEqual([...genders].sort(), ['female', 'male']);
 
-		for (const detail of randNameDetails({ ...options, gender: 'female', count: SAMPLE })) {
+		for (const detail of nameDetails({ ...options, gender: 'female', count: SAMPLE })) {
 			assert.strictEqual(detail.gender, 'female');
 		}
 	});
@@ -351,8 +360,10 @@ describe('Name', () => {
 		assert.ok(limited.length < 800, `expected the pool to run out: ${limited.length}`);
 	});
 
-	it('randNameDetails reports both scripts and the choices made', () => {
-		for (const detail of randNameDetails({ language: 'ja', count: SAMPLE })) {
+	it("output: 'detail' reports both scripts and the choices made", () => {
+		// Written out rather than going through the helper, so that the overload
+		// itself is what a test compiles against.
+		for (const detail of randName({ language: 'ja', count: SAMPLE, output: 'detail' })) {
 			assert.strictEqual(detail.language, 'ja');
 			assert.match(detail.native, SCRIPT.ja, detail.native);
 			assert.match(detail.roman, ROMAN, detail.roman);
