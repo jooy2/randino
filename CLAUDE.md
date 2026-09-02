@@ -364,7 +364,7 @@ The return value is random, so tests assert the **properties every result must h
 - The script matches the language (`/^[가-힣]+$/` for Korean, `\p{Script=Cyrillic}` for Russian, …).
 - The structure matches the options — word count for `includeSurname` / `includeMiddleName`, character count for CJK.
 - Requested constraints hold for every name: `startsWith`, `minLength` / `maxLength`, `unique`.
-- `count` is exact, including the clamped edges (`0`, negatives, above `NAME_COUNT_MAX`).
+- `count` is exact, including the clamped edges (`0`, negatives, above `RAND_COUNT_MAX`).
 - Anything genuinely deterministic is asserted by value: `nameLengthRange`, the romanizer's known outputs.
 
 Do not assert an exact generated name, and do not use a fixed seed — there is none. When a property test is flaky, the option is either under-specified or the assertion is wrong; **run the suite 20+ times before calling it stable**, because a 1-in-1000 case will show up in CI otherwise.
