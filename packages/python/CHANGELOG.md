@@ -1,5 +1,17 @@
 # Changelog
 
+## 2.0.0
+
+**2026-09-02**
+
+- **Breaking:** the fourteen nickname themes are their own generators now. `rand_word` takes a `theme`, and `rand_animal`, `rand_object`, `rand_nature`, `rand_plant`, `rand_gem`, `rand_concept`, `rand_myth`, `rand_job`, `rand_music`, `rand_place`, `rand_food`, `rand_sport`, `rand_vehicle` and `rand_product` are that generator with the theme already chosen. `word_length_range` reports what the pools hold. `rand_nickname` draws from the same pools rather than owning them.
+- **Breaking:** `NicknameLanguage`, `NicknameLanguageOption`, `NicknameTheme`, `NicknameThemeOption`, `NICKNAME_LANGUAGES` and `NICKNAME_THEMES` are `WordLanguage`, `WordLanguageOption`, `WordTheme`, `WordThemeOption`, `WORD_LANGUAGES` and `WORD_THEMES`. They describe the words, and the words are no longer only a nickname's business.
+- **Breaking:** `rand_nickname`'s `include_modifier` is gone. `rand_modifier` puts a modifier in front of any string — `rand_modifier("사자")` is `"멋진사자"` — picks the language off the value's own script when none is given, and draws a fresh modifier per entry for a list. `nickname_length_range` loses its `include_modifier` argument with it.
+- **Breaking:** `rand_nickname`'s `base_word` is gone, and with it the one argument whose default was `None` rather than `"all"`: `language` now defaults to `"all"` like every other one.
+- **Breaking:** `NAME_COUNT_MAX`, `NAME_LENGTH_MIN` / `MAX`, `NICKNAME_COUNT_MAX` and `NICKNAME_LENGTH_MIN` / `MAX` are `RAND_COUNT_MAX` and `RAND_LENGTH_MIN` / `MAX`, one set for every generator. The name length bound goes from 30 to 40 as a result.
+- `rand_suffix`, `rand_prefix` and `rand_modifier` all work with **no value at all**, handing back the token or the word they would have attached. `rand_suffix()` is `"nVtRC"`.
+- Added `WordDetail`, which `rand_word(output="detail")` returns.
+
 ## 1.1.0
 
 **2026-09-01**
