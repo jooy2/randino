@@ -18,9 +18,11 @@
  * **Utilities** answer a question about a language. The folder a page sits in
  * decides nothing but its URL.
  *
- * **Behaviour** holds the prose explaining how each generator's options behave.
- * It is a group of its own rather than two more entries under Guide, because it
- * grows by one page per generator and Guide does not.
+ * **Behaviour** holds the prose explaining how a generator's options behave,
+ * where there is enough of it to be its own page — `randName` and
+ * `randNickname` have one each, `randWord` does not. It is a group of its own
+ * rather than more entries under Guide, because it grows alongside Generators
+ * and Guide does not.
  *
  * Every `path` here has to exist as `en/<path>.md` **and** `ko/<path>.md`, or
  * VitePress fails the build on a dead link. That is the check, and it is why

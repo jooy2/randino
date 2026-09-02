@@ -299,7 +299,7 @@ Every variant is in the document and CSS hides all but one, which is what buys t
 `name/`, `nickname/`, `word/` and `decorate/` are four folders because those are four things in the source, and the sidebar deliberately does not repeat that split. A reader looking for `randNickname` is looking for a function, not for the corner of the library it belongs to, so the groups are what a function **is**:
 
 - **API**, which nests three groups by what a function *does with a string*: **Generators** make one out of nothing (`randName`, `randNickname`, `randWord`), **Decorators** attach something to one you already have (`randSuffix`, `randPrefix`, `randModifier`), and **Utilities** answer a question about a language (`nameLengthRange`, `wordLengthRange`, the two `nameSupports…`). Generators is kept short on purpose, so that a new kind of random text is visible when it arrives.
-- **Behaviour** — the prose explaining how each generator's options behave, one page per generator. Its own group rather than two more entries under Guide, because it grows alongside Generators and Guide does not.
+- **Behaviour** — the prose explaining how a generator's options behave, where there is enough of it to be its own page. `randName` and `randNickname` have one each; `randWord` does not, because it draws one word and its API page says everything there is to say. Its own group rather than more entries under Guide, because it grows alongside Generators and Guide does not.
 
 `data/sidebar.ts` nests one level: a `SidebarGroup`'s `items` are pages, or more groups. Deeper than that and the menu stops being a menu.
 
