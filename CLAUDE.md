@@ -30,6 +30,7 @@ packages/
   dart/         The pub.dev package (`randino`) — a port of it, same data, same rules
   python/       The PyPI package (`randino`) — likewise
 docs/           The documentation site (VitePress), English and Korean
+tools/          Repository tooling, published nowhere (see below)
 ```
 
 The **JavaScript package is the source of truth**. A behaviour change starts there, and the ports follow it; a change that lands only on one side is a bug in the making. Each package owns its own `README.md` and `CHANGELOG.md` because npm, pub.dev and PyPI all read those from the package root — the repository's own `README.md` is the only one that describes all of them at once, and there is no changelog at the repository root.
@@ -197,6 +198,8 @@ Do not try to fake either with `Object` or a generic: `T extends Object` would t
 
 The JavaScript package is the source of truth. A behaviour change lands there first, then in each port, in the same commit where that is practical. Every suite asserts the same properties over the same pools, so a port that drifted shows up as a test that passes on one side and fails on another — which is the point of porting the tests rather than writing new ones.
 
+That catches drifting *behaviour*. It does not catch drifting *data*: a word added to one package's pools and not the others breaks no property, because every suite asserts over whatever pools its own package happens to hold. `node tools/parity/index.mjs` is what catches that — see `tools/parity/README.md`, and the section below.
+
 ## The Python package (`packages/python`)
 
 A port of the JavaScript package, not a second design. Same datasets, same rules, same numbers; what differs is the surface, which is Python's.
@@ -361,6 +364,30 @@ Two things it does not hard-code. The custom domain is read out of the npm packa
 
 The push needs `secrets.ACCESS_TOKEN`, a token with write access to this repository. It is a repository secret, so the workflow is the only thing that can deploy — a fork running it finds nothing and stops at that step.
 
+## Repository tooling (`tools/`)
+
+Scripts that belong to the repository rather than to any one package. Nothing here is published, and no package depends on it.
+
+```
+tools/
+  parity/
+    index.mjs             # the check: read all three, compare, fail on a difference
+    dump-javascript.ts    # one dump per package, each writing the canonical shape
+    dump_dart.dart
+    dump_python.py
+    README.md             # what canonical means, and what the check covers
+```
+
+### `tools/parity` — the packages hold the same data
+
+Every package holds its own copy of the pools, and no per-package suite can see past its own copy: a word added to `packages/javascript` and forgotten in the other two breaks no test, because each suite asserts over whatever its own package happens to hold. `node tools/parity/index.mjs` loads the datasets out of all three the way each package loads them, and fails on any difference.
+
+It runs on pull requests and on pushes to `main` through `.github/workflows/run-check-parity.yml`, which is the one workflow that installs all three toolchains at once.
+
+**The dumps normalize what only differs because the languages differ, and nothing else.** A pool entry is `{ n, r }` everywhere; field names are the JavaScript ones; an optional field is present and null rather than absent; `syn` carries its `kind` tag even in the two packages that tell the shapes apart by type. That normalization lives in the three dumps — one per package, each responsible for its own language's spelling — so the comparison itself has nothing to know about any of them. Adding a field to a dataset means adding it to all three dumps, and the check reports a field only one dump writes as a difference, which is the intended failure.
+
+**Do not widen it into a general "the ports agree" check.** It covers what is written once per package *as data*: the word and name datasets, the surname romanization map, and the bounds in `constants` and `decorate/data`. The nickname generator's shape weights are deliberately left out — they are private to the generator in the Dart port, and making them public for the sake of a check would be letting the check design the API.
+
 ## Testing a random generator
 
 The return value is random, so tests assert the **properties every result must have**, over a sample large enough (`SAMPLE = 60`) that a broken option cannot pass by luck:
@@ -411,6 +438,7 @@ Nicknames:
 7. Port all of it to `packages/dart`: the code goes in `NameLanguage`, the dataset in `lib/src/name/data/<code>.dart` and `index.dart`, the regex in `test/name_test.dart`.
 8. Port all of it to `packages/python`: the code goes in the `NameLanguage` `Literal` in `src/randino/_types.py`, the dataset in `src/randino/name/data/<code>.py` and `__init__.py`, the script check in `SCRIPT` in `tests/test_name.py`. A language that exists in one package and not another is the failure mode this repository has to avoid, and the three suites are what catch it.
 9. Add the row to the tables in `docs/en/guide/languages.md` and `docs/ko/guide/languages.md`, and to the one in the root `README.md`.
+10. Run `node tools/parity/index.mjs` from the repository root. The three suites catch a language that exists in one package and not another; only this catches a pool that is one entry short in one of them.
 
 ## Adding a word language
 
@@ -429,6 +457,7 @@ To add one that clears the bar:
 6. No person names, and no word that is only a name — for `en` this is enforced against the person-name pools, which is why `job` has no `Knight`, `Baker` or `Hunter` and `plant` no `Rose` or `Ivy`. Add the language to the README tables and to `SCRIPT` in `test/word.test.ts` **and** `test/nickname.test.ts`; the existing per-language tests then cover it.
 7. Port all of it to `packages/dart` and `packages/python`, the same way a name language is ported.
 8. Add the row to the tables in `docs/*/guide/languages.md` and to the root `README.md`.
+9. Run `node tools/parity/index.mjs` from the repository root — three pools of 60+ nouns each are exactly where one word goes missing unnoticed.
 
 ## Adding a word theme
 
@@ -441,6 +470,7 @@ A theme is a slice of everyday vocabulary that a modifier can sit in front of. A
 5. Add the `rand<Theme>` function beside the other fourteen, export it from `lib/word/index.ts`, and add it to the `THEMED` table in `test/word.test.ts` — that table is asserted to have exactly one entry per theme, so a missing function fails the suite. Update the theme list in `README.md` and the doc comment on `WordTheme`.
 6. Do the same in `packages/dart` and `packages/python` — `WordTheme`, the theme list, the pool in all four language files, and the themed function. Neither Dart's `Map` nor Python's `dict` complains about a missing theme the way the TypeScript `Record` does, which is why both ports assert every language fills every theme.
 7. Add the row to `docs/en/word/themes.md` and `docs/ko/word/themes.md`.
+8. Run `node tools/parity/index.mjs` from the repository root. A theme adds four pools to each of three packages, which is twelve chances to drop a word.
 
 ## Commit conventions
 

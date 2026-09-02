@@ -29,8 +29,11 @@ randino ships for more than one programming language, so there is no single pack
 | `packages/dart`       | The pub.dev package. `dart test`, `dart analyze`       | `packages/dart`       |
 | `packages/python`     | The PyPI package. `pytest`, `ruff check .`, `mypy`     | `packages/python`     |
 | `docs`                | The documentation site. `npm run dev`, `npm run build` | `docs`                |
+| `tools`               | Repository tooling, published nowhere                  | the repository root   |
 
 The **JavaScript package is the source of truth**: a behaviour change starts there and the ports follow it, and every test suite asserts the same properties over the same data. A change that lands on only one side is a bug in the making, so please send all of them.
+
+Each package holds its own copy of the datasets, so a word added to one of them and forgotten in the others breaks no test. `node tools/parity/index.mjs`, from the repository root, reads the data out of all three and fails if they disagree — run it whenever you touch a pool. CI runs it too.
 
 Each package keeps its own `README.md` and `CHANGELOG.md`, because npm, pub.dev and PyPI read those from the package root. The repository's `README.md` is the only one that describes all of them at once.
 
