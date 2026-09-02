@@ -6,20 +6,20 @@
 
 | 테마 | 함수 | 담고 있는 것 | 한국어 | 영어 |
 | --- | --- | --- | --- | --- |
-| `animal` | `randAnimal` | 동물 | 사자, 고양이 | Lion, Cat |
-| `object` | `randObject` | 손 닿는 사물 | 물병, 우산 | Bottle, Umbrella |
-| `nature` | `randNature` | 자연과 자연 현상 | 하늘, 노을 | Sky, Dawn |
-| `plant` | `randPlant` | 식물과 그 부분 | 민들레, 솔방울 | Dandelion, Acorn |
-| `gem` | `randGem` | 돌, 금속, 보석 | 흑요석, 청동 | Obsidian, Bronze |
-| `concept` | `randConcept` | 학문 용어와 인문·사회의 개념 | 철학, 자유 | Philosophy, Truth |
-| `myth` | `randMyth` | 신화 속 존재와 사물 | 구미호, 불사조 | Phoenix, Rune |
-| `job` | `randJob` | 직업과 역할 | 대장장이, 항해사 | Blacksmith, Archer |
-| `music` | `randMusic` | 악기, 형식, 용어 | 교향곡, 거문고 | Cello, Sonata |
-| `place` | `randPlace` | 걸어 들어가거나 올라갈 수 있는 곳 | 광장, 골목 | Lighthouse, Plaza |
-| `food` | `randFood` | 음식과 음료 | 떡볶이, 녹차 | Dumpling, Cocoa |
-| `sport` | `randSport` | 스포츠와 그 목표물 | 양궁, 트로피 | Archery, Trophy |
-| `vehicle` | `randVehicle` | 사람을 실어 나르는 것 | 열기구, 전차 | Airship, Tramcar |
-| `product` | `randProduct` | 사서 쓰는 물건 | 이어폰, 냉장고 | Earbuds, Toaster |
+| `animal` | [`randAnimal`](./rand-animal) | 동물 | 사자, 고양이 | Lion, Cat |
+| `object` | [`randObject`](./rand-object) | 손 닿는 사물 | 물병, 우산 | Bottle, Umbrella |
+| `nature` | [`randNature`](./rand-nature) | 자연과 자연 현상 | 하늘, 노을 | Sky, Dawn |
+| `plant` | [`randPlant`](./rand-plant) | 식물과 그 부분 | 민들레, 솔방울 | Dandelion, Acorn |
+| `gem` | [`randGem`](./rand-gem) | 돌, 금속, 보석 | 흑요석, 청동 | Obsidian, Bronze |
+| `concept` | [`randConcept`](./rand-concept) | 학문 용어와 인문·사회의 개념 | 철학, 자유 | Philosophy, Truth |
+| `myth` | [`randMyth`](./rand-myth) | 신화 속 존재와 사물 | 구미호, 불사조 | Phoenix, Rune |
+| `job` | [`randJob`](./rand-job) | 직업과 역할 | 대장장이, 항해사 | Blacksmith, Archer |
+| `music` | [`randMusic`](./rand-music) | 악기, 형식, 용어 | 교향곡, 거문고 | Cello, Sonata |
+| `place` | [`randPlace`](./rand-place) | 걸어 들어가거나 올라갈 수 있는 곳 | 광장, 골목 | Lighthouse, Plaza |
+| `food` | [`randFood`](./rand-food) | 음식과 음료 | 떡볶이, 녹차 | Dumpling, Cocoa |
+| `sport` | [`randSport`](./rand-sport) | 스포츠와 그 목표물 | 양궁, 트로피 | Archery, Trophy |
+| `vehicle` | [`randVehicle`](./rand-vehicle) | 사람을 실어 나르는 것 | 열기구, 전차 | Airship, Tramcar |
+| `product` | [`randProduct`](./rand-product) | 사서 쓰는 물건 | 이어폰, 냉장고 | Earbuds, Toaster |
 
 ::: lang js
 

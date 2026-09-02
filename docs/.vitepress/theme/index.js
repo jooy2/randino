@@ -2,6 +2,7 @@ import DefaultTheme from 'vitepress/theme';
 import Layout from './components/Layout.vue';
 import Lang from './components/Lang.vue';
 import Demo from './components/Demo.vue';
+import WordOptions from './components/WordOptions.vue';
 import PackageLinks from './components/PackageLinks.vue';
 import { syncCodeLanguage } from '../data/language';
 import './styles/lang.css';
@@ -25,6 +26,9 @@ export default {
 		// Used straight from `demo.md`, the same way `Lang` is used from every
 		// reference page.
 		app.component('Demo', Demo);
+
+		// One table, fifteen pages: `randWord` and each of its themed forms.
+		app.component('WordOptions', WordOptions);
 
 		// Reads the stored choice into the reactive copy the components use, and
 		// writes it back onto `<html>`. No-op during SSR.

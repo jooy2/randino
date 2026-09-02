@@ -41,23 +41,17 @@ rand_word()
 
 Every option is optional, and the defaults are what the empty call above uses.
 
-| Option | Type | Default | Description |
-| --- | --- | --- | --- |
-| `language` | <Lang js="WordLanguageOption" dart="WordLanguage?" py="WordLanguageOption" code /> | <Lang js="'all'" dart="null" py="&quot;all&quot;" code /> | Language of the generated words. <Lang js="'all'" dart="null" py="&quot;all&quot;" code /> mixes every supported language, picking one per word. |
-| `theme` | <Lang js="WordThemeOption" dart="WordTheme?" py="WordThemeOption" code /> | <Lang js="'all'" dart="null" py="&quot;all&quot;" code /> | What the words are about. See [Themes](./themes). |
-| `count` | <Lang js="number" dart="int" py="int" code /> | `1` | How many words to return. Clamped to `0` … `10000`. |
-| `style` | <Lang js="number" dart="int" py="int" code /> | `0` | `0` draws real words, `100` invents words that only read like the language, and anything between mixes the two. |
-| <Lang js="minLength" dart="minLength" py="min_length" code /> | <Lang js="number" dart="int?" py="int &#124; None" code /> | _pools_ | Minimum length in characters. |
-| <Lang js="maxLength" dart="maxLength" py="max_length" code /> | <Lang js="number" dart="int?" py="int &#124; None" code /> | _pools_ | Maximum length in characters. |
-| <Lang js="startsWith" dart="startsWith" py="starts_with" code /> | <Lang js="string" dart="String?" py="str" code /> | <Lang js="—" dart="null" py="&quot;&quot;" code /> | Keep only words whose first character is this one. |
-| `unique` | <Lang js="boolean" dart="bool" py="bool" code /> | <Lang js="false" dart="false" py="False" code /> | Never return the same word twice. May return fewer than `count` once a pool runs out. |
-| `output` | <Lang js="RandOutput" py="RandOutput" code /> | <Lang js="'value'" py="&quot;value&quot;" code /> | Strings, or a `WordDetail` per word. Dart has no such parameter — see [the detail output](#the-detail-output). |
+<WordOptions theme />
 
-Everything but `language` and `theme` is an option every generator in the package takes, and means the same thing on each of them.
+The same table is on each of the fourteen pages below, drawn from one component rather than written out fifteen times. Everything but `language` and `theme` is an option every generator in the package takes, and means the same thing on each of them.
+
+Dart has no `output`; [the detail output](#the-detail-output) is `randWordDetails` there.
 
 ## One function per theme
 
-A theme is not only an option — each of the fourteen is a function of its own, which is `randWord` with the theme already chosen.
+A theme is not only an option — each of the fourteen is a function of its own, which is `randWord` with the theme already chosen. Each has a page of its own; the words each theme holds are on [Themes](./themes).
+
+[`randAnimal`](./rand-animal) · [`randObject`](./rand-object) · [`randNature`](./rand-nature) · [`randPlant`](./rand-plant) · [`randGem`](./rand-gem) · [`randConcept`](./rand-concept) · [`randMyth`](./rand-myth) · [`randJob`](./rand-job) · [`randMusic`](./rand-music) · [`randPlace`](./rand-place) · [`randFood`](./rand-food) · [`randSport`](./rand-sport) · [`randVehicle`](./rand-vehicle) · [`randProduct`](./rand-product)
 
 ::: lang js
 
@@ -97,7 +91,7 @@ rand_gem(language="ko", count=2, unique=True)  # ['흑요석', '청동']
 
 :::
 
-They take every option `randWord` does except `theme`, which they answer. The full list is in [Themes](./themes).
+They take every option `randWord` does except `theme`, which they answer.
 
 ## Length
 

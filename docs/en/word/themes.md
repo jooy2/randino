@@ -6,20 +6,20 @@ Each theme is also a generator of its own. `randWord` takes the theme as an opti
 
 | Theme | Function | What it holds | Korean | English |
 | --- | --- | --- | --- | --- |
-| `animal` | `randAnimal` | animals | 사자, 고양이 | Lion, Cat |
-| `object` | `randObject` | things within reach | 물병, 우산 | Bottle, Umbrella |
-| `nature` | `randNature` | nature and its phenomena | 하늘, 노을 | Sky, Dawn |
-| `plant` | `randPlant` | plants, and their parts | 민들레, 솔방울 | Dandelion, Acorn |
-| `gem` | `randGem` | stones, metals and gems | 흑요석, 청동 | Obsidian, Bronze |
-| `concept` | `randConcept` | terms, and ideas from the humanities | 철학, 자유 | Philosophy, Truth |
-| `myth` | `randMyth` | creatures and things out of myth | 구미호, 불사조 | Phoenix, Rune |
-| `job` | `randJob` | the trades and roles people hold | 대장장이, 항해사 | Blacksmith, Archer |
-| `music` | `randMusic` | instruments, forms and terms | 교향곡, 거문고 | Cello, Sonata |
-| `place` | `randPlace` | places you can walk into or up to | 광장, 골목 | Lighthouse, Plaza |
-| `food` | `randFood` | food and drink | 떡볶이, 녹차 | Dumpling, Cocoa |
-| `sport` | `randSport` | sports, and what they are played for | 양궁, 트로피 | Archery, Trophy |
-| `vehicle` | `randVehicle` | things that carry you | 열기구, 전차 | Airship, Tramcar |
-| `product` | `randProduct` | things you buy | 이어폰, 냉장고 | Earbuds, Toaster |
+| `animal` | [`randAnimal`](./rand-animal) | animals | 사자, 고양이 | Lion, Cat |
+| `object` | [`randObject`](./rand-object) | things within reach | 물병, 우산 | Bottle, Umbrella |
+| `nature` | [`randNature`](./rand-nature) | nature and its phenomena | 하늘, 노을 | Sky, Dawn |
+| `plant` | [`randPlant`](./rand-plant) | plants, and their parts | 민들레, 솔방울 | Dandelion, Acorn |
+| `gem` | [`randGem`](./rand-gem) | stones, metals and gems | 흑요석, 청동 | Obsidian, Bronze |
+| `concept` | [`randConcept`](./rand-concept) | terms, and ideas from the humanities | 철학, 자유 | Philosophy, Truth |
+| `myth` | [`randMyth`](./rand-myth) | creatures and things out of myth | 구미호, 불사조 | Phoenix, Rune |
+| `job` | [`randJob`](./rand-job) | the trades and roles people hold | 대장장이, 항해사 | Blacksmith, Archer |
+| `music` | [`randMusic`](./rand-music) | instruments, forms and terms | 교향곡, 거문고 | Cello, Sonata |
+| `place` | [`randPlace`](./rand-place) | places you can walk into or up to | 광장, 골목 | Lighthouse, Plaza |
+| `food` | [`randFood`](./rand-food) | food and drink | 떡볶이, 녹차 | Dumpling, Cocoa |
+| `sport` | [`randSport`](./rand-sport) | sports, and what they are played for | 양궁, 트로피 | Archery, Trophy |
+| `vehicle` | [`randVehicle`](./rand-vehicle) | things that carry you | 열기구, 전차 | Airship, Tramcar |
+| `product` | [`randProduct`](./rand-product) | things you buy | 이어폰, 냉장고 | Earbuds, Toaster |
 
 ::: lang js
 

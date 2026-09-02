@@ -41,23 +41,17 @@ rand_word()
 
 모든 옵션은 선택 사항이며, 기본값은 위의 인자 없는 호출이 사용하는 값입니다.
 
-| 옵션 | 타입 | 기본값 | 설명 |
-| --- | --- | --- | --- |
-| `language` | <Lang js="WordLanguageOption" dart="WordLanguage?" py="WordLanguageOption" code /> | <Lang js="'all'" dart="null" py="&quot;all&quot;" code /> | 생성할 단어의 언어. <Lang js="'all'" dart="null" py="&quot;all&quot;" code />이면 단어마다 언어를 하나씩 골라 모든 언어를 섞습니다. |
-| `theme` | <Lang js="WordThemeOption" dart="WordTheme?" py="WordThemeOption" code /> | <Lang js="'all'" dart="null" py="&quot;all&quot;" code /> | 단어의 주제. [테마](./themes)를 참고하세요. |
-| `count` | <Lang js="number" dart="int" py="int" code /> | `1` | 돌려줄 단어 개수. `0` … `10000`으로 제한됩니다. |
-| `style` | <Lang js="number" dart="int" py="int" code /> | `0` | `0`은 실제 단어를 뽑고, `100`은 그 언어처럼 읽히기만 하는 단어를 만들어내며, 그 사이 값은 둘을 섞습니다. |
-| <Lang js="minLength" dart="minLength" py="min_length" code /> | <Lang js="number" dart="int?" py="int &#124; None" code /> | _단어 풀_ | 최소 글자 수. |
-| <Lang js="maxLength" dart="maxLength" py="max_length" code /> | <Lang js="number" dart="int?" py="int &#124; None" code /> | _단어 풀_ | 최대 글자 수. |
-| <Lang js="startsWith" dart="startsWith" py="starts_with" code /> | <Lang js="string" dart="String?" py="str" code /> | <Lang js="—" dart="null" py="&quot;&quot;" code /> | 이 글자로 시작하는 단어만 남깁니다. |
-| `unique` | <Lang js="boolean" dart="bool" py="bool" code /> | <Lang js="false" dart="false" py="False" code /> | 같은 단어를 두 번 돌려주지 않습니다. 풀이 바닥나면 `count`보다 적게 돌아올 수 있습니다. |
-| `output` | <Lang js="RandOutput" py="RandOutput" code /> | <Lang js="'value'" py="&quot;value&quot;" code /> | 문자열, 또는 단어마다 `WordDetail`. Dart에는 이 옵션이 없습니다. [상세 출력](#the-detail-output)을 참고하세요. |
+<WordOptions theme />
 
-`language`와 `theme`을 뺀 나머지는 이 패키지의 모든 생성 함수가 공통으로 받는 옵션이며, 어느 함수에서든 같은 뜻입니다.
+같은 표가 아래 14개 페이지에도 들어 있으며, 15번 따로 쓰는 대신 하나의 컴포넌트에서 그려집니다. `language`와 `theme`을 뺀 나머지는 이 패키지의 모든 생성 함수가 공통으로 받는 옵션이며, 어느 함수에서든 같은 뜻입니다.
+
+Dart에는 `output`이 없습니다. 거기서는 [상세 출력](#the-detail-output)이 `randWordDetails`입니다.
 
 ## 테마마다 함수가 하나씩
 
-테마는 옵션이기만 한 것이 아닙니다. 14개 각각이 그 자체로 함수이며, 테마를 미리 정해 둔 `randWord`입니다.
+테마는 옵션이기만 한 것이 아닙니다. 14개 각각이 그 자체로 함수이며, 테마를 미리 정해 둔 `randWord`입니다. 각각 문서 페이지가 하나씩 있고, 각 테마가 담고 있는 단어는 [테마](./themes)에 있습니다.
+
+[`randAnimal`](./rand-animal) · [`randObject`](./rand-object) · [`randNature`](./rand-nature) · [`randPlant`](./rand-plant) · [`randGem`](./rand-gem) · [`randConcept`](./rand-concept) · [`randMyth`](./rand-myth) · [`randJob`](./rand-job) · [`randMusic`](./rand-music) · [`randPlace`](./rand-place) · [`randFood`](./rand-food) · [`randSport`](./rand-sport) · [`randVehicle`](./rand-vehicle) · [`randProduct`](./rand-product)
 
 ::: lang js
 
@@ -97,7 +91,7 @@ rand_gem(language="ko", count=2, unique=True)  # ['흑요석', '청동']
 
 :::
 
-`theme`을 뺀 `randWord`의 모든 옵션을 그대로 받습니다. 전체 목록은 [테마](./themes)에 있습니다.
+`theme`을 뺀 `randWord`의 모든 옵션을 그대로 받습니다.
 
 ## 길이
 

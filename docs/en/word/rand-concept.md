@@ -1,0 +1,51 @@
+# randConcept
+
+Ideas out of the humanities and the social world.
+
+[`randWord`](./rand-word) with `theme` fixed to <Lang js="'concept'" dart="WordTheme.concept" py="&quot;concept&quot;" code />; every other option is the same one, and means the same thing.
+
+::: lang js
+
+```javascript
+import { randConcept } from 'randino';
+
+randConcept({ language: 'ko', count: 3 }); // ['자유', '평화', '진리']
+randConcept({ language: 'en', output: 'detail' });
+// [{ word: 'Freedom', language: 'en', theme: 'concept' }]
+```
+
+:::
+
+::: lang dart
+
+```dart
+import 'package:randino/randino.dart';
+
+randConcept(language: WordLanguage.ko, count: 3); // [자유, 평화, 진리]
+randConcept(language: WordLanguage.en, count: 3); // [Freedom, Peace, Truth]
+```
+
+Returns `List<String>`. For the detail form, pass `WordTheme.concept` to `randWordDetails` — Dart has no overloads, and fourteen more functions for it would be fourteen too many.
+
+:::
+
+::: lang py
+
+```python
+from randino import rand_concept
+
+rand_concept(language="ko", count=3)  # ['자유', '평화', '진리']
+rand_concept(language="en", output="detail")
+# [WordDetail(word='Freedom', language='en', theme='concept')]
+```
+
+:::
+
+## Options
+
+<WordOptions />
+
+## See also
+
+- [`randWord`](./rand-word) — the same generator with `theme` open, and what each option does in full.
+- [Themes](./themes) — the other thirteen, and the words each one holds.

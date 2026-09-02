@@ -20,7 +20,7 @@
 import { existsSync, readFileSync } from 'node:fs';
 import { writeFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
-import { inlineLang } from './data/markdown';
+import { inlineLang, wordOptionsTable } from './data/markdown';
 import { SIDEBAR, type SidebarGroup, type SidebarPage } from './data/sidebar';
 
 export interface LlmsOptions {
@@ -84,6 +84,11 @@ function flatten(markdown: string): string {
 			)
 			// The demo is a Vue component; in a text file it is nothing at all.
 			.replace(/^<Demo\s*\/>$/gm, '')
+			// The option table is a component too, but one whose content a reader of
+			// this file needs — so it is drawn out rather than dropped.
+			.replace(/^<WordOptions(\s+theme)?\s*\/>$/gm, (_, theme?: string) =>
+				wordOptionsTable(Boolean(theme))
+			)
 			// Whatever the removals left behind.
 			.replace(/\n{3,}/g, '\n\n')
 			.trim()

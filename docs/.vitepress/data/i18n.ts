@@ -41,6 +41,50 @@ const strings = {
 	},
 	/** On the button, for a reader who reaches it without seeing the label. */
 	languageSelect: { ko: '언어 선택', en: 'Select a language' },
+	/* `WordOptions.vue` — the table `randWord` and its fourteen themed forms share.
+	   The option names themselves are not here, by the rule above; what is left is
+	   the column headings and one sentence per option. */
+	optionName: { ko: '옵션', en: 'Option' },
+	optionType: { ko: '타입', en: 'Type' },
+	optionDefault: { ko: '기본값', en: 'Default' },
+	optionAbout: { ko: '설명', en: 'Description' },
+	optionFromPools: { ko: '단어 풀', en: 'pools' },
+	optionLanguage: {
+		ko: '생성할 단어의 언어. 생략하면 언어마다 하나씩 골라 모두 섞습니다.',
+		en: 'Language of the generated words. Left out, it picks one per word and mixes them all.'
+	},
+	optionTheme: {
+		ko: '단어의 주제. 테마마다 같은 함수가 하나씩 따로 있습니다.',
+		en: 'What the words are about. Each theme also has a function of its own.'
+	},
+	optionCount: {
+		ko: '돌려줄 단어 개수. 0 … 10000으로 제한됩니다.',
+		en: 'How many words to return. Clamped to 0 … 10000.'
+	},
+	optionStyle: {
+		ko: '0은 실제 단어를 뽑고, 100은 그 언어처럼 읽히기만 하는 단어를 만들어냅니다.',
+		en: '0 draws real words, 100 invents words that only read like the language.'
+	},
+	optionMinLength: {
+		ko: '최소 글자 수. 생략하면 단어 풀이 담고 있는 범위를 따릅니다.',
+		en: 'Minimum length in characters. Left out, it follows what the pools hold.'
+	},
+	optionMaxLength: {
+		ko: '최대 글자 수. 풀이 만족시킬 수 없으면 가장 가까운 단어로 답합니다.',
+		en: 'Maximum length in characters. A range the pool cannot serve is answered with the closest word.'
+	},
+	optionStartsWith: {
+		ko: '이 글자로 시작하는 단어만 남깁니다.',
+		en: 'Keep only words whose first character is this one.'
+	},
+	optionUnique: {
+		ko: '같은 단어를 두 번 돌려주지 않습니다. 풀이 바닥나면 요청보다 적게 돌아옵니다.',
+		en: 'Never return the same word twice. Returns fewer than asked once a pool runs out.'
+	},
+	optionOutput: {
+		ko: '문자열, 또는 단어마다 WordDetail 하나.',
+		en: 'Strings, or one WordDetail per word.'
+	},
 	/* The demo page. Its controls are labelled with the option names themselves,
 	   so these are only the parts that are not identifiers. */
 	demoNames: { ko: '사람 이름', en: 'Person names' },

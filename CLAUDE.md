@@ -70,7 +70,7 @@ lib/
   word/
     index.ts
     randWord.ts             # public: string[], or WordDetail[] on `output: 'detail'`
-    randAnimal.ts …         # public: one per theme, fourteen of them
+    randAnimal.ts …         # public: one per theme, fourteen of them, one doc page each
     wordLengthRange.ts      # public helper
     wordGenerator.ts        # internal: the generator, and the drawing primitives
     data/
@@ -268,6 +268,8 @@ docs/
       i18n.ts               # the few strings the site's own components render
     llms.ts                 # `llms.txt` and `llms-full.txt`, written at build time
     theme/                  # the language switch, the packages menu, the demo, the CSS
+      components/
+        WordOptions.vue     # the option table `randWord` and its fourteen share
   en/  ko/                  # the pages, mirrored
   scripts/
     copy-changelog.mjs      # every package's CHANGELOG.md -> docs/<locale>/changelog.md
@@ -305,7 +307,9 @@ Every variant is in the document and CSS hides all but one, which is what buys t
 
 **One page, one function**, which is why there is no `helpers` page holding three of them any more: a page that documents three functions can be named after none of them, so the menu names the page and the reader still has to open it to find out whether what they came for is inside.
 
-The one exception is a **family of functions that differ only by a fixed argument**. `randAnimal` … `randProduct` are fourteen names for `randWord` with its `theme` decided, so they share `randWord`'s page and are listed on it — fourteen sidebar entries whose pages would say the same thing in fourteen places is a worse menu, not a better one. A function with an option of its own gets a page of its own.
+There is **no exception for a family of functions**. `randAnimal` … `randProduct` are fourteen names for `randWord` with its `theme` decided, and they have fourteen pages: a reader looking for `randAnimal` should find `randAnimal`, not a section of somebody else's page. What that would cost — the same option table written out thirty times, in two locales, with three packages' types in every cell — is paid by `WordOptions.vue` instead, which draws the table once and takes a `theme` prop for the one page that accepts the option rather than answering it. **A page repeated across pages is a component, not a reason to merge the pages.**
+
+Those fourteen are their own sidebar group, **Word themes**, rather than eleven more entries under Generators, and they are the one group the navbar's API dropdown leaves out — see the comment in `config.ts`. The Markdown that is left on each page is what actually differs: what the theme is, and three code samples of it.
 
 The navbar is the same lists — its API dropdown is Generators, Decorators and Utilities as three labelled sections, built out of `data/sidebar.ts` by `navGroupsFor`, so the menu and the sections it points into cannot drift. Its **Packages** dropdown is `PackageLinks.vue`, which is where npm, pub.dev and PyPI went when they stopped being three of the four icons in the navbar's right-hand corner; the registry URLs are still derived from the three manifests in `config.ts`, and GitHub is the one social link left. Its marks are `RegistryMark.vue` and not `LangMark.vue` — npm is not JavaScript and PyPI is not Python, and only pub.dev, which brands itself with the Dart logo, has the same drawing in both files.
 

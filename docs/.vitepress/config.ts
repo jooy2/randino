@@ -75,12 +75,17 @@ const packageLinks = [
 /**
  * The navbar, in every locale: the prose, the functions, and where to get them.
  *
- * **API** is a dropdown over the same pages the sidebar's two function groups
- * hold, split the same way: what generates a name or a nickname, and what
- * decorates a string or answers a question about a language. Not split by
- * `name/` versus `nickname/` — a reader looking for `randNickname` is looking
- * for a function, not for the half of the library it belongs to.
+ * **API** is a dropdown over the same pages the sidebar's function groups hold,
+ * split the same way: what generates a name, a nickname or a word, what
+ * decorates a string, and what answers a question about a language. Not split
+ * by `name/` versus `nickname/` — a reader looking for `randNickname` is
+ * looking for a function, not for the corner of the library it belongs to.
  * `navGroupsFor` is what keeps the menu and those sections in step.
+ *
+ * The sidebar's fourteenth-of-a-generator group, **Word themes**, is the one
+ * left out: fourteen names for `randWord` with its argument decided would
+ * double the menu and say nothing `randWord` does not. The sidebar lists them;
+ * the dropdown points at the function they all are.
  */
 const navFor = (lang: string, labels: { demo: string; guide: string; packages: string }) => [
 	{ text: labels.guide, link: `${localeBase(lang, defaultLocale)}guide/getting-started` },

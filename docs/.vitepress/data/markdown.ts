@@ -1,3 +1,6 @@
+import { t } from './i18n';
+import { isPhrase, isVariants, wordOptionRows, type OptionCell } from './wordOptions';
+
 /**
  * The one transform two very different readers both need.
  *
@@ -23,4 +26,41 @@ export function inlineLang(markdown: string): string {
 
 		return /\bcode\b/.test(attrs) ? `\`${js}\`` : js;
 	});
+}
+
+/**
+ * `<WordOptions />` → the option table it draws, as Markdown.
+ *
+ * The component is the site's copy of that table and this is the text file's:
+ * `llms-full.txt` has no Vue to render a component and no CSS to hide a
+ * variant, so the row would otherwise arrive as the literal tag and the reader
+ * would be told a page has options and not which ones. Both come off the same
+ * rows in `data/wordOptions.ts`, in the JavaScript spelling for the reason
+ * everything else in that file is.
+ */
+export function wordOptionsTable(theme: boolean): string {
+	const cell = (value: OptionCell): string => {
+		if (isPhrase(value)) {
+			return `_${t('en', value.i18n)}_`;
+		}
+
+		const text = isVariants(value) ? value.js : value;
+
+		return text ? `\`${text}\`` : '—';
+	};
+
+	const rows = wordOptionRows(theme)
+		// A row no JavaScript spelling exists for is a row the npm package has not
+		// got, which is the half this file keeps.
+		.filter((row) => row.type.js)
+		.map(
+			(row) =>
+				`| ${cell(row.name)} | ${cell(row.type)} | ${cell(row.fallback)} | ${t('en', row.about)} |`
+		);
+
+	return [
+		`| ${t('en', 'optionName')} | ${t('en', 'optionType')} | ${t('en', 'optionDefault')} | ${t('en', 'optionAbout')} |`,
+		'| --- | --- | --- | --- |',
+		...rows
+	].join('\n');
 }
