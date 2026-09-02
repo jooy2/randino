@@ -1,6 +1,6 @@
 # 데모
 
-아래의 모든 것은 브라우저에서 직접 실행됩니다. 컨트롤은 `randName`과 `randNickname`이 실제로 받는 옵션이고, 결과 아래의 코드 블록은 지금 설정이 만들어 내는 호출이며, 보이는 값은 Generate를 누를 때마다 새로 뽑힙니다.
+아래의 모든 것은 브라우저에서 직접 실행됩니다. 컨트롤은 `randName`, `randNickname`, `randWord`가 실제로 받는 옵션이고, 결과 아래의 코드 블록은 지금 설정이 만들어 내는 호출이며, 보이는 값은 Generate를 누를 때마다 새로 뽑힙니다.
 
 <Demo />
 
@@ -12,6 +12,8 @@
 - 닉네임 탭에서 `theme`을 `animal`로, `wordSeparator`를 `-`로 지정해 보세요. 구분자도 길이에 포함되므로, 범위가 좁으면 단어를 자르는 대신 수식어를 뺍니다.
 - 한국어 닉네임에서 `maxLength`를 `3`으로 낮춰 보세요. 단어가 잘리는 대신 세 단어짜리 형태가 아예 빠집니다. 길이는 단어가 아니라 형태를 고릅니다.
 - `randSuffix`를 켜 보세요. 토큰은 닉네임이 완성된 뒤에 붙기 때문에, 길이 옵션이 그것을 신경 쓸 필요가 없습니다.
+- 단어 탭에서 `theme`을 고르고 Generate를 눌러 보세요. 닉네임을 만드는 바로 그 단어 풀을 아무것도 더하지 않은 채로 받게 됩니다. `randAnimal`을 비롯한 13개 함수가 테마를 미리 정해 둔 이 호출입니다.
+- 단어 탭에서 장식 함수를 `randModifier`로 바꿔 보세요. 명사 앞에 수식어를 붙이는 것이 `randNickname`이 하는 일의 대부분이며, 코드 블록에 그 두 함수가 그대로 드러납니다.
 
 ## 이 페이지가 아닌 것 {#what-this-page-is-not}
 
@@ -22,5 +24,5 @@
 ## 다음으로 볼 것 {#where-to-go-next}
 
 - [시작하기](./guide/getting-started) — 세 패키지 중 쓰는 것으로 설치하기.
-- [`randName`](./name/rand-name)과 [`randNickname`](./nickname/rand-nickname) — 위 패널의 모든 옵션을 글로.
+- [`randName`](./name/rand-name), [`randNickname`](./nickname/rand-nickname), [`randWord`](./word/rand-word) — 위 패널의 모든 옵션을 글로.
 - [지원 언어](./guide/languages) — 각 언어가 할 수 있는 것과 할 수 없는 것.

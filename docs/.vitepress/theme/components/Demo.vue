@@ -8,10 +8,13 @@ import {
 	nameLengthRange,
 	nameSupportsMiddleName,
 	nicknameLengthRange,
+	randModifier,
 	randName,
 	randNickname,
 	randPrefix,
-	randSuffix
+	randSuffix,
+	randWord,
+	wordLengthRange
 } from 'randino';
 import { localeOf, t } from '../../data/i18n';
 
@@ -54,8 +57,16 @@ const COUNT_MAX = 50;
 const tab = ref('name');
 const details = ref(false);
 
-/** `randSuffix` / `randPrefix`, applied to whatever the generator returned. */
-const affix = reactive({ kind: 'none', length: 5, separator: '_' });
+/** A decorator, applied to whatever the generator returned. */
+const decorate = reactive({ kind: 'none', length: 5, separator: '_' });
+
+/** The separator each kind defaults to, so switching does not carry one over. */
+watch(
+	() => decorate.kind,
+	(kind) => {
+		decorate.separator = kind === 'modifier' ? '' : '_';
+	}
+);
 
 const name = reactive({
 	language: 'ko',
@@ -83,6 +94,17 @@ const nickname = reactive({
 	unique: false
 });
 
+const word = reactive({
+	language: 'ko',
+	theme: 'all',
+	count: 8,
+	style: 0,
+	minLength: '',
+	maxLength: '',
+	startsWith: '',
+	unique: false
+});
+
 /** An empty box is "not asked for", not `0`. */
 function num(value) {
 	const parsed = Number(value);
@@ -106,6 +128,19 @@ const options = computed(() => {
 		if (num(name.maxLength) !== undefined) out.maxLength = num(name.maxLength);
 		if (name.startsWith) out.startsWith = name.startsWith;
 		if (name.unique) out.unique = true;
+
+		return out;
+	}
+
+	if (tab.value === 'word') {
+		if (word.language !== 'all') out.language = word.language;
+		if (word.theme !== 'all') out.theme = word.theme;
+		if (word.count !== 1) out.count = Number(word.count);
+		if (Number(word.style) !== 0) out.style = Number(word.style);
+		if (num(word.minLength) !== undefined) out.minLength = num(word.minLength);
+		if (num(word.maxLength) !== undefined) out.maxLength = num(word.maxLength);
+		if (word.startsWith) out.startsWith = word.startsWith;
+		if (word.unique) out.unique = true;
 
 		return out;
 	}
@@ -144,11 +179,18 @@ const generatorOptions = computed(() => {
 	return out;
 });
 
-const affixOptions = computed(() => {
+/** What the decorator is called with — a modifier takes no `length`. */
+const decorateOptions = computed(() => {
 	const out = {};
 
-	if (Number(affix.length) !== 5) out.length = Number(affix.length);
-	if (affix.separator !== '_') out.separator = affix.separator;
+	if (decorate.kind === 'modifier') {
+		if (decorate.separator) out.separator = decorate.separator;
+
+		return out;
+	}
+
+	if (Number(decorate.length) !== 5) out.length = Number(decorate.length);
+	if (decorate.separator !== '_') out.separator = decorate.separator;
 
 	return out;
 });
@@ -159,10 +201,17 @@ const fallbackRange = computed(() => {
 		return nameLengthRange(name.language, name.includeSurname, name.includeMiddleName);
 	}
 
+	if (tab.value === 'word') {
+		return wordLengthRange(word.language, word.theme);
+	}
+
 	return nicknameLengthRange(nickname.language, nickname.wordSeparator);
 });
 
 const supportsMiddleName = computed(() => nameSupportsMiddleName(name.language));
+
+/** The three of them, by the name the reader picks in the select. */
+const DECORATORS = { suffix: randSuffix, prefix: randPrefix, modifier: randModifier };
 
 const rows = ref([]);
 const asked = ref(0);
@@ -186,6 +235,18 @@ function generate() {
 		} else {
 			items = randName(config);
 		}
+	} else if (tab.value === 'word') {
+		if (details.value) {
+			const drawn = randWord({ ...config, output: 'detail' });
+
+			items = drawn.map((detail) => detail.word);
+			meta = drawn.map((detail) => [
+				['language', detail.language],
+				['theme', String(detail.theme)]
+			]);
+		} else {
+			items = randWord(config);
+		}
 	} else if (details.value) {
 		const drawn = randNickname({ ...config, output: 'detail' });
 
@@ -199,10 +260,10 @@ function generate() {
 		items = randNickname(config);
 	}
 
-	if (affix.kind !== 'none') {
-		const attach = affix.kind === 'suffix' ? randSuffix : randPrefix;
+	if (decorate.kind !== 'none') {
+		const attach = DECORATORS[decorate.kind];
 
-		items = attach(items, affixOptions.value);
+		items = attach(items, decorateOptions.value);
 	}
 
 	asked.value = config.count ?? 1;
@@ -237,27 +298,36 @@ function objectLiteral(source) {
 	return inline.length <= 56 ? inline : `{\n\t${pairs.join(',\n\t')}\n}`;
 }
 
-const code = computed(() => {
-	const isName = tab.value === 'name';
-	const generator = isName ? 'randName' : 'randNickname';
+const GENERATORS = { name: 'randName', nickname: 'randNickname', word: 'randWord' };
 
+const DECORATOR_NAMES = {
+	suffix: 'randSuffix',
+	prefix: 'randPrefix',
+	modifier: 'randModifier'
+};
+
+const DETAIL_FIELDS = { name: 'native', nickname: 'nickname', word: 'word' };
+
+const code = computed(() => {
+	const generator = GENERATORS[tab.value];
 	const call = `${generator}(${objectLiteral(generatorOptions.value)})`;
 
-	if (affix.kind === 'none') {
+	if (decorate.kind === 'none') {
 		return `import { ${generator} } from 'randino';\n\n${call};`;
 	}
 
-	const wrapper = affix.kind === 'suffix' ? 'randSuffix' : 'randPrefix';
-	const extra = objectLiteral(affixOptions.value);
+	const wrapper = DECORATOR_NAMES[decorate.kind];
+	const extra = objectLiteral(decorateOptions.value);
 	const imports = [generator, wrapper].sort().join(', ');
 
 	if (!details.value) {
 		return `import { ${imports} } from 'randino';\n\n${wrapper}(${call}${extra ? `, ${extra}` : ''});`;
 	}
 
-	// The affix attaches to strings, and details are objects — so the two-step
+	// A decorator attaches to strings, and details are objects — so the two-step
 	// form, which is what the page is doing behind the output above.
-	const field = isName ? (name.script === 'roman' ? 'roman' : 'native') : 'nickname';
+	const field =
+		tab.value === 'name' && name.script === 'roman' ? 'roman' : DETAIL_FIELDS[tab.value];
 
 	return [
 		`import { ${imports} } from 'randino';`,
@@ -300,6 +370,15 @@ async function copy() {
 				@click="tab = 'nickname'"
 			>
 				{{ t(locale, 'demoNicknames') }}
+			</button>
+			<button
+				type="button"
+				role="tab"
+				:aria-selected="tab === 'word'"
+				class="randino-demo-tab"
+				@click="tab = 'word'"
+			>
+				{{ t(locale, 'demoWords') }}
 			</button>
 		</div>
 
@@ -373,6 +452,56 @@ async function copy() {
 				</label>
 			</div>
 
+			<div v-else-if="tab === 'word'" class="randino-demo-fields">
+				<label class="randino-demo-field">
+					<span><code>language</code></span>
+					<select v-model="word.language">
+						<option value="all">all</option>
+						<option v-for="code_ in WORD_LANGUAGES" :key="code_" :value="code_">
+							{{ code_ }} — {{ LANGUAGE_NAMES[code_] }}
+						</option>
+					</select>
+				</label>
+
+				<label class="randino-demo-field">
+					<span><code>theme</code></span>
+					<select v-model="word.theme">
+						<option value="all">all</option>
+						<option v-for="item in WORD_THEMES" :key="item" :value="item">{{ item }}</option>
+					</select>
+				</label>
+
+				<label class="randino-demo-field">
+					<span><code>count</code></span>
+					<input v-model.number="word.count" type="number" min="1" :max="COUNT_MAX" />
+				</label>
+
+				<label class="randino-demo-field randino-demo-wide">
+					<span><code>style</code> — {{ word.style }}</span>
+					<input v-model.number="word.style" type="range" min="0" max="100" step="5" />
+				</label>
+
+				<label class="randino-demo-field">
+					<span><code>minLength</code></span>
+					<input v-model="word.minLength" type="number" min="1" :placeholder="fallbackRange[0]" />
+				</label>
+
+				<label class="randino-demo-field">
+					<span><code>maxLength</code></span>
+					<input v-model="word.maxLength" type="number" min="1" :placeholder="fallbackRange[1]" />
+				</label>
+
+				<label class="randino-demo-field">
+					<span><code>startsWith</code></span>
+					<input v-model="word.startsWith" type="text" maxlength="1" placeholder="—" />
+				</label>
+
+				<label class="randino-demo-check">
+					<input v-model="word.unique" type="checkbox" />
+					<code>unique</code>
+				</label>
+			</div>
+
 			<div v-else class="randino-demo-fields">
 				<label class="randino-demo-field">
 					<span><code>language</code></span>
@@ -440,32 +569,37 @@ async function copy() {
 
 			<div class="randino-demo-fields randino-demo-affix">
 				<label class="randino-demo-field">
-					<span>{{ t(locale, 'demoAffix') }}</span>
-					<select v-model="affix.kind">
-						<option value="none">{{ t(locale, 'demoAffixNone') }}</option>
+					<span>{{ t(locale, 'demoDecorate') }}</span>
+					<select v-model="decorate.kind">
+						<option value="none">{{ t(locale, 'demoDecorateNone') }}</option>
 						<option value="suffix">randSuffix</option>
 						<option value="prefix">randPrefix</option>
+						<option value="modifier">randModifier</option>
 					</select>
 				</label>
 
-				<label class="randino-demo-field" :class="{ 'is-off': affix.kind === 'none' }">
+				<label
+					class="randino-demo-field"
+					:class="{ 'is-off': decorate.kind === 'none' || decorate.kind === 'modifier' }"
+				>
 					<span><code>length</code></span>
 					<input
-						v-model.number="affix.length"
+						v-model.number="decorate.length"
 						type="number"
 						min="1"
 						max="32"
-						:disabled="affix.kind === 'none'"
+						:disabled="decorate.kind === 'none' || decorate.kind === 'modifier'"
 					/>
 				</label>
 
-				<label class="randino-demo-field" :class="{ 'is-off': affix.kind === 'none' }">
+				<label class="randino-demo-field" :class="{ 'is-off': decorate.kind === 'none' }">
 					<span><code>separator</code></span>
 					<input
-						v-model="affix.separator"
+						v-model="decorate.separator"
 						type="text"
 						maxlength="4"
-						:disabled="affix.kind === 'none'"
+						placeholder="—"
+						:disabled="decorate.kind === 'none'"
 					/>
 				</label>
 

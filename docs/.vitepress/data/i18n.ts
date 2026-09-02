@@ -45,12 +45,13 @@ const strings = {
 	   so these are only the parts that are not identifiers. */
 	demoNames: { ko: '사람 이름', en: 'Person names' },
 	demoNicknames: { ko: '닉네임', en: 'Nicknames' },
+	demoWords: { ko: '단어', en: 'Words' },
 	demoGenerate: { ko: '생성', en: 'Generate' },
 	demoCopy: { ko: '복사', en: 'Copy' },
 	demoCopied: { ko: '복사됨', en: 'Copied' },
 	demoDetails: { ko: '상세 정보 보기', en: 'Show details' },
-	demoAffix: { ko: '무작위 접사', en: 'Random affix' },
-	demoAffixNone: { ko: '없음', en: 'none' },
+	demoDecorate: { ko: '장식 함수', en: 'Decorator' },
+	demoDecorateNone: { ko: '없음', en: 'none' },
 	demoCall: { ko: '이 결과를 만든 호출', en: 'The call behind this' },
 	demoEmpty: {
 		ko: '조건에 맞는 결과가 없습니다. 길이 범위나 startsWith를 넓혀 보세요.',
