@@ -24,6 +24,14 @@ import re
 from dataclasses import dataclass
 from typing import Literal, NamedTuple
 
+from randino._internal.generate import (
+    collect,
+    draw_language,
+    length_bounds,
+    resolve_length,
+    resolve_prefix,
+    resolve_style,
+)
 from randino._internal.utils import (
     capitalize_first,
     chance,
@@ -38,14 +46,7 @@ from randino._types import (
     NicknameTheme,
     NicknameThemeOption,
 )
-from randino.nickname.data import (
-    NICKNAME_COUNT_MAX,
-    NICKNAME_DATA,
-    NICKNAME_LANGUAGES,
-    NICKNAME_LENGTH_MAX,
-    NICKNAME_LENGTH_MIN,
-    NICKNAME_THEMES,
-)
+from randino.nickname.data import NICKNAME_DATA, NICKNAME_LANGUAGES, NICKNAME_THEMES
 from randino.nickname.data._types import (
     NicknameLanguageData,
     PoolSynthesis,
@@ -390,7 +391,7 @@ def has_boundary_repeat(words: list[str]) -> bool:
     return any(words[index - 1][-1:] == words[index][:1] for index in range(1, len(words)))
 
 
-def length_bounds(
+def bounds_for(
     data: NicknameLanguageData,
     bounds: Bounds,
     patterns: tuple[Pattern, ...],
@@ -406,18 +407,7 @@ def length_bounds(
     natural_min = min(low for low, _ in ranges)
     natural_max = max(high for _, high in ranges)
 
-    low = clamp(
-        natural_min if settings.min_length is None else settings.min_length,
-        NICKNAME_LENGTH_MIN,
-        NICKNAME_LENGTH_MAX,
-    )
-    high = clamp(
-        natural_max if settings.max_length is None else settings.max_length,
-        NICKNAME_LENGTH_MIN,
-        NICKNAME_LENGTH_MAX,
-    )
-
-    return low, max(low, high)
+    return length_bounds(settings.min_length, settings.max_length, natural_min, natural_max)
 
 
 def natural_range(
@@ -471,7 +461,7 @@ def generate_one(language: NicknameLanguage, settings: Settings) -> Built:
             else cached
         )
 
-        low, high = length_bounds(data, bounds, patterns, settings)
+        low, high = bounds_for(data, bounds, patterns, settings)
         # Prefer a shape that can actually land inside the range.
         spans = {pattern: pattern_range(pattern.slots, bounds, len(joiner)) for pattern in patterns}
         fitting = tuple(
@@ -545,50 +535,33 @@ def generate_nickname_details(
     """Generate `count` nicknames, applied to every option the caller passed."""
     settings = Settings(
         theme=theme,
-        style=clamp(style, 0, 100),
-        min_length=None if min_length is None else math.floor(min_length),
-        max_length=None if max_length is None else math.floor(max_length),
+        style=resolve_style(style),
+        min_length=resolve_length(min_length),
+        max_length=resolve_length(max_length),
         include_modifier=include_modifier,
         base_word=base_word.strip(),
-        prefix=starts_with.strip()[:1],
+        prefix=resolve_prefix(starts_with),
         separator=word_separator,
     )
     resolved: NicknameLanguageOption = language or (
         detect_language(settings.base_word) if settings.base_word else "all"
     )
-    wanted = clamp(math.floor(count), 0, NICKNAME_COUNT_MAX)
-    prefix = settings.prefix.lower()
 
-    seen: set[str] = set()
-    nicknames: list[NicknameDetail] = []
-    max_attempts = wanted * 50 + 500
-    attempts = 0
-
-    while len(nicknames) < wanted and attempts < max_attempts:
-        attempts += 1
-
-        code: NicknameLanguage = pick(NICKNAME_LANGUAGES) if resolved == "all" else resolved
+    def draw() -> NicknameDetail:
+        code = draw_language(resolved, NICKNAME_LANGUAGES)
         words, built_theme = generate_one(code, settings)
-        word = joiner_of(NICKNAME_DATA[code], settings).join(words)
 
-        if not word:
-            continue
-        if prefix and not word.lower().startswith(prefix):
-            continue
-
-        if unique:
-            if word in seen:
-                continue
-
-            seen.add(word)
-
-        nicknames.append(
-            NicknameDetail(
-                nickname=word,
-                words=words,
-                language=code,
-                theme=built_theme,
-            )
+        return NicknameDetail(
+            nickname=joiner_of(NICKNAME_DATA[code], settings).join(words),
+            words=words,
+            language=code,
+            theme=built_theme,
         )
 
-    return nicknames
+    return collect(
+        count=count,
+        unique=unique,
+        starts_with=settings.prefix,
+        draw=draw,
+        key_of=lambda detail: detail.nickname,
+    )

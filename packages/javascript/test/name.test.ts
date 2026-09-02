@@ -1,7 +1,7 @@
 import assert from 'assert';
 import { describe, it } from 'node:test';
 import {
-	NAME_COUNT_MAX,
+	RAND_COUNT_MAX,
 	NAME_LANGUAGES,
 	nameLengthRange,
 	nameSupportsMiddleName,
@@ -74,7 +74,7 @@ describe('Name', () => {
 		assert.strictEqual(randName({ count: 0 }).length, 0);
 		assert.strictEqual(randName({ count: -10 }).length, 0);
 		assert.strictEqual(randName({ count: 2.7 }).length, 2);
-		assert.strictEqual(randName({ count: NAME_COUNT_MAX + 500 }).length, NAME_COUNT_MAX);
+		assert.strictEqual(randName({ count: RAND_COUNT_MAX + 500 }).length, RAND_COUNT_MAX);
 	});
 
 	it('every language writes names in its own script', () => {

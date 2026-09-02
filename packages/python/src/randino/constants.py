@@ -1,0 +1,20 @@
+"""Bounds every generator shares.
+
+They used to be `NAME_*` and `NICKNAME_*`, one set each, which meant a third
+generator had to invent a third set holding the same numbers. What a generator
+produces differs; how many of them you may ask for, and how long you may ask
+them to be, does not.
+"""
+
+RAND_COUNT_MAX = 10000
+"""Upper bound for `count` on every generator.
+
+Generation is cheap, but an unbounded count with `unique=True` can spend a long
+time re-drawing from an exhausted pool.
+"""
+
+RAND_LENGTH_MIN = 1
+"""Lower bound for `min_length` / `max_length` on every generator, in characters."""
+
+RAND_LENGTH_MAX = 40
+"""Upper bound for `min_length` / `max_length` on every generator, in characters."""

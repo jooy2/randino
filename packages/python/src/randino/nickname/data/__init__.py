@@ -39,12 +39,3 @@ NICKNAME_DATA: dict[NicknameLanguage, NicknameLanguageData] = {
     "zh": ZH,
 }
 """Each language's pools and rules, keyed by its code."""
-
-NICKNAME_LENGTH_MIN = 1
-"""Lower bound for `min_length`, in characters of the nickname itself."""
-
-NICKNAME_LENGTH_MAX = 40
-"""Upper bound for `max_length`."""
-
-NICKNAME_COUNT_MAX = 10000
-"""Upper bound for `count`."""

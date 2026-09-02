@@ -16,6 +16,14 @@
 // What used to be the fifth entry here, `uniqueSuffix`, is `randSuffix` now:
 // attaching a token to a string was never a thing about nicknames.
 
+import {
+	collect,
+	drawLanguage,
+	lengthBounds,
+	resolveLength,
+	resolvePrefix,
+	resolveStyle
+} from '../_internal/generate.js';
 import { capitalizeFirst, chance, clamp, pick, randInt } from '../_internal/utils.js';
 import type {
 	NicknameDetail,
@@ -24,14 +32,7 @@ import type {
 	NicknameThemeOption,
 	RandNicknameOptions
 } from '../_types/global.js';
-import {
-	NICKNAME_COUNT_MAX,
-	NICKNAME_DATA,
-	NICKNAME_LANGUAGES,
-	NICKNAME_LENGTH_MAX,
-	NICKNAME_LENGTH_MIN,
-	NICKNAME_THEMES
-} from './data/index.js';
+import { NICKNAME_DATA, NICKNAME_LANGUAGES, NICKNAME_THEMES } from './data/index.js';
 import type { NicknameLanguageData, WordPool, WordSynthesis } from './data/types.js';
 
 type Slot = 'modifier' | 'noun' | 'part';
@@ -377,7 +378,7 @@ function hasBoundaryRepeat(words: readonly string[]): boolean {
  * Length range for one language and theme: what the caller asked for, falling
  * back to everything the available shapes can produce.
  */
-function lengthBounds(
+function boundsFor(
 	data: NicknameLanguageData,
 	bounds: Bounds,
 	patterns: readonly { slots: readonly Slot[]; weight: number }[],
@@ -393,10 +394,7 @@ function lengthBounds(
 		naturalMax = Math.max(naturalMax, high);
 	}
 
-	const min = clamp(settings.minLength ?? naturalMin, NICKNAME_LENGTH_MIN, NICKNAME_LENGTH_MAX);
-	const max = clamp(settings.maxLength ?? naturalMax, NICKNAME_LENGTH_MIN, NICKNAME_LENGTH_MAX);
-
-	return [min, Math.max(min, max)];
+	return lengthBounds(settings.minLength, settings.maxLength, naturalMin, naturalMax);
 }
 
 /**
@@ -459,7 +457,7 @@ function generateOne(language: NicknameLanguage, settings: Settings): Built {
 			? { ...cached, noun: [settings.baseWord.length, settings.baseWord.length] }
 			: cached;
 
-		const [min, max] = lengthBounds(data, bounds, patterns, settings);
+		const [min, max] = boundsFor(data, bounds, patterns, settings);
 		// Prefer a shape that can actually land inside the range.
 		const fitting = patterns.filter(({ slots }) => {
 			const [low, high] = patternRange(slots, bounds, joiner.length);
@@ -503,12 +501,12 @@ function resolveSettings(options: RandNicknameOptions): Settings {
 
 	return {
 		theme: options.theme ?? 'all',
-		style: clamp(options.style ?? 0, 0, 100),
-		minLength: options.minLength === undefined ? undefined : Math.floor(options.minLength),
-		maxLength: options.maxLength === undefined ? undefined : Math.floor(options.maxLength),
+		style: resolveStyle(options.style),
+		minLength: resolveLength(options.minLength),
+		maxLength: resolveLength(options.maxLength),
 		includeModifier: options.includeModifier ?? true,
 		baseWord,
-		prefix: (options.startsWith ?? '').trim().slice(0, 1),
+		prefix: resolvePrefix(options.startsWith),
 		separator: options.wordSeparator
 	};
 }
@@ -534,33 +532,20 @@ export function generateNicknameDetails(options: RandNicknameOptions = {}): Nick
 	const settings = resolveSettings(options);
 	const language =
 		options.language ?? (settings.baseWord ? detectLanguage(settings.baseWord) : 'all');
-	const count = clamp(Math.floor(options.count ?? 1), 0, NICKNAME_COUNT_MAX);
-	const unique = options.unique ?? false;
-	const prefix = settings.prefix.toLowerCase();
 
-	const seen = new Set<string>();
-	const nicknames: NicknameDetail[] = [];
-	const maxAttempts = count * 50 + 500;
-	let attempts = 0;
+	return collect(
+		options,
+		() => {
+			const code = drawLanguage(language, NICKNAME_LANGUAGES);
+			const { words, theme } = generateOne(code, settings);
 
-	while (nicknames.length < count && attempts < maxAttempts) {
-		attempts += 1;
-
-		const code = language === 'all' ? pick(NICKNAME_LANGUAGES) : language;
-		const { words, theme } = generateOne(code, settings);
-		const word = words.join(joinerOf(NICKNAME_DATA[code], settings));
-
-		if (!word) continue;
-		if (prefix && !word.toLowerCase().startsWith(prefix)) continue;
-
-		if (unique) {
-			if (seen.has(word)) continue;
-
-			seen.add(word);
-		}
-
-		nicknames.push({ nickname: word, words, language: code, theme });
-	}
-
-	return nicknames;
+			return {
+				nickname: words.join(joinerOf(NICKNAME_DATA[code], settings)),
+				words,
+				language: code,
+				theme
+			};
+		},
+		(detail) => detail.nickname
+	);
 }

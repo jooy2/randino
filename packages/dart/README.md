@@ -132,7 +132,7 @@ nameSupportsRoman(NameLanguage.en); // false
 nicknameLengthRange(language: NicknameLanguage.ko); // LengthRange(1, 12)
 ```
 
-`nameLanguages`, `nicknameLanguages` and `nicknameThemes` list what the generators accept; `nameCountMax`, `nameLengthMin` / `Max`, `nicknameCountMax`, `nicknameLengthMin` / `Max`, `affixLengthDefault` / `Max`, `affixSeparatorDefault` and `affixCharset` are the bounds and defaults every parameter is clamped to.
+`nameLanguages`, `nicknameLanguages` and `nicknameThemes` list what the generators accept; `randCountMax`, `randLengthMin` / `Max`, `affixLengthDefault` / `Max`, `affixSeparatorDefault` and `affixCharset` are the bounds and defaults every parameter is clamped to.
 
 ## Differences from the npm package
 

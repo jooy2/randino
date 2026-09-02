@@ -35,11 +35,3 @@ export const NAME_DATA: Record<NameLanguage, NameLanguageData> = {
 	es: ES,
 	vi: VI
 };
-
-// Bounds for `minLength` / `maxLength`, in characters of the native form.
-export const NAME_LENGTH_MIN = 1;
-export const NAME_LENGTH_MAX = 30;
-
-// Upper bound for `count`. Generation is cheap, but an unbounded count with
-// `unique: true` can spend a long time re-drawing from an exhausted pool.
-export const NAME_COUNT_MAX = 10000;

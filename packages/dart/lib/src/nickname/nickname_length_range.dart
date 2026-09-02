@@ -1,3 +1,4 @@
+import 'package:randino/src/constants.dart';
 import 'package:randino/src/internal/utils.dart';
 import 'package:randino/src/nickname/data/index.dart';
 import 'package:randino/src/nickname/nickname_generator.dart';
@@ -35,7 +36,7 @@ LengthRange nicknameLengthRange({
   }
 
   return LengthRange(
-    clampInt(min, nicknameLengthMin, nicknameLengthMax),
-    clampInt(max, nicknameLengthMin, nicknameLengthMax),
+    clampInt(min, randLengthMin, randLengthMax),
+    clampInt(max, randLengthMin, randLengthMax),
   );
 }

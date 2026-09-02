@@ -16,6 +16,7 @@
 // What used to be the fifth entry here, `uniqueSuffix`, is `randSuffix` now:
 // attaching a token to a string was never a thing about nicknames.
 
+import 'package:randino/src/internal/generate.dart';
 import 'package:randino/src/internal/utils.dart';
 import 'package:randino/src/nickname/data/index.dart';
 import 'package:randino/src/nickname/data/types.dart';
@@ -420,10 +421,7 @@ LengthRange _lengthBounds(
     if (range.max > naturalMax) naturalMax = range.max;
   }
 
-  final min = clampInt(settings.minLength ?? naturalMin, nicknameLengthMin, nicknameLengthMax);
-  final max = clampInt(settings.maxLength ?? naturalMax, nicknameLengthMin, nicknameLengthMax);
-
-  return LengthRange(min, max < min ? min : max);
+  return lengthBounds(settings.minLength, settings.maxLength, naturalMin, naturalMax);
 }
 
 /// Every length a language can produce, across all of its themes — the fallback
@@ -558,54 +556,36 @@ List<NicknameDetail> generateNicknameDetails({
   bool unique = false,
 }) {
   final trimmedBase = (baseWord ?? '').trim();
-  final trimmedPrefix = (startsWith ?? '').trim();
   final settings = _Settings(
     theme: theme,
-    style: clampInt(style, 0, 100),
+    style: resolveStyle(style),
     minLength: minLength,
     maxLength: maxLength,
     includeModifier: includeModifier,
     baseWord: trimmedBase,
-    prefix: trimmedPrefix.isEmpty ? '' : trimmedPrefix.substring(0, 1),
+    prefix: resolvePrefix(startsWith),
     separator: wordSeparator,
   );
   final resolvedLanguage =
       language ?? (trimmedBase.isNotEmpty ? _detectLanguage(trimmedBase) : null);
-  final resolvedCount = clampInt(count, 0, nicknameCountMax);
-  final prefix = settings.prefix.toLowerCase();
 
-  final seen = <String>{};
-  final nicknames = <NicknameDetail>[];
-  final maxAttempts = resolvedCount * 50 + 500;
-  var attempts = 0;
-
-  while (nicknames.length < resolvedCount && attempts < maxAttempts) {
-    attempts += 1;
-
+  return collect<NicknameDetail>(
+    count: count,
+    unique: unique,
+    startsWith: settings.prefix,
     // Written out: `??` would otherwise infer `pick`'s type argument from the
     // nullable left-hand side, and hand back a `NicknameLanguage?`.
-    final NicknameLanguage code = resolvedLanguage ?? pick(nicknameLanguages);
-    final built = _generateOne(code, settings);
-    final word = built.words.join(_joinerOf(nicknameData[code]!, settings));
+    draw: () {
+      final NicknameLanguage code = resolvedLanguage ?? pick(nicknameLanguages);
+      final built = _generateOne(code, settings);
 
-    if (word.isEmpty) continue;
-    if (prefix.isNotEmpty && !word.toLowerCase().startsWith(prefix)) continue;
-
-    if (unique) {
-      if (seen.contains(word)) continue;
-
-      seen.add(word);
-    }
-
-    nicknames.add(
-      NicknameDetail(
-        nickname: word,
+      return NicknameDetail(
+        nickname: built.words.join(_joinerOf(nicknameData[code]!, settings)),
         words: List<String>.unmodifiable(built.words),
         language: code,
         theme: built.theme,
-      ),
-    );
-  }
-
-  return nicknames;
+      );
+    },
+    keyOf: (detail) => detail.nickname,
+  );
 }

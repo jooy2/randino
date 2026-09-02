@@ -1,3 +1,4 @@
+import 'package:randino/src/constants.dart';
 import 'package:randino/src/internal/utils.dart';
 import 'package:randino/src/name/data/index.dart';
 import 'package:randino/src/types.dart';
@@ -45,7 +46,7 @@ LengthRange nameLengthRange({
   }
 
   return LengthRange(
-    clampInt(min, nameLengthMin, nameLengthMax),
-    clampInt(max, nameLengthMin, nameLengthMax),
+    clampInt(min, randLengthMin, randLengthMax),
+    clampInt(max, randLengthMin, randLengthMax),
   );
 }

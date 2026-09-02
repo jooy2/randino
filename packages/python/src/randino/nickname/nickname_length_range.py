@@ -2,12 +2,9 @@
 
 from randino._internal.utils import clamp
 from randino._types import NicknameLanguageOption
+from randino.constants import RAND_LENGTH_MAX, RAND_LENGTH_MIN
 from randino.nickname._generator import natural_range
-from randino.nickname.data import (
-    NICKNAME_LANGUAGES,
-    NICKNAME_LENGTH_MAX,
-    NICKNAME_LENGTH_MIN,
-)
+from randino.nickname.data import NICKNAME_LANGUAGES
 
 
 def nickname_length_range(
@@ -37,6 +34,6 @@ def nickname_length_range(
     ranges = [natural_range(code, include_modifier, word_separator) for code in languages]
 
     return (
-        clamp(min(low for low, _ in ranges), NICKNAME_LENGTH_MIN, NICKNAME_LENGTH_MAX),
-        clamp(max(high for _, high in ranges), NICKNAME_LENGTH_MIN, NICKNAME_LENGTH_MAX),
+        clamp(min(low for low, _ in ranges), RAND_LENGTH_MIN, RAND_LENGTH_MAX),
+        clamp(max(high for _, high in ranges), RAND_LENGTH_MIN, RAND_LENGTH_MAX),
     )

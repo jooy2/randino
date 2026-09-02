@@ -10,6 +10,7 @@
 //   and only padded with extra middle names when no draw can reach the minimum.
 // - Every name is produced in both scripts, native and romanized.
 
+import 'package:randino/src/internal/generate.dart';
 import 'package:randino/src/internal/utils.dart';
 import 'package:randino/src/name/data/index.dart';
 import 'package:randino/src/name/data/types.dart';
@@ -503,10 +504,7 @@ LengthRange _lengthBounds(NameLanguage language, _Settings settings) {
     includeSurname: settings.includeSurname,
     includeMiddleName: settings.includeMiddleName,
   );
-  final min = clampInt(settings.minLength ?? natural.min, nameLengthMin, nameLengthMax);
-  final max = clampInt(settings.maxLength ?? natural.max, nameLengthMin, nameLengthMax);
-
-  return LengthRange(min, max < min ? min : max);
+  return lengthBounds(settings.minLength, settings.maxLength, natural.min, natural.max);
 }
 
 NameDetail _generateOne(NameLanguage language, _Settings settings) {
@@ -536,41 +534,27 @@ List<NameDetail> generateNameDetails({
   String? startsWith,
   bool unique = false,
 }) {
-  final resolvedCount = clampInt(count, 0, nameCountMax);
   final settings = _Settings(
     gender: gender,
     includeSurname: includeSurname,
     includeMiddleName: includeMiddleName,
     minLength: minLength,
     maxLength: maxLength,
-    style: clampInt(style, 0, 100),
-    prefix: (startsWith ?? '').trim().isEmpty ? '' : (startsWith ?? '').trim().substring(0, 1),
+    style: resolveStyle(style),
+    prefix: resolvePrefix(startsWith),
   );
-  final prefix = settings.prefix.toLowerCase();
 
-  final seen = <String>{};
-  final names = <NameDetail>[];
-  // Generous enough that a plain request always fills up, while still ending a
-  // `unique` request whose pool has run out of combinations.
-  final maxAttempts = resolvedCount * 50 + 500;
-  var attempts = 0;
+  return collect<NameDetail>(
+    count: count,
+    unique: unique,
+    startsWith: settings.prefix,
+    // Written out: `??` would otherwise infer `pick`'s type argument from the
+    // nullable left-hand side, and hand back a `NameLanguage?`.
+    draw: () {
+      final NameLanguage code = language ?? pick(nameLanguages);
 
-  while (names.length < resolvedCount && attempts < maxAttempts) {
-    attempts += 1;
-
-    final detail = _generateOne(language ?? pick(nameLanguages), settings);
-
-    if (detail.native.isEmpty) continue;
-    if (prefix.isNotEmpty && !detail.native.toLowerCase().startsWith(prefix)) continue;
-
-    if (unique) {
-      if (seen.contains(detail.native)) continue;
-
-      seen.add(detail.native);
-    }
-
-    names.add(detail);
-  }
-
-  return names;
+      return _generateOne(code, settings);
+    },
+    keyOf: (detail) => detail.native,
+  );
 }

@@ -27,37 +27,46 @@ export type NameScript = 'native' | 'roman';
  */
 export type RandOutput = 'value' | 'detail';
 
-export interface RandNameOptions {
+/**
+ * The options every generator takes, whatever it generates. `randName`,
+ * `randNickname` and `randWord` each add their own on top of these — a gender, a
+ * theme, a word separator — but they all count, filter, deduplicate and report
+ * the same way, so those options are described once here rather than three times.
+ */
+export interface RandCommonOptions {
+	/** How many results to return. Default `1`, maximum `RAND_COUNT_MAX`. */
+	count?: number;
+	/**
+	 * `0` draws from the curated pools, `100` invents instead, and values in
+	 * between mix the two — per part, not per batch. Default `0`.
+	 */
+	style?: number;
+	/** Minimum length of the result, in characters. Defaults to the language's own range. */
+	minLength?: number;
+	/** Maximum length of the result, in characters. Defaults to the language's own range. */
+	maxLength?: number;
+	/** Keep only results whose first character is this one. */
+	startsWith?: string;
+	/**
+	 * Never return the same result twice. May return fewer than `count` once the
+	 * pools run out of combinations. Default `false`.
+	 */
+	unique?: boolean;
+	/** Strings, or one detail object per result. Default `'value'`. */
+	output?: RandOutput;
+}
+
+export interface RandNameOptions extends RandCommonOptions {
 	/** Language of the generated names. `'all'` mixes every language. Default `'all'`. */
 	language?: NameLanguageOption;
 	/** Gender the given name is drawn from. Default `'all'`. */
 	gender?: NameGenderOption;
-	/** How many names to return. Default `1`, maximum `10000`. */
-	count?: number;
-	/**
-	 * `0` draws names people actually carry, `100` invents new ones, and values in
-	 * between mix the two. Default `0`.
-	 */
-	style?: number;
-	/** Minimum length of the native form, in characters. Defaults to the language's own range. */
-	minLength?: number;
-	/** Maximum length of the native form, in characters. Defaults to the language's own range. */
-	maxLength?: number;
 	/** Include a surname. Default `true`. */
 	includeSurname?: boolean;
 	/** Include a middle name, for languages that use one. Default `false`. */
 	includeMiddleName?: boolean;
 	/** Script of the returned strings. Ignored when `output` is `'detail'`, which carries both. Default `'native'`. */
 	script?: NameScript;
-	/** Strings, or a `NameDetail` per name. Default `'value'`. */
-	output?: RandOutput;
-	/** Keep only names whose native form starts with this character. */
-	startsWith?: string;
-	/**
-	 * Never return the same name twice. May return fewer than `count` names when
-	 * the pool runs out of combinations. Default `false`.
-	 */
-	unique?: boolean;
 }
 
 /** A generated name in both scripts, with the choices that produced it. */
@@ -107,22 +116,11 @@ export type NicknameTheme =
 /** `'all'` draws from every theme. */
 export type NicknameThemeOption = NicknameTheme | 'all';
 
-export interface RandNicknameOptions {
+export interface RandNicknameOptions extends RandCommonOptions {
 	/** Language of the generated nicknames. `'all'` mixes every language. Default `'all'`. */
 	language?: NicknameLanguageOption;
 	/** What the nickname should be about. Default `'all'`. */
 	theme?: NicknameThemeOption;
-	/** How many nicknames to return. Default `1`, maximum `10000`. */
-	count?: number;
-	/**
-	 * `0` builds nicknames out of real words, `100` invents words that only read
-	 * like the language, and values in between mix the two. Default `0`.
-	 */
-	style?: number;
-	/** Minimum length of the nickname, in characters. Defaults to the language's own range. */
-	minLength?: number;
-	/** Maximum length of the nickname, in characters. */
-	maxLength?: number;
 	/** Decorate the noun with a modifier (`멋진사자` rather than `사자`). Default `true`. */
 	includeModifier?: boolean;
 	/**
@@ -137,15 +135,6 @@ export interface RandNicknameOptions {
 	 * the decoration — `'고양이'` gives `멋진고양이`, `고양이꼬리`, `파란고양이발바닥`.
 	 */
 	baseWord?: string;
-	/** Keep only nicknames whose first character is this one. */
-	startsWith?: string;
-	/**
-	 * Never return the same nickname twice. May return fewer than `count`
-	 * nicknames once the pools run out of combinations. Default `false`.
-	 */
-	unique?: boolean;
-	/** Strings, or a `NicknameDetail` per nickname. Default `'value'`. */
-	output?: RandOutput;
 }
 
 /** What `randSuffix` and `randPrefix` attach — the same three for both. */

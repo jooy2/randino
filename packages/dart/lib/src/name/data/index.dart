@@ -37,15 +37,3 @@ final Map<NameLanguage, NameLanguageData> nameData =
       NameLanguage.es: es,
       NameLanguage.vi: vi,
     });
-
-/// Lower bound for `minLength` / `maxLength`, in characters of the native form.
-const int nameLengthMin = 1;
-
-/// Upper bound for `minLength` / `maxLength`, in characters of the native form.
-const int nameLengthMax = 30;
-
-/// Upper bound for `count`.
-///
-/// Generation is cheap, but an unbounded count with `unique: true` can spend a
-/// long time re-drawing from an exhausted pool.
-const int nameCountMax = 10000;

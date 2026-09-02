@@ -2,20 +2,65 @@
 
 생성기가 받아들이는 목록과, 모든 숫자 옵션이 제한되는 절대 범위입니다. 여기에서 예외를 던지는 것은 없습니다. `count`가 `-10`이면 아무것도 반환하지 않고, 100만이면 1만 개를 반환합니다.
 
+## 공통 범위 {#shared-bounds}
+
+모든 생성 함수는 같은 방식으로 개수를 세고, 값을 제한하고, 중복을 걸러냅니다. 그래서 범위 상수도 생성 함수마다 하나씩 두지 않고 하나로 묶여 있습니다.
+
+::: lang js
+
+```javascript
+import { RAND_COUNT_MAX, RAND_LENGTH_MAX, RAND_LENGTH_MIN } from 'randino';
+```
+
+| 이름              | 타입     | 값      |
+| ----------------- | -------- | ------- |
+| `RAND_LENGTH_MIN` | `number` | `1`     |
+| `RAND_LENGTH_MAX` | `number` | `40`    |
+| `RAND_COUNT_MAX`  | `number` | `10000` |
+
+:::
+
+::: lang dart
+
+```dart
+import 'package:randino/randino.dart';
+```
+
+| 이름            | 타입  | 값      |
+| --------------- | ----- | ------- |
+| `randLengthMin` | `int` | `1`     |
+| `randLengthMax` | `int` | `40`    |
+| `randCountMax`  | `int` | `10000` |
+
+:::
+
+::: lang py
+
+```python
+from randino import RAND_COUNT_MAX, RAND_LENGTH_MAX, RAND_LENGTH_MIN
+```
+
+| 이름              | 타입  | 값      |
+| ----------------- | ----- | ------- |
+| `RAND_LENGTH_MIN` | `int` | `1`     |
+| `RAND_LENGTH_MAX` | `int` | `40`    |
+| `RAND_COUNT_MAX`  | `int` | `10000` |
+
+:::
+
+길이 옵션은 생성 결과의 글자 수를 기준으로 `1 … 40`으로 제한됩니다. `count`는 `0 … 10000`으로 제한되는데, 상한이 있는 이유는 `unique`를 켠 채로 개수를 제한하지 않으면 이미 바닥난 후보에서 계속 다시 뽑느라 오래 걸릴 수 있기 때문입니다.
+
 ## 이름
 
 ::: lang js
 
 ```javascript
-import { NAME_COUNT_MAX, NAME_LANGUAGES, NAME_LENGTH_MAX, NAME_LENGTH_MIN } from 'randino';
+import { NAME_LANGUAGES } from 'randino';
 ```
 
-| 이름              | 타입             | 값                      |
-| ----------------- | ---------------- | ----------------------- |
-| `NAME_LANGUAGES`  | `NameLanguage[]` | 지원하는 모든 이름 언어 |
-| `NAME_LENGTH_MIN` | `number`         | `1`                     |
-| `NAME_LENGTH_MAX` | `number`         | `30`                    |
-| `NAME_COUNT_MAX`  | `number`         | `10000`                 |
+| 이름             | 타입             | 값                      |
+| ---------------- | ---------------- | ----------------------- |
+| `NAME_LANGUAGES` | `NameLanguage[]` | 지원하는 모든 이름 언어 |
 
 :::
 
@@ -28,50 +73,33 @@ import 'package:randino/randino.dart';
 | 이름            | 타입                 | 값                      |
 | --------------- | -------------------- | ----------------------- |
 | `nameLanguages` | `List<NameLanguage>` | 지원하는 모든 이름 언어 |
-| `nameLengthMin` | `int`                | `1`                     |
-| `nameLengthMax` | `int`                | `30`                    |
-| `nameCountMax`  | `int`                | `10000`                 |
 
 :::
 
 ::: lang py
 
 ```python
-from randino import NAME_COUNT_MAX, NAME_LANGUAGES, NAME_LENGTH_MAX, NAME_LENGTH_MIN
+from randino import NAME_LANGUAGES
 ```
 
-| 이름              | 타입                     | 값                      |
-| ----------------- | ------------------------ | ----------------------- |
-| `NAME_LANGUAGES`  | `tuple[NameLanguage, …]` | 지원하는 모든 이름 언어 |
-| `NAME_LENGTH_MIN` | `int`                    | `1`                     |
-| `NAME_LENGTH_MAX` | `int`                    | `30`                    |
-| `NAME_COUNT_MAX`  | `int`                    | `10000`                 |
+| 이름             | 타입                     | 값                      |
+| ---------------- | ------------------------ | ----------------------- |
+| `NAME_LANGUAGES` | `tuple[NameLanguage, …]` | 지원하는 모든 이름 언어 |
 
 :::
-
-길이 옵션은 고유 표기의 글자 수 기준으로 `1 … 30` 범위로 제한됩니다. `count`는 `0 … 10000`으로 제한되는데, 상한이 있는 이유는 `unique`를 켠 채로 개수를 제한하지 않으면 조합이 바닥난 풀에서 오래 다시 뽑을 수 있기 때문입니다.
 
 ## 닉네임
 
 ::: lang js
 
 ```javascript
-import {
-	NICKNAME_COUNT_MAX,
-	NICKNAME_LANGUAGES,
-	NICKNAME_LENGTH_MAX,
-	NICKNAME_LENGTH_MIN,
-	NICKNAME_THEMES
-} from 'randino';
+import { NICKNAME_LANGUAGES, NICKNAME_THEMES } from 'randino';
 ```
 
-| 이름                  | 타입                 | 값                        |
-| --------------------- | -------------------- | ------------------------- |
-| `NICKNAME_LANGUAGES`  | `NicknameLanguage[]` | 지원하는 모든 닉네임 언어 |
-| `NICKNAME_THEMES`     | `NicknameTheme[]`    | 14개 테마 전체            |
-| `NICKNAME_LENGTH_MIN` | `number`             | `1`                       |
-| `NICKNAME_LENGTH_MAX` | `number`             | `40`                      |
-| `NICKNAME_COUNT_MAX`  | `number`             | `10000`                   |
+| 이름                 | 타입                 | 값                        |
+| -------------------- | -------------------- | ------------------------- |
+| `NICKNAME_LANGUAGES` | `NicknameLanguage[]` | 지원하는 모든 닉네임 언어 |
+| `NICKNAME_THEMES`    | `NicknameTheme[]`    | 14개 테마 전체            |
 
 :::
 
@@ -85,31 +113,19 @@ import 'package:randino/randino.dart';
 | ------------------- | ------------------------ | ------------------------- |
 | `nicknameLanguages` | `List<NicknameLanguage>` | 지원하는 모든 닉네임 언어 |
 | `nicknameThemes`    | `List<NicknameTheme>`    | 14개 테마 전체            |
-| `nicknameLengthMin` | `int`                    | `1`                       |
-| `nicknameLengthMax` | `int`                    | `40`                      |
-| `nicknameCountMax`  | `int`                    | `10000`                   |
 
 :::
 
 ::: lang py
 
 ```python
-from randino import (
-    NICKNAME_COUNT_MAX,
-    NICKNAME_LANGUAGES,
-    NICKNAME_LENGTH_MAX,
-    NICKNAME_LENGTH_MIN,
-    NICKNAME_THEMES,
-)
+from randino import NICKNAME_LANGUAGES, NICKNAME_THEMES
 ```
 
-| 이름                  | 타입                         | 값                        |
-| --------------------- | ---------------------------- | ------------------------- |
-| `NICKNAME_LANGUAGES`  | `tuple[NicknameLanguage, …]` | 지원하는 모든 닉네임 언어 |
-| `NICKNAME_THEMES`     | `tuple[NicknameTheme, …]`    | 14개 테마 전체            |
-| `NICKNAME_LENGTH_MIN` | `int`                        | `1`                       |
-| `NICKNAME_LENGTH_MAX` | `int`                        | `40`                      |
-| `NICKNAME_COUNT_MAX`  | `int`                        | `10000`                   |
+| 이름                 | 타입                         | 값                        |
+| -------------------- | ---------------------------- | ------------------------- |
+| `NICKNAME_LANGUAGES` | `tuple[NicknameLanguage, …]` | 지원하는 모든 닉네임 언어 |
+| `NICKNAME_THEMES`    | `tuple[NicknameTheme, …]`    | 14개 테마 전체            |
 
 :::
 

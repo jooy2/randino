@@ -46,12 +46,3 @@ final Map<NicknameLanguage, NicknameLanguageData> nicknameData =
         NicknameLanguage.zh: zh,
       },
     );
-
-/// Lower bound for `minLength` / `maxLength`, in characters.
-const int nicknameLengthMin = 1;
-
-/// Upper bound for `minLength` / `maxLength`, in characters.
-const int nicknameLengthMax = 40;
-
-/// Upper bound for `count`.
-const int nicknameCountMax = 10000;

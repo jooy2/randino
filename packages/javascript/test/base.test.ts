@@ -11,15 +11,12 @@ describe('base test', () => {
 			'AFFIX_LENGTH_DEFAULT',
 			'AFFIX_LENGTH_MAX',
 			'AFFIX_SEPARATOR_DEFAULT',
-			'NAME_COUNT_MAX',
 			'NAME_LANGUAGES',
-			'NAME_LENGTH_MAX',
-			'NAME_LENGTH_MIN',
-			'NICKNAME_COUNT_MAX',
 			'NICKNAME_LANGUAGES',
-			'NICKNAME_LENGTH_MAX',
-			'NICKNAME_LENGTH_MIN',
 			'NICKNAME_THEMES',
+			'RAND_COUNT_MAX',
+			'RAND_LENGTH_MAX',
+			'RAND_LENGTH_MIN',
 			'nameLengthRange',
 			'nameSupportsMiddleName',
 			'nameSupportsRoman',
@@ -39,17 +36,17 @@ describe('base test', () => {
 		assert.strictEqual(typeof randino.nameSupportsMiddleName, 'function');
 		assert.strictEqual(typeof randino.nameSupportsRoman, 'function');
 		assert.ok(Array.isArray(randino.NAME_LANGUAGES));
-		assert.strictEqual(randino.NAME_LENGTH_MIN, 1);
-		assert.strictEqual(randino.NAME_LENGTH_MAX, 30);
-		assert.strictEqual(randino.NAME_COUNT_MAX, 10000);
+
+		// One set of bounds for every generator, rather than one pair per category
+		// holding the same numbers.
+		assert.strictEqual(randino.RAND_LENGTH_MIN, 1);
+		assert.strictEqual(randino.RAND_LENGTH_MAX, 40);
+		assert.strictEqual(randino.RAND_COUNT_MAX, 10000);
 
 		assert.strictEqual(typeof randino.randNickname, 'function');
 		assert.strictEqual(typeof randino.nicknameLengthRange, 'function');
 		assert.ok(Array.isArray(randino.NICKNAME_LANGUAGES));
 		assert.ok(Array.isArray(randino.NICKNAME_THEMES));
-		assert.strictEqual(randino.NICKNAME_LENGTH_MIN, 1);
-		assert.strictEqual(randino.NICKNAME_LENGTH_MAX, 40);
-		assert.strictEqual(randino.NICKNAME_COUNT_MAX, 10000);
 
 		assert.strictEqual(typeof randino.randSuffix, 'function');
 		assert.strictEqual(typeof randino.randPrefix, 'function');

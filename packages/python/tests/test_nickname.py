@@ -9,9 +9,9 @@ person-name pools.
 import re
 
 from randino import (
-    NICKNAME_COUNT_MAX,
     NICKNAME_LANGUAGES,
     NICKNAME_THEMES,
+    RAND_COUNT_MAX,
     NicknameLanguage,
     NicknameTheme,
     nickname_length_range,
@@ -68,7 +68,7 @@ def test_rand_nickname_returns_exactly_count_nicknames() -> None:
     assert len(rand_nickname(count=0)) == 0
     assert len(rand_nickname(count=-10)) == 0
     assert len(rand_nickname(count=2.7)) == 2  # type: ignore[call-overload]
-    assert len(rand_nickname(count=NICKNAME_COUNT_MAX + 500)) == NICKNAME_COUNT_MAX
+    assert len(rand_nickname(count=RAND_COUNT_MAX + 500)) == RAND_COUNT_MAX
 
 
 def test_every_language_writes_nicknames_in_its_own_script() -> None:

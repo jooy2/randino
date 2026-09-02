@@ -10,8 +10,8 @@ import unicodedata
 from collections.abc import Callable
 
 from randino import (
-    NAME_COUNT_MAX,
     NAME_LANGUAGES,
+    RAND_COUNT_MAX,
     NameLanguage,
     name_length_range,
     name_supports_middle_name,
@@ -97,7 +97,7 @@ def test_rand_name_returns_exactly_count_names() -> None:
     assert len(rand_name(count=-10)) == 0
     # A fractional count is floored rather than raising, the way the npm package does.
     assert len(rand_name(count=2.7)) == 2  # type: ignore[call-overload]
-    assert len(rand_name(count=NAME_COUNT_MAX + 500)) == NAME_COUNT_MAX
+    assert len(rand_name(count=RAND_COUNT_MAX + 500)) == RAND_COUNT_MAX
 
 
 def test_every_language_writes_names_in_its_own_script() -> None:

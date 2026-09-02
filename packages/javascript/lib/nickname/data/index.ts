@@ -34,9 +34,3 @@ export const NICKNAME_DATA: Record<NicknameLanguage, NicknameLanguageData> = {
 	ja: JA,
 	zh: ZH
 };
-
-// Bounds for `minLength` / `maxLength`, in characters.
-export const NICKNAME_LENGTH_MIN = 1;
-export const NICKNAME_LENGTH_MAX = 40;
-
-export const NICKNAME_COUNT_MAX = 10000;

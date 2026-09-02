@@ -2,20 +2,65 @@
 
 The lists the generators accept, and the hard bounds every numeric option is clamped to. Nothing here throws: a `count` of `-10` returns nothing and a `count` of a million returns ten thousand.
 
+## Shared bounds
+
+Every generator counts, clamps and deduplicates the same way, so the bounds are one set rather than one per generator.
+
+::: lang js
+
+```javascript
+import { RAND_COUNT_MAX, RAND_LENGTH_MAX, RAND_LENGTH_MIN } from 'randino';
+```
+
+| Name              | Type     | Value   |
+| ----------------- | -------- | ------- |
+| `RAND_LENGTH_MIN` | `number` | `1`     |
+| `RAND_LENGTH_MAX` | `number` | `40`    |
+| `RAND_COUNT_MAX`  | `number` | `10000` |
+
+:::
+
+::: lang dart
+
+```dart
+import 'package:randino/randino.dart';
+```
+
+| Name            | Type  | Value   |
+| --------------- | ----- | ------- |
+| `randLengthMin` | `int` | `1`     |
+| `randLengthMax` | `int` | `40`    |
+| `randCountMax`  | `int` | `10000` |
+
+:::
+
+::: lang py
+
+```python
+from randino import RAND_COUNT_MAX, RAND_LENGTH_MAX, RAND_LENGTH_MIN
+```
+
+| Name              | Type  | Value   |
+| ----------------- | ----- | ------- |
+| `RAND_LENGTH_MIN` | `int` | `1`     |
+| `RAND_LENGTH_MAX` | `int` | `40`    |
+| `RAND_COUNT_MAX`  | `int` | `10000` |
+
+:::
+
+The length options are clamped into `1 … 40`, counted in characters of what the generator returns. `count` is clamped into `0 … 10000` — the upper bound is there because an unbounded count with `unique` on can spend a long time re-drawing from an exhausted pool.
+
 ## Names
 
 ::: lang js
 
 ```javascript
-import { NAME_COUNT_MAX, NAME_LANGUAGES, NAME_LENGTH_MAX, NAME_LENGTH_MIN } from 'randino';
+import { NAME_LANGUAGES } from 'randino';
 ```
 
-| Name              | Type             | Value                         |
-| ----------------- | ---------------- | ----------------------------- |
-| `NAME_LANGUAGES`  | `NameLanguage[]` | Every supported name language |
-| `NAME_LENGTH_MIN` | `number`         | `1`                           |
-| `NAME_LENGTH_MAX` | `number`         | `30`                          |
-| `NAME_COUNT_MAX`  | `number`         | `10000`                       |
+| Name             | Type             | Value                         |
+| ---------------- | ---------------- | ----------------------------- |
+| `NAME_LANGUAGES` | `NameLanguage[]` | Every supported name language |
 
 :::
 
@@ -28,50 +73,33 @@ import 'package:randino/randino.dart';
 | Name            | Type                 | Value                         |
 | --------------- | -------------------- | ----------------------------- |
 | `nameLanguages` | `List<NameLanguage>` | Every supported name language |
-| `nameLengthMin` | `int`                | `1`                           |
-| `nameLengthMax` | `int`                | `30`                          |
-| `nameCountMax`  | `int`                | `10000`                       |
 
 :::
 
 ::: lang py
 
 ```python
-from randino import NAME_COUNT_MAX, NAME_LANGUAGES, NAME_LENGTH_MAX, NAME_LENGTH_MIN
+from randino import NAME_LANGUAGES
 ```
 
-| Name              | Type                     | Value                         |
-| ----------------- | ------------------------ | ----------------------------- |
-| `NAME_LANGUAGES`  | `tuple[NameLanguage, …]` | Every supported name language |
-| `NAME_LENGTH_MIN` | `int`                    | `1`                           |
-| `NAME_LENGTH_MAX` | `int`                    | `30`                          |
-| `NAME_COUNT_MAX`  | `int`                    | `10000`                       |
+| Name             | Type                     | Value                         |
+| ---------------- | ------------------------ | ----------------------------- |
+| `NAME_LANGUAGES` | `tuple[NameLanguage, …]` | Every supported name language |
 
 :::
-
-The length options are clamped into `1 … 30`, counted in characters of the native form. `count` is clamped into `0 … 10000` — the upper bound is there because an unbounded count with `unique` on can spend a long time re-drawing from an exhausted pool.
 
 ## Nicknames
 
 ::: lang js
 
 ```javascript
-import {
-	NICKNAME_COUNT_MAX,
-	NICKNAME_LANGUAGES,
-	NICKNAME_LENGTH_MAX,
-	NICKNAME_LENGTH_MIN,
-	NICKNAME_THEMES
-} from 'randino';
+import { NICKNAME_LANGUAGES, NICKNAME_THEMES } from 'randino';
 ```
 
-| Name                  | Type                 | Value                             |
-| --------------------- | -------------------- | --------------------------------- |
-| `NICKNAME_LANGUAGES`  | `NicknameLanguage[]` | Every supported nickname language |
-| `NICKNAME_THEMES`     | `NicknameTheme[]`    | All fourteen themes               |
-| `NICKNAME_LENGTH_MIN` | `number`             | `1`                               |
-| `NICKNAME_LENGTH_MAX` | `number`             | `40`                              |
-| `NICKNAME_COUNT_MAX`  | `number`             | `10000`                           |
+| Name                 | Type                 | Value                             |
+| -------------------- | -------------------- | --------------------------------- |
+| `NICKNAME_LANGUAGES` | `NicknameLanguage[]` | Every supported nickname language |
+| `NICKNAME_THEMES`    | `NicknameTheme[]`    | All fourteen themes               |
 
 :::
 
@@ -85,31 +113,19 @@ import 'package:randino/randino.dart';
 | ------------------- | ------------------------ | --------------------------------- |
 | `nicknameLanguages` | `List<NicknameLanguage>` | Every supported nickname language |
 | `nicknameThemes`    | `List<NicknameTheme>`    | All fourteen themes               |
-| `nicknameLengthMin` | `int`                    | `1`                               |
-| `nicknameLengthMax` | `int`                    | `40`                              |
-| `nicknameCountMax`  | `int`                    | `10000`                           |
 
 :::
 
 ::: lang py
 
 ```python
-from randino import (
-    NICKNAME_COUNT_MAX,
-    NICKNAME_LANGUAGES,
-    NICKNAME_LENGTH_MAX,
-    NICKNAME_LENGTH_MIN,
-    NICKNAME_THEMES,
-)
+from randino import NICKNAME_LANGUAGES, NICKNAME_THEMES
 ```
 
-| Name                  | Type                         | Value                             |
-| --------------------- | ---------------------------- | --------------------------------- |
-| `NICKNAME_LANGUAGES`  | `tuple[NicknameLanguage, …]` | Every supported nickname language |
-| `NICKNAME_THEMES`     | `tuple[NicknameTheme, …]`    | All fourteen themes               |
-| `NICKNAME_LENGTH_MIN` | `int`                        | `1`                               |
-| `NICKNAME_LENGTH_MAX` | `int`                        | `40`                              |
-| `NICKNAME_COUNT_MAX`  | `int`                        | `10000`                           |
+| Name                 | Type                         | Value                             |
+| -------------------- | ---------------------------- | --------------------------------- |
+| `NICKNAME_LANGUAGES` | `tuple[NicknameLanguage, …]` | Every supported nickname language |
+| `NICKNAME_THEMES`    | `tuple[NicknameTheme, …]`    | All fourteen themes               |
 
 :::
 

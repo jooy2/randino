@@ -46,23 +46,20 @@ void main() {
           'affixLengthDefault',
           'affixLengthMax',
           'affixSeparatorDefault',
-          'nameCountMax',
           'nameLanguages',
-          'nameLengthMax',
-          'nameLengthMin',
           'nameLengthRange',
           'nameSupportsMiddleName',
           'nameSupportsRoman',
-          'nicknameCountMax',
           'nicknameLanguages',
-          'nicknameLengthMax',
-          'nicknameLengthMin',
           'nicknameLengthRange',
           'nicknameThemes',
           'randName',
           'randNameDetails',
           'randNickname',
           'randNicknameDetails',
+          'randCountMax',
+          'randLengthMax',
+          'randLengthMin',
           'randPrefix',
           'randPrefixAll',
           'randSuffix',
@@ -90,15 +87,14 @@ void main() {
 
     test('the bounds are the same numbers the JavaScript package uses', () {
       expect(nameLanguages, hasLength(9));
-      expect(nameLengthMin, 1);
-      expect(nameLengthMax, 30);
-      expect(nameCountMax, 10000);
+      // One set of bounds for every generator, rather than one set per
+      // category holding the same numbers.
+      expect(randLengthMin, 1);
+      expect(randLengthMax, 40);
+      expect(randCountMax, 10000);
 
       expect(nicknameLanguages, hasLength(4));
       expect(nicknameThemes, hasLength(14));
-      expect(nicknameLengthMin, 1);
-      expect(nicknameLengthMax, 40);
-      expect(nicknameCountMax, 10000);
 
       expect(affixLengthDefault, 5);
       expect(affixLengthMax, 32);

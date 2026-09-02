@@ -10,15 +10,17 @@
 //   and only padded with extra middle names when no draw can reach the minimum.
 // - Every name is produced in both scripts, native and romanized.
 
+import {
+	collect,
+	drawLanguage,
+	lengthBounds,
+	resolveLength,
+	resolvePrefix,
+	resolveStyle
+} from '../_internal/generate.js';
 import { capitalizeFirst, chance, clamp, pick, pickWeighted, randInt } from '../_internal/utils.js';
 import type { NameDetail, NameGender, NameLanguage, RandNameOptions } from '../_types/global.js';
-import {
-	NAME_COUNT_MAX,
-	NAME_DATA,
-	NAME_LANGUAGES,
-	NAME_LENGTH_MAX,
-	NAME_LENGTH_MIN
-} from './data/index.js';
+import { NAME_DATA, NAME_LANGUAGES } from './data/index.js';
 import type { NameLanguageData, NamePool, NameToken, SyllableSet } from './data/types.js';
 import { nameLengthRange } from './nameLengthRange.js';
 import { romanize, romanizeHangul } from './romanize.js';
@@ -505,16 +507,14 @@ function generateSpaced(
  * Length range for one language: what the caller asked for, falling back to the
  * language's own natural range for whichever bound was left out.
  */
-function lengthBounds(language: NameLanguage, settings: Settings): [number, number] {
+function boundsFor(language: NameLanguage, settings: Settings): [number, number] {
 	const [naturalMin, naturalMax] = nameLengthRange(
 		language,
 		settings.includeSurname,
 		settings.includeMiddleName
 	);
-	const min = clamp(settings.minLength ?? naturalMin, NAME_LENGTH_MIN, NAME_LENGTH_MAX);
-	const max = clamp(settings.maxLength ?? naturalMax, NAME_LENGTH_MIN, NAME_LENGTH_MAX);
 
-	return [min, Math.max(min, max)];
+	return lengthBounds(settings.minLength, settings.maxLength, naturalMin, naturalMax);
 }
 
 function generateOne(language: NameLanguage, settings: Settings): NameDetail {
@@ -522,7 +522,7 @@ function generateOne(language: NameLanguage, settings: Settings): NameDetail {
 	const gender: NameGender =
 		settings.gender === 'all' ? (Math.random() < 0.5 ? 'male' : 'female') : settings.gender;
 	const isMale = gender === 'male';
-	const [min, max] = lengthBounds(language, settings);
+	const [min, max] = boundsFor(language, settings);
 	const entry =
 		data.joiner === ''
 			? generateCjk(data, settings, isMale, min, max)
@@ -537,43 +537,20 @@ function resolveSettings(options: RandNameOptions): Settings {
 		gender: options.gender ?? 'all',
 		includeSurname: options.includeSurname ?? true,
 		includeMiddleName: options.includeMiddleName ?? false,
-		minLength: options.minLength === undefined ? undefined : Math.floor(options.minLength),
-		maxLength: options.maxLength === undefined ? undefined : Math.floor(options.maxLength),
-		style: clamp(options.style ?? 0, 0, 100),
-		prefix: (options.startsWith ?? '').trim().slice(0, 1)
+		minLength: resolveLength(options.minLength),
+		maxLength: resolveLength(options.maxLength),
+		style: resolveStyle(options.style),
+		prefix: resolvePrefix(options.startsWith)
 	};
 }
 
 export function generateNameDetails(options: RandNameOptions = {}): NameDetail[] {
 	const language = options.language ?? 'all';
-	const count = clamp(Math.floor(options.count ?? 1), 0, NAME_COUNT_MAX);
-	const unique = options.unique ?? false;
 	const settings = resolveSettings(options);
-	const prefix = settings.prefix.toLowerCase();
 
-	const seen = new Set<string>();
-	const names: NameDetail[] = [];
-	// Generous enough that a plain request always fills up, while still ending a
-	// `unique` request whose pool has run out of combinations.
-	const maxAttempts = count * 50 + 500;
-	let attempts = 0;
-
-	while (names.length < count && attempts < maxAttempts) {
-		attempts += 1;
-
-		const detail = generateOne(language === 'all' ? pick(NAME_LANGUAGES) : language, settings);
-
-		if (!detail.native) continue;
-		if (prefix && !detail.native.toLowerCase().startsWith(prefix)) continue;
-
-		if (unique) {
-			if (seen.has(detail.native)) continue;
-
-			seen.add(detail.native);
-		}
-
-		names.push(detail);
-	}
-
-	return names;
+	return collect(
+		options,
+		() => generateOne(drawLanguage(language, NAME_LANGUAGES), settings),
+		(detail) => detail.native
+	);
 }

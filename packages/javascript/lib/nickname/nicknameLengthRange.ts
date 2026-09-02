@@ -1,6 +1,7 @@
 import { clamp } from '../_internal/utils.js';
+import { RAND_LENGTH_MAX, RAND_LENGTH_MIN } from '../constants.js';
 import type { NicknameLanguageOption } from '../_types/global.js';
-import { NICKNAME_LANGUAGES, NICKNAME_LENGTH_MAX, NICKNAME_LENGTH_MIN } from './data/index.js';
+import { NICKNAME_LANGUAGES } from './data/index.js';
 import { naturalRange } from './nicknameGenerator.js';
 
 /**
@@ -34,7 +35,7 @@ export function nicknameLengthRange(
 	}
 
 	return [
-		clamp(min, NICKNAME_LENGTH_MIN, NICKNAME_LENGTH_MAX),
-		clamp(max, NICKNAME_LENGTH_MIN, NICKNAME_LENGTH_MAX)
+		clamp(min, RAND_LENGTH_MIN, RAND_LENGTH_MAX),
+		clamp(max, RAND_LENGTH_MIN, RAND_LENGTH_MAX)
 	];
 }

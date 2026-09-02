@@ -18,14 +18,8 @@ def test_the_package_exports_exactly_its_public_api() -> None:
         "AFFIX_LENGTH_DEFAULT",
         "AFFIX_LENGTH_MAX",
         "AFFIX_SEPARATOR_DEFAULT",
-        "NAME_COUNT_MAX",
         "NAME_LANGUAGES",
-        "NAME_LENGTH_MAX",
-        "NAME_LENGTH_MIN",
-        "NICKNAME_COUNT_MAX",
         "NICKNAME_LANGUAGES",
-        "NICKNAME_LENGTH_MAX",
-        "NICKNAME_LENGTH_MIN",
         "NICKNAME_THEMES",
         "NameDetail",
         "NameGender",
@@ -38,6 +32,9 @@ def test_the_package_exports_exactly_its_public_api() -> None:
         "NicknameLanguageOption",
         "NicknameTheme",
         "NicknameThemeOption",
+        "RAND_COUNT_MAX",
+        "RAND_LENGTH_MAX",
+        "RAND_LENGTH_MIN",
         "name_length_range",
         "name_supports_middle_name",
         "name_supports_roman",
@@ -62,17 +59,16 @@ def test_the_functions_are_callable_and_the_constants_are_what_they_claim() -> N
     assert callable(randino.name_supports_middle_name)
     assert callable(randino.name_supports_roman)
     assert isinstance(randino.NAME_LANGUAGES, tuple)
-    assert randino.NAME_LENGTH_MIN == 1
-    assert randino.NAME_LENGTH_MAX == 30
-    assert randino.NAME_COUNT_MAX == 10000
+    # One set of bounds for every generator, rather than one set per category
+    # holding the same numbers.
+    assert randino.RAND_LENGTH_MIN == 1
+    assert randino.RAND_LENGTH_MAX == 40
+    assert randino.RAND_COUNT_MAX == 10000
 
     assert callable(randino.rand_nickname)
     assert callable(randino.nickname_length_range)
     assert isinstance(randino.NICKNAME_LANGUAGES, tuple)
     assert isinstance(randino.NICKNAME_THEMES, tuple)
-    assert randino.NICKNAME_LENGTH_MIN == 1
-    assert randino.NICKNAME_LENGTH_MAX == 40
-    assert randino.NICKNAME_COUNT_MAX == 10000
 
     assert callable(randino.rand_suffix)
     assert callable(randino.rand_prefix)

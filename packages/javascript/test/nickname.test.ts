@@ -1,7 +1,7 @@
 import assert from 'assert';
 import { describe, it } from 'node:test';
 import {
-	NICKNAME_COUNT_MAX,
+	RAND_COUNT_MAX,
 	NICKNAME_LANGUAGES,
 	NICKNAME_THEMES,
 	nicknameLengthRange,
@@ -66,10 +66,7 @@ describe('Nickname', () => {
 		assert.strictEqual(randNickname({ count: 0 }).length, 0);
 		assert.strictEqual(randNickname({ count: -10 }).length, 0);
 		assert.strictEqual(randNickname({ count: 2.7 }).length, 2);
-		assert.strictEqual(
-			randNickname({ count: NICKNAME_COUNT_MAX + 500 }).length,
-			NICKNAME_COUNT_MAX
-		);
+		assert.strictEqual(randNickname({ count: RAND_COUNT_MAX + 500 }).length, RAND_COUNT_MAX);
 	});
 
 	it('every language writes nicknames in its own script', () => {

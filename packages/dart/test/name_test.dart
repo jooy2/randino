@@ -53,7 +53,7 @@ void main() {
       // Out-of-range counts are clamped rather than rejected.
       expect(randName(count: 0).length, 0);
       expect(randName(count: -10).length, 0);
-      expect(randName(count: nameCountMax + 500).length, nameCountMax);
+      expect(randName(count: randCountMax + 500).length, randCountMax);
     });
 
     test('every language writes names in its own script', () {

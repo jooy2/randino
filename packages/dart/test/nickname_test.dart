@@ -46,7 +46,7 @@ void main() {
       expect(randNickname(count: 25).length, 25);
       expect(randNickname(count: 0).length, 0);
       expect(randNickname(count: -10).length, 0);
-      expect(randNickname(count: nicknameCountMax + 500).length, nicknameCountMax);
+      expect(randNickname(count: randCountMax + 500).length, randCountMax);
     });
 
     test('every language writes nicknames in its own script', () {

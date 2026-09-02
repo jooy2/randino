@@ -25,14 +25,14 @@ export 'src/affix/rand_prefix.dart' show randPrefix;
 export 'src/affix/rand_prefix_all.dart' show randPrefixAll;
 export 'src/affix/rand_suffix.dart' show randSuffix;
 export 'src/affix/rand_suffix_all.dart' show randSuffixAll;
-export 'src/name/data/index.dart' show nameCountMax, nameLanguages, nameLengthMax, nameLengthMin;
+export 'src/constants.dart' show randCountMax, randLengthMax, randLengthMin;
+export 'src/name/data/index.dart' show nameLanguages;
 export 'src/name/name_length_range.dart' show nameLengthRange;
 export 'src/name/name_supports_middle_name.dart' show nameSupportsMiddleName;
 export 'src/name/name_supports_roman.dart' show nameSupportsRoman;
 export 'src/name/rand_name.dart' show randName;
 export 'src/name/rand_name_details.dart' show randNameDetails;
-export 'src/nickname/data/index.dart'
-    show nicknameCountMax, nicknameLanguages, nicknameLengthMax, nicknameLengthMin, nicknameThemes;
+export 'src/nickname/data/index.dart' show nicknameLanguages, nicknameThemes;
 export 'src/nickname/nickname_length_range.dart' show nicknameLengthRange;
 export 'src/nickname/rand_nickname.dart' show randNickname;
 export 'src/nickname/rand_nickname_details.dart' show randNicknameDetails;

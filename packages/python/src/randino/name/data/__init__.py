@@ -30,16 +30,3 @@ NAME_DATA: dict[NameLanguage, NameLanguageData] = {
     "vi": VI,
 }
 """Each language's pools and rules, keyed by its code."""
-
-NAME_LENGTH_MIN = 1
-"""Lower bound for `min_length`, in characters of the native form."""
-
-NAME_LENGTH_MAX = 30
-"""Upper bound for `max_length`, in characters of the native form."""
-
-NAME_COUNT_MAX = 10000
-"""Upper bound for `count`.
-
-Generation is cheap, but an unbounded count with `unique=True` can spend a long
-time re-drawing from an exhausted pool.
-"""

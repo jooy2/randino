@@ -1,6 +1,7 @@
 import { clamp } from '../_internal/utils.js';
+import { RAND_LENGTH_MAX, RAND_LENGTH_MIN } from '../constants.js';
 import type { NameLanguageOption } from '../_types/global.js';
-import { NAME_DATA, NAME_LANGUAGES, NAME_LENGTH_MAX, NAME_LENGTH_MIN } from './data/index.js';
+import { NAME_DATA, NAME_LANGUAGES } from './data/index.js';
 
 /**
  * Natural length range of a full name in the given language, in characters of the
@@ -44,7 +45,7 @@ export function nameLengthRange(
 	}
 
 	return [
-		clamp(min, NAME_LENGTH_MIN, NAME_LENGTH_MAX),
-		clamp(max, NAME_LENGTH_MIN, NAME_LENGTH_MAX)
+		clamp(min, RAND_LENGTH_MIN, RAND_LENGTH_MAX),
+		clamp(max, RAND_LENGTH_MIN, RAND_LENGTH_MAX)
 	];
 }

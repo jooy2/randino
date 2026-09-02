@@ -19,6 +19,14 @@ from collections.abc import Collection
 from dataclasses import dataclass, field
 from typing import Literal, NamedTuple
 
+from randino._internal.generate import (
+    collect,
+    draw_language,
+    length_bounds,
+    resolve_length,
+    resolve_prefix,
+    resolve_style,
+)
 from randino._internal.parse import NameToken
 from randino._internal.utils import (
     capitalize_first,
@@ -36,13 +44,7 @@ from randino._types import (
     NameLanguageOption,
 )
 from randino.name._romanize import romanize, romanize_hangul
-from randino.name.data import (
-    NAME_COUNT_MAX,
-    NAME_DATA,
-    NAME_LANGUAGES,
-    NAME_LENGTH_MAX,
-    NAME_LENGTH_MIN,
-)
+from randino.name.data import NAME_DATA, NAME_LANGUAGES
 from randino.name.data._types import NameLanguageData, NamePool, SyllableSet
 from randino.name.name_length_range import name_length_range
 
@@ -504,7 +506,7 @@ def generate_spaced(
     return assemble(data, parts)
 
 
-def length_bounds(language: NameLanguage, settings: Settings) -> tuple[int, int]:
+def bounds_for(language: NameLanguage, settings: Settings) -> tuple[int, int]:
     """Length range for one language.
 
     What the caller asked for, falling back to the language's own natural range for
@@ -513,18 +515,8 @@ def length_bounds(language: NameLanguage, settings: Settings) -> tuple[int, int]
     natural_min, natural_max = name_length_range(
         language, settings.include_surname, settings.include_middle_name
     )
-    low = clamp(
-        natural_min if settings.min_length is None else settings.min_length,
-        NAME_LENGTH_MIN,
-        NAME_LENGTH_MAX,
-    )
-    high = clamp(
-        natural_max if settings.max_length is None else settings.max_length,
-        NAME_LENGTH_MIN,
-        NAME_LENGTH_MAX,
-    )
 
-    return low, max(low, high)
+    return length_bounds(settings.min_length, settings.max_length, natural_min, natural_max)
 
 
 def generate_one(language: NameLanguage, settings: Settings) -> NameDetail:
@@ -535,7 +527,7 @@ def generate_one(language: NameLanguage, settings: Settings) -> NameDetail:
         if settings.gender == "all"
         else settings.gender
     )
-    low, high = length_bounds(language, settings)
+    low, high = bounds_for(language, settings)
     build = generate_cjk if data.joiner == "" else generate_spaced
     entry = build(data, settings, gender == "male", low, high)
 
@@ -560,38 +552,16 @@ def generate_name_details(
         gender=gender,
         include_surname=include_surname,
         include_middle_name=include_middle_name,
-        min_length=None if min_length is None else math.floor(min_length),
-        max_length=None if max_length is None else math.floor(max_length),
-        style=clamp(style, 0, 100),
-        prefix=starts_with.strip()[:1],
+        min_length=resolve_length(min_length),
+        max_length=resolve_length(max_length),
+        style=resolve_style(style),
+        prefix=resolve_prefix(starts_with),
     )
-    wanted = clamp(math.floor(count), 0, NAME_COUNT_MAX)
-    prefix = settings.prefix.lower()
 
-    seen: set[str] = set()
-    names: list[NameDetail] = []
-    # Generous enough that a plain request always fills up, while still ending a
-    # `unique` request whose pool has run out of combinations.
-    max_attempts = wanted * 50 + 500
-    attempts = 0
-
-    while len(names) < wanted and attempts < max_attempts:
-        attempts += 1
-
-        code: NameLanguage = pick(NAME_LANGUAGES) if language == "all" else language
-        detail = generate_one(code, settings)
-
-        if not detail.native:
-            continue
-        if prefix and not detail.native.lower().startswith(prefix):
-            continue
-
-        if unique:
-            if detail.native in seen:
-                continue
-
-            seen.add(detail.native)
-
-        names.append(detail)
-
-    return names
+    return collect(
+        count=count,
+        unique=unique,
+        starts_with=settings.prefix,
+        draw=lambda: generate_one(draw_language(language, NAME_LANGUAGES), settings),
+        key_of=lambda detail: detail.native,
+    )
