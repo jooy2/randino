@@ -12,6 +12,7 @@
 - Added `AFFIX_LENGTH_DEFAULT`, `AFFIX_LENGTH_MAX`, `AFFIX_SEPARATOR_DEFAULT` and `AFFIX_CHARSET`, the bounds and defaults `randSuffix` and `randPrefix` are clamped to.
 - Added `RandOutput` for the new `output` option, and `RandCommonOptions` — what `count`, `style`, `minLength` / `maxLength`, `startsWith`, `unique` and `output` are on every generator, which `RandNameOptions`, `RandNicknameOptions` and the new `RandWordOptions` all extend. Also `RandThemedWordOptions`, `WordDetail` and `RandModifierOptions`.
 - Those common options are resolved and applied in one place now rather than once per generator. Nothing about them changed from the outside; a new generator gets all of them by construction.
+- The package declares `sideEffects: false`, so a bundler can drop the pools a caller never reaches. It could not before: the pools are built by a function call at the top level, which a bundler has to assume is impure, so importing `randSuffix` alone pulled in every language's name and word data — 33 KB gzipped of a 39 KB library. That import is 0.4 KB now, and `randName` on its own is 15 KB rather than 37 KB. Which `language` or `theme` a caller asks for is still decided at run time, so one language's pools cannot be dropped without the rest.
 
 ## 1.0.0 (2026-09-01)
 
