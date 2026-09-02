@@ -1,26 +1,18 @@
 # Changelog
 
-## 1.2.0
-
-- **Breaking:** the fourteen nickname themes are their own generators now. `rand_word` takes a `theme`, and `rand_animal`, `rand_object`, `rand_nature`, `rand_plant`, `rand_gem`, `rand_concept`, `rand_myth`, `rand_job`, `rand_music`, `rand_place`, `rand_food`, `rand_sport`, `rand_vehicle` and `rand_product` are that generator with the theme already chosen. `word_length_range` reports what the pools hold. `rand_nickname` draws from the same pools rather than owning them.
-- **Breaking:** `NicknameLanguage`, `NicknameLanguageOption`, `NicknameTheme`, `NicknameThemeOption`, `NICKNAME_LANGUAGES` and `NICKNAME_THEMES` are `WordLanguage`, `WordLanguageOption`, `WordTheme`, `WordThemeOption`, `WORD_LANGUAGES` and `WORD_THEMES`. They describe the words, and the words are no longer only a nickname's business.
-- **Breaking:** `rand_nickname`'s `include_modifier` is gone. `rand_modifier` puts a modifier in front of any string — `rand_modifier("사자")` is `"멋진사자"` — picks the language off the value's own script when none is given, and draws a fresh modifier per entry for a list. `nickname_length_range` loses its `include_modifier` argument with it.
-- **Breaking:** `rand_nickname`'s `base_word` is gone, and with it the one argument whose default was `None` rather than `"all"`: `language` now defaults to `"all"` like every other one.
-- **Breaking:** `NAME_COUNT_MAX`, `NAME_LENGTH_MIN` / `MAX`, `NICKNAME_COUNT_MAX` and `NICKNAME_LENGTH_MIN` / `MAX` are `RAND_COUNT_MAX` and `RAND_LENGTH_MIN` / `MAX`, one set for every generator. The name length bound goes from 30 to 40 as a result.
-- `rand_suffix`, `rand_prefix` and `rand_modifier` all work with **no value at all**, handing back the token or the word they would have attached. `rand_suffix()` is `"nVtRC"`.
-- **Breaking:** the `randino.affix` package is `randino.decorate`, which is what the three functions in it now do between them. Everything it holds is still re-exported from `randino` itself, which is where it is meant to be imported from.
-- Added `WordDetail`, which `rand_word(output="detail")` returns.
-- `count`, `style`, `min_length` / `max_length`, `starts_with`, `unique` and `output` are the same arguments on every generator now, resolved and applied in one place rather than once per generator. Nothing about them changed from the outside; a new generator gets all of them by construction.
-
 ## 1.1.0
-
-**2026-09-01**
 
 - **Breaking:** `random_name` and `random_nickname` are now `rand_name` and `rand_nickname`. The old names are gone; there are no aliases.
 - **Breaking:** `random_name_details` and `random_nickname_details` are gone entirely. `rand_name` and `rand_nickname` take `output="detail"` instead and return the same `list[NameDetail]` / `list[NicknameDetail]`, with `@overload` carrying the return type so a checker knows which one it got.
-- **Breaking:** the nickname generator's `unique_suffix`, `unique_suffix_length`, `unique_suffix_separator` and `unique_suffix_charset` arguments are gone, and so are `NicknameDetail.suffix`, `NICKNAME_SUFFIX_LENGTH_MAX` and `NICKNAME_SUFFIX_CHARSET`. `min_length` / `max_length` now describe the whole nickname, with nothing excluded from them.
-- Added `rand_suffix` and `rand_prefix`, which attach a random token to a `str` or to every `str` in a `list` — a fresh one per value — with `length`, `separator` and `charset`.
-- Added `AFFIX_LENGTH_DEFAULT`, `AFFIX_LENGTH_MAX`, `AFFIX_SEPARATOR_DEFAULT` and `AFFIX_CHARSET`, the bounds and defaults those two are clamped to, and `RandOutput` for the new `output` argument.
+- **Breaking:** the fourteen nickname themes are their own generators now. `rand_word` takes a `theme`, and `rand_animal`, `rand_object`, `rand_nature`, `rand_plant`, `rand_gem`, `rand_concept`, `rand_myth`, `rand_job`, `rand_music`, `rand_place`, `rand_food`, `rand_sport`, `rand_vehicle` and `rand_product` are that generator with the theme already chosen. `word_length_range` reports what the pools hold, and `rand_nickname` draws from those pools rather than owning them.
+- **Breaking:** `NicknameLanguage`, `NicknameLanguageOption`, `NicknameTheme`, `NicknameThemeOption`, `NICKNAME_LANGUAGES` and `NICKNAME_THEMES` are `WordLanguage`, `WordLanguageOption`, `WordTheme`, `WordThemeOption`, `WORD_LANGUAGES` and `WORD_THEMES`. They describe the words, and the words are no longer only a nickname's business.
+- **Breaking:** three groups of nickname arguments are gone, all for one reason — decorating a string was never a thing about nicknames. `unique_suffix`, `unique_suffix_length`, `unique_suffix_separator` and `unique_suffix_charset` are `rand_suffix`; `include_modifier` is `rand_modifier`; and `base_word` is `rand_modifier` on a word you already have, which also takes with it the one argument whose default was `None` rather than `"all"` — `language` now defaults to `"all"` like every other one. `NicknameDetail.suffix`, `NICKNAME_SUFFIX_LENGTH_MAX` and `NICKNAME_SUFFIX_CHARSET` go too, `nickname_length_range` loses its `include_modifier` argument, and `min_length` / `max_length` now describe the whole nickname with nothing excluded from them.
+- **Breaking:** `NAME_COUNT_MAX`, `NAME_LENGTH_MIN` / `MAX`, `NICKNAME_COUNT_MAX` and `NICKNAME_LENGTH_MIN` / `MAX` are `RAND_COUNT_MAX` and `RAND_LENGTH_MIN` / `MAX`, one set for every generator. The name length bound goes from 30 to 40 as a result.
+- **Breaking:** the `randino.affix` package is `randino.decorate`, which is what the three functions in it now do between them. Everything it holds is still re-exported from `randino` itself, which is where it is meant to be imported from.
+- Added the decorators. `rand_suffix` and `rand_prefix` attach a random token to a `str`, or to every `str` in a `list` — a fresh one per value — with `length`, `separator` and `charset`; `rand_modifier` attaches a word out of the pools instead, so `rand_modifier("사자")` is `"멋진사자"`, and picks the language off the value's own script when none is given. All three work with **no value at all**, handing back the token or the word they would have attached: `rand_suffix()` is `"nVtRC"`.
+- Added `AFFIX_LENGTH_DEFAULT`, `AFFIX_LENGTH_MAX`, `AFFIX_SEPARATOR_DEFAULT` and `AFFIX_CHARSET`, the bounds and defaults `rand_suffix` and `rand_prefix` are clamped to.
+- Added `RandOutput` for the new `output` argument, and `WordDetail`, which `rand_word(output="detail")` returns.
+- `count`, `style`, `min_length` / `max_length`, `starts_with`, `unique` and `output` are the same arguments on every generator now, resolved and applied in one place rather than once per generator. Nothing about them changed from the outside; a new generator gets all of them by construction.
 
 ## 1.0.0
 
