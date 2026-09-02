@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.1.0
+## 1.1.0 (2026-09-02)
 
 - **Breaking:** `randomName` and `randomNickname` are now `randName` and `randNickname`, and `RandomNameOptions` / `RandomNicknameOptions` are `RandNameOptions` / `RandNicknameOptions`. The old names are gone; there are no aliases.
 - **Breaking:** `randomNameDetails` and `randomNicknameDetails` are gone entirely. `randName` and `randNickname` take `output: 'detail'` instead and return the same `NameDetail[]` / `NicknameDetail[]`, with overloads carrying the return type so nothing has to be cast — splitting one generator over its return type meant every option had to be documented twice.
