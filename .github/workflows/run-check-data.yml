@@ -1,0 +1,60 @@
+name: run-check-data
+
+# The datasets are written once in `data/` and generated into all three
+# packages. Two things can go wrong that no package's own suite can see: a
+# generated file edited by hand instead of its source, and the packages holding
+# different data. This checks for both.
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+    paths:
+      - data/**
+      - packages/**
+      - tools/**
+      - .github/workflows/run-check-data.yml
+  workflow_dispatch:
+
+jobs:
+  run-check-data:
+    runs-on: ubuntu-latest
+    name: Check the generated data
+
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: packages/javascript/package-lock.json
+      - uses: dart-lang/setup-dart@v1
+        with:
+          sdk: stable
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      # The generator runs each package's own formatter over what it writes, and
+      # each dump loads its package the way that package's tests do. So every
+      # toolchain has to be here, dev tools included — `ruff` is the formatter
+      # for the Python side.
+      - name: Install the JavaScript package
+        run: npm ci
+        working-directory: packages/javascript
+      - name: Install the Dart package
+        run: dart pub get
+        working-directory: packages/dart
+      - name: Install the Python package
+        run: pip install -e ".[dev]"
+        working-directory: packages/python
+
+      # First, because a stale generated file is the likelier mistake and says
+      # exactly which file to regenerate.
+      - name: Check the generated files match `data/`
+        run: node tools/codegen/index.mjs --check
+
+      # Then the end-to-end check: the emitters could agree with `data/` and
+      # still have written something one language reads differently.
+      - name: Compare the datasets across the packages
+        run: node tools/parity/index.mjs

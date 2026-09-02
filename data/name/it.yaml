@@ -1,0 +1,28 @@
+language: Italian
+order: given-first
+joiner: ' '
+hasMiddle: true
+roman: fold
+lengthSpec:
+  given: [5, 10]
+  last: [5, 8]
+  middle: [5, 9]
+last: |
+  Rossi Russo Ferrari Esposito Bianchi Romano Colombo Ricci Marino Greco Bruno
+  Gallo Conti De Luca Costa Giordano Mancini Rizzo Lombardi Moretti Barbieri
+  Fontana Santoro Mariani Rinaldi Caruso Ferrara Galli Martini Leone Longo Gentile
+  Vitale Lombardo Serra Coppola Marchesi Parisi Villa Conte Farina Testa Grasso
+  Palumbo Amato Sartori
+male: |
+  Lorenzo Francesco Alessandro Andrea Matteo Leonardo Gabriele Riccardo Tommaso
+  Edoardo Federico Davide Giuseppe Antonio Marco Luca Giovanni Stefano Simone
+  Paolo Roberto Giorgio Nicola Salvatore Pietro Vincenzo Angelo Emanuele Michele
+  Fabio Alessio Daniele Dario Enrico Filippo Gianluca Giacomo Luigi Mattia
+  Maurizio Nicolò Pasquale Raffaele Umberto Carlo Claudio Domenico
+female: |
+  Sofia Giulia Aurora Alice Ginevra Emma Giorgia Greta Martina Chiara Sara
+  Beatrice Anna Francesca Elena Valentina Federica Elisa Alessia Ilaria Silvia
+  Laura Marta Gaia Noemi Camilla Bianca Roberta Paola Lucia Antonella Arianna
+  Carlotta Caterina Eleonora Emanuela Gabriella Giada Giovanna Ludovica Margherita
+  Michela Nicoletta Rossella Serena Stefania Vittoria
+syn: italian

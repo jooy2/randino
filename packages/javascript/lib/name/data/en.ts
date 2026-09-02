@@ -1,3 +1,6 @@
+// Generated from `data/name/en.yaml` by `tools/codegen`.
+// Edit that file and re-run the generator; edits here are overwritten.
+
 import { words } from '../../_internal/parse.js';
 import { WESTERN_SYLLABLES } from './syllables.js';
 import type { NameLanguageData } from './types.js';
@@ -8,39 +11,6 @@ export const EN: NameLanguageData = {
 	hasMiddle: true,
 	roman: 'fold',
 	lengthSpec: { given: [4, 8], last: [4, 8], middle: [4, 8] },
-	male: words(`
-		James William Oliver Henry Jack Noah Ethan Liam Lucas Benjamin Alexander Daniel
-		Matthew Samuel David Michael Joseph Nathan Ryan Andrew Thomas Charles Gabriel
-		Julian Adam Nicholas Aaron Christian Owen Dylan Isaac Leo Max George Eric Jacob
-		Logan Mason Elijah Caleb Wyatt Grayson Levi Hunter Connor Evan Nolan Cole Miles
-		Jasper Theodore Oscar Felix Simon Vincent Patrick Peter Paul Mark Steven Brian
-		Kevin Justin Jason Timothy Gregory Edward Arthur Albert Frank Harry Alan Neil
-		Craig Dean Glenn Ross Todd Wayne Bruce Roger Keith Curtis Marcus Trevor Shane
-		Blake Chase Drew Brett Colin Derek Eliot Finn Grant Hugh Ian Jared Kyle Lance
-		Mitchell Nash Perry Quentin Reid Seth Tyler Victor Walter Zachary Preston Spencer
-		Tristan Emmett Rowan Silas Declan Everett Beckett Rhys Callum Xavier Quinn
-		Anthony Joshua Brandon Emerson Dominic Cameron Austin Jordan Travis Douglas
-		Russell Raymond Philip Dennis Jerome Leonard Bernard Eugene Duncan Malcolm
-		Alistair Lachlan Rory Ronan Aidan Brendan Kieran Gavin Stuart Jonathan
-		Frederick Lawrence Wesley Garrett Ezra Sawyer Landon Easton Gideon Tobias
-	`),
-	female: words(`
-		Emma Olivia Ava Sophia Isabella Charlotte Amelia Mia Harper Evelyn Abigail Emily
-		Grace Chloe Victoria Lily Hannah Zoe Ella Scarlett Aria Layla Nora Hazel Aurora
-		Violet Ruby Alice Claire Stella Ivy Rose Eva Naomi Julia Sarah Madison Avery
-		Riley Penelope Lucy Anna Caroline Nova Willow Elena Maya Leah Audrey Savannah
-		Bella Skylar Paisley Everly Kennedy Piper Lydia Peyton Sadie Alexa Josephine
-		Eliza Vivian Clara Delilah Isla Adeline Cora Iris Jasmine Juliette Faith Hope
-		Daisy Poppy Ruth Esther Margaret Catherine Helen Diana Laura Rachel Rebecca Megan
-		Nicole Amanda Melissa Jennifer Michelle Kimberly Amy Angela Heather Wendy Paula
-		Tessa Bonnie Sylvia Vera Nina Elsie Freya Maisie Rosie Edith Beatrix Gemma Imogen
-		Norah Opal Pearl Quinn Sienna Talia Ursula Verity Wren Ximena Yvonne Zara
-		Sophie Eleanor Natalie Kayla Brooke Danielle Stephanie Christina Veronica
-		Melanie Erica Joanna Beverly Marilyn Doris Gloria Irene Judith Louise Phoebe
-		Rosalie Matilda Harriet Florence Genevieve Cecilia Beatrice Miriam Marina
-		Sabrina Adelaide Arabella Bridget Cordelia Rosemary Holly Summer Autumn
-		Juniper Nadia
-	`),
 	last: words(`
 		Smith Johnson Williams Brown Jones Miller Davis Wilson Anderson Taylor Thomas
 		Moore Jackson Martin Lee Clark Lewis Walker Hall Allen Young King Wright Scott
@@ -56,6 +26,39 @@ export const EN: NameLanguageData = {
 		Fleming Gordon Hopkins Manning Mercer Nichols Norris Pearson Reynolds Sherman
 		Sutton Thornton Walton Whitaker Abbott Bradley Bishop Donovan Elliott Rhodes
 		Sinclair Walsh Yates Keller Tate
+	`),
+	male: words(`
+		James William Oliver Henry Jack Noah Ethan Liam Lucas Benjamin Alexander Daniel
+		Matthew Samuel David Michael Joseph Nathan Ryan Andrew Thomas Charles Gabriel
+		Julian Adam Nicholas Aaron Christian Owen Dylan Isaac Leo Max George Eric Jacob
+		Logan Mason Elijah Caleb Wyatt Grayson Levi Hunter Connor Evan Nolan Cole Miles
+		Jasper Theodore Oscar Felix Simon Vincent Patrick Peter Paul Mark Steven Brian
+		Kevin Justin Jason Timothy Gregory Edward Arthur Albert Frank Harry Alan Neil
+		Craig Dean Glenn Ross Todd Wayne Bruce Roger Keith Curtis Marcus Trevor Shane
+		Blake Chase Drew Brett Colin Derek Eliot Finn Grant Hugh Ian Jared Kyle Lance
+		Mitchell Nash Perry Quentin Reid Seth Tyler Victor Walter Zachary Preston
+		Spencer Tristan Emmett Rowan Silas Declan Everett Beckett Rhys Callum Xavier
+		Quinn Anthony Joshua Brandon Emerson Dominic Cameron Austin Jordan Travis
+		Douglas Russell Raymond Philip Dennis Jerome Leonard Bernard Eugene Duncan
+		Malcolm Alistair Lachlan Rory Ronan Aidan Brendan Kieran Gavin Stuart Jonathan
+		Frederick Lawrence Wesley Garrett Ezra Sawyer Landon Easton Gideon Tobias
+	`),
+	female: words(`
+		Emma Olivia Ava Sophia Isabella Charlotte Amelia Mia Harper Evelyn Abigail Emily
+		Grace Chloe Victoria Lily Hannah Zoe Ella Scarlett Aria Layla Nora Hazel Aurora
+		Violet Ruby Alice Claire Stella Ivy Rose Eva Naomi Julia Sarah Madison Avery
+		Riley Penelope Lucy Anna Caroline Nova Willow Elena Maya Leah Audrey Savannah
+		Bella Skylar Paisley Everly Kennedy Piper Lydia Peyton Sadie Alexa Josephine
+		Eliza Vivian Clara Delilah Isla Adeline Cora Iris Jasmine Juliette Faith Hope
+		Daisy Poppy Ruth Esther Margaret Catherine Helen Diana Laura Rachel Rebecca
+		Megan Nicole Amanda Melissa Jennifer Michelle Kimberly Amy Angela Heather Wendy
+		Paula Tessa Bonnie Sylvia Vera Nina Elsie Freya Maisie Rosie Edith Beatrix Gemma
+		Imogen Norah Opal Pearl Quinn Sienna Talia Ursula Verity Wren Ximena Yvonne Zara
+		Sophie Eleanor Natalie Kayla Brooke Danielle Stephanie Christina Veronica
+		Melanie Erica Joanna Beverly Marilyn Doris Gloria Irene Judith Louise Phoebe
+		Rosalie Matilda Harriet Florence Genevieve Cecilia Beatrice Miriam Marina
+		Sabrina Adelaide Arabella Bridget Cordelia Rosemary Holly Summer Autumn Juniper
+		Nadia
 	`),
 	syn: WESTERN_SYLLABLES
 };

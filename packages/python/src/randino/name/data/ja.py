@@ -1,3 +1,5 @@
+# Generated from `data/name/ja.yaml` by `tools/codegen`.
+# Edit that file and re-run the generator; edits here are overwritten.
 """Japanese name pools."""
 
 from randino._internal.parse import tokens
@@ -22,8 +24,9 @@ JA = NameLanguageData(
     """),
     # Whole given names, romanized the way the reading is actually written, so the
     # realistic end of `style` hands out names people have rather than assembled
-    # kanji. Two- and three-character names only: `givenLenWeights` never asks for
-    # a one-character name, and the syllable pools below still cover every length.
+    # kanji. Two- and three-character names only: `given_len_weights` never asks for
+    # a
+    # one-character name, and the syllable pools below still cover every length.
     given_male=tokens("""
         陽翔:Haruto 悠真:Yuma 大翔:Hiroto 湊斗:Minato 朝陽:Asahi 蒼空:Sora 颯太:Sota
         大和:Yamato 陸斗:Rikuto 大輝:Daiki 拓海:Takumi 翔太:Shota 直樹:Naoki 和也:Kazuya
@@ -40,13 +43,7 @@ JA = NameLanguageData(
         健:ken 翔:sho 悠:yu 直:nao 拓:taku 亮:ryo 隼:haya 大:dai 陽:yo 和:kazu 智:tomo
         貴:taka
     """),
-    rest_male=tokens("""
-        太:ta 郎:ro 斗:to 介:suke 也:ya 樹:ki 人:to 平:hei 輝:ki 之:yuki
-    """),
-    first_female=tokens("""
-        美:mi 結:yu 彩:aya 咲:saki 愛:ai 千:chi 真:ma 莉:ri 陽:hi 花:hana 楓:kae
-    """),
-    rest_female=tokens("""
-        子:ko 奈:na 香:ka 音:ne 乃:no 衣:i 愛:a 咲:saki 美:mi 帆:ho
-    """),
+    rest_male=tokens("太:ta 郎:ro 斗:to 介:suke 也:ya 樹:ki 人:to 平:hei 輝:ki 之:yuki"),
+    first_female=tokens("美:mi 結:yu 彩:aya 咲:saki 愛:ai 千:chi 真:ma 莉:ri 陽:hi 花:hana 楓:kae"),
+    rest_female=tokens("子:ko 奈:na 香:ka 音:ne 乃:no 衣:i 愛:a 咲:saki 美:mi 帆:ho"),
 )

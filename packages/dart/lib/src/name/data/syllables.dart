@@ -1,4 +1,5 @@
-// Ported verbatim from the JavaScript package; see CLAUDE.md.
+// Generated from `data/name/syllables.yaml` by `tools/codegen`.
+// Edit that file and re-run the generator; edits here are overwritten.
 
 import 'package:randino/src/internal/parse.dart';
 import 'package:randino/src/name/data/types.dart';

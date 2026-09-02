@@ -29,11 +29,28 @@ randino ships for more than one programming language, so there is no single pack
 | `packages/dart`       | The pub.dev package. `dart test`, `dart analyze`       | `packages/dart`       |
 | `packages/python`     | The PyPI package. `pytest`, `ruff check .`, `mypy`     | `packages/python`     |
 | `docs`                | The documentation site. `npm run dev`, `npm run build` | `docs`                |
+| `data`                | The datasets. Every package's copy is generated from here | the repository root |
 | `tools`               | Repository tooling, published nowhere                  | the repository root   |
 
-The **JavaScript package is the source of truth**: a behaviour change starts there and the ports follow it, and every test suite asserts the same properties over the same data. A change that lands on only one side is a bug in the making, so please send all of them.
+The **JavaScript package is the source of truth** for behaviour: a behaviour change starts there and the ports follow it, and every test suite asserts the same properties over the same data. A change that lands on only one side is a bug in the making, so please send all of them.
 
-Each package holds its own copy of the datasets, so a word added to one of them and forgotten in the others breaks no test. `node tools/parity/index.mjs`, from the repository root, reads the data out of all three and fails if they disagree — run it whenever you touch a pool. CI runs it too.
+### Changing a pool
+
+The datasets are the exception, and they are not edited per package. Every pool lives once in `data/`, and each package's data files are generated from it:
+
+```
+# edit data/word/ko.yaml, data/name/en.yaml, …
+node tools/codegen/index.mjs
+```
+
+That rewrites the data files in all three packages and formats them. Commit the generated files with your change — the packages ship without a build step. The files carry a banner saying they are generated; an edit made there directly is thrown away by the next run, and CI says so.
+
+Two checks guard this, both run by CI and both worth running yourself from the repository root:
+
+```
+node tools/codegen/index.mjs --check   # the generated files match data/
+node tools/parity/index.mjs            # the three packages parse the same data
+```
 
 Each package keeps its own `README.md` and `CHANGELOG.md`, because npm, pub.dev and PyPI read those from the package root. The repository's `README.md` is the only one that describes all of them at once.
 

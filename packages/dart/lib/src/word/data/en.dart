@@ -1,4 +1,5 @@
-// Ported verbatim from the JavaScript package; see CLAUDE.md.
+// Generated from `data/word/en.yaml` by `tools/codegen`.
+// Edit that file and re-run the generator; edits here are overwritten.
 
 import 'package:randino/src/internal/parse.dart';
 import 'package:randino/src/types.dart';
@@ -15,19 +16,20 @@ final WordLanguageData en = WordLanguageData(
     Sleepy Dancing Running Flying Singing Roaming Whispering Glowing Fading Rolling
     Falling Rising Ancient Modern Endless Hollow Round Jagged Soft Warm Cool Sweet
     Salty Bitter Spicy Fuzzy Silky Marble Copper Ivory Neon Polar Feral Noble Humble
-    Merry Grumpy Mellow Stormy Frosty Dusty Foggy Radiant Bronze Umber Cobalt Verdant
-    Fierce Nimble Prickly Restless Sturdy Tangled Vivid Whimsical Shimmering Wandering
-    Amber Indigo Jade Onyx Coral Teal Sable Ashen Auburn Maroon Russet Saffron Lilac
-    Ochre Slate Charcoal Pearly Witty Bold Timid Cheerful Jolly Bashful Placid Serene
-    Eager Earnest Steady Rowdy Sassy Snappy Zesty Breezy Dreamy Moody Cranky Perky
-    Quirky Spry Wily Cunning Valiant Regal Lofty Meek Stoic Solemn Somber Blithe
-    Genial Ardent Tender Sleeping Leaping Drifting Prowling Soaring Diving Gliding
-    Humming Laughing Dreaming Blooming Melting Twinkling Rustling Crackling Bouncing
-    Spinning Floating Climbing Chasing Lurking Roving Strolling Tumbling Glassy Wooden
-    Woolen Rubbery Crispy Chewy Creamy Buttery Syrupy Smoky Dewy Sandy Muddy Icy Wispy
-    Downy Plush Satin Linen Massive Petite Slender Chunky Stout Lanky Narrow Curved
-    Spiral Zigzag Twisted Pointed Blunt Oval Astral Stellar Nebular Orbital Twilight
-    Midnight Autumnal Wintry Vernal Timeless Antique
+    Merry Grumpy Mellow Stormy Frosty Dusty Foggy Radiant Bronze Umber Cobalt
+    Verdant Fierce Nimble Prickly Restless Sturdy Tangled Vivid Whimsical Shimmering
+    Wandering Amber Indigo Jade Onyx Coral Teal Sable Ashen Auburn Maroon Russet
+    Saffron Lilac Ochre Slate Charcoal Pearly Witty Bold Timid Cheerful Jolly
+    Bashful Placid Serene Eager Earnest Steady Rowdy Sassy Snappy Zesty Breezy
+    Dreamy Moody Cranky Perky Quirky Spry Wily Cunning Valiant Regal Lofty Meek
+    Stoic Solemn Somber Blithe Genial Ardent Tender Sleeping Leaping Drifting
+    Prowling Soaring Diving Gliding Humming Laughing Dreaming Blooming Melting
+    Twinkling Rustling Crackling Bouncing Spinning Floating Climbing Chasing Lurking
+    Roving Strolling Tumbling Glassy Wooden Woolen Rubbery Crispy Chewy Creamy
+    Buttery Syrupy Smoky Dewy Sandy Muddy Icy Wispy Downy Plush Satin Linen Massive
+    Petite Slender Chunky Stout Lanky Narrow Curved Spiral Zigzag Twisted Pointed
+    Blunt Oval Astral Stellar Nebular Orbital Twilight Midnight Autumnal Wintry
+    Vernal Timeless Antique
   '''),
   nouns: {
     WordTheme.animal: words(r'''
@@ -44,21 +46,20 @@ final WordLanguageData en = WordLanguageData(
       Bottle Pencil Eraser Umbrella Lantern Lamp Clock Mirror Keyring Padlock Satchel
       Cap Boot Glove Scarf Goggles Bangle Button Needle Thread Scissors Brush Paint
       Paper Notebook Bookmark Letter Postcard Postage Compass Atlas Telescope
-      Microscope Camera Reel Radio Gramophone Balloon
-      Kite Spindle Marbles Dice Card Puzzle Blocks Sail Anchor
-      Beacon Tent Backpack Bedroll Torch Matchbox Candle Flowerpot Kettle Teacup
-      Spoon Plate Saucepan Hatchet Shovel Handsaw Ladder Cogwheel Mainspring Magnet
-      Ribbon Envelope Cushion Quilt Basket Broom Whistle Knot Bucket Anvil Bellows
-      Chisel Easel Flask Goblet Hourglass Inkwell Quiver Sundial Parasol
+      Microscope Camera Reel Radio Gramophone Balloon Kite Spindle Marbles Dice Card
+      Puzzle Blocks Sail Anchor Beacon Tent Backpack Bedroll Torch Matchbox Candle
+      Flowerpot Kettle Teacup Spoon Plate Saucepan Hatchet Shovel Handsaw Ladder
+      Cogwheel Mainspring Magnet Ribbon Envelope Cushion Quilt Basket Broom Whistle
+      Knot Bucket Anvil Bellows Chisel Easel Flask Goblet Hourglass Inkwell Quiver
+      Sundial Parasol
     '''),
     WordTheme.nature: words(r'''
       Sky Cloud Breeze Rain Snow Frost Icicle Mist Dewdrop Rainbow Sunset Sunrise Dawn
       Dusk Star Moon Galaxy Comet Meteor Lightning Thunder Downpour Monsoon Typhoon
       Whirlwind Wave Tide Ocean River Lake Waterfall Ravine Mountain Hillside Meadow
-      Forest Cavern Desert Sandbank Boulder Pebble
-      Volcano Earthquake Ember Cinder Glacier Reef Marshland Prairie Canyon Echo
-      Shadow Zephyr Squall Drizzle Snowdrift Avalanche Tundra Oasis Lagoon Geyser
-      Plateau Driftwood
+      Forest Cavern Desert Sandbank Boulder Pebble Volcano Earthquake Ember Cinder
+      Glacier Reef Marshland Prairie Canyon Echo Shadow Zephyr Squall Drizzle
+      Snowdrift Avalanche Tundra Oasis Lagoon Geyser Plateau Driftwood
     '''),
     WordTheme.plant: words(r'''
       Treetop Leaf Blossom Petal Rootlet Seedling Berry Moss Fern Bamboo Pinecone
@@ -78,14 +79,14 @@ final WordLanguageData en = WordLanguageData(
       Gemstone Geode Meteorite Diamond Prism Alloy Ingot
     '''),
     WordTheme.concept: words(r'''
-      Freedom Peace Justice Truth Wisdom Courage Memory Daydream Story Poem
-      Sketch Grammar Logic Physics Chemistry Biology Philosophy Mathematics
-      Geometry Algebra History Myth Legend Fable Proverb Riddle Secret Promise
-      Friendship Journey Adventure Voyage Discovery Experiment Question Answer Debate
-      Council Festival Holiday Season Moment Eternity Universe Dimension Balance
-      Harmony Palette Contrast Ritual Custom Culture Language
-      Alphabet Cipher Archive Almanac Calendar Curiosity Solitude Nostalgia Reverie
-      Paradox Enigma Odyssey Symmetry Spectrum Horizon Sanctuary
+      Freedom Peace Justice Truth Wisdom Courage Memory Daydream Story Poem Sketch
+      Grammar Logic Physics Chemistry Biology Philosophy Mathematics Geometry Algebra
+      History Myth Legend Fable Proverb Riddle Secret Promise Friendship Journey
+      Adventure Voyage Discovery Experiment Question Answer Debate Council Festival
+      Holiday Season Moment Eternity Universe Dimension Balance Harmony Palette
+      Contrast Ritual Custom Culture Language Alphabet Cipher Archive Almanac Calendar
+      Curiosity Solitude Nostalgia Reverie Paradox Enigma Odyssey Symmetry Spectrum
+      Horizon Sanctuary
     '''),
     WordTheme.myth: words(r'''
       Dragon Wyvern Phoenix Griffin Chimera Hydra Golem Orc Goblin Troll Elf Dwarf
@@ -105,17 +106,17 @@ final WordLanguageData en = WordLanguageData(
       Firefighter Officer Doctor Nurse Pharmacist Teacher Student Librarian Reporter
       Writer Editor Translator Singer Actor Director Minstrel Miner Carpenter Potter
       Tailor Weaver Seer Prophet Priest Shaman Scholar Inventor Explorer Traveler
-      Athlete Referee Juggler Acrobat Sculptor Paladin Cavalier Squire Crusader
-      Herald Scribe Barkeep Innkeeper Huntsman Stonecutter
+      Athlete Referee Juggler Acrobat Sculptor Paladin Cavalier Squire Crusader Herald
+      Scribe Barkeep Innkeeper Huntsman Stonecutter
     '''),
     WordTheme.music: words(r'''
-      Piano Guitar Fiddle Drum Chime Mandolin Melody Rhythm Chord Ballad Waltz
-      Lullaby Flute Piccolo Clarinet Oboe Bassoon Trumpet Trombone Tuba Saxophone
-      Harp Cello Viola Violin Banjo Ukulele Accordion Harmonica Xylophone Marimba
-      Tambourine Maracas Cymbal Bagpipe Organ Kalimba Sitar Lute Lyre Zither Ocarina
-      Bugle Sonata Symphony Concerto Overture Prelude Interlude Refrain Chorus Anthem
-      Serenade Nocturne Rhapsody Etude Fugue Octave Tempo Cadence Crescendo Staccato
-      Encore Duet Trio Quartet Songbook
+      Piano Guitar Fiddle Drum Chime Mandolin Melody Rhythm Chord Ballad Waltz Lullaby
+      Flute Piccolo Clarinet Oboe Bassoon Trumpet Trombone Tuba Saxophone Harp Cello
+      Viola Violin Banjo Ukulele Accordion Harmonica Xylophone Marimba Tambourine
+      Maracas Cymbal Bagpipe Organ Kalimba Sitar Lute Lyre Zither Ocarina Bugle Sonata
+      Symphony Concerto Overture Prelude Interlude Refrain Chorus Anthem Serenade
+      Nocturne Rhapsody Etude Fugue Octave Tempo Cadence Crescendo Staccato Encore
+      Duet Trio Quartet Songbook
     '''),
     WordTheme.place: words(r'''
       Market Plaza Metropolis Village Alleyway Bridge Garden Library Museum Theater
@@ -152,8 +153,8 @@ final WordLanguageData en = WordLanguageData(
     WordTheme.product: words(r'''
       Laptop Computer Keyboard Trackpad Monitor Printer Speaker Earbuds Headphone
       Microphone Drone Tablet Smartphone Charger Battery Remote Fridge Washer Vacuum
-      Heater Cooler Purifier Toaster Blender Oven Microwave Television Humidifier Razor
-      Toothbrush Shampoo Perfume Lipstick Sneakers Wristwatch Console
+      Heater Cooler Purifier Toaster Blender Oven Microwave Television Humidifier
+      Razor Toothbrush Shampoo Perfume Lipstick Sneakers Wristwatch Console
     '''),
   },
   parts: words(r'''
