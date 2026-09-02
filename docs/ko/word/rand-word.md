@@ -213,3 +213,4 @@ rand_word(language="ko", theme="plant", output="detail")
 - [테마](./themes) — 14개 테마와 각각의 함수.
 - [`wordLengthRange`](./word-length-range) — 언어의 단어 풀이 담고 있는 길이 범위.
 - [`randNickname`](../nickname/rand-nickname) — 같은 단어를 조합하는 쪽.
+- [`randModifier`](../decorate/rand-modifier) — 이미 가진 단어 앞에 수식어를 붙이는 함수.

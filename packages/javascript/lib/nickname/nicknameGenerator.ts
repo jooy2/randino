@@ -61,7 +61,6 @@ type Settings = {
 	style: number;
 	minLength?: number;
 	maxLength?: number;
-	includeModifier: boolean;
 	prefix: string;
 	separator?: string;
 };
@@ -97,21 +96,13 @@ function slotBounds(language: WordLanguage, data: WordLanguageData, theme: WordT
 	return bounds;
 }
 
-/** The shapes available for the current options, in the order they are weighted. */
+/** The shapes available for the language, in the order they are weighted. */
 function usablePatterns(
-	data: WordLanguageData,
-	settings: Settings
+	data: WordLanguageData
 ): readonly { slots: readonly Slot[]; weight: number }[] {
-	const usable = PATTERNS.filter(({ slots }) => {
-		if (!settings.includeModifier && slots.includes('modifier')) return false;
-		if (!data.parts && slots.includes('part')) return false;
-
-		return true;
-	});
-
-	// Options can rule out every shape — a language with no `parts` pool and no
-	// modifier allowed, say. The bare noun is then the only answer.
-	return usable.length ? usable : [{ slots: ['noun'], weight: 1 }];
+	// The only shapes a language can rule out are the compound ones, and only by
+	// having no `parts` pool — which `ja` and `zh` do not.
+	return PATTERNS.filter(({ slots }) => data.parts || !slots.includes('part'));
 }
 
 /** Shortest and longest nickname a shape can produce. */
@@ -241,18 +232,11 @@ function boundsFor(
  */
 export function naturalRange(
 	language: WordLanguage,
-	includeModifier: boolean,
 	separator?: string
 ): readonly [number, number] {
 	const data = WORD_DATA[language];
-	const settings: Settings = {
-		theme: 'all',
-		style: 0,
-		includeModifier,
-		prefix: '',
-		separator
-	};
-	const patterns = usablePatterns(data, settings);
+	const settings: Settings = { theme: 'all', style: 0, prefix: '', separator };
+	const patterns = usablePatterns(data);
 	const joiner = joinerOf(data, settings).length;
 	let min = Infinity;
 	let max = 0;
@@ -276,7 +260,7 @@ type Built = { words: string[]; theme: WordTheme | null };
 function generateOne(language: WordLanguage, settings: Settings): Built {
 	const data = WORD_DATA[language];
 	const themes = themesOf(settings.theme);
-	const patterns = usablePatterns(data, settings);
+	const patterns = usablePatterns(data);
 	const joiner = joinerOf(data, settings);
 	let best: Built | null = null;
 	let bestDistance = Infinity;
@@ -331,7 +315,6 @@ function resolveSettings(options: RandNicknameOptions): Settings {
 		style: resolveStyle(options.style),
 		minLength: resolveLength(options.minLength),
 		maxLength: resolveLength(options.maxLength),
-		includeModifier: options.includeModifier ?? true,
 		prefix: resolvePrefix(options.startsWith),
 		separator: options.wordSeparator
 	};

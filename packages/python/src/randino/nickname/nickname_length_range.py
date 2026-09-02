@@ -9,7 +9,6 @@ from randino.word.data import WORD_LANGUAGES
 
 def nickname_length_range(
     language: WordLanguageOption = "all",
-    include_modifier: bool = True,
     word_separator: str | None = None,
 ) -> tuple[int, int]:
     """Every nickname length the language can produce, in characters.
@@ -23,15 +22,13 @@ def nickname_length_range(
     Example:
         >>> nickname_length_range("ko")
         (1, 12)
-        >>> nickname_length_range("ko", False)
-        (1, 8)
         >>> nickname_length_range("en")
         (3, 30)
-        >>> nickname_length_range("ko", True, "-")
+        >>> nickname_length_range("ko", "-")
         (1, 14)
     """
     languages = WORD_LANGUAGES if language == "all" else (language,)
-    ranges = [natural_range(code, include_modifier, word_separator) for code in languages]
+    ranges = [natural_range(code, word_separator) for code in languages]
 
     return (
         clamp(min(low for low, _ in ranges), RAND_LENGTH_MIN, RAND_LENGTH_MAX),

@@ -14,6 +14,8 @@ Every option and every example, with **Dart** picked in the sidebar. This README
 
 - **Person names** read like names people actually carry — 김민준, Emma Clover, Иванов Иван — and come with their English pronunciation. 9 languages.
 - **Nicknames** are the handles you would pick for a game or a website — 멋진사자, MistyOwl, 고양이꼬리. Built from everyday words across fourteen themes, never from person names.
+- **Words** are those fourteen themes on their own — `randWord`, plus `randAnimal`, `randFood` and twelve more.
+- **Decorators** attach something to a string you already have: `randSuffix`, `randPrefix` and `randModifier`.
 - Every parameter is named and optional, and a **null enum means "every one of them"** — `randName()` on its own works.
 - **Pure Dart, no dependencies.** It imports nothing but `dart:math`, so it runs on the VM, on the web and inside Flutter on every platform.
 
@@ -90,7 +92,6 @@ randNicknameDetails(language: WordLanguage.ko).first;
 | `count`                   | `int`               | `1`                    |
 | `style`                   | `int` (0 real … 100 invented) | `0`          |
 | `minLength` / `maxLength` | `int?`              | _language_             |
-| `includeModifier`         | `bool`              | `true`                 |
 | `wordSeparator`           | `String?`           | _language_             |
 | `startsWith`              | `String?`           | `null`                 |
 | `unique`                  | `bool`              | `false`                |
@@ -126,17 +127,18 @@ wordLengthRange(language: WordLanguage.ko); // LengthRange(1, 4)
 
 One function per theme: `randAnimal`, `randObject`, `randNature`, `randPlant`, `randGem`, `randConcept`, `randMyth`, `randJob`, `randMusic`, `randPlace`, `randFood`, `randSport`, `randVehicle`, `randProduct`. They return `List<String>`; for the detail form, pass the theme to `randWordDetails`.
 
-## Prefixes and suffixes
+## Decorators
 
-`randSuffix` and `randPrefix` attach a random token to a string — which is what turns a nickname that is merely unlikely to collide into one that cannot. They take anything, not just this library's output, which is why they are not a parameter on the generators.
+`randSuffix`, `randPrefix` and `randModifier` attach something to a string you already have, rather than generating one. They take anything, not just this library's output, which is why none of them is a parameter on a generator — and each of them works with no value at all, handing back the thing it would have attached.
 
 ```dart
-randSuffix('멋진사자'); // '멋진사자_nVtRC'
+randSuffix(value: '멋진사자'); // '멋진사자_nVtRC'
 randSuffixAll(randNickname(language: WordLanguage.ko, count: 2));
-// ['달력_U7aNZ', '조용한바구니_RUKAP']
+// [달력_U7aNZ, 조용한바구니_RUKAP]
 
-randPrefix('order-4021', length: 4, separator: '-'); // 'k3Rm-order-4021'
-randSuffix('MistyOwl', length: 8, charset: '0123456789'); // 'MistyOwl_40218836'
+randPrefix(value: 'order-4021', length: 4, separator: '-'); // 'k3Rm-order-4021'
+randSuffix(value: 'MistyOwl', length: 8, charset: '0123456789'); // 'MistyOwl_40218836'
+randSuffix(); // 'nVtRC' — the token on its own
 ```
 
 | Parameter   | Type      | Default    |
@@ -145,7 +147,27 @@ randSuffix('MistyOwl', length: 8, charset: '0123456789'); // 'MistyOwl_40218836'
 | `separator` | `String`  | `'_'`      |
 | `charset`   | `String?` | _built-in_ |
 
-A fresh token per value, never one for the batch. The default charset leaves out `0O1lI`, because these end up in names people read aloud and type back in. The `…All` forms are Dart's answer to a signature the other two packages write as `String | List<String>`.
+A fresh token per value, never one for the batch. The default charset leaves out `0O1lI`, because these end up in names people read aloud and type back in. The `…All` forms are Dart's answer to a signature the other two packages write as `String | List<String>`, and `value` is named rather than positional because Dart cannot make a positional parameter optional alongside named ones.
+
+`randModifier` attaches a word instead of a token — what `randNickname`'s `includeModifier` used to do, for any string:
+
+```dart
+randModifier(value: '사자'); // '멋진사자'
+randModifier(value: 'Owl', separator: ' '); // 'Misty Owl'
+randModifier(); // '멋진'
+
+randModifierAll(randAnimal(language: WordLanguage.ko, count: 2));
+// [오래된곰, 영원한도마뱀]
+```
+
+| Parameter   | Type            | Default    |
+| ----------- | --------------- | ---------- |
+| `value`     | `String?`       | `null`     |
+| `language`  | `WordLanguage?` | _script_   |
+| `style`     | `int`           | `0`        |
+| `separator` | `String?`       | _language_ |
+
+With no `language`, the script of the value picks one, so `'고양이'` is never handed an English modifier.
 
 ## Helpers and constants
 
@@ -171,6 +193,7 @@ The two generate the same output from the same data, and only the surface is Dar
 | `[number, number]`                 | `LengthRange`, which compares by value         |
 | `NameDetail` / `NicknameDetail` interfaces | The same two names, as classes         |
 | `output: 'detail'`                 | `randNameDetails` / `randNicknameDetails` / `randWordDetails` |
+| `randModifier('사자')`             | `randModifier(value: '사자')` — every parameter is named |
 | `randSuffix(['a', 'b'])`           | `randSuffixAll(['a', 'b'])`                    |
 
 The last two are the same limitation twice: Dart has neither overloads nor union types, so one function cannot return `List<String>` for one argument and `List<NameDetail>` for another. Where npm and PyPI pick the shape with an option, pub.dev picks it with a second function.

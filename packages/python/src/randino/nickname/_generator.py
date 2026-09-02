@@ -80,7 +80,6 @@ class Settings:
 
     theme: WordThemeOption
     style: int
-    include_modifier: bool
     prefix: str
     min_length: int | None = None
     max_length: int | None = None
@@ -119,21 +118,15 @@ def slot_bounds(language: WordLanguage, data: WordLanguageData, theme: WordTheme
     return bounds
 
 
-def usable_patterns(data: WordLanguageData, settings: Settings) -> tuple[Pattern, ...]:
-    """The shapes available for the current options, in the order they are weighted."""
+def usable_patterns(data: WordLanguageData) -> tuple[Pattern, ...]:
+    """The shapes available for the language, in the order they are weighted.
 
-    def keep(pattern: Pattern) -> bool:
-        slots = pattern.slots
-
-        if not settings.include_modifier and "modifier" in slots:
-            return False
-        return not (data.parts is None and "part" in slots)
-
-    usable = tuple(pattern for pattern in PATTERNS if keep(pattern))
-
-    # Options can rule out every shape — a language with no `parts` pool and no
-    # modifier allowed, say. The bare noun is then the only answer.
-    return usable or (Pattern(("noun",), 1),)
+    The only shapes a language can rule out are the compound ones, and only by
+    having no `parts` pool — which `ja` and `zh` do not.
+    """
+    return tuple(
+        pattern for pattern in PATTERNS if data.parts is not None or "part" not in pattern.slots
+    )
 
 
 def pattern_range(slots: tuple[Slot, ...], bounds: Bounds, joiner: int) -> tuple[int, int]:
@@ -245,9 +238,7 @@ def bounds_for(
     return length_bounds(settings.min_length, settings.max_length, natural_min, natural_max)
 
 
-def natural_range(
-    language: WordLanguage, include_modifier: bool, separator: str | None = None
-) -> tuple[int, int]:
+def natural_range(language: WordLanguage, separator: str | None = None) -> tuple[int, int]:
     """Every length a language can produce, across all of its themes.
 
     The fallback for an omitted `min_length` / `max_length`, and what
@@ -255,14 +246,8 @@ def natural_range(
     and pools the generator actually draws from.
     """
     data = WORD_DATA[language]
-    settings = Settings(
-        theme="all",
-        style=0,
-        include_modifier=include_modifier,
-        prefix="",
-        separator=separator,
-    )
-    patterns = usable_patterns(data, settings)
+    settings = Settings(theme="all", style=0, prefix="", separator=separator)
+    patterns = usable_patterns(data)
     joiner = len(joiner_of(data, settings))
     ranges = [
         pattern_range(pattern.slots, slot_bounds(language, data, theme), joiner)
@@ -277,7 +262,7 @@ def generate_one(language: WordLanguage, settings: Settings) -> Built:
     """Build one complete nickname in one language."""
     data = WORD_DATA[language]
     themes = themes_of(settings.theme)
-    patterns = usable_patterns(data, settings)
+    patterns = usable_patterns(data)
     joiner = joiner_of(data, settings)
     best: Built | None = None
     best_distance = math.inf
@@ -331,7 +316,6 @@ def generate_nickname_details(
     style: int = 0,
     min_length: int | None = None,
     max_length: int | None = None,
-    include_modifier: bool = True,
     word_separator: str | None = None,
     starts_with: str = "",
     unique: bool = False,
@@ -342,7 +326,6 @@ def generate_nickname_details(
         style=resolve_style(style),
         min_length=resolve_length(min_length),
         max_length=resolve_length(max_length),
-        include_modifier=include_modifier,
         prefix=resolve_prefix(starts_with),
         separator=word_separator,
     )

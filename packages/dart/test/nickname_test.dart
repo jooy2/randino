@@ -144,28 +144,6 @@ void main() {
       expect(details.any((detail) => detail.words.length == 3), isTrue);
     });
 
-    test('includeModifier: false leaves the word undecorated', () {
-      for (final language in wordLanguages) {
-        final parts = wordData[language]!.parts ?? const <String>[];
-
-        for (final detail in randNicknameDetails(
-          language: language,
-          count: sample,
-          includeModifier: false,
-        )) {
-          // A noun, and at most one trailing word behind it. Note that a few
-          // words serve as both modifier and noun (무지개, Marble), so the check
-          // has to be structural rather than "is not a modifier".
-          expect(detail.words.length, lessThanOrEqualTo(2), reason: detail.nickname);
-          expect(nounsOf(language), contains(detail.words[0]), reason: detail.nickname);
-
-          if (detail.words.length == 2) {
-            expect(parts, contains(detail.words[1]), reason: detail.nickname);
-          }
-        }
-      }
-    });
-
     test('theme decides what the nickname is about', () {
       for (final theme in wordThemes) {
         for (final language in wordLanguages) {
@@ -239,11 +217,7 @@ void main() {
     test('omitted length bounds fall back to what the language can produce', () {
       expect(nicknameLengthRange(language: WordLanguage.zh), const LengthRange(2, 5));
       expect(nicknameLengthRange(language: WordLanguage.ko), const LengthRange(1, 12));
-      // Without a modifier the upper end drops to a noun plus a trailing word.
-      expect(
-        nicknameLengthRange(language: WordLanguage.ko, includeModifier: false),
-        const LengthRange(1, 8),
-      );
+      expect(nicknameLengthRange(language: WordLanguage.en), const LengthRange(3, 30));
 
       for (final language in wordLanguages) {
         final range = nicknameLengthRange(language: language);
@@ -383,12 +357,13 @@ void main() {
 
       expect(nicknames.toSet().length, nicknames.length);
 
-      // A single word plus one theme is a small pool, so the request runs out of
-      // combinations and returns fewer instead of looping.
+      // One theme in one language, held to two characters, is a small enough
+      // pool that the request runs out of combinations and returns fewer
+      // instead of looping.
       final limited = randNickname(
         language: WordLanguage.zh,
         theme: WordTheme.animal,
-        includeModifier: false,
+        maxLength: 2,
         count: 400,
         unique: true,
       );

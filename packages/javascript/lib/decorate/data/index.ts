@@ -1,6 +1,9 @@
 // Bounds and defaults for `randSuffix` and `randPrefix`. They are the nickname
 // package's old `NICKNAME_SUFFIX_*` constants, which stopped belonging to
 // nicknames the moment the suffix became something you attach to any string.
+//
+// `randModifier` is the third decorator and takes none of these: what it
+// attaches is a word out of the pools, not a token out of a charset.
 
 /** Characters in an affix when no `length` is asked for. */
 export const AFFIX_LENGTH_DEFAULT = 5;

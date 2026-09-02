@@ -26,6 +26,7 @@ describe('base test', () => {
 			'randFood',
 			'randGem',
 			'randJob',
+			'randModifier',
 			'randMusic',
 			'randMyth',
 			'randName',
@@ -72,6 +73,11 @@ describe('base test', () => {
 
 		assert.strictEqual(typeof randino.randSuffix, 'function');
 		assert.strictEqual(typeof randino.randPrefix, 'function');
+		// The decorators work with nothing to decorate, which is what makes what
+		// they attach available on its own.
+		assert.strictEqual(typeof randino.randSuffix(), 'string');
+		assert.strictEqual(typeof randino.randPrefix(), 'string');
+		assert.strictEqual(typeof randino.randModifier(), 'string');
 		assert.strictEqual(randino.AFFIX_LENGTH_DEFAULT, 5);
 		assert.strictEqual(randino.AFFIX_LENGTH_MAX, 32);
 		assert.strictEqual(randino.AFFIX_SEPARATOR_DEFAULT, '_');

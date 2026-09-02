@@ -14,21 +14,16 @@ import 'package:randino/src/word/data/index.dart';
 ///
 /// ```dart
 /// nicknameLengthRange(language: WordLanguage.ko); // LengthRange(1, 12)
-/// nicknameLengthRange(language: WordLanguage.ko, includeModifier: false); // LengthRange(1, 8)
 /// nicknameLengthRange(language: WordLanguage.en); // LengthRange(3, 30)
 /// nicknameLengthRange(language: WordLanguage.ko, wordSeparator: '-'); // LengthRange(1, 14)
 /// ```
-LengthRange nicknameLengthRange({
-  WordLanguage? language,
-  bool includeModifier = true,
-  String? wordSeparator,
-}) {
+LengthRange nicknameLengthRange({WordLanguage? language, String? wordSeparator}) {
   final languages = language == null ? wordLanguages : <WordLanguage>[language];
   var min = 1 << 30;
   var max = 0;
 
   for (final code in languages) {
-    final range = naturalRange(code, includeModifier, wordSeparator);
+    final range = naturalRange(code, wordSeparator);
 
     if (range.min < min) min = range.min;
     if (range.max > max) max = range.max;

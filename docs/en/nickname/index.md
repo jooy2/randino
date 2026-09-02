@@ -138,7 +138,7 @@ It is not cosmetic: **its length is part of the nickname's**, so a separator nar
 
 ### A unique suffix is not an option here
 
-It used to be four of them. Attaching a random token to a string is a thing about strings rather than about nicknames, so it is [`randSuffix`](../affix/rand-suffix) now — which takes these nicknames, or a name, or an order number.
+It used to be four of them. Attaching a random token to a string is a thing about strings rather than about nicknames, so it is [`randSuffix`](../decorate/rand-suffix) now — which takes these nicknames, or a name, or an order number.
 
 ::: lang js
 
@@ -211,4 +211,4 @@ rand_nickname(language="en", style=100, count=3)
 
 ### `unique`, and why a suffix is usually the better answer
 
-Korean and English have over nine million word combinations each, so duplicates are rare either way. `unique` rules them out inside one call and returns fewer nicknames once the pools run out; [`randSuffix`](../affix/rand-suffix) makes collisions impossible across calls, across processes and across users, which is the guarantee a sign-up form actually needs.
+Korean and English have over nine million word combinations each, so duplicates are rare either way. `unique` rules them out inside one call and returns fewer nicknames once the pools run out; [`randSuffix`](../decorate/rand-suffix) makes collisions impossible across calls, across processes and across users, which is the guarantee a sign-up form actually needs.

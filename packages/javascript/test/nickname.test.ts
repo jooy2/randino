@@ -138,28 +138,6 @@ describe('Nickname', () => {
 		assert.ok(details.some((detail) => detail.words.length === 3));
 	});
 
-	it('includeModifier: false leaves the word undecorated', () => {
-		for (const language of WORD_LANGUAGES) {
-			const parts = WORD_DATA[language].parts ?? [];
-
-			for (const detail of nicknameDetails({
-				language,
-				count: SAMPLE,
-				includeModifier: false
-			})) {
-				// A noun, and at most one trailing word behind it. Note that a few
-				// words serve as both modifier and noun (무지개, Marble), so the check
-				// has to be structural rather than "is not a modifier".
-				assert.ok(detail.words.length <= 2, detail.nickname);
-				assert.ok(nounsOf(language).includes(detail.words[0]), detail.nickname);
-
-				if (detail.words.length === 2) {
-					assert.ok(parts.includes(detail.words[1]), detail.nickname);
-				}
-			}
-		}
-	});
-
 	it('theme decides what the nickname is about', () => {
 		for (const theme of WORD_THEMES) {
 			for (const language of WORD_LANGUAGES) {
@@ -221,8 +199,7 @@ describe('Nickname', () => {
 	it('omitted length bounds fall back to what the language can produce', () => {
 		assert.deepStrictEqual(nicknameLengthRange('zh'), [2, 5]);
 		assert.deepStrictEqual(nicknameLengthRange('ko'), [1, 12]);
-		// Without a modifier the upper end drops to a noun plus a trailing word.
-		assert.deepStrictEqual(nicknameLengthRange('ko', false), [1, 8]);
+		assert.deepStrictEqual(nicknameLengthRange('en'), [3, 30]);
 
 		for (const language of WORD_LANGUAGES) {
 			const [min, max] = nicknameLengthRange(language);
@@ -262,8 +239,8 @@ describe('Nickname', () => {
 		}
 
 		// The separator is part of the nickname, so it counts toward the length.
-		assert.deepStrictEqual(nicknameLengthRange('ko', true, '-'), [1, 14]);
-		assert.deepStrictEqual(nicknameLengthRange('en', true, ' '), [3, 32]);
+		assert.deepStrictEqual(nicknameLengthRange('ko', '-'), [1, 14]);
+		assert.deepStrictEqual(nicknameLengthRange('en', ' '), [3, 32]);
 
 		for (const [language, wordSeparator, minLength, maxLength] of [
 			['ko', ' ', 5, 8],
@@ -335,12 +312,13 @@ describe('Nickname', () => {
 		const nicknames = randNickname({ language: 'ko', count: 2000, unique: true });
 		assert.strictEqual(new Set(nicknames).size, nicknames.length);
 
-		// A single word plus one theme is a small pool, so the request runs out of
-		// combinations and returns fewer instead of looping.
+		// One theme in one language, held to two characters, is a small enough pool
+		// that the request runs out of combinations and returns fewer instead of
+		// looping.
 		const limited = randNickname({
 			language: 'zh',
 			theme: 'animal',
-			includeModifier: false,
+			maxLength: 2,
 			count: 400,
 			unique: true
 		});

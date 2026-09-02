@@ -8,17 +8,15 @@ Every nickname length the language can produce, in characters. This is what [`ra
 import { nicknameLengthRange } from 'randino';
 
 nicknameLengthRange('ko'); // [1, 12]
-nicknameLengthRange('ko', false); // [1, 8]
 nicknameLengthRange('en'); // [3, 30]
 nicknameLengthRange('zh'); // [2, 5]
-nicknameLengthRange('ko', true, '-'); // [1, 14]
+nicknameLengthRange('ko', '-'); // [1, 14]
 ```
 
-| Parameter | Type | Default | Description |
-| --- | --- | --- | --- |
-| `language` | `WordLanguageOption` | `'all'` | The language, or `'all'` for every one |
-| `includeModifier` | `boolean` | `true` | Count the modifier shapes |
-| `wordSeparator` | `string` | — | Count what a separator adds between the words |
+| Parameter       | Type                 | Default | Description                                   |
+| --------------- | -------------------- | ------- | --------------------------------------------- |
+| `language`      | `WordLanguageOption` | `'all'` | The language, or `'all'` for every one        |
+| `wordSeparator` | `string`             | —       | Count what a separator adds between the words |
 
 Returns `[min, max]`.
 
@@ -30,17 +28,15 @@ Returns `[min, max]`.
 import 'package:randino/randino.dart';
 
 nicknameLengthRange(language: WordLanguage.ko); // LengthRange(1, 12)
-nicknameLengthRange(language: WordLanguage.ko, includeModifier: false); // LengthRange(1, 8)
 nicknameLengthRange(language: WordLanguage.en); // LengthRange(3, 30)
 nicknameLengthRange(language: WordLanguage.zh); // LengthRange(2, 5)
 nicknameLengthRange(language: WordLanguage.ko, wordSeparator: '-'); // LengthRange(1, 14)
 ```
 
-| Parameter         | Type            | Default | Description                                   |
-| ----------------- | --------------- | ------- | --------------------------------------------- |
-| `language`        | `WordLanguage?` | `null`  | The language, or null for every one           |
-| `includeModifier` | `bool`          | `true`  | Count the modifier shapes                     |
-| `wordSeparator`   | `String?`       | `null`  | Count what a separator adds between the words |
+| Parameter       | Type            | Default | Description                                   |
+| --------------- | --------------- | ------- | --------------------------------------------- |
+| `language`      | `WordLanguage?` | `null`  | The language, or null for every one           |
+| `wordSeparator` | `String?`       | `null`  | Count what a separator adds between the words |
 
 Returns a `LengthRange`, which compares by value.
 
@@ -52,16 +48,14 @@ Returns a `LengthRange`, which compares by value.
 from randino import nickname_length_range
 
 nickname_length_range("ko")  # (1, 12)
-nickname_length_range("ko", include_modifier=False)  # (1, 8)
 nickname_length_range("en")  # (3, 30)
 nickname_length_range("zh")  # (2, 5)
-nickname_length_range("ko", word_separator="-")  # (1, 14)
+nickname_length_range("ko", "-")  # (1, 14)
 ```
 
 | Parameter | Type | Default | Description |
 | --- | --- | --- | --- |
 | `language` | `WordLanguageOption` | `"all"` | The language, or `"all"` for every one |
-| `include_modifier` | `bool` | `True` | Count the modifier shapes |
 | `word_separator` | `str \| None` | `None` | Count what a separator adds between the words |
 
 Returns a `tuple[int, int]`.
@@ -136,7 +130,7 @@ nickname_length_range("en", word_separator=" ")  # (3, 32)
 
 :::
 
-**A random suffix is outside the range entirely.** [`randSuffix`](../affix/rand-suffix) attaches its token after the nickname is finished, so <Lang js="minLength" dart="minLength" py="min_length" code /> and <Lang js="maxLength" dart="maxLength" py="max_length" code /> describe the whole nickname and nothing is excluded from them.
+**A random suffix is outside the range entirely.** [`randSuffix`](../decorate/rand-suffix) attaches its token after the nickname is finished, so <Lang js="minLength" dart="minLength" py="min_length" code /> and <Lang js="maxLength" dart="maxLength" py="max_length" code /> describe the whole nickname and nothing is excluded from them.
 
 ## See also
 

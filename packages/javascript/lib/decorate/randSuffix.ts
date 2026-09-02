@@ -2,6 +2,14 @@ import type { RandAffixOptions } from '../_types/global.js';
 import { attach } from './attach.js';
 
 /**
+ * A random token on its own, with nothing to attach it to.
+ *
+ * @example
+ * randSuffix(); // 'nVtRC'
+ * randSuffix({ length: 8 }); // 'k3Rm9dQx'
+ */
+export function randSuffix(options?: RandAffixOptions): string;
+/**
  * Appends a random token to a string, so that two people asking for the same
  * nickname at the same moment do not walk away with the same one.
  *
@@ -21,8 +29,8 @@ export function randSuffix(value: string, options?: RandAffixOptions): string;
  */
 export function randSuffix(value: string[], options?: RandAffixOptions): string[];
 export function randSuffix(
-	value: string | string[],
-	options: RandAffixOptions = {}
+	value?: string | string[] | RandAffixOptions,
+	options?: RandAffixOptions
 ): string | string[] {
 	return attach(value, options, (item, token, separator) => item + separator + token);
 }

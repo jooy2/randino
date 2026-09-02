@@ -56,7 +56,6 @@ class _Settings {
     required this.style,
     required this.minLength,
     required this.maxLength,
-    required this.includeModifier,
     required this.prefix,
     required this.separator,
   });
@@ -65,7 +64,6 @@ class _Settings {
   final int style;
   final int? minLength;
   final int? maxLength;
-  final bool includeModifier;
   final String prefix;
   final String? separator;
 }
@@ -97,27 +95,13 @@ _Bounds _slotBounds(WordLanguage language, WordLanguageData data, WordTheme them
   return bounds;
 }
 
-/// The shapes available for the current options, in the order they are weighted.
-List<_Pattern> _usablePatterns(WordLanguageData data, _Settings settings) {
-  final usable = _patterns
-      .where((pattern) {
-        final slots = pattern.slots;
-
-        if (!settings.includeModifier && slots.contains(_Slot.modifier)) return false;
-        if (data.parts == null && slots.contains(_Slot.part)) return false;
-
-        return true;
-      })
-      .toList(growable: false);
-
-  // Options can rule out every shape — a language with no `parts` pool and no
-  // modifier allowed, say. The bare noun is then the only answer.
-  return usable.isNotEmpty
-      ? usable
-      : const <_Pattern>[
-        _Pattern(<_Slot>[_Slot.noun], 1),
-      ];
-}
+/// The shapes available for the language, in the order they are weighted.
+///
+/// The only shapes a language can rule out are the compound ones, and only by
+/// having no `parts` pool — which `ja` and `zh` do not.
+List<_Pattern> _usablePatterns(WordLanguageData data) => _patterns
+    .where((pattern) => data.parts != null || !pattern.slots.contains(_Slot.part))
+    .toList(growable: false);
 
 /// Shortest and longest nickname a shape can produce.
 LengthRange _patternRange(List<_Slot> slots, _Bounds bounds, int joiner) {
@@ -250,18 +234,17 @@ LengthRange _lengthBounds(
 /// for an omitted `minLength` / `maxLength`, and what `nicknameLengthRange`
 /// reports. Kept here so it is derived from the same shapes and pools the
 /// generator actually draws from.
-LengthRange naturalRange(WordLanguage language, bool includeModifier, String? separator) {
+LengthRange naturalRange(WordLanguage language, String? separator) {
   final data = wordData[language]!;
   final settings = _Settings(
     theme: null,
     style: 0,
     minLength: null,
     maxLength: null,
-    includeModifier: includeModifier,
     prefix: '',
     separator: separator,
   );
-  final patterns = _usablePatterns(data, settings);
+  final patterns = _usablePatterns(data);
   final joiner = _joinerOf(data, settings).length;
   var min = 1 << 30;
   var max = 0;
@@ -283,7 +266,7 @@ LengthRange naturalRange(WordLanguage language, bool includeModifier, String? se
 _Built _generateOne(WordLanguage language, _Settings settings) {
   final data = wordData[language]!;
   final themes = themesOf(settings.theme);
-  final patterns = _usablePatterns(data, settings);
+  final patterns = _usablePatterns(data);
   final joiner = _joinerOf(data, settings);
   _Built? best;
   var bestDistance = 1 << 30;
@@ -345,7 +328,6 @@ List<NicknameDetail> generateNicknameDetails({
   int style = 0,
   int? minLength,
   int? maxLength,
-  bool includeModifier = true,
   String? wordSeparator,
   String? startsWith,
   bool unique = false,
@@ -355,7 +337,6 @@ List<NicknameDetail> generateNicknameDetails({
     style: resolveStyle(style),
     minLength: minLength,
     maxLength: maxLength,
-    includeModifier: includeModifier,
     prefix: resolvePrefix(startsWith),
     separator: wordSeparator,
   );

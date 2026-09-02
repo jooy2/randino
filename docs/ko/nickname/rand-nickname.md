@@ -47,7 +47,6 @@ rand_nickname()
 | `style` | <Lang js="number" dart="int" py="int" code /> | `0` | `0`은 실제 단어를, `100`은 그 언어처럼 읽히기만 하는 단어를 만들어 씁니다. 중간값은 둘을 섞습니다. |
 | <Lang js="minLength" dart="minLength" py="min_length" code /> | <Lang js="number" dart="int?" py="int &#124; None" code /> | _언어별_ | 최소 글자 수. |
 | <Lang js="maxLength" dart="maxLength" py="max_length" code /> | <Lang js="number" dart="int?" py="int &#124; None" code /> | _언어별_ | 최대 글자 수. |
-| <Lang js="includeModifier" dart="includeModifier" py="include_modifier" code /> | <Lang js="boolean" dart="bool" py="bool" code /> | <Lang js="true" dart="true" py="True" code /> | 단어를 꾸밉니다. `사자`가 아니라 `멋진사자`. |
 | <Lang js="wordSeparator" dart="wordSeparator" py="word_separator" code /> | <Lang js="string" dart="String?" py="str &#124; None" code /> | _언어별_ | 단어 사이에 넣습니다. 길이 범위에 포함됩니다. 기본값은 붙여 쓰는 것입니다. |
 | <Lang js="startsWith" dart="startsWith" py="starts_with" code /> | <Lang js="string" dart="String?" py="str" code /> | <Lang js="—" dart="null" py="&quot;&quot;" code /> | 첫 글자가 이 글자인 닉네임만 반환합니다. |
 | `unique` | <Lang js="boolean" dart="bool" py="bool" code /> | <Lang js="false" dart="false" py="False" code /> | 같은 닉네임을 두 번 반환하지 않습니다. 조합이 바닥나면 `count`보다 적게 반환할 수 있습니다. |
@@ -215,37 +214,6 @@ rand_nickname(language="en", theme="gem", count=3)
 
 14개 테마와 각 테마가 담고 있는 것은 [테마](../word/themes)에 있습니다.
 
-### 꾸미지 않은 단어
-
-::: lang js
-
-```javascript
-randNickname({ language: 'ko', count: 4, includeModifier: false });
-// ['미래', '반지', '고릴라', '구름언덕']
-```
-
-:::
-
-::: lang dart
-
-```dart
-randNickname(language: WordLanguage.ko, count: 4, includeModifier: false);
-// ['미래', '반지', '고릴라', '구름언덕']
-```
-
-:::
-
-::: lang py
-
-```python
-rand_nickname(language="ko", count=4, include_modifier=False)
-# ['미래', '반지', '고릴라', '구름언덕']
-```
-
-:::
-
-뒤따르는 단어는 여전히 허용됩니다. <Lang js="includeModifier" dart="includeModifier" py="include_modifier" code />는 수식어가 들어가는 형태만 제외할 뿐, 하나만 남기는 옵션이 아닙니다.
-
 ### 단어 사이의 구분자
 
 ::: lang js
@@ -297,7 +265,7 @@ rand_nickname(language="ja", word_separator="・", count=3)
 
 ### 고유 접미사 {#a-unique-suffix}
 
-이를 위한 옵션은 없습니다. [`randSuffix`](../affix/rand-suffix)가 넘겨받은 무엇에든 무작위 토큰을 붙이며, 여기서 만든 닉네임도 그 대상입니다.
+이를 위한 옵션은 없습니다. [`randSuffix`](../decorate/rand-suffix)가 넘겨받은 무엇에든 무작위 토큰을 붙이며, 여기서 만든 닉네임도 그 대상입니다.
 
 ::: lang js
 
@@ -421,7 +389,7 @@ for detail in rand_nickname(language="ko", count=3, output="detail"):
 
 ### 읽는 부분과 구분자를 따로 저장하기 {#storing-the-readable-part-and-the-discriminator}
 
-가입 흐름에서는 보통 읽는 부분과 충돌을 막는 부분을 두 컬럼으로 나누어 둡니다. 나중에 이름을 바꿀 때 한쪽만 유지하고 다른 쪽을 갈아 끼울 수 있기 때문입니다. 두 번째 값을 만드는 것이 [`randSuffix`](../affix/rand-suffix)이며, 첫 번째 값에서 다시 잘라낼 일이 없습니다.
+가입 흐름에서는 보통 읽는 부분과 충돌을 막는 부분을 두 컬럼으로 나누어 둡니다. 나중에 이름을 바꿀 때 한쪽만 유지하고 다른 쪽을 갈아 끼울 수 있기 때문입니다. 두 번째 값을 만드는 것이 [`randSuffix`](../decorate/rand-suffix)이며, 첫 번째 값에서 다시 잘라낼 일이 없습니다.
 
 ::: lang js
 
@@ -509,6 +477,6 @@ for detail in rand_nickname(language="en", count=100, output="detail"):
 
 ## 함께 보기
 
-- [`randSuffix`](../affix/rand-suffix) — 닉네임이 절대 겹치지 않아야 할 때 붙이는 무작위 토큰.
+- [`randSuffix`](../decorate/rand-suffix) — 닉네임이 절대 겹치지 않아야 할 때 붙이는 무작위 토큰.
 - [테마](../word/themes) — 닉네임을 만드는 14개 어휘 묶음.
 - [`nicknameLengthRange`](./nickname-length-range) — 각 언어가 만들 수 있는 모든 길이.

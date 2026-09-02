@@ -78,7 +78,6 @@ const nickname = reactive({
 	style: 0,
 	minLength: '',
 	maxLength: '',
-	includeModifier: true,
 	wordSeparator: '',
 	startsWith: '',
 	unique: false
@@ -117,7 +116,6 @@ const options = computed(() => {
 	if (Number(nickname.style) !== 0) out.style = Number(nickname.style);
 	if (num(nickname.minLength) !== undefined) out.minLength = num(nickname.minLength);
 	if (num(nickname.maxLength) !== undefined) out.maxLength = num(nickname.maxLength);
-	if (!nickname.includeModifier) out.includeModifier = false;
 	if (nickname.wordSeparator) out.wordSeparator = nickname.wordSeparator;
 	if (nickname.startsWith) out.startsWith = nickname.startsWith;
 	if (nickname.unique) out.unique = true;
@@ -161,7 +159,7 @@ const fallbackRange = computed(() => {
 		return nameLengthRange(name.language, name.includeSurname, name.includeMiddleName);
 	}
 
-	return nicknameLengthRange(nickname.language, nickname.includeModifier, nickname.wordSeparator);
+	return nicknameLengthRange(nickname.language, nickname.wordSeparator);
 });
 
 const supportsMiddleName = computed(() => nameSupportsMiddleName(name.language));
@@ -432,11 +430,6 @@ async function copy() {
 				<label class="randino-demo-field">
 					<span><code>startsWith</code></span>
 					<input v-model="nickname.startsWith" type="text" maxlength="1" placeholder="—" />
-				</label>
-
-				<label class="randino-demo-check">
-					<input v-model="nickname.includeModifier" type="checkbox" />
-					<code>includeModifier</code>
 				</label>
 
 				<label class="randino-demo-check">

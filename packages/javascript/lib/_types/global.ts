@@ -150,8 +150,6 @@ export interface RandNicknameOptions extends RandCommonOptions {
 	language?: WordLanguageOption;
 	/** What the nickname should be about. Default `'all'`. */
 	theme?: WordThemeOption;
-	/** Decorate the noun with a modifier (`멋진사자` rather than `사자`). Default `true`. */
-	includeModifier?: boolean;
 	/**
 	 * Placed between the words a nickname is built from (`'멋진 사자'`,
 	 * `'misty-owl'`), and counted toward `minLength` / `maxLength`. Defaults to the
@@ -161,7 +159,12 @@ export interface RandNicknameOptions extends RandCommonOptions {
 	wordSeparator?: string;
 }
 
-/** What `randSuffix` and `randPrefix` attach — the same three for both. */
+/**
+ * What `randSuffix` and `randPrefix` attach — the same three for both.
+ *
+ * `randModifier` is the third decorator and shares none of them: it attaches a
+ * word rather than a token, so it takes `RandModifierOptions` instead.
+ */
 export interface RandAffixOptions {
 	/** Characters in the token. Default `5`, maximum `32`. */
 	length?: number;
@@ -169,6 +172,26 @@ export interface RandAffixOptions {
 	separator?: string;
 	/** Characters the token is drawn from. Defaults to alphanumerics without `0O1lI`. */
 	charset?: string;
+}
+
+/** What `randModifier` puts in front of a value. */
+export interface RandModifierOptions {
+	/**
+	 * Language the modifier is drawn from. Left out, the script of the value
+	 * picks it, so `'고양이'` is never handed an English modifier; with no value
+	 * at all, or with `'all'`, every language is in play.
+	 */
+	language?: WordLanguageOption;
+	/**
+	 * `0` draws a modifier the language actually uses, `100` invents one that
+	 * only reads like it. Default `0`.
+	 */
+	style?: number;
+	/**
+	 * Placed between the modifier and the value. Defaults to the way the language
+	 * itself joins words, which is to run them together (`멋진사자`, `MistyOwl`).
+	 */
+	separator?: string;
 }
 
 /** A generated nickname with the pieces it was built from. */

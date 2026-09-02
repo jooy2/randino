@@ -2,8 +2,18 @@
 
 from typing import overload
 
-from randino.affix._attach import attach
-from randino.affix.data import AFFIX_LENGTH_DEFAULT, AFFIX_SEPARATOR_DEFAULT
+from randino.decorate._attach import attach
+from randino.decorate.data import AFFIX_LENGTH_DEFAULT, AFFIX_SEPARATOR_DEFAULT
+
+
+@overload
+def rand_suffix(
+    value: None = ...,
+    *,
+    length: int = ...,
+    separator: str = ...,
+    charset: str = ...,
+) -> str: ...
 
 
 @overload
@@ -27,7 +37,7 @@ def rand_suffix(
 
 
 def rand_suffix(
-    value: str | list[str],
+    value: str | list[str] | None = None,
     *,
     length: int = AFFIX_LENGTH_DEFAULT,
     separator: str = AFFIX_SEPARATOR_DEFAULT,
@@ -36,19 +46,23 @@ def rand_suffix(
     """Append a random token, so that two people asking at the same moment differ.
 
     A list gets a fresh token per entry rather than one for the batch, which is
-    what a generator's output is usually passed here for.
+    what a generator's output is usually passed here for. With no value at all
+    you get the bare token — what a decorator attaches is worth having on its own.
 
     Args:
-        value: The string, or the list of strings, to append to.
+        value: The string, or the list of strings, to append to. Omitted, the
+            token is the whole answer and `separator` is not used.
         length: Characters in the token. Clamped to `1..32`.
         separator: Placed between the value and the token.
         charset: Characters the token is drawn from. Defaults to alphanumerics
             without `0O1lI`, the pairs that are easy to misread.
 
     Returns:
-        A string when `value` is a string, a list when it is a list.
+        A string when `value` is a string or omitted, a list when it is a list.
 
     Example:
+        >>> rand_suffix()
+        'nVtRC'
         >>> rand_suffix("멋진사자")
         '멋진사자_nVtRC'
         >>> rand_suffix(rand_nickname(language="ko", count=2))

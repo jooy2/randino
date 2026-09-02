@@ -8,17 +8,15 @@
 import { nicknameLengthRange } from 'randino';
 
 nicknameLengthRange('ko'); // [1, 12]
-nicknameLengthRange('ko', false); // [1, 8]
 nicknameLengthRange('en'); // [3, 30]
 nicknameLengthRange('zh'); // [2, 5]
-nicknameLengthRange('ko', true, '-'); // [1, 14]
+nicknameLengthRange('ko', '-'); // [1, 14]
 ```
 
-| 파라미터          | 타입                 | 기본값  | 설명                                    |
-| ----------------- | -------------------- | ------- | --------------------------------------- |
-| `language`        | `WordLanguageOption` | `'all'` | 언어, 또는 `'all'`로 전체               |
-| `includeModifier` | `boolean`            | `true`  | 수식어가 들어가는 형태를 포함           |
-| `wordSeparator`   | `string`             | —       | 구분자가 단어 사이에 더하는 길이를 포함 |
+| 파라미터        | 타입                 | 기본값  | 설명                                    |
+| --------------- | -------------------- | ------- | --------------------------------------- |
+| `language`      | `WordLanguageOption` | `'all'` | 언어, 또는 `'all'`로 전체               |
+| `wordSeparator` | `string`             | —       | 구분자가 단어 사이에 더하는 길이를 포함 |
 
 `[min, max]`를 반환합니다.
 
@@ -30,17 +28,15 @@ nicknameLengthRange('ko', true, '-'); // [1, 14]
 import 'package:randino/randino.dart';
 
 nicknameLengthRange(language: WordLanguage.ko); // LengthRange(1, 12)
-nicknameLengthRange(language: WordLanguage.ko, includeModifier: false); // LengthRange(1, 8)
 nicknameLengthRange(language: WordLanguage.en); // LengthRange(3, 30)
 nicknameLengthRange(language: WordLanguage.zh); // LengthRange(2, 5)
 nicknameLengthRange(language: WordLanguage.ko, wordSeparator: '-'); // LengthRange(1, 14)
 ```
 
-| 파라미터          | 타입            | 기본값 | 설명                                    |
-| ----------------- | --------------- | ------ | --------------------------------------- |
-| `language`        | `WordLanguage?` | `null` | 언어, 또는 null로 전체                  |
-| `includeModifier` | `bool`          | `true` | 수식어가 들어가는 형태를 포함           |
-| `wordSeparator`   | `String?`       | `null` | 구분자가 단어 사이에 더하는 길이를 포함 |
+| 파라미터        | 타입            | 기본값 | 설명                                    |
+| --------------- | --------------- | ------ | --------------------------------------- |
+| `language`      | `WordLanguage?` | `null` | 언어, 또는 null로 전체                  |
+| `wordSeparator` | `String?`       | `null` | 구분자가 단어 사이에 더하는 길이를 포함 |
 
 값으로 비교되는 `LengthRange`를 반환합니다.
 
@@ -52,17 +48,15 @@ nicknameLengthRange(language: WordLanguage.ko, wordSeparator: '-'); // LengthRan
 from randino import nickname_length_range
 
 nickname_length_range("ko")  # (1, 12)
-nickname_length_range("ko", include_modifier=False)  # (1, 8)
 nickname_length_range("en")  # (3, 30)
 nickname_length_range("zh")  # (2, 5)
-nickname_length_range("ko", word_separator="-")  # (1, 14)
+nickname_length_range("ko", "-")  # (1, 14)
 ```
 
-| 파라미터           | 타입                 | 기본값  | 설명                                    |
-| ------------------ | -------------------- | ------- | --------------------------------------- |
-| `language`         | `WordLanguageOption` | `"all"` | 언어, 또는 `"all"`로 전체               |
-| `include_modifier` | `bool`               | `True`  | 수식어가 들어가는 형태를 포함           |
-| `word_separator`   | `str \| None`        | `None`  | 구분자가 단어 사이에 더하는 길이를 포함 |
+| 파라미터         | 타입                 | 기본값  | 설명                                    |
+| ---------------- | -------------------- | ------- | --------------------------------------- |
+| `language`       | `WordLanguageOption` | `"all"` | 언어, 또는 `"all"`로 전체               |
+| `word_separator` | `str \| None`        | `None`  | 구분자가 단어 사이에 더하는 길이를 포함 |
 
 `tuple[int, int]`를 반환합니다.
 
@@ -136,7 +130,7 @@ nickname_length_range("en", word_separator=" ")  # (3, 32)
 
 :::
 
-**무작위 접미사는 이 범위 밖에 있습니다.** [`randSuffix`](../affix/rand-suffix)는 닉네임이 완성된 뒤에 토큰을 붙이므로, <Lang js="minLength" dart="minLength" py="min_length" code />와 <Lang js="maxLength" dart="maxLength" py="max_length" code />는 닉네임 전체를 가리키며 빼고 셀 것이 없습니다.
+**무작위 접미사는 이 범위 밖에 있습니다.** [`randSuffix`](../decorate/rand-suffix)는 닉네임이 완성된 뒤에 토큰을 붙이므로, <Lang js="minLength" dart="minLength" py="min_length" code />와 <Lang js="maxLength" dart="maxLength" py="max_length" code />는 닉네임 전체를 가리키며 빼고 셀 것이 없습니다.
 
 ## 함께 보기
 

@@ -138,7 +138,7 @@ rand_nickname(language="en", word_separator="-", count=4)
 
 ### 고유 접미사는 여기 옵션이 아닙니다 {#a-unique-suffix-is-not-an-option-here}
 
-예전에는 옵션 네 개였습니다. 문자열에 무작위 토큰을 붙이는 일은 닉네임이 아니라 문자열에 대한 이야기여서, 지금은 [`randSuffix`](../affix/rand-suffix)가 맡습니다. 이 닉네임에도, 이름에도, 주문 번호에도 쓸 수 있습니다.
+예전에는 옵션 네 개였습니다. 문자열에 무작위 토큰을 붙이는 일은 닉네임이 아니라 문자열에 대한 이야기여서, 지금은 [`randSuffix`](../decorate/rand-suffix)가 맡습니다. 이 닉네임에도, 이름에도, 주문 번호에도 쓸 수 있습니다.
 
 ::: lang js
 
@@ -211,4 +211,4 @@ rand_nickname(language="en", style=100, count=3)
 
 ### `unique`, 그리고 대개는 접미사가 더 나은 이유 {#unique-and-why-a-suffix-is-usually-better}
 
-한국어와 영어는 각각 900만 가지가 넘는 단어 조합을 가지므로 중복은 어느 쪽이든 드뭅니다. `unique`는 한 번의 호출 안에서 중복을 없애고, 조합이 바닥나면 더 적은 개수를 돌려줍니다. [`randSuffix`](../affix/rand-suffix)는 호출과 프로세스와 사용자를 가로질러 충돌을 불가능하게 만드는데, 가입 폼에 실제로 필요한 보장은 이쪽입니다.
+한국어와 영어는 각각 900만 가지가 넘는 단어 조합을 가지므로 중복은 어느 쪽이든 드뭅니다. `unique`는 한 번의 호출 안에서 중복을 없애고, 조합이 바닥나면 더 적은 개수를 돌려줍니다. [`randSuffix`](../decorate/rand-suffix)는 호출과 프로세스와 사용자를 가로질러 충돌을 불가능하게 만드는데, 가입 폼에 실제로 필요한 보장은 이쪽입니다.

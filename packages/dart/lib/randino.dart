@@ -19,13 +19,15 @@
 /// nine supported languages.
 library;
 
-export 'src/affix/data/index.dart'
-    show affixCharset, affixLengthDefault, affixLengthMax, affixSeparatorDefault;
-export 'src/affix/rand_prefix.dart' show randPrefix;
-export 'src/affix/rand_prefix_all.dart' show randPrefixAll;
-export 'src/affix/rand_suffix.dart' show randSuffix;
-export 'src/affix/rand_suffix_all.dart' show randSuffixAll;
 export 'src/constants.dart' show randCountMax, randLengthMax, randLengthMin;
+export 'src/decorate/data/index.dart'
+    show affixCharset, affixLengthDefault, affixLengthMax, affixSeparatorDefault;
+export 'src/decorate/rand_modifier.dart' show randModifier;
+export 'src/decorate/rand_modifier_all.dart' show randModifierAll;
+export 'src/decorate/rand_prefix.dart' show randPrefix;
+export 'src/decorate/rand_prefix_all.dart' show randPrefixAll;
+export 'src/decorate/rand_suffix.dart' show randSuffix;
+export 'src/decorate/rand_suffix_all.dart' show randSuffixAll;
 export 'src/name/data/index.dart' show nameLanguages;
 export 'src/name/name_length_range.dart' show nameLengthRange;
 export 'src/name/name_supports_middle_name.dart' show nameSupportsMiddleName;

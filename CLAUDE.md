@@ -12,11 +12,13 @@ Guidance for AI agents (and humans) working in this repository. Written in Engli
 
 All three are implemented. Keep the generators apart — a shared "generator" abstraction is not wanted — but the options they all take, and the loop that draws until it has `count` results, live in `_internal/generate` and are shared. So are the word pools: `word/data` is the one dataset, and `nickname` consumes it.
 
-Beside them sits **affix**, which generates nothing a person reads: `randSuffix` and `randPrefix` attach a random token to a string you already have (`멋진사자` → `멋진사자_nVtRC`). It used to be the nickname generator's `uniqueSuffix*` options, and it moved out because attaching a token to a string was never a thing about nicknames. The generators are about the words now, and any caller with a string can reach for it.
+Beside them sits **decorate**, which generates nothing on its own: it attaches something to a string you already have. `randSuffix` and `randPrefix` attach a random token (`멋진사자` → `멋진사자_nVtRC`); `randModifier` attaches a word out of the pools (`사자` → `멋진사자`). All three used to be nickname options — `uniqueSuffix*` and `includeModifier` — and all three moved out for the same reason: decorating a string was never a thing about nicknames. **Every decorator works with no value at all**, handing back the token or the word it would have attached, because what it attaches is worth having on its own.
+
+That is the third group, and the three of them are why the split is not generators-and-helpers: a decorator neither generates from nothing nor answers a question. The docs sidebar has **Generators**, **Decorators** and **Utilities** for exactly this reason.
 
 The name generator is a port of the logic behind vutools' [Random Person Name Generator](https://www.vutools.com/tools/text/random-person-name-generator) (`client/src/app/[locale]/tools/text/random-person-name-generator` in the `www-vutools-com` repo), with the same options. Two deliberate differences: the web page's `es-hangul` dependency is replaced by an internal romanizer (see below), and length bounds are resolved per language so `language: 'all'` does not stretch a Korean name to fill a Spanish name's range.
 
-The nickname and word generators have no upstream — they are this repo's own. Their options mirror the name generator's where they mean the same thing: those live on `RandCommonOptions` (`count`, `style`, `minLength` / `maxLength`, `startsWith`, `unique`, `output`), and each generator adds only what is its own. `randWord` adds `language` and `theme`; `randNickname` adds those plus `includeModifier` and `wordSeparator`.
+The nickname and word generators have no upstream — they are this repo's own. Their options mirror the name generator's where they mean the same thing: those live on `RandCommonOptions` (`count`, `style`, `minLength` / `maxLength`, `startsWith`, `unique`, `output`), and each generator adds only what is its own. `randWord` adds `language` and `theme`; `randNickname` adds those plus `wordSeparator`.
 
 **A new generator should add options, not repeat them.** If it counts, filters by a starting character or deduplicates, it calls `collect` in `_internal/generate` and gets all of that for free.
 
@@ -43,11 +45,14 @@ lib/
     utils.ts                # shared random/string helpers, never exported
     parse.ts                # words() / tokens() / romanMap() dataset helpers
     generate.ts             # the common options, and the draw loop (`collect`)
-  affix/
+    script.ts               # which language a string is written in, by its script
+  decorate/
     index.ts                # the category's public surface
-    randSuffix.ts           # public: string | string[] -> the same, token attached
+    randSuffix.ts           # public: nothing, a string, or an array -> the same, token attached
     randPrefix.ts           # public: the mirror of it
-    attach.ts               # internal: the one line the two of them differ by
+    randModifier.ts         # public: a word out of the pools instead of a token
+    attach.ts               # internal: the one line the affixes differ by, and the
+                            #   first-argument rule all three share
     data/index.ts           # AFFIX_CHARSET, the length bounds, the separator
   name/
     index.ts                # the category's public surface
@@ -79,7 +84,7 @@ lib/
     nicknameGenerator.ts    # internal: shapes, length fitting; draws through word/
 test/
   base.test.ts              # the package's export surface
-  affix.test.ts             # one *.test.ts per category
+  decorate.test.ts          # one *.test.ts per category
   name.test.ts
   nickname.test.ts
   word.test.ts
@@ -136,7 +141,7 @@ lib/
     internal/
       utils.dart            # pick / randInt / chance / clamp, never exported
       parse.dart            # words() / pairs() / weightMap() / romanMap()
-    affix/                  # mirrors lib/affix, plus the `…All` list forms
+      decorate/               # mirrors lib/decorate, plus the `…All` list forms
     name/                   # mirrors lib/name in the JavaScript package
       data/                 # one file per language, ported verbatim
       romanize.dart
@@ -149,7 +154,7 @@ lib/
     nickname/               # mirrors lib/nickname
 test/
   base_test.dart            # the barrel's export surface, read out of the source
-  affix_test.dart
+  decorate_test.dart
   name_test.dart
   nickname_test.dart
   word_test.dart
@@ -182,7 +187,7 @@ example/
 
 Dart has neither overloads nor union types, so a function cannot hand back one type for one argument and another type for another. That costs two things, and both are the same limitation:
 
-- `randSuffix` takes a `String` and `randSuffixAll` takes a `List<String>`, where npm and PyPI have one function taking either.
+- `randSuffix` takes a `String` and `randSuffixAll` takes a `List<String>`, where npm and PyPI have one function taking either. The same goes for `randModifier` / `randModifierAll`. And because Dart cannot make a positional parameter optional alongside named ones, the decorators' `value` is **named**: `randSuffix(value: 'a')`, so that `randSuffix()` can mean the bare token.
 - `randNameDetails`, `randNicknameDetails` and `randWordDetails` still exist here. In the other two packages they are `output: 'detail'` on the generator itself; in Dart, `randName` returns `List<String>` and that is the end of it.
 - The **fourteen themed word functions have no detail form.** Twenty-eight functions for one option would be the wrong trade, so `randAnimal` returns `List<String>` and a caller who wants the detail passes `WordTheme.animal` to `randWordDetails`. That asymmetry is documented on every one of them.
 
@@ -203,7 +208,7 @@ src/randino/
   _internal/
     utils.py                # pick / rand_int / chance / clamp, never exported
     parse.py                # words() / tokens() / weights() / roman_map()
-  affix/                    # mirrors lib/affix; `@overload` carries the shape
+  decorate/                 # mirrors lib/decorate; `@overload` carries the shape
   name/                     # mirrors lib/name in the JavaScript package
     data/                   # one file per language, ported verbatim
     _romanize.py
@@ -217,7 +222,7 @@ src/randino/
   py.typed                  # PEP 561 — without it every annotation is ignored
 tests/
   test_base.py              # the barrel's export surface, and the no-dependency rule
-  test_affix.py
+  test_decorate.py
   test_name.py
   test_nickname.py
   test_word.py
@@ -291,9 +296,9 @@ Every variant is in the document and CSS hides all but one, which is what buys t
 
 ### The menu is not the folders
 
-`name/` and `nickname/` are two folders because the two generators are two things, and the sidebar deliberately does not repeat that split. A reader looking for `randNickname` is looking for a function, not for the half of the library it belongs to, so the groups are what a function **is**:
+`name/`, `nickname/`, `word/` and `decorate/` are four folders because those are four things in the source, and the sidebar deliberately does not repeat that split. A reader looking for `randNickname` is looking for a function, not for the corner of the library it belongs to, so the groups are what a function **is**:
 
-- **API**, which nests: **Generators** are the two that hand back names and nicknames, **Utilities** are everything else callable — what decorates a string (`randSuffix`, `randPrefix`) and what answers a question about a language (`nameLengthRange` and the two `nameSupports…`). Generators is kept short on purpose, so that a new kind of random text is visible when it arrives.
+- **API**, which nests three groups by what a function *does with a string*: **Generators** make one out of nothing (`randName`, `randNickname`, `randWord`), **Decorators** attach something to one you already have (`randSuffix`, `randPrefix`, `randModifier`), and **Utilities** answer a question about a language (`nameLengthRange`, `wordLengthRange`, the two `nameSupports…`). Generators is kept short on purpose, so that a new kind of random text is visible when it arrives.
 - **Behaviour** — the prose explaining how each generator's options behave, one page per generator. Its own group rather than two more entries under Guide, because it grows alongside Generators and Guide does not.
 
 `data/sidebar.ts` nests one level: a `SidebarGroup`'s `items` are pages, or more groups. Deeper than that and the menu stops being a menu.
@@ -302,7 +307,7 @@ Every variant is in the document and CSS hides all but one, which is what buys t
 
 The one exception is a **family of functions that differ only by a fixed argument**. `randAnimal` … `randProduct` are fourteen names for `randWord` with its `theme` decided, so they share `randWord`'s page and are listed on it — fourteen sidebar entries whose pages would say the same thing in fourteen places is a worse menu, not a better one. A function with an option of its own gets a page of its own.
 
-The navbar is the same lists — its API dropdown is Generators and Utilities as two labelled sections, built out of `data/sidebar.ts` by `navGroupsFor`, so the menu and the sections it points into cannot drift. Its **Packages** dropdown is `PackageLinks.vue`, which is where npm, pub.dev and PyPI went when they stopped being three of the four icons in the navbar's right-hand corner; the registry URLs are still derived from the three manifests in `config.ts`, and GitHub is the one social link left. Its marks are `RegistryMark.vue` and not `LangMark.vue` — npm is not JavaScript and PyPI is not Python, and only pub.dev, which brands itself with the Dart logo, has the same drawing in both files.
+The navbar is the same lists — its API dropdown is Generators, Decorators and Utilities as three labelled sections, built out of `data/sidebar.ts` by `navGroupsFor`, so the menu and the sections it points into cannot drift. Its **Packages** dropdown is `PackageLinks.vue`, which is where npm, pub.dev and PyPI went when they stopped being three of the four icons in the navbar's right-hand corner; the registry URLs are still derived from the three manifests in `config.ts`, and GitHub is the one social link left. Its marks are `RegistryMark.vue` and not `LangMark.vue` — npm is not JavaScript and PyPI is not Python, and only pub.dev, which brands itself with the Dart logo, has the same drawing in both files.
 
 ### The demo runs the real library
 
@@ -385,7 +390,8 @@ Nicknames:
 - **Length picks the shape, not the words.** `PATTERNS` are filtered to the ones that can land inside the range, then each slot is given the room left after the slots behind it have reserved their minimum. That is why a narrow range drops the modifier instead of truncating a word.
 - **The default range is wide on purpose** (`nicknameLengthRange('ko')` is `[1, 12]`): it spans every shape, and the pattern weights — not the range — decide what output usually looks like.
 - **`wordSeparator` replaces the language's joiner, everywhere.** It is not cosmetic: its length is part of the nickname's, so `patternRange`, `buildWords`, `lengthBounds` and `naturalRange` all read it through `joinerOf` rather than touching `data.joiner`. Reading `data.joiner` directly again is how a separated nickname starts overshooting `maxLength`. It also turns off the boundary-repeat re-draw — `石-霜` does not stutter the way `石霜` does.
-- **A unique suffix is not a nickname option.** `randSuffix` attaches one to any string, so `minLength` / `maxLength` describe the whole nickname and nothing has to be excluded from them.
+- **Neither a unique suffix nor a modifier is a nickname option.** `randSuffix` attaches a token to any string and `randModifier` attaches a word to one, so `minLength` / `maxLength` describe the whole nickname and nothing has to be excluded from them. What is left on the generator is the part that is genuinely about composing: the shapes, the length fitting, and the boundary re-draw.
+- **The nickname generator is now the thinnest it has been, and that is worth watching.** `randModifier(randAnimal())` produces `멋진사자` too. What `randNickname` still adds is the trailing-word shapes, a length range the whole thing has to land inside, and the re-draw when two words stutter across their boundary — real, but not much. If it is to stay its own generator it needs something that only a nickname has; that is open work, not a settled design.
 - **`theme` is reported, not asserted.** A word drawn from a theme reports it; an invented word is looked up across all themes, because it can spell a real one by accident, and reports `null` when it is found nowhere.
 - **Two rough spots trigger a re-draw** rather than being shipped: a `startsWith` that no real word in the rolled theme matched (another theme probably has one), and a word ending on the character the next one starts with (`石霜` + `霜雨`). Both fall back to the closest attempt if every attempt is rough.
 - **Invented-word templates stay short.** Two or three syllables per word, because up to three words are joined; `en` is capped at two.

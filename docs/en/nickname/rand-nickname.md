@@ -47,7 +47,6 @@ Every option is optional, and the defaults are what the empty call above uses.
 | `style` | <Lang js="number" dart="int" py="int" code /> | `0` | `0` uses real words, `100` invents words that only read like the language, and anything between mixes the two. |
 | <Lang js="minLength" dart="minLength" py="min_length" code /> | <Lang js="number" dart="int?" py="int &#124; None" code /> | _language_ | Minimum length in characters. |
 | <Lang js="maxLength" dart="maxLength" py="max_length" code /> | <Lang js="number" dart="int?" py="int &#124; None" code /> | _language_ | Maximum length in characters. |
-| <Lang js="includeModifier" dart="includeModifier" py="include_modifier" code /> | <Lang js="boolean" dart="bool" py="bool" code /> | <Lang js="true" dart="true" py="True" code /> | Decorate the word — `멋진사자` rather than `사자`. |
 | <Lang js="wordSeparator" dart="wordSeparator" py="word_separator" code /> | <Lang js="string" dart="String?" py="str &#124; None" code /> | _language_ | Placed between the words. Counts toward the length range. Defaults to running them together. |
 | <Lang js="startsWith" dart="startsWith" py="starts_with" code /> | <Lang js="string" dart="String?" py="str" code /> | <Lang js="—" dart="null" py="&quot;&quot;" code /> | Keep only nicknames whose first character is this one. |
 | `unique` | <Lang js="boolean" dart="bool" py="bool" code /> | <Lang js="false" dart="false" py="False" code /> | Never return the same nickname twice. May return fewer than `count` once the pools run out of combinations. |
@@ -215,37 +214,6 @@ rand_nickname(language="en", theme="gem", count=3)
 
 The fourteen themes, and what each one holds, are on [Themes](../word/themes).
 
-### An undecorated word
-
-::: lang js
-
-```javascript
-randNickname({ language: 'ko', count: 4, includeModifier: false });
-// ['미래', '반지', '고릴라', '구름언덕']
-```
-
-:::
-
-::: lang dart
-
-```dart
-randNickname(language: WordLanguage.ko, count: 4, includeModifier: false);
-// ['미래', '반지', '고릴라', '구름언덕']
-```
-
-:::
-
-::: lang py
-
-```python
-rand_nickname(language="ko", count=4, include_modifier=False)
-# ['미래', '반지', '고릴라', '구름언덕']
-```
-
-:::
-
-A trailing word is still allowed — <Lang js="includeModifier" dart="includeModifier" py="include_modifier" code /> drops the modifier shapes, not every shape but one.
-
 ### A separator between the words
 
 ::: lang js
@@ -297,7 +265,7 @@ Its length counts toward <Lang js="minLength" dart="minLength" py="min_length" c
 
 ### A unique suffix
 
-There is no option for one — [`randSuffix`](../affix/rand-suffix) attaches a random token to whatever you hand it, these nicknames included.
+There is no option for one — [`randSuffix`](../decorate/rand-suffix) attaches a random token to whatever you hand it, these nicknames included.
 
 ::: lang js
 
@@ -421,7 +389,7 @@ for detail in rand_nickname(language="ko", count=3, output="detail"):
 
 ### Storing the readable part and the discriminator
 
-A sign-up flow usually wants the readable part and the collision-breaking part in two columns, so that a later rename can keep one and replace the other. [`randSuffix`](../affix/rand-suffix) is what makes the second one, and it never has to be pulled back out of the first:
+A sign-up flow usually wants the readable part and the collision-breaking part in two columns, so that a later rename can keep one and replace the other. [`randSuffix`](../decorate/rand-suffix) is what makes the second one, and it never has to be pulled back out of the first:
 
 ::: lang js
 
@@ -509,6 +477,6 @@ for detail in rand_nickname(language="en", count=100, output="detail"):
 
 ## See also
 
-- [`randSuffix`](../affix/rand-suffix) — the random token, for when a nickname has to be collision-free.
+- [`randSuffix`](../decorate/rand-suffix) — the random token, for when a nickname has to be collision-free.
 - [Themes](../word/themes) — the fourteen slices of vocabulary a nickname is built from.
 - [`nicknameLengthRange`](./nickname-length-range) — every length a language can produce.

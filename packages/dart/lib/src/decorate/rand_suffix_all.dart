@@ -1,5 +1,5 @@
-import 'package:randino/src/affix/attach.dart';
-import 'package:randino/src/affix/data/index.dart';
+import 'package:randino/src/decorate/attach.dart';
+import 'package:randino/src/decorate/data/index.dart';
 
 /// [randSuffix] over a list — a fresh token for each entry rather than one for
 /// the batch, which is what a generator's output is usually passed here for.

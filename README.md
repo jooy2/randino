@@ -15,6 +15,7 @@ Every option, every language and every example — pick **JavaScript**, **Dart**
 - **Person names** read like names people actually carry — 김민준, Emma Clover, Иванов Иван — and come with their English pronunciation. 9 languages.
 - **Nicknames** are the handles you would pick for a game or a website — 멋진사자, MistyOwl, 고양이꼬리. Built from everyday words across fourteen themes, never from person names, with over nine million combinations in Korean and English before a random suffix is added.
 - **Words** are those fourteen themes on their own — `randWord`, and a function per theme: `randAnimal`, `randFood`, `randGem` and eleven more.
+- **Decorators** attach something to a string you already have rather than generating one: a random token with `randSuffix` and `randPrefix`, a modifier with `randModifier`.
 - One options set per generator: language, length, count, and a style setting that runs from realistic to fully invented.
 - **No runtime dependencies**, in any of the packages.
 
@@ -125,7 +126,7 @@ Every generator takes a language, or mixes every language it supports when you l
 | Person names   | `randName`                   | `rand_name`                  | 김민준 → Kim Minjun |
 | Nicknames      | `randNickname`               | `rand_nickname`              | 멋진사자, MistyOwl  |
 | Words          | `randWord`, `randAnimal`, …  | `rand_word`, `rand_animal`, … | 여우, Lantern       |
-| Random affixes | `randSuffix`, `randPrefix`   | `rand_suffix`, `rand_prefix` | 멋진사자_nVtRC      |
+| Decorators     | `randSuffix`, `randPrefix`, `randModifier` | `rand_suffix`, `rand_prefix`, `rand_modifier` | 멋진사자_nVtRC, 멋진사자 |
 
 Each generator returns strings by default, or one detail object per result with <code>output: 'detail'</code> — both scripts of a name, or the words a nickname was built from. The Dart package spells that as a second function (`randNameDetails`), because Dart has no way to make one function's return type depend on an argument.
 

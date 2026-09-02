@@ -13,8 +13,9 @@
  * because the two generators are two things, but a reader looking for the
  * function they are about to call does not care which folder it lives in. The
  * split here is by what a function *is*, one level down inside **API**:
- * **Generators** hand back names, nicknames and words, **Utilities** decorate a
- * string or answer a question about a language. The folder a page sits in
+ * **Generators** hand back names, nicknames and words out of nothing,
+ * **Decorators** attach something to a string you already have, and
+ * **Utilities** answer a question about a language. The folder a page sits in
  * decides nothing but its URL.
  *
  * **Behaviour** holds the prose explaining how each generator's options behave.
@@ -72,12 +73,20 @@ export const SIDEBAR: SidebarGroup[] = [
 				]
 			},
 			{
+				id: 'decorators',
+				en: 'Decorators',
+				ko: '장식 함수',
+				items: [
+					{ path: 'decorate/rand-suffix', en: 'randSuffix', ko: 'randSuffix' },
+					{ path: 'decorate/rand-prefix', en: 'randPrefix', ko: 'randPrefix' },
+					{ path: 'decorate/rand-modifier', en: 'randModifier', ko: 'randModifier' }
+				]
+			},
+			{
 				id: 'utilities',
 				en: 'Utilities',
 				ko: '유틸리티',
 				items: [
-					{ path: 'affix/rand-suffix', en: 'randSuffix', ko: 'randSuffix' },
-					{ path: 'affix/rand-prefix', en: 'randPrefix', ko: 'randPrefix' },
 					{ path: 'name/name-length-range', en: 'nameLengthRange', ko: 'nameLengthRange' },
 					{
 						path: 'name/name-supports-middle-name',

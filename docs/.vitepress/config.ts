@@ -85,7 +85,10 @@ const packageLinks = [
 const navFor = (lang: string, labels: { demo: string; guide: string; packages: string }) => [
 	{ text: labels.guide, link: `${localeBase(lang, defaultLocale)}guide/getting-started` },
 	{ text: labels.demo, link: `${localeBase(lang, defaultLocale)}demo` },
-	{ text: 'API', items: navGroupsFor(['generators', 'utilities'], lang, defaultLocale) },
+	{
+		text: 'API',
+		items: navGroupsFor(['generators', 'decorators', 'utilities'], lang, defaultLocale)
+	},
 	{
 		text: labels.packages,
 		items: [{ component: 'PackageLinks', props: { links: packageLinks } }]

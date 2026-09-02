@@ -10,7 +10,7 @@ void main() {
   _names();
   _words();
   _nicknames();
-  _affixes();
+  _decorators();
   _questionsAboutALanguage();
 }
 
@@ -80,12 +80,22 @@ void _nicknames() {
   // 오래된발견 <- [오래된, 발견] (concept)
 }
 
-/// Random tokens, attached to whatever you already have.
-void _affixes() {
-  print('-- affixes ----------------------------------------------------');
+/// The decorators, attached to whatever you already have.
+void _decorators() {
+  print('-- decorators -------------------------------------------------');
 
-  print(randSuffix('멋진사자')); // 멋진사자_nVtRC
-  print(randPrefix('order-4021', length: 4, separator: '-')); // k3Rm-order-4021
+  print(randSuffix(value: '멋진사자')); // 멋진사자_nVtRC
+  print(randPrefix(value: 'order-4021', length: 4, separator: '-')); // k3Rm-order-4021
+
+  // Every decorator works with no value at all, handing back what it would
+  // have attached.
+  print(randSuffix()); // nVtRC
+  print(randModifier()); // 멋진
+
+  // A word instead of a token. This is what `includeModifier` used to be.
+  print(randModifier(value: '사자')); // 멋진사자
+  print(randModifierAll(randAnimal(language: WordLanguage.ko, count: 3)));
+  // [오래된곰, 영원한도마뱀, 파란수달]
 
   // A fresh token per entry, which is what makes a batch of nicknames
   // collision-free rather than merely unlikely to collide.

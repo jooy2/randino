@@ -213,3 +213,4 @@ rand_word(language="ko", theme="plant", output="detail")
 - [Themes](./themes) — the fourteen of them, and the function each one has.
 - [`wordLengthRange`](./word-length-range) — what a language's pools can produce.
 - [`randNickname`](../nickname/rand-nickname) — the same words, put together.
+- [`randModifier`](../decorate/rand-modifier) — a modifier in front of a word you already have.

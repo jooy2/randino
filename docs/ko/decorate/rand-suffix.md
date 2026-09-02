@@ -16,7 +16,7 @@ randSuffix(randNickname({ language: 'ko', count: 2 }));
 
 | 옵션 | 타입 | 기본값 | 설명 |
 | --- | --- | --- | --- |
-| `value` | `string \| string[]` | — | 뒤에 붙일 대상. 옵션이 아니라 첫 번째 인자 |
+| `value` | `string \| string[]` | — | 뒤에 붙일 대상. 옵션이 아니라 첫 번째 인자. 생략하면 토큰만 |
 | `length` | `number` | `5` | 토큰의 글자 수. `1` … `32`로 제한 |
 | `separator` | `string` | `'_'` | 값과 토큰 사이에 들어감. 빈 문자열이면 바로 이어 붙음 |
 | `charset` | `string` | _내장_ | 토큰을 뽑아 쓸 문자들 |
@@ -30,8 +30,8 @@ randSuffix(randNickname({ language: 'ko', count: 2 }));
 ```dart
 import 'package:randino/randino.dart';
 
-randSuffix('멋진사자'); // '멋진사자_nVtRC'
-randSuffix('MistyOwl', length: 8, separator: '-'); // 'MistyOwl-k3Rm9dQx'
+randSuffix(value: '멋진사자'); // '멋진사자_nVtRC'
+randSuffix(value: 'MistyOwl', length: 8, separator: '-'); // 'MistyOwl-k3Rm9dQx'
 
 randSuffixAll(randNickname(language: WordLanguage.ko, count: 2));
 // ['달력_U7aNZ', '조용한바구니_RUKAP']
@@ -39,12 +39,12 @@ randSuffixAll(randNickname(language: WordLanguage.ko, count: 2));
 
 | 파라미터    | 타입      | 기본값 | 설명                              |
 | ----------- | --------- | ------ | --------------------------------- |
-| `value`     | `String`  | —      | 뒤에 붙일 대상. 위치 인자         |
+| `value`     | `String?` | `null` | 뒤에 붙일 대상. 생략하면 토큰만   |
 | `length`    | `int`     | `5`    | 토큰의 글자 수. `1` … `32`로 제한 |
 | `separator` | `String`  | `'_'`  | 값과 토큰 사이에 들어감           |
 | `charset`   | `String?` | `null` | 토큰을 뽑아 쓸 문자들             |
 
-`String`을 반환합니다. **리스트 형태는 `randSuffixAll`입니다.** `List<String>`을 받아 `List<String>`을 돌려주며, 이름 있는 파라미터는 동일합니다. Dart에는 오버로드도 유니온 타입도 없기 때문에, 하나가 두 형태를 받는 대신 두 함수로 나뉘어 있습니다.
+`String`을 반환합니다. `value`를 포함해 모든 파라미터가 이름 있는 파라미터입니다. Dart는 선택적 위치 파라미터와 이름 있는 파라미터를 함께 쓸 수 없고, 값을 선택 사항으로 만드는 쪽이 짧은 호출보다 가치가 있었습니다. **리스트 형태는 `randSuffixAll`입니다.** `List<String>`을 받아 `List<String>`을 돌려주며, 이름 있는 파라미터는 동일합니다. Dart에는 오버로드도 유니온 타입도 없기 때문에, 하나가 두 형태를 받는 대신 두 함수로 나뉘어 있습니다.
 
 :::
 
@@ -60,16 +60,51 @@ rand_suffix(rand_nickname(language="ko", count=2))
 # ['달력_U7aNZ', '조용한바구니_RUKAP']
 ```
 
-| 인자        | 타입               | 기본값 | 설명                                                |
-| ----------- | ------------------ | ------ | --------------------------------------------------- |
-| `value`     | `str \| list[str]` | —      | 뒤에 붙일 대상. 위치 인자이며, 나머지는 키워드 전용 |
-| `length`    | `int`              | `5`    | 토큰의 글자 수. `1` … `32`로 제한                   |
-| `separator` | `str`              | `"_"`  | 값과 토큰 사이에 들어감                             |
-| `charset`   | `str`              | `""`   | 토큰을 뽑아 쓸 문자들. 비어 있으면 기본값           |
+| 인자 | 타입 | 기본값 | 설명 |
+| --- | --- | --- | --- |
+| `value` | `str \| list[str] \| None` | `None` | 뒤에 붙일 대상. 위치 인자이며 나머지는 키워드 전용. 생략하면 토큰만 |
+| `length` | `int` | `5` | 토큰의 글자 수. `1` … `32`로 제한 |
+| `separator` | `str` | `"_"` | 값과 토큰 사이에 들어감 |
+| `charset` | `str` | `""` | 토큰을 뽑아 쓸 문자들. 비어 있으면 기본값 |
 
 `str`에는 `str`을, `list[str]`에는 `list[str]`을 반환합니다. `@overload`가 이 대응을 그대로 전달하므로 타입 검사기도 어느 쪽인지 압니다.
 
 :::
+
+## 토큰만 얻기 {#the-token-on-its-own}
+
+장식 함수가 붙이는 것은 붙일 대상이 없어도 그 자체로 쓸모가 있으므로, 값은 선택 사항입니다. 값을 주지 않으면 `randSuffix`는 토큰만 돌려줍니다. 구분자는 붙지 않습니다. 사이에 둘 것이 없기 때문입니다.
+
+::: lang js
+
+```javascript
+randSuffix(); // 'nVtRC'
+randSuffix({ length: 8 }); // 'k3Rm9dQx'
+```
+
+첫 번째 인자는 값 또는 옵션이며, 문자열이 옵션 객체가 될 일은 없으므로 두 형태 모두 모호하지 않게 읽힙니다.
+
+:::
+
+::: lang dart
+
+```dart
+randSuffix(); // 'nVtRC'
+randSuffix(length: 8); // 'k3Rm9dQx'
+```
+
+:::
+
+::: lang py
+
+```python
+rand_suffix()  # 'nVtRC'
+rand_suffix(length=8)  # 'k3Rm9dQx'
+```
+
+:::
+
+빈 문자열은 값이고, 값을 주지 않은 것은 값이 아닙니다. <Lang js="randSuffix('')" dart="randSuffix(value: '')" py="rand_suffix(&quot;&quot;)" code />는 구분자까지 포함해 `'_nVtRC'`를 돌려줍니다.
 
 ## 값마다 새로 뽑은 토큰 {#a-fresh-token-for-every-value}
 
@@ -118,8 +153,8 @@ randSuffix('MistyOwl', { charset: AFFIX_CHARSET.replace(/[A-Z]/g, '') }); // 'Mi
 ::: lang dart
 
 ```dart
-randSuffix('MistyOwl', charset: '0123456789'); // 'MistyOwl_40218'
-randSuffix('MistyOwl', charset: affixCharset.replaceAll(RegExp('[A-Z]'), '')); // 'MistyOwl_kq3mv'
+randSuffix(value: 'MistyOwl', charset: '0123456789'); // 'MistyOwl_40218'
+randSuffix(value: 'MistyOwl', charset: affixCharset.replaceAll(RegExp('[A-Z]'), '')); // 'MistyOwl_kq3mv'
 ```
 
 :::
@@ -141,5 +176,6 @@ rand_suffix("MistyOwl", charset="".join(c for c in AFFIX_CHARSET if not c.isuppe
 ## 함께 보기
 
 - [`randPrefix`](./rand-prefix) — 같은 토큰을 뒤가 아니라 앞에.
+- [`randModifier`](./rand-modifier) — 토큰이 아니라 단어를 붙이는 세 번째 장식 함수.
 - [`randNickname`](../nickname/rand-nickname) — 이 함수가 가장 자주 붙는 대상.
 - [상수](../reference/constants) — 기본 문자 집합과 길이 상한.

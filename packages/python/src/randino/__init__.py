@@ -27,15 +27,16 @@ from randino._types import (
     WordTheme,
     WordThemeOption,
 )
-from randino.affix import (
+from randino.constants import RAND_COUNT_MAX, RAND_LENGTH_MAX, RAND_LENGTH_MIN
+from randino.decorate import (
     AFFIX_CHARSET,
     AFFIX_LENGTH_DEFAULT,
     AFFIX_LENGTH_MAX,
     AFFIX_SEPARATOR_DEFAULT,
+    rand_modifier,
     rand_prefix,
     rand_suffix,
 )
-from randino.constants import RAND_COUNT_MAX, RAND_LENGTH_MAX, RAND_LENGTH_MIN
 from randino.name import (
     NAME_LANGUAGES,
     name_length_range,
@@ -97,6 +98,7 @@ __all__ = [
     "rand_food",
     "rand_gem",
     "rand_job",
+    "rand_modifier",
     "rand_music",
     "rand_myth",
     "rand_name",

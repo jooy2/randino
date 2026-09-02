@@ -45,6 +45,7 @@ def test_the_package_exports_exactly_its_public_api() -> None:
         "rand_food",
         "rand_gem",
         "rand_job",
+        "rand_modifier",
         "rand_music",
         "rand_myth",
         "rand_name",
@@ -95,6 +96,12 @@ def test_the_functions_are_callable_and_the_constants_are_what_they_claim() -> N
 
     assert callable(randino.rand_suffix)
     assert callable(randino.rand_prefix)
+    assert callable(randino.rand_modifier)
+    # The decorators work with nothing to decorate, which is what makes what they
+    # attach available on its own.
+    assert isinstance(randino.rand_suffix(), str)
+    assert isinstance(randino.rand_prefix(), str)
+    assert isinstance(randino.rand_modifier(), str)
     assert randino.AFFIX_LENGTH_DEFAULT == 5
     assert randino.AFFIX_LENGTH_MAX == 32
     assert randino.AFFIX_SEPARATOR_DEFAULT == "_"

@@ -1,5 +1,5 @@
-import 'package:randino/src/affix/attach.dart';
-import 'package:randino/src/affix/data/index.dart';
+import 'package:randino/src/decorate/attach.dart';
+import 'package:randino/src/decorate/data/index.dart';
 
 /// [randPrefix] over a list — a fresh token for each entry, not one for the
 /// batch. See [randSuffixAll] for why the list form is its own function.

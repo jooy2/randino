@@ -127,23 +127,6 @@ def test_every_nickname_is_a_word_with_something_added_to_it() -> None:
     assert any(len(detail.words) == 3 for detail in details)
 
 
-def test_include_modifier_false_leaves_the_word_undecorated() -> None:
-    for language in WORD_LANGUAGES:
-        parts = WORD_DATA[language].parts or ()
-
-        for detail in rand_nickname(
-            output="detail", language=language, count=SAMPLE, include_modifier=False
-        ):
-            # A noun, and at most one trailing word behind it. Note that a few words
-            # serve as both modifier and noun (무지개, Marble), so the check has to be
-            # structural rather than "is not a modifier".
-            assert len(detail.words) <= 2, detail.nickname
-            assert detail.words[0] in nouns_of(language), detail.nickname
-
-            if len(detail.words) == 2:
-                assert detail.words[1] in parts, detail.nickname
-
-
 def test_theme_decides_what_the_nickname_is_about() -> None:
     for theme in WORD_THEMES:
         for language in WORD_LANGUAGES:
@@ -197,8 +180,7 @@ def test_nicknames_stay_inside_the_requested_length_range() -> None:
 def test_omitted_length_bounds_fall_back_to_what_the_language_can_produce() -> None:
     assert nickname_length_range("zh") == (2, 5)
     assert nickname_length_range("ko") == (1, 12)
-    # Without a modifier the upper end drops to a noun plus a trailing word.
-    assert nickname_length_range("ko", False) == (1, 8)
+    assert nickname_length_range("en") == (3, 30)
 
     for language in WORD_LANGUAGES:
         low, high = nickname_length_range(language)
@@ -229,8 +211,8 @@ def test_word_separator_goes_between_the_words() -> None:
         assert detail.nickname == "".join(detail.words), detail.nickname
 
     # The separator is part of the nickname, so it counts toward the length.
-    assert nickname_length_range("ko", True, "-") == (1, 14)
-    assert nickname_length_range("en", True, " ") == (3, 32)
+    assert nickname_length_range("ko", "-") == (1, 14)
+    assert nickname_length_range("en", " ") == (3, 32)
 
     separated: list[tuple[WordLanguage, str, int, int]] = [
         ("ko", " ", 5, 8),
@@ -293,11 +275,9 @@ def test_unique_never_repeats_a_nickname() -> None:
     nicknames = rand_nickname(language="ko", count=2000, unique=True)
     assert len(set(nicknames)) == len(nicknames)
 
-    # A single word plus one theme is a small pool, so the request runs out of
-    # combinations and returns fewer instead of looping.
-    limited = rand_nickname(
-        language="zh", theme="animal", include_modifier=False, count=400, unique=True
-    )
+    # One theme in one language, held to two characters, is a small enough pool that
+    # the request runs out of combinations and returns fewer instead of looping.
+    limited = rand_nickname(language="zh", theme="animal", max_length=2, count=400, unique=True)
 
     assert len(set(limited)) == len(limited)
     assert len(limited) < 400, f"expected the pool to run out: {len(limited)}"

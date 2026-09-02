@@ -14,6 +14,8 @@ Every option and every example, with **Python** picked in the sidebar. This READ
 
 - **Person names** read like names people actually carry — 김민준, Emma Clover, Иванов Иван — and come with their English pronunciation. 9 languages.
 - **Nicknames** are the handles you would pick for a game or a website — 멋진사자, MistyOwl, 고양이꼬리. Built from everyday words across fourteen themes, never from person names.
+- **Words** are those fourteen themes on their own — `rand_word`, plus `rand_animal`, `rand_food` and twelve more.
+- **Decorators** attach something to a string you already have: `rand_suffix`, `rand_prefix` and `rand_modifier`.
 - Every argument is keyword-only and optional, so `rand_name()` on its own works.
 - **Pure Python, no dependencies.** It imports nothing outside the standard library, and ships a `py.typed` marker so mypy and Pyright read the annotations.
 
@@ -89,7 +91,6 @@ rand_nickname(language="ko", output="detail")[0]
 | `count`                     | `int`                             | `1`        |
 | `style`                     | `int` (0 real … 100 invented)     | `0`        |
 | `min_length` / `max_length` | `int \| None`                     | _language_ |
-| `include_modifier`          | `bool`                            | `True`     |
 | `word_separator`            | `str \| None`                     | _language_ |
 | `starts_with`               | `str`                             | `""`       |
 | `unique`                    | `bool`                            | `False`    |
@@ -131,9 +132,9 @@ word_length_range("ko")  # (1, 4)
 
 One function per theme: `rand_animal`, `rand_object`, `rand_nature`, `rand_plant`, `rand_gem`, `rand_concept`, `rand_myth`, `rand_job`, `rand_music`, `rand_place`, `rand_food`, `rand_sport`, `rand_vehicle`, `rand_product`. Each is `rand_word` with the theme already chosen.
 
-## Prefixes and suffixes
+## Decorators
 
-`rand_suffix` and `rand_prefix` attach a random token to a string, or to every string in a list — which is what turns a nickname that is merely unlikely to collide into one that cannot. They take anything, not just this library's output, which is why they are not an argument on the generators.
+`rand_suffix`, `rand_prefix` and `rand_modifier` attach something to a string you already have, rather than generating one. They take anything, not just this library's output, which is why none of them is an argument on a generator — and each of them works with no value at all, handing back the thing it would have attached.
 
 ```python
 from randino import rand_nickname, rand_prefix, rand_suffix
@@ -144,6 +145,7 @@ rand_suffix(rand_nickname(language="ko", count=2))
 
 rand_prefix("order-4021", length=4, separator="-")  # 'k3Rm-order-4021'
 rand_suffix("MistyOwl", length=8, charset="0123456789")  # 'MistyOwl_40218836'
+rand_suffix()  # 'nVtRC' — the token on its own
 ```
 
 | Argument    | Type  | Default    |
@@ -152,7 +154,29 @@ rand_suffix("MistyOwl", length=8, charset="0123456789")  # 'MistyOwl_40218836'
 | `separator` | `str` | `"_"`      |
 | `charset`   | `str` | _built-in_ |
 
-A fresh token per value, never one for the batch. The default charset leaves out `0O1lI`, because these end up in names people read aloud and type back in. `value` is positional, the rest keyword-only, and the overloads carry the shape through: a `str` in gives a `str`, a `list[str]` gives a `list[str]`.
+A fresh token per value, never one for the batch. The default charset leaves out `0O1lI`, because these end up in names people read aloud and type back in. `value` is positional and optional, the rest keyword-only, and the overloads carry the shape through: a `str` in gives a `str`, a `list[str]` gives a `list[str]`.
+
+`rand_modifier` attaches a word instead of a token — what `rand_nickname`'s `include_modifier` used to do, for any string:
+
+```python
+from randino import rand_animal, rand_modifier
+
+rand_modifier("사자")  # '멋진사자'
+rand_modifier("Owl", separator=" ")  # 'Misty Owl'
+rand_modifier()  # '멋진'
+
+rand_modifier(rand_animal(language="ko", count=2))
+# ['오래된곰', '영원한도마뱀']
+```
+
+| Argument    | Type                         | Default    |
+| ----------- | ---------------------------- | ---------- |
+| `value`     | `str \| list[str] \| None`   | `None`     |
+| `language`  | `WordLanguageOption \| None` | _script_   |
+| `style`     | `int`                        | `0`        |
+| `separator` | `str \| None`                | _language_ |
+
+With no `language`, the script of the value picks one, so `"고양이"` is never handed an English modifier.
 
 ## Helpers and constants
 

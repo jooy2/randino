@@ -4,5 +4,6 @@ export {
 	AFFIX_LENGTH_MAX,
 	AFFIX_SEPARATOR_DEFAULT
 } from './data/index.js';
+export { randModifier } from './randModifier.js';
 export { randPrefix } from './randPrefix.js';
 export { randSuffix } from './randSuffix.js';

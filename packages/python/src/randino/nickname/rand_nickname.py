@@ -20,7 +20,6 @@ def rand_nickname(
     style: int = ...,
     min_length: int | None = ...,
     max_length: int | None = ...,
-    include_modifier: bool = ...,
     word_separator: str | None = ...,
     starts_with: str = ...,
     unique: bool = ...,
@@ -37,7 +36,6 @@ def rand_nickname(
     style: int = ...,
     min_length: int | None = ...,
     max_length: int | None = ...,
-    include_modifier: bool = ...,
     word_separator: str | None = ...,
     starts_with: str = ...,
     unique: bool = ...,
@@ -53,7 +51,6 @@ def rand_nickname(
     style: int = 0,
     min_length: int | None = None,
     max_length: int | None = None,
-    include_modifier: bool = True,
     word_separator: str | None = None,
     starts_with: str = "",
     unique: bool = False,
@@ -74,8 +71,6 @@ def rand_nickname(
         min_length: Minimum length in characters. Defaults to the language's own
             range.
         max_length: Maximum length in characters.
-        include_modifier: Decorate the noun with a modifier (`멋진사자` rather than
-            `사자`).
         word_separator: Placed between the words a nickname is built from
             (`"멋진 사자"`, `"misty-owl"`), and counted toward `min_length` /
             `max_length`. Defaults to the way the language itself joins them, which
@@ -109,7 +104,6 @@ def rand_nickname(
         style=style,
         min_length=min_length,
         max_length=max_length,
-        include_modifier=include_modifier,
         word_separator=word_separator,
         starts_with=starts_with,
         unique=unique,

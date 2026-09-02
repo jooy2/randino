@@ -15,6 +15,7 @@ Every option and every example, with **JavaScript** picked in the sidebar. This 
 - **Person names** read like names people actually carry — 김민준, Emma Clover, Иванов Иван — and come with their English pronunciation. 9 languages.
 - **Nicknames** are the handles you would pick for a game or a website — 멋진사자, MistyOwl, 고양이꼬리. Built from everyday words across fourteen themes, never from person names.
 - **Words** are those themes on their own — `randWord`, plus `randAnimal`, `randFood` and twelve more.
+- **Decorators** attach something to a string you already have: `randSuffix`, `randPrefix` and `randModifier`.
 - One options object per generator, every option optional: `randName()` on its own works.
 - **No runtime dependencies.** ESM, typed, and it runs in Node and in the browser alike.
 
@@ -96,7 +97,6 @@ randNickname({ language: 'ko', output: 'detail' });
 | `count`                   | `number`                         | `1`        |
 | `style`                   | `number` (0 real … 100 invented) | `0`        |
 | `minLength` / `maxLength` | `number`                         | _language_ |
-| `includeModifier`         | `boolean`                        | `true`     |
 | `wordSeparator`           | `string`                         | _language_ |
 | `startsWith`              | `string`                         | —          |
 | `unique`                  | `boolean`                        | `false`    |
@@ -136,9 +136,9 @@ wordLengthRange('ko'); // [1, 4]
 
 One function per theme: `randAnimal`, `randObject`, `randNature`, `randPlant`, `randGem`, `randConcept`, `randMyth`, `randJob`, `randMusic`, `randPlace`, `randFood`, `randSport`, `randVehicle`, `randProduct`. Each is `randWord` with the theme already chosen.
 
-## Prefixes and suffixes
+## Decorators
 
-`randSuffix` and `randPrefix` attach a random token to a string, or to every string in an array — which is what turns a nickname that is merely unlikely to collide into one that cannot. They take anything, not just this library's output, which is why they are not an option on the generators.
+`randSuffix`, `randPrefix` and `randModifier` attach something to a string you already have, rather than generating one. They take anything, not just this library's output, which is why none of them is an option on a generator — and each of them works with no value at all, handing back the thing it would have attached.
 
 ```javascript
 import { randNickname, randPrefix, randSuffix } from 'randino';
@@ -149,6 +149,7 @@ randSuffix(randNickname({ language: 'ko', count: 2 }));
 
 randPrefix('order-4021', { length: 4, separator: '-' }); // 'k3Rm-order-4021'
 randSuffix('MistyOwl', { length: 8, charset: '0123456789' }); // 'MistyOwl_40218836'
+randSuffix(); // 'nVtRC' — the token on its own
 ```
 
 | Option      | Type     | Default    |
@@ -158,6 +159,27 @@ randSuffix('MistyOwl', { length: 8, charset: '0123456789' }); // 'MistyOwl_40218
 | `charset`   | `string` | _built-in_ |
 
 A fresh token per value, never one for the batch. The default charset leaves out `0O1lI`, because these end up in names people read aloud and type back in.
+
+`randModifier` attaches a word instead of a token — what `randNickname`'s `includeModifier` used to do, for any string:
+
+```javascript
+import { randAnimal, randModifier } from 'randino';
+
+randModifier('사자'); // '멋진사자'
+randModifier('Owl', { separator: ' ' }); // 'Misty Owl'
+randModifier(); // '멋진'
+
+randModifier(randAnimal({ language: 'ko', count: 2 }));
+// ['오래된곰', '영원한도마뱀']
+```
+
+| Option      | Type                 | Default    |
+| ----------- | -------------------- | ---------- |
+| `language`  | `WordLanguageOption` | _script_   |
+| `style`     | `number`             | `0`        |
+| `separator` | `string`             | _language_ |
+
+With no `language`, the script of the value picks one, so `'고양이'` is never handed an English modifier.
 
 ## Helpers and constants
 

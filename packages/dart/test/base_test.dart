@@ -63,6 +63,8 @@ void main() {
           'randFood',
           'randGem',
           'randJob',
+          'randModifier',
+          'randModifierAll',
           'randMusic',
           'randMyth',
           'randNature',
@@ -97,8 +99,15 @@ void main() {
       expect(randNicknameDetails()[0], isA<NicknameDetail>());
       expect(nicknameLengthRange(), isA<LengthRange>());
 
-      expect(randSuffix('a'), startsWith('a_'));
-      expect(randPrefix('a'), endsWith('_a'));
+      expect(randSuffix(value: 'a'), startsWith('a_'));
+      expect(randPrefix(value: 'a'), endsWith('_a'));
+      // The decorators work with nothing to decorate, which is what makes what
+      // they attach available on its own.
+      expect(randSuffix(), hasLength(affixLengthDefault));
+      expect(randPrefix(), hasLength(affixLengthDefault));
+      expect(randModifier(), isNotEmpty);
+      expect(randModifier(value: '사자'), endsWith('사자'));
+      expect(randModifierAll(const ['사자', '여우']), hasLength(2));
       expect(randSuffixAll(const ['a', 'b']), hasLength(2));
       expect(randPrefixAll(const ['a', 'b']), hasLength(2));
 

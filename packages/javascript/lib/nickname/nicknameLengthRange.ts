@@ -14,13 +14,11 @@ import { naturalRange } from './nicknameGenerator.js';
  *
  * @example
  * nicknameLengthRange('ko'); // [1, 12]
- * nicknameLengthRange('ko', false); // [1, 8]
  * nicknameLengthRange('en'); // [3, 30]
- * nicknameLengthRange('ko', true, '-'); // [1, 14]
+ * nicknameLengthRange('ko', '-'); // [1, 14]
  */
 export function nicknameLengthRange(
 	language: WordLanguageOption = 'all',
-	includeModifier = true,
 	wordSeparator?: string
 ): [number, number] {
 	const languages = language === 'all' ? WORD_LANGUAGES : [language];
@@ -28,7 +26,7 @@ export function nicknameLengthRange(
 	let max = 0;
 
 	for (const code of languages) {
-		const [low, high] = naturalRange(code, includeModifier, wordSeparator);
+		const [low, high] = naturalRange(code, wordSeparator);
 
 		min = Math.min(min, low);
 		max = Math.max(max, high);

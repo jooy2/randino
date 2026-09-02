@@ -1,4 +1,4 @@
-export * from './affix/index.js';
+export * from './decorate/index.js';
 export * from './constants.js';
 export * from './name/index.js';
 export * from './nickname/index.js';
