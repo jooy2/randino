@@ -78,30 +78,24 @@ rand_nickname(language="en", count=2)
 rand_nickname(language="ko", theme="animal", count=2)
 # ['깊은연어', '하얀여우갈기']
 
-rand_nickname(base_word="고양이", count=3)
-# ['하얀고양이', '고양이바람', '귀여운고양이뿔']
-
 rand_nickname(language="ko", output="detail")[0]
 # NicknameDetail(nickname='오래된발견', words=('오래된', '발견'), language='ko', theme='concept')
 ```
 
 | Argument                    | Type                              | Default    |
 | --------------------------- | --------------------------------- | ---------- |
-| `language`                  | `NicknameLanguageOption \| None`  | `None`     |
+| `language`                  | `NicknameLanguageOption`          | `"all"`    |
 | `theme`                     | `NicknameThemeOption`             | `"all"`    |
 | `count`                     | `int`                             | `1`        |
 | `style`                     | `int` (0 real … 100 invented)     | `0`        |
 | `min_length` / `max_length` | `int \| None`                     | _language_ |
 | `include_modifier`          | `bool`                            | `True`     |
 | `word_separator`            | `str \| None`                     | _language_ |
-| `base_word`                 | `str`                             | `""`       |
 | `starts_with`               | `str`                             | `""`       |
 | `unique`                    | `bool`                            | `False`    |
 | `output`                    | `RandOutput`                      | `"value"`  |
 
 `output="detail"` returns a `NicknameDetail` — `nickname`, `words`, `language` and `theme` — for each nickname instead of a string.
-
-`language` is the one argument whose default is `None` rather than `"all"`, and the two are not the same thing: left out, a `base_word` picks the language it is written in, so `"고양이"` is never handed an English modifier. Passing `"all"` mixes every language regardless.
 
 Themes: `animal`, `object`, `nature`, `plant`, `gem`, `concept`, `myth`, `job`, `music`, `place`, `food`, `sport`, `vehicle`, `product`.
 

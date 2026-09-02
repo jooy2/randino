@@ -14,7 +14,7 @@ from randino.nickname._generator import generate_nickname_details
 @overload
 def rand_nickname(
     *,
-    language: NicknameLanguageOption | None = ...,
+    language: NicknameLanguageOption = ...,
     theme: NicknameThemeOption = ...,
     count: int = ...,
     style: int = ...,
@@ -22,7 +22,6 @@ def rand_nickname(
     max_length: int | None = ...,
     include_modifier: bool = ...,
     word_separator: str | None = ...,
-    base_word: str = ...,
     starts_with: str = ...,
     unique: bool = ...,
     output: Literal["value"] = ...,
@@ -32,7 +31,7 @@ def rand_nickname(
 @overload
 def rand_nickname(
     *,
-    language: NicknameLanguageOption | None = ...,
+    language: NicknameLanguageOption = ...,
     theme: NicknameThemeOption = ...,
     count: int = ...,
     style: int = ...,
@@ -40,7 +39,6 @@ def rand_nickname(
     max_length: int | None = ...,
     include_modifier: bool = ...,
     word_separator: str | None = ...,
-    base_word: str = ...,
     starts_with: str = ...,
     unique: bool = ...,
     output: Literal["detail"],
@@ -49,7 +47,7 @@ def rand_nickname(
 
 def rand_nickname(
     *,
-    language: NicknameLanguageOption | None = None,
+    language: NicknameLanguageOption = "all",
     theme: NicknameThemeOption = "all",
     count: int = 1,
     style: int = 0,
@@ -57,7 +55,6 @@ def rand_nickname(
     max_length: int | None = None,
     include_modifier: bool = True,
     word_separator: str | None = None,
-    base_word: str = "",
     starts_with: str = "",
     unique: bool = False,
     output: RandOutput = "value",
@@ -70,10 +67,8 @@ def rand_nickname(
 
     Args:
         language: Language of the generated nicknames. `"all"` mixes every language.
-            Left out, it is `"all"` — or, when `base_word` is given, the language
-            that word is written in, so `"고양이"` is not handed an English modifier.
         theme: What the nickname should be about.
-        count: How many nicknames to return. Held inside `0`..`NICKNAME_COUNT_MAX`.
+        count: How many nicknames to return. Held inside `0`..`RAND_COUNT_MAX`.
         style: `0` builds nicknames out of real words, `100` invents words that only
             read like the language, and values in between mix the two.
         min_length: Minimum length in characters. Defaults to the language's own
@@ -85,9 +80,6 @@ def rand_nickname(
             (`"멋진 사자"`, `"misty-owl"`), and counted toward `min_length` /
             `max_length`. Defaults to the way the language itself joins them, which
             is to run them together (`멋진사자`, `MistyOwl`).
-        base_word: Build every nickname around this word instead of a random one,
-            adding only the decoration — `"고양이"` gives `멋진고양이`, `고양이꼬리`,
-            `파란고양이발바닥`.
         starts_with: Keep only nicknames whose first character is this one.
         unique: Never return the same nickname twice. May return fewer than `count`
             nicknames once the pools run out of combinations.
@@ -107,8 +99,6 @@ def rand_nickname(
         ['달리는표범_gDe2C', '조용한노을_nVtRC']
         >>> rand_nickname(language="ko", word_separator=" ", count=2)
         ['멋진 사자', '고양이 꼬리']
-        >>> rand_nickname(base_word="고양이", count=3)
-        ['멋진고양이', '고양이발바닥', '파란고양이꼬리']
         >>> rand_nickname(language="ko", output="detail")
         [NicknameDetail(nickname='멋진사자', words=('멋진', '사자'), language='ko', theme='animal')]
     """
@@ -121,7 +111,6 @@ def rand_nickname(
         max_length=max_length,
         include_modifier=include_modifier,
         word_separator=word_separator,
-        base_word=base_word,
         starts_with=starts_with,
         unique=unique,
     )

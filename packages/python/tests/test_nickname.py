@@ -160,7 +160,7 @@ def test_theme_decides_what_the_nickname_is_about() -> None:
 
 
 def test_a_word_belongs_to_exactly_one_theme() -> None:
-    # Two themes claiming one word make `theme` ambiguous for `base_word`, and make
+    # Two themes claiming one word make `theme` ambiguous, and make
     # `rand_nickname(output="detail")` report a theme the caller never asked about.
     for language in NICKNAME_LANGUAGES:
         owner: dict[str, NicknameTheme] = {}
@@ -249,39 +249,6 @@ def test_word_separator_goes_between_the_words() -> None:
             assert low <= len(nickname) <= high, (
                 f"{language} '{separator}' {low}-{high}: {nickname} ({len(nickname)})"
             )
-
-
-def test_base_word_keeps_the_word_and_varies_only_the_decoration() -> None:
-    details = rand_nickname(output="detail", base_word="고양이", count=100)
-
-    for detail in details:
-        assert "고양이" in detail.nickname, detail.nickname
-        assert "고양이" in detail.words, detail.nickname
-        # Something is always added, or the answer would be the input.
-        assert len(detail.words) > 1, detail.nickname
-        # The word decides the language when none was given.
-        assert detail.language == "ko"
-        # 고양이 is one of the generator's own animal words, so its theme is known.
-        assert detail.theme == "animal"
-        assert SCRIPT["ko"].fullmatch(detail.nickname), detail.nickname
-
-    assert len({detail.nickname for detail in details}) > 20
-
-    # A word the generator does not know belongs to no theme.
-    for detail in rand_nickname(output="detail", base_word="뿌꾸", count=20):
-        assert detail.theme is None
-        assert "뿌꾸" in detail.nickname, detail.nickname
-
-    # Each script picks the language that goes with it.
-    assert rand_nickname(output="detail", base_word="Cat")[0].language == "en"
-    assert rand_nickname(output="detail", base_word="ネコ")[0].language == "ja"
-    assert rand_nickname(output="detail", base_word="熊猫")[0].language == "zh"
-    # An explicit language wins over the guess.
-    assert rand_nickname(output="detail", base_word="고양이", language="en")[0].language == "en"
-
-    # A base word longer than the language's natural range is not truncated.
-    for nickname in rand_nickname(base_word="고양이발바닥무늬", count=20):
-        assert "고양이발바닥무늬" in nickname, nickname
 
 
 def test_starts_with_leads_every_nickname_with_the_requested_character() -> None:

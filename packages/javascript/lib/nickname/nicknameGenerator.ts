@@ -11,7 +11,6 @@
 //   modifier drops that pattern instead of truncating a word.
 // - `wordSeparator` decides what goes between the words, defaulting to the way
 //   the language joins them.
-// - `baseWord` pins the noun, so only the decoration varies.
 //
 // What used to be the fifth entry here, `uniqueSuffix`, is `randSuffix` now:
 // attaching a token to a string was never a thing about nicknames.
@@ -63,7 +62,6 @@ type Settings = {
 	minLength?: number;
 	maxLength?: number;
 	includeModifier: boolean;
-	baseWord: string;
 	prefix: string;
 	separator?: string;
 };
@@ -120,24 +118,15 @@ function usablePatterns(
 	data: NicknameLanguageData,
 	settings: Settings
 ): readonly { slots: readonly Slot[]; weight: number }[] {
-	const baseLeads =
-		!!settings.baseWord &&
-		settings.baseWord.toLowerCase().startsWith(settings.prefix.toLowerCase());
 	const usable = PATTERNS.filter(({ slots }) => {
 		if (!settings.includeModifier && slots.includes('modifier')) return false;
 		if (!data.parts && slots.includes('part')) return false;
-		// A given base word is the noun, so something has to be added to it —
-		// otherwise every nickname would come back as the word itself.
-		if (settings.baseWord && slots.length < 2) return false;
-		// The starting character has to land on a word the generator is free to
-		// choose, unless the given base word happens to start with it already.
-		if (settings.prefix && settings.baseWord && slots[0] === 'noun' && !baseLeads) return false;
 
 		return true;
 	});
 
-	// Options can rule out every shape — a base word with nothing allowed to
-	// decorate it, say. The word on its own is then the only answer.
+	// Options can rule out every shape — a language with no `parts` pool and no
+	// modifier allowed, say. The bare noun is then the only answer.
 	return usable.length ? usable : [{ slots: ['noun'], weight: 1 }];
 }
 
@@ -275,12 +264,6 @@ function pickSlotWord(
 	max: number,
 	prefix: string
 ): Chosen {
-	if (slot === 'noun' && settings.baseWord) {
-		const base = settings.baseWord;
-
-		return { word: data.capitalize ? capitalizeFirst(base) : base, missed: false };
-	}
-
 	const pool = slot === 'modifier' ? data.modifiers : slot === 'part' ? data.parts! : nouns;
 	const invent = chance(settings.style);
 	const word = invent ? null : pickWord(pool, min, max, prefix);
@@ -413,7 +396,6 @@ export function naturalRange(
 		theme: 'all',
 		style: 0,
 		includeModifier,
-		baseWord: '',
 		prefix: '',
 		separator
 	};
@@ -450,13 +432,7 @@ function generateOne(language: NicknameLanguage, settings: Settings): Built {
 		// One theme per nickname, so a mixed request spreads over all of them.
 		const theme = pick(themes);
 		const nouns = data.nouns[theme];
-		const cached = slotBounds(language, data, theme);
-		// A given base word takes the noun's place, so it also takes over its
-		// bounds — never write that into the cache.
-		const bounds: Bounds = settings.baseWord
-			? { ...cached, noun: [settings.baseWord.length, settings.baseWord.length] }
-			: cached;
-
+		const bounds = slotBounds(language, data, theme);
 		const [min, max] = boundsFor(data, bounds, patterns, settings);
 		// Prefer a shape that can actually land inside the range.
 		const fitting = patterns.filter(({ slots }) => {
@@ -470,8 +446,8 @@ function generateOne(language: NicknameLanguage, settings: Settings): Built {
 		const built: Built = {
 			words,
 			// Only a word the generator knows carries a theme. A drawn word came out
-			// of this theme; a given base word has to be looked up, and an invented
-			// one is found nowhere.
+			// of this theme; an invented one has to be looked up, because it can
+			// spell a real word by accident.
 			theme: nouns.includes(base) ? theme : themeOf(data, base)
 		};
 		const length = words.join(joiner).length;
@@ -497,41 +473,20 @@ function generateOne(language: NicknameLanguage, settings: Settings): Built {
 
 /** Resolve the caller's options into the settings a single nickname is built from. */
 function resolveSettings(options: RandNicknameOptions): Settings {
-	const baseWord = (options.baseWord ?? '').trim();
-
 	return {
 		theme: options.theme ?? 'all',
 		style: resolveStyle(options.style),
 		minLength: resolveLength(options.minLength),
 		maxLength: resolveLength(options.maxLength),
 		includeModifier: options.includeModifier ?? true,
-		baseWord,
 		prefix: resolvePrefix(options.startsWith),
 		separator: options.wordSeparator
 	};
 }
 
-const HANGUL = /[가-힣]/;
-const KANA = /[぀-ヿ]/;
-const HAN = /[一-鿿]/;
-
-/**
- * Language a given base word belongs to, so that `baseWord: '고양이'` is not
- * decorated with an English modifier. Only consulted when the caller left
- * `language` out.
- */
-function detectLanguage(word: string): NicknameLanguage {
-	if (HANGUL.test(word)) return 'ko';
-	if (KANA.test(word)) return 'ja';
-	if (HAN.test(word)) return 'zh';
-
-	return 'en';
-}
-
 export function generateNicknameDetails(options: RandNicknameOptions = {}): NicknameDetail[] {
 	const settings = resolveSettings(options);
-	const language =
-		options.language ?? (settings.baseWord ? detectLanguage(settings.baseWord) : 'all');
+	const language = options.language ?? 'all';
 
 	return collect(
 		options,

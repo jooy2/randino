@@ -72,7 +72,7 @@ def rand_name(
     Args:
         language: Language of the generated names. `"all"` mixes every language.
         gender: Pool the given name is drawn from. `"all"` picks one per name.
-        count: How many names to return. Held inside `0`..`NAME_COUNT_MAX`.
+        count: How many names to return. Held inside `0`..`RAND_COUNT_MAX`.
         style: `0` draws names people actually carry, `100` invents new ones, and
             values in between mix the two.
         min_length: Minimum length of the native form, in characters. Defaults to

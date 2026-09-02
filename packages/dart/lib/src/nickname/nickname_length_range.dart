@@ -9,9 +9,8 @@ import 'package:randino/src/types.dart';
 ///
 /// The lower end is a bare noun and the upper end a modifier, a noun and a
 /// trailing word together, so the range is wide on purpose — the shape of each
-/// nickname is picked inside it. A `baseWord` longer than this range widens it,
-/// and a [wordSeparator] widens it by what it adds between the words. A null
-/// [language] spans every language at once.
+/// nickname is picked inside it. A [wordSeparator] widens it by what it adds
+/// between the words, and a null [language] spans every language at once.
 ///
 /// ```dart
 /// nicknameLengthRange(language: NicknameLanguage.ko); // LengthRange(1, 12)

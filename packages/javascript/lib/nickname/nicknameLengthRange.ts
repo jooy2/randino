@@ -9,8 +9,8 @@ import { naturalRange } from './nicknameGenerator.js';
  * `randNickname` falls back to when `minLength` or `maxLength` is omitted. The
  * lower end is a bare noun and the upper end a modifier, a noun and a trailing
  * word together, so the range is wide on purpose — the shape of each nickname is
- * picked inside it. A `baseWord` longer than this range widens it, and a
- * `wordSeparator` widens it by what it adds between the words.
+ * picked inside it. A `wordSeparator` widens it by what it adds between the
+ * words.
  *
  * @example
  * nicknameLengthRange('ko'); // [1, 12]

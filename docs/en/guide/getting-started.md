@@ -204,7 +204,7 @@ A **null enum is what means "every one of them"**, which is to say: leave the pa
 randName(count: 5); // five names, each in one of the nine languages
 ```
 
-The one nullable that means something else is `NicknameDetail.theme`, where null says the word is not one the generator knows — an invented one, or a `baseWord` of your own.
+The one nullable that means something else is `NicknameDetail.theme`, where null says the word is not one the generator knows, which happens when it was invented.
 
 :::
 
@@ -230,8 +230,6 @@ rand_name(count=5)  # five names, each in one of the nine languages
 ```
 
 Names are `snake_case`: `includeMiddleName` is `include_middle_name`, `minLength` is `min_length`, `startsWith` is `starts_with`.
-
-`rand_nickname`'s `language` is the one argument whose default is `None` rather than `"all"`, and the two are not the same request. Left out, a `base_word` picks the language it is written in, so `"고양이"` is never handed an English modifier; passing `"all"` mixes every language regardless.
 
 :::
 

@@ -110,6 +110,6 @@ class NicknameDetail:
     theme: NicknameTheme | None
     """Theme the nickname's base word belongs to.
 
-    `None` when that word is not one the generator knows — an invented one, or a
-    `base_word` of your own.
+    `None` when that word is not one the generator knows, which happens when it
+    was invented.
     """

@@ -49,16 +49,9 @@ Every option is optional, and the defaults are what the empty call above uses.
 | <Lang js="maxLength" dart="maxLength" py="max_length" code /> | <Lang js="number" dart="int?" py="int &#124; None" code /> | _language_ | Maximum length in characters. |
 | <Lang js="includeModifier" dart="includeModifier" py="include_modifier" code /> | <Lang js="boolean" dart="bool" py="bool" code /> | <Lang js="true" dart="true" py="True" code /> | Decorate the word — `멋진사자` rather than `사자`. |
 | <Lang js="wordSeparator" dart="wordSeparator" py="word_separator" code /> | <Lang js="string" dart="String?" py="str &#124; None" code /> | _language_ | Placed between the words. Counts toward the length range. Defaults to running them together. |
-| <Lang js="baseWord" dart="baseWord" py="base_word" code /> | <Lang js="string" dart="String?" py="str" code /> | <Lang js="—" dart="null" py="&quot;&quot;" code /> | Build every nickname around this word, varying only the decoration. |
 | <Lang js="startsWith" dart="startsWith" py="starts_with" code /> | <Lang js="string" dart="String?" py="str" code /> | <Lang js="—" dart="null" py="&quot;&quot;" code /> | Keep only nicknames whose first character is this one. |
 | `unique` | <Lang js="boolean" dart="bool" py="bool" code /> | <Lang js="false" dart="false" py="False" code /> | Never return the same nickname twice. May return fewer than `count` once the pools run out of combinations. |
 | `output` | <Lang js="RandOutput" py="RandOutput" code /> | <Lang js="'value'" py="&quot;value&quot;" code /> | Strings, or a `NicknameDetail` per nickname. Dart has no such parameter — see [the detail output](#the-detail-output). |
-
-::: lang py
-
-`language` is the one option whose default is `None` rather than `"all"`, and the two are not the same request. Left out, a `base_word` picks the language it is written in, so `"고양이"` is never handed an English modifier; passing `"all"` mixes every language regardless of the base word.
-
-:::
 
 ## The detail output
 
@@ -120,7 +113,7 @@ Joining `words` with the language's own joiner reproduces `nickname` exactly —
 
 ### About `theme`
 
-The theme is **reported, not asserted**. A word drawn from a theme reports it; a <Lang js="baseWord" dart="baseWord" py="base_word" code /> of your own is looked up across every theme and reports the one that holds it; and an invented word is found nowhere and reports null.
+The theme is **reported, not asserted**. A word drawn from a theme reports it; an invented word is looked up across every theme, because it can spell a real one by accident, and reports null when it is found nowhere.
 
 Two coincidences follow from that and are worth expecting rather than treating as bugs. A word can be both a modifier and a noun — `무지개`, `Marble`, `自由` — and an invented word can spell a real one by accident: `나` + `비` is `나비`, so a nickname built at `style` 100 can come back with `theme` set to `animal`.
 
@@ -347,46 +340,6 @@ rand_suffix(rand_nickname(language="ko", count=2), length=8, separator="-")
 :::
 
 Because it happens afterwards, <Lang js="minLength" dart="minLength" py="min_length" code /> / <Lang js="maxLength" dart="maxLength" py="max_length" code /> describe the whole nickname rather than the part in front of a suffix.
-
-### A word of your own
-
-::: lang js
-
-```javascript
-randNickname({ baseWord: '고양이', count: 5 });
-// ['하얀고양이', '고양이바람', '떠도는고양이', '귀여운고양이뿔', '검은고양이손길']
-
-randNickname({ baseWord: 'Cat', count: 4 });
-// ['FlyingCat', 'DancingCatScale', 'MistyCatTail', 'WildCatScale']
-```
-
-:::
-
-::: lang dart
-
-```dart
-randNickname(baseWord: '고양이', count: 5);
-// ['하얀고양이', '고양이바람', '떠도는고양이', '귀여운고양이뿔', '검은고양이손길']
-
-randNickname(baseWord: 'Cat', count: 4);
-// ['FlyingCat', 'DancingCatScale', 'MistyCatTail', 'WildCatScale']
-```
-
-:::
-
-::: lang py
-
-```python
-rand_nickname(base_word="고양이", count=5)
-# ['하얀고양이', '고양이바람', '떠도는고양이', '귀여운고양이뿔', '검은고양이손길']
-
-rand_nickname(base_word="Cat", count=4)
-# ['FlyingCat', 'DancingCatScale', 'MistyCatTail', 'WildCatScale']
-```
-
-:::
-
-Something is always added, or the answer would be the word you passed in. Leave the language out and the **script of the word picks it**, which keeps `'고양이'` from being decorated in English.
 
 ### Invented words
 

@@ -196,7 +196,7 @@ class NicknameDetail {
   final NicknameLanguage language;
 
   /// Theme the nickname's base word belongs to, or `null` when that word is not
-  /// one the generator knows — an invented one, or a `baseWord` of your own.
+  /// one the generator knows, which happens when it was invented.
   final NicknameTheme? theme;
 
   @override

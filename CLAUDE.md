@@ -15,7 +15,7 @@ Beside them sits **affix**, which generates nothing a person reads: `randSuffix`
 
 The name generator is a port of the logic behind vutools' [Random Person Name Generator](https://www.vutools.com/tools/text/random-person-name-generator) (`client/src/app/[locale]/tools/text/random-person-name-generator` in the `www-vutools-com` repo), with the same options. Two deliberate differences: the web page's `es-hangul` dependency is replaced by an internal romanizer (see below), and length bounds are resolved per language so `language: 'all'` does not stretch a Korean name to fill a Spanish name's range.
 
-The nickname generator has no upstream — it is this repo's own. Its options mirror the name generator's where they mean the same thing (`language`, `count`, `style`, `minLength` / `maxLength`, `startsWith`, `unique`), and add `theme`, `includeModifier` and `baseWord`.
+The nickname generator has no upstream — it is this repo's own. Its options mirror the name generator's where they mean the same thing — those live on `RandCommonOptions` now (`count`, `style`, `minLength` / `maxLength`, `startsWith`, `unique`, `output`) — and add `language`, `theme`, `includeModifier` and `wordSeparator`.
 
 ## Repository layout
 
@@ -213,7 +213,7 @@ Set up with `uv venv && uv pip install -e ".[dev]"`, or the `pip` equivalent.
 ### Conventions
 
 - **Keyword-only arguments, not an options object.** `rand_name(language="ko", count=3)`; the `*` in every generator's signature is deliberate, because `rand_name("ja", "female", 5)` is both unreadable and a parameter order frozen into the API. The three `name_*` / `nickname_length_range` helpers are the exception — they take their arguments positionally as well, the way the JavaScript ones do, because they are short enough to read either way.
-- **`Literal`, not enums.** `language="ko"` is the same string the npm package takes, and `"all"` survives the crossing intact — which is why Python needs none of Dart's "a null enum means every one of them". The one `None` that means something is `rand_nickname`'s `language`: omitted, a `base_word` picks the language it is written in. That is `undefined` vs `'all'` in the npm package too, not an invention.
+- **`Literal`, not enums.** `language="ko"` is the same string the npm package takes, and `"all"` survives the crossing intact — which is why Python needs none of Dart's "a null enum means every one of them", and why no argument here has to distinguish "omitted" from "every one of them".
 - **`tuple[int, int]` replaces `[number, number]`**, and the two details are frozen dataclasses with `slots=True`.
 - **File names are `snake_case`, one public function per file**, named after the function. `__init__.py` re-exports them and `__all__` is the contract.
 - **Imports are absolute** (`from randino.name.data import NAME_DATA`), even inside the package, so a moved file breaks loudly rather than silently.
@@ -361,7 +361,7 @@ Nicknames:
 - **The default range is wide on purpose** (`nicknameLengthRange('ko')` is `[1, 12]`): it spans every shape, and the pattern weights — not the range — decide what output usually looks like.
 - **`wordSeparator` replaces the language's joiner, everywhere.** It is not cosmetic: its length is part of the nickname's, so `patternRange`, `buildWords`, `lengthBounds` and `naturalRange` all read it through `joinerOf` rather than touching `data.joiner`. Reading `data.joiner` directly again is how a separated nickname starts overshooting `maxLength`. It also turns off the boundary-repeat re-draw — `石-霜` does not stutter the way `石霜` does.
 - **A unique suffix is not a nickname option.** `randSuffix` attaches one to any string, so `minLength` / `maxLength` describe the whole nickname and nothing has to be excluded from them.
-- **`theme` is reported, not asserted.** A word drawn from a theme reports it, a given `baseWord` is looked up across all themes, and an invented word reports `null`.
+- **`theme` is reported, not asserted.** A word drawn from a theme reports it; an invented word is looked up across all themes, because it can spell a real one by accident, and reports `null` when it is found nowhere.
 - **Two rough spots trigger a re-draw** rather than being shipped: a `startsWith` that no real word in the rolled theme matched (another theme probably has one), and a word ending on the character the next one starts with (`石霜` + `霜雨`). Both fall back to the closest attempt if every attempt is rough.
 - **Invented-word templates stay short.** Two or three syllables per word, because up to three words are joined; `en` is capped at two.
 
@@ -401,7 +401,7 @@ A theme is a slice of everyday vocabulary that a modifier can sit in front of. A
 
 1. Add the name to `NicknameTheme` in `lib/_types/global.ts` and to `NICKNAME_THEMES` in `lib/nickname/data/index.ts`.
 2. Add the pool to **all four** languages. A theme that only one language can fill is not a theme.
-3. **Themes have to be disjoint**, and `test/nickname.test.ts` asserts it. A word in two of them makes `theme` ambiguous for `baseWord`, and it makes the detail output report a theme the caller did not ask about. When a new theme claims a word an old one already holds, move it rather than copy it — `place` took the twelve places that were sitting in `concept`, `vehicle` took 자전거 / 기차 / 배 out of `object`, `plant` took the flowers and trees out of `nature`, and `music` took the instruments out of `object` and 리듬 / 선율 / 화음 out of `concept`. Where the two senses are genuinely different words, rename instead of moving: the English toy became `Marbles` so `gem` could keep `Marble`.
+3. **Themes have to be disjoint**, and `test/nickname.test.ts` asserts it. A word in two of them makes the reported `theme` ambiguous, and it makes the detail output report a theme the caller did not ask about. When a new theme claims a word an old one already holds, move it rather than copy it — `place` took the twelve places that were sitting in `concept`, `vehicle` took 자전거 / 기차 / 배 out of `object`, `plant` took the flowers and trees out of `nature`, and `music` took the instruments out of `object` and 리듬 / 선율 / 화음 out of `concept`. Where the two senses are genuinely different words, rename instead of moving: the English toy became `Marbles` so `gem` could keep `Marble`.
 4. Watch the word lengths. `nicknameLengthRange` is derived from the shortest and longest word in the pools, and `test/nickname.test.ts` pins three of its values, so a Chinese noun outside 2–3 characters or a Korean one outside 1–4 changes a number the tests assert by value.
 5. Update the theme table in `README.md` and the doc comment on `NicknameTheme`. The existing per-theme tests cover the new theme as soon as it is in `NICKNAME_THEMES`.
 6. Do the same in `packages/dart` and `packages/python` — `NicknameTheme`, the theme list, and the pool in all four language files. Neither Dart's `Map` nor Python's `dict` complains about a missing theme the way the TypeScript `Record` does, which is why both ports' `test_nickname` asserts every language fills every theme.

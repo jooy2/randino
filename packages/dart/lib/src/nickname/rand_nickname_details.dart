@@ -19,7 +19,6 @@ List<NicknameDetail> randNicknameDetails({
   int? maxLength,
   bool includeModifier = true,
   String? wordSeparator,
-  String? baseWord,
   String? startsWith,
   bool unique = false,
 }) => generateNicknameDetails(
@@ -31,7 +30,6 @@ List<NicknameDetail> randNicknameDetails({
   maxLength: maxLength,
   includeModifier: includeModifier,
   wordSeparator: wordSeparator,
-  baseWord: baseWord,
   startsWith: startsWith,
   unique: unique,
 );

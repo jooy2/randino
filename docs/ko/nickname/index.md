@@ -169,48 +169,6 @@ rand_suffix(rand_nickname(language="ko", count=3))
 
 토큰이 나중에 붙기 때문에, <Lang js="minLength" dart="minLength" py="min_length" code />와 <Lang js="maxLength" dart="maxLength" py="max_length" code />는 닉네임 전체를 가리키며 빼고 셀 것이 없습니다.
 
-### `baseWord`는 단어를 고정하고 장식만 바꿉니다
-
-무언가는 항상 덧붙습니다. 그러지 않으면 넘긴 단어가 그대로 돌아올 테니까요. 언어를 생략하면 **단어의 문자 체계가 언어를 결정합니다.** `'고양이'`에 영어 수식어가 붙지 않는 것이 이 때문입니다.
-
-::: lang js
-
-```javascript
-randNickname({ baseWord: '고양이', count: 5 });
-// ['하얀고양이', '고양이바람', '떠도는고양이', '귀여운고양이뿔', '검은고양이손길']
-
-randNickname({ baseWord: 'Cat', count: 4 });
-// ['FlyingCat', 'DancingCatScale', 'MistyCatTail', 'WildCatScale']
-```
-
-:::
-
-::: lang dart
-
-```dart
-randNickname(baseWord: '고양이', count: 5);
-// ['하얀고양이', '고양이바람', '떠도는고양이', '귀여운고양이뿔', '검은고양이손길']
-
-randNickname(baseWord: 'Cat', count: 4);
-// ['FlyingCat', 'DancingCatScale', 'MistyCatTail', 'WildCatScale']
-```
-
-:::
-
-::: lang py
-
-```python
-rand_nickname(base_word="고양이", count=5)
-# ['하얀고양이', '고양이바람', '떠도는고양이', '귀여운고양이뿔', '검은고양이손길']
-
-rand_nickname(base_word="Cat", count=4)
-# ['FlyingCat', 'DancingCatScale', 'MistyCatTail', 'WildCatScale']
-```
-
-:::
-
-언어의 자연스러운 길이 범위보다 긴 기준 단어를 넘기면, 단어가 잘리는 대신 범위가 넓어집니다.
-
 ### `style`은 단어를 뽑는 대신 만들어냅니다
 
 `0`에서는 모든 단어가 실제 단어입니다. `100`에 가까워지면 해당 언어의 음절로 단어를 조립하며, 사전에 있는 단어가 아니라 지어낸 핸들처럼 읽힙니다.

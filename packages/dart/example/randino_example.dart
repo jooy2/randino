@@ -56,11 +56,6 @@ void _nicknames() {
   print(randNickname(language: NicknameLanguage.en, wordSeparator: '-', count: 3));
   // [Soft-Bat, Genial-Moose-Cove, Dreamy-Umbrella-Halo]
 
-  // Pin the word and let only the decoration vary. With no language given, the
-  // script of the word picks one.
-  print(randNickname(baseWord: '고양이', count: 3));
-  // [하얀고양이, 고양이바람, 떠도는고양이]
-
   final detail = randNicknameDetails(language: NicknameLanguage.ko).first;
 
   print('${detail.nickname} <- ${detail.words} (${detail.theme?.name})');

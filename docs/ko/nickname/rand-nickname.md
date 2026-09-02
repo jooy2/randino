@@ -49,16 +49,9 @@ rand_nickname()
 | <Lang js="maxLength" dart="maxLength" py="max_length" code /> | <Lang js="number" dart="int?" py="int &#124; None" code /> | _언어별_ | 최대 글자 수. |
 | <Lang js="includeModifier" dart="includeModifier" py="include_modifier" code /> | <Lang js="boolean" dart="bool" py="bool" code /> | <Lang js="true" dart="true" py="True" code /> | 단어를 꾸밉니다. `사자`가 아니라 `멋진사자`. |
 | <Lang js="wordSeparator" dart="wordSeparator" py="word_separator" code /> | <Lang js="string" dart="String?" py="str &#124; None" code /> | _언어별_ | 단어 사이에 넣습니다. 길이 범위에 포함됩니다. 기본값은 붙여 쓰는 것입니다. |
-| <Lang js="baseWord" dart="baseWord" py="base_word" code /> | <Lang js="string" dart="String?" py="str" code /> | <Lang js="—" dart="null" py="&quot;&quot;" code /> | 모든 닉네임을 이 단어를 중심으로 만들고 장식만 바꿉니다. |
 | <Lang js="startsWith" dart="startsWith" py="starts_with" code /> | <Lang js="string" dart="String?" py="str" code /> | <Lang js="—" dart="null" py="&quot;&quot;" code /> | 첫 글자가 이 글자인 닉네임만 반환합니다. |
 | `unique` | <Lang js="boolean" dart="bool" py="bool" code /> | <Lang js="false" dart="false" py="False" code /> | 같은 닉네임을 두 번 반환하지 않습니다. 조합이 바닥나면 `count`보다 적게 반환할 수 있습니다. |
 | `output` | <Lang js="RandOutput" py="RandOutput" code /> | <Lang js="'value'" py="&quot;value&quot;" code /> | 문자열, 또는 닉네임마다 하나의 `NicknameDetail`. Dart에는 이 파라미터가 없습니다. [상세 출력](#the-detail-output)을 참고하세요. |
-
-::: lang py
-
-기본값이 `"all"`이 아니라 `None`인 옵션은 `language` 하나뿐이고, 둘은 같은 요청이 아닙니다. 생략하면 `base_word`가 쓰인 언어를 따라가므로 `"고양이"`에 영어 수식어가 붙는 일이 없고, `"all"`을 직접 넘기면 base word와 무관하게 모든 언어를 섞습니다.
-
-:::
 
 ## 상세 출력 {#the-detail-output}
 
@@ -120,7 +113,7 @@ rand_nickname(language="ko", output="detail")
 
 ### `theme`에 대하여 {#about-theme}
 
-테마는 **보고되는 값이지 요구되는 값이 아닙니다.** 테마에서 뽑은 단어는 그 테마를 보고하고, 직접 넘긴 <Lang js="baseWord" dart="baseWord" py="base_word" code />는 14개 테마 전체에서 찾아 해당 테마를 보고하며, 만들어낸 단어는 어디에도 없으므로 null을 보고합니다.
+테마는 **보고되는 값이지 요구되는 값이 아닙니다.** 테마에서 뽑은 단어는 그 테마를 보고하고, 만들어낸 단어는 우연히 실제 단어와 같아질 수 있으므로 14개 테마 전체에서 찾아본 뒤 어디에도 없으면 null을 보고합니다.
 
 여기서 두 가지 우연이 따라오는데, 버그가 아니라 예상해야 할 동작입니다. 하나는 같은 단어가 수식어이면서 명사일 수 있다는 것입니다(`무지개`, `Marble`, `自由`). 다른 하나는 만들어낸 단어가 우연히 실제 단어를 이룰 수 있다는 것입니다. `나` + `비`는 `나비`이므로 `style: 100`으로 만든 닉네임이 `theme`을 `animal`로 보고할 수 있습니다.
 
@@ -347,46 +340,6 @@ rand_suffix(rand_nickname(language="ko", count=2), length=8, separator="-")
 :::
 
 토큰은 그 뒤에 붙기 때문에, <Lang js="minLength" dart="minLength" py="min_length" code /> / <Lang js="maxLength" dart="maxLength" py="max_length" code />는 접미사 앞부분이 아니라 닉네임 전체를 가리킵니다.
-
-### 직접 지정한 단어
-
-::: lang js
-
-```javascript
-randNickname({ baseWord: '고양이', count: 5 });
-// ['하얀고양이', '고양이바람', '떠도는고양이', '귀여운고양이뿔', '검은고양이손길']
-
-randNickname({ baseWord: 'Cat', count: 4 });
-// ['FlyingCat', 'DancingCatScale', 'MistyCatTail', 'WildCatScale']
-```
-
-:::
-
-::: lang dart
-
-```dart
-randNickname(baseWord: '고양이', count: 5);
-// ['하얀고양이', '고양이바람', '떠도는고양이', '귀여운고양이뿔', '검은고양이손길']
-
-randNickname(baseWord: 'Cat', count: 4);
-// ['FlyingCat', 'DancingCatScale', 'MistyCatTail', 'WildCatScale']
-```
-
-:::
-
-::: lang py
-
-```python
-rand_nickname(base_word="고양이", count=5)
-# ['하얀고양이', '고양이바람', '떠도는고양이', '귀여운고양이뿔', '검은고양이손길']
-
-rand_nickname(base_word="Cat", count=4)
-# ['FlyingCat', 'DancingCatScale', 'MistyCatTail', 'WildCatScale']
-```
-
-:::
-
-무언가는 항상 덧붙습니다. 그러지 않으면 넘긴 단어가 그대로 돌아올 테니까요. 언어를 생략하면 **단어의 문자 체계가 언어를 결정합니다.** `'고양이'`에 영어 수식어가 붙지 않는 것이 이 때문입니다.
 
 ### 만들어낸 단어
 

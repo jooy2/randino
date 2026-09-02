@@ -16,8 +16,6 @@ import { generateNicknameDetails } from './nicknameGenerator.js';
  * // ['달리는표범_gDe2C', '조용한노을_nVtRC']
  * randNickname({ language: 'ko', wordSeparator: ' ', count: 2 });
  * // ['멋진 사자', '고양이 꼬리']
- * randNickname({ baseWord: '고양이', count: 3 });
- * // ['멋진고양이', '고양이발바닥', '파란고양이꼬리']
  */
 export function randNickname(options?: RandNicknameOptions & { output?: 'value' }): string[];
 /**

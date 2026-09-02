@@ -204,7 +204,7 @@ randName(
 randName(count: 5); // 9개 언어 중 하나씩, 이름 다섯 개
 ```
 
-null이 다른 뜻을 갖는 곳은 `NicknameDetail.theme` 하나뿐입니다. 여기서 null은 그 단어를 생성기가 모른다는 뜻으로, 새로 만들어낸 단어이거나 직접 넘긴 `baseWord`인 경우입니다.
+null이 다른 뜻을 갖는 곳은 `NicknameDetail.theme` 하나뿐입니다. 여기서 null은 그 단어를 생성기가 모른다는 뜻으로, 새로 만들어낸 단어인 경우입니다.
 
 :::
 
@@ -230,8 +230,6 @@ rand_name(count=5)  # 9개 언어 중 하나씩, 이름 다섯 개
 ```
 
 이름은 `snake_case`를 씁니다. `includeMiddleName`은 `include_middle_name`, `minLength`는 `min_length`, `startsWith`는 `starts_with`입니다.
-
-기본값이 `"all"`이 아니라 `None`인 인자는 `rand_nickname`의 `language` 하나뿐이고, 둘은 같은 요청이 아닙니다. 생략하면 `base_word`가 쓰인 언어를 따라가므로 `"고양이"`에 영어 수식어가 붙는 일이 없고, `"all"`을 직접 넘기면 base word와 무관하게 모든 언어를 섞습니다.
 
 :::
 

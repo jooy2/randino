@@ -136,8 +136,6 @@ nickname_length_range("en", word_separator=" ")  # (3, 32)
 
 :::
 
-**A <Lang js="baseWord" dart="baseWord" py="base_word" code /> longer than the range widens it** rather than being truncated. That is not reported here — this function describes the language's own pools — but it is what `randNickname` does with the word you gave it.
-
 **A random suffix is outside the range entirely.** [`randSuffix`](../affix/rand-suffix) attaches its token after the nickname is finished, so <Lang js="minLength" dart="minLength" py="min_length" code /> and <Lang js="maxLength" dart="maxLength" py="max_length" code /> describe the whole nickname and nothing is excluded from them.
 
 ## See also

@@ -47,9 +47,6 @@ randName({ language: 'en', gender: 'female', includeMiddleName: true });
 randNickname({ language: 'ko', count: 3 });
 // ['오래된곰', '영원한도마뱀', '귀여운신화다발']
 
-randNickname({ baseWord: '고양이', count: 3 });
-// ['하얀고양이', '고양이바람', '귀여운고양이뿔']
-
 randSuffix(randNickname({ language: 'ko', count: 2 }));
 // ['달력_U7aNZ', '조용한바구니_RUKAP']
 ```
@@ -74,9 +71,6 @@ randName(language: NameLanguage.en, gender: NameGender.female, includeMiddleName
 randNickname(language: NicknameLanguage.ko, count: 3);
 // ['오래된곰', '영원한도마뱀', '귀여운신화다발']
 
-randNickname(baseWord: '고양이', count: 3);
-// ['하얀고양이', '고양이바람', '귀여운고양이뿔']
-
 randSuffixAll(randNickname(language: NicknameLanguage.ko, count: 2));
 // ['달력_U7aNZ', '조용한바구니_RUKAP']
 ```
@@ -100,9 +94,6 @@ rand_name(language="en", gender="female", include_middle_name=True)
 
 rand_nickname(language="ko", count=3)
 # ['오래된곰', '영원한도마뱀', '귀여운신화다발']
-
-rand_nickname(base_word="고양이", count=3)
-# ['하얀고양이', '고양이바람', '귀여운고양이뿔']
 
 rand_suffix(rand_nickname(language="ko", count=2))
 # ['달력_U7aNZ', '조용한바구니_RUKAP']

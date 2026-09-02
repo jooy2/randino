@@ -180,8 +180,8 @@ describe('Nickname', () => {
 	});
 
 	it('a word belongs to exactly one theme', () => {
-		// Two themes claiming one word make `theme` ambiguous for `baseWord`, and
-		// make `randNickname`'s detail form report a theme the caller never asked about.
+		// Two themes claiming one word make `theme` ambiguous, and make
+		// `randNickname`'s detail form report a theme the caller never asked about.
 		for (const language of NICKNAME_LANGUAGES) {
 			const owner = new Map<string, NicknameTheme>();
 
@@ -282,42 +282,6 @@ describe('Nickname', () => {
 					`${language} '${wordSeparator}' ${minLength}-${maxLength}: ${nickname} (${nickname.length})`
 				);
 			}
-		}
-	});
-
-	it('baseWord keeps the word and varies only the decoration', () => {
-		const details = nicknameDetails({ baseWord: '고양이', count: 100 });
-
-		for (const detail of details) {
-			assert.ok(detail.nickname.includes('고양이'), detail.nickname);
-			assert.ok(detail.words.includes('고양이'), detail.nickname);
-			// Something is always added, or the answer would be the input.
-			assert.ok(detail.words.length > 1, detail.nickname);
-			// The word decides the language when none was given.
-			assert.strictEqual(detail.language, 'ko');
-			// 고양이 is one of the generator's own animal words, so its theme is known.
-			assert.strictEqual(detail.theme, 'animal');
-			assert.match(detail.nickname, SCRIPT.ko, detail.nickname);
-		}
-
-		assert.ok(new Set(details.map((detail) => detail.nickname)).size > 20);
-
-		// A word the generator does not know belongs to no theme.
-		for (const detail of nicknameDetails({ baseWord: '뿌꾸', count: 20 })) {
-			assert.strictEqual(detail.theme, null);
-			assert.ok(detail.nickname.includes('뿌꾸'), detail.nickname);
-		}
-
-		// Each script picks the language that goes with it.
-		assert.strictEqual(nicknameDetails({ baseWord: 'Cat' })[0].language, 'en');
-		assert.strictEqual(nicknameDetails({ baseWord: 'ネコ' })[0].language, 'ja');
-		assert.strictEqual(nicknameDetails({ baseWord: '熊猫' })[0].language, 'zh');
-		// An explicit language wins over the guess.
-		assert.strictEqual(nicknameDetails({ baseWord: '고양이', language: 'en' })[0].language, 'en');
-
-		// A base word longer than the language's natural range is not truncated.
-		for (const nickname of randNickname({ baseWord: '고양이발바닥무늬', count: 20 })) {
-			assert.ok(nickname.includes('고양이발바닥무늬'), nickname);
 		}
 	});
 

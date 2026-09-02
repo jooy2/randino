@@ -130,11 +130,6 @@ export interface RandNicknameOptions extends RandCommonOptions {
 	 * (`멋진사자`, `MistyOwl`).
 	 */
 	wordSeparator?: string;
-	/**
-	 * Build every nickname around this word instead of a random one, adding only
-	 * the decoration — `'고양이'` gives `멋진고양이`, `고양이꼬리`, `파란고양이발바닥`.
-	 */
-	baseWord?: string;
 }
 
 /** What `randSuffix` and `randPrefix` attach — the same three for both. */
@@ -156,7 +151,7 @@ export interface NicknameDetail {
 	language: NicknameLanguage;
 	/**
 	 * Theme the nickname's base word belongs to, or `null` when that word is not
-	 * one the generator knows — an invented one, or a `baseWord` of your own.
+	 * one the generator knows, which happens when it was invented.
 	 */
 	theme: NicknameTheme | null;
 }

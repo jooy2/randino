@@ -188,7 +188,7 @@ void main() {
     });
 
     test('a word belongs to exactly one theme', () {
-      // Two themes claiming one word make `theme` ambiguous for `baseWord`, and
+      // Two themes claiming one word make `theme` ambiguous, and
       // make `randNicknameDetails` report a theme the caller never asked about.
       for (final language in nicknameLanguages) {
         final owner = <String, NicknameTheme>{};
@@ -317,45 +317,6 @@ void main() {
             reason: "${language.name} '$wordSeparator' $minLength-$maxLength: $nickname",
           );
         }
-      }
-    });
-
-    test('baseWord keeps the word and varies only the decoration', () {
-      final details = randNicknameDetails(baseWord: '고양이', count: 100);
-
-      for (final detail in details) {
-        expect(detail.nickname, contains('고양이'), reason: detail.nickname);
-        expect(detail.words, contains('고양이'), reason: detail.nickname);
-        // Something is always added, or the answer would be the input.
-        expect(detail.words.length, greaterThan(1), reason: detail.nickname);
-        // The word decides the language when none was given.
-        expect(detail.language, NicknameLanguage.ko);
-        // 고양이 is one of the generator's own animal words, so its theme is known.
-        expect(detail.theme, NicknameTheme.animal);
-        expect(detail.nickname, matches(script[NicknameLanguage.ko]!), reason: detail.nickname);
-      }
-
-      expect(details.map((detail) => detail.nickname).toSet().length, greaterThan(20));
-
-      // A word the generator does not know belongs to no theme.
-      for (final detail in randNicknameDetails(baseWord: '뿌꾸', count: 20)) {
-        expect(detail.theme, isNull);
-        expect(detail.nickname, contains('뿌꾸'), reason: detail.nickname);
-      }
-
-      // Each script picks the language that goes with it.
-      expect(randNicknameDetails(baseWord: 'Cat')[0].language, NicknameLanguage.en);
-      expect(randNicknameDetails(baseWord: 'ネコ')[0].language, NicknameLanguage.ja);
-      expect(randNicknameDetails(baseWord: '熊猫')[0].language, NicknameLanguage.zh);
-      // An explicit language wins over the guess.
-      expect(
-        randNicknameDetails(baseWord: '고양이', language: NicknameLanguage.en)[0].language,
-        NicknameLanguage.en,
-      );
-
-      // A base word longer than the language's natural range is not truncated.
-      for (final nickname in randNickname(baseWord: '고양이발바닥무늬', count: 20)) {
-        expect(nickname, contains('고양이발바닥무늬'), reason: nickname);
       }
     });
 

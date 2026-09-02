@@ -12,7 +12,6 @@ a nickname from reading like one.
   drops that pattern instead of truncating a word.
 - `word_separator` decides what goes between the words, defaulting to the way the
   language joins them.
-- `base_word` pins the noun, so only the decoration varies.
 
 What used to be the fifth entry here, `unique_suffix`, is `rand_suffix` now:
 attaching a token to a string was never a thing about nicknames.
@@ -20,7 +19,6 @@ attaching a token to a string was never a thing about nicknames.
 
 import math
 import random
-import re
 from dataclasses import dataclass
 from typing import Literal, NamedTuple
 
@@ -95,7 +93,6 @@ class Settings:
     theme: NicknameThemeOption
     style: int
     include_modifier: bool
-    base_word: str
     prefix: str
     min_length: int | None = None
     max_length: int | None = None
@@ -146,31 +143,18 @@ def slot_bounds(
 
 def usable_patterns(data: NicknameLanguageData, settings: Settings) -> tuple[Pattern, ...]:
     """The shapes available for the current options, in the order they are weighted."""
-    base_leads = bool(settings.base_word) and settings.base_word.lower().startswith(
-        settings.prefix.lower()
-    )
 
     def keep(pattern: Pattern) -> bool:
         slots = pattern.slots
 
         if not settings.include_modifier and "modifier" in slots:
             return False
-        if data.parts is None and "part" in slots:
-            return False
-        # A given base word is the noun, so something has to be added to it —
-        # otherwise every nickname would come back as the word itself.
-        if settings.base_word and len(slots) < 2:
-            return False
-        # The starting character has to land on a word the generator is free to
-        # choose, unless the given base word happens to start with it already.
-        return not (
-            settings.prefix and settings.base_word and slots[0] == "noun" and not base_leads
-        )
+        return not (data.parts is None and "part" in slots)
 
     usable = tuple(pattern for pattern in PATTERNS if keep(pattern))
 
-    # Options can rule out every shape — a base word with nothing allowed to decorate
-    # it, say. The word on its own is then the only answer.
+    # Options can rule out every shape — a language with no `parts` pool and no
+    # modifier allowed, say. The bare noun is then the only answer.
     return usable or (Pattern(("noun",), 1),)
 
 
@@ -296,11 +280,6 @@ def pick_slot_word(
     prefix: str,
 ) -> Chosen:
     """Fill one slot of a shape with a word."""
-    if slot == "noun" and settings.base_word:
-        base = settings.base_word
-
-        return Chosen(capitalize_first(base) if data.capitalize else base, False)
-
     if slot == "modifier":
         pool = data.modifiers
     elif slot == "part":
@@ -424,7 +403,6 @@ def natural_range(
         theme="all",
         style=0,
         include_modifier=include_modifier,
-        base_word="",
         prefix="",
         separator=separator,
     )
@@ -452,15 +430,7 @@ def generate_one(language: NicknameLanguage, settings: Settings) -> Built:
         # One theme per nickname, so a mixed request spreads over all of them.
         theme = pick(themes)
         nouns = data.nouns[theme]
-        cached = slot_bounds(language, data, theme)
-        # A given base word takes the noun's place, so it also takes over its bounds —
-        # never write that into the cache.
-        bounds: Bounds = (
-            {**cached, "noun": (len(settings.base_word), len(settings.base_word))}
-            if settings.base_word
-            else cached
-        )
-
+        bounds = slot_bounds(language, data, theme)
         low, high = bounds_for(data, bounds, patterns, settings)
         # Prefer a shape that can actually land inside the range.
         spans = {pattern: pattern_range(pattern.slots, bounds, len(joiner)) for pattern in patterns}
@@ -497,30 +467,9 @@ def generate_one(language: NicknameLanguage, settings: Settings) -> Built:
     return best
 
 
-HANGUL = re.compile(r"[가-힣]")
-KANA = re.compile(r"[぀-ヿ]")
-HAN = re.compile(r"[一-鿿]")
-
-
-def detect_language(word: str) -> NicknameLanguage:
-    """Language a given base word belongs to.
-
-    So that `base_word="고양이"` is not decorated with an English modifier. Only
-    consulted when the caller left `language` out.
-    """
-    if HANGUL.search(word):
-        return "ko"
-    if KANA.search(word):
-        return "ja"
-    if HAN.search(word):
-        return "zh"
-
-    return "en"
-
-
 def generate_nickname_details(
     *,
-    language: NicknameLanguageOption | None = None,
+    language: NicknameLanguageOption = "all",
     theme: NicknameThemeOption = "all",
     count: int = 1,
     style: int = 0,
@@ -528,7 +477,6 @@ def generate_nickname_details(
     max_length: int | None = None,
     include_modifier: bool = True,
     word_separator: str | None = None,
-    base_word: str = "",
     starts_with: str = "",
     unique: bool = False,
 ) -> list[NicknameDetail]:
@@ -539,16 +487,12 @@ def generate_nickname_details(
         min_length=resolve_length(min_length),
         max_length=resolve_length(max_length),
         include_modifier=include_modifier,
-        base_word=base_word.strip(),
         prefix=resolve_prefix(starts_with),
         separator=word_separator,
     )
-    resolved: NicknameLanguageOption = language or (
-        detect_language(settings.base_word) if settings.base_word else "all"
-    )
 
     def draw() -> NicknameDetail:
-        code = draw_language(resolved, NICKNAME_LANGUAGES)
+        code = draw_language(language, NICKNAME_LANGUAGES)
         words, built_theme = generate_one(code, settings)
 
         return NicknameDetail(

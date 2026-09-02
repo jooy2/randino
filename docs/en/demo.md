@@ -9,7 +9,7 @@ Everything below runs in your browser. The controls are the options `randName` a
 - Set `language` to `ko` and drag `style` to `100`. The names stay Korean and stop being names anybody has — the generator builds them out of given-name characters instead of drawing from the pool.
 - Leave `language` on `all` and press Generate a few times. Nine scripts, and each name's length range is resolved for its own language rather than for the batch.
 - Pick `ru` and switch `gender`. Russian is the one language where the choice is visible from the outside: the patronymic and the surname both inflect.
-- On the nickname tab, set `baseWord` to `고양이` with no language. The script of the word picks the language, so it never gets an English modifier.
+- On the nickname tab, set `theme` to `animal` and `wordSeparator` to `-`. The separator counts toward the length range, so a narrow range drops the modifier rather than truncating a word.
 - Set `maxLength` to `3` on a Korean nickname. The three-word shapes drop out rather than being truncated — length picks the shape, not the words.
 - Turn on `randSuffix`. The token is attached after the nickname is finished, which is why the length options never have to account for it.
 

@@ -169,48 +169,6 @@ rand_suffix(rand_nickname(language="ko", count=3))
 
 Because the token is attached afterwards, <Lang js="minLength" dart="minLength" py="min_length" code /> and <Lang js="maxLength" dart="maxLength" py="max_length" code /> describe the whole nickname and have nothing to exclude.
 
-### `baseWord` pins the word and varies the decoration
-
-Something is always added to it, or the answer would be the word you passed in. When you leave the language out, the **script of the word picks it**, which keeps `'고양이'` from being decorated in English.
-
-::: lang js
-
-```javascript
-randNickname({ baseWord: '고양이', count: 5 });
-// ['하얀고양이', '고양이바람', '떠도는고양이', '귀여운고양이뿔', '검은고양이손길']
-
-randNickname({ baseWord: 'Cat', count: 4 });
-// ['FlyingCat', 'DancingCatScale', 'MistyCatTail', 'WildCatScale']
-```
-
-:::
-
-::: lang dart
-
-```dart
-randNickname(baseWord: '고양이', count: 5);
-// ['하얀고양이', '고양이바람', '떠도는고양이', '귀여운고양이뿔', '검은고양이손길']
-
-randNickname(baseWord: 'Cat', count: 4);
-// ['FlyingCat', 'DancingCatScale', 'MistyCatTail', 'WildCatScale']
-```
-
-:::
-
-::: lang py
-
-```python
-rand_nickname(base_word="고양이", count=5)
-# ['하얀고양이', '고양이바람', '떠도는고양이', '귀여운고양이뿔', '검은고양이손길']
-
-rand_nickname(base_word="Cat", count=4)
-# ['FlyingCat', 'DancingCatScale', 'MistyCatTail', 'WildCatScale']
-```
-
-:::
-
-A base word longer than the language's natural range widens the range rather than being truncated.
-
 ### `style` invents words rather than drawing them
 
 At `0` every word is a real one. Toward `100` the words are built from the language's own syllables, which reads as a made-up handle rather than a dictionary word.

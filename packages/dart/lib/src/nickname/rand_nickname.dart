@@ -22,8 +22,6 @@ import 'package:randino/src/types.dart';
 /// // ['달리는표범_gDe2C', '조용한노을_nVtRC']
 /// randNickname(language: NicknameLanguage.ko, wordSeparator: ' ', count: 2);
 /// // ['멋진 사자', '고양이 꼬리']
-/// randNickname(baseWord: '고양이', count: 3);
-/// // ['멋진고양이', '고양이발바닥', '파란고양이꼬리']
 /// ```
 List<String> randNickname({
   NicknameLanguage? language,
@@ -34,7 +32,6 @@ List<String> randNickname({
   int? maxLength,
   bool includeModifier = true,
   String? wordSeparator,
-  String? baseWord,
   String? startsWith,
   bool unique = false,
 }) =>
@@ -47,7 +44,6 @@ List<String> randNickname({
       maxLength: maxLength,
       includeModifier: includeModifier,
       wordSeparator: wordSeparator,
-      baseWord: baseWord,
       startsWith: startsWith,
       unique: unique,
     ).map((detail) => detail.nickname).toList();

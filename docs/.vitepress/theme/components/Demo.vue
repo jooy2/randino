@@ -80,7 +80,6 @@ const nickname = reactive({
 	maxLength: '',
 	includeModifier: true,
 	wordSeparator: '',
-	baseWord: '',
 	startsWith: '',
 	unique: false
 });
@@ -120,7 +119,6 @@ const options = computed(() => {
 	if (num(nickname.maxLength) !== undefined) out.maxLength = num(nickname.maxLength);
 	if (!nickname.includeModifier) out.includeModifier = false;
 	if (nickname.wordSeparator) out.wordSeparator = nickname.wordSeparator;
-	if (nickname.baseWord) out.baseWord = nickname.baseWord;
 	if (nickname.startsWith) out.startsWith = nickname.startsWith;
 	if (nickname.unique) out.unique = true;
 
@@ -429,11 +427,6 @@ async function copy() {
 				<label class="randino-demo-field">
 					<span><code>wordSeparator</code></span>
 					<input v-model="nickname.wordSeparator" type="text" maxlength="4" placeholder="—" />
-				</label>
-
-				<label class="randino-demo-field">
-					<span><code>baseWord</code></span>
-					<input v-model="nickname.baseWord" type="text" placeholder="—" />
 				</label>
 
 				<label class="randino-demo-field">

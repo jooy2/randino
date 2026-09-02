@@ -11,7 +11,6 @@
 //   modifier drops that pattern instead of truncating a word.
 // - `wordSeparator` decides what goes between the words, defaulting to the way
 //   the language joins them.
-// - `baseWord` pins the noun, so only the decoration varies.
 //
 // What used to be the fifth entry here, `uniqueSuffix`, is `randSuffix` now:
 // attaching a token to a string was never a thing about nicknames.
@@ -58,7 +57,6 @@ class _Settings {
     required this.minLength,
     required this.maxLength,
     required this.includeModifier,
-    required this.baseWord,
     required this.prefix,
     required this.separator,
   });
@@ -68,7 +66,6 @@ class _Settings {
   final int? minLength;
   final int? maxLength;
   final bool includeModifier;
-  final String baseWord;
   final String prefix;
   final String? separator;
 }
@@ -115,33 +112,19 @@ _Bounds _slotBounds(NicknameLanguage language, NicknameLanguageData data, Nickna
 
 /// The shapes available for the current options, in the order they are weighted.
 List<_Pattern> _usablePatterns(NicknameLanguageData data, _Settings settings) {
-  final baseLeads =
-      settings.baseWord.isNotEmpty &&
-      settings.baseWord.toLowerCase().startsWith(settings.prefix.toLowerCase());
   final usable = _patterns
       .where((pattern) {
         final slots = pattern.slots;
 
         if (!settings.includeModifier && slots.contains(_Slot.modifier)) return false;
         if (data.parts == null && slots.contains(_Slot.part)) return false;
-        // A given base word is the noun, so something has to be added to it —
-        // otherwise every nickname would come back as the word itself.
-        if (settings.baseWord.isNotEmpty && slots.length < 2) return false;
-        // The starting character has to land on a word the generator is free to
-        // choose, unless the given base word happens to start with it already.
-        if (settings.prefix.isNotEmpty &&
-            settings.baseWord.isNotEmpty &&
-            slots.first == _Slot.noun &&
-            !baseLeads) {
-          return false;
-        }
 
         return true;
       })
       .toList(growable: false);
 
-  // Options can rule out every shape — a base word with nothing allowed to
-  // decorate it, say. The word on its own is then the only answer.
+  // Options can rule out every shape — a language with no `parts` pool and no
+  // modifier allowed, say. The bare noun is then the only answer.
   return usable.isNotEmpty
       ? usable
       : const <_Pattern>[
@@ -292,12 +275,6 @@ _Chosen _pickSlotWord(
   int max,
   String prefix,
 ) {
-  if (slot == _Slot.noun && settings.baseWord.isNotEmpty) {
-    final base = settings.baseWord;
-
-    return _Chosen(data.capitalize ? capitalizeFirst(base) : base, false);
-  }
-
   final pool = switch (slot) {
     _Slot.modifier => data.modifiers,
     _Slot.part => data.parts!,
@@ -436,7 +413,6 @@ LengthRange naturalRange(NicknameLanguage language, bool includeModifier, String
     minLength: null,
     maxLength: null,
     includeModifier: includeModifier,
-    baseWord: '',
     prefix: '',
     separator: separator,
   );
@@ -471,17 +447,7 @@ _Built _generateOne(NicknameLanguage language, _Settings settings) {
     // One theme per nickname, so a mixed request spreads over all of them.
     final theme = pick(themes);
     final nouns = data.nouns[theme]!;
-    final cached = _slotBounds(language, data, theme);
-    // A given base word takes the noun's place, so it also takes over its
-    // bounds — never write that into the cache.
-    final bounds =
-        settings.baseWord.isEmpty
-            ? cached
-            : <_Slot, LengthRange>{
-              ...cached,
-              _Slot.noun: LengthRange(settings.baseWord.length, settings.baseWord.length),
-            };
-
+    final bounds = _slotBounds(language, data, theme);
     final range = _lengthBounds(data, bounds, patterns, settings);
     // Prefer a shape that can actually land inside the range.
     final fitting = patterns
@@ -525,21 +491,6 @@ _Built _generateOne(NicknameLanguage language, _Settings settings) {
   return best!;
 }
 
-final RegExp _hangul = RegExp('[가-힣]');
-final RegExp _kana = RegExp('[぀-ヿ]');
-final RegExp _han = RegExp('[一-鿿]');
-
-/// Language a given base word belongs to, so that a `baseWord` of `'고양이'` is
-/// not decorated with an English modifier. Only consulted when the caller left
-/// the language out.
-NicknameLanguage _detectLanguage(String word) {
-  if (_hangul.hasMatch(word)) return NicknameLanguage.ko;
-  if (_kana.hasMatch(word)) return NicknameLanguage.ja;
-  if (_han.hasMatch(word)) return NicknameLanguage.zh;
-
-  return NicknameLanguage.en;
-}
-
 /// Generate nicknames with every choice already resolved. `randNickname` and
 /// `randNicknameDetails` are the two public shapes over this.
 List<NicknameDetail> generateNicknameDetails({
@@ -551,23 +502,18 @@ List<NicknameDetail> generateNicknameDetails({
   int? maxLength,
   bool includeModifier = true,
   String? wordSeparator,
-  String? baseWord,
   String? startsWith,
   bool unique = false,
 }) {
-  final trimmedBase = (baseWord ?? '').trim();
   final settings = _Settings(
     theme: theme,
     style: resolveStyle(style),
     minLength: minLength,
     maxLength: maxLength,
     includeModifier: includeModifier,
-    baseWord: trimmedBase,
     prefix: resolvePrefix(startsWith),
     separator: wordSeparator,
   );
-  final resolvedLanguage =
-      language ?? (trimmedBase.isNotEmpty ? _detectLanguage(trimmedBase) : null);
 
   return collect<NicknameDetail>(
     count: count,
@@ -576,7 +522,7 @@ List<NicknameDetail> generateNicknameDetails({
     // Written out: `??` would otherwise infer `pick`'s type argument from the
     // nullable left-hand side, and hand back a `NicknameLanguage?`.
     draw: () {
-      final NicknameLanguage code = resolvedLanguage ?? pick(nicknameLanguages);
+      final NicknameLanguage code = language ?? pick(nicknameLanguages);
       final built = _generateOne(code, settings);
 
       return NicknameDetail(

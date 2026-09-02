@@ -79,9 +79,6 @@ randNickname(language: NicknameLanguage.en, count: 2);
 randNickname(language: NicknameLanguage.ko, theme: NicknameTheme.animal, count: 2);
 // ['깊은연어', '하얀여우갈기']
 
-randNickname(baseWord: '고양이', count: 3);
-// ['하얀고양이', '고양이바람', '귀여운고양이뿔']
-
 randNicknameDetails(language: NicknameLanguage.ko).first;
 // NicknameDetail(오래된발견, [오래된, 발견], ko, concept)
 ```
@@ -95,7 +92,6 @@ randNicknameDetails(language: NicknameLanguage.ko).first;
 | `minLength` / `maxLength` | `int?`              | _language_             |
 | `includeModifier`         | `bool`              | `true`                 |
 | `wordSeparator`           | `String?`           | _language_             |
-| `baseWord`                | `String?`           | `null`                 |
 | `startsWith`              | `String?`           | `null`                 |
 | `unique`                  | `bool`              | `false`                |
 
