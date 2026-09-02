@@ -8,7 +8,7 @@ description: Generate random person names and nicknames in nine languages — �
 hero:
   name: randino
   text: Random text that reads like the language
-  tagline: Person names people actually carry, and nicknames someone would actually pick. Nine languages, shipped for JavaScript, Dart and Python, with no runtime dependencies.
+  tagline: Person names people actually carry, nicknames someone would actually pick, and the everyday words behind them. Nine languages, shipped for JavaScript, Dart and Python, with no runtime dependencies.
   actions:
     - theme: brand
       text: Get started
@@ -19,6 +19,9 @@ hero:
     - theme: alt
       text: Nicknames
       link: /nickname/
+    - theme: alt
+      text: Words
+      link: /word/rand-word
   image:
     src: /512x512.png
     alt: randino
@@ -32,6 +35,10 @@ features:
     details: A modifier and a noun across fourteen themes — and never a person name, which is what keeps a handle from reading like one.
     link: /nickname/
     linkText: Nicknames
+  - title: The words on their own
+    details: Fourteen themes, a function each. randAnimal, randFood, randGem — the vocabulary a nickname is built from, without the nickname.
+    link: /word/rand-word
+    linkText: randWord
   - title: Three packages, one library
     details: The same datasets and the same rules for JavaScript, Dart and Python. One page documents all of them — pick your language in the sidebar.
     link: /guide/getting-started

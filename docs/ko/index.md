@@ -8,7 +8,7 @@ description: 9개 언어로 사람 이름과 닉네임을 무작위로 생성합
 hero:
   name: randino
   text: 그 언어답게 읽히는 무작위 텍스트
-  tagline: 실제로 쓰이는 사람 이름과, 사람이 실제로 고를 법한 닉네임. 9개 언어를 지원하고 JavaScript, Dart, Python으로 제공되며 런타임 의존성이 없습니다.
+  tagline: 실제로 쓰이는 사람 이름과, 사람이 실제로 고를 법한 닉네임, 그리고 그 바탕이 되는 일상 단어. 9개 언어를 지원하고 JavaScript, Dart, Python으로 제공되며 런타임 의존성이 없습니다.
   actions:
     - theme: brand
       text: 시작하기
@@ -19,6 +19,9 @@ hero:
     - theme: alt
       text: 닉네임
       link: /ko/nickname/
+    - theme: alt
+      text: 단어
+      link: /ko/word/rand-word
   image:
     src: /512x512.png
     alt: randino
@@ -32,6 +35,10 @@ features:
     details: 14개 테마의 명사에 수식어를 붙입니다. 사람 이름은 절대 쓰지 않으며, 그래서 닉네임이 이름처럼 읽히지 않습니다.
     link: /ko/nickname/
     linkText: 닉네임
+  - title: 단어 그 자체로
+    details: 14개 테마마다 함수가 하나씩. randAnimal, randFood, randGem — 닉네임을 만드는 어휘를 닉네임 없이 그대로 씁니다.
+    link: /ko/word/rand-word
+    linkText: randWord
   - title: 세 개의 패키지, 하나의 라이브러리
     details: JavaScript, Dart, Python이 같은 데이터셋과 같은 규칙을 씁니다. 문서 한 페이지가 셋 모두를 설명하며, 사이드바에서 원하는 언어를 고르면 됩니다.
     link: /ko/guide/getting-started
