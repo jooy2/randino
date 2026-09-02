@@ -126,13 +126,15 @@ Run from `packages/javascript`; there is no workspace root that forwards them.
 | Command          | What it does                                                        |
 | ---------------- | ------------------------------------------------------------------- |
 | `npm run test`   | `tsc` (emit to `dist`), then `node --test` over `test/**` via `tsx` |
-| `npm run build`  | `format` → `tsc` → `minify`                                         |
+| `npm run build`  | `format` → `clean` → `tsc` → `minify`                               |
 | `npm run lint`   | ESLint (`lint:fix` to fix)                                          |
 | `npm run format` | Prettier, in place                                                  |
 
 The tests are TypeScript but import from `../dist`, so they are run through `tsx` and **they need a build** — that is what `npm run test` does first. Node >= 18.
 
 Only `dist/` and the top-level `README.md` / `LICENSE` are published; `.npmignore` keeps `lib/`, `test/`, the config files and the remaining markdown out of the package.
+
+**`build` empties `dist/` first**, because `tsc` writes over what it emits and never deletes. A renamed folder leaves its old output behind — `lib/affix` became `lib/decorate` and `dist/affix` sat there afterwards — and since the whole of `dist/` is published, that is dead code shipped to npm.
 
 ## The Dart package (`packages/dart`)
 

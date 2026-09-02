@@ -29,7 +29,8 @@
 	},
 	"scripts": {
 		"test": "tsc && node --import tsx --test \"./test/**/*.test.ts\"",
-		"build": "npm run format && tsc && npm run minify",
+		"build": "npm run format && npm run clean && tsc && npm run minify",
+		"clean": "node -e \"require('node:fs').rmSync('dist', { recursive: true, force: true })\"",
 		"minify": "terser-glob 'dist/**/*.js' --config-file terser.config.json",
 		"lint": "eslint .",
 		"lint:fix": "eslint . --fix",
