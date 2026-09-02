@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.1.0
+## 1.1.0 (2026-09-02)
 
 - **Breaking:** `random_name` and `random_nickname` are now `rand_name` and `rand_nickname`. The old names are gone; there are no aliases.
 - **Breaking:** `random_name_details` and `random_nickname_details` are gone entirely. `rand_name` and `rand_nickname` take `output="detail"` instead and return the same `list[NameDetail]` / `list[NicknameDetail]`, with `@overload` carrying the return type so a checker knows which one it got.
