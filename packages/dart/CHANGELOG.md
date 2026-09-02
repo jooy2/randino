@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.1.0
+## 1.1.0 (2026-09-02)
 
 - **Breaking:** `randomName`, `randomNameDetails`, `randomNickname` and `randomNicknameDetails` are now `randName`, `randNameDetails`, `randNickname` and `randNicknameDetails`. The old names are gone; there are no aliases.
 - **Breaking:** the fourteen nickname themes are their own generators now. `randWord` takes a `theme`, and `randAnimal`, `randObject`, `randNature`, `randPlant`, `randGem`, `randConcept`, `randMyth`, `randJob`, `randMusic`, `randPlace`, `randFood`, `randSport`, `randVehicle` and `randProduct` are that generator with the theme already chosen. `randWordDetails` is the detail form — the themed functions have none of their own, and take the theme here instead. `wordLengthRange` reports what the pools hold, and `randNickname` draws from those pools rather than owning them.
