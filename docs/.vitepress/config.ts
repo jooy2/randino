@@ -82,10 +82,11 @@ const packageLinks = [
  * looking for a function, not for the corner of the library it belongs to.
  * `navGroupsFor` is what keeps the menu and those sections in step.
  *
- * The sidebar's fourteenth-of-a-generator group, **Word themes**, is the one
- * left out: fourteen names for `randWord` with its argument decided would
- * double the menu and say nothing `randWord` does not. The sidebar lists them;
- * the dropdown points at the function they all are.
+ * The sidebar's **Words** group, nested inside Generators, is the one left out
+ * — and it is left out by itself, because `navGroupsFor` reads a group's pages
+ * and not its subgroups. Fourteen names for `randWord` with its argument
+ * decided would double the menu and say nothing `randWord` does not; the
+ * sidebar lists them, and the dropdown points at the function they all are.
  */
 const navFor = (lang: string, labels: { demo: string; guide: string; packages: string }) => [
 	{ text: labels.guide, link: `${localeBase(lang, defaultLocale)}guide/getting-started` },

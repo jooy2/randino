@@ -13,17 +13,18 @@
  * because the two generators are two things, but a reader looking for the
  * function they are about to call does not care which folder it lives in. The
  * split here is by what a function *is*, one level down inside **API**:
- * **Generators** hand back names, nicknames and words out of nothing, **Word
- * themes** are the fourteen of them that answer `theme` rather than taking it,
+ * **Generators** hand back names, nicknames and words out of nothing,
  * **Decorators** attach something to a string you already have, and
  * **Utilities** answer a question about a language. The folder a page sits in
  * decides nothing but its URL.
  *
- * **Word themes is its own group and not fourteen more Generators.** They are
- * one generator with an argument decided, so listing them beside `randWord`
- * would bury it; and they are the group the navbar's API dropdown leaves out,
- * because fourteen entries in a menu is a wall rather than a menu. Every other
- * group is in both.
+ * **Words** is a level deeper still, inside Generators, and it is the only
+ * entry that goes that far. The fourteen themed functions are `randWord` with
+ * its argument decided, so they belong under it rather than beside it — and
+ * listed beside it they would bury the three generators in a list of
+ * seventeen. It is also the one group the navbar's API dropdown leaves out:
+ * `navGroupsFor` takes a group's pages and not its subgroups, so the dropdown
+ * shows the function the fourteen all are.
  *
  * **Behaviour** holds the prose explaining how a generator's options behave,
  * where there is enough of it to be its own page — `randName` and
@@ -78,28 +79,28 @@ export const SIDEBAR: SidebarGroup[] = [
 				items: [
 					{ path: 'name/rand-name', en: 'randName', ko: 'randName' },
 					{ path: 'nickname/rand-nickname', en: 'randNickname', ko: 'randNickname' },
-					{ path: 'word/rand-word', en: 'randWord', ko: 'randWord' }
-				]
-			},
-			{
-				id: 'word-themes',
-				en: 'Word themes',
-				ko: '단어 테마',
-				items: [
-					{ path: 'word/rand-animal', en: 'randAnimal', ko: 'randAnimal' },
-					{ path: 'word/rand-object', en: 'randObject', ko: 'randObject' },
-					{ path: 'word/rand-nature', en: 'randNature', ko: 'randNature' },
-					{ path: 'word/rand-plant', en: 'randPlant', ko: 'randPlant' },
-					{ path: 'word/rand-gem', en: 'randGem', ko: 'randGem' },
-					{ path: 'word/rand-concept', en: 'randConcept', ko: 'randConcept' },
-					{ path: 'word/rand-myth', en: 'randMyth', ko: 'randMyth' },
-					{ path: 'word/rand-job', en: 'randJob', ko: 'randJob' },
-					{ path: 'word/rand-music', en: 'randMusic', ko: 'randMusic' },
-					{ path: 'word/rand-place', en: 'randPlace', ko: 'randPlace' },
-					{ path: 'word/rand-food', en: 'randFood', ko: 'randFood' },
-					{ path: 'word/rand-sport', en: 'randSport', ko: 'randSport' },
-					{ path: 'word/rand-vehicle', en: 'randVehicle', ko: 'randVehicle' },
-					{ path: 'word/rand-product', en: 'randProduct', ko: 'randProduct' }
+					{ path: 'word/rand-word', en: 'randWord', ko: 'randWord' },
+					{
+						id: 'words',
+						en: 'Words',
+						ko: '단어',
+						items: [
+							{ path: 'word/rand-animal', en: 'randAnimal', ko: 'randAnimal' },
+							{ path: 'word/rand-object', en: 'randObject', ko: 'randObject' },
+							{ path: 'word/rand-nature', en: 'randNature', ko: 'randNature' },
+							{ path: 'word/rand-plant', en: 'randPlant', ko: 'randPlant' },
+							{ path: 'word/rand-gem', en: 'randGem', ko: 'randGem' },
+							{ path: 'word/rand-concept', en: 'randConcept', ko: 'randConcept' },
+							{ path: 'word/rand-myth', en: 'randMyth', ko: 'randMyth' },
+							{ path: 'word/rand-job', en: 'randJob', ko: 'randJob' },
+							{ path: 'word/rand-music', en: 'randMusic', ko: 'randMusic' },
+							{ path: 'word/rand-place', en: 'randPlace', ko: 'randPlace' },
+							{ path: 'word/rand-food', en: 'randFood', ko: 'randFood' },
+							{ path: 'word/rand-sport', en: 'randSport', ko: 'randSport' },
+							{ path: 'word/rand-vehicle', en: 'randVehicle', ko: 'randVehicle' },
+							{ path: 'word/rand-product', en: 'randProduct', ko: 'randProduct' }
+						]
+					}
 				]
 			},
 			{
