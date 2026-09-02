@@ -2,7 +2,7 @@ name: randino
 description: >-
   Generates random person names and nicknames in the language you ask for —
   Korean, English, Japanese, Chinese and six more. No dependencies, pure Dart.
-version: 2.0.0
+version: 1.2.0
 repository: https://github.com/jooy2/randino
 homepage: https://randino.cdget.com
 issue_tracker: https://github.com/jooy2/randino/issues

@@ -1,6 +1,6 @@
 # Changelog
 
-## 2.0.0 (2026-09-02)
+## 1.2.0
 
 - **Breaking:** the fourteen nickname themes are their own generators now. `randWord` takes a `theme`, and `randAnimal`, `randObject`, `randNature`, `randPlant`, `randGem`, `randConcept`, `randMyth`, `randJob`, `randMusic`, `randPlace`, `randFood`, `randSport`, `randVehicle` and `randProduct` are that generator with the theme already chosen. `wordLengthRange` reports what the pools hold. `randNickname` draws from the same pools rather than owning them.
 - **Breaking:** `NicknameLanguage`, `NicknameLanguageOption`, `NicknameTheme`, `NicknameThemeOption`, `NICKNAME_LANGUAGES` and `NICKNAME_THEMES` are `WordLanguage`, `WordLanguageOption`, `WordTheme`, `WordThemeOption`, `WORD_LANGUAGES` and `WORD_THEMES`. They describe the words, and the words are no longer only a nickname's business.
@@ -8,7 +8,8 @@
 - **Breaking:** `randNickname`'s `baseWord` is gone. Pinning a word and varying only the decoration is `randModifier` on a word you already have, and it carried the only piece of language guesswork a generator did.
 - **Breaking:** `NAME_COUNT_MAX`, `NAME_LENGTH_MIN` / `_MAX`, `NICKNAME_COUNT_MAX` and `NICKNAME_LENGTH_MIN` / `_MAX` are `RAND_COUNT_MAX` and `RAND_LENGTH_MIN` / `_MAX`, one set for every generator. The name length bound goes from 30 to 40 as a result.
 - `randSuffix`, `randPrefix` and `randModifier` all work with **no value at all**, handing back the token or the word they would have attached. `randSuffix()` is `'nVtRC'`; `randSuffix({ length: 8 })` is the same thing eight characters long.
-- Added `RandCommonOptions`, which is what `count`, `style`, `minLength` / `maxLength`, `startsWith`, `unique` and `output` are on every generator, and `RandWordOptions`, `RandThemedWordOptions`, `WordDetail` and `RandModifierOptions`.
+- Added `RandCommonOptions`, which is what `count`, `style`, `minLength` / `maxLength`, `startsWith`, `unique` and `output` are on every generator — `RandNameOptions`, `RandNicknameOptions` and the new `RandWordOptions` all extend it. Also `RandThemedWordOptions`, `WordDetail` and `RandModifierOptions`.
+- Those common options are resolved and applied in one place now rather than once per generator. Nothing about them changed from the outside; a new generator gets all of them by construction.
 
 ## 1.1.0 (2026-09-01)
 

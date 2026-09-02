@@ -1,8 +1,6 @@
 # Changelog
 
-## 2.0.0
-
-**2026-09-02**
+## 1.2.0
 
 - **Breaking:** the fourteen nickname themes are their own generators now. `rand_word` takes a `theme`, and `rand_animal`, `rand_object`, `rand_nature`, `rand_plant`, `rand_gem`, `rand_concept`, `rand_myth`, `rand_job`, `rand_music`, `rand_place`, `rand_food`, `rand_sport`, `rand_vehicle` and `rand_product` are that generator with the theme already chosen. `word_length_range` reports what the pools hold. `rand_nickname` draws from the same pools rather than owning them.
 - **Breaking:** `NicknameLanguage`, `NicknameLanguageOption`, `NicknameTheme`, `NicknameThemeOption`, `NICKNAME_LANGUAGES` and `NICKNAME_THEMES` are `WordLanguage`, `WordLanguageOption`, `WordTheme`, `WordThemeOption`, `WORD_LANGUAGES` and `WORD_THEMES`. They describe the words, and the words are no longer only a nickname's business.
@@ -10,7 +8,9 @@
 - **Breaking:** `rand_nickname`'s `base_word` is gone, and with it the one argument whose default was `None` rather than `"all"`: `language` now defaults to `"all"` like every other one.
 - **Breaking:** `NAME_COUNT_MAX`, `NAME_LENGTH_MIN` / `MAX`, `NICKNAME_COUNT_MAX` and `NICKNAME_LENGTH_MIN` / `MAX` are `RAND_COUNT_MAX` and `RAND_LENGTH_MIN` / `MAX`, one set for every generator. The name length bound goes from 30 to 40 as a result.
 - `rand_suffix`, `rand_prefix` and `rand_modifier` all work with **no value at all**, handing back the token or the word they would have attached. `rand_suffix()` is `"nVtRC"`.
+- **Breaking:** the `randino.affix` package is `randino.decorate`, which is what the three functions in it now do between them. Everything it holds is still re-exported from `randino` itself, which is where it is meant to be imported from.
 - Added `WordDetail`, which `rand_word(output="detail")` returns.
+- `count`, `style`, `min_length` / `max_length`, `starts_with`, `unique` and `output` are the same arguments on every generator now, resolved and applied in one place rather than once per generator. Nothing about them changed from the outside; a new generator gets all of them by construction.
 
 ## 1.1.0
 
