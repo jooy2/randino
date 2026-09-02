@@ -3,8 +3,8 @@ import { computed, onMounted, reactive, ref, watch } from 'vue';
 import { useData } from 'vitepress';
 import {
 	NAME_LANGUAGES,
-	NICKNAME_LANGUAGES,
-	NICKNAME_THEMES,
+	WORD_LANGUAGES,
+	WORD_THEMES,
 	nameLengthRange,
 	nameSupportsMiddleName,
 	nicknameLengthRange,
@@ -380,7 +380,7 @@ async function copy() {
 					<span><code>language</code></span>
 					<select v-model="nickname.language">
 						<option value="all">all</option>
-						<option v-for="code_ in NICKNAME_LANGUAGES" :key="code_" :value="code_">
+						<option v-for="code_ in WORD_LANGUAGES" :key="code_" :value="code_">
 							{{ code_ }} — {{ LANGUAGE_NAMES[code_] }}
 						</option>
 					</select>
@@ -390,7 +390,7 @@ async function copy() {
 					<span><code>theme</code></span>
 					<select v-model="nickname.theme">
 						<option value="all">all</option>
-						<option v-for="item in NICKNAME_THEMES" :key="item" :value="item">{{ item }}</option>
+						<option v-for="item in WORD_THEMES" :key="item" :value="item">{{ item }}</option>
 					</select>
 				</label>
 

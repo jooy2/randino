@@ -14,6 +14,7 @@ Every option and every example, with **JavaScript** picked in the sidebar. This 
 
 - **Person names** read like names people actually carry — 김민준, Emma Clover, Иванов Иван — and come with their English pronunciation. 9 languages.
 - **Nicknames** are the handles you would pick for a game or a website — 멋진사자, MistyOwl, 고양이꼬리. Built from everyday words across fourteen themes, never from person names.
+- **Words** are those themes on their own — `randWord`, plus `randAnimal`, `randFood` and twelve more.
 - One options object per generator, every option optional: `randName()` on its own works.
 - **No runtime dependencies.** ESM, typed, and it runs in Node and in the browser alike.
 
@@ -103,6 +104,38 @@ randNickname({ language: 'ko', output: 'detail' });
 
 Themes: `animal`, `object`, `nature`, `plant`, `gem`, `concept`, `myth`, `job`, `music`, `place`, `food`, `sport`, `vehicle`, `product`.
 
+## Words
+
+The pools the nicknames are built from, on their own. Fourteen themes, four languages, and a function per theme.
+
+```javascript
+import { randAnimal, randFood, randWord, wordLengthRange } from 'randino';
+
+randWord({ language: 'ko', theme: 'animal', count: 3 });
+// ['여우', '고래', '수달']
+
+randAnimal({ language: 'en', count: 2 }); // ['Otter', 'Falcon']
+randFood({ language: 'ko', count: 2 }); // ['떡볶이', '녹차']
+
+randWord({ language: 'ko', theme: 'plant', output: 'detail' });
+// [{ word: '민들레', language: 'ko', theme: 'plant' }]
+
+wordLengthRange('ko'); // [1, 4]
+```
+
+| Option                    | Type                             | Default   |
+| ------------------------- | -------------------------------- | --------- |
+| `language`                | `'all'` or a language code       | `'all'`   |
+| `theme`                   | `'all'` or a theme name          | `'all'`   |
+| `count`                   | `number`                         | `1`       |
+| `style`                   | `number` (0 real … 100 invented) | `0`       |
+| `minLength` / `maxLength` | `number`                         | _pools_   |
+| `startsWith`              | `string`                         | —         |
+| `unique`                  | `boolean`                        | `false`   |
+| `output`                  | `'value' \| 'detail'`            | `'value'` |
+
+One function per theme: `randAnimal`, `randObject`, `randNature`, `randPlant`, `randGem`, `randConcept`, `randMyth`, `randJob`, `randMusic`, `randPlace`, `randFood`, `randSport`, `randVehicle`, `randProduct`. Each is `randWord` with the theme already chosen.
+
 ## Prefixes and suffixes
 
 `randSuffix` and `randPrefix` attach a random token to a string, or to every string in an array — which is what turns a nickname that is merely unlikely to collide into one that cannot. They take anything, not just this library's output, which is why they are not an option on the generators.
@@ -134,8 +167,9 @@ import {
 	nameSupportsMiddleName,
 	nameSupportsRoman,
 	nicknameLengthRange,
+	wordLengthRange,
 	NAME_LANGUAGES,
-	NICKNAME_THEMES
+	WORD_THEMES
 } from 'randino';
 
 nameLengthRange('ko'); // [3, 3]
@@ -143,9 +177,10 @@ nameLengthRange('en', true, true); // [12, 24]
 nameSupportsMiddleName('ko'); // false
 nameSupportsRoman('en'); // false
 nicknameLengthRange('ko'); // [1, 12]
+wordLengthRange('ko'); // [1, 4]
 ```
 
-`NAME_LANGUAGES`, `NICKNAME_LANGUAGES` and `NICKNAME_THEMES` list what the generators accept; `RAND_COUNT_MAX`, `RAND_LENGTH_MIN` / `_MAX`, `AFFIX_LENGTH_DEFAULT` / `_MAX`, `AFFIX_SEPARATOR_DEFAULT` and `AFFIX_CHARSET` are the bounds and defaults every option is clamped to.
+`NAME_LANGUAGES`, `WORD_LANGUAGES` and `WORD_THEMES` list what the generators accept; `RAND_COUNT_MAX`, `RAND_LENGTH_MIN` / `_MAX`, `AFFIX_LENGTH_DEFAULT` / `_MAX`, `AFFIX_SEPARATOR_DEFAULT` and `AFFIX_CHARSET` are the bounds and defaults every option is clamped to.
 
 ## Development
 

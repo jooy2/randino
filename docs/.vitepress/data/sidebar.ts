@@ -13,9 +13,9 @@
  * because the two generators are two things, but a reader looking for the
  * function they are about to call does not care which folder it lives in. The
  * split here is by what a function *is*, one level down inside **API**:
- * **Generators** hand back names and nicknames, **Utilities** decorate a string
- * or answer a question about a language. The folder a page sits in decides
- * nothing but its URL.
+ * **Generators** hand back names, nicknames and words, **Utilities** decorate a
+ * string or answer a question about a language. The folder a page sits in
+ * decides nothing but its URL.
  *
  * **Behaviour** holds the prose explaining how each generator's options behave.
  * It is a group of its own rather than two more entries under Guide, because it
@@ -67,7 +67,8 @@ export const SIDEBAR: SidebarGroup[] = [
 				ko: '생성 함수',
 				items: [
 					{ path: 'name/rand-name', en: 'randName', ko: 'randName' },
-					{ path: 'nickname/rand-nickname', en: 'randNickname', ko: 'randNickname' }
+					{ path: 'nickname/rand-nickname', en: 'randNickname', ko: 'randNickname' },
+					{ path: 'word/rand-word', en: 'randWord', ko: 'randWord' }
 				]
 			},
 			{
@@ -92,7 +93,8 @@ export const SIDEBAR: SidebarGroup[] = [
 						path: 'nickname/nickname-length-range',
 						en: 'nicknameLengthRange',
 						ko: 'nicknameLengthRange'
-					}
+					},
+					{ path: 'word/word-length-range', en: 'wordLengthRange', ko: 'wordLengthRange' }
 				]
 			}
 		]
@@ -109,7 +111,7 @@ export const SIDEBAR: SidebarGroup[] = [
 		en: 'Reference',
 		ko: '레퍼런스',
 		items: [
-			{ path: 'nickname/themes', en: 'Themes', ko: '테마' },
+			{ path: 'word/themes', en: 'Themes', ko: '테마' },
 			{ path: 'reference/constants', en: 'Constants', ko: '상수' },
 			{ path: 'changelog', en: 'Changelog', ko: '변경 내역' }
 		]

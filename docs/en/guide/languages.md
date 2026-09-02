@@ -2,54 +2,54 @@
 
 randino generates in nine languages, each with its own pools, its own name order and its own romanization. Every generator takes a language, and mixes all of the ones it supports when you leave it out.
 
-| Code | Language   | Native     | Person names | Nicknames |
-| ---- | ---------- | ---------- | :----------: | :-------: |
-| `en` | English    | English    |      ✅      |    ✅     |
-| `ko` | Korean     | 한국어     |      ✅      |    ✅     |
-| `ja` | Japanese   | 日本語     |      ✅      |    ✅     |
-| `zh` | Chinese    | 中文       |      ✅      |    ✅     |
-| `it` | Italian    | Italiano   |      ✅      |    ❌     |
-| `de` | German     | Deutsch    |      ✅      |    ❌     |
-| `ru` | Russian    | Русский    |      ✅      |    ❌     |
-| `es` | Spanish    | Español    |      ✅      |    ❌     |
-| `vi` | Vietnamese | Tiếng Việt |      ✅      |    ❌     |
+| Code | Language   | Native     | Person names | Words and nicknames |
+| ---- | ---------- | ---------- | :----------: | :-----------------: |
+| `en` | English    | English    |      ✅      |         ✅          |
+| `ko` | Korean     | 한국어     |      ✅      |         ✅          |
+| `ja` | Japanese   | 日本語     |      ✅      |         ✅          |
+| `zh` | Chinese    | 中文       |      ✅      |         ✅          |
+| `it` | Italian    | Italiano   |      ✅      |         ❌          |
+| `de` | German     | Deutsch    |      ✅      |         ❌          |
+| `ru` | Russian    | Русский    |      ✅      |         ❌          |
+| `es` | Spanish    | Español    |      ✅      |         ❌          |
+| `vi` | Vietnamese | Tiếng Việt |      ✅      |         ❌          |
 
 ::: lang js
 
-The codes are string literals, and they are also available at runtime as `NAME_LANGUAGES` and `NICKNAME_LANGUAGES`.
+The codes are string literals, and they are also available at runtime as `NAME_LANGUAGES` and `WORD_LANGUAGES`.
 
 ```javascript
-import { NAME_LANGUAGES, NICKNAME_LANGUAGES } from 'randino';
+import { NAME_LANGUAGES, WORD_LANGUAGES } from 'randino';
 
 NAME_LANGUAGES; // ['en', 'ko', 'ja', 'zh', 'it', 'de', 'ru', 'es', 'vi']
-NICKNAME_LANGUAGES; // ['en', 'ko', 'ja', 'zh']
+WORD_LANGUAGES; // ['en', 'ko', 'ja', 'zh']
 ```
 
 :::
 
 ::: lang dart
 
-The codes are the members of two enums, and the lists are also available as `nameLanguages` and `nicknameLanguages`.
+The codes are the members of two enums, and the lists are also available as `nameLanguages` and `wordLanguages`.
 
 ```dart
 import 'package:randino/randino.dart';
 
 NameLanguage.ko.name; // 'ko'
 nameLanguages; // every NameLanguage, in presentation order
-nicknameLanguages; // [NicknameLanguage.en, .ko, .ja, .zh]
+wordLanguages; // [WordLanguage.en, .ko, .ja, .zh]
 ```
 
 :::
 
 ::: lang py
 
-The codes are `Literal` types, so a checker rejects a code that does not exist, and the tuples are also available at runtime as `NAME_LANGUAGES` and `NICKNAME_LANGUAGES`.
+The codes are `Literal` types, so a checker rejects a code that does not exist, and the tuples are also available at runtime as `NAME_LANGUAGES` and `WORD_LANGUAGES`.
 
 ```python
-from randino import NAME_LANGUAGES, NICKNAME_LANGUAGES
+from randino import NAME_LANGUAGES, WORD_LANGUAGES
 
 NAME_LANGUAGES  # ('en', 'ko', 'ja', 'zh', 'it', 'de', 'ru', 'es', 'vi')
-NICKNAME_LANGUAGES  # ('en', 'ko', 'ja', 'zh')
+WORD_LANGUAGES  # ('en', 'ko', 'ja', 'zh')
 ```
 
 :::
@@ -83,9 +83,9 @@ Romanization is the **English pronunciation of the native form**, not a translat
 
 English is the one language where romanizing changes nothing, because the names are already in the Latin alphabet.
 
-## Nicknames
+## Words and nicknames {#words-and-nicknames}
 
-Nicknames cover four languages rather than nine, and the reason is grammar rather than effort. A nickname joins a modifier to a noun, and that only reads naturally where the language asks for no agreement between the two.
+The word pools — and so `randWord`, the fourteen themed generators and `randNickname` — cover four languages rather than nine, and the reason is grammar rather than effort. A modifier has to sit in front of a noun exactly as it is written in the dictionary, and that only reads naturally where the language asks for no agreement between the two.
 
 | Code | Language | Shapes                      | Example                |
 | ---- | -------- | --------------------------- | ---------------------- |

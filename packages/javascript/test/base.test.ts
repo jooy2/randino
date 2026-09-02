@@ -12,19 +12,35 @@ describe('base test', () => {
 			'AFFIX_LENGTH_MAX',
 			'AFFIX_SEPARATOR_DEFAULT',
 			'NAME_LANGUAGES',
-			'NICKNAME_LANGUAGES',
-			'NICKNAME_THEMES',
 			'RAND_COUNT_MAX',
 			'RAND_LENGTH_MAX',
 			'RAND_LENGTH_MIN',
+			'WORD_LANGUAGES',
+			'WORD_THEMES',
 			'nameLengthRange',
 			'nameSupportsMiddleName',
 			'nameSupportsRoman',
 			'nicknameLengthRange',
+			'randAnimal',
+			'randConcept',
+			'randFood',
+			'randGem',
+			'randJob',
+			'randMusic',
+			'randMyth',
 			'randName',
+			'randNature',
 			'randNickname',
+			'randObject',
+			'randPlace',
+			'randPlant',
 			'randPrefix',
-			'randSuffix'
+			'randProduct',
+			'randSport',
+			'randSuffix',
+			'randVehicle',
+			'randWord',
+			'wordLengthRange'
 		]);
 
 		assert.strictEqual(typeof randino.randName, 'function');
@@ -45,8 +61,14 @@ describe('base test', () => {
 
 		assert.strictEqual(typeof randino.randNickname, 'function');
 		assert.strictEqual(typeof randino.nicknameLengthRange, 'function');
-		assert.ok(Array.isArray(randino.NICKNAME_LANGUAGES));
-		assert.ok(Array.isArray(randino.NICKNAME_THEMES));
+		assert.ok(Array.isArray(randino.WORD_LANGUAGES));
+		assert.ok(Array.isArray(randino.WORD_THEMES));
+
+		// One generator per theme, and the theme list is what says how many.
+		assert.strictEqual(typeof randino.randWord, 'function');
+		assert.strictEqual(typeof randino.wordLengthRange, 'function');
+		assert.strictEqual(typeof randino.randAnimal({ language: 'ko' })[0], 'string');
+		assert.strictEqual(randino.randProduct({ output: 'detail' })[0].theme, 'product');
 
 		assert.strictEqual(typeof randino.randSuffix, 'function');
 		assert.strictEqual(typeof randino.randPrefix, 'function');

@@ -141,10 +141,10 @@ randNickname({ language: 'en', count: 3 });
 ```dart
 import 'package:randino/randino.dart';
 
-randNickname(language: NicknameLanguage.ko, count: 3);
+randNickname(language: WordLanguage.ko, count: 3);
 // ['오래된곰', '영원한도마뱀', '귀여운신화다발']
 
-randNickname(language: NicknameLanguage.en, count: 3);
+randNickname(language: WordLanguage.en, count: 3);
 // ['FoggyHillside', 'CraneVoyage', 'TinyLeopardCloak']
 ```
 

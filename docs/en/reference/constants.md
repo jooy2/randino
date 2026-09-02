@@ -93,13 +93,13 @@ from randino import NAME_LANGUAGES
 ::: lang js
 
 ```javascript
-import { NICKNAME_LANGUAGES, NICKNAME_THEMES } from 'randino';
+import { WORD_LANGUAGES, WORD_THEMES } from 'randino';
 ```
 
-| Name                 | Type                 | Value                             |
-| -------------------- | -------------------- | --------------------------------- |
-| `NICKNAME_LANGUAGES` | `NicknameLanguage[]` | Every supported nickname language |
-| `NICKNAME_THEMES`    | `NicknameTheme[]`    | All fourteen themes               |
+| Name             | Type             | Value                             |
+| ---------------- | ---------------- | --------------------------------- |
+| `WORD_LANGUAGES` | `WordLanguage[]` | Every supported nickname language |
+| `WORD_THEMES`    | `WordTheme[]`    | All fourteen themes               |
 
 :::
 
@@ -109,23 +109,23 @@ import { NICKNAME_LANGUAGES, NICKNAME_THEMES } from 'randino';
 import 'package:randino/randino.dart';
 ```
 
-| Name                | Type                     | Value                             |
-| ------------------- | ------------------------ | --------------------------------- |
-| `nicknameLanguages` | `List<NicknameLanguage>` | Every supported nickname language |
-| `nicknameThemes`    | `List<NicknameTheme>`    | All fourteen themes               |
+| Name            | Type                 | Value                             |
+| --------------- | -------------------- | --------------------------------- |
+| `wordLanguages` | `List<WordLanguage>` | Every supported nickname language |
+| `wordThemes`    | `List<WordTheme>`    | All fourteen themes               |
 
 :::
 
 ::: lang py
 
 ```python
-from randino import NICKNAME_LANGUAGES, NICKNAME_THEMES
+from randino import WORD_LANGUAGES, WORD_THEMES
 ```
 
-| Name                 | Type                         | Value                             |
-| -------------------- | ---------------------------- | --------------------------------- |
-| `NICKNAME_LANGUAGES` | `tuple[NicknameLanguage, …]` | Every supported nickname language |
-| `NICKNAME_THEMES`    | `tuple[NicknameTheme, …]`    | All fourteen themes               |
+| Name             | Type                     | Value                             |
+| ---------------- | ------------------------ | --------------------------------- |
+| `WORD_LANGUAGES` | `tuple[WordLanguage, …]` | Every supported nickname language |
+| `WORD_THEMES`    | `tuple[WordTheme, …]`    | All fourteen themes               |
 
 :::
 
@@ -247,10 +247,10 @@ import type {
 	NameLanguageOption,
 	NameScript,
 	NicknameDetail,
-	NicknameLanguage,
-	NicknameLanguageOption,
-	NicknameTheme,
-	NicknameThemeOption,
+	WordLanguage,
+	WordLanguageOption,
+	WordTheme,
+	WordThemeOption,
 	RandNameOptions,
 	RandNicknameOptions,
 	RandOutput
@@ -272,7 +272,7 @@ import 'package:randino/randino.dart';
 
 // Enums
 NameLanguage, NameGender, NameScript
-NicknameLanguage, NicknameTheme
+WordLanguage, WordTheme
 
 // Values
 LengthRange, NameDetail, NicknameDetail
@@ -295,10 +295,10 @@ from randino import (
     NameLanguageOption,
     NameScript,
     NicknameDetail,
-    NicknameLanguage,
-    NicknameLanguageOption,
-    NicknameTheme,
-    NicknameThemeOption,
+    WordLanguage,
+    WordLanguageOption,
+    WordTheme,
+    WordThemeOption,
     RandOutput,
 )
 
@@ -314,4 +314,4 @@ There is no options type to import: the arguments are keyword-only rather than a
 ## See also
 
 - [Supported languages](../guide/languages) — what each language code covers.
-- [Themes](../nickname/themes) — what each theme holds.
+- [Themes](../word/themes) — what each theme holds.

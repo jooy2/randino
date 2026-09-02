@@ -7,12 +7,12 @@ import 'package:randino/src/types.dart';
 /// on their own — to highlight the base word, or to group by theme.
 ///
 /// ```dart
-/// randNicknameDetails(language: NicknameLanguage.ko);
+/// randNicknameDetails(language: WordLanguage.ko);
 /// // [NicknameDetail(멋진사자, [멋진, 사자], ko, animal)]
 /// ```
 List<NicknameDetail> randNicknameDetails({
-  NicknameLanguage? language,
-  NicknameTheme? theme,
+  WordLanguage? language,
+  WordTheme? theme,
   int count = 1,
   int style = 0,
   int? minLength,

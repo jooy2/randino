@@ -16,7 +16,7 @@ nicknameLengthRange('ko', true, '-'); // [1, 14]
 
 | Parameter | Type | Default | Description |
 | --- | --- | --- | --- |
-| `language` | `NicknameLanguageOption` | `'all'` | The language, or `'all'` for every one |
+| `language` | `WordLanguageOption` | `'all'` | The language, or `'all'` for every one |
 | `includeModifier` | `boolean` | `true` | Count the modifier shapes |
 | `wordSeparator` | `string` | — | Count what a separator adds between the words |
 
@@ -29,18 +29,18 @@ Returns `[min, max]`.
 ```dart
 import 'package:randino/randino.dart';
 
-nicknameLengthRange(language: NicknameLanguage.ko); // LengthRange(1, 12)
-nicknameLengthRange(language: NicknameLanguage.ko, includeModifier: false); // LengthRange(1, 8)
-nicknameLengthRange(language: NicknameLanguage.en); // LengthRange(3, 30)
-nicknameLengthRange(language: NicknameLanguage.zh); // LengthRange(2, 5)
-nicknameLengthRange(language: NicknameLanguage.ko, wordSeparator: '-'); // LengthRange(1, 14)
+nicknameLengthRange(language: WordLanguage.ko); // LengthRange(1, 12)
+nicknameLengthRange(language: WordLanguage.ko, includeModifier: false); // LengthRange(1, 8)
+nicknameLengthRange(language: WordLanguage.en); // LengthRange(3, 30)
+nicknameLengthRange(language: WordLanguage.zh); // LengthRange(2, 5)
+nicknameLengthRange(language: WordLanguage.ko, wordSeparator: '-'); // LengthRange(1, 14)
 ```
 
-| Parameter | Type | Default | Description |
-| --- | --- | --- | --- |
-| `language` | `NicknameLanguage?` | `null` | The language, or null for every one |
-| `includeModifier` | `bool` | `true` | Count the modifier shapes |
-| `wordSeparator` | `String?` | `null` | Count what a separator adds between the words |
+| Parameter         | Type            | Default | Description                                   |
+| ----------------- | --------------- | ------- | --------------------------------------------- |
+| `language`        | `WordLanguage?` | `null`  | The language, or null for every one           |
+| `includeModifier` | `bool`          | `true`  | Count the modifier shapes                     |
+| `wordSeparator`   | `String?`       | `null`  | Count what a separator adds between the words |
 
 Returns a `LengthRange`, which compares by value.
 
@@ -60,7 +60,7 @@ nickname_length_range("ko", word_separator="-")  # (1, 14)
 
 | Parameter | Type | Default | Description |
 | --- | --- | --- | --- |
-| `language` | `NicknameLanguageOption` | `"all"` | The language, or `"all"` for every one |
+| `language` | `WordLanguageOption` | `"all"` | The language, or `"all"` for every one |
 | `include_modifier` | `bool` | `True` | Count the modifier shapes |
 | `word_separator` | `str \| None` | `None` | Count what a separator adds between the words |
 
@@ -85,8 +85,8 @@ randNickname({ language: 'ko', maxLength: 3, count: 3 });
 ::: lang dart
 
 ```dart
-nicknameLengthRange(language: NicknameLanguage.ko); // LengthRange(1, 12) — every shape
-randNickname(language: NicknameLanguage.ko, maxLength: 3, count: 3);
+nicknameLengthRange(language: WordLanguage.ko); // LengthRange(1, 12) — every shape
+randNickname(language: WordLanguage.ko, maxLength: 3, count: 3);
 // ['노을', '파란곰', '수달'] — no room for three words
 ```
 
@@ -119,9 +119,9 @@ nicknameLengthRange('en', true, ' '); // [3, 32]
 ::: lang dart
 
 ```dart
-nicknameLengthRange(language: NicknameLanguage.ko); // LengthRange(1, 12)
-nicknameLengthRange(language: NicknameLanguage.ko, wordSeparator: '-'); // LengthRange(1, 14)
-nicknameLengthRange(language: NicknameLanguage.en, wordSeparator: ' '); // LengthRange(3, 32)
+nicknameLengthRange(language: WordLanguage.ko); // LengthRange(1, 12)
+nicknameLengthRange(language: WordLanguage.ko, wordSeparator: '-'); // LengthRange(1, 14)
+nicknameLengthRange(language: WordLanguage.en, wordSeparator: ' '); // LengthRange(3, 32)
 ```
 
 :::

@@ -80,24 +80,27 @@ export interface NameDetail {
 }
 
 /**
- * A language the nickname generator can build nicknames in. Fewer than
- * `NameLanguage`: a nickname joins a modifier to a noun, which only reads
- * naturally in languages that ask for no grammatical agreement.
+ * A language the word pools cover, and so a language `randWord`, `randModifier`
+ * and `randNickname` can work in. Fewer than `NameLanguage`: a modifier has to
+ * sit in front of a noun exactly as it is written in the dictionary, which only
+ * reads naturally in languages that ask for no grammatical agreement.
  */
-export type NicknameLanguage = 'en' | 'ko' | 'ja' | 'zh';
+export type WordLanguage = 'en' | 'ko' | 'ja' | 'zh';
 
 /** `'all'` mixes every supported language. */
-export type NicknameLanguageOption = NicknameLanguage | 'all';
+export type WordLanguageOption = WordLanguage | 'all';
 
 /**
- * What a nickname is about — animals (`사자`), everyday things (`물병`), nature
+ * What a word is about — animals (`사자`), everyday things (`물병`), nature
  * and its phenomena (`노을`), plants (`민들레`), stones and metals (`흑요석`),
  * ideas from the humanities and social world (`철학`), creatures out of myth
  * (`구미호`), the trades and roles people hold (`대장장이`), music (`교향곡`),
  * places (`광장`), food (`떡볶이`), sports (`양궁`), things that carry you
  * (`열기구`), or things you buy (`이어폰`). Person names are never used.
+ *
+ * Each one is also a generator of its own — `animal` is `randAnimal`.
  */
-export type NicknameTheme =
+export type WordTheme =
 	| 'animal'
 	| 'object'
 	| 'nature'
@@ -114,13 +117,39 @@ export type NicknameTheme =
 	| 'product';
 
 /** `'all'` draws from every theme. */
-export type NicknameThemeOption = NicknameTheme | 'all';
+export type WordThemeOption = WordTheme | 'all';
+
+export interface RandWordOptions extends RandCommonOptions {
+	/** Language of the generated words. `'all'` mixes every language. Default `'all'`. */
+	language?: WordLanguageOption;
+	/** What the words should be about. Default `'all'`. */
+	theme?: WordThemeOption;
+}
+
+/**
+ * What the fourteen themed generators take — `RandWordOptions` without the
+ * option they answer. `randAnimal({ theme: 'food' })` would be a contradiction,
+ * so it does not type-check.
+ */
+export type RandThemedWordOptions = Omit<RandWordOptions, 'theme'>;
+
+/** A generated word with where it came from. */
+export interface WordDetail {
+	/** The word itself. */
+	word: string;
+	language: WordLanguage;
+	/**
+	 * Theme the word belongs to, or `null` when it is not one the generator
+	 * knows, which happens when it was invented.
+	 */
+	theme: WordTheme | null;
+}
 
 export interface RandNicknameOptions extends RandCommonOptions {
 	/** Language of the generated nicknames. `'all'` mixes every language. Default `'all'`. */
-	language?: NicknameLanguageOption;
+	language?: WordLanguageOption;
 	/** What the nickname should be about. Default `'all'`. */
-	theme?: NicknameThemeOption;
+	theme?: WordThemeOption;
 	/** Decorate the noun with a modifier (`멋진사자` rather than `사자`). Default `true`. */
 	includeModifier?: boolean;
 	/**
@@ -148,10 +177,10 @@ export interface NicknameDetail {
 	nickname: string;
 	/** The words the nickname is made of, in order. */
 	words: string[];
-	language: NicknameLanguage;
+	language: WordLanguage;
 	/**
 	 * Theme the nickname's base word belongs to, or `null` when that word is not
 	 * one the generator knows, which happens when it was invented.
 	 */
-	theme: NicknameTheme | null;
+	theme: WordTheme | null;
 }

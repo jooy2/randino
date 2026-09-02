@@ -1,8 +1,8 @@
 import 'package:randino/src/constants.dart';
 import 'package:randino/src/internal/utils.dart';
-import 'package:randino/src/nickname/data/index.dart';
 import 'package:randino/src/nickname/nickname_generator.dart';
 import 'package:randino/src/types.dart';
+import 'package:randino/src/word/data/index.dart';
 
 /// Every nickname length the language can produce, in characters, which is what
 /// `randNickname` falls back to when `minLength` or `maxLength` is omitted.
@@ -13,17 +13,17 @@ import 'package:randino/src/types.dart';
 /// between the words, and a null [language] spans every language at once.
 ///
 /// ```dart
-/// nicknameLengthRange(language: NicknameLanguage.ko); // LengthRange(1, 12)
-/// nicknameLengthRange(language: NicknameLanguage.ko, includeModifier: false); // LengthRange(1, 8)
-/// nicknameLengthRange(language: NicknameLanguage.en); // LengthRange(3, 30)
-/// nicknameLengthRange(language: NicknameLanguage.ko, wordSeparator: '-'); // LengthRange(1, 14)
+/// nicknameLengthRange(language: WordLanguage.ko); // LengthRange(1, 12)
+/// nicknameLengthRange(language: WordLanguage.ko, includeModifier: false); // LengthRange(1, 8)
+/// nicknameLengthRange(language: WordLanguage.en); // LengthRange(3, 30)
+/// nicknameLengthRange(language: WordLanguage.ko, wordSeparator: '-'); // LengthRange(1, 14)
 /// ```
 LengthRange nicknameLengthRange({
-  NicknameLanguage? language,
+  WordLanguage? language,
   bool includeModifier = true,
   String? wordSeparator,
 }) {
-  final languages = language == null ? nicknameLanguages : <NicknameLanguage>[language];
+  final languages = language == null ? wordLanguages : <WordLanguage>[language];
   var min = 1 << 30;
   var max = 0;
 

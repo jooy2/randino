@@ -70,23 +70,23 @@ randNameDetails(language: NameLanguage.ko).first;
 ## Nicknames
 
 ```dart
-randNickname(language: NicknameLanguage.ko, count: 3);
+randNickname(language: WordLanguage.ko, count: 3);
 // ['오래된곰', '영원한도마뱀', '귀여운신화다발']
 
-randNickname(language: NicknameLanguage.en, count: 2);
+randNickname(language: WordLanguage.en, count: 2);
 // ['FoggyHillside', 'CraneVoyage']
 
-randNickname(language: NicknameLanguage.ko, theme: NicknameTheme.animal, count: 2);
+randNickname(language: WordLanguage.ko, theme: WordTheme.animal, count: 2);
 // ['깊은연어', '하얀여우갈기']
 
-randNicknameDetails(language: NicknameLanguage.ko).first;
+randNicknameDetails(language: WordLanguage.ko).first;
 // NicknameDetail(오래된발견, [오래된, 발견], ko, concept)
 ```
 
 | Parameter                 | Type                | Default                |
 | ------------------------- | ------------------- | ---------------------- |
-| `language`                | `NicknameLanguage?` | `null` — every one     |
-| `theme`                   | `NicknameTheme?`    | `null` — every one     |
+| `language`                | `WordLanguage?` | `null` — every one     |
+| `theme`                   | `WordTheme?`    | `null` — every one     |
 | `count`                   | `int`               | `1`                    |
 | `style`                   | `int` (0 real … 100 invented) | `0`          |
 | `minLength` / `maxLength` | `int?`              | _language_             |
@@ -97,13 +97,42 @@ randNicknameDetails(language: NicknameLanguage.ko).first;
 
 Themes: `animal`, `object`, `nature`, `plant`, `gem`, `concept`, `myth`, `job`, `music`, `place`, `food`, `sport`, `vehicle`, `product`.
 
+## Words
+
+The pools the nicknames are built from, on their own. Fourteen themes, four languages, and a function per theme.
+
+```dart
+randWord(language: WordLanguage.ko, theme: WordTheme.animal, count: 3);
+// [여우, 고래, 수달]
+
+randAnimal(language: WordLanguage.en, count: 2); // [Otter, Falcon]
+randFood(language: WordLanguage.ko, count: 2); // [떡볶이, 녹차]
+
+randWordDetails(language: WordLanguage.ko, theme: WordTheme.plant).first;
+// WordDetail(민들레, ko, plant)
+
+wordLengthRange(language: WordLanguage.ko); // LengthRange(1, 4)
+```
+
+| Parameter                 | Type            | Default            |
+| ------------------------- | --------------- | ------------------ |
+| `language`                | `WordLanguage?` | `null` — every one |
+| `theme`                   | `WordTheme?`    | `null` — every one |
+| `count`                   | `int`           | `1`                |
+| `style`                   | `int`           | `0`                |
+| `minLength` / `maxLength` | `int?`          | _pools_            |
+| `startsWith`              | `String?`       | `null`             |
+| `unique`                  | `bool`          | `false`            |
+
+One function per theme: `randAnimal`, `randObject`, `randNature`, `randPlant`, `randGem`, `randConcept`, `randMyth`, `randJob`, `randMusic`, `randPlace`, `randFood`, `randSport`, `randVehicle`, `randProduct`. They return `List<String>`; for the detail form, pass the theme to `randWordDetails`.
+
 ## Prefixes and suffixes
 
 `randSuffix` and `randPrefix` attach a random token to a string — which is what turns a nickname that is merely unlikely to collide into one that cannot. They take anything, not just this library's output, which is why they are not a parameter on the generators.
 
 ```dart
 randSuffix('멋진사자'); // '멋진사자_nVtRC'
-randSuffixAll(randNickname(language: NicknameLanguage.ko, count: 2));
+randSuffixAll(randNickname(language: WordLanguage.ko, count: 2));
 // ['달력_U7aNZ', '조용한바구니_RUKAP']
 
 randPrefix('order-4021', length: 4, separator: '-'); // 'k3Rm-order-4021'
@@ -125,10 +154,10 @@ nameLengthRange(language: NameLanguage.ko); // LengthRange(3, 3)
 nameLengthRange(language: NameLanguage.en, includeMiddleName: true); // LengthRange(12, 24)
 nameSupportsMiddleName(NameLanguage.ko); // false
 nameSupportsRoman(NameLanguage.en); // false
-nicknameLengthRange(language: NicknameLanguage.ko); // LengthRange(1, 12)
+nicknameLengthRange(language: WordLanguage.ko); // LengthRange(1, 12)
 ```
 
-`nameLanguages`, `nicknameLanguages` and `nicknameThemes` list what the generators accept; `randCountMax`, `randLengthMin` / `Max`, `affixLengthDefault` / `Max`, `affixSeparatorDefault` and `affixCharset` are the bounds and defaults every parameter is clamped to.
+`nameLanguages`, `wordLanguages` and `wordThemes` list what the generators accept; `randCountMax`, `randLengthMin` / `Max`, `affixLengthDefault` / `Max`, `affixSeparatorDefault` and `affixCharset` are the bounds and defaults every parameter is clamped to.
 
 ## Differences from the npm package
 
@@ -141,7 +170,7 @@ The two generate the same output from the same data, and only the surface is Dar
 | `language: 'all'` (the default)    | `language` left out, or `null`                 |
 | `[number, number]`                 | `LengthRange`, which compares by value         |
 | `NameDetail` / `NicknameDetail` interfaces | The same two names, as classes         |
-| `output: 'detail'`                 | `randNameDetails` / `randNicknameDetails`      |
+| `output: 'detail'`                 | `randNameDetails` / `randNicknameDetails` / `randWordDetails` |
 | `randSuffix(['a', 'b'])`           | `randSuffixAll(['a', 'b'])`                    |
 
 The last two are the same limitation twice: Dart has neither overloads nor union types, so one function cannot return `List<String>` for one argument and `List<NameDetail>` for another. Where npm and PyPI pick the shape with an option, pub.dev picks it with a second function.

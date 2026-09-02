@@ -1,14 +1,14 @@
 """The natural length range of a nickname."""
 
 from randino._internal.utils import clamp
-from randino._types import NicknameLanguageOption
+from randino._types import WordLanguageOption
 from randino.constants import RAND_LENGTH_MAX, RAND_LENGTH_MIN
 from randino.nickname._generator import natural_range
-from randino.nickname.data import NICKNAME_LANGUAGES
+from randino.word.data import WORD_LANGUAGES
 
 
 def nickname_length_range(
-    language: NicknameLanguageOption = "all",
+    language: WordLanguageOption = "all",
     include_modifier: bool = True,
     word_separator: str | None = None,
 ) -> tuple[int, int]:
@@ -30,7 +30,7 @@ def nickname_length_range(
         >>> nickname_length_range("ko", True, "-")
         (1, 14)
     """
-    languages = NICKNAME_LANGUAGES if language == "all" else (language,)
+    languages = WORD_LANGUAGES if language == "all" else (language,)
     ranges = [natural_range(code, include_modifier, word_separator) for code in languages]
 
     return (

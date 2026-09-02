@@ -14,18 +14,18 @@ import 'package:randino/src/types.dart';
 /// `nicknameLengthRange` reports.
 ///
 /// ```dart
-/// randNickname(language: NicknameLanguage.ko, count: 3);
+/// randNickname(language: WordLanguage.ko, count: 3);
 /// // ['멋진사자', '파란물병', '고양이꼬리']
-/// randNickname(language: NicknameLanguage.en);
+/// randNickname(language: WordLanguage.en);
 /// // ['MistyOwl']
-/// randSuffixAll(randNickname(language: NicknameLanguage.ko, count: 2));
+/// randSuffixAll(randNickname(language: WordLanguage.ko, count: 2));
 /// // ['달리는표범_gDe2C', '조용한노을_nVtRC']
-/// randNickname(language: NicknameLanguage.ko, wordSeparator: ' ', count: 2);
+/// randNickname(language: WordLanguage.ko, wordSeparator: ' ', count: 2);
 /// // ['멋진 사자', '고양이 꼬리']
 /// ```
 List<String> randNickname({
-  NicknameLanguage? language,
-  NicknameTheme? theme,
+  WordLanguage? language,
+  WordTheme? theme,
   int count = 1,
   int style = 0,
   int? minLength,

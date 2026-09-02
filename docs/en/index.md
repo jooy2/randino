@@ -79,10 +79,10 @@ randName(
 );
 // ['Людмила Николаевна Богданова']
 
-randNickname(language: NicknameLanguage.ko, count: 3);
+randNickname(language: WordLanguage.ko, count: 3);
 // ['오래된곰', '영원한도마뱀', '귀여운신화다발']
 
-randSuffixAll(randNickname(language: NicknameLanguage.en, count: 2));
+randSuffixAll(randNickname(language: WordLanguage.en, count: 2));
 // ['FoggyHillside_gDe2C', 'CraneVoyage_nVtRC']
 ```
 

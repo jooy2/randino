@@ -14,11 +14,11 @@ nicknameLengthRange('zh'); // [2, 5]
 nicknameLengthRange('ko', true, '-'); // [1, 14]
 ```
 
-| 파라미터          | 타입                     | 기본값  | 설명                                    |
-| ----------------- | ------------------------ | ------- | --------------------------------------- |
-| `language`        | `NicknameLanguageOption` | `'all'` | 언어, 또는 `'all'`로 전체               |
-| `includeModifier` | `boolean`                | `true`  | 수식어가 들어가는 형태를 포함           |
-| `wordSeparator`   | `string`                 | —       | 구분자가 단어 사이에 더하는 길이를 포함 |
+| 파라미터          | 타입                 | 기본값  | 설명                                    |
+| ----------------- | -------------------- | ------- | --------------------------------------- |
+| `language`        | `WordLanguageOption` | `'all'` | 언어, 또는 `'all'`로 전체               |
+| `includeModifier` | `boolean`            | `true`  | 수식어가 들어가는 형태를 포함           |
+| `wordSeparator`   | `string`             | —       | 구분자가 단어 사이에 더하는 길이를 포함 |
 
 `[min, max]`를 반환합니다.
 
@@ -29,18 +29,18 @@ nicknameLengthRange('ko', true, '-'); // [1, 14]
 ```dart
 import 'package:randino/randino.dart';
 
-nicknameLengthRange(language: NicknameLanguage.ko); // LengthRange(1, 12)
-nicknameLengthRange(language: NicknameLanguage.ko, includeModifier: false); // LengthRange(1, 8)
-nicknameLengthRange(language: NicknameLanguage.en); // LengthRange(3, 30)
-nicknameLengthRange(language: NicknameLanguage.zh); // LengthRange(2, 5)
-nicknameLengthRange(language: NicknameLanguage.ko, wordSeparator: '-'); // LengthRange(1, 14)
+nicknameLengthRange(language: WordLanguage.ko); // LengthRange(1, 12)
+nicknameLengthRange(language: WordLanguage.ko, includeModifier: false); // LengthRange(1, 8)
+nicknameLengthRange(language: WordLanguage.en); // LengthRange(3, 30)
+nicknameLengthRange(language: WordLanguage.zh); // LengthRange(2, 5)
+nicknameLengthRange(language: WordLanguage.ko, wordSeparator: '-'); // LengthRange(1, 14)
 ```
 
-| 파라미터          | 타입                | 기본값 | 설명                                    |
-| ----------------- | ------------------- | ------ | --------------------------------------- |
-| `language`        | `NicknameLanguage?` | `null` | 언어, 또는 null로 전체                  |
-| `includeModifier` | `bool`              | `true` | 수식어가 들어가는 형태를 포함           |
-| `wordSeparator`   | `String?`           | `null` | 구분자가 단어 사이에 더하는 길이를 포함 |
+| 파라미터          | 타입            | 기본값 | 설명                                    |
+| ----------------- | --------------- | ------ | --------------------------------------- |
+| `language`        | `WordLanguage?` | `null` | 언어, 또는 null로 전체                  |
+| `includeModifier` | `bool`          | `true` | 수식어가 들어가는 형태를 포함           |
+| `wordSeparator`   | `String?`       | `null` | 구분자가 단어 사이에 더하는 길이를 포함 |
 
 값으로 비교되는 `LengthRange`를 반환합니다.
 
@@ -58,11 +58,11 @@ nickname_length_range("zh")  # (2, 5)
 nickname_length_range("ko", word_separator="-")  # (1, 14)
 ```
 
-| 파라미터 | 타입 | 기본값 | 설명 |
-| --- | --- | --- | --- |
-| `language` | `NicknameLanguageOption` | `"all"` | 언어, 또는 `"all"`로 전체 |
-| `include_modifier` | `bool` | `True` | 수식어가 들어가는 형태를 포함 |
-| `word_separator` | `str \| None` | `None` | 구분자가 단어 사이에 더하는 길이를 포함 |
+| 파라미터           | 타입                 | 기본값  | 설명                                    |
+| ------------------ | -------------------- | ------- | --------------------------------------- |
+| `language`         | `WordLanguageOption` | `"all"` | 언어, 또는 `"all"`로 전체               |
+| `include_modifier` | `bool`               | `True`  | 수식어가 들어가는 형태를 포함           |
+| `word_separator`   | `str \| None`        | `None`  | 구분자가 단어 사이에 더하는 길이를 포함 |
 
 `tuple[int, int]`를 반환합니다.
 
@@ -85,8 +85,8 @@ randNickname({ language: 'ko', maxLength: 3, count: 3 });
 ::: lang dart
 
 ```dart
-nicknameLengthRange(language: NicknameLanguage.ko); // LengthRange(1, 12) — 모든 형태
-randNickname(language: NicknameLanguage.ko, maxLength: 3, count: 3);
+nicknameLengthRange(language: WordLanguage.ko); // LengthRange(1, 12) — 모든 형태
+randNickname(language: WordLanguage.ko, maxLength: 3, count: 3);
 // ['노을', '파란곰', '수달'] — 세 단어가 들어갈 자리가 없습니다
 ```
 
@@ -119,9 +119,9 @@ nicknameLengthRange('en', true, ' '); // [3, 32]
 ::: lang dart
 
 ```dart
-nicknameLengthRange(language: NicknameLanguage.ko); // LengthRange(1, 12)
-nicknameLengthRange(language: NicknameLanguage.ko, wordSeparator: '-'); // LengthRange(1, 14)
-nicknameLengthRange(language: NicknameLanguage.en, wordSeparator: ' '); // LengthRange(3, 32)
+nicknameLengthRange(language: WordLanguage.ko); // LengthRange(1, 12)
+nicknameLengthRange(language: WordLanguage.ko, wordSeparator: '-'); // LengthRange(1, 14)
+nicknameLengthRange(language: WordLanguage.en, wordSeparator: ' '); // LengthRange(3, 32)
 ```
 
 :::

@@ -37,17 +37,19 @@ second function, and splitting one generator into two over its return type meant
 every option had to be documented twice.
 """
 
-NicknameLanguage = Literal["en", "ko", "ja", "zh"]
-"""A language the nickname generator can build nicknames in.
+WordLanguage = Literal["en", "ko", "ja", "zh"]
+"""A language the word pools cover.
 
-Fewer than `NameLanguage`: a nickname joins a modifier to a noun, which only reads
-naturally in languages that ask for no grammatical agreement.
+And so a language `rand_word`, `rand_modifier` and `rand_nickname` can work in.
+Fewer than `NameLanguage`: a modifier has to sit in front of a noun exactly as it is
+written in the dictionary, which only reads naturally in languages that ask for no
+grammatical agreement.
 """
 
-NicknameLanguageOption = Literal[NicknameLanguage, "all"]
+WordLanguageOption = Literal[WordLanguage, "all"]
 """"all" mixes every supported language."""
 
-NicknameTheme = Literal[
+WordTheme = Literal[
     "animal",
     "object",
     "nature",
@@ -63,7 +65,7 @@ NicknameTheme = Literal[
     "vehicle",
     "product",
 ]
-"""What a nickname is about.
+"""What a word is about.
 
 Animals (`사자`), everyday things (`물병`), nature and its phenomena (`노을`), plants
 (`민들레`), stones and metals (`흑요석`), ideas from the humanities and social world
@@ -71,9 +73,11 @@ Animals (`사자`), everyday things (`물병`), nature and its phenomena (`노�
 (`대장장이`), music (`교향곡`), places (`광장`), food (`떡볶이`), sports (`양궁`),
 things that carry you (`열기구`), or things you buy (`이어폰`). Person names are
 never used.
+
+Each one is also a generator of its own — `"animal"` is `rand_animal`.
 """
 
-NicknameThemeOption = Literal[NicknameTheme, "all"]
+WordThemeOption = Literal[WordTheme, "all"]
 """"all" draws from every theme."""
 
 
@@ -95,6 +99,24 @@ class NameDetail:
 
 
 @dataclass(frozen=True, slots=True)
+class WordDetail:
+    """A generated word with where it came from."""
+
+    word: str
+    """The word itself."""
+
+    language: WordLanguage
+    """The language this word was drawn from."""
+
+    theme: WordTheme | None
+    """Theme the word belongs to.
+
+    `None` when it is not one the generator knows, which happens when it was
+    invented.
+    """
+
+
+@dataclass(frozen=True, slots=True)
 class NicknameDetail:
     """A generated nickname with the pieces it was built from."""
 
@@ -104,10 +126,10 @@ class NicknameDetail:
     words: tuple[str, ...]
     """The words the nickname is made of, in order."""
 
-    language: NicknameLanguage
+    language: WordLanguage
     """The language this nickname was generated in."""
 
-    theme: NicknameTheme | None
+    theme: WordTheme | None
     """Theme the nickname's base word belongs to.
 
     `None` when that word is not one the generator knows, which happens when it

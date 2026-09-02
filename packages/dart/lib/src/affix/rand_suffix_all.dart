@@ -9,7 +9,7 @@ import 'package:randino/src/affix/data/index.dart';
 /// npm and PyPI packages do.
 ///
 /// ```dart
-/// randSuffixAll(randNickname(language: NicknameLanguage.ko, count: 2));
+/// randSuffixAll(randNickname(language: WordLanguage.ko, count: 2));
 /// // ['오래된곰_AVcCV', '영원한도마뱀_RUKAP']
 /// ```
 List<String> randSuffixAll(

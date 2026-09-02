@@ -1,0 +1,31 @@
+import 'package:randino/src/types.dart';
+import 'package:randino/src/word/rand_word.dart';
+
+/// Food and drink, the everyday kind.
+///
+/// [randWord] with the theme already chosen; every other parameter is the same.
+/// For the detail form, pass [WordTheme.food] to `randWordDetails` — Dart has
+/// no overloads, and fourteen more functions for it would be fourteen too many.
+///
+/// ```dart
+/// randFood(language: WordLanguage.ko, count: 3); // [밥, 떡볶이, 빵]
+/// randFood(language: WordLanguage.en, count: 3); // [Rice, Noodle, Dumpling]
+/// ```
+List<String> randFood({
+  WordLanguage? language,
+  int count = 1,
+  int style = 0,
+  int? minLength,
+  int? maxLength,
+  String? startsWith,
+  bool unique = false,
+}) => randWord(
+  language: language,
+  theme: WordTheme.food,
+  count: count,
+  style: style,
+  minLength: minLength,
+  maxLength: maxLength,
+  startsWith: startsWith,
+  unique: unique,
+);

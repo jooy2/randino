@@ -4,18 +4,21 @@ Guidance for AI agents (and humans) working in this repository. Written in Engli
 
 ## What randino is
 
-**randino** is a zero-dependency library that generates random **person names** and **nicknames**, per language. It ships for more than one programming language — TypeScript, Dart and Python — and every one of them generates from the same datasets under the same rules. Two separate concerns, deliberately:
+**randino** is a zero-dependency library that generates random **person names**, **nicknames** and **everyday words**, per language. It ships for more than one programming language — TypeScript, Dart and Python — and every one of them generates from the same datasets under the same rules. Separate concerns, deliberately:
 
 - **Names** should read like names a person actually carries (`김민준`, `Emma Clover`). Sample data for forms, seeds, mockups.
 - **Nicknames** are the handles someone would pick for a game or a website (`멋진사자`, `MistyOwl`). They are built from everyday words and **never from person names** — that rule is the whole point of keeping the two apart.
+- **Words** are those everyday words on their own (`여우`, `Lantern`), one theme at a time. `randWord` takes the theme as an option, and the fourteen `randAnimal` / `randFood` / … functions are the same generator with the theme already chosen.
 
-Both generators are implemented. Keep them apart — a shared "generator" abstraction is not wanted, but shared _helpers_ (`_internal`) are.
+All three are implemented. Keep the generators apart — a shared "generator" abstraction is not wanted — but the options they all take, and the loop that draws until it has `count` results, live in `_internal/generate` and are shared. So are the word pools: `word/data` is the one dataset, and `nickname` consumes it.
 
 Beside them sits **affix**, which generates nothing a person reads: `randSuffix` and `randPrefix` attach a random token to a string you already have (`멋진사자` → `멋진사자_nVtRC`). It used to be the nickname generator's `uniqueSuffix*` options, and it moved out because attaching a token to a string was never a thing about nicknames. The generators are about the words now, and any caller with a string can reach for it.
 
 The name generator is a port of the logic behind vutools' [Random Person Name Generator](https://www.vutools.com/tools/text/random-person-name-generator) (`client/src/app/[locale]/tools/text/random-person-name-generator` in the `www-vutools-com` repo), with the same options. Two deliberate differences: the web page's `es-hangul` dependency is replaced by an internal romanizer (see below), and length bounds are resolved per language so `language: 'all'` does not stretch a Korean name to fill a Spanish name's range.
 
-The nickname generator has no upstream — it is this repo's own. Its options mirror the name generator's where they mean the same thing — those live on `RandCommonOptions` now (`count`, `style`, `minLength` / `maxLength`, `startsWith`, `unique`, `output`) — and add `language`, `theme`, `includeModifier` and `wordSeparator`.
+The nickname and word generators have no upstream — they are this repo's own. Their options mirror the name generator's where they mean the same thing: those live on `RandCommonOptions` (`count`, `style`, `minLength` / `maxLength`, `startsWith`, `unique`, `output`), and each generator adds only what is its own. `randWord` adds `language` and `theme`; `randNickname` adds those plus `includeModifier` and `wordSeparator`.
+
+**A new generator should add options, not repeat them.** If it counts, filters by a starting character or deduplicates, it calls `collect` in `_internal/generate` and gets all of that for free.
 
 ## Repository layout
 
@@ -35,9 +38,11 @@ The **JavaScript package is the source of truth**. A behaviour change starts the
 lib/
   index.ts                  # re-exports every category + the public types
   _types/global.ts          # ALL public types live here (options, results)
+  constants.ts              # RAND_COUNT_MAX and the length bounds, shared by all
   _internal/
     utils.ts                # shared random/string helpers, never exported
     parse.ts                # words() / tokens() / romanMap() dataset helpers
+    generate.ts             # the common options, and the draw loop (`collect`)
   affix/
     index.ts                # the category's public surface
     randSuffix.ts           # public: string | string[] -> the same, token attached
@@ -57,20 +62,27 @@ lib/
       types.ts              # internal dataset types
       syllables.ts          # syllable templates for invented names
       en.ts ko.ts ja.ts …   # one file per language
+  word/
+    index.ts
+    randWord.ts             # public: string[], or WordDetail[] on `output: 'detail'`
+    randAnimal.ts …         # public: one per theme, fourteen of them
+    wordLengthRange.ts      # public helper
+    wordGenerator.ts        # internal: the generator, and the drawing primitives
+    data/
+      index.ts              # WORD_DATA, WORD_LANGUAGES, WORD_THEMES
+      types.ts              # internal dataset types
+      en.ts ko.ts ja.ts zh.ts
   nickname/
     index.ts
     randNickname.ts         # public: string[], or NicknameDetail[] likewise
     nicknameLengthRange.ts  # public helper
-    nicknameGenerator.ts    # internal: shapes, length fitting
-    data/
-      index.ts              # NICKNAME_DATA, languages, themes, bounds
-      types.ts
-      en.ts ko.ts ja.ts zh.ts
+    nicknameGenerator.ts    # internal: shapes, length fitting; draws through word/
 test/
   base.test.ts              # the package's export surface
   affix.test.ts             # one *.test.ts per category
   name.test.ts
   nickname.test.ts
+  word.test.ts
 ```
 
 ### Conventions
@@ -130,12 +142,17 @@ lib/
       romanize.dart
       name_generator.dart
       rand_name.dart …
+    word/                   # mirrors lib/word, minus the themed detail forms
+      data/                 # one file per language, ported verbatim
+      word_generator.dart
+      rand_word.dart rand_animal.dart …
     nickname/               # mirrors lib/nickname
 test/
   base_test.dart            # the barrel's export surface, read out of the source
   affix_test.dart
   name_test.dart
   nickname_test.dart
+  word_test.dart
 example/
   randino_example.dart      # what pub.dev renders on the package's Example tab
 ```
@@ -166,7 +183,8 @@ example/
 Dart has neither overloads nor union types, so a function cannot hand back one type for one argument and another type for another. That costs two things, and both are the same limitation:
 
 - `randSuffix` takes a `String` and `randSuffixAll` takes a `List<String>`, where npm and PyPI have one function taking either.
-- `randNameDetails` and `randNicknameDetails` still exist here. In the other two packages they are `output: 'detail'` on the generator itself; in Dart, `randName` returns `List<String>` and that is the end of it.
+- `randNameDetails`, `randNicknameDetails` and `randWordDetails` still exist here. In the other two packages they are `output: 'detail'` on the generator itself; in Dart, `randName` returns `List<String>` and that is the end of it.
+- The **fourteen themed word functions have no detail form.** Twenty-eight functions for one option would be the wrong trade, so `randAnimal` returns `List<String>` and a caller who wants the detail passes `WordTheme.animal` to `randWordDetails`. That asymmetry is documented on every one of them.
 
 Do not try to fake either with `Object` or a generic: `T extends Object` would type-check `randSuffix(3)` and fail at run time, which is worse than a second name. **A new option that changes a return type lands as a second Dart function**, and the `::: lang` blocks on the docs page are where the two shapes are shown side by side.
 
@@ -191,6 +209,10 @@ src/randino/
     _romanize.py
     _generator.py
     rand_name.py …
+  word/                     # mirrors lib/word
+    data/                   # one file per language, ported verbatim
+    _generator.py
+    rand_word.py rand_animal.py …
   nickname/                 # mirrors lib/nickname
   py.typed                  # PEP 561 — without it every annotation is ignored
 tests/
@@ -198,6 +220,7 @@ tests/
   test_affix.py
   test_name.py
   test_nickname.py
+  test_word.py
 ```
 
 | Command                | What it does                     |
@@ -276,6 +299,8 @@ Every variant is in the document and CSS hides all but one, which is what buys t
 `data/sidebar.ts` nests one level: a `SidebarGroup`'s `items` are pages, or more groups. Deeper than that and the menu stops being a menu.
 
 **One page, one function**, which is why there is no `helpers` page holding three of them any more: a page that documents three functions can be named after none of them, so the menu names the page and the reader still has to open it to find out whether what they came for is inside.
+
+The one exception is a **family of functions that differ only by a fixed argument**. `randAnimal` … `randProduct` are fourteen names for `randWord` with its `theme` decided, so they share `randWord`'s page and are listed on it — fourteen sidebar entries whose pages would say the same thing in fourteen places is a worse menu, not a better one. A function with an option of its own gets a page of its own.
 
 The navbar is the same lists — its API dropdown is Generators and Utilities as two labelled sections, built out of `data/sidebar.ts` by `navGroupsFor`, so the menu and the sections it points into cannot drift. Its **Packages** dropdown is `PackageLinks.vue`, which is where npm, pub.dev and PyPI went when they stopped being three of the four icons in the navbar's right-hand corner; the registry URLs are still derived from the three manifests in `config.ts`, and GitHub is the one social link left. Its marks are `RegistryMark.vue` and not `LangMark.vue` — npm is not JavaScript and PyPI is not Python, and only pub.dev, which brands itself with the Dart logo, has the same drawing in both files.
 
@@ -377,35 +402,35 @@ Nicknames:
 8. Port all of it to `packages/python`: the code goes in the `NameLanguage` `Literal` in `src/randino/_types.py`, the dataset in `src/randino/name/data/<code>.py` and `__init__.py`, the script check in `SCRIPT` in `tests/test_name.py`. A language that exists in one package and not another is the failure mode this repository has to avoid, and the three suites are what catch it.
 9. Add the row to the tables in `docs/en/guide/languages.md` and `docs/ko/guide/languages.md`, and to the one in the root `README.md`.
 
-## Adding a nickname language
+## Adding a word language
 
-The four supported languages (`ko`, `en`, `ja`, `zh`) share one property: a modifier can sit in front of a noun exactly as it is written in the dictionary. **That is the bar for adding another one.** Italian, German, Russian, Spanish and Vietnamese are name languages but not nickname languages, and the reason is grammar, not effort:
+The four supported languages (`ko`, `en`, `ja`, `zh`) share one property: a modifier can sit in front of a noun exactly as it is written in the dictionary. **That is the bar for adding another one** — it is a word language and a nickname language at once, because they are the same pools. Italian, German, Russian, Spanish and Vietnamese are name languages but not word languages, and the reason is grammar, not effort:
 
 - Italian, Spanish, Russian and German inflect the modifier for the noun (`gatto azzurro` / `luna azzurra`, `blauer Wal` / `blaue Katze`). Supporting them means tagging every noun with its gender and storing every modifier once per gender — do that, or leave the language out. Half-agreement output is worse than none.
-- Vietnamese puts the modifier **after** the noun (`mèo xanh`) and reverses possessive compounds (`đuôi mèo`, not `mèo đuôi`), so it needs a word-order field on `NicknameLanguageData` before its pools are worth writing.
+- Vietnamese puts the modifier **after** the noun (`mèo xanh`) and reverses possessive compounds (`đuôi mèo`, not `mèo đuôi`), so it needs a word-order field on `WordLanguageData` before its pools are worth writing.
 
 To add one that clears the bar:
 
-1. Add the code to `NicknameLanguage` in `lib/_types/global.ts`.
-2. Add `lib/nickname/data/<code>.ts` with a `NicknameLanguageData` object: `joiner`, `capitalize`, `modifiers` in attributive form, `nouns` for every theme in `NICKNAME_THEMES`, an optional `parts` pool, and a `syn` template (`kind: 'syllable'` for alphabetic scripts, `kind: 'pool'` where one character is one syllable).
-3. Register it in `NICKNAME_DATA` and `NICKNAME_LANGUAGES` in `lib/nickname/data/index.ts`.
+1. Add the code to `WordLanguage` in `lib/_types/global.ts`.
+2. Add `lib/word/data/<code>.ts` with a `WordLanguageData` object: `joiner`, `capitalize`, `modifiers` in attributive form, `nouns` for every theme in `WORD_THEMES`, an optional `parts` pool, and a `syn` template (`kind: 'syllable'` for alphabetic scripts, `kind: 'pool'` where one character is one syllable).
+3. Register it in `WORD_DATA` and `WORD_LANGUAGES` in `lib/word/data/index.ts`.
 4. Leave `parts` out unless a bare noun-noun compound reads naturally — that is why `ja` and `zh` have none.
 5. Aim for 60+ nouns per theme; the pools are what make the output varied, and the combination count is roughly `modifiers × nouns × (1 + parts)` — around 9M for `ko` and `en`, 145K for `ja` and `zh`, which have no `parts`. `gem`, `sport`, `vehicle` and `product` are the exception (roughly 55 / 46 / 43 / 36 words) — the world holds fewer of those, and padding them with near-synonyms reads worse than a shorter pool.
-6. No person names, and no word that is only a name — for `en` this is enforced against the person-name pools, which is why `job` has no `Knight`, `Baker` or `Hunter` and `plant` no `Rose` or `Ivy`. Add the language to the README tables and to `SCRIPT` in `test/nickname.test.ts`; the existing per-language tests then cover it.
+6. No person names, and no word that is only a name — for `en` this is enforced against the person-name pools, which is why `job` has no `Knight`, `Baker` or `Hunter` and `plant` no `Rose` or `Ivy`. Add the language to the README tables and to `SCRIPT` in `test/word.test.ts` **and** `test/nickname.test.ts`; the existing per-language tests then cover it.
 7. Port all of it to `packages/dart` and `packages/python`, the same way a name language is ported.
 8. Add the row to the tables in `docs/*/guide/languages.md` and to the root `README.md`.
 
-## Adding a nickname theme
+## Adding a word theme
 
-A theme is a slice of everyday vocabulary that a modifier can sit in front of. Adding one touches every language at once, because `nouns` is a `Record<NicknameTheme, WordPool>` — the TypeScript type will not let a language skip it, and the ports assert it instead.
+A theme is a slice of everyday vocabulary that a modifier can sit in front of. Adding one touches every language at once, because `nouns` is a `Record<WordTheme, WordPool>` — the TypeScript type will not let a language skip it, and the ports assert it instead. **It also adds a public function**, because every theme has one.
 
-1. Add the name to `NicknameTheme` in `lib/_types/global.ts` and to `NICKNAME_THEMES` in `lib/nickname/data/index.ts`.
+1. Add the name to `WordTheme` in `lib/_types/global.ts` and to `WORD_THEMES` in `lib/word/data/index.ts`.
 2. Add the pool to **all four** languages. A theme that only one language can fill is not a theme.
 3. **Themes have to be disjoint**, and `test/nickname.test.ts` asserts it. A word in two of them makes the reported `theme` ambiguous, and it makes the detail output report a theme the caller did not ask about. When a new theme claims a word an old one already holds, move it rather than copy it — `place` took the twelve places that were sitting in `concept`, `vehicle` took 자전거 / 기차 / 배 out of `object`, `plant` took the flowers and trees out of `nature`, and `music` took the instruments out of `object` and 리듬 / 선율 / 화음 out of `concept`. Where the two senses are genuinely different words, rename instead of moving: the English toy became `Marbles` so `gem` could keep `Marble`.
-4. Watch the word lengths. `nicknameLengthRange` is derived from the shortest and longest word in the pools, and `test/nickname.test.ts` pins three of its values, so a Chinese noun outside 2–3 characters or a Korean one outside 1–4 changes a number the tests assert by value.
-5. Update the theme table in `README.md` and the doc comment on `NicknameTheme`. The existing per-theme tests cover the new theme as soon as it is in `NICKNAME_THEMES`.
-6. Do the same in `packages/dart` and `packages/python` — `NicknameTheme`, the theme list, and the pool in all four language files. Neither Dart's `Map` nor Python's `dict` complains about a missing theme the way the TypeScript `Record` does, which is why both ports' `test_nickname` asserts every language fills every theme.
-7. Add the row to `docs/en/nickname/themes.md` and `docs/ko/nickname/themes.md`.
+4. Watch the word lengths. `wordLengthRange` and `nicknameLengthRange` are both derived from the shortest and longest word in the pools, and `test/word.test.ts` and `test/nickname.test.ts` each pin three of their values, so a Chinese noun outside 2–3 characters or a Korean one outside 1–4 changes a number the tests assert by value.
+5. Add the `rand<Theme>` function beside the other fourteen, export it from `lib/word/index.ts`, and add it to the `THEMED` table in `test/word.test.ts` — that table is asserted to have exactly one entry per theme, so a missing function fails the suite. Update the theme list in `README.md` and the doc comment on `WordTheme`.
+6. Do the same in `packages/dart` and `packages/python` — `WordTheme`, the theme list, the pool in all four language files, and the themed function. Neither Dart's `Map` nor Python's `dict` complains about a missing theme the way the TypeScript `Record` does, which is why both ports assert every language fills every theme.
+7. Add the row to `docs/en/word/themes.md` and `docs/ko/word/themes.md`.
 
 ## Commit conventions
 

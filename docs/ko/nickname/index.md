@@ -18,7 +18,7 @@ randNickname({ language: 'ko', count: 3 });
 ```dart
 import 'package:randino/randino.dart';
 
-randNickname(language: NicknameLanguage.ko, count: 3);
+randNickname(language: WordLanguage.ko, count: 3);
 // ['오래된곰', '영원한도마뱀', '귀여운신화다발']
 ```
 
@@ -46,7 +46,7 @@ rand_nickname(language="ko", count=3)
 | [`randNickname`](./rand-nickname) | 닉네임 문자열, 또는 [닉네임마다 상세 정보](./rand-nickname#the-detail-output) |
 | [`nicknameLengthRange`](./nickname-length-range) | 해당 언어가 만들 수 있는 모든 길이 |
 
-명사는 14개 [테마](./themes)에서 오고, 모든 닉네임은 그중 한 테마의 단어를 중심으로 만들어집니다.
+명사는 14개 [테마](../word/themes)에서 오고, 모든 닉네임은 그중 한 테마의 단어를 중심으로 만들어집니다.
 
 ## 옵션의 동작 방식
 
@@ -71,10 +71,10 @@ randNickname({ language: 'en', count: 4, minLength: 4, maxLength: 9 });
 ::: lang dart
 
 ```dart
-randNickname(language: NicknameLanguage.ko, count: 4, minLength: 4, maxLength: 6);
+randNickname(language: WordLanguage.ko, count: 4, minLength: 4, maxLength: 6);
 // ['엉뚱한진리춤', '엉뚱한가위별', '해바라기', '별빛안개열매']
 
-randNickname(language: NicknameLanguage.en, count: 4, minLength: 4, maxLength: 9);
+randNickname(language: WordLanguage.en, count: 4, minLength: 4, maxLength: 9);
 // ['RustyBoot', 'DustyDuck', 'DustyMyth', 'RiddleEgg']
 ```
 
@@ -113,10 +113,10 @@ randNickname({ language: 'en', wordSeparator: '-', count: 4 });
 ::: lang dart
 
 ```dart
-randNickname(language: NicknameLanguage.ko, wordSeparator: ' ', count: 4);
+randNickname(language: WordLanguage.ko, wordSeparator: ' ', count: 4);
 // ['역사 발톱', '하늘빛 상상', '차가운 기억', '불빛 돛']
 
-randNickname(language: NicknameLanguage.en, wordSeparator: '-', count: 4);
+randNickname(language: WordLanguage.en, wordSeparator: '-', count: 4);
 // ['Headphone', 'Soft-Bat', 'Genial-Moose-Cove', 'Dreamy-Umbrella-Halo']
 ```
 
@@ -152,7 +152,7 @@ randSuffix(randNickname({ language: 'ko', count: 3 }));
 ::: lang dart
 
 ```dart
-randSuffixAll(randNickname(language: NicknameLanguage.ko, count: 3));
+randSuffixAll(randNickname(language: WordLanguage.ko, count: 3));
 // ['달력_U7aNZ', '금빛독수리다발_AVcCV', '조용한바구니_RUKAP']
 ```
 
@@ -188,10 +188,10 @@ randNickname({ language: 'en', style: 100, count: 3 });
 ::: lang dart
 
 ```dart
-randNickname(language: NicknameLanguage.ko, style: 100, count: 3);
+randNickname(language: WordLanguage.ko, style: 100, count: 3);
 // ['토한조해한', '가파모토히', '리누채무애저차부']
 
-randNickname(language: NicknameLanguage.en, style: 100, count: 3);
+randNickname(language: WordLanguage.en, style: 100, count: 3);
 // ['Duhusk', 'DresaelSlobru', 'BroureexGrosex']
 ```
 

@@ -11,7 +11,7 @@
 /// import 'package:randino/randino.dart';
 ///
 /// randName(language: NameLanguage.ko, count: 3); // ['김태윤', '원동혁', '조진우']
-/// randNickname(language: NicknameLanguage.en); // ['MistyOwl']
+/// randNickname(language: WordLanguage.en); // ['MistyOwl']
 /// ```
 ///
 /// Every parameter is optional and named, and a null enum means "every one of
@@ -32,7 +32,6 @@ export 'src/name/name_supports_middle_name.dart' show nameSupportsMiddleName;
 export 'src/name/name_supports_roman.dart' show nameSupportsRoman;
 export 'src/name/rand_name.dart' show randName;
 export 'src/name/rand_name_details.dart' show randNameDetails;
-export 'src/nickname/data/index.dart' show nicknameLanguages, nicknameThemes;
 export 'src/nickname/nickname_length_range.dart' show nicknameLengthRange;
 export 'src/nickname/rand_nickname.dart' show randNickname;
 export 'src/nickname/rand_nickname_details.dart' show randNicknameDetails;
@@ -44,5 +43,24 @@ export 'src/types.dart'
         NameLanguage,
         NameScript,
         NicknameDetail,
-        NicknameLanguage,
-        NicknameTheme;
+        WordDetail,
+        WordLanguage,
+        WordTheme;
+export 'src/word/data/index.dart' show wordLanguages, wordThemes;
+export 'src/word/rand_animal.dart' show randAnimal;
+export 'src/word/rand_concept.dart' show randConcept;
+export 'src/word/rand_food.dart' show randFood;
+export 'src/word/rand_gem.dart' show randGem;
+export 'src/word/rand_job.dart' show randJob;
+export 'src/word/rand_music.dart' show randMusic;
+export 'src/word/rand_myth.dart' show randMyth;
+export 'src/word/rand_nature.dart' show randNature;
+export 'src/word/rand_object.dart' show randObject;
+export 'src/word/rand_place.dart' show randPlace;
+export 'src/word/rand_plant.dart' show randPlant;
+export 'src/word/rand_product.dart' show randProduct;
+export 'src/word/rand_sport.dart' show randSport;
+export 'src/word/rand_vehicle.dart' show randVehicle;
+export 'src/word/rand_word.dart' show randWord;
+export 'src/word/rand_word_details.dart' show randWordDetails;
+export 'src/word/word_length_range.dart' show wordLengthRange;

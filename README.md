@@ -14,6 +14,7 @@ Every option, every language and every example — pick **JavaScript**, **Dart**
 
 - **Person names** read like names people actually carry — 김민준, Emma Clover, Иванов Иван — and come with their English pronunciation. 9 languages.
 - **Nicknames** are the handles you would pick for a game or a website — 멋진사자, MistyOwl, 고양이꼬리. Built from everyday words across fourteen themes, never from person names, with over nine million combinations in Korean and English before a random suffix is added.
+- **Words** are those fourteen themes on their own — `randWord`, and a function per theme: `randAnimal`, `randFood`, `randGem` and eleven more.
 - One options set per generator: language, length, count, and a style setting that runs from realistic to fully invented.
 - **No runtime dependencies**, in any of the packages.
 
@@ -68,10 +69,10 @@ randName(language: NameLanguage.ko, count: 3);
 randName(language: NameLanguage.en, gender: NameGender.female, includeMiddleName: true);
 // ['Grace Amelia Bennett']
 
-randNickname(language: NicknameLanguage.ko, count: 3);
+randNickname(language: WordLanguage.ko, count: 3);
 // ['오래된곰', '영원한도마뱀', '귀여운신화다발']
 
-randSuffixAll(randNickname(language: NicknameLanguage.ko, count: 2));
+randSuffixAll(randNickname(language: WordLanguage.ko, count: 2));
 // ['달력_U7aNZ', '조용한바구니_RUKAP']
 ```
 
@@ -103,31 +104,32 @@ Pure Python — it imports nothing outside the standard library, and ships a `py
 
 ## Supported languages
 
-Every generator takes a language, or mixes every language it supports when you leave it out. The two generators do not cover the same set: a nickname joins a modifier to a noun, which only reads naturally where the language asks for no agreement between them.
+Every generator takes a language, or mixes every language it supports when you leave it out. The name generator covers more of them than the word pools do: a modifier has to sit in front of a noun exactly as it is written in the dictionary, which only reads naturally where the language asks for no agreement between them.
 
-| Code | Language   | Native     | Person names | Nicknames |
-| ---- | ---------- | ---------- | :----------: | :-------: |
-| `en` | English    | English    |      ✅      |    ✅     |
-| `ko` | Korean     | 한국어     |      ✅      |    ✅     |
-| `ja` | Japanese   | 日本語     |      ✅      |    ✅     |
-| `zh` | Chinese    | 中文       |      ✅      |    ✅     |
-| `it` | Italian    | Italiano   |      ✅      |    ❌     |
-| `de` | German     | Deutsch    |      ✅      |    ❌     |
-| `ru` | Russian    | Русский    |      ✅      |    ❌     |
-| `es` | Spanish    | Español    |      ✅      |    ❌     |
-| `vi` | Vietnamese | Tiếng Việt |      ✅      |    ❌     |
+| Code | Language   | Native     | Person names | Words and nicknames |
+| ---- | ---------- | ---------- | :----------: | :-----------------: |
+| `en` | English    | English    |      ✅      |         ✅          |
+| `ko` | Korean     | 한국어     |      ✅      |         ✅          |
+| `ja` | Japanese   | 日本語     |      ✅      |         ✅          |
+| `zh` | Chinese    | 中文       |      ✅      |         ✅          |
+| `it` | Italian    | Italiano   |      ✅      |         ❌          |
+| `de` | German     | Deutsch    |      ✅      |         ❌          |
+| `ru` | Russian    | Русский    |      ✅      |         ❌          |
+| `es` | Spanish    | Español    |      ✅      |         ❌          |
+| `vi` | Vietnamese | Tiếng Việt |      ✅      |         ❌          |
 
 ## What it generates
 
-| Generator    | JavaScript and Dart                       | Python                                         | Example             |
-| ------------ | ----------------------------------------- | ---------------------------------------------- | ------------------- |
-| Person names | `randName`                            | `rand_name`                                | 김민준 → Kim Minjun |
-| Nicknames    | `randNickname`                        | `rand_nickname`                            | 멋진사자, MistyOwl  |
-| Random affixes | `randSuffix`, `randPrefix`              | `rand_suffix`, `rand_prefix`                 | 멋진사자_nVtRC      |
+| Generator      | JavaScript and Dart          | Python                       | Example             |
+| -------------- | ---------------------------- | ---------------------------- | ------------------- |
+| Person names   | `randName`                   | `rand_name`                  | 김민준 → Kim Minjun |
+| Nicknames      | `randNickname`               | `rand_nickname`              | 멋진사자, MistyOwl  |
+| Words          | `randWord`, `randAnimal`, …  | `rand_word`, `rand_animal`, … | 여우, Lantern       |
+| Random affixes | `randSuffix`, `randPrefix`   | `rand_suffix`, `rand_prefix` | 멋진사자_nVtRC      |
 
 Each generator returns strings by default, or one detail object per result with <code>output: 'detail'</code> — both scripts of a name, or the words a nickname was built from. The Dart package spells that as a second function (`randNameDetails`), because Dart has no way to make one function's return type depend on an argument.
 
-The full option tables, the fourteen nickname themes and the romanization rules are on the [documentation site](https://randino.cdget.com).
+The full option tables, the fourteen word themes and the romanization rules are on the [documentation site](https://randino.cdget.com).
 
 ## Repository layout
 

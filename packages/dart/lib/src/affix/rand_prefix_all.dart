@@ -5,7 +5,7 @@ import 'package:randino/src/affix/data/index.dart';
 /// batch. See [randSuffixAll] for why the list form is its own function.
 ///
 /// ```dart
-/// randPrefixAll(randNickname(language: NicknameLanguage.en, count: 2));
+/// randPrefixAll(randNickname(language: WordLanguage.en, count: 2));
 /// // ['AVcCV_MistyOwl', 'RUKAP_RustyBoot']
 /// ```
 List<String> randPrefixAll(

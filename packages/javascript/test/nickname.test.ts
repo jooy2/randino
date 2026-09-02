@@ -2,25 +2,25 @@ import assert from 'assert';
 import { describe, it } from 'node:test';
 import {
 	RAND_COUNT_MAX,
-	NICKNAME_LANGUAGES,
-	NICKNAME_THEMES,
+	WORD_LANGUAGES,
+	WORD_THEMES,
 	nicknameLengthRange,
 	randNickname
 } from '../dist/index.js';
 import type {
 	NicknameDetail,
-	NicknameLanguage,
-	NicknameTheme,
+	WordLanguage,
+	WordTheme,
 	RandNicknameOptions
 } from '../dist/index.js';
 // The datasets are internal, but a nickname is only as good as the words it is
 // built from — these checks are what keep person names out of them.
-import { NICKNAME_DATA } from '../dist/nickname/data/index.js';
+import { WORD_DATA } from '../dist/word/data/index.js';
 import { NAME_DATA } from '../dist/name/data/index.js';
 
 const SAMPLE = 60;
 
-const SCRIPT: Record<NicknameLanguage, RegExp> = {
+const SCRIPT: Record<WordLanguage, RegExp> = {
 	en: /^[A-Za-z]+$/,
 	ko: /^[가-힣]+$/,
 	ja: /^[々぀-ヿ一-鿿]+$/,
@@ -28,20 +28,20 @@ const SCRIPT: Record<NicknameLanguage, RegExp> = {
 };
 
 /** Every word the language can put in a nickname. */
-function allWords(language: NicknameLanguage): string[] {
-	const data = NICKNAME_DATA[language];
+function allWords(language: WordLanguage): string[] {
+	const data = WORD_DATA[language];
 
 	return [
 		...data.modifiers,
 		...(data.parts ?? []),
-		...NICKNAME_THEMES.flatMap((theme) => [...data.nouns[theme]])
+		...WORD_THEMES.flatMap((theme) => [...data.nouns[theme]])
 	];
 }
 
-function nounsOf(language: NicknameLanguage, theme?: NicknameTheme): string[] {
-	const data = NICKNAME_DATA[language];
+function nounsOf(language: WordLanguage, theme?: WordTheme): string[] {
+	const data = WORD_DATA[language];
 
-	return theme ? [...data.nouns[theme]] : NICKNAME_THEMES.flatMap((each) => [...data.nouns[each]]);
+	return theme ? [...data.nouns[theme]] : WORD_THEMES.flatMap((each) => [...data.nouns[each]]);
 }
 
 /**
@@ -70,7 +70,7 @@ describe('Nickname', () => {
 	});
 
 	it('every language writes nicknames in its own script', () => {
-		for (const language of NICKNAME_LANGUAGES) {
+		for (const language of WORD_LANGUAGES) {
 			for (const nickname of randNickname({ language, count: SAMPLE })) {
 				assert.match(nickname, SCRIPT[language], `${language}: ${nickname}`);
 			}
@@ -89,11 +89,11 @@ describe('Nickname', () => {
 			})
 		);
 
-		assert.strictEqual(used.size, NICKNAME_LANGUAGES.length);
+		assert.strictEqual(used.size, WORD_LANGUAGES.length);
 	});
 
 	it('nicknames are built from real words, and never from names', () => {
-		for (const language of NICKNAME_LANGUAGES) {
+		for (const language of WORD_LANGUAGES) {
 			const pool = new Set(allWords(language));
 
 			for (const detail of nicknameDetails({ language, count: 200 })) {
@@ -124,7 +124,7 @@ describe('Nickname', () => {
 
 	it('every nickname is a word with something added to it', () => {
 		const details = nicknameDetails({ language: 'ko', count: 200 });
-		const modifiers = new Set(NICKNAME_DATA.ko.modifiers);
+		const modifiers = new Set(WORD_DATA.ko.modifiers);
 		const decorated = details.filter(
 			(detail) => detail.words.length > 1 || modifiers.has(detail.words[0])
 		);
@@ -139,8 +139,8 @@ describe('Nickname', () => {
 	});
 
 	it('includeModifier: false leaves the word undecorated', () => {
-		for (const language of NICKNAME_LANGUAGES) {
-			const parts = NICKNAME_DATA[language].parts ?? [];
+		for (const language of WORD_LANGUAGES) {
+			const parts = WORD_DATA[language].parts ?? [];
 
 			for (const detail of nicknameDetails({
 				language,
@@ -161,8 +161,8 @@ describe('Nickname', () => {
 	});
 
 	it('theme decides what the nickname is about', () => {
-		for (const theme of NICKNAME_THEMES) {
-			for (const language of NICKNAME_LANGUAGES) {
+		for (const theme of WORD_THEMES) {
+			for (const language of WORD_LANGUAGES) {
 				const nouns = nounsOf(language, theme);
 
 				for (const detail of nicknameDetails({ language, theme, count: 40 })) {
@@ -176,16 +176,16 @@ describe('Nickname', () => {
 		}
 
 		const themes = new Set(nicknameDetails({ count: 400 }).map((detail) => detail.theme));
-		assert.deepStrictEqual([...themes].sort(), [...NICKNAME_THEMES].sort());
+		assert.deepStrictEqual([...themes].sort(), [...WORD_THEMES].sort());
 	});
 
 	it('a word belongs to exactly one theme', () => {
 		// Two themes claiming one word make `theme` ambiguous, and make
 		// `randNickname`'s detail form report a theme the caller never asked about.
-		for (const language of NICKNAME_LANGUAGES) {
-			const owner = new Map<string, NicknameTheme>();
+		for (const language of WORD_LANGUAGES) {
+			const owner = new Map<string, WordTheme>();
 
-			for (const theme of NICKNAME_THEMES) {
+			for (const theme of WORD_THEMES) {
 				for (const word of nounsOf(language, theme)) {
 					const held = owner.get(word);
 
@@ -197,7 +197,7 @@ describe('Nickname', () => {
 	});
 
 	it('nicknames stay inside the requested length range', () => {
-		const ranges: [NicknameLanguage, number, number][] = [
+		const ranges: [WordLanguage, number, number][] = [
 			['ko', 2, 3],
 			['ko', 4, 6],
 			['ko', 8, 10],
@@ -224,7 +224,7 @@ describe('Nickname', () => {
 		// Without a modifier the upper end drops to a noun plus a trailing word.
 		assert.deepStrictEqual(nicknameLengthRange('ko', false), [1, 8]);
 
-		for (const language of NICKNAME_LANGUAGES) {
+		for (const language of WORD_LANGUAGES) {
 			const [min, max] = nicknameLengthRange(language);
 
 			for (const style of [0, 100]) {
@@ -239,7 +239,7 @@ describe('Nickname', () => {
 	});
 
 	it('wordSeparator goes between the words', () => {
-		for (const language of NICKNAME_LANGUAGES) {
+		for (const language of WORD_LANGUAGES) {
 			for (const wordSeparator of ['', ' ', '-', '::']) {
 				for (const detail of nicknameDetails({ language, wordSeparator, count: SAMPLE })) {
 					assert.strictEqual(
@@ -269,7 +269,7 @@ describe('Nickname', () => {
 			['ko', ' ', 5, 8],
 			['en', '-', 8, 14],
 			['zh', '::', 6, 9]
-		] as [NicknameLanguage, string, number, number][]) {
+		] as [WordLanguage, string, number, number][]) {
 			for (const nickname of randNickname({
 				language,
 				wordSeparator,
@@ -353,11 +353,11 @@ describe('Nickname', () => {
 		// Written out rather than going through the helper, so that the overload
 		// itself is what a test compiles against.
 		for (const detail of randNickname({ count: 100, output: 'detail' })) {
-			const joiner = NICKNAME_DATA[detail.language].joiner;
+			const joiner = WORD_DATA[detail.language].joiner;
 
 			assert.strictEqual(detail.words.join(joiner), detail.nickname);
-			assert.ok(NICKNAME_LANGUAGES.includes(detail.language));
-			assert.ok(detail.theme === null || NICKNAME_THEMES.includes(detail.theme));
+			assert.ok(WORD_LANGUAGES.includes(detail.language));
+			assert.ok(detail.theme === null || WORD_THEMES.includes(detail.theme));
 		}
 	});
 });

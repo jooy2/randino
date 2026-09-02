@@ -9,11 +9,11 @@ person-name pools.
 import re
 
 from randino import (
-    NICKNAME_LANGUAGES,
-    NICKNAME_THEMES,
     RAND_COUNT_MAX,
-    NicknameLanguage,
-    NicknameTheme,
+    WORD_LANGUAGES,
+    WORD_THEMES,
+    WordLanguage,
+    WordTheme,
     nickname_length_range,
     rand_nickname,
 )
@@ -21,12 +21,12 @@ from randino import (
 # The datasets are internal, but a nickname is only as good as the words it is built
 # from — these checks are what keep person names out of them.
 from randino.name.data import NAME_DATA
-from randino.nickname.data import NICKNAME_DATA
+from randino.word.data import WORD_DATA
 from tests.test_name import pool_natives
 
 SAMPLE = 60
 
-SCRIPT: dict[NicknameLanguage, re.Pattern[str]] = {
+SCRIPT: dict[WordLanguage, re.Pattern[str]] = {
     "en": re.compile(r"[A-Za-z]+"),
     "ko": re.compile(r"[가-힣]+"),
     "ja": re.compile(r"[々぀-ヿ一-鿿]+"),
@@ -34,25 +34,25 @@ SCRIPT: dict[NicknameLanguage, re.Pattern[str]] = {
 }
 
 
-def all_words(language: NicknameLanguage) -> list[str]:
+def all_words(language: WordLanguage) -> list[str]:
     """Every word the language can put in a nickname."""
-    data = NICKNAME_DATA[language]
+    data = WORD_DATA[language]
 
     return [
         *data.modifiers,
         *(data.parts or ()),
-        *(word for theme in NICKNAME_THEMES for word in data.nouns[theme]),
+        *(word for theme in WORD_THEMES for word in data.nouns[theme]),
     ]
 
 
-def nouns_of(language: NicknameLanguage, theme: NicknameTheme | None = None) -> list[str]:
+def nouns_of(language: WordLanguage, theme: WordTheme | None = None) -> list[str]:
     """Every noun of one theme, or of all of them."""
-    nouns = NICKNAME_DATA[language].nouns
+    nouns = WORD_DATA[language].nouns
 
     if theme is not None:
         return list(nouns[theme])
 
-    return [word for each in NICKNAME_THEMES for word in nouns[each]]
+    return [word for each in WORD_THEMES for word in nouns[each]]
 
 
 def test_rand_nickname_returns_one_nickname_by_default() -> None:
@@ -72,7 +72,7 @@ def test_rand_nickname_returns_exactly_count_nicknames() -> None:
 
 
 def test_every_language_writes_nicknames_in_its_own_script() -> None:
-    for language in NICKNAME_LANGUAGES:
+    for language in WORD_LANGUAGES:
         for nickname in rand_nickname(language=language, count=SAMPLE):
             assert SCRIPT[language].fullmatch(nickname), f"{language}: {nickname}"
 
@@ -87,11 +87,11 @@ def test_the_mixed_language_uses_every_language_it_knows() -> None:
         assert SCRIPT[detail.language].fullmatch(detail.nickname), detail.nickname
         used.add(detail.language)
 
-    assert used == set(NICKNAME_LANGUAGES)
+    assert used == set(WORD_LANGUAGES)
 
 
 def test_nicknames_are_built_from_real_words_and_never_from_names() -> None:
-    for language in NICKNAME_LANGUAGES:
+    for language in WORD_LANGUAGES:
         pool = set(all_words(language))
 
         for detail in rand_nickname(output="detail", language=language, count=200):
@@ -114,7 +114,7 @@ def test_nicknames_are_built_from_real_words_and_never_from_names() -> None:
 
 def test_every_nickname_is_a_word_with_something_added_to_it() -> None:
     details = rand_nickname(output="detail", language="ko", count=200)
-    modifiers = set(NICKNAME_DATA["ko"].modifiers)
+    modifiers = set(WORD_DATA["ko"].modifiers)
     decorated = [
         detail for detail in details if len(detail.words) > 1 or detail.words[0] in modifiers
     ]
@@ -128,8 +128,8 @@ def test_every_nickname_is_a_word_with_something_added_to_it() -> None:
 
 
 def test_include_modifier_false_leaves_the_word_undecorated() -> None:
-    for language in NICKNAME_LANGUAGES:
-        parts = NICKNAME_DATA[language].parts or ()
+    for language in WORD_LANGUAGES:
+        parts = WORD_DATA[language].parts or ()
 
         for detail in rand_nickname(
             output="detail", language=language, count=SAMPLE, include_modifier=False
@@ -145,8 +145,8 @@ def test_include_modifier_false_leaves_the_word_undecorated() -> None:
 
 
 def test_theme_decides_what_the_nickname_is_about() -> None:
-    for theme in NICKNAME_THEMES:
-        for language in NICKNAME_LANGUAGES:
+    for theme in WORD_THEMES:
+        for language in WORD_LANGUAGES:
             nouns = nouns_of(language, theme)
 
             for detail in rand_nickname(output="detail", language=language, theme=theme, count=40):
@@ -156,16 +156,16 @@ def test_theme_decides_what_the_nickname_is_about() -> None:
                 )
 
     themes = {detail.theme for detail in rand_nickname(output="detail", count=400)}
-    assert themes == set(NICKNAME_THEMES)
+    assert themes == set(WORD_THEMES)
 
 
 def test_a_word_belongs_to_exactly_one_theme() -> None:
     # Two themes claiming one word make `theme` ambiguous, and make
     # `rand_nickname(output="detail")` report a theme the caller never asked about.
-    for language in NICKNAME_LANGUAGES:
-        owner: dict[str, NicknameTheme] = {}
+    for language in WORD_LANGUAGES:
+        owner: dict[str, WordTheme] = {}
 
-        for theme in NICKNAME_THEMES:
+        for theme in WORD_THEMES:
             for word in nouns_of(language, theme):
                 held = owner.get(word)
 
@@ -174,7 +174,7 @@ def test_a_word_belongs_to_exactly_one_theme() -> None:
 
 
 def test_nicknames_stay_inside_the_requested_length_range() -> None:
-    ranges: list[tuple[NicknameLanguage, int, int]] = [
+    ranges: list[tuple[WordLanguage, int, int]] = [
         ("ko", 2, 3),
         ("ko", 4, 6),
         ("ko", 8, 10),
@@ -200,7 +200,7 @@ def test_omitted_length_bounds_fall_back_to_what_the_language_can_produce() -> N
     # Without a modifier the upper end drops to a noun plus a trailing word.
     assert nickname_length_range("ko", False) == (1, 8)
 
-    for language in NICKNAME_LANGUAGES:
+    for language in WORD_LANGUAGES:
         low, high = nickname_length_range(language)
 
         for style in (0, 100):
@@ -211,7 +211,7 @@ def test_omitted_length_bounds_fall_back_to_what_the_language_can_produce() -> N
 
 
 def test_word_separator_goes_between_the_words() -> None:
-    for language in NICKNAME_LANGUAGES:
+    for language in WORD_LANGUAGES:
         for separator in ("", " ", "-", "::"):
             for detail in rand_nickname(
                 output="detail", language=language, word_separator=separator, count=SAMPLE
@@ -232,7 +232,7 @@ def test_word_separator_goes_between_the_words() -> None:
     assert nickname_length_range("ko", True, "-") == (1, 14)
     assert nickname_length_range("en", True, " ") == (3, 32)
 
-    separated: list[tuple[NicknameLanguage, str, int, int]] = [
+    separated: list[tuple[WordLanguage, str, int, int]] = [
         ("ko", " ", 5, 8),
         ("en", "-", 8, 14),
         ("zh", "::", 6, 9),
@@ -307,8 +307,8 @@ def test_output_detail_reports_the_pieces_it_used() -> None:
     # Written out rather than going through the helper, so that the overload
     # itself is what a type checker sees.
     for detail in rand_nickname(count=100, output="detail"):
-        joiner = NICKNAME_DATA[detail.language].joiner
+        joiner = WORD_DATA[detail.language].joiner
 
         assert joiner.join(detail.words) == detail.nickname
-        assert detail.language in NICKNAME_LANGUAGES
-        assert detail.theme is None or detail.theme in NICKNAME_THEMES
+        assert detail.language in WORD_LANGUAGES
+        assert detail.theme is None or detail.theme in WORD_THEMES

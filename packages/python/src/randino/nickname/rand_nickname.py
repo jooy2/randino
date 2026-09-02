@@ -4,9 +4,9 @@ from typing import Literal, overload
 
 from randino._types import (
     NicknameDetail,
-    NicknameLanguageOption,
-    NicknameThemeOption,
     RandOutput,
+    WordLanguageOption,
+    WordThemeOption,
 )
 from randino.nickname._generator import generate_nickname_details
 
@@ -14,8 +14,8 @@ from randino.nickname._generator import generate_nickname_details
 @overload
 def rand_nickname(
     *,
-    language: NicknameLanguageOption = ...,
-    theme: NicknameThemeOption = ...,
+    language: WordLanguageOption = ...,
+    theme: WordThemeOption = ...,
     count: int = ...,
     style: int = ...,
     min_length: int | None = ...,
@@ -31,8 +31,8 @@ def rand_nickname(
 @overload
 def rand_nickname(
     *,
-    language: NicknameLanguageOption = ...,
-    theme: NicknameThemeOption = ...,
+    language: WordLanguageOption = ...,
+    theme: WordThemeOption = ...,
     count: int = ...,
     style: int = ...,
     min_length: int | None = ...,
@@ -47,8 +47,8 @@ def rand_nickname(
 
 def rand_nickname(
     *,
-    language: NicknameLanguageOption = "all",
-    theme: NicknameThemeOption = "all",
+    language: WordLanguageOption = "all",
+    theme: WordThemeOption = "all",
     count: int = 1,
     style: int = 0,
     min_length: int | None = None,

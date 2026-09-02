@@ -1,10 +1,12 @@
-// The nickname generator itself. Internal — `randNickname` and
-// `randNicknameDetails` are the public entry points.
+// The nickname generator itself. Internal — `randNickname` is the public entry
+// point, in both of its output forms.
 //
 // A nickname is a noun with something added to it: a modifier in front
 // (멋진사자), a second noun behind (고양이꼬리), or both (파란고양이발바닥). The
-// nouns are everyday words — animals, things, nature, ideas — and never person
-// names, which is what keeps a nickname from reading like one.
+// nouns are the `word` category's pools — animals, things, nature, ideas — and
+// never person names, which is what keeps a nickname from reading like one.
+// Drawing one word is `word/wordGenerator`; putting several of them together is
+// what this file is.
 //
 // - `style` decides per word whether it comes out of a pool or is invented.
 // - `minLength` / `maxLength` pick the shape first: a range too short for a
@@ -23,16 +25,17 @@ import {
 	resolvePrefix,
 	resolveStyle
 } from '../_internal/generate.js';
-import { capitalizeFirst, chance, clamp, pick, randInt } from '../_internal/utils.js';
+import { pick } from '../_internal/utils.js';
 import type {
 	NicknameDetail,
-	NicknameLanguage,
-	NicknameTheme,
-	NicknameThemeOption,
+	WordLanguage,
+	WordTheme,
+	WordThemeOption,
 	RandNicknameOptions
 } from '../_types/global.js';
-import { NICKNAME_DATA, NICKNAME_LANGUAGES, NICKNAME_THEMES } from './data/index.js';
-import type { NicknameLanguageData, WordPool, WordSynthesis } from './data/types.js';
+import { WORD_DATA, WORD_LANGUAGES, WORD_THEMES } from '../word/data/index.js';
+import type { WordLanguageData, WordPool } from '../word/data/types.js';
+import { drawWord, poolBounds, themeOf, themesOf } from '../word/wordGenerator.js';
 
 type Slot = 'modifier' | 'noun' | 'part';
 
@@ -48,16 +51,13 @@ const PATTERNS: readonly { slots: readonly Slot[]; weight: number }[] = [
 // How many shapes to try before settling for the closest fit found.
 const FIT_ATTEMPTS = 12;
 
-// Attempts spent looking for an invented word of the requested length.
-const SYNTH_ATTEMPTS = 8;
-
 type Bounds = Record<Slot, readonly [number, number]>;
 
 // Everything a single nickname needs, with defaults already applied. The length
 // bounds stay optional: left out, they are resolved per language and theme. So
 // does the separator, which falls back to the language's own joiner.
 type Settings = {
-	theme: NicknameThemeOption;
+	theme: WordThemeOption;
 	style: number;
 	minLength?: number;
 	maxLength?: number;
@@ -71,30 +71,14 @@ type Settings = {
  * joiner. Its length is part of the nickname's, so every length calculation has
  * to go through here rather than reading `data.joiner` directly.
  */
-function joinerOf(data: NicknameLanguageData, settings: Settings): string {
+function joinerOf(data: WordLanguageData, settings: Settings): string {
 	return settings.separator ?? data.joiner;
-}
-
-function poolBounds(pool: WordPool): readonly [number, number] {
-	let min = Infinity;
-	let max = 0;
-
-	for (const word of pool) {
-		min = Math.min(min, word.length);
-		max = Math.max(max, word.length);
-	}
-
-	return [min === Infinity ? 1 : min, max || 1];
 }
 
 // Pool bounds never change, so they are worth computing once per language/theme.
 const boundsCache = new Map<string, Bounds>();
 
-function slotBounds(
-	language: NicknameLanguage,
-	data: NicknameLanguageData,
-	theme: NicknameTheme
-): Bounds {
+function slotBounds(language: WordLanguage, data: WordLanguageData, theme: WordTheme): Bounds {
 	const key = `${language}:${theme}`;
 	const cached = boundsCache.get(key);
 
@@ -115,7 +99,7 @@ function slotBounds(
 
 /** The shapes available for the current options, in the order they are weighted. */
 function usablePatterns(
-	data: NicknameLanguageData,
+	data: WordLanguageData,
 	settings: Settings
 ): readonly { slots: readonly Slot[]; weight: number }[] {
 	const usable = PATTERNS.filter(({ slots }) => {
@@ -165,123 +149,13 @@ function pickPattern(
 	return patterns[patterns.length - 1].slots;
 }
 
-// --- Word selection ---------------------------------------------------------
-
-/**
- * A pool word of a length between `min` and `max`, starting with `prefix` when
- * one was asked for. Falls back to a looser fit rather than nothing, and returns
- * null only when no word starts with the requested character.
- */
-function pickWord(pool: WordPool, min: number, max: number, prefix: string): string | null {
-	const candidates = prefix
-		? pool.filter((word) => word.toLowerCase().startsWith(prefix.toLowerCase()))
-		: pool;
-
-	if (!candidates.length) {
-		return null;
-	}
-
-	const fitting = candidates.filter((word) => word.length >= min && word.length <= max);
-
-	if (fitting.length) {
-		return pick(fitting);
-	}
-
-	const shortEnough = candidates.filter((word) => word.length <= max);
-
-	if (shortEnough.length) {
-		return pick(shortEnough);
-	}
-
-	const longEnough = candidates.filter((word) => word.length >= min);
-
-	return pick(longEnough.length ? longEnough : candidates);
-}
-
-/** Build one invented word, as close to the requested length as the template allows. */
-function synthWord(syn: WordSynthesis, min: number, max: number, prefix: string): string {
-	if (syn.kind === 'pool') {
-		// One entry is one character, so the length is the number of entries.
-		const low = Math.max(min, 1);
-		const high = Math.max(low, max);
-		const count = clamp(randInt(syn.minSyllables, syn.maxSyllables), low, high);
-		let out = prefix;
-
-		for (let i = out.length; i < count; i += 1) {
-			// Avoid immediately repeating a character (狼狼).
-			let next = pick(syn.pool);
-
-			for (let tries = 0; tries < 3 && next === out.slice(-1); tries += 1) {
-				next = pick(syn.pool);
-			}
-
-			out += next;
-		}
-
-		return out;
-	}
-
-	let best = '';
-	let bestDistance = Infinity;
-
-	for (let attempt = 0; attempt < SYNTH_ATTEMPTS; attempt += 1) {
-		const syllables = randInt(syn.minSyllables, syn.maxSyllables);
-		let word = '';
-
-		for (let i = 0; i < syllables; i += 1) {
-			word += (i === 0 && prefix ? prefix.toLowerCase() : pick(syn.onset)) + pick(syn.vowel);
-
-			if (i === syllables - 1) {
-				word += pick(syn.coda);
-			}
-		}
-
-		if (word.length >= min && word.length <= max) {
-			return word;
-		}
-
-		const distance = word.length < min ? min - word.length : word.length - max;
-
-		if (distance < bestDistance) {
-			bestDistance = distance;
-			best = word;
-		}
-	}
-
-	return best;
-}
-
-// `missed` marks a word that had to be invented because no real one started with
-// the requested character — worth another shape or theme before settling for it.
-type Chosen = { word: string; missed: boolean };
-
-function pickSlotWord(
-	data: NicknameLanguageData,
-	slot: Slot,
-	nouns: WordPool,
-	settings: Settings,
-	min: number,
-	max: number,
-	prefix: string
-): Chosen {
-	const pool = slot === 'modifier' ? data.modifiers : slot === 'part' ? data.parts! : nouns;
-	const invent = chance(settings.style);
-	const word = invent ? null : pickWord(pool, min, max, prefix);
-	const chosen = word ?? synthWord(data.syn, min, max, prefix);
-
-	return {
-		word: data.capitalize ? capitalizeFirst(chosen) : chosen,
-		missed: !invent && !word
-	};
-}
-
 /**
  * Fill a shape with words. Each slot is given the room left once the slots after
  * it have been reserved theirs, so the last word can always close the gap to
  * `min` and nothing overshoots `max`.
  */
 function buildWords(
-	data: NicknameLanguageData,
+	data: WordLanguageData,
 	slots: readonly Slot[],
 	bounds: Bounds,
 	nouns: WordPool,
@@ -306,15 +180,9 @@ function buildWords(
 
 		const low = Math.max(1, min - used - gap - restMax);
 		const high = Math.max(low, max - used - gap - restMin);
-		const chosen = pickSlotWord(
-			data,
-			slots[i],
-			nouns,
-			settings,
-			low,
-			high,
-			i === 0 ? settings.prefix : ''
-		);
+		const slot = slots[i];
+		const pool = slot === 'modifier' ? data.modifiers : slot === 'part' ? data.parts! : nouns;
+		const chosen = drawWord(data, pool, settings.style, low, high, i === 0 ? settings.prefix : '');
 
 		missed = missed || chosen.missed;
 		used += gap + chosen.word.length;
@@ -325,21 +193,6 @@ function buildWords(
 }
 
 // --- Per-nickname generation ------------------------------------------------
-
-function themesOf(theme: NicknameThemeOption): readonly NicknameTheme[] {
-	return theme === 'all' ? NICKNAME_THEMES : [theme];
-}
-
-/** Theme a word belongs to, across every theme of the language. */
-function themeOf(data: NicknameLanguageData, word: string): NicknameTheme | null {
-	for (const theme of NICKNAME_THEMES) {
-		if (data.nouns[theme].includes(word)) {
-			return theme;
-		}
-	}
-
-	return null;
-}
 
 /**
  * True when one word ends on the character the next one starts with (石霜 + 霜雨).
@@ -362,7 +215,7 @@ function hasBoundaryRepeat(words: readonly string[]): boolean {
  * back to everything the available shapes can produce.
  */
 function boundsFor(
-	data: NicknameLanguageData,
+	data: WordLanguageData,
 	bounds: Bounds,
 	patterns: readonly { slots: readonly Slot[]; weight: number }[],
 	settings: Settings
@@ -387,11 +240,11 @@ function boundsFor(
  * generator actually draws from.
  */
 export function naturalRange(
-	language: NicknameLanguage,
+	language: WordLanguage,
 	includeModifier: boolean,
 	separator?: string
 ): readonly [number, number] {
-	const data = NICKNAME_DATA[language];
+	const data = WORD_DATA[language];
 	const settings: Settings = {
 		theme: 'all',
 		style: 0,
@@ -404,7 +257,7 @@ export function naturalRange(
 	let min = Infinity;
 	let max = 0;
 
-	for (const theme of NICKNAME_THEMES) {
+	for (const theme of WORD_THEMES) {
 		const bounds = slotBounds(language, data, theme);
 
 		for (const { slots } of patterns) {
@@ -418,10 +271,10 @@ export function naturalRange(
 	return [min, max];
 }
 
-type Built = { words: string[]; theme: NicknameTheme | null };
+type Built = { words: string[]; theme: WordTheme | null };
 
-function generateOne(language: NicknameLanguage, settings: Settings): Built {
-	const data = NICKNAME_DATA[language];
+function generateOne(language: WordLanguage, settings: Settings): Built {
+	const data = WORD_DATA[language];
 	const themes = themesOf(settings.theme);
 	const patterns = usablePatterns(data, settings);
 	const joiner = joinerOf(data, settings);
@@ -491,11 +344,11 @@ export function generateNicknameDetails(options: RandNicknameOptions = {}): Nick
 	return collect(
 		options,
 		() => {
-			const code = drawLanguage(language, NICKNAME_LANGUAGES);
+			const code = drawLanguage(language, WORD_LANGUAGES);
 			const { words, theme } = generateOne(code, settings);
 
 			return {
-				nickname: words.join(joinerOf(NICKNAME_DATA[code], settings)),
+				nickname: words.join(joinerOf(WORD_DATA[code], settings)),
 				words,
 				language: code,
 				theme

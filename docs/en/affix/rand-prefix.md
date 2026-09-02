@@ -33,7 +33,7 @@ import 'package:randino/randino.dart';
 randPrefix('멋진사자'); // 'nVtRC_멋진사자'
 randPrefix('order-4021', length: 4, separator: '-'); // 'k3Rm-order-4021'
 
-randPrefixAll(randNickname(language: NicknameLanguage.en, count: 2));
+randPrefixAll(randNickname(language: WordLanguage.en, count: 2));
 // ['AVcCV_MistyOwl', 'RUKAP_RustyBoot']
 ```
 

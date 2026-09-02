@@ -84,8 +84,8 @@ rand_nickname(language="ko", output="detail")[0]
 
 | Argument                    | Type                              | Default    |
 | --------------------------- | --------------------------------- | ---------- |
-| `language`                  | `NicknameLanguageOption`          | `"all"`    |
-| `theme`                     | `NicknameThemeOption`             | `"all"`    |
+| `language`                  | `WordLanguageOption`          | `"all"`    |
+| `theme`                     | `WordThemeOption`             | `"all"`    |
 | `count`                     | `int`                             | `1`        |
 | `style`                     | `int` (0 real … 100 invented)     | `0`        |
 | `min_length` / `max_length` | `int \| None`                     | _language_ |
@@ -98,6 +98,38 @@ rand_nickname(language="ko", output="detail")[0]
 `output="detail"` returns a `NicknameDetail` — `nickname`, `words`, `language` and `theme` — for each nickname instead of a string.
 
 Themes: `animal`, `object`, `nature`, `plant`, `gem`, `concept`, `myth`, `job`, `music`, `place`, `food`, `sport`, `vehicle`, `product`.
+
+## Words
+
+The pools the nicknames are built from, on their own. Fourteen themes, four languages, and a function per theme.
+
+```python
+from randino import rand_animal, rand_food, rand_word, word_length_range
+
+rand_word(language="ko", theme="animal", count=3)
+# ['여우', '고래', '수달']
+
+rand_animal(language="en", count=2)  # ['Otter', 'Falcon']
+rand_food(language="ko", count=2)  # ['떡볶이', '녹차']
+
+rand_word(language="ko", theme="plant", output="detail")
+# [WordDetail(word='민들레', language='ko', theme='plant')]
+
+word_length_range("ko")  # (1, 4)
+```
+
+| Argument                    | Type                             | Default   |
+| --------------------------- | -------------------------------- | --------- |
+| `language`                  | `WordLanguageOption`             | `"all"`   |
+| `theme`                     | `WordThemeOption`                | `"all"`   |
+| `count`                     | `int`                            | `1`       |
+| `style`                     | `int` (0 real … 100 invented)    | `0`       |
+| `min_length` / `max_length` | `int \| None`                    | _pools_   |
+| `starts_with`               | `str`                            | `""`      |
+| `unique`                    | `bool`                           | `False`   |
+| `output`                    | `RandOutput`                     | `"value"` |
+
+One function per theme: `rand_animal`, `rand_object`, `rand_nature`, `rand_plant`, `rand_gem`, `rand_concept`, `rand_myth`, `rand_job`, `rand_music`, `rand_place`, `rand_food`, `rand_sport`, `rand_vehicle`, `rand_product`. Each is `rand_word` with the theme already chosen.
 
 ## Prefixes and suffixes
 
@@ -134,7 +166,7 @@ name_supports_roman("en")  # False
 nickname_length_range("ko")  # (1, 12)
 ```
 
-`NAME_LANGUAGES`, `NICKNAME_LANGUAGES` and `NICKNAME_THEMES` list what the generators accept; `RAND_COUNT_MAX`, `RAND_LENGTH_MIN` / `MAX`, `AFFIX_LENGTH_DEFAULT` / `MAX`, `AFFIX_SEPARATOR_DEFAULT` and `AFFIX_CHARSET` are the bounds and defaults every argument is clamped to.
+`NAME_LANGUAGES`, `WORD_LANGUAGES` and `WORD_THEMES` list what the generators accept; `RAND_COUNT_MAX`, `RAND_LENGTH_MIN` / `MAX`, `AFFIX_LENGTH_DEFAULT` / `MAX`, `AFFIX_SEPARATOR_DEFAULT` and `AFFIX_CHARSET` are the bounds and defaults every argument is clamped to.
 
 ## Differences from the npm package
 

@@ -41,8 +41,8 @@ Every option is optional, and the defaults are what the empty call above uses.
 
 | Option | Type | Default | Description |
 | --- | --- | --- | --- |
-| `language` | <Lang js="NicknameLanguageOption" dart="NicknameLanguage?" py="NicknameLanguageOption &#124; None" code /> | <Lang js="'all'" dart="null" py="None" code /> | Language of the generated nicknames. <Lang js="'all'" dart="null" py="&quot;all&quot;" code /> mixes every supported language, picking one per nickname. |
-| `theme` | <Lang js="NicknameThemeOption" dart="NicknameTheme?" py="NicknameThemeOption" code /> | <Lang js="'all'" dart="null" py="&quot;all&quot;" code /> | What the nickname is about. See [Themes](./themes). |
+| `language` | <Lang js="WordLanguageOption" dart="WordLanguage?" py="WordLanguageOption &#124; None" code /> | <Lang js="'all'" dart="null" py="None" code /> | Language of the generated nicknames. <Lang js="'all'" dart="null" py="&quot;all&quot;" code /> mixes every supported language, picking one per nickname. |
+| `theme` | <Lang js="WordThemeOption" dart="WordTheme?" py="WordThemeOption" code /> | <Lang js="'all'" dart="null" py="&quot;all&quot;" code /> | What the nickname is about. See [Themes](../word/themes). |
 | `count` | <Lang js="number" dart="int" py="int" code /> | `1` | How many nicknames to return. Clamped to `0` … `10000`. |
 | `style` | <Lang js="number" dart="int" py="int" code /> | `0` | `0` uses real words, `100` invents words that only read like the language, and anything between mixes the two. |
 | <Lang js="minLength" dart="minLength" py="min_length" code /> | <Lang js="number" dart="int?" py="int &#124; None" code /> | _language_ | Minimum length in characters. |
@@ -84,7 +84,7 @@ randNickname({ language: 'ko', output: 'detail' });
 ```dart
 import 'package:randino/randino.dart';
 
-randNicknameDetails(language: NicknameLanguage.ko);
+randNicknameDetails(language: WordLanguage.ko);
 // [NicknameDetail(오래된발견, [오래된, 발견], ko, concept)]
 ```
 
@@ -106,8 +106,8 @@ rand_nickname(language="ko", output="detail")
 | --- | --- | --- |
 | `nickname` | <Lang js="string" dart="String" py="str" code /> | The finished nickname. |
 | `words` | <Lang js="string[]" dart="List&lt;String&gt;" py="tuple[str, ...]" code /> | The words it is made of, in order. |
-| `language` | `NicknameLanguage` | The language this nickname was generated in. |
-| `theme` | <Lang js="NicknameTheme &#124; null" dart="NicknameTheme?" py="NicknameTheme &#124; None" code /> | Theme of the base word, or null when that word is not one the generator knows. |
+| `language` | `WordLanguage` | The language this nickname was generated in. |
+| `theme` | <Lang js="WordTheme &#124; null" dart="WordTheme?" py="WordTheme &#124; None" code /> | Theme of the base word, or null when that word is not one the generator knows. |
 
 Joining `words` with the language's own joiner reproduces `nickname` exactly — that is an invariant, and all three test suites assert it.
 
@@ -142,16 +142,16 @@ randNickname({ language: 'zh', count: 4 });
 ::: lang dart
 
 ```dart
-randNickname(language: NicknameLanguage.ko, count: 4);
+randNickname(language: WordLanguage.ko, count: 4);
 // ['오래된곰', '영원한도마뱀', '귀여운신화다발', '노을']
 
-randNickname(language: NicknameLanguage.en, count: 4);
+randNickname(language: WordLanguage.en, count: 4);
 // ['FoggyHillside', 'CraneVoyage', 'TinyLeopardCloak', 'MathematicsShard']
 
-randNickname(language: NicknameLanguage.ja, count: 4);
+randNickname(language: WordLanguage.ja, count: 4);
 // ['小さな雨', '海の彗星', '鋭いペンギン', '柔らかい記憶']
 
-randNickname(language: NicknameLanguage.zh, count: 4);
+randNickname(language: WordLanguage.zh, count: 4);
 // ['勇敢余烬', '快乐薄雾', '节日', '安静小狗']
 ```
 
@@ -192,10 +192,10 @@ randNickname({ language: 'en', theme: 'gem', count: 3 });
 ::: lang dart
 
 ```dart
-randNickname(language: NicknameLanguage.ko, theme: NicknameTheme.animal, count: 3);
+randNickname(language: WordLanguage.ko, theme: WordTheme.animal, count: 3);
 // ['깊은연어', '하얀여우갈기', '떠도는잉어']
 
-randNickname(language: NicknameLanguage.en, theme: NicknameTheme.gem, count: 3);
+randNickname(language: WordLanguage.en, theme: WordTheme.gem, count: 3);
 // ['PolarObsidian', 'AmberGeode', 'QuietMalachite']
 ```
 
@@ -213,7 +213,7 @@ rand_nickname(language="en", theme="gem", count=3)
 
 :::
 
-The fourteen themes, and what each one holds, are on [Themes](./themes).
+The fourteen themes, and what each one holds, are on [Themes](../word/themes).
 
 ### An undecorated word
 
@@ -229,7 +229,7 @@ randNickname({ language: 'ko', count: 4, includeModifier: false });
 ::: lang dart
 
 ```dart
-randNickname(language: NicknameLanguage.ko, count: 4, includeModifier: false);
+randNickname(language: WordLanguage.ko, count: 4, includeModifier: false);
 // ['미래', '반지', '고릴라', '구름언덕']
 ```
 
@@ -266,13 +266,13 @@ randNickname({ language: 'ja', wordSeparator: '・', count: 3 });
 ::: lang dart
 
 ```dart
-randNickname(language: NicknameLanguage.ko, wordSeparator: ' ', count: 4);
+randNickname(language: WordLanguage.ko, wordSeparator: ' ', count: 4);
 // ['역사 발톱', '하늘빛 상상', '차가운 기억', '불빛 돛']
 
-randNickname(language: NicknameLanguage.en, wordSeparator: '-', count: 4);
+randNickname(language: WordLanguage.en, wordSeparator: '-', count: 4);
 // ['Headphone', 'Soft-Bat', 'Genial-Moose-Cove', 'Dreamy-Umbrella-Halo']
 
-randNickname(language: NicknameLanguage.ja, wordSeparator: '・', count: 3);
+randNickname(language: WordLanguage.ja, wordSeparator: '・', count: 3);
 // ['硝子の・トラック', '甘い・珠玉', '美しい・ヒツジ']
 ```
 
@@ -314,11 +314,11 @@ randSuffix(randNickname({ language: 'ko', count: 2 }), { length: 8, separator: '
 ::: lang dart
 
 ```dart
-randSuffixAll(randNickname(language: NicknameLanguage.ko, count: 3));
+randSuffixAll(randNickname(language: WordLanguage.ko, count: 3));
 // ['달력_U7aNZ', '금빛독수리다발_AVcCV', '조용한바구니_RUKAP']
 
 randSuffixAll(
-  randNickname(language: NicknameLanguage.ko, count: 2),
+  randNickname(language: WordLanguage.ko, count: 2),
   length: 8,
   separator: '-',
 );
@@ -358,10 +358,10 @@ randNickname({ language: 'en', style: 100, count: 3 });
 ::: lang dart
 
 ```dart
-randNickname(language: NicknameLanguage.ko, style: 100, count: 3);
+randNickname(language: WordLanguage.ko, style: 100, count: 3);
 // ['토한조해한', '가파모토히', '리누채무애저차부']
 
-randNickname(language: NicknameLanguage.en, style: 100, count: 3);
+randNickname(language: WordLanguage.en, style: 100, count: 3);
 // ['Duhusk', 'DresaelSlobru', 'BroureexGrosex']
 ```
 
@@ -397,7 +397,7 @@ for (const { words, theme } of randNickname({ language: 'ko', count: 3, output: 
 ::: lang dart
 
 ```dart
-for (final detail in randNicknameDetails(language: NicknameLanguage.ko, count: 3)) {
+for (final detail in randNicknameDetails(language: WordLanguage.ko, count: 3)) {
   print('${detail.words.join(' + ')} ${detail.theme?.name}');
 }
 // 오래된 + 곰 animal
@@ -441,7 +441,7 @@ await users.insert({
 ::: lang dart
 
 ```dart
-final detail = randNicknameDetails(language: NicknameLanguage.en).first;
+final detail = randNicknameDetails(language: WordLanguage.en).first;
 final discriminator = randSuffix('', separator: '');
 
 await users.insert(
@@ -485,9 +485,9 @@ for (const detail of randNickname({ language: 'en', count: 100, output: 'detail'
 ::: lang dart
 
 ```dart
-final byTheme = <NicknameTheme?, List<String>>{};
+final byTheme = <WordTheme?, List<String>>{};
 
-for (final detail in randNicknameDetails(language: NicknameLanguage.en, count: 100)) {
+for (final detail in randNicknameDetails(language: WordLanguage.en, count: 100)) {
   byTheme.putIfAbsent(detail.theme, () => <String>[]).add(detail.nickname);
 }
 ```
@@ -499,7 +499,7 @@ for (final detail in randNicknameDetails(language: NicknameLanguage.en, count: 1
 ```python
 from collections import defaultdict
 
-by_theme: defaultdict[NicknameTheme | None, list[str]] = defaultdict(list)
+by_theme: defaultdict[WordTheme | None, list[str]] = defaultdict(list)
 
 for detail in rand_nickname(language="en", count=100, output="detail"):
     by_theme[detail.theme].append(detail.nickname)
@@ -510,5 +510,5 @@ for detail in rand_nickname(language="en", count=100, output="detail"):
 ## See also
 
 - [`randSuffix`](../affix/rand-suffix) — the random token, for when a nickname has to be collision-free.
-- [Themes](./themes) — the fourteen slices of vocabulary a nickname is built from.
+- [Themes](../word/themes) — the fourteen slices of vocabulary a nickname is built from.
 - [`nicknameLengthRange`](./nickname-length-range) — every length a language can produce.

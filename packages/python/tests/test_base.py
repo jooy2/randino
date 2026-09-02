@@ -19,8 +19,6 @@ def test_the_package_exports_exactly_its_public_api() -> None:
         "AFFIX_LENGTH_MAX",
         "AFFIX_SEPARATOR_DEFAULT",
         "NAME_LANGUAGES",
-        "NICKNAME_LANGUAGES",
-        "NICKNAME_THEMES",
         "NameDetail",
         "NameGender",
         "NameGenderOption",
@@ -28,21 +26,40 @@ def test_the_package_exports_exactly_its_public_api() -> None:
         "NameLanguageOption",
         "NameScript",
         "NicknameDetail",
-        "NicknameLanguage",
-        "NicknameLanguageOption",
-        "NicknameTheme",
-        "NicknameThemeOption",
         "RAND_COUNT_MAX",
         "RAND_LENGTH_MAX",
         "RAND_LENGTH_MIN",
+        "WORD_LANGUAGES",
+        "WORD_THEMES",
+        "WordDetail",
+        "WordLanguage",
+        "WordLanguageOption",
+        "WordTheme",
+        "WordThemeOption",
         "name_length_range",
         "name_supports_middle_name",
         "name_supports_roman",
         "nickname_length_range",
+        "rand_animal",
+        "rand_concept",
+        "rand_food",
+        "rand_gem",
+        "rand_job",
+        "rand_music",
+        "rand_myth",
         "rand_name",
+        "rand_nature",
         "rand_nickname",
+        "rand_object",
+        "rand_place",
+        "rand_plant",
         "rand_prefix",
+        "rand_product",
+        "rand_sport",
         "rand_suffix",
+        "rand_vehicle",
+        "rand_word",
+        "word_length_range",
     ]
 
     for name in randino.__all__:
@@ -67,8 +84,14 @@ def test_the_functions_are_callable_and_the_constants_are_what_they_claim() -> N
 
     assert callable(randino.rand_nickname)
     assert callable(randino.nickname_length_range)
-    assert isinstance(randino.NICKNAME_LANGUAGES, tuple)
-    assert isinstance(randino.NICKNAME_THEMES, tuple)
+    assert isinstance(randino.WORD_LANGUAGES, tuple)
+    assert isinstance(randino.WORD_THEMES, tuple)
+
+    # One generator per theme, and the theme list is what says how many.
+    assert callable(randino.rand_word)
+    assert callable(randino.word_length_range)
+    assert isinstance(randino.rand_animal(language="ko")[0], str)
+    assert randino.rand_product(output="detail")[0].theme == "product"
 
     assert callable(randino.rand_suffix)
     assert callable(randino.rand_prefix)

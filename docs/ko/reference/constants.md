@@ -93,13 +93,13 @@ from randino import NAME_LANGUAGES
 ::: lang js
 
 ```javascript
-import { NICKNAME_LANGUAGES, NICKNAME_THEMES } from 'randino';
+import { WORD_LANGUAGES, WORD_THEMES } from 'randino';
 ```
 
-| 이름                 | 타입                 | 값                        |
-| -------------------- | -------------------- | ------------------------- |
-| `NICKNAME_LANGUAGES` | `NicknameLanguage[]` | 지원하는 모든 닉네임 언어 |
-| `NICKNAME_THEMES`    | `NicknameTheme[]`    | 14개 테마 전체            |
+| 이름             | 타입             | 값                        |
+| ---------------- | ---------------- | ------------------------- |
+| `WORD_LANGUAGES` | `WordLanguage[]` | 지원하는 모든 닉네임 언어 |
+| `WORD_THEMES`    | `WordTheme[]`    | 14개 테마 전체            |
 
 :::
 
@@ -109,23 +109,23 @@ import { NICKNAME_LANGUAGES, NICKNAME_THEMES } from 'randino';
 import 'package:randino/randino.dart';
 ```
 
-| 이름                | 타입                     | 값                        |
-| ------------------- | ------------------------ | ------------------------- |
-| `nicknameLanguages` | `List<NicknameLanguage>` | 지원하는 모든 닉네임 언어 |
-| `nicknameThemes`    | `List<NicknameTheme>`    | 14개 테마 전체            |
+| 이름            | 타입                 | 값                        |
+| --------------- | -------------------- | ------------------------- |
+| `wordLanguages` | `List<WordLanguage>` | 지원하는 모든 닉네임 언어 |
+| `wordThemes`    | `List<WordTheme>`    | 14개 테마 전체            |
 
 :::
 
 ::: lang py
 
 ```python
-from randino import NICKNAME_LANGUAGES, NICKNAME_THEMES
+from randino import WORD_LANGUAGES, WORD_THEMES
 ```
 
-| 이름                 | 타입                         | 값                        |
-| -------------------- | ---------------------------- | ------------------------- |
-| `NICKNAME_LANGUAGES` | `tuple[NicknameLanguage, …]` | 지원하는 모든 닉네임 언어 |
-| `NICKNAME_THEMES`    | `tuple[NicknameTheme, …]`    | 14개 테마 전체            |
+| 이름             | 타입                     | 값                        |
+| ---------------- | ------------------------ | ------------------------- |
+| `WORD_LANGUAGES` | `tuple[WordLanguage, …]` | 지원하는 모든 닉네임 언어 |
+| `WORD_THEMES`    | `tuple[WordTheme, …]`    | 14개 테마 전체            |
 
 :::
 
@@ -247,10 +247,10 @@ import type {
 	NameLanguageOption,
 	NameScript,
 	NicknameDetail,
-	NicknameLanguage,
-	NicknameLanguageOption,
-	NicknameTheme,
-	NicknameThemeOption,
+	WordLanguage,
+	WordLanguageOption,
+	WordTheme,
+	WordThemeOption,
 	RandNameOptions,
 	RandNicknameOptions,
 	RandOutput
@@ -272,7 +272,7 @@ import 'package:randino/randino.dart';
 
 // enum
 NameLanguage, NameGender, NameScript
-NicknameLanguage, NicknameTheme
+WordLanguage, WordTheme
 
 // 값
 LengthRange, NameDetail, NicknameDetail
@@ -295,10 +295,10 @@ from randino import (
     NameLanguageOption,
     NameScript,
     NicknameDetail,
-    NicknameLanguage,
-    NicknameLanguageOption,
-    NicknameTheme,
-    NicknameThemeOption,
+    WordLanguage,
+    WordLanguageOption,
+    WordTheme,
+    WordThemeOption,
     RandOutput,
 )
 
@@ -314,4 +314,4 @@ import할 옵션 타입은 없습니다. 인자가 객체가 아니라 키워드
 ## 함께 보기
 
 - [지원 언어](../guide/languages) — 각 언어 코드가 다루는 범위.
-- [테마](../nickname/themes) — 각 테마가 담고 있는 것.
+- [테마](../word/themes) — 각 테마가 담고 있는 것.

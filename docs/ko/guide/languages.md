@@ -2,54 +2,54 @@
 
 randino는 9개 언어로 텍스트를 생성하며, 각 언어는 고유한 단어 풀과 이름 순서, 로마자 표기 규칙을 가집니다. 모든 생성기는 언어를 받고, 지정하지 않으면 지원하는 모든 언어를 섞습니다.
 
-| 코드 | 언어       | 표기       | 사람 이름 | 닉네임 |
-| ---- | ---------- | ---------- | :-------: | :----: |
-| `en` | 영어       | English    |    ✅     |   ✅   |
-| `ko` | 한국어     | 한국어     |    ✅     |   ✅   |
-| `ja` | 일본어     | 日本語     |    ✅     |   ✅   |
-| `zh` | 중국어     | 中文       |    ✅     |   ✅   |
-| `it` | 이탈리아어 | Italiano   |    ✅     |   ❌   |
-| `de` | 독일어     | Deutsch    |    ✅     |   ❌   |
-| `ru` | 러시아어   | Русский    |    ✅     |   ❌   |
-| `es` | 스페인어   | Español    |    ✅     |   ❌   |
-| `vi` | 베트남어   | Tiếng Việt |    ✅     |   ❌   |
+| 코드 | 언어       | 표기       | 사람 이름 | 단어와 닉네임 |
+| ---- | ---------- | ---------- | :-------: | :-----------: |
+| `en` | 영어       | English    |    ✅     |      ✅       |
+| `ko` | 한국어     | 한국어     |    ✅     |      ✅       |
+| `ja` | 일본어     | 日本語     |    ✅     |      ✅       |
+| `zh` | 중국어     | 中文       |    ✅     |      ✅       |
+| `it` | 이탈리아어 | Italiano   |    ✅     |      ❌       |
+| `de` | 독일어     | Deutsch    |    ✅     |      ❌       |
+| `ru` | 러시아어   | Русский    |    ✅     |      ❌       |
+| `es` | 스페인어   | Español    |    ✅     |      ❌       |
+| `vi` | 베트남어   | Tiếng Việt |    ✅     |      ❌       |
 
 ::: lang js
 
-코드는 문자열 리터럴이며, 런타임에는 `NAME_LANGUAGES`와 `NICKNAME_LANGUAGES`로도 확인할 수 있습니다.
+코드는 문자열 리터럴이며, 런타임에는 `NAME_LANGUAGES`와 `WORD_LANGUAGES`로도 확인할 수 있습니다.
 
 ```javascript
-import { NAME_LANGUAGES, NICKNAME_LANGUAGES } from 'randino';
+import { NAME_LANGUAGES, WORD_LANGUAGES } from 'randino';
 
 NAME_LANGUAGES; // ['en', 'ko', 'ja', 'zh', 'it', 'de', 'ru', 'es', 'vi']
-NICKNAME_LANGUAGES; // ['en', 'ko', 'ja', 'zh']
+WORD_LANGUAGES; // ['en', 'ko', 'ja', 'zh']
 ```
 
 :::
 
 ::: lang dart
 
-코드는 두 enum의 멤버이며, 목록은 `nameLanguages`와 `nicknameLanguages`로도 확인할 수 있습니다.
+코드는 두 enum의 멤버이며, 목록은 `nameLanguages`와 `wordLanguages`로도 확인할 수 있습니다.
 
 ```dart
 import 'package:randino/randino.dart';
 
 NameLanguage.ko.name; // 'ko'
 nameLanguages; // 표시 순서대로 나열된 모든 NameLanguage
-nicknameLanguages; // [NicknameLanguage.en, .ko, .ja, .zh]
+wordLanguages; // [WordLanguage.en, .ko, .ja, .zh]
 ```
 
 :::
 
 ::: lang py
 
-코드는 `Literal` 타입이므로 존재하지 않는 코드는 타입 검사기가 거부하며, 목록은 런타임에도 `NAME_LANGUAGES`와 `NICKNAME_LANGUAGES`로 확인할 수 있습니다.
+코드는 `Literal` 타입이므로 존재하지 않는 코드는 타입 검사기가 거부하며, 목록은 런타임에도 `NAME_LANGUAGES`와 `WORD_LANGUAGES`로 확인할 수 있습니다.
 
 ```python
-from randino import NAME_LANGUAGES, NICKNAME_LANGUAGES
+from randino import NAME_LANGUAGES, WORD_LANGUAGES
 
 NAME_LANGUAGES  # ('en', 'ko', 'ja', 'zh', 'it', 'de', 'ru', 'es', 'vi')
-NICKNAME_LANGUAGES  # ('en', 'ko', 'ja', 'zh')
+WORD_LANGUAGES  # ('en', 'ko', 'ja', 'zh')
 ```
 
 :::
@@ -83,9 +83,9 @@ NICKNAME_LANGUAGES  # ('en', 'ko', 'ja', 'zh')
 
 영어는 로마자 표기를 해도 아무것도 바뀌지 않는 유일한 언어입니다. 이미 라틴 알파벳으로 쓰여 있기 때문입니다.
 
-## 닉네임
+## 단어와 닉네임 {#words-and-nicknames}
 
-닉네임은 9개가 아니라 4개 언어만 지원하며, 이유는 작업량이 아니라 문법입니다. 닉네임은 수식어와 명사를 붙이는 구조인데, 이 방식은 둘 사이에 문법적 일치를 요구하지 않는 언어에서만 자연스럽게 읽힙니다.
+단어 풀은 — 그리고 그 위에 있는 `randWord`, 14개 테마 함수, `randNickname`은 — 9개가 아니라 4개 언어만 지원하며, 이유는 작업량이 아니라 문법입니다. 수식어는 사전에 실린 그대로 명사 앞에 놓여야 하는데, 이 방식은 둘 사이에 문법적 일치를 요구하지 않는 언어에서만 자연스럽게 읽힙니다.
 
 | 코드 | 언어   | 형태                  | 예시                   |
 | ---- | ------ | --------------------- | ---------------------- |

@@ -8,6 +8,7 @@ import 'package:randino/randino.dart';
 
 void main() {
   _names();
+  _words();
   _nicknames();
   _affixes();
   _questionsAboutALanguage();
@@ -41,22 +42,39 @@ void _names() {
   // 김서준 / Kim Seojun (male)
 }
 
+/// Words: the everyday vocabulary the nicknames are built from, on its own.
+void _words() {
+  print('-- words ------------------------------------------------------');
+
+  print(randWord(language: WordLanguage.ko, theme: WordTheme.animal, count: 3));
+  // [여우, 고래, 수달]
+
+  // Every theme is also a function of its own.
+  print(randAnimal(language: WordLanguage.en, count: 3)); // [Otter, Falcon, Lynx]
+  print(randFood(language: WordLanguage.ko, count: 3)); // [떡볶이, 녹차, 만두]
+
+  final word = randWordDetails(language: WordLanguage.ko, theme: WordTheme.plant).first;
+
+  print('${word.word} (${word.language.name}, ${word.theme?.name})');
+  // 민들레 (ko, plant)
+}
+
 /// Nicknames: the handle somebody would pick for a game or a website.
 void _nicknames() {
   print('-- nicknames --------------------------------------------------');
 
-  print(randNickname(language: NicknameLanguage.ko, count: 3));
+  print(randNickname(language: WordLanguage.ko, count: 3));
   // [오래된곰, 영원한도마뱀, 귀여운신화다발]
 
-  print(randNickname(language: NicknameLanguage.en, theme: NicknameTheme.animal, count: 3));
+  print(randNickname(language: WordLanguage.en, theme: WordTheme.animal, count: 3));
   // [StarfishFeather, RegalShark, MistyGooseFlock]
 
   // A separator replaces the way the language joins its words, and counts
   // toward the length range.
-  print(randNickname(language: NicknameLanguage.en, wordSeparator: '-', count: 3));
+  print(randNickname(language: WordLanguage.en, wordSeparator: '-', count: 3));
   // [Soft-Bat, Genial-Moose-Cove, Dreamy-Umbrella-Halo]
 
-  final detail = randNicknameDetails(language: NicknameLanguage.ko).first;
+  final detail = randNicknameDetails(language: WordLanguage.ko).first;
 
   print('${detail.nickname} <- ${detail.words} (${detail.theme?.name})');
   // 오래된발견 <- [오래된, 발견] (concept)
@@ -71,7 +89,7 @@ void _affixes() {
 
   // A fresh token per entry, which is what makes a batch of nicknames
   // collision-free rather than merely unlikely to collide.
-  print(randSuffixAll(randNickname(language: NicknameLanguage.ko, count: 3)));
+  print(randSuffixAll(randNickname(language: WordLanguage.ko, count: 3)));
   // [달력_U7aNZ, 금빛독수리다발_AVcCV, 조용한바구니_RUKAP]
 }
 
@@ -83,12 +101,13 @@ void _questionsAboutALanguage() {
   print(nameLengthRange(language: NameLanguage.en, includeMiddleName: true)); // LengthRange(12, 24)
   print(nameSupportsMiddleName(NameLanguage.ko)); // false
   print(nameSupportsRoman(NameLanguage.en)); // false
-  print(nicknameLengthRange(language: NicknameLanguage.ko)); // LengthRange(1, 12)
+  print(nicknameLengthRange(language: WordLanguage.ko)); // LengthRange(1, 12)
+  print(wordLengthRange(language: WordLanguage.ko)); // LengthRange(1, 4)
 
   print(
     '${nameLanguages.length} name languages, '
-    '${nicknameLanguages.length} nickname languages, '
-    '${nicknameThemes.length} themes',
+    '${wordLanguages.length} word languages, '
+    '${wordThemes.length} themes',
   );
-  // 9 name languages, 4 nickname languages, 14 themes
+  // 9 name languages, 4 word languages, 14 themes
 }

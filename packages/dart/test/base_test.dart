@@ -40,8 +40,9 @@ void main() {
           'NameLanguage',
           'NameScript',
           'NicknameDetail',
-          'NicknameLanguage',
-          'NicknameTheme',
+          'WordDetail',
+          'WordLanguage',
+          'WordTheme',
           'affixCharset',
           'affixLengthDefault',
           'affixLengthMax',
@@ -50,13 +51,27 @@ void main() {
           'nameLengthRange',
           'nameSupportsMiddleName',
           'nameSupportsRoman',
-          'nicknameLanguages',
+          'wordLanguages',
           'nicknameLengthRange',
-          'nicknameThemes',
+          'wordThemes',
           'randName',
           'randNameDetails',
           'randNickname',
           'randNicknameDetails',
+          'randAnimal',
+          'randConcept',
+          'randFood',
+          'randGem',
+          'randJob',
+          'randMusic',
+          'randMyth',
+          'randNature',
+          'randObject',
+          'randPlace',
+          'randPlant',
+          'randProduct',
+          'randSport',
+          'randVehicle',
           'randCountMax',
           'randLengthMax',
           'randLengthMin',
@@ -64,6 +79,9 @@ void main() {
           'randPrefixAll',
           'randSuffix',
           'randSuffixAll',
+          'randWord',
+          'randWordDetails',
+          'wordLengthRange',
         ]..sort(),
       );
     });
@@ -83,6 +101,11 @@ void main() {
       expect(randPrefix('a'), endsWith('_a'));
       expect(randSuffixAll(const ['a', 'b']), hasLength(2));
       expect(randPrefixAll(const ['a', 'b']), hasLength(2));
+
+      expect(randWord(), hasLength(1));
+      expect(randWordDetails()[0], isA<WordDetail>());
+      expect(wordLengthRange(), isA<LengthRange>());
+      expect(randAnimal(language: WordLanguage.ko), hasLength(1));
     });
 
     test('the bounds are the same numbers the JavaScript package uses', () {
@@ -93,8 +116,8 @@ void main() {
       expect(randLengthMax, 40);
       expect(randCountMax, 10000);
 
-      expect(nicknameLanguages, hasLength(4));
-      expect(nicknameThemes, hasLength(14));
+      expect(wordLanguages, hasLength(4));
+      expect(wordThemes, hasLength(14));
 
       expect(affixLengthDefault, 5);
       expect(affixLengthMax, 32);
@@ -107,8 +130,8 @@ void main() {
       // language added to one and not the other is a language the generator can
       // be asked for and cannot produce.
       expect(nameLanguages.toSet(), NameLanguage.values.toSet());
-      expect(nicknameLanguages.toSet(), NicknameLanguage.values.toSet());
-      expect(nicknameThemes.toSet(), NicknameTheme.values.toSet());
+      expect(wordLanguages.toSet(), WordLanguage.values.toSet());
+      expect(wordThemes.toSet(), WordTheme.values.toSet());
     });
 
     test('LengthRange compares by value', () {

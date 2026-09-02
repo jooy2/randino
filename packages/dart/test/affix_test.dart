@@ -11,7 +11,7 @@ final RegExp token = RegExp(r'^[0-9A-Za-z]{5}$');
 void main() {
   group('Affix', () {
     test('randSuffix appends the token and randPrefix puts it in front', () {
-      for (final word in randNickname(language: NicknameLanguage.en, count: sample)) {
+      for (final word in randNickname(language: WordLanguage.en, count: sample)) {
         final suffixed = randSuffix(word);
         final prefixed = randPrefix(word);
 
@@ -32,7 +32,7 @@ void main() {
     });
 
     test('the list forms attach one token per entry, not one for the batch', () {
-      final words = randNickname(language: NicknameLanguage.ko, count: sample);
+      final words = randNickname(language: WordLanguage.ko, count: sample);
       final suffixed = randSuffixAll(words);
       final prefixed = randPrefixAll(words);
 

@@ -1,0 +1,31 @@
+import 'package:randino/src/types.dart';
+import 'package:randino/src/word/rand_word.dart';
+
+/// Plants: trees, flowers, leaves and what grows on them.
+///
+/// [randWord] with the theme already chosen; every other parameter is the same.
+/// For the detail form, pass [WordTheme.plant] to `randWordDetails` — Dart has
+/// no overloads, and fourteen more functions for it would be fourteen too many.
+///
+/// ```dart
+/// randPlant(language: WordLanguage.ko, count: 3); // [나무, 민들레, 꽃]
+/// randPlant(language: WordLanguage.en, count: 3); // [Treetop, Blossom, Fern]
+/// ```
+List<String> randPlant({
+  WordLanguage? language,
+  int count = 1,
+  int style = 0,
+  int? minLength,
+  int? maxLength,
+  String? startsWith,
+  bool unique = false,
+}) => randWord(
+  language: language,
+  theme: WordTheme.plant,
+  count: count,
+  style: style,
+  minLength: minLength,
+  maxLength: maxLength,
+  startsWith: startsWith,
+  unique: unique,
+);

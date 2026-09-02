@@ -59,12 +59,13 @@ enum NameScript {
   roman,
 }
 
-/// A language the nickname generator can build nicknames in.
+/// A language the word pools cover.
 ///
-/// Fewer than [NameLanguage]: a nickname joins a modifier to a noun, which only
-/// reads naturally in languages that ask for no grammatical agreement. Wherever
-/// one of these is optional, `null` means every language.
-enum NicknameLanguage {
+/// Fewer than [NameLanguage]: a modifier has to sit in front of a noun exactly
+/// as it is written in the dictionary, which only reads naturally in languages
+/// that ask for no grammatical agreement. Wherever one of these is optional,
+/// `null` means every language.
+enum WordLanguage {
   /// English.
   en,
 
@@ -78,11 +79,12 @@ enum NicknameLanguage {
   zh,
 }
 
-/// What a nickname is about.
+/// What a word is about.
 ///
+/// Each one is also a generator of its own — [WordTheme.animal] is `randAnimal`.
 /// Wherever one of these is optional, `null` means every theme. Person names
 /// are never used, whichever theme is picked.
-enum NicknameTheme {
+enum WordTheme {
   /// Animals: 사자, Lion.
   animal,
 
@@ -175,6 +177,26 @@ class NameDetail {
   String toString() => 'NameDetail($native, $roman, ${language.name}, ${gender.name})';
 }
 
+/// A generated word with where it came from.
+class WordDetail {
+  /// Creates a detail record. Returned by the generator; there is rarely a
+  /// reason to build one by hand outside a test.
+  const WordDetail({required this.word, required this.language, required this.theme});
+
+  /// The word itself.
+  final String word;
+
+  /// The language this word was drawn from.
+  final WordLanguage language;
+
+  /// Theme the word belongs to, or `null` when it is not one the generator
+  /// knows, which happens when it was invented.
+  final WordTheme? theme;
+
+  @override
+  String toString() => 'WordDetail($word, ${language.name}, ${theme?.name})';
+}
+
 /// A generated nickname with the pieces it was built from.
 class NicknameDetail {
   /// Creates a detail record. Returned by the generator; there is rarely a
@@ -193,11 +215,11 @@ class NicknameDetail {
   final List<String> words;
 
   /// The language this nickname was generated in.
-  final NicknameLanguage language;
+  final WordLanguage language;
 
   /// Theme the nickname's base word belongs to, or `null` when that word is not
   /// one the generator knows, which happens when it was invented.
-  final NicknameTheme? theme;
+  final WordTheme? theme;
 
   @override
   String toString() => 'NicknameDetail($nickname, $words, ${language.name}, ${theme?.name})';

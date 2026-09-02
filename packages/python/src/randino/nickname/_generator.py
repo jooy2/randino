@@ -3,9 +3,10 @@
 Internal — `rand_nickname` is the public entry point, in both of its output forms.
 
 A nickname is a noun with something added to it: a modifier in front (멋진사자), a
-second noun behind (고양이꼬리), or both (파란고양이발바닥). The nouns are everyday
-words — animals, things, nature, ideas — and never person names, which is what keeps
-a nickname from reading like one.
+second noun behind (고양이꼬리), or both (파란고양이발바닥). The nouns are the `word`
+package's pools — animals, things, nature, ideas — and never person names, which is
+what keeps a nickname from reading like one. Drawing one word is
+`word/_generator.py`; putting several of them together is what this module is.
 
 - `style` decides per word whether it comes out of a pool or is invented.
 - `min_length` / `max_length` pick the shape first: a range too short for a modifier
@@ -30,27 +31,17 @@ from randino._internal.generate import (
     resolve_prefix,
     resolve_style,
 )
-from randino._internal.utils import (
-    capitalize_first,
-    chance,
-    clamp,
-    pick,
-    rand_int,
-)
+from randino._internal.utils import pick
 from randino._types import (
     NicknameDetail,
-    NicknameLanguage,
-    NicknameLanguageOption,
-    NicknameTheme,
-    NicknameThemeOption,
+    WordLanguage,
+    WordLanguageOption,
+    WordTheme,
+    WordThemeOption,
 )
-from randino.nickname.data import NICKNAME_DATA, NICKNAME_LANGUAGES, NICKNAME_THEMES
-from randino.nickname.data._types import (
-    NicknameLanguageData,
-    PoolSynthesis,
-    WordPool,
-    WordSynthesis,
-)
+from randino.word._generator import draw_word, pool_bounds, theme_of, themes_of
+from randino.word.data import WORD_DATA, WORD_LANGUAGES, WORD_THEMES
+from randino.word.data._types import WordLanguageData, WordPool
 
 Slot = Literal["modifier", "noun", "part"]
 
@@ -76,9 +67,6 @@ A bare noun stays rare on purpose — a modifier is what makes a nickname feel p
 FIT_ATTEMPTS = 12
 """How many shapes to try before settling for the closest fit found."""
 
-SYNTH_ATTEMPTS = 8
-"""Attempts spent looking for an invented word of the requested length."""
-
 Bounds = dict[Slot, tuple[int, int]]
 
 
@@ -90,7 +78,7 @@ class Settings:
     theme. So does the separator, which falls back to the language's own joiner.
     """
 
-    theme: NicknameThemeOption
+    theme: WordThemeOption
     style: int
     include_modifier: bool
     prefix: str
@@ -99,7 +87,7 @@ class Settings:
     separator: str | None = None
 
 
-def joiner_of(data: NicknameLanguageData, settings: Settings) -> str:
+def joiner_of(data: WordLanguageData, settings: Settings) -> str:
     """What goes between the words: the caller's separator, or the language's joiner.
 
     Its length is part of the nickname's, so every length calculation has to go
@@ -108,21 +96,11 @@ def joiner_of(data: NicknameLanguageData, settings: Settings) -> str:
     return data.joiner if settings.separator is None else settings.separator
 
 
-def pool_bounds(pool: WordPool) -> tuple[int, int]:
-    """Shortest and longest word in a pool."""
-    if not pool:
-        return 1, 1
-
-    return min(len(word) for word in pool), max(len(word) for word in pool)
-
-
 _bounds_cache: dict[str, Bounds] = {}
 """Pool bounds never change, so they are worth computing once per language/theme."""
 
 
-def slot_bounds(
-    language: NicknameLanguage, data: NicknameLanguageData, theme: NicknameTheme
-) -> Bounds:
+def slot_bounds(language: WordLanguage, data: WordLanguageData, theme: WordTheme) -> Bounds:
     """Shortest and longest word each slot of a shape can hold."""
     key = f"{language}:{theme}"
     cached = _bounds_cache.get(key)
@@ -141,7 +119,7 @@ def slot_bounds(
     return bounds
 
 
-def usable_patterns(data: NicknameLanguageData, settings: Settings) -> tuple[Pattern, ...]:
+def usable_patterns(data: WordLanguageData, settings: Settings) -> tuple[Pattern, ...]:
     """The shapes available for the current options, in the order they are weighted."""
 
     def keep(pattern: Pattern) -> bool:
@@ -181,132 +159,15 @@ def pick_pattern(patterns: tuple[Pattern, ...]) -> tuple[Slot, ...]:
     return patterns[-1].slots
 
 
-# --- Word selection ---------------------------------------------------------
-
-
-def pick_word(pool: WordPool, low: int, high: int, prefix: str) -> str | None:
-    """A pool word between `low` and `high` characters, starting with `prefix`.
-
-    Falls back to a looser fit rather than nothing, and returns None only when no
-    word starts with the requested character.
-    """
-    candidates = (
-        tuple(word for word in pool if word.lower().startswith(prefix.lower())) if prefix else pool
-    )
-
-    if not candidates:
-        return None
-
-    fitting = tuple(word for word in candidates if low <= len(word) <= high)
-
-    if fitting:
-        return pick(fitting)
-
-    short_enough = tuple(word for word in candidates if len(word) <= high)
-
-    if short_enough:
-        return pick(short_enough)
-
-    long_enough = tuple(word for word in candidates if len(word) >= low)
-
-    return pick(long_enough or candidates)
-
-
-def synth_word(syn: WordSynthesis, low: int, high: int, prefix: str) -> str:
-    """Build one invented word, as close to the requested length as the template allows."""
-    if isinstance(syn, PoolSynthesis):
-        # One entry is one character, so the length is the number of entries.
-        floor = max(low, 1)
-        ceiling = max(floor, high)
-        count = clamp(rand_int(syn.min_syllables, syn.max_syllables), floor, ceiling)
-        out = prefix
-
-        for _ in range(len(out), count):
-            # Avoid immediately repeating a character (狼狼).
-            following = pick(syn.pool)
-
-            for _tries in range(3):
-                if following != out[-1:]:
-                    break
-                following = pick(syn.pool)
-
-            out += following
-
-        return out
-
-    best = ""
-    best_distance = math.inf
-
-    for _attempt in range(SYNTH_ATTEMPTS):
-        syllables = rand_int(syn.min_syllables, syn.max_syllables)
-        word = ""
-
-        for index in range(syllables):
-            word += prefix.lower() if index == 0 and prefix else pick(syn.onset)
-            word += pick(syn.vowel)
-
-            if index == syllables - 1:
-                word += pick(syn.coda)
-
-        if low <= len(word) <= high:
-            return word
-
-        distance = low - len(word) if len(word) < low else len(word) - high
-
-        if distance < best_distance:
-            best_distance = distance
-            best = word
-
-    return best
-
-
-class Chosen(NamedTuple):
-    """One word, and whether it had to be invented against the caller's wishes."""
-
-    word: str
-
-    missed: bool
-    """The word had to be invented because no real one started with the requested
-    character — worth another shape or theme before settling for it."""
-
-
-def pick_slot_word(
-    data: NicknameLanguageData,
-    slot: Slot,
-    nouns: WordPool,
-    settings: Settings,
-    low: int,
-    high: int,
-    prefix: str,
-) -> Chosen:
-    """Fill one slot of a shape with a word."""
-    if slot == "modifier":
-        pool = data.modifiers
-    elif slot == "part":
-        assert data.parts is not None
-        pool = data.parts
-    else:
-        pool = nouns
-
-    invent = chance(settings.style)
-    word = None if invent else pick_word(pool, low, high, prefix)
-    chosen = word if word is not None else synth_word(data.syn, low, high, prefix)
-
-    return Chosen(
-        capitalize_first(chosen) if data.capitalize else chosen,
-        not invent and word is None,
-    )
-
-
 class Built(NamedTuple):
     """The words of one nickname, and the theme its base word came from."""
 
     words: tuple[str, ...]
-    theme: NicknameTheme | None
+    theme: WordTheme | None
 
 
 def build_words(
-    data: NicknameLanguageData,
+    data: WordLanguageData,
     slots: tuple[Slot, ...],
     bounds: Bounds,
     nouns: WordPool,
@@ -332,8 +193,17 @@ def build_words(
 
         floor = max(1, low - used - gap - rest_max)
         ceiling = max(floor, high - used - gap - rest_min)
-        chosen = pick_slot_word(
-            data, slot, nouns, settings, floor, ceiling, settings.prefix if index == 0 else ""
+
+        if slot == "modifier":
+            pool = data.modifiers
+        elif slot == "part":
+            assert data.parts is not None
+            pool = data.parts
+        else:
+            pool = nouns
+
+        chosen = draw_word(
+            data, pool, settings.style, floor, ceiling, settings.prefix if index == 0 else ""
         )
 
         missed = missed or chosen.missed
@@ -344,20 +214,6 @@ def build_words(
 
 
 # --- Per-nickname generation ------------------------------------------------
-
-
-def themes_of(theme: NicknameThemeOption) -> tuple[NicknameTheme, ...]:
-    """The themes one request draws from."""
-    return NICKNAME_THEMES if theme == "all" else (theme,)
-
-
-def theme_of(data: NicknameLanguageData, word: str) -> NicknameTheme | None:
-    """Theme a word belongs to, across every theme of the language."""
-    for theme in NICKNAME_THEMES:
-        if word in data.nouns[theme]:
-            return theme
-
-    return None
 
 
 def has_boundary_repeat(words: list[str]) -> bool:
@@ -371,7 +227,7 @@ def has_boundary_repeat(words: list[str]) -> bool:
 
 
 def bounds_for(
-    data: NicknameLanguageData,
+    data: WordLanguageData,
     bounds: Bounds,
     patterns: tuple[Pattern, ...],
     settings: Settings,
@@ -390,7 +246,7 @@ def bounds_for(
 
 
 def natural_range(
-    language: NicknameLanguage, include_modifier: bool, separator: str | None = None
+    language: WordLanguage, include_modifier: bool, separator: str | None = None
 ) -> tuple[int, int]:
     """Every length a language can produce, across all of its themes.
 
@@ -398,7 +254,7 @@ def natural_range(
     `nickname_length_range` reports. Kept here so it is derived from the same shapes
     and pools the generator actually draws from.
     """
-    data = NICKNAME_DATA[language]
+    data = WORD_DATA[language]
     settings = Settings(
         theme="all",
         style=0,
@@ -410,16 +266,16 @@ def natural_range(
     joiner = len(joiner_of(data, settings))
     ranges = [
         pattern_range(pattern.slots, slot_bounds(language, data, theme), joiner)
-        for theme in NICKNAME_THEMES
+        for theme in WORD_THEMES
         for pattern in patterns
     ]
 
     return min(low for low, _ in ranges), max(high for _, high in ranges)
 
 
-def generate_one(language: NicknameLanguage, settings: Settings) -> Built:
+def generate_one(language: WordLanguage, settings: Settings) -> Built:
     """Build one complete nickname in one language."""
-    data = NICKNAME_DATA[language]
+    data = WORD_DATA[language]
     themes = themes_of(settings.theme)
     patterns = usable_patterns(data, settings)
     joiner = joiner_of(data, settings)
@@ -469,8 +325,8 @@ def generate_one(language: NicknameLanguage, settings: Settings) -> Built:
 
 def generate_nickname_details(
     *,
-    language: NicknameLanguageOption = "all",
-    theme: NicknameThemeOption = "all",
+    language: WordLanguageOption = "all",
+    theme: WordThemeOption = "all",
     count: int = 1,
     style: int = 0,
     min_length: int | None = None,
@@ -492,11 +348,11 @@ def generate_nickname_details(
     )
 
     def draw() -> NicknameDetail:
-        code = draw_language(language, NICKNAME_LANGUAGES)
+        code = draw_language(language, WORD_LANGUAGES)
         words, built_theme = generate_one(code, settings)
 
         return NicknameDetail(
-            nickname=joiner_of(NICKNAME_DATA[code], settings).join(words),
+            nickname=joiner_of(WORD_DATA[code], settings).join(words),
             words=words,
             language=code,
             theme=built_theme,

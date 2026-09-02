@@ -33,7 +33,7 @@ import 'package:randino/randino.dart';
 randSuffix('멋진사자'); // '멋진사자_nVtRC'
 randSuffix('MistyOwl', length: 8, separator: '-'); // 'MistyOwl-k3Rm9dQx'
 
-randSuffixAll(randNickname(language: NicknameLanguage.ko, count: 2));
+randSuffixAll(randNickname(language: WordLanguage.ko, count: 2));
 // ['달력_U7aNZ', '조용한바구니_RUKAP']
 ```
 
