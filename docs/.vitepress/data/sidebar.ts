@@ -18,13 +18,15 @@
  * **Utilities** answer a question about a language. The folder a page sits in
  * decides nothing but its URL.
  *
- * **Words** is a level deeper still, inside Generators, and it is the only
- * entry that goes that far. The fourteen themed functions are `randWord` with
- * its argument decided, so they belong under it rather than beside it — and
- * listed beside it they would bury the three generators in a list of
- * seventeen. It is also the one group the navbar's API dropdown leaves out:
- * `navGroupsFor` takes a group's pages and not its subgroups, so the dropdown
- * shows the function the fourteen all are.
+ * **Generators** is the one that goes a level deeper, into **General** — the
+ * three that generate a kind of text — and **Words**, the fourteen themed forms
+ * of `randWord`. Seventeen entries in one list would bury the three, and the
+ * fourteen are `randWord` with its argument decided rather than fourteen
+ * separate ideas, so they sit beside the three rather than among them.
+ *
+ * Words is also the one group the navbar's API dropdown leaves out, which it
+ * says itself with `sidebarOnly`: fourteen names for one function is a wall in
+ * a menu, and the dropdown already points at the function they all are.
  *
  * **Behaviour** holds the prose explaining how a generator's options behave,
  * where there is enough of it to be its own page — `randName` and
@@ -44,12 +46,19 @@ export interface SidebarPage {
 	ko: string;
 }
 
-/** A section of the menu. Its `items` are pages, or — one level down — sections. */
+/** A section of the menu. Its `items` are pages, or — a level down — sections. */
 export interface SidebarGroup {
 	/** Only for a group the navbar also renders — see `navGroupsFor`. */
 	id?: string;
 	en: string;
 	ko: string;
+	/**
+	 * Kept out of the navbar's dropdown, pages and all. For a group that is long
+	 * enough to be a wall in a menu while still being worth a place in the
+	 * sidebar — **Words**, the fourteen themed forms of one function, is why this
+	 * exists.
+	 */
+	sidebarOnly?: boolean;
 	items: (SidebarPage | SidebarGroup)[];
 }
 
@@ -77,13 +86,19 @@ export const SIDEBAR: SidebarGroup[] = [
 				en: 'Generators',
 				ko: '생성 함수',
 				items: [
-					{ path: 'name/rand-name', en: 'randName', ko: 'randName' },
-					{ path: 'nickname/rand-nickname', en: 'randNickname', ko: 'randNickname' },
-					{ path: 'word/rand-word', en: 'randWord', ko: 'randWord' },
 					{
-						id: 'words',
+						en: 'General',
+						ko: '일반',
+						items: [
+							{ path: 'name/rand-name', en: 'randName', ko: 'randName' },
+							{ path: 'nickname/rand-nickname', en: 'randNickname', ko: 'randNickname' },
+							{ path: 'word/rand-word', en: 'randWord', ko: 'randWord' }
+						]
+					},
+					{
 						en: 'Words',
 						ko: '단어',
+						sidebarOnly: true,
 						items: [
 							{ path: 'word/rand-animal', en: 'randAnimal', ko: 'randAnimal' },
 							{ path: 'word/rand-object', en: 'randObject', ko: 'randObject' },
@@ -207,6 +222,26 @@ function groupById(entries: (SidebarPage | SidebarGroup)[], id: string): Sidebar
  * lists, so they are the same lists — a menu that quietly stops matching the
  * section it points into is the kind of thing only the reader notices.
  */
+/**
+ * Every page a group holds, however deep — minus the subgroups that asked to
+ * stay out of the menu.
+ *
+ * A group's pages used to be `items.filter(isPage)`, which stopped being the
+ * whole answer the moment **Generators** held its three in a **General**
+ * subgroup rather than directly. Recursing is what keeps the dropdown showing
+ * the same functions the sidebar section does; `sidebarOnly` is how the one
+ * subgroup that would flood it says so.
+ */
+function pagesOf(group: SidebarGroup): SidebarPage[] {
+	return group.items.flatMap((entry) => {
+		if (isPage(entry)) {
+			return [entry];
+		}
+
+		return entry.sidebarOnly ? [] : pagesOf(entry);
+	});
+}
+
 export function navGroupsFor(ids: string[], lang: string, defaultLocale: string) {
 	const base = localeBase(lang, defaultLocale);
 
@@ -219,7 +254,7 @@ export function navGroupsFor(ids: string[], lang: string, defaultLocale: string)
 
 		return {
 			text: labelOf(group, lang),
-			items: group.items.filter(isPage).map((page) => ({
+			items: pagesOf(group).map((page) => ({
 				text: labelOf(page, lang),
 				link: `${base}${page.path}`
 			}))
