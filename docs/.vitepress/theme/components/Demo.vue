@@ -69,7 +69,7 @@ watch(
 );
 
 const name = reactive({
-	language: 'ko',
+	language: 'en',
 	gender: 'all',
 	count: 8,
 	style: 0,
@@ -83,7 +83,7 @@ const name = reactive({
 });
 
 const nickname = reactive({
-	language: 'ko',
+	language: 'en',
 	theme: 'all',
 	count: 8,
 	style: 0,
@@ -95,7 +95,7 @@ const nickname = reactive({
 });
 
 const word = reactive({
-	language: 'ko',
+	language: 'en',
 	theme: 'all',
 	count: 8,
 	style: 0,
