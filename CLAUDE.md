@@ -77,7 +77,7 @@ lib/
     data/
       index.ts              # WORD_DATA, WORD_LANGUAGES, WORD_THEMES
       types.ts              # internal dataset types
-      en.ts ko.ts ja.ts zh.ts
+      en.ts ko.ts ja.ts zh.ts …   # one file per language, nine of them
   nickname/
     index.ts
     randNickname.ts         # public: string[], or NicknameDetail[] likewise
@@ -463,11 +463,12 @@ To add one that clears the bar:
 2. Add `lib/word/data/<code>.ts` with a `WordLanguageData` object: `joiner`, `capitalize`, `adjectives` and `actions` in attributive form, `nouns` for every theme in `WORD_THEMES`, the `frames` the language's grammar allows, an optional `parts` pool for the frames that ask for one, and a `syn` template (`kind: 'syllable'` for alphabetic scripts, `kind: 'pool'` where one character is one syllable).
 3. Register it in `WORD_DATA` and `WORD_LANGUAGES` in `lib/word/data/index.ts`.
 4. Write the frames before the pools. A shape is only worth a pool if the grammar carries it: `ja` and `zh` reach `parts` through の and 的 because a bare noun-noun compound does not read, and `en` has no possessive frame because `of` is a word rather than a particle.
-5. Aim for 100+ nouns per theme, which is where the existing four sit; the pools are what make the output varied, and the combination count is roughly `(adjectives + actions) × nouns × (1 + parts)` — around 20M for `en` and 19M for `ko`, 0.3M for `ja` and `zh`, which have no `parts`. `sport`, `vehicle` and `product` are the thinnest (roughly 115 / 113 / 105) because the world holds fewer of those, and padding a theme with near-synonyms reads worse than a shorter pool.
+5. Aim for 50+ nouns per theme, and more where the vocabulary is there. `ko`, `en`, `ja` and `zh` hold around 2,700 nouns each and the five added since hold around 1,550; the thinnest theme in any language sits in the forties. The pools are what make the output varied, and the combination count is roughly `(adjectives + actions) × nouns × (1 + parts)` — around 40M for the four with a `parts` pool, 0.3M for `es`, `it`, `de` and `ru`, which have none. **Padding a theme with near-synonyms reads worse than a shorter pool**, and inventing a compound to fill it is how `棒麺麭` and `대로변` got in; both were replaced.
 6. No person names, and no word that is only a name — for `en` this is enforced against the person-name pools, which is why `job` has no `Knight`, `Baker` or `Hunter` and `plant` no `Rose` or `Ivy`. Add the language to the README tables and to `SCRIPT` in `test/word.test.ts` **and** `test/nickname.test.ts`; the existing per-language tests then cover it.
-7. Port all of it to `packages/dart` and `packages/python`, the same way a name language is ported.
-8. Add the row to the tables in `docs/*/guide/languages.md` and to the root `README.md`.
-9. Run `node tools/parity/index.mjs` from the repository root — three pools of 100+ nouns each are exactly where one word goes missing unnoticed.
+7. A language that inflects tags its nouns and lists its endings: write `nouns` as a `theme -> \`gato:m luna:f\`` map through `taggedNouns`, and give `agreement` the rules per gender. Put the noun **first** in the frames where the grammar allows it; where it cannot (`blauer Wal`), `buildWords` draws the noun ahead of its turn instead.
+8. Port all of it to `packages/dart` and `packages/python`, the same way a name language is ported.
+9. Add the row to the tables in `docs/*/guide/languages.md` and to the root `README.md`.
+10. Run `node tools/parity/index.mjs` from the repository root — twenty-five pools in three packages are exactly where one word goes missing unnoticed.
 
 ## Adding a word theme
 

@@ -53,10 +53,10 @@ numbers in between promised a precision that was not there.
 WordLanguage = Literal["en", "ko", "ja", "zh", "vi", "es", "it", "de", "ru"]
 """A language the word pools cover.
 
-And so a language `rand_word`, `rand_modifier` and `rand_nickname` can work in.
-Fewer than `NameLanguage`: a modifier has to sit in front of a noun exactly as it is
-written in the dictionary, which only reads naturally in languages that ask for no
-grammatical agreement.
+And so a language `rand_word`, `rand_modifier` and `rand_nickname` can work in. The
+same nine `NameLanguage` holds: what used to keep a language out was word order or
+agreement between a modifier and its noun, and both are the language's own data now —
+the shapes in its frames, the endings in its agreement rules.
 """
 
 WordLanguageOption = Literal[WordLanguage, "all"]

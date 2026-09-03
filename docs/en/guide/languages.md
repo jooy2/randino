@@ -103,4 +103,4 @@ Neither word order nor agreement keeps a language out any more. The shapes belon
 
 Every language the name generator knows now has word pools too, so `language` means the same nine codes on every generator in the package.
 
-Japanese and Chinese use the modifier shapes only. A noun-noun compound in those languages needs a particle more often than not, or reads as garbled once the base word is abstract, so the trailing-word shapes are skipped for them.
+Japanese and Chinese reach a second noun only through の and 的. A bare noun-noun compound needs a particle more often than not in either language, or reads as garbled once the base word is abstract, so the shape that has one is the shape they got.
