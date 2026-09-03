@@ -29,7 +29,16 @@ final NameLanguageData en = NameLanguageData(
     Mills Norton Owens Payne Reeves Shaw Bryant Butler Coleman Doyle Ferguson
     Fleming Gordon Hopkins Manning Mercer Nichols Norris Pearson Reynolds Sherman
     Sutton Thornton Walton Whitaker Abbott Bradley Bishop Donovan Elliott Rhodes
-    Sinclair Walsh Yates Keller Tate
+    Sinclair Walsh Yates Keller Tate Ackerman Aldridge Alcott Ashford Atwood
+    Bancroft Barlow Barrett Bartlett Beaumont Benson Berkeley Blackwood Blythe
+    Bolton Bradshaw Braxton Bridges Brockman Buchanan Cadogan Calloway Carlisle
+    Carrington Chadwick Chambers Chandler Chesterton Clayton Cleveland Clifton
+    Compton Coventry Cromwell Crowther Cunningham Dalton Danvers Davenport Delaney
+    Dempsey Devereux Dorset Driscoll Duncan Eastwood Edgerton Ellsworth Everard
+    Fairbanks Fairfax Falconer Fenwick Fitzgerald Fleetwood Foxwell Galloway Garland
+    Gatsby Godwin Granger Greenwood Grimshaw Halloway Hampton Harcourt Hargrove
+    Harlow Hathaway Haverford Hawthorne Hayward Heathcote Hollis Huntington
+    Ingersoll Kingsley Langdon Larkin Lockwood
   '''),
   male: pool(r'''
     James William Oliver Henry Jack Noah Ethan Liam Lucas Benjamin Alexander Daniel
@@ -45,7 +54,15 @@ final NameLanguageData en = NameLanguageData(
     Quinn Anthony Joshua Brandon Emerson Dominic Cameron Austin Jordan Travis
     Douglas Russell Raymond Philip Dennis Jerome Leonard Bernard Eugene Duncan
     Malcolm Alistair Lachlan Rory Ronan Aidan Brendan Kieran Gavin Stuart Jonathan
-    Frederick Lawrence Wesley Garrett Ezra Sawyer Landon Easton Gideon Tobias
+    Frederick Lawrence Wesley Garrett Ezra Sawyer Landon Easton Gideon Tobias Abel
+    Adrian Alfred Angus Barnaby Bennett Bertram Blaine Bradley Brennan Bryson
+    Caspian Cedric Clifford Clinton Conrad Corbin Cyrus Dalton Damian Darius Desmond
+    Dexter Donald Dorian Edmund Edwin Elias Ellis Emory Ernest Esmond Fabian
+    Fletcher Floyd Francis Franklin Gareth Gerald Gilbert Godfrey Gordon Graham
+    Harold Harvey Herbert Horace Howard Hugo Humphrey Isaiah Jonah Joel Julius
+    Keaton Kenneth Lawson Leland Lionel Lloyd Magnus Marlon Maurice Maxwell Miller
+    Milton Morgan Nathaniel Nigel Norman Orson Osborn Percival Phineas Quincy
+    Randolph Reginald
   '''),
   female: pool(r'''
     Emma Olivia Ava Sophia Isabella Charlotte Amelia Mia Harper Evelyn Abigail Emily
@@ -62,7 +79,14 @@ final NameLanguageData en = NameLanguageData(
     Melanie Erica Joanna Beverly Marilyn Doris Gloria Irene Judith Louise Phoebe
     Rosalie Matilda Harriet Florence Genevieve Cecilia Beatrice Miriam Marina
     Sabrina Adelaide Arabella Bridget Cordelia Rosemary Holly Summer Autumn Juniper
-    Nadia
+    Nadia Abigale Adele Agatha Agnes Alberta Althea Amara Amelie Annabel Antonia
+    Arden Ariadne Astrid Aveline Belinda Bernice Bethany Beverley Blythe Bridgette
+    Bronwyn Camille Carmen Cassandra Cecily Celeste Celia Charity Clarissa
+    Clementine Colette Constance Coraline Cressida Daphne Deirdre Delia Dorothea
+    Eartha Edwina Eileen Elaine Eloise Elspeth Emmeline Enid Estelle Etta Evangeline
+    Fenella Fiona Flora Frances Georgia Georgina Geraldine Gwendolyn Helena
+    Henrietta Hilda Honora Imelda Ingrid Isadora Isolde Jacinta Jemima Jessamine
+    Josie Juno Katrina Lorna Mabel Madeline Maren
   '''),
   syn: westernSyllables,
 );
