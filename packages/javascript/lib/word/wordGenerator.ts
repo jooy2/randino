@@ -24,7 +24,7 @@ import type {
 	WordThemeOption
 } from '../_types/global.js';
 import { WORD_DATA, WORD_LANGUAGES, WORD_THEMES } from './data/index.js';
-import type { WordLanguageData, WordPool, WordSynthesis } from './data/types.js';
+import type { WordGender, WordLanguageData, WordPool, WordSynthesis } from './data/types.js';
 
 // How many themes to try before settling for the closest word found.
 const FIT_ATTEMPTS = 12;
@@ -59,6 +59,34 @@ export function modifierFollows(data: WordLanguageData): boolean {
 	}
 
 	return false;
+}
+
+/**
+ * A modifier reshaped to agree with a noun of `gender`. The first rule whose
+ * ending matches wins; a word none of them match is already right, which is how
+ * Spanish `azul` stays `azul` beside both `gato` and `luna`.
+ *
+ * A language with no `agreement` hands the word straight back, so every
+ * generator can call this without asking whether the language inflects.
+ */
+export function agree(
+	data: WordLanguageData,
+	word: string,
+	gender: WordGender | undefined
+): string {
+	const rules = gender && data.agreement?.[gender];
+
+	if (!rules) {
+		return word;
+	}
+
+	for (const [ending, replacement] of rules) {
+		if (word.endsWith(ending)) {
+			return word.slice(0, word.length - ending.length) + replacement;
+		}
+	}
+
+	return word;
 }
 
 /** Shortest and longest word in a pool. */

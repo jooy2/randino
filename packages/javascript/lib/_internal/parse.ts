@@ -2,6 +2,8 @@
 // separated strings inside a template literal instead of one array entry per
 // line, which keeps a 120-name pool to a handful of lines.
 
+import type { WordGender, WordPool } from '../word/data/types.js';
+
 /**
  * Split a whitespace-separated pool. `_` stands for a space inside a single
  * entry, so multi-word names survive the split (`De_Luca` -> `De Luca`).
@@ -11,6 +13,31 @@ export function words(source: string): readonly string[] {
 		.trim()
 		.split(/\s+/)
 		.map((word) => word.replace(/_/g, ' '));
+}
+
+/**
+ * Split a `theme -> \`gato:m luna:f\`` map into the pools and the gender lookup
+ * the two of them share. One pass over one source, so a language that inflects
+ * still writes each noun exactly once.
+ */
+export function taggedNouns<T extends string>(
+	source: Record<T, string>
+): { pools: Record<T, WordPool>; gender: Record<string, WordGender> } {
+	const pools = {} as Record<T, WordPool>;
+	const gender: Record<string, WordGender> = {};
+
+	for (const theme of Object.keys(source) as T[]) {
+		pools[theme] = words(source[theme]).map((entry) => {
+			const at = entry.lastIndexOf(':');
+			const word = entry.slice(0, at);
+
+			gender[word] = entry.slice(at + 1) as WordGender;
+
+			return word;
+		});
+	}
+
+	return { pools, gender };
 }
 
 /**

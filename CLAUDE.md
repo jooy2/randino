@@ -450,10 +450,11 @@ Nicknames:
 
 ## Adding a word language
 
-The five supported languages (`ko`, `en`, `ja`, `zh`, `vi`) share one property: a modifier can sit beside a noun exactly as it is written in the dictionary, with no agreement between the two. **That is the bar for adding another one** — it is a word language and a nickname language at once, because they are the same pools. Italian, German, Russian and Spanish are name languages but not word languages, and the reason is grammar, not effort:
+Six languages are supported (`ko`, `en`, `ja`, `zh`, `vi`, `es`), and neither word order nor agreement is a bar any more:
 
-- Italian, Spanish, Russian and German inflect the modifier for the noun (`gatto azzurro` / `luna azzurra`, `blauer Wal` / `blaue Katze`). Supporting them means tagging every noun with its gender and storing every modifier once per gender — do that, or leave the language out. Half-agreement output is worse than none.
-- **Word order is no longer an obstacle.** Vietnamese puts the modifier after the noun (`mèo xanh`) and the possessed thing in front of its owner (`đuôi mèo`), and says both in its own `frames`. `modifierFollows` reads that back out of the frames so `randModifier` attaches on the right side, rather than a second field stating an order the frames could contradict.
+- **Word order lives in the frames.** Vietnamese and Spanish put the modifier after the noun (`mèo xanh`, `gato azul`) and Vietnamese puts the possessed thing in front of its owner (`đuôi mèo`); both say so in their own `frames`. `modifierFollows` reads that back out of the frames so `randModifier` attaches on the right side, rather than a second field stating an order the frames could contradict.
+- **Agreement lives in the data.** A language that inflects tags each noun (`gato:m luna:f`), and `agreement` lists the endings a modifier changes per gender. `taggedNouns` splits the tag back off so each word is still typed once, and `agree` applies the first rule that matches — a word no rule matches is already right (`azul`). Rules rather than a function, so `tools/parity` compares them as data.
+- **Agreement only reaches a modifier drawn after its noun.** `buildWords` fills the slots in frame order, so the noun's gender is known by the time a modifier is drawn only when the frame puts the noun first. Italian, Russian and German put the modifier in front (`blauer Wal`), and that is what still keeps them out — not the rules, which their endings would fit.
 
 To add one that clears the bar:
 

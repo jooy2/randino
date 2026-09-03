@@ -50,6 +50,17 @@ void main() {
         'adjectives': listed(entry.value.adjectives),
         'actions': listed(entry.value.actions),
         'parts': listed(entry.value.parts),
+        'nounGender': entry.value.nounGender == null
+            ? null
+            : <String, Object?>{
+                for (final g in entry.value.nounGender!.entries) g.key: g.value.name,
+              },
+        'agreement': entry.value.agreement == null
+            ? null
+            : <String, Object?>{
+                for (final g in entry.value.agreement!.entries)
+                  g.key.name: <Object?>[for (final rule in g.value) <String>[...rule]],
+              },
         // Optional in one package and defaulted in another; written as a list
         // either way so the shapes compare.
         'frames': <Object?>[

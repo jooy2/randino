@@ -16,6 +16,21 @@ from randino._types import WordTheme
 WordPool = tuple[str, ...]
 """A pool of whole words."""
 
+WordGender = Literal["m", "f", "n"]
+"""The gender a noun carries in a language whose modifiers agree with it.
+
+Only those languages tag their nouns; the rest leave the lookup out entirely.
+"""
+
+WordAgreement = Mapping[WordGender, tuple[tuple[str, str], ...]]
+"""How a modifier written in its base form changes to agree with a noun.
+
+Each rule is `(ending, replacement)`; the first whose ending matches wins, and a
+modifier no rule matches is already in the right form (Spanish `azul` is the same
+beside `gato` and `luna`). Rules rather than a function so that the three packages
+compare as data — see `tools/parity`.
+"""
+
 
 @dataclass(frozen=True, slots=True)
 class SyllableSynthesis:
@@ -142,6 +157,19 @@ class WordLanguageData:
 
     syn: WordSynthesis
     """How this language's invented words are built."""
+
+    noun_gender: Mapping[str, WordGender] | None = None
+    """The gender of each noun, for a language whose modifiers agree with it.
+
+    Written as a `gato:m` tag on the pool and split out by `tagged_nouns`, so each
+    word is still typed once.
+    """
+
+    agreement: WordAgreement | None = None
+    """How a modifier is reshaped to agree with the noun it sits beside.
+
+    Left out by a language that asks for no agreement, which is most of them.
+    """
 
     parts: WordPool | None = None
     """Trailing noun for compounds (고양이 + 꼬리, 狮子 + 的 + 眼泪), used by nicknames only.

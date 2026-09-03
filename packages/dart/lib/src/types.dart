@@ -101,6 +101,9 @@ enum WordLanguage {
 
   /// Vietnamese.
   vi,
+
+  /// Spanish.
+  es,
 }
 
 /// What a word is about.

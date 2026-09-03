@@ -3,7 +3,7 @@ import { generateWordDetails } from './wordGenerator.js';
 
 /**
  * Generate everyday words — the vocabulary a nickname is built from, on its own.
- * Animals, things, nature, ideas: twenty-five themes, in five languages. Person
+ * Animals, things, nature, ideas: twenty-five themes, in six languages. Person
  * names are never used.
  *
  * `theme` picks what the words are about; the twenty-five `rand…` functions beside

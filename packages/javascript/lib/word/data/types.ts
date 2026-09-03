@@ -12,6 +12,25 @@ import type { WordTheme } from '../../_types/global.js';
 export type WordPool = readonly string[];
 
 /**
+ * The gender a noun carries in a language whose modifiers agree with it. Only
+ * those languages tag their nouns; the rest leave the lookup out entirely.
+ */
+export type WordGender = 'm' | 'f' | 'n';
+
+/**
+ * How a modifier written in its base form changes to agree with a noun of a
+ * given gender. Each rule is `[ending, replacement]`; the first whose ending
+ * matches wins, and a modifier no rule matches is already in the right form
+ * (Spanish `azul` is the same beside `gato` and `luna`).
+ *
+ * Rules rather than a function so that the three packages compare as data
+ * rather than as three copies of the same branch — see `tools/parity`.
+ */
+export type WordAgreement = {
+	[gender in WordGender]?: readonly (readonly [string, string])[];
+};
+
+/**
  * How a word is built when `realism` calls for an invented one:
  * - `syllable`: onset + vowel + coda, for alphabetic scripts (Blorin).
  * - `pool`: pick N whole syllables or characters, for scripts where one character
@@ -61,6 +80,13 @@ export type WordLanguageData = {
 	// The words themselves, grouped by theme. Deliberately common nouns — never
 	// person names.
 	nouns: Record<WordTheme, WordPool>;
+	// The gender of each noun, for a language whose modifiers agree with it.
+	// Written as a `gato:m` tag on the pool and split out by `taggedNouns`, so
+	// each word is still typed once.
+	nounGender?: Record<string, WordGender>;
+	// How a modifier is reshaped to agree with the noun it sits beside. Left out
+	// by a language that asks for no agreement, which is most of them.
+	agreement?: WordAgreement;
 	// Words that say what the noun is like, in the form that can sit straight in
 	// front of it (Korean attributive: 멋진, Japanese: 青い / 静かな). A handful of
 	// them are nouns used attributively (별빛, Marble); they describe all the

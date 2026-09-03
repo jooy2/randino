@@ -17,6 +17,8 @@ import type {
 // The datasets are internal, but a nickname is only as good as the words it is
 // built from — these checks are what keep person names out of them.
 import { LOOSE_THEMES, WORD_DATA } from '../dist/word/data/index.js';
+import { agree } from '../dist/word/wordGenerator.js';
+import type { WordGender } from '../dist/word/data/types.js';
 import { NAME_DATA } from '../dist/name/data/index.js';
 
 const SAMPLE = 60;
@@ -26,16 +28,23 @@ const SCRIPT: Record<WordLanguage, RegExp> = {
 	ko: /^[가-힣]+$/,
 	ja: /^[々぀-ヿ一-鿿]+$/,
 	zh: /^[々一-鿿]+$/,
-	vi: /^[a-zA-ZÀ-ỹ]+(?: [a-zA-ZÀ-ỹ]+)*$/
+	vi: /^[a-zA-ZÀ-ỹ]+(?: [a-zA-ZÀ-ỹ]+)*$/,
+	es: /^[a-zA-ZÀ-ÿ]+(?: [a-zA-ZÀ-ÿ]+)*$/
 };
 
-/** Every word the language can put in a nickname. */
+/**
+ * Every word the language can put in a nickname. A language whose modifiers
+ * agree with the noun puts the agreed form in, so every gender's shape of every
+ * modifier counts as one of its words.
+ */
 function allWords(language: WordLanguage): string[] {
 	const data = WORD_DATA[language];
+	const genders = Object.keys(data.agreement ?? {}) as WordGender[];
+	const modifiers = [...data.adjectives, ...data.actions];
 
 	return [
-		...data.adjectives,
-		...data.actions,
+		...modifiers,
+		...genders.flatMap((gender) => modifiers.map((word) => agree(data, word, gender))),
 		...(data.parts ?? []),
 		...WORD_THEMES.flatMap((theme) => [...data.nouns[theme]])
 	];

@@ -5,7 +5,11 @@ instead of one list entry per line, which keeps a 120-name pool to a handful of
 lines.
 """
 
-from typing import NamedTuple
+from collections.abc import Mapping
+from typing import NamedTuple, cast
+
+from randino._types import WordTheme
+from randino.word.data._types import WordGender, WordPool
 
 
 class NameToken(NamedTuple):
@@ -48,3 +52,28 @@ def weights(source: str) -> dict[str, int]:
 def roman_map(source: str) -> dict[str, str]:
     """Build a native -> romanization lookup from `native:roman` pairs."""
     return {token.n: token.r for token in tokens(source)}
+
+
+def tagged_nouns(
+    source: Mapping[WordTheme, str],
+) -> tuple[dict[WordTheme, WordPool], dict[str, WordGender]]:
+    """Split a `theme -> "gato:m luna:f"` map into the pools and the gender lookup.
+
+    One pass over one source, so a language that inflects still writes each noun
+    exactly once.
+    """
+    pools: dict[WordTheme, WordPool] = {}
+    gender: dict[str, WordGender] = {}
+
+    for theme, pool in source.items():
+        entries = []
+
+        for tagged in words(pool):
+            word, _, tag = tagged.rpartition(":")
+
+            gender[word] = cast(WordGender, tag)
+            entries.append(word)
+
+        pools[theme] = tuple(entries)
+
+    return pools, gender

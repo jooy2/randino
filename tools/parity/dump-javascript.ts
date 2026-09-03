@@ -61,6 +61,15 @@ console.log(
 						adjectives: list(data.adjectives),
 						actions: list(data.actions),
 						parts: list(data.parts),
+						nounGender: map(data.nounGender),
+						agreement: data.agreement
+							? Object.fromEntries(
+									Object.entries(data.agreement).map(([gender, rules]) => [
+										gender,
+										(rules ?? []).map((rule) => [...rule])
+									])
+								)
+							: null,
 						frames: data.frames.map((frame) => ({
 							slots: [...frame.slots],
 							// Optional in one package and defaulted in another; written as a

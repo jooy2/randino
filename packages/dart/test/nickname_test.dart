@@ -3,6 +3,7 @@ import 'package:randino/randino.dart';
 // built from — these checks are what keep person names out of them.
 import 'package:randino/src/name/data/index.dart' as name_data;
 import 'package:randino/src/word/data/index.dart';
+import 'package:randino/src/word/data/types.dart';
 import 'package:randino/src/word/word_generator.dart';
 import 'package:test/test.dart';
 
@@ -14,15 +15,20 @@ final Map<WordLanguage, RegExp> script = <WordLanguage, RegExp>{
   WordLanguage.ja: RegExp(r'^[々぀-ヿ一-鿿]+$'),
   WordLanguage.zh: RegExp(r'^[々一-鿿]+$'),
   WordLanguage.vi: RegExp(r'^[a-zA-ZÀ-ỹ]+(?: [a-zA-ZÀ-ỹ]+)*$'),
+  WordLanguage.es: RegExp(r'^[a-zA-ZÀ-ÿ]+(?: [a-zA-ZÀ-ÿ]+)*$'),
 };
 
 /// Every word the language can put in a nickname.
 List<String> allWords(WordLanguage language) {
   final data = wordData[language]!;
+  final modifiers = <String>[...data.adjectives, ...data.actions];
 
   return <String>[
-    ...data.adjectives,
-    ...data.actions,
+    ...modifiers,
+    // A language whose modifiers agree with the noun puts the agreed form in,
+    // so every gender's shape of every modifier counts as one of its words.
+    for (final gender in data.agreement?.keys ?? const <WordGender>[])
+      for (final word in modifiers) agree(data, word, gender),
     ...?data.parts,
     for (final theme in wordThemes) ...data.nouns[theme]!,
   ];

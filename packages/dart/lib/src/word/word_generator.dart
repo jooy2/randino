@@ -26,6 +26,25 @@ const int _synthAttempts = 8;
 /// this one would save nothing worth the bookkeeping.
 WordPool modifiersOf(WordLanguageData data) => <String>[...data.adjectives, ...data.actions];
 
+/// A modifier reshaped to agree with a noun of [gender].
+///
+/// The first rule whose ending matches wins; a word none of them match is
+/// already right, which is how Spanish `azul` stays `azul` beside both `gato`
+/// and `luna`. A language with no agreement hands the word straight back.
+String agree(WordLanguageData data, String word, WordGender? gender) {
+  final rules = gender == null ? null : data.agreement?[gender];
+
+  if (rules == null) return word;
+
+  for (final rule in rules) {
+    if (word.endsWith(rule[0])) {
+      return word.substring(0, word.length - rule[0].length) + rule[1];
+    }
+  }
+
+  return word;
+}
+
 /// Whether a modifier follows the noun rather than leading it.
 ///
 /// The language's own frames already say so: Vietnamese writes `mèo xanh`, the

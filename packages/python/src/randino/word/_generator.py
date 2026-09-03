@@ -28,6 +28,7 @@ from randino._types import (
 from randino.word.data import WORD_DATA, WORD_LANGUAGES, WORD_THEMES
 from randino.word.data._types import (
     PoolSynthesis,
+    WordGender,
     WordLanguageData,
     WordPool,
     WordSynthesis,
@@ -47,6 +48,25 @@ def modifiers_of(data: WordLanguageData) -> WordPool:
     would save nothing worth the bookkeeping.
     """
     return (*data.adjectives, *data.actions)
+
+
+def agree(data: WordLanguageData, word: str, gender: WordGender | None) -> str:
+    """Return a modifier reshaped to agree with a noun of `gender`.
+
+    The first rule whose ending matches wins; a word none of them match is already
+    right, which is how Spanish `azul` stays `azul` beside both `gato` and `luna`. A
+    language with no agreement hands the word straight back.
+    """
+    rules = data.agreement.get(gender) if gender and data.agreement else None
+
+    if not rules:
+        return word
+
+    for ending, replacement in rules:
+        if word.endswith(ending):
+            return word[: len(word) - len(ending)] + replacement
+
+    return word
 
 
 def modifier_follows(data: WordLanguageData) -> bool:

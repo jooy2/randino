@@ -38,8 +38,14 @@ import type {
 	RandNicknameOptions
 } from '../_types/global.js';
 import { LOOSE_THEMES, WORD_DATA, WORD_LANGUAGES, WORD_THEMES } from '../word/data/index.js';
-import type { WordFrame, WordLanguageData, WordPool, WordSlot } from '../word/data/types.js';
-import { drawWord, poolBounds, themeOf, themesOf } from '../word/wordGenerator.js';
+import type {
+	WordFrame,
+	WordGender,
+	WordLanguageData,
+	WordPool,
+	WordSlot
+} from '../word/data/types.js';
+import { agree, drawWord, poolBounds, themeOf, themesOf } from '../word/wordGenerator.js';
 
 // How many shapes to try before settling for the closest fit found.
 const FIT_ATTEMPTS = 12;
@@ -189,6 +195,7 @@ function buildWords(
 ): { words: string[]; missed: boolean } {
 	const joiner = joinerOf(data, settings).length;
 	const words: string[] = [];
+	let gender: WordGender | undefined;
 	let missed = false;
 	let used = 0;
 
@@ -206,12 +213,22 @@ function buildWords(
 
 		const low = Math.max(1, min - used - gap - restMax);
 		const high = Math.max(low, max - used - gap - restMin);
-		const pool = poolOf(data, frame.slots[i], nouns);
+		const slot = frame.slots[i];
+		const pool = poolOf(data, slot, nouns);
 		const chosen = drawWord(data, pool, settings.invent, low, high, i === 0 ? settings.prefix : '');
+		// A language that inflects makes its modifiers agree with the noun. The
+		// frames of such a language put the noun first (`gato azul`), so its
+		// gender is known by the time a modifier is drawn; a modifier drawn ahead
+		// of its noun is left as it is rather than guessed at.
+		const word = slot === 'noun' ? chosen.word : agree(data, chosen.word, gender);
+
+		if (slot === 'noun') {
+			gender = data.nounGender?.[chosen.word];
+		}
 
 		missed = missed || chosen.missed;
-		used += gap + chosen.word.length;
-		words.push(chosen.word);
+		used += gap + word.length;
+		words.push(word);
 	}
 
 	return { words, missed };

@@ -12,6 +12,28 @@ import 'package:randino/src/types.dart';
 /// A pool of words a generator can draw from.
 typedef WordPool = List<String>;
 
+/// The gender a noun carries in a language whose modifiers agree with it.
+///
+/// Only those languages tag their nouns; the rest leave the lookup out.
+enum WordGender {
+  /// Masculine.
+  m,
+
+  /// Feminine.
+  f,
+
+  /// Neuter.
+  n,
+}
+
+/// How a modifier written in its base form changes to agree with a noun.
+///
+/// Each rule is `[ending, replacement]`; the first whose ending matches wins,
+/// and a modifier no rule matches is already in the right form (Spanish `azul`
+/// is the same beside `gato` and `luna`). Rules rather than a function so that
+/// the three packages compare as data — see `tools/parity`.
+typedef WordAgreement = Map<WordGender, List<List<String>>>;
+
 /// How a word is built when `realism` calls for an invented one.
 sealed class WordSynthesis {
   /// Creates a synthesis template.
@@ -115,6 +137,8 @@ class WordLanguageData {
     required this.frames,
     required this.syn,
     this.parts,
+    this.nounGender,
+    this.agreement,
   });
 
   /// Joins words that are put together. `''` everywhere so far — Korean and
@@ -149,6 +173,17 @@ class WordLanguageData {
   /// The shapes a nickname of this language can take. Every language has to
   /// declare its own: a shape is only as natural as the grammar behind it.
   final List<WordFrame> frames;
+
+  /// The gender of each noun, for a language whose modifiers agree with it.
+  ///
+  /// Written as a `gato:m` tag on the pool and split out by `taggedNouns`, so
+  /// each word is still typed once.
+  final Map<String, WordGender>? nounGender;
+
+  /// How a modifier is reshaped to agree with the noun it sits beside.
+  ///
+  /// Left out by a language that asks for no agreement, which is most of them.
+  final WordAgreement? agreement;
 
   /// How an invented word is built.
   final WordSynthesis syn;

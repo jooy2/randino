@@ -54,6 +54,12 @@ word = {
         "adjectives": listed(data.adjectives),
         "actions": listed(data.actions),
         "parts": listed(data.parts),
+        "nounGender": None if data.noun_gender is None else dict(data.noun_gender),
+        "agreement": (
+            None
+            if data.agreement is None
+            else {g: [list(rule) for rule in rules] for g, rules in data.agreement.items()}
+        ),
         # Optional in one package and defaulted in another; written as a list
         # either way so the shapes compare.
         "frames": [

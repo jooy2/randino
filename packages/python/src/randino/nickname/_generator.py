@@ -46,9 +46,15 @@ from randino._types import (
     WordTheme,
     WordThemeOption,
 )
-from randino.word._generator import draw_word, pool_bounds, theme_of, themes_of
+from randino.word._generator import agree, draw_word, pool_bounds, theme_of, themes_of
 from randino.word.data import LOOSE_THEMES, WORD_DATA, WORD_LANGUAGES, WORD_THEMES
-from randino.word.data._types import WordFrame, WordLanguageData, WordPool, WordSlot
+from randino.word.data._types import (
+    WordFrame,
+    WordGender,
+    WordLanguageData,
+    WordPool,
+    WordSlot,
+)
 
 FIT_ATTEMPTS = 12
 """How many shapes to try before settling for the closest fit found."""
@@ -203,6 +209,7 @@ def build_words(
     """
     joiner = len(joiner_of(data, settings))
     words: list[str] = []
+    gender: WordGender | None = None
     missed = False
     used = 0
 
@@ -223,9 +230,18 @@ def build_words(
             settings.prefix if index == 0 else "",
         )
 
+        # A language that inflects makes its modifiers agree with the noun. The
+        # frames of such a language put the noun first (`gato azul`), so its gender is
+        # known by the time a modifier is drawn; a modifier drawn ahead of its noun is
+        # left as it is rather than guessed at.
+        word = chosen.word if slot == "noun" else agree(data, chosen.word, gender)
+
+        if slot == "noun":
+            gender = data.noun_gender.get(chosen.word) if data.noun_gender else None
+
         missed = missed or chosen.missed
-        used += gap + len(chosen.word)
-        words.append(chosen.word)
+        used += gap + len(word)
+        words.append(word)
 
     return words, missed
 

@@ -2,6 +2,9 @@
 // separated strings inside a raw multi-line string instead of one list entry
 // per line, which keeps a 120-name pool to a handful of lines.
 
+import 'package:randino/src/types.dart';
+import 'package:randino/src/word/data/types.dart';
+
 final RegExp _whitespace = RegExp(r'\s+');
 
 /// Split a whitespace-separated pool. `_` stands for a space inside a single
@@ -32,3 +35,40 @@ Map<String, int> weightMap(String source) => Map<String, int>.unmodifiable(<Stri
 Map<String, String> romanMap(String source) => Map<String, String>.unmodifiable(<String, String>{
   for (final pair in pairs(source)) pair[0]: pair[1],
 });
+
+/// A noun pool split from its `gato:m` tags, and the lookup those tags carry.
+class TaggedNouns {
+  /// Creates a split pool.
+  const TaggedNouns(this.pools, this.gender);
+
+  /// The words, with the tags taken off.
+  final Map<WordTheme, WordPool> pools;
+
+  /// The gender each of them carries.
+  final Map<String, WordGender> gender;
+}
+
+/// Split a `theme -> 'gato:m luna:f'` map into the pools and the gender lookup.
+///
+/// One pass over one source, so a language that inflects still writes each noun
+/// exactly once.
+TaggedNouns taggedNouns(Map<WordTheme, String> source) {
+  final pools = <WordTheme, WordPool>{};
+  final gender = <String, WordGender>{};
+
+  for (final entry in source.entries) {
+    final pool = <String>[];
+
+    for (final tagged in words(entry.value)) {
+      final at = tagged.lastIndexOf(':');
+      final word = tagged.substring(0, at);
+
+      gender[word] = WordGender.values.byName(tagged.substring(at + 1));
+      pool.add(word);
+    }
+
+    pools[entry.key] = pool;
+  }
+
+  return TaggedNouns(pools, gender);
+}

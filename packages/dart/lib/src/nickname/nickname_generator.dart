@@ -196,6 +196,7 @@ _Filled _buildWords(
 ) {
   final joiner = _joinerOf(data, settings).length;
   final words = <String>[];
+  WordGender? gender;
   var missed = false;
   var used = 0;
 
@@ -215,12 +216,20 @@ _Filled _buildWords(
     final low = lowRaw < 1 ? 1 : lowRaw;
     final highRaw = max - used - gap - restMin;
     final high = highRaw < low ? low : highRaw;
-    final pool = _poolOf(data, frame.slots[i], nouns);
+    final slot = frame.slots[i];
+    final pool = _poolOf(data, slot, nouns);
     final chosen = drawWord(data, pool, settings.invent, low, high, i == 0 ? settings.prefix : '');
+    // A language that inflects makes its modifiers agree with the noun. The
+    // frames of such a language put the noun first (`gato azul`), so its gender
+    // is known by the time a modifier is drawn; a modifier drawn ahead of its
+    // noun is left as it is rather than guessed at.
+    final word = slot == WordSlot.noun ? chosen.word : agree(data, chosen.word, gender);
+
+    if (slot == WordSlot.noun) gender = data.nounGender?[chosen.word];
 
     missed = missed || chosen.missed;
-    used += gap + chosen.word.length;
-    words.add(chosen.word);
+    used += gap + word.length;
+    words.add(word);
   }
 
   return _Filled(words, missed);

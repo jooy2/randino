@@ -18,7 +18,7 @@ from randino import (
 
 # The decorating pools are internal, but what `rand_modifier` attaches has to come out
 # of them, and they are the same pools the nickname generator uses.
-from randino.word._generator import modifiers_of
+from randino.word._generator import modifier_follows, modifiers_of
 from randino.word.data import WORD_DATA
 
 SAMPLE = 60
@@ -114,8 +114,9 @@ def test_with_no_value_at_all_the_token_is_the_whole_answer() -> None:
 def test_rand_modifier_attaches_on_the_side_the_language_uses() -> None:
     for language in WORD_LANGUAGES:
         modifiers = set(modifiers_of(WORD_DATA[language]))
-        # Vietnamese writes `mèo xanh`, so the modifier lands behind the value.
-        follows = language == "vi"
+        # Vietnamese and Spanish write `mèo xanh` and `gato azul`, so the modifier
+        # lands behind the value. The frames are what say so.
+        follows = modifier_follows(WORD_DATA[language])
 
         for word in rand_word(language=language, count=SAMPLE):
             decorated = rand_modifier(word, language=language)

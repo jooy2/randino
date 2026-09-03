@@ -16,6 +16,7 @@ import type { WordLanguage } from '../dist/index.js';
 // The decorating pools are internal, but what `randModifier` attaches has to
 // come out of them, and they are the same pools the nickname generator uses.
 import { WORD_DATA } from '../dist/word/data/index.js';
+import { modifierFollows } from '../dist/word/wordGenerator.js';
 
 const SAMPLE = 60;
 
@@ -125,8 +126,9 @@ describe('Decorate', () => {
 	it('randModifier attaches a real modifier on the side the language uses', () => {
 		for (const language of WORD_LANGUAGES) {
 			const modifiers = new Set(modifiersOf(language));
-			// Vietnamese writes `mèo xanh`, so the modifier lands behind the value.
-			const follows = language === 'vi';
+			// Vietnamese and Spanish write `mèo xanh` and `gato azul`, so the modifier
+			// lands behind the value. The frames are what say so.
+			const follows = modifierFollows(WORD_DATA[language]);
 
 			for (const word of randWord({ language, count: SAMPLE })) {
 				const decorated = randModifier(word, { language });

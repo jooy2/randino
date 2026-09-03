@@ -114,8 +114,9 @@ void main() {
     test('randModifier attaches a real modifier on the side the language uses', () {
       for (final language in wordLanguages) {
         final modifiers = modifiersOf(wordData[language]!).toSet();
-        // Vietnamese writes `mèo xanh`, so the modifier lands behind the value.
-        final follows = language == WordLanguage.vi;
+        // Vietnamese and Spanish write `mèo xanh` and `gato azul`, so the modifier
+        // lands behind the value. The frames are what say so.
+        final follows = modifierFollows(wordData[language]!);
 
         for (final word in randWord(language: language, count: sample)) {
           final decorated = randModifier(value: word, language: language);

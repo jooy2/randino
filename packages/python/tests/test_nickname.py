@@ -24,7 +24,7 @@ from randino import (
 # The datasets are internal, but a nickname is only as good as the words it is built
 # from — these checks are what keep person names out of them.
 from randino.name.data import NAME_DATA
-from randino.word._generator import modifiers_of
+from randino.word._generator import agree, modifiers_of
 from randino.word.data import LOOSE_THEMES, WORD_DATA
 from tests.test_name import pool_natives
 
@@ -36,16 +36,22 @@ SCRIPT: dict[WordLanguage, re.Pattern[str]] = {
     "ja": re.compile(r"[々぀-ヿ一-鿿]+"),
     "zh": re.compile(r"[々一-鿿]+"),
     "vi": re.compile(r"[a-zA-ZÀ-ỹ]+(?: [a-zA-ZÀ-ỹ]+)*"),
+    "es": re.compile(r"[a-zA-ZÀ-ÿ]+(?: [a-zA-ZÀ-ÿ]+)*"),
 }
 
 
 def all_words(language: WordLanguage) -> list[str]:
-    """Every word the language can put in a nickname."""
+    """Every word the language can put in a nickname.
+
+    A language whose modifiers agree with the noun puts the agreed form in, so every
+    gender's shape of every modifier counts as one of its words.
+    """
     data = WORD_DATA[language]
+    modifiers = [*data.adjectives, *data.actions]
 
     return [
-        *data.adjectives,
-        *data.actions,
+        *modifiers,
+        *(agree(data, word, gender) for gender in (data.agreement or {}) for word in modifiers),
         *(data.parts or ()),
         *(word for theme in WORD_THEMES for word in data.nouns[theme]),
     ]
