@@ -4,6 +4,7 @@
 
 - Every word theme holds roughly twice the words it did. All fourteen gained at least fifty entries per language, so the smallest pools are no longer the ones that shape the output: `sport` went from 46 to about 115, `vehicle` from 43 to about 113, and `product` from 36 to about 105. Each language now draws from around 1,900 nouns rather than 900, which roughly doubles what `rand_word`, the fourteen themed generators and `rand_nickname` can produce.
 - The person-name pools grew with them. The seven languages that had around 45 entries per pool now hold roughly twice that — Italian, German, Spanish and Russian sit near 95 for each of given names and surnames, Vietnamese near 80, and Japanese and Chinese surnames at 95 with their given names at about 75. English and Korean, already the largest, gained too: English is near 235 per pool and Korean holds 272 male and 259 female given names. Russian patronymics went from 18 to 48, and the CJK syllable pools that build invented names grew alongside. Around 3,750 name parts in total, up from about 2,200.
+- Fixed the Italian surname `De Luca`, which was two surnames. The pools separate entries by whitespace and spell a space inside one as `_`, and this entry was written with a real space — so `rand_name(language="it")` could hand back `Marco De` or `Marco Luca`. It is one surname now.
 
 ## 1.1.0 (2026-09-02)
 

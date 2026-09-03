@@ -12,7 +12,7 @@ IT = NameLanguageData(
     length_spec=NameLengthSpec(given=(5, 10), last=(5, 8), middle=(5, 9)),
     last=words("""
         Rossi Russo Ferrari Esposito Bianchi Romano Colombo Ricci Marino Greco Bruno
-        Gallo Conti De Luca Costa Giordano Mancini Rizzo Lombardi Moretti Barbieri
+        Gallo Conti De_Luca Costa Giordano Mancini Rizzo Lombardi Moretti Barbieri
         Fontana Santoro Mariani Rinaldi Caruso Ferrara Galli Martini Leone Longo Gentile
         Vitale Lombardo Serra Coppola Marchesi Parisi Villa Conte Farina Testa Grasso
         Palumbo Amato Sartori Battaglia Rizzi Monti Fabbri Grassi Bernardi Silvestri
