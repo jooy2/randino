@@ -3,7 +3,7 @@ layout: home
 
 title: randino
 titleTemplate: Random names and nicknames, in the language you ask for
-description: Generate random person names and nicknames in nine languages — 김민준, Emma Clover, 멋진사자, MistyOwl. One library shipped for JavaScript, Dart and Python, with no runtime dependencies.
+description: Generate random person names and nicknames in nine languages — Emma Clover, MistyOwl. One library shipped for JavaScript, Dart and Python, with no runtime dependencies.
 
 hero:
   name: randino
@@ -28,7 +28,7 @@ hero:
 
 features:
   - title: Names, not name-shaped strings
-    details: Drawn from curated pools per language, with surnames weighted the way the population is. A fifth of the Korean names come back a 김.
+    details: Drawn from curated pools per language, with surnames weighted the way the population is. A fifth of the Korean names come back a Kim.
     link: /name/
     linkText: Person names
   - title: Nicknames from everyday words
@@ -56,14 +56,14 @@ features:
 ```javascript
 import { randName, randNickname, randSuffix } from 'randino';
 
-randName({ language: 'ko', count: 3 });
-// ['김태윤', '원동혁', '조진우']
+randName({ language: 'en', count: 3 });
+// ['Christina Mills', 'Jack Reeves', 'Brian Wallace']
 
-randName({ language: 'ru', gender: 'female', includeMiddleName: true });
-// ['Людмила Николаевна Богданова']
+randName({ language: 'en', gender: 'female', includeMiddleName: true });
+// ['Danielle Sylvia Owens']
 
-randNickname({ language: 'ko', count: 3 });
-// ['오래된곰', '영원한도마뱀', '귀여운신화다발']
+randNickname({ language: 'en', count: 3 });
+// ['FoggyHillside', 'CraneVoyage', 'TinyLeopardCloak']
 
 randSuffix(randNickname({ language: 'en', count: 2 }));
 // ['FoggyHillside_gDe2C', 'CraneVoyage_nVtRC']
@@ -76,18 +76,18 @@ randSuffix(randNickname({ language: 'en', count: 2 }));
 ```dart
 import 'package:randino/randino.dart';
 
-randName(language: NameLanguage.ko, count: 3);
-// ['김태윤', '원동혁', '조진우']
+randName(language: NameLanguage.en, count: 3);
+// ['Christina Mills', 'Jack Reeves', 'Brian Wallace']
 
 randName(
-  language: NameLanguage.ru,
+  language: NameLanguage.en,
   gender: NameGender.female,
   includeMiddleName: true,
 );
-// ['Людмила Николаевна Богданова']
+// ['Danielle Sylvia Owens']
 
-randNickname(language: WordLanguage.ko, count: 3);
-// ['오래된곰', '영원한도마뱀', '귀여운신화다발']
+randNickname(language: WordLanguage.en, count: 3);
+// ['FoggyHillside', 'CraneVoyage', 'TinyLeopardCloak']
 
 randSuffixAll(randNickname(language: WordLanguage.en, count: 2));
 // ['FoggyHillside_gDe2C', 'CraneVoyage_nVtRC']
@@ -100,14 +100,14 @@ randSuffixAll(randNickname(language: WordLanguage.en, count: 2));
 ```python
 from randino import rand_name, rand_nickname, rand_suffix
 
-rand_name(language="ko", count=3)
-# ['김태윤', '원동혁', '조진우']
+rand_name(language="en", count=3)
+# ['Christina Mills', 'Jack Reeves', 'Brian Wallace']
 
-rand_name(language="ru", gender="female", include_middle_name=True)
-# ['Людмила Николаевна Богданова']
+rand_name(language="en", gender="female", include_middle_name=True)
+# ['Danielle Sylvia Owens']
 
-rand_nickname(language="ko", count=3)
-# ['오래된곰', '영원한도마뱀', '귀여운신화다발']
+rand_nickname(language="en", count=3)
+# ['FoggyHillside', 'CraneVoyage', 'TinyLeopardCloak']
 
 rand_suffix(rand_nickname(language="en", count=2))
 # ['FoggyHillside_gDe2C', 'CraneVoyage_nVtRC']

@@ -94,8 +94,8 @@ rand_name()
 ::: lang js
 
 ```javascript
-randName({ language: 'ko', count: 3 });
-// ['김태윤', '원동혁', '조진우']
+randName({ language: 'en', count: 3 });
+// ['Christina Mills', 'Jack Reeves', 'Brian Wallace']
 ```
 
 :::
@@ -103,8 +103,8 @@ randName({ language: 'ko', count: 3 });
 ::: lang dart
 
 ```dart
-randName(language: NameLanguage.ko, count: 3);
-// ['김태윤', '원동혁', '조진우']
+randName(language: NameLanguage.en, count: 3);
+// ['Christina Mills', 'Jack Reeves', 'Brian Wallace']
 ```
 
 :::
@@ -112,8 +112,8 @@ randName(language: NameLanguage.ko, count: 3);
 ::: lang py
 
 ```python
-rand_name(language="ko", count=3)
-# ['김태윤', '원동혁', '조진우']
+rand_name(language="en", count=3)
+# ['Christina Mills', 'Jack Reeves', 'Brian Wallace']
 ```
 
 :::
@@ -127,9 +127,6 @@ rand_name(language="ko", count=3)
 ```javascript
 import { randNickname } from 'randino';
 
-randNickname({ language: 'ko', count: 3 });
-// ['오래된곰', '영원한도마뱀', '귀여운신화다발']
-
 randNickname({ language: 'en', count: 3 });
 // ['FoggyHillside', 'CraneVoyage', 'TinyLeopardCloak']
 ```
@@ -141,9 +138,6 @@ randNickname({ language: 'en', count: 3 });
 ```dart
 import 'package:randino/randino.dart';
 
-randNickname(language: WordLanguage.ko, count: 3);
-// ['오래된곰', '영원한도마뱀', '귀여운신화다발']
-
 randNickname(language: WordLanguage.en, count: 3);
 // ['FoggyHillside', 'CraneVoyage', 'TinyLeopardCloak']
 ```
@@ -154,9 +148,6 @@ randNickname(language: WordLanguage.en, count: 3);
 
 ```python
 from randino import rand_nickname
-
-rand_nickname(language="ko", count=3)
-# ['오래된곰', '영원한도마뱀', '귀여운신화다발']
 
 rand_nickname(language="en", count=3)
 # ['FoggyHillside', 'CraneVoyage', 'TinyLeopardCloak']
