@@ -212,8 +212,21 @@ export const JA: WordLanguageData = {
 			計量杯 計量匙 麺棒 混合器 濾器 焦付防 保温器
 		`)
 	},
-	// No `parts` pool: a Japanese noun-noun compound needs a particle or a reading
-	// change more often than not, so nicknames stay at modifier + noun.
+	// Only ever reached through の. A bare Japanese noun-noun compound needs a
+	// reading change more often than not, which is why the frames below never ask
+	// for one.
+	parts: words(`
+		尻尾 足跡 翼 影 瞳 声 息 温もり 香り 模様 鱗 鬣 角 嘴 鰭 巣 穴 卵 種 欠片 群れ
+		里 国 王国 旅 物語 歌 踊り 星 光 音 風 波 丘 谷 実 束 羽根 爪 髭 眉 殻 笑み 涙
+		陰 紋 破片 夢 記憶 面影
+	`),
+	frames: [
+		{ slots: ['noun'], weight: 10 },
+		{ slots: ['adjective', 'noun'], weight: 38 },
+		{ slots: ['action', 'noun'], weight: 26 },
+		{ slots: ['noun', 'part'], glue: ['の'], weight: 16 },
+		{ slots: ['adjective', 'noun', 'part'], glue: ['', 'の'], weight: 10 }
+	],
 	syn: {
 		kind: 'pool',
 		pool: words(`

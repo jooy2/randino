@@ -50,6 +50,16 @@ void main() {
         'adjectives': listed(entry.value.adjectives),
         'actions': listed(entry.value.actions),
         'parts': listed(entry.value.parts),
+        // Optional in one package and defaulted in another; written as a list
+        // either way so the shapes compare.
+        'frames': <Object?>[
+          for (final frame in entry.value.frames)
+            <String, Object?>{
+              'slots': <String>[for (final slot in frame.slots) slot.name],
+              'glue': <String>[...?frame.glue],
+              'weight': frame.weight,
+            },
+        ],
         'nouns': <String, Object?>{
           for (final noun in entry.value.nouns.entries)
             noun.key.name: listed(noun.value),

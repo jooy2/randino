@@ -285,6 +285,17 @@ final WordLanguageData en = WordLanguageData(
   '''),
   // Kept short on purpose: an invented word is joined to one or two others, and
   // long syllables add up to something nobody would type.
+  // English compounds without a particle (OwlFeather), so there is no possessive
+  // shape here: `Of` would be a word rather than something that attaches to the
+  // word in front of it, and a word separator would land on the wrong side.
+  frames: const <WordFrame>[
+    WordFrame(<WordSlot>[WordSlot.noun], 10),
+    WordFrame(<WordSlot>[WordSlot.adjective, WordSlot.noun], 34),
+    WordFrame(<WordSlot>[WordSlot.action, WordSlot.noun], 22),
+    WordFrame(<WordSlot>[WordSlot.noun, WordSlot.part], 12),
+    WordFrame(<WordSlot>[WordSlot.adjective, WordSlot.noun, WordSlot.part], 16),
+    WordFrame(<WordSlot>[WordSlot.action, WordSlot.noun, WordSlot.part], 6),
+  ],
   syn: SyllableSynthesis(
     onset: words(r'b c d f g h j k l m n p r s t v w z br cl dr fl gr sk sl sn st th tr'),
     vowel: words(r'a a e e i i o o u u ae ee ou'),

@@ -59,6 +59,13 @@ console.log(
 						adjectives: list(data.adjectives),
 						actions: list(data.actions),
 						parts: list(data.parts),
+						frames: data.frames.map((frame) => ({
+							slots: [...frame.slots],
+							// Optional in one package and defaulted in another; written as a
+							// list either way so the shapes compare.
+							glue: [...(frame.glue ?? [])],
+							weight: frame.weight
+						})),
 						nouns: Object.fromEntries(
 							Object.entries(data.nouns).map(([theme, words]) => [theme, list(words)])
 						),

@@ -1,16 +1,20 @@
 // The nickname generator itself. Internal — `randNickname` and
 // `randNicknameDetails` are the public entry points.
 //
-// A nickname is a noun with something added to it: a modifier in front
-// (멋진사자), a second noun behind (고양이꼬리), or both (파란고양이발바닥). The
-// nouns are the `word` category's pools — animals, things, nature, ideas — and
-// never person names, which is what keeps a nickname from reading like one.
-// Drawing one word is `word/word_generator.dart`; putting several of them
-// together is what this file is.
+// A nickname is a noun with something added to it: a word for what it is like in
+// front (멋진사자), one for what it is doing (웃는사자), a second noun behind
+// (고양이꼬리), or a possessive between the two (사자의눈물). The nouns are the
+// `word` category's pools — animals, things, nature, ideas — and never person
+// names, which is what keeps a nickname from reading like one. Drawing one word
+// is `word/word_generator.dart`; putting several of them together is what this
+// file is.
 //
+// - Which shapes exist is the language's own business, and `data.frames` is
+//   where it says so. A shape carries its particles with it, so Chinese can put
+//   的 between a verb and its noun where Korean needs nothing.
 // - `style` decides per word whether it comes out of a pool or is invented.
 // - `minLength` / `maxLength` pick the shape first: a range too short for a
-//   modifier drops that pattern instead of truncating a word.
+//   modifier drops that frame instead of truncating a word.
 // - `wordSeparator` decides what goes between the words, defaulting to the way
 //   the language joins them.
 //
@@ -24,28 +28,10 @@ import 'package:randino/src/word/data/index.dart';
 import 'package:randino/src/word/data/types.dart';
 import 'package:randino/src/word/word_generator.dart';
 
-enum _Slot { modifier, noun, part }
-
-class _Pattern {
-  const _Pattern(this.slots, this.weight);
-
-  final List<_Slot> slots;
-  final int weight;
-}
-
-// The shapes a nickname can take, and how often each one is used. A bare noun
-// stays rare on purpose — a modifier is what makes a nickname feel picked.
-const List<_Pattern> _patterns = <_Pattern>[
-  _Pattern(<_Slot>[_Slot.noun], 12),
-  _Pattern(<_Slot>[_Slot.modifier, _Slot.noun], 50),
-  _Pattern(<_Slot>[_Slot.noun, _Slot.part], 12),
-  _Pattern(<_Slot>[_Slot.modifier, _Slot.noun, _Slot.part], 26),
-];
-
 // How many shapes to try before settling for the closest fit found.
 const int _fitAttempts = 12;
 
-typedef _Bounds = Map<_Slot, LengthRange>;
+typedef _Bounds = Map<WordSlot, LengthRange>;
 
 // Everything a single nickname needs, with defaults already applied. The length
 // bounds stay optional: left out, they are resolved per language and theme. So
@@ -84,10 +70,11 @@ _Bounds _slotBounds(WordLanguage language, WordLanguageData data, WordTheme them
     return cached;
   }
 
-  final bounds = <_Slot, LengthRange>{
-    _Slot.modifier: poolBounds(modifiersOf(data)),
-    _Slot.noun: poolBounds(data.nouns[theme]!),
-    _Slot.part: poolBounds(data.parts ?? const <String>[]),
+  final bounds = <WordSlot, LengthRange>{
+    WordSlot.adjective: poolBounds(data.adjectives),
+    WordSlot.action: poolBounds(data.actions),
+    WordSlot.noun: poolBounds(data.nouns[theme]!),
+    WordSlot.part: poolBounds(data.parts ?? const <String>[]),
   };
 
   _boundsCache[key] = bounds;
@@ -95,47 +82,75 @@ _Bounds _slotBounds(WordLanguage language, WordLanguageData data, WordTheme them
   return bounds;
 }
 
-/// The shapes available for the language, in the order they are weighted.
-///
-/// The only shapes a language can rule out are the compound ones, and only by
-/// having no `parts` pool — which `ja` and `zh` do not.
-List<_Pattern> _usablePatterns(WordLanguageData data) => _patterns
-    .where((pattern) => data.parts != null || !pattern.slots.contains(_Slot.part))
-    .toList(growable: false);
+/// What sits in front of the slot at [index], in characters: the frame's own
+/// particle for that gap, and then whatever joins the words. Nothing at all in
+/// front of the first slot.
+int _gapOf(WordFrame frame, int index, int joiner) =>
+    index == 0 ? 0 : frame.glueAt(index).length + joiner;
 
-/// Shortest and longest nickname a shape can produce.
-LengthRange _patternRange(List<_Slot> slots, _Bounds bounds, int joiner) {
-  final gaps = (slots.length - 1) * joiner;
-  var min = gaps;
-  var max = gaps;
+/// Shortest and longest nickname a frame can produce.
+LengthRange _frameRange(WordFrame frame, _Bounds bounds, int joiner) {
+  var min = 0;
+  var max = 0;
 
-  for (final slot in slots) {
-    min += bounds[slot]!.min;
-    max += bounds[slot]!.max;
+  for (var i = 0; i < frame.slots.length; i += 1) {
+    final gap = _gapOf(frame, i, joiner);
+
+    min += gap + bounds[frame.slots[i]]!.min;
+    max += gap + bounds[frame.slots[i]]!.max;
   }
 
   return LengthRange(min, max);
 }
 
-List<_Slot> _pickPattern(List<_Pattern> patterns) {
-  final total = patterns.fold<int>(0, (sum, pattern) => sum + pattern.weight);
+WordFrame _pickFrame(List<WordFrame> frames) {
+  final total = frames.fold<int>(0, (sum, frame) => sum + frame.weight);
   var roll = randDouble() * total;
 
-  for (final pattern in patterns) {
-    roll -= pattern.weight;
+  for (final frame in frames) {
+    roll -= frame.weight;
 
     if (roll <= 0) {
-      return pattern.slots;
+      return frame;
     }
   }
 
-  return patterns[patterns.length - 1].slots;
+  return frames[frames.length - 1];
+}
+
+/// The pool one slot draws from.
+WordPool _poolOf(WordLanguageData data, WordSlot slot, WordPool nouns) => switch (slot) {
+  WordSlot.adjective => data.adjectives,
+  WordSlot.action => data.actions,
+  // Only a frame of the language's own can ask for this, and one that does is
+  // only written where the pool is.
+  WordSlot.part => data.parts!,
+  WordSlot.noun => nouns,
+};
+
+/// The finished string: the words in order, with the frame's particles between
+/// them.
+String _assemble(List<String> words, WordFrame frame, String joiner) {
+  final buffer = StringBuffer();
+
+  for (var i = 0; i < words.length; i += 1) {
+    if (i > 0) {
+      buffer
+        ..write(frame.glueAt(i))
+        ..write(joiner);
+    }
+
+    buffer.write(words[i]);
+  }
+
+  return buffer.toString();
 }
 
 class _Built {
-  const _Built(this.words, this.theme);
+  const _Built(this.words, this.nickname, this.theme);
 
   final List<String> words;
+  final String nickname;
   final WordTheme? theme;
 }
 
@@ -146,12 +161,12 @@ class _Filled {
   final bool missed;
 }
 
-/// Fill a shape with words. Each slot is given the room left once the slots
+/// Fill a frame with words. Each slot is given the room left once the slots
 /// after it have been reserved theirs, so the last word can always close the gap
 /// to [min] and nothing overshoots [max].
 _Filled _buildWords(
   WordLanguageData data,
-  List<_Slot> slots,
+  WordFrame frame,
   _Bounds bounds,
   WordPool nouns,
   _Settings settings,
@@ -163,26 +178,23 @@ _Filled _buildWords(
   var missed = false;
   var used = 0;
 
-  for (var i = 0; i < slots.length; i += 1) {
-    final gap = i > 0 ? joiner : 0;
+  for (var i = 0; i < frame.slots.length; i += 1) {
+    final gap = _gapOf(frame, i, joiner);
     var restMin = 0;
     var restMax = 0;
 
-    for (var rest = i + 1; rest < slots.length; rest += 1) {
-      restMin += bounds[slots[rest]]!.min + joiner;
-      restMax += bounds[slots[rest]]!.max + joiner;
+    for (var rest = i + 1; rest < frame.slots.length; rest += 1) {
+      final restGap = _gapOf(frame, rest, joiner);
+
+      restMin += bounds[frame.slots[rest]]!.min + restGap;
+      restMax += bounds[frame.slots[rest]]!.max + restGap;
     }
 
     final lowRaw = min - used - gap - restMax;
     final low = lowRaw < 1 ? 1 : lowRaw;
     final highRaw = max - used - gap - restMin;
     final high = highRaw < low ? low : highRaw;
-    final slot = slots[i];
-    final pool = switch (slot) {
-      _Slot.modifier => modifiersOf(data),
-      _Slot.part => data.parts!,
-      _Slot.noun => nouns,
-    };
+    final pool = _poolOf(data, frame.slots[i], nouns);
     final chosen = drawWord(data, pool, settings.style, low, high, i == 0 ? settings.prefix : '');
 
     missed = missed || chosen.missed;
@@ -196,12 +208,13 @@ _Filled _buildWords(
 // --- Per-nickname generation ------------------------------------------------
 
 /// True when one word ends on the character the next one starts with (石霜 +
-/// 霜雨). Only meaningful where words run together with neither a separator nor
-/// a capital between them — plenty of real words double a character inside
-/// themselves (씩씩한, Sunny).
-bool _hasBoundaryRepeat(List<String> words) {
+/// 霜雨). Only meaningful where the two run straight together — a particle or a
+/// capital between them reads fine, and plenty of real words double a character
+/// inside themselves (씩씩한, Sunny).
+bool _hasBoundaryRepeat(List<String> words, WordFrame frame) {
   for (var i = 1; i < words.length; i += 1) {
-    if (words[i - 1].substring(words[i - 1].length - 1) == words[i].substring(0, 1)) {
+    if (frame.glueAt(i).isEmpty &&
+        words[i - 1].substring(words[i - 1].length - 1) == words[i].substring(0, 1)) {
       return true;
     }
   }
@@ -210,18 +223,14 @@ bool _hasBoundaryRepeat(List<String> words) {
 }
 
 /// Length range for one language and theme: what the caller asked for, falling
-/// back to everything the available shapes can produce.
-LengthRange _lengthBounds(
-  WordLanguageData data,
-  _Bounds bounds,
-  List<_Pattern> patterns,
-  _Settings settings,
-) {
+/// back to everything the language's frames can produce.
+LengthRange _lengthBounds(WordLanguageData data, _Bounds bounds, _Settings settings) {
+  final joiner = _joinerOf(data, settings).length;
   var naturalMin = 1 << 30;
   var naturalMax = 0;
 
-  for (final pattern in patterns) {
-    final range = _patternRange(pattern.slots, bounds, _joinerOf(data, settings).length);
+  for (final frame in data.frames) {
+    final range = _frameRange(frame, bounds, joiner);
 
     if (range.min < naturalMin) naturalMin = range.min;
     if (range.max > naturalMax) naturalMax = range.max;
@@ -232,7 +241,7 @@ LengthRange _lengthBounds(
 
 /// Every length a language can produce, across all of its themes — the fallback
 /// for an omitted `minLength` / `maxLength`, and what `nicknameLengthRange`
-/// reports. Kept here so it is derived from the same shapes and pools the
+/// reports. Kept here so it is derived from the same frames and pools the
 /// generator actually draws from.
 LengthRange naturalRange(WordLanguage language, String? separator) {
   final data = wordData[language]!;
@@ -244,7 +253,6 @@ LengthRange naturalRange(WordLanguage language, String? separator) {
     prefix: '',
     separator: separator,
   );
-  final patterns = _usablePatterns(data);
   final joiner = _joinerOf(data, settings).length;
   var min = 1 << 30;
   var max = 0;
@@ -252,8 +260,8 @@ LengthRange naturalRange(WordLanguage language, String? separator) {
   for (final theme in wordThemes) {
     final bounds = _slotBounds(language, data, theme);
 
-    for (final pattern in patterns) {
-      final range = _patternRange(pattern.slots, bounds, joiner);
+    for (final frame in data.frames) {
+      final range = _frameRange(frame, bounds, joiner);
 
       if (range.min < min) min = range.min;
       if (range.max > max) max = range.max;
@@ -266,7 +274,6 @@ LengthRange naturalRange(WordLanguage language, String? separator) {
 _Built _generateOne(WordLanguage language, _Settings settings) {
   final data = wordData[language]!;
   final themes = themesOf(settings.theme);
-  final patterns = _usablePatterns(data);
   final joiner = _joinerOf(data, settings);
   _Built? best;
   var bestDistance = 1 << 30;
@@ -276,31 +283,34 @@ _Built _generateOne(WordLanguage language, _Settings settings) {
     final theme = pick(themes);
     final nouns = data.nouns[theme]!;
     final bounds = _slotBounds(language, data, theme);
-    final range = _lengthBounds(data, bounds, patterns, settings);
+    final range = _lengthBounds(data, bounds, settings);
     // Prefer a shape that can actually land inside the range.
-    final fitting = patterns
-        .where((pattern) {
-          final span = _patternRange(pattern.slots, bounds, joiner.length);
+    final fitting = data.frames
+        .where((frame) {
+          final span = _frameRange(frame, bounds, joiner.length);
 
           return span.max >= range.min && span.min <= range.max;
         })
         .toList(growable: false);
-    final slots = _pickPattern(fitting.isNotEmpty ? fitting : patterns);
-    final filled = _buildWords(data, slots, bounds, nouns, settings, range.min, range.max);
-    final base = filled.words[slots.indexOf(_Slot.noun)];
+    final frame = _pickFrame(fitting.isNotEmpty ? fitting : data.frames);
+    final filled = _buildWords(data, frame, bounds, nouns, settings, range.min, range.max);
+    final base = filled.words[frame.slots.indexOf(WordSlot.noun)];
+    final nickname = _assemble(filled.words, frame, joiner);
     final built = _Built(
       filled.words,
+      nickname,
       // Only a word the generator knows carries a theme. A drawn word came out
       // of this theme; an invented one has to be looked up, because it can spell
       // a real word by accident.
       nouns.contains(base) ? theme : themeOf(data, base),
     );
-    final length = filled.words.join(joiner).length;
+    final length = nickname.length;
     // Worth spending another attempt on, but not worth failing over: a real word
     // may well start with the requested character in one of the other themes,
     // and another draw will not stutter across the word boundary.
     final rough =
-        filled.missed || (joiner.isEmpty && !data.capitalize && _hasBoundaryRepeat(filled.words));
+        filled.missed ||
+        (joiner.isEmpty && !data.capitalize && _hasBoundaryRepeat(filled.words, frame));
 
     if (length >= range.min && length <= range.max && !rough) {
       return built;
@@ -352,7 +362,7 @@ List<NicknameDetail> generateNicknameDetails({
       final built = _generateOne(code, settings);
 
       return NicknameDetail(
-        nickname: built.words.join(_joinerOf(wordData[code]!, settings)),
+        nickname: built.nickname,
         words: List<String>.unmodifiable(built.words),
         language: code,
         theme: built.theme,

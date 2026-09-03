@@ -39,6 +39,52 @@ function allWords(language: WordLanguage): string[] {
 	];
 }
 
+/** Every particle the language's frames can put between two words, longest first. */
+function gluesOf(language: WordLanguage): string[] {
+	const seen = new Set<string>(['']);
+
+	for (const frame of WORD_DATA[language].frames) {
+		for (const glue of frame.glue ?? []) {
+			seen.add(glue);
+		}
+	}
+
+	return [...seen].sort((a, b) => b.length - a.length);
+}
+
+/**
+ * True when the nickname is exactly its words in order, with nothing between
+ * them but the separator and a particle the language allows. Backtracks, because
+ * a particle and the first character of the next word can be the same one (`의`
+ * in front of `의자`).
+ */
+function joinedBy(
+	nickname: string,
+	words: readonly string[],
+	glues: readonly string[],
+	separator: string
+): boolean {
+	if (!words.length) {
+		return nickname === '';
+	}
+
+	if (!nickname.startsWith(words[0])) {
+		return false;
+	}
+
+	const rest = nickname.slice(words[0].length);
+
+	if (words.length === 1) {
+		return rest === '';
+	}
+
+	return glues.some(
+		(glue) =>
+			rest.startsWith(glue + separator) &&
+			joinedBy(rest.slice(glue.length + separator.length), words.slice(1), glues, separator)
+	);
+}
+
 function nounsOf(language: WordLanguage, theme?: WordTheme): string[] {
 	const data = WORD_DATA[language];
 
@@ -198,7 +244,7 @@ describe('Nickname', () => {
 	});
 
 	it('omitted length bounds fall back to what the language can produce', () => {
-		assert.deepStrictEqual(nicknameLengthRange('zh'), [2, 5]);
+		assert.deepStrictEqual(nicknameLengthRange('zh'), [2, 8]);
 		assert.deepStrictEqual(nicknameLengthRange('ko'), [1, 13]);
 		assert.deepStrictEqual(nicknameLengthRange('en'), [3, 31]);
 
@@ -220,9 +266,8 @@ describe('Nickname', () => {
 		for (const language of WORD_LANGUAGES) {
 			for (const wordSeparator of ['', ' ', '-', '::']) {
 				for (const detail of nicknameDetails({ language, wordSeparator, count: SAMPLE })) {
-					assert.strictEqual(
-						detail.nickname,
-						detail.words.join(wordSeparator),
+					assert.ok(
+						joinedBy(detail.nickname, detail.words, gluesOf(language), wordSeparator),
 						`${language} '${wordSeparator}': ${detail.nickname}`
 					);
 
@@ -236,7 +281,10 @@ describe('Nickname', () => {
 		// Omitted, it falls back to the way the language joins its words, which is
 		// to run them together.
 		for (const detail of nicknameDetails({ count: SAMPLE })) {
-			assert.strictEqual(detail.nickname, detail.words.join(''), detail.nickname);
+			assert.ok(
+				joinedBy(detail.nickname, detail.words, gluesOf(detail.language), ''),
+				detail.nickname
+			);
 		}
 
 		// The separator is part of the nickname, so it counts toward the length.
@@ -334,7 +382,7 @@ describe('Nickname', () => {
 		for (const detail of randNickname({ count: 100, output: 'detail' })) {
 			const joiner = WORD_DATA[detail.language].joiner;
 
-			assert.strictEqual(detail.words.join(joiner), detail.nickname);
+			assert.ok(joinedBy(detail.nickname, detail.words, gluesOf(detail.language), joiner));
 			assert.ok(WORD_LANGUAGES.includes(detail.language));
 			assert.ok(detail.theme === null || WORD_THEMES.includes(detail.theme));
 		}

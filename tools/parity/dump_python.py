@@ -54,6 +54,16 @@ word = {
         "adjectives": listed(data.adjectives),
         "actions": listed(data.actions),
         "parts": listed(data.parts),
+        # Optional in one package and defaulted in another; written as a list
+        # either way so the shapes compare.
+        "frames": [
+            {
+                "slots": list(frame.slots),
+                "glue": list(frame.glue),
+                "weight": frame.weight,
+            }
+            for frame in data.frames
+        ],
         "nouns": {theme: listed(words) for theme, words in data.nouns.items()},
         # The npm package tags the two shapes with `kind`; here they are two
         # classes, so the tag is written back out for the comparison.

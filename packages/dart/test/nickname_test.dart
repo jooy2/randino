@@ -27,6 +27,49 @@ List<String> allWords(WordLanguage language) {
   ];
 }
 
+/// Every particle the language's frames can put between two words, longest first.
+List<String> gluesOf(WordLanguage language) {
+  final seen = <String>{''};
+
+  for (final frame in wordData[language]!.frames) {
+    seen.addAll(frame.glue ?? const <String>[]);
+  }
+
+  return seen.toList()..sort((a, b) => b.length - a.length);
+}
+
+/// True when the nickname is exactly its words in order, with nothing between
+/// them but the separator and a particle the language allows.
+///
+/// Backtracks, because a particle and the first character of the next word can
+/// be the same one (`의` in front of `의자`).
+bool joinedBy(String nickname, List<String> words, List<String> glues, String separator) {
+  if (words.isEmpty) {
+    return nickname.isEmpty;
+  }
+
+  if (!nickname.startsWith(words.first)) {
+    return false;
+  }
+
+  final rest = nickname.substring(words.first.length);
+
+  if (words.length == 1) {
+    return rest.isEmpty;
+  }
+
+  return glues.any(
+    (glue) =>
+        rest.startsWith('$glue$separator') &&
+        joinedBy(
+          rest.substring(glue.length + separator.length),
+          words.sublist(1),
+          glues,
+          separator,
+        ),
+  );
+}
+
 List<String> nounsOf(WordLanguage language, [WordTheme? theme]) {
   final data = wordData[language]!;
 
@@ -217,7 +260,7 @@ void main() {
     });
 
     test('omitted length bounds fall back to what the language can produce', () {
-      expect(nicknameLengthRange(language: WordLanguage.zh), const LengthRange(2, 5));
+      expect(nicknameLengthRange(language: WordLanguage.zh), const LengthRange(2, 8));
       expect(nicknameLengthRange(language: WordLanguage.ko), const LengthRange(1, 13));
       expect(nicknameLengthRange(language: WordLanguage.en), const LengthRange(3, 31));
 
@@ -245,8 +288,8 @@ void main() {
             count: sample,
           )) {
             expect(
-              detail.nickname,
-              detail.words.join(wordSeparator),
+              joinedBy(detail.nickname, detail.words, gluesOf(language), wordSeparator),
+              isTrue,
               reason: "${language.name} '$wordSeparator': ${detail.nickname}",
             );
 
@@ -260,7 +303,11 @@ void main() {
       // Omitted, it falls back to the way the language joins its words, which is
       // to run them together.
       for (final detail in randNicknameDetails(count: sample)) {
-        expect(detail.nickname, detail.words.join(), reason: detail.nickname);
+        expect(
+          joinedBy(detail.nickname, detail.words, gluesOf(detail.language), ''),
+          isTrue,
+          reason: detail.nickname,
+        );
       }
 
       // The separator is part of the nickname, so it counts toward the length.
@@ -382,7 +429,7 @@ void main() {
       for (final detail in randNicknameDetails(count: 100)) {
         final joiner = wordData[detail.language]!.joiner;
 
-        expect(detail.words.join(joiner), detail.nickname);
+        expect(joinedBy(detail.nickname, detail.words, gluesOf(detail.language), joiner), isTrue);
         expect(wordLanguages, contains(detail.language));
         expect(detail.theme == null || wordThemes.contains(detail.theme), isTrue);
       }

@@ -281,6 +281,17 @@ export const EN: WordLanguageData = {
 	`),
 	// Kept short on purpose: an invented word is joined to one or two others, and
 	// long syllables add up to something nobody would type.
+	// English compounds without a particle (OwlFeather), so there is no possessive
+	// shape here: `Of` would be a word rather than something that attaches to the
+	// word in front of it, and a `wordSeparator` would land on the wrong side.
+	frames: [
+		{ slots: ['noun'], weight: 10 },
+		{ slots: ['adjective', 'noun'], weight: 34 },
+		{ slots: ['action', 'noun'], weight: 22 },
+		{ slots: ['noun', 'part'], weight: 12 },
+		{ slots: ['adjective', 'noun', 'part'], weight: 16 },
+		{ slots: ['action', 'noun', 'part'], weight: 6 }
+	],
 	syn: {
 		kind: 'syllable',
 		onset: words('b c d f g h j k l m n p r s t v w z br cl dr fl gr sk sl sn st th tr'),

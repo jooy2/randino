@@ -198,7 +198,11 @@ export interface RandModifierOptions {
 export interface NicknameDetail {
 	/** The finished nickname. */
 	nickname: string;
-	/** The words the nickname is made of, in order. */
+	/**
+	 * The words the nickname is made of, in order — the words only. A shape that
+	 * needs a particle between two of them carries it in `nickname` and nowhere
+	 * here, so `사자의눈물` reports `['사자', '눈물']`.
+	 */
 	words: string[];
 	language: WordLanguage;
 	/**

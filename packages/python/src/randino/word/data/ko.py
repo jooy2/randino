@@ -1,7 +1,7 @@
 """Korean nickname pools."""
 
 from randino._internal.parse import words
-from randino.word.data._types import PoolSynthesis, WordLanguageData
+from randino.word.data._types import PoolSynthesis, WordFrame, WordLanguageData
 
 KO = WordLanguageData(
     joiner="",
@@ -236,6 +236,17 @@ KO = WordLanguageData(
         웃음 울음 그늘 문양 파편
     """),
     # Invented words are built from whole syllables, which is how Hangul reads.
+    # 의 is the one particle Korean needs here; everything else sits straight in
+    # front of the noun.
+    frames=(
+        WordFrame(("noun",), 10),
+        WordFrame(("adjective", "noun"), 32),
+        WordFrame(("action", "noun"), 20),
+        WordFrame(("noun", "part"), 10),
+        WordFrame(("adjective", "noun", "part"), 15),
+        WordFrame(("action", "noun", "part"), 5),
+        WordFrame(("noun", "part"), 8, glue=("의",)),
+    ),
     syn=PoolSynthesis(
         pool=words("""
             가 나 다 라 마 바 사 아 자 차 카 타 파 하 거 너 더 러 머 버 서 어 저 처 커 터 퍼

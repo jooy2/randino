@@ -124,7 +124,11 @@ class NicknameDetail:
     """The finished nickname."""
 
     words: tuple[str, ...]
-    """The words the nickname is made of, in order."""
+    """The words the nickname is made of, in order — the words only.
+
+    A shape that needs a particle between two of them carries it in `nickname` and
+    nowhere here, so `사자의눈물` reports `("사자", "눈물")`.
+    """
 
     language: WordLanguage
     """The language this nickname was generated in."""

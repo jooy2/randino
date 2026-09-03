@@ -234,6 +234,17 @@ export const KO: WordLanguageData = {
 		웃음 울음 그늘 문양 파편
 	`),
 	// Invented words are built from whole syllables, which is how Hangul reads.
+	// 의 is the one particle Korean needs here; everything else sits straight in
+	// front of the noun.
+	frames: [
+		{ slots: ['noun'], weight: 10 },
+		{ slots: ['adjective', 'noun'], weight: 32 },
+		{ slots: ['action', 'noun'], weight: 20 },
+		{ slots: ['noun', 'part'], weight: 10 },
+		{ slots: ['adjective', 'noun', 'part'], weight: 15 },
+		{ slots: ['action', 'noun', 'part'], weight: 5 },
+		{ slots: ['noun', 'part'], glue: ['의'], weight: 8 }
+	],
 	syn: {
 		kind: 'pool',
 		pool: words(`

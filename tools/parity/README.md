@@ -44,10 +44,10 @@ The word datasets, the name datasets, the surname romanization map, and the
 bounds every generator shares (`constants` and `decorate/data`). That is
 everything written once per package as data.
 
-The nickname generator's shape weights are **not** covered: they are private to
-the generator in the Dart port, and exposing them for the sake of a check would
-be letting the check design the API. They are pinned by each package's own
-tests instead.
+That now includes the nickname shapes. They used to be a table private to each
+generator and were left out for it; they are `WordLanguageData.frames` today —
+per language, with the particle each gap needs — so the slots, the particles and
+the weights are all data, and all compared.
 
 ## Running it
 

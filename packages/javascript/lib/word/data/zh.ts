@@ -204,8 +204,23 @@ export const ZH: WordLanguageData = {
 			隔热垫
 		`)
 	},
-	// No `parts` pool: a Chinese noun-noun compound reads as garbled rather than
-	// playful once the base noun is abstract, so nicknames stay at modifier + noun.
+	// Only ever reached through 的. A bare Chinese noun-noun compound reads as
+	// garbled rather than playful once the base noun is abstract.
+	parts: words(`
+		尾巴 足迹 翅膀 影子 瞳孔 手掌 声音 气息 暖意 香气 花纹 鳞片 鬃毛 犄角 鸟喙 鱼鳍
+		巢穴 洞窟 种子 碎片 群落 村落 国度 王国 旅程 故事 歌谣 舞步 星辰 光芒 声响 微风
+		波纹 山丘 山谷 果实 花束 羽毛 利爪 胡须 眉毛 外壳 笑容 泪水 阴影 纹章 残片 梦境
+		记忆 侧脸
+	`),
+	// 的 is what a Chinese verb needs before its noun (奔跑的狮子, never 奔跑狮子)
+	// and what carries the possessive. A descriptive compound takes none.
+	frames: [
+		{ slots: ['noun'], weight: 10 },
+		{ slots: ['adjective', 'noun'], weight: 38 },
+		{ slots: ['action', 'noun'], glue: ['的'], weight: 26 },
+		{ slots: ['noun', 'part'], glue: ['的'], weight: 16 },
+		{ slots: ['adjective', 'noun', 'part'], glue: ['', '的'], weight: 10 }
+	],
 	syn: {
 		kind: 'pool',
 		pool: words(`

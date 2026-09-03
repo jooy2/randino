@@ -3,12 +3,13 @@
 Not part of the public API — callers only ever see the keyword arguments and the two
 details. One dataset per language rather than one per generator: `rand_word` and its
 fourteen themed forms draw from `nouns`, `rand_modifier` draws from `adjectives` and
-`actions`, and `rand_nickname` puts the two together and adds `parts`. The pools are the
-same words either way, so they are written once.
+`actions`, and `rand_nickname` puts them together in the shapes `frames` allows. The
+pools are the same words either way, so they are written once.
 """
 
-from collections.abc import Mapping
+from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
+from typing import Literal
 
 from randino._types import WordTheme
 
@@ -59,6 +60,42 @@ and the generator branches on `isinstance`, which is what lets a reader of
 """
 
 
+WordSlot = Literal["adjective", "action", "noun", "part"]
+"""What one word does inside a nickname.
+
+`adjective` says what the noun is like (멋진, Brave, 青い), `action` what it is doing
+(웃는, Laughing, 踊る), `noun` is the base word, and `part` a trailing noun.
+"""
+
+
+@dataclass(frozen=True, slots=True)
+class WordFrame:
+    """One shape a nickname can take, written in the order the language puts it in.
+
+    Per language rather than shared, because the shapes themselves differ: Chinese
+    needs 的 between a verb and its noun where Korean needs nothing, and a language
+    with no possessive particle has no possessive shape at all.
+    """
+
+    slots: tuple[WordSlot, ...]
+    """The words to draw, in order."""
+
+    weight: int
+    """How often this shape is used, against the other frames of the language."""
+
+    glue: tuple[str, ...] = ()
+    """A particle for each gap, so one entry shorter than `slots`.
+
+    Empty where every gap is empty. It attaches to the word in front of it, which is
+    what puts a word separator after it rather than around it (`사자의 눈물`, never
+    `사자 의 눈물`).
+    """
+
+    def glue_at(self, index: int) -> str:
+        """Return the particle in front of the slot at `index`, or `""` where there is none."""
+        return self.glue[index - 1] if 1 <= index <= len(self.glue) else ""
+
+
 @dataclass(frozen=True, slots=True)
 class WordLanguageData:
     """Everything the generators know about one word language."""
@@ -96,12 +133,18 @@ class WordLanguageData:
     predicate.
     """
 
+    frames: Sequence[WordFrame]
+    """The shapes a nickname of this language can take.
+
+    Every language has to declare its own: a shape is only as natural as the grammar
+    behind it.
+    """
+
     syn: WordSynthesis
     """How this language's invented words are built."""
 
     parts: WordPool | None = None
-    """Optional trailing noun for compounds (고양이 + 꼬리), used by nicknames only.
+    """Trailing noun for compounds (고양이 + 꼬리, 狮子 + 的 + 眼泪), used by nicknames only.
 
-    Languages that would need a particle or a different word order for this leave it
-    out, and the compound patterns are then skipped for them.
+    A language with no frame that asks for one leaves it out.
     """

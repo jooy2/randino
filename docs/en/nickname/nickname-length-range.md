@@ -9,7 +9,7 @@ import { nicknameLengthRange } from 'randino';
 
 nicknameLengthRange('ko'); // [1, 13]
 nicknameLengthRange('en'); // [3, 31]
-nicknameLengthRange('zh'); // [2, 5]
+nicknameLengthRange('zh'); // [2, 8]
 nicknameLengthRange('ko', '-'); // [1, 15]
 ```
 
@@ -29,7 +29,7 @@ import 'package:randino/randino.dart';
 
 nicknameLengthRange(language: WordLanguage.ko); // LengthRange(1, 13)
 nicknameLengthRange(language: WordLanguage.en); // LengthRange(3, 31)
-nicknameLengthRange(language: WordLanguage.zh); // LengthRange(2, 5)
+nicknameLengthRange(language: WordLanguage.zh); // LengthRange(2, 8)
 nicknameLengthRange(language: WordLanguage.ko, wordSeparator: '-'); // LengthRange(1, 15)
 ```
 
@@ -49,7 +49,7 @@ from randino import nickname_length_range
 
 nickname_length_range("ko")  # (1, 13)
 nickname_length_range("en")  # (3, 31)
-nickname_length_range("zh")  # (2, 5)
+nickname_length_range("zh")  # (2, 8)
 nickname_length_range("ko", "-")  # (1, 15)
 ```
 

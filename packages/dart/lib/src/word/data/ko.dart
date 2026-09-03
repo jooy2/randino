@@ -238,6 +238,17 @@ final WordLanguageData ko = WordLanguageData(
     웃음 울음 그늘 문양 파편
   '''),
   // Invented words are built from whole syllables, which is how Hangul reads.
+  // 의 is the one particle Korean needs here; everything else sits straight in
+  // front of the noun.
+  frames: const <WordFrame>[
+    WordFrame(<WordSlot>[WordSlot.noun], 10),
+    WordFrame(<WordSlot>[WordSlot.adjective, WordSlot.noun], 32),
+    WordFrame(<WordSlot>[WordSlot.action, WordSlot.noun], 20),
+    WordFrame(<WordSlot>[WordSlot.noun, WordSlot.part], 10),
+    WordFrame(<WordSlot>[WordSlot.adjective, WordSlot.noun, WordSlot.part], 15),
+    WordFrame(<WordSlot>[WordSlot.action, WordSlot.noun, WordSlot.part], 5),
+    WordFrame(<WordSlot>[WordSlot.noun, WordSlot.part], 8, glue: <String>['의']),
+  ],
   syn: PoolSynthesis(
     pool: words(r'''
       가 나 다 라 마 바 사 아 자 차 카 타 파 하 거 너 더 러 머 버 서 어 저 처 커 터 퍼

@@ -1,6 +1,6 @@
 # Nicknames
 
-A nickname is the handle someone would pick for a game or a website — MistyOwl, CraneVoyage, RustyBoot. randino builds one out of an everyday word with something added to it: a modifier in front, a second word behind, or both.
+A nickname is the handle someone would pick for a game or a website — MistyOwl, CraneVoyage, RustyBoot. randino builds one out of an everyday word with something added to it: a word for what it is like in front, one for what it is doing, a second word behind, or a possessive between the two.
 
 ::: lang js
 
@@ -52,9 +52,11 @@ The nouns come from fourteen [themes](../word/themes), and every nickname is bui
 
 ### Length picks the shape, not the words
 
-A nickname has four possible shapes — a bare noun, a modifier and a noun, a noun and a trailing word, or all three — and <Lang js="minLength" dart="minLength" py="min_length" code /> / <Lang js="maxLength" dart="maxLength" py="max_length" code /> choose **between the shapes first**. The shapes that cannot land inside the range are dropped, then each slot is given the room left after the slots behind it have reserved their minimum.
+Each language declares its own shapes — a bare noun, a word for what the noun is like in front of it, one for what it is doing, a trailing word behind it, a possessive between the two, or a combination — and <Lang js="minLength" dart="minLength" py="min_length" code /> / <Lang js="maxLength" dart="maxLength" py="max_length" code /> choose **between the shapes first**. The shapes that cannot land inside the range are dropped, then each slot is given the room left after the slots behind it have reserved their minimum.
 
 That is why a narrow range drops the modifier instead of truncating a word, and why a long range brings the three-word shapes in.
+
+The shapes belong to the language rather than to the generator, because grammar differs: Chinese needs 的 between a verb and its noun (`奔跑的狮子`) where Korean needs nothing (`달리는사자`), and English has no possessive shape at all, since `of` is a word rather than a particle that attaches to the word in front of it.
 
 ::: lang js
 

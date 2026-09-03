@@ -1,6 +1,6 @@
 # randNickname
 
-Generates nicknames and returns `count` of them as strings. Each one is an everyday word with something added to it — a modifier in front, a second word behind, or both — and **never a person name**. With [`output: 'detail'`](#the-detail-output) it reports the words it used instead.
+Generates nicknames and returns `count` of them as strings. Each one is an everyday word with something added to it — a word for what it is like in front, one for what it is doing, a second word behind, a possessive between the two — and **never a person name**. With [`output: 'detail'`](#the-detail-output) it reports the words it used instead.
 
 ::: lang js
 
@@ -104,11 +104,11 @@ rand_nickname(language="en", output="detail")
 | Field | Type | Description |
 | --- | --- | --- |
 | `nickname` | <Lang js="string" dart="String" py="str" code /> | The finished nickname. |
-| `words` | <Lang js="string[]" dart="List&lt;String&gt;" py="tuple[str, ...]" code /> | The words it is made of, in order. |
+| `words` | <Lang js="string[]" dart="List&lt;String&gt;" py="tuple[str, ...]" code /> | The words it is made of, in order — the words only. |
 | `language` | `WordLanguage` | The language this nickname was generated in. |
 | `theme` | <Lang js="WordTheme &#124; null" dart="WordTheme?" py="WordTheme &#124; None" code /> | Theme of the base word, or null when that word is not one the generator knows. |
 
-Joining `words` with the language's own joiner reproduces `nickname` exactly — that is an invariant, and all three test suites assert it.
+`words` holds the words and nothing else. A shape that needs a particle between two of them carries it in `nickname` alone, so `사자의눈물` reports `['사자', '눈물']` and joining the two back together does not reproduce it. Read `nickname` for the finished string, and `words` for what it was built from.
 
 ### About `theme`
 

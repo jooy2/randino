@@ -3,8 +3,9 @@
 //
 // One dataset per language rather than one per generator: `randWord` and its
 // fourteen themed forms draw from `nouns`, `randModifier` draws from
-// `modifiers`, and `randNickname` puts the two together and adds `parts`. The
-// pools are the same words either way, so they are written once.
+// `adjectives` and `actions`, and `randNickname` puts them together in the
+// shapes `frames` allows. The pools are the same words either way, so they are
+// written once.
 
 import type { WordTheme } from '../../_types/global.js';
 
@@ -27,6 +28,30 @@ export type WordSynthesis =
 	  }
 	| { kind: 'pool'; pool: WordPool; minSyllables: number; maxSyllables: number };
 
+/** What one word does inside a nickname. */
+export type WordSlot = 'adjective' | 'action' | 'noun' | 'part';
+
+/**
+ * One shape a nickname can take, written in the order the language puts it in.
+ *
+ * Per language rather than shared, because the shapes themselves differ: Chinese
+ * needs 的 between a verb and its noun where Korean needs nothing, and a
+ * language with no possessive particle has no possessive shape at all.
+ */
+export type WordFrame = {
+	/** The words to draw, in order. */
+	slots: readonly WordSlot[];
+	/**
+	 * A particle for each gap, so one entry shorter than `slots`, and left out
+	 * entirely where every gap is empty. It attaches to the word in front of it,
+	 * which is what puts a `wordSeparator` after it rather than around it
+	 * (`사자의 눈물`, never `사자 의 눈물`).
+	 */
+	glue?: readonly string[];
+	/** How often this shape is used, against the other frames of the language. */
+	weight: number;
+};
+
 export type WordLanguageData = {
 	// Joins words that are put together. '' everywhere so far — Korean and CJK
 	// words run together, and alphabetic ones read as CamelCase (BraveLion).
@@ -47,9 +72,11 @@ export type WordLanguageData = {
 	// noun where an adjective needs nothing (Chinese 奔跑的狮子), and only an
 	// action can become a predicate.
 	actions: WordPool;
-	// Optional trailing noun for compounds (고양이 + 꼬리), used by nicknames
-	// only. Languages that would need a particle or a different word order for
-	// this leave it out, and the compound patterns are then skipped for them.
+	// Trailing noun for compounds (고양이 + 꼬리, 狮子 + 的 + 眼泪), used by
+	// nicknames only. A language with no frame that asks for one leaves it out.
 	parts?: WordPool;
+	// The shapes a nickname of this language can take. Every language has to
+	// declare its own: a shape is only as natural as the grammar behind it.
+	frames: readonly WordFrame[];
 	syn: WordSynthesis;
 };

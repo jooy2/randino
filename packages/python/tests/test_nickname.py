@@ -7,6 +7,7 @@ person-name pools.
 """
 
 import re
+from collections.abc import Sequence
 
 from randino import (
     RAND_COUNT_MAX,
@@ -45,6 +46,40 @@ def all_words(language: WordLanguage) -> list[str]:
         *(data.parts or ()),
         *(word for theme in WORD_THEMES for word in data.nouns[theme]),
     ]
+
+
+def glues_of(language: WordLanguage) -> list[str]:
+    """Every particle the language's frames can put between two words, longest first."""
+    seen = {""}
+
+    for frame in WORD_DATA[language].frames:
+        seen.update(frame.glue)
+
+    return sorted(seen, key=len, reverse=True)
+
+
+def joined_by(nickname: str, words: Sequence[str], glues: Sequence[str], separator: str) -> bool:
+    """True when the nickname is exactly its words in order, with only allowed particles between.
+
+    Backtracks, because a particle and the first character of the next word can be the
+    same one (`의` in front of `의자`).
+    """
+    if not words:
+        return nickname == ""
+
+    if not nickname.startswith(words[0]):
+        return False
+
+    rest = nickname[len(words[0]) :]
+
+    if len(words) == 1:
+        return rest == ""
+
+    return any(
+        rest.startswith(glue + separator)
+        and joined_by(rest[len(glue) + len(separator) :], words[1:], glues, separator)
+        for glue in glues
+    )
 
 
 def nouns_of(language: WordLanguage, theme: WordTheme | None = None) -> list[str]:
@@ -180,7 +215,7 @@ def test_nicknames_stay_inside_the_requested_length_range() -> None:
 
 
 def test_omitted_length_bounds_fall_back_to_what_the_language_can_produce() -> None:
-    assert nickname_length_range("zh") == (2, 5)
+    assert nickname_length_range("zh") == (2, 8)
     assert nickname_length_range("ko") == (1, 13)
     assert nickname_length_range("en") == (3, 31)
 
@@ -200,7 +235,7 @@ def test_word_separator_goes_between_the_words() -> None:
             for detail in rand_nickname(
                 output="detail", language=language, word_separator=separator, count=SAMPLE
             ):
-                assert detail.nickname == separator.join(detail.words), (
+                assert joined_by(detail.nickname, detail.words, glues_of(language), separator), (
                     f"{language} '{separator}': {detail.nickname}"
                 )
 
@@ -210,7 +245,9 @@ def test_word_separator_goes_between_the_words() -> None:
     # Omitted, it falls back to the way the language joins its words, which is to run
     # them together.
     for detail in rand_nickname(output="detail", count=SAMPLE):
-        assert detail.nickname == "".join(detail.words), detail.nickname
+        assert joined_by(detail.nickname, detail.words, glues_of(detail.language), ""), (
+            detail.nickname
+        )
 
     # The separator is part of the nickname, so it counts toward the length.
     assert nickname_length_range("ko", "-") == (1, 15)
@@ -291,6 +328,6 @@ def test_output_detail_reports_the_pieces_it_used() -> None:
     for detail in rand_nickname(count=100, output="detail"):
         joiner = WORD_DATA[detail.language].joiner
 
-        assert joiner.join(detail.words) == detail.nickname
+        assert joined_by(detail.nickname, detail.words, glues_of(detail.language), joiner)
         assert detail.language in WORD_LANGUAGES
         assert detail.theme is None or detail.theme in WORD_THEMES

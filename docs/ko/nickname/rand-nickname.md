@@ -1,6 +1,6 @@
 # randNickname
 
-닉네임을 생성해서 `count`개의 문자열로 돌려줍니다. 각 닉네임은 일상 단어에 무언가를 덧붙인 것이고 — 앞에 수식어, 뒤에 단어 하나, 또는 둘 다 — **사람 이름은 절대 쓰지 않습니다**. [`output: 'detail'`](#the-detail-output)을 주면 대신 어떤 단어를 썼는지 알려 줍니다.
+닉네임을 생성해서 `count`개의 문자열로 돌려줍니다. 각 닉네임은 일상 단어에 무언가를 덧붙인 것이고 — 앞에 어떤지 말하는 말, 앞에 무엇을 하는지 말하는 말, 뒤에 단어 하나, 둘 사이의 소유격 — **사람 이름은 절대 쓰지 않습니다**. [`output: 'detail'`](#the-detail-output)을 주면 대신 어떤 단어를 썼는지 알려 줍니다.
 
 ::: lang js
 
@@ -104,11 +104,11 @@ rand_nickname(language="en", output="detail")
 | 필드 | 타입 | 설명 |
 | --- | --- | --- |
 | `nickname` | <Lang js="string" dart="String" py="str" code /> | 완성된 닉네임. |
-| `words` | <Lang js="string[]" dart="List&lt;String&gt;" py="tuple[str, ...]" code /> | 순서대로의 구성 단어들. |
+| `words` | <Lang js="string[]" dart="List&lt;String&gt;" py="tuple[str, ...]" code /> | 순서대로의 구성 단어들. 단어만 담습니다. |
 | `language` | `WordLanguage` | 이 닉네임이 생성된 언어. |
 | `theme` | <Lang js="WordTheme &#124; null" dart="WordTheme?" py="WordTheme &#124; None" code /> | 기준 단어의 테마. 생성기가 모르는 단어면 null입니다. |
 
-`words`를 그 언어의 연결 방식으로 이어 붙이면 정확히 `nickname`이 됩니다. 이는 불변 조건이며 세 테스트 스위트 모두 이를 검증합니다.
+`words`에는 단어만 들어갑니다. 두 단어 사이에 조사가 필요한 형태라면 그 조사는 `nickname`에만 있으므로, `사자의눈물`의 `words`는 `['사자', '눈물']`이고 이어 붙여도 원래 닉네임이 나오지 않습니다. 완성된 문자열은 `nickname`에서, 무엇으로 만들어졌는지는 `words`에서 읽으십시오.
 
 ### `theme`에 대하여 {#about-theme}
 

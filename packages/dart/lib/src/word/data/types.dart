@@ -3,8 +3,9 @@
 //
 // One dataset per language rather than one per generator: `randWord` and its
 // fourteen themed forms draw from `nouns`, `randModifier` draws from
-// `adjectives` and `actions`, and `randNickname` puts the two together and adds
-// `parts`. The pools are the same words either way, so they are written once.
+// `adjectives` and `actions`, and `randNickname` puts them together in the
+// shapes `frames` allows. The pools are the same words either way, so they are
+// written once.
 
 import 'package:randino/src/types.dart';
 
@@ -58,6 +59,50 @@ class PoolSynthesis extends WordSynthesis {
   final WordPool pool;
 }
 
+/// What one word does inside a nickname.
+enum WordSlot {
+  /// Says what the noun is like: 멋진, Brave, 青い.
+  adjective,
+
+  /// Says what the noun is doing: 웃는, Laughing, 踊る.
+  action,
+
+  /// The nickname's base word, out of one theme's pool.
+  noun,
+
+  /// A trailing noun, from [WordLanguageData.parts].
+  part,
+}
+
+/// One shape a nickname can take, written in the order the language puts it in.
+///
+/// Per language rather than shared, because the shapes themselves differ:
+/// Chinese needs 的 between a verb and its noun where Korean needs nothing, and
+/// a language with no possessive particle has no possessive shape at all.
+class WordFrame {
+  /// Creates a nickname shape.
+  const WordFrame(this.slots, this.weight, {this.glue});
+
+  /// The words to draw, in order.
+  final List<WordSlot> slots;
+
+  /// How often this shape is used, against the other frames of the language.
+  final int weight;
+
+  /// A particle for each gap, so one entry shorter than [slots], and null where
+  /// every gap is empty. It attaches to the word in front of it, which is what
+  /// puts a word separator after it rather than around it (`사자의 눈물`, never
+  /// `사자 의 눈물`).
+  final List<String>? glue;
+
+  /// The particle in front of the slot at [index], or `''` where there is none.
+  String glueAt(int index) {
+    final all = glue;
+
+    return all == null || index < 1 || index > all.length ? '' : all[index - 1];
+  }
+}
+
 /// Everything the generators know about one word language.
 class WordLanguageData {
   /// Creates a language dataset.
@@ -67,6 +112,7 @@ class WordLanguageData {
     required this.nouns,
     required this.adjectives,
     required this.actions,
+    required this.frames,
     required this.syn,
     this.parts,
   });
@@ -96,10 +142,13 @@ class WordLanguageData {
   /// action can become a predicate.
   final WordPool actions;
 
-  /// Optional trailing noun for compounds (고양이 + 꼬리), used by nicknames
-  /// only. Languages that would need a particle or a different word order for
-  /// this leave it null, and the compound patterns are then skipped for them.
+  /// Trailing noun for compounds (고양이 + 꼬리, 狮子 + 的 + 眼泪), used by
+  /// nicknames only. A language with no frame that asks for one leaves it null.
   final WordPool? parts;
+
+  /// The shapes a nickname of this language can take. Every language has to
+  /// declare its own: a shape is only as natural as the grammar behind it.
+  final List<WordFrame> frames;
 
   /// How an invented word is built.
   final WordSynthesis syn;
