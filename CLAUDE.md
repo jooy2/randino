@@ -450,11 +450,12 @@ Nicknames:
 
 ## Adding a word language
 
-Seven languages are supported (`ko`, `en`, `ja`, `zh`, `vi`, `es`, `it`), and neither word order nor agreement is a bar any more:
+Eight languages are supported (`ko`, `en`, `ja`, `zh`, `vi`, `es`, `it`, `de`), and neither word order nor agreement is a bar any more:
 
 - **Word order lives in the frames.** Vietnamese, Spanish and Italian put the modifier after the noun (`mèo xanh`, `gato azul`) and Vietnamese puts the possessed thing in front of its owner (`đuôi mèo`); both say so in their own `frames`. `modifierFollows` reads that back out of the frames so `randModifier` attaches on the right side, rather than a second field stating an order the frames could contradict.
 - **Agreement lives in the data.** A language that inflects tags each noun (`gato:m luna:f`), and `agreement` lists the endings a modifier changes per gender. `taggedNouns` splits the tag back off so each word is still typed once, and `agree` applies the first rule that matches — a word no rule matches is already right (`azul`). Rules rather than a function, so `tools/parity` compares them as data.
-- **Agreement only reaches a modifier drawn after its noun.** `buildWords` fills the slots in frame order, so the noun's gender is known by the time a modifier is drawn only when the frame puts the noun first. Russian and German put the modifier in front (`blauer Wal`), and that is what still keeps them out — not the rules, which their endings would fit.
+- **A modifier in front of its noun still agrees.** `buildWords` draws the noun ahead of its turn when the language inflects and the frame puts the noun second, so German writes `blauer Wal` and `blaue Katze` correctly. The pre-drawn noun's length is exact rather than a range, which keeps the length fitting as tight as it is everywhere else.
+- **German writes its nouns capitalised in the pool** rather than setting `capitalize`, which would capitalise the modifier too. The data is simply correct German.
 
 To add one that clears the bar:
 

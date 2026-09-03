@@ -38,6 +38,7 @@ SCRIPT: dict[WordLanguage, re.Pattern[str]] = {
     "vi": re.compile(r"[a-zA-ZÀ-ỹ]+(?: [a-zA-ZÀ-ỹ]+)*"),
     "es": re.compile(r"[a-zA-ZÀ-ÿ]+(?: [a-zA-ZÀ-ÿ]+)*"),
     "it": re.compile(r"[a-zA-ZÀ-ÿ]+(?: [a-zA-ZÀ-ÿ]+)*"),
+    "de": re.compile(r"[a-zA-ZÀ-ÿß]+(?: [a-zA-ZÀ-ÿß]+)*"),
 }
 
 

@@ -1,4 +1,5 @@
 import type { WordLanguage, WordTheme } from '../../_types/global.js';
+import { DE } from './de.js';
 import { EN } from './en.js';
 import { ES } from './es.js';
 import { IT } from './it.js';
@@ -11,7 +12,16 @@ import { ZH } from './zh.js';
 // Languages the word pools cover. Fewer than the name generator: a modifier has
 // to sit in front of a noun exactly as it is written in the dictionary, which
 // only works without grammatical agreement — see CLAUDE.md before adding one.
-export const WORD_LANGUAGES: readonly WordLanguage[] = ['en', 'ko', 'ja', 'zh', 'vi', 'es', 'it'];
+export const WORD_LANGUAGES: readonly WordLanguage[] = [
+	'en',
+	'ko',
+	'ja',
+	'zh',
+	'vi',
+	'es',
+	'it',
+	'de'
+];
 
 // What the words can be about. Person names are deliberately absent.
 export const WORD_THEMES: readonly WordTheme[] = [
@@ -63,5 +73,6 @@ export const WORD_DATA: Record<WordLanguage, WordLanguageData> = {
 	zh: ZH,
 	vi: VI,
 	es: ES,
-	it: IT
+	it: IT,
+	de: DE
 };

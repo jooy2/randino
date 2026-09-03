@@ -97,7 +97,7 @@ Themes: `animal`, `object`, `nature`, `plant`, `gem`, `concept`, `myth`, `job`, 
 
 ## Words
 
-The pools the nicknames are built from, on their own. Twenty-five themes, seven languages, and a function per theme.
+The pools the nicknames are built from, on their own. Twenty-five themes, eight languages, and a function per theme.
 
 ```dart
 randWord(language: WordLanguage.en, theme: WordTheme.animal, count: 3);

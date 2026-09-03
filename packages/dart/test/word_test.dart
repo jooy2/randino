@@ -14,6 +14,7 @@ final Map<WordLanguage, RegExp> script = <WordLanguage, RegExp>{
   WordLanguage.vi: RegExp(r'^[a-zA-ZÀ-ỹ]+(?: [a-zA-ZÀ-ỹ]+)*$'),
   WordLanguage.es: RegExp(r'^[a-zA-ZÀ-ÿ]+(?: [a-zA-ZÀ-ÿ]+)*$'),
   WordLanguage.it: RegExp(r'^[a-zA-ZÀ-ÿ]+(?: [a-zA-ZÀ-ÿ]+)*$'),
+  WordLanguage.de: RegExp(r'^[a-zA-ZÀ-ÿß]+(?: [a-zA-ZÀ-ÿß]+)*$'),
 };
 
 /// The themed generator for each theme, which is what the seventeen of them are.

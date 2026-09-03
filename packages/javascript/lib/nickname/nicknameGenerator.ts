@@ -195,7 +195,19 @@ function buildWords(
 ): { words: string[]; missed: boolean } {
 	const joiner = joinerOf(data, settings).length;
 	const words: string[] = [];
-	let gender: WordGender | undefined;
+	const nounAt = frame.slots.indexOf('noun');
+	// A language that inflects has to know the noun's gender before it draws a
+	// modifier, and its frames may put the modifier first (`blauer Wal`). So the
+	// noun is drawn ahead of its turn and waits for the slot it belongs to; its
+	// length is then exact rather than a range, which keeps the length fitting as
+	// tight as it is for every other language.
+	const early =
+		data.agreement && nounAt > 0
+			? drawWord(data, nouns, settings.invent, bounds.noun[0], bounds.noun[1], '')
+			: null;
+	const span = (index: number): readonly [number, number] =>
+		early && index === nounAt ? [early.word.length, early.word.length] : bounds[frame.slots[index]];
+	let gender: WordGender | undefined = early ? data.nounGender?.[early.word] : undefined;
 	let missed = false;
 	let used = 0;
 
@@ -207,22 +219,23 @@ function buildWords(
 		for (let rest = i + 1; rest < frame.slots.length; rest += 1) {
 			const restGap = gapOf(frame, rest, joiner);
 
-			restMin += bounds[frame.slots[rest]][0] + restGap;
-			restMax += bounds[frame.slots[rest]][1] + restGap;
+			restMin += span(rest)[0] + restGap;
+			restMax += span(rest)[1] + restGap;
 		}
 
 		const low = Math.max(1, min - used - gap - restMax);
 		const high = Math.max(low, max - used - gap - restMin);
 		const slot = frame.slots[i];
 		const pool = poolOf(data, slot, nouns);
-		const chosen = drawWord(data, pool, settings.invent, low, high, i === 0 ? settings.prefix : '');
-		// A language that inflects makes its modifiers agree with the noun. The
-		// frames of such a language put the noun first (`gato azul`), so its
-		// gender is known by the time a modifier is drawn; a modifier drawn ahead
-		// of its noun is left as it is rather than guessed at.
+		const chosen =
+			early && i === nounAt
+				? early
+				: drawWord(data, pool, settings.invent, low, high, i === 0 ? settings.prefix : '');
+		// A language that inflects makes its modifiers agree with the noun, which
+		// is why the noun is in hand before any of them is drawn.
 		const word = slot === 'noun' ? chosen.word : agree(data, chosen.word, gender);
 
-		if (slot === 'noun') {
+		if (slot === 'noun' && !early) {
 			gender = data.nounGender?.[chosen.word];
 		}
 

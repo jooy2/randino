@@ -196,7 +196,28 @@ _Filled _buildWords(
 ) {
   final joiner = _joinerOf(data, settings).length;
   final words = <String>[];
-  WordGender? gender;
+  final nounAt = frame.slots.indexOf(WordSlot.noun);
+  // A language that inflects has to know the noun's gender before it draws a
+  // modifier, and its frames may put the modifier first (`blauer Wal`). So the
+  // noun is drawn ahead of its turn and waits for the slot it belongs to; its
+  // length is then exact rather than a range, which keeps the length fitting as
+  // tight as it is for every other language.
+  final early =
+      data.agreement != null && nounAt > 0
+          ? drawWord(
+            data,
+            nouns,
+            settings.invent,
+            bounds[WordSlot.noun]!.min,
+            bounds[WordSlot.noun]!.max,
+            '',
+          )
+          : null;
+  LengthRange span(int index) =>
+      early != null && index == nounAt
+          ? LengthRange(early.word.length, early.word.length)
+          : bounds[frame.slots[index]]!;
+  WordGender? gender = early == null ? null : data.nounGender?[early.word];
   var missed = false;
   var used = 0;
 
@@ -208,8 +229,8 @@ _Filled _buildWords(
     for (var rest = i + 1; rest < frame.slots.length; rest += 1) {
       final restGap = _gapOf(frame, rest, joiner);
 
-      restMin += bounds[frame.slots[rest]]!.min + restGap;
-      restMax += bounds[frame.slots[rest]]!.max + restGap;
+      restMin += span(rest).min + restGap;
+      restMax += span(rest).max + restGap;
     }
 
     final lowRaw = min - used - gap - restMax;
@@ -218,14 +239,15 @@ _Filled _buildWords(
     final high = highRaw < low ? low : highRaw;
     final slot = frame.slots[i];
     final pool = _poolOf(data, slot, nouns);
-    final chosen = drawWord(data, pool, settings.invent, low, high, i == 0 ? settings.prefix : '');
-    // A language that inflects makes its modifiers agree with the noun. The
-    // frames of such a language put the noun first (`gato azul`), so its gender
-    // is known by the time a modifier is drawn; a modifier drawn ahead of its
-    // noun is left as it is rather than guessed at.
+    final chosen =
+        early != null && i == nounAt
+            ? early
+            : drawWord(data, pool, settings.invent, low, high, i == 0 ? settings.prefix : '');
+    // A language that inflects makes its modifiers agree with the noun, which is
+    // why the noun is in hand before any of them is drawn.
     final word = slot == WordSlot.noun ? chosen.word : agree(data, chosen.word, gender);
 
-    if (slot == WordSlot.noun) gender = data.nounGender?[chosen.word];
+    if (slot == WordSlot.noun && early == null) gender = data.nounGender?[chosen.word];
 
     missed = missed || chosen.missed;
     used += gap + word.length;

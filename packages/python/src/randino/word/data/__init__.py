@@ -2,6 +2,7 @@
 
 from randino._types import WordLanguage, WordTheme
 from randino.word.data._types import WordLanguageData
+from randino.word.data.de import DE
 from randino.word.data.en import EN
 from randino.word.data.es import ES
 from randino.word.data.it import IT
@@ -10,7 +11,7 @@ from randino.word.data.ko import KO
 from randino.word.data.vi import VI
 from randino.word.data.zh import ZH
 
-WORD_LANGUAGES: tuple[WordLanguage, ...] = ("en", "ko", "ja", "zh", "vi", "es", "it")
+WORD_LANGUAGES: tuple[WordLanguage, ...] = ("en", "ko", "ja", "zh", "vi", "es", "it", "de")
 """Languages the word pools cover.
 
 Fewer than the name generator: a modifier has to sit in front of a noun exactly as it
@@ -68,5 +69,6 @@ WORD_DATA: dict[WordLanguage, WordLanguageData] = {
     "vi": VI,
     "es": ES,
     "it": IT,
+    "de": DE,
 }
 """Each language's pools and rules, keyed by its code."""

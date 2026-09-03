@@ -30,7 +30,8 @@ const SCRIPT: Record<WordLanguage, RegExp> = {
 	zh: /^[々一-鿿]+$/,
 	vi: /^[a-zA-ZÀ-ỹ]+(?: [a-zA-ZÀ-ỹ]+)*$/,
 	es: /^[a-zA-ZÀ-ÿ]+(?: [a-zA-ZÀ-ÿ]+)*$/,
-	it: /^[a-zA-ZÀ-ÿ]+(?: [a-zA-ZÀ-ÿ]+)*$/
+	it: /^[a-zA-ZÀ-ÿ]+(?: [a-zA-ZÀ-ÿ]+)*$/,
+	de: /^[a-zA-ZÀ-ÿß]+(?: [a-zA-ZÀ-ÿß]+)*$/
 };
 
 /**

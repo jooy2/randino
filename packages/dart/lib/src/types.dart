@@ -107,6 +107,9 @@ enum WordLanguage {
 
   /// Italian.
   it,
+
+  /// German.
+  de,
 }
 
 /// What a word is about.

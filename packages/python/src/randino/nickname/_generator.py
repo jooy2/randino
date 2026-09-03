@@ -209,34 +209,56 @@ def build_words(
     """
     joiner = len(joiner_of(data, settings))
     words: list[str] = []
-    gender: WordGender | None = None
+    noun_at = frame.slots.index("noun") if "noun" in frame.slots else -1
+    # A language that inflects has to know the noun's gender before it draws a
+    # modifier, and its frames may put the modifier first (`blauer Wal`). So the noun
+    # is drawn ahead of its turn and waits for the slot it belongs to; its length is
+    # then exact rather than a range, which keeps the length fitting as tight as it is
+    # for every other language.
+    early = (
+        draw_word(data, nouns, settings.invent, bounds["noun"][0], bounds["noun"][1], "")
+        if data.agreement and noun_at > 0
+        else None
+    )
+
+    def span(at: int) -> tuple[int, int]:
+        if early is not None and at == noun_at:
+            return len(early.word), len(early.word)
+
+        return bounds[frame.slots[at]]
+
+    gender: WordGender | None = (
+        None if early is None else (data.noun_gender.get(early.word) if data.noun_gender else None)
+    )
     missed = False
     used = 0
 
     for index, slot in enumerate(frame.slots):
         gap = gap_of(frame, index, joiner)
         rest = range(index + 1, len(frame.slots))
-        rest_min = sum(bounds[frame.slots[at]][0] + gap_of(frame, at, joiner) for at in rest)
-        rest_max = sum(bounds[frame.slots[at]][1] + gap_of(frame, at, joiner) for at in rest)
+        rest_min = sum(span(at)[0] + gap_of(frame, at, joiner) for at in rest)
+        rest_max = sum(span(at)[1] + gap_of(frame, at, joiner) for at in rest)
 
         floor = max(1, low - used - gap - rest_max)
         ceiling = max(floor, high - used - gap - rest_min)
-        chosen = draw_word(
-            data,
-            pool_of(data, slot, nouns),
-            settings.invent,
-            floor,
-            ceiling,
-            settings.prefix if index == 0 else "",
+        chosen = (
+            early
+            if early is not None and index == noun_at
+            else draw_word(
+                data,
+                pool_of(data, slot, nouns),
+                settings.invent,
+                floor,
+                ceiling,
+                settings.prefix if index == 0 else "",
+            )
         )
 
-        # A language that inflects makes its modifiers agree with the noun. The
-        # frames of such a language put the noun first (`gato azul`), so its gender is
-        # known by the time a modifier is drawn; a modifier drawn ahead of its noun is
-        # left as it is rather than guessed at.
+        # A language that inflects makes its modifiers agree with the noun, which is
+        # why the noun is in hand before any of them is drawn.
         word = chosen.word if slot == "noun" else agree(data, chosen.word, gender)
 
-        if slot == "noun":
+        if slot == "noun" and early is None:
             gender = data.noun_gender.get(chosen.word) if data.noun_gender else None
 
         missed = missed or chosen.missed
