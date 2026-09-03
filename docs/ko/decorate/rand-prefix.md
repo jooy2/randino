@@ -7,7 +7,7 @@
 ```javascript
 import { randNickname, randPrefix } from 'randino';
 
-randPrefix('멋진사자'); // 'nVtRC_멋진사자'
+randPrefix('MistyOwl'); // 'nVtRC_MistyOwl'
 randPrefix('order-4021', { length: 4, separator: '-' }); // 'k3Rm-order-4021'
 
 randPrefix(randNickname({ language: 'en', count: 2 }));
@@ -30,7 +30,7 @@ randPrefix(randNickname({ language: 'en', count: 2 }));
 ```dart
 import 'package:randino/randino.dart';
 
-randPrefix(value: '멋진사자'); // 'nVtRC_멋진사자'
+randPrefix(value: 'MistyOwl'); // 'nVtRC_MistyOwl'
 randPrefix(value: 'order-4021', length: 4, separator: '-'); // 'k3Rm-order-4021'
 
 randPrefixAll(randNickname(language: WordLanguage.en, count: 2));
@@ -53,7 +53,7 @@ randPrefixAll(randNickname(language: WordLanguage.en, count: 2));
 ```python
 from randino import rand_nickname, rand_prefix
 
-rand_prefix("멋진사자")  # 'nVtRC_멋진사자'
+rand_prefix("MistyOwl")  # 'nVtRC_MistyOwl'
 rand_prefix("order-4021", length=4, separator="-")  # 'k3Rm-order-4021'
 
 rand_prefix(rand_nickname(language="en", count=2))

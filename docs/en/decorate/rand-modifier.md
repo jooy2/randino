@@ -1,6 +1,6 @@
 # randModifier
 
-Puts a random modifier in front of a string, or of every string in an array — `사자` becomes `멋진사자`, `Owl` becomes `MistyOwl`. It takes any string rather than only this library's output, and with none at all it hands back the modifier itself.
+Puts a random modifier in front of a string, or of every string in an array — `Owl` becomes `MistyOwl`. It takes any string rather than only this library's output, and with none at all it hands back the modifier itself.
 
 This is what `randNickname`'s `includeModifier` used to be. It stopped being a nickname option for the same reason [`randSuffix`](./rand-suffix) did: decorating a string is a thing about strings, not about nicknames.
 
@@ -9,12 +9,12 @@ This is what `randNickname`'s `includeModifier` used to be. It stopped being a n
 ```javascript
 import { randAnimal, randModifier } from 'randino';
 
-randModifier('사자'); // '멋진사자'
+randModifier('Owl'); // 'MistyOwl'
 randModifier('Owl', { separator: ' ' }); // 'Misty Owl'
-randModifier(); // '멋진'
+randModifier(); // 'Misty'
 
-randModifier(randAnimal({ language: 'ko', count: 2 }));
-// ['오래된곰', '영원한도마뱀']
+randModifier(randAnimal({ language: 'en', count: 2 }));
+// ['TwinklingLynx', 'OnyxCrane']
 ```
 
 | Option | Type | Default | Description |
@@ -33,12 +33,12 @@ Returns a `string` for a `string`, and a `string[]` for a `string[]`.
 ```dart
 import 'package:randino/randino.dart';
 
-randModifier(value: '사자'); // '멋진사자'
+randModifier(value: 'Owl'); // 'MistyOwl'
 randModifier(value: 'Owl', separator: ' '); // 'Misty Owl'
-randModifier(); // '멋진'
+randModifier(); // 'Misty'
 
-randModifierAll(randAnimal(language: WordLanguage.ko, count: 2));
-// [오래된곰, 영원한도마뱀]
+randModifierAll(randAnimal(language: WordLanguage.en, count: 2));
+// [TwinklingLynx, OnyxCrane]
 ```
 
 | Parameter   | Type            | Default    | Description                                      |
@@ -57,12 +57,12 @@ Returns a `String`. **`randModifierAll` is the list form**, the way `randSuffixA
 ```python
 from randino import rand_animal, rand_modifier
 
-rand_modifier("사자")  # '멋진사자'
+rand_modifier("Owl")  # 'MistyOwl'
 rand_modifier("Owl", separator=" ")  # 'Misty Owl'
-rand_modifier()  # '멋진'
+rand_modifier()  # 'Misty'
 
-rand_modifier(rand_animal(language="ko", count=2))
-# ['오래된곰', '영원한도마뱀']
+rand_modifier(rand_animal(language="en", count=2))
+# ['TwinklingLynx', 'OnyxCrane']
 ```
 
 | Argument | Type | Default | Description |
@@ -119,8 +119,8 @@ Not one for the batch, the same way [`randSuffix`](./rand-suffix) draws a token 
 ::: lang js
 
 ```javascript
-randModifier(['사자', '사자', '사자']);
-// ['멋진사자', '조용한사자', '푸른사자']
+randModifier(['Owl', 'Owl', 'Owl']);
+// ['SunnyOwl', 'WoolenOwl', 'TealOwl']
 ```
 
 :::
@@ -128,8 +128,8 @@ randModifier(['사자', '사자', '사자']);
 ::: lang dart
 
 ```dart
-randModifierAll(const ['사자', '사자', '사자']);
-// [멋진사자, 조용한사자, 푸른사자]
+randModifierAll(const ['Owl', 'Owl', 'Owl']);
+// [SunnyOwl, WoolenOwl, TealOwl]
 ```
 
 :::
@@ -137,8 +137,8 @@ randModifierAll(const ['사자', '사자', '사자']);
 ::: lang py
 
 ```python
-rand_modifier(["사자", "사자", "사자"])
-# ['멋진사자', '조용한사자', '푸른사자']
+rand_modifier(["Owl", "Owl", "Owl"])
+# ['SunnyOwl', 'WoolenOwl', 'TealOwl']
 ```
 
 :::
@@ -150,8 +150,8 @@ rand_modifier(["사자", "사자", "사자"])
 ::: lang js
 
 ```javascript
-randModifier('사자', { separator: '-' }); // '멋진-사자'
-randModifier({ language: 'ko', style: 100 }); // '다순'
+randModifier('Owl', { separator: '-' }); // 'Pointed-Owl'
+randModifier({ language: 'en', style: 100 }); // 'Snikith'
 ```
 
 :::
@@ -159,8 +159,8 @@ randModifier({ language: 'ko', style: 100 }); // '다순'
 ::: lang dart
 
 ```dart
-randModifier(value: '사자', separator: '-'); // '멋진-사자'
-randModifier(language: WordLanguage.ko, style: 100); // '다순'
+randModifier(value: 'Owl', separator: '-'); // 'Pointed-Owl'
+randModifier(language: WordLanguage.en, style: 100); // 'Snikith'
 ```
 
 :::
@@ -168,8 +168,8 @@ randModifier(language: WordLanguage.ko, style: 100); // '다순'
 ::: lang py
 
 ```python
-rand_modifier("사자", separator="-")  # '멋진-사자'
-rand_modifier(language="ko", style=100)  # '다순'
+rand_modifier("Owl", separator="-")  # 'Pointed-Owl'
+rand_modifier(language="en", style=100)  # 'Snikith'
 ```
 
 :::

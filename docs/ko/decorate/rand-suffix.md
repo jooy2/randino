@@ -1,17 +1,17 @@
 # randSuffix
 
-문자열 하나, 또는 배열 안의 모든 문자열 뒤에 무작위 토큰을 붙입니다. `멋진사자`는 `멋진사자_nVtRC`가 됩니다. 닉네임이 겹칠 가능성이 낮은 정도에서 겹칠 수 없는 상태로 바뀌는 지점이 여기이며, 이 라이브러리가 만든 문자열이 아니어도 상관없이 받습니다.
+문자열 하나, 또는 배열 안의 모든 문자열 뒤에 무작위 토큰을 붙입니다. `MistyOwl`은 `MistyOwl_nVtRC`가 됩니다. 닉네임이 겹칠 가능성이 낮은 정도에서 겹칠 수 없는 상태로 바뀌는 지점이 여기이며, 이 라이브러리가 만든 문자열이 아니어도 상관없이 받습니다.
 
 ::: lang js
 
 ```javascript
 import { randNickname, randSuffix } from 'randino';
 
-randSuffix('멋진사자'); // '멋진사자_nVtRC'
+randSuffix('MistyOwl'); // 'MistyOwl_nVtRC'
 randSuffix('MistyOwl', { length: 8, separator: '-' }); // 'MistyOwl-k3Rm9dQx'
 
-randSuffix(randNickname({ language: 'ko', count: 2 }));
-// ['달력_U7aNZ', '조용한바구니_RUKAP']
+randSuffix(randNickname({ language: 'en', count: 2 }));
+// ['RoundSeason_RVBnC', 'RowdyDusk_dwtu5']
 ```
 
 | 옵션 | 타입 | 기본값 | 설명 |
@@ -30,11 +30,11 @@ randSuffix(randNickname({ language: 'ko', count: 2 }));
 ```dart
 import 'package:randino/randino.dart';
 
-randSuffix(value: '멋진사자'); // '멋진사자_nVtRC'
+randSuffix(value: 'MistyOwl'); // 'MistyOwl_nVtRC'
 randSuffix(value: 'MistyOwl', length: 8, separator: '-'); // 'MistyOwl-k3Rm9dQx'
 
-randSuffixAll(randNickname(language: WordLanguage.ko, count: 2));
-// ['달력_U7aNZ', '조용한바구니_RUKAP']
+randSuffixAll(randNickname(language: WordLanguage.en, count: 2));
+// ['RoundSeason_RVBnC', 'RowdyDusk_dwtu5']
 ```
 
 | 파라미터    | 타입      | 기본값 | 설명                              |
@@ -53,11 +53,11 @@ randSuffixAll(randNickname(language: WordLanguage.ko, count: 2));
 ```python
 from randino import rand_nickname, rand_suffix
 
-rand_suffix("멋진사자")  # '멋진사자_nVtRC'
+rand_suffix("MistyOwl")  # 'MistyOwl_nVtRC'
 rand_suffix("MistyOwl", length=8, separator="-")  # 'MistyOwl-k3Rm9dQx'
 
-rand_suffix(rand_nickname(language="ko", count=2))
-# ['달력_U7aNZ', '조용한바구니_RUKAP']
+rand_suffix(rand_nickname(language="en", count=2))
+# ['RoundSeason_RVBnC', 'RowdyDusk_dwtu5']
 ```
 
 | 인자 | 타입 | 기본값 | 설명 |

@@ -1,6 +1,6 @@
 # randModifier
 
-문자열 하나, 또는 배열 안의 모든 문자열 앞에 무작위 수식어를 붙입니다. `사자`는 `멋진사자`가 되고 `Owl`은 `MistyOwl`이 됩니다. 이 라이브러리가 만든 값뿐 아니라 어떤 문자열에도 쓸 수 있고, 값을 주지 않으면 수식어 자체를 돌려줍니다.
+문자열 하나, 또는 배열 안의 모든 문자열 앞에 무작위 수식어를 붙입니다. `Owl`은 `MistyOwl`이 됩니다. 이 라이브러리가 만든 값뿐 아니라 어떤 문자열에도 쓸 수 있고, 값을 주지 않으면 수식어 자체를 돌려줍니다.
 
 `randNickname`의 `includeModifier`가 이 함수가 되었습니다. [`randSuffix`](./rand-suffix)와 같은 이유로 닉네임 옵션이 아니게 되었습니다. 문자열을 장식하는 일은 닉네임에 관한 것이 아니라 문자열에 관한 것이기 때문입니다.
 
@@ -9,12 +9,12 @@
 ```javascript
 import { randAnimal, randModifier } from 'randino';
 
-randModifier('사자'); // '멋진사자'
+randModifier('Owl'); // 'MistyOwl'
 randModifier('Owl', { separator: ' ' }); // 'Misty Owl'
-randModifier(); // '멋진'
+randModifier(); // 'Misty'
 
-randModifier(randAnimal({ language: 'ko', count: 2 }));
-// ['오래된곰', '영원한도마뱀']
+randModifier(randAnimal({ language: 'en', count: 2 }));
+// ['TwinklingLynx', 'OnyxCrane']
 ```
 
 | 옵션 | 타입 | 기본값 | 설명 |
@@ -33,12 +33,12 @@ randModifier(randAnimal({ language: 'ko', count: 2 }));
 ```dart
 import 'package:randino/randino.dart';
 
-randModifier(value: '사자'); // '멋진사자'
+randModifier(value: 'Owl'); // 'MistyOwl'
 randModifier(value: 'Owl', separator: ' '); // 'Misty Owl'
-randModifier(); // '멋진'
+randModifier(); // 'Misty'
 
-randModifierAll(randAnimal(language: WordLanguage.ko, count: 2));
-// [오래된곰, 영원한도마뱀]
+randModifierAll(randAnimal(language: WordLanguage.en, count: 2));
+// [TwinklingLynx, OnyxCrane]
 ```
 
 | 파라미터    | 타입            | 기본값      | 설명                                       |
@@ -57,12 +57,12 @@ randModifierAll(randAnimal(language: WordLanguage.ko, count: 2));
 ```python
 from randino import rand_animal, rand_modifier
 
-rand_modifier("사자")  # '멋진사자'
+rand_modifier("Owl")  # 'MistyOwl'
 rand_modifier("Owl", separator=" ")  # 'Misty Owl'
-rand_modifier()  # '멋진'
+rand_modifier()  # 'Misty'
 
-rand_modifier(rand_animal(language="ko", count=2))
-# ['오래된곰', '영원한도마뱀']
+rand_modifier(rand_animal(language="en", count=2))
+# ['TwinklingLynx', 'OnyxCrane']
 ```
 
 | 인자 | 타입 | 기본값 | 설명 |
@@ -119,8 +119,8 @@ rand_modifier("고양이", language="en")  # 'Misty고양이'
 ::: lang js
 
 ```javascript
-randModifier(['사자', '사자', '사자']);
-// ['멋진사자', '조용한사자', '푸른사자']
+randModifier(['Owl', 'Owl', 'Owl']);
+// ['SunnyOwl', 'WoolenOwl', 'TealOwl']
 ```
 
 :::
@@ -128,8 +128,8 @@ randModifier(['사자', '사자', '사자']);
 ::: lang dart
 
 ```dart
-randModifierAll(const ['사자', '사자', '사자']);
-// [멋진사자, 조용한사자, 푸른사자]
+randModifierAll(const ['Owl', 'Owl', 'Owl']);
+// [SunnyOwl, WoolenOwl, TealOwl]
 ```
 
 :::
@@ -137,8 +137,8 @@ randModifierAll(const ['사자', '사자', '사자']);
 ::: lang py
 
 ```python
-rand_modifier(["사자", "사자", "사자"])
-# ['멋진사자', '조용한사자', '푸른사자']
+rand_modifier(["Owl", "Owl", "Owl"])
+# ['SunnyOwl', 'WoolenOwl', 'TealOwl']
 ```
 
 :::
@@ -150,8 +150,8 @@ rand_modifier(["사자", "사자", "사자"])
 ::: lang js
 
 ```javascript
-randModifier('사자', { separator: '-' }); // '멋진-사자'
-randModifier({ language: 'ko', style: 100 }); // '다순'
+randModifier('Owl', { separator: '-' }); // 'Pointed-Owl'
+randModifier({ language: 'en', style: 100 }); // 'Snikith'
 ```
 
 :::
@@ -159,8 +159,8 @@ randModifier({ language: 'ko', style: 100 }); // '다순'
 ::: lang dart
 
 ```dart
-randModifier(value: '사자', separator: '-'); // '멋진-사자'
-randModifier(language: WordLanguage.ko, style: 100); // '다순'
+randModifier(value: 'Owl', separator: '-'); // 'Pointed-Owl'
+randModifier(language: WordLanguage.en, style: 100); // 'Snikith'
 ```
 
 :::
@@ -168,8 +168,8 @@ randModifier(language: WordLanguage.ko, style: 100); // '다순'
 ::: lang py
 
 ```python
-rand_modifier("사자", separator="-")  # '멋진-사자'
-rand_modifier(language="ko", style=100)  # '다순'
+rand_modifier("Owl", separator="-")  # 'Pointed-Owl'
+rand_modifier(language="en", style=100)  # 'Snikith'
 ```
 
 :::

@@ -1,17 +1,17 @@
 # randSuffix
 
-Appends a random token to a string, or to every string in an array — `멋진사자` becomes `멋진사자_nVtRC`. It is what turns a nickname that is merely unlikely to collide into one that cannot, and it takes any string rather than only this library's output.
+Appends a random token to a string, or to every string in an array — `MistyOwl` becomes `MistyOwl_nVtRC`. It is what turns a nickname that is merely unlikely to collide into one that cannot, and it takes any string rather than only this library's output.
 
 ::: lang js
 
 ```javascript
 import { randNickname, randSuffix } from 'randino';
 
-randSuffix('멋진사자'); // '멋진사자_nVtRC'
+randSuffix('MistyOwl'); // 'MistyOwl_nVtRC'
 randSuffix('MistyOwl', { length: 8, separator: '-' }); // 'MistyOwl-k3Rm9dQx'
 
-randSuffix(randNickname({ language: 'ko', count: 2 }));
-// ['달력_U7aNZ', '조용한바구니_RUKAP']
+randSuffix(randNickname({ language: 'en', count: 2 }));
+// ['RoundSeason_RVBnC', 'RowdyDusk_dwtu5']
 ```
 
 | Option | Type | Default | Description |
@@ -30,11 +30,11 @@ Returns a `string` for a `string`, and a `string[]` for a `string[]`.
 ```dart
 import 'package:randino/randino.dart';
 
-randSuffix(value: '멋진사자'); // '멋진사자_nVtRC'
+randSuffix(value: 'MistyOwl'); // 'MistyOwl_nVtRC'
 randSuffix(value: 'MistyOwl', length: 8, separator: '-'); // 'MistyOwl-k3Rm9dQx'
 
-randSuffixAll(randNickname(language: WordLanguage.ko, count: 2));
-// ['달력_U7aNZ', '조용한바구니_RUKAP']
+randSuffixAll(randNickname(language: WordLanguage.en, count: 2));
+// ['RoundSeason_RVBnC', 'RowdyDusk_dwtu5']
 ```
 
 | Parameter   | Type      | Default | Description                                    |
@@ -53,11 +53,11 @@ Returns a `String`. Every parameter is named, `value` included: Dart cannot comb
 ```python
 from randino import rand_nickname, rand_suffix
 
-rand_suffix("멋진사자")  # '멋진사자_nVtRC'
+rand_suffix("MistyOwl")  # 'MistyOwl_nVtRC'
 rand_suffix("MistyOwl", length=8, separator="-")  # 'MistyOwl-k3Rm9dQx'
 
-rand_suffix(rand_nickname(language="ko", count=2))
-# ['달력_U7aNZ', '조용한바구니_RUKAP']
+rand_suffix(rand_nickname(language="en", count=2))
+# ['RoundSeason_RVBnC', 'RowdyDusk_dwtu5']
 ```
 
 | Argument | Type | Default | Description |
