@@ -158,7 +158,7 @@ EN = WordLanguageData(
             Rakshasa Oni Tengu Kitsune Kappa Bunyip Drake Lindworm Amphisbaena Catoblepas
             Peryton Hippogriff Nightmare Familiar Coven Incantation Invocation Summoning
             Banishment Divination Scrying Portal Ley Sanctum Reliquary Effigy Idol Totem
-            Fetish Charm Curseward Hexbolt
+            Fetish Charm Warding Runestone
         """),
         "job": words("""
             Wizard Sorcerer Ranger Thief Rogue Pirate Sailor Captain Chef Gardener
@@ -254,10 +254,10 @@ EN = WordLanguageData(
             Snowplow Monorail Trolley Rickshaw Palanquin Dinghy Yacht Catamaran Hovercraft
             Icebreaker Tanker Barge Trawler Biplane Seaplane Zeppelin Blimp Rover Lander
             Shuttle Snowmobile Unicycle Tricycle Moped Caravan Hearse Coupe Sedan Roadster
-            Speedboat Houseboat Tugboat Dredger Forklift Hatchback Roadtrain Camper Trailer
+            Speedboat Houseboat Tugboat Dredger Forklift Hatchback Streetcar Camper Trailer
             Sidecar Buggy Quadbike Rollerblade Toboggan Litter Palfrey Skiff Punt Junk
             Sampan Coracle Outrigger Schooner Clipper Cutter Corvette Frigate Airliner
-            Turboprop Sailplane Autogyro Tiltrotor Landrover Halftrack Snowcat Trolleybus
+            Turboprop Sailplane Autogyro Tiltrotor Snowplough Halftrack Snowcat Trolleybus
             Railbus
         """),
         "product": words("""
@@ -269,7 +269,7 @@ EN = WordLanguageData(
             Grinder Fryer Steamer Dishwasher Dryer Hairdryer Lotion Sunscreen Slippers
             Sandals Mattress Curtain Doorbell Thermostat Nightlight Calculator Whiteboard
             Socket Adapter Lightbulb Extension Stapler Organizer Diffuser Sanitizer
-            Detergent Conditioner Softener Freshener Ricecooker Pressurepot Skillet Colander
+            Detergent Conditioner Softener Freshener Percolator Griddle Skillet Colander
             Whisk Peeler Corkscrew Thermos Tumbler Doormat Hanger Wardrobe Bookshelf
             Nightstand Recliner Beanbag Footstool Ottoman Bedframe Duvet Bedsheet Pillowcase
             Towel Bathrobe Slipmat Showerhead Faucet Plunger Squeegee
