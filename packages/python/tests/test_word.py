@@ -11,7 +11,9 @@ from randino import (
     WordLanguage,
     WordTheme,
     rand_animal,
+    rand_color,
     rand_concept,
+    rand_finance,
     rand_food,
     rand_gem,
     rand_job,
@@ -23,6 +25,7 @@ from randino import (
     rand_plant,
     rand_product,
     rand_sport,
+    rand_tech,
     rand_vehicle,
     rand_word,
     word_length_range,
@@ -56,8 +59,11 @@ THEMED = {
     "sport": rand_sport,
     "vehicle": rand_vehicle,
     "product": rand_product,
+    "color": rand_color,
+    "finance": rand_finance,
+    "tech": rand_tech,
 }
-"""The themed generator for each theme, which is what the fourteen of them are."""
+"""The themed generator for each theme, which is what the seventeen of them are."""
 
 
 def pool_of(language: WordLanguage, theme: WordTheme | None = None) -> tuple[str, ...]:

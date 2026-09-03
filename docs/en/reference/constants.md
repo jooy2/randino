@@ -99,7 +99,7 @@ import { WORD_LANGUAGES, WORD_THEMES } from 'randino';
 | Name             | Type             | Value                             |
 | ---------------- | ---------------- | --------------------------------- |
 | `WORD_LANGUAGES` | `WordLanguage[]` | Every supported nickname language |
-| `WORD_THEMES`    | `WordTheme[]`    | All fourteen themes               |
+| `WORD_THEMES`    | `WordTheme[]`    | All seventeen themes              |
 
 :::
 
@@ -112,7 +112,7 @@ import 'package:randino/randino.dart';
 | Name            | Type                 | Value                             |
 | --------------- | -------------------- | --------------------------------- |
 | `wordLanguages` | `List<WordLanguage>` | Every supported nickname language |
-| `wordThemes`    | `List<WordTheme>`    | All fourteen themes               |
+| `wordThemes`    | `List<WordTheme>`    | All seventeen themes              |
 
 :::
 
@@ -125,7 +125,7 @@ from randino import WORD_LANGUAGES, WORD_THEMES
 | Name             | Type                     | Value                             |
 | ---------------- | ------------------------ | --------------------------------- |
 | `WORD_LANGUAGES` | `tuple[WordLanguage, …]` | Every supported nickname language |
-| `WORD_THEMES`    | `tuple[WordTheme, …]`    | All fourteen themes               |
+| `WORD_THEMES`    | `tuple[WordTheme, …]`    | All seventeen themes              |
 
 :::
 

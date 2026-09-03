@@ -13,8 +13,8 @@ Every option, every language and every example — pick **JavaScript**, **Dart**
 **randino** generates random text in the language you ask for. Today that is person names and nicknames; the shape it is built in — one function per kind of text, one set of options, per-language datasets — is meant to hold whatever comes next.
 
 - **Person names** read like names people actually carry — Emma Clover, Jack Reeves — and come with their English pronunciation. 9 languages.
-- **Nicknames** are the handles you would pick for a game or a website — MistyOwl, CraneVoyage, RustyBoot. Built from everyday words across fourteen themes, never from person names, with over nine million combinations in Korean and English before a random suffix is added.
-- **Words** are those fourteen themes on their own — `randWord`, and a function per theme: `randAnimal`, `randFood`, `randGem` and eleven more.
+- **Nicknames** are the handles you would pick for a game or a website — MistyOwl, CraneVoyage, RustyBoot. Built from everyday words across seventeen themes, never from person names, with over nine million combinations in Korean and English before a random suffix is added.
+- **Words** are those seventeen themes on their own — `randWord`, and a function per theme: `randAnimal`, `randFood`, `randGem` and eleven more.
 - **Decorators** attach something to a string you already have rather than generating one: a random token with `randSuffix` and `randPrefix`, a modifier with `randModifier`.
 - One options set per generator: language, length, count, and a `realism` setting that goes from real words to fully invented ones.
 - **No runtime dependencies**, in any of the packages.
@@ -130,7 +130,7 @@ Every generator takes a language, or mixes every language it supports when you l
 
 Each generator returns strings by default, or one detail object per result with <code>output: 'detail'</code> — both scripts of a name, or the words a nickname was built from. The Dart package spells that as a second function (`randNameDetails`), because Dart has no way to make one function's return type depend on an argument.
 
-The full option tables, the fourteen word themes and the romanization rules are on the [documentation site](https://randino.cdget.com).
+The full option tables, the seventeen word themes and the romanization rules are on the [documentation site](https://randino.cdget.com).
 
 ## Repository layout
 

@@ -2,7 +2,7 @@
 
 Not part of the public API — callers only ever see the keyword arguments and the two
 details. One dataset per language rather than one per generator: `rand_word` and its
-fourteen themed forms draw from `nouns`, `rand_modifier` draws from `adjectives` and
+seventeen themed forms draw from `nouns`, `rand_modifier` draws from `adjectives` and
 `actions`, and `rand_nickname` puts them together in the shapes `frames` allows. The
 pools are the same words either way, so they are written once.
 """

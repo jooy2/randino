@@ -51,7 +51,9 @@ export 'src/types.dart'
         WordTheme;
 export 'src/word/data/index.dart' show wordLanguages, wordThemes;
 export 'src/word/rand_animal.dart' show randAnimal;
+export 'src/word/rand_color.dart' show randColor;
 export 'src/word/rand_concept.dart' show randConcept;
+export 'src/word/rand_finance.dart' show randFinance;
 export 'src/word/rand_food.dart' show randFood;
 export 'src/word/rand_gem.dart' show randGem;
 export 'src/word/rand_job.dart' show randJob;
@@ -63,6 +65,7 @@ export 'src/word/rand_place.dart' show randPlace;
 export 'src/word/rand_plant.dart' show randPlant;
 export 'src/word/rand_product.dart' show randProduct;
 export 'src/word/rand_sport.dart' show randSport;
+export 'src/word/rand_tech.dart' show randTech;
 export 'src/word/rand_vehicle.dart' show randVehicle;
 export 'src/word/rand_word.dart' show randWord;
 export 'src/word/rand_word_details.dart' show randWordDetails;

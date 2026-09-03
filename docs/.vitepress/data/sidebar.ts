@@ -19,13 +19,13 @@
  * decides nothing but its URL.
  *
  * **Generators** is the one that goes a level deeper, into **General** — the
- * three that generate a kind of text — and **Words**, the fourteen themed forms
- * of `randWord`. Seventeen entries in one list would bury the three, and the
- * fourteen are `randWord` with its argument decided rather than fourteen
+ * three that generate a kind of text — and **Words**, the seventeen themed forms
+ * of `randWord`. Twenty entries in one list would bury the three, and the
+ * seventeen are `randWord` with its argument decided rather than seventeen
  * separate ideas, so they sit beside the three rather than among them.
  *
  * Words is also the one group the navbar's API dropdown leaves out, which it
- * says itself with `sidebarOnly`: fourteen names for one function is a wall in
+ * says itself with `sidebarOnly`: seventeen names for one function is a wall in
  * a menu, and the dropdown already points at the function they all are.
  *
  * **Behaviour** holds the prose explaining how a generator's options behave,
@@ -55,7 +55,7 @@ export interface SidebarGroup {
 	/**
 	 * Kept out of the navbar's dropdown, pages and all. For a group that is long
 	 * enough to be a wall in a menu while still being worth a place in the
-	 * sidebar — **Words**, the fourteen themed forms of one function, is why this
+	 * sidebar — **Words**, the seventeen themed forms of one function, is why this
 	 * exists.
 	 */
 	sidebarOnly?: boolean;
@@ -113,7 +113,10 @@ export const SIDEBAR: SidebarGroup[] = [
 							{ path: 'word/rand-food', en: 'randFood', ko: 'randFood' },
 							{ path: 'word/rand-sport', en: 'randSport', ko: 'randSport' },
 							{ path: 'word/rand-vehicle', en: 'randVehicle', ko: 'randVehicle' },
-							{ path: 'word/rand-product', en: 'randProduct', ko: 'randProduct' }
+							{ path: 'word/rand-product', en: 'randProduct', ko: 'randProduct' },
+							{ path: 'word/rand-color', en: 'randColor', ko: 'randColor' },
+							{ path: 'word/rand-finance', en: 'randFinance', ko: 'randFinance' },
+							{ path: 'word/rand-tech', en: 'randTech', ko: 'randTech' }
 						]
 					}
 				]

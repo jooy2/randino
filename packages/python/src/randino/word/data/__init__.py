@@ -30,6 +30,9 @@ WORD_THEMES: tuple[WordTheme, ...] = (
     "sport",
     "vehicle",
     "product",
+    "color",
+    "finance",
+    "tech",
 )
 """What the words can be about. Person names are deliberately absent."""
 

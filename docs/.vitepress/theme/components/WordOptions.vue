@@ -6,7 +6,7 @@ import { localeOf, t } from '../../data/i18n';
 import { isPhrase, isVariants, wordOptionRows } from '../../data/wordOptions';
 
 /**
- * The option table `randWord` and its fourteen themed forms share.
+ * The option table `randWord` and its seventeen themed forms share.
  *
  * Fifteen pages take the same options, and the only difference is that the
  * themed ones answer `theme` rather than accepting it. Written out in Markdown

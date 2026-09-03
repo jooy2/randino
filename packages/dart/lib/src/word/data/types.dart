@@ -2,7 +2,7 @@
 // — consumers only ever see the option parameters and the two details.
 //
 // One dataset per language rather than one per generator: `randWord` and its
-// fourteen themed forms draw from `nouns`, `randModifier` draws from
+// seventeen themed forms draw from `nouns`, `randModifier` draws from
 // `adjectives` and `actions`, and `randNickname` puts them together in the
 // shapes `frames` allows. The pools are the same words either way, so they are
 // written once.

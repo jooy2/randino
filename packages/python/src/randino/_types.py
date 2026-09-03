@@ -77,6 +77,9 @@ WordTheme = Literal[
     "sport",
     "vehicle",
     "product",
+    "color",
+    "finance",
+    "tech",
 ]
 """What a word is about.
 

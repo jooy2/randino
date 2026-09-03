@@ -1,6 +1,8 @@
 export { WORD_LANGUAGES, WORD_THEMES } from './data/index.js';
 export { randAnimal } from './randAnimal.js';
+export { randColor } from './randColor.js';
 export { randConcept } from './randConcept.js';
+export { randFinance } from './randFinance.js';
 export { randFood } from './randFood.js';
 export { randGem } from './randGem.js';
 export { randJob } from './randJob.js';
@@ -12,6 +14,7 @@ export { randPlace } from './randPlace.js';
 export { randPlant } from './randPlant.js';
 export { randProduct } from './randProduct.js';
 export { randSport } from './randSport.js';
+export { randTech } from './randTech.js';
 export { randVehicle } from './randVehicle.js';
 export { randWord } from './randWord.js';
 export { wordLengthRange } from './wordLengthRange.js';

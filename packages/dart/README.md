@@ -13,8 +13,8 @@ Every option and every example, with **Dart** picked in the sidebar. This README
 **randino** generates random person names and nicknames in the language you ask for.
 
 - **Person names** read like names people actually carry — Emma Clover, Jack Reeves — and come with their English pronunciation. 9 languages.
-- **Nicknames** are the handles you would pick for a game or a website — MistyOwl, CraneVoyage, RustyBoot. Built from everyday words across fourteen themes, never from person names.
-- **Words** are those fourteen themes on their own — `randWord`, plus `randAnimal`, `randFood` and twelve more.
+- **Nicknames** are the handles you would pick for a game or a website — MistyOwl, CraneVoyage, RustyBoot. Built from everyday words across seventeen themes, never from person names.
+- **Words** are those seventeen themes on their own — `randWord`, plus `randAnimal`, `randFood` and twelve more.
 - **Decorators** attach something to a string you already have: `randSuffix`, `randPrefix` and `randModifier`.
 - Every parameter is named and optional, and a **null enum means "every one of them"** — `randName()` on its own works.
 - **Pure Dart, no dependencies.** It imports nothing but `dart:math`, so it runs on the VM, on the web and inside Flutter on every platform.
@@ -93,7 +93,7 @@ randNicknameDetails(language: WordLanguage.en).first;
 | `startsWith`              | `String?`           | `null`                 |
 | `unique`                  | `bool`              | `false`                |
 
-Themes: `animal`, `object`, `nature`, `plant`, `gem`, `concept`, `myth`, `job`, `music`, `place`, `food`, `sport`, `vehicle`, `product`.
+Themes: `animal`, `object`, `nature`, `plant`, `gem`, `concept`, `myth`, `job`, `music`, `place`, `food`, `sport`, `vehicle`, `product`, `color`, `finance`, `tech`.
 
 ## Words
 
@@ -122,7 +122,7 @@ wordLengthRange(language: WordLanguage.en); // LengthRange(3, 11)
 | `startsWith`              | `String?`       | `null`             |
 | `unique`                  | `bool`          | `false`            |
 
-One function per theme: `randAnimal`, `randObject`, `randNature`, `randPlant`, `randGem`, `randConcept`, `randMyth`, `randJob`, `randMusic`, `randPlace`, `randFood`, `randSport`, `randVehicle`, `randProduct`. They return `List<String>`; for the detail form, pass the theme to `randWordDetails`.
+One function per theme: `randAnimal`, `randObject`, `randNature`, `randPlant`, `randGem`, `randConcept`, `randMyth`, `randJob`, `randMusic`, `randPlace`, `randFood`, `randSport`, `randVehicle`, `randProduct`, `randColor`, `randFinance`, `randTech`. They return `List<String>`; for the detail form, pass the theme to `randWordDetails`.
 
 ## Decorators
 

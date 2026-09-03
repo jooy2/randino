@@ -22,7 +22,9 @@ describe('base test', () => {
 			'nameSupportsRoman',
 			'nicknameLengthRange',
 			'randAnimal',
+			'randColor',
 			'randConcept',
+			'randFinance',
 			'randFood',
 			'randGem',
 			'randJob',
@@ -39,6 +41,7 @@ describe('base test', () => {
 			'randProduct',
 			'randSport',
 			'randSuffix',
+			'randTech',
 			'randVehicle',
 			'randWord',
 			'wordLengthRange'

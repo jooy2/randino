@@ -13,7 +13,7 @@ Every option and every example, with **JavaScript** picked in the sidebar. This 
 **randino** generates random person names and nicknames in the language you ask for.
 
 - **Person names** read like names people actually carry — Emma Clover, Jack Reeves — and come with their English pronunciation. 9 languages.
-- **Nicknames** are the handles you would pick for a game or a website — MistyOwl, CraneVoyage, RustyBoot. Built from everyday words across fourteen themes, never from person names.
+- **Nicknames** are the handles you would pick for a game or a website — MistyOwl, CraneVoyage, RustyBoot. Built from everyday words across seventeen themes, never from person names.
 - **Words** are those themes on their own — `randWord`, plus `randAnimal`, `randFood` and twelve more.
 - **Decorators** attach something to a string you already have: `randSuffix`, `randPrefix` and `randModifier`.
 - One options object per generator, every option optional: `randName()` on its own works.
@@ -99,7 +99,7 @@ randNickname({ language: 'en', output: 'detail' });
 | `unique`                  | `boolean`                  | `false`    |
 | `output`                  | `'value' \| 'detail'`      | `'value'`  |
 
-Themes: `animal`, `object`, `nature`, `plant`, `gem`, `concept`, `myth`, `job`, `music`, `place`, `food`, `sport`, `vehicle`, `product`.
+Themes: `animal`, `object`, `nature`, `plant`, `gem`, `concept`, `myth`, `job`, `music`, `place`, `food`, `sport`, `vehicle`, `product`, `color`, `finance`, `tech`.
 
 ## Words
 
@@ -131,7 +131,7 @@ wordLengthRange('en'); // [3, 11]
 | `unique`                  | `boolean`                  | `false`   |
 | `output`                  | `'value' \| 'detail'`      | `'value'` |
 
-One function per theme: `randAnimal`, `randObject`, `randNature`, `randPlant`, `randGem`, `randConcept`, `randMyth`, `randJob`, `randMusic`, `randPlace`, `randFood`, `randSport`, `randVehicle`, `randProduct`. Each is `randWord` with the theme already chosen.
+One function per theme: `randAnimal`, `randObject`, `randNature`, `randPlant`, `randGem`, `randConcept`, `randMyth`, `randJob`, `randMusic`, `randPlace`, `randFood`, `randSport`, `randVehicle`, `randProduct`, `randColor`, `randFinance`, `randTech`. Each is `randWord` with the theme already chosen.
 
 ## Decorators
 

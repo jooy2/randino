@@ -1,8 +1,8 @@
 # Themes
 
-A theme is a slice of everyday vocabulary that a modifier can sit in front of. There are fourteen of them, every language fills every one, and **a word belongs to exactly one** — which is what makes the theme a word reports unambiguous.
+A theme is a slice of everyday vocabulary that a modifier can sit in front of. There are seventeen of them, every language fills every one, and **a word belongs to exactly one** — which is what makes the theme a word reports unambiguous.
 
-Each theme is also a generator of its own. `randWord` takes the theme as an option; the fourteen functions in the third column are the same generator with the theme already chosen, and `randNickname` builds on the same pools.
+Each theme is also a generator of its own. `randWord` takes the theme as an option; the seventeen functions in the third column are the same generator with the theme already chosen, and `randNickname` builds on the same pools.
 
 | Theme | Function | What it holds | Korean | English |
 | --- | --- | --- | --- | --- |
@@ -20,6 +20,9 @@ Each theme is also a generator of its own. `randWord` takes the theme as an opti
 | `sport` | [`randSport`](./rand-sport) | sports, and what they are played for | 양궁, 트로피 | Archery, Trophy |
 | `vehicle` | [`randVehicle`](./rand-vehicle) | things that carry you | 열기구, 전차 | Airship, Tramcar |
 | `product` | [`randProduct`](./rand-product) | things you buy | 이어폰, 냉장고 | Earbuds, Toaster |
+| `color` | [`randColor`](./rand-color) | colours, plain and storied | 주홍, 쪽빛 | Crimson, Ochre |
+| `finance` | [`randFinance`](./rand-finance) | money, and what is done with it | 이자, 환율 | Ledger, Yield |
+| `tech` | [`randTech`](./rand-tech) | computers, and the networks between them | 서버, 캐시 | Server, Subnet |
 
 ::: lang js
 
@@ -70,7 +73,7 @@ rand_food(language="en", count=3)  # the same thing
 
 :::
 
-Leave the theme out and each result draws from one theme picked at random, so a batch spreads across all fourteen.
+Leave the theme out and each result draws from one theme picked at random, so a batch spreads across all seventeen.
 
 ## The rules a theme follows
 
@@ -91,6 +94,6 @@ That last row is a real coincidence rather than a bug: the syllable templates sp
 
 ## See also
 
-- [`randWord`](./rand-word) — the generator the theme belongs to, and the fourteen functions beside it.
+- [`randWord`](./rand-word) — the generator the theme belongs to, and the seventeen functions beside it.
 - [`randNickname`](../nickname/rand-nickname) — the same pools, put together.
 - [Constants](../reference/constants) — the theme list at runtime.

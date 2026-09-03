@@ -276,6 +276,39 @@ final WordLanguageData en = WordLanguageData(
       Nightstand Recliner Beanbag Footstool Ottoman Bedframe Duvet Bedsheet Pillowcase
       Towel Bathrobe Slipmat Showerhead Faucet Plunger Squeegee
     '''),
+    WordTheme.color: words(r'''
+      Crimson Scarlet Vermilion Carmine Magenta Fuchsia Cerise Blush Apricot Tangerine
+      Ochre Umber Sepia Mustard Chartreuse Lime Mint Teal Aqua Cyan Azure Navy Indigo
+      Mauve Plum Maroon Burgundy Rust Terracotta Cream Beige Taupe Khaki Charcoal
+      Graphite Pewter Alabaster Ebony Jet Cerulean Periwinkle Saffron Blonde Auburn
+      Ginger Ultramarine Viridian Bistre Fawn Buff Ecru Oatmeal Porcelain Bone Smoke
+      Denim Wine Brick Clay Sand Straw Honeydew Seafoam Powder Ice Ash Soot Coal Pitch
+      Puce Russet Sable Gamboge Verdigris Celadon Eggshell Cinnamon Nutmeg Paprika Wheat
+    '''),
+    WordTheme.finance: words(r'''
+      Ledger Invoice Receipt Bond Share Dividend Interest Loan Mortgage Deposit Savings
+      Account Budget Audit Asset Liability Equity Capital Revenue Profit Margin Surplus
+      Deficit Debt Credit Debit Cheque Currency Exchange Yield Portfolio Escrow Levy
+      Tariff Rebate Refund Premium Annuity Pension Payroll Wage Salary Bonus Commission
+      Royalty Franchise Merger Buyout Bailout Collateral Lien Voucher Coupon Bullion
+      Vault Treasury Exchequer Remittance Clearing Settlement Arbitrage Futures Warrant
+      Promissory Overdraft Withdrawal Statement Passbook Custody Trustee Creditor Debtor
+      Lender Borrower Guarantor Valuation Appraisal Inflation Recession Liquidity
+      Solvency Bankruptcy Windfall Endowment Subsidy Stipend Allowance Expense Outlay
+      Turnover Markup Discount Instalment Arrears
+    '''),
+    WordTheme.tech: words(r'''
+      Server Cache Buffer Pixel Bitmap Codec Packet Protocol Daemon Queue Stack Heap
+      Pointer Compiler Runtime Firmware Registry Bandwidth Latency Gateway Firewall
+      Subnet Hostname Payload Checksum Schema Cursor Backup Cluster Shard Replica
+      Snapshot Container Sandbox Pipeline Repository Commit Debugger Macro Array Matrix
+      Boolean Integer Syntax Parser Lexer Bytecode Assembler Instruction Interrupt
+      Register Bitrate Throughput Handshake Namespace Middleware Endpoint Webhook
+      Encryption Decryption Hashing Salting Sharding Caching Rendering Rasterizer Shader
+      Texture Polygon Wireframe Viewport Framebuffer Bitfield Nibble Octet Uplink
+      Downlink Routing Switching Bridging Tunnelling Multicast Broadcast Datagram
+      Bootloader Filesystem Partition Directory Symlink Checkpoint Rollback Migration
+    '''),
   },
   parts: words(r'''
     Tail Paw Track Wing Shade Whisker Feather Scale Mane Horn Beak Fin Nest Den Egg

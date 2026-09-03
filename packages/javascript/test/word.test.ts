@@ -5,7 +5,9 @@ import {
 	WORD_LANGUAGES,
 	WORD_THEMES,
 	randAnimal,
+	randColor,
 	randConcept,
+	randFinance,
 	randFood,
 	randGem,
 	randJob,
@@ -17,6 +19,7 @@ import {
 	randPlant,
 	randProduct,
 	randSport,
+	randTech,
 	randVehicle,
 	randWord,
 	wordLengthRange
@@ -41,7 +44,7 @@ const SCRIPT: Record<WordLanguage, RegExp> = {
 	zh: /^[々一-鿿]+$/
 };
 
-/** The themed generator for each theme, which is what the fourteen of them are. */
+/** The themed generator for each theme, which is what the seventeen of them are. */
 const THEMED: Record<WordTheme, (options?: RandThemedWordOptions) => string[]> = {
 	animal: randAnimal,
 	object: randObject,
@@ -56,7 +59,10 @@ const THEMED: Record<WordTheme, (options?: RandThemedWordOptions) => string[]> =
 	food: randFood,
 	sport: randSport,
 	vehicle: randVehicle,
-	product: randProduct
+	product: randProduct,
+	color: randColor,
+	finance: randFinance,
+	tech: randTech
 };
 
 function nounsOf(language: WordLanguage, theme?: WordTheme): string[] {

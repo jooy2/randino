@@ -60,7 +60,9 @@ void main() {
           'randNickname',
           'randNicknameDetails',
           'randAnimal',
+          'randColor',
           'randConcept',
+          'randFinance',
           'randFood',
           'randGem',
           'randJob',
@@ -74,6 +76,7 @@ void main() {
           'randPlant',
           'randProduct',
           'randSport',
+          'randTech',
           'randVehicle',
           'randCountMax',
           'randLengthMax',
@@ -127,7 +130,7 @@ void main() {
       expect(randCountMax, 10000);
 
       expect(wordLanguages, hasLength(4));
-      expect(wordThemes, hasLength(14));
+      expect(wordThemes, hasLength(17));
 
       expect(affixLengthDefault, 5);
       expect(affixLengthMax, 32);

@@ -112,7 +112,9 @@ export type WordLanguageOption = WordLanguage | 'all';
  * ideas from the humanities and social world (`철학`), creatures out of myth
  * (`구미호`), the trades and roles people hold (`대장장이`), music (`교향곡`),
  * places (`광장`), food (`떡볶이`), sports (`양궁`), things that carry you
- * (`열기구`), or things you buy (`이어폰`). Person names are never used.
+ * (`열기구`), things you buy (`이어폰`), colours (`주홍`), money and what is done
+ * with it (`이자`), or the vocabulary of computing (`캐시`). Person names are
+ * never used.
  *
  * Each one is also a generator of its own — `animal` is `randAnimal`.
  */
@@ -130,7 +132,10 @@ export type WordTheme =
 	| 'food'
 	| 'sport'
 	| 'vehicle'
-	| 'product';
+	| 'product'
+	| 'color'
+	| 'finance'
+	| 'tech';
 
 /** `'all'` draws from every theme. */
 export type WordThemeOption = WordTheme | 'all';
@@ -143,7 +148,7 @@ export interface RandWordOptions extends RandCommonOptions {
 }
 
 /**
- * What the fourteen themed generators take — `RandWordOptions` without the
+ * What the seventeen themed generators take — `RandWordOptions` without the
  * option they answer. `randAnimal({ theme: 'food' })` would be a contradiction,
  * so it does not type-check.
  */

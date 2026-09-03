@@ -85,7 +85,7 @@ English is the one language where romanizing changes nothing, because the names 
 
 ## Words and nicknames {#words-and-nicknames}
 
-The word pools — and so `randWord`, the fourteen themed generators and `randNickname` — cover four languages rather than nine, and the reason is grammar rather than effort. A modifier has to sit in front of a noun exactly as it is written in the dictionary, and that only reads naturally where the language asks for no agreement between the two.
+The word pools — and so `randWord`, the seventeen themed generators and `randNickname` — cover four languages rather than nine, and the reason is grammar rather than effort. A modifier has to sit in front of a noun exactly as it is written in the dictionary, and that only reads naturally where the language asks for no agreement between the two.
 
 | Code | Language | Shapes                      | Example                |
 | ---- | -------- | --------------------------- | ---------------------- |

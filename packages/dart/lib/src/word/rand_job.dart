@@ -5,7 +5,7 @@ import 'package:randino/src/word/rand_word.dart';
 ///
 /// [randWord] with the theme already chosen; every other parameter is the same.
 /// For the detail form, pass [WordTheme.job] to `randWordDetails` — Dart has
-/// no overloads, and fourteen more functions for it would be fourteen too many.
+/// no overloads, and seventeen more functions for it would be seventeen too many.
 ///
 /// ```dart
 /// randJob(language: WordLanguage.ko, count: 3); // [기사, 마법사, 대장장이]

@@ -46,7 +46,7 @@ rand_nickname(language="en", count=3)
 | [`randNickname`](./rand-nickname) | 닉네임 문자열, 또는 [닉네임마다 상세 정보](./rand-nickname#the-detail-output) |
 | [`nicknameLengthRange`](./nickname-length-range) | 해당 언어가 만들 수 있는 모든 길이 |
 
-명사는 14개 [테마](../word/themes)에서 오고, 모든 닉네임은 그중 한 테마의 단어를 중심으로 만들어집니다.
+명사는 17개 [테마](../word/themes)에서 오고, 모든 닉네임은 그중 한 테마의 단어를 중심으로 만들어집니다.
 
 ## 옵션의 동작 방식
 

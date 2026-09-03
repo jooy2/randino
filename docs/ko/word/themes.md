@@ -1,8 +1,8 @@
 # 테마
 
-테마는 수식어를 앞에 붙일 수 있는 일상 어휘의 한 묶음입니다. 모두 14개이고, 모든 언어가 모든 테마를 채우며, **한 단어는 정확히 하나의 테마에만 속합니다.** 생성 결과가 보고하는 테마가 모호해지지 않는 이유가 이것입니다.
+테마는 수식어를 앞에 붙일 수 있는 일상 어휘의 한 묶음입니다. 모두 17개이고, 모든 언어가 모든 테마를 채우며, **한 단어는 정확히 하나의 테마에만 속합니다.** 생성 결과가 보고하는 테마가 모호해지지 않는 이유가 이것입니다.
 
-테마 하나하나가 그 자체로 생성 함수이기도 합니다. `randWord`는 테마를 옵션으로 받고, 표 세 번째 열의 14개 함수는 테마를 미리 정해 둔 같은 생성기이며, `randNickname`도 같은 단어 풀 위에서 동작합니다.
+테마 하나하나가 그 자체로 생성 함수이기도 합니다. `randWord`는 테마를 옵션으로 받고, 표 세 번째 열의 17개 함수는 테마를 미리 정해 둔 같은 생성기이며, `randNickname`도 같은 단어 풀 위에서 동작합니다.
 
 | 테마 | 함수 | 담고 있는 것 | 한국어 | 영어 |
 | --- | --- | --- | --- | --- |
@@ -20,6 +20,9 @@
 | `sport` | [`randSport`](./rand-sport) | 스포츠와 그 목표물 | 양궁, 트로피 | Archery, Trophy |
 | `vehicle` | [`randVehicle`](./rand-vehicle) | 사람을 실어 나르는 것 | 열기구, 전차 | Airship, Tramcar |
 | `product` | [`randProduct`](./rand-product) | 사서 쓰는 물건 | 이어폰, 냉장고 | Earbuds, Toaster |
+| `color` | [`randColor`](./rand-color) | 색 이름 | 주홍, 쪽빛 | Crimson, Ochre |
+| `finance` | [`randFinance`](./rand-finance) | 돈과 돈으로 하는 일 | 이자, 환율 | Ledger, Yield |
+| `tech` | [`randTech`](./rand-tech) | 컴퓨터와 그 사이의 망 | 서버, 캐시 | Server, Subnet |
 
 ::: lang js
 
@@ -70,7 +73,7 @@ rand_food(language="en", count=3)  # 같은 결과
 
 :::
 
-테마를 생략하면 결과마다 테마를 하나씩 무작위로 골라 뽑으므로, 한 번에 여러 개를 만들면 14개 테마에 고르게 퍼집니다.
+테마를 생략하면 결과마다 테마를 하나씩 무작위로 골라 뽑으므로, 한 번에 여러 개를 만들면 17개 테마에 고르게 퍼집니다.
 
 ## 테마가 지키는 규칙
 
@@ -91,6 +94,6 @@ rand_food(language="en", count=3)  # 같은 결과
 
 ## 함께 보기
 
-- [`randWord`](./rand-word) — 테마가 속한 생성 함수와, 그 옆의 14개 함수.
+- [`randWord`](./rand-word) — 테마가 속한 생성 함수와, 그 옆의 17개 함수.
 - [`randNickname`](../nickname/rand-nickname) — 같은 단어 풀을 조합하는 쪽.
 - [상수](../reference/constants) — 런타임에서의 테마 목록.

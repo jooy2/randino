@@ -5,7 +5,7 @@ import 'package:randino/src/word/rand_word.dart';
 ///
 /// [randWord] with the theme already chosen; every other parameter is the same.
 /// For the detail form, pass [WordTheme.music] to `randWordDetails` — Dart has
-/// no overloads, and fourteen more functions for it would be fourteen too many.
+/// no overloads, and seventeen more functions for it would be seventeen too many.
 ///
 /// ```dart
 /// randMusic(language: WordLanguage.ko, count: 3); // [피아노, 거문고, 교향곡]

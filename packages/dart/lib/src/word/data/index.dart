@@ -33,6 +33,9 @@ final List<WordTheme> wordThemes = List<WordTheme>.unmodifiable(<WordTheme>[
   WordTheme.sport,
   WordTheme.vehicle,
   WordTheme.product,
+  WordTheme.color,
+  WordTheme.finance,
+  WordTheme.tech,
 ]);
 
 /// The dataset behind each language. Internal.

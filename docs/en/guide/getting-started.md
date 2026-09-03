@@ -229,5 +229,5 @@ Names are `snake_case`: `includeMiddleName` is `include_middle_name`, `minLength
 - [**Supported languages**](./languages) — what the nine codes cover, and why the word pools cover fewer of them.
 - [**Person names**](../name/) — every option, and what it does to the output.
 - [**Nicknames**](../nickname/) — every option, and how the shapes are chosen.
-- [**`randWord`**](../word/rand-word) — the fourteen themes on their own, one function each.
+- [**`randWord`**](../word/rand-word) — the seventeen themes on their own, one function each.
 - [**`randModifier`**](../decorate/rand-modifier) — a modifier in front of any string, the way `randSuffix` puts a token behind one.

@@ -5,7 +5,7 @@ import 'package:randino/src/word/word_generator.dart';
 ///
 /// Dart has neither overloads nor union types, so the detail form is its own
 /// function rather than the `output` option the npm and PyPI packages take.
-/// It is also where the fourteen themed functions send you for details: pass
+/// It is also where the seventeen themed functions send you for details: pass
 /// their [WordTheme] here.
 ///
 /// [WordDetail.theme] is null for an invented word that matches nothing in the

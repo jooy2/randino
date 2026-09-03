@@ -146,6 +146,15 @@ enum WordTheme {
 
   /// Things you buy: 이어폰, Toaster.
   product,
+
+  /// Colours: 주홍, Crimson.
+  color,
+
+  /// Money and what is done with it: 이자, Ledger.
+  finance,
+
+  /// The vocabulary of computing: 캐시, Server.
+  tech,
 }
 
 /// A span of lengths in characters, inclusive at both ends.

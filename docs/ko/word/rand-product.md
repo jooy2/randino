@@ -24,7 +24,7 @@ import 'package:randino/randino.dart';
 randProduct(language: WordLanguage.en, count: 3); // [Laptop, Keyboard, Earbuds]
 ```
 
-`List<String>`을 반환합니다. 상세 출력이 필요하면 `randWordDetails`에 `WordTheme.product`을 넘기세요. Dart에는 오버로드가 없고, 그것만을 위해 함수를 14개 더 두는 것은 지나칩니다.
+`List<String>`을 반환합니다. 상세 출력이 필요하면 `randWordDetails`에 `WordTheme.product`을 넘기세요. Dart에는 오버로드가 없고, 그것만을 위해 함수를 17개 더 두는 것은 지나칩니다.
 
 :::
 

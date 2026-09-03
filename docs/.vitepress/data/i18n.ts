@@ -41,7 +41,7 @@ const strings = {
 	},
 	/** On the button, for a reader who reaches it without seeing the label. */
 	languageSelect: { ko: '언어 선택', en: 'Select a language' },
-	/* `WordOptions.vue` — the table `randWord` and its fourteen themed forms share.
+	/* `WordOptions.vue` — the table `randWord` and its seventeen themed forms share.
 	   The option names themselves are not here, by the rule above; what is left is
 	   the column headings and one sentence per option. */
 	optionName: { ko: '옵션', en: 'Option' },

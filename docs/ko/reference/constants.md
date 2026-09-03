@@ -99,7 +99,7 @@ import { WORD_LANGUAGES, WORD_THEMES } from 'randino';
 | 이름             | 타입             | 값                        |
 | ---------------- | ---------------- | ------------------------- |
 | `WORD_LANGUAGES` | `WordLanguage[]` | 지원하는 모든 닉네임 언어 |
-| `WORD_THEMES`    | `WordTheme[]`    | 14개 테마 전체            |
+| `WORD_THEMES`    | `WordTheme[]`    | 17개 테마 전체            |
 
 :::
 
@@ -112,7 +112,7 @@ import 'package:randino/randino.dart';
 | 이름            | 타입                 | 값                        |
 | --------------- | -------------------- | ------------------------- |
 | `wordLanguages` | `List<WordLanguage>` | 지원하는 모든 닉네임 언어 |
-| `wordThemes`    | `List<WordTheme>`    | 14개 테마 전체            |
+| `wordThemes`    | `List<WordTheme>`    | 17개 테마 전체            |
 
 :::
 
@@ -125,7 +125,7 @@ from randino import WORD_LANGUAGES, WORD_THEMES
 | 이름             | 타입                     | 값                        |
 | ---------------- | ------------------------ | ------------------------- |
 | `WORD_LANGUAGES` | `tuple[WordLanguage, …]` | 지원하는 모든 닉네임 언어 |
-| `WORD_THEMES`    | `tuple[WordTheme, …]`    | 14개 테마 전체            |
+| `WORD_THEMES`    | `tuple[WordTheme, …]`    | 17개 테마 전체            |
 
 :::
 

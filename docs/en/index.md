@@ -32,7 +32,7 @@ features:
     link: /name/
     linkText: Person names
   - title: Nicknames from everyday words
-    details: A modifier and a noun across fourteen themes — and never a person name, which is what keeps a handle from reading like one.
+    details: A modifier and a noun across seventeen themes — and never a person name, which is what keeps a handle from reading like one.
     link: /nickname/
     linkText: Nicknames
   - title: The words on their own

@@ -2,7 +2,9 @@
 
 from randino.word.data import WORD_LANGUAGES, WORD_THEMES
 from randino.word.rand_animal import rand_animal
+from randino.word.rand_color import rand_color
 from randino.word.rand_concept import rand_concept
+from randino.word.rand_finance import rand_finance
 from randino.word.rand_food import rand_food
 from randino.word.rand_gem import rand_gem
 from randino.word.rand_job import rand_job
@@ -14,6 +16,7 @@ from randino.word.rand_place import rand_place
 from randino.word.rand_plant import rand_plant
 from randino.word.rand_product import rand_product
 from randino.word.rand_sport import rand_sport
+from randino.word.rand_tech import rand_tech
 from randino.word.rand_vehicle import rand_vehicle
 from randino.word.rand_word import rand_word
 from randino.word.word_length_range import word_length_range
@@ -22,7 +25,9 @@ __all__ = [
     "WORD_LANGUAGES",
     "WORD_THEMES",
     "rand_animal",
+    "rand_color",
     "rand_concept",
+    "rand_finance",
     "rand_food",
     "rand_gem",
     "rand_job",
@@ -34,6 +39,7 @@ __all__ = [
     "rand_plant",
     "rand_product",
     "rand_sport",
+    "rand_tech",
     "rand_vehicle",
     "rand_word",
     "word_length_range",

@@ -24,7 +24,7 @@ import 'package:randino/randino.dart';
 randGem(language: WordLanguage.en, count: 3); // [Gold, Quartz, Obsidian]
 ```
 
-Returns `List<String>`. For the detail form, pass `WordTheme.gem` to `randWordDetails` — Dart has no overloads, and fourteen more functions for it would be fourteen too many.
+Returns `List<String>`. For the detail form, pass `WordTheme.gem` to `randWordDetails` — Dart has no overloads, and seventeen more functions for it would be seventeen too many.
 
 :::
 
@@ -47,4 +47,4 @@ rand_gem(language="en", output="detail")
 ## See also
 
 - [`randWord`](./rand-word) — the same generator with `theme` open, and what each option does in full.
-- [Themes](./themes) — the other thirteen, and the words each one holds.
+- [Themes](./themes) — the other sixteen, and the words each one holds.

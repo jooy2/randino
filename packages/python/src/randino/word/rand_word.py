@@ -51,7 +51,7 @@ def rand_word(
     """Generate everyday words: animals, things, nature, ideas.
 
     Fourteen themes, in four languages. Person names are never used. `theme` picks
-    what the words are about; the fourteen `rand_…` functions beside this one are the
+    what the words are about; the seventeen `rand_…` functions beside this one are the
     same generator with one theme already chosen.
 
     Args:

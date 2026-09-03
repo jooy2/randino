@@ -25,7 +25,10 @@ export const WORD_THEMES: readonly WordTheme[] = [
 	'food',
 	'sport',
 	'vehicle',
-	'product'
+	'product',
+	'color',
+	'finance',
+	'tech'
 ];
 
 export const WORD_DATA: Record<WordLanguage, WordLanguageData> = {

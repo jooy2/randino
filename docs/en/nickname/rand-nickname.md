@@ -212,7 +212,7 @@ rand_nickname(language="en", theme="gem", count=3)
 
 :::
 
-The fourteen themes, and what each one holds, are on [Themes](../word/themes).
+The seventeen themes, and what each one holds, are on [Themes](../word/themes).
 
 ### A separator between the words
 
@@ -460,5 +460,5 @@ for detail in rand_nickname(language="en", count=100, output="detail"):
 ## See also
 
 - [`randSuffix`](../decorate/rand-suffix) — the random token, for when a nickname has to be collision-free.
-- [Themes](../word/themes) — the fourteen slices of vocabulary a nickname is built from.
+- [Themes](../word/themes) — the seventeen slices of vocabulary a nickname is built from.
 - [`nicknameLengthRange`](./nickname-length-range) — every length a language can produce.
