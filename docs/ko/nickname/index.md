@@ -162,7 +162,7 @@ rand_suffix(rand_nickname(language="en", count=3))
 
 토큰이 나중에 붙기 때문에, <Lang js="minLength" dart="minLength" py="min_length" code />와 <Lang js="maxLength" dart="maxLength" py="max_length" code />는 닉네임 전체를 가리키며 빼고 셀 것이 없습니다.
 
-### `realism`은 단어를 뽑는 대신 만들어냅니다
+### `realism`은 단어를 뽑는 대신 만들어냅니다 {#realism-invents-words-rather-than-drawing-them}
 
 `0`에서는 모든 단어가 실제 단어입니다. `100`에 가까워지면 해당 언어의 음절로 단어를 조립하며, 사전에 있는 단어가 아니라 지어낸 핸들처럼 읽힙니다.
 
@@ -189,6 +189,32 @@ randNickname(language: WordLanguage.en, realism: RandRealism.invented, count: 3)
 ```python
 rand_nickname(language="en", realism="invented", count=3)
 # ['Duhusk', 'DresaelSlobru', 'BroureexGrosex']
+```
+
+:::
+
+`realism`은 <Lang js="theme: 'all'" dart="theme을 비운 경우" py="theme=&quot;all&quot;" code />가 **어떤 테마를 도는지**도 정합니다. 열일곱 개 가운데 `color`, `finance`, `tech` 셋은 닉네임으로 어색합니다. 색이나 대출 앞에 수식어가 붙으면 핸들이 아니라 농담으로 읽히기 때문입니다(`멋진대출`, `BraveInvoice`, `奔跑的服务器`). `real`에서는 빠지고 `mixed`와 `invented`에서는 들어옵니다. 테마를 직접 지정하면 `realism`과 무관하게 언제나 그 테마가 나옵니다. `finance`를 달라고 했는데 다른 것이 나오면 옵션이 동작하지 않는 것이니까요.
+
+::: lang js
+
+```javascript
+randNickname({ theme: 'finance', count: 2 }); // ['QuietLedger', 'RisingYield']
+```
+
+:::
+
+::: lang dart
+
+```dart
+randNickname(theme: WordTheme.finance, count: 2); // [QuietLedger, RisingYield]
+```
+
+:::
+
+::: lang py
+
+```python
+rand_nickname(theme="finance", count=2)  # ['QuietLedger', 'RisingYield']
 ```
 
 :::

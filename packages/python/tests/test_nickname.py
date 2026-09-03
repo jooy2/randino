@@ -25,7 +25,7 @@ from randino import (
 # from — these checks are what keep person names out of them.
 from randino.name.data import NAME_DATA
 from randino.word._generator import modifiers_of
-from randino.word.data import WORD_DATA
+from randino.word.data import LOOSE_THEMES, WORD_DATA
 from tests.test_name import pool_natives
 
 SAMPLE = 60
@@ -177,8 +177,30 @@ def test_theme_decides_what_the_nickname_is_about() -> None:
                     f"{detail.nickname} has no {theme} word"
                 )
 
+    # `theme="all"` spans every theme a nickname can carry, which at the default
+    # realism is every theme but the loose ones.
+    natural = {theme for theme in WORD_THEMES if theme not in LOOSE_THEMES}
     themes = {detail.theme for detail in rand_nickname(output="detail", count=400)}
-    assert themes == set(WORD_THEMES)
+
+    assert themes == natural
+
+
+def test_realism_decides_which_themes_all_spans() -> None:
+    # A modifier in front of a colour or a loan reads as a joke, so those themes wait
+    # for the caller to loosen `realism` — or to name one.
+    for detail in rand_nickname(output="detail", count=400):
+        assert detail.theme not in LOOSE_THEMES, f"{detail.nickname}: {detail.theme}"
+
+    loosened = {
+        detail.theme for detail in rand_nickname(output="detail", realism="mixed", count=400)
+    }
+
+    assert any(theme in loosened for theme in LOOSE_THEMES)
+
+    # A theme the caller named is honoured whatever the realism is.
+    for theme in LOOSE_THEMES:
+        for detail in rand_nickname(output="detail", language="ko", theme=theme, count=40):
+            assert detail.theme == theme, detail.nickname
 
 
 def test_a_word_belongs_to_exactly_one_theme() -> None:

@@ -11,7 +11,8 @@
 // - Which shapes exist is the language's own business, and `data.frames` is
 //   where it says so. A shape carries its particles with it, so Chinese can put
 //   的 between a verb and its noun where Korean needs nothing.
-// - `realism` decides per word whether it comes out of a pool or is invented.
+// - `realism` decides per word whether it comes out of a pool or is invented,
+//   and which themes `theme: 'all'` spans — see `LOOSE_THEMES`.
 // - `minLength` / `maxLength` pick the shape first: a range too short for a
 //   modifier drops that frame instead of truncating a word.
 // - `wordSeparator` decides what goes between the words, defaulting to the way
@@ -36,7 +37,7 @@ import type {
 	WordThemeOption,
 	RandNicknameOptions
 } from '../_types/global.js';
-import { WORD_DATA, WORD_LANGUAGES, WORD_THEMES } from '../word/data/index.js';
+import { LOOSE_THEMES, WORD_DATA, WORD_LANGUAGES, WORD_THEMES } from '../word/data/index.js';
 import type { WordFrame, WordLanguageData, WordPool, WordSlot } from '../word/data/types.js';
 import { drawWord, poolBounds, themeOf, themesOf } from '../word/wordGenerator.js';
 
@@ -52,11 +53,27 @@ type Settings = {
 	theme: WordThemeOption;
 	// How often one part is invented rather than drawn, as a percentage.
 	invent: number;
+	// Whether the themes that make an awkward nickname are in play. Off at
+	// `realism: 'real'`, which is what keeps `theme: 'all'` readable.
+	loose: boolean;
 	minLength?: number;
 	maxLength?: number;
 	prefix: string;
 	separator?: string;
 };
+
+/**
+ * The themes one nickname may draw from. `theme: 'all'` spans every theme a
+ * nickname can carry, which at `realism: 'real'` is every theme but the loose
+ * ones; a theme the caller named is always honoured.
+ */
+function themesFor(settings: Settings): readonly WordTheme[] {
+	if (settings.theme !== 'all' || settings.loose) {
+		return themesOf(settings.theme);
+	}
+
+	return WORD_THEMES.filter((theme) => !LOOSE_THEMES.includes(theme));
+}
 
 /**
  * What goes between the words: the caller's separator, or the language's own
@@ -252,7 +269,7 @@ export function naturalRange(
 	separator?: string
 ): readonly [number, number] {
 	const data = WORD_DATA[language];
-	const settings: Settings = { theme: 'all', invent: 0, prefix: '', separator };
+	const settings: Settings = { theme: 'all', invent: 0, loose: true, prefix: '', separator };
 	const joiner = joinerOf(data, settings).length;
 	let min = Infinity;
 	let max = 0;
@@ -275,7 +292,7 @@ type Built = { words: string[]; nickname: string; theme: WordTheme | null };
 
 function generateOne(language: WordLanguage, settings: Settings): Built {
 	const data = WORD_DATA[language];
-	const themes = themesOf(settings.theme);
+	const themes = themesFor(settings);
 	const joiner = joinerOf(data, settings);
 	let best: Built | null = null;
 	let bestDistance = Infinity;
@@ -331,6 +348,7 @@ function resolveSettings(options: RandNicknameOptions): Settings {
 	return {
 		theme: options.theme ?? 'all',
 		invent: resolveRealism(options.realism),
+		loose: (options.realism ?? 'real') !== 'real',
 		minLength: resolveLength(options.minLength),
 		maxLength: resolveLength(options.maxLength),
 		prefix: resolvePrefix(options.startsWith),

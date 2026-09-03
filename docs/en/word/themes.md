@@ -75,6 +75,8 @@ rand_food(language="en", count=3)  # the same thing
 
 Leave the theme out and each result draws from one theme picked at random, so a batch spreads across all seventeen.
 
+`randNickname` is the exception: at the default `realism` it spans fourteen of them, leaving out `color`, `finance` and `tech`, because a word in front of a colour or a loan reads as a joke rather than a handle. Loosening `realism` puts them back, and naming one of them works at any realism. See [How a nickname behaves](../nickname/#realism-invents-words-rather-than-drawing-them).
+
 ## The rules a theme follows
 
 **Themes are disjoint.** A word in two of them would make the reported theme ambiguous, and would make the detail output name a theme the caller never asked about. When a new theme claims a word an older one already held, the word **moves** rather than being copied: `place` took the twelve places that were sitting in `concept`, `vehicle` took the bicycle and the train out of `object`, `plant` took the flowers and the trees out of `nature`, and `music` took the instruments out of `object`. Where the two senses are genuinely different words, the word is renamed instead — the English toy became `Marbles` so that `gem` could keep `Marble`.

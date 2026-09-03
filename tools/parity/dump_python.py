@@ -19,7 +19,7 @@ from randino.decorate.data import (
 )
 from randino.name.data import NAME_DATA, NAME_LANGUAGES
 from randino.name.data.ko import KO_SURNAME_ROMAN
-from randino.word.data import WORD_DATA, WORD_LANGUAGES, WORD_THEMES
+from randino.word.data import LOOSE_THEMES, WORD_DATA, WORD_LANGUAGES, WORD_THEMES
 from randino.word.data._types import SyllableSynthesis
 
 
@@ -138,6 +138,7 @@ print(
             "word": {
                 "languages": list(WORD_LANGUAGES),
                 "themes": list(WORD_THEMES),
+                "looseThemes": list(LOOSE_THEMES),
                 "data": word,
             },
             "name": {

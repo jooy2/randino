@@ -38,6 +38,20 @@ final List<WordTheme> wordThemes = List<WordTheme>.unmodifiable(<WordTheme>[
   WordTheme.tech,
 ]);
 
+/// Themes a nickname only reaches once `realism` loosens.
+///
+/// Every one of them is a word theme like any other, and `randWord` draws from
+/// them at any level; what they are not is a slice of vocabulary you can put a
+/// modifier in front of and still have something anybody would type —
+/// `멋진대출`, `BraveInvoice` and `奔跑的服务器` read as a joke rather than a
+/// handle.
+///
+/// So `randNickname` leaves them out of a null `theme` at `RandRealism.real`
+/// and puts them back at `mixed` and `invented`. A theme the caller named is
+/// always honoured: asking for `finance` and getting something else would be
+/// the parameter not working.
+const List<WordTheme> looseThemes = <WordTheme>[WordTheme.color, WordTheme.finance, WordTheme.tech];
+
 /// The dataset behind each language. Internal.
 final Map<WordLanguage, WordLanguageData> wordData =
     Map<WordLanguage, WordLanguageData>.unmodifiable(<WordLanguage, WordLanguageData>{

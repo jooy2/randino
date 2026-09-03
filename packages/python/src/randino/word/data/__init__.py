@@ -36,6 +36,19 @@ WORD_THEMES: tuple[WordTheme, ...] = (
 )
 """What the words can be about. Person names are deliberately absent."""
 
+LOOSE_THEMES: tuple[WordTheme, ...] = ("color", "finance", "tech")
+"""Themes a nickname only reaches once `realism` loosens.
+
+Every one of them is a word theme like any other, and `rand_word` draws from them at
+any level; what they are not is a slice of vocabulary you can put a modifier in front
+of and still have something anybody would type — `멋진대출`, `BraveInvoice` and
+`奔跑的服务器` read as a joke rather than a handle.
+
+So `rand_nickname` leaves them out of `theme="all"` at `realism="real"` and puts them
+back at `"mixed"` and `"invented"`. A theme the caller named is always honoured: asking
+for `finance` and getting something else would be the argument not working.
+"""
+
 WORD_DATA: dict[WordLanguage, WordLanguageData] = {
     "en": EN,
     "ko": KO,

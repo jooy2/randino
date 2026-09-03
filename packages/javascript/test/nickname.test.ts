@@ -16,7 +16,7 @@ import type {
 } from '../dist/index.js';
 // The datasets are internal, but a nickname is only as good as the words it is
 // built from — these checks are what keep person names out of them.
-import { WORD_DATA } from '../dist/word/data/index.js';
+import { LOOSE_THEMES, WORD_DATA } from '../dist/word/data/index.js';
 import { NAME_DATA } from '../dist/name/data/index.js';
 
 const SAMPLE = 60;
@@ -201,8 +201,33 @@ describe('Nickname', () => {
 			}
 		}
 
+		// `theme: 'all'` spans every theme a nickname can carry, which at the
+		// default realism is every theme but the loose ones.
+		const natural = WORD_THEMES.filter((theme) => !LOOSE_THEMES.includes(theme));
 		const themes = new Set(nicknameDetails({ count: 400 }).map((detail) => detail.theme));
-		assert.deepStrictEqual([...themes].sort(), [...WORD_THEMES].sort());
+
+		assert.deepStrictEqual([...themes].sort(), [...natural].sort());
+	});
+
+	it('realism decides which themes `all` spans', () => {
+		// A modifier in front of a colour or a loan reads as a joke, so those
+		// themes wait for the caller to loosen `realism` — or to name one.
+		for (const detail of nicknameDetails({ count: 400 })) {
+			assert.ok(!LOOSE_THEMES.includes(detail.theme!), `${detail.nickname}: ${detail.theme}`);
+		}
+
+		const loosened = new Set(
+			nicknameDetails({ realism: 'mixed', count: 400 }).map((detail) => detail.theme)
+		);
+
+		assert.ok(LOOSE_THEMES.some((theme) => loosened.has(theme)));
+
+		// A theme the caller named is honoured whatever the realism is.
+		for (const theme of LOOSE_THEMES) {
+			for (const detail of nicknameDetails({ language: 'ko', theme, count: 40 })) {
+				assert.strictEqual(detail.theme, theme, detail.nickname);
+			}
+		}
 	});
 
 	it('a word belongs to exactly one theme', () => {

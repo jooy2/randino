@@ -12,7 +12,8 @@
 // - Which shapes exist is the language's own business, and `data.frames` is
 //   where it says so. A shape carries its particles with it, so Chinese can put
 //   的 between a verb and its noun where Korean needs nothing.
-// - `realism` decides per word whether it comes out of a pool or is invented.
+// - `realism` decides per word whether it comes out of a pool or is invented,
+//   and which themes a null `theme` spans — see `looseThemes`.
 // - `minLength` / `maxLength` pick the shape first: a range too short for a
 //   modifier drops that frame instead of truncating a word.
 // - `wordSeparator` decides what goes between the words, defaulting to the way
@@ -40,6 +41,7 @@ class _Settings {
   const _Settings({
     required this.theme,
     required this.invent,
+    required this.loose,
     required this.minLength,
     required this.maxLength,
     required this.prefix,
@@ -50,10 +52,27 @@ class _Settings {
 
   /// How often one part is invented rather than drawn, as a percentage.
   final int invent;
+
+  /// Whether the themes that make an awkward nickname are in play. Off at
+  /// [RandRealism.real], which is what keeps a null theme readable.
+  final bool loose;
   final int? minLength;
   final int? maxLength;
   final String prefix;
   final String? separator;
+}
+
+/// The themes one nickname may draw from.
+///
+/// A null [_Settings.theme] spans every theme a nickname can carry, which at
+/// [RandRealism.real] is every theme but the loose ones; a theme the caller
+/// named is always honoured.
+List<WordTheme> _themesFor(_Settings settings) {
+  if (settings.theme != null || settings.loose) {
+    return themesOf(settings.theme);
+  }
+
+  return wordThemes.where((theme) => !looseThemes.contains(theme)).toList(growable: false);
 }
 
 /// What goes between the words: the caller's separator, or the language's own
@@ -250,6 +269,7 @@ LengthRange naturalRange(WordLanguage language, String? separator) {
   final settings = _Settings(
     theme: null,
     invent: 0,
+    loose: true,
     minLength: null,
     maxLength: null,
     prefix: '',
@@ -275,7 +295,7 @@ LengthRange naturalRange(WordLanguage language, String? separator) {
 
 _Built _generateOne(WordLanguage language, _Settings settings) {
   final data = wordData[language]!;
-  final themes = themesOf(settings.theme);
+  final themes = _themesFor(settings);
   final joiner = _joinerOf(data, settings);
   _Built? best;
   var bestDistance = 1 << 30;
@@ -347,6 +367,7 @@ List<NicknameDetail> generateNicknameDetails({
   final settings = _Settings(
     theme: theme,
     invent: resolveRealism(realism),
+    loose: realism != RandRealism.real,
     minLength: minLength,
     maxLength: maxLength,
     prefix: resolvePrefix(startsWith),

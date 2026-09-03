@@ -164,7 +164,7 @@ Because the token is attached afterwards, <Lang js="minLength" dart="minLength" 
 
 ### `realism` invents words rather than drawing them
 
-At `0` every word is a real one. Toward `100` the words are built from the language's own syllables, which reads as a made-up handle rather than a dictionary word.
+At `real` every word is a real one. At `invented` the words are built from the language's own syllables, which reads as a made-up handle rather than a dictionary word.
 
 ::: lang js
 
@@ -189,6 +189,32 @@ randNickname(language: WordLanguage.en, realism: RandRealism.invented, count: 3)
 ```python
 rand_nickname(language="en", realism="invented", count=3)
 # ['Duhusk', 'DresaelSlobru', 'BroureexGrosex']
+```
+
+:::
+
+`realism` also decides **which themes** <Lang js="theme: 'all'" dart="a null theme" py="theme=&quot;all&quot;" code /> spans. Three of the seventeen — `color`, `finance` and `tech` — make an awkward nickname: a word in front of a colour or a loan reads as a joke rather than a handle (`BraveInvoice`, `멋진대출`, `奔跑的服务器`). At `real` they are left out; at `mixed` and `invented` they are in. Naming one of them is always honoured, whatever the realism is — asking for `finance` and getting something else would be the option not working.
+
+::: lang js
+
+```javascript
+randNickname({ theme: 'finance', count: 2 }); // ['QuietLedger', 'RisingYield']
+```
+
+:::
+
+::: lang dart
+
+```dart
+randNickname(theme: WordTheme.finance, count: 2); // [QuietLedger, RisingYield]
+```
+
+:::
+
+::: lang py
+
+```python
+rand_nickname(theme="finance", count=2)  # ['QuietLedger', 'RisingYield']
 ```
 
 :::

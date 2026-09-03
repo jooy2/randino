@@ -15,6 +15,7 @@ import {
 import { NAME_DATA, NAME_LANGUAGES } from '../../packages/javascript/lib/name/data/index.js';
 import { KO_SURNAME_ROMAN } from '../../packages/javascript/lib/name/data/ko.js';
 import {
+	LOOSE_THEMES,
 	WORD_DATA,
 	WORD_LANGUAGES,
 	WORD_THEMES
@@ -50,6 +51,7 @@ console.log(
 		word: {
 			languages: [...WORD_LANGUAGES],
 			themes: [...WORD_THEMES],
+			looseThemes: [...LOOSE_THEMES],
 			data: Object.fromEntries(
 				Object.entries(WORD_DATA).map(([code, data]) => [
 					code,

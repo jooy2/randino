@@ -209,9 +209,39 @@ void main() {
         }
       }
 
+      // A null theme spans every theme a nickname can carry, which at the
+      // default realism is every theme but the loose ones.
+      final natural = wordThemes.where((theme) => !looseThemes.contains(theme)).toSet();
       final themes = randNicknameDetails(count: 400).map((detail) => detail.theme).toSet();
 
-      expect(themes, wordThemes.toSet());
+      expect(themes, natural);
+    });
+
+    test('realism decides which themes a null theme spans', () {
+      // A modifier in front of a colour or a loan reads as a joke, so those
+      // themes wait for the caller to loosen realism — or to name one.
+      for (final detail in randNicknameDetails(count: 400)) {
+        expect(looseThemes, isNot(contains(detail.theme)), reason: detail.nickname);
+      }
+
+      final loosened =
+          randNicknameDetails(
+            realism: RandRealism.mixed,
+            count: 400,
+          ).map((detail) => detail.theme).toSet();
+
+      expect(looseThemes.any(loosened.contains), isTrue);
+
+      // A theme the caller named is honoured whatever the realism is.
+      for (final theme in looseThemes) {
+        for (final detail in randNicknameDetails(
+          language: WordLanguage.ko,
+          theme: theme,
+          count: 40,
+        )) {
+          expect(detail.theme, theme, reason: detail.nickname);
+        }
+      }
     });
 
     test('a word belongs to exactly one theme', () {

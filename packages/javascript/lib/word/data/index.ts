@@ -31,6 +31,20 @@ export const WORD_THEMES: readonly WordTheme[] = [
 	'tech'
 ];
 
+/**
+ * Themes a nickname only reaches once `realism` loosens. Every one of them is a
+ * word theme like any other, and `randWord` draws from them at any level; what
+ * they are not is a slice of vocabulary you can put a modifier in front of and
+ * still have something anybody would type — `멋진대출`, `BraveInvoice` and
+ * `奔跑的服务器` read as a joke rather than a handle.
+ *
+ * So `randNickname` leaves them out of `theme: 'all'` at `realism: 'real'` and
+ * puts them back at `'mixed'` and `'invented'`. An explicit theme is always
+ * honoured: asking for `finance` and getting something else would be the option
+ * not working.
+ */
+export const LOOSE_THEMES: readonly WordTheme[] = ['color', 'finance', 'tech'];
+
 export const WORD_DATA: Record<WordLanguage, WordLanguageData> = {
 	en: EN,
 	ko: KO,

@@ -12,7 +12,8 @@ together is what this module is.
 - Which shapes exist is the language's own business, and `data.frames` is where it says
   so. A shape carries its particles with it, so Chinese can put 的 between a verb and
   its noun where Korean needs nothing.
-- `realism` decides per word whether it comes out of a pool or is invented.
+- `realism` decides per word whether it comes out of a pool or is invented, and which
+  themes `theme="all"` spans — see `LOOSE_THEMES`.
 - `min_length` / `max_length` pick the shape first: a range too short for a modifier
   drops that frame instead of truncating a word.
 - `word_separator` decides what goes between the words, defaulting to the way the
@@ -46,7 +47,7 @@ from randino._types import (
     WordThemeOption,
 )
 from randino.word._generator import draw_word, pool_bounds, theme_of, themes_of
-from randino.word.data import WORD_DATA, WORD_LANGUAGES, WORD_THEMES
+from randino.word.data import LOOSE_THEMES, WORD_DATA, WORD_LANGUAGES, WORD_THEMES
 from randino.word.data._types import WordFrame, WordLanguageData, WordPool, WordSlot
 
 FIT_ATTEMPTS = 12
@@ -65,10 +66,23 @@ class Settings:
 
     theme: WordThemeOption
     invent: int
+    loose: bool
     prefix: str
     min_length: int | None = None
     max_length: int | None = None
     separator: str | None = None
+
+
+def themes_for(settings: Settings) -> tuple[WordTheme, ...]:
+    """The themes one nickname may draw from.
+
+    `theme="all"` spans every theme a nickname can carry, which at `realism="real"` is
+    every theme but the loose ones; a theme the caller named is always honoured.
+    """
+    if settings.theme != "all" or settings.loose:
+        return themes_of(settings.theme)
+
+    return tuple(theme for theme in WORD_THEMES if theme not in LOOSE_THEMES)
 
 
 def joiner_of(data: WordLanguageData, settings: Settings) -> str:
@@ -254,7 +268,7 @@ def natural_range(language: WordLanguage, separator: str | None = None) -> tuple
     and pools the generator actually draws from.
     """
     data = WORD_DATA[language]
-    settings = Settings(theme="all", invent=0, prefix="", separator=separator)
+    settings = Settings(theme="all", invent=0, loose=True, prefix="", separator=separator)
     joiner = len(joiner_of(data, settings))
     ranges = [
         frame_range(frame, slot_bounds(language, data, theme), joiner)
@@ -268,7 +282,7 @@ def natural_range(language: WordLanguage, separator: str | None = None) -> tuple
 def generate_one(language: WordLanguage, settings: Settings) -> Built:
     """Build one complete nickname in one language."""
     data = WORD_DATA[language]
-    themes = themes_of(settings.theme)
+    themes = themes_for(settings)
     joiner = joiner_of(data, settings)
     best: Built | None = None
     best_distance = math.inf
@@ -330,6 +344,7 @@ def generate_nickname_details(
     settings = Settings(
         theme=theme,
         invent=resolve_realism(realism),
+        loose=realism != "real",
         min_length=resolve_length(min_length),
         max_length=resolve_length(max_length),
         prefix=resolve_prefix(starts_with),

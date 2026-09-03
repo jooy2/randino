@@ -140,6 +140,7 @@ void main() {
           for (final language in wordLanguages) language.name,
         ],
         'themes': <String>[for (final theme in wordThemes) theme.name],
+        'looseThemes': <String>[for (final theme in looseThemes) theme.name],
         'data': word,
       },
       'name': <String, Object?>{
