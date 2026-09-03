@@ -12,8 +12,8 @@ Every option and every example, with **Python** picked in the sidebar. This READ
 
 **randino** generates random person names and nicknames in the language you ask for.
 
-- **Person names** read like names people actually carry — 김민준, Emma Clover, Иванов Иван — and come with their English pronunciation. 9 languages.
-- **Nicknames** are the handles you would pick for a game or a website — 멋진사자, MistyOwl, 고양이꼬리. Built from everyday words across fourteen themes, never from person names.
+- **Person names** read like names people actually carry — Emma Clover, Jack Reeves — and come with their English pronunciation. 9 languages.
+- **Nicknames** are the handles you would pick for a game or a website — MistyOwl, CraneVoyage, RustyBoot. Built from everyday words across fourteen themes, never from person names.
 - **Words** are those fourteen themes on their own — `rand_word`, plus `rand_animal`, `rand_food` and twelve more.
 - **Decorators** attach something to a string you already have: `rand_suffix`, `rand_prefix` and `rand_modifier`.
 - Every argument is keyword-only and optional, so `rand_name()` on its own works.
@@ -37,8 +37,8 @@ from randino import rand_name
 rand_name()
 # ['Emma Clover']
 
-rand_name(language="ko", count=3)
-# ['김태윤', '원동혁', '조진우']
+rand_name(language="en", count=3)
+# ['Christina Mills', 'Jack Reeves', 'Brian Wallace']
 
 rand_name(language="ko", script="roman")
 # ['Kim Minjun']
@@ -71,17 +71,14 @@ rand_name(language="ko", output="detail")[0]
 ```python
 from randino import rand_nickname
 
-rand_nickname(language="ko", count=3)
-# ['오래된곰', '영원한도마뱀', '귀여운신화다발']
+rand_nickname(language="en", count=3)
+# ['FoggyHillside', 'CraneVoyage', 'TinyLeopardCloak']
 
-rand_nickname(language="en", count=2)
-# ['FoggyHillside', 'CraneVoyage']
+rand_nickname(language="en", theme="animal", count=2)
+# ['FloatingFalcon', 'ChewyOtter']
 
-rand_nickname(language="ko", theme="animal", count=2)
-# ['깊은연어', '하얀여우갈기']
-
-rand_nickname(language="ko", output="detail")[0]
-# NicknameDetail(nickname='오래된발견', words=('오래된', '발견'), language='ko', theme='concept')
+rand_nickname(language="en", output="detail")[0]
+# NicknameDetail(nickname='MistyOwl', words=('Misty', 'Owl'), language='en', theme='animal')
 ```
 
 | Argument                    | Type                              | Default    |
@@ -107,16 +104,16 @@ The pools the nicknames are built from, on their own. Fourteen themes, four lang
 ```python
 from randino import rand_animal, rand_food, rand_word, word_length_range
 
-rand_word(language="ko", theme="animal", count=3)
-# ['여우', '고래', '수달']
+rand_word(language="en", theme="animal", count=3)
+# ['Otter', 'Falcon', 'Lynx']
 
-rand_animal(language="en", count=2)  # ['Otter', 'Falcon']
-rand_food(language="ko", count=2)  # ['떡볶이', '녹차']
+rand_animal(language="en", count=2)  # ['Turtle', 'Crane']
+rand_food(language="en", count=2)  # ['Dumpling', 'Cocoa']
 
-rand_word(language="ko", theme="plant", output="detail")
-# [WordDetail(word='민들레', language='ko', theme='plant')]
+rand_word(language="en", theme="plant", output="detail")
+# [WordDetail(word='Cedar', language='en', theme='plant')]
 
-word_length_range("ko")  # (1, 4)
+word_length_range("en")  # (3, 11)
 ```
 
 | Argument                    | Type                             | Default   |
@@ -139,9 +136,9 @@ One function per theme: `rand_animal`, `rand_object`, `rand_nature`, `rand_plant
 ```python
 from randino import rand_nickname, rand_prefix, rand_suffix
 
-rand_suffix("멋진사자")  # '멋진사자_nVtRC'
-rand_suffix(rand_nickname(language="ko", count=2))
-# ['달력_U7aNZ', '조용한바구니_RUKAP']
+rand_suffix("MistyOwl")  # 'MistyOwl_nVtRC'
+rand_suffix(rand_nickname(language="en", count=2))
+# ['RoundSeason_RVBnC', 'RowdyDusk_dwtu5']
 
 rand_prefix("order-4021", length=4, separator="-")  # 'k3Rm-order-4021'
 rand_suffix("MistyOwl", length=8, charset="0123456789")  # 'MistyOwl_40218836'
@@ -161,12 +158,12 @@ A fresh token per value, never one for the batch. The default charset leaves out
 ```python
 from randino import rand_animal, rand_modifier
 
-rand_modifier("사자")  # '멋진사자'
+rand_modifier("Owl")  # 'MistyOwl'
 rand_modifier("Owl", separator=" ")  # 'Misty Owl'
-rand_modifier()  # '멋진'
+rand_modifier()  # 'Misty'
 
-rand_modifier(rand_animal(language="ko", count=2))
-# ['오래된곰', '영원한도마뱀']
+rand_modifier(rand_animal(language="en", count=2))
+# ['TwinklingLynx', 'OnyxCrane']
 ```
 
 | Argument    | Type                         | Default    |

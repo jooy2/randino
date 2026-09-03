@@ -12,8 +12,8 @@ Every option and every example, with **Dart** picked in the sidebar. This README
 
 **randino** generates random person names and nicknames in the language you ask for.
 
-- **Person names** read like names people actually carry — 김민준, Emma Clover, Иванов Иван — and come with their English pronunciation. 9 languages.
-- **Nicknames** are the handles you would pick for a game or a website — 멋진사자, MistyOwl, 고양이꼬리. Built from everyday words across fourteen themes, never from person names.
+- **Person names** read like names people actually carry — Emma Clover, Jack Reeves — and come with their English pronunciation. 9 languages.
+- **Nicknames** are the handles you would pick for a game or a website — MistyOwl, CraneVoyage, RustyBoot. Built from everyday words across fourteen themes, never from person names.
 - **Words** are those fourteen themes on their own — `randWord`, plus `randAnimal`, `randFood` and twelve more.
 - **Decorators** attach something to a string you already have: `randSuffix`, `randPrefix` and `randModifier`.
 - Every parameter is named and optional, and a **null enum means "every one of them"** — `randName()` on its own works.
@@ -37,8 +37,8 @@ import 'package:randino/randino.dart';
 randName();
 // ['Emma Clover']
 
-randName(language: NameLanguage.ko, count: 3);
-// ['김태윤', '원동혁', '조진우']
+randName(language: NameLanguage.en, count: 3);
+// ['Christina Mills', 'Jack Reeves', 'Brian Wallace']
 
 randName(language: NameLanguage.ko, script: NameScript.roman);
 // ['Kim Minjun']
@@ -72,17 +72,14 @@ randNameDetails(language: NameLanguage.ko).first;
 ## Nicknames
 
 ```dart
-randNickname(language: WordLanguage.ko, count: 3);
-// ['오래된곰', '영원한도마뱀', '귀여운신화다발']
+randNickname(language: WordLanguage.en, count: 3);
+// ['FoggyHillside', 'CraneVoyage', 'TinyLeopardCloak']
 
-randNickname(language: WordLanguage.en, count: 2);
-// ['FoggyHillside', 'CraneVoyage']
+randNickname(language: WordLanguage.en, theme: WordTheme.animal, count: 2);
+// ['FloatingFalcon', 'ChewyOtter']
 
-randNickname(language: WordLanguage.ko, theme: WordTheme.animal, count: 2);
-// ['깊은연어', '하얀여우갈기']
-
-randNicknameDetails(language: WordLanguage.ko).first;
-// NicknameDetail(오래된발견, [오래된, 발견], ko, concept)
+randNicknameDetails(language: WordLanguage.en).first;
+// NicknameDetail(MistyOwl, [Misty, Owl], en, animal)
 ```
 
 | Parameter                 | Type                | Default                |
@@ -103,16 +100,16 @@ Themes: `animal`, `object`, `nature`, `plant`, `gem`, `concept`, `myth`, `job`, 
 The pools the nicknames are built from, on their own. Fourteen themes, four languages, and a function per theme.
 
 ```dart
-randWord(language: WordLanguage.ko, theme: WordTheme.animal, count: 3);
-// [여우, 고래, 수달]
+randWord(language: WordLanguage.en, theme: WordTheme.animal, count: 3);
+// [Otter, Falcon, Lynx]
 
-randAnimal(language: WordLanguage.en, count: 2); // [Otter, Falcon]
-randFood(language: WordLanguage.ko, count: 2); // [떡볶이, 녹차]
+randAnimal(language: WordLanguage.en, count: 2); // [Turtle, Crane]
+randFood(language: WordLanguage.en, count: 2); // [Dumpling, Cocoa]
 
-randWordDetails(language: WordLanguage.ko, theme: WordTheme.plant).first;
-// WordDetail(민들레, ko, plant)
+randWordDetails(language: WordLanguage.en, theme: WordTheme.plant).first;
+// WordDetail(Cedar, en, plant)
 
-wordLengthRange(language: WordLanguage.ko); // LengthRange(1, 4)
+wordLengthRange(language: WordLanguage.en); // LengthRange(3, 11)
 ```
 
 | Parameter                 | Type            | Default            |
@@ -132,9 +129,9 @@ One function per theme: `randAnimal`, `randObject`, `randNature`, `randPlant`, `
 `randSuffix`, `randPrefix` and `randModifier` attach something to a string you already have, rather than generating one. They take anything, not just this library's output, which is why none of them is a parameter on a generator — and each of them works with no value at all, handing back the thing it would have attached.
 
 ```dart
-randSuffix(value: '멋진사자'); // '멋진사자_nVtRC'
-randSuffixAll(randNickname(language: WordLanguage.ko, count: 2));
-// [달력_U7aNZ, 조용한바구니_RUKAP]
+randSuffix(value: 'MistyOwl'); // 'MistyOwl_nVtRC'
+randSuffixAll(randNickname(language: WordLanguage.en, count: 2));
+// [RoundSeason_RVBnC, RowdyDusk_dwtu5]
 
 randPrefix(value: 'order-4021', length: 4, separator: '-'); // 'k3Rm-order-4021'
 randSuffix(value: 'MistyOwl', length: 8, charset: '0123456789'); // 'MistyOwl_40218836'
@@ -152,12 +149,12 @@ A fresh token per value, never one for the batch. The default charset leaves out
 `randModifier` attaches a word instead of a token — what `randNickname`'s `includeModifier` used to do, for any string:
 
 ```dart
-randModifier(value: '사자'); // '멋진사자'
+randModifier(value: 'Owl'); // 'MistyOwl'
 randModifier(value: 'Owl', separator: ' '); // 'Misty Owl'
-randModifier(); // '멋진'
+randModifier(); // 'Misty'
 
-randModifierAll(randAnimal(language: WordLanguage.ko, count: 2));
-// [오래된곰, 영원한도마뱀]
+randModifierAll(randAnimal(language: WordLanguage.en, count: 2));
+// [TwinklingLynx, OnyxCrane]
 ```
 
 | Parameter   | Type            | Default    |
@@ -193,7 +190,7 @@ The two generate the same output from the same data, and only the surface is Dar
 | `[number, number]`                 | `LengthRange`, which compares by value         |
 | `NameDetail` / `NicknameDetail` interfaces | The same two names, as classes         |
 | `output: 'detail'`                 | `randNameDetails` / `randNicknameDetails` / `randWordDetails` |
-| `randModifier('사자')`             | `randModifier(value: '사자')` — every parameter is named |
+| `randModifier('Owl')`             | `randModifier(value: 'Owl')` — every parameter is named |
 | `randSuffix(['a', 'b'])`           | `randSuffixAll(['a', 'b'])`                    |
 
 The last two are the same limitation twice: Dart has neither overloads nor union types, so one function cannot return `List<String>` for one argument and `List<NameDetail>` for another. Where npm and PyPI pick the shape with an option, pub.dev picks it with a second function.

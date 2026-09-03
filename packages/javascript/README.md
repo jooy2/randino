@@ -12,8 +12,8 @@ Every option and every example, with **JavaScript** picked in the sidebar. This 
 
 **randino** generates random person names and nicknames in the language you ask for.
 
-- **Person names** read like names people actually carry — 김민준, Emma Clover, Иванов Иван — and come with their English pronunciation. 9 languages.
-- **Nicknames** are the handles you would pick for a game or a website — 멋진사자, MistyOwl, 고양이꼬리. Built from everyday words across fourteen themes, never from person names.
+- **Person names** read like names people actually carry — Emma Clover, Jack Reeves — and come with their English pronunciation. 9 languages.
+- **Nicknames** are the handles you would pick for a game or a website — MistyOwl, CraneVoyage, RustyBoot. Built from everyday words across fourteen themes, never from person names.
 - **Words** are those themes on their own — `randWord`, plus `randAnimal`, `randFood` and twelve more.
 - **Decorators** attach something to a string you already have: `randSuffix`, `randPrefix` and `randModifier`.
 - One options object per generator, every option optional: `randName()` on its own works.
@@ -37,8 +37,8 @@ import { randName } from 'randino';
 randName();
 // ['Emma Clover']
 
-randName({ language: 'ko', count: 3 });
-// ['김태윤', '원동혁', '조진우']
+randName({ language: 'en', count: 3 });
+// ['Christina Mills', 'Jack Reeves', 'Brian Wallace']
 
 randName({ language: 'ko', script: 'roman' });
 // ['Kim Minjun']
@@ -72,21 +72,18 @@ randName({ language: 'ko', output: 'detail' });
 ```javascript
 import { randNickname } from 'randino';
 
-randNickname({ language: 'ko', count: 3 });
-// ['오래된곰', '영원한도마뱀', '귀여운신화다발']
+randNickname({ language: 'en', count: 3 });
+// ['FoggyHillside', 'CraneVoyage', 'TinyLeopardCloak']
 
-randNickname({ language: 'en', count: 2 });
-// ['FoggyHillside', 'CraneVoyage']
+randNickname({ language: 'en', theme: 'animal', count: 2 });
+// ['FloatingFalcon', 'ChewyOtter']
 
-randNickname({ language: 'ko', theme: 'animal', count: 2 });
-// ['깊은연어', '하얀여우갈기']
-
-randNickname({ language: 'ko', output: 'detail' });
+randNickname({ language: 'en', output: 'detail' });
 // [{
-//   nickname: '오래된발견',
-//   words: ['오래된', '발견'],
-//   language: 'ko',
-//   theme: 'concept'
+//   nickname: 'MistyOwl',
+//   words: ['Misty', 'Owl'],
+//   language: 'en',
+//   theme: 'animal'
 // }]
 ```
 
@@ -111,16 +108,16 @@ The pools the nicknames are built from, on their own. Fourteen themes, four lang
 ```javascript
 import { randAnimal, randFood, randWord, wordLengthRange } from 'randino';
 
-randWord({ language: 'ko', theme: 'animal', count: 3 });
-// ['여우', '고래', '수달']
+randWord({ language: 'en', theme: 'animal', count: 3 });
+// ['Otter', 'Falcon', 'Lynx']
 
-randAnimal({ language: 'en', count: 2 }); // ['Otter', 'Falcon']
-randFood({ language: 'ko', count: 2 }); // ['떡볶이', '녹차']
+randAnimal({ language: 'en', count: 2 }); // ['Turtle', 'Crane']
+randFood({ language: 'en', count: 2 }); // ['Dumpling', 'Cocoa']
 
-randWord({ language: 'ko', theme: 'plant', output: 'detail' });
-// [{ word: '민들레', language: 'ko', theme: 'plant' }]
+randWord({ language: 'en', theme: 'plant', output: 'detail' });
+// [{ word: 'Cedar', language: 'en', theme: 'plant' }]
 
-wordLengthRange('ko'); // [1, 4]
+wordLengthRange('en'); // [3, 11]
 ```
 
 | Option                    | Type                             | Default   |
@@ -143,9 +140,9 @@ One function per theme: `randAnimal`, `randObject`, `randNature`, `randPlant`, `
 ```javascript
 import { randNickname, randPrefix, randSuffix } from 'randino';
 
-randSuffix('멋진사자'); // '멋진사자_nVtRC'
-randSuffix(randNickname({ language: 'ko', count: 2 }));
-// ['달력_U7aNZ', '조용한바구니_RUKAP']
+randSuffix('MistyOwl'); // 'MistyOwl_nVtRC'
+randSuffix(randNickname({ language: 'en', count: 2 }));
+// ['RoundSeason_RVBnC', 'RowdyDusk_dwtu5']
 
 randPrefix('order-4021', { length: 4, separator: '-' }); // 'k3Rm-order-4021'
 randSuffix('MistyOwl', { length: 8, charset: '0123456789' }); // 'MistyOwl_40218836'
@@ -165,12 +162,12 @@ A fresh token per value, never one for the batch. The default charset leaves out
 ```javascript
 import { randAnimal, randModifier } from 'randino';
 
-randModifier('사자'); // '멋진사자'
+randModifier('Owl'); // 'MistyOwl'
 randModifier('Owl', { separator: ' ' }); // 'Misty Owl'
-randModifier(); // '멋진'
+randModifier(); // 'Misty'
 
-randModifier(randAnimal({ language: 'ko', count: 2 }));
-// ['오래된곰', '영원한도마뱀']
+randModifier(randAnimal({ language: 'en', count: 2 }));
+// ['TwinklingLynx', 'OnyxCrane']
 ```
 
 | Option      | Type                 | Default    |

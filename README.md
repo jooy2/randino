@@ -12,8 +12,8 @@ Every option, every language and every example — pick **JavaScript**, **Dart**
 
 **randino** generates random text in the language you ask for. Today that is person names and nicknames; the shape it is built in — one function per kind of text, one set of options, per-language datasets — is meant to hold whatever comes next.
 
-- **Person names** read like names people actually carry — 김민준, Emma Clover, Иванов Иван — and come with their English pronunciation. 9 languages.
-- **Nicknames** are the handles you would pick for a game or a website — 멋진사자, MistyOwl, 고양이꼬리. Built from everyday words across fourteen themes, never from person names, with over nine million combinations in Korean and English before a random suffix is added.
+- **Person names** read like names people actually carry — Emma Clover, Jack Reeves — and come with their English pronunciation. 9 languages.
+- **Nicknames** are the handles you would pick for a game or a website — MistyOwl, CraneVoyage, RustyBoot. Built from everyday words across fourteen themes, never from person names, with over nine million combinations in Korean and English before a random suffix is added.
 - **Words** are those fourteen themes on their own — `randWord`, and a function per theme: `randAnimal`, `randFood`, `randGem` and eleven more.
 - **Decorators** attach something to a string you already have rather than generating one: a random token with `randSuffix` and `randPrefix`, a modifier with `randModifier`.
 - One options set per generator: language, length, count, and a style setting that runs from realistic to fully invented.
@@ -40,17 +40,17 @@ npm install randino
 ```javascript
 import { randName, randNickname, randSuffix } from 'randino';
 
-randName({ language: 'ko', count: 3 });
-// ['김태윤', '원동혁', '조진우']
+randName({ language: 'en', count: 3 });
+// ['Christina Mills', 'Jack Reeves', 'Brian Wallace']
 
 randName({ language: 'en', gender: 'female', includeMiddleName: true });
 // ['Grace Amelia Bennett']
 
-randNickname({ language: 'ko', count: 3 });
-// ['오래된곰', '영원한도마뱀', '귀여운신화다발']
+randNickname({ language: 'en', count: 3 });
+// ['FoggyHillside', 'CraneVoyage', 'TinyLeopardCloak']
 
-randSuffix(randNickname({ language: 'ko', count: 2 }));
-// ['달력_U7aNZ', '조용한바구니_RUKAP']
+randSuffix(randNickname({ language: 'en', count: 2 }));
+// ['RoundSeason_RVBnC', 'RowdyDusk_dwtu5']
 ```
 
 ESM, typed, and no runtime dependencies. [**The JavaScript quick start**](packages/javascript/README.md) has the rest.
@@ -64,17 +64,17 @@ dart pub add randino
 ```dart
 import 'package:randino/randino.dart';
 
-randName(language: NameLanguage.ko, count: 3);
-// ['김태윤', '원동혁', '조진우']
+randName(language: NameLanguage.en, count: 3);
+// ['Christina Mills', 'Jack Reeves', 'Brian Wallace']
 
 randName(language: NameLanguage.en, gender: NameGender.female, includeMiddleName: true);
 // ['Grace Amelia Bennett']
 
-randNickname(language: WordLanguage.ko, count: 3);
-// ['오래된곰', '영원한도마뱀', '귀여운신화다발']
+randNickname(language: WordLanguage.en, count: 3);
+// ['FoggyHillside', 'CraneVoyage', 'TinyLeopardCloak']
 
-randSuffixAll(randNickname(language: WordLanguage.ko, count: 2));
-// ['달력_U7aNZ', '조용한바구니_RUKAP']
+randSuffixAll(randNickname(language: WordLanguage.en, count: 2));
+// ['RoundSeason_RVBnC', 'RowdyDusk_dwtu5']
 ```
 
 Pure Dart — it imports nothing but `dart:math`, so it runs on the VM, on the web and inside Flutter on every platform. Options are named parameters rather than an options object, which is the one deliberate difference from the JavaScript API. [**The Dart quick start**](packages/dart/README.md) has the rest.
@@ -88,17 +88,17 @@ pip install randino
 ```python
 from randino import rand_name, rand_nickname, rand_suffix
 
-rand_name(language="ko", count=3)
-# ['김태윤', '원동혁', '조진우']
+rand_name(language="en", count=3)
+# ['Christina Mills', 'Jack Reeves', 'Brian Wallace']
 
 rand_name(language="en", gender="female", include_middle_name=True)
 # ['Grace Amelia Bennett']
 
-rand_nickname(language="ko", count=3)
-# ['오래된곰', '영원한도마뱀', '귀여운신화다발']
+rand_nickname(language="en", count=3)
+# ['FoggyHillside', 'CraneVoyage', 'TinyLeopardCloak']
 
-rand_suffix(rand_nickname(language="ko", count=2))
-# ['달력_U7aNZ', '조용한바구니_RUKAP']
+rand_suffix(rand_nickname(language="en", count=2))
+# ['RoundSeason_RVBnC', 'RowdyDusk_dwtu5']
 ```
 
 Pure Python — it imports nothing outside the standard library, and ships a `py.typed` marker so mypy and Pyright read its annotations. Options are keyword-only arguments in `snake_case`; the values are the same strings the JavaScript package takes, typed as `Literal`. [**The Python quick start**](packages/python/README.md) has the rest.
@@ -123,10 +123,10 @@ Every generator takes a language, or mixes every language it supports when you l
 
 | Generator      | JavaScript and Dart          | Python                       | Example             |
 | -------------- | ---------------------------- | ---------------------------- | ------------------- |
-| Person names   | `randName`                   | `rand_name`                  | 김민준 → Kim Minjun |
-| Nicknames      | `randNickname`               | `rand_nickname`              | 멋진사자, MistyOwl  |
-| Words          | `randWord`, `randAnimal`, …  | `rand_word`, `rand_animal`, … | 여우, Lantern       |
-| Decorators     | `randSuffix`, `randPrefix`, `randModifier` | `rand_suffix`, `rand_prefix`, `rand_modifier` | 멋진사자_nVtRC, 멋진사자 |
+| Person names   | `randName`                   | `rand_name`                  | Emma Clover, Jack Reeves |
+| Nicknames      | `randNickname`               | `rand_nickname`              | MistyOwl, CraneVoyage |
+| Words          | `randWord`, `randAnimal`, …  | `rand_word`, `rand_animal`, … | Lantern, Otter |
+| Decorators     | `randSuffix`, `randPrefix`, `randModifier` | `rand_suffix`, `rand_prefix`, `rand_modifier` | MistyOwl_nVtRC, MistyOwl |
 
 Each generator returns strings by default, or one detail object per result with <code>output: 'detail'</code> — both scripts of a name, or the words a nickname was built from. The Dart package spells that as a second function (`randNameDetails`), because Dart has no way to make one function's return type depend on an argument.
 
