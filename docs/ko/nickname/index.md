@@ -1,14 +1,14 @@
 # 닉네임
 
-닉네임은 게임이나 웹사이트에서 쓸 법한 핸들입니다. 멋진사자, MistyOwl, 고양이꼬리 같은 것들이죠. randino는 일상 단어에 무언가를 덧붙여 닉네임을 만듭니다. 앞에 수식어를 붙이거나, 뒤에 단어를 하나 더 붙이거나, 둘 다 하는 식입니다.
+닉네임은 게임이나 웹사이트에서 쓸 법한 핸들입니다. MistyOwl, CraneVoyage, RustyBoot 같은 것들이죠. randino는 일상 단어에 무언가를 덧붙여 닉네임을 만듭니다. 앞에 수식어를 붙이거나, 뒤에 단어를 하나 더 붙이거나, 둘 다 하는 식입니다.
 
 ::: lang js
 
 ```javascript
 import { randNickname } from 'randino';
 
-randNickname({ language: 'ko', count: 3 });
-// ['오래된곰', '영원한도마뱀', '귀여운신화다발']
+randNickname({ language: 'en', count: 3 });
+// ['FoggyHillside', 'CraneVoyage', 'TinyLeopardCloak']
 ```
 
 :::
@@ -18,8 +18,8 @@ randNickname({ language: 'ko', count: 3 });
 ```dart
 import 'package:randino/randino.dart';
 
-randNickname(language: WordLanguage.ko, count: 3);
-// ['오래된곰', '영원한도마뱀', '귀여운신화다발']
+randNickname(language: WordLanguage.en, count: 3);
+// ['FoggyHillside', 'CraneVoyage', 'TinyLeopardCloak']
 ```
 
 :::
@@ -29,13 +29,13 @@ randNickname(language: WordLanguage.ko, count: 3);
 ```python
 from randino import rand_nickname
 
-rand_nickname(language="ko", count=3)
-# ['오래된곰', '영원한도마뱀', '귀여운신화다발']
+rand_nickname(language="en", count=3)
+# ['FoggyHillside', 'CraneVoyage', 'TinyLeopardCloak']
 ```
 
 :::
 
-**사람 이름은 절대 쓰지 않습니다.** 이름과 닉네임을 하나가 아닌 두 생성기로 나눈 이유가 바로 이 규칙입니다. 누군가의 이름으로 만든 핸들은 그 사람의 실명처럼 읽히지만, 사자와 멋진으로 만든 핸들은 핸들로 읽힙니다. 영어 단어 풀은 영어 사람 이름 풀과 겹치지 않는지 자동으로 검사하며, 그래서 `job` 테마에 `Knight`, `Baker`, `Hunter`가 없고 `plant` 테마에 `Rose`나 `Ivy`가 없습니다.
+**사람 이름은 절대 쓰지 않습니다.** 이름과 닉네임을 하나가 아닌 두 생성기로 나눈 이유가 바로 이 규칙입니다. 누군가의 이름으로 만든 핸들은 그 사람의 실명처럼 읽히지만, `Owl`과 `Misty`로 만든 핸들은 핸들로 읽힙니다. 영어 단어 풀은 영어 사람 이름 풀과 겹치지 않는지 자동으로 검사하며, 그래서 `job` 테마에 `Knight`, `Baker`, `Hunter`가 없고 `plant` 테마에 `Rose`나 `Ivy`가 없습니다.
 
 한국어와 일본어는 이 검사를 적용할 수 없습니다. 하늘, 별, 森은 이름으로도 쓰이는 일상 명사이기 때문입니다. 그래도 `아름다운하늘`은 누구의 이름도 아닙니다.
 
@@ -59,9 +59,6 @@ rand_nickname(language="ko", count=3)
 ::: lang js
 
 ```javascript
-randNickname({ language: 'ko', count: 4, minLength: 4, maxLength: 6 });
-// ['엉뚱한진리춤', '엉뚱한가위별', '해바라기', '별빛안개열매']
-
 randNickname({ language: 'en', count: 4, minLength: 4, maxLength: 9 });
 // ['RustyBoot', 'DustyDuck', 'DustyMyth', 'RiddleEgg']
 ```
@@ -71,9 +68,6 @@ randNickname({ language: 'en', count: 4, minLength: 4, maxLength: 9 });
 ::: lang dart
 
 ```dart
-randNickname(language: WordLanguage.ko, count: 4, minLength: 4, maxLength: 6);
-// ['엉뚱한진리춤', '엉뚱한가위별', '해바라기', '별빛안개열매']
-
 randNickname(language: WordLanguage.en, count: 4, minLength: 4, maxLength: 9);
 // ['RustyBoot', 'DustyDuck', 'DustyMyth', 'RiddleEgg']
 ```
@@ -83,9 +77,6 @@ randNickname(language: WordLanguage.en, count: 4, minLength: 4, maxLength: 9);
 ::: lang py
 
 ```python
-rand_nickname(language="ko", count=4, min_length=4, max_length=6)
-# ['엉뚱한진리춤', '엉뚱한가위별', '해바라기', '별빛안개열매']
-
 rand_nickname(language="en", count=4, min_length=4, max_length=9)
 # ['RustyBoot', 'DustyDuck', 'DustyMyth', 'RiddleEgg']
 ```
@@ -101,8 +92,8 @@ rand_nickname(language="en", count=4, min_length=4, max_length=9)
 ::: lang js
 
 ```javascript
-randNickname({ language: 'ko', wordSeparator: ' ', count: 4 });
-// ['역사 발톱', '하늘빛 상상', '차가운 기억', '불빛 돛']
+randNickname({ language: 'en', wordSeparator: ' ', count: 4 });
+// ['Soldier', 'Hollow Petal', 'Syrupy Mica Tale', 'Spinning Cathedral']
 
 randNickname({ language: 'en', wordSeparator: '-', count: 4 });
 // ['Headphone', 'Soft-Bat', 'Genial-Moose-Cove', 'Dreamy-Umbrella-Halo']
@@ -113,8 +104,8 @@ randNickname({ language: 'en', wordSeparator: '-', count: 4 });
 ::: lang dart
 
 ```dart
-randNickname(language: WordLanguage.ko, wordSeparator: ' ', count: 4);
-// ['역사 발톱', '하늘빛 상상', '차가운 기억', '불빛 돛']
+randNickname(language: WordLanguage.en, wordSeparator: ' ', count: 4);
+// ['Soldier', 'Hollow Petal', 'Syrupy Mica Tale', 'Spinning Cathedral']
 
 randNickname(language: WordLanguage.en, wordSeparator: '-', count: 4);
 // ['Headphone', 'Soft-Bat', 'Genial-Moose-Cove', 'Dreamy-Umbrella-Halo']
@@ -125,8 +116,8 @@ randNickname(language: WordLanguage.en, wordSeparator: '-', count: 4);
 ::: lang py
 
 ```python
-rand_nickname(language="ko", word_separator=" ", count=4)
-# ['역사 발톱', '하늘빛 상상', '차가운 기억', '불빛 돛']
+rand_nickname(language="en", word_separator=" ", count=4)
+# ['Soldier', 'Hollow Petal', 'Syrupy Mica Tale', 'Spinning Cathedral']
 
 rand_nickname(language="en", word_separator="-", count=4)
 # ['Headphone', 'Soft-Bat', 'Genial-Moose-Cove', 'Dreamy-Umbrella-Halo']
@@ -143,8 +134,8 @@ rand_nickname(language="en", word_separator="-", count=4)
 ::: lang js
 
 ```javascript
-randSuffix(randNickname({ language: 'ko', count: 3 }));
-// ['달력_U7aNZ', '금빛독수리다발_AVcCV', '조용한바구니_RUKAP']
+randSuffix(randNickname({ language: 'en', count: 3 }));
+// ['RoundSeason_RVBnC', 'RowdyDusk_dwtu5', 'RovingLakeShard_QqMVH']
 ```
 
 :::
@@ -152,8 +143,8 @@ randSuffix(randNickname({ language: 'ko', count: 3 }));
 ::: lang dart
 
 ```dart
-randSuffixAll(randNickname(language: WordLanguage.ko, count: 3));
-// ['달력_U7aNZ', '금빛독수리다발_AVcCV', '조용한바구니_RUKAP']
+randSuffixAll(randNickname(language: WordLanguage.en, count: 3));
+// ['RoundSeason_RVBnC', 'RowdyDusk_dwtu5', 'RovingLakeShard_QqMVH']
 ```
 
 :::
@@ -161,8 +152,8 @@ randSuffixAll(randNickname(language: WordLanguage.ko, count: 3));
 ::: lang py
 
 ```python
-rand_suffix(rand_nickname(language="ko", count=3))
-# ['달력_U7aNZ', '금빛독수리다발_AVcCV', '조용한바구니_RUKAP']
+rand_suffix(rand_nickname(language="en", count=3))
+# ['RoundSeason_RVBnC', 'RowdyDusk_dwtu5', 'RovingLakeShard_QqMVH']
 ```
 
 :::
@@ -176,9 +167,6 @@ rand_suffix(rand_nickname(language="ko", count=3))
 ::: lang js
 
 ```javascript
-randNickname({ language: 'ko', style: 100, count: 3 });
-// ['토한조해한', '가파모토히', '리누채무애저차부']
-
 randNickname({ language: 'en', style: 100, count: 3 });
 // ['Duhusk', 'DresaelSlobru', 'BroureexGrosex']
 ```
@@ -188,9 +176,6 @@ randNickname({ language: 'en', style: 100, count: 3 });
 ::: lang dart
 
 ```dart
-randNickname(language: WordLanguage.ko, style: 100, count: 3);
-// ['토한조해한', '가파모토히', '리누채무애저차부']
-
 randNickname(language: WordLanguage.en, style: 100, count: 3);
 // ['Duhusk', 'DresaelSlobru', 'BroureexGrosex']
 ```
@@ -200,9 +185,6 @@ randNickname(language: WordLanguage.en, style: 100, count: 3);
 ::: lang py
 
 ```python
-rand_nickname(language="ko", style=100, count=3)
-# ['토한조해한', '가파모토히', '리누채무애저차부']
-
 rand_nickname(language="en", style=100, count=3)
 # ['Duhusk', 'DresaelSlobru', 'BroureexGrosex']
 ```

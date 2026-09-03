@@ -67,12 +67,12 @@ Dart에는 인자에 따라 반환 타입이 달라지는 함수를 만들 방�
 ```javascript
 import { randNickname } from 'randino';
 
-randNickname({ language: 'ko', output: 'detail' });
+randNickname({ language: 'en', output: 'detail' });
 // [{
-//   nickname: '오래된발견',
-//   words: ['오래된', '발견'],
-//   language: 'ko',
-//   theme: 'concept'
+//   nickname: 'MistyOwl',
+//   words: ['Misty', 'Owl'],
+//   language: 'en',
+//   theme: 'animal'
 // }]
 ```
 
@@ -83,8 +83,8 @@ randNickname({ language: 'ko', output: 'detail' });
 ```dart
 import 'package:randino/randino.dart';
 
-randNicknameDetails(language: WordLanguage.ko);
-// [NicknameDetail(오래된발견, [오래된, 발견], ko, concept)]
+randNicknameDetails(language: WordLanguage.en);
+// [NicknameDetail(MistyOwl, [Misty, Owl], en, animal)]
 ```
 
 :::
@@ -94,9 +94,9 @@ randNicknameDetails(language: WordLanguage.ko);
 ```python
 from randino import rand_nickname
 
-rand_nickname(language="ko", output="detail")
-# [NicknameDetail(nickname='오래된발견', words=('오래된', '발견'),
-#                 language='ko', theme='concept')]
+rand_nickname(language="en", output="detail")
+# [NicknameDetail(nickname='MistyOwl', words=('Misty', 'Owl'),
+#                 language='en', theme='animal')]
 ```
 
 :::
@@ -114,7 +114,7 @@ rand_nickname(language="ko", output="detail")
 
 테마는 **보고되는 값이지 요구되는 값이 아닙니다.** 테마에서 뽑은 단어는 그 테마를 보고하고, 만들어낸 단어는 우연히 실제 단어와 같아질 수 있으므로 14개 테마 전체에서 찾아본 뒤 어디에도 없으면 null을 보고합니다.
 
-여기서 두 가지 우연이 따라오는데, 버그가 아니라 예상해야 할 동작입니다. 하나는 같은 단어가 수식어이면서 명사일 수 있다는 것입니다(`무지개`, `Marble`, `自由`). 다른 하나는 만들어낸 단어가 우연히 실제 단어를 이룰 수 있다는 것입니다. `나` + `비`는 `나비`이므로 `style: 100`으로 만든 닉네임이 `theme`을 `animal`로 보고할 수 있습니다.
+여기서 두 가지 우연이 따라오는데, 버그가 아니라 예상해야 할 동작입니다. 하나는 같은 단어가 수식어이면서 명사일 수 있다는 것입니다(`Marble`이 그렇습니다). 다른 하나는 만들어낸 단어가 우연히 실제 단어를 이룰 수 있다는 것입니다. 음절 템플릿이 이따금 `Snake`를 만들어내므로 `style: 100`으로 만든 닉네임이 `theme`을 `animal`로 보고할 수 있습니다.
 
 ## 예제
 
@@ -179,8 +179,8 @@ rand_nickname(language="zh", count=4)
 ::: lang js
 
 ```javascript
-randNickname({ language: 'ko', theme: 'animal', count: 3 });
-// ['깊은연어', '하얀여우갈기', '떠도는잉어']
+randNickname({ language: 'en', theme: 'animal', count: 3 });
+// ['FloatingFalcon', 'ChewyOtter', 'PlacidMantis']
 
 randNickname({ language: 'en', theme: 'gem', count: 3 });
 // ['PolarObsidian', 'AmberGeode', 'QuietMalachite']
@@ -191,8 +191,8 @@ randNickname({ language: 'en', theme: 'gem', count: 3 });
 ::: lang dart
 
 ```dart
-randNickname(language: WordLanguage.ko, theme: WordTheme.animal, count: 3);
-// ['깊은연어', '하얀여우갈기', '떠도는잉어']
+randNickname(language: WordLanguage.en, theme: WordTheme.animal, count: 3);
+// ['FloatingFalcon', 'ChewyOtter', 'PlacidMantis']
 
 randNickname(language: WordLanguage.en, theme: WordTheme.gem, count: 3);
 // ['PolarObsidian', 'AmberGeode', 'QuietMalachite']
@@ -203,8 +203,8 @@ randNickname(language: WordLanguage.en, theme: WordTheme.gem, count: 3);
 ::: lang py
 
 ```python
-rand_nickname(language="ko", theme="animal", count=3)
-# ['깊은연어', '하얀여우갈기', '떠도는잉어']
+rand_nickname(language="en", theme="animal", count=3)
+# ['FloatingFalcon', 'ChewyOtter', 'PlacidMantis']
 
 rand_nickname(language="en", theme="gem", count=3)
 # ['PolarObsidian', 'AmberGeode', 'QuietMalachite']
@@ -219,14 +219,11 @@ rand_nickname(language="en", theme="gem", count=3)
 ::: lang js
 
 ```javascript
-randNickname({ language: 'ko', wordSeparator: ' ', count: 4 });
-// ['역사 발톱', '하늘빛 상상', '차가운 기억', '불빛 돛']
+randNickname({ language: 'en', wordSeparator: ' ', count: 4 });
+// ['Soldier', 'Hollow Petal', 'Syrupy Mica Tale', 'Spinning Cathedral']
 
 randNickname({ language: 'en', wordSeparator: '-', count: 4 });
 // ['Headphone', 'Soft-Bat', 'Genial-Moose-Cove', 'Dreamy-Umbrella-Halo']
-
-randNickname({ language: 'ja', wordSeparator: '・', count: 3 });
-// ['硝子の・トラック', '甘い・珠玉', '美しい・ヒツジ']
 ```
 
 :::
@@ -234,14 +231,11 @@ randNickname({ language: 'ja', wordSeparator: '・', count: 3 });
 ::: lang dart
 
 ```dart
-randNickname(language: WordLanguage.ko, wordSeparator: ' ', count: 4);
-// ['역사 발톱', '하늘빛 상상', '차가운 기억', '불빛 돛']
+randNickname(language: WordLanguage.en, wordSeparator: ' ', count: 4);
+// ['Soldier', 'Hollow Petal', 'Syrupy Mica Tale', 'Spinning Cathedral']
 
 randNickname(language: WordLanguage.en, wordSeparator: '-', count: 4);
 // ['Headphone', 'Soft-Bat', 'Genial-Moose-Cove', 'Dreamy-Umbrella-Halo']
-
-randNickname(language: WordLanguage.ja, wordSeparator: '・', count: 3);
-// ['硝子の・トラック', '甘い・珠玉', '美しい・ヒツジ']
 ```
 
 :::
@@ -249,14 +243,11 @@ randNickname(language: WordLanguage.ja, wordSeparator: '・', count: 3);
 ::: lang py
 
 ```python
-rand_nickname(language="ko", word_separator=" ", count=4)
-# ['역사 발톱', '하늘빛 상상', '차가운 기억', '불빛 돛']
+rand_nickname(language="en", word_separator=" ", count=4)
+# ['Soldier', 'Hollow Petal', 'Syrupy Mica Tale', 'Spinning Cathedral']
 
 rand_nickname(language="en", word_separator="-", count=4)
 # ['Headphone', 'Soft-Bat', 'Genial-Moose-Cove', 'Dreamy-Umbrella-Halo']
-
-rand_nickname(language="ja", word_separator="・", count=3)
-# ['硝子の・トラック', '甘い・珠玉', '美しい・ヒツジ']
 ```
 
 :::
@@ -270,11 +261,11 @@ rand_nickname(language="ja", word_separator="・", count=3)
 ::: lang js
 
 ```javascript
-randSuffix(randNickname({ language: 'ko', count: 3 }));
-// ['달력_U7aNZ', '금빛독수리다발_AVcCV', '조용한바구니_RUKAP']
+randSuffix(randNickname({ language: 'en', count: 3 }));
+// ['RoundSeason_RVBnC', 'RowdyDusk_dwtu5', 'RovingLakeShard_QqMVH']
 
-randSuffix(randNickname({ language: 'ko', count: 2 }), { length: 8, separator: '-' });
-// ['금빛앵무새여행-Qw9NND4j', '느린연필-uxscYCy6']
+randSuffix(randNickname({ language: 'en', count: 2 }), { length: 8, separator: '-' });
+// ['GenialFern-9xq9SgJf', 'BoldBicycle-PGc4keqM']
 ```
 
 :::
@@ -282,15 +273,15 @@ randSuffix(randNickname({ language: 'ko', count: 2 }), { length: 8, separator: '
 ::: lang dart
 
 ```dart
-randSuffixAll(randNickname(language: WordLanguage.ko, count: 3));
-// ['달력_U7aNZ', '금빛독수리다발_AVcCV', '조용한바구니_RUKAP']
+randSuffixAll(randNickname(language: WordLanguage.en, count: 3));
+// ['RoundSeason_RVBnC', 'RowdyDusk_dwtu5', 'RovingLakeShard_QqMVH']
 
 randSuffixAll(
-  randNickname(language: WordLanguage.ko, count: 2),
+  randNickname(language: WordLanguage.en, count: 2),
   length: 8,
   separator: '-',
 );
-// ['금빛앵무새여행-Qw9NND4j', '느린연필-uxscYCy6']
+// ['GenialFern-9xq9SgJf', 'BoldBicycle-PGc4keqM']
 ```
 
 :::
@@ -298,11 +289,11 @@ randSuffixAll(
 ::: lang py
 
 ```python
-rand_suffix(rand_nickname(language="ko", count=3))
-# ['달력_U7aNZ', '금빛독수리다발_AVcCV', '조용한바구니_RUKAP']
+rand_suffix(rand_nickname(language="en", count=3))
+# ['RoundSeason_RVBnC', 'RowdyDusk_dwtu5', 'RovingLakeShard_QqMVH']
 
-rand_suffix(rand_nickname(language="ko", count=2), length=8, separator="-")
-# ['금빛앵무새여행-Qw9NND4j', '느린연필-uxscYCy6']
+rand_suffix(rand_nickname(language="en", count=2), length=8, separator="-")
+# ['GenialFern-9xq9SgJf', 'BoldBicycle-PGc4keqM']
 ```
 
 :::
@@ -314,9 +305,6 @@ rand_suffix(rand_nickname(language="ko", count=2), length=8, separator="-")
 ::: lang js
 
 ```javascript
-randNickname({ language: 'ko', style: 100, count: 3 });
-// ['토한조해한', '가파모토히', '리누채무애저차부']
-
 randNickname({ language: 'en', style: 100, count: 3 });
 // ['Duhusk', 'DresaelSlobru', 'BroureexGrosex']
 ```
@@ -326,9 +314,6 @@ randNickname({ language: 'en', style: 100, count: 3 });
 ::: lang dart
 
 ```dart
-randNickname(language: WordLanguage.ko, style: 100, count: 3);
-// ['토한조해한', '가파모토히', '리누채무애저차부']
-
 randNickname(language: WordLanguage.en, style: 100, count: 3);
 // ['Duhusk', 'DresaelSlobru', 'BroureexGrosex']
 ```
@@ -338,9 +323,6 @@ randNickname(language: WordLanguage.en, style: 100, count: 3);
 ::: lang py
 
 ```python
-rand_nickname(language="ko", style=100, count=3)
-# ['토한조해한', '가파모토히', '리누채무애저차부']
-
 rand_nickname(language="en", style=100, count=3)
 # ['Duhusk', 'DresaelSlobru', 'BroureexGrosex']
 ```
@@ -352,12 +334,12 @@ rand_nickname(language="en", style=100, count=3)
 ::: lang js
 
 ```javascript
-for (const { words, theme } of randNickname({ language: 'ko', count: 3, output: 'detail' })) {
+for (const { words, theme } of randNickname({ language: 'en', count: 3, output: 'detail' })) {
 	console.log(words.join(' + '), theme);
 }
-// 오래된 + 곰 animal
-// 영원한 + 도마뱀 animal
-// 귀여운 + 신화 + 다발 myth
+// Grumpy + Zither music
+// Fierce + Printer product
+// Endless + Obsidian + Wing gem
 ```
 
 :::
@@ -365,12 +347,12 @@ for (const { words, theme } of randNickname({ language: 'ko', count: 3, output: 
 ::: lang dart
 
 ```dart
-for (final detail in randNicknameDetails(language: WordLanguage.ko, count: 3)) {
+for (final detail in randNicknameDetails(language: WordLanguage.en, count: 3)) {
   print('${detail.words.join(' + ')} ${detail.theme?.name}');
 }
-// 오래된 + 곰 animal
-// 영원한 + 도마뱀 animal
-// 귀여운 + 신화 + 다발 myth
+// Grumpy + Zither music
+// Fierce + Printer product
+// Endless + Obsidian + Wing gem
 ```
 
 :::
@@ -378,11 +360,11 @@ for (final detail in randNicknameDetails(language: WordLanguage.ko, count: 3)) {
 ::: lang py
 
 ```python
-for detail in rand_nickname(language="ko", count=3, output="detail"):
+for detail in rand_nickname(language="en", count=3, output="detail"):
     print(" + ".join(detail.words), detail.theme)
-# 오래된 + 곰 animal
-# 영원한 + 도마뱀 animal
-# 귀여운 + 신화 + 다발 myth
+# Grumpy + Zither music
+# Fierce + Printer product
+# Endless + Obsidian + Wing gem
 ```
 
 :::

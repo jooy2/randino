@@ -69,9 +69,9 @@ The lower end is a bare noun and the upper end a modifier, a noun and a trailing
 ::: lang js
 
 ```javascript
-nicknameLengthRange('ko'); // [1, 12] — every shape
-randNickname({ language: 'ko', maxLength: 3, count: 3 });
-// ['노을', '파란곰', '수달'] — no room for three words
+nicknameLengthRange('en'); // [3, 30] — every shape
+randNickname({ language: 'en', maxLength: 8, count: 3 });
+// ['CoolPoem', 'MaidClaw', 'RustyBus'] — no room for three words
 ```
 
 :::
@@ -79,9 +79,9 @@ randNickname({ language: 'ko', maxLength: 3, count: 3 });
 ::: lang dart
 
 ```dart
-nicknameLengthRange(language: WordLanguage.ko); // LengthRange(1, 12) — every shape
-randNickname(language: WordLanguage.ko, maxLength: 3, count: 3);
-// ['노을', '파란곰', '수달'] — no room for three words
+nicknameLengthRange(language: WordLanguage.en); // LengthRange(3, 30) — every shape
+randNickname(language: WordLanguage.en, maxLength: 8, count: 3);
+// ['CoolPoem', 'MaidClaw', 'RustyBus'] — no room for three words
 ```
 
 :::
@@ -89,9 +89,9 @@ randNickname(language: WordLanguage.ko, maxLength: 3, count: 3);
 ::: lang py
 
 ```python
-nickname_length_range("ko")  # (1, 12) — every shape
-rand_nickname(language="ko", max_length=3, count=3)
-# ['노을', '파란곰', '수달'] — no room for three words
+nickname_length_range("en")  # (3, 30) — every shape
+rand_nickname(language="en", max_length=8, count=3)
+# ['CoolPoem', 'MaidClaw', 'RustyBus'] — no room for three words
 ```
 
 :::

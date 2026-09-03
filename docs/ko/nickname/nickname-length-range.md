@@ -69,9 +69,9 @@ nickname_length_range("ko", "-")  # (1, 14)
 ::: lang js
 
 ```javascript
-nicknameLengthRange('ko'); // [1, 12] — 모든 형태
-randNickname({ language: 'ko', maxLength: 3, count: 3 });
-// ['노을', '파란곰', '수달'] — 세 단어가 들어갈 자리가 없습니다
+nicknameLengthRange('en'); // [3, 30] — 모든 형태
+randNickname({ language: 'en', maxLength: 8, count: 3 });
+// ['CoolPoem', 'MaidClaw', 'RustyBus'] — 세 단어가 들어갈 자리가 없습니다
 ```
 
 :::
@@ -79,9 +79,9 @@ randNickname({ language: 'ko', maxLength: 3, count: 3 });
 ::: lang dart
 
 ```dart
-nicknameLengthRange(language: WordLanguage.ko); // LengthRange(1, 12) — 모든 형태
-randNickname(language: WordLanguage.ko, maxLength: 3, count: 3);
-// ['노을', '파란곰', '수달'] — 세 단어가 들어갈 자리가 없습니다
+nicknameLengthRange(language: WordLanguage.en); // LengthRange(3, 30) — 모든 형태
+randNickname(language: WordLanguage.en, maxLength: 8, count: 3);
+// ['CoolPoem', 'MaidClaw', 'RustyBus'] — 세 단어가 들어갈 자리가 없습니다
 ```
 
 :::
@@ -89,9 +89,9 @@ randNickname(language: WordLanguage.ko, maxLength: 3, count: 3);
 ::: lang py
 
 ```python
-nickname_length_range("ko")  # (1, 12) — 모든 형태
-rand_nickname(language="ko", max_length=3, count=3)
-# ['노을', '파란곰', '수달'] — 세 단어가 들어갈 자리가 없습니다
+nickname_length_range("en")  # (3, 30) — 모든 형태
+rand_nickname(language="en", max_length=8, count=3)
+# ['CoolPoem', 'MaidClaw', 'RustyBus'] — 세 단어가 들어갈 자리가 없습니다
 ```
 
 :::

@@ -1,14 +1,14 @@
 # Nicknames
 
-A nickname is the handle someone would pick for a game or a website — 멋진사자, MistyOwl, 고양이꼬리. randino builds one out of an everyday word with something added to it: a modifier in front, a second word behind, or both.
+A nickname is the handle someone would pick for a game or a website — MistyOwl, CraneVoyage, RustyBoot. randino builds one out of an everyday word with something added to it: a modifier in front, a second word behind, or both.
 
 ::: lang js
 
 ```javascript
 import { randNickname } from 'randino';
 
-randNickname({ language: 'ko', count: 3 });
-// ['오래된곰', '영원한도마뱀', '귀여운신화다발']
+randNickname({ language: 'en', count: 3 });
+// ['FoggyHillside', 'CraneVoyage', 'TinyLeopardCloak']
 ```
 
 :::
@@ -18,8 +18,8 @@ randNickname({ language: 'ko', count: 3 });
 ```dart
 import 'package:randino/randino.dart';
 
-randNickname(language: WordLanguage.ko, count: 3);
-// ['오래된곰', '영원한도마뱀', '귀여운신화다발']
+randNickname(language: WordLanguage.en, count: 3);
+// ['FoggyHillside', 'CraneVoyage', 'TinyLeopardCloak']
 ```
 
 :::
@@ -29,13 +29,13 @@ randNickname(language: WordLanguage.ko, count: 3);
 ```python
 from randino import rand_nickname
 
-rand_nickname(language="ko", count=3)
-# ['오래된곰', '영원한도마뱀', '귀여운신화다발']
+rand_nickname(language="en", count=3)
+# ['FoggyHillside', 'CraneVoyage', 'TinyLeopardCloak']
 ```
 
 :::
 
-**Person names are never used.** That rule is the whole reason nicknames and names are two generators rather than one: a handle built out of somebody's name reads as that person's identity, and a handle built out of 사자 and 멋진 reads as a handle. The English pools are checked against the English person-name pools automatically, which is why `job` has no `Knight`, `Baker` or `Hunter` and `plant` no `Rose` or `Ivy`.
+**Person names are never used.** That rule is the whole reason nicknames and names are two generators rather than one: a handle built out of somebody's name reads as that person's identity, and a handle built out of `Owl` and `Misty` reads as a handle. The English pools are checked against the English person-name pools automatically, which is why `job` has no `Knight`, `Baker` or `Hunter` and `plant` no `Rose` or `Ivy`.
 
 Korean and Japanese cannot be held to that check — 하늘, 별 and 森 are everyday nouns that happen to also be names — but `아름다운하늘` is still nobody's name.
 
@@ -59,9 +59,6 @@ That is why a narrow range drops the modifier instead of truncating a word, and 
 ::: lang js
 
 ```javascript
-randNickname({ language: 'ko', count: 4, minLength: 4, maxLength: 6 });
-// ['엉뚱한진리춤', '엉뚱한가위별', '해바라기', '별빛안개열매']
-
 randNickname({ language: 'en', count: 4, minLength: 4, maxLength: 9 });
 // ['RustyBoot', 'DustyDuck', 'DustyMyth', 'RiddleEgg']
 ```
@@ -71,9 +68,6 @@ randNickname({ language: 'en', count: 4, minLength: 4, maxLength: 9 });
 ::: lang dart
 
 ```dart
-randNickname(language: WordLanguage.ko, count: 4, minLength: 4, maxLength: 6);
-// ['엉뚱한진리춤', '엉뚱한가위별', '해바라기', '별빛안개열매']
-
 randNickname(language: WordLanguage.en, count: 4, minLength: 4, maxLength: 9);
 // ['RustyBoot', 'DustyDuck', 'DustyMyth', 'RiddleEgg']
 ```
@@ -83,9 +77,6 @@ randNickname(language: WordLanguage.en, count: 4, minLength: 4, maxLength: 9);
 ::: lang py
 
 ```python
-rand_nickname(language="ko", count=4, min_length=4, max_length=6)
-# ['엉뚱한진리춤', '엉뚱한가위별', '해바라기', '별빛안개열매']
-
 rand_nickname(language="en", count=4, min_length=4, max_length=9)
 # ['RustyBoot', 'DustyDuck', 'DustyMyth', 'RiddleEgg']
 ```
@@ -101,8 +92,8 @@ Left out, each language joins its words the way it writes them: Korean, Japanese
 ::: lang js
 
 ```javascript
-randNickname({ language: 'ko', wordSeparator: ' ', count: 4 });
-// ['역사 발톱', '하늘빛 상상', '차가운 기억', '불빛 돛']
+randNickname({ language: 'en', wordSeparator: ' ', count: 4 });
+// ['Soldier', 'Hollow Petal', 'Syrupy Mica Tale', 'Spinning Cathedral']
 
 randNickname({ language: 'en', wordSeparator: '-', count: 4 });
 // ['Headphone', 'Soft-Bat', 'Genial-Moose-Cove', 'Dreamy-Umbrella-Halo']
@@ -113,8 +104,8 @@ randNickname({ language: 'en', wordSeparator: '-', count: 4 });
 ::: lang dart
 
 ```dart
-randNickname(language: WordLanguage.ko, wordSeparator: ' ', count: 4);
-// ['역사 발톱', '하늘빛 상상', '차가운 기억', '불빛 돛']
+randNickname(language: WordLanguage.en, wordSeparator: ' ', count: 4);
+// ['Soldier', 'Hollow Petal', 'Syrupy Mica Tale', 'Spinning Cathedral']
 
 randNickname(language: WordLanguage.en, wordSeparator: '-', count: 4);
 // ['Headphone', 'Soft-Bat', 'Genial-Moose-Cove', 'Dreamy-Umbrella-Halo']
@@ -125,8 +116,8 @@ randNickname(language: WordLanguage.en, wordSeparator: '-', count: 4);
 ::: lang py
 
 ```python
-rand_nickname(language="ko", word_separator=" ", count=4)
-# ['역사 발톱', '하늘빛 상상', '차가운 기억', '불빛 돛']
+rand_nickname(language="en", word_separator=" ", count=4)
+# ['Soldier', 'Hollow Petal', 'Syrupy Mica Tale', 'Spinning Cathedral']
 
 rand_nickname(language="en", word_separator="-", count=4)
 # ['Headphone', 'Soft-Bat', 'Genial-Moose-Cove', 'Dreamy-Umbrella-Halo']
@@ -143,8 +134,8 @@ It used to be four of them. Attaching a random token to a string is a thing abou
 ::: lang js
 
 ```javascript
-randSuffix(randNickname({ language: 'ko', count: 3 }));
-// ['달력_U7aNZ', '금빛독수리다발_AVcCV', '조용한바구니_RUKAP']
+randSuffix(randNickname({ language: 'en', count: 3 }));
+// ['RoundSeason_RVBnC', 'RowdyDusk_dwtu5', 'RovingLakeShard_QqMVH']
 ```
 
 :::
@@ -152,8 +143,8 @@ randSuffix(randNickname({ language: 'ko', count: 3 }));
 ::: lang dart
 
 ```dart
-randSuffixAll(randNickname(language: WordLanguage.ko, count: 3));
-// ['달력_U7aNZ', '금빛독수리다발_AVcCV', '조용한바구니_RUKAP']
+randSuffixAll(randNickname(language: WordLanguage.en, count: 3));
+// ['RoundSeason_RVBnC', 'RowdyDusk_dwtu5', 'RovingLakeShard_QqMVH']
 ```
 
 :::
@@ -161,8 +152,8 @@ randSuffixAll(randNickname(language: WordLanguage.ko, count: 3));
 ::: lang py
 
 ```python
-rand_suffix(rand_nickname(language="ko", count=3))
-# ['달력_U7aNZ', '금빛독수리다발_AVcCV', '조용한바구니_RUKAP']
+rand_suffix(rand_nickname(language="en", count=3))
+# ['RoundSeason_RVBnC', 'RowdyDusk_dwtu5', 'RovingLakeShard_QqMVH']
 ```
 
 :::
@@ -176,9 +167,6 @@ At `0` every word is a real one. Toward `100` the words are built from the langu
 ::: lang js
 
 ```javascript
-randNickname({ language: 'ko', style: 100, count: 3 });
-// ['토한조해한', '가파모토히', '리누채무애저차부']
-
 randNickname({ language: 'en', style: 100, count: 3 });
 // ['Duhusk', 'DresaelSlobru', 'BroureexGrosex']
 ```
@@ -188,9 +176,6 @@ randNickname({ language: 'en', style: 100, count: 3 });
 ::: lang dart
 
 ```dart
-randNickname(language: WordLanguage.ko, style: 100, count: 3);
-// ['토한조해한', '가파모토히', '리누채무애저차부']
-
 randNickname(language: WordLanguage.en, style: 100, count: 3);
 // ['Duhusk', 'DresaelSlobru', 'BroureexGrosex']
 ```
@@ -200,9 +185,6 @@ randNickname(language: WordLanguage.en, style: 100, count: 3);
 ::: lang py
 
 ```python
-rand_nickname(language="ko", style=100, count=3)
-# ['토한조해한', '가파모토히', '리누채무애저차부']
-
 rand_nickname(language="en", style=100, count=3)
 # ['Duhusk', 'DresaelSlobru', 'BroureexGrosex']
 ```
