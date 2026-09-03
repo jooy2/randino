@@ -13,9 +13,9 @@ import 'package:randino/src/types.dart';
 List<String> randModifierAll(
   List<String> values, {
   WordLanguage? language,
-  int style = 0,
+  RandRealism realism = RandRealism.real,
   String? separator,
 }) => [
   for (final value in values)
-    randModifier(value: value, language: language, style: style, separator: separator),
+    randModifier(value: value, language: language, realism: realism, separator: separator),
 ];

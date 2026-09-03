@@ -8,11 +8,13 @@ person-name pools.
 
 import re
 from collections.abc import Sequence
+from typing import get_args
 
 from randino import (
     RAND_COUNT_MAX,
     WORD_LANGUAGES,
     WORD_THEMES,
+    RandRealism,
     WordLanguage,
     WordTheme,
     nickname_length_range,
@@ -113,7 +115,7 @@ def test_every_language_writes_nicknames_in_its_own_script() -> None:
         for nickname in rand_nickname(language=language, count=SAMPLE):
             assert SCRIPT[language].fullmatch(nickname), f"{language}: {nickname}"
 
-        for nickname in rand_nickname(language=language, count=SAMPLE, style=100):
+        for nickname in rand_nickname(language=language, count=SAMPLE, realism="invented"):
             assert SCRIPT[language].fullmatch(nickname), f"{language} invented: {nickname}"
 
 
@@ -222,10 +224,10 @@ def test_omitted_length_bounds_fall_back_to_what_the_language_can_produce() -> N
     for language in WORD_LANGUAGES:
         low, high = nickname_length_range(language)
 
-        for style in (0, 100):
-            for nickname in rand_nickname(language=language, style=style, count=SAMPLE):
+        for realism in ("real", "invented"):
+            for nickname in rand_nickname(language=language, realism=realism, count=SAMPLE):
                 assert low <= len(nickname) <= high, (
-                    f"{language} @ {style}: {nickname} ({len(nickname)})"
+                    f"{language} @ {realism}: {nickname} ({len(nickname)})"
                 )
 
 
@@ -284,9 +286,9 @@ def test_starts_with_leads_every_nickname_with_the_requested_character() -> None
         assert re.fullmatch(r"Z[A-Za-z]+", nickname), nickname
 
 
-def test_style_invents_words_instead_of_drawing_them() -> None:
+def test_realism_invents_words_instead_of_drawing_them() -> None:
     pool = set(all_words("ko"))
-    invented = rand_nickname(output="detail", language="ko", style=100, count=200)
+    invented = rand_nickname(output="detail", language="ko", realism="invented", count=200)
     drawn = [detail for detail in invented if any(word in pool for word in detail.words)]
 
     assert len(drawn) < 20, f"{len(drawn)} of 200 still came from the pools"
@@ -301,13 +303,14 @@ def test_style_invents_words_instead_of_drawing_them() -> None:
             assert any(word in nouns for word in detail.words), detail.nickname
 
     # Halfway, both kinds of word show up.
-    mixed = rand_nickname(output="detail", language="ko", style=50, count=200)
+    mixed = rand_nickname(output="detail", language="ko", realism="mixed", count=200)
     assert any(all(word in pool for word in detail.words) for detail in mixed)
     assert any(all(word not in pool for word in detail.words) for detail in mixed)
 
     # Out-of-range values are clamped rather than rejected.
-    for style in (-50, 500):
-        assert len(rand_nickname(language="ko", style=style, count=5)) == 5
+    # Every level is accepted, and the type is what rules the rest out.
+    for realism in get_args(RandRealism):
+        assert len(rand_nickname(language="ko", realism=realism, count=5)) == 5
 
 
 def test_unique_never_repeats_a_nickname() -> None:

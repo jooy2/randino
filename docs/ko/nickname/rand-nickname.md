@@ -44,7 +44,7 @@ rand_nickname()
 | `language` | <Lang js="WordLanguageOption" dart="WordLanguage?" py="WordLanguageOption &#124; None" code /> | <Lang js="'all'" dart="null" py="None" code /> | 생성할 닉네임의 언어. <Lang js="'all'" dart="null" py="&quot;all&quot;" code />이면 지원하는 모든 언어를 섞어서 닉네임마다 하나씩 고릅니다. |
 | `theme` | <Lang js="WordThemeOption" dart="WordTheme?" py="WordThemeOption" code /> | <Lang js="'all'" dart="null" py="&quot;all&quot;" code /> | 닉네임의 주제. [테마](../word/themes)를 참고하세요. |
 | `count` | <Lang js="number" dart="int" py="int" code /> | `1` | 반환할 닉네임의 개수. `0` … `10000` 범위로 제한됩니다. |
-| `style` | <Lang js="number" dart="int" py="int" code /> | `0` | `0`은 실제 단어를, `100`은 그 언어처럼 읽히기만 하는 단어를 만들어 씁니다. 중간값은 둘을 섞습니다. |
+| `realism` | `RandRealism` | <Lang js="`'real'`" dart="`RandRealism.real`" py="`\"real\"`" /> | `real`은 실제 단어를, `invented`는 그 언어처럼 읽히기만 하는 단어를 만들어 씁니다. `mixed`는 단어마다 판단합니다. |
 | <Lang js="minLength" dart="minLength" py="min_length" code /> | <Lang js="number" dart="int?" py="int &#124; None" code /> | _언어별_ | 최소 글자 수. |
 | <Lang js="maxLength" dart="maxLength" py="max_length" code /> | <Lang js="number" dart="int?" py="int &#124; None" code /> | _언어별_ | 최대 글자 수. |
 | <Lang js="wordSeparator" dart="wordSeparator" py="word_separator" code /> | <Lang js="string" dart="String?" py="str &#124; None" code /> | _언어별_ | 단어 사이에 넣습니다. 길이 범위에 포함됩니다. 기본값은 붙여 쓰는 것입니다. |
@@ -114,7 +114,7 @@ rand_nickname(language="en", output="detail")
 
 테마는 **보고되는 값이지 요구되는 값이 아닙니다.** 테마에서 뽑은 단어는 그 테마를 보고하고, 만들어낸 단어는 우연히 실제 단어와 같아질 수 있으므로 14개 테마 전체에서 찾아본 뒤 어디에도 없으면 null을 보고합니다.
 
-여기서 두 가지 우연이 따라오는데, 버그가 아니라 예상해야 할 동작입니다. 하나는 같은 단어가 수식어이면서 명사일 수 있다는 것입니다(`Marble`이 그렇습니다). 다른 하나는 만들어낸 단어가 우연히 실제 단어를 이룰 수 있다는 것입니다. 음절 템플릿이 이따금 `Snake`를 만들어내므로 `style: 100`으로 만든 닉네임이 `theme`을 `animal`로 보고할 수 있습니다.
+여기서 두 가지 우연이 따라오는데, 버그가 아니라 예상해야 할 동작입니다. 하나는 같은 단어가 수식어이면서 명사일 수 있다는 것입니다(`Marble`이 그렇습니다). 다른 하나는 만들어낸 단어가 우연히 실제 단어를 이룰 수 있다는 것입니다. 음절 템플릿이 이따금 `Snake`를 만들어내므로 `realism: 'invented'`로 만든 닉네임이 `theme`을 `animal`로 보고할 수 있습니다.
 
 ## 예제
 
@@ -305,7 +305,7 @@ rand_suffix(rand_nickname(language="en", count=2), length=8, separator="-")
 ::: lang js
 
 ```javascript
-randNickname({ language: 'en', style: 100, count: 3 });
+randNickname({ language: 'en', realism: 'invented', count: 3 });
 // ['Duhusk', 'DresaelSlobru', 'BroureexGrosex']
 ```
 
@@ -314,7 +314,7 @@ randNickname({ language: 'en', style: 100, count: 3 });
 ::: lang dart
 
 ```dart
-randNickname(language: WordLanguage.en, style: 100, count: 3);
+randNickname(language: WordLanguage.en, realism: RandRealism.invented, count: 3);
 // ['Duhusk', 'DresaelSlobru', 'BroureexGrosex']
 ```
 
@@ -323,7 +323,7 @@ randNickname(language: WordLanguage.en, style: 100, count: 3);
 ::: lang py
 
 ```python
-rand_nickname(language="en", style=100, count=3)
+rand_nickname(language="en", realism="invented", count=3)
 # ['Duhusk', 'DresaelSlobru', 'BroureexGrosex']
 ```
 

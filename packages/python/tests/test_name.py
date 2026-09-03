@@ -8,11 +8,13 @@ a broken option cannot pass by luck.
 import re
 import unicodedata
 from collections.abc import Callable
+from typing import get_args
 
 from randino import (
     NAME_LANGUAGES,
     RAND_COUNT_MAX,
     NameLanguage,
+    RandRealism,
     name_length_range,
     name_supports_middle_name,
     name_supports_roman,
@@ -254,21 +256,21 @@ def test_starts_with_leads_every_name_with_the_requested_character() -> None:
         assert name.startswith("B"), name
 
 
-def test_style_invents_names_without_breaking_the_script_or_the_structure() -> None:
-    for style in (0, 50, 100, -20, 500):
+def test_realism_invents_names_without_breaking_the_script_or_the_structure() -> None:
+    for realism in get_args(RandRealism):
         for language in NAME_LANGUAGES:
-            for name in rand_name(language=language, style=style, count=20):
-                assert SCRIPT[language](name), f"{language} @ {style}: {name}"
+            for name in rand_name(language=language, realism=realism, count=20):
+                assert SCRIPT[language](name), f"{language} @ {realism}: {name}"
 
     # The abstract end should mostly leave the curated pools behind.
-    realistic = set(rand_name(language="en", style=0, count=400))
-    abstract = rand_name(language="en", style=100, count=100)
+    realistic = set(rand_name(language="en", realism="real", count=400))
+    abstract = rand_name(language="en", realism="invented", count=100)
     overlap = sum(1 for name in abstract if name in realistic)
 
     assert overlap < 10, f"too many invented names look curated: {overlap}"
 
 
-def test_style_zero_stays_inside_the_curated_pools() -> None:
+def test_realism_real_stays_inside_the_curated_pools() -> None:
     # The realistic end promises names people actually carry, so a rolled given name
     # length the pool cannot serve has to be re-rolled rather than invented. Ranges
     # here are ones the pools can satisfy; asking for a length no real name has (a
@@ -286,7 +288,7 @@ def test_style_zero_stays_inside_the_curated_pools() -> None:
         assert data.given_male is not None and data.given_female is not None
         given = set(pool_natives(data.given_male) + pool_natives(data.given_female))
 
-        for name in rand_name(language=language, style=0, count=300, **bounds):  # type: ignore[call-overload]
+        for name in rand_name(language=language, realism="real", count=300, **bounds):  # type: ignore[call-overload]
             surname = surname_of(language, name)
 
             assert surname, f"{language}: no curated surname leads {name}"
@@ -313,7 +315,7 @@ def test_surnames_follow_the_frequency_table_of_the_languages_that_have_one() ->
     # enough below to be unreachable by chance, and an even draw over the pool (1.3% /
     # 3.3% / 2.2%) cannot come near any of them.
     def share(language: NameLanguage, surname: str) -> float:
-        names = rand_name(language=language, style=0, count=2000)
+        names = rand_name(language=language, realism="real", count=2000)
 
         return sum(1 for name in names if name.startswith(surname)) / len(names)
 

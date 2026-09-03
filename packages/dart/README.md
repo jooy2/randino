@@ -59,7 +59,7 @@ randNameDetails(language: NameLanguage.ko).first;
 | `language`                | `NameLanguage?` | `null` — every one  |
 | `gender`                  | `NameGender?`   | `null` — one per name |
 | `count`                   | `int`           | `1`                 |
-| `style`                   | `int` (0 real … 100 invented) | `0`   |
+| `realism`                 | `RandRealism`             | `RandRealism.real` |
 | `minLength` / `maxLength` | `int?`          | _language_          |
 | `includeSurname`          | `bool`          | `true`              |
 | `includeMiddleName`       | `bool`          | `false`             |
@@ -87,7 +87,7 @@ randNicknameDetails(language: WordLanguage.en).first;
 | `language`                | `WordLanguage?` | `null` — every one     |
 | `theme`                   | `WordTheme?`    | `null` — every one     |
 | `count`                   | `int`               | `1`                    |
-| `style`                   | `int` (0 real … 100 invented) | `0`          |
+| `realism`                 | `RandRealism`             | `RandRealism.real` |
 | `minLength` / `maxLength` | `int?`              | _language_             |
 | `wordSeparator`           | `String?`           | _language_             |
 | `startsWith`              | `String?`           | `null`                 |
@@ -117,7 +117,7 @@ wordLengthRange(language: WordLanguage.en); // LengthRange(3, 11)
 | `language`                | `WordLanguage?` | `null` — every one |
 | `theme`                   | `WordTheme?`    | `null` — every one |
 | `count`                   | `int`           | `1`                |
-| `style`                   | `int`           | `0`                |
+| `realism`                 | `RandRealism`   | `RandRealism.real` |
 | `minLength` / `maxLength` | `int?`          | _pools_            |
 | `startsWith`              | `String?`       | `null`             |
 | `unique`                  | `bool`          | `false`            |
@@ -161,7 +161,7 @@ randModifierAll(randAnimal(language: WordLanguage.en, count: 2));
 | ----------- | --------------- | ---------- |
 | `value`     | `String?`       | `null`     |
 | `language`  | `WordLanguage?` | _script_   |
-| `style`     | `int`           | `0`        |
+| `realism`   | `RandRealism`   | `RandRealism.real` |
 | `separator` | `String?`       | _language_ |
 
 With no `language`, the script of the value picks one, so `'고양이'` is never handed an English modifier.

@@ -45,6 +45,7 @@ export 'src/types.dart'
         NameLanguage,
         NameScript,
         NicknameDetail,
+        RandRealism,
         WordDetail,
         WordLanguage,
         WordTheme;

@@ -12,7 +12,7 @@ together is what this module is.
 - Which shapes exist is the language's own business, and `data.frames` is where it says
   so. A shape carries its particles with it, so Chinese can put 的 between a verb and
   its noun where Korean needs nothing.
-- `style` decides per word whether it comes out of a pool or is invented.
+- `realism` decides per word whether it comes out of a pool or is invented.
 - `min_length` / `max_length` pick the shape first: a range too short for a modifier
   drops that frame instead of truncating a word.
 - `word_separator` decides what goes between the words, defaulting to the way the
@@ -34,11 +34,12 @@ from randino._internal.generate import (
     length_bounds,
     resolve_length,
     resolve_prefix,
-    resolve_style,
+    resolve_realism,
 )
 from randino._internal.utils import pick
 from randino._types import (
     NicknameDetail,
+    RandRealism,
     WordLanguage,
     WordLanguageOption,
     WordTheme,
@@ -63,7 +64,7 @@ class Settings:
     """
 
     theme: WordThemeOption
-    style: int
+    invent: int
     prefix: str
     min_length: int | None = None
     max_length: int | None = None
@@ -202,7 +203,7 @@ def build_words(
         chosen = draw_word(
             data,
             pool_of(data, slot, nouns),
-            settings.style,
+            settings.invent,
             floor,
             ceiling,
             settings.prefix if index == 0 else "",
@@ -253,7 +254,7 @@ def natural_range(language: WordLanguage, separator: str | None = None) -> tuple
     and pools the generator actually draws from.
     """
     data = WORD_DATA[language]
-    settings = Settings(theme="all", style=0, prefix="", separator=separator)
+    settings = Settings(theme="all", invent=0, prefix="", separator=separator)
     joiner = len(joiner_of(data, settings))
     ranges = [
         frame_range(frame, slot_bounds(language, data, theme), joiner)
@@ -318,7 +319,7 @@ def generate_nickname_details(
     language: WordLanguageOption = "all",
     theme: WordThemeOption = "all",
     count: int = 1,
-    style: int = 0,
+    realism: RandRealism = "real",
     min_length: int | None = None,
     max_length: int | None = None,
     word_separator: str | None = None,
@@ -328,7 +329,7 @@ def generate_nickname_details(
     """Generate `count` nicknames, applied to every option the caller passed."""
     settings = Settings(
         theme=theme,
-        style=resolve_style(style),
+        invent=resolve_realism(realism),
         min_length=resolve_length(min_length),
         max_length=resolve_length(max_length),
         prefix=resolve_prefix(starts_with),

@@ -13,7 +13,7 @@ import {
 	lengthBounds,
 	resolveLength,
 	resolvePrefix,
-	resolveStyle
+	resolveRealism
 } from '../_internal/generate.js';
 import { capitalizeFirst } from '../_internal/utils.js';
 import type {
@@ -165,18 +165,18 @@ export type Drawn = { word: string; missed: boolean };
 export function drawWord(
 	data: WordLanguageData,
 	pool: WordPool,
-	style: number,
+	invent: number,
 	min: number,
 	max: number,
 	prefix: string
 ): Drawn {
-	const invent = chance(style);
-	const word = invent ? null : pickWord(pool, min, max, prefix);
+	const made = chance(invent);
+	const word = made ? null : pickWord(pool, min, max, prefix);
 	const chosen = word ?? synthWord(data.syn, min, max, prefix);
 
 	return {
 		word: data.capitalize ? capitalizeFirst(chosen) : chosen,
-		missed: !invent && !word
+		missed: !made && !word
 	};
 }
 
@@ -205,7 +205,8 @@ export function naturalRange(
 
 type Settings = {
 	theme: WordThemeOption;
-	style: number;
+	// How often one part is invented rather than drawn, as a percentage.
+	invent: number;
 	minLength?: number;
 	maxLength?: number;
 	prefix: string;
@@ -223,7 +224,7 @@ function generateOne(language: WordLanguage, settings: Settings): WordDetail {
 		const pool = data.nouns[theme];
 		const [low, high] = poolBounds(pool);
 		const [min, max] = lengthBounds(settings.minLength, settings.maxLength, low, high);
-		const { word, missed } = drawWord(data, pool, settings.style, min, max, settings.prefix);
+		const { word, missed } = drawWord(data, pool, settings.invent, min, max, settings.prefix);
 		const detail: WordDetail = {
 			word,
 			language,
@@ -254,7 +255,7 @@ export function generateWordDetails(options: RandWordOptions = {}): WordDetail[]
 	const language = options.language ?? 'all';
 	const settings: Settings = {
 		theme: options.theme ?? 'all',
-		style: resolveStyle(options.style),
+		invent: resolveRealism(options.realism),
 		minLength: resolveLength(options.minLength),
 		maxLength: resolveLength(options.maxLength),
 		prefix: resolvePrefix(options.startsWith)

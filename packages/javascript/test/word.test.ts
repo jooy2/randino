@@ -21,7 +21,13 @@ import {
 	randWord,
 	wordLengthRange
 } from '../dist/index.js';
-import type { RandThemedWordOptions, WordDetail, WordLanguage, WordTheme } from '../dist/index.js';
+import type {
+	RandRealism,
+	RandThemedWordOptions,
+	WordDetail,
+	WordLanguage,
+	WordTheme
+} from '../dist/index.js';
 // The datasets are internal, but a word generator is only as good as the pools
 // behind it — these checks are what tie the output back to them.
 import { WORD_DATA } from '../dist/word/data/index.js';
@@ -86,7 +92,7 @@ describe('Word', () => {
 				assert.match(word, SCRIPT[language], `${language}: ${word}`);
 			}
 
-			for (const word of randWord({ language, count: SAMPLE, style: 100 })) {
+			for (const word of randWord({ language, count: SAMPLE, realism: 'invented' })) {
 				assert.match(word, SCRIPT[language], `${language} invented: ${word}`);
 			}
 		}
@@ -208,9 +214,9 @@ describe('Word', () => {
 		}
 	});
 
-	it('style invents words instead of drawing them', () => {
+	it('realism invents words instead of drawing them', () => {
 		const pool = new Set(nounsOf('ko'));
-		const invented = details({ language: 'ko', style: 100, count: 200 });
+		const invented = details({ language: 'ko', realism: 'invented', count: 200 });
 		const drawn = invented.filter((detail) => pool.has(detail.word));
 
 		assert.ok(drawn.length < 20, `${drawn.length} of 200 still came from the pools`);
@@ -226,15 +232,16 @@ describe('Word', () => {
 		}
 
 		// Halfway, both kinds of word show up.
-		const mixed = details({ language: 'ko', style: 50, count: 200 });
+		const mixed = details({ language: 'ko', realism: 'mixed', count: 200 });
 
 		assert.ok(mixed.some((detail) => pool.has(detail.word)));
 		assert.ok(mixed.some((detail) => !pool.has(detail.word)));
 
-		// Out-of-range values are clamped rather than rejected.
-		for (const style of [-50, 500]) {
-			assert.strictEqual(randWord({ language: 'ko', style, count: 5 }).length, 5);
-		}
+		// A level outside the three, which only an untyped caller can pass, falls
+		// back to the default rather than throwing.
+		const unknown = 'wild' as RandRealism;
+
+		assert.strictEqual(randWord({ language: 'ko', realism: unknown, count: 5 }).length, 5);
 	});
 
 	it('unique never repeats a word', () => {

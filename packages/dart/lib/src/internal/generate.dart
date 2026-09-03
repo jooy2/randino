@@ -23,8 +23,13 @@ String resolvePrefix(String? startsWith) {
   return trimmed.isEmpty ? '' : trimmed.substring(0, 1);
 }
 
-/// `style`, clamped to the 0-100 scale rather than rejected outside it.
-int resolveStyle(int style) => clampInt(style, 0, 100);
+/// [realism] as the chance of inventing one part, as a percentage, which is what
+/// every generator actually asks of it.
+int resolveRealism(RandRealism realism) => switch (realism) {
+  RandRealism.real => 0,
+  RandRealism.mixed => 50,
+  RandRealism.invented => 100,
+};
 
 /// A caller's length bounds against a natural range, clamped to what is allowed.
 LengthRange lengthBounds(int? min, int? max, int naturalMin, int naturalMax) {

@@ -28,6 +28,22 @@ export type NameScript = 'native' | 'roman';
 export type RandOutput = 'value' | 'detail';
 
 /**
+ * How close to the real language a result stays:
+ * - `real`: every part is drawn from the curated pools, and is a word or a name
+ *   the language actually has. The default.
+ * - `mixed`: decided per part, so one name can pair a real surname with an
+ *   invented given name.
+ * - `invented`: every part is built from the language's own sounds instead, so
+ *   it reads like the language without being any of its words.
+ *
+ * Three levels rather than the 0-100 number this used to be. The decision is
+ * taken per part and there is nothing between "always" and "half the time"
+ * worth naming, so the numbers in between promised a precision that was not
+ * there.
+ */
+export type RandRealism = 'real' | 'mixed' | 'invented';
+
+/**
  * The options every generator takes, whatever it generates. `randName`,
  * `randNickname` and `randWord` each add their own on top of these — a gender, a
  * theme, a word separator — but they all count, filter, deduplicate and report
@@ -37,10 +53,10 @@ export interface RandCommonOptions {
 	/** How many results to return. Default `1`, maximum `RAND_COUNT_MAX`. */
 	count?: number;
 	/**
-	 * `0` draws from the curated pools, `100` invents instead, and values in
-	 * between mix the two — per part, not per batch. Default `0`.
+	 * Whether the parts are drawn from the curated pools or invented to read like
+	 * the language. `'mixed'` decides per part, not per batch. Default `'real'`.
 	 */
-	style?: number;
+	realism?: RandRealism;
 	/** Minimum length of the result, in characters. Defaults to the language's own range. */
 	minLength?: number;
 	/** Maximum length of the result, in characters. Defaults to the language's own range. */
@@ -183,10 +199,10 @@ export interface RandModifierOptions {
 	 */
 	language?: WordLanguageOption;
 	/**
-	 * `0` draws a modifier the language actually uses, `100` invents one that
-	 * only reads like it. Default `0`.
+	 * Whether the modifier is one the language actually uses, or one invented to
+	 * read like it. Default `'real'`.
 	 */
-	style?: number;
+	realism?: RandRealism;
 	/**
 	 * Placed between the modifier and the value. Defaults to the way the language
 	 * itself joins words, which is to run them together (`멋진사자`, `MistyOwl`).

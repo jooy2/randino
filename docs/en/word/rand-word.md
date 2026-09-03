@@ -135,15 +135,15 @@ rand_word(language="en", min_length=9, count=3)
 
 ## Invented words
 
-`style` is a dial rather than a switch: `0` draws from the pools, `100` invents words that only read like the language, and anything between decides per word.
+`realism` has three levels: `real` draws from the pools, `invented` builds words that only read like the language, and `mixed` decides per word.
 
 ::: lang js
 
 ```javascript
-randWord({ language: 'en', style: 100, count: 4 });
+randWord({ language: 'en', realism: 'invented', count: 4 });
 // ['Sterath', 'Lisleen', 'Kaezan', 'Mibaeth']
 
-randWord({ language: 'en', style: 50, count: 4 });
+randWord({ language: 'en', realism: 'mixed', count: 4 });
 // ['Blorin', 'Meadow', 'Tavren', 'Compass']
 ```
 
@@ -152,7 +152,7 @@ randWord({ language: 'en', style: 50, count: 4 });
 ::: lang dart
 
 ```dart
-randWord(language: WordLanguage.en, style: 100, count: 4);
+randWord(language: WordLanguage.en, realism: RandRealism.invented, count: 4);
 // [Sterath, Lisleen, Kaezan, Mibaeth]
 ```
 
@@ -161,7 +161,7 @@ randWord(language: WordLanguage.en, style: 100, count: 4);
 ::: lang py
 
 ```python
-rand_word(language="en", style=100, count=4)
+rand_word(language="en", realism="invented", count=4)
 # ['Sterath', 'Lisleen', 'Kaezan', 'Mibaeth']
 ```
 

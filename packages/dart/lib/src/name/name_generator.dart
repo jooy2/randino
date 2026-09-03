@@ -1,9 +1,9 @@
 // The name generator itself. Internal — `randName` and `randNameDetails`
 // are the public entry points.
 //
-// - At the realistic end of `style`, names come out of the curated pools: whole
+// - At `realism: RandRealism.real`, names come out of the curated pools: whole
 //   given names for CJK, given/surname pools for the other scripts.
-// - Toward the abstract end they are invented instead — Latin and Cyrillic
+// - At `RandRealism.invented` they are built instead — Latin and Cyrillic
 //   scripts from syllable templates, CJK by combining given-name syllables.
 // - The structure the caller asked for (surname, middle name, starting letter) is
 //   always honoured. The length range is satisfied by re-drawing from the pools,
@@ -44,7 +44,7 @@ class _Settings {
     required this.includeMiddleName,
     required this.minLength,
     required this.maxLength,
-    required this.style,
+    required this.invent,
     required this.prefix,
   });
 
@@ -53,7 +53,9 @@ class _Settings {
   final bool includeMiddleName;
   final int? minLength;
   final int? maxLength;
-  final int style;
+
+  /// How often one part is invented rather than drawn, as a percentage.
+  final int invent;
   final String prefix;
 }
 
@@ -188,7 +190,7 @@ _Entry _composeGiven(NameLanguageData data, bool isMale, int length, String pref
 /// A real CJK given name that fits the length range, or null when the pool holds
 /// none. The length follows the language's own distribution, but only over the
 /// lengths the pool can actually serve: rolling a length first and then looking
-/// it up would drop through to an invented name at `style: 0` whenever the pool
+/// it up would drop through to an invented name at `RandRealism.real` whenever the pool
 /// has no real name of that length — Korean lists three-syllable given names in
 /// its weights and holds none, so one name in twenty-five came out invented.
 _Entry? _curatedGiven(NameLanguageData data, bool isMale, int min, int max, String prefix) {
@@ -332,7 +334,7 @@ _Entry _generateCjk(
   final givenPrefix = leadsWithSurname ? '' : prefix;
 
   _Entry drawGiven() {
-    if (!chance(settings.style)) {
+    if (!chance(settings.invent)) {
       final real = _curatedGiven(data, isMale, min, max, givenPrefix);
 
       if (real != null) {
@@ -377,7 +379,7 @@ _Parts _drawParts(NameLanguageData data, _Settings settings, bool isMale) {
 
   _Entry given;
 
-  if (data.syn != null && chance(settings.style)) {
+  if (data.syn != null && chance(settings.invent)) {
     given = _synthEntry(data, givenPrefix);
   } else if (givenPrefix.isNotEmpty) {
     given = _leadEntry(data, givenPool, NamePart.given, givenPrefix);
@@ -390,7 +392,7 @@ _Parts _drawParts(NameLanguageData data, _Settings settings, bool isMale) {
   if (settings.includeSurname) {
     final surnamePrefix = leadsWithSurname ? settings.prefix : '';
 
-    if (data.syn != null && chance(settings.style)) {
+    if (data.syn != null && chance(settings.invent)) {
       surname = _synthEntry(data, surnamePrefix);
     } else if (surnamePrefix.isNotEmpty) {
       surname = _leadEntry(data, data.last, NamePart.surname, surnamePrefix);
@@ -526,7 +528,7 @@ List<NameDetail> generateNameDetails({
   NameLanguage? language,
   NameGender? gender,
   int count = 1,
-  int style = 0,
+  RandRealism realism = RandRealism.real,
   int? minLength,
   int? maxLength,
   bool includeSurname = true,
@@ -540,7 +542,7 @@ List<NameDetail> generateNameDetails({
     includeMiddleName: includeMiddleName,
     minLength: minLength,
     maxLength: maxLength,
-    style: resolveStyle(style),
+    invent: resolveRealism(realism),
     prefix: resolvePrefix(startsWith),
   );
 

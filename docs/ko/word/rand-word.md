@@ -135,15 +135,15 @@ rand_word(language="en", min_length=9, count=3)
 
 ## 만들어낸 단어
 
-`style`은 스위치가 아니라 다이얼입니다. `0`은 풀에서 뽑고, `100`은 그 언어처럼 읽히기만 하는 단어를 만들어내며, 그 사이 값은 단어마다 판단합니다.
+`realism`은 세 단계입니다. `real`은 풀에서 뽑고, `invented`는 그 언어처럼 읽히기만 하는 단어를 만들어내며, `mixed`는 단어마다 판단합니다.
 
 ::: lang js
 
 ```javascript
-randWord({ language: 'en', style: 100, count: 4 });
+randWord({ language: 'en', realism: 'invented', count: 4 });
 // ['Sterath', 'Lisleen', 'Kaezan', 'Mibaeth']
 
-randWord({ language: 'en', style: 50, count: 4 });
+randWord({ language: 'en', realism: 'mixed', count: 4 });
 // ['Blorin', 'Meadow', 'Tavren', 'Compass']
 ```
 
@@ -152,7 +152,7 @@ randWord({ language: 'en', style: 50, count: 4 });
 ::: lang dart
 
 ```dart
-randWord(language: WordLanguage.en, style: 100, count: 4);
+randWord(language: WordLanguage.en, realism: RandRealism.invented, count: 4);
 // [Sterath, Lisleen, Kaezan, Mibaeth]
 ```
 
@@ -161,7 +161,7 @@ randWord(language: WordLanguage.en, style: 100, count: 4);
 ::: lang py
 
 ```python
-rand_word(language="en", style=100, count=4)
+rand_word(language="en", realism="invented", count=4)
 # ['Sterath', 'Lisleen', 'Kaezan', 'Mibaeth']
 ```
 

@@ -34,7 +34,7 @@ final NameLanguageData ja = NameLanguageData(
     大西:Onishi 杉本:Sugimoto
   '''),
   // Whole given names, romanized the way the reading is actually written, so the
-  // realistic end of `style` hands out names people have rather than assembled
+  // `RandRealism.real` hands out names people have rather than assembled
   // kanji. Two- and three-character names only: `givenLenWeights` never asks for a
   // one-character name, and the syllable pools below still cover every length.
   givenMale: tokenPool(r'''

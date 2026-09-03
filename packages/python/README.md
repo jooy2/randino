@@ -55,7 +55,7 @@ rand_name(language="ko", output="detail")[0]
 | `language`                  | `NameLanguageOption`          | `"all"`    |
 | `gender`                    | `NameGenderOption`            | `"all"`    |
 | `count`                     | `int`                         | `1`        |
-| `style`                     | `int` (0 real … 100 invented) | `0`        |
+| `realism`                   | `RandRealism`                 | `"real"`   |
 | `min_length` / `max_length` | `int \| None`                 | _language_ |
 | `include_surname`           | `bool`                        | `True`     |
 | `include_middle_name`       | `bool`                        | `False`    |
@@ -86,7 +86,7 @@ rand_nickname(language="en", output="detail")[0]
 | `language`                  | `WordLanguageOption`          | `"all"`    |
 | `theme`                     | `WordThemeOption`             | `"all"`    |
 | `count`                     | `int`                             | `1`        |
-| `style`                     | `int` (0 real … 100 invented)     | `0`        |
+| `realism`                   | `RandRealism`                     | `"real"`   |
 | `min_length` / `max_length` | `int \| None`                     | _language_ |
 | `word_separator`            | `str \| None`                     | _language_ |
 | `starts_with`               | `str`                             | `""`       |
@@ -121,7 +121,7 @@ word_length_range("en")  # (3, 11)
 | `language`                  | `WordLanguageOption`             | `"all"`   |
 | `theme`                     | `WordThemeOption`                | `"all"`   |
 | `count`                     | `int`                            | `1`       |
-| `style`                     | `int` (0 real … 100 invented)    | `0`       |
+| `realism`                   | `RandRealism`                    | `"real"`  |
 | `min_length` / `max_length` | `int \| None`                    | _pools_   |
 | `starts_with`               | `str`                            | `""`      |
 | `unique`                    | `bool`                           | `False`   |
@@ -170,7 +170,7 @@ rand_modifier(rand_animal(language="en", count=2))
 | ----------- | ---------------------------- | ---------- |
 | `value`     | `str \| list[str] \| None`   | `None`     |
 | `language`  | `WordLanguageOption \| None` | _script_   |
-| `style`     | `int`                        | `0`        |
+| `realism`   | `RandRealism`                | `"real"`   |
 | `separator` | `str \| None`                | _language_ |
 
 With no `language`, the script of the value picks one, so `"고양이"` is never handed an English modifier.

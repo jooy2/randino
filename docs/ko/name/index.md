@@ -48,7 +48,7 @@ rand_name(language="en", count=3)
 
 두 생성기는 대부분의 옵션을 공유합니다. 아래는 사용하기 전에 동작을 알아 두면 좋은 옵션들입니다.
 
-### `style` — 실제 이름과 만들어낸 이름
+### `realism` — 실제 이름과 만들어낸 이름
 
 기본값인 `0`에서는 모든 요소를 실제로 쓰이는 이름 풀에서 뽑고, **그 범위를 벗어나지 않습니다**. 길이 범위가 여러 이름 길이를 허용할 때도, 길이를 먼저 굴린 다음 없는 길이를 만들어내는 대신 풀이 실제로 제공할 수 있는 길이 중에서 고릅니다.
 
@@ -57,7 +57,7 @@ rand_name(language="en", count=3)
 ::: lang js
 
 ```javascript
-randName({ language: 'en', style: 100, count: 3 });
+randName({ language: 'en', realism: 'invented', count: 3 });
 // ['Deder Kuvoun', 'Jaihil Brouvinn', 'Thoowoun Wiatou']
 ```
 
@@ -66,7 +66,7 @@ randName({ language: 'en', style: 100, count: 3 });
 ::: lang dart
 
 ```dart
-randName(language: NameLanguage.en, style: 100, count: 3);
+randName(language: NameLanguage.en, realism: RandRealism.invented, count: 3);
 // ['Deder Kuvoun', 'Jaihil Brouvinn', 'Thoowoun Wiatou']
 ```
 
@@ -75,7 +75,7 @@ randName(language: NameLanguage.en, style: 100, count: 3);
 ::: lang py
 
 ```python
-rand_name(language="en", style=100, count=3)
+rand_name(language="en", realism="invented", count=3)
 # ['Deder Kuvoun', 'Jaihil Brouvinn', 'Thoowoun Wiatou']
 ```
 

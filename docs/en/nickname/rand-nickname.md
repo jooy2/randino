@@ -44,7 +44,7 @@ Every option is optional, and the defaults are what the empty call above uses.
 | `language` | <Lang js="WordLanguageOption" dart="WordLanguage?" py="WordLanguageOption &#124; None" code /> | <Lang js="'all'" dart="null" py="None" code /> | Language of the generated nicknames. <Lang js="'all'" dart="null" py="&quot;all&quot;" code /> mixes every supported language, picking one per nickname. |
 | `theme` | <Lang js="WordThemeOption" dart="WordTheme?" py="WordThemeOption" code /> | <Lang js="'all'" dart="null" py="&quot;all&quot;" code /> | What the nickname is about. See [Themes](../word/themes). |
 | `count` | <Lang js="number" dart="int" py="int" code /> | `1` | How many nicknames to return. Clamped to `0` … `10000`. |
-| `style` | <Lang js="number" dart="int" py="int" code /> | `0` | `0` uses real words, `100` invents words that only read like the language, and anything between mixes the two. |
+| `realism` | `RandRealism` | <Lang js="`'real'`" dart="`RandRealism.real`" py="`\"real\"`" /> | `real` uses real words, `invented` builds words that only read like the language, and `mixed` decides per word. |
 | <Lang js="minLength" dart="minLength" py="min_length" code /> | <Lang js="number" dart="int?" py="int &#124; None" code /> | _language_ | Minimum length in characters. |
 | <Lang js="maxLength" dart="maxLength" py="max_length" code /> | <Lang js="number" dart="int?" py="int &#124; None" code /> | _language_ | Maximum length in characters. |
 | <Lang js="wordSeparator" dart="wordSeparator" py="word_separator" code /> | <Lang js="string" dart="String?" py="str &#124; None" code /> | _language_ | Placed between the words. Counts toward the length range. Defaults to running them together. |
@@ -114,7 +114,7 @@ rand_nickname(language="en", output="detail")
 
 The theme is **reported, not asserted**. A word drawn from a theme reports it; an invented word is looked up across every theme, because it can spell a real one by accident, and reports null when it is found nowhere.
 
-Two coincidences follow from that and are worth expecting rather than treating as bugs. A word can be both a modifier and a noun — `Marble` is one — and an invented word can spell a real one by accident: the syllable templates spell `Snake` now and then, so a nickname built at `style` 100 can come back with `theme` set to `animal`.
+Two coincidences follow from that and are worth expecting rather than treating as bugs. A word can be both a modifier and a noun — `Marble` is one — and an invented word can spell a real one by accident: the syllable templates spell `Snake` now and then, so a nickname built at `realism: 'invented'` can come back with `theme` set to `animal`.
 
 ## Examples
 
@@ -305,7 +305,7 @@ Because it happens afterwards, <Lang js="minLength" dart="minLength" py="min_len
 ::: lang js
 
 ```javascript
-randNickname({ language: 'en', style: 100, count: 3 });
+randNickname({ language: 'en', realism: 'invented', count: 3 });
 // ['Duhusk', 'DresaelSlobru', 'BroureexGrosex']
 ```
 
@@ -314,7 +314,7 @@ randNickname({ language: 'en', style: 100, count: 3 });
 ::: lang dart
 
 ```dart
-randNickname(language: WordLanguage.en, style: 100, count: 3);
+randNickname(language: WordLanguage.en, realism: RandRealism.invented, count: 3);
 // ['Duhusk', 'DresaelSlobru', 'BroureexGrosex']
 ```
 
@@ -323,7 +323,7 @@ randNickname(language: WordLanguage.en, style: 100, count: 3);
 ::: lang py
 
 ```python
-rand_nickname(language="en", style=100, count=3)
+rand_nickname(language="en", realism="invented", count=3)
 # ['Duhusk', 'DresaelSlobru', 'BroureexGrosex']
 ```
 

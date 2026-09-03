@@ -166,7 +166,7 @@ def test_rand_modifier_follows_the_script_of_the_value_when_no_language_is_given
         assert belongs(rand_modifier("고양이", language="en"), "en")
 
 
-def test_rand_modifier_takes_a_separator_a_style_and_a_list() -> None:
+def test_rand_modifier_takes_a_separator_a_realism_and_a_list() -> None:
     for _ in range(SAMPLE):
         assert re.fullmatch(r"[A-Za-z]+ Owl", rand_modifier("Owl", language="en", separator=" "))
         assert re.fullmatch(r"[가-힣]+-사자", rand_modifier("사자", language="ko", separator="-"))
@@ -176,7 +176,7 @@ def test_rand_modifier_takes_a_separator_a_style_and_a_list() -> None:
     drawn = 0
 
     for _ in range(200):
-        word = rand_modifier(language="ko", style=100)
+        word = rand_modifier(language="ko", realism="invented")
 
         assert re.fullmatch(r"[가-힣]+", word), word
 

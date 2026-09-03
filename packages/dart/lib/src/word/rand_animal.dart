@@ -14,7 +14,7 @@ import 'package:randino/src/word/rand_word.dart';
 List<String> randAnimal({
   WordLanguage? language,
   int count = 1,
-  int style = 0,
+  RandRealism realism = RandRealism.real,
   int? minLength,
   int? maxLength,
   String? startsWith,
@@ -23,7 +23,7 @@ List<String> randAnimal({
   language: language,
   theme: WordTheme.animal,
   count: count,
-  style: style,
+  realism: realism,
   minLength: minLength,
   maxLength: maxLength,
   startsWith: startsWith,

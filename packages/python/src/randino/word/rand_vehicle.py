@@ -2,7 +2,7 @@
 
 from typing import Literal, overload
 
-from randino._types import WordDetail, WordLanguageOption, WordThemeOption
+from randino._types import RandRealism, WordDetail, WordLanguageOption, WordThemeOption
 from randino.word.rand_word import rand_word
 
 
@@ -11,7 +11,7 @@ def rand_vehicle(
     *,
     language: WordLanguageOption = ...,
     count: int = ...,
-    style: int = ...,
+    realism: RandRealism = ...,
     min_length: int | None = ...,
     max_length: int | None = ...,
     starts_with: str = ...,
@@ -25,7 +25,7 @@ def rand_vehicle(
     *,
     language: WordLanguageOption = ...,
     count: int = ...,
-    style: int = ...,
+    realism: RandRealism = ...,
     min_length: int | None = ...,
     max_length: int | None = ...,
     starts_with: str = ...,
@@ -38,7 +38,7 @@ def rand_vehicle(
     *,
     language: WordLanguageOption = "all",
     count: int = 1,
-    style: int = 0,
+    realism: RandRealism = "real",
     min_length: int | None = None,
     max_length: int | None = None,
     starts_with: str = "",
@@ -66,7 +66,7 @@ def rand_vehicle(
             language=language,
             theme=theme,
             count=count,
-            style=style,
+            realism=realism,
             min_length=min_length,
             max_length=max_length,
             starts_with=starts_with,
@@ -78,7 +78,7 @@ def rand_vehicle(
         language=language,
         theme=theme,
         count=count,
-        style=style,
+        realism=realism,
         min_length=min_length,
         max_length=max_length,
         starts_with=starts_with,

@@ -48,7 +48,7 @@ rand_name(language="en", count=3)
 
 The two generators share most of their options, and these are the ones whose behaviour is worth knowing before you reach for them.
 
-### `style` — real names, or invented ones
+### `realism` — real names, or invented ones
 
 At `0` — the default — every part is drawn from a curated pool of names in use, and **stays there**: when the length range leaves room for more than one given-name length, the length is chosen from the ones the pool can actually serve rather than rolled first and invented around.
 
@@ -57,7 +57,7 @@ Toward `100` names are invented instead: Latin and Cyrillic scripts from syllabl
 ::: lang js
 
 ```javascript
-randName({ language: 'en', style: 100, count: 3 });
+randName({ language: 'en', realism: 'invented', count: 3 });
 // ['Deder Kuvoun', 'Jaihil Brouvinn', 'Thoowoun Wiatou']
 ```
 
@@ -66,7 +66,7 @@ randName({ language: 'en', style: 100, count: 3 });
 ::: lang dart
 
 ```dart
-randName(language: NameLanguage.en, style: 100, count: 3);
+randName(language: NameLanguage.en, realism: RandRealism.invented, count: 3);
 // ['Deder Kuvoun', 'Jaihil Brouvinn', 'Thoowoun Wiatou']
 ```
 
@@ -75,7 +75,7 @@ randName(language: NameLanguage.en, style: 100, count: 3);
 ::: lang py
 
 ```python
-rand_name(language="en", style=100, count=3)
+rand_name(language="en", realism="invented", count=3)
 # ['Deder Kuvoun', 'Jaihil Brouvinn', 'Thoowoun Wiatou']
 ```
 

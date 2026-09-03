@@ -181,7 +181,7 @@ void main() {
       }
     });
 
-    test('randModifier takes a separator, a style and a list', () {
+    test('randModifier takes a separator, a realism and a list', () {
       for (var i = 0; i < sample; i += 1) {
         expect(
           randModifier(value: 'Owl', language: WordLanguage.en, separator: ' '),
@@ -198,7 +198,7 @@ void main() {
       var drawn = 0;
 
       for (var i = 0; i < 200; i += 1) {
-        final word = randModifier(language: WordLanguage.ko, style: 100);
+        final word = randModifier(language: WordLanguage.ko, realism: RandRealism.invented);
 
         expect(word, matches(RegExp('^[가-힣]+\$')), reason: word);
 

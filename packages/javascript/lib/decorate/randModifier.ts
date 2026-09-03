@@ -1,4 +1,4 @@
-import { drawLanguage, resolveStyle } from '../_internal/generate.js';
+import { drawLanguage, resolveRealism } from '../_internal/generate.js';
 import { detectLanguage } from '../_internal/script.js';
 import type { RandModifierOptions } from '../_types/global.js';
 import { WORD_DATA, WORD_LANGUAGES } from '../word/data/index.js';
@@ -14,7 +14,7 @@ function draw(value: string | undefined, options: RandModifierOptions): [string,
 	const data = WORD_DATA[language];
 	const pool = modifiersOf(data);
 	const [min, max] = poolBounds(pool);
-	const { word } = drawWord(data, pool, resolveStyle(options.style), min, max, '');
+	const { word } = drawWord(data, pool, resolveRealism(options.realism), min, max, '');
 
 	return [word, options.separator ?? data.joiner];
 }

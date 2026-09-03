@@ -6,7 +6,7 @@ Everything below runs in your browser. The controls are the options `randName`, 
 
 ## What to try
 
-- Set `language` to `en` and drag `style` to `100`. The names still read as English and stop being names anybody has — the generator builds them out of syllable templates instead of drawing from the pool.
+- Set `language` to `en` and `realism` to `invented`. The names still read as English and stop being names anybody has — the generator builds them out of syllable templates instead of drawing from the pool.
 - Leave `language` on `all` and press Generate a few times. Nine scripts, and each name's length range is resolved for its own language rather than for the batch.
 - Pick `ru` and switch `gender`. Russian is the one language where the choice is visible from the outside: the patronymic and the surname both inflect.
 - On the nickname tab, set `theme` to `animal` and `wordSeparator` to `-`. The separator counts toward the length range, so a narrow range drops the modifier rather than truncating a word.

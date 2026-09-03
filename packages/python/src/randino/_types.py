@@ -37,6 +37,19 @@ second function, and splitting one generator into two over its return type meant
 every option had to be documented twice.
 """
 
+RandRealism = Literal["real", "mixed", "invented"]
+"""How close to the real language a result stays.
+
+`"real"` draws every part from the curated pools, so it is a word or a name the
+language actually has. `"mixed"` decides per part, so one name can pair a real surname
+with an invented given name. `"invented"` builds every part from the language's own
+sounds instead, so it reads like the language without being any of its words.
+
+Three levels rather than the 0-100 number this used to be. The decision is taken per
+part and there is nothing between "always" and "half the time" worth naming, so the
+numbers in between promised a precision that was not there.
+"""
+
 WordLanguage = Literal["en", "ko", "ja", "zh"]
 """A language the word pools cover.
 

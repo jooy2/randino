@@ -8,7 +8,7 @@ import {
 	nameSupportsRoman,
 	randName
 } from '../dist/index.js';
-import type { NameDetail, NameLanguage, RandNameOptions } from '../dist/index.js';
+import type { NameDetail, NameLanguage, RandNameOptions, RandRealism } from '../dist/index.js';
 // Internal, so they get their own checks: everything else about a generated name
 // is random, but romanization is a pure function with known answers, and the
 // pools are what the tests below hold the generator to.
@@ -264,24 +264,24 @@ describe('Name', () => {
 		}
 	});
 
-	it('style invents names without breaking the script or the structure', () => {
-		for (const style of [0, 50, 100, -20, 500]) {
+	it('realism invents names without breaking the script or the structure', () => {
+		for (const realism of ['real', 'mixed', 'invented', 'wild' as RandRealism]) {
 			for (const language of NAME_LANGUAGES) {
-				for (const name of randName({ language, style, count: 20 })) {
-					assert.match(name, SCRIPT[language], `${language} @ ${style}: ${name}`);
+				for (const name of randName({ language, realism, count: 20 })) {
+					assert.match(name, SCRIPT[language], `${language} @ ${realism}: ${name}`);
 				}
 			}
 		}
 
 		// The abstract end should mostly leave the curated pools behind.
-		const realistic = new Set(randName({ language: 'en', style: 0, count: 400 }));
-		const abstract = randName({ language: 'en', style: 100, count: 100 });
+		const realistic = new Set(randName({ language: 'en', realism: 'real', count: 400 }));
+		const abstract = randName({ language: 'en', realism: 'invented', count: 100 });
 		const overlap = abstract.filter((name) => realistic.has(name)).length;
 
 		assert.ok(overlap < 10, `too many invented names look curated: ${overlap}`);
 	});
 
-	it('style: 0 stays inside the curated pools', () => {
+	it("realism: 'real' stays inside the curated pools", () => {
 		// The realistic end promises names people actually carry, so a rolled given
 		// name length the pool cannot serve has to be re-rolled rather than invented.
 		// Ranges here are ones the pools can satisfy; asking for a length no real
@@ -298,7 +298,7 @@ describe('Name', () => {
 			const data = NAME_DATA[language];
 			const given = new Set([...data.givenMale!, ...data.givenFemale!].map(native));
 
-			for (const name of randName({ language, style: 0, count: 300, ...bounds })) {
+			for (const name of randName({ language, realism: 'real', count: 300, ...bounds })) {
 				const surname = surnameOf(language, name);
 
 				assert.ok(surname, `${language}: no curated surname leads ${name}`);
@@ -331,7 +331,7 @@ describe('Name', () => {
 		// far enough below to be unreachable by chance, and an even draw over the
 		// pool (1.3% / 3.3% / 2.2%) cannot come near any of them.
 		const share = (language: 'ko' | 'vi' | 'zh', surname: string) => {
-			const names = randName({ language, style: 0, count: 2000 });
+			const names = randName({ language, realism: 'real', count: 2000 });
 
 			return names.filter((name) => name.startsWith(surname)).length / names.length;
 		};

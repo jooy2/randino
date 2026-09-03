@@ -2,7 +2,7 @@
 
 Internal — `rand_name` is the public entry point, in both of its output forms.
 
-- At the realistic end of `style`, names come out of the curated pools: whole given
+- At `realism="real"`, names come out of the curated pools: whole given
   names for CJK, given/surname pools for the other scripts.
 - Toward the abstract end they are invented instead — Latin and Cyrillic scripts
   from syllable templates, CJK by combining given-name syllables.
@@ -25,7 +25,7 @@ from randino._internal.generate import (
     length_bounds,
     resolve_length,
     resolve_prefix,
-    resolve_style,
+    resolve_realism,
 )
 from randino._internal.parse import NameToken
 from randino._internal.utils import (
@@ -42,6 +42,7 @@ from randino._types import (
     NameGenderOption,
     NameLanguage,
     NameLanguageOption,
+    RandRealism,
 )
 from randino.name._romanize import romanize, romanize_hangul
 from randino.name.data import NAME_DATA, NAME_LANGUAGES
@@ -96,7 +97,7 @@ class Settings:
     gender: NameGenderOption
     include_surname: bool
     include_middle_name: bool
-    style: int
+    invent: int
     prefix: str
     min_length: int | None = None
     max_length: int | None = None
@@ -230,7 +231,7 @@ def curated_given(
 
     The length follows the language's own distribution, but only over the lengths the
     pool can actually serve: rolling a length first and then looking it up would drop
-    through to an invented name at `style=0` whenever the pool has no real name of
+    through to an invented name at `realism="real"` whenever the pool has no real name of
     that length — Korean lists three-syllable given names in its weights and holds
     none, so one name in twenty-five came out invented.
     """
@@ -364,7 +365,7 @@ def generate_cjk(
     given_prefix = "" if leads_with_surname else prefix
 
     def draw_given() -> Entry:
-        if not chance(settings.style):
+        if not chance(settings.invent):
             real = curated_given(data, is_male, low, high, given_prefix)
 
             if real is not None:
@@ -403,7 +404,7 @@ def draw_parts(data: NameLanguageData, settings: Settings, is_male: bool) -> Par
     leads_with_surname = surname_leads(data, settings.include_surname)
     given_prefix = "" if leads_with_surname else settings.prefix
 
-    if data.syn is not None and chance(settings.style):
+    if data.syn is not None and chance(settings.invent):
         given = synth_entry(data, given_prefix)
     elif given_prefix:
         given = lead_entry(data, given_pool, "given", given_prefix)
@@ -415,7 +416,7 @@ def draw_parts(data: NameLanguageData, settings: Settings, is_male: bool) -> Par
     if settings.include_surname:
         surname_prefix = settings.prefix if leads_with_surname else ""
 
-        if data.syn is not None and chance(settings.style):
+        if data.syn is not None and chance(settings.invent):
             surname = synth_entry(data, surname_prefix)
         elif surname_prefix:
             surname = lead_entry(data, data.last, "surname", surname_prefix)
@@ -539,7 +540,7 @@ def generate_name_details(
     language: NameLanguageOption = "all",
     gender: NameGenderOption = "all",
     count: int = 1,
-    style: int = 0,
+    realism: RandRealism = "real",
     min_length: int | None = None,
     max_length: int | None = None,
     include_surname: bool = True,
@@ -554,7 +555,7 @@ def generate_name_details(
         include_middle_name=include_middle_name,
         min_length=resolve_length(min_length),
         max_length=resolve_length(max_length),
-        style=resolve_style(style),
+        invent=resolve_realism(realism),
         prefix=resolve_prefix(starts_with),
     )
 

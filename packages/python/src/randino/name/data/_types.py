@@ -130,4 +130,4 @@ class NameLanguageData:
     """CJK following syllables of an invented female given name."""
 
     syn: SyllableSet | None = None
-    """Western/Vietnamese invented-name synthesis (abstract end of the style range)."""
+    """Western/Vietnamese invented-name synthesis, for `realism="invented"`."""

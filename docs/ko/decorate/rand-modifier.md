@@ -21,7 +21,7 @@ randModifier(randAnimal({ language: 'en', count: 2 }));
 | --- | --- | --- | --- |
 | `value` | `string \| string[]` | — | 장식할 대상. 옵션이 아니라 첫 번째 인자. 생략하면 수식어만 |
 | `language` | `WordLanguageOption` | _문자 체계_ | 수식어를 뽑을 언어 |
-| `style` | `number` | `0` | `0`은 실제 수식어를 뽑고, `100`은 그 언어처럼 읽히기만 하는 수식어를 만들어냅니다 |
+| `realism` | `RandRealism` | `'real'` | `real`은 언어가 쓰는 수식어를 뽑고, `invented`는 그 언어처럼 읽히기만 하는 수식어를 만들어냅니다 |
 | `separator` | `string` | _언어_ | 수식어와 값 사이에 들어감 |
 
 `string`에는 `string`을, `string[]`에는 `string[]`을 반환합니다.
@@ -41,12 +41,12 @@ randModifierAll(randAnimal(language: WordLanguage.en, count: 2));
 // [TwinklingLynx, OnyxCrane]
 ```
 
-| 파라미터    | 타입            | 기본값      | 설명                                       |
-| ----------- | --------------- | ----------- | ------------------------------------------ |
-| `value`     | `String?`       | `null`      | 장식할 대상. 생략하면 수식어만             |
-| `language`  | `WordLanguage?` | _문자 체계_ | 수식어를 뽑을 언어                         |
-| `style`     | `int`           | `0`         | `0`은 실제 수식어, `100`은 만들어낸 수식어 |
-| `separator` | `String?`       | _언어_      | 수식어와 값 사이에 들어감                  |
+| 파라미터 | 타입 | 기본값 | 설명 |
+| --- | --- | --- | --- |
+| `value` | `String?` | `null` | 장식할 대상. 생략하면 수식어만 |
+| `language` | `WordLanguage?` | _문자 체계_ | 수식어를 뽑을 언어 |
+| `realism` | `RandRealism` | `RandRealism.real` | `real`은 실제 수식어, `invented`는 만들어낸 수식어 |
+| `separator` | `String?` | _언어_ | 수식어와 값 사이에 들어감 |
 
 `String`을 반환합니다. **리스트 형태는 `randModifierAll`입니다.** `randSuffix`에 대한 `randSuffixAll`과 같습니다.
 
@@ -69,7 +69,7 @@ rand_modifier(rand_animal(language="en", count=2))
 | --- | --- | --- | --- |
 | `value` | `str \| list[str] \| None` | `None` | 장식할 대상. 위치 인자이며 나머지는 키워드 전용 |
 | `language` | `WordLanguageOption \| None` | _문자 체계_ | 수식어를 뽑을 언어 |
-| `style` | `int` | `0` | `0`은 실제 수식어, `100`은 만들어낸 수식어 |
+| `realism` | `RandRealism` | `"real"` | `real`은 실제 수식어, `invented`는 만들어낸 수식어 |
 | `separator` | `str \| None` | _언어_ | 수식어와 값 사이에 들어감 |
 
 `str`에는 `str`을, `list[str]`에는 `list[str]`을 반환하며 `@overload`가 이를 전달합니다.
@@ -145,13 +145,13 @@ rand_modifier(["Owl", "Owl", "Owl"])
 
 ## 구분자와 만들어낸 수식어 {#the-separator-and-invented-modifiers}
 
-`separator`의 기본값은 그 언어가 단어를 잇는 방식, 즉 붙여 쓰는 것입니다. `style`은 모든 생성 함수가 가진 그 다이얼입니다. `0`은 언어가 실제로 쓰는 수식어를 뽑고, `100`은 그 언어처럼 읽히기만 하는 수식어를 만들어냅니다.
+`separator`의 기본값은 그 언어가 단어를 잇는 방식, 즉 붙여 쓰는 것입니다. `realism`은 모든 생성 함수가 가진 그 옵션입니다. `real`은 언어가 실제로 쓰는 수식어를 뽑고, `invented`는 그 언어처럼 읽히기만 하는 수식어를 만들어냅니다.
 
 ::: lang js
 
 ```javascript
 randModifier('Owl', { separator: '-' }); // 'Pointed-Owl'
-randModifier({ language: 'en', style: 100 }); // 'Snikith'
+randModifier({ language: 'en', realism: 'invented' }); // 'Snikith'
 ```
 
 :::
@@ -160,7 +160,7 @@ randModifier({ language: 'en', style: 100 }); // 'Snikith'
 
 ```dart
 randModifier(value: 'Owl', separator: '-'); // 'Pointed-Owl'
-randModifier(language: WordLanguage.en, style: 100); // 'Snikith'
+randModifier(language: WordLanguage.en, realism: RandRealism.invented); // 'Snikith'
 ```
 
 :::
@@ -169,7 +169,7 @@ randModifier(language: WordLanguage.en, style: 100); // 'Snikith'
 
 ```python
 rand_modifier("Owl", separator="-")  # 'Pointed-Owl'
-rand_modifier(language="en", style=100)  # 'Snikith'
+rand_modifier(language="en", realism="invented")  # 'Snikith'
 ```
 
 :::

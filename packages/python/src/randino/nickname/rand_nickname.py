@@ -5,6 +5,7 @@ from typing import Literal, overload
 from randino._types import (
     NicknameDetail,
     RandOutput,
+    RandRealism,
     WordLanguageOption,
     WordThemeOption,
 )
@@ -17,7 +18,7 @@ def rand_nickname(
     language: WordLanguageOption = ...,
     theme: WordThemeOption = ...,
     count: int = ...,
-    style: int = ...,
+    realism: RandRealism = ...,
     min_length: int | None = ...,
     max_length: int | None = ...,
     word_separator: str | None = ...,
@@ -33,7 +34,7 @@ def rand_nickname(
     language: WordLanguageOption = ...,
     theme: WordThemeOption = ...,
     count: int = ...,
-    style: int = ...,
+    realism: RandRealism = ...,
     min_length: int | None = ...,
     max_length: int | None = ...,
     word_separator: str | None = ...,
@@ -48,7 +49,7 @@ def rand_nickname(
     language: WordLanguageOption = "all",
     theme: WordThemeOption = "all",
     count: int = 1,
-    style: int = 0,
+    realism: RandRealism = "real",
     min_length: int | None = None,
     max_length: int | None = None,
     word_separator: str | None = None,
@@ -66,8 +67,8 @@ def rand_nickname(
         language: Language of the generated nicknames. `"all"` mixes every language.
         theme: What the nickname should be about.
         count: How many nicknames to return. Held inside `0`..`RAND_COUNT_MAX`.
-        style: `0` builds nicknames out of real words, `100` invents words that only
-            read like the language, and values in between mix the two.
+        realism: whether the words are real ones or invented to read like the
+            language. `"mixed"` decides per word.
         min_length: Minimum length in characters. Defaults to the language's own
             range.
         max_length: Maximum length in characters.
@@ -101,7 +102,7 @@ def rand_nickname(
         language=language,
         theme=theme,
         count=count,
-        style=style,
+        realism=realism,
         min_length=min_length,
         max_length=max_length,
         word_separator=word_separator,

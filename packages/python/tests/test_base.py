@@ -29,6 +29,7 @@ def test_the_package_exports_exactly_its_public_api() -> None:
         "RAND_COUNT_MAX",
         "RAND_LENGTH_MAX",
         "RAND_LENGTH_MIN",
+        "RandRealism",
         "WORD_LANGUAGES",
         "WORD_THEMES",
         "WordDetail",

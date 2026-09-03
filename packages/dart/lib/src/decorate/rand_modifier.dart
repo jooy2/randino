@@ -8,7 +8,12 @@ import 'package:randino/src/word/word_generator.dart';
 /// Draws one modifier, and reports the separator its language joins with.
 ///
 /// Internal — shared by [randModifier] and `randModifierAll`.
-(String, String) drawModifier(String? value, WordLanguage? language, int style, String? separator) {
+(String, String) drawModifier(
+  String? value,
+  WordLanguage? language,
+  RandRealism realism,
+  String? separator,
+) {
   // The language of the word being decorated, so that '고양이' is not handed an
   // English modifier. Only consulted when the caller left the language out.
   final WordLanguage code =
@@ -16,7 +21,7 @@ import 'package:randino/src/word/word_generator.dart';
   final data = wordData[code]!;
   final pool = modifiersOf(data);
   final bounds = poolBounds(pool);
-  final drawn = drawWord(data, pool, resolveStyle(style), bounds.min, bounds.max, '');
+  final drawn = drawWord(data, pool, resolveRealism(realism), bounds.min, bounds.max, '');
 
   return (drawn.word, separator ?? data.joiner);
 }
@@ -30,17 +35,22 @@ import 'package:randino/src/word/word_generator.dart';
 ///
 /// With [value] left out you get the modifier on its own. With [language] left
 /// out, the script of the value picks one; with no value either, every language
-/// is in play. [style] runs from `0`, a modifier the language actually uses, to
-/// `100`, one that only reads like it. [separator] defaults to the way the
-/// language joins words, which is to run them together.
+/// is in play. [realism] decides whether the modifier is one the language
+/// actually uses or one invented to read like it. [separator] defaults to the
+/// way the language joins words, which is to run them together.
 ///
 /// ```dart
 /// randModifier(); // '멋진'
 /// randModifier('사자'); // '멋진사자'
 /// randModifier('Owl', separator: ' '); // 'Misty Owl'
 /// ```
-String randModifier({String? value, WordLanguage? language, int style = 0, String? separator}) {
-  final (word, joiner) = drawModifier(value, language, style, separator);
+String randModifier({
+  String? value,
+  WordLanguage? language,
+  RandRealism realism = RandRealism.real,
+  String? separator,
+}) {
+  final (word, joiner) = drawModifier(value, language, realism, separator);
 
   return value == null ? word : '$word$joiner$value';
 }

@@ -31,8 +31,8 @@ void _names() {
     randName(language: NameLanguage.ru, gender: NameGender.female, includeMiddleName: true),
   ); // [Людмила Николаевна Богданова]
 
-  // `style` is consulted per part, so 50 mixes real and invented ones.
-  print(randName(language: NameLanguage.en, style: 100, count: 3));
+  // `realism` is consulted per part, so `mixed` pairs real and invented ones.
+  print(randName(language: NameLanguage.en, realism: RandRealism.invented, count: 3));
   // [Deder Kuvoun, Jaihil Brouvinn, Thoowoun Wiatou]
 
   // Both scripts at once, plus the choices behind each name.

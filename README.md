@@ -16,7 +16,7 @@ Every option, every language and every example — pick **JavaScript**, **Dart**
 - **Nicknames** are the handles you would pick for a game or a website — MistyOwl, CraneVoyage, RustyBoot. Built from everyday words across fourteen themes, never from person names, with over nine million combinations in Korean and English before a random suffix is added.
 - **Words** are those fourteen themes on their own — `randWord`, and a function per theme: `randAnimal`, `randFood`, `randGem` and eleven more.
 - **Decorators** attach something to a string you already have rather than generating one: a random token with `randSuffix` and `randPrefix`, a modifier with `randModifier`.
-- One options set per generator: language, length, count, and a style setting that runs from realistic to fully invented.
+- One options set per generator: language, length, count, and a `realism` setting that goes from real words to fully invented ones.
 - **No runtime dependencies**, in any of the packages.
 
 ## Packages

@@ -184,7 +184,7 @@ describe('Decorate', () => {
 		}
 	});
 
-	it('randModifier takes a separator, a style and a list', () => {
+	it('randModifier takes a separator, a realism and a list', () => {
 		for (let i = 0; i < SAMPLE; i += 1) {
 			assert.match(randModifier('Owl', { language: 'en', separator: ' ' }), /^[A-Za-z]+ Owl$/);
 			assert.match(randModifier('사자', { language: 'ko', separator: '-' }), /^[가-힣]+-사자$/);
@@ -195,7 +195,7 @@ describe('Decorate', () => {
 		let drawn = 0;
 
 		for (let i = 0; i < 200; i += 1) {
-			const word = randModifier({ language: 'ko', style: 100 });
+			const word = randModifier({ language: 'ko', realism: 'invented' });
 
 			assert.match(word, /^[가-힣]+$/, word);
 

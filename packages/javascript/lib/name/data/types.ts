@@ -60,6 +60,6 @@ export type NameLanguageData = {
 	restMale?: NamePool;
 	firstFemale?: NamePool;
 	restFemale?: NamePool;
-	// Western/Vietnamese invented-name synthesis (abstract end of the style range).
+	// Western/Vietnamese invented-name synthesis, for `realism: 'invented'`.
 	syn?: SyllableSet;
 };

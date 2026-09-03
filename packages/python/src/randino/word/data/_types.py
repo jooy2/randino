@@ -52,7 +52,7 @@ class PoolSynthesis:
 
 
 WordSynthesis = SyllableSynthesis | PoolSynthesis
-"""How invented words are built at the abstract end of the style range.
+"""How a word is built when `realism` calls for an invented one.
 
 The npm package tells the two apart with a `kind` field; here they are two classes
 and the generator branches on `isinstance`, which is what lets a reader of

@@ -12,7 +12,7 @@ import 'package:randino/src/types.dart';
 /// A pool of words a generator can draw from.
 typedef WordPool = List<String>;
 
-/// How invented words are built at the abstract end of the style range.
+/// How a word is built when `realism` calls for an invented one.
 sealed class WordSynthesis {
   /// Creates a synthesis template.
   const WordSynthesis({required this.minSyllables, required this.maxSyllables});

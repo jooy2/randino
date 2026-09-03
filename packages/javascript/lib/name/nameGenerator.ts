@@ -1,9 +1,9 @@
 // The name generator itself. Internal — `randName` and `randNameDetails` are
 // the public entry points.
 //
-// - At the realistic end of `style`, names come out of the curated pools: whole
+// - At `realism: 'real'`, names come out of the curated pools: whole
 //   given names for CJK, given/surname pools for the other scripts.
-// - Toward the abstract end they are invented instead — Latin and Cyrillic
+// - At `'invented'` they are built instead — Latin and Cyrillic
 //   scripts from syllable templates, CJK by combining given-name syllables.
 // - The structure the caller asked for (surname, middle name, starting letter) is
 //   always honoured. The length range is satisfied by re-drawing from the pools,
@@ -16,7 +16,7 @@ import {
 	lengthBounds,
 	resolveLength,
 	resolvePrefix,
-	resolveStyle
+	resolveRealism
 } from '../_internal/generate.js';
 import { capitalizeFirst, chance, clamp, pick, pickWeighted, randInt } from '../_internal/utils.js';
 import type { NameDetail, NameGender, NameLanguage, RandNameOptions } from '../_types/global.js';
@@ -39,7 +39,8 @@ type Settings = {
 	includeMiddleName: boolean;
 	minLength?: number;
 	maxLength?: number;
-	style: number;
+	// How often one part is invented rather than drawn, as a percentage.
+	invent: number;
 	prefix: string;
 };
 
@@ -199,7 +200,7 @@ function composeGiven(
  * A real CJK given name that fits the length range, or null when the pool holds
  * none. The length follows the language's own distribution, but only over the
  * lengths the pool can actually serve: rolling a length first and then looking it
- * up would drop through to an invented name at `style: 0` whenever the pool has
+ * up would drop through to an invented name at `realism: 'real'` whenever the pool has
  * no real name of that length — Korean lists three-syllable given names in its
  * weights and holds none, so one name in twenty-five came out invented.
  */
@@ -354,7 +355,7 @@ function generateCjk(
 
 	const givenPrefix = leadsWithSurname ? '' : prefix;
 	const drawGiven = (): Entry => {
-		if (!chance(settings.style)) {
+		if (!chance(settings.invent)) {
 			const real = curatedGiven(data, isMale, min, max, givenPrefix);
 
 			if (real) {
@@ -392,7 +393,7 @@ function drawParts(data: NameLanguageData, settings: Settings, isMale: boolean):
 
 	let given: Entry;
 
-	if (data.syn && chance(settings.style)) {
+	if (data.syn && chance(settings.invent)) {
 		given = synthEntry(data, givenPrefix || undefined);
 	} else if (givenPrefix) {
 		given = leadEntry(data, givenPool, 'given', givenPrefix);
@@ -405,7 +406,7 @@ function drawParts(data: NameLanguageData, settings: Settings, isMale: boolean):
 	if (settings.includeSurname) {
 		const surnamePrefix = leadsWithSurname ? settings.prefix : '';
 
-		if (data.syn && chance(settings.style)) {
+		if (data.syn && chance(settings.invent)) {
 			surname = synthEntry(data, surnamePrefix || undefined);
 		} else if (surnamePrefix) {
 			surname = leadEntry(data, data.last, 'surname', surnamePrefix);
@@ -539,7 +540,7 @@ function resolveSettings(options: RandNameOptions): Settings {
 		includeMiddleName: options.includeMiddleName ?? false,
 		minLength: resolveLength(options.minLength),
 		maxLength: resolveLength(options.maxLength),
-		style: resolveStyle(options.style),
+		invent: resolveRealism(options.realism),
 		prefix: resolvePrefix(options.startsWith)
 	};
 }

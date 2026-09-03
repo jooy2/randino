@@ -2,6 +2,7 @@
 
 ## vNext (2026--)
 
+- **Breaking:** `style` is `realism`, and it takes the `RandRealism` enum instead of an `int` from 0 to 100. `style: 0` becomes `realism: RandRealism.real` (still the default, so it can be dropped), `style: 100` becomes `RandRealism.invented`, and anything in between becomes `RandRealism.mixed`. The decision was always a coin flip per part, so the numbers between 0, 50 and 100 promised a precision that was not there.
 - Nicknames are built from shapes the language itself declares, which adds two of them. A word for what the noun is **doing** now takes the front slot on its own (`웃는사자`, `StudyingFox`, `踊るキツネ`, `奔跑的狮子`), and Korean, Japanese and Chinese gained a **possessive** shape (`사자의눈물`, `ライオンの涙`, `狮子的眼泪`). Japanese and Chinese had no two-noun shape at all before, because a bare compound does not read in either; through の and 的 it does.
 - **Breaking:** `NicknameDetail.words` holds the words and nothing else, so joining them no longer reproduces `nickname` where a shape put a particle between two of them — `사자의눈물` reports `['사자', '눈물']`. Read `nickname` for the finished string.
 - `nicknameLengthRange` widened again for the two languages that gained a shape: `WordLanguage.zh` is `LengthRange(2, 8)` rather than `LengthRange(2, 5)`, and `WordLanguage.ja` `LengthRange(1, 14)` rather than `LengthRange(1, 11)`.

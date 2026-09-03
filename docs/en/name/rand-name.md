@@ -44,7 +44,7 @@ Every option is optional, and the defaults are what the empty call above uses.
 | `language` | <Lang js="NameLanguageOption" dart="NameLanguage?" py="NameLanguageOption" code /> | <Lang js="'all'" dart="null" py="&quot;all&quot;" code /> | Language of the generated names. <Lang js="'all'" dart="null" py="&quot;all&quot;" code /> mixes every supported language, picking one per name. |
 | `gender` | <Lang js="NameGenderOption" dart="NameGender?" py="NameGenderOption" code /> | <Lang js="'all'" dart="null" py="&quot;all&quot;" code /> | Which pools the given name is drawn from. Left out, a gender is picked per name. |
 | `count` | <Lang js="number" dart="int" py="int" code /> | `1` | How many names to return. Clamped to `0` … `10000`. |
-| `style` | <Lang js="number" dart="int" py="int" code /> | `0` | `0` draws names people actually carry, `100` invents new ones, and anything between mixes the two per name and per part. |
+| `realism` | `RandRealism` | <Lang js="`'real'`" dart="`RandRealism.real`" py="`\"real\"`" /> | `real` draws names people actually carry, `invented` builds new ones, and `mixed` decides per part. |
 | <Lang js="minLength" dart="minLength" py="min_length" code /> | <Lang js="number" dart="int?" py="int &#124; None" code /> | _language_ | Minimum length of the native form, in characters. |
 | <Lang js="maxLength" dart="maxLength" py="max_length" code /> | <Lang js="number" dart="int?" py="int &#124; None" code /> | _language_ | Maximum length of the native form, in characters. |
 | <Lang js="includeSurname" dart="includeSurname" py="include_surname" code /> | <Lang js="boolean" dart="bool" py="bool" code /> | <Lang js="true" dart="true" py="True" code /> | Include the family name. |

@@ -11,7 +11,7 @@
 // - Which shapes exist is the language's own business, and `data.frames` is
 //   where it says so. A shape carries its particles with it, so Chinese can put
 //   的 between a verb and its noun where Korean needs nothing.
-// - `style` decides per word whether it comes out of a pool or is invented.
+// - `realism` decides per word whether it comes out of a pool or is invented.
 // - `minLength` / `maxLength` pick the shape first: a range too short for a
 //   modifier drops that frame instead of truncating a word.
 // - `wordSeparator` decides what goes between the words, defaulting to the way
@@ -26,7 +26,7 @@ import {
 	lengthBounds,
 	resolveLength,
 	resolvePrefix,
-	resolveStyle
+	resolveRealism
 } from '../_internal/generate.js';
 import { pick } from '../_internal/utils.js';
 import type {
@@ -50,7 +50,8 @@ type Bounds = Record<WordSlot, readonly [number, number]>;
 // does the separator, which falls back to the language's own joiner.
 type Settings = {
 	theme: WordThemeOption;
-	style: number;
+	// How often one part is invented rather than drawn, as a percentage.
+	invent: number;
 	minLength?: number;
 	maxLength?: number;
 	prefix: string;
@@ -189,7 +190,7 @@ function buildWords(
 		const low = Math.max(1, min - used - gap - restMax);
 		const high = Math.max(low, max - used - gap - restMin);
 		const pool = poolOf(data, frame.slots[i], nouns);
-		const chosen = drawWord(data, pool, settings.style, low, high, i === 0 ? settings.prefix : '');
+		const chosen = drawWord(data, pool, settings.invent, low, high, i === 0 ? settings.prefix : '');
 
 		missed = missed || chosen.missed;
 		used += gap + chosen.word.length;
@@ -251,7 +252,7 @@ export function naturalRange(
 	separator?: string
 ): readonly [number, number] {
 	const data = WORD_DATA[language];
-	const settings: Settings = { theme: 'all', style: 0, prefix: '', separator };
+	const settings: Settings = { theme: 'all', invent: 0, prefix: '', separator };
 	const joiner = joinerOf(data, settings).length;
 	let min = Infinity;
 	let max = 0;
@@ -329,7 +330,7 @@ function generateOne(language: WordLanguage, settings: Settings): Built {
 function resolveSettings(options: RandNicknameOptions): Settings {
 	return {
 		theme: options.theme ?? 'all',
-		style: resolveStyle(options.style),
+		invent: resolveRealism(options.realism),
 		minLength: resolveLength(options.minLength),
 		maxLength: resolveLength(options.maxLength),
 		prefix: resolvePrefix(options.startsWith),

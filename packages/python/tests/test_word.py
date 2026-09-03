@@ -1,11 +1,13 @@
 """The word generators: `rand_word` and the fourteen themed ones."""
 
 import re
+from typing import get_args
 
 from randino import (
     RAND_COUNT_MAX,
     WORD_LANGUAGES,
     WORD_THEMES,
+    RandRealism,
     WordLanguage,
     WordTheme,
     rand_animal,
@@ -88,7 +90,7 @@ def test_every_language_writes_its_words_in_its_own_script() -> None:
         for word in rand_word(language=language, count=SAMPLE):
             assert SCRIPT[language].match(word), f"{language}: {word}"
 
-        for word in rand_word(language=language, count=SAMPLE, style=100):
+        for word in rand_word(language=language, count=SAMPLE, realism="invented"):
             assert SCRIPT[language].match(word), f"{language} invented: {word}"
 
 
@@ -191,9 +193,9 @@ def test_starts_with_leads_every_word_with_the_requested_character() -> None:
         assert re.fullmatch(r"Z[A-Za-z]+", word), word
 
 
-def test_style_invents_words_instead_of_drawing_them() -> None:
+def test_realism_invents_words_instead_of_drawing_them() -> None:
     pool = set(pool_of("ko"))
-    invented = rand_word(output="detail", language="ko", style=100, count=200)
+    invented = rand_word(output="detail", language="ko", realism="invented", count=200)
     drawn = [detail for detail in invented if detail.word in pool]
 
     assert len(drawn) < 20, f"{len(drawn)} of 200 still came from the pools"
@@ -207,14 +209,15 @@ def test_style_invents_words_instead_of_drawing_them() -> None:
             assert detail.word in pool_of("ko", detail.theme), detail.word
 
     # Halfway, both kinds of word show up.
-    mixed = rand_word(output="detail", language="ko", style=50, count=200)
+    mixed = rand_word(output="detail", language="ko", realism="mixed", count=200)
 
     assert any(detail.word in pool for detail in mixed)
     assert any(detail.word not in pool for detail in mixed)
 
     # Out-of-range values are clamped rather than rejected.
-    for style in (-50, 500):
-        assert len(rand_word(language="ko", style=style, count=5)) == 5
+    # Every level is accepted, and the type is what rules the rest out.
+    for realism in get_args(RandRealism):
+        assert len(rand_word(language="ko", realism=realism, count=5)) == 5
 
 
 def test_unique_never_repeats_a_word() -> None:

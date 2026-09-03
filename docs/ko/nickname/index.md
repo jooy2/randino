@@ -162,14 +162,14 @@ rand_suffix(rand_nickname(language="en", count=3))
 
 토큰이 나중에 붙기 때문에, <Lang js="minLength" dart="minLength" py="min_length" code />와 <Lang js="maxLength" dart="maxLength" py="max_length" code />는 닉네임 전체를 가리키며 빼고 셀 것이 없습니다.
 
-### `style`은 단어를 뽑는 대신 만들어냅니다
+### `realism`은 단어를 뽑는 대신 만들어냅니다
 
 `0`에서는 모든 단어가 실제 단어입니다. `100`에 가까워지면 해당 언어의 음절로 단어를 조립하며, 사전에 있는 단어가 아니라 지어낸 핸들처럼 읽힙니다.
 
 ::: lang js
 
 ```javascript
-randNickname({ language: 'en', style: 100, count: 3 });
+randNickname({ language: 'en', realism: 'invented', count: 3 });
 // ['Duhusk', 'DresaelSlobru', 'BroureexGrosex']
 ```
 
@@ -178,7 +178,7 @@ randNickname({ language: 'en', style: 100, count: 3 });
 ::: lang dart
 
 ```dart
-randNickname(language: WordLanguage.en, style: 100, count: 3);
+randNickname(language: WordLanguage.en, realism: RandRealism.invented, count: 3);
 // ['Duhusk', 'DresaelSlobru', 'BroureexGrosex']
 ```
 
@@ -187,7 +187,7 @@ randNickname(language: WordLanguage.en, style: 100, count: 3);
 ::: lang py
 
 ```python
-rand_nickname(language="en", style=100, count=3)
+rand_nickname(language="en", realism="invented", count=3)
 # ['Duhusk', 'DresaelSlobru', 'BroureexGrosex']
 ```
 

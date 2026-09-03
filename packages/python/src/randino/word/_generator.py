@@ -14,10 +14,11 @@ from randino._internal.generate import (
     draw_language,
     length_bounds,
     resolve_prefix,
-    resolve_style,
+    resolve_realism,
 )
 from randino._internal.utils import capitalize_first, chance, clamp, pick, rand_int
 from randino._types import (
+    RandRealism,
     WordDetail,
     WordLanguage,
     WordLanguageOption,
@@ -159,19 +160,19 @@ class Drawn(NamedTuple):
 def draw_word(
     data: WordLanguageData,
     pool: WordPool,
-    style: int,
+    invent: int,
     low: int,
     high: int,
     prefix: str,
 ) -> Drawn:
-    """Draw one word from `pool`, or invent one, at the given `style`."""
-    invent = chance(style)
-    word = None if invent else pick_word(pool, low, high, prefix)
+    """Draw one word from `pool`, or invent one `invent` percent of the time."""
+    made = chance(invent)
+    word = None if made else pick_word(pool, low, high, prefix)
     chosen = word if word is not None else synth_word(data.syn, low, high, prefix)
 
     return Drawn(
         capitalize_first(chosen) if data.capitalize else chosen,
-        not invent and word is None,
+        not made and word is None,
     )
 
 
@@ -191,7 +192,7 @@ class Settings(NamedTuple):
     """Everything one word needs, with the defaults already applied."""
 
     theme: WordThemeOption
-    style: int
+    invent: int
     min_length: int | None
     max_length: int | None
     prefix: str
@@ -212,7 +213,7 @@ def generate_one(language: WordLanguage, settings: Settings) -> WordDetail:
         low, high = length_bounds(
             settings.min_length, settings.max_length, natural_low, natural_high
         )
-        word, missed = draw_word(data, pool, settings.style, low, high, settings.prefix)
+        word, missed = draw_word(data, pool, settings.invent, low, high, settings.prefix)
         detail = WordDetail(
             word=word,
             language=language,
@@ -244,7 +245,7 @@ def generate_word_details(
     language: WordLanguageOption = "all",
     theme: WordThemeOption = "all",
     count: int = 1,
-    style: int = 0,
+    realism: RandRealism = "real",
     min_length: int | None = None,
     max_length: int | None = None,
     starts_with: str = "",
@@ -253,7 +254,7 @@ def generate_word_details(
     """Generate `count` words, applied to every option the caller passed."""
     settings = Settings(
         theme=theme,
-        style=resolve_style(style),
+        invent=resolve_realism(realism),
         min_length=min_length,
         max_length=max_length,
         prefix=resolve_prefix(starts_with),

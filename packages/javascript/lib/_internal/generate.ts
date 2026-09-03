@@ -7,7 +7,7 @@
 // a new generator gets all of it by calling `collect`.
 
 import { RAND_COUNT_MAX, RAND_LENGTH_MAX, RAND_LENGTH_MIN } from '../constants.js';
-import type { RandCommonOptions } from '../_types/global.js';
+import type { RandCommonOptions, RandRealism } from '../_types/global.js';
 import { clamp, pick } from './utils.js';
 
 /** `count`, floored and clamped to what a generator will serve. */
@@ -24,9 +24,20 @@ export function resolvePrefix(startsWith?: string): string {
 	return (startsWith ?? '').trim().slice(0, 1);
 }
 
-/** `style`, clamped to the 0-100 scale rather than rejected outside it. */
-export function resolveStyle(style?: number): number {
-	return clamp(style ?? 0, 0, 100);
+// How often a part is invented rather than drawn, per level, as a percentage.
+const INVENT_CHANCE: Record<RandRealism, number> = {
+	real: 0,
+	mixed: 50,
+	invented: 100
+};
+
+/**
+ * `realism` as the chance of inventing one part, which is what every generator
+ * actually asks of it. A level the type rules out but a JavaScript caller can
+ * still pass falls back to the default rather than throwing.
+ */
+export function resolveRealism(realism?: RandRealism): number {
+	return INVENT_CHANCE[realism as RandRealism] ?? INVENT_CHANCE.real;
 }
 
 /**

@@ -72,7 +72,7 @@ const name = reactive({
 	language: 'en',
 	gender: 'all',
 	count: 8,
-	style: 0,
+	realism: 'real',
 	script: 'native',
 	includeSurname: true,
 	includeMiddleName: false,
@@ -86,7 +86,7 @@ const nickname = reactive({
 	language: 'en',
 	theme: 'all',
 	count: 8,
-	style: 0,
+	realism: 'real',
 	minLength: '',
 	maxLength: '',
 	wordSeparator: '',
@@ -98,7 +98,7 @@ const word = reactive({
 	language: 'en',
 	theme: 'all',
 	count: 8,
-	style: 0,
+	realism: 'real',
 	minLength: '',
 	maxLength: '',
 	startsWith: '',
@@ -120,7 +120,7 @@ const options = computed(() => {
 		if (name.language !== 'all') out.language = name.language;
 		if (name.gender !== 'all') out.gender = name.gender;
 		if (name.count !== 1) out.count = Number(name.count);
-		if (Number(name.style) !== 0) out.style = Number(name.style);
+		if (name.realism !== 'real') out.realism = name.realism;
 		if (name.script !== 'native') out.script = name.script;
 		if (!name.includeSurname) out.includeSurname = false;
 		if (name.includeMiddleName) out.includeMiddleName = true;
@@ -136,7 +136,7 @@ const options = computed(() => {
 		if (word.language !== 'all') out.language = word.language;
 		if (word.theme !== 'all') out.theme = word.theme;
 		if (word.count !== 1) out.count = Number(word.count);
-		if (Number(word.style) !== 0) out.style = Number(word.style);
+		if (word.realism !== 'real') out.realism = word.realism;
 		if (num(word.minLength) !== undefined) out.minLength = num(word.minLength);
 		if (num(word.maxLength) !== undefined) out.maxLength = num(word.maxLength);
 		if (word.startsWith) out.startsWith = word.startsWith;
@@ -148,7 +148,7 @@ const options = computed(() => {
 	if (nickname.language !== 'all') out.language = nickname.language;
 	if (nickname.theme !== 'all') out.theme = nickname.theme;
 	if (nickname.count !== 1) out.count = Number(nickname.count);
-	if (Number(nickname.style) !== 0) out.style = Number(nickname.style);
+	if (nickname.realism !== 'real') out.realism = nickname.realism;
 	if (num(nickname.minLength) !== undefined) out.minLength = num(nickname.minLength);
 	if (num(nickname.maxLength) !== undefined) out.maxLength = num(nickname.maxLength);
 	if (nickname.wordSeparator) out.wordSeparator = nickname.wordSeparator;
@@ -416,9 +416,13 @@ async function copy() {
 					<input v-model.number="name.count" type="number" min="1" :max="COUNT_MAX" />
 				</label>
 
-				<label class="randino-demo-field randino-demo-wide">
-					<span><code>style</code> — {{ name.style }}</span>
-					<input v-model.number="name.style" type="range" min="0" max="100" step="5" />
+				<label class="randino-demo-field">
+					<span><code>realism</code></span>
+					<select v-model="name.realism">
+						<option value="real">real</option>
+						<option value="mixed">mixed</option>
+						<option value="invented">invented</option>
+					</select>
 				</label>
 
 				<label class="randino-demo-field">
@@ -476,9 +480,13 @@ async function copy() {
 					<input v-model.number="word.count" type="number" min="1" :max="COUNT_MAX" />
 				</label>
 
-				<label class="randino-demo-field randino-demo-wide">
-					<span><code>style</code> — {{ word.style }}</span>
-					<input v-model.number="word.style" type="range" min="0" max="100" step="5" />
+				<label class="randino-demo-field">
+					<span><code>realism</code></span>
+					<select v-model="word.realism">
+						<option value="real">real</option>
+						<option value="mixed">mixed</option>
+						<option value="invented">invented</option>
+					</select>
 				</label>
 
 				<label class="randino-demo-field">
@@ -526,9 +534,13 @@ async function copy() {
 					<input v-model.number="nickname.count" type="number" min="1" :max="COUNT_MAX" />
 				</label>
 
-				<label class="randino-demo-field randino-demo-wide">
-					<span><code>style</code> — {{ nickname.style }}</span>
-					<input v-model.number="nickname.style" type="range" min="0" max="100" step="5" />
+				<label class="randino-demo-field">
+					<span><code>realism</code></span>
+					<select v-model="nickname.realism">
+						<option value="real">real</option>
+						<option value="mixed">mixed</option>
+						<option value="invented">invented</option>
+					</select>
 				</label>
 
 				<label class="randino-demo-field">

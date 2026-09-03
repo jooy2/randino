@@ -162,14 +162,14 @@ rand_suffix(rand_nickname(language="en", count=3))
 
 Because the token is attached afterwards, <Lang js="minLength" dart="minLength" py="min_length" code /> and <Lang js="maxLength" dart="maxLength" py="max_length" code /> describe the whole nickname and have nothing to exclude.
 
-### `style` invents words rather than drawing them
+### `realism` invents words rather than drawing them
 
 At `0` every word is a real one. Toward `100` the words are built from the language's own syllables, which reads as a made-up handle rather than a dictionary word.
 
 ::: lang js
 
 ```javascript
-randNickname({ language: 'en', style: 100, count: 3 });
+randNickname({ language: 'en', realism: 'invented', count: 3 });
 // ['Duhusk', 'DresaelSlobru', 'BroureexGrosex']
 ```
 
@@ -178,7 +178,7 @@ randNickname({ language: 'en', style: 100, count: 3 });
 ::: lang dart
 
 ```dart
-randNickname(language: WordLanguage.en, style: 100, count: 3);
+randNickname(language: WordLanguage.en, realism: RandRealism.invented, count: 3);
 // ['Duhusk', 'DresaelSlobru', 'BroureexGrosex']
 ```
 
@@ -187,7 +187,7 @@ randNickname(language: WordLanguage.en, style: 100, count: 3);
 ::: lang py
 
 ```python
-rand_nickname(language="en", style=100, count=3)
+rand_nickname(language="en", realism="invented", count=3)
 # ['Duhusk', 'DresaelSlobru', 'BroureexGrosex']
 ```
 

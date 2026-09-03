@@ -82,10 +82,10 @@ Leave the theme out and each result draws from one theme picked at random, so a 
 
 ## Where a theme comes from
 
-| Where the word came from   | What `theme` reports                          |
-| -------------------------- | --------------------------------------------- |
-| Drawn from a theme         | That theme                                    |
-| Invented at a high `style` | Null — unless it happens to spell a real word |
+| Where the word came from          | What `theme` reports                          |
+| --------------------------------- | --------------------------------------------- |
+| Drawn from a theme                | That theme                                    |
+| Invented at `realism: 'invented'` | Null — unless it happens to spell a real word |
 
 That last row is a real coincidence rather than a bug: the syllable templates spell `Snake` now and then, so an invented word can come back with `theme` set to `animal`.
 

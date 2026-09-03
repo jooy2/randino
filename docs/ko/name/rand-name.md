@@ -44,7 +44,7 @@ rand_name()
 | `language` | <Lang js="NameLanguageOption" dart="NameLanguage?" py="NameLanguageOption" code /> | <Lang js="'all'" dart="null" py="&quot;all&quot;" code /> | 생성할 이름의 언어. <Lang js="'all'" dart="null" py="&quot;all&quot;" code />이면 지원하는 모든 언어를 섞어서 이름마다 하나씩 고릅니다. |
 | `gender` | <Lang js="NameGenderOption" dart="NameGender?" py="NameGenderOption" code /> | <Lang js="'all'" dart="null" py="&quot;all&quot;" code /> | 이름을 어느 풀에서 뽑을지. 생략하면 이름마다 성별을 하나씩 고릅니다. |
 | `count` | <Lang js="number" dart="int" py="int" code /> | `1` | 반환할 이름의 개수. `0` … `10000` 범위로 제한됩니다. |
-| `style` | <Lang js="number" dart="int" py="int" code /> | `0` | `0`은 실제로 쓰이는 이름을, `100`은 새로 만들어낸 이름을 뽑습니다. 중간값은 이름마다, 요소마다 둘을 섞습니다. |
+| `realism` | `RandRealism` | <Lang js="`'real'`" dart="`RandRealism.real`" py="`\"real\"`" /> | `real`은 실제로 쓰이는 이름을, `invented`는 새로 만들어낸 이름을 뽑습니다. `mixed`는 요소마다 판단합니다. |
 | <Lang js="minLength" dart="minLength" py="min_length" code /> | <Lang js="number" dart="int?" py="int &#124; None" code /> | _언어별_ | 고유 표기의 최소 글자 수. |
 | <Lang js="maxLength" dart="maxLength" py="max_length" code /> | <Lang js="number" dart="int?" py="int &#124; None" code /> | _언어별_ | 고유 표기의 최대 글자 수. |
 | <Lang js="includeSurname" dart="includeSurname" py="include_surname" code /> | <Lang js="boolean" dart="bool" py="bool" code /> | <Lang js="true" dart="true" py="True" code /> | 성을 포함합니다. |

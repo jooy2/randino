@@ -309,24 +309,33 @@ void main() {
       }
     });
 
-    test('style invents names without breaking the script or the structure', () {
-      for (final style in <int>[0, 50, 100, -20, 500]) {
+    test('realism invents names without breaking the script or the structure', () {
+      for (final realism in RandRealism.values) {
         for (final language in nameLanguages) {
-          for (final name in randName(language: language, style: style, count: 20)) {
-            expect(name, matches(script[language]!), reason: '${language.name} @ $style: $name');
+          for (final name in randName(language: language, realism: realism, count: 20)) {
+            expect(
+              name,
+              matches(script[language]!),
+              reason: '${language.name} @ ${realism.name}: $name',
+            );
           }
         }
       }
 
       // The abstract end should mostly leave the curated pools behind.
-      final realistic = randName(language: NameLanguage.en, style: 0, count: 400).toSet();
-      final abstract = randName(language: NameLanguage.en, style: 100, count: 100);
+      final realistic =
+          randName(language: NameLanguage.en, realism: RandRealism.real, count: 400).toSet();
+      final abstract = randName(
+        language: NameLanguage.en,
+        realism: RandRealism.invented,
+        count: 100,
+      );
       final overlap = abstract.where(realistic.contains).length;
 
       expect(overlap, lessThan(10), reason: 'too many invented names look curated: $overlap');
     });
 
-    test('style: 0 stays inside the curated pools', () {
+    test('realism real stays inside the curated pools', () {
       // The realistic end promises names people actually carry, so a rolled given
       // name length the pool cannot serve has to be re-rolled rather than invented.
       // Ranges here are ones the pools can satisfy; asking for a length no real
@@ -348,7 +357,7 @@ void main() {
 
         for (final name in randName(
           language: language,
-          style: 0,
+          realism: RandRealism.real,
           count: 300,
           minLength: minLength,
           maxLength: maxLength,
@@ -391,7 +400,7 @@ void main() {
       // far enough below to be unreachable by chance, and an even draw over the
       // pool (1.3% / 3.3% / 2.2%) cannot come near any of them.
       double share(NameLanguage language, String surname) {
-        final names = randName(language: language, style: 0, count: 2000);
+        final names = randName(language: language, realism: RandRealism.real, count: 2000);
 
         return names.where((name) => name.startsWith(surname)).length / names.length;
       }

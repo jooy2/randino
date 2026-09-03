@@ -18,7 +18,7 @@ That is the third group, and the three of them are why the split is not generato
 
 The name generator is a port of the logic behind vutools' [Random Person Name Generator](https://www.vutools.com/tools/text/random-person-name-generator) (`client/src/app/[locale]/tools/text/random-person-name-generator` in the `www-vutools-com` repo), with the same options. Two deliberate differences: the web page's `es-hangul` dependency is replaced by an internal romanizer (see below), and length bounds are resolved per language so `language: 'all'` does not stretch a Korean name to fill a Spanish name's range.
 
-The nickname and word generators have no upstream — they are this repo's own. Their options mirror the name generator's where they mean the same thing: those live on `RandCommonOptions` (`count`, `style`, `minLength` / `maxLength`, `startsWith`, `unique`, `output`), and each generator adds only what is its own. `randWord` adds `language` and `theme`; `randNickname` adds those plus `wordSeparator`.
+The nickname and word generators have no upstream — they are this repo's own. Their options mirror the name generator's where they mean the same thing: those live on `RandCommonOptions` (`count`, `realism`, `minLength` / `maxLength`, `startsWith`, `unique`, `output`), and each generator adds only what is its own. `randWord` adds `language` and `theme`; `randNickname` adds those plus `wordSeparator`.
 
 **A new generator should add options, not repeat them.** If it counts, filters by a starting character or deduplicates, it calls `collect` in `_internal/generate` and gets all of that for free.
 
@@ -409,16 +409,16 @@ Gender is the one option with no directly observable effect in most languages. I
 
 Nicknames are checked against the datasets themselves: `randNickname({ output: 'detail' })` reports the `words` it used, so every word can be asserted to come from the language's pools, and the English pools are asserted to share nothing with the English person-name pools. Korean and Japanese cannot have that last invariant — `하늘`, `별` and `森` are everyday nouns that also happen to be names, and `아름다운하늘` is still nobody's name.
 
-Two coincidences are load-bearing and must not be asserted away: a word can be both a modifier and a noun (`무지개`, `Marble`, `自由`), and an invented word can spell a real one by accident (`나` + `비` -> `나비`, so `theme` comes back as `'animal'` at `style: 100`). Structural assertions survive both; "the first word is not a modifier" does not.
+Two coincidences are load-bearing and must not be asserted away: a word can be both a modifier and a noun (`무지개`, `Marble`, `自由`), and an invented word can spell a real one by accident (`나` + `비` -> `나비`, so `theme` comes back as `'animal'` at `realism: 'invented'`). Structural assertions survive both; "the first word is not a modifier" does not.
 
 ## Behavior worth knowing before changing it
 
 - **Structure beats length.** A length range too narrow for the requested parts is answered with the closest name the generator can build; it never drops a surname or middle name the caller asked for. For space-separated languages the range is satisfied by re-drawing up to `FIT_ATTEMPTS` times, so a very narrow range is best-effort. CJK hits it exactly.
 - **`unique` defaults to `false`** so that `count` is always exact. Turning it on trades that for deduplication and can return fewer names.
-- **`style` is consulted per part**, not per batch, so `50` mixes real and invented parts within one name.
+- **`realism` is consulted per part**, not per batch, so `'mixed'` pairs real and invented parts within one name. It is three levels rather than the 0-100 number it was: the decision is a coin flip per part, and nothing between "always" and "half the time" was worth naming.
 - **Length bounds are resolved per language** inside `generateOne`, not once per call. Keep it that way, or mixed-language output regresses.
 - **`givenLenWeights` stretching:** asking a CJK language for a range longer than its real names produces long invented given names on purpose. That is a deliberate ask, not a bug. The stretch is off for a curated draw, where the pool — not the range — decides what lengths exist.
-- **`style: 0` does not invent to hit a length.** `curatedGiven` takes the whole range and picks the length from the lengths the pool holds, so a weight table that lists a length the pool has none of (Korean lists three-syllable given names and has none) no longer drops one name in twenty-five through to `composeGiven`. A range that only a length the pool lacks can satisfy still invents — there is nothing real to draw.
+- **`realism: 'real'` does not invent to hit a length.** `curatedGiven` takes the whole range and picks the length from the lengths the pool holds, so a weight table that lists a length the pool has none of (Korean lists three-syllable given names and has none) no longer drops one name in twenty-five through to `composeGiven`. A range that only a length the pool lacks can satisfy still invents — there is nothing real to draw.
 - **Surnames are weighted where the distribution is steep.** `lastWeights` is a `native:weight` table in tenths of a percent of the population, and only `ko`, `zh` and `vi` have one: 김 covers a fifth of Korea and Nguyễn two fifths of Vietnam, so an even draw over the pool is the loudest way the output stops reading like the language. English, German, Italian, Spanish, Russian and Japanese surnames have a long enough tail that the even draw is already within the right order of magnitude — do not add a table there for symmetry. Surnames the table leaves out keep `LAST_WEIGHT_DEFAULT`, so only the head needs listing; `test/name.test.ts` asserts every weighted surname is still in the pool.
 
 Nicknames:

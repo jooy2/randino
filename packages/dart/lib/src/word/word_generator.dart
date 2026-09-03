@@ -164,13 +164,13 @@ class Drawn {
   final bool missed;
 }
 
-/// Draw one word from [pool], or invent one, at the given [style].
-Drawn drawWord(WordLanguageData data, WordPool pool, int style, int min, int max, String prefix) {
-  final invent = chance(style);
-  final word = invent ? null : pickWord(pool, min, max, prefix);
+/// Draw one word from [pool], or invent one [invent] percent of the time.
+Drawn drawWord(WordLanguageData data, WordPool pool, int invent, int min, int max, String prefix) {
+  final made = chance(invent);
+  final word = made ? null : pickWord(pool, min, max, prefix);
   final chosen = word ?? synthWord(data.syn, min, max, prefix);
 
-  return Drawn(data.capitalize ? capitalizeFirst(chosen) : chosen, !invent && word == null);
+  return Drawn(data.capitalize ? capitalizeFirst(chosen) : chosen, !made && word == null);
 }
 
 /// Every length the language's pools hold, across the requested themes.
@@ -195,7 +195,7 @@ LengthRange naturalRange(WordLanguage language, WordTheme? theme) {
 WordDetail _generateOne(
   WordLanguage language,
   WordTheme? theme,
-  int style,
+  int invent,
   int? minLength,
   int? maxLength,
   String prefix,
@@ -211,7 +211,7 @@ WordDetail _generateOne(
     final pool = data.nouns[drawnTheme]!;
     final natural = poolBounds(pool);
     final range = lengthBounds(minLength, maxLength, natural.min, natural.max);
-    final drawn = drawWord(data, pool, style, range.min, range.max, prefix);
+    final drawn = drawWord(data, pool, invent, range.min, range.max, prefix);
     final detail = WordDetail(
       word: drawn.word,
       language: language,
@@ -248,13 +248,13 @@ List<WordDetail> generateWordDetails({
   WordLanguage? language,
   WordTheme? theme,
   int count = 1,
-  int style = 0,
+  RandRealism realism = RandRealism.real,
   int? minLength,
   int? maxLength,
   String? startsWith,
   bool unique = false,
 }) {
-  final resolvedStyle = resolveStyle(style);
+  final invent = resolveRealism(realism);
   final prefix = resolvePrefix(startsWith);
 
   return collect<WordDetail>(
@@ -266,7 +266,7 @@ List<WordDetail> generateWordDetails({
     draw: () {
       final WordLanguage code = language ?? pick(wordLanguages);
 
-      return _generateOne(code, theme, resolvedStyle, minLength, maxLength, prefix);
+      return _generateOne(code, theme, invent, minLength, maxLength, prefix);
     },
     keyOf: (detail) => detail.word,
   );

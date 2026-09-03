@@ -11,6 +11,7 @@ from collections.abc import Callable, Sequence
 from typing import TypeVar
 
 from randino._internal.utils import clamp, pick
+from randino._types import RandRealism
 from randino.constants import RAND_COUNT_MAX, RAND_LENGTH_MAX, RAND_LENGTH_MIN
 
 T = TypeVar("T")
@@ -31,9 +32,17 @@ def resolve_prefix(starts_with: str) -> str:
     return starts_with.strip()[:1]
 
 
-def resolve_style(style: int) -> int:
-    """Return `style`, clamped to the 0-100 scale rather than rejected outside it."""
-    return clamp(style, 0, 100)
+_INVENT_CHANCE: dict[str, int] = {"real": 0, "mixed": 50, "invented": 100}
+"""How often a part is invented rather than drawn, per level, as a percentage."""
+
+
+def resolve_realism(realism: RandRealism) -> int:
+    """Return `realism` as the chance of inventing one part, as a percentage.
+
+    That is what every generator actually asks of it. A level the type rules out but an
+    unchecked caller can still pass falls back to the default rather than raising.
+    """
+    return _INVENT_CHANCE.get(realism, 0)
 
 
 def resolve_length(value: int | None) -> int | None:

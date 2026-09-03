@@ -2,7 +2,7 @@
 
 from typing import Literal, overload
 
-from randino._types import WordDetail, WordLanguageOption, WordThemeOption
+from randino._types import RandRealism, WordDetail, WordLanguageOption, WordThemeOption
 from randino.word._generator import generate_word_details
 
 
@@ -12,7 +12,7 @@ def rand_word(
     language: WordLanguageOption = ...,
     theme: WordThemeOption = ...,
     count: int = ...,
-    style: int = ...,
+    realism: RandRealism = ...,
     min_length: int | None = ...,
     max_length: int | None = ...,
     starts_with: str = ...,
@@ -27,7 +27,7 @@ def rand_word(
     language: WordLanguageOption = ...,
     theme: WordThemeOption = ...,
     count: int = ...,
-    style: int = ...,
+    realism: RandRealism = ...,
     min_length: int | None = ...,
     max_length: int | None = ...,
     starts_with: str = ...,
@@ -41,7 +41,7 @@ def rand_word(
     language: WordLanguageOption = "all",
     theme: WordThemeOption = "all",
     count: int = 1,
-    style: int = 0,
+    realism: RandRealism = "real",
     min_length: int | None = None,
     max_length: int | None = None,
     starts_with: str = "",
@@ -58,8 +58,8 @@ def rand_word(
         language: Language of the generated words. `"all"` mixes every language.
         theme: What the words should be about.
         count: How many words to return. Held inside `0`..`RAND_COUNT_MAX`.
-        style: `0` draws real words, `100` invents words that only read like the
-            language, and values in between mix the two.
+        realism: whether the word is a real one or invented to read like the
+            language. `"mixed"` decides per word.
         min_length: Minimum length in characters. Defaults to what the pools hold.
         max_length: Maximum length in characters.
         starts_with: Keep only words whose first character is this one.
@@ -84,7 +84,7 @@ def rand_word(
         language=language,
         theme=theme,
         count=count,
-        style=style,
+        realism=realism,
         min_length=min_length,
         max_length=max_length,
         starts_with=starts_with,

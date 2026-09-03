@@ -53,19 +53,19 @@ randName({ language: 'ko', output: 'detail' });
 // [{ native: '여미주', roman: 'Yeo Miju', language: 'ko', gender: 'female' }]
 ```
 
-| Option                    | Type                             | Default    |
-| ------------------------- | -------------------------------- | ---------- |
-| `language`                | `'all'` or a language code       | `'all'`    |
-| `gender`                  | `'all' \| 'male' \| 'female'`    | `'all'`    |
-| `count`                   | `number`                         | `1`        |
-| `style`                   | `number` (0 real … 100 invented) | `0`        |
-| `minLength` / `maxLength` | `number`                         | _language_ |
-| `includeSurname`          | `boolean`                        | `true`     |
-| `includeMiddleName`       | `boolean`                        | `false`    |
-| `script`                  | `'native' \| 'roman'`            | `'native'` |
-| `output`                  | `'value' \| 'detail'`            | `'value'`  |
-| `startsWith`              | `string`                         | —          |
-| `unique`                  | `boolean`                        | `false`    |
+| Option                    | Type                          | Default    |
+| ------------------------- | ----------------------------- | ---------- |
+| `language`                | `'all'` or a language code    | `'all'`    |
+| `gender`                  | `'all' \| 'male' \| 'female'` | `'all'`    |
+| `count`                   | `number`                      | `1`        |
+| `realism`                 | `RandRealism`                 | `'real'`   |
+| `minLength` / `maxLength` | `number`                      | _language_ |
+| `includeSurname`          | `boolean`                     | `true`     |
+| `includeMiddleName`       | `boolean`                     | `false`    |
+| `script`                  | `'native' \| 'roman'`         | `'native'` |
+| `output`                  | `'value' \| 'detail'`         | `'value'`  |
+| `startsWith`              | `string`                      | —          |
+| `unique`                  | `boolean`                     | `false`    |
 
 ## Nicknames
 
@@ -87,17 +87,17 @@ randNickname({ language: 'en', output: 'detail' });
 // }]
 ```
 
-| Option                    | Type                             | Default    |
-| ------------------------- | -------------------------------- | ---------- |
-| `language`                | `'all'` or a language code       | `'all'`    |
-| `theme`                   | `'all'` or a theme name          | `'all'`    |
-| `count`                   | `number`                         | `1`        |
-| `style`                   | `number` (0 real … 100 invented) | `0`        |
-| `minLength` / `maxLength` | `number`                         | _language_ |
-| `wordSeparator`           | `string`                         | _language_ |
-| `startsWith`              | `string`                         | —          |
-| `unique`                  | `boolean`                        | `false`    |
-| `output`                  | `'value' \| 'detail'`            | `'value'`  |
+| Option                    | Type                       | Default    |
+| ------------------------- | -------------------------- | ---------- |
+| `language`                | `'all'` or a language code | `'all'`    |
+| `theme`                   | `'all'` or a theme name    | `'all'`    |
+| `count`                   | `number`                   | `1`        |
+| `realism`                 | `RandRealism`              | `'real'`   |
+| `minLength` / `maxLength` | `number`                   | _language_ |
+| `wordSeparator`           | `string`                   | _language_ |
+| `startsWith`              | `string`                   | —          |
+| `unique`                  | `boolean`                  | `false`    |
+| `output`                  | `'value' \| 'detail'`      | `'value'`  |
 
 Themes: `animal`, `object`, `nature`, `plant`, `gem`, `concept`, `myth`, `job`, `music`, `place`, `food`, `sport`, `vehicle`, `product`.
 
@@ -120,16 +120,16 @@ randWord({ language: 'en', theme: 'plant', output: 'detail' });
 wordLengthRange('en'); // [3, 11]
 ```
 
-| Option                    | Type                             | Default   |
-| ------------------------- | -------------------------------- | --------- |
-| `language`                | `'all'` or a language code       | `'all'`   |
-| `theme`                   | `'all'` or a theme name          | `'all'`   |
-| `count`                   | `number`                         | `1`       |
-| `style`                   | `number` (0 real … 100 invented) | `0`       |
-| `minLength` / `maxLength` | `number`                         | _pools_   |
-| `startsWith`              | `string`                         | —         |
-| `unique`                  | `boolean`                        | `false`   |
-| `output`                  | `'value' \| 'detail'`            | `'value'` |
+| Option                    | Type                       | Default   |
+| ------------------------- | -------------------------- | --------- |
+| `language`                | `'all'` or a language code | `'all'`   |
+| `theme`                   | `'all'` or a theme name    | `'all'`   |
+| `count`                   | `number`                   | `1`       |
+| `realism`                 | `RandRealism`              | `'real'`  |
+| `minLength` / `maxLength` | `number`                   | _pools_   |
+| `startsWith`              | `string`                   | —         |
+| `unique`                  | `boolean`                  | `false`   |
+| `output`                  | `'value' \| 'detail'`      | `'value'` |
 
 One function per theme: `randAnimal`, `randObject`, `randNature`, `randPlant`, `randGem`, `randConcept`, `randMyth`, `randJob`, `randMusic`, `randPlace`, `randFood`, `randSport`, `randVehicle`, `randProduct`. Each is `randWord` with the theme already chosen.
 
@@ -173,7 +173,7 @@ randModifier(randAnimal({ language: 'en', count: 2 }));
 | Option      | Type                 | Default    |
 | ----------- | -------------------- | ---------- |
 | `language`  | `WordLanguageOption` | _script_   |
-| `style`     | `number`             | `0`        |
+| `realism`   | `RandRealism`        | `'real'`   |
 | `separator` | `string`             | _language_ |
 
 With no `language`, the script of the value picks one, so `'고양이'` is never handed an English modifier.

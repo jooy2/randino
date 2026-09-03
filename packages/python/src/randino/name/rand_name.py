@@ -8,6 +8,7 @@ from randino._types import (
     NameLanguageOption,
     NameScript,
     RandOutput,
+    RandRealism,
 )
 from randino.name._generator import generate_name_details
 
@@ -18,7 +19,7 @@ def rand_name(
     language: NameLanguageOption = ...,
     gender: NameGenderOption = ...,
     count: int = ...,
-    style: int = ...,
+    realism: RandRealism = ...,
     min_length: int | None = ...,
     max_length: int | None = ...,
     include_surname: bool = ...,
@@ -36,7 +37,7 @@ def rand_name(
     language: NameLanguageOption = ...,
     gender: NameGenderOption = ...,
     count: int = ...,
-    style: int = ...,
+    realism: RandRealism = ...,
     min_length: int | None = ...,
     max_length: int | None = ...,
     include_surname: bool = ...,
@@ -53,7 +54,7 @@ def rand_name(
     language: NameLanguageOption = "all",
     gender: NameGenderOption = "all",
     count: int = 1,
-    style: int = 0,
+    realism: RandRealism = "real",
     min_length: int | None = None,
     max_length: int | None = None,
     include_surname: bool = True,
@@ -73,8 +74,8 @@ def rand_name(
         language: Language of the generated names. `"all"` mixes every language.
         gender: Pool the given name is drawn from. `"all"` picks one per name.
         count: How many names to return. Held inside `0`..`RAND_COUNT_MAX`.
-        style: `0` draws names people actually carry, `100` invents new ones, and
-            values in between mix the two.
+        realism: whether the parts are names people actually carry or invented
+            ones. `"mixed"` decides per part.
         min_length: Minimum length of the native form, in characters. Defaults to
             the language's own range.
         max_length: Maximum length of the native form, in characters. Defaults to
@@ -108,7 +109,7 @@ def rand_name(
         language=language,
         gender=gender,
         count=count,
-        style=style,
+        realism=realism,
         min_length=min_length,
         max_length=max_length,
         include_surname=include_surname,

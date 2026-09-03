@@ -12,7 +12,7 @@ import type { WordTheme } from '../../_types/global.js';
 export type WordPool = readonly string[];
 
 /**
- * How invented words are built at the abstract end of the style range:
+ * How a word is built when `realism` calls for an invented one:
  * - `syllable`: onset + vowel + coda, for alphabetic scripts (Blorin).
  * - `pool`: pick N whole syllables or characters, for scripts where one character
  *   is already a syllable (뮤겔, 星霧).

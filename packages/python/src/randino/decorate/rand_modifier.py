@@ -2,14 +2,16 @@
 
 from typing import overload
 
-from randino._internal.generate import draw_language, resolve_style
+from randino._internal.generate import draw_language, resolve_realism
 from randino._internal.script import detect_language
-from randino._types import WordLanguageOption
+from randino._types import RandRealism, WordLanguageOption
 from randino.word._generator import draw_word, modifiers_of, pool_bounds
 from randino.word.data import WORD_DATA, WORD_LANGUAGES
 
 
-def _draw(value: str | None, language: WordLanguageOption | None, style: int) -> tuple[str, str]:
+def _draw(
+    value: str | None, language: WordLanguageOption | None, realism: RandRealism
+) -> tuple[str, str]:
     """One modifier, and the separator its language joins words with."""
     # The language of the word being decorated, so that `"고양이"` is not handed an
     # English modifier. Only consulted when the caller left `language` out.
@@ -18,7 +20,7 @@ def _draw(value: str | None, language: WordLanguageOption | None, style: int) ->
     data = WORD_DATA[code]
     pool = modifiers_of(data)
     low, high = pool_bounds(pool)
-    word, _missed = draw_word(data, pool, resolve_style(style), low, high, "")
+    word, _missed = draw_word(data, pool, resolve_realism(realism), low, high, "")
 
     return word, data.joiner
 
@@ -28,7 +30,7 @@ def rand_modifier(
     value: None = ...,
     *,
     language: WordLanguageOption | None = ...,
-    style: int = ...,
+    realism: RandRealism = ...,
     separator: str | None = ...,
 ) -> str: ...
 
@@ -38,7 +40,7 @@ def rand_modifier(
     value: str,
     *,
     language: WordLanguageOption | None = ...,
-    style: int = ...,
+    realism: RandRealism = ...,
     separator: str | None = ...,
 ) -> str: ...
 
@@ -48,7 +50,7 @@ def rand_modifier(
     value: list[str],
     *,
     language: WordLanguageOption | None = ...,
-    style: int = ...,
+    realism: RandRealism = ...,
     separator: str | None = ...,
 ) -> list[str]: ...
 
@@ -57,7 +59,7 @@ def rand_modifier(
     value: str | list[str] | None = None,
     *,
     language: WordLanguageOption | None = None,
-    style: int = 0,
+    realism: RandRealism = "real",
     separator: str | None = None,
 ) -> str | list[str]:
     """Put a random modifier in front of a string: `"사자"` becomes `"멋진사자"`.
@@ -74,8 +76,8 @@ def rand_modifier(
         language: Language the modifier is drawn from. Left out, the script of the
             value picks it, so `"고양이"` is never handed an English modifier; with
             no value at all, or with `"all"`, every language is in play.
-        style: `0` draws a modifier the language actually uses, `100` invents one
-            that only reads like it.
+        realism: whether the modifier is one the language actually uses, or one
+            invented to read like it.
         separator: Placed between the modifier and the value. Defaults to the way
             the language itself joins words, which is to run them together.
 
@@ -93,10 +95,10 @@ def rand_modifier(
         ['오래된곰', '영원한도마뱀']
     """
     if value is None:
-        return _draw(None, language, style)[0]
+        return _draw(None, language, realism)[0]
 
     def one(item: str) -> str:
-        word, joiner = _draw(item, language, style)
+        word, joiner = _draw(item, language, realism)
 
         return word + (joiner if separator is None else separator) + item
 

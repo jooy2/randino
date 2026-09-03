@@ -12,7 +12,7 @@
 // - Which shapes exist is the language's own business, and `data.frames` is
 //   where it says so. A shape carries its particles with it, so Chinese can put
 //   的 between a verb and its noun where Korean needs nothing.
-// - `style` decides per word whether it comes out of a pool or is invented.
+// - `realism` decides per word whether it comes out of a pool or is invented.
 // - `minLength` / `maxLength` pick the shape first: a range too short for a
 //   modifier drops that frame instead of truncating a word.
 // - `wordSeparator` decides what goes between the words, defaulting to the way
@@ -39,7 +39,7 @@ typedef _Bounds = Map<WordSlot, LengthRange>;
 class _Settings {
   const _Settings({
     required this.theme,
-    required this.style,
+    required this.invent,
     required this.minLength,
     required this.maxLength,
     required this.prefix,
@@ -47,7 +47,9 @@ class _Settings {
   });
 
   final WordTheme? theme;
-  final int style;
+
+  /// How often one part is invented rather than drawn, as a percentage.
+  final int invent;
   final int? minLength;
   final int? maxLength;
   final String prefix;
@@ -195,7 +197,7 @@ _Filled _buildWords(
     final highRaw = max - used - gap - restMin;
     final high = highRaw < low ? low : highRaw;
     final pool = _poolOf(data, frame.slots[i], nouns);
-    final chosen = drawWord(data, pool, settings.style, low, high, i == 0 ? settings.prefix : '');
+    final chosen = drawWord(data, pool, settings.invent, low, high, i == 0 ? settings.prefix : '');
 
     missed = missed || chosen.missed;
     used += gap + chosen.word.length;
@@ -247,7 +249,7 @@ LengthRange naturalRange(WordLanguage language, String? separator) {
   final data = wordData[language]!;
   final settings = _Settings(
     theme: null,
-    style: 0,
+    invent: 0,
     minLength: null,
     maxLength: null,
     prefix: '',
@@ -335,7 +337,7 @@ List<NicknameDetail> generateNicknameDetails({
   WordLanguage? language,
   WordTheme? theme,
   int count = 1,
-  int style = 0,
+  RandRealism realism = RandRealism.real,
   int? minLength,
   int? maxLength,
   String? wordSeparator,
@@ -344,7 +346,7 @@ List<NicknameDetail> generateNicknameDetails({
 }) {
   final settings = _Settings(
     theme: theme,
-    style: resolveStyle(style),
+    invent: resolveRealism(realism),
     minLength: minLength,
     maxLength: maxLength,
     prefix: resolvePrefix(startsWith),

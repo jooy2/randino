@@ -21,7 +21,7 @@ randModifier(randAnimal({ language: 'en', count: 2 }));
 | --- | --- | --- | --- |
 | `value` | `string \| string[]` | — | What to decorate. The first argument, not an option. Omit it for the modifier alone |
 | `language` | `WordLanguageOption` | _script_ | Language the modifier is drawn from |
-| `style` | `number` | `0` | `0` draws a real modifier, `100` invents one that only reads like the language |
+| `realism` | `RandRealism` | `'real'` | `real` draws a modifier the language uses, `invented` builds one that only reads like it |
 | `separator` | `string` | _language_ | Placed between the modifier and the value |
 
 Returns a `string` for a `string`, and a `string[]` for a `string[]`.
@@ -41,12 +41,12 @@ randModifierAll(randAnimal(language: WordLanguage.en, count: 2));
 // [TwinklingLynx, OnyxCrane]
 ```
 
-| Parameter   | Type            | Default    | Description                                      |
-| ----------- | --------------- | ---------- | ------------------------------------------------ |
-| `value`     | `String?`       | `null`     | What to decorate. Omit it for the modifier alone |
-| `language`  | `WordLanguage?` | _script_   | Language the modifier is drawn from              |
-| `style`     | `int`           | `0`        | `0` draws a real modifier, `100` invents one     |
-| `separator` | `String?`       | _language_ | Placed between the modifier and the value        |
+| Parameter | Type | Default | Description |
+| --- | --- | --- | --- |
+| `value` | `String?` | `null` | What to decorate. Omit it for the modifier alone |
+| `language` | `WordLanguage?` | _script_ | Language the modifier is drawn from |
+| `realism` | `RandRealism` | `RandRealism.real` | `real` draws a real modifier, `invented` builds one |
+| `separator` | `String?` | _language_ | Placed between the modifier and the value |
 
 Returns a `String`. **`randModifierAll` is the list form**, the way `randSuffixAll` is for `randSuffix`.
 
@@ -69,7 +69,7 @@ rand_modifier(rand_animal(language="en", count=2))
 | --- | --- | --- | --- |
 | `value` | `str \| list[str] \| None` | `None` | What to decorate. Positional; the rest are keyword-only |
 | `language` | `WordLanguageOption \| None` | _script_ | Language the modifier is drawn from |
-| `style` | `int` | `0` | `0` draws a real modifier, `100` invents one |
+| `realism` | `RandRealism` | `"real"` | `real` draws a real modifier, `invented` builds one |
 | `separator` | `str \| None` | _language_ | Placed between the modifier and the value |
 
 Returns a `str` for a `str`, and a `list[str]` for a `list[str]` — carried by `@overload`.
@@ -145,13 +145,13 @@ rand_modifier(["Owl", "Owl", "Owl"])
 
 ## The separator, and invented modifiers
 
-`separator` defaults to the way the language itself joins words, which is to run them together. `style` is the same dial every generator has: `0` draws a modifier the language actually uses, `100` invents one that only reads like it.
+`separator` defaults to the way the language itself joins words, which is to run them together. `realism` is the same option every generator has: `real` draws a modifier the language actually uses, `invented` builds one that only reads like it.
 
 ::: lang js
 
 ```javascript
 randModifier('Owl', { separator: '-' }); // 'Pointed-Owl'
-randModifier({ language: 'en', style: 100 }); // 'Snikith'
+randModifier({ language: 'en', realism: 'invented' }); // 'Snikith'
 ```
 
 :::
@@ -160,7 +160,7 @@ randModifier({ language: 'en', style: 100 }); // 'Snikith'
 
 ```dart
 randModifier(value: 'Owl', separator: '-'); // 'Pointed-Owl'
-randModifier(language: WordLanguage.en, style: 100); // 'Snikith'
+randModifier(language: WordLanguage.en, realism: RandRealism.invented); // 'Snikith'
 ```
 
 :::
@@ -169,7 +169,7 @@ randModifier(language: WordLanguage.en, style: 100); // 'Snikith'
 
 ```python
 rand_modifier("Owl", separator="-")  # 'Pointed-Owl'
-rand_modifier(language="en", style=100)  # 'Snikith'
+rand_modifier(language="en", realism="invented")  # 'Snikith'
 ```
 
 :::

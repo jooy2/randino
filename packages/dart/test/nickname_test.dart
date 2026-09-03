@@ -100,7 +100,11 @@ void main() {
           expect(nickname, matches(script[language]!), reason: '${language.name}: $nickname');
         }
 
-        for (final nickname in randNickname(language: language, count: sample, style: 100)) {
+        for (final nickname in randNickname(
+          language: language,
+          count: sample,
+          realism: RandRealism.invented,
+        )) {
           expect(
             nickname,
             matches(script[language]!),
@@ -267,12 +271,16 @@ void main() {
       for (final language in wordLanguages) {
         final range = nicknameLengthRange(language: language);
 
-        for (final style in <int>[0, 100]) {
-          for (final nickname in randNickname(language: language, style: style, count: sample)) {
+        for (final realism in <RandRealism>[RandRealism.real, RandRealism.invented]) {
+          for (final nickname in randNickname(
+            language: language,
+            realism: realism,
+            count: sample,
+          )) {
             expect(
               nickname.length,
               inInclusiveRange(range.min, range.max),
-              reason: '${language.name} @ $style: $nickname',
+              reason: '${language.name} @ ${realism.name}: $nickname',
             );
           }
         }
@@ -366,9 +374,13 @@ void main() {
       }
     });
 
-    test('style invents words instead of drawing them', () {
+    test('realism invents words instead of drawing them', () {
       final pool = allWords(WordLanguage.ko).toSet();
-      final invented = randNicknameDetails(language: WordLanguage.ko, style: 100, count: 200);
+      final invented = randNicknameDetails(
+        language: WordLanguage.ko,
+        realism: RandRealism.invented,
+        count: 200,
+      );
       final drawn = invented.where((detail) => detail.words.any(pool.contains)).length;
 
       expect(drawn, lessThan(20), reason: '$drawn of 200 still came from the pools');
@@ -390,14 +402,19 @@ void main() {
       }
 
       // Halfway, both kinds of word show up.
-      final mixed = randNicknameDetails(language: WordLanguage.ko, style: 50, count: 200);
+      final mixed = randNicknameDetails(
+        language: WordLanguage.ko,
+        realism: RandRealism.mixed,
+        count: 200,
+      );
 
       expect(mixed.any((detail) => detail.words.every(pool.contains)), isTrue);
       expect(mixed.any((detail) => !detail.words.any(pool.contains)), isTrue);
 
       // Out-of-range values are clamped rather than rejected.
-      for (final style in <int>[-50, 500]) {
-        expect(randNickname(language: WordLanguage.ko, style: style, count: 5).length, 5);
+      // Every level is accepted, and the enum is what rules the rest out.
+      for (final realism in RandRealism.values) {
+        expect(randNickname(language: WordLanguage.ko, realism: realism, count: 5).length, 5);
       }
     });
 

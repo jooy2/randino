@@ -3,7 +3,7 @@
 import 'package:randino/src/internal/parse.dart';
 import 'package:randino/src/name/data/types.dart';
 
-// Syllable templates used at the abstract end of the style range. Names built
+// Syllable templates used when `realism` calls for an invented name. Names built
 // from these are invented rather than drawn from a pool, so they should read as
 // plausible for the language without matching anyone real.
 

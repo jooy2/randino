@@ -9,6 +9,7 @@ import {
 } from '../dist/index.js';
 import type {
 	NicknameDetail,
+	RandRealism,
 	WordLanguage,
 	WordTheme,
 	RandNicknameOptions
@@ -122,7 +123,7 @@ describe('Nickname', () => {
 				assert.match(nickname, SCRIPT[language], `${language}: ${nickname}`);
 			}
 
-			for (const nickname of randNickname({ language, count: SAMPLE, style: 100 })) {
+			for (const nickname of randNickname({ language, count: SAMPLE, realism: 'invented' })) {
 				assert.match(nickname, SCRIPT[language], `${language} invented: ${nickname}`);
 			}
 		}
@@ -251,11 +252,11 @@ describe('Nickname', () => {
 		for (const language of WORD_LANGUAGES) {
 			const [min, max] = nicknameLengthRange(language);
 
-			for (const style of [0, 100]) {
-				for (const nickname of randNickname({ language, style, count: SAMPLE })) {
+			for (const realism of ['real', 'invented'] as const) {
+				for (const nickname of randNickname({ language, realism, count: SAMPLE })) {
 					assert.ok(
 						nickname.length >= min && nickname.length <= max,
-						`${language} @ ${style}: ${nickname} (${nickname.length})`
+						`${language} @ ${realism}: ${nickname} (${nickname.length})`
 					);
 				}
 			}
@@ -326,9 +327,9 @@ describe('Nickname', () => {
 		}
 	});
 
-	it('style invents words instead of drawing them', () => {
+	it('realism invents words instead of drawing them', () => {
 		const pool = new Set(allWords('ko'));
-		const invented = nicknameDetails({ language: 'ko', style: 100, count: 200 });
+		const invented = nicknameDetails({ language: 'ko', realism: 'invented', count: 200 });
 		const drawn = invented.filter((detail) => detail.words.some((word) => pool.has(word)));
 
 		assert.ok(drawn.length < 20, `${drawn.length} of 200 still came from the pools`);
@@ -347,14 +348,15 @@ describe('Nickname', () => {
 		}
 
 		// Halfway, both kinds of word show up.
-		const mixed = nicknameDetails({ language: 'ko', style: 50, count: 200 });
+		const mixed = nicknameDetails({ language: 'ko', realism: 'mixed', count: 200 });
 		assert.ok(mixed.some((detail) => detail.words.every((word) => pool.has(word))));
 		assert.ok(mixed.some((detail) => detail.words.every((word) => !pool.has(word))));
 
-		// Out-of-range values are clamped rather than rejected.
-		for (const style of [-50, 500]) {
-			assert.strictEqual(randNickname({ language: 'ko', style, count: 5 }).length, 5);
-		}
+		// A level outside the three, which only an untyped caller can pass, falls
+		// back to the default rather than throwing.
+		const unknown = 'wild' as RandRealism;
+
+		assert.strictEqual(randNickname({ language: 'ko', realism: unknown, count: 5 }).length, 5);
 	});
 
 	it('unique never repeats a nickname', () => {

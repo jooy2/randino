@@ -76,7 +76,11 @@ void main() {
           expect(word, matches(script[language]!), reason: '$language: $word');
         }
 
-        for (final word in randWord(language: language, count: sample, style: 100)) {
+        for (final word in randWord(
+          language: language,
+          count: sample,
+          realism: RandRealism.invented,
+        )) {
           expect(word, matches(script[language]!), reason: '$language invented: $word');
         }
       }
@@ -202,9 +206,13 @@ void main() {
       }
     });
 
-    test('style invents words instead of drawing them', () {
+    test('realism invents words instead of drawing them', () {
       final pool = poolOf(WordLanguage.ko).toSet();
-      final invented = randWordDetails(language: WordLanguage.ko, style: 100, count: 200);
+      final invented = randWordDetails(
+        language: WordLanguage.ko,
+        realism: RandRealism.invented,
+        count: 200,
+      );
       final drawn = invented.where((detail) => pool.contains(detail.word));
 
       expect(drawn.length, lessThan(20));
@@ -220,14 +228,19 @@ void main() {
       }
 
       // Halfway, both kinds of word show up.
-      final mixed = randWordDetails(language: WordLanguage.ko, style: 50, count: 200);
+      final mixed = randWordDetails(
+        language: WordLanguage.ko,
+        realism: RandRealism.mixed,
+        count: 200,
+      );
 
       expect(mixed.any((detail) => pool.contains(detail.word)), isTrue);
       expect(mixed.any((detail) => !pool.contains(detail.word)), isTrue);
 
       // Out-of-range values are clamped rather than rejected.
-      for (final style in <int>[-50, 500]) {
-        expect(randWord(language: WordLanguage.ko, style: style, count: 5), hasLength(5));
+      // Every level is accepted, and the enum is what rules the rest out.
+      for (final realism in RandRealism.values) {
+        expect(randWord(language: WordLanguage.ko, realism: realism, count: 5), hasLength(5));
       }
     });
 

@@ -40,6 +40,7 @@ void main() {
           'NameLanguage',
           'NameScript',
           'NicknameDetail',
+          'RandRealism',
           'WordDetail',
           'WordLanguage',
           'WordTheme',
