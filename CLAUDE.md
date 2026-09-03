@@ -458,11 +458,11 @@ To add one that clears the bar:
 2. Add `lib/word/data/<code>.ts` with a `WordLanguageData` object: `joiner`, `capitalize`, `modifiers` in attributive form, `nouns` for every theme in `WORD_THEMES`, an optional `parts` pool, and a `syn` template (`kind: 'syllable'` for alphabetic scripts, `kind: 'pool'` where one character is one syllable).
 3. Register it in `WORD_DATA` and `WORD_LANGUAGES` in `lib/word/data/index.ts`.
 4. Leave `parts` out unless a bare noun-noun compound reads naturally — that is why `ja` and `zh` have none.
-5. Aim for 60+ nouns per theme; the pools are what make the output varied, and the combination count is roughly `modifiers × nouns × (1 + parts)` — around 9M for `ko` and `en`, 145K for `ja` and `zh`, which have no `parts`. `gem`, `sport`, `vehicle` and `product` are the exception (roughly 55 / 46 / 43 / 36 words) — the world holds fewer of those, and padding them with near-synonyms reads worse than a shorter pool.
+5. Aim for 100+ nouns per theme, which is where the existing four sit; the pools are what make the output varied, and the combination count is roughly `modifiers × nouns × (1 + parts)` — around 20M for `en` and 19M for `ko`, 0.3M for `ja` and `zh`, which have no `parts`. `sport`, `vehicle` and `product` are the thinnest (roughly 115 / 113 / 105) because the world holds fewer of those, and padding a theme with near-synonyms reads worse than a shorter pool.
 6. No person names, and no word that is only a name — for `en` this is enforced against the person-name pools, which is why `job` has no `Knight`, `Baker` or `Hunter` and `plant` no `Rose` or `Ivy`. Add the language to the README tables and to `SCRIPT` in `test/word.test.ts` **and** `test/nickname.test.ts`; the existing per-language tests then cover it.
 7. Port all of it to `packages/dart` and `packages/python`, the same way a name language is ported.
 8. Add the row to the tables in `docs/*/guide/languages.md` and to the root `README.md`.
-9. Run `node tools/parity/index.mjs` from the repository root — three pools of 60+ nouns each are exactly where one word goes missing unnoticed.
+9. Run `node tools/parity/index.mjs` from the repository root — three pools of 100+ nouns each are exactly where one word goes missing unnoticed.
 
 ## Adding a word theme
 

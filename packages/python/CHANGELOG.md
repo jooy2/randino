@@ -1,5 +1,9 @@
 # Changelog
 
+## vNext (2026--)
+
+- Every word theme holds roughly twice the words it did. All fourteen gained at least fifty entries per language, so the smallest pools are no longer the ones that shape the output: `sport` went from 46 to about 115, `vehicle` from 43 to about 113, and `product` from 36 to about 105. Each language now draws from around 1,900 nouns rather than 900, which roughly doubles what `rand_word`, the fourteen themed generators and `rand_nickname` can produce.
+
 ## 1.1.0 (2026-09-02)
 
 - **Breaking:** `random_name` and `random_nickname` are now `rand_name` and `rand_nickname`. The old names are gone; there are no aliases.
