@@ -85,7 +85,7 @@ English is the one language where romanizing changes nothing, because the names 
 
 ## Words and nicknames {#words-and-nicknames}
 
-The word pools — and so `randWord`, the twenty-five themed generators and `randNickname` — cover eight languages rather than nine, and the reason is grammar rather than effort. A modifier has to sit beside a noun exactly as it is written in the dictionary, and that only reads naturally where the language asks for no agreement between the two.
+The word pools — and so `randWord`, the twenty-five themed generators and `randNickname` — cover every one of the nine. What differs between them is where the modifier goes and whether it changes shape beside the noun, and each language says both in its own frames and agreement rules.
 
 | Code | Language   | Shapes                         | Example                    |
 | ---- | ---------- | ------------------------------ | -------------------------- |
@@ -94,12 +94,13 @@ The word pools — and so `randWord`, the twenty-five themed generators and `ran
 | `ja` | Japanese   | modifier (attributive form)    | 青いライオン, 星の影       |
 | `zh` | Chinese    | modifier, 的 before a verb     | 快乐熊猫, 奔跑的狮子       |
 | `vi` | Vietnamese | modifier **after** the noun    | mèo xanh, đuôi mèo         |
-| `es` | Spanish    | modifier after, **agreeing**   | gato azul, luna dorata     |
+| `es` | Spanish    | modifier after, **agreeing**   | gato azul, luna dorada     |
 | `it` | Italian    | modifier after, **agreeing**   | gatto azzurro, luna dorata |
 | `de` | German     | modifier **before**, declining | blauer Wal, blaue Katze    |
+| `ru` | Russian    | modifier **before**, declining | синий кит, синяя рыба      |
 
 Neither word order nor agreement keeps a language out any more. The shapes belong to the language, so Vietnamese writes its own — the modifier behind the noun, the possessed thing in front of its owner. And a language that inflects tags each noun with its gender and lists the endings a modifier changes, so Spanish writes `gato dorado` beside `luna dorada` without either form being stored twice.
 
-**Russian** is the one still missing, and only because its pools are not written yet — its endings fit the same rules German's do.
+Every language the name generator knows now has word pools too, so `language` means the same nine codes on every generator in the package.
 
 Japanese and Chinese use the modifier shapes only. A noun-noun compound in those languages needs a particle more often than not, or reads as garbled once the base word is abstract, so the trailing-word shapes are skipped for them.

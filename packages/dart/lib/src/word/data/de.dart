@@ -71,7 +71,7 @@ final TaggedNouns _nouns = taggedNouns(<WordTheme, String>{
   WordTheme.myth: r'''
     Drache:m Phönix:m Einhorn:n Meerjungfrau:f Fee:f Kobold:m Elf:m Zwerg:m Troll:m
     Oger:m Riese:m Chimäre:f Hydra:f Greif:m Zentaur:m Minotaurus:m Sphinx:f Pegasus:m
-    Krake_Sage:m Basilisk:m Golem:m Vampir:m Werwolf:m Gespenst:n Geist:m Seele:f
+     Basilisk:m Golem:m Vampir:m Werwolf:m Gespenst:n Geist:m Seele:f
     Dämon:m Engel:m Göttin:f Gott:m Zauber:m Fluch:m Weissagung:f Orakel:n Amulett:n
     Talisman:m Rune:f Pforte:f Heiligtum:n Götze:m Totem:n Nymphe:f Najade:f Dryade:f
     Walküre:f Muse:f Hexer:m Hexe:f Nekromant:m Alchemist:m Weiser:m Vorzeichen:n Omen:n
@@ -150,7 +150,7 @@ final TaggedNouns _nouns = taggedNouns(<WordTheme, String>{
   ''',
   WordTheme.color: r'''
     Karmesin:n Scharlach:n Zinnoberrot:n Purpur:n Magenta:n Fuchsia:n Rosa:n Lachs:n
-    Orange_Farbe:n Ocker:n Siena:n Sepia:n Senfgelb:n Olivgrün:n Limone:f Smaragdgrün:n
+     Ocker:n Siena:n Sepia:n Senfgelb:n Olivgrün:n Limone:f Smaragdgrün:n
     Türkis:n Zyan:n Himmelblau:n Indigo:n Flieder:n Malve:f Veilchen:n Weinrot:n Rost:m
     Terrakotta:n Creme:f Beige:n Khaki:n Anthrazit:n Zinngrau:n Ebenholz:n
     Rabenschwarz:n Azurblau:n Safrangelb:n Aquamarin:n Grünspan:m Perlmutt:n Kupferrot:n
@@ -164,7 +164,7 @@ final TaggedNouns _nouns = taggedNouns(<WordTheme, String>{
     Kapital:n Ertrag:m Gewinn:m Spanne:f Überschuss:m Fehlbetrag:m Schuld:f Kredit:m
     Lastschrift:f Scheck:m Münze:f Währung:f Rendite:f Depot:n Zoll:m Erstattung:f
     Prämie:f Rente:f Lohnliste:f Gehalt:n Lohn:m Bonus:m Provision:f Lizenzgebühr:f
-    Franchise:f Fusion:f Übernahme:f Rettung:f Sicherheit:f Gutschein:m Barren_Gold:m
+    Franchise:f Fusion:f Übernahme:f Rettung:f Sicherheit:f Gutschein:m
     Tresor:m Staatskasse:f Überweisung:f Abrechnung:f Arbitrage:f Kontoauszug:m
     Sparbuch:n Verwahrung:f Gläubiger:m Schuldner:m Verleiher:m Bürge:m Bewertung:f
     Schätzung:f Inflation:f Rezession:f Liquidität:f Konkurs:m Spende:f Zuschuss:m
@@ -193,7 +193,7 @@ final TaggedNouns _nouns = taggedNouns(<WordTheme, String>{
   WordTheme.space: r'''
     Stern:m Mond:m Sonne:f Galaxie:f Komet:m Meteor:m Polarlicht:n Mondsichel:f
     Sternenstaub:m Milchstraße:f Finsternis:f Weltall:n Planet:m Trabant:m Kleinplanet:m
-    Nebel_Stern:m Sternhaufen:m Sternbild:n Umlaufbahn:f Schwerkraft:f Drehung:f
+     Sternhaufen:m Sternbild:n Umlaufbahn:f Schwerkraft:f Drehung:f
     Umlauf:m Sonnenfleck:m Krater:m Lichtjahr:n Gestirn:n Firmament:n Ekliptik:f
     Meridian:m Stratosphäre:f Lufthülle:f Leere:f Vollmond:m Neumond:m Halbmond:m
     Mondlicht:n Sternenlicht:n Polarstern:m Abendstern:m Morgenstern:m Mars:m Venus:f
@@ -227,7 +227,7 @@ final TaggedNouns _nouns = taggedNouns(<WordTheme, String>{
     Knorpel:m Herz:n Lunge:f Leber:f Magen:m Niere:f Milz:f Darm:m Blase:f Gehirn:n
     Nerv:m Vene:f Arterie:f Blut:n Fleisch:n Haut:f Pore:f Haar:n Bart:m Träne:f
     Schweiß:m Speichel:m Atem:m Puls:m Herzschlag:m Kniescheibe:f Jochbein:n
-    Trommelfell:n Augapfel:m Falte:f Grübchen:n Narbe:f Bluterguss:m Blase_Haut:f
+    Trommelfell:n Augapfel:m Falte:f Grübchen:n Narbe:f Bluterguss:m
     Schwiele:f
   ''',
   WordTheme.clothing: r'''
@@ -238,7 +238,7 @@ final TaggedNouns _nouns = taggedNouns(<WordTheme, String>{
     Umhang:m Poncho:m Regenmantel:m Anorak:m Parka:m Badeanzug:m Taucheranzug:m
     Overall:m Ärmel:m Kragen:m Manschette:f Saum:m Futter:n Stoff:m Leinen:n Seide:f
     Baumwolle:f Wolle:f Samt:m Kord:m Flanell:m Leder:n Barett:n Mütze:f Kappe:f
-    Helm_Kleid:m Turban:m Schleier:m Tuch:n
+     Turban:m Schleier:m Tuch:n
   ''',
   WordTheme.tool: r'''
     Axt:f Schaufel:f Säge:f Leiter:f Zange:f Meißel:m Amboss:m Blasebalg:m Ahle:f
@@ -266,14 +266,14 @@ final WordLanguageData de = WordLanguageData(
   joiner: ' ',
   capitalize: false,
   adjectives: words(r'''
-    blau grün rot schwarz weiß gelb golden silbern dunkel_hell hell glänzend groß klein
-    lang kurz breit schmal hoch_gross niedrig schnell langsam stark schwach hart weich
+    blau grün rot schwarz weiß gelb golden silbern hell glänzend groß klein
+    lang kurz breit schmal niedrig schnell langsam stark schwach hart weich
     warm kalt lauwarm trocken feucht sauber neu alt jung schön hässlich süß bitter
     salzig scharf sauer sanft rau leicht schwer rund spitz tief fern nah reich arm
     selten ruhig laut tapfer weise fröhlich traurig frei ewig durchsichtig einsam
     strahlend wild heiter still uralt modern endlos hohl seidig neblig wolkig regnerisch
     sonnig schneeig windig rostig neugierig schelmisch edel bescheiden freundlich
-    wild_wild flink stachelig ruhelos kräftig verworren lebhaft zart grau blass innig
+     flink stachelig ruhelos kräftig verworren lebhaft zart grau blass innig
     eisig glühend düster leuchtend erhaben schlicht zierlich drollig schlau kühn faul
     wach glatt dicht knapp
   '''),

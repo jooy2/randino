@@ -50,7 +50,7 @@ part and there is nothing between "always" and "half the time" worth naming, so 
 numbers in between promised a precision that was not there.
 """
 
-WordLanguage = Literal["en", "ko", "ja", "zh", "vi", "es", "it", "de"]
+WordLanguage = Literal["en", "ko", "ja", "zh", "vi", "es", "it", "de", "ru"]
 """A language the word pools cover.
 
 And so a language `rand_word`, `rand_modifier` and `rand_nickname` can work in.

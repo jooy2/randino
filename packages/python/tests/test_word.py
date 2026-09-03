@@ -54,6 +54,7 @@ SCRIPT: dict[WordLanguage, re.Pattern[str]] = {
     "es": re.compile(r"^[a-zA-ZÀ-ÿ]+(?: [a-zA-ZÀ-ÿ]+)*$"),
     "it": re.compile(r"^[a-zA-ZÀ-ÿ]+(?: [a-zA-ZÀ-ÿ]+)*$"),
     "de": re.compile(r"^[a-zA-ZÀ-ÿß]+(?: [a-zA-ZÀ-ÿß]+)*$"),
+    "ru": re.compile(r"^[\u0400-\u04ff]+(?: [\u0400-\u04ff]+)*$"),
 }
 
 THEMED = {

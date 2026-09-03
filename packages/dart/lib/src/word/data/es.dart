@@ -116,7 +116,7 @@ final TaggedNouns _nouns = taggedNouns(<WordTheme, String>{
     arroz:m pan:m fideo:m sopa:f guiso:m ensalada:f sal:f azúcar:m pimienta:f ajo:m
     cebolla:f patata:f zanahoria:f pepino:m calabaza:f col:f lechuga:f espinaca:f seta:f
     tofu:m huevo:m queso:m mantequilla:f yogur:m manzana:f fresa:f uva:f sandía:f
-    melocotón:m naranja:f limón:m plátano:m mango:m cereza:f piña_fruta:f chocolate:m
+    melocotón:m naranja:f limón:m plátano:m mango:m cereza:f chocolate:m
     caramelo:m galleta:f pastel:m flan:m rosquilla:f gofre:m tortita:f hamburguesa:f
     pizza:f pasta:f curry:m tortilla:f paella:f empanada:f croqueta:f churro:m turrón:m
     mazapán:m gazpacho:m tapa:f bocadillo:m salchicha:f jamón:m tocino:m chorizo:m
@@ -125,7 +125,7 @@ final TaggedNouns _nouns = taggedNouns(<WordTheme, String>{
   WordTheme.sport: r'''
     fútbol:m béisbol:m baloncesto:m voleibol:m tenis:m bádminton:m golf:m boliche:m
     billar:m natación:f atletismo:m maratón:m gimnasia:f karate:m judo:m esgrima:f
-    lucha:f boxeo:m tiro:m equitación:f remo:m vela_deporte:f surf:m esquí:m hockey:m
+    lucha:f boxeo:m tiro:m equitación:f remo:m surf:m esquí:m hockey:m
     rugby:m críquet:m ciclismo:m escalada:f raqueta:f bate:m portería:f medalla:f
     trofeo:m campeón:m eliminatoria:f prórroga:f polo:m patinaje:m buceo:m dardo:m
     valla:f jabalina:f disco:m relevo:m marcador:m casco:m falta:f jonrón:m espalda:f
@@ -153,34 +153,34 @@ final TaggedNouns _nouns = taggedNouns(<WordTheme, String>{
     sacacorchos:m termo:m felpudo:m percha:f armario:m estante:m mesilla:f
   ''',
   WordTheme.color: r'''
-    carmesí:m escarlata:m bermellón:m magenta:m fucsia:m rosado:m coral_color:m
-    salmón_color:m ámbar_color:m ocre:m siena:m sepia:m mostaza:m oliva:m lima:f
-    turquesa:f cian:m azul_cielo:m añil:m índigo:m lila:m malva:f púrpura:f borgoña:m
-    herrumbre:f terracota:f crema:f beige:m caqui:m carbón:m peltre:m marfil_color:m
+    carmesí:m escarlata:m bermellón:m magenta:m fucsia:m rosado:m
+      ocre:m siena:m sepia:m mostaza:m oliva:m lima:f
+    turquesa:f cian:m añil:m índigo:m lila:m malva:f púrpura:f borgoña:m
+    herrumbre:f terracota:f crema:f beige:m caqui:m carbón:m peltre:m
     ébano:m azabache:m cerúleo:m azafrán:m aguamarina:f verdín:m celadón:m nácar:m
-    cobrizo:m dorado_color:m bronceado:m ceniza:f humo:m vino_color:m arena_color:f
+    cobrizo:m bronceado:m ceniza:f humo:m
     trigo:m canela:f nuez_moscada:f pimentón:m
   ''',
   WordTheme.finance: r'''
-    factura:f recibo:m bono:m acción_bolsa:f dividendo:m interés:m préstamo:m hipoteca:f
+    factura:f recibo:m bono:m dividendo:m interés:m préstamo:m hipoteca:f
     depósito:m ahorro:m cuenta:f saldo:m presupuesto:m auditoría:f activo:m pasivo:m
     capital:m ingreso:m ganancia:f margen:m superávit:m déficit:m deuda:f crédito:m
     débito:m cheque:m moneda:f divisa:f rendimiento:m cartera:f arancel:m reembolso:m
-    prima:f pensión:f nómina:f salario:m sueldo:m bono_extra:m comisión:f regalía:f
-    franquicia:f fusión:f adquisición:f rescate:m aval:m vale:m cupón:m lingote_oro:m
+    prima:f pensión:f nómina:f salario:m sueldo:m comisión:f regalía:f
+    franquicia:f fusión:f adquisición:f rescate:m aval:m vale:m cupón:m
     caja_fuerte:f tesorería:f remesa:f liquidación:f arbitraje:m garantía:f
     descubierto:m extracto:m libreta:f custodia:f acreedor:m deudor:m prestamista:m
     fiador:m tasación:f inflación:f recesión:f liquidez:f solvencia:f quiebra:f
     donación:f subsidio:m estipendio:m gasto:m descuento:m plazo:m
   ''',
   WordTheme.tech: r'''
-    servidor:m caché:f búfer:m píxel:m códec:m paquete:m protocolo:m cola_datos:f
-    pila_datos:f montículo:m puntero:m compilador:m firmware:m registro:m latencia:f
-    pasarela_red:f cortafuegos:m subred:f anfitrión:m carga_útil:f suma_control:f
+    servidor:m caché:f búfer:m píxel:m códec:m paquete:m protocolo:m
+     montículo:m puntero:m compilador:m firmware:m registro:m latencia:f
+     cortafuegos:m subred:f anfitrión:m carga_útil:f
     esquema:m cursor:m respaldo:m clúster:m fragmento:m réplica:f instantánea:f
     contenedor:m tubería:f repositorio:m depurador:m macro:f matriz:f entero:m
     sintaxis:f analizador:m ensamblador:m instrucción:f interrupción:f tasa_de_bits:f
-    saludo_red:m extremo:m cifrado:m descifrado:m sombreador:m textura:f polígono:m
+     extremo:m cifrado:m descifrado:m sombreador:m textura:f polígono:m
     malla:f octeto:m enrutamiento:m conmutación:f difusión:f datagrama:m partición:f
     directorio:m reversión:f migración:f
   ''',
@@ -188,13 +188,13 @@ final TaggedNouns _nouns = taggedNouns(<WordTheme, String>{
     nube:f viento:m lluvia:f nieve:f escarcha:f niebla:f rocío:m arcoíris:m ocaso:m
     rayo:m trueno:m chubasco:m monzón:m tifón:m torbellino:m ventisca:f llovizna:f
     granizo:m aguanieve:f vendaval:m ráfaga:f ciclón:m tormenta:f tempestad:f diluvio:m
-    aguacero:m calima:f bruma:f neblina:f humedad_aire:f pronóstico:m nublado:m solana:f
+    aguacero:m calima:f bruma:f neblina:f pronóstico:m nublado:m solana:f
     ola_de_calor:f helada:f deshielo:m cellisca:f remolino:m brisa:f céfiro:m galerna:f
     borrasca:f anticiclón:m clima:m temperatura:f presión:f nubarrón:m chaparrón:m
     sereno:m relámpago:m centella:f escampada:f
   ''',
   WordTheme.space: r'''
-    estrella:f luna:f sol:m galaxia:f cometa_astro:m meteoro:m aurora:f menguante:m
+    estrella:f luna:f sol:m galaxia:f meteoro:m aurora:f menguante:m
     creciente:m eclipse:m cenit:m universo:m planeta:m satélite:m asteroide:m nebulosa:f
     cúmulo:m constelación:f órbita:f gravedad:f rotación:f traslación:f mancha_solar:f
     cráter:m año_luz:m astro:m firmamento:m eclíptica:f meridiano:m estratosfera:f
@@ -203,12 +203,12 @@ final TaggedNouns _nouns = taggedNouns(<WordTheme, String>{
     supernova:f cuásar:m púlsar:m vía_láctea:f cosmos:m
   ''',
   WordTheme.time: r'''
-    amanecer:m alba:f crepúsculo:m ocaso_hora:m anochecer:m solsticio:m equinoccio:m
+    amanecer:m alba:f crepúsculo:m anochecer:m solsticio:m equinoccio:m
     momento:m eternidad:f futuro:m instante:m siglo:m década:f mañana:f mediodía:m
     tarde:f noche:f medianoche:f madrugada:f víspera:f ayer:m hoy:m jornada:f semana:f
     quincena:f mes:m trimestre:m semestre:m año:m lustro:m milenio:m época:f era:f
     edad:f primavera:f verano:m otoño:m invierno:m solano:m antaño:m ahora:m luego:m
-    infancia:f juventud:f madurez:f vejez:f ocaso_vida:m plazo_tiempo:m intervalo:m
+    infancia:f juventud:f madurez:f vejez:f intervalo:m
     duración:f transcurso:m período:m aniversario:m efeméride:f temporada:f alborada:f
     atardecer:m
   ''',
@@ -242,24 +242,24 @@ final TaggedNouns _nouns = taggedNouns(<WordTheme, String>{
     chaleco:m rebeca:f jersey:m sudadera:f calcetín:m media:f pijama:m delantal:m
     pañuelo:m corbata:f pajarita:f cinturón:m faja:f mocasín:m bota:f pantufla:f
     uniforme:m disfraz:m bata:f capa:f poncho:m chubasquero:m anorak:m parka:f bañador:m
-    mono_trabajo:m manga:f puño_camisa:m dobladillo:m solapa:f forro:m tela:f lino:m
+     manga:f dobladillo:m solapa:f forro:m tela:f lino:m
     seda:f algodón:m lana:f terciopelo:m pana:f franela:f cuero:m boina:f gorro:m
-    gorra:f casco_ropa:m turbante:m velo:m chal:m mantón:m
+    gorra:f turbante:m velo:m chal:m mantón:m
   ''',
   WordTheme.tool: r'''
     hacha:f pala:f sierra:f alicate:m cincel:m yunque:m fuelle:m lezna:f abrazadera:f
     nivel:m calibre:m regla:f tijera:f martillo:m mazo:m taladro:m lija:f pico:m hoz:f
     guadaña:f azada:f arado:m rastrillo:m soldador:m amoladora:f cortadora:f hachuela:f
     palanca:f cuña:f polea:f manivela:f almádena:f paleta:f rallador:m tamiz:m laya:f
-    mayal:m huso:m lanzadera:f carrete:m cuchilla:f taller_caja:f remachadora:f
+    mayal:m huso:m lanzadera:f carrete:m cuchilla:f remachadora:f
     clavadora:f caladora:f torno:m lijadora:f motosierra:f serrucho:m gubia:f punzón:m
     escuadra:f bisel:m
   ''',
   WordTheme.drink: r'''
     café:m té:m zumo:m leche:f agua:f gaseosa:f limonada:f sidra:f horchata:f batido:m
     malteada:f infusión:f poleo:m tila:f mate:m cortado:m capuchino:m expreso:m
-    carajillo:m descafeinado:m cerveza:f caña_cerveza:f clara:f vino:m tinto:m
-    blanco_vino:m rosado_vino:m cava:m champán:m jerez:m oporto:m vermut:m sangría:f
+    carajillo:m descafeinado:m cerveza:f clara:f vino:m tinto:m
+      cava:m champán:m jerez:m oporto:m vermut:m sangría:f
     licor:m aguardiente:m orujo:m ron:m ginebra:f vodka:m whisky:m coñac:m brandy:m
     tequila:m mezcal:m sake:m hidromiel:f cóctel:m ponche:m néctar:m jarabe:m refresco:m
     soda:f tónica:f granizado:m
@@ -280,7 +280,7 @@ final WordLanguageData es = WordLanguageData(
     infinito hueco sedoso brumoso nublado lluvioso soleado nevado ventoso oxidado
     curioso travieso noble humilde gentil feroz ágil espinoso inquieto robusto enredado
     vívido tenue gris pálido intenso cálido helado ardiente sombrío luminoso majestuoso
-    sencillo elegante gracioso astuto audaz sereno_calmo perezoso alerta afilado romo
+    sencillo elegante gracioso astuto audaz perezoso alerta afilado romo
     liso rugoso denso escaso
   '''),
   actions: words(r'''

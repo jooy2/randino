@@ -6,6 +6,7 @@ import { IT } from './it.js';
 import { JA } from './ja.js';
 import { KO } from './ko.js';
 import type { WordLanguageData } from './types.js';
+import { RU } from './ru.js';
 import { VI } from './vi.js';
 import { ZH } from './zh.js';
 
@@ -20,7 +21,8 @@ export const WORD_LANGUAGES: readonly WordLanguage[] = [
 	'vi',
 	'es',
 	'it',
-	'de'
+	'de',
+	'ru'
 ];
 
 // What the words can be about. Person names are deliberately absent.
@@ -74,5 +76,6 @@ export const WORD_DATA: Record<WordLanguage, WordLanguageData> = {
 	vi: VI,
 	es: ES,
 	it: IT,
-	de: DE
+	de: DE,
+	ru: RU
 };

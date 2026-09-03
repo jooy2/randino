@@ -103,7 +103,7 @@ Themes: `animal`, `object`, `nature`, `plant`, `gem`, `concept`, `myth`, `job`, 
 
 ## Words
 
-The pools the nicknames are built from, on their own. Twenty-five themes, eight languages, and a function per theme.
+The pools the nicknames are built from, on their own. Twenty-five themes, nine languages, and a function per theme.
 
 ```javascript
 import { randAnimal, randFood, randWord, wordLengthRange } from 'randino';

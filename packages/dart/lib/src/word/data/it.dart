@@ -23,7 +23,7 @@ final TaggedNouns _nouns = taggedNouns(<WordTheme, String>{
     bottiglia:f matita:f gomma:f ombrello:m lampada:f lanterna:f specchio:m chiave:f
     lucchetto:m borsa:f bottone:m ago:m filo:m pennello:m vernice:f carta:f quaderno:m
     lettera:f cartolina:f francobollo:m mappa:f cannocchiale:m microscopio:m macchina:f
-    pellicola:f radio:f palloncino:m aquilone:m trottola:f biglia:f dado:m carta_gioco:f
+    pellicola:f radio:f palloncino:m aquilone:m trottola:f biglia:f dado:m
     puzzle:m vela:f ancora:f tenda:f torcia:f fiammifero:m candela:f vaso:m teiera:f
     tazza:f cucchiaio:m pentola:f ingranaggio:m molla:f magnete:m nastro:m busta:f
     cuscino:m coperta:f cesto:m scopa:f fischietto:m corda:f secchio:m ventaglio:m
@@ -45,7 +45,7 @@ final TaggedNouns _nouns = taggedNouns(<WordTheme, String>{
     acero:m ciliegio:m rosa:f loto:m crisantemo:m orchidea:f tarassaco:m girasole:m
     ninfea:f erba:f ramo:m germoglio:m bocciolo:m petalo:m polline:m pigna:f ghianda:f
     ginkgo:m salice:m betulla:f cedro:m abete:m quercia:f castagno:m noce:m
-    prato_verde:m alga:f siepe:f mazzo:m cactus:m aloe:f basilico:m timo:m origano:m
+     alga:f siepe:f mazzo:m cactus:m aloe:f basilico:m timo:m origano:m
     prezzemolo:m coriandolo:m finocchio:m aneto:m salvia:f dragoncello:m menta:f
     camomilla:f lavanda:f edera:f palma:f
   ''',
@@ -113,7 +113,7 @@ final TaggedNouns _nouns = taggedNouns(<WordTheme, String>{
     farmacia:f libreria:f panetteria:f caffetteria:f ristorante:m cucina:f camera:f
     salotto:m corridoio:m tunnel:m passerella:f incrocio:m viale:m fortezza:f fattoria:f
     ranch:m frutteto:m abbazia:f chiostro:m bastione:m torretta:f fossato:m cantiere:m
-    molo_lungo:m accampamento:m villa:f dimora:f borgo:m
+     accampamento:m villa:f dimora:f borgo:m
   ''',
   WordTheme.food: r'''
     riso:m pane:m pasta:f zuppa:f stufato:m insalata:f sale:m zucchero:m pepe:m aglio:m
@@ -130,10 +130,10 @@ final TaggedNouns _nouns = taggedNouns(<WordTheme, String>{
     calcio:m baseball:m pallavolo:f tennis:m badminton:m golf:m bowling:m biliardo:m
     nuoto:m atletica:f maratona:f ginnastica:f karate:m judo:m scherma:f lotta:f
     pugilato:m tiro:m equitazione:f canottaggio:m surf:m sci:m hockey:m rugby:m
-    cricket:m ciclismo:m arrampicata:f racchetta:f mazza_gioco:f porta:f medaglia:f
-    trofeo:m campione:m finale_sport:f eliminatoria:f allenamento:m polo:m pattinaggio:m
+    cricket:m ciclismo:m arrampicata:f racchetta:f porta:f medaglia:f
+    trofeo:m campione:m eliminatoria:f allenamento:m polo:m pattinaggio:m
     tuffo:m freccetta:f ostacolo:m giavellotto:m disco:m staffetta:f tabellone:m casco:m
-    fallo:m dorso:m rana_stile:f sollevamento:m slitta:f servizio:m rimbalzo:m salto:m
+    fallo:m dorso:m sollevamento:m slitta:f servizio:m rimbalzo:m salto:m
     corsa:f traguardo:m podio:m spogliatoio:m tribuna:f tifoseria:f
   ''',
   WordTheme.vehicle: r'''
@@ -159,8 +159,8 @@ final TaggedNouns _nouns = taggedNouns(<WordTheme, String>{
   ''',
   WordTheme.color: r'''
     cremisi:m scarlatto:m vermiglio:m magenta:m fucsia:m rosato:m arancione:m ambrato:m
-    ocra:f seppia:f senape:f oliva_colore:f lime_colore:m smeraldino:m turchese:m
-    ciano:m celeste:m indaco:m lilla:m malva_colore:f violetto:m porpora:f bordeaux:m
+    ocra:f seppia:f senape:f smeraldino:m turchese:m
+    ciano:m celeste:m indaco:m lilla:m violetto:m porpora:f bordeaux:m
     ruggine:f terracotta:f crema:f beige:m cachi:m peltro:m ebano:m giaietto:m ceruleo:m
     zafferano:m acquamarina:f verderame:m celadon:m madreperla:f ramato:m argenteo:m
     bronzeo:m cenere:f fumo:m vinaccia:f grano:m cannella:f noce_moscata:f paprika:f
@@ -172,7 +172,7 @@ final TaggedNouns _nouns = taggedNouns(<WordTheme, String>{
     credito:m addebito:m assegno:m moneta:f valuta:f rendimento:m portafoglio:m dazio:m
     rimborso:m premio:m pensione:f busta_paga:f stipendio:m salario:m bonus:m
     provvigione:f royalty:f franchigia:f fusione:f acquisizione:f salvataggio:m
-    garanzia:f buono:m coupon:m lingotto_oro:m cassaforte:f tesoreria:f rimessa:f
+    garanzia:f buono:m coupon:m cassaforte:f tesoreria:f rimessa:f
     liquidazione:f arbitraggio:m scoperto:m estratto:m libretto:m custodia:f creditore:m
     debitore:m prestatore:m garante:m valutazione:f perizia:f inflazione:f recessione:f
     liquidità:f solvibilità:f fallimento:m donazione:f sussidio:m spesa:f sconto:m
@@ -180,12 +180,12 @@ final TaggedNouns _nouns = taggedNouns(<WordTheme, String>{
   ''',
   WordTheme.tech: r'''
     server:m cache:f buffer:m pixel:m codec:m pacchetto:m protocollo:m coda:f
-    pila_dati:f cumulo:m puntatore:m compilatore:m firmware:m registro:m latenza:f
+     cumulo:m puntatore:m compilatore:m firmware:m registro:m latenza:f
     gateway:m firewall:m sottorete:f host:m carico_utile:m checksum:m schema:m cursore:m
     backup:m cluster:m frammento:m replica:f istantanea:f contenitore:m pipeline:f
     repository:m debugger:m macro:f matrice:f intero:m sintassi:f analizzatore:m
     assemblatore:m istruzione:f interruzione:f bitrate:m throughput:m handshake:m
-    spazio_nomi:m endpoint:m cifratura:f decifratura:f hashing:m rendering:m shader:m
+     endpoint:m cifratura:f decifratura:f hashing:m rendering:m shader:m
     texture:f poligono:m reticolo:m ottetto:m commutazione:f multicast:m broadcast:m
     datagramma:m bootloader:m partizione:f cartella:f collegamento:m ripristino:m
     migrazione:f
@@ -200,7 +200,7 @@ final TaggedNouns _nouns = taggedNouns(<WordTheme, String>{
     saetta:f sereno:m schiarita:f afa:f galaverna:f
   ''',
   WordTheme.space: r'''
-    stella:f luna:f sole_astro:m galassia:f cometa:f meteora:f aurora:f falce_lunare:f
+    stella:f luna:f galassia:f cometa:f meteora:f aurora:f falce_lunare:f
     eclissi:f zenit:m universo:m pianeta:m satellite:m asteroide:m nebulosa:f ammasso:m
     orbita:f gravità:f rotazione:f rivoluzione:f cratere:m anno_luce:m astro:m
     firmamento:m eclittica:f meridiano:m stratosfera:f atmosfera:f vuoto:m plenilunio:m
@@ -208,12 +208,12 @@ final TaggedNouns _nouns = taggedNouns(<WordTheme, String>{
     plutone:m supernova:f buco_nero:m quasar:m pulsar:f via_lattea:f cosmo:m
   ''',
   WordTheme.time: r'''
-    alba:f aurora_ora:f crepuscolo:m tramonto_ora:m imbrunire:m solstizio:m equinozio:m
+    alba:f crepuscolo:m imbrunire:m solstizio:m equinozio:m
     stagione:f momento:m eternità:f futuro:m istante:m secolo:m decennio:m mattino:m
-    mezzogiorno:m pomeriggio:m sera:f notte:f mezzanotte:f alba_presto:f vigilia:f
+    mezzogiorno:m pomeriggio:m sera:f notte:f mezzanotte:f vigilia:f
     ieri:m oggi:m giornata:f settimana:f quindicina:f mese:m trimestre:m semestre:m
     anno:m lustro:m millennio:m epoca:f era:f età:f primavera:f estate:f autunno:m
-    inverno:m antico_tempo:m adesso:m poi:m infanzia:f gioventù:f maturità:f vecchiaia:f
+    inverno:m adesso:m poi:m infanzia:f gioventù:f maturità:f vecchiaia:f
     scadenza:f intervallo:m durata:f periodo:m anniversario:m ricorrenza:f albeggiare:m
   ''',
   WordTheme.emotion: r'''
@@ -229,7 +229,7 @@ final TaggedNouns _nouns = taggedNouns(<WordTheme, String>{
   ''',
   WordTheme.body: r'''
     testa:f fronte:f sopracciglio:m ciglio:m palpebra:f naso:m guancia:f mento:m
-    mascella:f labbro:m lingua_bocca:f dente:m gengiva:f orecchio:m lobo:m collo:m
+    mascella:f labbro:m dente:m gengiva:f orecchio:m lobo:m collo:m
     nuca:f spalla:f gomito:m polso:m palmo:m nocca:f dito:m pollice:m unghia:f pugno:m
     petto:m costola:f pancia:f ombelico:m schiena:f vita:f anca:f coscia:f ginocchio:m
     stinco:m polpaccio:m caviglia:f tallone:m osso:m cranio:m muscolo:m tendine:m
@@ -250,20 +250,20 @@ final TaggedNouns _nouns = taggedNouns(<WordTheme, String>{
     cuoio:m basco:m cuffia:f berretto:m elmetto:m turbante:m velo:m scialle:m
   ''',
   WordTheme.tool: r'''
-    ascia:f pala:f sega:f scala_mano:f pinza:f scalpello:m incudine:f mantice:m lesina:f
+    ascia:f pala:f sega:f pinza:f scalpello:m incudine:f mantice:m lesina:f
     morsetto:m morsa:f livella:f calibro:m goniometro:m righello:m forbice:f martello:m
     mazzuolo:m trapano:m pialla:f piccone:m falce:f falcetto:m zappa:f aratro:m
     rastrello:m cacciavite:m saldatore:m troncatrice:f metro:m compasso:m accetta:f
     leva:f cuneo:m carrucola:f manovella:f mazza:f cazzuola:f cote:f lima:f grattugia:f
     setaccio:m vanga:f erpice:m correggiato:m fuso:m spola:f rocchetto:m manico:m lama:f
     cassetta:f rivettatrice:f chiodatrice:f seghetto:m tornio:m levigatrice:f motosega:f
-    sgorbia:f punteruolo:m squadra:f smusso:m banco_lavoro:m
+    sgorbia:f punteruolo:m squadra:f smusso:m
   ''',
   WordTheme.drink: r'''
     caffè:m tè:m succo:m latte:m acqua:f gassosa:f limonata:f sidro:m orzata:f
     frullato:m infuso:m tisana:f mate:m cioccolata:f macchiato:m cappuccino:m espresso:m
-    corretto:m decaffeinato:m birra:f bionda:f rossa:f vino:m rosso_vino:m bianco_vino:m
-    rosato_vino:m spumante:m prosecco:m champagne:m sherry:m porto_vino:m vermut:m
+    corretto:m decaffeinato:m birra:f bionda:f rossa:f vino:m
+     spumante:m prosecco:m champagne:m sherry:m vermut:m
     sangria:f liquore:m grappa:f acquavite:f rum:m gin:m vodka:m whisky:m cognac:m
     brandy:m tequila:m sake:m idromele:m cocktail:m punch:m nettare:m sciroppo:m
     bibita:f soda:f tonica:f granita:f

@@ -110,6 +110,9 @@ enum WordLanguage {
 
   /// German.
   de,
+
+  /// Russian.
+  ru,
 }
 
 /// What a word is about.

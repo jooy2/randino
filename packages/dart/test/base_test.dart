@@ -137,7 +137,7 @@ void main() {
       expect(randLengthMax, 40);
       expect(randCountMax, 10000);
 
-      expect(wordLanguages, hasLength(8));
+      expect(wordLanguages, hasLength(9));
       expect(wordThemes, hasLength(25));
 
       expect(affixLengthDefault, 5);

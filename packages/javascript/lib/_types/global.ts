@@ -103,7 +103,7 @@ export interface NameDetail {
  * is no longer the obstacle it was — Vietnamese puts its modifier after the noun
  * and says so in its own frames.
  */
-export type WordLanguage = 'en' | 'ko' | 'ja' | 'zh' | 'vi' | 'es' | 'it' | 'de';
+export type WordLanguage = 'en' | 'ko' | 'ja' | 'zh' | 'vi' | 'es' | 'it' | 'de' | 'ru';
 
 /** `'all'` mixes every supported language. */
 export type WordLanguageOption = WordLanguage | 'all';

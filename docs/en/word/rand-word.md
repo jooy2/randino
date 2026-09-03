@@ -1,6 +1,6 @@
 # randWord
 
-Generates everyday words and returns `count` of them as strings. Animals, things, nature, ideas — twenty-five [themes](./themes), in eight languages, and **never a person name**. With [`output: 'detail'`](#the-detail-output) it reports the language and theme behind each word.
+Generates everyday words and returns `count` of them as strings. Animals, things, nature, ideas — twenty-five [themes](./themes), in nine languages, and **never a person name**. With [`output: 'detail'`](#the-detail-output) it reports the language and theme behind each word.
 
 These are the pools [`randNickname`](../nickname/rand-nickname) is built from. This is the same vocabulary with nothing added to it.
 

@@ -450,7 +450,7 @@ Nicknames:
 
 ## Adding a word language
 
-Eight languages are supported (`ko`, `en`, `ja`, `zh`, `vi`, `es`, `it`, `de`), and neither word order nor agreement is a bar any more:
+Every name language now has word pools too (`ko`, `en`, `ja`, `zh`, `vi`, `es`, `it`, `de`, `ru`), and neither word order nor agreement is a bar any more:
 
 - **Word order lives in the frames.** Vietnamese, Spanish and Italian put the modifier after the noun (`mèo xanh`, `gato azul`) and Vietnamese puts the possessed thing in front of its owner (`đuôi mèo`); both say so in their own `frames`. `modifierFollows` reads that back out of the frames so `randModifier` attaches on the right side, rather than a second field stating an order the frames could contradict.
 - **Agreement lives in the data.** A language that inflects tags each noun (`gato:m luna:f`), and `agreement` lists the endings a modifier changes per gender. `taggedNouns` splits the tag back off so each word is still typed once, and `agree` applies the first rule that matches — a word no rule matches is already right (`azul`). Rules rather than a function, so `tools/parity` compares them as data.
