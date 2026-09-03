@@ -1,14 +1,14 @@
 # 사람 이름
 
-randino는 실제로 쓰이는 이름을 생성합니다. 김민준, Emma Clover, Иванов Иван 같은 이름을 9개 언어로, 각 언어의 문자와 함께 영어 발음까지 만들어 냅니다. 폼, 시드 데이터, 목업, 픽스처 같은 샘플 데이터를 위한 기능입니다.
+randino는 실제로 쓰이는 이름을 생성합니다. Emma Clover, Jack Reeves 같은 이름을 9개 언어로, 각 언어의 문자와 함께 영어 발음까지 만들어 냅니다. 폼, 시드 데이터, 목업, 픽스처 같은 샘플 데이터를 위한 기능입니다.
 
 ::: lang js
 
 ```javascript
 import { randName } from 'randino';
 
-randName({ language: 'ko', count: 3 });
-// ['김태윤', '원동혁', '조진우']
+randName({ language: 'en', count: 3 });
+// ['Christina Mills', 'Jack Reeves', 'Brian Wallace']
 ```
 
 :::
@@ -18,8 +18,8 @@ randName({ language: 'ko', count: 3 });
 ```dart
 import 'package:randino/randino.dart';
 
-randName(language: NameLanguage.ko, count: 3);
-// ['김태윤', '원동혁', '조진우']
+randName(language: NameLanguage.en, count: 3);
+// ['Christina Mills', 'Jack Reeves', 'Brian Wallace']
 ```
 
 :::
@@ -29,8 +29,8 @@ randName(language: NameLanguage.ko, count: 3);
 ```python
 from randino import rand_name
 
-rand_name(language="ko", count=3)
-# ['김태윤', '원동혁', '조진우']
+rand_name(language="en", count=3)
+# ['Christina Mills', 'Jack Reeves', 'Brian Wallace']
 ```
 
 :::
@@ -59,9 +59,6 @@ rand_name(language="ko", count=3)
 ```javascript
 randName({ language: 'en', style: 100, count: 3 });
 // ['Deder Kuvoun', 'Jaihil Brouvinn', 'Thoowoun Wiatou']
-
-randName({ language: 'ko', style: 100, count: 3 });
-// ['송승완', '구상겸', '채진훈']
 ```
 
 :::
@@ -71,9 +68,6 @@ randName({ language: 'ko', style: 100, count: 3 });
 ```dart
 randName(language: NameLanguage.en, style: 100, count: 3);
 // ['Deder Kuvoun', 'Jaihil Brouvinn', 'Thoowoun Wiatou']
-
-randName(language: NameLanguage.ko, style: 100, count: 3);
-// ['송승완', '구상겸', '채진훈']
 ```
 
 :::
@@ -83,9 +77,6 @@ randName(language: NameLanguage.ko, style: 100, count: 3);
 ```python
 rand_name(language="en", style=100, count=3)
 # ['Deder Kuvoun', 'Jaihil Brouvinn', 'Thoowoun Wiatou']
-
-rand_name(language="ko", style=100, count=3)
-# ['송승완', '구상겸', '채진훈']
 ```
 
 :::

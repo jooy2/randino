@@ -194,11 +194,8 @@ rand_name(count=5)
 randName({ language: 'en', count: 3, includeSurname: false });
 // ['Rachel', 'Eliza', 'Tessa']
 
-randName({ language: 'vi', count: 3, includeMiddleName: true });
-// ['Lý Thu Thảo', 'Phạm Quang Hùng', 'Dương Văn Phong']
-
-randName({ language: 'ru', count: 2, gender: 'female', includeMiddleName: true });
-// ['Людмила Николаевна Богданова', 'Марина Максимовна Богданова']
+randName({ language: 'en', count: 3, includeMiddleName: true });
+// ['Danielle Sylvia Owens', 'Gloria Harriet Norton', 'Peyton Beatrix Owens']
 ```
 
 :::
@@ -209,16 +206,8 @@ randName({ language: 'ru', count: 2, gender: 'female', includeMiddleName: true }
 randName(language: NameLanguage.en, count: 3, includeSurname: false);
 // ['Rachel', 'Eliza', 'Tessa']
 
-randName(language: NameLanguage.vi, count: 3, includeMiddleName: true);
-// ['Lý Thu Thảo', 'Phạm Quang Hùng', 'Dương Văn Phong']
-
-randName(
-  language: NameLanguage.ru,
-  count: 2,
-  gender: NameGender.female,
-  includeMiddleName: true,
-);
-// ['Людмила Николаевна Богданова', 'Марина Максимовна Богданова']
+randName(language: NameLanguage.en, count: 3, includeMiddleName: true);
+// ['Danielle Sylvia Owens', 'Gloria Harriet Norton', 'Peyton Beatrix Owens']
 ```
 
 :::
@@ -229,11 +218,8 @@ randName(
 rand_name(language="en", count=3, include_surname=False)
 # ['Rachel', 'Eliza', 'Tessa']
 
-rand_name(language="vi", count=3, include_middle_name=True)
-# ['Lý Thu Thảo', 'Phạm Quang Hùng', 'Dương Văn Phong']
-
-rand_name(language="ru", count=2, gender="female", include_middle_name=True)
-# ['Людмила Николаевна Богданова', 'Марина Максимовна Богданова']
+rand_name(language="en", count=3, include_middle_name=True)
+# ['Danielle Sylvia Owens', 'Gloria Harriet Norton', 'Peyton Beatrix Owens']
 ```
 
 :::
@@ -285,9 +271,6 @@ rand_name(language="ja", count=3, script="roman")
 ::: lang js
 
 ```javascript
-randName({ language: 'ko', count: 3, startsWith: '이' });
-// ['이예빈', '이우진', '이서현']
-
 randName({ language: 'en', count: 3, startsWith: 'k' });
 // ['Kayla Morgan', 'Keith Doyle', 'Kimberly Vaughn']
 ```
@@ -297,9 +280,6 @@ randName({ language: 'en', count: 3, startsWith: 'k' });
 ::: lang dart
 
 ```dart
-randName(language: NameLanguage.ko, count: 3, startsWith: '이');
-// ['이예빈', '이우진', '이서현']
-
 randName(language: NameLanguage.en, count: 3, startsWith: 'k');
 // ['Kayla Morgan', 'Keith Doyle', 'Kimberly Vaughn']
 ```
@@ -309,9 +289,6 @@ randName(language: NameLanguage.en, count: 3, startsWith: 'k');
 ::: lang py
 
 ```python
-rand_name(language="ko", count=3, starts_with="이")
-# ['이예빈', '이우진', '이서현']
-
 rand_name(language="en", count=3, starts_with="k")
 # ['Kayla Morgan', 'Keith Doyle', 'Kimberly Vaughn']
 ```
@@ -325,9 +302,6 @@ rand_name(language="en", count=3, starts_with="k")
 ::: lang js
 
 ```javascript
-randName({ language: 'ko', count: 3, minLength: 5, maxLength: 8 });
-// ['남궁하윤서', '김서연아린', '박도윤하람']
-
 randName({ language: 'en', count: 2, minLength: 20, maxLength: 25 });
 // ['Josephine Adelaide Sinclair', 'Christina Genevieve Whitaker']
 ```
@@ -337,9 +311,6 @@ randName({ language: 'en', count: 2, minLength: 20, maxLength: 25 });
 ::: lang dart
 
 ```dart
-randName(language: NameLanguage.ko, count: 3, minLength: 5, maxLength: 8);
-// ['남궁하윤서', '김서연아린', '박도윤하람']
-
 randName(language: NameLanguage.en, count: 2, minLength: 20, maxLength: 25);
 // ['Josephine Adelaide Sinclair', 'Christina Genevieve Whitaker']
 ```
@@ -349,9 +320,6 @@ randName(language: NameLanguage.en, count: 2, minLength: 20, maxLength: 25);
 ::: lang py
 
 ```python
-rand_name(language="ko", count=3, min_length=5, max_length=8)
-# ['남궁하윤서', '김서연아린', '박도윤하람']
-
 rand_name(language="en", count=2, min_length=20, max_length=25)
 # ['Josephine Adelaide Sinclair', 'Christina Genevieve Whitaker']
 ```
