@@ -9,7 +9,7 @@ Everyday things: what is on a desk, in a bag, around a house.
 ```javascript
 import { randObject } from 'randino';
 
-randObject({ language: 'ko', count: 3 }); // ['물병', '연필', '우산']
+randObject({ language: 'en', count: 3 }); // ['Bottle', 'Pencil', 'Umbrella']
 randObject({ language: 'en', output: 'detail' });
 // [{ word: 'Bottle', language: 'en', theme: 'object' }]
 ```
@@ -21,7 +21,6 @@ randObject({ language: 'en', output: 'detail' });
 ```dart
 import 'package:randino/randino.dart';
 
-randObject(language: WordLanguage.ko, count: 3); // [물병, 연필, 우산]
 randObject(language: WordLanguage.en, count: 3); // [Bottle, Pencil, Umbrella]
 ```
 
@@ -34,7 +33,7 @@ Returns `List<String>`. For the detail form, pass `WordTheme.object` to `randWor
 ```python
 from randino import rand_object
 
-rand_object(language="ko", count=3)  # ['물병', '연필', '우산']
+rand_object(language="en", count=3)  # ['Bottle', 'Pencil', 'Umbrella']
 rand_object(language="en", output="detail")
 # [WordDetail(word='Bottle', language='en', theme='object')]
 ```

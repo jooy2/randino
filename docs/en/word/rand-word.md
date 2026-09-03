@@ -58,9 +58,9 @@ A theme is not only an option — each of the fourteen is a function of its own,
 ```javascript
 import { randAnimal, randFood, randGem } from 'randino';
 
-randAnimal({ language: 'ko', count: 3 }); // ['여우', '고래', '수달']
+randAnimal({ language: 'en', count: 3 }); // ['Otter', 'Falcon', 'Lynx']
 randFood({ language: 'en', count: 2 }); // ['Dumpling', 'Cocoa']
-randGem({ language: 'ko', count: 2, unique: true }); // ['흑요석', '청동']
+randGem({ language: 'en', count: 2, unique: true }); // ['Obsidian', 'Bronze']
 ```
 
 :::
@@ -70,9 +70,9 @@ randGem({ language: 'ko', count: 2, unique: true }); // ['흑요석', '청동']
 ```dart
 import 'package:randino/randino.dart';
 
-randAnimal(language: WordLanguage.ko, count: 3); // [여우, 고래, 수달]
+randAnimal(language: WordLanguage.en, count: 3); // [Otter, Falcon, Lynx]
 randFood(language: WordLanguage.en, count: 2); // [Dumpling, Cocoa]
-randGem(language: WordLanguage.ko, count: 2, unique: true); // [흑요석, 청동]
+randGem(language: WordLanguage.en, count: 2, unique: true); // [Obsidian, Bronze]
 ```
 
 The themed functions return `List<String>` only. For the detail form, pass the theme to `randWordDetails` — Dart has no overloads, and fourteen more functions for it would be fourteen too many.
@@ -84,9 +84,9 @@ The themed functions return `List<String>` only. For the detail form, pass the t
 ```python
 from randino import rand_animal, rand_food, rand_gem
 
-rand_animal(language="ko", count=3)  # ['여우', '고래', '수달']
+rand_animal(language="en", count=3)  # ['Otter', 'Falcon', 'Lynx']
 rand_food(language="en", count=2)  # ['Dumpling', 'Cocoa']
-rand_gem(language="ko", count=2, unique=True)  # ['흑요석', '청동']
+rand_gem(language="en", count=2, unique=True)  # ['Obsidian', 'Bronze']
 ```
 
 :::
@@ -100,8 +100,8 @@ Left out, <Lang js="minLength" dart="minLength" py="min_length" code /> and <Lan
 ::: lang js
 
 ```javascript
-randWord({ language: 'ko', theme: 'animal', maxLength: 2, count: 4 });
-// ['곰', '수달', '여우', '학']
+randWord({ language: 'en', theme: 'animal', maxLength: 4, count: 4 });
+// ['Cat', 'Ant', 'Frog', 'Carp']
 
 randWord({ language: 'en', minLength: 9, count: 3 });
 // ['Saxophone', 'Spaghetti', 'Spaceship']
@@ -112,8 +112,8 @@ randWord({ language: 'en', minLength: 9, count: 3 });
 ::: lang dart
 
 ```dart
-randWord(language: WordLanguage.ko, theme: WordTheme.animal, maxLength: 2, count: 4);
-// [곰, 수달, 여우, 학]
+randWord(language: WordLanguage.en, theme: WordTheme.animal, maxLength: 4, count: 4);
+// [Cat, Ant, Frog, Carp]
 
 randWord(language: WordLanguage.en, minLength: 9, count: 3);
 // [Saxophone, Spaghetti, Spaceship]
@@ -124,8 +124,8 @@ randWord(language: WordLanguage.en, minLength: 9, count: 3);
 ::: lang py
 
 ```python
-rand_word(language="ko", theme="animal", max_length=2, count=4)
-# ['곰', '수달', '여우', '학']
+rand_word(language="en", theme="animal", max_length=4, count=4)
+# ['Cat', 'Ant', 'Frog', 'Carp']
 
 rand_word(language="en", min_length=9, count=3)
 # ['Saxophone', 'Spaghetti', 'Spaceship']
@@ -140,8 +140,8 @@ rand_word(language="en", min_length=9, count=3)
 ::: lang js
 
 ```javascript
-randWord({ language: 'ko', style: 100, count: 4 });
-// ['다순', '머차', '멜포', '재거']
+randWord({ language: 'en', style: 100, count: 4 });
+// ['Sterath', 'Lisleen', 'Kaezan', 'Mibaeth']
 
 randWord({ language: 'en', style: 50, count: 4 });
 // ['Blorin', 'Meadow', 'Tavren', 'Compass']
@@ -152,8 +152,8 @@ randWord({ language: 'en', style: 50, count: 4 });
 ::: lang dart
 
 ```dart
-randWord(language: WordLanguage.ko, style: 100, count: 4);
-// [다순, 머차, 멜포, 재거]
+randWord(language: WordLanguage.en, style: 100, count: 4);
+// [Sterath, Lisleen, Kaezan, Mibaeth]
 ```
 
 :::
@@ -161,21 +161,21 @@ randWord(language: WordLanguage.ko, style: 100, count: 4);
 ::: lang py
 
 ```python
-rand_word(language="ko", style=100, count=4)
-# ['다순', '머차', '멜포', '재거']
+rand_word(language="en", style=100, count=4)
+# ['Sterath', 'Lisleen', 'Kaezan', 'Mibaeth']
 ```
 
 :::
 
-An invented word can spell a real one by accident — `나` + `비` is `나비` — and the theme is then reported rather than hidden.
+An invented word can spell a real one by accident — the syllable templates do come out as `Snake` now and then — and the theme is then reported rather than hidden.
 
 ## The detail output {#the-detail-output}
 
 ::: lang js
 
 ```javascript
-randWord({ language: 'ko', theme: 'plant', output: 'detail' });
-// [{ word: '민들레', language: 'ko', theme: 'plant' }]
+randWord({ language: 'en', theme: 'plant', output: 'detail' });
+// [{ word: 'Cedar', language: 'en', theme: 'plant' }]
 ```
 
 :::
@@ -183,8 +183,8 @@ randWord({ language: 'ko', theme: 'plant', output: 'detail' });
 ::: lang dart
 
 ```dart
-randWordDetails(language: WordLanguage.ko, theme: WordTheme.plant).first;
-// WordDetail(민들레, ko, plant)
+randWordDetails(language: WordLanguage.en, theme: WordTheme.plant).first;
+// WordDetail(Cedar, en, plant)
 ```
 
 Dart has neither overloads nor union types, so the detail form is its own function.
@@ -194,8 +194,8 @@ Dart has neither overloads nor union types, so the detail form is its own functi
 ::: lang py
 
 ```python
-rand_word(language="ko", theme="plant", output="detail")
-# [WordDetail(word='민들레', language='ko', theme='plant')]
+rand_word(language="en", theme="plant", output="detail")
+# [WordDetail(word='Cedar', language='en', theme='plant')]
 ```
 
 :::

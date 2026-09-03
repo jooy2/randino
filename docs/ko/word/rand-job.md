@@ -9,7 +9,7 @@
 ```javascript
 import { randJob } from 'randino';
 
-randJob({ language: 'ko', count: 3 }); // ['기사', '마법사', '대장장이']
+randJob({ language: 'en', count: 3 }); // ['Wizard', 'Ranger', 'Blacksmith']
 randJob({ language: 'en', output: 'detail' });
 // [{ word: 'Wizard', language: 'en', theme: 'job' }]
 ```
@@ -21,7 +21,6 @@ randJob({ language: 'en', output: 'detail' });
 ```dart
 import 'package:randino/randino.dart';
 
-randJob(language: WordLanguage.ko, count: 3); // [기사, 마법사, 대장장이]
 randJob(language: WordLanguage.en, count: 3); // [Wizard, Ranger, Blacksmith]
 ```
 
@@ -34,7 +33,7 @@ randJob(language: WordLanguage.en, count: 3); // [Wizard, Ranger, Blacksmith]
 ```python
 from randino import rand_job
 
-rand_job(language="ko", count=3)  # ['기사', '마법사', '대장장이']
+rand_job(language="en", count=3)  # ['Wizard', 'Ranger', 'Blacksmith']
 rand_job(language="en", output="detail")
 # [WordDetail(word='Wizard', language='en', theme='job')]
 ```

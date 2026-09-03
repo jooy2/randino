@@ -58,9 +58,9 @@ Dart에는 `output`이 없습니다. 거기서는 [상세 출력](#the-detail-ou
 ```javascript
 import { randAnimal, randFood, randGem } from 'randino';
 
-randAnimal({ language: 'ko', count: 3 }); // ['여우', '고래', '수달']
+randAnimal({ language: 'en', count: 3 }); // ['Otter', 'Falcon', 'Lynx']
 randFood({ language: 'en', count: 2 }); // ['Dumpling', 'Cocoa']
-randGem({ language: 'ko', count: 2, unique: true }); // ['흑요석', '청동']
+randGem({ language: 'en', count: 2, unique: true }); // ['Obsidian', 'Bronze']
 ```
 
 :::
@@ -70,9 +70,9 @@ randGem({ language: 'ko', count: 2, unique: true }); // ['흑요석', '청동']
 ```dart
 import 'package:randino/randino.dart';
 
-randAnimal(language: WordLanguage.ko, count: 3); // [여우, 고래, 수달]
+randAnimal(language: WordLanguage.en, count: 3); // [Otter, Falcon, Lynx]
 randFood(language: WordLanguage.en, count: 2); // [Dumpling, Cocoa]
-randGem(language: WordLanguage.ko, count: 2, unique: true); // [흑요석, 청동]
+randGem(language: WordLanguage.en, count: 2, unique: true); // [Obsidian, Bronze]
 ```
 
 테마 함수는 `List<String>`만 돌려줍니다. 상세 출력이 필요하면 `randWordDetails`에 테마를 넘기세요. Dart에는 오버로드가 없고, 그것만을 위해 함수를 14개 더 두는 것은 지나칩니다.
@@ -84,9 +84,9 @@ randGem(language: WordLanguage.ko, count: 2, unique: true); // [흑요석, 청�
 ```python
 from randino import rand_animal, rand_food, rand_gem
 
-rand_animal(language="ko", count=3)  # ['여우', '고래', '수달']
+rand_animal(language="en", count=3)  # ['Otter', 'Falcon', 'Lynx']
 rand_food(language="en", count=2)  # ['Dumpling', 'Cocoa']
-rand_gem(language="ko", count=2, unique=True)  # ['흑요석', '청동']
+rand_gem(language="en", count=2, unique=True)  # ['Obsidian', 'Bronze']
 ```
 
 :::
@@ -100,8 +100,8 @@ rand_gem(language="ko", count=2, unique=True)  # ['흑요석', '청동']
 ::: lang js
 
 ```javascript
-randWord({ language: 'ko', theme: 'animal', maxLength: 2, count: 4 });
-// ['곰', '수달', '여우', '학']
+randWord({ language: 'en', theme: 'animal', maxLength: 4, count: 4 });
+// ['Cat', 'Ant', 'Frog', 'Carp']
 
 randWord({ language: 'en', minLength: 9, count: 3 });
 // ['Saxophone', 'Spaghetti', 'Spaceship']
@@ -112,8 +112,8 @@ randWord({ language: 'en', minLength: 9, count: 3 });
 ::: lang dart
 
 ```dart
-randWord(language: WordLanguage.ko, theme: WordTheme.animal, maxLength: 2, count: 4);
-// [곰, 수달, 여우, 학]
+randWord(language: WordLanguage.en, theme: WordTheme.animal, maxLength: 4, count: 4);
+// [Cat, Ant, Frog, Carp]
 
 randWord(language: WordLanguage.en, minLength: 9, count: 3);
 // [Saxophone, Spaghetti, Spaceship]
@@ -124,8 +124,8 @@ randWord(language: WordLanguage.en, minLength: 9, count: 3);
 ::: lang py
 
 ```python
-rand_word(language="ko", theme="animal", max_length=2, count=4)
-# ['곰', '수달', '여우', '학']
+rand_word(language="en", theme="animal", max_length=4, count=4)
+# ['Cat', 'Ant', 'Frog', 'Carp']
 
 rand_word(language="en", min_length=9, count=3)
 # ['Saxophone', 'Spaghetti', 'Spaceship']
@@ -140,8 +140,8 @@ rand_word(language="en", min_length=9, count=3)
 ::: lang js
 
 ```javascript
-randWord({ language: 'ko', style: 100, count: 4 });
-// ['다순', '머차', '멜포', '재거']
+randWord({ language: 'en', style: 100, count: 4 });
+// ['Sterath', 'Lisleen', 'Kaezan', 'Mibaeth']
 
 randWord({ language: 'en', style: 50, count: 4 });
 // ['Blorin', 'Meadow', 'Tavren', 'Compass']
@@ -152,8 +152,8 @@ randWord({ language: 'en', style: 50, count: 4 });
 ::: lang dart
 
 ```dart
-randWord(language: WordLanguage.ko, style: 100, count: 4);
-// [다순, 머차, 멜포, 재거]
+randWord(language: WordLanguage.en, style: 100, count: 4);
+// [Sterath, Lisleen, Kaezan, Mibaeth]
 ```
 
 :::
@@ -161,21 +161,21 @@ randWord(language: WordLanguage.ko, style: 100, count: 4);
 ::: lang py
 
 ```python
-rand_word(language="ko", style=100, count=4)
-# ['다순', '머차', '멜포', '재거']
+rand_word(language="en", style=100, count=4)
+# ['Sterath', 'Lisleen', 'Kaezan', 'Mibaeth']
 ```
 
 :::
 
-만들어낸 단어가 우연히 실제 단어를 이룰 수 있습니다. `나` + `비`는 `나비`가 되고, 그럴 때는 테마를 숨기지 않고 그대로 보고합니다.
+만들어낸 단어가 우연히 실제 단어를 이룰 수 있습니다. 음절 템플릿이 `Snake`를 만들어내는 일도 있고, 그럴 때는 테마를 숨기지 않고 그대로 보고합니다.
 
 ## 상세 출력 {#the-detail-output}
 
 ::: lang js
 
 ```javascript
-randWord({ language: 'ko', theme: 'plant', output: 'detail' });
-// [{ word: '민들레', language: 'ko', theme: 'plant' }]
+randWord({ language: 'en', theme: 'plant', output: 'detail' });
+// [{ word: 'Cedar', language: 'en', theme: 'plant' }]
 ```
 
 :::
@@ -183,8 +183,8 @@ randWord({ language: 'ko', theme: 'plant', output: 'detail' });
 ::: lang dart
 
 ```dart
-randWordDetails(language: WordLanguage.ko, theme: WordTheme.plant).first;
-// WordDetail(민들레, ko, plant)
+randWordDetails(language: WordLanguage.en, theme: WordTheme.plant).first;
+// WordDetail(Cedar, en, plant)
 ```
 
 Dart에는 오버로드도 유니온 타입도 없으므로 상세 출력은 별도 함수입니다.
@@ -194,8 +194,8 @@ Dart에는 오버로드도 유니온 타입도 없으므로 상세 출력은 별
 ::: lang py
 
 ```python
-rand_word(language="ko", theme="plant", output="detail")
-# [WordDetail(word='민들레', language='ko', theme='plant')]
+rand_word(language="en", theme="plant", output="detail")
+# [WordDetail(word='Cedar', language='en', theme='plant')]
 ```
 
 :::

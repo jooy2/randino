@@ -9,7 +9,7 @@ Nature and its phenomena — sky, weather, water, land.
 ```javascript
 import { randNature } from 'randino';
 
-randNature({ language: 'ko', count: 3 }); // ['하늘', '노을', '바람']
+randNature({ language: 'en', count: 3 }); // ['Sky', 'Sunset', 'Breeze']
 randNature({ language: 'en', output: 'detail' });
 // [{ word: 'Sky', language: 'en', theme: 'nature' }]
 ```
@@ -21,7 +21,6 @@ randNature({ language: 'en', output: 'detail' });
 ```dart
 import 'package:randino/randino.dart';
 
-randNature(language: WordLanguage.ko, count: 3); // [하늘, 노을, 바람]
 randNature(language: WordLanguage.en, count: 3); // [Sky, Sunset, Breeze]
 ```
 
@@ -34,7 +33,7 @@ Returns `List<String>`. For the detail form, pass `WordTheme.nature` to `randWor
 ```python
 from randino import rand_nature
 
-rand_nature(language="ko", count=3)  # ['하늘', '노을', '바람']
+rand_nature(language="en", count=3)  # ['Sky', 'Sunset', 'Breeze']
 rand_nature(language="en", output="detail")
 # [WordDetail(word='Sky', language='en', theme='nature')]
 ```

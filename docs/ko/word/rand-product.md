@@ -9,7 +9,7 @@
 ```javascript
 import { randProduct } from 'randino';
 
-randProduct({ language: 'ko', count: 3 }); // ['노트북', '키보드', '이어폰']
+randProduct({ language: 'en', count: 3 }); // ['Laptop', 'Keyboard', 'Earbuds']
 randProduct({ language: 'en', output: 'detail' });
 // [{ word: 'Laptop', language: 'en', theme: 'product' }]
 ```
@@ -21,7 +21,6 @@ randProduct({ language: 'en', output: 'detail' });
 ```dart
 import 'package:randino/randino.dart';
 
-randProduct(language: WordLanguage.ko, count: 3); // [노트북, 키보드, 이어폰]
 randProduct(language: WordLanguage.en, count: 3); // [Laptop, Keyboard, Earbuds]
 ```
 
@@ -34,7 +33,7 @@ randProduct(language: WordLanguage.en, count: 3); // [Laptop, Keyboard, Earbuds]
 ```python
 from randino import rand_product
 
-rand_product(language="ko", count=3)  # ['노트북', '키보드', '이어폰']
+rand_product(language="en", count=3)  # ['Laptop', 'Keyboard', 'Earbuds']
 rand_product(language="en", output="detail")
 # [WordDetail(word='Laptop', language='en', theme='product')]
 ```

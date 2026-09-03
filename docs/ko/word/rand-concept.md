@@ -9,7 +9,7 @@
 ```javascript
 import { randConcept } from 'randino';
 
-randConcept({ language: 'ko', count: 3 }); // ['자유', '평화', '진리']
+randConcept({ language: 'en', count: 3 }); // ['Freedom', 'Peace', 'Truth']
 randConcept({ language: 'en', output: 'detail' });
 // [{ word: 'Freedom', language: 'en', theme: 'concept' }]
 ```
@@ -21,7 +21,6 @@ randConcept({ language: 'en', output: 'detail' });
 ```dart
 import 'package:randino/randino.dart';
 
-randConcept(language: WordLanguage.ko, count: 3); // [자유, 평화, 진리]
 randConcept(language: WordLanguage.en, count: 3); // [Freedom, Peace, Truth]
 ```
 
@@ -34,7 +33,7 @@ randConcept(language: WordLanguage.en, count: 3); // [Freedom, Peace, Truth]
 ```python
 from randino import rand_concept
 
-rand_concept(language="ko", count=3)  # ['자유', '평화', '진리']
+rand_concept(language="en", count=3)  # ['Freedom', 'Peace', 'Truth']
 rand_concept(language="en", output="detail")
 # [WordDetail(word='Freedom', language='en', theme='concept')]
 ```

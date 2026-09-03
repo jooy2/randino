@@ -9,7 +9,7 @@ Plants: trees, flowers, leaves and what grows on them.
 ```javascript
 import { randPlant } from 'randino';
 
-randPlant({ language: 'ko', count: 3 }); // ['나무', '민들레', '솔방울']
+randPlant({ language: 'en', count: 3 }); // ['Treetop', 'Blossom', 'Fern']
 randPlant({ language: 'en', output: 'detail' });
 // [{ word: 'Treetop', language: 'en', theme: 'plant' }]
 ```
@@ -21,7 +21,6 @@ randPlant({ language: 'en', output: 'detail' });
 ```dart
 import 'package:randino/randino.dart';
 
-randPlant(language: WordLanguage.ko, count: 3); // [나무, 민들레, 솔방울]
 randPlant(language: WordLanguage.en, count: 3); // [Treetop, Blossom, Fern]
 ```
 
@@ -34,7 +33,7 @@ Returns `List<String>`. For the detail form, pass `WordTheme.plant` to `randWord
 ```python
 from randino import rand_plant
 
-rand_plant(language="ko", count=3)  # ['나무', '민들레', '솔방울']
+rand_plant(language="en", count=3)  # ['Treetop', 'Blossom', 'Fern']
 rand_plant(language="en", output="detail")
 # [WordDetail(word='Treetop', language='en', theme='plant')]
 ```

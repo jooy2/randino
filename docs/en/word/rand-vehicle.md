@@ -9,7 +9,7 @@ Things that carry you.
 ```javascript
 import { randVehicle } from 'randino';
 
-randVehicle({ language: 'ko', count: 3 }); // ['자전거', '기차', '열기구']
+randVehicle({ language: 'en', count: 3 }); // ['Bicycle', 'Boat', 'Airship']
 randVehicle({ language: 'en', output: 'detail' });
 // [{ word: 'Bicycle', language: 'en', theme: 'vehicle' }]
 ```
@@ -21,7 +21,6 @@ randVehicle({ language: 'en', output: 'detail' });
 ```dart
 import 'package:randino/randino.dart';
 
-randVehicle(language: WordLanguage.ko, count: 3); // [자전거, 기차, 열기구]
 randVehicle(language: WordLanguage.en, count: 3); // [Bicycle, Boat, Airship]
 ```
 
@@ -34,7 +33,7 @@ Returns `List<String>`. For the detail form, pass `WordTheme.vehicle` to `randWo
 ```python
 from randino import rand_vehicle
 
-rand_vehicle(language="ko", count=3)  # ['자전거', '기차', '열기구']
+rand_vehicle(language="en", count=3)  # ['Bicycle', 'Boat', 'Airship']
 rand_vehicle(language="en", output="detail")
 # [WordDetail(word='Bicycle', language='en', theme='vehicle')]
 ```

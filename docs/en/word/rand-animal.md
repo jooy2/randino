@@ -9,7 +9,7 @@ Animals — the creatures a nickname is most often built around.
 ```javascript
 import { randAnimal } from 'randino';
 
-randAnimal({ language: 'ko', count: 3 }); // ['여우', '고래', '수달']
+randAnimal({ language: 'en', count: 3 }); // ['Otter', 'Falcon', 'Lynx']
 randAnimal({ language: 'en', output: 'detail' });
 // [{ word: 'Otter', language: 'en', theme: 'animal' }]
 ```
@@ -21,7 +21,6 @@ randAnimal({ language: 'en', output: 'detail' });
 ```dart
 import 'package:randino/randino.dart';
 
-randAnimal(language: WordLanguage.ko, count: 3); // [여우, 고래, 수달]
 randAnimal(language: WordLanguage.en, count: 3); // [Otter, Falcon, Lynx]
 ```
 
@@ -34,7 +33,7 @@ Returns `List<String>`. For the detail form, pass `WordTheme.animal` to `randWor
 ```python
 from randino import rand_animal
 
-rand_animal(language="ko", count=3)  # ['여우', '고래', '수달']
+rand_animal(language="en", count=3)  # ['Otter', 'Falcon', 'Lynx']
 rand_animal(language="en", output="detail")
 # [WordDetail(word='Otter', language='en', theme='animal')]
 ```

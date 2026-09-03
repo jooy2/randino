@@ -9,7 +9,7 @@ Food and drink, the everyday kind.
 ```javascript
 import { randFood } from 'randino';
 
-randFood({ language: 'ko', count: 3 }); // ['밥', '떡볶이', '녹차']
+randFood({ language: 'en', count: 3 }); // ['Rice', 'Noodle', 'Dumpling']
 randFood({ language: 'en', output: 'detail' });
 // [{ word: 'Rice', language: 'en', theme: 'food' }]
 ```
@@ -21,7 +21,6 @@ randFood({ language: 'en', output: 'detail' });
 ```dart
 import 'package:randino/randino.dart';
 
-randFood(language: WordLanguage.ko, count: 3); // [밥, 떡볶이, 녹차]
 randFood(language: WordLanguage.en, count: 3); // [Rice, Noodle, Dumpling]
 ```
 
@@ -34,7 +33,7 @@ Returns `List<String>`. For the detail form, pass `WordTheme.food` to `randWordD
 ```python
 from randino import rand_food
 
-rand_food(language="ko", count=3)  # ['밥', '떡볶이', '녹차']
+rand_food(language="en", count=3)  # ['Rice', 'Noodle', 'Dumpling']
 rand_food(language="en", output="detail")
 # [WordDetail(word='Rice', language='en', theme='food')]
 ```

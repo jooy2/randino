@@ -9,7 +9,7 @@
 ```javascript
 import { randPlace } from 'randino';
 
-randPlace({ language: 'ko', count: 3 }); // ['시장', '광장', '마을']
+randPlace({ language: 'en', count: 3 }); // ['Market', 'Plaza', 'Village']
 randPlace({ language: 'en', output: 'detail' });
 // [{ word: 'Market', language: 'en', theme: 'place' }]
 ```
@@ -21,7 +21,6 @@ randPlace({ language: 'en', output: 'detail' });
 ```dart
 import 'package:randino/randino.dart';
 
-randPlace(language: WordLanguage.ko, count: 3); // [시장, 광장, 마을]
 randPlace(language: WordLanguage.en, count: 3); // [Market, Plaza, Village]
 ```
 
@@ -34,7 +33,7 @@ randPlace(language: WordLanguage.en, count: 3); // [Market, Plaza, Village]
 ```python
 from randino import rand_place
 
-rand_place(language="ko", count=3)  # ['시장', '광장', '마을']
+rand_place(language="en", count=3)  # ['Market', 'Plaza', 'Village']
 rand_place(language="en", output="detail")
 # [WordDetail(word='Market', language='en', theme='place')]
 ```

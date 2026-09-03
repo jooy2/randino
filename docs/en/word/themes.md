@@ -30,10 +30,10 @@ WORD_THEMES;
 // ['animal', 'object', 'nature', 'plant', 'gem', 'concept', 'myth', 'job',
 //  'music', 'place', 'food', 'sport', 'vehicle', 'product']
 
-randWord({ theme: 'food', language: 'ko', count: 3 });
-// ['떡볶이', '녹차', '만두']
+randWord({ theme: 'food', language: 'en', count: 3 });
+// ['Dumpling', 'Cocoa', 'Pancake']
 
-randFood({ language: 'ko', count: 3 }); // the same thing
+randFood({ language: 'en', count: 3 }); // the same thing
 ```
 
 :::
@@ -45,10 +45,10 @@ import 'package:randino/randino.dart';
 
 wordThemes; // every WordTheme, in presentation order
 
-randWord(theme: WordTheme.food, language: WordLanguage.ko, count: 3);
-// [떡볶이, 녹차, 만두]
+randWord(theme: WordTheme.food, language: WordLanguage.en, count: 3);
+// [Dumpling, Cocoa, Pancake]
 
-randFood(language: WordLanguage.ko, count: 3); // the same thing
+randFood(language: WordLanguage.en, count: 3); // the same thing
 ```
 
 :::
@@ -62,10 +62,10 @@ WORD_THEMES
 # ('animal', 'object', 'nature', 'plant', 'gem', 'concept', 'myth', 'job',
 #  'music', 'place', 'food', 'sport', 'vehicle', 'product')
 
-rand_word(theme="food", language="ko", count=3)
-# ['떡볶이', '녹차', '만두']
+rand_word(theme="food", language="en", count=3)
+# ['Dumpling', 'Cocoa', 'Pancake']
 
-rand_food(language="ko", count=3)  # the same thing
+rand_food(language="en", count=3)  # the same thing
 ```
 
 :::
@@ -87,7 +87,7 @@ Leave the theme out and each result draws from one theme picked at random, so a 
 | Drawn from a theme         | That theme                                    |
 | Invented at a high `style` | Null — unless it happens to spell a real word |
 
-That last row is a real coincidence rather than a bug: `나` + `비` spells `나비`, so an invented Korean word can come back with `theme` set to `animal`.
+That last row is a real coincidence rather than a bug: the syllable templates spell `Snake` now and then, so an invented word can come back with `theme` set to `animal`.
 
 ## See also
 

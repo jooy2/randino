@@ -30,10 +30,10 @@ WORD_THEMES;
 // ['animal', 'object', 'nature', 'plant', 'gem', 'concept', 'myth', 'job',
 //  'music', 'place', 'food', 'sport', 'vehicle', 'product']
 
-randWord({ theme: 'food', language: 'ko', count: 3 });
-// ['떡볶이', '녹차', '만두']
+randWord({ theme: 'food', language: 'en', count: 3 });
+// ['Dumpling', 'Cocoa', 'Pancake']
 
-randFood({ language: 'ko', count: 3 }); // 같은 결과
+randFood({ language: 'en', count: 3 }); // 같은 결과
 ```
 
 :::
@@ -45,10 +45,10 @@ import 'package:randino/randino.dart';
 
 wordThemes; // 표시 순서대로 나열된 모든 WordTheme
 
-randWord(theme: WordTheme.food, language: WordLanguage.ko, count: 3);
-// [떡볶이, 녹차, 만두]
+randWord(theme: WordTheme.food, language: WordLanguage.en, count: 3);
+// [Dumpling, Cocoa, Pancake]
 
-randFood(language: WordLanguage.ko, count: 3); // 같은 결과
+randFood(language: WordLanguage.en, count: 3); // 같은 결과
 ```
 
 :::
@@ -62,10 +62,10 @@ WORD_THEMES
 # ('animal', 'object', 'nature', 'plant', 'gem', 'concept', 'myth', 'job',
 #  'music', 'place', 'food', 'sport', 'vehicle', 'product')
 
-rand_word(theme="food", language="ko", count=3)
-# ['떡볶이', '녹차', '만두']
+rand_word(theme="food", language="en", count=3)
+# ['Dumpling', 'Cocoa', 'Pancake']
 
-rand_food(language="ko", count=3)  # 같은 결과
+rand_food(language="en", count=3)  # 같은 결과
 ```
 
 :::
@@ -87,7 +87,7 @@ rand_food(language="ko", count=3)  # 같은 결과
 | 테마에서 뽑음           | 그 테마                                  |
 | 높은 `style`로 만들어냄 | null — 우연히 실제 단어를 이루지 않는 한 |
 
-마지막 줄은 버그가 아니라 실제로 일어나는 우연입니다. `나` + `비`는 `나비`가 되므로, 만들어낸 한국어 단어가 `theme`을 `animal`로 보고할 수 있습니다.
+마지막 줄은 버그가 아니라 실제로 일어나는 우연입니다. 음절 템플릿이 이따금 `Snake`를 만들어내므로, 만들어낸 단어가 `theme`을 `animal`로 보고할 수 있습니다.
 
 ## 함께 보기
 

@@ -9,7 +9,7 @@ Music: instruments, forms and the words around them.
 ```javascript
 import { randMusic } from 'randino';
 
-randMusic({ language: 'ko', count: 3 }); // ['피아노', '거문고', '교향곡']
+randMusic({ language: 'en', count: 3 }); // ['Piano', 'Fiddle', 'Symphony']
 randMusic({ language: 'en', output: 'detail' });
 // [{ word: 'Piano', language: 'en', theme: 'music' }]
 ```
@@ -21,7 +21,6 @@ randMusic({ language: 'en', output: 'detail' });
 ```dart
 import 'package:randino/randino.dart';
 
-randMusic(language: WordLanguage.ko, count: 3); // [피아노, 거문고, 교향곡]
 randMusic(language: WordLanguage.en, count: 3); // [Piano, Fiddle, Symphony]
 ```
 
@@ -34,7 +33,7 @@ Returns `List<String>`. For the detail form, pass `WordTheme.music` to `randWord
 ```python
 from randino import rand_music
 
-rand_music(language="ko", count=3)  # ['피아노', '거문고', '교향곡']
+rand_music(language="en", count=3)  # ['Piano', 'Fiddle', 'Symphony']
 rand_music(language="en", output="detail")
 # [WordDetail(word='Piano', language='en', theme='music')]
 ```

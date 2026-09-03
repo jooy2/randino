@@ -9,7 +9,7 @@
 ```javascript
 import { randMyth } from 'randino';
 
-randMyth({ language: 'ko', count: 3 }); // ['용', '봉황', '구미호']
+randMyth({ language: 'en', count: 3 }); // ['Dragon', 'Phoenix', 'Griffin']
 randMyth({ language: 'en', output: 'detail' });
 // [{ word: 'Dragon', language: 'en', theme: 'myth' }]
 ```
@@ -21,7 +21,6 @@ randMyth({ language: 'en', output: 'detail' });
 ```dart
 import 'package:randino/randino.dart';
 
-randMyth(language: WordLanguage.ko, count: 3); // [용, 봉황, 구미호]
 randMyth(language: WordLanguage.en, count: 3); // [Dragon, Phoenix, Griffin]
 ```
 
@@ -34,7 +33,7 @@ randMyth(language: WordLanguage.en, count: 3); // [Dragon, Phoenix, Griffin]
 ```python
 from randino import rand_myth
 
-rand_myth(language="ko", count=3)  # ['용', '봉황', '구미호']
+rand_myth(language="en", count=3)  # ['Dragon', 'Phoenix', 'Griffin']
 rand_myth(language="en", output="detail")
 # [WordDetail(word='Dragon', language='en', theme='myth')]
 ```

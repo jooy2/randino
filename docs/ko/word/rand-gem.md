@@ -9,7 +9,7 @@
 ```javascript
 import { randGem } from 'randino';
 
-randGem({ language: 'ko', count: 3 }); // ['금', '수정', '흑요석']
+randGem({ language: 'en', count: 3 }); // ['Gold', 'Quartz', 'Obsidian']
 randGem({ language: 'en', output: 'detail' });
 // [{ word: 'Gold', language: 'en', theme: 'gem' }]
 ```
@@ -21,7 +21,6 @@ randGem({ language: 'en', output: 'detail' });
 ```dart
 import 'package:randino/randino.dart';
 
-randGem(language: WordLanguage.ko, count: 3); // [금, 수정, 흑요석]
 randGem(language: WordLanguage.en, count: 3); // [Gold, Quartz, Obsidian]
 ```
 
@@ -34,7 +33,7 @@ randGem(language: WordLanguage.en, count: 3); // [Gold, Quartz, Obsidian]
 ```python
 from randino import rand_gem
 
-rand_gem(language="ko", count=3)  # ['금', '수정', '흑요석']
+rand_gem(language="en", count=3)  # ['Gold', 'Quartz', 'Obsidian']
 rand_gem(language="en", output="detail")
 # [WordDetail(word='Gold', language='en', theme='gem')]
 ```

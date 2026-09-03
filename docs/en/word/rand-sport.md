@@ -9,7 +9,7 @@ Sports and the things people play.
 ```javascript
 import { randSport } from 'randino';
 
-randSport({ language: 'ko', count: 3 }); // ['축구', '야구', '양궁']
+randSport({ language: 'en', count: 3 }); // ['Soccer', 'Baseball', 'Archery']
 randSport({ language: 'en', output: 'detail' });
 // [{ word: 'Soccer', language: 'en', theme: 'sport' }]
 ```
@@ -21,7 +21,6 @@ randSport({ language: 'en', output: 'detail' });
 ```dart
 import 'package:randino/randino.dart';
 
-randSport(language: WordLanguage.ko, count: 3); // [축구, 야구, 양궁]
 randSport(language: WordLanguage.en, count: 3); // [Soccer, Baseball, Archery]
 ```
 
@@ -34,7 +33,7 @@ Returns `List<String>`. For the detail form, pass `WordTheme.sport` to `randWord
 ```python
 from randino import rand_sport
 
-rand_sport(language="ko", count=3)  # ['축구', '야구', '양궁']
+rand_sport(language="en", count=3)  # ['Soccer', 'Baseball', 'Archery']
 rand_sport(language="en", output="detail")
 # [WordDetail(word='Soccer', language='en', theme='sport')]
 ```
