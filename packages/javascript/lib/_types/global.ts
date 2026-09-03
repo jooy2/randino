@@ -135,7 +135,15 @@ export type WordTheme =
 	| 'product'
 	| 'color'
 	| 'finance'
-	| 'tech';
+	| 'tech'
+	| 'weather'
+	| 'space'
+	| 'time'
+	| 'emotion'
+	| 'body'
+	| 'clothing'
+	| 'tool'
+	| 'drink';
 
 /** `'all'` draws from every theme. */
 export type WordThemeOption = WordTheme | 'all';
@@ -148,7 +156,7 @@ export interface RandWordOptions extends RandCommonOptions {
 }
 
 /**
- * What the seventeen themed generators take — `RandWordOptions` without the
+ * What the twenty-five themed generators take — `RandWordOptions` without the
  * option they answer. `randAnimal({ theme: 'food' })` would be a contradiction,
  * so it does not type-check.
  */

@@ -46,7 +46,7 @@ rand_nickname(language="en", count=3)
 | [`randNickname`](./rand-nickname) | 닉네임 문자열, 또는 [닉네임마다 상세 정보](./rand-nickname#the-detail-output) |
 | [`nicknameLengthRange`](./nickname-length-range) | 해당 언어가 만들 수 있는 모든 길이 |
 
-명사는 17개 [테마](../word/themes)에서 오고, 모든 닉네임은 그중 한 테마의 단어를 중심으로 만들어집니다.
+명사는 25개 [테마](../word/themes)에서 오고, 모든 닉네임은 그중 한 테마의 단어를 중심으로 만들어집니다.
 
 ## 옵션의 동작 방식
 
@@ -193,7 +193,7 @@ rand_nickname(language="en", realism="invented", count=3)
 
 :::
 
-`realism`은 <Lang js="theme: 'all'" dart="theme을 비운 경우" py="theme=&quot;all&quot;" code />가 **어떤 테마를 도는지**도 정합니다. 열일곱 개 가운데 `color`, `finance`, `tech` 셋은 닉네임으로 어색합니다. 색이나 대출 앞에 수식어가 붙으면 핸들이 아니라 농담으로 읽히기 때문입니다(`멋진대출`, `BraveInvoice`, `奔跑的服务器`). `real`에서는 빠지고 `mixed`와 `invented`에서는 들어옵니다. 테마를 직접 지정하면 `realism`과 무관하게 언제나 그 테마가 나옵니다. `finance`를 달라고 했는데 다른 것이 나오면 옵션이 동작하지 않는 것이니까요.
+`realism`은 <Lang js="theme: 'all'" dart="theme을 비운 경우" py="theme=&quot;all&quot;" code />가 **어떤 테마를 도는지**도 정합니다. 스물다섯 개 가운데 `color`, `finance`, `tech` 셋은 닉네임으로 어색합니다. 색이나 대출 앞에 수식어가 붙으면 핸들이 아니라 농담으로 읽히기 때문입니다(`멋진대출`, `BraveInvoice`, `奔跑的服务器`). `real`에서는 빠지고 `mixed`와 `invented`에서는 들어옵니다. 테마를 직접 지정하면 `realism`과 무관하게 언제나 그 테마가 나옵니다. `finance`를 달라고 했는데 다른 것이 나오면 옵션이 동작하지 않는 것이니까요.
 
 ::: lang js
 

@@ -32,11 +32,11 @@ features:
     link: /ko/name/
     linkText: 사람 이름
   - title: 일상 단어로 만드는 닉네임
-    details: 17개 테마의 명사에 수식어를 붙입니다. 사람 이름은 절대 쓰지 않으며, 그래서 닉네임이 이름처럼 읽히지 않습니다.
+    details: 25개 테마의 명사에 수식어를 붙입니다. 사람 이름은 절대 쓰지 않으며, 그래서 닉네임이 이름처럼 읽히지 않습니다.
     link: /ko/nickname/
     linkText: 닉네임
   - title: 단어 그 자체로
-    details: 17개 테마마다 함수가 하나씩. randAnimal, randFood, randGem — 닉네임을 만드는 어휘를 닉네임 없이 그대로 씁니다.
+    details: 25개 테마마다 함수가 하나씩. randAnimal, randFood, randGem — 닉네임을 만드는 어휘를 닉네임 없이 그대로 씁니다.
     link: /ko/word/rand-word
     linkText: randWord
   - title: 세 개의 패키지, 하나의 라이브러리

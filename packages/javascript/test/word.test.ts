@@ -5,8 +5,12 @@ import {
 	WORD_LANGUAGES,
 	WORD_THEMES,
 	randAnimal,
+	randBody,
+	randClothing,
 	randColor,
 	randConcept,
+	randDrink,
+	randEmotion,
 	randFinance,
 	randFood,
 	randGem,
@@ -18,9 +22,13 @@ import {
 	randPlace,
 	randPlant,
 	randProduct,
+	randSpace,
 	randSport,
 	randTech,
+	randTime,
+	randTool,
 	randVehicle,
+	randWeather,
 	randWord,
 	wordLengthRange
 } from '../dist/index.js';
@@ -62,7 +70,15 @@ const THEMED: Record<WordTheme, (options?: RandThemedWordOptions) => string[]> =
 	product: randProduct,
 	color: randColor,
 	finance: randFinance,
-	tech: randTech
+	tech: randTech,
+	weather: randWeather,
+	space: randSpace,
+	time: randTime,
+	emotion: randEmotion,
+	body: randBody,
+	clothing: randClothing,
+	tool: randTool,
+	drink: randDrink
 };
 
 function nounsOf(language: WordLanguage, theme?: WordTheme): string[] {

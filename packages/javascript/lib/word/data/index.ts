@@ -28,7 +28,15 @@ export const WORD_THEMES: readonly WordTheme[] = [
 	'product',
 	'color',
 	'finance',
-	'tech'
+	'tech',
+	'weather',
+	'space',
+	'time',
+	'emotion',
+	'body',
+	'clothing',
+	'tool',
+	'drink'
 ];
 
 /**

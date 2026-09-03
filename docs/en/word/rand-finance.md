@@ -24,7 +24,7 @@ import 'package:randino/randino.dart';
 randFinance(language: WordLanguage.en, count: 3); // [Ledger, Yield, Escrow]
 ```
 
-Returns `List<String>`. For the detail form, pass `WordTheme.finance` to `randWordDetails` — Dart has no overloads, and seventeen more functions for it would be seventeen too many.
+Returns `List<String>`. For the detail form, pass `WordTheme.finance` to `randWordDetails` — Dart has no overloads, and twenty-four more functions for it would be twenty-four too many.
 
 :::
 
@@ -47,4 +47,4 @@ rand_finance(language="en", output="detail")
 ## See also
 
 - [`randWord`](./rand-word) — the same generator with `theme` open, and what each option does in full.
-- [Themes](./themes) — the other sixteen, and the words each one holds.
+- [Themes](./themes) — the other twenty-four, and the words each one holds.

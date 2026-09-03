@@ -155,6 +155,30 @@ enum WordTheme {
 
   /// The vocabulary of computing: 캐시, Server.
   tech,
+
+  /// What the sky is doing: 소나기, Drizzle.
+  weather,
+
+  /// Beyond the sky: 은하, Comet.
+  space,
+
+  /// When something happens: 새벽, Twilight.
+  time,
+
+  /// What someone feels: 그리움, Longing.
+  emotion,
+
+  /// Parts of a body: 손목, Shoulder.
+  body,
+
+  /// What people wear: 두루마기, Cardigan.
+  clothing,
+
+  /// What a hand works with: 대패, Chisel.
+  tool,
+
+  /// Something to drink: 식혜, Cider.
+  drink,
 }
 
 /// A span of lengths in characters, inclusive at both ends.

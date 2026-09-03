@@ -1,5 +1,5 @@
 /**
- * The options `randWord` and its seventeen themed forms take, as data.
+ * The options `randWord` and its twenty-five themed forms take, as data.
  *
  * Fifteen pages document the same table, in two locales, with three packages'
  * types in every cell — so it is written once here and drawn from two places:
@@ -38,7 +38,7 @@ export interface WordOptionRow {
 	 * Omitted means every one of them.
 	 */
 	langs?: string;
-	/** Only `randWord` takes this one; the seventeen answer it instead. */
+	/** Only `randWord` takes this one; the twenty-five answer it instead. */
 	themeOnly?: boolean;
 }
 

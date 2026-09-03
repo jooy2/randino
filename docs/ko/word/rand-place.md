@@ -24,7 +24,7 @@ import 'package:randino/randino.dart';
 randPlace(language: WordLanguage.en, count: 3); // [Market, Plaza, Village]
 ```
 
-`List<String>`을 반환합니다. 상세 출력이 필요하면 `randWordDetails`에 `WordTheme.place`을 넘기세요. Dart에는 오버로드가 없고, 그것만을 위해 함수를 17개 더 두는 것은 지나칩니다.
+`List<String>`을 반환합니다. 상세 출력이 필요하면 `randWordDetails`에 `WordTheme.place`을 넘기세요. Dart에는 오버로드가 없고, 그것만을 위해 함수를 24개 더 두는 것은 지나칩니다.
 
 :::
 

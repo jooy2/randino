@@ -19,13 +19,13 @@
  * decides nothing but its URL.
  *
  * **Generators** is the one that goes a level deeper, into **General** — the
- * three that generate a kind of text — and **Words**, the seventeen themed forms
- * of `randWord`. Twenty entries in one list would bury the three, and the
- * seventeen are `randWord` with its argument decided rather than seventeen
+ * three that generate a kind of text — and **Words**, the twenty-five themed forms
+ * of `randWord`. Twenty-eight entries in one list would bury the three, and the
+ * twenty-five are `randWord` with its argument decided rather than twenty-five
  * separate ideas, so they sit beside the three rather than among them.
  *
  * Words is also the one group the navbar's API dropdown leaves out, which it
- * says itself with `sidebarOnly`: seventeen names for one function is a wall in
+ * says itself with `sidebarOnly`: twenty-five names for one function is a wall in
  * a menu, and the dropdown already points at the function they all are.
  *
  * **Behaviour** holds the prose explaining how a generator's options behave,
@@ -55,7 +55,7 @@ export interface SidebarGroup {
 	/**
 	 * Kept out of the navbar's dropdown, pages and all. For a group that is long
 	 * enough to be a wall in a menu while still being worth a place in the
-	 * sidebar — **Words**, the seventeen themed forms of one function, is why this
+	 * sidebar — **Words**, the twenty-five themed forms of one function, is why this
 	 * exists.
 	 */
 	sidebarOnly?: boolean;
@@ -116,7 +116,15 @@ export const SIDEBAR: SidebarGroup[] = [
 							{ path: 'word/rand-product', en: 'randProduct', ko: 'randProduct' },
 							{ path: 'word/rand-color', en: 'randColor', ko: 'randColor' },
 							{ path: 'word/rand-finance', en: 'randFinance', ko: 'randFinance' },
-							{ path: 'word/rand-tech', en: 'randTech', ko: 'randTech' }
+							{ path: 'word/rand-tech', en: 'randTech', ko: 'randTech' },
+							{ path: 'word/rand-weather', en: 'randWeather', ko: 'randWeather' },
+							{ path: 'word/rand-space', en: 'randSpace', ko: 'randSpace' },
+							{ path: 'word/rand-time', en: 'randTime', ko: 'randTime' },
+							{ path: 'word/rand-emotion', en: 'randEmotion', ko: 'randEmotion' },
+							{ path: 'word/rand-body', en: 'randBody', ko: 'randBody' },
+							{ path: 'word/rand-clothing', en: 'randClothing', ko: 'randClothing' },
+							{ path: 'word/rand-tool', en: 'randTool', ko: 'randTool' },
+							{ path: 'word/rand-drink', en: 'randDrink', ko: 'randDrink' }
 						]
 					}
 				]

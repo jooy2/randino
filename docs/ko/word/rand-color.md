@@ -24,7 +24,7 @@ import 'package:randino/randino.dart';
 randColor(language: WordLanguage.en, count: 3); // [Crimson, Teal, Ochre]
 ```
 
-`List<String>`을 돌려줍니다. 상세 형태가 필요하면 `randWordDetails`에 `WordTheme.color`을 넘기십시오. Dart에는 오버로드가 없고, 이것만을 위해 함수를 열일곱 개 더 두는 것은 열일곱 개가 많습니다.
+`List<String>`을 돌려줍니다. 상세 형태가 필요하면 `randWordDetails`에 `WordTheme.color`을 넘기십시오. Dart에는 오버로드가 없고, 이것만을 위해 함수를 스물네 개 더 두는 것은 스물네 개가 많습니다.
 
 :::
 
@@ -47,4 +47,4 @@ rand_color(language="en", output="detail")
 ## 함께 보기 {#see-also}
 
 - [`randWord`](./rand-word) — `theme`이 열려 있는 같은 생성 함수, 그리고 각 옵션의 전체 설명.
-- [테마](./themes) — 나머지 열여섯 개와 각 테마가 담은 단어들.
+- [테마](./themes) — 나머지 스물네 개와 각 테마가 담은 단어들.

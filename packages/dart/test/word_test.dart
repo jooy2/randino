@@ -50,6 +50,22 @@ themed = <WordTheme, List<String> Function({WordLanguage? language, int count})>
       ({WordLanguage? language, int count = 1}) => randFinance(language: language, count: count),
   WordTheme.tech:
       ({WordLanguage? language, int count = 1}) => randTech(language: language, count: count),
+  WordTheme.weather:
+      ({WordLanguage? language, int count = 1}) => randWeather(language: language, count: count),
+  WordTheme.space:
+      ({WordLanguage? language, int count = 1}) => randSpace(language: language, count: count),
+  WordTheme.time:
+      ({WordLanguage? language, int count = 1}) => randTime(language: language, count: count),
+  WordTheme.emotion:
+      ({WordLanguage? language, int count = 1}) => randEmotion(language: language, count: count),
+  WordTheme.body:
+      ({WordLanguage? language, int count = 1}) => randBody(language: language, count: count),
+  WordTheme.clothing:
+      ({WordLanguage? language, int count = 1}) => randClothing(language: language, count: count),
+  WordTheme.tool:
+      ({WordLanguage? language, int count = 1}) => randTool(language: language, count: count),
+  WordTheme.drink:
+      ({WordLanguage? language, int count = 1}) => randDrink(language: language, count: count),
 };
 
 List<String> poolOf(WordLanguage language, [WordTheme? theme]) {

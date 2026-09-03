@@ -5,7 +5,7 @@ import 'package:randino/src/word/rand_word.dart';
 ///
 /// [randWord] with the theme already chosen; every other parameter is the same.
 /// For the detail form, pass [WordTheme.gem] to `randWordDetails` — Dart has
-/// no overloads, and seventeen more functions for it would be seventeen too many.
+/// no overloads, and twenty-four more functions for it would be twenty-four too many.
 ///
 /// ```dart
 /// randGem(language: WordLanguage.ko, count: 3); // [금, 수정, 흑요석]

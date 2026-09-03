@@ -24,7 +24,7 @@ import 'package:randino/randino.dart';
 randObject(language: WordLanguage.en, count: 3); // [Bottle, Pencil, Umbrella]
 ```
 
-Returns `List<String>`. For the detail form, pass `WordTheme.object` to `randWordDetails` — Dart has no overloads, and seventeen more functions for it would be seventeen too many.
+Returns `List<String>`. For the detail form, pass `WordTheme.object` to `randWordDetails` — Dart has no overloads, and twenty-four more functions for it would be twenty-four too many.
 
 :::
 
@@ -47,4 +47,4 @@ rand_object(language="en", output="detail")
 ## See also
 
 - [`randWord`](./rand-word) — the same generator with `theme` open, and what each option does in full.
-- [Themes](./themes) — the other sixteen, and the words each one holds.
+- [Themes](./themes) — the other twenty-four, and the words each one holds.

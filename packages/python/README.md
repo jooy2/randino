@@ -13,8 +13,8 @@ Every option and every example, with **Python** picked in the sidebar. This READ
 **randino** generates random person names and nicknames in the language you ask for.
 
 - **Person names** read like names people actually carry — Emma Clover, Jack Reeves — and come with their English pronunciation. 9 languages.
-- **Nicknames** are the handles you would pick for a game or a website — MistyOwl, CraneVoyage, RustyBoot. Built from everyday words across seventeen themes, never from person names.
-- **Words** are those seventeen themes on their own — `rand_word`, plus `rand_animal`, `rand_food` and twelve more.
+- **Nicknames** are the handles you would pick for a game or a website — MistyOwl, CraneVoyage, RustyBoot. Built from everyday words across twenty-five themes, never from person names.
+- **Words** are those twenty-five themes on their own — `rand_word`, plus `rand_animal`, `rand_food` and twelve more.
 - **Decorators** attach something to a string you already have: `rand_suffix`, `rand_prefix` and `rand_modifier`.
 - Every argument is keyword-only and optional, so `rand_name()` on its own works.
 - **Pure Python, no dependencies.** It imports nothing outside the standard library, and ships a `py.typed` marker so mypy and Pyright read the annotations.
@@ -95,7 +95,7 @@ rand_nickname(language="en", output="detail")[0]
 
 `output="detail"` returns a `NicknameDetail` — `nickname`, `words`, `language` and `theme` — for each nickname instead of a string.
 
-Themes: `animal`, `object`, `nature`, `plant`, `gem`, `concept`, `myth`, `job`, `music`, `place`, `food`, `sport`, `vehicle`, `product`, `color`, `finance`, `tech`.
+Themes: `animal`, `object`, `nature`, `plant`, `gem`, `concept`, `myth`, `job`, `music`, `place`, `food`, `sport`, `vehicle`, `product`, `color`, `finance`, `tech`, `weather`, `space`, `time`, `emotion`, `body`, `clothing`, `tool`, `drink`.
 
 ## Words
 
@@ -127,7 +127,7 @@ word_length_range("en")  # (3, 11)
 | `unique`                    | `bool`                           | `False`   |
 | `output`                    | `RandOutput`                     | `"value"` |
 
-One function per theme: `rand_animal`, `rand_object`, `rand_nature`, `rand_plant`, `rand_gem`, `rand_concept`, `rand_myth`, `rand_job`, `rand_music`, `rand_place`, `rand_food`, `rand_sport`, `rand_vehicle`, `rand_product`, `rand_color`, `rand_finance`, `rand_tech`. Each is `rand_word` with the theme already chosen.
+One function per theme: `rand_animal`, `rand_object`, `rand_nature`, `rand_plant`, `rand_gem`, `rand_concept`, `rand_myth`, `rand_job`, `rand_music`, `rand_place`, `rand_food`, `rand_sport`, `rand_vehicle`, `rand_product`, `rand_color`, `rand_finance`, `rand_tech`, `rand_weather`, `rand_space`, `rand_time`, `rand_emotion`, `rand_body`, `rand_clothing`, `rand_tool`, `rand_drink`. Each is `rand_word` with the theme already chosen.
 
 ## Decorators
 

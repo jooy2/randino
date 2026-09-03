@@ -46,7 +46,7 @@ Korean and Japanese cannot be held to that check — 하늘, 별 and 森 are eve
 | [`randNickname`](./rand-nickname) | The nicknames as strings, or [a detail per nickname](./rand-nickname#the-detail-output) |
 | [`nicknameLengthRange`](./nickname-length-range) | Every length a language can produce |
 
-The nouns come from seventeen [themes](../word/themes), and every nickname is built around a word from one of them.
+The nouns come from twenty-five [themes](../word/themes), and every nickname is built around a word from one of them.
 
 ## How the options behave
 
@@ -193,7 +193,7 @@ rand_nickname(language="en", realism="invented", count=3)
 
 :::
 
-`realism` also decides **which themes** <Lang js="theme: 'all'" dart="a null theme" py="theme=&quot;all&quot;" code /> spans. Three of the seventeen — `color`, `finance` and `tech` — make an awkward nickname: a word in front of a colour or a loan reads as a joke rather than a handle (`BraveInvoice`, `멋진대출`, `奔跑的服务器`). At `real` they are left out; at `mixed` and `invented` they are in. Naming one of them is always honoured, whatever the realism is — asking for `finance` and getting something else would be the option not working.
+`realism` also decides **which themes** <Lang js="theme: 'all'" dart="a null theme" py="theme=&quot;all&quot;" code /> spans. Three of the twenty-five — `color`, `finance` and `tech` — make an awkward nickname: a word in front of a colour or a loan reads as a joke rather than a handle (`BraveInvoice`, `멋진대출`, `奔跑的服务器`). At `real` they are left out; at `mixed` and `invented` they are in. Naming one of them is always honoured, whatever the realism is — asking for `finance` and getting something else would be the option not working.
 
 ::: lang js
 

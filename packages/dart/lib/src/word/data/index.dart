@@ -36,6 +36,14 @@ final List<WordTheme> wordThemes = List<WordTheme>.unmodifiable(<WordTheme>[
   WordTheme.color,
   WordTheme.finance,
   WordTheme.tech,
+  WordTheme.weather,
+  WordTheme.space,
+  WordTheme.time,
+  WordTheme.emotion,
+  WordTheme.body,
+  WordTheme.clothing,
+  WordTheme.tool,
+  WordTheme.drink,
 ]);
 
 /// Themes a nickname only reaches once `realism` loosens.

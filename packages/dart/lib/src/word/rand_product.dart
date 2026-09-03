@@ -5,7 +5,7 @@ import 'package:randino/src/word/rand_word.dart';
 ///
 /// [randWord] with the theme already chosen; every other parameter is the same.
 /// For the detail form, pass [WordTheme.product] to `randWordDetails` — Dart has
-/// no overloads, and seventeen more functions for it would be seventeen too many.
+/// no overloads, and twenty-four more functions for it would be twenty-four too many.
 ///
 /// ```dart
 /// randProduct(language: WordLanguage.ko, count: 3); // [노트북, 키보드, 이어폰]

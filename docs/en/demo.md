@@ -12,7 +12,7 @@ Everything below runs in your browser. The controls are the options `randName`, 
 - On the nickname tab, set `theme` to `animal` and `wordSeparator` to `-`. The separator counts toward the length range, so a narrow range drops the modifier rather than truncating a word.
 - Set `maxLength` to `8` on an English nickname. The three-word shapes drop out rather than being truncated — length picks the shape, not the words.
 - Turn on `randSuffix`. The token is attached after the nickname is finished, which is why the length options never have to account for it.
-- On the words tab, pick a `theme` and press Generate. These are the pools a nickname is built from, handed over with nothing added — `randAnimal` and its sixteen siblings are this call with the theme already chosen.
+- On the words tab, pick a `theme` and press Generate. These are the pools a nickname is built from, handed over with nothing added — `randAnimal` and its twenty-four siblings are this call with the theme already chosen.
 - Switch the decorator to `randModifier` on the words tab. A modifier in front of a noun is most of what `randNickname` does, and the code block shows the two functions doing it in the open.
 
 ## What this page is not

@@ -1,8 +1,8 @@
 # Themes
 
-A theme is a slice of everyday vocabulary that a modifier can sit in front of. There are seventeen of them, every language fills every one, and **a word belongs to exactly one** — which is what makes the theme a word reports unambiguous.
+A theme is a slice of everyday vocabulary that a modifier can sit in front of. There are twenty-five of them, every language fills every one, and **a word belongs to exactly one** — which is what makes the theme a word reports unambiguous.
 
-Each theme is also a generator of its own. `randWord` takes the theme as an option; the seventeen functions in the third column are the same generator with the theme already chosen, and `randNickname` builds on the same pools.
+Each theme is also a generator of its own. `randWord` takes the theme as an option; the twenty-five functions in the third column are the same generator with the theme already chosen, and `randNickname` builds on the same pools.
 
 | Theme | Function | What it holds | Korean | English |
 | --- | --- | --- | --- | --- |
@@ -23,6 +23,14 @@ Each theme is also a generator of its own. `randWord` takes the theme as an opti
 | `color` | [`randColor`](./rand-color) | colours, plain and storied | 주홍, 쪽빛 | Crimson, Ochre |
 | `finance` | [`randFinance`](./rand-finance) | money, and what is done with it | 이자, 환율 | Ledger, Yield |
 | `tech` | [`randTech`](./rand-tech) | computers, and the networks between them | 서버, 캐시 | Server, Subnet |
+| `weather` | [`randWeather`](./rand-weather) | what the sky is doing | 소나기, 무지개 | Drizzle, Gale |
+| `space` | [`randSpace`](./rand-space) | what is beyond the sky | 은하, 혜성 | Galaxy, Nebula |
+| `time` | [`randTime`](./rand-time) | when something happens | 새벽, 한여름 | Twilight, Epoch |
+| `emotion` | [`randEmotion`](./rand-emotion) | what someone feels | 그리움, 설렘 | Longing, Relief |
+| `body` | [`randBody`](./rand-body) | the parts of a body | 손목, 심장 | Wrist, Sinew |
+| `clothing` | [`randClothing`](./rand-clothing) | what people wear | 두루마기, 양말 | Cardigan, Linen |
+| `tool` | [`randTool`](./rand-tool) | what a hand works with | 대패, 곡괭이 | Chisel, Trowel |
+| `drink` | [`randDrink`](./rand-drink) | something to drink | 식혜, 보리차 | Cider, Cordial |
 
 ::: lang js
 
@@ -73,9 +81,9 @@ rand_food(language="en", count=3)  # the same thing
 
 :::
 
-Leave the theme out and each result draws from one theme picked at random, so a batch spreads across all seventeen.
+Leave the theme out and each result draws from one theme picked at random, so a batch spreads across all twenty-five.
 
-`randNickname` is the exception: at the default `realism` it spans fourteen of them, leaving out `color`, `finance` and `tech`, because a word in front of a colour or a loan reads as a joke rather than a handle. Loosening `realism` puts them back, and naming one of them works at any realism. See [How a nickname behaves](../nickname/#realism-invents-words-rather-than-drawing-them).
+`randNickname` is the exception: at the default `realism` it spans twenty-two of them, leaving out `color`, `finance` and `tech`, because a word in front of a colour or a loan reads as a joke rather than a handle. Loosening `realism` puts them back, and naming one of them works at any realism. See [How a nickname behaves](../nickname/#realism-invents-words-rather-than-drawing-them).
 
 ## The rules a theme follows
 
@@ -96,6 +104,6 @@ That last row is a real coincidence rather than a bug: the syllable templates sp
 
 ## See also
 
-- [`randWord`](./rand-word) — the generator the theme belongs to, and the seventeen functions beside it.
+- [`randWord`](./rand-word) — the generator the theme belongs to, and the twenty-five functions beside it.
 - [`randNickname`](../nickname/rand-nickname) — the same pools, put together.
 - [Constants](../reference/constants) — the theme list at runtime.
