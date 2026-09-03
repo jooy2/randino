@@ -1,6 +1,3 @@
-// Generated from `data/name/ja.yaml` by `tools/codegen`.
-// Edit that file and re-run the generator; edits here are overwritten.
-
 import { tokens } from '../../_internal/parse.js';
 import type { NameLanguageData } from './types.js';
 

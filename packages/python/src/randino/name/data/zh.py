@@ -1,5 +1,3 @@
-# Generated from `data/name/zh.yaml` by `tools/codegen`.
-# Edit that file and re-run the generator; edits here are overwritten.
 """Chinese name pools."""
 
 from randino._internal.parse import tokens, weights

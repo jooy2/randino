@@ -1,6 +1,3 @@
-// Generated from `data/name/ko.yaml` by `tools/codegen`.
-// Edit that file and re-run the generator; edits here are overwritten.
-
 import { romanMap, weights, words } from '../../_internal/parse.js';
 import type { NameLanguageData } from './types.js';
 

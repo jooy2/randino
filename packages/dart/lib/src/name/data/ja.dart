@@ -1,5 +1,4 @@
-// Generated from `data/name/ja.yaml` by `tools/codegen`.
-// Edit that file and re-run the generator; edits here are overwritten.
+// Ported verbatim from the JavaScript package; see CLAUDE.md.
 
 import 'package:randino/src/name/data/types.dart';
 import 'package:randino/src/types.dart';

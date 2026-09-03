@@ -1,5 +1,3 @@
-# Generated from `data/name/es.yaml` by `tools/codegen`.
-# Edit that file and re-run the generator; edits here are overwritten.
 """Spanish name pools."""
 
 from randino._internal.parse import words

@@ -1,6 +1,3 @@
-// Generated from `data/name/syllables.yaml` by `tools/codegen`.
-// Edit that file and re-run the generator; edits here are overwritten.
-
 // Syllable templates used at the abstract end of the style range. Names built
 // from these are invented rather than drawn from a pool, so they should read as
 // plausible for the language without matching anyone real.

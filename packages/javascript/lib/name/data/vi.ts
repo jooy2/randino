@@ -1,6 +1,3 @@
-// Generated from `data/name/vi.yaml` by `tools/codegen`.
-// Edit that file and re-run the generator; edits here are overwritten.
-
 import { weights, words } from '../../_internal/parse.js';
 import { VIETNAMESE_SYLLABLES } from './syllables.js';
 import type { NameLanguageData } from './types.js';

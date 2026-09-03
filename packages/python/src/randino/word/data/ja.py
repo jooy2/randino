@@ -1,5 +1,3 @@
-# Generated from `data/word/ja.yaml` by `tools/codegen`.
-# Edit that file and re-run the generator; edits here are overwritten.
 """Japanese nickname pools."""
 
 from randino._internal.parse import words

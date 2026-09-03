@@ -1,5 +1,3 @@
-# Generated from `data/name/ko.yaml` by `tools/codegen`.
-# Edit that file and re-run the generator; edits here are overwritten.
 """Korean name pools."""
 
 from randino._internal.parse import roman_map, weights, words

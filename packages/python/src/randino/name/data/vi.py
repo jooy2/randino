@@ -1,5 +1,3 @@
-# Generated from `data/name/vi.yaml` by `tools/codegen`.
-# Edit that file and re-run the generator; edits here are overwritten.
 """Vietnamese name pools."""
 
 from randino._internal.parse import weights, words

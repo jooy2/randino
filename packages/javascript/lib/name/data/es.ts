@@ -1,6 +1,3 @@
-// Generated from `data/name/es.yaml` by `tools/codegen`.
-// Edit that file and re-run the generator; edits here are overwritten.
-
 import { words } from '../../_internal/parse.js';
 import { SPANISH_SYLLABLES } from './syllables.js';
 import type { NameLanguageData } from './types.js';
