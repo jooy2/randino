@@ -3,6 +3,7 @@ import 'package:randino/src/word/data/en.dart';
 import 'package:randino/src/word/data/ja.dart';
 import 'package:randino/src/word/data/ko.dart';
 import 'package:randino/src/word/data/types.dart';
+import 'package:randino/src/word/data/vi.dart';
 import 'package:randino/src/word/data/zh.dart';
 
 /// Languages the word pools cover.
@@ -15,6 +16,7 @@ final List<WordLanguage> wordLanguages = List<WordLanguage>.unmodifiable(<WordLa
   WordLanguage.ko,
   WordLanguage.ja,
   WordLanguage.zh,
+  WordLanguage.vi,
 ]);
 
 /// What the words can be about. Person names are deliberately absent.
@@ -67,4 +69,5 @@ final Map<WordLanguage, WordLanguageData> wordData =
       WordLanguage.ko: ko,
       WordLanguage.ja: ja,
       WordLanguage.zh: zh,
+      WordLanguage.vi: vi,
     });

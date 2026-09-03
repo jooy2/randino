@@ -26,6 +26,22 @@ const int _synthAttempts = 8;
 /// this one would save nothing worth the bookkeeping.
 WordPool modifiersOf(WordLanguageData data) => <String>[...data.adjectives, ...data.actions];
 
+/// Whether a modifier follows the noun rather than leading it.
+///
+/// The language's own frames already say so: Vietnamese writes `mèo xanh`, the
+/// rest write `파란 고양이`. Read from the frames rather than declared beside
+/// them, so a language cannot state one order and compose in the other.
+bool modifierFollows(WordLanguageData data) {
+  for (final frame in data.frames) {
+    final noun = frame.slots.indexOf(WordSlot.noun);
+    final modifier = frame.slots.indexOf(WordSlot.adjective);
+
+    if (noun >= 0 && modifier >= 0) return modifier > noun;
+  }
+
+  return false;
+}
+
 /// Shortest and longest word in [pool].
 LengthRange poolBounds(WordPool pool) {
   var min = 1 << 30;

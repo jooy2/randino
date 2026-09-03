@@ -2,11 +2,11 @@ import { drawLanguage, resolveRealism } from '../_internal/generate.js';
 import { detectLanguage } from '../_internal/script.js';
 import type { RandModifierOptions } from '../_types/global.js';
 import { WORD_DATA, WORD_LANGUAGES } from '../word/data/index.js';
-import { drawWord, modifiersOf, poolBounds } from '../word/wordGenerator.js';
+import { drawWord, modifierFollows, modifiersOf, poolBounds } from '../word/wordGenerator.js';
 import { firstArgument } from './attach.js';
 
-/** Draw one modifier, and report the language it came from. */
-function draw(value: string | undefined, options: RandModifierOptions): [string, string] {
+/** Draw one modifier, the separator to use, and which side of the value it goes. */
+function draw(value: string | undefined, options: RandModifierOptions): [string, string, boolean] {
 	// The language of the word being decorated, so that `'고양이'` is not handed
 	// an English modifier. Only consulted when the caller left `language` out.
 	const requested = options.language ?? (value ? detectLanguage(value) : 'all');
@@ -16,7 +16,7 @@ function draw(value: string | undefined, options: RandModifierOptions): [string,
 	const [min, max] = poolBounds(pool);
 	const { word } = drawWord(data, pool, resolveRealism(options.realism), min, max, '');
 
-	return [word, options.separator ?? data.joiner];
+	return [word, options.separator ?? data.joiner, modifierFollows(data)];
 }
 
 /**
@@ -65,9 +65,10 @@ export function randModifier(
 	}
 
 	const one = (item: string) => {
-		const [word, separator] = draw(item, settings);
+		const [word, separator, follows] = draw(item, settings);
 
-		return word + separator + item;
+		// Vietnamese puts the modifier after the noun, and says so in its frames.
+		return follows ? item + separator + word : word + separator + item;
 	};
 
 	return Array.isArray(target) ? target.map(one) : one(target);

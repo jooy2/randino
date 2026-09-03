@@ -8,7 +8,7 @@ import 'package:randino/src/word/word_generator.dart';
 /// Draws one modifier, and reports the separator its language joins with.
 ///
 /// Internal — shared by [randModifier] and `randModifierAll`.
-(String, String) drawModifier(
+(String, String, bool) drawModifier(
   String? value,
   WordLanguage? language,
   RandRealism realism,
@@ -23,7 +23,7 @@ import 'package:randino/src/word/word_generator.dart';
   final bounds = poolBounds(pool);
   final drawn = drawWord(data, pool, resolveRealism(realism), bounds.min, bounds.max, '');
 
-  return (drawn.word, separator ?? data.joiner);
+  return (drawn.word, separator ?? data.joiner, modifierFollows(data));
 }
 
 /// Puts a random modifier in front of [value]: `'사자'` becomes `'멋진사자'`.
@@ -50,7 +50,10 @@ String randModifier({
   RandRealism realism = RandRealism.real,
   String? separator,
 }) {
-  final (word, joiner) = drawModifier(value, language, realism, separator);
+  final (word, joiner, follows) = drawModifier(value, language, realism, separator);
 
-  return value == null ? word : '$word$joiner$value';
+  if (value == null) return word;
+
+  // Vietnamese puts the modifier after the noun, and says so in its frames.
+  return follows ? '$value$joiner$word' : '$word$joiner$value';
 }

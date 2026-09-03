@@ -111,18 +111,24 @@ void main() {
       }
     });
 
-    test('randModifier puts a real modifier in front of the value', () {
+    test('randModifier attaches a real modifier on the side the language uses', () {
       for (final language in wordLanguages) {
         final modifiers = modifiersOf(wordData[language]!).toSet();
+        // Vietnamese writes `mèo xanh`, so the modifier lands behind the value.
+        final follows = language == WordLanguage.vi;
 
         for (final word in randWord(language: language, count: sample)) {
           final decorated = randModifier(value: word, language: language);
+          final attached =
+              follows
+                  ? decorated.substring(word.length)
+                  : decorated.substring(0, decorated.length - word.length);
 
-          expect(decorated, endsWith(word), reason: decorated);
+          expect(decorated, follows ? startsWith(word) : endsWith(word), reason: decorated);
           expect(
             modifiers,
-            contains(decorated.substring(0, decorated.length - word.length)),
-            reason: '$decorated does not start with a $language modifier',
+            contains(attached.trim()),
+            reason: '$decorated carries no $language modifier',
           );
         }
       }

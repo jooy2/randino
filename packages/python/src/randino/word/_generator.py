@@ -49,6 +49,20 @@ def modifiers_of(data: WordLanguageData) -> WordPool:
     return (*data.adjectives, *data.actions)
 
 
+def modifier_follows(data: WordLanguageData) -> bool:
+    """Whether a modifier follows the noun rather than leading it.
+
+    The language's own frames already say so: Vietnamese writes `mèo xanh`, the rest
+    write `파란 고양이`. Read from the frames rather than declared beside them, so a
+    language cannot state one order and compose in the other.
+    """
+    for frame in data.frames:
+        if "noun" in frame.slots and "adjective" in frame.slots:
+            return frame.slots.index("adjective") > frame.slots.index("noun")
+
+    return False
+
+
 def pool_bounds(pool: WordPool) -> tuple[int, int]:
     """Shortest and longest word in a pool."""
     if not pool:

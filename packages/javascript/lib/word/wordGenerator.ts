@@ -42,6 +42,25 @@ export function modifiersOf(data: WordLanguageData): WordPool {
 	return [...data.adjectives, ...data.actions];
 }
 
+/**
+ * Whether a modifier follows the noun rather than leading it, which the
+ * language's own frames already say: Vietnamese writes `mèo xanh`, the rest
+ * write `파란 고양이`. Read from the frames rather than declared beside them, so
+ * a language cannot state one order and compose in the other.
+ */
+export function modifierFollows(data: WordLanguageData): boolean {
+	for (const frame of data.frames) {
+		const noun = frame.slots.indexOf('noun');
+		const modifier = frame.slots.indexOf('adjective');
+
+		if (noun >= 0 && modifier >= 0) {
+			return modifier > noun;
+		}
+	}
+
+	return false;
+}
+
 /** Shortest and longest word in a pool. */
 export function poolBounds(pool: WordPool): readonly [number, number] {
 	let min = Infinity;

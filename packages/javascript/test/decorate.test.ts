@@ -122,18 +122,20 @@ describe('Decorate', () => {
 		assert.strictEqual(randSuffix('').length, 6);
 	});
 
-	it('randModifier puts a real modifier in front of the value', () => {
+	it('randModifier attaches a real modifier on the side the language uses', () => {
 		for (const language of WORD_LANGUAGES) {
 			const modifiers = new Set(modifiersOf(language));
+			// Vietnamese writes `mèo xanh`, so the modifier lands behind the value.
+			const follows = language === 'vi';
 
 			for (const word of randWord({ language, count: SAMPLE })) {
 				const decorated = randModifier(word, { language });
+				const attached = follows
+					? decorated.slice(word.length)
+					: decorated.slice(0, decorated.length - word.length);
 
-				assert.ok(decorated.endsWith(word), decorated);
-				assert.ok(
-					modifiers.has(decorated.slice(0, decorated.length - word.length)),
-					`${decorated} does not start with a ${language} modifier`
-				);
+				assert.ok(follows ? decorated.startsWith(word) : decorated.endsWith(word), decorated);
+				assert.ok(modifiers.has(attached.trim()), `${decorated} carries no ${language} modifier`);
 			}
 		}
 	});

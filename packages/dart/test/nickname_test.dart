@@ -13,6 +13,7 @@ final Map<WordLanguage, RegExp> script = <WordLanguage, RegExp>{
   WordLanguage.ko: RegExp(r'^[가-힣]+$'),
   WordLanguage.ja: RegExp(r'^[々぀-ヿ一-鿿]+$'),
   WordLanguage.zh: RegExp(r'^[々一-鿿]+$'),
+  WordLanguage.vi: RegExp(r'^[a-zA-ZÀ-ỹ]+(?: [a-zA-ZÀ-ỹ]+)*$'),
 };
 
 /// Every word the language can put in a nickname.
@@ -342,7 +343,12 @@ void main() {
       // to run them together.
       for (final detail in randNicknameDetails(count: sample)) {
         expect(
-          joinedBy(detail.nickname, detail.words, gluesOf(detail.language), ''),
+          joinedBy(
+            detail.nickname,
+            detail.words,
+            gluesOf(detail.language),
+            wordData[detail.language]!.joiner,
+          ),
           isTrue,
           reason: detail.nickname,
         );

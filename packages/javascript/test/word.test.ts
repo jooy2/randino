@@ -49,7 +49,8 @@ const SCRIPT: Record<WordLanguage, RegExp> = {
 	en: /^[A-Za-z]+$/,
 	ko: /^[가-힣]+$/,
 	ja: /^[々぀-ヿ一-鿿]+$/,
-	zh: /^[々一-鿿]+$/
+	zh: /^[々一-鿿]+$/,
+	vi: /^[a-zA-ZÀ-ỹ]+(?: [a-zA-ZÀ-ỹ]+)*$/
 };
 
 /** The themed generator for each theme, which is what the seventeen of them are. */

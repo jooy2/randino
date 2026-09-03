@@ -85,18 +85,18 @@ English is the one language where romanizing changes nothing, because the names 
 
 ## Words and nicknames {#words-and-nicknames}
 
-The word pools — and so `randWord`, the twenty-five themed generators and `randNickname` — cover four languages rather than nine, and the reason is grammar rather than effort. A modifier has to sit in front of a noun exactly as it is written in the dictionary, and that only reads naturally where the language asks for no agreement between the two.
+The word pools — and so `randWord`, the twenty-five themed generators and `randNickname` — cover five languages rather than nine, and the reason is grammar rather than effort. A modifier has to sit beside a noun exactly as it is written in the dictionary, and that only reads naturally where the language asks for no agreement between the two.
 
-| Code | Language | Shapes                      | Example                |
-| ---- | -------- | --------------------------- | ---------------------- |
-| `ko` | Korean   | modifier, trailing word     | 멋진사자, 고양이꼬리   |
-| `en` | English  | modifier, trailing word     | MistyOwl, CatTail      |
-| `ja` | Japanese | modifier (attributive form) | 青いライオン, 静かな海 |
-| `zh` | Chinese  | modifier                    | 快乐熊猫, 神秘森林     |
+| Code | Language   | Shapes                      | Example              |
+| ---- | ---------- | --------------------------- | -------------------- |
+| `ko` | Korean     | modifier, trailing word     | 멋진사자, 고양이꼬리 |
+| `en` | English    | modifier, trailing word     | MistyOwl, CatTail    |
+| `ja` | Japanese   | modifier (attributive form) | 青いライオン, 星の影 |
+| `zh` | Chinese    | modifier, 的 before a verb  | 快乐熊猫, 奔跑的狮子 |
+| `vi` | Vietnamese | modifier **after** the noun | mèo xanh, đuôi mèo   |
 
-The five that are missing are missing for two different reasons:
+Word order is no longer what keeps a language out: the shapes belong to the language, so Vietnamese writes its own — the modifier behind the noun, the possessed thing in front of its owner.
 
-- **Italian, Spanish, Russian and German inflect the modifier for the noun** — `gatto azzurro` against `luna azzurra`, `blauer Wal` against `blaue Katze`. Supporting them means tagging every noun with its gender and storing every modifier once per gender. Half-agreement output is worse than none, so they are left out until that work is done.
-- **Vietnamese puts the modifier after the noun** (`mèo xanh`) and reverses possessive compounds (`đuôi mèo`, not `mèo đuôi`), so it needs a word-order setting the datasets do not have yet.
+The four still missing are missing for one reason. **Italian, Spanish, Russian and German inflect the modifier for the noun** — `gatto azzurro` against `luna azzurra`, `blauer Wal` against `blaue Katze`. Supporting them means tagging every noun with its gender and storing every modifier once per gender. Half-agreement output is worse than none, so they wait until that work is done.
 
 Japanese and Chinese use the modifier shapes only. A noun-noun compound in those languages needs a particle more often than not, or reads as garbled once the base word is abstract, so the trailing-word shapes are skipped for them.

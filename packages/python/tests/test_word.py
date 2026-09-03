@@ -50,6 +50,7 @@ SCRIPT: dict[WordLanguage, re.Pattern[str]] = {
     "ko": re.compile(r"^[가-힣]+$"),
     "ja": re.compile(r"^[々぀-ヿ一-鿿]+$"),
     "zh": re.compile(r"^[々一-鿿]+$"),
+    "vi": re.compile(r"^[a-zA-ZÀ-ỹ]+(?: [a-zA-ZÀ-ỹ]+)*$"),
 }
 
 THEMED = {

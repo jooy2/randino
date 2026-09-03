@@ -450,10 +450,10 @@ Nicknames:
 
 ## Adding a word language
 
-The four supported languages (`ko`, `en`, `ja`, `zh`) share one property: a modifier can sit in front of a noun exactly as it is written in the dictionary. **That is the bar for adding another one** — it is a word language and a nickname language at once, because they are the same pools. Italian, German, Russian, Spanish and Vietnamese are name languages but not word languages, and the reason is grammar, not effort:
+The five supported languages (`ko`, `en`, `ja`, `zh`, `vi`) share one property: a modifier can sit beside a noun exactly as it is written in the dictionary, with no agreement between the two. **That is the bar for adding another one** — it is a word language and a nickname language at once, because they are the same pools. Italian, German, Russian and Spanish are name languages but not word languages, and the reason is grammar, not effort:
 
 - Italian, Spanish, Russian and German inflect the modifier for the noun (`gatto azzurro` / `luna azzurra`, `blauer Wal` / `blaue Katze`). Supporting them means tagging every noun with its gender and storing every modifier once per gender — do that, or leave the language out. Half-agreement output is worse than none.
-- Vietnamese puts the modifier **after** the noun (`mèo xanh`) and reverses possessive compounds (`đuôi mèo`, not `mèo đuôi`). Word order is a frame's own business now, so this one is a matter of writing the frames rather than of changing `WordLanguageData`.
+- **Word order is no longer an obstacle.** Vietnamese puts the modifier after the noun (`mèo xanh`) and the possessed thing in front of its owner (`đuôi mèo`), and says both in its own `frames`. `modifierFollows` reads that back out of the frames so `randModifier` attaches on the right side, rather than a second field stating an order the frames could contradict.
 
 To add one that clears the bar:
 

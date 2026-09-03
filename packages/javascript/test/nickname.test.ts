@@ -25,7 +25,8 @@ const SCRIPT: Record<WordLanguage, RegExp> = {
 	en: /^[A-Za-z]+$/,
 	ko: /^[가-힣]+$/,
 	ja: /^[々぀-ヿ一-鿿]+$/,
-	zh: /^[々一-鿿]+$/
+	zh: /^[々一-鿿]+$/,
+	vi: /^[a-zA-ZÀ-ỹ]+(?: [a-zA-ZÀ-ỹ]+)*$/
 };
 
 /** Every word the language can put in a nickname. */
@@ -307,8 +308,10 @@ describe('Nickname', () => {
 		// Omitted, it falls back to the way the language joins its words, which is
 		// to run them together.
 		for (const detail of nicknameDetails({ count: SAMPLE })) {
+			const joiner = WORD_DATA[detail.language].joiner;
+
 			assert.ok(
-				joinedBy(detail.nickname, detail.words, gluesOf(detail.language), ''),
+				joinedBy(detail.nickname, detail.words, gluesOf(detail.language), joiner),
 				detail.nickname
 			);
 		}

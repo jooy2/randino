@@ -98,10 +98,12 @@ export interface NameDetail {
 /**
  * A language the word pools cover, and so a language `randWord`, `randModifier`
  * and `randNickname` can work in. Fewer than `NameLanguage`: a modifier has to
- * sit in front of a noun exactly as it is written in the dictionary, which only
- * reads naturally in languages that ask for no grammatical agreement.
+ * sit beside a noun exactly as it is written in the dictionary, which only reads
+ * naturally in a language that asks for no agreement between the two. Word order
+ * is no longer the obstacle it was — Vietnamese puts its modifier after the noun
+ * and says so in its own frames.
  */
-export type WordLanguage = 'en' | 'ko' | 'ja' | 'zh';
+export type WordLanguage = 'en' | 'ko' | 'ja' | 'zh' | 'vi';
 
 /** `'all'` mixes every supported language. */
 export type WordLanguageOption = WordLanguage | 'all';

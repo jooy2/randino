@@ -3,12 +3,13 @@ import { EN } from './en.js';
 import { JA } from './ja.js';
 import { KO } from './ko.js';
 import type { WordLanguageData } from './types.js';
+import { VI } from './vi.js';
 import { ZH } from './zh.js';
 
 // Languages the word pools cover. Fewer than the name generator: a modifier has
 // to sit in front of a noun exactly as it is written in the dictionary, which
 // only works without grammatical agreement — see CLAUDE.md before adding one.
-export const WORD_LANGUAGES: readonly WordLanguage[] = ['en', 'ko', 'ja', 'zh'];
+export const WORD_LANGUAGES: readonly WordLanguage[] = ['en', 'ko', 'ja', 'zh', 'vi'];
 
 // What the words can be about. Person names are deliberately absent.
 export const WORD_THEMES: readonly WordTheme[] = [
@@ -57,5 +58,6 @@ export const WORD_DATA: Record<WordLanguage, WordLanguageData> = {
 	en: EN,
 	ko: KO,
 	ja: JA,
-	zh: ZH
+	zh: ZH,
+	vi: VI
 };

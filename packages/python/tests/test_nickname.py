@@ -35,6 +35,7 @@ SCRIPT: dict[WordLanguage, re.Pattern[str]] = {
     "ko": re.compile(r"[가-힣]+"),
     "ja": re.compile(r"[々぀-ヿ一-鿿]+"),
     "zh": re.compile(r"[々一-鿿]+"),
+    "vi": re.compile(r"[a-zA-ZÀ-ỹ]+(?: [a-zA-ZÀ-ỹ]+)*"),
 }
 
 
@@ -269,7 +270,9 @@ def test_word_separator_goes_between_the_words() -> None:
     # Omitted, it falls back to the way the language joins its words, which is to run
     # them together.
     for detail in rand_nickname(output="detail", count=SAMPLE):
-        assert joined_by(detail.nickname, detail.words, glues_of(detail.language), ""), (
+        joiner = WORD_DATA[detail.language].joiner
+
+        assert joined_by(detail.nickname, detail.words, glues_of(detail.language), joiner), (
             detail.nickname
         )
 

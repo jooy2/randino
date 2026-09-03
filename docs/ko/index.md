@@ -44,7 +44,7 @@ features:
     link: /ko/guide/getting-started
     linkText: 시작하기
   - title: 9개 언어
-    details: 한국어, 영어, 일본어, 중국어, 이탈리아어, 독일어, 러시아어, 스페인어, 베트남어를 각자의 문자와 로마자 표기 규칙으로 지원합니다.
+    details: 한국어, 영어, 일본어, 중국어, 베트남어, 이탈리아어, 독일어, 러시아어, 스페인어, 베트남어를 각자의 문자와 로마자 표기 규칙으로 지원합니다.
     link: /ko/guide/languages
     linkText: 지원 언어
 ---

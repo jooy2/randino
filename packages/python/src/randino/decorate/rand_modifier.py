@@ -5,14 +5,14 @@ from typing import overload
 from randino._internal.generate import draw_language, resolve_realism
 from randino._internal.script import detect_language
 from randino._types import RandRealism, WordLanguageOption
-from randino.word._generator import draw_word, modifiers_of, pool_bounds
+from randino.word._generator import draw_word, modifier_follows, modifiers_of, pool_bounds
 from randino.word.data import WORD_DATA, WORD_LANGUAGES
 
 
 def _draw(
     value: str | None, language: WordLanguageOption | None, realism: RandRealism
-) -> tuple[str, str]:
-    """One modifier, and the separator its language joins words with."""
+) -> tuple[str, str, bool]:
+    """One modifier, the separator its language joins with, and which side it goes."""
     # The language of the word being decorated, so that `"고양이"` is not handed an
     # English modifier. Only consulted when the caller left `language` out.
     requested = language or (detect_language(value) if value is not None else "all")
@@ -22,7 +22,7 @@ def _draw(
     low, high = pool_bounds(pool)
     word, _missed = draw_word(data, pool, resolve_realism(realism), low, high, "")
 
-    return word, data.joiner
+    return word, data.joiner, modifier_follows(data)
 
 
 @overload
@@ -98,9 +98,11 @@ def rand_modifier(
         return _draw(None, language, realism)[0]
 
     def one(item: str) -> str:
-        word, joiner = _draw(item, language, realism)
+        word, joiner, follows = _draw(item, language, realism)
+        gap = joiner if separator is None else separator
 
-        return word + (joiner if separator is None else separator) + item
+        # Vietnamese puts the modifier after the noun, and says so in its frames.
+        return item + gap + word if follows else word + gap + item
 
     if isinstance(value, str):
         return one(value)

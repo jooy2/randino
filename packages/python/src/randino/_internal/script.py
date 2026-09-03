@@ -11,6 +11,10 @@ from randino._types import WordLanguage
 HANGUL = re.compile(r"[가-힣]")
 KANA = re.compile(r"[぀-ヿ]")
 HAN = re.compile(r"[一-鿿]")
+# Vietnamese shares the Latin alphabet with English, and is told apart by the
+# letters and tone marks English never uses. A Vietnamese word carrying none of
+# them reads as English, which is the most a single word can be asked to say.
+VIETNAMESE = re.compile(r"[\u00c0-\u024f\u1ea0-\u1ef9]")
 
 
 def detect_language(text: str) -> WordLanguage:
@@ -31,5 +35,7 @@ def detect_language(text: str) -> WordLanguage:
         return "ja"
     if HAN.search(text):
         return "zh"
+    if VIETNAMESE.search(text):
+        return "vi"
 
     return "en"

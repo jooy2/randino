@@ -111,17 +111,20 @@ def test_with_no_value_at_all_the_token_is_the_whole_answer() -> None:
     assert len(rand_suffix("")) == 6
 
 
-def test_rand_modifier_puts_a_real_modifier_in_front_of_the_value() -> None:
+def test_rand_modifier_attaches_on_the_side_the_language_uses() -> None:
     for language in WORD_LANGUAGES:
         modifiers = set(modifiers_of(WORD_DATA[language]))
+        # Vietnamese writes `mèo xanh`, so the modifier lands behind the value.
+        follows = language == "vi"
 
         for word in rand_word(language=language, count=SAMPLE):
             decorated = rand_modifier(word, language=language)
-
-            assert decorated.endswith(word), decorated
-            assert decorated[: len(decorated) - len(word)] in modifiers, (
-                f"{decorated} does not start with a {language} modifier"
+            attached = (
+                decorated[len(word) :] if follows else decorated[: len(decorated) - len(word)]
             )
+
+            assert decorated.startswith(word) if follows else decorated.endswith(word), decorated
+            assert attached.strip() in modifiers, f"{decorated} carries no {language} modifier"
 
 
 def test_rand_modifier_on_its_own_is_the_modifier() -> None:
