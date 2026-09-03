@@ -85,7 +85,7 @@ _Bounds _slotBounds(WordLanguage language, WordLanguageData data, WordTheme them
   }
 
   final bounds = <_Slot, LengthRange>{
-    _Slot.modifier: poolBounds(data.modifiers),
+    _Slot.modifier: poolBounds(modifiersOf(data)),
     _Slot.noun: poolBounds(data.nouns[theme]!),
     _Slot.part: poolBounds(data.parts ?? const <String>[]),
   };
@@ -179,7 +179,7 @@ _Filled _buildWords(
     final high = highRaw < low ? low : highRaw;
     final slot = slots[i];
     final pool = switch (slot) {
-      _Slot.modifier => data.modifiers,
+      _Slot.modifier => modifiersOf(data),
       _Slot.part => data.parts!,
       _Slot.noun => nouns,
     };

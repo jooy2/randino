@@ -1,7 +1,8 @@
 import 'package:randino/randino.dart';
-// The modifier pools are internal, but what `randModifier` attaches has to come
-// out of them, and it is the same pool the nickname generator uses.
+// The decorating pools are internal, but what `randModifier` attaches has to
+// come out of them, and they are the same pools the nickname generator uses.
 import 'package:randino/src/word/data/index.dart';
+import 'package:randino/src/word/word_generator.dart';
 import 'package:test/test.dart';
 
 /// Large enough that a broken option cannot pass by luck. The same number the
@@ -112,7 +113,7 @@ void main() {
 
     test('randModifier puts a real modifier in front of the value', () {
       for (final language in wordLanguages) {
-        final modifiers = wordData[language]!.modifiers.toSet();
+        final modifiers = modifiersOf(wordData[language]!).toSet();
 
         for (final word in randWord(language: language, count: sample)) {
           final decorated = randModifier(value: word, language: language);
@@ -129,7 +130,7 @@ void main() {
 
     test('randModifier on its own is the modifier', () {
       for (final language in wordLanguages) {
-        final modifiers = wordData[language]!.modifiers.toSet();
+        final modifiers = modifiersOf(wordData[language]!).toSet();
 
         for (var i = 0; i < sample; i += 1) {
           expect(modifiers, contains(randModifier(language: language)), reason: '$language');
@@ -143,7 +144,7 @@ void main() {
         final word = randModifier();
 
         for (final language in wordLanguages) {
-          if (wordData[language]!.modifiers.contains(word)) {
+          if (modifiersOf(wordData[language]!).contains(word)) {
             used.add(language);
           }
         }
@@ -154,7 +155,7 @@ void main() {
 
     test('randModifier follows the script of the value when no language is given', () {
       bool belongs(String word, WordLanguage language) =>
-          wordData[language]!.modifiers.any(word.startsWith);
+          modifiersOf(wordData[language]!).any(word.startsWith);
 
       final scripts = <String, WordLanguage>{
         '고양이': WordLanguage.ko,
@@ -193,7 +194,7 @@ void main() {
       }
 
       // An invented modifier is still in the language's script.
-      final pool = wordData[WordLanguage.ko]!.modifiers.toSet();
+      final pool = modifiersOf(wordData[WordLanguage.ko]!).toSet();
       var drawn = 0;
 
       for (var i = 0; i < 200; i += 1) {

@@ -4,27 +4,45 @@ import type { WordLanguageData } from './types.js';
 export const EN: WordLanguageData = {
 	joiner: '',
 	capitalize: true,
-	modifiers: words(`
+	adjectives: words(`
 		Brave Bright Blue Crimson Golden Silver Emerald Scarlet Azure Quiet Loud Swift
-		Slow Giant Tiny Clever Gentle Wild Calm Cosmic Lunar Solar Frozen Burning Misty
-		Cloudy Rainy Sunny Snowy Windy Rusty Shiny Velvet Hidden Lonely Curious Dizzy
-		Sleepy Dancing Running Flying Singing Roaming Whispering Glowing Fading Rolling
-		Falling Rising Ancient Modern Endless Hollow Round Jagged Soft Warm Cool Sweet
+		Slow Giant Tiny Clever Gentle Wild Calm Cosmic Lunar Solar Misty
+		Cloudy Rainy Sunny Snowy Windy Rusty Shiny Velvet Lonely Curious Dizzy
+		Sleepy Ancient Modern Endless Hollow Round Jagged Soft Warm Cool Sweet
 		Salty Bitter Spicy Fuzzy Silky Marble Copper Ivory Neon Polar Feral Noble Humble
 		Merry Grumpy Mellow Stormy Frosty Dusty Foggy Radiant Bronze Umber Cobalt
-		Verdant Fierce Nimble Prickly Restless Sturdy Tangled Vivid Whimsical Shimmering
-		Wandering Amber Indigo Jade Onyx Coral Teal Sable Ashen Auburn Maroon Russet
+		Verdant Fierce Nimble Prickly Restless Sturdy Tangled Vivid Whimsical
+		Amber Indigo Jade Onyx Coral Teal Sable Ashen Auburn Maroon Russet
 		Saffron Lilac Ochre Slate Charcoal Pearly Witty Bold Timid Cheerful Jolly
 		Bashful Placid Serene Eager Earnest Steady Rowdy Sassy Snappy Zesty Breezy
 		Dreamy Moody Cranky Perky Quirky Spry Wily Cunning Valiant Regal Lofty Meek
-		Stoic Solemn Somber Blithe Genial Ardent Tender Sleeping Leaping Drifting
-		Prowling Soaring Diving Gliding Humming Laughing Dreaming Blooming Melting
-		Twinkling Rustling Crackling Bouncing Spinning Floating Climbing Chasing Lurking
-		Roving Strolling Tumbling Glassy Wooden Woolen Rubbery Crispy Chewy Creamy
+		Stoic Solemn Somber Blithe Genial Ardent Tender
+		Glassy Wooden Woolen Rubbery Crispy Chewy Creamy
 		Buttery Syrupy Smoky Dewy Sandy Muddy Icy Wispy Downy Plush Satin Linen Massive
 		Petite Slender Chunky Stout Lanky Narrow Curved Spiral Zigzag Twisted Pointed
 		Blunt Oval Astral Stellar Nebular Orbital Twilight Midnight Autumnal Wintry
 		Vernal Timeless Antique
+	`),
+	// The same attributive slot, for what the noun is doing rather than what it is
+	// like: Studying + Fox, Tear + Of + Lion.
+	actions: words(`
+		Burning Frozen Dancing Running Flying Singing Roaming Whispering Glowing Fading
+		Rolling Falling Rising Shimmering Wandering Hidden Sleeping Leaping Drifting
+		Prowling Soaring Diving Gliding Humming Laughing Dreaming Blooming Melting
+		Twinkling Rustling Crackling Bouncing Spinning Floating Climbing Chasing Lurking
+		Roving Strolling Tumbling Studying Working Cooking Baking Painting Drawing
+		Writing Reading Counting Building Mending Planting Digging Fishing Waiting
+		Guarding Seeking Calling Shouting Muttering Watching Peeking Listening
+		Remembering Imagining Wondering Hesitating Deciding Cheering Greeting Hugging
+		Soothing Waking Napping Yawning Stretching Traveling Fleeing Landing Circling
+		Pacing Crawling Frolicking Teasing Eating Drinking Chewing Roasting Knocking
+		Hauling Pushing Pulling Throwing Catching Dropping Hiding Sinking Flowing
+		Overflowing Thawing Blazing Smoldering Scattering Pouring Seeping Spreading
+		Ripening Growing Wilting Setting Nodding Resting Leaning Hanging Perched Curled
+		Sprawled Halted Sighing Grinning Snoozing Skipping Prancing Bounding Darting
+		Slinking Hovering Swaying Bobbing Drumming Strumming Whistling Chanting Weaving
+		Carving Forging Sailing Rowing Paddling Marching Racing Juggling Vanishing
+		Returning
 	`),
 	nouns: {
 		animal: words(`

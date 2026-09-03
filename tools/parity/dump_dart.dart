@@ -47,7 +47,8 @@ void main() {
       entry.key.name: <String, Object?>{
         'joiner': entry.value.joiner,
         'capitalize': entry.value.capitalize,
-        'modifiers': listed(entry.value.modifiers),
+        'adjectives': listed(entry.value.adjectives),
+        'actions': listed(entry.value.actions),
         'parts': listed(entry.value.parts),
         'nouns': <String, Object?>{
           for (final noun in entry.value.nouns.entries)

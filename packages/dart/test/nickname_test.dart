@@ -3,6 +3,7 @@ import 'package:randino/randino.dart';
 // built from — these checks are what keep person names out of them.
 import 'package:randino/src/name/data/index.dart' as name_data;
 import 'package:randino/src/word/data/index.dart';
+import 'package:randino/src/word/word_generator.dart';
 import 'package:test/test.dart';
 
 const int sample = 60;
@@ -19,7 +20,8 @@ List<String> allWords(WordLanguage language) {
   final data = wordData[language]!;
 
   return <String>[
-    ...data.modifiers,
+    ...data.adjectives,
+    ...data.actions,
     ...?data.parts,
     for (final theme in wordThemes) ...data.nouns[theme]!,
   ];
@@ -128,7 +130,7 @@ void main() {
 
     test('every nickname is a word with something added to it', () {
       final details = randNicknameDetails(language: WordLanguage.ko, count: 200);
-      final modifiers = wordData[WordLanguage.ko]!.modifiers.toSet();
+      final modifiers = modifiersOf(wordData[WordLanguage.ko]!).toSet();
       final decorated =
           details
               .where((detail) => detail.words.length > 1 || modifiers.contains(detail.words[0]))
@@ -216,8 +218,8 @@ void main() {
 
     test('omitted length bounds fall back to what the language can produce', () {
       expect(nicknameLengthRange(language: WordLanguage.zh), const LengthRange(2, 5));
-      expect(nicknameLengthRange(language: WordLanguage.ko), const LengthRange(1, 12));
-      expect(nicknameLengthRange(language: WordLanguage.en), const LengthRange(3, 30));
+      expect(nicknameLengthRange(language: WordLanguage.ko), const LengthRange(1, 13));
+      expect(nicknameLengthRange(language: WordLanguage.en), const LengthRange(3, 31));
 
       for (final language in wordLanguages) {
         final range = nicknameLengthRange(language: language);
@@ -264,11 +266,11 @@ void main() {
       // The separator is part of the nickname, so it counts toward the length.
       expect(
         nicknameLengthRange(language: WordLanguage.ko, wordSeparator: '-'),
-        const LengthRange(1, 14),
+        const LengthRange(1, 15),
       );
       expect(
         nicknameLengthRange(language: WordLanguage.en, wordSeparator: ' '),
-        const LengthRange(3, 32),
+        const LengthRange(3, 33),
       );
 
       const cases = <(WordLanguage, String, int, int)>[

@@ -16,8 +16,9 @@ from randino import (
     rand_word,
 )
 
-# The modifier pools are internal, but what `rand_modifier` attaches has to come out
-# of them, and it is the same pool the nickname generator uses.
+# The decorating pools are internal, but what `rand_modifier` attaches has to come out
+# of them, and they are the same pools the nickname generator uses.
+from randino.word._generator import modifiers_of
 from randino.word.data import WORD_DATA
 
 SAMPLE = 60
@@ -112,7 +113,7 @@ def test_with_no_value_at_all_the_token_is_the_whole_answer() -> None:
 
 def test_rand_modifier_puts_a_real_modifier_in_front_of_the_value() -> None:
     for language in WORD_LANGUAGES:
-        modifiers = set(WORD_DATA[language].modifiers)
+        modifiers = set(modifiers_of(WORD_DATA[language]))
 
         for word in rand_word(language=language, count=SAMPLE):
             decorated = rand_modifier(word, language=language)
@@ -125,7 +126,7 @@ def test_rand_modifier_puts_a_real_modifier_in_front_of_the_value() -> None:
 
 def test_rand_modifier_on_its_own_is_the_modifier() -> None:
     for language in WORD_LANGUAGES:
-        modifiers = set(WORD_DATA[language].modifiers)
+        modifiers = set(modifiers_of(WORD_DATA[language]))
 
         for _ in range(SAMPLE):
             assert rand_modifier(language=language) in modifiers, language
@@ -137,7 +138,7 @@ def test_rand_modifier_on_its_own_is_the_modifier() -> None:
         word = rand_modifier()
 
         for language in WORD_LANGUAGES:
-            if word in WORD_DATA[language].modifiers:
+            if word in modifiers_of(WORD_DATA[language]):
                 used.add(language)
 
     assert used == set(WORD_LANGUAGES)
@@ -145,7 +146,7 @@ def test_rand_modifier_on_its_own_is_the_modifier() -> None:
 
 def test_rand_modifier_follows_the_script_of_the_value_when_no_language_is_given() -> None:
     def belongs(word: str, language: WordLanguage) -> bool:
-        return any(word.startswith(modifier) for modifier in WORD_DATA[language].modifiers)
+        return any(word.startswith(modifier) for modifier in modifiers_of(WORD_DATA[language]))
 
     scripts: list[tuple[str, WordLanguage]] = [
         ("고양이", "ko"),
@@ -171,7 +172,7 @@ def test_rand_modifier_takes_a_separator_a_style_and_a_list() -> None:
         assert re.fullmatch(r"[가-힣]+-사자", rand_modifier("사자", language="ko", separator="-"))
 
     # An invented modifier is still in the language's script.
-    pool = set(WORD_DATA["ko"].modifiers)
+    pool = set(modifiers_of(WORD_DATA["ko"]))
     drawn = 0
 
     for _ in range(200):

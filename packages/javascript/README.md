@@ -195,7 +195,7 @@ nameLengthRange('ko'); // [3, 3]
 nameLengthRange('en', true, true); // [12, 24]
 nameSupportsMiddleName('ko'); // false
 nameSupportsRoman('en'); // false
-nicknameLengthRange('ko'); // [1, 12]
+nicknameLengthRange('ko'); // [1, 13]
 wordLengthRange('ko'); // [1, 4]
 ```
 

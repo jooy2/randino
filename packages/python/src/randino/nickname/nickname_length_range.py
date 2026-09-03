@@ -21,11 +21,11 @@ def nickname_length_range(
 
     Example:
         >>> nickname_length_range("ko")
-        (1, 12)
+        (1, 13)
         >>> nickname_length_range("en")
-        (3, 30)
+        (3, 31)
         >>> nickname_length_range("ko", "-")
-        (1, 14)
+        (1, 15)
     """
     languages = WORD_LANGUAGES if language == "all" else (language,)
     ranges = [natural_range(code, word_separator) for code in languages]

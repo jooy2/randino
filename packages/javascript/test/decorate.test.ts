@@ -13,11 +13,17 @@ import {
 	randWord
 } from '../dist/index.js';
 import type { WordLanguage } from '../dist/index.js';
-// The modifier pools are internal, but what `randModifier` attaches has to come
-// out of them, and it is the same pool the nickname generator uses.
+// The decorating pools are internal, but what `randModifier` attaches has to
+// come out of them, and they are the same pools the nickname generator uses.
 import { WORD_DATA } from '../dist/word/data/index.js';
 
 const SAMPLE = 60;
+
+/** Every word the language can decorate with, adjectives and actions together. */
+const modifiersOf = (language: WordLanguage): string[] => [
+	...WORD_DATA[language].adjectives,
+	...WORD_DATA[language].actions
+];
 
 /** The default token, as a pattern — the charset minus `0O1lI`, five long. */
 const TOKEN = /^[0-9A-Za-z]{5}$/;
@@ -118,7 +124,7 @@ describe('Decorate', () => {
 
 	it('randModifier puts a real modifier in front of the value', () => {
 		for (const language of WORD_LANGUAGES) {
-			const modifiers = new Set(WORD_DATA[language].modifiers);
+			const modifiers = new Set(modifiersOf(language));
 
 			for (const word of randWord({ language, count: SAMPLE })) {
 				const decorated = randModifier(word, { language });
@@ -134,7 +140,7 @@ describe('Decorate', () => {
 
 	it('randModifier on its own is the modifier', () => {
 		for (const language of WORD_LANGUAGES) {
-			const modifiers = new Set(WORD_DATA[language].modifiers);
+			const modifiers = new Set(modifiersOf(language));
 
 			for (let i = 0; i < SAMPLE; i += 1) {
 				assert.ok(modifiers.has(randModifier({ language })), language);
@@ -148,7 +154,7 @@ describe('Decorate', () => {
 			const word = randModifier();
 
 			for (const language of WORD_LANGUAGES) {
-				if (WORD_DATA[language].modifiers.includes(word)) {
+				if (modifiersOf(language).includes(word)) {
 					used.add(language);
 				}
 			}
@@ -159,7 +165,7 @@ describe('Decorate', () => {
 
 	it('randModifier follows the script of the value when no language is given', () => {
 		const belongs = (word: string, language: WordLanguage) =>
-			WORD_DATA[language].modifiers.some((modifier) => word.startsWith(modifier));
+			modifiersOf(language).some((modifier) => word.startsWith(modifier));
 
 		for (const [word, language] of [
 			['고양이', 'ko'],
@@ -185,7 +191,7 @@ describe('Decorate', () => {
 		}
 
 		// An invented modifier is still in the language's script.
-		const invented = new Set(WORD_DATA.ko.modifiers);
+		const invented = new Set(modifiersOf('ko'));
 		let drawn = 0;
 
 		for (let i = 0; i < 200; i += 1) {

@@ -36,10 +36,17 @@ export type WordLanguageData = {
 	// The words themselves, grouped by theme. Deliberately common nouns — never
 	// person names.
 	nouns: Record<WordTheme, WordPool>;
-	// Words that decorate a noun, in the form that can precede it directly
-	// (Korean attributive: 멋진, Japanese: 青い / 静かな). `randModifier` draws
-	// from here, and so does the nickname generator's modifier slot.
-	modifiers: WordPool;
+	// Words that say what the noun is like, in the form that can sit straight in
+	// front of it (Korean attributive: 멋진, Japanese: 青い / 静かな). A handful of
+	// them are nouns used attributively (별빛, Marble); they describe all the
+	// same, so they live here rather than in a third pool.
+	adjectives: WordPool;
+	// Words that say what the noun is doing, in that same attributive form
+	// (웃는, Laughing, 踊る). Kept apart from `adjectives` because the two are
+	// different grammar: a language may need something between an action and its
+	// noun where an adjective needs nothing (Chinese 奔跑的狮子), and only an
+	// action can become a predicate.
+	actions: WordPool;
 	// Optional trailing noun for compounds (고양이 + 꼬리), used by nicknames
 	// only. Languages that would need a particle or a different word order for
 	// this leave it out, and the compound patterns are then skipped for them.

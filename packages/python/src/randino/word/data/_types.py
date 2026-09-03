@@ -2,9 +2,9 @@
 
 Not part of the public API — callers only ever see the keyword arguments and the two
 details. One dataset per language rather than one per generator: `rand_word` and its
-fourteen themed forms draw from `nouns`, `rand_modifier` draws from `modifiers`, and
-`rand_nickname` puts the two together and adds `parts`. The pools are the same words
-either way, so they are written once.
+fourteen themed forms draw from `nouns`, `rand_modifier` draws from `adjectives` and
+`actions`, and `rand_nickname` puts the two together and adds `parts`. The pools are the
+same words either way, so they are written once.
 """
 
 from collections.abc import Mapping
@@ -79,11 +79,21 @@ class WordLanguageData:
     Deliberately common nouns — never person names.
     """
 
-    modifiers: WordPool
-    """Words that decorate a noun, in the form that can precede it directly.
+    adjectives: WordPool
+    """Words that say what the noun is like, in the form that can sit straight in front of it.
 
-    Korean attributive: 멋진; Japanese: 青い / 静かな. `rand_modifier` draws from here,
-    and so does the nickname generator's modifier slot.
+    Korean attributive: 멋진; Japanese: 青い / 静かな. A handful of them are nouns used
+    attributively (별빛, Marble); they describe all the same, so they live here rather
+    than in a third pool.
+    """
+
+    actions: WordPool
+    """Words that say what the noun is doing, in that same attributive form.
+
+    웃는, Laughing, 踊る. Kept apart from `adjectives` because the two are different
+    grammar: a language may need something between an action and its noun where an
+    adjective needs nothing (Chinese 奔跑的狮子), and only an action can become a
+    predicate.
     """
 
     syn: WordSynthesis

@@ -39,6 +39,15 @@ SYNTH_ATTEMPTS = 8
 """Attempts spent looking for an invented word of the requested length."""
 
 
+def modifiers_of(data: WordLanguageData) -> WordPool:
+    """Return the two decorating pools as one, for a draw that does not care which it gets.
+
+    Built per call: every draw already walks the pool it is given, so holding this one
+    would save nothing worth the bookkeeping.
+    """
+    return (*data.adjectives, *data.actions)
+
+
 def pool_bounds(pool: WordPool) -> tuple[int, int]:
     """Shortest and longest word in a pool."""
     if not pool:

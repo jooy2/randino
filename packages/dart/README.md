@@ -173,7 +173,7 @@ nameLengthRange(language: NameLanguage.ko); // LengthRange(3, 3)
 nameLengthRange(language: NameLanguage.en, includeMiddleName: true); // LengthRange(12, 24)
 nameSupportsMiddleName(NameLanguage.ko); // false
 nameSupportsRoman(NameLanguage.en); // false
-nicknameLengthRange(language: WordLanguage.ko); // LengthRange(1, 12)
+nicknameLengthRange(language: WordLanguage.ko); // LengthRange(1, 13)
 ```
 
 `nameLanguages`, `wordLanguages` and `wordThemes` list what the generators accept; `randCountMax`, `randLengthMin` / `Max`, `affixLengthDefault` / `Max`, `affixSeparatorDefault` and `affixCharset` are the bounds and defaults every parameter is clamped to.

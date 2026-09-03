@@ -13,9 +13,9 @@ import 'package:randino/src/word/data/index.dart';
 /// between the words, and a null [language] spans every language at once.
 ///
 /// ```dart
-/// nicknameLengthRange(language: WordLanguage.ko); // LengthRange(1, 12)
-/// nicknameLengthRange(language: WordLanguage.en); // LengthRange(3, 30)
-/// nicknameLengthRange(language: WordLanguage.ko, wordSeparator: '-'); // LengthRange(1, 14)
+/// nicknameLengthRange(language: WordLanguage.ko); // LengthRange(1, 13)
+/// nicknameLengthRange(language: WordLanguage.en); // LengthRange(3, 31)
+/// nicknameLengthRange(language: WordLanguage.ko, wordSeparator: '-'); // LengthRange(1, 15)
 /// ```
 LengthRange nicknameLengthRange({WordLanguage? language, String? wordSeparator}) {
   final languages = language == null ? wordLanguages : <WordLanguage>[language];

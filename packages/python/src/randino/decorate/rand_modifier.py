@@ -5,7 +5,7 @@ from typing import overload
 from randino._internal.generate import draw_language, resolve_style
 from randino._internal.script import detect_language
 from randino._types import WordLanguageOption
-from randino.word._generator import draw_word, pool_bounds
+from randino.word._generator import draw_word, modifiers_of, pool_bounds
 from randino.word.data import WORD_DATA, WORD_LANGUAGES
 
 
@@ -16,8 +16,9 @@ def _draw(value: str | None, language: WordLanguageOption | None, style: int) ->
     requested = language or (detect_language(value) if value is not None else "all")
     code = draw_language(requested, WORD_LANGUAGES)
     data = WORD_DATA[code]
-    low, high = pool_bounds(data.modifiers)
-    word, _missed = draw_word(data, data.modifiers, resolve_style(style), low, high, "")
+    pool = modifiers_of(data)
+    low, high = pool_bounds(pool)
+    word, _missed = draw_word(data, pool, resolve_style(style), low, high, "")
 
     return word, data.joiner
 

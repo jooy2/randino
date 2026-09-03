@@ -51,7 +51,8 @@ word = {
     code: {
         "joiner": data.joiner,
         "capitalize": data.capitalize,
-        "modifiers": listed(data.modifiers),
+        "adjectives": listed(data.adjectives),
+        "actions": listed(data.actions),
         "parts": listed(data.parts),
         "nouns": {theme: listed(words) for theme, words in data.nouns.items()},
         # The npm package tags the two shapes with `kind`; here they are two

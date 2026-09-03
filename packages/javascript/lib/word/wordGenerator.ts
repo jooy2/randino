@@ -32,6 +32,16 @@ const FIT_ATTEMPTS = 12;
 // Attempts spent looking for an invented word of the requested length.
 const SYNTH_ATTEMPTS = 8;
 
+/**
+ * The two decorating pools as one, for a draw that does not care whether it gets
+ * a word for what the noun is like or one for what it is doing. Built per call:
+ * every draw already walks the pool it is given, so holding this one would save
+ * nothing worth the bookkeeping.
+ */
+export function modifiersOf(data: WordLanguageData): WordPool {
+	return [...data.adjectives, ...data.actions];
+}
+
 /** Shortest and longest word in a pool. */
 export function poolBounds(pool: WordPool): readonly [number, number] {
 	let min = Infinity;

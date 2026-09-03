@@ -7,10 +7,10 @@ Every nickname length the language can produce, in characters. This is what [`ra
 ```javascript
 import { nicknameLengthRange } from 'randino';
 
-nicknameLengthRange('ko'); // [1, 12]
-nicknameLengthRange('en'); // [3, 30]
+nicknameLengthRange('ko'); // [1, 13]
+nicknameLengthRange('en'); // [3, 31]
 nicknameLengthRange('zh'); // [2, 5]
-nicknameLengthRange('ko', '-'); // [1, 14]
+nicknameLengthRange('ko', '-'); // [1, 15]
 ```
 
 | Parameter       | Type                 | Default | Description                                   |
@@ -27,10 +27,10 @@ Returns `[min, max]`.
 ```dart
 import 'package:randino/randino.dart';
 
-nicknameLengthRange(language: WordLanguage.ko); // LengthRange(1, 12)
-nicknameLengthRange(language: WordLanguage.en); // LengthRange(3, 30)
+nicknameLengthRange(language: WordLanguage.ko); // LengthRange(1, 13)
+nicknameLengthRange(language: WordLanguage.en); // LengthRange(3, 31)
 nicknameLengthRange(language: WordLanguage.zh); // LengthRange(2, 5)
-nicknameLengthRange(language: WordLanguage.ko, wordSeparator: '-'); // LengthRange(1, 14)
+nicknameLengthRange(language: WordLanguage.ko, wordSeparator: '-'); // LengthRange(1, 15)
 ```
 
 | Parameter       | Type            | Default | Description                                   |
@@ -47,10 +47,10 @@ Returns a `LengthRange`, which compares by value.
 ```python
 from randino import nickname_length_range
 
-nickname_length_range("ko")  # (1, 12)
-nickname_length_range("en")  # (3, 30)
+nickname_length_range("ko")  # (1, 13)
+nickname_length_range("en")  # (3, 31)
 nickname_length_range("zh")  # (2, 5)
-nickname_length_range("ko", "-")  # (1, 14)
+nickname_length_range("ko", "-")  # (1, 15)
 ```
 
 | Parameter | Type | Default | Description |
@@ -69,7 +69,7 @@ The lower end is a bare noun and the upper end a modifier, a noun and a trailing
 ::: lang js
 
 ```javascript
-nicknameLengthRange('en'); // [3, 30] — every shape
+nicknameLengthRange('en'); // [3, 31] — every shape
 randNickname({ language: 'en', maxLength: 8, count: 3 });
 // ['CoolPoem', 'MaidClaw', 'RustyBus'] — no room for three words
 ```
@@ -79,7 +79,7 @@ randNickname({ language: 'en', maxLength: 8, count: 3 });
 ::: lang dart
 
 ```dart
-nicknameLengthRange(language: WordLanguage.en); // LengthRange(3, 30) — every shape
+nicknameLengthRange(language: WordLanguage.en); // LengthRange(3, 31) — every shape
 randNickname(language: WordLanguage.en, maxLength: 8, count: 3);
 // ['CoolPoem', 'MaidClaw', 'RustyBus'] — no room for three words
 ```
@@ -89,7 +89,7 @@ randNickname(language: WordLanguage.en, maxLength: 8, count: 3);
 ::: lang py
 
 ```python
-nickname_length_range("en")  # (3, 30) — every shape
+nickname_length_range("en")  # (3, 31) — every shape
 rand_nickname(language="en", max_length=8, count=3)
 # ['CoolPoem', 'MaidClaw', 'RustyBus'] — no room for three words
 ```
@@ -103,9 +103,9 @@ rand_nickname(language="en", max_length=8, count=3)
 ::: lang js
 
 ```javascript
-nicknameLengthRange('ko'); // [1, 12]
-nicknameLengthRange('ko', '-'); // [1, 14] — two separators in the longest shape
-nicknameLengthRange('en', ' '); // [3, 32]
+nicknameLengthRange('ko'); // [1, 13]
+nicknameLengthRange('ko', '-'); // [1, 15] — two separators in the longest shape
+nicknameLengthRange('en', ' '); // [3, 33]
 ```
 
 :::
@@ -113,9 +113,9 @@ nicknameLengthRange('en', ' '); // [3, 32]
 ::: lang dart
 
 ```dart
-nicknameLengthRange(language: WordLanguage.ko); // LengthRange(1, 12)
-nicknameLengthRange(language: WordLanguage.ko, wordSeparator: '-'); // LengthRange(1, 14)
-nicknameLengthRange(language: WordLanguage.en, wordSeparator: ' '); // LengthRange(3, 32)
+nicknameLengthRange(language: WordLanguage.ko); // LengthRange(1, 13)
+nicknameLengthRange(language: WordLanguage.ko, wordSeparator: '-'); // LengthRange(1, 15)
+nicknameLengthRange(language: WordLanguage.en, wordSeparator: ' '); // LengthRange(3, 33)
 ```
 
 :::
@@ -123,9 +123,9 @@ nicknameLengthRange(language: WordLanguage.en, wordSeparator: ' '); // LengthRan
 ::: lang py
 
 ```python
-nickname_length_range("ko")  # (1, 12)
-nickname_length_range("ko", word_separator="-")  # (1, 14) — two separators in the longest shape
-nickname_length_range("en", word_separator=" ")  # (3, 32)
+nickname_length_range("ko")  # (1, 13)
+nickname_length_range("ko", word_separator="-")  # (1, 15) — two separators in the longest shape
+nickname_length_range("en", word_separator=" ")  # (3, 33)
 ```
 
 :::

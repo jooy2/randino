@@ -56,7 +56,8 @@ console.log(
 					{
 						joiner: data.joiner,
 						capitalize: data.capitalize,
-						modifiers: list(data.modifiers),
+						adjectives: list(data.adjectives),
+						actions: list(data.actions),
 						parts: list(data.parts),
 						nouns: Object.fromEntries(
 							Object.entries(data.nouns).map(([theme, words]) => [theme, list(words)])

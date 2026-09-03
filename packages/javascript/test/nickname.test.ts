@@ -32,7 +32,8 @@ function allWords(language: WordLanguage): string[] {
 	const data = WORD_DATA[language];
 
 	return [
-		...data.modifiers,
+		...data.adjectives,
+		...data.actions,
 		...(data.parts ?? []),
 		...WORD_THEMES.flatMap((theme) => [...data.nouns[theme]])
 	];
@@ -124,7 +125,7 @@ describe('Nickname', () => {
 
 	it('every nickname is a word with something added to it', () => {
 		const details = nicknameDetails({ language: 'ko', count: 200 });
-		const modifiers = new Set(WORD_DATA.ko.modifiers);
+		const modifiers = new Set([...WORD_DATA.ko.adjectives, ...WORD_DATA.ko.actions]);
 		const decorated = details.filter(
 			(detail) => detail.words.length > 1 || modifiers.has(detail.words[0])
 		);
@@ -198,8 +199,8 @@ describe('Nickname', () => {
 
 	it('omitted length bounds fall back to what the language can produce', () => {
 		assert.deepStrictEqual(nicknameLengthRange('zh'), [2, 5]);
-		assert.deepStrictEqual(nicknameLengthRange('ko'), [1, 12]);
-		assert.deepStrictEqual(nicknameLengthRange('en'), [3, 30]);
+		assert.deepStrictEqual(nicknameLengthRange('ko'), [1, 13]);
+		assert.deepStrictEqual(nicknameLengthRange('en'), [3, 31]);
 
 		for (const language of WORD_LANGUAGES) {
 			const [min, max] = nicknameLengthRange(language);
@@ -239,8 +240,8 @@ describe('Nickname', () => {
 		}
 
 		// The separator is part of the nickname, so it counts toward the length.
-		assert.deepStrictEqual(nicknameLengthRange('ko', '-'), [1, 14]);
-		assert.deepStrictEqual(nicknameLengthRange('en', ' '), [3, 32]);
+		assert.deepStrictEqual(nicknameLengthRange('ko', '-'), [1, 15]);
+		assert.deepStrictEqual(nicknameLengthRange('en', ' '), [3, 33]);
 
 		for (const [language, wordSeparator, minLength, maxLength] of [
 			['ko', ' ', 5, 8],

@@ -184,7 +184,7 @@ name_length_range("ko")  # (3, 3)
 name_length_range("en", include_middle_name=True)  # (12, 24)
 name_supports_middle_name("ko")  # False
 name_supports_roman("en")  # False
-nickname_length_range("ko")  # (1, 12)
+nickname_length_range("ko")  # (1, 13)
 ```
 
 `NAME_LANGUAGES`, `WORD_LANGUAGES` and `WORD_THEMES` list what the generators accept; `RAND_COUNT_MAX`, `RAND_LENGTH_MIN` / `MAX`, `AFFIX_LENGTH_DEFAULT` / `MAX`, `AFFIX_SEPARATOR_DEFAULT` and `AFFIX_CHARSET` are the bounds and defaults every argument is clamped to.

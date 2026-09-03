@@ -39,7 +39,7 @@ from randino._types import (
     WordTheme,
     WordThemeOption,
 )
-from randino.word._generator import draw_word, pool_bounds, theme_of, themes_of
+from randino.word._generator import draw_word, modifiers_of, pool_bounds, theme_of, themes_of
 from randino.word.data import WORD_DATA, WORD_LANGUAGES, WORD_THEMES
 from randino.word.data._types import WordLanguageData, WordPool
 
@@ -108,7 +108,7 @@ def slot_bounds(language: WordLanguage, data: WordLanguageData, theme: WordTheme
         return cached
 
     bounds: Bounds = {
-        "modifier": pool_bounds(data.modifiers),
+        "modifier": pool_bounds(modifiers_of(data)),
         "noun": pool_bounds(data.nouns[theme]),
         "part": pool_bounds(data.parts or ()),
     }
@@ -188,7 +188,7 @@ def build_words(
         ceiling = max(floor, high - used - gap - rest_min)
 
         if slot == "modifier":
-            pool = data.modifiers
+            pool = modifiers_of(data)
         elif slot == "part":
             assert data.parts is not None
             pool = data.parts

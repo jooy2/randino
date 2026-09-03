@@ -21,6 +21,7 @@ from randino import (
 # The datasets are internal, but a nickname is only as good as the words it is built
 # from — these checks are what keep person names out of them.
 from randino.name.data import NAME_DATA
+from randino.word._generator import modifiers_of
 from randino.word.data import WORD_DATA
 from tests.test_name import pool_natives
 
@@ -39,7 +40,8 @@ def all_words(language: WordLanguage) -> list[str]:
     data = WORD_DATA[language]
 
     return [
-        *data.modifiers,
+        *data.adjectives,
+        *data.actions,
         *(data.parts or ()),
         *(word for theme in WORD_THEMES for word in data.nouns[theme]),
     ]
@@ -114,7 +116,7 @@ def test_nicknames_are_built_from_real_words_and_never_from_names() -> None:
 
 def test_every_nickname_is_a_word_with_something_added_to_it() -> None:
     details = rand_nickname(output="detail", language="ko", count=200)
-    modifiers = set(WORD_DATA["ko"].modifiers)
+    modifiers = set(modifiers_of(WORD_DATA["ko"]))
     decorated = [
         detail for detail in details if len(detail.words) > 1 or detail.words[0] in modifiers
     ]
@@ -179,8 +181,8 @@ def test_nicknames_stay_inside_the_requested_length_range() -> None:
 
 def test_omitted_length_bounds_fall_back_to_what_the_language_can_produce() -> None:
     assert nickname_length_range("zh") == (2, 5)
-    assert nickname_length_range("ko") == (1, 12)
-    assert nickname_length_range("en") == (3, 30)
+    assert nickname_length_range("ko") == (1, 13)
+    assert nickname_length_range("en") == (3, 31)
 
     for language in WORD_LANGUAGES:
         low, high = nickname_length_range(language)
@@ -211,8 +213,8 @@ def test_word_separator_goes_between_the_words() -> None:
         assert detail.nickname == "".join(detail.words), detail.nickname
 
     # The separator is part of the nickname, so it counts toward the length.
-    assert nickname_length_range("ko", "-") == (1, 14)
-    assert nickname_length_range("en", " ") == (3, 32)
+    assert nickname_length_range("ko", "-") == (1, 15)
+    assert nickname_length_range("en", " ") == (3, 33)
 
     separated: list[tuple[WordLanguage, str, int, int]] = [
         ("ko", " ", 5, 8),

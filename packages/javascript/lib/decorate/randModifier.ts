@@ -2,7 +2,7 @@ import { drawLanguage, resolveStyle } from '../_internal/generate.js';
 import { detectLanguage } from '../_internal/script.js';
 import type { RandModifierOptions } from '../_types/global.js';
 import { WORD_DATA, WORD_LANGUAGES } from '../word/data/index.js';
-import { drawWord, poolBounds } from '../word/wordGenerator.js';
+import { drawWord, modifiersOf, poolBounds } from '../word/wordGenerator.js';
 import { firstArgument } from './attach.js';
 
 /** Draw one modifier, and report the language it came from. */
@@ -12,8 +12,9 @@ function draw(value: string | undefined, options: RandModifierOptions): [string,
 	const requested = options.language ?? (value ? detectLanguage(value) : 'all');
 	const language = drawLanguage(requested, WORD_LANGUAGES);
 	const data = WORD_DATA[language];
-	const [min, max] = poolBounds(data.modifiers);
-	const { word } = drawWord(data, data.modifiers, resolveStyle(options.style), min, max, '');
+	const pool = modifiersOf(data);
+	const [min, max] = poolBounds(pool);
+	const { word } = drawWord(data, pool, resolveStyle(options.style), min, max, '');
 
 	return [word, options.separator ?? data.joiner];
 }

@@ -35,7 +35,7 @@ import type {
 } from '../_types/global.js';
 import { WORD_DATA, WORD_LANGUAGES, WORD_THEMES } from '../word/data/index.js';
 import type { WordLanguageData, WordPool } from '../word/data/types.js';
-import { drawWord, poolBounds, themeOf, themesOf } from '../word/wordGenerator.js';
+import { drawWord, modifiersOf, poolBounds, themeOf, themesOf } from '../word/wordGenerator.js';
 
 type Slot = 'modifier' | 'noun' | 'part';
 
@@ -86,7 +86,7 @@ function slotBounds(language: WordLanguage, data: WordLanguageData, theme: WordT
 	}
 
 	const bounds: Bounds = {
-		modifier: poolBounds(data.modifiers),
+		modifier: poolBounds(modifiersOf(data)),
 		noun: poolBounds(data.nouns[theme]),
 		part: poolBounds(data.parts ?? [])
 	};
@@ -172,7 +172,7 @@ function buildWords(
 		const low = Math.max(1, min - used - gap - restMax);
 		const high = Math.max(low, max - used - gap - restMin);
 		const slot = slots[i];
-		const pool = slot === 'modifier' ? data.modifiers : slot === 'part' ? data.parts! : nouns;
+		const pool = slot === 'modifier' ? modifiersOf(data) : slot === 'part' ? data.parts! : nouns;
 		const chosen = drawWord(data, pool, settings.style, low, high, i === 0 ? settings.prefix : '');
 
 		missed = missed || chosen.missed;

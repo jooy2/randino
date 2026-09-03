@@ -14,8 +14,9 @@ import 'package:randino/src/word/word_generator.dart';
   final WordLanguage code =
       language ?? (value == null ? pick(wordLanguages) : detectLanguage(value));
   final data = wordData[code]!;
-  final bounds = poolBounds(data.modifiers);
-  final drawn = drawWord(data, data.modifiers, resolveStyle(style), bounds.min, bounds.max, '');
+  final pool = modifiersOf(data);
+  final bounds = poolBounds(pool);
+  final drawn = drawWord(data, pool, resolveStyle(style), bounds.min, bounds.max, '');
 
   return (drawn.word, separator ?? data.joiner);
 }
