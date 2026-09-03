@@ -104,8 +104,8 @@ rand_nickname(language="ko", max_length=3, count=3)
 
 ```javascript
 nicknameLengthRange('ko'); // [1, 12]
-nicknameLengthRange('ko', true, '-'); // [1, 14] — two separators in the longest shape
-nicknameLengthRange('en', true, ' '); // [3, 32]
+nicknameLengthRange('ko', '-'); // [1, 14] — two separators in the longest shape
+nicknameLengthRange('en', ' '); // [3, 32]
 ```
 
 :::

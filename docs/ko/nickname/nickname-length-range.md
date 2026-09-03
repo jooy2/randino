@@ -104,8 +104,8 @@ rand_nickname(language="ko", max_length=3, count=3)
 
 ```javascript
 nicknameLengthRange('ko'); // [1, 12]
-nicknameLengthRange('ko', true, '-'); // [1, 14] — 가장 긴 형태에는 구분자가 두 개
-nicknameLengthRange('en', true, ' '); // [3, 32]
+nicknameLengthRange('ko', '-'); // [1, 14] — 가장 긴 형태에는 구분자가 두 개
+nicknameLengthRange('en', ' '); // [3, 32]
 ```
 
 :::
