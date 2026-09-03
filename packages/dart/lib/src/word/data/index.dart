@@ -1,6 +1,7 @@
 import 'package:randino/src/types.dart';
 import 'package:randino/src/word/data/en.dart';
 import 'package:randino/src/word/data/es.dart';
+import 'package:randino/src/word/data/it.dart';
 import 'package:randino/src/word/data/ja.dart';
 import 'package:randino/src/word/data/ko.dart';
 import 'package:randino/src/word/data/types.dart';
@@ -19,6 +20,7 @@ final List<WordLanguage> wordLanguages = List<WordLanguage>.unmodifiable(<WordLa
   WordLanguage.zh,
   WordLanguage.vi,
   WordLanguage.es,
+  WordLanguage.it,
 ]);
 
 /// What the words can be about. Person names are deliberately absent.
@@ -73,4 +75,5 @@ final Map<WordLanguage, WordLanguageData> wordData =
       WordLanguage.zh: zh,
       WordLanguage.vi: vi,
       WordLanguage.es: es,
+      WordLanguage.it: it,
     });

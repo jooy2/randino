@@ -2,6 +2,7 @@
 
 ## vNext (2026--)
 
+- Added **Italian**, on the same agreement the Spanish pools brought in — `language="it"` across all twenty-five themes, around 1,600 nouns with their gender, 111 words for what a noun is like and 96 for what it is doing.
 - Added **Spanish** to the word pools, and with it the agreement a language that inflects needs. `language="es"` reaches all twenty-five themes: around 1,600 nouns, 116 words for what a noun is like and 100 for what it is doing. A noun carries its gender (`gato:m luna:f`) and `agreement` lists the endings a modifier changes, so `gato dorado` and `luna dorada` both come out right without either form being stored twice.
 - Added **Vietnamese** to the word pools, so `rand_word`, the twenty-five themed generators, `rand_modifier` and `rand_nickname` all take `language="vi"`. Around 1,650 nouns, 120 words for what a noun is like and 110 for what it is doing. Vietnamese was left out until now because its modifier follows the noun (`mèo xanh`) and its possessive runs the other way (`đuôi mèo`); the frames a language declares carry both, so no setting had to be invented for it. `rand_modifier` reads the same frames and attaches on the side the language uses.
 - Added eight more word themes, and a generator for each: `weather`, `space`, `time`, `emotion`, `body`, `clothing`, `tool` and `drink` — `rand_weather`, `rand_space`, `rand_time`, `rand_emotion`, `rand_body`, `rand_clothing`, `rand_tool` and `rand_drink`. Twenty-five themes now, and around 700 more nouns per language.

@@ -16,6 +16,7 @@ final Map<WordLanguage, RegExp> script = <WordLanguage, RegExp>{
   WordLanguage.zh: RegExp(r'^[々一-鿿]+$'),
   WordLanguage.vi: RegExp(r'^[a-zA-ZÀ-ỹ]+(?: [a-zA-ZÀ-ỹ]+)*$'),
   WordLanguage.es: RegExp(r'^[a-zA-ZÀ-ÿ]+(?: [a-zA-ZÀ-ÿ]+)*$'),
+  WordLanguage.it: RegExp(r'^[a-zA-ZÀ-ÿ]+(?: [a-zA-ZÀ-ÿ]+)*$'),
 };
 
 /// Every word the language can put in a nickname.

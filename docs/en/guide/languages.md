@@ -85,19 +85,20 @@ English is the one language where romanizing changes nothing, because the names 
 
 ## Words and nicknames {#words-and-nicknames}
 
-The word pools — and so `randWord`, the twenty-five themed generators and `randNickname` — cover six languages rather than nine, and the reason is grammar rather than effort. A modifier has to sit beside a noun exactly as it is written in the dictionary, and that only reads naturally where the language asks for no agreement between the two.
+The word pools — and so `randWord`, the twenty-five themed generators and `randNickname` — cover seven languages rather than nine, and the reason is grammar rather than effort. A modifier has to sit beside a noun exactly as it is written in the dictionary, and that only reads naturally where the language asks for no agreement between the two.
 
-| Code | Language   | Shapes                       | Example                |
-| ---- | ---------- | ---------------------------- | ---------------------- |
-| `ko` | Korean     | modifier, trailing word      | 멋진사자, 고양이꼬리   |
-| `en` | English    | modifier, trailing word      | MistyOwl, CatTail      |
-| `ja` | Japanese   | modifier (attributive form)  | 青いライオン, 星の影   |
-| `zh` | Chinese    | modifier, 的 before a verb   | 快乐熊猫, 奔跑的狮子   |
-| `vi` | Vietnamese | modifier **after** the noun  | mèo xanh, đuôi mèo     |
-| `es` | Spanish    | modifier after, **agreeing** | gato azul, luna dorada |
+| Code | Language   | Shapes                       | Example                    |
+| ---- | ---------- | ---------------------------- | -------------------------- |
+| `ko` | Korean     | modifier, trailing word      | 멋진사자, 고양이꼬리       |
+| `en` | English    | modifier, trailing word      | MistyOwl, CatTail          |
+| `ja` | Japanese   | modifier (attributive form)  | 青いライオン, 星の影       |
+| `zh` | Chinese    | modifier, 的 before a verb   | 快乐熊猫, 奔跑的狮子       |
+| `vi` | Vietnamese | modifier **after** the noun  | mèo xanh, đuôi mèo         |
+| `es` | Spanish    | modifier after, **agreeing** | gato azul, luna dorata     |
+| `it` | Italian    | modifier after, **agreeing** | gatto azzurro, luna dorata |
 
 Neither word order nor agreement keeps a language out any more. The shapes belong to the language, so Vietnamese writes its own — the modifier behind the noun, the possessed thing in front of its owner. And a language that inflects tags each noun with its gender and lists the endings a modifier changes, so Spanish writes `gato dorado` beside `luna dorada` without either form being stored twice.
 
-The three still missing are missing for the same reason, one step further on. **Italian, Russian and German** inflect too, and their frames put the modifier in front of the noun (`blauer Wal`), which is the one case agreement cannot reach yet: the modifier is drawn before the noun whose gender it would have to match.
+The two still missing are missing for the same reason, one step further on. **Russian and German** inflect too, and their frames put the modifier in front of the noun (`blauer Wal`), which is the one case agreement cannot reach yet: the modifier is drawn before the noun whose gender it would have to match.
 
 Japanese and Chinese use the modifier shapes only. A noun-noun compound in those languages needs a particle more often than not, or reads as garbled once the base word is abstract, so the trailing-word shapes are skipped for them.

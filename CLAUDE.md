@@ -450,11 +450,11 @@ Nicknames:
 
 ## Adding a word language
 
-Six languages are supported (`ko`, `en`, `ja`, `zh`, `vi`, `es`), and neither word order nor agreement is a bar any more:
+Seven languages are supported (`ko`, `en`, `ja`, `zh`, `vi`, `es`, `it`), and neither word order nor agreement is a bar any more:
 
-- **Word order lives in the frames.** Vietnamese and Spanish put the modifier after the noun (`mèo xanh`, `gato azul`) and Vietnamese puts the possessed thing in front of its owner (`đuôi mèo`); both say so in their own `frames`. `modifierFollows` reads that back out of the frames so `randModifier` attaches on the right side, rather than a second field stating an order the frames could contradict.
+- **Word order lives in the frames.** Vietnamese, Spanish and Italian put the modifier after the noun (`mèo xanh`, `gato azul`) and Vietnamese puts the possessed thing in front of its owner (`đuôi mèo`); both say so in their own `frames`. `modifierFollows` reads that back out of the frames so `randModifier` attaches on the right side, rather than a second field stating an order the frames could contradict.
 - **Agreement lives in the data.** A language that inflects tags each noun (`gato:m luna:f`), and `agreement` lists the endings a modifier changes per gender. `taggedNouns` splits the tag back off so each word is still typed once, and `agree` applies the first rule that matches — a word no rule matches is already right (`azul`). Rules rather than a function, so `tools/parity` compares them as data.
-- **Agreement only reaches a modifier drawn after its noun.** `buildWords` fills the slots in frame order, so the noun's gender is known by the time a modifier is drawn only when the frame puts the noun first. Italian, Russian and German put the modifier in front (`blauer Wal`), and that is what still keeps them out — not the rules, which their endings would fit.
+- **Agreement only reaches a modifier drawn after its noun.** `buildWords` fills the slots in frame order, so the noun's gender is known by the time a modifier is drawn only when the frame puts the noun first. Russian and German put the modifier in front (`blauer Wal`), and that is what still keeps them out — not the rules, which their endings would fit.
 
 To add one that clears the bar:
 
