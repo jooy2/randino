@@ -33,6 +33,10 @@ spelling out in one shape both others can be compared against:
   and "set to nothing" cannot be confused for each other.
 - `syn` always carries the `kind` tag, even in the two packages that tell the
   shapes apart by type.
+- A field that is optional in one package and defaulted in another is written
+  the same way in all three: a sentence part's `head`, `tail` and `tailAlt` are
+  `""` where the language writes nothing, and `modifiable` and `bare` are always
+  a boolean.
 
 `index.mjs` compares the JavaScript dump against the other two, one leaf field
 at a time. The JavaScript package is the source of truth, so a difference is
@@ -40,14 +44,20 @@ always reported as the other package's.
 
 ## What it covers
 
-The word datasets, the name datasets, the surname romanization map, and the
-bounds every generator shares (`constants` and `decorate/data`). That is
-everything written once per package as data.
+The word datasets, the sentence datasets, the name datasets, the surname
+romanization map, and the bounds every generator shares (`constants` and
+`decorate/data`). That is everything written once per package as data.
 
-That now includes the nickname shapes. They used to be a table private to each
+That includes the nickname shapes. They used to be a table private to each
 generator and were left out for it; they are `WordLanguageData.frames` today —
 per language, with the particle each gap needs — so the slots, the particles and
 the weights are all data, and all compared.
+
+The sentence datasets are the same story on a larger scale: the verbs with the
+noun classes each group takes, the predicate adjectives, the adverbs, the
+articles and the shapes, in nine languages. `THEME_CLASS` is compared with them,
+because a theme moving from one class to another changes what every verb of
+every language will accept.
 
 ## Running it
 

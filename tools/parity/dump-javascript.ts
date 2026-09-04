@@ -4,7 +4,8 @@
 import {
 	RAND_COUNT_MAX,
 	RAND_LENGTH_MAX,
-	RAND_LENGTH_MIN
+	RAND_LENGTH_MIN,
+	RAND_SENTENCE_LENGTH_MAX
 } from '../../packages/javascript/lib/constants.js';
 import {
 	AFFIX_CHARSET,
@@ -13,6 +14,10 @@ import {
 	AFFIX_SEPARATOR_DEFAULT
 } from '../../packages/javascript/lib/decorate/data/index.js';
 import { NAME_DATA, NAME_LANGUAGES } from '../../packages/javascript/lib/name/data/index.js';
+import {
+	SENTENCE_DATA,
+	THEME_CLASS
+} from '../../packages/javascript/lib/sentence/data/index.js';
 import { KO_SURNAME_ROMAN } from '../../packages/javascript/lib/name/data/ko.js';
 import {
 	LOOSE_THEMES,
@@ -43,6 +48,7 @@ console.log(
 			randCountMax: RAND_COUNT_MAX,
 			randLengthMin: RAND_LENGTH_MIN,
 			randLengthMax: RAND_LENGTH_MAX,
+			randSentenceLengthMax: RAND_SENTENCE_LENGTH_MAX,
 			affixLengthDefault: AFFIX_LENGTH_DEFAULT,
 			affixLengthMax: AFFIX_LENGTH_MAX,
 			affixSeparatorDefault: AFFIX_SEPARATOR_DEFAULT,
@@ -96,6 +102,52 @@ console.log(
 										minSyllables: data.syn.minSyllables,
 										maxSyllables: data.syn.maxSyllables
 									}
+					}
+				])
+			)
+		},
+		sentence: {
+			themeClass: map(THEME_CLASS),
+			data: Object.fromEntries(
+				Object.entries(SENTENCE_DATA).map(([code, data]) => [
+					code,
+					{
+						space: data.space,
+						capitalize: data.capitalize,
+						terminator: data.terminator,
+						// Optional in one package and defaulted in another; written the same
+						// way here either way, so the shapes compare.
+						predicateAgrees: data.predicateAgrees ?? false,
+						articles: data.articles
+							? Object.fromEntries(
+									Object.entries(data.articles).map(([gender, rules]) => [
+										gender,
+										(rules ?? []).map((rule) => [...rule])
+									])
+								)
+							: null,
+						verbs: data.verbs.map((group) => ({
+							subject: [...group.subject],
+							object: list(group.object),
+							words: list(group.words)
+						})),
+						states: data.states.map((group) => ({
+							subject: [...group.subject],
+							words: list(group.words)
+						})),
+						manners: list(data.manners),
+						times: list(data.times),
+						frames: data.frames.map((frame) => ({
+							parts: frame.parts.map((part) => ({
+								slot: part.slot,
+								head: part.head ?? '',
+								tail: part.tail ?? '',
+								tailAlt: part.tailAlt ?? '',
+								modifiable: part.modifiable ?? false,
+								bare: part.bare ?? false
+							})),
+							weight: frame.weight
+						}))
 					}
 				])
 			)

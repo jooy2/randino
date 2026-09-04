@@ -10,7 +10,12 @@ from collections.abc import Mapping, Sequence
 from typing import Any
 
 from randino._internal.parse import NameToken
-from randino.constants import RAND_COUNT_MAX, RAND_LENGTH_MAX, RAND_LENGTH_MIN
+from randino.constants import (
+    RAND_COUNT_MAX,
+    RAND_LENGTH_MAX,
+    RAND_LENGTH_MIN,
+    RAND_SENTENCE_LENGTH_MAX,
+)
 from randino.decorate.data import (
     AFFIX_CHARSET,
     AFFIX_LENGTH_DEFAULT,
@@ -19,6 +24,7 @@ from randino.decorate.data import (
 )
 from randino.name.data import NAME_DATA, NAME_LANGUAGES
 from randino.name.data.ko import KO_SURNAME_ROMAN
+from randino.sentence.data import SENTENCE_DATA, THEME_CLASS
 from randino.word.data import LOOSE_THEMES, WORD_DATA, WORD_LANGUAGES, WORD_THEMES
 from randino.word.data._types import SyllableSynthesis
 
@@ -129,6 +135,57 @@ name = {
     for code, data in NAME_DATA.items()
 }
 
+sentence = {
+    code: {
+        "space": data.space,
+        "capitalize": data.capitalize,
+        "terminator": data.terminator,
+        # Optional in one package and defaulted in another; written the same way
+        # here either way, so the shapes compare.
+        "predicateAgrees": data.predicate_agrees,
+        "articles": (
+            None
+            if data.articles is None
+            else {
+                gender: [list(rule) for rule in rules]
+                for gender, rules in data.articles.items()
+            }
+        ),
+        "verbs": [
+            {
+                "subject": list(group.subject),
+                "object": None if group.object is None else list(group.object),
+                "words": listed(group.words),
+            }
+            for group in data.verbs
+        ],
+        "states": [
+            {"subject": list(group.subject), "words": listed(group.words)}
+            for group in data.states
+        ],
+        "manners": listed(data.manners),
+        "times": listed(data.times),
+        "frames": [
+            {
+                "parts": [
+                    {
+                        "slot": part.slot,
+                        "head": part.head,
+                        "tail": part.tail,
+                        "tailAlt": part.tail_alt,
+                        "modifiable": part.modifiable,
+                        "bare": part.bare,
+                    }
+                    for part in frame.parts
+                ],
+                "weight": frame.weight,
+            }
+            for frame in data.frames
+        ],
+    }
+    for code, data in SENTENCE_DATA.items()
+}
+
 print(
     json.dumps(
         {
@@ -136,6 +193,7 @@ print(
                 "randCountMax": RAND_COUNT_MAX,
                 "randLengthMin": RAND_LENGTH_MIN,
                 "randLengthMax": RAND_LENGTH_MAX,
+                "randSentenceLengthMax": RAND_SENTENCE_LENGTH_MAX,
                 "affixLengthDefault": AFFIX_LENGTH_DEFAULT,
                 "affixLengthMax": AFFIX_LENGTH_MAX,
                 "affixSeparatorDefault": AFFIX_SEPARATOR_DEFAULT,
@@ -146,6 +204,10 @@ print(
                 "themes": list(WORD_THEMES),
                 "looseThemes": list(LOOSE_THEMES),
                 "data": word,
+            },
+            "sentence": {
+                "themeClass": dict(THEME_CLASS),
+                "data": sentence,
             },
             "name": {
                 "languages": list(NAME_LANGUAGES),

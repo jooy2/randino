@@ -13,6 +13,7 @@ import 'package:randino/src/decorate/data/index.dart';
 import 'package:randino/src/name/data/index.dart';
 import 'package:randino/src/name/data/ko.dart';
 import 'package:randino/src/name/data/types.dart';
+import 'package:randino/src/sentence/data/index.dart';
 import 'package:randino/src/word/data/index.dart';
 import 'package:randino/src/word/data/types.dart';
 
@@ -97,6 +98,60 @@ void main() {
       },
   };
 
+  final sentence = <String, Object?>{
+    for (final entry in sentenceData.entries)
+      entry.key.name: <String, Object?>{
+        'space': entry.value.space,
+        'capitalize': entry.value.capitalize,
+        'terminator': entry.value.terminator,
+        // Optional in one package and defaulted in another; written the same way
+        // here either way, so the shapes compare.
+        'predicateAgrees': entry.value.predicateAgrees,
+        'articles': entry.value.articles == null
+            ? null
+            : <String, Object?>{
+                for (final g in entry.value.articles!.entries)
+                  g.key.name: <Object?>[for (final rule in g.value) <String>[...rule]],
+              },
+        'verbs': <Object?>[
+          for (final group in entry.value.verbs)
+            <String, Object?>{
+              'subject': <String>[for (final noun in group.subject) noun.name],
+              'object': group.object == null
+                  ? null
+                  : <String>[for (final noun in group.object!) noun.name],
+              'words': listed(group.words),
+            },
+        ],
+        'states': <Object?>[
+          for (final group in entry.value.states)
+            <String, Object?>{
+              'subject': <String>[for (final noun in group.subject) noun.name],
+              'words': listed(group.words),
+            },
+        ],
+        'manners': listed(entry.value.manners),
+        'times': listed(entry.value.times),
+        'frames': <Object?>[
+          for (final frame in entry.value.frames)
+            <String, Object?>{
+              'parts': <Object?>[
+                for (final part in frame.parts)
+                  <String, Object?>{
+                    'slot': part.slot.name,
+                    'head': part.head ?? '',
+                    'tail': part.tail ?? '',
+                    'tailAlt': part.tailAlt ?? '',
+                    'modifiable': part.modifiable,
+                    'bare': part.bare,
+                  },
+              ],
+              'weight': frame.weight,
+            },
+        ],
+      },
+  };
+
   final name = <String, Object?>{
     for (final entry in nameData.entries)
       entry.key.name: <String, Object?>{
@@ -141,6 +196,7 @@ void main() {
         'randCountMax': randCountMax,
         'randLengthMin': randLengthMin,
         'randLengthMax': randLengthMax,
+        'randSentenceLengthMax': randSentenceLengthMax,
         'affixLengthDefault': affixLengthDefault,
         'affixLengthMax': affixLengthMax,
         'affixSeparatorDefault': affixSeparatorDefault,
@@ -153,6 +209,12 @@ void main() {
         'themes': <String>[for (final theme in wordThemes) theme.name],
         'looseThemes': <String>[for (final theme in looseThemes) theme.name],
         'data': word,
+      },
+      'sentence': <String, Object?>{
+        'themeClass': <String, Object?>{
+          for (final entry in themeClass.entries) entry.key.name: entry.value.name,
+        },
+        'data': sentence,
       },
       'name': <String, Object?>{
         'languages': <String>[
