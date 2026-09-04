@@ -339,6 +339,29 @@ function fittingPiece(pool: WordPool, low: number, high: number): string {
 }
 
 /**
+ * Whether a pool writes its own entries with a capital, which is what an invented
+ * word standing in for one has to match.
+ *
+ * Read off the pool rather than declared beside it, for the same reason
+ * `modifierFollows` reads the frames: German capitalizes its nouns and nothing
+ * else, so `capitalize` on the language would capitalize its modifiers too, and a
+ * second field saying so could contradict the pool it describes. The first entry
+ * with a case to it answers for all of them — no pool of any language here is
+ * written both ways.
+ */
+export function poolCapitalizes(pool: WordPool): boolean {
+	for (const entry of pool) {
+		const first = entry.charAt(0);
+
+		if (first.toLowerCase() !== first.toUpperCase()) {
+			return first === first.toUpperCase();
+		}
+	}
+
+	return false;
+}
+
+/**
  * One word out of `pool`, or an invented one. `missed` marks a word that had to
  * be invented because no real one started with the requested character — worth
  * another theme before settling for it.
@@ -358,7 +381,10 @@ export function drawWord(
 	const chosen = word ?? synthWord(data.syn, min, max, prefix);
 
 	return {
-		word: data.capitalize ? capitalizeFirst(chosen) : chosen,
+		// An invented word is written the way the pool it stands in for is written,
+		// which is how a German one comes out `Biefreum` rather than `biefreum`
+		// beside the `Klugheit` and `Bettdecke` of the pools.
+		word: data.capitalize || poolCapitalizes(pool) ? capitalizeFirst(chosen) : chosen,
 		missed: !made && !word
 	};
 }

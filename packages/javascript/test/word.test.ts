@@ -42,7 +42,7 @@ import type {
 // The datasets are internal, but a word generator is only as good as the pools
 // behind it — these checks are what tie the output back to them.
 import { WORD_DATA } from '../dist/word/data/index.js';
-import { genderOf, synthBounds } from '../dist/word/wordGenerator.js';
+import { genderOf, poolCapitalizes, synthBounds } from '../dist/word/wordGenerator.js';
 
 const SAMPLE = 60;
 
@@ -309,6 +309,33 @@ describe('Word', () => {
 
 			for (const word of randWord({ language, realism: 'invented', count: 40 })) {
 				assert.ok(genderOf(data, word), `${language}: ${word}`);
+			}
+		}
+	});
+
+	it('an invented word is capitalized the way its pool is', () => {
+		// German capitalizes its nouns and nothing else, so it writes them capitalized
+		// in the pool rather than setting `capitalize` — which left every invented
+		// German noun lowercase beside them.
+		for (const language of WORD_LANGUAGES) {
+			const data = WORD_DATA[language];
+
+			for (const theme of WORD_THEMES) {
+				const capitalized = poolCapitalizes(data.nouns[theme]);
+
+				for (const word of randWord({ language, theme, realism: 'invented', count: 12 })) {
+					const first = word.charAt(0);
+
+					if (first.toLowerCase() === first.toUpperCase()) {
+						continue;
+					}
+
+					assert.strictEqual(
+						first === first.toUpperCase(),
+						capitalized,
+						`${language} ${theme}: ${word}`
+					);
+				}
 			}
 		}
 	});
