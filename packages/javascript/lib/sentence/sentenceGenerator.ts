@@ -608,7 +608,8 @@ function stateGroupsFor(
 
 /* --- Building one sentence ------------------------------------------------- */
 
-type Phrase = { text: string; noun?: string; theme?: WordTheme | null };
+/** One noun phrase, and the noun it was built around. */
+type Phrase = { text: string; noun: string; theme: WordTheme | null };
 
 type Built = {
 	sentence: string;
@@ -956,7 +957,7 @@ function compose(
 
 			if (part.slot === 'subject') {
 				subject = built;
-				gender = wordData.nounGender?.[capitalizeAsPool(wordData, built.noun!)];
+				gender = wordData.nounGender?.[capitalizeAsPool(wordData, built.noun)];
 			}
 		} else {
 			phrase = predicateFor(
