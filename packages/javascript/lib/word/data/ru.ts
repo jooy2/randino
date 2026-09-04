@@ -269,6 +269,17 @@ export const RU: WordLanguageData = {
 	// masculine one. The rules before each general one are the spelling rule after
 	// ж ш ч щ г к х, where `-яя` and `-ее` are written `-ая` and `-ое`, and the
 	// reflexive participle, whose ending sits behind a `-ся` no other rule reaches.
+	// Russian declares its gender in its ending, so a word outside the pools is read
+	// the same way one inside them is: `-а` and `-я` are feminine, `-о` and `-е`
+	// neuter, a consonant masculine. `-ь` is both and is left to the default.
+	genderRules: [
+		['а', 'f'],
+		['я', 'f'],
+		['о', 'n'],
+		['е', 'n'],
+		['ё', 'n'],
+		['', 'm']
+	],
 	agreement: {
 		f: [
 			['щийся', 'щаяся'],

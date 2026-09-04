@@ -43,7 +43,7 @@ import type {
 } from '../_types/global.js';
 import { LOOSE_THEMES, WORD_DATA, WORD_LANGUAGES, WORD_THEMES } from '../word/data/index.js';
 import type { WordFrame, WordGender, WordLanguageData, WordPool } from '../word/data/types.js';
-import { agree, drawWord, poolBounds, themeOf, themesOf } from '../word/wordGenerator.js';
+import { agree, drawWord, genderOf, poolBounds, themeOf, themesOf } from '../word/wordGenerator.js';
 
 // How many shapes to try before settling for the closest fit found.
 const FIT_ATTEMPTS = 12;
@@ -264,7 +264,7 @@ function buildWords(
 			: null;
 	const span = (index: number): readonly [number, number] =>
 		early && index === nounAt ? [early.word.length, early.word.length] : bounds[frame.slots[index]];
-	let gender: WordGender | undefined = early ? data.nounGender?.[early.word] : undefined;
+	let gender: WordGender | undefined = early ? genderOf(data, early.word) : undefined;
 	let missed = false;
 	let used = 0;
 
@@ -293,7 +293,7 @@ function buildWords(
 		const word = slot === 'noun' ? chosen.word : agree(data, chosen.word, gender);
 
 		if (slot === 'noun' && !early) {
-			gender = data.nounGender?.[chosen.word];
+			gender = genderOf(data, chosen.word);
 		}
 
 		missed = missed || chosen.missed;

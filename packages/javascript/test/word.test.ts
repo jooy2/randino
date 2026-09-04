@@ -42,7 +42,7 @@ import type {
 // The datasets are internal, but a word generator is only as good as the pools
 // behind it — these checks are what tie the output back to them.
 import { WORD_DATA } from '../dist/word/data/index.js';
-import { synthBounds } from '../dist/word/wordGenerator.js';
+import { genderOf, synthBounds } from '../dist/word/wordGenerator.js';
 
 const SAMPLE = 60;
 
@@ -289,6 +289,26 @@ describe('Word', () => {
 				})) {
 					assert.strictEqual(word.length, length, `${language} wanted ${length}: ${word}`);
 				}
+			}
+		}
+	});
+
+	it('a language that inflects has a gender for a word it has never seen', () => {
+		// The pools carry a gender word by word, and an invented word is in none of
+		// them. Read off the ending instead, which is what keeps an article and an
+		// adjective agreeing with each other in front of a word nobody has seen.
+		for (const language of WORD_LANGUAGES) {
+			const data = WORD_DATA[language];
+
+			if (!data.agreement) {
+				assert.strictEqual(data.genderRules, undefined, language);
+				continue;
+			}
+
+			assert.ok(data.genderRules, `${language} inflects and has no gender rules`);
+
+			for (const word of randWord({ language, realism: 'invented', count: 40 })) {
+				assert.ok(genderOf(data, word), `${language}: ${word}`);
 			}
 		}
 	});

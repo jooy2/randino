@@ -157,6 +157,41 @@ export function themesOf(theme: WordThemeOption): readonly WordTheme[] {
 	return theme === 'all' ? WORD_THEMES : [theme];
 }
 
+/**
+ * The gender a word is taken to have, for the languages whose articles and
+ * modifiers ask.
+ *
+ * The pools carry it word by word, and an invented word is in none of them — so a
+ * word the pools do not hold is read by its ending instead, which is what the
+ * language itself does. Without that, Spanish and Italian write no article at all
+ * in front of an invented noun (they declare theirs under `m` and `f` alone) and
+ * every language that inflects hands back the base form of its modifier.
+ *
+ * A made-up word has no true gender. What this buys is an article and an
+ * adjective that agree with each other.
+ */
+export function genderOf(data: WordLanguageData, word: string): WordGender | undefined {
+	const known = data.nounGender?.[word];
+
+	if (known) {
+		return known;
+	}
+
+	if (!data.genderRules) {
+		return undefined;
+	}
+
+	const lower = word.toLowerCase();
+
+	for (const [ending, gender] of data.genderRules) {
+		if (lower.endsWith(ending)) {
+			return gender;
+		}
+	}
+
+	return undefined;
+}
+
 /** Theme a word belongs to, across every theme of the language. */
 export function themeOf(data: WordLanguageData, word: string): WordTheme | null {
 	for (const theme of WORD_THEMES) {

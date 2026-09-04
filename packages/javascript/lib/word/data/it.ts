@@ -287,6 +287,16 @@ export const IT: WordLanguageData = {
 	// Italian modifiers agree with the noun, and the base form is the masculine
 	// one. Only `-o` changes; an `-e` modifier such as `grande` is the same beside
 	// either gender and matches no rule.
+	// A word outside the pools is read by its ending, the way Italian reads one:
+	// `-a`, `-zione` and `-tà` are feminine, the rest masculine.
+	genderRules: [
+		['zione', 'f'],
+		['sione', 'f'],
+		['tà', 'f'],
+		['tù', 'f'],
+		['a', 'f'],
+		['', 'm']
+	],
 	agreement: {
 		f: [['o', 'a']],
 		p: [

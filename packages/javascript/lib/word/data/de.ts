@@ -274,6 +274,20 @@ export const DE: WordLanguageData = {
 	// bare stem: `blau` becomes `blauer Wal`, `blaue Katze`, `blaues Haus`. The
 	// empty ending matches every word, so the rule before it is only there to stop
 	// a stem that already ends in `-e` from doubling it (`leise`, not `leisee`).
+	// German gender is not predictable from the ending, and these four suffixes are
+	// the exception — every noun in `-ung`, `-heit`, `-keit` or `-schaft` is
+	// feminine, and one in `-chen` or `-lein` neuter. A made-up word matching none
+	// of them is masculine, which is a guess; what it buys is an article and an
+	// adjective that agree with each other rather than a bare `Ein blau …`.
+	genderRules: [
+		['ung', 'f'],
+		['heit', 'f'],
+		['keit', 'f'],
+		['schaft', 'f'],
+		['chen', 'n'],
+		['lein', 'n'],
+		['', 'm']
+	],
 	agreement: {
 		m: [
 			['el', 'ler'],

@@ -5,6 +5,7 @@ import { WORD_DATA, WORD_LANGUAGES } from '../word/data/index.js';
 import {
 	agree,
 	drawWord,
+	genderOf,
 	modifierFollows,
 	modifiersOf,
 	poolBounds
@@ -23,9 +24,10 @@ function draw(value: string | undefined, options: RandModifierOptions): [string,
 	const { word } = drawWord(data, pool, resolveRealism(options.realism), min, max, '');
 
 	// A value the language knows is a noun whose gender it can look up, so the
-	// modifier lands in the form that goes beside it. A value from anywhere else
-	// has no gender to agree with, and `agree` hands the base form back.
-	const gender = value === undefined ? undefined : data.nounGender?.[value];
+	// modifier lands in the form that goes beside it. A value from anywhere else is
+	// read by its ending, the way the language itself reads an unfamiliar word, and
+	// a language that does not inflect has nothing to look up either way.
+	const gender = value === undefined ? undefined : genderOf(data, value);
 
 	return [agree(data, word, gender), options.separator ?? data.joiner, modifierFollows(data)];
 }

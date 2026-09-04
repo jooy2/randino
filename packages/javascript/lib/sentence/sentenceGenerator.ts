@@ -46,6 +46,7 @@ import type { WordGender, WordLanguageData, WordPool } from '../word/data/types.
 import {
 	agree,
 	drawWord,
+	genderOf,
 	modifierFollows,
 	pickWord,
 	poolBounds,
@@ -766,7 +767,7 @@ function nounPhrase(
 	const drawn =
 		forced ??
 		plain(wordData, drawWord(wordData, pool, invent, Math.min(low, high), high, prefix).word);
-	const gender = wordData.nounGender?.[capitalizeAsPool(wordData, drawn)];
+	const gender = genderOf(wordData, capitalizeAsPool(wordData, drawn));
 	const parts = [drawn];
 
 	if (modify) {
@@ -1091,7 +1092,7 @@ function compose(
 
 			if (part.slot === 'subject') {
 				subject = built;
-				gender = wordData.nounGender?.[capitalizeAsPool(wordData, built.noun)];
+				gender = genderOf(wordData, capitalizeAsPool(wordData, built.noun));
 			}
 		} else {
 			phrase = predicateFor(
