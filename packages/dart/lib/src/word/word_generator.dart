@@ -16,9 +16,6 @@ import 'package:randino/src/word/data/types.dart';
 // How many themes to try before settling for the closest word found.
 const int _fitAttempts = 12;
 
-// Attempts spent looking for an invented word of the requested length.
-const int _synthAttempts = 8;
-
 /// The two decorating pools as one, for a draw that does not care whether it
 /// gets a word for what the noun is like or one for what it is doing.
 ///
@@ -63,6 +60,90 @@ bool modifierFollows(WordLanguageData data) {
   }
 
   return false;
+}
+
+/// Shortest and longest entry of [pool], counting an empty entry as the zero it
+/// is. [poolBounds] answers the same question for a pool of words, where an empty
+/// result would mean nothing; a coda pool holds the empty string on purpose.
+LengthRange _pieceSpan(WordPool pool) {
+  var min = 1 << 30;
+  var max = 0;
+
+  for (final entry in pool) {
+    if (entry.length < min) min = entry.length;
+    if (entry.length > max) max = entry.length;
+  }
+
+  return LengthRange(min == 1 << 30 ? 0 : min, max);
+}
+
+/// What a word of [count] syllables can be, at its shortest and at its longest.
+LengthRange _syllableSpan(SyllableSynthesis syn, int count) {
+  final onset = _pieceSpan(syn.onset);
+  final vowel = _pieceSpan(syn.vowel);
+  final coda = _pieceSpan(syn.coda);
+
+  return LengthRange(
+    count * (onset.min + vowel.min) + coda.min,
+    count * (onset.max + vowel.max) + coda.max,
+  );
+}
+
+/// Shortest and longest word the invention template can make, the way
+/// [poolBounds] reports the same about a pool.
+///
+/// What a caller asking for an invented word can be given is decided here rather
+/// than by the pools, and a length budget measured against the pools is wrong by
+/// however far the two differ — English invents at most two syllables where its
+/// pools hold words of twelve letters.
+LengthRange synthBounds(WordSynthesis syn) {
+  if (syn is PoolSynthesis) {
+    // One entry is one character, so the length is the number of entries.
+    return LengthRange(
+      syn.minSyllables < 1 ? 1 : syn.minSyllables,
+      syn.maxSyllables < 1 ? 1 : syn.maxSyllables,
+    );
+  }
+
+  final template = syn as SyllableSynthesis;
+  final low = _syllableSpan(template, template.minSyllables).min;
+  final high = _syllableSpan(template, template.maxSyllables).max;
+
+  return LengthRange(low < 1 ? 1 : low, high < 1 ? 1 : high);
+}
+
+/// One piece of an invented word, as close to the room left for it as the pool
+/// allows.
+String _fittingPiece(WordPool pool, int low, int high) {
+  final fitting = pool.where((entry) => entry.length >= low && entry.length <= high).toList();
+
+  if (fitting.isNotEmpty) return pick(fitting);
+
+  // Every piece that comes equally close, not the first of them: a room no piece
+  // fits is the common case at the ends of a range, and taking the first turned
+  // every such word into the same one.
+  final closest = <String>[];
+  var bestDistance = 1 << 30;
+
+  for (final entry in pool) {
+    final distance =
+        entry.length < low
+            ? low - entry.length
+            : entry.length > high
+            ? entry.length - high
+            : 0;
+
+    if (distance < bestDistance) {
+      bestDistance = distance;
+      closest
+        ..clear()
+        ..add(entry);
+    } else if (distance == bestDistance) {
+      closest.add(entry);
+    }
+  }
+
+  return closest.isEmpty ? '' : pick(closest);
 }
 
 /// Shortest and longest word in [pool].
@@ -155,37 +236,55 @@ String synthWord(WordSynthesis syn, int min, int max, String prefix) {
   }
 
   final template = syn as SyllableSynthesis;
-  var best = '';
-  var bestDistance = 1 << 30;
+  // Built against the length rather than sampled until something fits. Drawing
+  // each piece at random and re-rolling the whole word missed a third of the
+  // exact lengths English, Spanish, Italian, German and Russian were asked for:
+  // the shortest and the longest word a template can spell need every piece to
+  // come out that way at once, which random sampling almost never does.
+  final counts = <int>[];
 
-  for (var attempt = 0; attempt < _synthAttempts; attempt += 1) {
-    final syllables = randInt(template.minSyllables, template.maxSyllables);
-    final buffer = StringBuffer();
+  for (var count = template.minSyllables; count <= template.maxSyllables; count += 1) {
+    final span = _syllableSpan(template, count);
 
-    for (var i = 0; i < syllables; i += 1) {
-      buffer.write(i == 0 && prefix.isNotEmpty ? prefix.toLowerCase() : pick(template.onset));
-      buffer.write(pick(template.vowel));
-
-      if (i == syllables - 1) {
-        buffer.write(pick(template.coda));
-      }
-    }
-
-    final word = buffer.toString();
-
-    if (word.length >= min && word.length <= max) {
-      return word;
-    }
-
-    final distance = word.length < min ? min - word.length : word.length - max;
-
-    if (distance < bestDistance) {
-      bestDistance = distance;
-      best = word;
-    }
+    if (span.max >= min && span.min <= max) counts.add(count);
   }
 
-  return best;
+  final syllables =
+      counts.isNotEmpty ? pick(counts) : randInt(template.minSyllables, template.maxSyllables);
+  // The pieces the word is spelled out of, in order. A requested first character
+  // stands in for the opening onset, which is what makes `startsWith` work.
+  final pieces = <WordPool>[];
+
+  for (var i = 0; i < syllables; i += 1) {
+    pieces.add(i == 0 && prefix.isNotEmpty ? <String>[prefix.toLowerCase()] : template.onset);
+    pieces.add(template.vowel);
+  }
+
+  pieces.add(template.coda);
+
+  // What the pieces after each one can still add, so a piece is only chosen from
+  // the lengths that leave the rest of the word able to land in the range.
+  final restLow = List<int>.filled(pieces.length + 1, 0);
+  final restHigh = List<int>.filled(pieces.length + 1, 0);
+
+  for (var i = pieces.length - 1; i >= 0; i -= 1) {
+    final span = _pieceSpan(pieces[i]);
+
+    restLow[i] = span.min + restLow[i + 1];
+    restHigh[i] = span.max + restHigh[i + 1];
+  }
+
+  final buffer = StringBuffer();
+
+  for (var i = 0; i < pieces.length; i += 1) {
+    final written = buffer.length;
+
+    buffer.write(
+      _fittingPiece(pieces[i], min - written - restHigh[i + 1], max - written - restLow[i + 1]),
+    );
+  }
+
+  return buffer.toString();
 }
 
 /// One word out of a pool, or an invented one.

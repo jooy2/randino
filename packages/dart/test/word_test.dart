@@ -2,6 +2,7 @@ import 'package:randino/randino.dart';
 // The datasets are internal, but a word generator is only as good as the pools
 // behind it — these checks are what tie the output back to them.
 import 'package:randino/src/word/data/index.dart';
+import 'package:randino/src/word/word_generator.dart';
 import 'package:test/test.dart';
 
 const int sample = 60;
@@ -268,6 +269,28 @@ void main() {
       // Every level is accepted, and the enum is what rules the rest out.
       for (final realism in RandRealism.values) {
         expect(randWord(language: WordLanguage.ko, realism: realism, count: 5), hasLength(5));
+      }
+    });
+
+    test('an invented word is the length it was asked for, where the template can spell one', () {
+      // The template decides what an invented word can be, and it is narrower
+      // than the pools: Spanish invents at least two syllables where its pools
+      // hold a two-letter word. Inside what the template can spell, the length
+      // is exact.
+      for (final language in WordLanguage.values) {
+        final span = synthBounds(wordData[language]!.syn);
+
+        for (var length = span.min; length <= span.max; length += 1) {
+          for (final word in randWord(
+            language: language,
+            realism: RandRealism.invented,
+            minLength: length,
+            maxLength: length,
+            count: 20,
+          )) {
+            expect(word.length, length, reason: '$language wanted $length: $word');
+          }
+        }
       }
     });
 

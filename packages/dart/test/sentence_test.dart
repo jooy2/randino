@@ -414,6 +414,43 @@ void main() {
       }
     });
 
+    test('a narrow range is met too, anywhere in the language`s own range', () {
+      // The wide ranges below are met by most shapes the language has. A narrow
+      // one is what caught the budget measuring a phrase against every pool of
+      // the language rather than the one it draws from.
+      //
+      // Swept across what the language is observed to produce rather than across
+      // `sentenceLengthRange`, whose ends are the shortest and longest sentence
+      // the shapes could spell — the very top of it needs the longest word of
+      // every pool at once, which is a fit no draw is going to find.
+      for (final language in WordLanguage.values) {
+        final seen = randSentence(
+          language: language,
+          count: 400,
+        ).map((sentence) => sentence.length).toList(growable: false)..sort();
+        final lowest = seen[(seen.length * 0.05).floor()];
+        final highest = seen[(seen.length * 0.95).floor()];
+        final step = (highest - lowest) ~/ 8 < 2 ? 2 : (highest - lowest) ~/ 8;
+
+        for (var minLength = lowest; minLength + 5 <= highest; minLength += step) {
+          final maxLength = highest < minLength + 5 ? highest : minLength + 5;
+
+          for (final sentence in randSentence(
+            language: language,
+            minLength: minLength,
+            maxLength: maxLength,
+            count: 30,
+          )) {
+            expect(
+              sentence.length >= minLength && sentence.length <= maxLength,
+              isTrue,
+              reason: '$language $minLength-$maxLength: $sentence (${sentence.length})',
+            );
+          }
+        }
+      }
+    });
+
     test('sentences respect the length range', () {
       const ranges = <(WordLanguage, int, int)>[
         (WordLanguage.ko, 8, 16),

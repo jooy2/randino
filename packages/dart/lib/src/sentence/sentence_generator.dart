@@ -359,6 +359,8 @@ final Map<String, WordPool> _nounCache = <String, WordPool>{};
 final Map<WordLanguage, Map<SentenceSlot, LengthRange>> _boundsCache =
     <WordLanguage, Map<SentenceSlot, LengthRange>>{};
 final Map<WordLanguage, LengthRange> _modifierBounds = <WordLanguage, LengthRange>{};
+final Map<String, LengthRange> _spanCache = <String, LengthRange>{};
+final Map<String, WordPool> _agreedCache = <String, WordPool>{};
 
 /// The nouns of one theme a sentence may use.
 ///
@@ -385,6 +387,62 @@ WordPool _nounsOf(WordLanguage language, WordTheme theme) {
   _nounCache[key] = usable;
 
   return usable;
+}
+
+/// Shortest and longest noun one phrase can actually be given, which is not the
+/// same question [poolBounds] answers.
+///
+/// At `RandRealism.invented` the word comes out of the language's syllable
+/// template rather than its pools, and English invents at most two syllables
+/// where its pools hold words of twelve letters. A budget measured against the
+/// wrong one of those is a `minLength` the phrase cannot reach.
+LengthRange _nounSpan(WordLanguage language, WordTheme theme, int invent) {
+  final key = '${language.name}:${theme.name}:$invent';
+  final cached = _spanCache[key];
+
+  if (cached != null) return cached;
+
+  final pool = poolBounds(_nounsOf(language, theme));
+  final syn = synthBounds(wordData[language]!.syn);
+  // `RandRealism.mixed` draws from both, so both lengths are on the table.
+  final span =
+      invent >= 100
+          ? syn
+          : invent <= 0
+          ? pool
+          : LengthRange(
+            pool.min < syn.min ? pool.min : syn.min,
+            pool.max > syn.max ? pool.max : syn.max,
+          );
+
+  _spanCache[key] = span;
+
+  return span;
+}
+
+/// The modifiers of a language, in the form they take beside a noun of [gender].
+///
+/// Written out rather than agreed after the fact, because a length budget has to
+/// see the word the sentence will actually carry: German `blau` is `blauer` in
+/// front of a masculine noun, and choosing by the four letters and writing the
+/// six is how a sentence quietly stepped outside its range.
+WordPool _agreedModifiers(WordLanguage language, WordGender? gender) {
+  final lexicon = wordData[language]!;
+
+  if (gender == null || lexicon.agreement == null) return lexicon.adjectives;
+
+  final key = '${language.name}:${gender.name}';
+  final cached = _agreedCache[key];
+
+  if (cached != null) return cached;
+
+  final agreed = lexicon.adjectives
+      .map((word) => agree(lexicon, word, gender))
+      .toList(growable: false);
+
+  _agreedCache[key] = agreed;
+
+  return agreed;
 }
 
 LengthRange _span(Iterable<WordPool> pools) {
@@ -420,7 +478,10 @@ Map<SentenceSlot, LengthRange> _slotBounds(WordLanguage language) {
   bounds[SentenceSlot.place] = bounds[SentenceSlot.subject]!;
 
   _boundsCache[language] = bounds;
-  _modifierBounds[language] = poolBounds(wordData[language]!.adjectives);
+  final lexicon = wordData[language]!;
+  final genders = <WordGender?>[null, if (lexicon.agreement != null) ...lexicon.agreement!.keys];
+
+  _modifierBounds[language] = _span(genders.map((gender) => _agreedModifiers(language, gender)));
 
   return bounds;
 }
@@ -533,17 +594,19 @@ LengthRange naturalRange(WordLanguage language) {
 List<WordTheme> _themesForClasses(List<WordTheme> themes, List<NounClass> classes) =>
     themes.where((theme) => classes.contains(themeClass[theme])).toList(growable: false);
 
-SentenceFrame _pickFrame(List<SentenceFrame> frames) {
+SentenceFrame _pickFrame(List<SentenceFrame> frames, [int Function(SentenceFrame)? boost]) {
+  int weightOf(SentenceFrame frame) => frame.weight * (boost == null ? 1 : boost(frame));
+
   var total = 0;
 
   for (final frame in frames) {
-    total += frame.weight;
+    total += weightOf(frame);
   }
 
   var roll = randDouble() * total;
 
   for (final frame in frames) {
-    roll -= frame.weight;
+    roll -= weightOf(frame);
 
     if (roll <= 0) return frame;
   }
@@ -676,11 +739,13 @@ _Phrase _nounPhrase(
   required String prefix,
   required int min,
   required int max,
+  required LengthRange nouns,
 }) {
   final lexicon = wordData[language]!;
   final pool = _nounsOf(language, theme);
   final space = data.space.length;
-  final nouns = poolBounds(pool);
+  // Measured against the base forms, because the noun that decides the gender
+  // has not been drawn yet; the modifier itself is chosen from the agreed pool.
   final modifiers = poolBounds(lexicon.adjectives);
   final article = bare ? const LengthRange(0, 0) : _articleSpan(data);
   final overhead = article.max == 0 ? 0 : article.max + space;
@@ -696,19 +761,20 @@ _Phrase _nounPhrase(
   if (modify) {
     final room = max - overhead - drawn.length - space;
     final want = min - overhead - drawn.length - space;
-    final chosen =
-        forcedModifier ??
-        _plain(
-          lexicon,
-          pickWord(
-                lexicon.adjectives,
-                _atLeast(1, _atMost(want, room)),
-                _atLeast(1, _atMost(modifiers.max, room)),
-                '',
-              ) ??
-              pick(lexicon.adjectives),
-        );
-    final modifier = agree(lexicon, chosen, gender);
+    final agreed = _agreedModifiers(language, gender);
+    final modifier =
+        forcedModifier != null
+            ? agree(lexicon, forcedModifier, gender)
+            : _plain(
+              lexicon,
+              pickWord(
+                    agreed,
+                    _atLeast(1, _atMost(want, room)),
+                    _atLeast(1, _atMost(modifiers.max, room)),
+                    '',
+                  ) ??
+                  pick(agreed),
+            );
 
     if (modifierFollows(lexicon)) {
       parts.add(modifier);
@@ -832,10 +898,51 @@ _Built _compose(
   final first = frame.parts.first;
   final prefixable = _isNounSlot(first.slot) && first.head == null && data.articles == null;
   final space = data.space.length;
+  // Every phrase's theme is settled before any of them is drawn, because a length
+  // budget is only as good as the pools it was measured against. Left to the loop,
+  // each phrase was given the room the language's longest noun would need and drew
+  // a word out of its own theme, which is how a sentence came out short of a
+  // `minLength` the shape could otherwise have reached.
+  final partThemes = <WordTheme?>[
+    for (var i = 0; i < frame.parts.length; i += 1)
+      !_isNounSlot(frame.parts[i].slot)
+          ? null
+          : frame.parts[i].slot == SentenceSlot.subject
+          ? subjectTheme
+          : (plan.phrase[i]?.theme ??
+              _themeForPart(frame.parts[i].slot, verbGroup?.object, themes)),
+  ];
+  // The same for the predicate: `bounds` spans every group the language has, and
+  // one sentence draws from one of them. A word the caller required is narrower
+  // still — its length is not a range at all.
+  final partBounds = <Map<SentenceSlot, LengthRange>>[];
+  final partModifier = <LengthRange>[];
+
+  for (var i = 0; i < frame.parts.length; i += 1) {
+    final part = frame.parts[i];
+    final required = plan.phrase[i];
+    final exact = required == null ? null : LengthRange(required.word.length, required.word.length);
+    final own = Map<SentenceSlot, LengthRange>.from(bounds);
+    final owed = plan.modifier[i];
+
+    if (partThemes[i] != null) {
+      own[part.slot] = exact ?? _nounSpan(language, partThemes[i]!, settings.invent);
+    } else if (part.slot == SentenceSlot.verb || part.slot == SentenceSlot.state) {
+      own[part.slot] = exact ?? poolBounds(stateGroup?.words ?? verbGroup!.words);
+    } else if (exact != null) {
+      own[part.slot] = exact;
+    }
+
+    partBounds.add(own);
+    partModifier.add(
+      owed == null ? modifierBounds : LengthRange(owed.word.length, owed.word.length),
+    );
+  }
+
   final spans = <LengthRange>[
     for (var i = 0; i < frame.parts.length; i += 1)
       () {
-        final range = _partRange(frame.parts[i], data, bounds, modifierBounds);
+        final range = _partRange(frame.parts[i], data, partBounds[i], partModifier[i]);
         final gap = i == 0 ? 0 : space;
 
         return LengthRange(gap + range.min, gap + range.max);
@@ -868,14 +975,17 @@ _Built _compose(
     if (_isNounSlot(part.slot)) {
       final required = plan.phrase[i];
       final owed = plan.modifier[i];
-      final theme =
-          part.slot == SentenceSlot.subject
-              ? subjectTheme
-              : (required?.theme ?? _themeForPart(part.slot, verbGroup?.object, themes));
-      final room = high - poolBounds(_nounsOf(language, theme)).min;
+      final theme = partThemes[i]!;
+      final nouns = partBounds[i][part.slot]!;
+      final article = part.bare ? const LengthRange(0, 0) : _articleSpan(data);
+      final room = high - nouns.min;
+      // A phrase whose share of the range is longer than any noun of its theme
+      // takes a modifier whatever the roll says, which is the only way it can
+      // reach it — the alternative is a sentence that quietly misses `minLength`.
+      final needed = low > (article.max == 0 ? 0 : article.max + space) + nouns.max;
       final modify =
           part.modifiable &&
-          (owed != null || (room >= modifierBounds.min + space && chance(modifyChance)));
+          (owed != null || needed || (room >= modifierBounds.min + space && chance(modifyChance)));
       final built = _nounPhrase(
         language,
         data,
@@ -888,6 +998,7 @@ _Built _compose(
         prefix: prefixable && i == 0 ? settings.prefix : '',
         min: low,
         max: high,
+        nouns: nouns,
       );
 
       phrase = built.text;
@@ -998,7 +1109,21 @@ _Built _generateOne(WordLanguage language, _Settings settings) {
   var bestTooLong = false;
 
   for (var attempt = 0; attempt < _fitAttempts; attempt += 1) {
-    final frame = _pickFrame(usable);
+    // After a miss, a shape whose own range runs past the requested one in the
+    // direction that was missed is four times as likely. Weighted rather than
+    // filtered: a shape that missed by two characters can still make it on the
+    // next draw, and dropping it left a language whose short shape was the only
+    // one in range settling for whatever it had.
+    final frame = _pickFrame(
+      usable,
+      attempt == 0 || bestDistance == 0
+          ? null
+          : (candidate) {
+            final own = _frameRange(candidate, data, bounds, modifierBounds);
+
+            return (bestTooLong ? own.min <= range.min : own.max >= range.max) ? 4 : 1;
+          },
+    );
     final built = _compose(
       language,
       data,
