@@ -14,28 +14,29 @@ Everything here is about `randSentence`. It shipped in the vNext section of the 
 
 ## Status
 
-- [ ] A. Length bounds are best-effort where they should be exact
+- [x] A. Length bounds are best-effort where they should be exact
 - [ ] B. More than one sentence per result, and the sentences hold together
 - [ ] C. A person name where a sentence has room for one
 - [ ] D. Questions, exclamations and sentences that trail off
 - [ ] E. Dialogue and thought, in the language's own quotation marks
 - [ ] F. Politeness, which is mostly a Korean question
 - [ ] G. Numbers, counters and amounts of money
+- [ ] H. An invented noun has no gender, so two languages write no article at all
 
 ---
 
-## A. Length bounds are best-effort where they should be exact
+## A. Length bounds are best-effort where they should be exact — done
 
-`randSentence({ language: 'ko', minLength: 30, maxLength: 40 })` returns a 28-character sentence about once in forty. The generator already re-draws `FIT_ATTEMPTS` times and keeps the closest, so the failure is rare rather than systematic, but a length range that is quietly missed is a bug rather than a trade-off.
+`randSentence({ language: 'ko', minLength: 30, maxLength: 40 })` returned a 28-character sentence about once in forty. Every phrase was budgeted against pools it does not draw from: `slotBounds` measures the verb pools of every group the language has where one sentence uses one group, and the noun bounds span every theme where one phrase draws from one. The room left for the phrases behind this one was over-stated by the difference, so each phrase claimed less than its share and the last was handed a minimum its own pool could not meet.
 
-Two causes, both in `sentenceGenerator.ts`:
+What landed:
 
-- `slotBounds` measures the verb and state pools across **every** group of the language, while one sentence draws from **one** group. `frameRange` therefore over-states what a shape can reach, `restMax` over-states what the phrases after this one will take, and the phrase being drawn asks for less than its share. The last phrase is then handed a minimum its own pool cannot meet, and `pickWord` falls through to `pick`.
-- A shape is admitted to `fitting` on that same over-stated range, so a shape that cannot actually reach `minLength` is drawn anyway.
+- The themes and the predicate are settled before any phrase is drawn, and the budget is measured against those.
+- An invented word is budgeted against the language's syllable template rather than its pools, a required word's length is exact rather than a range, and a modifier is chosen in the form it agrees in — German was choosing `blau` by its four letters and writing the six of `blauer`.
+- `synthWord` builds against the length rather than sampling until something fits. Each piece is chosen from the lengths that leave the rest of the word able to land in the range. A third of the exact lengths English, Spanish, Italian, German and Russian were asked for used to come back wrong; now only the ones the template cannot spell at all do.
+- After a miss, a shape whose own range runs past the requested one in the direction that was missed is four times as likely — weighted rather than filtered, so a shape that missed by two characters is still drawn next time.
 
-Fix by measuring against the group in play: the predicate is chosen before the phrases, so its pool is known. Keep the fallback — a range no shape can reach still has to answer with the closest — but stop reporting a reachable range as reachable when it is not.
-
-Verify with a script over every language and a spread of ranges, 2000 draws each, and assert the count that lands outside the range is zero. `test/sentence.test.ts` already checks the bounds; tighten it so it would have caught this.
+What is left, and it is not a bug: a range at the very top of what a language can spell is still best-effort, because reaching it needs the longest word of every pool at once. The tests sweep the body of each language's distribution rather than its ends for that reason.
 
 ## B. More than one sentence per result, and the sentences hold together
 
@@ -126,6 +127,17 @@ Scope it at the marks. A speech tag — `…라고 그는 말했다` — needs a
 **An amount of money.** `currency` in the same block — `원`, `dollars`, `円`, `元`, `đồng`, `euros`, `рублей` — and a shape that uses it. Digit grouping is `100,000` in every one of the nine, so one rule covers it. This is the smaller half; do the counted phrase first and this after.
 
 The number itself should be drawn from a range that reads naturally: a handful of apples, a large sum of money. One range per class is too fine; one per `numeral` block is too coarse. Two ranges, a small one for counted things and a large one for money, is probably right.
+
+
+## H. An invented noun has no gender, so two languages write no article at all
+
+`randSentence({ language: 'es', realism: 'invented' })` writes `Hoy, nuedeiguion tiembla.` where it should write `Hoy, el nuedeiguion tiembla.`, and `Chauquuel denso` where the adjective should agree with whatever gender the noun is taken to have. Italian does the same. German writes the article, because it declares a rule under `n` that the lookup falls back to, but its adjective keeps the base form — `Ein blau …` rather than `Ein blaues …`.
+
+The cause is one line: gender is read out of `nounGender`, which only holds the words in the pools. An invented word is in none of them, so `articleFor` finds no rule and `agree` hands the word straight back. Spanish and Italian declare their articles under `m` and `f` alone, and there is no `n` to fall back to.
+
+The fix is data, in the same shape `agreement` and `articles` already have: `genderRules`, an ordered list of `[ending, gender]` that says what gender a word of that shape is taken to be. Spanish reads `-a`, `-ión` and `-dad` as feminine and everything else as masculine; Italian reads `-a`; Russian reads `-а` / `-я` and `-о` / `-е`. German gender is not predictable from the ending, but `-ung`, `-heit`, `-keit` and `-schaft` are, and a made-up word that matches none of them can be masculine — what matters for a word nobody has seen before is that the article and the adjective agree with each other.
+
+Decide while doing it whether `randModifier` should read the same rules. It documents that a value from outside the pools gets the base form back, and that would change.
 
 ---
 
