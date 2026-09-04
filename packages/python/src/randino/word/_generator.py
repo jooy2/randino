@@ -7,6 +7,7 @@ is why the drawing lives here and the composing lives in `nickname/_generator.py
 """
 
 import math
+from collections.abc import Sequence
 from typing import Literal, NamedTuple
 
 from randino._internal.generate import (
@@ -29,6 +30,7 @@ from randino._types import (
 from randino.word.data import WORD_DATA, WORD_LANGUAGES, WORD_THEMES
 from randino.word.data._types import (
     PoolSynthesis,
+    SyllableSynthesis,
     WordGender,
     WordLanguageData,
     WordPool,
@@ -37,9 +39,6 @@ from randino.word.data._types import (
 
 FIT_ATTEMPTS = 12
 """Themes to try before settling for the closest word found."""
-
-SYNTH_ATTEMPTS = 8
-"""Attempts spent looking for an invented word of the requested length."""
 
 
 def modifiers_of(data: WordLanguageData, kind: ModifierKind | Literal["all"] = "all") -> WordPool:
@@ -86,6 +85,79 @@ def modifier_follows(data: WordLanguageData) -> bool:
             return frame.slots.index("adjective") > frame.slots.index("noun")
 
     return False
+
+
+def _piece_span(pool: Sequence[str]) -> tuple[int, int]:
+    """Shortest and longest entry of a pool, counting an empty entry as the zero it is.
+
+    `pool_bounds` answers the same question for a pool of words, where an empty result
+    would mean nothing; a coda pool holds `""` on purpose.
+    """
+    if not pool:
+        return 0, 0
+
+    return min(len(entry) for entry in pool), max(len(entry) for entry in pool)
+
+
+def _syllable_span(syn: SyllableSynthesis, count: int) -> tuple[int, int]:
+    """What a word of `count` syllables can be, at its shortest and at its longest."""
+    onset_low, onset_high = _piece_span(syn.onset)
+    vowel_low, vowel_high = _piece_span(syn.vowel)
+    coda_low, coda_high = _piece_span(syn.coda)
+
+    return (
+        count * (onset_low + vowel_low) + coda_low,
+        count * (onset_high + vowel_high) + coda_high,
+    )
+
+
+def synth_bounds(syn: WordSynthesis) -> tuple[int, int]:
+    """Shortest and longest word the invention template can make.
+
+    The same question `pool_bounds` answers about a pool. What a caller asking for an
+    invented word can be given is decided here rather than by the pools, and a length
+    budget measured against the pools is wrong by however far the two differ — English
+    invents at most two syllables where its pools hold words of twelve letters.
+
+    Args:
+        syn: The language's invention template.
+
+    Returns:
+        The shortest and the longest word it can spell.
+    """
+    if isinstance(syn, PoolSynthesis):
+        # One entry is one character, so the length is the number of entries.
+        return max(1, syn.min_syllables), max(1, syn.max_syllables)
+
+    low, _ = _syllable_span(syn, syn.min_syllables)
+    _, high = _syllable_span(syn, syn.max_syllables)
+
+    return max(1, low), max(1, high)
+
+
+def _fitting_piece(pool: Sequence[str], low: int, high: int) -> str:
+    """One piece of an invented word, as close to the room left for it as the pool allows."""
+    fitting = [entry for entry in pool if low <= len(entry) <= high]
+
+    if fitting:
+        return pick(fitting)
+
+    # Every piece that comes equally close, not the first of them: a room no piece fits
+    # is the common case at the ends of a range, and taking the first turned every such
+    # word into the same one.
+    closest: list[str] = []
+    best_distance = math.inf
+
+    for entry in pool:
+        distance = low - len(entry) if len(entry) < low else max(0, len(entry) - high)
+
+        if distance < best_distance:
+            best_distance = distance
+            closest = [entry]
+        elif distance == best_distance:
+            closest.append(entry)
+
+    return pick(closest) if closest else ""
 
 
 def pool_bounds(pool: WordPool) -> tuple[int, int]:
@@ -160,30 +232,47 @@ def synth_word(syn: WordSynthesis, low: int, high: int, prefix: str) -> str:
 
         return out
 
-    best = ""
-    best_distance = math.inf
+    # Built against the length rather than sampled until something fits. Drawing each
+    # piece at random and re-rolling the whole word missed a third of the exact lengths
+    # English, Spanish, Italian, German and Russian were asked for: the shortest and the
+    # longest word a template can spell need every piece to come out that way at once,
+    # which random sampling almost never does.
+    counts = [
+        count
+        for count in range(syn.min_syllables, syn.max_syllables + 1)
+        if _syllable_span(syn, count)[1] >= low and _syllable_span(syn, count)[0] <= high
+    ]
+    syllables = pick(counts) if counts else rand_int(syn.min_syllables, syn.max_syllables)
+    # The pieces the word is spelled out of, in order. A requested first character stands
+    # in for the opening onset, which is what makes `starts_with` work.
+    pieces: list[Sequence[str]] = []
 
-    for _attempt in range(SYNTH_ATTEMPTS):
-        syllables = rand_int(syn.min_syllables, syn.max_syllables)
-        word = ""
+    for index in range(syllables):
+        pieces.append([prefix.lower()] if index == 0 and prefix else syn.onset)
+        pieces.append(syn.vowel)
 
-        for index in range(syllables):
-            word += prefix.lower() if index == 0 and prefix else pick(syn.onset)
-            word += pick(syn.vowel)
+    pieces.append(syn.coda)
 
-            if index == syllables - 1:
-                word += pick(syn.coda)
+    # What the pieces after each one can still add, so a piece is only chosen from the
+    # lengths that leave the rest of the word able to land in the range.
+    rest_low = [0] * (len(pieces) + 1)
+    rest_high = [0] * (len(pieces) + 1)
 
-        if low <= len(word) <= high:
-            return word
+    for index in range(len(pieces) - 1, -1, -1):
+        piece_low, piece_high = _piece_span(pieces[index])
+        rest_low[index] = piece_low + rest_low[index + 1]
+        rest_high[index] = piece_high + rest_high[index + 1]
 
-        distance = low - len(word) if len(word) < low else len(word) - high
+    word = ""
 
-        if distance < best_distance:
-            best_distance = distance
-            best = word
+    for index, piece in enumerate(pieces):
+        word += _fitting_piece(
+            piece,
+            low - len(word) - rest_high[index + 1],
+            high - len(word) - rest_low[index + 1],
+        )
 
-    return best
+    return word
 
 
 class Drawn(NamedTuple):

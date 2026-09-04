@@ -41,6 +41,7 @@ from randino import (
 
 # The datasets are internal, but a word generator is only as good as the pools behind
 # it — these checks are what tie the output back to them.
+from randino.word._generator import synth_bounds
 from randino.word.data import WORD_DATA
 
 SAMPLE = 60
@@ -245,6 +246,27 @@ def test_realism_invents_words_instead_of_drawing_them() -> None:
     # Every level is accepted, and the type is what rules the rest out.
     for realism in get_args(RandRealism):
         assert len(rand_word(language="ko", realism=realism, count=5)) == 5
+
+
+def test_an_invented_word_is_the_length_it_was_asked_for() -> None:
+    """Inside what the template can spell, an invented word's length is exact.
+
+    The template decides what an invented word can be, and it is narrower than the
+    pools: Spanish invents at least two syllables where its pools hold a two-letter
+    word.
+    """
+    for language in WORD_LANGUAGES:
+        lowest, highest = synth_bounds(WORD_DATA[language].syn)
+
+        for length in range(lowest, highest + 1):
+            for word in rand_word(
+                language=language,
+                realism="invented",
+                min_length=length,
+                max_length=length,
+                count=20,
+            ):
+                assert len(word) == length, f"{language} wanted {length}: {word}"
 
 
 def test_unique_never_repeats_a_word() -> None:

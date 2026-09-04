@@ -347,6 +347,33 @@ def test_include_picks_the_language_the_word_is_written_in() -> None:
         assert "고양이" in detail.sentence
 
 
+def test_a_narrow_range_is_met_anywhere_in_the_language_s_own_range() -> None:
+    """A narrow window, swept across what the language is observed to produce.
+
+    The wide ranges below are met by most shapes the language has. A narrow one is what
+    caught the budget measuring a phrase against every pool of the language rather than
+    the one it draws from. Swept across the observed lengths rather than across
+    `sentence_length_range`, whose ends are the shortest and longest sentence the shapes
+    could spell — the very top of it needs the longest word of every pool at once, which
+    is a fit no draw is going to find.
+    """
+    for language in WORD_LANGUAGES:
+        seen = sorted(len(sentence) for sentence in rand_sentence(language=language, count=400))
+        lowest = seen[int(len(seen) * 0.05)]
+        highest = seen[int(len(seen) * 0.95)]
+        step = max(2, (highest - lowest) // 8)
+
+        for min_length in range(lowest, highest - 4, step):
+            max_length = min(highest, min_length + 5)
+
+            for sentence in rand_sentence(
+                language=language, min_length=min_length, max_length=max_length, count=30
+            ):
+                assert min_length <= len(sentence) <= max_length, (
+                    f"{language} {min_length}-{max_length}: {sentence} ({len(sentence)})"
+                )
+
+
 def test_sentences_respect_the_length_range() -> None:
     ranges: list[tuple[WordLanguage, int, int]] = [
         ("ko", 8, 16),

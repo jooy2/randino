@@ -20,7 +20,7 @@ not — no tag on any noun, because `THEME_CLASS` already knows what a theme nam
 """
 
 import random
-from collections.abc import Sequence
+from collections.abc import Callable, Sequence
 from dataclasses import dataclass, field
 from typing import cast
 
@@ -61,6 +61,7 @@ from randino.word._generator import (
     modifier_follows,
     pick_word,
     pool_bounds,
+    synth_bounds,
     theme_of,
 )
 from randino.word.data import WORD_DATA, WORD_LANGUAGES, WORD_THEMES
@@ -357,6 +358,8 @@ def _required_at(frame: SentenceFrame, plan: Plan, slot: SentenceSlot) -> Requir
 
 _NOUN_CACHE: dict[tuple[WordLanguage, WordTheme], WordPool] = {}
 _BOUNDS_CACHE: dict[WordLanguage, dict[str, tuple[int, int]]] = {}
+_SPAN_CACHE: dict[tuple[WordLanguage, WordTheme, int], tuple[int, int]] = {}
+_AGREED_CACHE: dict[tuple[WordLanguage, WordGender], WordPool] = {}
 
 
 def _nouns_of(language: WordLanguage, theme: WordTheme) -> WordPool:
@@ -385,6 +388,62 @@ def _nouns_of(language: WordLanguage, theme: WordTheme) -> WordPool:
     _NOUN_CACHE[key] = usable
 
     return usable
+
+
+def _noun_span(language: WordLanguage, theme: WordTheme, invent: int) -> tuple[int, int]:
+    """Shortest and longest noun one phrase can actually be given.
+
+    Not the same question `pool_bounds` answers: at `realism="invented"` the word comes
+    out of the language's syllable template rather than its pools, and English invents
+    at most two syllables where its pools hold words of twelve letters. A budget
+    measured against the wrong one of those is a `min_length` the phrase cannot reach.
+    """
+    key = (language, theme, invent)
+    cached = _SPAN_CACHE.get(key)
+
+    if cached is not None:
+        return cached
+
+    pool_low, pool_high = pool_bounds(_nouns_of(language, theme))
+    syn_low, syn_high = synth_bounds(WORD_DATA[language].syn)
+
+    if invent >= 100:
+        span = (syn_low, syn_high)
+    elif invent <= 0:
+        span = (pool_low, pool_high)
+    else:
+        # `"mixed"` draws from both, so both lengths are on the table.
+        span = (min(pool_low, syn_low), max(pool_high, syn_high))
+
+    _SPAN_CACHE[key] = span
+
+    return span
+
+
+def _agreed_modifiers(language: WordLanguage, gender: WordGender | None) -> WordPool:
+    """The modifiers of a language, in the form they take beside a noun of `gender`.
+
+    Written out rather than agreed after the fact, because a length budget has to see
+    the word the sentence will actually carry: German `blau` is `blauer` in front of a
+    masculine noun, and choosing by the four letters and writing the six is how a
+    sentence quietly stepped outside its range.
+    """
+    lexicon = WORD_DATA[language]
+
+    if gender is None or lexicon.agreement is None:
+        return lexicon.adjectives
+
+    key = (language, gender)
+    cached = _AGREED_CACHE.get(key)
+
+    if cached is not None:
+        return cached
+
+    agreed = tuple(agree(lexicon, word, gender) for word in lexicon.adjectives)
+
+    _AGREED_CACHE[key] = agreed
+
+    return agreed
 
 
 def _span(pools: Sequence[WordPool]) -> tuple[int, int]:
@@ -417,7 +476,12 @@ def _slot_bounds(language: WordLanguage) -> dict[str, tuple[int, int]]:
         "state": _span([group.words for group in data.states]),
         "manner": _span([data.manners]),
         "time": _span([data.times]),
-        "modifier": pool_bounds(WORD_DATA[language].adjectives),
+        "modifier": _span(
+            [
+                _agreed_modifiers(language, gender)
+                for gender in (None, *(WORD_DATA[language].agreement or {}))
+            ]
+        ),
     }
 
     _BOUNDS_CACHE[language] = bounds
@@ -521,13 +585,24 @@ def _themes_for_classes(
     return tuple(theme for theme in themes if THEME_CLASS[theme] in classes)
 
 
-def _pick_frame(frames: Sequence[SentenceFrame]) -> SentenceFrame:
-    """One shape, drawn in proportion to the weights the language gave them."""
-    total = sum(frame.weight for frame in frames)
+def _pick_frame(
+    frames: Sequence[SentenceFrame],
+    boost: Callable[[SentenceFrame], int] | None = None,
+) -> SentenceFrame:
+    """One shape, drawn in proportion to the weights the language gave them.
+
+    `boost` multiplies a shape's weight, which is what a retry uses to ask for a shape
+    that reaches further without dropping the others.
+    """
+
+    def weight_of(frame: SentenceFrame) -> int:
+        return frame.weight * (1 if boost is None else boost(frame))
+
+    total = sum(weight_of(frame) for frame in frames)
     roll = random.random() * total
 
     for frame in frames:
-        roll -= frame.weight
+        roll -= weight_of(frame)
 
         if roll <= 0:
             return frame
@@ -675,6 +750,7 @@ def _noun_phrase(
     prefix: str,
     low: int,
     high: int,
+    span: tuple[int, int],
 ) -> Phrase:
     """Build one noun phrase: an article, the noun, and a modifier where there is room.
 
@@ -686,7 +762,9 @@ def _noun_phrase(
     lexicon = WORD_DATA[language]
     pool = _nouns_of(language, theme)
     space = len(data.space)
-    _, noun_max = pool_bounds(pool)
+    _, noun_max = span
+    # Measured against the base forms, because the noun that decides the gender has not
+    # been drawn yet; the modifier itself is chosen from the agreed pool below.
     mod_min, mod_max = pool_bounds(lexicon.adjectives)
     _, article_max = (0, 0) if bare else _article_span(data)
     overhead = article_max + space if article_max else 0
@@ -705,12 +783,16 @@ def _noun_phrase(
     if modify:
         room = high - overhead - len(drawn) - space
         want = low - overhead - len(drawn) - space
-        chosen = forced_modifier or _plain(
-            lexicon,
-            pick_word(lexicon.adjectives, max(1, min(want, room)), max(1, min(mod_max, room)), "")
-            or pick(lexicon.adjectives),
+        agreed = _agreed_modifiers(language, gender)
+        modifier = (
+            agree(lexicon, forced_modifier, gender)
+            if forced_modifier
+            else _plain(
+                lexicon,
+                pick_word(agreed, max(1, min(want, room)), max(1, min(mod_max, room)), "")
+                or pick(agreed),
+            )
         )
-        modifier = agree(lexicon, chosen, gender)
 
         if modifier_follows(lexicon):
             parts.append(modifier)
@@ -858,13 +940,64 @@ def _compose(
     first = frame.parts[0]
     prefixable = first.slot in NOUN_SLOTS and not first.head and data.articles is None
     space = len(data.space)
+    # Every phrase's theme is settled before any of them is drawn, because a length
+    # budget is only as good as the pools it was measured against. Left to the loop, each
+    # phrase was given the room the language's longest noun would need and drew a word
+    # out of its own theme, which is how a sentence came out short of a `min_length` the
+    # shape could otherwise have reached.
+    part_themes: list[WordTheme | None] = []
+
+    for index, part in enumerate(frame.parts):
+        if part.slot not in NOUN_SLOTS:
+            part_themes.append(None)
+            continue
+
+        if part.slot == "subject":
+            part_themes.append(subject_theme)
+            continue
+
+        required = plan.phrase.get(index)
+        part_themes.append(
+            required.theme
+            if required is not None and required.theme is not None
+            else _theme_for_part(
+                part.slot,
+                verb_group.object if verb_group is not None else None,
+                themes,
+            )
+        )
+
+    # The same for the predicate: `bounds` spans every group the language has, and one
+    # sentence draws from one of them. A word the caller required is narrower still — its
+    # length is not a range at all.
+    part_bounds: list[dict[str, tuple[int, int]]] = []
+
+    for index, part in enumerate(frame.parts):
+        required = plan.phrase.get(index)
+        exact = None if required is None else (len(required.word), len(required.word))
+        own = dict(bounds)
+        theme = part_themes[index]
+
+        if theme is not None:
+            owed = plan.modifier.get(index)
+            own[part.slot] = exact or _noun_span(language, theme, settings.invent)
+
+            if owed is not None:
+                own["modifier"] = (len(owed.word), len(owed.word))
+        elif part.slot in ("verb", "state"):
+            own[part.slot] = exact or pool_bounds(predicates)
+        elif exact is not None:
+            own[part.slot] = exact
+
+        part_bounds.append(own)
+
     spans = [
         (
             (0 if index == 0 else space) + part_low,
             (0 if index == 0 else space) + part_high,
         )
         for index, (part_low, part_high) in enumerate(
-            _part_range(part, data, bounds) for part in frame.parts
+            _part_range(part, data, part_bounds[index]) for index, part in enumerate(frame.parts)
         )
     ]
     written: list[str] = []
@@ -886,22 +1019,17 @@ def _compose(
         if part.slot in NOUN_SLOTS:
             required = plan.phrase.get(index)
             owed = plan.modifier.get(index)
-            theme = (
-                subject_theme
-                if part.slot == "subject"
-                else (
-                    required.theme
-                    if required is not None and required.theme is not None
-                    else _theme_for_part(
-                        part.slot,
-                        verb_group.object if verb_group is not None else None,
-                        themes,
-                    )
-                )
-            )
-            room = part_high - pool_bounds(_nouns_of(language, theme))[0]
+            theme = cast("WordTheme", part_themes[index])
+            noun_low, noun_high = part_bounds[index][part.slot]
+            _, article_max = (0, 0) if part.bare else _article_span(data)
+            room = part_high - noun_low
+            # A phrase whose share of the range is longer than any noun of its theme
+            # takes a modifier whatever the roll says, which is the only way it can
+            # reach it — the alternative is a sentence that misses `min_length`.
+            needed = part_low > (article_max + space if article_max else 0) + noun_high
             modify = part.modifiable and (
                 owed is not None
+                or needed
                 or (room >= bounds["modifier"][0] + space and chance(modify_chance))
             )
             built = _noun_phrase(
@@ -916,6 +1044,7 @@ def _compose(
                 prefix=settings.prefix if prefixable and index == 0 else "",
                 low=part_low,
                 high=part_high,
+                span=(noun_low, noun_high),
             )
             phrase = built.text
 
@@ -1027,8 +1156,18 @@ def _generate_one(language: WordLanguage, settings: Settings) -> Built:
     best_distance = None
     best_too_long = False
 
+    def reaching(candidate: SentenceFrame) -> int:
+        # After a miss, a shape whose own range runs past the requested one in the
+        # direction that was missed is four times as likely. Weighted rather than
+        # filtered: a shape that missed by two characters can still make it on the next
+        # draw, and dropping it left a language whose short shape was the only one in
+        # range settling for whatever it had.
+        own_low, own_high = _frame_range(candidate, data, bounds)
+
+        return 4 if (own_low <= low if best_too_long else own_high >= high) else 1
+
     for attempt in range(FIT_ATTEMPTS):
-        frame = _pick_frame(usable)
+        frame = _pick_frame(usable, None if attempt == 0 else reaching)
         built = _compose(
             language,
             data,
