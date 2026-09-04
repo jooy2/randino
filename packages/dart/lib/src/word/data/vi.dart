@@ -58,7 +58,7 @@ final WordLanguageData vi = WordLanguageData(
       cây lá hoa rễ hạt quả rêu dương_xỉ tre thông phong anh_đào hoa_hồng hoa_sen
       hoa_cúc hoa_mai hoa_lan bồ_công_anh hướng_dương hoa_súng cỏ cành mầm chồi nụ
       cánh_hoa phấn_hoa vòng_gỗ quả_thông quả_sồi bạch_quả liễu bạch_dương tùng bách sồi
-      dẻ óc_chó thảm_cỏ rong tảo rong_biển bồn_cây hàng_rào_cây lá_non lá_rụng lá_khô
+      dẻ óc_chó thảm_cỏ tảo rong_biển bồn_cây hàng_rào_cây
       bó_hoa cỏ_dại xương_rồng lô_hội húng_quế hương_thảo bạc_hà thì_là mùi_tây nghệ_tây
       rau_mùi hẹ me sim ổi
     '''),
@@ -67,7 +67,7 @@ final WordLanguageData vi = WordLanguageData(
       mã_não hổ_phách ngọc_trai ngọc_bích bạch_ngọc ngọc đá_hoa đá_granit đá_vôi
       đá_bazan đá_lửa thiên_thạch quặng đá_thô đá_quý thỏi_vàng thỏi_bạc vân_mẫu
       huỳnh_thạch lưu_huỳnh ngà sa_khoáng lá_vàng lá_bạc than_chì thủy_ngân thạch_cao
-      đá_phiến ngọc_quý mạch_quặng hồng_ngọc ngọc_đen lục_bảo đá_mắt_mèo đá_mặt_trăng
+      đá_phiến mạch_quặng hồng_ngọc ngọc_đen lục_bảo đá_mắt_mèo đá_mặt_trăng
       ngọc_lam kim_cương san_hô_đỏ
     '''),
     WordTheme.concept: words(r'''
@@ -83,11 +83,11 @@ final WordLanguageData vi = WordLanguageData(
     '''),
     WordTheme.myth: words(r'''
       rồng phượng_hoàng kỳ_lân tiên yêu_tinh ma hồn oan_hồn thần thiên_thần ác_quỷ
-      người_cá quái_vật ác_thú thánh_thú thần_thú ảo_thú ma_vương long_vương nữ_thần_ảo
+      người_cá quái_vật ác_thú thánh_thú thần_thú ma_vương long_vương
       phép_thuật ma_lực thần_chú lời_nguyền tiên_tri sấm_truyền kết_giới bùa_hộ_mệnh
-      phong_ấn ảo_giác rồng_lửa rồng_băng hắc_long bạch_long thanh_long bạch_hổ chu_tước
+      phong_ấn ảo_giác hắc_long bạch_long thanh_long bạch_hổ chu_tước
       huyền_vũ cửu_vĩ_hồ chim_lửa người_sói ma_cà_rồng xác_sống hình_nhân người_lùn
-      quỷ_lùn tinh_linh thủy_thần sơn_thần hải_thần lôi_thần phong_thần nữ_thủy_thần
+      quỷ_lùn tinh_linh thủy_thần sơn_thần hải_thần lôi_thần phong_thần
       mỹ_nhân_ngư nhân_mã nhân_sư thiên_mã hải_quái thần_điểu linh_hồn ma_thuật đạo_sĩ
       pháp_sư thầy_bói nhà_tiên_tri hiền_giả
     '''),
@@ -193,7 +193,7 @@ final WordLanguageData vi = WordLanguageData(
       mưa_đêm tuyết_rơi băng_giá sương_muối nắng_nóng đợt_nóng đợt_lạnh gió_bấc gió_nồm
       gió_lào mây_đen vầng_mây áp_thấp áp_cao thời_tiết khí_hậu nhiệt_độ độ_ẩm khí_áp
       trời_quang trời_râm trời_mưa nắng_gắt bóng_râm nắng_chiều gió_biển gió_núi
-      cơn_giông chớp sương_sớm nắng_sớm
+      cơn_giông chớp nắng_sớm
     '''),
     WordTheme.space: words(r'''
       sao mặt_trăng mặt_trời thiên_hà sao_chổi sao_băng cực_quang bụi_sao dải_ngân_hà
@@ -259,9 +259,9 @@ final WordLanguageData vi = WordLanguageData(
       trà_hoa_cúc trà_gừng trà_sen trà_atiso sữa_đậu_nành cà_phê_sữa cà_phê_đen bạc_xỉu
       nước_dừa nước_mía nước_chanh sinh_tố sữa_lắc nước_ngọt trà_sữa trà_đá cà_phê_đá
       bia bia_hơi bia_đen rượu_vang rượu_trắng rượu_nếp rượu_cần rượu_gạo rượu_thuốc
-      rượu_mạnh sâm_banh cốc_tai nước_lọc nước_ấm nước_nóng nước_đá nước_đường
-      mật_ong_pha nước_sâm nước_rau_má nước_vối nước_sấu trà_bí_đao nước_yến
-      nước_khoáng nước_hoa_quả sữa_tươi sữa_đặc
+      rượu_mạnh sâm_banh cốc_tai nước_đường
+      nước_sâm nước_rau_má nước_vối nước_sấu trà_bí_đao nước_yến
+      nước_khoáng sữa_tươi sữa_đặc
     '''),
   },
   parts: words(r'''

@@ -464,12 +464,31 @@ To add one that clears the bar:
 2. Add `lib/word/data/<code>.ts` with a `WordLanguageData` object: `joiner`, `capitalize`, `adjectives` and `actions` in attributive form, `nouns` for every theme in `WORD_THEMES`, the `frames` the language's grammar allows, an optional `parts` pool for the frames that ask for one, and a `syn` template (`kind: 'syllable'` for alphabetic scripts, `kind: 'pool'` where one character is one syllable).
 3. Register it in `WORD_DATA` and `WORD_LANGUAGES` in `lib/word/data/index.ts`.
 4. Write the frames before the pools. A shape is only worth a pool if the grammar carries it: `ja` and `zh` reach `parts` through の and 的 because a bare noun-noun compound does not read, and `en` has no possessive frame because `of` is a word rather than a particle.
-5. Aim for 50+ nouns per theme, and more where the vocabulary is there. `ko`, `en`, `ja` and `zh` hold around 2,700 nouns each and the five added since hold around 1,550; the thinnest theme in any language sits in the forties. The pools are what make the output varied, and the combination count is roughly `(adjectives + actions) × nouns × (1 + parts)` — around 40M for the four with a `parts` pool, 0.3M for `es`, `it`, `de` and `ru`, which have none. **Padding a theme with near-synonyms reads worse than a shorter pool**, and inventing a compound to fill it is how `棒麺麭` and `대로변` got in; both were replaced.
+5. Aim for 50+ nouns per theme, and more where the vocabulary is there. `ko`, `en`, `ja` and `zh` hold around 2,700 nouns each and the five added since hold around 1,550; the thinnest theme in any language sits in the forties. The pools are what make the output varied, and the combination count is roughly `(adjectives + actions) × nouns × (1 + parts)` — around 40M for the four with a `parts` pool, 0.3M for `es`, `it`, `de` and `ru`, which have none. **Padding a theme with near-synonyms reads worse than a shorter pool**, and inventing a compound to fill it is how `棒麺麭` and `대로변` got in; both were replaced. See the compound rule below — a pool grows by finding words the theme does not have yet, never by qualifying one it already holds.
 6. No person names, and no word that is only a name — for `en` this is enforced against the person-name pools, which is why `job` has no `Knight`, `Baker` or `Hunter` and `plant` no `Rose` or `Ivy`. Add the language to the README tables and to `SCRIPT` in `test/word.test.ts` **and** `test/nickname.test.ts`; the existing per-language tests then cover it.
 7. A language that inflects tags its nouns and lists its endings: write `nouns` as a `theme -> \`gato:m luna:f\`` map through `taggedNouns`, and give `agreement` the rules per form, `p` (and `fp` where the plural inflects for gender) included if any noun has no singular. Put the noun **first** in the frames where the grammar allows it; where it cannot (`blauer Wal`), `buildWords` draws the noun ahead of its turn instead.
 8. Port all of it to `packages/dart` and `packages/python`, the same way a name language is ported.
 9. Add the row to the tables in `docs/*/guide/languages.md` and to the root `README.md`.
 10. Run `node tools/parity/index.mjs` from the repository root — twenty-five pools in three packages are exactly where one word goes missing unnoticed.
+
+### The compound rule: one entry per thing
+
+A compound belongs in a pool only when it names **something the base word does not**. When it names the same thing with a qualifier in front, the base word wins — it is the one people actually reach for, and both entries in one theme is the same thing drawn twice.
+
+```text
+Drop:  민들레꽃 beside 민들레 · 국화꽃 beside 국화 · 연두색 beside 연두 · 은하계 beside 은하
+       杜鹃花 beside 杜鹃 · 銀河系 beside 銀河 · 小汽车 beside 汽车 · мостик beside мост
+       lá non / lá rụng / lá khô beside lá · nước ấm / nước nóng / nước đá beside nước
+       Omelette beside Omelet · Slippers beside Slipper · Crossroad beside Crossroads
+Keep:  밧줄 · 리본 · 끈 — three objects, three roles, no compound needed between them
+       가방끈, 지우개털, 만두피, 책갈피 — a part or a by-product is its own thing
+       彗星 / 流星 / 惑星 beside 星 · 霧雨 / 梅雨 beside 雨 — the language names these separately
+       Debt / Debtor · Knee / Kneecap · 銀 / 水銀 — different referents that share a character
+```
+
+The test is not whether the compound is a real word — `풋사과` and `햇사과` are both real, and both are still `사과`. It is whether a speaker naming the thing would say the compound or the base. Say the base out loud first; if it already answers, the compound is padding.
+
+This applies to every language, and the failure looks different in each. Korean and Japanese suffix a classifier (`꽃`, `類`, `具`, `体`); Chinese suffixes `系` or `馆`; Vietnamese puts a state in front of a noun (`lá khô`, `nước ấm`); English keeps a British and an American spelling of one word; Russian keeps a diminutive beside its base. `tools/parity` cannot see any of it — the packages agree with each other perfectly while all three hold the same redundant entry. What finds it is comparing a pool **against itself**: within one theme, look for a word that contains another.
 
 ## Adding a word theme
 
