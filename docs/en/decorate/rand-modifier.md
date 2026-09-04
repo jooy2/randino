@@ -115,9 +115,9 @@ rand_modifier("고양이", language="en")  # 'Misty고양이'
 
 With no value there is no script to read, so every language is in play unless you name one.
 
-## A word the language knows gets an agreeing modifier
+## The modifier agrees with the value
 
-In a language whose modifiers change shape beside the noun, `randModifier` looks the value up in that language's pools. A word it finds carries a gender, so the modifier comes back in the form that goes with it; a word from anywhere else has no gender to agree with, and the modifier stays in its base form.
+In a language whose modifiers change shape beside the noun, `randModifier` looks the value up in that language's pools. A word it finds carries a gender, so the modifier comes back in the form that goes with it. A word from no pool is read by its ending instead, the way the language itself reads an unfamiliar one — Spanish takes `-a`, `-ión` and `-dad` as feminine, Russian `-а` and `-о`, and German the four suffixes that are predictable — so a made-up word gets a modifier that agrees with it too.
 
 A noun with no singular at all — `ножницы`, `gafas`, `Jeans` — is tagged plural for the same reason, so the modifier beside it is plural too.
 
