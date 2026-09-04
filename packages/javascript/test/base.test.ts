@@ -15,6 +15,7 @@ describe('base test', () => {
 			'RAND_COUNT_MAX',
 			'RAND_LENGTH_MAX',
 			'RAND_LENGTH_MIN',
+			'RAND_SENTENCE_LENGTH_MAX',
 			'WORD_LANGUAGES',
 			'WORD_THEMES',
 			'nameLengthRange',
@@ -43,6 +44,7 @@ describe('base test', () => {
 			'randPlant',
 			'randPrefix',
 			'randProduct',
+			'randSentence',
 			'randSpace',
 			'randSport',
 			'randSuffix',
@@ -52,6 +54,7 @@ describe('base test', () => {
 			'randVehicle',
 			'randWeather',
 			'randWord',
+			'sentenceLengthRange',
 			'wordLengthRange'
 		]);
 
@@ -73,6 +76,13 @@ describe('base test', () => {
 
 		assert.strictEqual(typeof randino.randNickname, 'function');
 		assert.strictEqual(typeof randino.nicknameLengthRange, 'function');
+
+		// A sentence is many words rather than at most three, so it is the one
+		// generator with a length ceiling of its own.
+		assert.strictEqual(typeof randino.randSentence, 'function');
+		assert.strictEqual(typeof randino.sentenceLengthRange, 'function');
+		assert.ok(Array.isArray(randino.randSentence({ output: 'detail' })[0].phrases));
+		assert.strictEqual(randino.RAND_SENTENCE_LENGTH_MAX, 200);
 		assert.ok(Array.isArray(randino.WORD_LANGUAGES));
 		assert.ok(Array.isArray(randino.WORD_THEMES));
 

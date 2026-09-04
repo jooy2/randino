@@ -10,11 +10,12 @@ Every option and every example, with **JavaScript** picked in the sidebar. This 
 
 ---
 
-**randino** generates random person names and nicknames in the language you ask for.
+**randino** generates random person names, nicknames, words and sentences in the language you ask for.
 
 - **Person names** read like names people actually carry — Emma Clover, Jack Reeves — and come with their English pronunciation. 9 languages.
 - **Nicknames** are the handles you would pick for a game or a website — MistyOwl, CraneVoyage, RustyBoot. Built from everyday words across twenty-five themes, never from person names.
 - **Words** are those themes on their own — `randWord`, plus `randAnimal`, `randFood` and twelve more.
+- **Sentences** are whole statements in the language's own grammar — `randSentence`. The verb decides what can stand beside it, so the words of one sentence belong together.
 - **Decorators** attach something to a string you already have: `randSuffix`, `randPrefix` and `randModifier`.
 - One options object per generator, every option optional: `randName()` on its own works.
 - **No runtime dependencies.** ESM, typed, and it runs in Node and in the browser alike.
@@ -138,6 +139,53 @@ wordLengthRange('en'); // [3, 11]
 
 One function per theme: `randAnimal`, `randObject`, `randNature`, `randPlant`, `randGem`, `randConcept`, `randMyth`, `randJob`, `randMusic`, `randPlace`, `randFood`, `randSport`, `randVehicle`, `randProduct`, `randColor`, `randFinance`, `randTech`, `randWeather`, `randSpace`, `randTime`, `randEmotion`, `randBody`, `randClothing`, `randTool`, `randDrink`. Each is `randWord` with the theme already chosen.
 
+## Sentences
+
+Whole statements, written the way the language writes them. The nouns are the same pools the words and nicknames come from; what a sentence adds is the grammar — a verb that states what can do it and what it can be done to, and the shapes each language allows.
+
+```javascript
+import { randSentence, sentenceLengthRange } from 'randino';
+
+randSentence({ language: 'en', count: 3 });
+// ['The brave lion runs quietly.', 'The otter swims in the cove.', 'The sky is blue.']
+
+randSentence({ language: 'ko', count: 2 });
+// ['검은 고양이가 숲에서 잠잔다.', '여우가 사과를 먹는다.']
+
+randSentence({ language: 'en', shape: 'simple' }); // ['The gondola passes.']
+randSentence({ language: 'en', include: ['brave', 'lion'] });
+// ['The brave lion yawns quietly.']
+
+randSentence({ language: 'ko', output: 'detail' });
+// [{
+//   sentence: '검은 고양이가 숲에서 잠잔다.',
+//   phrases: ['검은 고양이', '숲', '잠잔다'],
+//   slots: ['subject', 'place', 'verb'],
+//   language: 'ko',
+//   theme: 'animal'
+// }]
+
+sentenceLengthRange('en'); // [13, 92]
+```
+
+| Option                    | Type                                            | Default    |
+| ------------------------- | ----------------------------------------------- | ---------- |
+| `language`                | `'all'` or a language code                      | `'all'`    |
+| `theme`                   | `'all'` or a theme name                         | `'all'`    |
+| `shape`                   | `'all' \| 'simple' \| 'detailed' \| 'complex'`  | `'all'`    |
+| `slots`                   | `'all' \| 'none'` or one or more `SentenceSlot` | `'all'`    |
+| `include`                 | `string` or `string[]`                          | —          |
+| `count`                   | `number`                                        | `1`        |
+| `realism`                 | `RandRealism`                                   | `'real'`   |
+| `minLength` / `maxLength` | `number`                                        | _language_ |
+| `startsWith`              | `string`                                        | —          |
+| `unique`                  | `boolean`                                       | `false`    |
+| `output`                  | `'value' \| 'detail'`                           | `'value'`  |
+
+`slots` names the parts a shape may carry beside its subject: `object`, `place`, `time`, `manner`, `state`, or `'none'` for a subject and its predicate alone. A language declares its own shapes, so German has no `object` and Russian no `place` — both mark those with a case their nouns would have to change for — and asking for one falls back to the closest shape the language does have.
+
+`include` puts words you name into every sentence. A word the pools hold goes in the phrase it belongs to, and a word from anywhere else is used as a noun.
+
 ## Decorators
 
 `randSuffix`, `randPrefix` and `randModifier` attach something to a string you already have, rather than generating one. They take anything, not just this library's output, which is why none of them is an option on a generator — and each of them works with no value at all, handing back the thing it would have attached.
@@ -193,6 +241,7 @@ import {
 	nameSupportsMiddleName,
 	nameSupportsRoman,
 	nicknameLengthRange,
+	sentenceLengthRange,
 	wordLengthRange,
 	NAME_LANGUAGES,
 	WORD_THEMES
@@ -203,10 +252,11 @@ nameLengthRange('en', true, true); // [12, 24]
 nameSupportsMiddleName('ko'); // false
 nameSupportsRoman('en'); // false
 nicknameLengthRange('ko'); // [1, 13]
+sentenceLengthRange('ko'); // [6, 41]
 wordLengthRange('ko'); // [1, 4]
 ```
 
-`NAME_LANGUAGES`, `WORD_LANGUAGES` and `WORD_THEMES` list what the generators accept; `RAND_COUNT_MAX`, `RAND_LENGTH_MIN` / `_MAX`, `AFFIX_LENGTH_DEFAULT` / `_MAX`, `AFFIX_SEPARATOR_DEFAULT` and `AFFIX_CHARSET` are the bounds and defaults every option is clamped to.
+`NAME_LANGUAGES`, `WORD_LANGUAGES` and `WORD_THEMES` list what the generators accept; `RAND_COUNT_MAX`, `RAND_LENGTH_MIN` / `_MAX`, `RAND_SENTENCE_LENGTH_MAX`, `AFFIX_LENGTH_DEFAULT` / `_MAX`, `AFFIX_SEPARATOR_DEFAULT` and `AFFIX_CHARSET` are the bounds and defaults every option is clamped to.
 
 ## Development
 

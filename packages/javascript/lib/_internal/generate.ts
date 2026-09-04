@@ -48,15 +48,23 @@ export function resolveLength(value?: number): number | undefined {
 	return value === undefined ? undefined : Math.floor(value);
 }
 
-/** A caller's length bounds against a natural range, clamped to what is allowed. */
+/**
+ * A caller's length bounds against a natural range, clamped to what is allowed.
+ *
+ * `ceiling` is the highest bound the generator will serve, and only
+ * `randSentence` passes one of its own: a sentence is many words where every
+ * other generator produces at most three, so `RAND_LENGTH_MAX` would cut most of
+ * them in half.
+ */
 export function lengthBounds(
 	min: number | undefined,
 	max: number | undefined,
 	naturalMin: number,
-	naturalMax: number
+	naturalMax: number,
+	ceiling: number = RAND_LENGTH_MAX
 ): [number, number] {
-	const low = clamp(min ?? naturalMin, RAND_LENGTH_MIN, RAND_LENGTH_MAX);
-	const high = clamp(max ?? naturalMax, RAND_LENGTH_MIN, RAND_LENGTH_MAX);
+	const low = clamp(min ?? naturalMin, RAND_LENGTH_MIN, ceiling);
+	const high = clamp(max ?? naturalMax, RAND_LENGTH_MIN, ceiling);
 
 	return [low, Math.max(low, high)];
 }

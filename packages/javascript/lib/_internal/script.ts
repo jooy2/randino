@@ -26,3 +26,38 @@ export function detectLanguage(text: string): WordLanguage {
 
 	return 'en';
 }
+
+// Hangul syllables are composed as (initial * 21 + vowel) * 28 + final, so the
+// remainder is the final consonant, and 0 means there is none.
+const HANGUL_BASE = 0xac00;
+const HANGUL_LAST = 0xd7a3;
+const HANGUL_FINALS = 28;
+
+const VOWELS = /[aeiouàáâãäåèéêëìíîïòóôõöùúûüыаеёиоуэюяıəăâêôơư]/;
+
+/**
+ * Whether `text` ends on a consonant, which is what a language whose particles
+ * alternate needs to know: Korean writes `사자가` and `사슴이` for the same
+ * particle, by whether the syllable in front of it closes on one.
+ *
+ * Answered by the script rather than per language. A Hangul syllable carries its
+ * final consonant in its code point; a Latin or Cyrillic word is judged by its
+ * last letter; a script that writes no vowels of its own — Han, kana — has no
+ * answer to give and reports `false`, which is also what its particles need,
+ * since they do not alternate.
+ */
+export function endsWithConsonant(text: string): boolean {
+	const last = text.trim().slice(-1);
+
+	if (!last) {
+		return false;
+	}
+
+	const code = last.codePointAt(0)!;
+
+	if (code >= HANGUL_BASE && code <= HANGUL_LAST) {
+		return (code - HANGUL_BASE) % HANGUL_FINALS !== 0;
+	}
+
+	return /\p{Letter}/u.test(last) && !VOWELS.test(last.toLowerCase());
+}

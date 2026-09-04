@@ -284,3 +284,95 @@ export interface NicknameDetail {
 	 */
 	theme: WordTheme | null;
 }
+
+/**
+ * What one phrase does in a sentence:
+ * - `subject`: who or what the sentence is about (`검은 고양이가`).
+ * - `verb`: what the subject does (`잠잔다`).
+ * - `object`: what it does it to (`사과를`).
+ * - `state`: what it is like, where the sentence has no verb at all (`파랗다`).
+ * - `place`: where it happens (`숲에서`).
+ * - `time`: when (`새벽에`).
+ * - `manner`: how (`조용히`).
+ *
+ * A sentence is headed by a `verb` or by a `state`, never by both.
+ */
+export type SentenceSlot = 'subject' | 'verb' | 'object' | 'state' | 'place' | 'time' | 'manner';
+
+/**
+ * Which shapes a sentence may take, named by the parts they carry beside the
+ * subject. A shape qualifies when it uses at least one of them, the same way
+ * `WordSlotOption` reads for a nickname: an array is a set to draw from rather
+ * than a list every shape has to satisfy.
+ *
+ * `'none'` asks for the bare subject and its predicate, and `'all'` — the
+ * default — leaves the shape to the language's own frame weights.
+ */
+export type SentenceSlotOption = SentenceSlot | readonly SentenceSlot[] | 'all' | 'none';
+
+/**
+ * How much a sentence says, which is the closest thing it has to an expected
+ * length:
+ * - `simple`: a subject and its predicate (`사자가 달린다`).
+ * - `detailed`: one phrase more (`사자가 숲에서 달린다`).
+ * - `complex`: two or more (`용감한 사자가 새벽에 숲에서 달린다`).
+ *
+ * `minLength` and `maxLength` bound the characters; this bounds the parts, which
+ * is what a caller usually means by a short or a long sentence.
+ */
+export type SentenceShape = 'simple' | 'detailed' | 'complex';
+
+/** `'all'` leaves the shape to the language's own frame weights. */
+export type SentenceShapeOption = SentenceShape | 'all';
+
+export interface RandSentenceOptions extends RandCommonOptions {
+	/** Language of the generated sentences. `'all'` mixes every language. Default `'all'`. */
+	language?: WordLanguageOption;
+	/** What the sentence's subject is about. Default `'all'`. */
+	theme?: WordThemeOption;
+	/** How much the sentence says. Default `'all'`. */
+	shape?: SentenceShapeOption;
+	/**
+	 * Which shapes the sentences may take, by the parts they carry beside the
+	 * subject. Default `'all'`.
+	 *
+	 * A language declares its own shapes, so not every one of them can answer
+	 * every request — German has no `object` shape, because an accusative noun
+	 * phrase needs a case its articles would have to carry. Asking for one it
+	 * does not have falls back to the closest shape it does, and with
+	 * `language: 'all'` the languages that can answer are preferred.
+	 */
+	slots?: SentenceSlotOption;
+	/**
+	 * Words the sentence has to contain, each at least once. A word the language's
+	 * pools hold is put in the phrase it belongs to, so `include: '사자'` makes it
+	 * the subject and `include: '달린다'` makes it the verb; a word from anywhere
+	 * else is used as a noun.
+	 *
+	 * A sentence has room for as many of them as it has phrases, so asking for
+	 * more words than the longest shape can carry places what fits and drops the
+	 * rest.
+	 */
+	include?: string | readonly string[];
+}
+
+/** A generated sentence with the pieces it was built from. */
+export interface SentenceDetail {
+	/** The finished sentence, punctuation and all. */
+	sentence: string;
+	/**
+	 * The phrases the sentence is made of, in order — a phrase and its modifier,
+	 * without the particle or preposition that marks it. So `검은 고양이가 잠잔다`
+	 * reports `['검은 고양이', '잠잔다']`.
+	 */
+	phrases: string[];
+	/** What each phrase does in the sentence, at the same index as `phrases`. */
+	slots: SentenceSlot[];
+	language: WordLanguage;
+	/**
+	 * Theme the sentence's subject belongs to, or `null` when that word is not one
+	 * the generator knows, which happens when it was invented or was handed in
+	 * through `include`.
+	 */
+	theme: WordTheme | null;
+}

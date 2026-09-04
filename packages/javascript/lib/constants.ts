@@ -15,3 +15,11 @@ export const RAND_LENGTH_MIN = 1;
 
 /** Upper bound for `minLength` / `maxLength` on every generator, in characters. */
 export const RAND_LENGTH_MAX = 40;
+
+/**
+ * Upper bound for `minLength` / `maxLength` on `randSentence`, in characters.
+ * Its own number rather than `RAND_LENGTH_MAX`, because a sentence is many words
+ * and their particles where a name, a word and a nickname are at most three — a
+ * ceiling of 40 would cut most sentences of every language in half.
+ */
+export const RAND_SENTENCE_LENGTH_MAX = 200;
