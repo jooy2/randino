@@ -21,7 +21,7 @@ Everything here is about `randSentence`. It shipped in the vNext section of the 
 - [ ] E. Dialogue and thought, in the language's own quotation marks
 - [ ] F. Politeness, which is mostly a Korean question
 - [ ] G. Numbers, counters and amounts of money
-- [ ] H. An invented noun has no gender, so two languages write no article at all
+- [x] H. An invented noun has no gender, so two languages write no article at all
 
 ---
 
@@ -129,15 +129,17 @@ Scope it at the marks. A speech tag — `…라고 그는 말했다` — needs a
 The number itself should be drawn from a range that reads naturally: a handful of apples, a large sum of money. One range per class is too fine; one per `numeral` block is too coarse. Two ranges, a small one for counted things and a large one for money, is probably right.
 
 
-## H. An invented noun has no gender, so two languages write no article at all
+## H. An invented noun has no gender, so two languages write no article at all — done
 
-`randSentence({ language: 'es', realism: 'invented' })` writes `Hoy, nuedeiguion tiembla.` where it should write `Hoy, el nuedeiguion tiembla.`, and `Chauquuel denso` where the adjective should agree with whatever gender the noun is taken to have. Italian does the same. German writes the article, because it declares a rule under `n` that the lookup falls back to, but its adjective keeps the base form — `Ein blau …` rather than `Ein blaues …`.
+`randSentence({ language: 'es', realism: 'invented' })` wrote `Hoy, nuedeiguion tiembla.` with no article at all, and `Chauquuel denso` with the adjective in whatever form the pool stored. Italian did the same; German wrote its article, because it declares a rule under `n` that the lookup falls back to, but kept the base adjective — `Ein blau …`.
 
-The cause is one line: gender is read out of `nounGender`, which only holds the words in the pools. An invented word is in none of them, so `articleFor` finds no rule and `agree` hands the word straight back. Spanish and Italian declare their articles under `m` and `f` alone, and there is no `n` to fall back to.
+`genderRules` is what a language now says about a word it has never seen, in the same ordered `[ending, gender]` shape `agreement` and `articles` already have. Spanish reads `-a`, `-ión`, `-dad`, `-tad`, `-umbre` and `-triz` as feminine; Italian `-a`, `-zione` and `-tà`; Russian `-а` / `-я` and `-о` / `-е`; German the four suffixes that are predictable, and everything else as masculine. `randModifier` reads them too, so `randModifier('casa', { language: 'es' })` is `casa cálida`.
 
-The fix is data, in the same shape `agreement` and `articles` already have: `genderRules`, an ordered list of `[ending, gender]` that says what gender a word of that shape is taken to be. Spanish reads `-a`, `-ión` and `-dad` as feminine and everything else as masculine; Italian reads `-a`; Russian reads `-а` / `-я` and `-о` / `-е`. German gender is not predictable from the ending, but `-ung`, `-heit`, `-keit` and `-schaft` are, and a made-up word that matches none of them can be masculine — what matters for a word nobody has seen before is that the article and the adjective agree with each other.
+Two more things turned up while doing it, and both are fixed:
 
-Decide while doing it whether `randModifier` should read the same rules. It documents that a value from outside the pools gets the base form back, and that would change.
+- An invented word was not written the way its pool is. German capitalizes its nouns and nothing else, so it writes them capitalized in the pool rather than setting `capitalize` — and `drawWord` only ever consulted `capitalize`, so `randWord({ language: 'de', realism: 'invented' })` came back `mütert` beside the `Klugheit` of the pools. `poolCapitalizes` reads it off the pool, the way `modifierFollows` reads a word order off the frames.
+- An invented word was rarely the length it was asked for. See A.
+
 
 ---
 
