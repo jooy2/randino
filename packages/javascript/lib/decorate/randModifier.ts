@@ -2,7 +2,13 @@ import { drawLanguage, resolveRealism } from '../_internal/generate.js';
 import { detectLanguage } from '../_internal/script.js';
 import type { RandModifierOptions } from '../_types/global.js';
 import { WORD_DATA, WORD_LANGUAGES } from '../word/data/index.js';
-import { drawWord, modifierFollows, modifiersOf, poolBounds } from '../word/wordGenerator.js';
+import {
+	agree,
+	drawWord,
+	modifierFollows,
+	modifiersOf,
+	poolBounds
+} from '../word/wordGenerator.js';
 import { firstArgument } from './attach.js';
 
 /** Draw one modifier, the separator to use, and which side of the value it goes. */
@@ -16,7 +22,12 @@ function draw(value: string | undefined, options: RandModifierOptions): [string,
 	const [min, max] = poolBounds(pool);
 	const { word } = drawWord(data, pool, resolveRealism(options.realism), min, max, '');
 
-	return [word, options.separator ?? data.joiner, modifierFollows(data)];
+	// A value the language knows is a noun whose gender it can look up, so the
+	// modifier lands in the form that goes beside it. A value from anywhere else
+	// has no gender to agree with, and `agree` hands the base form back.
+	const gender = value === undefined ? undefined : data.nounGender?.[value];
+
+	return [agree(data, word, gender), options.separator ?? data.joiner, modifierFollows(data)];
 }
 
 /**

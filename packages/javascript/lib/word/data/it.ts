@@ -226,8 +226,8 @@ const NOUNS = taggedNouns({
 		lentiggine:f fossetta:f cicatrice:f livido:m callo:m
 	`,
 	clothing: `
-		cappello:m scarpa:f guanto:m sciarpa:f occhiali:m cappotto:m giaccone:m giacca:f camicia:f
-		blusa:f tunica:f pantalone:m jeans:m calzoncino:m gonna:f abito:m gilet:m cardigan:m
+		cappello:m scarpa:f guanto:m sciarpa:f occhiali:p cappotto:m giaccone:m giacca:f camicia:f
+		blusa:f tunica:f pantalone:m jeans:p calzoncino:m gonna:f abito:m gilet:m cardigan:m
 		maglione:m felpa:f calzino:m calza:f biancheria:f pigiama:m grembiule:m bandana:f
 		cravatta:f farfallino:m cintura:f fascia:f scarpetta:f mocassino:m stivale:m divisa:f
 		costume:m vestaglia:f mantello:m poncho:m impermeabile:m giubbotto:m parka:m muta:f tuta:f
@@ -288,7 +288,15 @@ export const IT: WordLanguageData = {
 	// one. Only `-o` changes; an `-e` modifier such as `grande` is the same beside
 	// either gender and matches no rule.
 	agreement: {
-		f: [['o', 'a']]
+		f: [['o', 'a']],
+		p: [
+			['o', 'i'],
+			['e', 'i']
+		],
+		fp: [
+			['o', 'e'],
+			['e', 'i']
+		]
 	},
 	// Italian puts the modifier after the noun (`gatto azzurro`), which is also
 	// what lets it agree: the noun is drawn first, so its gender is known. There

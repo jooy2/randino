@@ -24,6 +24,16 @@ enum WordGender {
 
   /// Neuter.
   n,
+
+  /// The language's default plural, for a noun that has no singular at all
+  /// (`ножницы`, `Jeans`). Where the plural also inflects for gender this is
+  /// the masculine one and [fp] is the feminine; Russian and German plurals are
+  /// the same whatever the gender, so those two only ever use this.
+  p,
+
+  /// Feminine plural, in a language whose plural inflects for gender: Spanish
+  /// `gafas doradas` beside `celos dorados`.
+  fp,
 }
 
 /// How a modifier written in its base form changes to agree with a noun.

@@ -112,6 +112,50 @@ rand_modifier("고양이", language="en")  # 'Misty고양이'
 
 값이 없으면 읽을 문자 체계도 없으므로, 언어를 지정하지 않는 한 모든 언어가 대상이 됩니다.
 
+## 아는 단어에는 일치한 수식어가 붙습니다 {#a-word-the-language-knows-gets-an-agreeing-modifier}
+
+수식어가 명사 옆에서 모양을 바꾸는 언어라면 `randModifier`는 값을 그 언어의 단어 풀에서 찾습니다. 찾은 단어는 성을 가지고 있으므로 수식어가 거기에 맞는 형태로 나옵니다. 풀에 없는 단어는 맞출 성이 없으니 수식어가 기본형 그대로 붙습니다.
+
+단수형이 아예 없는 명사(`ножницы`, `gafas`, `Jeans`)도 같은 이유로 복수 태그를 답니다. 그래서 그 옆의 수식어도 복수형입니다.
+
+::: lang js
+
+```javascript
+randModifier('luna', { language: 'es' }); // 'luna dorada'
+randModifier('gato', { language: 'es' }); // 'gato dorado'
+randModifier('gafas', { language: 'es' }); // 'gafas doradas'
+randModifier('Katze', { language: 'de' }); // 'blaue Katze'
+randModifier('Zzyzx', { language: 'es' }); // 'Zzyzx dorado' — 모르는 단어
+```
+
+:::
+
+::: lang dart
+
+```dart
+randModifier(value: 'luna', language: WordLanguage.es); // 'luna dorada'
+randModifier(value: 'gato', language: WordLanguage.es); // 'gato dorado'
+randModifier(value: 'gafas', language: WordLanguage.es); // 'gafas doradas'
+randModifier(value: 'Katze', language: WordLanguage.de); // 'blaue Katze'
+randModifier(value: 'Zzyzx', language: WordLanguage.es); // 'Zzyzx dorado'
+```
+
+:::
+
+::: lang py
+
+```python
+rand_modifier("luna", language="es")  # 'luna dorada'
+rand_modifier("gato", language="es")  # 'gato dorado'
+rand_modifier("gafas", language="es")  # 'gafas doradas'
+rand_modifier("Katze", language="de")  # 'blaue Katze'
+rand_modifier("Zzyzx", language="es")  # 'Zzyzx dorado' — 모르는 단어
+```
+
+:::
+
+수식어가 모양을 바꾸지 않는 `ko`, `en`, `ja`, `zh`, `vi`는 영향이 없습니다. 맞출 것이 없으니 어떤 값에든 어떤 수식어든 붙습니다.
+
 ## 값마다 새로 뽑은 수식어 {#a-fresh-modifier-for-every-value}
 
 한 번 뽑아 전체에 쓰지 않습니다. [`randSuffix`](./rand-suffix)가 값마다 토큰을 뽑는 것과 같습니다. 배열을 넘길 이유가 바로 이것입니다.

@@ -16,10 +16,15 @@ from randino._types import WordTheme
 WordPool = tuple[str, ...]
 """A pool of whole words."""
 
-WordGender = Literal["m", "f", "n"]
-"""The gender a noun carries in a language whose modifiers agree with it.
+WordGender = Literal["m", "f", "n", "p", "fp"]
+"""The form a modifier takes beside a noun, where modifiers agree with it.
 
 Only those languages tag their nouns; the rest leave the lookup out entirely.
+`p` is for a noun that has no singular at all (`ножницы`, `Jeans`), which a
+singular modifier cannot stand beside. It means the language's default plural, so
+a language whose plural also inflects for gender writes the other one as `fp` —
+Spanish `gafas doradas` beside `celos dorados`. Russian and German plurals are
+the same whatever the gender, so those two only ever use `p`.
 """
 
 WordAgreement = Mapping[WordGender, tuple[tuple[str, str], ...]]

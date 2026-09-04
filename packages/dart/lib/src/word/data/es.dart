@@ -221,7 +221,7 @@ final TaggedNouns _nouns = taggedNouns(<WordTheme, String>{
     serenidad:f calma:f sosiego:m confianza:f duda:f sospecha:f preocupación:f
     ansiedad:f pavor:m terror:m pánico:m furia:f rabia:f enojo:m fastidio:m
     aburrimiento:m apatía:f entusiasmo:m fervor:m ardor:m emoción:f ilusión:f coraje:m
-    valentía:f timidez:f vergüenza:f culpa:f orgullo:m envidia:f celos:m codicia:f
+    valentía:f timidez:f vergüenza:f culpa:f orgullo:m envidia:f celos:p codicia:f
     ánimo:m humor:m capricho:m
   ''',
   WordTheme.body: r'''
@@ -237,7 +237,7 @@ final TaggedNouns _nouns = taggedNouns(<WordTheme, String>{
     cicatriz:f moretón:m ampolla:f callo:m
   ''',
   WordTheme.clothing: r'''
-    sombrero:m zapato:m guante:m bufanda:f gafas:f abrigo:m gabán:m chaqueta:f
+    sombrero:m zapato:m guante:m bufanda:f gafas:fp abrigo:m gabán:m chaqueta:f
     americana:f camisa:f blusa:f túnica:f pantalón:m vaquero:m short:m falda:f vestido:m
     chaleco:m rebeca:f jersey:m sudadera:f calcetín:m media:f pijama:m delantal:m
     pañuelo:m corbata:f pajarita:f cinturón:m faja:f mocasín:m bota:f pantufla:f
@@ -308,6 +308,30 @@ final WordLanguageData es = WordLanguageData(
       <String>['ín', 'ina'],
       <String>['án', 'ana'],
       <String>['o', 'a'],
+    ],
+    WordGender.p: <List<String>>[
+      <String>['z', 'ces'],
+      <String>['or', 'ores'],
+      <String>['ón', 'ones'],
+      <String>['és', 'eses'],
+      <String>['ín', 'ines'],
+      <String>['án', 'anes'],
+      <String>['o', 'os'],
+      <String>['a', 'as'],
+      <String>['e', 'es'],
+      <String>['', 'es'],
+    ],
+    WordGender.fp: <List<String>>[
+      <String>['z', 'ces'],
+      <String>['or', 'oras'],
+      <String>['ón', 'onas'],
+      <String>['és', 'esas'],
+      <String>['ín', 'inas'],
+      <String>['án', 'anas'],
+      <String>['o', 'as'],
+      <String>['a', 'as'],
+      <String>['e', 'es'],
+      <String>['', 'es'],
     ],
   },
   // Spanish puts the modifier after the noun (`gato azul`), which is also what

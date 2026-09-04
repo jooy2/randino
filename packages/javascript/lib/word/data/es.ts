@@ -206,7 +206,7 @@ const NOUNS = taggedNouns({
 		templanza:f integridad:f sinceridad:f asombro:m reverencia:f serenidad:f calma:f sosiego:m
 		confianza:f duda:f sospecha:f preocupación:f ansiedad:f pavor:m terror:m pánico:m furia:f
 		rabia:f enojo:m fastidio:m aburrimiento:m apatía:f entusiasmo:m fervor:m ardor:m emoción:f
-		ilusión:f coraje:m valentía:f timidez:f vergüenza:f culpa:f orgullo:m envidia:f celos:m
+		ilusión:f coraje:m valentía:f timidez:f vergüenza:f culpa:f orgullo:m envidia:f celos:p
 		codicia:f ánimo:m humor:m capricho:m
 	`,
 	body: `
@@ -221,7 +221,7 @@ const NOUNS = taggedNouns({
 		arruga:f peca:f hoyuelo:m cicatriz:f moretón:m ampolla:f callo:m
 	`,
 	clothing: `
-		sombrero:m zapato:m guante:m bufanda:f gafas:f abrigo:m gabán:m chaqueta:f americana:f
+		sombrero:m zapato:m guante:m bufanda:f gafas:fp abrigo:m gabán:m chaqueta:f americana:f
 		camisa:f blusa:f túnica:f pantalón:m vaquero:m short:m falda:f vestido:m chaleco:m
 		rebeca:f jersey:m sudadera:f calcetín:m media:f pijama:m delantal:m pañuelo:m corbata:f
 		pajarita:f cinturón:m faja:f mocasín:m bota:f pantufla:f uniforme:m disfraz:m bata:f
@@ -288,6 +288,30 @@ export const ES: WordLanguageData = {
 			['ín', 'ina'],
 			['án', 'ana'],
 			['o', 'a']
+		],
+		p: [
+			['z', 'ces'],
+			['or', 'ores'],
+			['ón', 'ones'],
+			['és', 'eses'],
+			['ín', 'ines'],
+			['án', 'anes'],
+			['o', 'os'],
+			['a', 'as'],
+			['e', 'es'],
+			['', 'es']
+		],
+		fp: [
+			['z', 'ces'],
+			['or', 'oras'],
+			['ón', 'onas'],
+			['és', 'esas'],
+			['ín', 'inas'],
+			['án', 'anas'],
+			['o', 'as'],
+			['a', 'as'],
+			['e', 'es'],
+			['', 'es']
 		]
 	},
 	// Spanish puts the modifier after the noun (`gato azul`), which is also what

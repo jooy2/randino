@@ -26,6 +26,7 @@ from randino import (
 from randino.name.data import NAME_DATA
 from randino.word._generator import agree, modifiers_of
 from randino.word.data import LOOSE_THEMES, WORD_DATA
+from randino.word.data._types import WordGender
 from tests.test_name import pool_natives
 
 SAMPLE = 60
@@ -225,6 +226,37 @@ def test_a_word_belongs_to_exactly_one_theme() -> None:
 
                 assert held is None, f"{language}: {word} is in both {held} and {theme}"
                 owner[word] = theme
+
+
+def test_a_noun_with_no_singular_takes_a_plural_modifier() -> None:
+    # `ножницы` and `Jeans` have no singular for a singular modifier to agree
+    # with, so they are tagged `p` — the language's default plural — and `fp`
+    # where the plural inflects for gender as well.
+    forms: list[tuple[WordLanguage, str, WordGender, str]] = [
+        ("ru", "синий", "p", "синие"),
+        ("ru", "смеющийся", "p", "смеющиеся"),
+        ("ru", "большой", "p", "большие"),
+        ("de", "blau", "p", "blaue"),
+        ("de", "edel", "p", "edle"),
+        ("es", "dorado", "p", "dorados"),
+        ("es", "dorado", "fp", "doradas"),
+        ("es", "azul", "p", "azules"),
+        ("it", "azzurro", "p", "azzurri"),
+        ("it", "verde", "p", "verdi"),
+    ]
+
+    for language, word, gender, expected in forms:
+        assert agree(WORD_DATA[language], word, gender) == expected, word
+
+    # A modifier is written in the singular, so a language that tags a noun
+    # plural must have the rules for it. The singular forms need no such check:
+    # the base form is one of them, and Spanish lists only `f` for that reason.
+    for language in WORD_LANGUAGES:
+        data = WORD_DATA[language]
+        plural = [g for g in (data.noun_gender or {}).values() if g in ("p", "fp")]
+
+        for gender in plural:
+            assert (data.agreement or {}).get(gender), f"{language}: no rules for {gender}"
 
 
 def test_nicknames_stay_inside_the_requested_length_range() -> None:

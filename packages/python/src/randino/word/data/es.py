@@ -228,7 +228,7 @@ _POOLS, _GENDER = tagged_nouns(
         sospecha:f preocupación:f ansiedad:f pavor:m terror:m pánico:m furia:f rabia:f
         enojo:m fastidio:m aburrimiento:m apatía:f entusiasmo:m fervor:m ardor:m
         emoción:f ilusión:f coraje:m valentía:f timidez:f vergüenza:f culpa:f orgullo:m
-        envidia:f celos:m codicia:f ánimo:m humor:m capricho:m
+        envidia:f celos:p codicia:f ánimo:m humor:m capricho:m
     """,
         "body": """
         cabeza:f frente:f ceja:f pestaña:f párpado:m nariz:f mejilla:f barbilla:f
@@ -243,7 +243,7 @@ _POOLS, _GENDER = tagged_nouns(
         peca:f hoyuelo:m cicatriz:f moretón:m ampolla:f callo:m
     """,
         "clothing": """
-        sombrero:m zapato:m guante:m bufanda:f gafas:f abrigo:m gabán:m chaqueta:f
+        sombrero:m zapato:m guante:m bufanda:f gafas:fp abrigo:m gabán:m chaqueta:f
         americana:f camisa:f blusa:f túnica:f pantalón:m vaquero:m short:m falda:f
         vestido:m chaleco:m rebeca:f jersey:m sudadera:f calcetín:m media:f pijama:m
         delantal:m pañuelo:m corbata:f pajarita:f cinturón:m faja:f mocasín:m bota:f
@@ -315,6 +315,30 @@ ES = WordLanguageData(
             ("ín", "ina"),
             ("án", "ana"),
             ("o", "a"),
+        ),
+        "p": (
+            ("z", "ces"),
+            ("or", "ores"),
+            ("ón", "ones"),
+            ("és", "eses"),
+            ("ín", "ines"),
+            ("án", "anes"),
+            ("o", "os"),
+            ("a", "as"),
+            ("e", "es"),
+            ("", "es"),
+        ),
+        "fp": (
+            ("z", "ces"),
+            ("or", "oras"),
+            ("ón", "onas"),
+            ("és", "esas"),
+            ("ín", "inas"),
+            ("án", "anas"),
+            ("o", "as"),
+            ("a", "as"),
+            ("e", "es"),
+            ("", "es"),
         ),
     },
     # Spanish puts the modifier after the noun (`gato azul`), which is also what

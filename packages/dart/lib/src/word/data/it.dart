@@ -240,8 +240,8 @@ final TaggedNouns _nouns = taggedNouns(<WordTheme, String>{
     cicatrice:f livido:m callo:m
   ''',
   WordTheme.clothing: r'''
-    cappello:m scarpa:f guanto:m sciarpa:f occhiali:m cappotto:m giaccone:m giacca:f
-    camicia:f blusa:f tunica:f pantalone:m jeans:m calzoncino:m gonna:f abito:m gilet:m
+    cappello:m scarpa:f guanto:m sciarpa:f occhiali:p cappotto:m giaccone:m giacca:f
+    camicia:f blusa:f tunica:f pantalone:m jeans:p calzoncino:m gonna:f abito:m gilet:m
     cardigan:m maglione:m felpa:f calzino:m calza:f biancheria:f pigiama:m grembiule:m
     bandana:f cravatta:f farfallino:m cintura:f fascia:f scarpetta:f mocassino:m
     stivale:m divisa:f costume:m vestaglia:f mantello:m poncho:m impermeabile:m
@@ -308,6 +308,14 @@ final WordLanguageData it = WordLanguageData(
   agreement: const <WordGender, List<List<String>>>{
     WordGender.f: <List<String>>[
       <String>['o', 'a'],
+    ],
+    WordGender.p: <List<String>>[
+      <String>['o', 'i'],
+      <String>['e', 'i'],
+    ],
+    WordGender.fp: <List<String>>[
+      <String>['o', 'e'],
+      <String>['e', 'i'],
     ],
   },
   // Italian puts the modifier after the noun (`gatto azzurro`), which is also

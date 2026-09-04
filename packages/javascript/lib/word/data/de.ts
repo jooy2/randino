@@ -215,7 +215,7 @@ const NOUNS = taggedNouns({
 	`,
 	clothing: `
 		Hut:m Schuh:m Handschuh:m Schal:m Brille:f Mantel:m Jacke:f Hemd:n Bluse:f Kittel:m Hose:f
-		Jeans:f Rock:m Kleid:n Weste:f Strickjacke:f Pullover:m Kapuzenpulli:m Socke:f Strumpf:m
+		Jeans:p Rock:m Kleid:n Weste:f Strickjacke:f Pullover:m Kapuzenpulli:m Socke:f Strumpf:m
 		Unterwäsche:f Schlafanzug:m Schürze:f Kopftuch:n Krawatte:f Gürtel:m Schärpe:f Stiefel:m
 		Turnschuh:m Pantoffel:m Uniform:f Kostüm:n Robe:f Umhang:m Poncho:m Regenmantel:m Anorak:m
 		Parka:m Badeanzug:m Taucheranzug:m Overall:m Ärmel:m Kragen:m Manschette:f Saum:m Futter:n
@@ -276,16 +276,32 @@ export const DE: WordLanguageData = {
 	// a stem that already ends in `-e` from doubling it (`leise`, not `leisee`).
 	agreement: {
 		m: [
+			['el', 'ler'],
+			['auer', 'aurer'],
+
 			['e', 'er'],
 			['', 'er']
 		],
 		f: [
+			['el', 'le'],
+			['auer', 'aure'],
+
 			['e', 'e'],
 			['', 'e']
 		],
 		n: [
+			['el', 'les'],
+			['auer', 'aures'],
+
 			['e', 'es'],
 			['', 'es']
+		],
+		p: [
+			['el', 'le'],
+			['auer', 'aure'],
+
+			['e', 'e'],
+			['', 'e']
 		]
 	},
 	// German puts the modifier in front of the noun, so the noun is drawn ahead of

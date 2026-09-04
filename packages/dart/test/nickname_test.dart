@@ -275,6 +275,46 @@ void main() {
       }
     });
 
+    test('a noun with no singular takes a plural modifier', () {
+      // `ножницы` and `Jeans` have no singular for a singular modifier to
+      // agree with, so they are tagged `p` — the language's default plural —
+      // and `fp` where the plural inflects for gender as well.
+      const forms = <(WordLanguage, String, WordGender, String)>[
+        (WordLanguage.ru, 'синий', WordGender.p, 'синие'),
+        (WordLanguage.ru, 'смеющийся', WordGender.p, 'смеющиеся'),
+        (WordLanguage.ru, 'большой', WordGender.p, 'большие'),
+        (WordLanguage.de, 'blau', WordGender.p, 'blaue'),
+        (WordLanguage.de, 'edel', WordGender.p, 'edle'),
+        (WordLanguage.es, 'dorado', WordGender.p, 'dorados'),
+        (WordLanguage.es, 'dorado', WordGender.fp, 'doradas'),
+        (WordLanguage.es, 'azul', WordGender.p, 'azules'),
+        (WordLanguage.it, 'azzurro', WordGender.p, 'azzurri'),
+        (WordLanguage.it, 'verde', WordGender.p, 'verdi'),
+      ];
+
+      for (final (language, word, gender, expected) in forms) {
+        expect(agree(wordData[language]!, word, gender), expected, reason: word);
+      }
+
+      // A modifier is written in the singular, so a language that tags a noun
+      // plural must have the rules for it. The singular forms need no such
+      // check: the base form is one of them, and Spanish lists only `f`.
+      for (final language in wordLanguages) {
+        final data = wordData[language]!;
+        final plural = (data.nounGender ?? const <String, WordGender>{}).values.where(
+          (g) => g == WordGender.p || g == WordGender.fp,
+        );
+
+        for (final gender in plural) {
+          expect(
+            data.agreement?[gender],
+            isNotNull,
+            reason: '$language: no rules for ${gender.name}',
+          );
+        }
+      }
+    });
+
     test('nicknames stay inside the requested length range', () {
       const ranges = <(WordLanguage, int, int)>[
         (WordLanguage.ko, 2, 3),

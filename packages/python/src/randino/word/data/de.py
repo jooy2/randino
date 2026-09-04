@@ -240,7 +240,7 @@ _POOLS, _GENDER = tagged_nouns(
     """,
         "clothing": """
         Hut:m Schuh:m Handschuh:m Schal:m Brille:f Mantel:m Jacke:f Hemd:n Bluse:f
-        Kittel:m Hose:f Jeans:f Rock:m Kleid:n Weste:f Strickjacke:f Pullover:m
+        Kittel:m Hose:f Jeans:p Rock:m Kleid:n Weste:f Strickjacke:f Pullover:m
         Kapuzenpulli:m Socke:f Strumpf:m Unterwäsche:f Schlafanzug:m Schürze:f
         Kopftuch:n Krawatte:f Gürtel:m Schärpe:f Stiefel:m Turnschuh:m Pantoffel:m
         Uniform:f Kostüm:n Robe:f Umhang:m Poncho:m Regenmantel:m Anorak:m Parka:m
@@ -303,9 +303,15 @@ DE = WordLanguageData(
     # German declines the modifier in front of the noun, and the base form is the
     # bare stem: `blau` becomes `blauer Wal`, `blaue Katze`, `blaues Haus`.
     agreement={
-        "m": (("e", "er"), ("", "er")),
-        "f": (("e", "e"), ("", "e")),
-        "n": (("e", "es"), ("", "es")),
+        "m": (("el", "ler"), ("auer", "aurer"), ("e", "er"), ("", "er")),
+        "f": (("el", "le"), ("auer", "aure"), ("e", "e"), ("", "e")),
+        "n": (("el", "les"), ("auer", "aures"), ("e", "es"), ("", "es")),
+        "p": (
+            ("el", "le"),
+            ("auer", "aure"),
+            ("e", "e"),
+            ("", "e"),
+        ),
     },
     # German puts the modifier in front of the noun, so the noun is drawn ahead of
     # its turn. Its nouns are written capitalised, the way German writes them.

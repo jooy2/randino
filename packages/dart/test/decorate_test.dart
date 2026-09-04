@@ -2,6 +2,7 @@ import 'package:randino/randino.dart';
 // The decorating pools are internal, but what `randModifier` attaches has to
 // come out of them, and they are the same pools the nickname generator uses.
 import 'package:randino/src/word/data/index.dart';
+import 'package:randino/src/word/data/types.dart';
 import 'package:randino/src/word/word_generator.dart';
 import 'package:test/test.dart';
 
@@ -113,7 +114,14 @@ void main() {
 
     test('randModifier attaches a real modifier on the side the language uses', () {
       for (final language in wordLanguages) {
-        final modifiers = modifiersOf(wordData[language]!).toSet();
+        final data = wordData[language]!;
+        // A value the language knows carries a gender, and the modifier agrees
+        // with it, so every form of every modifier counts as a real one.
+        final modifiers = <String>{
+          ...modifiersOf(data),
+          for (final form in data.agreement?.keys ?? const <WordGender>[])
+            for (final word in modifiersOf(data)) agree(data, word, form),
+        };
         // Vietnamese and Spanish write `mèo xanh` and `gato azul`, so the modifier
         // lands behind the value. The frames are what say so.
         final follows = modifierFollows(wordData[language]!);

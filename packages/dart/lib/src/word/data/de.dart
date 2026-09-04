@@ -232,7 +232,7 @@ final TaggedNouns _nouns = taggedNouns(<WordTheme, String>{
   ''',
   WordTheme.clothing: r'''
     Hut:m Schuh:m Handschuh:m Schal:m Brille:f Mantel:m Jacke:f Hemd:n Bluse:f Kittel:m
-    Hose:f Jeans:f Rock:m Kleid:n Weste:f Strickjacke:f Pullover:m Kapuzenpulli:m
+    Hose:f Jeans:p Rock:m Kleid:n Weste:f Strickjacke:f Pullover:m Kapuzenpulli:m
     Socke:f Strumpf:m Unterwäsche:f Schlafanzug:m Schürze:f Kopftuch:n Krawatte:f
     Gürtel:m Schärpe:f Stiefel:m Turnschuh:m Pantoffel:m Uniform:f Kostüm:n Robe:f
     Umhang:m Poncho:m Regenmantel:m Anorak:m Parka:m Badeanzug:m Taucheranzug:m
@@ -295,16 +295,31 @@ final WordLanguageData de = WordLanguageData(
   // bare stem: `blau` becomes `blauer Wal`, `blaue Katze`, `blaues Haus`.
   agreement: const <WordGender, List<List<String>>>{
     WordGender.m: <List<String>>[
+      <String>['el', 'ler'],
+      <String>['auer', 'aurer'],
+
       <String>['e', 'er'],
       <String>['', 'er'],
     ],
     WordGender.f: <List<String>>[
+      <String>['el', 'le'],
+      <String>['auer', 'aure'],
+
       <String>['e', 'e'],
       <String>['', 'e'],
     ],
     WordGender.n: <List<String>>[
+      <String>['el', 'les'],
+      <String>['auer', 'aures'],
+
       <String>['e', 'es'],
       <String>['', 'es'],
+    ],
+    WordGender.p: <List<String>>[
+      <String>['el', 'le'],
+      <String>['auer', 'aure'],
+      <String>['e', 'e'],
+      <String>['', 'e'],
     ],
   },
   // German puts the modifier in front of the noun, so the noun is drawn ahead of

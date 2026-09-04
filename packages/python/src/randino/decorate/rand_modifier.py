@@ -5,7 +5,13 @@ from typing import overload
 from randino._internal.generate import draw_language, resolve_realism
 from randino._internal.script import detect_language
 from randino._types import RandRealism, WordLanguageOption
-from randino.word._generator import draw_word, modifier_follows, modifiers_of, pool_bounds
+from randino.word._generator import (
+    agree,
+    draw_word,
+    modifier_follows,
+    modifiers_of,
+    pool_bounds,
+)
 from randino.word.data import WORD_DATA, WORD_LANGUAGES
 
 
@@ -21,8 +27,12 @@ def _draw(
     pool = modifiers_of(data)
     low, high = pool_bounds(pool)
     word, _missed = draw_word(data, pool, resolve_realism(realism), low, high, "")
+    # A value the language knows is a noun whose gender it can look up, so the
+    # modifier lands in the form that goes beside it. A value from anywhere else
+    # has no gender to agree with, and `agree` hands the base form back.
+    gender = None if value is None else (data.noun_gender or {}).get(value)
 
-    return word, data.joiner, modifier_follows(data)
+    return agree(data, word, gender), data.joiner, modifier_follows(data)
 
 
 @overload

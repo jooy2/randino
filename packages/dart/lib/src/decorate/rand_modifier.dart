@@ -22,8 +22,12 @@ import 'package:randino/src/word/word_generator.dart';
   final pool = modifiersOf(data);
   final bounds = poolBounds(pool);
   final drawn = drawWord(data, pool, resolveRealism(realism), bounds.min, bounds.max, '');
+  // A value the language knows is a noun whose gender it can look up, so the
+  // modifier lands in the form that goes beside it. A value from anywhere else
+  // has no gender to agree with, and `agree` hands the base form back.
+  final gender = value == null ? null : data.nounGender?[value];
 
-  return (drawn.word, separator ?? data.joiner, modifierFollows(data));
+  return (agree(data, drawn.word, gender), separator ?? data.joiner, modifierFollows(data));
 }
 
 /// Puts a random modifier in front of [value]: `'사자'` becomes `'멋진사자'`.

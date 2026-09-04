@@ -16,7 +16,8 @@ import type { WordLanguage } from '../dist/index.js';
 // The decorating pools are internal, but what `randModifier` attaches has to
 // come out of them, and they are the same pools the nickname generator uses.
 import { WORD_DATA } from '../dist/word/data/index.js';
-import { modifierFollows } from '../dist/word/wordGenerator.js';
+import { agree, modifierFollows } from '../dist/word/wordGenerator.js';
+import type { WordGender } from '../dist/word/data/types.js';
 
 const SAMPLE = 60;
 
@@ -125,7 +126,14 @@ describe('Decorate', () => {
 
 	it('randModifier attaches a real modifier on the side the language uses', () => {
 		for (const language of WORD_LANGUAGES) {
-			const modifiers = new Set(modifiersOf(language));
+			const data = WORD_DATA[language];
+			// A value the language knows carries a gender, and the modifier agrees
+			// with it, so every form of every modifier counts as a real one.
+			const forms = Object.keys(data.agreement ?? {}) as WordGender[];
+			const modifiers = new Set([
+				...modifiersOf(language),
+				...forms.flatMap((form) => modifiersOf(language).map((word) => agree(data, word, form)))
+			]);
 			// Vietnamese and Spanish write `mèo xanh` and `gato azul`, so the modifier
 			// lands behind the value. The frames are what say so.
 			const follows = modifierFollows(WORD_DATA[language]);

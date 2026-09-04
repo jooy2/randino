@@ -112,6 +112,50 @@ rand_modifier("고양이", language="en")  # 'Misty고양이'
 
 With no value there is no script to read, so every language is in play unless you name one.
 
+## A word the language knows gets an agreeing modifier
+
+In a language whose modifiers change shape beside the noun, `randModifier` looks the value up in that language's pools. A word it finds carries a gender, so the modifier comes back in the form that goes with it; a word from anywhere else has no gender to agree with, and the modifier stays in its base form.
+
+A noun with no singular at all — `ножницы`, `gafas`, `Jeans` — is tagged plural for the same reason, so the modifier beside it is plural too.
+
+::: lang js
+
+```javascript
+randModifier('luna', { language: 'es' }); // 'luna dorada'
+randModifier('gato', { language: 'es' }); // 'gato dorado'
+randModifier('gafas', { language: 'es' }); // 'gafas doradas'
+randModifier('Katze', { language: 'de' }); // 'blaue Katze'
+randModifier('Zzyzx', { language: 'es' }); // 'Zzyzx dorado' — not a word it knows
+```
+
+:::
+
+::: lang dart
+
+```dart
+randModifier(value: 'luna', language: WordLanguage.es); // 'luna dorada'
+randModifier(value: 'gato', language: WordLanguage.es); // 'gato dorado'
+randModifier(value: 'gafas', language: WordLanguage.es); // 'gafas doradas'
+randModifier(value: 'Katze', language: WordLanguage.de); // 'blaue Katze'
+randModifier(value: 'Zzyzx', language: WordLanguage.es); // 'Zzyzx dorado'
+```
+
+:::
+
+::: lang py
+
+```python
+rand_modifier("luna", language="es")  # 'luna dorada'
+rand_modifier("gato", language="es")  # 'gato dorado'
+rand_modifier("gafas", language="es")  # 'gafas doradas'
+rand_modifier("Katze", language="de")  # 'blaue Katze'
+rand_modifier("Zzyzx", language="es")  # 'Zzyzx dorado' — not a word it knows
+```
+
+:::
+
+The six languages whose modifiers do not change shape — `ko`, `en`, `ja`, `zh`, `vi` — are unaffected: there is nothing to agree with, so any value gets any modifier.
+
 ## A fresh modifier for every value
 
 Not one for the batch, the same way [`randSuffix`](./rand-suffix) draws a token per value. That is the whole reason an array is worth passing.

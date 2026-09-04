@@ -260,6 +260,42 @@ describe('Nickname', () => {
 		}
 	});
 
+	it('a noun with no singular takes a plural modifier', () => {
+		// `ножницы` and `Jeans` have no singular for a singular modifier to agree
+		// with, so they are tagged `p` — the language's default plural — and `fp`
+		// where the plural inflects for gender as well.
+		const forms: [WordLanguage, string, WordGender, string][] = [
+			['ru', 'синий', 'p', 'синие'],
+			['ru', 'смеющийся', 'p', 'смеющиеся'],
+			['ru', 'большой', 'p', 'большие'],
+			['de', 'blau', 'p', 'blaue'],
+			['de', 'edel', 'p', 'edle'],
+			['es', 'dorado', 'p', 'dorados'],
+			['es', 'dorado', 'fp', 'doradas'],
+			['es', 'azul', 'p', 'azules'],
+			['it', 'azzurro', 'p', 'azzurri'],
+			['it', 'verde', 'p', 'verdi']
+		];
+
+		for (const [language, word, gender, expected] of forms) {
+			assert.strictEqual(agree(WORD_DATA[language], word, gender), expected, word);
+		}
+
+		// A modifier is written in the singular, so a language that tags a noun
+		// plural must have the rules for it. The singular forms need no such check:
+		// the base form is one of them, and Spanish lists only `f` for that reason.
+		for (const language of WORD_LANGUAGES) {
+			const data = WORD_DATA[language];
+			const plural = Object.values(data.nounGender ?? {}).filter(
+				(gender) => gender === 'p' || gender === 'fp'
+			);
+
+			for (const gender of plural) {
+				assert.ok(data.agreement?.[gender], `${language}: no rules for ${gender}`);
+			}
+		}
+	});
+
 	it('nicknames stay inside the requested length range', () => {
 		const ranges: [WordLanguage, number, number][] = [
 			['ko', 2, 3],

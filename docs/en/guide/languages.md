@@ -99,7 +99,7 @@ The word pools — and so `randWord`, the twenty-five themed generators and `ran
 | `de` | German     | modifier **before**, declining | blauer Wal, blaue Katze    |
 | `ru` | Russian    | modifier **before**, declining | синий кит, синяя рыба      |
 
-Neither word order nor agreement keeps a language out any more. The shapes belong to the language, so Vietnamese writes its own — the modifier behind the noun, the possessed thing in front of its owner. And a language that inflects tags each noun with its gender and lists the endings a modifier changes, so Spanish writes `gato dorado` beside `luna dorada` without either form being stored twice.
+Neither word order nor agreement keeps a language out any more. The shapes belong to the language, so Vietnamese writes its own — the modifier behind the noun, the possessed thing in front of its owner. And a language that inflects tags each noun with its gender and lists the endings a modifier changes, so Spanish writes `gato dorado` beside `luna dorada` without either form being stored twice. A noun with no singular at all — `ножницы`, `gafas`, `Jeans` — is tagged plural instead, because no singular modifier can stand beside it.
 
 Every language the name generator knows now has word pools too, so `language` means the same nine codes on every generator in the package.
 
