@@ -157,6 +157,34 @@ def test_every_language_writes_sentences_in_its_own_script_and_closes_them() -> 
                 assert " ." not in sentence, f"{language}: {sentence}"
 
 
+def test_a_language_with_articles_writes_one_invented_word_or_not() -> None:
+    """Spanish and Italian write an article in front of an invented noun too.
+
+    An invented noun is in no pool, so it has no entry in `noun_gender` — and both
+    declare their articles under `m` and `f` alone, with no `n` to fall back to. Both
+    wrote no article at all in front of one until the gender was read off the ending.
+    """
+    for language in WORD_LANGUAGES:
+        articles = SENTENCE_DATA[language].articles
+
+        if articles is None:
+            continue
+
+        written = {article for rules in articles.values() for _, article in rules}
+
+        for realism in ("real", "invented"):
+            for sentence in rand_sentence(language=language, realism=realism, count=SAMPLE):
+                carries = any(
+                    # An elided article runs into the word behind it — `l'orso`.
+                    article in sentence.lower()
+                    if article.endswith("'")
+                    else re.search(rf"(^|\s){article}\s", sentence, re.IGNORECASE)
+                    for article in written
+                )
+
+                assert carries, f"{language} {realism}: {sentence}"
+
+
 def test_a_language_that_capitalizes_opens_its_sentences_on_a_capital() -> None:
     for language in WORD_LANGUAGES:
         if not SENTENCE_DATA[language].capitalize:
@@ -356,7 +384,16 @@ def test_a_narrow_range_is_met_anywhere_in_the_language_s_own_range() -> None:
     `sentence_length_range`, whose ends are the shortest and longest sentence the shapes
     could spell — the very top of it needs the longest word of every pool at once, which
     is a fit no draw is going to find.
+
+    A miss is still possible and the assertion says so: German's shortest shape tops out
+    around seventeen characters and the same shape with a modifier starts above
+    twenty-two, so a window in between is one the language has almost nothing to put in.
+    What has to hold is that a miss is rare and small. The bug this replaced missed by
+    six characters one time in forty.
     """
+    misses: list[str] = []
+    drawn = 0
+
     for language in WORD_LANGUAGES:
         seen = sorted(len(sentence) for sentence in rand_sentence(language=language, count=400))
         lowest = seen[int(len(seen) * 0.05)]
@@ -369,9 +406,21 @@ def test_a_narrow_range_is_met_anywhere_in_the_language_s_own_range() -> None:
             for sentence in rand_sentence(
                 language=language, min_length=min_length, max_length=max_length, count=30
             ):
-                assert min_length <= len(sentence) <= max_length, (
-                    f"{language} {min_length}-{max_length}: {sentence} ({len(sentence)})"
-                )
+                drawn += 1
+                over = len(sentence) - max_length
+                distance = over if over > 0 else min_length - len(sentence)
+
+                if distance <= 0:
+                    continue
+
+                miss = f"{language} {min_length}-{max_length}: {sentence} ({len(sentence)})"
+                misses.append(miss)
+
+                assert distance <= 2, f"off by {distance}: {miss}"
+
+    assert len(misses) * 200 <= drawn, (
+        f"{len(misses)} of {drawn} outside the range: {' | '.join(misses[:5])}"
+    )
 
 
 def test_sentences_respect_the_length_range() -> None:

@@ -58,6 +58,7 @@ from randino.sentence.data._types import (
 from randino.word._generator import (
     agree,
     draw_word,
+    gender_of,
     modifier_follows,
     pick_word,
     pool_bounds,
@@ -775,9 +776,7 @@ def _noun_phrase(
         lexicon,
         draw_word(lexicon, pool, invent, min(noun_low, noun_high), noun_high, prefix).word,
     )
-    gender = (
-        None if lexicon.noun_gender is None else lexicon.noun_gender.get(_as_pool(lexicon, drawn))
-    )
+    gender = gender_of(lexicon, _as_pool(lexicon, drawn))
     parts = [drawn]
 
     if modify:
@@ -1050,11 +1049,7 @@ def _compose(
 
             if part.slot == "subject":
                 subject = built
-                gender = (
-                    None
-                    if lexicon.noun_gender is None
-                    else lexicon.noun_gender.get(_as_pool(lexicon, built.noun))
-                )
+                gender = gender_of(lexicon, _as_pool(lexicon, built.noun))
         else:
             phrase = _predicate_for(
                 part.slot,

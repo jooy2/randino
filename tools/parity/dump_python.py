@@ -61,6 +61,11 @@ word = {
         "actions": listed(data.actions),
         "parts": listed(data.parts),
         "nounGender": None if data.noun_gender is None else dict(data.noun_gender),
+        "genderRules": (
+            None
+            if data.gender_rules is None
+            else [[ending, gender] for ending, gender in data.gender_rules]
+        ),
         "agreement": (
             None
             if data.agreement is None

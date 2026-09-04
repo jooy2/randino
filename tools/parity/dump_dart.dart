@@ -56,6 +56,11 @@ void main() {
             : <String, Object?>{
                 for (final g in entry.value.nounGender!.entries) g.key: g.value.name,
               },
+        'genderRules': entry.value.genderRules == null
+            ? null
+            : <Object?>[
+                for (final rule in entry.value.genderRules!) <String>[rule.$1, rule.$2.name],
+              ],
         'agreement': entry.value.agreement == null
             ? null
             : <String, Object?>{

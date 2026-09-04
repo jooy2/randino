@@ -162,6 +162,20 @@ class WordLanguageData:
     word is still typed once.
     """
 
+    gender_rules: Sequence[tuple[str, WordGender]] | None = None
+    """The gender a word outside the pools is taken to have, read off its ending.
+
+    Ordered `(ending, gender)` rules, first match wins, and `""` matches anything —
+    the same shape `agreement` and a sentence's articles have.
+
+    It exists for the invented words, which are in no pool and so have no entry in
+    `noun_gender`. Without it Spanish and Italian write no article at all in front of
+    one, because they declare their articles under `m` and `f` alone, and every
+    language that inflects gives it the base form of its modifier. A made-up word has
+    no true gender; what matters is that the article and the adjective beside it agree
+    with each other.
+    """
+
     agreement: WordAgreement | None = None
     """How a modifier is reshaped to agree with the noun it sits beside.
 

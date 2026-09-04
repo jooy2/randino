@@ -68,6 +68,9 @@ console.log(
 						actions: list(data.actions),
 						parts: list(data.parts),
 						nounGender: map(data.nounGender),
+						genderRules: data.genderRules
+							? data.genderRules.map((rule) => [...rule])
+							: null,
 						agreement: data.agreement
 							? Object.fromEntries(
 									Object.entries(data.agreement).map(([gender, rules]) => [

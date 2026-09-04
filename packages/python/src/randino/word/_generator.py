@@ -173,6 +173,67 @@ def themes_of(theme: WordThemeOption) -> tuple[WordTheme, ...]:
     return WORD_THEMES if theme == "all" else (theme,)
 
 
+def gender_of(data: WordLanguageData, word: str) -> WordGender | None:
+    """The gender a word is taken to have, for languages whose articles and modifiers ask.
+
+    The pools carry it word by word, and an invented word is in none of them — so a word
+    the pools do not hold is read by its ending instead, which is what the language
+    itself does. Without that, Spanish and Italian write no article at all in front of
+    an invented noun (they declare theirs under `m` and `f` alone) and every language
+    that inflects hands back the base form of its modifier.
+
+    A made-up word has no true gender. What this buys is an article and an adjective
+    that agree with each other.
+
+    Args:
+        data: The language's dataset.
+        word: The word to judge.
+
+    Returns:
+        Its gender, or None for a language that does not ask.
+    """
+    known = None if data.noun_gender is None else data.noun_gender.get(word)
+
+    if known is not None:
+        return known
+
+    if data.gender_rules is None:
+        return None
+
+    lower = word.lower()
+
+    for ending, gender in data.gender_rules:
+        if lower.endswith(ending):
+            return gender
+
+    return None
+
+
+def pool_capitalizes(pool: WordPool) -> bool:
+    """Whether a pool writes its own entries with a capital.
+
+    That is what an invented word standing in for one has to match. Read off the pool
+    rather than declared beside it, for the same reason `modifier_follows` reads the
+    frames: German capitalizes its nouns and nothing else, so `capitalize` on the
+    language would capitalize its modifiers too, and a second field saying so could
+    contradict the pool it describes. The first entry with a case to it answers for all
+    of them — no pool of any language here is written both ways.
+
+    Args:
+        pool: The pool to judge.
+
+    Returns:
+        True when its entries open on a capital.
+    """
+    for entry in pool:
+        first = entry[:1]
+
+        if first.lower() != first.upper():
+            return first == first.upper()
+
+    return False
+
+
 def theme_of(data: WordLanguageData, word: str) -> WordTheme | None:
     """Theme a word belongs to, across every theme of the language."""
     for theme in WORD_THEMES:
@@ -298,8 +359,13 @@ def draw_word(
     word = None if made else pick_word(pool, low, high, prefix)
     chosen = word if word is not None else synth_word(data.syn, low, high, prefix)
 
+    # An invented word is written the way the pool it stands in for is written, which is
+    # how a German one comes out `Biefreum` rather than `biefreum` beside the `Klugheit`
+    # and `Bettdecke` of the pools.
+    capitalized = data.capitalize or pool_capitalizes(pool)
+
     return Drawn(
-        capitalize_first(chosen) if data.capitalize else chosen,
+        capitalize_first(chosen) if capitalized else chosen,
         not made and word is None,
     )
 

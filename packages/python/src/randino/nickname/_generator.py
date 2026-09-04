@@ -50,7 +50,14 @@ from randino._types import (
     WordTheme,
     WordThemeOption,
 )
-from randino.word._generator import agree, draw_word, pool_bounds, theme_of, themes_of
+from randino.word._generator import (
+    agree,
+    draw_word,
+    gender_of,
+    pool_bounds,
+    theme_of,
+    themes_of,
+)
 from randino.word.data import LOOSE_THEMES, WORD_DATA, WORD_LANGUAGES, WORD_THEMES
 from randino.word.data._types import WordFrame, WordGender, WordLanguageData, WordPool
 
@@ -296,9 +303,7 @@ def build_words(
 
         return bounds[frame.slots[at]]
 
-    gender: WordGender | None = (
-        None if early is None else (data.noun_gender.get(early.word) if data.noun_gender else None)
-    )
+    gender: WordGender | None = None if early is None else gender_of(data, early.word)
     missed = False
     used = 0
 
@@ -328,7 +333,7 @@ def build_words(
         word = chosen.word if slot == "noun" else agree(data, chosen.word, gender)
 
         if slot == "noun" and early is None:
-            gender = data.noun_gender.get(chosen.word) if data.noun_gender else None
+            gender = gender_of(data, chosen.word)
 
         missed = missed or chosen.missed
         used += gap + len(word)

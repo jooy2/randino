@@ -41,7 +41,7 @@ from randino import (
 
 # The datasets are internal, but a word generator is only as good as the pools behind
 # it — these checks are what tie the output back to them.
-from randino.word._generator import synth_bounds
+from randino.word._generator import gender_of, pool_capitalizes, synth_bounds
 from randino.word.data import WORD_DATA
 
 SAMPLE = 60
@@ -267,6 +267,46 @@ def test_an_invented_word_is_the_length_it_was_asked_for() -> None:
                 count=20,
             ):
                 assert len(word) == length, f"{language} wanted {length}: {word}"
+
+
+def test_a_language_that_inflects_has_a_gender_for_a_word_it_has_never_seen() -> None:
+    """An invented word is read by its ending, since no pool holds it.
+
+    That is what keeps an article and an adjective agreeing with each other in front of
+    a word nobody has seen.
+    """
+    for language in WORD_LANGUAGES:
+        data = WORD_DATA[language]
+
+        if data.agreement is None:
+            assert data.gender_rules is None, language
+            continue
+
+        assert data.gender_rules is not None, f"{language} inflects and has no gender rules"
+
+        for word in rand_word(language=language, realism="invented", count=40):
+            assert gender_of(data, word) is not None, f"{language}: {word}"
+
+
+def test_an_invented_word_is_capitalized_the_way_its_pool_is() -> None:
+    """German capitalizes its nouns and nothing else, and an invented one has to match.
+
+    It writes them capitalized in the pool rather than setting `capitalize`, which left
+    every invented German noun lowercase beside them.
+    """
+    for language in WORD_LANGUAGES:
+        data = WORD_DATA[language]
+
+        for theme in WORD_THEMES:
+            capitalized = pool_capitalizes(data.nouns[theme])
+
+            for word in rand_word(language=language, theme=theme, realism="invented", count=12):
+                first = word[:1]
+
+                if first.lower() == first.upper():
+                    continue
+
+                assert (first == first.upper()) == capitalized, f"{language} {theme}: {word}"
 
 
 def test_unique_never_repeats_a_word() -> None:
