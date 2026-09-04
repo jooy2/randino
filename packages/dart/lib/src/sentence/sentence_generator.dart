@@ -755,7 +755,7 @@ _Phrase _nounPhrase(
   final drawn =
       forced ??
       _plain(lexicon, drawWord(lexicon, pool, invent, low < high ? low : high, high, prefix).word);
-  final gender = lexicon.nounGender?[_asPool(lexicon, drawn)];
+  final gender = genderOf(lexicon, _asPool(lexicon, drawn));
   final parts = <String>[drawn];
 
   if (modify) {
@@ -1005,7 +1005,7 @@ _Built _compose(
 
       if (part.slot == SentenceSlot.subject) {
         subject = built;
-        gender = lexicon.nounGender?[_asPool(lexicon, built.noun)];
+        gender = genderOf(lexicon, _asPool(lexicon, built.noun));
       }
     } else {
       phrase = _predicateFor(

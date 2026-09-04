@@ -294,6 +294,56 @@ void main() {
       }
     });
 
+    test('a language that inflects has a gender for a word it has never seen', () {
+      // The pools carry a gender word by word, and an invented word is in none of
+      // them. Read off the ending instead, which is what keeps an article and an
+      // adjective agreeing with each other in front of a word nobody has seen.
+      for (final language in WordLanguage.values) {
+        final data = wordData[language]!;
+
+        if (data.agreement == null) {
+          expect(data.genderRules, isNull, reason: language.name);
+          continue;
+        }
+
+        expect(data.genderRules, isNotNull, reason: '${language.name} inflects with no rules');
+
+        for (final word in randWord(language: language, realism: RandRealism.invented, count: 40)) {
+          expect(genderOf(data, word), isNotNull, reason: '${language.name}: $word');
+        }
+      }
+    });
+
+    test('an invented word is capitalized the way its pool is', () {
+      // German capitalizes its nouns and nothing else, so it writes them
+      // capitalized in the pool rather than setting `capitalize` — which left
+      // every invented German noun lowercase beside them.
+      for (final language in WordLanguage.values) {
+        final data = wordData[language]!;
+
+        for (final theme in WordTheme.values) {
+          final capitalized = poolCapitalizes(data.nouns[theme]!);
+
+          for (final word in randWord(
+            language: language,
+            theme: theme,
+            realism: RandRealism.invented,
+            count: 12,
+          )) {
+            final first = word.substring(0, 1);
+
+            if (first.toLowerCase() == first.toUpperCase()) continue;
+
+            expect(
+              first == first.toUpperCase(),
+              capitalized,
+              reason: '${language.name} ${theme.name}: $word',
+            );
+          }
+        }
+      }
+    });
+
     test('unique never repeats a word', () {
       final words = randWord(language: WordLanguage.ko, count: 400, unique: true);
 

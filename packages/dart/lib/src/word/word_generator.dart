@@ -162,6 +162,57 @@ LengthRange poolBounds(WordPool pool) {
 /// The themes one draw may use. A null [theme] means every one of them.
 List<WordTheme> themesOf(WordTheme? theme) => theme == null ? wordThemes : <WordTheme>[theme];
 
+/// The gender a word is taken to have, for the languages whose articles and
+/// modifiers ask.
+///
+/// The pools carry it word by word, and an invented word is in none of them — so
+/// a word the pools do not hold is read by its ending instead, which is what the
+/// language itself does. Without that, Spanish and Italian write no article at
+/// all in front of an invented noun (they declare theirs under `m` and `f`
+/// alone) and every language that inflects hands back the base form of its
+/// modifier.
+///
+/// A made-up word has no true gender. What this buys is an article and an
+/// adjective that agree with each other.
+WordGender? genderOf(WordLanguageData data, String word) {
+  final known = data.nounGender?[word];
+
+  if (known != null) return known;
+
+  final rules = data.genderRules;
+
+  if (rules == null) return null;
+
+  final lower = word.toLowerCase();
+
+  for (final (ending, gender) in rules) {
+    if (lower.endsWith(ending)) return gender;
+  }
+
+  return null;
+}
+
+/// Whether a pool writes its own entries with a capital, which is what an
+/// invented word standing in for one has to match.
+///
+/// Read off the pool rather than declared beside it, for the same reason
+/// [modifierFollows] reads the frames: German capitalizes its nouns and nothing
+/// else, so `capitalize` on the language would capitalize its modifiers too, and
+/// a second field saying so could contradict the pool it describes. The first
+/// entry with a case to it answers for all of them — no pool of any language here
+/// is written both ways.
+bool poolCapitalizes(WordPool pool) {
+  for (final entry in pool) {
+    final first = entry.substring(0, 1);
+
+    if (first.toLowerCase() != first.toUpperCase()) {
+      return first == first.toUpperCase();
+    }
+  }
+
+  return false;
+}
+
 /// Theme a word belongs to, across every theme of the language.
 WordTheme? themeOf(WordLanguageData data, String word) {
   for (final theme in wordThemes) {
@@ -308,7 +359,12 @@ Drawn drawWord(WordLanguageData data, WordPool pool, int invent, int min, int ma
   final word = made ? null : pickWord(pool, min, max, prefix);
   final chosen = word ?? synthWord(data.syn, min, max, prefix);
 
-  return Drawn(data.capitalize ? capitalizeFirst(chosen) : chosen, !made && word == null);
+  // An invented word is written the way the pool it stands in for is written,
+  // which is how a German one comes out `Biefreum` rather than `biefreum` beside
+  // the `Klugheit` and `Bettdecke` of the pools.
+  final capitalized = data.capitalize || poolCapitalizes(pool);
+
+  return Drawn(capitalized ? capitalizeFirst(chosen) : chosen, !made && word == null);
 }
 
 /// Every length the language's pools hold, across the requested themes.

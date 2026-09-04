@@ -290,6 +290,17 @@ final WordLanguageData ru = WordLanguageData(
   // Russian declines the modifier in front of the noun, and the base form is the
   // masculine one. The rules before each general one are the spelling rule after
   // ж ш ч щ г к х, and the reflexive participle.
+  // Russian declares its gender in its ending, so a word outside the pools is read
+  // the same way one inside them is: `-а` and `-я` are feminine, `-о` and `-е`
+  // neuter, a consonant masculine. `-ь` is both and is left to the default.
+  genderRules: const <(String, WordGender)>[
+    ('а', WordGender.f),
+    ('я', WordGender.f),
+    ('о', WordGender.n),
+    ('е', WordGender.n),
+    ('ё', WordGender.n),
+    ('', WordGender.m),
+  ],
   agreement: const <WordGender, List<List<String>>>{
     WordGender.f: <List<String>>[
       <String>['щийся', 'щаяся'],

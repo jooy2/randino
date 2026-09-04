@@ -293,6 +293,20 @@ final WordLanguageData de = WordLanguageData(
   nounGender: _nouns.gender,
   // German declines the modifier in front of the noun, and the base form is the
   // bare stem: `blau` becomes `blauer Wal`, `blaue Katze`, `blaues Haus`.
+  // German gender is not predictable from the ending, and these four suffixes are
+  // the exception — every noun in `-ung`, `-heit`, `-keit` or `-schaft` is
+  // feminine, and one in `-chen` or `-lein` neuter. A made-up word matching none
+  // of them is masculine, which is a guess; what it buys is an article and an
+  // adjective that agree with each other rather than a bare `Ein blau …`.
+  genderRules: const <(String, WordGender)>[
+    ('ung', WordGender.f),
+    ('heit', WordGender.f),
+    ('keit', WordGender.f),
+    ('schaft', WordGender.f),
+    ('chen', WordGender.n),
+    ('lein', WordGender.n),
+    ('', WordGender.m),
+  ],
   agreement: const <WordGender, List<List<String>>>{
     WordGender.m: <List<String>>[
       <String>['el', 'ler'],

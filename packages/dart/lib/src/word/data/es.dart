@@ -300,6 +300,19 @@ final WordLanguageData es = WordLanguageData(
   // Spanish modifiers agree with the noun, and the base form is the masculine
   // one. Only the endings listed change; `azul` and `grande` match no rule and
   // are already right beside either gender.
+  // A word outside the pools is read by its ending, which is what Spanish itself
+  // does: `-a`, `-ión`, `-dad`, `-tad` and `-umbre` are feminine, the rest
+  // masculine. An invented word has no true gender, and this is what keeps the
+  // article and the adjective beside it agreeing with each other.
+  genderRules: const <(String, WordGender)>[
+    ('ión', WordGender.f),
+    ('dad', WordGender.f),
+    ('tad', WordGender.f),
+    ('umbre', WordGender.f),
+    ('triz', WordGender.f),
+    ('a', WordGender.f),
+    ('', WordGender.m),
+  ],
   agreement: const <WordGender, List<List<String>>>{
     WordGender.f: <List<String>>[
       <String>['or', 'ora'],

@@ -274,7 +274,7 @@ _Filled _buildWords(
       early != null && index == nounAt
           ? LengthRange(early.word.length, early.word.length)
           : bounds[frame.slots[index]]!;
-  WordGender? gender = early == null ? null : data.nounGender?[early.word];
+  WordGender? gender = early == null ? null : genderOf(data, early.word);
   var missed = false;
   var used = 0;
 
@@ -304,7 +304,7 @@ _Filled _buildWords(
     // why the noun is in hand before any of them is drawn.
     final word = slot == WordSlot.noun ? chosen.word : agree(data, chosen.word, gender);
 
-    if (slot == WordSlot.noun && early == null) gender = data.nounGender?[chosen.word];
+    if (slot == WordSlot.noun && early == null) gender = genderOf(data, chosen.word);
 
     missed = missed || chosen.missed;
     used += gap + word.length;

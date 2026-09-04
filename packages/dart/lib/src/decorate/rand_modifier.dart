@@ -24,9 +24,10 @@ import 'package:randino/src/word/word_generator.dart';
   final bounds = poolBounds(pool);
   final drawn = drawWord(data, pool, resolveRealism(realism), bounds.min, bounds.max, '');
   // A value the language knows is a noun whose gender it can look up, so the
-  // modifier lands in the form that goes beside it. A value from anywhere else
-  // has no gender to agree with, and `agree` hands the base form back.
-  final gender = value == null ? null : data.nounGender?[value];
+  // modifier lands in the form that goes beside it. A value from anywhere else is
+  // read by its ending, the way the language itself reads an unfamiliar word, and
+  // a language that does not inflect has nothing to look up either way.
+  final gender = value == null ? null : genderOf(data, value);
 
   return (agree(data, drawn.word, gender), separator ?? data.joiner, modifierFollows(data));
 }

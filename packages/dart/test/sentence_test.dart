@@ -155,6 +155,41 @@ void main() {
       }
     });
 
+    test('a language with articles writes one, invented word or not', () {
+      // An invented noun is in no pool, so it has no entry in `nounGender` — and
+      // Spanish and Italian declare their articles under `m` and `f` alone, with
+      // no `n` to fall back to. Both wrote no article at all in front of one
+      // until the gender was read off the ending instead.
+      for (final language in WordLanguage.values) {
+        final articles = sentenceData[language]!.articles;
+
+        if (articles == null) continue;
+
+        final written = <String>{
+          for (final rules in articles.values)
+            for (final rule in rules) rule[1],
+        };
+
+        for (final realism in <RandRealism>[RandRealism.real, RandRealism.invented]) {
+          for (final sentence in randSentence(
+            language: language,
+            realism: realism,
+            count: sample,
+          )) {
+            final carries = written.any(
+              // An elided article runs into the word behind it — `l'orso`.
+              (article) =>
+                  article.endsWith("'")
+                      ? sentence.toLowerCase().contains(article)
+                      : RegExp('(^|\\s)$article\\s', caseSensitive: false).hasMatch(sentence),
+            );
+
+            expect(carries, isTrue, reason: '$language $realism: $sentence');
+          }
+        }
+      }
+    });
+
     test('a language that capitalizes opens its sentences on a capital', () {
       for (final language in wordLanguages) {
         if (!sentenceData[language]!.capitalize) continue;
