@@ -9,7 +9,7 @@ Colours, from the plain ones to the ones with a history.
 ```javascript
 import { randColor } from 'randino';
 
-randColor({ language: 'en', count: 3 }); // ['Crimson', 'Teal', 'Ochre']
+randColor({ language: 'en', count: 3 }); // ['Crimson', 'Teal', 'Ocher']
 randColor({ language: 'en', output: 'detail' });
 // [{ word: 'Crimson', language: 'en', theme: 'color' }]
 ```
@@ -21,7 +21,7 @@ randColor({ language: 'en', output: 'detail' });
 ```dart
 import 'package:randino/randino.dart';
 
-randColor(language: WordLanguage.en, count: 3); // [Crimson, Teal, Ochre]
+randColor(language: WordLanguage.en, count: 3); // [Crimson, Teal, Ocher]
 ```
 
 Returns `List<String>`. For the detail form, pass `WordTheme.color` to `randWordDetails` — Dart has no overloads, and twenty-four more functions for it would be twenty-four too many.
@@ -33,7 +33,7 @@ Returns `List<String>`. For the detail form, pass `WordTheme.color` to `randWord
 ```python
 from randino import rand_color
 
-rand_color(language="en", count=3)  # ['Crimson', 'Teal', 'Ochre']
+rand_color(language="en", count=3)  # ['Crimson', 'Teal', 'Ocher']
 rand_color(language="en", output="detail")
 # [WordDetail(word='Crimson', language='en', theme='color')]
 ```

@@ -20,7 +20,7 @@
 | `sport` | [`randSport`](./rand-sport) | 스포츠와 그 목표물 | 양궁, 트로피 | Archery, Trophy |
 | `vehicle` | [`randVehicle`](./rand-vehicle) | 사람을 실어 나르는 것 | 열기구, 전차 | Airship, Tramcar |
 | `product` | [`randProduct`](./rand-product) | 사서 쓰는 물건 | 이어폰, 냉장고 | Earbuds, Toaster |
-| `color` | [`randColor`](./rand-color) | 색 이름 | 주홍, 쪽빛 | Crimson, Ochre |
+| `color` | [`randColor`](./rand-color) | 색 이름 | 주홍, 쪽빛 | Crimson, Ocher |
 | `finance` | [`randFinance`](./rand-finance) | 돈과 돈으로 하는 일 | 이자, 환율 | Ledger, Yield |
 | `tech` | [`randTech`](./rand-tech) | 컴퓨터와 그 사이의 망 | 서버, 캐시 | Server, Subnet |
 | `weather` | [`randWeather`](./rand-weather) | 하늘이 하는 일 | 소나기, 무지개 | Drizzle, Gale |

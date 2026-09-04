@@ -190,9 +190,9 @@ export const VI: WordLanguageData = {
 			bình_minh chạng_vạng hạ_chí đông_chí xuân_phân thu_phân mùa khoảnh_khắc vĩnh_hằng
 			tương_lai sát_na năm_tháng ngày_lễ buổi_sáng buổi_trưa buổi_chiều buổi_tối ban_đêm
 			nửa_đêm chính_ngọ rạng_sáng sáng_sớm đêm_khuya hôm_qua hôm_nay ngày_mai ngày_kia hôm_kia
-			một_ngày hai_ngày ba_ngày mười_ngày nửa_tháng một_tháng nửa_năm một_năm năm_nay năm_ngoái
-			năm_sau mùa_xuân mùa_hè mùa_thu mùa_đông đầu_xuân cuối_xuân đầu_hè giữa_hè cuối_hè
-			đầu_thu cuối_thu đầu_đông giữa_đông cuối_đông tiết_khí lập_xuân lập_hạ lập_thu lập_đông
+			quá_khứ hiện_tại thế_kỷ thập_kỷ kỷ_nguyên thời_đại tuần_lễ cuối_tuần năm_nay năm_ngoái
+			năm_sau mùa_xuân mùa_hè mùa_thu mùa_đông đầu_xuân giây_lát chốc_lát giữa_hè giao_thừa
+			rằm cuối_thu sinh_nhật thời_hạn ngày_xưa tiết_khí lập_xuân lập_hạ lập_thu lập_đông
 			thời_khắc thời_gian thiên_thu thời_thơ_ấu tuổi_trẻ tuổi_già xế_chiều quãng_đời thuở_xưa
 			bây_giờ sau_này
 		`),

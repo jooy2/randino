@@ -20,7 +20,7 @@ Each theme is also a generator of its own. `randWord` takes the theme as an opti
 | `sport` | [`randSport`](./rand-sport) | sports, and what they are played for | 양궁, 트로피 | Archery, Trophy |
 | `vehicle` | [`randVehicle`](./rand-vehicle) | things that carry you | 열기구, 전차 | Airship, Tramcar |
 | `product` | [`randProduct`](./rand-product) | things you buy | 이어폰, 냉장고 | Earbuds, Toaster |
-| `color` | [`randColor`](./rand-color) | colours, plain and storied | 주홍, 쪽빛 | Crimson, Ochre |
+| `color` | [`randColor`](./rand-color) | colours, plain and storied | 주홍, 쪽빛 | Crimson, Ocher |
 | `finance` | [`randFinance`](./rand-finance) | money, and what is done with it | 이자, 환율 | Ledger, Yield |
 | `tech` | [`randTech`](./rand-tech) | computers, and the networks between them | 서버, 캐시 | Server, Subnet |
 | `weather` | [`randWeather`](./rand-weather) | what the sky is doing | 소나기, 무지개 | Drizzle, Gale |

@@ -17,7 +17,7 @@ final WordLanguageData en = WordLanguageData(
     Merry Grumpy Mellow Stormy Frosty Dusty Foggy Radiant Bronze Umber Cobalt
     Verdant Fierce Nimble Prickly Restless Sturdy Tangled Vivid Whimsical
     Amber Indigo Jade Onyx Coral Teal Sable Ashen Auburn Maroon Russet
-    Saffron Lilac Ochre Slate Charcoal Pearly Witty Bold Timid Cheerful Jolly
+    Saffron Lilac Ocher Slate Charcoal Pearly Witty Bold Timid Cheerful Jolly
     Bashful Placid Serene Eager Earnest Steady Rowdy Sassy Snappy Zesty Breezy
     Dreamy Moody Cranky Perky Quirky Spry Wily Cunning Valiant Regal Lofty Meek
     Stoic Solemn Somber Blithe Genial Ardent Tender
@@ -190,13 +190,13 @@ final WordLanguageData en = WordLanguageData(
       Schoolyard Parkland Harbor Wharf Pier Station Airport Lighthouse Citadel Palace
       Temple Shrine Chapel Cathedral Monastery Tower Attic Cellar Rooftop Courtyard
       Balcony Veranda Greenhouse Barn Cottage Cabin Lodge Tavern Bakery Diner Kitchen
-      Bedroom Hallway Staircase Corridor Tunnel Overpass Crossroad Boardwalk Promenade
+      Bedroom Hallway Staircase Corridor Tunnel Overpass Byway Boardwalk Promenade
       Playground Stadium Arena Gymnasium Bathhouse Clinic Pharmacy Bookshop Aquarium
       Gallery Observatory Fortress Boulevard Esplanade Arcade Terrace Atrium Foyer Lobby
       Stairwell Basement Loft Pantry Larder Workshop Studio Planetarium Orchard Vineyard
       Meadowland Pastureland Farmstead Barnyard Silo Windmill Watermill Watchtower
       Belfry Steeple Cloister Abbey Rampart Bastion Turret Drawbridge Moat Gatehouse
-      Keep Bazaar Marketplace Emporium Warehouse Depot Terminal Quay Jetty Harbourside
+      Keep Bazaar Marketplace Emporium Warehouse Depot Terminal Quay Jetty Harborside
       Campsite Manor Hamlet Rotunda Colonnade Portico Pavilion Gazebo Pergola Bandstand
       Coliseum Forum Agora Necropolis Catacomb Crypt Mausoleum Obelisk Cenotaph Waypoint
       Crossroads Roundabout Underpass Viaduct Aqueduct Causeway Embankment Levee Weir
@@ -210,7 +210,7 @@ final WordLanguageData en = WordLanguageData(
       Kimchi Tofu Potato Carrot Cabbage Lettuce Spinach Broccoli Pumpkin Cucumber Garlic
       Mushroom Apple Strawberry Grape Watermelon Peach Lemon Banana Mango Pineapple
       Blueberry Chocolate Candy Honey Syrup Lemonade Popcorn Baguette Brioche Muffin
-      Scone Crumpet Crepe Omelette Frittata Quiche Paella Gnocchi Ravioli Linguine
+      Scone Crumpet Crepe Cornbread Frittata Quiche Paella Gnocchi Ravioli Linguine
       Fettuccine Ramen Udon Soba Pho Congee Bisque Consomme Goulash Casserole Meatloaf
       Pastrami Prosciutto Salami Terrine Cutlet Schnitzel Kebab Skewer Roast Brisket
       Ribeye Sirloin Tenderloin Drumstick Fillet Sashimi Ceviche Tartare Coleslaw Hummus
@@ -230,7 +230,7 @@ final WordLanguageData en = WordLanguageData(
       Paragliding Windsurfing Waterpolo Sparring Uppercut Knockout Takedown Grapple
       Somersault Cartwheel Handstand Backflip Warmup Timeout Assist Shootout Tiebreak
       Deuce Birdie Bogey Putter Fairway Racetrack Velodrome Ringside Bleachers
-      Grandstand Sprinting
+      Grandstand Pommel
     '''),
     WordTheme.vehicle: words(r'''
       Bicycle Locomotive Boat Automobile Bus Taxi Truck Motorbike Scooter Skateboard
@@ -244,7 +244,7 @@ final WordLanguageData en = WordLanguageData(
       Speedboat Houseboat Tugboat Dredger Forklift Hatchback Streetcar Camper Trailer
       Sidecar Buggy Quadbike Rollerblade Toboggan Litter Palfrey Skiff Punt Junk Sampan
       Coracle Outrigger Schooner Clipper Cutter Corvette Frigate Airliner Turboprop
-      Sailplane Autogyro Tiltrotor Snowplough Halftrack Snowcat Trolleybus Railbus
+      Sailplane Autogyro Tiltrotor Stagecoach Halftrack Snowcat Trolleybus Railbus
     '''),
     WordTheme.product: words(r'''
       Laptop Computer Keyboard Trackpad Monitor Printer Speaker Earbuds Headphone
@@ -261,24 +261,24 @@ final WordLanguageData en = WordLanguageData(
     '''),
     WordTheme.color: words(r'''
       Crimson Scarlet Vermilion Carmine Magenta Fuchsia Cerise Blush Apricot Tangerine
-      Ochre Umber Sepia Mustard Chartreuse Lime Mint Teal Aqua Cyan Azure Navy Indigo
+      Ocher Umber Sepia Mustard Chartreuse Lime Mint Teal Aqua Cyan Azure Navy Indigo
       Mauve Plum Maroon Burgundy Rust Terracotta Cream Beige Taupe Khaki Charcoal
       Graphite Pewter Alabaster Ebony Jet Cerulean Periwinkle Saffron Blonde Auburn
-      Ginger Ultramarine Viridian Bistre Fawn Buff Ecru Oatmeal Porcelain Bone Smoke
+      Ginger Ultramarine Viridian Bister Fawn Buff Ecru Oatmeal Porcelain Bone Smoke
       Denim Wine Brick Clay Sand Straw Honeydew Seafoam Powder Ice Ash Soot Coal Pitch
       Puce Russet Sable Gamboge Verdigris Celadon Eggshell Cinnamon Nutmeg Paprika Wheat
     '''),
     WordTheme.finance: words(r'''
       Ledger Invoice Receipt Bond Share Dividend Interest Loan Mortgage Deposit Savings
       Account Budget Audit Asset Liability Equity Capital Revenue Profit Margin Surplus
-      Deficit Debt Credit Debit Cheque Currency Exchange Yield Portfolio Escrow Levy
+      Deficit Debt Credit Debit Check Currency Exchange Yield Portfolio Escrow Levy
       Tariff Rebate Refund Premium Annuity Pension Payroll Wage Salary Bonus Commission
       Royalty Franchise Merger Buyout Bailout Collateral Lien Voucher Coupon Bullion
       Vault Treasury Exchequer Remittance Clearing Settlement Arbitrage Futures Warrant
       Debenture Overdraft Withdrawal Statement Passbook Custody Trustee Creditor Debtor
       Lender Borrower Guarantor Valuation Appraisal Inflation Recession Liquidity
       Solvency Bankruptcy Windfall Endowment Subsidy Stipend Allowance Expense Outlay
-      Turnover Markup Discount Instalment Arrears
+      Turnover Markup Discount Installment Arrears
     '''),
     WordTheme.tech: words(r'''
       Server Cache Buffer Pixel Bitmap Codec Packet Protocol Daemon Queue Stack Heap
@@ -289,7 +289,7 @@ final WordLanguageData en = WordLanguageData(
       Register Bitrate Throughput Handshake Namespace Middleware Endpoint Webhook
       Encryption Decryption Hashing Salting Sharding Caching Rendering Rasterizer Shader
       Texture Polygon Wireframe Viewport Framebuffer Bitfield Nibble Octet Uplink
-      Downlink Routing Switching Bridging Tunnelling Multicast Broadcast Datagram
+      Downlink Routing Switching Bridging Tunneling Multicast Broadcast Datagram
       Bootloader Filesystem Partition Directory Symlink Checkpoint Rollback Migration
     '''),
     WordTheme.weather: words(r'''
@@ -318,8 +318,8 @@ final WordLanguageData en = WordLanguageData(
       Sundown Yesterday Today Tomorrow Weekday Weekend Fortnight Decade Century
       Millennium Epoch Era Aeon Instant Interval Duration Springtime Summertime Winter
       Midsummer Midwinter Daytime Nighttime Lifetime Childhood Youth Adulthood Dotage
-      Heyday Dayspring Nightwatch Eventide Forenoon Gloaming Nightlong Daybreaking
-      Hereafter Nowadays Bygone Yesteryear Prime Dusking Springtide Harvesttime
+      Heyday Dayspring Nightwatch Eventide Forenoon Gloaming Nightlong Sennight
+      Hereafter Nowadays Bygone Yesteryear Prime Vesper Springtide Harvesttime
       Wintertide Autumntide
     '''),
     WordTheme.emotion: words(r'''
@@ -330,10 +330,10 @@ final WordLanguageData en = WordLanguageData(
       Relief Despair Grief Melancholy Gloom Sadness Loneliness Regret Remorse Guilt
       Shame Pride Vanity Envy Jealousy Greed Desire Passion Affection Fondness
       Tenderness Warmth Kindness Sympathy Pity Trust Doubt Suspicion Worry Anxiety Dread
-      Terror Panic Rage Wrath Irritation Annoyance Boredom Apathy Zeal Ardour Fervour
+      Terror Panic Rage Wrath Irritation Annoyance Boredom Apathy Zeal Ardor Fervor
       Excitement Eagerness Resolve Willpower Confidence Modesty Calmness Composure
       Nerves Bravery Timidity Gladness Mirth Levity Sentiment Emotion Mood Temper Whim
-      Rancour Malice Spite Yearn Solace Ecstasy Anguish Torment Longingness
+      Rancor Malice Spite Contentment Solace Ecstasy Anguish Torment Wistfulness
     '''),
     WordTheme.body: words(r'''
       Head Forehead Eyebrow Eyelash Eyelid Nose Nostril Cheek Chin Jaw Lip Tongue Tooth
@@ -346,9 +346,9 @@ final WordLanguageData en = WordLanguageData(
       Bruise Blister Callus Torso Limb Sinew Marrow
     '''),
     WordTheme.clothing: words(r'''
-      Glove Scarf Slippers Sandals Bathrobe Coat Overcoat Jacket Blazer Shirt Blouse
+      Glove Scarf Espadrille Brogue Bathrobe Coat Overcoat Jacket Blazer Shirt Blouse
       Tunic Trousers Jeans Shorts Skirt Dress Gown Vest Cardigan Sweater Jumper Hoodie
-      Sock Stocking Tights Underwear Pyjamas Apron Bandana Kerchief Necktie Bowtie Belt
+      Sock Stocking Tights Underwear Pajamas Apron Bandana Kerchief Necktie Bowtie Belt
       Sash Sneaker Loafer Sandal Clog Moccasin Slipper Uniform Costume Robe Mantle
       Poncho Raincoat Anorak Parka Windbreaker Swimsuit Wetsuit Overalls Dungarees
       Sleeve Collar Cuff Hem Lapel Lining Fabric Linen Silk Cotton Wool Velvet Corduroy
@@ -359,18 +359,18 @@ final WordLanguageData en = WordLanguageData(
     WordTheme.tool: words(r'''
       Shovel Ladder Wrench Pliers Chisel Anvil Bellows Awl Clamp Vise Level Caliper
       Protractor Ruler Scissors Needle Punch Plumbline Hammer Drill Sandpaper Plane
-      Pickaxe Sickle Scythe Hoe Plough Rake Spanner Screwdriver Soldering Tapemeasure
+      Pickaxe Sickle Scythe Hoe Plow Rake Spanner Screwdriver Soldering Tapemeasure
       Chalkline Adze Crowbar Lever Wedge Pulley Crank Sledge Trowel Chuck Whetstone
       Grater Sieve Spade Harrow Flail Handle Blade Toolkit Toolbox Fastener Rivetgun
       Nailgun Jigsaw Bandsaw Lathe Sander Chainsaw Ripsaw Coping Gouge Burin Scriber
-      Divider Setsquare Tsquare Bevel Jointer Mitre Vice Workbench Clawhammer Ballpeen
+      Divider Setsquare Tsquare Bevel Jointer Miter Vice Workbench Clawhammer Ballpeen
       Axe Saw Hacksaw Yardstick Screwjack Pincer Bradawl Scraper Burnisher Drawknife
-      Spokeshave Mitrebox Nailset Plumbbob Pipewrench Boltcutter
+      Spokeshave Miterbox Nailset Plumbbob Pipewrench Boltcutter
     '''),
     WordTheme.drink: words(r'''
       Coffee Cocoa Water Soda Cider Cordial Smoothie Milkshake Latte Espresso Cappuccino
       Americano Mocha Macchiato Ristretto Chai Matcha Oolong Infusion Brew Ale Lager
-      Stout Pilsner Beer Sherry Port Vermouth Whisky Brandy Vodka Rum Tequila Gin Sake
+      Stout Pilsner Beer Sherry Port Vermouth Whiskey Brandy Vodka Rum Tequila Gin Sake
       Mead Cocktail Highball Champagne Liqueur Absinthe Aperitif Digestif Kefir Kombucha
       Lassi Horchata Sherbet Frappe Eggnog Toddy Grog Wassail Nightcap Tonic Seltzer
       Springwater Icewater Hotwater Sweetwater Coldbrew Nitrobrew Coldpress Milk Juice

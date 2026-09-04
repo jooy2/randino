@@ -9,7 +9,7 @@
 ```javascript
 import { randColor } from 'randino';
 
-randColor({ language: 'en', count: 3 }); // ['Crimson', 'Teal', 'Ochre']
+randColor({ language: 'en', count: 3 }); // ['Crimson', 'Teal', 'Ocher']
 randColor({ language: 'en', output: 'detail' });
 // [{ word: 'Crimson', language: 'en', theme: 'color' }]
 ```
@@ -21,7 +21,7 @@ randColor({ language: 'en', output: 'detail' });
 ```dart
 import 'package:randino/randino.dart';
 
-randColor(language: WordLanguage.en, count: 3); // [Crimson, Teal, Ochre]
+randColor(language: WordLanguage.en, count: 3); // [Crimson, Teal, Ocher]
 ```
 
 `List<String>`을 돌려줍니다. 상세 형태가 필요하면 `randWordDetails`에 `WordTheme.color`을 넘기십시오. Dart에는 오버로드가 없고, 이것만을 위해 함수를 스물네 개 더 두는 것은 스물네 개가 많습니다.
@@ -33,7 +33,7 @@ randColor(language: WordLanguage.en, count: 3); // [Crimson, Teal, Ochre]
 ```python
 from randino import rand_color
 
-rand_color(language="en", count=3)  # ['Crimson', 'Teal', 'Ochre']
+rand_color(language="en", count=3)  # ['Crimson', 'Teal', 'Ocher']
 rand_color(language="en", output="detail")
 # [WordDetail(word='Crimson', language='en', theme='color')]
 ```
