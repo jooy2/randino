@@ -42,6 +42,7 @@ import type {
 // The datasets are internal, but a word generator is only as good as the pools
 // behind it — these checks are what tie the output back to them.
 import { WORD_DATA } from '../dist/word/data/index.js';
+import { synthBounds } from '../dist/word/wordGenerator.js';
 
 const SAMPLE = 60;
 
@@ -269,6 +270,27 @@ describe('Word', () => {
 		const unknown = 'wild' as RandRealism;
 
 		assert.strictEqual(randWord({ language: 'ko', realism: unknown, count: 5 }).length, 5);
+	});
+
+	it('an invented word is the length it was asked for, where the template can spell one', () => {
+		// The template decides what an invented word can be, and it is narrower than
+		// the pools: Spanish invents at least two syllables where its pools hold a
+		// two-letter word. Inside what the template can spell, the length is exact.
+		for (const language of WORD_LANGUAGES) {
+			const [lowest, highest] = synthBounds(WORD_DATA[language].syn);
+
+			for (let length = lowest; length <= highest; length += 1) {
+				for (const word of randWord({
+					language,
+					realism: 'invented',
+					minLength: length,
+					maxLength: length,
+					count: 20
+				})) {
+					assert.strictEqual(word.length, length, `${language} wanted ${length}: ${word}`);
+				}
+			}
+		}
 	});
 
 	it('unique never repeats a word', () => {

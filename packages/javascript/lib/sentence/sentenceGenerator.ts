@@ -49,6 +49,7 @@ import {
 	modifierFollows,
 	pickWord,
 	poolBounds,
+	synthBounds,
 	themeOf
 } from '../word/wordGenerator.js';
 import { SENTENCE_DATA, THEME_CLASS } from './data/index.js';
@@ -356,6 +357,8 @@ function requiredAt(frame: SentenceFrame, plan: Plan, slot: SentenceSlot): Requi
 // Pools and their bounds never change, so they are worth holding on to.
 const nounCache = new Map<string, WordPool>();
 const boundsCache = new Map<string, Record<string, readonly [number, number]>>();
+const spanCache = new Map<string, readonly [number, number]>();
+const agreedCache = new Map<string, readonly string[]>();
 
 /**
  * The nouns of one theme a sentence may use. A language that inflects leaves out
@@ -386,6 +389,73 @@ function nounsOf(language: WordLanguage, theme: WordTheme): WordPool {
 	return usable;
 }
 
+/**
+ * Shortest and longest noun one phrase can actually be given, which is not the
+ * same question `poolBounds` answers: at `realism: 'invented'` the word comes out
+ * of the language's syllable template rather than its pools, and English invents
+ * at most two syllables where its pools hold words of twelve letters. A budget
+ * measured against the wrong one of those is a `minLength` the phrase cannot
+ * reach.
+ */
+function nounSpan(
+	language: WordLanguage,
+	theme: WordTheme,
+	invent: number
+): readonly [number, number] {
+	const key = `${language}:${theme}:${invent}`;
+	const cached = spanCache.get(key);
+
+	if (cached) {
+		return cached;
+	}
+
+	const [poolLow, poolHigh] = poolBounds(nounsOf(language, theme));
+	const [synLow, synHigh] = synthBounds(WORD_DATA[language].syn);
+	// `'mixed'` draws from both, so both lengths are on the table.
+	const span: readonly [number, number] =
+		invent >= 100
+			? [synLow, synHigh]
+			: invent <= 0
+				? [poolLow, poolHigh]
+				: [Math.min(poolLow, synLow), Math.max(poolHigh, synHigh)];
+
+	spanCache.set(key, span);
+
+	return span;
+}
+
+/**
+ * The modifiers of a language, in the form they take beside a noun of `gender`.
+ *
+ * Written out rather than agreed after the fact, because a length budget has to
+ * see the word the sentence will actually carry: German `blau` is `blauer` in
+ * front of a masculine noun, and choosing by the four letters and writing the six
+ * is how a sentence quietly stepped outside its range.
+ */
+function agreedModifiers(
+	language: WordLanguage,
+	gender: WordGender | undefined
+): readonly string[] {
+	const wordData = WORD_DATA[language];
+
+	if (!gender || !wordData.agreement) {
+		return wordData.adjectives;
+	}
+
+	const key = `${language}:${gender}`;
+	const cached = agreedCache.get(key);
+
+	if (cached) {
+		return cached;
+	}
+
+	const agreed = wordData.adjectives.map((word) => agree(wordData, word, gender));
+
+	agreedCache.set(key, agreed);
+
+	return agreed;
+}
+
 /** Shortest and longest word each kind of slot can contribute, over every theme. */
 function slotBounds(language: WordLanguage): Record<string, readonly [number, number]> {
 	const cached = boundsCache.get(language);
@@ -409,9 +479,12 @@ function slotBounds(language: WordLanguage): Record<string, readonly [number, nu
 
 		return [min === Infinity ? 1 : min, max || 1];
 	};
+	const genders: (WordGender | undefined)[] = wordData.agreement
+		? [undefined, ...(Object.keys(wordData.agreement) as WordGender[])]
+		: [undefined];
 	const bounds = {
 		noun: span(WORD_THEMES.map((theme) => nounsOf(language, theme))),
-		modifier: span([wordData.adjectives]),
+		modifier: span(genders.map((gender) => agreedModifiers(language, gender))),
 		verb: span(data.verbs.map((group) => group.words)),
 		state: span(data.states.map((group) => group.words)),
 		manner: span([data.manners]),
@@ -526,12 +599,16 @@ function themesForClasses(
 	return themes.filter((theme) => classes.includes(THEME_CLASS[theme]));
 }
 
-function pickFrame(frames: readonly SentenceFrame[]): SentenceFrame {
-	const total = frames.reduce((sum, frame) => sum + frame.weight, 0);
+function pickFrame(
+	frames: readonly SentenceFrame[],
+	boost?: (frame: SentenceFrame) => number
+): SentenceFrame {
+	const weightOf = (frame: SentenceFrame) => frame.weight * (boost ? boost(frame) : 1);
+	const total = frames.reduce((sum, frame) => sum + weightOf(frame), 0);
 	let roll = Math.random() * total;
 
 	for (const frame of frames) {
-		roll -= frame.weight;
+		roll -= weightOf(frame);
 
 		if (roll <= 0) {
 			return frame;
@@ -671,13 +748,16 @@ function nounPhrase(
 	invent: number,
 	prefix: string,
 	min: number,
-	max: number
+	max: number,
+	span: readonly [number, number]
 ): Phrase {
 	const wordData = WORD_DATA[language];
 	const pool = nounsOf(language, theme);
 	const space = data.space.length;
-	const [, nounMax] = poolBounds(pool);
+	const [, nounMax] = span;
 	const [modMin, modMax] = poolBounds(wordData.adjectives);
+	// Measured against the base forms, because the noun that decides the gender has
+	// not been drawn yet; the modifier itself is chosen from the agreed pool below.
 	const [, articleMax] = bare ? [0, 0] : articleSpan(data);
 	const overhead = articleMax ? articleMax + space : 0;
 	const modCost = modify ? modMin + space : 0;
@@ -692,18 +772,18 @@ function nounPhrase(
 	if (modify) {
 		const room = max - overhead - drawn.length - space;
 		const want = min - overhead - drawn.length - space;
-		const chosen =
-			forcedModifier ??
+		const agreed = agreedModifiers(language, gender);
+		const modifier =
+			(forcedModifier ? agree(wordData, forcedModifier, gender) : null) ??
 			plain(
 				wordData,
 				pickWord(
-					wordData.adjectives,
+					agreed,
 					Math.max(1, Math.min(want, room)),
 					Math.max(1, Math.min(modMax, room)),
 					''
-				) ?? pick(wordData.adjectives)
+				) ?? pick(agreed)
 			);
-		const modifier = agree(wordData, chosen, gender);
 
 		if (modifierFollows(wordData)) {
 			parts.push(modifier);
@@ -789,7 +869,21 @@ function generateOne(language: WordLanguage, settings: Settings): Built {
 	let bestTooLong = false;
 
 	for (let attempt = 0; attempt < FIT_ATTEMPTS; attempt += 1) {
-		const frame = pickFrame(usable);
+		// After a miss, a shape whose own range runs past the requested one in the
+		// direction that was missed is four times as likely. Weighted rather than
+		// filtered: a shape that missed by two characters can still make it on the
+		// next draw, and dropping it left a language whose short shape was the only
+		// one in range settling for whatever it had.
+		const frame = pickFrame(
+			usable,
+			attempt > 0 && bestDistance > 0
+				? (candidate) => {
+						const [low, high] = frameRange(candidate, data, bounds);
+
+						return (bestTooLong ? low <= min : high >= max) ? 4 : 1;
+					}
+				: undefined
+		);
 		const modifyChance = modifyChanceFor(attempt === 0 ? 0 : bestDistance, bestTooLong);
 		const built = compose(
 			language,
@@ -888,6 +982,42 @@ function compose(
 	// rather than being answered with something else entirely.
 	const subjectTheme =
 		subjectRequired?.theme ?? pick(subjectThemes.length ? subjectThemes : themes);
+	// Every phrase's theme is settled before any of them is drawn, because a length
+	// budget is only as good as the pools it was measured against. Left to the loop,
+	// each phrase was given the room the language's longest noun would need and
+	// drew a word out of its own theme, which is how a sentence came out short of a
+	// `minLength` the shape could otherwise have reached.
+	const partThemes = frame.parts.map((part, i) =>
+		isNounSlot(part.slot)
+			? part.slot === 'subject'
+				? subjectTheme
+				: (plan.phrase.get(i)?.theme ?? themeForPart(part.slot, group, themes))
+			: null
+	);
+	// The same for the predicate: `bounds` spans every group the language has, and
+	// one sentence draws from one of them. A word the caller required is narrower
+	// still — its length is not a range at all.
+	const partBounds = frame.parts.map((part, i) => {
+		const theme = partThemes[i];
+		const required = plan.phrase.get(i);
+		const exact = required ? ([required.word.length, required.word.length] as const) : null;
+
+		if (theme) {
+			const owed = plan.modifier.get(i);
+
+			return {
+				...bounds,
+				noun: exact ?? nounSpan(language, theme, settings.invent),
+				modifier: owed ? ([owed.word.length, owed.word.length] as const) : bounds.modifier
+			};
+		}
+
+		if (part.slot === 'verb' || part.slot === 'state') {
+			return { ...bounds, [part.slot]: exact ?? poolBounds(group.words) };
+		}
+
+		return exact ? { ...bounds, [part.slot]: exact } : bounds;
+	});
 	// Only a shape that opens on a noun phrase with nothing in front of it can
 	// honour `startsWith`; anywhere else the sentence opens on an article, a
 	// preposition or an adverbial, and `collect` filters what does not match.
@@ -895,7 +1025,7 @@ function compose(
 	const prefixable = isNounSlot(first.slot) && !first.head && !data.articles;
 	const space = data.space.length;
 	const spans = frame.parts.map((part, i) => {
-		const [low, high] = partRange(part, data, bounds);
+		const [low, high] = partRange(part, data, partBounds[i]);
 		const gap = i === 0 ? 0 : space;
 
 		return [gap + low, gap + high] as const;
@@ -931,14 +1061,17 @@ function compose(
 		if (isNounSlot(part.slot)) {
 			const required = plan.phrase.get(i);
 			const owed = plan.modifier.get(i);
-			const theme =
-				part.slot === 'subject'
-					? subjectTheme
-					: (required?.theme ?? themeForPart(part.slot, group, themes));
-			const room = high - poolBounds(nounsOf(language, theme))[0];
+			const theme = partThemes[i]!;
+			const [nounLow, nounHigh] = partBounds[i].noun;
+			const [, articleMax] = part.bare ? [0, 0] : articleSpan(data);
+			const room = high - nounLow;
+			// A phrase whose share of the range is longer than any noun of its theme
+			// takes a modifier whatever the roll says, which is the only way it can
+			// reach it — the alternative is a sentence that quietly misses `minLength`.
+			const needed = low > (articleMax ? articleMax + space : 0) + nounHigh;
 			const modify =
 				(part.modifiable ?? false) &&
-				(Boolean(owed) || (room >= bounds.modifier[0] + space && chance(modifyChance)));
+				(Boolean(owed) || needed || (room >= bounds.modifier[0] + space && chance(modifyChance)));
 			const built = nounPhrase(
 				language,
 				data,
@@ -950,7 +1083,8 @@ function compose(
 				settings.invent,
 				prefixable && i === 0 ? settings.prefix : '',
 				low,
-				high
+				high,
+				[nounLow, nounHigh]
 			);
 
 			phrase = built.text;

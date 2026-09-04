@@ -30,9 +30,6 @@ import type { WordGender, WordLanguageData, WordPool, WordSynthesis } from './da
 // How many themes to try before settling for the closest word found.
 const FIT_ATTEMPTS = 12;
 
-// Attempts spent looking for an invented word of the requested length.
-const SYNTH_ATTEMPTS = 8;
-
 /**
  * The decorating pool one draw may use: a word for what the noun is like, one
  * for what it is doing, or either. Built per call — every draw already walks the
@@ -107,6 +104,54 @@ export function poolBounds(pool: WordPool): readonly [number, number] {
 	return [min === Infinity ? 1 : min, max || 1];
 }
 
+/**
+ * Shortest and longest entry of a pool, counting an empty entry as the zero it is.
+ * `poolBounds` answers the same question for a pool of words, where an empty
+ * result would mean nothing; a coda pool holds `''` on purpose.
+ */
+function pieceSpan(pool: WordPool): readonly [number, number] {
+	let low = Infinity;
+	let high = 0;
+
+	for (const entry of pool) {
+		low = Math.min(low, entry.length);
+		high = Math.max(high, entry.length);
+	}
+
+	return [low === Infinity ? 0 : low, high];
+}
+
+/** What a word of `count` syllables can be, at its shortest and at its longest. */
+function syllableSpan(syn: WordSynthesis & { kind: 'syllable' }, count: number) {
+	const [onsetLow, onsetHigh] = pieceSpan(syn.onset);
+	const [vowelLow, vowelHigh] = pieceSpan(syn.vowel);
+	const [codaLow, codaHigh] = pieceSpan(syn.coda);
+
+	return [
+		count * (onsetLow + vowelLow) + codaLow,
+		count * (onsetHigh + vowelHigh) + codaHigh
+	] as const;
+}
+
+/**
+ * Shortest and longest word the invention template can make, the way `poolBounds`
+ * reports the same about a pool. What a caller asking for an invented word can be
+ * given is decided here rather than by the pools, and a length budget measured
+ * against the pools is wrong by however far the two differ — English invents at
+ * most two syllables where its pools hold words of twelve letters.
+ */
+export function synthBounds(syn: WordSynthesis): readonly [number, number] {
+	if (syn.kind === 'pool') {
+		// One entry is one character, so the length is the number of entries.
+		return [Math.max(1, syn.minSyllables), Math.max(1, syn.maxSyllables)];
+	}
+
+	const [low] = syllableSpan(syn, syn.minSyllables);
+	const [, high] = syllableSpan(syn, syn.maxSyllables);
+
+	return [Math.max(1, low), Math.max(1, high)];
+}
+
 /** The themes one draw may use. */
 export function themesOf(theme: WordThemeOption): readonly WordTheme[] {
 	return theme === 'all' ? WORD_THEMES : [theme];
@@ -177,34 +222,85 @@ export function synthWord(syn: WordSynthesis, min: number, max: number, prefix: 
 		return out;
 	}
 
-	let best = '';
-	let bestDistance = Infinity;
+	// Built against the length rather than sampled until something fits. Drawing
+	// each piece at random and re-rolling the whole word missed a third of the
+	// exact lengths English, Spanish, Italian, German and Russian were asked for:
+	// the shortest and the longest word a template can spell need every piece to
+	// come out that way at once, which random sampling almost never does.
+	const counts: number[] = [];
 
-	for (let attempt = 0; attempt < SYNTH_ATTEMPTS; attempt += 1) {
-		const syllables = randInt(syn.minSyllables, syn.maxSyllables);
-		let word = '';
+	for (let count = syn.minSyllables; count <= syn.maxSyllables; count += 1) {
+		const [low, high] = syllableSpan(syn, count);
 
-		for (let i = 0; i < syllables; i += 1) {
-			word += (i === 0 && prefix ? prefix.toLowerCase() : pick(syn.onset)) + pick(syn.vowel);
-
-			if (i === syllables - 1) {
-				word += pick(syn.coda);
-			}
-		}
-
-		if (word.length >= min && word.length <= max) {
-			return word;
-		}
-
-		const distance = word.length < min ? min - word.length : word.length - max;
-
-		if (distance < bestDistance) {
-			bestDistance = distance;
-			best = word;
+		if (high >= min && low <= max) {
+			counts.push(count);
 		}
 	}
 
-	return best;
+	const syllables = counts.length ? pick(counts) : randInt(syn.minSyllables, syn.maxSyllables);
+	// The pieces the word is spelled out of, in order. A requested first character
+	// stands in for the opening onset, which is what makes `startsWith` work.
+	const pieces: WordPool[] = [];
+
+	for (let i = 0; i < syllables; i += 1) {
+		pieces.push(i === 0 && prefix ? [prefix.toLowerCase()] : syn.onset);
+		pieces.push(syn.vowel);
+	}
+
+	pieces.push(syn.coda);
+
+	// What the pieces after each one can still add, so a piece is only chosen from
+	// the lengths that leave the rest of the word able to land in the range.
+	const restLow = new Array<number>(pieces.length + 1).fill(0);
+	const restHigh = new Array<number>(pieces.length + 1).fill(0);
+
+	for (let i = pieces.length - 1; i >= 0; i -= 1) {
+		const [low, high] = pieceSpan(pieces[i]);
+
+		restLow[i] = low + restLow[i + 1];
+		restHigh[i] = high + restHigh[i + 1];
+	}
+
+	let word = '';
+
+	for (let i = 0; i < pieces.length; i += 1) {
+		word += fittingPiece(
+			pieces[i],
+			min - word.length - restHigh[i + 1],
+			max - word.length - restLow[i + 1]
+		);
+	}
+
+	return word;
+}
+
+/** One piece of an invented word, as close to the room left for it as the pool allows. */
+function fittingPiece(pool: WordPool, low: number, high: number): string {
+	const fitting = pool.filter((entry) => entry.length >= low && entry.length <= high);
+
+	if (fitting.length) {
+		return pick(fitting);
+	}
+
+	// Every piece that comes equally close, not the first of them: a room no piece
+	// fits is the common case at the ends of a range, and taking the first turned
+	// every such word into the same one.
+	let closest: string[] = [];
+	let bestDistance = Infinity;
+
+	for (const entry of pool) {
+		const distance =
+			entry.length < low ? low - entry.length : entry.length > high ? entry.length - high : 0;
+
+		if (distance < bestDistance) {
+			bestDistance = distance;
+			closest = [entry];
+		} else if (distance === bestDistance) {
+			closest.push(entry);
+		}
+	}
+
+	return closest.length ? pick(closest) : '';
 }
 
 /**

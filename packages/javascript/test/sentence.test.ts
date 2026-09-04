@@ -461,6 +461,39 @@ describe('Sentence', () => {
 		}
 	});
 
+	it('a narrow range is met too, anywhere in the language`s own range', () => {
+		// The wide ranges above are met by most shapes the language has. A narrow one
+		// is what caught the budget measuring a phrase against every pool of the
+		// language rather than the one it draws from.
+		//
+		// Swept across what the language is observed to produce rather than across
+		// `sentenceLengthRange`, whose ends are the shortest and longest sentence the
+		// shapes could spell — the very top of it needs the longest word of every
+		// pool at once, which is a fit no draw is going to find.
+		for (const language of WORD_LANGUAGES) {
+			const seen = randSentence({ language, count: 400 })
+				.map((sentence) => sentence.length)
+				.sort((a, b) => a - b);
+			// The tails are left out: the longest sentence in four hundred needs the
+			// longest word of every pool at once, and asking for a five-character window
+			// around it is asking for that same draw again.
+			const lowest = seen[Math.floor(seen.length * 0.05)];
+			const highest = seen[Math.floor(seen.length * 0.95)];
+			const step = Math.max(2, Math.floor((highest - lowest) / 8));
+
+			for (let minLength = lowest; minLength + 5 <= highest; minLength += step) {
+				const maxLength = Math.min(highest, minLength + 5);
+
+				for (const sentence of randSentence({ language, minLength, maxLength, count: 30 })) {
+					assert.ok(
+						sentence.length >= minLength && sentence.length <= maxLength,
+						`${language} ${minLength}-${maxLength}: ${sentence} (${sentence.length})`
+					);
+				}
+			}
+		}
+	});
+
 	it('sentences start with `startsWith`', () => {
 		for (const [language, prefix] of [
 			['ko', '사'],
