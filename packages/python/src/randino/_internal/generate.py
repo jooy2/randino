@@ -55,10 +55,16 @@ def length_bounds(
     high: int | None,
     natural_low: int,
     natural_high: int,
+    ceiling: int = RAND_LENGTH_MAX,
 ) -> tuple[int, int]:
-    """Return the caller's bounds against a natural range, clamped to what is allowed."""
-    resolved_low = clamp(natural_low if low is None else low, RAND_LENGTH_MIN, RAND_LENGTH_MAX)
-    resolved_high = clamp(natural_high if high is None else high, RAND_LENGTH_MIN, RAND_LENGTH_MAX)
+    """Return the caller's bounds against a natural range, clamped to what is allowed.
+
+    `ceiling` is the highest bound the generator will serve, and only `rand_sentence`
+    passes one of its own: a sentence is many words where every other generator
+    produces at most three, so `RAND_LENGTH_MAX` would cut most of them in half.
+    """
+    resolved_low = clamp(natural_low if low is None else low, RAND_LENGTH_MIN, ceiling)
+    resolved_high = clamp(natural_high if high is None else high, RAND_LENGTH_MIN, ceiling)
 
     return resolved_low, max(resolved_low, resolved_high)
 

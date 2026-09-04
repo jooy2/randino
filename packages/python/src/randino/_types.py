@@ -162,6 +162,67 @@ class WordDetail:
     """
 
 
+SentenceSlot = Literal["subject", "verb", "object", "state", "place", "time", "manner"]
+"""What one phrase does in a sentence.
+
+`subject` is who or what the sentence is about (`검은 고양이가`), `verb` what it does
+(`잠잔다`), `object` what it does it to (`사과를`), and `state` what it is like where
+the sentence has no verb at all (`파랗다`). The rest frame the action: `place` where it
+happens (`숲에서`), `time` when (`새벽에`), `manner` how (`조용히`).
+
+A sentence is headed by a `verb` or by a `state`, never by both.
+"""
+
+SentenceSlotOption = SentenceSlot | Sequence[SentenceSlot] | Literal["all", "none"]
+"""Which shapes a sentence may take, named by the parts they carry beside the subject.
+
+A shape qualifies when it uses at least one of them, the same way `WordSlotOption`
+reads for a nickname: a sequence is a set to draw from rather than a list every shape
+has to satisfy. `"none"` asks for the bare subject and its predicate, and `"all"` — the
+default — leaves the shape to the language's own frame weights.
+"""
+
+SentenceShape = Literal["simple", "detailed", "complex"]
+"""How much a sentence says, which is the closest thing it has to an expected length.
+
+`"simple"` is a subject and its predicate (`사자가 달린다`), `"detailed"` one phrase
+more (`사자가 숲에서 달린다`), and `"complex"` two or more (`용감한 사자가 새벽에
+숲에서 달린다`). `min_length` and `max_length` bound the characters; this bounds the
+parts, which is what a caller usually means by a short or a long sentence.
+"""
+
+SentenceShapeOption = Literal[SentenceShape, "all"]
+""""all" leaves the shape to the language's own frame weights."""
+
+
+@dataclass(frozen=True, slots=True)
+class SentenceDetail:
+    """A generated sentence with the pieces it was built from."""
+
+    sentence: str
+    """The finished sentence, punctuation and all."""
+
+    phrases: tuple[str, ...]
+    """The phrases the sentence is made of, in order.
+
+    A phrase and its modifier, without the particle or preposition that marks it. So
+    `검은 고양이가 잠잔다` reports `("검은 고양이", "잠잔다")`.
+    """
+
+    slots: tuple[SentenceSlot, ...]
+    """What each phrase does in the sentence, at the same index as `phrases`."""
+
+    language: WordLanguage
+    """The language this sentence was generated in."""
+
+    theme: WordTheme | None
+    """Theme the sentence's subject belongs to.
+
+    None when that word is not one the generator knows, which happens when it was
+    invented or was handed in through `include`.
+    """
+
+
 @dataclass(frozen=True, slots=True)
 class NicknameDetail:
     """A generated nickname with the pieces it was built from."""

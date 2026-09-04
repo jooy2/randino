@@ -39,3 +39,45 @@ def detect_language(text: str) -> WordLanguage:
         return "vi"
 
     return "en"
+
+
+# Hangul syllables are composed as (initial * 21 + vowel) * 28 + final, so the
+# remainder is the final consonant, and 0 means there is none.
+_HANGUL_BASE = 0xAC00
+_HANGUL_LAST = 0xD7A3
+_HANGUL_FINALS = 28
+
+LETTER = re.compile(r"[^\W\d_]", re.UNICODE)
+VOWELS = re.compile(r"[aeiouàáâãäåèéêëìíîïòóôõöùúûüыаеёиоуэюяıəăâêôơư]")
+
+
+def ends_with_consonant(text: str) -> bool:
+    """Whether `text` ends on a consonant.
+
+    That is what a language whose particles alternate needs to know: Korean writes
+    `사자가` and `사슴이` for the same particle, by whether the syllable in front of it
+    closes on one.
+
+    Answered by the script rather than per language. A Hangul syllable carries its final
+    consonant in its code point; a Latin or Cyrillic word is judged by its last letter;
+    a script that writes no vowels of its own — Han, kana — has no answer to give and
+    reports False, which is also what its particles need, since they do not alternate.
+
+    Args:
+        text: The text to judge.
+
+    Returns:
+        True when the last letter closes the syllable.
+    """
+    trimmed = text.rstrip()
+
+    if not trimmed:
+        return False
+
+    last = trimmed[-1]
+    code = ord(last)
+
+    if _HANGUL_BASE <= code <= _HANGUL_LAST:
+        return (code - _HANGUL_BASE) % _HANGUL_FINALS != 0
+
+    return bool(LETTER.match(last)) and not VOWELS.match(last.lower())

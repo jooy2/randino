@@ -1,16 +1,19 @@
-"""randino — random person names and nicknames, per language, with no dependencies.
+"""randino — random names, nicknames, words and sentences, per language, no dependencies.
 
-Two separate concerns, deliberately. `rand_name` produces names a person could
-actually carry (`김민준`, `Emma Clover`); `rand_nickname` produces the handle
-someone would pick for a game or a website (`멋진사자`, `MistyOwl`), built from
-everyday words and never from person names.
+Separate concerns, deliberately. `rand_name` produces names a person could actually
+carry (`김민준`, `Emma Clover`); `rand_nickname` produces the handle someone would pick
+for a game or a website (`멋진사자`, `MistyOwl`), built from everyday words and never
+from person names; `rand_word` hands those words over on their own; and `rand_sentence`
+writes a whole statement in the language's own grammar.
 
 Example:
-    >>> from randino import rand_name, rand_nickname
+    >>> from randino import rand_name, rand_nickname, rand_sentence
     >>> rand_name(language="ko", count=3)
     ['김민준', '이서연', '박지호']
     >>> rand_nickname(language="en")
     ['MistyOwl']
+    >>> rand_sentence(language="en")
+    ['The brave lion runs quietly.']
 """
 
 from randino._types import (
@@ -23,6 +26,11 @@ from randino._types import (
     NameScript,
     NicknameDetail,
     RandRealism,
+    SentenceDetail,
+    SentenceShape,
+    SentenceShapeOption,
+    SentenceSlot,
+    SentenceSlotOption,
     WordDetail,
     WordLanguage,
     WordLanguageOption,
@@ -31,7 +39,12 @@ from randino._types import (
     WordTheme,
     WordThemeOption,
 )
-from randino.constants import RAND_COUNT_MAX, RAND_LENGTH_MAX, RAND_LENGTH_MIN
+from randino.constants import (
+    RAND_COUNT_MAX,
+    RAND_LENGTH_MAX,
+    RAND_LENGTH_MIN,
+    RAND_SENTENCE_LENGTH_MAX,
+)
 from randino.decorate import (
     AFFIX_CHARSET,
     AFFIX_LENGTH_DEFAULT,
@@ -49,6 +62,7 @@ from randino.name import (
     rand_name,
 )
 from randino.nickname import nickname_length_range, rand_nickname
+from randino.sentence import rand_sentence, sentence_length_range
 from randino.word import (
     WORD_LANGUAGES,
     WORD_THEMES,
@@ -90,6 +104,7 @@ __all__ = [
     "RAND_COUNT_MAX",
     "RAND_LENGTH_MAX",
     "RAND_LENGTH_MIN",
+    "RAND_SENTENCE_LENGTH_MAX",
     "WORD_LANGUAGES",
     "WORD_THEMES",
     "ModifierKind",
@@ -101,6 +116,11 @@ __all__ = [
     "NameScript",
     "NicknameDetail",
     "RandRealism",
+    "SentenceDetail",
+    "SentenceShape",
+    "SentenceShapeOption",
+    "SentenceSlot",
+    "SentenceSlotOption",
     "WordDetail",
     "WordLanguage",
     "WordLanguageOption",
@@ -134,6 +154,7 @@ __all__ = [
     "rand_plant",
     "rand_prefix",
     "rand_product",
+    "rand_sentence",
     "rand_space",
     "rand_sport",
     "rand_suffix",
@@ -143,5 +164,6 @@ __all__ = [
     "rand_vehicle",
     "rand_weather",
     "rand_word",
+    "sentence_length_range",
     "word_length_range",
 ]

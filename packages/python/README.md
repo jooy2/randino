@@ -15,6 +15,7 @@ Every option and every example, with **Python** picked in the sidebar. This READ
 - **Person names** read like names people actually carry — Emma Clover, Jack Reeves — and come with their English pronunciation. 9 languages.
 - **Nicknames** are the handles you would pick for a game or a website — MistyOwl, CraneVoyage, RustyBoot. Built from everyday words across twenty-five themes, never from person names.
 - **Words** are those twenty-five themes on their own — `rand_word`, plus `rand_animal`, `rand_food` and twelve more.
+- **Sentences** are whole statements in the language's own grammar — `rand_sentence`. The verb decides what can stand beside it, so the words of one sentence belong together.
 - **Decorators** attach something to a string you already have: `rand_suffix`, `rand_prefix` and `rand_modifier`.
 - Every argument is keyword-only and optional, so `rand_name()` on its own works.
 - **Pure Python, no dependencies.** It imports nothing outside the standard library, and ships a `py.typed` marker so mypy and Pyright read the annotations.
@@ -134,6 +135,49 @@ word_length_range("en")  # (3, 11)
 
 One function per theme: `rand_animal`, `rand_object`, `rand_nature`, `rand_plant`, `rand_gem`, `rand_concept`, `rand_myth`, `rand_job`, `rand_music`, `rand_place`, `rand_food`, `rand_sport`, `rand_vehicle`, `rand_product`, `rand_color`, `rand_finance`, `rand_tech`, `rand_weather`, `rand_space`, `rand_time`, `rand_emotion`, `rand_body`, `rand_clothing`, `rand_tool`, `rand_drink`. Each is `rand_word` with the theme already chosen.
 
+## Sentences
+
+Whole statements, written the way the language writes them. The nouns are the same pools the words and nicknames come from; what a sentence adds is the grammar — a verb that states what can do it and what it can be done to, and the shapes each language allows.
+
+```python
+from randino import rand_sentence, sentence_length_range
+
+rand_sentence(language="en", count=3)
+# ['The brave lion runs quietly.', 'The otter swims in the cove.', 'The sky is blue.']
+
+rand_sentence(language="ko", count=2)
+# ['검은 고양이가 숲에서 잠잔다.', '여우가 사과를 먹는다.']
+
+rand_sentence(language="en", shape="simple")  # ['The gondola passes.']
+rand_sentence(language="en", include=["brave", "lion"])
+# ['The brave lion yawns quietly.']
+
+rand_sentence(language="ko", output="detail")
+# [SentenceDetail(sentence='검은 고양이가 숲에서 잠잔다.',
+#                 phrases=('검은 고양이', '숲', '잠잔다'),
+#                 slots=('subject', 'place', 'verb'), language='ko', theme='animal')]
+
+sentence_length_range("en")  # (13, 92)
+```
+
+| Argument                    | Type                                | Default   |
+| --------------------------- | ----------------------------------- | --------- |
+| `language`                  | `WordLanguageOption`                | `"all"`   |
+| `theme`                     | `WordThemeOption`                   | `"all"`   |
+| `shape`                     | `SentenceShapeOption`               | `"all"`   |
+| `slots`                     | `SentenceSlotOption`                | `"all"`   |
+| `include`                   | `str \| Sequence[str]`              | `()`      |
+| `count`                     | `int`                               | `1`       |
+| `realism`                   | `RandRealism`                       | `"real"`  |
+| `min_length` / `max_length` | `int \| None`                       | _language_ |
+| `starts_with`               | `str`                               | `""`      |
+| `unique`                    | `bool`                              | `False`   |
+| `output`                    | `RandOutput`                        | `"value"` |
+
+`slots` names the parts a shape may carry beside its subject: `object`, `place`, `time`, `manner`, `state`, or `"none"` for a subject and its predicate alone. A language declares its own shapes, so German has no `object` and Russian no `place` — both mark those with a case their nouns would have to change for — and asking for one falls back to the closest shape the language does have.
+
+`include` puts words you name into every sentence. A word the pools hold goes in the phrase it belongs to, and a word from anywhere else is used as a noun.
+
 ## Decorators
 
 `rand_suffix`, `rand_prefix` and `rand_modifier` attach something to a string you already have, rather than generating one. They take anything, not just this library's output, which is why none of them is an argument on a generator — and each of them works with no value at all, handing back the thing it would have attached.
@@ -192,6 +236,7 @@ name_length_range("en", include_middle_name=True)  # (12, 24)
 name_supports_middle_name("ko")  # False
 name_supports_roman("en")  # False
 nickname_length_range("ko")  # (1, 13)
+sentence_length_range("ko")  # (6, 41)
 ```
 
 `NAME_LANGUAGES`, `WORD_LANGUAGES` and `WORD_THEMES` list what the generators accept; `RAND_COUNT_MAX`, `RAND_LENGTH_MIN` / `MAX`, `AFFIX_LENGTH_DEFAULT` / `MAX`, `AFFIX_SEPARATOR_DEFAULT` and `AFFIX_CHARSET` are the bounds and defaults every argument is clamped to.
