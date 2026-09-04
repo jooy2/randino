@@ -9,8 +9,9 @@ Guidance for AI agents (and humans) working in this repository. Written in Engli
 - **Names** should read like names a person actually carries (`김민준`, `Emma Clover`). Sample data for forms, seeds, mockups.
 - **Nicknames** are the handles someone would pick for a game or a website (`멋진사자`, `MistyOwl`). They are built from everyday words and **never from person names** — that rule is the whole point of keeping the two apart.
 - **Words** are those everyday words on their own (`여우`, `Lantern`), one theme at a time. `randWord` takes the theme as an option, and the twenty-five `randAnimal` / `randFood` / … functions are the same generator with the theme already chosen.
+- **Sentences** are whole statements in the language's own grammar (`여우가 사과를 먹는다.`, `The brave lion runs quietly.`). They draw the same nouns a nickname does, and what they add is everything a sentence needs beside them — a verb in the form a statement ends on, the particles, the articles and the shapes.
 
-All three are implemented. Keep the generators apart — a shared "generator" abstraction is not wanted — but the options they all take, and the loop that draws until it has `count` results, live in `_internal/generate` and are shared. So are the word pools: `word/data` is the one dataset, and `nickname` consumes it.
+All four are implemented. Keep the generators apart — a shared "generator" abstraction is not wanted — but the options they all take, and the loop that draws until it has `count` results, live in `_internal/generate` and are shared. So are the word pools: `word/data` is the one dataset, and `nickname` consumes it.
 
 Beside them sits **decorate**, which generates nothing on its own: it attaches something to a string you already have. `randSuffix` and `randPrefix` attach a random token (`멋진사자` → `멋진사자_nVtRC`); `randModifier` attaches a word out of the pools (`사자` → `멋진사자`). All three used to be nickname options — `uniqueSuffix*` and `includeModifier` — and all three moved out for the same reason: decorating a string was never a thing about nicknames. **Every decorator works with no value at all**, handing back the token or the word it would have attached, because what it attaches is worth having on its own.
 
@@ -18,7 +19,7 @@ That is the third group, and the three of them are why the split is not generato
 
 The name generator is a port of the logic behind vutools' [Random Person Name Generator](https://www.vutools.com/tools/text/random-person-name-generator) (`client/src/app/[locale]/tools/text/random-person-name-generator` in the `www-vutools-com` repo), with the same options. Two deliberate differences: the web page's `es-hangul` dependency is replaced by an internal romanizer (see below), and length bounds are resolved per language so `language: 'all'` does not stretch a Korean name to fill a Spanish name's range.
 
-The nickname and word generators have no upstream — they are this repo's own. Their options mirror the name generator's where they mean the same thing: those live on `RandCommonOptions` (`count`, `realism`, `minLength` / `maxLength`, `startsWith`, `unique`, `output`), and each generator adds only what is its own. `randWord` adds `language` and `theme`; `randNickname` adds those plus `wordSeparator`.
+The nickname, word and sentence generators have no upstream — they are this repo's own. Their options mirror the name generator's where they mean the same thing: those live on `RandCommonOptions` (`count`, `realism`, `minLength` / `maxLength`, `startsWith`, `unique`, `output`), and each generator adds only what is its own. `randWord` adds `language` and `theme`; `randNickname` adds those plus `wordSeparator`; `randSentence` adds `shape`, `slots` and `include`.
 
 **A new generator should add options, not repeat them.** If it counts, filters by a starting character or deduplicates, it calls `collect` in `_internal/generate` and gets all of that for free.
 
@@ -83,11 +84,21 @@ lib/
     randNickname.ts         # public: string[], or NicknameDetail[] likewise
     nicknameLengthRange.ts  # public helper
     nicknameGenerator.ts    # internal: shapes, length fitting; draws through word/
+  sentence/
+    index.ts
+    randSentence.ts         # public: string[], or SentenceDetail[] likewise
+    sentenceLengthRange.ts  # public helper
+    sentenceGenerator.ts    # internal: the shapes, the verb selection, the fitting
+    data/
+      index.ts              # SENTENCE_DATA, THEME_CLASS
+      types.ts              # internal dataset types (verbs, states, frames)
+      en.ts ko.ts ja.ts …   # one file per language, nine of them
 test/
   base.test.ts              # the package's export surface
   decorate.test.ts          # one *.test.ts per category
   name.test.ts
   nickname.test.ts
+  sentence.test.ts
   word.test.ts
 ```
 
@@ -156,11 +167,14 @@ lib/
       word_generator.dart
       rand_word.dart rand_animal.dart …
     nickname/               # mirrors lib/nickname
+    sentence/               # mirrors lib/sentence, plus `randSentenceDetails`
+      data/                 # one file per language, ported verbatim
 test/
   base_test.dart            # the barrel's export surface, read out of the source
   decorate_test.dart
   name_test.dart
   nickname_test.dart
+  sentence_test.dart
   word_test.dart
 example/
   randino_example.dart      # what pub.dev renders on the package's Example tab
@@ -192,7 +206,8 @@ example/
 Dart has neither overloads nor union types, so a function cannot hand back one type for one argument and another type for another. That costs two things, and both are the same limitation:
 
 - `randSuffix` takes a `String` and `randSuffixAll` takes a `List<String>`, where npm and PyPI have one function taking either. The same goes for `randModifier` / `randModifierAll`. And because Dart cannot make a positional parameter optional alongside named ones, the decorators' `value` is **named**: `randSuffix(value: 'a')`, so that `randSuffix()` can mean the bare token.
-- `randNameDetails`, `randNicknameDetails` and `randWordDetails` still exist here. In the other two packages they are `output: 'detail'` on the generator itself; in Dart, `randName` returns `List<String>` and that is the end of it.
+- `randNameDetails`, `randNicknameDetails`, `randWordDetails` and `randSentenceDetails` still exist here. In the other two packages they are `output: 'detail'` on the generator itself; in Dart, `randName` returns `List<String>` and that is the end of it.
+- `randSentence`'s `include` is a `List<String>` where the other two take a string or a list, for the same reason.
 - The **twenty-five themed word functions have no detail form.** Twenty-eight functions for one option would be the wrong trade, so `randAnimal` returns `List<String>` and a caller who wants the detail passes `WordTheme.animal` to `randWordDetails`. That asymmetry is documented on every one of them.
 
 Do not try to fake either with `Object` or a generic: `T extends Object` would type-check `randSuffix(3)` and fail at run time, which is worse than a second name. **A new option that changes a return type lands as a second Dart function**, and the `::: lang` blocks on the docs page are where the two shapes are shown side by side.
@@ -225,12 +240,15 @@ src/randino/
     _generator.py
     rand_word.py rand_animal.py …
   nickname/                 # mirrors lib/nickname
+  sentence/                 # mirrors lib/sentence
+    data/                   # one file per language, ported verbatim
   py.typed                  # PEP 561 — without it every annotation is ignored
 tests/
   test_base.py              # the barrel's export surface, and the no-dependency rule
   test_decorate.py
   test_name.py
   test_nickname.py
+  test_sentence.py
   test_word.py
 ```
 
@@ -391,7 +409,7 @@ It runs from `.github/workflows/run-check-data.yml`, the one workflow that insta
 
 **The dumps normalize what only differs because the languages differ, and nothing else.** A pool entry is `{ n, r }` everywhere; field names are the JavaScript ones; an optional field is present and null rather than absent; `syn` carries its `kind` tag even in the two packages that tell the shapes apart by type. That normalization lives in the three dumps — one per package, each responsible for its own language's spelling — so the comparison itself has nothing to know about any of them. Adding a field to a dataset means adding it to all three dumps, and the check reports a field only one dump writes as a difference, which is the intended failure.
 
-**Do not widen it into a general "the ports agree" check.** It covers the word and name datasets, the surname romanization map, and the bounds in `constants` and `decorate/data` — the last of which is still written by hand in each package. The nickname shapes are in it now that they are `WordLanguageData.frames`: they were left out while they were a table private to each generator, and being data is what put them in.
+**Do not widen it into a general "the ports agree" check.** It covers the word, sentence and name datasets, the surname romanization map, and the bounds in `constants` and `decorate/data` — the last of which is still written by hand in each package. The nickname shapes are in it now that they are `WordLanguageData.frames`: they were left out while they were a table private to each generator, and being data is what put them in. The sentence datasets are the same story on a larger scale, `THEME_CLASS` included, because a theme moving from one class to another changes what every verb of every language will accept.
 
 ## Testing a random generator
 
@@ -408,6 +426,8 @@ Do not assert an exact generated name, and do not use a fixed seed — there is 
 Gender is the one option with no directly observable effect in most languages. It is verified through Russian, whose middle name and surname inflect for it (`…ович` / `…овна`, `Иванов` / `Иванова`).
 
 Nicknames are checked against the datasets themselves: `randNickname({ output: 'detail' })` reports the `words` it used, so every word can be asserted to come from the language's pools, and the English pools are asserted to share nothing with the English person-name pools. Korean and Japanese cannot have that last invariant — `하늘`, `별` and `森` are everyday nouns that also happen to be names, and `아름다운하늘` is still nobody's name.
+
+Sentences are checked the same way, one layer up: every phrase has to decompose into what the generator is allowed to build (an article, a noun, at most one modifier, on the side the language puts it), every verb has to belong to a group that accepts the subject's class, and Korean's `가` / `이` has to match the coda of the word in front of it. `randSentence({ output: 'detail' })` is what makes all three checkable.
 
 Two coincidences are load-bearing and must not be asserted away: a word can be both a modifier and a noun (`무지개`, `Marble`, `自由`), and an invented word can spell a real one by accident (`나` + `비` -> `나비`, so `theme` comes back as `'animal'` at `realism: 'invented'`). Structural assertions survive both; "the first word is not a modifier" does not.
 
@@ -437,6 +457,29 @@ Nicknames:
 - **`NicknameDetail.words` is the words and nothing else.** A frame's particle lives in `nickname` alone, so `사자의눈물` reports `['사자', '눈물']` and joining them back does not reproduce it. The three suites assert the weaker property instead: the words appear in order with nothing between them but the separator and a particle the language declares.
 - **Two rough spots trigger a re-draw** rather than being shipped: a `startsWith` that no real word in the rolled theme matched (another theme probably has one), and a word ending on the character the next one starts with (`石霜` + `霜雨`). The second is skipped across a gap that has a particle in it, which already keeps the two apart. Both fall back to the closest attempt if every attempt is rough.
 - **Invented-word templates stay short.** Two or three syllables per word, because up to three words are joined; `en` is capped at two.
+
+Sentences:
+
+- **The shapes belong to the language, again.** `SentenceLanguageData.frames` writes them out in the language's own order, and each part carries what the language writes around it — a `head` in front (English `in`, Chinese `在`), a `tail` behind (Korean `가`, Japanese `が`). **A language declares only what it can write correctly**: German has no `object` frame and Russian no `place`, because both would put the noun in a case its own ending or its article has to change for. A request neither can answer falls back, and `languagesFor` prefers the ones that can.
+- **A verb states what it can take, and that is the whole of the coherence.** `VerbGroup` names the noun classes that can be its subject and its object, the nouns are drawn from those alone, and `THEME_CLASS` maps the twenty-five themes onto ten classes so no noun needs a tag of its own. Adding a verb group means asking what can do it, not what it means. A class with no intransitive group and no state group is a class no sentence can be built around — `test/sentence.test.ts` asserts every class has both.
+- **The predicate is chosen before the nouns.** `compose` picks the verb or state group first, then the subject's theme out of the classes it accepts, then the phrases in frame order. That order is what lets the subject's gender be in hand before the modifier that has to agree with it, and it is why a shape the language cannot head is dropped in `generateOne` rather than papered over.
+- **`realism` reaches the words and never the grammar.** An invented sentence keeps its particles, its articles, its agreement and its shape. That is what makes `수줍은 노오가 안개 파저멜을 챙긴다.` still Korean.
+- **Korean particle alternation is a script question, not a language branch.** `endsWithConsonant` in `_internal/script.ts` answers it from the code point, and the data declares both allomorphs as `tail` / `tailAlt`. Any language whose particles alternate on a coda can use it without a line in the generator.
+- **A noun with no singular is left out of a sentence entirely.** `nounsOf` filters `p` and `fp` out for a language that inflects: they would need a plural verb beside them, and a second verb pool is a lot of data for a dozen words.
+- **`include` places a word by what it can be, not by what it is.** A `Requirement` carries a list of slots, best first, and the shape takes the first still free — which is how `['brave', 'lion', 'quietly']` puts `brave` in the modifier slot rather than the predicate. More required words than the longest shape has phrases means the extras are dropped; that is documented, not fixed.
+- **`SentenceDetail.phrases` holds the phrases and nothing else.** The particle or preposition lives in `sentence` alone, so joining them back does not reproduce it. All three suites assert the weaker property instead: the phrases appear in order.
+- **`RAND_SENTENCE_LENGTH_MAX` is its own ceiling.** Every other generator produces at most three words, so 40 is right for them and would cut most sentences in half. `lengthBounds` takes the ceiling as an argument rather than the sentence generator clamping afterwards.
+
+## Adding a sentence language
+
+Every word language has sentence data too, so this is only for a language being added from scratch — do the word language first.
+
+1. Write the **frames** before anything else. A shape is only worth having if the grammar carries it, and the ones the language cannot write correctly are the ones it must not declare. German and Russian are the worked examples: nominative only, because every other case changes the noun or the article.
+2. Add `lib/sentence/data/<code>.ts` with a `SentenceLanguageData` object: `space` (a space everywhere but CJK), `capitalize`, `terminator`, the `articles` if the language has them, `predicateAgrees` if its predicate adjectives inflect, the verb and state groups, `manners`, `times`, and the frames.
+3. **Verbs go in groups, in the form a plain statement ends on.** Each group names the classes that can be its subject and — when transitive — its object. Every one of the ten classes needs at least one group that accepts it as a subject, and at least one state group that describes it.
+4. **Adverbials are written whole**, particle and all: `새벽에`, `at dawn`, `por la mañana`. They are idiomatic, and splitting them into a noun and a marker would buy nothing.
+5. Register it in `SENTENCE_DATA`, add the script regex to `test/sentence.test.ts`, and port all of it to `packages/dart` and `packages/python`.
+6. Run `node tools/parity/index.mjs`.
 
 ## Adding a name language
 
@@ -498,14 +541,15 @@ This applies to every language, and the failure looks different in each. Korean 
 A theme is a slice of everyday vocabulary that a modifier can sit in front of. Adding one touches every language at once, because `nouns` is a `Record<WordTheme, WordPool>` — the TypeScript type will not let a language skip it, and the ports assert it instead. **It also adds a public function**, because every theme has one.
 
 1. Add the name to `WordTheme` in `lib/_types/global.ts` and to `WORD_THEMES` in `lib/word/data/index.ts`.
-2. Add the pool to **all four** languages. A theme that only one language can fill is not a theme.
+2. Add the pool to **all nine** languages. A theme that only one language can fill is not a theme.
 3. **Themes have to be disjoint**, and `test/nickname.test.ts` asserts it. A word in two of them makes the reported `theme` ambiguous, and it makes the detail output report a theme the caller did not ask about. When a new theme claims a word an old one already holds, move it rather than copy it — `place` took the twelve places that were sitting in `concept`, `vehicle` took 자전거 / 기차 / 배 out of `object`, `plant` took the flowers and trees out of `nature`, and `music` took the instruments out of `object` and 리듬 / 선율 / 화음 out of `concept`. Where the two senses are genuinely different words, rename instead of moving: the English toy became `Marbles` so `gem` could keep `Marble`.
 4. Watch the word lengths. `wordLengthRange` and `nicknameLengthRange` are both derived from the shortest and longest word in the pools, and `test/word.test.ts` and `test/nickname.test.ts` each pin three of their values, so a Chinese noun outside 2–3 characters or a Korean one outside 1–4 changes a number the tests assert by value.
 5. Add the `rand<Theme>` function beside the other twenty-five, export it from `lib/word/index.ts`, and add it to the `THEMED` table in `test/word.test.ts` — that table is asserted to have exactly one entry per theme, so a missing function fails the suite. Update the theme list in `README.md` and the doc comment on `WordTheme`.
-6. Do the same in `packages/dart` and `packages/python` — `WordTheme`, the theme list, the pool in all four language files, and the themed function. Neither Dart's `Map` nor Python's `dict` complains about a missing theme the way the TypeScript `Record` does, which is why both ports assert every language fills every theme.
-7. Decide whether the theme belongs in `LOOSE_THEMES`. A theme a modifier cannot sit in front of without the result reading as a joke goes in, and `randNickname` then only reaches it once `realism` loosens or the caller names it. `color`, `finance` and `tech` are there; everything a nickname can carry stays out.
-8. Add the row to `docs/en/word/themes.md` and `docs/ko/word/themes.md`.
-9. Run `node tools/parity/index.mjs` from the repository root. A theme adds four pools to each of three packages, which is twelve chances to drop a word.
+6. Do the same in `packages/dart` and `packages/python` — `WordTheme`, the theme list, the pool in all nine language files, and the themed function. Neither Dart's `Map` nor Python's `dict` complains about a missing theme the way the TypeScript `Record` does, which is why both ports assert every language fills every theme.
+7. Give it a class in `THEME_CLASS` (`lib/sentence/data/index.ts`), in all three packages. Without one the theme has no verb that will take it, and `test/sentence.test.ts` fails.
+8. Decide whether the theme belongs in `LOOSE_THEMES`. A theme a modifier cannot sit in front of without the result reading as a joke goes in, and `randNickname` then only reaches it once `realism` loosens or the caller names it. `color`, `finance` and `tech` are there; everything a nickname can carry stays out.
+9. Add the row to `docs/en/word/themes.md` and `docs/ko/word/themes.md`, and to the class table on `docs/*/sentence/index.md`.
+10. Run `node tools/parity/index.mjs` from the repository root. A theme adds nine pools to each of three packages, which is twenty-seven chances to drop a word.
 
 ## Commit conventions
 
