@@ -197,6 +197,38 @@ enum WordTheme {
   drink,
 }
 
+/// What one word does inside a nickname.
+///
+/// [noun] is the word every shape is built around; the other three are what a
+/// shape may put beside it. `randNickname`'s `slots` names the ones it may use,
+/// and [NicknameDetail.slots] reports the ones it did.
+enum WordSlot {
+  /// Says what the noun is like: 멋진, Brave, 青い.
+  adjective,
+
+  /// Says what the noun is doing: 웃는, Laughing, 踊る.
+  action,
+
+  /// The nickname's base word, out of one theme's pool.
+  noun,
+
+  /// A trailing noun, joined to the base word.
+  part,
+}
+
+/// The two slots that can modify a noun, which is what `randModifier` draws.
+///
+/// A separate enum rather than a subset of [WordSlot], because Dart cannot
+/// narrow one: `randModifier(kind: WordSlot.noun)` would have to be an error at
+/// run time, and this way it is one at compile time.
+enum ModifierKind {
+  /// Says what the value is like: 멋진, Misty.
+  adjective,
+
+  /// Says what the value is doing: 웃는, Laughing.
+  action,
+}
+
 /// A span of lengths in characters, inclusive at both ends.
 class LengthRange {
   /// Creates a range from [min] to [max], both inclusive.
@@ -273,6 +305,7 @@ class NicknameDetail {
   const NicknameDetail({
     required this.nickname,
     required this.words,
+    required this.slots,
     required this.language,
     required this.theme,
   });
@@ -285,6 +318,10 @@ class NicknameDetail {
   /// A shape that needs a particle between two of them carries it in [nickname]
   /// and nowhere here, so `사자의눈물` reports `['사자', '눈물']`.
   final List<String> words;
+
+  /// What each word does in the shape, at the same index as [words] — the noun
+  /// the nickname is built around, and whatever the shape put beside it.
+  final List<WordSlot> slots;
 
   /// The language this nickname was generated in.
   final WordLanguage language;

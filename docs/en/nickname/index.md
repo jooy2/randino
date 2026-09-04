@@ -58,6 +58,8 @@ That is why a narrow range drops the modifier instead of truncating a word, and 
 
 The shapes belong to the language rather than to the generator, because grammar differs: Chinese needs 的 between a verb and its noun (`奔跑的狮子`) where Korean needs nothing (`달리는사자`), and English has no possessive shape at all, since `of` is a word rather than a particle that attaches to the word in front of it.
 
+`slots` picks between the shapes too, and it picks first: it decides which shapes are on the table, and the length range then chooses among those. [`randNickname`](./rand-nickname#picking-the-shape) has the examples.
+
 ::: lang js
 
 ```javascript

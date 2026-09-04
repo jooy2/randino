@@ -78,6 +78,9 @@ randNickname(language: WordLanguage.en, count: 3);
 randNickname(language: WordLanguage.en, theme: WordTheme.animal, count: 2);
 // ['FloatingFalcon', 'ChewyOtter']
 
+randNickname(language: WordLanguage.en, slots: {WordSlot.action}, count: 2);
+// ['CountingHarmonics', 'HaulingBurrito']
+
 randNicknameDetails(language: WordLanguage.en).first;
 // NicknameDetail(MistyOwl, [Misty, Owl], en, animal)
 ```
@@ -86,6 +89,7 @@ randNicknameDetails(language: WordLanguage.en).first;
 | ------------------------- | ------------------- | ---------------------- |
 | `language`                | `WordLanguage?` | `null` — every one     |
 | `theme`                   | `WordTheme?`    | `null` — every one     |
+| `slots`                   | `Set<WordSlot>?` | `null` — every shape  |
 | `count`                   | `int`               | `1`                    |
 | `realism`                 | `RandRealism`             | `RandRealism.real` |
 | `minLength` / `maxLength` | `int?`              | _language_             |
@@ -151,6 +155,7 @@ A fresh token per value, never one for the batch. The default charset leaves out
 ```dart
 randModifier(value: 'Owl'); // 'MistyOwl'
 randModifier(value: 'Owl', separator: ' '); // 'Misty Owl'
+randModifier(value: 'Owl', kind: ModifierKind.action); // 'CountingOwl'
 randModifier(); // 'Misty'
 
 randModifierAll(randAnimal(language: WordLanguage.en, count: 2));
@@ -162,6 +167,7 @@ randModifierAll(randAnimal(language: WordLanguage.en, count: 2));
 | `value`     | `String?`       | `null`     |
 | `language`  | `WordLanguage?` | _script_   |
 | `realism`   | `RandRealism`   | `RandRealism.real` |
+| `kind`      | `ModifierKind?` | `null`     |
 | `separator` | `String?`       | _language_ |
 
 With no `language`, the script of the value picks one, so `'고양이'` is never handed an English modifier.

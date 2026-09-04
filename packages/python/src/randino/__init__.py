@@ -14,6 +14,7 @@ Example:
 """
 
 from randino._types import (
+    ModifierKind,
     NameDetail,
     NameGender,
     NameGenderOption,
@@ -25,6 +26,8 @@ from randino._types import (
     WordDetail,
     WordLanguage,
     WordLanguageOption,
+    WordSlot,
+    WordSlotOption,
     WordTheme,
     WordThemeOption,
 )
@@ -89,6 +92,7 @@ __all__ = [
     "RAND_LENGTH_MIN",
     "WORD_LANGUAGES",
     "WORD_THEMES",
+    "ModifierKind",
     "NameDetail",
     "NameGender",
     "NameGenderOption",
@@ -100,6 +104,8 @@ __all__ = [
     "WordDetail",
     "WordLanguage",
     "WordLanguageOption",
+    "WordSlot",
+    "WordSlotOption",
     "WordTheme",
     "WordThemeOption",
     "name_length_range",

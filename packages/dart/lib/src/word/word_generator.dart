@@ -24,7 +24,11 @@ const int _synthAttempts = 8;
 ///
 /// Built per call: every draw already walks the pool it is given, so holding
 /// this one would save nothing worth the bookkeeping.
-WordPool modifiersOf(WordLanguageData data) => <String>[...data.adjectives, ...data.actions];
+WordPool modifiersOf(WordLanguageData data, [ModifierKind? kind]) => switch (kind) {
+  ModifierKind.adjective => data.adjectives,
+  ModifierKind.action => data.actions,
+  null => <String>[...data.adjectives, ...data.actions],
+};
 
 /// A modifier reshaped to agree with a noun of [gender].
 ///

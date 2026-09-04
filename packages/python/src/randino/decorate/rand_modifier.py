@@ -1,10 +1,10 @@
 """Put a random modifier in front of a string, or of every string in a list."""
 
-from typing import overload
+from typing import Literal, overload
 
 from randino._internal.generate import draw_language, resolve_realism
 from randino._internal.script import detect_language
-from randino._types import RandRealism, WordLanguageOption
+from randino._types import ModifierKind, RandRealism, WordLanguageOption
 from randino.word._generator import (
     agree,
     draw_word,
@@ -16,7 +16,10 @@ from randino.word.data import WORD_DATA, WORD_LANGUAGES
 
 
 def _draw(
-    value: str | None, language: WordLanguageOption | None, realism: RandRealism
+    value: str | None,
+    language: WordLanguageOption | None,
+    realism: RandRealism,
+    kind: ModifierKind | Literal["all"],
 ) -> tuple[str, str, bool]:
     """One modifier, the separator its language joins with, and which side it goes."""
     # The language of the word being decorated, so that `"고양이"` is not handed an
@@ -24,7 +27,7 @@ def _draw(
     requested = language or (detect_language(value) if value is not None else "all")
     code = draw_language(requested, WORD_LANGUAGES)
     data = WORD_DATA[code]
-    pool = modifiers_of(data)
+    pool = modifiers_of(data, kind)
     low, high = pool_bounds(pool)
     word, _missed = draw_word(data, pool, resolve_realism(realism), low, high, "")
     # A value the language knows is a noun whose gender it can look up, so the
@@ -41,6 +44,7 @@ def rand_modifier(
     *,
     language: WordLanguageOption | None = ...,
     realism: RandRealism = ...,
+    kind: ModifierKind | Literal["all"] = ...,
     separator: str | None = ...,
 ) -> str: ...
 
@@ -51,6 +55,7 @@ def rand_modifier(
     *,
     language: WordLanguageOption | None = ...,
     realism: RandRealism = ...,
+    kind: ModifierKind | Literal["all"] = ...,
     separator: str | None = ...,
 ) -> str: ...
 
@@ -61,6 +66,7 @@ def rand_modifier(
     *,
     language: WordLanguageOption | None = ...,
     realism: RandRealism = ...,
+    kind: ModifierKind | Literal["all"] = ...,
     separator: str | None = ...,
 ) -> list[str]: ...
 
@@ -70,6 +76,7 @@ def rand_modifier(
     *,
     language: WordLanguageOption | None = None,
     realism: RandRealism = "real",
+    kind: ModifierKind | Literal["all"] = "all",
     separator: str | None = None,
 ) -> str | list[str]:
     """Put a random modifier in front of a string: `"사자"` becomes `"멋진사자"`.
@@ -88,6 +95,8 @@ def rand_modifier(
             no value at all, or with `"all"`, every language is in play.
         realism: whether the modifier is one the language actually uses, or one
             invented to read like it.
+        kind: whether the modifier says what the value is like (`멋진`, `Misty`) or
+            what it is doing (`웃는`, `Laughing`). `"all"` draws from both.
         separator: Placed between the modifier and the value. Defaults to the way
             the language itself joins words, which is to run them together.
 
@@ -101,14 +110,16 @@ def rand_modifier(
         '멋진사자'
         >>> rand_modifier("Owl", separator=" ")
         'Misty Owl'
+        >>> rand_modifier(language="ko", kind="action")
+        '웃는'
         >>> rand_modifier(rand_animal(language="ko", count=2))
         ['오래된곰', '영원한도마뱀']
     """
     if value is None:
-        return _draw(None, language, realism)[0]
+        return _draw(None, language, realism, kind)[0]
 
     def one(item: str) -> str:
-        word, joiner, follows = _draw(item, language, realism)
+        word, joiner, follows = _draw(item, language, realism, kind)
         gap = joiner if separator is None else separator
 
         # Vietnamese puts the modifier after the noun, and says so in its frames.

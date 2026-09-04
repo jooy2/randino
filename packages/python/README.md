@@ -77,14 +77,19 @@ rand_nickname(language="en", count=3)
 rand_nickname(language="en", theme="animal", count=2)
 # ['FloatingFalcon', 'ChewyOtter']
 
+rand_nickname(language="en", slots="action", count=2)
+# ['CountingHarmonics', 'HaulingBurrito']
+
 rand_nickname(language="en", output="detail")[0]
-# NicknameDetail(nickname='MistyOwl', words=('Misty', 'Owl'), language='en', theme='animal')
+# NicknameDetail(nickname='MistyOwl', words=('Misty', 'Owl'),
+#                slots=('adjective', 'noun'), language='en', theme='animal')
 ```
 
 | Argument                    | Type                              | Default    |
 | --------------------------- | --------------------------------- | ---------- |
 | `language`                  | `WordLanguageOption`          | `"all"`    |
 | `theme`                     | `WordThemeOption`             | `"all"`    |
+| `slots`                     | `WordSlotOption`              | `"all"`    |
 | `count`                     | `int`                             | `1`        |
 | `realism`                   | `RandRealism`                     | `"real"`   |
 | `min_length` / `max_length` | `int \| None`                     | _language_ |
@@ -93,7 +98,7 @@ rand_nickname(language="en", output="detail")[0]
 | `unique`                    | `bool`                            | `False`    |
 | `output`                    | `RandOutput`                      | `"value"`  |
 
-`output="detail"` returns a `NicknameDetail` — `nickname`, `words`, `language` and `theme` — for each nickname instead of a string.
+`output="detail"` returns a `NicknameDetail` — `nickname`, `words`, `slots`, `language` and `theme` — for each nickname instead of a string.
 
 Themes: `animal`, `object`, `nature`, `plant`, `gem`, `concept`, `myth`, `job`, `music`, `place`, `food`, `sport`, `vehicle`, `product`, `color`, `finance`, `tech`, `weather`, `space`, `time`, `emotion`, `body`, `clothing`, `tool`, `drink`.
 
@@ -160,6 +165,7 @@ from randino import rand_animal, rand_modifier
 
 rand_modifier("Owl")  # 'MistyOwl'
 rand_modifier("Owl", separator=" ")  # 'Misty Owl'
+rand_modifier("Owl", kind="action")  # 'CountingOwl'
 rand_modifier()  # 'Misty'
 
 rand_modifier(rand_animal(language="en", count=2))
@@ -171,6 +177,7 @@ rand_modifier(rand_animal(language="en", count=2))
 | `value`     | `str \| list[str] \| None`   | `None`     |
 | `language`  | `WordLanguageOption \| None` | _script_   |
 | `realism`   | `RandRealism`                | `"real"`   |
+| `kind`      | `ModifierKind \| "all"`      | `"all"`    |
 | `separator` | `str \| None`                | _language_ |
 
 With no `language`, the script of the value picks one, so `"고양이"` is never handed an English modifier.

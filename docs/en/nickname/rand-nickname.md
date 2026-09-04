@@ -43,6 +43,7 @@ Every option is optional, and the defaults are what the empty call above uses.
 | --- | --- | --- | --- |
 | `language` | <Lang js="WordLanguageOption" dart="WordLanguage?" py="WordLanguageOption &#124; None" code /> | <Lang js="'all'" dart="null" py="None" code /> | Language of the generated nicknames. <Lang js="'all'" dart="null" py="&quot;all&quot;" code /> mixes every supported language, picking one per nickname. |
 | `theme` | <Lang js="WordThemeOption" dart="WordTheme?" py="WordThemeOption" code /> | <Lang js="'all'" dart="null" py="&quot;all&quot;" code /> | What the nickname is about. See [Themes](../word/themes). |
+| `slots` | <Lang js="WordSlotOption" dart="Set&lt;WordSlot&gt;?" py="WordSlotOption" code /> | <Lang js="'all'" dart="null" py="&quot;all&quot;" code /> | Which shapes to accept, by what they put beside the noun. See [Picking the shape](#picking-the-shape). |
 | `count` | <Lang js="number" dart="int" py="int" code /> | `1` | How many nicknames to return. Clamped to `0` … `10000`. |
 | `realism` | `RandRealism` | <Lang js="`'real'`" dart="`RandRealism.real`" py="`\"real\"`" /> | `real` uses real words, `invented` builds words that only read like the language, and `mixed` decides per word. |
 | <Lang js="minLength" dart="minLength" py="min_length" code /> | <Lang js="number" dart="int?" py="int &#124; None" code /> | _language_ | Minimum length in characters. |
@@ -71,6 +72,7 @@ randNickname({ language: 'en', output: 'detail' });
 // [{
 //   nickname: 'MistyOwl',
 //   words: ['Misty', 'Owl'],
+//   slots: ['adjective', 'noun'],
 //   language: 'en',
 //   theme: 'animal'
 // }]
@@ -85,6 +87,8 @@ import 'package:randino/randino.dart';
 
 randNicknameDetails(language: WordLanguage.en);
 // [NicknameDetail(MistyOwl, [Misty, Owl], en, animal)]
+randNicknameDetails(language: WordLanguage.en).first.slots;
+// [WordSlot.adjective, WordSlot.noun]
 ```
 
 :::
@@ -96,7 +100,7 @@ from randino import rand_nickname
 
 rand_nickname(language="en", output="detail")
 # [NicknameDetail(nickname='MistyOwl', words=('Misty', 'Owl'),
-#                 language='en', theme='animal')]
+#                 slots=('adjective', 'noun'), language='en', theme='animal')]
 ```
 
 :::
@@ -105,8 +109,11 @@ rand_nickname(language="en", output="detail")
 | --- | --- | --- |
 | `nickname` | <Lang js="string" dart="String" py="str" code /> | The finished nickname. |
 | `words` | <Lang js="string[]" dart="List&lt;String&gt;" py="tuple[str, ...]" code /> | The words it is made of, in order — the words only. |
+| `slots` | <Lang js="WordSlot[]" dart="List&lt;WordSlot&gt;" py="tuple[WordSlot, ...]" code /> | What each word does in the shape, at the same index as `words`. |
 | `language` | `WordLanguage` | The language this nickname was generated in. |
 | `theme` | <Lang js="WordTheme &#124; null" dart="WordTheme?" py="WordTheme &#124; None" code /> | Theme of the base word, or null when that word is not one the generator knows. |
+
+`slots` lines up with `words`: the word at index 2 is the thing `slots[2]` names. Every shape has exactly one `noun`, and the rest is whatever the shape put beside it.
 
 `words` holds the words and nothing else. A shape that needs a particle between two of them carries it in `nickname` alone, so `사자의눈물` reports `['사자', '눈물']` and joining the two back together does not reproduce it. Read `nickname` for the finished string, and `words` for what it was built from.
 
@@ -213,6 +220,100 @@ rand_nickname(language="en", theme="gem", count=3)
 :::
 
 The twenty-five themes, and what each one holds, are on [Themes](../word/themes).
+
+### Picking the shape {#picking-the-shape}
+
+`slots` names what a shape may put beside the noun, and the shapes that use none of it are dropped. A shape qualifies when it uses **at least one** of the slots — so naming two asks for either and leaves the choice to chance, which is what `['adjective', 'action']` below does.
+
+::: lang js
+
+```javascript
+randNickname({ language: 'en', slots: 'action', count: 3 });
+// ['CountingHarmonics', 'HaulingBurrito', 'FloatingSelkie']
+
+randNickname({ language: 'en', slots: 'part', count: 3 });
+// ['CardTrack', 'DreamyBlackthornBreeze', 'ThrowingParachuteHorn']
+
+randNickname({ language: 'en', slots: ['adjective', 'action'], count: 3 });
+// ['JadeOdyssey', 'DownyBreeze', 'MidnightFinchLair']
+
+randNickname({ language: 'en', slots: 'none', count: 3 });
+// ['Captain', 'Bronze', 'Clown']
+```
+
+:::
+
+::: lang dart
+
+```dart
+randNickname(language: WordLanguage.en, slots: {WordSlot.action}, count: 3);
+// ['CountingHarmonics', 'HaulingBurrito', 'FloatingSelkie']
+
+randNickname(language: WordLanguage.en, slots: {WordSlot.part}, count: 3);
+// ['CardTrack', 'DreamyBlackthornBreeze', 'ThrowingParachuteHorn']
+
+randNickname(
+  language: WordLanguage.en,
+  slots: {WordSlot.adjective, WordSlot.action},
+  count: 3,
+);
+// ['JadeOdyssey', 'DownyBreeze', 'MidnightFinchLair']
+
+// The empty set is what `'none'` spells in the other two packages.
+randNickname(language: WordLanguage.en, slots: {}, count: 3);
+// ['Captain', 'Bronze', 'Clown']
+```
+
+:::
+
+::: lang py
+
+```python
+rand_nickname(language="en", slots="action", count=3)
+# ['CountingHarmonics', 'HaulingBurrito', 'FloatingSelkie']
+
+rand_nickname(language="en", slots="part", count=3)
+# ['CardTrack', 'DreamyBlackthornBreeze', 'ThrowingParachuteHorn']
+
+rand_nickname(language="en", slots=("adjective", "action"), count=3)
+# ['JadeOdyssey', 'DownyBreeze', 'MidnightFinchLair']
+
+rand_nickname(language="en", slots="none", count=3)
+# ['Captain', 'Bronze', 'Clown']
+```
+
+:::
+
+**A language answers with what it has.** The shapes are the language's own, so not every one of them can answer every request: Spanish, Italian, German and Russian have no trailing-noun shape, because `cola de gato` needs a preposition rather than a joiner. Asking one of them for `part` falls back to every shape it does have, the same way a length range too narrow for a shape is answered with the closest fit rather than with an error.
+
+::: lang js
+
+```javascript
+randNickname({ language: 'de', slots: 'part', count: 3 });
+// ['klingender Obstler', 'freier Geysir', 'wilder Drache']
+```
+
+:::
+
+::: lang dart
+
+```dart
+randNickname(language: WordLanguage.de, slots: {WordSlot.part}, count: 3);
+// ['klingender Obstler', 'freier Geysir', 'wilder Drache']
+```
+
+:::
+
+::: lang py
+
+```python
+rand_nickname(language="de", slots="part", count=3)
+# ['klingender Obstler', 'freier Geysir', 'wilder Drache']
+```
+
+:::
+
+With no language named, the ones that can answer are preferred over the ones that cannot, so asking every language for a trailing noun draws from the five that have one.
 
 ### A separator between the words
 

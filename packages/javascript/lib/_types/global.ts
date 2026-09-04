@@ -175,11 +175,44 @@ export interface WordDetail {
 	theme: WordTheme | null;
 }
 
+/**
+ * What one word does inside a nickname. `noun` is the word every shape is built
+ * around; the other three are what a shape may put beside it — a word for what
+ * the noun is like, one for what it is doing, and a second noun behind it.
+ */
+export type WordSlot = 'adjective' | 'action' | 'noun' | 'part';
+
+/**
+ * Which shapes a nickname may take, named by the slots they put beside the noun.
+ * A shape qualifies when it uses at least one of them, so an array is a set to
+ * draw from rather than a list every shape has to satisfy: `['adjective',
+ * 'action']` asks for a modifier and leaves the kind to chance.
+ *
+ * `'none'` asks for the bare noun, and `'all'` — the default — leaves the shape
+ * to the language's own frame weights.
+ */
+export type WordSlotOption = WordSlot | readonly WordSlot[] | 'all' | 'none';
+
+/** The two slots that can modify a noun, which is what `randModifier` draws. */
+export type ModifierKind = Extract<WordSlot, 'adjective' | 'action'>;
+
 export interface RandNicknameOptions extends RandCommonOptions {
 	/** Language of the generated nicknames. `'all'` mixes every language. Default `'all'`. */
 	language?: WordLanguageOption;
 	/** What the nickname should be about. Default `'all'`. */
 	theme?: WordThemeOption;
+	/**
+	 * Which shapes the nicknames may take. Default `'all'`, which is every shape
+	 * the language declares, drawn by its own weights.
+	 *
+	 * A language declares its own shapes, so not every one of them can answer
+	 * every request — Spanish has no trailing-noun shape, because `cola de gato`
+	 * needs a preposition. Asking for one it does not have falls back to the
+	 * closest shape it does, the way a length range too narrow for a shape is
+	 * answered with the closest fit rather than an error. With `language: 'all'`,
+	 * the languages that can answer are preferred over the ones that cannot.
+	 */
+	slots?: WordSlotOption;
 	/**
 	 * Placed between the words a nickname is built from (`'멋진 사자'`,
 	 * `'misty-owl'`), and counted toward `minLength` / `maxLength`. Defaults to the
@@ -218,6 +251,11 @@ export interface RandModifierOptions {
 	 */
 	realism?: RandRealism;
 	/**
+	 * Whether the modifier says what the value is like (`멋진`, `Misty`) or what
+	 * it is doing (`웃는`, `Laughing`). Default `'all'`, which draws from both.
+	 */
+	kind?: ModifierKind | 'all';
+	/**
 	 * Placed between the modifier and the value. Defaults to the way the language
 	 * itself joins words, which is to run them together (`멋진사자`, `MistyOwl`).
 	 */
@@ -234,6 +272,11 @@ export interface NicknameDetail {
 	 * here, so `사자의눈물` reports `['사자', '눈물']`.
 	 */
 	words: string[];
+	/**
+	 * What each word does in the shape, at the same index as `words` — the noun
+	 * the nickname is built around, and whatever the shape put beside it.
+	 */
+	slots: WordSlot[];
 	language: WordLanguage;
 	/**
 	 * Theme the nickname's base word belongs to, or `null` when that word is not

@@ -168,6 +168,60 @@ void main() {
       expect(used, hasLength(wordLanguages.length));
     });
 
+    test('kind decides whether the modifier describes or acts', () {
+      for (final language in wordLanguages) {
+        final data = wordData[language]!;
+        // A value the language knows inflects the modifier, so the value is left
+        // out here and the base form is what comes back.
+        final pools = <ModifierKind, Set<String>>{
+          ModifierKind.adjective: data.adjectives.toSet(),
+          ModifierKind.action: data.actions.toSet(),
+        };
+
+        for (final kind in ModifierKind.values) {
+          for (var i = 0; i < sample; i += 1) {
+            final word = randModifier(language: language, kind: kind);
+
+            expect(pools[kind], contains(word), reason: '$language: $word is no $kind');
+          }
+        }
+
+        // Decorating a value still agrees with it, whichever kind was asked for.
+        final noun = data.nounGender?.keys.first;
+
+        if (noun != null) {
+          // The base form counts too: Spanish lists no masculine rules because
+          // the base form already is the masculine one.
+          final forms = <String>{
+            ...data.actions,
+            for (final gender in data.agreement?.keys ?? const <WordGender>[])
+              for (final word in data.actions) agree(data, word, gender),
+          };
+
+          for (var i = 0; i < sample; i += 1) {
+            final decorated = randModifier(
+              value: noun,
+              language: language,
+              kind: ModifierKind.action,
+              separator: '|',
+            );
+            final attached = decorated.split('|').firstWhere((part) => part != noun);
+
+            expect(forms, contains(attached), reason: '$language: $decorated');
+          }
+        }
+      }
+
+      // Left out, both kinds are in play — which is what it did before there was
+      // a parameter at all.
+      final both = <String>{
+        for (var i = 0; i < 400; i += 1) randModifier(language: WordLanguage.ko),
+      };
+
+      expect(both.any(wordData[WordLanguage.ko]!.adjectives.contains), isTrue);
+      expect(both.any(wordData[WordLanguage.ko]!.actions.contains), isTrue);
+    });
+
     test('randModifier follows the script of the value when no language is given', () {
       bool belongs(String word, WordLanguage language) =>
           modifiersOf(wordData[language]!).any(word.startsWith);

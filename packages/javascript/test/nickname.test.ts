@@ -11,6 +11,7 @@ import type {
 	NicknameDetail,
 	RandRealism,
 	WordLanguage,
+	WordSlot,
 	WordTheme,
 	RandNicknameOptions
 } from '../dist/index.js';
@@ -97,6 +98,33 @@ function joinedBy(
 			rest.startsWith(glue + separator) &&
 			joinedBy(rest.slice(glue.length + separator.length), words.slice(1), glues, separator)
 	);
+}
+
+/**
+ * The words one slot can put in a nickname, in every form it can take. The same
+ * agreement caveat as `allWords`: a modifier is stored in the base form and can
+ * come out inflected.
+ */
+function poolFor(language: WordLanguage, slot: WordSlot): string[] {
+	const data = WORD_DATA[language];
+
+	if (slot === 'noun') {
+		return nounsOf(language);
+	}
+
+	if (slot === 'part') {
+		return [...(data.parts ?? [])];
+	}
+
+	const genders = Object.keys(data.agreement ?? {}) as WordGender[];
+	const pool = [...(slot === 'adjective' ? data.adjectives : data.actions)];
+
+	return [...pool, ...genders.flatMap((gender) => pool.map((word) => agree(data, word, gender)))];
+}
+
+/** The slots a language's frames can actually use. */
+function slotsOf(language: WordLanguage): Set<WordSlot> {
+	return new Set(WORD_DATA[language].frames.flatMap((frame) => [...frame.slots]));
 }
 
 function nounsOf(language: WordLanguage, theme?: WordTheme): string[] {
@@ -452,6 +480,91 @@ describe('Nickname', () => {
 
 		assert.strictEqual(new Set(limited).size, limited.length);
 		assert.ok(limited.length < 400, `expected the pool to run out: ${limited.length}`);
+	});
+
+	it('slots decides what shape a nickname takes', () => {
+		for (const language of WORD_LANGUAGES) {
+			const available = slotsOf(language);
+
+			for (const slot of ['adjective', 'action', 'part'] as WordSlot[]) {
+				const details = nicknameDetails({ language, slots: slot, count: SAMPLE });
+
+				// A language with no such shape answers with its closest rather than
+				// with nothing, which for `part` is every shape it has.
+				if (!available.has(slot)) {
+					assert.strictEqual(details.length, SAMPLE, `${language}: ${slot}`);
+					continue;
+				}
+
+				for (const detail of details) {
+					assert.ok(detail.slots.includes(slot), `${language}: ${detail.nickname}`);
+				}
+			}
+
+			// Named together, the slots are a set to draw from: every nickname has a
+			// modifier, and which kind is left to chance.
+			const either = nicknameDetails({
+				language,
+				slots: ['adjective', 'action'],
+				count: 200
+			});
+			const kinds = new Set(
+				either.flatMap((detail) => detail.slots.filter((slot) => slot !== 'noun'))
+			);
+
+			for (const detail of either) {
+				assert.ok(
+					detail.slots.some((slot) => slot === 'adjective' || slot === 'action'),
+					`${language}: ${detail.nickname}`
+				);
+			}
+
+			assert.ok(kinds.has('adjective') && kinds.has('action'), `${language}: ${[...kinds]}`);
+
+			// `'none'` is the bare noun, and an empty set asks the same thing.
+			for (const slots of ['none', []] as const) {
+				for (const detail of nicknameDetails({ language, slots, count: SAMPLE })) {
+					assert.deepStrictEqual(detail.slots, ['noun'], detail.nickname);
+				}
+			}
+		}
+	});
+
+	it('slots picks the languages that can answer it', () => {
+		const able = WORD_LANGUAGES.filter((language) => slotsOf(language).has('part'));
+		const used = new Set(
+			nicknameDetails({ slots: 'part', count: 300 }).map((detail) => detail.language)
+		);
+
+		assert.ok(able.length > 0 && able.length < WORD_LANGUAGES.length);
+		assert.deepStrictEqual([...used].sort(), [...able].sort());
+	});
+
+	it("output: 'detail' reports what each word does", () => {
+		for (const language of WORD_LANGUAGES) {
+			for (const detail of nicknameDetails({ language, count: SAMPLE })) {
+				assert.strictEqual(detail.slots.length, detail.words.length, detail.nickname);
+				assert.strictEqual(detail.slots.filter((slot) => slot === 'noun').length, 1);
+
+				for (let i = 0; i < detail.words.length; i += 1) {
+					assert.ok(
+						poolFor(language, detail.slots[i]).includes(detail.words[i]),
+						`${detail.nickname}: ${detail.words[i]} is no ${detail.slots[i]}`
+					);
+				}
+			}
+		}
+
+		// The frames are the language's own, so a caller reading the detail must not
+		// be able to reach into them. `'none'` has exactly one shape, which is what
+		// makes the second draw's answer knowable.
+		const [first] = nicknameDetails({ language: 'ko', slots: 'none', count: 1 });
+
+		first.slots.push('part');
+
+		for (const detail of nicknameDetails({ language: 'ko', slots: 'none', count: 5 })) {
+			assert.deepStrictEqual(detail.slots, ['noun'], detail.nickname);
+		}
 	});
 
 	it("output: 'detail' reports the pieces it used", () => {

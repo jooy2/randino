@@ -14,8 +14,15 @@ List<String> randModifierAll(
   List<String> values, {
   WordLanguage? language,
   RandRealism realism = RandRealism.real,
+  ModifierKind? kind,
   String? separator,
 }) => [
   for (final value in values)
-    randModifier(value: value, language: language, realism: realism, separator: separator),
+    randModifier(
+      value: value,
+      language: language,
+      realism: realism,
+      kind: kind,
+      separator: separator,
+    ),
 ];

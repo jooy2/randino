@@ -43,6 +43,7 @@ rand_nickname()
 | --- | --- | --- | --- |
 | `language` | <Lang js="WordLanguageOption" dart="WordLanguage?" py="WordLanguageOption &#124; None" code /> | <Lang js="'all'" dart="null" py="None" code /> | 생성할 닉네임의 언어. <Lang js="'all'" dart="null" py="&quot;all&quot;" code />이면 지원하는 모든 언어를 섞어서 닉네임마다 하나씩 고릅니다. |
 | `theme` | <Lang js="WordThemeOption" dart="WordTheme?" py="WordThemeOption" code /> | <Lang js="'all'" dart="null" py="&quot;all&quot;" code /> | 닉네임의 주제. [테마](../word/themes)를 참고하세요. |
+| `slots` | <Lang js="WordSlotOption" dart="Set&lt;WordSlot&gt;?" py="WordSlotOption" code /> | <Lang js="'all'" dart="null" py="&quot;all&quot;" code /> | 명사 옆에 무엇을 두는 형태를 받을지. [형태 고르기](#picking-the-shape)를 참고하세요. |
 | `count` | <Lang js="number" dart="int" py="int" code /> | `1` | 반환할 닉네임의 개수. `0` … `10000` 범위로 제한됩니다. |
 | `realism` | `RandRealism` | <Lang js="`'real'`" dart="`RandRealism.real`" py="`\"real\"`" /> | `real`은 실제 단어를, `invented`는 그 언어처럼 읽히기만 하는 단어를 만들어 씁니다. `mixed`는 단어마다 판단합니다. |
 | <Lang js="minLength" dart="minLength" py="min_length" code /> | <Lang js="number" dart="int?" py="int &#124; None" code /> | _언어별_ | 최소 글자 수. |
@@ -71,6 +72,7 @@ randNickname({ language: 'en', output: 'detail' });
 // [{
 //   nickname: 'MistyOwl',
 //   words: ['Misty', 'Owl'],
+//   slots: ['adjective', 'noun'],
 //   language: 'en',
 //   theme: 'animal'
 // }]
@@ -85,6 +87,8 @@ import 'package:randino/randino.dart';
 
 randNicknameDetails(language: WordLanguage.en);
 // [NicknameDetail(MistyOwl, [Misty, Owl], en, animal)]
+randNicknameDetails(language: WordLanguage.en).first.slots;
+// [WordSlot.adjective, WordSlot.noun]
 ```
 
 :::
@@ -96,7 +100,7 @@ from randino import rand_nickname
 
 rand_nickname(language="en", output="detail")
 # [NicknameDetail(nickname='MistyOwl', words=('Misty', 'Owl'),
-#                 language='en', theme='animal')]
+#                 slots=('adjective', 'noun'), language='en', theme='animal')]
 ```
 
 :::
@@ -105,8 +109,11 @@ rand_nickname(language="en", output="detail")
 | --- | --- | --- |
 | `nickname` | <Lang js="string" dart="String" py="str" code /> | 완성된 닉네임. |
 | `words` | <Lang js="string[]" dart="List&lt;String&gt;" py="tuple[str, ...]" code /> | 순서대로의 구성 단어들. 단어만 담습니다. |
+| `slots` | <Lang js="WordSlot[]" dart="List&lt;WordSlot&gt;" py="tuple[WordSlot, ...]" code /> | 각 단어가 형태 안에서 하는 역할. `words`와 인덱스가 맞습니다. |
 | `language` | `WordLanguage` | 이 닉네임이 생성된 언어. |
 | `theme` | <Lang js="WordTheme &#124; null" dart="WordTheme?" py="WordTheme &#124; None" code /> | 기준 단어의 테마. 생성기가 모르는 단어면 null입니다. |
+
+`slots`는 `words`와 인덱스가 맞습니다. 2번 단어가 하는 역할이 `slots[2]`입니다. 어떤 형태든 `noun`은 정확히 하나이고, 나머지가 그 형태가 명사 옆에 둔 것입니다.
 
 `words`에는 단어만 들어갑니다. 두 단어 사이에 조사가 필요한 형태라면 그 조사는 `nickname`에만 있으므로, `사자의눈물`의 `words`는 `['사자', '눈물']`이고 이어 붙여도 원래 닉네임이 나오지 않습니다. 완성된 문자열은 `nickname`에서, 무엇으로 만들어졌는지는 `words`에서 읽으십시오.
 
@@ -213,6 +220,100 @@ rand_nickname(language="en", theme="gem", count=3)
 :::
 
 25개 테마와 각 테마가 담고 있는 것은 [테마](../word/themes)에 있습니다.
+
+### 형태 고르기 {#picking-the-shape}
+
+`slots`는 명사 옆에 무엇이 올 수 있는지를 지정하고, 그중 아무것도 쓰지 않는 형태는 빠집니다. 이름 붙인 슬롯 중 **하나라도** 쓰면 통과하므로, 둘을 함께 적으면 "둘 중 아무거나"가 되어 선택은 무작위로 남습니다. 아래의 `['adjective', 'action']`이 그것입니다.
+
+::: lang js
+
+```javascript
+randNickname({ language: 'en', slots: 'action', count: 3 });
+// ['CountingHarmonics', 'HaulingBurrito', 'FloatingSelkie']
+
+randNickname({ language: 'en', slots: 'part', count: 3 });
+// ['CardTrack', 'DreamyBlackthornBreeze', 'ThrowingParachuteHorn']
+
+randNickname({ language: 'en', slots: ['adjective', 'action'], count: 3 });
+// ['JadeOdyssey', 'DownyBreeze', 'MidnightFinchLair']
+
+randNickname({ language: 'en', slots: 'none', count: 3 });
+// ['Captain', 'Bronze', 'Clown']
+```
+
+:::
+
+::: lang dart
+
+```dart
+randNickname(language: WordLanguage.en, slots: {WordSlot.action}, count: 3);
+// ['CountingHarmonics', 'HaulingBurrito', 'FloatingSelkie']
+
+randNickname(language: WordLanguage.en, slots: {WordSlot.part}, count: 3);
+// ['CardTrack', 'DreamyBlackthornBreeze', 'ThrowingParachuteHorn']
+
+randNickname(
+  language: WordLanguage.en,
+  slots: {WordSlot.adjective, WordSlot.action},
+  count: 3,
+);
+// ['JadeOdyssey', 'DownyBreeze', 'MidnightFinchLair']
+
+// 빈 집합이 다른 두 패키지의 `'none'`에 해당합니다.
+randNickname(language: WordLanguage.en, slots: {}, count: 3);
+// ['Captain', 'Bronze', 'Clown']
+```
+
+:::
+
+::: lang py
+
+```python
+rand_nickname(language="en", slots="action", count=3)
+# ['CountingHarmonics', 'HaulingBurrito', 'FloatingSelkie']
+
+rand_nickname(language="en", slots="part", count=3)
+# ['CardTrack', 'DreamyBlackthornBreeze', 'ThrowingParachuteHorn']
+
+rand_nickname(language="en", slots=("adjective", "action"), count=3)
+# ['JadeOdyssey', 'DownyBreeze', 'MidnightFinchLair']
+
+rand_nickname(language="en", slots="none", count=3)
+# ['Captain', 'Bronze', 'Clown']
+```
+
+:::
+
+**언어는 자기가 가진 것으로 답합니다.** 형태는 언어마다 다르므로 모든 요청에 답할 수 있는 것은 아닙니다. 스페인어, 이탈리아어, 독일어, 러시아어에는 명사를 뒤에 붙이는 형태가 없습니다. `cola de gato`처럼 전치사가 필요하지 조사로 이어지지 않기 때문입니다. 이 언어들에 `part`를 요구하면 그 언어가 가진 형태 전체로 되돌아갑니다. 형태 하나를 담기에 너무 좁은 길이 범위가 오류 대신 가장 가까운 결과로 답하는 것과 같습니다.
+
+::: lang js
+
+```javascript
+randNickname({ language: 'de', slots: 'part', count: 3 });
+// ['klingender Obstler', 'freier Geysir', 'wilder Drache']
+```
+
+:::
+
+::: lang dart
+
+```dart
+randNickname(language: WordLanguage.de, slots: {WordSlot.part}, count: 3);
+// ['klingender Obstler', 'freier Geysir', 'wilder Drache']
+```
+
+:::
+
+::: lang py
+
+```python
+rand_nickname(language="de", slots="part", count=3)
+# ['klingender Obstler', 'freier Geysir', 'wilder Drache']
+```
+
+:::
+
+언어를 지정하지 않으면 답할 수 있는 언어가 그러지 못하는 언어보다 우선합니다. 모든 언어에 뒤따르는 명사를 요구하면 그 형태를 가진 다섯 언어에서 뽑힙니다.
 
 ### 단어 사이의 구분자
 

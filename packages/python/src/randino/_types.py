@@ -4,6 +4,7 @@ The options themselves are keyword arguments rather than a type: `randName({ …
 in the npm package is `rand_name(…)` here.
 """
 
+from collections.abc import Sequence
 from dataclasses import dataclass
 from typing import Literal
 
@@ -104,6 +105,27 @@ Each one is also a generator of its own — `"animal"` is `rand_animal`.
 WordThemeOption = Literal[WordTheme, "all"]
 """"all" draws from every theme."""
 
+WordSlot = Literal["adjective", "action", "noun", "part"]
+"""What one word does inside a nickname.
+
+`adjective` says what the noun is like (멋진, Brave, 青い), `action` what it is doing
+(웃는, Laughing, 踊る), `noun` is the base word every shape is built around, and `part`
+a trailing noun. `rand_nickname`'s `slots` names the ones a shape may use, and
+`NicknameDetail.slots` reports the ones it did.
+"""
+
+WordSlotOption = WordSlot | Sequence[WordSlot] | Literal["all", "none"]
+"""Which shapes a nickname may take, named by the slots they put beside the noun.
+
+A shape qualifies when it uses at least one of them, so a sequence is a set to draw
+from rather than a list every shape has to satisfy: `("adjective", "action")` asks for
+a modifier and leaves the kind to chance. `"none"` asks for the bare noun, and `"all"`
+— the default — leaves the shape to the language's own frame weights.
+"""
+
+ModifierKind = Literal["adjective", "action"]
+"""The two slots that can modify a noun, which is what `rand_modifier` draws."""
+
 
 @dataclass(frozen=True, slots=True)
 class NameDetail:
@@ -152,6 +174,12 @@ class NicknameDetail:
 
     A shape that needs a particle between two of them carries it in `nickname` and
     nowhere here, so `사자의눈물` reports `("사자", "눈물")`.
+    """
+
+    slots: tuple[WordSlot, ...]
+    """What each word does in the shape, at the same index as `words`.
+
+    The noun the nickname is built around, and whatever the shape put beside it.
     """
 
     language: WordLanguage

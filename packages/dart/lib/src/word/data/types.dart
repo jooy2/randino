@@ -91,21 +91,6 @@ class PoolSynthesis extends WordSynthesis {
   final WordPool pool;
 }
 
-/// What one word does inside a nickname.
-enum WordSlot {
-  /// Says what the noun is like: 멋진, Brave, 青い.
-  adjective,
-
-  /// Says what the noun is doing: 웃는, Laughing, 踊る.
-  action,
-
-  /// The nickname's base word, out of one theme's pool.
-  noun,
-
-  /// A trailing noun, from [WordLanguageData.parts].
-  part,
-}
-
 /// One shape a nickname can take, written in the order the language puts it in.
 ///
 /// Per language rather than shared, because the shapes themselves differ:

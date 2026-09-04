@@ -18,7 +18,7 @@ function draw(value: string | undefined, options: RandModifierOptions): [string,
 	const requested = options.language ?? (value ? detectLanguage(value) : 'all');
 	const language = drawLanguage(requested, WORD_LANGUAGES);
 	const data = WORD_DATA[language];
-	const pool = modifiersOf(data);
+	const pool = modifiersOf(data, options.kind ?? 'all');
 	const [min, max] = poolBounds(pool);
 	const { word } = drawWord(data, pool, resolveRealism(options.realism), min, max, '');
 
@@ -37,6 +37,7 @@ function draw(value: string | undefined, options: RandModifierOptions): [string,
  * @example
  * randModifier({ language: 'ko' }); // '멋진'
  * randModifier({ language: 'en' }); // 'Misty'
+ * randModifier({ language: 'ko', kind: 'action' }); // '웃는'
  */
 export function randModifier(options?: RandModifierOptions): string;
 /**

@@ -17,6 +17,7 @@ import {
 } from '../_internal/generate.js';
 import { capitalizeFirst } from '../_internal/utils.js';
 import type {
+	ModifierKind,
 	RandWordOptions,
 	WordDetail,
 	WordLanguage,
@@ -33,13 +34,17 @@ const FIT_ATTEMPTS = 12;
 const SYNTH_ATTEMPTS = 8;
 
 /**
- * The two decorating pools as one, for a draw that does not care whether it gets
- * a word for what the noun is like or one for what it is doing. Built per call:
- * every draw already walks the pool it is given, so holding this one would save
- * nothing worth the bookkeeping.
+ * The decorating pool one draw may use: a word for what the noun is like, one
+ * for what it is doing, or either. Built per call — every draw already walks the
+ * pool it is given, so holding this one would save nothing worth the
+ * bookkeeping.
  */
-export function modifiersOf(data: WordLanguageData): WordPool {
-	return [...data.adjectives, ...data.actions];
+export function modifiersOf(data: WordLanguageData, kind: ModifierKind | 'all' = 'all'): WordPool {
+	if (kind === 'adjective') {
+		return data.adjectives;
+	}
+
+	return kind === 'action' ? data.actions : [...data.adjectives, ...data.actions];
 }
 
 /**

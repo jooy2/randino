@@ -7,6 +7,7 @@ from randino._types import (
     RandOutput,
     RandRealism,
     WordLanguageOption,
+    WordSlotOption,
     WordThemeOption,
 )
 from randino.nickname._generator import generate_nickname_details
@@ -17,6 +18,7 @@ def rand_nickname(
     *,
     language: WordLanguageOption = ...,
     theme: WordThemeOption = ...,
+    slots: WordSlotOption = ...,
     count: int = ...,
     realism: RandRealism = ...,
     min_length: int | None = ...,
@@ -33,6 +35,7 @@ def rand_nickname(
     *,
     language: WordLanguageOption = ...,
     theme: WordThemeOption = ...,
+    slots: WordSlotOption = ...,
     count: int = ...,
     realism: RandRealism = ...,
     min_length: int | None = ...,
@@ -48,6 +51,7 @@ def rand_nickname(
     *,
     language: WordLanguageOption = "all",
     theme: WordThemeOption = "all",
+    slots: WordSlotOption = "all",
     count: int = 1,
     realism: RandRealism = "real",
     min_length: int | None = None,
@@ -66,6 +70,12 @@ def rand_nickname(
     Args:
         language: Language of the generated nicknames. `"all"` mixes every language.
         theme: What the nickname should be about.
+        slots: Which shapes to accept, named by what they put beside the noun. A
+            shape qualifies when it uses at least one of them, so a sequence asks
+            for any of them and leaves the choice to chance. `"none"` asks for the
+            bare noun, and `"all"` leaves the shape to the language's own frame
+            weights. A language with no shape for what was asked answers with the
+            closest it has.
         count: How many nicknames to return. Held inside `0`..`RAND_COUNT_MAX`.
         realism: whether the words are real ones or invented to read like the
             language. `"mixed"` decides per word.
@@ -80,7 +90,8 @@ def rand_nickname(
         unique: Never return the same nickname twice. May return fewer than `count`
             nicknames once the pools run out of combinations.
         output: `"value"` for strings, `"detail"` for a `NicknameDetail` per
-            nickname — the words in order, the language and the theme.
+            nickname — the words in order, what each of them does in the shape, the
+            language and the theme.
 
     Returns:
         A `list[str]`, or a `list[NicknameDetail]` when `output="detail"` — the
@@ -95,12 +106,15 @@ def rand_nickname(
         ['달리는표범_gDe2C', '조용한노을_nVtRC']
         >>> rand_nickname(language="ko", word_separator=" ", count=2)
         ['멋진 사자', '고양이 꼬리']
-        >>> rand_nickname(language="ko", output="detail")
-        [NicknameDetail(nickname='멋진사자', words=('멋진', '사자'), language='ko', theme='animal')]
+        >>> rand_nickname(language="ko", slots="action", count=2)
+        ['웃는사자', '달리는표범꼬리']
+        >>> rand_nickname(language="ko", output="detail")[0].slots
+        ('adjective', 'noun')
     """
     details: list[NicknameDetail] = generate_nickname_details(
         language=language,
         theme=theme,
+        slots=slots,
         count=count,
         realism=realism,
         min_length=min_length,

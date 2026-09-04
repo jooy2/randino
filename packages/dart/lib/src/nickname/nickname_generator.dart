@@ -14,6 +14,8 @@
 //   的 between a verb and its noun where Korean needs nothing.
 // - `realism` decides per word whether it comes out of a pool or is invented,
 //   and which themes a null `theme` spans — see `looseThemes`.
+// - `slots` names the shapes a caller will accept, by what they put beside the
+//   noun. A language with no such shape answers with its closest.
 // - `minLength` / `maxLength` pick the shape first: a range too short for a
 //   modifier drops that frame instead of truncating a word.
 // - `wordSeparator` decides what goes between the words, defaulting to the way
@@ -40,6 +42,7 @@ typedef _Bounds = Map<WordSlot, LengthRange>;
 class _Settings {
   const _Settings({
     required this.theme,
+    required this.slots,
     required this.invent,
     required this.loose,
     required this.minLength,
@@ -49,6 +52,10 @@ class _Settings {
   });
 
   final WordTheme? theme;
+
+  /// The slots a shape may put beside the noun. Null is every shape the language
+  /// has; an empty set is the bare noun, which is the ask no slot answers.
+  final Set<WordSlot>? slots;
 
   /// How often one part is invented rather than drawn, as a percentage.
   final int invent;
@@ -73,6 +80,55 @@ List<WordTheme> _themesFor(_Settings settings) {
   }
 
   return wordThemes.where((theme) => !looseThemes.contains(theme)).toList(growable: false);
+}
+
+/// Whether a shape is one the caller asked for: it uses at least one of the
+/// slots they named.
+///
+/// At least one rather than all of them, because the named slots are a set to
+/// draw from — `{WordSlot.adjective, WordSlot.action}` asks for a modifier and
+/// leaves the kind to chance, and no language has a shape carrying both. An
+/// empty set reads the other way round, and matches the bare noun alone.
+bool _matchesSlots(WordFrame frame, Set<WordSlot> slots) =>
+    slots.isEmpty
+        ? frame.slots.every((slot) => slot == WordSlot.noun)
+        : frame.slots.any(slots.contains);
+
+/// The shapes one nickname may take.
+///
+/// A language declares its own, so not every one of them can answer every
+/// request — Spanish has no trailing-noun shape, because `cola de gato` needs a
+/// preposition. A request no shape of the language matches leaves every shape in
+/// play, the way a length range too narrow for a shape is answered with the
+/// closest fit rather than with nothing.
+List<WordFrame> _framesFor(WordLanguageData data, _Settings settings) {
+  final wanted = settings.slots;
+
+  if (wanted == null) return data.frames;
+
+  final matching = data.frames
+      .where((frame) => _matchesSlots(frame, wanted))
+      .toList(growable: false);
+
+  return matching.isNotEmpty ? matching : data.frames;
+}
+
+/// The languages one draw may come from.
+///
+/// A null language prefers the ones whose shapes answer the request, so asking
+/// every language for a trailing noun does not spend most of its draws on the
+/// four that have no such shape. When none of them can, every language is back
+/// in play and each answers with its closest.
+List<WordLanguage> _languagesFor(_Settings settings) {
+  final wanted = settings.slots;
+
+  if (wanted == null) return wordLanguages;
+
+  final able = wordLanguages
+      .where((code) => wordData[code]!.frames.any((frame) => _matchesSlots(frame, wanted)))
+      .toList(growable: false);
+
+  return able.isNotEmpty ? able : wordLanguages;
 }
 
 /// What goes between the words: the caller's separator, or the language's own
@@ -168,9 +224,10 @@ String _assemble(List<String> words, WordFrame frame, String joiner) {
 }
 
 class _Built {
-  const _Built(this.words, this.nickname, this.theme);
+  const _Built(this.words, this.slots, this.nickname, this.theme);
 
   final List<String> words;
+  final List<WordSlot> slots;
   final String nickname;
   final WordTheme? theme;
 }
@@ -276,12 +333,17 @@ bool _hasBoundaryRepeat(List<String> words, WordFrame frame) {
 
 /// Length range for one language and theme: what the caller asked for, falling
 /// back to everything the language's frames can produce.
-LengthRange _lengthBounds(WordLanguageData data, _Bounds bounds, _Settings settings) {
+LengthRange _lengthBounds(
+  WordLanguageData data,
+  List<WordFrame> frames,
+  _Bounds bounds,
+  _Settings settings,
+) {
   final joiner = _joinerOf(data, settings).length;
   var naturalMin = 1 << 30;
   var naturalMax = 0;
 
-  for (final frame in data.frames) {
+  for (final frame in frames) {
     final range = _frameRange(frame, bounds, joiner);
 
     if (range.min < naturalMin) naturalMin = range.min;
@@ -299,6 +361,7 @@ LengthRange naturalRange(WordLanguage language, String? separator) {
   final data = wordData[language]!;
   final settings = _Settings(
     theme: null,
+    slots: null,
     invent: 0,
     loose: true,
     minLength: null,
@@ -327,6 +390,10 @@ LengthRange naturalRange(WordLanguage language, String? separator) {
 _Built _generateOne(WordLanguage language, _Settings settings) {
   final data = wordData[language]!;
   final themes = _themesFor(settings);
+  // The shapes the caller allowed, which is every one of the language's unless
+  // they asked. Neither the theme nor the length range changes them, so this is
+  // settled once rather than per attempt.
+  final allowed = _framesFor(data, settings);
   final joiner = _joinerOf(data, settings);
   _Built? best;
   var bestDistance = 1 << 30;
@@ -336,21 +403,22 @@ _Built _generateOne(WordLanguage language, _Settings settings) {
     final theme = pick(themes);
     final nouns = data.nouns[theme]!;
     final bounds = _slotBounds(language, data, theme);
-    final range = _lengthBounds(data, bounds, settings);
+    final range = _lengthBounds(data, allowed, bounds, settings);
     // Prefer a shape that can actually land inside the range.
-    final fitting = data.frames
+    final fitting = allowed
         .where((frame) {
           final span = _frameRange(frame, bounds, joiner.length);
 
           return span.max >= range.min && span.min <= range.max;
         })
         .toList(growable: false);
-    final frame = _pickFrame(fitting.isNotEmpty ? fitting : data.frames);
+    final frame = _pickFrame(fitting.isNotEmpty ? fitting : allowed);
     final filled = _buildWords(data, frame, bounds, nouns, settings, range.min, range.max);
     final base = filled.words[frame.slots.indexOf(WordSlot.noun)];
     final nickname = _assemble(filled.words, frame, joiner);
     final built = _Built(
       filled.words,
+      frame.slots,
       nickname,
       // Only a word the generator knows carries a theme. A drawn word came out
       // of this theme; an invented one has to be looked up, because it can spell
@@ -387,6 +455,7 @@ _Built _generateOne(WordLanguage language, _Settings settings) {
 List<NicknameDetail> generateNicknameDetails({
   WordLanguage? language,
   WordTheme? theme,
+  Set<WordSlot>? slots,
   int count = 1,
   RandRealism realism = RandRealism.real,
   int? minLength,
@@ -397,6 +466,7 @@ List<NicknameDetail> generateNicknameDetails({
 }) {
   final settings = _Settings(
     theme: theme,
+    slots: slots,
     invent: resolveRealism(realism),
     loose: realism != RandRealism.real,
     minLength: minLength,
@@ -412,12 +482,15 @@ List<NicknameDetail> generateNicknameDetails({
     // Written out: `??` would otherwise infer `pick`'s type argument from the
     // nullable left-hand side, and hand back a `WordLanguage?`.
     draw: () {
-      final WordLanguage code = language ?? pick(wordLanguages);
+      final WordLanguage code = language ?? pick(_languagesFor(settings));
       final built = _generateOne(code, settings);
 
       return NicknameDetail(
         nickname: built.nickname,
         words: List<String>.unmodifiable(built.words),
+        // Unmodifiable, and a copy: the frames are the language's own, so a
+        // caller reading the detail must not be able to reach into them.
+        slots: List<WordSlot>.unmodifiable(built.slots),
         language: code,
         theme: built.theme,
       );

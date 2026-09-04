@@ -22,6 +22,7 @@ randModifier(randAnimal({ language: 'en', count: 2 }));
 | `value` | `string \| string[]` | — | 장식할 대상. 옵션이 아니라 첫 번째 인자. 생략하면 수식어만 |
 | `language` | `WordLanguageOption` | _문자 체계_ | 수식어를 뽑을 언어 |
 | `realism` | `RandRealism` | `'real'` | `real`은 언어가 쓰는 수식어를 뽑고, `invented`는 그 언어처럼 읽히기만 하는 수식어를 만들어냅니다 |
+| `kind` | `ModifierKind \| 'all'` | `'all'` | `adjective`는 어떤지를, `action`은 무엇을 하는지를 말합니다 |
 | `separator` | `string` | _언어_ | 수식어와 값 사이에 들어감 |
 
 `string`에는 `string`을, `string[]`에는 `string[]`을 반환합니다.
@@ -46,6 +47,7 @@ randModifierAll(randAnimal(language: WordLanguage.en, count: 2));
 | `value` | `String?` | `null` | 장식할 대상. 생략하면 수식어만 |
 | `language` | `WordLanguage?` | _문자 체계_ | 수식어를 뽑을 언어 |
 | `realism` | `RandRealism` | `RandRealism.real` | `real`은 실제 수식어, `invented`는 만들어낸 수식어 |
+| `kind` | `ModifierKind?` | `null` | `adjective`는 어떤지를, `action`은 무엇을 하는지를 말합니다 |
 | `separator` | `String?` | _언어_ | 수식어와 값 사이에 들어감 |
 
 `String`을 반환합니다. **리스트 형태는 `randModifierAll`입니다.** `randSuffix`에 대한 `randSuffixAll`과 같습니다.
@@ -70,6 +72,7 @@ rand_modifier(rand_animal(language="en", count=2))
 | `value` | `str \| list[str] \| None` | `None` | 장식할 대상. 위치 인자이며 나머지는 키워드 전용 |
 | `language` | `WordLanguageOption \| None` | _문자 체계_ | 수식어를 뽑을 언어 |
 | `realism` | `RandRealism` | `"real"` | `real`은 실제 수식어, `invented`는 만들어낸 수식어 |
+| `kind` | `ModifierKind \| Literal["all"]` | `"all"` | `adjective`는 어떤지를, `action`은 무엇을 하는지를 말합니다 |
 | `separator` | `str \| None` | _언어_ | 수식어와 값 사이에 들어감 |
 
 `str`에는 `str`을, `list[str]`에는 `list[str]`을 반환하며 `@overload`가 이를 전달합니다.
@@ -155,6 +158,50 @@ rand_modifier("Zzyzx", language="es")  # 'Zzyzx dorado' — 모르는 단어
 :::
 
 수식어가 모양을 바꾸지 않는 `ko`, `en`, `ja`, `zh`, `vi`는 영향이 없습니다. 맞출 것이 없으니 어떤 값에든 어떤 수식어든 붙습니다.
+
+## `kind`가 수식어의 성격을 정합니다 {#kind-picks-what-the-modifier-says}
+
+수식어는 값이 **어떤지**를 말하거나 **무엇을 하는지**를 말하고, 둘은 하나가 아니라 두 개의 풀입니다. `kind`가 그 사이를 정하며, 지정하지 않으면 둘 다 나옵니다. 옵션이 생기기 전의 동작이 그것입니다.
+
+::: lang js
+
+```javascript
+randModifier({ language: 'en', kind: 'adjective' }); // 'Coral'
+randModifier({ language: 'en', kind: 'action' }); // 'Bobbing'
+
+randModifier('Owl', { language: 'en', kind: 'action' }); // 'CountingOwl'
+randModifier('사자', { language: 'ko', kind: 'action' }); // '숨기는사자'
+```
+
+:::
+
+::: lang dart
+
+```dart
+randModifier(language: WordLanguage.en, kind: ModifierKind.adjective); // 'Coral'
+randModifier(language: WordLanguage.en, kind: ModifierKind.action); // 'Bobbing'
+
+randModifier(value: 'Owl', language: WordLanguage.en, kind: ModifierKind.action);
+// 'CountingOwl'
+randModifier(value: '사자', language: WordLanguage.ko, kind: ModifierKind.action);
+// '숨기는사자'
+```
+
+:::
+
+::: lang py
+
+```python
+rand_modifier(language="en", kind="adjective")  # 'Coral'
+rand_modifier(language="en", kind="action")  # 'Bobbing'
+
+rand_modifier("Owl", language="en", kind="action")  # 'CountingOwl'
+rand_modifier("사자", language="ko", kind="action")  # '숨기는사자'
+```
+
+:::
+
+둘을 가른 이유는 취향이 아니라 문법입니다. 형용사에는 필요 없는 조사가 동작과 명사 사이에는 필요한 언어가 있어서, 중국어는 `奔跑的狮子`와 `快乐狮子`를 이렇게 다르게 씁니다. `randNickname`의 [`slots`](../nickname/rand-nickname#picking-the-shape)가 같은 구분을 형태 전체를 고르는 자리에서 쓰는 것입니다.
 
 ## 값마다 새로 뽑은 수식어 {#a-fresh-modifier-for-every-value}
 

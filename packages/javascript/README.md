@@ -78,10 +78,14 @@ randNickname({ language: 'en', count: 3 });
 randNickname({ language: 'en', theme: 'animal', count: 2 });
 // ['FloatingFalcon', 'ChewyOtter']
 
+randNickname({ language: 'en', slots: 'action', count: 2 });
+// ['CountingHarmonics', 'HaulingBurrito']
+
 randNickname({ language: 'en', output: 'detail' });
 // [{
 //   nickname: 'MistyOwl',
 //   words: ['Misty', 'Owl'],
+//   slots: ['adjective', 'noun'],
 //   language: 'en',
 //   theme: 'animal'
 // }]
@@ -91,6 +95,7 @@ randNickname({ language: 'en', output: 'detail' });
 | ------------------------- | -------------------------- | ---------- |
 | `language`                | `'all'` or a language code | `'all'`    |
 | `theme`                   | `'all'` or a theme name    | `'all'`    |
+| `slots`                   | `WordSlotOption`           | `'all'`    |
 | `count`                   | `number`                   | `1`        |
 | `realism`                 | `RandRealism`              | `'real'`   |
 | `minLength` / `maxLength` | `number`                   | _language_ |
@@ -164,17 +169,19 @@ import { randAnimal, randModifier } from 'randino';
 
 randModifier('Owl'); // 'MistyOwl'
 randModifier('Owl', { separator: ' ' }); // 'Misty Owl'
+randModifier('Owl', { kind: 'action' }); // 'CountingOwl'
 randModifier(); // 'Misty'
 
 randModifier(randAnimal({ language: 'en', count: 2 }));
 // ['TwinklingLynx', 'OnyxCrane']
 ```
 
-| Option      | Type                 | Default    |
-| ----------- | -------------------- | ---------- |
-| `language`  | `WordLanguageOption` | _script_   |
-| `realism`   | `RandRealism`        | `'real'`   |
-| `separator` | `string`             | _language_ |
+| Option      | Type                    | Default    |
+| ----------- | ----------------------- | ---------- |
+| `language`  | `WordLanguageOption`    | _script_   |
+| `realism`   | `RandRealism`           | `'real'`   |
+| `kind`      | `ModifierKind \| 'all'` | `'all'`    |
+| `separator` | `string`                | _language_ |
 
 With no `language`, the script of the value picks one, so `'고양이'` is never handed an English modifier.
 

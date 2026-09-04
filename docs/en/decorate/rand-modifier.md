@@ -22,6 +22,7 @@ randModifier(randAnimal({ language: 'en', count: 2 }));
 | `value` | `string \| string[]` | — | What to decorate. The first argument, not an option. Omit it for the modifier alone |
 | `language` | `WordLanguageOption` | _script_ | Language the modifier is drawn from |
 | `realism` | `RandRealism` | `'real'` | `real` draws a modifier the language uses, `invented` builds one that only reads like it |
+| `kind` | `ModifierKind \| 'all'` | `'all'` | `adjective` says what the value is like, `action` what it is doing |
 | `separator` | `string` | _language_ | Placed between the modifier and the value |
 
 Returns a `string` for a `string`, and a `string[]` for a `string[]`.
@@ -46,6 +47,7 @@ randModifierAll(randAnimal(language: WordLanguage.en, count: 2));
 | `value` | `String?` | `null` | What to decorate. Omit it for the modifier alone |
 | `language` | `WordLanguage?` | _script_ | Language the modifier is drawn from |
 | `realism` | `RandRealism` | `RandRealism.real` | `real` draws a real modifier, `invented` builds one |
+| `kind` | `ModifierKind?` | `null` | `adjective` says what the value is like, `action` what it is doing |
 | `separator` | `String?` | _language_ | Placed between the modifier and the value |
 
 Returns a `String`. **`randModifierAll` is the list form**, the way `randSuffixAll` is for `randSuffix`.
@@ -70,6 +72,7 @@ rand_modifier(rand_animal(language="en", count=2))
 | `value` | `str \| list[str] \| None` | `None` | What to decorate. Positional; the rest are keyword-only |
 | `language` | `WordLanguageOption \| None` | _script_ | Language the modifier is drawn from |
 | `realism` | `RandRealism` | `"real"` | `real` draws a real modifier, `invented` builds one |
+| `kind` | `ModifierKind \| Literal["all"]` | `"all"` | `adjective` says what the value is like, `action` what it is doing |
 | `separator` | `str \| None` | _language_ | Placed between the modifier and the value |
 
 Returns a `str` for a `str`, and a `list[str]` for a `list[str]` — carried by `@overload`.
@@ -155,6 +158,50 @@ rand_modifier("Zzyzx", language="es")  # 'Zzyzx dorado' — not a word it knows
 :::
 
 The six languages whose modifiers do not change shape — `ko`, `en`, `ja`, `zh`, `vi` — are unaffected: there is nothing to agree with, so any value gets any modifier.
+
+## `kind` picks what the modifier says
+
+A modifier either says what the value **is like** or what it **is doing**, and they are two pools rather than one. `kind` picks between them; left out, both are in play, which is what it did before there was an option.
+
+::: lang js
+
+```javascript
+randModifier({ language: 'en', kind: 'adjective' }); // 'Coral'
+randModifier({ language: 'en', kind: 'action' }); // 'Bobbing'
+
+randModifier('Owl', { language: 'en', kind: 'action' }); // 'CountingOwl'
+randModifier('사자', { language: 'ko', kind: 'action' }); // '숨기는사자'
+```
+
+:::
+
+::: lang dart
+
+```dart
+randModifier(language: WordLanguage.en, kind: ModifierKind.adjective); // 'Coral'
+randModifier(language: WordLanguage.en, kind: ModifierKind.action); // 'Bobbing'
+
+randModifier(value: 'Owl', language: WordLanguage.en, kind: ModifierKind.action);
+// 'CountingOwl'
+randModifier(value: '사자', language: WordLanguage.ko, kind: ModifierKind.action);
+// '숨기는사자'
+```
+
+:::
+
+::: lang py
+
+```python
+rand_modifier(language="en", kind="adjective")  # 'Coral'
+rand_modifier(language="en", kind="action")  # 'Bobbing'
+
+rand_modifier("Owl", language="en", kind="action")  # 'CountingOwl'
+rand_modifier("사자", language="ko", kind="action")  # '숨기는사자'
+```
+
+:::
+
+The two are kept apart because they are different grammar, not different flavours: a language may need a particle between an action and its noun where an adjective needs none, which is why Chinese writes `奔跑的狮子` and `快乐狮子`. `randNickname`'s [`slots`](../nickname/rand-nickname#picking-the-shape) is the same distinction, made where a whole shape is being picked.
 
 ## A fresh modifier for every value
 

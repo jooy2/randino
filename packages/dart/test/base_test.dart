@@ -35,6 +35,7 @@ void main() {
         exportedNames().toList()..sort(),
         <String>[
           'LengthRange',
+          'ModifierKind',
           'NameDetail',
           'NameGender',
           'NameLanguage',
@@ -43,6 +44,7 @@ void main() {
           'RandRealism',
           'WordDetail',
           'WordLanguage',
+          'WordSlot',
           'WordTheme',
           'affixCharset',
           'affixLengthDefault',

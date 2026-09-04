@@ -9,10 +9,13 @@ import 'package:randino/src/types.dart';
 /// ```dart
 /// randNicknameDetails(language: WordLanguage.ko);
 /// // [NicknameDetail(멋진사자, [멋진, 사자], ko, animal)]
+/// randNicknameDetails(language: WordLanguage.ko).first.slots;
+/// // [WordSlot.adjective, WordSlot.noun]
 /// ```
 List<NicknameDetail> randNicknameDetails({
   WordLanguage? language,
   WordTheme? theme,
+  Set<WordSlot>? slots,
   int count = 1,
   RandRealism realism = RandRealism.real,
   int? minLength,
@@ -23,6 +26,7 @@ List<NicknameDetail> randNicknameDetails({
 }) => generateNicknameDetails(
   language: language,
   theme: theme,
+  slots: slots,
   count: count,
   realism: realism,
   minLength: minLength,

@@ -40,6 +40,7 @@ export 'src/nickname/rand_nickname_details.dart' show randNicknameDetails;
 export 'src/types.dart'
     show
         LengthRange,
+        ModifierKind,
         NameDetail,
         NameGender,
         NameLanguage,
@@ -48,6 +49,7 @@ export 'src/types.dart'
         RandRealism,
         WordDetail,
         WordLanguage,
+        WordSlot,
         WordTheme;
 export 'src/word/data/index.dart' show wordLanguages, wordThemes;
 export 'src/word/rand_animal.dart' show randAnimal;

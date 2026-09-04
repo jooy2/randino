@@ -175,6 +175,57 @@ describe('Decorate', () => {
 		assert.strictEqual(used.size, WORD_LANGUAGES.length);
 	});
 
+	it('kind decides whether the modifier describes or acts', () => {
+		for (const language of WORD_LANGUAGES) {
+			const data = WORD_DATA[language];
+			const genders = Object.keys(data.agreement ?? {}) as WordGender[];
+			// A value the language knows inflects the modifier, so the value is left
+			// out here and the base form is what comes back.
+			const pools = {
+				adjective: new Set(data.adjectives),
+				action: new Set(data.actions)
+			};
+
+			for (const kind of ['adjective', 'action'] as const) {
+				for (let i = 0; i < SAMPLE; i += 1) {
+					const word = randModifier({ language, kind });
+
+					assert.ok(pools[kind].has(word), `${language}: ${word} is no ${kind}`);
+				}
+			}
+
+			// Decorating a value still agrees with it, whichever kind was asked for.
+			const noun = Object.keys(data.nounGender ?? {})[0];
+
+			if (noun) {
+				// The base form counts too: Spanish lists no `m` rules because the base
+				// form already is the masculine one.
+				const forms = new Set([
+					...data.actions,
+					...genders.flatMap((gender) => [...data.actions].map((word) => agree(data, word, gender)))
+				]);
+
+				for (let i = 0; i < SAMPLE; i += 1) {
+					const decorated = randModifier(noun, { language, kind: 'action', separator: '|' });
+					const attached = decorated.split('|').filter((part) => part !== noun)[0];
+
+					assert.ok(forms.has(attached), `${language}: ${decorated}`);
+				}
+			}
+		}
+
+		// Left out, both kinds are in play — which is what it did before there was
+		// an option at all.
+		const both = new Set<string>();
+
+		for (let i = 0; i < 400; i += 1) {
+			both.add(randModifier({ language: 'ko' }));
+		}
+
+		assert.ok([...both].some((word) => WORD_DATA.ko.adjectives.includes(word)));
+		assert.ok([...both].some((word) => WORD_DATA.ko.actions.includes(word)));
+	});
+
 	it('randModifier follows the script of the value when no language is given', () => {
 		const belongs = (word: string, language: WordLanguage) =>
 			modifiersOf(language).some((modifier) => word.startsWith(modifier));

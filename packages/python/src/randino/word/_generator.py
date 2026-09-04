@@ -7,7 +7,7 @@ is why the drawing lives here and the composing lives in `nickname/_generator.py
 """
 
 import math
-from typing import NamedTuple
+from typing import Literal, NamedTuple
 
 from randino._internal.generate import (
     collect,
@@ -18,6 +18,7 @@ from randino._internal.generate import (
 )
 from randino._internal.utils import capitalize_first, chance, clamp, pick, rand_int
 from randino._types import (
+    ModifierKind,
     RandRealism,
     WordDetail,
     WordLanguage,
@@ -41,13 +42,17 @@ SYNTH_ATTEMPTS = 8
 """Attempts spent looking for an invented word of the requested length."""
 
 
-def modifiers_of(data: WordLanguageData) -> WordPool:
-    """Return the two decorating pools as one, for a draw that does not care which it gets.
+def modifiers_of(data: WordLanguageData, kind: ModifierKind | Literal["all"] = "all") -> WordPool:
+    """Return the decorating pool one draw may use.
 
-    Built per call: every draw already walks the pool it is given, so holding this one
-    would save nothing worth the bookkeeping.
+    A word for what the noun is like, one for what it is doing, or either. Built per
+    call: every draw already walks the pool it is given, so holding this one would save
+    nothing worth the bookkeeping.
     """
-    return (*data.adjectives, *data.actions)
+    if kind == "adjective":
+        return data.adjectives
+
+    return data.actions if kind == "action" else (*data.adjectives, *data.actions)
 
 
 def agree(data: WordLanguageData, word: str, gender: WordGender | None) -> str:

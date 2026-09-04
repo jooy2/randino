@@ -14,6 +14,8 @@ together is what this module is.
   its noun where Korean needs nothing.
 - `realism` decides per word whether it comes out of a pool or is invented, and which
   themes `theme="all"` spans — see `LOOSE_THEMES`.
+- `slots` names the shapes a caller will accept, by what they put beside the noun. A
+  language with no such shape answers with its closest.
 - `min_length` / `max_length` pick the shape first: a range too short for a modifier
   drops that frame instead of truncating a word.
 - `word_separator` decides what goes between the words, defaulting to the way the
@@ -27,7 +29,7 @@ import math
 import random
 from collections.abc import Sequence
 from dataclasses import dataclass
-from typing import NamedTuple
+from typing import Literal, NamedTuple, cast
 
 from randino._internal.generate import (
     collect,
@@ -43,18 +45,14 @@ from randino._types import (
     RandRealism,
     WordLanguage,
     WordLanguageOption,
+    WordSlot,
+    WordSlotOption,
     WordTheme,
     WordThemeOption,
 )
 from randino.word._generator import agree, draw_word, pool_bounds, theme_of, themes_of
 from randino.word.data import LOOSE_THEMES, WORD_DATA, WORD_LANGUAGES, WORD_THEMES
-from randino.word.data._types import (
-    WordFrame,
-    WordGender,
-    WordLanguageData,
-    WordPool,
-    WordSlot,
-)
+from randino.word.data._types import WordFrame, WordGender, WordLanguageData, WordPool
 
 FIT_ATTEMPTS = 12
 """How many shapes to try before settling for the closest fit found."""
@@ -71,6 +69,7 @@ class Settings:
     """
 
     theme: WordThemeOption
+    slots: tuple[WordSlot, ...] | Literal["all", "none"]
     invent: int
     loose: bool
     prefix: str
@@ -89,6 +88,75 @@ def themes_for(settings: Settings) -> tuple[WordTheme, ...]:
         return themes_of(settings.theme)
 
     return tuple(theme for theme in WORD_THEMES if theme not in LOOSE_THEMES)
+
+
+def matches_slots(frame: WordFrame, slots: tuple[WordSlot, ...] | Literal["none"]) -> bool:
+    """Whether a shape uses at least one of the slots the caller named.
+
+    At least one rather than all of them, because the named slots are a set to draw
+    from — `("adjective", "action")` asks for a modifier and leaves the kind to chance,
+    and no language has a shape carrying both. `"none"` reads the other way round, and
+    matches the bare noun alone.
+    """
+    if slots == "none":
+        return all(slot == "noun" for slot in frame.slots)
+
+    return any(slot in slots for slot in frame.slots)
+
+
+def frames_for(data: WordLanguageData, settings: Settings) -> tuple[WordFrame, ...]:
+    """The shapes one nickname may take.
+
+    A language declares its own, so not every one of them can answer every request —
+    Spanish has no trailing-noun shape, because `cola de gato` needs a preposition. A
+    request no shape of the language matches leaves every shape in play, the way a
+    length range too narrow for a shape is answered with the closest fit rather than
+    with nothing.
+    """
+    wanted = settings.slots
+
+    if wanted == "all":
+        return tuple(data.frames)
+
+    matching = tuple(frame for frame in data.frames if matches_slots(frame, wanted))
+
+    return matching or tuple(data.frames)
+
+
+def languages_for(settings: Settings) -> tuple[WordLanguage, ...]:
+    """The languages one draw may come from.
+
+    `language="all"` prefers the ones whose shapes answer the request, so asking every
+    language for a trailing noun does not spend most of its draws on the four that have
+    no such shape. When none of them can, every language is back in play and each
+    answers with its closest.
+    """
+    wanted = settings.slots
+
+    if wanted == "all":
+        return WORD_LANGUAGES
+
+    able = tuple(
+        code
+        for code in WORD_LANGUAGES
+        if any(matches_slots(frame, wanted) for frame in WORD_DATA[code].frames)
+    )
+
+    return able or WORD_LANGUAGES
+
+
+def resolve_slots(slots: WordSlotOption) -> tuple[WordSlot, ...] | Literal["all", "none"]:
+    """The caller's `slots`, in the form the generator wants.
+
+    One slot becomes a one-entry set, and an empty one asks the same thing `"none"`
+    does, since neither leaves any slot allowed beside the noun.
+    """
+    if slots in ("all", "none"):
+        return slots
+
+    wanted = (slots,) if isinstance(slots, str) else tuple(slots)
+
+    return cast("tuple[WordSlot, ...]", wanted) or "none"
 
 
 def joiner_of(data: WordLanguageData, settings: Settings) -> str:
@@ -188,6 +256,7 @@ class Built(NamedTuple):
     """The words of one nickname, the string they make, and the base word's theme."""
 
     words: tuple[str, ...]
+    slots: tuple[WordSlot, ...]
     nickname: str
     theme: WordTheme | None
 
@@ -284,14 +353,19 @@ def has_boundary_repeat(words: list[str], frame: WordFrame) -> bool:
     )
 
 
-def bounds_for(data: WordLanguageData, bounds: Bounds, settings: Settings) -> tuple[int, int]:
+def bounds_for(
+    data: WordLanguageData,
+    frames: tuple[WordFrame, ...],
+    bounds: Bounds,
+    settings: Settings,
+) -> tuple[int, int]:
     """Length range for one language and theme.
 
     What the caller asked for, falling back to everything the language's frames can
     produce.
     """
     joiner = len(joiner_of(data, settings))
-    ranges = [frame_range(frame, bounds, joiner) for frame in data.frames]
+    ranges = [frame_range(frame, bounds, joiner) for frame in frames]
     natural_min = min(low for low, _ in ranges)
     natural_max = max(high for _, high in ranges)
 
@@ -306,7 +380,9 @@ def natural_range(language: WordLanguage, separator: str | None = None) -> tuple
     and pools the generator actually draws from.
     """
     data = WORD_DATA[language]
-    settings = Settings(theme="all", invent=0, loose=True, prefix="", separator=separator)
+    settings = Settings(
+        theme="all", slots="all", invent=0, loose=True, prefix="", separator=separator
+    )
     joiner = len(joiner_of(data, settings))
     ranges = [
         frame_range(frame, slot_bounds(language, data, theme), joiner)
@@ -321,6 +397,10 @@ def generate_one(language: WordLanguage, settings: Settings) -> Built:
     """Build one complete nickname in one language."""
     data = WORD_DATA[language]
     themes = themes_for(settings)
+    # The shapes the caller allowed, which is every one of the language's unless they
+    # asked. Neither the theme nor the length range changes them, so this is settled
+    # once rather than per attempt.
+    allowed = frames_for(data, settings)
     joiner = joiner_of(data, settings)
     best: Built | None = None
     best_distance = math.inf
@@ -330,16 +410,19 @@ def generate_one(language: WordLanguage, settings: Settings) -> Built:
         theme = pick(themes)
         nouns = data.nouns[theme]
         bounds = slot_bounds(language, data, theme)
-        low, high = bounds_for(data, bounds, settings)
+        low, high = bounds_for(data, allowed, bounds, settings)
         # Prefer a shape that can actually land inside the range.
-        spans = [(frame, frame_range(frame, bounds, len(joiner))) for frame in data.frames]
+        spans = [(frame, frame_range(frame, bounds, len(joiner))) for frame in allowed]
         fitting = [frame for frame, (low_, high_) in spans if high_ >= low and low_ <= high]
-        frame = pick_frame(fitting or list(data.frames))
+        frame = pick_frame(fitting or list(allowed))
         words, missed = build_words(data, frame, bounds, nouns, settings, low, high)
         base = words[frame.slots.index("noun")]
         nickname = assemble(words, frame, joiner)
         built = Built(
             tuple(words),
+            # A tuple, so that a caller reading the detail cannot reach into the
+            # language's own frame and change the shape for everyone after them.
+            tuple(frame.slots),
             nickname,
             # Only a word the generator knows carries a theme. A drawn word came out of
             # this theme; an invented one has to be looked up, because it can spell a
@@ -370,6 +453,7 @@ def generate_nickname_details(
     *,
     language: WordLanguageOption = "all",
     theme: WordThemeOption = "all",
+    slots: WordSlotOption = "all",
     count: int = 1,
     realism: RandRealism = "real",
     min_length: int | None = None,
@@ -381,6 +465,7 @@ def generate_nickname_details(
     """Generate `count` nicknames, applied to every option the caller passed."""
     settings = Settings(
         theme=theme,
+        slots=resolve_slots(slots),
         invent=resolve_realism(realism),
         loose=realism != "real",
         min_length=resolve_length(min_length),
@@ -390,12 +475,13 @@ def generate_nickname_details(
     )
 
     def draw() -> NicknameDetail:
-        code = draw_language(language, WORD_LANGUAGES)
-        words, nickname, built_theme = generate_one(code, settings)
+        code = draw_language(language, languages_for(settings))
+        words, built_slots, nickname, built_theme = generate_one(code, settings)
 
         return NicknameDetail(
             nickname=nickname,
             words=words,
+            slots=built_slots,
             language=code,
             theme=built_theme,
         )

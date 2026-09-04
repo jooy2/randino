@@ -11,7 +11,7 @@ from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from typing import Literal
 
-from randino._types import WordTheme
+from randino._types import WordSlot, WordTheme
 
 WordPool = tuple[str, ...]
 """A pool of whole words."""
@@ -77,14 +77,6 @@ WordSynthesis = SyllableSynthesis | PoolSynthesis
 The npm package tells the two apart with a `kind` field; here they are two classes
 and the generator branches on `isinstance`, which is what lets a reader of
 `PoolSynthesis` see that it has no `onset` at all.
-"""
-
-
-WordSlot = Literal["adjective", "action", "noun", "part"]
-"""What one word does inside a nickname.
-
-`adjective` says what the noun is like (멋진, Brave, 青い), `action` what it is doing
-(웃는, Laughing, 踊る), `noun` is the base word, and `part` a trailing noun.
 """
 
 

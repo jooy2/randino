@@ -155,6 +155,50 @@ def test_rand_modifier_on_its_own_is_the_modifier() -> None:
     assert used == set(WORD_LANGUAGES)
 
 
+def test_kind_decides_whether_the_modifier_describes_or_acts() -> None:
+    for language in WORD_LANGUAGES:
+        data = WORD_DATA[language]
+        # A value the language knows inflects the modifier, so the value is left out
+        # here and the base form is what comes back.
+        pools = {"adjective": set(data.adjectives), "action": set(data.actions)}
+
+        for kind in ("adjective", "action"):
+            for _ in range(SAMPLE):
+                word = rand_modifier(language=language, kind=kind)
+
+                assert word in pools[kind], f"{language}: {word} is no {kind}"
+
+        # Decorating a value still agrees with it, whichever kind was asked for.
+        noun = next(iter(data.noun_gender or {}), None)
+
+        if noun is None:
+            continue
+
+        # The base form counts too: Spanish lists no masculine rules because the base
+        # form already is the masculine one.
+        forms = {
+            *data.actions,
+            *(
+                agree(data, word, gender)
+                for gender in (data.agreement or {})
+                for word in data.actions
+            ),
+        }
+
+        for _ in range(SAMPLE):
+            decorated = rand_modifier(noun, language=language, kind="action", separator="|")
+            attached = next(part for part in decorated.split("|") if part != noun)
+
+            assert attached in forms, f"{language}: {decorated}"
+
+
+def test_rand_modifier_draws_from_both_kinds_when_none_is_asked_for() -> None:
+    both = {rand_modifier(language="ko") for _ in range(400)}
+
+    assert both & set(WORD_DATA["ko"].adjectives)
+    assert both & set(WORD_DATA["ko"].actions)
+
+
 def test_rand_modifier_follows_the_script_of_the_value_when_no_language_is_given() -> None:
     def belongs(word: str, language: WordLanguage) -> bool:
         return any(word.startswith(modifier) for modifier in modifiers_of(WORD_DATA[language]))

@@ -16,6 +16,7 @@ from randino import (
     WORD_THEMES,
     RandRealism,
     WordLanguage,
+    WordSlot,
     WordTheme,
     nickname_length_range,
     rand_nickname,
@@ -103,6 +104,33 @@ def nouns_of(language: WordLanguage, theme: WordTheme | None = None) -> list[str
         return list(nouns[theme])
 
     return [word for each in WORD_THEMES for word in nouns[each]]
+
+
+def pool_for(language: WordLanguage, slot: WordSlot) -> list[str]:
+    """The words one slot can put in a nickname, in every form it can take.
+
+    The same agreement caveat as `all_words`: a modifier is stored in the base form and
+    can come out inflected.
+    """
+    data = WORD_DATA[language]
+
+    if slot == "noun":
+        return nouns_of(language)
+
+    if slot == "part":
+        return list(data.parts or ())
+
+    pool = data.adjectives if slot == "adjective" else data.actions
+
+    return [
+        *pool,
+        *(agree(data, word, gender) for gender in (data.agreement or {}) for word in pool),
+    ]
+
+
+def slots_of(language: WordLanguage) -> set[WordSlot]:
+    """The slots a language's frames can actually use."""
+    return {slot for frame in WORD_DATA[language].frames for slot in frame.slots}
 
 
 def test_rand_nickname_returns_one_nickname_by_default() -> None:
@@ -400,3 +428,63 @@ def test_output_detail_reports_the_pieces_it_used() -> None:
         assert joined_by(detail.nickname, detail.words, glues_of(detail.language), joiner)
         assert detail.language in WORD_LANGUAGES
         assert detail.theme is None or detail.theme in WORD_THEMES
+
+
+def test_slots_decides_what_shape_a_nickname_takes() -> None:
+    for language in WORD_LANGUAGES:
+        available = slots_of(language)
+
+        for slot in ("adjective", "action", "part"):
+            details = rand_nickname(language=language, slots=slot, count=SAMPLE, output="detail")
+
+            # A language with no such shape answers with its closest rather than with
+            # nothing, which for `part` is every shape it has.
+            if slot not in available:
+                assert len(details) == SAMPLE, f"{language}: {slot}"
+                continue
+
+            for detail in details:
+                assert slot in detail.slots, f"{language}: {detail.nickname}"
+
+        # Named together, the slots are a set to draw from: every nickname has a
+        # modifier, and which kind is left to chance.
+        either = rand_nickname(
+            language=language, slots=("adjective", "action"), count=200, output="detail"
+        )
+        kinds = {slot for detail in either for slot in detail.slots if slot != "noun"}
+
+        for detail in either:
+            assert {"adjective", "action"} & set(detail.slots), f"{language}: {detail.nickname}"
+
+        assert {"adjective", "action"} <= kinds, f"{language}: {kinds}"
+
+        # `"none"` is the bare noun, and an empty sequence asks the same thing.
+        for slots in ("none", ()):
+            for detail in rand_nickname(
+                language=language, slots=slots, count=SAMPLE, output="detail"
+            ):
+                assert detail.slots == ("noun",), detail.nickname
+
+
+def test_slots_picks_the_languages_that_can_answer_it() -> None:
+    able = {language for language in WORD_LANGUAGES if "part" in slots_of(language)}
+    used = {detail.language for detail in rand_nickname(slots="part", count=300, output="detail")}
+
+    assert 0 < len(able) < len(WORD_LANGUAGES)
+    assert used == able
+
+
+def test_output_detail_reports_what_each_word_does() -> None:
+    for language in WORD_LANGUAGES:
+        for detail in rand_nickname(language=language, count=SAMPLE, output="detail"):
+            assert len(detail.slots) == len(detail.words), detail.nickname
+            assert detail.slots.count("noun") == 1
+
+            for word, slot in zip(detail.words, detail.slots, strict=True):
+                assert word in pool_for(language, slot), f"{detail.nickname}: {word} is no {slot}"
+
+    # The frames are the language's own, so what a caller reads is a tuple rather than
+    # the frame's own sequence.
+    detail = rand_nickname(language="ko", output="detail")[0]
+
+    assert isinstance(detail.slots, tuple)

@@ -13,6 +13,8 @@
 //   的 between a verb and its noun where Korean needs nothing.
 // - `realism` decides per word whether it comes out of a pool or is invented,
 //   and which themes `theme: 'all'` spans — see `LOOSE_THEMES`.
+// - `slots` names the shapes a caller will accept, by what they put beside the
+//   noun. A language with no such shape answers with its closest.
 // - `minLength` / `maxLength` pick the shape first: a range too short for a
 //   modifier drops that frame instead of truncating a word.
 // - `wordSeparator` decides what goes between the words, defaulting to the way
@@ -33,18 +35,14 @@ import { pick } from '../_internal/utils.js';
 import type {
 	NicknameDetail,
 	WordLanguage,
+	WordSlot,
+	WordSlotOption,
 	WordTheme,
 	WordThemeOption,
 	RandNicknameOptions
 } from '../_types/global.js';
 import { LOOSE_THEMES, WORD_DATA, WORD_LANGUAGES, WORD_THEMES } from '../word/data/index.js';
-import type {
-	WordFrame,
-	WordGender,
-	WordLanguageData,
-	WordPool,
-	WordSlot
-} from '../word/data/types.js';
+import type { WordFrame, WordGender, WordLanguageData, WordPool } from '../word/data/types.js';
 import { agree, drawWord, poolBounds, themeOf, themesOf } from '../word/wordGenerator.js';
 
 // How many shapes to try before settling for the closest fit found.
@@ -57,6 +55,9 @@ type Bounds = Record<WordSlot, readonly [number, number]>;
 // does the separator, which falls back to the language's own joiner.
 type Settings = {
 	theme: WordThemeOption;
+	// The slots a shape may put beside the noun, normalized: a single slot has
+	// become a one-entry set, and an empty set has become `'none'`.
+	slots: readonly WordSlot[] | 'all' | 'none';
 	// How often one part is invented rather than drawn, as a percentage.
 	invent: number;
 	// Whether the themes that make an awkward nickname are in play. Off at
@@ -79,6 +80,62 @@ function themesFor(settings: Settings): readonly WordTheme[] {
 	}
 
 	return WORD_THEMES.filter((theme) => !LOOSE_THEMES.includes(theme));
+}
+
+/**
+ * Whether a shape is one the caller asked for: it uses at least one of the slots
+ * they named. At least one rather than all of them, because the named slots are
+ * a set to draw from — `['adjective', 'action']` asks for a modifier and leaves
+ * the kind to chance, and no language has a shape carrying both.
+ *
+ * `'none'` reads the other way round, and matches the bare noun alone.
+ */
+function matchesSlots(frame: WordFrame, slots: readonly WordSlot[] | 'none'): boolean {
+	return slots === 'none'
+		? frame.slots.every((slot) => slot === 'noun')
+		: frame.slots.some((slot) => slots.includes(slot));
+}
+
+/**
+ * The shapes one nickname may take. A language declares its own, so not every
+ * one of them can answer every request — Spanish has no trailing-noun shape,
+ * because `cola de gato` needs a preposition. A request no shape of the language
+ * matches leaves every shape in play, the way a length range too narrow for a
+ * shape is answered with the closest fit rather than with nothing.
+ */
+function framesFor(data: WordLanguageData, settings: Settings): readonly WordFrame[] {
+	const wanted = settings.slots;
+
+	if (wanted === 'all') {
+		return data.frames;
+	}
+
+	const matching = data.frames.filter((frame) => matchesSlots(frame, wanted));
+
+	return matching.length ? matching : data.frames;
+}
+
+/** Whether a language has a shape that answers the request at all. */
+function carries(data: WordLanguageData, settings: Settings): boolean {
+	const wanted = settings.slots;
+
+	return wanted === 'all' || data.frames.some((frame) => matchesSlots(frame, wanted));
+}
+
+/**
+ * The languages one draw may come from. `language: 'all'` prefers the ones whose
+ * shapes answer the request, so asking every language for a trailing noun does
+ * not spend most of its draws on the four that have no such shape. When none of
+ * them can, every language is back in play and each answers with its closest.
+ */
+function languagesFor(settings: Settings): readonly WordLanguage[] {
+	if (settings.slots === 'all') {
+		return WORD_LANGUAGES;
+	}
+
+	const able = WORD_LANGUAGES.filter((code) => carries(WORD_DATA[code], settings));
+
+	return able.length ? able : WORD_LANGUAGES;
 }
 
 /**
@@ -271,6 +328,7 @@ function hasBoundaryRepeat(words: readonly string[], frame: WordFrame): boolean 
  */
 function boundsFor(
 	data: WordLanguageData,
+	frames: readonly WordFrame[],
 	bounds: Bounds,
 	settings: Settings
 ): readonly [number, number] {
@@ -278,7 +336,7 @@ function boundsFor(
 	let naturalMin = Infinity;
 	let naturalMax = 0;
 
-	for (const frame of data.frames) {
+	for (const frame of frames) {
 		const [low, high] = frameRange(frame, bounds, joiner);
 
 		naturalMin = Math.min(naturalMin, low);
@@ -299,7 +357,14 @@ export function naturalRange(
 	separator?: string
 ): readonly [number, number] {
 	const data = WORD_DATA[language];
-	const settings: Settings = { theme: 'all', invent: 0, loose: true, prefix: '', separator };
+	const settings: Settings = {
+		theme: 'all',
+		slots: 'all',
+		invent: 0,
+		loose: true,
+		prefix: '',
+		separator
+	};
 	const joiner = joinerOf(data, settings).length;
 	let min = Infinity;
 	let max = 0;
@@ -318,11 +383,20 @@ export function naturalRange(
 	return [min, max];
 }
 
-type Built = { words: string[]; nickname: string; theme: WordTheme | null };
+type Built = {
+	words: string[];
+	slots: WordSlot[];
+	nickname: string;
+	theme: WordTheme | null;
+};
 
 function generateOne(language: WordLanguage, settings: Settings): Built {
 	const data = WORD_DATA[language];
 	const themes = themesFor(settings);
+	// The shapes the caller allowed, which is every one of the language's unless
+	// they asked. Neither the theme nor the length range changes them, so this is
+	// settled once rather than per attempt.
+	const allowed = framesFor(data, settings);
 	const joiner = joinerOf(data, settings);
 	let best: Built | null = null;
 	let bestDistance = Infinity;
@@ -332,19 +406,22 @@ function generateOne(language: WordLanguage, settings: Settings): Built {
 		const theme = pick(themes);
 		const nouns = data.nouns[theme];
 		const bounds = slotBounds(language, data, theme);
-		const [min, max] = boundsFor(data, bounds, settings);
+		const [min, max] = boundsFor(data, allowed, bounds, settings);
 		// Prefer a shape that can actually land inside the range.
-		const fitting = data.frames.filter((frame) => {
+		const fitting = allowed.filter((frame) => {
 			const [low, high] = frameRange(frame, bounds, joiner.length);
 
 			return high >= min && low <= max;
 		});
-		const frame = pickFrame(fitting.length ? fitting : data.frames);
+		const frame = pickFrame(fitting.length ? fitting : allowed);
 		const { words, missed } = buildWords(data, frame, bounds, nouns, settings, min, max);
 		const base = words[frame.slots.indexOf('noun')];
 		const nickname = assemble(words, frame, joiner);
 		const built: Built = {
 			words,
+			// A copy, so that a caller reading the detail cannot reach into the
+			// language's own frame and change the shape for everyone after them.
+			slots: [...frame.slots],
 			nickname,
 			// Only a word the generator knows carries a theme. A drawn word came out
 			// of this theme; an invented one has to be looked up, because it can
@@ -373,10 +450,30 @@ function generateOne(language: WordLanguage, settings: Settings): Built {
 	return best!;
 }
 
+/**
+ * The caller's `slots`, in the form the generator wants: one slot becomes a
+ * one-entry set, and an empty set asks the same thing `'none'` does, since
+ * neither leaves any slot allowed beside the noun.
+ */
+function resolveSlots(slots: WordSlotOption | undefined): Settings['slots'] {
+	if (slots === undefined) {
+		return 'all';
+	}
+
+	if (slots === 'all' || slots === 'none') {
+		return slots;
+	}
+
+	const wanted = typeof slots === 'string' ? [slots] : slots;
+
+	return wanted.length ? wanted : 'none';
+}
+
 /** Resolve the caller's options into the settings a single nickname is built from. */
 function resolveSettings(options: RandNicknameOptions): Settings {
 	return {
 		theme: options.theme ?? 'all',
+		slots: resolveSlots(options.slots),
 		invent: resolveRealism(options.realism),
 		loose: (options.realism ?? 'real') !== 'real',
 		minLength: resolveLength(options.minLength),
@@ -393,10 +490,10 @@ export function generateNicknameDetails(options: RandNicknameOptions = {}): Nick
 	return collect(
 		options,
 		() => {
-			const code = drawLanguage(language, WORD_LANGUAGES);
-			const { words, nickname, theme } = generateOne(code, settings);
+			const code = drawLanguage(language, languagesFor(settings));
+			const { words, slots, nickname, theme } = generateOne(code, settings);
 
-			return { nickname, words, language: code, theme };
+			return { nickname, words, slots, language: code, theme };
 		},
 		(detail) => detail.nickname
 	);

@@ -80,6 +80,30 @@ bool joinedBy(String nickname, List<String> words, List<String> glues, String se
   );
 }
 
+/// The words one slot can put in a nickname, in every form it can take.
+///
+/// The same agreement caveat as [allWords]: a modifier is stored in the base
+/// form and can come out inflected.
+List<String> poolFor(WordLanguage language, WordSlot slot) {
+  final data = wordData[language]!;
+
+  if (slot == WordSlot.noun) return nounsOf(language);
+  if (slot == WordSlot.part) return <String>[...?data.parts];
+
+  final pool = slot == WordSlot.adjective ? data.adjectives : data.actions;
+
+  return <String>[
+    ...pool,
+    for (final gender in data.agreement?.keys ?? const <WordGender>[])
+      for (final word in pool) agree(data, word, gender),
+  ];
+}
+
+/// The slots a language's frames can actually use.
+Set<WordSlot> slotsOf(WordLanguage language) => <WordSlot>{
+  for (final frame in wordData[language]!.frames) ...frame.slots,
+};
+
 List<String> nounsOf(WordLanguage language, [WordTheme? theme]) {
   final data = wordData[language]!;
 
@@ -525,6 +549,93 @@ void main() {
         lessThan(400),
         reason: 'expected the pool to run out: ${limited.length}',
       );
+    });
+
+    test('slots decides what shape a nickname takes', () {
+      for (final language in wordLanguages) {
+        final available = slotsOf(language);
+
+        for (final slot in [WordSlot.adjective, WordSlot.action, WordSlot.part]) {
+          final details = randNicknameDetails(language: language, slots: {slot}, count: sample);
+
+          // A language with no such shape answers with its closest rather than
+          // with nothing, which for `part` is every shape it has.
+          if (!available.contains(slot)) {
+            expect(details, hasLength(sample), reason: '$language: $slot');
+            continue;
+          }
+
+          for (final detail in details) {
+            expect(detail.slots, contains(slot), reason: '$language: ${detail.nickname}');
+          }
+        }
+
+        // Named together, the slots are a set to draw from: every nickname has a
+        // modifier, and which kind is left to chance.
+        final either = randNicknameDetails(
+          language: language,
+          slots: {WordSlot.adjective, WordSlot.action},
+          count: 200,
+        );
+        final kinds = <WordSlot>{
+          for (final detail in either) ...detail.slots.where((slot) => slot != WordSlot.noun),
+        };
+
+        for (final detail in either) {
+          expect(
+            detail.slots.any((slot) => slot == WordSlot.adjective || slot == WordSlot.action),
+            isTrue,
+            reason: '$language: ${detail.nickname}',
+          );
+        }
+
+        expect(kinds, containsAll([WordSlot.adjective, WordSlot.action]), reason: '$language');
+
+        // An empty set asks for the bare noun, which is the ask no slot answers.
+        for (final detail in randNicknameDetails(
+          language: language,
+          slots: const {},
+          count: sample,
+        )) {
+          expect(detail.slots, [WordSlot.noun], reason: detail.nickname);
+        }
+      }
+    });
+
+    test('slots picks the languages that can answer it', () {
+      final able = wordLanguages.where((language) => slotsOf(language).contains(WordSlot.part));
+      final used =
+          randNicknameDetails(
+            slots: {WordSlot.part},
+            count: 300,
+          ).map((detail) => detail.language).toSet();
+
+      expect(able, isNotEmpty);
+      expect(able.length, lessThan(wordLanguages.length));
+      expect(used, unorderedEquals(able));
+    });
+
+    test('randNicknameDetails reports what each word does', () {
+      for (final language in wordLanguages) {
+        for (final detail in randNicknameDetails(language: language, count: sample)) {
+          expect(detail.slots, hasLength(detail.words.length), reason: detail.nickname);
+          expect(detail.slots.where((slot) => slot == WordSlot.noun), hasLength(1));
+
+          for (var i = 0; i < detail.words.length; i += 1) {
+            expect(
+              poolFor(language, detail.slots[i]),
+              contains(detail.words[i]),
+              reason: '${detail.nickname}: ${detail.words[i]} is no ${detail.slots[i]}',
+            );
+          }
+        }
+      }
+
+      // The frames are the language's own, so a caller reading the detail must
+      // not be able to reach into them.
+      final detail = randNicknameDetails(language: WordLanguage.ko).first;
+
+      expect(() => detail.slots.add(WordSlot.part), throwsUnsupportedError);
     });
 
     test('randNicknameDetails reports the pieces it used', () {

@@ -7,7 +7,7 @@
 // shapes `frames` allows. The pools are the same words either way, so they are
 // written once.
 
-import type { WordTheme } from '../../_types/global.js';
+import type { WordSlot, WordTheme } from '../../_types/global.js';
 
 export type WordPool = readonly string[];
 
@@ -53,9 +53,6 @@ export type WordSynthesis =
 			maxSyllables: number;
 	  }
 	| { kind: 'pool'; pool: WordPool; minSyllables: number; maxSyllables: number };
-
-/** What one word does inside a nickname. */
-export type WordSlot = 'adjective' | 'action' | 'noun' | 'part';
 
 /**
  * One shape a nickname can take, written in the order the language puts it in.

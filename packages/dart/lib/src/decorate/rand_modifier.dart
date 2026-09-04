@@ -12,6 +12,7 @@ import 'package:randino/src/word/word_generator.dart';
   String? value,
   WordLanguage? language,
   RandRealism realism,
+  ModifierKind? kind,
   String? separator,
 ) {
   // The language of the word being decorated, so that '고양이' is not handed an
@@ -19,7 +20,7 @@ import 'package:randino/src/word/word_generator.dart';
   final WordLanguage code =
       language ?? (value == null ? pick(wordLanguages) : detectLanguage(value));
   final data = wordData[code]!;
-  final pool = modifiersOf(data);
+  final pool = modifiersOf(data, kind);
   final bounds = poolBounds(pool);
   final drawn = drawWord(data, pool, resolveRealism(realism), bounds.min, bounds.max, '');
   // A value the language knows is a noun whose gender it can look up, so the
@@ -40,21 +41,25 @@ import 'package:randino/src/word/word_generator.dart';
 /// With [value] left out you get the modifier on its own. With [language] left
 /// out, the script of the value picks one; with no value either, every language
 /// is in play. [realism] decides whether the modifier is one the language
-/// actually uses or one invented to read like it. [separator] defaults to the
-/// way the language joins words, which is to run them together.
+/// actually uses or one invented to read like it, and [kind] whether it says
+/// what the value is like or what it is doing — left out, both are in play.
+/// [separator] defaults to the way the language joins words, which is to run
+/// them together.
 ///
 /// ```dart
 /// randModifier(); // '멋진'
-/// randModifier('사자'); // '멋진사자'
-/// randModifier('Owl', separator: ' '); // 'Misty Owl'
+/// randModifier(value: '사자'); // '멋진사자'
+/// randModifier(value: 'Owl', separator: ' '); // 'Misty Owl'
+/// randModifier(kind: ModifierKind.action); // '웃는'
 /// ```
 String randModifier({
   String? value,
   WordLanguage? language,
   RandRealism realism = RandRealism.real,
+  ModifierKind? kind,
   String? separator,
 }) {
-  final (word, joiner, follows) = drawModifier(value, language, realism, separator);
+  final (word, joiner, follows) = drawModifier(value, language, realism, kind, separator);
 
   if (value == null) return word;
 

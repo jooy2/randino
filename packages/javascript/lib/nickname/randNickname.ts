@@ -16,20 +16,24 @@ import { generateNicknameDetails } from './nicknameGenerator.js';
  * // ['달리는표범_gDe2C', '조용한노을_nVtRC']
  * randNickname({ language: 'ko', wordSeparator: ' ', count: 2 });
  * // ['멋진 사자', '고양이 꼬리']
+ * randNickname({ language: 'ko', slots: 'action', count: 2 });
+ * // ['웃는사자', '달리는표범꼬리']
  */
 export function randNickname(options?: RandNicknameOptions & { output?: 'value' }): string[];
 /**
  * Generate nicknames along with the pieces each one was built from.
  *
  * `output: 'detail'` returns a `NicknameDetail` per nickname instead of a
- * string — the words in order, the language and the theme. Useful when you need
- * the words on their own, to highlight the base word or to group by theme.
+ * string — the words in order, what each of them does in the shape, the language
+ * and the theme. Useful when you need the words on their own, to highlight the
+ * base word or to group by theme.
  *
  * @example
  * randNickname({ language: 'ko', output: 'detail' });
  * // [{
  * //   nickname: '멋진사자',
  * //   words: ['멋진', '사자'],
+ * //   slots: ['adjective', 'noun'],
  * //   language: 'ko',
  * //   theme: 'animal'
  * // }]
