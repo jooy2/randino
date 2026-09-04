@@ -152,7 +152,7 @@ EN = WordLanguageData(
             Sylph Efreet Marid Naga Rakshasa Oni Tengu Kitsune Kappa Bunyip Drake
             Lindworm Amphisbaena Catoblepas Peryton Hippogriff Nightmare Familiar Coven
             Incantation Invocation Summoning Banishment Divination Scrying Portal Ley
-            Sanctum Reliquary Effigy Idol Totem Fetish Charm Warding Runestone
+            Sanctum Reliquary Effigy Idol Totem Phylactery Charm Warding Runestone
         """),
         "job": words("""
             Wizard Sorcerer Ranger Thief Rogue Pirate Sailor Captain Chef Gardener
@@ -289,7 +289,7 @@ EN = WordLanguageData(
             Portfolio Escrow Levy Tariff Rebate Refund Premium Annuity Pension Payroll
             Wage Salary Bonus Commission Royalty Franchise Merger Buyout Bailout
             Collateral Lien Voucher Coupon Bullion Vault Treasury Exchequer Remittance
-            Clearing Settlement Arbitrage Futures Warrant Promissory Overdraft
+            Clearing Settlement Arbitrage Futures Warrant Debenture Overdraft
             Withdrawal Statement Passbook Custody Trustee Creditor Debtor Lender
             Borrower Guarantor Valuation Appraisal Inflation Recession Liquidity
             Solvency Bankruptcy Windfall Endowment Subsidy Stipend Allowance Expense

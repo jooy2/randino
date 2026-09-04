@@ -106,7 +106,7 @@ final TaggedNouns _nouns = taggedNouns(<WordTheme, String>{
     teatro:m escuela:f parque:m puerto:m muelle:m estación:f aeropuerto:m faro:m
     castillo:m muralla:f palacio:m templo:m torre:f desván:m sótano:m azotea:f patio:m
     porche:m invernadero:m granero:m cabaña:f mirador:m recreo:m gimnasio:m piscina:f
-    acuario:m galería:f zoológico:m balneario:m ayuntamiento:m correos:m hospital:m
+    acuario:m galería:f zoológico:m balneario:m ayuntamiento:m mesón:m hospital:m
     farmacia:f librería:f panadería:f cafetería:f restaurante:m cocina:f dormitorio:m
     salón:m pasillo:m escalera:f túnel:m pasarela:f cruce:m alameda:f fortaleza:f
     granja:f rancho:m huerto:m abadía:f claustro:m bastión:m atalaya:f foso:m
@@ -198,8 +198,8 @@ final TaggedNouns _nouns = taggedNouns(<WordTheme, String>{
     creciente:m eclipse:m cenit:m universo:m planeta:m satélite:m asteroide:m nebulosa:f
     cúmulo:m constelación:f órbita:f gravedad:f rotación:f traslación:f mancha_solar:f
     cráter:m año_luz:m astro:m firmamento:m eclíptica:f meridiano:m estratosfera:f
-    atmósfera:f vacío:m ingravidez:f plenilunio:m novilunio:m polar:f vespertino:m
-    matutino:m marte:m venus:m júpiter:m saturno:m urano:m neptuno:m plutón:m
+    atmósfera:f vacío:m ingravidez:f plenilunio:m novilunio:m perigeo:m apogeo:m
+    lucero:m marte:m venus:m júpiter:m saturno:m urano:m neptuno:m plutón:m
     supernova:f cuásar:m púlsar:m vía_láctea:f cosmos:m
   ''',
   WordTheme.time: r'''
@@ -207,7 +207,7 @@ final TaggedNouns _nouns = taggedNouns(<WordTheme, String>{
     momento:m eternidad:f futuro:m instante:m siglo:m década:f mañana:f mediodía:m
     tarde:f noche:f medianoche:f madrugada:f víspera:f ayer:m hoy:m jornada:f semana:f
     quincena:f mes:m trimestre:m semestre:m año:m lustro:m milenio:m época:f era:f
-    edad:f primavera:f verano:m otoño:m invierno:m solano:m antaño:m ahora:m luego:m
+    edad:f primavera:f verano:m otoño:m invierno:m solano:m trienio:m ahora:m bienio:m
     infancia:f juventud:f madurez:f vejez:f intervalo:m
     duración:f transcurso:m período:m aniversario:m efeméride:f temporada:f alborada:f
     atardecer:m

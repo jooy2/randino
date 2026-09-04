@@ -30,7 +30,7 @@ export const VI: WordLanguageData = {
 			cừu lợn khỉ vượn cá_sấu rắn thằn_lằn rùa ếch cóc chim én sẻ quạ chim_ưng đại_bàng công
 			vẹt cú bồ_câu hạc thiên_nga vịt ngỗng gà cá cá_voi cá_heo cá_mập mực bạch_tuộc tôm cua sò
 			ốc bướm ong kiến nhện chuồn_chuồn ve muỗi ruồi giun sâu tằm dơi chồn nhím lạc_đà hà_mã
-			tê_giác hươu_cao_cổ chuột sứa hải_cẩu đà_điểu chim_sẻ cá_chép lươn
+			tê_giác hươu_cao_cổ chuột sứa hải_cẩu đà_điểu bọ_ngựa cá_chép lươn
 		`),
 		object: words(`
 			chai bút tẩy ô đèn gương chìa_khóa ổ_khóa túi cúc kim chỉ cọ giấy vở thư tem con_dấu
@@ -44,7 +44,7 @@ export const VI: WordLanguageData = {
 			sông_băng san_hô đầm_lầy suối vịnh cồn_cát đỉnh_núi hoang_mạc rừng_thưa thảo_nguyên đầm
 			cửa_sông châu_thổ phá đảo bán_đảo eo_đất quần_đảo cao_nguyên vách_đá khe_núi bãi_cát
 			bãi_đá rạn_san_hô đáy_biển vực_sâu mạch_nước hố_sụt măng_đá nhũ_đá hang_động gờ_đá bóng
-			vọng hương lửa than_hồng dòng_chảy bờ_biển bãi_bồi
+			âm_vang hương lửa than_hồng dòng_chảy bờ_biển bãi_bồi
 		`),
 		plant: words(`
 			cây lá hoa rễ hạt quả rêu dương_xỉ tre thông phong anh_đào hoa_hồng hoa_sen hoa_cúc
@@ -57,8 +57,8 @@ export const VI: WordLanguageData = {
 			vàng bạc đồng sắt thép đồng_thau thiếc kẽm bạch_kim thủy_tinh pha_lê thạch_anh mã_não
 			hổ_phách ngọc_trai ngọc_bích bạch_ngọc ngọc đá_hoa đá_granit đá_vôi đá_bazan đá_lửa
 			thiên_thạch quặng đá_thô đá_quý thỏi_vàng thỏi_bạc vân_mẫu huỳnh_thạch lưu_huỳnh ngà
-			sa_khoáng lá_vàng lá_bạc than_chì thủy_ngân thạch_cao bạch_á ngọc_quý mạch_quặng
-			hồng_ngọc lam_ngọc lục_bảo đá_mắt_mèo đá_mặt_trăng ngọc_lam kim_cương san_hô_đỏ
+			sa_khoáng lá_vàng lá_bạc than_chì thủy_ngân thạch_cao đá_phiến ngọc_quý mạch_quặng
+			hồng_ngọc ngọc_đen lục_bảo đá_mắt_mèo đá_mặt_trăng ngọc_lam kim_cương san_hô_đỏ
 		`),
 		concept: words(`
 			tự_do hòa_bình công_lý chân_lý trí_tuệ ký_ức tưởng_tượng câu_chuyện thơ phác_họa ngữ_pháp
@@ -76,7 +76,7 @@ export const VI: WordLanguageData = {
 			quái_vật ác_thú thánh_thú thần_thú ảo_thú ma_vương long_vương nữ_thần_ảo phép_thuật
 			ma_lực thần_chú lời_nguyền tiên_tri sấm_truyền kết_giới bùa_hộ_mệnh phong_ấn ảo_giác
 			rồng_lửa rồng_băng hắc_long bạch_long thanh_long bạch_hổ chu_tước huyền_vũ cửu_vĩ_hồ
-			chim_lửa người_sói ma_cà_rồng xác_sống ma_nơ_canh người_lùn quỷ_lùn tinh_linh thủy_thần
+			chim_lửa người_sói ma_cà_rồng xác_sống hình_nhân người_lùn quỷ_lùn tinh_linh thủy_thần
 			sơn_thần hải_thần lôi_thần phong_thần nữ_thủy_thần mỹ_nhân_ngư nhân_mã nhân_sư thiên_mã
 			hải_quái thần_điểu linh_hồn ma_thuật đạo_sĩ pháp_sư thầy_bói nhà_tiên_tri hiền_giả
 		`),
@@ -86,7 +86,7 @@ export const VI: WordLanguageData = {
 			nữ_hoàng hoàng_tử công_chúa hoàng_đế quản_gia thị_nữ người_hầu thương_nhân nông_dân
 			ngư_dân mục_đồng tiều_phu lái_đò phu_xe hoa_tiêu phi_công kỹ_sư lao_công lính_cứu_hỏa
 			cảnh_sát bác_sĩ y_tá dược_sĩ thú_y giáo_viên học_sinh thủ_thư nhà_báo nhà_văn dịch_giả
-			ca_sĩ diễn_viên đạo_diễn nhạc_công thợ_mỏ thợ_mộc thợ_gốm thợ_may tế_sư học_giả tiến_sĩ
+			ca_sĩ diễn_viên đạo_diễn nhạc_công thợ_mỏ thợ_mộc thợ_gốm thợ_may thầy_tế học_giả tiến_sĩ
 			trọng_tài nghệ_sĩ_xiếc
 		`),
 		music: words(`
@@ -94,8 +94,8 @@ export const VI: WordLanguageData = {
 			kèn kèn_trumpet đàn_hạc đàn_cello đàn_viola vĩ_cầm trống_lớn chũm_chọe trống_lắc mộc_cầm
 			phong_cầm khẩu_cầm đàn_bầu đàn_nhị đàn_nguyệt sáo_trúc bản_nhạc nốt_nhạc dấu_lặng âm_giai
 			hợp_xướng đơn_ca hòa_tấu độc_tấu buổi_diễn sân_khấu giao_hưởng điệu_valse nhạc_jazz
-			dân_ca khúc_hát_ru hành_khúc khúc_dạo_đầu khúc_giữa âm_sắc nhịp_phách dàn_nhạc
-			chương_nhạc khúc_mở_màn dạ_khúc khúc_hát_đêm thánh_ca tụng_ca cầu_hồn_khúc song_ca tam_ca
+			dân_ca khúc_hát_ru hành_khúc khúc_dạo_đầu khúc_kết âm_sắc nhịp_phách dàn_nhạc
+			chương_nhạc khúc_mở_màn dạ_khúc biến_tấu thánh_ca tụng_ca cầu_hồn_khúc song_ca tam_ca
 			tứ_tấu ngũ_tấu nhạc_trưởng quãng_tám bán_âm khóa_nhạc khuông_nhạc tổng_phổ máy_nhịp
 		`),
 		place: words(`
@@ -148,7 +148,7 @@ export const VI: WordLanguageData = {
 			trắng_ngà trắng_sữa đen_tuyền bạc_kim ánh_vàng ánh_bạc đỏ_gạch đỏ_ruby hồng_phấn hồng_sen
 			cam_cháy vàng_kim vàng_mơ vàng_đồng màu_lục_bảo lục_nhạt lam_sẫm lam_nhạt tím_nhạt
 			tím_sẫm nâu_sẫm nâu_nhạt xám_bạc trắng_tinh đen_nhánh đỏ_tươi cam_tươi vàng_tươi
-			xanh_tươi màu_ngọc_lam hổ_phách_sắc đồng_sắc màu_cát màu_tro màu_khói màu_đất màu_trời
+			xanh_tươi màu_ngọc_lam màu_hổ_phách màu_đồng màu_cát màu_tro màu_khói màu_đất màu_trời
 			màu_biển màu_mực màu_máu
 		`),
 		finance: words(`
@@ -156,14 +156,14 @@ export const VI: WordLanguageData = {
 			tiết_kiệm tài_khoản số_dư ngân_sách kiểm_toán tài_sản nợ_phải_trả doanh_thu lợi_nhuận
 			thặng_dư thâm_hụt khoản_nợ tín_dụng tiền_tệ tỷ_giá lợi_suất thuế_quan hoàn_thuế
 			phí_bảo_hiểm lương_hưu bảng_lương tiền_công tiền_lương tiền_thưởng nhượng_quyền sáp_nhập
-			thâu_tóm cứu_trợ két_sắt kho_bạc chuyển_tiền quyết_toán rút_quá sao_kê sổ_tiết_kiệm
+			thâu_tóm cứu_trợ két_sắt kho_bạc chuyển_tiền quyết_toán thấu_chi sao_kê sổ_tiết_kiệm
 			chủ_nợ con_nợ người_đi_vay định_giá thẩm_định lạm_phát suy_thoái thanh_khoản phá_sản
 			của_trời_cho trợ_cấp phụ_cấp chi_phí vòng_quay chiết_khấu trả_góp nợ_quá_hạn
 		`),
 		tech: words(`
 			máy_chủ bộ_nhớ_đệm bộ_đệm điểm_ảnh mã_hóa gói_tin giao_thức hàng_đợi ngăn_xếp con_trỏ
 			phần_sụn sổ_đăng_ký băng_thông độ_trễ cổng_kết_nối tường_lửa mạng_con tên_máy tải_trọng
-			tổng_kiểm lược_đồ bản_sao_lưu cụm_máy phân_mảnh bản_sao ảnh_chụp vùng_chứa hộp_cát
+			mã_kiểm_tra lược_đồ bản_sao_lưu cụm_máy phân_mảnh bản_sao ảnh_chụp vùng_chứa hộp_cát
 			đường_ống kho_mã trình_gỡ_lỗi lệnh_tắt mảng ma_trận số_nguyên cú_pháp mã_máy lệnh ngắt
 			thanh_ghi tốc_độ_bit thông_lượng bắt_tay trung_gian điểm_cuối giải_mã băm kết_xuất
 			bộ_tô_bóng kết_cấu đa_giác khung_dây khung_nhìn bộ_đệm_khung tám_bit đường_lên
@@ -174,14 +174,14 @@ export const VI: WordLanguageData = {
 			mây gió mưa tuyết sương_giá sương_mù sương cầu_vồng hoàng_hôn sét sấm mưa_rào gió_mùa bão
 			lốc_xoáy bão_tuyết mưa_phùn mưa_lớn gió_giật gió_mạnh gió_nhẹ mưa_đá mưa_tuyết tia_nắng
 			ảo_ảnh quầng_sáng giọt_mưa hạt_mưa màn_mưa mưa_xuân mưa_thu mưa_đêm tuyết_rơi băng_giá
-			sương_muối nắng_nóng đợt_nóng đợt_lạnh gió_bấc gió_nồm gió_lào mây_đen mây_mưa áp_thấp
+			sương_muối nắng_nóng đợt_nóng đợt_lạnh gió_bấc gió_nồm gió_lào mây_đen vầng_mây áp_thấp
 			áp_cao thời_tiết khí_hậu nhiệt_độ độ_ẩm khí_áp trời_quang trời_râm trời_mưa nắng_gắt
 			bóng_râm nắng_chiều gió_biển gió_núi cơn_giông chớp sương_sớm nắng_sớm
 		`),
 		space: words(`
 			sao mặt_trăng mặt_trời thiên_hà sao_chổi sao_băng cực_quang bụi_sao dải_ngân_hà nhật_thực
 			nguyệt_thực thiên_đỉnh vũ_trụ hành_tinh vệ_tinh tinh_vân cụm_sao chòm_sao quỹ_đạo
-			trọng_lực tự_quay công_chuyển vết_đen gió_mặt_trời bề_mặt_trăng năm_ánh_sáng thiên_thể
+			trọng_lực tự_quay nhật_hoa vết_đen gió_mặt_trời bề_mặt_trăng năm_ánh_sáng thiên_thể
 			liên_sao định_tinh thiên_cầu hoàng_đạo hệ_ngân_hà hố_đen mưa_sao_băng bụi_vũ_trụ
 			hệ_mặt_trời chân_không trăng_khuyết trăng_tròn trăng_non ánh_trăng ánh_sao sao_bắc_cực
 			sao_hôm sao_mai sao_hỏa sao_kim sao_mộc sao_thổ sao_thủy
@@ -228,7 +228,7 @@ export const VI: WordLanguageData = {
 			rìu xẻng cưa thang cờ_lê kìm đục đe ống_bễ dùi kẹp ê_tô thước_thủy thước_cặp thước_đo_góc
 			thước_kẻ kéo búa búa_gỗ máy_khoan giấy_nhám bào cuốc liềm hái bừa cào mỏ_lết tua_vít
 			mỏ_hàn máy_mài máy_cắt máy_hàn thước_dây dây_mực com_pa rìu_nhỏ xà_beng đòn_bẩy nêm
-			ròng_rọc tay_quay búa_tạ bay đá_mài giũa bàn_nạo cái_sàng mai bừa_đất cối_xay thoi
+			ròng_rọc tay_quay búa_tạ bay đá_mài giũa bàn_nạo cái_sàng mai cày cối_xay thoi
 			ống_chỉ cán lưỡi_dao bộ_dụng_cụ hộp_đồ_nghề đinh_vít máy_bắn_đinh cưa_lọng cưa_vòng
 			máy_tiện máy_chà_nhám cưa_xích cưa_tay mũi_vạch thước_vuông ke_góc bàn_thợ
 		`),
@@ -238,7 +238,7 @@ export const VI: WordLanguageData = {
 			nước_chanh sinh_tố sữa_lắc nước_ngọt trà_sữa trà_đá cà_phê_đá bia bia_hơi bia_đen
 			rượu_vang rượu_trắng rượu_nếp rượu_cần rượu_gạo rượu_thuốc rượu_mạnh sâm_banh cốc_tai
 			nước_lọc nước_ấm nước_nóng nước_đá nước_đường mật_ong_pha nước_sâm nước_rau_má nước_vối
-			trà_atisô trà_bí_đao nước_yến nước_khoáng nước_hoa_quả sữa_tươi sữa_đặc
+			nước_sấu trà_bí_đao nước_yến nước_khoáng nước_hoa_quả sữa_tươi sữa_đặc
 		`)
 	},
 	parts: words(`

@@ -100,7 +100,7 @@ const NOUNS = taggedNouns({
 		mercato:m piazza:f città:f villaggio:m vicolo:m ponte:m giardino:m biblioteca:f museo:m
 		teatro:m scuola:f parco:m porto:m molo:m stazione:f aeroporto:m faro:m castello:m mura:f
 		palazzo:m tempio:m torre:f soffitta:f cantina:f terrazza:f cortile:m portico:m serra:f
-		fienile:m baita:f belvedere:m gioco:m palestra:f piscina:f acquario:m galleria:f zoo:m
+		fienile:m baita:f belvedere:m parco_giochi:m palestra:f piscina:f acquario:m galleria:f zoo:m
 		terme:f municipio:m posta:f ospedale:m farmacia:f libreria:f panetteria:f caffetteria:f
 		ristorante:m cucina:f camera:f salotto:m corridoio:m tunnel:m passerella:f incrocio:m
 		viale:m fortezza:f fattoria:f ranch:m frutteto:m abbazia:f chiostro:m bastione:m
@@ -114,7 +114,7 @@ const NOUNS = taggedNouns({
 		biscotto:m torta:f budino:m ciambella:f cialda:f frittella:f hamburger:m pizza:f curry:m
 		frittata:f risotto:m lasagna:f gnocco:m raviolo:m tortellino:m polenta:f focaccia:f
 		grissino:m panino:m salsiccia:f prosciutto:m pancetta:f salame:m mortadella:f polpetta:f
-		bistecca:f costoletta:f marmellata:f miele:m tiramisu:m cannolo:m
+		bistecca:f costoletta:f marmellata:f miele:m tiramisù:m cannolo:m
 	`,
 	sport: `
 		calcio:m baseball:m pallavolo:f tennis:m badminton:m golf:m bowling:m biliardo:m nuoto:m
@@ -191,7 +191,7 @@ const NOUNS = taggedNouns({
 		eclissi:f zenit:m universo:m pianeta:m satellite:m asteroide:m nebulosa:f ammasso:m
 		orbita:f gravità:f rotazione:f rivoluzione:f cratere:m anno_luce:m astro:m firmamento:m
 		eclittica:f meridiano:m stratosfera:f atmosfera:f vuoto:m plenilunio:m novilunio:m
-		polare:f vespro:m marte:m venere:f giove:m saturno:m urano:m nettuno:m plutone:m
+		perigeo:m vespro:m marte:m venere:f giove:m saturno:m urano:m nettuno:m plutone:m
 		supernova:f buco_nero:m quasar:m pulsar:f via_lattea:f cosmo:m
 	`,
 	time: `
@@ -200,7 +200,7 @@ const NOUNS = taggedNouns({
 		mezzogiorno:m pomeriggio:m sera:f notte:f mezzanotte:f vigilia:f ieri:m
 		oggi:m giornata:f settimana:f quindicina:f mese:m trimestre:m semestre:m anno:m lustro:m
 		millennio:m epoca:f era:f età:f primavera:f estate:f autunno:m inverno:m
-		adesso:m poi:m infanzia:f gioventù:f maturità:f vecchiaia:f scadenza:f intervallo:m
+		triennio:m biennio:m infanzia:f gioventù:f maturità:f vecchiaia:f scadenza:f intervallo:m
 		durata:f periodo:m anniversario:m ricorrenza:f albeggiare:m
 	`,
 	emotion: `
@@ -250,7 +250,7 @@ const NOUNS = taggedNouns({
 		infuso:m tisana:f mate:m cioccolata:f macchiato:m cappuccino:m espresso:m corretto:m
 		decaffeinato:m birra:f bionda:f rossa:f vino:m
 		spumante:m prosecco:m champagne:m sherry:m vermut:m sangria:f liquore:m
-		grappa:f acquavite:f rum:m gin:m vodka:m whisky:m cognac:m brandy:m tequila:m sake:m
+		grappa:f acquavite:f rum:m gin:m vodka:f whisky:m cognac:m brandy:m tequila:m sake:m
 		idromele:m cocktail:m punch:m nettare:m sciroppo:m bibita:f soda:f tonica:f granita:f
 	`
 });

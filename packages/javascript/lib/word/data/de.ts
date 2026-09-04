@@ -34,7 +34,7 @@ const NOUNS = taggedNouns({
 		Tropfstein:m Grotte:f Sims:n Hang:m Schatten:m Echo:n Glut:f Quelle:f Ufer:n Küste:f
 	`,
 	plant: `
-		Baum:m Blatt:n Blume:f Wurzel:f Samen:m Frucht:f Moos:n Farn:m Bambus:m Kieferbaum:m
+		Baum:m Blatt:n Blume:f Wurzel:f Samen:m Frucht:f Moos:n Farn:m Bambus:m Föhre:f
 		Ahorn:m Kirschbaum:m Rose:f Lotus:m Chrysantheme:f Orchidee:f Löwenzahn:m Sonnenblume:f
 		Seerose:f Gras:n Zweig:m Trieb:m Knospe:f Blütenblatt:n Pollen:m Zapfen:m Eichel:f
 		Ginkgo:m Weide:f Birke:f Zeder:f Tanne:f Eiche:f Kastanie:f Walnuss:f Rasen:m Alge:f
@@ -47,7 +47,7 @@ const NOUNS = taggedNouns({
 		Kristall:m Quarz:m Amethyst:m Achat:m Bernstein:m Perle:f Jade:f Opal:m Obsidian:m
 		Marmor:m Granit:m Kalkstein:m Basalt:m Feuerstein:m Meteorit:m Erz:n Edelstein:m Barren:m
 		Glimmer:m Flussspat:m Kalzit:m Malachit:m Granat:m Schwefel:m Elfenbein:n Nugget:n
-		Graphit:n Quecksilber:n Gips:m Ader:f Olivin:m Turmalin:m Rubin:m Saphir:m Smaragd:m
+		Graphit:m Quecksilber:n Gips:m Ader:f Olivin:m Turmalin:m Rubin:m Saphir:m Smaragd:m
 		Topas:m Zirkon:m Pyrit:m Magnetit:m Hämatit:m Zinnober:m Bleiglanz:m Talk:m Wismut:n
 	`,
 	concept: `
@@ -107,7 +107,7 @@ const NOUNS = taggedNouns({
 		Banane:f Mango:f Kirsche:f Ananas:f Schokolade:f Bonbon:n Keks:m Kuchen:m Pudding:m
 		Donut:m Waffel:f Pfannkuchen:m Hamburger:m Pizza:f Nudelgericht:n Curry:n Omelett:n
 		Brezel:f Brötchen:n Semmel:f Strudel:m Torte:f Wurst:f Schinken:m Speck:m Salami:f
-		Frikadelle:f Schnitzel:n Braten:m Marmelade:f Honig:m Sahne:f Quark:m Klöße:m Knödel:m
+		Frikadelle:f Schnitzel:n Braten:m Marmelade:f Honig:m Sahne:f Quark:m Sauerkraut:n Knödel:m
 	`,
 	sport: `
 		Fußball:m Baseball:m Basketball:m Volleyball:m Tischtennis:n Tennis:n Federball:m Golf:n
@@ -159,13 +159,13 @@ const NOUNS = taggedNouns({
 	`,
 	tech: `
 		Server:m Puffer:m Bildpunkt:m Codec:m Paket:n Protokoll:n Stapel:m Halde:f Zeiger:m
-		Firmware:f Bandbreite:f Latenz:f Torweg:m Brandmauer:f Teilnetz:n Rechnername:m Nutzlast:f
+		Firmware:f Bandbreite:f Latenz:f Gateway:n Brandmauer:f Teilnetz:n Rechnername:m Nutzlast:f
 		Prüfsumme:f Schema:n Sicherung:f Verbund:m Splitter:m Abbild:n Behälter:m Sandkasten:m
-		Fließband:n Ablage:f Fehlersucher:m Makro:n Feld:n Matrix:f Ganzzahl:f Syntax:f
-		Zerteiler:m Assembler:m Befehl:m Bitrate:f Durchsatz:m Handschlag:m Namensraum:m
-		Vermittler:m Endpunkt:m Streuwert:m Darstellung:f Schattierer:m Textur:f Vieleck:n
-		Gitternetz:n Oktett:n Wegewahl:f Vermittlung:f Rundruf:m Datagramm:n Startlader:m
-		Dateisystem:n Partition:f Verzeichnis:n Prüfpunkt:m Rückrollung:f Umzug:m
+		Pipeline:f Ablage:f Fehlersucher:m Makro:n Feld:n Matrix:f Ganzzahl:f Syntax:f
+		Parser:m Assembler:m Befehl:m Bitrate:f Durchsatz:m Handschlag:m Namensraum:m
+		Vermittler:m Endpunkt:m Streuwert:m Darstellung:f Shader:m Textur:f Vieleck:n
+		Gitternetz:n Oktett:n Wegewahl:f Vermittlung:f Rundruf:m Datagramm:n Bootloader:m
+		Dateisystem:n Partition:f Verzeichnis:n Prüfpunkt:m Rollback:n Migration:f
 	`,
 	weather: `
 		Wolke:f Wind:m Regen:m Schnee:m Reif:m Nebel:m Tau:m Regenbogen:m Blitz:m Donner:m
@@ -262,7 +262,7 @@ export const DE: WordLanguageData = {
 		hörend sehend träumend wachend versteckt jagend fangend werfend ziehend schiebend öffnend
 		schließend bauend pflanzend erntend kochend backend webend nähend rudernd fahrend
 		kletternd rollend treibend fließend brennend schmelzend blühend welkend fallend wandernd
-		flüsternd leuchtend blinkend schwebend wiegend kreisend schleichend hüpfend springend
+		flüsternd schimmernd blinkend schwebend wiegend kreisend schleichend hüpfend springend
 		schnaufend gähnend streckend grübelnd staunend zögernd jubelnd grüßend umarmend
 		streichelnd tröstend weckend reisend fliehend landend spähend lauschend zählend messend
 		schmiedend schnitzend polierend gießend schneidend hackend faltend wickelnd siegelnd
