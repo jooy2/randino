@@ -230,4 +230,5 @@ rand_name(count=5)  # 9개 언어 중 하나씩, 이름 다섯 개
 - [**사람 이름**](../name/) — 모든 옵션과, 각 옵션이 출력에 미치는 영향.
 - [**닉네임**](../nickname/) — 모든 옵션과 형태를 고르는 방식.
 - [**`randWord`**](../word/rand-word) — 25개 테마를 그 자체로, 테마마다 함수 하나씩.
+- [**`randSentence`**](../sentence/rand-sentence) — 그 언어의 문법으로 쓴 완결된 문장.
 - [**`randModifier`**](../decorate/rand-modifier) — `randSuffix`가 토큰을 뒤에 붙이듯, 어떤 문자열 앞에든 수식어를 붙입니다.

@@ -13,26 +13,26 @@
  * because the two generators are two things, but a reader looking for the
  * function they are about to call does not care which folder it lives in. The
  * split here is by what a function *is*, one level down inside **API**:
- * **Generators** hand back names, nicknames and words out of nothing,
+ * **Generators** hand back names, nicknames, words and sentences out of nothing,
  * **Decorators** attach something to a string you already have, and
  * **Utilities** answer a question about a language. The folder a page sits in
  * decides nothing but its URL.
  *
  * **Generators** is the one that goes a level deeper, into **General** — the
- * three that generate a kind of text — and **Words**, the twenty-five themed forms
- * of `randWord`. Twenty-eight entries in one list would bury the three, and the
+ * four that generate a kind of text — and **Words**, the twenty-five themed forms
+ * of `randWord`. Twenty-nine entries in one list would bury the four, and the
  * twenty-five are `randWord` with its argument decided rather than twenty-five
- * separate ideas, so they sit beside the three rather than among them.
+ * separate ideas, so they sit beside the four rather than among them.
  *
  * Words is also the one group the navbar's API dropdown leaves out, which it
  * says itself with `sidebarOnly`: twenty-five names for one function is a wall in
  * a menu, and the dropdown already points at the function they all are.
  *
  * **Behaviour** holds the prose explaining how a generator's options behave,
- * where there is enough of it to be its own page — `randName` and
- * `randNickname` have one each, `randWord` does not. It is a group of its own
- * rather than more entries under Guide, because it grows alongside Generators
- * and Guide does not.
+ * where there is enough of it to be its own page — `randName`, `randNickname`
+ * and `randSentence` have one each, `randWord` does not. It is a group of its
+ * own rather than more entries under Guide, because it grows alongside
+ * Generators and Guide does not.
  *
  * Every `path` here has to exist as `en/<path>.md` **and** `ko/<path>.md`, or
  * VitePress fails the build on a dead link. That is the check, and it is why
@@ -92,7 +92,8 @@ export const SIDEBAR: SidebarGroup[] = [
 						items: [
 							{ path: 'name/rand-name', en: 'randName', ko: 'randName' },
 							{ path: 'nickname/rand-nickname', en: 'randNickname', ko: 'randNickname' },
-							{ path: 'word/rand-word', en: 'randWord', ko: 'randWord' }
+							{ path: 'word/rand-word', en: 'randWord', ko: 'randWord' },
+							{ path: 'sentence/rand-sentence', en: 'randSentence', ko: 'randSentence' }
 						]
 					},
 					{
@@ -160,6 +161,11 @@ export const SIDEBAR: SidebarGroup[] = [
 						en: 'nicknameLengthRange',
 						ko: 'nicknameLengthRange'
 					},
+					{
+						path: 'sentence/sentence-length-range',
+						en: 'sentenceLengthRange',
+						ko: 'sentenceLengthRange'
+					},
 					{ path: 'word/word-length-range', en: 'wordLengthRange', ko: 'wordLengthRange' }
 				]
 			}
@@ -170,7 +176,8 @@ export const SIDEBAR: SidebarGroup[] = [
 		ko: '동작 방식',
 		items: [
 			{ path: 'name/', en: 'Person names', ko: '사람 이름' },
-			{ path: 'nickname/', en: 'Nicknames', ko: '닉네임' }
+			{ path: 'nickname/', en: 'Nicknames', ko: '닉네임' },
+			{ path: 'sentence/', en: 'Sentences', ko: '문장' }
 		]
 	},
 	{

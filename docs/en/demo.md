@@ -27,5 +27,5 @@ The output is also **not seeded**. There is no way to ask randino for the same b
 ## Where to go next
 
 - [Getting started](./guide/getting-started) — installing it, for whichever of the three packages you use.
-- [`randName`](./name/rand-name), [`randNickname`](./nickname/rand-nickname) and [`randWord`](./word/rand-word) — every option in the panel above, written out.
+- [`randName`](./name/rand-name), [`randNickname`](./nickname/rand-nickname), [`randWord`](./word/rand-word) and [`randSentence`](./sentence/rand-sentence) — every option in the panel above, written out.
 - [Supported languages](./guide/languages) — what each language can and cannot do.

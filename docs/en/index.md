@@ -2,13 +2,13 @@
 layout: home
 
 title: randino
-titleTemplate: Random names and nicknames, in the language you ask for
-description: Generate random person names and nicknames in nine languages — Emma Clover, MistyOwl. One library shipped for JavaScript, Dart and Python, with no runtime dependencies.
+titleTemplate: Random names, nicknames and sentences, in the language you ask for
+description: Generate random person names, nicknames, words and sentences in nine languages — Emma Clover, MistyOwl, 여우가 사과를 먹는다. One library shipped for JavaScript, Dart and Python, with no runtime dependencies.
 
 hero:
   name: randino
   text: Random text that reads like the language
-  tagline: Person names people actually carry, nicknames someone would actually pick, and the everyday words behind them. Nine languages, shipped for JavaScript, Dart and Python, with no runtime dependencies.
+  tagline: Person names people actually carry, nicknames someone would actually pick, the everyday words behind them, and whole sentences in the language's own grammar. Nine languages, shipped for JavaScript, Dart and Python, with no runtime dependencies.
   actions:
     - theme: brand
       text: Get started
@@ -22,6 +22,9 @@ hero:
     - theme: alt
       text: Words
       link: /word/rand-word
+    - theme: alt
+      text: Sentences
+      link: /sentence/
   image:
     src: /512x512.png
     alt: randino
@@ -36,9 +39,13 @@ features:
     link: /nickname/
     linkText: Nicknames
   - title: The words on their own
-    details: Fourteen themes, a function each. randAnimal, randFood, randGem — the vocabulary a nickname is built from, without the nickname.
+    details: Twenty-five themes, a function each. randAnimal, randFood, randGem — the vocabulary a nickname is built from, without the nickname.
     link: /word/rand-word
     linkText: randWord
+  - title: Sentences, not word salad
+    details: A verb states what can do it and what it can be done to, so the words of one sentence belong together. Each language writes its own particles, articles and word order.
+    link: /sentence/
+    linkText: Sentences
   - title: Three packages, one library
     details: The same datasets and the same rules for JavaScript, Dart and Python. One page documents all of them — pick your language in the sidebar.
     link: /guide/getting-started

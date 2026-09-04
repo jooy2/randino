@@ -230,4 +230,5 @@ Names are `snake_case`: `includeMiddleName` is `include_middle_name`, `minLength
 - [**Person names**](../name/) — every option, and what it does to the output.
 - [**Nicknames**](../nickname/) — every option, and how the shapes are chosen.
 - [**`randWord`**](../word/rand-word) — the twenty-five themes on their own, one function each.
+- [**`randSentence`**](../sentence/rand-sentence) — whole statements, in the language's own grammar.
 - [**`randModifier`**](../decorate/rand-modifier) — a modifier in front of any string, the way `randSuffix` puts a token behind one.

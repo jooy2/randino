@@ -2,17 +2,17 @@
 
 randino generates in nine languages, each with its own pools, its own name order and its own romanization. Every generator takes a language, and mixes all of the ones it supports when you leave it out.
 
-| Code | Language   | Native     | Person names | Words and nicknames |
-| ---- | ---------- | ---------- | :----------: | :-----------------: |
-| `en` | English    | English    |      ✅      |         ✅          |
-| `ko` | Korean     | 한국어     |      ✅      |         ✅          |
-| `ja` | Japanese   | 日本語     |      ✅      |         ✅          |
-| `zh` | Chinese    | 中文       |      ✅      |         ✅          |
-| `it` | Italian    | Italiano   |      ✅      |         ❌          |
-| `de` | German     | Deutsch    |      ✅      |         ❌          |
-| `ru` | Russian    | Русский    |      ✅      |         ❌          |
-| `es` | Spanish    | Español    |      ✅      |         ❌          |
-| `vi` | Vietnamese | Tiếng Việt |      ✅      |         ❌          |
+| Code | Language   | Native     | Person names | Words and nicknames | Sentences |
+| ---- | ---------- | ---------- | :----------: | :-----------------: | :-------: |
+| `en` | English    | English    |      ✅      |         ✅          |    ✅     |
+| `ko` | Korean     | 한국어     |      ✅      |         ✅          |    ✅     |
+| `ja` | Japanese   | 日本語     |      ✅      |         ✅          |    ✅     |
+| `zh` | Chinese    | 中文       |      ✅      |         ✅          |    ✅     |
+| `it` | Italian    | Italiano   |      ✅      |         ✅          |    ✅     |
+| `de` | German     | Deutsch    |      ✅      |         ✅          |    ✅     |
+| `ru` | Russian    | Русский    |      ✅      |         ✅          |    ✅     |
+| `es` | Spanish    | Español    |      ✅      |         ✅          |    ✅     |
+| `vi` | Vietnamese | Tiếng Việt |      ✅      |         ✅          |    ✅     |
 
 ::: lang js
 
@@ -22,7 +22,7 @@ The codes are string literals, and they are also available at runtime as `NAME_L
 import { NAME_LANGUAGES, WORD_LANGUAGES } from 'randino';
 
 NAME_LANGUAGES; // ['en', 'ko', 'ja', 'zh', 'it', 'de', 'ru', 'es', 'vi']
-WORD_LANGUAGES; // ['en', 'ko', 'ja', 'zh']
+WORD_LANGUAGES; // ['en', 'ko', 'ja', 'zh', 'vi', 'es', 'it', 'de', 'ru']
 ```
 
 :::
@@ -36,7 +36,7 @@ import 'package:randino/randino.dart';
 
 NameLanguage.ko.name; // 'ko'
 nameLanguages; // every NameLanguage, in presentation order
-wordLanguages; // [WordLanguage.en, .ko, .ja, .zh]
+wordLanguages; // every WordLanguage, in presentation order
 ```
 
 :::
@@ -49,7 +49,7 @@ The codes are `Literal` types, so a checker rejects a code that does not exist, 
 from randino import NAME_LANGUAGES, WORD_LANGUAGES
 
 NAME_LANGUAGES  # ('en', 'ko', 'ja', 'zh', 'it', 'de', 'ru', 'es', 'vi')
-WORD_LANGUAGES  # ('en', 'ko', 'ja', 'zh')
+WORD_LANGUAGES  # ('en', 'ko', 'ja', 'zh', 'vi', 'es', 'it', 'de', 'ru')
 ```
 
 :::
@@ -104,3 +104,21 @@ Neither word order nor agreement keeps a language out any more. The shapes belon
 Every language the name generator knows now has word pools too, so `language` means the same nine codes on every generator in the package.
 
 Japanese and Chinese reach a second noun only through の and 的. A bare noun-noun compound needs a particle more often than not in either language, or reads as garbled once the base word is abstract, so the shape that has one is the shape they got.
+
+## Sentences
+
+Every language writes sentences too, and each declares the shapes its own grammar can carry. What differs is where the verb stands, how a phrase is marked, and which shapes the language can write at all.
+
+| Code | Language | Shapes it declares | A sentence |
+| --- | --- | --- | --- |
+| `ko` | Korean | every one, verb last | 검은 고양이가 숲에서 잠잔다. |
+| `ja` | Japanese | every one, verb last | ハンバーガーが暗礁で冷める。 |
+| `zh` | Chinese | every one, place before the verb | 巨乌贼又品尝朱红椰汁。 |
+| `en` | English | every one, verb second | The angler cleans the towel in the balcony. |
+| `vi` | Vietnamese | every one, verb second | Lông mi run trong khe núi. |
+| `es` | Spanish | every one, verb second | La vía láctea brilla en la roca pobre. |
+| `it` | Italian | every one, place without article | Il birraio audace dimentica l'eclissi. |
+| `de` | German | no object, no place | Im Frühling blüht eine Chrysantheme noch. |
+| `ru` | Russian | no object, no place | Спутанный юпитер едва светлеет. |
+
+German and Russian are narrower for the same reason. Both would put an object in the accusative and a place in another case again, and each case changes the noun's own ending or the article in front of it — so the shapes that need one are shapes they do not declare. Asking for one falls back to the closest they have. [Sentences](../sentence/) has the whole of it.

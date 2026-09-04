@@ -10,11 +10,12 @@ Every option, every language and every example — pick **JavaScript**, **Dart**
 
 ---
 
-**randino** generates random text in the language you ask for. Today that is person names and nicknames; the shape it is built in — one function per kind of text, one set of options, per-language datasets — is meant to hold whatever comes next.
+**randino** generates random text in the language you ask for. Today that is person names, nicknames, words and whole sentences; the shape it is built in — one function per kind of text, one set of options, per-language datasets — is meant to hold whatever comes next.
 
 - **Person names** read like names people actually carry — Emma Clover, Jack Reeves — and come with their English pronunciation. 9 languages.
 - **Nicknames** are the handles you would pick for a game or a website — MistyOwl, CraneVoyage, RustyBoot. Built from everyday words across twenty-five themes, never from person names, with over nine million combinations in Korean and English before a random suffix is added.
-- **Words** are those twenty-five themes on their own — `randWord`, and a function per theme: `randAnimal`, `randFood`, `randGem` and eleven more.
+- **Words** are those twenty-five themes on their own — `randWord`, and a function per theme: `randAnimal`, `randFood`, `randGem` and twenty-two more.
+- **Sentences** are whole statements in the language's own grammar — `randSentence`. A verb states what can do it and what it can be done to, so the words of one sentence belong together: 여우가 사과를 먹는다, The brave lion runs quietly.
 - **Decorators** attach something to a string you already have rather than generating one: a random token with `randSuffix` and `randPrefix`, a modifier with `randModifier`.
 - One options set per generator: language, length, count, and a `realism` setting that goes from real words to fully invented ones.
 - **No runtime dependencies**, in any of the packages.
@@ -105,19 +106,21 @@ Pure Python — it imports nothing outside the standard library, and ships a `py
 
 ## Supported languages
 
-Every generator takes a language, or mixes every language it supports when you leave it out. The name generator covers more of them than the word pools do: a modifier has to sit in front of a noun exactly as it is written in the dictionary, which only reads naturally where the language asks for no agreement between them.
+Every generator takes a language, or mixes every language it supports when you leave it out. All nine are covered everywhere: what used to keep a language out of the word pools was word order or agreement between a modifier and its noun, and both are the language's own data now.
 
-| Code | Language   | Native     | Person names | Words and nicknames |
-| ---- | ---------- | ---------- | :----------: | :-----------------: |
-| `en` | English    | English    |      ✅      |         ✅          |
-| `ko` | Korean     | 한국어     |      ✅      |         ✅          |
-| `ja` | Japanese   | 日本語     |      ✅      |         ✅          |
-| `zh` | Chinese    | 中文       |      ✅      |         ✅          |
-| `it` | Italian    | Italiano   |      ✅      |         ❌          |
-| `de` | German     | Deutsch    |      ✅      |         ❌          |
-| `ru` | Russian    | Русский    |      ✅      |         ❌          |
-| `es` | Spanish    | Español    |      ✅      |         ❌          |
-| `vi` | Vietnamese | Tiếng Việt |      ✅      |         ❌          |
+| Code | Language   | Native     | Person names | Words and nicknames | Sentences |
+| ---- | ---------- | ---------- | :----------: | :-----------------: | :-------: |
+| `en` | English    | English    |      ✅      |         ✅          |    ✅     |
+| `ko` | Korean     | 한국어     |      ✅      |         ✅          |    ✅     |
+| `ja` | Japanese   | 日本語     |      ✅      |         ✅          |    ✅     |
+| `zh` | Chinese    | 中文       |      ✅      |         ✅          |    ✅     |
+| `it` | Italian    | Italiano   |      ✅      |         ✅          |    ✅     |
+| `de` | German     | Deutsch    |      ✅      |         ✅          |    ✅     |
+| `ru` | Russian    | Русский    |      ✅      |         ✅          |    ✅     |
+| `es` | Spanish    | Español    |      ✅      |         ✅          |    ✅     |
+| `vi` | Vietnamese | Tiếng Việt |      ✅      |         ✅          |    ✅     |
+
+A sentence is the one place where a language can still be narrower than the others. Each declares the shapes its own grammar carries, so German writes no object and Russian no place — both would put the noun in a case its own ending has to change for.
 
 ## What it generates
 
@@ -126,6 +129,7 @@ Every generator takes a language, or mixes every language it supports when you l
 | Person names   | `randName`                   | `rand_name`                  | Emma Clover, Jack Reeves |
 | Nicknames      | `randNickname`               | `rand_nickname`              | MistyOwl, CraneVoyage |
 | Words          | `randWord`, `randAnimal`, …  | `rand_word`, `rand_animal`, … | Lantern, Otter |
+| Sentences      | `randSentence`               | `rand_sentence`              | The brave lion runs quietly. |
 | Decorators     | `randSuffix`, `randPrefix`, `randModifier` | `rand_suffix`, `rand_prefix`, `rand_modifier` | MistyOwl_nVtRC, MistyOwl |
 
 Each generator returns strings by default, or one detail object per result with <code>output: 'detail'</code> — both scripts of a name, or the words a nickname was built from. The Dart package spells that as a second function (`randNameDetails`), because Dart has no way to make one function's return type depend on an argument.

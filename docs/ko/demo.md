@@ -27,5 +27,5 @@
 ## 다음으로 볼 것 {#where-to-go-next}
 
 - [시작하기](./guide/getting-started) — 세 패키지 중 쓰는 것으로 설치하기.
-- [`randName`](./name/rand-name), [`randNickname`](./nickname/rand-nickname), [`randWord`](./word/rand-word) — 위 패널의 모든 옵션을 글로.
+- [`randName`](./name/rand-name), [`randNickname`](./nickname/rand-nickname), [`randWord`](./word/rand-word), [`randSentence`](./sentence/rand-sentence) — 위 패널의 모든 옵션을 글로.
 - [지원 언어](./guide/languages) — 각 언어가 할 수 있는 것과 할 수 없는 것.

@@ -9,14 +9,20 @@ Every generator counts, clamps and deduplicates the same way, so the bounds are 
 ::: lang js
 
 ```javascript
-import { RAND_COUNT_MAX, RAND_LENGTH_MAX, RAND_LENGTH_MIN } from 'randino';
+import {
+	RAND_COUNT_MAX,
+	RAND_LENGTH_MAX,
+	RAND_LENGTH_MIN,
+	RAND_SENTENCE_LENGTH_MAX
+} from 'randino';
 ```
 
-| Name              | Type     | Value   |
-| ----------------- | -------- | ------- |
-| `RAND_LENGTH_MIN` | `number` | `1`     |
-| `RAND_LENGTH_MAX` | `number` | `40`    |
-| `RAND_COUNT_MAX`  | `number` | `10000` |
+| Name                       | Type     | Value   |
+| -------------------------- | -------- | ------- |
+| `RAND_LENGTH_MIN`          | `number` | `1`     |
+| `RAND_LENGTH_MAX`          | `number` | `40`    |
+| `RAND_SENTENCE_LENGTH_MAX` | `number` | `200`   |
+| `RAND_COUNT_MAX`           | `number` | `10000` |
 
 :::
 
@@ -26,29 +32,36 @@ import { RAND_COUNT_MAX, RAND_LENGTH_MAX, RAND_LENGTH_MIN } from 'randino';
 import 'package:randino/randino.dart';
 ```
 
-| Name            | Type  | Value   |
-| --------------- | ----- | ------- |
-| `randLengthMin` | `int` | `1`     |
-| `randLengthMax` | `int` | `40`    |
-| `randCountMax`  | `int` | `10000` |
+| Name                    | Type  | Value   |
+| ----------------------- | ----- | ------- |
+| `randLengthMin`         | `int` | `1`     |
+| `randLengthMax`         | `int` | `40`    |
+| `randSentenceLengthMax` | `int` | `200`   |
+| `randCountMax`          | `int` | `10000` |
 
 :::
 
 ::: lang py
 
 ```python
-from randino import RAND_COUNT_MAX, RAND_LENGTH_MAX, RAND_LENGTH_MIN
+from randino import (
+    RAND_COUNT_MAX,
+    RAND_LENGTH_MAX,
+    RAND_LENGTH_MIN,
+    RAND_SENTENCE_LENGTH_MAX,
+)
 ```
 
-| Name              | Type  | Value   |
-| ----------------- | ----- | ------- |
-| `RAND_LENGTH_MIN` | `int` | `1`     |
-| `RAND_LENGTH_MAX` | `int` | `40`    |
-| `RAND_COUNT_MAX`  | `int` | `10000` |
+| Name                       | Type  | Value   |
+| -------------------------- | ----- | ------- |
+| `RAND_LENGTH_MIN`          | `int` | `1`     |
+| `RAND_LENGTH_MAX`          | `int` | `40`    |
+| `RAND_SENTENCE_LENGTH_MAX` | `int` | `200`   |
+| `RAND_COUNT_MAX`           | `int` | `10000` |
 
 :::
 
-The length options are clamped into `1 … 40`, counted in characters of what the generator returns. `count` is clamped into `0 … 10000` — the upper bound is there because an unbounded count with `unique` on can spend a long time re-drawing from an exhausted pool.
+The length options are clamped into `1 … 40`, counted in characters of what the generator returns — except on `randSentence`, whose ceiling is `200`. A sentence is many words where a name, a word and a nickname are at most three. `count` is clamped into `0 … 10000` — the upper bound is there because an unbounded count with `unique` on can spend a long time re-drawing from an exhausted pool.
 
 ## Names
 

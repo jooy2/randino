@@ -9,14 +9,20 @@
 ::: lang js
 
 ```javascript
-import { RAND_COUNT_MAX, RAND_LENGTH_MAX, RAND_LENGTH_MIN } from 'randino';
+import {
+	RAND_COUNT_MAX,
+	RAND_LENGTH_MAX,
+	RAND_LENGTH_MIN,
+	RAND_SENTENCE_LENGTH_MAX
+} from 'randino';
 ```
 
-| 이름              | 타입     | 값      |
-| ----------------- | -------- | ------- |
-| `RAND_LENGTH_MIN` | `number` | `1`     |
-| `RAND_LENGTH_MAX` | `number` | `40`    |
-| `RAND_COUNT_MAX`  | `number` | `10000` |
+| 이름                       | 타입     | 값      |
+| -------------------------- | -------- | ------- |
+| `RAND_LENGTH_MIN`          | `number` | `1`     |
+| `RAND_LENGTH_MAX`          | `number` | `40`    |
+| `RAND_SENTENCE_LENGTH_MAX` | `number` | `200`   |
+| `RAND_COUNT_MAX`           | `number` | `10000` |
 
 :::
 
@@ -26,29 +32,36 @@ import { RAND_COUNT_MAX, RAND_LENGTH_MAX, RAND_LENGTH_MIN } from 'randino';
 import 'package:randino/randino.dart';
 ```
 
-| 이름            | 타입  | 값      |
-| --------------- | ----- | ------- |
-| `randLengthMin` | `int` | `1`     |
-| `randLengthMax` | `int` | `40`    |
-| `randCountMax`  | `int` | `10000` |
+| 이름                    | 타입  | 값      |
+| ----------------------- | ----- | ------- |
+| `randLengthMin`         | `int` | `1`     |
+| `randLengthMax`         | `int` | `40`    |
+| `randSentenceLengthMax` | `int` | `200`   |
+| `randCountMax`          | `int` | `10000` |
 
 :::
 
 ::: lang py
 
 ```python
-from randino import RAND_COUNT_MAX, RAND_LENGTH_MAX, RAND_LENGTH_MIN
+from randino import (
+    RAND_COUNT_MAX,
+    RAND_LENGTH_MAX,
+    RAND_LENGTH_MIN,
+    RAND_SENTENCE_LENGTH_MAX,
+)
 ```
 
-| 이름              | 타입  | 값      |
-| ----------------- | ----- | ------- |
-| `RAND_LENGTH_MIN` | `int` | `1`     |
-| `RAND_LENGTH_MAX` | `int` | `40`    |
-| `RAND_COUNT_MAX`  | `int` | `10000` |
+| 이름                       | 타입  | 값      |
+| -------------------------- | ----- | ------- |
+| `RAND_LENGTH_MIN`          | `int` | `1`     |
+| `RAND_LENGTH_MAX`          | `int` | `40`    |
+| `RAND_SENTENCE_LENGTH_MAX` | `int` | `200`   |
+| `RAND_COUNT_MAX`           | `int` | `10000` |
 
 :::
 
-길이 옵션은 생성 결과의 글자 수를 기준으로 `1 … 40`으로 제한됩니다. `count`는 `0 … 10000`으로 제한되는데, 상한이 있는 이유는 `unique`를 켠 채로 개수를 제한하지 않으면 이미 바닥난 후보에서 계속 다시 뽑느라 오래 걸릴 수 있기 때문입니다.
+길이 옵션은 생성 결과의 글자 수를 기준으로 `1 … 40`으로 제한됩니다. `randSentence`만은 상한이 `200`입니다. 이름과 단어와 닉네임은 길어야 세 단어지만 문장은 여러 단어이기 때문입니다. `count`는 `0 … 10000`으로 제한되는데, 상한이 있는 이유는 `unique`를 켠 채로 개수를 제한하지 않으면 이미 바닥난 후보에서 계속 다시 뽑느라 오래 걸릴 수 있기 때문입니다.
 
 ## 이름
 
