@@ -12,8 +12,10 @@ import {
 	randName,
 	randNickname,
 	randPrefix,
+	randSentence,
 	randSuffix,
 	randWord,
+	sentenceLengthRange,
 	wordLengthRange
 } from 'randino';
 import { localeOf, t } from '../../data/i18n';
@@ -105,6 +107,25 @@ const word = reactive({
 	unique: false
 });
 
+const sentence = reactive({
+	language: 'en',
+	theme: 'all',
+	shape: 'all',
+	slots: 'all',
+	count: 8,
+	realism: 'real',
+	minLength: '',
+	maxLength: '',
+	include: '',
+	startsWith: '',
+	unique: false
+});
+
+const SENTENCE_SLOTS = ['object', 'place', 'time', 'manner', 'state'];
+
+/** The words typed into `include`, which the option takes as an array. */
+const included = computed(() => sentence.include.split(/[\s,]+/).filter(Boolean));
+
 /** An empty box is "not asked for", not `0`. */
 function num(value) {
 	const parsed = Number(value);
@@ -128,6 +149,22 @@ const options = computed(() => {
 		if (num(name.maxLength) !== undefined) out.maxLength = num(name.maxLength);
 		if (name.startsWith) out.startsWith = name.startsWith;
 		if (name.unique) out.unique = true;
+
+		return out;
+	}
+
+	if (tab.value === 'sentence') {
+		if (sentence.language !== 'all') out.language = sentence.language;
+		if (sentence.theme !== 'all') out.theme = sentence.theme;
+		if (sentence.shape !== 'all') out.shape = sentence.shape;
+		if (sentence.slots !== 'all') out.slots = sentence.slots;
+		if (included.value.length) out.include = included.value;
+		if (sentence.count !== 1) out.count = Number(sentence.count);
+		if (sentence.realism !== 'real') out.realism = sentence.realism;
+		if (num(sentence.minLength) !== undefined) out.minLength = num(sentence.minLength);
+		if (num(sentence.maxLength) !== undefined) out.maxLength = num(sentence.maxLength);
+		if (sentence.startsWith) out.startsWith = sentence.startsWith;
+		if (sentence.unique) out.unique = true;
 
 		return out;
 	}
@@ -205,6 +242,10 @@ const fallbackRange = computed(() => {
 		return wordLengthRange(word.language, word.theme);
 	}
 
+	if (tab.value === 'sentence') {
+		return sentenceLengthRange(sentence.language);
+	}
+
 	return nicknameLengthRange(nickname.language, nickname.wordSeparator);
 });
 
@@ -212,6 +253,13 @@ const supportsMiddleName = computed(() => nameSupportsMiddleName(name.language))
 
 /** The three of them, by the name the reader picks in the select. */
 const DECORATORS = { suffix: randSuffix, prefix: randPrefix, modifier: randModifier };
+
+/**
+ * Whether a decorator runs at all. It is offered on every tab but this one: a
+ * decorator attaches a token or a word to a name, and a whole sentence is not a
+ * string anybody attaches anything to.
+ */
+const decorating = computed(() => tab.value !== 'sentence' && decorate.kind !== 'none');
 
 const rows = ref([]);
 const asked = ref(0);
@@ -234,6 +282,20 @@ function generate() {
 			]);
 		} else {
 			items = randName(config);
+		}
+	} else if (tab.value === 'sentence') {
+		if (details.value) {
+			const drawn = randSentence({ ...config, output: 'detail' });
+
+			items = drawn.map((detail) => detail.sentence);
+			meta = drawn.map((detail) => [
+				['phrases', detail.phrases.join(' + ')],
+				['slots', detail.slots.join(' + ')],
+				['language', detail.language],
+				['theme', String(detail.theme)]
+			]);
+		} else {
+			items = randSentence(config);
 		}
 	} else if (tab.value === 'word') {
 		if (details.value) {
@@ -260,7 +322,7 @@ function generate() {
 		items = randNickname(config);
 	}
 
-	if (decorate.kind !== 'none') {
+	if (decorating.value) {
 		const attach = DECORATORS[decorate.kind];
 
 		items = attach(items, decorateOptions.value);
@@ -282,6 +344,10 @@ watch([tab, details], generate);
  * ------------------------------------------------------------------------- */
 
 function literal(value) {
+	if (Array.isArray(value)) {
+		return `[${value.map(literal).join(', ')}]`;
+	}
+
 	return typeof value === 'string' ? `'${value.replace(/'/g, "\\'")}'` : String(value);
 }
 
@@ -298,7 +364,12 @@ function objectLiteral(source) {
 	return inline.length <= 56 ? inline : `{\n\t${pairs.join(',\n\t')}\n}`;
 }
 
-const GENERATORS = { name: 'randName', nickname: 'randNickname', word: 'randWord' };
+const GENERATORS = {
+	name: 'randName',
+	nickname: 'randNickname',
+	word: 'randWord',
+	sentence: 'randSentence'
+};
 
 const DECORATOR_NAMES = {
 	suffix: 'randSuffix',
@@ -306,13 +377,18 @@ const DECORATOR_NAMES = {
 	modifier: 'randModifier'
 };
 
-const DETAIL_FIELDS = { name: 'native', nickname: 'nickname', word: 'word' };
+const DETAIL_FIELDS = {
+	name: 'native',
+	nickname: 'nickname',
+	word: 'word',
+	sentence: 'sentence'
+};
 
 const code = computed(() => {
 	const generator = GENERATORS[tab.value];
 	const call = `${generator}(${objectLiteral(generatorOptions.value)})`;
 
-	if (decorate.kind === 'none') {
+	if (!decorating.value) {
 		return `import { ${generator} } from 'randino';\n\n${call};`;
 	}
 
@@ -379,6 +455,15 @@ async function copy() {
 				@click="tab = 'word'"
 			>
 				{{ t(locale, 'demoWords') }}
+			</button>
+			<button
+				type="button"
+				role="tab"
+				:aria-selected="tab === 'sentence'"
+				class="randino-demo-tab"
+				@click="tab = 'sentence'"
+			>
+				{{ t(locale, 'demoSentences') }}
 			</button>
 		</div>
 
@@ -452,6 +537,98 @@ async function copy() {
 
 				<label class="randino-demo-check">
 					<input v-model="name.unique" type="checkbox" />
+					<code>unique</code>
+				</label>
+			</div>
+
+			<div v-else-if="tab === 'sentence'" class="randino-demo-fields">
+				<label class="randino-demo-field">
+					<span><code>language</code></span>
+					<select v-model="sentence.language">
+						<option value="all">all</option>
+						<option v-for="code_ in WORD_LANGUAGES" :key="code_" :value="code_">
+							{{ code_ }} — {{ LANGUAGE_NAMES[code_] }}
+						</option>
+					</select>
+				</label>
+
+				<label class="randino-demo-field">
+					<span><code>theme</code></span>
+					<select v-model="sentence.theme">
+						<option value="all">all</option>
+						<option v-for="item in WORD_THEMES" :key="item" :value="item">{{ item }}</option>
+					</select>
+				</label>
+
+				<label class="randino-demo-field">
+					<span><code>shape</code></span>
+					<select v-model="sentence.shape">
+						<option value="all">all</option>
+						<option value="simple">simple</option>
+						<option value="detailed">detailed</option>
+						<option value="complex">complex</option>
+					</select>
+				</label>
+
+				<label class="randino-demo-field">
+					<span><code>slots</code></span>
+					<select v-model="sentence.slots">
+						<option value="all">all</option>
+						<option value="none">none</option>
+						<option v-for="item in SENTENCE_SLOTS" :key="item" :value="item">{{ item }}</option>
+					</select>
+				</label>
+
+				<label class="randino-demo-field randino-demo-wide">
+					<span><code>include</code></span>
+					<input
+						v-model="sentence.include"
+						type="text"
+						:placeholder="t(locale, 'demoIncludeHint')"
+					/>
+				</label>
+
+				<label class="randino-demo-field">
+					<span><code>count</code></span>
+					<input v-model.number="sentence.count" type="number" min="1" :max="COUNT_MAX" />
+				</label>
+
+				<label class="randino-demo-field">
+					<span><code>realism</code></span>
+					<select v-model="sentence.realism">
+						<option value="real">real</option>
+						<option value="mixed">mixed</option>
+						<option value="invented">invented</option>
+					</select>
+				</label>
+
+				<label class="randino-demo-field">
+					<span><code>minLength</code></span>
+					<input
+						v-model="sentence.minLength"
+						type="number"
+						min="1"
+						:placeholder="fallbackRange[0]"
+					/>
+				</label>
+
+				<label class="randino-demo-field">
+					<span><code>maxLength</code></span>
+					<input
+						v-model="sentence.maxLength"
+						type="number"
+						min="1"
+						:placeholder="fallbackRange[1]"
+					/>
+				</label>
+
+				<label class="randino-demo-field">
+					<span><code>startsWith</code></span>
+					<input v-model="sentence.startsWith" type="text" maxlength="1" placeholder="—" />
+				</label>
+
+				<label class="randino-demo-check">
+					<input v-model="sentence.unique" type="checkbox" />
 					<code>unique</code>
 				</label>
 			</div>
@@ -580,7 +757,7 @@ async function copy() {
 			</div>
 
 			<div class="randino-demo-fields randino-demo-affix">
-				<label class="randino-demo-field">
+				<label v-if="tab !== 'sentence'" class="randino-demo-field">
 					<span>{{ t(locale, 'demoDecorate') }}</span>
 					<select v-model="decorate.kind">
 						<option value="none">{{ t(locale, 'demoDecorateNone') }}</option>
@@ -591,6 +768,7 @@ async function copy() {
 				</label>
 
 				<label
+					v-if="tab !== 'sentence'"
 					class="randino-demo-field"
 					:class="{ 'is-off': decorate.kind === 'none' || decorate.kind === 'modifier' }"
 				>
@@ -604,7 +782,11 @@ async function copy() {
 					/>
 				</label>
 
-				<label class="randino-demo-field" :class="{ 'is-off': decorate.kind === 'none' }">
+				<label
+					v-if="tab !== 'sentence'"
+					class="randino-demo-field"
+					:class="{ 'is-off': decorate.kind === 'none' }"
+				>
 					<span><code>separator</code></span>
 					<input
 						v-model="decorate.separator"

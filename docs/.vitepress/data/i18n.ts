@@ -90,6 +90,11 @@ const strings = {
 	demoNames: { ko: '사람 이름', en: 'Person names' },
 	demoNicknames: { ko: '닉네임', en: 'Nicknames' },
 	demoWords: { ko: '단어', en: 'Words' },
+	demoSentences: { ko: '문장', en: 'Sentences' },
+	demoIncludeHint: {
+		ko: '반드시 넣을 단어 (공백으로 구분)',
+		en: 'words to include, separated by spaces'
+	},
 	demoGenerate: { ko: '생성', en: 'Generate' },
 	demoCopy: { ko: '복사', en: 'Copy' },
 	demoCopied: { ko: '복사됨', en: 'Copied' },

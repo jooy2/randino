@@ -84,7 +84,7 @@
 	color: var(--vp-c-text-2);
 }
 
-/* A slider needs the room; a number box does not. */
+/* A box that takes a list of words needs the room; a number box does not. */
 .randino-demo-wide {
 	grid-column: span 2;
 }
