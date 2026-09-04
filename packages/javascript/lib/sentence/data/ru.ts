@@ -31,7 +31,7 @@ export const RU: SentenceLanguageData = {
 			words: words(`едет останавливается проезжает возвращается отправляется скользит`)
 		},
 		{
-			subject: ['abstract', 'event'],
+			subject: ['idea', 'event'],
 			words: words(`расходится исчезает остаётся плывёт нарастает`)
 		},
 		{
@@ -68,7 +68,7 @@ export const RU: SentenceLanguageData = {
 				'vehicle',
 				'place',
 				'event',
-				'abstract',
+				'idea',
 				'body'
 			],
 			words: words(`красивый странный новый редкий`)
@@ -86,7 +86,7 @@ export const RU: SentenceLanguageData = {
 			words: words(`сладкий солёный острый кислый горячий холодный`)
 		},
 		{
-			subject: ['abstract'],
+			subject: ['idea'],
 			words: words(`простой ясный смутный вечный мимолётный`)
 		},
 		{

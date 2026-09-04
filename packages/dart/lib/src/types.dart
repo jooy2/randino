@@ -298,6 +298,81 @@ class WordDetail {
   String toString() => 'WordDetail($word, ${language.name}, ${theme?.name})';
 }
 
+/// What one phrase does in a sentence.
+enum SentenceSlot {
+  /// Who or what the sentence is about: `검은 고양이가`.
+  subject,
+
+  /// What the subject does: `잠잔다`.
+  verb,
+
+  /// What it does it to: `사과를`.
+  object,
+
+  /// What it is like, where the sentence has no verb at all: `파랗다`.
+  state,
+
+  /// Where it happens: `숲에서`.
+  place,
+
+  /// When it happens: `새벽에`.
+  time,
+
+  /// How it is done: `조용히`.
+  manner,
+}
+
+/// How much a sentence says, which is the closest thing it has to an expected
+/// length.
+///
+/// `minLength` and `maxLength` bound the characters; this bounds the parts,
+/// which is what a caller usually means by a short or a long sentence.
+enum SentenceShape {
+  /// A subject and its predicate: `사자가 달린다`.
+  simple,
+
+  /// One phrase more: `사자가 숲에서 달린다`.
+  detailed,
+
+  /// Two or more: `용감한 사자가 새벽에 숲에서 달린다`.
+  complex,
+}
+
+/// A generated sentence with the pieces it was built from.
+class SentenceDetail {
+  /// Creates a detail record. Returned by the generator; there is rarely a
+  /// reason to build one by hand outside a test.
+  const SentenceDetail({
+    required this.sentence,
+    required this.phrases,
+    required this.slots,
+    required this.language,
+    required this.theme,
+  });
+
+  /// The finished sentence, punctuation and all.
+  final String sentence;
+
+  /// The phrases the sentence is made of, in order — a phrase and its modifier,
+  /// without the particle or preposition that marks it. So `검은 고양이가
+  /// 잠잔다` reports `['검은 고양이', '잠잔다']`.
+  final List<String> phrases;
+
+  /// What each phrase does in the sentence, at the same index as [phrases].
+  final List<SentenceSlot> slots;
+
+  /// The language this sentence was generated in.
+  final WordLanguage language;
+
+  /// Theme the sentence's subject belongs to, or `null` when that word is not
+  /// one the generator knows, which happens when it was invented or was handed
+  /// in through `include`.
+  final WordTheme? theme;
+
+  @override
+  String toString() => 'SentenceDetail($sentence, $phrases, ${language.name}, ${theme?.name})';
+}
+
 /// A generated nickname with the pieces it was built from.
 class NicknameDetail {
   /// Creates a detail record. Returned by the generator; there is rarely a

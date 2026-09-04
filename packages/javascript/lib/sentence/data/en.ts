@@ -38,7 +38,7 @@ export const EN: SentenceLanguageData = {
 		},
 		{
 			subject: ['person', 'creature'],
-			object: ['abstract', 'event', 'place'],
+			object: ['idea', 'event', 'place'],
 			words: words(`remembers forgets imagines counts describes`)
 		},
 		{
@@ -54,7 +54,7 @@ export const EN: SentenceLanguageData = {
 			words: words(`runs stops passes returns departs slides`)
 		},
 		{
-			subject: ['abstract', 'event'],
+			subject: ['idea', 'event'],
 			words: words(`spreads vanishes remains lingers returns gathers`)
 		},
 		{
@@ -88,7 +88,7 @@ export const EN: SentenceLanguageData = {
 				'vehicle',
 				'place',
 				'event',
-				'abstract',
+				'idea',
 				'body'
 			],
 			words: words(`beautiful strange new common rare`)
@@ -106,7 +106,7 @@ export const EN: SentenceLanguageData = {
 			words: words(`sweet salty spicy sour hot cold nutty mild`)
 		},
 		{
-			subject: ['abstract'],
+			subject: ['idea'],
 			words: words(`simple obvious vague endless fleeting stubborn`)
 		},
 		{

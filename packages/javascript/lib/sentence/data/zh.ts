@@ -32,7 +32,7 @@ export const ZH: SentenceLanguageData = {
 		},
 		{
 			subject: ['person', 'creature'],
-			object: ['abstract', 'event', 'place'],
+			object: ['idea', 'event', 'place'],
 			words: words(`记得 忘记 想象 数`)
 		},
 		{
@@ -48,7 +48,7 @@ export const ZH: SentenceLanguageData = {
 			words: words(`行驶 停下 经过 返回 出发 滑行`)
 		},
 		{
-			subject: ['abstract', 'event'],
+			subject: ['idea', 'event'],
 			words: words(`蔓延 消失 留下 飘荡 加深`)
 		},
 		{
@@ -81,7 +81,7 @@ export const ZH: SentenceLanguageData = {
 				'vehicle',
 				'place',
 				'event',
-				'abstract',
+				'idea',
 				'body'
 			],
 			words: words(`美丽 陌生 新 常见 罕见`)
@@ -99,7 +99,7 @@ export const ZH: SentenceLanguageData = {
 			words: words(`甜 咸 辣 酸 烫 凉 香`)
 		},
 		{
-			subject: ['abstract'],
+			subject: ['idea'],
 			words: words(`简单 明显 模糊 永恒 短暂`)
 		},
 		{

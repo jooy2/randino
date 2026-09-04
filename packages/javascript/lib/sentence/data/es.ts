@@ -51,7 +51,7 @@ export const ES: SentenceLanguageData = {
 		},
 		{
 			subject: ['person', 'creature'],
-			object: ['abstract', 'event', 'place'],
+			object: ['idea', 'event', 'place'],
 			words: words(`recuerda olvida imagina cuenta`)
 		},
 		{
@@ -67,7 +67,7 @@ export const ES: SentenceLanguageData = {
 			words: words(`circula se_detiene pasa regresa parte resbala`)
 		},
 		{
-			subject: ['abstract', 'event'],
+			subject: ['idea', 'event'],
 			words: words(`se_extiende desaparece permanece flota se_ahonda`)
 		},
 		{
@@ -102,7 +102,7 @@ export const ES: SentenceLanguageData = {
 				'vehicle',
 				'place',
 				'event',
-				'abstract',
+				'idea',
 				'body'
 			],
 			words: words(`hermoso extraño nuevo común raro`)
@@ -120,7 +120,7 @@ export const ES: SentenceLanguageData = {
 			words: words(`dulce salado picante ácido caliente frío sabroso`)
 		},
 		{
-			subject: ['abstract'],
+			subject: ['idea'],
 			words: words(`sencillo evidente vago eterno fugaz`)
 		},
 		{

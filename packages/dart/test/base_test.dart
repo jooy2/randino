@@ -42,6 +42,9 @@ void main() {
           'NameScript',
           'NicknameDetail',
           'RandRealism',
+          'SentenceDetail',
+          'SentenceShape',
+          'SentenceSlot',
           'WordDetail',
           'WordLanguage',
           'WordSlot',
@@ -56,6 +59,7 @@ void main() {
           'nameSupportsRoman',
           'wordLanguages',
           'nicknameLengthRange',
+          'sentenceLengthRange',
           'wordThemes',
           'randAnimal',
           'randBody',
@@ -71,6 +75,7 @@ void main() {
           'randJob',
           'randLengthMax',
           'randLengthMin',
+          'randSentenceLengthMax',
           'randModifier',
           'randModifierAll',
           'randMusic',
@@ -86,6 +91,8 @@ void main() {
           'randPrefix',
           'randPrefixAll',
           'randProduct',
+          'randSentence',
+          'randSentenceDetails',
           'randSpace',
           'randSport',
           'randSuffix',
@@ -128,6 +135,13 @@ void main() {
       expect(randWord(), hasLength(1));
       expect(randWordDetails()[0], isA<WordDetail>());
       expect(wordLengthRange(), isA<LengthRange>());
+
+      // A sentence is many words rather than at most three, so it is the one
+      // generator with a length ceiling of its own.
+      expect(randSentence(), hasLength(1));
+      expect(randSentenceDetails()[0], isA<SentenceDetail>());
+      expect(sentenceLengthRange(), isA<LengthRange>());
+      expect(randSentenceLengthMax, 200);
       expect(randAnimal(language: WordLanguage.ko), hasLength(1));
     });
 

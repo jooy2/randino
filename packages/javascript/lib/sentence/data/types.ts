@@ -30,7 +30,7 @@ export type NounClass =
 	| 'vehicle'
 	| 'place'
 	| 'event'
-	| 'abstract'
+	| 'idea'
 	| 'body';
 
 /**

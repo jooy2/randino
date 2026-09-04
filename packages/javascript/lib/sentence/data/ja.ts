@@ -31,7 +31,7 @@ export const JA: SentenceLanguageData = {
 		},
 		{
 			subject: ['person', 'creature'],
-			object: ['abstract', 'event', 'place'],
+			object: ['idea', 'event', 'place'],
 			words: words(`覚える 忘れる 想像する 数える`)
 		},
 		{
@@ -47,7 +47,7 @@ export const JA: SentenceLanguageData = {
 			words: words(`走る 止まる 通る 戻る 出発する 滑る`)
 		},
 		{
-			subject: ['abstract', 'event'],
+			subject: ['idea', 'event'],
 			words: words(`広がる 消える 残る 漂う 深まる`)
 		},
 		{
@@ -83,7 +83,7 @@ export const JA: SentenceLanguageData = {
 				'vehicle',
 				'place',
 				'event',
-				'abstract',
+				'idea',
 				'body'
 			],
 			words: words(`美しい 珍しい 新しい 見慣れない`)
@@ -101,7 +101,7 @@ export const JA: SentenceLanguageData = {
 			words: words(`甘い しょっぱい 辛い 酸っぱい 熱い 冷たい 香ばしい`)
 		},
 		{
-			subject: ['abstract'],
+			subject: ['idea'],
 			words: words(`難しい 易しい 明らかだ 曖昧だ 永遠だ はかない`)
 		},
 		{

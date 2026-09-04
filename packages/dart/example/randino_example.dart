@@ -10,6 +10,7 @@ void main() {
   _names();
   _words();
   _nicknames();
+  _sentences();
   _decorators();
   _questionsAboutALanguage();
 }
@@ -81,6 +82,36 @@ void _nicknames() {
 }
 
 /// The decorators, attached to whatever you already have.
+/// Sentences: a subject and something said about it, in the language's grammar.
+void _sentences() {
+  print('-- sentences --------------------------------------------------');
+
+  print(randSentence(language: WordLanguage.en, count: 3));
+  // [The brave lion runs quietly., The otter swims in the cove., The sky is blue.]
+
+  print(randSentence(language: WordLanguage.ko, count: 2));
+  // [검은 고양이가 숲에서 잠잔다., 여우가 사과를 먹는다.]
+
+  // `shape` decides how much the sentence says, which is the closest thing it
+  // has to an expected length.
+  print(randSentence(language: WordLanguage.en, shape: SentenceShape.simple, count: 2));
+  // [The gondola passes., The cattail is withered.]
+
+  // German declares no object and no place: both would put the noun in a case
+  // its own ending has to change for.
+  print(randSentence(language: WordLanguage.de, count: 2));
+  // [Ein blauer Wal schwimmt., Am Morgen schläft ein Wolf.]
+
+  // Every word listed lands in every sentence.
+  print(randSentence(language: WordLanguage.ko, include: <String>['사자', '조용히'], count: 2));
+  // [멋진 사자가 조용히 멈춘다., 사자가 조용히 와플을 맛본다.]
+
+  final detail = randSentenceDetails(language: WordLanguage.ko).first;
+
+  print('${detail.sentence} <- ${detail.phrases} (${detail.theme?.name})');
+  // 검은 고양이가 숲에서 잠잔다. <- [검은 고양이, 숲, 잠잔다] (animal)
+}
+
 void _decorators() {
   print('-- decorators -------------------------------------------------');
 

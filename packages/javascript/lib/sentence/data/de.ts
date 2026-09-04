@@ -42,7 +42,7 @@ export const DE: SentenceLanguageData = {
 			words: words(`fährt hält rollt wendet gleitet`)
 		},
 		{
-			subject: ['abstract', 'event'],
+			subject: ['idea', 'event'],
 			words: words(`wächst verschwindet bleibt schwebt vertieft`)
 		},
 		{
@@ -73,7 +73,7 @@ export const DE: SentenceLanguageData = {
 				'vehicle',
 				'place',
 				'event',
-				'abstract',
+				'idea',
 				'body'
 			],
 			words: words(`schön fremd neu häufig selten`)
@@ -91,7 +91,7 @@ export const DE: SentenceLanguageData = {
 			words: words(`süß salzig scharf sauer heiß kalt herzhaft`)
 		},
 		{
-			subject: ['abstract'],
+			subject: ['idea'],
 			words: words(`einfach deutlich vage ewig flüchtig`)
 		},
 		{

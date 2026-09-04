@@ -74,7 +74,7 @@ export const IT: SentenceLanguageData = {
 		},
 		{
 			subject: ['person', 'creature'],
-			object: ['abstract', 'event', 'place'],
+			object: ['idea', 'event', 'place'],
 			words: words(`ricorda dimentica immagina conta`)
 		},
 		{
@@ -90,7 +90,7 @@ export const IT: SentenceLanguageData = {
 			words: words(`viaggia si_ferma passa torna parte scivola`)
 		},
 		{
-			subject: ['abstract', 'event'],
+			subject: ['idea', 'event'],
 			words: words(`si_diffonde svanisce rimane fluttua cresce`)
 		},
 		{
@@ -124,7 +124,7 @@ export const IT: SentenceLanguageData = {
 				'vehicle',
 				'place',
 				'event',
-				'abstract',
+				'idea',
 				'body'
 			],
 			words: words(`bello strano nuovo comune raro`)
@@ -142,7 +142,7 @@ export const IT: SentenceLanguageData = {
 			words: words(`dolce salato piccante aspro caldo freddo saporito`)
 		},
 		{
-			subject: ['abstract'],
+			subject: ['idea'],
 			words: words(`semplice evidente vago eterno fugace`)
 		},
 		{

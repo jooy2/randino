@@ -25,3 +25,36 @@ WordLanguage detectLanguage(String text) {
 
   return WordLanguage.en;
 }
+
+// Hangul syllables are composed as (initial * 21 + vowel) * 28 + final, so the
+// remainder is the final consonant, and 0 means there is none.
+const int _hangulBase = 0xac00;
+const int _hangulLast = 0xd7a3;
+const int _hangulFinals = 28;
+
+final RegExp _letter = RegExp(r'\p{Letter}', unicode: true);
+final RegExp _vowels = RegExp('[aeiouàáâãäåèéêëìíîïòóôõöùúûüыаеёиоуэюяıəăâêôơư]');
+
+/// Whether [text] ends on a consonant, which is what a language whose particles
+/// alternate needs to know: Korean writes `사자가` and `사슴이` for the same
+/// particle, by whether the syllable in front of it closes on one.
+///
+/// Answered by the script rather than per language. A Hangul syllable carries
+/// its final consonant in its code point; a Latin or Cyrillic word is judged by
+/// its last letter; a script that writes no vowels of its own — Han, kana — has
+/// no answer to give and reports false, which is also what its particles need,
+/// since they do not alternate.
+bool endsWithConsonant(String text) {
+  final trimmed = text.trimRight();
+
+  if (trimmed.isEmpty) return false;
+
+  final last = trimmed.substring(trimmed.length - 1);
+  final code = last.runes.first;
+
+  if (code >= _hangulBase && code <= _hangulLast) {
+    return (code - _hangulBase) % _hangulFinals != 0;
+  }
+
+  return _letter.hasMatch(last) && !_vowels.hasMatch(last.toLowerCase());
+}

@@ -40,11 +40,11 @@ export const THEME_CLASS: Record<WordTheme, NounClass> = {
 	weather: 'event',
 	sport: 'event',
 	time: 'event',
-	concept: 'abstract',
-	emotion: 'abstract',
-	finance: 'abstract',
-	tech: 'abstract',
-	color: 'abstract',
+	concept: 'idea',
+	emotion: 'idea',
+	finance: 'idea',
+	tech: 'idea',
+	color: 'idea',
 	body: 'body'
 };
 

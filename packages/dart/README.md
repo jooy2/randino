@@ -15,6 +15,7 @@ Every option and every example, with **Dart** picked in the sidebar. This README
 - **Person names** read like names people actually carry — Emma Clover, Jack Reeves — and come with their English pronunciation. 9 languages.
 - **Nicknames** are the handles you would pick for a game or a website — MistyOwl, CraneVoyage, RustyBoot. Built from everyday words across twenty-five themes, never from person names.
 - **Words** are those twenty-five themes on their own — `randWord`, plus `randAnimal`, `randFood` and twelve more.
+- **Sentences** are whole statements in the language's own grammar — `randSentence`. The verb decides what can stand beside it, so the words of one sentence belong together.
 - **Decorators** attach something to a string you already have: `randSuffix`, `randPrefix` and `randModifier`.
 - Every parameter is named and optional, and a **null enum means "every one of them"** — `randName()` on its own works.
 - **Pure Dart, no dependencies.** It imports nothing but `dart:math`, so it runs on the VM, on the web and inside Flutter on every platform.
@@ -128,6 +129,45 @@ wordLengthRange(language: WordLanguage.en); // LengthRange(3, 11)
 
 One function per theme: `randAnimal`, `randObject`, `randNature`, `randPlant`, `randGem`, `randConcept`, `randMyth`, `randJob`, `randMusic`, `randPlace`, `randFood`, `randSport`, `randVehicle`, `randProduct`, `randColor`, `randFinance`, `randTech`, `randWeather`, `randSpace`, `randTime`, `randEmotion`, `randBody`, `randClothing`, `randTool`, `randDrink`. They return `List<String>`; for the detail form, pass the theme to `randWordDetails`.
 
+## Sentences
+
+Whole statements, written the way the language writes them. The nouns are the same pools the words and nicknames come from; what a sentence adds is the grammar — a verb that states what can do it and what it can be done to, and the shapes each language allows.
+
+```dart
+randSentence(language: WordLanguage.en, count: 3);
+// [The brave lion runs quietly., The otter swims in the cove., The sky is blue.]
+
+randSentence(language: WordLanguage.ko, count: 2);
+// [검은 고양이가 숲에서 잠잔다., 여우가 사과를 먹는다.]
+
+randSentence(language: WordLanguage.en, shape: SentenceShape.simple);
+// [The gondola passes.]
+randSentence(language: WordLanguage.en, include: <String>['brave', 'lion']);
+// [The brave lion yawns quietly.]
+
+randSentenceDetails(language: WordLanguage.ko).first;
+// SentenceDetail(검은 고양이가 숲에서 잠잔다., [검은 고양이, 숲, 잠잔다], ko, animal)
+
+sentenceLengthRange(WordLanguage.en); // LengthRange(13, 92)
+```
+
+| Parameter                 | Type                  | Default            |
+| ------------------------- | --------------------- | ------------------ |
+| `language`                | `WordLanguage?`       | `null` — every one |
+| `theme`                   | `WordTheme?`          | `null` — every one |
+| `shape`                   | `SentenceShape?`      | `null` — every one |
+| `slots`                   | `Set<SentenceSlot>?`  | `null` — every one |
+| `include`                 | `List<String>`        | `const []`         |
+| `count`                   | `int`                 | `1`                |
+| `realism`                 | `RandRealism`         | `RandRealism.real` |
+| `minLength` / `maxLength` | `int?`                | _language_         |
+| `startsWith`              | `String?`             | `null`             |
+| `unique`                  | `bool`                | `false`            |
+
+`slots` names the parts a shape may carry beside its subject: `object`, `place`, `time`, `manner`, `state`, or an empty set for a subject and its predicate alone. A language declares its own shapes, so German has no `object` and Russian no `place` — both mark those with a case their nouns would have to change for — and asking for one falls back to the closest shape the language does have.
+
+`include` puts words you name into every sentence. A word the pools hold goes in the phrase it belongs to, and a word from anywhere else is used as a noun.
+
 ## Decorators
 
 `randSuffix`, `randPrefix` and `randModifier` attach something to a string you already have, rather than generating one. They take anything, not just this library's output, which is why none of them is a parameter on a generator — and each of them works with no value at all, handing back the thing it would have attached.
@@ -180,9 +220,10 @@ nameLengthRange(language: NameLanguage.en, includeMiddleName: true); // LengthRa
 nameSupportsMiddleName(NameLanguage.ko); // false
 nameSupportsRoman(NameLanguage.en); // false
 nicknameLengthRange(language: WordLanguage.ko); // LengthRange(1, 13)
+sentenceLengthRange(WordLanguage.ko); // LengthRange(6, 41)
 ```
 
-`nameLanguages`, `wordLanguages` and `wordThemes` list what the generators accept; `randCountMax`, `randLengthMin` / `Max`, `affixLengthDefault` / `Max`, `affixSeparatorDefault` and `affixCharset` are the bounds and defaults every parameter is clamped to.
+`nameLanguages`, `wordLanguages` and `wordThemes` list what the generators accept; `randCountMax`, `randLengthMin` / `Max`, `randSentenceLengthMax`, `affixLengthDefault` / `Max`, `affixSeparatorDefault` and `affixCharset` are the bounds and defaults every parameter is clamped to.
 
 ## Differences from the npm package
 
@@ -195,9 +236,10 @@ The two generate the same output from the same data, and only the surface is Dar
 | `language: 'all'` (the default)    | `language` left out, or `null`                 |
 | `[number, number]`                 | `LengthRange`, which compares by value         |
 | `NameDetail` / `NicknameDetail` interfaces | The same two names, as classes         |
-| `output: 'detail'`                 | `randNameDetails` / `randNicknameDetails` / `randWordDetails` |
+| `output: 'detail'`                 | `randNameDetails` / `randNicknameDetails` / `randWordDetails` / `randSentenceDetails` |
 | `randModifier('Owl')`             | `randModifier(value: 'Owl')` — every parameter is named |
 | `randSuffix(['a', 'b'])`           | `randSuffixAll(['a', 'b'])`                    |
+| `include: 'lion'` or `['lion']`    | `include: ['lion']` — a list either way        |
 
 The last two are the same limitation twice: Dart has neither overloads nor union types, so one function cannot return `List<String>` for one argument and `List<NameDetail>` for another. Where npm and PyPI pick the shape with an option, pub.dev picks it with a second function.
 

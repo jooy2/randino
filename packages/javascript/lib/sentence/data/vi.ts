@@ -32,7 +32,7 @@ export const VI: SentenceLanguageData = {
 		},
 		{
 			subject: ['person', 'creature'],
-			object: ['abstract', 'event', 'place'],
+			object: ['idea', 'event', 'place'],
 			words: words(`nhớ quên tưởng_tượng đếm`)
 		},
 		{
@@ -48,7 +48,7 @@ export const VI: SentenceLanguageData = {
 			words: words(`chạy dừng_lại đi_qua trở_về khởi_hành trượt`)
 		},
 		{
-			subject: ['abstract', 'event'],
+			subject: ['idea', 'event'],
 			words: words(`lan_ra biến_mất còn_lại trôi đậm_thêm`)
 		},
 		{
@@ -81,7 +81,7 @@ export const VI: SentenceLanguageData = {
 				'vehicle',
 				'place',
 				'event',
-				'abstract',
+				'idea',
 				'body'
 			],
 			words: words(`đẹp lạ mới phổ_biến hiếm`)
@@ -99,7 +99,7 @@ export const VI: SentenceLanguageData = {
 			words: words(`ngọt mặn cay chua nóng lạnh bùi`)
 		},
 		{
-			subject: ['abstract'],
+			subject: ['idea'],
 			words: words(`đơn_giản rõ_ràng mơ_hồ vĩnh_cửu thoáng_qua`)
 		},
 		{

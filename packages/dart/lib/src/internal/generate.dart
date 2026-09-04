@@ -32,9 +32,20 @@ int resolveRealism(RandRealism realism) => switch (realism) {
 };
 
 /// A caller's length bounds against a natural range, clamped to what is allowed.
-LengthRange lengthBounds(int? min, int? max, int naturalMin, int naturalMax) {
-  final low = clampInt(min ?? naturalMin, randLengthMin, randLengthMax);
-  final high = clampInt(max ?? naturalMax, randLengthMin, randLengthMax);
+///
+/// [ceiling] is the highest bound the generator will serve, and only
+/// `randSentence` passes one of its own: a sentence is many words where every
+/// other generator produces at most three, so [randLengthMax] would cut most of
+/// them in half.
+LengthRange lengthBounds(
+  int? min,
+  int? max,
+  int naturalMin,
+  int naturalMax, {
+  int ceiling = randLengthMax,
+}) {
+  final low = clampInt(min ?? naturalMin, randLengthMin, ceiling);
+  final high = clampInt(max ?? naturalMax, randLengthMin, ceiling);
 
   return LengthRange(low, high < low ? low : high);
 }

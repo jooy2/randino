@@ -34,7 +34,7 @@ export const KO: SentenceLanguageData = {
 		},
 		{
 			subject: ['person', 'creature'],
-			object: ['abstract', 'event', 'place'],
+			object: ['idea', 'event', 'place'],
 			words: words(`꿈꾼다 기억한다 잊는다 상상한다 헤아린다`)
 		},
 		{
@@ -50,7 +50,7 @@ export const KO: SentenceLanguageData = {
 			words: words(`달린다 멈춘다 지나간다 돌아온다 출발한다 미끄러진다`)
 		},
 		{
-			subject: ['abstract', 'event'],
+			subject: ['idea', 'event'],
 			words: words(`번진다 사라진다 남는다 스며든다 되풀이된다 짙어진다`)
 		},
 		{
@@ -84,7 +84,7 @@ export const KO: SentenceLanguageData = {
 				'vehicle',
 				'place',
 				'event',
-				'abstract',
+				'idea',
 				'body'
 			],
 			words: words(`아름답다 낯설다 새롭다 흔하다 드물다`)
@@ -102,7 +102,7 @@ export const KO: SentenceLanguageData = {
 			words: words(`달다 짜다 맵다 시다 뜨겁다 차갑다 고소하다 담백하다`)
 		},
 		{
-			subject: ['abstract'],
+			subject: ['idea'],
 			words: words(`어렵다 쉽다 분명하다 흐릿하다 영원하다 덧없다`)
 		},
 		{

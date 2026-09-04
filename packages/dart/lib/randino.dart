@@ -1,17 +1,19 @@
-/// randino generates random person names and nicknames in the language you ask
-/// for.
+/// randino generates random person names, nicknames, words and sentences in the
+/// language you ask for.
 ///
-/// Two generators, kept apart on purpose. **Person names** read like names
+/// Four generators, kept apart on purpose. **Person names** read like names
 /// people actually carry (김민준, Emma Clover) and come with their English
 /// pronunciation. **Nicknames** are the handles someone would pick for a game or
 /// a website (멋진사자, MistyOwl); they are built from everyday words and never
-/// from person names.
+/// from person names. **Words** are those everyday words on their own, and
+/// **sentences** are whole statements written in the language's own grammar.
 ///
 /// ```dart
 /// import 'package:randino/randino.dart';
 ///
 /// randName(language: NameLanguage.ko, count: 3); // ['김태윤', '원동혁', '조진우']
 /// randNickname(language: WordLanguage.en); // ['MistyOwl']
+/// randSentence(language: WordLanguage.en); // ['The brave lion runs quietly.']
 /// ```
 ///
 /// Every parameter is optional and named, and a null enum means "every one of
@@ -19,7 +21,7 @@
 /// nine supported languages.
 library;
 
-export 'src/constants.dart' show randCountMax, randLengthMax, randLengthMin;
+export 'src/constants.dart' show randCountMax, randLengthMax, randLengthMin, randSentenceLengthMax;
 export 'src/decorate/data/index.dart'
     show affixCharset, affixLengthDefault, affixLengthMax, affixSeparatorDefault;
 export 'src/decorate/rand_modifier.dart' show randModifier;
@@ -37,6 +39,9 @@ export 'src/name/rand_name_details.dart' show randNameDetails;
 export 'src/nickname/nickname_length_range.dart' show nicknameLengthRange;
 export 'src/nickname/rand_nickname.dart' show randNickname;
 export 'src/nickname/rand_nickname_details.dart' show randNicknameDetails;
+export 'src/sentence/rand_sentence.dart' show randSentence;
+export 'src/sentence/rand_sentence_details.dart' show randSentenceDetails;
+export 'src/sentence/sentence_length_range.dart' show sentenceLengthRange;
 export 'src/types.dart'
     show
         LengthRange,
@@ -47,6 +52,9 @@ export 'src/types.dart'
         NameScript,
         NicknameDetail,
         RandRealism,
+        SentenceDetail,
+        SentenceShape,
+        SentenceSlot,
         WordDetail,
         WordLanguage,
         WordSlot,

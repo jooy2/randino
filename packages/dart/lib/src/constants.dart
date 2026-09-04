@@ -17,3 +17,10 @@ const int randLengthMin = 1;
 
 /// Upper bound for `minLength` / `maxLength` on every generator, in characters.
 const int randLengthMax = 40;
+
+/// Upper bound for `minLength` / `maxLength` on `randSentence`, in characters.
+///
+/// Its own number rather than [randLengthMax], because a sentence is many words
+/// and their particles where a name, a word and a nickname are at most three — a
+/// ceiling of 40 would cut most sentences of every language in half.
+const int randSentenceLengthMax = 200;
