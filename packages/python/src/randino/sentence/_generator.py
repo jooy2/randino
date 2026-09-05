@@ -37,6 +37,7 @@ from randino._internal.utils import chance, clamp, pick
 from randino._types import (
     RandRealism,
     SentenceDetail,
+    SentenceQuote,
     SentenceShapeOption,
     SentenceSlot,
     SentenceSlotOption,
@@ -55,6 +56,7 @@ from randino.sentence.data._types import (
     NounClass,
     SentenceFrame,
     SentenceLanguageData,
+    SentenceMark,
     SentenceMood,
     SentencePart,
     StateGroup,
@@ -116,13 +118,61 @@ class Settings:
     types: tuple[SentenceType, ...]
     """What the sentences may be doing, normalized to a set to draw from."""
 
+    quote: SentenceQuote | None
+    """Which marks a quoted line takes, or None for the type's own default."""
+
     min_length: int | None = None
     max_length: int | None = None
 
 
-def _mood_for(type_: SentenceType) -> SentenceMood:
-    """The one thing a shape has to match to answer a type."""
-    return "question" if type_ == "question" else "statement"
+QUOTED_MARKS: tuple[SentenceMark, ...] = ("statement", "question", "exclamation")
+"""The kinds a quoted line can be.
+
+Somebody speaking is as often asking as telling, and often enough neither, so the mark
+is drawn rather than fixed.
+"""
+
+
+def _mark_for(type_: SentenceType) -> SentenceMark:
+    """The kind whose mark a sentence of this type closes on.
+
+    Dialogue and thought have no mark of their own: what they quote is a sentence of
+    another kind, and they take its mark and put quotation marks around it.
+
+    Args:
+        type_: What the caller asked for.
+
+    Returns:
+        The kind whose mark the sentence closes on.
+    """
+    if type_ in ("dialogue", "thought"):
+        return pick(QUOTED_MARKS)
+
+    return cast("SentenceMark", type_)
+
+
+def _quote_for(
+    data: SentenceLanguageData, type_: SentenceType, override: SentenceQuote | None
+) -> tuple[str, str] | None:
+    """The marks a quoted line is wrapped in, or None when nothing is quoted.
+
+    Args:
+        data: The language's sentence dataset.
+        type_: What the caller asked for.
+        override: The caller's `quote`, if any.
+
+    Returns:
+        The pair of marks, or None.
+    """
+    if type_ not in ("dialogue", "thought"):
+        return None
+
+    return data.quotes[override or ("double" if type_ == "dialogue" else "single")]
+
+
+def _mood_for(mark: SentenceMark) -> SentenceMood:
+    """The one thing a shape has to match to answer a kind."""
+    return "question" if mark == "question" else "statement"
 
 
 @dataclass(frozen=True, slots=True)
@@ -135,6 +185,14 @@ class Draw:
 
     budget: tuple[int, int]
     type: SentenceType
+    """What the caller asked for, and what the detail reports."""
+
+    mark: SentenceMark
+    """The kind whose mark it closes on — its own, or the one it is quoting."""
+
+    quote: tuple[str, str] | None
+    """The quotation marks it is wrapped in, or None."""
+
     opener: str
     """A connective or an interjection, `""` for neither."""
 
@@ -1039,12 +1097,12 @@ def _theme_for_part(
 
 
 def _form_of(
-    state_group: StateGroup | None, verb_group: VerbGroup | None, type_: SentenceType
+    state_group: StateGroup | None, verb_group: VerbGroup | None, mark: SentenceMark
 ) -> WordPool:
-    """The predicates of a group, in the form this type of sentence ends on."""
+    """The predicates of a group, in the form this kind of sentence ends on."""
     group: StateGroup | VerbGroup = state_group if state_group is not None else verb_group  # type: ignore[assignment]
 
-    if type_ != "question":
+    if mark != "question":
         return group.words
 
     return group.forms.get("question", group.words)
@@ -1130,7 +1188,7 @@ def _compose(
     # with the plain words, which is what lets a required word be translated rather than
     # written out in the wrong form.
     base = predicates
-    predicates = _form_of(state_group, verb_group, draw.type)
+    predicates = _form_of(state_group, verb_group, draw.mark)
     subject_themes = _themes_for_classes(themes, subject_classes)
     subject_required = _required_at(frame, plan, "subject")
     # A theme the caller named is honoured even when no verb group of the language
@@ -1166,8 +1224,9 @@ def _compose(
     )
     space = len(data.space)
     opener = draw.opener
-    close = data.terminators[draw.type]
-    open_mark = data.openers.get(draw.type, "")
+    close = data.terminators[draw.mark]
+    open_mark = data.openers.get(draw.mark, "")
+    quote_open, quote_close = draw.quote or ("", "")
     tag = data.space + frame.tag if frame.tag else ""
     # Every phrase's theme is settled before any of them is drawn, because a length
     # budget is only as good as the pools it was measured against. Left to the loop, each
@@ -1282,7 +1341,14 @@ def _compose(
     # A pronoun says nothing about its own gender, and neither does a name carried
     # over, so what agrees with either agrees with the noun it stands for.
     gender: WordGender | None = follow.topic.gender if follow is not None and any(proper) else None
-    used = len(close) + len(open_mark) + len(tag) + (len(opener) + space if opener else 0)
+    used = (
+        len(close)
+        + len(open_mark)
+        + len(tag)
+        + len(quote_open)
+        + len(quote_close)
+        + (len(opener) + space if opener else 0)
+    )
 
     if opener:
         written.append(_upper(opener) if data.capitalize else opener)
@@ -1404,7 +1470,7 @@ def _compose(
     return Built(
         # The opener is written against the first phrase rather than beside it —
         # Spanish `¿El león corre?`, never `¿ El león corre ?`.
-        open_mark + data.space.join(written) + tag + close,
+        quote_open + open_mark + data.space.join(written) + tag + close + quote_close,
         tuple(reported),
         tuple(slots),
         tuple(names),
@@ -1542,7 +1608,7 @@ def _follow_for(data: SentenceLanguageData, topic: Topic) -> Follow:
 
 
 def _opener_for(
-    data: SentenceLanguageData, type_: SentenceType, following: bool, room: int, shortest: int
+    data: SentenceLanguageData, mark: SentenceMark, following: bool, room: int, shortest: int
 ) -> str:
     """What a sentence opens on: an interjection for an exclamation, else a connective.
 
@@ -1555,7 +1621,7 @@ def _opener_for(
 
     Args:
         data: The language's sentence dataset.
-        type_: What this sentence is doing.
+        mark: The kind whose mark this sentence closes on.
         following: Whether it follows another sentence of the same result.
         room: The longest this sentence may be.
         shortest: The shortest sentence the language's shapes could spell.
@@ -1568,7 +1634,7 @@ def _opener_for(
     def fitting(pool: WordPool) -> tuple[str, ...]:
         return tuple(word for word in pool if len(word) <= spare)
 
-    if type_ == "exclamation":
+    if mark == "exclamation":
         usable = fitting(data.interjections)
 
         if usable and chance(INTERJECTION_CHANCE):
@@ -1593,8 +1659,12 @@ def _generate_result(language: WordLanguage, settings: Settings) -> list[Built]:
     bounds = _slot_bounds(language)
     # Every shape any of the requested types could take, because the budget is shared
     # out before the first type is even drawn.
+    # A quoted line can be any kind at all, so its shapes are all of them.
     frames = [
-        frame for type_ in settings.types for frame in _frames_for(data, settings, _mood_for(type_))
+        frame
+        for type_ in settings.types
+        for mark in (QUOTED_MARKS if type_ in ("dialogue", "thought") else (type_,))
+        for frame in _frames_for(data, settings, _mood_for(cast("SentenceMark", mark)))
     ]
     shortest = _natural_span(data, frames, bounds)[0]
     budgets = _share_out(
@@ -1605,11 +1675,14 @@ def _generate_result(language: WordLanguage, settings: Settings) -> list[Built]:
 
     for budget in budgets:
         type_ = pick(settings.types)
+        mark = _mark_for(type_)
         follow = None if topic is None else _follow_for(data, topic)
         draw = Draw(
             budget,
             type_,
-            _opener_for(data, type_, follow is not None, budget[1], shortest),
+            mark,
+            _quote_for(data, type_, settings.quote),
+            _opener_for(data, mark, follow is not None, budget[1], shortest),
             follow,
         )
         one = _generate_one(language, settings, draw)
@@ -1620,7 +1693,9 @@ def _generate_result(language: WordLanguage, settings: Settings) -> list[Built]:
         # to carry what it opens on after all, that is the part worth giving up: it
         # stands in front of the whole sentence rather than instead of any piece of it.
         if draw.opener and _distance_from(len(one.sentence), budget) > 0:
-            bare = _generate_one(language, settings, Draw(budget, type_, "", follow))
+            bare = _generate_one(
+                language, settings, Draw(budget, type_, mark, draw.quote, "", follow)
+            )
 
             if _distance_from(len(bare.sentence), budget) < _distance_from(
                 len(one.sentence), budget
@@ -1664,7 +1739,7 @@ def _generate_one(language: WordLanguage, settings: Settings, draw: Draw) -> Bui
     budget = draw.budget
     data = SENTENCE_DATA[language]
     bounds = _slot_bounds(language)
-    allowed = _frames_for(data, settings, _mood_for(draw.type))
+    allowed = _frames_for(data, settings, _mood_for(draw.mark))
     requested = _subject_themes_for(settings, follow)
     # The words a caller required go in the first sentence — once in the result rather
     # than once in every sentence of it.
@@ -1755,7 +1830,14 @@ def _generate_one(language: WordLanguage, settings: Settings, draw: Draw) -> Bui
 
 def _resolve_types(type_: SentenceTypeOption) -> tuple[SentenceType, ...]:
     """The caller's `type`, as the set one sentence is drawn from."""
-    every: tuple[SentenceType, ...] = ("statement", "question", "exclamation", "trailing")
+    every: tuple[SentenceType, ...] = (
+        "statement",
+        "question",
+        "exclamation",
+        "trailing",
+        "dialogue",
+        "thought",
+    )
 
     if type_ == "all":
         return every
@@ -1796,6 +1878,7 @@ def generate_sentence_details(
     sentences: int = 1,
     include_name: bool = False,
     type: SentenceTypeOption = "statement",
+    quote: SentenceQuote | None = None,
 ) -> list[SentenceDetail]:
     """Generate sentences with every choice already resolved.
 
@@ -1814,6 +1897,7 @@ def generate_sentence_details(
         sentences: How many sentences one result holds.
         include_name: Whether a phrase about a person is written as a name.
         type: What the sentences are doing.
+        quote: Which quotation marks a quoted line takes.
 
     Returns:
         One `SentenceDetail` per result.
@@ -1832,6 +1916,7 @@ def generate_sentence_details(
         realism=realism,
         include_name=include_name,
         types=_resolve_types(type),
+        quote=quote,
     )
 
     def draw() -> SentenceDetail:

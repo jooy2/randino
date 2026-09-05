@@ -7,6 +7,7 @@ from randino._types import (
     RandOutput,
     RandRealism,
     SentenceDetail,
+    SentenceQuote,
     SentenceShapeOption,
     SentenceSlotOption,
     SentenceTypeOption,
@@ -33,6 +34,7 @@ def rand_sentence(
     sentences: int = ...,
     include_name: bool = ...,
     type: SentenceTypeOption = ...,
+    quote: SentenceQuote | None = ...,
     output: Literal["value"] = ...,
 ) -> list[str]: ...
 
@@ -54,6 +56,7 @@ def rand_sentence(
     sentences: int = ...,
     include_name: bool = ...,
     type: SentenceTypeOption = ...,
+    quote: SentenceQuote | None = ...,
     output: Literal["detail"],
 ) -> list[SentenceDetail]: ...
 
@@ -74,6 +77,7 @@ def rand_sentence(
     sentences: int = 1,
     include_name: bool = False,
     type: SentenceTypeOption = "statement",
+    quote: SentenceQuote | None = None,
     output: RandOutput = "value",
 ) -> list[str] | list[SentenceDetail]:
     """Generate whole sentences, written the way the language writes them.
@@ -125,6 +129,9 @@ def rand_sentence(
             the mark, and the four that need more — English's do-support, German's verb
             moving to the front, Korean's and Japanese's endings — say so in their own
             shapes.
+        quote: Which quotation marks a `"dialogue"` or a `"thought"` is written in. Left
+            out, dialogue takes the language's first-level marks and thought its
+            second-level ones. Ignored by every other type.
         output: `"value"` for strings, `"detail"` for a `SentenceDetail` per sentence —
             the phrases in order, what each of them does, the language and the theme.
 
@@ -159,6 +166,7 @@ def rand_sentence(
         sentences=sentences,
         include_name=include_name,
         type=type,
+        quote=quote,
     )
 
     if output == "detail":

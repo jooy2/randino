@@ -195,16 +195,28 @@ SentenceShapeOption = Literal[SentenceShape, "all"]
 """"all" leaves the shape to the language's own frame weights."""
 
 
-SentenceType = Literal["statement", "question", "exclamation", "trailing"]
+SentenceType = Literal["statement", "question", "exclamation", "trailing", "dialogue", "thought"]
 """What a sentence is doing.
 
 It decides what the sentence closes on and — where the grammar needs it — the shape it
 takes: `"statement"` says something, `"question"` asks it, `"exclamation"` says it with
-feeling, and `"trailing"` is a statement that stops rather than ends. A question is a
-shape, not a punctuation mark bolted on: English writes `Does the lion run?` and German
-`Läuft ein Wolf?`, and both are shapes their own frames declare. A language whose
-question differs from its statement by nothing but the mark declares none, and gets its
-statement shapes back.
+feeling, `"trailing"` is a statement that stops rather than ends, and `"dialogue"` and
+`"thought"` are lines somebody says or thinks, in the language's own quotation marks.
+
+A question is a shape, not a punctuation mark bolted on: English writes `Does the lion
+run?` and German `Läuft ein Wolf?`, and both are shapes their own frames declare. A
+language whose question differs from its statement by nothing but the mark declares
+none, and gets its statement shapes back. `"dialogue"` and `"thought"` are the two that
+are not shapes at all: what is quoted is a sentence of one of the other kinds, drawn per
+line, because somebody speaking is as often asking as telling.
+"""
+
+SentenceQuote = Literal["double", "single"]
+"""Which pair of quotation marks a quoted line takes.
+
+Left out, `"dialogue"` takes the language's first-level marks and `"thought"` the ones
+it keeps for a second level — `“…”` beside `‘…’` in English, `«…»` beside `„…“` in
+Russian.
 """
 
 SentenceTypeOption = SentenceType | Sequence[SentenceType] | Literal["all"]

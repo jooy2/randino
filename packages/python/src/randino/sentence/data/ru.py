@@ -18,6 +18,7 @@ RU = SentenceLanguageData(
         "exclamation": "!",
         "trailing": "…",
     },
+    quotes={"double": ("«", "»"), "single": ("„", "“")},
     predicate_agrees=True,
     verbs=(
         VerbGroup(

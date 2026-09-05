@@ -18,6 +18,7 @@ KO = SentenceLanguageData(
         "exclamation": "!",
         "trailing": "…",
     },
+    quotes={"double": ("“", "”"), "single": ("‘", "’")},
     # Plain declarative — the form a written statement takes, rather than the
     # polite 합니다체 a person would speak.
     verbs=(

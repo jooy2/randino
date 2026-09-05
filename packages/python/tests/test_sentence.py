@@ -12,6 +12,7 @@ from randino import (
     WORD_LANGUAGES,
     WORD_THEMES,
     RandRealism,
+    SentenceQuote,
     SentenceShape,
     SentenceSlot,
     SentenceType,
@@ -26,7 +27,7 @@ from randino.name.data import NAME_DATA
 # it — these checks read the pools a sentence is allowed to draw from.
 from randino.sentence._generator import shape_of
 from randino.sentence.data import SENTENCE_DATA, THEME_CLASS
-from randino.sentence.data._types import PredicateForms
+from randino.sentence.data._types import PredicateForms, SentenceMark
 from randino.word._generator import agree
 from randino.word.data import WORD_DATA
 from randino.word.data._types import WordGender, WordPool
@@ -34,15 +35,15 @@ from randino.word.data._types import WordGender, WordPool
 SAMPLE = 60
 
 SCRIPT: dict[WordLanguage, re.Pattern[str]] = {
-    "en": re.compile(r"^[A-Za-z' ,.?!…]+$"),
-    "ko": re.compile(r"^[가-힣 ,.?!…]+$"),
-    "ja": re.compile(r"^[々぀-ヿ一-鿿。、？！…]+$"),
-    "zh": re.compile(r"^[々一-鿿。，？！…]+$"),
-    "vi": re.compile(r"^[a-zA-ZÀ-ỹ ,.?!…]+$"),
-    "es": re.compile(r"^[a-zA-ZÀ-ÿ ,.?!…¿¡]+$"),
-    "it": re.compile(r"^[a-zA-ZÀ-ÿ' ,.?!…]+$"),
-    "de": re.compile(r"^[a-zA-ZÀ-ÿß ,.?!…]+$"),
-    "ru": re.compile(r"^[Ѐ-ӿ ,.?!…]+$"),
+    "en": re.compile(r"^[A-Za-z' ,.?!…“”‘’]+$"),
+    "ko": re.compile(r"^[가-힣 ,.?!…“”‘’]+$"),
+    "ja": re.compile(r"^[々぀-ヿ一-鿿。、？！…「」『』]+$"),
+    "zh": re.compile(r"^[々一-鿿。，？！…“”‘’]+$"),
+    "vi": re.compile(r"^[a-zA-ZÀ-ỹ ,.?!…“”‘’]+$"),
+    "es": re.compile(r"^[a-zA-ZÀ-ÿ ,.?!…¿¡«»“”]+$"),
+    "it": re.compile(r"^[a-zA-ZÀ-ÿ' ,.?!…«»“”]+$"),
+    "de": re.compile(r"^[a-zA-ZÀ-ÿß ,.?!…„“‚‘]+$"),
+    "ru": re.compile(r"^[Ѐ-ӿ ,.?!…«»„“]+$"),
 }
 
 SHAPES: tuple[SentenceShape, ...] = ("simple", "detailed", "complex")
@@ -808,7 +809,10 @@ def test_korean_picks_the_particle_a_name_asks_for_too() -> None:
 
 
 def test_type_decides_what_the_sentence_is_doing_and_what_it_closes_on() -> None:
-    types: tuple[SentenceType, ...] = ("statement", "question", "exclamation", "trailing")
+    # The four a language writes a mark of its own for; a quoted line takes the mark of
+    # whatever it quotes, and has its own test below.
+    types: tuple[SentenceMark, ...] = ("statement", "question", "exclamation", "trailing")
+    every: tuple[SentenceType, ...] = (*types, "dialogue", "thought")
 
     for language in WORD_LANGUAGES:
         data = SENTENCE_DATA[language]
@@ -841,7 +845,7 @@ def test_type_decides_what_the_sentence_is_doing_and_what_it_closes_on() -> None
         for type_ in detail.types
     }
 
-    assert len(seen) == len(types)
+    assert len(seen) == len(every)
 
 
 def test_a_question_is_a_shape_not_a_mark_bolted_onto_a_statement() -> None:
@@ -968,6 +972,62 @@ def test_every_language_can_write_every_type_inside_its_own_length_range() -> No
                 assert low <= len(sentence) <= high, (
                     f"{language} {type_}: {sentence} ({len(sentence)}) outside {low}-{high}"
                 )
+
+
+def test_a_quoted_line_is_a_sentence_in_the_languages_own_marks() -> None:
+    for language in WORD_LANGUAGES:
+        data = SENTENCE_DATA[language]
+        marks = list(data.terminators.values())
+        pairs: dict[SentenceType, SentenceQuote] = {"dialogue": "double", "thought": "single"}
+
+        for type_, kind in pairs.items():
+            open_mark, close_mark = data.quotes[kind]
+
+            for detail in rand_sentence(
+                language=language, type=type_, count=SAMPLE, output="detail"
+            ):
+                assert detail.types == (type_,), detail.sentence
+                assert detail.sentence.startswith(open_mark), f"{language}: {detail.sentence}"
+                assert detail.sentence.endswith(close_mark), f"{language}: {detail.sentence}"
+                assert SCRIPT[language].match(detail.sentence), detail.sentence
+
+                # What is quoted is a whole sentence, closed the way its own kind closes
+                # — a spoken line is as often asking as telling.
+                inner = detail.sentence[len(open_mark) : -len(close_mark)]
+
+                assert any(inner.endswith(mark) for mark in marks), (
+                    f"{language}: '{inner}' closes on no mark"
+                )
+
+
+def test_a_quoted_line_is_as_often_asking_as_telling() -> None:
+    # The mark under a quote is drawn per line rather than fixed, so a hundred of them
+    # are not a hundred statements.
+    data = SENTENCE_DATA["en"]
+    closes = {sentence[-2] for sentence in rand_sentence(language="en", type="dialogue", count=200)}
+
+    assert data.terminators["statement"] in closes
+    assert data.terminators["question"] in closes
+    assert data.terminators["exclamation"] in closes
+
+
+def test_quote_picks_the_marks_whatever_the_type() -> None:
+    kinds: tuple[SentenceQuote, ...] = ("double", "single")
+    quoted: tuple[SentenceType, ...] = ("dialogue", "thought")
+
+    for language in WORD_LANGUAGES:
+        quotes = SENTENCE_DATA[language].quotes
+
+        for kind in kinds:
+            open_mark, close_mark = quotes[kind]
+
+            for type_ in quoted:
+                for sentence in rand_sentence(language=language, type=type_, quote=kind, count=20):
+                    assert sentence.startswith(open_mark), f"{language} {type_} {kind}: {sentence}"
+                    assert sentence.endswith(close_mark), f"{language} {type_} {kind}: {sentence}"
+
+        # The two levels are two different pairs, or the option means nothing.
+        assert quotes["double"] != quotes["single"], f"{language} quotes"
 
 
 def test_the_detail_form_reports_what_the_sentence_was_built_from() -> None:

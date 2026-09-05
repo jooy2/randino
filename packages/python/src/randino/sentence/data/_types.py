@@ -12,7 +12,7 @@ from collections.abc import Mapping, Sequence
 from dataclasses import dataclass, field
 from typing import Literal
 
-from randino._types import SentenceSlot, SentenceType
+from randino._types import SentenceQuote, SentenceSlot
 from randino.word.data._types import WordGender, WordPool
 
 NounClass = Literal[
@@ -135,6 +135,13 @@ class SentencePart:
     """
 
 
+SentenceMark = Literal["statement", "question", "exclamation", "trailing"]
+"""The kinds of sentence a language writes a mark of its own for.
+
+`"dialogue"` and `"thought"` are not among them: what they quote is a sentence of one of
+these, so they take its mark and add the quotation marks around it.
+"""
+
 SentenceMood = Literal["statement", "question"]
 """What a shape is for.
 
@@ -208,8 +215,8 @@ class SentenceLanguageData:
     capitalize: bool
     """Whether the sentence opens on a capital letter."""
 
-    terminators: Mapping[SentenceType, str]
-    """What a sentence of each type closes on."""
+    terminators: Mapping[SentenceMark, str]
+    """What a sentence of each kind closes on."""
 
     verbs: Sequence[VerbGroup]
     """The verbs, grouped by what they can take."""
@@ -230,6 +237,14 @@ class SentenceLanguageData:
     after it writes the comma.
     """
 
+    quotes: Mapping[SentenceQuote, tuple[str, str]]
+    """The two levels of quotation marks the language writes, as `(open, close)`.
+
+    Per language and not close to universal: Japanese writes `「」` and `『』`, German
+    opens low and closes high (`„…“`), and Spanish, Italian and Russian reach for
+    guillemets before anything else.
+    """
+
     interjections: WordPool
     """What an exclamation opens on (`와,`, `Wow,`, `ああ、`).
 
@@ -247,7 +262,7 @@ class SentenceLanguageData:
     articles: SentenceArticles | None = None
     """The article a noun phrase opens with. Left out by a language with no articles."""
 
-    openers: Mapping[SentenceType, str] = field(default_factory=dict)
+    openers: Mapping[SentenceMark, str] = field(default_factory=dict)
     """What a sentence opens on, for a language that marks the type at both ends.
 
     Spanish `¿` and `¡` are the only ones here, and every other language leaves it out.

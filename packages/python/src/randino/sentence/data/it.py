@@ -18,6 +18,7 @@ IT = SentenceLanguageData(
         "exclamation": "!",
         "trailing": "…",
     },
+    quotes={"double": ("«", "»"), "single": ("“", "”")},
     # The definite article, which Italian picks by gender and by the sound the
     # noun opens on: `l'` before a vowel, `lo` before an s plus a consonant, and
     # `il` for everything else. The elided form carries its own boundary.

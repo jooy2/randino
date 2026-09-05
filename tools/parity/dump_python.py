@@ -148,6 +148,7 @@ sentence = {
         # Optional in one package and defaulted in another; written as a map either way
         # so the shapes compare.
         "openers": dict(data.openers),
+        "quotes": {kind: list(pair) for kind, pair in data.quotes.items()},
         # Optional in one package and defaulted in another; written the same way
         # here either way, so the shapes compare.
         "predicateAgrees": data.predicate_agrees,

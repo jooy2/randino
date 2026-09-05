@@ -18,6 +18,7 @@ VI = SentenceLanguageData(
         "exclamation": "!",
         "trailing": "…",
     },
+    quotes={"double": ("“", "”"), "single": ("‘", "’")},
     verbs=(
         VerbGroup(
             subject=("creature", "person"),

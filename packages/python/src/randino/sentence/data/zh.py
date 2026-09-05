@@ -18,6 +18,10 @@ ZH = SentenceLanguageData(
         "exclamation": "！",
         "trailing": "…",
     },
+    # The curly quotes rather than 「」: these pools are written in simplified
+    # Chinese, and horizontal simplified text uses “” — the corner brackets are
+    # what Taiwan and Hong Kong write.
+    quotes={"double": ("“", "”"), "single": ("‘", "’")},
     verbs=(
         VerbGroup(
             subject=("creature", "person"),

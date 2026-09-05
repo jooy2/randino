@@ -18,6 +18,9 @@ JA = SentenceLanguageData(
         "exclamation": "！",
         "trailing": "…",
     },
+    # The corner brackets, not the curly quotes: Japanese writes 「」 first and
+    # 『』 for a quote inside one.
+    quotes={"double": ("「", "」"), "single": ("『", "』")},
     verbs=(
         VerbGroup(
             subject=("creature", "person"),

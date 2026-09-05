@@ -34,6 +34,7 @@ def test_the_package_exports_exactly_its_public_api() -> None:
         "RAND_SENTENCE_LENGTH_MAX",
         "RandRealism",
         "SentenceDetail",
+        "SentenceQuote",
         "SentenceShape",
         "SentenceShapeOption",
         "SentenceSlot",
