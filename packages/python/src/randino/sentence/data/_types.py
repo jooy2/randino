@@ -37,13 +37,19 @@ slice of vocabulary, and which of these it falls into is the same in every langu
 """
 
 
-PredicateForm = Literal["question"]
+PredicateForm = Literal["question", "polite", "politeQuestion"]
 """A form a predicate takes beside the one a plain statement ends on.
 
-`"question"` is Korean `달리니` beside `달린다`, and English `run` beside `runs`. A form
-rather than another pool: the same verbs, said differently. Every form pool is
-index-aligned with `words`, so a verb keeps its meaning across them and a word the
-caller required can be translated into the form the sentence needs.
+`"question"` is Korean `달리니` beside `달린다`, and English `run` beside `runs`;
+`"polite"` is `달립니다`, and `"politeQuestion"` `달립니까`. A form rather than another
+pool: the same verbs, said differently. Every form pool is index-aligned with `words`,
+so a verb keeps its meaning across them and a word the caller required can be translated
+into the form the sentence needs.
+
+A group declares only what its language actually writes, and the lookup falls back along
+`politeQuestion` → `polite` → `question` → `words`. That is why Japanese declares
+`"polite"` alone: `走ります` is its polite question too, because the `か` that asks is
+the frame's tag rather than part of the verb.
 """
 
 PredicateForms = Mapping[PredicateForm, WordPool]

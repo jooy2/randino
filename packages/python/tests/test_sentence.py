@@ -1030,6 +1030,75 @@ def test_quote_picks_the_marks_whatever_the_type() -> None:
         assert quotes["double"] != quotes["single"], f"{language} quotes"
 
 
+def test_style_is_what_korean_and_japanese_do_with_politeness() -> None:
+    # The two languages this changes, and the seven it does not. Plain and polite are
+    # two forms of the same predicate, so a polite sentence is the plain one said to
+    # somebody rather than a different sentence.
+    polite: dict[WordLanguage, str] = {
+        "ko": r"(니다|니까)[.?!…”’]$",
+        # A Japanese verb closes on ます and an adjective on です.
+        "ja": r"(ます|です)か?[。？！…」』]$",
+    }
+    types: tuple[SentenceType, ...] = ("statement", "question")
+
+    for language in WORD_LANGUAGES:
+        data = SENTENCE_DATA[language]
+        declares = any(
+            "polite" in forms
+            for forms in (
+                *(group.forms for group in data.verbs),
+                *(group.forms for group in data.states),
+            )
+        )
+
+        assert declares == (language in polite), (
+            f"{language} {'declares' if declares else 'declares no'} polite forms"
+        )
+
+        for type_ in types:
+            for sentence in rand_sentence(
+                language=language, type=type_, style="polite", count=SAMPLE
+            ):
+                if language in polite:
+                    assert re.search(polite[language], sentence), f"{language} {type_}: {sentence}"
+
+
+def test_a_polite_predicate_comes_out_of_the_polite_pools() -> None:
+    languages: tuple[WordLanguage, ...] = ("ko", "ja")
+    types: tuple[SentenceType, ...] = ("statement", "question")
+
+    for language in languages:
+        data = SENTENCE_DATA[language]
+
+        for type_ in types:
+            asking = type_ == "question"
+
+            def asked(words: WordPool, forms: PredicateForms, asking: bool = asking) -> list[str]:
+                chosen = (
+                    forms.get("politeQuestion") or forms.get("polite")
+                    if asking
+                    else forms.get("polite")
+                )
+
+                return list(chosen or words)
+
+            pools: dict[SentenceSlot, set[str]] = {
+                "verb": {w for g in data.verbs for w in asked(g.words, g.forms)},
+                "state": {w for g in data.states for w in asked(g.words, g.forms)},
+            }
+
+            for detail in rand_sentence(
+                language=language, type=type_, style="polite", count=120, output="detail"
+            ):
+                for phrase, slot in zip(detail.phrases, detail.slots, strict=True):
+                    if slot not in ("verb", "state"):
+                        continue
+
+                    assert phrase in pools[slot], (
+                        f"{language} {type_}: '{phrase}' is not a polite {slot}"
+                    )
+
+
 def test_the_detail_form_reports_what_the_sentence_was_built_from() -> None:
     for detail in rand_sentence(output="detail", language="en", count=SAMPLE):
         assert detail.sentence

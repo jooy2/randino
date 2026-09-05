@@ -211,6 +211,17 @@ are not shapes at all: what is quoted is a sentence of one of the other kinds, d
 line, because somebody speaking is as often asking as telling.
 """
 
+SentenceStyle = Literal["plain", "polite"]
+"""How a sentence addresses whoever is reading it.
+
+`"plain"` is the form a written statement takes (`사자가 달린다`, `猫が走る`) and the
+default; `"polite"` is the form you would use speaking to somebody (`사자가 달립니다`,
+`猫が走ります`). Korean and Japanese are the whole of it. Spanish, Italian, German and
+Russian have a T–V distinction, but it lives in the second person and every sentence
+here is third; English has no such form at all. In those five, `"polite"` writes exactly
+what `"plain"` does.
+"""
+
 SentenceQuote = Literal["double", "single"]
 """Which pair of quotation marks a quoted line takes.
 

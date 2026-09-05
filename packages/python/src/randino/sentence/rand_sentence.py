@@ -10,6 +10,7 @@ from randino._types import (
     SentenceQuote,
     SentenceShapeOption,
     SentenceSlotOption,
+    SentenceStyle,
     SentenceTypeOption,
     WordLanguageOption,
     WordThemeOption,
@@ -35,6 +36,7 @@ def rand_sentence(
     include_name: bool = ...,
     type: SentenceTypeOption = ...,
     quote: SentenceQuote | None = ...,
+    style: SentenceStyle = ...,
     output: Literal["value"] = ...,
 ) -> list[str]: ...
 
@@ -57,6 +59,7 @@ def rand_sentence(
     include_name: bool = ...,
     type: SentenceTypeOption = ...,
     quote: SentenceQuote | None = ...,
+    style: SentenceStyle = ...,
     output: Literal["detail"],
 ) -> list[SentenceDetail]: ...
 
@@ -78,6 +81,7 @@ def rand_sentence(
     include_name: bool = False,
     type: SentenceTypeOption = "statement",
     quote: SentenceQuote | None = None,
+    style: SentenceStyle = "plain",
     output: RandOutput = "value",
 ) -> list[str] | list[SentenceDetail]:
     """Generate whole sentences, written the way the language writes them.
@@ -132,6 +136,9 @@ def rand_sentence(
         quote: Which quotation marks a `"dialogue"` or a `"thought"` is written in. Left
             out, dialogue takes the language's first-level marks and thought its
             second-level ones. Ignored by every other type.
+        style: How the sentence addresses its reader. Korean and Japanese are the two
+            languages this changes — `달린다` becomes `달립니다` and `走る` becomes
+            `走ります` — and the other seven write the same sentence either way.
         output: `"value"` for strings, `"detail"` for a `SentenceDetail` per sentence —
             the phrases in order, what each of them does, the language and the theme.
 
@@ -167,6 +174,7 @@ def rand_sentence(
         include_name=include_name,
         type=type,
         quote=quote,
+        style=style,
     )
 
     if output == "detail":

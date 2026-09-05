@@ -41,6 +41,7 @@ from randino._types import (
     SentenceShapeOption,
     SentenceSlot,
     SentenceSlotOption,
+    SentenceStyle,
     SentenceType,
     SentenceTypeOption,
     WordLanguage,
@@ -120,6 +121,9 @@ class Settings:
 
     quote: SentenceQuote | None
     """Which marks a quoted line takes, or None for the type's own default."""
+
+    style: SentenceStyle
+    """How the sentences address their reader."""
 
     min_length: int | None = None
     max_length: int | None = None
@@ -1097,15 +1101,41 @@ def _theme_for_part(
 
 
 def _form_of(
-    state_group: StateGroup | None, verb_group: VerbGroup | None, mark: SentenceMark
+    state_group: StateGroup | None,
+    verb_group: VerbGroup | None,
+    mark: SentenceMark,
+    style: SentenceStyle,
 ) -> WordPool:
-    """The predicates of a group, in the form this kind of sentence ends on."""
+    """The predicates of a group, in the form this sentence ends on.
+
+    The chain is `politeQuestion` → `polite` → `question` → `words`, so a group declares
+    only what its language actually writes. Japanese declares `"polite"` alone and it
+    serves the question too, because the `か` that asks is the frame's tag rather than
+    part of the verb; Korean declares both, because `달립니까` is not `달립니다`.
+
+    Args:
+        state_group: The state group heading the shape, or None.
+        verb_group: The verb group heading it, or None.
+        mark: The kind whose mark the sentence closes on.
+        style: How the sentence addresses its reader.
+
+    Returns:
+        The pool the predicate is drawn from.
+    """
     group: StateGroup | VerbGroup = state_group if state_group is not None else verb_group  # type: ignore[assignment]
+    asking = mark == "question"
 
-    if mark != "question":
-        return group.words
+    if style == "polite":
+        polite = (
+            group.forms.get("politeQuestion") or group.forms.get("polite")
+            if asking
+            else group.forms.get("polite")
+        )
 
-    return group.forms.get("question", group.words)
+        if polite:
+            return polite
+
+    return (group.forms.get("question") if asking else None) or group.words
 
 
 def _predicate_for(
@@ -1188,7 +1218,7 @@ def _compose(
     # with the plain words, which is what lets a required word be translated rather than
     # written out in the wrong form.
     base = predicates
-    predicates = _form_of(state_group, verb_group, draw.mark)
+    predicates = _form_of(state_group, verb_group, draw.mark, settings.style)
     subject_themes = _themes_for_classes(themes, subject_classes)
     subject_required = _required_at(frame, plan, "subject")
     # A theme the caller named is honoured even when no verb group of the language
@@ -1879,6 +1909,7 @@ def generate_sentence_details(
     include_name: bool = False,
     type: SentenceTypeOption = "statement",
     quote: SentenceQuote | None = None,
+    style: SentenceStyle = "plain",
 ) -> list[SentenceDetail]:
     """Generate sentences with every choice already resolved.
 
@@ -1898,6 +1929,7 @@ def generate_sentence_details(
         include_name: Whether a phrase about a person is written as a name.
         type: What the sentences are doing.
         quote: Which quotation marks a quoted line takes.
+        style: How the sentences address their reader.
 
     Returns:
         One `SentenceDetail` per result.
@@ -1917,6 +1949,7 @@ def generate_sentence_details(
         include_name=include_name,
         types=_resolve_types(type),
         quote=quote,
+        style=style,
     )
 
     def draw() -> SentenceDetail:
