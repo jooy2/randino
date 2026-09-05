@@ -141,6 +141,11 @@ export const ES: SentenceLanguageData = {
 		en_primavera en_verano en_otoño en_invierno los_fines_de_semana hace_poco a_veces
 		cada_día al_anochecer
 	`),
+	// Written with the comma the ones that need one take.
+	connectives: words(`y_luego pero entonces además, sin_embargo, después por_fin mientras_tanto,`),
+	// Spanish carries its subject in the verb ending, so a second sentence about
+	// the same thing writes no pronoun at all.
+	pronouns: { n: [''] },
 	frames: [
 		{
 			parts: [{ slot: 'subject', modifiable: true }, { slot: 'verb' }],

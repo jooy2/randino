@@ -122,6 +122,13 @@ export const KO: SentenceLanguageData = {
 		새벽에 아침에 낮에 저녁에 밤에 한밤중에 오늘 어제 내일 봄에 여름에 가을에 겨울에
 		주말에 방금 가끔 매일 해질녘에 이른봄에 늦가을에
 	`),
+	// What a sentence opens on when it follows another. Written whole, so a
+	// language that wants a comma after its connective writes the comma.
+	connectives: words(`그리고 그래서 하지만 그런데 이윽고 곧 결국 그러자 한편 이내`),
+	// Korean leaves the subject out as readily as it writes 그것, and the empty
+	// entry is how the data says so.
+	pronouns: { n: ['', '그것'] },
+	pronounless: ['person'],
 	// Korean closes on its predicate, so every shape here does. What differs is
 	// what stands in front of it, and in which order.
 	frames: [

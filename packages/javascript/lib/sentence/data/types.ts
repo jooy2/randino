@@ -119,6 +119,20 @@ export type SentenceArticles = {
 	[gender in WordGender]?: readonly (readonly [string, string])[];
 };
 
+/**
+ * The subject pronoun a later sentence refers to the topic with, by the topic's
+ * gender. Nominative only, because a subject is never in another case.
+ *
+ * `''` is a real entry and means the language writes no subject at all, which is
+ * what Korean, Japanese, Chinese, Spanish and Italian actually do in a second
+ * sentence about the same thing. The lookup falls back to `n` the way
+ * `SentenceArticles` does, so a language whose pronoun does not inflect writes
+ * one rule.
+ */
+export type SentencePronouns = {
+	[gender in WordGender]?: WordPool;
+};
+
 export type SentenceLanguageData = {
 	/**
 	 * Placed between the phrases, and between the words inside one. A space in
@@ -146,5 +160,26 @@ export type SentenceLanguageData = {
 	manners: WordPool;
 	/** When it happens, written whole, particle and all (`새벽에`, `at dawn`). */
 	times: WordPool;
+	/**
+	 * What a sentence opens on when it follows another one of the same result
+	 * (`그리고`, `and then`, `そして`). Written whole, so a language that needs a
+	 * comma after it writes the comma.
+	 */
+	connectives: WordPool;
+	/** How a later sentence refers to the topic without naming it again. */
+	pronouns: SentencePronouns;
+	/**
+	 * Noun classes the language's written pronouns are wrong for. A sentence about
+	 * one of them leaves the subject out where the language can, and names the
+	 * topic again where it cannot.
+	 *
+	 * English is the reason it exists: `he` and `she` need a person's gender,
+	 * which a job noun does not carry, and `they` needs a plural verb the pools
+	 * are not written in — so an English sentence about a person names it again.
+	 * The languages whose written pronoun is inanimate — `그것`, `それ`, `它`, `nó`
+	 * — list `person` too, and drop the subject instead, which is what they would
+	 * do anyway. Omitted by a language whose pronouns stand for anything.
+	 */
+	pronounless?: readonly NounClass[];
 	frames: readonly SentenceFrame[];
 };

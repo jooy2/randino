@@ -140,6 +140,13 @@ console.log(
 						})),
 						manners: list(data.manners),
 						times: list(data.times),
+						connectives: list(data.connectives),
+						pronouns: Object.fromEntries(
+							Object.entries(data.pronouns).map(([gender, pool]) => [gender, list(pool)])
+						),
+						// Optional in one package and defaulted in another; written as a list
+						// either way so the shapes compare.
+						pronounless: [...(data.pronounless ?? [])],
 						frames: data.frames.map((frame) => ({
 							parts: frame.parts.map((part) => ({
 								slot: part.slot,

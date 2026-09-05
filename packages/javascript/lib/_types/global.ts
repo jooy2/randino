@@ -351,28 +351,52 @@ export interface RandSentenceOptions extends RandCommonOptions {
 	 *
 	 * A sentence has room for as many of them as it has phrases, so asking for
 	 * more words than the longest shape can carry places what fits and drops the
-	 * rest.
+	 * rest. With `sentences` above 1 the words go in the first of them, which is
+	 * what puts each of them in the result once rather than once per sentence.
 	 */
 	include?: string | readonly string[];
+	/**
+	 * How many sentences one result holds. Default `1`, maximum
+	 * `RAND_SENTENCE_COUNT_MAX`.
+	 *
+	 * They come back as one string rather than as separate results — `count` is
+	 * still how many strings there are — and they are about the same thing: a
+	 * later sentence names the first one's subject again, refers to it with a
+	 * pronoun, or draws a fresh subject of the same kind, and may open on a
+	 * connective.
+	 *
+	 * `minLength` and `maxLength` describe the whole string whatever this is, so
+	 * the range is shared out across the sentences before any of them is drawn.
+	 */
+	sentences?: number;
 }
 
 /** A generated sentence with the pieces it was built from. */
 export interface SentenceDetail {
-	/** The finished sentence, punctuation and all. */
+	/** The finished result, punctuation and all — every sentence of it, joined. */
 	sentence: string;
+	/**
+	 * One entry per sentence. A single entry unless `sentences` asked for more,
+	 * and `sentence` is always these joined by the language's own space.
+	 */
+	sentences: string[];
 	/**
 	 * The phrases the sentence is made of, in order — a phrase and its modifier,
 	 * without the particle or preposition that marks it. So `검은 고양이가 잠잔다`
 	 * reports `['검은 고양이', '잠잔다']`.
+	 *
+	 * One flat list across every sentence of the result, the same way `slots` is.
+	 * A connective a sentence opens on is not a phrase and is not in here.
 	 */
 	phrases: string[];
 	/** What each phrase does in the sentence, at the same index as `phrases`. */
 	slots: SentenceSlot[];
 	language: WordLanguage;
 	/**
-	 * Theme the sentence's subject belongs to, or `null` when that word is not one
-	 * the generator knows, which happens when it was invented or was handed in
-	 * through `include`.
+	 * Theme the result's subject belongs to — the first sentence's, which is what
+	 * every sentence after it stays about. `null` when that word is not one the
+	 * generator knows, which happens when it was invented or was handed in through
+	 * `include`.
 	 */
 	theme: WordTheme | null;
 }

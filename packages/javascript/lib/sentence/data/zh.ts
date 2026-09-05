@@ -119,6 +119,9 @@ export const ZH: SentenceLanguageData = {
 		黎明时 早晨 中午 傍晚 夜里 深夜 今天 昨天 明天 春天 夏天 秋天 冬天 周末 刚才
 		有时 每天 黄昏时
 	`),
+	connectives: words(`然后 所以 但是 不过 于是 后来 接着 同时 终于`),
+	pronouns: { n: ['', '它'] },
+	pronounless: ['person'],
 	// Chinese puts its verb after the subject and everything that frames the
 	// action — the place phrase included — in front of it.
 	frames: [

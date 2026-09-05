@@ -121,6 +121,9 @@ export const JA: SentenceLanguageData = {
 		夜明けに 朝に 昼に 夕方に 夜に 真夜中に 今日 昨日 明日 春に 夏に 秋に 冬に 週末に
 		さっき 時々 毎日 夕暮れに
 	`),
+	connectives: words(`そして だから しかし ところが やがて すぐに ついに 一方 また`),
+	pronouns: { n: ['', 'それ'] },
+	pronounless: ['person'],
 	frames: [
 		{
 			parts: [{ slot: 'subject', tail: 'が', modifiable: true }, { slot: 'verb' }],

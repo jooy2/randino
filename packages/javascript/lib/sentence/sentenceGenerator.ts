@@ -29,8 +29,8 @@ import {
 	resolveRealism
 } from '../_internal/generate.js';
 import { endsWithConsonant } from '../_internal/script.js';
-import { chance, pick } from '../_internal/utils.js';
-import { RAND_SENTENCE_LENGTH_MAX } from '../constants.js';
+import { chance, clamp, pick } from '../_internal/utils.js';
+import { RAND_SENTENCE_COUNT_MAX, RAND_SENTENCE_LENGTH_MAX } from '../constants.js';
 import type {
 	RandSentenceOptions,
 	SentenceDetail,
@@ -89,6 +89,43 @@ type Settings = {
 	maxLength?: number;
 	prefix: string;
 	include: readonly string[];
+	// How many sentences one result holds, clamped.
+	sentences: number;
+};
+
+/**
+ * What the sentences of one result are about: the first sentence's subject, and
+ * everything a later one needs to keep talking about it.
+ *
+ * A paragraph is not three draws, and this is the whole of the difference. The
+ * class is what a fresh subject stays inside, the noun is what naming it again
+ * writes, and the gender is what a pronoun and an agreeing predicate need.
+ */
+type Topic = {
+	/** The subject noun as the first sentence wrote it. */
+	noun: string;
+	theme: WordTheme | null;
+	/** The class its theme falls into. Null when the noun is one no pool holds. */
+	class: NounClass | null;
+	gender: WordGender | undefined;
+};
+
+/**
+ * How a sentence that follows another refers to what the two of them are about:
+ * `'repeat'` names the topic again, `'pronoun'` stands in for it — with the empty
+ * string where the language drops its subject — and `'fresh'` draws another noun
+ * of the same class.
+ */
+type Reference = 'repeat' | 'pronoun' | 'fresh';
+
+/** Everything a sentence after the first one is built with. */
+type Follow = {
+	topic: Topic;
+	reference: Reference;
+	/** What a `'pronoun'` reference writes; `''` where the language writes nothing. */
+	pronoun: string;
+	/** The connective the sentence opens on, `''` for none. */
+	opener: string;
 };
 
 /* --- Shapes ---------------------------------------------------------------- */
@@ -297,14 +334,26 @@ function classify(language: WordLanguage, word: string): Requirement {
  */
 function planFor(
 	frame: SentenceFrame,
-	requirements: readonly Requirement[]
+	requirements: readonly Requirement[],
+	subject?: Requirement
 ): { plan: Plan; complete: boolean } {
-	if (!requirements.length) {
+	if (!requirements.length && !subject) {
 		return { plan: EMPTY_PLAN, complete: true };
 	}
 
 	const plan: Plan = { phrase: new Map(), modifier: new Map() };
 	let complete = true;
+
+	// A sentence carrying on about the topic is handed its subject rather than
+	// asking for it, so it goes in the subject's own phrase before the greedy
+	// placement below reaches for the first noun slot it can find.
+	if (subject) {
+		const at = frame.parts.findIndex((part) => part.slot === 'subject');
+
+		if (at >= 0) {
+			plan.phrase.set(at, subject);
+		}
+	}
 
 	for (const requirement of requirements) {
 		const placed = requirement.slots.some((slot) => {
@@ -564,18 +613,16 @@ function frameRange(
 	return [min, max];
 }
 
-/**
- * Every sentence length the language can produce — the fallback for an omitted
- * `minLength` / `maxLength`, and what `sentenceLengthRange` reports. Derived from
- * the same frames and pools the generator draws from.
- */
-export function naturalRange(language: WordLanguage): readonly [number, number] {
-	const data = SENTENCE_DATA[language];
-	const bounds = slotBounds(language);
+/** The shortest and longest sentence a set of shapes can produce. */
+function naturalSpan(
+	data: SentenceLanguageData,
+	frames: readonly SentenceFrame[],
+	bounds: Record<string, readonly [number, number]>
+): readonly [number, number] {
 	let min = Infinity;
 	let max = 0;
 
-	for (const frame of data.frames) {
+	for (const frame of frames) {
 		const [low, high] = frameRange(frame, data, bounds);
 
 		min = Math.min(min, low);
@@ -583,6 +630,17 @@ export function naturalRange(language: WordLanguage): readonly [number, number] 
 	}
 
 	return [min, max];
+}
+
+/**
+ * Every sentence length the language can produce — the fallback for an omitted
+ * `minLength` / `maxLength`, and what `sentenceLengthRange` reports. Derived from
+ * the same frames and pools the generator draws from.
+ */
+export function naturalRange(language: WordLanguage): readonly [number, number] {
+	const data = SENTENCE_DATA[language];
+
+	return naturalSpan(data, data.frames, slotBounds(language));
 }
 
 /* --- Choosing the words ---------------------------------------------------- */
@@ -694,6 +752,10 @@ type Built = {
 	phrases: string[];
 	slots: SentenceSlot[];
 	theme: WordTheme | null;
+	/** The subject noun as written, which is what the next sentence carries on about. */
+	subject: string | null;
+	/** Its gender, for the pronoun and the agreement of whatever follows. */
+	gender: WordGender | undefined;
 };
 
 /** The article a phrase opens with, by the noun's gender and the word after it. */
@@ -833,15 +895,48 @@ function modifyChanceFor(distance: number, tooLong: boolean): number {
 	return tooLong ? 0 : 100;
 }
 
-function generateOne(language: WordLanguage, settings: Settings): Built {
+/**
+ * The themes a sentence may draw its subject from. A sentence carrying on about
+ * a topic stays inside the topic's own class, which is what makes a paragraph
+ * read as one rather than as three draws that happened to land together.
+ */
+function subjectThemesFor(settings: Settings, follow: Follow | null): readonly WordTheme[] {
+	const requested = themesOf(settings.theme);
+
+	if (!follow?.topic.class) {
+		return requested;
+	}
+
+	const inClass = themesForClasses(requested, [follow.topic.class]);
+
+	return inClass.length ? inClass : requested;
+}
+
+function generateOne(
+	language: WordLanguage,
+	settings: Settings,
+	budget: readonly [number, number],
+	follow: Follow | null
+): Built {
 	const wordData = WORD_DATA[language];
 	const data = SENTENCE_DATA[language];
 	const bounds = slotBounds(language);
 	const allowed = framesFor(data, settings);
-	const requested = themesOf(settings.theme);
-	const requirements = settings.include.map((word) => classify(language, word));
-	const [min, max] = boundsFor(data, allowed, bounds, settings);
-	const plans = new Map(allowed.map((frame) => [frame, planFor(frame, requirements)]));
+	const requested = subjectThemesFor(settings, follow);
+	// The words a caller required go in the first sentence — once in the result
+	// rather than once in every sentence of it.
+	const requirements = follow ? [] : settings.include.map((word) => classify(language, word));
+	const carried =
+		follow?.reference === 'repeat'
+			? ({
+					word: follow.topic.noun,
+					slots: ['subject'],
+					theme: follow.topic.theme ?? undefined,
+					known: follow.topic.theme !== null
+				} as Requirement)
+			: undefined;
+	const [min, max] = budget;
+	const plans = new Map(allowed.map((frame) => [frame, planFor(frame, requirements, carried)]));
 	// A shape is only worth drawing when the language has a predicate for it: a
 	// `body` subject has no transitive verb in any language here, so a shape with
 	// an object in it would have to fall back to a verb that means something else.
@@ -897,7 +992,8 @@ function generateOne(language: WordLanguage, settings: Settings): Built {
 			modifyChance,
 			bounds,
 			min,
-			max
+			max,
+			follow
 		);
 
 		if (built.sentence.length >= min && built.sentence.length <= max) {
@@ -917,30 +1013,67 @@ function generateOne(language: WordLanguage, settings: Settings): Built {
 	return best!;
 }
 
-/** The length range one sentence has to land in. */
+/**
+ * The length range one whole result has to land in — every sentence of it and the
+ * spaces between them, because that is what `minLength` and `maxLength` describe.
+ *
+ * The ceiling is per sentence rather than per result: a paragraph of ten is ten
+ * sentences long, and capping it at what one of them may be would answer the ask
+ * with ten sentences of twenty characters.
+ */
 function boundsFor(
 	data: SentenceLanguageData,
 	frames: readonly SentenceFrame[],
 	bounds: Record<string, readonly [number, number]>,
 	settings: Settings
 ): [number, number] {
-	let naturalMin = Infinity;
-	let naturalMax = 0;
-
-	for (const frame of frames) {
-		const [low, high] = frameRange(frame, data, bounds);
-
-		naturalMin = Math.min(naturalMin, low);
-		naturalMax = Math.max(naturalMax, high);
-	}
+	const count = settings.sentences;
+	const gap = data.space.length * (count - 1);
+	const [naturalMin, naturalMax] = naturalSpan(data, frames, bounds);
 
 	return lengthBounds(
 		settings.minLength,
 		settings.maxLength,
-		naturalMin,
-		naturalMax,
-		RAND_SENTENCE_LENGTH_MAX
+		naturalMin * count + gap,
+		naturalMax * count + gap,
+		RAND_SENTENCE_LENGTH_MAX * count + gap
 	);
+}
+
+/** How far a length falls outside a range, and `0` when it is inside it. */
+function distanceFrom(length: number, [low, high]: readonly [number, number]): number {
+	return length > high ? length - high : Math.max(0, low - length);
+}
+
+/**
+ * The result's range, shared out over its sentences. The joins between them come
+ * off the top and the last sentence absorbs the rounding, so the shares add back
+ * up to exactly what the caller asked for rather than to one character less.
+ */
+function shareOut(
+	min: number,
+	max: number,
+	count: number,
+	space: number
+): readonly (readonly [number, number])[] {
+	if (count === 1) {
+		return [[min, max]];
+	}
+
+	const gap = space * (count - 1);
+	const split = (total: number): number[] => {
+		const body = Math.max(count, total - gap);
+		const each = Math.floor(body / count);
+		const shares = new Array<number>(count).fill(each);
+
+		shares[count - 1] = body - each * (count - 1);
+
+		return shares;
+	};
+	const mins = split(min);
+	const maxs = split(max);
+
+	return mins.map((low, i) => [Math.max(1, low), Math.max(low, maxs[i])] as const);
 }
 
 /**
@@ -964,7 +1097,8 @@ function compose(
 	modifyChance: number,
 	bounds: Record<string, readonly [number, number]>,
 	min: number,
-	max: number
+	max: number,
+	follow: Follow | null
 ): Built {
 	const themes = requested.length ? requested : WORD_THEMES;
 	const headed = frame.parts.some((part) => part.slot === 'state') ? 'state' : 'verb';
@@ -983,28 +1117,50 @@ function compose(
 	// rather than being answered with something else entirely.
 	const subjectTheme =
 		subjectRequired?.theme ?? pick(subjectThemes.length ? subjectThemes : themes);
+	// A sentence carrying on about the topic stands a pronoun where its subject
+	// would go, and the languages that drop their subject stand nothing there at
+	// all — in which case the phrase is not in the shape to carry an article, a
+	// modifier or a particle. Written out as its own list so that every budget
+	// below is measured against what the sentence actually writes; `at` is the
+	// index back into the frame, which is what the plan is keyed by.
+	const pronoun = follow?.reference === 'pronoun' ? follow.pronoun : null;
+	const parts: { part: SentencePart; at: number }[] = [];
+
+	frame.parts.forEach((part, at) => {
+		if (part.slot !== 'subject' || pronoun === null) {
+			parts.push({ part, at });
+
+			return;
+		}
+
+		if (pronoun) {
+			parts.push({ part: { ...part, modifiable: false, bare: true }, at });
+		}
+	});
+
 	// Every phrase's theme is settled before any of them is drawn, because a length
 	// budget is only as good as the pools it was measured against. Left to the loop,
 	// each phrase was given the room the language's longest noun would need and
 	// drew a word out of its own theme, which is how a sentence came out short of a
 	// `minLength` the shape could otherwise have reached.
-	const partThemes = frame.parts.map((part, i) =>
+	const partThemes = parts.map(({ part, at }) =>
 		isNounSlot(part.slot)
 			? part.slot === 'subject'
 				? subjectTheme
-				: (plan.phrase.get(i)?.theme ?? themeForPart(part.slot, group, themes))
+				: (plan.phrase.get(at)?.theme ?? themeForPart(part.slot, group, themes))
 			: null
 	);
 	// The same for the predicate: `bounds` spans every group the language has, and
 	// one sentence draws from one of them. A word the caller required is narrower
-	// still — its length is not a range at all.
-	const partBounds = frame.parts.map((part, i) => {
+	// still — its length is not a range at all, and neither is a pronoun's.
+	const partBounds = parts.map(({ part, at }, i) => {
 		const theme = partThemes[i];
-		const required = plan.phrase.get(i);
-		const exact = required ? ([required.word.length, required.word.length] as const) : null;
+		const required = plan.phrase.get(at);
+		const written = part.slot === 'subject' && pronoun ? pronoun : required?.word;
+		const exact = written ? ([written.length, written.length] as const) : null;
 
 		if (theme) {
-			const owed = plan.modifier.get(i);
+			const owed = plan.modifier.get(at);
 
 			return {
 				...bounds,
@@ -1021,11 +1177,13 @@ function compose(
 	});
 	// Only a shape that opens on a noun phrase with nothing in front of it can
 	// honour `startsWith`; anywhere else the sentence opens on an article, a
-	// preposition or an adverbial, and `collect` filters what does not match.
-	const first = frame.parts[0];
-	const prefixable = isNounSlot(first.slot) && !first.head && !data.articles;
+	// preposition or an adverbial, and `collect` filters what does not match. A
+	// sentence after the first one never opens the result, so it never carries it.
+	const first = parts[0].part;
+	const prefixable = !follow && isNounSlot(first.slot) && !first.head && !data.articles;
 	const space = data.space.length;
-	const spans = frame.parts.map((part, i) => {
+	const opener = follow?.opener ?? '';
+	const spans = parts.map(({ part }, i) => {
 		const [low, high] = partRange(part, data, partBounds[i]);
 		const gap = i === 0 ? 0 : space;
 
@@ -1035,15 +1193,21 @@ function compose(
 	const reported: string[] = [];
 	const slots: SentenceSlot[] = [];
 	let subject: Phrase | undefined;
-	let gender: WordGender | undefined;
-	let used = data.terminator.length;
+	// A pronoun says nothing about its own gender, so what agrees with it agrees
+	// with the noun it stands for.
+	let gender: WordGender | undefined = pronoun ? follow!.topic.gender : undefined;
+	let used = data.terminator.length + (opener ? opener.length + space : 0);
 
-	for (let i = 0; i < frame.parts.length; i += 1) {
-		const part = frame.parts[i];
+	if (opener) {
+		written.push(data.capitalize ? upper(opener) : opener);
+	}
+
+	for (let i = 0; i < parts.length; i += 1) {
+		const { part, at } = parts[i];
 		let restMin = 0;
 		let restMax = 0;
 
-		for (let rest = i + 1; rest < frame.parts.length; rest += 1) {
+		for (let rest = i + 1; rest < parts.length; rest += 1) {
 			restMin += spans[rest][0];
 			restMax += spans[rest][1];
 		}
@@ -1059,9 +1223,11 @@ function compose(
 		const low = Math.max(1, min - used - overhead - restMax);
 		let phrase: string;
 
-		if (isNounSlot(part.slot)) {
-			const required = plan.phrase.get(i);
-			const owed = plan.modifier.get(i);
+		if (part.slot === 'subject' && pronoun) {
+			phrase = pronoun;
+		} else if (isNounSlot(part.slot)) {
+			const required = plan.phrase.get(at);
+			const owed = plan.modifier.get(at);
 			const theme = partThemes[i]!;
 			const [nounLow, nounHigh] = partBounds[i].noun;
 			const [, articleMax] = part.bare ? [0, 0] : articleSpan(data);
@@ -1100,7 +1266,7 @@ function compose(
 				wordData,
 				data,
 				group,
-				plan.phrase.get(i),
+				plan.phrase.get(at),
 				gender,
 				low,
 				high
@@ -1108,9 +1274,9 @@ function compose(
 		}
 
 		// The opening capital belongs to whatever is written first, and that is the
-		// phrase itself unless a preposition stands in front of it. Applied here
-		// rather than to the finished string, so the phrase the detail reports is
-		// the one the sentence actually shows.
+		// phrase itself unless a connective or a preposition stands in front of it.
+		// Applied here rather than to the finished string, so the phrase the detail
+		// reports is the one the sentence actually shows.
 		const opens = data.capitalize && !written.length;
 		const head = opens && part.head ? upper(part.head) : part.head;
 		const text = opens && !part.head ? upper(phrase) : phrase;
@@ -1130,7 +1296,9 @@ function compose(
 		sentence: written.join(data.space) + data.terminator,
 		phrases: reported,
 		slots,
-		theme: subject?.theme ?? null
+		theme: subject?.theme ?? null,
+		subject: subject?.noun ?? (pronoun ? follow!.topic.noun : null),
+		gender: subject ? gender : pronoun !== null ? follow!.topic.gender : undefined
 	};
 }
 
@@ -1194,6 +1362,135 @@ function themeForPart(
 	return pick(places.length ? places : themes);
 }
 
+/* --- Building the whole result --------------------------------------------- */
+
+// How often a sentence that follows another one opens on a connective.
+const CONNECTIVE_CHANCE = 40;
+
+// How a sentence refers to the topic, against the other two ways of doing it.
+const REFERENCE_WEIGHT: Record<Reference, number> = { repeat: 25, pronoun: 40, fresh: 35 };
+
+/** What the rest of the result is about, read off the sentence that opened it. */
+function topicOf(built: Built): Topic | null {
+	if (!built.subject) {
+		return null;
+	}
+
+	return {
+		noun: built.subject,
+		theme: built.theme,
+		class: built.theme ? THEME_CLASS[built.theme] : null,
+		gender: built.gender
+	};
+}
+
+/**
+ * The pronouns the language can stand in for this topic with. A class its written
+ * pronouns are wrong for is left with the empty entry alone — the language says
+ * nothing where it can, and where it cannot, there is no pronoun to be had and
+ * the sentence names the topic again instead.
+ */
+function pronounsFor(data: SentenceLanguageData, topic: Topic): WordPool {
+	const pool = data.pronouns[topic.gender ?? 'n'] ?? data.pronouns.n ?? [];
+
+	if (topic.class && data.pronounless?.includes(topic.class)) {
+		return pool.filter((word) => !word);
+	}
+
+	return pool;
+}
+
+/**
+ * How one sentence carries on from the one before it.
+ *
+ * `room` is what this sentence may be at its longest, and it is what decides
+ * whether it opens on a connective at all: a connective is written in front of a
+ * whole sentence rather than instead of any part of it, so one longer than the
+ * budget can spare is a sentence that overshoots by exactly its length. Russian
+ * `тем временем` is thirteen characters, and a third of a range of seventy-five
+ * has nowhere to put them.
+ */
+function followFor(
+	data: SentenceLanguageData,
+	topic: Topic,
+	room: number,
+	shortest: number
+): Follow {
+	const pronouns = pronounsFor(data, topic);
+	const usable: Reference[] = pronouns.length
+		? ['repeat', 'pronoun', 'fresh']
+		: ['repeat', 'fresh'];
+	const spare = room - data.space.length - shortest;
+	const openers = data.connectives.filter((word) => word.length <= spare);
+	const total = usable.reduce((sum, each) => sum + REFERENCE_WEIGHT[each], 0);
+	let roll = Math.random() * total;
+	let reference = usable[usable.length - 1];
+
+	for (const each of usable) {
+		roll -= REFERENCE_WEIGHT[each];
+
+		if (roll <= 0) {
+			reference = each;
+			break;
+		}
+	}
+
+	return {
+		topic,
+		reference,
+		pronoun: reference === 'pronoun' ? pick(pronouns) : '',
+		opener: openers.length && chance(CONNECTIVE_CHANCE) ? pick(openers) : ''
+	};
+}
+
+/**
+ * Every sentence of one result, in order.
+ *
+ * The range is shared out before the first of them is drawn, and the topic is
+ * taken from that first sentence — so what follows is about the same thing rather
+ * than another draw that happened to land beside it.
+ */
+function generateResult(language: WordLanguage, settings: Settings): Built[] {
+	const data = SENTENCE_DATA[language];
+	const bounds = slotBounds(language);
+	const frames = framesFor(data, settings);
+	const [shortest] = naturalSpan(data, frames, bounds);
+	const [min, max] = boundsFor(data, frames, bounds, settings);
+	const budgets = shareOut(min, max, settings.sentences, data.space.length);
+	const built: Built[] = [];
+	let topic: Topic | null = null;
+
+	for (let i = 0; i < settings.sentences; i += 1) {
+		const follow = topic ? followFor(data, topic, budgets[i][1], shortest) : null;
+		let one = generateOne(language, settings, budgets[i], follow);
+
+		// `followFor` reserves room for the connective against the shortest sentence
+		// the shapes could spell, which is a floor no draw actually reaches — the
+		// shortest word of every pool at once. When the sentence that came back could
+		// not be made short enough to carry the connective after all, the connective
+		// is the part worth giving up: it is written in front of the whole sentence
+		// rather than instead of any piece of it.
+		if (follow?.opener && distanceFrom(one.sentence.length, budgets[i]) > 0) {
+			const bare = generateOne(language, settings, budgets[i], { ...follow, opener: '' });
+
+			if (
+				distanceFrom(bare.sentence.length, budgets[i]) <
+				distanceFrom(one.sentence.length, budgets[i])
+			) {
+				one = bare;
+			}
+		}
+
+		built.push(one);
+
+		if (!topic) {
+			topic = topicOf(one);
+		}
+	}
+
+	return built;
+}
+
 /* --- The public entry point's engine --------------------------------------- */
 
 /**
@@ -1230,7 +1527,8 @@ function resolveSettings(options: RandSentenceOptions): Settings {
 		minLength: resolveLength(options.minLength),
 		maxLength: resolveLength(options.maxLength),
 		prefix: resolvePrefix(options.startsWith),
-		include: resolveInclude(options.include)
+		include: resolveInclude(options.include),
+		sentences: clamp(Math.floor(options.sentences ?? 1), 1, RAND_SENTENCE_COUNT_MAX)
 	};
 }
 
@@ -1242,9 +1540,19 @@ export function generateSentenceDetails(options: RandSentenceOptions = {}): Sent
 		options,
 		() => {
 			const code = drawLanguage(language, languagesFor(settings));
-			const { sentence, phrases, slots, theme } = generateOne(code, settings);
+			const data = SENTENCE_DATA[code];
+			const built = generateResult(code, settings);
 
-			return { sentence, phrases, slots, language: code, theme };
+			return {
+				sentence: built.map((one) => one.sentence).join(data.space),
+				sentences: built.map((one) => one.sentence),
+				phrases: built.flatMap((one) => one.phrases),
+				slots: built.flatMap((one) => one.slots),
+				language: code,
+				// What the result is about is what its first sentence was about; the
+				// ones after it stay inside that noun's class.
+				theme: built[0].theme
+			};
 		},
 		(detail) => detail.sentence
 	);

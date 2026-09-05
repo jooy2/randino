@@ -127,6 +127,10 @@ export const EN: SentenceLanguageData = {
 		in_spring in_summer in_autumn in_winter on_weekends just_now sometimes every_day
 		at_dusk before_long
 	`),
+	connectives: words(`and_then so but meanwhile afterwards still later soon even_so at_last`),
+	pronouns: { n: words(`it`) },
+	// English cannot drop a subject, so a sentence about a person names it again.
+	pronounless: ['person'],
 	// English puts its verb second, and the sentence grows to the right of it.
 	frames: [
 		{

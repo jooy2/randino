@@ -2,6 +2,7 @@ import assert from 'assert';
 import { describe, it } from 'node:test';
 import {
 	RAND_COUNT_MAX,
+	RAND_SENTENCE_COUNT_MAX,
 	WORD_LANGUAGES,
 	WORD_THEMES,
 	randSentence,
@@ -39,6 +40,75 @@ const SCRIPT: Record<WordLanguage, RegExp> = {
 };
 
 const SHAPES: readonly SentenceShape[] = ['simple', 'detailed', 'complex'];
+
+/** How a capitalizing language writes the first word of a sentence. */
+function upperFirst(word: string): string {
+	return word.charAt(0).toUpperCase() + word.slice(1);
+}
+
+/** Every subject pronoun the language can write, in both cases. */
+function pronounsOf(language: WordLanguage): Set<string> {
+	const written = Object.values(SENTENCE_DATA[language].pronouns).flatMap((pool) => [
+		...(pool ?? [])
+	]);
+
+	return new Set([...written, ...written.map(upperFirst)].filter(Boolean));
+}
+
+/**
+ * The noun a phrase was built around, as far as the pools can tell — the same
+ * decomposition `explains` makes, kept instead of thrown away. Null for a phrase
+ * built on a word no pool holds, which is what an invented subject is.
+ */
+function nounIn(language: WordLanguage, phrase: string): string | null {
+	const space = SENTENCE_DATA[language].space;
+	const nouns = poolFor(language, 'subject');
+	const modifiers = modifiersFor(language);
+	let rest = phrase;
+
+	for (const article of articlesFor(language)) {
+		const opening = article.endsWith("'") ? article : article + space;
+
+		if (rest.startsWith(opening)) {
+			rest = rest.slice(opening.length);
+			break;
+		}
+	}
+
+	if (nouns.has(rest)) {
+		return rest;
+	}
+
+	for (let at = 1; at < rest.length; at += 1) {
+		if (space && rest.slice(at, at + space.length) !== space) {
+			continue;
+		}
+
+		const left = rest.slice(0, at);
+		const right = rest.slice(at + space.length);
+
+		if (modifiers.has(left) && nouns.has(right)) {
+			return right;
+		}
+
+		if (nouns.has(left) && modifiers.has(right)) {
+			return left;
+		}
+	}
+
+	return null;
+}
+
+/** The theme whose pool holds a noun, in the form a sentence writes it. */
+function themeOfNoun(language: WordLanguage, noun: string): WordTheme | null {
+	for (const theme of WORD_THEMES) {
+		if (WORD_DATA[language].nouns[theme].some((word) => plain(language, word) === noun)) {
+			return theme;
+		}
+	}
+
+	return null;
+}
 
 function sentenceDetails(options: RandSentenceOptions = {}): SentenceDetail[] {
 	return randSentence({ ...options, output: 'detail' });
@@ -568,6 +638,169 @@ describe('Sentence', () => {
 		const sentences = randSentence({ language: 'ko', unique: true, count: 300 });
 
 		assert.strictEqual(new Set(sentences).size, sentences.length);
+	});
+
+	it('`sentences` puts more than one sentence in one result', () => {
+		for (const language of WORD_LANGUAGES) {
+			const data = SENTENCE_DATA[language];
+
+			for (const detail of sentenceDetails({ language, sentences: 3, count: 40 })) {
+				assert.strictEqual(detail.sentences.length, 3, detail.sentence);
+				assert.strictEqual(detail.sentences.join(data.space), detail.sentence);
+
+				for (const sentence of detail.sentences) {
+					assert.ok(sentence.endsWith(data.terminator), `${language}: ${sentence}`);
+					assert.match(sentence, SCRIPT[language], `${language}: ${sentence}`);
+					// Every sentence closes exactly once, so two of them were never run
+					// together into one entry.
+					assert.strictEqual(
+						sentence.split(data.terminator).length - 1,
+						1,
+						`${language}: ${sentence}`
+					);
+					assert.ok(!sentence.includes('  '), `${language} double space: ${sentence}`);
+				}
+			}
+		}
+
+		for (const detail of sentenceDetails({ count: 20 })) {
+			assert.strictEqual(detail.sentences.length, 1, detail.sentence);
+			assert.strictEqual(detail.sentences[0], detail.sentence);
+		}
+	});
+
+	it('`sentences` is clamped, and `count` still says how many strings there are', () => {
+		for (const [asked, expected] of [
+			[0, 1],
+			[-3, 1],
+			[2.9, 2],
+			[RAND_SENTENCE_COUNT_MAX + 5, RAND_SENTENCE_COUNT_MAX]
+		] as [number, number][]) {
+			for (const detail of sentenceDetails({ language: 'ko', sentences: asked, count: 10 })) {
+				assert.strictEqual(detail.sentences.length, expected, detail.sentence);
+			}
+		}
+
+		assert.strictEqual(randSentence({ sentences: 4, count: 7 }).length, 7);
+	});
+
+	it('the length range describes the whole result, not one sentence of it', () => {
+		const ranges: [WordLanguage, number, number, number][] = [
+			['ko', 2, 24, 40],
+			['ko', 3, 40, 60],
+			['en', 2, 40, 70],
+			['ja', 3, 24, 42],
+			['zh', 2, 14, 28],
+			['de', 2, 34, 60],
+			['ru', 3, 40, 75]
+		];
+
+		for (const [language, sentences, minLength, maxLength] of ranges) {
+			for (const sentence of randSentence({
+				language,
+				sentences,
+				minLength,
+				maxLength,
+				count: SAMPLE
+			})) {
+				assert.ok(
+					sentence.length >= minLength && sentence.length <= maxLength,
+					`${language} x${sentences} ${minLength}-${maxLength}: ${sentence} (${sentence.length})`
+				);
+			}
+		}
+	});
+
+	it('the sentences of one result are about the same kind of thing', () => {
+		// A paragraph is not three draws. Every sentence after the first names that
+		// first subject again, stands a pronoun where it was, or draws another noun
+		// of the same class — so a paragraph that opens on a creature never wanders
+		// into an idea halfway through.
+		for (const language of WORD_LANGUAGES) {
+			const pronouns = pronounsOf(language);
+
+			for (const detail of sentenceDetails({ language, sentences: 3, count: 60 })) {
+				if (detail.theme === null) {
+					continue;
+				}
+
+				const wanted = THEME_CLASS[detail.theme];
+				let subjects = 0;
+
+				for (let i = 0; i < detail.phrases.length; i += 1) {
+					if (detail.slots[i] !== 'subject') {
+						continue;
+					}
+
+					subjects += 1;
+
+					const phrase = detail.phrases[i];
+
+					if (pronouns.has(phrase)) {
+						continue;
+					}
+
+					// Any of the three sentences can be the one a phrase opens, so both
+					// cases are tried rather than only the first phrase of the result.
+					const noun =
+						nounIn(language, phrase) ??
+						nounIn(language, phrase.charAt(0).toLowerCase() + phrase.slice(1));
+					const theme = noun ? themeOfNoun(language, noun) : null;
+
+					assert.ok(
+						theme === null || THEME_CLASS[theme] === wanted,
+						`${language}: '${phrase}' is a ${theme} where the result is about a ${wanted} (${detail.sentence})`
+					);
+				}
+
+				assert.ok(subjects >= 1, detail.sentence);
+			}
+		}
+	});
+
+	it('a connective opens a sentence that follows another, and only one', () => {
+		for (const language of WORD_LANGUAGES) {
+			const data = SENTENCE_DATA[language];
+			const openers = data.connectives.map(
+				(word) => (data.capitalize ? upperFirst(word) : word) + data.space
+			);
+			let seen = 0;
+
+			for (const detail of sentenceDetails({ language, sentences: 3, count: 120 })) {
+				assert.ok(
+					!openers.some((opener) => detail.sentences[0].startsWith(opener)),
+					`${language}: the first sentence opens on a connective (${detail.sentence})`
+				);
+
+				seen += detail.sentences
+					.slice(1)
+					.filter((sentence) => openers.some((opener) => sentence.startsWith(opener))).length;
+			}
+
+			// And the language can actually write one, which is what makes the check
+			// above worth anything.
+			assert.ok(seen > 0, `${language} never wrote a connective`);
+		}
+	});
+
+	it('a language whose nouns carry a gender has a pronoun for each of them', () => {
+		for (const language of WORD_LANGUAGES) {
+			const data = SENTENCE_DATA[language];
+			const genders = Object.keys(WORD_DATA[language].agreement ?? {}) as WordGender[];
+
+			assert.ok(data.connectives.length > 0, `${language} has no connectives`);
+			assert.ok(
+				data.pronouns.n !== undefined || genders.length > 0,
+				`${language} has no pronoun to fall back to`
+			);
+
+			for (const gender of genders) {
+				assert.ok(
+					(data.pronouns[gender] ?? data.pronouns.n) !== undefined,
+					`${language}: nothing stands in for a ${gender} subject`
+				);
+			}
+		}
 	});
 
 	it('the detail form reports what the sentence was built from', () => {

@@ -15,6 +15,7 @@ describe('base test', () => {
 			'RAND_COUNT_MAX',
 			'RAND_LENGTH_MAX',
 			'RAND_LENGTH_MIN',
+			'RAND_SENTENCE_COUNT_MAX',
 			'RAND_SENTENCE_LENGTH_MAX',
 			'WORD_LANGUAGES',
 			'WORD_THEMES',
@@ -83,6 +84,7 @@ describe('base test', () => {
 		assert.strictEqual(typeof randino.sentenceLengthRange, 'function');
 		assert.ok(Array.isArray(randino.randSentence({ output: 'detail' })[0].phrases));
 		assert.strictEqual(randino.RAND_SENTENCE_LENGTH_MAX, 200);
+		assert.strictEqual(randino.RAND_SENTENCE_COUNT_MAX, 10);
 		assert.ok(Array.isArray(randino.WORD_LANGUAGES));
 		assert.ok(Array.isArray(randino.WORD_THEMES));
 

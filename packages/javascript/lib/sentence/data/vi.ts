@@ -120,6 +120,9 @@ export const VI: SentenceLanguageData = {
 		ngày_mai vào_mùa_xuân vào_mùa_hè vào_mùa_thu vào_mùa_đông vào_cuối_tuần vừa_rồi
 		đôi_khi mỗi_ngày lúc_hoàng_hôn
 	`),
+	connectives: words(`rồi và_rồi nhưng thế_là sau_đó cuối_cùng đồng_thời tuy_vậy`),
+	pronouns: { n: ['', 'nó'] },
+	pronounless: ['person'],
 	frames: [
 		{
 			parts: [{ slot: 'subject', modifiable: true }, { slot: 'verb' }],
