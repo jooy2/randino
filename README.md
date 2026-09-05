@@ -13,7 +13,7 @@ Every option, every language and every example — pick **JavaScript**, **Dart**
 **randino** generates random text in the language you ask for. Today that is person names, nicknames, words and whole sentences; the shape it is built in — one function per kind of text, one set of options, per-language datasets — is meant to hold whatever comes next.
 
 - **Person names** read like names people actually carry — Emma Clover, Jack Reeves — and come with their English pronunciation. 9 languages.
-- **Nicknames** are the handles you would pick for a game or a website — MistyOwl, CraneVoyage, RustyBoot. Built from everyday words across twenty-five themes, never from person names, with over nine million combinations in Korean and English before a random suffix is added.
+- **Nicknames** are the handles you would pick for a game or a website — MistyOwl, CraneVoyage, RustyBoot. Built from everyday words across twenty-five themes, never from person names, with over forty million combinations in Korean and English before a random suffix is added.
 - **Words** are those twenty-five themes on their own — `randWord`, and a function per theme: `randAnimal`, `randFood`, `randGem` and twenty-two more.
 - **Sentences** are whole statements in the language's own grammar — `randSentence`. A verb states what can do it and what it can be done to, so the words of one sentence belong together: 여우가 사과를 먹는다, The brave lion runs quietly.
 - **Decorators** attach something to a string you already have rather than generating one: a random token with `randSuffix` and `randPrefix`, a modifier with `randModifier`.

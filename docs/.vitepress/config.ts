@@ -103,7 +103,7 @@ const navFor = (lang: string, labels: { demo: string; guide: string; packages: s
 
 /** The site's own sentence. Read twice: once by a crawler, once by `llms.txt`. */
 const siteDescription =
-	'Random person names and nicknames in the language you ask for — Korean, English, Japanese, Chinese and five more. One library, shipped for JavaScript, Dart and Python, with no runtime dependencies.';
+	'Random person names, nicknames, words and sentences in the language you ask for — Korean, English, Japanese, Chinese and five more. One library, shipped for JavaScript, Dart and Python, with no runtime dependencies.';
 
 const vitePressI18nConfig: VitePressI18nOptions = {
 	locales: supportLocales,
@@ -111,7 +111,7 @@ const vitePressI18nConfig: VitePressI18nOptions = {
 	searchProvider: 'local',
 	description: {
 		en: siteDescription,
-		ko: '요청한 언어로 사람 이름과 닉네임을 무작위로 생성합니다. 한국어, 영어, 일본어, 중국어를 포함한 9개 언어를 지원하며, JavaScript, Dart, Python 패키지로 제공되고 런타임 의존성이 없습니다.'
+		ko: '요청한 언어로 사람 이름과 닉네임, 단어와 문장을 무작위로 생성합니다. 한국어, 영어, 일본어, 중국어를 포함한 9개 언어를 지원하며, JavaScript, Dart, Python 패키지로 제공되고 런타임 의존성이 없습니다.'
 	},
 	themeConfig: {
 		en: {

@@ -10,17 +10,17 @@ Every option and every example, with **Dart** picked in the sidebar. This README
 
 ---
 
-**randino** generates random person names and nicknames in the language you ask for.
+**randino** generates random person names, nicknames, words and sentences in the language you ask for.
 
 - **Person names** read like names people actually carry — Emma Clover, Jack Reeves — and come with their English pronunciation. 9 languages.
 - **Nicknames** are the handles you would pick for a game or a website — MistyOwl, CraneVoyage, RustyBoot. Built from everyday words across twenty-five themes, never from person names.
-- **Words** are those twenty-five themes on their own — `randWord`, plus `randAnimal`, `randFood` and twelve more.
+- **Words** are those twenty-five themes on their own — `randWord`, plus `randAnimal`, `randFood` and twenty-three more.
 - **Sentences** are whole statements in the language's own grammar — `randSentence`. The verb decides what can stand beside it, so the words of one sentence belong together.
 - **Decorators** attach something to a string you already have: `randSuffix`, `randPrefix` and `randModifier`.
 - Every parameter is named and optional, and a **null enum means "every one of them"** — `randName()` on its own works.
 - **Pure Dart, no dependencies.** It imports nothing but `dart:math`, so it runs on the VM, on the web and inside Flutter on every platform.
 
-This is the Dart half. The [npm package](https://www.npmjs.com/package/randino) is the other one, and the two generate from the same datasets under the same rules. They version independently, so this package's number and the npm one's will not always agree.
+This is the Dart package. The [npm package](https://www.npmjs.com/package/randino) and the [PyPI package](https://pypi.org/project/randino/) are the other two, and all three generate from the same datasets under the same rules. They version independently, so the numbers on pub.dev, npm and PyPI will not always agree.
 
 ## Install
 
@@ -148,7 +148,7 @@ randSentence(language: WordLanguage.en, include: <String>['brave', 'lion']);
 randSentenceDetails(language: WordLanguage.ko).first;
 // SentenceDetail(검은 고양이가 숲에서 잠잔다., [검은 고양이, 숲, 잠잔다], ko, animal)
 
-sentenceLengthRange(WordLanguage.en); // LengthRange(13, 92)
+sentenceLengthRange(WordLanguage.en); // LengthRange(12, 92)
 ```
 
 | Parameter                 | Type                  | Default            |
@@ -158,15 +158,22 @@ sentenceLengthRange(WordLanguage.en); // LengthRange(13, 92)
 | `shape`                   | `SentenceShape?`      | `null` — every one |
 | `slots`                   | `Set<SentenceSlot>?`  | `null` — every one |
 | `include`                 | `List<String>`        | `const []`         |
+| `type`                    | `Set<SentenceType>?`  | `null` — drawn     |
+| `quote`                   | `SentenceQuote?`      | `null`             |
+| `style`                   | `SentenceStyle?`      | `null` — drawn     |
+| `sentences`               | `int`                 | `1`                |
+| `includeName`             | `bool?`               | `null` — drawn     |
 | `count`                   | `int`                 | `1`                |
 | `realism`                 | `RandRealism`         | `RandRealism.real` |
 | `minLength` / `maxLength` | `int?`                | _language_         |
 | `startsWith`              | `String?`             | `null`             |
 | `unique`                  | `bool`                | `false`            |
 
-`slots` names the parts a shape may carry beside its subject: `object`, `place`, `time`, `manner`, `state`, or an empty set for a subject and its predicate alone. A language declares its own shapes, so German has no `object` and Russian no `place` — both mark those with a case their nouns would have to change for — and asking for one falls back to the closest shape the language does have.
+`slots` names the parts a shape may carry beside its subject: `object`, `place`, `time`, `manner`, `state`, `quantity`, `money`, `date`, `clock`, or an empty set for a subject and its predicate alone. A language declares its own shapes, so German has no `object` and Russian no `place` — both mark those with a case their nouns would have to change for — and asking for one falls back to the closest shape the language does have.
 
 `include` puts words you name into every sentence. A word the pools hold goes in the phrase it belongs to, and a word from anywhere else is used as a noun.
+
+`type` is what the sentence does: a statement, a question, an exclamation, a line that trails off, or one somebody says or thinks. `style` is the speech level, which Korean writes four of. `sentences` puts up to ten of them in one string, about one subject. `includeName` puts a generated person's name where a person can stand. Left out, the three of them are drawn per result.
 
 ## Decorators
 
@@ -220,7 +227,7 @@ nameLengthRange(language: NameLanguage.en, includeMiddleName: true); // LengthRa
 nameSupportsMiddleName(NameLanguage.ko); // false
 nameSupportsRoman(NameLanguage.en); // false
 nicknameLengthRange(language: WordLanguage.ko); // LengthRange(1, 13)
-sentenceLengthRange(WordLanguage.ko); // LengthRange(6, 41)
+sentenceLengthRange(WordLanguage.ko); // LengthRange(5, 43)
 ```
 
 `nameLanguages`, `wordLanguages` and `wordThemes` list what the generators accept; `randCountMax`, `randLengthMin` / `Max`, `randSentenceLengthMax`, `affixLengthDefault` / `Max`, `affixSeparatorDefault` and `affixCharset` are the bounds and defaults every parameter is clamped to.

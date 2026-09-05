@@ -10,17 +10,17 @@ Every option and every example, with **Python** picked in the sidebar. This READ
 
 ---
 
-**randino** generates random person names and nicknames in the language you ask for.
+**randino** generates random person names, nicknames, words and sentences in the language you ask for.
 
 - **Person names** read like names people actually carry — Emma Clover, Jack Reeves — and come with their English pronunciation. 9 languages.
 - **Nicknames** are the handles you would pick for a game or a website — MistyOwl, CraneVoyage, RustyBoot. Built from everyday words across twenty-five themes, never from person names.
-- **Words** are those twenty-five themes on their own — `rand_word`, plus `rand_animal`, `rand_food` and twelve more.
+- **Words** are those twenty-five themes on their own — `rand_word`, plus `rand_animal`, `rand_food` and twenty-three more.
 - **Sentences** are whole statements in the language's own grammar — `rand_sentence`. The verb decides what can stand beside it, so the words of one sentence belong together.
 - **Decorators** attach something to a string you already have: `rand_suffix`, `rand_prefix` and `rand_modifier`.
 - Every argument is keyword-only and optional, so `rand_name()` on its own works.
 - **Pure Python, no dependencies.** It imports nothing outside the standard library, and ships a `py.typed` marker so mypy and Pyright read the annotations.
 
-This is the Python half. The [npm package](https://www.npmjs.com/package/randino) and the [pub.dev package](https://pub.dev/packages/randino) are the others, and all three generate from the same datasets under the same rules. They version independently, so this package's number and the others' will not always agree.
+This is the Python package. The [npm package](https://www.npmjs.com/package/randino) and the [pub.dev package](https://pub.dev/packages/randino) are the other two, and all three generate from the same datasets under the same rules. They version independently, so the numbers on PyPI, npm and pub.dev will not always agree.
 
 ## Install
 
@@ -157,7 +157,7 @@ rand_sentence(language="ko", output="detail")
 #                 phrases=('검은 고양이', '숲', '잠잔다'),
 #                 slots=('subject', 'place', 'verb'), language='ko', theme='animal')]
 
-sentence_length_range("en")  # (13, 92)
+sentence_length_range("en")  # (12, 92)
 ```
 
 | Argument                    | Type                                | Default   |
@@ -167,6 +167,11 @@ sentence_length_range("en")  # (13, 92)
 | `shape`                     | `SentenceShapeOption`               | `"all"`   |
 | `slots`                     | `SentenceSlotOption`                | `"all"`   |
 | `include`                   | `str \| Sequence[str]`              | `()`      |
+| `type`                      | `SentenceTypeOption \| None`        | _drawn_   |
+| `quote`                     | `SentenceQuote \| None`             | `None`    |
+| `style`                     | `SentenceStyle \| None`             | _drawn_   |
+| `sentences`                 | `int`                               | `1`       |
+| `include_name`              | `bool \| None`                      | _drawn_   |
 | `count`                     | `int`                               | `1`       |
 | `realism`                   | `RandRealism`                       | `"real"`  |
 | `min_length` / `max_length` | `int \| None`                       | _language_ |
@@ -174,9 +179,11 @@ sentence_length_range("en")  # (13, 92)
 | `unique`                    | `bool`                              | `False`   |
 | `output`                    | `RandOutput`                        | `"value"` |
 
-`slots` names the parts a shape may carry beside its subject: `object`, `place`, `time`, `manner`, `state`, or `"none"` for a subject and its predicate alone. A language declares its own shapes, so German has no `object` and Russian no `place` — both mark those with a case their nouns would have to change for — and asking for one falls back to the closest shape the language does have.
+`slots` names the parts a shape may carry beside its subject: `object`, `place`, `time`, `manner`, `state`, `quantity`, `money`, `date`, `clock`, or `"none"` for a subject and its predicate alone. A language declares its own shapes, so German has no `object` and Russian no `place` — both mark those with a case their nouns would have to change for — and asking for one falls back to the closest shape the language does have.
 
 `include` puts words you name into every sentence. A word the pools hold goes in the phrase it belongs to, and a word from anywhere else is used as a noun.
+
+`type` is what the sentence does: a statement, a question, an exclamation, a line that trails off, or one somebody says or thinks. `style` is the speech level, which Korean writes four of. `sentences` puts up to ten of them in one string, about one subject. `include_name` puts a generated person's name where a person can stand. Left out, the three of them are drawn per result.
 
 ## Decorators
 
@@ -236,7 +243,7 @@ name_length_range("en", include_middle_name=True)  # (11, 32)
 name_supports_middle_name("ko")  # False
 name_supports_roman("en")  # False
 nickname_length_range("ko")  # (1, 13)
-sentence_length_range("ko")  # (6, 41)
+sentence_length_range("ko")  # (5, 43)
 ```
 
 `NAME_LANGUAGES`, `WORD_LANGUAGES` and `WORD_THEMES` list what the generators accept; `RAND_COUNT_MAX`, `RAND_LENGTH_MIN` / `MAX`, `AFFIX_LENGTH_DEFAULT` / `MAX`, `AFFIX_SEPARATOR_DEFAULT` and `AFFIX_CHARSET` are the bounds and defaults every argument is clamped to.

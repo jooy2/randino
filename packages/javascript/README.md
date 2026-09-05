@@ -14,13 +14,13 @@ Every option and every example, with **JavaScript** picked in the sidebar. This 
 
 - **Person names** read like names people actually carry — Emma Clover, Jack Reeves — and come with their English pronunciation. 9 languages.
 - **Nicknames** are the handles you would pick for a game or a website — MistyOwl, CraneVoyage, RustyBoot. Built from everyday words across twenty-five themes, never from person names.
-- **Words** are those themes on their own — `randWord`, plus `randAnimal`, `randFood` and twelve more.
+- **Words** are those themes on their own — `randWord`, plus `randAnimal`, `randFood` and twenty-three more.
 - **Sentences** are whole statements in the language's own grammar — `randSentence`. The verb decides what can stand beside it, so the words of one sentence belong together.
 - **Decorators** attach something to a string you already have: `randSuffix`, `randPrefix` and `randModifier`.
 - One options object per generator, every option optional: `randName()` on its own works.
 - **No runtime dependencies.** ESM, typed, and it runs in Node and in the browser alike.
 
-This is the JavaScript half. The [Dart package](https://pub.dev/packages/randino) is the other one, and the two generate from the same datasets under the same rules. They version independently, so this package's number and the pub.dev one's will not always agree.
+This is the JavaScript package. The [Dart package](https://pub.dev/packages/randino) and the [Python package](https://pypi.org/project/randino/) are the other two, and all three generate from the same datasets under the same rules. They version independently, so the numbers on npm, pub.dev and PyPI will not always agree.
 
 ## Install
 
@@ -165,7 +165,7 @@ randSentence({ language: 'ko', output: 'detail' });
 //   theme: 'animal'
 // }]
 
-sentenceLengthRange('en'); // [13, 92]
+sentenceLengthRange('en'); // [12, 92]
 ```
 
 | Option                    | Type                                            | Default    |
@@ -175,6 +175,11 @@ sentenceLengthRange('en'); // [13, 92]
 | `shape`                   | `'all' \| 'simple' \| 'detailed' \| 'complex'`  | `'all'`    |
 | `slots`                   | `'all' \| 'none'` or one or more `SentenceSlot` | `'all'`    |
 | `include`                 | `string` or `string[]`                          | —          |
+| `type`                    | `'all'` or one or more `SentenceType`           | _drawn_    |
+| `quote`                   | `'double' \| 'single'`                          | —          |
+| `style`                   | `SentenceStyle`                                 | _drawn_    |
+| `sentences`               | `number`                                        | `1`        |
+| `includeName`             | `boolean`                                       | _drawn_    |
 | `count`                   | `number`                                        | `1`        |
 | `realism`                 | `RandRealism`                                   | `'real'`   |
 | `minLength` / `maxLength` | `number`                                        | _language_ |
@@ -182,9 +187,11 @@ sentenceLengthRange('en'); // [13, 92]
 | `unique`                  | `boolean`                                       | `false`    |
 | `output`                  | `'value' \| 'detail'`                           | `'value'`  |
 
-`slots` names the parts a shape may carry beside its subject: `object`, `place`, `time`, `manner`, `state`, or `'none'` for a subject and its predicate alone. A language declares its own shapes, so German has no `object` and Russian no `place` — both mark those with a case their nouns would have to change for — and asking for one falls back to the closest shape the language does have.
+`slots` names the parts a shape may carry beside its subject: `object`, `place`, `time`, `manner`, `state`, `quantity`, `money`, `date`, `clock`, or `'none'` for a subject and its predicate alone. A language declares its own shapes, so German has no `object` and Russian no `place` — both mark those with a case their nouns would have to change for — and asking for one falls back to the closest shape the language does have.
 
 `include` puts words you name into every sentence. A word the pools hold goes in the phrase it belongs to, and a word from anywhere else is used as a noun.
+
+`type` is what the sentence does: a statement, a question, an exclamation, a line that trails off, or one somebody says or thinks. `style` is the speech level, which Korean writes four of. `sentences` puts up to ten of them in one string, about one subject. `includeName` puts a generated person's name where a person can stand. Left out, the three of them are drawn per result.
 
 ## Decorators
 
@@ -252,7 +259,7 @@ nameLengthRange('en', true, true); // [11, 32]
 nameSupportsMiddleName('ko'); // false
 nameSupportsRoman('en'); // false
 nicknameLengthRange('ko'); // [1, 13]
-sentenceLengthRange('ko'); // [6, 41]
+sentenceLengthRange('ko'); // [5, 43]
 wordLengthRange('ko'); // [1, 4]
 ```
 
