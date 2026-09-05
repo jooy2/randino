@@ -49,6 +49,7 @@ Every option is optional, and the defaults are what the empty call above uses.
 | `slots` | <Lang js="SentenceSlotOption" dart="Set&lt;SentenceSlot&gt;?" py="SentenceSlotOption" code /> | <Lang js="'all'" dart="null" py="&quot;all&quot;" code /> | Which parts it carries beside the subject. See [Picking the shape](#picking-the-shape). |
 | `include` | <Lang js="string &#124; string[]" dart="List&lt;String&gt;" py="str &#124; Sequence[str]" code /> | <Lang js="—" dart="const []" py="()" code /> | Words every sentence has to contain. See [Words it has to contain](#words-it-has-to-contain). |
 | `sentences` | <Lang js="number" dart="int" py="int" code /> | `1` | How many sentences one result holds. See [More than one sentence](#more-than-one-sentence). |
+| <Lang js="includeName" dart="includeName" py="include_name" code /> | <Lang js="boolean" dart="bool" py="bool" code /> | <Lang js="false" dart="false" py="False" code /> | Write a person's name where the sentence has room for one. See [A person's name](#a-persons-name). |
 | `count` | <Lang js="number" dart="int" py="int" code /> | `1` | How many sentences to return. Clamped to `0` … `10000`. |
 | `realism` | `RandRealism` | <Lang js="`'real'`" dart="`RandRealism.real`" py="`\"real\"`" /> | `real` uses real words, `invented` builds words that only read like the language, and `mixed` decides per word. The grammar stays real either way. |
 | <Lang js="minLength" dart="minLength" py="min_length" code /> | <Lang js="number" dart="int?" py="int &#124; None" code /> | _language_ | Minimum length in characters, punctuation included. |
@@ -402,6 +403,92 @@ rand_sentence(language="ko", sentences=3, min_length=40, max_length=55)
 
 `include` goes in the first sentence, which puts each word in the result once rather than once per sentence. `sentences` is clamped to <Lang js="RAND_SENTENCE_COUNT_MAX" dart="randSentenceCountMax" py="RAND_SENTENCE_COUNT_MAX" code />, which is ten — already a paragraph.
 
+## A person's name {#a-persons-name}
+
+Every other generator here keeps person names out on purpose — a nickname is never built from one, and that rule is the whole point of keeping names and words apart. A sentence is the exception, and only when you ask: <Lang js="includeName" py="include_name" dart="includeName" code /> writes a generated name where the sentence has room for a person.
+
+::: lang js
+
+```javascript
+randSentence({ language: 'en', includeName: true, count: 3 });
+// ['Callum drinks the round rye.', 'Gavin crawls.', 'Veronica paints the plunger neatly.']
+
+randSentence({ language: 'ko', includeName: true, count: 3 });
+// ['소한이 날아오른다.', '종현이 심벌즈를 판다.', '은영이 어슬렁댄다.']
+
+randSentence({ language: 'es', includeName: true, count: 3 });
+// ['Hilario imagina la duda.', 'Adrián calienta la uva redonda.', 'Santiago rueda.']
+```
+
+:::
+
+::: lang dart
+
+```dart
+randSentence(language: WordLanguage.en, includeName: true, count: 3);
+// [Callum drinks the round rye., Gavin crawls., Veronica paints the plunger neatly.]
+
+randSentence(language: WordLanguage.ko, includeName: true, count: 3);
+// [소한이 날아오른다., 종현이 심벌즈를 판다., 은영이 어슬렁댄다.]
+
+randSentence(language: WordLanguage.es, includeName: true, count: 3);
+// [Hilario imagina la duda., Adrián calienta la uva redonda., Santiago rueda.]
+```
+
+:::
+
+::: lang py
+
+```python
+rand_sentence(language="en", include_name=True, count=3)
+# ['Callum drinks the round rye.', 'Gavin crawls.', 'Veronica paints the plunger neatly.']
+
+rand_sentence(language="ko", include_name=True, count=3)
+# ['소한이 날아오른다.', '종현이 심벌즈를 판다.', '은영이 어슬렁댄다.']
+
+rand_sentence(language="es", include_name=True, count=3)
+# ['Hilario imagina la duda.', 'Adrián calienta la uva redonda.', 'Santiago rueda.']
+```
+
+:::
+
+**It is a bare given name**, not a full one and not a noun phrase: no article, no modifier, and the particle Korean puts after it chosen from its own last character the way any other word's is (`소한이`, `은영이`). It carries the gender it was drawn for, so a Spanish, Italian or Russian predicate agrees with it — `Celeste è affamata` beside `Ivano è raro` — which is the one thing the generator could not read off a name, since a name is in none of the word pools.
+
+**A name only stands where a person could.** Turning the option on narrows the subject to the themes that name people, so that the sentence has somewhere to put one. A `theme` you named yourself still wins, and then no name is written at all:
+
+::: lang js
+
+```javascript
+randSentence({ language: 'en', theme: 'animal', includeName: true, count: 2 });
+// ['The wildebeest is lazy.', 'Yesterday, the moose stops.']
+```
+
+:::
+
+::: lang dart
+
+```dart
+randSentence(language: WordLanguage.en, theme: WordTheme.animal, includeName: true, count: 2);
+// [The wildebeest is lazy., Yesterday, the moose stops.]
+```
+
+:::
+
+::: lang py
+
+```python
+rand_sentence(language="en", theme="animal", include_name=True, count=2)
+# ['The wildebeest is lazy.', 'Yesterday, the moose stops.']
+```
+
+:::
+
+`SentenceDetail.names` reports the names a result was written with, and a named subject reports <Lang js="theme: null" dart="theme: null" py="theme=None" code /> — a name belongs to no theme.
+
+::: warning It costs 22 KB, whether you use it or not The option reaches the person-name pools, and a synchronous API has no dynamic import to hide behind — so a bundle that includes `randSentence` at all includes them. Bundling only `randSentence` with esbuild and gzipping: **122.5 KB before, 144.5 KB after**, `+22.0 KB` or `+18%`. The sentence generator already carries the whole word pools, which is 110 KB of that, and the name pools are the 22 KB beside them.
+
+If you never write a name and the size matters, there is nothing to do about it in this version except not to import `randSentence`. :::
+
 ## The detail output {#the-detail-output}
 
 `output: 'detail'` reports the pieces each sentence was built from — the phrases in order, what each of them does, the language and the subject's theme — instead of returning a string.
@@ -459,6 +546,7 @@ rand_sentence(language="ko", output="detail", count=1)
 | `sentences` | <Lang js="string[]" dart="List&lt;String&gt;" py="tuple[str, ...]" code /> | One entry per sentence. A single entry unless `sentences` asked for more. |
 | `phrases` | <Lang js="string[]" dart="List&lt;String&gt;" py="tuple[str, ...]" code /> | The phrases it is made of, in order — without the particles. One flat list across every sentence. |
 | `slots` | <Lang js="SentenceSlot[]" dart="List&lt;SentenceSlot&gt;" py="tuple[SentenceSlot, ...]" code /> | What each phrase does, at the same index as `phrases`. |
+| `names` | <Lang js="string[]" dart="List&lt;String&gt;" py="tuple[str, ...]" code /> | The person names the result was written with, in order. Empty unless `includeName` asked for them. |
 | `language` | `WordLanguage` | The language this sentence was generated in. |
 | `theme` | <Lang js="WordTheme &#124; null" dart="WordTheme?" py="WordTheme &#124; None" code /> | Theme of the subject — the first sentence's, which is what the rest stay about. Null when that word is not one the generator knows. |
 

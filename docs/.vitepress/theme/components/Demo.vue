@@ -114,6 +114,7 @@ const sentence = reactive({
 	shape: 'all',
 	slots: 'all',
 	sentences: 1,
+	includeName: false,
 	count: 8,
 	realism: 'real',
 	minLength: '',
@@ -161,6 +162,7 @@ const options = computed(() => {
 		if (sentence.shape !== 'all') out.shape = sentence.shape;
 		if (sentence.slots !== 'all') out.slots = sentence.slots;
 		if (Number(sentence.sentences) > 1) out.sentences = Number(sentence.sentences);
+		if (sentence.includeName) out.includeName = true;
 		if (included.value.length) out.include = included.value;
 		if (sentence.count !== 1) out.count = Number(sentence.count);
 		if (sentence.realism !== 'real') out.realism = sentence.realism;
@@ -593,6 +595,11 @@ async function copy() {
 						type="text"
 						:placeholder="t(locale, 'demoIncludeHint')"
 					/>
+				</label>
+
+				<label class="randino-demo-check">
+					<input v-model="sentence.includeName" type="checkbox" />
+					<code>includeName</code>
 				</label>
 
 				<label class="randino-demo-field">

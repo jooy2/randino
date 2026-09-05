@@ -49,6 +49,7 @@ rand_sentence()
 | `slots` | <Lang js="SentenceSlotOption" dart="Set&lt;SentenceSlot&gt;?" py="SentenceSlotOption" code /> | <Lang js="'all'" dart="null" py="&quot;all&quot;" code /> | 주어 옆에 무엇을 두는지. [형태 고르기](#picking-the-shape) 참고. |
 | `include` | <Lang js="string &#124; string[]" dart="List&lt;String&gt;" py="str &#124; Sequence[str]" code /> | <Lang js="—" dart="const []" py="()" code /> | 모든 문장에 반드시 들어가야 할 단어. [반드시 넣을 단어](#words-it-has-to-contain) 참고. |
 | `sentences` | <Lang js="number" dart="int" py="int" code /> | `1` | 결과 하나에 담을 문장 수. [문장을 여러 개](#more-than-one-sentence) 참고. |
+| <Lang js="includeName" dart="includeName" py="include_name" code /> | <Lang js="boolean" dart="bool" py="bool" code /> | <Lang js="false" dart="false" py="False" code /> | 사람이 설 자리에 사람 이름을 씁니다. [사람 이름](#a-persons-name) 참고. |
 | `count` | <Lang js="number" dart="int" py="int" code /> | `1` | 돌려줄 문장 개수. `0` … `10000`으로 제한됩니다. |
 | `realism` | `RandRealism` | <Lang js="`'real'`" dart="`RandRealism.real`" py="`\"real\"`" /> | `real`은 실제 단어를, `invented`는 그 언어처럼 읽히기만 하는 단어를 씁니다. `mixed`는 단어마다 정합니다. 문법은 어느 쪽이든 실제 그대로입니다. |
 | <Lang js="minLength" dart="minLength" py="min_length" code /> | <Lang js="number" dart="int?" py="int &#124; None" code /> | _언어_ | 문장 부호를 포함한 최소 글자 수. |
@@ -402,6 +403,92 @@ rand_sentence(language="ko", sentences=3, min_length=40, max_length=55)
 
 `include`에 적은 단어는 첫 문장에 들어갑니다. 문장마다 한 번씩이 아니라 결과에 한 번씩 넣기 위해서입니다. `sentences`는 <Lang js="RAND_SENTENCE_COUNT_MAX" dart="randSentenceCountMax" py="RAND_SENTENCE_COUNT_MAX" code />인 10으로 제한됩니다. 열 문장이면 이미 한 문단입니다.
 
+## 사람 이름 {#a-persons-name}
+
+여기 있는 다른 생성기는 사람 이름을 일부러 피합니다. 닉네임은 사람 이름으로 만들지 않고, 그 규칙이야말로 이름과 단어를 갈라 둔 이유입니다. 문장만 예외이고, 그것도 직접 요청했을 때뿐입니다. <Lang js="includeName" py="include_name" dart="includeName" code />은 문장에 사람이 설 자리가 있을 때 생성한 이름을 씁니다.
+
+::: lang js
+
+```javascript
+randSentence({ language: 'en', includeName: true, count: 3 });
+// ['Callum drinks the round rye.', 'Gavin crawls.', 'Veronica paints the plunger neatly.']
+
+randSentence({ language: 'ko', includeName: true, count: 3 });
+// ['소한이 날아오른다.', '종현이 심벌즈를 판다.', '은영이 어슬렁댄다.']
+
+randSentence({ language: 'es', includeName: true, count: 3 });
+// ['Hilario imagina la duda.', 'Adrián calienta la uva redonda.', 'Santiago rueda.']
+```
+
+:::
+
+::: lang dart
+
+```dart
+randSentence(language: WordLanguage.en, includeName: true, count: 3);
+// [Callum drinks the round rye., Gavin crawls., Veronica paints the plunger neatly.]
+
+randSentence(language: WordLanguage.ko, includeName: true, count: 3);
+// [소한이 날아오른다., 종현이 심벌즈를 판다., 은영이 어슬렁댄다.]
+
+randSentence(language: WordLanguage.es, includeName: true, count: 3);
+// [Hilario imagina la duda., Adrián calienta la uva redonda., Santiago rueda.]
+```
+
+:::
+
+::: lang py
+
+```python
+rand_sentence(language="en", include_name=True, count=3)
+# ['Callum drinks the round rye.', 'Gavin crawls.', 'Veronica paints the plunger neatly.']
+
+rand_sentence(language="ko", include_name=True, count=3)
+# ['소한이 날아오른다.', '종현이 심벌즈를 판다.', '은영이 어슬렁댄다.']
+
+rand_sentence(language="es", include_name=True, count=3)
+# ['Hilario imagina la duda.', 'Adrián calienta la uva redonda.', 'Santiago rueda.']
+```
+
+:::
+
+**성 없는 이름 하나**입니다. 명사구가 아니라서 관사도 수식어도 붙지 않고, 한국어 조사는 다른 단어와 똑같이 이름의 마지막 글자를 보고 고릅니다(`소한이`, `은영이`). 뽑을 때 정해진 성별을 그대로 지니고 있어서 스페인어·이탈리아어·러시아어의 서술 형용사가 이름에 맞춰 굴절합니다. `Celeste è affamata` 옆에 `Ivano è raro`처럼요. 이름은 어느 단어 풀에도 없으니 생성기가 성별을 읽어 낼 곳이 달리 없고, 이것이 이름이 글자 말고 지녀야 할 유일한 정보입니다.
+
+**이름은 사람이 설 수 있는 자리에만 섭니다.** 이 옵션을 켜면 주어가 사람을 가리키는 테마로 좁혀져 문장에 이름을 둘 자리가 생깁니다. 직접 지정한 `theme`이 우선이고, 그때는 이름이 아예 쓰이지 않습니다.
+
+::: lang js
+
+```javascript
+randSentence({ language: 'en', theme: 'animal', includeName: true, count: 2 });
+// ['The wildebeest is lazy.', 'Yesterday, the moose stops.']
+```
+
+:::
+
+::: lang dart
+
+```dart
+randSentence(language: WordLanguage.en, theme: WordTheme.animal, includeName: true, count: 2);
+// [The wildebeest is lazy., Yesterday, the moose stops.]
+```
+
+:::
+
+::: lang py
+
+```python
+rand_sentence(language="en", theme="animal", include_name=True, count=2)
+# ['The wildebeest is lazy.', 'Yesterday, the moose stops.']
+```
+
+:::
+
+`SentenceDetail.names`는 결과에 쓰인 이름을 알려 줍니다. 주어가 이름이면 <Lang js="theme: null" dart="theme: null" py="theme=None" code />입니다. 이름은 어느 테마에도 속하지 않으니까요.
+
+::: warning 쓰든 쓰지 않든 22 KB가 늡니다 이 옵션은 사람 이름 풀에 손을 대는데, 동기 API에는 동적 import로 숨길 자리가 없습니다. 그래서 `randSentence`를 포함하는 번들은 이름 풀도 함께 포함합니다. esbuild로 `randSentence`만 번들하고 gzip한 결과는 **이전 122.5 KB, 이후 144.5 KB**로 `+22.0 KB`, `+18%`입니다. 문장 생성기는 이미 단어 풀 전체를 들고 있고 그것이 110 KB이며, 이름 풀은 그 옆의 22 KB입니다.
+
+이름을 쓸 일이 없고 크기가 중요하다면, 이 버전에서 할 수 있는 일은 `randSentence`를 가져오지 않는 것뿐입니다. :::
+
 ## 상세 출력 {#the-detail-output}
 
 `output: 'detail'`은 문자열 대신 각 문장을 이루는 요소를 알려줍니다. 순서대로의 구, 각 구가 하는 일, 언어, 그리고 주어의 테마입니다.
@@ -459,6 +546,7 @@ rand_sentence(language="ko", output="detail", count=1)
 | `sentences` | <Lang js="string[]" dart="List&lt;String&gt;" py="tuple[str, ...]" code /> | 문장마다 하나씩. `sentences`로 더 요청하지 않았다면 항목 하나입니다. |
 | `phrases` | <Lang js="string[]" dart="List&lt;String&gt;" py="tuple[str, ...]" code /> | 문장을 이루는 구를 순서대로. 조사는 빠져 있습니다. 모든 문장을 통틀어 한 줄로 이어집니다. |
 | `slots` | <Lang js="SentenceSlot[]" dart="List&lt;SentenceSlot&gt;" py="tuple[SentenceSlot, ...]" code /> | 각 구가 하는 일. `phrases`와 같은 인덱스입니다. |
+| `names` | <Lang js="string[]" dart="List&lt;String&gt;" py="tuple[str, ...]" code /> | 결과에 쓰인 사람 이름을 순서대로. `includeName`으로 요청하지 않았다면 비어 있습니다. |
 | `language` | `WordLanguage` | 이 문장을 만든 언어. |
 | `theme` | <Lang js="WordTheme &#124; null" dart="WordTheme?" py="WordTheme &#124; None" code /> | 주어의 테마. 첫 문장의 것이고, 나머지 문장이 계속 이야기하는 대상입니다. 생성기가 모르는 단어면 null입니다. |
 

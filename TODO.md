@@ -16,7 +16,7 @@ Everything here is about `randSentence`. It shipped in the vNext section of the 
 
 - [x] A. Length bounds are best-effort where they should be exact
 - [x] B. More than one sentence per result, and the sentences hold together
-- [ ] C. A person name where a sentence has room for one
+- [x] C. A person name where a sentence has room for one
 - [ ] D. Questions, exclamations and sentences that trail off
 - [ ] E. Dialogue and thought, in the language's own quotation marks
 - [ ] F. Politeness, which is mostly a Korean question
@@ -55,18 +55,23 @@ What landed, and what it turned out to cost:
 
 The demo page has the control, the length placeholders scale with it, and `tools/parity` compares `connectives`, `pronouns` and `pronounless` across all three packages.
 
-## C. A person name where a sentence has room for one
+## C. A person name where a sentence has room for one — done
 
-`randSentence({ includeName: true })` puts a generated person name in a noun phrase whose class is `person`, and writes the sentence without one when the shape it drew has no such phrase. Never forced: a name appears where a name can stand.
+`randSentence({ includeName: true })` writes a generated person's name where the sentence has room for one, and writes the sentence without one when it does not.
 
-- The name comes from `randName`'s generator in the same language — every word language is also a name language, so there is no gap to fill.
-- A name is a bare proper noun: no article, no modifier, and the particle Korean puts after it is chosen by `endsWithConsonant` the same way it is for any other word.
-- The name's gender is what a modifier and a predicate agree with in Spanish, Italian, Russian and German, so it has to be carried the way a noun's gender already is.
-- `SentenceDetail` should report which phrases are names, so a test can assert one appeared.
+What landed:
 
-**The cost, and it is real.** `lib/sentence` does not import `lib/name` today, so a caller who reaches only `randSentence` does not pay for the name pools. A static import makes them part of that reach whether `includeName` is passed or not, roughly doubling what the sentence generator pulls in. There is no dynamic import to hide behind in a synchronous API. Measure it before and after with the same method the 0.4 KB / 33 KB figures in `CLAUDE.md` came from, write the number down, and say so on the docs page.
+- **The option narrows the subject rather than forcing a phrase.** A name can only stand where a person could, so turning it on narrows the subject to the person-class themes — which is one line in `subjectThemesFor`, and everything downstream follows from it: the verb groups filter to the ones that take a person subject, and so do the shapes. A `theme` the caller named still wins, so `theme: 'animal'` with `includeName` is a sentence about a lion and carries no name.
+- **Only the subject.** No language's verb groups declare `person` as an object class and no frame puts a person in a place phrase, so an object or a place is never a person and biasing them would buy nothing. That is why the change is as small as it is.
+- **A bare given name**, not the full name `randName()` would give: a sentence about someone uses the name they are called by, and a surname in every clause reads like a roster. No article, no modifier, and Korean's particle chosen by `endsWithConsonant` on the name itself.
+- **The gender comes with it.** A name is in no pool, so `genderOf` has nothing to read; `properName` hands back the gender the name was drawn for, and only for a language whose words agree at all. `Celeste è affamata` beside `Ivano è raro`, and the three suites assert it against the given-name pools.
+- `startsWith` reaches the name too, through `randName`'s own `startsWith`.
+- `SentenceDetail.names`, and a named subject reports `theme: null` — a name belongs to no theme. `Topic` carries `named`, so a paragraph's `repeat` writes the name again rather than putting an article in front of it, and a name subject fixes the topic's class to `person` without a theme to derive it from.
 
-**It does not weaken the nickname rule.** A nickname is never built from a person name, and that stays true — this is a sentence, the caller asked for it, and it is off by default.
+**The cost, measured.** Bundling only `randSentence` with esbuild and gzipping, the way `CLAUDE.md`'s 0.4 KB / 33 KB figures were: **122.5 KB before, 144.5 KB after — +22.0 KB, +18%**, paid by every caller of `randSentence` whether they pass the option or not.
+
+The plan guessed this would roughly double what the generator pulls in. **It does not, and the guess was wrong for an interesting reason**: the sentence generator already carries the whole word pools, which is 110 KB of the 122.5, and the name pools are 22 KB beside them. What doubles is a bundle that reaches `randName` alone (22.3 KB); a bundle that already reaches a sentence barely notices. The number is written down on the docs page, in an admonition rather than a footnote, because it is the kind of thing a reader finds out too late.
+
 
 ## D. Questions, exclamations and sentences that trail off
 
