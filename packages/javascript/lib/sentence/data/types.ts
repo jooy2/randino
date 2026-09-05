@@ -35,21 +35,38 @@ export type NounClass =
 
 /**
  * A form a predicate takes beside the one a plain statement ends on. `question`
- * is Korean `달리니` beside `달린다`, and English `run` beside `runs`; `polite`
- * is `달립니다`, and `politeQuestion` `달립니까`.
+ * is Korean `달리니` beside `달린다` and English `run` beside `runs`;
+ * `exclamation` is `달리는구나`, `casual` `달려`, `polite` `달려요` and `formal`
+ * `달립니다`.
  *
  * A form rather than another pool: the same verbs, said differently. Every form
  * pool is index-aligned with `words`, so a verb keeps its meaning across them and
  * a word the caller required can be translated into the form the sentence needs.
  *
- * A group declares only what its language actually writes, and the lookup falls
- * back along `politeQuestion` → `polite` → `question` → `words`. That is why
- * Japanese declares `polite` alone: `走ります` is its polite question too, because
- * the `か` that asks is the frame's tag rather than part of the verb.
+ * A group declares only what its language actually writes, and each level falls
+ * back along its own chain to the plain statement the `words` already are. That
+ * is why Japanese declares `polite` alone: `走ります` is its formal form and its
+ * polite question too, because the `か` that asks is the frame's tag rather than
+ * part of the verb.
  */
-export type PredicateForm = 'question' | 'polite' | 'politeQuestion';
+export type PredicateForm =
+	'question' | 'exclamation' | 'casual' | 'polite' | 'formal' | 'formalQuestion';
 
-/** The forms a group declares, beside the plain statement its `words` are in. */
+/**
+ * The forms a group declares, beside the plain statement its `words` are in.
+ * Every one of them is index-aligned with `words`.
+ *
+ * `casual` and `polite` carry no mood of their own because in Korean they have
+ * none: `달려` is the statement, the question and the exclamation, and only the
+ * mark after it differs. `formal` is the level that does move for a question,
+ * which is why it is the only one with a `formalQuestion` beside it.
+ *
+ * An entry may write more than one ending with `|` between them, and one of
+ * them is drawn. That is what keeps a pool index-aligned with `words` while
+ * `달리니|달리나|달리는가` is still one entry for one verb — a Korean question
+ * has several endings and a generator that only ever wrote the first would
+ * close every sentence the same way.
+ */
 export type PredicateForms = Partial<Record<PredicateForm, WordPool>>;
 
 /**

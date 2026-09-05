@@ -54,27 +54,43 @@ enum NounClass {
 /// A form a predicate takes beside the one a plain statement ends on.
 ///
 /// `question` is Korean `달리니` beside `달린다`, and English `run` beside
-/// `runs`; `polite` is `달립니다`, and `politeQuestion` `달립니까`. A form rather
-/// than another pool: the same verbs, said differently. Every form pool is
-/// index-aligned with `words`, so a verb keeps its meaning across them and a
+/// `runs`; `casual` is `달려`, `polite` `달려요` and `formal` `달립니다`. A form
+/// rather than another pool: the same verbs, said differently. Every form pool
+/// is index-aligned with `words`, so a verb keeps its meaning across them and a
 /// word the caller required can be translated into the form the sentence needs.
 ///
-/// A group declares only what its language actually writes, and the lookup falls
-/// back along `politeQuestion` → `polite` → `question` → `words`. That is why
-/// Japanese declares `polite` alone: `走ります` is its polite question too,
-/// because the `か` that asks is the frame's tag rather than part of the verb.
+/// A group declares only what its language actually writes, and each level
+/// falls back along its own chain to the plain statement the `words` already
+/// are. That is why Japanese declares `polite` alone: `走ります` is its polite
+/// question too, because the `か` that asks is the frame's tag rather than part
+/// of the verb, and it is its formal form as well.
 enum PredicateForm {
-  /// The form a question ends on.
+  /// The form a 해라체 question ends on.
   question,
 
-  /// The form a sentence takes when it is spoken to somebody.
+  /// The form a 해라체 exclamation ends on: `달리는구나`, `달리네`.
+  exclamation,
+
+  /// 해체, which serves every mood at once: `달려` asks and tells alike.
+  casual,
+
+  /// 해요체, which likewise serves every mood: `달려요`.
   polite,
 
-  /// Both at once, where the language writes something different again.
-  politeQuestion,
+  /// 합쇼체, the one level that does move for a question: `달립니다`.
+  formal,
+
+  /// What 합쇼체 moves to: `달립니까`.
+  formalQuestion,
 }
 
 /// The forms a group declares, beside the plain statement its `words` are in.
+///
+/// An entry may write more than one ending with `|` between them, and one of
+/// them is drawn. That is what keeps a pool index-aligned with `words` while
+/// `달리니|달리나|달리는가` is still one entry for one verb — a Korean question
+/// has several endings and a generator that only ever wrote the first would
+/// close every sentence the same way.
 typedef PredicateForms = Map<PredicateForm, WordPool>;
 
 /// Verbs that take the same arguments.

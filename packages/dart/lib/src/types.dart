@@ -392,16 +392,28 @@ enum SentenceQuote {
 
 /// How a sentence addresses whoever is reading it.
 ///
-/// Korean and Japanese are the whole of it. Spanish, Italian, German and Russian
-/// have a T–V distinction, but it lives in the second person and every sentence
-/// here is third; English has no such form at all. In those five,
-/// [SentenceStyle.polite] writes exactly what [SentenceStyle.plain] does.
+/// Four levels, which is what a Korean speech level actually is. Korean has all
+/// four; Japanese has two and maps onto them, [SentenceStyle.casual] being its
+/// plain form and [SentenceStyle.polite] and [SentenceStyle.formal] both
+/// `走ります`. Spanish, Italian, German and Russian have a T–V distinction, but
+/// it lives in the second person and every sentence here is third; English has
+/// no such form at all. In those seven all four levels write the same sentence.
 enum SentenceStyle {
   /// The form a written statement takes: `사자가 달린다`, `猫が走る`.
+  ///
+  /// Nobody is being addressed; it is the voice of a book.
   plain,
 
-  /// The form you would use speaking to somebody: `사자가 달립니다`, `猫が走ります`.
+  /// The form you use with someone you are close to: `사자가 달려`.
+  casual,
+
+  /// The same closeness, said politely: `사자가 달려요`.
+  ///
+  /// The warmest of the four, and the one most spoken Korean is in.
   polite,
+
+  /// Polite and at a distance: `사자가 달립니다`, `猫が走ります`.
+  formal,
 }
 
 /// A generated sentence with the pieces it was built from.

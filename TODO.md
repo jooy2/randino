@@ -43,22 +43,42 @@ have made every counted phrase in them reserve a character it never writes.
 Every plain question ends `~니?` and every polite one `~ㅂ니까?`; an exclamation
 is a statement with `!` after it. Korean does not work that way.
 
-- [ ] `SentenceStyle` becomes four levels rather than two: `plain` (해라체),
+- [x] `SentenceStyle` becomes four levels rather than two: `plain` (해라체),
       `casual` (해체), `polite` (해요체), `formal` (합쇼체). The old `'polite'`
       meant 합쇼체 and becomes `formal`.
-- [ ] A form pool entry may list alternatives with `|`, one of which is drawn.
+- [x] A form pool entry may list alternatives with `|`, one of which is drawn.
       That keeps `forms` index-aligned with `words` — which is what lets a
       required word be translated by position — while `달리니|달리나|달리는가`
       is still one entry for one verb.
-- [ ] Korean writes the levels it actually has, per mood: question endings
+- [x] Korean writes the levels it actually has, per mood: question endings
       beyond `~니?`, and an exclamation ending of its own (`~구나!`, `~네!`,
       `~군!`) rather than a statement with a mark.
-- [ ] Japanese maps its two forms onto the four levels; the other seven declare
+- [x] Japanese maps its two forms onto the four levels; the other seven declare
       nothing and every level gives the same sentence back, the way `polite`
       already behaves there.
-- [ ] Dialogue and thought stop being a quoted statement. A line somebody says
+- [x] Dialogue and thought stop being a quoted statement. A line somebody says
       is drawn at a spoken level, a thought at the levels a person thinks in,
       with the endings that go with them.
+
+What it cost, and what came out of it:
+
+- **Six form keys, not the twelve a level-by-mood matrix would need.** 해체 and
+  해요체 have no separate question or exclamation — `달려` asks and tells alike
+  — so each of them is one pool. That, and the `|` alternatives, is what kept
+  Korean to three new pools per group rather than nine: 147 predicates written
+  out four more ways, against 147 × 9 if every mood needed its own.
+- **The random default for `style` landed here rather than in C**, because
+  `styleFor` has to answer "what level is this line" for a dialogue line whether
+  or not the caller named one. Splitting it would have meant writing the same
+  decision twice.
+- Nine tests across each suite assumed two levels. The ones that pin a form now
+  pin a level with it, and the ones that only wanted "is this a predicate at all"
+  read every form of the group. The 해라체 and 해체 halves of the level test are
+  asserted by what they never write (a polite ending) rather than by a pattern
+  over their endings, which would only have restated the pool.
+- A first pass had `아름답니?` and `작니?`. An adjective takes `-(으)니`, so the
+  ㅂ-irregular stems soften (`아름다우니`) and the other consonant-final ones take
+  the `으` (`작으니`). Nineteen entries fixed before the data was generated.
 
 ## C. Random is the default
 

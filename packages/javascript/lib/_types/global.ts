@@ -358,18 +358,22 @@ export type SentenceType =
 export type SentenceQuote = 'double' | 'single';
 
 /**
- * How a sentence addresses whoever is reading it:
+ * How a sentence addresses whoever is reading it. Four levels, coldest to
+ * warmest in the middle two, which is what a Korean speech level actually is:
  * - `plain`: the form a written statement takes (`사자가 달린다`, `猫が走る`).
- *   The default, and what every sentence here has been until now.
- * - `polite`: the form you would use speaking to somebody (`사자가 달립니다`,
- *   `猫が走ります`).
+ *   Nobody is being addressed; it is the voice of a book.
+ * - `casual`: the form you use with someone you are close to (`사자가 달려`).
+ * - `polite`: the same closeness, said politely (`사자가 달려요`). The warmest of
+ *   the four, and the one most spoken Korean is in.
+ * - `formal`: polite and at a distance (`사자가 달립니다`, `猫が走ります`).
  *
- * Korean and Japanese are the whole of it. Spanish, Italian, German and Russian
- * have a T–V distinction, but it lives in the second person and every sentence
- * here is third; English has no such form at all. In those five, `polite` writes
- * exactly what `plain` does.
+ * Korean has all four. Japanese has two and maps onto them: `casual` is its
+ * plain form and `polite` and `formal` are both `走ります`. Spanish, Italian,
+ * German and Russian have a T–V distinction, but it lives in the second person
+ * and every sentence here is third; English has no such form at all. In those
+ * seven all four levels write exactly the same sentence.
  */
-export type SentenceStyle = 'plain' | 'polite';
+export type SentenceStyle = 'plain' | 'casual' | 'polite' | 'formal';
 
 /**
  * Which of them a result may be. An array is a set to draw from, decided per
@@ -428,12 +432,14 @@ export interface RandSentenceOptions extends RandCommonOptions {
 	 */
 	quote?: SentenceQuote;
 	/**
-	 * How the sentence addresses its reader. Default `'plain'`.
+	 * How the sentence addresses its reader. Drawn per result when left out, so
+	 * that two calls are not the same voice twice.
 	 *
 	 * Korean and Japanese are the two languages this changes: `달린다` becomes
-	 * `달립니다` and `走る` becomes `走ります`, question included (`달립니까?`).
-	 * The other seven write the same sentence either way, which is what their
-	 * grammar actually does with politeness in the third person.
+	 * `달려`, `달려요` or `달립니다`, question and exclamation included (`달려요?`,
+	 * `달리는구나!`). The other seven write the same sentence at every level,
+	 * which is what their grammar actually does with politeness in the third
+	 * person.
 	 */
 	style?: SentenceStyle;
 	/**

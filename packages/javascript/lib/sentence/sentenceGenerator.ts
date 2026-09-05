@@ -64,6 +64,7 @@ import { nameLengthRange } from '../name/nameLengthRange.js';
 import { SENTENCE_DATA, THEME_CLASS } from './data/index.js';
 import type {
 	NounClass,
+	PredicateForm,
 	SentenceFrame,
 	SentenceMark,
 	SentenceMood,
@@ -197,13 +198,42 @@ type Settings = {
 	types: readonly SentenceType[];
 	// Which marks a quoted line takes, or undefined for the type's own default.
 	quote?: SentenceQuote;
-	// How the sentences address their reader.
-	style: SentenceStyle;
+	// How the sentences address their reader, or null when the caller left it to
+	// the generator.
+	style: SentenceStyle | null;
 };
 
 // The kinds a quoted line can be. Somebody speaking is as often asking as
 // telling, and often enough neither, so the mark is drawn rather than fixed.
 const QUOTED_MARKS: readonly SentenceMark[] = ['statement', 'question', 'exclamation'];
+
+// Every level, in the order they run from the voice of a book to the one most
+// spoken Korean is in.
+const STYLES: readonly SentenceStyle[] = ['plain', 'casual', 'polite', 'formal'];
+
+// A line somebody says out loud is never 해라체 — that is the voice of a book,
+// not of a person with a listener in front of them. A thought is the other way
+// round: it is addressed to nobody, so it is never polite.
+const SPOKEN_LEVELS: readonly SentenceStyle[] = ['casual', 'polite', 'formal'];
+const THOUGHT_LEVELS: readonly SentenceStyle[] = ['plain', 'casual'];
+
+/**
+ * The level one line is said at. A level the caller named is used for every
+ * line, quoted or not; without one, the result has a voice of its own and only
+ * a quoted line steps outside it, because what a person says is not written the
+ * way the sentence around it is.
+ */
+function styleFor(type: SentenceType, asked: SentenceStyle | null, voice: SentenceStyle) {
+	if (asked) {
+		return asked;
+	}
+
+	if (type === 'dialogue') {
+		return pick(SPOKEN_LEVELS);
+	}
+
+	return type === 'thought' ? pick(THOUGHT_LEVELS) : voice;
+}
 
 /**
  * The kind whose mark a sentence of this type closes on. Dialogue and thought
@@ -246,6 +276,8 @@ type Draw = {
 	quote: readonly [string, string] | null;
 	/** A connective or an interjection, `''` for neither. */
 	opener: string;
+	/** The level this line is said at, which a quoted one does not share. */
+	style: SentenceStyle;
 	follow: Follow | null;
 };
 
@@ -705,8 +737,15 @@ function slotBounds(language: WordLanguage): Record<string, readonly [number, nu
 		modifier: span(genders.map((gender) => agreedModifiers(language, gender))),
 		// Every form a predicate can take, not only the plain statement's: a question
 		// form is a different length, and the shape is chosen against these.
-		verb: span(data.verbs.flatMap((group) => [group.words, ...Object.values(group.forms ?? {})])),
-		state: span(data.states.flatMap((group) => [group.words, ...Object.values(group.forms ?? {})])),
+		verb: span(
+			data.verbs.flatMap((group) => [group.words, ...Object.values(group.forms ?? {}).map(endings)])
+		),
+		state: span(
+			data.states.flatMap((group) => [
+				group.words,
+				...Object.values(group.forms ?? {}).map(endings)
+			])
+		),
 		manner: span([data.manners]),
 		time: span([data.times]),
 		money: moneySpan(data)
@@ -1361,7 +1400,7 @@ function compose(
 	// The same predicates, in the form this type of sentence ends on. Index-aligned
 	// with `group.words`, which is what lets a required word be translated rather
 	// than written out in the wrong form.
-	const predicates = formOf(group, draw.mark, settings.style);
+	const predicates = formOf(group, draw.mark, draw.style);
 	const subjectThemes = themesForClasses(themes, group.subject);
 	const subjectRequired = requiredAt(frame, plan, 'subject');
 	// A theme the caller named is honoured even when no verb group of the language
@@ -1678,25 +1717,74 @@ function predicateFor(
 /**
  * The predicates of a group, in the form this sentence ends on.
  *
- * The chain is `politeQuestion` → `polite` → `question` → `words`, so a group
- * declares only what its language actually writes. Japanese declares `polite`
- * alone and it serves the question too, because the `か` that asks is the frame's
- * tag rather than part of the verb; Korean declares both, because `달립니까`
- * is not `달립니다`.
+ * Each level falls back along its own chain to the plain statement the `words`
+ * already are, so a group declares only what its language actually writes.
+ * Japanese declares `polite` alone and it serves the formal level and the
+ * question too, because the `か` that asks is the frame's tag rather than part
+ * of the verb.
  */
+/**
+ * Which form a level writes for each mood, best first, falling through to the
+ * plain statement the group's `words` already are.
+ *
+ * A level a language does not declare costs nothing: every chain ends where it
+ * started, which is why seven of the nine write the same sentence whatever the
+ * caller asks for. `trailing` is a statement that stops early, so it ends on the
+ * statement's form.
+ */
+const FORM_CHAIN: Record<SentenceStyle, Record<SentenceMark, readonly PredicateForm[]>> = {
+	plain: {
+		statement: [],
+		trailing: [],
+		question: ['question'],
+		exclamation: ['exclamation']
+	},
+	casual: {
+		statement: ['casual'],
+		trailing: ['casual'],
+		question: ['casual', 'question'],
+		exclamation: ['casual', 'exclamation']
+	},
+	polite: {
+		statement: ['polite'],
+		trailing: ['polite'],
+		question: ['polite', 'question'],
+		exclamation: ['polite', 'exclamation']
+	},
+	formal: {
+		statement: ['formal', 'polite'],
+		trailing: ['formal', 'polite'],
+		question: ['formalQuestion', 'formal', 'polite', 'question'],
+		exclamation: ['formal', 'polite', 'exclamation']
+	}
+};
+
+/**
+ * One of the endings a form pool entry lists. `달리니|달리나|달리는가` is one
+ * verb written three ways, and a sentence takes one of them; an entry with no
+ * `|` in it is itself.
+ */
+function oneOf(entry: string): string {
+	return entry.includes('|') ? pick(entry.split('|')) : entry;
+}
+
+/** Every ending an entry lists, which is what a length budget has to span. */
+function endings(pool: WordPool): WordPool {
+	return pool.flatMap((entry) => (entry.includes('|') ? entry.split('|') : [entry]));
+}
+
 function formOf(group: StateGroup | VerbGroup, mark: SentenceMark, style: SentenceStyle): WordPool {
 	const forms = group.forms;
-	const asking = mark === 'question';
 
-	if (style === 'polite') {
-		const polite = asking ? (forms?.politeQuestion ?? forms?.polite) : forms?.polite;
+	for (const key of FORM_CHAIN[style][mark]) {
+		const pool = forms?.[key];
 
-		if (polite) {
-			return polite;
+		if (pool) {
+			return pool.map(oneOf);
 		}
 	}
 
-	return (asking ? forms?.question : undefined) ?? group.words;
+	return group.words;
 }
 
 function upper(word: string): string {
@@ -1868,6 +1956,10 @@ function generateResult(language: WordLanguage, settings: Settings): Built[] {
 	const budgets = shareOut(min, max, settings.sentences, data.space.length);
 	const built: Built[] = [];
 	let topic: Topic | null = null;
+	// The result's own voice, settled once. A caller who named a level gets that
+	// one throughout; one who did not gets a paragraph that is at least consistent
+	// with itself, rather than a level rerolled every sentence.
+	const voice = settings.style ?? pick(STYLES);
 
 	for (let i = 0; i < settings.sentences; i += 1) {
 		const budget = budgets[i];
@@ -1880,6 +1972,7 @@ function generateResult(language: WordLanguage, settings: Settings): Built[] {
 			mark,
 			quote: quoteFor(data, type, settings.quote),
 			opener: openerFor(data, mark, follow !== null, budget[1], shortest),
+			style: styleFor(type, settings.style, voice),
 			follow
 		};
 		let one = generateOne(language, settings, draw);
@@ -1975,7 +2068,7 @@ function resolveSettings(options: RandSentenceOptions): Settings {
 		includeName: options.includeName ?? false,
 		types: resolveTypes(options.type),
 		quote: options.quote,
-		style: options.style === 'polite' ? 'polite' : 'plain'
+		style: STYLES.includes(options.style as SentenceStyle) ? (options.style as SentenceStyle) : null
 	};
 }
 

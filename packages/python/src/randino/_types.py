@@ -216,15 +216,20 @@ are not shapes at all: what is quoted is a sentence of one of the other kinds, d
 line, because somebody speaking is as often asking as telling.
 """
 
-SentenceStyle = Literal["plain", "polite"]
+SentenceStyle = Literal["plain", "casual", "polite", "formal"]
 """How a sentence addresses whoever is reading it.
 
-`"plain"` is the form a written statement takes (`사자가 달린다`, `猫が走る`) and the
-default; `"polite"` is the form you would use speaking to somebody (`사자가 달립니다`,
-`猫が走ります`). Korean and Japanese are the whole of it. Spanish, Italian, German and
-Russian have a T–V distinction, but it lives in the second person and every sentence
-here is third; English has no such form at all. In those five, `"polite"` writes exactly
-what `"plain"` does.
+Four levels, which is what a Korean speech level actually is. `"plain"` is the form a
+written statement takes (`사자가 달린다`, `猫が走る`), addressed to nobody; `"casual"`
+is what you say to someone you are close to (`사자가 달려`); `"polite"` is the same
+closeness said politely (`사자가 달려요`), the warmest of the four; `"formal"` is polite
+and at a distance (`사자가 달립니다`, `猫が走ります`).
+
+Korean has all four. Japanese has two and maps onto them, `"casual"` being its plain
+form and `"polite"` and `"formal"` both `走ります`. Spanish, Italian, German and Russian
+have a T–V distinction, but it lives in the second person and every sentence here is
+third; English has no such form at all. In those seven all four levels write exactly the
+same sentence.
 """
 
 SentenceQuote = Literal["double", "single"]

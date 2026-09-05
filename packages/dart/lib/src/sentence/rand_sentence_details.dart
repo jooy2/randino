@@ -36,9 +36,11 @@ import 'package:randino/src/types.dart';
 /// written in. Left out, dialogue takes the language's first-level marks and
 /// thought its second-level ones.
 ///
-/// [style] says how the sentence addresses its reader. Korean and Japanese are
-/// the two languages this changes — `달린다` becomes `달립니다` and `走る`
-/// becomes `走ります` — and the other seven write the same sentence either way.
+/// [style] is the speech level the sentence is written at, drawn per result when
+/// left out so that two calls are not the same voice twice. Korean and Japanese
+/// are the two languages this changes — `달린다` becomes `달려`, `달려요` or
+/// `달립니다`, question and exclamation included — and the other seven write the
+/// same sentence at every level.
 ///
 /// ```dart
 /// randSentenceDetails(language: WordLanguage.ko);
@@ -60,7 +62,7 @@ List<SentenceDetail> randSentenceDetails({
   bool includeName = false,
   Set<SentenceType>? type,
   SentenceQuote? quote,
-  SentenceStyle style = SentenceStyle.plain,
+  SentenceStyle? style,
 }) => generateSentenceDetails(
   language: language,
   theme: theme,

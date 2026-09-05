@@ -41,14 +41,88 @@ List<String> inflected(WordLanguage language, List<String> pool) {
 }
 
 /// Every word the language may put in a phrase of [slot].
+/// The form keys a level reaches for.
+///
+/// `question` and `exclamation` are 해라체's own and say nothing about whether a
+/// language has levels at all — English declares `question` and has none.
+const List<PredicateForm> styleForms = <PredicateForm>[
+  PredicateForm.casual,
+  PredicateForm.polite,
+  PredicateForm.formal,
+  PredicateForm.formalQuestion,
+];
+
+/// Which form a level writes for each mood, best first.
+///
+/// The generator's own chain, written out again here so a change to it has to be
+/// made twice rather than agreeing with itself by construction.
+const Map<SentenceStyle, Map<SentenceType, List<PredicateForm>>> formChain =
+    <SentenceStyle, Map<SentenceType, List<PredicateForm>>>{
+      SentenceStyle.plain: <SentenceType, List<PredicateForm>>{
+        SentenceType.statement: <PredicateForm>[],
+        SentenceType.trailing: <PredicateForm>[],
+        SentenceType.question: <PredicateForm>[PredicateForm.question],
+        SentenceType.exclamation: <PredicateForm>[PredicateForm.exclamation],
+      },
+      SentenceStyle.casual: <SentenceType, List<PredicateForm>>{
+        SentenceType.statement: <PredicateForm>[PredicateForm.casual],
+        SentenceType.trailing: <PredicateForm>[PredicateForm.casual],
+        SentenceType.question: <PredicateForm>[PredicateForm.casual, PredicateForm.question],
+        SentenceType.exclamation: <PredicateForm>[PredicateForm.casual, PredicateForm.exclamation],
+      },
+      SentenceStyle.polite: <SentenceType, List<PredicateForm>>{
+        SentenceType.statement: <PredicateForm>[PredicateForm.polite],
+        SentenceType.trailing: <PredicateForm>[PredicateForm.polite],
+        SentenceType.question: <PredicateForm>[PredicateForm.polite, PredicateForm.question],
+        SentenceType.exclamation: <PredicateForm>[PredicateForm.polite, PredicateForm.exclamation],
+      },
+      SentenceStyle.formal: <SentenceType, List<PredicateForm>>{
+        SentenceType.statement: <PredicateForm>[PredicateForm.formal, PredicateForm.polite],
+        SentenceType.trailing: <PredicateForm>[PredicateForm.formal, PredicateForm.polite],
+        SentenceType.question: <PredicateForm>[
+          PredicateForm.formalQuestion,
+          PredicateForm.formal,
+          PredicateForm.polite,
+          PredicateForm.question,
+        ],
+        SentenceType.exclamation: <PredicateForm>[
+          PredicateForm.formal,
+          PredicateForm.polite,
+          PredicateForm.exclamation,
+        ],
+      },
+    };
+
+/// Every ending an entry lists: `달리니|달리나` is one entry and two endings.
+List<String> endings(WordPool pool) => <String>[for (final entry in pool) ...entry.split('|')];
+
+/// The predicates one group can write at one level and mood.
+List<String> formsOf(WordPool words, PredicateForms forms, SentenceStyle style, SentenceType mark) {
+  for (final key in formChain[style]![mark]!) {
+    final pool = forms[key];
+
+    if (pool != null) return endings(pool);
+  }
+
+  return words.toList(growable: false);
+}
+
+/// Every predicate a group can write at any level and any mood.
+List<String> everyForm(WordPool words, PredicateForms forms) => <String>[
+  ...words,
+  for (final pool in forms.values) ...endings(pool),
+];
+
 Set<String> poolFor(WordLanguage language, SentenceSlot slot) {
   final data = sentenceData[language]!;
 
   switch (slot) {
     case SentenceSlot.verb:
-      return <String>{for (final group in data.verbs) ...group.words};
+      return <String>{for (final group in data.verbs) ...everyForm(group.words, group.forms)};
     case SentenceSlot.state:
-      final states = <String>[for (final group in data.states) ...group.words];
+      final states = <String>[
+        for (final group in data.states) ...everyForm(group.words, group.forms),
+      ];
 
       return (data.predicateAgrees ? inflected(language, states) : states).toSet();
     case SentenceSlot.manner:
@@ -463,7 +537,8 @@ void main() {
           // one of its groups accounts for it.
           final groups = data.verbs.where(
             (group) =>
-                group.words.contains(detail.phrases[at]) && (group.object != null) == transitive,
+                everyForm(group.words, group.forms).contains(detail.phrases[at]) &&
+                (group.object != null) == transitive,
           );
 
           expect(groups, isNotEmpty, reason: '$language: ${detail.sentence}');
@@ -1233,7 +1308,7 @@ void main() {
         // English do-support, and the base form behind it.
         WordLanguage.en: RegExp(r'^(Does|Is) '),
         // Korean changes the ending on the predicate itself.
-        WordLanguage.ko: RegExp(r'니\?$'),
+        WordLanguage.ko: RegExp(r'(니|나|가)\?$'),
         // A tag Japanese, Chinese and Vietnamese write after the whole clause.
         WordLanguage.ja: RegExp(r'か？$'),
         WordLanguage.zh: RegExp(r'吗？$'),
@@ -1244,6 +1319,7 @@ void main() {
         for (final sentence in randSentence(
           language: language,
           type: <SentenceType>{SentenceType.question},
+          style: SentenceStyle.plain,
           count: sample,
         )) {
           expect(sentence, matches(shape), reason: '$language: $sentence');
@@ -1257,6 +1333,7 @@ void main() {
       for (final sentence in randSentence(
         language: WordLanguage.de,
         type: <SentenceType>{SentenceType.question},
+        style: SentenceStyle.plain,
         count: sample,
       )) {
         final first = sentence.split(' ').first.toLowerCase();
@@ -1295,10 +1372,12 @@ void main() {
       for (final language in wordLanguages) {
         final data = sentenceData[language]!;
         final verbForms = <String>[
-          for (final group in data.verbs) ...(group.forms[PredicateForm.question] ?? group.words),
+          for (final group in data.verbs)
+            ...formsOf(group.words, group.forms, SentenceStyle.plain, SentenceType.question),
         ];
         final stateForms = <String>[
-          for (final group in data.states) ...(group.forms[PredicateForm.question] ?? group.words),
+          for (final group in data.states)
+            ...formsOf(group.words, group.forms, SentenceStyle.plain, SentenceType.question),
         ];
         final expected = <SentenceSlot, Set<String>>{
           SentenceSlot.verb: verbForms.toSet(),
@@ -1311,6 +1390,7 @@ void main() {
         for (final detail in randSentenceDetails(
           language: language,
           type: <SentenceType>{SentenceType.question},
+          style: SentenceStyle.plain,
           count: 120,
         )) {
           for (var i = 0; i < detail.phrases.length; i += 1) {
@@ -1336,20 +1416,31 @@ void main() {
     test('`include` puts a required predicate in the form the type asks for', () {
       // The pools are index-aligned so that a word named in the statement form
       // can be said the other way rather than written out wrong.
-      for (final sentence in randSentence(
-        language: WordLanguage.ko,
-        include: <String>['달린다'],
-        type: <SentenceType>{SentenceType.question},
-        count: 30,
-      )) {
-        expect(sentence, contains('달리니'), reason: sentence);
-        expect(sentence.contains('달린다'), isFalse, reason: sentence);
+      const written = <SentenceStyle, List<String>>{
+        SentenceStyle.plain: <String>['달리니', '달리나', '달리는가'],
+        SentenceStyle.casual: <String>['달려', '달리지'],
+        SentenceStyle.polite: <String>['달려요', '달리죠'],
+        SentenceStyle.formal: <String>['달립니까'],
+      };
+
+      for (final entry in written.entries) {
+        for (final sentence in randSentence(
+          language: WordLanguage.ko,
+          include: <String>['달린다'],
+          type: <SentenceType>{SentenceType.question},
+          style: entry.key,
+          count: 30,
+        )) {
+          expect(entry.value.any(sentence.contains), isTrue, reason: '${entry.key}: $sentence');
+          expect(sentence.contains('달린다'), isFalse, reason: sentence);
+        }
       }
 
       for (final sentence in randSentence(
         language: WordLanguage.en,
         include: <String>['runs'],
         type: <SentenceType>{SentenceType.question},
+        style: SentenceStyle.plain,
         count: 30,
       )) {
         expect(sentence, matches(RegExp(r'\brun\b')), reason: sentence);
@@ -1412,13 +1503,26 @@ void main() {
       }
     });
 
-    test('`style` is what Korean and Japanese do with politeness', () {
-      // The two languages this changes, and the seven it does not. Plain and
-      // polite are two forms of the same predicate, so a polite sentence is the
-      // plain one said to somebody rather than a different sentence.
-      final polite = <WordLanguage, RegExp>{
-        WordLanguage.ko: RegExp(r'(니다|니까)[.?!…”’]$'),
+    test('`style` is the speech level, and Korean is the language with four of them', () {
+      // What each level closes on, where a mark is what the level actually is.
+      // 해라체 and 해체 are left out on purpose: 해체 is the stem with `-아/-어`
+      // contracted onto it, so a pattern over its endings would only restate the
+      // pool, and the test below reads the pools themselves. What is worth
+      // asserting about those two is the other half — that neither ever closes
+      // on a polite ending.
+      final closes = <WordLanguage, Map<SentenceStyle, RegExp>>{
+        WordLanguage.ko: <SentenceStyle, RegExp>{
+          SentenceStyle.polite: RegExp(r'(요|죠)[.?!…”’]$'),
+          SentenceStyle.formal: RegExp(r'(니다|니까)[.?!…”’]$'),
+        },
         // A Japanese verb closes on ます and an adjective on です.
+        WordLanguage.ja: <SentenceStyle, RegExp>{
+          SentenceStyle.polite: RegExp(r'(ます|です)か?[。？！…」』]$'),
+          SentenceStyle.formal: RegExp(r'(ます|です)か?[。？！…」』]$'),
+        },
+      };
+      final addressed = <WordLanguage, RegExp>{
+        WordLanguage.ko: RegExp(r'(요|죠|니다|니까)[.?!…”’]$'),
         WordLanguage.ja: RegExp(r'(ます|です)か?[。？！…」』]$'),
       };
 
@@ -1427,68 +1531,75 @@ void main() {
         final declares = <PredicateForms>[
           for (final group in data.verbs) group.forms,
           for (final group in data.states) group.forms,
-        ].any((forms) => forms.containsKey(PredicateForm.polite));
+        ].any((forms) => styleForms.any(forms.containsKey));
 
         expect(
           declares,
-          polite.containsKey(language),
-          reason: '$language ${declares ? 'declares' : 'declares no'} polite forms',
+          closes.containsKey(language),
+          reason: '$language ${declares ? 'declares' : 'declares no'} forms for a level',
         );
 
-        for (final type in <SentenceType>[SentenceType.statement, SentenceType.question]) {
-          for (final sentence in randSentence(
-            language: language,
-            type: <SentenceType>{type},
-            style: SentenceStyle.polite,
-            count: sample,
-          )) {
-            if (polite.containsKey(language)) {
-              expect(sentence, matches(polite[language]!), reason: '$language $type: $sentence');
+        for (final style in SentenceStyle.values) {
+          for (final type in <SentenceType>[SentenceType.statement, SentenceType.question]) {
+            for (final sentence in randSentence(
+              language: language,
+              type: <SentenceType>{type},
+              style: style,
+              count: sample,
+            )) {
+              final pattern = closes[language]?[style];
+
+              if (pattern != null) {
+                expect(sentence, matches(pattern), reason: '$language $style $type: $sentence');
+              } else if (addressed.containsKey(language)) {
+                expect(
+                  addressed[language]!.hasMatch(sentence),
+                  isFalse,
+                  reason: '$language $style $type addresses somebody: $sentence',
+                );
+              }
             }
           }
         }
       }
     });
 
-    test('a polite predicate comes out of the polite pools', () {
+    test('a predicate comes out of the pool its level and its mood land on', () {
       for (final language in <WordLanguage>[WordLanguage.ko, WordLanguage.ja]) {
         final data = sentenceData[language]!;
 
-        for (final type in <SentenceType>[SentenceType.statement, SentenceType.question]) {
-          final asking = type == SentenceType.question;
+        for (final style in SentenceStyle.values) {
+          for (final type in <SentenceType>[
+            SentenceType.statement,
+            SentenceType.question,
+            SentenceType.exclamation,
+          ]) {
+            final pools = <SentenceSlot, Set<String>>{
+              SentenceSlot.verb: <String>{
+                for (final group in data.verbs) ...formsOf(group.words, group.forms, style, type),
+              },
+              SentenceSlot.state: <String>{
+                for (final group in data.states) ...formsOf(group.words, group.forms, style, type),
+              },
+            };
 
-          List<String> asked(WordPool words, PredicateForms forms) => <String>[
-            ...(asking
-                    ? (forms[PredicateForm.politeQuestion] ?? forms[PredicateForm.polite])
-                    : forms[PredicateForm.polite]) ??
-                words,
-          ];
+            for (final detail in randSentenceDetails(
+              language: language,
+              type: <SentenceType>{type},
+              style: style,
+              count: 60,
+            )) {
+              for (var i = 0; i < detail.phrases.length; i += 1) {
+                final slot = detail.slots[i];
 
-          final pools = <SentenceSlot, Set<String>>{
-            SentenceSlot.verb: <String>{
-              for (final group in data.verbs) ...asked(group.words, group.forms),
-            },
-            SentenceSlot.state: <String>{
-              for (final group in data.states) ...asked(group.words, group.forms),
-            },
-          };
+                if (slot != SentenceSlot.verb && slot != SentenceSlot.state) continue;
 
-          for (final detail in randSentenceDetails(
-            language: language,
-            type: <SentenceType>{type},
-            style: SentenceStyle.polite,
-            count: 120,
-          )) {
-            for (var i = 0; i < detail.phrases.length; i += 1) {
-              final slot = detail.slots[i];
-
-              if (slot != SentenceSlot.verb && slot != SentenceSlot.state) continue;
-
-              expect(
-                pools[slot]!.contains(detail.phrases[i]),
-                isTrue,
-                reason: '$language $type: "${detail.phrases[i]}" is not a polite $slot',
-              );
+                expect(
+                  pools[slot]!.contains(detail.phrases[i]),
+                  isTrue,
+                  reason: '$language $style $type: "${detail.phrases[i]}" is not a $style $slot',
+                );
+              }
             }
           }
         }
@@ -1679,7 +1790,9 @@ void main() {
 
           if (at < 0 || !detail.slots.contains(SentenceSlot.money)) continue;
 
-          final groups = data.verbs.where((group) => group.words.contains(detail.phrases[at]));
+          final groups = data.verbs.where(
+            (group) => everyForm(group.words, group.forms).contains(detail.phrases[at]),
+          );
 
           expect(
             groups.any((group) => group.object?.contains(NounClass.idea) ?? false),

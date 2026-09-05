@@ -47,7 +47,7 @@ Every option is optional, and the defaults are what the empty call above uses.
 | `theme` | <Lang js="WordThemeOption" dart="WordTheme?" py="WordThemeOption" code /> | <Lang js="'all'" dart="null" py="&quot;all&quot;" code /> | What the sentence's **subject** is about. See [Themes](../word/themes). |
 | `type` | <Lang js="SentenceTypeOption" dart="Set&lt;SentenceType&gt;?" py="SentenceTypeOption" code /> | <Lang js="'statement'" dart="null" py="&quot;statement&quot;" code /> | What the sentence is doing. See [Asking, exclaiming, trailing off](#asking-exclaiming-trailing-off). |
 | `quote` | <Lang js="SentenceQuote" dart="SentenceQuote?" py="SentenceQuote &#124; None" code /> | <Lang js="—" dart="null" py="None" code /> | Which marks a quoted line takes. See [Dialogue and thought](#dialogue-and-thought). |
-| `style` | `SentenceStyle` | <Lang js="`'plain'`" dart="`SentenceStyle.plain`" py="`\"plain\"`" /> | How the sentence addresses its reader. See [Politeness](#politeness). |
+| `style` | `SentenceStyle` | drawn | The speech level it is written at. See [The speech level](#politeness). |
 | `shape` | <Lang js="SentenceShapeOption" dart="SentenceShape?" py="SentenceShapeOption" code /> | <Lang js="'all'" dart="null" py="&quot;all&quot;" code /> | How much the sentence says. See [How much it says](#how-much-it-says). |
 | `slots` | <Lang js="SentenceSlotOption" dart="Set&lt;SentenceSlot&gt;?" py="SentenceSlotOption" code /> | <Lang js="'all'" dart="null" py="&quot;all&quot;" code /> | Which parts it carries beside the subject. See [Picking the shape](#picking-the-shape) and [Counting, and money](#counting-and-money). |
 | `include` | <Lang js="string &#124; string[]" dart="List&lt;String&gt;" py="str &#124; Sequence[str]" code /> | <Lang js="—" dart="const []" py="()" code /> | Words every sentence has to contain. See [Words it has to contain](#words-it-has-to-contain). |
@@ -514,21 +514,33 @@ rand_sentence(language="en", type="all", sentences=3)
 
 A word you named through `include` comes out in the form the type asks for: `include: '달린다'` with `type: 'question'` writes `달리니?`, not `달린다?`. The forms are stored beside the plain words rather than instead of them, one for one, which is what makes the translation possible.
 
-## Politeness {#politeness}
+## The speech level {#politeness}
 
-`style` says how the sentence addresses its reader. `'plain'` is the default and everything above — the form a written statement takes. `'polite'` is the form you would use speaking to somebody.
+`style` is the speech level the sentence is written at. Four of them, which is what a Korean speech level actually is:
+
+| Level      | Korean      | What it is                                                  |
+| ---------- | ----------- | ----------------------------------------------------------- |
+| `'plain'`  | 해라체      | The voice of a book. Nobody is being addressed.             |
+| `'casual'` | 해체 (반말) | What you say to someone you are close to.                   |
+| `'polite'` | 해요체      | The same closeness, said politely. The warmest of the four. |
+| `'formal'` | 합쇼체      | Polite and at a distance.                                   |
+
+**Left out, the level is drawn per result**, so two calls are not the same voice twice. Name one and every sentence of the result is written at it.
 
 ::: lang js
 
 ```javascript
-randSentence({ language: 'ko', count: 2 });
-// ['도도한 쓸개가 고요한 촌락에서 움직인다.', '한밤중에 라떼가 녹는다.']
+randSentence({ language: 'ko', style: 'plain', count: 2 });
+// ['포도밭이 청량한 별자리에서 물든다.', '주먹이 저린다.']
+
+randSentence({ language: 'ko', style: 'casual', count: 2 });
+// ['계란은 고소해.', '노란 카멜레온이 찹쌀떡을 씹어.']
 
 randSentence({ language: 'ko', style: 'polite', count: 2 });
-// ['영겁이 남습니다.', '새벽에 뇌가 항성에서 움직입니다.']
+// ['고래 6마리가 어슬렁대죠.', '체온이 떨려요.']
 
-randSentence({ language: 'ja', type: 'question', style: 'polite', count: 2 });
-// ['寂しい腎臓が震えますか？', '森の送球が漂いますか？']
+randSentence({ language: 'ko', style: 'formal', count: 2 });
+// ['마차가 약국에서 흔들립니다.', '등산복이 서서히 반짝입니다.']
 ```
 
 :::
@@ -536,19 +548,17 @@ randSentence({ language: 'ja', type: 'question', style: 'polite', count: 2 });
 ::: lang dart
 
 ```dart
-randSentence(language: WordLanguage.ko, count: 2);
-// [도도한 쓸개가 고요한 촌락에서 움직인다., 한밤중에 라떼가 녹는다.]
+randSentence(language: WordLanguage.ko, style: SentenceStyle.plain, count: 2);
+// [포도밭이 청량한 별자리에서 물든다., 주먹이 저린다.]
+
+randSentence(language: WordLanguage.ko, style: SentenceStyle.casual, count: 2);
+// [계란은 고소해., 노란 카멜레온이 찹쌀떡을 씹어.]
 
 randSentence(language: WordLanguage.ko, style: SentenceStyle.polite, count: 2);
-// [영겁이 남습니다., 새벽에 뇌가 항성에서 움직입니다.]
+// [고래 6마리가 어슬렁대죠., 체온이 떨려요.]
 
-randSentence(
-  language: WordLanguage.ja,
-  type: {SentenceType.question},
-  style: SentenceStyle.polite,
-  count: 2,
-);
-// [寂しい腎臓が震えますか？, 森の送球が漂いますか？]
+randSentence(language: WordLanguage.ko, style: SentenceStyle.formal, count: 2);
+// [마차가 약국에서 흔들립니다., 등산복이 서서히 반짝입니다.]
 ```
 
 :::
@@ -556,21 +566,74 @@ randSentence(
 ::: lang py
 
 ```python
-rand_sentence(language="ko", count=2)
-# ['도도한 쓸개가 고요한 촌락에서 움직인다.', '한밤중에 라떼가 녹는다.']
+rand_sentence(language="ko", style="plain", count=2)
+# ['포도밭이 청량한 별자리에서 물든다.', '주먹이 저린다.']
+
+rand_sentence(language="ko", style="casual", count=2)
+# ['계란은 고소해.', '노란 카멜레온이 찹쌀떡을 씹어.']
 
 rand_sentence(language="ko", style="polite", count=2)
-# ['영겁이 남습니다.', '새벽에 뇌가 항성에서 움직입니다.']
+# ['고래 6마리가 어슬렁대죠.', '체온이 떨려요.']
 
-rand_sentence(language="ja", type="question", style="polite", count=2)
-# ['寂しい腎臓が震えますか？', '森の送球が漂いますか？']
+rand_sentence(language="ko", style="formal", count=2)
+# ['마차가 약국에서 흔들립니다.', '등산복이 서서히 반짝입니다.']
 ```
 
 :::
 
-**Korean and Japanese are the whole of it.** It is the same mechanism `type` uses — another form of the same predicate, stored beside the plain one — so a polite sentence is the plain one said to somebody rather than a different sentence. Korean writes `달린다` → `달립니다` and `달리니?` → `달립니까?`; Japanese writes `走る` → `走ります`, and `か` does the asking either way.
+**The level reaches the mood, not just the ending.** 해체 and 해요체 have no separate question or exclamation — `달려` asks and tells alike, and only the mark after it differs — so those two levels write one form for everything. 해라체 and 합쇼체 do move, and they move differently: 해라체 asks with `-니`, `-나` and `-(으)ㄴ가` and exclaims with `-구나`, `-네` and `-군`, while 합쇼체 turns `달립니다` into `달립니까`.
 
-**The other seven write the same sentence either way, and that is not a gap.** Spanish, Italian, German and Russian have a T–V distinction, but it lives in the second person and every sentence here is third — `el león corre` is what you say to anybody. English has no such form at all. Rather than inventing one, those seven declare no polite form and `style` changes nothing in them.
+::: lang js
+
+```javascript
+randSentence({ language: 'ko', style: 'plain', type: 'question', count: 2 });
+// ['치안판사가 귀여운 당김음을 닦나?', '발랄한 음료가 무지개 별무리에서 끓는가?']
+
+randSentence({ language: 'ko', style: 'plain', type: 'exclamation', count: 2 });
+// ['저런, 매콤한 목련이 뿌리내리는구나!', '저런, 어선이 귀여운 그림자에서 달리네!']
+```
+
+:::
+
+::: lang dart
+
+```dart
+randSentence(
+  language: WordLanguage.ko,
+  style: SentenceStyle.plain,
+  type: {SentenceType.question},
+  count: 2,
+);
+// [치안판사가 귀여운 당김음을 닦나?, 발랄한 음료가 무지개 별무리에서 끓는가?]
+
+randSentence(
+  language: WordLanguage.ko,
+  style: SentenceStyle.plain,
+  type: {SentenceType.exclamation},
+  count: 2,
+);
+// [저런, 매콤한 목련이 뿌리내리는구나!, 저런, 어선이 귀여운 그림자에서 달리네!]
+```
+
+:::
+
+::: lang py
+
+```python
+rand_sentence(language="ko", style="plain", type="question", count=2)
+# ['치안판사가 귀여운 당김음을 닦나?', '발랄한 음료가 무지개 별무리에서 끓는가?']
+
+rand_sentence(language="ko", style="plain", type="exclamation", count=2)
+# ['저런, 매콤한 목련이 뿌리내리는구나!', '저런, 어선이 귀여운 그림자에서 달리네!']
+```
+
+:::
+
+**A Korean question has more than one ending, and a pool entry says so.** The form pools stay index-aligned with the plain words — that is what lets a required word be translated by its position — and an entry lists its endings with `|` between them: `달리니|달리나|달리는가` is one verb written three ways. One of them is drawn per sentence.
+
+**Japanese has two levels and maps onto the four.** `'casual'` is its plain form and `'polite'` and `'formal'` are both `走ります`; `か` does the asking at every level, because it is the frame's tag rather than part of the verb.
+
+**The other seven write the same sentence at every level, and that is not a gap.** Spanish, Italian, German and Russian have a T–V distinction, but it lives in the second person and every sentence here is third — `el león corre` is what you say to anybody. English has no such form at all. Rather than inventing one, those seven declare no level and `style` changes nothing in them.
 
 ## Dialogue and thought {#dialogue-and-thought}
 

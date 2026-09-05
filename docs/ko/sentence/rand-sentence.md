@@ -47,7 +47,7 @@ rand_sentence()
 | `theme` | <Lang js="WordThemeOption" dart="WordTheme?" py="WordThemeOption" code /> | <Lang js="'all'" dart="null" py="&quot;all&quot;" code /> | 문장의 **주어**가 무엇에 관한 것인지. [테마](../word/themes) 참고. |
 | `type` | <Lang js="SentenceTypeOption" dart="Set&lt;SentenceType&gt;?" py="SentenceTypeOption" code /> | <Lang js="'statement'" dart="null" py="&quot;statement&quot;" code /> | 문장이 무엇을 하는지. [묻고, 외치고, 말끝을 흐리기](#asking-exclaiming-trailing-off) 참고. |
 | `quote` | <Lang js="SentenceQuote" dart="SentenceQuote?" py="SentenceQuote &#124; None" code /> | <Lang js="—" dart="null" py="None" code /> | 인용된 문장이 어떤 따옴표를 쓸지. [대사와 생각](#dialogue-and-thought) 참고. |
-| `style` | `SentenceStyle` | <Lang js="`'plain'`" dart="`SentenceStyle.plain`" py="`\"plain\"`" /> | 문장이 읽는 사람을 어떻게 대하는지. [높임](#politeness) 참고. |
+| `style` | `SentenceStyle` | 무작위 | 어느 화계로 쓸지. [화계](#politeness) 참고. |
 | `shape` | <Lang js="SentenceShapeOption" dart="SentenceShape?" py="SentenceShapeOption" code /> | <Lang js="'all'" dart="null" py="&quot;all&quot;" code /> | 문장이 얼마나 많은 것을 말하는지. [얼마나 말할지](#how-much-it-says) 참고. |
 | `slots` | <Lang js="SentenceSlotOption" dart="Set&lt;SentenceSlot&gt;?" py="SentenceSlotOption" code /> | <Lang js="'all'" dart="null" py="&quot;all&quot;" code /> | 주어 옆에 무엇을 두는지. [형태 고르기](#picking-the-shape)와 [수량과 금액](#counting-and-money) 참고. |
 | `include` | <Lang js="string &#124; string[]" dart="List&lt;String&gt;" py="str &#124; Sequence[str]" code /> | <Lang js="—" dart="const []" py="()" code /> | 모든 문장에 반드시 들어가야 할 단어. [반드시 넣을 단어](#words-it-has-to-contain) 참고. |
@@ -487,21 +487,33 @@ rand_sentence(language="en", type="all", sentences=3)
 
 `include`로 지정한 단어는 타입이 요구하는 형태로 나옵니다. `include: '달린다'`에 `type: 'question'`이면 `달린다?`가 아니라 `달리니?`입니다. 각 형태는 평서형을 대신하는 것이 아니라 그 옆에 하나씩 짝지어 저장되고, 그것이 이 변환을 가능하게 합니다.
 
-## 높임 {#politeness}
+## 화계 {#politeness}
 
-`style`은 문장이 읽는 사람을 어떻게 대하는지 정합니다. 기본값 `'plain'`은 위의 모든 예시이고, 글로 쓰는 서술문의 형태입니다. `'polite'`는 사람에게 말할 때 쓰는 형태입니다.
+`style`은 문장을 어느 화계로 쓸지 정합니다. 네 단계이고, 한국어의 화계가 실제로 그렇습니다.
+
+| 값         | 화계        | 어떤 말투인가                                      |
+| ---------- | ----------- | -------------------------------------------------- |
+| `'plain'`  | 해라체      | 글의 목소리. 듣는 사람이 없습니다.                 |
+| `'casual'` | 해체 (반말) | 가까운 사이에 하는 말.                             |
+| `'polite'` | 해요체      | 같은 거리에서 높여 말한 것. 넷 중 가장 다정합니다. |
+| `'formal'` | 합쇼체      | 높이되 거리를 둔 말.                               |
+
+**지정하지 않으면 결과마다 하나를 뽑습니다.** 두 번 부르면 두 번 다 같은 목소리가 나오지는 않습니다. 지정하면 그 결과의 모든 문장이 그 화계로 쓰입니다.
 
 ::: lang js
 
 ```javascript
-randSentence({ language: 'ko', count: 2 });
-// ['도도한 쓸개가 고요한 촌락에서 움직인다.', '한밤중에 라떼가 녹는다.']
+randSentence({ language: 'ko', style: 'plain', count: 2 });
+// ['포도밭이 청량한 별자리에서 물든다.', '주먹이 저린다.']
+
+randSentence({ language: 'ko', style: 'casual', count: 2 });
+// ['계란은 고소해.', '노란 카멜레온이 찹쌀떡을 씹어.']
 
 randSentence({ language: 'ko', style: 'polite', count: 2 });
-// ['영겁이 남습니다.', '새벽에 뇌가 항성에서 움직입니다.']
+// ['고래 6마리가 어슬렁대죠.', '체온이 떨려요.']
 
-randSentence({ language: 'ja', type: 'question', style: 'polite', count: 2 });
-// ['寂しい腎臓が震えますか？', '森の送球が漂いますか？']
+randSentence({ language: 'ko', style: 'formal', count: 2 });
+// ['마차가 약국에서 흔들립니다.', '등산복이 서서히 반짝입니다.']
 ```
 
 :::
@@ -509,19 +521,17 @@ randSentence({ language: 'ja', type: 'question', style: 'polite', count: 2 });
 ::: lang dart
 
 ```dart
-randSentence(language: WordLanguage.ko, count: 2);
-// [도도한 쓸개가 고요한 촌락에서 움직인다., 한밤중에 라떼가 녹는다.]
+randSentence(language: WordLanguage.ko, style: SentenceStyle.plain, count: 2);
+// [포도밭이 청량한 별자리에서 물든다., 주먹이 저린다.]
+
+randSentence(language: WordLanguage.ko, style: SentenceStyle.casual, count: 2);
+// [계란은 고소해., 노란 카멜레온이 찹쌀떡을 씹어.]
 
 randSentence(language: WordLanguage.ko, style: SentenceStyle.polite, count: 2);
-// [영겁이 남습니다., 새벽에 뇌가 항성에서 움직입니다.]
+// [고래 6마리가 어슬렁대죠., 체온이 떨려요.]
 
-randSentence(
-  language: WordLanguage.ja,
-  type: {SentenceType.question},
-  style: SentenceStyle.polite,
-  count: 2,
-);
-// [寂しい腎臓が震えますか？, 森の送球が漂いますか？]
+randSentence(language: WordLanguage.ko, style: SentenceStyle.formal, count: 2);
+// [마차가 약국에서 흔들립니다., 등산복이 서서히 반짝입니다.]
 ```
 
 :::
@@ -529,21 +539,74 @@ randSentence(
 ::: lang py
 
 ```python
-rand_sentence(language="ko", count=2)
-# ['도도한 쓸개가 고요한 촌락에서 움직인다.', '한밤중에 라떼가 녹는다.']
+rand_sentence(language="ko", style="plain", count=2)
+# ['포도밭이 청량한 별자리에서 물든다.', '주먹이 저린다.']
+
+rand_sentence(language="ko", style="casual", count=2)
+# ['계란은 고소해.', '노란 카멜레온이 찹쌀떡을 씹어.']
 
 rand_sentence(language="ko", style="polite", count=2)
-# ['영겁이 남습니다.', '새벽에 뇌가 항성에서 움직입니다.']
+# ['고래 6마리가 어슬렁대죠.', '체온이 떨려요.']
 
-rand_sentence(language="ja", type="question", style="polite", count=2)
-# ['寂しい腎臓が震えますか？', '森の送球が漂いますか？']
+rand_sentence(language="ko", style="formal", count=2)
+# ['마차가 약국에서 흔들립니다.', '등산복이 서서히 반짝입니다.']
 ```
 
 :::
 
-**한국어와 일본어가 전부입니다.** `type`이 쓰는 것과 같은 장치입니다. 같은 서술어의 또 다른 형태를 평서형 옆에 저장해 두는 것이고, 그래서 높임말 문장은 다른 문장이 아니라 같은 문장을 사람에게 말한 것입니다. 한국어는 `달린다` → `달립니다`, `달리니?` → `달립니까?`로 쓰고, 일본어는 `走る` → `走ります`로 쓰며 묻는 일은 `か`가 어느 쪽에서든 합니다.
+**화계는 어미만이 아니라 서법까지 바꿉니다.** 해체와 해요체는 의문형과 감탄형이 따로 없습니다. `달려`는 묻는 말이기도 하고 하는 말이기도 하며 뒤에 붙는 문장부호만 다릅니다. 그래서 이 둘은 모든 서법에 형태 하나를 씁니다. 해라체와 합쇼체는 움직이고, 움직이는 방식이 서로 다릅니다. 해라체는 `-니`, `-나`, `-(으)ㄴ가`로 묻고 `-구나`, `-네`, `-군`으로 감탄하며, 합쇼체는 `달립니다`를 `달립니까`로 바꿉니다.
 
-**나머지 일곱 언어는 어느 쪽이든 같은 문장을 씁니다. 빠뜨린 것이 아닙니다.** 스페인어·이탈리아어·독일어·러시아어에는 T–V 구분이 있지만 그것은 2인칭의 일이고, 여기 있는 문장은 모두 3인칭입니다. `el león corre`는 누구에게 하든 같은 말입니다. 영어에는 그런 형태 자체가 없습니다. 없는 것을 지어내는 대신, 그 일곱 언어는 높임 형태를 선언하지 않고 `style`은 그 안에서 아무것도 바꾸지 않습니다.
+::: lang js
+
+```javascript
+randSentence({ language: 'ko', style: 'plain', type: 'question', count: 2 });
+// ['치안판사가 귀여운 당김음을 닦나?', '발랄한 음료가 무지개 별무리에서 끓는가?']
+
+randSentence({ language: 'ko', style: 'plain', type: 'exclamation', count: 2 });
+// ['저런, 매콤한 목련이 뿌리내리는구나!', '저런, 어선이 귀여운 그림자에서 달리네!']
+```
+
+:::
+
+::: lang dart
+
+```dart
+randSentence(
+  language: WordLanguage.ko,
+  style: SentenceStyle.plain,
+  type: {SentenceType.question},
+  count: 2,
+);
+// [치안판사가 귀여운 당김음을 닦나?, 발랄한 음료가 무지개 별무리에서 끓는가?]
+
+randSentence(
+  language: WordLanguage.ko,
+  style: SentenceStyle.plain,
+  type: {SentenceType.exclamation},
+  count: 2,
+);
+// [저런, 매콤한 목련이 뿌리내리는구나!, 저런, 어선이 귀여운 그림자에서 달리네!]
+```
+
+:::
+
+::: lang py
+
+```python
+rand_sentence(language="ko", style="plain", type="question", count=2)
+# ['치안판사가 귀여운 당김음을 닦나?', '발랄한 음료가 무지개 별무리에서 끓는가?']
+
+rand_sentence(language="ko", style="plain", type="exclamation", count=2)
+# ['저런, 매콤한 목련이 뿌리내리는구나!', '저런, 어선이 귀여운 그림자에서 달리네!']
+```
+
+:::
+
+**한국어 의문형은 어미가 하나가 아니고, 풀의 항목이 그것을 적습니다.** 형태 풀은 평서형과 자리를 맞춰 저장됩니다. 지정한 단어를 자리로 찾아 바꿀 수 있는 이유가 그것입니다. 그러면서 한 항목이 `|`로 여러 어미를 적습니다. `달리니|달리나|달리는가`는 동사 하나를 세 가지로 쓴 것이고, 문장마다 그중 하나가 뽑힙니다.
+
+**일본어는 두 단계이고 네 단계에 맞춰집니다.** `'casual'`은 보통체이고 `'polite'`와 `'formal'`은 둘 다 `走ります`입니다. 묻는 일은 어느 화계에서든 `か`가 하는데, 동사의 일부가 아니라 형태(frame)의 꼬리이기 때문입니다.
+
+**나머지 일곱 언어는 어느 화계에서도 같은 문장을 씁니다. 빠진 것이 아닙니다.** 스페인어·이탈리아어·독일어·러시아어에는 T–V 구분이 있지만 그것은 2인칭의 일이고 여기 문장은 전부 3인칭입니다. `el león corre`는 누구에게든 그렇게 말합니다. 영어에는 그런 형태가 아예 없습니다. 없는 것을 지어내는 대신 이 일곱은 화계를 선언하지 않고, `style`은 아무것도 바꾸지 않습니다.
 
 ## 대사와 생각 {#dialogue-and-thought}
 

@@ -199,8 +199,9 @@ class _Settings {
   /// Which marks a quoted line takes, or null for the type's own default.
   final SentenceQuote? quote;
 
-  /// How the sentences address their reader.
-  final SentenceStyle style;
+  /// How the sentences address their reader, or null when the caller left it to
+  /// the generator.
+  final SentenceStyle? style;
 }
 
 // The kinds a quoted line can be. Somebody speaking is as often asking as
@@ -211,12 +212,96 @@ const List<SentenceType> _quotedMarks = <SentenceType>[
   SentenceType.exclamation,
 ];
 
+/// Every level, from the voice of a book to the one most spoken Korean is in.
+const List<SentenceStyle> _styles = SentenceStyle.values;
+
+/// The levels a line somebody says out loud is said at.
+///
+/// Never 해라체 — that is the voice of a book, not of a person with a listener in
+/// front of them.
+const List<SentenceStyle> _spokenLevels = <SentenceStyle>[
+  SentenceStyle.casual,
+  SentenceStyle.polite,
+  SentenceStyle.formal,
+];
+
+/// The levels a thought is thought at, which is the other way round: it is
+/// addressed to nobody, so it is never polite.
+const List<SentenceStyle> _thoughtLevels = <SentenceStyle>[
+  SentenceStyle.plain,
+  SentenceStyle.casual,
+];
+
+/// Which form a level writes for each mood, best first.
+///
+/// A chain ends where it started, at the plain statement the group's `words`
+/// already are, which is why seven of the nine write the same sentence whatever
+/// the caller asks for. A trailing sentence is a statement that stops early, so
+/// it ends on the statement's form.
+const Map<SentenceStyle, Map<SentenceType, List<PredicateForm>>> _formChain =
+    <SentenceStyle, Map<SentenceType, List<PredicateForm>>>{
+      SentenceStyle.plain: <SentenceType, List<PredicateForm>>{
+        SentenceType.statement: <PredicateForm>[],
+        SentenceType.trailing: <PredicateForm>[],
+        SentenceType.question: <PredicateForm>[PredicateForm.question],
+        SentenceType.exclamation: <PredicateForm>[PredicateForm.exclamation],
+      },
+      SentenceStyle.casual: <SentenceType, List<PredicateForm>>{
+        SentenceType.statement: <PredicateForm>[PredicateForm.casual],
+        SentenceType.trailing: <PredicateForm>[PredicateForm.casual],
+        SentenceType.question: <PredicateForm>[PredicateForm.casual, PredicateForm.question],
+        SentenceType.exclamation: <PredicateForm>[PredicateForm.casual, PredicateForm.exclamation],
+      },
+      SentenceStyle.polite: <SentenceType, List<PredicateForm>>{
+        SentenceType.statement: <PredicateForm>[PredicateForm.polite],
+        SentenceType.trailing: <PredicateForm>[PredicateForm.polite],
+        SentenceType.question: <PredicateForm>[PredicateForm.polite, PredicateForm.question],
+        SentenceType.exclamation: <PredicateForm>[PredicateForm.polite, PredicateForm.exclamation],
+      },
+      SentenceStyle.formal: <SentenceType, List<PredicateForm>>{
+        SentenceType.statement: <PredicateForm>[PredicateForm.formal, PredicateForm.polite],
+        SentenceType.trailing: <PredicateForm>[PredicateForm.formal, PredicateForm.polite],
+        SentenceType.question: <PredicateForm>[
+          PredicateForm.formalQuestion,
+          PredicateForm.formal,
+          PredicateForm.polite,
+          PredicateForm.question,
+        ],
+        SentenceType.exclamation: <PredicateForm>[
+          PredicateForm.formal,
+          PredicateForm.polite,
+          PredicateForm.exclamation,
+        ],
+      },
+    };
+
+/// One of the endings a form pool entry lists.
+///
+/// `달리니|달리나|달리는가` is one verb written three ways, and a sentence takes
+/// one of them; an entry with no `|` in it is itself.
+String _oneOf(String entry) => entry.contains('|') ? pick(entry.split('|')) : entry;
+
+/// Every ending an entry lists, which is what a length budget has to span.
+WordPool _endings(WordPool pool) => <String>[for (final entry in pool) ...entry.split('|')];
+
 /// The kind whose mark a sentence of this type closes on.
 ///
 /// Dialogue and thought have no mark of their own: what they quote is a sentence
 /// of another kind, and they take its mark and put quotation marks around it.
 SentenceType _markFor(SentenceType type) =>
     type == SentenceType.dialogue || type == SentenceType.thought ? pick(_quotedMarks) : type;
+
+/// The level one line is said at.
+///
+/// A level the caller named is used for every line, quoted or not; without one,
+/// the result has a voice of its own and only a quoted line steps outside it,
+/// because what a person says is not written the way the sentence around it is.
+SentenceStyle _styleFor(SentenceType type, SentenceStyle? asked, SentenceStyle voice) {
+  if (asked != null) return asked;
+  if (type == SentenceType.dialogue) return pick(_spokenLevels);
+
+  return type == SentenceType.thought ? pick(_thoughtLevels) : voice;
+}
 
 /// The marks a quoted line is wrapped in, or null when nothing is quoted.
 List<String>? _quoteFor(SentenceLanguageData data, SentenceType type, SentenceQuote? override) {
@@ -233,7 +318,7 @@ SentenceMood _moodFor(SentenceType mark) =>
 /// Everything one sentence of a result is drawn against: the room it has, what
 /// it is doing, what it opens on, and — after the first — what it is about.
 class _Draw {
-  const _Draw(this.budget, this.type, this.mark, this.quote, this.opener, this.follow);
+  const _Draw(this.budget, this.type, this.mark, this.quote, this.opener, this.style, this.follow);
 
   final LengthRange budget;
 
@@ -248,6 +333,9 @@ class _Draw {
 
   /// A connective or an interjection, `''` for neither.
   final String opener;
+
+  /// The level this line is said at, which a quoted one does not share.
+  final SentenceStyle style;
   final _Follow? follow;
 }
 
@@ -706,10 +794,16 @@ Map<SentenceSlot, LengthRange> _slotBounds(WordLanguage language) {
     // Every form a predicate can take, not only the plain statement's: a question
     // form is a different length, and the shape is chosen against these.
     SentenceSlot.verb: _span(<WordPool>[
-      for (final group in data.verbs) ...<WordPool>[group.words, ...group.forms.values],
+      for (final group in data.verbs) ...<WordPool>[
+        group.words,
+        ...group.forms.values.map(_endings),
+      ],
     ]),
     SentenceSlot.state: _span(<WordPool>[
-      for (final group in data.states) ...<WordPool>[group.words, ...group.forms.values],
+      for (final group in data.states) ...<WordPool>[
+        group.words,
+        ...group.forms.values.map(_endings),
+      ],
     ]),
     SentenceSlot.manner: _span(<WordPool>[data.manners]),
     SentenceSlot.time: _span(<WordPool>[data.times]),
@@ -1216,7 +1310,7 @@ _Built _compose(
   // with the plain words, which is what lets a required word be translated rather
   // than written out in the wrong form.
   final base = stateGroup?.words ?? verbGroup!.words;
-  final predicates = _formOf(stateGroup, verbGroup, draw.mark, settings.style);
+  final predicates = _formOf(stateGroup, verbGroup, draw.mark, draw.style);
   final subjectClasses = stateGroup?.subject ?? verbGroup!.subject;
   final subjectThemes = _themesForClasses(themes, subjectClasses);
   final subjectRequired = _requiredAt(frame, plan, SentenceSlot.subject);
@@ -1515,11 +1609,11 @@ _Built _compose(
 
 /// The predicates of a group, in the form this sentence ends on.
 ///
-/// The chain is `politeQuestion` → `polite` → `question` → `words`, so a group
-/// declares only what its language actually writes. Japanese declares `polite`
-/// alone and it serves the question too, because the `か` that asks is the
-/// frame's tag rather than part of the verb; Korean declares both, because
-/// `달립니까` is not `달립니다`.
+/// Each level falls back along its own chain to the plain statement the `words`
+/// already are, so a group declares only what its language actually writes.
+/// Japanese declares `polite` alone and it serves the formal level and the
+/// question too, because the `か` that asks is the frame's tag rather than part
+/// of the verb.
 WordPool _formOf(
   StateGroup? stateGroup,
   VerbGroup? verbGroup,
@@ -1528,18 +1622,14 @@ WordPool _formOf(
 ) {
   final forms = stateGroup?.forms ?? verbGroup!.forms;
   final words = stateGroup?.words ?? verbGroup!.words;
-  final asking = mark == SentenceType.question;
 
-  if (style == SentenceStyle.polite) {
-    final polite =
-        asking
-            ? (forms[PredicateForm.politeQuestion] ?? forms[PredicateForm.polite])
-            : forms[PredicateForm.polite];
+  for (final key in _formChain[style]![mark]!) {
+    final pool = forms[key];
 
-    if (polite != null) return polite;
+    if (pool != null) return pool.map(_oneOf).toList(growable: false);
   }
 
-  return (asking ? forms[PredicateForm.question] : null) ?? words;
+  return words;
 }
 
 /// The word a phrase that is not a noun phrase writes: the predicate, or an
@@ -1929,6 +2019,12 @@ List<_Built> _generateResult(WordLanguage language, _Settings settings) {
   );
   final built = <_Built>[];
   _Topic? topic;
+  // The result's own voice, settled once. A caller who named a level gets that
+  // one throughout; one who did not gets a paragraph that is at least consistent
+  // with itself, rather than a level rerolled every sentence.
+  // Written out: `??` would otherwise infer `pick`'s type argument from the
+  // nullable left-hand side, and hand back a `SentenceStyle?`.
+  final SentenceStyle voice = settings.style ?? pick<SentenceStyle>(_styles);
 
   for (var i = 0; i < settings.sentences; i += 1) {
     final budget = budgets[i];
@@ -1941,6 +2037,7 @@ List<_Built> _generateResult(WordLanguage language, _Settings settings) {
       mark,
       _quoteFor(data, type, settings.quote),
       _openerFor(data, mark, follow != null, budget.max, shortest),
+      _styleFor(type, settings.style, voice),
       follow,
     );
     var one = _generateOne(language, settings, draw);
@@ -1955,7 +2052,7 @@ List<_Built> _generateResult(WordLanguage language, _Settings settings) {
       final bare = _generateOne(
         language,
         settings,
-        _Draw(draw.budget, draw.type, draw.mark, draw.quote, '', draw.follow),
+        _Draw(draw.budget, draw.type, draw.mark, draw.quote, '', draw.style, draw.follow),
       );
 
       if (_distanceFrom(bare.sentence.length, budget) <
@@ -1990,7 +2087,7 @@ List<SentenceDetail> generateSentenceDetails({
   bool includeName = false,
   Set<SentenceType>? type,
   SentenceQuote? quote,
-  SentenceStyle style = SentenceStyle.plain,
+  SentenceStyle? style,
 }) {
   final settings = _Settings(
     theme: theme,

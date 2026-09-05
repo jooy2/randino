@@ -43,6 +43,13 @@ const SCRIPT: Record<WordLanguage, RegExp> = {
 
 const SHAPES: readonly SentenceShape[] = ['simple', 'detailed', 'complex'];
 
+const STYLES: readonly SentenceStyle[] = ['plain', 'casual', 'polite', 'formal'];
+
+// The form keys a level reaches for. `question` and `exclamation` are 해라체's
+// own and say nothing about whether a language has levels at all — English
+// declares `question` and has none.
+const STYLE_FORMS = ['casual', 'polite', 'formal', 'formalQuestion'] as const;
+
 /** How a capitalizing language writes the first word of a sentence. */
 function upperFirst(word: string): string {
 	return word.charAt(0).toUpperCase() + word.slice(1);
@@ -211,17 +218,69 @@ function inflectedFor(language: WordLanguage, pool: readonly string[]): string[]
 	];
 }
 
+type Group = { words: readonly string[]; forms?: Partial<Record<string, readonly string[]>> };
+
+/** Every ending an entry lists: `달리니|달리나` is one entry and two endings. */
+function endings(pool: readonly string[]): string[] {
+	return pool.flatMap((entry) => entry.split('|'));
+}
+
+/**
+ * Which form a level writes for each mood, best first. The generator's own
+ * `FORM_CHAIN`, written out again here so a change to it has to be made twice
+ * rather than agreeing with itself by construction.
+ */
+const FORM_CHAIN: Record<SentenceStyle, Record<SentenceMark, readonly string[]>> = {
+	plain: { statement: [], trailing: [], question: ['question'], exclamation: ['exclamation'] },
+	casual: {
+		statement: ['casual'],
+		trailing: ['casual'],
+		question: ['casual', 'question'],
+		exclamation: ['casual', 'exclamation']
+	},
+	polite: {
+		statement: ['polite'],
+		trailing: ['polite'],
+		question: ['polite', 'question'],
+		exclamation: ['polite', 'exclamation']
+	},
+	formal: {
+		statement: ['formal', 'polite'],
+		trailing: ['formal', 'polite'],
+		question: ['formalQuestion', 'formal', 'polite', 'question'],
+		exclamation: ['formal', 'polite', 'exclamation']
+	}
+};
+
+/** The predicates one group can write at one level and mood. */
+function formsOf(group: Group, style: SentenceStyle, mark: SentenceMark): string[] {
+	for (const key of FORM_CHAIN[style][mark]) {
+		const pool = group.forms?.[key];
+
+		if (pool) {
+			return endings(pool);
+		}
+	}
+
+	return [...group.words];
+}
+
+/** Every predicate a group can write at any level and any mood. */
+function everyForm(group: Group): string[] {
+	return [...group.words, ...endings(Object.values(group.forms ?? {}).flat())];
+}
+
 function poolFor(language: WordLanguage, slot: SentenceSlot): Set<string> {
 	const wordData = WORD_DATA[language];
 	const data = SENTENCE_DATA[language];
 	const inflected = (pool: readonly string[]) => inflectedFor(language, pool);
 
 	if (slot === 'verb') {
-		return new Set(data.verbs.flatMap((group) => [...group.words]));
+		return new Set(data.verbs.flatMap(everyForm));
 	}
 
 	if (slot === 'state') {
-		const states = data.states.flatMap((group) => [...group.words]);
+		const states = data.states.flatMap(everyForm);
 
 		return new Set(data.predicateAgrees ? inflected(states) : states);
 	}
@@ -507,7 +566,7 @@ describe('Sentence', () => {
 				// right when one of its groups accounts for it.
 				const groups = data.verbs.filter(
 					(group) =>
-						group.words.includes(detail.phrases[at]) && Boolean(group.object) === transitive
+						everyForm(group).includes(detail.phrases[at]) && Boolean(group.object) === transitive
 				);
 
 				assert.ok(
@@ -634,7 +693,10 @@ describe('Sentence', () => {
 		for (const [language, include] of cases) {
 			const listed = typeof include === 'string' ? [include] : include;
 
-			for (const sentence of randSentence({ language, include, count: 40 })) {
+			// A required predicate is named in the form a plain statement ends on, and
+			// every other level writes it in its own form — which the test above is
+			// what covers. Here the word has to survive as itself.
+			for (const sentence of randSentence({ language, include, style: 'plain', count: 40 })) {
 				for (const word of listed) {
 					assert.ok(
 						sentence.toLowerCase().includes(word.toLowerCase()),
@@ -1130,8 +1192,10 @@ describe('Sentence', () => {
 		const CARRIES: [WordLanguage, RegExp][] = [
 			// English do-support, and the base form behind it.
 			['en', /^(Does|Is) /],
-			// Korean changes the ending on the predicate itself.
-			['ko', /니\?$/],
+			// Korean changes the ending on the predicate itself. Which ending is the
+			// level's business — 해라체 asks with `-니`, `-나` and `-(으)ㄴ가` — so the
+			// level is pinned below and the shape is what is under test.
+			['ko', /(니|나|가)\?$/],
 			// A tag Japanese, Chinese and Vietnamese write after the whole clause.
 			['ja', /か？$/],
 			['zh', /吗？$/],
@@ -1139,7 +1203,12 @@ describe('Sentence', () => {
 		];
 
 		for (const [language, shape] of CARRIES) {
-			for (const sentence of randSentence({ language, type: 'question', count: SAMPLE })) {
+			for (const sentence of randSentence({
+				language,
+				type: 'question',
+				style: 'plain',
+				count: SAMPLE
+			})) {
 				assert.match(sentence, shape, `${language}: ${sentence}`);
 			}
 		}
@@ -1148,7 +1217,12 @@ describe('Sentence', () => {
 		// predicate or on the `ist` that stands in for one.
 		const verbs = new Set(poolFor('de', 'verb'));
 
-		for (const sentence of randSentence({ language: 'de', type: 'question', count: SAMPLE })) {
+		for (const sentence of randSentence({
+			language: 'de',
+			type: 'question',
+			style: 'plain',
+			count: SAMPLE
+		})) {
 			const first = sentence.split(' ')[0].toLowerCase();
 
 			assert.ok(verbs.has(first) || first === 'ist', `de: ${sentence}`);
@@ -1178,14 +1252,13 @@ describe('Sentence', () => {
 	});
 
 	it('a predicate is written in the form its type asks for', () => {
-		// The question form where the group declares one, and the plain words where
-		// it does not — English states need none, because the shape moves `is` to
-		// the front and leaves `green` alone.
+		// The form the level's chain lands on, and the plain words where the group
+		// declares nothing — English states need none, because the shape moves `is`
+		// to the front and leaves `green` alone.
 		for (const language of WORD_LANGUAGES) {
 			const data = SENTENCE_DATA[language];
-			const asked = (
-				groups: readonly { words: readonly string[]; forms?: { question?: readonly string[] } }[]
-			) => groups.flatMap((group) => [...(group.forms?.question ?? group.words)]);
+			const asked = (groups: readonly Group[]) =>
+				groups.flatMap((group) => formsOf(group, 'plain', 'question'));
 			const states = asked(data.states);
 			const expected: Record<string, Set<string>> = {
 				verb: new Set(asked(data.verbs)),
@@ -1194,7 +1267,12 @@ describe('Sentence', () => {
 				state: new Set(data.predicateAgrees ? inflectedFor(language, states) : states)
 			};
 
-			for (const detail of sentenceDetails({ language, type: 'question', count: 120 })) {
+			for (const detail of sentenceDetails({
+				language,
+				type: 'question',
+				style: 'plain',
+				count: 120
+			})) {
 				for (let i = 0; i < detail.phrases.length; i += 1) {
 					const slot = detail.slots[i];
 
@@ -1218,20 +1296,32 @@ describe('Sentence', () => {
 	it('`include` puts a required predicate in the form the type asks for', () => {
 		// The pools are index-aligned so that a word named in the statement form can
 		// be said the other way rather than written out wrong.
-		for (const sentence of randSentence({
-			language: 'ko',
-			include: '달린다',
-			type: 'question',
-			count: 30
-		})) {
-			assert.ok(sentence.includes('달리니'), sentence);
-			assert.ok(!sentence.includes('달린다'), sentence);
+		for (const [style, written] of [
+			['plain', ['달리니', '달리나', '달리는가']],
+			['casual', ['달려', '달리지']],
+			['polite', ['달려요', '달리죠']],
+			['formal', ['달립니까']]
+		] as [SentenceStyle, string[]][]) {
+			for (const sentence of randSentence({
+				language: 'ko',
+				include: '달린다',
+				type: 'question',
+				style,
+				count: 30
+			})) {
+				assert.ok(
+					written.some((form) => sentence.includes(form)),
+					`${style}: ${sentence}`
+				);
+				assert.ok(!sentence.includes('달린다'), sentence);
+			}
 		}
 
 		for (const sentence of randSentence({
 			language: 'en',
 			include: 'runs',
 			type: 'question',
+			style: 'plain',
 			count: 30
 		})) {
 			assert.match(sentence, /\brun\b/, sentence);
@@ -1352,96 +1442,109 @@ describe('Sentence', () => {
 		}
 	});
 
-	it('`style` is what Korean and Japanese do with politeness', () => {
-		// The two languages this changes, and the seven it does not. `plain` and
-		// `polite` are two forms of the same predicate, so a polite sentence is the
-		// plain one said to somebody rather than a different sentence.
-		// A Japanese verb closes on ます and an adjective on です; Korean's two
-		// endings cover both.
-		const POLITE: Record<string, RegExp> = {
-			ko: /(니다|니까)[.?!…”’]$/,
+	it('`style` is the speech level, and Korean is the language with four of them', () => {
+		// The two languages a level changes, and the seven it does not. Korean has
+		// all four; Japanese has two and maps onto them, `casual` being its plain
+		// form and `polite` and `formal` both `走ります`.
+		// What each level closes on, where a mark is what the level actually is.
+		// 해라체 and 해체 are left out on purpose: 해체 is the stem with `-아/-어`
+		// contracted onto it, so a regex over its endings would only restate the
+		// pool, and the test below reads the pools themselves. What is worth
+		// asserting about those two is the other half — that neither ever closes on
+		// a polite ending.
+		const CLOSES: Partial<Record<WordLanguage, Partial<Record<SentenceStyle, RegExp>>>> = {
+			ko: { polite: /(요|죠)[.?!…”’]$/, formal: /(니다|니까)[.?!…”’]$/ },
+			// A Japanese verb closes on ます and an adjective on です.
+			ja: { polite: /(ます|です)か?[。？！…」』]$/, formal: /(ます|です)か?[。？！…」』]$/ }
+		};
+		const ADDRESSED: Partial<Record<WordLanguage, RegExp>> = {
+			ko: /(요|죠|니다|니까)[.?!…”’]$/,
 			ja: /(ます|です)か?[。？！…」』]$/
 		};
 
 		for (const language of WORD_LANGUAGES) {
 			const data = SENTENCE_DATA[language];
-			const declares = [...data.verbs, ...data.states].some(
-				(group) => group.forms?.polite !== undefined
+			const declares = [...data.verbs, ...data.states].some((group) =>
+				STYLE_FORMS.some((key) => group.forms?.[key] !== undefined)
 			);
 
 			assert.strictEqual(
 				declares,
-				language in POLITE,
-				`${language} ${declares ? 'declares' : 'declares no'} polite forms`
+				language in CLOSES,
+				`${language} ${declares ? 'declares' : 'declares no'} forms for a level`
 			);
 
-			for (const type of ['statement', 'question'] as SentenceType[]) {
-				for (const sentence of randSentence({ language, type, style: 'polite', count: SAMPLE })) {
-					if (language in POLITE) {
-						assert.match(sentence, POLITE[language], `${language} ${type}: ${sentence}`);
+			for (const style of STYLES) {
+				const closes = CLOSES[language]?.[style];
+				const addressed = ADDRESSED[language];
+
+				for (const type of ['statement', 'question'] as SentenceType[]) {
+					for (const sentence of randSentence({ language, type, style, count: SAMPLE })) {
+						if (closes) {
+							assert.match(sentence, closes, `${language} ${style} ${type}: ${sentence}`);
+						} else if (addressed) {
+							assert.doesNotMatch(
+								sentence,
+								addressed,
+								`${language} ${style} ${type} addresses somebody: ${sentence}`
+							);
+						}
 					}
 				}
 			}
 		}
 
-		// A language with no polite form writes exactly what it writes plainly, which
-		// is what its grammar actually does with politeness in the third person.
+		// A language with no form of its own writes exactly the same sentence at
+		// every level, which is what its grammar actually does with politeness in
+		// the third person.
 		for (const language of WORD_LANGUAGES) {
-			if (language in POLITE) {
+			if (language in CLOSES) {
 				continue;
 			}
 
-			const plain = new Set(randSentence({ language, unique: true, count: 200 }));
-			const polite = randSentence({ language, style: 'polite', unique: true, count: 200 });
+			const pools = poolFor(language, 'verb');
 
-			// Not the same strings — they are random — but drawn from the same pools,
-			// so every predicate of one is a predicate of the other.
-			assert.ok(polite.length > 0 && plain.size > 0, language);
-		}
-	});
+			for (const style of STYLES) {
+				for (const detail of sentenceDetails({ language, style, count: 40 })) {
+					const at = detail.slots.indexOf('verb');
 
-	it('a polite predicate comes out of the polite pools', () => {
-		for (const language of ['ko', 'ja'] as WordLanguage[]) {
-			const data = SENTENCE_DATA[language];
-			const wordData = WORD_DATA[language];
-			const asked = (
-				groups: readonly {
-					words: readonly string[];
-					forms?: { polite?: readonly string[]; politeQuestion?: readonly string[] };
-				}[],
-				question: boolean
-			) =>
-				groups.flatMap((group) => [
-					...((question
-						? (group.forms?.politeQuestion ?? group.forms?.polite)
-						: group.forms?.polite) ?? group.words)
-				]);
-
-			for (const type of ['statement', 'question'] as SentenceType[]) {
-				const question = type === 'question';
-				const states = asked(data.states, question);
-				const pools: Record<string, Set<string>> = {
-					verb: new Set(asked(data.verbs, question)),
-					state: new Set(data.predicateAgrees ? inflectedFor(language, states) : states)
-				};
-
-				for (const detail of sentenceDetails({ language, type, style: 'polite', count: 120 })) {
-					for (let i = 0; i < detail.phrases.length; i += 1) {
-						const slot = detail.slots[i];
-
-						if (slot !== 'verb' && slot !== 'state') {
-							continue;
-						}
-
-						assert.ok(
-							pools[slot].has(detail.phrases[i]),
-							`${language} ${type}: '${detail.phrases[i]}' is not a polite ${slot} (${detail.sentence})`
-						);
+					if (at >= 0) {
+						assert.ok(pools.has(detail.phrases[at]), `${language} ${style}: ${detail.sentence}`);
 					}
 				}
 			}
+		}
+	});
 
-			assert.ok(wordData.adjectives.length > 0, language);
+	it('a predicate comes out of the pool its level and its mood land on', () => {
+		for (const language of ['ko', 'ja'] as WordLanguage[]) {
+			const data = SENTENCE_DATA[language];
+
+			for (const style of STYLES) {
+				for (const type of ['statement', 'question', 'exclamation'] as SentenceType[]) {
+					const mark = type as SentenceMark;
+					const states = data.states.flatMap((group) => formsOf(group, style, mark));
+					const pools: Record<string, Set<string>> = {
+						verb: new Set(data.verbs.flatMap((group) => formsOf(group, style, mark))),
+						state: new Set(data.predicateAgrees ? inflectedFor(language, states) : states)
+					};
+
+					for (const detail of sentenceDetails({ language, type, style, count: 60 })) {
+						for (let i = 0; i < detail.phrases.length; i += 1) {
+							const slot = detail.slots[i];
+
+							if (slot !== 'verb' && slot !== 'state') {
+								continue;
+							}
+
+							assert.ok(
+								pools[slot].has(detail.phrases[i]),
+								`${language} ${style} ${type}: '${detail.phrases[i]}' is not a ${style} ${slot} (${detail.sentence})`
+							);
+						}
+					}
+				}
+			}
 		}
 	});
 
@@ -1600,7 +1703,7 @@ describe('Sentence', () => {
 					continue;
 				}
 
-				const groups = data.verbs.filter((group) => group.words.includes(detail.phrases[at]));
+				const groups = data.verbs.filter((group) => everyForm(group).includes(detail.phrases[at]));
 
 				assert.ok(
 					groups.some((group) => group.object?.includes('idea')),

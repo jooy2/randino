@@ -16,6 +16,7 @@ from randino import (
     SentenceQuote,
     SentenceShape,
     SentenceSlot,
+    SentenceStyle,
     SentenceType,
     WordLanguage,
     WordTheme,
@@ -28,7 +29,7 @@ from randino.name.data import NAME_DATA
 # it — these checks read the pools a sentence is allowed to draw from.
 from randino.sentence._generator import shape_of
 from randino.sentence.data import SENTENCE_DATA, THEME_CLASS
-from randino.sentence.data._types import PredicateForms, SentenceMark
+from randino.sentence.data._types import PredicateForm, PredicateForms, SentenceMark
 from randino.word._generator import agree
 from randino.word.data import WORD_DATA
 from randino.word.data._types import WordGender, WordPool
@@ -63,15 +64,78 @@ def inflected(language: WordLanguage, pool: tuple[str, ...]) -> list[str]:
     return [*pool, *(agree(data, word, gender) for gender in genders for word in pool)]
 
 
+STYLES: tuple[SentenceStyle, ...] = ("plain", "casual", "polite", "formal")
+
+STYLE_FORMS: tuple[PredicateForm, ...] = ("casual", "polite", "formal", "formalQuestion")
+"""The form keys a level reaches for.
+
+`question` and `exclamation` are 해라체's own and say nothing about whether a language
+has levels at all — English declares `question` and has none.
+"""
+
+FORM_CHAIN: dict[SentenceStyle, dict[SentenceMark, tuple[PredicateForm, ...]]] = {
+    "plain": {
+        "statement": (),
+        "trailing": (),
+        "question": ("question",),
+        "exclamation": ("exclamation",),
+    },
+    "casual": {
+        "statement": ("casual",),
+        "trailing": ("casual",),
+        "question": ("casual", "question"),
+        "exclamation": ("casual", "exclamation"),
+    },
+    "polite": {
+        "statement": ("polite",),
+        "trailing": ("polite",),
+        "question": ("polite", "question"),
+        "exclamation": ("polite", "exclamation"),
+    },
+    "formal": {
+        "statement": ("formal", "polite"),
+        "trailing": ("formal", "polite"),
+        "question": ("formalQuestion", "formal", "polite", "question"),
+        "exclamation": ("formal", "polite", "exclamation"),
+    },
+}
+"""The generator's own chain, written out again so a change has to be made twice."""
+
+
+def endings(pool: WordPool) -> list[str]:
+    """Every ending an entry lists: `달리니|달리나` is one entry and two endings."""
+    return [ending for entry in pool for ending in entry.split("|")]
+
+
+def forms_of(
+    words: WordPool, forms: PredicateForms, style: SentenceStyle, mark: SentenceMark
+) -> list[str]:
+    """The predicates one group can write at one level and mood."""
+    for key in FORM_CHAIN[style][mark]:
+        pool = forms.get(key)
+
+        if pool:
+            return endings(pool)
+
+    return list(words)
+
+
+def every_form(words: WordPool, forms: PredicateForms) -> list[str]:
+    """Every predicate a group can write at any level and any mood."""
+    return [*words, *(ending for pool in forms.values() for ending in endings(pool))]
+
+
 def pool_for(language: WordLanguage, slot: SentenceSlot) -> set[str]:
     """Every word the language may put in a phrase of `slot`."""
     data = SENTENCE_DATA[language]
 
     if slot == "verb":
-        return {word for group in data.verbs for word in group.words}
+        return {word for group in data.verbs for word in every_form(group.words, group.forms)}
 
     if slot == "state":
-        states = tuple(word for group in data.states for word in group.words)
+        states = tuple(
+            word for group in data.states for word in every_form(group.words, group.forms)
+        )
 
         return set(inflected(language, states) if data.predicate_agrees else states)
 
@@ -293,7 +357,8 @@ def test_a_verb_only_takes_the_subject_and_object_its_group_allows() -> None:
             groups = [
                 group
                 for group in data.verbs
-                if detail.phrases[at] in group.words and (group.object is not None) == transitive
+                if detail.phrases[at] in every_form(group.words, group.forms)
+                and (group.object is not None) == transitive
             ]
 
             assert groups, f"{language}: {detail.sentence}"
@@ -953,8 +1018,10 @@ def test_a_question_is_a_shape_not_a_mark_bolted_onto_a_statement() -> None:
     carries: dict[WordLanguage, str] = {
         # English do-support, and the base form behind it.
         "en": r"^(Does|Is) ",
-        # Korean changes the ending on the predicate itself.
-        "ko": r"니\?$",
+        # Korean changes the ending on the predicate itself. Which ending is the
+        # level's business — 해라체 asks with `-니`, `-나` and `-(으)ㄴ가` — so the level
+        # is pinned below and the shape is what is under test.
+        "ko": r"(니|나|가)\?$",
         # A tag Japanese, Chinese and Vietnamese write after the whole clause.
         "ja": r"か？$",
         "zh": r"吗？$",
@@ -962,7 +1029,9 @@ def test_a_question_is_a_shape_not_a_mark_bolted_onto_a_statement() -> None:
     }
 
     for language, shape in carries.items():
-        for sentence in rand_sentence(language=language, type="question", count=SAMPLE):
+        for sentence in rand_sentence(
+            language=language, type="question", style="plain", count=SAMPLE
+        ):
             assert re.search(shape, sentence), f"{language}: {sentence}"
 
     # German moves its finite verb to the front, so the question opens on the predicate
@@ -1000,8 +1069,12 @@ def test_a_predicate_is_written_in_the_form_its_type_asks_for() -> None:
     # leaves `green` alone.
     for language in WORD_LANGUAGES:
         data = SENTENCE_DATA[language]
-        verb_forms = [w for g in data.verbs for w in g.forms.get("question", g.words)]
-        state_forms = [w for g in data.states for w in g.forms.get("question", g.words)]
+        verb_forms = [
+            w for g in data.verbs for w in forms_of(g.words, g.forms, "plain", "question")
+        ]
+        state_forms = [
+            w for g in data.states for w in forms_of(g.words, g.forms, "plain", "question")
+        ]
         expected: dict[SentenceSlot, set[str]] = {
             "verb": set(verb_forms),
             # A predicate adjective that agrees comes out in the form its subject asked
@@ -1011,7 +1084,9 @@ def test_a_predicate_is_written_in_the_form_its_type_asks_for() -> None:
             ),
         }
 
-        for detail in rand_sentence(language=language, type="question", count=120, output="detail"):
+        for detail in rand_sentence(
+            language=language, type="question", style="plain", count=120, output="detail"
+        ):
             for index, (phrase, slot) in enumerate(zip(detail.phrases, detail.slots, strict=True)):
                 if slot not in ("verb", "state"):
                     continue
@@ -1027,11 +1102,23 @@ def test_a_predicate_is_written_in_the_form_its_type_asks_for() -> None:
 def test_include_puts_a_required_predicate_in_the_form_the_type_asks_for() -> None:
     # The pools are index-aligned so that a word named in the statement form can be said
     # the other way rather than written out wrong.
-    for sentence in rand_sentence(language="ko", include="달린다", type="question", count=30):
-        assert "달리니" in sentence, sentence
-        assert "달린다" not in sentence, sentence
+    written: dict[SentenceStyle, tuple[str, ...]] = {
+        "plain": ("달리니", "달리나", "달리는가"),
+        "casual": ("달려", "달리지"),
+        "polite": ("달려요", "달리죠"),
+        "formal": ("달립니까",),
+    }
 
-    for sentence in rand_sentence(language="en", include="runs", type="question", count=30):
+    for style, forms in written.items():
+        for sentence in rand_sentence(
+            language="ko", include="달린다", type="question", style=style, count=30
+        ):
+            assert any(form in sentence for form in forms), f"{style}: {sentence}"
+            assert "달린다" not in sentence, sentence
+
+    for sentence in rand_sentence(
+        language="en", include="runs", type="question", style="plain", count=30
+    ):
         assert re.search(r"\brun\b", sentence), sentence
 
 
@@ -1129,13 +1216,22 @@ def test_quote_picks_the_marks_whatever_the_type() -> None:
         assert quotes["double"] != quotes["single"], f"{language} quotes"
 
 
-def test_style_is_what_korean_and_japanese_do_with_politeness() -> None:
-    # The two languages this changes, and the seven it does not. Plain and polite are
-    # two forms of the same predicate, so a polite sentence is the plain one said to
-    # somebody rather than a different sentence.
-    polite: dict[WordLanguage, str] = {
-        "ko": r"(니다|니까)[.?!…”’]$",
+def test_style_is_the_speech_level_and_korean_is_the_one_with_four_of_them() -> None:
+    # What each level closes on, where a mark is what the level actually is. 해라체 and
+    # 해체 are left out on purpose: 해체 is the stem with `-아/-어` contracted onto it,
+    # so a pattern over its endings would only restate the pool, and the test below
+    # reads the pools themselves. What is worth asserting about those two is the other
+    # half — that neither ever closes on a polite ending.
+    closes: dict[WordLanguage, dict[SentenceStyle, str]] = {
+        "ko": {"polite": r"(요|죠)[.?!…”’]$", "formal": r"(니다|니까)[.?!…”’]$"},
         # A Japanese verb closes on ます and an adjective on です.
+        "ja": {
+            "polite": r"(ます|です)か?[。？！…」』]$",
+            "formal": r"(ます|です)か?[。？！…」』]$",
+        },
+    }
+    addressed: dict[WordLanguage, str] = {
+        "ko": r"(요|죠|니다|니까)[.?!…”’]$",
         "ja": r"(ます|です)か?[。？！…」』]$",
     }
     types: tuple[SentenceType, ...] = ("statement", "question")
@@ -1143,59 +1239,63 @@ def test_style_is_what_korean_and_japanese_do_with_politeness() -> None:
     for language in WORD_LANGUAGES:
         data = SENTENCE_DATA[language]
         declares = any(
-            "polite" in forms
+            key in forms
             for forms in (
                 *(group.forms for group in data.verbs),
                 *(group.forms for group in data.states),
             )
+            for key in STYLE_FORMS
         )
 
-        assert declares == (language in polite), (
-            f"{language} {'declares' if declares else 'declares no'} polite forms"
+        assert declares == (language in closes), (
+            f"{language} {'declares' if declares else 'declares no'} forms for a level"
         )
 
-        for type_ in types:
-            for sentence in rand_sentence(
-                language=language, type=type_, style="polite", count=SAMPLE
-            ):
-                if language in polite:
-                    assert re.search(polite[language], sentence), f"{language} {type_}: {sentence}"
+        for style in STYLES:
+            pattern = closes.get(language, {}).get(style)
+
+            for type_ in types:
+                for sentence in rand_sentence(
+                    language=language, type=type_, style=style, count=SAMPLE
+                ):
+                    if pattern:
+                        assert re.search(pattern, sentence), (
+                            f"{language} {style} {type_}: {sentence}"
+                        )
+                    elif language in addressed:
+                        assert not re.search(addressed[language], sentence), (
+                            f"{language} {style} {type_} addresses somebody: {sentence}"
+                        )
 
 
-def test_a_polite_predicate_comes_out_of_the_polite_pools() -> None:
+def test_a_predicate_comes_out_of_the_pool_its_level_and_mood_land_on() -> None:
     languages: tuple[WordLanguage, ...] = ("ko", "ja")
-    types: tuple[SentenceType, ...] = ("statement", "question")
+    types: tuple[SentenceMark, ...] = ("statement", "question", "exclamation")
 
     for language in languages:
         data = SENTENCE_DATA[language]
 
-        for type_ in types:
-            asking = type_ == "question"
+        for style in STYLES:
+            for mark in types:
+                pools: dict[SentenceSlot, set[str]] = {
+                    "verb": {
+                        w for g in data.verbs for w in forms_of(g.words, g.forms, style, mark)
+                    },
+                    "state": {
+                        w for g in data.states for w in forms_of(g.words, g.forms, style, mark)
+                    },
+                }
 
-            def asked(words: WordPool, forms: PredicateForms, asking: bool = asking) -> list[str]:
-                chosen = (
-                    forms.get("politeQuestion") or forms.get("polite")
-                    if asking
-                    else forms.get("polite")
-                )
+                for detail in rand_sentence(
+                    language=language, type=mark, style=style, count=60, output="detail"
+                ):
+                    for phrase, slot in zip(detail.phrases, detail.slots, strict=True):
+                        if slot not in ("verb", "state"):
+                            continue
 
-                return list(chosen or words)
-
-            pools: dict[SentenceSlot, set[str]] = {
-                "verb": {w for g in data.verbs for w in asked(g.words, g.forms)},
-                "state": {w for g in data.states for w in asked(g.words, g.forms)},
-            }
-
-            for detail in rand_sentence(
-                language=language, type=type_, style="polite", count=120, output="detail"
-            ):
-                for phrase, slot in zip(detail.phrases, detail.slots, strict=True):
-                    if slot not in ("verb", "state"):
-                        continue
-
-                    assert phrase in pools[slot], (
-                        f"{language} {type_}: '{phrase}' is not a polite {slot}"
-                    )
+                        assert phrase in pools[slot], (
+                            f"{language} {style} {mark}: '{phrase}' is not a {style} {slot}"
+                        )
 
 
 def test_a_number_is_written_against_its_counter_the_way_the_language_writes_it() -> None:
@@ -1327,7 +1427,7 @@ def test_an_amount_stands_where_the_verbs_that_take_an_idea_can_take_it() -> Non
                 continue
 
             verb = detail.phrases[detail.slots.index("verb")]
-            groups = [group for group in data.verbs if verb in group.words]
+            groups = [group for group in data.verbs if verb in every_form(group.words, group.forms)]
 
             assert any("idea" in (group.object or ()) for group in groups), (
                 f"{language}: {verb} takes no idea ({detail.sentence})"

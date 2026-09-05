@@ -20,7 +20,7 @@ not — no tag on any noun, because `THEME_CLASS` already knows what a theme nam
 """
 
 import random
-from collections.abc import Callable, Sequence
+from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass, field
 from typing import cast
 
@@ -55,6 +55,7 @@ from randino.name.name_length_range import name_length_range
 from randino.sentence.data import SENTENCE_DATA, THEME_CLASS
 from randino.sentence.data._types import (
     NounClass,
+    PredicateForm,
     SentenceFrame,
     SentenceLanguageData,
     SentenceMark,
@@ -219,8 +220,10 @@ class Settings:
     quote: SentenceQuote | None
     """Which marks a quoted line takes, or None for the type's own default."""
 
-    style: SentenceStyle
-    """How the sentences address their reader."""
+    style: SentenceStyle | None
+    """How the sentences address their reader, or None when the caller left it to the
+    generator.
+    """
 
     min_length: int | None = None
     max_length: int | None = None
@@ -232,6 +235,110 @@ QUOTED_MARKS: tuple[SentenceMark, ...] = ("statement", "question", "exclamation"
 Somebody speaking is as often asking as telling, and often enough neither, so the mark
 is drawn rather than fixed.
 """
+
+
+STYLES: tuple[SentenceStyle, ...] = ("plain", "casual", "polite", "formal")
+"""Every level, from the voice of a book to the one most spoken Korean is in."""
+
+SPOKEN_LEVELS: tuple[SentenceStyle, ...] = ("casual", "polite", "formal")
+"""The levels a line somebody says out loud is said at.
+
+Never 해라체 — that is the voice of a book, not of a person with a listener in front of
+them.
+"""
+
+THOUGHT_LEVELS: tuple[SentenceStyle, ...] = ("plain", "casual")
+"""The levels a thought is thought at.
+
+The other way round from a spoken line: it is addressed to nobody, so it is never
+polite.
+"""
+
+FORM_CHAIN: Mapping[SentenceStyle, Mapping[SentenceMark, tuple[PredicateForm, ...]]] = {
+    "plain": {
+        "statement": (),
+        "trailing": (),
+        "question": ("question",),
+        "exclamation": ("exclamation",),
+    },
+    "casual": {
+        "statement": ("casual",),
+        "trailing": ("casual",),
+        "question": ("casual", "question"),
+        "exclamation": ("casual", "exclamation"),
+    },
+    "polite": {
+        "statement": ("polite",),
+        "trailing": ("polite",),
+        "question": ("polite", "question"),
+        "exclamation": ("polite", "exclamation"),
+    },
+    "formal": {
+        "statement": ("formal", "polite"),
+        "trailing": ("formal", "polite"),
+        "question": ("formalQuestion", "formal", "polite", "question"),
+        "exclamation": ("formal", "polite", "exclamation"),
+    },
+}
+"""Which form a level writes for each mood, best first.
+
+A chain ends where it started, at the plain statement the group's `words` already are,
+which is why seven of the nine write the same sentence whatever the caller asks for. A
+trailing sentence is a statement that stops early, so it ends on the statement's form.
+"""
+
+
+def _one_of(entry: str) -> str:
+    """One of the endings a form pool entry lists.
+
+    `달리니|달리나|달리는가` is one verb written three ways, and a sentence takes one of
+    them; an entry with no `|` in it is itself.
+
+    Args:
+        entry: The pool entry.
+
+    Returns:
+        The ending this sentence writes.
+    """
+    return pick(entry.split("|")) if "|" in entry else entry
+
+
+def _endings(pool: WordPool) -> WordPool:
+    """Every ending an entry lists, which is what a length budget has to span.
+
+    Args:
+        pool: A form pool.
+
+    Returns:
+        The pool with every alternative written out on its own.
+    """
+    return tuple(ending for entry in pool for ending in entry.split("|"))
+
+
+def _style_for(
+    type_: SentenceType, asked: SentenceStyle | None, voice: SentenceStyle
+) -> SentenceStyle:
+    """The level one line is said at.
+
+    A level the caller named is used for every line, quoted or not; without one, the
+    result has a voice of its own and only a quoted line steps outside it, because what
+    a person says is not written the way the sentence around it is.
+
+    Args:
+        type_: What this line is.
+        asked: The level the caller named, or None.
+        voice: The level the result settled on.
+
+    Returns:
+        The level this line is written at.
+    """
+    if asked is not None:
+        return asked
+
+    if type_ == "dialogue":
+        return pick(SPOKEN_LEVELS)
+
+    return pick(THOUGHT_LEVELS) if type_ == "thought" else voice
 
 
 def _mark_for(type_: SentenceType) -> SentenceMark:
@@ -296,6 +403,9 @@ class Draw:
 
     opener: str
     """A connective or an interjection, `""` for neither."""
+
+    style: SentenceStyle
+    """The level this line is said at, which a quoted one does not share."""
 
     follow: "Follow | None"
 
@@ -737,11 +847,11 @@ def _slot_bounds(language: WordLanguage) -> dict[str, tuple[int, int]]:
         # form is a different length, and the shape is chosen against these.
         "verb": _span(
             [group.words for group in data.verbs]
-            + [pool for group in data.verbs for pool in group.forms.values()]
+            + [_endings(pool) for group in data.verbs for pool in group.forms.values()]
         ),
         "state": _span(
             [group.words for group in data.states]
-            + [pool for group in data.states for pool in group.forms.values()]
+            + [_endings(pool) for group in data.states for pool in group.forms.values()]
         ),
         "manner": _span([data.manners]),
         "time": _span([data.times]),
@@ -1233,10 +1343,10 @@ def _form_of(
 ) -> WordPool:
     """The predicates of a group, in the form this sentence ends on.
 
-    The chain is `politeQuestion` → `polite` → `question` → `words`, so a group declares
-    only what its language actually writes. Japanese declares `"polite"` alone and it
-    serves the question too, because the `か` that asks is the frame's tag rather than
-    part of the verb; Korean declares both, because `달립니까` is not `달립니다`.
+    Each level falls back along its own chain to the plain statement the `words` already
+    are, so a group declares only what its language actually writes. Japanese declares
+    `"polite"` alone and it serves the formal level and the question too, because the
+    `か` that asks is the frame's tag rather than part of the verb.
 
     Args:
         state_group: The state group heading the shape, or None.
@@ -1248,19 +1358,14 @@ def _form_of(
         The pool the predicate is drawn from.
     """
     group: StateGroup | VerbGroup = state_group if state_group is not None else verb_group  # type: ignore[assignment]
-    asking = mark == "question"
 
-    if style == "polite":
-        polite = (
-            group.forms.get("politeQuestion") or group.forms.get("polite")
-            if asking
-            else group.forms.get("polite")
-        )
+    for key in FORM_CHAIN[style][mark]:
+        pool = group.forms.get(key)
 
-        if polite:
-            return polite
+        if pool:
+            return tuple(_one_of(entry) for entry in pool)
 
-    return (group.forms.get("question") if asking else None) or group.words
+    return group.words
 
 
 def _predicate_for(
@@ -1343,7 +1448,7 @@ def _compose(
     # with the plain words, which is what lets a required word be translated rather than
     # written out in the wrong form.
     base = predicates
-    predicates = _form_of(state_group, verb_group, draw.mark, settings.style)
+    predicates = _form_of(state_group, verb_group, draw.mark, draw.style)
     subject_themes = _themes_for_classes(themes, subject_classes)
     subject_required = _required_at(frame, plan, "subject")
     # A theme the caller named is honoured even when no verb group of the language
@@ -1838,6 +1943,10 @@ def _generate_result(language: WordLanguage, settings: Settings) -> list[Built]:
     )
     built: list[Built] = []
     topic: Topic | None = None
+    # The result's own voice, settled once. A caller who named a level gets that one
+    # throughout; one who did not gets a paragraph that is at least consistent with
+    # itself, rather than a level rerolled every sentence.
+    voice = settings.style if settings.style is not None else pick(STYLES)
 
     for budget in budgets:
         type_ = pick(settings.types)
@@ -1849,6 +1958,7 @@ def _generate_result(language: WordLanguage, settings: Settings) -> list[Built]:
             mark,
             _quote_for(data, type_, settings.quote),
             _opener_for(data, mark, follow is not None, budget[1], shortest),
+            _style_for(type_, settings.style, voice),
             follow,
         )
         one = _generate_one(language, settings, draw)
@@ -1860,7 +1970,9 @@ def _generate_result(language: WordLanguage, settings: Settings) -> list[Built]:
         # stands in front of the whole sentence rather than instead of any piece of it.
         if draw.opener and _distance_from(len(one.sentence), budget) > 0:
             bare = _generate_one(
-                language, settings, Draw(budget, type_, mark, draw.quote, "", follow)
+                language,
+                settings,
+                Draw(budget, type_, mark, draw.quote, "", draw.style, follow),
             )
 
             if _distance_from(len(bare.sentence), budget) < _distance_from(
@@ -2045,7 +2157,7 @@ def generate_sentence_details(
     include_name: bool = False,
     type: SentenceTypeOption = "statement",
     quote: SentenceQuote | None = None,
-    style: SentenceStyle = "plain",
+    style: SentenceStyle | None = None,
 ) -> list[SentenceDetail]:
     """Generate sentences with every choice already resolved.
 
