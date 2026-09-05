@@ -11,6 +11,14 @@ import 'package:randino/src/types.dart';
 /// The particles are left out of [SentenceDetail.phrases], so joining them back
 /// does not reproduce the sentence.
 ///
+///
+/// [sentences] puts more than one sentence in one result — they come back as one
+/// string, and `count` is still how many strings there are. They are about the
+/// same thing: a later sentence names the first one's subject again, refers to
+/// it with a pronoun, or draws a fresh subject of the same kind, and may open on
+/// a connective. `minLength` and `maxLength` describe the whole string whatever
+/// this is.
+///
 /// ```dart
 /// randSentenceDetails(language: WordLanguage.ko);
 /// // [SentenceDetail(검은 고양이가 숲에서 잠잔다., [검은 고양이, 숲, 잠잔다], ko, animal)]
@@ -27,6 +35,7 @@ List<SentenceDetail> randSentenceDetails({
   int? maxLength,
   String? startsWith,
   bool unique = false,
+  int sentences = 1,
 }) => generateSentenceDetails(
   language: language,
   theme: theme,
@@ -39,4 +48,5 @@ List<SentenceDetail> randSentenceDetails({
   maxLength: maxLength,
   startsWith: startsWith,
   unique: unique,
+  sentences: sentences,
 );

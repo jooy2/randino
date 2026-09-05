@@ -3,6 +3,7 @@
 import 'package:randino/src/internal/parse.dart';
 import 'package:randino/src/sentence/data/types.dart';
 import 'package:randino/src/types.dart';
+import 'package:randino/src/word/data/types.dart';
 
 /// The sentence dataset for vi.
 final SentenceLanguageData vi = SentenceLanguageData(
@@ -159,6 +160,11 @@ final SentenceLanguageData vi = SentenceLanguageData(
       ngày_mai vào_mùa_xuân vào_mùa_hè vào_mùa_thu vào_mùa_đông vào_cuối_tuần vừa_rồi
       đôi_khi mỗi_ngày lúc_hoàng_hôn
     '''),
+  connectives: words(r'rồi và_rồi nhưng thế_là sau_đó cuối_cùng đồng_thời tuy_vậy'),
+  pronouns: const <WordGender, WordPool>{
+    WordGender.n: <String>['', 'nó'],
+  },
+  pronounless: const <NounClass>[NounClass.person],
   frames: const <SentenceFrame>[
     SentenceFrame(<SentencePart>[
       SentencePart(SentenceSlot.subject, modifiable: true),

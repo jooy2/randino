@@ -168,6 +168,10 @@ final SentenceLanguageData en = SentenceLanguageData(
       at_dawn in_the_morning at_noon in_the_evening at_night today yesterday tomorrow in_spring
       in_summer in_autumn in_winter on_weekends just_now sometimes every_day at_dusk before_long
     '''),
+  connectives: words(r'and_then so but meanwhile afterwards still later soon even_so at_last'),
+  pronouns: <WordGender, WordPool>{WordGender.n: words(r'it')},
+  // English cannot drop a subject, so a sentence about a person names it again.
+  pronounless: const <NounClass>[NounClass.person],
   frames: const <SentenceFrame>[
     SentenceFrame(<SentencePart>[
       SentencePart(SentenceSlot.subject, modifiable: true),

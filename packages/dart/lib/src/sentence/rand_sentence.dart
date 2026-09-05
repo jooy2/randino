@@ -22,6 +22,14 @@ import 'package:randino/src/types.dart';
 /// the pools hold goes in the phrase it belongs to; a word from anywhere else is
 /// used as a noun.
 ///
+///
+/// [sentences] puts more than one sentence in one result — they come back as one
+/// string, and `count` is still how many strings there are. They are about the
+/// same thing: a later sentence names the first one's subject again, refers to
+/// it with a pronoun, or draws a fresh subject of the same kind, and may open on
+/// a connective. `minLength` and `maxLength` describe the whole string whatever
+/// this is.
+///
 /// ```dart
 /// randSentence(language: WordLanguage.ko, count: 2);
 /// // ['검은 고양이가 숲에서 잠잔다.', '여우가 사과를 먹는다.']
@@ -44,6 +52,7 @@ List<String> randSentence({
   int? maxLength,
   String? startsWith,
   bool unique = false,
+  int sentences = 1,
 }) =>
     generateSentenceDetails(
       language: language,
@@ -57,4 +66,5 @@ List<String> randSentence({
       maxLength: maxLength,
       startsWith: startsWith,
       unique: unique,
+      sentences: sentences,
     ).map((detail) => detail.sentence).toList();

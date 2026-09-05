@@ -3,6 +3,7 @@
 import 'package:randino/src/internal/parse.dart';
 import 'package:randino/src/sentence/data/types.dart';
 import 'package:randino/src/types.dart';
+import 'package:randino/src/word/data/types.dart';
 
 /// The sentence dataset for ru.
 final SentenceLanguageData ru = SentenceLanguageData(
@@ -132,6 +133,12 @@ final SentenceLanguageData ru = SentenceLanguageData(
       на_рассвете утром днём вечером ночью сегодня вчера завтра весной летом осенью зимой
       в_выходные только_что иногда каждый_день в_сумерках
     '''),
+  connectives: words(r'и_потом но затем поэтому однако наконец потом тем_временем'),
+  pronouns: <WordGender, WordPool>{
+    WordGender.m: words(r'он'),
+    WordGender.f: words(r'она'),
+    WordGender.n: words(r'оно'),
+  },
   // Nominative only, which is why there is neither an object nor a place here: a
   // Russian noun changes its own ending for both, and the endings are the noun's
   // own rather than a rule the pools could carry.

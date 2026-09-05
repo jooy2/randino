@@ -3,6 +3,7 @@
 import 'package:randino/src/internal/parse.dart';
 import 'package:randino/src/sentence/data/types.dart';
 import 'package:randino/src/types.dart';
+import 'package:randino/src/word/data/types.dart';
 
 /// The sentence dataset for zh.
 final SentenceLanguageData zh = SentenceLanguageData(
@@ -159,6 +160,11 @@ final SentenceLanguageData zh = SentenceLanguageData(
       黎明时 早晨 中午 傍晚 夜里 深夜 今天 昨天 明天 春天 夏天 秋天 冬天 周末 刚才 有时 每天
       黄昏时
     '''),
+  connectives: words(r'然后 所以 但是 不过 于是 后来 接着 同时 终于'),
+  pronouns: const <WordGender, WordPool>{
+    WordGender.n: <String>['', '它'],
+  },
+  pronounless: const <NounClass>[NounClass.person],
   frames: const <SentenceFrame>[
     SentenceFrame(<SentencePart>[
       SentencePart(SentenceSlot.subject, modifiable: true),

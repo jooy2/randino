@@ -200,6 +200,11 @@ final SentenceLanguageData it = SentenceLanguageData(
       all'alba al_mattino a_mezzogiorno di_sera di_notte oggi ieri domani in_primavera in_estate
       in_autunno in_inverno nel_fine_settimana poco_fa a_volte ogni_giorno al_tramonto
     '''),
+  connectives: words(r'e_poi ma allora inoltre, tuttavia, dopo infine intanto,'),
+  // Pro-drop, the same as Spanish: `esso` exists and nobody writes it.
+  pronouns: const <WordGender, WordPool>{
+    WordGender.n: <String>[''],
+  },
   frames: const <SentenceFrame>[
     SentenceFrame(<SentencePart>[
       SentencePart(SentenceSlot.subject, modifiable: true),

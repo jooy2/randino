@@ -57,6 +57,7 @@ class _Settings {
     required this.maxLength,
     required this.prefix,
     required this.include,
+    required this.sentences,
   });
 
   final WordTheme? theme;
@@ -72,6 +73,47 @@ class _Settings {
   final int? maxLength;
   final String prefix;
   final List<String> include;
+
+  /// How many sentences one result holds, clamped.
+  final int sentences;
+}
+
+/// What the sentences of one result are about: the first sentence's subject, and
+/// everything a later one needs to keep talking about it.
+///
+/// A paragraph is not three draws, and this is the whole of the difference. The
+/// class is what a fresh subject stays inside, the noun is what naming it again
+/// writes, and the gender is what a pronoun and an agreeing predicate need.
+class _Topic {
+  const _Topic(this.noun, this.theme, this.nounClass, this.gender);
+
+  /// The subject noun as the first sentence wrote it.
+  final String noun;
+  final WordTheme? theme;
+
+  /// The class its theme falls into. Null when the noun is one no pool holds.
+  final NounClass? nounClass;
+  final WordGender? gender;
+}
+
+/// How a sentence that follows another refers to what the two of them are about:
+/// [repeat] names the topic again, [pronoun] stands in for it — with the empty
+/// string where the language drops its subject — and [fresh] draws another noun
+/// of the same class.
+enum _Reference { repeat, pronoun, fresh }
+
+/// Everything a sentence after the first one is built with.
+class _Follow {
+  const _Follow(this.topic, this.reference, this.pronoun, this.opener);
+
+  final _Topic topic;
+  final _Reference reference;
+
+  /// What a [_Reference.pronoun] writes; `''` where the language writes nothing.
+  final String pronoun;
+
+  /// The connective the sentence opens on, `''` for none.
+  final String opener;
 }
 
 /* --- Shapes ---------------------------------------------------------------- */
@@ -293,9 +335,18 @@ _Requirement _classify(WordLanguage language, String word) {
 ///
 /// Greedy: a word takes the first of its own slots that is still free, which is
 /// enough because the lists are short and ordered by how specific the reading is.
-_Placement _planFor(SentenceFrame frame, List<_Requirement> requirements) {
+_Placement _planFor(SentenceFrame frame, List<_Requirement> requirements, [_Requirement? subject]) {
   final plan = _Plan(<int, _Requirement>{}, <int, _Requirement>{});
   var complete = true;
+
+  // A sentence carrying on about the topic is handed its subject rather than
+  // asking for it, so it goes in the subject's own phrase before the greedy
+  // placement below reaches for the first noun slot it can find.
+  if (subject != null) {
+    final at = _indexWhere(frame, (part, i) => part.slot == SentenceSlot.subject);
+
+    if (at >= 0) plan.phrase[at] = subject;
+  }
 
   for (final requirement in requirements) {
     var placed = false;
@@ -574,18 +625,8 @@ LengthRange _frameRange(
 LengthRange naturalRange(WordLanguage language) {
   final data = sentenceData[language]!;
   final bounds = _slotBounds(language);
-  final modifier = _modifierBounds[language]!;
-  var min = 1 << 30;
-  var max = 0;
 
-  for (final frame in data.frames) {
-    final range = _frameRange(frame, data, bounds, modifier);
-
-    if (range.min < min) min = range.min;
-    if (range.max > max) max = range.max;
-  }
-
-  return LengthRange(min, max);
+  return _naturalSpan(data, data.frames, bounds, _modifierBounds[language]!);
 }
 
 /* --- Choosing the words ---------------------------------------------------- */
@@ -683,12 +724,19 @@ class _Phrase {
 }
 
 class _Built {
-  const _Built(this.sentence, this.phrases, this.slots, this.theme);
+  const _Built(this.sentence, this.phrases, this.slots, this.theme, this.subject, this.gender);
 
   final String sentence;
   final List<String> phrases;
   final List<SentenceSlot> slots;
   final WordTheme? theme;
+
+  /// The subject noun as written, which is what the next sentence carries on
+  /// about.
+  final String? subject;
+
+  /// Its gender, for the pronoun and the agreement of whatever follows.
+  final WordGender? gender;
 }
 
 /// The article a phrase opens with, by the noun's gender and the word after it.
@@ -858,6 +906,7 @@ _Built _compose(
   LengthRange modifierBounds,
   int min,
   int max,
+  _Follow? follow,
 ) {
   final lexicon = wordData[language]!;
   final themes = requested.isNotEmpty ? requested : wordThemes;
@@ -892,38 +941,78 @@ _Built _compose(
   // nullable left-hand side, and hand back a `WordTheme?`.
   final WordTheme subjectTheme =
       subjectRequired?.theme ?? pick<WordTheme>(subjectThemes.isNotEmpty ? subjectThemes : themes);
+  // A sentence carrying on about the topic stands a pronoun where its subject
+  // would go, and the languages that drop their subject stand nothing there at
+  // all — in which case the phrase is not in the shape to carry an article, a
+  // modifier or a particle. Written out as its own list so that every budget
+  // below is measured against what the sentence actually writes; `at` is the
+  // index back into the frame, which is what the plan is keyed by.
+  final String? pronoun = follow?.reference == _Reference.pronoun ? follow!.pronoun : null;
+  final parts = <SentencePart>[];
+  final at = <int>[];
+
+  for (var i = 0; i < frame.parts.length; i += 1) {
+    final part = frame.parts[i];
+
+    if (part.slot != SentenceSlot.subject || pronoun == null) {
+      parts.add(part);
+      at.add(i);
+
+      continue;
+    }
+
+    if (pronoun.isNotEmpty) {
+      parts.add(
+        SentencePart(
+          part.slot,
+          head: part.head,
+          tail: part.tail,
+          tailAlt: part.tailAlt,
+          bare: true,
+        ),
+      );
+      at.add(i);
+    }
+  }
+
   // Only a shape that opens on a noun phrase with nothing in front of it can
   // honour `startsWith`; anywhere else the sentence opens on an article, a
-  // preposition or an adverbial, and `collect` filters what does not match.
-  final first = frame.parts.first;
-  final prefixable = _isNounSlot(first.slot) && first.head == null && data.articles == null;
+  // preposition or an adverbial, and `collect` filters what does not match. A
+  // sentence after the first one never opens the result, so it never carries it.
+  final first = parts.first;
+  final prefixable =
+      follow == null && _isNounSlot(first.slot) && first.head == null && data.articles == null;
   final space = data.space.length;
+  final opener = follow?.opener ?? '';
   // Every phrase's theme is settled before any of them is drawn, because a length
   // budget is only as good as the pools it was measured against. Left to the loop,
   // each phrase was given the room the language's longest noun would need and drew
   // a word out of its own theme, which is how a sentence came out short of a
   // `minLength` the shape could otherwise have reached.
   final partThemes = <WordTheme?>[
-    for (var i = 0; i < frame.parts.length; i += 1)
-      !_isNounSlot(frame.parts[i].slot)
+    for (var i = 0; i < parts.length; i += 1)
+      !_isNounSlot(parts[i].slot)
           ? null
-          : frame.parts[i].slot == SentenceSlot.subject
+          : parts[i].slot == SentenceSlot.subject
           ? subjectTheme
-          : (plan.phrase[i]?.theme ??
-              _themeForPart(frame.parts[i].slot, verbGroup?.object, themes)),
+          : (plan.phrase[at[i]]?.theme ?? _themeForPart(parts[i].slot, verbGroup?.object, themes)),
   ];
   // The same for the predicate: `bounds` spans every group the language has, and
   // one sentence draws from one of them. A word the caller required is narrower
-  // still — its length is not a range at all.
+  // still — its length is not a range at all, and neither is a pronoun's.
   final partBounds = <Map<SentenceSlot, LengthRange>>[];
   final partModifier = <LengthRange>[];
 
-  for (var i = 0; i < frame.parts.length; i += 1) {
-    final part = frame.parts[i];
-    final required = plan.phrase[i];
-    final exact = required == null ? null : LengthRange(required.word.length, required.word.length);
+  for (var i = 0; i < parts.length; i += 1) {
+    final part = parts[i];
+    final required = plan.phrase[at[i]];
+    final String? word =
+        part.slot == SentenceSlot.subject && pronoun != null && pronoun.isNotEmpty
+            ? pronoun
+            : required?.word;
+    final exact = word == null ? null : LengthRange(word.length, word.length);
     final own = Map<SentenceSlot, LengthRange>.from(bounds);
-    final owed = plan.modifier[i];
+    final owed = plan.modifier[at[i]];
 
     if (partThemes[i] != null) {
       own[part.slot] = exact ?? _nounSpan(language, partThemes[i]!, settings.invent);
@@ -940,9 +1029,9 @@ _Built _compose(
   }
 
   final spans = <LengthRange>[
-    for (var i = 0; i < frame.parts.length; i += 1)
+    for (var i = 0; i < parts.length; i += 1)
       () {
-        final range = _partRange(frame.parts[i], data, partBounds[i], partModifier[i]);
+        final range = _partRange(parts[i], data, partBounds[i], partModifier[i]);
         final gap = i == 0 ? 0 : space;
 
         return LengthRange(gap + range.min, gap + range.max);
@@ -952,15 +1041,19 @@ _Built _compose(
   final reported = <String>[];
   final slots = <SentenceSlot>[];
   _Phrase? subject;
-  WordGender? gender;
-  var used = data.terminator.length;
+  // A pronoun says nothing about its own gender, so what agrees with it agrees
+  // with the noun it stands for.
+  WordGender? gender = pronoun != null && pronoun.isNotEmpty ? follow!.topic.gender : null;
+  var used = data.terminator.length + (opener.isEmpty ? 0 : opener.length + space);
 
-  for (var i = 0; i < frame.parts.length; i += 1) {
-    final part = frame.parts[i];
+  if (opener.isNotEmpty) written.add(data.capitalize ? _upper(opener) : opener);
+
+  for (var i = 0; i < parts.length; i += 1) {
+    final part = parts[i];
     var restMin = 0;
     var restMax = 0;
 
-    for (var rest = i + 1; rest < frame.parts.length; rest += 1) {
+    for (var rest = i + 1; rest < parts.length; rest += 1) {
       restMin += spans[rest].min;
       restMax += spans[rest].max;
     }
@@ -972,9 +1065,11 @@ _Built _compose(
     final low = _atLeast(1, min - used - overhead - restMax);
     String phrase;
 
-    if (_isNounSlot(part.slot)) {
-      final required = plan.phrase[i];
-      final owed = plan.modifier[i];
+    if (part.slot == SentenceSlot.subject && pronoun != null && pronoun.isNotEmpty) {
+      phrase = pronoun;
+    } else if (_isNounSlot(part.slot)) {
+      final required = plan.phrase[at[i]];
+      final owed = plan.modifier[at[i]];
       final theme = partThemes[i]!;
       final nouns = partBounds[i][part.slot]!;
       final article = part.bare ? const LengthRange(0, 0) : _articleSpan(data);
@@ -1013,7 +1108,7 @@ _Built _compose(
         lexicon,
         data,
         stateGroup?.words ?? verbGroup!.words,
-        plan.phrase[i],
+        plan.phrase[at[i]],
         gender,
         low,
         high,
@@ -1021,9 +1116,9 @@ _Built _compose(
     }
 
     // The opening capital belongs to whatever is written first, and that is the
-    // phrase itself unless a preposition stands in front of it. Applied here
-    // rather than to the finished string, so the phrase the detail reports is
-    // the one the sentence actually shows.
+    // phrase itself unless a connective or a preposition stands in front of it.
+    // Applied here rather than to the finished string, so the phrase the detail
+    // reports is the one the sentence actually shows.
     final opens = data.capitalize && written.isEmpty;
     final head = opens && part.head != null ? _upper(part.head!) : part.head;
     final text = opens && part.head == null ? _upper(phrase) : phrase;
@@ -1037,7 +1132,14 @@ _Built _compose(
     used += gap + headCost + text.length + tail.length;
   }
 
-  return _Built(written.join(data.space) + data.terminator, reported, slots, subject?.theme);
+  return _Built(
+    written.join(data.space) + data.terminator,
+    reported,
+    slots,
+    subject?.theme,
+    subject?.noun ?? (pronoun != null && pronoun.isNotEmpty ? follow!.topic.noun : null),
+    subject != null ? gender : (pronoun != null ? follow!.topic.gender : null),
+  );
 }
 
 /// The word a phrase that is not a noun phrase writes: the predicate, or an
@@ -1067,19 +1169,52 @@ String _predicateFor(
   return agreed(pickWord(pool, min < max ? min : max, max, '') ?? pick(pool));
 }
 
-_Built _generateOne(WordLanguage language, _Settings settings) {
+/// The themes a sentence may draw its subject from.
+///
+/// A sentence carrying on about a topic stays inside the topic's own class,
+/// which is what makes a paragraph read as one rather than as three draws that
+/// happened to land together.
+List<WordTheme> _subjectThemesFor(_Settings settings, _Follow? follow) {
+  final requested = settings.theme == null ? wordThemes : <WordTheme>[settings.theme!];
+  final topicClass = follow?.topic.nounClass;
+
+  if (topicClass == null) return requested;
+
+  final inClass = _themesForClasses(requested, <NounClass>[topicClass]);
+
+  return inClass.isNotEmpty ? inClass : requested;
+}
+
+_Built _generateOne(
+  WordLanguage language,
+  _Settings settings,
+  LengthRange budget,
+  _Follow? follow,
+) {
   final data = sentenceData[language]!;
   final bounds = _slotBounds(language);
   final modifierBounds = _modifierBounds[language]!;
   final allowed = _framesFor(data, settings);
-  final requested = settings.theme == null ? wordThemes : <WordTheme>[settings.theme!];
-  final requirements = settings.include
-      .map((word) => _classify(language, word))
-      .toList(growable: false);
+  final requested = _subjectThemesFor(settings, follow);
+  // The words a caller required go in the first sentence — once in the result
+  // rather than once in every sentence of it.
+  final requirements =
+      follow != null
+          ? const <_Requirement>[]
+          : settings.include.map((word) => _classify(language, word)).toList(growable: false);
+  final carried =
+      follow?.reference == _Reference.repeat
+          ? _Requirement(
+            follow!.topic.noun,
+            const <SentenceSlot?>[SentenceSlot.subject],
+            theme: follow.topic.theme,
+            known: follow.topic.theme != null,
+          )
+          : null;
   final placements = <SentenceFrame, _Placement>{
-    for (final frame in allowed) frame: _planFor(frame, requirements),
+    for (final frame in allowed) frame: _planFor(frame, requirements, carried),
   };
-  final range = _boundsFor(data, allowed, bounds, modifierBounds, settings);
+  final range = budget;
   // A shape is only worth drawing when the language has a predicate for it: a
   // `body` subject has no transitive verb in any language here, so a shape with
   // an object in it would have to fall back to a verb that means something else.
@@ -1136,6 +1271,7 @@ _Built _generateOne(WordLanguage language, _Settings settings) {
       modifierBounds,
       range.min,
       range.max,
+      follow,
     );
     final length = built.sentence.length;
 
@@ -1154,7 +1290,33 @@ _Built _generateOne(WordLanguage language, _Settings settings) {
   return best!;
 }
 
-/// The length range one sentence has to land in.
+/// The shortest and longest sentence a set of shapes can produce.
+LengthRange _naturalSpan(
+  SentenceLanguageData data,
+  List<SentenceFrame> frames,
+  Map<SentenceSlot, LengthRange> bounds,
+  LengthRange modifier,
+) {
+  var min = 1 << 30;
+  var max = 0;
+
+  for (final frame in frames) {
+    final range = _frameRange(frame, data, bounds, modifier);
+
+    if (range.min < min) min = range.min;
+    if (range.max > max) max = range.max;
+  }
+
+  return LengthRange(min, max);
+}
+
+/// The length range one whole result has to land in — every sentence of it and
+/// the spaces between them, because that is what `minLength` and `maxLength`
+/// describe.
+///
+/// The ceiling is per sentence rather than per result: a paragraph of ten is ten
+/// sentences long, and capping it at what one of them may be would answer the
+/// ask with ten sentences of twenty characters.
 LengthRange _boundsFor(
   SentenceLanguageData data,
   List<SentenceFrame> frames,
@@ -1162,23 +1324,186 @@ LengthRange _boundsFor(
   LengthRange modifier,
   _Settings settings,
 ) {
-  var naturalMin = 1 << 30;
-  var naturalMax = 0;
-
-  for (final frame in frames) {
-    final range = _frameRange(frame, data, bounds, modifier);
-
-    if (range.min < naturalMin) naturalMin = range.min;
-    if (range.max > naturalMax) naturalMax = range.max;
-  }
+  final count = settings.sentences;
+  final gap = data.space.length * (count - 1);
+  final natural = _naturalSpan(data, frames, bounds, modifier);
 
   return lengthBounds(
     settings.minLength,
     settings.maxLength,
-    naturalMin,
-    naturalMax,
-    ceiling: randSentenceLengthMax,
+    natural.min * count + gap,
+    natural.max * count + gap,
+    ceiling: randSentenceLengthMax * count + gap,
   );
+}
+
+/// How far a length falls outside a range, and `0` when it is inside it.
+int _distanceFrom(int length, LengthRange range) =>
+    length > range.max ? length - range.max : _atLeast(0, range.min - length);
+
+/// The result's range, shared out over its sentences.
+///
+/// The joins between them come off the top and the last sentence absorbs the
+/// rounding, so the shares add back up to exactly what the caller asked for
+/// rather than to one character less.
+List<LengthRange> _shareOut(LengthRange range, int count, int space) {
+  if (count == 1) return <LengthRange>[range];
+
+  final gap = space * (count - 1);
+
+  List<int> split(int total) {
+    final body = _atLeast(count, total - gap);
+    final each = body ~/ count;
+    final shares = List<int>.filled(count, each);
+
+    shares[count - 1] = body - each * (count - 1);
+
+    return shares;
+  }
+
+  final mins = split(range.min);
+  final maxs = split(range.max);
+
+  return <LengthRange>[
+    for (var i = 0; i < count; i += 1)
+      LengthRange(_atLeast(1, mins[i]), _atLeast(mins[i], maxs[i])),
+  ];
+}
+
+/* --- Building the whole result --------------------------------------------- */
+
+// How often a sentence that follows another one opens on a connective.
+const int _connectiveChance = 40;
+
+// How a sentence refers to the topic, against the other two ways of doing it.
+const Map<_Reference, int> _referenceWeight = <_Reference, int>{
+  _Reference.repeat: 25,
+  _Reference.pronoun: 40,
+  _Reference.fresh: 35,
+};
+
+/// What the rest of the result is about, read off the sentence that opened it.
+_Topic? _topicOf(_Built built) {
+  final noun = built.subject;
+
+  if (noun == null) return null;
+
+  final theme = built.theme;
+
+  return _Topic(noun, theme, theme == null ? null : themeClass[theme], built.gender);
+}
+
+/// The pronouns the language can stand in for this topic with.
+///
+/// A class its written pronouns are wrong for is left with the empty entry alone
+/// — the language says nothing where it can, and where it cannot, there is no
+/// pronoun to be had and the sentence names the topic again instead.
+WordPool _pronounsFor(SentenceLanguageData data, _Topic topic) {
+  final pool =
+      data.pronouns[topic.gender ?? WordGender.n] ??
+      data.pronouns[WordGender.n] ??
+      const <String>[];
+  final topicClass = topic.nounClass;
+
+  if (topicClass != null && data.pronounless.contains(topicClass)) {
+    return pool.where((word) => word.isEmpty).toList(growable: false);
+  }
+
+  return pool;
+}
+
+/// How one sentence carries on from the one before it.
+///
+/// [room] is what this sentence may be at its longest, and it is what decides
+/// whether it opens on a connective at all: a connective is written in front of
+/// a whole sentence rather than instead of any part of it, so one longer than
+/// the budget can spare is a sentence that overshoots by exactly its length.
+/// Russian `тем временем` is thirteen characters, and a third of a range of
+/// seventy-five has nowhere to put them.
+_Follow _followFor(SentenceLanguageData data, _Topic topic, int room, int shortest) {
+  final pronouns = _pronounsFor(data, topic);
+  final usable =
+      pronouns.isNotEmpty
+          ? const <_Reference>[_Reference.repeat, _Reference.pronoun, _Reference.fresh]
+          : const <_Reference>[_Reference.repeat, _Reference.fresh];
+  final spare = room - data.space.length - shortest;
+  final openers = data.connectives.where((word) => word.length <= spare).toList(growable: false);
+  var total = 0;
+
+  for (final each in usable) {
+    total += _referenceWeight[each]!;
+  }
+
+  var roll = randDouble() * total;
+  var reference = usable.last;
+
+  for (final each in usable) {
+    roll -= _referenceWeight[each]!;
+
+    if (roll <= 0) {
+      reference = each;
+      break;
+    }
+  }
+
+  return _Follow(
+    topic,
+    reference,
+    reference == _Reference.pronoun ? pick(pronouns) : '',
+    openers.isNotEmpty && chance(_connectiveChance) ? pick(openers) : '',
+  );
+}
+
+/// Every sentence of one result, in order.
+///
+/// The range is shared out before the first of them is drawn, and the topic is
+/// taken from that first sentence — so what follows is about the same thing
+/// rather than another draw that happened to land beside it.
+List<_Built> _generateResult(WordLanguage language, _Settings settings) {
+  final data = sentenceData[language]!;
+  final bounds = _slotBounds(language);
+  final modifierBounds = _modifierBounds[language]!;
+  final frames = _framesFor(data, settings);
+  final shortest = _naturalSpan(data, frames, bounds, modifierBounds).min;
+  final budgets = _shareOut(
+    _boundsFor(data, frames, bounds, modifierBounds, settings),
+    settings.sentences,
+    data.space.length,
+  );
+  final built = <_Built>[];
+  _Topic? topic;
+
+  for (var i = 0; i < settings.sentences; i += 1) {
+    final follow = topic == null ? null : _followFor(data, topic, budgets[i].max, shortest);
+    var one = _generateOne(language, settings, budgets[i], follow);
+
+    // `_followFor` reserves room for the connective against the shortest
+    // sentence the shapes could spell, which is a floor no draw actually reaches
+    // — the shortest word of every pool at once. When the sentence that came
+    // back could not be made short enough to carry the connective after all, the
+    // connective is the part worth giving up: it is written in front of the
+    // whole sentence rather than instead of any piece of it.
+    if (follow != null &&
+        follow.opener.isNotEmpty &&
+        _distanceFrom(one.sentence.length, budgets[i]) > 0) {
+      final bare = _generateOne(
+        language,
+        settings,
+        budgets[i],
+        _Follow(follow.topic, follow.reference, follow.pronoun, ''),
+      );
+
+      if (_distanceFrom(bare.sentence.length, budgets[i]) <
+          _distanceFrom(one.sentence.length, budgets[i])) {
+        one = bare;
+      }
+    }
+
+    built.add(one);
+    topic ??= _topicOf(one);
+  }
+
+  return built;
 }
 
 /// Generate sentences with every choice already resolved.
@@ -1196,6 +1521,7 @@ List<SentenceDetail> generateSentenceDetails({
   int? maxLength,
   String? startsWith,
   bool unique = false,
+  int sentences = 1,
 }) {
   final settings = _Settings(
     theme: theme,
@@ -1206,6 +1532,7 @@ List<SentenceDetail> generateSentenceDetails({
     maxLength: maxLength,
     prefix: resolvePrefix(startsWith),
     include: include.map((word) => word.trim()).where((word) => word.isNotEmpty).toList(),
+    sentences: clampInt(sentences, 1, randSentenceCountMax),
   );
 
   return collect<SentenceDetail>(
@@ -1214,16 +1541,20 @@ List<SentenceDetail> generateSentenceDetails({
     startsWith: settings.prefix,
     draw: () {
       final WordLanguage code = language ?? pick(_languagesFor(settings));
-      final built = _generateOne(code, settings);
+      final data = sentenceData[code]!;
+      final built = _generateResult(code, settings);
 
       return SentenceDetail(
-        sentence: built.sentence,
-        phrases: List<String>.unmodifiable(built.phrases),
+        sentence: built.map((one) => one.sentence).join(data.space),
+        sentences: List<String>.unmodifiable(built.map((one) => one.sentence)),
+        phrases: List<String>.unmodifiable(built.expand((one) => one.phrases)),
         // Unmodifiable, and a copy: the frames are the language's own, so a
         // caller reading the detail must not be able to reach into them.
-        slots: List<SentenceSlot>.unmodifiable(built.slots),
+        slots: List<SentenceSlot>.unmodifiable(built.expand((one) => one.slots)),
         language: code,
-        theme: built.theme,
+        // What the result is about is what its first sentence was about; the
+        // ones after it stay inside that noun's class.
+        theme: built.first.theme,
       );
     },
     keyOf: (detail) => detail.sentence,

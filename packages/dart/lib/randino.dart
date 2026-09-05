@@ -21,7 +21,8 @@
 /// nine supported languages.
 library;
 
-export 'src/constants.dart' show randCountMax, randLengthMax, randLengthMin, randSentenceLengthMax;
+export 'src/constants.dart'
+    show randCountMax, randLengthMax, randLengthMin, randSentenceCountMax, randSentenceLengthMax;
 export 'src/decorate/data/index.dart'
     show affixCharset, affixLengthDefault, affixLengthMax, affixSeparatorDefault;
 export 'src/decorate/rand_modifier.dart' show randModifier;

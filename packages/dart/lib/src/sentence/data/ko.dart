@@ -3,6 +3,7 @@
 import 'package:randino/src/internal/parse.dart';
 import 'package:randino/src/sentence/data/types.dart';
 import 'package:randino/src/types.dart';
+import 'package:randino/src/word/data/types.dart';
 
 /// The sentence dataset for ko.
 final SentenceLanguageData ko = SentenceLanguageData(
@@ -161,6 +162,15 @@ final SentenceLanguageData ko = SentenceLanguageData(
       새벽에 아침에 낮에 저녁에 밤에 한밤중에 오늘 어제 내일 봄에 여름에 가을에 겨울에 주말에
       방금 가끔 매일 해질녘에 이른봄에 늦가을에
     '''),
+  // What a sentence opens on when it follows another. Written whole, so a
+  // language that wants a comma after its connective writes the comma.
+  connectives: words(r'그리고 그래서 하지만 그런데 이윽고 곧 결국 그러자 한편 이내'),
+  // Korean leaves the subject out as readily as it writes 그것, and the empty
+  // entry is how the data says so.
+  pronouns: const <WordGender, WordPool>{
+    WordGender.n: <String>['', '그것'],
+  },
+  pronounless: const <NounClass>[NounClass.person],
   frames: const <SentenceFrame>[
     SentenceFrame(<SentencePart>[
       SentencePart(SentenceSlot.subject, tail: '가', tailAlt: '이', modifiable: true),

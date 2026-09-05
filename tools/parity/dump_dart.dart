@@ -137,6 +137,13 @@ void main() {
         ],
         'manners': listed(entry.value.manners),
         'times': listed(entry.value.times),
+        'connectives': listed(entry.value.connectives),
+        'pronouns': <String, Object?>{
+          for (final g in entry.value.pronouns.entries) g.key.name: listed(g.value),
+        },
+        // Optional in one package and defaulted in another; written as a list
+        // either way so the shapes compare.
+        'pronounless': <String>[for (final noun in entry.value.pronounless) noun.name],
         'frames': <Object?>[
           for (final frame in entry.value.frames)
             <String, Object?>{

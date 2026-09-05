@@ -120,6 +120,68 @@ bool explains(WordLanguage language, String phrase) {
   return false;
 }
 
+/// How a capitalizing language writes the first word of a sentence.
+String upperFirst(String word) =>
+    word.isEmpty ? word : word.substring(0, 1).toUpperCase() + word.substring(1);
+
+/// Every subject pronoun the language can write, in both cases.
+Set<String> pronounsOf(WordLanguage language) {
+  final written = <String>[
+    for (final pool in sentenceData[language]!.pronouns.values) ...pool,
+  ].where((word) => word.isNotEmpty);
+
+  return <String>{...written, ...written.map(upperFirst)};
+}
+
+/// The noun a phrase was built around, as far as the pools can tell.
+///
+/// The same decomposition [explains] makes, kept instead of thrown away. Null
+/// for a phrase built on a word no pool holds, which is what an invented subject
+/// is.
+String? nounIn(WordLanguage language, String phrase) {
+  final space = sentenceData[language]!.space;
+  final nouns = poolFor(language, SentenceSlot.subject);
+  final modifiers = modifiersFor(language);
+  var rest = phrase;
+
+  for (final article in articlesFor(language)) {
+    final opening = article.endsWith("'") ? article : article + space;
+
+    if (rest.startsWith(opening)) {
+      rest = rest.substring(opening.length);
+      break;
+    }
+  }
+
+  if (nouns.contains(rest)) return rest;
+
+  for (var at = 1; at < rest.length; at += 1) {
+    if (space.isNotEmpty &&
+        (at + space.length > rest.length || rest.substring(at, at + space.length) != space)) {
+      continue;
+    }
+
+    final left = rest.substring(0, at);
+    final right = rest.substring(at + space.length);
+
+    if (modifiers.contains(left) && nouns.contains(right)) return right;
+    if (nouns.contains(left) && modifiers.contains(right)) return left;
+  }
+
+  return null;
+}
+
+/// The theme whose pool holds a noun, in the form a sentence writes it.
+WordTheme? themeOfNoun(WordLanguage language, String noun) {
+  for (final theme in wordThemes) {
+    if (wordData[language]!.nouns[theme]!.any((word) => plain(language, word) == noun)) {
+      return theme;
+    }
+  }
+
+  return null;
+}
+
 void main() {
   group('Sentence', () {
     test('randSentence returns one sentence by default', () {
@@ -562,6 +624,174 @@ void main() {
       final sentences = randSentence(language: WordLanguage.ko, unique: true, count: 300);
 
       expect(sentences.toSet(), hasLength(sentences.length));
+    });
+
+    test('`sentences` puts more than one sentence in one result', () {
+      for (final language in wordLanguages) {
+        final data = sentenceData[language]!;
+
+        for (final detail in randSentenceDetails(language: language, sentences: 3, count: 40)) {
+          expect(detail.sentences, hasLength(3), reason: detail.sentence);
+          expect(detail.sentences.join(data.space), detail.sentence);
+
+          for (final sentence in detail.sentences) {
+            expect(sentence, endsWith(data.terminator), reason: '$language: $sentence');
+            expect(sentence, matches(script[language]!), reason: '$language: $sentence');
+            // Every sentence closes exactly once, so two of them were never run
+            // together into one entry.
+            expect(sentence.split(data.terminator).length - 1, 1, reason: '$language: $sentence');
+            expect(sentence.contains('  '), isFalse, reason: '$language: $sentence');
+          }
+        }
+      }
+
+      for (final detail in randSentenceDetails(count: 20)) {
+        expect(detail.sentences, hasLength(1));
+        expect(detail.sentences.first, detail.sentence);
+      }
+    });
+
+    test('`sentences` is clamped, and `count` still says how many strings there are', () {
+      for (final each in const <List<int>>[
+        <int>[0, 1],
+        <int>[-3, 1],
+        <int>[randSentenceCountMax + 5, randSentenceCountMax],
+      ]) {
+        for (final detail in randSentenceDetails(
+          language: WordLanguage.ko,
+          sentences: each[0],
+          count: 10,
+        )) {
+          expect(detail.sentences, hasLength(each[1]), reason: detail.sentence);
+        }
+      }
+
+      expect(randSentence(sentences: 4, count: 7), hasLength(7));
+    });
+
+    test('the length range describes the whole result, not one sentence of it', () {
+      const ranges = <List<Object>>[
+        <Object>[WordLanguage.ko, 2, 24, 40],
+        <Object>[WordLanguage.ko, 3, 40, 60],
+        <Object>[WordLanguage.en, 2, 40, 70],
+        <Object>[WordLanguage.ja, 3, 24, 42],
+        <Object>[WordLanguage.zh, 2, 14, 28],
+        <Object>[WordLanguage.de, 2, 34, 60],
+        <Object>[WordLanguage.ru, 3, 40, 75],
+      ];
+
+      for (final each in ranges) {
+        final language = each[0] as WordLanguage;
+        final sentences = each[1] as int;
+        final minLength = each[2] as int;
+        final maxLength = each[3] as int;
+
+        for (final sentence in randSentence(
+          language: language,
+          sentences: sentences,
+          minLength: minLength,
+          maxLength: maxLength,
+          count: sample,
+        )) {
+          expect(
+            sentence.length,
+            allOf(greaterThanOrEqualTo(minLength), lessThanOrEqualTo(maxLength)),
+            reason: '$language x$sentences $minLength-$maxLength: $sentence',
+          );
+        }
+      }
+    });
+
+    test('the sentences of one result are about the same kind of thing', () {
+      // A paragraph is not three draws. Every sentence after the first names that
+      // first subject again, stands a pronoun where it was, or draws another noun
+      // of the same class — so a paragraph that opens on a creature never wanders
+      // into an idea halfway through.
+      for (final language in wordLanguages) {
+        final pronouns = pronounsOf(language);
+
+        for (final detail in randSentenceDetails(language: language, sentences: 3, count: 60)) {
+          final theme = detail.theme;
+
+          if (theme == null) continue;
+
+          final wanted = themeClass[theme];
+          var subjects = 0;
+
+          for (var i = 0; i < detail.phrases.length; i += 1) {
+            if (detail.slots[i] != SentenceSlot.subject) continue;
+
+            subjects += 1;
+
+            final phrase = detail.phrases[i];
+
+            if (pronouns.contains(phrase)) continue;
+
+            // Any of the three sentences can be the one a phrase opens, so both
+            // cases are tried rather than only the first phrase of the result.
+            final noun =
+                nounIn(language, phrase) ??
+                nounIn(language, phrase.substring(0, 1).toLowerCase() + phrase.substring(1));
+            final found = noun == null ? null : themeOfNoun(language, noun);
+
+            expect(
+              found == null || themeClass[found] == wanted,
+              isTrue,
+              reason:
+                  '$language: "$phrase" is a $found where the result is about a $wanted (${detail.sentence})',
+            );
+          }
+
+          expect(subjects, greaterThanOrEqualTo(1), reason: detail.sentence);
+        }
+      }
+    });
+
+    test('a connective opens a sentence that follows another, and only one', () {
+      for (final language in wordLanguages) {
+        final data = sentenceData[language]!;
+        final openers = data.connectives
+            .map((word) => (data.capitalize ? upperFirst(word) : word) + data.space)
+            .toList(growable: false);
+        var seen = 0;
+
+        for (final detail in randSentenceDetails(language: language, sentences: 3, count: 120)) {
+          expect(
+            openers.any(detail.sentences.first.startsWith),
+            isFalse,
+            reason: '$language: the first sentence opens on a connective (${detail.sentence})',
+          );
+
+          seen +=
+              detail.sentences.skip(1).where((sentence) => openers.any(sentence.startsWith)).length;
+        }
+
+        // And the language can actually write one, which is what makes the check
+        // above worth anything.
+        expect(seen, greaterThan(0), reason: '$language never wrote a connective');
+      }
+    });
+
+    test('a language whose nouns carry a gender has a pronoun for each of them', () {
+      for (final language in wordLanguages) {
+        final data = sentenceData[language]!;
+        final genders = wordData[language]!.agreement?.keys.toList() ?? const <WordGender>[];
+
+        expect(data.connectives, isNotEmpty, reason: '$language has no connectives');
+        expect(
+          data.pronouns[WordGender.n] != null || genders.isNotEmpty,
+          isTrue,
+          reason: '$language has no pronoun to fall back to',
+        );
+
+        for (final gender in genders) {
+          expect(
+            data.pronouns[gender] ?? data.pronouns[WordGender.n],
+            isNotNull,
+            reason: '$language: nothing stands in for a $gender subject',
+          );
+        }
+      }
     });
 
     test('the detail form reports what the sentence was built from', () {

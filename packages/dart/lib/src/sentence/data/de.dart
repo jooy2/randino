@@ -146,6 +146,17 @@ final SentenceLanguageData de = SentenceLanguageData(
       im_Frühling im_Sommer im_Herbst im_Winter am_Wochenende gerade_eben manchmal jeden_Tag
       in_der_Dämmerung
     '''),
+  // Only the coordinating ones. German puts its finite verb second and counts
+  // whatever opens the clause towards that, so `dann` or `danach` in front would
+  // need the verb and the subject the other way round — a shape the frames write,
+  // not something a connective can bolt on. `und`, `aber`, `doch` and `denn` sit
+  // outside the clause and leave the order alone.
+  connectives: words(r'und aber doch denn'),
+  pronouns: <WordGender, WordPool>{
+    WordGender.m: words(r'er'),
+    WordGender.f: words(r'sie'),
+    WordGender.n: words(r'es'),
+  },
   // German declares the fewest shapes here, and both reasons are its cases. An
   // object would be accusative and a place dative, and each changes the article
   // and the modifier ending together. What is left is the nominative, and the

@@ -344,18 +344,28 @@ class SentenceDetail {
   /// reason to build one by hand outside a test.
   const SentenceDetail({
     required this.sentence,
+    required this.sentences,
     required this.phrases,
     required this.slots,
     required this.language,
     required this.theme,
   });
 
-  /// The finished sentence, punctuation and all.
+  /// The finished result, punctuation and all — every sentence of it, joined.
   final String sentence;
+
+  /// One entry per sentence.
+  ///
+  /// A single entry unless `sentences` asked for more, and [sentence] is always
+  /// these joined by the language's own space.
+  final List<String> sentences;
 
   /// The phrases the sentence is made of, in order — a phrase and its modifier,
   /// without the particle or preposition that marks it. So `검은 고양이가
   /// 잠잔다` reports `['검은 고양이', '잠잔다']`.
+  ///
+  /// One flat list across every sentence of the result, the same way [slots] is.
+  /// A connective a sentence opens on is not a phrase and is not in here.
   final List<String> phrases;
 
   /// What each phrase does in the sentence, at the same index as [phrases].
@@ -364,9 +374,11 @@ class SentenceDetail {
   /// The language this sentence was generated in.
   final WordLanguage language;
 
-  /// Theme the sentence's subject belongs to, or `null` when that word is not
-  /// one the generator knows, which happens when it was invented or was handed
-  /// in through `include`.
+  /// Theme the result's subject belongs to — the first sentence's, which is what
+  /// every sentence after it stays about.
+  ///
+  /// Null when that word is not one the generator knows, which happens when it
+  /// was invented or was handed in through `include`.
   final WordTheme? theme;
 
   @override

@@ -75,6 +75,7 @@ void main() {
           'randJob',
           'randLengthMax',
           'randLengthMin',
+          'randSentenceCountMax',
           'randSentenceLengthMax',
           'randModifier',
           'randModifierAll',
@@ -142,6 +143,7 @@ void main() {
       expect(randSentenceDetails()[0], isA<SentenceDetail>());
       expect(sentenceLengthRange(), isA<LengthRange>());
       expect(randSentenceLengthMax, 200);
+      expect(randSentenceCountMax, 10);
       expect(randAnimal(language: WordLanguage.ko), hasLength(1));
     });
 

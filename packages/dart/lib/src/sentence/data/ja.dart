@@ -3,6 +3,7 @@
 import 'package:randino/src/internal/parse.dart';
 import 'package:randino/src/sentence/data/types.dart';
 import 'package:randino/src/types.dart';
+import 'package:randino/src/word/data/types.dart';
 
 /// The sentence dataset for ja.
 final SentenceLanguageData ja = SentenceLanguageData(
@@ -160,6 +161,11 @@ final SentenceLanguageData ja = SentenceLanguageData(
       夜明けに 朝に 昼に 夕方に 夜に 真夜中に 今日 昨日 明日 春に 夏に 秋に 冬に 週末に さっき
       時々 毎日 夕暮れに
     '''),
+  connectives: words(r'そして だから しかし ところが やがて すぐに ついに 一方 また'),
+  pronouns: const <WordGender, WordPool>{
+    WordGender.n: <String>['', 'それ'],
+  },
+  pronounless: const <NounClass>[NounClass.person],
   frames: const <SentenceFrame>[
     SentenceFrame(<SentencePart>[
       SentencePart(SentenceSlot.subject, tail: 'が', modifiable: true),
