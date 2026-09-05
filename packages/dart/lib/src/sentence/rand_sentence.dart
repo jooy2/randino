@@ -76,7 +76,7 @@ List<String> randSentence({
   String? startsWith,
   bool unique = false,
   int sentences = 1,
-  bool includeName = false,
+  bool? includeName,
   Set<SentenceType>? type,
   SentenceQuote? quote,
   SentenceStyle? style,

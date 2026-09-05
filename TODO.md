@@ -82,12 +82,40 @@ What it cost, and what came out of it:
 
 ## C. Random is the default
 
-- [ ] `type` defaults to all six rather than `'statement'`, `style` to a level
+- [x] `type` defaults to all six rather than `'statement'`, `style` to a level
       drawn per result, and `includeName` to a coin flip. `realism`, `count`,
       `sentences` and the lengths keep the defaults they have — `'real'` is what
       the other three generators default to and a paragraph of ten is an ask.
-- [ ] The demo gets the same: every select that can be random says so, and says
+- [x] The demo gets the same: every select that can be random says so, and says
       so by default.
+
+What it cost, and the four bugs the new default turned up:
+
+- **A drawn kind has to be chosen against the room the sentence has.** A
+  question is a different shape and a quoted line pays for its marks out of the
+  same budget, so drawing the kind first and discovering that afterwards gave
+  `‘Họa sĩ có ồn ào không?’` out of a range of 12 to 17. `kindFor` filters the
+  kinds to the ones whose shapes fit, and falls back to all of them the way
+  every other narrowing here does.
+- **A name is settled the same way.** A named sentence is much shorter than an
+  unnamed one — `Yvonne` where a noun phrase writes `die schlanke Wolke` — so
+  `roomFor` measures a named result against the name's own lengths and
+  `nameFits` declines to draw one into a range only the longer shape can reach.
+- **`includeName` was writing over a word `include` had named.** `include:
+  '깜냥이'` came back as a sentence that did not contain `깜냥이`. A requirement
+  holds its place now.
+- **A word required into a counted subject lost its theme.** A counted shape has
+  no `subject` part — its quantity is the subject — and `requiredAt` was looking
+  for one regardless, so `사과` was counted in `명`.
+- Thirty-odd tests across the three suites read the old default. The ones about
+  something else pin `type: 'statement', includeName: false`; the ones about the
+  defaults were rewritten to assert what is drawn. The narrow-range sweep now
+  samples its windows from one kind, because the middle 90% of a bimodal
+  mixture is a band neither mode covers.
+- The German short-shape miss is at four characters rather than three now.
+  Measured at zero in 22,200 draws of that sweep; the cause is unchanged and
+  written in the test — the fitting reweights the shape after a miss but not
+  the theme.
 
 ## D. A paragraph remembers its scene
 

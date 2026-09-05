@@ -193,7 +193,9 @@ type Settings = {
 	// How many sentences one result holds, clamped.
 	sentences: number;
 	// Whether a phrase about a person is written as a name.
-	includeName: boolean;
+	// Whether a sentence about a person writes a name, or null when the caller left
+	// it to the generator, in which case it is decided once per result.
+	includeName: boolean | null;
 	// What the sentences may be doing, normalized to a set to draw from.
 	types: readonly SentenceType[];
 	// Which marks a quoted line takes, or undefined for the type's own default.
@@ -233,15 +235,6 @@ function styleFor(type: SentenceType, asked: SentenceStyle | null, voice: Senten
 	}
 
 	return type === 'thought' ? pick(THOUGHT_LEVELS) : voice;
-}
-
-/**
- * The kind whose mark a sentence of this type closes on. Dialogue and thought
- * have no mark of their own: what they quote is a sentence of another kind, and
- * they take its mark and put quotation marks around it.
- */
-function markFor(type: SentenceType): SentenceMark {
-	return type === 'dialogue' || type === 'thought' ? pick(QUOTED_MARKS) : type;
 }
 
 /** The marks a quoted line is wrapped in, or null when nothing is quoted. */
@@ -1128,16 +1121,19 @@ function properName(
 	language: WordLanguage,
 	wordData: WordLanguageData,
 	settings: Settings,
-	prefix: string,
-	min: number,
-	max: number
+	prefix: string
 ): { text: string; gender: WordGender | undefined } {
+	// No length range, on purpose. `randName` reads one as a licence to change the
+	// name's structure: a CJK given name is stretched to fill a range longer than
+	// its real ones, and an alphabetic language writes a second given name where
+	// one will not reach — `心敏若花清嫣华娜华梅瑶` and `Annette Tanja`, each of them
+	// one person. Both are the name generator answering a caller who asked for a
+	// length; a sentence is asking for a name. `nameSpan` is what the budget
+	// measured this phrase against, and an unsteered draw is what fits it.
 	const drawn = drawName(language, {
 		includeSurname: false,
 		realism: settings.realism,
-		startsWith: prefix,
-		minLength: min,
-		maxLength: max
+		startsWith: prefix
 	});
 
 	return {
@@ -1206,7 +1202,7 @@ function generateOne(language: WordLanguage, settings: Settings, draw: Draw): Bu
 	const budget = draw.budget;
 	const wordData = WORD_DATA[language];
 	const data = SENTENCE_DATA[language];
-	const bounds = slotBounds(language);
+	const bounds = roomFor(language, settings.includeName);
 	const allowed = framesFor(data, settings, moodFor(draw.mark));
 	const requested = subjectThemesFor(settings, follow);
 	// The words a caller required go in the first sentence — once in the result
@@ -1402,7 +1398,12 @@ function compose(
 	// than written out in the wrong form.
 	const predicates = formOf(group, draw.mark, draw.style);
 	const subjectThemes = themesForClasses(themes, group.subject);
-	const subjectRequired = requiredAt(frame, plan, 'subject');
+	// Which part is the subject is the shape's business, not the slot's: a counted
+	// shape has no `subject` part and its quantity is the subject. Looking for a
+	// `subject` part regardless is how a word required into a counted subject lost
+	// its theme, and `사과` came out as `사과 9명` — nine people's worth of apple.
+	const subjectSlot = subjectSlotOf(frame);
+	const subjectRequired = requiredAt(frame, plan, subjectSlot);
 	// A theme the caller named is honoured even when no verb group of the language
 	// has anything to say about it, the same way a shape it cannot make falls back
 	// rather than being answered with something else entirely.
@@ -1434,7 +1435,6 @@ function compose(
 	// each phrase was given the room the language's longest noun would need and
 	// drew a word out of its own theme, which is how a sentence came out short of a
 	// `minLength` the shape could otherwise have reached.
-	const subjectSlot = subjectSlotOf(frame);
 	const partThemes = shape.map(({ part, at }) =>
 		isNounSlot(part.slot)
 			? part.slot === subjectSlot
@@ -1447,13 +1447,20 @@ function compose(
 	// fresh name for a phrase about a person. All three are bare words — no article,
 	// no modifier, nothing but the word and whatever particle the frame puts after
 	// it — and `''` marks the one that has to be drawn against the room it is given.
-	const proper = shape.map(({ part }, i) => {
+	const proper = shape.map(({ part, at }, i) => {
 		if (part.slot === 'subject' && pronoun) {
 			return pronoun;
 		}
 
 		if (part.slot === 'subject' && follow?.reference === 'repeat' && follow.topic.named) {
 			return follow.topic.noun;
+		}
+
+		// A word the caller required holds its place against all of this. `include`
+		// says the sentence has to contain it, and a name written over it would be a
+		// sentence that does not.
+		if (plan.phrase.has(at)) {
+			return null;
 		}
 
 		const theme = partThemes[i];
@@ -1570,9 +1577,7 @@ function compose(
 					language,
 					wordData,
 					settings,
-					prefixable && i === 0 ? settings.prefix : '',
-					Math.min(low, high),
-					high
+					prefixable && i === 0 ? settings.prefix : ''
 				);
 
 				phrase = drawn.text;
@@ -1938,6 +1943,92 @@ function openerFor(
  * taken from that first sentence — so what follows is about the same thing rather
  * than another draw that happened to land beside it.
  */
+/**
+ * The kind this sentence is, and the kind whose mark it closes on, chosen
+ * against the room it has.
+ *
+ * A shape is not always answerable in a narrow range: a question is a different
+ * shape — Vietnamese writes `không` after the whole clause, English `Does` in
+ * front of the subject — and a quoted line pays for its marks out of the same
+ * budget. Drawing the kind first and discovering that afterwards is how
+ * `‘Họa sĩ có ồn ào không?’` came out of a range of 12 to 17.
+ *
+ * A kind the caller named is still drawn when none of them fit, which is the
+ * same best effort every other narrowing here makes.
+ */
+function kindFor(
+	data: SentenceLanguageData,
+	settings: Settings,
+	bounds: Record<string, readonly [number, number]>,
+	budget: readonly [number, number]
+): readonly [SentenceType, SentenceMark] {
+	const fits = (mark: SentenceMark, room: number) =>
+		framesFor(data, settings, moodFor(mark)).some(
+			(frame) => frameRange(frame, data, bounds)[0] <= room
+		);
+	const marksOf = (type: SentenceType) =>
+		type === 'dialogue' || type === 'thought' ? QUOTED_MARKS : [type as SentenceMark];
+	const roomOf = (type: SentenceType) => {
+		const quote = quoteFor(data, type, settings.quote);
+
+		return budget[1] - (quote ? quote[0].length + quote[1].length : 0);
+	};
+	const usable = settings.types.filter((type) =>
+		marksOf(type).some((mark) => fits(mark, roomOf(type)))
+	);
+	const type = pick(usable.length ? usable : settings.types);
+	const marks = marksOf(type).filter((mark) => fits(mark, roomOf(type)));
+
+	return [type, pick(marks.length ? marks : marksOf(type))];
+}
+
+/**
+ * Whether a result that writes a name can still land in the range the caller
+ * asked for.
+ *
+ * A name is one word and no article — `Yvonne` where a noun phrase would write
+ * `die schlanke Wolke` — so a named sentence is the shorter of the two by a wide
+ * margin, and a range only the longer one can reach is a range a name cannot be
+ * in. Asked for a name outright the generator writes one anyway, the same way it
+ * answers a range too narrow for the parts it was told to carry; drawn, it is
+ * one more thing to decide against the room.
+ */
+/**
+ * The slot bounds this result is measured against: the language's own, with the
+ * subject narrowed to a name when the result writes one.
+ *
+ * A name is one word and no article — `Yvonne` where a noun phrase would write
+ * `die schlanke Wolke` — so a shape chosen against noun lengths is a shape a
+ * named sentence cannot fill. Both the result's budget and the per-sentence
+ * choice of shape read this rather than `slotBounds` directly.
+ */
+function roomFor(
+	language: WordLanguage,
+	includeName: boolean | null
+): Record<string, readonly [number, number]> {
+	const bounds = slotBounds(language);
+
+	return includeName ? { ...bounds, subject: nameSpan(language) } : bounds;
+}
+
+function nameFits(
+	data: SentenceLanguageData,
+	frames: readonly SentenceFrame[],
+	bounds: Record<string, readonly [number, number]>,
+	settings: Settings,
+	language: WordLanguage
+): boolean {
+	if (settings.minLength === undefined) {
+		return true;
+	}
+
+	const count = settings.sentences;
+	const gap = data.space.length * (count - 1);
+	const [, natural] = naturalSpan(data, frames, roomFor(language, true));
+
+	return settings.minLength <= natural * count + gap;
+}
+
 function generateResult(language: WordLanguage, settings: Settings): Built[] {
 	const data = SENTENCE_DATA[language];
 	const bounds = slotBounds(language);
@@ -1951,8 +2042,18 @@ function generateResult(language: WordLanguage, settings: Settings): Built[] {
 			(mark) => framesFor(data, settings, moodFor(mark))
 		)
 	);
-	const [shortest] = naturalSpan(data, frames, bounds);
-	const [min, max] = boundsFor(data, frames, bounds, settings);
+	// A result either has a person in it or does not; deciding that per sentence
+	// would put a name in one line of a paragraph and not the next. Settled here
+	// because it takes the language's own name lengths to know whether a name can
+	// answer the range that was asked for.
+	const named =
+		settings.includeName ?? (nameFits(data, frames, bounds, settings, language) && chance(50));
+	const settled = settings.includeName === named ? settings : { ...settings, includeName: named };
+	// And the budget is measured against what a named result actually writes: one
+	// word where a noun phrase would have written an article, a modifier and a noun.
+	const room = roomFor(language, named);
+	const [shortest] = naturalSpan(data, frames, room);
+	const [min, max] = boundsFor(data, frames, room, settled);
 	const budgets = shareOut(min, max, settings.sentences, data.space.length);
 	const built: Built[] = [];
 	let topic: Topic | null = null;
@@ -1963,8 +2064,7 @@ function generateResult(language: WordLanguage, settings: Settings): Built[] {
 
 	for (let i = 0; i < settings.sentences; i += 1) {
 		const budget = budgets[i];
-		const type = pick(settings.types);
-		const mark = markFor(type);
+		const [type, mark] = kindFor(data, settled, room, budget);
 		const follow = topic ? followFor(data, topic) : null;
 		const draw: Draw = {
 			budget,
@@ -1975,7 +2075,7 @@ function generateResult(language: WordLanguage, settings: Settings): Built[] {
 			style: styleFor(type, settings.style, voice),
 			follow
 		};
-		let one = generateOne(language, settings, draw);
+		let one = generateOne(language, settled, draw);
 
 		// `openerFor` reserves room against the shortest sentence the shapes could
 		// spell, which is a floor no draw actually reaches — the shortest word of
@@ -1984,7 +2084,7 @@ function generateResult(language: WordLanguage, settings: Settings): Built[] {
 		// giving up: it stands in front of the whole sentence rather than instead of
 		// any piece of it.
 		if (draw.opener && distanceFrom(one.sentence.length, budget) > 0) {
-			const bare = generateOne(language, settings, { ...draw, opener: '' });
+			const bare = generateOne(language, settled, { ...draw, opener: '' });
 
 			if (distanceFrom(bare.sentence.length, budget) < distanceFrom(one.sentence.length, budget)) {
 				one = bare;
@@ -2017,7 +2117,11 @@ function resolveSlots(slots: SentenceSlotOption | undefined): Settings['slots'] 
 	return wanted.length ? wanted : 'none';
 }
 
-/** The caller's `type`, as the set one sentence is drawn from. */
+/**
+ * The caller's `type`, as the set one sentence is drawn from. Left out, or asked
+ * for something none of these are, the set is every one of them: a sentence with
+ * nothing said about it is as likely to ask as to tell.
+ */
 function resolveTypes(type: SentenceTypeOption | undefined): readonly SentenceType[] {
 	const all: readonly SentenceType[] = [
 		'statement',
@@ -2028,18 +2132,14 @@ function resolveTypes(type: SentenceTypeOption | undefined): readonly SentenceTy
 		'thought'
 	];
 
-	if (type === undefined) {
-		return ['statement'];
-	}
-
-	if (type === 'all') {
+	if (type === undefined || type === 'all') {
 		return all;
 	}
 
 	const wanted = typeof type === 'string' ? [type] : type;
 	const usable = wanted.filter((each) => all.includes(each));
 
-	return usable.length ? usable : ['statement'];
+	return usable.length ? usable : all;
 }
 
 /** The caller's `include`, as a list with the blanks taken out. */
@@ -2065,7 +2165,7 @@ function resolveSettings(options: RandSentenceOptions): Settings {
 		include: resolveInclude(options.include),
 		sentences: clamp(Math.floor(options.sentences ?? 1), 1, RAND_SENTENCE_COUNT_MAX),
 		realism: options.realism ?? 'real',
-		includeName: options.includeName ?? false,
+		includeName: typeof options.includeName === 'boolean' ? options.includeName : null,
 		types: resolveTypes(options.type),
 		quote: options.quote,
 		style: STYLES.includes(options.style as SentenceStyle) ? (options.style as SentenceStyle) : null

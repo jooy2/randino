@@ -114,9 +114,9 @@ const sentence = reactive({
 	shape: 'all',
 	slots: 'all',
 	sentences: 1,
-	type: 'statement',
+	type: '',
 	style: '',
-	includeName: false,
+	includeName: '',
 	count: 8,
 	realism: 'real',
 	minLength: '',
@@ -168,8 +168,8 @@ const options = computed(() => {
 		if (sentence.shape !== 'all') out.shape = sentence.shape;
 		if (sentence.slots !== 'all') out.slots = sentence.slots;
 		if (Number(sentence.sentences) > 1) out.sentences = Number(sentence.sentences);
-		if (sentence.includeName) out.includeName = true;
-		if (sentence.type !== 'statement') out.type = sentence.type;
+		if (sentence.includeName) out.includeName = sentence.includeName === 'on';
+		if (sentence.type) out.type = sentence.type;
 		if (sentence.style) out.style = sentence.style;
 		if (included.value.length) out.include = included.value;
 		if (sentence.count !== 1) out.count = Number(sentence.count);
@@ -608,8 +608,8 @@ async function copy() {
 				<label class="randino-demo-field">
 					<span><code>type</code></span>
 					<select v-model="sentence.type">
+						<option value="">random</option>
 						<option v-for="item in SENTENCE_TYPES" :key="item" :value="item">{{ item }}</option>
-						<option value="all">all</option>
 					</select>
 				</label>
 
@@ -621,9 +621,13 @@ async function copy() {
 					</select>
 				</label>
 
-				<label class="randino-demo-check">
-					<input v-model="sentence.includeName" type="checkbox" />
-					<code>includeName</code>
+				<label class="randino-demo-field">
+					<span><code>includeName</code></span>
+					<select v-model="sentence.includeName">
+						<option value="">random</option>
+						<option value="on">on</option>
+						<option value="off">off</option>
+					</select>
 				</label>
 
 				<label class="randino-demo-field">

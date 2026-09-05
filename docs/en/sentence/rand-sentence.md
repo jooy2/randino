@@ -45,14 +45,14 @@ Every option is optional, and the defaults are what the empty call above uses.
 | --- | --- | --- | --- |
 | `language` | <Lang js="WordLanguageOption" dart="WordLanguage?" py="WordLanguageOption" code /> | <Lang js="'all'" dart="null" py="&quot;all&quot;" code /> | Language of the generated sentences. <Lang js="'all'" dart="null" py="&quot;all&quot;" code /> mixes every supported language, picking one per sentence. |
 | `theme` | <Lang js="WordThemeOption" dart="WordTheme?" py="WordThemeOption" code /> | <Lang js="'all'" dart="null" py="&quot;all&quot;" code /> | What the sentence's **subject** is about. See [Themes](../word/themes). |
-| `type` | <Lang js="SentenceTypeOption" dart="Set&lt;SentenceType&gt;?" py="SentenceTypeOption" code /> | <Lang js="'statement'" dart="null" py="&quot;statement&quot;" code /> | What the sentence is doing. See [Asking, exclaiming, trailing off](#asking-exclaiming-trailing-off). |
+| `type` | <Lang js="SentenceTypeOption" dart="Set&lt;SentenceType&gt;?" py="SentenceTypeOption" code /> | drawn | What the sentence is doing. See [Asking, exclaiming, trailing off](#asking-exclaiming-trailing-off). |
 | `quote` | <Lang js="SentenceQuote" dart="SentenceQuote?" py="SentenceQuote &#124; None" code /> | <Lang js="—" dart="null" py="None" code /> | Which marks a quoted line takes. See [Dialogue and thought](#dialogue-and-thought). |
 | `style` | `SentenceStyle` | drawn | The speech level it is written at. See [The speech level](#politeness). |
 | `shape` | <Lang js="SentenceShapeOption" dart="SentenceShape?" py="SentenceShapeOption" code /> | <Lang js="'all'" dart="null" py="&quot;all&quot;" code /> | How much the sentence says. See [How much it says](#how-much-it-says). |
 | `slots` | <Lang js="SentenceSlotOption" dart="Set&lt;SentenceSlot&gt;?" py="SentenceSlotOption" code /> | <Lang js="'all'" dart="null" py="&quot;all&quot;" code /> | Which parts it carries beside the subject. See [Picking the shape](#picking-the-shape) and [Counting, and money](#counting-and-money). |
 | `include` | <Lang js="string &#124; string[]" dart="List&lt;String&gt;" py="str &#124; Sequence[str]" code /> | <Lang js="—" dart="const []" py="()" code /> | Words every sentence has to contain. See [Words it has to contain](#words-it-has-to-contain). |
 | `sentences` | <Lang js="number" dart="int" py="int" code /> | `1` | How many sentences one result holds. See [More than one sentence](#more-than-one-sentence). |
-| <Lang js="includeName" dart="includeName" py="include_name" code /> | <Lang js="boolean" dart="bool" py="bool" code /> | <Lang js="false" dart="false" py="False" code /> | Write a person's name where the sentence has room for one. See [A person's name](#a-persons-name). |
+| <Lang js="includeName" dart="includeName" py="include_name" code /> | <Lang js="boolean" dart="bool" py="bool" code /> | drawn | Write a person's name where the sentence has room for one. See [A person's name](#a-persons-name). |
 | `count` | <Lang js="number" dart="int" py="int" code /> | `1` | How many sentences to return. Clamped to `0` … `10000`. |
 | `realism` | `RandRealism` | <Lang js="`'real'`" dart="`RandRealism.real`" py="`\"real\"`" /> | `real` uses real words, `invented` builds words that only read like the language, and `mixed` decides per word. The grammar stays real either way. |
 | <Lang js="minLength" dart="minLength" py="min_length" code /> | <Lang js="number" dart="int?" py="int &#124; None" code /> | _language_ | Minimum length in characters, punctuation included. |
@@ -395,7 +395,7 @@ Two things follow from that. A sentence has room for **as many words as it has p
 
 ## Asking, exclaiming, trailing off {#asking-exclaiming-trailing-off}
 
-`type` says what the sentence is doing. `'statement'` is the default and everything so far; the other three are `'question'`, `'exclamation'` and `'trailing'` — a statement that stops rather than ends.
+`type` says what the sentence is doing: `'statement'`, `'question'`, `'exclamation'` and `'trailing'` — a statement that stops rather than ends — plus the two quoted kinds below. **Left out, one of the six is drawn per sentence**, so a call with nothing said about it asks as readily as it tells. Name one, a set of them, or `'all'`.
 
 ::: lang js
 
@@ -807,7 +807,9 @@ rand_sentence(language="ko", sentences=3, min_length=40, max_length=55)
 
 ## A person's name {#a-persons-name}
 
-Every other generator here keeps person names out on purpose — a nickname is never built from one, and that rule is the whole point of keeping names and words apart. A sentence is the exception, and only when you ask: <Lang js="includeName" py="include_name" dart="includeName" code /> writes a generated name where the sentence has room for a person.
+Every other generator here keeps person names out on purpose — a nickname is never built from one, and that rule is the whole point of keeping names and words apart. A sentence is the exception: <Lang js="includeName" py="include_name" dart="includeName" code /> writes a generated name where the sentence has room for a person.
+
+**Left out, it is a coin flip per result** — a paragraph either has a person in it or does not, rather than naming one in its second line and not its first. Set it yourself and that answer stands.
 
 ::: lang js
 

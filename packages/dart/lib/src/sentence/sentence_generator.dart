@@ -190,8 +190,9 @@ class _Settings {
   /// the caller asked for.
   final RandRealism realism;
 
-  /// Whether a phrase about a person is written as a name.
-  final bool includeName;
+  /// Whether a sentence about a person writes a name, or null when the caller
+  /// left it to the generator, in which case it is decided once per result.
+  final bool? includeName;
 
   /// What the sentences may be doing, normalized to a set to draw from.
   final List<SentenceType> types;
@@ -202,6 +203,25 @@ class _Settings {
   /// How the sentences address their reader, or null when the caller left it to
   /// the generator.
   final SentenceStyle? style;
+
+  /// The same settings with [includeName] decided, which is what one result is
+  /// drawn against. Dart has no spread for a class, so the copy is written out.
+  _Settings naming(bool named) => _Settings(
+    theme: theme,
+    shape: shape,
+    slots: slots,
+    invent: invent,
+    minLength: minLength,
+    maxLength: maxLength,
+    prefix: prefix,
+    include: include,
+    sentences: sentences,
+    realism: realism,
+    includeName: named,
+    types: types,
+    quote: quote,
+    style: style,
+  );
 }
 
 // The kinds a quoted line can be. Somebody speaking is as often asking as
@@ -283,13 +303,6 @@ String _oneOf(String entry) => entry.contains('|') ? pick(entry.split('|')) : en
 
 /// Every ending an entry lists, which is what a length budget has to span.
 WordPool _endings(WordPool pool) => <String>[for (final entry in pool) ...entry.split('|')];
-
-/// The kind whose mark a sentence of this type closes on.
-///
-/// Dialogue and thought have no mark of their own: what they quote is a sentence
-/// of another kind, and they take its mark and put quotation marks around it.
-SentenceType _markFor(SentenceType type) =>
-    type == SentenceType.dialogue || type == SentenceType.thought ? pick(_quotedMarks) : type;
 
 /// The level one line is said at.
 ///
@@ -1207,16 +1220,19 @@ _Named _properName(
   WordLanguageData lexicon,
   _Settings settings,
   String prefix,
-  int min,
-  int max,
 ) {
+  // No length range, on purpose. `randName` reads one as a licence to change the
+  // name's structure: a CJK given name is stretched to fill a range longer than
+  // its real ones, and an alphabetic language writes a second given name where
+  // one will not reach — `한진혜미유효영지경혜연림정` and `Annette Tanja`, each of
+  // them one person. Both are the name generator answering a caller who asked
+  // for a length; a sentence is asking for a name. `_nameSpan` is what the
+  // budget measured this phrase against, and an unsteered draw is what fits it.
   final drawn = drawName(
     NameLanguage.values.byName(language.name),
     includeSurname: false,
     realism: settings.realism,
     startsWith: prefix,
-    minLength: min,
-    maxLength: max,
   );
 
   return _Named(
@@ -1313,7 +1329,12 @@ _Built _compose(
   final predicates = _formOf(stateGroup, verbGroup, draw.mark, draw.style);
   final subjectClasses = stateGroup?.subject ?? verbGroup!.subject;
   final subjectThemes = _themesForClasses(themes, subjectClasses);
-  final subjectRequired = _requiredAt(frame, plan, SentenceSlot.subject);
+  // Which part is the subject is the shape's business, not the slot's: a counted
+  // shape has no `subject` part and its quantity is the subject. Looking for a
+  // `subject` part regardless is how a word required into a counted subject lost
+  // its theme, and `사과` came out as `사과 9명` — nine people's worth of apple.
+  final subjectSlot = _subjectSlotOf(frame);
+  final subjectRequired = _requiredAt(frame, plan, subjectSlot);
   // A theme the caller named is honoured even when no verb group of the language
   // has anything to say about it, the same way a shape it cannot make falls back
   // rather than being answered with something else entirely.
@@ -1359,7 +1380,6 @@ _Built _compose(
   // each phrase was given the room the language's longest noun would need and drew
   // a word out of its own theme, which is how a sentence came out short of a
   // `minLength` the shape could otherwise have reached.
-  final subjectSlot = _subjectSlotOf(frame);
   final partThemes = <WordTheme?>[
     for (var i = 0; i < shape.length; i += 1)
       !_isNounSlot(shape[i].slot)
@@ -1389,9 +1409,16 @@ _Built _compose(
           return follow.topic.noun;
         }
 
+        // A word the caller required holds its place against all of this.
+        // `include` says the sentence has to contain it, and a name written over
+        // it would be a sentence that does not.
+        if (plan.phrase.containsKey(at[i])) return null;
+
         final theme = partThemes[i];
 
-        return settings.includeName && theme != null && themeClass[theme] == NounClass.person
+        return (settings.includeName ?? false) &&
+                theme != null &&
+                themeClass[theme] == NounClass.person
             ? ''
             : null;
       }(),
@@ -1497,8 +1524,6 @@ _Built _compose(
           lexicon,
           settings,
           prefixable && i == 0 ? settings.prefix : '',
-          low < high ? low : high,
-          high,
         );
 
         phrase = drawn.text;
@@ -1678,7 +1703,7 @@ List<WordTheme> _subjectThemesFor(_Settings settings, _Follow? follow) {
   // still wins — a request for animals with `includeName` is a sentence about a
   // lion, not about somebody the lion reminded us of.
   final wanted =
-      settings.includeName
+      (settings.includeName ?? false)
           ? _themesForClasses(requested, const <NounClass>[NounClass.person])
           : requested;
   final themes = wanted.isNotEmpty ? wanted : requested;
@@ -1695,7 +1720,7 @@ _Built _generateOne(WordLanguage language, _Settings settings, _Draw draw) {
   final follow = draw.follow;
   final budget = draw.budget;
   final data = sentenceData[language]!;
-  final bounds = _slotBounds(language);
+  final bounds = _roomFor(language, settings.includeName);
   final modifierBounds = _modifierBounds[language]!;
   final allowed = _framesFor(data, settings, _moodFor(draw.mark));
   final requested = _subjectThemesFor(settings, follow);
@@ -1996,10 +2021,102 @@ String _openerFor(
 /// The range is shared out before the first of them is drawn, and the topic is
 /// taken from that first sentence — so what follows is about the same thing
 /// rather than another draw that happened to land beside it.
+/// The kind this sentence is, and the kind whose mark it closes on, chosen
+/// against the room it has.
+///
+/// A shape is not always answerable in a narrow range: a question is a different
+/// shape — Vietnamese writes `không` after the whole clause, English `Does` in
+/// front of the subject — and a quoted line pays for its marks out of the same
+/// budget. Drawing the kind first and discovering that afterwards is how
+/// `‘Họa sĩ có ồn ào không?’` came out of a range of 12 to 17.
+///
+/// A kind the caller named is still drawn when none of them fit, which is the
+/// same best effort every other narrowing here makes.
+List<SentenceType> _kindFor(
+  SentenceLanguageData data,
+  _Settings settings,
+  Map<SentenceSlot, LengthRange> bounds,
+  LengthRange modifierBounds,
+  LengthRange budget,
+) {
+  bool fits(SentenceType mark, int room) => _framesFor(
+    data,
+    settings,
+    _moodFor(mark),
+  ).any((frame) => _frameRange(frame, data, bounds, modifierBounds).min <= room);
+
+  List<SentenceType> marksOf(SentenceType type) =>
+      type == SentenceType.dialogue || type == SentenceType.thought
+          ? _quotedMarks
+          : <SentenceType>[type];
+
+  int roomOf(SentenceType type) {
+    final quote = _quoteFor(data, type, settings.quote);
+
+    return budget.max - (quote == null ? 0 : quote[0].length + quote[1].length);
+  }
+
+  final usable = settings.types
+      .where((type) => marksOf(type).any((mark) => fits(mark, roomOf(type))))
+      .toList(growable: false);
+  final type = pick(usable.isNotEmpty ? usable : settings.types);
+  final marks = marksOf(type).where((mark) => fits(mark, roomOf(type))).toList(growable: false);
+
+  return <SentenceType>[type, pick(marks.isNotEmpty ? marks : marksOf(type))];
+}
+
+/// The slot bounds this result is measured against: the language's own, with the
+/// subject narrowed to a name when the result writes one.
+///
+/// A name is one word and no article — `Yvonne` where a noun phrase would write
+/// `die schlanke Wolke` — so a shape chosen against noun lengths is a shape a
+/// named sentence cannot fill. Both the result's budget and the per-sentence
+/// choice of shape read this rather than `_slotBounds` directly.
+/// The modifier bounds, priming the cache that `_slotBounds` fills them from.
+///
+/// Reading `_modifierBounds` before anything has asked for the slot bounds is
+/// reading an empty map, which is why this is a function rather than a lookup.
+LengthRange _modifierSpan(WordLanguage language) {
+  _slotBounds(language);
+
+  return _modifierBounds[language]!;
+}
+
+Map<SentenceSlot, LengthRange> _roomFor(WordLanguage language, bool? includeName) {
+  final bounds = _slotBounds(language);
+
+  return (includeName ?? false)
+      ? <SentenceSlot, LengthRange>{...bounds, SentenceSlot.subject: _nameSpan(language)}
+      : bounds;
+}
+
+/// Whether a result that writes a name can still land in the range the caller
+/// asked for.
+///
+/// A named sentence is the shorter of the two by a wide margin, so a range only
+/// the longer one can reach is a range a name cannot be in. Asked for a name
+/// outright the generator writes one anyway, the same way it answers a range too
+/// narrow for the parts it was told to carry; drawn, it is one more thing to
+/// decide against the room.
+bool _nameFits(
+  SentenceLanguageData data,
+  List<SentenceFrame> frames,
+  LengthRange modifierBounds,
+  _Settings settings,
+  WordLanguage language,
+) {
+  if (settings.minLength == null) return true;
+
+  final count = settings.sentences;
+  final gap = data.space.length * (count - 1);
+  final natural = _naturalSpan(data, frames, _roomFor(language, true), modifierBounds);
+
+  return settings.minLength! <= natural.max * count + gap;
+}
+
 List<_Built> _generateResult(WordLanguage language, _Settings settings) {
   final data = sentenceData[language]!;
-  final bounds = _slotBounds(language);
-  final modifierBounds = _modifierBounds[language]!;
+  final modifierBounds = _modifierSpan(language);
   // Every shape any of the requested types could take, because the budget is
   // shared out before the first type is even drawn.
   // A quoted line can be any kind at all, so its shapes are all of them.
@@ -2011,9 +2128,20 @@ List<_Built> _generateResult(WordLanguage language, _Settings settings) {
               : <SentenceType>[type])
         ..._framesFor(data, settings, _moodFor(mark)),
   ];
-  final shortest = _naturalSpan(data, frames, bounds, modifierBounds).min;
+  // A result either has a person in it or does not; deciding that per sentence
+  // would put a name in one line of a paragraph and not the next. Settled here
+  // because it takes the language's own name lengths to know whether a name can
+  // answer the range that was asked for.
+  final named =
+      settings.includeName ??
+      (_nameFits(data, frames, modifierBounds, settings, language) && chance(50));
+  final settled = settings.includeName == named ? settings : settings.naming(named);
+  // And the budget is measured against what a named result actually writes: one
+  // word where a noun phrase would have written an article, a modifier and a noun.
+  final room = _roomFor(language, named);
+  final shortest = _naturalSpan(data, frames, room, modifierBounds).min;
   final budgets = _shareOut(
-    _boundsFor(data, frames, bounds, modifierBounds, settings),
+    _boundsFor(data, frames, room, modifierBounds, settled),
     settings.sentences,
     data.space.length,
   );
@@ -2028,8 +2156,9 @@ List<_Built> _generateResult(WordLanguage language, _Settings settings) {
 
   for (var i = 0; i < settings.sentences; i += 1) {
     final budget = budgets[i];
-    final type = pick(settings.types);
-    final mark = _markFor(type);
+    final kind = _kindFor(data, settled, room, modifierBounds, budget);
+    final type = kind[0];
+    final mark = kind[1];
     final follow = topic == null ? null : _followFor(data, topic);
     final draw = _Draw(
       budget,
@@ -2037,10 +2166,10 @@ List<_Built> _generateResult(WordLanguage language, _Settings settings) {
       mark,
       _quoteFor(data, type, settings.quote),
       _openerFor(data, mark, follow != null, budget.max, shortest),
-      _styleFor(type, settings.style, voice),
+      _styleFor(type, settled.style, voice),
       follow,
     );
-    var one = _generateOne(language, settings, draw);
+    var one = _generateOne(language, settled, draw);
 
     // `_openerFor` reserves room against the shortest sentence the shapes could
     // spell, which is a floor no draw actually reaches — the shortest word of
@@ -2051,7 +2180,7 @@ List<_Built> _generateResult(WordLanguage language, _Settings settings) {
     if (draw.opener.isNotEmpty && _distanceFrom(one.sentence.length, budget) > 0) {
       final bare = _generateOne(
         language,
-        settings,
+        settled,
         _Draw(draw.budget, draw.type, draw.mark, draw.quote, '', draw.style, draw.follow),
       );
 
@@ -2084,7 +2213,7 @@ List<SentenceDetail> generateSentenceDetails({
   String? startsWith,
   bool unique = false,
   int sentences = 1,
-  bool includeName = false,
+  bool? includeName,
   Set<SentenceType>? type,
   SentenceQuote? quote,
   SentenceStyle? style,
@@ -2101,10 +2230,7 @@ List<SentenceDetail> generateSentenceDetails({
     sentences: clampInt(sentences, 1, randSentenceCountMax),
     realism: realism,
     includeName: includeName,
-    types:
-        type == null || type.isEmpty
-            ? const <SentenceType>[SentenceType.statement]
-            : type.toList(growable: false),
+    types: type == null || type.isEmpty ? SentenceType.values : type.toList(growable: false),
     quote: quote,
     style: style,
   );
@@ -2114,9 +2240,14 @@ List<SentenceDetail> generateSentenceDetails({
     unique: unique,
     startsWith: settings.prefix,
     draw: () {
-      final WordLanguage code = language ?? pick(_languagesFor(settings));
+      // A result either has a person in it or does not; deciding that per sentence
+      // would put a name in one line of a paragraph and not the next. It is
+      // settled before the language is drawn, because `_languagesFor` reads it to
+      // prefer the languages that can answer.
+      final drawn = settings.includeName == null ? settings.naming(chance(50)) : settings;
+      final WordLanguage code = language ?? pick(_languagesFor(drawn));
       final data = sentenceData[code]!;
-      final built = _generateResult(code, settings);
+      final built = _generateResult(code, drawn);
 
       return SentenceDetail(
         sentence: built.map((one) => one.sentence).join(data.space),

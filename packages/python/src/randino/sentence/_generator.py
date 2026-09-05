@@ -21,7 +21,7 @@ not — no tag on any noun, because `THEME_CLASS` already knows what a theme nam
 
 import random
 from collections.abc import Callable, Mapping, Sequence
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from typing import cast
 
 from randino._internal.generate import (
@@ -211,8 +211,10 @@ class Settings:
     caller asked for.
     """
 
-    include_name: bool
-    """Whether a phrase about a person is written as a name."""
+    include_name: bool | None
+    """Whether a sentence about a person writes a name, or None when the caller left it
+    to the generator, in which case it is decided once per result.
+    """
 
     types: tuple[SentenceType, ...]
     """What the sentences may be doing, normalized to a set to draw from."""
@@ -1254,8 +1256,6 @@ def _proper_name(
     lexicon: WordLanguageData,
     settings: Settings,
     prefix: str,
-    low: int,
-    high: int,
 ) -> tuple[str, WordGender | None]:
     """A person's name for a phrase that has room for one, and the gender it carries.
 
@@ -1270,20 +1270,23 @@ def _proper_name(
         lexicon: Its word data, which says whether anything agrees.
         settings: The sentence's own settings, for the realism level.
         prefix: A `starts_with` the name has to honour, or `""`.
-        low: Shortest the phrase may be.
-        high: Longest it may be.
 
     Returns:
         The name, and the gender whatever agrees with it has to agree with.
     """
+    # No length range, on purpose. `rand_name` reads one as a licence to change the
+    # name's structure: a CJK given name is stretched to fill a range longer than its
+    # real ones, and an alphabetic language writes a second given name where one will
+    # not reach — `한진혜미유효영지경혜연림정` and `Annette Tanja`, each of them one
+    # person. Both are the name generator answering a caller who asked for a length; a
+    # sentence is asking for a name. `_name_span` is what the budget measured this
+    # phrase against, and an unsteered draw is what fits it.
     drawn = draw_name(
         # `WordLanguage` and `NameLanguage` list the same nine codes.
         language,
         include_surname=False,
         realism=settings.realism,
         starts_with=prefix,
-        min_length=low,
-        max_length=high,
     )
     gender: WordGender | None = None
 
@@ -1450,7 +1453,12 @@ def _compose(
     base = predicates
     predicates = _form_of(state_group, verb_group, draw.mark, draw.style)
     subject_themes = _themes_for_classes(themes, subject_classes)
-    subject_required = _required_at(frame, plan, "subject")
+    # Which part is the subject is the shape's business, not the slot's: a counted
+    # shape has no `subject` part and its quantity is the subject. Looking for a
+    # `subject` part regardless is how a word required into a counted subject lost its
+    # theme, and `사과` came out as `사과 9명` — nine people's worth of apple.
+    subject_slot = _subject_slot_of(frame)
+    subject_required = _required_at(frame, plan, subject_slot)
     # A theme the caller named is honoured even when no verb group of the language
     # has anything to say about it, the same way a shape it cannot make falls back
     # rather than being answered with something else entirely.
@@ -1493,7 +1501,6 @@ def _compose(
     # phrase was given the room the language's longest noun would need and drew a word
     # out of its own theme, which is how a sentence came out short of a `min_length` the
     # shape could otherwise have reached.
-    subject_slot = _subject_slot_of(frame)
     part_themes: list[WordTheme | None] = []
 
     for index, part in enumerate(shape):
@@ -1533,6 +1540,11 @@ def _compose(
             and follow.topic.named
         ):
             proper.append(follow.topic.noun)
+        elif plan.phrase.get(at[index]) is not None:
+            # A word the caller required holds its place against all of this.
+            # `include` says the sentence has to contain it, and a name written over
+            # it would be a sentence that does not.
+            proper.append(None)
         else:
             theme = part_themes[index]
             person = theme is not None and THEME_CLASS[theme] == "person"
@@ -1639,8 +1651,6 @@ def _compose(
                     lexicon,
                     settings,
                     settings.prefix if prefixable and index == 0 else "",
-                    min(part_low, part_high),
-                    part_high,
                 )
                 names.append(phrase)
 
@@ -1919,6 +1929,114 @@ def _opener_for(
     return pick(usable) if usable and chance(CONNECTIVE_CHANCE) else ""
 
 
+def _room_for(language: WordLanguage, include_name: bool | None) -> dict[str, tuple[int, int]]:
+    """The slot bounds this result is measured against.
+
+    The language's own, with the subject narrowed to a name when the result writes one.
+    A name is one word and no article — `Yvonne` where a noun phrase would write
+    `die schlanke Wolke` — so a shape chosen against noun lengths is a shape a named
+    sentence cannot fill. Both the result's budget and the per-sentence choice of shape
+    read this rather than `_slot_bounds` directly.
+
+    Args:
+        language: The language the sentence is written in.
+        include_name: Whether the result writes a person's name.
+
+    Returns:
+        The bounds every phrase of this result is measured against.
+    """
+    bounds = _slot_bounds(language)
+
+    return {**bounds, "subject": _name_span(language)} if include_name else bounds
+
+
+def _name_fits(
+    data: SentenceLanguageData,
+    frames: list[SentenceFrame],
+    settings: Settings,
+    language: WordLanguage,
+) -> bool:
+    """Whether a named result can still land in the range the caller asked for.
+
+    A named sentence is the shorter of the two by a wide margin, so a range only the
+    longer one can reach is a range a name cannot be in. Asked for a name outright the
+    generator writes one anyway, the same way it answers a range too narrow for the
+    parts it was told to carry; drawn, it is one more thing to decide against the room.
+
+    Args:
+        data: The language's sentence data.
+        frames: Every shape the requested kinds could take.
+        settings: What the caller asked for.
+        language: The language the sentence is written in.
+
+    Returns:
+        Whether a name can answer the requested range.
+    """
+    if settings.min_length is None:
+        return True
+
+    count = settings.sentences
+    gap = len(data.space) * (count - 1)
+    natural = _natural_span(data, frames, _room_for(language, True))[1]
+
+    return settings.min_length <= natural * count + gap
+
+
+def _kind_for(
+    data: SentenceLanguageData,
+    settings: Settings,
+    bounds: dict[str, tuple[int, int]],
+    budget: tuple[int, int],
+) -> tuple[SentenceType, SentenceMark]:
+    """The kind this sentence is, and the kind whose mark it closes on.
+
+    Chosen against the room it has. A shape is not always answerable in a narrow range:
+    a question is a different shape — Vietnamese writes `không` after the whole clause,
+    English `Does` in front of the subject — and a quoted line pays for its marks out of
+    the same budget. Drawing the kind first and discovering that afterwards is how
+    `‘Họa sĩ có ồn ào không?’` came out of a range of 12 to 17.
+
+    A kind the caller named is still drawn when none of them fit, which is the same best
+    effort every other narrowing here makes.
+
+    Args:
+        data: The language's sentence data.
+        settings: What the caller asked for.
+        bounds: The bounds every phrase is measured against.
+        budget: The room this sentence has.
+
+    Returns:
+        The kind, and the kind whose mark it closes on.
+    """
+
+    def fits(mark: SentenceMark, room: int) -> bool:
+        return any(
+            _frame_range(frame, data, bounds)[0] <= room
+            for frame in _frames_for(data, settings, _mood_for(mark))
+        )
+
+    def marks_of(type_: SentenceType) -> tuple[SentenceMark, ...]:
+        if type_ in ("dialogue", "thought"):
+            return QUOTED_MARKS
+
+        return (cast("SentenceMark", type_),)
+
+    def room_of(type_: SentenceType) -> int:
+        quote = _quote_for(data, type_, settings.quote)
+
+        return budget[1] - (len(quote[0]) + len(quote[1]) if quote else 0)
+
+    usable = tuple(
+        type_
+        for type_ in settings.types
+        if any(fits(mark, room_of(type_)) for mark in marks_of(type_))
+    )
+    type_ = pick(usable or settings.types)
+    marks = tuple(mark for mark in marks_of(type_) if fits(mark, room_of(type_)))
+
+    return type_, pick(marks or marks_of(type_))
+
+
 def _generate_result(language: WordLanguage, settings: Settings) -> list[Built]:
     """Every sentence of one result, in order.
 
@@ -1927,7 +2045,6 @@ def _generate_result(language: WordLanguage, settings: Settings) -> list[Built]:
     another draw that happened to land beside it.
     """
     data = SENTENCE_DATA[language]
-    bounds = _slot_bounds(language)
     # Every shape any of the requested types could take, because the budget is shared
     # out before the first type is even drawn.
     # A quoted line can be any kind at all, so its shapes are all of them.
@@ -1937,9 +2054,22 @@ def _generate_result(language: WordLanguage, settings: Settings) -> list[Built]:
         for mark in (QUOTED_MARKS if type_ in ("dialogue", "thought") else (type_,))
         for frame in _frames_for(data, settings, _mood_for(cast("SentenceMark", mark)))
     ]
-    shortest = _natural_span(data, frames, bounds)[0]
+    # A result either has a person in it or does not; deciding that per sentence would
+    # put a name in one line of a paragraph and not the next. Settled here because it
+    # takes the language's own name lengths to know whether a name can answer the range
+    # that was asked for.
+    named = (
+        settings.include_name
+        if settings.include_name is not None
+        else (_name_fits(data, frames, settings, language) and chance(50))
+    )
+    settled = settings if settings.include_name == named else replace(settings, include_name=named)
+    # And the budget is measured against what a named result actually writes: one word
+    # where a noun phrase would have written an article, a modifier and a noun.
+    room = _room_for(language, named)
+    shortest = _natural_span(data, frames, room)[0]
     budgets = _share_out(
-        _bounds_for(data, frames, bounds, settings), settings.sentences, len(data.space)
+        _bounds_for(data, frames, room, settled), settings.sentences, len(data.space)
     )
     built: list[Built] = []
     topic: Topic | None = None
@@ -1949,8 +2079,7 @@ def _generate_result(language: WordLanguage, settings: Settings) -> list[Built]:
     voice = settings.style if settings.style is not None else pick(STYLES)
 
     for budget in budgets:
-        type_ = pick(settings.types)
-        mark = _mark_for(type_)
+        type_, mark = _kind_for(data, settled, room, budget)
         follow = None if topic is None else _follow_for(data, topic)
         draw = Draw(
             budget,
@@ -1961,7 +2090,7 @@ def _generate_result(language: WordLanguage, settings: Settings) -> list[Built]:
             _style_for(type_, settings.style, voice),
             follow,
         )
-        one = _generate_one(language, settings, draw)
+        one = _generate_one(language, settled, draw)
 
         # `_opener_for` reserves room against the shortest sentence the shapes could
         # spell, which is a floor no draw actually reaches — the shortest word of every
@@ -1971,7 +2100,7 @@ def _generate_result(language: WordLanguage, settings: Settings) -> list[Built]:
         if draw.opener and _distance_from(len(one.sentence), budget) > 0:
             bare = _generate_one(
                 language,
-                settings,
+                settled,
                 Draw(budget, type_, mark, draw.quote, "", draw.style, follow),
             )
 
@@ -2016,7 +2145,7 @@ def _generate_one(language: WordLanguage, settings: Settings, draw: Draw) -> Bui
     follow = draw.follow
     budget = draw.budget
     data = SENTENCE_DATA[language]
-    bounds = _slot_bounds(language)
+    bounds = _room_for(language, settings.include_name)
     allowed = _frames_for(data, settings, _mood_for(draw.mark))
     requested = _subject_themes_for(settings, follow)
     # The words a caller required go in the first sentence — once in the result rather
@@ -2106,8 +2235,12 @@ def _generate_one(language: WordLanguage, settings: Settings, draw: Draw) -> Bui
     return cast("Built", best)
 
 
-def _resolve_types(type_: SentenceTypeOption) -> tuple[SentenceType, ...]:
-    """The caller's `type`, as the set one sentence is drawn from."""
+def _resolve_types(type_: SentenceTypeOption | None) -> tuple[SentenceType, ...]:
+    """The caller's `type`, as the set one sentence is drawn from.
+
+    Left out, or asked for something none of these are, the set is every one of them:
+    a sentence with nothing said about it is as likely to ask as to tell.
+    """
     every: tuple[SentenceType, ...] = (
         "statement",
         "question",
@@ -2117,13 +2250,13 @@ def _resolve_types(type_: SentenceTypeOption) -> tuple[SentenceType, ...]:
         "thought",
     )
 
-    if type_ == "all":
+    if type_ is None or type_ == "all":
         return every
 
     wanted = (type_,) if isinstance(type_, str) else tuple(type_)
     usable = tuple(each for each in wanted if each in every)
 
-    return usable or ("statement",)
+    return usable or every
 
 
 def _resolve_slots(slots: SentenceSlotOption) -> tuple[SentenceSlot, ...] | str:
@@ -2154,8 +2287,8 @@ def generate_sentence_details(
     starts_with: str = "",
     unique: bool = False,
     sentences: int = 1,
-    include_name: bool = False,
-    type: SentenceTypeOption = "statement",
+    include_name: bool | None = None,
+    type: SentenceTypeOption | None = None,
     quote: SentenceQuote | None = None,
     style: SentenceStyle | None = None,
 ) -> list[SentenceDetail]:
@@ -2201,9 +2334,18 @@ def generate_sentence_details(
     )
 
     def draw() -> SentenceDetail:
-        code = draw_language(language, _languages_for(settings))
+        # A result either has a person in it or does not; deciding that per sentence
+        # would put a name in one line of a paragraph and not the next. It is settled
+        # before the language is drawn, because `_languages_for` reads it to prefer the
+        # languages that can answer.
+        drawn = (
+            settings
+            if settings.include_name is not None
+            else replace(settings, include_name=chance(50))
+        )
+        code = draw_language(language, _languages_for(drawn))
         data = SENTENCE_DATA[code]
-        built = _generate_result(code, settings)
+        built = _generate_result(code, drawn)
 
         return SentenceDetail(
             sentence=data.space.join(one.sentence for one in built),
