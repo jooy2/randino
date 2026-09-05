@@ -330,13 +330,28 @@ export type SentenceShape = 'simple' | 'detailed' | 'complex';
  * - `exclamation`: says it with feeling, usually behind an interjection
  *   (`와, 사자가 달린다!`).
  * - `trailing`: a statement that stops rather than ends (`사자가 달린다…`).
+ * - `dialogue`: a line somebody says, in the language's own quotation marks
+ *   (`“Does the lion run?”`, `「猫が走るか？」`).
+ * - `thought`: the same, in the marks the language keeps for a second level.
  *
  * A question is a shape, not a punctuation mark bolted on: English writes
  * `Does the lion run?` and German `Läuft ein Wolf?`, and both are shapes their
  * own `frames` declare. A language whose question differs from its statement by
  * nothing but the mark declares none, and gets its statement shapes back.
+ *
+ * `dialogue` and `thought` are the two that are not shapes at all: what is quoted
+ * is a sentence of one of the other kinds, drawn per line, because somebody
+ * speaking is as often asking as telling.
  */
-export type SentenceType = 'statement' | 'question' | 'exclamation' | 'trailing';
+export type SentenceType =
+	'statement' | 'question' | 'exclamation' | 'trailing' | 'dialogue' | 'thought';
+
+/**
+ * Which pair of quotation marks a quoted line takes. Left out, `dialogue` takes
+ * the language's first-level marks and `thought` the ones it keeps for a second
+ * level — `“…”` beside `‘…’` in English, `«…»` beside `„…“` in Russian.
+ */
+export type SentenceQuote = 'double' | 'single';
 
 /**
  * Which of them a result may be. An array is a set to draw from, decided per
@@ -388,6 +403,12 @@ export interface RandSentenceOptions extends RandCommonOptions {
 	 * their own shapes.
 	 */
 	type?: SentenceTypeOption;
+	/**
+	 * Which quotation marks a `'dialogue'` or a `'thought'` is written in. Left
+	 * out, dialogue takes the language's first-level marks and thought its
+	 * second-level ones. Ignored by every other type.
+	 */
+	quote?: SentenceQuote;
 	/**
 	 * Whether a sentence about a person writes a generated name where that person
 	 * would go — `Emma runs quietly.`, `민준이 조용히 달린다.` Default `false`.

@@ -5,6 +5,7 @@ export const VI: SentenceLanguageData = {
 	space: ' ',
 	capitalize: true,
 	terminators: { statement: '.', question: '?', exclamation: '!', trailing: '…' },
+	quotes: { double: ['“', '”'], single: ['‘', '’'] },
 	// Vietnamese inflects nothing, so a verb is written once and stands wherever
 	// it is put.
 	verbs: [

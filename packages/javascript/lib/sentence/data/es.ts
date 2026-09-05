@@ -5,6 +5,8 @@ export const ES: SentenceLanguageData = {
 	space: ' ',
 	capitalize: true,
 	terminators: { statement: '.', question: '?', exclamation: '!', trailing: '…' },
+	// Guillemets first, and the curly quotes for a quote inside one.
+	quotes: { double: ['«', '»'], single: ['“', '”'] },
 	// The one language here that marks a question and an exclamation at both
 	// ends, which is why the openers exist at all.
 	openers: { question: '¿', exclamation: '¡' },

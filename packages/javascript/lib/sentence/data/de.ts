@@ -5,6 +5,8 @@ export const DE: SentenceLanguageData = {
 	space: ' ',
 	capitalize: true,
 	terminators: { statement: '.', question: '?', exclamation: '!', trailing: '…' },
+	// German opens low and closes high, which is why the pair is not symmetrical.
+	quotes: { double: ['„', '“'], single: ['‚', '‘'] },
 	// The indefinite article, and it is what makes the modifiers come out right:
 	// after `ein` a German adjective takes the same endings it takes with no
 	// article at all — `ein blauer Wal`, `eine blaue Katze`, `ein blaues Haus` —

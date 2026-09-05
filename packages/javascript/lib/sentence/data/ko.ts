@@ -5,6 +5,7 @@ export const KO: SentenceLanguageData = {
 	space: ' ',
 	capitalize: false,
 	terminators: { statement: '.', question: '?', exclamation: '!', trailing: '…' },
+	quotes: { double: ['“', '”'], single: ['‘', '’'] },
 	// Plain declarative — the form a written statement takes, rather than the
 	// polite 합니다체 a person would speak. It is the shortest of them, and the one
 	// that does not aim a sentence at a listener who is not there.

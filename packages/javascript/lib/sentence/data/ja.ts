@@ -5,6 +5,9 @@ export const JA: SentenceLanguageData = {
 	space: '',
 	capitalize: false,
 	terminators: { statement: '。', question: '？', exclamation: '！', trailing: '…' },
+	// The corner brackets, not the curly quotes: Japanese writes ãã first and
+	// ãã for a quote inside one.
+	quotes: { double: ['「', '」'], single: ['『', '』'] },
 	// Dictionary form, which is the plain statement a written sentence ends on.
 	verbs: [
 		{

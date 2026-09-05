@@ -5,6 +5,7 @@ export const EN: SentenceLanguageData = {
 	space: ' ',
 	capitalize: true,
 	terminators: { statement: '.', question: '?', exclamation: '!', trailing: '…' },
+	quotes: { double: ['“', '”'], single: ['‘', '’'] },
 	// One article, and a definite one. English has three ways to open a noun
 	// phrase and only `the` is right for every noun in the pools: `a` is wrong in
 	// front of a mass noun (`a rain`) and a bare plural is wrong in front of a

@@ -5,6 +5,10 @@ export const ZH: SentenceLanguageData = {
 	space: '',
 	capitalize: false,
 	terminators: { statement: '。', question: '？', exclamation: '！', trailing: '…' },
+	// The curly quotes rather than ãã: these pools are written in simplified
+	// Chinese, and horizontal simplified text uses ââ â the corner brackets are
+	// what Taiwan and Hong Kong write.
+	quotes: { double: ['“', '”'], single: ['‘', '’'] },
 	// Chinese verbs take no form of their own — the same word stands whoever does
 	// it and whenever it happened.
 	verbs: [

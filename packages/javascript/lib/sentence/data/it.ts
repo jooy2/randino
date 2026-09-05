@@ -5,6 +5,7 @@ export const IT: SentenceLanguageData = {
 	space: ' ',
 	capitalize: true,
 	terminators: { statement: '.', question: '?', exclamation: '!', trailing: '…' },
+	quotes: { double: ['«', '»'], single: ['“', '”'] },
 	// The definite article, which Italian picks by gender and by the sound the
 	// noun opens on: `l'` before a vowel, `lo` before an s plus a consonant and
 	// the handful of clusters that go with it, `il` for everything else. The

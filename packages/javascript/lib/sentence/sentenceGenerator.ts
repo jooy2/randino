@@ -39,6 +39,7 @@ import type {
 	SentenceShapeOption,
 	SentenceSlot,
 	SentenceSlotOption,
+	SentenceQuote,
 	SentenceType,
 	SentenceTypeOption,
 	WordLanguage,
@@ -63,6 +64,7 @@ import { SENTENCE_DATA, THEME_CLASS } from './data/index.js';
 import type {
 	NounClass,
 	SentenceFrame,
+	SentenceMark,
 	SentenceMood,
 	SentenceLanguageData,
 	SentencePart,
@@ -105,11 +107,39 @@ type Settings = {
 	includeName: boolean;
 	// What the sentences may be doing, normalized to a set to draw from.
 	types: readonly SentenceType[];
+	// Which marks a quoted line takes, or undefined for the type's own default.
+	quote?: SentenceQuote;
 };
 
-/** The one thing a shape has to match to answer a type. */
-function moodFor(type: SentenceType): SentenceMood {
-	return type === 'question' ? 'question' : 'statement';
+// The kinds a quoted line can be. Somebody speaking is as often asking as
+// telling, and often enough neither, so the mark is drawn rather than fixed.
+const QUOTED_MARKS: readonly SentenceMark[] = ['statement', 'question', 'exclamation'];
+
+/**
+ * The kind whose mark a sentence of this type closes on. Dialogue and thought
+ * have no mark of their own: what they quote is a sentence of another kind, and
+ * they take its mark and put quotation marks around it.
+ */
+function markFor(type: SentenceType): SentenceMark {
+	return type === 'dialogue' || type === 'thought' ? pick(QUOTED_MARKS) : type;
+}
+
+/** The marks a quoted line is wrapped in, or null when nothing is quoted. */
+function quoteFor(
+	data: SentenceLanguageData,
+	type: SentenceType,
+	override: SentenceQuote | undefined
+): readonly [string, string] | null {
+	if (type !== 'dialogue' && type !== 'thought') {
+		return null;
+	}
+
+	return data.quotes[override ?? (type === 'dialogue' ? 'double' : 'single')];
+}
+
+/** The one thing a shape has to match to answer a kind. */
+function moodFor(mark: SentenceMark): SentenceMood {
+	return mark === 'question' ? 'question' : 'statement';
 }
 
 /**
@@ -118,7 +148,12 @@ function moodFor(type: SentenceType): SentenceMood {
  */
 type Draw = {
 	budget: readonly [number, number];
+	/** What the caller asked for, and what the detail reports. */
 	type: SentenceType;
+	/** The kind whose mark it closes on — its own, or the one it is quoting. */
+	mark: SentenceMark;
+	/** The quotation marks it is wrapped in, or null. */
+	quote: readonly [string, string] | null;
 	/** A connective or an interjection, `''` for neither. */
 	opener: string;
 	follow: Follow | null;
@@ -1019,7 +1054,7 @@ function generateOne(language: WordLanguage, settings: Settings, draw: Draw): Bu
 	const wordData = WORD_DATA[language];
 	const data = SENTENCE_DATA[language];
 	const bounds = slotBounds(language);
-	const allowed = framesFor(data, settings, moodFor(draw.type));
+	const allowed = framesFor(data, settings, moodFor(draw.mark));
 	const requested = subjectThemesFor(settings, follow);
 	// The words a caller required go in the first sentence — once in the result
 	// rather than once in every sentence of it.
@@ -1212,7 +1247,7 @@ function compose(
 	// The same predicates, in the form this type of sentence ends on. Index-aligned
 	// with `group.words`, which is what lets a required word be translated rather
 	// than written out in the wrong form.
-	const predicates = formOf(group, draw.type);
+	const predicates = formOf(group, draw.mark);
 	const subjectThemes = themesForClasses(themes, group.subject);
 	const subjectRequired = requiredAt(frame, plan, 'subject');
 	// A theme the caller named is honoured even when no verb group of the language
@@ -1314,8 +1349,9 @@ function compose(
 	const prefixable = !follow && isNounSlot(first.slot) && !first.head && !data.articles;
 	const space = data.space.length;
 	const opener = draw.opener;
-	const close = data.terminators[draw.type];
-	const open = data.openers?.[draw.type] ?? '';
+	const close = data.terminators[draw.mark];
+	const open = data.openers?.[draw.mark] ?? '';
+	const [quoteOpen, quoteClose] = draw.quote ?? ['', ''];
 	const tag = frame.tag ? data.space + frame.tag : '';
 	const spans = parts.map(({ part }, i) => {
 		const [low, high] = partRange(part, data, partBounds[i]);
@@ -1334,7 +1370,13 @@ function compose(
 	let gender: WordGender | undefined = proper.some((word) => word)
 		? follow?.topic.gender
 		: undefined;
-	let used = close.length + open.length + tag.length + (opener ? opener.length + space : 0);
+	let used =
+		close.length +
+		open.length +
+		tag.length +
+		quoteOpen.length +
+		quoteClose.length +
+		(opener ? opener.length + space : 0);
 
 	if (opener) {
 		written.push(data.capitalize ? upper(opener) : opener);
@@ -1471,7 +1513,7 @@ function compose(
 	return {
 		// The opener is written against the first phrase rather than beside it —
 		// Spanish `¿El león corre?`, never `¿ El león corre ?`.
-		sentence: open + written.join(data.space) + tag + close,
+		sentence: quoteOpen + open + written.join(data.space) + tag + close + quoteClose,
 		phrases: reported,
 		slots,
 		names,
@@ -1512,8 +1554,8 @@ function predicateFor(
 }
 
 /** The predicates of a group, in the form this type of sentence ends on. */
-function formOf(group: StateGroup | VerbGroup, type: SentenceType): WordPool {
-	return (type === 'question' ? group.forms?.question : undefined) ?? group.words;
+function formOf(group: StateGroup | VerbGroup, mark: SentenceMark): WordPool {
+	return (mark === 'question' ? group.forms?.question : undefined) ?? group.words;
 }
 
 function upper(word: string): string {
@@ -1637,7 +1679,7 @@ function followFor(data: SentenceLanguageData, topic: Topic): Follow {
  */
 function openerFor(
 	data: SentenceLanguageData,
-	type: SentenceType,
+	mark: SentenceMark,
 	following: boolean,
 	room: number,
 	shortest: number
@@ -1645,7 +1687,7 @@ function openerFor(
 	const spare = room - data.space.length - shortest;
 	const fitting = (pool: WordPool) => pool.filter((word) => word.length <= spare);
 
-	if (type === 'exclamation') {
+	if (mark === 'exclamation') {
 		const usable = fitting(data.interjections);
 
 		if (usable.length && chance(INTERJECTION_CHANCE)) {
@@ -1674,7 +1716,14 @@ function generateResult(language: WordLanguage, settings: Settings): Built[] {
 	const bounds = slotBounds(language);
 	// Every shape any of the requested types could take, because the budget is
 	// shared out before the first type is even drawn.
-	const frames = settings.types.flatMap((type) => framesFor(data, settings, moodFor(type)));
+	// Every shape any of the requested kinds could take, because the budget is
+	// shared out before the first of them is even drawn — and a quoted line can be
+	// any kind at all, so its shapes are all of them.
+	const frames = settings.types.flatMap((type) =>
+		(type === 'dialogue' || type === 'thought' ? QUOTED_MARKS : [type as SentenceMark]).flatMap(
+			(mark) => framesFor(data, settings, moodFor(mark))
+		)
+	);
 	const [shortest] = naturalSpan(data, frames, bounds);
 	const [min, max] = boundsFor(data, frames, bounds, settings);
 	const budgets = shareOut(min, max, settings.sentences, data.space.length);
@@ -1684,11 +1733,14 @@ function generateResult(language: WordLanguage, settings: Settings): Built[] {
 	for (let i = 0; i < settings.sentences; i += 1) {
 		const budget = budgets[i];
 		const type = pick(settings.types);
+		const mark = markFor(type);
 		const follow = topic ? followFor(data, topic) : null;
 		const draw: Draw = {
 			budget,
 			type,
-			opener: openerFor(data, type, follow !== null, budget[1], shortest),
+			mark,
+			quote: quoteFor(data, type, settings.quote),
+			opener: openerFor(data, mark, follow !== null, budget[1], shortest),
 			follow
 		};
 		let one = generateOne(language, settings, draw);
@@ -1735,7 +1787,14 @@ function resolveSlots(slots: SentenceSlotOption | undefined): Settings['slots'] 
 
 /** The caller's `type`, as the set one sentence is drawn from. */
 function resolveTypes(type: SentenceTypeOption | undefined): readonly SentenceType[] {
-	const all: readonly SentenceType[] = ['statement', 'question', 'exclamation', 'trailing'];
+	const all: readonly SentenceType[] = [
+		'statement',
+		'question',
+		'exclamation',
+		'trailing',
+		'dialogue',
+		'thought'
+	];
 
 	if (type === undefined) {
 		return ['statement'];
@@ -1775,7 +1834,8 @@ function resolveSettings(options: RandSentenceOptions): Settings {
 		sentences: clamp(Math.floor(options.sentences ?? 1), 1, RAND_SENTENCE_COUNT_MAX),
 		realism: options.realism ?? 'real',
 		includeName: options.includeName ?? false,
-		types: resolveTypes(options.type)
+		types: resolveTypes(options.type),
+		quote: options.quote
 	};
 }
 

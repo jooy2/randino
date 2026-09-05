@@ -30,15 +30,15 @@ const SAMPLE = 60;
 
 /** Everything a sentence of the language may be written with, punctuation aside. */
 const SCRIPT: Record<WordLanguage, RegExp> = {
-	en: /^[A-Za-z' ,.?!…]+$/,
-	ko: /^[가-힣 ,.?!…]+$/,
-	ja: /^[々぀-ヿ一-鿿。、？！…]+$/,
-	zh: /^[々一-鿿。，？！…]+$/,
-	vi: /^[a-zA-ZÀ-ỹ ,.?!…]+$/,
-	es: /^[a-zA-ZÀ-ÿ ,.?!…¿¡]+$/,
-	it: /^[a-zA-ZÀ-ÿ' ,.?!…]+$/,
-	de: /^[a-zA-ZÀ-ÿß ,.?!…]+$/,
-	ru: /^[Ѐ-ӿ ,.?!…]+$/
+	en: /^[A-Za-z' ,.?!…“”‘’]+$/,
+	ko: /^[가-힣 ,.?!…“”‘’]+$/,
+	ja: /^[々぀-ヿ一-鿿。、？！…「」『』]+$/,
+	zh: /^[々一-鿿。，？！…“”‘’]+$/,
+	vi: /^[a-zA-ZÀ-ỹ ,.?!…“”‘’]+$/,
+	es: /^[a-zA-ZÀ-ÿ ,.?!…¿¡«»“”]+$/,
+	it: /^[a-zA-ZÀ-ÿ' ,.?!…«»“”]+$/,
+	de: /^[a-zA-ZÀ-ÿß ,.?!…„“‚‘]+$/,
+	ru: /^[Ѐ-ӿ ,.?!…«»„“]+$/
 };
 
 const SHAPES: readonly SentenceShape[] = ['simple', 'detailed', 'complex'];
@@ -974,6 +974,7 @@ describe('Sentence', () => {
 
 	it('`type` decides what the sentence is doing, and what it closes on', () => {
 		const TYPES: readonly SentenceType[] = ['statement', 'question', 'exclamation', 'trailing'];
+		const EVERY: readonly SentenceType[] = [...TYPES, 'dialogue', 'thought'];
 
 		for (const language of WORD_LANGUAGES) {
 			const data = SENTENCE_DATA[language];
@@ -1008,7 +1009,7 @@ describe('Sentence', () => {
 			)
 		);
 
-		assert.strictEqual(seen.size, TYPES.length);
+		assert.strictEqual(seen.size, EVERY.length);
 	});
 
 	it('a question is a shape, not a mark bolted onto a statement', () => {
@@ -1166,6 +1167,76 @@ describe('Sentence', () => {
 					);
 				}
 			}
+		}
+	});
+
+	it('a quoted line is a sentence in the language`s own marks', () => {
+		for (const language of WORD_LANGUAGES) {
+			const data = SENTENCE_DATA[language];
+			const marks = Object.values(data.terminators);
+
+			for (const [type, kind] of [
+				['dialogue', 'double'],
+				['thought', 'single']
+			] as [SentenceType, 'double' | 'single'][]) {
+				const [open, close] = data.quotes[kind];
+
+				for (const detail of sentenceDetails({ language, type, count: SAMPLE })) {
+					assert.deepStrictEqual(detail.types, [type], detail.sentence);
+					assert.ok(detail.sentence.startsWith(open), `${language}: ${detail.sentence}`);
+					assert.ok(detail.sentence.endsWith(close), `${language}: ${detail.sentence}`);
+					assert.match(detail.sentence, SCRIPT[language], detail.sentence);
+
+					// What is quoted is a whole sentence, closed the way its own kind
+					// closes — a spoken line is as often asking as telling.
+					const inner = detail.sentence.slice(open.length, -close.length);
+
+					assert.ok(
+						marks.some((mark) => inner.endsWith(mark)),
+						`${language}: '${inner}' closes on no mark (${detail.sentence})`
+					);
+				}
+			}
+		}
+	});
+
+	it('a quoted line is as often asking as telling', () => {
+		// The mark under a quote is drawn per line rather than fixed, so a hundred
+		// of them are not a hundred statements.
+		const data = SENTENCE_DATA.en;
+		const closes = new Set<string>();
+
+		for (const sentence of randSentence({ language: 'en', type: 'dialogue', count: 200 })) {
+			closes.add(sentence.slice(-2, -1));
+		}
+
+		assert.ok(
+			closes.has(data.terminators.statement) &&
+				closes.has(data.terminators.question) &&
+				closes.has(data.terminators.exclamation),
+			`only ${[...closes].join('')} came out`
+		);
+	});
+
+	it('`quote` picks the marks, whatever the type', () => {
+		for (const language of WORD_LANGUAGES) {
+			const { quotes } = SENTENCE_DATA[language];
+
+			for (const kind of ['double', 'single'] as const) {
+				const [open, close] = quotes[kind];
+
+				for (const type of ['dialogue', 'thought'] as SentenceType[]) {
+					for (const sentence of randSentence({ language, type, quote: kind, count: 20 })) {
+						assert.ok(
+							sentence.startsWith(open) && sentence.endsWith(close),
+							`${language} ${type} ${kind}: ${sentence}`
+						);
+					}
+				}
+			}
+
+			// The two levels are two different pairs, or the option means nothing.
+			assert.notDeepStrictEqual(quotes.double, quotes.single, `${language} quotes`);
 		}
 	});
 

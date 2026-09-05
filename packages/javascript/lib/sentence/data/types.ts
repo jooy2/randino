@@ -8,7 +8,7 @@
 // allows. So the nouns are still drawn from `word/data`, and everything a
 // sentence adds to them lives here.
 
-import type { SentenceSlot, SentenceType } from '../../_types/global.js';
+import type { SentenceQuote, SentenceSlot, SentenceType } from '../../_types/global.js';
 import type { WordGender, WordPool } from '../../word/data/types.js';
 
 /**
@@ -126,6 +126,14 @@ export type SentencePart = {
 export type SentenceMood = 'statement' | 'question';
 
 /**
+ * The kinds of sentence a language writes a mark of its own for.
+ *
+ * `dialogue` and `thought` are not among them: what they quote is a sentence of
+ * one of these, so they take its mark and add the quotation marks around it.
+ */
+export type SentenceMark = Exclude<SentenceType, 'dialogue' | 'thought'>;
+
+/**
  * One shape a sentence can take, written in the order the language puts it in.
  *
  * Per language rather than shared, and for the same reason a nickname's frames
@@ -184,13 +192,21 @@ export type SentenceLanguageData = {
 	space: string;
 	/** Whether the sentence opens on a capital letter. */
 	capitalize: boolean;
-	/** What a sentence of each type closes on. */
-	terminators: Record<SentenceType, string>;
+	/** What a sentence of each kind closes on. */
+	terminators: Record<SentenceMark, string>;
 	/**
-	 * What it opens on, for a language that marks the type at both ends. Spanish
+	 * What it opens on, for a language that marks the kind at both ends. Spanish
 	 * `¿` and `¡` are the only ones here, and every other language leaves it out.
 	 */
-	openers?: Partial<Record<SentenceType, string>>;
+	openers?: Partial<Record<SentenceMark, string>>;
+	/**
+	 * The two levels of quotation marks the language writes, as `[open, close]`.
+	 *
+	 * Per language and not close to universal: Japanese writes `「」` and `『』`,
+	 * German opens low and closes high (`„…“`), and Spanish, Italian and Russian
+	 * reach for guillemets before anything else.
+	 */
+	quotes: Record<SentenceQuote, readonly [string, string]>;
 	/** The article a noun phrase opens with. Left out by a language with no articles. */
 	articles?: SentenceArticles;
 	/**

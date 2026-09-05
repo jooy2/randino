@@ -126,6 +126,9 @@ console.log(
 						// Optional in one package and defaulted in another; written as a
 						// map either way so the shapes compare.
 						openers: map(data.openers ?? {}),
+						quotes: Object.fromEntries(
+							Object.entries(data.quotes).map(([kind, pair]) => [kind, [...pair]])
+						),
 						// Optional in one package and defaulted in another; written the same
 						// way here either way, so the shapes compare.
 						predicateAgrees: data.predicateAgrees ?? false,

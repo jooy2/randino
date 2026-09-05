@@ -5,6 +5,7 @@ export const RU: SentenceLanguageData = {
 	space: ' ',
 	capitalize: true,
 	terminators: { statement: '.', question: '?', exclamation: '!', trailing: '…' },
+	quotes: { double: ['«', '»'], single: ['„', '“'] },
 	predicateAgrees: true,
 	// Third person singular of the present. The present is the one tense that does
 	// not inflect for the subject's gender, which is what lets one verb stand
