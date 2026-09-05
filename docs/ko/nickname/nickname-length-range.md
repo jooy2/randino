@@ -62,9 +62,9 @@ nickname_length_range("ko", "-")  # (1, 15)
 
 :::
 
-## 범위가 넓은 것은 의도된 것입니다
+## 기본 범위가 넓은 이유
 
-아래쪽 끝은 명사 하나이고 위쪽 끝은 수식어와 명사와 뒤따르는 단어를 모두 더한 것입니다. 그래서 기본 범위는 **모든 형태**를 포함하며, 결과물의 일반적인 모습을 결정하는 것은 범위가 아니라 형태별 가중치입니다. 범위를 좁히는 것이 곧 형태를 빼는 방법입니다.
+아래쪽 끝은 명사 하나이고, 위쪽 끝은 수식어와 명사와 뒤따르는 단어를 모두 더한 것입니다. 그래서 기본 범위는 모든 형태를 포함하며, 결과물의 일반적인 모습은 범위가 아니라 형태별 가중치가 정합니다. 범위를 좁히는 것이 곧 형태를 빼는 방법입니다.
 
 ::: lang js
 
@@ -98,7 +98,7 @@ rand_nickname(language="en", max_length=8, count=3)
 
 ## 범위를 넓히거나 좁히는 두 가지
 
-**구분자는 닉네임의 일부입니다.** 구분자의 길이도 <Lang js="minLength" dart="minLength" py="min_length" code /> / <Lang js="maxLength" dart="maxLength" py="max_length" code />에 포함되므로, 이 함수에 구분자를 넘겨 보면 남은 범위를 알 수 있습니다.
+구분자는 닉네임의 일부입니다. 구분자의 길이도 <Lang js="minLength" dart="minLength" py="min_length" code /> / <Lang js="maxLength" dart="maxLength" py="max_length" code />에 포함되므로, 이 함수에 구분자를 넘겨 보면 남은 범위를 알 수 있습니다.
 
 ::: lang js
 
@@ -130,7 +130,7 @@ nickname_length_range("en", word_separator=" ")  # (3, 33)
 
 :::
 
-**무작위 접미사는 이 범위 밖에 있습니다.** [`randSuffix`](../decorate/rand-suffix)는 닉네임이 완성된 뒤에 토큰을 붙이므로, <Lang js="minLength" dart="minLength" py="min_length" code />와 <Lang js="maxLength" dart="maxLength" py="max_length" code />는 닉네임 전체를 가리키며 빼고 셀 것이 없습니다.
+무작위 접미사는 이 범위 밖에 있습니다. [`randSuffix`](../decorate/rand-suffix)는 닉네임이 완성된 뒤에 토큰을 붙이므로, <Lang js="minLength" dart="minLength" py="min_length" code />와 <Lang js="maxLength" dart="maxLength" py="max_length" code />는 닉네임 전체를 가리키며 빼고 셀 것이 없습니다.
 
 ## 함께 보기
 

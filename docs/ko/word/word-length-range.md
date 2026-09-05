@@ -45,7 +45,7 @@ word_length_range()  # (1, 12) — 모든 언어를 한꺼번에
 | `language` | <Lang js="WordLanguageOption" dart="WordLanguage?" py="WordLanguageOption" code /> | <Lang js="'all'" dart="null" py="&quot;all&quot;" code /> | 조회할 언어, 또는 모든 언어. |
 | `theme` | <Lang js="WordThemeOption" dart="WordTheme?" py="WordThemeOption" code /> | <Lang js="'all'" dart="null" py="&quot;all&quot;" code /> | 조회할 테마, 또는 모든 테마. |
 
-다른 언어 조회 함수들과 마찬가지로 JavaScript와 Python에서는 위치 인자이고 Dart에서는 이름 있는 인자입니다.
+다른 조회 함수와 마찬가지로 JavaScript와 Python에서는 위치 인자이고, Dart에서는 이름 있는 인자입니다.
 
 ## 테마를 좁히면 범위도 좁아집니다
 
@@ -86,4 +86,4 @@ word_length_range("zh")  # (2, 3)
 ## 함께 보기
 
 - [`randWord`](./rand-word) — 이 범위를 사용하는 곳.
-- [`nicknameLengthRange`](../nickname/nickname-length-range) — 닉네임 전체에 대해 같은 것을 묻는 함수.
+- [`nicknameLengthRange`](../nickname/nickname-length-range) — 닉네임 전체의 길이 범위를 알려 주는 함수.
