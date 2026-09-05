@@ -43,6 +43,7 @@ from randino.constants import (
     RAND_COUNT_MAX,
     RAND_LENGTH_MAX,
     RAND_LENGTH_MIN,
+    RAND_SENTENCE_COUNT_MAX,
     RAND_SENTENCE_LENGTH_MAX,
 )
 from randino.decorate import (
@@ -104,6 +105,7 @@ __all__ = [
     "RAND_COUNT_MAX",
     "RAND_LENGTH_MAX",
     "RAND_LENGTH_MIN",
+    "RAND_SENTENCE_COUNT_MAX",
     "RAND_SENTENCE_LENGTH_MAX",
     "WORD_LANGUAGES",
     "WORD_THEMES",

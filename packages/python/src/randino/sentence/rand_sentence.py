@@ -29,6 +29,7 @@ def rand_sentence(
     max_length: int | None = ...,
     starts_with: str = ...,
     unique: bool = ...,
+    sentences: int = ...,
     output: Literal["value"] = ...,
 ) -> list[str]: ...
 
@@ -47,6 +48,7 @@ def rand_sentence(
     max_length: int | None = ...,
     starts_with: str = ...,
     unique: bool = ...,
+    sentences: int = ...,
     output: Literal["detail"],
 ) -> list[SentenceDetail]: ...
 
@@ -64,6 +66,7 @@ def rand_sentence(
     max_length: int | None = None,
     starts_with: str = "",
     unique: bool = False,
+    sentences: int = 1,
     output: RandOutput = "value",
 ) -> list[str] | list[SentenceDetail]:
     """Generate whole sentences, written the way the language writes them.
@@ -97,6 +100,12 @@ def rand_sentence(
             language that writes articles, that character is the article's.
         unique: Never return the same sentence twice. May return fewer than `count`
             sentences once the pools run out of combinations.
+        sentences: How many sentences one result holds, up to `RAND_SENTENCE_COUNT_MAX`.
+            They come back as one string — `count` is still how many strings there are
+            — and they are about the same thing: a later sentence names the first one's
+            subject again, refers to it with a pronoun, or draws a fresh subject of the
+            same kind, and may open on a connective. `min_length` and `max_length`
+            describe the whole string whatever this is.
         output: `"value"` for strings, `"detail"` for a `SentenceDetail` per sentence —
             the phrases in order, what each of them does, the language and the theme.
 
@@ -128,6 +137,7 @@ def rand_sentence(
         max_length=max_length,
         starts_with=starts_with,
         unique=unique,
+        sentences=sentences,
     )
 
     if output == "detail":

@@ -8,12 +8,14 @@ import re
 
 from randino import (
     RAND_COUNT_MAX,
+    RAND_SENTENCE_COUNT_MAX,
     WORD_LANGUAGES,
     WORD_THEMES,
     RandRealism,
     SentenceShape,
     SentenceSlot,
     WordLanguage,
+    WordTheme,
     rand_sentence,
     sentence_length_range,
 )
@@ -466,6 +468,198 @@ def test_unique_never_repeats_a_sentence() -> None:
     sentences = rand_sentence(language="ko", unique=True, count=300)
 
     assert len(set(sentences)) == len(sentences)
+
+
+def upper_first(word: str) -> str:
+    """How a capitalizing language writes the first word of a sentence."""
+    return word[:1].upper() + word[1:]
+
+
+def pronouns_of(language: WordLanguage) -> set[str]:
+    """Every subject pronoun the language can write, in both cases."""
+    written = [word for pool in SENTENCE_DATA[language].pronouns.values() for word in pool if word]
+
+    return {*written, *(upper_first(word) for word in written)}
+
+
+def noun_in(language: WordLanguage, phrase: str) -> str | None:
+    """The noun a phrase was built around, as far as the pools can tell.
+
+    The same decomposition `explains` makes, kept instead of thrown away. None for a
+    phrase built on a word no pool holds, which is what an invented subject is.
+    """
+    space = SENTENCE_DATA[language].space
+    nouns = pool_for(language, "subject")
+    modifiers = modifiers_for(language)
+    rest = phrase
+
+    for article in articles_for(language):
+        opening = article if article.endswith("'") else article + space
+
+        if rest.startswith(opening):
+            rest = rest[len(opening) :]
+            break
+
+    if rest in nouns:
+        return rest
+
+    for at in range(1, len(rest)):
+        if space and rest[at : at + len(space)] != space:
+            continue
+
+        left = rest[:at]
+        right = rest[at + len(space) :]
+
+        if left in modifiers and right in nouns:
+            return right
+
+        if left in nouns and right in modifiers:
+            return left
+
+    return None
+
+
+def theme_of_noun(language: WordLanguage, noun: str) -> WordTheme | None:
+    """The theme whose pool holds a noun, in the form a sentence writes it."""
+    for theme in WORD_THEMES:
+        if any(plain(language, word) == noun for word in WORD_DATA[language].nouns[theme]):
+            return theme
+
+    return None
+
+
+def test_sentences_puts_more_than_one_sentence_in_one_result() -> None:
+    for language in WORD_LANGUAGES:
+        data = SENTENCE_DATA[language]
+
+        for detail in rand_sentence(language=language, sentences=3, count=40, output="detail"):
+            assert len(detail.sentences) == 3, detail.sentence
+            assert data.space.join(detail.sentences) == detail.sentence
+
+            for sentence in detail.sentences:
+                assert sentence.endswith(data.terminator), f"{language}: {sentence}"
+                assert SCRIPT[language].match(sentence), f"{language}: {sentence}"
+                # Every sentence closes exactly once, so two of them were never run
+                # together into one entry.
+                assert sentence.count(data.terminator) == 1, f"{language}: {sentence}"
+                assert "  " not in sentence, f"{language}: {sentence}"
+
+    for detail in rand_sentence(count=20, output="detail"):
+        assert len(detail.sentences) == 1
+        assert detail.sentences[0] == detail.sentence
+
+
+def test_sentences_is_clamped_and_count_still_says_how_many_strings_there_are() -> None:
+    for asked, expected in (
+        (0, 1),
+        (-3, 1),
+        (RAND_SENTENCE_COUNT_MAX + 5, RAND_SENTENCE_COUNT_MAX),
+    ):
+        for detail in rand_sentence(language="ko", sentences=asked, count=10, output="detail"):
+            assert len(detail.sentences) == expected, detail.sentence
+
+    assert len(rand_sentence(sentences=4, count=7)) == 7
+
+
+def test_the_length_range_describes_the_whole_result() -> None:
+    ranges: tuple[tuple[WordLanguage, int, int, int], ...] = (
+        ("ko", 2, 24, 40),
+        ("ko", 3, 40, 60),
+        ("en", 2, 40, 70),
+        ("ja", 3, 24, 42),
+        ("zh", 2, 14, 28),
+        ("de", 2, 34, 60),
+        ("ru", 3, 40, 75),
+    )
+
+    for language, sentences, min_length, max_length in ranges:
+        for sentence in rand_sentence(
+            language=language,
+            sentences=sentences,
+            min_length=min_length,
+            max_length=max_length,
+            count=SAMPLE,
+        ):
+            assert min_length <= len(sentence) <= max_length, (
+                f"{language} x{sentences} {min_length}-{max_length}: {sentence}"
+            )
+
+
+def test_the_sentences_of_one_result_are_about_the_same_kind_of_thing() -> None:
+    # A paragraph is not three draws. Every sentence after the first names that first
+    # subject again, stands a pronoun where it was, or draws another noun of the same
+    # class — so a paragraph that opens on a creature never wanders into an idea
+    # halfway through.
+    for language in WORD_LANGUAGES:
+        pronouns = pronouns_of(language)
+
+        for detail in rand_sentence(language=language, sentences=3, count=60, output="detail"):
+            if detail.theme is None:
+                continue
+
+            wanted = THEME_CLASS[detail.theme]
+            subjects = 0
+
+            for phrase, slot in zip(detail.phrases, detail.slots, strict=True):
+                if slot != "subject":
+                    continue
+
+                subjects += 1
+
+                if phrase in pronouns:
+                    continue
+
+                # Any of the three sentences can be the one a phrase opens, so both
+                # cases are tried rather than only the first phrase of the result.
+                noun = noun_in(language, phrase) or noun_in(
+                    language, phrase[:1].lower() + phrase[1:]
+                )
+                found = theme_of_noun(language, noun) if noun is not None else None
+
+                assert found is None or THEME_CLASS[found] == wanted, (
+                    f"{language}: '{phrase}' is a {found} where the result is about a "
+                    f"{wanted} ({detail.sentence})"
+                )
+
+            assert subjects >= 1, detail.sentence
+
+
+def test_a_connective_opens_a_sentence_that_follows_another() -> None:
+    for language in WORD_LANGUAGES:
+        data = SENTENCE_DATA[language]
+        openers = [
+            (upper_first(word) if data.capitalize else word) + data.space
+            for word in data.connectives
+        ]
+        seen = 0
+
+        for detail in rand_sentence(language=language, sentences=3, count=120, output="detail"):
+            assert not any(detail.sentences[0].startswith(opener) for opener in openers), (
+                f"{language}: the first sentence opens on a connective ({detail.sentence})"
+            )
+
+            seen += sum(
+                any(sentence.startswith(opener) for opener in openers)
+                for sentence in detail.sentences[1:]
+            )
+
+        # And the language can actually write one, which is what makes the check above
+        # worth anything.
+        assert seen > 0, f"{language} never wrote a connective"
+
+
+def test_a_language_whose_nouns_carry_a_gender_has_a_pronoun_for_each_of_them() -> None:
+    for language in WORD_LANGUAGES:
+        data = SENTENCE_DATA[language]
+        genders: tuple[WordGender, ...] = tuple((WORD_DATA[language].agreement or {}).keys())
+
+        assert data.connectives, f"{language} has no connectives"
+        assert "n" in data.pronouns or genders, f"{language} has no pronoun to fall back to"
+
+        for gender in genders:
+            assert data.pronouns.get(gender) or data.pronouns.get("n"), (
+                f"{language}: nothing stands in for a {gender} subject"
+            )
 
 
 def test_the_detail_form_reports_what_the_sentence_was_built_from() -> None:

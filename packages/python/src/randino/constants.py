@@ -20,9 +20,21 @@ RAND_LENGTH_MAX = 40
 """Upper bound for `min_length` / `max_length` on every generator, in characters."""
 
 RAND_SENTENCE_LENGTH_MAX = 200
-"""Upper bound for `min_length` / `max_length` on `rand_sentence`, in characters.
+"""Upper bound for `min_length` / `max_length` on `rand_sentence`, per sentence.
 
-Its own number rather than `RAND_LENGTH_MAX`, because a sentence is many words and
-their particles where a name, a word and a nickname are at most three — a ceiling of
-40 would cut most sentences of every language in half.
+In characters, and its own number rather than `RAND_LENGTH_MAX`, because a sentence is
+many words and their particles where a name, a word and a nickname are at most three —
+a ceiling of 40 would cut most sentences of every language in half.
+
+Per sentence rather than per result, because `sentences` asks for more than one of them
+in one string: a paragraph of ten is allowed ten times this, and capping the paragraph
+at what one sentence may be would answer the ask with ten sentences of twenty
+characters.
+"""
+
+RAND_SENTENCE_COUNT_MAX = 10
+"""Upper bound for `sentences` on `rand_sentence` — how many sentences one result holds.
+
+Ten is already a paragraph, and every one of them still has to land inside the result's
+own length range.
 """

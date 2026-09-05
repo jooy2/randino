@@ -205,6 +205,9 @@ IT = SentenceLanguageData(
         in_estate in_autunno in_inverno nel_fine_settimana poco_fa a_volte ogni_giorno
         al_tramonto
     """),
+    connectives=words("e_poi ma allora inoltre, tuttavia, dopo infine intanto,"),
+    # Pro-drop, the same as Spanish: `esso` exists and nobody writes it.
+    pronouns={"n": ("",)},
     frames=(
         SentenceFrame(
             (

@@ -30,6 +30,7 @@ def test_the_package_exports_exactly_its_public_api() -> None:
         "RAND_COUNT_MAX",
         "RAND_LENGTH_MAX",
         "RAND_LENGTH_MIN",
+        "RAND_SENTENCE_COUNT_MAX",
         "RAND_SENTENCE_LENGTH_MAX",
         "RandRealism",
         "SentenceDetail",
@@ -105,6 +106,11 @@ def test_the_functions_are_callable_and_the_constants_are_what_they_claim() -> N
     assert randino.RAND_LENGTH_MIN == 1
     assert randino.RAND_LENGTH_MAX == 40
     assert randino.RAND_COUNT_MAX == 10000
+    # A sentence is many words rather than at most three, so it is the one generator
+    # with a length ceiling of its own — and the one that puts more than one result in
+    # a string.
+    assert randino.RAND_SENTENCE_LENGTH_MAX == 200
+    assert randino.RAND_SENTENCE_COUNT_MAX == 10
 
     assert callable(randino.rand_nickname)
     assert callable(randino.nickname_length_range)

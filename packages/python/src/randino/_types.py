@@ -200,13 +200,22 @@ class SentenceDetail:
     """A generated sentence with the pieces it was built from."""
 
     sentence: str
-    """The finished sentence, punctuation and all."""
+    """The finished result, punctuation and all — every sentence of it, joined."""
+
+    sentences: tuple[str, ...]
+    """One entry per sentence.
+
+    A single entry unless `sentences` asked for more, and `sentence` is always these
+    joined by the language's own space.
+    """
 
     phrases: tuple[str, ...]
     """The phrases the sentence is made of, in order.
 
     A phrase and its modifier, without the particle or preposition that marks it. So
-    `검은 고양이가 잠잔다` reports `("검은 고양이", "잠잔다")`.
+    `검은 고양이가 잠잔다` reports `("검은 고양이", "잠잔다")`. One flat tuple across
+    every sentence of the result, the same way `slots` is; a connective a sentence
+    opens on is not a phrase and is not in here.
     """
 
     slots: tuple[SentenceSlot, ...]
@@ -216,10 +225,11 @@ class SentenceDetail:
     """The language this sentence was generated in."""
 
     theme: WordTheme | None
-    """Theme the sentence's subject belongs to.
+    """Theme the result's subject belongs to — the first sentence's.
 
-    None when that word is not one the generator knows, which happens when it was
-    invented or was handed in through `include`.
+    That is what every sentence after it stays about. None when the word is not one the
+    generator knows, which happens when it was invented or was handed in through
+    `include`.
     """
 
 

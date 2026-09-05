@@ -33,7 +33,7 @@ from randino._internal.generate import (
     resolve_realism,
 )
 from randino._internal.script import ends_with_consonant
-from randino._internal.utils import chance, pick
+from randino._internal.utils import chance, clamp, pick
 from randino._types import (
     RandRealism,
     SentenceDetail,
@@ -45,7 +45,7 @@ from randino._types import (
     WordTheme,
     WordThemeOption,
 )
-from randino.constants import RAND_SENTENCE_LENGTH_MAX
+from randino.constants import RAND_SENTENCE_COUNT_MAX, RAND_SENTENCE_LENGTH_MAX
 from randino.sentence.data import SENTENCE_DATA, THEME_CLASS
 from randino.sentence.data._types import (
     NounClass,
@@ -95,8 +95,49 @@ class Settings:
 
     prefix: str
     include: tuple[str, ...]
+    sentences: int
+    """How many sentences one result holds, clamped."""
+
     min_length: int | None = None
     max_length: int | None = None
+
+
+@dataclass(frozen=True, slots=True)
+class Topic:
+    """What the sentences of one result are about.
+
+    The first sentence's subject, and everything a later one needs to keep talking
+    about it. A paragraph is not three draws, and this is the whole of the difference:
+    the class is what a fresh subject stays inside, the noun is what naming it again
+    writes, and the gender is what a pronoun and an agreeing predicate need.
+    """
+
+    noun: str
+    """The subject noun as the first sentence wrote it."""
+
+    theme: WordTheme | None
+    noun_class: NounClass | None
+    """The class its theme falls into. None when the noun is one no pool holds."""
+
+    gender: WordGender | None
+
+
+@dataclass(frozen=True, slots=True)
+class Follow:
+    """Everything a sentence after the first one is built with.
+
+    `reference` says how it refers to what the two of them are about: `"repeat"` names
+    the topic again, `"pronoun"` stands in for it — with the empty string where the
+    language drops its subject — and `"fresh"` draws another noun of the same class.
+    """
+
+    topic: Topic
+    reference: str
+    pronoun: str
+    """What a `"pronoun"` reference writes; `""` where the language writes nothing."""
+
+    opener: str
+    """The connective the sentence opens on, `""` for none."""
 
 
 # --- Shapes -----------------------------------------------------------------
@@ -288,14 +329,27 @@ def _classify(language: WordLanguage, word: str) -> Requirement:
     return Requirement(written, tuple(slots), theme=theme)
 
 
-def _plan_for(frame: SentenceFrame, requirements: Sequence[Requirement]) -> tuple[Plan, bool]:
+def _plan_for(
+    frame: SentenceFrame,
+    requirements: Sequence[Requirement],
+    subject: Requirement | None = None,
+) -> tuple[Plan, bool]:
     """Where each required word goes in this shape, and whether all of them fit.
 
     Greedy: a word takes the first of its own slots that is still free, which is enough
-    because the lists are short and ordered by how specific the reading is.
+    because the lists are short and ordered by how specific the reading is. A sentence
+    carrying on about the topic is handed its `subject` rather than asking for it, so
+    that goes in the subject's own phrase before the greedy placement reaches for the
+    first noun slot it can find.
     """
     plan = Plan()
     complete = True
+
+    if subject is not None:
+        for index, part in enumerate(frame.parts):
+            if part.slot == "subject":
+                plan.phrase[index] = subject
+                break
 
     for requirement in requirements:
         placed = False
@@ -549,6 +603,23 @@ def _frame_range(
     return (low, high)
 
 
+def _natural_span(
+    data: SentenceLanguageData,
+    frames: Sequence[SentenceFrame],
+    bounds: dict[str, tuple[int, int]],
+) -> tuple[int, int]:
+    """The shortest and longest sentence a set of shapes can produce."""
+    low = None
+    high = 0
+
+    for frame in frames:
+        frame_low, frame_high = _frame_range(frame, data, bounds)
+        low = frame_low if low is None else min(low, frame_low)
+        high = max(high, frame_high)
+
+    return (low or 1, high)
+
+
 def natural_range(language: WordLanguage) -> tuple[int, int]:
     """Every sentence length the language can produce.
 
@@ -563,16 +634,8 @@ def natural_range(language: WordLanguage) -> tuple[int, int]:
         The shortest and the longest sentence it can write.
     """
     data = SENTENCE_DATA[language]
-    bounds = _slot_bounds(language)
-    low = None
-    high = 0
 
-    for frame in data.frames:
-        frame_low, frame_high = _frame_range(frame, data, bounds)
-        low = frame_low if low is None else min(low, frame_low)
-        high = max(high, frame_high)
-
-    return (low or 1, high)
+    return _natural_span(data, data.frames, _slot_bounds(language))
 
 
 # --- Choosing the words -----------------------------------------------------
@@ -703,6 +766,11 @@ class Built:
     phrases: tuple[str, ...]
     slots: tuple[SentenceSlot, ...]
     theme: WordTheme | None
+    subject: str | None
+    """The subject noun as written, which is what the next sentence carries on about."""
+
+    gender: WordGender | None
+    """Its gender, for the pronoun and the agreement of whatever follows."""
 
 
 def _article_for(data: SentenceLanguageData, gender: WordGender | None, following: str) -> str:
@@ -891,6 +959,7 @@ def _compose(
     bounds: dict[str, tuple[int, int]],
     low: int,
     high: int,
+    follow: Follow | None,
 ) -> Built:
     """Fill a shape and write it out.
 
@@ -933,12 +1002,42 @@ def _compose(
         if subject_required is not None and subject_required.theme is not None
         else pick(subject_themes or themes)
     )
+    # A sentence carrying on about the topic stands a pronoun where its subject would
+    # go, and the languages that drop their subject stand nothing there at all — in
+    # which case the phrase is not in the shape to carry an article, a modifier or a
+    # particle. Written out as its own list so that every budget below is measured
+    # against what the sentence actually writes; `at` is the index back into the frame,
+    # which is what the plan is keyed by.
+    pronoun = follow.pronoun if follow is not None and follow.reference == "pronoun" else None
+    parts: list[SentencePart] = []
+    at: list[int] = []
+
+    for index, part in enumerate(frame.parts):
+        if part.slot != "subject" or pronoun is None:
+            parts.append(part)
+            at.append(index)
+        elif pronoun:
+            parts.append(
+                SentencePart(
+                    part.slot,
+                    head=part.head,
+                    tail=part.tail,
+                    tail_alt=part.tail_alt,
+                    bare=True,
+                )
+            )
+            at.append(index)
+
     # Only a shape that opens on a noun phrase with nothing in front of it can
     # honour `starts_with`; anywhere else the sentence opens on an article, a
-    # preposition or an adverbial, and `collect` filters what does not match.
-    first = frame.parts[0]
-    prefixable = first.slot in NOUN_SLOTS and not first.head and data.articles is None
+    # preposition or an adverbial, and `collect` filters what does not match. A
+    # sentence after the first one never opens the result, so it never carries it.
+    first = parts[0]
+    prefixable = (
+        follow is None and first.slot in NOUN_SLOTS and not first.head and data.articles is None
+    )
     space = len(data.space)
+    opener = follow.opener if follow is not None else ""
     # Every phrase's theme is settled before any of them is drawn, because a length
     # budget is only as good as the pools it was measured against. Left to the loop, each
     # phrase was given the room the language's longest noun would need and drew a word
@@ -946,7 +1045,7 @@ def _compose(
     # shape could otherwise have reached.
     part_themes: list[WordTheme | None] = []
 
-    for index, part in enumerate(frame.parts):
+    for index, part in enumerate(parts):
         if part.slot not in NOUN_SLOTS:
             part_themes.append(None)
             continue
@@ -955,7 +1054,7 @@ def _compose(
             part_themes.append(subject_theme)
             continue
 
-        required = plan.phrase.get(index)
+        required = plan.phrase.get(at[index])
         part_themes.append(
             required.theme
             if required is not None and required.theme is not None
@@ -968,17 +1067,22 @@ def _compose(
 
     # The same for the predicate: `bounds` spans every group the language has, and one
     # sentence draws from one of them. A word the caller required is narrower still — its
-    # length is not a range at all.
+    # length is not a range at all, and neither is a pronoun's.
     part_bounds: list[dict[str, tuple[int, int]]] = []
 
-    for index, part in enumerate(frame.parts):
-        required = plan.phrase.get(index)
-        exact = None if required is None else (len(required.word), len(required.word))
+    for index, part in enumerate(parts):
+        required = plan.phrase.get(at[index])
+        word = (
+            pronoun
+            if part.slot == "subject" and pronoun
+            else (required.word if required is not None else None)
+        )
+        exact = None if word is None else (len(word), len(word))
         own = dict(bounds)
         theme = part_themes[index]
 
         if theme is not None:
-            owed = plan.modifier.get(index)
+            owed = plan.modifier.get(at[index])
             own[part.slot] = exact or _noun_span(language, theme, settings.invent)
 
             if owed is not None:
@@ -996,17 +1100,22 @@ def _compose(
             (0 if index == 0 else space) + part_high,
         )
         for index, (part_low, part_high) in enumerate(
-            _part_range(part, data, part_bounds[index]) for index, part in enumerate(frame.parts)
+            _part_range(part, data, part_bounds[index]) for index, part in enumerate(parts)
         )
     ]
     written: list[str] = []
     reported: list[str] = []
     slots: list[SentenceSlot] = []
     subject: Phrase | None = None
-    gender: WordGender | None = None
-    used = len(data.terminator)
+    # A pronoun says nothing about its own gender, so what agrees with it agrees with
+    # the noun it stands for.
+    gender: WordGender | None = follow.topic.gender if pronoun and follow is not None else None
+    used = len(data.terminator) + (len(opener) + space if opener else 0)
 
-    for index, part in enumerate(frame.parts):
+    if opener:
+        written.append(_upper(opener) if data.capitalize else opener)
+
+    for index, part in enumerate(parts):
         rest_min = sum(span[0] for span in spans[index + 1 :])
         rest_max = sum(span[1] for span in spans[index + 1 :])
         gap = 0 if index == 0 else space
@@ -1015,9 +1124,11 @@ def _compose(
         part_high = max(1, high - used - overhead - rest_min)
         part_low = max(1, low - used - overhead - rest_max)
 
-        if part.slot in NOUN_SLOTS:
-            required = plan.phrase.get(index)
-            owed = plan.modifier.get(index)
+        if part.slot == "subject" and pronoun:
+            phrase = pronoun
+        elif part.slot in NOUN_SLOTS:
+            required = plan.phrase.get(at[index])
+            owed = plan.modifier.get(at[index])
             theme = cast("WordTheme", part_themes[index])
             noun_low, noun_high = part_bounds[index][part.slot]
             _, article_max = (0, 0) if part.bare else _article_span(data)
@@ -1056,16 +1167,16 @@ def _compose(
                 lexicon,
                 data,
                 predicates,
-                plan.phrase.get(index),
+                plan.phrase.get(at[index]),
                 gender,
                 part_low,
                 part_high,
             )
 
         # The opening capital belongs to whatever is written first, and that is the
-        # phrase itself unless a preposition stands in front of it. Applied here
-        # rather than to the finished string, so the phrase the detail reports is
-        # the one the sentence actually shows.
+        # phrase itself unless a connective or a preposition stands in front of it.
+        # Applied here rather than to the finished string, so the phrase the detail
+        # reports is the one the sentence actually shows.
         opens = data.capitalize and not written
         head = _upper(part.head) if opens and part.head else part.head
         text = _upper(phrase) if opens and not part.head else phrase
@@ -1079,11 +1190,17 @@ def _compose(
         slots.append(part.slot)
         used += gap + head_cost + len(text) + len(tail)
 
+    # A dropped subject leaves no phrase behind, so what the next sentence carries on
+    # about is the topic this one was already handed.
+    carried = follow.topic if pronoun is not None and follow is not None else None
+
     return Built(
         data.space.join(written) + data.terminator,
         tuple(reported),
         tuple(slots),
         subject.theme if subject is not None else None,
+        subject.noun if subject is not None else (carried.noun if carried and pronoun else None),
+        gender if subject is not None else (carried.gender if carried is not None else None),
     )
 
 
@@ -1093,33 +1210,217 @@ def _bounds_for(
     bounds: dict[str, tuple[int, int]],
     settings: Settings,
 ) -> tuple[int, int]:
-    """The length range one sentence has to land in."""
-    natural_low = None
-    natural_high = 0
+    """The length range one whole result has to land in.
 
-    for frame in frames:
-        frame_low, frame_high = _frame_range(frame, data, bounds)
-        natural_low = frame_low if natural_low is None else min(natural_low, frame_low)
-        natural_high = max(natural_high, frame_high)
+    Every sentence of it and the spaces between them, because that is what `min_length`
+    and `max_length` describe. The ceiling is per sentence rather than per result: a
+    paragraph of ten is ten sentences long, and capping it at what one of them may be
+    would answer the ask with ten sentences of twenty characters.
+    """
+    count = settings.sentences
+    gap = len(data.space) * (count - 1)
+    natural_low, natural_high = _natural_span(data, frames, bounds)
 
     return length_bounds(
         settings.min_length,
         settings.max_length,
-        natural_low or 1,
-        natural_high,
-        RAND_SENTENCE_LENGTH_MAX,
+        natural_low * count + gap,
+        natural_high * count + gap,
+        RAND_SENTENCE_LENGTH_MAX * count + gap,
     )
 
 
-def _generate_one(language: WordLanguage, settings: Settings) -> Built:
+def _distance_from(length: int, budget: tuple[int, int]) -> int:
+    """How far a length falls outside a range, and 0 when it is inside it."""
+    low, high = budget
+
+    return length - high if length > high else max(0, low - length)
+
+
+def _share_out(budget: tuple[int, int], count: int, space: int) -> list[tuple[int, int]]:
+    """The result's range, shared out over its sentences.
+
+    The joins between them come off the top and the last sentence absorbs the rounding,
+    so the shares add back up to exactly what the caller asked for rather than to one
+    character less.
+    """
+    if count == 1:
+        return [budget]
+
+    gap = space * (count - 1)
+
+    def split(total: int) -> list[int]:
+        body = max(count, total - gap)
+        each = body // count
+
+        return [each] * (count - 1) + [body - each * (count - 1)]
+
+    lows = split(budget[0])
+    highs = split(budget[1])
+
+    return [(max(1, lows[i]), max(lows[i], highs[i])) for i in range(count)]
+
+
+# --- Building the whole result ----------------------------------------------
+
+CONNECTIVE_CHANCE = 40
+"""How often a sentence that follows another one opens on a connective."""
+
+REFERENCE_WEIGHT = {"repeat": 25, "pronoun": 40, "fresh": 35}
+"""How a sentence refers to the topic, against the other two ways of doing it."""
+
+
+def _topic_of(built: Built) -> Topic | None:
+    """What the rest of the result is about, read off the sentence that opened it."""
+    if built.subject is None:
+        return None
+
+    return Topic(
+        built.subject,
+        built.theme,
+        THEME_CLASS[built.theme] if built.theme is not None else None,
+        built.gender,
+    )
+
+
+def _pronouns_for(data: SentenceLanguageData, topic: Topic) -> WordPool:
+    """The pronouns the language can stand in for this topic with.
+
+    A class its written pronouns are wrong for is left with the empty entry alone — the
+    language says nothing where it can, and where it cannot, there is no pronoun to be
+    had and the sentence names the topic again instead.
+    """
+    pool = data.pronouns.get(topic.gender or "n") or data.pronouns.get("n") or ()
+
+    if topic.noun_class is not None and topic.noun_class in data.pronounless:
+        return tuple(word for word in pool if not word)
+
+    return pool
+
+
+def _follow_for(data: SentenceLanguageData, topic: Topic, room: int, shortest: int) -> Follow:
+    """How one sentence carries on from the one before it.
+
+    `room` is what this sentence may be at its longest, and it is what decides whether
+    it opens on a connective at all: a connective is written in front of a whole
+    sentence rather than instead of any part of it, so one longer than the budget can
+    spare is a sentence that overshoots by exactly its length. Russian `тем временем`
+    is thirteen characters, and a third of a range of seventy-five has nowhere to put
+    them.
+    """
+    pronouns = _pronouns_for(data, topic)
+    usable = ("repeat", "pronoun", "fresh") if pronouns else ("repeat", "fresh")
+    spare = room - len(data.space) - shortest
+    openers = tuple(word for word in data.connectives if len(word) <= spare)
+    roll = random.random() * sum(REFERENCE_WEIGHT[each] for each in usable)
+    reference = usable[-1]
+
+    for each in usable:
+        roll -= REFERENCE_WEIGHT[each]
+
+        if roll <= 0:
+            reference = each
+            break
+
+    return Follow(
+        topic,
+        reference,
+        pick(pronouns) if reference == "pronoun" else "",
+        pick(openers) if openers and chance(CONNECTIVE_CHANCE) else "",
+    )
+
+
+def _generate_result(language: WordLanguage, settings: Settings) -> list[Built]:
+    """Every sentence of one result, in order.
+
+    The range is shared out before the first of them is drawn, and the topic is taken
+    from that first sentence — so what follows is about the same thing rather than
+    another draw that happened to land beside it.
+    """
+    data = SENTENCE_DATA[language]
+    bounds = _slot_bounds(language)
+    frames = _frames_for(data, settings)
+    shortest = _natural_span(data, frames, bounds)[0]
+    budgets = _share_out(
+        _bounds_for(data, frames, bounds, settings), settings.sentences, len(data.space)
+    )
+    built: list[Built] = []
+    topic: Topic | None = None
+
+    for budget in budgets:
+        follow = None if topic is None else _follow_for(data, topic, budget[1], shortest)
+        one = _generate_one(language, settings, budget, follow)
+
+        # `_follow_for` reserves room for the connective against the shortest sentence
+        # the shapes could spell, which is a floor no draw actually reaches — the
+        # shortest word of every pool at once. When the sentence that came back could
+        # not be made short enough to carry the connective after all, the connective is
+        # the part worth giving up: it is written in front of the whole sentence rather
+        # than instead of any piece of it.
+        if follow is not None and follow.opener and _distance_from(len(one.sentence), budget) > 0:
+            bare = _generate_one(
+                language,
+                settings,
+                budget,
+                Follow(follow.topic, follow.reference, follow.pronoun, ""),
+            )
+
+            if _distance_from(len(bare.sentence), budget) < _distance_from(
+                len(one.sentence), budget
+            ):
+                one = bare
+
+        built.append(one)
+
+        if topic is None:
+            topic = _topic_of(one)
+
+    return built
+
+
+def _subject_themes_for(settings: Settings, follow: Follow | None) -> tuple[WordTheme, ...]:
+    """The themes a sentence may draw its subject from.
+
+    A sentence carrying on about a topic stays inside the topic's own class, which is
+    what makes a paragraph read as one rather than as three draws that happened to land
+    together.
+    """
+    requested = WORD_THEMES if settings.theme == "all" else (settings.theme,)
+
+    if follow is None or follow.topic.noun_class is None:
+        return requested
+
+    in_class = _themes_for_classes(requested, (follow.topic.noun_class,))
+
+    return tuple(in_class) or requested
+
+
+def _generate_one(
+    language: WordLanguage,
+    settings: Settings,
+    budget: tuple[int, int],
+    follow: Follow | None,
+) -> Built:
     """Build one sentence, as close to what was asked for as the language allows."""
     data = SENTENCE_DATA[language]
     bounds = _slot_bounds(language)
     allowed = _frames_for(data, settings)
-    requested = WORD_THEMES if settings.theme == "all" else (settings.theme,)
-    requirements = [_classify(language, word) for word in settings.include]
-    plans = {id(frame): _plan_for(frame, requirements) for frame in allowed}
-    low, high = _bounds_for(data, allowed, bounds, settings)
+    requested = _subject_themes_for(settings, follow)
+    # The words a caller required go in the first sentence — once in the result rather
+    # than once in every sentence of it.
+    requirements = [] if follow is not None else [_classify(language, w) for w in settings.include]
+    carried = (
+        Requirement(
+            follow.topic.noun,
+            ("subject",),
+            theme=follow.topic.theme,
+            known=follow.topic.theme is not None,
+        )
+        if follow is not None and follow.reference == "repeat"
+        else None
+    )
+    plans = {id(frame): _plan_for(frame, requirements, carried) for frame in allowed}
+    low, high = budget
 
     def buildable(frame: SentenceFrame) -> bool:
         # A shape is only worth drawing when the language has a predicate for it:
@@ -1174,6 +1475,7 @@ def _generate_one(language: WordLanguage, settings: Settings) -> Built:
             bounds,
             low,
             high,
+            follow,
         )
         length = len(built.sentence)
 
@@ -1218,6 +1520,7 @@ def generate_sentence_details(
     max_length: int | None = None,
     starts_with: str = "",
     unique: bool = False,
+    sentences: int = 1,
 ) -> list[SentenceDetail]:
     """Generate sentences with every choice already resolved.
 
@@ -1233,9 +1536,10 @@ def generate_sentence_details(
         max_length: Maximum length in characters.
         starts_with: Keep only sentences whose first character is this one.
         unique: Never return the same sentence twice.
+        sentences: How many sentences one result holds.
 
     Returns:
-        One `SentenceDetail` per sentence.
+        One `SentenceDetail` per result.
     """
     listed = (include,) if isinstance(include, str) else tuple(include)
     settings = Settings(
@@ -1247,18 +1551,23 @@ def generate_sentence_details(
         max_length=resolve_length(max_length),
         prefix=resolve_prefix(starts_with),
         include=tuple(word.strip() for word in listed if word.strip()),
+        sentences=clamp(sentences, 1, RAND_SENTENCE_COUNT_MAX),
     )
 
     def draw() -> SentenceDetail:
         code = draw_language(language, _languages_for(settings))
-        built = _generate_one(code, settings)
+        data = SENTENCE_DATA[code]
+        built = _generate_result(code, settings)
 
         return SentenceDetail(
-            sentence=built.sentence,
-            phrases=built.phrases,
-            slots=built.slots,
+            sentence=data.space.join(one.sentence for one in built),
+            sentences=tuple(one.sentence for one in built),
+            phrases=tuple(phrase for one in built for phrase in one.phrases),
+            slots=tuple(slot for one in built for slot in one.slots),
             language=code,
-            theme=built.theme,
+            # What the result is about is what its first sentence was about; the ones
+            # after it stay inside that noun's class.
+            theme=built[0].theme,
         )
 
     return collect(
