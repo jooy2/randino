@@ -211,6 +211,14 @@ final SentenceLanguageData it = SentenceLanguageData(
     '''),
   connectives: words(r'e_poi ma allora inoltre, tuttavia, dopo infine intanto,'),
   interjections: words(r'oh, ah, ehi, caspita, mamma_mia, guarda, davvero,'),
+  numeral: const SentenceNumeral(
+    order: NumeralOrder.before,
+    counters: <NounClass, String>{},
+    count: LengthRange(2, 12),
+    currency: 'euro',
+    amounts: <int>[100, 500, 1000, 5000, 12000, 25000, 50000, 100000],
+    group: '.',
+  ),
   // Pro-drop, the same as Spanish: `esso` exists and nobody writes it.
   pronouns: const <WordGender, WordPool>{
     WordGender.n: <String>[''],
@@ -262,5 +270,10 @@ final SentenceLanguageData it = SentenceLanguageData(
       SentencePart(SentenceSlot.object, modifiable: true),
       SentencePart(SentenceSlot.manner),
     ], 5),
+    SentenceFrame(<SentencePart>[
+      SentencePart(SentenceSlot.subject, modifiable: true),
+      SentencePart(SentenceSlot.verb),
+      SentencePart(SentenceSlot.money),
+    ], 6),
   ],
 );

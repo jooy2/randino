@@ -102,6 +102,25 @@ final SentenceLanguageData zh = SentenceLanguageData(
     ),
   ],
   // A bare adjective cannot stand as a predicate on its own, so the shape that
+  numeral: const SentenceNumeral(
+    order: NumeralOrder.after,
+    counters: <NounClass, String>{
+      NounClass.creature: '只',
+      NounClass.person: '位',
+      NounClass.plant: '棵',
+      NounClass.edible: '个',
+      NounClass.thing: '个',
+      NounClass.vehicle: '辆',
+      NounClass.place: '处',
+      NounClass.event: '次',
+      NounClass.idea: '种',
+      NounClass.body: '个',
+    },
+    count: LengthRange(2, 12),
+    currency: '元',
+    amounts: <int>[100, 500, 1000, 3000, 5000, 10000, 30000, 50000, 100000],
+    group: ',',
+  ),
   // uses one writes 很 in front of it.
   states: <StateGroup>[
     StateGroup(
@@ -265,5 +284,19 @@ final SentenceLanguageData zh = SentenceLanguageData(
       mood: SentenceMood.question,
       tag: '吗',
     ),
+    SentenceFrame(<SentencePart>[
+      SentencePart(SentenceSlot.subject, modifiable: true),
+      SentencePart(SentenceSlot.verb),
+      SentencePart(SentenceSlot.quantity),
+    ], 6),
+    SentenceFrame(<SentencePart>[
+      SentencePart(SentenceSlot.quantity),
+      SentencePart(SentenceSlot.verb),
+    ], 5),
+    SentenceFrame(<SentencePart>[
+      SentencePart(SentenceSlot.subject, modifiable: true),
+      SentencePart(SentenceSlot.verb),
+      SentencePart(SentenceSlot.money),
+    ], 5),
   ],
 );

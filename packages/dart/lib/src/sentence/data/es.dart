@@ -197,6 +197,16 @@ final SentenceLanguageData es = SentenceLanguageData(
   connectives: words(r'y_luego pero entonces además, sin_embargo, después por_fin mientras_tanto,'),
   interjections: words(r'ay, oh, vaya, caramba, madre_mía, mira, desde_luego,'),
   // Spanish carries its subject in the verb ending, so a second sentence about
+  // Money only, for the reason English has: a counted phrase would need a plural
+  // noun, and most of these pools are not countable at all.
+  numeral: const SentenceNumeral(
+    order: NumeralOrder.before,
+    counters: <NounClass, String>{},
+    count: LengthRange(2, 12),
+    currency: 'euros',
+    amounts: <int>[100, 500, 1000, 5000, 12000, 25000, 50000, 100000],
+    group: '.',
+  ),
   // the same thing writes no pronoun at all.
   pronouns: const <WordGender, WordPool>{
     WordGender.n: <String>[''],
@@ -248,5 +258,10 @@ final SentenceLanguageData es = SentenceLanguageData(
       SentencePart(SentenceSlot.object, modifiable: true),
       SentencePart(SentenceSlot.manner),
     ], 5),
+    SentenceFrame(<SentencePart>[
+      SentencePart(SentenceSlot.subject, modifiable: true),
+      SentencePart(SentenceSlot.verb),
+      SentencePart(SentenceSlot.money),
+    ], 6),
   ],
 );

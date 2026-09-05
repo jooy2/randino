@@ -161,6 +161,18 @@ void main() {
         // Optional in one package and defaulted in another; written as a list
         // either way so the shapes compare.
         'pronounless': <String>[for (final noun in entry.value.pronounless) noun.name],
+        'numeral': entry.value.numeral == null
+            ? null
+            : <String, Object?>{
+                'order': entry.value.numeral!.order.name,
+                'counters': <String, Object?>{
+                  for (final c in entry.value.numeral!.counters.entries) c.key.name: c.value,
+                },
+                'count': <int>[entry.value.numeral!.count.min, entry.value.numeral!.count.max],
+                'currency': entry.value.numeral!.currency,
+                'amounts': <int>[...entry.value.numeral!.amounts],
+                'group': entry.value.numeral!.group,
+              },
         'frames': <Object?>[
           for (final frame in entry.value.frames)
             <String, Object?>{

@@ -297,6 +297,28 @@ final SentenceLanguageData ko = SentenceLanguageData(
   connectives: words(r'그리고 그래서 하지만 그런데 이윽고 곧 결국 그러자 한편 이내'),
   interjections: words(r'아, 오, 와, 어머, 이런, 저런, 세상에, 아이고, 참,'),
   // Korean leaves the subject out as readily as it writes 그것, and the empty
+  // Korean counts anything, because a classifier is what makes a noun countable:
+  // `가지` turns an abstraction into kinds of it. The counter is spaced off the
+  // number, which is what 한글 맞춤법 prescribes as the default.
+  numeral: const SentenceNumeral(
+    order: NumeralOrder.after,
+    counters: <NounClass, String>{
+      NounClass.creature: '마리',
+      NounClass.person: '명',
+      NounClass.plant: '그루',
+      NounClass.edible: '개',
+      NounClass.thing: '개',
+      NounClass.vehicle: '대',
+      NounClass.place: '곳',
+      NounClass.event: '번',
+      NounClass.idea: '가지',
+      NounClass.body: '개',
+    },
+    count: LengthRange(2, 12),
+    currency: '원',
+    amounts: <int>[1000, 5000, 10000, 30000, 50000, 100000, 300000, 500000, 1000000],
+    group: ',',
+  ),
   // entry is how the data says so.
   pronouns: const <WordGender, WordPool>{
     WordGender.n: <String>['', '그것'],
@@ -385,5 +407,21 @@ final SentenceLanguageData ko = SentenceLanguageData(
       12,
       mood: SentenceMood.question,
     ),
+    // A count and an amount. Money is an object of the verbs that take an idea,
+    // which is the class it belongs to.
+    SentenceFrame(<SentencePart>[
+      SentencePart(SentenceSlot.subject, tail: '가', tailAlt: '이', modifiable: true),
+      SentencePart(SentenceSlot.quantity, tail: '를', tailAlt: '을'),
+      SentencePart(SentenceSlot.verb),
+    ], 6),
+    SentenceFrame(<SentencePart>[
+      SentencePart(SentenceSlot.quantity, tail: '가', tailAlt: '이'),
+      SentencePart(SentenceSlot.verb),
+    ], 5),
+    SentenceFrame(<SentencePart>[
+      SentencePart(SentenceSlot.subject, tail: '가', tailAlt: '이', modifiable: true),
+      SentencePart(SentenceSlot.money, tail: '를', tailAlt: '을'),
+      SentencePart(SentenceSlot.verb),
+    ], 5),
   ],
 );

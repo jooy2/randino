@@ -131,6 +131,25 @@ final SentenceLanguageData ja = SentenceLanguageData(
   ],
   // Plain predicate forms, so a na-adjective closes on だ where an i-adjective
   // closes on itself. The `word` pools hold the attributive 静かな instead,
+  numeral: const SentenceNumeral(
+    order: NumeralOrder.after,
+    counters: <NounClass, String>{
+      NounClass.creature: '匹',
+      NounClass.person: '人',
+      NounClass.plant: '本',
+      NounClass.edible: '個',
+      NounClass.thing: '個',
+      NounClass.vehicle: '台',
+      NounClass.place: '箇所',
+      NounClass.event: '回',
+      NounClass.idea: '種類',
+      NounClass.body: '本',
+    },
+    count: LengthRange(2, 12),
+    currency: '円',
+    amounts: <int>[1000, 5000, 10000, 30000, 50000, 100000, 300000, 500000, 1000000],
+    group: ',',
+  ),
   // which cannot end a sentence.
   states: <StateGroup>[
     StateGroup(
@@ -314,5 +333,19 @@ final SentenceLanguageData ja = SentenceLanguageData(
       mood: SentenceMood.question,
       tag: 'か',
     ),
+    SentenceFrame(<SentencePart>[
+      SentencePart(SentenceSlot.subject, tail: 'が', modifiable: true),
+      SentencePart(SentenceSlot.quantity, tail: 'を'),
+      SentencePart(SentenceSlot.verb),
+    ], 6),
+    SentenceFrame(<SentencePart>[
+      SentencePart(SentenceSlot.quantity, tail: 'が'),
+      SentencePart(SentenceSlot.verb),
+    ], 5),
+    SentenceFrame(<SentencePart>[
+      SentencePart(SentenceSlot.subject, tail: 'が', modifiable: true),
+      SentencePart(SentenceSlot.money, tail: 'を'),
+      SentencePart(SentenceSlot.verb),
+    ], 5),
   ],
 );

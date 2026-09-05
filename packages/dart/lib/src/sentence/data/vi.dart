@@ -175,6 +175,27 @@ final SentenceLanguageData vi = SentenceLanguageData(
     WordGender.n: <String>['', 'nó'],
   },
   pronounless: const <NounClass>[NounClass.person],
+  // Vietnamese puts the classifier in front of the noun and the number in front
+  // of that, so the whole group reads `12 con mèo`.
+  numeral: const SentenceNumeral(
+    order: NumeralOrder.before,
+    counters: <NounClass, String>{
+      NounClass.creature: 'con',
+      NounClass.person: 'người',
+      NounClass.plant: 'cây',
+      NounClass.edible: 'cái',
+      NounClass.thing: 'cái',
+      NounClass.vehicle: 'chiếc',
+      NounClass.place: 'nơi',
+      NounClass.event: 'lần',
+      NounClass.idea: 'điều',
+      NounClass.body: 'cái',
+    },
+    count: LengthRange(2, 12),
+    currency: 'đồng',
+    amounts: <int>[10000, 50000, 100000, 200000, 500000, 1000000, 5000000],
+    group: '.',
+  ),
   frames: const <SentenceFrame>[
     SentenceFrame(<SentencePart>[
       SentencePart(SentenceSlot.subject, modifiable: true),
@@ -251,5 +272,19 @@ final SentenceLanguageData vi = SentenceLanguageData(
       mood: SentenceMood.question,
       tag: 'không',
     ),
+    SentenceFrame(<SentencePart>[
+      SentencePart(SentenceSlot.subject, modifiable: true),
+      SentencePart(SentenceSlot.verb),
+      SentencePart(SentenceSlot.quantity),
+    ], 6),
+    SentenceFrame(<SentencePart>[
+      SentencePart(SentenceSlot.quantity),
+      SentencePart(SentenceSlot.verb),
+    ], 5),
+    SentenceFrame(<SentencePart>[
+      SentencePart(SentenceSlot.subject, modifiable: true),
+      SentencePart(SentenceSlot.verb),
+      SentencePart(SentenceSlot.money),
+    ], 5),
   ],
 );

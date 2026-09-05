@@ -15,15 +15,15 @@ const int sample = 60;
 
 /// Everything a sentence of the language may be written with, punctuation aside.
 final Map<WordLanguage, RegExp> script = <WordLanguage, RegExp>{
-  WordLanguage.en: RegExp(r"^[A-Za-z' ,.?!…“”‘’]+$"),
-  WordLanguage.ko: RegExp(r'^[가-힣 ,.?!…“”‘’]+$'),
-  WordLanguage.ja: RegExp(r'^[々぀-ヿ一-鿿。、？！…「」『』]+$'),
-  WordLanguage.zh: RegExp(r'^[々一-鿿。，？！…“”‘’]+$'),
-  WordLanguage.vi: RegExp(r'^[a-zA-ZÀ-ỹ ,.?!…“”‘’]+$'),
-  WordLanguage.es: RegExp(r'^[a-zA-ZÀ-ÿ ,.?!…¿¡«»“”]+$'),
-  WordLanguage.it: RegExp(r"^[a-zA-ZÀ-ÿ' ,.?!…«»“”]+$"),
-  WordLanguage.de: RegExp(r'^[a-zA-ZÀ-ÿß ,.?!…„“‚‘]+$'),
-  WordLanguage.ru: RegExp(r'^[Ѐ-ӿ ,.?!…«»„“]+$'),
+  WordLanguage.en: RegExp(r"^[A-Za-z0-9' ,.?!…“”‘’]+$"),
+  WordLanguage.ko: RegExp(r'^[가-힣0-9 ,.?!…“”‘’]+$'),
+  WordLanguage.ja: RegExp(r'^[々぀-ヿ一-鿿0-9,。、？！…「」『』]+$'),
+  WordLanguage.zh: RegExp(r'^[々一-鿿0-9,。，？！…“”‘’]+$'),
+  WordLanguage.vi: RegExp(r'^[a-zA-ZÀ-ỹ0-9 ,.?!…“”‘’]+$'),
+  WordLanguage.es: RegExp(r'^[a-zA-ZÀ-ÿ0-9 ,.?!…¿¡«»“”]+$'),
+  WordLanguage.it: RegExp(r"^[a-zA-ZÀ-ÿ0-9' ,.?!…«»“”]+$"),
+  WordLanguage.de: RegExp(r'^[a-zA-ZÀ-ÿß0-9 ,.?!…„“‚‘]+$'),
+  WordLanguage.ru: RegExp(r'^[Ѐ-ӿ0-9 ,.?!…«»„“]+$'),
 };
 
 /// A word as a sentence writes it — English stores its pools capitalized.
@@ -125,6 +125,62 @@ bool explains(WordLanguage language, String phrase) {
 /// How a capitalizing language writes the first word of a sentence.
 String upperFirst(String word) =>
     word.isEmpty ? word : word.substring(0, 1).toUpperCase() + word.substring(1);
+
+String escapeRe(String text) => RegExp.escape(text);
+
+/// A counted phrase with its number taken off, so what is left is the noun
+/// phrase every other check already knows how to read.
+String stripCount(WordLanguage language, String phrase) {
+  final data = sentenceData[language]!;
+  final numeral = data.numeral;
+
+  if (numeral == null) return phrase;
+
+  final space = escapeRe(data.space);
+  final counters = numeral.counters.values.map(escapeRe).toList(growable: false);
+  final number = '\\d[\\d${escapeRe(numeral.group)}]*';
+  final group = counters.isEmpty ? number : '$number(?:$space(?:${counters.join('|')}))?';
+
+  return phrase.replaceAll(RegExp('$space$group\$'), '').replaceAll(RegExp('^$group$space'), '');
+}
+
+/// Whether a phrase is an amount of money, written the way the language writes it.
+bool isMoney(WordLanguage language, String phrase) {
+  final data = sentenceData[language]!;
+  final numeral = data.numeral;
+
+  if (numeral == null) return false;
+
+  return RegExp(
+    '^\\d[\\d${escapeRe(numeral.group)}]*${escapeRe(data.space)}${escapeRe(numeral.currency)}\$',
+  ).hasMatch(phrase);
+}
+
+/// Which sentence of a result each phrase belongs to.
+///
+/// `phrases` and `slots` are one flat list across every sentence, which is what
+/// they are for — but a question like "is this counted phrase the subject of its
+/// own sentence" needs the boundaries back, and the phrases appear in order, so
+/// walking them against `sentences` finds them.
+List<int> sentenceOf(SentenceDetail detail) {
+  final out = <int>[];
+  var at = 0;
+  var cursor = 0;
+
+  for (final phrase in detail.phrases) {
+    while (at < detail.sentences.length - 1 && detail.sentences[at].indexOf(phrase, cursor) < 0) {
+      at += 1;
+      cursor = 0;
+    }
+
+    final found = detail.sentences[at].indexOf(phrase, cursor);
+
+    cursor = found < 0 ? cursor : found + phrase.length;
+    out.add(at);
+  }
+
+  return out;
+}
 
 /// Every subject pronoun the language can write, in both cases.
 Set<String> pronounsOf(WordLanguage language) {
@@ -326,8 +382,20 @@ void main() {
               continue;
             }
 
+            if (slot == SentenceSlot.money) {
+              expect(
+                isMoney(language, phrase),
+                isTrue,
+                reason: '$language: $phrase is not an amount (${detail.sentence})',
+              );
+
+              continue;
+            }
+
+            // A counted phrase is a noun phrase with a number on it, so the
+            // number comes off before the pools are asked about the rest.
             expect(
-              explains(language, written),
+              explains(language, stripCount(language, written)),
               isTrue,
               reason:
                   '$language: $phrase is not a ${slot.name} the pools can build '
@@ -361,7 +429,14 @@ void main() {
           );
 
           expect(predicates, hasLength(1), reason: detail.sentence);
-          expect(detail.slots, contains(SentenceSlot.subject), reason: detail.sentence);
+          // A shape that counts what it is about has no separate subject: the
+          // counted phrase is what the verb agrees with.
+          expect(
+            detail.slots.contains(SentenceSlot.subject) ||
+                detail.slots.contains(SentenceSlot.quantity),
+            isTrue,
+            reason: detail.sentence,
+          );
         }
       }
     });
@@ -376,7 +451,13 @@ void main() {
 
           if (at < 0 || theme == null) continue;
 
-          final transitive = detail.slots.contains(SentenceSlot.object);
+          // A quantity beside a subject is an object with a number on it, and an
+          // amount is an object of the class money belongs to.
+          final transitive =
+              detail.slots.contains(SentenceSlot.object) ||
+              detail.slots.contains(SentenceSlot.money) ||
+              (detail.slots.contains(SentenceSlot.quantity) &&
+                  detail.slots.contains(SentenceSlot.subject));
           // A verb can sit in more than one group, so the sentence is right when
           // one of its groups accounts for it.
           final groups = data.verbs.where(
@@ -662,8 +743,15 @@ void main() {
             expect(sentence, matches(script[language]!), reason: '$language: $sentence');
             // Every sentence closes exactly once, so two of them were never run
             // together into one entry.
+            // Counted after the grouped numbers are taken out: Vietnamese,
+            // Spanish and Italian group on a full stop, so `5.000.000` is three
+            // of them and none is a terminator.
             expect(
-              sentence.split(data.terminators[SentenceType.statement]!).length - 1,
+              sentence
+                      .replaceAll(RegExp(r'\d[\d.,]*\d'), '#')
+                      .split(data.terminators[SentenceType.statement]!)
+                      .length -
+                  1,
               1,
               reason: '$language: $sentence',
             );
@@ -743,10 +831,24 @@ void main() {
           if (theme == null) continue;
 
           final wanted = themeClass[theme];
+          // A shape that counts what it is about has no separate subject, so the
+          // counted phrase is the one that has to stay on topic. It is checked
+          // only in the opening sentence, and only when that sentence has no
+          // subject of its own — the one case where it provably is the subject.
+          final belongs = sentenceOf(detail);
+          final opens =
+              !detail.slots.indexed.any(
+                (each) => each.$2 == SentenceSlot.subject && belongs[each.$1] == 0,
+              );
           var subjects = 0;
 
           for (var i = 0; i < detail.phrases.length; i += 1) {
-            if (detail.slots[i] != SentenceSlot.subject) continue;
+            final slot = detail.slots[i];
+
+            if (slot != SentenceSlot.subject &&
+                !(slot == SentenceSlot.quantity && belongs[i] == 0 && opens)) {
+              continue;
+            }
 
             subjects += 1;
 
@@ -756,9 +858,10 @@ void main() {
 
             // Any of the three sentences can be the one a phrase opens, so both
             // cases are tried rather than only the first phrase of the result.
+            final bare = stripCount(language, phrase);
             final found = <String>{
-              ...nounsIn(language, phrase),
-              ...nounsIn(language, phrase.substring(0, 1).toLowerCase() + phrase.substring(1)),
+              ...nounsIn(language, bare),
+              ...nounsIn(language, bare.substring(0, 1).toLowerCase() + bare.substring(1)),
             };
             final themes =
                 found.map((noun) => themeOfNoun(language, noun)).whereType<WordTheme>().toList();
@@ -957,6 +1060,9 @@ void main() {
         count: 200,
       )) {
         final at = detail.slots.indexOf(SentenceSlot.subject);
+
+        if (at < 0) continue;
+
         final name = detail.phrases[at];
 
         if (!detail.names.contains(name)) continue;
@@ -1378,6 +1484,189 @@ void main() {
               );
             }
           }
+        }
+      }
+    });
+
+    test('`slots: quantity` counts a noun with the counter its kind takes', () {
+      // Only the four languages with a classifier table declare a counted shape.
+      // A classifier is what makes a noun countable at all — `슬픔 12 가지` is
+      // twelve kinds of sadness — which is why English, Spanish and Italian do
+      // not: they would need a plural, and a plural of `sadness` is not a word.
+      final counting = wordLanguages
+          .where((language) => (sentenceData[language]!.numeral?.counters ?? {}).isNotEmpty)
+          .toList(growable: false);
+
+      expect(counting, <WordLanguage>[
+        WordLanguage.ko,
+        WordLanguage.ja,
+        WordLanguage.zh,
+        WordLanguage.vi,
+      ]);
+
+      for (final language in counting) {
+        final data = sentenceData[language]!;
+        final numeral = data.numeral!;
+        final counters = numeral.counters.values.toSet();
+
+        for (final detail in randSentenceDetails(
+          language: language,
+          slots: <SentenceSlot>{SentenceSlot.quantity},
+          count: sample,
+        )) {
+          final at = detail.slots.indexOf(SentenceSlot.quantity);
+
+          expect(at, greaterThanOrEqualTo(0), reason: '$language: ${detail.sentence}');
+
+          final phrase = detail.phrases[at];
+          final found = RegExp('\\d+${escapeRe(data.space)}(\\S+)').firstMatch(phrase);
+
+          expect(found, isNotNull, reason: '$language: "$phrase" carries no number');
+          expect(
+            counters.contains(found!.group(1)),
+            isTrue,
+            reason: '$language: "${found.group(1)}" is not a counter (${detail.sentence})',
+          );
+
+          final number = int.parse(RegExp(r'\d+').firstMatch(phrase)!.group(0)!);
+
+          expect(
+            number,
+            allOf(greaterThanOrEqualTo(numeral.count.min), lessThanOrEqualTo(numeral.count.max)),
+            reason: '$language: $number is outside ${numeral.count}',
+          );
+
+          // A counted phrase drops its article and takes no modifier.
+          for (final article in articlesFor(language)) {
+            expect(phrase.startsWith(article + data.space), isFalse, reason: phrase);
+          }
+
+          expect(
+            poolFor(language, SentenceSlot.subject).contains(stripCount(language, phrase)),
+            isTrue,
+            reason: '$language: "$phrase" is not a bare noun and a count',
+          );
+        }
+      }
+
+      // German and Russian declare no numeral at all, so asking falls back to
+      // the shapes they do have rather than inventing a case they cannot write.
+      for (final language in <WordLanguage>[WordLanguage.de, WordLanguage.ru]) {
+        expect(sentenceData[language]!.numeral, isNull, reason: '$language');
+
+        for (final detail in randSentenceDetails(
+          language: language,
+          slots: <SentenceSlot>{SentenceSlot.quantity},
+          count: 30,
+        )) {
+          expect(detail.slots, isNot(contains(SentenceSlot.quantity)), reason: detail.sentence);
+        }
+      }
+    });
+
+    test('`slots: money` writes an amount the language actually writes', () {
+      final paying = wordLanguages
+          .where((language) => sentenceData[language]!.numeral != null)
+          .toList(growable: false);
+
+      expect(paying, <WordLanguage>[
+        WordLanguage.en,
+        WordLanguage.ko,
+        WordLanguage.ja,
+        WordLanguage.zh,
+        WordLanguage.vi,
+        WordLanguage.es,
+        WordLanguage.it,
+      ]);
+
+      for (final language in paying) {
+        final numeral = sentenceData[language]!.numeral!;
+        final amounts = numeral.amounts.toSet();
+
+        for (final detail in randSentenceDetails(
+          language: language,
+          slots: <SentenceSlot>{SentenceSlot.money},
+          count: sample,
+        )) {
+          final at = detail.slots.indexOf(SentenceSlot.money);
+
+          expect(at, greaterThanOrEqualTo(0), reason: '$language: ${detail.sentence}');
+
+          final phrase = detail.phrases[at];
+
+          expect(
+            isMoney(language, phrase),
+            isTrue,
+            reason: '$language: "$phrase" is not an amount',
+          );
+
+          final digits = phrase.replaceAll(numeral.group, '');
+
+          expect(
+            amounts.contains(int.parse(RegExp(r'\d+').firstMatch(digits)!.group(0)!)),
+            isTrue,
+            reason: '$language: "$phrase" is not an amount the language writes',
+          );
+        }
+      }
+
+      // The two that cannot: an amount would be an object, and neither declares
+      // an object shape, because both would need a case their nouns change for.
+      for (final language in <WordLanguage>[WordLanguage.de, WordLanguage.ru]) {
+        for (final detail in randSentenceDetails(
+          language: language,
+          slots: <SentenceSlot>{SentenceSlot.money},
+          count: 30,
+        )) {
+          expect(detail.slots, isNot(contains(SentenceSlot.money)), reason: detail.sentence);
+        }
+      }
+    });
+
+    test('an amount stands where the verbs that take an idea can take it', () {
+      // Money is an idea, which is what decides the verbs it can stand beside.
+      for (final language in wordLanguages) {
+        final data = sentenceData[language]!;
+
+        for (final detail in randSentenceDetails(
+          language: language,
+          slots: <SentenceSlot>{SentenceSlot.money},
+          count: 60,
+        )) {
+          final at = detail.slots.indexOf(SentenceSlot.verb);
+
+          if (at < 0 || !detail.slots.contains(SentenceSlot.money)) continue;
+
+          final groups = data.verbs.where((group) => group.words.contains(detail.phrases[at]));
+
+          expect(
+            groups.any((group) => group.object?.contains(NounClass.idea) ?? false),
+            isTrue,
+            reason: '$language: ${detail.phrases[at]} takes no idea (${detail.sentence})',
+          );
+        }
+      }
+    });
+
+    test('a grouped number is written the way the language groups it', () {
+      for (final language in wordLanguages) {
+        final numeral = sentenceData[language]!.numeral;
+
+        if (numeral == null) continue;
+
+        for (final sentence in randSentence(
+          language: language,
+          slots: <SentenceSlot>{SentenceSlot.money},
+          count: 40,
+        )) {
+          final digits = RegExp(r'\d[\d.,\s]*\d').firstMatch(sentence)?.group(0) ?? '';
+
+          // Three digits between separators, and no other separator in sight.
+          expect(
+            digits,
+            matches(RegExp('^\\d{1,3}(${escapeRe(numeral.group)}\\d{3})*\$')),
+            reason: '$language: "$digits" ($sentence)',
+          );
         }
       }
     });

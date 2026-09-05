@@ -241,6 +241,67 @@ typedef SentenceArticles = Map<WordGender, List<List<String>>>;
 /// one rule.
 typedef SentencePronouns = Map<WordGender, WordPool>;
 
+/// Where a number stands relative to the noun it counts.
+enum NumeralOrder {
+  /// In front of it, classifier and all: `12 con mèo`.
+  before,
+
+  /// Behind it: `사과 12 개`.
+  after,
+}
+
+/// How a language writes a number beside a noun, and beside money.
+///
+/// Left out by a language that cannot write either correctly, which is what
+/// German and Russian do: both would need a case their nouns change their own
+/// ending for, the same reason neither declares an object shape.
+class SentenceNumeral {
+  /// Creates a numeral block.
+  const SentenceNumeral({
+    required this.order,
+    required this.counters,
+    required this.count,
+    required this.currency,
+    required this.amounts,
+    required this.group,
+  });
+
+  /// Where the number stands relative to the noun it counts.
+  final NumeralOrder order;
+
+  /// The counter each kind of noun takes.
+  ///
+  /// That is what the noun classes were worth having for: `마리` for a creature,
+  /// `명` for a person, `대` for a vehicle. A classifier is also what makes an
+  /// abstract noun countable at all — `슬픔 12 가지` is twelve kinds of sadness —
+  /// so a language with this table can count anything in its pools. English,
+  /// Spanish and Italian have no such word and would need a plural, and a plural
+  /// of `sadness` is not a thing anyone writes; that is why they leave it empty
+  /// and declare no counted shape.
+  final Map<NounClass, String> counters;
+
+  /// How many of a counted thing, at the fewest and at the most.
+  final LengthRange count;
+
+  /// What money is written in, after the amount (`원`, `dollars`, `円`).
+  ///
+  /// Joined by the language's own space, which is none at all in Japanese and
+  /// Chinese.
+  final String currency;
+
+  /// The amounts the language writes, as a pool rather than a range.
+  ///
+  /// A range would hand back `73,412 dollars`, and nobody writes that; these are
+  /// the round numbers a sentence actually names.
+  final List<int> amounts;
+
+  /// What separates the thousands.
+  ///
+  /// `,` in English, Korean, Japanese and Chinese; `.` in Vietnamese, Spanish
+  /// and Italian.
+  final String group;
+}
+
 /// Everything the sentence generator knows about one language.
 class SentenceLanguageData {
   /// Creates a sentence dataset.
@@ -261,6 +322,7 @@ class SentenceLanguageData {
     this.predicateAgrees = false,
     this.pronounless = const <NounClass>[],
     this.openers = const <SentenceType, String>{},
+    this.numeral,
   });
 
   /// Placed between the phrases, and between the words inside one.
@@ -343,6 +405,12 @@ class SentenceLanguageData {
   /// subject instead, which is what they would do anyway. Empty for a language
   /// whose pronouns stand for anything.
   final List<NounClass> pronounless;
+
+  /// How the language writes a number.
+  ///
+  /// Null for one that cannot, which then declares no `quantity` and no `money`
+  /// shape either.
+  final SentenceNumeral? numeral;
 
   /// The shapes a sentence of this language can take.
   final List<SentenceFrame> frames;

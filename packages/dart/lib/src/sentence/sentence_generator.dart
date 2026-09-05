@@ -45,7 +45,107 @@ const List<SentenceSlot> _nounSlots = <SentenceSlot>[
   SentenceSlot.subject,
   SentenceSlot.object,
   SentenceSlot.place,
+  SentenceSlot.quantity,
 ];
+
+/// The class money belongs to, which is what decides the verbs it can stand
+/// beside.
+///
+/// An amount is an idea, so the verbs that remember and count one are the verbs
+/// that can take it.
+const NounClass _moneyClass = NounClass.idea;
+
+/// Which slot this shape's subject stands in.
+///
+/// Usually the subject, and the quantity for a shape that counts the thing the
+/// sentence is about — `사과 12 개가 익는다` has no separate subject, and the
+/// counted phrase is what the verb agrees with.
+SentenceSlot _subjectSlotOf(SentenceFrame frame) =>
+    frame.parts.any((part) => part.slot == SentenceSlot.subject)
+        ? SentenceSlot.subject
+        : SentenceSlot.quantity;
+
+/// Whether a shape puts a noun phrase after its verb, counted or not.
+bool _takesObject(SentenceFrame frame) {
+  final subject = _subjectSlotOf(frame);
+
+  return frame.parts.any(
+    (part) =>
+        part.slot == SentenceSlot.object ||
+        part.slot == SentenceSlot.money ||
+        (part.slot == SentenceSlot.quantity && subject != SentenceSlot.quantity),
+  );
+}
+
+/// The digits of a number, grouped the way the language groups them.
+String _grouped(int value, String group) {
+  final digits = value.toString();
+  final out = StringBuffer();
+
+  for (var i = 0; i < digits.length; i += 1) {
+    if (i > 0 && (digits.length - i) % 3 == 0) out.write(group);
+
+    out.write(digits[i]);
+  }
+
+  return out.toString();
+}
+
+/// What a counted phrase writes beside its noun.
+String _countText(SentenceLanguageData data, WordTheme theme) {
+  final numeral = data.numeral!;
+  final counter = numeral.counters[themeClass[theme]];
+  final number = _grouped(randInt(numeral.count.min, numeral.count.max), numeral.group);
+
+  return counter == null ? number : number + data.space + counter;
+}
+
+/// What an amount of money writes.
+String _moneyText(SentenceLanguageData data) {
+  final numeral = data.numeral!;
+
+  return _grouped(pick(numeral.amounts), numeral.group) + data.space + numeral.currency;
+}
+
+/// Shortest and longest a count can be, so a phrase can reserve room for one.
+LengthRange _countSpan(SentenceLanguageData data) {
+  final numeral = data.numeral;
+
+  if (numeral == null) return const LengthRange(0, 0);
+
+  final counters = numeral.counters.values.toList(growable: false);
+  var low = 0;
+  var high = 0;
+
+  if (counters.isNotEmpty) {
+    low = counters.map((word) => word.length).reduce((a, b) => a < b ? a : b) + data.space.length;
+    high = counters.map((word) => word.length).reduce((a, b) => a > b ? a : b) + data.space.length;
+  }
+
+  return LengthRange(
+    data.space.length + _grouped(numeral.count.min, numeral.group).length + low,
+    data.space.length + _grouped(numeral.count.max, numeral.group).length + high,
+  );
+}
+
+/// The same for an amount, which is a phrase of its own rather than part of one.
+LengthRange _moneySpan(SentenceLanguageData data) {
+  final numeral = data.numeral;
+
+  if (numeral == null) return const LengthRange(1, 1);
+
+  final widths = numeral.amounts
+      .map(
+        (value) =>
+            _grouped(value, numeral.group).length + data.space.length + numeral.currency.length,
+      )
+      .toList(growable: false);
+
+  return LengthRange(
+    widths.reduce((a, b) => a < b ? a : b),
+    widths.reduce((a, b) => a > b ? a : b),
+  );
+}
 
 bool _isNounSlot(SentenceSlot slot) => _nounSlots.contains(slot);
 
@@ -617,6 +717,8 @@ Map<SentenceSlot, LengthRange> _slotBounds(WordLanguage language) {
 
   bounds[SentenceSlot.object] = bounds[SentenceSlot.subject]!;
   bounds[SentenceSlot.place] = bounds[SentenceSlot.subject]!;
+  bounds[SentenceSlot.quantity] = bounds[SentenceSlot.subject]!;
+  bounds[SentenceSlot.money] = _moneySpan(data);
 
   _boundsCache[language] = bounds;
   final lexicon = wordData[language]!;
@@ -679,10 +781,13 @@ LengthRange _partRange(
   final low = article.min == 0 ? 0 : article.min + space;
   final high = article.max == 0 ? 0 : article.max + space;
   final withModifier = part.modifiable ? modifier.max + space : 0;
+  // A counted phrase carries a number and the counter its kind takes, and no
+  // article and no modifier — `12 apples`, never `the 12 red apples`.
+  final count = part.slot == SentenceSlot.quantity ? _countSpan(data) : const LengthRange(0, 0);
 
   return LengthRange(
-    head + low + own.min + _tailMin(part),
-    head + high + withModifier + own.max + _tailMax(part),
+    head + low + own.min + count.min + _tailMin(part),
+    head + high + withModifier + own.max + count.max + _tailMax(part),
   );
 }
 
@@ -763,7 +868,11 @@ List<VerbGroup> _verbGroupsFor(
   List<WordTheme> themes,
   _Plan plan,
 ) {
-  final wantsObject = frame.parts.any((part) => part.slot == SentenceSlot.object);
+  // A quantity is an object with a number on it, and an amount is an object of
+  // the class money belongs to — unless the quantity is what the sentence is
+  // about, in which case it is the subject and the verb takes nothing.
+  final wantsObject = _takesObject(frame);
+  final wantsMoney = frame.parts.any((part) => part.slot == SentenceSlot.money);
   final subject = _requiredAt(frame, plan, SentenceSlot.subject);
   final object = _requiredAt(frame, plan, SentenceSlot.object);
   final verb = _requiredAt(frame, plan, SentenceSlot.verb);
@@ -771,6 +880,7 @@ List<VerbGroup> _verbGroupsFor(
   return data.verbs
       .where((group) {
         if ((group.object != null) != wantsObject) return false;
+        if (wantsMoney && !(group.object?.contains(_moneyClass) ?? false)) return false;
         if (verb != null && !group.words.contains(verb.word)) return false;
 
         final subjectTheme = subject?.theme;
@@ -914,6 +1024,7 @@ _Phrase _nounPhrase(
   required int min,
   required int max,
   required LengthRange nouns,
+  required String count,
 }) {
   final lexicon = wordData[language]!;
   final pool = _nounsOf(language, theme);
@@ -954,6 +1065,17 @@ _Phrase _nounPhrase(
       parts.add(modifier);
     } else {
       parts.insert(0, modifier);
+    }
+  }
+
+  // A counted phrase writes its number where the language puts it — behind the
+  // noun in Korean, Japanese and Chinese, in front of it in Vietnamese, where the
+  // classifier comes with it.
+  if (count.isNotEmpty) {
+    if (data.numeral?.order == NumeralOrder.before) {
+      parts.insert(0, count);
+    } else {
+      parts.add(count);
     }
   }
 
@@ -1037,7 +1159,7 @@ int _modifyChanceFor(int distance, bool tooLong) {
 
 /// The theme a phrase other than the subject draws from.
 WordTheme _themeForPart(SentenceSlot slot, List<NounClass>? objectClasses, List<WordTheme> themes) {
-  if (slot == SentenceSlot.object) {
+  if (slot == SentenceSlot.object || slot == SentenceSlot.quantity) {
     final usable = _themesForClasses(wordThemes, objectClasses ?? const <NounClass>[]);
 
     return pick(usable.isNotEmpty ? usable : wordThemes);
@@ -1087,11 +1209,7 @@ _Built _compose(
             verbs.isNotEmpty
                 ? verbs
                 : data.verbs
-                    .where(
-                      (group) =>
-                          (group.object != null) ==
-                          frame.parts.any((part) => part.slot == SentenceSlot.object),
-                    )
+                    .where((group) => (group.object != null) == _takesObject(frame))
                     .toList(growable: false),
           );
   // The same predicates, in the form this type of sentence ends on. Index-aligned
@@ -1147,11 +1265,12 @@ _Built _compose(
   // each phrase was given the room the language's longest noun would need and drew
   // a word out of its own theme, which is how a sentence came out short of a
   // `minLength` the shape could otherwise have reached.
+  final subjectSlot = _subjectSlotOf(frame);
   final partThemes = <WordTheme?>[
     for (var i = 0; i < shape.length; i += 1)
       !_isNounSlot(shape[i].slot)
           ? null
-          : shape[i].slot == SentenceSlot.subject
+          : shape[i].slot == subjectSlot
           ? subjectTheme
           : (plan.phrase[at[i]]?.theme ?? _themeForPart(shape[i].slot, verbGroup?.object, themes)),
   ];
@@ -1270,7 +1389,9 @@ _Built _compose(
     final low = _atLeast(1, min - used - overhead - restMax);
     String phrase;
 
-    if (proper[i] != null) {
+    if (part.slot == SentenceSlot.money) {
+      phrase = _moneyText(data);
+    } else if (proper[i] != null) {
       // A bare proper noun, drawn now if it was not carried in. `high` and `low`
       // are what the phrase has room for, and the name generator fits them the
       // same way a noun would.
@@ -1299,12 +1420,14 @@ _Built _compose(
       final theme = partThemes[i]!;
       final nouns = partBounds[i][part.slot]!;
       final article = part.bare ? const LengthRange(0, 0) : _articleSpan(data);
-      final room = high - nouns.min;
+      final counted = part.slot == SentenceSlot.quantity ? _countSpan(data).max : 0;
+      final room = high - nouns.min - counted;
       // A phrase whose share of the range is longer than any noun of its theme
       // takes a modifier whatever the roll says, which is the only way it can
       // reach it — the alternative is a sentence that quietly misses `minLength`.
       final needed = low > (article.max == 0 ? 0 : article.max + space) + nouns.max;
       final modify =
+          part.slot != SentenceSlot.quantity &&
           part.modifiable &&
           (owed != null || needed || (room >= modifierBounds.min + space && chance(modifyChance)));
       final built = _nounPhrase(
@@ -1313,18 +1436,21 @@ _Built _compose(
         theme,
         forced: required?.word,
         modify: modify,
-        bare: part.bare,
+        // A counted phrase drops its article and takes no modifier: `12 apples`,
+        // never `the 12 red apples`.
+        bare: part.slot == SentenceSlot.quantity || part.bare,
         forcedModifier: owed?.word,
         invent: settings.invent,
         prefix: prefixable && i == 0 ? settings.prefix : '',
         min: low,
         max: high,
         nouns: nouns,
+        count: part.slot == SentenceSlot.quantity ? _countText(data, theme) : '',
       );
 
       phrase = built.text;
 
-      if (part.slot == SentenceSlot.subject) {
+      if (part.slot == subjectSlot) {
         subject = built;
         gender = genderOf(lexicon, _asPool(lexicon, built.noun));
       }

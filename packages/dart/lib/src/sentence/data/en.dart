@@ -219,6 +219,17 @@ final SentenceLanguageData en = SentenceLanguageData(
   connectives: words(r'and_then so but meanwhile afterwards still later soon even_so at_last'),
   interjections: words(r'oh, ah, wow, well, look, goodness, my, indeed, honestly,'),
   pronouns: <WordGender, WordPool>{WordGender.n: words(r'it')},
+  // No counters, and so no counted shape: English would need a plural, and a
+  // plural of `sadness` or `bacon` is not a thing anyone writes. Money is
+  // countable whatever the pools hold, so the amount is all this declares.
+  numeral: const SentenceNumeral(
+    order: NumeralOrder.before,
+    counters: <NounClass, String>{},
+    count: LengthRange(2, 12),
+    currency: 'dollars',
+    amounts: <int>[100, 500, 1000, 5000, 12000, 25000, 50000, 100000],
+    group: ',',
+  ),
   // English cannot drop a subject, so a sentence about a person names it again.
   pronounless: const <NounClass>[NounClass.person],
   frames: const <SentenceFrame>[
@@ -314,5 +325,12 @@ final SentenceLanguageData en = SentenceLanguageData(
       10,
       mood: SentenceMood.question,
     ),
+    // Money and nothing else: a counted phrase would need a plural noun, and
+    // most of these pools are not countable at all.
+    SentenceFrame(<SentencePart>[
+      SentencePart(SentenceSlot.subject, modifiable: true),
+      SentencePart(SentenceSlot.verb),
+      SentencePart(SentenceSlot.money),
+    ], 6),
   ],
 );
