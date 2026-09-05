@@ -944,9 +944,13 @@ rand_sentence(language="en", theme="animal", include_name=True, count=2)
 
 `SentenceDetail.names`는 결과에 쓰인 이름을 알려 줍니다. 주어가 이름이면 <Lang js="theme: null" dart="theme: null" py="theme=None" code />입니다. 이름은 어느 테마에도 속하지 않으니까요.
 
-::: warning 쓰든 쓰지 않든 22 KB가 늡니다 이 옵션은 사람 이름 풀에 손을 대는데, 동기 API에는 동적 import로 숨길 자리가 없습니다. 그래서 `randSentence`를 포함하는 번들은 이름 풀도 함께 포함합니다. esbuild로 `randSentence`만 번들하고 gzip한 결과는 **이전 122.5 KB, 이후 144.5 KB**로 `+22.0 KB`, `+18%`입니다. 문장 생성기는 이미 단어 풀 전체를 들고 있고 그것이 110 KB이며, 이름 풀은 그 옆의 22 KB입니다.
+::: warning 쓰든 쓰지 않든 22 KB가 늡니다
 
-이름을 쓸 일이 없고 크기가 중요하다면, 이 버전에서 할 수 있는 일은 `randSentence`를 가져오지 않는 것뿐입니다. :::
+이 옵션은 사람 이름 풀에 손을 대는데, 동기 API에는 동적 import로 숨길 자리가 없습니다. 그래서 `randSentence`를 포함하는 번들은 이름 풀도 함께 포함합니다. esbuild로 `randSentence`만 번들하고 gzip한 결과는 **이전 122.5 KB, 이후 144.5 KB**로 `+22.0 KB`, `+18%`입니다. 문장 생성기는 이미 단어 풀 전체를 들고 있고 그것이 110 KB이며, 이름 풀은 그 옆의 22 KB입니다.
+
+이름을 쓸 일이 없고 크기가 중요하다면, 이 버전에서 할 수 있는 일은 `randSentence`를 가져오지 않는 것뿐입니다.
+
+:::
 
 ## 상세 출력 {#the-detail-output}
 

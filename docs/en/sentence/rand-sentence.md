@@ -971,9 +971,13 @@ rand_sentence(language="en", theme="animal", include_name=True, count=2)
 
 `SentenceDetail.names` reports the names a result was written with, and a named subject reports <Lang js="theme: null" dart="theme: null" py="theme=None" code /> — a name belongs to no theme.
 
-::: warning It costs 22 KB, whether you use it or not The option reaches the person-name pools, and a synchronous API has no dynamic import to hide behind — so a bundle that includes `randSentence` at all includes them. Bundling only `randSentence` with esbuild and gzipping: **122.5 KB before, 144.5 KB after**, `+22.0 KB` or `+18%`. The sentence generator already carries the whole word pools, which is 110 KB of that, and the name pools are the 22 KB beside them.
+::: warning It costs 22 KB, whether you use it or not
 
-If you never write a name and the size matters, there is nothing to do about it in this version except not to import `randSentence`. :::
+The option reaches the person-name pools, and a synchronous API has no dynamic import to hide behind — so a bundle that includes `randSentence` at all includes them. Bundling only `randSentence` with esbuild and gzipping: **122.5 KB before, 144.5 KB after**, `+22.0 KB` or `+18%`. The sentence generator already carries the whole word pools, which is 110 KB of that, and the name pools are the 22 KB beside them.
+
+If you never write a name and the size matters, there is nothing to do about it in this version except not to import `randSentence`.
+
+:::
 
 ## The detail output {#the-detail-output}
 
