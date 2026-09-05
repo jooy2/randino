@@ -235,6 +235,15 @@ const List<SentenceType> _quotedMarks = <SentenceType>[
 /// Every level, from the voice of a book to the one most spoken Korean is in.
 const List<SentenceStyle> _styles = SentenceStyle.values;
 
+/// The kinds that are a line somebody says or thinks rather than prose about it.
+const List<SentenceType> _quotedTypes = <SentenceType>[SentenceType.dialogue, SentenceType.thought];
+
+/// How often a sentence after the first keeps the kind the result opened on.
+///
+/// A paragraph that quotes, asks, exclaims and trails off in four lines is four
+/// paragraphs; one that never varies is a list.
+const int _leadChance = 70;
+
 /// The levels a line somebody says out loud is said at.
 ///
 /// Never 해라체 — that is the voice of a book, not of a person with a listener in
@@ -381,13 +390,19 @@ enum _Reference { repeat, pronoun, fresh }
 
 /// Everything a sentence after the first one is built with.
 class _Follow {
-  const _Follow(this.topic, this.reference, this.pronoun);
+  const _Follow(this.topic, this.reference, this.pronoun, this.scene);
 
   final _Topic topic;
   final _Reference reference;
 
   /// What a [_Reference.pronoun] writes; `''` where the language writes nothing.
   final String pronoun;
+
+  /// The nouns the result has already put on the page, by the slot they stood in.
+  ///
+  /// A sentence with one of those slots writes what is here rather than drawing
+  /// again — a paragraph whose place changes every line is not one paragraph.
+  final Map<SentenceSlot, _Requirement> scene;
 }
 
 /* --- Shapes ---------------------------------------------------------------- */
@@ -436,7 +451,17 @@ List<SentenceFrame> _framesFor(SentenceLanguageData data, _Settings settings, Se
           : data.frames
               .where((frame) => frame.mood == SentenceMood.statement)
               .toList(growable: false);
-  final usable = moody.isNotEmpty ? moody : data.frames;
+  final moodly = moody.isNotEmpty ? moody : data.frames;
+  // A counted shape has no room for a name: its quantity is its subject, and
+  // `서호 3명` counts somebody's name, which is not a thing a sentence says. Asked
+  // for a name, the shapes that cannot carry one are left out.
+  final nameable =
+      (settings.includeName ?? false)
+          ? moodly
+              .where((frame) => _subjectSlotOf(frame) != SentenceSlot.quantity)
+              .toList(growable: false)
+          : moodly;
+  final usable = nameable.isNotEmpty ? nameable : moodly;
   final wanted = settings.slots;
   final bySlots =
       wanted == null
@@ -620,18 +645,27 @@ _Requirement _classify(WordLanguage language, String word) {
 ///
 /// Greedy: a word takes the first of its own slots that is still free, which is
 /// enough because the lists are short and ordered by how specific the reading is.
-_Placement _planFor(SentenceFrame frame, List<_Requirement> requirements, [_Requirement? subject]) {
+_Placement _planFor(
+  SentenceFrame frame,
+  List<_Requirement> requirements, [
+  Map<SentenceSlot, _Requirement> pinned = const <SentenceSlot, _Requirement>{},
+]) {
   final plan = _Plan(<int, _Requirement>{}, <int, _Requirement>{});
   var complete = true;
 
-  // A sentence carrying on about the topic is handed its subject rather than
-  // asking for it, so it goes in the subject's own phrase before the greedy
+  // A sentence carrying on from another one is handed the phrases the result has
+  // already put on the page — its subject, and the place it is happening in —
+  // rather than asking for them, so each goes in its own slot before the greedy
   // placement below reaches for the first noun slot it can find.
-  if (subject != null) {
-    final at = _indexWhere(frame, (part, i) => part.slot == SentenceSlot.subject);
+  pinned.forEach((slot, requirement) {
+    // The subject goes wherever this shape's subject goes, which in a counted
+    // shape is its quantity: `사과 12개가 익는다` has no `subject` part, and a topic
+    // pinned to one would have been dropped and drawn again.
+    final wanted = slot == SentenceSlot.subject ? _subjectSlotOf(frame) : slot;
+    final at = _indexWhere(frame, (part, i) => part.slot == wanted);
 
-    if (at >= 0) plan.phrase[at] = subject;
-  }
+    if (at >= 0) plan.phrase[at] = requirement;
+  });
 
   for (final requirement in requirements) {
     var placed = false;
@@ -1058,6 +1092,7 @@ class _Built {
     this.subject,
     this.gender,
     this.named,
+    this.scene,
   );
 
   final String sentence;
@@ -1077,6 +1112,12 @@ class _Built {
 
   /// Its gender, for the pronoun and the agreement of whatever follows.
   final WordGender? gender;
+
+  /// The nouns this sentence put on the page that a later one keeps: where it is
+  /// happening, and what it is about beside its subject.
+  ///
+  /// A paragraph whose place changes every line is not one paragraph.
+  final Map<SentenceSlot, _Requirement> scene;
 
   /// Whether that subject is a person's name.
   final bool named;
@@ -1414,6 +1455,10 @@ _Built _compose(
         // it would be a sentence that does not.
         if (plan.phrase.containsKey(at[i])) return null;
 
+        // A person is one person. `사과 12개` counts apples, and `서호 3명` counts
+        // somebody's name, which is not a thing a sentence says.
+        if (part.slot == SentenceSlot.quantity) return null;
+
         final theme = partThemes[i];
 
         return (settings.includeName ?? false) &&
@@ -1483,6 +1528,8 @@ _Built _compose(
   final reported = <String>[];
   final slots = <SentenceSlot>[];
   final names = <String>[];
+  // The noun phrases this sentence drew for the slots a later one keeps.
+  final drawn = <SentenceSlot, _Phrase>{};
   _Phrase? subject;
   var named = false;
   // A pronoun says nothing about its own gender, and neither does a name carried
@@ -1573,6 +1620,13 @@ _Built _compose(
         subject = built;
         gender = genderOf(lexicon, _asPool(lexicon, built.noun));
       }
+
+      // A place is where the result is happening and an object is what it is
+      // about, so both are kept for the sentences that follow. A quantity is not:
+      // `사과 12개` is an amount of something rather than a thing.
+      if (part.slot == SentenceSlot.place || part.slot == SentenceSlot.object) {
+        drawn[part.slot] = built;
+      }
     } else {
       phrase = _predicateFor(
         part.slot,
@@ -1616,6 +1670,22 @@ _Built _compose(
       named
           ? reported[slots.indexOf(SentenceSlot.subject)]
           : (subject?.noun ?? (pronoun != null && pronoun.isNotEmpty ? follow!.topic.noun : null));
+  // Where this sentence happened and what it was about, for the next one. The
+  // bare noun rather than the phrase, so the next sentence writes its own article
+  // and may put a different modifier in front of the same place.
+  final scene = <SentenceSlot, _Requirement>{...?follow?.scene};
+
+  drawn.forEach((slot, entry) {
+    scene.putIfAbsent(
+      slot,
+      () => _Requirement(
+        entry.noun,
+        <SentenceSlot?>[slot],
+        theme: entry.theme,
+        known: entry.theme != null,
+      ),
+    );
+  });
 
   return _Built(
     // The opener is written against the first phrase rather than beside it —
@@ -1629,6 +1699,7 @@ _Built _compose(
     carried,
     subject != null || named ? gender : (pronoun != null ? follow!.topic.gender : null),
     named || (pronoun != null && (follow?.topic.named ?? false)),
+    scene,
   );
 }
 
@@ -1730,17 +1801,21 @@ _Built _generateOne(WordLanguage language, _Settings settings, _Draw draw) {
       follow != null
           ? const <_Requirement>[]
           : settings.include.map((word) => _classify(language, word)).toList(growable: false);
-  final carried =
-      follow?.reference == _Reference.repeat
-          ? _Requirement(
-            follow!.topic.noun,
-            const <SentenceSlot?>[SentenceSlot.subject],
-            theme: follow.topic.theme,
-            known: follow.topic.theme != null,
-          )
-          : null;
+  // What the result has already put on the page and this sentence keeps: its
+  // subject when the topic is being named again, and every noun of its scene.
+  final pinned = <SentenceSlot, _Requirement>{...?follow?.scene};
+
+  if (follow?.reference == _Reference.repeat) {
+    pinned[SentenceSlot.subject] = _Requirement(
+      follow!.topic.noun,
+      const <SentenceSlot?>[SentenceSlot.subject],
+      theme: follow.topic.theme,
+      known: follow.topic.theme != null,
+    );
+  }
+
   final placements = <SentenceFrame, _Placement>{
-    for (final frame in allowed) frame: _planFor(frame, requirements, carried),
+    for (final frame in allowed) frame: _planFor(frame, requirements, pinned),
   };
   final range = budget;
   // A shape is only worth drawing when the language has a predicate for it: a
@@ -1954,12 +2029,19 @@ WordPool _pronounsFor(SentenceLanguageData data, _Topic topic) {
 }
 
 /// How one sentence carries on from the one before it.
-_Follow _followFor(SentenceLanguageData data, _Topic topic) {
+_Follow _followFor(SentenceLanguageData data, _Topic topic, Map<SentenceSlot, _Requirement> scene) {
   final pronouns = _pronounsFor(data, topic);
+  // A person is an individual, not a kind of thing: a paragraph about Emma that
+  // draws a `fresh` subject is a paragraph that quietly becomes about Sophie.
+  // Every other topic can be another one of its own class.
+  final ways =
+      topic.named
+          ? const <_Reference>[_Reference.repeat, _Reference.pronoun]
+          : const <_Reference>[_Reference.repeat, _Reference.pronoun, _Reference.fresh];
   final usable =
       pronouns.isNotEmpty
-          ? const <_Reference>[_Reference.repeat, _Reference.pronoun, _Reference.fresh]
-          : const <_Reference>[_Reference.repeat, _Reference.fresh];
+          ? ways
+          : ways.where((way) => way != _Reference.pronoun).toList(growable: false);
   var total = 0;
 
   for (final each in usable) {
@@ -1978,7 +2060,7 @@ _Follow _followFor(SentenceLanguageData data, _Topic topic) {
     }
   }
 
-  return _Follow(topic, reference, reference == _Reference.pronoun ? pick(pronouns) : '');
+  return _Follow(topic, reference, reference == _Reference.pronoun ? pick(pronouns) : '', scene);
 }
 
 /// What a sentence opens on: an interjection when it is an exclamation, and a
@@ -2038,6 +2120,7 @@ List<SentenceType> _kindFor(
   Map<SentenceSlot, LengthRange> bounds,
   LengthRange modifierBounds,
   LengthRange budget,
+  SentenceType? lead,
 ) {
   bool fits(SentenceType mark, int room) => _framesFor(
     data,
@@ -2056,10 +2139,24 @@ List<SentenceType> _kindFor(
     return budget.max - (quote == null ? 0 : quote[0].length + quote[1].length);
   }
 
-  final usable = settings.types
+  // A paragraph stays in the register it opened in. A line somebody speaks is a
+  // line, and the next one is another line of the same speech; prose about it may
+  // ask and exclaim without stopping being prose. Nothing to keep to on the first
+  // sentence, which is where the register comes from.
+  final family =
+      lead == null
+          ? settings.types
+          : settings.types
+              .where(
+                (type) => _quotedTypes.contains(lead) ? type == lead : !_quotedTypes.contains(type),
+              )
+              .toList(growable: false);
+  final wanted = family.isNotEmpty ? family : settings.types;
+  final usable = wanted
       .where((type) => marksOf(type).any((mark) => fits(mark, roomOf(type))))
       .toList(growable: false);
-  final type = pick(usable.isNotEmpty ? usable : settings.types);
+  final pool = usable.isNotEmpty ? usable : wanted;
+  final type = lead != null && pool.contains(lead) && chance(_leadChance) ? lead : pick(pool);
   final marks = marksOf(type).where((mark) => fits(mark, roomOf(type))).toList(growable: false);
 
   return <SentenceType>[type, pick(marks.isNotEmpty ? marks : marksOf(type))];
@@ -2147,6 +2244,9 @@ List<_Built> _generateResult(WordLanguage language, _Settings settings) {
   );
   final built = <_Built>[];
   _Topic? topic;
+  var scene = const <SentenceSlot, _Requirement>{};
+  // What the result opened on, which is what the rest of it keeps to.
+  SentenceType? lead;
   // The result's own voice, settled once. A caller who named a level gets that
   // one throughout; one who did not gets a paragraph that is at least consistent
   // with itself, rather than a level rerolled every sentence.
@@ -2156,10 +2256,10 @@ List<_Built> _generateResult(WordLanguage language, _Settings settings) {
 
   for (var i = 0; i < settings.sentences; i += 1) {
     final budget = budgets[i];
-    final kind = _kindFor(data, settled, room, modifierBounds, budget);
+    final kind = _kindFor(data, settled, room, modifierBounds, budget, lead);
     final type = kind[0];
     final mark = kind[1];
-    final follow = topic == null ? null : _followFor(data, topic);
+    final follow = topic == null ? null : _followFor(data, topic, scene);
     final draw = _Draw(
       budget,
       type,
@@ -2191,6 +2291,8 @@ List<_Built> _generateResult(WordLanguage language, _Settings settings) {
     }
 
     built.add(one);
+    scene = one.scene;
+    lead ??= type;
     topic ??= _topicOf(one);
   }
 

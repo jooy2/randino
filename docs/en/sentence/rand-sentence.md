@@ -772,6 +772,12 @@ rand_sentence(language="ko", sentences=3)
 
 **The first sentence sets the topic**, and every sentence after it stays on it. It names that subject again, stands a pronoun where it was, or draws a fresh noun of the same kind — a paragraph that opens on a creature never wanders into an idea halfway through — and it may open on a connective (`But`, `하지만`, `そして`).
 
+**A person is not a kind of thing.** A paragraph about Emma is about Emma: it names her again or stands a pronoun where she was, and never draws somebody else of the same kind. That last one would be a paragraph that quietly becomes about Sophie.
+
+**It keeps its scene too.** A place the first sentence named is where the rest of it happens, and a thing it was about is the thing it stays about — a later sentence writes its own article and may put a different modifier in front, so `in the icy hamlet` becomes `in the hamlet`, not `in the vault`.
+
+**And it stays in the register it opened in.** A line somebody says is a line, and the next one is another line of the same speech; prose about it may ask and exclaim without becoming a line. A paragraph that quotes, asks, exclaims and trails off in four sentences is four paragraphs.
+
 What a language does for the pronoun is its own business. English writes `it`; Korean, Japanese, Chinese, Spanish and Italian leave the subject out entirely, which is what they actually do in a second sentence; German and Russian pick it by the noun's gender. A language whose written pronoun cannot stand for a person — English `he` and `she` need a gender the pools do not carry, and `그것`, `それ`, `它` and `nó` are inanimate — names the topic again instead.
 
 **The length range describes the whole string**, whatever the sentence count. It is shared out across the sentences before any of them is drawn, and the last one takes the rounding.

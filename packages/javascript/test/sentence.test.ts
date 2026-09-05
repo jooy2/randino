@@ -880,6 +880,59 @@ describe('Sentence', () => {
 		assert.strictEqual(new Set(sentences).size, sentences.length);
 	});
 
+	it('a paragraph keeps its scene, its person and its register', () => {
+		// A place named in the first sentence is where the rest of it happens, and a
+		// thing it was about is the thing it stays about. Before this the topic was
+		// the subject and nothing else, so the place changed every line.
+		for (const detail of sentenceDetails({
+			language: 'ko',
+			sentences: 4,
+			slots: ['place', 'object'],
+			count: 120
+		})) {
+			for (const slot of ['place', 'object'] as SentenceSlot[]) {
+				const drawn = detail.phrases
+					.filter((_, i) => detail.slots[i] === slot)
+					.map((phrase) => nounsIn('ko', phrase));
+
+				// Every one of them reads as the same noun: a later sentence writes its
+				// own modifier, so the phrases differ and the noun does not.
+				for (const found of drawn.slice(1)) {
+					assert.ok(
+						[...found].some((noun) => drawn[0].has(noun)),
+						`${slot} changed: ${detail.sentence}`
+					);
+				}
+			}
+		}
+
+		// A person is an individual rather than a kind of thing, so a paragraph about
+		// one is about that one. `fresh` would quietly make it about somebody else.
+		for (const detail of sentenceDetails({
+			language: 'ko',
+			sentences: 4,
+			includeName: true,
+			count: 120
+		})) {
+			assert.strictEqual(
+				new Set(detail.names).size,
+				Math.min(1, detail.names.length),
+				detail.sentence
+			);
+		}
+
+		// And it stays in the register it opened in: a line somebody says is a line,
+		// and prose about it may ask and exclaim without becoming a line.
+		for (const detail of sentenceDetails({ language: 'ko', sentences: 4, count: 200 })) {
+			const quoted = detail.types.map((type) => type === 'dialogue' || type === 'thought');
+
+			assert.ok(
+				quoted.every((one) => one === quoted[0]),
+				`the register changed mid-paragraph: ${detail.types.join('/')}`
+			);
+		}
+	});
+
 	it('`sentences` puts more than one sentence in one result', () => {
 		for (const language of WORD_LANGUAGES) {
 			const data = SENTENCE_DATA[language];

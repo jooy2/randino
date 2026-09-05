@@ -124,15 +124,37 @@ What it cost, and the four bugs the new default turned up:
 every line. The topic carries the subject and nothing else; the object, the
 place and the time are drawn fresh each sentence.
 
-- [ ] The topic becomes the scene: the subject, and whatever else the first
+- [x] The topic becomes the scene: the subject, and whatever else the first
       sentence put on the page. A place or a thing that has been named stays
       that place or that thing.
-- [ ] A name that has been introduced is the person the rest of the paragraph is
+- [x] A name that has been introduced is the person the rest of the paragraph is
       about. A fresh person is a new name, so `fresh` is not what a paragraph
       about somebody should mostly draw.
-- [ ] The mood is the paragraph's, not the sentence's. A line of dialogue
+- [x] The mood is the paragraph's, not the sentence's. A line of dialogue
       followed by a thought followed by a question is four moods in four
       sentences, and no paragraph reads like that.
+
+How it landed:
+
+- **The scene is a map of requirements, not a new mechanism.** `planFor` already
+  took the repeated subject and put it in its own slot; it takes a map now, and
+  the place and the object go in beside it. Everything downstream — the plan,
+  the exact-length budget, the article and the modifier — was already written
+  for a required word.
+- **The bare noun rather than the phrase.** A later sentence writes its own
+  article and may put a different modifier in front, so `in the icy hamlet`
+  becomes `in the hamlet` rather than repeating the words. That reads as the
+  same place, which is what was wanted.
+- **`fresh` is gone for a named topic.** Nothing else was needed: English has no
+  pronoun for a person the pools can gender, so it repeats the name; Korean and
+  the four others that drop their subject stand nothing there.
+- **The register, not the type.** Keeping the exact type would have made a
+  paragraph a list. Quoted and narrated are the two registers, and inside the
+  narrated one the type still varies with the opening one preferred.
+- Two more that fell out of it: a topic pinned to `subject` was dropped by a
+  counted shape, which has no `subject` part, and `서호 3명` counted somebody's
+  name. `planFor` reads `subjectSlotOf` now, and a counted shape is left out
+  when a name is asked for.
 
 ## E. A sentence can be about a date, a time or an amount
 

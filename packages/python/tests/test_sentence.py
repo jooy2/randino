@@ -777,6 +777,43 @@ def theme_of_noun(language: WordLanguage, noun: str) -> WordTheme | None:
     return None
 
 
+def test_a_paragraph_keeps_its_scene_its_person_and_its_register() -> None:
+    """A place, a thing and a person named once are the same ones all the way down."""
+    # A place named in the first sentence is where the rest of it happens, and a thing it
+    # was about is the thing it stays about. Before this the topic was the subject and
+    # nothing else, so the place changed every line.
+    for detail in rand_sentence(
+        language="ko", sentences=4, slots=["place", "object"], count=120, output="detail"
+    ):
+        for slot in ("place", "object"):
+            drawn = [
+                nouns_in("ko", phrase)
+                for phrase, each in zip(detail.phrases, detail.slots, strict=True)
+                if each == slot
+            ]
+
+            # Every one of them reads as the same noun: a later sentence writes its own
+            # modifier, so the phrases differ and the noun does not.
+            for found in drawn[1:]:
+                assert found & drawn[0], f"{slot} changed: {detail.sentence}"
+
+    # A person is an individual rather than a kind of thing, so a paragraph about one is
+    # about that one. `fresh` would quietly make it about somebody else.
+    for detail in rand_sentence(
+        language="ko", sentences=4, include_name=True, count=120, output="detail"
+    ):
+        assert len(set(detail.names)) == min(1, len(detail.names)), detail.sentence
+
+    # And it stays in the register it opened in: a line somebody says is a line, and
+    # prose about it may ask and exclaim without becoming a line.
+    for detail in rand_sentence(language="ko", sentences=4, count=200, output="detail"):
+        quoted = [type_ in ("dialogue", "thought") for type_ in detail.types]
+
+        assert all(one == quoted[0] for one in quoted), (
+            f"the register changed mid-paragraph: {'/'.join(detail.types)}"
+        )
+
+
 def test_sentences_puts_more_than_one_sentence_in_one_result() -> None:
     for language in WORD_LANGUAGES:
         data = SENTENCE_DATA[language]

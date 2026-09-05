@@ -209,6 +209,14 @@ type Settings = {
 // telling, and often enough neither, so the mark is drawn rather than fixed.
 const QUOTED_MARKS: readonly SentenceMark[] = ['statement', 'question', 'exclamation'];
 
+// The kinds that are a line somebody says or thinks rather than prose about it.
+const QUOTED_TYPES: readonly SentenceType[] = ['dialogue', 'thought'];
+
+// How often a sentence after the first keeps the kind the result opened on. A
+// paragraph that quotes, asks, exclaims and trails off in four lines is four
+// paragraphs; one that never varies is a list.
+const LEAD_CHANCE = 70;
+
 // Every level, in the order they run from the voice of a book to the one most
 // spoken Korean is in.
 const STYLES: readonly SentenceStyle[] = ['plain', 'casual', 'polite', 'formal'];
@@ -307,6 +315,12 @@ type Follow = {
 	reference: Reference;
 	/** What a `'pronoun'` reference writes; `''` where the language writes nothing. */
 	pronoun: string;
+	/**
+	 * The nouns the result has already put on the page, by the slot they stood in.
+	 * A sentence with one of those slots writes what is here rather than drawing
+	 * again — a paragraph whose place changes every line is not one paragraph.
+	 */
+	scene: ReadonlyMap<SentenceSlot, Requirement>;
 };
 
 /* --- Shapes ---------------------------------------------------------------- */
@@ -359,7 +373,14 @@ function framesFor(
 	const moody = byMood.length
 		? byMood
 		: data.frames.filter((frame) => (frame.mood ?? 'statement') === 'statement');
-	const usable = moody.length ? moody : data.frames;
+	const moodly = moody.length ? moody : data.frames;
+	// A counted shape has no room for a name: its quantity is its subject, and
+	// `서호 3명` counts somebody's name, which is not a thing a sentence says. Asked
+	// for a name, the shapes that cannot carry one are left out.
+	const nameable = settings.includeName
+		? moodly.filter((frame) => subjectSlotOf(frame) !== 'quantity')
+		: moodly;
+	const usable = nameable.length ? nameable : moodly;
 	const bySlots =
 		settings.slots === 'all'
 			? usable
@@ -528,23 +549,30 @@ function classify(language: WordLanguage, word: string): Requirement {
 function planFor(
 	frame: SentenceFrame,
 	requirements: readonly Requirement[],
-	subject?: Requirement
+	pinned?: ReadonlyMap<SentenceSlot, Requirement>
 ): { plan: Plan; complete: boolean } {
-	if (!requirements.length && !subject) {
+	if (!requirements.length && !pinned?.size) {
 		return { plan: EMPTY_PLAN, complete: true };
 	}
 
 	const plan: Plan = { phrase: new Map(), modifier: new Map() };
 	let complete = true;
 
-	// A sentence carrying on about the topic is handed its subject rather than
-	// asking for it, so it goes in the subject's own phrase before the greedy
+	// A sentence carrying on from another one is handed the phrases the result has
+	// already put on the page — its subject, and the place it is happening in —
+	// rather than asking for them, so each goes in its own slot before the greedy
 	// placement below reaches for the first noun slot it can find.
-	if (subject) {
-		const at = frame.parts.findIndex((part) => part.slot === 'subject');
+	if (pinned) {
+		for (const [slot, requirement] of pinned) {
+			// The subject goes wherever this shape's subject goes, which in a counted
+			// shape is its quantity: `사과 12개가 익는다` has no `subject` part, and a
+			// topic pinned to one would have been dropped and drawn again.
+			const wanted = slot === 'subject' ? subjectSlotOf(frame) : slot;
+			const at = frame.parts.findIndex((part) => part.slot === wanted);
 
-		if (at >= 0) {
-			plan.phrase.set(at, subject);
+			if (at >= 0) {
+				plan.phrase.set(at, requirement);
+			}
 		}
 	}
 
@@ -978,6 +1006,12 @@ type Built = {
 	named: boolean;
 	/** The person names this sentence was written with, in order. */
 	names: string[];
+	/**
+	 * The nouns this sentence put on the page that a later one keeps: where it is
+	 * happening, and what it is about beside its subject. A paragraph whose place
+	 * changes every line is not one paragraph.
+	 */
+	scene: Map<SentenceSlot, Requirement>;
 	/** What this sentence is doing. Set once the draw it came from is known. */
 	type: SentenceType;
 };
@@ -1208,17 +1242,20 @@ function generateOne(language: WordLanguage, settings: Settings, draw: Draw): Bu
 	// The words a caller required go in the first sentence — once in the result
 	// rather than once in every sentence of it.
 	const requirements = follow ? [] : settings.include.map((word) => classify(language, word));
-	const carried =
-		follow?.reference === 'repeat'
-			? ({
-					word: follow.topic.noun,
-					slots: ['subject'],
-					theme: follow.topic.theme ?? undefined,
-					known: follow.topic.theme !== null
-				} as Requirement)
-			: undefined;
+	// What the result has already put on the page and this sentence keeps: its
+	// subject when the topic is being named again, and every noun of its scene.
+	const pinned = new Map<SentenceSlot, Requirement>(follow?.scene ?? []);
+
+	if (follow?.reference === 'repeat') {
+		pinned.set('subject', {
+			word: follow.topic.noun,
+			slots: ['subject'],
+			theme: follow.topic.theme ?? undefined,
+			known: follow.topic.theme !== null
+		});
+	}
 	const [min, max] = budget;
-	const plans = new Map(allowed.map((frame) => [frame, planFor(frame, requirements, carried)]));
+	const plans = new Map(allowed.map((frame) => [frame, planFor(frame, requirements, pinned)]));
 	// A shape is only worth drawing when the language has a predicate for it: a
 	// `body` subject has no transitive verb in any language here, so a shape with
 	// an object in it would have to fall back to a verb that means something else.
@@ -1463,6 +1500,12 @@ function compose(
 			return null;
 		}
 
+		// A person is one person. `사과 12개` counts apples, and `서호 3명` counts
+		// somebody's name, which is not a thing a sentence says.
+		if (part.slot === 'quantity') {
+			return null;
+		}
+
 		const theme = partThemes[i];
 
 		return settings.includeName && theme && THEME_CLASS[theme] === 'person' ? '' : null;
@@ -1524,6 +1567,8 @@ function compose(
 	const reported: string[] = [];
 	const slots: SentenceSlot[] = [];
 	const names: string[] = [];
+	// The noun phrases this sentence drew for the slots a later one keeps.
+	const drawn = new Map<SentenceSlot, Phrase>();
 	let subject: Phrase | undefined;
 	let named = false;
 	// A pronoun says nothing about its own gender, and neither does a name carried
@@ -1631,6 +1676,13 @@ function compose(
 				subject = built;
 				gender = genderOf(wordData, capitalizeAsPool(wordData, built.noun));
 			}
+
+			// A place is where the result is happening and an object is what it is
+			// about, so both are kept for the sentences that follow. A quantity is
+			// not: `사과 12개` is an amount of something rather than a thing.
+			if (part.slot === 'place' || part.slot === 'object') {
+				drawn.set(part.slot, built);
+			}
 		} else {
 			phrase = predicateFor(
 				part.slot,
@@ -1675,6 +1727,21 @@ function compose(
 	const carried = named
 		? reported[slots.indexOf('subject')]
 		: (subject?.noun ?? (pronoun ? follow!.topic.noun : null));
+	// Where this sentence happened and what it was about, for the next one. The
+	// bare noun rather than the phrase, so the next sentence writes its own article
+	// and may put a different modifier in front of the same place.
+	const scene = new Map<SentenceSlot, Requirement>(follow?.scene ?? []);
+
+	for (const [slot, entry] of drawn) {
+		if (!scene.has(slot)) {
+			scene.set(slot, {
+				word: entry.noun,
+				slots: [slot],
+				theme: entry.theme ?? undefined,
+				known: entry.theme !== null
+			});
+		}
+	}
 
 	return {
 		// The opener is written against the first phrase rather than beside it —
@@ -1684,6 +1751,7 @@ function compose(
 		slots,
 		names,
 		type: draw.type,
+		scene,
 		theme: named ? null : (subject?.theme ?? null),
 		subject: carried ?? null,
 		gender: subject || named ? gender : pronoun !== null ? follow!.topic.gender : undefined,
@@ -1872,11 +1940,17 @@ function pronounsFor(data: SentenceLanguageData, topic: Topic): WordPool {
 }
 
 /** How one sentence carries on from the one before it. */
-function followFor(data: SentenceLanguageData, topic: Topic): Follow {
+function followFor(
+	data: SentenceLanguageData,
+	topic: Topic,
+	scene: ReadonlyMap<SentenceSlot, Requirement>
+): Follow {
 	const pronouns = pronounsFor(data, topic);
-	const usable: Reference[] = pronouns.length
-		? ['repeat', 'pronoun', 'fresh']
-		: ['repeat', 'fresh'];
+	// A person is an individual, not a kind of thing: a paragraph about Emma that
+	// draws a `fresh` subject is a paragraph that quietly becomes about Sophie.
+	// Every other topic can be another one of its own class.
+	const ways: Reference[] = topic.named ? ['repeat', 'pronoun'] : ['repeat', 'pronoun', 'fresh'];
+	const usable = pronouns.length ? ways : ways.filter((way) => way !== 'pronoun');
 	const total = usable.reduce((sum, each) => sum + REFERENCE_WEIGHT[each], 0);
 	let roll = Math.random() * total;
 	let reference = usable[usable.length - 1];
@@ -1893,7 +1967,8 @@ function followFor(data: SentenceLanguageData, topic: Topic): Follow {
 	return {
 		topic,
 		reference,
-		pronoun: reference === 'pronoun' ? pick(pronouns) : ''
+		pronoun: reference === 'pronoun' ? pick(pronouns) : '',
+		scene
 	};
 }
 
@@ -1960,7 +2035,8 @@ function kindFor(
 	data: SentenceLanguageData,
 	settings: Settings,
 	bounds: Record<string, readonly [number, number]>,
-	budget: readonly [number, number]
+	budget: readonly [number, number],
+	lead: SentenceType | null
 ): readonly [SentenceType, SentenceMark] {
 	const fits = (mark: SentenceMark, room: number) =>
 		framesFor(data, settings, moodFor(mark)).some(
@@ -1973,10 +2049,19 @@ function kindFor(
 
 		return budget[1] - (quote ? quote[0].length + quote[1].length : 0);
 	};
-	const usable = settings.types.filter((type) =>
-		marksOf(type).some((mark) => fits(mark, roomOf(type)))
-	);
-	const type = pick(usable.length ? usable : settings.types);
+	// A paragraph stays in the register it opened in. A line somebody speaks is a
+	// line, and the next one is another line of the same speech; prose about it may
+	// ask and exclaim without stopping being prose. Nothing to keep to on the first
+	// sentence, which is where the register comes from.
+	const family = lead
+		? settings.types.filter((type) =>
+				QUOTED_TYPES.includes(lead) ? type === lead : !QUOTED_TYPES.includes(type)
+			)
+		: settings.types;
+	const wanted = family.length ? family : settings.types;
+	const usable = wanted.filter((type) => marksOf(type).some((mark) => fits(mark, roomOf(type))));
+	const pool = usable.length ? usable : wanted;
+	const type = lead && pool.includes(lead) && chance(LEAD_CHANCE) ? lead : pick(pool);
 	const marks = marksOf(type).filter((mark) => fits(mark, roomOf(type)));
 
 	return [type, pick(marks.length ? marks : marksOf(type))];
@@ -2057,6 +2142,9 @@ function generateResult(language: WordLanguage, settings: Settings): Built[] {
 	const budgets = shareOut(min, max, settings.sentences, data.space.length);
 	const built: Built[] = [];
 	let topic: Topic | null = null;
+	let scene: ReadonlyMap<SentenceSlot, Requirement> = new Map();
+	// What the result opened on, which is what the rest of it keeps to.
+	let lead: SentenceType | null = null;
 	// The result's own voice, settled once. A caller who named a level gets that
 	// one throughout; one who did not gets a paragraph that is at least consistent
 	// with itself, rather than a level rerolled every sentence.
@@ -2064,8 +2152,8 @@ function generateResult(language: WordLanguage, settings: Settings): Built[] {
 
 	for (let i = 0; i < settings.sentences; i += 1) {
 		const budget = budgets[i];
-		const [type, mark] = kindFor(data, settled, room, budget);
-		const follow = topic ? followFor(data, topic) : null;
+		const [type, mark] = kindFor(data, settled, room, budget, lead);
+		const follow = topic ? followFor(data, topic, scene) : null;
 		const draw: Draw = {
 			budget,
 			type,
@@ -2092,6 +2180,8 @@ function generateResult(language: WordLanguage, settings: Settings): Built[] {
 		}
 
 		built.push(one);
+		scene = one.scene;
+		lead ??= type;
 
 		if (!topic) {
 			topic = topicOf(one);

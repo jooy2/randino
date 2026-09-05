@@ -921,6 +921,68 @@ void main() {
       expect(sentences.toSet(), hasLength(sentences.length));
     });
 
+    test('a paragraph keeps its scene, its person and its register', () {
+      // A place named in the first sentence is where the rest of it happens, and a
+      // thing it was about is the thing it stays about. Before this the topic was
+      // the subject and nothing else, so the place changed every line.
+      for (final detail in randSentenceDetails(
+        language: WordLanguage.ko,
+        sentences: 4,
+        slots: <SentenceSlot>{SentenceSlot.place, SentenceSlot.object},
+        count: 120,
+      )) {
+        for (final slot in <SentenceSlot>[SentenceSlot.place, SentenceSlot.object]) {
+          final drawn = <Set<String>>[
+            for (var i = 0; i < detail.phrases.length; i += 1)
+              if (detail.slots[i] == slot) nounsIn(WordLanguage.ko, detail.phrases[i]),
+          ];
+
+          // Every one of them reads as the same noun: a later sentence writes its
+          // own modifier, so the phrases differ and the noun does not.
+          for (final found in drawn.skip(1)) {
+            expect(
+              found.any(drawn.first.contains),
+              isTrue,
+              reason: '$slot changed: ${detail.sentence}',
+            );
+          }
+        }
+      }
+
+      // A person is an individual rather than a kind of thing, so a paragraph about
+      // one is about that one. `fresh` would quietly make it about somebody else.
+      for (final detail in randSentenceDetails(
+        language: WordLanguage.ko,
+        sentences: 4,
+        includeName: true,
+        count: 120,
+      )) {
+        expect(
+          detail.names.toSet(),
+          hasLength(detail.names.isEmpty ? 0 : 1),
+          reason: detail.sentence,
+        );
+      }
+
+      // And it stays in the register it opened in: a line somebody says is a line,
+      // and prose about it may ask and exclaim without becoming a line.
+      for (final detail in randSentenceDetails(
+        language: WordLanguage.ko,
+        sentences: 4,
+        count: 200,
+      )) {
+        final quoted = detail.types
+            .map((type) => type == SentenceType.dialogue || type == SentenceType.thought)
+            .toList(growable: false);
+
+        expect(
+          quoted.every((one) => one == quoted.first),
+          isTrue,
+          reason: 'the register changed mid-paragraph: ${detail.types.join('/')}',
+        );
+      }
+    });
+
     test('`sentences` puts more than one sentence in one result', () {
       for (final language in wordLanguages) {
         final data = sentenceData[language]!;

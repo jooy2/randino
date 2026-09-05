@@ -22,6 +22,7 @@ not — no tag on any noun, because `THEME_CLASS` already knows what a theme nam
 import random
 from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass, field, replace
+from types import MappingProxyType
 from typing import cast
 
 from randino._internal.generate import (
@@ -230,6 +231,16 @@ class Settings:
     min_length: int | None = None
     max_length: int | None = None
 
+
+QUOTED_TYPES: tuple[SentenceType, ...] = ("dialogue", "thought")
+"""The kinds that are a line somebody says or thinks rather than prose about it."""
+
+LEAD_CHANCE = 70
+"""How often a sentence after the first keeps the kind the result opened on.
+
+A paragraph that quotes, asks, exclaims and trails off in four lines is four
+paragraphs; one that never varies is a list.
+"""
 
 QUOTED_MARKS: tuple[SentenceMark, ...] = ("statement", "question", "exclamation")
 """The kinds a quoted line can be.
@@ -448,6 +459,13 @@ class Follow:
     pronoun: str
     """What a `"pronoun"` reference writes; `""` where the language writes nothing."""
 
+    scene: "Mapping[SentenceSlot, Requirement]"
+    """The nouns the result has already put on the page, by the slot they stood in.
+
+    A sentence with one of those slots writes what is here rather than drawing again —
+    a paragraph whose place changes every line is not one paragraph.
+    """
+
 
 # --- Shapes -----------------------------------------------------------------
 
@@ -491,7 +509,16 @@ def _frames_for(
     """
     by_mood = [frame for frame in data.frames if frame.mood == mood]
     moody = by_mood or [frame for frame in data.frames if frame.mood == "statement"]
-    usable = moody or list(data.frames)
+    moodly = moody or list(data.frames)
+    # A counted shape has no room for a name: its quantity is its subject, and
+    # `서호 3명` counts somebody's name, which is not a thing a sentence says. Asked for
+    # a name, the shapes that cannot carry one are left out.
+    nameable = (
+        [frame for frame in moodly if _subject_slot_of(frame) != "quantity"]
+        if settings.include_name
+        else moodly
+    )
+    usable = nameable or moodly
     by_slots = (
         usable
         if settings.slots == "all"
@@ -649,23 +676,29 @@ def _classify(language: WordLanguage, word: str) -> Requirement:
 def _plan_for(
     frame: SentenceFrame,
     requirements: Sequence[Requirement],
-    subject: Requirement | None = None,
+    pinned: Mapping[SentenceSlot, Requirement] = MappingProxyType({}),
 ) -> tuple[Plan, bool]:
     """Where each required word goes in this shape, and whether all of them fit.
 
     Greedy: a word takes the first of its own slots that is still free, which is enough
     because the lists are short and ordered by how specific the reading is. A sentence
-    carrying on about the topic is handed its `subject` rather than asking for it, so
-    that goes in the subject's own phrase before the greedy placement reaches for the
-    first noun slot it can find.
+    carrying on from another one is handed the phrases the result has already put on the
+    page — its subject, and the place it is happening in — rather than asking for them,
+    so each goes in its own slot before the greedy placement reaches for the first noun
+    slot it can find.
     """
     plan = Plan()
     complete = True
 
-    if subject is not None:
+    for pin, requirement in pinned.items():
+        # The subject goes wherever this shape's subject goes, which in a counted shape
+        # is its quantity: `사과 12개가 익는다` has no `subject` part, and a topic pinned
+        # to one would have been dropped and drawn again.
+        stands = _subject_slot_of(frame) if pin == "subject" else pin
+
         for index, part in enumerate(frame.parts):
-            if part.slot == "subject":
-                plan.phrase[index] = subject
+            if part.slot == stands:
+                plan.phrase[index] = requirement
                 break
 
     for requirement in requirements:
@@ -1127,6 +1160,13 @@ class Built:
     named: bool
     """Whether that subject is a person's name."""
 
+    scene: Mapping[SentenceSlot, Requirement]
+    """The nouns this sentence put on the page that a later one keeps.
+
+    Where it is happening, and what it is about beside its subject. A paragraph whose
+    place changes every line is not one paragraph.
+    """
+
 
 def _article_for(data: SentenceLanguageData, gender: WordGender | None, following: str) -> str:
     """The article a phrase opens with, by the noun's gender and the word after it."""
@@ -1545,6 +1585,10 @@ def _compose(
             # `include` says the sentence has to contain it, and a name written over
             # it would be a sentence that does not.
             proper.append(None)
+        elif part.slot == "quantity":
+            # A person is one person. `사과 12개` counts apples, and `서호 3명` counts
+            # somebody's name, which is not a thing a sentence says.
+            proper.append(None)
         else:
             theme = part_themes[index]
             person = theme is not None and THEME_CLASS[theme] == "person"
@@ -1609,6 +1653,8 @@ def _compose(
     reported: list[str] = []
     slots: list[SentenceSlot] = []
     names: list[str] = []
+    # The noun phrases this sentence drew for the slots a later one keeps.
+    drawn: dict[SentenceSlot, Phrase] = {}
     subject: Phrase | None = None
     named = False
     # A pronoun says nothing about its own gender, and neither does a name carried
@@ -1702,6 +1748,12 @@ def _compose(
             if part.slot == subject_slot:
                 subject = built
                 gender = gender_of(lexicon, _as_pool(lexicon, built.noun))
+
+            # A place is where the result is happening and an object is what it is
+            # about, so both are kept for the sentences that follow. A quantity is
+            # not: `사과 12개` is an amount of something rather than a thing.
+            if part.slot in ("place", "object"):
+                drawn[part.slot] = built
         else:
             phrase = _predicate_for(
                 part.slot,
@@ -1748,6 +1800,16 @@ def _compose(
     else:
         subject_word = carried.noun if carried is not None and pronoun else None
 
+    # Where this sentence happened and what it was about, for the next one. The bare
+    # noun rather than the phrase, so the next sentence writes its own article and may
+    # put a different modifier in front of the same place.
+    scene: dict[SentenceSlot, Requirement] = dict(follow.scene) if follow is not None else {}
+
+    for slot, entry in drawn.items():
+        scene.setdefault(
+            slot, Requirement(entry.noun, (slot,), theme=entry.theme, known=entry.theme is not None)
+        )
+
     return Built(
         # The opener is written against the first phrase rather than beside it —
         # Spanish `¿El león corre?`, never `¿ El león corre ?`.
@@ -1762,6 +1824,7 @@ def _compose(
         if subject is not None or named
         else (carried.gender if carried is not None else None),
         named or (carried is not None and carried.named),
+        scene,
     )
 
 
@@ -1871,10 +1934,16 @@ def _pronouns_for(data: SentenceLanguageData, topic: Topic) -> WordPool:
     return pool
 
 
-def _follow_for(data: SentenceLanguageData, topic: Topic) -> Follow:
+def _follow_for(
+    data: SentenceLanguageData, topic: Topic, scene: Mapping[SentenceSlot, Requirement]
+) -> Follow:
     """How one sentence carries on from the one before it."""
     pronouns = _pronouns_for(data, topic)
-    usable = ("repeat", "pronoun", "fresh") if pronouns else ("repeat", "fresh")
+    # A person is an individual, not a kind of thing: a paragraph about Emma that draws
+    # a `fresh` subject is a paragraph that quietly becomes about Sophie. Every other
+    # topic can be another one of its own class.
+    ways = ("repeat", "pronoun") if topic.named else ("repeat", "pronoun", "fresh")
+    usable = ways if pronouns else tuple(way for way in ways if way != "pronoun")
     roll = random.random() * sum(REFERENCE_WEIGHT[each] for each in usable)
     reference = usable[-1]
 
@@ -1885,7 +1954,7 @@ def _follow_for(data: SentenceLanguageData, topic: Topic) -> Follow:
             reference = each
             break
 
-    return Follow(topic, reference, pick(pronouns) if reference == "pronoun" else "")
+    return Follow(topic, reference, pick(pronouns) if reference == "pronoun" else "", scene)
 
 
 def _opener_for(
@@ -1987,6 +2056,7 @@ def _kind_for(
     settings: Settings,
     bounds: dict[str, tuple[int, int]],
     budget: tuple[int, int],
+    lead: SentenceType | None,
 ) -> tuple[SentenceType, SentenceMark]:
     """The kind this sentence is, and the kind whose mark it closes on.
 
@@ -2004,6 +2074,7 @@ def _kind_for(
         settings: What the caller asked for.
         bounds: The bounds every phrase is measured against.
         budget: The room this sentence has.
+        lead: The kind the result opened on, or None on its first sentence.
 
     Returns:
         The kind, and the kind whose mark it closes on.
@@ -2026,12 +2097,25 @@ def _kind_for(
 
         return budget[1] - (len(quote[0]) + len(quote[1]) if quote else 0)
 
-    usable = tuple(
-        type_
-        for type_ in settings.types
-        if any(fits(mark, room_of(type_)) for mark in marks_of(type_))
+    # A paragraph stays in the register it opened in. A line somebody speaks is a line,
+    # and the next one is another line of the same speech; prose about it may ask and
+    # exclaim without stopping being prose. Nothing to keep to on the first sentence,
+    # which is where the register comes from.
+    family = (
+        settings.types
+        if lead is None
+        else tuple(
+            type_
+            for type_ in settings.types
+            if (type_ == lead if lead in QUOTED_TYPES else type_ not in QUOTED_TYPES)
+        )
     )
-    type_ = pick(usable or settings.types)
+    wanted = family or settings.types
+    usable = tuple(
+        type_ for type_ in wanted if any(fits(mark, room_of(type_)) for mark in marks_of(type_))
+    )
+    pool = usable or wanted
+    type_ = lead if lead is not None and lead in pool and chance(LEAD_CHANCE) else pick(pool)
     marks = tuple(mark for mark in marks_of(type_) if fits(mark, room_of(type_)))
 
     return type_, pick(marks or marks_of(type_))
@@ -2073,14 +2157,17 @@ def _generate_result(language: WordLanguage, settings: Settings) -> list[Built]:
     )
     built: list[Built] = []
     topic: Topic | None = None
+    scene: Mapping[SentenceSlot, Requirement] = {}
+    # What the result opened on, which is what the rest of it keeps to.
+    lead: SentenceType | None = None
     # The result's own voice, settled once. A caller who named a level gets that one
     # throughout; one who did not gets a paragraph that is at least consistent with
     # itself, rather than a level rerolled every sentence.
     voice = settings.style if settings.style is not None else pick(STYLES)
 
     for budget in budgets:
-        type_, mark = _kind_for(data, settled, room, budget)
-        follow = None if topic is None else _follow_for(data, topic)
+        type_, mark = _kind_for(data, settled, room, budget, lead)
+        follow = None if topic is None else _follow_for(data, topic, scene)
         draw = Draw(
             budget,
             type_,
@@ -2110,6 +2197,10 @@ def _generate_result(language: WordLanguage, settings: Settings) -> list[Built]:
                 one = bare
 
         built.append(one)
+        scene = one.scene
+
+        if lead is None:
+            lead = type_
 
         if topic is None:
             topic = _topic_of(one)
@@ -2151,17 +2242,19 @@ def _generate_one(language: WordLanguage, settings: Settings, draw: Draw) -> Bui
     # The words a caller required go in the first sentence — once in the result rather
     # than once in every sentence of it.
     requirements = [] if follow is not None else [_classify(language, w) for w in settings.include]
-    carried = (
-        Requirement(
+    # What the result has already put on the page and this sentence keeps: its subject
+    # when the topic is being named again, and every noun of its scene.
+    pinned: dict[SentenceSlot, Requirement] = dict(follow.scene) if follow is not None else {}
+
+    if follow is not None and follow.reference == "repeat":
+        pinned["subject"] = Requirement(
             follow.topic.noun,
             ("subject",),
             theme=follow.topic.theme,
             known=follow.topic.theme is not None,
         )
-        if follow is not None and follow.reference == "repeat"
-        else None
-    )
-    plans = {id(frame): _plan_for(frame, requirements, carried) for frame in allowed}
+
+    plans = {id(frame): _plan_for(frame, requirements, pinned) for frame in allowed}
     low, high = budget
 
     def buildable(frame: SentenceFrame) -> bool:
