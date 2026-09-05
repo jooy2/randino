@@ -274,4 +274,4 @@ rand_modifier(language="en", realism="invented")  # 'Snikith'
 - [`randWord`](../word/rand-word) — 이 함수가 주로 앞에 붙는 단어들.
 - [`randSuffix`](./rand-suffix) — 단어 대신 무작위 토큰.
 - [`randNickname`](../nickname/rand-nickname) — 같은 단어 풀을 장식이 아니라 조합으로 쓰는 쪽.
-- [지원 언어](../guide/languages#words-and-nicknames) — 왜 9개가 아니라 4개인지.
+- [지원 언어](../guide/languages#words-and-nicknames) — 언어마다 수식어가 어디에 놓이고 언제 모양이 바뀌는지.

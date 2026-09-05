@@ -157,7 +157,7 @@ rand_modifier("Zzyzx", language="es")  # 'Zzyzx dorado' — not a word it knows
 
 :::
 
-The six languages whose modifiers do not change shape — `ko`, `en`, `ja`, `zh`, `vi` — are unaffected: there is nothing to agree with, so any value gets any modifier.
+The five languages whose modifiers do not change shape — `ko`, `en`, `ja`, `zh` and `vi` — are unaffected: there is nothing to agree with, so any value gets any modifier.
 
 ## `kind` picks what the modifier says
 
@@ -274,4 +274,4 @@ A modifier in front of a word is exactly what `randNickname` does most of the ti
 - [`randWord`](../word/rand-word) — the words this is usually put in front of.
 - [`randSuffix`](./rand-suffix) — a random token instead of a word.
 - [`randNickname`](../nickname/rand-nickname) — the same pools, composed rather than decorated.
-- [Supported languages](../guide/languages#words-and-nicknames) — why there are four of them and not nine.
+- [Supported languages](../guide/languages#words-and-nicknames) — where the modifier goes in each language, and when it changes shape.
