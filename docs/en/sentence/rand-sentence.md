@@ -48,6 +48,7 @@ Every option is optional, and the defaults are what the empty call above uses.
 | `shape` | <Lang js="SentenceShapeOption" dart="SentenceShape?" py="SentenceShapeOption" code /> | <Lang js="'all'" dart="null" py="&quot;all&quot;" code /> | How much the sentence says. See [How much it says](#how-much-it-says). |
 | `slots` | <Lang js="SentenceSlotOption" dart="Set&lt;SentenceSlot&gt;?" py="SentenceSlotOption" code /> | <Lang js="'all'" dart="null" py="&quot;all&quot;" code /> | Which parts it carries beside the subject. See [Picking the shape](#picking-the-shape). |
 | `include` | <Lang js="string &#124; string[]" dart="List&lt;String&gt;" py="str &#124; Sequence[str]" code /> | <Lang js="—" dart="const []" py="()" code /> | Words every sentence has to contain. See [Words it has to contain](#words-it-has-to-contain). |
+| `sentences` | <Lang js="number" dart="int" py="int" code /> | `1` | How many sentences one result holds. See [More than one sentence](#more-than-one-sentence). |
 | `count` | <Lang js="number" dart="int" py="int" code /> | `1` | How many sentences to return. Clamped to `0` … `10000`. |
 | `realism` | `RandRealism` | <Lang js="`'real'`" dart="`RandRealism.real`" py="`\"real\"`" /> | `real` uses real words, `invented` builds words that only read like the language, and `mixed` decides per word. The grammar stays real either way. |
 | <Lang js="minLength" dart="minLength" py="min_length" code /> | <Lang js="number" dart="int?" py="int &#124; None" code /> | _language_ | Minimum length in characters, punctuation included. |
@@ -56,7 +57,7 @@ Every option is optional, and the defaults are what the empty call above uses.
 | `unique` | <Lang js="boolean" dart="bool" py="bool" code /> | <Lang js="false" dart="false" py="False" code /> | Never return the same sentence twice. May return fewer than `count`. |
 | `output` | <Lang js="RandOutput" py="RandOutput" code /> | <Lang js="'value'" py="&quot;value&quot;" code /> | Strings, or a `SentenceDetail` per sentence. Dart has no such parameter — see [the detail output](#the-detail-output). |
 
-Both length bounds are clamped to <Lang js="RAND_SENTENCE_LENGTH_MAX" dart="randSentenceLengthMax" py="RAND_SENTENCE_LENGTH_MAX" code /> rather than to the ceiling the other generators use. A sentence is many words where a name, a word and a nickname are at most three.
+Both length bounds are clamped to <Lang js="RAND_SENTENCE_LENGTH_MAX" dart="randSentenceLengthMax" py="RAND_SENTENCE_LENGTH_MAX" code /> **per sentence** rather than to the ceiling the other generators use. A sentence is many words where a name, a word and a nickname are at most three, and a result of ten of them is allowed ten times that.
 
 ## Every language
 
@@ -323,6 +324,84 @@ A word can be more than one thing, and which it becomes depends on the rest. Eng
 
 Two things follow from that. A sentence has room for **as many words as it has phrases**, so asking for more than the longest shape can carry places what fits and leaves the rest out. And with no `language`, the languages whose pools actually hold every word you named are preferred, so `include: '고양이'` produces Korean.
 
+## More than one sentence {#more-than-one-sentence}
+
+`sentences` puts more than one sentence in **one result**. They come back as a single string — `count` is still how many strings there are — and they are about the same thing rather than being that many separate draws.
+
+::: lang js
+
+```javascript
+randSentence({ language: 'en', sentences: 3, count: 2 });
+// ['Tomorrow, the gentle shepherd stretches. The juggler guards the wild coda. But the cheerful miner walks softly.',
+//  'The temperance remains in the avalanche. Later the temperance gathers. It lingers once more.']
+
+randSentence({ language: 'ko', sentences: 3 });
+// ['수상한 단술이 익는다. 하지만 옅은 단술이 식는다. 순진한 단술이 식는다.']
+```
+
+:::
+
+::: lang dart
+
+```dart
+randSentence(language: WordLanguage.en, sentences: 3, count: 2);
+// [Tomorrow, the gentle shepherd stretches. The juggler guards the wild coda. But the cheerful miner walks softly.,
+//  The temperance remains in the avalanche. Later the temperance gathers. It lingers once more.]
+
+randSentence(language: WordLanguage.ko, sentences: 3);
+// [수상한 단술이 익는다. 하지만 옅은 단술이 식는다. 순진한 단술이 식는다.]
+```
+
+:::
+
+::: lang py
+
+```python
+rand_sentence(language="en", sentences=3, count=2)
+# ['Tomorrow, the gentle shepherd stretches. The juggler guards the wild coda. But the cheerful miner walks softly.',
+#  'The temperance remains in the avalanche. Later the temperance gathers. It lingers once more.']
+
+rand_sentence(language="ko", sentences=3)
+# ['수상한 단술이 익는다. 하지만 옅은 단술이 식는다. 순진한 단술이 식는다.']
+```
+
+:::
+
+**The first sentence sets the topic**, and every sentence after it stays on it. It names that subject again, stands a pronoun where it was, or draws a fresh noun of the same kind — a paragraph that opens on a creature never wanders into an idea halfway through — and it may open on a connective (`But`, `하지만`, `そして`).
+
+What a language does for the pronoun is its own business. English writes `it`; Korean, Japanese, Chinese, Spanish and Italian leave the subject out entirely, which is what they actually do in a second sentence; German and Russian pick it by the noun's gender. A language whose written pronoun cannot stand for a person — English `he` and `she` need a gender the pools do not carry, and `그것`, `それ`, `它` and `nó` are inanimate — names the topic again instead.
+
+**The length range describes the whole string**, whatever the sentence count. It is shared out across the sentences before any of them is drawn, and the last one takes the rounding.
+
+::: lang js
+
+```javascript
+randSentence({ language: 'ko', sentences: 3, minLength: 40, maxLength: 55 });
+// ['반달이 함께 깊어진다. 그리고 별똥별이 역에서 물든다. 아침에 그것이 조용해진다.'] // 45 characters
+```
+
+:::
+
+::: lang dart
+
+```dart
+randSentence(language: WordLanguage.ko, sentences: 3, minLength: 40, maxLength: 55);
+// [반달이 함께 깊어진다. 그리고 별똥별이 역에서 물든다. 아침에 그것이 조용해진다.] // 45 characters
+```
+
+:::
+
+::: lang py
+
+```python
+rand_sentence(language="ko", sentences=3, min_length=40, max_length=55)
+# ['반달이 함께 깊어진다. 그리고 별똥별이 역에서 물든다. 아침에 그것이 조용해진다.']  # 45 characters
+```
+
+:::
+
+`include` goes in the first sentence, which puts each word in the result once rather than once per sentence. `sentences` is clamped to <Lang js="RAND_SENTENCE_COUNT_MAX" dart="randSentenceCountMax" py="RAND_SENTENCE_COUNT_MAX" code />, which is ten — already a paragraph.
+
 ## The detail output {#the-detail-output}
 
 `output: 'detail'` reports the pieces each sentence was built from — the phrases in order, what each of them does, the language and the subject's theme — instead of returning a string.
@@ -339,6 +418,7 @@ Dart spells this as a **second function**, `randSentenceDetails`, because it has
 randSentence({ language: 'ko', output: 'detail', count: 1 });
 // [{
 //   sentence: '그리핀이 자줏빛 숲에서 총명한 고량주를 삼킨다.',
+//   sentences: ['그리핀이 자줏빛 숲에서 총명한 고량주를 삼킨다.'],
 //   phrases: ['그리핀', '자줏빛 숲', '총명한 고량주', '삼킨다'],
 //   slots: ['subject', 'place', 'object', 'verb'],
 //   language: 'ko',
@@ -365,6 +445,7 @@ randSentenceDetails(language: WordLanguage.ko).first.slots;
 ```python
 rand_sentence(language="ko", output="detail", count=1)
 # [SentenceDetail(sentence='그리핀이 자줏빛 숲에서 총명한 고량주를 삼킨다.',
+#                 sentences=('그리핀이 자줏빛 숲에서 총명한 고량주를 삼킨다.',),
 #                 phrases=('그리핀', '자줏빛 숲', '총명한 고량주', '삼킨다'),
 #                 slots=('subject', 'place', 'object', 'verb'),
 #                 language='ko', theme='myth')]
@@ -374,11 +455,12 @@ rand_sentence(language="ko", output="detail", count=1)
 
 | Field | Type | Description |
 | --- | --- | --- |
-| `sentence` | <Lang js="string" dart="String" py="str" code /> | The finished sentence, punctuation and all. |
-| `phrases` | <Lang js="string[]" dart="List&lt;String&gt;" py="tuple[str, ...]" code /> | The phrases it is made of, in order — without the particles. |
+| `sentence` | <Lang js="string" dart="String" py="str" code /> | The finished result, punctuation and all — every sentence of it, joined. |
+| `sentences` | <Lang js="string[]" dart="List&lt;String&gt;" py="tuple[str, ...]" code /> | One entry per sentence. A single entry unless `sentences` asked for more. |
+| `phrases` | <Lang js="string[]" dart="List&lt;String&gt;" py="tuple[str, ...]" code /> | The phrases it is made of, in order — without the particles. One flat list across every sentence. |
 | `slots` | <Lang js="SentenceSlot[]" dart="List&lt;SentenceSlot&gt;" py="tuple[SentenceSlot, ...]" code /> | What each phrase does, at the same index as `phrases`. |
 | `language` | `WordLanguage` | The language this sentence was generated in. |
-| `theme` | <Lang js="WordTheme &#124; null" dart="WordTheme?" py="WordTheme &#124; None" code /> | Theme of the subject, or null when that word is not one the generator knows. |
+| `theme` | <Lang js="WordTheme &#124; null" dart="WordTheme?" py="WordTheme &#124; None" code /> | Theme of the subject — the first sentence's, which is what the rest stay about. Null when that word is not one the generator knows. |
 
 `phrases` holds the phrases and nothing else. The particle or preposition that marks one lives in `sentence` alone, so `그리핀이 …` reports `그리핀` and joining the phrases back together does not reproduce the sentence. Read `sentence` for the finished string, and `phrases` for what it was built from.
 

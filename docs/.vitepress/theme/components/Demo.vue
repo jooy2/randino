@@ -3,6 +3,7 @@ import { computed, onMounted, reactive, ref, watch } from 'vue';
 import { useData } from 'vitepress';
 import {
 	NAME_LANGUAGES,
+	RAND_SENTENCE_COUNT_MAX,
 	WORD_LANGUAGES,
 	WORD_THEMES,
 	nameLengthRange,
@@ -112,6 +113,7 @@ const sentence = reactive({
 	theme: 'all',
 	shape: 'all',
 	slots: 'all',
+	sentences: 1,
 	count: 8,
 	realism: 'real',
 	minLength: '',
@@ -158,6 +160,7 @@ const options = computed(() => {
 		if (sentence.theme !== 'all') out.theme = sentence.theme;
 		if (sentence.shape !== 'all') out.shape = sentence.shape;
 		if (sentence.slots !== 'all') out.slots = sentence.slots;
+		if (Number(sentence.sentences) > 1) out.sentences = Number(sentence.sentences);
 		if (included.value.length) out.include = included.value;
 		if (sentence.count !== 1) out.count = Number(sentence.count);
 		if (sentence.realism !== 'real') out.realism = sentence.realism;
@@ -243,7 +246,11 @@ const fallbackRange = computed(() => {
 	}
 
 	if (tab.value === 'sentence') {
-		return sentenceLengthRange(sentence.language);
+		const [low, high] = sentenceLengthRange(sentence.language);
+		// The bounds describe the whole result, so the placeholder does too.
+		const count = Number(sentence.sentences) || 1;
+
+		return [low * count, high * count];
 	}
 
 	return nicknameLengthRange(nickname.language, nickname.wordSeparator);
@@ -585,6 +592,16 @@ async function copy() {
 						v-model="sentence.include"
 						type="text"
 						:placeholder="t(locale, 'demoIncludeHint')"
+					/>
+				</label>
+
+				<label class="randino-demo-field">
+					<span><code>sentences</code></span>
+					<input
+						v-model.number="sentence.sentences"
+						type="number"
+						min="1"
+						:max="RAND_SENTENCE_COUNT_MAX"
 					/>
 				</label>
 

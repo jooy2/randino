@@ -48,6 +48,7 @@ rand_sentence()
 | `shape` | <Lang js="SentenceShapeOption" dart="SentenceShape?" py="SentenceShapeOption" code /> | <Lang js="'all'" dart="null" py="&quot;all&quot;" code /> | 문장이 얼마나 많은 것을 말하는지. [얼마나 말할지](#how-much-it-says) 참고. |
 | `slots` | <Lang js="SentenceSlotOption" dart="Set&lt;SentenceSlot&gt;?" py="SentenceSlotOption" code /> | <Lang js="'all'" dart="null" py="&quot;all&quot;" code /> | 주어 옆에 무엇을 두는지. [형태 고르기](#picking-the-shape) 참고. |
 | `include` | <Lang js="string &#124; string[]" dart="List&lt;String&gt;" py="str &#124; Sequence[str]" code /> | <Lang js="—" dart="const []" py="()" code /> | 모든 문장에 반드시 들어가야 할 단어. [반드시 넣을 단어](#words-it-has-to-contain) 참고. |
+| `sentences` | <Lang js="number" dart="int" py="int" code /> | `1` | 결과 하나에 담을 문장 수. [문장을 여러 개](#more-than-one-sentence) 참고. |
 | `count` | <Lang js="number" dart="int" py="int" code /> | `1` | 돌려줄 문장 개수. `0` … `10000`으로 제한됩니다. |
 | `realism` | `RandRealism` | <Lang js="`'real'`" dart="`RandRealism.real`" py="`\"real\"`" /> | `real`은 실제 단어를, `invented`는 그 언어처럼 읽히기만 하는 단어를 씁니다. `mixed`는 단어마다 정합니다. 문법은 어느 쪽이든 실제 그대로입니다. |
 | <Lang js="minLength" dart="minLength" py="min_length" code /> | <Lang js="number" dart="int?" py="int &#124; None" code /> | _언어_ | 문장 부호를 포함한 최소 글자 수. |
@@ -56,7 +57,7 @@ rand_sentence()
 | `unique` | <Lang js="boolean" dart="bool" py="bool" code /> | <Lang js="false" dart="false" py="False" code /> | 같은 문장을 두 번 돌려주지 않습니다. `count`보다 적게 돌아올 수 있습니다. |
 | `output` | <Lang js="RandOutput" py="RandOutput" code /> | <Lang js="'value'" py="&quot;value&quot;" code /> | 문자열, 또는 문장마다 `SentenceDetail` 하나. Dart에는 이 옵션이 없습니다. [상세 출력](#the-detail-output) 참고. |
 
-두 길이 옵션은 다른 생성기가 쓰는 상한이 아니라 <Lang js="RAND_SENTENCE_LENGTH_MAX" dart="randSentenceLengthMax" py="RAND_SENTENCE_LENGTH_MAX" code />으로 제한됩니다. 이름과 단어와 닉네임은 길어야 세 단어지만 문장은 여러 단어이기 때문입니다.
+두 길이 옵션은 다른 생성기가 쓰는 상한이 아니라 **문장 하나당** <Lang js="RAND_SENTENCE_LENGTH_MAX" dart="randSentenceLengthMax" py="RAND_SENTENCE_LENGTH_MAX" code />으로 제한됩니다. 이름과 단어와 닉네임은 길어야 세 단어지만 문장은 여러 단어이고, 열 문장짜리 결과에는 그 열 배까지 허용됩니다.
 
 ## 모든 언어 {#every-language}
 
@@ -323,6 +324,84 @@ rand_sentence(language="ko", include=["사자", "조용히"], count=2)
 
 여기서 두 가지가 따라옵니다. 문장은 **구의 개수만큼** 단어를 담을 수 있으므로, 가장 긴 형태가 감당하는 것보다 많이 요청하면 들어가는 것만 넣고 나머지는 빠집니다. 그리고 `language`를 지정하지 않으면 적은 단어를 모두 가진 언어가 먼저 뽑히므로, `include: '고양이'`는 한국어 문장을 만듭니다.
 
+## 문장을 여러 개 {#more-than-one-sentence}
+
+`sentences`는 **결과 하나**에 문장을 여러 개 담습니다. 문자열 하나로 돌아오고 — 문자열이 몇 개인지는 여전히 `count`가 정합니다 — 그 문장들은 따로 뽑은 것이 아니라 같은 것에 관한 이야기입니다.
+
+::: lang js
+
+```javascript
+randSentence({ language: 'en', sentences: 3, count: 2 });
+// ['Tomorrow, the gentle shepherd stretches. The juggler guards the wild coda. But the cheerful miner walks softly.',
+//  'The temperance remains in the avalanche. Later the temperance gathers. It lingers once more.']
+
+randSentence({ language: 'ko', sentences: 3 });
+// ['수상한 단술이 익는다. 하지만 옅은 단술이 식는다. 순진한 단술이 식는다.']
+```
+
+:::
+
+::: lang dart
+
+```dart
+randSentence(language: WordLanguage.en, sentences: 3, count: 2);
+// [Tomorrow, the gentle shepherd stretches. The juggler guards the wild coda. But the cheerful miner walks softly.,
+//  The temperance remains in the avalanche. Later the temperance gathers. It lingers once more.]
+
+randSentence(language: WordLanguage.ko, sentences: 3);
+// [수상한 단술이 익는다. 하지만 옅은 단술이 식는다. 순진한 단술이 식는다.]
+```
+
+:::
+
+::: lang py
+
+```python
+rand_sentence(language="en", sentences=3, count=2)
+# ['Tomorrow, the gentle shepherd stretches. The juggler guards the wild coda. But the cheerful miner walks softly.',
+#  'The temperance remains in the avalanche. Later the temperance gathers. It lingers once more.']
+
+rand_sentence(language="ko", sentences=3)
+# ['수상한 단술이 익는다. 하지만 옅은 단술이 식는다. 순진한 단술이 식는다.']
+```
+
+:::
+
+**화제는 첫 문장이 정합니다.** 뒤따르는 문장은 그 주어를 다시 부르거나, 그 자리에 대명사를 세우거나, 같은 부류의 다른 명사를 뽑습니다. 생물로 시작한 문단이 중간에 개념으로 새지 않는다는 뜻입니다. 접속사(`But`, `하지만`, `そして`)로 시작하기도 합니다.
+
+대명사를 어떻게 쓸지는 언어마다 다릅니다. 영어는 `it`을 쓰고, 한국어·일본어·중국어·스페인어·이탈리아어는 주어를 아예 생략합니다. 두 번째 문장에서 실제로 그렇게 쓰기 때문입니다. 독일어와 러시아어는 명사의 성에 따라 고릅니다. 사람을 가리킬 수 없는 대명사만 가진 언어 — 영어의 `he`/`she`는 풀에 없는 성이 필요하고 `그것`, `それ`, `它`, `nó`는 무생물입니다 — 는 대신 화제를 다시 부릅니다.
+
+**길이 범위는 문장 수와 무관하게 문자열 전체를 가리킵니다.** 어느 문장도 뽑기 전에 범위를 나눠 갖고, 나머지는 마지막 문장이 떠안습니다.
+
+::: lang js
+
+```javascript
+randSentence({ language: 'ko', sentences: 3, minLength: 40, maxLength: 55 });
+// ['반달이 함께 깊어진다. 그리고 별똥별이 역에서 물든다. 아침에 그것이 조용해진다.'] // 45자
+```
+
+:::
+
+::: lang dart
+
+```dart
+randSentence(language: WordLanguage.ko, sentences: 3, minLength: 40, maxLength: 55);
+// [반달이 함께 깊어진다. 그리고 별똥별이 역에서 물든다. 아침에 그것이 조용해진다.] // 45자
+```
+
+:::
+
+::: lang py
+
+```python
+rand_sentence(language="ko", sentences=3, min_length=40, max_length=55)
+# ['반달이 함께 깊어진다. 그리고 별똥별이 역에서 물든다. 아침에 그것이 조용해진다.']  # 45자
+```
+
+:::
+
+`include`에 적은 단어는 첫 문장에 들어갑니다. 문장마다 한 번씩이 아니라 결과에 한 번씩 넣기 위해서입니다. `sentences`는 <Lang js="RAND_SENTENCE_COUNT_MAX" dart="randSentenceCountMax" py="RAND_SENTENCE_COUNT_MAX" code />인 10으로 제한됩니다. 열 문장이면 이미 한 문단입니다.
+
 ## 상세 출력 {#the-detail-output}
 
 `output: 'detail'`은 문자열 대신 각 문장을 이루는 요소를 알려줍니다. 순서대로의 구, 각 구가 하는 일, 언어, 그리고 주어의 테마입니다.
@@ -339,6 +418,7 @@ Dart에서는 이것이 **별도 함수** `randSentenceDetails`입니다. 인자
 randSentence({ language: 'ko', output: 'detail', count: 1 });
 // [{
 //   sentence: '그리핀이 자줏빛 숲에서 총명한 고량주를 삼킨다.',
+//   sentences: ['그리핀이 자줏빛 숲에서 총명한 고량주를 삼킨다.'],
 //   phrases: ['그리핀', '자줏빛 숲', '총명한 고량주', '삼킨다'],
 //   slots: ['subject', 'place', 'object', 'verb'],
 //   language: 'ko',
@@ -365,6 +445,7 @@ randSentenceDetails(language: WordLanguage.ko).first.slots;
 ```python
 rand_sentence(language="ko", output="detail", count=1)
 # [SentenceDetail(sentence='그리핀이 자줏빛 숲에서 총명한 고량주를 삼킨다.',
+#                 sentences=('그리핀이 자줏빛 숲에서 총명한 고량주를 삼킨다.',),
 #                 phrases=('그리핀', '자줏빛 숲', '총명한 고량주', '삼킨다'),
 #                 slots=('subject', 'place', 'object', 'verb'),
 #                 language='ko', theme='myth')]
@@ -374,11 +455,12 @@ rand_sentence(language="ko", output="detail", count=1)
 
 | 필드 | 타입 | 설명 |
 | --- | --- | --- |
-| `sentence` | <Lang js="string" dart="String" py="str" code /> | 문장 부호까지 포함한 완성된 문장. |
-| `phrases` | <Lang js="string[]" dart="List&lt;String&gt;" py="tuple[str, ...]" code /> | 문장을 이루는 구를 순서대로. 조사는 빠져 있습니다. |
+| `sentence` | <Lang js="string" dart="String" py="str" code /> | 문장 부호까지 포함한 완성된 결과. 모든 문장을 이어 붙인 것입니다. |
+| `sentences` | <Lang js="string[]" dart="List&lt;String&gt;" py="tuple[str, ...]" code /> | 문장마다 하나씩. `sentences`로 더 요청하지 않았다면 항목 하나입니다. |
+| `phrases` | <Lang js="string[]" dart="List&lt;String&gt;" py="tuple[str, ...]" code /> | 문장을 이루는 구를 순서대로. 조사는 빠져 있습니다. 모든 문장을 통틀어 한 줄로 이어집니다. |
 | `slots` | <Lang js="SentenceSlot[]" dart="List&lt;SentenceSlot&gt;" py="tuple[SentenceSlot, ...]" code /> | 각 구가 하는 일. `phrases`와 같은 인덱스입니다. |
 | `language` | `WordLanguage` | 이 문장을 만든 언어. |
-| `theme` | <Lang js="WordTheme &#124; null" dart="WordTheme?" py="WordTheme &#124; None" code /> | 주어의 테마. 생성기가 모르는 단어면 null입니다. |
+| `theme` | <Lang js="WordTheme &#124; null" dart="WordTheme?" py="WordTheme &#124; None" code /> | 주어의 테마. 첫 문장의 것이고, 나머지 문장이 계속 이야기하는 대상입니다. 생성기가 모르는 단어면 null입니다. |
 
 `phrases`에는 구만 들어 있습니다. 구를 표시하는 조사나 전치사는 `sentence`에만 있으므로, `그리핀이 …`는 `그리핀`으로 보고되고 구를 다시 이어 붙여도 원래 문장이 되지 않습니다. 완성된 문자열은 `sentence`에서, 그 문장을 이루는 요소는 `phrases`에서 읽으세요.
 
