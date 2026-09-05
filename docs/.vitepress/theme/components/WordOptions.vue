@@ -8,11 +8,11 @@ import { isPhrase, isVariants, wordOptionRows } from '../../data/wordOptions';
 /**
  * The option table `randWord` and its twenty-five themed forms share.
  *
- * Fifteen pages take the same options, and the only difference is that the
+ * Twenty-six pages take the same options, and the only difference is that the
  * themed ones answer `theme` rather than accepting it. Written out in Markdown
- * that is thirty copies of one table — in two locales, with three packages'
+ * that is fifty-two copies of one table — in two locales, with three packages'
  * types in every cell — and an option added to the generator would have to be
- * added to all thirty. So the rows live in `data/wordOptions.ts` and this draws
+ * added to every one of them. So the rows live in `data/wordOptions.ts` and this draws
  * them; `llms-full.txt` draws the same rows as plain Markdown.
  *
  * The **row labels are the option names themselves**, which is the rule the

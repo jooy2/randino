@@ -1,14 +1,14 @@
 /**
  * The options `randWord` and its twenty-five themed forms take, as data.
  *
- * Fifteen pages document the same table, in two locales, with three packages'
+ * Twenty-six pages document the same table, in two locales, with three packages'
  * types in every cell — so it is written once here and drawn from two places:
  * `theme/components/WordOptions.vue` for the site, and `wordOptionsTable` in
  * `markdown.ts` for `llms-full.txt`, which has no CSS to hide a variant with
  * and no Vue to render a component.
  *
  * Adding an option to the generator is one row here. Writing it out in Markdown
- * instead would be thirty edits, and the thirtieth is the one that gets missed.
+ * instead would be fifty-two edits, and the last one is the one that gets missed.
  */
 
 import type { StringKey } from './i18n';
@@ -71,10 +71,10 @@ export const WORD_OPTIONS: readonly WordOptionRow[] = [
 		about: 'optionCount'
 	},
 	{
-		name: 'style',
-		type: { js: 'number', dart: 'int', py: 'int' },
-		fallback: '0',
-		about: 'optionStyle'
+		name: 'realism',
+		type: { js: 'RandRealism', dart: 'RandRealism', py: 'RandRealism' },
+		fallback: { js: "'real'", dart: 'RandRealism.real', py: '"real"' },
+		about: 'optionRealism'
 	},
 	{
 		name: { js: 'minLength', dart: 'minLength', py: 'min_length' },

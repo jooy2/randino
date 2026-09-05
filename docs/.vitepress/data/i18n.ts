@@ -61,9 +61,9 @@ const strings = {
 		ko: '돌려줄 단어 개수. 0 … 10000으로 제한됩니다.',
 		en: 'How many words to return. Clamped to 0 … 10000.'
 	},
-	optionStyle: {
-		ko: '0은 실제 단어를 뽑고, 100은 그 언어처럼 읽히기만 하는 단어를 만들어냅니다.',
-		en: '0 draws real words, 100 invents words that only read like the language.'
+	optionRealism: {
+		ko: 'real은 풀에서 단어를 뽑고, invented는 그 언어처럼 읽히기만 하는 단어를 만들어냅니다. mixed는 단어마다 정합니다.',
+		en: 'real draws from the pools, invented builds words that only read like the language, and mixed decides per word.'
 	},
 	optionMinLength: {
 		ko: '최소 글자 수. 생략하면 단어 풀이 담고 있는 범위를 따릅니다.',
