@@ -338,6 +338,27 @@ enum SentenceShape {
   complex,
 }
 
+/// What a sentence is doing, which decides what it closes on and — where the
+/// grammar needs it — the shape it takes.
+///
+/// A question is a shape, not a punctuation mark bolted on: English writes
+/// `Does the lion run?` and German `Läuft ein Wolf?`, and both are shapes their
+/// own frames declare. A language whose question differs from its statement by
+/// nothing but the mark declares none, and gets its statement shapes back.
+enum SentenceType {
+  /// Says something: `사자가 달린다.`
+  statement,
+
+  /// Asks it: `사자가 달리니?`, `Does the lion run?`
+  question,
+
+  /// Says it with feeling, usually behind an interjection: `와, 사자가 달린다!`
+  exclamation,
+
+  /// A statement that stops rather than ends: `사자가 달린다…`
+  trailing,
+}
+
 /// A generated sentence with the pieces it was built from.
 class SentenceDetail {
   /// Creates a detail record. Returned by the generator; there is rarely a
@@ -348,6 +369,7 @@ class SentenceDetail {
     required this.phrases,
     required this.slots,
     required this.names,
+    required this.types,
     required this.language,
     required this.theme,
   });
@@ -377,6 +399,9 @@ class SentenceDetail {
   /// Empty unless `includeName` asked for them. Every one of them is also a
   /// phrase.
   final List<String> names;
+
+  /// What each sentence is doing, at the same index as [sentences].
+  final List<SentenceType> types;
 
   /// The language this sentence was generated in.
   final WordLanguage language;

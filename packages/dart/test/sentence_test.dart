@@ -15,15 +15,15 @@ const int sample = 60;
 
 /// Everything a sentence of the language may be written with, punctuation aside.
 final Map<WordLanguage, RegExp> script = <WordLanguage, RegExp>{
-  WordLanguage.en: RegExp(r"^[A-Za-z' ,.]+$"),
-  WordLanguage.ko: RegExp(r'^[가-힣 .]+$'),
-  WordLanguage.ja: RegExp(r'^[々぀-ヿ一-鿿。]+$'),
-  WordLanguage.zh: RegExp(r'^[々一-鿿。]+$'),
-  WordLanguage.vi: RegExp(r'^[a-zA-ZÀ-ỹ ,.]+$'),
-  WordLanguage.es: RegExp(r'^[a-zA-ZÀ-ÿ ,.]+$'),
-  WordLanguage.it: RegExp(r"^[a-zA-ZÀ-ÿ' ,.]+$"),
-  WordLanguage.de: RegExp(r'^[a-zA-ZÀ-ÿß ,.]+$'),
-  WordLanguage.ru: RegExp(r'^[Ѐ-ӿ ,.]+$'),
+  WordLanguage.en: RegExp(r"^[A-Za-z' ,.?!…]+$"),
+  WordLanguage.ko: RegExp(r'^[가-힣 ,.?!…]+$'),
+  WordLanguage.ja: RegExp(r'^[々぀-ヿ一-鿿。、？！…]+$'),
+  WordLanguage.zh: RegExp(r'^[々一-鿿。，？！…]+$'),
+  WordLanguage.vi: RegExp(r'^[a-zA-ZÀ-ỹ ,.?!…]+$'),
+  WordLanguage.es: RegExp(r'^[a-zA-ZÀ-ÿ ,.?!…¿¡]+$'),
+  WordLanguage.it: RegExp(r"^[a-zA-ZÀ-ÿ' ,.?!…]+$"),
+  WordLanguage.de: RegExp(r'^[a-zA-ZÀ-ÿß ,.?!…]+$'),
+  WordLanguage.ru: RegExp(r'^[Ѐ-ӿ ,.?!…]+$'),
 };
 
 /// A word as a sentence writes it — English stores its pools capitalized.
@@ -219,7 +219,7 @@ void main() {
 
     test('every language writes sentences in its own script, and closes them', () {
       for (final language in wordLanguages) {
-        final terminator = sentenceData[language]!.terminator;
+        final terminator = sentenceData[language]!.terminators[SentenceType.statement]!;
 
         for (final realism in RandRealism.values) {
           for (final sentence in randSentence(
@@ -654,11 +654,19 @@ void main() {
           expect(detail.sentences.join(data.space), detail.sentence);
 
           for (final sentence in detail.sentences) {
-            expect(sentence, endsWith(data.terminator), reason: '$language: $sentence');
+            expect(
+              sentence,
+              endsWith(data.terminators[SentenceType.statement]!),
+              reason: '$language: $sentence',
+            );
             expect(sentence, matches(script[language]!), reason: '$language: $sentence');
             // Every sentence closes exactly once, so two of them were never run
             // together into one entry.
-            expect(sentence.split(data.terminator).length - 1, 1, reason: '$language: $sentence');
+            expect(
+              sentence.split(data.terminators[SentenceType.statement]!).length - 1,
+              1,
+              reason: '$language: $sentence',
+            );
             expect(sentence.contains('  '), isFalse, reason: '$language: $sentence');
           }
         }
@@ -963,6 +971,238 @@ void main() {
 
         if (after == '이' || after == '은') {
           expect(coda, isTrue, reason: '$name$after (${detail.sentence})');
+        }
+      }
+    });
+
+    test('`type` decides what the sentence is doing, and what it closes on', () {
+      for (final language in wordLanguages) {
+        final data = sentenceData[language]!;
+
+        for (final type in SentenceType.values) {
+          for (final detail in randSentenceDetails(
+            language: language,
+            type: <SentenceType>{type},
+            count: sample,
+          )) {
+            expect(detail.types, <SentenceType>[type], reason: detail.sentence);
+            expect(
+              detail.sentence,
+              endsWith(data.terminators[type]!),
+              reason: '$language $type: ${detail.sentence}',
+            );
+            expect(detail.sentence, matches(script[language]!), reason: detail.sentence);
+
+            final opener = data.openers[type];
+
+            if (opener != null) {
+              expect(detail.sentence, startsWith(opener), reason: detail.sentence);
+            }
+          }
+        }
+      }
+
+      // Statements by default, and the option decides per sentence when it is
+      // given more than one to choose from.
+      for (final detail in randSentenceDetails(count: 40)) {
+        expect(detail.types, <SentenceType>[SentenceType.statement], reason: detail.sentence);
+      }
+
+      final seen = <SentenceType>{
+        for (final detail in randSentenceDetails(
+          language: WordLanguage.ko,
+          type: SentenceType.values.toSet(),
+          sentences: 3,
+          count: 120,
+        ))
+          ...detail.types,
+      };
+
+      expect(seen, hasLength(SentenceType.values.length));
+    });
+
+    test('a question is a shape, not a mark bolted onto a statement', () {
+      // The languages whose grammar moves for a question say so in their own
+      // frames, and the shape has to be one of those rather than the statement's.
+      final carries = <WordLanguage, RegExp>{
+        // English do-support, and the base form behind it.
+        WordLanguage.en: RegExp(r'^(Does|Is) '),
+        // Korean changes the ending on the predicate itself.
+        WordLanguage.ko: RegExp(r'니\?$'),
+        // A tag Japanese, Chinese and Vietnamese write after the whole clause.
+        WordLanguage.ja: RegExp(r'か？$'),
+        WordLanguage.zh: RegExp(r'吗？$'),
+        WordLanguage.vi: RegExp(r'không\?$'),
+      };
+
+      carries.forEach((language, shape) {
+        for (final sentence in randSentence(
+          language: language,
+          type: <SentenceType>{SentenceType.question},
+          count: sample,
+        )) {
+          expect(sentence, matches(shape), reason: '$language: $sentence');
+        }
+      });
+
+      // German moves its finite verb to the front, so the question opens on the
+      // predicate or on the `ist` that stands in for one.
+      final verbs = poolFor(WordLanguage.de, SentenceSlot.verb);
+
+      for (final sentence in randSentence(
+        language: WordLanguage.de,
+        type: <SentenceType>{SentenceType.question},
+        count: sample,
+      )) {
+        final first = sentence.split(' ').first.toLowerCase();
+
+        expect(verbs.contains(first) || first == 'ist', isTrue, reason: 'de: $sentence');
+      }
+    });
+
+    test('a question form pool is the same length as the words it restates', () {
+      // Index-aligned is the whole contract: a verb keeps its meaning across the
+      // forms, and a word the caller required is translated by its position.
+      for (final language in wordLanguages) {
+        final data = sentenceData[language]!;
+        final groups = <MapEntry<WordPool, PredicateForms>>[
+          for (final group in data.verbs) MapEntry(group.words, group.forms),
+          for (final group in data.states) MapEntry(group.words, group.forms),
+        ];
+
+        for (final group in groups) {
+          group.value.forEach((form, pool) {
+            expect(
+              pool,
+              hasLength(group.key.length),
+              reason: '$language: the $form pool is ${pool.length} beside ${group.key.length}',
+            );
+            expect(pool.every((word) => word.isNotEmpty), isTrue, reason: '$language: a blank');
+          });
+        }
+      }
+    });
+
+    test('a predicate is written in the form its type asks for', () {
+      // The question form where the group declares one, and the plain words where
+      // it does not — English states need none, because the shape moves `is` to
+      // the front and leaves `green` alone.
+      for (final language in wordLanguages) {
+        final data = sentenceData[language]!;
+        final verbForms = <String>[
+          for (final group in data.verbs) ...(group.forms[PredicateForm.question] ?? group.words),
+        ];
+        final stateForms = <String>[
+          for (final group in data.states) ...(group.forms[PredicateForm.question] ?? group.words),
+        ];
+        final expected = <SentenceSlot, Set<String>>{
+          SentenceSlot.verb: verbForms.toSet(),
+          // A predicate adjective that agrees comes out in the form its subject
+          // asked for, question or not.
+          SentenceSlot.state:
+              (data.predicateAgrees ? inflected(language, stateForms) : stateForms).toSet(),
+        };
+
+        for (final detail in randSentenceDetails(
+          language: language,
+          type: <SentenceType>{SentenceType.question},
+          count: 120,
+        )) {
+          for (var i = 0; i < detail.phrases.length; i += 1) {
+            final slot = detail.slots[i];
+
+            if (slot != SentenceSlot.verb && slot != SentenceSlot.state) continue;
+
+            final phrase = detail.phrases[i];
+            final written =
+                i == 0 ? phrase.substring(0, 1).toLowerCase() + phrase.substring(1) : phrase;
+            final pool = expected[slot]!;
+
+            expect(
+              pool.contains(written) || pool.contains(phrase),
+              isTrue,
+              reason: '$language: "$phrase" is not the $slot form a question asks for',
+            );
+          }
+        }
+      }
+    });
+
+    test('`include` puts a required predicate in the form the type asks for', () {
+      // The pools are index-aligned so that a word named in the statement form
+      // can be said the other way rather than written out wrong.
+      for (final sentence in randSentence(
+        language: WordLanguage.ko,
+        include: <String>['달린다'],
+        type: <SentenceType>{SentenceType.question},
+        count: 30,
+      )) {
+        expect(sentence, contains('달리니'), reason: sentence);
+        expect(sentence.contains('달린다'), isFalse, reason: sentence);
+      }
+
+      for (final sentence in randSentence(
+        language: WordLanguage.en,
+        include: <String>['runs'],
+        type: <SentenceType>{SentenceType.question},
+        count: 30,
+      )) {
+        expect(sentence, matches(RegExp(r'\brun\b')), reason: sentence);
+      }
+    });
+
+    test('an interjection opens an exclamation, and nothing else', () {
+      for (final language in wordLanguages) {
+        final data = sentenceData[language]!;
+        final openers = data.interjections
+            .map((word) => (data.capitalize ? upperFirst(word) : word) + data.space)
+            .toList(growable: false);
+
+        bool opens(String sentence) {
+          final mark = data.openers[SentenceType.exclamation];
+          final body = mark == null ? sentence : sentence.substring(mark.length);
+
+          return openers.any(body.startsWith);
+        }
+
+        var seen = 0;
+
+        for (final sentence in randSentence(
+          language: language,
+          type: <SentenceType>{SentenceType.exclamation},
+          count: 120,
+        )) {
+          if (opens(sentence)) seen += 1;
+        }
+
+        expect(seen, greaterThan(0), reason: '$language never wrote an interjection');
+
+        for (final sentence in randSentence(language: language, count: 120)) {
+          expect(opens(sentence), isFalse, reason: '$language: a statement opened on one');
+        }
+      }
+    });
+
+    test('every language can write every type inside its own length range', () {
+      for (final language in wordLanguages) {
+        final range = sentenceLengthRange(language);
+
+        for (final type in <SentenceType>[
+          SentenceType.question,
+          SentenceType.exclamation,
+          SentenceType.trailing,
+        ]) {
+          for (final sentence in randSentence(
+            language: language,
+            type: <SentenceType>{type},
+            count: 40,
+          )) {
+            expect(
+              sentence.length,
+              allOf(greaterThanOrEqualTo(range.min), lessThanOrEqualTo(range.max)),
+              reason: '$language $type: $sentence (${sentence.length})',
+            );
+          }
         }
       }
     });

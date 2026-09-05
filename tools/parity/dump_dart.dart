@@ -108,7 +108,14 @@ void main() {
       entry.key.name: <String, Object?>{
         'space': entry.value.space,
         'capitalize': entry.value.capitalize,
-        'terminator': entry.value.terminator,
+        'terminators': <String, Object?>{
+          for (final t in entry.value.terminators.entries) t.key.name: t.value,
+        },
+        // Optional in one package and defaulted in another; written as a map
+        // either way so the shapes compare.
+        'openers': <String, Object?>{
+          for (final t in entry.value.openers.entries) t.key.name: t.value,
+        },
         // Optional in one package and defaulted in another; written the same way
         // here either way, so the shapes compare.
         'predicateAgrees': entry.value.predicateAgrees,
@@ -126,6 +133,9 @@ void main() {
                   ? null
                   : <String>[for (final noun in group.object!) noun.name],
               'words': listed(group.words),
+              'forms': <String, Object?>{
+                for (final f in group.forms.entries) f.key.name: listed(f.value),
+              },
             },
         ],
         'states': <Object?>[
@@ -133,11 +143,15 @@ void main() {
             <String, Object?>{
               'subject': <String>[for (final noun in group.subject) noun.name],
               'words': listed(group.words),
+              'forms': <String, Object?>{
+                for (final f in group.forms.entries) f.key.name: listed(f.value),
+              },
             },
         ],
         'manners': listed(entry.value.manners),
         'times': listed(entry.value.times),
         'connectives': listed(entry.value.connectives),
+        'interjections': listed(entry.value.interjections),
         'pronouns': <String, Object?>{
           for (final g in entry.value.pronouns.entries) g.key.name: listed(g.value),
         },
@@ -159,6 +173,8 @@ void main() {
                   },
               ],
               'weight': frame.weight,
+              'mood': frame.mood.name,
+              'tag': frame.tag ?? '',
             },
         ],
       },

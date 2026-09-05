@@ -55,6 +55,7 @@ export 'src/types.dart'
         RandRealism,
         SentenceDetail,
         SentenceShape,
+        SentenceType,
         SentenceSlot,
         WordDetail,
         WordLanguage,

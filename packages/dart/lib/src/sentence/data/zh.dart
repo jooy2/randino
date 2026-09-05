@@ -9,7 +9,12 @@ import 'package:randino/src/word/data/types.dart';
 final SentenceLanguageData zh = SentenceLanguageData(
   space: '',
   capitalize: false,
-  terminator: '。',
+  terminators: const <SentenceType, String>{
+    SentenceType.statement: '。',
+    SentenceType.question: '？',
+    SentenceType.exclamation: '！',
+    SentenceType.trailing: '…',
+  },
   verbs: <VerbGroup>[
     VerbGroup(
       subject: const <NounClass>[NounClass.creature, NounClass.person],
@@ -161,6 +166,7 @@ final SentenceLanguageData zh = SentenceLanguageData(
       黄昏时
     '''),
   connectives: words(r'然后 所以 但是 不过 于是 后来 接着 同时 终于'),
+  interjections: words(r'啊， 哎呀， 哇， 唉， 天啊， 瞧， 咦，'),
   pronouns: const <WordGender, WordPool>{
     WordGender.n: <String>['', '它'],
   },
@@ -212,5 +218,45 @@ final SentenceLanguageData zh = SentenceLanguageData(
       SentencePart(SentenceSlot.verb),
       SentencePart(SentenceSlot.object, modifiable: true),
     ], 5),
+    // Chinese asks with 吗 after the whole clause, which is a tag rather than a
+    // phrase, and leaves everything in front of it alone.
+    SentenceFrame(
+      <SentencePart>[
+        SentencePart(SentenceSlot.subject, modifiable: true),
+        SentencePart(SentenceSlot.verb),
+      ],
+      20,
+      mood: SentenceMood.question,
+      tag: '吗',
+    ),
+    SentenceFrame(
+      <SentencePart>[
+        SentencePart(SentenceSlot.subject, modifiable: true),
+        SentencePart(SentenceSlot.verb),
+        SentencePart(SentenceSlot.object, modifiable: true),
+      ],
+      16,
+      mood: SentenceMood.question,
+      tag: '吗',
+    ),
+    SentenceFrame(
+      <SentencePart>[
+        SentencePart(SentenceSlot.subject, modifiable: true),
+        SentencePart(SentenceSlot.state, head: '很'),
+      ],
+      14,
+      mood: SentenceMood.question,
+      tag: '吗',
+    ),
+    SentenceFrame(
+      <SentencePart>[
+        SentencePart(SentenceSlot.subject, modifiable: true),
+        SentencePart(SentenceSlot.place, head: '在', tail: '里', modifiable: true),
+        SentencePart(SentenceSlot.verb),
+      ],
+      12,
+      mood: SentenceMood.question,
+      tag: '吗',
+    ),
   ],
 );

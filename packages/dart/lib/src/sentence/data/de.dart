@@ -9,7 +9,12 @@ import 'package:randino/src/word/data/types.dart';
 final SentenceLanguageData de = SentenceLanguageData(
   space: ' ',
   capitalize: true,
-  terminator: '.',
+  terminators: const <SentenceType, String>{
+    SentenceType.statement: '.',
+    SentenceType.question: '?',
+    SentenceType.exclamation: '!',
+    SentenceType.trailing: '…',
+  },
   // The indefinite article, and it is what makes the modifiers come out right:
   // after `ein` a German adjective takes the same endings it takes with no
   // article at all — `ein blauer Wal`, `eine blaue Katze`, `ein blaues Haus` —
@@ -152,6 +157,7 @@ final SentenceLanguageData de = SentenceLanguageData(
   // not something a connective can bolt on. `und`, `aber`, `doch` and `denn` sit
   // outside the clause and leave the order alone.
   connectives: words(r'und aber doch denn'),
+  interjections: words(r'oh, ach, na, mensch, oje, sieh_an, wahrhaftig,'),
   pronouns: <WordGender, WordPool>{
     WordGender.m: words(r'er'),
     WordGender.f: words(r'sie'),
@@ -187,5 +193,33 @@ final SentenceLanguageData de = SentenceLanguageData(
       SentencePart(SentenceSlot.subject, modifiable: true),
       SentencePart(SentenceSlot.manner),
     ], 14),
+    // German asks by moving the finite verb to the front, which is the same rule
+    // that keeps it second in a statement — the question is what happens when
+    // nothing stands in the first position at all.
+    SentenceFrame(
+      <SentencePart>[
+        SentencePart(SentenceSlot.verb),
+        SentencePart(SentenceSlot.subject, modifiable: true),
+      ],
+      26,
+      mood: SentenceMood.question,
+    ),
+    SentenceFrame(
+      <SentencePart>[
+        SentencePart(SentenceSlot.verb),
+        SentencePart(SentenceSlot.subject, modifiable: true),
+        SentencePart(SentenceSlot.manner),
+      ],
+      20,
+      mood: SentenceMood.question,
+    ),
+    SentenceFrame(
+      <SentencePart>[
+        SentencePart(SentenceSlot.subject, head: 'ist', modifiable: true),
+        SentencePart(SentenceSlot.state),
+      ],
+      18,
+      mood: SentenceMood.question,
+    ),
   ],
 );

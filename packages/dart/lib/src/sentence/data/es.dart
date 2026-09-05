@@ -9,7 +9,15 @@ import 'package:randino/src/word/data/types.dart';
 final SentenceLanguageData es = SentenceLanguageData(
   space: ' ',
   capitalize: true,
-  terminator: '.',
+  terminators: const <SentenceType, String>{
+    SentenceType.statement: '.',
+    SentenceType.question: '?',
+    SentenceType.exclamation: '!',
+    SentenceType.trailing: '…',
+  },
+  // The one language here that marks a question and an exclamation at both
+  // ends, which is why the openers exist at all.
+  openers: const <SentenceType, String>{SentenceType.question: '¿', SentenceType.exclamation: '¡'},
   // The definite article, by the noun's gender. The feminine entries in front of
   // the default are the nouns that begin on a stressed a- and take `el` for the
   // sound of it; the two that only start the same way are listed above them, so
@@ -182,6 +190,7 @@ final SentenceLanguageData es = SentenceLanguageData(
     '''),
   // Written with the comma the ones that need one take.
   connectives: words(r'y_luego pero entonces además, sin_embargo, después por_fin mientras_tanto,'),
+  interjections: words(r'ay, oh, vaya, caramba, madre_mía, mira, desde_luego,'),
   // Spanish carries its subject in the verb ending, so a second sentence about
   // the same thing writes no pronoun at all.
   pronouns: const <WordGender, WordPool>{

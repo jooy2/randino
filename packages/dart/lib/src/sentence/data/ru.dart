@@ -9,7 +9,12 @@ import 'package:randino/src/word/data/types.dart';
 final SentenceLanguageData ru = SentenceLanguageData(
   space: ' ',
   capitalize: true,
-  terminator: '.',
+  terminators: const <SentenceType, String>{
+    SentenceType.statement: '.',
+    SentenceType.question: '?',
+    SentenceType.exclamation: '!',
+    SentenceType.trailing: '…',
+  },
   predicateAgrees: true,
   verbs: <VerbGroup>[
     VerbGroup(
@@ -134,6 +139,7 @@ final SentenceLanguageData ru = SentenceLanguageData(
       в_выходные только_что иногда каждый_день в_сумерках
     '''),
   connectives: words(r'и_потом но затем поэтому однако наконец потом тем_временем'),
+  interjections: words(r'ах, ох, эх, ух, боже, гляди, право,'),
   pronouns: <WordGender, WordPool>{
     WordGender.m: words(r'он'),
     WordGender.f: words(r'она'),

@@ -9,7 +9,12 @@ import 'package:randino/src/word/data/types.dart';
 final SentenceLanguageData it = SentenceLanguageData(
   space: ' ',
   capitalize: true,
-  terminator: '.',
+  terminators: const <SentenceType, String>{
+    SentenceType.statement: '.',
+    SentenceType.question: '?',
+    SentenceType.exclamation: '!',
+    SentenceType.trailing: '…',
+  },
   // The definite article, which Italian picks by gender and by the sound the
   // noun opens on: `l'` before a vowel, `lo` before an s plus a consonant, and
   // `il` for everything else. The elided form carries its own boundary.
@@ -201,6 +206,7 @@ final SentenceLanguageData it = SentenceLanguageData(
       in_autunno in_inverno nel_fine_settimana poco_fa a_volte ogni_giorno al_tramonto
     '''),
   connectives: words(r'e_poi ma allora inoltre, tuttavia, dopo infine intanto,'),
+  interjections: words(r'oh, ah, ehi, caspita, mamma_mia, guarda, davvero,'),
   // Pro-drop, the same as Spanish: `esso` exists and nobody writes it.
   pronouns: const <WordGender, WordPool>{
     WordGender.n: <String>[''],

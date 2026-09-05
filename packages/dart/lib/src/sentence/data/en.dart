@@ -9,7 +9,12 @@ import 'package:randino/src/word/data/types.dart';
 final SentenceLanguageData en = SentenceLanguageData(
   space: ' ',
   capitalize: true,
-  terminator: '.',
+  terminators: const <SentenceType, String>{
+    SentenceType.statement: '.',
+    SentenceType.question: '?',
+    SentenceType.exclamation: '!',
+    SentenceType.trailing: '…',
+  },
   // One article, and a definite one. English has three ways to open a noun
   // phrase and only `the` is right for every noun in the pools: `a` is wrong in
   // front of a mass noun and a bare plural is wrong in front of a count one.
@@ -26,6 +31,12 @@ final SentenceLanguageData en = SentenceLanguageData(
         dances yawns hides waits stands sits tumbles wanders passes approaches dozes stretches
         listens
       '''),
+      forms: <PredicateForm, WordPool>{
+        PredicateForm.question: words(r'''
+        run walk leap swim fly crawl return leave stop rest sleep laugh cry sing dance
+        yawn hide wait stand sit tumble wander pass approach doze stretch listen
+      '''),
+      },
     ),
     VerbGroup(
       subject: const <NounClass>[NounClass.creature, NounClass.person],
@@ -33,6 +44,9 @@ final SentenceLanguageData en = SentenceLanguageData(
       words: words(r'''
         eats drinks chews swallows tastes bakes warms shares
       '''),
+      forms: <PredicateForm, WordPool>{
+        PredicateForm.question: words(r'eat drink chew swallow taste bake warm share'),
+      },
     ),
     VerbGroup(
       subject: const <NounClass>[NounClass.creature, NounClass.person],
@@ -40,6 +54,9 @@ final SentenceLanguageData en = SentenceLanguageData(
       words: words(r'''
         watches finds carries touches guards chooses moves lifts gathers
       '''),
+      forms: <PredicateForm, WordPool>{
+        PredicateForm.question: words(r'watch find carry touch guard choose move lift gather'),
+      },
     ),
     VerbGroup(
       subject: const <NounClass>[NounClass.person],
@@ -47,6 +64,9 @@ final SentenceLanguageData en = SentenceLanguageData(
       words: words(r'''
         makes mends cleans sells buys builds paints
       '''),
+      forms: <PredicateForm, WordPool>{
+        PredicateForm.question: words(r'make mend clean sell buy build paint'),
+      },
     ),
     VerbGroup(
       subject: const <NounClass>[NounClass.person, NounClass.creature],
@@ -54,48 +74,72 @@ final SentenceLanguageData en = SentenceLanguageData(
       words: words(r'''
         remembers forgets imagines counts describes
       '''),
+      forms: <PredicateForm, WordPool>{
+        PredicateForm.question: words(r'remember forget imagine count describe'),
+      },
     ),
     VerbGroup(
       subject: const <NounClass>[NounClass.place, NounClass.event],
       words: words(r'''
         glows flows darkens brightens deepens quiets fades widens
       '''),
+      forms: <PredicateForm, WordPool>{
+        PredicateForm.question: words(r'glow flow darken brighten deepen quiet fade widen'),
+      },
     ),
     VerbGroup(
       subject: const <NounClass>[NounClass.thing, NounClass.vehicle],
       words: words(r'''
         sways glitters falls rolls tilts ages creaks
       '''),
+      forms: <PredicateForm, WordPool>{
+        PredicateForm.question: words(r'sway glitter fall roll tilt age creak'),
+      },
     ),
     VerbGroup(
       subject: const <NounClass>[NounClass.vehicle],
       words: words(r'''
         runs stops passes returns departs slides
       '''),
+      forms: <PredicateForm, WordPool>{
+        PredicateForm.question: words(r'run stop pass return depart slide'),
+      },
     ),
     VerbGroup(
       subject: const <NounClass>[NounClass.idea, NounClass.event],
       words: words(r'''
         spreads vanishes remains lingers returns gathers
       '''),
+      forms: <PredicateForm, WordPool>{
+        PredicateForm.question: words(r'spread vanish remain linger return gather'),
+      },
     ),
     VerbGroup(
       subject: const <NounClass>[NounClass.plant],
       words: words(r'''
         grows wilts blooms sways spreads
       '''),
+      forms: <PredicateForm, WordPool>{
+        PredicateForm.question: words(r'grow wilt bloom sway spread'),
+      },
     ),
     VerbGroup(
       subject: const <NounClass>[NounClass.body],
       words: words(r'''
         trembles moves stiffens aches heals
       '''),
+      forms: <PredicateForm, WordPool>{
+        PredicateForm.question: words(r'tremble move stiffen ache heal'),
+      },
     ),
     VerbGroup(
       subject: const <NounClass>[NounClass.edible],
       words: words(r'''
         ripens cools boils melts spoils remains
       '''),
+      forms: <PredicateForm, WordPool>{
+        PredicateForm.question: words(r'ripen cool boil melt spoil remain'),
+      },
     ),
   ],
   states: <StateGroup>[
@@ -169,6 +213,7 @@ final SentenceLanguageData en = SentenceLanguageData(
       in_summer in_autumn in_winter on_weekends just_now sometimes every_day at_dusk before_long
     '''),
   connectives: words(r'and_then so but meanwhile afterwards still later soon even_so at_last'),
+  interjections: words(r'oh, ah, wow, well, look, goodness, my, indeed, honestly,'),
   pronouns: <WordGender, WordPool>{WordGender.n: words(r'it')},
   // English cannot drop a subject, so a sentence about a person names it again.
   pronounless: const <NounClass>[NounClass.person],
@@ -219,5 +264,51 @@ final SentenceLanguageData en = SentenceLanguageData(
       SentencePart(SentenceSlot.object, modifiable: true),
       SentencePart(SentenceSlot.manner),
     ], 5),
+    // English asks with do-support, so the auxiliary stands in front of the
+    // subject and the verb falls back to its base form — `Does the lion run?`
+    // rather than `Runs the lion?`. `ist` moves the same way.
+    SentenceFrame(
+      <SentencePart>[
+        SentencePart(SentenceSlot.subject, head: 'does', modifiable: true),
+        SentencePart(SentenceSlot.verb),
+      ],
+      20,
+      mood: SentenceMood.question,
+    ),
+    SentenceFrame(
+      <SentencePart>[
+        SentencePart(SentenceSlot.subject, head: 'does', modifiable: true),
+        SentencePart(SentenceSlot.verb),
+        SentencePart(SentenceSlot.object, modifiable: true),
+      ],
+      16,
+      mood: SentenceMood.question,
+    ),
+    SentenceFrame(
+      <SentencePart>[
+        SentencePart(SentenceSlot.subject, head: 'is', modifiable: true),
+        SentencePart(SentenceSlot.state),
+      ],
+      14,
+      mood: SentenceMood.question,
+    ),
+    SentenceFrame(
+      <SentencePart>[
+        SentencePart(SentenceSlot.subject, head: 'does', modifiable: true),
+        SentencePart(SentenceSlot.verb),
+        SentencePart(SentenceSlot.place, head: 'in', modifiable: true),
+      ],
+      12,
+      mood: SentenceMood.question,
+    ),
+    SentenceFrame(
+      <SentencePart>[
+        SentencePart(SentenceSlot.subject, head: 'does', modifiable: true),
+        SentencePart(SentenceSlot.verb),
+        SentencePart(SentenceSlot.manner),
+      ],
+      10,
+      mood: SentenceMood.question,
+    ),
   ],
 );

@@ -62,6 +62,7 @@ class _Settings {
     required this.sentences,
     required this.realism,
     required this.includeName,
+    required this.types,
   });
 
   final WordTheme? theme;
@@ -89,6 +90,26 @@ class _Settings {
 
   /// Whether a phrase about a person is written as a name.
   final bool includeName;
+
+  /// What the sentences may be doing, normalized to a set to draw from.
+  final List<SentenceType> types;
+}
+
+/// The one thing a shape has to match to answer a type.
+SentenceMood _moodFor(SentenceType type) =>
+    type == SentenceType.question ? SentenceMood.question : SentenceMood.statement;
+
+/// Everything one sentence of a result is drawn against: the room it has, what
+/// it is doing, what it opens on, and — after the first — what it is about.
+class _Draw {
+  const _Draw(this.budget, this.type, this.opener, this.follow);
+
+  final LengthRange budget;
+  final SentenceType type;
+
+  /// A connective or an interjection, `''` for neither.
+  final String opener;
+  final _Follow? follow;
 }
 
 /// What the sentences of one result are about: the first sentence's subject, and
@@ -120,16 +141,13 @@ enum _Reference { repeat, pronoun, fresh }
 
 /// Everything a sentence after the first one is built with.
 class _Follow {
-  const _Follow(this.topic, this.reference, this.pronoun, this.opener);
+  const _Follow(this.topic, this.reference, this.pronoun);
 
   final _Topic topic;
   final _Reference reference;
 
   /// What a [_Reference.pronoun] writes; `''` where the language writes nothing.
   final String pronoun;
-
-  /// The connective the sentence opens on, `''` for none.
-  final String opener;
 }
 
 /* --- Shapes ---------------------------------------------------------------- */
@@ -167,13 +185,24 @@ bool _matchesSlots(SentenceFrame frame, Set<SentenceSlot> slots) =>
 /// Both filters fall back rather than fail: a language that has no shape
 /// carrying what was asked for answers with the closest it does have, the same
 /// best-effort a too-narrow length range gets.
-List<SentenceFrame> _framesFor(SentenceLanguageData data, _Settings settings) {
+List<SentenceFrame> _framesFor(SentenceLanguageData data, _Settings settings, SentenceMood mood) {
+  // A language that writes its question with the mark alone declares no question
+  // shape, and answers with the statement shapes it does have. That is not a
+  // fallback so much as the point: `¿El león corre?` is the statement.
+  final byMood = data.frames.where((frame) => frame.mood == mood).toList(growable: false);
+  final moody =
+      byMood.isNotEmpty
+          ? byMood
+          : data.frames
+              .where((frame) => frame.mood == SentenceMood.statement)
+              .toList(growable: false);
+  final usable = moody.isNotEmpty ? moody : data.frames;
   final wanted = settings.slots;
   final bySlots =
       wanted == null
-          ? data.frames
-          : data.frames.where((frame) => _matchesSlots(frame, wanted)).toList(growable: false);
-  final allowed = bySlots.isNotEmpty ? bySlots : data.frames;
+          ? usable
+          : usable.where((frame) => _matchesSlots(frame, wanted)).toList(growable: false);
+  final allowed = bySlots.isNotEmpty ? bySlots : usable;
   final shape = settings.shape;
 
   if (shape == null) return allowed;
@@ -535,8 +564,14 @@ Map<SentenceSlot, LengthRange> _slotBounds(WordLanguage language) {
   final data = sentenceData[language]!;
   final bounds = <SentenceSlot, LengthRange>{
     SentenceSlot.subject: _span(wordThemes.map((theme) => _nounsOf(language, theme))),
-    SentenceSlot.verb: _span(data.verbs.map((group) => group.words)),
-    SentenceSlot.state: _span(data.states.map((group) => group.words)),
+    // Every form a predicate can take, not only the plain statement's: a question
+    // form is a different length, and the shape is chosen against these.
+    SentenceSlot.verb: _span(<WordPool>[
+      for (final group in data.verbs) ...<WordPool>[group.words, ...group.forms.values],
+    ]),
+    SentenceSlot.state: _span(<WordPool>[
+      for (final group in data.states) ...<WordPool>[group.words, ...group.forms.values],
+    ]),
     SentenceSlot.manner: _span(<WordPool>[data.manners]),
     SentenceSlot.time: _span(<WordPool>[data.times]),
   };
@@ -619,7 +654,16 @@ LengthRange _frameRange(
   Map<SentenceSlot, LengthRange> bounds,
   LengthRange modifier,
 ) {
-  var min = data.terminator.length;
+  // Measured against the longest mark the language writes, so a shape is never
+  // chosen for a range only the shortest one could have reached.
+  var marks = 0;
+
+  for (final mark in data.terminators.values) {
+    if (mark.length > marks) marks = mark.length;
+  }
+
+  final tag = frame.tag == null ? 0 : frame.tag!.length + data.space.length;
+  var min = marks + tag;
   var max = min;
 
   for (var i = 0; i < frame.parts.length; i += 1) {
@@ -753,6 +797,7 @@ class _Built {
     this.phrases,
     this.slots,
     this.names,
+    this.type,
     this.theme,
     this.subject,
     this.gender,
@@ -765,6 +810,9 @@ class _Built {
 
   /// The person names this sentence was written with, in order.
   final List<String> names;
+
+  /// What this sentence is doing.
+  final SentenceType type;
   final WordTheme? theme;
 
   /// The subject noun as written, which is what the next sentence carries on
@@ -981,8 +1029,9 @@ _Built _compose(
   LengthRange modifierBounds,
   int min,
   int max,
-  _Follow? follow,
+  _Draw draw,
 ) {
+  final follow = draw.follow;
   final lexicon = wordData[language]!;
   final themes = requested.isNotEmpty ? requested : wordThemes;
   final headed = frame.parts.any((part) => part.slot == SentenceSlot.state);
@@ -1006,6 +1055,11 @@ _Built _compose(
                     )
                     .toList(growable: false),
           );
+  // The same predicates, in the form this type of sentence ends on. Index-aligned
+  // with the plain words, which is what lets a required word be translated rather
+  // than written out in the wrong form.
+  final base = stateGroup?.words ?? verbGroup!.words;
+  final predicates = _formOf(stateGroup, verbGroup, draw.type);
   final subjectClasses = stateGroup?.subject ?? verbGroup!.subject;
   final subjectThemes = _themesForClasses(themes, subjectClasses);
   final subjectRequired = _requiredAt(frame, plan, SentenceSlot.subject);
@@ -1043,7 +1097,10 @@ _Built _compose(
   final prefixable =
       follow == null && _isNounSlot(first.slot) && first.head == null && data.articles == null;
   final space = data.space.length;
-  final opener = follow?.opener ?? '';
+  final opener = draw.opener;
+  final close = data.terminators[draw.type]!;
+  final open = data.openers[draw.type] ?? '';
+  final tag = frame.tag == null ? '' : data.space + frame.tag!;
   // Every phrase's theme is settled before any of them is drawn, because a length
   // budget is only as good as the pools it was measured against. Left to the loop,
   // each phrase was given the room the language's longest noun would need and drew
@@ -1121,7 +1178,7 @@ _Built _compose(
               ? _nameSpan(language)
               : _nounSpan(language, partThemes[i]!, settings.invent));
     } else if (part.slot == SentenceSlot.verb || part.slot == SentenceSlot.state) {
-      own[part.slot] = exact ?? poolBounds(stateGroup?.words ?? verbGroup!.words);
+      own[part.slot] = exact ?? poolBounds(predicates);
     } else if (exact != null) {
       own[part.slot] = exact;
     }
@@ -1151,7 +1208,7 @@ _Built _compose(
   // over, so what agrees with either agrees with the noun it stands for.
   WordGender? gender =
       proper.any((word) => word != null && word.isNotEmpty) ? follow?.topic.gender : null;
-  var used = data.terminator.length + (opener.isEmpty ? 0 : opener.length + space);
+  var used = close.length + open.length + tag.length + (opener.isEmpty ? 0 : opener.length + space);
 
   if (opener.isNotEmpty) written.add(data.capitalize ? _upper(opener) : opener);
 
@@ -1235,7 +1292,8 @@ _Built _compose(
         part.slot,
         lexicon,
         data,
-        stateGroup?.words ?? verbGroup!.words,
+        base,
+        predicates,
         plan.phrase[at[i]],
         gender,
         low,
@@ -1274,15 +1332,28 @@ _Built _compose(
           : (subject?.noun ?? (pronoun != null && pronoun.isNotEmpty ? follow!.topic.noun : null));
 
   return _Built(
-    written.join(data.space) + data.terminator,
+    // The opener is written against the first phrase rather than beside it —
+    // Spanish `¿El león corre?`, never `¿ El león corre ?`.
+    open + written.join(data.space) + tag + close,
     reported,
     slots,
     names,
+    draw.type,
     named ? null : subject?.theme,
     carried,
     subject != null || named ? gender : (pronoun != null ? follow!.topic.gender : null),
     named || (pronoun != null && (follow?.topic.named ?? false)),
   );
+}
+
+/// The predicates of a group, in the form this type of sentence ends on.
+WordPool _formOf(StateGroup? stateGroup, VerbGroup? verbGroup, SentenceType type) {
+  final forms = stateGroup?.forms ?? verbGroup!.forms;
+  final words = stateGroup?.words ?? verbGroup!.words;
+
+  if (type != SentenceType.question) return words;
+
+  return forms[PredicateForm.question] ?? words;
 }
 
 /// The word a phrase that is not a noun phrase writes: the predicate, or an
@@ -1291,6 +1362,7 @@ String _predicateFor(
   SentenceSlot slot,
   WordLanguageData wordData,
   SentenceLanguageData data,
+  WordPool base,
   WordPool predicates,
   _Requirement? required,
   WordGender? gender,
@@ -1300,7 +1372,13 @@ String _predicateFor(
   String agreed(String word) =>
       slot == SentenceSlot.state && data.predicateAgrees ? agree(wordData, word, gender) : word;
 
-  if (required != null) return agreed(required.word);
+  if (required != null) {
+    // A word the caller named is named in the form a statement ends on, and the
+    // form pools are index-aligned so that it can be said the other way instead.
+    final at = base.indexOf(required.word);
+
+    return agreed(at >= 0 && at < predicates.length ? predicates[at] : required.word);
+  }
 
   final pool =
       slot == SentenceSlot.manner
@@ -1337,16 +1415,13 @@ List<WordTheme> _subjectThemesFor(_Settings settings, _Follow? follow) {
   return inClass.isNotEmpty ? inClass : themes;
 }
 
-_Built _generateOne(
-  WordLanguage language,
-  _Settings settings,
-  LengthRange budget,
-  _Follow? follow,
-) {
+_Built _generateOne(WordLanguage language, _Settings settings, _Draw draw) {
+  final follow = draw.follow;
+  final budget = draw.budget;
   final data = sentenceData[language]!;
   final bounds = _slotBounds(language);
   final modifierBounds = _modifierBounds[language]!;
-  final allowed = _framesFor(data, settings);
+  final allowed = _framesFor(data, settings, _moodFor(draw.type));
   final requested = _subjectThemesFor(settings, follow);
   // The words a caller required go in the first sentence — once in the result
   // rather than once in every sentence of it.
@@ -1423,7 +1498,7 @@ _Built _generateOne(
       modifierBounds,
       range.min,
       range.max,
-      follow,
+      draw,
     );
     final length = built.sentence.length;
 
@@ -1527,6 +1602,11 @@ List<LengthRange> _shareOut(LengthRange range, int count, int space) {
 // How often a sentence that follows another one opens on a connective.
 const int _connectiveChance = 40;
 
+// How often an exclamation opens on an interjection. Higher than the
+// connective's, because an exclamation with nothing in front of it is a
+// statement wearing a mark.
+const int _interjectionChance = 65;
+
 // How a sentence refers to the topic, against the other two ways of doing it.
 const Map<_Reference, int> _referenceWeight = <_Reference, int>{
   _Reference.repeat: 25,
@@ -1573,21 +1653,12 @@ WordPool _pronounsFor(SentenceLanguageData data, _Topic topic) {
 }
 
 /// How one sentence carries on from the one before it.
-///
-/// [room] is what this sentence may be at its longest, and it is what decides
-/// whether it opens on a connective at all: a connective is written in front of
-/// a whole sentence rather than instead of any part of it, so one longer than
-/// the budget can spare is a sentence that overshoots by exactly its length.
-/// Russian `тем временем` is thirteen characters, and a third of a range of
-/// seventy-five has nowhere to put them.
-_Follow _followFor(SentenceLanguageData data, _Topic topic, int room, int shortest) {
+_Follow _followFor(SentenceLanguageData data, _Topic topic) {
   final pronouns = _pronounsFor(data, topic);
   final usable =
       pronouns.isNotEmpty
           ? const <_Reference>[_Reference.repeat, _Reference.pronoun, _Reference.fresh]
           : const <_Reference>[_Reference.repeat, _Reference.fresh];
-  final spare = room - data.space.length - shortest;
-  final openers = data.connectives.where((word) => word.length <= spare).toList(growable: false);
   var total = 0;
 
   for (final each in usable) {
@@ -1606,12 +1677,42 @@ _Follow _followFor(SentenceLanguageData data, _Topic topic, int room, int shorte
     }
   }
 
-  return _Follow(
-    topic,
-    reference,
-    reference == _Reference.pronoun ? pick(pronouns) : '',
-    openers.isNotEmpty && chance(_connectiveChance) ? pick(openers) : '',
-  );
+  return _Follow(topic, reference, reference == _Reference.pronoun ? pick(pronouns) : '');
+}
+
+/// What a sentence opens on: an interjection when it is an exclamation, and a
+/// connective when it follows another.
+///
+/// Never both — a sentence that opened on two things at once would be shouting
+/// its own footnote. [room] is what the sentence may be at its longest, and it
+/// is what decides whether it opens on anything at all: what stands in front is
+/// written before a whole sentence rather than instead of any part of it, so one
+/// longer than the budget can spare is a sentence that overshoots by exactly its
+/// length. Russian `тем временем` is thirteen characters, and a third of a range
+/// of seventy-five has nowhere to put them.
+String _openerFor(
+  SentenceLanguageData data,
+  SentenceType type,
+  bool following,
+  int room,
+  int shortest,
+) {
+  final spare = room - data.space.length - shortest;
+
+  List<String> fitting(WordPool pool) =>
+      pool.where((word) => word.length <= spare).toList(growable: false);
+
+  if (type == SentenceType.exclamation) {
+    final usable = fitting(data.interjections);
+
+    if (usable.isNotEmpty && chance(_interjectionChance)) return pick(usable);
+  }
+
+  if (!following) return '';
+
+  final usable = fitting(data.connectives);
+
+  return usable.isNotEmpty && chance(_connectiveChance) ? pick(usable) : '';
 }
 
 /// Every sentence of one result, in order.
@@ -1623,7 +1724,11 @@ List<_Built> _generateResult(WordLanguage language, _Settings settings) {
   final data = sentenceData[language]!;
   final bounds = _slotBounds(language);
   final modifierBounds = _modifierBounds[language]!;
-  final frames = _framesFor(data, settings);
+  // Every shape any of the requested types could take, because the budget is
+  // shared out before the first type is even drawn.
+  final frames = <SentenceFrame>[
+    for (final type in settings.types) ..._framesFor(data, settings, _moodFor(type)),
+  ];
   final shortest = _naturalSpan(data, frames, bounds, modifierBounds).min;
   final budgets = _shareOut(
     _boundsFor(data, frames, bounds, modifierBounds, settings),
@@ -1634,27 +1739,28 @@ List<_Built> _generateResult(WordLanguage language, _Settings settings) {
   _Topic? topic;
 
   for (var i = 0; i < settings.sentences; i += 1) {
-    final follow = topic == null ? null : _followFor(data, topic, budgets[i].max, shortest);
-    var one = _generateOne(language, settings, budgets[i], follow);
+    final budget = budgets[i];
+    final type = pick(settings.types);
+    final follow = topic == null ? null : _followFor(data, topic);
+    final draw = _Draw(
+      budget,
+      type,
+      _openerFor(data, type, follow != null, budget.max, shortest),
+      follow,
+    );
+    var one = _generateOne(language, settings, draw);
 
-    // `_followFor` reserves room for the connective against the shortest
-    // sentence the shapes could spell, which is a floor no draw actually reaches
-    // — the shortest word of every pool at once. When the sentence that came
-    // back could not be made short enough to carry the connective after all, the
-    // connective is the part worth giving up: it is written in front of the
-    // whole sentence rather than instead of any piece of it.
-    if (follow != null &&
-        follow.opener.isNotEmpty &&
-        _distanceFrom(one.sentence.length, budgets[i]) > 0) {
-      final bare = _generateOne(
-        language,
-        settings,
-        budgets[i],
-        _Follow(follow.topic, follow.reference, follow.pronoun, ''),
-      );
+    // `_openerFor` reserves room against the shortest sentence the shapes could
+    // spell, which is a floor no draw actually reaches — the shortest word of
+    // every pool at once. When the sentence that came back could not be made
+    // short enough to carry what it opens on after all, that is the part worth
+    // giving up: it stands in front of the whole sentence rather than instead of
+    // any piece of it.
+    if (draw.opener.isNotEmpty && _distanceFrom(one.sentence.length, budget) > 0) {
+      final bare = _generateOne(language, settings, _Draw(draw.budget, draw.type, '', draw.follow));
 
-      if (_distanceFrom(bare.sentence.length, budgets[i]) <
-          _distanceFrom(one.sentence.length, budgets[i])) {
+      if (_distanceFrom(bare.sentence.length, budget) <
+          _distanceFrom(one.sentence.length, budget)) {
         one = bare;
       }
     }
@@ -1683,6 +1789,7 @@ List<SentenceDetail> generateSentenceDetails({
   bool unique = false,
   int sentences = 1,
   bool includeName = false,
+  Set<SentenceType>? type,
 }) {
   final settings = _Settings(
     theme: theme,
@@ -1696,6 +1803,10 @@ List<SentenceDetail> generateSentenceDetails({
     sentences: clampInt(sentences, 1, randSentenceCountMax),
     realism: realism,
     includeName: includeName,
+    types:
+        type == null || type.isEmpty
+            ? const <SentenceType>[SentenceType.statement]
+            : type.toList(growable: false),
   );
 
   return collect<SentenceDetail>(
@@ -1715,6 +1826,7 @@ List<SentenceDetail> generateSentenceDetails({
         // caller reading the detail must not be able to reach into them.
         slots: List<SentenceSlot>.unmodifiable(built.expand((one) => one.slots)),
         names: List<String>.unmodifiable(built.expand((one) => one.names)),
+        types: List<SentenceType>.unmodifiable(built.map((one) => one.type)),
         language: code,
         // What the result is about is what its first sentence was about; the
         // ones after it stay inside that noun's class.

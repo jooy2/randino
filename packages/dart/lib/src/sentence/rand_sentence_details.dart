@@ -25,6 +25,13 @@ import 'package:randino/src/types.dart';
 /// name is a bare given name, and it carries its own gender, so what agrees with
 /// a subject agrees with it.
 ///
+/// [type] says what the sentences are doing — saying something, asking it,
+/// exclaiming it, or trailing off. A set of them decides per sentence, and null
+/// means statements. A language answers with what it has: five of the nine write
+/// a question with nothing but the mark, and the four that need more — English's
+/// do-support, German's verb moving to the front, Korean's and Japanese's
+/// endings — say so in their own shapes.
+///
 /// ```dart
 /// randSentenceDetails(language: WordLanguage.ko);
 /// // [SentenceDetail(검은 고양이가 숲에서 잠잔다., [검은 고양이, 숲, 잠잔다], ko, animal)]
@@ -43,6 +50,7 @@ List<SentenceDetail> randSentenceDetails({
   bool unique = false,
   int sentences = 1,
   bool includeName = false,
+  Set<SentenceType>? type,
 }) => generateSentenceDetails(
   language: language,
   theme: theme,
@@ -57,4 +65,5 @@ List<SentenceDetail> randSentenceDetails({
   unique: unique,
   sentences: sentences,
   includeName: includeName,
+  type: type,
 );

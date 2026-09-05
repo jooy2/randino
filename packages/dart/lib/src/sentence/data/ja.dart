@@ -9,7 +9,12 @@ import 'package:randino/src/word/data/types.dart';
 final SentenceLanguageData ja = SentenceLanguageData(
   space: '',
   capitalize: false,
-  terminator: '。',
+  terminators: const <SentenceType, String>{
+    SentenceType.statement: '。',
+    SentenceType.question: '？',
+    SentenceType.exclamation: '！',
+    SentenceType.trailing: '…',
+  },
   verbs: <VerbGroup>[
     VerbGroup(
       subject: const <NounClass>[NounClass.creature, NounClass.person],
@@ -162,6 +167,7 @@ final SentenceLanguageData ja = SentenceLanguageData(
       時々 毎日 夕暮れに
     '''),
   connectives: words(r'そして だから しかし ところが やがて すぐに ついに 一方 また'),
+  interjections: words(r'ああ、 おお、 まあ、 なんと、 やれやれ、 おや、 ほら、'),
   pronouns: const <WordGender, WordPool>{
     WordGender.n: <String>['', 'それ'],
   },
@@ -213,5 +219,45 @@ final SentenceLanguageData ja = SentenceLanguageData(
       SentencePart(SentenceSlot.object, tail: 'を', modifiable: true),
       SentencePart(SentenceSlot.verb),
     ], 5),
+    // Japanese asks with か after the predicate, which is a tag rather than a
+    // phrase — no slot could carry it, and the word order does not move.
+    SentenceFrame(
+      <SentencePart>[
+        SentencePart(SentenceSlot.subject, tail: 'が', modifiable: true),
+        SentencePart(SentenceSlot.verb),
+      ],
+      20,
+      mood: SentenceMood.question,
+      tag: 'か',
+    ),
+    SentenceFrame(
+      <SentencePart>[
+        SentencePart(SentenceSlot.subject, tail: 'が', modifiable: true),
+        SentencePart(SentenceSlot.object, tail: 'を', modifiable: true),
+        SentencePart(SentenceSlot.verb),
+      ],
+      16,
+      mood: SentenceMood.question,
+      tag: 'か',
+    ),
+    SentenceFrame(
+      <SentencePart>[
+        SentencePart(SentenceSlot.subject, tail: 'は', modifiable: true),
+        SentencePart(SentenceSlot.state),
+      ],
+      14,
+      mood: SentenceMood.question,
+      tag: 'か',
+    ),
+    SentenceFrame(
+      <SentencePart>[
+        SentencePart(SentenceSlot.subject, tail: 'が', modifiable: true),
+        SentencePart(SentenceSlot.place, tail: 'で', modifiable: true),
+        SentencePart(SentenceSlot.verb),
+      ],
+      12,
+      mood: SentenceMood.question,
+      tag: 'か',
+    ),
   ],
 );

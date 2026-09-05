@@ -51,6 +51,21 @@ enum NounClass {
   body,
 }
 
+/// A form a predicate takes beside the one a plain statement ends on.
+///
+/// `question` is Korean `달리니` beside `달린다`, and English `run` beside
+/// `runs`. A form rather than another pool: the same verbs, said differently.
+/// Every form pool is index-aligned with `words`, so a verb keeps its meaning
+/// across them and a word the caller required can be translated into the form
+/// the sentence needs.
+enum PredicateForm {
+  /// The form a question ends on.
+  question,
+}
+
+/// The forms a group declares, beside the plain statement its `words` are in.
+typedef PredicateForms = Map<PredicateForm, WordPool>;
+
 /// Verbs that take the same arguments.
 ///
 /// Written as a group rather than one tagged entry per verb, because the tag is
@@ -59,7 +74,12 @@ enum NounClass {
 /// done to.
 class VerbGroup {
   /// Creates a group of verbs.
-  const VerbGroup({required this.subject, required this.words, this.object});
+  const VerbGroup({
+    required this.subject,
+    required this.words,
+    this.object,
+    this.forms = const <PredicateForm, WordPool>{},
+  });
 
   /// Classes a noun has to belong to to be the subject of these verbs.
   final List<NounClass> subject;
@@ -69,6 +89,12 @@ class VerbGroup {
 
   /// The verbs themselves, in the form a plain statement ends on.
   final WordPool words;
+
+  /// The same verbs in another form, index-aligned with [words].
+  ///
+  /// Empty for a language whose verb does not change — Chinese, Vietnamese,
+  /// Spanish, Italian and Russian ask a question with the mark alone.
+  final PredicateForms forms;
 }
 
 /// Predicate adjectives that describe the same kinds of thing, grouped the way
@@ -79,13 +105,20 @@ class VerbGroup {
 /// start a noun phrase.
 class StateGroup {
   /// Creates a group of predicate adjectives.
-  const StateGroup({required this.subject, required this.words});
+  const StateGroup({
+    required this.subject,
+    required this.words,
+    this.forms = const <PredicateForm, WordPool>{},
+  });
 
   /// Classes a noun has to belong to to be described by these.
   final List<NounClass> subject;
 
   /// The adjectives themselves, in the form a plain statement ends on.
   final WordPool words;
+
+  /// The same adjectives in another form, index-aligned with [words].
+  final PredicateForms forms;
 }
 
 /// One phrase of a shape, with whatever the language writes around it.
@@ -134,6 +167,22 @@ class SentencePart {
   final bool bare;
 }
 
+/// What a shape is for.
+///
+/// A frame with no mood is a statement, and a statement shape also serves an
+/// exclamation and a sentence that trails off — those differ from it by the mark
+/// and by what stands in front, not by the order of the words. A question is the
+/// one that can differ, and only four of the nine languages need it to. The rest
+/// declare no question shape and get their statement shapes back, which is the
+/// same best-effort every other narrowing here makes.
+enum SentenceMood {
+  /// Says something, exclaims it, or trails off.
+  statement,
+
+  /// Asks it, in a shape the language's grammar actually moves for.
+  question,
+}
+
 /// One shape a sentence can take, written in the order the language puts it in.
 ///
 /// Per language rather than shared, and for the same reason a nickname's frames
@@ -141,13 +190,23 @@ class SentencePart {
 /// whose articles cannot mark an object has no shape that carries one.
 class SentenceFrame {
   /// Creates a sentence shape.
-  const SentenceFrame(this.parts, this.weight);
+  const SentenceFrame(this.parts, this.weight, {this.mood = SentenceMood.statement, this.tag});
 
   /// The phrases, in the order the language writes them.
   final List<SentencePart> parts;
 
   /// How often this shape is used, against the other frames of the language.
   final int weight;
+
+  /// What the shape is for. A statement unless it says otherwise.
+  final SentenceMood mood;
+
+  /// Written after the last phrase and before the terminator, with the
+  /// language's own space in front of it.
+  ///
+  /// That is Chinese `吗`, Japanese `か` and Vietnamese `không` — none of which
+  /// is a phrase, and none of which any slot could carry.
+  final String? tag;
 }
 
 /// The article a noun takes, by its gender and by how the word right after the
@@ -177,17 +236,19 @@ class SentenceLanguageData {
   const SentenceLanguageData({
     required this.space,
     required this.capitalize,
-    required this.terminator,
+    required this.terminators,
     required this.verbs,
     required this.states,
     required this.manners,
     required this.times,
     required this.connectives,
+    required this.interjections,
     required this.pronouns,
     required this.frames,
     this.articles,
     this.predicateAgrees = false,
     this.pronounless = const <NounClass>[],
+    this.openers = const <SentenceType, String>{},
   });
 
   /// Placed between the phrases, and between the words inside one.
@@ -200,8 +261,14 @@ class SentenceLanguageData {
   /// Whether the sentence opens on a capital letter.
   final bool capitalize;
 
-  /// What the sentence closes on.
-  final String terminator;
+  /// What a sentence of each type closes on.
+  final Map<SentenceType, String> terminators;
+
+  /// What it opens on, for a language that marks the type at both ends.
+  ///
+  /// Spanish `¿` and `¡` are the only ones here, and every other language leaves
+  /// it empty.
+  final Map<SentenceType, String> openers;
 
   /// The article a noun phrase opens with. Null for a language with no articles.
   final SentenceArticles? articles;
@@ -230,6 +297,14 @@ class SentenceLanguageData {
   ///
   /// Written whole, so a language that needs a comma after it writes the comma.
   final WordPool connectives;
+
+  /// What an exclamation opens on (`와,`, `Wow,`, `ああ、`).
+  ///
+  /// Written whole, comma and all, because where the comma goes is the
+  /// language's business. Exclamations alone: a statement that opened on one
+  /// would be reading itself aloud, and a question has its own mark to do the
+  /// work.
+  final WordPool interjections;
 
   /// How a later sentence refers to the topic without naming it again.
   final SentencePronouns pronouns;

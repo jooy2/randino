@@ -9,7 +9,12 @@ import 'package:randino/src/word/data/types.dart';
 final SentenceLanguageData vi = SentenceLanguageData(
   space: ' ',
   capitalize: true,
-  terminator: '.',
+  terminators: const <SentenceType, String>{
+    SentenceType.statement: '.',
+    SentenceType.question: '?',
+    SentenceType.exclamation: '!',
+    SentenceType.trailing: '…',
+  },
   verbs: <VerbGroup>[
     VerbGroup(
       subject: const <NounClass>[NounClass.creature, NounClass.person],
@@ -161,6 +166,7 @@ final SentenceLanguageData vi = SentenceLanguageData(
       đôi_khi mỗi_ngày lúc_hoàng_hôn
     '''),
   connectives: words(r'rồi và_rồi nhưng thế_là sau_đó cuối_cùng đồng_thời tuy_vậy'),
+  interjections: words(r'ôi, chà, ồ, trời_ơi, chao_ôi, này, thật_đấy,'),
   pronouns: const <WordGender, WordPool>{
     WordGender.n: <String>['', 'nó'],
   },
@@ -212,5 +218,34 @@ final SentenceLanguageData vi = SentenceLanguageData(
       SentencePart(SentenceSlot.object, modifiable: true),
       SentencePart(SentenceSlot.manner),
     ], 5),
+    // Vietnamese wraps the predicate: có in front of it, không after the clause.
+    SentenceFrame(
+      <SentencePart>[
+        SentencePart(SentenceSlot.subject, modifiable: true),
+        SentencePart(SentenceSlot.verb, head: 'có'),
+      ],
+      20,
+      mood: SentenceMood.question,
+      tag: 'không',
+    ),
+    SentenceFrame(
+      <SentencePart>[
+        SentencePart(SentenceSlot.subject, modifiable: true),
+        SentencePart(SentenceSlot.verb, head: 'có'),
+        SentencePart(SentenceSlot.object, modifiable: true),
+      ],
+      16,
+      mood: SentenceMood.question,
+      tag: 'không',
+    ),
+    SentenceFrame(
+      <SentencePart>[
+        SentencePart(SentenceSlot.subject, modifiable: true),
+        SentencePart(SentenceSlot.state, head: 'có'),
+      ],
+      14,
+      mood: SentenceMood.question,
+      tag: 'không',
+    ),
   ],
 );

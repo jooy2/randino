@@ -44,6 +44,7 @@ void main() {
           'RandRealism',
           'SentenceDetail',
           'SentenceShape',
+          'SentenceType',
           'SentenceSlot',
           'WordDetail',
           'WordLanguage',
