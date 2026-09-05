@@ -2,13 +2,13 @@
 layout: home
 
 title: randino
-titleTemplate: Random names, nicknames and sentences, in the language you ask for
-description: Generate random person names, nicknames, words and sentences in nine languages — Emma Clover, MistyOwl, 여우가 사과를 먹는다. One library shipped for JavaScript, Dart and Python, with no runtime dependencies.
+titleTemplate: Random names, nicknames, words and sentences, in the language you ask for
+description: Generate random person names, nicknames, words and sentences in nine languages. Emma Clover, MistyOwl, 여우가 사과를 먹는다. One library shipped for JavaScript, Dart and Python, with no runtime dependencies.
 
 hero:
   name: randino
   text: Random text that reads like the language
-  tagline: Person names people actually carry, nicknames someone would actually pick, the everyday words behind them, and whole sentences in the language's own grammar. Nine languages, shipped for JavaScript, Dart and Python, with no runtime dependencies.
+  tagline: Person names, nicknames, everyday words and whole sentences, in nine languages. One library, shipped for JavaScript, Dart and Python, with no runtime dependencies.
   actions:
     - theme: brand
       text: Get started
@@ -30,24 +30,24 @@ hero:
     alt: randino
 
 features:
-  - title: Names, not name-shaped strings
-    details: Drawn from curated pools per language, with surnames weighted the way the population is. A fifth of the Korean names come back a Kim.
+  - title: Names people carry
+    details: Curated pools per language, with surnames weighted the way a population is. About a fifth of the Korean names come back a Kim.
     link: /name/
     linkText: Person names
   - title: Nicknames from everyday words
-    details: A modifier and a noun across twenty-five themes — and never a person name, which is what keeps a handle from reading like one.
+    details: A modifier and a noun, across twenty-five themes. Person names are never used, so a handle never reads as somebody's.
     link: /nickname/
     linkText: Nicknames
-  - title: The words on their own
-    details: Twenty-five themes, a function each. randAnimal, randFood, randGem — the vocabulary a nickname is built from, without the nickname.
+  - title: Words by theme
+    details: Twenty-five themes with a function each, from randAnimal to randGem. The same vocabulary a nickname is built from, on its own.
     link: /word/rand-word
     linkText: randWord
-  - title: Sentences, not word salad
+  - title: Sentences with grammar
     details: A verb states what can do it and what it can be done to, so the words of one sentence belong together. Each language writes its own particles, articles and word order.
     link: /sentence/
     linkText: Sentences
   - title: Three packages, one library
-    details: The same datasets and the same rules for JavaScript, Dart and Python. One page documents all of them — pick your language in the sidebar.
+    details: The same datasets and the same rules for JavaScript, Dart and Python. One page documents all of them, so pick your language in the sidebar.
     link: /guide/getting-started
     linkText: Getting started
   - title: Nine languages
@@ -56,7 +56,7 @@ features:
     linkText: Supported languages
 ---
 
-## What it looks like
+## Examples
 
 ::: lang js
 
@@ -122,4 +122,4 @@ rand_suffix(rand_nickname(language="en", count=2))
 
 :::
 
-Every option is optional, so the shortest call there is returns one name in one of the nine languages. What each option does is on [Person names](./name/) and [Nicknames](./nickname/); installing it is one page, [Getting started](./guide/getting-started).
+Every option is optional, so the shortest call returns one name in one of the nine languages. [Person names](./name/) and [Nicknames](./nickname/) describe what each option does, and [Getting started](./guide/getting-started) covers the install.
