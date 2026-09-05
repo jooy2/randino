@@ -7,6 +7,27 @@ export const VI: SentenceLanguageData = {
 	terminators: { statement: '.', question: '?', exclamation: '!', trailing: '…' },
 	quotes: { double: ['“', '”'], single: ['‘', '’'] },
 	// Vietnamese inflects nothing, so a verb is written once and stands wherever
+	// Vietnamese puts the classifier in front of the noun and the number in front
+	// of that, so the whole group reads `12 con mèo`.
+	numeral: {
+		order: 'before',
+		counters: {
+			creature: 'con',
+			person: 'người',
+			plant: 'cây',
+			edible: 'cái',
+			thing: 'cái',
+			vehicle: 'chiếc',
+			place: 'nơi',
+			event: 'lần',
+			idea: 'điều',
+			body: 'cái'
+		},
+		count: [2, 12],
+		currency: 'đồng',
+		amounts: [10000, 50000, 100000, 200000, 500000, 1000000, 5000000],
+		group: '.'
+	},
 	// it is put.
 	verbs: [
 		{
@@ -216,6 +237,18 @@ export const VI: SentenceLanguageData = {
 			weight: 14,
 			mood: 'question',
 			tag: 'không'
+		},
+		{
+			parts: [{ slot: 'subject', modifiable: true }, { slot: 'verb' }, { slot: 'quantity' }],
+			weight: 6
+		},
+		{
+			parts: [{ slot: 'quantity' }, { slot: 'verb' }],
+			weight: 5
+		},
+		{
+			parts: [{ slot: 'subject', modifiable: true }, { slot: 'verb' }, { slot: 'money' }],
+			weight: 5
 		}
 	]
 };

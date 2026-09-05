@@ -294,10 +294,14 @@ export interface NicknameDetail {
  * - `place`: where it happens (`숲에서`).
  * - `time`: when (`새벽에`).
  * - `manner`: how (`조용히`).
+ * - `quantity`: how many of something (`사과 12 개`), which is a noun phrase with a
+ *   number and the counter its kind takes.
+ * - `money`: how much (`100,000 원`, `12,000 dollars`).
  *
  * A sentence is headed by a `verb` or by a `state`, never by both.
  */
-export type SentenceSlot = 'subject' | 'verb' | 'object' | 'state' | 'place' | 'time' | 'manner';
+export type SentenceSlot =
+	'subject' | 'verb' | 'object' | 'state' | 'place' | 'time' | 'manner' | 'quantity' | 'money';
 
 /**
  * Which shapes a sentence may take, named by the parts they carry beside the

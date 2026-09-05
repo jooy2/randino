@@ -30,15 +30,15 @@ const SAMPLE = 60;
 
 /** Everything a sentence of the language may be written with, punctuation aside. */
 const SCRIPT: Record<WordLanguage, RegExp> = {
-	en: /^[A-Za-z' ,.?!…“”‘’]+$/,
-	ko: /^[가-힣 ,.?!…“”‘’]+$/,
-	ja: /^[々぀-ヿ一-鿿。、？！…「」『』]+$/,
-	zh: /^[々一-鿿。，？！…“”‘’]+$/,
-	vi: /^[a-zA-ZÀ-ỹ ,.?!…“”‘’]+$/,
-	es: /^[a-zA-ZÀ-ÿ ,.?!…¿¡«»“”]+$/,
-	it: /^[a-zA-ZÀ-ÿ' ,.?!…«»“”]+$/,
-	de: /^[a-zA-ZÀ-ÿß ,.?!…„“‚‘]+$/,
-	ru: /^[Ѐ-ӿ ,.?!…«»„“]+$/
+	en: /^[A-Za-z0-9' ,.?!…“”‘’]+$/,
+	ko: /^[가-힣0-9 ,.?!…“”‘’]+$/,
+	ja: /^[々぀-ヿ一-鿿0-9,。、？！…「」『』]+$/,
+	zh: /^[々一-鿿0-9,。，？！…“”‘’]+$/,
+	vi: /^[a-zA-ZÀ-ỹ0-9 ,.?!…“”‘’]+$/,
+	es: /^[a-zA-ZÀ-ÿ0-9 ,.?!…¿¡«»“”]+$/,
+	it: /^[a-zA-ZÀ-ÿ0-9' ,.?!…«»“”]+$/,
+	de: /^[a-zA-ZÀ-ÿß0-9 ,.?!…„“‚‘]+$/,
+	ru: /^[Ѐ-ӿ0-9 ,.?!…«»„“]+$/
 };
 
 const SHAPES: readonly SentenceShape[] = ['simple', 'detailed', 'complex'];
@@ -132,6 +132,74 @@ function plain(language: WordLanguage, word: string): string {
  * take. A modifier is stored in one form and comes out agreeing with its noun,
  * so each gender's shape of it counts as one of the language's words.
  */
+function escapeRe(text: string): string {
+	return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+/**
+ * A counted phrase with its number taken off, so what is left is the noun phrase
+ * every other check already knows how to read.
+ */
+function stripCount(language: WordLanguage, phrase: string): string {
+	const data = SENTENCE_DATA[language];
+	const numeral = data.numeral;
+
+	if (!numeral) {
+		return phrase;
+	}
+
+	const space = escapeRe(data.space);
+	const counters = Object.values(numeral.counters).map(escapeRe);
+	const number = `\\d[\\d${escapeRe(numeral.group)}]*`;
+	const group = counters.length ? `${number}(?:${space}(?:${counters.join('|')}))?` : number;
+
+	return phrase
+		.replace(new RegExp(`${space}${group}$`), '')
+		.replace(new RegExp(`^${group}${space}`), '');
+}
+
+/** Whether a phrase is an amount of money, written the way the language writes it. */
+function isMoney(language: WordLanguage, phrase: string): boolean {
+	const data = SENTENCE_DATA[language];
+	const numeral = data.numeral;
+
+	if (!numeral) {
+		return false;
+	}
+
+	return new RegExp(
+		`^\\d[\\d${escapeRe(numeral.group)}]*${escapeRe(data.space)}${escapeRe(numeral.currency)}$`
+	).test(phrase);
+}
+
+/**
+ * Which sentence of a result each phrase belongs to.
+ *
+ * `phrases` and `slots` are one flat list across every sentence, which is what
+ * they are for — but a question like "is this counted phrase the subject of its
+ * own sentence" needs the boundaries back, and the phrases appear in order, so
+ * walking them against `sentences` finds them.
+ */
+function sentenceOf(detail: SentenceDetail): number[] {
+	const out: number[] = [];
+	let at = 0;
+	let cursor = 0;
+
+	for (const phrase of detail.phrases) {
+		while (at < detail.sentences.length - 1 && detail.sentences[at].indexOf(phrase, cursor) < 0) {
+			at += 1;
+			cursor = 0;
+		}
+
+		const found = detail.sentences[at].indexOf(phrase, cursor);
+
+		cursor = found < 0 ? cursor : found + phrase.length;
+		out.push(at);
+	}
+
+	return out;
+}
+
 function inflectedFor(language: WordLanguage, pool: readonly string[]): string[] {
 	const wordData = WORD_DATA[language];
 	const genders = Object.keys(wordData.agreement ?? {}) as WordGender[];
@@ -365,8 +433,19 @@ describe('Sentence', () => {
 						continue;
 					}
 
+					if (slot === 'money') {
+						assert.ok(
+							isMoney(language, phrase),
+							`${language}: '${phrase}' is not an amount (${detail.sentence})`
+						);
+
+						continue;
+					}
+
+					// A counted phrase is a noun phrase with a number on it, so the
+					// number comes off before the pools are asked about the rest.
 					assert.ok(
-						explains(language, written),
+						explains(language, stripCount(language, written)),
 						`${language}: '${phrase}' is not a ${slot} the pools can build (${detail.sentence})`
 					);
 				}
@@ -395,7 +474,12 @@ describe('Sentence', () => {
 				const predicates = detail.slots.filter((slot) => slot === 'verb' || slot === 'state');
 
 				assert.strictEqual(predicates.length, 1, detail.sentence);
-				assert.ok(detail.slots.includes('subject'), detail.sentence);
+				// A shape that counts what it is about has no separate subject: the
+				// counted phrase is what the verb agrees with.
+				assert.ok(
+					detail.slots.includes('subject') || detail.slots.includes('quantity'),
+					detail.sentence
+				);
 			}
 		}
 	});
@@ -411,7 +495,12 @@ describe('Sentence', () => {
 					continue;
 				}
 
-				const transitive = detail.slots.includes('object');
+				// A quantity beside a subject is an object with a number on it, and an
+				// amount is an object of the class money belongs to.
+				const transitive =
+					detail.slots.includes('object') ||
+					detail.slots.includes('money') ||
+					(detail.slots.includes('quantity') && detail.slots.includes('subject'));
 				// A verb can sit in more than one group — `gathers` is transitive
 				// beside a person and intransitive beside a crowd — so the sentence is
 				// right when one of its groups accounts for it.
@@ -679,9 +768,11 @@ describe('Sentence', () => {
 					assert.ok(sentence.endsWith(data.terminators.statement), `${language}: ${sentence}`);
 					assert.match(sentence, SCRIPT[language], `${language}: ${sentence}`);
 					// Every sentence closes exactly once, so two of them were never run
-					// together into one entry.
+					// together into one entry. Counted after the grouped numbers are
+					// taken out: Vietnamese, Spanish and Italian group on a full stop,
+					// so `5.000.000` is three of them and none is a terminator.
 					assert.strictEqual(
-						sentence.split(data.terminators.statement).length - 1,
+						sentence.replace(/\d[\d.,]*\d/g, '#').split(data.terminators.statement).length - 1,
 						1,
 						`${language}: ${sentence}`
 					);
@@ -752,10 +843,23 @@ describe('Sentence', () => {
 				}
 
 				const wanted = THEME_CLASS[detail.theme];
+				// A shape that counts what it is about has no separate subject, so the
+				// counted phrase is the one that has to stay on topic. Beside a subject
+				// it is an object instead, and belongs to whatever class the verb takes.
+				//
+				// A counted phrase is checked only in the opening sentence, and only
+				// when that sentence has no subject of its own — the one case where it
+				// provably is the subject. A later sentence may have dropped its
+				// subject, and then a counted object looks exactly the same from here.
+				const belongs = sentenceOf(detail);
+				const opens = !detail.slots.some((slot, i) => slot === 'subject' && belongs[i] === 0);
+				const counted = (at: number) => belongs[at] === 0 && opens;
 				let subjects = 0;
 
 				for (let i = 0; i < detail.phrases.length; i += 1) {
-					if (detail.slots[i] !== 'subject') {
+					const slot = detail.slots[i];
+
+					if (slot !== 'subject' && !(slot === 'quantity' && counted(i))) {
 						continue;
 					}
 
@@ -769,9 +873,10 @@ describe('Sentence', () => {
 
 					// Any of the three sentences can be the one a phrase opens, so both
 					// cases are tried rather than only the first phrase of the result.
+					const bare = stripCount(language, phrase);
 					const found = [
-						...nounsIn(language, phrase),
-						...nounsIn(language, phrase.charAt(0).toLowerCase() + phrase.slice(1))
+						...nounsIn(language, bare),
+						...nounsIn(language, bare.charAt(0).toLowerCase() + bare.slice(1))
 					];
 					const themes = found
 						.map((noun) => themeOfNoun(language, noun))
@@ -1341,6 +1446,144 @@ describe('Sentence', () => {
 				for (const [form, pool] of Object.entries(group.forms ?? {})) {
 					assert.strictEqual(pool.length, group.words.length, `${language} ${form}`);
 				}
+			}
+		}
+	});
+
+	it('`slots: quantity` counts a noun with the counter its kind takes', () => {
+		// Only the four languages with a classifier table declare a counted shape.
+		// A classifier is what makes a noun countable at all — `슬픔 12 가지` is
+		// twelve kinds of sadness — which is why English, Spanish and Italian do
+		// not: they would need a plural, and a plural of `sadness` is not a word.
+		const COUNTING = WORD_LANGUAGES.filter(
+			(language) => Object.keys(SENTENCE_DATA[language].numeral?.counters ?? {}).length > 0
+		);
+
+		assert.deepStrictEqual([...COUNTING], ['ko', 'ja', 'zh', 'vi']);
+
+		for (const language of COUNTING) {
+			const data = SENTENCE_DATA[language];
+			const numeral = data.numeral!;
+			const counters = new Set(Object.values(numeral.counters));
+
+			for (const detail of sentenceDetails({ language, slots: 'quantity', count: SAMPLE })) {
+				const at = detail.slots.indexOf('quantity');
+
+				assert.ok(at >= 0, `${language}: ${detail.sentence}`);
+
+				const phrase = detail.phrases[at];
+				const found = phrase.match(new RegExp(`\\d+${escapeRe(data.space)}(\\S+)`));
+
+				assert.ok(found, `${language}: '${phrase}' carries no number (${detail.sentence})`);
+				assert.ok(
+					counters.has(found![1]),
+					`${language}: '${found![1]}' is not a counter (${detail.sentence})`
+				);
+
+				const number = Number(phrase.match(/\d+/)![0]);
+
+				assert.ok(
+					number >= numeral.count[0] && number <= numeral.count[1],
+					`${language}: ${number} is outside ${numeral.count.join('-')}`
+				);
+
+				// A counted phrase drops its article and takes no modifier.
+				for (const article of articlesFor(language)) {
+					assert.ok(!phrase.startsWith(article + data.space), `${language}: ${phrase}`);
+				}
+
+				assert.ok(
+					poolFor(language, 'subject').has(stripCount(language, phrase)),
+					`${language}: '${phrase}' is not a bare noun and a count (${detail.sentence})`
+				);
+			}
+		}
+
+		// German and Russian declare no numeral at all, so asking falls back to the
+		// shapes they do have rather than inventing a case they cannot write.
+		for (const language of ['de', 'ru'] as WordLanguage[]) {
+			assert.strictEqual(SENTENCE_DATA[language].numeral, undefined, language);
+
+			for (const detail of sentenceDetails({ language, slots: 'quantity', count: 30 })) {
+				assert.ok(!detail.slots.includes('quantity'), detail.sentence);
+			}
+		}
+	});
+
+	it('`slots: money` writes an amount the language actually writes', () => {
+		const PAYING = WORD_LANGUAGES.filter((language) => SENTENCE_DATA[language].numeral);
+
+		assert.deepStrictEqual([...PAYING], ['en', 'ko', 'ja', 'zh', 'vi', 'es', 'it']);
+
+		for (const language of PAYING) {
+			const numeral = SENTENCE_DATA[language].numeral!;
+			const amounts = new Set(numeral.amounts);
+
+			for (const detail of sentenceDetails({ language, slots: 'money', count: SAMPLE })) {
+				const at = detail.slots.indexOf('money');
+
+				assert.ok(at >= 0, `${language}: ${detail.sentence}`);
+
+				const phrase = detail.phrases[at];
+
+				assert.ok(isMoney(language, phrase), `${language}: '${phrase}' is not an amount`);
+				assert.ok(
+					amounts.has(
+						Number(phrase.replace(new RegExp(escapeRe(numeral.group), 'g'), '').match(/\d+/)![0])
+					),
+					`${language}: '${phrase}' is not an amount the language writes`
+				);
+			}
+		}
+
+		// The two that cannot: an amount would be an object, and neither declares an
+		// object shape, because both would need a case their nouns change for.
+		for (const language of ['de', 'ru'] as WordLanguage[]) {
+			for (const detail of sentenceDetails({ language, slots: 'money', count: 30 })) {
+				assert.ok(!detail.slots.includes('money'), detail.sentence);
+			}
+		}
+	});
+
+	it('an amount stands where the verbs that take an idea can take it', () => {
+		// Money is an idea, which is what decides the verbs it can stand beside.
+		for (const language of WORD_LANGUAGES) {
+			const data = SENTENCE_DATA[language];
+
+			for (const detail of sentenceDetails({ language, slots: 'money', count: 60 })) {
+				const at = detail.slots.indexOf('verb');
+
+				if (at < 0 || !detail.slots.includes('money')) {
+					continue;
+				}
+
+				const groups = data.verbs.filter((group) => group.words.includes(detail.phrases[at]));
+
+				assert.ok(
+					groups.some((group) => group.object?.includes('idea')),
+					`${language}: ${detail.phrases[at]} takes no idea (${detail.sentence})`
+				);
+			}
+		}
+	});
+
+	it('a grouped number is written the way the language groups it', () => {
+		for (const language of WORD_LANGUAGES) {
+			const numeral = SENTENCE_DATA[language].numeral;
+
+			if (!numeral) {
+				continue;
+			}
+
+			for (const sentence of randSentence({ language, slots: 'money', count: 40 })) {
+				const digits = sentence.match(/\d[\d.,\s]*\d/)?.[0] ?? '';
+
+				// Three digits between separators, and no other separator in sight.
+				assert.match(
+					digits,
+					new RegExp(`^\\d{1,3}(${escapeRe(numeral.group)}\\d{3})*$`),
+					`${language}: '${digits}' (${sentence})`
+				);
 			}
 		}
 	});

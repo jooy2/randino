@@ -170,6 +170,14 @@ export const IT: SentenceLanguageData = {
 	pronouns: { n: [''] },
 	// Every Italian preposition merges with the article behind it, so the phrase a
 	// preposition opens goes without one — `in giardino` rather than `in la
+	numeral: {
+		order: 'before',
+		counters: {},
+		count: [2, 12],
+		currency: 'euro',
+		amounts: [100, 500, 1000, 5000, 12000, 25000, 50000, 100000],
+		group: '.'
+	},
 	// foresta`, which is not Italian at all.
 	frames: [
 		{
@@ -233,6 +241,10 @@ export const IT: SentenceLanguageData = {
 				{ slot: 'manner' }
 			],
 			weight: 5
+		},
+		{
+			parts: [{ slot: 'subject', modifiable: true }, { slot: 'verb' }, { slot: 'money' }],
+			weight: 6
 		}
 	]
 };

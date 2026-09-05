@@ -91,6 +91,25 @@ export const JA: SentenceLanguageData = {
 	],
 	// Plain predicate forms, so a na-adjective closes on だ where an i-adjective
 	// closes on itself. The `word` pools hold the attributive 静かな instead, which
+	numeral: {
+		order: 'after',
+		counters: {
+			creature: '匹',
+			person: '人',
+			plant: '本',
+			edible: '個',
+			thing: '個',
+			vehicle: '台',
+			place: '箇所',
+			event: '回',
+			idea: '種類',
+			body: '本'
+		},
+		count: [2, 12],
+		currency: '円',
+		amounts: [1000, 5000, 10000, 30000, 50000, 100000, 300000, 500000, 1000000],
+		group: ','
+	},
 	// cannot end a sentence.
 	states: [
 		{
@@ -270,6 +289,26 @@ export const JA: SentenceLanguageData = {
 			weight: 12,
 			mood: 'question',
 			tag: 'か'
+		},
+		{
+			parts: [
+				{ slot: 'subject', tail: 'が', modifiable: true },
+				{ slot: 'quantity', tail: 'を' },
+				{ slot: 'verb' }
+			],
+			weight: 6
+		},
+		{
+			parts: [{ slot: 'quantity', tail: 'が' }, { slot: 'verb' }],
+			weight: 5
+		},
+		{
+			parts: [
+				{ slot: 'subject', tail: 'が', modifiable: true },
+				{ slot: 'money', tail: 'を' },
+				{ slot: 'verb' }
+			],
+			weight: 5
 		}
 	]
 };

@@ -128,6 +128,25 @@ export const ZH: SentenceLanguageData = {
 	pronouns: { n: ['', '它'] },
 	pronounless: ['person'],
 	// Chinese puts its verb after the subject and everything that frames the
+	numeral: {
+		order: 'after',
+		counters: {
+			creature: '只',
+			person: '位',
+			plant: '棵',
+			edible: '个',
+			thing: '个',
+			vehicle: '辆',
+			place: '处',
+			event: '次',
+			idea: '种',
+			body: '个'
+		},
+		count: [2, 12],
+		currency: '元',
+		amounts: [100, 500, 1000, 3000, 5000, 10000, 30000, 50000, 100000],
+		group: ','
+	},
 	// action — the place phrase included — in front of it.
 	frames: [
 		{
@@ -228,6 +247,18 @@ export const ZH: SentenceLanguageData = {
 			weight: 12,
 			mood: 'question',
 			tag: '吗'
+		},
+		{
+			parts: [{ slot: 'subject', modifiable: true }, { slot: 'verb' }, { slot: 'quantity' }],
+			weight: 6
+		},
+		{
+			parts: [{ slot: 'quantity' }, { slot: 'verb' }],
+			weight: 5
+		},
+		{
+			parts: [{ slot: 'subject', modifiable: true }, { slot: 'verb' }, { slot: 'money' }],
+			weight: 5
 		}
 	]
 };

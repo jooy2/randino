@@ -150,6 +150,16 @@ export const ES: SentenceLanguageData = {
 	connectives: words(`y_luego pero entonces además, sin_embargo, después por_fin mientras_tanto,`),
 	interjections: words(`ay, oh, vaya, caramba, madre_mía, mira, desde_luego,`),
 	// Spanish carries its subject in the verb ending, so a second sentence about
+	// Money only, for the reason English has: a counted phrase would need a plural
+	// noun, and most of these pools are not countable at all.
+	numeral: {
+		order: 'before',
+		counters: {},
+		count: [2, 12],
+		currency: 'euros',
+		amounts: [100, 500, 1000, 5000, 12000, 25000, 50000, 100000],
+		group: '.'
+	},
 	// the same thing writes no pronoun at all.
 	pronouns: { n: [''] },
 	frames: [
@@ -214,6 +224,10 @@ export const ES: SentenceLanguageData = {
 				{ slot: 'manner' }
 			],
 			weight: 5
+		},
+		{
+			parts: [{ slot: 'subject', modifiable: true }, { slot: 'verb' }, { slot: 'money' }],
+			weight: 6
 		}
 	]
 };

@@ -161,6 +161,16 @@ console.log(
 						// Optional in one package and defaulted in another; written as a list
 						// either way so the shapes compare.
 						pronounless: [...(data.pronounless ?? [])],
+						numeral: data.numeral
+							? {
+									order: data.numeral.order,
+									counters: map(data.numeral.counters),
+									count: [...data.numeral.count],
+									currency: data.numeral.currency,
+									amounts: [...data.numeral.amounts],
+									group: data.numeral.group
+								}
+							: null,
 						frames: data.frames.map((frame) => ({
 							parts: frame.parts.map((part) => ({
 								slot: part.slot,

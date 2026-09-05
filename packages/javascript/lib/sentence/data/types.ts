@@ -187,6 +187,51 @@ export type SentencePronouns = {
 	[gender in WordGender]?: WordPool;
 };
 
+/**
+ * How a language writes a number beside a noun, and beside money.
+ *
+ * Left out by a language that cannot write either correctly, which is what
+ * German and Russian do: both would need a case their nouns change their own
+ * ending for, the same reason neither declares an object shape.
+ */
+export type SentenceNumeral = {
+	/**
+	 * Where the number stands relative to the noun it counts. Korean, Japanese and
+	 * Chinese put it behind (`사과 12 개`); Vietnamese puts it in front, classifier
+	 * and all (`12 con mèo`).
+	 */
+	order: 'before' | 'after';
+	/**
+	 * The counter each kind of noun takes, which is what the noun classes were
+	 * worth having for: `마리` for a creature, `명` for a person, `대` for a vehicle.
+	 *
+	 * A classifier is also what makes an abstract noun countable at all — `슬픔 12
+	 * 가지` is twelve kinds of sadness — so a language with this table can count
+	 * anything in its pools. English, Spanish and Italian have no such word and
+	 * would need a plural, and a plural of `sadness` is not a thing anyone writes;
+	 * that is why they declare `counters` empty and no counted shape.
+	 */
+	counters: Partial<Record<NounClass, string>>;
+	/** How many of a counted thing, at the fewest and at the most. */
+	count: readonly [number, number];
+	/**
+	 * What money is written in, after the amount (`원`, `dollars`, `円`). Joined by
+	 * the language's own space, which is none at all in Japanese and Chinese.
+	 */
+	currency: string;
+	/**
+	 * The amounts the language writes, as a pool rather than a range. A range would
+	 * hand back `73,412 dollars`, and nobody writes that; these are the round
+	 * numbers a sentence actually names.
+	 */
+	amounts: readonly number[];
+	/**
+	 * What separates the thousands. `,` in English, Korean, Japanese and Chinese;
+	 * `.` in Vietnamese, Spanish and Italian.
+	 */
+	group: string;
+};
+
 export type SentenceLanguageData = {
 	/**
 	 * Placed between the phrases, and between the words inside one. A space in
@@ -256,5 +301,10 @@ export type SentenceLanguageData = {
 	 * do anyway. Omitted by a language whose pronouns stand for anything.
 	 */
 	pronounless?: readonly NounClass[];
+	/**
+	 * How the language writes a number. Left out by one that cannot, which then
+	 * declares no `quantity` and no `money` shape either.
+	 */
+	numeral?: SentenceNumeral;
 	frames: readonly SentenceFrame[];
 };
