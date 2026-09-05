@@ -45,6 +45,7 @@ Every option is optional, and the defaults are what the empty call above uses.
 | --- | --- | --- | --- |
 | `language` | <Lang js="WordLanguageOption" dart="WordLanguage?" py="WordLanguageOption" code /> | <Lang js="'all'" dart="null" py="&quot;all&quot;" code /> | Language of the generated sentences. <Lang js="'all'" dart="null" py="&quot;all&quot;" code /> mixes every supported language, picking one per sentence. |
 | `theme` | <Lang js="WordThemeOption" dart="WordTheme?" py="WordThemeOption" code /> | <Lang js="'all'" dart="null" py="&quot;all&quot;" code /> | What the sentence's **subject** is about. See [Themes](../word/themes). |
+| `type` | <Lang js="SentenceTypeOption" dart="Set&lt;SentenceType&gt;?" py="SentenceTypeOption" code /> | <Lang js="'statement'" dart="null" py="&quot;statement&quot;" code /> | What the sentence is doing. See [Asking, exclaiming, trailing off](#asking-exclaiming-trailing-off). |
 | `shape` | <Lang js="SentenceShapeOption" dart="SentenceShape?" py="SentenceShapeOption" code /> | <Lang js="'all'" dart="null" py="&quot;all&quot;" code /> | How much the sentence says. See [How much it says](#how-much-it-says). |
 | `slots` | <Lang js="SentenceSlotOption" dart="Set&lt;SentenceSlot&gt;?" py="SentenceSlotOption" code /> | <Lang js="'all'" dart="null" py="&quot;all&quot;" code /> | Which parts it carries beside the subject. See [Picking the shape](#picking-the-shape). |
 | `include` | <Lang js="string &#124; string[]" dart="List&lt;String&gt;" py="str &#124; Sequence[str]" code /> | <Lang js="—" dart="const []" py="()" code /> | Words every sentence has to contain. See [Words it has to contain](#words-it-has-to-contain). |
@@ -325,6 +326,127 @@ A word can be more than one thing, and which it becomes depends on the rest. Eng
 
 Two things follow from that. A sentence has room for **as many words as it has phrases**, so asking for more than the longest shape can carry places what fits and leaves the rest out. And with no `language`, the languages whose pools actually hold every word you named are preferred, so `include: '고양이'` produces Korean.
 
+## Asking, exclaiming, trailing off {#asking-exclaiming-trailing-off}
+
+`type` says what the sentence is doing. `'statement'` is the default and everything so far; the other three are `'question'`, `'exclamation'` and `'trailing'` — a statement that stops rather than ends.
+
+::: lang js
+
+```javascript
+randSentence({ language: 'en', type: 'question', count: 2 });
+// ['Does the delphinium spread in the halfmoon?', 'Does the evening brighten in the obelisk?']
+
+randSentence({ language: 'en', type: 'exclamation', count: 2 });
+// ['Well, the chai boils in the mesa!', 'Wow, the loud sinew heals!']
+
+randSentence({ language: 'en', type: 'trailing', count: 2 });
+// ['In summer, the amber frappe melts…', 'The zesty dumpling cools…']
+```
+
+:::
+
+::: lang dart
+
+```dart
+randSentence(language: WordLanguage.en, type: {SentenceType.question}, count: 2);
+// [Does the delphinium spread in the halfmoon?, Does the evening brighten in the obelisk?]
+
+randSentence(language: WordLanguage.en, type: {SentenceType.exclamation}, count: 2);
+// [Well, the chai boils in the mesa!, Wow, the loud sinew heals!]
+
+randSentence(language: WordLanguage.en, type: {SentenceType.trailing}, count: 2);
+// [In summer, the amber frappe melts…, The zesty dumpling cools…]
+```
+
+:::
+
+::: lang py
+
+```python
+rand_sentence(language="en", type="question", count=2)
+# ['Does the delphinium spread in the halfmoon?', 'Does the evening brighten in the obelisk?']
+
+rand_sentence(language="en", type="exclamation", count=2)
+# ['Well, the chai boils in the mesa!', 'Wow, the loud sinew heals!']
+
+rand_sentence(language="en", type="trailing", count=2)
+# ['In summer, the amber frappe melts…', 'The zesty dumpling cools…']
+```
+
+:::
+
+**A question is a shape, not a mark bolted onto a statement.** That is the same rule the rest of the generator follows, and it is why the do-support is not a branch in the code: English declares a shape whose auxiliary stands in front of the subject, and the verb falls back to its base form. German moves its finite verb to where nothing else stands; Korean changes the ending on the predicate itself; Japanese, Chinese and Vietnamese add a tag — `か`, `吗`, `không` — after the whole clause.
+
+| Language | How it asks |  |
+| --- | --- | --- |
+| `en` | do-support, and the base form behind it | `Does the delphinium spread?` |
+| `de` | the finite verb moves to the front | `Fliegt ein düsteres Kaninchen sorgsam?` |
+| `ko` | the ending on the predicate changes | `베고니아가 시드니?` |
+| `ja` `zh` `vi` | a tag after the clause | `侦探在遥远北极星里靠近吗？` |
+| `es` `it` `ru` | the mark alone | `¿El vino vívido se estropea en la sabana?` |
+
+The last row is not a shortcut: for those three the question **is** the statement, so they declare no question shape and get their statement shapes back — the same best-effort a length range too narrow for a shape already gets. Spanish marks both ends, which is what its `¿` and `¡` are.
+
+**An exclamation usually opens on an interjection**, because one without anything in front of it is a statement wearing a mark. A statement never opens on one, and a question has its own mark to do the work.
+
+::: lang js
+
+```javascript
+randSentence({ language: 'ko', type: 'exclamation', count: 2 });
+// ['저런, 두꺼운 황사가 깊어진다!', '오, 여름에 해뜰녘이 초원에서 짙어진다!']
+```
+
+:::
+
+::: lang dart
+
+```dart
+randSentence(language: WordLanguage.ko, type: {SentenceType.exclamation}, count: 2);
+// [저런, 두꺼운 황사가 깊어진다!, 오, 여름에 해뜰녘이 초원에서 짙어진다!]
+```
+
+:::
+
+::: lang py
+
+```python
+rand_sentence(language="ko", type="exclamation", count=2)
+# ['저런, 두꺼운 황사가 깊어진다!', '오, 여름에 해뜰녘이 초원에서 짙어진다!']
+```
+
+:::
+
+Asking for more than one type decides per sentence, so a paragraph can ask something and then answer it. `SentenceDetail.types` reports which each one was.
+
+::: lang js
+
+```javascript
+randSentence({ language: 'en', type: 'all', sentences: 3 });
+// ['Does the spectrum spread in the cosmic meteor? But does the copper rapture gather? The spectrum remains…']
+```
+
+:::
+
+::: lang dart
+
+```dart
+randSentence(language: WordLanguage.en, type: SentenceType.values.toSet(), sentences: 3);
+// [Does the spectrum spread in the cosmic meteor? But does the copper rapture gather? The spectrum remains…]
+```
+
+:::
+
+::: lang py
+
+```python
+rand_sentence(language="en", type="all", sentences=3)
+# ['Does the spectrum spread in the cosmic meteor? But does the copper rapture gather? The spectrum remains…']
+```
+
+:::
+
+A word you named through `include` comes out in the form the type asks for: `include: '달린다'` with `type: 'question'` writes `달리니?`, not `달린다?`. The forms are stored beside the plain words rather than instead of them, one for one, which is what makes the translation possible.
+
 ## More than one sentence {#more-than-one-sentence}
 
 `sentences` puts more than one sentence in **one result**. They come back as a single string — `count` is still how many strings there are — and they are about the same thing rather than being that many separate draws.
@@ -547,6 +669,7 @@ rand_sentence(language="ko", output="detail", count=1)
 | `phrases` | <Lang js="string[]" dart="List&lt;String&gt;" py="tuple[str, ...]" code /> | The phrases it is made of, in order — without the particles. One flat list across every sentence. |
 | `slots` | <Lang js="SentenceSlot[]" dart="List&lt;SentenceSlot&gt;" py="tuple[SentenceSlot, ...]" code /> | What each phrase does, at the same index as `phrases`. |
 | `names` | <Lang js="string[]" dart="List&lt;String&gt;" py="tuple[str, ...]" code /> | The person names the result was written with, in order. Empty unless `includeName` asked for them. |
+| `types` | <Lang js="SentenceType[]" dart="List&lt;SentenceType&gt;" py="tuple[SentenceType, ...]" code /> | What each sentence is doing, at the same index as `sentences`. |
 | `language` | `WordLanguage` | The language this sentence was generated in. |
 | `theme` | <Lang js="WordTheme &#124; null" dart="WordTheme?" py="WordTheme &#124; None" code /> | Theme of the subject — the first sentence's, which is what the rest stay about. Null when that word is not one the generator knows. |
 

@@ -45,6 +45,7 @@ rand_sentence()
 | --- | --- | --- | --- |
 | `language` | <Lang js="WordLanguageOption" dart="WordLanguage?" py="WordLanguageOption" code /> | <Lang js="'all'" dart="null" py="&quot;all&quot;" code /> | 생성할 문장의 언어. <Lang js="'all'" dart="null" py="&quot;all&quot;" code />은 문장마다 하나씩 골라 모든 언어를 섞습니다. |
 | `theme` | <Lang js="WordThemeOption" dart="WordTheme?" py="WordThemeOption" code /> | <Lang js="'all'" dart="null" py="&quot;all&quot;" code /> | 문장의 **주어**가 무엇에 관한 것인지. [테마](../word/themes) 참고. |
+| `type` | <Lang js="SentenceTypeOption" dart="Set&lt;SentenceType&gt;?" py="SentenceTypeOption" code /> | <Lang js="'statement'" dart="null" py="&quot;statement&quot;" code /> | 문장이 무엇을 하는지. [묻고, 외치고, 말끝을 흐리기](#asking-exclaiming-trailing-off) 참고. |
 | `shape` | <Lang js="SentenceShapeOption" dart="SentenceShape?" py="SentenceShapeOption" code /> | <Lang js="'all'" dart="null" py="&quot;all&quot;" code /> | 문장이 얼마나 많은 것을 말하는지. [얼마나 말할지](#how-much-it-says) 참고. |
 | `slots` | <Lang js="SentenceSlotOption" dart="Set&lt;SentenceSlot&gt;?" py="SentenceSlotOption" code /> | <Lang js="'all'" dart="null" py="&quot;all&quot;" code /> | 주어 옆에 무엇을 두는지. [형태 고르기](#picking-the-shape) 참고. |
 | `include` | <Lang js="string &#124; string[]" dart="List&lt;String&gt;" py="str &#124; Sequence[str]" code /> | <Lang js="—" dart="const []" py="()" code /> | 모든 문장에 반드시 들어가야 할 단어. [반드시 넣을 단어](#words-it-has-to-contain) 참고. |
@@ -325,6 +326,100 @@ rand_sentence(language="ko", include=["사자", "조용히"], count=2)
 
 여기서 두 가지가 따라옵니다. 문장은 **구의 개수만큼** 단어를 담을 수 있으므로, 가장 긴 형태가 감당하는 것보다 많이 요청하면 들어가는 것만 넣고 나머지는 빠집니다. 그리고 `language`를 지정하지 않으면 적은 단어를 모두 가진 언어가 먼저 뽑히므로, `include: '고양이'`는 한국어 문장을 만듭니다.
 
+## 묻고, 외치고, 말끝을 흐리기 {#asking-exclaiming-trailing-off}
+
+`type`은 문장이 무엇을 하는지 정합니다. 기본값 `'statement'`가 지금까지의 전부이고, 나머지 셋은 `'question'`, `'exclamation'`, 그리고 끝나는 대신 멈추는 문장인 `'trailing'`입니다.
+
+::: lang js
+
+```javascript
+randSentence({ language: 'en', type: 'question', count: 2 });
+// ['Does the delphinium spread in the halfmoon?', 'Does the evening brighten in the obelisk?']
+
+randSentence({ language: 'ko', type: 'exclamation', count: 2 });
+// ['저런, 두꺼운 황사가 깊어진다!', '오, 여름에 해뜰녘이 초원에서 짙어진다!']
+
+randSentence({ language: 'ko', type: 'trailing', count: 2 });
+// ['십종경기는 넓다…', '로켓이 반짝인다…']
+```
+
+:::
+
+::: lang dart
+
+```dart
+randSentence(language: WordLanguage.en, type: {SentenceType.question}, count: 2);
+// [Does the delphinium spread in the halfmoon?, Does the evening brighten in the obelisk?]
+
+randSentence(language: WordLanguage.ko, type: {SentenceType.exclamation}, count: 2);
+// [저런, 두꺼운 황사가 깊어진다!, 오, 여름에 해뜰녘이 초원에서 짙어진다!]
+
+randSentence(language: WordLanguage.ko, type: {SentenceType.trailing}, count: 2);
+// [십종경기는 넓다…, 로켓이 반짝인다…]
+```
+
+:::
+
+::: lang py
+
+```python
+rand_sentence(language="en", type="question", count=2)
+# ['Does the delphinium spread in the halfmoon?', 'Does the evening brighten in the obelisk?']
+
+rand_sentence(language="ko", type="exclamation", count=2)
+# ['저런, 두꺼운 황사가 깊어진다!', '오, 여름에 해뜰녘이 초원에서 짙어진다!']
+
+rand_sentence(language="ko", type="trailing", count=2)
+# ['십종경기는 넓다…', '로켓이 반짝인다…']
+```
+
+:::
+
+**의문문은 문장부호를 갖다 붙인 것이 아니라 하나의 형태입니다.** 생성기의 나머지가 따르는 규칙 그대로이고, do-support가 코드의 분기가 아닌 이유이기도 합니다. 영어는 조동사가 주어 앞에 서는 형태를 선언하고, 동사는 기본형으로 돌아갑니다. 독일어는 정동사를 아무것도 서 있지 않은 첫 자리로 옮기고, 한국어는 서술어의 어미를 바꿉니다. 일본어·중국어·베트남어는 절 전체 뒤에 `か`, `吗`, `không` 같은 꼬리표를 붙입니다.
+
+| 언어           | 어떻게 묻는가                     |                                             |
+| -------------- | --------------------------------- | ------------------------------------------- |
+| `en`           | do-support, 그리고 그 뒤의 기본형 | `Does the delphinium spread?`               |
+| `de`           | 정동사가 맨 앞으로                | `Fliegt ein düsteres Kaninchen sorgsam?`    |
+| `ko`           | 서술어의 어미가 바뀜              | `베고니아가 시드니?`                        |
+| `ja` `zh` `vi` | 절 뒤의 꼬리표                    | `侦探在遥远北极星里靠近吗？`                |
+| `es` `it` `ru` | 문장부호만                        | `¿El vino vívido se estropea en la sabana?` |
+
+마지막 줄은 대충 넘긴 것이 아닙니다. 그 셋에서는 의문문이 **곧** 평서문이라서 의문형을 아예 선언하지 않고 평서형을 그대로 돌려받습니다. 어떤 형태에도 너무 좁은 길이 범위가 이미 받는 것과 같은 최선의 처리입니다. 스페인어는 양쪽 끝을 모두 표시하는데, `¿`와 `¡`가 그것입니다.
+
+**감탄문은 대개 감탄사로 시작합니다.** 앞에 아무것도 없는 감탄문은 문장부호만 걸친 평서문이기 때문입니다. 평서문은 감탄사로 시작하지 않고, 의문문에는 제 몫을 하는 문장부호가 이미 있습니다.
+
+여러 타입을 요청하면 문장마다 정해집니다. 한 문단이 무언가를 묻고 스스로 답할 수 있다는 뜻이고, `SentenceDetail.types`가 각각 무엇이었는지 알려 줍니다.
+
+::: lang js
+
+```javascript
+randSentence({ language: 'en', type: 'all', sentences: 3 });
+// ['Does the spectrum spread in the cosmic meteor? But does the copper rapture gather? The spectrum remains…']
+```
+
+:::
+
+::: lang dart
+
+```dart
+randSentence(language: WordLanguage.en, type: SentenceType.values.toSet(), sentences: 3);
+// [Does the spectrum spread in the cosmic meteor? But does the copper rapture gather? The spectrum remains…]
+```
+
+:::
+
+::: lang py
+
+```python
+rand_sentence(language="en", type="all", sentences=3)
+# ['Does the spectrum spread in the cosmic meteor? But does the copper rapture gather? The spectrum remains…']
+```
+
+:::
+
+`include`로 지정한 단어는 타입이 요구하는 형태로 나옵니다. `include: '달린다'`에 `type: 'question'`이면 `달린다?`가 아니라 `달리니?`입니다. 각 형태는 평서형을 대신하는 것이 아니라 그 옆에 하나씩 짝지어 저장되고, 그것이 이 변환을 가능하게 합니다.
+
 ## 문장을 여러 개 {#more-than-one-sentence}
 
 `sentences`는 **결과 하나**에 문장을 여러 개 담습니다. 문자열 하나로 돌아오고 — 문자열이 몇 개인지는 여전히 `count`가 정합니다 — 그 문장들은 따로 뽑은 것이 아니라 같은 것에 관한 이야기입니다.
@@ -547,6 +642,7 @@ rand_sentence(language="ko", output="detail", count=1)
 | `phrases` | <Lang js="string[]" dart="List&lt;String&gt;" py="tuple[str, ...]" code /> | 문장을 이루는 구를 순서대로. 조사는 빠져 있습니다. 모든 문장을 통틀어 한 줄로 이어집니다. |
 | `slots` | <Lang js="SentenceSlot[]" dart="List&lt;SentenceSlot&gt;" py="tuple[SentenceSlot, ...]" code /> | 각 구가 하는 일. `phrases`와 같은 인덱스입니다. |
 | `names` | <Lang js="string[]" dart="List&lt;String&gt;" py="tuple[str, ...]" code /> | 결과에 쓰인 사람 이름을 순서대로. `includeName`으로 요청하지 않았다면 비어 있습니다. |
+| `types` | <Lang js="SentenceType[]" dart="List&lt;SentenceType&gt;" py="tuple[SentenceType, ...]" code /> | 각 문장이 무엇을 하는지. `sentences`와 같은 자리입니다. |
 | `language` | `WordLanguage` | 이 문장을 만든 언어. |
 | `theme` | <Lang js="WordTheme &#124; null" dart="WordTheme?" py="WordTheme &#124; None" code /> | 주어의 테마. 첫 문장의 것이고, 나머지 문장이 계속 이야기하는 대상입니다. 생성기가 모르는 단어면 null입니다. |
 

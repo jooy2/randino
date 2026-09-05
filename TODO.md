@@ -17,7 +17,7 @@ Everything here is about `randSentence`. It shipped in the vNext section of the 
 - [x] A. Length bounds are best-effort where they should be exact
 - [x] B. More than one sentence per result, and the sentences hold together
 - [x] C. A person name where a sentence has room for one
-- [ ] D. Questions, exclamations and sentences that trail off
+- [x] D. Questions, exclamations and sentences that trail off
 - [ ] E. Dialogue and thought, in the language's own quotation marks
 - [ ] F. Politeness, which is mostly a Korean question
 - [ ] G. Numbers, counters and amounts of money
@@ -73,20 +73,23 @@ What landed:
 The plan guessed this would roughly double what the generator pulls in. **It does not, and the guess was wrong for an interesting reason**: the sentence generator already carries the whole word pools, which is 110 KB of the 122.5, and the name pools are 22 KB beside them. What doubles is a bundle that reaches `randName` alone (22.3 KB); a bundle that already reaches a sentence barely notices. The number is written down on the docs page, in an admonition rather than a footnote, because it is the kind of thing a reader finds out too late.
 
 
-## D. Questions, exclamations and sentences that trail off
+## D. Questions, exclamations and sentences that trail off — done
 
-`type?: SentenceType | SentenceType[] | 'all'`, default `'statement'`, where the moods are `'statement'`, `'question'`, `'exclamation'` and `'trailing'` (a statement that ends on `…`). `'dialogue'` and `'thought'` join them in E.
+`type` takes `'statement'` (the default), `'question'`, `'exclamation'` and `'trailing'`, one of them, a set of them, or `'all'` — decided per sentence, so a paragraph can ask something and then answer it. `SentenceDetail.types` reports which each one was.
 
-**A question is a shape, not a transformation.** That is the same rule the rest of the generator already follows, and it is what keeps the do-support out of the generator: English writes `Does the lion run?` as a shape whose first part carries `head: 'Does'`, and Korean writes `사자가 달리니?` as a shape that is the statement with a different ending on its verb.
+What landed, and what the plan got right:
 
-- `SentenceFrame.mood?: SentenceMood`, defaulting to `'statement'`. A language writes the question and exclamation shapes it can write, and declares none it cannot.
-- `SentenceFrame.tag?: string` — written after the last phrase, before the terminator, with the language's own space in front of it. That is Chinese `吗`, Vietnamese `không` and Japanese `か`, none of which is a phrase.
-- `SentenceLanguageData.terminator` becomes `terminators: { statement: '.', question: '?', exclamation: '!', trailing: '…' }`. Spanish opens a question on `¿`, so a mood needs an opener as well.
-- Predicates take a different **form**, not a different pool: `VerbGroup` and `StateGroup` gain `forms?: Partial<Record<PredicateForm, WordPool>>`, index-aligned with `words`. English `question` is the base form (`run` beside `runs`); Korean `question` is `달리니` beside `달린다`; Chinese, Vietnamese, Spanish, Italian and Russian declare none, because the form does not change. A test has to assert every declared form pool is the same length as its `words`.
+- **`SentenceFrame.mood` and `SentenceFrame.tag`, as written.** The plan's own line — "write those four carefully and the rest fall out" — held exactly. English needed do-support and the base form, German the verb in the first position, Korean the ending, and Japanese, Chinese and Vietnamese a tag. Spanish, Italian and Russian declare no question shape at all, and the existing fall-back to the statement shapes is not a compromise there: for those three the question **is** the statement.
+- `terminators` and `openers`, `VerbGroup.forms` / `StateGroup.forms`, and `interjections`, all as planned. The form pools are index-aligned with `words`, and that alignment earns itself twice: once for the length budget, and once for `include: '달린다'` with `type: 'question'`, which comes out `달리니?` rather than `달린다?` because the required word can be translated by its position.
+- **English states need no form at all**, which the plan did not say. `Is the lion brave?` moves `is` into the shape and leaves `brave` alone, so only English's verbs got a form pool. That is 99 base forms for English and 154 `-니` forms for Korean, and nothing else in any language.
 
-Five of the nine languages need nothing but punctuation for a question. The four that do need more are English (do-support and the base form), German (the verb moves to the front), Korean and Japanese (the ending changes). Write those four carefully and the rest fall out.
+Three things the plan did not have:
 
-Exclamations want an interjection in front of them more often than not — `와, 정말 맛있군!` — so `interjections: WordPool` is worth having, used by exclamation frames alone.
+- **An exclamation is not its own shape.** A statement's shape plus the mark and an interjection is what an exclamation is in all nine languages, so `SentenceMood` has two values rather than three and only questions declare shapes of their own. Writing exclamative endings — Korean `-구나`, Japanese `-なあ` — would be another 300 hand-written forms for a mood the punctuation already carries.
+- **What a sentence opens on is one decision, not two.** An interjection and a connective are the same thing in two moods, and a sentence never wants both, so `openerFor` replaced the connective half of `followFor` and the budget reservation is written once.
+- **`frameRange` measures against the longest mark the language writes**, not the statement's. `…` is one character in every language here and `。` is one too, but Spanish `¿…?` is two, and a shape chosen against the shorter one is a shape that overshoots.
+
+The derivation was mechanical and then read by eye: Korean's `-니` follows two rules (`-는다` → `-니`, and dropping the `ㄴ` coda otherwise), with the ㄹ-irregular `달다` → `다니` the only exception; English's base forms needed two hand-fixes, `dozes` → `doze` and `aches` → `ache`, where the `-es` rule fires on a stem that already ends in a silent `e`.
 
 ## E. Dialogue and thought, in the language's own quotation marks
 

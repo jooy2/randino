@@ -114,6 +114,7 @@ const sentence = reactive({
 	shape: 'all',
 	slots: 'all',
 	sentences: 1,
+	type: 'statement',
 	includeName: false,
 	count: 8,
 	realism: 'real',
@@ -125,6 +126,8 @@ const sentence = reactive({
 });
 
 const SENTENCE_SLOTS = ['object', 'place', 'time', 'manner', 'state'];
+
+const SENTENCE_TYPES = ['statement', 'question', 'exclamation', 'trailing'];
 
 /** The words typed into `include`, which the option takes as an array. */
 const included = computed(() => sentence.include.split(/[\s,]+/).filter(Boolean));
@@ -163,6 +166,7 @@ const options = computed(() => {
 		if (sentence.slots !== 'all') out.slots = sentence.slots;
 		if (Number(sentence.sentences) > 1) out.sentences = Number(sentence.sentences);
 		if (sentence.includeName) out.includeName = true;
+		if (sentence.type !== 'statement') out.type = sentence.type;
 		if (included.value.length) out.include = included.value;
 		if (sentence.count !== 1) out.count = Number(sentence.count);
 		if (sentence.realism !== 'real') out.realism = sentence.realism;
@@ -595,6 +599,14 @@ async function copy() {
 						type="text"
 						:placeholder="t(locale, 'demoIncludeHint')"
 					/>
+				</label>
+
+				<label class="randino-demo-field">
+					<span><code>type</code></span>
+					<select v-model="sentence.type">
+						<option v-for="item in SENTENCE_TYPES" :key="item" :value="item">{{ item }}</option>
+						<option value="all">all</option>
+					</select>
 				</label>
 
 				<label class="randino-demo-check">
