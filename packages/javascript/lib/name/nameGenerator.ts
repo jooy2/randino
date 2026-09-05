@@ -545,6 +545,17 @@ function resolveSettings(options: RandNameOptions): Settings {
 	};
 }
 
+/**
+ * One name in `language`, drawn the way `randName` would draw it.
+ *
+ * Internal, and the only way into this generator from outside `lib/name`:
+ * `randSentence` writes a person's name where a sentence has room for one, and it
+ * has no business resolving `randName`'s options itself.
+ */
+export function drawName(language: NameLanguage, options: RandNameOptions = {}): NameDetail {
+	return generateOne(language, resolveSettings(options));
+}
+
 export function generateNameDetails(options: RandNameOptions = {}): NameDetail[] {
 	const language = options.language ?? 'all';
 	const settings = resolveSettings(options);

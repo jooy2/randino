@@ -21,6 +21,7 @@ import type {
 import { WORD_DATA } from '../dist/word/data/index.js';
 import { agree } from '../dist/word/wordGenerator.js';
 import type { WordGender } from '../dist/word/data/types.js';
+import { NAME_DATA } from '../dist/name/data/index.js';
 import { SENTENCE_DATA, THEME_CLASS } from '../dist/sentence/data/index.js';
 import { shapeOf } from '../dist/sentence/sentenceGenerator.js';
 
@@ -223,6 +224,18 @@ function explains(language: WordLanguage, phrase: string): boolean {
 	}
 
 	return false;
+}
+
+/**
+ * The given names the language can write, by gender — the pools `randSentence`
+ * reaches through `includeName`. CJK languages keep whole given names under
+ * `givenMale` / `givenFemale`; the others draw from `male` / `female`.
+ */
+function givenNames(language: WordLanguage, gender: 'male' | 'female'): Set<string> {
+	const data = NAME_DATA[language];
+	const pool = gender === 'male' ? (data.givenMale ?? data.male) : (data.givenFemale ?? data.female);
+
+	return new Set((pool ?? []).map((entry) => (typeof entry === 'string' ? entry : entry.n)));
 }
 
 describe('Sentence', () => {
@@ -808,6 +821,146 @@ describe('Sentence', () => {
 					(data.pronouns[gender] ?? data.pronouns.n) !== undefined,
 					`${language}: nothing stands in for a ${gender} subject`
 				);
+			}
+		}
+	});
+
+	it('`includeName` writes a person\'s name where a sentence has room for one', () => {
+		for (const language of WORD_LANGUAGES) {
+			const details = sentenceDetails({ language, includeName: true, count: SAMPLE });
+
+			for (const detail of details) {
+				assert.ok(detail.names.length > 0, `${language}: no name in '${detail.sentence}'`);
+
+				for (const name of detail.names) {
+					assert.ok(detail.phrases.includes(name), `${language}: ${name} is not a phrase`);
+					assert.ok(detail.sentence.includes(name), `${language}: ${name} is not in the sentence`);
+				}
+
+				// A name is a bare proper noun, so nothing opens the phrase it stands in.
+				const at = detail.slots.indexOf('subject');
+
+				if (at >= 0 && detail.names.includes(detail.phrases[at])) {
+					for (const article of articlesFor(language)) {
+						assert.ok(
+							!detail.sentence.includes(`${article}${SENTENCE_DATA[language].space}${detail.phrases[at]}`),
+							`${language}: '${article}' in front of a name (${detail.sentence})`
+						);
+					}
+				}
+			}
+		}
+
+		// Off by default, and the pools are not reached at all.
+		for (const detail of sentenceDetails({ count: 60 })) {
+			assert.deepStrictEqual(detail.names, [], detail.sentence);
+		}
+	});
+
+	it('a name comes out of the language`s own given-name pools', () => {
+		for (const language of WORD_LANGUAGES) {
+			const known = new Set([
+				...givenNames(language, 'male'),
+				...givenNames(language, 'female')
+			]);
+
+			for (const detail of sentenceDetails({ language, includeName: true, count: SAMPLE })) {
+				for (const name of detail.names) {
+					// English writes its pools capitalized and a sentence opens on a
+					// capital, so the name is looked up the way the pool holds it.
+					assert.ok(
+						known.has(name) || known.has(upperFirst(name)),
+						`${language}: '${name}' is in no given-name pool (${detail.sentence})`
+					);
+				}
+			}
+		}
+	});
+
+	it('a theme the caller named wins over `includeName`', () => {
+		// A name can only stand where a person would. Asked for beside a theme that
+		// names no people, the sentence is about that theme and carries no name.
+		for (const detail of sentenceDetails({
+			language: 'en',
+			theme: 'animal',
+			includeName: true,
+			count: SAMPLE
+		})) {
+			assert.strictEqual(detail.theme, 'animal', detail.sentence);
+			assert.deepStrictEqual(detail.names, [], detail.sentence);
+		}
+	});
+
+	it('a predicate agrees with the gender of the name it describes', () => {
+		// The one thing a name has to carry beside its letters. Spanish, Italian and
+		// Russian inflect a predicate adjective, and a name is in no pool for
+		// `genderOf` to read a gender out of.
+		for (const language of WORD_LANGUAGES) {
+			const data = SENTENCE_DATA[language];
+			const wordData = WORD_DATA[language];
+
+			if (!data.predicateAgrees || !wordData.agreement) {
+				continue;
+			}
+
+			const male = givenNames(language, 'male');
+			const female = givenNames(language, 'female');
+			const states = data.states.flatMap((group) => [...group.words]);
+			const agreed = (gender: WordGender) =>
+				new Set(states.map((word) => agree(wordData, word, gender)));
+			const forms = { m: agreed('m'), f: agreed('f') };
+			let checked = 0;
+
+			for (const detail of sentenceDetails({
+				language,
+				includeName: true,
+				slots: 'state',
+				count: 200
+			})) {
+				const at = detail.slots.indexOf('state');
+				const subject = detail.phrases[detail.slots.indexOf('subject')];
+
+				if (at < 0 || !detail.names.includes(subject)) {
+					continue;
+				}
+
+				const gender = male.has(subject) ? 'm' : female.has(subject) ? 'f' : null;
+
+				if (gender === null) {
+					continue;
+				}
+
+				checked += 1;
+
+				assert.ok(
+					forms[gender].has(detail.phrases[at]),
+					`${language}: '${detail.phrases[at]}' does not agree with ${subject} (${detail.sentence})`
+				);
+			}
+
+			assert.ok(checked > 0, `${language}: no named subject was described`);
+		}
+	});
+
+	it('Korean picks the particle a name asks for too', () => {
+		for (const detail of sentenceDetails({ language: 'ko', includeName: true, count: 200 })) {
+			const at = detail.slots.indexOf('subject');
+			const name = detail.phrases[at];
+
+			if (!detail.names.includes(name)) {
+				continue;
+			}
+
+			const after = detail.sentence.charAt(detail.sentence.indexOf(name) + name.length);
+			const last = name.charCodeAt(name.length - 1);
+			const coda = last >= 0xac00 && last <= 0xd7a3 && (last - 0xac00) % 28 !== 0;
+
+			if (after === '가' || after === '는') {
+				assert.ok(!coda, `${name}${after} (${detail.sentence})`);
+			}
+
+			if (after === '이' || after === '은') {
+				assert.ok(coda, `${name}${after} (${detail.sentence})`);
 			}
 		}
 	});

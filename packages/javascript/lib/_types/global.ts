@@ -356,6 +356,22 @@ export interface RandSentenceOptions extends RandCommonOptions {
 	 */
 	include?: string | readonly string[];
 	/**
+	 * Whether a sentence about a person writes a generated name where that person
+	 * would go — `Emma runs quietly.`, `민준이 조용히 달린다.` Default `false`.
+	 *
+	 * Turning it on narrows the subject to the themes that name people, so that the
+	 * sentence has somewhere to put one; a `theme` you named yourself is still
+	 * honoured, and a sentence about a lion stays about a lion. The name is a bare
+	 * given name — no article and no modifier — and it carries its own gender, so
+	 * what agrees with a subject agrees with it.
+	 *
+	 * Off by default because it is the one option that reaches the person-name
+	 * pools: a caller who never asks for a name never pays for them. It does not
+	 * weaken the rule that a nickname is never built from a person name — this is a
+	 * sentence, and you asked.
+	 */
+	includeName?: boolean;
+	/**
 	 * How many sentences one result holds. Default `1`, maximum
 	 * `RAND_SENTENCE_COUNT_MAX`.
 	 *
@@ -391,6 +407,11 @@ export interface SentenceDetail {
 	phrases: string[];
 	/** What each phrase does in the sentence, at the same index as `phrases`. */
 	slots: SentenceSlot[];
+	/**
+	 * The person names the result was written with, in order, and empty unless
+	 * `includeName` asked for them. Every one of them is also a phrase.
+	 */
+	names: string[];
 	language: WordLanguage;
 	/**
 	 * Theme the result's subject belongs to — the first sentence's, which is what

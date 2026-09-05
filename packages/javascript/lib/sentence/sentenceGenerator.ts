@@ -32,6 +32,8 @@ import { endsWithConsonant } from '../_internal/script.js';
 import { chance, clamp, pick } from '../_internal/utils.js';
 import { RAND_SENTENCE_COUNT_MAX, RAND_SENTENCE_LENGTH_MAX } from '../constants.js';
 import type {
+	NameGender,
+	RandRealism,
 	RandSentenceOptions,
 	SentenceDetail,
 	SentenceShapeOption,
@@ -53,6 +55,8 @@ import {
 	synthBounds,
 	themeOf
 } from '../word/wordGenerator.js';
+import { drawName } from '../name/nameGenerator.js';
+import { nameLengthRange } from '../name/nameLengthRange.js';
 import { SENTENCE_DATA, THEME_CLASS } from './data/index.js';
 import type {
 	NounClass,
@@ -85,12 +89,17 @@ type Settings = {
 	slots: readonly SentenceSlot[] | 'all' | 'none';
 	// How often one word is invented rather than drawn, as a percentage.
 	invent: number;
+	// The same thing again, in the form `randName` takes it. A sentence that writes
+	// a person's name hands the name generator the level the caller asked for.
+	realism: RandRealism;
 	minLength?: number;
 	maxLength?: number;
 	prefix: string;
 	include: readonly string[];
 	// How many sentences one result holds, clamped.
 	sentences: number;
+	// Whether a phrase about a person is written as a name.
+	includeName: boolean;
 };
 
 /**
@@ -108,6 +117,8 @@ type Topic = {
 	/** The class its theme falls into. Null when the noun is one no pool holds. */
 	class: NounClass | null;
 	gender: WordGender | undefined;
+	/** Whether that noun is a person's name, which is written bare wherever it goes. */
+	named: boolean;
 };
 
 /**
@@ -756,6 +767,10 @@ type Built = {
 	subject: string | null;
 	/** Its gender, for the pronoun and the agreement of whatever follows. */
 	gender: WordGender | undefined;
+	/** Whether that subject is a person's name. */
+	named: boolean;
+	/** The person names this sentence was written with, in order. */
+	names: string[];
 };
 
 /** The article a phrase opens with, by the noun's gender and the word after it. */
@@ -872,6 +887,46 @@ function nounPhrase(
 	};
 }
 
+/**
+ * A person's name for a phrase that has room for one, and the gender it carries.
+ *
+ * A bare given name rather than a full one: a sentence about someone uses the
+ * name they are called by, and `randName`'s default would put a surname in every
+ * clause. The gender is the one the name was drawn for, translated into the
+ * gender a modifier and a predicate agree with — and only for a language whose
+ * words agree at all, since nothing else has any use for it.
+ */
+function properName(
+	language: WordLanguage,
+	wordData: WordLanguageData,
+	settings: Settings,
+	prefix: string,
+	min: number,
+	max: number
+): { text: string; gender: WordGender | undefined } {
+	const drawn = drawName(language, {
+		includeSurname: false,
+		realism: settings.realism,
+		startsWith: prefix,
+		minLength: min,
+		maxLength: max
+	});
+
+	return {
+		text: drawn.native,
+		gender: wordData.agreement ? nameGender(drawn.gender) : undefined
+	};
+}
+
+function nameGender(gender: NameGender): WordGender {
+	return gender === 'male' ? 'm' : 'f';
+}
+
+/** How long a given name of the language can be, which is what a phrase reserves. */
+function nameSpan(language: WordLanguage): readonly [number, number] {
+	return nameLengthRange(language, false);
+}
+
 /** The particle a part writes after its phrase, in the form the phrase asks for. */
 function tailOf(part: SentencePart, phrase: string): string {
 	if (part.tailAlt && endsWithConsonant(phrase)) {
@@ -902,14 +957,20 @@ function modifyChanceFor(distance: number, tooLong: boolean): number {
  */
 function subjectThemesFor(settings: Settings, follow: Follow | null): readonly WordTheme[] {
 	const requested = themesOf(settings.theme);
+	// A name can only stand where a person would, so asking for one narrows the
+	// subject to the themes that name people. A theme the caller named themselves
+	// still wins — `theme: 'animal'` with `includeName` is a sentence about a lion,
+	// not about somebody the lion reminded us of.
+	const wanted = settings.includeName ? themesForClasses(requested, ['person']) : requested;
+	const themes = wanted.length ? wanted : requested;
 
 	if (!follow?.topic.class) {
-		return requested;
+		return themes;
 	}
 
-	const inClass = themesForClasses(requested, [follow.topic.class]);
+	const inClass = themesForClasses(themes, [follow.topic.class]);
 
-	return inClass.length ? inClass : requested;
+	return inClass.length ? inClass : themes;
 }
 
 function generateOne(
@@ -1124,17 +1185,17 @@ function compose(
 	// below is measured against what the sentence actually writes; `at` is the
 	// index back into the frame, which is what the plan is keyed by.
 	const pronoun = follow?.reference === 'pronoun' ? follow.pronoun : null;
-	const parts: { part: SentencePart; at: number }[] = [];
+	const shape: { part: SentencePart; at: number }[] = [];
 
 	frame.parts.forEach((part, at) => {
 		if (part.slot !== 'subject' || pronoun === null) {
-			parts.push({ part, at });
+			shape.push({ part, at });
 
 			return;
 		}
 
 		if (pronoun) {
-			parts.push({ part: { ...part, modifiable: false, bare: true }, at });
+			shape.push({ part, at });
 		}
 	});
 
@@ -1143,12 +1204,35 @@ function compose(
 	// each phrase was given the room the language's longest noun would need and
 	// drew a word out of its own theme, which is how a sentence came out short of a
 	// `minLength` the shape could otherwise have reached.
-	const partThemes = parts.map(({ part, at }) =>
+	const partThemes = shape.map(({ part, at }) =>
 		isNounSlot(part.slot)
 			? part.slot === 'subject'
 				? subjectTheme
 				: (plan.phrase.get(at)?.theme ?? themeForPart(part.slot, group, themes))
 			: null
+	);
+	// What a phrase writes instead of a noun phrase, when it writes one at all: a
+	// pronoun standing in for the topic, the name a `repeat` carries forward, or a
+	// fresh name for a phrase about a person. All three are bare words — no article,
+	// no modifier, nothing but the word and whatever particle the frame puts after
+	// it — and `''` marks the one that has to be drawn against the room it is given.
+	const proper = shape.map(({ part }, i) => {
+		if (part.slot === 'subject' && pronoun) {
+			return pronoun;
+		}
+
+		if (part.slot === 'subject' && follow?.reference === 'repeat' && follow.topic.named) {
+			return follow.topic.noun;
+		}
+
+		const theme = partThemes[i];
+
+		return settings.includeName && theme && THEME_CLASS[theme] === 'person' ? '' : null;
+	});
+	const parts = shape.map((entry, i) =>
+		proper[i] === null
+			? entry
+			: { ...entry, part: { ...entry.part, modifiable: false, bare: true } }
 	);
 	// The same for the predicate: `bounds` spans every group the language has, and
 	// one sentence draws from one of them. A word the caller required is narrower
@@ -1156,15 +1240,20 @@ function compose(
 	const partBounds = parts.map(({ part, at }, i) => {
 		const theme = partThemes[i];
 		const required = plan.phrase.get(at);
-		const written = part.slot === 'subject' && pronoun ? pronoun : required?.word;
+		const written = proper[i] || required?.word;
 		const exact = written ? ([written.length, written.length] as const) : null;
 
 		if (theme) {
 			const owed = plan.modifier.get(at);
+			// A name that has still to be drawn is budgeted against the given names of
+			// the language rather than against its nouns — `randName` invents from its
+			// own syllables and draws from its own pools, and neither is this theme's.
+			const span =
+				proper[i] === '' ? nameSpan(language) : nounSpan(language, theme, settings.invent);
 
 			return {
 				...bounds,
-				noun: exact ?? nounSpan(language, theme, settings.invent),
+				noun: exact ?? span,
 				modifier: owed ? ([owed.word.length, owed.word.length] as const) : bounds.modifier
 			};
 		}
@@ -1192,10 +1281,14 @@ function compose(
 	const written: string[] = [];
 	const reported: string[] = [];
 	const slots: SentenceSlot[] = [];
+	const names: string[] = [];
 	let subject: Phrase | undefined;
-	// A pronoun says nothing about its own gender, so what agrees with it agrees
-	// with the noun it stands for.
-	let gender: WordGender | undefined = pronoun ? follow!.topic.gender : undefined;
+	let named = false;
+	// A pronoun says nothing about its own gender, and neither does a name carried
+	// over, so what agrees with either agrees with the noun it stands for.
+	let gender: WordGender | undefined = proper.some((word) => word)
+		? follow?.topic.gender
+		: undefined;
 	let used = data.terminator.length + (opener ? opener.length + space : 0);
 
 	if (opener) {
@@ -1223,8 +1316,33 @@ function compose(
 		const low = Math.max(1, min - used - overhead - restMax);
 		let phrase: string;
 
-		if (part.slot === 'subject' && pronoun) {
-			phrase = pronoun;
+		if (proper[i] !== null) {
+			// A bare proper noun, drawn now if it was not carried in. `high` and `low`
+			// are what the phrase has room for, and the name generator fits them the
+			// same way a noun would.
+			if (proper[i]) {
+				phrase = proper[i] as string;
+			} else {
+				const drawn = properName(
+					language,
+					wordData,
+					settings,
+					prefixable && i === 0 ? settings.prefix : '',
+					Math.min(low, high),
+					high
+				);
+
+				phrase = drawn.text;
+				names.push(drawn.text);
+
+				if (part.slot === 'subject') {
+					gender = drawn.gender;
+				}
+			}
+
+			if (part.slot === 'subject') {
+				named = true;
+			}
 		} else if (isNounSlot(part.slot)) {
 			const required = plan.phrase.get(at);
 			const owed = plan.modifier.get(at);
@@ -1290,15 +1408,29 @@ function compose(
 		reported.push(text);
 		slots.push(part.slot);
 		used += gap + headCost + text.length + tail.length;
+
+		// The opening capital belongs to the name too, so what the detail reports is
+		// what the sentence shows.
+		if (proper[i] === '' && text !== phrase) {
+			names[names.length - 1] = text;
+		}
 	}
+
+	// A sentence whose subject is a name carries that name forward; one whose
+	// subject was dropped carries forward what it was already handed.
+	const carried = named
+		? reported[slots.indexOf('subject')]
+		: (subject?.noun ?? (pronoun ? follow!.topic.noun : null));
 
 	return {
 		sentence: written.join(data.space) + data.terminator,
 		phrases: reported,
 		slots,
-		theme: subject?.theme ?? null,
-		subject: subject?.noun ?? (pronoun ? follow!.topic.noun : null),
-		gender: subject ? gender : pronoun !== null ? follow!.topic.gender : undefined
+		names,
+		theme: named ? null : (subject?.theme ?? null),
+		subject: carried ?? null,
+		gender: subject || named ? gender : pronoun !== null ? follow!.topic.gender : undefined,
+		named: named || (pronoun !== null && (follow?.topic.named ?? false))
 	};
 }
 
@@ -1379,8 +1511,11 @@ function topicOf(built: Built): Topic | null {
 	return {
 		noun: built.subject,
 		theme: built.theme,
-		class: built.theme ? THEME_CLASS[built.theme] : null,
-		gender: built.gender
+		// A name is in no pool and so has no theme, but it is a person all the same,
+		// which is the whole of what a later sentence needs to stay on topic.
+		class: built.named ? 'person' : built.theme ? THEME_CLASS[built.theme] : null,
+		gender: built.gender,
+		named: built.named
 	};
 }
 
@@ -1528,7 +1663,9 @@ function resolveSettings(options: RandSentenceOptions): Settings {
 		maxLength: resolveLength(options.maxLength),
 		prefix: resolvePrefix(options.startsWith),
 		include: resolveInclude(options.include),
-		sentences: clamp(Math.floor(options.sentences ?? 1), 1, RAND_SENTENCE_COUNT_MAX)
+		sentences: clamp(Math.floor(options.sentences ?? 1), 1, RAND_SENTENCE_COUNT_MAX),
+		realism: options.realism ?? 'real',
+		includeName: options.includeName ?? false
 	};
 }
 
@@ -1548,6 +1685,7 @@ export function generateSentenceDetails(options: RandSentenceOptions = {}): Sent
 				sentences: built.map((one) => one.sentence),
 				phrases: built.flatMap((one) => one.phrases),
 				slots: built.flatMap((one) => one.slots),
+				names: built.flatMap((one) => one.names),
 				language: code,
 				// What the result is about is what its first sentence was about; the
 				// ones after it stay inside that noun's class.
