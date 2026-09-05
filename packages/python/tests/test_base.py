@@ -38,6 +38,8 @@ def test_the_package_exports_exactly_its_public_api() -> None:
         "SentenceShapeOption",
         "SentenceSlot",
         "SentenceSlotOption",
+        "SentenceType",
+        "SentenceTypeOption",
         "WORD_LANGUAGES",
         "WORD_THEMES",
         "WordDetail",

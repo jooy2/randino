@@ -12,7 +12,12 @@ from randino.sentence.data._types import (
 ZH = SentenceLanguageData(
     space="",
     capitalize=False,
-    terminator="。",
+    terminators={
+        "statement": "。",
+        "question": "？",
+        "exclamation": "！",
+        "trailing": "…",
+    },
     verbs=(
         VerbGroup(
             subject=("creature", "person"),
@@ -164,6 +169,7 @@ ZH = SentenceLanguageData(
         黄昏时
     """),
     connectives=words("然后 所以 但是 不过 于是 后来 接着 同时 终于"),
+    interjections=words("啊， 哎呀， 哇， 唉， 天啊， 瞧， 咦，"),
     pronouns={"n": ("", "它")},
     pronounless=("person",),
     frames=(
@@ -239,6 +245,40 @@ ZH = SentenceLanguageData(
                 SentencePart("object", modifiable=True),
             ),
             5,
+        ),
+        # Chinese asks with 吗 after the whole clause, which is a tag rather than a
+        # phrase, and leaves everything in front of it alone.
+        SentenceFrame(
+            (SentencePart("subject", modifiable=True), SentencePart("verb")),
+            20,
+            mood="question",
+            tag="吗",
+        ),
+        SentenceFrame(
+            (
+                SentencePart("subject", modifiable=True),
+                SentencePart("verb"),
+                SentencePart("object", modifiable=True),
+            ),
+            16,
+            mood="question",
+            tag="吗",
+        ),
+        SentenceFrame(
+            (SentencePart("subject", modifiable=True), SentencePart("state", head="很")),
+            14,
+            mood="question",
+            tag="吗",
+        ),
+        SentenceFrame(
+            (
+                SentencePart("subject", modifiable=True),
+                SentencePart("place", head="在", tail="里", modifiable=True),
+                SentencePart("verb"),
+            ),
+            12,
+            mood="question",
+            tag="吗",
         ),
     ),
 )

@@ -9,6 +9,7 @@ from randino._types import (
     SentenceDetail,
     SentenceShapeOption,
     SentenceSlotOption,
+    SentenceTypeOption,
     WordLanguageOption,
     WordThemeOption,
 )
@@ -31,6 +32,7 @@ def rand_sentence(
     unique: bool = ...,
     sentences: int = ...,
     include_name: bool = ...,
+    type: SentenceTypeOption = ...,
     output: Literal["value"] = ...,
 ) -> list[str]: ...
 
@@ -51,6 +53,7 @@ def rand_sentence(
     unique: bool = ...,
     sentences: int = ...,
     include_name: bool = ...,
+    type: SentenceTypeOption = ...,
     output: Literal["detail"],
 ) -> list[SentenceDetail]: ...
 
@@ -70,6 +73,7 @@ def rand_sentence(
     unique: bool = False,
     sentences: int = 1,
     include_name: bool = False,
+    type: SentenceTypeOption = "statement",
     output: RandOutput = "value",
 ) -> list[str] | list[SentenceDetail]:
     """Generate whole sentences, written the way the language writes them.
@@ -115,6 +119,12 @@ def rand_sentence(
             you named yourself still wins. The name is a bare given name, and it
             carries its own gender, so what agrees with a subject agrees with it. Off
             by default because it is the one option that reaches the person-name pools.
+        type: What the sentences are doing — saying something, asking it, exclaiming it,
+            or trailing off. A sequence or `"all"` decides per sentence. A language
+            answers with what it has: five of the nine write a question with nothing but
+            the mark, and the four that need more — English's do-support, German's verb
+            moving to the front, Korean's and Japanese's endings — say so in their own
+            shapes.
         output: `"value"` for strings, `"detail"` for a `SentenceDetail` per sentence —
             the phrases in order, what each of them does, the language and the theme.
 
@@ -148,6 +158,7 @@ def rand_sentence(
         unique=unique,
         sentences=sentences,
         include_name=include_name,
+        type=type,
     )
 
     if output == "detail":

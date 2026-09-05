@@ -12,7 +12,12 @@ from randino.sentence.data._types import (
 VI = SentenceLanguageData(
     space=" ",
     capitalize=True,
-    terminator=".",
+    terminators={
+        "statement": ".",
+        "question": "?",
+        "exclamation": "!",
+        "trailing": "…",
+    },
     verbs=(
         VerbGroup(
             subject=("creature", "person"),
@@ -165,6 +170,7 @@ VI = SentenceLanguageData(
         đôi_khi mỗi_ngày lúc_hoàng_hôn
     """),
     connectives=words("rồi và_rồi nhưng thế_là sau_đó cuối_cùng đồng_thời tuy_vậy"),
+    interjections=words("ôi, chà, ồ, trời_ơi, chao_ôi, này, thật_đấy,"),
     pronouns={"n": ("", "nó")},
     pronounless=("person",),
     frames=(
@@ -240,6 +246,29 @@ VI = SentenceLanguageData(
                 SentencePart("manner"),
             ),
             5,
+        ),
+        # Vietnamese wraps the predicate: có in front of it, không after the clause.
+        SentenceFrame(
+            (SentencePart("subject", modifiable=True), SentencePart("verb", head="có")),
+            20,
+            mood="question",
+            tag="không",
+        ),
+        SentenceFrame(
+            (
+                SentencePart("subject", modifiable=True),
+                SentencePart("verb", head="có"),
+                SentencePart("object", modifiable=True),
+            ),
+            16,
+            mood="question",
+            tag="không",
+        ),
+        SentenceFrame(
+            (SentencePart("subject", modifiable=True), SentencePart("state", head="có")),
+            14,
+            mood="question",
+            tag="không",
         ),
     ),
 )

@@ -144,7 +144,10 @@ sentence = {
     code: {
         "space": data.space,
         "capitalize": data.capitalize,
-        "terminator": data.terminator,
+        "terminators": dict(data.terminators),
+        # Optional in one package and defaulted in another; written as a map either way
+        # so the shapes compare.
+        "openers": dict(data.openers),
         # Optional in one package and defaulted in another; written the same way
         # here either way, so the shapes compare.
         "predicateAgrees": data.predicate_agrees,
@@ -161,16 +164,22 @@ sentence = {
                 "subject": list(group.subject),
                 "object": None if group.object is None else list(group.object),
                 "words": listed(group.words),
+                "forms": {form: listed(pool) for form, pool in group.forms.items()},
             }
             for group in data.verbs
         ],
         "states": [
-            {"subject": list(group.subject), "words": listed(group.words)}
+            {
+                "subject": list(group.subject),
+                "words": listed(group.words),
+                "forms": {form: listed(pool) for form, pool in group.forms.items()},
+            }
             for group in data.states
         ],
         "manners": listed(data.manners),
         "times": listed(data.times),
         "connectives": listed(data.connectives),
+        "interjections": listed(data.interjections),
         "pronouns": {gender: listed(pool) for gender, pool in data.pronouns.items()},
         # Optional in one package and defaulted in another; written as a list either
         # way so the shapes compare.
@@ -189,6 +198,8 @@ sentence = {
                     for part in frame.parts
                 ],
                 "weight": frame.weight,
+                "mood": frame.mood,
+                "tag": frame.tag,
             }
             for frame in data.frames
         ],

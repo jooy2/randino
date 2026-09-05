@@ -9,10 +9,10 @@ are still drawn from `word/data`, and everything a sentence adds to them lives h
 """
 
 from collections.abc import Mapping, Sequence
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Literal
 
-from randino._types import SentenceSlot
+from randino._types import SentenceSlot, SentenceType
 from randino.word.data._types import WordGender, WordPool
 
 NounClass = Literal[
@@ -37,6 +37,19 @@ slice of vocabulary, and which of these it falls into is the same in every langu
 """
 
 
+PredicateForm = Literal["question"]
+"""A form a predicate takes beside the one a plain statement ends on.
+
+`"question"` is Korean `달리니` beside `달린다`, and English `run` beside `runs`. A form
+rather than another pool: the same verbs, said differently. Every form pool is
+index-aligned with `words`, so a verb keeps its meaning across them and a word the
+caller required can be translated into the form the sentence needs.
+"""
+
+PredicateForms = Mapping[PredicateForm, WordPool]
+"""The forms a group declares, beside the plain statement its `words` are in."""
+
+
 @dataclass(frozen=True, slots=True)
 class VerbGroup:
     """Verbs that take the same arguments.
@@ -55,6 +68,13 @@ class VerbGroup:
     object: tuple[NounClass, ...] | None = None
     """Classes it can take as a direct object. Left out by an intransitive group."""
 
+    forms: PredicateForms = field(default_factory=dict)
+    """The same verbs in another form, index-aligned with `words`.
+
+    Empty for a language whose verb does not change — Chinese, Vietnamese, Spanish,
+    Italian and Russian ask a question with the mark alone.
+    """
+
 
 @dataclass(frozen=True, slots=True)
 class StateGroup:
@@ -70,6 +90,9 @@ class StateGroup:
 
     words: WordPool
     """The adjectives themselves, in the form a plain statement ends on."""
+
+    forms: PredicateForms = field(default_factory=dict)
+    """The same adjectives in another form, index-aligned with `words`."""
 
 
 @dataclass(frozen=True, slots=True)
@@ -112,6 +135,17 @@ class SentencePart:
     """
 
 
+SentenceMood = Literal["statement", "question"]
+"""What a shape is for.
+
+A frame with the statement mood also serves an exclamation and a sentence that trails
+off — those differ from it by the mark and by what stands in front, not by the order of
+the words. A question is the one that can differ, and only four of the nine languages
+need it to. The rest declare no question shape and get their statement shapes back,
+which is the same best-effort every other narrowing here makes.
+"""
+
+
 @dataclass(frozen=True, slots=True)
 class SentenceFrame:
     """One shape a sentence can take, written in the order the language puts it in.
@@ -126,6 +160,16 @@ class SentenceFrame:
 
     weight: int
     """How often this shape is used, against the other frames of the language."""
+
+    mood: SentenceMood = "statement"
+    """What the shape is for."""
+
+    tag: str = ""
+    """Written after the last phrase and before the terminator, with the space in front.
+
+    That is Chinese `吗`, Japanese `か` and Vietnamese `không` — none of which is a
+    phrase, and none of which any slot could carry.
+    """
 
 
 SentenceArticles = Mapping[WordGender, tuple[tuple[str, str], ...]]
@@ -164,8 +208,8 @@ class SentenceLanguageData:
     capitalize: bool
     """Whether the sentence opens on a capital letter."""
 
-    terminator: str
-    """What the sentence closes on."""
+    terminators: Mapping[SentenceType, str]
+    """What a sentence of each type closes on."""
 
     verbs: Sequence[VerbGroup]
     """The verbs, grouped by what they can take."""
@@ -186,6 +230,14 @@ class SentenceLanguageData:
     after it writes the comma.
     """
 
+    interjections: WordPool
+    """What an exclamation opens on (`와,`, `Wow,`, `ああ、`).
+
+    Written whole, comma and all, because where the comma goes is the language's
+    business. Exclamations alone: a statement that opened on one would be reading itself
+    aloud, and a question has its own mark to do the work.
+    """
+
     pronouns: SentencePronouns
     """How a later sentence refers to the topic without naming it again."""
 
@@ -194,6 +246,12 @@ class SentenceLanguageData:
 
     articles: SentenceArticles | None = None
     """The article a noun phrase opens with. Left out by a language with no articles."""
+
+    openers: Mapping[SentenceType, str] = field(default_factory=dict)
+    """What a sentence opens on, for a language that marks the type at both ends.
+
+    Spanish `¿` and `¡` are the only ones here, and every other language leaves it out.
+    """
 
     predicate_agrees: bool = False
     """Whether a predicate adjective agrees with its subject the way an attributive one does.

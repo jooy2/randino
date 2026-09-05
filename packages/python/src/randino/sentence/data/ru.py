@@ -12,7 +12,12 @@ from randino.sentence.data._types import (
 RU = SentenceLanguageData(
     space=" ",
     capitalize=True,
-    terminator=".",
+    terminators={
+        "statement": ".",
+        "question": "?",
+        "exclamation": "!",
+        "trailing": "…",
+    },
     predicate_agrees=True,
     verbs=(
         VerbGroup(
@@ -137,6 +142,7 @@ RU = SentenceLanguageData(
         в_выходные только_что иногда каждый_день в_сумерках
     """),
     connectives=words("и_потом но затем поэтому однако наконец потом тем_временем"),
+    interjections=words("ах, ох, эх, ух, боже, гляди, право,"),
     pronouns={"m": words("он"), "f": words("она"), "n": words("оно")},
     # Nominative only, which is why there is neither an object nor a place here: a
     # Russian noun changes its own ending for both, and the endings are the noun's

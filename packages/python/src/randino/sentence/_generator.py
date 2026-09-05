@@ -40,6 +40,8 @@ from randino._types import (
     SentenceShapeOption,
     SentenceSlot,
     SentenceSlotOption,
+    SentenceType,
+    SentenceTypeOption,
     WordLanguage,
     WordLanguageOption,
     WordTheme,
@@ -53,6 +55,7 @@ from randino.sentence.data._types import (
     NounClass,
     SentenceFrame,
     SentenceLanguageData,
+    SentenceMood,
     SentencePart,
     StateGroup,
     VerbGroup,
@@ -110,8 +113,32 @@ class Settings:
     include_name: bool
     """Whether a phrase about a person is written as a name."""
 
+    types: tuple[SentenceType, ...]
+    """What the sentences may be doing, normalized to a set to draw from."""
+
     min_length: int | None = None
     max_length: int | None = None
+
+
+def _mood_for(type_: SentenceType) -> SentenceMood:
+    """The one thing a shape has to match to answer a type."""
+    return "question" if type_ == "question" else "statement"
+
+
+@dataclass(frozen=True, slots=True)
+class Draw:
+    """Everything one sentence of a result is drawn against.
+
+    The room it has, what it is doing, what it opens on, and — after the first — what
+    it is about.
+    """
+
+    budget: tuple[int, int]
+    type: SentenceType
+    opener: str
+    """A connective or an interjection, `""` for neither."""
+
+    follow: "Follow | None"
 
 
 @dataclass(frozen=True, slots=True)
@@ -150,9 +177,6 @@ class Follow:
     pronoun: str
     """What a `"pronoun"` reference writes; `""` where the language writes nothing."""
 
-    opener: str
-    """The connective the sentence opens on, `""` for none."""
-
 
 # --- Shapes -----------------------------------------------------------------
 
@@ -182,19 +206,27 @@ def _matches_slots(frame: SentenceFrame, slots: tuple[SentenceSlot, ...] | str) 
     return any(part.slot in slots for part in frame.parts)
 
 
-def _frames_for(data: SentenceLanguageData, settings: Settings) -> list[SentenceFrame]:
+def _frames_for(
+    data: SentenceLanguageData, settings: Settings, mood: SentenceMood
+) -> list[SentenceFrame]:
     """The shapes one sentence may take.
 
-    Both filters fall back rather than fail: a language that has no shape carrying what
-    was asked for answers with the closest it does have, the same best-effort a
-    too-narrow length range gets.
+    Every filter falls back rather than fails: a language that has no shape carrying
+    what was asked for answers with the closest it does have, the same best-effort a
+    too-narrow length range gets. A language that writes its question with the mark
+    alone declares no question shape, and answers with the statement shapes it does
+    have — that is not a fallback so much as the point: `¿El león corre?` is the
+    statement.
     """
+    by_mood = [frame for frame in data.frames if frame.mood == mood]
+    moody = by_mood or [frame for frame in data.frames if frame.mood == "statement"]
+    usable = moody or list(data.frames)
     by_slots = (
-        list(data.frames)
+        usable
         if settings.slots == "all"
-        else [frame for frame in data.frames if _matches_slots(frame, settings.slots)]
+        else [frame for frame in usable if _matches_slots(frame, settings.slots)]
     )
-    allowed = by_slots or list(data.frames)
+    allowed = by_slots or usable
 
     if settings.shape == "all":
         return allowed
@@ -541,8 +573,16 @@ def _slot_bounds(language: WordLanguage) -> dict[str, tuple[int, int]]:
         "subject": noun,
         "object": noun,
         "place": noun,
-        "verb": _span([group.words for group in data.verbs]),
-        "state": _span([group.words for group in data.states]),
+        # Every form a predicate can take, not only the plain statement's: a question
+        # form is a different length, and the shape is chosen against these.
+        "verb": _span(
+            [group.words for group in data.verbs]
+            + [pool for group in data.verbs for pool in group.forms.values()]
+        ),
+        "state": _span(
+            [group.words for group in data.states]
+            + [pool for group in data.states for pool in group.forms.values()]
+        ),
         "manner": _span([data.manners]),
         "time": _span([data.times]),
         "modifier": _span(
@@ -604,7 +644,11 @@ def _frame_range(
     bounds: dict[str, tuple[int, int]],
 ) -> tuple[int, int]:
     """Shortest and longest sentence a shape can produce."""
-    low = len(data.terminator)
+    # Measured against the longest mark the language writes, so a shape is never chosen
+    # for a range only the shortest one could have reached.
+    marks = max(len(mark) for mark in data.terminators.values())
+    tag = len(frame.tag) + len(data.space) if frame.tag else 0
+    low = marks + tag
     high = low
 
     for index, part in enumerate(frame.parts):
@@ -781,6 +825,9 @@ class Built:
     slots: tuple[SentenceSlot, ...]
     names: tuple[str, ...]
     """The person names this sentence was written with, in order."""
+
+    type: SentenceType
+    """What this sentence is doing."""
 
     theme: WordTheme | None
     subject: str | None
@@ -991,10 +1038,23 @@ def _theme_for_part(
     return pick(places or tuple(themes))
 
 
+def _form_of(
+    state_group: StateGroup | None, verb_group: VerbGroup | None, type_: SentenceType
+) -> WordPool:
+    """The predicates of a group, in the form this type of sentence ends on."""
+    group: StateGroup | VerbGroup = state_group if state_group is not None else verb_group  # type: ignore[assignment]
+
+    if type_ != "question":
+        return group.words
+
+    return group.forms.get("question", group.words)
+
+
 def _predicate_for(
     slot: SentenceSlot,
     lexicon: WordLanguageData,
     data: SentenceLanguageData,
+    base: WordPool,
     predicates: WordPool,
     required: Requirement | None,
     gender: WordGender | None,
@@ -1010,7 +1070,11 @@ def _predicate_for(
         return word
 
     if required is not None:
-        return agreed(required.word)
+        # A word the caller named is named in the form a statement ends on, and the form
+        # pools are index-aligned so that it can be said the other way instead.
+        at = base.index(required.word) if required.word in base else -1
+
+        return agreed(predicates[at] if 0 <= at < len(predicates) else required.word)
 
     pool = data.manners if slot == "manner" else data.times if slot == "time" else predicates
 
@@ -1028,7 +1092,7 @@ def _compose(
     bounds: dict[str, tuple[int, int]],
     low: int,
     high: int,
-    follow: Follow | None,
+    draw: Draw,
 ) -> Built:
     """Fill a shape and write it out.
 
@@ -1038,6 +1102,7 @@ def _compose(
     which is how a narrow range drops a modifier rather than overshooting a word, and
     how the subject's gender is in hand before the adjective that has to agree with it.
     """
+    follow = draw.follow
     lexicon = WORD_DATA[language]
     themes = tuple(requested) or WORD_THEMES
     headed = any(part.slot == "state" for part in frame.parts)
@@ -1061,6 +1126,11 @@ def _compose(
         subject_classes = verb_group.subject
         predicates = verb_group.words
 
+    # The same predicates, in the form this type of sentence ends on. Index-aligned
+    # with the plain words, which is what lets a required word be translated rather than
+    # written out in the wrong form.
+    base = predicates
+    predicates = _form_of(state_group, verb_group, draw.type)
     subject_themes = _themes_for_classes(themes, subject_classes)
     subject_required = _required_at(frame, plan, "subject")
     # A theme the caller named is honoured even when no verb group of the language
@@ -1095,7 +1165,10 @@ def _compose(
         follow is None and first.slot in NOUN_SLOTS and not first.head and data.articles is None
     )
     space = len(data.space)
-    opener = follow.opener if follow is not None else ""
+    opener = draw.opener
+    close = data.terminators[draw.type]
+    open_mark = data.openers.get(draw.type, "")
+    tag = data.space + frame.tag if frame.tag else ""
     # Every phrase's theme is settled before any of them is drawn, because a length
     # budget is only as good as the pools it was measured against. Left to the loop, each
     # phrase was given the room the language's longest noun would need and drew a word
@@ -1209,7 +1282,7 @@ def _compose(
     # A pronoun says nothing about its own gender, and neither does a name carried
     # over, so what agrees with either agrees with the noun it stands for.
     gender: WordGender | None = follow.topic.gender if follow is not None and any(proper) else None
-    used = len(data.terminator) + (len(opener) + space if opener else 0)
+    used = len(close) + len(open_mark) + len(tag) + (len(opener) + space if opener else 0)
 
     if opener:
         written.append(_upper(opener) if data.capitalize else opener)
@@ -1287,6 +1360,7 @@ def _compose(
                 part.slot,
                 lexicon,
                 data,
+                base,
                 predicates,
                 plan.phrase.get(at[index]),
                 gender,
@@ -1328,10 +1402,13 @@ def _compose(
         subject_word = carried.noun if carried is not None and pronoun else None
 
     return Built(
-        data.space.join(written) + data.terminator,
+        # The opener is written against the first phrase rather than beside it —
+        # Spanish `¿El león corre?`, never `¿ El león corre ?`.
+        open_mark + data.space.join(written) + tag + close,
         tuple(reported),
         tuple(slots),
         tuple(names),
+        draw.type,
         None if named else (subject.theme if subject is not None else None),
         subject_word,
         gender
@@ -1403,6 +1480,13 @@ def _share_out(budget: tuple[int, int], count: int, space: int) -> list[tuple[in
 CONNECTIVE_CHANCE = 40
 """How often a sentence that follows another one opens on a connective."""
 
+INTERJECTION_CHANCE = 65
+"""How often an exclamation opens on an interjection.
+
+Higher than the connective's, because an exclamation with nothing in front of it is a
+statement wearing a mark.
+"""
+
 REFERENCE_WEIGHT = {"repeat": 25, "pronoun": 40, "fresh": 35}
 """How a sentence refers to the topic, against the other two ways of doing it."""
 
@@ -1440,20 +1524,10 @@ def _pronouns_for(data: SentenceLanguageData, topic: Topic) -> WordPool:
     return pool
 
 
-def _follow_for(data: SentenceLanguageData, topic: Topic, room: int, shortest: int) -> Follow:
-    """How one sentence carries on from the one before it.
-
-    `room` is what this sentence may be at its longest, and it is what decides whether
-    it opens on a connective at all: a connective is written in front of a whole
-    sentence rather than instead of any part of it, so one longer than the budget can
-    spare is a sentence that overshoots by exactly its length. Russian `тем временем`
-    is thirteen characters, and a third of a range of seventy-five has nowhere to put
-    them.
-    """
+def _follow_for(data: SentenceLanguageData, topic: Topic) -> Follow:
+    """How one sentence carries on from the one before it."""
     pronouns = _pronouns_for(data, topic)
     usable = ("repeat", "pronoun", "fresh") if pronouns else ("repeat", "fresh")
-    spare = room - len(data.space) - shortest
-    openers = tuple(word for word in data.connectives if len(word) <= spare)
     roll = random.random() * sum(REFERENCE_WEIGHT[each] for each in usable)
     reference = usable[-1]
 
@@ -1464,12 +1538,48 @@ def _follow_for(data: SentenceLanguageData, topic: Topic, room: int, shortest: i
             reference = each
             break
 
-    return Follow(
-        topic,
-        reference,
-        pick(pronouns) if reference == "pronoun" else "",
-        pick(openers) if openers and chance(CONNECTIVE_CHANCE) else "",
-    )
+    return Follow(topic, reference, pick(pronouns) if reference == "pronoun" else "")
+
+
+def _opener_for(
+    data: SentenceLanguageData, type_: SentenceType, following: bool, room: int, shortest: int
+) -> str:
+    """What a sentence opens on: an interjection for an exclamation, else a connective.
+
+    Never both — a sentence that opened on two things at once would be shouting its own
+    footnote. `room` is what the sentence may be at its longest, and it is what decides
+    whether it opens on anything at all: what stands in front is written before a whole
+    sentence rather than instead of any part of it, so one longer than the budget can
+    spare is a sentence that overshoots by exactly its length. Russian `тем временем` is
+    thirteen characters, and a third of a range of seventy-five has nowhere to put them.
+
+    Args:
+        data: The language's sentence dataset.
+        type_: What this sentence is doing.
+        following: Whether it follows another sentence of the same result.
+        room: The longest this sentence may be.
+        shortest: The shortest sentence the language's shapes could spell.
+
+    Returns:
+        What the sentence opens on, or `""`.
+    """
+    spare = room - len(data.space) - shortest
+
+    def fitting(pool: WordPool) -> tuple[str, ...]:
+        return tuple(word for word in pool if len(word) <= spare)
+
+    if type_ == "exclamation":
+        usable = fitting(data.interjections)
+
+        if usable and chance(INTERJECTION_CHANCE):
+            return pick(usable)
+
+    if not following:
+        return ""
+
+    usable = fitting(data.connectives)
+
+    return pick(usable) if usable and chance(CONNECTIVE_CHANCE) else ""
 
 
 def _generate_result(language: WordLanguage, settings: Settings) -> list[Built]:
@@ -1481,7 +1591,11 @@ def _generate_result(language: WordLanguage, settings: Settings) -> list[Built]:
     """
     data = SENTENCE_DATA[language]
     bounds = _slot_bounds(language)
-    frames = _frames_for(data, settings)
+    # Every shape any of the requested types could take, because the budget is shared
+    # out before the first type is even drawn.
+    frames = [
+        frame for type_ in settings.types for frame in _frames_for(data, settings, _mood_for(type_))
+    ]
     shortest = _natural_span(data, frames, bounds)[0]
     budgets = _share_out(
         _bounds_for(data, frames, bounds, settings), settings.sentences, len(data.space)
@@ -1490,22 +1604,23 @@ def _generate_result(language: WordLanguage, settings: Settings) -> list[Built]:
     topic: Topic | None = None
 
     for budget in budgets:
-        follow = None if topic is None else _follow_for(data, topic, budget[1], shortest)
-        one = _generate_one(language, settings, budget, follow)
+        type_ = pick(settings.types)
+        follow = None if topic is None else _follow_for(data, topic)
+        draw = Draw(
+            budget,
+            type_,
+            _opener_for(data, type_, follow is not None, budget[1], shortest),
+            follow,
+        )
+        one = _generate_one(language, settings, draw)
 
-        # `_follow_for` reserves room for the connective against the shortest sentence
-        # the shapes could spell, which is a floor no draw actually reaches — the
-        # shortest word of every pool at once. When the sentence that came back could
-        # not be made short enough to carry the connective after all, the connective is
-        # the part worth giving up: it is written in front of the whole sentence rather
-        # than instead of any piece of it.
-        if follow is not None and follow.opener and _distance_from(len(one.sentence), budget) > 0:
-            bare = _generate_one(
-                language,
-                settings,
-                budget,
-                Follow(follow.topic, follow.reference, follow.pronoun, ""),
-            )
+        # `_opener_for` reserves room against the shortest sentence the shapes could
+        # spell, which is a floor no draw actually reaches — the shortest word of every
+        # pool at once. When the sentence that came back could not be made short enough
+        # to carry what it opens on after all, that is the part worth giving up: it
+        # stands in front of the whole sentence rather than instead of any piece of it.
+        if draw.opener and _distance_from(len(one.sentence), budget) > 0:
+            bare = _generate_one(language, settings, Draw(budget, type_, "", follow))
 
             if _distance_from(len(bare.sentence), budget) < _distance_from(
                 len(one.sentence), budget
@@ -1543,16 +1658,13 @@ def _subject_themes_for(settings: Settings, follow: Follow | None) -> tuple[Word
     return tuple(in_class) or themes
 
 
-def _generate_one(
-    language: WordLanguage,
-    settings: Settings,
-    budget: tuple[int, int],
-    follow: Follow | None,
-) -> Built:
+def _generate_one(language: WordLanguage, settings: Settings, draw: Draw) -> Built:
     """Build one sentence, as close to what was asked for as the language allows."""
+    follow = draw.follow
+    budget = draw.budget
     data = SENTENCE_DATA[language]
     bounds = _slot_bounds(language)
-    allowed = _frames_for(data, settings)
+    allowed = _frames_for(data, settings, _mood_for(draw.type))
     requested = _subject_themes_for(settings, follow)
     # The words a caller required go in the first sentence — once in the result rather
     # than once in every sentence of it.
@@ -1623,7 +1735,7 @@ def _generate_one(
             bounds,
             low,
             high,
-            follow,
+            draw,
         )
         length = len(built.sentence)
 
@@ -1639,6 +1751,19 @@ def _generate_one(
             best = built
 
     return cast("Built", best)
+
+
+def _resolve_types(type_: SentenceTypeOption) -> tuple[SentenceType, ...]:
+    """The caller's `type`, as the set one sentence is drawn from."""
+    every: tuple[SentenceType, ...] = ("statement", "question", "exclamation", "trailing")
+
+    if type_ == "all":
+        return every
+
+    wanted = (type_,) if isinstance(type_, str) else tuple(type_)
+    usable = tuple(each for each in wanted if each in every)
+
+    return usable or ("statement",)
 
 
 def _resolve_slots(slots: SentenceSlotOption) -> tuple[SentenceSlot, ...] | str:
@@ -1670,6 +1795,7 @@ def generate_sentence_details(
     unique: bool = False,
     sentences: int = 1,
     include_name: bool = False,
+    type: SentenceTypeOption = "statement",
 ) -> list[SentenceDetail]:
     """Generate sentences with every choice already resolved.
 
@@ -1687,6 +1813,7 @@ def generate_sentence_details(
         unique: Never return the same sentence twice.
         sentences: How many sentences one result holds.
         include_name: Whether a phrase about a person is written as a name.
+        type: What the sentences are doing.
 
     Returns:
         One `SentenceDetail` per result.
@@ -1704,6 +1831,7 @@ def generate_sentence_details(
         sentences=clamp(sentences, 1, RAND_SENTENCE_COUNT_MAX),
         realism=realism,
         include_name=include_name,
+        types=_resolve_types(type),
     )
 
     def draw() -> SentenceDetail:
@@ -1717,6 +1845,7 @@ def generate_sentence_details(
             phrases=tuple(phrase for one in built for phrase in one.phrases),
             slots=tuple(slot for one in built for slot in one.slots),
             names=tuple(name for one in built for name in one.names),
+            types=tuple(one.type for one in built),
             language=code,
             # What the result is about is what its first sentence was about; the ones
             # after it stay inside that noun's class.

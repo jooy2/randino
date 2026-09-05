@@ -12,7 +12,12 @@ from randino.sentence.data._types import (
 JA = SentenceLanguageData(
     space="",
     capitalize=False,
-    terminator="。",
+    terminators={
+        "statement": "。",
+        "question": "？",
+        "exclamation": "！",
+        "trailing": "…",
+    },
     verbs=(
         VerbGroup(
             subject=("creature", "person"),
@@ -165,6 +170,7 @@ JA = SentenceLanguageData(
         時々 毎日 夕暮れに
     """),
     connectives=words("そして だから しかし ところが やがて すぐに ついに 一方 また"),
+    interjections=words("ああ、 おお、 まあ、 なんと、 やれやれ、 おや、 ほら、"),
     pronouns={"n": ("", "それ")},
     pronounless=("person",),
     frames=(
@@ -240,6 +246,40 @@ JA = SentenceLanguageData(
                 SentencePart("verb"),
             ),
             5,
+        ),
+        # Japanese asks with か after the predicate, which is a tag rather than a
+        # phrase — no slot could carry it, and the word order does not move.
+        SentenceFrame(
+            (SentencePart("subject", tail="が", modifiable=True), SentencePart("verb")),
+            20,
+            mood="question",
+            tag="か",
+        ),
+        SentenceFrame(
+            (
+                SentencePart("subject", tail="が", modifiable=True),
+                SentencePart("object", tail="を", modifiable=True),
+                SentencePart("verb"),
+            ),
+            16,
+            mood="question",
+            tag="か",
+        ),
+        SentenceFrame(
+            (SentencePart("subject", tail="は", modifiable=True), SentencePart("state")),
+            14,
+            mood="question",
+            tag="か",
+        ),
+        SentenceFrame(
+            (
+                SentencePart("subject", tail="が", modifiable=True),
+                SentencePart("place", tail="で", modifiable=True),
+                SentencePart("verb"),
+            ),
+            12,
+            mood="question",
+            tag="か",
         ),
     ),
 )

@@ -14,6 +14,7 @@ from randino import (
     RandRealism,
     SentenceShape,
     SentenceSlot,
+    SentenceType,
     WordLanguage,
     WordTheme,
     rand_sentence,
@@ -25,22 +26,23 @@ from randino.name.data import NAME_DATA
 # it — these checks read the pools a sentence is allowed to draw from.
 from randino.sentence._generator import shape_of
 from randino.sentence.data import SENTENCE_DATA, THEME_CLASS
+from randino.sentence.data._types import PredicateForms
 from randino.word._generator import agree
 from randino.word.data import WORD_DATA
-from randino.word.data._types import WordGender
+from randino.word.data._types import WordGender, WordPool
 
 SAMPLE = 60
 
 SCRIPT: dict[WordLanguage, re.Pattern[str]] = {
-    "en": re.compile(r"^[A-Za-z' ,.]+$"),
-    "ko": re.compile(r"^[가-힣 .]+$"),
-    "ja": re.compile(r"^[々぀-ヿ一-鿿。]+$"),
-    "zh": re.compile(r"^[々一-鿿。]+$"),
-    "vi": re.compile(r"^[a-zA-ZÀ-ỹ ,.]+$"),
-    "es": re.compile(r"^[a-zA-ZÀ-ÿ ,.]+$"),
-    "it": re.compile(r"^[a-zA-ZÀ-ÿ' ,.]+$"),
-    "de": re.compile(r"^[a-zA-ZÀ-ÿß ,.]+$"),
-    "ru": re.compile(r"^[Ѐ-ӿ ,.]+$"),
+    "en": re.compile(r"^[A-Za-z' ,.?!…]+$"),
+    "ko": re.compile(r"^[가-힣 ,.?!…]+$"),
+    "ja": re.compile(r"^[々぀-ヿ一-鿿。、？！…]+$"),
+    "zh": re.compile(r"^[々一-鿿。，？！…]+$"),
+    "vi": re.compile(r"^[a-zA-ZÀ-ỹ ,.?!…]+$"),
+    "es": re.compile(r"^[a-zA-ZÀ-ÿ ,.?!…¿¡]+$"),
+    "it": re.compile(r"^[a-zA-ZÀ-ÿ' ,.?!…]+$"),
+    "de": re.compile(r"^[a-zA-ZÀ-ÿß ,.?!…]+$"),
+    "ru": re.compile(r"^[Ѐ-ӿ ,.?!…]+$"),
 }
 
 SHAPES: tuple[SentenceShape, ...] = ("simple", "detailed", "complex")
@@ -148,7 +150,7 @@ def test_rand_sentence_returns_exactly_count_sentences() -> None:
 
 def test_every_language_writes_sentences_in_its_own_script_and_closes_them() -> None:
     for language in WORD_LANGUAGES:
-        terminator = SENTENCE_DATA[language].terminator
+        terminator = SENTENCE_DATA[language].terminators["statement"]
 
         realisms: tuple[RandRealism, ...] = ("real", "invented")
 
@@ -542,11 +544,11 @@ def test_sentences_puts_more_than_one_sentence_in_one_result() -> None:
             assert data.space.join(detail.sentences) == detail.sentence
 
             for sentence in detail.sentences:
-                assert sentence.endswith(data.terminator), f"{language}: {sentence}"
+                assert sentence.endswith(data.terminators["statement"]), f"{language}: {sentence}"
                 assert SCRIPT[language].match(sentence), f"{language}: {sentence}"
                 # Every sentence closes exactly once, so two of them were never run
                 # together into one entry.
-                assert sentence.count(data.terminator) == 1, f"{language}: {sentence}"
+                assert sentence.count(data.terminators["statement"]) == 1, f"{language}: {sentence}"
                 assert "  " not in sentence, f"{language}: {sentence}"
 
     for detail in rand_sentence(count=20, output="detail"):
@@ -803,6 +805,169 @@ def test_korean_picks_the_particle_a_name_asks_for_too() -> None:
 
         if after in ("이", "은"):
             assert coda, f"{name}{after} ({detail.sentence})"
+
+
+def test_type_decides_what_the_sentence_is_doing_and_what_it_closes_on() -> None:
+    types: tuple[SentenceType, ...] = ("statement", "question", "exclamation", "trailing")
+
+    for language in WORD_LANGUAGES:
+        data = SENTENCE_DATA[language]
+
+        for type_ in types:
+            for detail in rand_sentence(
+                language=language, type=type_, count=SAMPLE, output="detail"
+            ):
+                assert detail.types == (type_,), detail.sentence
+                assert detail.sentence.endswith(data.terminators[type_]), (
+                    f"{language} {type_}: {detail.sentence}"
+                )
+                assert SCRIPT[language].match(detail.sentence), detail.sentence
+
+                opener = data.openers.get(type_)
+
+                if opener:
+                    assert detail.sentence.startswith(opener), detail.sentence
+
+    # Statements by default, and the option decides per sentence when it is given more
+    # than one to choose from.
+    for detail in rand_sentence(count=40, output="detail"):
+        assert detail.types == ("statement",), detail.sentence
+
+    seen = {
+        type_
+        for detail in rand_sentence(
+            language="ko", type="all", sentences=3, count=120, output="detail"
+        )
+        for type_ in detail.types
+    }
+
+    assert len(seen) == len(types)
+
+
+def test_a_question_is_a_shape_not_a_mark_bolted_onto_a_statement() -> None:
+    # The languages whose grammar moves for a question say so in their own frames, and
+    # the shape has to be one of those rather than the statement's.
+    carries: dict[WordLanguage, str] = {
+        # English do-support, and the base form behind it.
+        "en": r"^(Does|Is) ",
+        # Korean changes the ending on the predicate itself.
+        "ko": r"니\?$",
+        # A tag Japanese, Chinese and Vietnamese write after the whole clause.
+        "ja": r"か？$",
+        "zh": r"吗？$",
+        "vi": r"không\?$",
+    }
+
+    for language, shape in carries.items():
+        for sentence in rand_sentence(language=language, type="question", count=SAMPLE):
+            assert re.search(shape, sentence), f"{language}: {sentence}"
+
+    # German moves its finite verb to the front, so the question opens on the predicate
+    # or on the `ist` that stands in for one.
+    verbs = pool_for("de", "verb")
+
+    for sentence in rand_sentence(language="de", type="question", count=SAMPLE):
+        first = sentence.split(" ")[0].lower()
+
+        assert first in verbs or first == "ist", f"de: {sentence}"
+
+
+def test_a_question_form_pool_is_the_same_length_as_the_words_it_restates() -> None:
+    # Index-aligned is the whole contract: a verb keeps its meaning across the forms,
+    # and a word the caller required is translated by its position.
+    for language in WORD_LANGUAGES:
+        data = SENTENCE_DATA[language]
+
+        groups: list[tuple[WordPool, PredicateForms]] = [
+            *((group.words, group.forms) for group in data.verbs),
+            *((group.words, group.forms) for group in data.states),
+        ]
+
+        for words, forms in groups:
+            for form, pool in forms.items():
+                assert len(pool) == len(words), (
+                    f"{language}: the {form} pool is {len(pool)} beside {len(words)}"
+                )
+                assert all(pool), f"{language}: the {form} pool has a blank"
+
+
+def test_a_predicate_is_written_in_the_form_its_type_asks_for() -> None:
+    # The question form where the group declares one, and the plain words where it does
+    # not — English states need none, because the shape moves `is` to the front and
+    # leaves `green` alone.
+    for language in WORD_LANGUAGES:
+        data = SENTENCE_DATA[language]
+        verb_forms = [w for g in data.verbs for w in g.forms.get("question", g.words)]
+        state_forms = [w for g in data.states for w in g.forms.get("question", g.words)]
+        expected: dict[SentenceSlot, set[str]] = {
+            "verb": set(verb_forms),
+            # A predicate adjective that agrees comes out in the form its subject asked
+            # for, question or not.
+            "state": set(
+                inflected(language, tuple(state_forms)) if data.predicate_agrees else state_forms
+            ),
+        }
+
+        for detail in rand_sentence(language=language, type="question", count=120, output="detail"):
+            for index, (phrase, slot) in enumerate(zip(detail.phrases, detail.slots, strict=True)):
+                if slot not in ("verb", "state"):
+                    continue
+
+                written = phrase[:1].lower() + phrase[1:] if index == 0 else phrase
+                pool = expected[slot]
+
+                assert written in pool or phrase in pool, (
+                    f"{language}: '{phrase}' is not the {slot} form a question asks for"
+                )
+
+
+def test_include_puts_a_required_predicate_in_the_form_the_type_asks_for() -> None:
+    # The pools are index-aligned so that a word named in the statement form can be said
+    # the other way rather than written out wrong.
+    for sentence in rand_sentence(language="ko", include="달린다", type="question", count=30):
+        assert "달리니" in sentence, sentence
+        assert "달린다" not in sentence, sentence
+
+    for sentence in rand_sentence(language="en", include="runs", type="question", count=30):
+        assert re.search(r"\brun\b", sentence), sentence
+
+
+def test_an_interjection_opens_an_exclamation_and_nothing_else() -> None:
+    for language in WORD_LANGUAGES:
+        data = SENTENCE_DATA[language]
+        openers = [
+            (upper_first(word) if data.capitalize else word) + data.space
+            for word in data.interjections
+        ]
+
+        mark = data.openers.get("exclamation", "")
+
+        def opens(sentence: str, openers: list[str] = openers, mark: str = mark) -> bool:
+            body = sentence[len(mark) :] if mark else sentence
+
+            return any(body.startswith(opener) for opener in openers)
+
+        seen = sum(
+            opens(sentence)
+            for sentence in rand_sentence(language=language, type="exclamation", count=120)
+        )
+
+        assert seen > 0, f"{language} never wrote an interjection"
+
+        for sentence in rand_sentence(language=language, count=120):
+            assert not opens(sentence), f"{language}: a statement opened on one ({sentence})"
+
+
+def test_every_language_can_write_every_type_inside_its_own_length_range() -> None:
+    for language in WORD_LANGUAGES:
+        low, high = sentence_length_range(language)
+        types: tuple[SentenceType, ...] = ("question", "exclamation", "trailing")
+
+        for type_ in types:
+            for sentence in rand_sentence(language=language, type=type_, count=40):
+                assert low <= len(sentence) <= high, (
+                    f"{language} {type_}: {sentence} ({len(sentence)}) outside {low}-{high}"
+                )
 
 
 def test_the_detail_form_reports_what_the_sentence_was_built_from() -> None:

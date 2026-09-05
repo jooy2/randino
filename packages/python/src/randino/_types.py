@@ -195,6 +195,25 @@ SentenceShapeOption = Literal[SentenceShape, "all"]
 """"all" leaves the shape to the language's own frame weights."""
 
 
+SentenceType = Literal["statement", "question", "exclamation", "trailing"]
+"""What a sentence is doing.
+
+It decides what the sentence closes on and — where the grammar needs it — the shape it
+takes: `"statement"` says something, `"question"` asks it, `"exclamation"` says it with
+feeling, and `"trailing"` is a statement that stops rather than ends. A question is a
+shape, not a punctuation mark bolted on: English writes `Does the lion run?` and German
+`Läuft ein Wolf?`, and both are shapes their own frames declare. A language whose
+question differs from its statement by nothing but the mark declares none, and gets its
+statement shapes back.
+"""
+
+SentenceTypeOption = SentenceType | Sequence[SentenceType] | Literal["all"]
+"""Which of them a result may be.
+
+A sequence is a set to draw from, decided per sentence, and `"all"` is every one.
+"""
+
+
 @dataclass(frozen=True, slots=True)
 class SentenceDetail:
     """A generated sentence with the pieces it was built from."""
@@ -226,6 +245,9 @@ class SentenceDetail:
 
     Empty unless `include_name` asked for them. Every one of them is also a phrase.
     """
+
+    types: tuple[SentenceType, ...]
+    """What each sentence is doing, at the same index as `sentences`."""
 
     language: WordLanguage
     """The language this sentence was generated in."""

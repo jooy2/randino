@@ -12,7 +12,12 @@ from randino.sentence.data._types import (
 IT = SentenceLanguageData(
     space=" ",
     capitalize=True,
-    terminator=".",
+    terminators={
+        "statement": ".",
+        "question": "?",
+        "exclamation": "!",
+        "trailing": "…",
+    },
     # The definite article, which Italian picks by gender and by the sound the
     # noun opens on: `l'` before a vowel, `lo` before an s plus a consonant, and
     # `il` for everything else. The elided form carries its own boundary.
@@ -206,6 +211,7 @@ IT = SentenceLanguageData(
         al_tramonto
     """),
     connectives=words("e_poi ma allora inoltre, tuttavia, dopo infine intanto,"),
+    interjections=words("oh, ah, ehi, caspita, mamma_mia, guarda, davvero,"),
     # Pro-drop, the same as Spanish: `esso` exists and nobody writes it.
     pronouns={"n": ("",)},
     frames=(

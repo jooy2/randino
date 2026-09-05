@@ -12,7 +12,12 @@ from randino.sentence.data._types import (
 DE = SentenceLanguageData(
     space=" ",
     capitalize=True,
-    terminator=".",
+    terminators={
+        "statement": ".",
+        "question": "?",
+        "exclamation": "!",
+        "trailing": "…",
+    },
     # The indefinite article, and it is what makes the modifiers come out right:
     # after `ein` a German adjective takes the same endings it takes with no
     # article at all — `ein blauer Wal`, `eine blaue Katze`, `ein blaues Haus` —
@@ -149,6 +154,7 @@ DE = SentenceLanguageData(
     # not something a connective can bolt on. `und`, `aber`, `doch` and `denn` sit
     # outside the clause and leave the order alone.
     connectives=words("und aber doch denn"),
+    interjections=words("oh, ach, na, mensch, oje, sieh_an, wahrhaftig,"),
     pronouns={"m": words("er"), "f": words("sie"), "n": words("es")},
     # German declares the fewest shapes here, and both reasons are its cases. An
     # object would be accusative and a place dative, and each changes the article
@@ -194,6 +200,28 @@ DE = SentenceLanguageData(
                 SentencePart("manner"),
             ),
             14,
+        ),
+        # German asks by moving the finite verb to the front, which is the same rule
+        # that keeps it second in a statement — the question is what happens when
+        # nothing stands in the first position at all.
+        SentenceFrame(
+            (SentencePart("verb"), SentencePart("subject", modifiable=True)),
+            26,
+            mood="question",
+        ),
+        SentenceFrame(
+            (
+                SentencePart("verb"),
+                SentencePart("subject", modifiable=True),
+                SentencePart("manner"),
+            ),
+            20,
+            mood="question",
+        ),
+        SentenceFrame(
+            (SentencePart("subject", head="ist", modifiable=True), SentencePart("state")),
+            18,
+            mood="question",
         ),
     ),
 )

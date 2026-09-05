@@ -12,7 +12,15 @@ from randino.sentence.data._types import (
 ES = SentenceLanguageData(
     space=" ",
     capitalize=True,
-    terminator=".",
+    terminators={
+        "statement": ".",
+        "question": "?",
+        "exclamation": "!",
+        "trailing": "…",
+    },
+    # The one language here that marks a question and an exclamation at both
+    # ends, which is why the openers exist at all.
+    openers={"question": "¿", "exclamation": "¡"},
     # The definite article, by the noun's gender. The feminine entries in front of
     # the default are the nouns that begin on a stressed a- and take `el` for the
     # sound of it; the two that only start the same way are listed above them, so
@@ -184,6 +192,7 @@ ES = SentenceLanguageData(
     """),
     # Written with the comma the ones that need one take.
     connectives=words("y_luego pero entonces además, sin_embargo, después por_fin mientras_tanto,"),
+    interjections=words("ay, oh, vaya, caramba, madre_mía, mira, desde_luego,"),
     # Spanish carries its subject in the verb ending, so a second sentence about
     # the same thing writes no pronoun at all.
     pronouns={"n": ("",)},
