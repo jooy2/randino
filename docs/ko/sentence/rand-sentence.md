@@ -46,6 +46,7 @@ rand_sentence()
 | `language` | <Lang js="WordLanguageOption" dart="WordLanguage?" py="WordLanguageOption" code /> | <Lang js="'all'" dart="null" py="&quot;all&quot;" code /> | 생성할 문장의 언어. <Lang js="'all'" dart="null" py="&quot;all&quot;" code />은 문장마다 하나씩 골라 모든 언어를 섞습니다. |
 | `theme` | <Lang js="WordThemeOption" dart="WordTheme?" py="WordThemeOption" code /> | <Lang js="'all'" dart="null" py="&quot;all&quot;" code /> | 문장의 **주어**가 무엇에 관한 것인지. [테마](../word/themes) 참고. |
 | `type` | <Lang js="SentenceTypeOption" dart="Set&lt;SentenceType&gt;?" py="SentenceTypeOption" code /> | <Lang js="'statement'" dart="null" py="&quot;statement&quot;" code /> | 문장이 무엇을 하는지. [묻고, 외치고, 말끝을 흐리기](#asking-exclaiming-trailing-off) 참고. |
+| `quote` | <Lang js="SentenceQuote" dart="SentenceQuote?" py="SentenceQuote &#124; None" code /> | <Lang js="—" dart="null" py="None" code /> | 인용된 문장이 어떤 따옴표를 쓸지. [대사와 생각](#dialogue-and-thought) 참고. |
 | `shape` | <Lang js="SentenceShapeOption" dart="SentenceShape?" py="SentenceShapeOption" code /> | <Lang js="'all'" dart="null" py="&quot;all&quot;" code /> | 문장이 얼마나 많은 것을 말하는지. [얼마나 말할지](#how-much-it-says) 참고. |
 | `slots` | <Lang js="SentenceSlotOption" dart="Set&lt;SentenceSlot&gt;?" py="SentenceSlotOption" code /> | <Lang js="'all'" dart="null" py="&quot;all&quot;" code /> | 주어 옆에 무엇을 두는지. [형태 고르기](#picking-the-shape) 참고. |
 | `include` | <Lang js="string &#124; string[]" dart="List&lt;String&gt;" py="str &#124; Sequence[str]" code /> | <Lang js="—" dart="const []" py="()" code /> | 모든 문장에 반드시 들어가야 할 단어. [반드시 넣을 단어](#words-it-has-to-contain) 참고. |
@@ -419,6 +420,98 @@ rand_sentence(language="en", type="all", sentences=3)
 :::
 
 `include`로 지정한 단어는 타입이 요구하는 형태로 나옵니다. `include: '달린다'`에 `type: 'question'`이면 `달린다?`가 아니라 `달리니?`입니다. 각 형태는 평서형을 대신하는 것이 아니라 그 옆에 하나씩 짝지어 저장되고, 그것이 이 변환을 가능하게 합니다.
+
+## 대사와 생각 {#dialogue-and-thought}
+
+`'dialogue'`와 `'thought'`는 형태가 아예 아닌 두 타입입니다. 둘 다 문장을 그 언어의 따옴표로 감싸고, 감싸는 대상은 줄마다 새로 뽑힙니다. 말하는 사람은 이야기하는 만큼이나 자주 묻기 때문입니다.
+
+::: lang js
+
+```javascript
+randSentence({ language: 'en', type: 'dialogue', count: 2 });
+// ['“The stout profit is endless!”', '“Does the blue intuition remain?”']
+
+randSentence({ language: 'ja', type: 'dialogue', count: 2 });
+// ['「組版工は速いか？」', '「芒が伸びるか？」']
+
+randSentence({ language: 'ko', type: 'thought', count: 2 });
+// ['‘대나무는 푸르다!’', '‘산뜻한 혜성은 밝니?’']
+```
+
+:::
+
+::: lang dart
+
+```dart
+randSentence(language: WordLanguage.en, type: {SentenceType.dialogue}, count: 2);
+// [“The stout profit is endless!”, “Does the blue intuition remain?”]
+
+randSentence(language: WordLanguage.ja, type: {SentenceType.dialogue}, count: 2);
+// [「組版工は速いか？」, 「芒が伸びるか？」]
+
+randSentence(language: WordLanguage.ko, type: {SentenceType.thought}, count: 2);
+// [‘대나무는 푸르다!’, ‘산뜻한 혜성은 밝니?’]
+```
+
+:::
+
+::: lang py
+
+```python
+rand_sentence(language="en", type="dialogue", count=2)
+# ['“The stout profit is endless!”', '“Does the blue intuition remain?”']
+
+rand_sentence(language="ja", type="dialogue", count=2)
+# ['「組版工は速いか？」', '「芒が伸びるか？」']
+
+rand_sentence(language="ko", type="thought", count=2)
+# ['‘대나무는 푸르다!’', '‘산뜻한 혜성은 밝니?’']
+```
+
+:::
+
+**따옴표는 그 언어의 것이고, 결코 만국 공통이 아닙니다.** 대사는 1차 따옴표를, 생각은 2차 따옴표를 씁니다.
+
+| 언어                | 1차     | 2차     |
+| ------------------- | ------- | ------- |
+| `en` `ko` `zh` `vi` | `“…”`   | `‘…’`   |
+| `ja`                | `「…」` | `『…』` |
+| `es` `it`           | `«…»`   | `“…”`   |
+| `de`                | `„…“`   | `‚…‘`   |
+| `ru`                | `«…»`   | `„…“`   |
+
+중국어는 낫표가 아니라 굽은 따옴표를 씁니다. 이 풀은 간체자로 쓰여 있고, 가로쓰기 간체 중국어는 `“”`를 씁니다. `「」`는 대만과 홍콩의 것입니다. 독일어는 아래에서 열고 위에서 닫기 때문에 짝이 대칭이 아닙니다.
+
+`quote`는 타입과 무관하게 어떤 짝을 쓸지 덮어씁니다. 생각을 1차 따옴표로 크게 외치게 할 수도, 대사를 2차 따옴표로 속삭이게 할 수도 있습니다.
+
+::: lang js
+
+```javascript
+randSentence({ language: 'ru', type: 'thought', quote: 'double' });
+// ['«Эх, беспокойный торт ненадолго кипит!»']
+```
+
+:::
+
+::: lang dart
+
+```dart
+randSentence(language: WordLanguage.ru, type: {SentenceType.thought}, quote: SentenceQuote.double);
+// [«Эх, беспокойный торт ненадолго кипит!»]
+```
+
+:::
+
+::: lang py
+
+```python
+rand_sentence(language="ru", type="thought", quote="double")
+# ['«Эх, беспокойный торт ненадолго кипит!»']
+```
+
+:::
+
+**인용 표지는 없습니다.** `…라고 그는 말했다`에는 말한 사람이 필요하고 그것은 [`includeName`](#a-persons-name)이 가지고 있지만, 말하는 동사는 아홉 언어 어느 풀에도 없습니다. 돌려받는 것은 대사 자체이지, 누가 말했는지가 아닙니다.
 
 ## 문장을 여러 개 {#more-than-one-sentence}
 

@@ -46,6 +46,7 @@ Every option is optional, and the defaults are what the empty call above uses.
 | `language` | <Lang js="WordLanguageOption" dart="WordLanguage?" py="WordLanguageOption" code /> | <Lang js="'all'" dart="null" py="&quot;all&quot;" code /> | Language of the generated sentences. <Lang js="'all'" dart="null" py="&quot;all&quot;" code /> mixes every supported language, picking one per sentence. |
 | `theme` | <Lang js="WordThemeOption" dart="WordTheme?" py="WordThemeOption" code /> | <Lang js="'all'" dart="null" py="&quot;all&quot;" code /> | What the sentence's **subject** is about. See [Themes](../word/themes). |
 | `type` | <Lang js="SentenceTypeOption" dart="Set&lt;SentenceType&gt;?" py="SentenceTypeOption" code /> | <Lang js="'statement'" dart="null" py="&quot;statement&quot;" code /> | What the sentence is doing. See [Asking, exclaiming, trailing off](#asking-exclaiming-trailing-off). |
+| `quote` | <Lang js="SentenceQuote" dart="SentenceQuote?" py="SentenceQuote &#124; None" code /> | <Lang js="—" dart="null" py="None" code /> | Which marks a quoted line takes. See [Dialogue and thought](#dialogue-and-thought). |
 | `shape` | <Lang js="SentenceShapeOption" dart="SentenceShape?" py="SentenceShapeOption" code /> | <Lang js="'all'" dart="null" py="&quot;all&quot;" code /> | How much the sentence says. See [How much it says](#how-much-it-says). |
 | `slots` | <Lang js="SentenceSlotOption" dart="Set&lt;SentenceSlot&gt;?" py="SentenceSlotOption" code /> | <Lang js="'all'" dart="null" py="&quot;all&quot;" code /> | Which parts it carries beside the subject. See [Picking the shape](#picking-the-shape). |
 | `include` | <Lang js="string &#124; string[]" dart="List&lt;String&gt;" py="str &#124; Sequence[str]" code /> | <Lang js="—" dart="const []" py="()" code /> | Words every sentence has to contain. See [Words it has to contain](#words-it-has-to-contain). |
@@ -446,6 +447,98 @@ rand_sentence(language="en", type="all", sentences=3)
 :::
 
 A word you named through `include` comes out in the form the type asks for: `include: '달린다'` with `type: 'question'` writes `달리니?`, not `달린다?`. The forms are stored beside the plain words rather than instead of them, one for one, which is what makes the translation possible.
+
+## Dialogue and thought {#dialogue-and-thought}
+
+`'dialogue'` and `'thought'` are the two types that are not shapes at all. Both wrap a sentence in the language's own quotation marks, and what they wrap is drawn per line — somebody speaking is as often asking as telling.
+
+::: lang js
+
+```javascript
+randSentence({ language: 'en', type: 'dialogue', count: 2 });
+// ['“The stout profit is endless!”', '“Does the blue intuition remain?”']
+
+randSentence({ language: 'ja', type: 'dialogue', count: 2 });
+// ['「組版工は速いか？」', '「芒が伸びるか？」']
+
+randSentence({ language: 'en', type: 'thought', count: 2 });
+// ['‘Is the tangled kraken restless?’', '‘Does the bronze torch age?’']
+```
+
+:::
+
+::: lang dart
+
+```dart
+randSentence(language: WordLanguage.en, type: {SentenceType.dialogue}, count: 2);
+// [“The stout profit is endless!”, “Does the blue intuition remain?”]
+
+randSentence(language: WordLanguage.ja, type: {SentenceType.dialogue}, count: 2);
+// [「組版工は速いか？」, 「芒が伸びるか？」]
+
+randSentence(language: WordLanguage.en, type: {SentenceType.thought}, count: 2);
+// [‘Is the tangled kraken restless?’, ‘Does the bronze torch age?’]
+```
+
+:::
+
+::: lang py
+
+```python
+rand_sentence(language="en", type="dialogue", count=2)
+# ['“The stout profit is endless!”', '“Does the blue intuition remain?”']
+
+rand_sentence(language="ja", type="dialogue", count=2)
+# ['「組版工は速いか？」', '「芒が伸びるか？」']
+
+rand_sentence(language="en", type="thought", count=2)
+# ['‘Is the tangled kraken restless?’', '‘Does the bronze torch age?’']
+```
+
+:::
+
+**The marks are the language's, and they are not close to universal.** Dialogue takes the first level and thought the second:
+
+| Language            | First level | Second level |
+| ------------------- | ----------- | ------------ |
+| `en` `ko` `zh` `vi` | `“…”`       | `‘…’`        |
+| `ja`                | `「…」`     | `『…』`      |
+| `es` `it`           | `«…»`       | `“…”`        |
+| `de`                | `„…“`       | `‚…‘`        |
+| `ru`                | `«…»`       | `„…“`        |
+
+Chinese takes the curly quotes rather than the corner brackets: these pools are written in simplified Chinese, and horizontal simplified text uses `“”` — `「」` is what Taiwan and Hong Kong write. German opens low and closes high, which is why its pair is not symmetrical.
+
+`quote` overrides which pair is used, whatever the type — so a thought can be shouted in the first-level marks and a line of dialogue whispered in the second.
+
+::: lang js
+
+```javascript
+randSentence({ language: 'ru', type: 'thought', quote: 'double' });
+// ['«Эх, беспокойный торт ненадолго кипит!»']
+```
+
+:::
+
+::: lang dart
+
+```dart
+randSentence(language: WordLanguage.ru, type: {SentenceType.thought}, quote: SentenceQuote.double);
+// [«Эх, беспокойный торт ненадолго кипит!»]
+```
+
+:::
+
+::: lang py
+
+```python
+rand_sentence(language="ru", type="thought", quote="double")
+# ['«Эх, беспокойный торт ненадолго кипит!»']
+```
+
+:::
+
+**There is no speech tag.** `…라고 그는 말했다` needs a speaker, which [`includeName`](#a-persons-name) has, and a verb of speaking, which none of the nine languages' pools hold. What you get is the line, not who said it.
 
 ## More than one sentence {#more-than-one-sentence}
 

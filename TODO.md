@@ -18,7 +18,7 @@ Everything here is about `randSentence`. It shipped in the vNext section of the 
 - [x] B. More than one sentence per result, and the sentences hold together
 - [x] C. A person name where a sentence has room for one
 - [x] D. Questions, exclamations and sentences that trail off
-- [ ] E. Dialogue and thought, in the language's own quotation marks
+- [x] E. Dialogue and thought, in the language's own quotation marks
 - [ ] F. Politeness, which is mostly a Korean question
 - [ ] G. Numbers, counters and amounts of money
 - [x] H. An invented noun has no gender, so two languages write no article at all
@@ -91,15 +91,16 @@ Three things the plan did not have:
 
 The derivation was mechanical and then read by eye: Korean's `-니` follows two rules (`-는다` → `-니`, and dropping the `ㄴ` coda otherwise), with the ㄹ-irregular `달다` → `다니` the only exception; English's base forms needed two hand-fixes, `dozes` → `doze` and `aches` → `ache`, where the `-es` rule fires on a stem that already ends in a silent `e`.
 
-## E. Dialogue and thought, in the language's own quotation marks
+## E. Dialogue and thought, in the language's own quotation marks — done
 
-`'dialogue'` and `'thought'` join `SentenceType`. Both wrap a sentence in quotation marks; what differs is which marks, and that a spoken line is as often a question as a statement, so the mood underneath is drawn rather than fixed.
+`'dialogue'` and `'thought'` join `SentenceType`, both wrap a sentence in quotation marks, and `quote` overrides which pair. Scoped at the marks, as planned: there is no speech tag, and the docs page says so.
 
-- `quote?: 'double' | 'single'` overrides which marks are used. Left out, dialogue takes the language's double marks and thought its single ones.
-- `SentenceLanguageData.quotes: { double: readonly [string, string]; single: readonly [string, string] }`. Japanese and Chinese use `「」` and `『』`, not `“”` and `‘’`.
-- A quoted line is speech, so it is where politeness (F) actually shows.
+What landed:
 
-Scope it at the marks. A speech tag — `…라고 그는 말했다` — needs a speaker, which is C, and a verb of speaking, which is a pool none of the nine languages has yet. Leave it out and say so.
+- **`SentenceMark` is the type the plan implied but did not name.** Dialogue and thought have no mark of their own, so `terminators` and `openers` are keyed by the four kinds that do, and `Draw` carries `mark` beside `type` — what the caller asked for, and what the sentence actually closes on. TypeScript writes it as `Exclude<SentenceType, 'dialogue' | 'thought'>`, Python as its own `Literal`, and Dart says it in a doc comment, which is the usual three-way split.
+- `quotes` per language, as planned — and **one correction to the plan's data**. It named `「」` and `『』` for Chinese as well as Japanese; these pools are simplified Chinese, and horizontal simplified text writes `“”`. The corner brackets are Taiwan and Hong Kong. The comment in `zh.ts` says so.
+- The plan named only Japanese and Chinese as the interesting cases; German turned out to be one too (`„…“` opens low and closes high, so the pair is not symmetrical), as did Spanish, Italian and Russian, which reach for guillemets before anything else.
+- The mark under a quote is drawn from statement, question and exclamation. `trailing` is left out of that set: a quoted line that trails off reads as an unfinished quotation rather than as somebody trailing off, and three is enough for the property the plan wanted — that a spoken line is as often a question as a statement. The three suites assert exactly that over 200 lines.
 
 ## F. Politeness, which is mostly a Korean question
 

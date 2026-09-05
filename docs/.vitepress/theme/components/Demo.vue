@@ -127,7 +127,7 @@ const sentence = reactive({
 
 const SENTENCE_SLOTS = ['object', 'place', 'time', 'manner', 'state'];
 
-const SENTENCE_TYPES = ['statement', 'question', 'exclamation', 'trailing'];
+const SENTENCE_TYPES = ['statement', 'question', 'exclamation', 'trailing', 'dialogue', 'thought'];
 
 /** The words typed into `include`, which the option takes as an array. */
 const included = computed(() => sentence.include.split(/[\s,]+/).filter(Boolean));
