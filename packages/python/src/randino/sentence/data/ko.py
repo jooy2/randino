@@ -4,6 +4,7 @@ from randino._internal.parse import words
 from randino.sentence.data._types import (
     SentenceFrame,
     SentenceLanguageData,
+    SentenceNumeral,
     SentencePart,
     StateGroup,
     VerbGroup,
@@ -339,6 +340,28 @@ KO = SentenceLanguageData(
     connectives=words("그리고 그래서 하지만 그런데 이윽고 곧 결국 그러자 한편 이내"),
     interjections=words("아, 오, 와, 어머, 이런, 저런, 세상에, 아이고, 참,"),
     # Korean leaves the subject out as readily as it writes 그것, and the empty
+    # Korean counts anything, because a classifier is what makes a noun countable:
+    # `가지` turns an abstraction into kinds of it. The counter is spaced off the
+    # number, which is what 한글 맞춤법 prescribes as the default.
+    numeral=SentenceNumeral(
+        order="after",
+        counters={
+            "creature": "마리",
+            "person": "명",
+            "plant": "그루",
+            "edible": "개",
+            "thing": "개",
+            "vehicle": "대",
+            "place": "곳",
+            "event": "번",
+            "idea": "가지",
+            "body": "개",
+        },
+        count=(2, 12),
+        currency="원",
+        amounts=(1000, 5000, 10000, 30000, 50000, 100000, 300000, 500000, 1000000),
+        group=",",
+    ),
     # entry is how the data says so.
     pronouns={"n": ("", "그것")},
     pronounless=("person",),
@@ -451,6 +474,28 @@ KO = SentenceLanguageData(
             ),
             12,
             mood="question",
+        ),
+        # A count and an amount. Money is an object of the verbs that take an idea,
+        # which is the class it belongs to.
+        SentenceFrame(
+            (
+                SentencePart("subject", tail="가", tail_alt="이", modifiable=True),
+                SentencePart("quantity", tail="를", tail_alt="을"),
+                SentencePart("verb"),
+            ),
+            6,
+        ),
+        SentenceFrame(
+            (SentencePart("quantity", tail="가", tail_alt="이"), SentencePart("verb")),
+            5,
+        ),
+        SentenceFrame(
+            (
+                SentencePart("subject", tail="가", tail_alt="이", modifiable=True),
+                SentencePart("money", tail="를", tail_alt="을"),
+                SentencePart("verb"),
+            ),
+            5,
         ),
     ),
 )

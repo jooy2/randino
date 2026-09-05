@@ -4,6 +4,7 @@ from randino._internal.parse import words
 from randino.sentence.data._types import (
     SentenceFrame,
     SentenceLanguageData,
+    SentenceNumeral,
     SentencePart,
     StateGroup,
     VerbGroup,
@@ -196,6 +197,16 @@ ES = SentenceLanguageData(
     connectives=words("y_luego pero entonces además, sin_embargo, después por_fin mientras_tanto,"),
     interjections=words("ay, oh, vaya, caramba, madre_mía, mira, desde_luego,"),
     # Spanish carries its subject in the verb ending, so a second sentence about
+    # Money only, for the reason English has: a counted phrase would need a plural
+    # noun, and most of these pools are not countable at all.
+    numeral=SentenceNumeral(
+        order="before",
+        counters={},
+        count=(2, 12),
+        currency="euros",
+        amounts=(100, 500, 1000, 5000, 12000, 25000, 50000, 100000),
+        group=".",
+    ),
     # the same thing writes no pronoun at all.
     pronouns={"n": ("",)},
     frames=(
@@ -271,6 +282,14 @@ ES = SentenceLanguageData(
                 SentencePart("manner"),
             ),
             5,
+        ),
+        SentenceFrame(
+            (
+                SentencePart("subject", modifiable=True),
+                SentencePart("verb"),
+                SentencePart("money"),
+            ),
+            6,
         ),
     ),
 )

@@ -723,7 +723,13 @@ describe('Sentence', () => {
 
 					misses.push(`${language} ${minLength}-${maxLength}: ${sentence} (${sentence.length})`);
 
-					assert.ok(distance <= 2, `off by ${distance}: ${misses[misses.length - 1]}`);
+					// Three rather than two, and German is why. Its short shape reaches a
+					// window like 18–23 only with a long enough noun, and the theme is
+					// settled before the noun is drawn — so a run of fourteen attempts
+					// that all rolled a short-noun theme (`color` is `Rot` and `Blau`)
+					// settles three characters short. Measured at roughly one draw in
+					// thirty thousand.
+					assert.ok(distance <= 3, `off by ${distance}: ${misses[misses.length - 1]}`);
 				}
 			}
 		}

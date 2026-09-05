@@ -85,8 +85,104 @@ MODIFY_CHANCE = 45
 Length can override it in both directions — see `_modify_chance_for`.
 """
 
-NOUN_SLOTS: tuple[SentenceSlot, ...] = ("subject", "object", "place")
+NOUN_SLOTS: tuple[SentenceSlot, ...] = ("subject", "object", "place", "quantity")
 """The slots that are a noun phrase, and so draw from the word pools."""
+
+MONEY_CLASS: NounClass = "idea"
+"""The class money belongs to, which decides the verbs it can stand beside.
+
+An amount is an idea, so the verbs that remember and count one are the verbs that can
+take it.
+"""
+
+
+def _subject_slot_of(frame: SentenceFrame) -> SentenceSlot:
+    """Which slot this shape's subject stands in.
+
+    Usually the subject, and the quantity for a shape that counts the thing the sentence
+    is about — `사과 12 개가 익는다` has no separate subject, and the counted phrase is
+    what the verb agrees with.
+
+    Args:
+        frame: The shape.
+
+    Returns:
+        The slot its subject stands in.
+    """
+    return "subject" if any(part.slot == "subject" for part in frame.parts) else "quantity"
+
+
+def _takes_object(frame: SentenceFrame) -> bool:
+    """Whether a shape puts a noun phrase after its verb, counted or not."""
+    subject = _subject_slot_of(frame)
+
+    return any(
+        part.slot == "object"
+        or part.slot == "money"
+        or (part.slot == "quantity" and subject != "quantity")
+        for part in frame.parts
+    )
+
+
+def _grouped(value: int, group: str) -> str:
+    """The digits of a number, grouped the way the language groups them."""
+    return f"{value:,}".replace(",", group)
+
+
+def _count_text(data: SentenceLanguageData, theme: WordTheme) -> str:
+    """What a counted phrase writes beside its noun."""
+    numeral = data.numeral
+
+    if numeral is None:
+        return ""
+
+    counter = numeral.counters.get(THEME_CLASS[theme])
+    number = _grouped(random.randint(numeral.count[0], numeral.count[1]), numeral.group)
+
+    return number if counter is None else number + data.space + counter
+
+
+def _money_text(data: SentenceLanguageData) -> str:
+    """What an amount of money writes."""
+    numeral = data.numeral
+
+    if numeral is None:
+        return ""
+
+    return _grouped(pick(numeral.amounts), numeral.group) + data.space + numeral.currency
+
+
+def _count_span(data: SentenceLanguageData) -> tuple[int, int]:
+    """Shortest and longest a count can be, so a phrase can reserve room for one."""
+    numeral = data.numeral
+
+    if numeral is None:
+        return (0, 0)
+
+    counters = list(numeral.counters.values())
+    low = min((len(word) for word in counters), default=0)
+    high = max((len(word) for word in counters), default=0)
+    space = len(data.space)
+
+    return (
+        space + len(_grouped(numeral.count[0], numeral.group)) + (low + space if counters else 0),
+        space + len(_grouped(numeral.count[1], numeral.group)) + (high + space if counters else 0),
+    )
+
+
+def _money_span(data: SentenceLanguageData) -> tuple[int, int]:
+    """The same for an amount, which is a phrase of its own rather than part of one."""
+    numeral = data.numeral
+
+    if numeral is None:
+        return (1, 1)
+
+    widths = [
+        len(_grouped(value, numeral.group)) + len(data.space) + len(numeral.currency)
+        for value in numeral.amounts
+    ]
+
+    return (min(widths), max(widths))
 
 
 @dataclass(frozen=True, slots=True)
@@ -635,6 +731,7 @@ def _slot_bounds(language: WordLanguage) -> dict[str, tuple[int, int]]:
         "subject": noun,
         "object": noun,
         "place": noun,
+        "quantity": noun,
         # Every form a predicate can take, not only the plain statement's: a question
         # form is a different length, and the shape is chosen against these.
         "verb": _span(
@@ -647,6 +744,7 @@ def _slot_bounds(language: WordLanguage) -> dict[str, tuple[int, int]]:
         ),
         "manner": _span([data.manners]),
         "time": _span([data.times]),
+        "money": _money_span(data),
         "modifier": _span(
             [
                 _agreed_modifiers(language, gender)
@@ -693,10 +791,18 @@ def _part_range(
 
     article_min, article_max = (0, 0) if part.bare else _article_span(data)
     modifier = bounds["modifier"][1] + space if part.modifiable else 0
+    # A counted phrase carries a number and the counter its kind takes, and no article
+    # and no modifier — `12 apples`, never `the 12 red apples`.
+    count_min, count_max = _count_span(data) if part.slot == "quantity" else (0, 0)
 
     return (
-        head + (article_min + space if article_min else 0) + low + _tail_min(part),
-        head + (article_max + space if article_max else 0) + modifier + high + _tail_max(part),
+        head + (article_min + space if article_min else 0) + low + count_min + _tail_min(part),
+        head
+        + (article_max + space if article_max else 0)
+        + modifier
+        + high
+        + count_max
+        + _tail_max(part),
     )
 
 
@@ -805,7 +911,11 @@ def _verb_groups_for(
     Transitive exactly when the shape has an object, able to take the subject the shape
     will be given, and — when a word was required — the group that word belongs to.
     """
-    wants_object = any(part.slot == "object" for part in frame.parts)
+    # A quantity is an object with a number on it, and an amount is an object of the
+    # class money belongs to — unless the quantity is what the sentence is about, in
+    # which case it is the subject and the verb takes nothing.
+    wants_object = _takes_object(frame)
+    wants_money = any(part.slot == "money" for part in frame.parts)
     subject = _required_at(frame, plan, "subject")
     obj = _required_at(frame, plan, "object")
     verb = _required_at(frame, plan, "verb")
@@ -813,6 +923,9 @@ def _verb_groups_for(
 
     for group in data.verbs:
         if (group.object is not None) != wants_object:
+            continue
+
+        if wants_money and MONEY_CLASS not in (group.object or ()):
             continue
         if verb is not None and verb.word not in group.words:
             continue
@@ -949,13 +1062,15 @@ def _noun_phrase(
     low: int,
     high: int,
     span: tuple[int, int],
+    count: str,
 ) -> Phrase:
     """Build one noun phrase: an article, the noun, and a modifier where there is room.
 
     `low` and `high` are what the whole phrase has to land in. The article is reserved
     before the noun is drawn — its length is not known until the noun's gender is, so
     the longest one the language has is what gets set aside — and whatever the noun
-    leaves over is what the modifier is drawn to fit.
+    leaves over is what the modifier is drawn to fit. `count` is what a counted phrase
+    writes beside its noun, on the side the language puts it.
     """
     lexicon = WORD_DATA[language]
     pool = _nouns_of(language, theme)
@@ -994,6 +1109,15 @@ def _noun_phrase(
             parts.append(modifier)
         else:
             parts.insert(0, modifier)
+
+    # A counted phrase writes its number where the language puts it — behind the noun in
+    # Korean, Japanese and Chinese, in front of it in Vietnamese, where the classifier
+    # comes with it.
+    if count:
+        if data.numeral is not None and data.numeral.order == "before":
+            parts.insert(0, count)
+        else:
+            parts.append(count)
 
     article = "" if bare else _article_for(data, gender, parts[0])
     # An elided article carries its own boundary — `l'orso`, never `l' orso`.
@@ -1090,7 +1214,7 @@ def _theme_for_part(
     themes: Sequence[WordTheme],
 ) -> WordTheme:
     """The theme a phrase other than the subject draws from."""
-    if slot == "object":
+    if slot in ("object", "quantity"):
         usable = _themes_for_classes(WORD_THEMES, object_classes or ())
 
         return pick(usable or WORD_THEMES)
@@ -1194,7 +1318,7 @@ def _compose(
     lexicon = WORD_DATA[language]
     themes = tuple(requested) or WORD_THEMES
     headed = any(part.slot == "state" for part in frame.parts)
-    wants_object = any(part.slot == "object" for part in frame.parts)
+    wants_object = _takes_object(frame)
     # A shape whose predicate has nothing to say about the requested subject only
     # gets this far when no shape of the language did, so the fallback is the same
     # best effort every other narrowing here makes.
@@ -1263,6 +1387,7 @@ def _compose(
     # phrase was given the room the language's longest noun would need and drew a word
     # out of its own theme, which is how a sentence came out short of a `min_length` the
     # shape could otherwise have reached.
+    subject_slot = _subject_slot_of(frame)
     part_themes: list[WordTheme | None] = []
 
     for index, part in enumerate(shape):
@@ -1270,7 +1395,7 @@ def _compose(
             part_themes.append(None)
             continue
 
-        if part.slot == "subject":
+        if part.slot == subject_slot:
             part_themes.append(subject_theme)
             continue
 
@@ -1392,7 +1517,9 @@ def _compose(
         part_high = max(1, high - used - overhead - rest_min)
         part_low = max(1, low - used - overhead - rest_max)
 
-        if proper[index] is not None:
+        if part.slot == "money":
+            phrase = _money_text(data)
+        elif proper[index] is not None:
             # A bare proper noun, drawn now if it was not carried in. `part_high` and
             # `part_low` are what the phrase has room for, and the name generator fits
             # them the same way a noun would.
@@ -1422,15 +1549,20 @@ def _compose(
             theme = cast("WordTheme", part_themes[index])
             noun_low, noun_high = part_bounds[index][part.slot]
             _, article_max = (0, 0) if part.bare else _article_span(data)
-            room = part_high - noun_low
+            counted = _count_span(data)[1] if part.slot == "quantity" else 0
+            room = part_high - noun_low - counted
             # A phrase whose share of the range is longer than any noun of its theme
             # takes a modifier whatever the roll says, which is the only way it can
             # reach it — the alternative is a sentence that misses `min_length`.
             needed = part_low > (article_max + space if article_max else 0) + noun_high
-            modify = part.modifiable and (
-                owed is not None
-                or needed
-                or (room >= bounds["modifier"][0] + space and chance(modify_chance))
+            modify = (
+                part.slot != "quantity"
+                and part.modifiable
+                and (
+                    owed is not None
+                    or needed
+                    or (room >= bounds["modifier"][0] + space and chance(modify_chance))
+                )
             )
             built = _noun_phrase(
                 language,
@@ -1438,17 +1570,20 @@ def _compose(
                 theme,
                 forced=required.word if required is not None else None,
                 modify=modify,
-                bare=part.bare,
+                # A counted phrase drops its article and takes no modifier: `12 apples`,
+                # never `the 12 red apples`.
+                bare=part.slot == "quantity" or part.bare,
                 forced_modifier=owed.word if owed is not None else None,
                 invent=settings.invent,
                 prefix=settings.prefix if prefixable and index == 0 else "",
                 low=part_low,
                 high=part_high,
                 span=(noun_low, noun_high),
+                count=_count_text(data, theme) if part.slot == "quantity" else "",
             )
             phrase = built.text
 
-            if part.slot == "subject":
+            if part.slot == subject_slot:
                 subject = built
                 gender = gender_of(lexicon, _as_pool(lexicon, built.noun))
         else:

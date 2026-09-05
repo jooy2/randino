@@ -185,6 +185,18 @@ sentence = {
         # Optional in one package and defaulted in another; written as a list either
         # way so the shapes compare.
         "pronounless": list(data.pronounless),
+        "numeral": (
+            None
+            if data.numeral is None
+            else {
+                "order": data.numeral.order,
+                "counters": dict(data.numeral.counters),
+                "count": list(data.numeral.count),
+                "currency": data.numeral.currency,
+                "amounts": list(data.numeral.amounts),
+                "group": data.numeral.group,
+            }
+        ),
         "frames": [
             {
                 "parts": [

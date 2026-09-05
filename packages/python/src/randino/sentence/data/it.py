@@ -4,6 +4,7 @@ from randino._internal.parse import words
 from randino.sentence.data._types import (
     SentenceFrame,
     SentenceLanguageData,
+    SentenceNumeral,
     SentencePart,
     StateGroup,
     VerbGroup,
@@ -213,6 +214,14 @@ IT = SentenceLanguageData(
     """),
     connectives=words("e_poi ma allora inoltre, tuttavia, dopo infine intanto,"),
     interjections=words("oh, ah, ehi, caspita, mamma_mia, guarda, davvero,"),
+    numeral=SentenceNumeral(
+        order="before",
+        counters={},
+        count=(2, 12),
+        currency="euro",
+        amounts=(100, 500, 1000, 5000, 12000, 25000, 50000, 100000),
+        group=".",
+    ),
     # Pro-drop, the same as Spanish: `esso` exists and nobody writes it.
     pronouns={"n": ("",)},
     frames=(
@@ -288,6 +297,14 @@ IT = SentenceLanguageData(
                 SentencePart("manner"),
             ),
             5,
+        ),
+        SentenceFrame(
+            (
+                SentencePart("subject", modifiable=True),
+                SentencePart("verb"),
+                SentencePart("money"),
+            ),
+            6,
         ),
     ),
 )

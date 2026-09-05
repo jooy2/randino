@@ -4,6 +4,7 @@ from randino._internal.parse import words
 from randino.sentence.data._types import (
     SentenceFrame,
     SentenceLanguageData,
+    SentenceNumeral,
     SentencePart,
     StateGroup,
     VerbGroup,
@@ -129,6 +130,25 @@ JA = SentenceLanguageData(
     ),
     # Plain predicate forms, so a na-adjective closes on だ where an i-adjective
     # closes on itself. The `word` pools hold the attributive 静かな instead,
+    numeral=SentenceNumeral(
+        order="after",
+        counters={
+            "creature": "匹",
+            "person": "人",
+            "plant": "本",
+            "edible": "個",
+            "thing": "個",
+            "vehicle": "台",
+            "place": "箇所",
+            "event": "回",
+            "idea": "種類",
+            "body": "本",
+        },
+        count=(2, 12),
+        currency="円",
+        amounts=(1000, 5000, 10000, 30000, 50000, 100000, 300000, 500000, 1000000),
+        group=",",
+    ),
     # which cannot end a sentence.
     states=(
         StateGroup(
@@ -336,6 +356,23 @@ JA = SentenceLanguageData(
             12,
             mood="question",
             tag="か",
+        ),
+        SentenceFrame(
+            (
+                SentencePart("subject", tail="が", modifiable=True),
+                SentencePart("quantity", tail="を"),
+                SentencePart("verb"),
+            ),
+            6,
+        ),
+        SentenceFrame((SentencePart("quantity", tail="が"), SentencePart("verb")), 5),
+        SentenceFrame(
+            (
+                SentencePart("subject", tail="が", modifiable=True),
+                SentencePart("money", tail="を"),
+                SentencePart("verb"),
+            ),
+            5,
         ),
     ),
 )

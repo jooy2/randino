@@ -4,6 +4,7 @@ from randino._internal.parse import words
 from randino.sentence.data._types import (
     SentenceFrame,
     SentenceLanguageData,
+    SentenceNumeral,
     SentencePart,
     StateGroup,
     VerbGroup,
@@ -199,6 +200,17 @@ EN = SentenceLanguageData(
     connectives=words("and_then so but meanwhile afterwards still later soon even_so at_last"),
     interjections=words("oh, ah, wow, well, look, goodness, my, indeed, honestly,"),
     pronouns={"n": words("it")},
+    # No counters, and so no counted shape: English would need a plural, and a
+    # plural of `sadness` or `bacon` is not a thing anyone writes. Money is
+    # countable whatever the pools hold, so the amount is all this declares.
+    numeral=SentenceNumeral(
+        order="before",
+        counters={},
+        count=(2, 12),
+        currency="dollars",
+        amounts=(100, 500, 1000, 5000, 12000, 25000, 50000, 100000),
+        group=",",
+    ),
     # English cannot drop a subject, so a sentence about a person names it again.
     pronounless=("person",),
     frames=(
@@ -314,6 +326,16 @@ EN = SentenceLanguageData(
             ),
             10,
             mood="question",
+        ),
+        # Money and nothing else: a counted phrase would need a plural noun, and
+        # most of these pools are not countable at all.
+        SentenceFrame(
+            (
+                SentencePart("subject", modifiable=True),
+                SentencePart("verb"),
+                SentencePart("money"),
+            ),
+            6,
         ),
     ),
 )

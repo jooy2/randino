@@ -162,13 +162,18 @@ class WordDetail:
     """
 
 
-SentenceSlot = Literal["subject", "verb", "object", "state", "place", "time", "manner"]
+SentenceSlot = Literal[
+    "subject", "verb", "object", "state", "place", "time", "manner", "quantity", "money"
+]
 """What one phrase does in a sentence.
 
 `subject` is who or what the sentence is about (`검은 고양이가`), `verb` what it does
 (`잠잔다`), `object` what it does it to (`사과를`), and `state` what it is like where
 the sentence has no verb at all (`파랗다`). The rest frame the action: `place` where it
 happens (`숲에서`), `time` when (`새벽에`), `manner` how (`조용히`).
+
+`quantity` is how many of something (`사과 12 개`), which is a noun phrase with a number
+and the counter its kind takes, and `money` is how much (`100,000 원`, `12,000 dollars`).
 
 A sentence is headed by a `verb` or by a `state`, never by both.
 """

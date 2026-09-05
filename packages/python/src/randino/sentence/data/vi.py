@@ -4,6 +4,7 @@ from randino._internal.parse import words
 from randino.sentence.data._types import (
     SentenceFrame,
     SentenceLanguageData,
+    SentenceNumeral,
     SentencePart,
     StateGroup,
     VerbGroup,
@@ -174,6 +175,27 @@ VI = SentenceLanguageData(
     interjections=words("ôi, chà, ồ, trời_ơi, chao_ôi, này, thật_đấy,"),
     pronouns={"n": ("", "nó")},
     pronounless=("person",),
+    # Vietnamese puts the classifier in front of the noun and the number in front
+    # of that, so the whole group reads `12 con mèo`.
+    numeral=SentenceNumeral(
+        order="before",
+        counters={
+            "creature": "con",
+            "person": "người",
+            "plant": "cây",
+            "edible": "cái",
+            "thing": "cái",
+            "vehicle": "chiếc",
+            "place": "nơi",
+            "event": "lần",
+            "idea": "điều",
+            "body": "cái",
+        },
+        count=(2, 12),
+        currency="đồng",
+        amounts=(10000, 50000, 100000, 200000, 500000, 1000000, 5000000),
+        group=".",
+    ),
     frames=(
         SentenceFrame(
             (
@@ -270,6 +292,23 @@ VI = SentenceLanguageData(
             14,
             mood="question",
             tag="không",
+        ),
+        SentenceFrame(
+            (
+                SentencePart("subject", modifiable=True),
+                SentencePart("verb"),
+                SentencePart("quantity"),
+            ),
+            6,
+        ),
+        SentenceFrame((SentencePart("quantity"), SentencePart("verb")), 5),
+        SentenceFrame(
+            (
+                SentencePart("subject", modifiable=True),
+                SentencePart("verb"),
+                SentencePart("money"),
+            ),
+            5,
         ),
     ),
 )

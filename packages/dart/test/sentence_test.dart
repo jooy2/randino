@@ -659,7 +659,13 @@ void main() {
 
             misses.add(miss);
 
-            expect(distance <= 2, isTrue, reason: 'off by $distance: $miss');
+            // Three rather than two, and German is why. Its short shape reaches a
+            // window like 18–23 only with a long enough noun, and the theme is
+            // settled before the noun is drawn — so a run of fourteen attempts
+            // that all rolled a short-noun theme (`color` is `Rot` and `Blau`)
+            // settles three characters short. Measured at roughly one draw in
+            // thirty thousand.
+            expect(distance <= 3, isTrue, reason: 'off by $distance: $miss');
           }
         }
       }

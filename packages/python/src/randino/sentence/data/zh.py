@@ -4,6 +4,7 @@ from randino._internal.parse import words
 from randino.sentence.data._types import (
     SentenceFrame,
     SentenceLanguageData,
+    SentenceNumeral,
     SentencePart,
     StateGroup,
     VerbGroup,
@@ -102,6 +103,25 @@ ZH = SentenceLanguageData(
         ),
     ),
     # A bare adjective cannot stand as a predicate on its own, so the shape that
+    numeral=SentenceNumeral(
+        order="after",
+        counters={
+            "creature": "只",
+            "person": "位",
+            "plant": "棵",
+            "edible": "个",
+            "thing": "个",
+            "vehicle": "辆",
+            "place": "处",
+            "event": "次",
+            "idea": "种",
+            "body": "个",
+        },
+        count=(2, 12),
+        currency="元",
+        amounts=(100, 500, 1000, 3000, 5000, 10000, 30000, 50000, 100000),
+        group=",",
+    ),
     # uses one writes 很 in front of it.
     states=(
         StateGroup(
@@ -283,6 +303,23 @@ ZH = SentenceLanguageData(
             12,
             mood="question",
             tag="吗",
+        ),
+        SentenceFrame(
+            (
+                SentencePart("subject", modifiable=True),
+                SentencePart("verb"),
+                SentencePart("quantity"),
+            ),
+            6,
+        ),
+        SentenceFrame((SentencePart("quantity"), SentencePart("verb")), 5),
+        SentenceFrame(
+            (
+                SentencePart("subject", modifiable=True),
+                SentencePart("verb"),
+                SentencePart("money"),
+            ),
+            5,
         ),
     ),
 )
