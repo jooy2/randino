@@ -37,6 +37,11 @@ const pool = (source: readonly Entry[] | undefined) =>
 
 const list = (source: readonly string[] | undefined) => (source === undefined ? null : [...source]);
 
+// Optional in one package and defaulted in another; written as a map of lists
+// either way, so the shapes compare.
+const forms = (source: Readonly<Record<string, readonly string[]>> | undefined) =>
+	Object.fromEntries(Object.entries(source ?? {}).map(([key, pool]) => [key, [...pool]]));
+
 const map = (source: Readonly<Record<string | number, unknown>> | undefined) =>
 	source === undefined
 		? null
@@ -117,7 +122,10 @@ console.log(
 					{
 						space: data.space,
 						capitalize: data.capitalize,
-						terminator: data.terminator,
+						terminators: map(data.terminators),
+						// Optional in one package and defaulted in another; written as a
+						// map either way so the shapes compare.
+						openers: map(data.openers ?? {}),
 						// Optional in one package and defaulted in another; written the same
 						// way here either way, so the shapes compare.
 						predicateAgrees: data.predicateAgrees ?? false,
@@ -132,15 +140,18 @@ console.log(
 						verbs: data.verbs.map((group) => ({
 							subject: [...group.subject],
 							object: list(group.object),
-							words: list(group.words)
+							words: list(group.words),
+							forms: forms(group.forms)
 						})),
 						states: data.states.map((group) => ({
 							subject: [...group.subject],
-							words: list(group.words)
+							words: list(group.words),
+							forms: forms(group.forms)
 						})),
 						manners: list(data.manners),
 						times: list(data.times),
 						connectives: list(data.connectives),
+						interjections: list(data.interjections),
 						pronouns: Object.fromEntries(
 							Object.entries(data.pronouns).map(([gender, pool]) => [gender, list(pool)])
 						),
@@ -156,7 +167,9 @@ console.log(
 								modifiable: part.modifiable ?? false,
 								bare: part.bare ?? false
 							})),
-							weight: frame.weight
+							weight: frame.weight,
+							mood: frame.mood ?? 'statement',
+							tag: frame.tag ?? ''
 						}))
 					}
 				])

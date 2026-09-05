@@ -8,7 +8,7 @@
 // allows. So the nouns are still drawn from `word/data`, and everything a
 // sentence adds to them lives here.
 
-import type { SentenceSlot } from '../../_types/global.js';
+import type { SentenceSlot, SentenceType } from '../../_types/global.js';
 import type { WordGender, WordPool } from '../../word/data/types.js';
 
 /**
@@ -34,6 +34,19 @@ export type NounClass =
 	| 'body';
 
 /**
+ * A form a predicate takes beside the one a plain statement ends on. `question`
+ * is Korean `달리니` beside `달린다`, and English `run` beside `runs`.
+ *
+ * A form rather than another pool: the same verbs, said differently. Every form
+ * pool is index-aligned with `words`, so a verb keeps its meaning across them and
+ * a word the caller required can be translated into the form the sentence needs.
+ */
+export type PredicateForm = 'question';
+
+/** The forms a group declares, beside the plain statement its `words` are in. */
+export type PredicateForms = Partial<Record<PredicateForm, WordPool>>;
+
+/**
  * Verbs that take the same arguments. Written as a group rather than one tagged
  * entry per verb, because the tag is the interesting part and a group of thirty
  * verbs shares one: they all say what can do the doing, and — when the verb is
@@ -46,6 +59,12 @@ export type VerbGroup = {
 	object?: readonly NounClass[];
 	/** The verbs themselves, in the form a plain statement ends on (`달린다`, `runs`). */
 	words: WordPool;
+	/**
+	 * The same verbs in another form, index-aligned with `words`. Left out by a
+	 * language whose verb does not change — Chinese, Vietnamese, Spanish, Italian
+	 * and Russian ask a question with the mark alone.
+	 */
+	forms?: PredicateForms;
 };
 
 /**
@@ -58,6 +77,8 @@ export type StateGroup = {
 	/** Classes a noun has to belong to to be described by these. */
 	subject: readonly NounClass[];
 	words: WordPool;
+	/** The same adjectives in another form, index-aligned with `words`. */
+	forms?: PredicateForms;
 };
 
 /**
@@ -94,6 +115,17 @@ export type SentencePart = {
 };
 
 /**
+ * What a shape is for. A frame with no mood is a statement, and a statement shape
+ * also serves an exclamation and a sentence that trails off — those differ from
+ * it by the mark and by what stands in front, not by the order of the words.
+ *
+ * A question is the one that can differ, and only four of the nine languages need
+ * it to. The rest declare no question shape and get their statement shapes back,
+ * which is the same best-effort every other narrowing here makes.
+ */
+export type SentenceMood = 'statement' | 'question';
+
+/**
  * One shape a sentence can take, written in the order the language puts it in.
  *
  * Per language rather than shared, and for the same reason a nickname's frames
@@ -104,6 +136,14 @@ export type SentenceFrame = {
 	parts: readonly SentencePart[];
 	/** How often this shape is used, against the other frames of the language. */
 	weight: number;
+	/** What the shape is for. Left out by a statement. */
+	mood?: SentenceMood;
+	/**
+	 * Written after the last phrase and before the terminator, with the language's
+	 * own space in front of it. That is Chinese `吗`, Japanese `か` and Vietnamese
+	 * `không` — none of which is a phrase, and none of which any slot could carry.
+	 */
+	tag?: string;
 };
 
 /**
@@ -144,8 +184,13 @@ export type SentenceLanguageData = {
 	space: string;
 	/** Whether the sentence opens on a capital letter. */
 	capitalize: boolean;
-	/** What the sentence closes on. */
-	terminator: string;
+	/** What a sentence of each type closes on. */
+	terminators: Record<SentenceType, string>;
+	/**
+	 * What it opens on, for a language that marks the type at both ends. Spanish
+	 * `¿` and `¡` are the only ones here, and every other language leaves it out.
+	 */
+	openers?: Partial<Record<SentenceType, string>>;
 	/** The article a noun phrase opens with. Left out by a language with no articles. */
 	articles?: SentenceArticles;
 	/**
@@ -168,6 +213,14 @@ export type SentenceLanguageData = {
 	connectives: WordPool;
 	/** How a later sentence refers to the topic without naming it again. */
 	pronouns: SentencePronouns;
+	/**
+	 * What an exclamation opens on (`와,`, `Wow,`, `ああ、`). Written whole, comma
+	 * and all, because where the comma goes is the language's business.
+	 *
+	 * Exclamations alone: a statement that opened on one would be reading itself
+	 * aloud, and a question has its own mark to do the work.
+	 */
+	interjections: WordPool;
 	/**
 	 * Noun classes the language's written pronouns are wrong for. A sentence about
 	 * one of them leaves the subject out where the language can, and names the

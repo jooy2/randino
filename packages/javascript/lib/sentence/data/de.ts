@@ -4,7 +4,7 @@ import type { SentenceLanguageData } from './types.js';
 export const DE: SentenceLanguageData = {
 	space: ' ',
 	capitalize: true,
-	terminator: '.',
+	terminators: { statement: '.', question: '?', exclamation: '!', trailing: '…' },
 	// The indefinite article, and it is what makes the modifiers come out right:
 	// after `ein` a German adjective takes the same endings it takes with no
 	// article at all — `ein blauer Wal`, `eine blaue Katze`, `ein blaues Haus` —
@@ -118,6 +118,7 @@ export const DE: SentenceLanguageData = {
 	// not something a connective can bolt on. `und`, `aber`, `doch` and `denn` sit
 	// outside the clause and leave the order alone.
 	connectives: words(`und aber doch denn`),
+	interjections: words(`oh, ach, na, mensch, oje, sieh_an, wahrhaftig,`),
 	pronouns: { m: words(`er`), f: words(`sie`), n: words(`es`) },
 	// German declares the fewest shapes here, and both reasons are its cases. An
 	// object would be accusative, which changes the article and the modifier
@@ -152,6 +153,24 @@ export const DE: SentenceLanguageData = {
 				{ slot: 'manner' }
 			],
 			weight: 14
+		},
+		// German asks by moving the finite verb to the front, which is the same rule
+		// that keeps it second in a statement — the question is what happens when
+		// nothing stands in the first position at all.
+		{
+			parts: [{ slot: 'verb' }, { slot: 'subject', modifiable: true }],
+			weight: 26,
+			mood: 'question'
+		},
+		{
+			parts: [{ slot: 'verb' }, { slot: 'subject', modifiable: true }, { slot: 'manner' }],
+			weight: 20,
+			mood: 'question'
+		},
+		{
+			parts: [{ slot: 'subject', head: 'ist', modifiable: true }, { slot: 'state' }],
+			weight: 18,
+			mood: 'question'
 		}
 	]
 };

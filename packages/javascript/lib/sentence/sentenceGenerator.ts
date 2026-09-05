@@ -39,6 +39,8 @@ import type {
 	SentenceShapeOption,
 	SentenceSlot,
 	SentenceSlotOption,
+	SentenceType,
+	SentenceTypeOption,
 	WordLanguage,
 	WordTheme,
 	WordThemeOption
@@ -61,6 +63,7 @@ import { SENTENCE_DATA, THEME_CLASS } from './data/index.js';
 import type {
 	NounClass,
 	SentenceFrame,
+	SentenceMood,
 	SentenceLanguageData,
 	SentencePart,
 	StateGroup,
@@ -100,6 +103,25 @@ type Settings = {
 	sentences: number;
 	// Whether a phrase about a person is written as a name.
 	includeName: boolean;
+	// What the sentences may be doing, normalized to a set to draw from.
+	types: readonly SentenceType[];
+};
+
+/** The one thing a shape has to match to answer a type. */
+function moodFor(type: SentenceType): SentenceMood {
+	return type === 'question' ? 'question' : 'statement';
+}
+
+/**
+ * Everything one sentence of a result is drawn against: the room it has, what it
+ * is doing, what it opens on, and — after the first — what it is about.
+ */
+type Draw = {
+	budget: readonly [number, number];
+	type: SentenceType;
+	/** A connective or an interjection, `''` for neither. */
+	opener: string;
+	follow: Follow | null;
 };
 
 /**
@@ -135,8 +157,6 @@ type Follow = {
 	reference: Reference;
 	/** What a `'pronoun'` reference writes; `''` where the language writes nothing. */
 	pronoun: string;
-	/** The connective the sentence opens on, `''` for none. */
-	opener: string;
 };
 
 /* --- Shapes ---------------------------------------------------------------- */
@@ -177,12 +197,24 @@ function matchesSlots(frame: SentenceFrame, slots: readonly SentenceSlot[] | 'no
  * language that has no shape carrying what was asked for answers with the
  * closest it does have, the same best-effort a too-narrow length range gets.
  */
-function framesFor(data: SentenceLanguageData, settings: Settings): readonly SentenceFrame[] {
+function framesFor(
+	data: SentenceLanguageData,
+	settings: Settings,
+	mood: SentenceMood
+): readonly SentenceFrame[] {
+	// A language that writes its question with the mark alone declares no question
+	// shape, and answers with the statement shapes it does have. That is not a
+	// fallback so much as the point: `¿El león corre?` is the statement.
+	const byMood = data.frames.filter((frame) => (frame.mood ?? 'statement') === mood);
+	const moody = byMood.length
+		? byMood
+		: data.frames.filter((frame) => (frame.mood ?? 'statement') === 'statement');
+	const usable = moody.length ? moody : data.frames;
 	const bySlots =
 		settings.slots === 'all'
-			? data.frames
-			: data.frames.filter((frame) => matchesSlots(frame, settings.slots as never));
-	const allowed = bySlots.length ? bySlots : data.frames;
+			? usable
+			: usable.filter((frame) => matchesSlots(frame, settings.slots as never));
+	const allowed = bySlots.length ? bySlots : usable;
 
 	if (settings.shape === 'all') {
 		return allowed;
@@ -546,8 +578,10 @@ function slotBounds(language: WordLanguage): Record<string, readonly [number, nu
 	const bounds = {
 		noun: span(WORD_THEMES.map((theme) => nounsOf(language, theme))),
 		modifier: span(genders.map((gender) => agreedModifiers(language, gender))),
-		verb: span(data.verbs.map((group) => group.words)),
-		state: span(data.states.map((group) => group.words)),
+		// Every form a predicate can take, not only the plain statement's: a question
+		// form is a different length, and the shape is chosen against these.
+		verb: span(data.verbs.flatMap((group) => [group.words, ...Object.values(group.forms ?? {})])),
+		state: span(data.states.flatMap((group) => [group.words, ...Object.values(group.forms ?? {})])),
 		manner: span([data.manners]),
 		time: span([data.times])
 	};
@@ -610,7 +644,11 @@ function frameRange(
 	data: SentenceLanguageData,
 	bounds: Record<string, readonly [number, number]>
 ): readonly [number, number] {
-	let min = data.terminator.length;
+	// Measured against the longest mark the language writes, so a shape is never
+	// chosen for a range only the shortest one could have reached.
+	const marks = Math.max(...Object.values(data.terminators).map((mark) => mark.length));
+	const tag = frame.tag ? frame.tag.length + data.space.length : 0;
+	let min = marks + tag;
 	let max = min;
 
 	for (let i = 0; i < frame.parts.length; i += 1) {
@@ -771,6 +809,8 @@ type Built = {
 	named: boolean;
 	/** The person names this sentence was written with, in order. */
 	names: string[];
+	/** What this sentence is doing. Set once the draw it came from is known. */
+	type: SentenceType;
 };
 
 /** The article a phrase opens with, by the noun's gender and the word after it. */
@@ -973,16 +1013,13 @@ function subjectThemesFor(settings: Settings, follow: Follow | null): readonly W
 	return inClass.length ? inClass : themes;
 }
 
-function generateOne(
-	language: WordLanguage,
-	settings: Settings,
-	budget: readonly [number, number],
-	follow: Follow | null
-): Built {
+function generateOne(language: WordLanguage, settings: Settings, draw: Draw): Built {
+	const follow = draw.follow;
+	const budget = draw.budget;
 	const wordData = WORD_DATA[language];
 	const data = SENTENCE_DATA[language];
 	const bounds = slotBounds(language);
-	const allowed = framesFor(data, settings);
+	const allowed = framesFor(data, settings, moodFor(draw.type));
 	const requested = subjectThemesFor(settings, follow);
 	// The words a caller required go in the first sentence — once in the result
 	// rather than once in every sentence of it.
@@ -1054,7 +1091,7 @@ function generateOne(
 			bounds,
 			min,
 			max,
-			follow
+			draw
 		);
 
 		if (built.sentence.length >= min && built.sentence.length <= max) {
@@ -1159,8 +1196,9 @@ function compose(
 	bounds: Record<string, readonly [number, number]>,
 	min: number,
 	max: number,
-	follow: Follow | null
+	draw: Draw
 ): Built {
+	const follow = draw.follow;
 	const themes = requested.length ? requested : WORD_THEMES;
 	const headed = frame.parts.some((part) => part.slot === 'state') ? 'state' : 'verb';
 	// A shape whose predicate has nothing to say about the requested subject only
@@ -1171,6 +1209,10 @@ function compose(
 			? (stateGroupsFor(data, themes, frame, plan) as (StateGroup | VerbGroup)[])
 			: (verbGroupsFor(data, frame, themes, plan) as (StateGroup | VerbGroup)[]);
 	const group = pick(groups.length ? groups : headedFallback(data, frame, headed));
+	// The same predicates, in the form this type of sentence ends on. Index-aligned
+	// with `group.words`, which is what lets a required word be translated rather
+	// than written out in the wrong form.
+	const predicates = formOf(group, draw.type);
 	const subjectThemes = themesForClasses(themes, group.subject);
 	const subjectRequired = requiredAt(frame, plan, 'subject');
 	// A theme the caller named is honoured even when no verb group of the language
@@ -1259,7 +1301,7 @@ function compose(
 		}
 
 		if (part.slot === 'verb' || part.slot === 'state') {
-			return { ...bounds, [part.slot]: exact ?? poolBounds(group.words) };
+			return { ...bounds, [part.slot]: exact ?? poolBounds(predicates) };
 		}
 
 		return exact ? { ...bounds, [part.slot]: exact } : bounds;
@@ -1271,7 +1313,10 @@ function compose(
 	const first = parts[0].part;
 	const prefixable = !follow && isNounSlot(first.slot) && !first.head && !data.articles;
 	const space = data.space.length;
-	const opener = follow?.opener ?? '';
+	const opener = draw.opener;
+	const close = data.terminators[draw.type];
+	const open = data.openers?.[draw.type] ?? '';
+	const tag = frame.tag ? data.space + frame.tag : '';
 	const spans = parts.map(({ part }, i) => {
 		const [low, high] = partRange(part, data, partBounds[i]);
 		const gap = i === 0 ? 0 : space;
@@ -1289,7 +1334,7 @@ function compose(
 	let gender: WordGender | undefined = proper.some((word) => word)
 		? follow?.topic.gender
 		: undefined;
-	let used = data.terminator.length + (opener ? opener.length + space : 0);
+	let used = close.length + open.length + tag.length + (opener ? opener.length + space : 0);
 
 	if (opener) {
 		written.push(data.capitalize ? upper(opener) : opener);
@@ -1383,7 +1428,8 @@ function compose(
 				part.slot,
 				wordData,
 				data,
-				group,
+				group.words,
+				predicates,
 				plan.phrase.get(at),
 				gender,
 				low,
@@ -1423,10 +1469,13 @@ function compose(
 		: (subject?.noun ?? (pronoun ? follow!.topic.noun : null));
 
 	return {
-		sentence: written.join(data.space) + data.terminator,
+		// The opener is written against the first phrase rather than beside it —
+		// Spanish `¿El león corre?`, never `¿ El león corre ?`.
+		sentence: open + written.join(data.space) + tag + close,
 		phrases: reported,
 		slots,
 		names,
+		type: draw.type,
 		theme: named ? null : (subject?.theme ?? null),
 		subject: carried ?? null,
 		gender: subject || named ? gender : pronoun !== null ? follow!.topic.gender : undefined,
@@ -1439,7 +1488,8 @@ function predicateFor(
 	slot: SentenceSlot,
 	wordData: WordLanguageData,
 	data: SentenceLanguageData,
-	group: StateGroup | VerbGroup,
+	base: WordPool,
+	predicates: WordPool,
 	required: Requirement | undefined,
 	gender: WordGender | undefined,
 	min: number,
@@ -1449,13 +1499,21 @@ function predicateFor(
 		slot === 'state' && data.predicateAgrees ? agree(wordData, word, gender) : word;
 
 	if (required) {
-		return agreed(required.word);
+		// A word the caller named is named in the form a statement ends on, and the
+		// form pools are index-aligned so that it can be said the other way instead.
+		const at = base.indexOf(required.word);
+
+		return agreed(at >= 0 ? (predicates[at] ?? required.word) : required.word);
 	}
 
-	const pool =
-		slot === 'manner' ? data.manners : slot === 'time' ? data.times : (group.words as WordPool);
+	const pool = slot === 'manner' ? data.manners : slot === 'time' ? data.times : predicates;
 
 	return agreed(pickWord(pool, Math.min(min, max), max, '') ?? pick(pool));
+}
+
+/** The predicates of a group, in the form this type of sentence ends on. */
+function formOf(group: StateGroup | VerbGroup, type: SentenceType): WordPool {
+	return (type === 'question' ? group.forms?.question : undefined) ?? group.words;
 }
 
 function upper(word: string): string {
@@ -1499,6 +1557,10 @@ function themeForPart(
 // How often a sentence that follows another one opens on a connective.
 const CONNECTIVE_CHANCE = 40;
 
+// How often an exclamation opens on an interjection. Higher than the connective's,
+// because an exclamation with nothing in front of it is a statement wearing a mark.
+const INTERJECTION_CHANCE = 65;
+
 // How a sentence refers to the topic, against the other two ways of doing it.
 const REFERENCE_WEIGHT: Record<Reference, number> = { repeat: 25, pronoun: 40, fresh: 35 };
 
@@ -1535,28 +1597,12 @@ function pronounsFor(data: SentenceLanguageData, topic: Topic): WordPool {
 	return pool;
 }
 
-/**
- * How one sentence carries on from the one before it.
- *
- * `room` is what this sentence may be at its longest, and it is what decides
- * whether it opens on a connective at all: a connective is written in front of a
- * whole sentence rather than instead of any part of it, so one longer than the
- * budget can spare is a sentence that overshoots by exactly its length. Russian
- * `тем временем` is thirteen characters, and a third of a range of seventy-five
- * has nowhere to put them.
- */
-function followFor(
-	data: SentenceLanguageData,
-	topic: Topic,
-	room: number,
-	shortest: number
-): Follow {
+/** How one sentence carries on from the one before it. */
+function followFor(data: SentenceLanguageData, topic: Topic): Follow {
 	const pronouns = pronounsFor(data, topic);
 	const usable: Reference[] = pronouns.length
 		? ['repeat', 'pronoun', 'fresh']
 		: ['repeat', 'fresh'];
-	const spare = room - data.space.length - shortest;
-	const openers = data.connectives.filter((word) => word.length <= spare);
 	const total = usable.reduce((sum, each) => sum + REFERENCE_WEIGHT[each], 0);
 	let roll = Math.random() * total;
 	let reference = usable[usable.length - 1];
@@ -1573,9 +1619,47 @@ function followFor(
 	return {
 		topic,
 		reference,
-		pronoun: reference === 'pronoun' ? pick(pronouns) : '',
-		opener: openers.length && chance(CONNECTIVE_CHANCE) ? pick(openers) : ''
+		pronoun: reference === 'pronoun' ? pick(pronouns) : ''
 	};
+}
+
+/**
+ * What a sentence opens on: an interjection when it is an exclamation, and a
+ * connective when it follows another. Never both — a sentence that opened on two
+ * things at once would be shouting its own footnote.
+ *
+ * `room` is what the sentence may be at its longest, and it is what decides
+ * whether it opens on anything at all: what stands in front is written before a
+ * whole sentence rather than instead of any part of it, so one longer than the
+ * budget can spare is a sentence that overshoots by exactly its length. Russian
+ * `тем временем` is thirteen characters, and a third of a range of seventy-five
+ * has nowhere to put them.
+ */
+function openerFor(
+	data: SentenceLanguageData,
+	type: SentenceType,
+	following: boolean,
+	room: number,
+	shortest: number
+): string {
+	const spare = room - data.space.length - shortest;
+	const fitting = (pool: WordPool) => pool.filter((word) => word.length <= spare);
+
+	if (type === 'exclamation') {
+		const usable = fitting(data.interjections);
+
+		if (usable.length && chance(INTERJECTION_CHANCE)) {
+			return pick(usable);
+		}
+	}
+
+	if (!following) {
+		return '';
+	}
+
+	const usable = fitting(data.connectives);
+
+	return usable.length && chance(CONNECTIVE_CHANCE) ? pick(usable) : '';
 }
 
 /**
@@ -1588,7 +1672,9 @@ function followFor(
 function generateResult(language: WordLanguage, settings: Settings): Built[] {
 	const data = SENTENCE_DATA[language];
 	const bounds = slotBounds(language);
-	const frames = framesFor(data, settings);
+	// Every shape any of the requested types could take, because the budget is
+	// shared out before the first type is even drawn.
+	const frames = settings.types.flatMap((type) => framesFor(data, settings, moodFor(type)));
 	const [shortest] = naturalSpan(data, frames, bounds);
 	const [min, max] = boundsFor(data, frames, bounds, settings);
 	const budgets = shareOut(min, max, settings.sentences, data.space.length);
@@ -1596,22 +1682,27 @@ function generateResult(language: WordLanguage, settings: Settings): Built[] {
 	let topic: Topic | null = null;
 
 	for (let i = 0; i < settings.sentences; i += 1) {
-		const follow = topic ? followFor(data, topic, budgets[i][1], shortest) : null;
-		let one = generateOne(language, settings, budgets[i], follow);
+		const budget = budgets[i];
+		const type = pick(settings.types);
+		const follow = topic ? followFor(data, topic) : null;
+		const draw: Draw = {
+			budget,
+			type,
+			opener: openerFor(data, type, follow !== null, budget[1], shortest),
+			follow
+		};
+		let one = generateOne(language, settings, draw);
 
-		// `followFor` reserves room for the connective against the shortest sentence
-		// the shapes could spell, which is a floor no draw actually reaches — the
-		// shortest word of every pool at once. When the sentence that came back could
-		// not be made short enough to carry the connective after all, the connective
-		// is the part worth giving up: it is written in front of the whole sentence
-		// rather than instead of any piece of it.
-		if (follow?.opener && distanceFrom(one.sentence.length, budgets[i]) > 0) {
-			const bare = generateOne(language, settings, budgets[i], { ...follow, opener: '' });
+		// `openerFor` reserves room against the shortest sentence the shapes could
+		// spell, which is a floor no draw actually reaches — the shortest word of
+		// every pool at once. When the sentence that came back could not be made
+		// short enough to carry what it opens on after all, that is the part worth
+		// giving up: it stands in front of the whole sentence rather than instead of
+		// any piece of it.
+		if (draw.opener && distanceFrom(one.sentence.length, budget) > 0) {
+			const bare = generateOne(language, settings, { ...draw, opener: '' });
 
-			if (
-				distanceFrom(bare.sentence.length, budgets[i]) <
-				distanceFrom(one.sentence.length, budgets[i])
-			) {
+			if (distanceFrom(bare.sentence.length, budget) < distanceFrom(one.sentence.length, budget)) {
 				one = bare;
 			}
 		}
@@ -1642,6 +1733,24 @@ function resolveSlots(slots: SentenceSlotOption | undefined): Settings['slots'] 
 	return wanted.length ? wanted : 'none';
 }
 
+/** The caller's `type`, as the set one sentence is drawn from. */
+function resolveTypes(type: SentenceTypeOption | undefined): readonly SentenceType[] {
+	const all: readonly SentenceType[] = ['statement', 'question', 'exclamation', 'trailing'];
+
+	if (type === undefined) {
+		return ['statement'];
+	}
+
+	if (type === 'all') {
+		return all;
+	}
+
+	const wanted = typeof type === 'string' ? [type] : type;
+	const usable = wanted.filter((each) => all.includes(each));
+
+	return usable.length ? usable : ['statement'];
+}
+
 /** The caller's `include`, as a list with the blanks taken out. */
 function resolveInclude(include: RandSentenceOptions['include']): readonly string[] {
 	if (include === undefined) {
@@ -1665,7 +1774,8 @@ function resolveSettings(options: RandSentenceOptions): Settings {
 		include: resolveInclude(options.include),
 		sentences: clamp(Math.floor(options.sentences ?? 1), 1, RAND_SENTENCE_COUNT_MAX),
 		realism: options.realism ?? 'real',
-		includeName: options.includeName ?? false
+		includeName: options.includeName ?? false,
+		types: resolveTypes(options.type)
 	};
 }
 
@@ -1686,6 +1796,7 @@ export function generateSentenceDetails(options: RandSentenceOptions = {}): Sent
 				phrases: built.flatMap((one) => one.phrases),
 				slots: built.flatMap((one) => one.slots),
 				names: built.flatMap((one) => one.names),
+				types: built.map((one) => one.type),
 				language: code,
 				// What the result is about is what its first sentence was about; the
 				// ones after it stay inside that noun's class.

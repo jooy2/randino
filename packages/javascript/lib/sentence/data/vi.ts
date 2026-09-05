@@ -4,7 +4,7 @@ import type { SentenceLanguageData } from './types.js';
 export const VI: SentenceLanguageData = {
 	space: ' ',
 	capitalize: true,
-	terminator: '.',
+	terminators: { statement: '.', question: '?', exclamation: '!', trailing: '…' },
 	// Vietnamese inflects nothing, so a verb is written once and stands wherever
 	// it is put.
 	verbs: [
@@ -121,6 +121,7 @@ export const VI: SentenceLanguageData = {
 		đôi_khi mỗi_ngày lúc_hoàng_hôn
 	`),
 	connectives: words(`rồi và_rồi nhưng thế_là sau_đó cuối_cùng đồng_thời tuy_vậy`),
+	interjections: words(`ôi, chà, ồ, trời_ơi, chao_ôi, này, thật_đấy,`),
 	pronouns: { n: ['', 'nó'] },
 	pronounless: ['person'],
 	frames: [
@@ -185,6 +186,35 @@ export const VI: SentenceLanguageData = {
 				{ slot: 'manner' }
 			],
 			weight: 5
+		},
+		// Vietnamese wraps the predicate: có in front of it, không after the clause.
+		{
+			parts: [
+				{ slot: 'subject', modifiable: true },
+				{ slot: 'verb', head: 'có' }
+			],
+			weight: 20,
+			mood: 'question',
+			tag: 'không'
+		},
+		{
+			parts: [
+				{ slot: 'subject', modifiable: true },
+				{ slot: 'verb', head: 'có' },
+				{ slot: 'object', modifiable: true }
+			],
+			weight: 16,
+			mood: 'question',
+			tag: 'không'
+		},
+		{
+			parts: [
+				{ slot: 'subject', modifiable: true },
+				{ slot: 'state', head: 'có' }
+			],
+			weight: 14,
+			mood: 'question',
+			tag: 'không'
 		}
 	]
 };

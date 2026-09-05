@@ -4,7 +4,7 @@ import type { SentenceLanguageData } from './types.js';
 export const IT: SentenceLanguageData = {
 	space: ' ',
 	capitalize: true,
-	terminator: '.',
+	terminators: { statement: '.', question: '?', exclamation: '!', trailing: '…' },
 	// The definite article, which Italian picks by gender and by the sound the
 	// noun opens on: `l'` before a vowel, `lo` before an s plus a consonant and
 	// the handful of clusters that go with it, `il` for everything else. The
@@ -164,6 +164,7 @@ export const IT: SentenceLanguageData = {
 		al_tramonto
 	`),
 	connectives: words(`e_poi ma allora inoltre, tuttavia, dopo infine intanto,`),
+	interjections: words(`oh, ah, ehi, caspita, mamma_mia, guarda, davvero,`),
 	// Pro-drop, the same as Spanish: `esso` exists and nobody writes it.
 	pronouns: { n: [''] },
 	// Every Italian preposition merges with the article behind it, so the phrase a

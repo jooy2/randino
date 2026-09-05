@@ -13,6 +13,7 @@ import type {
 	SentenceDetail,
 	SentenceShape,
 	SentenceSlot,
+	SentenceType,
 	WordLanguage,
 	WordTheme
 } from '../dist/index.js';
@@ -29,15 +30,15 @@ const SAMPLE = 60;
 
 /** Everything a sentence of the language may be written with, punctuation aside. */
 const SCRIPT: Record<WordLanguage, RegExp> = {
-	en: /^[A-Za-z' ,.]+$/,
-	ko: /^[가-힣 .]+$/,
-	ja: /^[々぀-ヿ一-鿿。]+$/,
-	zh: /^[々一-鿿。]+$/,
-	vi: /^[a-zA-ZÀ-ỹ ,.]+$/,
-	es: /^[a-zA-ZÀ-ÿ ,.]+$/,
-	it: /^[a-zA-ZÀ-ÿ' ,.]+$/,
-	de: /^[a-zA-ZÀ-ÿß ,.]+$/,
-	ru: /^[Ѐ-ӿ ,.]+$/
+	en: /^[A-Za-z' ,.?!…]+$/,
+	ko: /^[가-힣 ,.?!…]+$/,
+	ja: /^[々぀-ヿ一-鿿。、？！…]+$/,
+	zh: /^[々一-鿿。，？！…]+$/,
+	vi: /^[a-zA-ZÀ-ỹ ,.?!…]+$/,
+	es: /^[a-zA-ZÀ-ÿ ,.?!…¿¡]+$/,
+	it: /^[a-zA-ZÀ-ÿ' ,.?!…]+$/,
+	de: /^[a-zA-ZÀ-ÿß ,.?!…]+$/,
+	ru: /^[Ѐ-ӿ ,.?!…]+$/
 };
 
 const SHAPES: readonly SentenceShape[] = ['simple', 'detailed', 'complex'];
@@ -131,14 +132,20 @@ function plain(language: WordLanguage, word: string): string {
  * take. A modifier is stored in one form and comes out agreeing with its noun,
  * so each gender's shape of it counts as one of the language's words.
  */
-function poolFor(language: WordLanguage, slot: SentenceSlot): Set<string> {
+function inflectedFor(language: WordLanguage, pool: readonly string[]): string[] {
 	const wordData = WORD_DATA[language];
-	const data = SENTENCE_DATA[language];
 	const genders = Object.keys(wordData.agreement ?? {}) as WordGender[];
-	const inflected = (pool: readonly string[]) => [
+
+	return [
 		...pool,
 		...genders.flatMap((gender) => pool.map((word) => agree(wordData, word, gender)))
 	];
+}
+
+function poolFor(language: WordLanguage, slot: SentenceSlot): Set<string> {
+	const wordData = WORD_DATA[language];
+	const data = SENTENCE_DATA[language];
+	const inflected = (pool: readonly string[]) => inflectedFor(language, pool);
 
 	if (slot === 'verb') {
 		return new Set(data.verbs.flatMap((group) => [...group.words]));
@@ -233,7 +240,8 @@ function explains(language: WordLanguage, phrase: string): boolean {
  */
 function givenNames(language: WordLanguage, gender: 'male' | 'female'): Set<string> {
 	const data = NAME_DATA[language];
-	const pool = gender === 'male' ? (data.givenMale ?? data.male) : (data.givenFemale ?? data.female);
+	const pool =
+		gender === 'male' ? (data.givenMale ?? data.male) : (data.givenFemale ?? data.female);
 
 	return new Set((pool ?? []).map((entry) => (typeof entry === 'string' ? entry : entry.n)));
 }
@@ -257,7 +265,7 @@ describe('Sentence', () => {
 
 	it('every language writes sentences in its own script, and closes them', () => {
 		for (const language of WORD_LANGUAGES) {
-			const terminator = SENTENCE_DATA[language].terminator;
+			const terminator = SENTENCE_DATA[language].terminators.statement;
 
 			for (const realism of ['real', 'invented'] as const) {
 				for (const sentence of randSentence({ language, realism, count: SAMPLE })) {
@@ -668,12 +676,12 @@ describe('Sentence', () => {
 				assert.strictEqual(detail.sentences.join(data.space), detail.sentence);
 
 				for (const sentence of detail.sentences) {
-					assert.ok(sentence.endsWith(data.terminator), `${language}: ${sentence}`);
+					assert.ok(sentence.endsWith(data.terminators.statement), `${language}: ${sentence}`);
 					assert.match(sentence, SCRIPT[language], `${language}: ${sentence}`);
 					// Every sentence closes exactly once, so two of them were never run
 					// together into one entry.
 					assert.strictEqual(
-						sentence.split(data.terminator).length - 1,
+						sentence.split(data.terminators.statement).length - 1,
 						1,
 						`${language}: ${sentence}`
 					);
@@ -825,7 +833,7 @@ describe('Sentence', () => {
 		}
 	});
 
-	it('`includeName` writes a person\'s name where a sentence has room for one', () => {
+	it("`includeName` writes a person's name where a sentence has room for one", () => {
 		for (const language of WORD_LANGUAGES) {
 			const details = sentenceDetails({ language, includeName: true, count: SAMPLE });
 
@@ -843,7 +851,9 @@ describe('Sentence', () => {
 				if (at >= 0 && detail.names.includes(detail.phrases[at])) {
 					for (const article of articlesFor(language)) {
 						assert.ok(
-							!detail.sentence.includes(`${article}${SENTENCE_DATA[language].space}${detail.phrases[at]}`),
+							!detail.sentence.includes(
+								`${article}${SENTENCE_DATA[language].space}${detail.phrases[at]}`
+							),
 							`${language}: '${article}' in front of a name (${detail.sentence})`
 						);
 					}
@@ -859,10 +869,7 @@ describe('Sentence', () => {
 
 	it('a name comes out of the language`s own given-name pools', () => {
 		for (const language of WORD_LANGUAGES) {
-			const known = new Set([
-				...givenNames(language, 'male'),
-				...givenNames(language, 'female')
-			]);
+			const known = new Set([...givenNames(language, 'male'), ...givenNames(language, 'female')]);
 
 			for (const detail of sentenceDetails({ language, includeName: true, count: SAMPLE })) {
 				for (const name of detail.names) {
@@ -961,6 +968,203 @@ describe('Sentence', () => {
 
 			if (after === '이' || after === '은') {
 				assert.ok(coda, `${name}${after} (${detail.sentence})`);
+			}
+		}
+	});
+
+	it('`type` decides what the sentence is doing, and what it closes on', () => {
+		const TYPES: readonly SentenceType[] = ['statement', 'question', 'exclamation', 'trailing'];
+
+		for (const language of WORD_LANGUAGES) {
+			const data = SENTENCE_DATA[language];
+
+			for (const type of TYPES) {
+				for (const detail of sentenceDetails({ language, type, count: SAMPLE })) {
+					assert.deepStrictEqual(detail.types, [type], detail.sentence);
+					assert.ok(
+						detail.sentence.endsWith(data.terminators[type]),
+						`${language} ${type}: ${detail.sentence}`
+					);
+					assert.match(detail.sentence, SCRIPT[language], `${language}: ${detail.sentence}`);
+
+					const opener = data.openers?.[type];
+
+					if (opener) {
+						assert.ok(detail.sentence.startsWith(opener), `${language}: ${detail.sentence}`);
+					}
+				}
+			}
+		}
+
+		// Statements by default, and the option decides per sentence when it is given
+		// more than one to choose from.
+		for (const detail of sentenceDetails({ count: 40 })) {
+			assert.deepStrictEqual(detail.types, ['statement'], detail.sentence);
+		}
+
+		const seen = new Set(
+			sentenceDetails({ language: 'ko', type: 'all', sentences: 3, count: 120 }).flatMap(
+				(detail) => detail.types
+			)
+		);
+
+		assert.strictEqual(seen.size, TYPES.length);
+	});
+
+	it('a question is a shape, not a mark bolted onto a statement', () => {
+		// The four languages whose grammar moves for a question say so in their own
+		// frames, and the shape has to be one of those rather than the statement's.
+		const CARRIES: [WordLanguage, RegExp][] = [
+			// English do-support, and the base form behind it.
+			['en', /^(Does|Is) /],
+			// Korean changes the ending on the predicate itself.
+			['ko', /니\?$/],
+			// A tag Japanese, Chinese and Vietnamese write after the whole clause.
+			['ja', /か？$/],
+			['zh', /吗？$/],
+			['vi', /không\?$/]
+		];
+
+		for (const [language, shape] of CARRIES) {
+			for (const sentence of randSentence({ language, type: 'question', count: SAMPLE })) {
+				assert.match(sentence, shape, `${language}: ${sentence}`);
+			}
+		}
+
+		// German moves its finite verb to the front, so the question opens on the
+		// predicate or on the `ist` that stands in for one.
+		const verbs = new Set(poolFor('de', 'verb'));
+
+		for (const sentence of randSentence({ language: 'de', type: 'question', count: SAMPLE })) {
+			const first = sentence.split(' ')[0].toLowerCase();
+
+			assert.ok(verbs.has(first) || first === 'ist', `de: ${sentence}`);
+		}
+	});
+
+	it('a question form pool is the same length as the words it restates', () => {
+		// Index-aligned is the whole contract: a verb keeps its meaning across the
+		// forms, and a word the caller required is translated by its position.
+		for (const language of WORD_LANGUAGES) {
+			const data = SENTENCE_DATA[language];
+
+			for (const group of [...data.verbs, ...data.states]) {
+				for (const [form, pool] of Object.entries(group.forms ?? {})) {
+					assert.strictEqual(
+						pool.length,
+						group.words.length,
+						`${language}: the ${form} pool is ${pool.length} beside ${group.words.length} words`
+					);
+					assert.ok(
+						pool.every((word) => word.length > 0),
+						`${language}: the ${form} pool has a blank`
+					);
+				}
+			}
+		}
+	});
+
+	it('a predicate is written in the form its type asks for', () => {
+		// The question form where the group declares one, and the plain words where
+		// it does not — English states need none, because the shape moves `is` to
+		// the front and leaves `green` alone.
+		for (const language of WORD_LANGUAGES) {
+			const data = SENTENCE_DATA[language];
+			const asked = (
+				groups: readonly { words: readonly string[]; forms?: { question?: readonly string[] } }[]
+			) => groups.flatMap((group) => [...(group.forms?.question ?? group.words)]);
+			const states = asked(data.states);
+			const expected: Record<string, Set<string>> = {
+				verb: new Set(asked(data.verbs)),
+				// A predicate adjective that agrees comes out in the form its subject
+				// asked for, question or not.
+				state: new Set(data.predicateAgrees ? inflectedFor(language, states) : states)
+			};
+
+			for (const detail of sentenceDetails({ language, type: 'question', count: 120 })) {
+				for (let i = 0; i < detail.phrases.length; i += 1) {
+					const slot = detail.slots[i];
+
+					if (slot !== 'verb' && slot !== 'state') {
+						continue;
+					}
+
+					const phrase = detail.phrases[i];
+					const written = i === 0 ? phrase.charAt(0).toLowerCase() + phrase.slice(1) : phrase;
+					const pool = expected[slot];
+
+					assert.ok(
+						pool.has(written) || pool.has(phrase),
+						`${language}: '${phrase}' is not the ${slot} form a question asks for (${detail.sentence})`
+					);
+				}
+			}
+		}
+	});
+
+	it('`include` puts a required predicate in the form the type asks for', () => {
+		// The pools are index-aligned so that a word named in the statement form can
+		// be said the other way rather than written out wrong.
+		for (const sentence of randSentence({
+			language: 'ko',
+			include: '달린다',
+			type: 'question',
+			count: 30
+		})) {
+			assert.ok(sentence.includes('달리니'), sentence);
+			assert.ok(!sentence.includes('달린다'), sentence);
+		}
+
+		for (const sentence of randSentence({
+			language: 'en',
+			include: 'runs',
+			type: 'question',
+			count: 30
+		})) {
+			assert.match(sentence, /\brun\b/, sentence);
+		}
+	});
+
+	it('an interjection opens an exclamation, and nothing else', () => {
+		for (const language of WORD_LANGUAGES) {
+			const data = SENTENCE_DATA[language];
+			const openers = data.interjections.map(
+				(word) => (data.capitalize ? upperFirst(word) : word) + data.space
+			);
+			const opens = (sentence: string) => {
+				const body = data.openers?.exclamation
+					? sentence.slice(data.openers.exclamation.length)
+					: sentence;
+
+				return openers.some((opener) => body.startsWith(opener));
+			};
+			let seen = 0;
+
+			for (const sentence of randSentence({ language, type: 'exclamation', count: 120 })) {
+				if (opens(sentence)) {
+					seen += 1;
+				}
+			}
+
+			assert.ok(seen > 0, `${language} never wrote an interjection`);
+
+			for (const sentence of randSentence({ language, count: 120 })) {
+				assert.ok(!opens(sentence), `${language}: a statement opened on one (${sentence})`);
+			}
+		}
+	});
+
+	it('every language can write every type inside its own length range', () => {
+		for (const language of WORD_LANGUAGES) {
+			const [min, max] = sentenceLengthRange(language);
+
+			for (const type of ['question', 'exclamation', 'trailing'] as SentenceType[]) {
+				for (const sentence of randSentence({ language, type, count: 40 })) {
+					assert.ok(
+						sentence.length >= min && sentence.length <= max,
+						`${language} ${type}: ${sentence} (${sentence.length}) outside ${min}-${max}`
+					);
+				}
 			}
 		}
 	});

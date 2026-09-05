@@ -4,7 +4,7 @@ import type { SentenceLanguageData } from './types.js';
 export const ZH: SentenceLanguageData = {
 	space: '',
 	capitalize: false,
-	terminator: '。',
+	terminators: { statement: '。', question: '？', exclamation: '！', trailing: '…' },
 	// Chinese verbs take no form of their own — the same word stands whoever does
 	// it and whenever it happened.
 	verbs: [
@@ -120,6 +120,7 @@ export const ZH: SentenceLanguageData = {
 		有时 每天 黄昏时
 	`),
 	connectives: words(`然后 所以 但是 不过 于是 后来 接着 同时 终于`),
+	interjections: words(`啊， 哎呀， 哇， 唉， 天啊， 瞧， 咦，`),
 	pronouns: { n: ['', '它'] },
 	pronounless: ['person'],
 	// Chinese puts its verb after the subject and everything that frames the
@@ -186,6 +187,43 @@ export const ZH: SentenceLanguageData = {
 				{ slot: 'object', modifiable: true }
 			],
 			weight: 5
+		},
+		// Chinese asks with 吗 after the whole clause, which is a tag rather than a
+		// phrase, and leaves everything in front of it alone.
+		{
+			parts: [{ slot: 'subject', modifiable: true }, { slot: 'verb' }],
+			weight: 20,
+			mood: 'question',
+			tag: '吗'
+		},
+		{
+			parts: [
+				{ slot: 'subject', modifiable: true },
+				{ slot: 'verb' },
+				{ slot: 'object', modifiable: true }
+			],
+			weight: 16,
+			mood: 'question',
+			tag: '吗'
+		},
+		{
+			parts: [
+				{ slot: 'subject', modifiable: true },
+				{ slot: 'state', head: '很' }
+			],
+			weight: 14,
+			mood: 'question',
+			tag: '吗'
+		},
+		{
+			parts: [
+				{ slot: 'subject', modifiable: true },
+				{ slot: 'place', head: '在', tail: '里', modifiable: true },
+				{ slot: 'verb' }
+			],
+			weight: 12,
+			mood: 'question',
+			tag: '吗'
 		}
 	]
 };

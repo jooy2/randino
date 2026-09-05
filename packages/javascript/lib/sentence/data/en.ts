@@ -4,7 +4,7 @@ import type { SentenceLanguageData } from './types.js';
 export const EN: SentenceLanguageData = {
 	space: ' ',
 	capitalize: true,
-	terminator: '.',
+	terminators: { statement: '.', question: '?', exclamation: '!', trailing: '…' },
 	// One article, and a definite one. English has three ways to open a noun
 	// phrase and only `the` is right for every noun in the pools: `a` is wrong in
 	// front of a mass noun (`a rain`) and a bare plural is wrong in front of a
@@ -19,55 +19,72 @@ export const EN: SentenceLanguageData = {
 				runs walks leaps swims flies crawls returns leaves stops rests sleeps laughs
 				cries sings dances yawns hides waits stands sits tumbles wanders passes
 				approaches dozes stretches listens
-			`)
+			`),
+			forms: {
+				question: words(`
+					run walk leap swim fly crawl return leave stop rest sleep laugh cry sing dance yawn
+					hide wait stand sit tumble wander pass approach doze stretch listen
+				`)
+			}
 		},
 		{
 			subject: ['creature', 'person'],
 			object: ['edible'],
-			words: words(`eats drinks chews swallows tastes bakes warms shares`)
+			words: words(`eats drinks chews swallows tastes bakes warms shares`),
+			forms: { question: words(`eat drink chew swallow taste bake warm share`) }
 		},
 		{
 			subject: ['creature', 'person'],
 			object: ['thing', 'plant', 'edible'],
-			words: words(`watches finds carries touches guards chooses moves lifts gathers`)
+			words: words(`watches finds carries touches guards chooses moves lifts gathers`),
+			forms: { question: words(`watch find carry touch guard choose move lift gather`) }
 		},
 		{
 			subject: ['person'],
 			object: ['thing', 'vehicle'],
-			words: words(`makes mends cleans sells buys builds paints`)
+			words: words(`makes mends cleans sells buys builds paints`),
+			forms: { question: words(`make mend clean sell buy build paint`) }
 		},
 		{
 			subject: ['person', 'creature'],
 			object: ['idea', 'event', 'place'],
-			words: words(`remembers forgets imagines counts describes`)
+			words: words(`remembers forgets imagines counts describes`),
+			forms: { question: words(`remember forget imagine count describe`) }
 		},
 		{
 			subject: ['place', 'event'],
-			words: words(`glows flows darkens brightens deepens quiets fades widens`)
+			words: words(`glows flows darkens brightens deepens quiets fades widens`),
+			forms: { question: words(`glow flow darken brighten deepen quiet fade widen`) }
 		},
 		{
 			subject: ['thing', 'vehicle'],
-			words: words(`sways glitters falls rolls tilts ages creaks`)
+			words: words(`sways glitters falls rolls tilts ages creaks`),
+			forms: { question: words(`sway glitter fall roll tilt age creak`) }
 		},
 		{
 			subject: ['vehicle'],
-			words: words(`runs stops passes returns departs slides`)
+			words: words(`runs stops passes returns departs slides`),
+			forms: { question: words(`run stop pass return depart slide`) }
 		},
 		{
 			subject: ['idea', 'event'],
-			words: words(`spreads vanishes remains lingers returns gathers`)
+			words: words(`spreads vanishes remains lingers returns gathers`),
+			forms: { question: words(`spread vanish remain linger return gather`) }
 		},
 		{
 			subject: ['plant'],
-			words: words(`grows wilts blooms sways spreads`)
+			words: words(`grows wilts blooms sways spreads`),
+			forms: { question: words(`grow wilt bloom sway spread`) }
 		},
 		{
 			subject: ['body'],
-			words: words(`trembles moves stiffens aches heals`)
+			words: words(`trembles moves stiffens aches heals`),
+			forms: { question: words(`tremble move stiffen ache heal`) }
 		},
 		{
 			subject: ['edible'],
-			words: words(`ripens cools boils melts spoils remains`)
+			words: words(`ripens cools boils melts spoils remains`),
+			forms: { question: words(`ripen cool boil melt spoil remain`) }
 		}
 	],
 	states: [
@@ -128,6 +145,7 @@ export const EN: SentenceLanguageData = {
 		at_dusk before_long
 	`),
 	connectives: words(`and_then so but meanwhile afterwards still later soon even_so at_last`),
+	interjections: words(`oh, ah, wow, well, look, goodness, my, indeed, honestly,`),
 	pronouns: { n: words(`it`) },
 	// English cannot drop a subject, so a sentence about a person names it again.
 	pronounless: ['person'],
@@ -194,6 +212,46 @@ export const EN: SentenceLanguageData = {
 				{ slot: 'manner' }
 			],
 			weight: 5
+		},
+		// English asks with do-support, so the auxiliary stands in front of the
+		// subject and the verb falls back to its base form — `Does the lion run?`
+		// rather than `Runs the lion?`. `is` moves the same way.
+		{
+			parts: [{ slot: 'subject', head: 'does', modifiable: true }, { slot: 'verb' }],
+			weight: 20,
+			mood: 'question'
+		},
+		{
+			parts: [
+				{ slot: 'subject', head: 'does', modifiable: true },
+				{ slot: 'verb' },
+				{ slot: 'object', modifiable: true }
+			],
+			weight: 16,
+			mood: 'question'
+		},
+		{
+			parts: [{ slot: 'subject', head: 'is', modifiable: true }, { slot: 'state' }],
+			weight: 14,
+			mood: 'question'
+		},
+		{
+			parts: [
+				{ slot: 'subject', head: 'does', modifiable: true },
+				{ slot: 'verb' },
+				{ slot: 'place', head: 'in', modifiable: true }
+			],
+			weight: 12,
+			mood: 'question'
+		},
+		{
+			parts: [
+				{ slot: 'subject', head: 'does', modifiable: true },
+				{ slot: 'verb' },
+				{ slot: 'manner' }
+			],
+			weight: 10,
+			mood: 'question'
 		}
 	]
 };

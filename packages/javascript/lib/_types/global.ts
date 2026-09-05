@@ -322,6 +322,28 @@ export type SentenceSlotOption = SentenceSlot | readonly SentenceSlot[] | 'all' 
  */
 export type SentenceShape = 'simple' | 'detailed' | 'complex';
 
+/**
+ * What a sentence is doing, which decides what it closes on and — where the
+ * grammar needs it — the shape it takes:
+ * - `statement`: says something (`사자가 달린다.`). The default.
+ * - `question`: asks it (`사자가 달리니?`, `Does the lion run?`).
+ * - `exclamation`: says it with feeling, usually behind an interjection
+ *   (`와, 사자가 달린다!`).
+ * - `trailing`: a statement that stops rather than ends (`사자가 달린다…`).
+ *
+ * A question is a shape, not a punctuation mark bolted on: English writes
+ * `Does the lion run?` and German `Läuft ein Wolf?`, and both are shapes their
+ * own `frames` declare. A language whose question differs from its statement by
+ * nothing but the mark declares none, and gets its statement shapes back.
+ */
+export type SentenceType = 'statement' | 'question' | 'exclamation' | 'trailing';
+
+/**
+ * Which of them a result may be. An array is a set to draw from, decided per
+ * sentence, and `'all'` is every one of them.
+ */
+export type SentenceTypeOption = SentenceType | readonly SentenceType[] | 'all';
+
 /** `'all'` leaves the shape to the language's own frame weights. */
 export type SentenceShapeOption = SentenceShape | 'all';
 
@@ -355,6 +377,17 @@ export interface RandSentenceOptions extends RandCommonOptions {
 	 * what puts each of them in the result once rather than once per sentence.
 	 */
 	include?: string | readonly string[];
+	/**
+	 * What the sentences are doing — saying something, asking it, exclaiming it, or
+	 * trailing off. Default `'statement'`, and an array or `'all'` decides per
+	 * sentence.
+	 *
+	 * A language answers with what it has: five of the nine write a question with
+	 * nothing but the mark, and the four that need more — English's do-support,
+	 * German's verb moving to the front, Korean's and Japanese's endings — say so in
+	 * their own shapes.
+	 */
+	type?: SentenceTypeOption;
 	/**
 	 * Whether a sentence about a person writes a generated name where that person
 	 * would go — `Emma runs quietly.`, `민준이 조용히 달린다.` Default `false`.
@@ -412,6 +445,8 @@ export interface SentenceDetail {
 	 * `includeName` asked for them. Every one of them is also a phrase.
 	 */
 	names: string[];
+	/** What each sentence is doing, at the same index as `sentences`. */
+	types: SentenceType[];
 	language: WordLanguage;
 	/**
 	 * Theme the result's subject belongs to — the first sentence's, which is what

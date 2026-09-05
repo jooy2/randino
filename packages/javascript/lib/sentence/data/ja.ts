@@ -4,7 +4,7 @@ import type { SentenceLanguageData } from './types.js';
 export const JA: SentenceLanguageData = {
 	space: '',
 	capitalize: false,
-	terminator: '。',
+	terminators: { statement: '。', question: '？', exclamation: '！', trailing: '…' },
 	// Dictionary form, which is the plain statement a written sentence ends on.
 	verbs: [
 		{
@@ -122,6 +122,7 @@ export const JA: SentenceLanguageData = {
 		さっき 時々 毎日 夕暮れに
 	`),
 	connectives: words(`そして だから しかし ところが やがて すぐに ついに 一方 また`),
+	interjections: words(`ああ、 おお、 まあ、 なんと、 やれやれ、 おや、 ほら、`),
 	pronouns: { n: ['', 'それ'] },
 	pronounless: ['person'],
 	frames: [
@@ -191,6 +192,40 @@ export const JA: SentenceLanguageData = {
 				{ slot: 'verb' }
 			],
 			weight: 5
+		},
+		// Japanese asks with か after the predicate, which is a tag rather than a
+		// phrase — no slot could carry it, and the word order does not move.
+		{
+			parts: [{ slot: 'subject', tail: 'が', modifiable: true }, { slot: 'verb' }],
+			weight: 20,
+			mood: 'question',
+			tag: 'か'
+		},
+		{
+			parts: [
+				{ slot: 'subject', tail: 'が', modifiable: true },
+				{ slot: 'object', tail: 'を', modifiable: true },
+				{ slot: 'verb' }
+			],
+			weight: 16,
+			mood: 'question',
+			tag: 'か'
+		},
+		{
+			parts: [{ slot: 'subject', tail: 'は', modifiable: true }, { slot: 'state' }],
+			weight: 14,
+			mood: 'question',
+			tag: 'か'
+		},
+		{
+			parts: [
+				{ slot: 'subject', tail: 'が', modifiable: true },
+				{ slot: 'place', tail: 'で', modifiable: true },
+				{ slot: 'verb' }
+			],
+			weight: 12,
+			mood: 'question',
+			tag: 'か'
 		}
 	]
 };

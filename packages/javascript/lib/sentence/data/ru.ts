@@ -4,7 +4,7 @@ import type { SentenceLanguageData } from './types.js';
 export const RU: SentenceLanguageData = {
 	space: ' ',
 	capitalize: true,
-	terminator: '.',
+	terminators: { statement: '.', question: '?', exclamation: '!', trailing: '…' },
 	predicateAgrees: true,
 	// Third person singular of the present. The present is the one tense that does
 	// not inflect for the subject's gender, which is what lets one verb stand
@@ -107,6 +107,7 @@ export const RU: SentenceLanguageData = {
 		в_выходные только_что иногда каждый_день в_сумерках
 	`),
 	connectives: words(`и_потом но затем поэтому однако наконец потом тем_временем`),
+	interjections: words(`ах, ох, эх, ух, боже, гляди, право,`),
 	pronouns: { m: words(`он`), f: words(`она`), n: words(`оно`) },
 	// Nominative only, which is why there is neither an object nor a place here: a
 	// Russian noun changes its own ending for both, and the endings are the noun's
