@@ -26,7 +26,8 @@ export const VI: SentenceLanguageData = {
 		count: [2, 12],
 		currency: 'đồng',
 		amounts: [10000, 50000, 100000, 200000, 500000, 1000000, 5000000],
-		group: '.'
+		group: '.',
+		gap: ' '
 	},
 	// it is put.
 	verbs: [

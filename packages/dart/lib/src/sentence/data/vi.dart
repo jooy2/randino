@@ -195,6 +195,7 @@ final SentenceLanguageData vi = SentenceLanguageData(
     currency: 'đồng',
     amounts: <int>[10000, 50000, 100000, 200000, 500000, 1000000, 5000000],
     group: '.',
+    gap: ' ',
   ),
   frames: const <SentenceFrame>[
     SentenceFrame(<SentencePart>[

@@ -283,7 +283,8 @@ export const KO: SentenceLanguageData = {
 		count: [2, 12],
 		currency: '원',
 		amounts: [1000, 5000, 10000, 30000, 50000, 100000, 300000, 500000, 1000000],
-		group: ','
+		group: ',',
+		gap: ''
 	},
 	// what stands in front of it, and in which order.
 	frames: [

@@ -210,6 +210,7 @@ EN = SentenceLanguageData(
         currency="dollars",
         amounts=(100, 500, 1000, 5000, 12000, 25000, 50000, 100000),
         group=",",
+        gap=" ",
     ),
     # English cannot drop a subject, so a sentence about a person names it again.
     pronounless=("person",),

@@ -172,6 +172,7 @@ void main() {
                 'currency': entry.value.numeral!.currency,
                 'amounts': <int>[...entry.value.numeral!.amounts],
                 'group': entry.value.numeral!.group,
+                'gap': entry.value.numeral!.gap,
               },
         'frames': <Object?>[
           for (final frame in entry.value.frames)

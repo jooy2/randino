@@ -206,6 +206,7 @@ final SentenceLanguageData es = SentenceLanguageData(
     currency: 'euros',
     amounts: <int>[100, 500, 1000, 5000, 12000, 25000, 50000, 100000],
     group: '.',
+    gap: ' ',
   ),
   // the same thing writes no pronoun at all.
   pronouns: const <WordGender, WordPool>{

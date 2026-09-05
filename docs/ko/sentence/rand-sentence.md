@@ -279,7 +279,7 @@ rand_sentence(language="de", slots="object", count=3)
 
 ```javascript
 randSentence({ language: 'ko', slots: 'quantity', count: 2 });
-// ['파란 문어가 녹차 6 개를 줍는다.', '파리가 감주 6 개를 굽는다.']
+// ['파란 문어가 녹차 6개를 줍는다.', '파리가 감주 6개를 굽는다.']
 
 randSentence({ language: 'vi', slots: 'quantity', count: 2 });
 // ['Kỹ sư hẹp lau 7 cái thư.', '4 chiếc xe nôi chạy.']
@@ -294,7 +294,7 @@ randSentence({ language: 'en', slots: 'money', count: 2 });
 
 ```dart
 randSentence(language: WordLanguage.ko, slots: {SentenceSlot.quantity}, count: 2);
-// [파란 문어가 녹차 6 개를 줍는다., 파리가 감주 6 개를 굽는다.]
+// [파란 문어가 녹차 6개를 줍는다., 파리가 감주 6개를 굽는다.]
 
 randSentence(language: WordLanguage.vi, slots: {SentenceSlot.quantity}, count: 2);
 // [Kỹ sư hẹp lau 7 cái thư., 4 chiếc xe nôi chạy.]
@@ -309,7 +309,7 @@ randSentence(language: WordLanguage.en, slots: {SentenceSlot.money}, count: 2);
 
 ```python
 rand_sentence(language="ko", slots="quantity", count=2)
-# ['파란 문어가 녹차 6 개를 줍는다.', '파리가 감주 6 개를 굽는다.']
+# ['파란 문어가 녹차 6개를 줍는다.', '파리가 감주 6개를 굽는다.']
 
 rand_sentence(language="vi", slots="quantity", count=2)
 # ['Kỹ sư hẹp lau 7 cái thư.', '4 chiếc xe nôi chạy.']
@@ -333,6 +333,8 @@ rand_sentence(language="en", slots="money", count=2)
 **독일어와 러시아어는 둘 다 없습니다.** 금액은 목적어 자리에 서는데, 두 언어 모두 목적어 형태를 선언하지 않습니다. 명사가 제 어미를 바꿔야 하는 격이 필요하기 때문이고, 이는 처음부터 두 언어가 목적어 형태를 두지 않은 것과 같은 이유입니다.
 
 **수량 명사구는 관사를 떼고 수식어를 붙이지 않습니다.** `12 apples`이지 `the 12 red apples`이 아닙니다. 그리고 천 단위 구분은 그 언어의 방식대로입니다. 영어·한국어·일본어·중국어는 `,`, 베트남어·스페인어·이탈리아어는 `.`입니다.
+
+**숫자와 그것이 세는 것 사이도 언어마다 다릅니다.** 한국어는 단위와 화폐를 숫자에 붙여 씁니다. `6개`, `300,000원`처럼요. 일본어와 중국어는 애초에 띄어쓰기가 없으니 마찬가지입니다. 베트남어·영어·스페인어·이탈리아어는 띄어 씁니다. `6 con`, `500 dollars`.
 
 ## 반드시 넣을 단어 {#words-it-has-to-contain}
 

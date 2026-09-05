@@ -127,13 +127,13 @@ function countText(data: SentenceLanguageData, theme: WordTheme): string {
 	const [low, high] = numeral.count;
 	const number = grouped(randInt(low, high), numeral.group);
 
-	return counter ? number + data.space + counter : number;
+	return counter ? number + numeral.gap + counter : number;
 }
 
 function moneyText(data: SentenceLanguageData): string {
 	const numeral = data.numeral!;
 
-	return grouped(pick(numeral.amounts), numeral.group) + data.space + numeral.currency;
+	return grouped(pick(numeral.amounts), numeral.group) + numeral.gap + numeral.currency;
 }
 
 /** Shortest and longest a count can be, so a phrase can reserve room for one. */
@@ -148,8 +148,8 @@ function countSpan(data: SentenceLanguageData): readonly [number, number] {
 	const width = (value: number) => grouped(value, numeral.group).length;
 	const counter = counters.length
 		? [
-				Math.min(...counters.map((word) => word.length)) + data.space.length,
-				Math.max(...counters.map((word) => word.length)) + data.space.length
+				Math.min(...counters.map((word) => word.length)) + numeral.gap.length,
+				Math.max(...counters.map((word) => word.length)) + numeral.gap.length
 			]
 		: [0, 0];
 
@@ -168,7 +168,7 @@ function moneySpan(data: SentenceLanguageData): readonly [number, number] {
 	}
 
 	const widths = numeral.amounts.map(
-		(value) => grouped(value, numeral.group).length + data.space.length + numeral.currency.length
+		(value) => grouped(value, numeral.group).length + numeral.gap.length + numeral.currency.length
 	);
 
 	return [Math.min(...widths), Math.max(...widths)];

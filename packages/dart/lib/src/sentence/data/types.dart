@@ -264,6 +264,7 @@ class SentenceNumeral {
     required this.currency,
     required this.amounts,
     required this.group,
+    required this.gap,
   });
 
   /// Where the number stands relative to the noun it counts.
@@ -283,10 +284,8 @@ class SentenceNumeral {
   /// How many of a counted thing, at the fewest and at the most.
   final LengthRange count;
 
-  /// What money is written in, after the amount (`원`, `dollars`, `円`).
-  ///
-  /// Joined by the language's own space, which is none at all in Japanese and
-  /// Chinese.
+  /// What money is written in, after the amount (`원`, `dollars`, `円`), joined
+  /// by the same [gap] a counter is.
   final String currency;
 
   /// The amounts the language writes, as a pool rather than a range.
@@ -300,6 +299,19 @@ class SentenceNumeral {
   /// `,` in English, Korean, Japanese and Chinese; `.` in Vietnamese, Spanish
   /// and Italian.
   final String group;
+
+  /// What stands between the digits and what they count — the counter, or the
+  /// currency.
+  ///
+  /// Empty in Korean, Japanese and Chinese, which write `6개`, `6個` and `6个`
+  /// with nothing in between; a space in Vietnamese, English, Spanish and
+  /// Italian, which write `6 con` and `500 dollars`.
+  ///
+  /// Its own field rather than the language's space, because Korean writes a
+  /// space everywhere else and still attaches this one. 한글 맞춤법 제43항 spaces a
+  /// unit noun off the number it follows and then allows the attached form with
+  /// Arabic numerals, which is what anyone writing `6개` actually does.
+  final String gap;
 }
 
 /// Everything the sentence generator knows about one language.

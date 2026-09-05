@@ -97,14 +97,14 @@ String _countText(SentenceLanguageData data, WordTheme theme) {
   final counter = numeral.counters[themeClass[theme]];
   final number = _grouped(randInt(numeral.count.min, numeral.count.max), numeral.group);
 
-  return counter == null ? number : number + data.space + counter;
+  return counter == null ? number : number + numeral.gap + counter;
 }
 
 /// What an amount of money writes.
 String _moneyText(SentenceLanguageData data) {
   final numeral = data.numeral!;
 
-  return _grouped(pick(numeral.amounts), numeral.group) + data.space + numeral.currency;
+  return _grouped(pick(numeral.amounts), numeral.group) + numeral.gap + numeral.currency;
 }
 
 /// Shortest and longest a count can be, so a phrase can reserve room for one.
@@ -118,8 +118,8 @@ LengthRange _countSpan(SentenceLanguageData data) {
   var high = 0;
 
   if (counters.isNotEmpty) {
-    low = counters.map((word) => word.length).reduce((a, b) => a < b ? a : b) + data.space.length;
-    high = counters.map((word) => word.length).reduce((a, b) => a > b ? a : b) + data.space.length;
+    low = counters.map((word) => word.length).reduce((a, b) => a < b ? a : b) + numeral.gap.length;
+    high = counters.map((word) => word.length).reduce((a, b) => a > b ? a : b) + numeral.gap.length;
   }
 
   return LengthRange(
@@ -137,7 +137,7 @@ LengthRange _moneySpan(SentenceLanguageData data) {
   final widths = numeral.amounts
       .map(
         (value) =>
-            _grouped(value, numeral.group).length + data.space.length + numeral.currency.length,
+            _grouped(value, numeral.group).length + numeral.gap.length + numeral.currency.length,
       )
       .toList(growable: false);
 

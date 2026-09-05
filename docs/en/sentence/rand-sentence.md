@@ -279,7 +279,7 @@ Two more parts a shape can carry, reached the same way every other one is — th
 
 ```javascript
 randSentence({ language: 'ko', slots: 'quantity', count: 2 });
-// ['파란 문어가 녹차 6 개를 줍는다.', '파리가 감주 6 개를 굽는다.']
+// ['파란 문어가 녹차 6개를 줍는다.', '파리가 감주 6개를 굽는다.']
 
 randSentence({ language: 'vi', slots: 'quantity', count: 2 });
 // ['Kỹ sư hẹp lau 7 cái thư.', '4 chiếc xe nôi chạy.']
@@ -294,7 +294,7 @@ randSentence({ language: 'en', slots: 'money', count: 2 });
 
 ```dart
 randSentence(language: WordLanguage.ko, slots: {SentenceSlot.quantity}, count: 2);
-// [파란 문어가 녹차 6 개를 줍는다., 파리가 감주 6 개를 굽는다.]
+// [파란 문어가 녹차 6개를 줍는다., 파리가 감주 6개를 굽는다.]
 
 randSentence(language: WordLanguage.vi, slots: {SentenceSlot.quantity}, count: 2);
 // [Kỹ sư hẹp lau 7 cái thư., 4 chiếc xe nôi chạy.]
@@ -309,7 +309,7 @@ randSentence(language: WordLanguage.en, slots: {SentenceSlot.money}, count: 2);
 
 ```python
 rand_sentence(language="ko", slots="quantity", count=2)
-# ['파란 문어가 녹차 6 개를 줍는다.', '파리가 감주 6 개를 굽는다.']
+# ['파란 문어가 녹차 6개를 줍는다.', '파리가 감주 6개를 굽는다.']
 
 rand_sentence(language="vi", slots="quantity", count=2)
 # ['Kỹ sư hẹp lau 7 cái thư.', '4 chiếc xe nôi chạy.']
@@ -333,6 +333,8 @@ rand_sentence(language="en", slots="money", count=2)
 **German and Russian do neither.** An amount stands where an object does, and neither declares an object shape, because both would put the noun in a case its own ending has to change for. That is the same rule that has kept them from declaring an object shape all along.
 
 **A counted phrase drops its article and takes no modifier** — `12 apples`, never `the 12 red apples`. And the thousands are grouped the way the language groups them: `,` in English, Korean, Japanese and Chinese, `.` in Vietnamese, Spanish and Italian.
+
+**What stands between the digits and what they count is the language's own too.** Korean attaches the counter and the currency to the number — `6개`, `300,000원` — and so do Japanese and Chinese, which write no space anywhere. Vietnamese, English, Spanish and Italian keep the space: `6 con`, `500 dollars`.
 
 ## Words it has to contain {#words-it-has-to-contain}
 

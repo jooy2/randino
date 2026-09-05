@@ -28,11 +28,15 @@ already right because their `space` is empty, and Vietnamese, English, Spanish
 and Italian genuinely do write the gap — so this is not one rule, it is a thing
 each language declares.
 
-- [ ] `SentenceNumeral` gains `gap`, the string between the number and what it
+- [x] `SentenceNumeral` gains `gap`, the string between the number and what it
       counts. `''` for `ko`, `ja` and `zh`; `' '` for `vi`, `en`, `es`, `it`.
-- [ ] `countText` and `moneyText` read it instead of `data.space`.
-- [ ] All three packages, all three parity dumps, and a test that asserts the
+- [x] `countText` and `moneyText` read it instead of `data.space`.
+- [x] All three packages, all three parity dumps, and a test that asserts the
       Korean output has no space in it.
+
+The length budget reads it too — `countSpan` and `moneySpan` were adding
+`data.space.length` for a gap that is now empty in three languages, which would
+have made every counted phrase in them reserve a character it never writes.
 
 ## B. `style` becomes the speech level, and the endings vary
 

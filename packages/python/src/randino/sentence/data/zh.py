@@ -121,6 +121,7 @@ ZH = SentenceLanguageData(
         currency="元",
         amounts=(100, 500, 1000, 3000, 5000, 10000, 30000, 50000, 100000),
         group=",",
+        gap="",
     ),
     # uses one writes 很 in front of it.
     states=(

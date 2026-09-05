@@ -221,6 +221,7 @@ IT = SentenceLanguageData(
         currency="euro",
         amounts=(100, 500, 1000, 5000, 12000, 25000, 50000, 100000),
         group=".",
+        gap=" ",
     ),
     # Pro-drop, the same as Spanish: `esso` exists and nobody writes it.
     pronouns={"n": ("",)},

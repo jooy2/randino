@@ -195,6 +195,7 @@ sentence = {
                 "currency": data.numeral.currency,
                 "amounts": list(data.numeral.amounts),
                 "group": data.numeral.group,
+                "gap": data.numeral.gap,
             }
         ),
         "frames": [

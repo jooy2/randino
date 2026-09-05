@@ -149,9 +149,10 @@ function stripCount(language: WordLanguage, phrase: string): string {
 	}
 
 	const space = escapeRe(data.space);
+	const gap = escapeRe(numeral.gap);
 	const counters = Object.values(numeral.counters).map(escapeRe);
 	const number = `\\d[\\d${escapeRe(numeral.group)}]*`;
-	const group = counters.length ? `${number}(?:${space}(?:${counters.join('|')}))?` : number;
+	const group = counters.length ? `${number}(?:${gap}(?:${counters.join('|')}))?` : number;
 
 	return phrase
 		.replace(new RegExp(`${space}${group}$`), '')
@@ -168,7 +169,7 @@ function isMoney(language: WordLanguage, phrase: string): boolean {
 	}
 
 	return new RegExp(
-		`^\\d[\\d${escapeRe(numeral.group)}]*${escapeRe(data.space)}${escapeRe(numeral.currency)}$`
+		`^\\d[\\d${escapeRe(numeral.group)}]*${escapeRe(numeral.gap)}${escapeRe(numeral.currency)}$`
 	).test(phrase);
 }
 
@@ -1456,6 +1457,42 @@ describe('Sentence', () => {
 		}
 	});
 
+	it('a number is written against its counter the way the language writes it', () => {
+		// Korean spaces a unit noun off a spelled-out number and attaches it to
+		// digits, which is what anyone writing `6개` does; Japanese and Chinese have
+		// no space anywhere. The four that write the gap all write a plain space.
+		const GAPS: Partial<Record<WordLanguage, string>> = {
+			ko: '',
+			ja: '',
+			zh: '',
+			vi: ' ',
+			en: ' ',
+			es: ' ',
+			it: ' '
+		};
+
+		for (const language of WORD_LANGUAGES) {
+			const numeral = SENTENCE_DATA[language].numeral;
+
+			assert.strictEqual(numeral?.gap, GAPS[language], language);
+		}
+
+		// And the sentences agree with the table: nothing stands between the digits
+		// and the counter or the currency in the three that attach them.
+		for (const language of ['ko', 'ja', 'zh'] as const) {
+			for (const detail of sentenceDetails({
+				language,
+				slots: ['quantity', 'money'],
+				count: SAMPLE
+			})) {
+				assert.ok(
+					!/\d\s/.test(detail.sentence),
+					`${language}: '${detail.sentence}' spaces a number off what it counts`
+				);
+			}
+		}
+	});
+
 	it('`slots: quantity` counts a noun with the counter its kind takes', () => {
 		// Only the four languages with a classifier table declare a counted shape.
 		// A classifier is what makes a noun countable at all — `슬픔 12 가지` is
@@ -1478,7 +1515,7 @@ describe('Sentence', () => {
 				assert.ok(at >= 0, `${language}: ${detail.sentence}`);
 
 				const phrase = detail.phrases[at];
-				const found = phrase.match(new RegExp(`\\d+${escapeRe(data.space)}(\\S+)`));
+				const found = phrase.match(new RegExp(`\\d+${escapeRe(numeral.gap)}(\\S+)`));
 
 				assert.ok(found, `${language}: '${phrase}' carries no number (${detail.sentence})`);
 				assert.ok(

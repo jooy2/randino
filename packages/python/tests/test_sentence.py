@@ -534,9 +534,10 @@ def strip_count(language: WordLanguage, phrase: str) -> str:
         return phrase
 
     space = re.escape(data.space)
+    gap = re.escape(numeral.gap)
     counters = [re.escape(word) for word in numeral.counters.values()]
     number = rf"\d[\d{re.escape(numeral.group)}]*"
-    group = f"{number}(?:{space}(?:{'|'.join(counters)}))?" if counters else number
+    group = f"{number}(?:{gap}(?:{'|'.join(counters)}))?" if counters else number
 
     return re.sub(f"^{group}{space}", "", re.sub(f"{space}{group}$", "", phrase))
 
@@ -551,7 +552,7 @@ def is_money(language: WordLanguage, phrase: str) -> bool:
 
     pattern = (
         rf"^\d[\d{re.escape(numeral.group)}]*"
-        f"{re.escape(data.space)}{re.escape(numeral.currency)}$"
+        f"{re.escape(numeral.gap)}{re.escape(numeral.currency)}$"
     )
 
     return re.fullmatch(pattern, phrase) is not None
@@ -1197,6 +1198,37 @@ def test_a_polite_predicate_comes_out_of_the_polite_pools() -> None:
                     )
 
 
+def test_a_number_is_written_against_its_counter_the_way_the_language_writes_it() -> None:
+    """Korean attaches a counter to digits; the four that write the gap write a space."""
+    # 한글 맞춤법 제43항 spaces a unit noun off a spelled-out number and then allows the
+    # attached form with Arabic numerals, which is what anyone writing `6개` does.
+    # Japanese and Chinese have no space anywhere.
+    gaps: dict[WordLanguage, str] = {
+        "ko": "",
+        "ja": "",
+        "zh": "",
+        "vi": " ",
+        "en": " ",
+        "es": " ",
+        "it": " ",
+    }
+
+    for language in WORD_LANGUAGES:
+        numeral = SENTENCE_DATA[language].numeral
+
+        assert (numeral.gap if numeral else None) == gaps.get(language), language
+
+    # And the sentences agree with the table: nothing stands between the digits and the
+    # counter or the currency in the three that attach them.
+    for language in ("ko", "ja", "zh"):
+        for detail in rand_sentence(
+            language=language, slots=["quantity", "money"], count=SAMPLE, output="detail"
+        ):
+            assert not re.search(r"\d\s", detail.sentence), (
+                f"{language}: '{detail.sentence}' spaces a number off what it counts"
+            )
+
+
 def test_slots_quantity_counts_a_noun_with_the_counter_its_kind_takes() -> None:
     # Only the four languages with a classifier table declare a counted shape. A
     # classifier is what makes a noun countable at all — `슬픔 12 가지` is twelve kinds
@@ -1223,7 +1255,7 @@ def test_slots_quantity_counts_a_noun_with_the_counter_its_kind_takes() -> None:
             assert "quantity" in detail.slots, f"{language}: {detail.sentence}"
 
             phrase = detail.phrases[detail.slots.index("quantity")]
-            found = re.search(rf"\d+{re.escape(data.space)}(\S+)", phrase)
+            found = re.search(rf"\d+{re.escape(numeral.gap)}(\S+)", phrase)
 
             assert found, f"{language}: '{phrase}' carries no number"
             assert found.group(1) in counters, (

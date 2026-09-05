@@ -168,7 +168,8 @@ console.log(
 									count: [...data.numeral.count],
 									currency: data.numeral.currency,
 									amounts: [...data.numeral.amounts],
-									group: data.numeral.group
+									group: data.numeral.group,
+									gap: data.numeral.gap
 								}
 							: null,
 						frames: data.frames.map((frame) => ({

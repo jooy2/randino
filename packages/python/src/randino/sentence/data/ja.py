@@ -148,6 +148,7 @@ JA = SentenceLanguageData(
         currency="円",
         amounts=(1000, 5000, 10000, 30000, 50000, 100000, 300000, 500000, 1000000),
         group=",",
+        gap="",
     ),
     # which cannot end a sentence.
     states=(

@@ -145,7 +145,8 @@ export const ZH: SentenceLanguageData = {
 		count: [2, 12],
 		currency: '元',
 		amounts: [100, 500, 1000, 3000, 5000, 10000, 30000, 50000, 100000],
-		group: ','
+		group: ',',
+		gap: ''
 	},
 	// action — the place phrase included — in front of it.
 	frames: [

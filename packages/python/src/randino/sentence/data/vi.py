@@ -195,6 +195,7 @@ VI = SentenceLanguageData(
         currency="đồng",
         amounts=(10000, 50000, 100000, 200000, 500000, 1000000, 5000000),
         group=".",
+        gap=" ",
     ),
     frames=(
         SentenceFrame(

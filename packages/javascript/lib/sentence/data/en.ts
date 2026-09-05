@@ -159,7 +159,8 @@ export const EN: SentenceLanguageData = {
 		count: [2, 12],
 		currency: 'dollars',
 		amounts: [100, 500, 1000, 5000, 12000, 25000, 50000, 100000],
-		group: ','
+		group: ',',
+		gap: ' '
 	},
 	// English puts its verb second, and the sentence grows to the right of it.
 	frames: [

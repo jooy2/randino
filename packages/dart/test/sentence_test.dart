@@ -137,9 +137,10 @@ String stripCount(WordLanguage language, String phrase) {
   if (numeral == null) return phrase;
 
   final space = escapeRe(data.space);
+  final gap = escapeRe(numeral.gap);
   final counters = numeral.counters.values.map(escapeRe).toList(growable: false);
   final number = '\\d[\\d${escapeRe(numeral.group)}]*';
-  final group = counters.isEmpty ? number : '$number(?:$space(?:${counters.join('|')}))?';
+  final group = counters.isEmpty ? number : '$number(?:$gap(?:${counters.join('|')}))?';
 
   return phrase.replaceAll(RegExp('$space$group\$'), '').replaceAll(RegExp('^$group$space'), '');
 }
@@ -152,7 +153,7 @@ bool isMoney(WordLanguage language, String phrase) {
   if (numeral == null) return false;
 
   return RegExp(
-    '^\\d[\\d${escapeRe(numeral.group)}]*${escapeRe(data.space)}${escapeRe(numeral.currency)}\$',
+    '^\\d[\\d${escapeRe(numeral.group)}]*${escapeRe(numeral.gap)}${escapeRe(numeral.currency)}\$',
   ).hasMatch(phrase);
 }
 
@@ -1494,6 +1495,41 @@ void main() {
       }
     });
 
+    test('a number is written against its counter the way the language writes it', () {
+      // Korean spaces a unit noun off a spelled-out number and attaches it to
+      // digits, which is what anyone writing `6개` does; Japanese and Chinese
+      // have no space anywhere. The four that write the gap write a plain space.
+      const gaps = <WordLanguage, String>{
+        WordLanguage.ko: '',
+        WordLanguage.ja: '',
+        WordLanguage.zh: '',
+        WordLanguage.vi: ' ',
+        WordLanguage.en: ' ',
+        WordLanguage.es: ' ',
+        WordLanguage.it: ' ',
+      };
+
+      for (final language in WordLanguage.values) {
+        expect(sentenceData[language]!.numeral?.gap, gaps[language], reason: '$language');
+      }
+
+      // And the sentences agree with the table: nothing stands between the
+      // digits and the counter or the currency in the three that attach them.
+      for (final language in [WordLanguage.ko, WordLanguage.ja, WordLanguage.zh]) {
+        for (final detail in randSentenceDetails(
+          language: language,
+          slots: <SentenceSlot>{SentenceSlot.quantity, SentenceSlot.money},
+          count: sample,
+        )) {
+          expect(
+            RegExp(r'\d\s').hasMatch(detail.sentence),
+            isFalse,
+            reason: '$language: "${detail.sentence}" spaces a number off what it counts',
+          );
+        }
+      }
+    });
+
     test('`slots: quantity` counts a noun with the counter its kind takes', () {
       // Only the four languages with a classifier table declare a counted shape.
       // A classifier is what makes a noun countable at all — `슬픔 12 가지` is
@@ -1525,7 +1561,7 @@ void main() {
           expect(at, greaterThanOrEqualTo(0), reason: '$language: ${detail.sentence}');
 
           final phrase = detail.phrases[at];
-          final found = RegExp('\\d+${escapeRe(data.space)}(\\S+)').firstMatch(phrase);
+          final found = RegExp('\\d+${escapeRe(numeral.gap)}(\\S+)').firstMatch(phrase);
 
           expect(found, isNotNull, reason: '$language: "$phrase" carries no number');
           expect(

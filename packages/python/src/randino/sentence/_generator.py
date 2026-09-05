@@ -139,7 +139,7 @@ def _count_text(data: SentenceLanguageData, theme: WordTheme) -> str:
     counter = numeral.counters.get(THEME_CLASS[theme])
     number = _grouped(random.randint(numeral.count[0], numeral.count[1]), numeral.group)
 
-    return number if counter is None else number + data.space + counter
+    return number if counter is None else number + numeral.gap + counter
 
 
 def _money_text(data: SentenceLanguageData) -> str:
@@ -149,7 +149,7 @@ def _money_text(data: SentenceLanguageData) -> str:
     if numeral is None:
         return ""
 
-    return _grouped(pick(numeral.amounts), numeral.group) + data.space + numeral.currency
+    return _grouped(pick(numeral.amounts), numeral.group) + numeral.gap + numeral.currency
 
 
 def _count_span(data: SentenceLanguageData) -> tuple[int, int]:
@@ -163,10 +163,11 @@ def _count_span(data: SentenceLanguageData) -> tuple[int, int]:
     low = min((len(word) for word in counters), default=0)
     high = max((len(word) for word in counters), default=0)
     space = len(data.space)
+    gap = len(numeral.gap)
 
     return (
-        space + len(_grouped(numeral.count[0], numeral.group)) + (low + space if counters else 0),
-        space + len(_grouped(numeral.count[1], numeral.group)) + (high + space if counters else 0),
+        space + len(_grouped(numeral.count[0], numeral.group)) + (low + gap if counters else 0),
+        space + len(_grouped(numeral.count[1], numeral.group)) + (high + gap if counters else 0),
     )
 
 
@@ -178,7 +179,7 @@ def _money_span(data: SentenceLanguageData) -> tuple[int, int]:
         return (1, 1)
 
     widths = [
-        len(_grouped(value, numeral.group)) + len(data.space) + len(numeral.currency)
+        len(_grouped(value, numeral.group)) + len(numeral.gap) + len(numeral.currency)
         for value in numeral.amounts
     ]
 

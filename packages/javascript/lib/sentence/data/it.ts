@@ -176,7 +176,8 @@ export const IT: SentenceLanguageData = {
 		count: [2, 12],
 		currency: 'euro',
 		amounts: [100, 500, 1000, 5000, 12000, 25000, 50000, 100000],
-		group: '.'
+		group: '.',
+		gap: ' '
 	},
 	// foresta`, which is not Italian at all.
 	frames: [

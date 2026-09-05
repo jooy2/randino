@@ -108,7 +108,8 @@ export const JA: SentenceLanguageData = {
 		count: [2, 12],
 		currency: '円',
 		amounts: [1000, 5000, 10000, 30000, 50000, 100000, 300000, 500000, 1000000],
-		group: ','
+		group: ',',
+		gap: ''
 	},
 	// cannot end a sentence.
 	states: [
