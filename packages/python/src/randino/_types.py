@@ -221,6 +221,12 @@ class SentenceDetail:
     slots: tuple[SentenceSlot, ...]
     """What each phrase does in the sentence, at the same index as `phrases`."""
 
+    names: tuple[str, ...]
+    """The person names the result was written with, in order.
+
+    Empty unless `include_name` asked for them. Every one of them is also a phrase.
+    """
+
     language: WordLanguage
     """The language this sentence was generated in."""
 

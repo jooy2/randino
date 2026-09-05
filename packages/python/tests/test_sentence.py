@@ -19,6 +19,7 @@ from randino import (
     rand_sentence,
     sentence_length_range,
 )
+from randino.name.data import NAME_DATA
 
 # The datasets are internal, but a sentence is only as good as the grammar behind
 # it — these checks read the pools a sentence is allowed to draw from.
@@ -668,6 +669,140 @@ def test_a_language_whose_nouns_carry_a_gender_has_a_pronoun_for_each_of_them() 
             assert data.pronouns.get(gender) or data.pronouns.get("n"), (
                 f"{language}: nothing stands in for a {gender} subject"
             )
+
+
+def given_names(language: WordLanguage, gender: str) -> set[str]:
+    """The given names the language can write, by gender.
+
+    The pools `rand_sentence` reaches through `include_name`. CJK languages keep whole
+    given names under `given_male` / `given_female`; the others draw from `male` /
+    `female`.
+    """
+    data = NAME_DATA[language]
+    pool = (
+        (data.given_male or data.male) if gender == "male" else (data.given_female or data.female)
+    )
+
+    return {entry if isinstance(entry, str) else entry.n for entry in (pool or ())}
+
+
+def test_include_name_writes_a_person_name_where_a_sentence_has_room_for_one() -> None:
+    for language in WORD_LANGUAGES:
+        space = SENTENCE_DATA[language].space
+
+        for detail in rand_sentence(
+            language=language, include_name=True, count=SAMPLE, output="detail"
+        ):
+            assert detail.names, f"{language}: no name in {detail.sentence}"
+
+            for name in detail.names:
+                assert name in detail.phrases, f"{language}: {name} is not a phrase"
+                assert name in detail.sentence
+
+            # A name is a bare proper noun, so nothing opens the phrase it stands in.
+            if "subject" not in detail.slots:
+                continue
+
+            at = detail.slots.index("subject")
+
+            if detail.phrases[at] in detail.names:
+                for article in articles_for(language):
+                    assert f"{article}{space}{detail.phrases[at]}" not in detail.sentence, (
+                        f"{language}: '{article}' in front of a name ({detail.sentence})"
+                    )
+
+    # Off by default, and the pools are not reached at all.
+    for detail in rand_sentence(count=60, output="detail"):
+        assert detail.names == (), detail.sentence
+
+
+def test_a_name_comes_out_of_the_languages_own_given_name_pools() -> None:
+    for language in WORD_LANGUAGES:
+        known = given_names(language, "male") | given_names(language, "female")
+
+        for detail in rand_sentence(
+            language=language, include_name=True, count=SAMPLE, output="detail"
+        ):
+            for name in detail.names:
+                # English writes its pools capitalized and a sentence opens on a
+                # capital, so the name is looked up the way the pool holds it.
+                assert name in known or upper_first(name) in known, (
+                    f"{language}: '{name}' is in no given-name pool ({detail.sentence})"
+                )
+
+
+def test_a_theme_the_caller_named_wins_over_include_name() -> None:
+    # A name can only stand where a person would. Asked for beside a theme that names
+    # no people, the sentence is about that theme and carries no name.
+    for detail in rand_sentence(
+        language="en", theme="animal", include_name=True, count=SAMPLE, output="detail"
+    ):
+        assert detail.theme == "animal", detail.sentence
+        assert detail.names == (), detail.sentence
+
+
+def test_a_predicate_agrees_with_the_gender_of_the_name_it_describes() -> None:
+    # The one thing a name has to carry beside its letters. Spanish, Italian and
+    # Russian inflect a predicate adjective, and a name is in no pool for `gender_of`
+    # to read a gender out of.
+    for language in WORD_LANGUAGES:
+        data = SENTENCE_DATA[language]
+        lexicon = WORD_DATA[language]
+
+        if not data.predicate_agrees or lexicon.agreement is None:
+            continue
+
+        male = given_names(language, "male")
+        female = given_names(language, "female")
+        states = [word for group in data.states for word in group.words]
+        forms: dict[str, set[str]] = {
+            gender: {agree(lexicon, word, gender) for word in states} for gender in ("m", "f")
+        }
+        checked = 0
+
+        for detail in rand_sentence(
+            language=language, include_name=True, slots="state", count=200, output="detail"
+        ):
+            if "state" not in detail.slots or "subject" not in detail.slots:
+                continue
+
+            subject = detail.phrases[detail.slots.index("subject")]
+
+            if subject not in detail.names:
+                continue
+
+            gender = "m" if subject in male else ("f" if subject in female else None)
+
+            if gender is None:
+                continue
+
+            checked += 1
+            state = detail.phrases[detail.slots.index("state")]
+
+            assert state in forms[gender], (
+                f"{language}: '{state}' does not agree with {subject} ({detail.sentence})"
+            )
+
+        assert checked > 0, f"{language}: no named subject was described"
+
+
+def test_korean_picks_the_particle_a_name_asks_for_too() -> None:
+    for detail in rand_sentence(language="ko", include_name=True, count=200, output="detail"):
+        at = detail.slots.index("subject")
+        name = detail.phrases[at]
+
+        if name not in detail.names:
+            continue
+
+        after = detail.sentence[detail.sentence.index(name) + len(name)]
+        last = ord(name[-1])
+        coda = 0xAC00 <= last <= 0xD7A3 and (last - 0xAC00) % 28 != 0
+
+        if after in ("가", "는"):
+            assert not coda, f"{name}{after} ({detail.sentence})"
+
+        if after in ("이", "은"):
+            assert coda, f"{name}{after} ({detail.sentence})"
 
 
 def test_the_detail_form_reports_what_the_sentence_was_built_from() -> None:

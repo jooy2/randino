@@ -535,6 +535,46 @@ def generate_one(language: NameLanguage, settings: Settings) -> NameDetail:
     return NameDetail(native=entry.n, roman=entry.r, language=language, gender=gender)
 
 
+def draw_name(
+    language: NameLanguage,
+    *,
+    realism: RandRealism = "real",
+    include_surname: bool = True,
+    min_length: int | None = None,
+    max_length: int | None = None,
+    starts_with: str = "",
+) -> NameDetail:
+    """One name in `language`, drawn the way `rand_name` would draw it.
+
+    Internal, and the only way into this generator from outside `randino.name`:
+    `rand_sentence` writes a person's name where a sentence has room for one, and it
+    has no business resolving `rand_name`'s options itself.
+
+    Args:
+        language: The language to write the name in.
+        realism: Whether the name is drawn from the pools or invented.
+        include_surname: Whether a surname is written beside the given name.
+        min_length: Minimum length in characters.
+        max_length: Maximum length in characters.
+        starts_with: Keep only names whose first character is this one.
+
+    Returns:
+        One `NameDetail`.
+    """
+    return generate_one(
+        language,
+        Settings(
+            gender="all",
+            include_surname=include_surname,
+            include_middle_name=False,
+            min_length=resolve_length(min_length),
+            max_length=resolve_length(max_length),
+            invent=resolve_realism(realism),
+            prefix=resolve_prefix(starts_with),
+        ),
+    )
+
+
 def generate_name_details(
     *,
     language: NameLanguageOption = "all",

@@ -46,6 +46,8 @@ from randino._types import (
     WordThemeOption,
 )
 from randino.constants import RAND_SENTENCE_COUNT_MAX, RAND_SENTENCE_LENGTH_MAX
+from randino.name._generator import draw_name
+from randino.name.name_length_range import name_length_range
 from randino.sentence.data import SENTENCE_DATA, THEME_CLASS
 from randino.sentence.data._types import (
     NounClass,
@@ -98,6 +100,16 @@ class Settings:
     sentences: int
     """How many sentences one result holds, clamped."""
 
+    realism: RandRealism
+    """The same thing `invent` is, in the form `rand_name` takes it.
+
+    A sentence that writes a person's name hands the name generator the level the
+    caller asked for.
+    """
+
+    include_name: bool
+    """Whether a phrase about a person is written as a name."""
+
     min_length: int | None = None
     max_length: int | None = None
 
@@ -120,6 +132,8 @@ class Topic:
     """The class its theme falls into. None when the noun is one no pool holds."""
 
     gender: WordGender | None
+    named: bool
+    """Whether that noun is a person's name, which is written bare wherever it goes."""
 
 
 @dataclass(frozen=True, slots=True)
@@ -765,12 +779,18 @@ class Built:
     sentence: str
     phrases: tuple[str, ...]
     slots: tuple[SentenceSlot, ...]
+    names: tuple[str, ...]
+    """The person names this sentence was written with, in order."""
+
     theme: WordTheme | None
     subject: str | None
     """The subject noun as written, which is what the next sentence carries on about."""
 
     gender: WordGender | None
     """Its gender, for the pronoun and the agreement of whatever follows."""
+
+    named: bool
+    """Whether that subject is a person's name."""
 
 
 def _article_for(data: SentenceLanguageData, gender: WordGender | None, following: str) -> str:
@@ -883,6 +903,55 @@ def _noun_phrase(
         if any(_plain(lexicon, entry) == drawn for entry in pool)
         else theme_of(lexicon, _as_pool(lexicon, drawn)),
     )
+
+
+def _proper_name(
+    language: WordLanguage,
+    lexicon: WordLanguageData,
+    settings: Settings,
+    prefix: str,
+    low: int,
+    high: int,
+) -> tuple[str, WordGender | None]:
+    """A person's name for a phrase that has room for one, and the gender it carries.
+
+    A bare given name rather than a full one: a sentence about someone uses the name
+    they are called by, and `rand_name`'s default would put a surname in every clause.
+    The gender is the one the name was drawn for, translated into the gender a modifier
+    and a predicate agree with — and only for a language whose words agree at all,
+    since nothing else has any use for it.
+
+    Args:
+        language: The language the sentence is written in.
+        lexicon: Its word data, which says whether anything agrees.
+        settings: The sentence's own settings, for the realism level.
+        prefix: A `starts_with` the name has to honour, or `""`.
+        low: Shortest the phrase may be.
+        high: Longest it may be.
+
+    Returns:
+        The name, and the gender whatever agrees with it has to agree with.
+    """
+    drawn = draw_name(
+        # `WordLanguage` and `NameLanguage` list the same nine codes.
+        language,
+        include_surname=False,
+        realism=settings.realism,
+        starts_with=prefix,
+        min_length=low,
+        max_length=high,
+    )
+    gender: WordGender | None = None
+
+    if lexicon.agreement is not None:
+        gender = "m" if drawn.gender == "male" else "f"
+
+    return drawn.native, gender
+
+
+def _name_span(language: WordLanguage) -> tuple[int, int]:
+    """How long a given name of the language can be, which is what a phrase reserves."""
+    return name_length_range(language, False)
 
 
 def _tail_of(part: SentencePart, phrase: str) -> str:
@@ -1009,30 +1078,19 @@ def _compose(
     # against what the sentence actually writes; `at` is the index back into the frame,
     # which is what the plan is keyed by.
     pronoun = follow.pronoun if follow is not None and follow.reference == "pronoun" else None
-    parts: list[SentencePart] = []
+    shape: list[SentencePart] = []
     at: list[int] = []
 
     for index, part in enumerate(frame.parts):
-        if part.slot != "subject" or pronoun is None:
-            parts.append(part)
-            at.append(index)
-        elif pronoun:
-            parts.append(
-                SentencePart(
-                    part.slot,
-                    head=part.head,
-                    tail=part.tail,
-                    tail_alt=part.tail_alt,
-                    bare=True,
-                )
-            )
+        if part.slot != "subject" or pronoun is None or pronoun:
+            shape.append(part)
             at.append(index)
 
     # Only a shape that opens on a noun phrase with nothing in front of it can
     # honour `starts_with`; anywhere else the sentence opens on an article, a
     # preposition or an adverbial, and `collect` filters what does not match. A
     # sentence after the first one never opens the result, so it never carries it.
-    first = parts[0]
+    first = shape[0]
     prefixable = (
         follow is None and first.slot in NOUN_SLOTS and not first.head and data.articles is None
     )
@@ -1045,7 +1103,7 @@ def _compose(
     # shape could otherwise have reached.
     part_themes: list[WordTheme | None] = []
 
-    for index, part in enumerate(parts):
+    for index, part in enumerate(shape):
         if part.slot not in NOUN_SLOTS:
             part_themes.append(None)
             continue
@@ -1065,6 +1123,41 @@ def _compose(
             )
         )
 
+    # What a phrase writes instead of a noun phrase, when it writes one at all: a
+    # pronoun standing in for the topic, the name a repeat carries forward, or a fresh
+    # name for a phrase about a person. All three are bare words — no article, no
+    # modifier, nothing but the word and whatever particle the frame puts after it —
+    # and `""` marks the one that has to be drawn against the room it is given.
+    proper: list[str | None] = []
+
+    for index, part in enumerate(shape):
+        if part.slot == "subject" and pronoun:
+            proper.append(pronoun)
+        elif (
+            part.slot == "subject"
+            and follow is not None
+            and follow.reference == "repeat"
+            and follow.topic.named
+        ):
+            proper.append(follow.topic.noun)
+        else:
+            theme = part_themes[index]
+            person = theme is not None and THEME_CLASS[theme] == "person"
+            proper.append("" if settings.include_name and person else None)
+
+    parts = [
+        part
+        if proper[index] is None
+        else SentencePart(
+            part.slot,
+            head=part.head,
+            tail=part.tail,
+            tail_alt=part.tail_alt,
+            bare=True,
+        )
+        for index, part in enumerate(shape)
+    ]
+
     # The same for the predicate: `bounds` spans every group the language has, and one
     # sentence draws from one of them. A word the caller required is narrower still — its
     # length is not a range at all, and neither is a pronoun's.
@@ -1072,18 +1165,22 @@ def _compose(
 
     for index, part in enumerate(parts):
         required = plan.phrase.get(at[index])
-        word = (
-            pronoun
-            if part.slot == "subject" and pronoun
-            else (required.word if required is not None else None)
-        )
+        word = proper[index] or (required.word if required is not None else None)
         exact = None if word is None else (len(word), len(word))
         own = dict(bounds)
         theme = part_themes[index]
 
         if theme is not None:
             owed = plan.modifier.get(at[index])
-            own[part.slot] = exact or _noun_span(language, theme, settings.invent)
+            # A name that has still to be drawn is budgeted against the given names of
+            # the language rather than against its nouns — `rand_name` invents from its
+            # own syllables and draws from its own pools, and neither is this theme's.
+            span = (
+                _name_span(language)
+                if proper[index] == ""
+                else _noun_span(language, theme, settings.invent)
+            )
+            own[part.slot] = exact or span
 
             if owed is not None:
                 own["modifier"] = (len(owed.word), len(owed.word))
@@ -1106,10 +1203,12 @@ def _compose(
     written: list[str] = []
     reported: list[str] = []
     slots: list[SentenceSlot] = []
+    names: list[str] = []
     subject: Phrase | None = None
-    # A pronoun says nothing about its own gender, so what agrees with it agrees with
-    # the noun it stands for.
-    gender: WordGender | None = follow.topic.gender if pronoun and follow is not None else None
+    named = False
+    # A pronoun says nothing about its own gender, and neither does a name carried
+    # over, so what agrees with either agrees with the noun it stands for.
+    gender: WordGender | None = follow.topic.gender if follow is not None and any(proper) else None
     used = len(data.terminator) + (len(opener) + space if opener else 0)
 
     if opener:
@@ -1124,8 +1223,30 @@ def _compose(
         part_high = max(1, high - used - overhead - rest_min)
         part_low = max(1, low - used - overhead - rest_max)
 
-        if part.slot == "subject" and pronoun:
-            phrase = pronoun
+        if proper[index] is not None:
+            # A bare proper noun, drawn now if it was not carried in. `part_high` and
+            # `part_low` are what the phrase has room for, and the name generator fits
+            # them the same way a noun would.
+            carried_in = proper[index]
+
+            if carried_in:
+                phrase = carried_in
+            else:
+                phrase, drawn_gender = _proper_name(
+                    language,
+                    lexicon,
+                    settings,
+                    settings.prefix if prefixable and index == 0 else "",
+                    min(part_low, part_high),
+                    part_high,
+                )
+                names.append(phrase)
+
+                if part.slot == "subject":
+                    gender = drawn_gender
+
+            if part.slot == "subject":
+                named = True
         elif part.slot in NOUN_SLOTS:
             required = plan.phrase.get(at[index])
             owed = plan.modifier.get(at[index])
@@ -1190,17 +1311,33 @@ def _compose(
         slots.append(part.slot)
         used += gap + head_cost + len(text) + len(tail)
 
+        # The opening capital belongs to the name too, so what the detail reports is
+        # what the sentence shows.
+        if proper[index] == "" and text != phrase:
+            names[-1] = text
+
     # A dropped subject leaves no phrase behind, so what the next sentence carries on
     # about is the topic this one was already handed.
     carried = follow.topic if pronoun is not None and follow is not None else None
+    # A sentence whose subject is a name carries that name forward.
+    if named:
+        subject_word: str | None = reported[slots.index("subject")]
+    elif subject is not None:
+        subject_word = subject.noun
+    else:
+        subject_word = carried.noun if carried is not None and pronoun else None
 
     return Built(
         data.space.join(written) + data.terminator,
         tuple(reported),
         tuple(slots),
-        subject.theme if subject is not None else None,
-        subject.noun if subject is not None else (carried.noun if carried and pronoun else None),
-        gender if subject is not None else (carried.gender if carried is not None else None),
+        tuple(names),
+        None if named else (subject.theme if subject is not None else None),
+        subject_word,
+        gender
+        if subject is not None or named
+        else (carried.gender if carried is not None else None),
+        named or (carried is not None and carried.named),
     )
 
 
@@ -1278,8 +1415,13 @@ def _topic_of(built: Built) -> Topic | None:
     return Topic(
         built.subject,
         built.theme,
-        THEME_CLASS[built.theme] if built.theme is not None else None,
+        # A name is in no pool and so has no theme, but it is a person all the same,
+        # which is the whole of what a later sentence needs to stay on topic.
+        "person"
+        if built.named
+        else (THEME_CLASS[built.theme] if built.theme is not None else None),
         built.gender,
+        built.named,
     )
 
 
@@ -1386,13 +1528,19 @@ def _subject_themes_for(settings: Settings, follow: Follow | None) -> tuple[Word
     together.
     """
     requested = WORD_THEMES if settings.theme == "all" else (settings.theme,)
+    # A name can only stand where a person would, so asking for one narrows the subject
+    # to the themes that name people. A theme the caller named themselves still wins —
+    # `theme="animal"` with `include_name` is a sentence about a lion, not about
+    # somebody the lion reminded us of.
+    wanted = _themes_for_classes(requested, ("person",)) if settings.include_name else requested
+    themes = tuple(wanted) or requested
 
     if follow is None or follow.topic.noun_class is None:
-        return requested
+        return themes
 
-    in_class = _themes_for_classes(requested, (follow.topic.noun_class,))
+    in_class = _themes_for_classes(themes, (follow.topic.noun_class,))
 
-    return tuple(in_class) or requested
+    return tuple(in_class) or themes
 
 
 def _generate_one(
@@ -1521,6 +1669,7 @@ def generate_sentence_details(
     starts_with: str = "",
     unique: bool = False,
     sentences: int = 1,
+    include_name: bool = False,
 ) -> list[SentenceDetail]:
     """Generate sentences with every choice already resolved.
 
@@ -1537,6 +1686,7 @@ def generate_sentence_details(
         starts_with: Keep only sentences whose first character is this one.
         unique: Never return the same sentence twice.
         sentences: How many sentences one result holds.
+        include_name: Whether a phrase about a person is written as a name.
 
     Returns:
         One `SentenceDetail` per result.
@@ -1552,6 +1702,8 @@ def generate_sentence_details(
         prefix=resolve_prefix(starts_with),
         include=tuple(word.strip() for word in listed if word.strip()),
         sentences=clamp(sentences, 1, RAND_SENTENCE_COUNT_MAX),
+        realism=realism,
+        include_name=include_name,
     )
 
     def draw() -> SentenceDetail:
@@ -1564,6 +1716,7 @@ def generate_sentence_details(
             sentences=tuple(one.sentence for one in built),
             phrases=tuple(phrase for one in built for phrase in one.phrases),
             slots=tuple(slot for one in built for slot in one.slots),
+            names=tuple(name for one in built for name in one.names),
             language=code,
             # What the result is about is what its first sentence was about; the ones
             # after it stay inside that noun's class.

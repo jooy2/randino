@@ -30,6 +30,7 @@ def rand_sentence(
     starts_with: str = ...,
     unique: bool = ...,
     sentences: int = ...,
+    include_name: bool = ...,
     output: Literal["value"] = ...,
 ) -> list[str]: ...
 
@@ -49,6 +50,7 @@ def rand_sentence(
     starts_with: str = ...,
     unique: bool = ...,
     sentences: int = ...,
+    include_name: bool = ...,
     output: Literal["detail"],
 ) -> list[SentenceDetail]: ...
 
@@ -67,6 +69,7 @@ def rand_sentence(
     starts_with: str = "",
     unique: bool = False,
     sentences: int = 1,
+    include_name: bool = False,
     output: RandOutput = "value",
 ) -> list[str] | list[SentenceDetail]:
     """Generate whole sentences, written the way the language writes them.
@@ -106,6 +109,12 @@ def rand_sentence(
             subject again, refers to it with a pronoun, or draws a fresh subject of the
             same kind, and may open on a connective. `min_length` and `max_length`
             describe the whole string whatever this is.
+        include_name: Whether a sentence about a person writes a generated name where
+            that person would go — `Emma runs quietly.`, `민준이 조용히 달린다.`
+            Turning it on narrows the subject to the themes that name people; a `theme`
+            you named yourself still wins. The name is a bare given name, and it
+            carries its own gender, so what agrees with a subject agrees with it. Off
+            by default because it is the one option that reaches the person-name pools.
         output: `"value"` for strings, `"detail"` for a `SentenceDetail` per sentence —
             the phrases in order, what each of them does, the language and the theme.
 
@@ -138,6 +147,7 @@ def rand_sentence(
         starts_with=starts_with,
         unique=unique,
         sentences=sentences,
+        include_name=include_name,
     )
 
     if output == "detail":
