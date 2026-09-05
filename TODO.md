@@ -15,7 +15,7 @@ Everything here is about `randSentence`. It shipped in the vNext section of the 
 ## Status
 
 - [x] A. Length bounds are best-effort where they should be exact
-- [ ] B. More than one sentence per result, and the sentences hold together
+- [x] B. More than one sentence per result, and the sentences hold together
 - [ ] C. A person name where a sentence has room for one
 - [ ] D. Questions, exclamations and sentences that trail off
 - [ ] E. Dialogue and thought, in the language's own quotation marks
@@ -38,32 +38,22 @@ What landed:
 
 What is left, and it is not a bug: a range at the very top of what a language can spell is still best-effort, because reaching it needs the longest word of every pool at once. The tests sweep the body of each language's distribution rather than its ends for that reason.
 
-## B. More than one sentence per result, and the sentences hold together
+## B. More than one sentence per result, and the sentences hold together — done
 
-`randSentence({ sentences: 3 })` returns **one** string holding three sentences — `['여우가 사과를 먹는다. 그것은 달다. 여우가 떠난다.']` — not three array entries. `count` stays what it is: how many strings come back.
+`randSentence({ sentences: 3 })` returns **one** string holding three sentences, `count` still says how many strings come back, and `minLength` / `maxLength` describe the whole string — shared out across the sentences before any of them is drawn, with the last absorbing the rounding.
 
-- `sentences?: number`, default 1, clamped against a new `RAND_SENTENCE_COUNT_MAX` (10 is enough; the length ceiling bounds it anyway).
-- `minLength` / `maxLength` describe **the whole string**, whatever the sentence count. The budget is split across the sentences before any of them is drawn, and the last one absorbs the rounding.
-- The sentences of one result share a **topic**: the subject noun of the first, its theme and its gender. A later sentence either names it again, refers to it with a pronoun, or draws a fresh subject from the same noun class, and may open with a connective. What it must not do is wander into another class, which is what makes three sentences read as a paragraph rather than three draws.
+What landed, and what it turned out to cost:
 
-Data, in `SentenceLanguageData`:
+- `sentences`, clamped against `RAND_SENTENCE_COUNT_MAX` (10). **`RAND_SENTENCE_LENGTH_MAX` became a ceiling per sentence rather than per result**, which was not in the plan: capping a ten-sentence paragraph at 200 characters answers the ask with ten sentences of twenty, which is not what anyone means by it.
+- The topic is the first sentence's subject, its theme, its class and its gender. A later sentence repeats it, stands a pronoun where it was, or draws a fresh noun of the same class — `repeat` / `pronoun` / `fresh`, weighted 25 / 40 / 35.
+- `connectives` and `pronouns` per language, as planned. Two things the plan did not have:
+  - **`pronounless`**, the classes a language's written pronoun is wrong for. English is the reason — `he` and `she` need a gender a job noun does not carry, and `they` needs a plural verb the pools are not written in — and `그것`, `それ`, `它` and `nó` are inanimate, so those four list `person` too. A pronoun reference for such a class narrows to the empty entry: the language drops the subject where it can, and names the topic again where it cannot.
+  - **German's `connectives` are the coordinating ones alone** (`und`, `aber`, `doch`, `denn`). Anything else — `dann`, `danach`, `schließlich` — takes the first position of the clause and sends the finite verb behind it, and German already has a time-first frame, so a connective in front would have put two constituents before the verb. A connective cannot bolt a shape on; the frames write shapes.
+- **A dropped subject removes the whole phrase**, not just its word — its article, its modifier and its particle with it, or `가 달린다` comes out. `compose` builds its own list of the parts the sentence actually writes, keyed back to the frame for the plan, and every budget below it is measured against that list rather than against the frame.
+- **A connective has to be reserved before the sentence is drawn.** It is written in front of a whole sentence rather than instead of any part of it, so one the budget cannot spare overshoots the range by exactly its length; Russian `тем временем` is thirteen characters, and a third of a range of seventy-five has nowhere to put them. `followFor` only offers the connectives that leave room for the shortest sentence the shapes could spell — and because that floor needs the shortest word of every pool at once and no draw reaches it, a sentence that still misses is rebuilt without the connective. Both were found by the `ru x3 40-75` case failing one run in five.
+- `SentenceDetail` grew `sentences` alone; `types` waits for D.
 
-- `connectives: WordPool` — what a sentence opens with when it follows another (`그리고`, `그래서`, `하지만`, `and then`, `そして`, `然后`, `rồi`, `pero`, `poi`, `dann`, `но`).
-- `pronouns` — the subject pronoun by gender, nominative only, because that is the only case a subject is ever in. English `it`, Korean `그것`, German `er` / `sie` / `es`, Russian `он` / `она` / `оно`. A language that drops its subject pronoun (Korean, Japanese, Chinese, Spanish, Italian) may also declare the empty string, which is what those languages actually do in a second sentence.
-
-`SentenceDetail` grows two arrays rather than a nested shape, which is what it already does with `phrases` and `slots`:
-
-```ts
-export interface SentenceDetail {
-    sentence: string;        // every sentence, joined
-    sentences: string[];     // one entry per sentence
-    phrases: string[];       // every phrase, in order, across all of them
-    slots: SentenceSlot[];   // what each phrase does
-    types: SentenceType[];   // one entry per sentence (see D)
-    language: WordLanguage;
-    theme: WordTheme | null; // the topic's theme
-}
-```
+The demo page has the control, the length placeholders scale with it, and `tools/parity` compares `connectives`, `pronouns` and `pronounless` across all three packages.
 
 ## C. A person name where a sentence has room for one
 
