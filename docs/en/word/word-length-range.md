@@ -9,7 +9,7 @@ import { wordLengthRange } from 'randino';
 
 wordLengthRange('ko'); // [1, 4]
 wordLengthRange('en'); // [3, 11]
-wordLengthRange(); // [1, 11] — every language at once
+wordLengthRange(); // [1, 12] — every language at once
 ```
 
 :::
@@ -21,7 +21,7 @@ import 'package:randino/randino.dart';
 
 wordLengthRange(language: WordLanguage.ko); // LengthRange(1, 4)
 wordLengthRange(language: WordLanguage.en); // LengthRange(3, 11)
-wordLengthRange(); // LengthRange(1, 11) — every language at once
+wordLengthRange(); // LengthRange(1, 12) — every language at once
 ```
 
 :::
@@ -33,7 +33,7 @@ from randino import word_length_range
 
 word_length_range("ko")  # (1, 4)
 word_length_range("en")  # (3, 11)
-word_length_range()  # (1, 11) — every language at once
+word_length_range()  # (1, 12) — every language at once
 ```
 
 :::
@@ -55,7 +55,7 @@ A theme is a pool of its own, so its range always sits inside the language's.
 
 ```javascript
 wordLengthRange('en'); // [3, 11]
-wordLengthRange('en', 'gem'); // [3, 9]
+wordLengthRange('en', 'weather'); // [4, 10]
 wordLengthRange('zh'); // [2, 3] — every Chinese noun is two or three characters
 ```
 
@@ -65,7 +65,7 @@ wordLengthRange('zh'); // [2, 3] — every Chinese noun is two or three characte
 
 ```dart
 wordLengthRange(language: WordLanguage.en); // LengthRange(3, 11)
-wordLengthRange(language: WordLanguage.en, theme: WordTheme.gem); // LengthRange(3, 9)
+wordLengthRange(language: WordLanguage.en, theme: WordTheme.weather); // LengthRange(4, 10)
 wordLengthRange(language: WordLanguage.zh); // LengthRange(2, 3)
 ```
 
@@ -75,7 +75,7 @@ wordLengthRange(language: WordLanguage.zh); // LengthRange(2, 3)
 
 ```python
 word_length_range("en")  # (3, 11)
-word_length_range("en", "gem")  # (3, 9)
+word_length_range("en", "weather")  # (4, 10)
 word_length_range("zh")  # (2, 3)
 ```
 

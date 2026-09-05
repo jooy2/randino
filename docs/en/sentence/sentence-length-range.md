@@ -7,10 +7,10 @@ Every sentence length the language can produce, in characters. That is what [`ra
 ```javascript
 import { sentenceLengthRange } from 'randino';
 
-sentenceLengthRange('ko'); // [6, 41]
-sentenceLengthRange('en'); // [13, 92]
+sentenceLengthRange('ko'); // [5, 43]
+sentenceLengthRange('en'); // [12, 92]
 sentenceLengthRange('zh'); // [4, 20]
-sentenceLengthRange(); // [4, 102] — every language at once
+sentenceLengthRange(); // [4, 105] — every language at once
 ```
 
 :::
@@ -20,10 +20,10 @@ sentenceLengthRange(); // [4, 102] — every language at once
 ```dart
 import 'package:randino/randino.dart';
 
-sentenceLengthRange(WordLanguage.ko); // LengthRange(6, 41)
-sentenceLengthRange(WordLanguage.en); // LengthRange(13, 92)
+sentenceLengthRange(WordLanguage.ko); // LengthRange(5, 43)
+sentenceLengthRange(WordLanguage.en); // LengthRange(12, 92)
 sentenceLengthRange(WordLanguage.zh); // LengthRange(4, 20)
-sentenceLengthRange(); // LengthRange(4, 102) — every language at once
+sentenceLengthRange(); // LengthRange(4, 105) — every language at once
 ```
 
 :::
@@ -33,10 +33,10 @@ sentenceLengthRange(); // LengthRange(4, 102) — every language at once
 ```python
 from randino import sentence_length_range
 
-sentence_length_range("ko")  # (6, 41)
-sentence_length_range("en")  # (13, 92)
+sentence_length_range("ko")  # (5, 43)
+sentence_length_range("en")  # (12, 92)
 sentence_length_range("zh")  # (4, 20)
-sentence_length_range()  # (4, 102) — every language at once
+sentence_length_range()  # (4, 105) — every language at once
 ```
 
 :::

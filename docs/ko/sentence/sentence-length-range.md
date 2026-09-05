@@ -7,10 +7,10 @@
 ```javascript
 import { sentenceLengthRange } from 'randino';
 
-sentenceLengthRange('ko'); // [6, 41]
-sentenceLengthRange('en'); // [13, 92]
+sentenceLengthRange('ko'); // [5, 43]
+sentenceLengthRange('en'); // [12, 92]
 sentenceLengthRange('zh'); // [4, 20]
-sentenceLengthRange(); // [4, 102] — 모든 언어를 한꺼번에
+sentenceLengthRange(); // [4, 105] — 모든 언어를 한꺼번에
 ```
 
 :::
@@ -20,10 +20,10 @@ sentenceLengthRange(); // [4, 102] — 모든 언어를 한꺼번에
 ```dart
 import 'package:randino/randino.dart';
 
-sentenceLengthRange(WordLanguage.ko); // LengthRange(6, 41)
-sentenceLengthRange(WordLanguage.en); // LengthRange(13, 92)
+sentenceLengthRange(WordLanguage.ko); // LengthRange(5, 43)
+sentenceLengthRange(WordLanguage.en); // LengthRange(12, 92)
 sentenceLengthRange(WordLanguage.zh); // LengthRange(4, 20)
-sentenceLengthRange(); // LengthRange(4, 102) — 모든 언어를 한꺼번에
+sentenceLengthRange(); // LengthRange(4, 105) — 모든 언어를 한꺼번에
 ```
 
 :::
@@ -33,10 +33,10 @@ sentenceLengthRange(); // LengthRange(4, 102) — 모든 언어를 한꺼번에
 ```python
 from randino import sentence_length_range
 
-sentence_length_range("ko")  # (6, 41)
-sentence_length_range("en")  # (13, 92)
+sentence_length_range("ko")  # (5, 43)
+sentence_length_range("en")  # (12, 92)
 sentence_length_range("zh")  # (4, 20)
-sentence_length_range()  # (4, 102) — 모든 언어를 한꺼번에
+sentence_length_range()  # (4, 105) — 모든 언어를 한꺼번에
 ```
 
 :::
