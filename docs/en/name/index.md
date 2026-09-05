@@ -46,13 +46,13 @@ rand_name(language="en", count=3)
 
 ## How the options behave
 
-The two generators share most of their options, and these are the ones whose behaviour is worth knowing before you reach for them.
+Most of `randName`'s options are the ones every generator takes. These are the ones whose behaviour is worth knowing before you reach for them.
 
 ### `realism` — real names, or invented ones
 
-At `0` — the default — every part is drawn from a curated pool of names in use, and **stays there**: when the length range leaves room for more than one given-name length, the length is chosen from the ones the pool can actually serve rather than rolled first and invented around.
+At `'real'`, the default, every part is drawn from a curated pool of names in use, and stays there: when the length range leaves room for more than one given-name length, the length is chosen from the ones the pool can actually serve rather than rolled first and invented around.
 
-Toward `100` names are invented instead: Latin and Cyrillic scripts from syllable templates, and Korean, Japanese and Chinese by combining given-name characters freely. Values in between decide **per name and per part**, so `50` mixes real and invented parts inside one batch and sometimes inside one name.
+At `'invented'` the names are built instead. Latin and Cyrillic scripts come from syllable templates, and Korean, Japanese and Chinese from given-name characters combined freely. `'mixed'` decides per name and per part, so one batch, and sometimes one name, holds both.
 
 ::: lang js
 

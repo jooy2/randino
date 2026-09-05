@@ -166,7 +166,7 @@ rand_suffix(rand_nickname(language="en", count=3))
 
 ### `realism`은 단어를 뽑는 대신 만들어냅니다 {#realism-invents-words-rather-than-drawing-them}
 
-`0`에서는 모든 단어가 실제 단어입니다. `100`에 가까워지면 해당 언어의 음절로 단어를 조립하며, 사전에 있는 단어가 아니라 지어낸 핸들처럼 읽힙니다.
+`'real'`에서는 모든 단어가 실제 단어입니다. `'invented'`는 그 언어의 음절로 단어를 조립하므로, 사전에 있는 단어가 아니라 지어낸 핸들처럼 읽힙니다.
 
 ::: lang js
 
@@ -223,4 +223,4 @@ rand_nickname(theme="finance", count=2)  # ['QuietLedger', 'RisingYield']
 
 ### `unique`, 그리고 대개는 접미사가 더 나은 이유 {#unique-and-why-a-suffix-is-usually-better}
 
-한국어와 영어는 각각 900만 가지가 넘는 단어 조합을 가지므로 중복은 어느 쪽이든 드뭅니다. `unique`는 한 번의 호출 안에서 중복을 없애고, 조합이 바닥나면 더 적은 개수를 돌려줍니다. [`randSuffix`](../decorate/rand-suffix)는 호출과 프로세스와 사용자를 가로질러 충돌을 불가능하게 만드는데, 가입 폼에 실제로 필요한 보장은 이쪽입니다.
+한국어와 영어는 각각 단어 조합이 4천만 가지가 넘으므로 중복은 어느 쪽이든 드뭅니다. `unique`는 한 번의 호출 안에서 중복을 없애고, 조합이 바닥나면 더 적은 개수를 돌려줍니다. [`randSuffix`](../decorate/rand-suffix)는 호출과 프로세스와 사용자를 가로질러 충돌을 불가능하게 만드는데, 가입 폼에 실제로 필요한 보장은 이쪽입니다.

@@ -223,4 +223,4 @@ rand_nickname(theme="finance", count=2)  # ['QuietLedger', 'RisingYield']
 
 ### `unique`, and why a suffix is usually the better answer
 
-Korean and English have over nine million word combinations each, so duplicates are rare either way. `unique` rules them out inside one call and returns fewer nicknames once the pools run out; [`randSuffix`](../decorate/rand-suffix) makes collisions impossible across calls, across processes and across users, which is the guarantee a sign-up form actually needs.
+Korean and English have over forty million word combinations each, so duplicates are rare either way. `unique` rules them out inside one call and returns fewer nicknames once the pools run out; [`randSuffix`](../decorate/rand-suffix) makes collisions impossible across calls, across processes and across users, which is the guarantee a sign-up form actually needs.
