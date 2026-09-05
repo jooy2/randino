@@ -1299,6 +1299,89 @@ void main() {
       }
     });
 
+    test('`style` is what Korean and Japanese do with politeness', () {
+      // The two languages this changes, and the seven it does not. Plain and
+      // polite are two forms of the same predicate, so a polite sentence is the
+      // plain one said to somebody rather than a different sentence.
+      final polite = <WordLanguage, RegExp>{
+        WordLanguage.ko: RegExp(r'(니다|니까)[.?!…”’]$'),
+        // A Japanese verb closes on ます and an adjective on です.
+        WordLanguage.ja: RegExp(r'(ます|です)か?[。？！…」』]$'),
+      };
+
+      for (final language in wordLanguages) {
+        final data = sentenceData[language]!;
+        final declares = <PredicateForms>[
+          for (final group in data.verbs) group.forms,
+          for (final group in data.states) group.forms,
+        ].any((forms) => forms.containsKey(PredicateForm.polite));
+
+        expect(
+          declares,
+          polite.containsKey(language),
+          reason: '$language ${declares ? 'declares' : 'declares no'} polite forms',
+        );
+
+        for (final type in <SentenceType>[SentenceType.statement, SentenceType.question]) {
+          for (final sentence in randSentence(
+            language: language,
+            type: <SentenceType>{type},
+            style: SentenceStyle.polite,
+            count: sample,
+          )) {
+            if (polite.containsKey(language)) {
+              expect(sentence, matches(polite[language]!), reason: '$language $type: $sentence');
+            }
+          }
+        }
+      }
+    });
+
+    test('a polite predicate comes out of the polite pools', () {
+      for (final language in <WordLanguage>[WordLanguage.ko, WordLanguage.ja]) {
+        final data = sentenceData[language]!;
+
+        for (final type in <SentenceType>[SentenceType.statement, SentenceType.question]) {
+          final asking = type == SentenceType.question;
+
+          List<String> asked(WordPool words, PredicateForms forms) => <String>[
+            ...(asking
+                    ? (forms[PredicateForm.politeQuestion] ?? forms[PredicateForm.polite])
+                    : forms[PredicateForm.polite]) ??
+                words,
+          ];
+
+          final pools = <SentenceSlot, Set<String>>{
+            SentenceSlot.verb: <String>{
+              for (final group in data.verbs) ...asked(group.words, group.forms),
+            },
+            SentenceSlot.state: <String>{
+              for (final group in data.states) ...asked(group.words, group.forms),
+            },
+          };
+
+          for (final detail in randSentenceDetails(
+            language: language,
+            type: <SentenceType>{type},
+            style: SentenceStyle.polite,
+            count: 120,
+          )) {
+            for (var i = 0; i < detail.phrases.length; i += 1) {
+              final slot = detail.slots[i];
+
+              if (slot != SentenceSlot.verb && slot != SentenceSlot.state) continue;
+
+              expect(
+                pools[slot]!.contains(detail.phrases[i]),
+                isTrue,
+                reason: '$language $type: "${detail.phrases[i]}" is not a polite $slot',
+              );
+            }
+          }
+        }
+      }
+    });
+
     test('the detail form reports what the sentence was built from', () {
       for (final detail in randSentenceDetails(language: WordLanguage.en, count: sample)) {
         expect(detail.sentence, isNotEmpty);

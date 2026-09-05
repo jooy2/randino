@@ -58,6 +58,7 @@ export 'src/types.dart'
         SentenceQuote,
         SentenceType,
         SentenceSlot,
+        SentenceStyle,
         WordDetail,
         WordLanguage,
         WordSlot,

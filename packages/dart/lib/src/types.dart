@@ -382,6 +382,20 @@ enum SentenceQuote {
   single,
 }
 
+/// How a sentence addresses whoever is reading it.
+///
+/// Korean and Japanese are the whole of it. Spanish, Italian, German and Russian
+/// have a T–V distinction, but it lives in the second person and every sentence
+/// here is third; English has no such form at all. In those five,
+/// [SentenceStyle.polite] writes exactly what [SentenceStyle.plain] does.
+enum SentenceStyle {
+  /// The form a written statement takes: `사자가 달린다`, `猫が走る`.
+  plain,
+
+  /// The form you would use speaking to somebody: `사자가 달립니다`, `猫が走ります`.
+  polite,
+}
+
 /// A generated sentence with the pieces it was built from.
 class SentenceDetail {
   /// Creates a detail record. Returned by the generator; there is rarely a

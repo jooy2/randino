@@ -47,6 +47,7 @@ void main() {
           'SentenceShape',
           'SentenceType',
           'SentenceSlot',
+          'SentenceStyle',
           'WordDetail',
           'WordLanguage',
           'WordSlot',

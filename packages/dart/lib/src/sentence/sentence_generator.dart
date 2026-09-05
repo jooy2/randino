@@ -64,6 +64,7 @@ class _Settings {
     required this.includeName,
     required this.types,
     required this.quote,
+    required this.style,
   });
 
   final WordTheme? theme;
@@ -97,6 +98,9 @@ class _Settings {
 
   /// Which marks a quoted line takes, or null for the type's own default.
   final SentenceQuote? quote;
+
+  /// How the sentences address their reader.
+  final SentenceStyle style;
 }
 
 // The kinds a quoted line can be. Somebody speaking is as often asking as
@@ -1094,7 +1098,7 @@ _Built _compose(
   // with the plain words, which is what lets a required word be translated rather
   // than written out in the wrong form.
   final base = stateGroup?.words ?? verbGroup!.words;
-  final predicates = _formOf(stateGroup, verbGroup, draw.mark);
+  final predicates = _formOf(stateGroup, verbGroup, draw.mark, settings.style);
   final subjectClasses = stateGroup?.subject ?? verbGroup!.subject;
   final subjectThemes = _themesForClasses(themes, subjectClasses);
   final subjectRequired = _requiredAt(frame, plan, SentenceSlot.subject);
@@ -1383,14 +1387,33 @@ _Built _compose(
   );
 }
 
-/// The predicates of a group, in the form this type of sentence ends on.
-WordPool _formOf(StateGroup? stateGroup, VerbGroup? verbGroup, SentenceType mark) {
+/// The predicates of a group, in the form this sentence ends on.
+///
+/// The chain is `politeQuestion` → `polite` → `question` → `words`, so a group
+/// declares only what its language actually writes. Japanese declares `polite`
+/// alone and it serves the question too, because the `か` that asks is the
+/// frame's tag rather than part of the verb; Korean declares both, because
+/// `달립니까` is not `달립니다`.
+WordPool _formOf(
+  StateGroup? stateGroup,
+  VerbGroup? verbGroup,
+  SentenceType mark,
+  SentenceStyle style,
+) {
   final forms = stateGroup?.forms ?? verbGroup!.forms;
   final words = stateGroup?.words ?? verbGroup!.words;
+  final asking = mark == SentenceType.question;
 
-  if (mark != SentenceType.question) return words;
+  if (style == SentenceStyle.polite) {
+    final polite =
+        asking
+            ? (forms[PredicateForm.politeQuestion] ?? forms[PredicateForm.polite])
+            : forms[PredicateForm.polite];
 
-  return forms[PredicateForm.question] ?? words;
+    if (polite != null) return polite;
+  }
+
+  return (asking ? forms[PredicateForm.question] : null) ?? words;
 }
 
 /// The word a phrase that is not a noun phrase writes: the predicate, or an
@@ -1841,6 +1864,7 @@ List<SentenceDetail> generateSentenceDetails({
   bool includeName = false,
   Set<SentenceType>? type,
   SentenceQuote? quote,
+  SentenceStyle style = SentenceStyle.plain,
 }) {
   final settings = _Settings(
     theme: theme,
@@ -1859,6 +1883,7 @@ List<SentenceDetail> generateSentenceDetails({
             ? const <SentenceType>[SentenceType.statement]
             : type.toList(growable: false),
     quote: quote,
+    style: style,
   );
 
   return collect<SentenceDetail>(

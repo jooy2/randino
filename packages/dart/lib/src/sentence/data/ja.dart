@@ -28,6 +28,12 @@ final SentenceLanguageData ja = SentenceLanguageData(
         走る 歩く 跳ぶ 泳ぐ 飛ぶ 這う 戻る 去る 止まる 休む 眠る 笑う 泣く 歌う 踊る 隠れる 待つ
         立つ 座る 転がる さまよう 通る 近づく 伸びる 聞く
       '''),
+      forms: <PredicateForm, WordPool>{
+        PredicateForm.polite: words(r'''
+          走ります 歩きます 跳びます 泳ぎます 飛びます 這います 戻ります 去ります 止まります 休みます 眠ります 笑います 泣きます 歌います 踊ります
+          隠れます 待ちます 立ちます 座ります 転がります さまよいます 通ります 近づきます 伸びます 聞きます
+        '''),
+      },
     ),
     VerbGroup(
       subject: const <NounClass>[NounClass.creature, NounClass.person],
@@ -35,6 +41,9 @@ final SentenceLanguageData ja = SentenceLanguageData(
       words: words(r'''
         食べる 飲む 噛む 味わう 焼く 温める
       '''),
+      forms: <PredicateForm, WordPool>{
+        PredicateForm.polite: words(r'食べます 飲みます 噛みます 味わいます 焼きます 温めます'),
+      },
     ),
     VerbGroup(
       subject: const <NounClass>[NounClass.creature, NounClass.person],
@@ -42,6 +51,9 @@ final SentenceLanguageData ja = SentenceLanguageData(
       words: words(r'''
         見る 探す 拾う 運ぶ 触る 守る 選ぶ 動かす 集める
       '''),
+      forms: <PredicateForm, WordPool>{
+        PredicateForm.polite: words(r'見ます 探します 拾います 運びます 触ります 守ります 選びます 動かします 集めます'),
+      },
     ),
     VerbGroup(
       subject: const <NounClass>[NounClass.person],
@@ -49,6 +61,9 @@ final SentenceLanguageData ja = SentenceLanguageData(
       words: words(r'''
         作る 直す 磨く 売る 買う 建てる
       '''),
+      forms: <PredicateForm, WordPool>{
+        PredicateForm.polite: words(r'作ります 直します 磨きます 売ります 買います 建てます'),
+      },
     ),
     VerbGroup(
       subject: const <NounClass>[NounClass.person, NounClass.creature],
@@ -56,48 +71,62 @@ final SentenceLanguageData ja = SentenceLanguageData(
       words: words(r'''
         覚える 忘れる 想像する 数える
       '''),
+      forms: <PredicateForm, WordPool>{PredicateForm.polite: words(r'覚えます 忘れます 想像します 数えます')},
     ),
     VerbGroup(
       subject: const <NounClass>[NounClass.place, NounClass.event],
       words: words(r'''
         光る 流れる 暮れる 明ける 深まる 静まる 色づく
       '''),
+      forms: <PredicateForm, WordPool>{
+        PredicateForm.polite: words(r'光ります 流れます 暮れます 明けます 深まります 静まります 色づきます'),
+      },
     ),
     VerbGroup(
       subject: const <NounClass>[NounClass.thing, NounClass.vehicle],
       words: words(r'''
         揺れる 輝く 落ちる 転がる 傾く 古びる
       '''),
+      forms: <PredicateForm, WordPool>{
+        PredicateForm.polite: words(r'揺れます 輝きます 落ちます 転がります 傾きます 古びます'),
+      },
     ),
     VerbGroup(
       subject: const <NounClass>[NounClass.vehicle],
       words: words(r'''
         走る 止まる 通る 戻る 出発する 滑る
       '''),
+      forms: <PredicateForm, WordPool>{
+        PredicateForm.polite: words(r'走ります 止まります 通ります 戻ります 出発します 滑ります'),
+      },
     ),
     VerbGroup(
       subject: const <NounClass>[NounClass.idea, NounClass.event],
       words: words(r'''
         広がる 消える 残る 漂う 深まる
       '''),
+      forms: <PredicateForm, WordPool>{PredicateForm.polite: words(r'広がります 消えます 残ります 漂います 深まります')},
     ),
     VerbGroup(
       subject: const <NounClass>[NounClass.plant],
       words: words(r'''
         育つ 枯れる 咲く 揺れる 伸びる
       '''),
+      forms: <PredicateForm, WordPool>{PredicateForm.polite: words(r'育ちます 枯れます 咲きます 揺れます 伸びます')},
     ),
     VerbGroup(
       subject: const <NounClass>[NounClass.body],
       words: words(r'''
         震える 動く 痺れる 固まる
       '''),
+      forms: <PredicateForm, WordPool>{PredicateForm.polite: words(r'震えます 動きます 痺れます 固まります')},
     ),
     VerbGroup(
       subject: const <NounClass>[NounClass.edible],
       words: words(r'''
         熟れる 冷める 煮える 溶ける 傷む
       '''),
+      forms: <PredicateForm, WordPool>{PredicateForm.polite: words(r'熟れます 冷めます 煮えます 溶けます 傷みます')},
     ),
   ],
   // Plain predicate forms, so a na-adjective closes on だ where an i-adjective
@@ -109,6 +138,11 @@ final SentenceLanguageData ja = SentenceLanguageData(
       words: words(r'''
         大きい 小さい 速い 遅い 静かだ うるさい 勇敢だ 元気だ 眠い 賢い 優しい 荒々しい
       '''),
+      forms: <PredicateForm, WordPool>{
+        PredicateForm.polite: words(
+          r'大きいです 小さいです 速いです 遅いです 静かです うるさいです 勇敢です 元気です 眠いです 賢いです 優しいです 荒々しいです',
+        ),
+      },
     ),
     StateGroup(
       subject: const <NounClass>[
@@ -126,42 +160,57 @@ final SentenceLanguageData ja = SentenceLanguageData(
       words: words(r'''
         美しい 珍しい 新しい 見慣れない
       '''),
+      forms: <PredicateForm, WordPool>{PredicateForm.polite: words(r'美しいです 珍しいです 新しいです 見慣れないです')},
     ),
     StateGroup(
       subject: const <NounClass>[NounClass.place, NounClass.event],
       words: words(r'''
         広い 狭い 静かだ 深い 暗い 明るい 遠い 険しい
       '''),
+      forms: <PredicateForm, WordPool>{
+        PredicateForm.polite: words(r'広いです 狭いです 静かです 深いです 暗いです 明るいです 遠いです 険しいです'),
+      },
     ),
     StateGroup(
       subject: const <NounClass>[NounClass.thing, NounClass.vehicle],
       words: words(r'''
         硬い 軽い 重い 古い 滑らかだ 透明だ 丈夫だ
       '''),
+      forms: <PredicateForm, WordPool>{
+        PredicateForm.polite: words(r'硬いです 軽いです 重いです 古いです 滑らかです 透明です 丈夫です'),
+      },
     ),
     StateGroup(
       subject: const <NounClass>[NounClass.edible],
       words: words(r'''
         甘い しょっぱい 辛い 酸っぱい 熱い 冷たい 香ばしい
       '''),
+      forms: <PredicateForm, WordPool>{
+        PredicateForm.polite: words(r'甘いです しょっぱいです 辛いです 酸っぱいです 熱いです 冷たいです 香ばしいです'),
+      },
     ),
     StateGroup(
       subject: const <NounClass>[NounClass.idea],
       words: words(r'''
         難しい 易しい 明らかだ 曖昧だ 永遠だ はかない
       '''),
+      forms: <PredicateForm, WordPool>{
+        PredicateForm.polite: words(r'難しいです 易しいです 明らかです 曖昧です 永遠です はかないです'),
+      },
     ),
     StateGroup(
       subject: const <NounClass>[NounClass.plant],
       words: words(r'''
         青い 香しい 瑞々しい
       '''),
+      forms: <PredicateForm, WordPool>{PredicateForm.polite: words(r'青いです 香しいです 瑞々しいです')},
     ),
     StateGroup(
       subject: const <NounClass>[NounClass.body],
       words: words(r'''
         温かい 冷たい 痛い 硬い
       '''),
+      forms: <PredicateForm, WordPool>{PredicateForm.polite: words(r'温かいです 冷たいです 痛いです 硬いです')},
     ),
   ],
   manners: words(r'''
