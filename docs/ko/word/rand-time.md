@@ -24,7 +24,7 @@ import 'package:randino/randino.dart';
 randTime(language: WordLanguage.en, count: 3); // [Twilight, Solstice, Eternity]
 ```
 
-`List<String>`을 돌려줍니다. 상세 형태가 필요하면 `randWordDetails`에 `WordTheme.time`을 넘기십시오. Dart에는 오버로드가 없고, 이것만을 위해 함수를 스물네 개 더 두는 것은 스물네 개가 많습니다.
+`List<String>`을 돌려줍니다. 상세 출력이 필요하면 `randWordDetails`에 `WordTheme.time`을 넘기세요. Dart에는 오버로드가 없어서, 이것만을 위해 함수를 스물다섯 개 더 두는 것은 과합니다.
 
 :::
 

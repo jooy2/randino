@@ -24,7 +24,7 @@ import 'package:randino/randino.dart';
 randWeather(language: WordLanguage.en, count: 3); // [Drizzle, Rainbow, Hoarfrost]
 ```
 
-Returns `List<String>`. For the detail form, pass `WordTheme.weather` to `randWordDetails` — Dart has no overloads, and twenty-four more functions for it would be twenty-four too many.
+Returns `List<String>`. For the detail form, pass `WordTheme.weather` to `randWordDetails` — Dart has no overloads, and twenty-five more functions for it would be twenty-five too many.
 
 :::
 

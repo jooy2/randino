@@ -16,7 +16,7 @@ Each theme is also a generator of its own. `randWord` takes the theme as an opti
 | `job` | [`randJob`](./rand-job) | the trades and roles people hold | 대장장이, 항해사 | Blacksmith, Archer |
 | `music` | [`randMusic`](./rand-music) | instruments, forms and terms | 교향곡, 거문고 | Cello, Sonata |
 | `place` | [`randPlace`](./rand-place) | places you can walk into or up to | 광장, 골목 | Lighthouse, Plaza |
-| `food` | [`randFood`](./rand-food) | food and drink | 떡볶이, 녹차 | Dumpling, Cocoa |
+| `food` | [`randFood`](./rand-food) | things to eat | 떡볶이, 김밥 | Dumpling, Pancake |
 | `sport` | [`randSport`](./rand-sport) | sports, and what they are played for | 양궁, 트로피 | Archery, Trophy |
 | `vehicle` | [`randVehicle`](./rand-vehicle) | things that carry you | 열기구, 전차 | Airship, Tramcar |
 | `product` | [`randProduct`](./rand-product) | things you buy | 이어폰, 냉장고 | Earbuds, Toaster |
@@ -39,7 +39,9 @@ import { WORD_THEMES, randFood, randWord } from 'randino';
 
 WORD_THEMES;
 // ['animal', 'object', 'nature', 'plant', 'gem', 'concept', 'myth', 'job',
-//  'music', 'place', 'food', 'sport', 'vehicle', 'product']
+//  'music', 'place', 'food', 'sport', 'vehicle', 'product', 'color', 'finance',
+//  'tech', 'weather', 'space', 'time', 'emotion', 'body', 'clothing', 'tool',
+//  'drink']
 
 randWord({ theme: 'food', language: 'en', count: 3 });
 // ['Dumpling', 'Cocoa', 'Pancake']
@@ -71,7 +73,9 @@ from randino import WORD_THEMES, rand_food, rand_word
 
 WORD_THEMES
 # ('animal', 'object', 'nature', 'plant', 'gem', 'concept', 'myth', 'job',
-#  'music', 'place', 'food', 'sport', 'vehicle', 'product')
+#  'music', 'place', 'food', 'sport', 'vehicle', 'product', 'color', 'finance',
+#  'tech', 'weather', 'space', 'time', 'emotion', 'body', 'clothing', 'tool',
+#  'drink')
 
 rand_word(theme="food", language="en", count=3)
 # ['Dumpling', 'Cocoa', 'Pancake']
@@ -91,7 +95,7 @@ Leave the theme out and each result draws from one theme picked at random, so a 
 
 **No person names, and no word that is only a name.** For English this is enforced against the person-name pools automatically, which is why `job` has no `Knight`, `Baker` or `Hunter` and `plant` no `Rose` or `Ivy`. Korean and Japanese cannot be held to the same check — 하늘, 별 and 森 are everyday nouns that happen also to be names — but a modifier in front of one is still nobody's name.
 
-**Pool sizes are uneven on purpose.** Most themes hold sixty or more nouns per language; `gem`, `sport`, `vehicle` and `product` hold roughly 55, 46, 43 and 36. The world simply has fewer of those, and padding a pool with near-synonyms reads worse than a shorter pool.
+**Pool sizes are uneven on purpose.** Most themes hold sixty or more nouns per language, and the thinnest sit in the forties. Some of these slices of vocabulary hold fewer words to begin with, and padding a pool with near-synonyms reads worse than a shorter pool.
 
 ## Where a theme comes from
 

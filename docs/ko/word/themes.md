@@ -16,7 +16,7 @@
 | `job` | [`randJob`](./rand-job) | 직업과 역할 | 대장장이, 항해사 | Blacksmith, Archer |
 | `music` | [`randMusic`](./rand-music) | 악기, 형식, 용어 | 교향곡, 거문고 | Cello, Sonata |
 | `place` | [`randPlace`](./rand-place) | 걸어 들어가거나 올라갈 수 있는 곳 | 광장, 골목 | Lighthouse, Plaza |
-| `food` | [`randFood`](./rand-food) | 음식과 음료 | 떡볶이, 녹차 | Dumpling, Cocoa |
+| `food` | [`randFood`](./rand-food) | 먹는 것 | 떡볶이, 김밥 | Dumpling, Pancake |
 | `sport` | [`randSport`](./rand-sport) | 스포츠와 그 목표물 | 양궁, 트로피 | Archery, Trophy |
 | `vehicle` | [`randVehicle`](./rand-vehicle) | 사람을 실어 나르는 것 | 열기구, 전차 | Airship, Tramcar |
 | `product` | [`randProduct`](./rand-product) | 사서 쓰는 물건 | 이어폰, 냉장고 | Earbuds, Toaster |
@@ -39,7 +39,9 @@ import { WORD_THEMES, randFood, randWord } from 'randino';
 
 WORD_THEMES;
 // ['animal', 'object', 'nature', 'plant', 'gem', 'concept', 'myth', 'job',
-//  'music', 'place', 'food', 'sport', 'vehicle', 'product']
+//  'music', 'place', 'food', 'sport', 'vehicle', 'product', 'color', 'finance',
+//  'tech', 'weather', 'space', 'time', 'emotion', 'body', 'clothing', 'tool',
+//  'drink']
 
 randWord({ theme: 'food', language: 'en', count: 3 });
 // ['Dumpling', 'Cocoa', 'Pancake']
@@ -71,7 +73,9 @@ from randino import WORD_THEMES, rand_food, rand_word
 
 WORD_THEMES
 # ('animal', 'object', 'nature', 'plant', 'gem', 'concept', 'myth', 'job',
-#  'music', 'place', 'food', 'sport', 'vehicle', 'product')
+#  'music', 'place', 'food', 'sport', 'vehicle', 'product', 'color', 'finance',
+#  'tech', 'weather', 'space', 'time', 'emotion', 'body', 'clothing', 'tool',
+#  'drink')
 
 rand_word(theme="food", language="en", count=3)
 # ['Dumpling', 'Cocoa', 'Pancake']
@@ -91,7 +95,7 @@ rand_food(language="en", count=3)  # 같은 결과
 
 **사람 이름은 쓰지 않고, 이름으로만 쓰이는 단어도 쓰지 않습니다.** 영어는 사람 이름 풀과 자동으로 대조하므로 `job`에 `Knight`, `Baker`, `Hunter`가 없고 `plant`에 `Rose`나 `Ivy`가 없습니다. 한국어와 일본어는 같은 검사를 적용할 수 없습니다. 하늘, 별, 森은 이름으로도 쓰이는 일상 명사이기 때문입니다. 그래도 그 앞에 수식어가 붙으면 누구의 이름도 아닙니다.
 
-**풀 크기가 고르지 않은 것은 의도된 것입니다.** 대부분의 테마는 언어마다 60개 이상의 명사를 담고 있지만, `gem`, `sport`, `vehicle`, `product`는 각각 약 55, 46, 43, 36개입니다. 세상에 그만큼밖에 없고, 비슷한 말로 풀을 부풀리면 짧은 풀보다 나쁘게 읽힙니다.
+**풀 크기가 고르지 않은 것은 의도된 것입니다.** 테마 대부분은 언어마다 명사를 60개 이상 담고 있고, 가장 얇은 테마도 40개대입니다. 어휘 자체가 그만큼밖에 없는 갈래가 있고, 비슷한 말로 풀을 부풀리면 짧은 풀보다 나쁘게 읽힙니다.
 
 ## 테마는 어디서 오는가
 

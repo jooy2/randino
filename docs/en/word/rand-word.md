@@ -51,7 +51,7 @@ Dart has no `output`; [the detail output](#the-detail-output) is `randWordDetail
 
 A theme is not only an option — each of the twenty-five is a function of its own, which is `randWord` with the theme already chosen. Each has a page of its own; the words each theme holds are on [Themes](./themes).
 
-[`randAnimal`](./rand-animal) · [`randObject`](./rand-object) · [`randNature`](./rand-nature) · [`randPlant`](./rand-plant) · [`randGem`](./rand-gem) · [`randConcept`](./rand-concept) · [`randMyth`](./rand-myth) · [`randJob`](./rand-job) · [`randMusic`](./rand-music) · [`randPlace`](./rand-place) · [`randFood`](./rand-food) · [`randSport`](./rand-sport) · [`randVehicle`](./rand-vehicle) · [`randProduct`](./rand-product)
+[`randAnimal`](./rand-animal) · [`randObject`](./rand-object) · [`randNature`](./rand-nature) · [`randPlant`](./rand-plant) · [`randGem`](./rand-gem) · [`randConcept`](./rand-concept) · [`randMyth`](./rand-myth) · [`randJob`](./rand-job) · [`randMusic`](./rand-music) · [`randPlace`](./rand-place) · [`randFood`](./rand-food) · [`randSport`](./rand-sport) · [`randVehicle`](./rand-vehicle) · [`randProduct`](./rand-product) · [`randColor`](./rand-color) · [`randFinance`](./rand-finance) · [`randTech`](./rand-tech) · [`randWeather`](./rand-weather) · [`randSpace`](./rand-space) · [`randTime`](./rand-time) · [`randEmotion`](./rand-emotion) · [`randBody`](./rand-body) · [`randClothing`](./rand-clothing) · [`randTool`](./rand-tool) · [`randDrink`](./rand-drink)
 
 ::: lang js
 
@@ -75,7 +75,7 @@ randFood(language: WordLanguage.en, count: 2); // [Dumpling, Cocoa]
 randGem(language: WordLanguage.en, count: 2, unique: true); // [Obsidian, Bronze]
 ```
 
-The themed functions return `List<String>` only. For the detail form, pass the theme to `randWordDetails` — Dart has no overloads, and twenty-four more functions for it would be twenty-four too many.
+The themed functions return `List<String>` only. For the detail form, pass the theme to `randWordDetails` — Dart has no overloads, and twenty-five more functions for it would be twenty-five too many.
 
 :::
 

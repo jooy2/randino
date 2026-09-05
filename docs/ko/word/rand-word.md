@@ -51,7 +51,7 @@ Dart에는 `output`이 없습니다. 거기서는 [상세 출력](#the-detail-ou
 
 테마는 옵션이기만 한 것이 아닙니다. 25개 각각이 그 자체로 함수이며, 테마를 미리 정해 둔 `randWord`입니다. 각각 문서 페이지가 하나씩 있고, 각 테마가 담고 있는 단어는 [테마](./themes)에 있습니다.
 
-[`randAnimal`](./rand-animal) · [`randObject`](./rand-object) · [`randNature`](./rand-nature) · [`randPlant`](./rand-plant) · [`randGem`](./rand-gem) · [`randConcept`](./rand-concept) · [`randMyth`](./rand-myth) · [`randJob`](./rand-job) · [`randMusic`](./rand-music) · [`randPlace`](./rand-place) · [`randFood`](./rand-food) · [`randSport`](./rand-sport) · [`randVehicle`](./rand-vehicle) · [`randProduct`](./rand-product)
+[`randAnimal`](./rand-animal) · [`randObject`](./rand-object) · [`randNature`](./rand-nature) · [`randPlant`](./rand-plant) · [`randGem`](./rand-gem) · [`randConcept`](./rand-concept) · [`randMyth`](./rand-myth) · [`randJob`](./rand-job) · [`randMusic`](./rand-music) · [`randPlace`](./rand-place) · [`randFood`](./rand-food) · [`randSport`](./rand-sport) · [`randVehicle`](./rand-vehicle) · [`randProduct`](./rand-product) · [`randColor`](./rand-color) · [`randFinance`](./rand-finance) · [`randTech`](./rand-tech) · [`randWeather`](./rand-weather) · [`randSpace`](./rand-space) · [`randTime`](./rand-time) · [`randEmotion`](./rand-emotion) · [`randBody`](./rand-body) · [`randClothing`](./rand-clothing) · [`randTool`](./rand-tool) · [`randDrink`](./rand-drink)
 
 ::: lang js
 
@@ -75,7 +75,7 @@ randFood(language: WordLanguage.en, count: 2); // [Dumpling, Cocoa]
 randGem(language: WordLanguage.en, count: 2, unique: true); // [Obsidian, Bronze]
 ```
 
-테마 함수는 `List<String>`만 돌려줍니다. 상세 출력이 필요하면 `randWordDetails`에 테마를 넘기세요. Dart에는 오버로드가 없고, 그것만을 위해 함수를 24개 더 두는 것은 지나칩니다.
+테마 함수는 `List<String>`만 돌려줍니다. 상세 출력이 필요하면 `randWordDetails`에 테마를 넘기세요. Dart에는 오버로드가 없어서, 이것만을 위해 함수를 스물다섯 개 더 두는 것은 과합니다.
 
 :::
 
