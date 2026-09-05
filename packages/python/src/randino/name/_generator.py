@@ -7,8 +7,9 @@ Internal — `rand_name` is the public entry point, in both of its output forms.
 - Toward the abstract end they are invented instead — Latin and Cyrillic scripts
   from syllable templates, CJK by combining given-name syllables.
 - The structure the caller asked for (surname, middle name, starting letter) is
-  always honoured. The length range is satisfied by re-drawing from the pools, and
-  only padded with extra middle names when no draw can reach the minimum.
+  always honoured. The length range is satisfied by re-drawing from the pools; a
+  range no draw landed in is answered by drawing each part from the lengths that
+  can still reach it, and only then padded with extra middle names.
 - Every name is produced in both scripts, native and romanized.
 """
 
@@ -113,6 +114,61 @@ def starting_with(pool: NamePool, prefix: str) -> NamePool:
     lower = prefix.lower()
 
     return tuple(item for item in pool if native_of(item).lower().startswith(lower))
+
+
+def span_of(pool: NamePool) -> tuple[int, int]:
+    """The shortest and longest item a pool holds, in characters of the native form."""
+    lengths = [len(native_of(item)) for item in pool]
+
+    return min(lengths), max(lengths)
+
+
+def miss_by(length: int, low: int, high: int) -> float:
+    """How far a length falls outside the range.
+
+    A score to rank names by rather than a character count: overshooting scores half
+    a character more than falling short by the same amount, because `max_length` is
+    the bound a caller is usually holding to — a field limit, a column width — where
+    `min_length` only shapes how a name reads.
+    """
+    if length < low:
+        return low - length
+
+    if length > high:
+        return length - high + 0.5
+
+    return 0
+
+
+def lengths_between(pool: NamePool, low: int, high: int) -> NamePool:
+    """Pool items between `low` and `high` characters long.
+
+    Falls back to the items closest to that window when the pool holds none inside
+    it.
+    """
+    inside = tuple(item for item in pool if miss_by(len(native_of(item)), low, high) == 0)
+
+    if inside:
+        return inside
+
+    closest = min(miss_by(len(native_of(item)), low, high) for item in pool)
+
+    return tuple(item for item in pool if miss_by(len(native_of(item)), low, high) == closest)
+
+
+def fitted(
+    pool: NamePool, fit: tuple[int, int] | None, spent: int, rest: tuple[int, int]
+) -> NamePool:
+    """A pool narrowed to the lengths one part may take.
+
+    `spent` is what the name already costs, and `rest` the shortest and longest the
+    parts behind it can still total. A `fit` of None hands the pool straight back,
+    which is what every draw outside the length fitting passes.
+    """
+    if fit is None:
+        return pool
+
+    return lengths_between(pool, fit[0] - spent - rest[1], fit[1] - spent - rest[0])
 
 
 def pick_pooled(pool: NamePool, data: NameLanguageData, part: NamePart) -> str | NameToken:
@@ -397,31 +453,73 @@ def feminize_ru(surname: str) -> str:
     return surname
 
 
-def draw_parts(data: NameLanguageData, settings: Settings, is_male: bool) -> Parts:
-    """Draw one structurally complete space-separated name, ignoring the length range."""
+def draw_parts(
+    data: NameLanguageData,
+    settings: Settings,
+    is_male: bool,
+    fit: tuple[int, int] | None = None,
+) -> Parts:
+    """Draw one structurally complete space-separated name.
+
+    `fit` is the length range the whole name has to land in, and it is None for
+    every draw the length fitting makes on its own: an even draw over the pools is
+    what keeps each part's length distribution the language's own, and re-drawing is
+    how a range is normally met. A range here is the last resort, and it is spent
+    from left to right — each part is drawn from the lengths that still leave the
+    parts behind it able to reach it. Nothing is invented under one, because a
+    syllable template cannot be asked to come out a given length.
+    """
     given_pool = data.male if is_male else data.female
     assert given_pool is not None
+    middle_pool = (
+        (data.middle_male if is_male else data.middle_female) or given_pool
+        if settings.include_middle_name and data.has_middle
+        else None
+    )
     leads_with_surname = surname_leads(data, settings.include_surname)
     given_prefix = "" if leads_with_surname else settings.prefix
+    invent = settings.invent if fit is None else 0
+    # Only a fitted draw measures the pools. They run to a few hundred entries, and
+    # every attempt of a normal draw would pay for the scan.
+    gaps = (
+        0
+        if fit is None
+        else (len(data.joiner) if settings.include_surname else 0)
+        + (len(data.joiner) if middle_pool is not None else 0)
+    )
+    last_span = span_of(data.last) if fit is not None and settings.include_surname else (0, 0)
+    middle_span = span_of(middle_pool) if fit is not None and middle_pool is not None else (0, 0)
+    # Feminizing a Russian surname can add a character (Иванов -> Иванова), which is
+    # a character the range has to account for before any pool is narrowed.
+    inflates = 1 if settings.include_surname and data.roman == "translit" and not is_male else 0
 
-    if data.syn is not None and chance(settings.invent):
+    if data.syn is not None and chance(invent):
         given = synth_entry(data, given_prefix)
-    elif given_prefix:
-        given = lead_entry(data, given_pool, "given", given_prefix)
     else:
-        given = pick_entry(given_pool, data, "given")
+        pool = fitted(
+            given_pool,
+            fit,
+            gaps + inflates,
+            (last_span[0] + middle_span[0], last_span[1] + middle_span[1]),
+        )
+        given = (
+            lead_entry(data, pool, "given", given_prefix)
+            if given_prefix
+            else pick_entry(pool, data, "given")
+        )
 
     surname: Entry | None = None
 
     if settings.include_surname:
         surname_prefix = settings.prefix if leads_with_surname else ""
+        pool = fitted(data.last, fit, gaps + len(given.n) + inflates, middle_span)
 
-        if data.syn is not None and chance(settings.invent):
+        if data.syn is not None and chance(invent):
             surname = synth_entry(data, surname_prefix)
         elif surname_prefix:
-            surname = lead_entry(data, data.last, "surname", surname_prefix)
+            surname = lead_entry(data, pool, "surname", surname_prefix)
         else:
-            native = native_of(pick_pooled(data.last, data, "surname"))
+            native = native_of(pick_pooled(pool, data, "surname"))
 
             if data.roman == "translit" and not is_male:
                 native = feminize_ru(native)
@@ -430,16 +528,17 @@ def draw_parts(data: NameLanguageData, settings: Settings, is_male: bool) -> Par
 
     middles: list[Entry] = []
 
-    if settings.include_middle_name and data.has_middle:
-        middle_pool = (data.middle_male if is_male else data.middle_female) or given_pool
+    if middle_pool is not None:
+        spent = gaps + len(given.n) + (len(surname.n) if surname is not None else 0)
+        pool = fitted(middle_pool, fit, spent, (0, 0))
         # Languages without a dedicated middle-name pool reuse given names, so
         # re-draw rather than hand out "Levi Levi Cole".
-        middle = pick_entry(middle_pool, data, "given")
+        middle = pick_entry(pool, data, "given")
 
         for _tries in range(4):
             if middle.n != given.n:
                 break
-            middle = pick_entry(middle_pool, data, "given")
+            middle = pick_entry(pool, data, "given")
 
         middles.append(middle)
 
@@ -466,7 +565,7 @@ def generate_spaced(
         if min_length <= length <= max_length:
             return assemble(data, parts)
 
-        distance = min_length - length if length < min_length else length - max_length
+        distance = miss_by(length, min_length, max_length)
 
         if distance < best_distance:
             best_distance = distance
@@ -474,10 +573,18 @@ def generate_spaced(
 
     assert best is not None
     parts = best
+    # Every attempt missed. An even draw will not turn up `Ann Cox` or `Maximilian`
+    # by chance when most of the pool is the wrong length, so draw each part from the
+    # lengths that can still land inside the range — and keep that draw only if it
+    # came closer than the twelve honest ones did.
+    aimed = draw_parts(data, settings, is_male, (min_length, max_length))
+
+    if miss_by(len(assemble(data, aimed).n), min_length, max_length) < best_distance:
+        parts = aimed
+
     # Still short of the minimum: pad with extra given names, English-style.
     given_pool = data.male if is_male else data.female
     assert given_pool is not None
-    required = len(parts.middles)
     used = {parts.given.n, *(entry.n for entry in parts.middles)}
 
     for _guard in range(16):
@@ -490,19 +597,18 @@ def generate_spaced(
         # in the name already — "Paul Paul Vincent Edwards" reads as a mistake.
         room = max_length - length - len(data.joiner)
         fits = tuple(item for item in given_pool if len(native_of(item)) <= room)
+
+        if not fits:
+            # Nothing in the pool is short enough to add. Stop here: a name left a few
+            # characters short of the minimum is closer to what was asked for than one
+            # carrying a whole extra part past the maximum.
+            break
+
         fresh = tuple(item for item in fits if native_of(item) not in used)
-        pad = pick_entry(fresh or fits or given_pool, data, "given")
+        pad = pick_entry(fresh or fits, data, "given")
 
         used.add(pad.n)
         parts.middles.append(pad)
-
-    # Padding can overshoot; drop pads back off, never the requested middle name.
-    while len(assemble(data, parts).n) > max_length and len(parts.middles) > required:
-        popped = parts.middles.pop()
-
-        if len(assemble(data, parts).n) < min_length:
-            parts.middles.append(popped)
-            break
 
     return assemble(data, parts)
 

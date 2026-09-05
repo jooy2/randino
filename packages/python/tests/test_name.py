@@ -218,6 +218,75 @@ def test_names_stay_inside_the_requested_length_range() -> None:
             assert low <= len(name) <= high, f"{language} {low}-{high}: {name} ({len(name)})"
 
 
+def test_a_maximum_the_pools_can_meet_is_never_overshot() -> None:
+    # A range no draw landed inside used to be answered by padding the name with a
+    # whole extra given name, so an exact ten characters came back as
+    # `Rosemarie Gabriele`.
+    ranges: list[tuple[NameLanguage, bool, int, int]] = [
+        ("en", True, 7, 10),
+        ("de", True, 8, 11),
+        ("it", True, 8, 11),
+        ("es", True, 7, 10),
+        ("ru", True, 8, 11),
+        ("vi", True, 4, 6),
+        ("de", False, 10, 10),
+        ("en", False, 8, 8),
+        ("it", False, 10, 10),
+    ]
+
+    for realism in ("real", "mixed", "invented"):
+        for language, include_surname, low, high in ranges:
+            for name in rand_name(
+                language=language,
+                include_surname=include_surname,
+                realism=realism,
+                min_length=low,
+                max_length=high,
+                count=SAMPLE,
+            ):
+                assert len(name) <= high, f"{language} {realism} {low}-{high}: {name}"
+
+    # A minimum no single given name can reach is where the padding used to fire.
+    # Drawn names only: a syllable template can spell a longer word than any pool
+    # holds, and one character over is then genuinely the closest the generator can
+    # come.
+    beyond: list[tuple[NameLanguage, int]] = [("en", 12), ("de", 12), ("it", 12), ("ru", 14)]
+
+    for language, length in beyond:
+        for name in rand_name(
+            language=language,
+            include_surname=False,
+            min_length=length,
+            max_length=length,
+            count=SAMPLE,
+        ):
+            assert len(name) <= length, f"{language} {length}: {name}"
+
+
+def test_an_exact_length_the_pools_hold_is_drawn_not_approached() -> None:
+    # Twelve even draws will not turn up the one ten-character German given name by
+    # chance. When they miss, each part is drawn from the lengths that can still land
+    # inside the range instead.
+    exact: list[tuple[NameLanguage, int]] = [
+        ("de", 10),
+        ("en", 8),
+        ("it", 9),
+        ("es", 9),
+        ("ru", 10),
+        ("vi", 5),
+    ]
+
+    for language, length in exact:
+        for name in rand_name(
+            language=language,
+            include_surname=False,
+            min_length=length,
+            max_length=length,
+            count=SAMPLE,
+        ):
+            assert len(name) == length, f"{language}: {name}"
+
+
 def test_omitted_length_bounds_fall_back_to_the_language_default() -> None:
     assert name_length_range("ko") == (3, 3)
     assert name_length_range("ko", False) == (2, 2)

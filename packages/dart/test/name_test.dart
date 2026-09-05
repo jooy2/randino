@@ -243,6 +243,91 @@ void main() {
       }
     });
 
+    test('a maximum the pools can meet is never overshot', () {
+      // A range no draw landed inside used to be answered by padding the name
+      // with a whole extra given name, so an exact ten characters came back as
+      // `Rosemarie Gabriele`.
+      const ranges = <(NameLanguage, bool, int, int)>[
+        (NameLanguage.en, true, 7, 10),
+        (NameLanguage.de, true, 8, 11),
+        (NameLanguage.it, true, 8, 11),
+        (NameLanguage.es, true, 7, 10),
+        (NameLanguage.ru, true, 8, 11),
+        (NameLanguage.vi, true, 4, 6),
+        (NameLanguage.de, false, 10, 10),
+        (NameLanguage.en, false, 8, 8),
+        (NameLanguage.it, false, 10, 10),
+      ];
+
+      for (final realism in RandRealism.values) {
+        for (final (language, includeSurname, minLength, maxLength) in ranges) {
+          for (final name in randName(
+            language: language,
+            includeSurname: includeSurname,
+            realism: realism,
+            minLength: minLength,
+            maxLength: maxLength,
+            count: sample,
+          )) {
+            expect(
+              name.length,
+              lessThanOrEqualTo(maxLength),
+              reason: '${language.name} ${realism.name} $minLength-$maxLength: $name',
+            );
+          }
+        }
+      }
+
+      // A minimum no single given name can reach is where the padding used to
+      // fire. Drawn names only: a syllable template can spell a longer word than
+      // any pool holds, and one character over is then genuinely the closest the
+      // generator can come.
+      const beyond = <(NameLanguage, int)>[
+        (NameLanguage.en, 12),
+        (NameLanguage.de, 12),
+        (NameLanguage.it, 12),
+        (NameLanguage.ru, 14),
+      ];
+
+      for (final (language, length) in beyond) {
+        for (final name in randName(
+          language: language,
+          includeSurname: false,
+          minLength: length,
+          maxLength: length,
+          count: sample,
+        )) {
+          expect(name.length, lessThanOrEqualTo(length), reason: '${language.name} $length: $name');
+        }
+      }
+    });
+
+    test('an exact length the pools hold is drawn, not approached', () {
+      // Twelve even draws will not turn up the one ten-character German given
+      // name by chance. When they miss, each part is drawn from the lengths that
+      // can still land inside the range instead.
+      const exact = <(NameLanguage, int)>[
+        (NameLanguage.de, 10),
+        (NameLanguage.en, 8),
+        (NameLanguage.it, 9),
+        (NameLanguage.es, 9),
+        (NameLanguage.ru, 10),
+        (NameLanguage.vi, 5),
+      ];
+
+      for (final (language, length) in exact) {
+        for (final name in randName(
+          language: language,
+          includeSurname: false,
+          minLength: length,
+          maxLength: length,
+          count: sample,
+        )) {
+          expect(name.length, length, reason: '${language.name}: $name');
+        }
+      }
+    });
+
     test('omitted length bounds fall back to the language default', () {
       expect(nameLengthRange(language: NameLanguage.ko), const LengthRange(3, 3));
       expect(

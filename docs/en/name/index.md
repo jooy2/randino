@@ -91,7 +91,7 @@ The other six languages have a long enough tail that an even draw is already wit
 
 <Lang js="minLength" dart="minLength" py="min_length" code /> and <Lang js="maxLength" dart="maxLength" py="max_length" code /> count **characters of the native form, spaces between parts included**. The structure you asked for always wins: a range too narrow for the requested parts is answered with the closest name the generator can build, never by dropping a surname or middle name you asked for.
 
-For space-separated languages the range is satisfied by re-drawing from the pools, so a very narrow range is best-effort. Korean, Japanese and Chinese hit it exactly, because their given names are composed a syllable at a time.
+For space-separated languages the range is satisfied by re-drawing from the pools, and a range no draw landed inside is answered by drawing each part from the lengths that still can. So a maximum the pools can write a name inside is met; one they cannot reach at all is answered with a name short of the minimum rather than past the maximum. Korean, Japanese and Chinese hit the range exactly, because their given names are composed a syllable at a time.
 
 Leave both out and each language falls back to its own range, which is what <Lang js="nameLengthRange" dart="nameLengthRange" py="name_length_range" code /> reports — and that fallback is resolved **per language**, so mixing languages does not stretch a Korean name to fill a Spanish name's range.
 

@@ -6,8 +6,9 @@
 // - At `RandRealism.invented` they are built instead — Latin and Cyrillic
 //   scripts from syllable templates, CJK by combining given-name syllables.
 // - The structure the caller asked for (surname, middle name, starting letter) is
-//   always honoured. The length range is satisfied by re-drawing from the pools,
-//   and only padded with extra middle names when no draw can reach the minimum.
+//   always honoured. The length range is satisfied by re-drawing from the pools;
+//   a range no draw landed in is answered by drawing each part from the lengths
+//   that can still reach it, and only then padded with extra middle names.
 // - Every name is produced in both scripts, native and romanized.
 
 import 'package:randino/src/internal/generate.dart';
@@ -79,6 +80,79 @@ NamePool _startingWith(NamePool pool, String prefix) {
   final lower = prefix.toLowerCase();
 
   return pool.where((item) => item.n.toLowerCase().startsWith(lower)).toList(growable: false);
+}
+
+/// The shortest and longest item a pool holds, in characters of the native form.
+LengthRange _spanOf(NamePool pool) {
+  var low = pool.first.n.length;
+  var high = low;
+
+  for (final item in pool) {
+    final length = item.n.length;
+
+    if (length < low) {
+      low = length;
+    }
+
+    if (length > high) {
+      high = length;
+    }
+  }
+
+  return LengthRange(low, high);
+}
+
+/// How far a length falls outside the range. A score to rank names by rather than
+/// a character count: overshooting scores half a character more than falling
+/// short by the same amount, because `maxLength` is the bound a caller is usually
+/// holding to — a field limit, a column width — where `minLength` only shapes how
+/// a name reads.
+double _missBy(int length, int min, int max) {
+  if (length < min) {
+    return (min - length).toDouble();
+  }
+
+  if (length > max) {
+    return length - max + 0.5;
+  }
+
+  return 0;
+}
+
+/// Pool items between [low] and [high] characters long, or the ones closest to
+/// that window when the pool holds none inside it.
+NamePool _lengthsBetween(NamePool pool, int low, int high) {
+  final inside = pool
+      .where((item) => _missBy(item.n.length, low, high) == 0)
+      .toList(growable: false);
+
+  if (inside.isNotEmpty) {
+    return inside;
+  }
+
+  var closest = double.infinity;
+
+  for (final item in pool) {
+    final miss = _missBy(item.n.length, low, high);
+
+    if (miss < closest) {
+      closest = miss;
+    }
+  }
+
+  return pool.where((item) => _missBy(item.n.length, low, high) == closest).toList(growable: false);
+}
+
+/// A pool narrowed to the lengths one part may take: [spent] is what the name
+/// already costs, and [rest] the shortest and longest the parts behind it can
+/// still total. A null [fit] hands the pool straight back, which is what every
+/// draw outside the length fitting passes.
+NamePool _fitted(NamePool pool, LengthRange? fit, int spent, LengthRange rest) {
+  if (fit == null) {
+    return pool;
+  }
+
+  return _lengthsBetween(pool, fit.min - spent - rest.max, fit.max - spent - rest.min);
 }
 
 /// Draw one pool item. Surnames follow the language's own frequency table where
@@ -370,34 +444,69 @@ String _feminizeRu(String surname) {
   return surname;
 }
 
-/// Draw one structurally complete space-separated name, ignoring the length
-/// range.
-_Parts _drawParts(NameLanguageData data, _Settings settings, bool isMale) {
+/// Draw one structurally complete space-separated name.
+///
+/// [fit] is the length range the whole name has to land in, and it is null for
+/// every draw the length fitting makes on its own: an even draw over the pools is
+/// what keeps each part's length distribution the language's own, and re-drawing
+/// is how a range is normally met. A range here is the last resort, and it is
+/// spent from left to right — each part is drawn from the lengths that still
+/// leave the parts behind it able to reach it. Nothing is invented under one,
+/// because a syllable template cannot be asked to come out a given length.
+_Parts _drawParts(NameLanguageData data, _Settings settings, bool isMale, [LengthRange? fit]) {
   final givenPool = (isMale ? data.male : data.female)!;
+  final middlePool =
+      settings.includeMiddleName && data.hasMiddle
+          ? (isMale ? (data.middleMale ?? givenPool) : (data.middleFemale ?? givenPool))
+          : null;
   final leadsWithSurname = _surnameLeads(data, settings.includeSurname);
   final givenPrefix = leadsWithSurname ? '' : settings.prefix;
+  final invent = fit == null ? settings.invent : 0;
+  // Only a fitted draw measures the pools. They run to a few hundred entries, and
+  // every attempt of a normal draw would pay for the scan.
+  final gaps =
+      fit == null
+          ? 0
+          : (settings.includeSurname ? data.joiner.length : 0) +
+              (middlePool != null ? data.joiner.length : 0);
+  final lastSpan =
+      fit != null && settings.includeSurname ? _spanOf(data.last) : const LengthRange(0, 0);
+  final middleSpan =
+      fit != null && middlePool != null ? _spanOf(middlePool) : const LengthRange(0, 0);
+  // Feminizing a Russian surname can add a character (Иванов -> Иванова), which is
+  // a character the range has to account for before any pool is narrowed.
+  final inflates = settings.includeSurname && data.roman == RomanMode.translit && !isMale ? 1 : 0;
 
   _Entry given;
 
-  if (data.syn != null && chance(settings.invent)) {
+  if (data.syn != null && chance(invent)) {
     given = _synthEntry(data, givenPrefix);
-  } else if (givenPrefix.isNotEmpty) {
-    given = _leadEntry(data, givenPool, NamePart.given, givenPrefix);
   } else {
-    given = _pickEntry(givenPool, data, NamePart.given);
+    final pool = _fitted(
+      givenPool,
+      fit,
+      gaps + inflates,
+      LengthRange(lastSpan.min + middleSpan.min, lastSpan.max + middleSpan.max),
+    );
+
+    given =
+        givenPrefix.isNotEmpty
+            ? _leadEntry(data, pool, NamePart.given, givenPrefix)
+            : _pickEntry(pool, data, NamePart.given);
   }
 
   _Entry? surname;
 
   if (settings.includeSurname) {
     final surnamePrefix = leadsWithSurname ? settings.prefix : '';
+    final pool = _fitted(data.last, fit, gaps + given.n.length + inflates, middleSpan);
 
-    if (data.syn != null && chance(settings.invent)) {
+    if (data.syn != null && chance(invent)) {
       surname = _synthEntry(data, surnamePrefix);
     } else if (surnamePrefix.isNotEmpty) {
-      surname = _leadEntry(data, data.last, NamePart.surname, surnamePrefix);
+      surname = _leadEntry(data, pool, NamePart.surname, surnamePrefix);
     } else {
-      var native = _pickPooled(data.last, data, NamePart.surname).n;
+      var native = _pickPooled(pool, data, NamePart.surname).n;
 
       if (data.roman == RomanMode.translit && !isMale) {
         native = _feminizeRu(native);
@@ -409,14 +518,15 @@ _Parts _drawParts(NameLanguageData data, _Settings settings, bool isMale) {
 
   final middles = <_Entry>[];
 
-  if (settings.includeMiddleName && data.hasMiddle) {
-    final middlePool = isMale ? (data.middleMale ?? givenPool) : (data.middleFemale ?? givenPool);
+  if (middlePool != null) {
+    final spent = gaps + given.n.length + (surname?.n.length ?? 0);
+    final pool = _fitted(middlePool, fit, spent, const LengthRange(0, 0));
     // Languages without a dedicated middle-name pool reuse given names, so
     // re-draw rather than hand out "Levi Levi Cole".
-    var middle = _pickEntry(middlePool, data, NamePart.given);
+    var middle = _pickEntry(pool, data, NamePart.given);
 
     for (var tries = 0; tries < 4 && middle.n == given.n; tries += 1) {
-      middle = _pickEntry(middlePool, data, NamePart.given);
+      middle = _pickEntry(pool, data, NamePart.given);
     }
 
     middles.add(middle);
@@ -435,7 +545,7 @@ _Entry _generateSpaced(
   // Re-draw rather than trim: shortening a name by dropping parts would throw
   // away the surname or middle name the caller explicitly asked for.
   _Parts? best;
-  var bestDistance = 1 << 30;
+  var bestDistance = double.infinity;
 
   for (var attempt = 0; attempt < _fitAttempts; attempt += 1) {
     final parts = _drawParts(data, settings, isMale);
@@ -445,7 +555,7 @@ _Entry _generateSpaced(
       return _assemble(data, parts);
     }
 
-    final distance = length < minLength ? minLength - length : length - maxLength;
+    final distance = _missBy(length, minLength, maxLength);
 
     if (distance < bestDistance) {
       bestDistance = distance;
@@ -453,10 +563,19 @@ _Entry _generateSpaced(
     }
   }
 
-  final parts = best!;
+  var parts = best!;
+  // Every attempt missed. An even draw will not turn up `Ann Cox` or `Maximilian`
+  // by chance when most of the pool is the wrong length, so draw each part from
+  // the lengths that can still land inside the range — and keep that draw only if
+  // it came closer than the twelve honest ones did.
+  final aimed = _drawParts(data, settings, isMale, LengthRange(minLength, maxLength));
+
+  if (_missBy(_assemble(data, aimed).n.length, minLength, maxLength) < bestDistance) {
+    parts = aimed;
+  }
+
   // Still short of the minimum: pad with extra given names, English-style.
   final givenPool = (isMale ? data.male : data.female)!;
-  final required = parts.middles.length;
   final used = <String>{parts.given.n, ...parts.middles.map((entry) => entry.n)};
 
   for (var guard = 0; guard < 16; guard += 1) {
@@ -470,29 +589,19 @@ _Entry _generateSpaced(
     // not in the name already — "Paul Paul Vincent Edwards" reads as a mistake.
     final room = maxLength - length - data.joiner.length;
     final fits = givenPool.where((item) => item.n.length <= room).toList(growable: false);
+
+    if (fits.isEmpty) {
+      // Nothing in the pool is short enough to add. Stop here: a name left a few
+      // characters short of the minimum is closer to what was asked for than one
+      // carrying a whole extra part past the maximum.
+      break;
+    }
+
     final fresh = fits.where((item) => !used.contains(item.n)).toList(growable: false);
-    final pad = _pickEntry(
-      fresh.isNotEmpty
-          ? fresh
-          : fits.isNotEmpty
-          ? fits
-          : givenPool,
-      data,
-      NamePart.given,
-    );
+    final pad = _pickEntry(fresh.isNotEmpty ? fresh : fits, data, NamePart.given);
 
     used.add(pad.n);
     parts.middles.add(pad);
-  }
-
-  // Padding can overshoot; drop pads back off, never the requested middle name.
-  while (_assemble(data, parts).n.length > maxLength && parts.middles.length > required) {
-    final popped = parts.middles.removeLast();
-
-    if (_assemble(data, parts).n.length < minLength) {
-      parts.middles.add(popped);
-      break;
-    }
   }
 
   return _assemble(data, parts);

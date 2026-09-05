@@ -6,8 +6,9 @@
 // - At `'invented'` they are built instead — Latin and Cyrillic
 //   scripts from syllable templates, CJK by combining given-name syllables.
 // - The structure the caller asked for (surname, middle name, starting letter) is
-//   always honoured. The length range is satisfied by re-drawing from the pools,
-//   and only padded with extra middle names when no draw can reach the minimum.
+//   always honoured. The length range is satisfied by re-drawing from the pools;
+//   a range no draw landed in is answered by drawing each part from the lengths
+//   that can still reach it, and only then padded with extra middle names.
 // - Every name is produced in both scripts, native and romanized.
 
 import {
@@ -66,6 +67,67 @@ function startingWith(pool: NamePool, prefix: string): NamePool {
 	const lower = prefix.toLowerCase();
 
 	return pool.filter((item) => nativeOf(item).toLowerCase().startsWith(lower));
+}
+
+/** The shortest and longest item a pool holds, in characters of the native form. */
+function spanOf(pool: NamePool): [number, number] {
+	const lengths = pool.map((item) => nativeOf(item).length);
+
+	return [Math.min(...lengths), Math.max(...lengths)];
+}
+
+/**
+ * How far a length falls outside the range. A score to rank names by rather than a
+ * character count: overshooting scores half a character more than falling short by
+ * the same amount, because `maxLength` is the bound a caller is usually holding to
+ * — a field limit, a column width — where `minLength` only shapes how a name reads.
+ */
+function missBy(length: number, min: number, max: number): number {
+	if (length < min) {
+		return min - length;
+	}
+
+	if (length > max) {
+		return length - max + 0.5;
+	}
+
+	return 0;
+}
+
+/**
+ * Pool items between `low` and `high` characters long, or the ones closest to that
+ * window when the pool holds none inside it.
+ */
+function lengthsBetween(pool: NamePool, low: number, high: number): NamePool {
+	const missOf = (item: string | NameToken): number => missBy(nativeOf(item).length, low, high);
+	const inside = pool.filter((item) => missOf(item) === 0);
+
+	if (inside.length) {
+		return inside;
+	}
+
+	const closest = Math.min(...pool.map(missOf));
+
+	return pool.filter((item) => missOf(item) === closest);
+}
+
+/**
+ * A pool narrowed to the lengths one part may take: `spent` is what the name
+ * already costs, and `rest` the shortest and longest the parts behind it can
+ * still total. A null `fit` hands the pool straight back, which is what every
+ * draw outside the length fitting passes.
+ */
+function fitted(
+	pool: NamePool,
+	fit: readonly [number, number] | null,
+	spent: number,
+	rest: readonly [number, number]
+): NamePool {
+	if (!fit) {
+		return pool;
+	}
+
+	return lengthsBetween(pool, fit[0] - spent - rest[1], fit[1] - spent - rest[0]);
 }
 
 /**
@@ -385,33 +447,71 @@ function feminizeRu(surname: string): string {
 	return surname;
 }
 
-/** Draw one structurally complete space-separated name, ignoring the length range. */
-function drawParts(data: NameLanguageData, settings: Settings, isMale: boolean): Parts {
+/**
+ * Draw one structurally complete space-separated name.
+ *
+ * `fit` is the length range the whole name has to land in, and it is null for
+ * every draw the length fitting makes on its own: an even draw over the pools is
+ * what keeps each part's length distribution the language's own, and re-drawing is
+ * how a range is normally met. A range here is the last resort, and it is spent
+ * from left to right — each part is drawn from the lengths that still leave the
+ * parts behind it able to reach it. Nothing is invented under one, because a
+ * syllable template cannot be asked to come out a given length.
+ */
+function drawParts(
+	data: NameLanguageData,
+	settings: Settings,
+	isMale: boolean,
+	fit: readonly [number, number] | null = null
+): Parts {
 	const givenPool = (isMale ? data.male : data.female)!;
+	const middlePool =
+		settings.includeMiddleName && data.hasMiddle
+			? isMale
+				? (data.middleMale ?? givenPool)
+				: (data.middleFemale ?? givenPool)
+			: null;
 	const leadsWithSurname = surnameLeads(data, settings.includeSurname);
 	const givenPrefix = leadsWithSurname ? '' : settings.prefix;
+	const invent = fit ? 0 : settings.invent;
+	// Only a fitted draw measures the pools. They run to a few hundred entries, and
+	// every attempt of a normal draw would pay for the scan.
+	const gaps = fit
+		? (settings.includeSurname ? data.joiner.length : 0) + (middlePool ? data.joiner.length : 0)
+		: 0;
+	const lastSpan: [number, number] = fit && settings.includeSurname ? spanOf(data.last) : [0, 0];
+	const middleSpan: [number, number] = fit && middlePool ? spanOf(middlePool) : [0, 0];
+	// Feminizing a Russian surname can add a character (Иванов -> Иванова), which
+	// is a character the range has to account for before any pool is narrowed.
+	const inflates = settings.includeSurname && data.roman === 'translit' && !isMale ? 1 : 0;
 
 	let given: Entry;
 
-	if (data.syn && chance(settings.invent)) {
+	if (data.syn && chance(invent)) {
 		given = synthEntry(data, givenPrefix || undefined);
-	} else if (givenPrefix) {
-		given = leadEntry(data, givenPool, 'given', givenPrefix);
 	} else {
-		given = pickEntry(givenPool, data, 'given');
+		const pool = fitted(givenPool, fit, gaps + inflates, [
+			lastSpan[0] + middleSpan[0],
+			lastSpan[1] + middleSpan[1]
+		]);
+
+		given = givenPrefix
+			? leadEntry(data, pool, 'given', givenPrefix)
+			: pickEntry(pool, data, 'given');
 	}
 
 	let surname: Entry | null = null;
 
 	if (settings.includeSurname) {
 		const surnamePrefix = leadsWithSurname ? settings.prefix : '';
+		const pool = fitted(data.last, fit, gaps + given.n.length + inflates, middleSpan);
 
-		if (data.syn && chance(settings.invent)) {
+		if (data.syn && chance(invent)) {
 			surname = synthEntry(data, surnamePrefix || undefined);
 		} else if (surnamePrefix) {
-			surname = leadEntry(data, data.last, 'surname', surnamePrefix);
+			surname = leadEntry(data, pool, 'surname', surnamePrefix);
 		} else {
-			let native = nativeOf(pickPooled(data.last, data, 'surname'));
+			let native = nativeOf(pickPooled(pool, data, 'surname'));
 
 			if (data.roman === 'translit' && !isMale) {
 				native = feminizeRu(native);
@@ -423,14 +523,15 @@ function drawParts(data: NameLanguageData, settings: Settings, isMale: boolean):
 
 	const middles: Entry[] = [];
 
-	if (settings.includeMiddleName && data.hasMiddle) {
-		const middlePool = isMale ? (data.middleMale ?? givenPool) : (data.middleFemale ?? givenPool);
+	if (middlePool) {
+		const spent = gaps + given.n.length + (surname ? surname.n.length : 0);
+		const pool = fitted(middlePool, fit, spent, [0, 0]);
 		// Languages without a dedicated middle-name pool reuse given names, so
 		// re-draw rather than hand out "Levi Levi Cole".
-		let middle = pickEntry(middlePool, data, 'given');
+		let middle = pickEntry(pool, data, 'given');
 
 		for (let tries = 0; tries < 4 && middle.n === given.n; tries += 1) {
-			middle = pickEntry(middlePool, data, 'given');
+			middle = pickEntry(pool, data, 'given');
 		}
 
 		middles.push(middle);
@@ -459,7 +560,7 @@ function generateSpaced(
 			return assemble(data, parts);
 		}
 
-		const distance = length < minLength ? minLength - length : length - maxLength;
+		const distance = missBy(length, minLength, maxLength);
 
 		if (distance < bestDistance) {
 			bestDistance = distance;
@@ -467,10 +568,19 @@ function generateSpaced(
 		}
 	}
 
-	const parts = best!;
+	let parts = best!;
+	// Every attempt missed. An even draw will not turn up `Ann Cox` or `Maximilian`
+	// by chance when most of the pool is the wrong length, so draw each part from
+	// the lengths that can still land inside the range — and keep that draw only if
+	// it came closer than the twelve honest ones did.
+	const aimed = drawParts(data, settings, isMale, [minLength, maxLength]);
+
+	if (missBy(assemble(data, aimed).n.length, minLength, maxLength) < bestDistance) {
+		parts = aimed;
+	}
+
 	// Still short of the minimum: pad with extra given names, English-style.
 	const givenPool = (isMale ? data.male : data.female)!;
-	const required = parts.middles.length;
 	const used = new Set([parts.given.n, ...parts.middles.map((entry) => entry.n)]);
 
 	for (let guard = 0; guard < 16; guard += 1) {
@@ -484,21 +594,19 @@ function generateSpaced(
 		// not in the name already — "Paul Paul Vincent Edwards" reads as a mistake.
 		const room = maxLength - length - data.joiner.length;
 		const fits = givenPool.filter((item) => nativeOf(item).length <= room);
+
+		if (!fits.length) {
+			// Nothing in the pool is short enough to add. Stop here: a name left a
+			// few characters short of the minimum is closer to what was asked for
+			// than one carrying a whole extra part past the maximum.
+			break;
+		}
+
 		const fresh = fits.filter((item) => !used.has(nativeOf(item)));
-		const pad = pickEntry(fresh.length ? fresh : fits.length ? fits : givenPool, data, 'given');
+		const pad = pickEntry(fresh.length ? fresh : fits, data, 'given');
 
 		used.add(pad.n);
 		parts.middles.push(pad);
-	}
-
-	// Padding can overshoot; drop pads back off, never the requested middle name.
-	while (assemble(data, parts).n.length > maxLength && parts.middles.length > required) {
-		const popped = parts.middles.pop()!;
-
-		if (assemble(data, parts).n.length < minLength) {
-			parts.middles.push(popped);
-			break;
-		}
 	}
 
 	return assemble(data, parts);

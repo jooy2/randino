@@ -214,6 +214,91 @@ describe('Name', () => {
 		}
 	});
 
+	it('a maximum the pools can meet is never overshot', () => {
+		// A range no draw landed inside used to be answered by padding the name
+		// with a whole extra given name, so an exact ten characters came back as
+		// `Rosemarie Gabriele`. The last three ask for more than one given name
+		// can spell, which is where the padding used to fire.
+		const ranges: [NameLanguage, boolean, number, number][] = [
+			['en', true, 7, 10],
+			['de', true, 8, 11],
+			['it', true, 8, 11],
+			['es', true, 7, 10],
+			['ru', true, 8, 11],
+			['vi', true, 4, 6],
+			['de', false, 10, 10],
+			['en', false, 8, 8],
+			['it', false, 10, 10]
+		];
+
+		for (const realism of ['real', 'mixed', 'invented'] as const) {
+			for (const [language, includeSurname, minLength, maxLength] of ranges) {
+				for (const name of randName({
+					language,
+					includeSurname,
+					realism,
+					minLength,
+					maxLength,
+					count: SAMPLE
+				})) {
+					assert.ok(
+						name.length <= maxLength,
+						`${language} ${realism} ${minLength}-${maxLength}: ${name} (${name.length})`
+					);
+				}
+			}
+		}
+
+		// A minimum no single given name can reach is where the padding used to
+		// fire. Drawn names only: a syllable template can spell a longer word than
+		// any pool holds, and one character over is then genuinely the closest the
+		// generator can come.
+		const beyond: [NameLanguage, number][] = [
+			['en', 12],
+			['de', 12],
+			['it', 12],
+			['ru', 14]
+		];
+
+		for (const [language, length] of beyond) {
+			for (const name of randName({
+				language,
+				includeSurname: false,
+				minLength: length,
+				maxLength: length,
+				count: SAMPLE
+			})) {
+				assert.ok(name.length <= length, `${language} ${length}: ${name} (${name.length})`);
+			}
+		}
+	});
+
+	it('an exact length the pools hold is drawn, not approached', () => {
+		// Twelve even draws will not turn up the one ten-character German given
+		// name by chance. When they miss, each part is drawn from the lengths that
+		// can still land inside the range instead.
+		const exact: [NameLanguage, boolean, number][] = [
+			['de', false, 10],
+			['en', false, 8],
+			['it', false, 9],
+			['es', false, 9],
+			['ru', false, 10],
+			['vi', false, 5]
+		];
+
+		for (const [language, includeSurname, length] of exact) {
+			for (const name of randName({
+				language,
+				includeSurname,
+				minLength: length,
+				maxLength: length,
+				count: SAMPLE
+			})) {
+				assert.strictEqual(name.length, length, `${language}: ${name}`);
+			}
+		}
+	});
+
 	it('omitted length bounds fall back to the language default', () => {
 		assert.deepStrictEqual(nameLengthRange('ko'), [3, 3]);
 		assert.deepStrictEqual(nameLengthRange('ko', false), [2, 2]);
