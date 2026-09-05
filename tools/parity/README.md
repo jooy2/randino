@@ -1,6 +1,6 @@
 # Data parity
 
-Every package holds its own copy of the datasets — the same pools, written in
+Every package holds its own copy of the datasets: the same pools, written in
 its own language's syntax. That is deliberate: each package stays a plain
 library with no build step, no data file to ship and nothing to resolve at run
 time. What it costs is that a word added to one package and not the others is
@@ -21,8 +21,8 @@ differences are the languages', not the data's:
 | Which synthesis a language uses | a `kind` field | a sealed class | two classes |
 | The name order | `'family-first'` | `NameOrder.familyFirst` | `"family-first"` |
 
-So each package gets a dump of its own — `dump-javascript.ts`, `dump_dart.dart`,
-`dump_python.py` — and each one is responsible for writing its language's
+So each package gets a dump of its own (`dump-javascript.ts`, `dump_dart.dart`
+and `dump_python.py`), and each one is responsible for writing its language's
 spelling out in one shape both others can be compared against:
 
 - Field names are the JavaScript ones, which is the spelling the docs, the
@@ -48,10 +48,9 @@ The word datasets, the sentence datasets, the name datasets, the surname
 romanization map, and the bounds every generator shares (`constants` and
 `decorate/data`). That is everything written once per package as data.
 
-That includes the nickname shapes. They used to be a table private to each
-generator and were left out for it; they are `WordLanguageData.frames` today —
-per language, with the particle each gap needs — so the slots, the particles and
-the weights are all data, and all compared.
+That includes the nickname shapes. They are `WordLanguageData.frames`, one set
+per language with the particle each gap needs, so the slots, the particles and
+the weights are all data and all compared.
 
 The sentence datasets are the same story on a larger scale: the verbs with the
 noun classes each group takes, the predicate adjectives, the adverbs, the

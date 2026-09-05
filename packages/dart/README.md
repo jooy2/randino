@@ -17,7 +17,7 @@ Every option and every example, with **Dart** picked in the sidebar. This README
 - **Words** are those twenty-five themes on their own: `randWord`, plus `randAnimal`, `randFood` and twenty-three more.
 - **Sentences** are whole statements in the language's own grammar, from `randSentence`. The verb decides what can stand beside it, so the words of one sentence belong together.
 - **Decorators** attach something to a string you already have: `randSuffix`, `randPrefix` and `randModifier`.
-- Every parameter is named and optional, and a **null enum means "every one of them"** — `randName()` on its own works.
+- Every parameter is named and optional, and a **null enum means "every one of them"**, so `randName()` on its own works.
 - **Pure Dart, no dependencies.** It imports nothing but `dart:math`, so it runs on the VM, on the web and inside Flutter on every platform.
 
 This is the Dart package. The [npm package](https://www.npmjs.com/package/randino) and the [PyPI package](https://pypi.org/project/randino/) are the other two, and all three generate from the same datasets under the same rules. They version independently, so the numbers on pub.dev, npm and PyPI will not always agree.
@@ -68,7 +68,7 @@ randNameDetails(language: NameLanguage.ko).first;
 | `startsWith`              | `String?`       | `null`              |
 | `unique`                  | `bool`          | `false`             |
 
-`randNameDetails` takes the same parameters except `script`, and returns a `NameDetail` — `native`, `roman`, `language` and `gender` — for each name.
+`randNameDetails` takes the same parameters except `script`, and returns a `NameDetail` for each name, carrying `native`, `roman`, `language` and `gender`.
 
 ## Nicknames
 
@@ -131,7 +131,7 @@ One function per theme: `randAnimal`, `randObject`, `randNature`, `randPlant`, `
 
 ## Sentences
 
-Whole statements, written the way the language writes them. The nouns are the same pools the words and nicknames come from; what a sentence adds is the grammar — a verb that states what can do it and what it can be done to, and the shapes each language allows.
+Whole statements, written the way the language writes them. The nouns are the same pools the words and nicknames come from, and what a sentence adds is the grammar: a verb that states what can do it and what it can be done to, and the shapes each language allows.
 
 ```dart
 randSentence(language: WordLanguage.en, count: 3);
@@ -169,7 +169,7 @@ sentenceLengthRange(WordLanguage.en); // LengthRange(12, 92)
 | `startsWith`              | `String?`             | `null`             |
 | `unique`                  | `bool`                | `false`            |
 
-`slots` names the parts a shape may carry beside its subject: `object`, `place`, `time`, `manner`, `state`, `quantity`, `money`, `date`, `clock`, or an empty set for a subject and its predicate alone. A language declares its own shapes, so German has no `object` and Russian no `place` — both mark those with a case their nouns would have to change for — and asking for one falls back to the closest shape the language does have.
+`slots` names the parts a shape may carry beside its subject: `object`, `place`, `time`, `manner`, `state`, `quantity`, `money`, `date`, `clock`, or an empty set for a subject and its predicate alone. A language declares its own shapes, so German has no `object` and Russian no `place`, because both would mark those with a case their nouns have to change for. Asking for one falls back to the closest shape the language does have.
 
 `include` puts words you name into every sentence. A word the pools hold goes in the phrase it belongs to, and a word from anywhere else is used as a noun.
 
@@ -177,7 +177,7 @@ sentenceLengthRange(WordLanguage.en); // LengthRange(12, 92)
 
 ## Decorators
 
-`randSuffix`, `randPrefix` and `randModifier` attach something to a string you already have, rather than generating one. They take anything, not just this library's output, which is why none of them is a parameter on a generator — and each of them works with no value at all, handing back the thing it would have attached.
+`randSuffix`, `randPrefix` and `randModifier` attach something to a string you already have, rather than generating one. They take anything, not just this library's output, which is why none of them is a parameter on a generator. Each of them also works with no value at all, handing back the thing it would have attached.
 
 ```dart
 randSuffix(value: 'MistyOwl'); // 'MistyOwl_nVtRC'
@@ -197,7 +197,7 @@ randSuffix(); // 'nVtRC' — the token on its own
 
 A fresh token per value, never one for the batch. The default charset leaves out `0O1lI`, because these end up in names people read aloud and type back in. The `…All` forms are Dart's answer to a signature the other two packages write as `String | List<String>`, and `value` is named rather than positional because Dart cannot make a positional parameter optional alongside named ones.
 
-`randModifier` attaches a word instead of a token — what `randNickname`'s `includeModifier` used to do, for any string:
+`randModifier` attaches a word instead of a token, in front of any string:
 
 ```dart
 randModifier(value: 'Owl'); // 'MistyOwl'

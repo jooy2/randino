@@ -28,7 +28,7 @@ Every option, every language and every example, with **JavaScript**, **Dart** or
 | [`packages/dart`](packages/dart)             | [pub.dev: `randino`](https://pub.dev/packages/randino)    | Dart 3.7 or newer (Flutter 3.29)  | [README](packages/dart/README.md)       |
 | [`packages/python`](packages/python)         | [PyPI: `randino`](https://pypi.org/project/randino/)      | Python 3.10 or newer              | [README](packages/python/README.md)     |
 
-All three generate from **the same datasets and the same rules**, so `randName({ language: 'ko' })`, `randName(language: NameLanguage.ko)` and `rand_name(language="ko")` draw from the same pools and honour the same options. They **version independently** and keep separate changelogs — [`packages/javascript/CHANGELOG.md`](packages/javascript/CHANGELOG.md), [`packages/dart/CHANGELOG.md`](packages/dart/CHANGELOG.md) and [`packages/python/CHANGELOG.md`](packages/python/CHANGELOG.md) — so a release on one side is not a release on the others and the numbers will not always agree.
+All three generate from **the same datasets and the same rules**, so `randName({ language: 'ko' })`, `randName(language: NameLanguage.ko)` and `rand_name(language="ko")` draw from the same pools and honour the same options. They **version independently** and keep separate changelogs ([`packages/javascript/CHANGELOG.md`](packages/javascript/CHANGELOG.md), [`packages/dart/CHANGELOG.md`](packages/dart/CHANGELOG.md) and [`packages/python/CHANGELOG.md`](packages/python/CHANGELOG.md)), so a release on one side is not a release on the others and the numbers will not always agree.
 
 ## Install
 
@@ -78,7 +78,7 @@ randSuffixAll(randNickname(language: WordLanguage.en, count: 2));
 // ['RoundSeason_RVBnC', 'RowdyDusk_dwtu5']
 ```
 
-Pure Dart — it imports nothing but `dart:math`, so it runs on the VM, on the web and inside Flutter on every platform. Options are named parameters rather than an options object, which is the one deliberate difference from the JavaScript API. [**The Dart quick start**](packages/dart/README.md) has the rest.
+Pure Dart. It imports nothing but `dart:math`, so it runs on the VM, on the web and inside Flutter on every platform. Options are named parameters rather than an options object, which is the one deliberate difference from the JavaScript API. [**The Dart quick start**](packages/dart/README.md) has the rest.
 
 ### Python
 
@@ -102,11 +102,11 @@ rand_suffix(rand_nickname(language="en", count=2))
 # ['RoundSeason_RVBnC', 'RowdyDusk_dwtu5']
 ```
 
-Pure Python — it imports nothing outside the standard library, and ships a `py.typed` marker so mypy and Pyright read its annotations. Options are keyword-only arguments in `snake_case`; the values are the same strings the JavaScript package takes, typed as `Literal`. [**The Python quick start**](packages/python/README.md) has the rest.
+Pure Python. It imports nothing outside the standard library and ships a `py.typed` marker, so mypy and Pyright read its annotations. Options are keyword-only arguments in `snake_case`; the values are the same strings the JavaScript package takes, typed as `Literal`. [**The Python quick start**](packages/python/README.md) has the rest.
 
 ## Supported languages
 
-Every generator takes a language, or mixes every language it supports when you leave it out. All nine are covered everywhere: what used to keep a language out of the word pools was word order or agreement between a modifier and its noun, and both are the language's own data now.
+Every generator takes a language, or mixes every language it supports when you leave it out. All nine are covered everywhere, including the word pools: where a modifier goes and how it agrees with its noun are part of each language's own data.
 
 | Code | Language   | Native     | Person names | Words and nicknames | Sentences |
 | ---- | ---------- | ---------- | :----------: | :-----------------: | :-------: |
@@ -120,7 +120,7 @@ Every generator takes a language, or mixes every language it supports when you l
 | `es` | Spanish    | Español    |      ✅      |         ✅          |    ✅     |
 | `vi` | Vietnamese | Tiếng Việt |      ✅      |         ✅          |    ✅     |
 
-A sentence is the one place where a language can still be narrower than the others. Each declares the shapes its own grammar carries, so German writes no object and Russian no place — both would put the noun in a case its own ending has to change for.
+A sentence is the one place where a language can be narrower than the others. Each declares the shapes its own grammar carries, so German writes no object and Russian no place, because both would put the noun in a case its own ending has to change for.
 
 ## What it generates
 
@@ -132,7 +132,7 @@ A sentence is the one place where a language can still be narrower than the othe
 | Sentences      | `randSentence`               | `rand_sentence`              | The brave lion runs quietly. |
 | Decorators     | `randSuffix`, `randPrefix`, `randModifier` | `rand_suffix`, `rand_prefix`, `rand_modifier` | MistyOwl_nVtRC, MistyOwl |
 
-Each generator returns strings by default, or one detail object per result with <code>output: 'detail'</code> — both scripts of a name, or the words a nickname was built from. The Dart package spells that as a second function (`randNameDetails`), because Dart has no way to make one function's return type depend on an argument.
+Each generator returns strings by default, or one detail object per result with <code>output: 'detail'</code>: both scripts of a name, or the words a nickname was built from. The Dart package spells that as a second function (`randNameDetails`), because Dart has no way to make one function's return type depend on an argument.
 
 The full option tables, the twenty-five word themes and the romanization rules are on the [documentation site](https://randino.cdget.com).
 

@@ -65,7 +65,7 @@ rand_name(language="ko", output="detail")[0]
 | `unique`                    | `bool`                        | `False`    |
 | `output`                    | `RandOutput`                  | `"value"`  |
 
-`output="detail"` returns a `NameDetail` — `native`, `roman`, `language` and `gender` — for each name instead of a string, and makes `script` moot because both forms are already there. The two shapes are `@overload`ed, so a type checker knows which one a call returns.
+`output="detail"` returns a `NameDetail` for each name instead of a string, carrying `native`, `roman`, `language` and `gender`, which makes `script` moot because both forms are already there. The two shapes are `@overload`ed, so a type checker knows which one a call returns.
 
 ## Nicknames
 
@@ -99,7 +99,7 @@ rand_nickname(language="en", output="detail")[0]
 | `unique`                    | `bool`                            | `False`    |
 | `output`                    | `RandOutput`                      | `"value"`  |
 
-`output="detail"` returns a `NicknameDetail` — `nickname`, `words`, `slots`, `language` and `theme` — for each nickname instead of a string.
+`output="detail"` returns a `NicknameDetail` for each nickname instead of a string, carrying `nickname`, `words`, `slots`, `language` and `theme`.
 
 Themes: `animal`, `object`, `nature`, `plant`, `gem`, `concept`, `myth`, `job`, `music`, `place`, `food`, `sport`, `vehicle`, `product`, `color`, `finance`, `tech`, `weather`, `space`, `time`, `emotion`, `body`, `clothing`, `tool`, `drink`.
 
@@ -137,7 +137,7 @@ One function per theme: `rand_animal`, `rand_object`, `rand_nature`, `rand_plant
 
 ## Sentences
 
-Whole statements, written the way the language writes them. The nouns are the same pools the words and nicknames come from; what a sentence adds is the grammar — a verb that states what can do it and what it can be done to, and the shapes each language allows.
+Whole statements, written the way the language writes them. The nouns are the same pools the words and nicknames come from, and what a sentence adds is the grammar: a verb that states what can do it and what it can be done to, and the shapes each language allows.
 
 ```python
 from randino import rand_sentence, sentence_length_range
@@ -179,7 +179,7 @@ sentence_length_range("en")  # (12, 92)
 | `unique`                    | `bool`                              | `False`   |
 | `output`                    | `RandOutput`                        | `"value"` |
 
-`slots` names the parts a shape may carry beside its subject: `object`, `place`, `time`, `manner`, `state`, `quantity`, `money`, `date`, `clock`, or `"none"` for a subject and its predicate alone. A language declares its own shapes, so German has no `object` and Russian no `place` — both mark those with a case their nouns would have to change for — and asking for one falls back to the closest shape the language does have.
+`slots` names the parts a shape may carry beside its subject: `object`, `place`, `time`, `manner`, `state`, `quantity`, `money`, `date`, `clock`, or `"none"` for a subject and its predicate alone. A language declares its own shapes, so German has no `object` and Russian no `place`, because both would mark those with a case their nouns have to change for. Asking for one falls back to the closest shape the language does have.
 
 `include` puts words you name into every sentence. A word the pools hold goes in the phrase it belongs to, and a word from anywhere else is used as a noun.
 
@@ -187,7 +187,7 @@ sentence_length_range("en")  # (12, 92)
 
 ## Decorators
 
-`rand_suffix`, `rand_prefix` and `rand_modifier` attach something to a string you already have, rather than generating one. They take anything, not just this library's output, which is why none of them is an argument on a generator — and each of them works with no value at all, handing back the thing it would have attached.
+`rand_suffix`, `rand_prefix` and `rand_modifier` attach something to a string you already have, rather than generating one. They take anything, not just this library's output, which is why none of them is an argument on a generator. Each of them also works with no value at all, handing back the thing it would have attached.
 
 ```python
 from randino import rand_nickname, rand_prefix, rand_suffix
@@ -209,7 +209,7 @@ rand_suffix()  # 'nVtRC' — the token on its own
 
 A fresh token per value, never one for the batch. The default charset leaves out `0O1lI`, because these end up in names people read aloud and type back in. `value` is positional and optional, the rest keyword-only, and the overloads carry the shape through: a `str` in gives a `str`, a `list[str]` gives a `list[str]`.
 
-`rand_modifier` attaches a word instead of a token — what `rand_nickname`'s `include_modifier` used to do, for any string:
+`rand_modifier` attaches a word instead of a token, in front of any string:
 
 ```python
 from randino import rand_animal, rand_modifier

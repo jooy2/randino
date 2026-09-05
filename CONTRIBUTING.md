@@ -1,6 +1,6 @@
-# Contributing to Project
+# Contributing to randino
 
-Thank you for contributing to the project. Your contributions will help us take the project to the next level.
+Thank you for contributing. This page covers how to report an issue, where each part of the repository lives, and what a pull request should contain.
 
 This project adheres to the Contributor Covenant code of conduct. Your contribution implies that you have read and agree to this policy. Any behavior that undermines the quality of the project community, including this policy, will be warned or restricted by the maintainers.
 
@@ -35,7 +35,7 @@ The **JavaScript package is the source of truth**: a behaviour change starts the
 
 ### Changing a pool
 
-The datasets are the case where that is easiest to get wrong. Each package holds its own copy of the pools in its own language's syntax, and no package's own suite can see past its own copy — a word added to `packages/javascript` and forgotten in the other two breaks no test. So the pools have to be edited in all three, and this is what checks you did:
+The datasets are the case where that is easiest to get wrong. Each package holds its own copy of the pools in its own language's syntax, and no package's suite can see past its own copy, so a word added to `packages/javascript` and forgotten in the other two breaks no test. The pools have to be edited in all three, and this is what checks you did:
 
 ```
 node tools/parity/index.mjs

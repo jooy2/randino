@@ -28,7 +28,7 @@ This is the JavaScript package. The [Dart package](https://pub.dev/packages/rand
 npm install randino
 ```
 
-Requires **Node.js 18 or newer**, or any browser — the package ships ESM with type declarations and pulls nothing in behind it.
+Requires **Node.js 18 or newer**, or any browser. The package ships ESM with type declarations and pulls nothing in behind it.
 
 ## Person names
 
@@ -141,7 +141,7 @@ One function per theme: `randAnimal`, `randObject`, `randNature`, `randPlant`, `
 
 ## Sentences
 
-Whole statements, written the way the language writes them. The nouns are the same pools the words and nicknames come from; what a sentence adds is the grammar — a verb that states what can do it and what it can be done to, and the shapes each language allows.
+Whole statements, written the way the language writes them. The nouns are the same pools the words and nicknames come from, and what a sentence adds is the grammar: a verb that states what can do it and what it can be done to, and the shapes each language allows.
 
 ```javascript
 import { randSentence, sentenceLengthRange } from 'randino';
@@ -187,7 +187,7 @@ sentenceLengthRange('en'); // [12, 92]
 | `unique`                  | `boolean`                                       | `false`    |
 | `output`                  | `'value' \| 'detail'`                           | `'value'`  |
 
-`slots` names the parts a shape may carry beside its subject: `object`, `place`, `time`, `manner`, `state`, `quantity`, `money`, `date`, `clock`, or `'none'` for a subject and its predicate alone. A language declares its own shapes, so German has no `object` and Russian no `place` — both mark those with a case their nouns would have to change for — and asking for one falls back to the closest shape the language does have.
+`slots` names the parts a shape may carry beside its subject: `object`, `place`, `time`, `manner`, `state`, `quantity`, `money`, `date`, `clock`, or `'none'` for a subject and its predicate alone. A language declares its own shapes, so German has no `object` and Russian no `place`, because both would mark those with a case their nouns have to change for. Asking for one falls back to the closest shape the language does have.
 
 `include` puts words you name into every sentence. A word the pools hold goes in the phrase it belongs to, and a word from anywhere else is used as a noun.
 
@@ -195,7 +195,7 @@ sentenceLengthRange('en'); // [12, 92]
 
 ## Decorators
 
-`randSuffix`, `randPrefix` and `randModifier` attach something to a string you already have, rather than generating one. They take anything, not just this library's output, which is why none of them is an option on a generator — and each of them works with no value at all, handing back the thing it would have attached.
+`randSuffix`, `randPrefix` and `randModifier` attach something to a string you already have, rather than generating one. They take anything, not just this library's output, which is why none of them is an option on a generator. Each of them also works with no value at all, handing back the thing it would have attached.
 
 ```javascript
 import { randNickname, randPrefix, randSuffix } from 'randino';
@@ -217,7 +217,7 @@ randSuffix(); // 'nVtRC' — the token on its own
 
 A fresh token per value, never one for the batch. The default charset leaves out `0O1lI`, because these end up in names people read aloud and type back in.
 
-`randModifier` attaches a word instead of a token — what `randNickname`'s `includeModifier` used to do, for any string:
+`randModifier` attaches a word instead of a token, in front of any string:
 
 ```javascript
 import { randAnimal, randModifier } from 'randino';
@@ -274,7 +274,7 @@ npm run build     # format, tsc, minify
 npm run lint
 ```
 
-The tests import from `dist/`, so they need a build — `npm run test` does that first.
+The tests import from `dist/`, so they need a build. `npm run test` does that first.
 
 ## License
 
