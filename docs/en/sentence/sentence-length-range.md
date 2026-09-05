@@ -47,9 +47,9 @@ sentence_length_range()  # (4, 105) — every language at once
 
 Returns <Lang js="[min, max]" dart="a LengthRange" py="(min, max)" code />, both inclusive.
 
-## Why the range is so wide
+## The default range {#why-the-range-is-so-wide}
 
-The lower end is the shortest shape with the shortest words in it, and the upper end the longest shape with a modifier on every phrase. A sentence that lands anywhere between the two is a sentence the language can write, and which one you get is decided inside that range — by the frame weights, not by the ends.
+The range is wide because its ends are extremes. The lower end is the shortest shape with the shortest words in it, and the upper end the longest shape with a modifier on every phrase. A sentence that lands anywhere between the two is a sentence the language can write, and the frame weights rather than the ends decide which one you get.
 
 That is also what makes narrowing it useful. Ask for a short range and the shapes that cannot fit drop out:
 

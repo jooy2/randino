@@ -1,6 +1,6 @@
 # nameSupportsRoman
 
-Whether asking for the romanized script produces anything different from the native one. Only English answers `false` — its names are already written in the Latin alphabet. Like the two helpers beside it, it is pure and it takes the language the same way the generators do.
+Whether asking for the romanized script produces anything different from the native one. Only English answers `false`, because its names are already written in the Latin alphabet. Like the two helpers beside it, it is pure and it takes the language the same way the generators do.
 
 ::: lang js
 

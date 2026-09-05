@@ -24,7 +24,7 @@ import 'package:randino/randino.dart';
 randVehicle(language: WordLanguage.en, count: 3); // [Bicycle, Boat, Airship]
 ```
 
-Returns `List<String>`. For the detail form, pass `WordTheme.vehicle` to `randWordDetails` — Dart has no overloads, and twenty-five more functions for it would be twenty-five too many.
+Returns `List<String>`. For the detail form, pass `WordTheme.vehicle` to `randWordDetails`. Dart has no overloads, and a detail twin for each of the twenty-five themes would be twenty-five functions too many.
 
 :::
 

@@ -64,7 +64,7 @@ Returns a `tuple[int, int]`.
 
 ## The range is wide on purpose
 
-The lower end is a bare noun and the upper end a modifier, a noun and a trailing word together, so the default range spans **every shape** — and it is the shape weights, not the range, that decide what output usually looks like. Narrowing the range is how you take a shape away:
+The lower end is a bare noun and the upper end a modifier, a noun and a trailing word together, so the default range spans every shape. It is the shape weights rather than the range that decide what output usually looks like, and narrowing the range is how you take a shape away:
 
 ::: lang js
 
@@ -98,7 +98,7 @@ rand_nickname(language="en", max_length=8, count=3)
 
 ## Two things that widen or narrow it
 
-**A separator is part of the nickname.** Its length counts toward <Lang js="minLength" dart="minLength" py="min_length" code /> / <Lang js="maxLength" dart="maxLength" py="max_length" code />, so passing one to this function is how you find out what is left:
+A separator is part of the nickname. Its length counts toward <Lang js="minLength" dart="minLength" py="min_length" code /> / <Lang js="maxLength" dart="maxLength" py="max_length" code />, so passing one to this function is how you find out what is left:
 
 ::: lang js
 
@@ -130,7 +130,7 @@ nickname_length_range("en", word_separator=" ")  # (3, 33)
 
 :::
 
-**A random suffix is outside the range entirely.** [`randSuffix`](../decorate/rand-suffix) attaches its token after the nickname is finished, so <Lang js="minLength" dart="minLength" py="min_length" code /> and <Lang js="maxLength" dart="maxLength" py="max_length" code /> describe the whole nickname and nothing is excluded from them.
+A random suffix is outside the range entirely. [`randSuffix`](../decorate/rand-suffix) attaches its token after the nickname is finished, so <Lang js="minLength" dart="minLength" py="min_length" code /> and <Lang js="maxLength" dart="maxLength" py="max_length" code /> describe the whole nickname and nothing is excluded from them.
 
 ## See also
 

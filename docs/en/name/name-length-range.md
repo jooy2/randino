@@ -1,6 +1,6 @@
 # nameLengthRange
 
-The natural length range of a full name in that language, in characters of the native form. This is what [`randName`](./rand-name) falls back to when <Lang js="minLength" dart="minLength" py="min_length" code /> or <Lang js="maxLength" dart="maxLength" py="max_length" code /> is omitted. It answers a question about a language rather than generating anything, so it is pure — and leaving the language out covers every one of them at once.
+The natural length range of a full name in that language, in characters of the native form. This is what [`randName`](./rand-name) falls back to when <Lang js="minLength" dart="minLength" py="min_length" code /> or <Lang js="maxLength" dart="maxLength" py="max_length" code /> is omitted. It answers a question about a language rather than generating anything, so it is pure, and leaving the language out covers every one of them at once.
 
 ::: lang js
 
@@ -40,7 +40,7 @@ nameLengthRange(language: NameLanguage.en, includeMiddleName: true); // LengthRa
 | `includeSurname` | `bool` | `true` | Count the family name |
 | `includeMiddleName` | `bool` | `false` | Count a middle name, where the language has one |
 
-Returns a `LengthRange`, which compares by value — `nameLengthRange(language: NameLanguage.ko) == const LengthRange(2, 3)` is `true`.
+Returns a `LengthRange`, which compares by value, so `nameLengthRange(language: NameLanguage.ko) == const LengthRange(2, 3)` is `true`.
 
 :::
 
@@ -61,13 +61,13 @@ name_length_range("en", include_middle_name=True)  # (11, 32)
 | `include_surname` | `bool` | `True` | Count the family name |
 | `include_middle_name` | `bool` | `False` | Count a middle name, where the language has one |
 
-Returns a `tuple[int, int]`. This helper and the two beside it take their arguments positionally as well as by keyword — they are short enough to read either way, unlike the generators, which are keyword-only.
+Returns a `tuple[int, int]`. This helper and the two beside it take their arguments positionally as well as by keyword, since they are short enough to read either way, unlike the generators, which are keyword-only.
 
 :::
 
-## It counts only the parts that are switched on
+## Counting only the parts that are switched on {#it-counts-only-the-parts-that-are-switched-on}
 
-Which is the part worth knowing. Dropping the surname relaxes the range rather than making the given name stretch to fill it, and asking for a middle name a language does not have cannot widen it:
+Dropping the surname lowers the range rather than making the given name stretch to fill it, and asking for a middle name a language does not have cannot widen it:
 
 ::: lang js
 

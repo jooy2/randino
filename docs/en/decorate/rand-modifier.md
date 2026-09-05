@@ -1,8 +1,8 @@
 # randModifier
 
-Puts a random modifier in front of a string, or of every string in an array — `Owl` becomes `MistyOwl`. It takes any string rather than only this library's output, and with none at all it hands back the modifier itself.
+Puts a random modifier in front of a string, or of every string in an array, so `Owl` becomes `MistyOwl`. It takes any string rather than only this library's output, and with none at all it hands back the modifier itself.
 
-This is what `randNickname`'s `includeModifier` used to be. It stopped being a nickname option for the same reason [`randSuffix`](./rand-suffix) did: decorating a string is a thing about strings, not about nicknames.
+It is a function rather than a nickname option for the same reason [`randSuffix`](./rand-suffix) is: decorating a string is a thing about strings rather than about nicknames.
 
 ::: lang js
 
@@ -75,7 +75,7 @@ rand_modifier(rand_animal(language="en", count=2))
 | `kind` | `ModifierKind \| Literal["all"]` | `"all"` | `adjective` says what the value is like, `action` what it is doing |
 | `separator` | `str \| None` | _language_ | Placed between the modifier and the value |
 
-Returns a `str` for a `str`, and a `list[str]` for a `list[str]` — carried by `@overload`.
+Returns a `str` for a `str`, and a `list[str]` for a `list[str]`, carried by `@overload`.
 
 :::
 
@@ -117,9 +117,9 @@ With no value there is no script to read, so every language is in play unless yo
 
 ## The modifier agrees with the value
 
-In a language whose modifiers change shape beside the noun, `randModifier` looks the value up in that language's pools. A word it finds carries a gender, so the modifier comes back in the form that goes with it. A word from no pool is read by its ending instead, the way the language itself reads an unfamiliar one — Spanish takes `-a`, `-ión` and `-dad` as feminine, Russian `-а` and `-о`, and German the four suffixes that are predictable — so a made-up word gets a modifier that agrees with it too.
+In a language whose modifiers change shape beside the noun, `randModifier` looks the value up in that language's pools. A word it finds carries a gender, so the modifier comes back in the form that goes with it. A word from no pool is read by its ending instead, the way the language itself reads an unfamiliar one. Spanish takes `-a`, `-ión` and `-dad` as feminine, Russian `-а` and `-о`, and German the four suffixes that are predictable, so a made-up word gets a modifier that agrees with it too.
 
-A noun with no singular at all — `ножницы`, `gafas`, `Jeans` — is tagged plural for the same reason, so the modifier beside it is plural too.
+A noun with no singular at all, such as `ножницы`, `gafas` or `Jeans`, is tagged plural for the same reason, so the modifier beside it is plural too.
 
 ::: lang js
 
@@ -157,11 +157,11 @@ rand_modifier("Zzyzx", language="es")  # 'Zzyzx dorado' — not a word it knows
 
 :::
 
-The five languages whose modifiers do not change shape — `ko`, `en`, `ja`, `zh` and `vi` — are unaffected: there is nothing to agree with, so any value gets any modifier.
+The five languages whose modifiers do not change shape, `ko`, `en`, `ja`, `zh` and `vi`, are unaffected. There is nothing to agree with, so any value gets any modifier.
 
 ## `kind` picks what the modifier says
 
-A modifier either says what the value **is like** or what it **is doing**, and they are two pools rather than one. `kind` picks between them; left out, both are in play, which is what it did before there was an option.
+A modifier either says what the value is like or what it is doing, and they are two pools rather than one. `kind` picks between them, and left out, both are in play.
 
 ::: lang js
 
@@ -201,11 +201,11 @@ rand_modifier("사자", language="ko", kind="action")  # '숨기는사자'
 
 :::
 
-The two are kept apart because they are different grammar, not different flavours: a language may need a particle between an action and its noun where an adjective needs none, which is why Chinese writes `奔跑的狮子` and `快乐狮子`. `randNickname`'s [`slots`](../nickname/rand-nickname#picking-the-shape) is the same distinction, made where a whole shape is being picked.
+The two are kept apart because they are different grammar. A language may need a particle between an action and its noun where an adjective needs none, which is why Chinese writes `奔跑的狮子` and `快乐狮子`. `randNickname`'s [`slots`](../nickname/rand-nickname#picking-the-shape) is the same distinction, made where a whole shape is being picked.
 
 ## A fresh modifier for every value
 
-Not one for the batch, the same way [`randSuffix`](./rand-suffix) draws a token per value. That is the whole reason an array is worth passing.
+The modifier is drawn per value rather than once for the batch, the same way [`randSuffix`](./rand-suffix) draws its token. That is the reason an array is worth passing.
 
 ::: lang js
 
@@ -267,7 +267,7 @@ rand_modifier(language="en", realism="invented")  # 'Snikith'
 
 ## The modifier and the noun are the same pools a nickname uses
 
-A modifier in front of a word is exactly what `randNickname` does most of the time, so <Lang js="randModifier(randAnimal())" dart="randModifier(value: randAnimal().first)" py="rand_modifier(rand_animal())" code /> and `randNickname({ theme: 'animal' })` reach into the same place. What the nickname generator adds on top is the shapes and the length fitting: a trailing word, a range the whole thing has to land inside, and a re-draw when two words stutter across their boundary.
+A modifier in front of a word is what `randNickname` does most of the time, so <Lang js="randModifier(randAnimal())" dart="randModifier(value: randAnimal().first)" py="rand_modifier(rand_animal())" code /> and `randNickname({ theme: 'animal' })` reach into the same place. What the nickname generator adds is the shapes and the length fitting: a trailing word, a range the whole thing has to land inside, and a re-draw when two words stutter across their boundary.
 
 ## See also
 

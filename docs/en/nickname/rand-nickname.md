@@ -1,6 +1,6 @@
 # randNickname
 
-Generates nicknames and returns `count` of them as strings. Each one is an everyday word with something added to it — a word for what it is like in front, one for what it is doing, a second word behind, a possessive between the two — and **never a person name**. With [`output: 'detail'`](#the-detail-output) it reports the words it used instead.
+Generates nicknames and returns `count` of them as strings. Each one is an everyday word with something added to it: an adjective in front, a verb in front, a second word behind, or a possessive between the two. **Person names are never used.** With [`output: 'detail'`](#the-detail-output) it reports the words it used instead.
 
 ::: lang js
 
@@ -55,7 +55,7 @@ Every option is optional, and the defaults are what the empty call above uses.
 
 ## The detail output
 
-`output: 'detail'` reports the pieces each nickname was built from — the words in order, the language and the theme — instead of returning a string. Useful for highlighting the base word, or for grouping by theme.
+`output: 'detail'` reports the pieces each nickname was built from instead of returning a string: the words in order, the language and the theme. Use it to highlight the base word, or to group by theme.
 
 ::: lang dart
 
@@ -121,7 +121,7 @@ rand_nickname(language="en", output="detail")
 
 The theme is **reported, not asserted**. A word drawn from a theme reports it; an invented word is looked up across every theme, because it can spell a real one by accident, and reports null when it is found nowhere.
 
-Two coincidences follow from that and are worth expecting rather than treating as bugs. A word can be both a modifier and a noun — `Marble` is one — and an invented word can spell a real one by accident: the syllable templates spell `Snake` now and then, so a nickname built at `realism: 'invented'` can come back with `theme` set to `animal`.
+Two coincidences follow from that, and both are worth expecting rather than treating as bugs. A word can be both a modifier and a noun, as `Marble` is, and an invented word can spell a real one by accident: the syllable templates spell `Snake` now and then, so a nickname built at `realism: 'invented'` can come back with `theme` set to `animal`.
 
 ## Examples
 
@@ -223,7 +223,7 @@ The twenty-five themes, and what each one holds, are on [Themes](../word/themes)
 
 ### Picking the shape {#picking-the-shape}
 
-`slots` names what a shape may put beside the noun, and the shapes that use none of it are dropped. A shape qualifies when it uses **at least one** of the slots — so naming two asks for either and leaves the choice to chance, which is what `['adjective', 'action']` below does.
+`slots` names what a shape may put beside the noun, and the shapes that use none of it are dropped. A shape qualifies when it uses at least one of the slots, so naming two asks for either and leaves the choice to chance, which is what `['adjective', 'action']` below does.
 
 ::: lang js
 
@@ -353,11 +353,11 @@ rand_nickname(language="en", word_separator="-", count=4)
 
 :::
 
-Its length counts toward <Lang js="minLength" dart="minLength" py="min_length" code /> / <Lang js="maxLength" dart="maxLength" py="max_length" code /> — pass it to [`nicknameLengthRange`](./nickname-length-range) to see what is left.
+Its length counts toward <Lang js="minLength" dart="minLength" py="min_length" code /> and <Lang js="maxLength" dart="maxLength" py="max_length" code />. Pass it to [`nicknameLengthRange`](./nickname-length-range) to see what is left.
 
 ### A unique suffix
 
-There is no option for one — [`randSuffix`](../decorate/rand-suffix) attaches a random token to whatever you hand it, these nicknames included.
+There is no option for one. [`randSuffix`](../decorate/rand-suffix) attaches a random token to whatever you hand it, these nicknames included.
 
 ::: lang js
 

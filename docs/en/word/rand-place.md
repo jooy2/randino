@@ -1,6 +1,6 @@
 # randPlace
 
-Places — where people gather, live and pass through.
+Places where people gather, live and pass through.
 
 [`randWord`](./rand-word) with `theme` fixed to <Lang js="'place'" dart="WordTheme.place" py="&quot;place&quot;" code />; every other option is the same one, and means the same thing.
 
@@ -24,7 +24,7 @@ import 'package:randino/randino.dart';
 randPlace(language: WordLanguage.en, count: 3); // [Market, Plaza, Village]
 ```
 
-Returns `List<String>`. For the detail form, pass `WordTheme.place` to `randWordDetails` — Dart has no overloads, and twenty-five more functions for it would be twenty-five too many.
+Returns `List<String>`. For the detail form, pass `WordTheme.place` to `randWordDetails`. Dart has no overloads, and a detail twin for each of the twenty-five themes would be twenty-five functions too many.
 
 :::
 

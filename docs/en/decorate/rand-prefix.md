@@ -1,6 +1,6 @@
 # randPrefix
 
-Prepends a random token to a string, or to every string in an array — the mirror of [`randSuffix`](./rand-suffix), for the places where the distinguishing part belongs in front: a shard, a tenant, a key that sorts by nothing in particular.
+Prepends a random token to a string, or to every string in an array. It mirrors [`randSuffix`](./rand-suffix), for the places where the distinguishing part belongs in front: a shard, a tenant, a key that sorts by nothing in particular.
 
 ::: lang js
 
@@ -73,7 +73,7 @@ Returns a `str` for a `str`, and a `list[str]` for a `list[str]`.
 
 ## Everything else is `randSuffix`
 
-The token, the defaults, the clamping and the fresh-token-per-value rule are the same — the two share their implementation and differ by which side the token lands on. That includes the value being optional: `randPrefix()` hands back the same bare token `randSuffix()` does, because which side it would have landed on is not decided yet. What [`randSuffix`](./rand-suffix) says about the charset applies here unchanged.
+The token, the defaults, the clamping and the fresh-token-per-value rule are the same. The two share their implementation and differ by which side the token lands on. That includes the value being optional: `randPrefix()` hands back the same bare token `randSuffix()` does. What [`randSuffix`](./rand-suffix) says about the charset applies here unchanged.
 
 ## See also
 

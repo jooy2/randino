@@ -1,6 +1,6 @@
 # randName
 
-Generates person names and returns `count` of them as strings, written in the script you asked for — or, with [`output: 'detail'`](#the-detail-output), the native and romanized form of each name together with the language and gender behind it.
+Generates person names and returns `count` of them as strings, written in the script you asked for. With [`output: 'detail'`](#the-detail-output) it returns the native and romanized form of each name instead, together with the language and gender behind it.
 
 ::: lang js
 
@@ -54,7 +54,7 @@ Every option is optional, and the defaults are what the empty call above uses.
 | `unique` | <Lang js="boolean" dart="bool" py="bool" code /> | <Lang js="false" dart="false" py="False" code /> | Never return the same name twice. May return fewer than `count` once the pools run out of combinations. |
 | `output` | <Lang js="RandOutput" py="RandOutput" code /> | <Lang js="'value'" py="&quot;value&quot;" code /> | Strings, or a `NameDetail` per name. Dart has no such parameter — see [the detail output](#the-detail-output). |
 
-<Lang js="minLength" dart="minLength" py="min_length" code /> and <Lang js="maxLength" dart="maxLength" py="max_length" code /> default to the language's own range, which [`nameLengthRange`](./name-length-range) reports — and that fallback is resolved **per language**, so a mixed draw does not stretch a Korean name to fill a Spanish name's range.
+<Lang js="minLength" dart="minLength" py="min_length" code /> and <Lang js="maxLength" dart="maxLength" py="max_length" code /> default to the language's own range, which [`nameLengthRange`](./name-length-range) reports. That fallback is resolved per language, so a mixed draw does not stretch a Korean name to fill a Spanish name's range.
 
 ## The detail output
 
@@ -280,7 +280,7 @@ rand_name(language="ja", count=3, script="roman")
 
 :::
 
-English is the one language where this changes nothing — the names are already in the Latin alphabet, which is what [`nameSupportsRoman`](./name-supports-roman) reports.
+English is the one language where this changes nothing, because the names are already in the Latin alphabet. [`nameSupportsRoman`](./name-supports-roman) reports that.
 
 ### A starting character
 
@@ -342,7 +342,7 @@ rand_name(language="en", count=2, min_length=20, max_length=25)
 
 :::
 
-The structure you asked for always wins. A range too narrow for the requested parts is answered with the closest name the generator can build, never by dropping the surname or middle name — see [how the options behave](./#length-is-counted-in-the-native-form).
+The structure you asked for always wins. A range too narrow for the requested parts is answered with the closest name the generator can build, never by dropping the surname or middle name. See [how the options behave](./#length-is-counted-in-the-native-form).
 
 ### A name next to its pronunciation
 
@@ -427,7 +427,7 @@ rand_name(count=3, output="detail")
 
 ### Gender, where it is observable
 
-Most languages do not show which pool a given name came from. Russian does — its patronymic and its surname both inflect — which is what makes the choice verifiable there:
+Most languages do not show which pool a given name came from. Russian does, because its patronymic and its surname both inflect, which makes the choice verifiable there:
 
 ::: lang js
 

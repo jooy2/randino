@@ -1,8 +1,8 @@
 # randWord
 
-Generates everyday words and returns `count` of them as strings. Animals, things, nature, ideas — twenty-five [themes](./themes), in nine languages, and **never a person name**. With [`output: 'detail'`](#the-detail-output) it reports the language and theme behind each word.
+Generates everyday words and returns `count` of them as strings. Animals, things, nature and ideas, across twenty-five [themes](./themes) in nine languages, and **never a person name**. With [`output: 'detail'`](#the-detail-output) it reports the language and theme behind each word.
 
-These are the pools [`randNickname`](../nickname/rand-nickname) is built from. This is the same vocabulary with nothing added to it.
+These are the pools [`randNickname`](../nickname/rand-nickname) is built from, handed back with nothing added to them.
 
 ::: lang js
 
@@ -49,7 +49,7 @@ Dart has no `output`; [the detail output](#the-detail-output) is `randWordDetail
 
 ## One function per theme
 
-A theme is not only an option — each of the twenty-five is a function of its own, which is `randWord` with the theme already chosen. Each has a page of its own; the words each theme holds are on [Themes](./themes).
+A theme is an option and a function both. Each of the twenty-five is `randWord` with the theme already chosen, and each has a page of its own. The words each theme holds are on [Themes](./themes).
 
 [`randAnimal`](./rand-animal) · [`randObject`](./rand-object) · [`randNature`](./rand-nature) · [`randPlant`](./rand-plant) · [`randGem`](./rand-gem) · [`randConcept`](./rand-concept) · [`randMyth`](./rand-myth) · [`randJob`](./rand-job) · [`randMusic`](./rand-music) · [`randPlace`](./rand-place) · [`randFood`](./rand-food) · [`randSport`](./rand-sport) · [`randVehicle`](./rand-vehicle) · [`randProduct`](./rand-product) · [`randColor`](./rand-color) · [`randFinance`](./rand-finance) · [`randTech`](./rand-tech) · [`randWeather`](./rand-weather) · [`randSpace`](./rand-space) · [`randTime`](./rand-time) · [`randEmotion`](./rand-emotion) · [`randBody`](./rand-body) · [`randClothing`](./rand-clothing) · [`randTool`](./rand-tool) · [`randDrink`](./rand-drink)
 
@@ -75,7 +75,7 @@ randFood(language: WordLanguage.en, count: 2); // [Dumpling, Cocoa]
 randGem(language: WordLanguage.en, count: 2, unique: true); // [Obsidian, Bronze]
 ```
 
-The themed functions return `List<String>` only. For the detail form, pass the theme to `randWordDetails` — Dart has no overloads, and twenty-five more functions for it would be twenty-five too many.
+The themed functions return `List<String>` only. For the detail form, pass the theme to `randWordDetails`. Dart has no overloads, and a detail twin for each of the twenty-five themes would be twenty-five functions too many.
 
 :::
 
@@ -95,7 +95,7 @@ They take every option `randWord` does except `theme`, which they answer.
 
 ## Length
 
-Left out, <Lang js="minLength" dart="minLength" py="min_length" code /> and <Lang js="maxLength" dart="maxLength" py="max_length" code /> fall back to what the pools actually hold — that is what [`wordLengthRange`](./word-length-range) reports. A range the pool cannot satisfy is answered with the closest word it has rather than a truncated one.
+Left out, <Lang js="minLength" dart="minLength" py="min_length" code /> and <Lang js="maxLength" dart="maxLength" py="max_length" code /> fall back to what the pools actually hold, which is what [`wordLengthRange`](./word-length-range) reports. A range the pool cannot satisfy is answered with the closest word it has rather than a truncated one.
 
 ::: lang js
 
@@ -167,7 +167,7 @@ rand_word(language="en", realism="invented", count=4)
 
 :::
 
-An invented word can spell a real one by accident — the syllable templates do come out as `Snake` now and then — and the theme is then reported rather than hidden.
+An invented word can spell a real one by accident, since the syllable templates do come out as `Snake` now and then. The theme is then reported rather than hidden.
 
 ## The detail output {#the-detail-output}
 

@@ -1,6 +1,6 @@
 # randSentence
 
-Generates whole sentences and returns `count` of them as strings. Each one is a subject and something said about it, written the way the language writes it — the particle a Korean noun asks for, the article an Italian noun opens on, the second position a German verb never gives up. With [`output: 'detail'`](#the-detail-output) it reports the phrases it used instead.
+Generates whole sentences and returns `count` of them as strings. Each one is a subject and something said about it, written the way the language writes it: the particle a Korean noun asks for, the article an Italian noun opens on, the second position a German verb holds. With [`output: 'detail'`](#the-detail-output) it reports the phrases it used instead.
 
 ::: lang js
 
@@ -130,7 +130,7 @@ rand_sentence(language="ru", count=3)
 
 All nine of them, and each writes its own punctuation: `。` closes a Japanese or Chinese sentence, `.` the rest.
 
-## How much it says {#how-much-it-says}
+## How many phrases a sentence carries {#how-much-it-says}
 
 `shape` picks how many phrases the sentence has, which is the closest thing it has to an expected length. `minLength` and `maxLength` bound the characters; this bounds the parts.
 
@@ -240,7 +240,7 @@ rand_sentence(language="en", slots="none", count=3)
 
 :::
 
-**A language answers with what it has.** The shapes are the language's own, so not every one of them can answer every request. German declares no `object` and Russian no `place`: both would put the noun in a case its own ending has to change for, and the pools hold one form of each word. Asking for one falls back to every shape the language does have, the same way a length range too narrow for a shape is answered with the closest fit rather than with an error.
+A language answers with what it has. The shapes are the language's own, so not every one of them can answer every request. German declares no `object` and Russian no `place`: both would put the noun in a case its own ending has to change for, and the pools hold one form of each word. Asking for one falls back to every shape the language does have, the same way a length range too narrow for a shape is answered with the closest fit rather than with an error.
 
 ::: lang js
 
@@ -271,9 +271,9 @@ rand_sentence(language="de", slots="object", count=3)
 
 With no language named, the ones that can answer are preferred over the ones that cannot.
 
-## Counting, and money {#counting-and-money}
+## Counting and money {#counting-and-money}
 
-Two more parts a shape can carry, reached the same way every other one is — through `slots`. A **quantity** is a noun phrase with a number and the counter its kind takes; **money** is an amount and what the language counts it in.
+A shape can carry two more parts, asked for through `slots` like every other one. A `quantity` is a noun phrase with a number and the counter its kind takes; `money` is an amount and what the language counts it in.
 
 ::: lang js
 
@@ -320,7 +320,7 @@ rand_sentence(language="en", slots="money", count=2)
 
 :::
 
-**Four languages count, and it is the four with a classifier.** The counter comes from the noun's class, which is what the classes were worth having for — `마리` for a creature, `대` for a vehicle, `그루` for a plant. Korean, Japanese and Chinese put the number behind the noun; Vietnamese puts it in front, classifier and all.
+Four languages count, and they are the four with a classifier. The counter comes from the noun's class: `마리` for a creature, `대` for a vehicle, `그루` for a plant. Korean, Japanese and Chinese put the number behind the noun; Vietnamese puts it in front, classifier and all.
 
 | Language            | Counts | Names an amount |
 | ------------------- | ------ | --------------- |
@@ -328,13 +328,13 @@ rand_sentence(language="en", slots="money", count=2)
 | `en` `es` `it`      | —      | ✅              |
 | `de` `ru`           | —      | —               |
 
-**English, Spanish and Italian do not count, and the reason is not the plural rule.** A plural rule is easy to write; what it produces from these pools is `12 sadnesses`, `12 bacons` and `12 goggleses`, because most nouns in them cannot be counted at all and nothing in the data says which can. A classifier language has no such problem — `슬픔 12 가지` is twelve kinds of sadness, and the classifier is what makes the abstraction countable — so the counted shape is exactly the languages that have one.
+English, Spanish and Italian do not count. A plural rule applied to these pools produces `12 sadnesses`, `12 bacons` and `12 goggleses`, because most nouns in them cannot be counted at all and nothing in the data says which can. A classifier language has no such problem: `슬픔 12가지` is twelve kinds of sadness, and the classifier is what makes the abstraction countable. So the counted shape is exactly the languages that have one.
 
-**German and Russian do neither.** An amount stands where an object does, and neither declares an object shape, because both would put the noun in a case its own ending has to change for. That is the same rule that has kept them from declaring an object shape all along.
+German and Russian do neither. An amount stands where an object does, and neither declares an object shape, because both would put the noun in a case its own ending has to change for. That is the same rule that has kept them from declaring an object shape all along.
 
-**A counted phrase drops its article and takes no modifier** — `12 apples`, never `the 12 red apples`. And the thousands are grouped the way the language groups them: `,` in English, Korean, Japanese and Chinese, `.` in Vietnamese, Spanish and Italian.
+A counted phrase drops its article and takes no modifier: `12 apples`, never `the 12 red apples`. The thousands are grouped the way the language groups them, with `,` in English, Korean, Japanese and Chinese and `.` in Vietnamese, Spanish and Italian.
 
-**What stands between the digits and what they count is the language's own too.** Korean attaches the counter and the currency to the number — `6개`, `300,000원` — and so do Japanese and Chinese, which write no space anywhere. Vietnamese, English, Spanish and Italian keep the space: `6 con`, `500 dollars`.
+What stands between the digits and what they count is the language's own too. Korean attaches the counter and the currency to the number (`6개`, `300,000원`), and so do Japanese and Chinese, which write no space anywhere. Vietnamese, English, Spanish and Italian keep the space: `6 con`, `500 dollars`.
 
 ## A day and a time {#a-day-and-a-time}
 
@@ -385,19 +385,19 @@ rand_sentence(language="de", slots="date", count=2)
 
 :::
 
-**A date is word order as much as it is digits.** `2026년 9월 5일` runs largest to smallest, `ngày 5 tháng 9 năm 2026` runs the other way with a word in front of every part, and `5. September 2026` names its month and puts a full stop after the day. Each language writes its own template, and the five that name their months list them.
+A date is word order as much as it is digits. `2026년 9월 5일` runs largest to smallest, `ngày 5 tháng 9 năm 2026` runs the other way with a word in front of every part, and `5. September 2026` names its month and puts a full stop after the day. Each language writes its own template, and the five that name their months list them.
 
-**Either can stand two ways.** As an adverbial — `2026년 9월 5일에 사자가 달린다`, `On September 5, 2026, the lion runs` — or as what the sentence equates its subject to: `면접은 11시 40분이다.`, `The match is at 11:40.`
+Either can stand two ways: as an adverbial (`2026년 9월 5일에 사자가 달린다`, `On September 5, 2026, the lion runs`), or as what the sentence equates its subject to (`면접은 11시 40분이다.`, `The match is at 11:40.`).
 
-**The second of those is a copular shape**, and it is the only shape with neither a verb nor a state in it. The copula is a predicate like any other: it states the classes its subject may belong to — an event is a thing that happens on a day, and a lion is not — and it takes the form the level and the mood ask for, so Korean writes `이다`, `이야`, `이에요` and `입니다` and asks with `이니?`.
+The second of those is a copular shape, and it is the only shape with neither a verb nor a state in it. The copula is a predicate like any other. It states the classes its subject may belong to (a thing that happens on a day is an event, not a lion), and it takes the form the level and the mood ask for, so Korean writes `이다`, `이야`, `이에요` and `입니다` and asks with `이니?`.
 
-**Where the copula stands is the language's business.** Korean and Japanese write it onto the end of what it equates the subject to (`11시 40분이다` is one word); English, Chinese, Vietnamese, Spanish, Italian and German write it as a word of its own in front, and keep the preposition the phrase would carry anyway (`ist am 5. März`).
+Where the copula stands is the language's business. Korean and Japanese write it onto the end of what it equates the subject to (`11시 40분이다` is one word); English, Chinese, Vietnamese, Spanish, Italian and German write it as a word of its own in front, and keep the preposition the phrase would carry anyway (`ist am 5. März`).
 
-**Russian declares no calendar**, and asking for one falls back the way any unanswerable ask does. It equates a subject to a day with a dash rather than a word, and a dash does not change for a question or for a level — declaring one would be a shape the language cannot write.
+Russian declares no calendar, so asking for one falls back the way any unanswerable ask does. It equates a subject to a day with a dash rather than a word, and a dash does not change for a question or for a level, so declaring one would be a shape the language cannot write.
 
 ## Words it has to contain {#words-it-has-to-contain}
 
-`include` lists words every sentence has to hold, each at least once. A word the pools know goes in the phrase it belongs to — a noun becomes the subject, a verb the predicate, an adverb the manner — and a word from anywhere else is used as a noun.
+`include` lists words every sentence has to hold, each at least once. A word the pools know goes in the phrase it belongs to: a noun becomes the subject, a verb the predicate, an adverb the manner. A word from anywhere else is used as a noun.
 
 ::: lang js
 
@@ -452,11 +452,11 @@ A word can be more than one thing, and which it becomes depends on the rest. Eng
 
 Two things follow from that. A sentence has room for **as many words as it has phrases**, so asking for more than the longest shape can carry places what fits and leaves the rest out. And with no `language`, the languages whose pools actually hold every word you named are preferred, so `include: '고양이'` produces Korean.
 
-## Asking, exclaiming, trailing off {#asking-exclaiming-trailing-off}
+## What a sentence does {#asking-exclaiming-trailing-off}
 
-`type` says what the sentence is doing: `'statement'`, `'question'`, `'exclamation'` and `'trailing'` — a statement that stops rather than ends — plus the two quoted kinds below. **Left out, one of the six is drawn per sentence.** Name one, a set of them, or `'all'`.
+`type` says what the sentence is doing: `'statement'`, `'question'`, `'exclamation'`, `'trailing'` (a statement that stops rather than ends), plus the two quoted kinds below. Left out, one of the six is drawn per sentence. Name one, a set of them, or `'all'`.
 
-That draw is **weighted rather than even**, because prose is. A statement is far and away the most likely, a line somebody says comes next, and a question or an exclamation is the rarest of the six — a question is only worth reading when the sentences around it are not questions. Naming a kind yourself still gets you that kind and nothing else.
+That draw is weighted rather than even, because prose is. A statement is far and away the most likely, a line somebody says comes next, and a question or an exclamation is the rarest of the six. Naming a kind yourself still gets you that kind and nothing else.
 
 ::: lang js
 
@@ -503,7 +503,7 @@ rand_sentence(language="en", type="trailing", count=2)
 
 :::
 
-**A question is a shape, not a mark bolted onto a statement.** That is the same rule the rest of the generator follows, and it is why the do-support is not a branch in the code: English declares a shape whose auxiliary stands in front of the subject, and the verb falls back to its base form. German moves its finite verb to where nothing else stands; Korean changes the ending on the predicate itself; Japanese, Chinese and Vietnamese add a tag — `か`, `吗`, `không` — after the whole clause.
+A question is a shape of its own rather than a mark added to a statement, which is why the do-support is not a branch in the code. English declares a shape whose auxiliary stands in front of the subject, and the verb falls back to its base form. German moves its finite verb to where nothing else stands, Korean changes the ending on the predicate itself, and Japanese, Chinese and Vietnamese add a tag (`か`, `吗`, `không`) after the whole clause.
 
 | Language | How it asks |  |
 | --- | --- | --- |
@@ -513,9 +513,9 @@ rand_sentence(language="en", type="trailing", count=2)
 | `ja` `zh` `vi` | a tag after the clause | `侦探在遥远北极星里靠近吗？` |
 | `es` `it` `ru` | the mark alone | `¿El vino vívido se estropea en la sabana?` |
 
-The last row is not a shortcut: for those three the question **is** the statement, so they declare no question shape and get their statement shapes back — the same best-effort a length range too narrow for a shape already gets. Spanish marks both ends, which is what its `¿` and `¡` are.
+In the three languages on the last row the question is the statement, so they declare no question shape and get their statement shapes back. Spanish marks both ends, which is what its `¿` and `¡` are.
 
-**An exclamation usually opens on an interjection**, because one without anything in front of it is a statement wearing a mark. A statement never opens on one, and a question has its own mark to do the work.
+An exclamation usually opens on an interjection, because one without anything in front of it is a statement wearing a mark. A statement never opens on one, and a question has its own mark to do the work.
 
 ::: lang js
 
@@ -586,7 +586,7 @@ A word you named through `include` comes out in the form the type asks for: `inc
 | `'polite'` | 해요체      | The same closeness, said politely. The warmest of the four. |
 | `'formal'` | 합쇼체      | Polite and at a distance.                                   |
 
-**Left out, the level is drawn per result**, so two calls are not the same voice twice. Name one and every sentence of the result is written at it.
+Left out, the level is drawn per result, so two calls are not the same voice twice. Name one and every sentence of the result is written at it.
 
 ::: lang js
 
@@ -642,7 +642,7 @@ rand_sentence(language="ko", style="formal", count=2)
 
 :::
 
-**The level reaches the mood, not just the ending.** 해체 and 해요체 have no separate question or exclamation — `달려` asks and tells alike, and only the mark after it differs — so those two levels write one form for everything. 해라체 and 합쇼체 do move, and they move differently: 해라체 asks with `-니`, `-나` and `-(으)ㄴ가` and exclaims with `-구나`, `-네` and `-군`, while 합쇼체 turns `달립니다` into `달립니까`.
+The level reaches the mood as well as the ending. 해체 and 해요체 have no separate question or exclamation, since `달려` asks and tells alike and only the mark after it differs, so those two levels write one form for everything. 해라체 and 합쇼체 do change, and they change differently: 해라체 asks with `-니`, `-나` and `-(으)ㄴ가` and exclaims with `-구나`, `-네` and `-군`, while 합쇼체 turns `달립니다` into `달립니까`.
 
 ::: lang js
 
@@ -690,15 +690,15 @@ rand_sentence(language="ko", style="plain", type="exclamation", count=2)
 
 :::
 
-**A Korean question has more than one ending, and a pool entry says so.** The form pools stay index-aligned with the plain words — that is what lets a required word be translated by its position — and an entry lists its endings with `|` between them: `달리니|달리나|달리는가` is one verb written three ways. One of them is drawn per sentence.
+A Korean question has more than one ending, and a pool entry says so. The form pools stay index-aligned with the plain words, which is what lets a required word be translated by its position, and an entry lists its endings with `|` between them: `달리니|달리나|달리는가` is one verb written three ways. One of them is drawn per sentence.
 
-**Japanese has two levels and maps onto the four.** `'casual'` is its plain form and `'polite'` and `'formal'` are both `走ります`; `か` does the asking at every level, because it is the frame's tag rather than part of the verb.
+Japanese has two levels and maps onto the four. `'casual'` is its plain form and `'polite'` and `'formal'` are both `走ります`; `か` does the asking at every level, because it is the frame's tag rather than part of the verb.
 
-**The other seven write the same sentence at every level, and that is not a gap.** Spanish, Italian, German and Russian have a T–V distinction, but it lives in the second person and every sentence here is third — `el león corre` is what you say to anybody. English has no such form at all. Rather than inventing one, those seven declare no level and `style` changes nothing in them.
+The other seven write the same sentence at every level. Spanish, Italian, German and Russian have a T–V distinction, but it lives in the second person and every sentence here is third, so `el león corre` is what you say to anybody. English has no such form at all. Those seven declare no level, and `style` changes nothing in them.
 
 ## Dialogue and thought {#dialogue-and-thought}
 
-`'dialogue'` and `'thought'` are the two types that are not shapes at all. Both wrap a sentence in the language's own quotation marks, and what they wrap is drawn per line — somebody speaking asks more often than a page of prose does, and still tells more often than either.
+`'dialogue'` and `'thought'` are the two types that are not shapes. Both wrap a sentence in the language's own quotation marks, and what they wrap is drawn per line. Somebody speaking asks more often than a page of prose does, and still tells more often than they ask.
 
 ::: lang js
 
@@ -745,7 +745,7 @@ rand_sentence(language="en", type="thought", count=2)
 
 :::
 
-**The marks are the language's, and they are not close to universal.** Dialogue takes the first level and thought the second:
+The marks are the language's, and they are not close to universal. Dialogue takes the first level and thought the second:
 
 | Language            | First level | Second level |
 | ------------------- | ----------- | ------------ |
@@ -755,9 +755,9 @@ rand_sentence(language="en", type="thought", count=2)
 | `de`                | `„…“`       | `‚…‘`        |
 | `ru`                | `«…»`       | `„…“`        |
 
-Chinese takes the curly quotes rather than the corner brackets: these pools are written in simplified Chinese, and horizontal simplified text uses `“”` — `「」` is what Taiwan and Hong Kong write. German opens low and closes high, which is why its pair is not symmetrical.
+Chinese takes the curly quotes rather than the corner brackets: these pools are written in simplified Chinese, and horizontal simplified text uses `“”`, while `「」` is what Taiwan and Hong Kong write. German opens low and closes high, which is why its pair is not symmetrical.
 
-`quote` overrides which pair is used, whatever the type — so a thought can be shouted in the first-level marks and a line of dialogue whispered in the second.
+`quote` overrides which pair is used, whatever the type, so a thought can carry the first-level marks and a line of dialogue the second.
 
 ::: lang js
 
@@ -786,11 +786,11 @@ rand_sentence(language="ru", type="thought", quote="double")
 
 :::
 
-**There is no speech tag.** `…라고 그는 말했다` needs a speaker, which [`includeName`](#a-persons-name) has, and a verb of speaking, which none of the nine languages' pools hold. What you get is the line, not who said it.
+There is no speech tag. `…라고 그는 말했다` needs a speaker, which [`includeName`](#a-persons-name) has, and a verb of speaking, which none of the nine languages' pools hold. What you get is the line, not who said it.
 
 ## More than one sentence {#more-than-one-sentence}
 
-`sentences` puts more than one sentence in **one result**. They come back as a single string — `count` is still how many strings there are — and they are about the same thing rather than being that many separate draws.
+`sentences` puts more than one sentence in one result. They come back as a single string, `count` is still how many strings there are, and they are about the same thing rather than being that many separate draws.
 
 ::: lang js
 
@@ -831,15 +831,15 @@ rand_sentence(language="ko", sentences=3)
 
 :::
 
-**The first sentence sets the topic**, and every sentence after it stays on it. It names that subject again, stands a pronoun where it was, or draws a fresh noun of the same kind — a paragraph that opens on a creature never wanders into an idea halfway through — and it may open on a connective (`But`, `하지만`, `そして`).
+The first sentence sets the topic, and every sentence after it stays on it. It names that subject again, stands a pronoun where it was, or draws a fresh noun of the same kind, so a paragraph that opens on a creature never wanders into an idea halfway through. It may also open on a connective (`But`, `하지만`, `そして`).
 
-**A person is not a kind of thing.** A paragraph about Emma is about Emma: it names her again or stands a pronoun where she was, and never draws somebody else of the same kind. That last one would be a paragraph that quietly becomes about Sophie.
+A person is not a kind of thing. A paragraph about Emma is about Emma: it names her again or stands a pronoun where she was, and never draws somebody else of the same kind. That last one would be a paragraph that quietly becomes about Sophie.
 
-**It keeps its scene too.** A place the first sentence named is where the rest of it happens, and a thing it was about is the thing it stays about — a later sentence writes its own article and may put a different modifier in front, so `in the icy hamlet` becomes `in the hamlet`, not `in the vault`.
+It keeps its scene too. A place the first sentence named is where the rest of it happens, and a thing it was about is the thing it stays about. A later sentence writes its own article and may put a different modifier in front, so `in the icy hamlet` becomes `in the hamlet`, not `in the vault`.
 
-**And it stays in the register it opened in.** Prose about a line never becomes one, so a narrated paragraph never quotes. A quoted one is lines with prose between them: two people talking take turns, and one person saying four things in a row is a paragraph missing everything that happened while they said them. What that prose may not be is a third voice, so it tells rather than asks.
+And it stays in the register it opened in. Prose about a line never becomes one, so a narrated paragraph never quotes. A quoted one is lines with prose between them: two people talking take turns, and one person saying four things in a row is a paragraph missing everything that happened while they said them. What that prose may not be is a third voice, so it tells rather than asks.
 
-**A connective only claims what the two sentences can carry.** Each one is tagged by what it says about the sentence in front of it, and three of the four can open any continuation — time passed, here is one more thing, this cuts against that. The fourth cannot: `so`, `therefore`, `그러므로` and `だから` say this sentence _follows from_ the last one, which is only true when the two are about the same thing and this one is telling rather than asking. `그러므로 금빛 하이볼이 식죠?` after a sentence about a pretzel is a consequence of nothing.
+A connective only claims what the two sentences can carry. Each one is tagged by what it says about the sentence in front of it, and three of the four can open any continuation: time passed, here is one more thing, this cuts against that. The fourth cannot. `so`, `therefore`, `그러므로` and `だから` say this sentence follows from the last one, which is only true when the two are about the same thing and this one is telling rather than asking. `그러므로 금빛 하이볼이 식죠?` after a sentence about a pretzel is a consequence of nothing.
 
 | Claim           | English               | Korean               | Japanese             |
 | --------------- | --------------------- | -------------------- | -------------------- |
@@ -850,13 +850,13 @@ rand_sentence(language="ko", sentences=3)
 
 A language declares only the kinds it can write. German has none for time passed: `dann` and `danach` are adverbs, and an adverb in the first position moves the finite verb, so the five coordinating conjunctions are all it can open a clause with.
 
-**Nothing in a paragraph is said twice over.** A kind the sentence before it already was is less likely each time it comes round again, so a run of questions ends by itself; a verb group is spent before it starts over, rather than closing three of four lines on the same word; a person is named and then left alone; a fresh subject usually comes from the topic's own theme rather than from anywhere in its class; and no two sentences of one result open on the same connective or interjection.
+Nothing in a paragraph is said twice over. A kind the sentence before it already was is less likely each time it comes round again, so a run of questions ends by itself; a verb group is spent before it starts over, rather than closing three of four lines on the same word; a person is named and then left alone; a fresh subject usually comes from the topic's own theme rather than from anywhere in its class; and no two sentences of one result open on the same connective or interjection.
 
-What a language does for the pronoun is its own business. English writes `it`; Korean, Japanese, Chinese, Spanish and Italian leave the subject out entirely, which is what they actually do in a second sentence; German and Russian pick it by the noun's gender. A language whose written pronoun cannot stand for a person — English `he` and `she` need a gender the word pools do not carry, and `그것`, `それ`, `它` and `nó` are inanimate — names the topic again instead.
+Each language handles the pronoun its own way. English writes `it`; Korean, Japanese, Chinese, Spanish and Italian leave the subject out entirely, which is what they actually do in a second sentence; German and Russian pick it by the noun's gender. A language whose written pronoun cannot stand for a person names the topic again instead: English `he` and `she` need a gender the word pools do not carry, and `그것`, `それ`, `它` and `nó` are inanimate.
 
-**A name is the exception**, because it is the one subject that does carry a gender. `Philip counts the prime. He forgets it in the supernova.` is English standing `he` where `the locksmith` could only ever be named again. A language that writes no gendered pronoun is unaffected: Korean drops the subject rather than saying `그것` about somebody.
+A name is the exception, because it is the one subject that does carry a gender. `Philip counts the prime. He forgets it in the supernova.` is English standing `he` where `the locksmith` could only ever be named again. A language that writes no gendered pronoun is unaffected: Korean drops the subject rather than saying `그것` about somebody.
 
-**The length range describes the whole string**, whatever the sentence count. It is shared out across the sentences before any of them is drawn, and the last one takes the rounding.
+The length range describes the whole string, whatever the sentence count. It is shared out across the sentences before any of them is drawn, and the last one takes the rounding.
 
 ::: lang js
 
@@ -885,13 +885,13 @@ rand_sentence(language="ko", sentences=3, min_length=40, max_length=55)
 
 :::
 
-`include` goes in the first sentence, which puts each word in the result once rather than once per sentence. `sentences` is clamped to <Lang js="RAND_SENTENCE_COUNT_MAX" dart="randSentenceCountMax" py="RAND_SENTENCE_COUNT_MAX" code />, which is ten — already a paragraph.
+`include` goes in the first sentence, which puts each word in the result once rather than once per sentence. `sentences` is clamped to <Lang js="RAND_SENTENCE_COUNT_MAX" dart="randSentenceCountMax" py="RAND_SENTENCE_COUNT_MAX" code />, which is ten.
 
 ## A person's name {#a-persons-name}
 
-Every other generator here keeps person names out on purpose — a nickname is never built from one, and that rule is the whole point of keeping names and words apart. A sentence is the exception: <Lang js="includeName" py="include_name" dart="includeName" code /> writes a generated name where the sentence has room for a person.
+Every other generator here keeps person names out on purpose. A nickname is never built from one, and that rule is the whole point of keeping names and words apart. A sentence is the exception: <Lang js="includeName" py="include_name" dart="includeName" code /> writes a generated name where the sentence has room for a person.
 
-**Left out, it is a coin flip per result** — a paragraph either has a person in it or does not, rather than naming one in its second line and not its first. Set it yourself and that answer stands.
+Left out, it is a coin flip per result rather than per sentence, because a paragraph either has a person in it or does not. Set it yourself and that answer stands.
 
 ::: lang js
 
@@ -938,9 +938,9 @@ rand_sentence(language="es", include_name=True, count=3)
 
 :::
 
-**It is a bare given name**, not a full one and not a noun phrase: no article, no modifier, and the particle Korean puts after it chosen from its own last character the way any other word's is (`소한이`, `은영이`). It carries the gender it was drawn for, so a Spanish, Italian or Russian predicate agrees with it — `Celeste è affamata` beside `Ivano è raro` — which is the one thing the generator could not read off a name, since a name is in none of the word pools.
+It is a bare given name rather than a full one or a noun phrase: no article, no modifier, and the particle Korean puts after it chosen from its own last character the way any other word's is (`소한이`, `은영이`). It carries the gender it was drawn for, so a Spanish, Italian or Russian predicate agrees with it, as in `Celeste è affamata` beside `Ivano è raro`. That gender is the one thing the generator could not read off a name, since a name is in none of the word pools.
 
-**A name only stands where a person could.** Turning the option on narrows the subject to the themes that name people, so that the sentence has somewhere to put one. A `theme` you named yourself still wins, and then no name is written at all:
+A name only stands where a person could. Turning the option on narrows the subject to the themes that name people, so that the sentence has somewhere to put one. A `theme` you named yourself still wins, and then no name is written at all:
 
 ::: lang js
 
@@ -969,11 +969,11 @@ rand_sentence(language="en", theme="animal", include_name=True, count=2)
 
 :::
 
-`SentenceDetail.names` reports the names a result was written with, and a named subject reports <Lang js="theme: null" dart="theme: null" py="theme=None" code /> — a name belongs to no theme.
+`SentenceDetail.names` reports the names a result was written with, and a named subject reports <Lang js="theme: null" dart="theme: null" py="theme=None" code />, because a name belongs to no theme.
 
 ::: warning It costs 22 KB, whether you use it or not
 
-The option reaches the person-name pools, and a synchronous API has no dynamic import to hide behind — so a bundle that includes `randSentence` at all includes them. Bundling only `randSentence` with esbuild and gzipping: **122.5 KB before, 144.5 KB after**, `+22.0 KB` or `+18%`. The sentence generator already carries the whole word pools, which is 110 KB of that, and the name pools are the 22 KB beside them.
+The option reaches the person-name pools, and a synchronous API has no dynamic import to hide behind, so a bundle that includes `randSentence` at all includes them. Bundling only `randSentence` with esbuild and gzipping: **122.5 KB before, 144.5 KB after**, `+22.0 KB` or `+18%`. The sentence generator already carries the whole word pools, which is 110 KB of that, and the name pools are the 22 KB beside them.
 
 If you never write a name and the size matters, there is nothing to do about it in this version except not to import `randSentence`.
 
@@ -981,7 +981,7 @@ If you never write a name and the size matters, there is nothing to do about it 
 
 ## The detail output {#the-detail-output}
 
-`output: 'detail'` reports the pieces each sentence was built from — the phrases in order, what each of them does, the language and the subject's theme — instead of returning a string.
+`output: 'detail'` reports the pieces each sentence was built from instead of returning a string: the phrases in order, what each of them does, the language, and the subject's theme.
 
 ::: lang dart
 
@@ -1043,7 +1043,7 @@ rand_sentence(language="ko", output="detail", count=1)
 
 `phrases` holds the phrases and nothing else. The particle or preposition that marks one lives in `sentence` alone, so `그리핀이 …` reports `그리핀` and joining the phrases back together does not reproduce the sentence. Read `sentence` for the finished string, and `phrases` for what it was built from.
 
-Every sentence has exactly one `subject` and exactly one predicate, and that predicate is a `verb` or a `state` — never both.
+Every sentence has exactly one `subject` and exactly one predicate, and that predicate is either a `verb` or a `state`, never both.
 
 ## A theme for the subject
 

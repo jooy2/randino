@@ -1,6 +1,6 @@
 # randAnimal
 
-Animals — the creatures a nickname is most often built around.
+Animals, the creatures a nickname is most often built around.
 
 [`randWord`](./rand-word) with `theme` fixed to <Lang js="'animal'" dart="WordTheme.animal" py="&quot;animal&quot;" code />; every other option is the same one, and means the same thing.
 
@@ -24,7 +24,7 @@ import 'package:randino/randino.dart';
 randAnimal(language: WordLanguage.en, count: 3); // [Otter, Falcon, Lynx]
 ```
 
-Returns `List<String>`. For the detail form, pass `WordTheme.animal` to `randWordDetails` — Dart has no overloads, and twenty-five more functions for it would be twenty-five too many.
+Returns `List<String>`. For the detail form, pass `WordTheme.animal` to `randWordDetails`. Dart has no overloads, and a detail twin for each of the twenty-five themes would be twenty-five functions too many.
 
 :::
 

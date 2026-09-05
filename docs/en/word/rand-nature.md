@@ -1,6 +1,6 @@
 # randNature
 
-Nature and its phenomena — sky, weather, water, land.
+Nature and its phenomena: sky, weather, water and land.
 
 [`randWord`](./rand-word) with `theme` fixed to <Lang js="'nature'" dart="WordTheme.nature" py="&quot;nature&quot;" code />; every other option is the same one, and means the same thing.
 
@@ -24,7 +24,7 @@ import 'package:randino/randino.dart';
 randNature(language: WordLanguage.en, count: 3); // [Sky, Sunset, Breeze]
 ```
 
-Returns `List<String>`. For the detail form, pass `WordTheme.nature` to `randWordDetails` — Dart has no overloads, and twenty-five more functions for it would be twenty-five too many.
+Returns `List<String>`. For the detail form, pass `WordTheme.nature` to `randWordDetails`. Dart has no overloads, and a detail twin for each of the twenty-five themes would be twenty-five functions too many.
 
 :::
 

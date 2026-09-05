@@ -1,6 +1,6 @@
 # Nicknames
 
-A nickname is the handle someone would pick for a game or a website — MistyOwl, CraneVoyage, RustyBoot. randino builds one out of an everyday word with something added to it: a word for what it is like in front, one for what it is doing, a second word behind, or a possessive between the two.
+A nickname is the handle someone would pick for a game or a website: MistyOwl, CraneVoyage, RustyBoot. randino builds one out of an everyday word with something added to it, which is an adjective in front, a verb in front, a second word behind, or a possessive between the two.
 
 ::: lang js
 
@@ -37,7 +37,7 @@ rand_nickname(language="en", count=3)
 
 **Person names are never used.** That rule is the whole reason nicknames and names are two generators rather than one: a handle built out of somebody's name reads as that person's identity, and a handle built out of `Owl` and `Misty` reads as a handle. The English pools are checked against the English person-name pools automatically, which is why `job` has no `Knight`, `Baker` or `Hunter` and `plant` no `Rose` or `Ivy`.
 
-Korean and Japanese cannot be held to that check — 하늘, 별 and 森 are everyday nouns that happen to also be names — but `아름다운하늘` is still nobody's name.
+Korean and Japanese cannot be held to that check, because 하늘, 별 and 森 are everyday nouns that happen to also be names. `아름다운하늘` is still nobody's name.
 
 ## What is in the box
 
@@ -52,7 +52,7 @@ The nouns come from twenty-five [themes](../word/themes), and every nickname is 
 
 ### Length picks the shape, not the words
 
-Each language declares its own shapes — a bare noun, a word for what the noun is like in front of it, one for what it is doing, a trailing word behind it, a possessive between the two, or a combination — and <Lang js="minLength" dart="minLength" py="min_length" code /> / <Lang js="maxLength" dart="maxLength" py="max_length" code /> choose **between the shapes first**. The shapes that cannot land inside the range are dropped, then each slot is given the room left after the slots behind it have reserved their minimum.
+Each language declares its own shapes: a bare noun, an adjective in front of it, a verb in front of it, a trailing word behind it, a possessive between the two, or a combination. <Lang js="minLength" dart="minLength" py="min_length" code /> and <Lang js="maxLength" dart="maxLength" py="max_length" code /> choose between those shapes before they choose any words. The shapes that cannot land inside the range are dropped, then each slot is given the room left after the slots behind it have reserved their minimum.
 
 That is why a narrow range drops the modifier instead of truncating a word, and why a long range brings the three-word shapes in.
 
@@ -87,7 +87,7 @@ rand_nickname(language="en", count=4, min_length=4, max_length=9)
 
 :::
 
-The default range is **wide on purpose**: it spans every shape, and the shape weights — not the range — decide what output usually looks like. `nicknameLengthRange` is what reports it.
+The default range is wide on purpose. It spans every shape, and the shape weights rather than the range decide what output usually looks like. `nicknameLengthRange` is what reports it.
 
 ### `wordSeparator` replaces the language's own joiner
 
@@ -131,9 +131,9 @@ rand_nickname(language="en", word_separator="-", count=4)
 
 It is not cosmetic: **its length is part of the nickname's**, so a separator narrows the range the same way a longer word does. Pass it to `nicknameLengthRange` to see what is left.
 
-### A unique suffix is not an option here
+### A unique suffix is a separate function {#a-unique-suffix-is-not-an-option-here}
 
-It used to be four of them. Attaching a random token to a string is a thing about strings rather than about nicknames, so it is [`randSuffix`](../decorate/rand-suffix) now — which takes these nicknames, or a name, or an order number.
+Attaching a random token to a string is a thing about strings rather than about nicknames, so [`randSuffix`](../decorate/rand-suffix) does it. It takes these nicknames, or a name, or an order number.
 
 ::: lang js
 
@@ -195,7 +195,7 @@ rand_nickname(language="en", realism="invented", count=3)
 
 :::
 
-`realism` also decides **which themes** <Lang js="theme: 'all'" dart="a null theme" py="theme=&quot;all&quot;" code /> spans. Three of the twenty-five — `color`, `finance` and `tech` — make an awkward nickname: a word in front of a colour or a loan reads as a joke rather than a handle (`BraveInvoice`, `멋진대출`, `奔跑的服务器`). At `real` they are left out; at `mixed` and `invented` they are in. Naming one of them is always honoured, whatever the realism is — asking for `finance` and getting something else would be the option not working.
+`realism` also decides which themes <Lang js="theme: 'all'" dart="a null theme" py="theme=&quot;all&quot;" code /> spans. Three of the twenty-five, `color`, `finance` and `tech`, make an awkward nickname: a word in front of a colour or a loan reads as a joke rather than a handle (`BraveInvoice`, `멋진대출`, `奔跑的服务器`). At `real` they are left out; at `mixed` and `invented` they are in. Naming one of them is always honoured, whatever the realism is.
 
 ::: lang js
 
@@ -221,6 +221,6 @@ rand_nickname(theme="finance", count=2)  # ['QuietLedger', 'RisingYield']
 
 :::
 
-### `unique`, and why a suffix is usually the better answer
+### `unique`, and the suffix beside it {#unique-and-why-a-suffix-is-usually-the-better-answer}
 
 Korean and English have over forty million word combinations each, so duplicates are rare either way. `unique` rules them out inside one call and returns fewer nicknames once the pools run out; [`randSuffix`](../decorate/rand-suffix) makes collisions impossible across calls, across processes and across users, which is the guarantee a sign-up form actually needs.

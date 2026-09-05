@@ -18,9 +18,9 @@ Everything below runs in your browser. The controls are the options `randName`, 
 - Type two words into `include` — `brave lion` in English, `사자 조용히` in Korean. Both land in every sentence, and `brave` becomes a modifier or a predicate depending on what the rest of the shape has room for.
 - Set `shape` to `simple` and then to `complex`. The sentence gains a phrase rather than a longer word, which is the same thing `minLength` does one character at a time.
 
-## What this page is not
+## The scope of this page {#what-this-page-is-not}
 
-A generator you should call from a browser at scale — it is a demonstration. The library itself has no network calls and no dependencies, so the same code runs on a server, in a build script or in a test fixture exactly as it runs here.
+This page is a demonstration rather than a generator to call from a browser at scale. The library itself has no network calls and no dependencies, so the same code runs on a server, in a build script or in a test fixture exactly as it runs here.
 
 The output is also **not seeded**. There is no way to ask randino for the same batch twice; if you need reproducibility, keep the strings rather than the settings that produced them.
 

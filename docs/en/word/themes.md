@@ -1,6 +1,6 @@
 # Themes
 
-A theme is a slice of everyday vocabulary that a modifier can sit in front of. There are twenty-five of them, every language fills every one, and **a word belongs to exactly one** — which is what makes the theme a word reports unambiguous.
+A theme is a slice of everyday vocabulary that a modifier can sit in front of. There are twenty-five of them, every language fills every one, and **a word belongs to exactly one**, which is what makes the theme a word reports unambiguous.
 
 Each theme is also a generator of its own. `randWord` takes the theme as an option; the twenty-five functions in the third column are the same generator with the theme already chosen, and `randNickname` builds on the same pools.
 
@@ -91,13 +91,13 @@ Leave the theme out and each result draws from one theme picked at random, so a 
 
 ## The rules a theme follows
 
-**Themes are disjoint.** A word in two of them would make the reported theme ambiguous, and would make the detail output name a theme the caller never asked about. When a new theme claims a word an older one already held, the word **moves** rather than being copied: `place` took the twelve places that were sitting in `concept`, `vehicle` took the bicycle and the train out of `object`, `plant` took the flowers and the trees out of `nature`, and `music` took the instruments out of `object`. Where the two senses are genuinely different words, the word is renamed instead — the English toy became `Marbles` so that `gem` could keep `Marble`.
+**Themes are disjoint.** A word in two of them would make the reported theme ambiguous, and would make the detail output name a theme the caller never asked about. When a new theme claims a word an older one already held, the word **moves** rather than being copied: `place` took the twelve places that were sitting in `concept`, `vehicle` took the bicycle and the train out of `object`, `plant` took the flowers and the trees out of `nature`, and `music` took the instruments out of `object`. Where the two senses are genuinely different words, the word is renamed instead: the English toy became `Marbles` so that `gem` could keep `Marble`.
 
-**No person names, and no word that is only a name.** For English this is enforced against the person-name pools automatically, which is why `job` has no `Knight`, `Baker` or `Hunter` and `plant` no `Rose` or `Ivy`. Korean and Japanese cannot be held to the same check — 하늘, 별 and 森 are everyday nouns that happen also to be names — but a modifier in front of one is still nobody's name.
+**No person names, and no word that is only a name.** For English this is enforced against the person-name pools automatically, which is why `job` has no `Knight`, `Baker` or `Hunter` and `plant` no `Rose` or `Ivy`. Korean and Japanese cannot be held to the same check, because 하늘, 별 and 森 are everyday nouns that happen also to be names. A modifier in front of one is still nobody's name.
 
 **Pool sizes are uneven on purpose.** Most themes hold sixty or more nouns per language, and the thinnest sit in the forties. Some of these slices of vocabulary hold fewer words to begin with, and padding a pool with near-synonyms reads worse than a shorter pool.
 
-## Where a theme comes from
+## The theme a word reports {#where-a-theme-comes-from}
 
 | Where the word came from          | What `theme` reports                          |
 | --------------------------------- | --------------------------------------------- |

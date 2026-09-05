@@ -61,7 +61,7 @@ from randino import (
 
 :::
 
-The length options are clamped into `1 … 40`, counted in characters of what the generator returns — except on `randSentence`, whose ceiling is `200`. A sentence is many words where a name, a word and a nickname are at most three. `count` is clamped into `0 … 10000` — the upper bound is there because an unbounded count with `unique` on can spend a long time re-drawing from an exhausted pool.
+The length options are clamped into `1 … 40`, counted in characters of what the generator returns, except on `randSentence`, whose ceiling is `200`. A sentence is many words where a name, a word and a nickname are at most three. `count` is clamped into `0 … 10000`, because an unbounded count with `unique` on can spend a long time re-drawing from an exhausted pool.
 
 ## Names
 
@@ -201,7 +201,7 @@ from randino import (
 
 The charset is alphanumerics **minus the pairs that misread**: no `0` or `O`, no `1`, `l` or `I`. An affix is something somebody reads off a screen and types into another one, and those five characters are where that goes wrong.
 
-Narrow it or extend it through <Lang js="charset" dart="charset" py="charset" code /> — starting from the default rather than from the alphabet keeps that property:
+Narrow it or extend it through <Lang js="charset" dart="charset" py="charset" code />. Starting from the default rather than from the alphabet keeps that property:
 
 ::: lang js
 
@@ -272,7 +272,7 @@ import type {
 const options: RandNameOptions = { language: 'ko', count: 3 };
 ```
 
-The `…Option` types are the union of a language or theme with `'all'` — `NameLanguageOption` is `NameLanguage | 'all'`. Use the narrower one wherever `'all'` is not a valid answer, which is what the helpers do.
+The `…Option` types are the union of a language or theme with `'all'`, so `NameLanguageOption` is `NameLanguage | 'all'`. Use the narrower one wherever `'all'` is not a valid answer, which is what the helpers do.
 
 :::
 
@@ -318,7 +318,7 @@ from randino import (
 language: NameLanguageOption = "ko"
 ```
 
-They are `Literal` types rather than classes, so `"kr"` is rejected where `NameLanguage` is expected. The `…Option` types add `"all"` — `NameLanguageOption` is `NameLanguage | Literal["all"]`. Use the narrower one wherever `"all"` is not a valid answer.
+They are `Literal` types rather than classes, so `"kr"` is rejected where `NameLanguage` is expected. The `…Option` types add `"all"`, so `NameLanguageOption` is `NameLanguage | Literal["all"]`. Use the narrower one wherever `"all"` is not a valid answer.
 
 There is no options type to import: the arguments are keyword-only rather than an object, so there is nothing to annotate.
 

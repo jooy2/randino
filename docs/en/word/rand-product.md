@@ -1,6 +1,6 @@
 # randProduct
 
-Things you buy — the manufactured end of the vocabulary.
+Things you buy, the manufactured end of the vocabulary.
 
 [`randWord`](./rand-word) with `theme` fixed to <Lang js="'product'" dart="WordTheme.product" py="&quot;product&quot;" code />; every other option is the same one, and means the same thing.
 
@@ -24,7 +24,7 @@ import 'package:randino/randino.dart';
 randProduct(language: WordLanguage.en, count: 3); // [Laptop, Keyboard, Earbuds]
 ```
 
-Returns `List<String>`. For the detail form, pass `WordTheme.product` to `randWordDetails` — Dart has no overloads, and twenty-five more functions for it would be twenty-five too many.
+Returns `List<String>`. For the detail form, pass `WordTheme.product` to `randWordDetails`. Dart has no overloads, and a detail twin for each of the twenty-five themes would be twenty-five functions too many.
 
 :::
 

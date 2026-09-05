@@ -85,7 +85,7 @@ English is the one language where romanizing changes nothing, because the names 
 
 ## Words and nicknames {#words-and-nicknames}
 
-The word pools — and so `randWord`, the twenty-five themed generators and `randNickname` — cover every one of the nine. What differs between them is where the modifier goes and whether it changes shape beside the noun, and each language says both in its own frames and agreement rules.
+The word pools cover every one of the nine, and so do `randWord`, the twenty-five themed generators and `randNickname`. What differs between the languages is where the modifier goes and whether it changes shape beside the noun, and each language says both in its own frames and agreement rules.
 
 | Code | Language   | Shapes                         | Example                    |
 | ---- | ---------- | ------------------------------ | -------------------------- |
@@ -99,11 +99,11 @@ The word pools — and so `randWord`, the twenty-five themed generators and `ran
 | `de` | German     | modifier **before**, declining | blauer Wal, blaue Katze    |
 | `ru` | Russian    | modifier **before**, declining | синий кит, синяя рыба      |
 
-Neither word order nor agreement keeps a language out any more. The shapes belong to the language, so Vietnamese writes its own — the modifier behind the noun, the possessed thing in front of its owner. And a language that inflects tags each noun with its gender and lists the endings a modifier changes, so Spanish writes `gato dorado` beside `luna dorada` without either form being stored twice. A noun with no singular at all — `ножницы`, `gafas`, `Jeans` — is tagged plural instead, because no singular modifier can stand beside it.
+The shapes belong to the language, so Vietnamese writes its own: the modifier behind the noun, the possessed thing in front of its owner. A language that inflects tags each noun with its gender and lists the endings a modifier changes, so Spanish writes `gato dorado` beside `luna dorada` without either form being stored twice. A noun with no singular at all, such as `ножницы`, `gafas` or `Jeans`, is tagged plural instead, because no singular modifier can stand beside it.
 
-Every language the name generator knows now has word pools too, so `language` means the same nine codes on every generator in the package.
+Every language the name generator knows has word pools too, so `language` means the same nine codes on every generator in the package.
 
-Japanese and Chinese reach a second noun only through の and 的. A bare noun-noun compound needs a particle more often than not in either language, or reads as garbled once the base word is abstract, so the shape that has one is the shape they got.
+Japanese and Chinese reach a second noun only through の and 的. A bare noun-noun compound needs a particle more often than not in either language, and reads as garbled once the base word is abstract.
 
 ## Sentences
 
@@ -121,4 +121,4 @@ Every language writes sentences too, and each declares the shapes its own gramma
 | `de` | German | no object, no place | Im Frühling blüht eine Chrysantheme noch. |
 | `ru` | Russian | no object, no place | Спутанный юпитер едва светлеет. |
 
-German and Russian are narrower for the same reason. Both would put an object in the accusative and a place in another case again, and each case changes the noun's own ending or the article in front of it — so the shapes that need one are shapes they do not declare. Asking for one falls back to the closest they have. [Sentences](../sentence/) has the whole of it.
+German and Russian are narrower for the same reason. Both would put an object in the accusative and a place in another case again, and each case changes the noun's own ending or the article in front of it, so they do not declare the shapes that need one. Asking for one falls back to the closest they have. [Sentences](../sentence/) covers this in full.
