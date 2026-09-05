@@ -454,7 +454,9 @@ Two things follow from that. A sentence has room for **as many words as it has p
 
 ## Asking, exclaiming, trailing off {#asking-exclaiming-trailing-off}
 
-`type` says what the sentence is doing: `'statement'`, `'question'`, `'exclamation'` and `'trailing'` — a statement that stops rather than ends — plus the two quoted kinds below. **Left out, one of the six is drawn per sentence**, so a call with nothing said about it asks as readily as it tells. Name one, a set of them, or `'all'`.
+`type` says what the sentence is doing: `'statement'`, `'question'`, `'exclamation'` and `'trailing'` — a statement that stops rather than ends — plus the two quoted kinds below. **Left out, one of the six is drawn per sentence.** Name one, a set of them, or `'all'`.
+
+That draw is **weighted rather than even**, because prose is. A statement is far and away the most likely, a line somebody says comes next, and a question or an exclamation is the rarest of the six — a question is only worth reading when the sentences around it are not questions. Naming a kind yourself still gets you that kind and nothing else.
 
 ::: lang js
 
@@ -696,7 +698,7 @@ rand_sentence(language="ko", style="plain", type="exclamation", count=2)
 
 ## Dialogue and thought {#dialogue-and-thought}
 
-`'dialogue'` and `'thought'` are the two types that are not shapes at all. Both wrap a sentence in the language's own quotation marks, and what they wrap is drawn per line — somebody speaking is as often asking as telling.
+`'dialogue'` and `'thought'` are the two types that are not shapes at all. Both wrap a sentence in the language's own quotation marks, and what they wrap is drawn per line — somebody speaking asks more often than a page of prose does, and still tells more often than either.
 
 ::: lang js
 
@@ -835,9 +837,13 @@ rand_sentence(language="ko", sentences=3)
 
 **It keeps its scene too.** A place the first sentence named is where the rest of it happens, and a thing it was about is the thing it stays about — a later sentence writes its own article and may put a different modifier in front, so `in the icy hamlet` becomes `in the hamlet`, not `in the vault`.
 
-**And it stays in the register it opened in.** A line somebody says is a line, and the next one is another line of the same speech; prose about it may ask and exclaim without becoming a line. A paragraph that quotes, asks, exclaims and trails off in four sentences is four paragraphs.
+**And it stays in the register it opened in.** Prose about a line never becomes one, so a narrated paragraph never quotes. A quoted one is lines with prose between them: two people talking take turns, and one person saying four things in a row is a paragraph missing everything that happened while they said them. What that prose may not be is a third voice, so it tells rather than asks.
 
-What a language does for the pronoun is its own business. English writes `it`; Korean, Japanese, Chinese, Spanish and Italian leave the subject out entirely, which is what they actually do in a second sentence; German and Russian pick it by the noun's gender. A language whose written pronoun cannot stand for a person — English `he` and `she` need a gender the pools do not carry, and `그것`, `それ`, `它` and `nó` are inanimate — names the topic again instead.
+**Nothing in a paragraph is said twice over.** A kind the sentence before it already was is less likely each time it comes round again, so a run of questions ends by itself; a verb group is spent before it starts over, rather than closing three of four lines on the same word; a person is named and then left alone; a fresh subject usually comes from the topic's own theme rather than from anywhere in its class; and no two sentences of one result open on the same connective or interjection.
+
+What a language does for the pronoun is its own business. English writes `it`; Korean, Japanese, Chinese, Spanish and Italian leave the subject out entirely, which is what they actually do in a second sentence; German and Russian pick it by the noun's gender. A language whose written pronoun cannot stand for a person — English `he` and `she` need a gender the word pools do not carry, and `그것`, `それ`, `它` and `nó` are inanimate — names the topic again instead.
+
+**A name is the exception**, because it is the one subject that does carry a gender. `Philip counts the prime. He forgets it in the supernova.` is English standing `he` where `the locksmith` could only ever be named again. A language that writes no gendered pronoun is unaffected: Korean drops the subject rather than saying `그것` about somebody.
 
 **The length range describes the whole string**, whatever the sentence count. It is shared out across the sentences before any of them is drawn, and the last one takes the rounding.
 

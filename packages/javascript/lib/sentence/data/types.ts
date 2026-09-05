@@ -370,6 +370,12 @@ export type SentenceLanguageData = {
 	 * The languages whose written pronoun is inanimate — `그것`, `それ`, `它`, `nó`
 	 * — list `person` too, and drop the subject instead, which is what they would
 	 * do anyway. Omitted by a language whose pronouns stand for anything.
+	 *
+	 * A topic that carries a gender is the exception, and a person's name is the
+	 * only thing that does: `he` is wrong for `the locksmith` and right for
+	 * `Philip`. A language that declares no pool for that gender is unaffected,
+	 * which is why Korean drops the subject rather than writing `그것` about
+	 * somebody.
 	 */
 	pronounless?: readonly NounClass[];
 	/**

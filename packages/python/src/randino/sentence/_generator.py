@@ -34,7 +34,7 @@ from randino._internal.generate import (
     resolve_realism,
 )
 from randino._internal.script import ends_with_consonant
-from randino._internal.utils import chance, clamp, pick
+from randino._internal.utils import chance, clamp, pick, pick_weighted
 from randino._types import (
     RandRealism,
     SentenceDetail,
@@ -80,6 +80,12 @@ from randino.word.data._types import WordGender, WordLanguageData, WordPool
 
 FIT_ATTEMPTS = 14
 """How many sentences to build before settling for the closest fit found."""
+
+THEME_CHANCE = 65
+"""How often a fresh subject is drawn from the topic's own theme.
+
+Rather than from anywhere in the topic's class.
+"""
 
 MODIFY_CHANCE = 45
 """How often a noun phrase that may carry a modifier is given one.
@@ -336,17 +342,64 @@ class Settings:
 QUOTED_TYPES: tuple[SentenceType, ...] = ("dialogue", "thought")
 """The kinds that are a line somebody says or thinks rather than prose about it."""
 
-LEAD_CHANCE = 70
-"""How often a sentence after the first keeps the kind the result opened on.
+NARRATION: tuple[SentenceType, ...] = ("statement", "trailing")
+"""The kinds prose about a quoted line can be.
 
-A paragraph that quotes, asks, exclaims and trails off in four lines is four
-paragraphs; one that never varies is a list.
+A line is answered by another line or by a sentence about it, and narration that asks
+or exclaims is a third voice in a scene that has two.
+"""
+
+TYPE_WEIGHT: dict[SentenceType, int] = {
+    "statement": 100,
+    "dialogue": 34,
+    "trailing": 16,
+    "question": 14,
+    "thought": 12,
+    "exclamation": 10,
+}
+"""What each kind is worth against the others wherever the caller left it to chance.
+
+Prose is mostly statements: a paragraph that tells, asks, exclaims, trails off and
+quotes in equal measure is not a paragraph but a sampler of the six. A line somebody
+says comes next, because it is the one kind that carries a scene with it, and the two
+marked kinds are the rarest — a question is only worth reading when the sentences
+around it are not questions.
+"""
+
+MARK_WEIGHT: dict[SentenceMark, int] = {
+    "statement": 100,
+    "question": 34,
+    "exclamation": 22,
+    "trailing": 16,
+}
+"""The same for the mark a quoted line closes on, which is drawn rather than fixed.
+
+Somebody speaking asks more often than a page of prose does, and still tells more often
+than either.
+"""
+
+QUOTED_BOOST = 6
+"""How much more likely a quoted line is inside a result that opened on one.
+
+Speech is what a scene of speech is made of, and what the boost leaves room for is the
+prose between the lines — the only thing that keeps two of them from reading as one
+person talking to themselves.
+"""
+
+REPEAT_DAMP = 0.45
+"""What one more of the same in a row costs, against everything but a plain statement.
+
+A second question straight after one reads as a quiz and a third exclamation as a
+shouting match, so each repeat is worth less than the last — damped rather than
+forbidden, because an exchange of two lines is a conversation and a run of ten is
+the tic.
 """
 
 QUOTED_MARKS: tuple[SentenceMark, ...] = ("statement", "question", "exclamation")
 """The kinds a quoted line can be.
 
-Somebody speaking is as often asking as telling, and often enough neither, so the mark
+Somebody speaking asks more often than a page of prose does and often enough does
+neither, so the mark
 is drawn rather than fixed.
 """
 
@@ -521,6 +574,14 @@ class Draw:
     style: SentenceStyle
     """The level this line is said at, which a quoted one does not share."""
 
+    avoid: frozenset[str]
+    """The predicates and adverbials the result has already used, in their plain form.
+
+    A verb group holds four words and a paragraph holds ten sentences, so this cannot
+    always be honoured — what it does is spend the group before it starts over, rather
+    than rolling `식습니다` three times in four lines.
+    """
+
     follow: "Follow | None"
 
 
@@ -565,6 +626,41 @@ class Follow:
 
     A sentence with one of those slots writes what is here rather than drawing again —
     a paragraph whose place changes every line is not one paragraph.
+    """
+
+
+@dataclass(slots=True)
+class Flow:
+    """What the result has written so far, and what keeps the next sentence from it.
+
+    A paragraph is not a set of draws that happened to land together, and every field
+    here is one of the ways that shows: the register it opened in, the kind and the mark
+    it has just used, what it opened those sentences on, and whether the last of them
+    named the topic instead of standing a pronoun where it was.
+    """
+
+    lead: SentenceType | None = None
+    """The kind the result opened on, which is the register the rest of it keeps."""
+
+    last: SentenceType | None = None
+    """The kind the sentence before this one was."""
+
+    run: int = 0
+    """How many of that kind in a row."""
+
+    mark: SentenceMark | None = None
+    """The mark that sentence closed on, quoted or not."""
+
+    opened: bool = False
+    """Whether it opened on a connective or an interjection."""
+
+    openers: set[str] = field(default_factory=set)
+    """Every one the result has already used, so that none is written twice."""
+
+    repeated: bool = True
+    """Whether it named the topic rather than standing a pronoun where it was.
+
+    The opening sentence names the subject itself, which is why this starts True.
     """
 
 
@@ -1274,6 +1370,9 @@ class Built:
     names: tuple[str, ...]
     """The person names this sentence was written with, in order."""
 
+    used: tuple[str, ...]
+    """The predicates and adverbials it used, in their plain form."""
+
     type: SentenceType
     """What this sentence is doing."""
 
@@ -1418,23 +1517,17 @@ def _noun_phrase(
     )
 
 
-def _proper_name(
-    language: WordLanguage,
-    lexicon: WordLanguageData,
-    settings: Settings,
-    prefix: str,
-) -> tuple[str, WordGender | None]:
+def _proper_name(language: WordLanguage, settings: Settings, prefix: str) -> tuple[str, WordGender]:
     """A person's name for a phrase that has room for one, and the gender it carries.
 
     A bare given name rather than a full one: a sentence about someone uses the name
     they are called by, and `rand_name`'s default would put a surname in every clause.
     The gender is the one the name was drawn for, translated into the gender a modifier
-    and a predicate agree with — and only for a language whose words agree at all,
-    since nothing else has any use for it.
+    and a predicate agree with — and carried even by a language whose words agree with
+    nothing, because a pronoun still has to pick between `he` and `she`.
 
     Args:
         language: The language the sentence is written in.
-        lexicon: Its word data, which says whether anything agrees.
         settings: The sentence's own settings, for the realism level.
         prefix: A `starts_with` the name has to honour, or `""`.
 
@@ -1455,12 +1548,7 @@ def _proper_name(
         realism=settings.realism,
         starts_with=prefix,
     )
-    gender: WordGender | None = None
-
-    if lexicon.agreement is not None:
-        gender = "m" if drawn.gender == "male" else "f"
-
-    return drawn.native, gender
+    return drawn.native, ("m" if drawn.gender == "male" else "f")
 
 
 def _name_span(language: WordLanguage) -> tuple[int, int]:
@@ -1548,8 +1636,15 @@ def _predicate_for(
     gender: WordGender | None,
     low: int,
     high: int,
-) -> str:
-    """The word a phrase that is not a noun phrase writes: the predicate, or an adverb."""
+    avoid: frozenset[str],
+) -> tuple[str, str]:
+    """What a phrase that is not a noun phrase writes, and the word it is a form of.
+
+    `avoid` holds what the result has already said, and the plain form is what it holds:
+    `끓습니까` and `끓어` are one verb said twice, so remembering the written form would
+    remember nothing. It is a preference and not a filter — the range comes first, and a
+    pool with nothing unused left inside it is drawn from as it always was.
+    """
 
     def agreed(word: str) -> str:
         if slot == "state" and data.predicate_agrees:
@@ -1562,17 +1657,36 @@ def _predicate_for(
         # pools are index-aligned so that it can be said the other way instead.
         at = base.index(required.word) if required.word in base else -1
 
-        return agreed(predicates[at] if 0 <= at < len(predicates) else required.word)
+        return (
+            agreed(predicates[at] if 0 <= at < len(predicates) else required.word),
+            required.word,
+        )
 
     if slot == "date":
-        return _date_text(data)
+        return _date_text(data), ""
 
     if slot == "clock":
-        return _clock_text(data)
+        return _clock_text(data), ""
 
     pool = data.manners if slot == "manner" else data.times if slot == "time" else predicates
 
-    return agreed(pick_word(pool, min(low, high), high, "") or pick(pool))
+    def plainly(at: int) -> str:
+        # A predicate is a form of the word at the same index of the group; an adverbial
+        # is written whole and is its own plain form.
+        if pool is predicates and 0 <= at < len(base):
+            return base[at]
+
+        return pool[at]
+
+    least = min(low, high)
+    fresh = tuple(
+        word
+        for at, word in enumerate(pool)
+        if plainly(at) not in avoid and least <= len(word) <= high
+    )
+    drawn = pick(fresh) if fresh else (pick_word(pool, least, high, "") or pick(pool))
+
+    return agreed(drawn), plainly(pool.index(drawn))
 
 
 def _compose(
@@ -1794,6 +1908,9 @@ def _compose(
     reported: list[str] = []
     slots: list[SentenceSlot] = []
     names: list[str] = []
+    # The predicates and adverbials this sentence spends, for the next one to leave
+    # alone.
+    spent: list[str] = []
     # The noun phrases this sentence drew for the slots a later one keeps.
     drawn: dict[SentenceSlot, Phrase] = {}
     subject: Phrase | None = None
@@ -1834,10 +1951,7 @@ def _compose(
                 phrase = carried_in
             else:
                 phrase, drawn_gender = _proper_name(
-                    language,
-                    lexicon,
-                    settings,
-                    settings.prefix if prefixable and index == 0 else "",
+                    language, settings, settings.prefix if prefixable and index == 0 else ""
                 )
                 names.append(phrase)
 
@@ -1896,7 +2010,7 @@ def _compose(
             if part.slot in ("place", "object"):
                 drawn[part.slot] = built
         else:
-            phrase = _predicate_for(
+            phrase, plain_form = _predicate_for(
                 part.slot,
                 lexicon,
                 data,
@@ -1906,7 +2020,11 @@ def _compose(
                 gender,
                 part_low,
                 part_high,
+                draw.avoid,
             )
+
+            if plain_form:
+                spent.append(plain_form)
 
         # The opening capital belongs to whatever is written first, and that is the
         # phrase itself unless a connective or a preposition stands in front of it.
@@ -1967,6 +2085,7 @@ def _compose(
         tuple(reported),
         tuple(slots),
         tuple(names),
+        tuple(spent),
         draw.type,
         None if named else (subject.theme if subject is not None else None),
         subject_word,
@@ -2047,8 +2166,22 @@ Higher than the connective's, because an exclamation with nothing in front of it
 statement wearing a mark.
 """
 
+OPENER_DAMP = 0.4
+"""What both of those are worth when the sentence before this one already opened.
+
+Two in a row read as a list of asides rather than as a paragraph.
+"""
+
 REFERENCE_WEIGHT = {"repeat": 25, "pronoun": 40, "fresh": 35}
 """How a sentence refers to the topic, against the other two ways of doing it."""
+
+NAMED_DAMP = 0.6
+"""What naming the topic again is worth when the topic is a person's name.
+
+A name is the most conspicuous word in a sentence and the one a reader is least likely
+to lose track of, so prose names somebody once and then leaves them alone;
+`신우가 …. 신우는 …. 신우가 …` is a caption written three times.
+"""
 
 
 def _topic_of(built: Built) -> Topic | None:
@@ -2075,40 +2208,64 @@ def _pronouns_for(data: SentenceLanguageData, topic: Topic) -> WordPool:
     A class its written pronouns are wrong for is left with the empty entry alone — the
     language says nothing where it can, and where it cannot, there is no pronoun to be
     had and the sentence names the topic again instead.
-    """
-    pool = data.pronouns.get(topic.gender or "n") or data.pronouns.get("n") or ()
 
-    if topic.noun_class is not None and topic.noun_class in data.pronounless:
+    A gendered pronoun is the one thing such a class can still take, and only where the
+    topic carries a gender to choose it by. That is what the list is about: `he` and
+    `she` cannot stand for `the locksmith`, because nothing says which of the two, and a
+    name says. A language that declares no pool for that gender has none to offer, so
+    Korean still drops the subject rather than writing `그것` about somebody.
+    """
+    gendered = data.pronouns.get(topic.gender) if topic.gender else None
+    pool = gendered or data.pronouns.get("n") or ()
+
+    if gendered is None and topic.noun_class is not None and topic.noun_class in data.pronounless:
         return tuple(word for word in pool if not word)
 
     return pool
 
 
 def _follow_for(
-    data: SentenceLanguageData, topic: Topic, scene: Mapping[SentenceSlot, Requirement]
+    data: SentenceLanguageData,
+    topic: Topic,
+    scene: Mapping[SentenceSlot, Requirement],
+    repeated: bool,
 ) -> Follow:
-    """How one sentence carries on from the one before it."""
+    """How one sentence carries on from the one before it.
+
+    `repeated` says whether that one already named the topic, and naming it again
+    straight afterwards is what makes a paragraph read as a caption written ten times —
+    worst of all with a person's name, which has no pronoun to alternate with in the
+    languages that leave their subject out.
+    """
     pronouns = _pronouns_for(data, topic)
     # A person is an individual, not a kind of thing: a paragraph about Emma that draws
     # a `fresh` subject is a paragraph that quietly becomes about Sophie. Every other
     # topic can be another one of its own class.
     ways = ("repeat", "pronoun") if topic.named else ("repeat", "pronoun", "fresh")
     usable = ways if pronouns else tuple(way for way in ways if way != "pronoun")
-    roll = random.random() * sum(REFERENCE_WEIGHT[each] for each in usable)
-    reference = usable[-1]
 
-    for each in usable:
-        roll -= REFERENCE_WEIGHT[each]
+    def weight_of(way: str) -> float:
+        if way != "repeat":
+            return REFERENCE_WEIGHT[way]
 
-        if roll <= 0:
-            reference = each
-            break
+        return (
+            REFERENCE_WEIGHT[way]
+            * (REPEAT_DAMP if repeated else 1)
+            * (NAMED_DAMP if topic.named else 1)
+        )
+
+    reference = pick_weighted(usable, weight_of)
 
     return Follow(topic, reference, pick(pronouns) if reference == "pronoun" else "", scene)
 
 
 def _opener_for(
-    data: SentenceLanguageData, mark: SentenceMark, following: bool, room: int, shortest: int
+    data: SentenceLanguageData,
+    mark: SentenceMark,
+    following: bool,
+    room: int,
+    shortest: int,
+    flow: Flow,
 ) -> str:
     """What a sentence opens on: an interjection for an exclamation, else a connective.
 
@@ -2125,6 +2282,7 @@ def _opener_for(
         following: Whether it follows another sentence of the same result.
         room: The longest this sentence may be.
         shortest: The shortest sentence the language's shapes could spell.
+        flow: What the result has already opened its sentences on.
 
     Returns:
         What the sentence opens on, or `""`.
@@ -2132,12 +2290,17 @@ def _opener_for(
     spare = room - len(data.space) - shortest
 
     def fitting(pool: WordPool) -> tuple[str, ...]:
-        return tuple(word for word in pool if len(word) <= spare)
+        # Never the same one twice in one result.
+        return tuple(word for word in pool if len(word) <= spare and word not in flow.openers)
+
+    # Far less likely at all when the sentence before this one already opened on
+    # something.
+    damp = OPENER_DAMP if flow.opened else 1
 
     if mark == "exclamation":
         usable = fitting(data.interjections)
 
-        if usable and chance(INTERJECTION_CHANCE):
+        if usable and chance(INTERJECTION_CHANCE * damp):
             return pick(usable)
 
     if not following:
@@ -2145,7 +2308,7 @@ def _opener_for(
 
     usable = fitting(data.connectives)
 
-    return pick(usable) if usable and chance(CONNECTIVE_CHANCE) else ""
+    return pick(usable) if usable and chance(CONNECTIVE_CHANCE * damp) else ""
 
 
 def _room_for(language: WordLanguage, include_name: bool | None) -> dict[str, tuple[int, int]]:
@@ -2206,7 +2369,7 @@ def _kind_for(
     settings: Settings,
     bounds: dict[str, tuple[int, int]],
     budget: tuple[int, int],
-    lead: SentenceType | None,
+    flow: Flow,
 ) -> tuple[SentenceType, SentenceMark]:
     """The kind this sentence is, and the kind whose mark it closes on.
 
@@ -2224,7 +2387,7 @@ def _kind_for(
         settings: What the caller asked for.
         bounds: The bounds every phrase is measured against.
         budget: The room this sentence has.
-        lead: The kind the result opened on, or None on its first sentence.
+        flow: What the result has already said, and in what register.
 
     Returns:
         The kind, and the kind whose mark it closes on.
@@ -2252,17 +2415,23 @@ def _kind_for(
 
         return (budget[0] - marks, budget[1] - marks)
 
-    # A paragraph stays in the register it opened in. A line somebody speaks is a line,
-    # and the next one is another line of the same speech; prose about it may ask and
-    # exclaim without stopping being prose. Nothing to keep to on the first sentence,
-    # which is where the register comes from.
+    # A paragraph stays in the register it opened in. Prose about a line may not become
+    # one, so the narrated register is the closed half; a quoted one keeps the prose that
+    # goes between its lines, because a line answered only by another line is one person
+    # talking to themselves. Nothing to keep to on the first sentence, which is where the
+    # register comes from.
+    lead = flow.lead
     family = (
         settings.types
         if lead is None
         else tuple(
             type_
             for type_ in settings.types
-            if (type_ == lead if lead in QUOTED_TYPES else type_ not in QUOTED_TYPES)
+            if (
+                (type_ == lead or type_ in NARRATION)
+                if lead in QUOTED_TYPES
+                else type_ not in QUOTED_TYPES
+            )
         )
     )
     wanted = family or settings.types
@@ -2270,10 +2439,35 @@ def _kind_for(
         type_ for type_ in wanted if any(fits(mark, room_of(type_)) for mark in marks_of(type_))
     )
     pool = usable or wanted
-    type_ = lead if lead is not None and lead in pool and chance(LEAD_CHANCE) else pick(pool)
+    type_ = pick_weighted(pool, lambda each: _type_weight_for(each, flow))
     marks = tuple(mark for mark in marks_of(type_) if fits(mark, room_of(type_)))
 
-    return type_, pick(marks or marks_of(type_))
+    return type_, pick_weighted(marks or marks_of(type_), lambda mark: _mark_weight_for(mark, flow))
+
+
+def _type_weight_for(type_: SentenceType, flow: Flow) -> float:
+    """What one kind is worth here, in this result, after what it has already said.
+
+    Two things move it off the flat weight. A result that opened on a quoted line is a
+    scene of speech, so the line it opened on outweighs the prose around it; and a kind
+    the sentence before this one already was is worth less each time it comes round
+    again, so that a run of them ends by itself. The plain statement is the one thing
+    exempt from that: a run of statements is what prose is.
+    """
+    quoted = flow.lead is not None and flow.lead in QUOTED_TYPES
+    base = TYPE_WEIGHT[type_] * (QUOTED_BOOST if quoted and type_ == flow.lead else 1)
+
+    if type_ != flow.last or type_ == "statement":
+        return base
+
+    return base * REPEAT_DAMP**flow.run
+
+
+def _mark_weight_for(mark: SentenceMark, flow: Flow) -> float:
+    """The same for the mark a quoted line closes on."""
+    base = MARK_WEIGHT[mark]
+
+    return base * REPEAT_DAMP if mark == flow.mark and mark != "statement" else base
 
 
 def _generate_result(language: WordLanguage, settings: Settings) -> list[Built]:
@@ -2313,26 +2507,31 @@ def _generate_result(language: WordLanguage, settings: Settings) -> list[Built]:
     built: list[Built] = []
     topic: Topic | None = None
     scene: Mapping[SentenceSlot, Requirement] = {}
-    # What the result opened on, which is what the rest of it keeps to.
-    lead: SentenceType | None = None
+    # What the result has said so far — the register it opened in, and everything the
+    # next sentence has to avoid saying the same way.
+    flow = Flow()
+    # What it has already said with its predicates and its adverbials.
+    spent: set[str] = set()
     # The result's own voice, settled once. A caller who named a level gets that one
     # throughout; one who did not gets a paragraph that is at least consistent with
     # itself, rather than a level rerolled every sentence.
     voice = settings.style if settings.style is not None else pick(STYLES)
 
     for budget in budgets:
-        type_, mark = _kind_for(data, settled, room, budget, lead)
-        follow = None if topic is None else _follow_for(data, topic, scene)
+        type_, mark = _kind_for(data, settled, room, budget, flow)
+        follow = None if topic is None else _follow_for(data, topic, scene, flow.repeated)
         draw = Draw(
             budget,
             type_,
             mark,
             _quote_for(data, type_, settings.quote),
-            _opener_for(data, mark, follow is not None, budget[1], shortest),
+            _opener_for(data, mark, follow is not None, budget[1], shortest, flow),
             _style_for(type_, settings.style, voice),
+            frozenset(spent),
             follow,
         )
         one = _generate_one(language, settled, draw)
+        opened = draw.opener
 
         # `_opener_for` reserves room against the shortest sentence the shapes could
         # spell, which is a floor no draw actually reaches — the shortest word of every
@@ -2343,19 +2542,29 @@ def _generate_result(language: WordLanguage, settings: Settings) -> list[Built]:
             bare = _generate_one(
                 language,
                 settled,
-                Draw(budget, type_, mark, draw.quote, "", draw.style, follow),
+                Draw(budget, type_, mark, draw.quote, "", draw.style, draw.avoid, follow),
             )
 
             if _distance_from(len(bare.sentence), budget) < _distance_from(
                 len(one.sentence), budget
             ):
                 one = bare
+                opened = ""
 
         built.append(one)
         scene = one.scene
+        spent.update(one.used)
+        flow.run = flow.run + 1 if type_ == flow.last else 1
+        flow.last = type_
+        flow.mark = mark
+        flow.opened = bool(opened)
+        flow.repeated = follow is None or follow.reference == "repeat"
 
-        if lead is None:
-            lead = type_
+        if opened:
+            flow.openers.add(opened)
+
+        if flow.lead is None:
+            flow.lead = type_
 
         if topic is None:
             topic = _topic_of(one)
@@ -2380,6 +2589,15 @@ def _subject_themes_for(settings: Settings, follow: Follow | None) -> tuple[Word
 
     if follow is None or follow.topic.noun_class is None:
         return themes
+
+    # A fresh subject is usually another noun of the topic's own theme rather than of
+    # its wider class. The class is what a paragraph may not leave — a verb that takes a
+    # creature takes every creature — but a paragraph that opens on a drink and then
+    # works through every edible there is reads as a list of them.
+    own = follow.topic.theme
+
+    if own is not None and own in themes and chance(THEME_CHANCE):
+        return (own,)
 
     in_class = _themes_for_classes(themes, (follow.topic.noun_class,))
 

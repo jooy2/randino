@@ -225,7 +225,8 @@ run?` and German `Läuft ein Wolf?`, and both are shapes their own frames declar
 language whose question differs from its statement by nothing but the mark declares
 none, and gets its statement shapes back. `"dialogue"` and `"thought"` are the two that
 are not shapes at all: what is quoted is a sentence of one of the other kinds, drawn per
-line, because somebody speaking is as often asking as telling.
+line, because somebody speaking asks more often than a page of prose does — and still
+tells more often than either.
 """
 
 SentenceStyle = Literal["plain", "casual", "polite", "formal"]

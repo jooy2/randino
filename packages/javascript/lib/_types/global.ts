@@ -358,7 +358,8 @@ export type SentenceShape = 'simple' | 'detailed' | 'complex';
  *
  * `dialogue` and `thought` are the two that are not shapes at all: what is quoted
  * is a sentence of one of the other kinds, drawn per line, because somebody
- * speaking is as often asking as telling.
+ * speaking asks more often than a page of prose does, and still tells more often
+ * than either.
  */
 export type SentenceType =
 	'statement' | 'question' | 'exclamation' | 'trailing' | 'dialogue' | 'thought';
@@ -428,9 +429,14 @@ export interface RandSentenceOptions extends RandCommonOptions {
 	 */
 	include?: string | readonly string[];
 	/**
-	 * What the sentences are doing — saying something, asking it, exclaiming it, or
-	 * trailing off. Default `'statement'`, and an array or `'all'` decides per
-	 * sentence.
+	 * What the sentences are doing — saying something, asking it, exclaiming it,
+	 * quoting somebody, or trailing off. Left out, or given more than one, the kind
+	 * is decided per sentence.
+	 *
+	 * That decision is weighted rather than even, because prose is: a statement is
+	 * far and away the most likely, a line somebody says comes next, and a question
+	 * or an exclamation is the rarest of them. Naming one kind still gets you that
+	 * kind and nothing else.
 	 *
 	 * A language answers with what it has: five of the nine write a question with
 	 * nothing but the mark, and the four that need more — English's do-support,
@@ -480,6 +486,12 @@ export interface RandSentenceOptions extends RandCommonOptions {
 	 * later sentence names the first one's subject again, refers to it with a
 	 * pronoun, or draws a fresh subject of the same kind, and may open on a
 	 * connective.
+	 *
+	 * A result reads as one paragraph rather than as several draws that landed
+	 * together. It keeps the register it opened in, so a scene of speech is lines
+	 * with prose between them and never a quoted line answering a quoted question;
+	 * it spends its verbs before it repeats one; it names a person and then leaves
+	 * them alone; and it never opens two of its sentences on the same word.
 	 *
 	 * `minLength` and `maxLength` describe the whole string whatever this is, so
 	 * the range is shared out across the sentences before any of them is drawn.

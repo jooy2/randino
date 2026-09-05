@@ -1011,21 +1011,194 @@ void main() {
         );
       }
 
-      // And it stays in the register it opened in: a line somebody says is a line,
-      // and prose about it may ask and exclaim without becoming a line.
-      for (final detail in randSentenceDetails(
-        language: WordLanguage.ko,
-        sentences: 4,
-        count: 200,
-      )) {
-        final quoted = detail.types
-            .map((type) => type == SentenceType.dialogue || type == SentenceType.thought)
-            .toList(growable: false);
+      // And it names them and then leaves them alone. A name is the most
+      // conspicuous word a sentence can carry and the one a reader is least likely
+      // to lose track of, so `신우가 …. 신우는 …. 신우가 …` is one caption written
+      // three times. The opening sentence always writes it, which is the floor
+      // this is measured against.
+      for (final language in <WordLanguage>[WordLanguage.ko, WordLanguage.en]) {
+        var carried = 0;
+        var lines = 0;
+
+        for (final detail in randSentenceDetails(
+          type: statementOnly,
+          language: language,
+          sentences: 5,
+          includeName: true,
+          count: 300,
+        )) {
+          if (detail.names.isEmpty) continue;
+
+          final name = detail.names.first;
+
+          for (final sentence in detail.sentences) {
+            lines += 1;
+            if (sentence.contains(name)) carried += 1;
+          }
+        }
 
         expect(
-          quoted.every((one) => one == quoted.first),
-          isTrue,
-          reason: 'the register changed mid-paragraph: ${detail.types.join('/')}',
+          carried / lines,
+          lessThan(0.6),
+          reason:
+              '$language: ${(carried / lines * 100).toStringAsFixed(1)}% of the lines name them',
+        );
+      }
+
+      // English is the one that had nothing to leave them alone with. It cannot drop
+      // a subject, and `pronounless` kept `he` and `she` away from every person —
+      // rightly for `the locksmith`, which carries no gender, and wrongly for a name,
+      // which is the one thing that says which of the two it is.
+      final stands = RegExp(r'\b(?:he|she)\b', caseSensitive: false);
+      var stood = 0;
+
+      for (final detail in randSentenceDetails(
+        type: statementOnly,
+        language: WordLanguage.en,
+        sentences: 4,
+        includeName: true,
+        count: 200,
+      )) {
+        stood += detail.sentences.where(stands.hasMatch).length;
+      }
+
+      expect(stood, greaterThan(0), reason: 'no English paragraph stood a pronoun for the name');
+
+      // And it stays in the register it opened in. A narrated paragraph never
+      // quotes; a quoted one is lines with prose between them rather than lines
+      // alone, because two people talking take turns and one person saying four
+      // things in a row is a paragraph missing everything that happened while they
+      // said them. What the prose may not be is a third voice — a narrated question
+      // in the middle of a scene of speech is somebody else asking.
+      bool isQuoted(SentenceType type) =>
+          type == SentenceType.dialogue || type == SentenceType.thought;
+      var mixed = 0;
+
+      for (final detail in randSentenceDetails(
+        language: WordLanguage.ko,
+        includeName: false,
+        sentences: 4,
+        count: 300,
+      )) {
+        final lead = detail.types.first;
+
+        for (final type in detail.types) {
+          expect(
+            isQuoted(lead)
+                ? type == lead || type == SentenceType.statement || type == SentenceType.trailing
+                : !isQuoted(type),
+            isTrue,
+            reason: 'the register changed mid-paragraph: ${detail.types.join('/')}',
+          );
+        }
+
+        if (isQuoted(lead) && detail.types.any((type) => !isQuoted(type))) mixed += 1;
+      }
+
+      expect(mixed, greaterThan(0), reason: 'no quoted paragraph carried prose between its lines');
+    });
+
+    test('a paragraph is mostly statements, and never opens twice on the same word', () {
+      // The six kinds are drawn against each other rather than evenly. Prose is
+      // mostly statements, a line somebody says comes next, and the two kinds that
+      // carry a mark of their own are the rarest: a question is only worth reading
+      // when the sentences around it are not questions. Every kind used to be one
+      // in six, and a paragraph of ten came out as ten questions often enough to be
+      // the first thing anybody noticed.
+      final tally = <SentenceType, int>{};
+      var total = 0;
+
+      for (final detail in randSentenceDetails(sentences: 5, count: 400)) {
+        for (final type in detail.types) {
+          tally[type] = (tally[type] ?? 0) + 1;
+          total += 1;
+        }
+      }
+
+      double share(SentenceType type) => (tally[type] ?? 0) / total;
+
+      final marked = share(SentenceType.question) + share(SentenceType.exclamation);
+
+      // Wide margins, because what is under test is the ordering rather than the
+      // weights: the measured figures are 65% against 13%.
+      expect(
+        share(SentenceType.statement),
+        greaterThan(0.4),
+        reason: 'statements are ${(share(SentenceType.statement) * 100).toStringAsFixed(1)}%',
+      );
+      expect(
+        marked,
+        lessThan(0.25),
+        reason: 'questions and exclamations are ${(marked * 100).toStringAsFixed(1)}%',
+      );
+
+      // And what a sentence opens on is written once per result. Read in Korean
+      // alone, which writes neither an opening mark nor a capital, so what a
+      // sentence starts with is the word itself.
+      final data = sentenceData[WordLanguage.ko]!;
+      final words = <String>[...data.connectives, ...data.interjections];
+      var seen = 0;
+
+      for (final detail in randSentenceDetails(
+        language: WordLanguage.ko,
+        sentences: 6,
+        count: 300,
+      )) {
+        final openers = <String>[
+          for (final sentence in detail.sentences)
+            ...() {
+              final body = sentence.replaceFirst(RegExp('^[“”‘’]'), '');
+
+              return words.where((word) => body.startsWith(word + data.space)).take(1);
+            }(),
+        ];
+
+        expect(openers.toSet(), hasLength(openers.length), reason: detail.sentence);
+
+        seen += openers.length;
+      }
+
+      expect(seen, greaterThan(0), reason: 'no sentence opened on anything at all');
+    });
+
+    test('a paragraph spends its predicates before it repeats one', () {
+      // A verb group holds four words and a paragraph holds four sentences, so the
+      // group is drawn down rather than rolled afresh each time — `식습니다` three
+      // times in four lines is the same sentence written three times. It is a
+      // preference and not a rule, because the length range still comes first,
+      // which is why this is a ratio rather than an equality.
+      for (final language in wordLanguages) {
+        var sum = 0.0;
+        var seen = 0;
+
+        for (final detail in randSentenceDetails(
+          type: statementOnly,
+          includeName: false,
+          language: language,
+          sentences: 4,
+          shape: SentenceShape.simple,
+          slots: const <SentenceSlot>{},
+          style: SentenceStyle.plain,
+          count: 200,
+        )) {
+          final written = <String>[
+            for (var i = 0; i < detail.phrases.length; i += 1)
+              if (detail.slots[i] == SentenceSlot.verb || detail.slots[i] == SentenceSlot.state)
+                detail.phrases[i],
+          ];
+
+          if (written.isEmpty) continue;
+
+          sum += written.toSet().length / written.length;
+          seen += 1;
+        }
+
+        // An even draw over a group of four would sit near 0.7; every language
+        // measures 0.97 or better.
+        expect(
+          sum / seen,
+          greaterThan(0.9),
+          reason: '$language: ${(sum / seen).toStringAsFixed(3)} of them distinct',
         );
       }
     });
@@ -1497,7 +1670,7 @@ void main() {
             expect(detail.sentence, matches(script[language]!), reason: detail.sentence);
 
             // What is quoted is a whole sentence, closed the way its own kind
-            // closes — a spoken line is as often asking as telling.
+            // closes — a spoken line is not always a statement.
             final inner = detail.sentence.substring(
               open.length,
               detail.sentence.length - close.length,
@@ -1513,7 +1686,7 @@ void main() {
       }
     });
 
-    test('a quoted line is as often asking as telling', () {
+    test('a quoted line is not always a statement', () {
       // The mark under a quote is drawn per line rather than fixed, so a hundred
       // of them are not a hundred statements.
       final data = sentenceData[WordLanguage.en]!;

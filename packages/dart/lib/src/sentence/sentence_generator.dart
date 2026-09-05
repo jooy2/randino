@@ -40,6 +40,10 @@ const int _fitAttempts = 14;
 // override it in both directions — see [_modifyChanceFor].
 const int _modifyChance = 45;
 
+// How often a sentence that draws a fresh subject draws it from the topic's own
+// theme rather than from anywhere in the topic's class.
+const int _themeChance = 65;
+
 /// The slots that are a noun phrase, and so draw from the word pools.
 const List<SentenceSlot> _nounSlots = <SentenceSlot>[
   SentenceSlot.subject,
@@ -301,11 +305,54 @@ const List<SentenceStyle> _styles = SentenceStyle.values;
 /// The kinds that are a line somebody says or thinks rather than prose about it.
 const List<SentenceType> _quotedTypes = <SentenceType>[SentenceType.dialogue, SentenceType.thought];
 
-/// How often a sentence after the first keeps the kind the result opened on.
+/// The kinds prose about a quoted line can be.
 ///
-/// A paragraph that quotes, asks, exclaims and trails off in four lines is four
-/// paragraphs; one that never varies is a list.
-const int _leadChance = 70;
+/// A line is answered by another line or by a sentence about it, and narration
+/// that asks or exclaims is a third voice in a scene that has two.
+const List<SentenceType> _narration = <SentenceType>[SentenceType.statement, SentenceType.trailing];
+
+/// What each kind is worth against the others wherever the caller left the kind
+/// to chance.
+///
+/// Prose is mostly statements: a paragraph that tells, asks, exclaims, trails off
+/// and quotes in equal measure is not a paragraph but a sampler of the six. A
+/// line somebody says comes next, because it is the one kind that carries a scene
+/// with it, and the two marked kinds are the rarest — a question is only worth
+/// reading when the sentences around it are not questions.
+const Map<SentenceType, int> _typeWeight = <SentenceType, int>{
+  SentenceType.statement: 100,
+  SentenceType.dialogue: 34,
+  SentenceType.trailing: 16,
+  SentenceType.question: 14,
+  SentenceType.thought: 12,
+  SentenceType.exclamation: 10,
+};
+
+/// The same for the mark a quoted line closes on, which is drawn rather than
+/// fixed: somebody speaking asks more often than a page of prose does, and still
+/// tells more often than either.
+const Map<SentenceType, int> _markWeight = <SentenceType, int>{
+  SentenceType.statement: 100,
+  SentenceType.question: 34,
+  SentenceType.exclamation: 22,
+  SentenceType.trailing: 16,
+};
+
+/// How much more likely a quoted line is inside a result that opened on one.
+///
+/// Speech is what a scene of speech is made of, and what the boost leaves room
+/// for is the prose between the lines — the only thing that keeps two of them
+/// from reading as one person talking to themselves.
+const int _quotedBoost = 6;
+
+/// What one more of the same in a row costs, against everything but the plain
+/// statement a paragraph runs on.
+///
+/// A second question straight after one reads as a quiz and a third exclamation
+/// as a shouting match, so each repeat is worth less than the last — damped
+/// rather than forbidden, because an exchange of two lines is a conversation and
+/// a run of ten is the tic.
+const double _repeatDamp = 0.45;
 
 /// The levels a line somebody says out loud is said at.
 ///
@@ -403,7 +450,16 @@ SentenceMood _moodFor(SentenceType mark) =>
 /// Everything one sentence of a result is drawn against: the room it has, what
 /// it is doing, what it opens on, and — after the first — what it is about.
 class _Draw {
-  const _Draw(this.budget, this.type, this.mark, this.quote, this.opener, this.style, this.follow);
+  const _Draw(
+    this.budget,
+    this.type,
+    this.mark,
+    this.quote,
+    this.opener,
+    this.style,
+    this.avoid,
+    this.follow,
+  );
 
   final LengthRange budget;
 
@@ -421,6 +477,14 @@ class _Draw {
 
   /// The level this line is said at, which a quoted one does not share.
   final SentenceStyle style;
+
+  /// The predicates and adverbials the result has already used, in their plain
+  /// form.
+  ///
+  /// A verb group holds four words and a paragraph holds ten sentences, so this
+  /// cannot always be honoured — what it does is spend the group before it starts
+  /// over, rather than rolling `식습니다` three times in four lines.
+  final Set<String> avoid;
   final _Follow? follow;
 }
 
@@ -466,6 +530,39 @@ class _Follow {
   /// A sentence with one of those slots writes what is here rather than drawing
   /// again — a paragraph whose place changes every line is not one paragraph.
   final Map<SentenceSlot, _Requirement> scene;
+}
+
+/// What the result has written so far, and the whole of what keeps the next
+/// sentence from writing it again.
+///
+/// A paragraph is not a set of draws that happened to land together, and every
+/// field here is one of the ways that shows: the register it opened in, the kind
+/// and the mark it has just used, what it opened those sentences on, and whether
+/// the last of them named the topic instead of standing a pronoun where it was.
+class _Flow {
+  _Flow();
+
+  /// The kind the result opened on, which is the register the rest of it keeps.
+  SentenceType? lead;
+
+  /// The kind the sentence before this one was, and how many of it in a row.
+  SentenceType? last;
+  int run = 0;
+
+  /// The mark that sentence closed on, quoted or not.
+  SentenceType? mark;
+
+  /// Whether it opened on a connective or an interjection.
+  bool opened = false;
+
+  /// Every one the result has already used, so that none is written twice.
+  final Set<String> openers = <String>{};
+
+  /// Whether it named the topic rather than standing a pronoun where it was.
+  ///
+  /// The opening sentence names the subject itself, which is why this starts
+  /// true.
+  bool repeated = true;
 }
 
 /* --- Shapes ---------------------------------------------------------------- */
@@ -1167,6 +1264,7 @@ class _Built {
     this.phrases,
     this.slots,
     this.names,
+    this.used,
     this.type,
     this.theme,
     this.subject,
@@ -1181,6 +1279,9 @@ class _Built {
 
   /// The person names this sentence was written with, in order.
   final List<String> names;
+
+  /// The predicates and adverbials it used, in their plain form.
+  final List<String> used;
 
   /// What this sentence is doing.
   final SentenceType type;
@@ -1334,14 +1435,10 @@ int _atMost(int ceiling, int value) => value > ceiling ? ceiling : value;
 /// A bare given name rather than a full one: a sentence about someone uses the
 /// name they are called by, and `randName`'s default would put a surname in
 /// every clause. The gender is the one the name was drawn for, translated into
-/// the gender a modifier and a predicate agree with — and only for a language
-/// whose words agree at all, since nothing else has any use for it.
-_Named _properName(
-  WordLanguage language,
-  WordLanguageData lexicon,
-  _Settings settings,
-  String prefix,
-) {
+/// the gender a modifier and a predicate agree with — and carried even by a
+/// language whose words agree with nothing, because a pronoun still has to pick
+/// between `he` and `she`.
+_Named _properName(WordLanguage language, _Settings settings, String prefix) {
   // No length range, on purpose. `randName` reads one as a licence to change the
   // name's structure: a CJK given name is stretched to fill a range longer than
   // its real ones, and an alphabetic language writes a second given name where
@@ -1356,12 +1453,7 @@ _Named _properName(
     startsWith: prefix,
   );
 
-  return _Named(
-    drawn.native,
-    lexicon.agreement == null
-        ? null
-        : (drawn.gender == NameGender.male ? WordGender.m : WordGender.f),
-  );
+  return _Named(drawn.native, drawn.gender == NameGender.male ? WordGender.m : WordGender.f);
 }
 
 /// How long a given name of the language can be, which is what a phrase reserves.
@@ -1619,6 +1711,9 @@ _Built _compose(
   final reported = <String>[];
   final slots = <SentenceSlot>[];
   final names = <String>[];
+  // The predicates and adverbials this sentence spends, for the next one to leave
+  // alone.
+  final spent = <String>[];
   // The noun phrases this sentence drew for the slots a later one keeps.
   final drawn = <SentenceSlot, _Phrase>{};
   _Phrase? subject;
@@ -1658,12 +1753,7 @@ _Built _compose(
       if (proper[i]!.isNotEmpty) {
         phrase = proper[i]!;
       } else {
-        final drawn = _properName(
-          language,
-          lexicon,
-          settings,
-          prefixable && i == 0 ? settings.prefix : '',
-        );
+        final drawn = _properName(language, settings, prefixable && i == 0 ? settings.prefix : '');
 
         phrase = drawn.text;
         names.add(drawn.text);
@@ -1720,7 +1810,7 @@ _Built _compose(
         drawn[part.slot] = built;
       }
     } else {
-      phrase = _predicateFor(
+      final drawn = _predicateFor(
         part.slot,
         lexicon,
         data,
@@ -1730,7 +1820,12 @@ _Built _compose(
         gender,
         low,
         high,
+        draw.avoid,
       );
+
+      phrase = drawn.text;
+
+      if (drawn.base.isNotEmpty) spent.add(drawn.base);
     }
 
     // The opening capital belongs to whatever is written first, and that is the
@@ -1796,6 +1891,7 @@ _Built _compose(
     reported,
     slots,
     names,
+    spent,
     draw.type,
     named ? null : subject?.theme,
     carried,
@@ -1830,9 +1926,23 @@ WordPool _formOf(
   return words;
 }
 
+/// What a phrase that is not a noun phrase writes, and the word it is a form of.
+class _Predicate {
+  const _Predicate(this.text, this.base);
+
+  final String text;
+  final String base;
+}
+
 /// The word a phrase that is not a noun phrase writes: the predicate, or an
 /// adverb.
-String _predicateFor(
+///
+/// [avoid] holds what the result has already said, and the plain form is what it
+/// holds: `끓습니까` and `끓어` are one verb said twice, so remembering the
+/// written form would remember nothing. It is a preference and not a filter —
+/// the range comes first, and a pool with nothing unused left inside it is drawn
+/// from as it always was.
+_Predicate _predicateFor(
   SentenceSlot slot,
   WordLanguageData wordData,
   SentenceLanguageData data,
@@ -1842,6 +1952,7 @@ String _predicateFor(
   WordGender? gender,
   int min,
   int max,
+  Set<String> avoid,
 ) {
   String agreed(String word) =>
       slot == SentenceSlot.state && data.predicateAgrees ? agree(wordData, word, gender) : word;
@@ -1851,11 +1962,14 @@ String _predicateFor(
     // form pools are index-aligned so that it can be said the other way instead.
     final at = base.indexOf(required.word);
 
-    return agreed(at >= 0 && at < predicates.length ? predicates[at] : required.word);
+    return _Predicate(
+      agreed(at >= 0 && at < predicates.length ? predicates[at] : required.word),
+      required.word,
+    );
   }
 
-  if (slot == SentenceSlot.date) return _dateText(data);
-  if (slot == SentenceSlot.clock) return _clockText(data);
+  if (slot == SentenceSlot.date) return _Predicate(_dateText(data), '');
+  if (slot == SentenceSlot.clock) return _Predicate(_clockText(data), '');
 
   final pool =
       slot == SentenceSlot.manner
@@ -1863,8 +1977,20 @@ String _predicateFor(
           : slot == SentenceSlot.time
           ? data.times
           : predicates;
+  // A predicate is a form of the word at the same index of the group; an
+  // adverbial is written whole and is its own plain form.
+  String plainly(int at) =>
+      identical(pool, predicates) && at >= 0 && at < base.length ? base[at] : pool[at];
+  final low = min < max ? min : max;
+  final fresh = <String>[
+    for (var at = 0; at < pool.length; at += 1)
+      if (!avoid.contains(plainly(at)) && pool[at].length >= low && pool[at].length <= max)
+        pool[at],
+  ];
+  final String drawn =
+      fresh.isNotEmpty ? pick(fresh) : (pickWord(pool, low, max, '') ?? pick(pool));
 
-  return agreed(pickWord(pool, min < max ? min : max, max, '') ?? pick(pool));
+  return _Predicate(agreed(drawn), plainly(pool.indexOf(drawn)));
 }
 
 /// The themes a sentence may draw its subject from.
@@ -1883,9 +2009,20 @@ List<WordTheme> _subjectThemesFor(_Settings settings, _Follow? follow) {
           ? _themesForClasses(requested, const <NounClass>[NounClass.person])
           : requested;
   final themes = wanted.isNotEmpty ? wanted : requested;
-  final topicClass = follow?.topic.nounClass;
+
+  if (follow == null) return themes;
+
+  final topicClass = follow.topic.nounClass;
 
   if (topicClass == null) return themes;
+
+  // A fresh subject is usually another noun of the topic's own theme rather than
+  // of its wider class. The class is what a paragraph may not leave — a verb that
+  // takes a creature takes every creature — but a paragraph that opens on a drink
+  // and then works through every edible there is reads as a list of them.
+  final own = follow.topic.theme;
+
+  if (own != null && themes.contains(own) && chance(_themeChance)) return <WordTheme>[own];
 
   final inClass = _themesForClasses(themes, <NounClass>[topicClass]);
 
@@ -2096,12 +2233,23 @@ const int _connectiveChance = 40;
 // statement wearing a mark.
 const int _interjectionChance = 65;
 
+// What both of those are worth when the sentence before this one already opened
+// on something. Two in a row read as a list of asides rather than as a paragraph.
+const double _openerDamp = 0.4;
+
 // How a sentence refers to the topic, against the other two ways of doing it.
 const Map<_Reference, int> _referenceWeight = <_Reference, int>{
   _Reference.repeat: 25,
   _Reference.pronoun: 40,
   _Reference.fresh: 35,
 };
+
+// What naming the topic again is worth when the topic is a person's name.
+//
+// A name is the most conspicuous word in a sentence and the one a reader is
+// least likely to lose track of, so prose names somebody once and then leaves
+// them alone; `신우가 …. 신우는 …. 신우가 …` is a caption written three times.
+const double _namedDamp = 0.6;
 
 /// What the rest of the result is about, read off the sentence that opened it.
 _Topic? _topicOf(_Built built) {
@@ -2128,13 +2276,18 @@ _Topic? _topicOf(_Built built) {
 /// — the language says nothing where it can, and where it cannot, there is no
 /// pronoun to be had and the sentence names the topic again instead.
 WordPool _pronounsFor(SentenceLanguageData data, _Topic topic) {
-  final pool =
-      data.pronouns[topic.gender ?? WordGender.n] ??
-      data.pronouns[WordGender.n] ??
-      const <String>[];
+  // A gendered pronoun is the one thing a `pronounless` class can still take, and
+  // only where the topic carries a gender to choose it by. That is what the list
+  // is about: `he` and `she` cannot stand for `the locksmith`, because nothing
+  // says which of the two, and a name says. A language that declares no pool for
+  // that gender has none to offer, so Korean still drops the subject rather than
+  // writing `그것` about somebody.
+  final gender = topic.gender;
+  final gendered = gender == null ? null : data.pronouns[gender];
+  final pool = gendered ?? data.pronouns[WordGender.n] ?? const <String>[];
   final topicClass = topic.nounClass;
 
-  if (topicClass != null && data.pronounless.contains(topicClass)) {
+  if (gendered == null && topicClass != null && data.pronounless.contains(topicClass)) {
     return pool.where((word) => word.isEmpty).toList(growable: false);
   }
 
@@ -2142,7 +2295,17 @@ WordPool _pronounsFor(SentenceLanguageData data, _Topic topic) {
 }
 
 /// How one sentence carries on from the one before it.
-_Follow _followFor(SentenceLanguageData data, _Topic topic, Map<SentenceSlot, _Requirement> scene) {
+///
+/// [repeated] says whether that one already named the topic, and naming it again
+/// straight afterwards is what makes a paragraph read as a caption written ten
+/// times — worst of all with a person's name, which has no pronoun to alternate
+/// with in the languages that leave their subject out.
+_Follow _followFor(
+  SentenceLanguageData data,
+  _Topic topic,
+  Map<SentenceSlot, _Requirement> scene,
+  bool repeated,
+) {
   final pronouns = _pronounsFor(data, topic);
   // A person is an individual, not a kind of thing: a paragraph about Emma that
   // draws a `fresh` subject is a paragraph that quietly becomes about Sophie.
@@ -2155,23 +2318,11 @@ _Follow _followFor(SentenceLanguageData data, _Topic topic, Map<SentenceSlot, _R
       pronouns.isNotEmpty
           ? ways
           : ways.where((way) => way != _Reference.pronoun).toList(growable: false);
-  var total = 0;
+  final reference = pickWeighted<_Reference>(usable, (way) {
+    if (way != _Reference.repeat) return _referenceWeight[way]!;
 
-  for (final each in usable) {
-    total += _referenceWeight[each]!;
-  }
-
-  var roll = randDouble() * total;
-  var reference = usable.last;
-
-  for (final each in usable) {
-    roll -= _referenceWeight[each]!;
-
-    if (roll <= 0) {
-      reference = each;
-      break;
-    }
-  }
+    return _referenceWeight[way]! * (repeated ? _repeatDamp : 1) * (topic.named ? _namedDamp : 1);
+  });
 
   return _Follow(topic, reference, reference == _Reference.pronoun ? pick(pronouns) : '', scene);
 }
@@ -2186,29 +2337,37 @@ _Follow _followFor(SentenceLanguageData data, _Topic topic, Map<SentenceSlot, _R
 /// longer than the budget can spare is a sentence that overshoots by exactly its
 /// length. Russian `тем временем` is thirteen characters, and a third of a range
 /// of seventy-five has nowhere to put them.
+///
+/// [flow] is the other half of the decision, and it is what makes an opener read
+/// as one: never the same word twice in one result, and far less likely at all
+/// when the sentence before this one already opened on something.
 String _openerFor(
   SentenceLanguageData data,
   SentenceType mark,
   bool following,
   int room,
   int shortest,
+  _Flow flow,
 ) {
   final spare = room - data.space.length - shortest;
 
-  List<String> fitting(WordPool pool) =>
-      pool.where((word) => word.length <= spare).toList(growable: false);
+  List<String> fitting(WordPool pool) => pool
+      .where((word) => word.length <= spare && !flow.openers.contains(word))
+      .toList(growable: false);
+
+  final damp = flow.opened ? _openerDamp : 1.0;
 
   if (mark == SentenceType.exclamation) {
     final usable = fitting(data.interjections);
 
-    if (usable.isNotEmpty && chance(_interjectionChance)) return pick(usable);
+    if (usable.isNotEmpty && chance(_interjectionChance * damp)) return pick(usable);
   }
 
   if (!following) return '';
 
   final usable = fitting(data.connectives);
 
-  return usable.isNotEmpty && chance(_connectiveChance) ? pick(usable) : '';
+  return usable.isNotEmpty && chance(_connectiveChance * damp) ? pick(usable) : '';
 }
 
 /// Every sentence of one result, in order.
@@ -2233,7 +2392,7 @@ List<SentenceType> _kindFor(
   Map<SentenceSlot, LengthRange> bounds,
   LengthRange modifierBounds,
   LengthRange budget,
-  SentenceType? lead,
+  _Flow flow,
 ) {
   // Both ends: a shape whose shortest is past the top of the budget overshoots
   // whatever it draws, and one whose longest is under the bottom falls short of
@@ -2257,16 +2416,21 @@ List<SentenceType> _kindFor(
     return LengthRange(budget.min - marks, budget.max - marks);
   }
 
-  // A paragraph stays in the register it opened in. A line somebody speaks is a
-  // line, and the next one is another line of the same speech; prose about it may
-  // ask and exclaim without stopping being prose. Nothing to keep to on the first
-  // sentence, which is where the register comes from.
+  // A paragraph stays in the register it opened in. Prose about a line may not
+  // become one, so the narrated register is the closed half; a quoted one keeps
+  // the prose that goes between its lines, because a line answered only by
+  // another line is one person talking to themselves. Nothing to keep to on the
+  // first sentence, which is where the register comes from.
+  final lead = flow.lead;
   final family =
       lead == null
           ? settings.types
           : settings.types
               .where(
-                (type) => _quotedTypes.contains(lead) ? type == lead : !_quotedTypes.contains(type),
+                (type) =>
+                    _quotedTypes.contains(lead)
+                        ? type == lead || _narration.contains(type)
+                        : !_quotedTypes.contains(type),
               )
               .toList(growable: false);
   final wanted = family.isNotEmpty ? family : settings.types;
@@ -2274,10 +2438,46 @@ List<SentenceType> _kindFor(
       .where((type) => marksOf(type).any((mark) => fits(mark, roomOf(type))))
       .toList(growable: false);
   final pool = usable.isNotEmpty ? usable : wanted;
-  final type = lead != null && pool.contains(lead) && chance(_leadChance) ? lead : pick(pool);
+  final type = pickWeighted<SentenceType>(pool, (each) => _typeWeightFor(each, flow));
   final marks = marksOf(type).where((mark) => fits(mark, roomOf(type))).toList(growable: false);
 
-  return <SentenceType>[type, pick(marks.isNotEmpty ? marks : marksOf(type))];
+  return <SentenceType>[
+    type,
+    pickWeighted<SentenceType>(
+      marks.isNotEmpty ? marks : marksOf(type),
+      (mark) => _markWeightFor(mark, flow),
+    ),
+  ];
+}
+
+/// What one kind is worth here, in this result, after what it has already said.
+///
+/// Two things move it off the flat weight. A result that opened on a quoted line
+/// is a scene of speech, so the line it opened on outweighs the prose around it;
+/// and a kind the sentence before this one already was is worth less each time it
+/// comes round again, so that a run of them ends by itself. The plain statement
+/// is the one thing exempt from that: a run of statements is what prose is.
+double _typeWeightFor(SentenceType type, _Flow flow) {
+  final lead = flow.lead;
+  final quoted = lead != null && _quotedTypes.contains(lead);
+  final base = _typeWeight[type]! * (quoted && type == lead ? _quotedBoost : 1);
+
+  if (type != flow.last || type == SentenceType.statement) return base.toDouble();
+
+  var weight = base.toDouble();
+
+  for (var each = 0; each < flow.run; each += 1) {
+    weight *= _repeatDamp;
+  }
+
+  return weight;
+}
+
+/// The same for the mark a quoted line closes on.
+double _markWeightFor(SentenceType mark, _Flow flow) {
+  final base = _markWeight[mark]!.toDouble();
+
+  return mark == flow.mark && mark != SentenceType.statement ? base * _repeatDamp : base;
 }
 
 /// The slot bounds this result is measured against: the language's own, with the
@@ -2363,8 +2563,11 @@ List<_Built> _generateResult(WordLanguage language, _Settings settings) {
   final built = <_Built>[];
   _Topic? topic;
   var scene = const <SentenceSlot, _Requirement>{};
-  // What the result opened on, which is what the rest of it keeps to.
-  SentenceType? lead;
+  // What the result has said so far — the register it opened in, and everything
+  // the next sentence has to avoid saying the same way.
+  final flow = _Flow();
+  // What it has already said with its predicates and its adverbials.
+  final spent = <String>{};
   // The result's own voice, settled once. A caller who named a level gets that
   // one throughout; one who did not gets a paragraph that is at least consistent
   // with itself, rather than a level rerolled every sentence.
@@ -2374,20 +2577,22 @@ List<_Built> _generateResult(WordLanguage language, _Settings settings) {
 
   for (var i = 0; i < settings.sentences; i += 1) {
     final budget = budgets[i];
-    final kind = _kindFor(data, settled, room, modifierBounds, budget, lead);
+    final kind = _kindFor(data, settled, room, modifierBounds, budget, flow);
     final type = kind[0];
     final mark = kind[1];
-    final follow = topic == null ? null : _followFor(data, topic, scene);
+    final follow = topic == null ? null : _followFor(data, topic, scene, flow.repeated);
     final draw = _Draw(
       budget,
       type,
       mark,
       _quoteFor(data, type, settings.quote),
-      _openerFor(data, mark, follow != null, budget.max, shortest),
+      _openerFor(data, mark, follow != null, budget.max, shortest, flow),
       _styleFor(type, settled.style, voice),
+      spent,
       follow,
     );
     var one = _generateOne(language, settled, draw);
+    var opened = draw.opener;
 
     // `_openerFor` reserves room against the shortest sentence the shapes could
     // spell, which is a floor no draw actually reaches — the shortest word of
@@ -2399,18 +2604,37 @@ List<_Built> _generateResult(WordLanguage language, _Settings settings) {
       final bare = _generateOne(
         language,
         settled,
-        _Draw(draw.budget, draw.type, draw.mark, draw.quote, '', draw.style, draw.follow),
+        _Draw(
+          draw.budget,
+          draw.type,
+          draw.mark,
+          draw.quote,
+          '',
+          draw.style,
+          draw.avoid,
+          draw.follow,
+        ),
       );
 
       if (_distanceFrom(bare.sentence.length, budget) <
           _distanceFrom(one.sentence.length, budget)) {
         one = bare;
+        opened = '';
       }
     }
 
     built.add(one);
     scene = one.scene;
-    lead ??= type;
+    spent.addAll(one.used);
+    flow.run = type == flow.last ? flow.run + 1 : 1;
+    flow.last = type;
+    flow.mark = mark;
+    flow.opened = opened.isNotEmpty;
+    flow.lead ??= type;
+    flow.repeated = follow == null || follow.reference == _Reference.repeat;
+
+    if (opened.isNotEmpty) flow.openers.add(opened);
+
     topic ??= _topicOf(one);
   }
 

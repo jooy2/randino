@@ -495,6 +495,12 @@ class SentenceLanguageData {
   /// is inanimate — `그것`, `それ`, `它`, `nó` — list `person` too, and drop the
   /// subject instead, which is what they would do anyway. Empty for a language
   /// whose pronouns stand for anything.
+  ///
+  /// A topic that carries a gender is the exception, and a person's name is the
+  /// only thing that does: `he` is wrong for `the locksmith` and right for
+  /// `Philip`. A language that declares no pool for that gender is unaffected,
+  /// which is why Korean drops the subject rather than writing `그것` about
+  /// somebody.
   final List<NounClass> pronounless;
 
   /// How the language writes a number.

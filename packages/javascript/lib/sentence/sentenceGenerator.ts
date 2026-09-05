@@ -29,7 +29,7 @@ import {
 	resolveRealism
 } from '../_internal/generate.js';
 import { endsWithConsonant } from '../_internal/script.js';
-import { chance, clamp, pick, randInt } from '../_internal/utils.js';
+import { chance, clamp, pick, pickWeighted, randInt } from '../_internal/utils.js';
 import { RAND_SENTENCE_COUNT_MAX, RAND_SENTENCE_LENGTH_MAX } from '../constants.js';
 import type {
 	NameGender,
@@ -80,6 +80,10 @@ const FIT_ATTEMPTS = 14;
 // How often a noun phrase that may carry a modifier is given one. Length can
 // override it in both directions — see `modifyChanceFor`.
 const MODIFY_CHANCE = 45;
+
+// How often a sentence that draws a fresh subject draws it from the topic's own
+// theme rather than from anywhere in the topic's class.
+const THEME_CHANCE = 65;
 
 /** The slots that are a noun phrase, and so draw from the word pools. */
 const NOUN_SLOTS: readonly SentenceSlot[] = ['subject', 'object', 'place', 'quantity'];
@@ -283,10 +287,48 @@ const QUOTED_MARKS: readonly SentenceMark[] = ['statement', 'question', 'exclama
 // The kinds that are a line somebody says or thinks rather than prose about it.
 const QUOTED_TYPES: readonly SentenceType[] = ['dialogue', 'thought'];
 
-// How often a sentence after the first keeps the kind the result opened on. A
-// paragraph that quotes, asks, exclaims and trails off in four lines is four
-// paragraphs; one that never varies is a list.
-const LEAD_CHANCE = 70;
+// The kinds prose about a quoted line can be. A line is answered by another line
+// or by a sentence about it, and narration that asks or exclaims is a third voice
+// in a scene that has two.
+const NARRATION: readonly SentenceType[] = ['statement', 'trailing'];
+
+// What each kind is worth against the others wherever the caller left the kind to
+// chance. Prose is mostly statements: a paragraph that tells, asks, exclaims,
+// trails off and quotes in equal measure is not a paragraph but a sampler of the
+// six. A line somebody says comes next, because it is the one kind that carries a
+// scene with it, and the two marked kinds are the rarest — a question is only
+// worth reading when the sentences around it are not questions.
+const TYPE_WEIGHT: Record<SentenceType, number> = {
+	statement: 100,
+	dialogue: 34,
+	trailing: 16,
+	question: 14,
+	thought: 12,
+	exclamation: 10
+};
+
+// The same for the mark a quoted line closes on, which is drawn rather than
+// fixed: somebody speaking asks more often than a page of prose does, and still
+// tells more often than either.
+const MARK_WEIGHT: Record<SentenceMark, number> = {
+	statement: 100,
+	question: 34,
+	exclamation: 22,
+	trailing: 16
+};
+
+// How much more likely a quoted line is inside a result that opened on one.
+// Speech is what a scene of speech is made of, and what the boost leaves room for
+// is the prose between the lines — the only thing that keeps two of them from
+// reading as one person talking to themselves.
+const QUOTED_BOOST = 6;
+
+// What one more of the same in a row costs, against everything but the plain
+// statement a paragraph runs on. A second question straight after one reads as a
+// quiz and a third exclamation as a shouting match, so each repeat is worth less
+// than the last — damped rather than forbidden, because an exchange of two lines
+// is a conversation and a run of ten is the tic.
+const REPEAT_DAMP = 0.45;
 
 // Every level, in the order they run from the voice of a book to the one most
 // spoken Korean is in.
@@ -350,6 +392,13 @@ type Draw = {
 	opener: string;
 	/** The level this line is said at, which a quoted one does not share. */
 	style: SentenceStyle;
+	/**
+	 * The predicates and adverbials the result has already used, in their plain
+	 * form. A verb group holds four words and a paragraph holds ten sentences, so
+	 * this cannot always be honoured — what it does is spend the group before it
+	 * starts over, rather than rolling `식습니다` three times in four lines.
+	 */
+	avoid: ReadonlySet<string>;
 	follow: Follow | null;
 };
 
@@ -392,6 +441,31 @@ type Follow = {
 	 * again — a paragraph whose place changes every line is not one paragraph.
 	 */
 	scene: ReadonlyMap<SentenceSlot, Requirement>;
+};
+
+/**
+ * What the result has written so far, and the whole of what keeps the next
+ * sentence from writing it again.
+ *
+ * A paragraph is not a set of draws that happened to land together, and every
+ * field here is one of the ways that shows: the register it opened in, the kind
+ * and the mark it has just used, what it opened those sentences on, and whether
+ * the last of them named the topic instead of standing a pronoun where it was.
+ */
+type Flow = {
+	/** The kind the result opened on, which is the register the rest of it keeps. */
+	lead: SentenceType | null;
+	/** The kind the sentence before this one was, and how many of it in a row. */
+	last: SentenceType | null;
+	run: number;
+	/** The mark that sentence closed on, quoted or not. */
+	mark: SentenceMark | null;
+	/** Whether it opened on a connective or an interjection. */
+	opened: boolean;
+	/** Every one the result has already used, so that none of them is written twice. */
+	openers: Set<string>;
+	/** Whether it named the topic rather than standing a pronoun where it was. */
+	repeated: boolean;
 };
 
 /* --- Shapes ---------------------------------------------------------------- */
@@ -1109,6 +1183,8 @@ type Built = {
 	named: boolean;
 	/** The person names this sentence was written with, in order. */
 	names: string[];
+	/** The predicates and adverbials it used, in their plain form. */
+	used: string[];
 	/**
 	 * The nouns this sentence put on the page that a later one keeps: where it is
 	 * happening, and what it is about beside its subject. A paragraph whose place
@@ -1251,15 +1327,15 @@ function nounPhrase(
  * A bare given name rather than a full one: a sentence about someone uses the
  * name they are called by, and `randName`'s default would put a surname in every
  * clause. The gender is the one the name was drawn for, translated into the
- * gender a modifier and a predicate agree with — and only for a language whose
- * words agree at all, since nothing else has any use for it.
+ * gender a modifier and a predicate agree with — and carried even by a language
+ * whose words agree with nothing, because a pronoun still has to pick between
+ * `he` and `she`.
  */
 function properName(
 	language: WordLanguage,
-	wordData: WordLanguageData,
 	settings: Settings,
 	prefix: string
-): { text: string; gender: WordGender | undefined } {
+): { text: string; gender: WordGender } {
 	// No length range, on purpose. `randName` reads one as a licence to change the
 	// name's structure: a CJK given name is stretched to fill a range longer than
 	// its real ones, and an alphabetic language writes a second given name where
@@ -1273,10 +1349,7 @@ function properName(
 		startsWith: prefix
 	});
 
-	return {
-		text: drawn.native,
-		gender: wordData.agreement ? nameGender(drawn.gender) : undefined
-	};
+	return { text: drawn.native, gender: nameGender(drawn.gender) };
 }
 
 function nameGender(gender: NameGender): WordGender {
@@ -1327,6 +1400,16 @@ function subjectThemesFor(settings: Settings, follow: Follow | null): readonly W
 
 	if (!follow?.topic.class) {
 		return themes;
+	}
+
+	// A fresh subject is usually another noun of the topic's own theme rather than
+	// of its wider class. The class is what a paragraph may not leave — a verb that
+	// takes a creature takes every creature — but a paragraph that opens on a drink
+	// and then works through every edible there is reads as a list of them.
+	const own = follow.topic.theme;
+
+	if (own && themes.includes(own) && chance(THEME_CHANCE)) {
+		return [own];
 	}
 
 	const inClass = themesForClasses(themes, [follow.topic.class]);
@@ -1685,6 +1768,9 @@ function compose(
 	const reported: string[] = [];
 	const slots: SentenceSlot[] = [];
 	const names: string[] = [];
+	// The predicates and adverbials this sentence spends, for the next one to leave
+	// alone.
+	const spent: string[] = [];
 	// The noun phrases this sentence drew for the slots a later one keeps.
 	const drawn = new Map<SentenceSlot, Phrase>();
 	let subject: Phrase | undefined;
@@ -1736,12 +1822,7 @@ function compose(
 			if (proper[i]) {
 				phrase = proper[i] as string;
 			} else {
-				const drawn = properName(
-					language,
-					wordData,
-					settings,
-					prefixable && i === 0 ? settings.prefix : ''
-				);
+				const drawn = properName(language, settings, prefixable && i === 0 ? settings.prefix : '');
 
 				phrase = drawn.text;
 				names.push(drawn.text);
@@ -1802,7 +1883,7 @@ function compose(
 				drawn.set(part.slot, built);
 			}
 		} else {
-			phrase = predicateFor(
+			const drawn = predicateFor(
 				part.slot,
 				wordData,
 				data,
@@ -1811,8 +1892,15 @@ function compose(
 				plan.phrase.get(at),
 				gender,
 				low,
-				high
+				high,
+				draw.avoid
 			);
+
+			phrase = drawn.text;
+
+			if (drawn.base) {
+				spent.push(drawn.base);
+			}
 		}
 
 		// The opening capital belongs to whatever is written first, and that is the
@@ -1878,6 +1966,7 @@ function compose(
 		phrases: reported,
 		slots,
 		names,
+		used: spent,
 		type: draw.type,
 		scene,
 		theme: named ? null : (subject?.theme ?? null),
@@ -1887,7 +1976,18 @@ function compose(
 	};
 }
 
-/** The word a phrase that is not a noun phrase writes: the predicate, or an adverb. */
+/** What a phrase that is not a noun phrase writes, and the word it is a form of. */
+type Predicate = { text: string; base: string };
+
+/**
+ * The word a phrase that is not a noun phrase writes: the predicate, or an adverb.
+ *
+ * `avoid` holds what the result has already said, and the plain form is what it
+ * holds: `끓습니까` and `끓어` are one verb said twice, so remembering the written
+ * form would remember nothing. It is a preference and not a filter — the range
+ * comes first, and a pool with nothing unused left inside it is drawn from as it
+ * always was.
+ */
 function predicateFor(
 	slot: SentenceSlot,
 	wordData: WordLanguageData,
@@ -1897,8 +1997,9 @@ function predicateFor(
 	required: Requirement | undefined,
 	gender: WordGender | undefined,
 	min: number,
-	max: number
-): string {
+	max: number,
+	avoid: ReadonlySet<string>
+): Predicate {
 	const agreed = (word: string) =>
 		slot === 'state' && data.predicateAgrees ? agree(wordData, word, gender) : word;
 
@@ -1907,20 +2008,31 @@ function predicateFor(
 		// form pools are index-aligned so that it can be said the other way instead.
 		const at = base.indexOf(required.word);
 
-		return agreed(at >= 0 ? (predicates[at] ?? required.word) : required.word);
+		return {
+			text: agreed(at >= 0 ? (predicates[at] ?? required.word) : required.word),
+			base: required.word
+		};
 	}
 
 	if (slot === 'date') {
-		return dateText(data);
+		return { text: dateText(data), base: '' };
 	}
 
 	if (slot === 'clock') {
-		return clockText(data);
+		return { text: clockText(data), base: '' };
 	}
 
 	const pool = slot === 'manner' ? data.manners : slot === 'time' ? data.times : predicates;
+	// A predicate is a form of the word at the same index of the group; an adverbial
+	// is written whole and is its own plain form.
+	const plainly = (at: number) => (pool === predicates ? (base[at] ?? pool[at]) : pool[at]);
+	const low = Math.min(min, max);
+	const fresh = pool.filter(
+		(word, at) => !avoid.has(plainly(at)) && word.length >= low && word.length <= max
+	);
+	const drawn = fresh.length ? pick(fresh) : (pickWord(pool, low, max, '') ?? pick(pool));
 
-	return agreed(pickWord(pool, Math.min(min, max), max, '') ?? pick(pool));
+	return { text: agreed(drawn), base: plainly(pool.indexOf(drawn)) };
 }
 
 /**
@@ -2043,8 +2155,18 @@ const CONNECTIVE_CHANCE = 40;
 // because an exclamation with nothing in front of it is a statement wearing a mark.
 const INTERJECTION_CHANCE = 65;
 
+// What both of those are worth when the sentence before this one already opened on
+// something. Two in a row read as a list of asides rather than as a paragraph.
+const OPENER_DAMP = 0.4;
+
 // How a sentence refers to the topic, against the other two ways of doing it.
 const REFERENCE_WEIGHT: Record<Reference, number> = { repeat: 25, pronoun: 40, fresh: 35 };
+
+// What naming the topic again is worth when the topic is a person's name. A name
+// is the most conspicuous word in a sentence and the one a reader is least likely
+// to lose track of, so prose names somebody once and then leaves them alone;
+// `신우가 …. 신우는 …. 신우가 …` is a caption written three times.
+const NAMED_DAMP = 0.6;
 
 /** What the rest of the result is about, read off the sentence that opened it. */
 function topicOf(built: Built): Topic | null {
@@ -2070,20 +2192,35 @@ function topicOf(built: Built): Topic | null {
  * the sentence names the topic again instead.
  */
 function pronounsFor(data: SentenceLanguageData, topic: Topic): WordPool {
-	const pool = data.pronouns[topic.gender ?? 'n'] ?? data.pronouns.n ?? [];
+	// A gendered pronoun is the one thing a `pronounless` class can still take, and
+	// only where the topic carries a gender to choose it by. That is what the list
+	// is about: `he` and `she` cannot stand for `the locksmith`, because nothing
+	// says which of the two, and a name says. A language that declares no pool for
+	// that gender has none to offer, so Korean still drops the subject rather than
+	// writing `그것` about somebody.
+	const gendered = topic.gender ? data.pronouns[topic.gender] : undefined;
+	const pool = gendered ?? data.pronouns.n ?? [];
 
-	if (topic.class && data.pronounless?.includes(topic.class)) {
+	if (!gendered && topic.class && data.pronounless?.includes(topic.class)) {
 		return pool.filter((word) => !word);
 	}
 
 	return pool;
 }
 
-/** How one sentence carries on from the one before it. */
+/**
+ * How one sentence carries on from the one before it.
+ *
+ * `repeated` says whether that one already named the topic, and naming it again
+ * straight afterwards is what makes a paragraph read as a caption written ten
+ * times — worst of all with a person's name, which has no pronoun to alternate
+ * with in the languages that leave their subject out.
+ */
 function followFor(
 	data: SentenceLanguageData,
 	topic: Topic,
-	scene: ReadonlyMap<SentenceSlot, Requirement>
+	scene: ReadonlyMap<SentenceSlot, Requirement>,
+	repeated: boolean
 ): Follow {
 	const pronouns = pronounsFor(data, topic);
 	// A person is an individual, not a kind of thing: a paragraph about Emma that
@@ -2091,18 +2228,14 @@ function followFor(
 	// Every other topic can be another one of its own class.
 	const ways: Reference[] = topic.named ? ['repeat', 'pronoun'] : ['repeat', 'pronoun', 'fresh'];
 	const usable = pronouns.length ? ways : ways.filter((way) => way !== 'pronoun');
-	const total = usable.reduce((sum, each) => sum + REFERENCE_WEIGHT[each], 0);
-	let roll = Math.random() * total;
-	let reference = usable[usable.length - 1];
-
-	for (const each of usable) {
-		roll -= REFERENCE_WEIGHT[each];
-
-		if (roll <= 0) {
-			reference = each;
-			break;
+	const weightOf = (way: Reference) => {
+		if (way !== 'repeat') {
+			return REFERENCE_WEIGHT[way];
 		}
-	}
+
+		return REFERENCE_WEIGHT[way] * (repeated ? REPEAT_DAMP : 1) * (topic.named ? NAMED_DAMP : 1);
+	};
+	const reference = pickWeighted(usable, weightOf);
 
 	return {
 		topic,
@@ -2123,21 +2256,28 @@ function followFor(
  * budget can spare is a sentence that overshoots by exactly its length. Russian
  * `тем временем` is thirteen characters, and a third of a range of seventy-five
  * has nowhere to put them.
+ *
+ * `flow` is the other half of the decision, and it is what makes an opener read
+ * as one: never the same word twice in one result, and far less likely at all
+ * when the sentence before this one already opened on something.
  */
 function openerFor(
 	data: SentenceLanguageData,
 	mark: SentenceMark,
 	following: boolean,
 	room: number,
-	shortest: number
+	shortest: number,
+	flow: Flow
 ): string {
 	const spare = room - data.space.length - shortest;
-	const fitting = (pool: WordPool) => pool.filter((word) => word.length <= spare);
+	const fitting = (pool: WordPool) =>
+		pool.filter((word) => word.length <= spare && !flow.openers.has(word));
+	const damp = flow.opened ? OPENER_DAMP : 1;
 
 	if (mark === 'exclamation') {
 		const usable = fitting(data.interjections);
 
-		if (usable.length && chance(INTERJECTION_CHANCE)) {
+		if (usable.length && chance(INTERJECTION_CHANCE * damp)) {
 			return pick(usable);
 		}
 	}
@@ -2148,7 +2288,7 @@ function openerFor(
 
 	const usable = fitting(data.connectives);
 
-	return usable.length && chance(CONNECTIVE_CHANCE) ? pick(usable) : '';
+	return usable.length && chance(CONNECTIVE_CHANCE * damp) ? pick(usable) : '';
 }
 
 /**
@@ -2176,7 +2316,7 @@ function kindFor(
 	settings: Settings,
 	bounds: Record<string, readonly [number, number]>,
 	budget: readonly [number, number],
-	lead: SentenceType | null
+	flow: Flow
 ): readonly [SentenceType, SentenceMark] {
 	// Both ends: a shape whose shortest is past the top of the budget overshoots
 	// whatever it draws, and one whose longest is under the bottom falls short of
@@ -2195,22 +2335,52 @@ function kindFor(
 
 		return [budget[0] - marks, budget[1] - marks];
 	};
-	// A paragraph stays in the register it opened in. A line somebody speaks is a
-	// line, and the next one is another line of the same speech; prose about it may
-	// ask and exclaim without stopping being prose. Nothing to keep to on the first
-	// sentence, which is where the register comes from.
+	// A paragraph stays in the register it opened in. Prose about a line may not
+	// become one, so the narrated register is the closed half; a quoted one keeps
+	// the prose that goes between its lines, because a line answered only by
+	// another line is one person talking to themselves. Nothing to keep to on the
+	// first sentence, which is where the register comes from.
+	const lead = flow.lead;
 	const family = lead
 		? settings.types.filter((type) =>
-				QUOTED_TYPES.includes(lead) ? type === lead : !QUOTED_TYPES.includes(type)
+				QUOTED_TYPES.includes(lead)
+					? type === lead || NARRATION.includes(type)
+					: !QUOTED_TYPES.includes(type)
 			)
 		: settings.types;
 	const wanted = family.length ? family : settings.types;
 	const usable = wanted.filter((type) => marksOf(type).some((mark) => fits(mark, roomOf(type))));
 	const pool = usable.length ? usable : wanted;
-	const type = lead && pool.includes(lead) && chance(LEAD_CHANCE) ? lead : pick(pool);
+	const type = pickWeighted(pool, (each) => typeWeight(each, flow));
 	const marks = marksOf(type).filter((mark) => fits(mark, roomOf(type)));
 
-	return [type, pick(marks.length ? marks : marksOf(type))];
+	return [
+		type,
+		pickWeighted(marks.length ? marks : marksOf(type), (mark) => markWeight(mark, flow))
+	];
+}
+
+/**
+ * What one kind is worth here, in this result, after what it has already said.
+ *
+ * Two things move it off the flat weight. A result that opened on a quoted line
+ * is a scene of speech, so the line it opened on outweighs the prose around it;
+ * and a kind the sentence before this one already was is worth less each time it
+ * comes round again, so that a run of them ends by itself. The plain statement is
+ * the one thing exempt from that: a run of statements is what prose is.
+ */
+function typeWeight(type: SentenceType, flow: Flow): number {
+	const quoted = flow.lead !== null && QUOTED_TYPES.includes(flow.lead);
+	const base = TYPE_WEIGHT[type] * (quoted && type === flow.lead ? QUOTED_BOOST : 1);
+
+	return type === flow.last && type !== 'statement' ? base * REPEAT_DAMP ** flow.run : base;
+}
+
+/** The same for the mark a quoted line closes on. */
+function markWeight(mark: SentenceMark, flow: Flow): number {
+	const base = MARK_WEIGHT[mark];
+
+	return mark === flow.mark && mark !== 'statement' ? base * REPEAT_DAMP : base;
 }
 
 /**
@@ -2289,8 +2459,20 @@ function generateResult(language: WordLanguage, settings: Settings): Built[] {
 	const built: Built[] = [];
 	let topic: Topic | null = null;
 	let scene: ReadonlyMap<SentenceSlot, Requirement> = new Map();
-	// What the result opened on, which is what the rest of it keeps to.
-	let lead: SentenceType | null = null;
+	// What the result has said so far — the register it opened in, and everything
+	// the next sentence has to avoid saying the same way. The first sentence names
+	// the subject itself, which is why `repeated` starts true.
+	const flow: Flow = {
+		lead: null,
+		last: null,
+		run: 0,
+		mark: null,
+		opened: false,
+		openers: new Set(),
+		repeated: true
+	};
+	// What the result has already said with its predicates and its adverbials.
+	const spent = new Set<string>();
 	// The result's own voice, settled once. A caller who named a level gets that
 	// one throughout; one who did not gets a paragraph that is at least consistent
 	// with itself, rather than a level rerolled every sentence.
@@ -2298,18 +2480,20 @@ function generateResult(language: WordLanguage, settings: Settings): Built[] {
 
 	for (let i = 0; i < settings.sentences; i += 1) {
 		const budget = budgets[i];
-		const [type, mark] = kindFor(data, settled, room, budget, lead);
-		const follow = topic ? followFor(data, topic, scene) : null;
+		const [type, mark] = kindFor(data, settled, room, budget, flow);
+		const follow = topic ? followFor(data, topic, scene, flow.repeated) : null;
 		const draw: Draw = {
 			budget,
 			type,
 			mark,
 			quote: quoteFor(data, type, settings.quote),
-			opener: openerFor(data, mark, follow !== null, budget[1], shortest),
+			opener: openerFor(data, mark, follow !== null, budget[1], shortest, flow),
 			style: styleFor(type, settings.style, voice),
+			avoid: spent,
 			follow
 		};
 		let one = generateOne(language, settled, draw);
+		let opened = draw.opener;
 
 		// `openerFor` reserves room against the shortest sentence the shapes could
 		// spell, which is a floor no draw actually reaches — the shortest word of
@@ -2322,12 +2506,27 @@ function generateResult(language: WordLanguage, settings: Settings): Built[] {
 
 			if (distanceFrom(bare.sentence.length, budget) < distanceFrom(one.sentence.length, budget)) {
 				one = bare;
+				opened = '';
 			}
 		}
 
 		built.push(one);
 		scene = one.scene;
-		lead ??= type;
+
+		for (const word of one.used) {
+			spent.add(word);
+		}
+
+		flow.run = type === flow.last ? flow.run + 1 : 1;
+		flow.last = type;
+		flow.mark = mark;
+		flow.opened = Boolean(opened);
+		flow.lead ??= type;
+		flow.repeated = follow ? follow.reference === 'repeat' : true;
+
+		if (opened) {
+			flow.openers.add(opened);
+		}
 
 		if (!topic) {
 			topic = topicOf(one);

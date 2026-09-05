@@ -37,11 +37,21 @@ import 'package:randino/src/types.dart';
 /// a subject agrees with it.
 ///
 /// [type] says what the sentences are doing — saying something, asking it,
-/// exclaiming it, or trailing off. A set of them decides per sentence, and null
-/// means statements. A language answers with what it has: five of the nine write
-/// a question with nothing but the mark, and the four that need more — English's
+/// exclaiming it, quoting somebody, or trailing off. A null set, or one holding
+/// more than one kind, decides per sentence, and that decision is weighted rather
+/// than even, because prose is: a statement is far and away the most likely, a
+/// line somebody says comes next, and a question or an exclamation is the rarest
+/// of them. A language answers with what it has: five of the nine write a
+/// question with nothing but the mark, and the four that need more — English's
 /// do-support, German's verb moving to the front, Korean's and Japanese's
 /// endings — say so in their own shapes.
+///
+/// [sentences] is how many sentences one result holds, and a result of several
+/// reads as one paragraph rather than as several draws that landed together. It
+/// keeps the register it opened in, so a scene of speech is lines with prose
+/// between them; it spends its verbs before it repeats one; it names a person and
+/// then leaves them alone; and it never opens two of its sentences on the same
+/// word.
 ///
 /// [quote] overrides which quotation marks a `dialogue` or a `thought` is
 /// written in. Left out, dialogue takes the language's first-level marks and

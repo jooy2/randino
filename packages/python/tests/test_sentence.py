@@ -847,14 +847,166 @@ def test_a_paragraph_keeps_its_scene_its_person_and_its_register() -> None:
     ):
         assert len(set(detail.names)) == min(1, len(detail.names)), detail.sentence
 
-    # And it stays in the register it opened in: a line somebody says is a line, and
-    # prose about it may ask and exclaim without becoming a line.
-    for detail in rand_sentence(language="ko", sentences=4, count=200, output="detail"):
-        quoted = [type_ in ("dialogue", "thought") for type_ in detail.types]
+    # And it names them and then leaves them alone. A name is the most conspicuous word a
+    # sentence can carry and the one a reader is least likely to lose track of, so
+    # `신우가 …. 신우는 …. 신우가 …` is one caption written three times. The opening
+    # sentence always writes it, which is the floor this is measured against.
+    for language in ("ko", "en"):
+        carried = 0
+        lines = 0
 
-        assert all(one == quoted[0] for one in quoted), (
-            f"the register changed mid-paragraph: {'/'.join(detail.types)}"
+        for detail in rand_sentence(
+            type="statement",
+            language=language,
+            sentences=5,
+            include_name=True,
+            count=300,
+            output="detail",
+        ):
+            if not detail.names:
+                continue
+
+            for sentence in detail.sentences:
+                lines += 1
+                carried += 1 if detail.names[0] in sentence else 0
+
+        assert carried / lines < 0.6, (
+            f"{language}: {carried / lines * 100:.1f}% of the lines name them"
         )
+
+    # English is the one that had nothing to leave them alone with. It cannot drop a
+    # subject, and `pronounless` kept `he` and `she` away from every person — rightly for
+    # `the locksmith`, which carries no gender, and wrongly for a name, which is the one
+    # thing that says which of the two it is.
+    stands = re.compile(r"\b(?:he|she)\b", re.IGNORECASE)
+    stood = 0
+
+    for detail in rand_sentence(
+        type="statement", language="en", sentences=4, include_name=True, count=200, output="detail"
+    ):
+        stood += sum(1 for sentence in detail.sentences if stands.search(sentence))
+
+    assert stood > 0, "no English paragraph stood a pronoun where the name was"
+
+    # And it stays in the register it opened in. A narrated paragraph never quotes; a
+    # quoted one is lines with prose between them rather than lines alone, because two
+    # people talking take turns and one person saying four things in a row is a paragraph
+    # missing everything that happened while they said them. What the prose may not be is
+    # a third voice — a narrated question in the middle of a scene of speech is somebody
+    # else asking.
+    mixed = 0
+
+    for detail in rand_sentence(
+        language="ko", sentences=4, include_name=False, count=300, output="detail"
+    ):
+        lead = detail.types[0]
+        quoted = lead in ("dialogue", "thought")
+
+        for type_ in detail.types:
+            assert (
+                type_ in (lead, "statement", "trailing")
+                if quoted
+                else type_ not in ("dialogue", "thought")
+            ), f"the register changed mid-paragraph: {'/'.join(detail.types)}"
+
+        if quoted and any(type_ not in ("dialogue", "thought") for type_ in detail.types):
+            mixed += 1
+
+    assert mixed > 0, "no quoted paragraph carried any prose between its lines"
+
+
+def test_a_paragraph_is_mostly_statements_and_opens_each_line_its_own_way() -> None:
+    """Prose is mostly statements, and no result opens twice on the same word."""
+    # The six kinds are drawn against each other rather than evenly. Prose is mostly
+    # statements, a line somebody says comes next, and the two kinds that carry a mark of
+    # their own are the rarest: a question is only worth reading when the sentences around
+    # it are not questions. Every kind used to be one in six, and a paragraph of ten came
+    # out as ten questions often enough to be the first thing anybody noticed.
+    tally: dict[str, int] = {}
+    total = 0
+
+    for detail in rand_sentence(sentences=5, count=400, output="detail"):
+        for type_ in detail.types:
+            tally[type_] = tally.get(type_, 0) + 1
+            total += 1
+
+    def share(type_: str) -> float:
+        return tally.get(type_, 0) / total
+
+    marked = share("question") + share("exclamation")
+
+    # Wide margins, because what is under test is the ordering rather than the weights:
+    # the measured figures are 65% against 13%.
+    assert share("statement") > 0.4, f"statements are {share('statement') * 100:.1f}%"
+    assert marked < 0.25, f"questions and exclamations are {marked * 100:.1f}%"
+
+    # And what a sentence opens on is written once per result. Read in Korean alone, which
+    # writes neither an opening mark nor a capital, so what a sentence starts with is the
+    # word itself.
+    data = SENTENCE_DATA["ko"]
+    words = (*data.connectives, *data.interjections)
+    seen = 0
+
+    for detail in rand_sentence(language="ko", sentences=6, count=300, output="detail"):
+        openers = [
+            found
+            for sentence in detail.sentences
+            for found in (
+                next(
+                    (
+                        word
+                        for word in words
+                        if sentence.lstrip("“”‘’").startswith(word + data.space)
+                    ),
+                    None,
+                ),
+            )
+            if found is not None
+        ]
+
+        assert len(set(openers)) == len(openers), detail.sentence
+
+        seen += len(openers)
+
+    assert seen > 0, "no sentence opened on anything at all"
+
+
+def test_a_paragraph_spends_its_predicates_before_it_repeats_one() -> None:
+    """A verb group is drawn down rather than rolled afresh every sentence."""
+    # A verb group holds four words and a paragraph holds four sentences, so the group is
+    # spent before it starts over — `식습니다` three times in four lines is the same
+    # sentence written three times. It is a preference and not a rule, because the length
+    # range still comes first, which is why this is a ratio rather than an equality.
+    for language in WORD_LANGUAGES:
+        total = 0.0
+        seen = 0
+
+        for detail in rand_sentence(
+            type="statement",
+            include_name=False,
+            language=language,
+            sentences=4,
+            shape="simple",
+            slots="none",
+            style="plain",
+            count=200,
+            output="detail",
+        ):
+            written = [
+                phrase
+                for phrase, slot in zip(detail.phrases, detail.slots, strict=True)
+                if slot in ("verb", "state")
+            ]
+
+            if not written:
+                continue
+
+            total += len(set(written)) / len(written)
+            seen += 1
+
+        # An even draw over a group of four would sit near 0.7; every language measures
+        # 0.97 or better.
+        assert total / seen > 0.9, f"{language}: {total / seen:.3f} of them distinct"
 
 
 def test_sentences_puts_more_than_one_sentence_in_one_result() -> None:
@@ -1375,7 +1527,7 @@ def test_a_quoted_line_is_a_sentence_in_the_languages_own_marks() -> None:
                 assert SCRIPT[language].match(detail.sentence), detail.sentence
 
                 # What is quoted is a whole sentence, closed the way its own kind closes
-                # — a spoken line is as often asking as telling.
+                # — a spoken line is not always a statement.
                 inner = detail.sentence[len(open_mark) : -len(close_mark)]
 
                 assert any(inner.endswith(mark) for mark in marks), (

@@ -120,7 +120,12 @@ def rand_sentence(
             — and they are about the same thing: a later sentence names the first one's
             subject again, refers to it with a pronoun, or draws a fresh subject of the
             same kind, and may open on a connective. `min_length` and `max_length`
-            describe the whole string whatever this is.
+            describe the whole string whatever this is. A result of several reads as
+            one paragraph rather than as several draws that landed together: it keeps
+            the register it opened in, so a scene of speech is lines with prose between
+            them; it spends its verbs before it repeats one; it names a person and then
+            leaves them alone; and it never opens two of its sentences on the same
+            word.
         include_name: Whether a sentence about a person writes a generated name where
             that person would go — `Emma runs quietly.`, `민준이 조용히 달린다.`
             Turning it on narrows the subject to the themes that name people; a `theme`
@@ -128,7 +133,10 @@ def rand_sentence(
             carries its own gender, so what agrees with a subject agrees with it. Off
             by default because it is the one option that reaches the person-name pools.
         type: What the sentences are doing — saying something, asking it, exclaiming it,
-            or trailing off. A sequence or `"all"` decides per sentence. A language
+            quoting somebody, or trailing off. A sequence or `"all"` decides per
+            sentence, and that decision is weighted rather than even, because prose is:
+            a statement is far and away the most likely, a line somebody says comes
+            next, and a question or an exclamation is the rarest of them. A language
             answers with what it has: five of the nine write a question with nothing but
             the mark, and the four that need more — English's do-support, German's verb
             moving to the front, Korean's and Japanese's endings — say so in their own
