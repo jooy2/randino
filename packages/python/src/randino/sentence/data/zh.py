@@ -2,6 +2,7 @@
 
 from randino._internal.parse import words
 from randino.sentence.data._types import (
+    SentenceCalendar,
     SentenceFrame,
     SentenceLanguageData,
     SentenceNumeral,
@@ -197,7 +198,51 @@ ZH = SentenceLanguageData(
     interjections=words("啊， 哎呀， 哇， 唉， 天啊， 瞧， 咦，"),
     pronouns={"n": ("", "它")},
     pronounless=("person",),
+    # Chinese writes a date largest to smallest and its copula as a word of its own, in
+    # front of what it equates the subject to.
+    calendar=SentenceCalendar(
+        date="Y年M月D日",
+        clock="h点mm分",
+        years=(2020, 2030),
+        copula=StateGroup(
+            # An event is a thing that happens on a day, and a lion is not.
+            subject=("event",),
+            words=words("是"),
+        ),
+    ),
     frames=(
+        # A date and a clock, standing where an adverbial stands.
+        SentenceFrame(
+            (
+                SentencePart("date", head="在"),
+                SentencePart("subject", modifiable=True),
+                SentencePart("verb"),
+            ),
+            5,
+        ),
+        SentenceFrame(
+            (
+                SentencePart("clock", head="在"),
+                SentencePart("subject", modifiable=True),
+                SentencePart("verb"),
+            ),
+            5,
+        ),
+        # And the shape that equates the subject to one: `比赛是11点40分。`
+        SentenceFrame(
+            (
+                SentencePart("subject", modifiable=True),
+                SentencePart("date", copula="head"),
+            ),
+            4,
+        ),
+        SentenceFrame(
+            (
+                SentencePart("subject", modifiable=True),
+                SentencePart("clock", copula="head"),
+            ),
+            4,
+        ),
         SentenceFrame(
             (
                 SentencePart("subject", modifiable=True),

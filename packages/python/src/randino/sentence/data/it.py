@@ -2,6 +2,7 @@
 
 from randino._internal.parse import words
 from randino.sentence.data._types import (
+    SentenceCalendar,
     SentenceFrame,
     SentenceLanguageData,
     SentenceNumeral,
@@ -225,7 +226,54 @@ IT = SentenceLanguageData(
     ),
     # Pro-drop, the same as Spanish: `esso` exists and nobody writes it.
     pronouns={"n": ("",)},
+    # Italian names its months and writes the day first with nothing between the parts.
+    calendar=SentenceCalendar(
+        date="D MMMM Y",
+        months=words("""
+            gennaio febbraio marzo aprile maggio giugno luglio agosto settembre ottobre
+            novembre dicembre
+        """),
+        clock="h:mm",
+        years=(2020, 2030),
+        copula=StateGroup(
+            # An event is a thing that happens on a day, and a lion is not.
+            subject=("event",),
+            words=words("è"),
+        ),
+    ),
     frames=(
+        # A date and a clock, standing where an adverbial stands.
+        SentenceFrame(
+            (
+                SentencePart("date", head="il", tail=","),
+                SentencePart("subject", modifiable=True),
+                SentencePart("verb"),
+            ),
+            5,
+        ),
+        SentenceFrame(
+            (
+                SentencePart("clock", head="alle", tail=","),
+                SentencePart("subject", modifiable=True),
+                SentencePart("verb"),
+            ),
+            5,
+        ),
+        # And the shape that equates the subject to one: `La partita è alle 11:40.`
+        SentenceFrame(
+            (
+                SentencePart("subject", modifiable=True),
+                SentencePart("date", head="il", copula="head"),
+            ),
+            4,
+        ),
+        SentenceFrame(
+            (
+                SentencePart("subject", modifiable=True),
+                SentencePart("clock", head="alle", copula="head"),
+            ),
+            4,
+        ),
         SentenceFrame(
             (
                 SentencePart("subject", modifiable=True),

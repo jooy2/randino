@@ -189,7 +189,52 @@ export const JA: SentenceLanguageData = {
 	interjections: words(`ああ、 おお、 まあ、 なんと、 やれやれ、 おや、 ほら、`),
 	pronouns: { n: ['', 'それ'] },
 	pronounless: ['person'],
+	// Japanese writes a date largest to smallest with nothing between the parts,
+	// and its copula onto the end of what it equates the subject to.
+	calendar: {
+		date: 'Y年M月D日',
+		clock: 'h時mm分',
+		years: [2020, 2030],
+		copula: {
+			// An event is a thing that happens on a day, and a lion is not.
+			subject: ['event'],
+			words: words(`だ`),
+			forms: { polite: words(`です`) }
+		}
+	},
 	frames: [
+		// A date and a clock, standing where an adverbial stands.
+		{
+			parts: [
+				{ slot: 'date', tail: 'に' },
+				{ slot: 'subject', tail: 'が', modifiable: true },
+				{ slot: 'verb' }
+			],
+			weight: 5
+		},
+		{
+			parts: [
+				{ slot: 'clock', tail: 'に' },
+				{ slot: 'subject', tail: 'が', modifiable: true },
+				{ slot: 'verb' }
+			],
+			weight: 5
+		},
+		// And the shape that equates the subject to one: `試合は11時40分だ。`
+		{
+			parts: [
+				{ slot: 'subject', tail: 'は' },
+				{ slot: 'date', copula: 'tail' }
+			],
+			weight: 4
+		},
+		{
+			parts: [
+				{ slot: 'subject', tail: 'は' },
+				{ slot: 'clock', copula: 'tail' }
+			],
+			weight: 4
+		},
 		{
 			parts: [{ slot: 'subject', tail: 'が', modifiable: true }, { slot: 'verb' }],
 			weight: 20

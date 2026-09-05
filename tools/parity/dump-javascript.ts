@@ -172,6 +172,19 @@ console.log(
 									gap: data.numeral.gap
 								}
 							: null,
+						calendar: data.calendar
+							? {
+									date: data.calendar.date,
+									months: list(data.calendar.months),
+									clock: data.calendar.clock,
+									years: [...data.calendar.years],
+									copula: {
+										subject: [...data.calendar.copula.subject],
+										words: list(data.calendar.copula.words),
+										forms: forms(data.calendar.copula.forms)
+									}
+								}
+							: null,
 						frames: data.frames.map((frame) => ({
 							parts: frame.parts.map((part) => ({
 								slot: part.slot,
@@ -179,7 +192,8 @@ console.log(
 								tail: part.tail ?? '',
 								tailAlt: part.tailAlt ?? '',
 								modifiable: part.modifiable ?? false,
-								bare: part.bare ?? false
+								bare: part.bare ?? false,
+								copula: part.copula ?? ''
 							})),
 							weight: frame.weight,
 							mood: frame.mood ?? 'statement',

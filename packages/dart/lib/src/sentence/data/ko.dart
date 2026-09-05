@@ -637,7 +637,48 @@ final SentenceLanguageData ko = SentenceLanguageData(
     WordGender.n: <String>['', '그것'],
   },
   pronounless: const <NounClass>[NounClass.person],
+  // Korean writes a date largest to smallest and a clock the same way, and its
+  // copula is written onto the end of what it equates the subject to. Both close
+  // on a coda — `일`, `분` — so `이다` never has to contract to `다`.
+  calendar: SentenceCalendar(
+    date: 'Y년 M월 D일',
+    clock: 'h시 mm분',
+    years: LengthRange(2020, 2030),
+    copula: StateGroup(
+      // An event is a thing that happens on a day, and a lion is not.
+      subject: <NounClass>[NounClass.event],
+      words: <String>['이다'],
+      forms: <PredicateForm, WordPool>{
+        PredicateForm.question: <String>['이니|인가'],
+        PredicateForm.exclamation: <String>['이구나|이네'],
+        PredicateForm.casual: <String>['이야|이지'],
+        PredicateForm.polite: <String>['이에요|이죠'],
+        PredicateForm.formal: <String>['입니다'],
+        PredicateForm.formalQuestion: <String>['입니까'],
+      },
+    ),
+  ),
   frames: const <SentenceFrame>[
+    // A date and a clock, standing where an adverbial stands.
+    SentenceFrame(<SentencePart>[
+      SentencePart(SentenceSlot.date, tail: '에'),
+      SentencePart(SentenceSlot.subject, tail: '가', tailAlt: '이', modifiable: true),
+      SentencePart(SentenceSlot.verb),
+    ], 5),
+    SentenceFrame(<SentencePart>[
+      SentencePart(SentenceSlot.clock, tail: '에'),
+      SentencePart(SentenceSlot.subject, tail: '가', tailAlt: '이', modifiable: true),
+      SentencePart(SentenceSlot.verb),
+    ], 5),
+    // And the shape that equates the subject to one: `면접은 2026년 9월 5일이다.`
+    SentenceFrame(<SentencePart>[
+      SentencePart(SentenceSlot.subject, tail: '는', tailAlt: '은'),
+      SentencePart(SentenceSlot.date, copula: CopulaSide.tail),
+    ], 4),
+    SentenceFrame(<SentencePart>[
+      SentencePart(SentenceSlot.subject, tail: '는', tailAlt: '은'),
+      SentencePart(SentenceSlot.clock, copula: CopulaSide.tail),
+    ], 4),
     SentenceFrame(<SentencePart>[
       SentencePart(SentenceSlot.subject, tail: '가', tailAlt: '이', modifiable: true),
       SentencePart(SentenceSlot.verb),

@@ -197,7 +197,39 @@ final SentenceLanguageData vi = SentenceLanguageData(
     group: '.',
     gap: ' ',
   ),
+  // Vietnamese writes a date smallest to largest, with a word in front of every
+  // part, and its copula as a word of its own.
+  calendar: SentenceCalendar(
+    date: 'ngày D tháng M năm Y',
+    clock: 'h giờ mm',
+    years: LengthRange(2020, 2030),
+    copula: StateGroup(
+      // An event is a thing that happens on a day, and a lion is not.
+      subject: <NounClass>[NounClass.event],
+      words: <String>['là'],
+    ),
+  ),
   frames: const <SentenceFrame>[
+    // A date and a clock, standing where an adverbial stands.
+    SentenceFrame(<SentencePart>[
+      SentencePart(SentenceSlot.date, head: 'vào', tail: ','),
+      SentencePart(SentenceSlot.subject, modifiable: true),
+      SentencePart(SentenceSlot.verb),
+    ], 5),
+    SentenceFrame(<SentencePart>[
+      SentencePart(SentenceSlot.clock, head: 'lúc', tail: ','),
+      SentencePart(SentenceSlot.subject, modifiable: true),
+      SentencePart(SentenceSlot.verb),
+    ], 5),
+    // And the shape that equates the subject to one: `Trận đấu là 11 giờ 40.`
+    SentenceFrame(<SentencePart>[
+      SentencePart(SentenceSlot.subject, modifiable: true),
+      SentencePart(SentenceSlot.date, copula: CopulaSide.head),
+    ], 4),
+    SentenceFrame(<SentencePart>[
+      SentencePart(SentenceSlot.subject, modifiable: true),
+      SentencePart(SentenceSlot.clock, copula: CopulaSide.head),
+    ], 4),
     SentenceFrame(<SentencePart>[
       SentencePart(SentenceSlot.subject, modifiable: true),
       SentencePart(SentenceSlot.verb),

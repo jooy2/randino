@@ -49,7 +49,7 @@ rand_sentence()
 | `quote` | <Lang js="SentenceQuote" dart="SentenceQuote?" py="SentenceQuote &#124; None" code /> | <Lang js="—" dart="null" py="None" code /> | 인용된 문장이 어떤 따옴표를 쓸지. [대사와 생각](#dialogue-and-thought) 참고. |
 | `style` | `SentenceStyle` | 무작위 | 어느 화계로 쓸지. [화계](#politeness) 참고. |
 | `shape` | <Lang js="SentenceShapeOption" dart="SentenceShape?" py="SentenceShapeOption" code /> | <Lang js="'all'" dart="null" py="&quot;all&quot;" code /> | 문장이 얼마나 많은 것을 말하는지. [얼마나 말할지](#how-much-it-says) 참고. |
-| `slots` | <Lang js="SentenceSlotOption" dart="Set&lt;SentenceSlot&gt;?" py="SentenceSlotOption" code /> | <Lang js="'all'" dart="null" py="&quot;all&quot;" code /> | 주어 옆에 무엇을 두는지. [형태 고르기](#picking-the-shape)와 [수량과 금액](#counting-and-money) 참고. |
+| `slots` | <Lang js="SentenceSlotOption" dart="Set&lt;SentenceSlot&gt;?" py="SentenceSlotOption" code /> | <Lang js="'all'" dart="null" py="&quot;all&quot;" code /> | 주어 옆에 무엇을 두는지. [형태 고르기](#picking-the-shape), [수량과 금액](#counting-and-money), [날짜와 시각](#a-day-and-a-time) 참고. |
 | `include` | <Lang js="string &#124; string[]" dart="List&lt;String&gt;" py="str &#124; Sequence[str]" code /> | <Lang js="—" dart="const []" py="()" code /> | 모든 문장에 반드시 들어가야 할 단어. [반드시 넣을 단어](#words-it-has-to-contain) 참고. |
 | `sentences` | <Lang js="number" dart="int" py="int" code /> | `1` | 결과 하나에 담을 문장 수. [문장을 여러 개](#more-than-one-sentence) 참고. |
 | <Lang js="includeName" dart="includeName" py="include_name" code /> | <Lang js="boolean" dart="bool" py="bool" code /> | 무작위 | 사람이 설 자리에 사람 이름을 씁니다. [사람 이름](#a-persons-name) 참고. |
@@ -335,6 +335,65 @@ rand_sentence(language="en", slots="money", count=2)
 **수량 명사구는 관사를 떼고 수식어를 붙이지 않습니다.** `12 apples`이지 `the 12 red apples`이 아닙니다. 그리고 천 단위 구분은 그 언어의 방식대로입니다. 영어·한국어·일본어·중국어는 `,`, 베트남어·스페인어·이탈리아어는 `.`입니다.
 
 **숫자와 그것이 세는 것 사이도 언어마다 다릅니다.** 한국어는 단위와 화폐를 숫자에 붙여 씁니다. `6개`, `300,000원`처럼요. 일본어와 중국어는 애초에 띄어쓰기가 없으니 마찬가지입니다. 베트남어·영어·스페인어·이탈리아어는 띄어 씁니다. `6 con`, `500 dollars`.
+
+## 날짜와 시각 {#a-day-and-a-time}
+
+문장이 담을 수 있는 두 가지가 더 있습니다. **date**는 어느 날인지, **clock**은 몇 시인지이고, 둘 다 그 언어가 쓰는 방식으로 적힙니다.
+
+::: lang js
+
+```javascript
+randSentence({ language: 'ko', slots: 'date', count: 2 });
+// ['2024년 5월 12일에 촉촉한 모래톱이 깊어지죠.', '비는 2027년 9월 19일입니다.']
+
+randSentence({ language: 'en', slots: 'clock', count: 2 });
+// ['At 13:24, the sherbet remains.', 'The torrent is at 3:26.']
+
+randSentence({ language: 'de', slots: 'date', count: 2 });
+// ['Ein Pokal ist am 9. November 2028.', 'Ein verworrenes Hockey ist am 7. März 2028.']
+```
+
+:::
+
+::: lang dart
+
+```dart
+randSentence(language: WordLanguage.ko, slots: {SentenceSlot.date}, count: 2);
+// [2024년 5월 12일에 촉촉한 모래톱이 깊어지죠., 비는 2027년 9월 19일입니다.]
+
+randSentence(language: WordLanguage.en, slots: {SentenceSlot.clock}, count: 2);
+// [At 13:24, the sherbet remains., The torrent is at 3:26.]
+
+randSentence(language: WordLanguage.de, slots: {SentenceSlot.date}, count: 2);
+// [Ein Pokal ist am 9. November 2028., Ein verworrenes Hockey ist am 7. März 2028.]
+```
+
+:::
+
+::: lang py
+
+```python
+rand_sentence(language="ko", slots="date", count=2)
+# ['2024년 5월 12일에 촉촉한 모래톱이 깊어지죠.', '비는 2027년 9월 19일입니다.']
+
+rand_sentence(language="en", slots="clock", count=2)
+# ['At 13:24, the sherbet remains.', 'The torrent is at 3:26.']
+
+rand_sentence(language="de", slots="date", count=2)
+# ['Ein Pokal ist am 9. November 2028.', 'Ein verworrenes Hockey ist am 7. März 2028.']
+```
+
+:::
+
+**날짜는 숫자만큼이나 어순입니다.** `2026년 9월 5일`은 큰 단위부터 가고, `ngày 5 tháng 9 năm 2026`은 반대로 가면서 각 부분 앞에 단어를 붙이며, `5. September 2026`은 달을 이름으로 부르고 일 뒤에 마침표를 찍습니다. 언어마다 자기 형식을 선언하고, 달을 이름으로 부르는 다섯 언어는 열두 이름을 함께 적습니다.
+
+**둘 다 두 자리에 설 수 있습니다.** 부사구로 서거나(`2026년 9월 5일에 사자가 달린다`, `On September 5, 2026, the lion runs`), 문장이 주어를 그것과 같다고 놓는 자리에 섭니다. `면접은 11시 40분이다.`, `The match is at 11:40.`
+
+**뒤쪽이 계사문이고**, 동사도 상태도 없는 유일한 문형입니다. 계사는 다른 서술어와 똑같이 다뤄집니다. 주어가 속할 수 있는 부류를 선언하고 — 사건은 어느 날에 일어나는 것이고 사자는 아닙니다 — 화계와 서법이 요구하는 형태를 취합니다. 그래서 한국어는 `이다`, `이야`, `이에요`, `입니다`를 쓰고 `이니?`로 묻습니다.
+
+**계사가 어디에 서는지는 언어가 정합니다.** 한국어와 일본어는 같다고 놓는 대상 끝에 붙여 씁니다. `11시 40분이다`는 한 단어입니다. 영어·중국어·베트남어·스페인어·이탈리아어·독일어는 앞에 단어 하나로 세우고, 그 구가 원래 달고 있던 전치사도 그대로 둡니다. `ist am 5. März`처럼요.
+
+**러시아어는 calendar를 선언하지 않습니다.** 요청하면 답할 수 없는 다른 요청과 같은 방식으로 물러납니다. 러시아어는 주어를 어느 날과 같다고 놓을 때 단어가 아니라 줄표를 쓰는데, 줄표는 의문이나 화계에 따라 변하지 않습니다. 선언한다면 그 언어가 쓸 수 없는 문형이 됩니다.
 
 ## 반드시 넣을 단어 {#words-it-has-to-contain}
 

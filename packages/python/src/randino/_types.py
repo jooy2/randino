@@ -163,7 +163,17 @@ class WordDetail:
 
 
 SentenceSlot = Literal[
-    "subject", "verb", "object", "state", "place", "time", "manner", "quantity", "money"
+    "subject",
+    "verb",
+    "object",
+    "state",
+    "place",
+    "time",
+    "manner",
+    "quantity",
+    "money",
+    "date",
+    "clock",
 ]
 """What one phrase does in a sentence.
 
@@ -172,10 +182,12 @@ SentenceSlot = Literal[
 the sentence has no verb at all (`파랗다`). The rest frame the action: `place` where it
 happens (`숲에서`), `time` when (`새벽에`), `manner` how (`조용히`).
 
-`quantity` is how many of something (`사과 12 개`), which is a noun phrase with a number
-and the counter its kind takes, and `money` is how much (`100,000 원`, `12,000 dollars`).
+`quantity` is how many of something (`사과 12개`), which is a noun phrase with a number
+and the counter its kind takes, and `money` is how much (`100,000원`, `12,000 dollars`).
+`date` is what day (`2026년 9월 5일`) and `clock` what time of day (`11시 40분`).
 
-A sentence is headed by a `verb` or by a `state`, never by both.
+A sentence is headed by a `verb` or by a `state`, and a shape with neither is a copular
+one: it equates its subject to a `date` or a `clock` instead.
 """
 
 SentenceSlotOption = SentenceSlot | Sequence[SentenceSlot] | Literal["all", "none"]

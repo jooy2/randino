@@ -49,7 +49,7 @@ Every option is optional, and the defaults are what the empty call above uses.
 | `quote` | <Lang js="SentenceQuote" dart="SentenceQuote?" py="SentenceQuote &#124; None" code /> | <Lang js="—" dart="null" py="None" code /> | Which marks a quoted line takes. See [Dialogue and thought](#dialogue-and-thought). |
 | `style` | `SentenceStyle` | drawn | The speech level it is written at. See [The speech level](#politeness). |
 | `shape` | <Lang js="SentenceShapeOption" dart="SentenceShape?" py="SentenceShapeOption" code /> | <Lang js="'all'" dart="null" py="&quot;all&quot;" code /> | How much the sentence says. See [How much it says](#how-much-it-says). |
-| `slots` | <Lang js="SentenceSlotOption" dart="Set&lt;SentenceSlot&gt;?" py="SentenceSlotOption" code /> | <Lang js="'all'" dart="null" py="&quot;all&quot;" code /> | Which parts it carries beside the subject. See [Picking the shape](#picking-the-shape) and [Counting, and money](#counting-and-money). |
+| `slots` | <Lang js="SentenceSlotOption" dart="Set&lt;SentenceSlot&gt;?" py="SentenceSlotOption" code /> | <Lang js="'all'" dart="null" py="&quot;all&quot;" code /> | Which parts it carries beside the subject. See [Picking the shape](#picking-the-shape), [Counting, and money](#counting-and-money) and [A day and a time](#a-day-and-a-time). |
 | `include` | <Lang js="string &#124; string[]" dart="List&lt;String&gt;" py="str &#124; Sequence[str]" code /> | <Lang js="—" dart="const []" py="()" code /> | Words every sentence has to contain. See [Words it has to contain](#words-it-has-to-contain). |
 | `sentences` | <Lang js="number" dart="int" py="int" code /> | `1` | How many sentences one result holds. See [More than one sentence](#more-than-one-sentence). |
 | <Lang js="includeName" dart="includeName" py="include_name" code /> | <Lang js="boolean" dart="bool" py="bool" code /> | drawn | Write a person's name where the sentence has room for one. See [A person's name](#a-persons-name). |
@@ -335,6 +335,65 @@ rand_sentence(language="en", slots="money", count=2)
 **A counted phrase drops its article and takes no modifier** — `12 apples`, never `the 12 red apples`. And the thousands are grouped the way the language groups them: `,` in English, Korean, Japanese and Chinese, `.` in Vietnamese, Spanish and Italian.
 
 **What stands between the digits and what they count is the language's own too.** Korean attaches the counter and the currency to the number — `6개`, `300,000원` — and so do Japanese and Chinese, which write no space anywhere. Vietnamese, English, Spanish and Italian keep the space: `6 con`, `500 dollars`.
+
+## A day and a time {#a-day-and-a-time}
+
+Two more parts a shape can carry: a **date** is what day and a **clock** what time of day, both written the way the language writes them.
+
+::: lang js
+
+```javascript
+randSentence({ language: 'ko', slots: 'date', count: 2 });
+// ['2024년 5월 12일에 촉촉한 모래톱이 깊어지죠.', '비는 2027년 9월 19일입니다.']
+
+randSentence({ language: 'en', slots: 'clock', count: 2 });
+// ['At 13:24, the sherbet remains.', 'The torrent is at 3:26.']
+
+randSentence({ language: 'de', slots: 'date', count: 2 });
+// ['Ein Pokal ist am 9. November 2028.', 'Ein verworrenes Hockey ist am 7. März 2028.']
+```
+
+:::
+
+::: lang dart
+
+```dart
+randSentence(language: WordLanguage.ko, slots: {SentenceSlot.date}, count: 2);
+// [2024년 5월 12일에 촉촉한 모래톱이 깊어지죠., 비는 2027년 9월 19일입니다.]
+
+randSentence(language: WordLanguage.en, slots: {SentenceSlot.clock}, count: 2);
+// [At 13:24, the sherbet remains., The torrent is at 3:26.]
+
+randSentence(language: WordLanguage.de, slots: {SentenceSlot.date}, count: 2);
+// [Ein Pokal ist am 9. November 2028., Ein verworrenes Hockey ist am 7. März 2028.]
+```
+
+:::
+
+::: lang py
+
+```python
+rand_sentence(language="ko", slots="date", count=2)
+# ['2024년 5월 12일에 촉촉한 모래톱이 깊어지죠.', '비는 2027년 9월 19일입니다.']
+
+rand_sentence(language="en", slots="clock", count=2)
+# ['At 13:24, the sherbet remains.', 'The torrent is at 3:26.']
+
+rand_sentence(language="de", slots="date", count=2)
+# ['Ein Pokal ist am 9. November 2028.', 'Ein verworrenes Hockey ist am 7. März 2028.']
+```
+
+:::
+
+**A date is word order as much as it is digits.** `2026년 9월 5일` runs largest to smallest, `ngày 5 tháng 9 năm 2026` runs the other way with a word in front of every part, and `5. September 2026` names its month and puts a full stop after the day. Each language writes its own template, and the five that name their months list them.
+
+**Either can stand two ways.** As an adverbial — `2026년 9월 5일에 사자가 달린다`, `On September 5, 2026, the lion runs` — or as what the sentence equates its subject to: `면접은 11시 40분이다.`, `The match is at 11:40.`
+
+**The second of those is a copular shape**, and it is the only shape with neither a verb nor a state in it. The copula is a predicate like any other: it states the classes its subject may belong to — an event is a thing that happens on a day, and a lion is not — and it takes the form the level and the mood ask for, so Korean writes `이다`, `이야`, `이에요` and `입니다` and asks with `이니?`.
+
+**Where the copula stands is the language's business.** Korean and Japanese write it onto the end of what it equates the subject to (`11시 40분이다` is one word); English, Chinese, Vietnamese, Spanish, Italian and German write it as a word of its own in front, and keep the preposition the phrase would carry anyway (`ist am 5. März`).
+
+**Russian declares no calendar**, and asking for one falls back the way any unanswerable ask does. It equates a subject to a day with a dash rather than a word, and a dash does not change for a question or for a level — declaring one would be a shape the language cannot write.
 
 ## Words it has to contain {#words-it-has-to-contain}
 

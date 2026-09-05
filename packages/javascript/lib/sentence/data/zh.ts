@@ -149,7 +149,51 @@ export const ZH: SentenceLanguageData = {
 		gap: ''
 	},
 	// action — the place phrase included — in front of it.
+	// Chinese writes a date largest to smallest and its copula as a word of its
+	// own, in front of what it equates the subject to.
+	calendar: {
+		date: 'Y年M月D日',
+		clock: 'h点mm分',
+		years: [2020, 2030],
+		copula: {
+			// An event is a thing that happens on a day, and a lion is not.
+			subject: ['event'],
+			words: words(`是`)
+		}
+	},
 	frames: [
+		// A date and a clock, standing where an adverbial stands.
+		{
+			parts: [
+				{ slot: 'date', head: '在' },
+				{ slot: 'subject', modifiable: true },
+				{ slot: 'verb' }
+			],
+			weight: 5
+		},
+		{
+			parts: [
+				{ slot: 'clock', head: '在' },
+				{ slot: 'subject', modifiable: true },
+				{ slot: 'verb' }
+			],
+			weight: 5
+		},
+		// And the shape that equates the subject to one: `比赛是11点40分。`
+		{
+			parts: [
+				{ slot: 'subject', modifiable: true },
+				{ slot: 'date', copula: 'head' }
+			],
+			weight: 4
+		},
+		{
+			parts: [
+				{ slot: 'subject', modifiable: true },
+				{ slot: 'clock', copula: 'head' }
+			],
+			weight: 4
+		},
 		{
 			parts: [{ slot: 'subject', modifiable: true }, { slot: 'verb' }],
 			weight: 20

@@ -30,14 +30,14 @@ const SAMPLE = 60;
 
 /** Everything a sentence of the language may be written with, punctuation aside. */
 const SCRIPT: Record<WordLanguage, RegExp> = {
-	en: /^[A-Za-z0-9' ,.?!…“”‘’]+$/,
-	ko: /^[가-힣0-9 ,.?!…“”‘’]+$/,
+	en: /^[A-Za-z0-9' :,.?!…“”‘’]+$/,
+	ko: /^[가-힣0-9 :,.?!…“”‘’]+$/,
 	ja: /^[々぀-ヿ一-鿿0-9,。、？！…「」『』]+$/,
 	zh: /^[々一-鿿0-9,。，？！…“”‘’]+$/,
-	vi: /^[a-zA-ZÀ-ỹ0-9 ,.?!…“”‘’]+$/,
-	es: /^[a-zA-ZÀ-ÿ0-9 ,.?!…¿¡«»“”]+$/,
-	it: /^[a-zA-ZÀ-ÿ0-9' ,.?!…«»“”]+$/,
-	de: /^[a-zA-ZÀ-ÿß0-9 ,.?!…„“‚‘]+$/,
+	vi: /^[a-zA-ZÀ-ỹ0-9 :,.?!…“”‘’]+$/,
+	es: /^[a-zA-ZÀ-ÿ0-9 :,.?!…¿¡«»“”]+$/,
+	it: /^[a-zA-ZÀ-ÿ0-9' :,.?!…«»“”]+$/,
+	de: /^[a-zA-ZÀ-ÿß0-9 :,.?!…„“‚‘]+$/,
 	ru: /^[Ѐ-ӿ0-9 ,.?!…«»„“]+$/
 };
 
@@ -179,6 +179,31 @@ function stripCount(language: WordLanguage, phrase: string): string {
 	return phrase
 		.replace(new RegExp(`${space}${group}$`), '')
 		.replace(new RegExp(`^${group}${space}`), '');
+}
+
+/**
+ * Whether a phrase is a date or a clock the language's own template could write,
+ * checked by turning that template into a pattern.
+ */
+function isCalendar(language: WordLanguage, slot: 'date' | 'clock', phrase: string): boolean {
+	const calendar = SENTENCE_DATA[language].calendar;
+
+	if (!calendar) {
+		return false;
+	}
+
+	const pattern =
+		slot === 'clock'
+			? escapeRe(calendar.clock).replace('h', '\\d{1,2}').replace('mm', '\\d{2}')
+			: escapeRe(calendar.date)
+					.replace('Y', '\\d{4}')
+					.replace('D', '\\d{1,2}')
+					.replace(
+						calendar.months ? 'MMMM' : 'M',
+						calendar.months ? `(?:${calendar.months.map(escapeRe).join('|')})` : '\\d{1,2}'
+					);
+
+	return new RegExp(`^${pattern}$`).test(phrase);
 }
 
 /** Whether a phrase is an amount of money, written the way the language writes it. */
@@ -517,6 +542,17 @@ describe('Sentence', () => {
 						continue;
 					}
 
+					// A date and a clock are written out of the language's own template
+					// rather than out of any pool.
+					if (slot === 'date' || slot === 'clock') {
+						assert.ok(
+							isCalendar(language, slot, phrase),
+							`${language}: '${phrase}' is not a ${slot} the template can write (${detail.sentence})`
+						);
+
+						continue;
+					}
+
 					// A counted phrase is a noun phrase with a number on it, so the
 					// number comes off before the pools are asked about the rest.
 					assert.ok(
@@ -547,8 +583,16 @@ describe('Sentence', () => {
 		for (const language of WORD_LANGUAGES) {
 			for (const detail of sentenceDetails({ language, count: 120 })) {
 				const predicates = detail.slots.filter((slot) => slot === 'verb' || slot === 'state');
+				// A copular shape has neither: it equates its subject to a day or a
+				// time, and the copula is written onto that phrase rather than standing
+				// as one of its own.
+				const copular = detail.slots.includes('date') || detail.slots.includes('clock');
 
-				assert.strictEqual(predicates.length, 1, detail.sentence);
+				assert.strictEqual(
+					predicates.length,
+					copular && !predicates.length ? 0 : 1,
+					detail.sentence
+				);
 				// A shape that counts what it is about has no separate subject: the
 				// counted phrase is what the verb agrees with.
 				assert.ok(
@@ -948,8 +992,16 @@ describe('Sentence', () => {
 					// together into one entry. Counted after the grouped numbers are
 					// taken out: Vietnamese, Spanish and Italian group on a full stop,
 					// so `5.000.000` is three of them and none is a terminator.
+					// German writes the day of a date with a full stop after it, which is
+					// the same character, so that comes out too.
 					assert.strictEqual(
-						sentence.replace(/\d[\d.,]*\d/g, '#').split(data.terminators.statement).length - 1,
+						sentence
+							// German writes the day of a date with a full stop after it, and
+							// Vietnamese, Spanish and Italian group thousands on one, so both
+							// come out before the terminators are counted.
+							.replace(/\d+\.(?=\s\S)/g, '#')
+							.replace(/\d[\d.,]*\d/g, '#')
+							.split(data.terminators.statement).length - 1,
 						1,
 						`${language}: ${sentence}`
 					);
@@ -1760,6 +1812,101 @@ describe('Sentence', () => {
 					`${language}: '${detail.sentence}' spaces a number off what it counts`
 				);
 			}
+		}
+	});
+
+	it('`slots: date` and `slots: clock` write the language`s own calendar', () => {
+		// Eight of the nine. Russian equates its subject to a day with a dash rather
+		// than a word, and a dash does not change for a question or for a level, so
+		// it declares no calendar and answers with the shapes it does have.
+		const DATED = WORD_LANGUAGES.filter((language) => SENTENCE_DATA[language].calendar);
+
+		assert.deepStrictEqual([...DATED], ['en', 'ko', 'ja', 'zh', 'vi', 'es', 'it', 'de']);
+
+		for (const language of DATED) {
+			for (const slot of ['date', 'clock'] as const) {
+				let seen = 0;
+
+				for (const detail of sentenceDetails({ language, slots: slot, count: SAMPLE })) {
+					const at = detail.slots.indexOf(slot);
+
+					assert.ok(at >= 0, `${language}: ${detail.sentence}`);
+					assert.ok(
+						isCalendar(language, slot, detail.phrases[at]),
+						`${language}: '${detail.phrases[at]}' is not a ${slot} (${detail.sentence})`
+					);
+
+					seen += 1;
+				}
+
+				assert.ok(seen > 0, `${language} never wrote a ${slot}`);
+			}
+		}
+
+		for (const detail of sentenceDetails({ language: 'ru', slots: 'date', count: 30 })) {
+			assert.ok(!detail.slots.includes('date'), detail.sentence);
+		}
+	});
+
+	it('a copular shape equates a subject that can be a day', () => {
+		// The copula is a predicate like any other: it states the classes its subject
+		// may belong to, and it takes the form the level and the mood ask for.
+		for (const language of WORD_LANGUAGES) {
+			const calendar = SENTENCE_DATA[language].calendar;
+
+			if (!calendar) {
+				continue;
+			}
+
+			assert.deepStrictEqual([...calendar.copula.subject], ['event']);
+
+			for (const detail of sentenceDetails({ language, slots: ['date', 'clock'], count: 200 })) {
+				const copular = !detail.slots.includes('verb') && !detail.slots.includes('state');
+
+				if (!copular) {
+					continue;
+				}
+
+				assert.ok(detail.theme !== null, detail.sentence);
+				assert.strictEqual(
+					THEME_CLASS[detail.theme as WordTheme],
+					'event',
+					`${language}: ${detail.theme} is not a thing that happens on a day (${detail.sentence})`
+				);
+			}
+		}
+
+		// And the form follows the level, which is what makes it a predicate rather
+		// than a word bolted onto the phrase.
+		for (const [style, written] of [
+			['plain', '이다'],
+			['casual', '이야|이지'],
+			['polite', '이에요|이죠'],
+			['formal', '입니다']
+		] as [SentenceStyle, string][]) {
+			let seen = 0;
+
+			for (const detail of sentenceDetails({
+				language: 'ko',
+				slots: ['date', 'clock'],
+				style,
+				type: 'statement',
+				count: 200
+			})) {
+				if (detail.slots.includes('verb') || detail.slots.includes('state')) {
+					continue;
+				}
+
+				assert.match(
+					detail.sentence,
+					new RegExp(`(${written.split('|').map(escapeRe).join('|')})[.]$`),
+					`${style}: ${detail.sentence}`
+				);
+
+				seen += 1;
+			}
+
+			assert.ok(seen > 0, `${style} wrote no copular sentence`);
 		}
 	});
 

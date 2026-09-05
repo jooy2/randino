@@ -2,6 +2,7 @@
 
 from randino._internal.parse import words
 from randino.sentence.data._types import (
+    SentenceCalendar,
     SentenceFrame,
     SentenceLanguageData,
     SentenceNumeral,
@@ -250,7 +251,46 @@ JA = SentenceLanguageData(
     interjections=words("ああ、 おお、 まあ、 なんと、 やれやれ、 おや、 ほら、"),
     pronouns={"n": ("", "それ")},
     pronounless=("person",),
+    # Japanese writes a date largest to smallest with nothing between the parts, and its
+    # copula onto the end of what it equates the subject to.
+    calendar=SentenceCalendar(
+        date="Y年M月D日",
+        clock="h時mm分",
+        years=(2020, 2030),
+        copula=StateGroup(
+            # An event is a thing that happens on a day, and a lion is not.
+            subject=("event",),
+            words=words("だ"),
+            forms={"polite": words("です")},
+        ),
+    ),
     frames=(
+        # A date and a clock, standing where an adverbial stands.
+        SentenceFrame(
+            (
+                SentencePart("date", tail="に"),
+                SentencePart("subject", tail="が", modifiable=True),
+                SentencePart("verb"),
+            ),
+            5,
+        ),
+        SentenceFrame(
+            (
+                SentencePart("clock", tail="に"),
+                SentencePart("subject", tail="が", modifiable=True),
+                SentencePart("verb"),
+            ),
+            5,
+        ),
+        # And the shape that equates the subject to one: `試合は11時40分だ。`
+        SentenceFrame(
+            (SentencePart("subject", tail="は"), SentencePart("date", copula="tail")),
+            4,
+        ),
+        SentenceFrame(
+            (SentencePart("subject", tail="は"), SentencePart("clock", copula="tail")),
+            4,
+        ),
         SentenceFrame(
             (
                 SentencePart("subject", tail="が", modifiable=True),

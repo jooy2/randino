@@ -127,7 +127,55 @@ export const DE: SentenceLanguageData = {
 	// ending together; a place would be dative, which changes them again. What is
 	// left is the nominative, and the second rule German never breaks: the verb
 	// stands second, so a shape that opens on a time puts the subject behind it.
+	// German names its months, writes the day first with a full stop after it, and
+	// puts `Uhr` after a clock time.
+	calendar: {
+		date: 'D. MMMM Y',
+		months: words(`
+			Januar Februar März April Mai Juni Juli August September Oktober November Dezember
+		`),
+		clock: 'h:mm Uhr',
+		years: [2020, 2030],
+		copula: {
+			// An event is a thing that happens on a day, and a lion is not.
+			subject: ['event'],
+			words: words(`ist`)
+		}
+	},
 	frames: [
+		// A date and a clock. German puts its finite verb second and counts whatever
+		// opens the clause towards that, so the subject stands behind the verb.
+		{
+			parts: [
+				{ slot: 'date', head: 'am' },
+				{ slot: 'verb' },
+				{ slot: 'subject', modifiable: true }
+			],
+			weight: 5
+		},
+		{
+			parts: [
+				{ slot: 'clock', head: 'um' },
+				{ slot: 'verb' },
+				{ slot: 'subject', modifiable: true }
+			],
+			weight: 5
+		},
+		// And the shape that equates the subject to one: `Das Spiel ist um 11:40 Uhr.`
+		{
+			parts: [
+				{ slot: 'subject', modifiable: true },
+				{ slot: 'date', head: 'am', copula: 'head' }
+			],
+			weight: 4
+		},
+		{
+			parts: [
+				{ slot: 'subject', modifiable: true },
+				{ slot: 'clock', head: 'um', copula: 'head' }
+			],
+			weight: 4
+		},
 		{
 			parts: [{ slot: 'subject', modifiable: true }, { slot: 'verb' }],
 			weight: 26

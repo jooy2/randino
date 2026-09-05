@@ -113,6 +113,14 @@ class StateGroup:
     """The same adjectives in another form, index-aligned with `words`."""
 
 
+CopulaSide = Literal["head", "tail"]
+"""Which side of the phrase a copula is written on.
+
+`"head"` is its own word in front — English `is`, Chinese `是`; `"tail"` is written onto
+the end — Korean `이다`, Japanese `です`.
+"""
+
+
 @dataclass(frozen=True, slots=True)
 class SentencePart:
     """One phrase of a shape, with whatever the language writes around it.
@@ -150,6 +158,17 @@ class SentencePart:
     Italian is why this exists: every Italian preposition merges with the article behind
     it (`in` + `la` is `nella`), so a phrase opening on one either carries the merged
     form or carries no article at all.
+    """
+
+    copula: CopulaSide | None = None
+    """Where the copula stands relative to this phrase, on the shape that equates a
+    subject to it.
+
+    `"head"` is English `is` and Chinese `是`, written as their own word in front;
+    `"tail"` is Korean `이다` and Japanese `です`, written onto the end of the phrase. On
+    the phrase rather than a part of its own because that is what a copula is in half of
+    these languages: `11시 40분이다` is one word, and a slot for it would have to be
+    written with no space in front, which is a thing no other part does.
     """
 
 
@@ -224,6 +243,41 @@ NumeralOrder = Literal["before", "after"]
 Korean, Japanese and Chinese put it behind (`사과 12 개`); Vietnamese puts it in front,
 classifier and all (`12 con mèo`).
 """
+
+
+@dataclass(frozen=True, slots=True)
+class SentenceCalendar:
+    """How a language writes a date, a clock time, and the copula for one.
+
+    The templates are written as the language writes them, with letters standing for the
+    numbers, because a date is word order as much as it is digits: `2026년 9월 5일` runs
+    largest to smallest and `ngày 5 tháng 9 năm 2026` runs the other way with a word in
+    front of every part.
+    """
+
+    date: str
+    """The date.
+
+    `Y` is the year, `M` the month as a number, `D` the day, and `MMMM` the month's name
+    for a language that writes one.
+    """
+
+    clock: str
+    """The clock. `h` is the hour and `mm` the minute, zero-padded to two."""
+
+    years: tuple[int, int]
+    """The years a date may fall in, at the earliest and the latest."""
+
+    copula: "StateGroup"
+    """The copula, as a predicate group.
+
+    One entry with whatever forms the language writes for a question, an exclamation and
+    each level. It states the classes its subject may belong to the way a verb group
+    does — an event is a thing that happens on a day, and a lion is not.
+    """
+
+    months: WordPool | None = None
+    """The month names in order, for a date that writes `MMMM`."""
 
 
 @dataclass(frozen=True, slots=True)
@@ -352,6 +406,14 @@ class SentenceLanguageData:
 
     None for one that cannot, which then declares no `quantity` and no `money` shape
     either.
+    """
+
+    calendar: SentenceCalendar | None = None
+    """How the language writes a date and a clock time, and the copula for one.
+
+    None for a language that cannot write them the way the shapes here need — Russian
+    equates with a dash rather than a word, and a dash does not change for a question or
+    a level.
     """
 
     openers: Mapping[SentenceMark, str] = field(default_factory=dict)

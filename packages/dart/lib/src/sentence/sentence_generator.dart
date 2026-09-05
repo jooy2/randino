@@ -55,6 +55,14 @@ const List<SentenceSlot> _nounSlots = <SentenceSlot>[
 /// that can take it.
 const NounClass _moneyClass = NounClass.idea;
 
+/// Whether a shape has anywhere a person's name could stand.
+///
+/// A counted shape makes its quantity the subject, and a copular one equates its
+/// subject to a day — neither is a room for somebody.
+bool _carriesPerson(SentenceFrame frame) =>
+    _subjectSlotOf(frame) != SentenceSlot.quantity &&
+    !frame.parts.any((part) => part.copula != null);
+
 /// Which slot this shape's subject stands in.
 ///
 /// Usually the subject, and the quantity for a shape that counts the thing the
@@ -89,6 +97,61 @@ String _grouped(int value, String group) {
   }
 
   return out.toString();
+}
+
+/// A date, written the way the language writes one.
+///
+/// `Y`, `M`, `D` and `MMMM` stand for the year, the month, the day and the
+/// month's name.
+String _dateText(SentenceLanguageData data) {
+  final calendar = data.calendar!;
+  final month = randInt(1, 12);
+  // The month goes in last, because a month's name has letters in it that the
+  // other two stand for: `März` would lose its `M` to the month number.
+  final written = calendar.date
+      .replaceFirst('Y', '${randInt(calendar.years.min, calendar.years.max)}')
+      .replaceFirst('D', '${randInt(1, 28)}');
+
+  return calendar.months == null
+      ? written.replaceFirst('M', '$month')
+      : written.replaceFirst('MMMM', calendar.months![month - 1]);
+}
+
+/// A clock time, likewise. `h` is the hour and `mm` the minute.
+String _clockText(SentenceLanguageData data) {
+  final calendar = data.calendar!;
+
+  return calendar.clock
+      .replaceFirst('h', '${randInt(0, 23)}')
+      .replaceFirst('mm', '${randInt(0, 59)}'.padLeft(2, '0'));
+}
+
+/// Shortest and longest either of them can be, for the budget.
+///
+/// Measured by taking the numbers out of the template and adding back the widest
+/// and narrowest each of them can be written as.
+LengthRange _calendarSpan(SentenceLanguageData data, SentenceSlot slot) {
+  final calendar = data.calendar;
+
+  if (calendar == null) return const LengthRange(1, 1);
+
+  if (slot == SentenceSlot.clock) {
+    final fixed = calendar.clock.replaceFirst('h', '').replaceFirst('mm', '').length;
+
+    return LengthRange(fixed + 1 + 2, fixed + 2 + 2);
+  }
+
+  final fixed =
+      (calendar.months == null
+              ? calendar.date.replaceFirst('M', '')
+              : calendar.date.replaceFirst('MMMM', ''))
+          .replaceFirst('Y', '')
+          .replaceFirst('D', '')
+          .length;
+  final names = calendar.months == null ? const LengthRange(1, 2) : poolBounds(calendar.months!);
+  final years = <int>['${calendar.years.min}'.length, '${calendar.years.max}'.length];
+
+  return LengthRange(fixed + names.min + years[0] + 1, fixed + names.max + years[1] + 2);
 }
 
 /// What a counted phrase writes beside its noun.
@@ -457,9 +520,7 @@ List<SentenceFrame> _framesFor(SentenceLanguageData data, _Settings settings, Se
   // for a name, the shapes that cannot carry one are left out.
   final nameable =
       (settings.includeName ?? false)
-          ? moodly
-              .where((frame) => _subjectSlotOf(frame) != SentenceSlot.quantity)
-              .toList(growable: false)
+          ? moodly.where(_carriesPerson).toList(growable: false)
           : moodly;
   final usable = nameable.isNotEmpty ? nameable : moodly;
   final wanted = settings.slots;
@@ -860,6 +921,8 @@ Map<SentenceSlot, LengthRange> _slotBounds(WordLanguage language) {
   bounds[SentenceSlot.place] = bounds[SentenceSlot.subject]!;
   bounds[SentenceSlot.quantity] = bounds[SentenceSlot.subject]!;
   bounds[SentenceSlot.money] = _moneySpan(data);
+  bounds[SentenceSlot.date] = _calendarSpan(data, SentenceSlot.date);
+  bounds[SentenceSlot.clock] = _calendarSpan(data, SentenceSlot.clock);
 
   _boundsCache[language] = bounds;
   final lexicon = wordData[language]!;
@@ -904,6 +967,21 @@ int _tailMax(SentencePart part) {
 }
 
 /// What one part adds to the sentence, at its shortest and at its longest.
+/// How much room the copula takes on the phrase it is written onto.
+///
+/// Every form of it, because the level and the mood are settled after the shape
+/// is. A copula in front is a word of its own; one on the end is written onto
+/// the phrase with nothing between them.
+LengthRange _copulaSpan(SentencePart part, SentenceLanguageData data) {
+  if (part.copula == null || data.calendar == null) return const LengthRange(0, 0);
+
+  final group = data.calendar!.copula;
+  final own = _span(<WordPool>[group.words, ...group.forms.values.map(_endings)]);
+  final gap = part.copula == CopulaSide.head ? data.space.length : 0;
+
+  return LengthRange(own.min + gap, own.max + gap);
+}
+
 LengthRange _partRange(
   SentencePart part,
   SentenceLanguageData data,
@@ -911,11 +989,13 @@ LengthRange _partRange(
   LengthRange modifier,
 ) {
   final space = data.space.length;
-  final head = part.head == null ? 0 : part.head!.length + space;
+  final copula = _copulaSpan(part, data);
+  final head = (part.head == null ? 0 : part.head!.length + space) + copula.min;
   final own = bounds[part.slot]!;
+  final extra = copula.max - copula.min;
 
   if (!_isNounSlot(part.slot)) {
-    return LengthRange(head + own.min + _tailMin(part), head + own.max + _tailMax(part));
+    return LengthRange(head + own.min + _tailMin(part), head + own.max + _tailMax(part) + extra);
   }
 
   final article = part.bare ? const LengthRange(0, 0) : _articleSpan(data);
@@ -1346,11 +1426,22 @@ _Built _compose(
   final follow = draw.follow;
   final lexicon = wordData[language]!;
   final themes = requested.isNotEmpty ? requested : wordThemes;
-  final headed = frame.parts.any((part) => part.slot == SentenceSlot.state);
+  // A shape with a `state` part is headed by one and a shape with a `verb` part
+  // by that; a shape with neither is a copular one, which equates its subject to
+  // the date or the clock it carries and takes the language's copula for a
+  // predicate.
+  final copular =
+      !frame.parts.any((part) => part.slot == SentenceSlot.state || part.slot == SentenceSlot.verb);
+  final headed = copular || frame.parts.any((part) => part.slot == SentenceSlot.state);
   // A shape whose predicate has nothing to say about the requested subject only
   // gets this far when no shape of the language did, so the fallback is the same
   // best effort every other narrowing here makes.
-  final states = headed ? _stateGroupsFor(data, themes, frame, plan) : const <StateGroup>[];
+  final states =
+      copular
+          ? <StateGroup>[data.calendar!.copula]
+          : headed
+          ? _stateGroupsFor(data, themes, frame, plan)
+          : const <StateGroup>[];
   final verbs = headed ? const <VerbGroup>[] : _verbGroupsFor(data, frame, themes, plan);
   final StateGroup? stateGroup = headed ? pick(states.isNotEmpty ? states : data.states) : null;
   final VerbGroup? verbGroup =
@@ -1551,7 +1642,8 @@ _Built _compose(
     }
 
     final gap = i == 0 ? 0 : space;
-    final headCost = part.head == null ? 0 : part.head!.length + space;
+    final headCost =
+        (part.head == null ? 0 : part.head!.length + space) + _copulaSpan(part, data).min;
     final overhead = gap + headCost + _tailMin(part);
     final high = _atLeast(1, max - used - overhead - restMin);
     final low = _atLeast(1, min - used - overhead - restMax);
@@ -1645,10 +1737,20 @@ _Built _compose(
     // phrase itself unless a connective or a preposition stands in front of it.
     // Applied here rather than to the finished string, so the phrase the detail
     // reports is the one the sentence actually shows.
+    // The copula is written onto this phrase rather than beside it, on whichever
+    // side the language puts it: `11시 40분이다` is one word and `is September 5`
+    // is two. Its form comes from the same chain a verb's does, so a copular
+    // question asks and a polite one is polite. A copula in front still lets the
+    // phrase keep its own preposition, because German says `ist am 5. März`.
+    final copula = part.copula == null ? '' : _oneOf(pick(predicates));
     final opens = data.capitalize && written.isEmpty;
-    final head = opens && part.head != null ? _upper(part.head!) : part.head;
-    final text = opens && part.head == null ? _upper(phrase) : phrase;
-    final tail = _tailOf(part, text);
+    final opener = <String>[
+      if (part.copula == CopulaSide.head) copula,
+      if (part.head != null) part.head!,
+    ].join(data.space);
+    final head = opener.isEmpty ? null : (opens ? _upper(opener) : opener);
+    final text = opens && opener.isEmpty ? _upper(phrase) : phrase;
+    final tail = (part.copula == CopulaSide.tail ? copula : '') + _tailOf(part, text);
 
     if (head != null) written.add(head);
 
@@ -1752,6 +1854,9 @@ String _predicateFor(
     return agreed(at >= 0 && at < predicates.length ? predicates[at] : required.word);
   }
 
+  if (slot == SentenceSlot.date) return _dateText(data);
+  if (slot == SentenceSlot.clock) return _clockText(data);
+
   final pool =
       slot == SentenceSlot.manner
           ? data.manners
@@ -1825,6 +1930,14 @@ _Built _generateOne(WordLanguage language, _Settings settings, _Draw draw) {
     final placement = placements[frame]!;
 
     if (!placement.complete) return false;
+
+    // A copular shape equates its subject to a day, so it is worth drawing only
+    // where the subject can be one: a match is on a Tuesday and a buggy is not.
+    if (!frame.parts.any(
+      (part) => part.slot == SentenceSlot.state || part.slot == SentenceSlot.verb,
+    )) {
+      return _themesForClasses(requested, data.calendar!.copula.subject).isNotEmpty;
+    }
 
     return frame.parts.any((part) => part.slot == SentenceSlot.state)
         ? _stateGroupsFor(data, requested, frame, placement.plan).isNotEmpty

@@ -212,7 +212,52 @@ final SentenceLanguageData es = SentenceLanguageData(
   pronouns: const <WordGender, WordPool>{
     WordGender.n: <String>[''],
   },
+  // Spanish names its months and writes `de` between every part of a date.
+  calendar: SentenceCalendar(
+    date: 'D de MMMM de Y',
+    months: <String>[
+      'enero',
+      'febrero',
+      'marzo',
+      'abril',
+      'mayo',
+      'junio',
+      'julio',
+      'agosto',
+      'septiembre',
+      'octubre',
+      'noviembre',
+      'diciembre',
+    ],
+    clock: 'h:mm',
+    years: LengthRange(2020, 2030),
+    copula: StateGroup(
+      // An event is a thing that happens on a day, and a lion is not.
+      subject: <NounClass>[NounClass.event],
+      words: <String>['es'],
+    ),
+  ),
   frames: const <SentenceFrame>[
+    // A date and a clock, standing where an adverbial stands.
+    SentenceFrame(<SentencePart>[
+      SentencePart(SentenceSlot.date, head: 'el', tail: ','),
+      SentencePart(SentenceSlot.subject, modifiable: true),
+      SentencePart(SentenceSlot.verb),
+    ], 5),
+    SentenceFrame(<SentencePart>[
+      SentencePart(SentenceSlot.clock, head: 'a las', tail: ','),
+      SentencePart(SentenceSlot.subject, modifiable: true),
+      SentencePart(SentenceSlot.verb),
+    ], 5),
+    // And the shape that equates the subject to one: `El partido es a las 11:40.`
+    SentenceFrame(<SentencePart>[
+      SentencePart(SentenceSlot.subject, modifiable: true),
+      SentencePart(SentenceSlot.date, head: 'el', copula: CopulaSide.head),
+    ], 4),
+    SentenceFrame(<SentencePart>[
+      SentencePart(SentenceSlot.subject, modifiable: true),
+      SentencePart(SentenceSlot.clock, head: 'a las', copula: CopulaSide.head),
+    ], 4),
     SentenceFrame(<SentencePart>[
       SentencePart(SentenceSlot.subject, modifiable: true),
       SentencePart(SentenceSlot.verb),

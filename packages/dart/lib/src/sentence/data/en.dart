@@ -233,7 +233,52 @@ final SentenceLanguageData en = SentenceLanguageData(
   ),
   // English cannot drop a subject, so a sentence about a person names it again.
   pronounless: const <NounClass>[NounClass.person],
+  // English names its months and writes the copula as a word of its own.
+  calendar: SentenceCalendar(
+    date: 'MMMM D, Y',
+    months: <String>[
+      'January',
+      'February',
+      'March',
+      'April',
+      'May',
+      'June',
+      'July',
+      'August',
+      'September',
+      'October',
+      'November',
+      'December',
+    ],
+    clock: 'h:mm',
+    years: LengthRange(2020, 2030),
+    copula: StateGroup(
+      // An event is a thing that happens on a day, and a lion is not.
+      subject: <NounClass>[NounClass.event],
+      words: <String>['is'],
+    ),
+  ),
   frames: const <SentenceFrame>[
+    // A date and a clock, standing where an adverbial stands.
+    SentenceFrame(<SentencePart>[
+      SentencePart(SentenceSlot.date, head: 'on', tail: ','),
+      SentencePart(SentenceSlot.subject, modifiable: true),
+      SentencePart(SentenceSlot.verb),
+    ], 5),
+    SentenceFrame(<SentencePart>[
+      SentencePart(SentenceSlot.clock, head: 'at', tail: ','),
+      SentencePart(SentenceSlot.subject, modifiable: true),
+      SentencePart(SentenceSlot.verb),
+    ], 5),
+    // And the shape that equates the subject to one: `The match is at 11:40.`
+    SentenceFrame(<SentencePart>[
+      SentencePart(SentenceSlot.subject, modifiable: true),
+      SentencePart(SentenceSlot.date, head: 'on', copula: CopulaSide.head),
+    ], 4),
+    SentenceFrame(<SentencePart>[
+      SentencePart(SentenceSlot.subject, modifiable: true),
+      SentencePart(SentenceSlot.clock, head: 'at', copula: CopulaSide.head),
+    ], 4),
     SentenceFrame(<SentencePart>[
       SentencePart(SentenceSlot.subject, modifiable: true),
       SentencePart(SentenceSlot.verb),

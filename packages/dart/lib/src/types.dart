@@ -299,6 +299,10 @@ class WordDetail {
 }
 
 /// What one phrase does in a sentence.
+///
+/// A sentence is headed by a [SentenceSlot.verb] or by a [SentenceSlot.state],
+/// and a shape with neither is a copular one: it equates its subject to a
+/// [SentenceSlot.date] or a [SentenceSlot.clock] instead.
 enum SentenceSlot {
   /// Who or what the sentence is about: `검은 고양이가`.
   subject,
@@ -321,13 +325,19 @@ enum SentenceSlot {
   /// How it is done: `조용히`.
   manner,
 
-  /// How many of something: `사과 12 개`.
+  /// How many of something: `사과 12개`.
   ///
   /// A noun phrase with a number and the counter its kind takes.
   quantity,
 
-  /// How much: `100,000 원`, `12,000 dollars`.
+  /// How much: `100,000원`, `12,000 dollars`.
   money,
+
+  /// What day: `2026년 9월 5일`, `September 5, 2026`.
+  date,
+
+  /// What time of day: `11시 40분`, `11:40`.
+  clock,
 }
 
 /// How much a sentence says, which is the closest thing it has to an expected

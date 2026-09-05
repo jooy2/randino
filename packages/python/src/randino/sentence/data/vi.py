@@ -2,6 +2,7 @@
 
 from randino._internal.parse import words
 from randino.sentence.data._types import (
+    SentenceCalendar,
     SentenceFrame,
     SentenceLanguageData,
     SentenceNumeral,
@@ -197,7 +198,51 @@ VI = SentenceLanguageData(
         group=".",
         gap=" ",
     ),
+    # Vietnamese writes a date smallest to largest, with a word in front of every part,
+    # and its copula as a word of its own.
+    calendar=SentenceCalendar(
+        date="ngày D tháng M năm Y",
+        clock="h giờ mm",
+        years=(2020, 2030),
+        copula=StateGroup(
+            # An event is a thing that happens on a day, and a lion is not.
+            subject=("event",),
+            words=words("là"),
+        ),
+    ),
     frames=(
+        # A date and a clock, standing where an adverbial stands.
+        SentenceFrame(
+            (
+                SentencePart("date", head="vào", tail=","),
+                SentencePart("subject", modifiable=True),
+                SentencePart("verb"),
+            ),
+            5,
+        ),
+        SentenceFrame(
+            (
+                SentencePart("clock", head="lúc", tail=","),
+                SentencePart("subject", modifiable=True),
+                SentencePart("verb"),
+            ),
+            5,
+        ),
+        # And the shape that equates the subject to one: `Trận đấu là 11 giờ 40.`
+        SentenceFrame(
+            (
+                SentencePart("subject", modifiable=True),
+                SentencePart("date", copula="head"),
+            ),
+            4,
+        ),
+        SentenceFrame(
+            (
+                SentencePart("subject", modifiable=True),
+                SentencePart("clock", copula="head"),
+            ),
+            4,
+        ),
         SentenceFrame(
             (
                 SentencePart("subject", modifiable=True),

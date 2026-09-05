@@ -294,14 +294,27 @@ export interface NicknameDetail {
  * - `place`: where it happens (`숲에서`).
  * - `time`: when (`새벽에`).
  * - `manner`: how (`조용히`).
- * - `quantity`: how many of something (`사과 12 개`), which is a noun phrase with a
+ * - `quantity`: how many of something (`사과 12개`), which is a noun phrase with a
  *   number and the counter its kind takes.
- * - `money`: how much (`100,000 원`, `12,000 dollars`).
+ * - `money`: how much (`100,000원`, `12,000 dollars`).
+ * - `date`: what day (`2026년 9월 5일`, `September 5, 2026`).
+ * - `clock`: what time of day (`11시 40분`, `11:40`).
  *
- * A sentence is headed by a `verb` or by a `state`, never by both.
+ * A sentence is headed by a `verb` or by a `state`, and a shape with neither is
+ * a copular one: it equates its subject to a `date` or a `clock` instead.
  */
 export type SentenceSlot =
-	'subject' | 'verb' | 'object' | 'state' | 'place' | 'time' | 'manner' | 'quantity' | 'money';
+	| 'subject'
+	| 'verb'
+	| 'object'
+	| 'state'
+	| 'place'
+	| 'time'
+	| 'manner'
+	| 'quantity'
+	| 'money'
+	| 'date'
+	| 'clock';
 
 /**
  * Which shapes a sentence may take, named by the parts they carry beside the

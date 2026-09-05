@@ -147,7 +147,51 @@ export const VI: SentenceLanguageData = {
 	interjections: words(`ôi, chà, ồ, trời_ơi, chao_ôi, này, thật_đấy,`),
 	pronouns: { n: ['', 'nó'] },
 	pronounless: ['person'],
+	// Vietnamese writes a date smallest to largest, with a word in front of every
+	// part, and its copula as a word of its own.
+	calendar: {
+		date: 'ngày D tháng M năm Y',
+		clock: 'h giờ mm',
+		years: [2020, 2030],
+		copula: {
+			// An event is a thing that happens on a day, and a lion is not.
+			subject: ['event'],
+			words: words(`là`)
+		}
+	},
 	frames: [
+		// A date and a clock, standing where an adverbial stands.
+		{
+			parts: [
+				{ slot: 'date', head: 'vào', tail: ',' },
+				{ slot: 'subject', modifiable: true },
+				{ slot: 'verb' }
+			],
+			weight: 5
+		},
+		{
+			parts: [
+				{ slot: 'clock', head: 'lúc', tail: ',' },
+				{ slot: 'subject', modifiable: true },
+				{ slot: 'verb' }
+			],
+			weight: 5
+		},
+		// And the shape that equates the subject to one: `Trận đấu là 11 giờ 40.`
+		{
+			parts: [
+				{ slot: 'subject', modifiable: true },
+				{ slot: 'date', copula: 'head' }
+			],
+			weight: 4
+		},
+		{
+			parts: [
+				{ slot: 'subject', modifiable: true },
+				{ slot: 'clock', copula: 'head' }
+			],
+			weight: 4
+		},
 		{
 			parts: [{ slot: 'subject', modifiable: true }, { slot: 'verb' }],
 			weight: 20

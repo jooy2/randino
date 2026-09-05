@@ -505,7 +505,61 @@ export const KO: SentenceLanguageData = {
 		gap: ''
 	},
 	// what stands in front of it, and in which order.
+	// Korean writes a date largest to smallest and a clock the same way, and its
+	// copula is written onto the end of what it equates the subject to. Both close
+	// on a coda — `일`, `분` — so `이다` never has to contract to `다`.
+	calendar: {
+		date: 'Y년 M월 D일',
+		clock: 'h시 mm분',
+		years: [2020, 2030],
+		copula: {
+			// An event is a thing that happens on a day, and a lion is not.
+			subject: ['event'],
+			words: words(`이다`),
+			forms: {
+				question: words(`이니|인가`),
+				exclamation: words(`이구나|이네`),
+				casual: words(`이야|이지`),
+				polite: words(`이에요|이죠`),
+				formal: words(`입니다`),
+				formalQuestion: words(`입니까`)
+			}
+		}
+	},
 	frames: [
+		// A date and a clock, standing where an adverbial stands.
+		{
+			parts: [
+				{ slot: 'date', tail: '에' },
+				{ slot: 'subject', tail: '가', tailAlt: '이', modifiable: true },
+				{ slot: 'verb' }
+			],
+			weight: 5
+		},
+		{
+			parts: [
+				{ slot: 'clock', tail: '에' },
+				{ slot: 'subject', tail: '가', tailAlt: '이', modifiable: true },
+				{ slot: 'verb' }
+			],
+			weight: 5
+		},
+		// And the shape that equates the subject to one, which is what the copula is
+		// for: `면접은 2026년 9월 5일이다.`
+		{
+			parts: [
+				{ slot: 'subject', tail: '는', tailAlt: '은' },
+				{ slot: 'date', copula: 'tail' }
+			],
+			weight: 4
+		},
+		{
+			parts: [
+				{ slot: 'subject', tail: '는', tailAlt: '은' },
+				{ slot: 'clock', copula: 'tail' }
+			],
+			weight: 4
+		},
 		{
 			parts: [{ slot: 'subject', tail: '가', tailAlt: '이', modifiable: true }, { slot: 'verb' }],
 			weight: 20

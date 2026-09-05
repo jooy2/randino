@@ -163,7 +163,53 @@ export const EN: SentenceLanguageData = {
 		gap: ' '
 	},
 	// English puts its verb second, and the sentence grows to the right of it.
+	// English names its months and writes the copula as a word of its own.
+	calendar: {
+		date: 'MMMM D, Y',
+		months: words(`
+			January February March April May June July August September October November December
+		`),
+		clock: 'h:mm',
+		years: [2020, 2030],
+		copula: {
+			// An event is a thing that happens on a day, and a lion is not.
+			subject: ['event'],
+			words: words(`is`)
+		}
+	},
 	frames: [
+		// A date and a clock, standing where an adverbial stands.
+		{
+			parts: [
+				{ slot: 'date', head: 'on', tail: ',' },
+				{ slot: 'subject', modifiable: true },
+				{ slot: 'verb' }
+			],
+			weight: 5
+		},
+		{
+			parts: [
+				{ slot: 'clock', head: 'at', tail: ',' },
+				{ slot: 'subject', modifiable: true },
+				{ slot: 'verb' }
+			],
+			weight: 5
+		},
+		// And the shape that equates the subject to one: `The match is at 11:40.`
+		{
+			parts: [
+				{ slot: 'subject', modifiable: true },
+				{ slot: 'date', head: 'on', copula: 'head' }
+			],
+			weight: 4
+		},
+		{
+			parts: [
+				{ slot: 'subject', modifiable: true },
+				{ slot: 'clock', head: 'at', copula: 'head' }
+			],
+			weight: 4
+		},
 		{
 			parts: [{ slot: 'subject', modifiable: true }, { slot: 'verb' }],
 			weight: 20

@@ -98,6 +98,23 @@ take it.
 """
 
 
+def _carries_person(frame: SentenceFrame) -> bool:
+    """Whether a shape has anywhere a person's name could stand.
+
+    A counted shape makes its quantity the subject, and a copular one equates its
+    subject to a day — neither is a room for somebody.
+
+    Args:
+        frame: The shape.
+
+    Returns:
+        Whether a name can stand in it.
+    """
+    return _subject_slot_of(frame) != "quantity" and not any(
+        part.copula is not None for part in frame.parts
+    )
+
+
 def _subject_slot_of(frame: SentenceFrame) -> SentenceSlot:
     """Which slot this shape's subject stands in.
 
@@ -129,6 +146,90 @@ def _takes_object(frame: SentenceFrame) -> bool:
 def _grouped(value: int, group: str) -> str:
     """The digits of a number, grouped the way the language groups them."""
     return f"{value:,}".replace(",", group)
+
+
+def _date_text(data: SentenceLanguageData) -> str:
+    """A date, written the way the language writes one.
+
+    `Y`, `M`, `D` and `MMMM` stand for the year, the month, the day and the month's
+    name.
+
+    Args:
+        data: The language's sentence data.
+
+    Returns:
+        The date as the language writes it.
+    """
+    calendar = data.calendar
+
+    if calendar is None:
+        return ""
+
+    month = random.randint(1, 12)
+    # The month goes in last, because a month's name has letters in it that the other
+    # two stand for: `März` would lose its `M` to the month number.
+    written = calendar.date.replace(
+        "Y", str(random.randint(calendar.years[0], calendar.years[1])), 1
+    ).replace("D", str(random.randint(1, 28)), 1)
+
+    if calendar.months is None:
+        return written.replace("M", str(month), 1)
+
+    return written.replace("MMMM", calendar.months[month - 1], 1)
+
+
+def _clock_text(data: SentenceLanguageData) -> str:
+    """A clock time, likewise. `h` is the hour and `mm` the minute.
+
+    Args:
+        data: The language's sentence data.
+
+    Returns:
+        The time as the language writes it.
+    """
+    calendar = data.calendar
+
+    if calendar is None:
+        return ""
+
+    return calendar.clock.replace("h", str(random.randint(0, 23)), 1).replace(
+        "mm", f"{random.randint(0, 59):02d}", 1
+    )
+
+
+def _calendar_span(data: SentenceLanguageData, slot: SentenceSlot) -> tuple[int, int]:
+    """Shortest and longest a date or a clock can be, for the budget.
+
+    Measured by taking the numbers out of the template and adding back the widest and
+    narrowest each of them can be written as.
+
+    Args:
+        data: The language's sentence data.
+        slot: Which of the two.
+
+    Returns:
+        The shortest and longest it can be.
+    """
+    calendar = data.calendar
+
+    if calendar is None:
+        return (1, 1)
+
+    if slot == "clock":
+        fixed = len(calendar.clock.replace("h", "", 1).replace("mm", "", 1))
+
+        return (fixed + 1 + 2, fixed + 2 + 2)
+
+    without = (
+        calendar.date.replace("M", "", 1)
+        if calendar.months is None
+        else calendar.date.replace("MMMM", "", 1)
+    )
+    fixed = len(without.replace("Y", "", 1).replace("D", "", 1))
+    names = (1, 2) if calendar.months is None else pool_bounds(calendar.months)
+    years = (len(str(calendar.years[0])), len(str(calendar.years[1])))
+
+    return (fixed + names[0] + years[0] + 1, fixed + names[1] + years[1] + 2)
 
 
 def _count_text(data: SentenceLanguageData, theme: WordTheme) -> str:
@@ -514,9 +615,7 @@ def _frames_for(
     # `서호 3명` counts somebody's name, which is not a thing a sentence says. Asked for
     # a name, the shapes that cannot carry one are left out.
     nameable = (
-        [frame for frame in moodly if _subject_slot_of(frame) != "quantity"]
-        if settings.include_name
-        else moodly
+        [frame for frame in moodly if _carries_person(frame)] if settings.include_name else moodly
     )
     usable = nameable or moodly
     by_slots = (
@@ -891,6 +990,8 @@ def _slot_bounds(language: WordLanguage) -> dict[str, tuple[int, int]]:
         "manner": _span([data.manners]),
         "time": _span([data.times]),
         "money": _money_span(data),
+        "date": _calendar_span(data, "date"),
+        "clock": _calendar_span(data, "clock"),
         "modifier": _span(
             [
                 _agreed_modifiers(language, gender)
@@ -922,6 +1023,30 @@ def _tail_max(part: SentencePart) -> int:
     return max(len(part.tail), len(part.tail_alt))
 
 
+def _copula_span(part: SentencePart, data: SentenceLanguageData) -> tuple[int, int]:
+    """How much room the copula takes on the phrase it is written onto.
+
+    Every form of it, because the level and the mood are settled after the shape is. A
+    copula in front is a word of its own; one on the end is written onto the phrase with
+    nothing between them.
+
+    Args:
+        part: The phrase it is written onto.
+        data: The language's sentence data.
+
+    Returns:
+        The shortest and longest it can be.
+    """
+    if part.copula is None or data.calendar is None:
+        return (0, 0)
+
+    group = data.calendar.copula
+    low, high = _span([group.words, *(_endings(pool) for pool in group.forms.values())])
+    gap = len(data.space) if part.copula == "head" else 0
+
+    return (low + gap, high + gap)
+
+
 def _part_range(
     part: SentencePart,
     data: SentenceLanguageData,
@@ -929,11 +1054,13 @@ def _part_range(
 ) -> tuple[int, int]:
     """What one part adds to the sentence, at its shortest and at its longest."""
     space = len(data.space)
-    head = len(part.head) + space if part.head else 0
+    copula_low, copula_high = _copula_span(part, data)
+    head = (len(part.head) + space if part.head else 0) + copula_low
+    extra = copula_high - copula_low
     low, high = bounds[part.slot]
 
     if part.slot not in NOUN_SLOTS:
-        return (head + low + _tail_min(part), head + high + _tail_max(part))
+        return (head + low + _tail_min(part), head + high + _tail_max(part) + extra)
 
     article_min, article_max = (0, 0) if part.bare else _article_span(data)
     modifier = bounds["modifier"][1] + space if part.modifiable else 0
@@ -1437,6 +1564,12 @@ def _predicate_for(
 
         return agreed(predicates[at] if 0 <= at < len(predicates) else required.word)
 
+    if slot == "date":
+        return _date_text(data)
+
+    if slot == "clock":
+        return _clock_text(data)
+
     pool = data.manners if slot == "manner" else data.times if slot == "time" else predicates
 
     return agreed(pick_word(pool, min(low, high), high, "") or pick(pool))
@@ -1466,7 +1599,11 @@ def _compose(
     follow = draw.follow
     lexicon = WORD_DATA[language]
     themes = tuple(requested) or WORD_THEMES
-    headed = any(part.slot == "state" for part in frame.parts)
+    # A shape with a `state` part is headed by one and a shape with a `verb` part by
+    # that; a shape with neither is a copular one, which equates its subject to the date
+    # or the clock it carries and takes the language's copula for a predicate.
+    copular = not any(part.slot in ("state", "verb") for part in frame.parts)
+    headed = copular or any(part.slot == "state" for part in frame.parts)
     wants_object = _takes_object(frame)
     # A shape whose predicate has nothing to say about the requested subject only
     # gets this far when no shape of the language did, so the fallback is the same
@@ -1475,7 +1612,11 @@ def _compose(
     verb_group: VerbGroup | None = None
 
     if headed:
-        states = _state_groups_for(data, themes, frame, plan) or list(data.states)
+        states = (
+            [data.calendar.copula]
+            if copular and data.calendar is not None
+            else _state_groups_for(data, themes, frame, plan) or list(data.states)
+        )
         state_group = pick(states)
         subject_classes = state_group.subject
         predicates = state_group.words
@@ -1676,7 +1817,7 @@ def _compose(
         rest_min = sum(span[0] for span in spans[index + 1 :])
         rest_max = sum(span[1] for span in spans[index + 1 :])
         gap = 0 if index == 0 else space
-        head_cost = len(part.head) + space if part.head else 0
+        head_cost = (len(part.head) + space if part.head else 0) + _copula_span(part, data)[0]
         overhead = gap + head_cost + _tail_min(part)
         part_high = max(1, high - used - overhead - rest_min)
         part_low = max(1, low - used - overhead - rest_max)
@@ -1771,10 +1912,19 @@ def _compose(
         # phrase itself unless a connective or a preposition stands in front of it.
         # Applied here rather than to the finished string, so the phrase the detail
         # reports is the one the sentence actually shows.
+        # The copula is written onto this phrase rather than beside it, on whichever
+        # side the language puts it: `11시 40분이다` is one word and `is September 5` is
+        # two. Its form comes from the same chain a verb's does, so a copular question
+        # asks and a polite one is polite. A copula in front still lets the phrase keep
+        # its own preposition, because German says `ist am 5. März`.
+        copula = _one_of(pick(predicates)) if part.copula else ""
         opens = data.capitalize and not written
-        head = _upper(part.head) if opens and part.head else part.head
-        text = _upper(phrase) if opens and not part.head else phrase
-        tail = _tail_of(part, text)
+        opener = data.space.join(
+            piece for piece in (copula if part.copula == "head" else "", part.head) if piece
+        )
+        head = (_upper(opener) if opens else opener) if opener else ""
+        text = _upper(phrase) if opens and not opener else phrase
+        tail = (copula if part.copula == "tail" else "") + _tail_of(part, text)
 
         if head:
             written.append(head)
@@ -2271,6 +2421,13 @@ def _generate_one(language: WordLanguage, settings: Settings, draw: Draw) -> Bui
 
         if not complete:
             return False
+
+        # A copular shape equates its subject to a day, so it is worth drawing only
+        # where the subject can be one: a match is on a Tuesday and a buggy is not.
+        if not any(part.slot in ("state", "verb") for part in frame.parts):
+            classes = data.calendar.copula.subject if data.calendar is not None else ()
+
+            return bool(_themes_for_classes(requested, classes))
 
         if any(part.slot == "state" for part in frame.parts):
             return bool(_state_groups_for(data, requested, frame, plan))

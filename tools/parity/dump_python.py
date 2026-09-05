@@ -198,6 +198,26 @@ sentence = {
                 "gap": data.numeral.gap,
             }
         ),
+        "calendar": (
+            None
+            if data.calendar is None
+            else {
+                "date": data.calendar.date,
+                "months": (
+                    None if data.calendar.months is None else listed(data.calendar.months)
+                ),
+                "clock": data.calendar.clock,
+                "years": list(data.calendar.years),
+                "copula": {
+                    "subject": list(data.calendar.copula.subject),
+                    "words": listed(data.calendar.copula.words),
+                    "forms": {
+                        form: listed(pool)
+                        for form, pool in data.calendar.copula.forms.items()
+                    },
+                },
+            }
+        ),
         "frames": [
             {
                 "parts": [
@@ -208,6 +228,7 @@ sentence = {
                         "tailAlt": part.tail_alt,
                         "modifiable": part.modifiable,
                         "bare": part.bare,
+                        "copula": part.copula or "",
                     }
                     for part in frame.parts
                 ],

@@ -38,14 +38,14 @@ from randino.word.data._types import WordGender, WordPool
 SAMPLE = 60
 
 SCRIPT: dict[WordLanguage, re.Pattern[str]] = {
-    "en": re.compile(r"^[A-Za-z0-9' ,.?!…“”‘’]+$"),
-    "ko": re.compile(r"^[가-힣0-9 ,.?!…“”‘’]+$"),
+    "en": re.compile(r"^[A-Za-z0-9' :,.?!…“”‘’]+$"),
+    "ko": re.compile(r"^[가-힣0-9 :,.?!…“”‘’]+$"),
     "ja": re.compile(r"^[々぀-ヿ一-鿿0-9,。、？！…「」『』]+$"),
     "zh": re.compile(r"^[々一-鿿0-9,。，？！…“”‘’]+$"),
-    "vi": re.compile(r"^[a-zA-ZÀ-ỹ0-9 ,.?!…“”‘’]+$"),
-    "es": re.compile(r"^[a-zA-ZÀ-ÿ0-9 ,.?!…¿¡«»“”]+$"),
-    "it": re.compile(r"^[a-zA-ZÀ-ÿ0-9' ,.?!…«»“”]+$"),
-    "de": re.compile(r"^[a-zA-ZÀ-ÿß0-9 ,.?!…„“‚‘]+$"),
+    "vi": re.compile(r"^[a-zA-ZÀ-ỹ0-9 :,.?!…“”‘’]+$"),
+    "es": re.compile(r"^[a-zA-ZÀ-ÿ0-9 :,.?!…¿¡«»“”]+$"),
+    "it": re.compile(r"^[a-zA-ZÀ-ÿ0-9' :,.?!…«»“”]+$"),
+    "de": re.compile(r"^[a-zA-ZÀ-ÿß0-9 :,.?!…„“‚‘]+$"),
     "ru": re.compile(r"^[Ѐ-ӿ0-9 ,.?!…«»„“]+$"),
 }
 
@@ -321,6 +321,16 @@ def test_every_phrase_is_written_out_of_the_languages_own_pools() -> None:
 
                     continue
 
+                # A date and a clock are written out of the language's own template
+                # rather than out of any pool.
+                if slot in ("date", "clock"):
+                    assert is_calendar(language, slot, phrase), (
+                        f"{language}: {phrase} is not a {slot} the template can write "
+                        f"({detail.sentence})"
+                    )
+
+                    continue
+
                 # A counted phrase is a noun phrase with a number on it, so the number
                 # comes off before the pools are asked about the rest.
                 assert explains(language, strip_count(language, written)), (
@@ -345,7 +355,12 @@ def test_a_sentence_has_one_predicate_and_it_is_a_verb_or_a_state() -> None:
         for detail in rand_sentence(output="detail", language=language, count=120):
             predicates = [slot for slot in detail.slots if slot in ("verb", "state")]
 
-            assert len(predicates) == 1, detail.sentence
+            # A copular shape has neither: it equates its subject to a day or a time,
+            # and the copula is written onto that phrase rather than standing as one of
+            # its own.
+            copular = "date" in detail.slots or "clock" in detail.slots
+
+            assert len(predicates) == (0 if copular and not predicates else 1), detail.sentence
             # A shape that counts what it is about has no separate subject: the
             # counted phrase is what the verb agrees with.
             assert "subject" in detail.slots or "quantity" in detail.slots, detail.sentence
@@ -699,6 +714,34 @@ def strip_count(language: WordLanguage, phrase: str) -> str:
     return re.sub(f"^{group}{space}", "", re.sub(f"{space}{group}$", "", phrase))
 
 
+def is_calendar(language: WordLanguage, slot: SentenceSlot, phrase: str) -> bool:
+    """Whether a phrase is a date or a clock the language's own template could write.
+
+    Checked by turning that template into a pattern.
+    """
+    calendar = SENTENCE_DATA[language].calendar
+
+    if calendar is None:
+        return False
+
+    if slot == "clock":
+        pattern = re.escape(calendar.clock).replace("h", r"\d{1,2}", 1).replace("mm", r"\d{2}", 1)
+    else:
+        names = (
+            r"\d{1,2}"
+            if calendar.months is None
+            else f"(?:{'|'.join(re.escape(name) for name in calendar.months)})"
+        )
+        pattern = (
+            re.escape(calendar.date)
+            .replace("Y", r"\d{4}", 1)
+            .replace("D", r"\d{1,2}", 1)
+            .replace("MMMM" if calendar.months else "M", names, 1)
+        )
+
+    return re.fullmatch(pattern, phrase) is not None
+
+
 def is_money(language: WordLanguage, phrase: str) -> bool:
     """Whether a phrase is an amount, written the way the language writes it."""
     data = SENTENCE_DATA[language]
@@ -837,9 +880,11 @@ def test_sentences_puts_more_than_one_sentence_in_one_result() -> None:
                 # Counted after the grouped numbers are taken out: Vietnamese, Spanish
                 # and Italian group on a full stop, so `5.000.000` is three of them and
                 # none is a terminator.
-                assert (
-                    re.sub(r"\d[\d.,]*\d", "#", sentence).count(data.terminators["statement"]) == 1
-                ), f"{language}: {sentence}"
+                # German writes the day of a date with a full stop after it, so that
+                # comes out too.
+                counted = re.sub(r"\d[\d.,]*\d", "#", re.sub(r"\d+\.(?=\s\S)", "#", sentence))
+
+                assert counted.count(data.terminators["statement"]) == 1, f"{language}: {sentence}"
                 assert "  " not in sentence, f"{language}: {sentence}"
 
     for detail in rand_sentence(type="statement", include_name=False, count=20, output="detail"):
@@ -1479,6 +1524,103 @@ def test_a_number_is_written_against_its_counter_the_way_the_language_writes_it(
             assert not re.search(r"\d\s", detail.sentence), (
                 f"{language}: '{detail.sentence}' spaces a number off what it counts"
             )
+
+
+def test_slots_date_and_slots_clock_write_the_languages_own_calendar() -> None:
+    """Eight of the nine write a date and a clock; Russian declares no calendar."""
+    # Russian equates its subject to a day with a dash rather than a word, and a dash
+    # does not change for a question or for a level.
+    dated = [language for language in WORD_LANGUAGES if SENTENCE_DATA[language].calendar]
+
+    assert dated == ["en", "ko", "ja", "zh", "vi", "es", "it", "de"]
+
+    for language in dated:
+        for slot in ("date", "clock"):
+            seen = 0
+
+            for detail in rand_sentence(
+                language=language,
+                slots=slot,
+                type="statement",
+                include_name=False,
+                count=SAMPLE,
+                output="detail",
+            ):
+                assert slot in detail.slots, f"{language}: {detail.sentence}"
+
+                phrase = detail.phrases[detail.slots.index(slot)]
+
+                assert is_calendar(language, slot, phrase), (
+                    f"{language}: '{phrase}' is not a {slot} ({detail.sentence})"
+                )
+
+                seen += 1
+
+            assert seen > 0, f"{language} never wrote a {slot}"
+
+    for detail in rand_sentence(
+        language="ru", slots="date", type="statement", include_name=False, count=30, output="detail"
+    ):
+        assert "date" not in detail.slots, detail.sentence
+
+
+def test_a_copular_shape_equates_a_subject_that_can_be_a_day() -> None:
+    """The copula states the classes its subject may belong to, and takes a form."""
+    for language in WORD_LANGUAGES:
+        calendar = SENTENCE_DATA[language].calendar
+
+        if calendar is None:
+            continue
+
+        assert tuple(calendar.copula.subject) == ("event",)
+
+        for detail in rand_sentence(
+            language=language,
+            slots=["date", "clock"],
+            type="statement",
+            include_name=False,
+            count=200,
+            output="detail",
+        ):
+            if "verb" in detail.slots or "state" in detail.slots:
+                continue
+
+            assert detail.theme is not None, detail.sentence
+            assert THEME_CLASS[detail.theme] == "event", (
+                f"{language}: {detail.theme} is not a thing that happens on a day"
+            )
+
+    # And the form follows the level, which is what makes it a predicate rather than a
+    # word bolted onto the phrase.
+    written: dict[SentenceStyle, tuple[str, ...]] = {
+        "plain": ("이다",),
+        "casual": ("이야", "이지"),
+        "polite": ("이에요", "이죠"),
+        "formal": ("입니다",),
+    }
+
+    for style, forms in written.items():
+        seen = 0
+
+        for detail in rand_sentence(
+            language="ko",
+            slots=["date", "clock"],
+            style=style,
+            type="statement",
+            include_name=False,
+            count=200,
+            output="detail",
+        ):
+            if "verb" in detail.slots or "state" in detail.slots:
+                continue
+
+            assert any(detail.sentence.endswith(f"{form}.") for form in forms), (
+                f"{style}: {detail.sentence}"
+            )
+
+            seen += 1
+
+        assert seen > 0, f"{style} wrote no copular sentence"
 
 
 def test_slots_quantity_counts_a_noun_with_the_counter_its_kind_takes() -> None:

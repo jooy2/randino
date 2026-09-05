@@ -247,7 +247,42 @@ final SentenceLanguageData ja = SentenceLanguageData(
     WordGender.n: <String>['', 'それ'],
   },
   pronounless: const <NounClass>[NounClass.person],
+  // Japanese writes a date largest to smallest with nothing between the parts,
+  // and its copula onto the end of what it equates the subject to.
+  calendar: SentenceCalendar(
+    date: 'Y年M月D日',
+    clock: 'h時mm分',
+    years: LengthRange(2020, 2030),
+    copula: StateGroup(
+      // An event is a thing that happens on a day, and a lion is not.
+      subject: <NounClass>[NounClass.event],
+      words: <String>['だ'],
+      forms: <PredicateForm, WordPool>{
+        PredicateForm.polite: <String>['です'],
+      },
+    ),
+  ),
   frames: const <SentenceFrame>[
+    // A date and a clock, standing where an adverbial stands.
+    SentenceFrame(<SentencePart>[
+      SentencePart(SentenceSlot.date, tail: 'に'),
+      SentencePart(SentenceSlot.subject, tail: 'が', modifiable: true),
+      SentencePart(SentenceSlot.verb),
+    ], 5),
+    SentenceFrame(<SentencePart>[
+      SentencePart(SentenceSlot.clock, tail: 'に'),
+      SentencePart(SentenceSlot.subject, tail: 'が', modifiable: true),
+      SentencePart(SentenceSlot.verb),
+    ], 5),
+    // And the shape that equates the subject to one: `試合は11時40分だ。`
+    SentenceFrame(<SentencePart>[
+      SentencePart(SentenceSlot.subject, tail: 'は'),
+      SentencePart(SentenceSlot.date, copula: CopulaSide.tail),
+    ], 4),
+    SentenceFrame(<SentencePart>[
+      SentencePart(SentenceSlot.subject, tail: 'は'),
+      SentencePart(SentenceSlot.clock, copula: CopulaSide.tail),
+    ], 4),
     SentenceFrame(<SentencePart>[
       SentencePart(SentenceSlot.subject, tail: 'が', modifiable: true),
       SentencePart(SentenceSlot.verb),

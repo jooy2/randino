@@ -163,7 +163,53 @@ export const ES: SentenceLanguageData = {
 	},
 	// the same thing writes no pronoun at all.
 	pronouns: { n: [''] },
+	// Spanish names its months and writes `de` between every part of a date.
+	calendar: {
+		date: 'D de MMMM de Y',
+		months: words(`
+			enero febrero marzo abril mayo junio julio agosto septiembre octubre noviembre diciembre
+		`),
+		clock: 'h:mm',
+		years: [2020, 2030],
+		copula: {
+			// An event is a thing that happens on a day, and a lion is not.
+			subject: ['event'],
+			words: words(`es`)
+		}
+	},
 	frames: [
+		// A date and a clock, standing where an adverbial stands.
+		{
+			parts: [
+				{ slot: 'date', head: 'el', tail: ',' },
+				{ slot: 'subject', modifiable: true },
+				{ slot: 'verb' }
+			],
+			weight: 5
+		},
+		{
+			parts: [
+				{ slot: 'clock', head: 'a las', tail: ',' },
+				{ slot: 'subject', modifiable: true },
+				{ slot: 'verb' }
+			],
+			weight: 5
+		},
+		// And the shape that equates the subject to one: `El partido es a las 11:40.`
+		{
+			parts: [
+				{ slot: 'subject', modifiable: true },
+				{ slot: 'date', head: 'el', copula: 'head' }
+			],
+			weight: 4
+		},
+		{
+			parts: [
+				{ slot: 'subject', modifiable: true },
+				{ slot: 'clock', head: 'a las', copula: 'head' }
+			],
+			weight: 4
+		},
 		{
 			parts: [{ slot: 'subject', modifiable: true }, { slot: 'verb' }],
 			weight: 20

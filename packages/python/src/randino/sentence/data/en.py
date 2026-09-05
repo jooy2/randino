@@ -2,6 +2,7 @@
 
 from randino._internal.parse import words
 from randino.sentence.data._types import (
+    SentenceCalendar,
     SentenceFrame,
     SentenceLanguageData,
     SentenceNumeral,
@@ -214,7 +215,54 @@ EN = SentenceLanguageData(
     ),
     # English cannot drop a subject, so a sentence about a person names it again.
     pronounless=("person",),
+    # English names its months and writes the copula as a word of its own.
+    calendar=SentenceCalendar(
+        date="MMMM D, Y",
+        months=words("""
+            January February March April May June July August September October November
+            December
+        """),
+        clock="h:mm",
+        years=(2020, 2030),
+        copula=StateGroup(
+            # An event is a thing that happens on a day, and a lion is not.
+            subject=("event",),
+            words=words("is"),
+        ),
+    ),
     frames=(
+        # A date and a clock, standing where an adverbial stands.
+        SentenceFrame(
+            (
+                SentencePart("date", head="on", tail=","),
+                SentencePart("subject", modifiable=True),
+                SentencePart("verb"),
+            ),
+            5,
+        ),
+        SentenceFrame(
+            (
+                SentencePart("clock", head="at", tail=","),
+                SentencePart("subject", modifiable=True),
+                SentencePart("verb"),
+            ),
+            5,
+        ),
+        # And the shape that equates the subject to one: `The match is at 11:40.`
+        SentenceFrame(
+            (
+                SentencePart("subject", modifiable=True),
+                SentencePart("date", head="on", copula="head"),
+            ),
+            4,
+        ),
+        SentenceFrame(
+            (
+                SentencePart("subject", modifiable=True),
+                SentencePart("clock", head="at", copula="head"),
+            ),
+            4,
+        ),
         SentenceFrame(
             (
                 SentencePart("subject", modifiable=True),

@@ -174,6 +174,29 @@ void main() {
                 'group': entry.value.numeral!.group,
                 'gap': entry.value.numeral!.gap,
               },
+        'calendar': entry.value.calendar == null
+            ? null
+            : <String, Object?>{
+                'date': entry.value.calendar!.date,
+                'months': entry.value.calendar!.months == null
+                    ? null
+                    : listed(entry.value.calendar!.months!),
+                'clock': entry.value.calendar!.clock,
+                'years': <int>[
+                  entry.value.calendar!.years.min,
+                  entry.value.calendar!.years.max,
+                ],
+                'copula': <String, Object?>{
+                  'subject': <String>[
+                    for (final noun in entry.value.calendar!.copula.subject) noun.name,
+                  ],
+                  'words': listed(entry.value.calendar!.copula.words),
+                  'forms': <String, Object?>{
+                    for (final f in entry.value.calendar!.copula.forms.entries)
+                      f.key.name: listed(f.value),
+                  },
+                },
+              },
         'frames': <Object?>[
           for (final frame in entry.value.frames)
             <String, Object?>{
@@ -186,6 +209,7 @@ void main() {
                     'tailAlt': part.tailAlt ?? '',
                     'modifiable': part.modifiable,
                     'bare': part.bare,
+                    'copula': part.copula?.name ?? '',
                   },
               ],
               'weight': frame.weight,

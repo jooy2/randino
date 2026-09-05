@@ -180,7 +180,55 @@ export const IT: SentenceLanguageData = {
 		gap: ' '
 	},
 	// foresta`, which is not Italian at all.
+	// Italian names its months and writes the day first with nothing between the
+	// parts.
+	calendar: {
+		date: 'D MMMM Y',
+		months: words(`
+			gennaio febbraio marzo aprile maggio giugno luglio agosto settembre ottobre novembre
+			dicembre
+		`),
+		clock: 'h:mm',
+		years: [2020, 2030],
+		copula: {
+			// An event is a thing that happens on a day, and a lion is not.
+			subject: ['event'],
+			words: words(`è`)
+		}
+	},
 	frames: [
+		// A date and a clock, standing where an adverbial stands.
+		{
+			parts: [
+				{ slot: 'date', head: 'il', tail: ',' },
+				{ slot: 'subject', modifiable: true },
+				{ slot: 'verb' }
+			],
+			weight: 5
+		},
+		{
+			parts: [
+				{ slot: 'clock', head: 'alle', tail: ',' },
+				{ slot: 'subject', modifiable: true },
+				{ slot: 'verb' }
+			],
+			weight: 5
+		},
+		// And the shape that equates the subject to one: `La partita è alle 11:40.`
+		{
+			parts: [
+				{ slot: 'subject', modifiable: true },
+				{ slot: 'date', head: 'il', copula: 'head' }
+			],
+			weight: 4
+		},
+		{
+			parts: [
+				{ slot: 'subject', modifiable: true },
+				{ slot: 'clock', head: 'alle', copula: 'head' }
+			],
+			weight: 4
+		},
 		{
 			parts: [{ slot: 'subject', modifiable: true }, { slot: 'verb' }],
 			weight: 20

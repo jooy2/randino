@@ -96,8 +96,19 @@ function isNounSlot(slot: SentenceSlot): boolean {
 const MONEY_CLASS: NounClass = 'idea';
 
 /**
+ * Whether a shape has anywhere a person's name could stand. A counted shape
+ * makes its quantity the subject, and a copular one equates its subject to a day
+ * — neither is a room for somebody.
+ */
+function carriesPerson(frame: SentenceFrame): boolean {
+	return (
+		subjectSlotOf(frame) !== 'quantity' && !frame.parts.some((part) => part.copula !== undefined)
+	);
+}
+
+/**
  * Which slot this shape's subject stands in. Usually `subject`, and `quantity`
- * for a shape that counts the thing the sentence is about — `사과 12 개가 익는다`
+ * for a shape that counts the thing the sentence is about — `사과 12개가 익는다`
  * has no separate subject, and the counted phrase is what the verb agrees with.
  */
 function subjectSlotOf(frame: SentenceFrame): SentenceSlot {
@@ -119,6 +130,66 @@ function takesObject(frame: SentenceFrame): boolean {
 /** The digits of a number, grouped the way the language groups them. */
 function grouped(value: number, group: string): string {
 	return String(value).replace(/\B(?=(\d{3})+(?!\d))/g, group);
+}
+
+/**
+ * A date, written the way the language writes one. `Y`, `M`, `D` and `MMMM`
+ * stand for the year, the month, the day and the month's name.
+ */
+function dateText(data: SentenceLanguageData): string {
+	const calendar = data.calendar!;
+	const [first, last] = calendar.years;
+	const month = randInt(1, 12);
+	// The month goes in last, because a month's name has letters in it that the
+	// other two stand for: `März` would lose its `M` to the month number.
+	const written = calendar.date
+		.replace('Y', String(randInt(first, last)))
+		.replace('D', String(randInt(1, 28)));
+
+	return calendar.months
+		? written.replace('MMMM', calendar.months[month - 1])
+		: written.replace('M', String(month));
+}
+
+/** A clock time, likewise. `h` is the hour and `mm` the minute. */
+function clockText(data: SentenceLanguageData): string {
+	const calendar = data.calendar!;
+
+	return calendar.clock
+		.replace('h', String(randInt(0, 23)))
+		.replace('mm', String(randInt(0, 59)).padStart(2, '0'));
+}
+
+/**
+ * Shortest and longest either of them can be, for the budget. Measured by taking
+ * the numbers out of the template and adding back the widest and narrowest each
+ * of them can be written as.
+ */
+function calendarSpan(
+	data: SentenceLanguageData,
+	slot: 'date' | 'clock'
+): readonly [number, number] {
+	const calendar = data.calendar;
+
+	if (!calendar) {
+		return [1, 1];
+	}
+
+	if (slot === 'clock') {
+		const fixed = calendar.clock.replace('h', '').replace('mm', '').length;
+
+		return [fixed + 1 + 2, fixed + 2 + 2];
+	}
+
+	const fixed = (
+		calendar.months ? calendar.date.replace('MMMM', '') : calendar.date.replace('M', '')
+	)
+		.replace('Y', '')
+		.replace('D', '').length;
+	const names = calendar.months ? poolBounds(calendar.months) : ([1, 2] as const);
+	const years = [String(calendar.years[0]).length, String(calendar.years[1]).length];
+
+	return [fixed + names[0] + years[0] + 1, fixed + names[1] + years[1] + 2];
 }
 
 /** What a counted phrase writes beside its noun, and what an amount writes. */
@@ -374,12 +445,11 @@ function framesFor(
 		? byMood
 		: data.frames.filter((frame) => (frame.mood ?? 'statement') === 'statement');
 	const moodly = moody.length ? moody : data.frames;
-	// A counted shape has no room for a name: its quantity is its subject, and
-	// `서호 3명` counts somebody's name, which is not a thing a sentence says. Asked
-	// for a name, the shapes that cannot carry one are left out.
-	const nameable = settings.includeName
-		? moodly.filter((frame) => subjectSlotOf(frame) !== 'quantity')
-		: moodly;
+	// Two shapes have no room for a name. A counted one makes its quantity the
+	// subject, and `서호 3명` counts somebody's name; a copular one equates its
+	// subject to a day, and a person is not a day. Asked for a name, both are left
+	// out rather than answered with a sentence that does not mean anything.
+	const nameable = settings.includeName ? moodly.filter(carriesPerson) : moodly;
 	const usable = nameable.length ? nameable : moodly;
 	const bySlots =
 		settings.slots === 'all'
@@ -769,7 +839,9 @@ function slotBounds(language: WordLanguage): Record<string, readonly [number, nu
 		),
 		manner: span([data.manners]),
 		time: span([data.times]),
-		money: moneySpan(data)
+		money: moneySpan(data),
+		date: calendarSpan(data, 'date'),
+		clock: calendarSpan(data, 'clock')
 	};
 
 	boundsCache.set(language, bounds);
@@ -797,15 +869,46 @@ function articleSpan(data: SentenceLanguageData): readonly [number, number] {
 }
 
 /** What one part adds to the sentence, at its shortest and at its longest. */
+/**
+ * How much room the copula takes on the phrase it is written onto, at its
+ * shortest and its longest. Every form of it, because the level and the mood are
+ * settled after the shape is.
+ */
+function copulaSpan(part: SentencePart, data: SentenceLanguageData): readonly [number, number] {
+	if (!part.copula || !data.calendar) {
+		return [0, 0];
+	}
+
+	const group = data.calendar.copula;
+	const pools = [group.words, ...Object.values(group.forms ?? {}).map(endings)];
+	let low = Infinity;
+	let high = 0;
+
+	for (const pool of pools) {
+		const [min, max] = poolBounds(pool);
+
+		low = Math.min(low, min);
+		high = Math.max(high, max);
+	}
+
+	// A copula in front is a word of its own; one on the end is written onto the
+	// phrase with nothing between them.
+	const gap = part.copula === 'head' ? data.space.length : 0;
+
+	return [low + gap, high + gap];
+}
+
 function partRange(
 	part: SentencePart,
 	data: SentenceLanguageData,
 	bounds: Record<string, readonly [number, number]>
 ): readonly [number, number] {
 	const space = data.space.length;
-	const head = part.head ? part.head.length + space : 0;
+	const [copulaLow, copulaHigh] = copulaSpan(part, data);
+	const head = (part.head ? part.head.length + space : 0) + copulaLow;
 	const tail = Math.min(part.tail?.length ?? 0, part.tailAlt?.length ?? part.tail?.length ?? 0);
-	const tailMax = Math.max(part.tail?.length ?? 0, part.tailAlt?.length ?? 0);
+	const tailMax =
+		Math.max(part.tail?.length ?? 0, part.tailAlt?.length ?? 0) + (copulaHigh - copulaLow);
 
 	if (!isNounSlot(part.slot)) {
 		const [low, high] = bounds[part.slot];
@@ -1266,6 +1369,12 @@ function generateOne(language: WordLanguage, settings: Settings, draw: Draw): Bu
 			return false;
 		}
 
+		// A copular shape equates its subject to a day, so it is worth drawing only
+		// where the subject can be one: a match is on a Tuesday and a buggy is not.
+		if (!frame.parts.some((part) => part.slot === 'state' || part.slot === 'verb')) {
+			return themesForClasses(requested, data.calendar!.copula.subject).length > 0;
+		}
+
 		return frame.parts.some((part) => part.slot === 'state')
 			? stateGroupsFor(data, requested, frame, plan).length > 0
 			: verbGroupsFor(data, frame, requested, plan).length > 0;
@@ -1421,14 +1530,23 @@ function compose(
 ): Built {
 	const follow = draw.follow;
 	const themes = requested.length ? requested : WORD_THEMES;
-	const headed = frame.parts.some((part) => part.slot === 'state') ? 'state' : 'verb';
+	// A shape with a `state` part is headed by one and a shape with a `verb` part by
+	// that; a shape with neither is a copular one, which equates its subject to the
+	// date or the clock it carries and takes the language's copula for a predicate.
+	const headed = frame.parts.some((part) => part.slot === 'state')
+		? 'state'
+		: frame.parts.some((part) => part.slot === 'verb')
+			? 'verb'
+			: 'copula';
 	// A shape whose predicate has nothing to say about the requested subject only
 	// gets this far when no shape of the language did, so the fallback is the same
 	// best effort every other narrowing here makes.
 	const groups =
-		headed === 'state'
-			? (stateGroupsFor(data, themes, frame, plan) as (StateGroup | VerbGroup)[])
-			: (verbGroupsFor(data, frame, themes, plan) as (StateGroup | VerbGroup)[]);
+		headed === 'copula'
+			? [data.calendar!.copula as StateGroup | VerbGroup]
+			: headed === 'state'
+				? (stateGroupsFor(data, themes, frame, plan) as (StateGroup | VerbGroup)[])
+				: (verbGroupsFor(data, frame, themes, plan) as (StateGroup | VerbGroup)[]);
 	const group = pick(groups.length ? groups : headedFallback(data, frame, headed));
 	// The same predicates, in the form this type of sentence ends on. Index-aligned
 	// with `group.words`, which is what lets a required word be translated rather
@@ -1599,7 +1717,7 @@ function compose(
 		}
 
 		const gap = i === 0 ? 0 : space;
-		const headCost = part.head ? part.head.length + space : 0;
+		const headCost = (part.head ? part.head.length + space : 0) + copulaSpan(part, data)[0];
 		const tailCost = Math.min(
 			part.tail?.length ?? 0,
 			part.tailAlt?.length ?? part.tail?.length ?? 0
@@ -1701,10 +1819,20 @@ function compose(
 		// phrase itself unless a connective or a preposition stands in front of it.
 		// Applied here rather than to the finished string, so the phrase the detail
 		// reports is the one the sentence actually shows.
+		// The copula is written onto this phrase rather than beside it, on whichever
+		// side the language puts it: `11시 40분이다` is one word and `is September 5`
+		// is two. Its form comes from the same chain a verb's does, so a copular
+		// question asks and a polite one is polite.
+		const copula = part.copula ? oneOf(pick(predicates)) : '';
 		const opens = data.capitalize && !written.length;
-		const head = opens && part.head ? upper(part.head) : part.head;
-		const text = opens && !part.head ? upper(phrase) : phrase;
-		const tail = tailOf(part, text);
+		// A copula in front still lets the phrase keep its own preposition, because
+		// German says `ist am 5. März` and English `is on September 5`.
+		const opener = [part.copula === 'head' ? copula : '', part.head ?? '']
+			.filter(Boolean)
+			.join(data.space);
+		const head = opens && opener ? upper(opener) : opener;
+		const text = opens && !opener ? upper(phrase) : phrase;
+		const tail = (part.copula === 'tail' ? copula : '') + tailOf(part, text);
 
 		if (head) {
 			written.push(head);
@@ -1780,6 +1908,14 @@ function predicateFor(
 		const at = base.indexOf(required.word);
 
 		return agreed(at >= 0 ? (predicates[at] ?? required.word) : required.word);
+	}
+
+	if (slot === 'date') {
+		return dateText(data);
+	}
+
+	if (slot === 'clock') {
+		return clockText(data);
 	}
 
 	const pool = slot === 'manner' ? data.manners : slot === 'time' ? data.times : predicates;
@@ -1868,8 +2004,12 @@ function upper(word: string): string {
 function headedFallback(
 	data: SentenceLanguageData,
 	frame: SentenceFrame,
-	headed: 'state' | 'verb'
+	headed: 'state' | 'verb' | 'copula'
 ): (StateGroup | VerbGroup)[] {
+	if (headed === 'copula') {
+		return [data.calendar!.copula];
+	}
+
 	if (headed === 'state') {
 		return [...data.states];
 	}

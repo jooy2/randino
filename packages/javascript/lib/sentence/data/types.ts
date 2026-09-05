@@ -135,6 +135,18 @@ export type SentencePart = {
 	 * either carries the merged form or carries no article at all.
 	 */
 	bare?: boolean;
+	/**
+	 * Where the copula stands relative to this phrase, on the shape that equates
+	 * a subject to it. `head` is English `is` and Chinese `是`, written as their
+	 * own word in front; `tail` is Korean `이다` and Japanese `です`, written onto
+	 * the end of the phrase.
+	 *
+	 * On the phrase rather than a part of its own because that is what a copula
+	 * is in half of these languages: `11시 40분이다` is one word, and a slot for it
+	 * would have to be written with no space in front, which is a thing no other
+	 * part does.
+	 */
+	copula?: 'head' | 'tail';
 };
 
 /**
@@ -211,6 +223,36 @@ export type SentencePronouns = {
  * German and Russian do: both would need a case their nouns change their own
  * ending for, the same reason neither declares an object shape.
  */
+/**
+ * How a language writes a date, a clock time, and the copula that equates a
+ * subject to one.
+ *
+ * The templates are written as the language writes them, with letters standing
+ * for the numbers, because a date is word order as much as it is digits:
+ * `2026년 9월 5일` runs largest to smallest and `ngày 5 tháng 9 năm 2026` runs
+ * the other way with a word in front of every part.
+ */
+export type SentenceCalendar = {
+	/**
+	 * The date. `Y` is the year, `M` the month as a number, `D` the day, and
+	 * `MMMM` the month's name for a language that writes one.
+	 */
+	date: string;
+	/** The month names in order, for a date that writes `MMMM`. */
+	months?: WordPool;
+	/** The clock. `h` is the hour and `mm` the minute, zero-padded to two. */
+	clock: string;
+	/** The years a date may fall in, at the earliest and the latest. */
+	years: readonly [number, number];
+	/**
+	 * The copula, as a predicate group: one entry with whatever forms the
+	 * language writes for a question, an exclamation and each level. It states
+	 * the classes its subject may belong to the way a verb group does — an event
+	 * is a thing that happens on a day, and a lion is not.
+	 */
+	copula: StateGroup;
+};
+
 export type SentenceNumeral = {
 	/**
 	 * Where the number stands relative to the noun it counts. Korean, Japanese and
@@ -335,5 +377,12 @@ export type SentenceLanguageData = {
 	 * declares no `quantity` and no `money` shape either.
 	 */
 	numeral?: SentenceNumeral;
+	/**
+	 * How the language writes a date and a clock time, and the copula that
+	 * equates a subject to one. Left out by a language that cannot write them the
+	 * way the shapes here need — Russian equates with a dash rather than a word,
+	 * and a dash does not change for a question or a level.
+	 */
+	calendar?: SentenceCalendar;
 	frames: readonly SentenceFrame[];
 };

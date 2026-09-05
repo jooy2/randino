@@ -2,6 +2,7 @@
 
 from randino._internal.parse import words
 from randino.sentence.data._types import (
+    SentenceCalendar,
     SentenceFrame,
     SentenceLanguageData,
     SentenceNumeral,
@@ -677,7 +678,60 @@ KO = SentenceLanguageData(
     # entry is how the data says so.
     pronouns={"n": ("", "그것")},
     pronounless=("person",),
+    # Korean writes a date largest to smallest and a clock the same way, and its
+    # copula is written onto the end of what it equates the subject to. Both close on a
+    # coda — `일`, `분` — so `이다` never has to contract to `다`.
+    calendar=SentenceCalendar(
+        date="Y년 M월 D일",
+        clock="h시 mm분",
+        years=(2020, 2030),
+        copula=StateGroup(
+            # An event is a thing that happens on a day, and a lion is not.
+            subject=("event",),
+            words=words("이다"),
+            forms={
+                "question": words("이니|인가"),
+                "exclamation": words("이구나|이네"),
+                "casual": words("이야|이지"),
+                "polite": words("이에요|이죠"),
+                "formal": words("입니다"),
+                "formalQuestion": words("입니까"),
+            },
+        ),
+    ),
     frames=(
+        # A date and a clock, standing where an adverbial stands.
+        SentenceFrame(
+            (
+                SentencePart("date", tail="에"),
+                SentencePart("subject", tail="가", tail_alt="이", modifiable=True),
+                SentencePart("verb"),
+            ),
+            5,
+        ),
+        SentenceFrame(
+            (
+                SentencePart("clock", tail="에"),
+                SentencePart("subject", tail="가", tail_alt="이", modifiable=True),
+                SentencePart("verb"),
+            ),
+            5,
+        ),
+        # And the shape that equates the subject to one: `면접은 2026년 9월 5일이다.`
+        SentenceFrame(
+            (
+                SentencePart("subject", tail="는", tail_alt="은"),
+                SentencePart("date", copula="tail"),
+            ),
+            4,
+        ),
+        SentenceFrame(
+            (
+                SentencePart("subject", tail="는", tail_alt="은"),
+                SentencePart("clock", copula="tail"),
+            ),
+            4,
+        ),
         SentenceFrame(
             (
                 SentencePart("subject", tail="가", tail_alt="이", modifiable=True),

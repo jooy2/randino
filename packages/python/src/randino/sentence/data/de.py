@@ -2,6 +2,7 @@
 
 from randino._internal.parse import words
 from randino.sentence.data._types import (
+    SentenceCalendar,
     SentenceFrame,
     SentenceLanguageData,
     SentencePart,
@@ -163,7 +164,55 @@ DE = SentenceLanguageData(
     # and the modifier ending together. What is left is the nominative, and the
     # rule German never breaks: the verb stands second, so a shape that opens on a
     # time puts the subject behind it.
+    # German names its months, writes the day first with a full stop after it, and puts
+    # `Uhr` after a clock time.
+    calendar=SentenceCalendar(
+        date="D. MMMM Y",
+        months=words("""
+            Januar Februar März April Mai Juni Juli August September Oktober November Dezember
+        """),
+        clock="h:mm Uhr",
+        years=(2020, 2030),
+        copula=StateGroup(
+            # An event is a thing that happens on a day, and a lion is not.
+            subject=("event",),
+            words=words("ist"),
+        ),
+    ),
     frames=(
+        # A date and a clock. German puts its finite verb second and counts whatever
+        # opens the clause towards that, so the subject stands behind the verb.
+        SentenceFrame(
+            (
+                SentencePart("date", head="am"),
+                SentencePart("verb"),
+                SentencePart("subject", modifiable=True),
+            ),
+            5,
+        ),
+        SentenceFrame(
+            (
+                SentencePart("clock", head="um"),
+                SentencePart("verb"),
+                SentencePart("subject", modifiable=True),
+            ),
+            5,
+        ),
+        # And the shape that equates the subject to one: `Das Spiel ist um 11:40 Uhr.`
+        SentenceFrame(
+            (
+                SentencePart("subject", modifiable=True),
+                SentencePart("date", head="am", copula="head"),
+            ),
+            4,
+        ),
+        SentenceFrame(
+            (
+                SentencePart("subject", modifiable=True),
+                SentencePart("clock", head="um", copula="head"),
+            ),
+            4,
+        ),
         SentenceFrame(
             (
                 SentencePart("subject", modifiable=True),

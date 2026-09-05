@@ -173,7 +173,54 @@ final SentenceLanguageData de = SentenceLanguageData(
   // and the modifier ending together. What is left is the nominative, and the
   // rule German never breaks: the verb stands second, so a shape that opens on a
   // time puts the subject behind it.
+  // German names its months, writes the day first with a full stop after it, and
+  // puts `Uhr` after a clock time.
+  calendar: SentenceCalendar(
+    date: 'D. MMMM Y',
+    months: <String>[
+      'Januar',
+      'Februar',
+      'März',
+      'April',
+      'Mai',
+      'Juni',
+      'Juli',
+      'August',
+      'September',
+      'Oktober',
+      'November',
+      'Dezember',
+    ],
+    clock: 'h:mm Uhr',
+    years: LengthRange(2020, 2030),
+    copula: StateGroup(
+      // An event is a thing that happens on a day, and a lion is not.
+      subject: <NounClass>[NounClass.event],
+      words: <String>['ist'],
+    ),
+  ),
   frames: const <SentenceFrame>[
+    // A date and a clock. German puts its finite verb second and counts whatever
+    // opens the clause towards that, so the subject stands behind the verb.
+    SentenceFrame(<SentencePart>[
+      SentencePart(SentenceSlot.date, head: 'am'),
+      SentencePart(SentenceSlot.verb),
+      SentencePart(SentenceSlot.subject, modifiable: true),
+    ], 5),
+    SentenceFrame(<SentencePart>[
+      SentencePart(SentenceSlot.clock, head: 'um'),
+      SentencePart(SentenceSlot.verb),
+      SentencePart(SentenceSlot.subject, modifiable: true),
+    ], 5),
+    // And the shape that equates the subject to one: `Das Spiel ist um 11:40 Uhr.`
+    SentenceFrame(<SentencePart>[
+      SentencePart(SentenceSlot.subject, modifiable: true),
+      SentencePart(SentenceSlot.date, head: 'am', copula: CopulaSide.head),
+    ], 4),
+    SentenceFrame(<SentencePart>[
+      SentencePart(SentenceSlot.subject, modifiable: true),
+      SentencePart(SentenceSlot.clock, head: 'um', copula: CopulaSide.head),
+    ], 4),
     SentenceFrame(<SentencePart>[
       SentencePart(SentenceSlot.subject, modifiable: true),
       SentencePart(SentenceSlot.verb),

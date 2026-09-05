@@ -23,14 +23,14 @@ const statementOnly = <SentenceType>{SentenceType.statement};
 
 /// Everything a sentence of the language may be written with, punctuation aside.
 final Map<WordLanguage, RegExp> script = <WordLanguage, RegExp>{
-  WordLanguage.en: RegExp(r"^[A-Za-z0-9' ,.?!…“”‘’]+$"),
-  WordLanguage.ko: RegExp(r'^[가-힣0-9 ,.?!…“”‘’]+$'),
+  WordLanguage.en: RegExp(r"^[A-Za-z0-9' :,.?!…“”‘’]+$"),
+  WordLanguage.ko: RegExp(r'^[가-힣0-9 :,.?!…“”‘’]+$'),
   WordLanguage.ja: RegExp(r'^[々぀-ヿ一-鿿0-9,。、？！…「」『』]+$'),
   WordLanguage.zh: RegExp(r'^[々一-鿿0-9,。，？！…“”‘’]+$'),
-  WordLanguage.vi: RegExp(r'^[a-zA-ZÀ-ỹ0-9 ,.?!…“”‘’]+$'),
-  WordLanguage.es: RegExp(r'^[a-zA-ZÀ-ÿ0-9 ,.?!…¿¡«»“”]+$'),
-  WordLanguage.it: RegExp(r"^[a-zA-ZÀ-ÿ0-9' ,.?!…«»“”]+$"),
-  WordLanguage.de: RegExp(r'^[a-zA-ZÀ-ÿß0-9 ,.?!…„“‚‘]+$'),
+  WordLanguage.vi: RegExp(r'^[a-zA-ZÀ-ỹ0-9 :,.?!…“”‘’]+$'),
+  WordLanguage.es: RegExp(r'^[a-zA-ZÀ-ÿ0-9 :,.?!…¿¡«»“”]+$'),
+  WordLanguage.it: RegExp(r"^[a-zA-ZÀ-ÿ0-9' :,.?!…«»“”]+$"),
+  WordLanguage.de: RegExp(r'^[a-zA-ZÀ-ÿß0-9 :,.?!…„“‚‘]+$'),
   WordLanguage.ru: RegExp(r'^[Ѐ-ӿ0-9 ,.?!…«»„“]+$'),
 };
 
@@ -225,6 +225,29 @@ String stripCount(WordLanguage language, String phrase) {
   final group = counters.isEmpty ? number : '$number(?:$gap(?:${counters.join('|')}))?';
 
   return phrase.replaceAll(RegExp('$space$group\$'), '').replaceAll(RegExp('^$group$space'), '');
+}
+
+/// Whether a phrase is a date or a clock the language's own template could
+/// write, checked by turning that template into a pattern.
+bool isCalendar(WordLanguage language, SentenceSlot slot, String phrase) {
+  final calendar = sentenceData[language]!.calendar;
+
+  if (calendar == null) return false;
+
+  final pattern =
+      slot == SentenceSlot.clock
+          ? escapeRe(calendar.clock).replaceFirst('h', r'\d{1,2}').replaceFirst('mm', r'\d{2}')
+          : escapeRe(calendar.date)
+              .replaceFirst('Y', r'\d{4}')
+              .replaceFirst('D', r'\d{1,2}')
+              .replaceFirst(
+                calendar.months == null ? 'M' : 'MMMM',
+                calendar.months == null
+                    ? r'\d{1,2}'
+                    : '(?:${calendar.months!.map(escapeRe).join('|')})',
+              );
+
+  return RegExp('^$pattern\$').hasMatch(phrase);
 }
 
 /// Whether a phrase is an amount of money, written the way the language writes it.
@@ -484,6 +507,20 @@ void main() {
               continue;
             }
 
+            // A date and a clock are written out of the language's own template
+            // rather than out of any pool.
+            if (slot == SentenceSlot.date || slot == SentenceSlot.clock) {
+              expect(
+                isCalendar(language, slot, phrase),
+                isTrue,
+                reason:
+                    '$language: $phrase is not a ${slot.name} the template can write '
+                    '(${detail.sentence})',
+              );
+
+              continue;
+            }
+
             // A counted phrase is a noun phrase with a number on it, so the
             // number comes off before the pools are asked about the rest.
             expect(
@@ -520,7 +557,17 @@ void main() {
             (slot) => slot == SentenceSlot.verb || slot == SentenceSlot.state,
           );
 
-          expect(predicates, hasLength(1), reason: detail.sentence);
+          // A copular shape has neither: it equates its subject to a day or a
+          // time, and the copula is written onto that phrase rather than
+          // standing as one of its own.
+          final copular =
+              detail.slots.contains(SentenceSlot.date) || detail.slots.contains(SentenceSlot.clock);
+
+          expect(
+            predicates,
+            hasLength(copular && predicates.isEmpty ? 0 : 1),
+            reason: detail.sentence,
+          );
           // A shape that counts what it is about has no separate subject: the
           // counted phrase is what the verb agrees with.
           expect(
@@ -1011,6 +1058,9 @@ void main() {
             // of them and none is a terminator.
             expect(
               sentence
+                      // German writes the day of a date with a full stop after
+                      // it, so that comes out too.
+                      .replaceAll(RegExp(r'\d+\.(?=\s\S)'), '#')
                       .replaceAll(RegExp(r'\d[\d.,]*\d'), '#')
                       .split(data.terminators[SentenceType.statement]!)
                       .length -
@@ -1850,6 +1900,133 @@ void main() {
             reason: '$language: "${detail.sentence}" spaces a number off what it counts',
           );
         }
+      }
+    });
+
+    test('`slots: date` and `slots: clock` write the language`s own calendar', () {
+      // Eight of the nine. Russian equates its subject to a day with a dash
+      // rather than a word, and a dash does not change for a question or for a
+      // level, so it declares no calendar and answers with the shapes it has.
+      final dated = wordLanguages
+          .where((language) => sentenceData[language]!.calendar != null)
+          .toList(growable: false);
+
+      expect(dated, <WordLanguage>[
+        WordLanguage.en,
+        WordLanguage.ko,
+        WordLanguage.ja,
+        WordLanguage.zh,
+        WordLanguage.vi,
+        WordLanguage.es,
+        WordLanguage.it,
+        WordLanguage.de,
+      ]);
+
+      for (final language in dated) {
+        for (final slot in <SentenceSlot>[SentenceSlot.date, SentenceSlot.clock]) {
+          var seen = 0;
+
+          for (final detail in randSentenceDetails(
+            language: language,
+            slots: <SentenceSlot>{slot},
+            type: statementOnly,
+            includeName: false,
+            count: sample,
+          )) {
+            final at = detail.slots.indexOf(slot);
+
+            expect(at, greaterThanOrEqualTo(0), reason: '$language: ${detail.sentence}');
+            expect(
+              isCalendar(language, slot, detail.phrases[at]),
+              isTrue,
+              reason: '$language: "${detail.phrases[at]}" is not a ${slot.name}',
+            );
+
+            seen += 1;
+          }
+
+          expect(seen, greaterThan(0), reason: '$language never wrote a ${slot.name}');
+        }
+      }
+
+      for (final detail in randSentenceDetails(
+        language: WordLanguage.ru,
+        slots: <SentenceSlot>{SentenceSlot.date},
+        type: statementOnly,
+        includeName: false,
+        count: 30,
+      )) {
+        expect(detail.slots.contains(SentenceSlot.date), isFalse, reason: detail.sentence);
+      }
+    });
+
+    test('a copular shape equates a subject that can be a day', () {
+      // The copula is a predicate like any other: it states the classes its
+      // subject may belong to, and it takes the form the level and the mood ask
+      // for.
+      for (final language in wordLanguages) {
+        final calendar = sentenceData[language]!.calendar;
+
+        if (calendar == null) continue;
+
+        expect(calendar.copula.subject, <NounClass>[NounClass.event]);
+
+        for (final detail in randSentenceDetails(
+          language: language,
+          slots: <SentenceSlot>{SentenceSlot.date, SentenceSlot.clock},
+          type: statementOnly,
+          includeName: false,
+          count: 200,
+        )) {
+          if (detail.slots.contains(SentenceSlot.verb) ||
+              detail.slots.contains(SentenceSlot.state)) {
+            continue;
+          }
+
+          expect(detail.theme, isNotNull, reason: detail.sentence);
+          expect(
+            themeClass[detail.theme!],
+            NounClass.event,
+            reason: '$language: ${detail.theme} is not a thing that happens on a day',
+          );
+        }
+      }
+
+      // And the form follows the level, which is what makes it a predicate
+      // rather than a word bolted onto the phrase.
+      const written = <SentenceStyle, List<String>>{
+        SentenceStyle.plain: <String>['이다'],
+        SentenceStyle.casual: <String>['이야', '이지'],
+        SentenceStyle.polite: <String>['이에요', '이죠'],
+        SentenceStyle.formal: <String>['입니다'],
+      };
+
+      for (final entry in written.entries) {
+        var seen = 0;
+
+        for (final detail in randSentenceDetails(
+          language: WordLanguage.ko,
+          slots: <SentenceSlot>{SentenceSlot.date, SentenceSlot.clock},
+          style: entry.key,
+          type: statementOnly,
+          includeName: false,
+          count: 200,
+        )) {
+          if (detail.slots.contains(SentenceSlot.verb) ||
+              detail.slots.contains(SentenceSlot.state)) {
+            continue;
+          }
+
+          expect(
+            entry.value.any((form) => detail.sentence.endsWith('$form.')),
+            isTrue,
+            reason: '${entry.key}: ${detail.sentence}',
+          );
+
+          seen += 1;
+        }
+
+        expect(seen, greaterThan(0), reason: '${entry.key} wrote no copular sentence');
       }
     });
 

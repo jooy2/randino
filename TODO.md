@@ -158,10 +158,27 @@ How it landed:
 
 ## E. A sentence can be about a date, a time or an amount
 
-- [ ] `date` and `clock` slots, written the way each language writes them
+- [x] `date` and `clock` slots, written the way each language writes them
       (`2026년 9월 5일에`, `11시 40분에`).
-- [ ] A copular shape — `약속 시간은 11시 40분이다.` — which is a frame family
+- [x] A copular shape — `약속 시간은 11시 40분이다.` — which is a frame family
       none of the nine has yet. A language declares it only if it can write it.
+
+What the copula turned out to be:
+
+- **A predicate, not a word.** It has to change for the level and the mood the
+  way a verb does, or a copular sentence is the one flat thing in a library that
+  just stopped being flat. So `SentenceCalendar.copula` is a `StateGroup` with
+  one entry and its forms, and it states its subject classes the way a verb
+  group does — which is what keeps `버기는 11시 40분이다` out.
+- **Written onto the phrase, not standing as one.** `11시 40분이다` is one word
+  in Korean and `is at 11:40` is two in English, so a slot of its own would have
+  had to be written with no space in front, which nothing else does.
+  `SentencePart.copula` says which side instead, and a copula in front still
+  lets the phrase keep its own preposition (`ist am 5. März`).
+- **A shape with neither a verb nor a state is a copular one.** No flag needed:
+  every other shape has one or the other, so the absence is the signal.
+- Russian is the one language that declares no calendar. It equates with a dash,
+  and a dash does not change for a question or a level.
 
 ## F. More shapes, and more ways to say the same thing
 
