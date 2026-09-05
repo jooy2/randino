@@ -133,15 +133,19 @@ Set<String> pronounsOf(WordLanguage language) {
   return <String>{...written, ...written.map(upperFirst)};
 }
 
-/// The noun a phrase was built around, as far as the pools can tell.
+/// Every noun a phrase could have been built around, as far as the pools can
+/// tell — the same decomposition [explains] makes, kept instead of thrown away.
 ///
-/// The same decomposition [explains] makes, kept instead of thrown away. Null
-/// for a phrase built on a word no pool holds, which is what an invented subject
-/// is.
-String? nounIn(WordLanguage language, String phrase) {
+/// Every one of them rather than the first, because a word can be both a noun
+/// and a modifier and two of them beside each other parse both ways: Vietnamese
+/// `Sâu ấm` is a warm worm and a deep teapot, and only the generator knows which
+/// it meant. Empty for a phrase built on a word no pool holds, which is what an
+/// invented subject is.
+Set<String> nounsIn(WordLanguage language, String phrase) {
   final space = sentenceData[language]!.space;
   final nouns = poolFor(language, SentenceSlot.subject);
   final modifiers = modifiersFor(language);
+  final found = <String>{};
   var rest = phrase;
 
   for (final article in articlesFor(language)) {
@@ -153,7 +157,7 @@ String? nounIn(WordLanguage language, String phrase) {
     }
   }
 
-  if (nouns.contains(rest)) return rest;
+  if (nouns.contains(rest)) found.add(rest);
 
   for (var at = 1; at < rest.length; at += 1) {
     if (space.isNotEmpty &&
@@ -164,11 +168,11 @@ String? nounIn(WordLanguage language, String phrase) {
     final left = rest.substring(0, at);
     final right = rest.substring(at + space.length);
 
-    if (modifiers.contains(left) && nouns.contains(right)) return right;
-    if (nouns.contains(left) && modifiers.contains(right)) return left;
+    if (modifiers.contains(left) && nouns.contains(right)) found.add(right);
+    if (nouns.contains(left) && modifiers.contains(right)) found.add(left);
   }
 
-  return null;
+  return found;
 }
 
 /// The theme whose pool holds a noun, in the form a sentence writes it.
@@ -729,16 +733,18 @@ void main() {
 
             // Any of the three sentences can be the one a phrase opens, so both
             // cases are tried rather than only the first phrase of the result.
-            final noun =
-                nounIn(language, phrase) ??
-                nounIn(language, phrase.substring(0, 1).toLowerCase() + phrase.substring(1));
-            final found = noun == null ? null : themeOfNoun(language, noun);
+            final found = <String>{
+              ...nounsIn(language, phrase),
+              ...nounsIn(language, phrase.substring(0, 1).toLowerCase() + phrase.substring(1)),
+            };
+            final themes =
+                found.map((noun) => themeOfNoun(language, noun)).whereType<WordTheme>().toList();
 
             expect(
-              found == null || themeClass[found] == wanted,
+              themes.isEmpty || themes.any((theme) => themeClass[theme] == wanted),
               isTrue,
               reason:
-                  '$language: "$phrase" is a $found where the result is about a $wanted (${detail.sentence})',
+                  '$language: "$phrase" reads as $themes where the result is about a $wanted (${detail.sentence})',
             );
           }
 

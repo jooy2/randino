@@ -482,15 +482,19 @@ def pronouns_of(language: WordLanguage) -> set[str]:
     return {*written, *(upper_first(word) for word in written)}
 
 
-def noun_in(language: WordLanguage, phrase: str) -> str | None:
-    """The noun a phrase was built around, as far as the pools can tell.
+def nouns_in(language: WordLanguage, phrase: str) -> set[str]:
+    """Every noun a phrase could have been built around, as far as the pools can tell.
 
-    The same decomposition `explains` makes, kept instead of thrown away. None for a
+    The same decomposition `explains` makes, kept instead of thrown away — and every
+    one of them rather than the first, because a word can be both a noun and a modifier
+    and two of them beside each other parse both ways: Vietnamese `Sâu ấm` is a warm
+    worm and a deep teapot, and only the generator knows which it meant. Empty for a
     phrase built on a word no pool holds, which is what an invented subject is.
     """
     space = SENTENCE_DATA[language].space
     nouns = pool_for(language, "subject")
     modifiers = modifiers_for(language)
+    found: set[str] = set()
     rest = phrase
 
     for article in articles_for(language):
@@ -501,7 +505,7 @@ def noun_in(language: WordLanguage, phrase: str) -> str | None:
             break
 
     if rest in nouns:
-        return rest
+        found.add(rest)
 
     for at in range(1, len(rest)):
         if space and rest[at : at + len(space)] != space:
@@ -511,12 +515,12 @@ def noun_in(language: WordLanguage, phrase: str) -> str | None:
         right = rest[at + len(space) :]
 
         if left in modifiers and right in nouns:
-            return right
+            found.add(right)
 
         if left in nouns and right in modifiers:
-            return left
+            found.add(left)
 
-    return None
+    return found
 
 
 def theme_of_noun(language: WordLanguage, noun: str) -> WordTheme | None:
@@ -611,13 +615,17 @@ def test_the_sentences_of_one_result_are_about_the_same_kind_of_thing() -> None:
 
                 # Any of the three sentences can be the one a phrase opens, so both
                 # cases are tried rather than only the first phrase of the result.
-                noun = noun_in(language, phrase) or noun_in(
+                found = nouns_in(language, phrase) | nouns_in(
                     language, phrase[:1].lower() + phrase[1:]
                 )
-                found = theme_of_noun(language, noun) if noun is not None else None
+                themes = [
+                    theme
+                    for theme in (theme_of_noun(language, noun) for noun in found)
+                    if theme is not None
+                ]
 
-                assert found is None or THEME_CLASS[found] == wanted, (
-                    f"{language}: '{phrase}' is a {found} where the result is about a "
+                assert not themes or any(THEME_CLASS[theme] == wanted for theme in themes), (
+                    f"{language}: '{phrase}' reads as {themes} where the result is about a "
                     f"{wanted} ({detail.sentence})"
                 )
 

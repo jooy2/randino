@@ -56,14 +56,20 @@ function pronounsOf(language: WordLanguage): Set<string> {
 }
 
 /**
- * The noun a phrase was built around, as far as the pools can tell — the same
- * decomposition `explains` makes, kept instead of thrown away. Null for a phrase
- * built on a word no pool holds, which is what an invented subject is.
+ * Every noun a phrase could have been built around, as far as the pools can tell
+ * — the same decomposition `explains` makes, kept instead of thrown away.
+ *
+ * Every one of them rather than the first, because a word can be both a noun and
+ * a modifier and two of them beside each other parse both ways: Vietnamese `Sâu
+ * ấm` is a warm worm and a deep teapot, and only the generator knows which it
+ * meant. Empty for a phrase built on a word no pool holds, which is what an
+ * invented subject is.
  */
-function nounIn(language: WordLanguage, phrase: string): string | null {
+function nounsIn(language: WordLanguage, phrase: string): Set<string> {
 	const space = SENTENCE_DATA[language].space;
 	const nouns = poolFor(language, 'subject');
 	const modifiers = modifiersFor(language);
+	const found = new Set<string>();
 	let rest = phrase;
 
 	for (const article of articlesFor(language)) {
@@ -76,7 +82,7 @@ function nounIn(language: WordLanguage, phrase: string): string | null {
 	}
 
 	if (nouns.has(rest)) {
-		return rest;
+		found.add(rest);
 	}
 
 	for (let at = 1; at < rest.length; at += 1) {
@@ -88,15 +94,15 @@ function nounIn(language: WordLanguage, phrase: string): string | null {
 		const right = rest.slice(at + space.length);
 
 		if (modifiers.has(left) && nouns.has(right)) {
-			return right;
+			found.add(right);
 		}
 
 		if (nouns.has(left) && modifiers.has(right)) {
-			return left;
+			found.add(left);
 		}
 	}
 
-	return null;
+	return found;
 }
 
 /** The theme whose pool holds a noun, in the form a sentence writes it. */
@@ -742,14 +748,17 @@ describe('Sentence', () => {
 
 					// Any of the three sentences can be the one a phrase opens, so both
 					// cases are tried rather than only the first phrase of the result.
-					const noun =
-						nounIn(language, phrase) ??
-						nounIn(language, phrase.charAt(0).toLowerCase() + phrase.slice(1));
-					const theme = noun ? themeOfNoun(language, noun) : null;
+					const found = [
+						...nounsIn(language, phrase),
+						...nounsIn(language, phrase.charAt(0).toLowerCase() + phrase.slice(1))
+					];
+					const themes = found
+						.map((noun) => themeOfNoun(language, noun))
+						.filter((theme): theme is WordTheme => theme !== null);
 
 					assert.ok(
-						theme === null || THEME_CLASS[theme] === wanted,
-						`${language}: '${phrase}' is a ${theme} where the result is about a ${wanted} (${detail.sentence})`
+						themes.length === 0 || themes.some((theme) => THEME_CLASS[theme] === wanted),
+						`${language}: '${phrase}' reads as ${themes.join('/')} where the result is about a ${wanted} (${detail.sentence})`
 					);
 				}
 
