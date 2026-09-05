@@ -30,6 +30,12 @@ import 'package:randino/src/types.dart';
 /// a connective. `minLength` and `maxLength` describe the whole string whatever
 /// this is.
 ///
+/// [includeName] writes a generated person's name where a sentence has room for
+/// one — `Emma runs quietly.`, `민준이 조용히 달린다.` It narrows the subject to
+/// the themes that name people; a [theme] you named yourself still wins. The
+/// name is a bare given name, and it carries its own gender, so what agrees with
+/// a subject agrees with it.
+///
 /// ```dart
 /// randSentence(language: WordLanguage.ko, count: 2);
 /// // ['검은 고양이가 숲에서 잠잔다.', '여우가 사과를 먹는다.']
@@ -53,6 +59,7 @@ List<String> randSentence({
   String? startsWith,
   bool unique = false,
   int sentences = 1,
+  bool includeName = false,
 }) =>
     generateSentenceDetails(
       language: language,
@@ -67,4 +74,5 @@ List<String> randSentence({
       startsWith: startsWith,
       unique: unique,
       sentences: sentences,
+      includeName: includeName,
     ).map((detail) => detail.sentence).toList();

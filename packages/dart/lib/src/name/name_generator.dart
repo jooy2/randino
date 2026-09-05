@@ -522,6 +522,33 @@ NameDetail _generateOne(NameLanguage language, _Settings settings) {
   return NameDetail(native: entry.n, roman: entry.r, language: language, gender: gender);
 }
 
+/// One name in [language], drawn the way `randName` would draw it.
+///
+/// Internal, and the only way into this generator from outside `lib/src/name`:
+/// `randSentence` writes a person's name where a sentence has room for one, and
+/// it has no business resolving `randName`'s options itself.
+NameDetail drawName(
+  NameLanguage language, {
+  NameGender? gender,
+  RandRealism realism = RandRealism.real,
+  bool includeSurname = true,
+  bool includeMiddleName = false,
+  int? minLength,
+  int? maxLength,
+  String? startsWith,
+}) => _generateOne(
+  language,
+  _Settings(
+    gender: gender,
+    includeSurname: includeSurname,
+    includeMiddleName: includeMiddleName,
+    minLength: minLength,
+    maxLength: maxLength,
+    invent: resolveRealism(realism),
+    prefix: resolvePrefix(startsWith),
+  ),
+);
+
 /// Generate names with every choice already resolved. `randName` and
 /// `randNameDetails` are the two public shapes over this.
 List<NameDetail> generateNameDetails({

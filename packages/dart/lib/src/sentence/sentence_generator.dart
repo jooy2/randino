@@ -24,6 +24,8 @@ import 'package:randino/src/constants.dart';
 import 'package:randino/src/internal/generate.dart';
 import 'package:randino/src/internal/script.dart';
 import 'package:randino/src/internal/utils.dart';
+import 'package:randino/src/name/name_generator.dart';
+import 'package:randino/src/name/name_length_range.dart';
 import 'package:randino/src/sentence/data/index.dart';
 import 'package:randino/src/sentence/data/types.dart';
 import 'package:randino/src/types.dart';
@@ -58,6 +60,8 @@ class _Settings {
     required this.prefix,
     required this.include,
     required this.sentences,
+    required this.realism,
+    required this.includeName,
   });
 
   final WordTheme? theme;
@@ -76,6 +80,15 @@ class _Settings {
 
   /// How many sentences one result holds, clamped.
   final int sentences;
+
+  /// The same thing [invent] is, in the form `randName` takes it.
+  ///
+  /// A sentence that writes a person's name hands the name generator the level
+  /// the caller asked for.
+  final RandRealism realism;
+
+  /// Whether a phrase about a person is written as a name.
+  final bool includeName;
 }
 
 /// What the sentences of one result are about: the first sentence's subject, and
@@ -85,7 +98,7 @@ class _Settings {
 /// class is what a fresh subject stays inside, the noun is what naming it again
 /// writes, and the gender is what a pronoun and an agreeing predicate need.
 class _Topic {
-  const _Topic(this.noun, this.theme, this.nounClass, this.gender);
+  const _Topic(this.noun, this.theme, this.nounClass, this.gender, this.named);
 
   /// The subject noun as the first sentence wrote it.
   final String noun;
@@ -94,6 +107,9 @@ class _Topic {
   /// The class its theme falls into. Null when the noun is one no pool holds.
   final NounClass? nounClass;
   final WordGender? gender;
+
+  /// Whether that noun is a person's name, which is written bare wherever it goes.
+  final bool named;
 }
 
 /// How a sentence that follows another refers to what the two of them are about:
@@ -715,6 +731,14 @@ List<StateGroup> _stateGroupsFor(
 
 /* --- Building one sentence ------------------------------------------------- */
 
+/// A person's name, and the gender whatever agrees with it has to agree with.
+class _Named {
+  const _Named(this.text, this.gender);
+
+  final String text;
+  final WordGender? gender;
+}
+
 class _Phrase {
   const _Phrase(this.text, this.noun, this.theme);
 
@@ -724,11 +748,23 @@ class _Phrase {
 }
 
 class _Built {
-  const _Built(this.sentence, this.phrases, this.slots, this.theme, this.subject, this.gender);
+  const _Built(
+    this.sentence,
+    this.phrases,
+    this.slots,
+    this.names,
+    this.theme,
+    this.subject,
+    this.gender,
+    this.named,
+  );
 
   final String sentence;
   final List<String> phrases;
   final List<SentenceSlot> slots;
+
+  /// The person names this sentence was written with, in order.
+  final List<String> names;
   final WordTheme? theme;
 
   /// The subject noun as written, which is what the next sentence carries on
@@ -737,6 +773,9 @@ class _Built {
 
   /// Its gender, for the pronoun and the agreement of whatever follows.
   final WordGender? gender;
+
+  /// Whether that subject is a person's name.
+  final bool named;
 }
 
 /// The article a phrase opens with, by the noun's gender and the word after it.
@@ -853,6 +892,42 @@ int _atLeast(int floor, int value) => value < floor ? floor : value;
 
 int _atMost(int ceiling, int value) => value > ceiling ? ceiling : value;
 
+/// A person's name for a phrase that has room for one, and the gender it carries.
+///
+/// A bare given name rather than a full one: a sentence about someone uses the
+/// name they are called by, and `randName`'s default would put a surname in
+/// every clause. The gender is the one the name was drawn for, translated into
+/// the gender a modifier and a predicate agree with — and only for a language
+/// whose words agree at all, since nothing else has any use for it.
+_Named _properName(
+  WordLanguage language,
+  WordLanguageData lexicon,
+  _Settings settings,
+  String prefix,
+  int min,
+  int max,
+) {
+  final drawn = drawName(
+    NameLanguage.values.byName(language.name),
+    includeSurname: false,
+    realism: settings.realism,
+    startsWith: prefix,
+    minLength: min,
+    maxLength: max,
+  );
+
+  return _Named(
+    drawn.native,
+    lexicon.agreement == null
+        ? null
+        : (drawn.gender == NameGender.male ? WordGender.m : WordGender.f),
+  );
+}
+
+/// How long a given name of the language can be, which is what a phrase reserves.
+LengthRange _nameSpan(WordLanguage language) =>
+    nameLengthRange(language: NameLanguage.values.byName(language.name), includeSurname: false);
+
 /// The particle a part writes after its phrase, in the form the phrase asks for.
 String _tailOf(SentencePart part, String phrase) {
   final alt = part.tailAlt;
@@ -948,29 +1023,14 @@ _Built _compose(
   // below is measured against what the sentence actually writes; `at` is the
   // index back into the frame, which is what the plan is keyed by.
   final String? pronoun = follow?.reference == _Reference.pronoun ? follow!.pronoun : null;
-  final parts = <SentencePart>[];
+  final shape = <SentencePart>[];
   final at = <int>[];
 
   for (var i = 0; i < frame.parts.length; i += 1) {
     final part = frame.parts[i];
 
-    if (part.slot != SentenceSlot.subject || pronoun == null) {
-      parts.add(part);
-      at.add(i);
-
-      continue;
-    }
-
-    if (pronoun.isNotEmpty) {
-      parts.add(
-        SentencePart(
-          part.slot,
-          head: part.head,
-          tail: part.tail,
-          tailAlt: part.tailAlt,
-          bare: true,
-        ),
-      );
+    if (part.slot != SentenceSlot.subject || pronoun == null || pronoun.isNotEmpty) {
+      shape.add(part);
       at.add(i);
     }
   }
@@ -979,7 +1039,7 @@ _Built _compose(
   // honour `startsWith`; anywhere else the sentence opens on an article, a
   // preposition or an adverbial, and `collect` filters what does not match. A
   // sentence after the first one never opens the result, so it never carries it.
-  final first = parts.first;
+  final first = shape.first;
   final prefixable =
       follow == null && _isNounSlot(first.slot) && first.head == null && data.articles == null;
   final space = data.space.length;
@@ -990,12 +1050,52 @@ _Built _compose(
   // a word out of its own theme, which is how a sentence came out short of a
   // `minLength` the shape could otherwise have reached.
   final partThemes = <WordTheme?>[
-    for (var i = 0; i < parts.length; i += 1)
-      !_isNounSlot(parts[i].slot)
+    for (var i = 0; i < shape.length; i += 1)
+      !_isNounSlot(shape[i].slot)
           ? null
-          : parts[i].slot == SentenceSlot.subject
+          : shape[i].slot == SentenceSlot.subject
           ? subjectTheme
-          : (plan.phrase[at[i]]?.theme ?? _themeForPart(parts[i].slot, verbGroup?.object, themes)),
+          : (plan.phrase[at[i]]?.theme ?? _themeForPart(shape[i].slot, verbGroup?.object, themes)),
+  ];
+  // What a phrase writes instead of a noun phrase, when it writes one at all: a
+  // pronoun standing in for the topic, the name a repeat carries forward, or a
+  // fresh name for a phrase about a person. All three are bare words — no
+  // article, no modifier, nothing but the word and whatever particle the frame
+  // puts after it — and `''` marks the one that has to be drawn against the room
+  // it is given.
+  final proper = <String?>[
+    for (var i = 0; i < shape.length; i += 1)
+      () {
+        final part = shape[i];
+
+        if (part.slot == SentenceSlot.subject && pronoun != null && pronoun.isNotEmpty) {
+          return pronoun;
+        }
+
+        if (part.slot == SentenceSlot.subject &&
+            follow?.reference == _Reference.repeat &&
+            follow!.topic.named) {
+          return follow.topic.noun;
+        }
+
+        final theme = partThemes[i];
+
+        return settings.includeName && theme != null && themeClass[theme] == NounClass.person
+            ? ''
+            : null;
+      }(),
+  ];
+  final parts = <SentencePart>[
+    for (var i = 0; i < shape.length; i += 1)
+      proper[i] == null
+          ? shape[i]
+          : SentencePart(
+            shape[i].slot,
+            head: shape[i].head,
+            tail: shape[i].tail,
+            tailAlt: shape[i].tailAlt,
+            bare: true,
+          ),
   ];
   // The same for the predicate: `bounds` spans every group the language has, and
   // one sentence draws from one of them. A word the caller required is narrower
@@ -1006,16 +1106,20 @@ _Built _compose(
   for (var i = 0; i < parts.length; i += 1) {
     final part = parts[i];
     final required = plan.phrase[at[i]];
-    final String? word =
-        part.slot == SentenceSlot.subject && pronoun != null && pronoun.isNotEmpty
-            ? pronoun
-            : required?.word;
+    final String? word = (proper[i] != null && proper[i]!.isNotEmpty) ? proper[i] : required?.word;
     final exact = word == null ? null : LengthRange(word.length, word.length);
     final own = Map<SentenceSlot, LengthRange>.from(bounds);
     final owed = plan.modifier[at[i]];
 
     if (partThemes[i] != null) {
-      own[part.slot] = exact ?? _nounSpan(language, partThemes[i]!, settings.invent);
+      // A name that has still to be drawn is budgeted against the given names of
+      // the language rather than against its nouns — `randName` invents from its
+      // own syllables and draws from its own pools, and neither is this theme's.
+      own[part.slot] =
+          exact ??
+          (proper[i] == ''
+              ? _nameSpan(language)
+              : _nounSpan(language, partThemes[i]!, settings.invent));
     } else if (part.slot == SentenceSlot.verb || part.slot == SentenceSlot.state) {
       own[part.slot] = exact ?? poolBounds(stateGroup?.words ?? verbGroup!.words);
     } else if (exact != null) {
@@ -1040,10 +1144,13 @@ _Built _compose(
   final written = <String>[];
   final reported = <String>[];
   final slots = <SentenceSlot>[];
+  final names = <String>[];
   _Phrase? subject;
-  // A pronoun says nothing about its own gender, so what agrees with it agrees
-  // with the noun it stands for.
-  WordGender? gender = pronoun != null && pronoun.isNotEmpty ? follow!.topic.gender : null;
+  var named = false;
+  // A pronoun says nothing about its own gender, and neither does a name carried
+  // over, so what agrees with either agrees with the noun it stands for.
+  WordGender? gender =
+      proper.any((word) => word != null && word.isNotEmpty) ? follow?.topic.gender : null;
   var used = data.terminator.length + (opener.isEmpty ? 0 : opener.length + space);
 
   if (opener.isNotEmpty) written.add(data.capitalize ? _upper(opener) : opener);
@@ -1065,8 +1172,29 @@ _Built _compose(
     final low = _atLeast(1, min - used - overhead - restMax);
     String phrase;
 
-    if (part.slot == SentenceSlot.subject && pronoun != null && pronoun.isNotEmpty) {
-      phrase = pronoun;
+    if (proper[i] != null) {
+      // A bare proper noun, drawn now if it was not carried in. `high` and `low`
+      // are what the phrase has room for, and the name generator fits them the
+      // same way a noun would.
+      if (proper[i]!.isNotEmpty) {
+        phrase = proper[i]!;
+      } else {
+        final drawn = _properName(
+          language,
+          lexicon,
+          settings,
+          prefixable && i == 0 ? settings.prefix : '',
+          low < high ? low : high,
+          high,
+        );
+
+        phrase = drawn.text;
+        names.add(drawn.text);
+
+        if (part.slot == SentenceSlot.subject) gender = drawn.gender;
+      }
+
+      if (part.slot == SentenceSlot.subject) named = true;
     } else if (_isNounSlot(part.slot)) {
       final required = plan.phrase[at[i]];
       final owed = plan.modifier[at[i]];
@@ -1130,15 +1258,30 @@ _Built _compose(
     reported.add(text);
     slots.add(part.slot);
     used += gap + headCost + text.length + tail.length;
+
+    // The opening capital belongs to the name too, so what the detail reports is
+    // what the sentence shows.
+    if (proper[i] != null && proper[i]!.isEmpty && text != phrase) {
+      names[names.length - 1] = text;
+    }
   }
+
+  // A sentence whose subject is a name carries that name forward; one whose
+  // subject was dropped carries forward what it was already handed.
+  final carried =
+      named
+          ? reported[slots.indexOf(SentenceSlot.subject)]
+          : (subject?.noun ?? (pronoun != null && pronoun.isNotEmpty ? follow!.topic.noun : null));
 
   return _Built(
     written.join(data.space) + data.terminator,
     reported,
     slots,
-    subject?.theme,
-    subject?.noun ?? (pronoun != null && pronoun.isNotEmpty ? follow!.topic.noun : null),
-    subject != null ? gender : (pronoun != null ? follow!.topic.gender : null),
+    names,
+    named ? null : subject?.theme,
+    carried,
+    subject != null || named ? gender : (pronoun != null ? follow!.topic.gender : null),
+    named || (pronoun != null && (follow?.topic.named ?? false)),
   );
 }
 
@@ -1176,13 +1319,22 @@ String _predicateFor(
 /// happened to land together.
 List<WordTheme> _subjectThemesFor(_Settings settings, _Follow? follow) {
   final requested = settings.theme == null ? wordThemes : <WordTheme>[settings.theme!];
+  // A name can only stand where a person would, so asking for one narrows the
+  // subject to the themes that name people. A theme the caller named themselves
+  // still wins — a request for animals with `includeName` is a sentence about a
+  // lion, not about somebody the lion reminded us of.
+  final wanted =
+      settings.includeName
+          ? _themesForClasses(requested, const <NounClass>[NounClass.person])
+          : requested;
+  final themes = wanted.isNotEmpty ? wanted : requested;
   final topicClass = follow?.topic.nounClass;
 
-  if (topicClass == null) return requested;
+  if (topicClass == null) return themes;
 
-  final inClass = _themesForClasses(requested, <NounClass>[topicClass]);
+  final inClass = _themesForClasses(themes, <NounClass>[topicClass]);
 
-  return inClass.isNotEmpty ? inClass : requested;
+  return inClass.isNotEmpty ? inClass : themes;
 }
 
 _Built _generateOne(
@@ -1390,7 +1542,15 @@ _Topic? _topicOf(_Built built) {
 
   final theme = built.theme;
 
-  return _Topic(noun, theme, theme == null ? null : themeClass[theme], built.gender);
+  return _Topic(
+    noun,
+    theme,
+    // A name is in no pool and so has no theme, but it is a person all the same,
+    // which is the whole of what a later sentence needs to stay on topic.
+    built.named ? NounClass.person : (theme == null ? null : themeClass[theme]),
+    built.gender,
+    built.named,
+  );
 }
 
 /// The pronouns the language can stand in for this topic with.
@@ -1522,6 +1682,7 @@ List<SentenceDetail> generateSentenceDetails({
   String? startsWith,
   bool unique = false,
   int sentences = 1,
+  bool includeName = false,
 }) {
   final settings = _Settings(
     theme: theme,
@@ -1533,6 +1694,8 @@ List<SentenceDetail> generateSentenceDetails({
     prefix: resolvePrefix(startsWith),
     include: include.map((word) => word.trim()).where((word) => word.isNotEmpty).toList(),
     sentences: clampInt(sentences, 1, randSentenceCountMax),
+    realism: realism,
+    includeName: includeName,
   );
 
   return collect<SentenceDetail>(
@@ -1551,6 +1714,7 @@ List<SentenceDetail> generateSentenceDetails({
         // Unmodifiable, and a copy: the frames are the language's own, so a
         // caller reading the detail must not be able to reach into them.
         slots: List<SentenceSlot>.unmodifiable(built.expand((one) => one.slots)),
+        names: List<String>.unmodifiable(built.expand((one) => one.names)),
         language: code,
         // What the result is about is what its first sentence was about; the
         // ones after it stay inside that noun's class.

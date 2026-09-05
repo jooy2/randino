@@ -1,6 +1,8 @@
 import 'package:randino/randino.dart';
 // The datasets are internal, but a sentence is only as good as the grammar
 // behind it — these checks read the pools a sentence is allowed to draw from.
+import 'package:randino/src/name/data/index.dart';
+import 'package:randino/src/name/data/types.dart';
 import 'package:randino/src/sentence/data/index.dart';
 import 'package:randino/src/sentence/data/types.dart';
 import 'package:randino/src/sentence/sentence_generator.dart';
@@ -184,6 +186,19 @@ WordTheme? themeOfNoun(WordLanguage language, String noun) {
   }
 
   return null;
+}
+
+/// The given names the language can write, by gender — the pools `randSentence`
+/// reaches through `includeName`.
+///
+/// CJK languages keep whole given names under `givenMale` / `givenFemale`; the
+/// others draw from `male` / `female`.
+Set<String> givenNames(WordLanguage language, NameGender gender) {
+  final data = nameData[NameLanguage.values.byName(language.name)]!;
+  final pool =
+      gender == NameGender.male ? (data.givenMale ?? data.male) : (data.givenFemale ?? data.female);
+
+  return <String>{for (final entry in pool ?? const <NameEntry>[]) entry.n};
 }
 
 void main() {
@@ -796,6 +811,158 @@ void main() {
             isNotNull,
             reason: '$language: nothing stands in for a $gender subject',
           );
+        }
+      }
+    });
+
+    test('`includeName` writes a person\'s name where a sentence has room for one', () {
+      for (final language in wordLanguages) {
+        final space = sentenceData[language]!.space;
+
+        for (final detail in randSentenceDetails(
+          language: language,
+          includeName: true,
+          count: sample,
+        )) {
+          expect(detail.names, isNotEmpty, reason: '$language: no name in ${detail.sentence}');
+
+          for (final name in detail.names) {
+            expect(detail.phrases, contains(name), reason: '$language: $name is not a phrase');
+            expect(detail.sentence, contains(name));
+          }
+
+          // A name is a bare proper noun, so nothing opens the phrase it stands in.
+          final at = detail.slots.indexOf(SentenceSlot.subject);
+
+          if (at >= 0 && detail.names.contains(detail.phrases[at])) {
+            for (final article in articlesFor(language)) {
+              expect(
+                detail.sentence.contains('$article$space${detail.phrases[at]}'),
+                isFalse,
+                reason: '$language: "$article" in front of a name (${detail.sentence})',
+              );
+            }
+          }
+        }
+      }
+
+      // Off by default, and the pools are not reached at all.
+      for (final detail in randSentenceDetails(count: 60)) {
+        expect(detail.names, isEmpty, reason: detail.sentence);
+      }
+    });
+
+    test('a name comes out of the language`s own given-name pools', () {
+      for (final language in wordLanguages) {
+        final known = <String>{
+          ...givenNames(language, NameGender.male),
+          ...givenNames(language, NameGender.female),
+        };
+
+        for (final detail in randSentenceDetails(
+          language: language,
+          includeName: true,
+          count: sample,
+        )) {
+          for (final name in detail.names) {
+            // English writes its pools capitalized and a sentence opens on a
+            // capital, so the name is looked up the way the pool holds it.
+            expect(
+              known.contains(name) || known.contains(upperFirst(name)),
+              isTrue,
+              reason: '$language: "$name" is in no given-name pool (${detail.sentence})',
+            );
+          }
+        }
+      }
+    });
+
+    test('a theme the caller named wins over `includeName`', () {
+      // A name can only stand where a person would. Asked for beside a theme that
+      // names no people, the sentence is about that theme and carries no name.
+      for (final detail in randSentenceDetails(
+        language: WordLanguage.en,
+        theme: WordTheme.animal,
+        includeName: true,
+        count: sample,
+      )) {
+        expect(detail.theme, WordTheme.animal, reason: detail.sentence);
+        expect(detail.names, isEmpty, reason: detail.sentence);
+      }
+    });
+
+    test('a predicate agrees with the gender of the name it describes', () {
+      // The one thing a name has to carry beside its letters. Spanish, Italian and
+      // Russian inflect a predicate adjective, and a name is in no pool for
+      // `genderOf` to read a gender out of.
+      for (final language in wordLanguages) {
+        final data = sentenceData[language]!;
+        final lexicon = wordData[language]!;
+
+        if (!data.predicateAgrees || lexicon.agreement == null) continue;
+
+        final male = givenNames(language, NameGender.male);
+        final female = givenNames(language, NameGender.female);
+        final states = <String>[for (final group in data.states) ...group.words];
+        final forms = <WordGender, Set<String>>{
+          for (final gender in <WordGender>[WordGender.m, WordGender.f])
+            gender: <String>{for (final word in states) agree(lexicon, word, gender)},
+        };
+        var checked = 0;
+
+        for (final detail in randSentenceDetails(
+          language: language,
+          includeName: true,
+          slots: <SentenceSlot>{SentenceSlot.state},
+          count: 200,
+        )) {
+          final at = detail.slots.indexOf(SentenceSlot.state);
+          final subject = detail.phrases[detail.slots.indexOf(SentenceSlot.subject)];
+
+          if (at < 0 || !detail.names.contains(subject)) continue;
+
+          final gender =
+              male.contains(subject)
+                  ? WordGender.m
+                  : (female.contains(subject) ? WordGender.f : null);
+
+          if (gender == null) continue;
+
+          checked += 1;
+
+          expect(
+            forms[gender]!.contains(detail.phrases[at]),
+            isTrue,
+            reason:
+                '$language: "${detail.phrases[at]}" does not agree with $subject (${detail.sentence})',
+          );
+        }
+
+        expect(checked, greaterThan(0), reason: '$language: no named subject was described');
+      }
+    });
+
+    test('Korean picks the particle a name asks for too', () {
+      for (final detail in randSentenceDetails(
+        language: WordLanguage.ko,
+        includeName: true,
+        count: 200,
+      )) {
+        final at = detail.slots.indexOf(SentenceSlot.subject);
+        final name = detail.phrases[at];
+
+        if (!detail.names.contains(name)) continue;
+
+        final after = detail.sentence[detail.sentence.indexOf(name) + name.length];
+        final last = name.codeUnitAt(name.length - 1);
+        final coda = last >= 0xac00 && last <= 0xd7a3 && (last - 0xac00) % 28 != 0;
+
+        if (after == '가' || after == '는') {
+          expect(coda, isFalse, reason: '$name$after (${detail.sentence})');
+        }
+
+        if (after == '이' || after == '은') {
+          expect(coda, isTrue, reason: '$name$after (${detail.sentence})');
         }
       }
     });

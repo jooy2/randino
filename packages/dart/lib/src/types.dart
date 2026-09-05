@@ -347,6 +347,7 @@ class SentenceDetail {
     required this.sentences,
     required this.phrases,
     required this.slots,
+    required this.names,
     required this.language,
     required this.theme,
   });
@@ -370,6 +371,12 @@ class SentenceDetail {
 
   /// What each phrase does in the sentence, at the same index as [phrases].
   final List<SentenceSlot> slots;
+
+  /// The person names the result was written with, in order.
+  ///
+  /// Empty unless `includeName` asked for them. Every one of them is also a
+  /// phrase.
+  final List<String> names;
 
   /// The language this sentence was generated in.
   final WordLanguage language;
