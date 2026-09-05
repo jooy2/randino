@@ -10,7 +10,7 @@ final NameLanguageData ja = NameLanguageData(
   hasMiddle: false,
   roman: RomanMode.token,
   lengthSpec: NameLengthSpec(
-    given: LengthRange(2, 2),
+    given: LengthRange(2, 3),
     last: LengthRange(1, 3),
     middle: LengthRange(0, 0),
   ),
@@ -35,8 +35,9 @@ final NameLanguageData ja = NameLanguageData(
   '''),
   // Whole given names, romanized the way the reading is actually written, so the
   // `RandRealism.real` hands out names people have rather than assembled
-  // kanji. Two- and three-character names only: `givenLenWeights` never asks for a
-  // one-character name, and the syllable pools below still cover every length.
+  // kanji. The pool holds one-character names too (湊, 蓮, 樹), but
+  // `givenLenWeights` asks only for two and three, so `lengthSpec` says two and
+  // three: what is declared is what comes out, not what the pool happens to hold.
   givenMale: tokenPool(r'''
     陽翔:Haruto 悠真:Yuma 大翔:Hiroto 湊斗:Minato 朝陽:Asahi 蒼空:Sora 颯太:Sota
     大和:Yamato 陸斗:Rikuto 大輝:Daiki 拓海:Takumi 翔太:Shota 直樹:Naoki 和也:Kazuya

@@ -9,7 +9,7 @@ RU = NameLanguageData(
     joiner=" ",
     has_middle=True,
     roman="translit",
-    length_spec=NameLengthSpec(given=(5, 11), last=(6, 9), middle=(10, 14)),
+    length_spec=NameLengthSpec(given=(3, 11), last=(4, 11), middle=(5, 14)),
     # Every surname here is the masculine form; `feminize_ru` derives the feminine
     # one, so a new entry has to end in -ов / -ев / -ёв / -ин / -ын / -ский / -ой.
     last=words("""

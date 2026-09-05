@@ -7,7 +7,7 @@ export const ES: NameLanguageData = {
 	joiner: ' ',
 	hasMiddle: true,
 	roman: 'fold',
-	lengthSpec: { given: [6, 10], last: [5, 10], middle: [6, 10] },
+	lengthSpec: { given: [3, 10], last: [3, 9], middle: [3, 10] },
 	last: words(`
 		García Rodríguez González Fernández López Martínez Sánchez Pérez Gómez Martín
 		Jiménez Ruiz Hernández Díaz Moreno Álvarez Romero Alonso Gutiérrez Navarro

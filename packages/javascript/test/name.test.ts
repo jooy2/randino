@@ -2,6 +2,8 @@ import assert from 'assert';
 import { describe, it } from 'node:test';
 import {
 	RAND_COUNT_MAX,
+	RAND_LENGTH_MAX,
+	RAND_LENGTH_MIN,
 	NAME_LANGUAGES,
 	nameLengthRange,
 	nameSupportsMiddleName,
@@ -19,6 +21,9 @@ import { romanizeHangul } from '../dist/name/romanize.js';
 // must have — script, structure, length, requested prefix — over a sample large
 // enough that a broken option cannot pass by luck.
 const SAMPLE = 60;
+// For the checks that have to see a pool's rarest entry rather than its typical
+// one, where sixty draws would miss it.
+const WIDE = 400;
 
 // A name may be a single part or several joined by a single space.
 const joined = (part: string) => new RegExp(`^${part}+( ${part}+)*$`, 'u');
@@ -133,13 +138,20 @@ describe('Name', () => {
 			assert.strictEqual(name.split(' ').length, 1, name);
 		}
 
-		// Korean keeps its own default range: one syllable of surname plus two of
-		// given name.
-		for (const name of randName({ language: 'ko', count: SAMPLE })) {
+		// Korean writes one syllable of surname in front of one or two of given
+		// name. Pinning the length is what makes the surname countable: at three
+		// syllables the given name is two, and dropping the surname leaves two.
+		for (const name of randName({ language: 'ko', count: SAMPLE, minLength: 3, maxLength: 3 })) {
 			assert.strictEqual(name.length, 3, name);
 		}
 
-		for (const name of randName({ language: 'ko', count: SAMPLE, includeSurname: false })) {
+		for (const name of randName({
+			language: 'ko',
+			count: SAMPLE,
+			includeSurname: false,
+			minLength: 2,
+			maxLength: 2
+		})) {
 			assert.strictEqual(name.length, 2, name);
 		}
 	});
@@ -162,8 +174,11 @@ describe('Name', () => {
 		assert.strictEqual(nameSupportsMiddleName('ko'), false);
 		assert.strictEqual(nameSupportsMiddleName('en'), true);
 
+		const [low, high] = nameLengthRange('ko');
+
 		for (const name of randName({ language: 'ko', count: SAMPLE, includeMiddleName: true })) {
-			assert.strictEqual(name.length, 3, name);
+			assert.ok(name.length >= low && name.length <= high, name);
+			assert.strictEqual(name.split(' ').length, 1, name);
 		}
 	});
 
@@ -210,6 +225,62 @@ describe('Name', () => {
 					name.length >= minLength && name.length <= maxLength,
 					`${language} ${minLength}-${maxLength}: ${name} (${name.length})`
 				);
+			}
+		}
+	});
+
+	it('the default range is what the pools can actually produce', () => {
+		// `lengthSpec` is the one hand-written number in a language's dataset, and a
+		// wrong one is silent: too narrow and the generator re-draws real names
+		// away, too wide and it aims at lengths nothing can spell. `en` used to
+		// declare given names of four to eight characters over a pool that runs
+		// from three to ten.
+		const spanOf = (pool: readonly (string | { n: string })[]): [number, number] => {
+			const lengths = pool.map((item) => (typeof item === 'string' ? item : item.n).length);
+
+			return [Math.min(...lengths), Math.max(...lengths)];
+		};
+
+		for (const language of NAME_LANGUAGES) {
+			const data = NAME_DATA[language];
+
+			// Checked against the pools where the pools are the whole story. A CJK
+			// given name is capped by its weight table as well — Japanese holds
+			// one-character given names and never draws one — and a Russian surname
+			// comes out longer than the pool entry it was feminized from.
+			if (!data.givenLenWeights) {
+				const given = spanOf([...data.male!, ...data.female!]);
+
+				assert.deepStrictEqual(nameLengthRange(language, false), given);
+
+				if (data.roman !== 'translit') {
+					const last = spanOf(data.last);
+					const gap = data.joiner.length;
+
+					assert.deepStrictEqual(nameLengthRange(language), [
+						given[0] + last[0] + gap,
+						given[1] + last[1] + gap
+					]);
+				}
+			}
+
+			// And whatever is switched on, a draw let loose of the range still lands
+			// inside the one the language declares.
+			for (const includeMiddleName of [false, true]) {
+				const [low, high] = nameLengthRange(language, true, includeMiddleName);
+
+				for (const name of randName({
+					language,
+					includeMiddleName,
+					minLength: RAND_LENGTH_MIN,
+					maxLength: RAND_LENGTH_MAX,
+					count: WIDE
+				})) {
+					assert.ok(
+						name.length >= low && name.length <= high,
+						`${language}: ${name} (${name.length}) outside [${low}, ${high}]`
+					);
+				}
 			}
 		}
 	});
@@ -300,13 +371,13 @@ describe('Name', () => {
 	});
 
 	it('omitted length bounds fall back to the language default', () => {
-		assert.deepStrictEqual(nameLengthRange('ko'), [3, 3]);
-		assert.deepStrictEqual(nameLengthRange('ko', false), [2, 2]);
-		assert.deepStrictEqual(nameLengthRange('en'), [8, 16]);
-		assert.deepStrictEqual(nameLengthRange('en', false), [4, 8]);
-		assert.deepStrictEqual(nameLengthRange('en', true, true), [12, 24]);
+		assert.deepStrictEqual(nameLengthRange('ko'), [2, 3]);
+		assert.deepStrictEqual(nameLengthRange('ko', false), [1, 2]);
+		assert.deepStrictEqual(nameLengthRange('en'), [7, 21]);
+		assert.deepStrictEqual(nameLengthRange('en', false), [3, 10]);
+		assert.deepStrictEqual(nameLengthRange('en', true, true), [11, 32]);
 		// A middle name the language does not have cannot widen the range.
-		assert.deepStrictEqual(nameLengthRange('ko', true, true), [3, 3]);
+		assert.deepStrictEqual(nameLengthRange('ko', true, true), [2, 3]);
 
 		for (const language of NAME_LANGUAGES) {
 			const [min, max] = nameLengthRange(language);

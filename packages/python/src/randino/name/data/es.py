@@ -9,7 +9,7 @@ ES = NameLanguageData(
     joiner=" ",
     has_middle=True,
     roman="fold",
-    length_spec=NameLengthSpec(given=(6, 10), last=(5, 10), middle=(6, 10)),
+    length_spec=NameLengthSpec(given=(3, 10), last=(3, 9), middle=(3, 10)),
     last=words("""
         García Rodríguez González Fernández López Martínez Sánchez Pérez Gómez Martín
         Jiménez Ruiz Hernández Díaz Moreno Álvarez Romero Alonso Gutiérrez Navarro

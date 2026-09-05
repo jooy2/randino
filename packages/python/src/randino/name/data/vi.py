@@ -9,7 +9,7 @@ VI = NameLanguageData(
     joiner=" ",
     has_middle=True,
     roman="fold",
-    length_spec=NameLengthSpec(given=(2, 6), last=(3, 7), middle=(3, 6)),
+    length_spec=NameLengthSpec(given=(1, 6), last=(2, 6), middle=(2, 6)),
     # Share of the population carrying each surname, in tenths of a percent. No
     # language in the set is more lopsided: two Vietnamese names in five are a
     # Nguyễn, so drawing the thirty surnames evenly is the most visible skew there

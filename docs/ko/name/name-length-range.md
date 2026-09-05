@@ -7,10 +7,10 @@
 ```javascript
 import { nameLengthRange } from 'randino';
 
-nameLengthRange('ko'); // [3, 3]
-nameLengthRange('ko', false); // [2, 2]
-nameLengthRange('en'); // [8, 16]
-nameLengthRange('en', true, true); // [12, 24]
+nameLengthRange('ko'); // [2, 3]
+nameLengthRange('ko', false); // [1, 2]
+nameLengthRange('en'); // [7, 21]
+nameLengthRange('en', true, true); // [11, 32]
 ```
 
 | 파라미터            | 타입                 | 기본값  | 설명                                  |
@@ -28,10 +28,10 @@ nameLengthRange('en', true, true); // [12, 24]
 ```dart
 import 'package:randino/randino.dart';
 
-nameLengthRange(language: NameLanguage.ko); // LengthRange(3, 3)
-nameLengthRange(language: NameLanguage.ko, includeSurname: false); // LengthRange(2, 2)
-nameLengthRange(language: NameLanguage.en); // LengthRange(8, 16)
-nameLengthRange(language: NameLanguage.en, includeMiddleName: true); // LengthRange(12, 24)
+nameLengthRange(language: NameLanguage.ko); // LengthRange(2, 3)
+nameLengthRange(language: NameLanguage.ko, includeSurname: false); // LengthRange(1, 2)
+nameLengthRange(language: NameLanguage.en); // LengthRange(7, 21)
+nameLengthRange(language: NameLanguage.en, includeMiddleName: true); // LengthRange(11, 32)
 ```
 
 | 파라미터            | 타입            | 기본값  | 설명                                  |
@@ -40,7 +40,7 @@ nameLengthRange(language: NameLanguage.en, includeMiddleName: true); // LengthRa
 | `includeSurname`    | `bool`          | `true`  | 성을 길이에 포함                      |
 | `includeMiddleName` | `bool`          | `false` | 중간 이름이 있는 언어라면 길이에 포함 |
 
-값으로 비교되는 `LengthRange`를 반환합니다. `nameLengthRange(language: NameLanguage.ko) == const LengthRange(3, 3)`은 `true`입니다.
+값으로 비교되는 `LengthRange`를 반환합니다. `nameLengthRange(language: NameLanguage.ko) == const LengthRange(2, 3)`은 `true`입니다.
 
 :::
 
@@ -49,10 +49,10 @@ nameLengthRange(language: NameLanguage.en, includeMiddleName: true); // LengthRa
 ```python
 from randino import name_length_range
 
-name_length_range("ko")  # (3, 3)
-name_length_range("ko", include_surname=False)  # (2, 2)
-name_length_range("en")  # (8, 16)
-name_length_range("en", include_middle_name=True)  # (12, 24)
+name_length_range("ko")  # (2, 3)
+name_length_range("ko", include_surname=False)  # (1, 2)
+name_length_range("en")  # (7, 21)
+name_length_range("en", include_middle_name=True)  # (11, 32)
 ```
 
 | 파라미터              | 타입                 | 기본값  | 설명                                  |
@@ -72,7 +72,7 @@ name_length_range("en", include_middle_name=True)  # (12, 24)
 ::: lang js
 
 ```javascript
-nameLengthRange('ko', true, true); // [3, 3] — 한국어에는 중간 이름이 없습니다
+nameLengthRange('ko', true, true); // [2, 3] — 한국어에는 중간 이름이 없습니다
 ```
 
 :::
@@ -81,7 +81,7 @@ nameLengthRange('ko', true, true); // [3, 3] — 한국어에는 중간 이름�
 
 ```dart
 nameLengthRange(language: NameLanguage.ko, includeMiddleName: true);
-// LengthRange(3, 3) — 한국어에는 중간 이름이 없습니다
+// LengthRange(2, 3) — 한국어에는 중간 이름이 없습니다
 ```
 
 :::
@@ -90,7 +90,7 @@ nameLengthRange(language: NameLanguage.ko, includeMiddleName: true);
 
 ```python
 name_length_range("ko", include_middle_name=True)
-# (3, 3) — 한국어에는 중간 이름이 없습니다
+# (2, 3) — 한국어에는 중간 이름이 없습니다
 ```
 
 :::

@@ -7,7 +7,7 @@ export const VI: NameLanguageData = {
 	joiner: ' ',
 	hasMiddle: true,
 	roman: 'fold',
-	lengthSpec: { given: [2, 6], last: [3, 7], middle: [3, 6] },
+	lengthSpec: { given: [1, 6], last: [2, 6], middle: [2, 6] },
 	// Share of the population carrying each surname, in tenths of a percent. No
 	// language in the set is more lopsided: two Vietnamese names in five are a
 	// Nguyễn, so drawing the thirty surnames evenly is the most visible skew there

@@ -7,10 +7,10 @@ The natural length range of a full name in that language, in characters of the n
 ```javascript
 import { nameLengthRange } from 'randino';
 
-nameLengthRange('ko'); // [3, 3]
-nameLengthRange('ko', false); // [2, 2]
-nameLengthRange('en'); // [8, 16]
-nameLengthRange('en', true, true); // [12, 24]
+nameLengthRange('ko'); // [2, 3]
+nameLengthRange('ko', false); // [1, 2]
+nameLengthRange('en'); // [7, 21]
+nameLengthRange('en', true, true); // [11, 32]
 ```
 
 | Parameter | Type | Default | Description |
@@ -28,10 +28,10 @@ Returns `[min, max]`.
 ```dart
 import 'package:randino/randino.dart';
 
-nameLengthRange(language: NameLanguage.ko); // LengthRange(3, 3)
-nameLengthRange(language: NameLanguage.ko, includeSurname: false); // LengthRange(2, 2)
-nameLengthRange(language: NameLanguage.en); // LengthRange(8, 16)
-nameLengthRange(language: NameLanguage.en, includeMiddleName: true); // LengthRange(12, 24)
+nameLengthRange(language: NameLanguage.ko); // LengthRange(2, 3)
+nameLengthRange(language: NameLanguage.ko, includeSurname: false); // LengthRange(1, 2)
+nameLengthRange(language: NameLanguage.en); // LengthRange(7, 21)
+nameLengthRange(language: NameLanguage.en, includeMiddleName: true); // LengthRange(11, 32)
 ```
 
 | Parameter | Type | Default | Description |
@@ -40,7 +40,7 @@ nameLengthRange(language: NameLanguage.en, includeMiddleName: true); // LengthRa
 | `includeSurname` | `bool` | `true` | Count the family name |
 | `includeMiddleName` | `bool` | `false` | Count a middle name, where the language has one |
 
-Returns a `LengthRange`, which compares by value — `nameLengthRange(language: NameLanguage.ko) == const LengthRange(3, 3)` is `true`.
+Returns a `LengthRange`, which compares by value — `nameLengthRange(language: NameLanguage.ko) == const LengthRange(2, 3)` is `true`.
 
 :::
 
@@ -49,10 +49,10 @@ Returns a `LengthRange`, which compares by value — `nameLengthRange(language: 
 ```python
 from randino import name_length_range
 
-name_length_range("ko")  # (3, 3)
-name_length_range("ko", include_surname=False)  # (2, 2)
-name_length_range("en")  # (8, 16)
-name_length_range("en", include_middle_name=True)  # (12, 24)
+name_length_range("ko")  # (2, 3)
+name_length_range("ko", include_surname=False)  # (1, 2)
+name_length_range("en")  # (7, 21)
+name_length_range("en", include_middle_name=True)  # (11, 32)
 ```
 
 | Parameter | Type | Default | Description |
@@ -72,7 +72,7 @@ Which is the part worth knowing. Dropping the surname relaxes the range rather t
 ::: lang js
 
 ```javascript
-nameLengthRange('ko', true, true); // [3, 3] — Korean has no middle name
+nameLengthRange('ko', true, true); // [2, 3] — Korean has no middle name
 ```
 
 :::
@@ -81,7 +81,7 @@ nameLengthRange('ko', true, true); // [3, 3] — Korean has no middle name
 
 ```dart
 nameLengthRange(language: NameLanguage.ko, includeMiddleName: true);
-// LengthRange(3, 3) — Korean has no middle name
+// LengthRange(2, 3) — Korean has no middle name
 ```
 
 :::
@@ -90,7 +90,7 @@ nameLengthRange(language: NameLanguage.ko, includeMiddleName: true);
 
 ```python
 name_length_range("ko", include_middle_name=True)
-# (3, 3) — Korean has no middle name
+# (2, 3) — Korean has no middle name
 ```
 
 :::

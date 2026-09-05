@@ -25,7 +25,7 @@ final NameLanguageData ko = NameLanguageData(
   hasMiddle: false,
   roman: RomanMode.hangul,
   lengthSpec: NameLengthSpec(
-    given: LengthRange(2, 2),
+    given: LengthRange(1, 2),
     last: LengthRange(1, 1),
     middle: LengthRange(0, 0),
   ),

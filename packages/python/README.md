@@ -231,8 +231,8 @@ With no `language`, the script of the value picks one, so `"고양이"` is never
 ```python
 from randino import name_length_range, name_supports_roman, nickname_length_range
 
-name_length_range("ko")  # (3, 3)
-name_length_range("en", include_middle_name=True)  # (12, 24)
+name_length_range("ko")  # (2, 3)
+name_length_range("en", include_middle_name=True)  # (11, 32)
 name_supports_middle_name("ko")  # False
 name_supports_roman("en")  # False
 nickname_length_range("ko")  # (1, 13)

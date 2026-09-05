@@ -79,12 +79,17 @@ class SyllableSet {
   final int maxSyllables;
 }
 
-/// Character span of each part of a full name, joiner included.
+/// Character span of each part of a full name: the shortest and longest that
+/// part can actually come out, joiner excluded.
 ///
-/// Summing the parts that are actually switched on yields a default length
-/// range that matches the requested structure, so turning a surname or middle
-/// name off relaxes the range instead of forcing the remaining parts to stretch
-/// and fill it.
+/// `nameLengthRange` adds a joiner per part it switches on. Summing the parts
+/// that are switched on yields a default length range that matches the requested
+/// structure, so turning a surname or middle name off relaxes the range instead
+/// of forcing the remaining parts to stretch and fill it.
+///
+/// These are measured, not estimated. A span narrower than the pools produces
+/// names the default range calls too long, and a wider one leaves the generator
+/// re-drawing for a length nothing can reach.
 class NameLengthSpec {
   /// Creates a length spec.
   const NameLengthSpec({required this.given, required this.last, required this.middle});
@@ -92,10 +97,10 @@ class NameLengthSpec {
   /// Span of the given name.
   final LengthRange given;
 
-  /// Span of the surname, the joiner in front of it included.
+  /// Span of the surname.
   final LengthRange last;
 
-  /// Span of the middle name, the joiner in front of it included.
+  /// Span of the middle name.
   final LengthRange middle;
 }
 

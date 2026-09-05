@@ -21,7 +21,7 @@ KO = NameLanguageData(
     joiner="",
     has_middle=False,
     roman="hangul",
-    length_spec=NameLengthSpec(given=(2, 2), last=(1, 1), middle=(0, 0)),
+    length_spec=NameLengthSpec(given=(1, 2), last=(1, 1), middle=(0, 0)),
     # Weighted to reality: two-syllable given names dominate, one- and
     # three-syllable ones are the exception.
     given_len_weights={1: 4, 2: 92, 3: 4},

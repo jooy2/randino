@@ -19,7 +19,7 @@ export const KO: NameLanguageData = {
 	joiner: '',
 	hasMiddle: false,
 	roman: 'hangul',
-	lengthSpec: { given: [2, 2], last: [1, 1], middle: [0, 0] },
+	lengthSpec: { given: [1, 2], last: [1, 1], middle: [0, 0] },
 	// Weighted to reality: two-syllable given names dominate, one- and
 	// three-syllable ones are the exception.
 	givenLenWeights: { 1: 4, 2: 92, 3: 4 },

@@ -215,8 +215,8 @@ With no `language`, the script of the value picks one, so `'고양이'` is never
 ## Helpers and constants
 
 ```dart
-nameLengthRange(language: NameLanguage.ko); // LengthRange(3, 3)
-nameLengthRange(language: NameLanguage.en, includeMiddleName: true); // LengthRange(12, 24)
+nameLengthRange(language: NameLanguage.ko); // LengthRange(2, 3)
+nameLengthRange(language: NameLanguage.en, includeMiddleName: true); // LengthRange(11, 32)
 nameSupportsMiddleName(NameLanguage.ko); // false
 nameSupportsRoman(NameLanguage.en); // false
 nicknameLengthRange(language: WordLanguage.ko); // LengthRange(1, 13)

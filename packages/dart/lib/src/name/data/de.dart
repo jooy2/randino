@@ -11,9 +11,9 @@ final NameLanguageData de = NameLanguageData(
   hasMiddle: true,
   roman: RomanMode.fold,
   lengthSpec: NameLengthSpec(
-    given: LengthRange(5, 10),
-    last: LengthRange(5, 8),
-    middle: LengthRange(5, 9),
+    given: LengthRange(3, 10),
+    last: LengthRange(4, 10),
+    middle: LengthRange(3, 10),
   ),
   last: pool(r'''
     Müller Schmidt Schneider Fischer Weber Meyer Wagner Becker Schulz Hoffmann

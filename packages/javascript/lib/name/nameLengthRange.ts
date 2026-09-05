@@ -11,9 +11,9 @@ import { NAME_DATA, NAME_LANGUAGES } from './data/index.js';
  * to stretch and fill it.
  *
  * @example
- * nameLengthRange('ko'); // [3, 3]
- * nameLengthRange('ko', false); // [2, 2]
- * nameLengthRange('en'); // [8, 16]
+ * nameLengthRange('ko'); // [2, 3]
+ * nameLengthRange('ko', false); // [1, 2]
+ * nameLengthRange('en'); // [7, 21]
  */
 export function nameLengthRange(
 	language: NameLanguageOption = 'all',
@@ -30,14 +30,16 @@ export function nameLengthRange(
 		let low = given[0];
 		let high = given[1];
 
+		// Each part beyond the first brings the joiner with it: one space for the
+		// space-separated scripts, nothing for CJK.
 		if (includeSurname) {
-			low += last[0];
-			high += last[1];
+			low += last[0] + data.joiner.length;
+			high += last[1] + data.joiner.length;
 		}
 
 		if (includeMiddleName && data.hasMiddle) {
-			low += middle[0];
-			high += middle[1];
+			low += middle[0] + data.joiner.length;
+			high += middle[1] + data.joiner.length;
 		}
 
 		min = Math.min(min, low);

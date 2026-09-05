@@ -12,9 +12,9 @@ final NameLanguageData vi = NameLanguageData(
   hasMiddle: true,
   roman: RomanMode.fold,
   lengthSpec: NameLengthSpec(
-    given: LengthRange(2, 6),
-    last: LengthRange(3, 7),
-    middle: LengthRange(3, 6),
+    given: LengthRange(1, 6),
+    last: LengthRange(2, 6),
+    middle: LengthRange(2, 6),
   ),
   // Share of the population carrying each surname, in tenths of a percent. No
   // language in the set is more lopsided: two Vietnamese names in five are a

@@ -247,8 +247,8 @@ import {
 	WORD_THEMES
 } from 'randino';
 
-nameLengthRange('ko'); // [3, 3]
-nameLengthRange('en', true, true); // [12, 24]
+nameLengthRange('ko'); // [2, 3]
+nameLengthRange('en', true, true); // [11, 32]
 nameSupportsMiddleName('ko'); // false
 nameSupportsRoman('en'); // false
 nicknameLengthRange('ko'); // [1, 13]

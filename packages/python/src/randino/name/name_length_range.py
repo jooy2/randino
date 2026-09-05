@@ -20,11 +20,11 @@ def name_length_range(
 
     Example:
         >>> name_length_range("ko")
-        (3, 3)
+        (2, 3)
         >>> name_length_range("ko", False)
-        (2, 2)
+        (1, 2)
         >>> name_length_range("en")
-        (8, 16)
+        (7, 21)
     """
     languages = NAME_LANGUAGES if language == "all" else (language,)
     low = RAND_LENGTH_MAX
@@ -35,13 +35,15 @@ def name_length_range(
         given, last, middle = data.length_spec.given, data.length_spec.last, data.length_spec.middle
         shortest, longest = given
 
+        # Each part beyond the first brings the joiner with it: one space for the
+        # space-separated scripts, nothing for CJK.
         if include_surname:
-            shortest += last[0]
-            longest += last[1]
+            shortest += last[0] + len(data.joiner)
+            longest += last[1] + len(data.joiner)
 
         if include_middle_name and data.has_middle:
-            shortest += middle[0]
-            longest += middle[1]
+            shortest += middle[0] + len(data.joiner)
+            longest += middle[1] + len(data.joiner)
 
         low = min(low, shortest)
         high = max(high, longest)

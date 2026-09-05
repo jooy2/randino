@@ -9,7 +9,7 @@ DE = NameLanguageData(
     joiner=" ",
     has_middle=True,
     roman="fold",
-    length_spec=NameLengthSpec(given=(5, 10), last=(5, 8), middle=(5, 9)),
+    length_spec=NameLengthSpec(given=(3, 10), last=(4, 10), middle=(3, 10)),
     last=words("""
         Müller Schmidt Schneider Fischer Weber Meyer Wagner Becker Schulz Hoffmann
         Schäfer Koch Bauer Richter Klein Wolf Schröder Neumann Schwarz Zimmermann Braun

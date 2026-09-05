@@ -8,7 +8,7 @@ JA = NameLanguageData(
     joiner="",
     has_middle=False,
     roman="token",
-    length_spec=NameLengthSpec(given=(2, 2), last=(1, 3), middle=(0, 0)),
+    length_spec=NameLengthSpec(given=(2, 3), last=(1, 3), middle=(0, 0)),
     given_len_weights={2: 70, 3: 30},
     last=tokens("""
         佐藤:Sato 鈴木:Suzuki 高橋:Takahashi 田中:Tanaka 渡辺:Watanabe 伊藤:Ito
@@ -30,9 +30,9 @@ JA = NameLanguageData(
     """),
     # Whole given names, romanized the way the reading is actually written, so the
     # `realism="real"` hands out names people have rather than assembled
-    # kanji. Two- and three-character names only: `given_len_weights` never asks for
-    # a
-    # one-character name, and the syllable pools below still cover every length.
+    # kanji. The pool holds one-character names too (湊, 蓮, 樹), but
+    # `given_len_weights` asks only for two and three, so `length_spec` says two and
+    # three: what is declared is what comes out, not what the pool happens to hold.
     given_male=tokens("""
         陽翔:Haruto 悠真:Yuma 大翔:Hiroto 湊斗:Minato 朝陽:Asahi 蒼空:Sora 颯太:Sota
         大和:Yamato 陸斗:Rikuto 大輝:Daiki 拓海:Takumi 翔太:Shota 直樹:Naoki 和也:Kazuya

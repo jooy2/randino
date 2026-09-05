@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:randino/randino.dart';
 // Internal, so they get their own checks: everything else about a generated name
 // is random, but romanization is a pure function with known answers, and the
@@ -11,6 +13,10 @@ import 'package:test/test.dart';
 // must have — script, structure, length, requested prefix — over a sample large
 // enough that a broken option cannot pass by luck.
 const int sample = 60;
+
+// For the checks that have to see a pool's rarest entry rather than its typical
+// one, where sixty draws would miss it.
+const int wide = 400;
 
 // A name may be a single part or several joined by a single space.
 RegExp joined(String part) => RegExp('^$part+( $part+)*\$', unicode: true);
@@ -125,9 +131,15 @@ void main() {
         expect(name.split(' ').length, 1, reason: name);
       }
 
-      // Korean keeps its own default range: one syllable of surname plus two of
-      // given name.
-      for (final name in randName(language: NameLanguage.ko, count: sample)) {
+      // Korean writes one syllable of surname in front of one or two of given
+      // name. Pinning the length is what makes the surname countable: at three
+      // syllables the given name is two, and dropping the surname leaves two.
+      for (final name in randName(
+        language: NameLanguage.ko,
+        count: sample,
+        minLength: 3,
+        maxLength: 3,
+      )) {
         expect(name.length, 3, reason: name);
       }
 
@@ -135,6 +147,8 @@ void main() {
         language: NameLanguage.ko,
         count: sample,
         includeSurname: false,
+        minLength: 2,
+        maxLength: 2,
       )) {
         expect(name.length, 2, reason: name);
       }
@@ -156,12 +170,15 @@ void main() {
       expect(nameSupportsMiddleName(NameLanguage.ko), isFalse);
       expect(nameSupportsMiddleName(NameLanguage.en), isTrue);
 
+      final korean = nameLengthRange(language: NameLanguage.ko);
+
       for (final name in randName(
         language: NameLanguage.ko,
         count: sample,
         includeMiddleName: true,
       )) {
-        expect(name.length, 3, reason: name);
+        expect(name.length, inInclusiveRange(korean.min, korean.max), reason: name);
+        expect(name.split(' ').length, 1, reason: name);
       }
     });
 
@@ -239,6 +256,63 @@ void main() {
             inInclusiveRange(minLength, maxLength),
             reason: '${language.name} $minLength-$maxLength: $name',
           );
+        }
+      }
+    });
+
+    test('the default range is what the pools can actually produce', () {
+      // `lengthSpec` is the one hand-written number in a language's dataset, and a
+      // wrong one is silent: too narrow and the generator re-draws real names away,
+      // too wide and it aims at lengths nothing can spell. `en` used to declare
+      // given names of four to eight characters over a pool that runs from three
+      // to ten.
+      LengthRange spanOf(NamePool pool) {
+        final lengths = pool.map((entry) => entry.n.length);
+
+        return LengthRange(lengths.reduce(min), lengths.reduce(max));
+      }
+
+      for (final language in nameLanguages) {
+        final data = nameData[language]!;
+
+        // Checked against the pools where the pools are the whole story. A CJK
+        // given name is capped by its weight table as well — Japanese holds
+        // one-character given names and never draws one — and a Russian surname
+        // comes out longer than the pool entry it was feminized from.
+        if (data.givenLenWeights == null) {
+          final given = spanOf(<NameEntry>[...data.male!, ...data.female!]);
+
+          expect(nameLengthRange(language: language, includeSurname: false), given);
+
+          if (data.roman != RomanMode.translit) {
+            final last = spanOf(data.last);
+            final gap = data.joiner.length;
+
+            expect(
+              nameLengthRange(language: language),
+              LengthRange(given.min + last.min + gap, given.max + last.max + gap),
+            );
+          }
+        }
+
+        // And whatever is switched on, a draw let loose of the range still lands
+        // inside the one the language declares.
+        for (final includeMiddleName in <bool>[false, true]) {
+          final range = nameLengthRange(language: language, includeMiddleName: includeMiddleName);
+
+          for (final name in randName(
+            language: language,
+            includeMiddleName: includeMiddleName,
+            minLength: randLengthMin,
+            maxLength: randLengthMax,
+            count: wide,
+          )) {
+            expect(
+              name.length,
+              inInclusiveRange(range.min, range.max),
+              reason: '${language.name}: $name',
+            );
+          }
         }
       }
     });
@@ -329,24 +403,24 @@ void main() {
     });
 
     test('omitted length bounds fall back to the language default', () {
-      expect(nameLengthRange(language: NameLanguage.ko), const LengthRange(3, 3));
+      expect(nameLengthRange(language: NameLanguage.ko), const LengthRange(2, 3));
       expect(
         nameLengthRange(language: NameLanguage.ko, includeSurname: false),
-        const LengthRange(2, 2),
+        const LengthRange(1, 2),
       );
-      expect(nameLengthRange(language: NameLanguage.en), const LengthRange(8, 16));
+      expect(nameLengthRange(language: NameLanguage.en), const LengthRange(7, 21));
       expect(
         nameLengthRange(language: NameLanguage.en, includeSurname: false),
-        const LengthRange(4, 8),
+        const LengthRange(3, 10),
       );
       expect(
         nameLengthRange(language: NameLanguage.en, includeMiddleName: true),
-        const LengthRange(12, 24),
+        const LengthRange(11, 32),
       );
       // A middle name the language does not have cannot widen the range.
       expect(
         nameLengthRange(language: NameLanguage.ko, includeMiddleName: true),
-        const LengthRange(3, 3),
+        const LengthRange(2, 3),
       );
 
       for (final language in nameLanguages) {

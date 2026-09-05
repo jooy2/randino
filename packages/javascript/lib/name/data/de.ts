@@ -7,7 +7,7 @@ export const DE: NameLanguageData = {
 	joiner: ' ',
 	hasMiddle: true,
 	roman: 'fold',
-	lengthSpec: { given: [5, 10], last: [5, 8], middle: [5, 9] },
+	lengthSpec: { given: [3, 10], last: [4, 10], middle: [3, 10] },
 	last: words(`
 		Müller Schmidt Schneider Fischer Weber Meyer Wagner Becker Schulz Hoffmann
 		Schäfer Koch Bauer Richter Klein Wolf Schröder Neumann Schwarz Zimmermann Braun

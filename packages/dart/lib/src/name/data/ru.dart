@@ -11,9 +11,9 @@ final NameLanguageData ru = NameLanguageData(
   hasMiddle: true,
   roman: RomanMode.translit,
   lengthSpec: NameLengthSpec(
-    given: LengthRange(5, 11),
-    last: LengthRange(6, 9),
-    middle: LengthRange(10, 14),
+    given: LengthRange(3, 11),
+    last: LengthRange(4, 11),
+    middle: LengthRange(5, 14),
   ),
   // Every surname here is the masculine form; `feminizeRu` derives the feminine
   // one, so a new entry has to end in -ов / -ев / -ёв / -ин / -ын / -ский / -ой.

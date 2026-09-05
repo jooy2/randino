@@ -46,21 +46,26 @@ class SyllableSet:
 
 @dataclass(frozen=True, slots=True)
 class NameLengthSpec:
-    """Character span of each part of a full name, joiner included.
+    """Character span of each part of a full name, joiner excluded.
 
-    Summing the parts that are actually switched on yields a default length range
-    that matches the requested structure, so turning a surname or middle name off
-    relaxes the range instead of forcing the remaining parts to stretch and fill it.
+    `name_length_range` adds a joiner per part it switches on. Summing the parts
+    that are switched on yields a default length range that matches the requested
+    structure, so turning a surname or middle name off relaxes the range instead of
+    forcing the remaining parts to stretch and fill it.
+
+    These are measured, not estimated. A span narrower than the pools produces names
+    the default range calls too long, and a wider one leaves the generator re-drawing
+    for a length nothing can reach.
     """
 
     given: tuple[int, int]
     """Shortest and longest given name."""
 
     last: tuple[int, int]
-    """Shortest and longest surname, joiner included."""
+    """Shortest and longest surname."""
 
     middle: tuple[int, int]
-    """Shortest and longest middle name, joiner included."""
+    """Shortest and longest middle name."""
 
 
 @dataclass(frozen=True, slots=True)

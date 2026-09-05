@@ -11,9 +11,9 @@ final NameLanguageData es = NameLanguageData(
   hasMiddle: true,
   roman: RomanMode.fold,
   lengthSpec: NameLengthSpec(
-    given: LengthRange(6, 10),
-    last: LengthRange(5, 10),
-    middle: LengthRange(6, 10),
+    given: LengthRange(3, 10),
+    last: LengthRange(3, 9),
+    middle: LengthRange(3, 10),
   ),
   last: pool(r'''
     García Rodríguez González Fernández López Martínez Sánchez Pérez Gómez Martín

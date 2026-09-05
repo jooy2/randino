@@ -9,7 +9,7 @@ IT = NameLanguageData(
     joiner=" ",
     has_middle=True,
     roman="fold",
-    length_spec=NameLengthSpec(given=(5, 10), last=(5, 8), middle=(5, 9)),
+    length_spec=NameLengthSpec(given=(3, 10), last=(4, 10), middle=(3, 10)),
     last=words("""
         Rossi Russo Ferrari Esposito Bianchi Romano Colombo Ricci Marino Greco Bruno
         Gallo Conti De_Luca Costa Giordano Mancini Rizzo Lombardi Moretti Barbieri

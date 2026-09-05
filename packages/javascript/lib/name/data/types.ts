@@ -21,10 +21,16 @@ export type SyllableSet = {
 	maxSyllables: number;
 };
 
-// Character span of each part of a full name, joiner included. Summing the parts
-// that are actually switched on yields a default length range that matches the
-// requested structure, so turning a surname or middle name off relaxes the range
-// instead of forcing the remaining parts to stretch and fill it.
+// Character span of each part of a full name: the shortest and longest that part
+// can actually come out, joiner excluded — `nameLengthRange` adds a joiner per
+// part it switches on. Summing the parts that are switched on yields a default
+// length range that matches the requested structure, so turning a surname or
+// middle name off relaxes the range instead of forcing the remaining parts to
+// stretch and fill it.
+//
+// These are measured, not estimated. A span narrower than the pools produces
+// names the default range calls too long, and a wider one leaves the generator
+// re-drawing for a length nothing can reach.
 export type NameLengthSpec = {
 	given: readonly [number, number];
 	last: readonly [number, number];

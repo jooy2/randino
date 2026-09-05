@@ -13,6 +13,8 @@ from typing import get_args
 from randino import (
     NAME_LANGUAGES,
     RAND_COUNT_MAX,
+    RAND_LENGTH_MAX,
+    RAND_LENGTH_MIN,
     NameLanguage,
     RandRealism,
     name_length_range,
@@ -30,6 +32,9 @@ from randino.name.data import NAME_DATA
 from randino.name.data._types import NamePool
 
 SAMPLE = 60
+# For the checks that have to see a pool's rarest entry rather than its typical one,
+# where sixty draws would miss it.
+WIDE = 400
 
 
 def joined(name: str, letter: Callable[[str], bool]) -> bool:
@@ -149,11 +154,15 @@ def test_include_surname_adds_or_drops_the_family_name() -> None:
     for name in rand_name(language="en", include_surname=False, **spaced):  # type: ignore[call-overload]
         assert len(name.split(" ")) == 1, name
 
-    # Korean keeps its own default range: one syllable of surname plus two of given name.
-    for name in rand_name(language="ko", count=SAMPLE):
+    # Korean writes one syllable of surname in front of one or two of given name.
+    # Pinning the length is what makes the surname countable: at three syllables the
+    # given name is two, and dropping the surname leaves two.
+    for name in rand_name(language="ko", count=SAMPLE, min_length=3, max_length=3):
         assert len(name) == 3, name
 
-    for name in rand_name(language="ko", count=SAMPLE, include_surname=False):
+    for name in rand_name(
+        language="ko", count=SAMPLE, include_surname=False, min_length=2, max_length=2
+    ):
         assert len(name) == 2, name
 
 
@@ -170,8 +179,11 @@ def test_include_middle_name_adds_one_where_the_language_has_one() -> None:
     assert name_supports_middle_name("ko") is False
     assert name_supports_middle_name("en") is True
 
+    low, high = name_length_range("ko")
+
     for name in rand_name(language="ko", count=SAMPLE, include_middle_name=True):
-        assert len(name) == 3, name
+        assert low <= len(name) <= high, name
+        assert len(name.split(" ")) == 1, name
 
 
 def test_gender_picks_the_pools_the_name_is_drawn_from() -> None:
@@ -216,6 +228,54 @@ def test_names_stay_inside_the_requested_length_range() -> None:
     for language, low, high in ranges:
         for name in rand_name(language=language, min_length=low, max_length=high, count=SAMPLE):
             assert low <= len(name) <= high, f"{language} {low}-{high}: {name} ({len(name)})"
+
+
+def test_the_default_range_is_what_the_pools_can_actually_produce() -> None:
+    # `length_spec` is the one hand-written number in a language's dataset, and a
+    # wrong one is silent: too narrow and the generator re-draws real names away, too
+    # wide and it aims at lengths nothing can spell. `en` used to declare given names
+    # of four to eight characters over a pool that runs from three to ten.
+    def span_of(pool: NamePool) -> tuple[int, int]:
+        lengths = [len(item if isinstance(item, str) else item.n) for item in pool]
+
+        return min(lengths), max(lengths)
+
+    for language in NAME_LANGUAGES:
+        data = NAME_DATA[language]
+
+        # Checked against the pools where the pools are the whole story. A CJK given
+        # name is capped by its weight table as well — Japanese holds one-character
+        # given names and never draws one — and a Russian surname comes out longer
+        # than the pool entry it was feminized from.
+        if data.given_len_weights is None:
+            assert data.male is not None
+            assert data.female is not None
+            given = span_of((*data.male, *data.female))
+
+            assert name_length_range(language, False) == given, language
+
+            if data.roman != "translit":
+                last = span_of(data.last)
+                gap = len(data.joiner)
+
+                assert name_length_range(language) == (
+                    given[0] + last[0] + gap,
+                    given[1] + last[1] + gap,
+                ), language
+
+        # And whatever is switched on, a draw let loose of the range still lands
+        # inside the one the language declares.
+        for include_middle_name in (False, True):
+            low, high = name_length_range(language, True, include_middle_name)
+
+            for name in rand_name(
+                language=language,
+                include_middle_name=include_middle_name,
+                min_length=RAND_LENGTH_MIN,
+                max_length=RAND_LENGTH_MAX,
+                count=WIDE,
+            ):
+                assert low <= len(name) <= high, f"{language}: {name} ({len(name)})"
 
 
 def test_a_maximum_the_pools_can_meet_is_never_overshot() -> None:
@@ -288,13 +348,13 @@ def test_an_exact_length_the_pools_hold_is_drawn_not_approached() -> None:
 
 
 def test_omitted_length_bounds_fall_back_to_the_language_default() -> None:
-    assert name_length_range("ko") == (3, 3)
-    assert name_length_range("ko", False) == (2, 2)
-    assert name_length_range("en") == (8, 16)
-    assert name_length_range("en", False) == (4, 8)
-    assert name_length_range("en", True, True) == (12, 24)
+    assert name_length_range("ko") == (2, 3)
+    assert name_length_range("ko", False) == (1, 2)
+    assert name_length_range("en") == (7, 21)
+    assert name_length_range("en", False) == (3, 10)
+    assert name_length_range("en", True, True) == (11, 32)
     # A middle name the language does not have cannot widen the range.
-    assert name_length_range("ko", True, True) == (3, 3)
+    assert name_length_range("ko", True, True) == (2, 3)
 
     for language in NAME_LANGUAGES:
         low, high = name_length_range(language)

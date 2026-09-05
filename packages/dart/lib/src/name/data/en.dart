@@ -11,9 +11,9 @@ final NameLanguageData en = NameLanguageData(
   hasMiddle: true,
   roman: RomanMode.fold,
   lengthSpec: NameLengthSpec(
-    given: LengthRange(4, 8),
-    last: LengthRange(4, 8),
-    middle: LengthRange(4, 8),
+    given: LengthRange(3, 10),
+    last: LengthRange(3, 10),
+    middle: LengthRange(3, 10),
   ),
   last: pool(r'''
     Smith Johnson Williams Brown Jones Miller Davis Wilson Anderson Taylor Thomas
