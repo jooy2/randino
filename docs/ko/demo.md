@@ -18,14 +18,14 @@
 - `include`에 두 단어를 넣어 보세요. 한국어라면 `사자 조용히`, 영어라면 `brave lion`입니다. 모든 문장에 두 단어가 들어가며, `brave`는 남은 자리에 따라 수식어가 되기도 하고 서술어가 되기도 합니다.
 - `shape`를 `simple`에서 `complex`로 바꿔 보세요. 단어가 길어지는 대신 구가 하나 늘어납니다. `minLength`가 글자 단위로 하는 일을 구 단위로 하는 셈입니다.
 
-## 이 페이지가 아닌 것 {#what-this-page-is-not}
+## 이 페이지의 범위 {#what-this-page-is-not}
 
-브라우저에서 대량으로 호출하라고 만든 생성기가 아니라 시연입니다. 라이브러리 자체는 네트워크 호출도 의존성도 없으므로, 여기서 도는 것과 똑같은 코드가 서버에서도, 빌드 스크립트에서도, 테스트 픽스처에서도 그대로 돕니다.
+이 페이지는 시연이며, 브라우저에서 대량으로 호출하라고 만든 것이 아닙니다. 라이브러리 자체는 네트워크 호출도 의존성도 없으므로, 여기서 도는 것과 똑같은 코드가 서버에서도 빌드 스크립트에서도 테스트 픽스처에서도 그대로 돕니다.
 
-또한 결과에는 **시드가 없습니다.** randino에게 같은 묶음을 다시 달라고 할 방법은 없습니다. 재현이 필요하다면 그것을 만든 설정이 아니라 생성된 문자열을 보관하세요.
+결과에는 **시드가 없습니다.** 같은 묶음을 다시 받을 방법이 없으므로, 재현이 필요하다면 설정이 아니라 생성된 문자열을 보관하세요.
 
 ## 다음으로 볼 것 {#where-to-go-next}
 
 - [시작하기](./guide/getting-started) — 세 패키지 중 쓰는 것으로 설치하기.
-- [`randName`](./name/rand-name), [`randNickname`](./nickname/rand-nickname), [`randWord`](./word/rand-word), [`randSentence`](./sentence/rand-sentence) — 위 패널의 모든 옵션을 글로.
-- [지원 언어](./guide/languages) — 각 언어가 할 수 있는 것과 할 수 없는 것.
+- [`randName`](./name/rand-name), [`randNickname`](./nickname/rand-nickname), [`randWord`](./word/rand-word), [`randSentence`](./sentence/rand-sentence) — 위 패널에 있는 모든 옵션의 설명.
+- [지원 언어](./guide/languages) — 언어마다 할 수 있는 것과 할 수 없는 것.

@@ -1,6 +1,6 @@
 # randSuffix
 
-문자열 하나, 또는 배열 안의 모든 문자열 뒤에 무작위 토큰을 붙입니다. `MistyOwl`은 `MistyOwl_nVtRC`가 됩니다. 닉네임이 겹칠 가능성이 낮은 정도에서 겹칠 수 없는 상태로 바뀌는 지점이 여기이며, 이 라이브러리가 만든 문자열이 아니어도 상관없이 받습니다.
+문자열 하나, 또는 배열 안의 모든 문자열 뒤에 무작위 토큰을 붙입니다. `MistyOwl`은 `MistyOwl_nVtRC`가 됩니다. 이 토큰이 붙으면 닉네임이 겹칠 가능성이 낮은 정도가 아니라 겹칠 수 없는 값이 됩니다. 이 라이브러리가 만든 문자열이 아니어도 받습니다.
 
 ::: lang js
 
@@ -73,7 +73,7 @@ rand_suffix(rand_nickname(language="en", count=2))
 
 ## 토큰만 얻기 {#the-token-on-its-own}
 
-장식 함수가 붙이는 것은 붙일 대상이 없어도 그 자체로 쓸모가 있으므로, 값은 선택 사항입니다. 값을 주지 않으면 `randSuffix`는 토큰만 돌려줍니다. 구분자는 붙지 않습니다. 사이에 둘 것이 없기 때문입니다.
+장식 함수가 붙이는 것은 붙일 대상이 없어도 그 자체로 쓸모가 있으므로 값은 선택 사항입니다. 값을 주지 않으면 `randSuffix`는 토큰만 돌려주고, 사이에 둘 것이 없으므로 구분자는 붙지 않습니다.
 
 ::: lang js
 
@@ -108,7 +108,7 @@ rand_suffix(length=8)  # 'k3Rm9dQx'
 
 ## 값마다 새로 뽑은 토큰 {#a-fresh-token-for-every-value}
 
-한 번의 호출에 하나가 아닙니다. 리스트를 넘길 이유가 바로 이것입니다. 닉네임 100개를 넘기면 서로 다른 토큰 100개가 붙으므로, 서로 간에도 겹치지 않습니다.
+토큰은 호출마다 하나가 아니라 값마다 하나씩 뽑습니다. 닉네임 100개를 넘기면 서로 다른 토큰 100개가 붙으므로 결과끼리도 겹치지 않습니다. 리스트를 넘길 이유가 이것입니다.
 
 ::: lang js
 
@@ -169,13 +169,13 @@ rand_suffix("MistyOwl", charset="".join(c for c in AFFIX_CHARSET if not c.isuppe
 
 :::
 
-## 왜 닉네임 옵션이 아닌가 {#why-this-is-not-a-nickname-option}
+## 닉네임 옵션이 아닌 이유 {#why-this-is-not-a-nickname-option}
 
-예전에는 옵션이었습니다. <Lang js="uniqueSuffix" dart="uniqueSuffix" py="unique_suffix" code />과 그 옆의 세 옵션이 그것입니다. 하지만 문자열에 토큰을 붙이는 일은 닉네임에 대한 이야기가 아니라 문자열에 대한 이야기입니다. 별도 함수가 되면서 이름에도, 주문 번호에도, 이미 가지고 있는 무엇에든 쓸 수 있게 되었고, 닉네임 생성기의 길이 옵션은 접미사 앞부분이 아니라 닉네임 전체를 가리키는 값으로 돌아왔습니다.
+문자열에 토큰을 붙이는 일은 닉네임이 아니라 문자열에 관한 것이기 때문입니다. 별도 함수여서 이름에도, 주문 번호에도, 이미 만들어 둔 어떤 문자열에도 쓸 수 있습니다. 그리고 닉네임 생성기의 길이 옵션은 접미사를 뺀 앞부분이 아니라 닉네임 전체를 가리킵니다.
 
 ## 함께 보기
 
 - [`randPrefix`](./rand-prefix) — 같은 토큰을 뒤가 아니라 앞에.
-- [`randModifier`](./rand-modifier) — 토큰이 아니라 단어를 붙이는 세 번째 장식 함수.
-- [`randNickname`](../nickname/rand-nickname) — 이 함수가 가장 자주 붙는 대상.
+- [`randModifier`](./rand-modifier) — 토큰 대신 단어를 붙이는 세 번째 장식 함수.
+- [`randNickname`](../nickname/rand-nickname) — 이 함수를 가장 자주 붙이는 대상.
 - [상수](../reference/constants) — 기본 문자 집합과 길이 상한.

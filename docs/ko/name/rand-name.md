@@ -411,7 +411,7 @@ rand_name(count=3, output="detail")
 
 ### 성별이 겉으로 드러나는 경우
 
-대부분의 언어는 이름이 어느 풀에서 왔는지 드러내지 않습니다. 러시아어는 예외입니다. 부칭과 성이 모두 굴절하기 때문에 선택 결과를 눈으로 확인할 수 있습니다.
+대부분의 언어는 이름이 어느 풀에서 왔는지 드러내지 않습니다. 러시아어는 예외여서, 부칭과 성이 모두 굴절하므로 선택 결과를 눈으로 확인할 수 있습니다.
 
 ::: lang js
 
@@ -458,4 +458,4 @@ rand_name(language="ru", gender="female", include_middle_name=True, count=2, out
 
 - [지원 언어](../guide/languages#romanization) — 각 문자 체계가 영어 발음으로 바뀌는 방식.
 - [`nameLengthRange`](./name-length-range) — 이름이 기본값으로 쓰는 길이 범위.
-- [`nameSupportsMiddleName`](./name-supports-middle-name)과 [`nameSupportsRoman`](./name-supports-roman) — 언어에 대한 두 가지 질문.
+- [`nameSupportsMiddleName`](./name-supports-middle-name)과 [`nameSupportsRoman`](./name-supports-roman) — 중간 이름과 로마자 표기를 지원하는지 알려 주는 두 함수.

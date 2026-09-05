@@ -1,6 +1,6 @@
 # randPrefix
 
-문자열 하나, 또는 배열 안의 모든 문자열 앞에 무작위 토큰을 붙입니다. [`randSuffix`](./rand-suffix)의 거울상이며, 구분자가 앞에 와야 하는 곳을 위한 것입니다. 샤드, 테넌트, 딱히 정렬 기준이 없는 키 같은 것들입니다.
+문자열 하나, 또는 배열 안의 모든 문자열 앞에 무작위 토큰을 붙입니다. [`randSuffix`](./rand-suffix)를 앞쪽으로 뒤집은 것으로, 구분자가 앞에 와야 하는 값에 씁니다. 샤드나 테넌트, 정렬 기준이 따로 없는 키 같은 것입니다.
 
 ::: lang js
 
@@ -73,10 +73,10 @@ rand_prefix(rand_nickname(language="en", count=2))
 
 ## 나머지는 전부 `randSuffix`와 같습니다 {#everything-else-is-rand-suffix}
 
-토큰, 기본값, 값 제한, 값마다 새 토큰을 뽑는다는 규칙까지 모두 동일합니다. 값이 선택 사항이라는 점도 같습니다. `randPrefix()`는 `randSuffix()`와 똑같은 토큰만 돌려줍니다. 어느 쪽에 붙었을지가 아직 정해지지 않았기 때문입니다. 두 함수는 구현을 공유하고 토큰이 어느 쪽에 붙는지만 다릅니다. [`randSuffix`](./rand-suffix)의 문자 집합 설명이 여기에도 그대로 적용됩니다.
+토큰과 기본값, 값 제한, 값마다 새 토큰을 뽑는 규칙까지 모두 같습니다. 값이 선택 사항인 것도 같아서, `randPrefix()`는 `randSuffix()`와 똑같이 토큰만 돌려줍니다. 두 함수는 구현을 공유하고 토큰이 어느 쪽에 붙는지만 다릅니다. [`randSuffix`](./rand-suffix)의 문자 집합 설명이 여기에도 그대로 적용됩니다.
 
 ## 함께 보기
 
 - [`randSuffix`](./rand-suffix) — 같은 토큰을 앞이 아니라 뒤에.
-- [`randModifier`](./rand-modifier) — 토큰이 아니라 단어를 붙이는 세 번째 장식 함수.
+- [`randModifier`](./rand-modifier) — 토큰 대신 단어를 붙이는 세 번째 장식 함수.
 - [상수](../reference/constants) — 기본 문자 집합과 길이 상한.

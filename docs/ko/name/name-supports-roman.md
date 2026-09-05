@@ -56,5 +56,5 @@ name_supports_roman("en")  # False
 ## 함께 보기
 
 - [`randName`](./rand-name) — 이 함수가 답해 주는 문자 체계 옵션.
-- [`randName`의 상세 출력](./rand-name#the-detail-output) — 두 표기를 한 번에 돌려주므로 물어볼 필요가 없는 쪽.
+- [`randName`의 상세 출력](./rand-name#the-detail-output) — 두 표기를 한 번에 돌려주므로 따로 물어볼 필요가 없습니다.
 - [지원 언어](../guide/languages) — 각 언어가 쓰는 로마자 표기 규칙.

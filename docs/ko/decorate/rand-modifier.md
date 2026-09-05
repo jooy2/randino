@@ -2,7 +2,7 @@
 
 문자열 하나, 또는 배열 안의 모든 문자열 앞에 무작위 수식어를 붙입니다. `Owl`은 `MistyOwl`이 됩니다. 이 라이브러리가 만든 값뿐 아니라 어떤 문자열에도 쓸 수 있고, 값을 주지 않으면 수식어 자체를 돌려줍니다.
 
-`randNickname`의 `includeModifier`가 이 함수가 되었습니다. [`randSuffix`](./rand-suffix)와 같은 이유로 닉네임 옵션이 아니게 되었습니다. 문자열을 장식하는 일은 닉네임에 관한 것이 아니라 문자열에 관한 것이기 때문입니다.
+닉네임 옵션이 아니라 별도 함수인 이유는 [`randSuffix`](./rand-suffix)와 같습니다. 문자열을 장식하는 일은 닉네임이 아니라 문자열에 관한 것이기 때문입니다.
 
 ::: lang js
 
@@ -117,7 +117,7 @@ rand_modifier("고양이", language="en")  # 'Misty고양이'
 
 ## 수식어는 값에 맞춰 모양을 바꿉니다 {#the-modifier-agrees-with-the-value}
 
-수식어가 명사 옆에서 모양을 바꾸는 언어라면 `randModifier`는 값을 그 언어의 단어 풀에서 찾습니다. 찾은 단어는 성을 가지고 있으므로 수식어가 거기에 맞는 형태로 나옵니다. 풀에 없는 단어는 어미로 판단합니다. 스페인어는 `-a`, `-ión`, `-dad`를 여성으로, 러시아어는 `-а`와 `-о`를, 독일어는 어미로 알 수 있는 네 가지를 그렇게 읽습니다. 그래서 지어낸 단어에도 성에 맞는 수식어가 붙습니다.
+수식어가 명사 옆에서 모양을 바꾸는 언어라면 `randModifier`는 값을 그 언어의 단어 풀에서 찾습니다. 풀에 있는 단어에는 성이 붙어 있으므로 수식어가 거기에 맞는 형태로 나옵니다. 풀에 없는 단어는 어미로 판단합니다. 스페인어는 `-a`, `-ión`, `-dad`를 여성으로 읽고, 러시아어는 `-а`와 `-о`를, 독일어는 어미로 알 수 있는 네 가지를 그렇게 읽습니다. 그래서 지어낸 단어에도 성에 맞는 수식어가 붙습니다.
 
 단수형이 아예 없는 명사(`ножницы`, `gafas`, `Jeans`)도 같은 이유로 복수 태그를 답니다. 그래서 그 옆의 수식어도 복수형입니다.
 
@@ -161,7 +161,7 @@ rand_modifier("Zzyzx", language="es")  # 'Zzyzx dorado' — 모르는 단어
 
 ## `kind`가 수식어의 성격을 정합니다 {#kind-picks-what-the-modifier-says}
 
-수식어는 값이 **어떤지**를 말하거나 **무엇을 하는지**를 말하고, 둘은 하나가 아니라 두 개의 풀입니다. `kind`가 그 사이를 정하며, 지정하지 않으면 둘 다 나옵니다. 옵션이 생기기 전의 동작이 그것입니다.
+수식어는 값이 어떤지를 말하거나 무엇을 하는지를 말하며, 둘은 서로 다른 풀입니다. `kind`가 그중 어느 쪽을 쓸지 정하고, 지정하지 않으면 둘 다 나옵니다.
 
 ::: lang js
 
@@ -201,11 +201,11 @@ rand_modifier("사자", language="ko", kind="action")  # '숨기는사자'
 
 :::
 
-둘을 가른 이유는 취향이 아니라 문법입니다. 형용사에는 필요 없는 조사가 동작과 명사 사이에는 필요한 언어가 있어서, 중국어는 `奔跑的狮子`와 `快乐狮子`를 이렇게 다르게 씁니다. `randNickname`의 [`slots`](../nickname/rand-nickname#picking-the-shape)가 같은 구분을 형태 전체를 고르는 자리에서 쓰는 것입니다.
+둘을 가른 것은 문법 때문입니다. 형용사에는 필요 없는 조사가 동작과 명사 사이에는 필요한 언어가 있어서, 중국어는 `奔跑的狮子`와 `快乐狮子`를 다르게 씁니다. `randNickname`의 [`slots`](../nickname/rand-nickname#picking-the-shape)는 같은 구분을 형태 전체를 고르는 자리에서 씁니다.
 
 ## 값마다 새로 뽑은 수식어 {#a-fresh-modifier-for-every-value}
 
-한 번 뽑아 전체에 쓰지 않습니다. [`randSuffix`](./rand-suffix)가 값마다 토큰을 뽑는 것과 같습니다. 배열을 넘길 이유가 바로 이것입니다.
+한 번 뽑아 전체에 쓰지 않고 값마다 새로 뽑습니다. [`randSuffix`](./rand-suffix)가 값마다 토큰을 뽑는 것과 같으며, 배열을 넘길 이유도 이것입니다.
 
 ::: lang js
 
@@ -267,7 +267,7 @@ rand_modifier(language="en", realism="invented")  # 'Snikith'
 
 ## 수식어와 명사는 닉네임이 쓰는 그 단어 풀입니다 {#the-same-pools-a-nickname-uses}
 
-단어 앞에 수식어를 붙이는 것은 `randNickname`이 대부분의 경우에 하는 일과 같습니다. <Lang js="randModifier(randAnimal())" dart="randModifier(value: randAnimal().first)" py="rand_modifier(rand_animal())" code />와 `randNickname({ theme: 'animal' })`은 같은 곳에서 단어를 꺼냅니다. 닉네임 생성기가 그 위에 더하는 것은 형태와 길이 맞추기입니다. 뒤에 붙는 단어, 결과 전체가 들어가야 하는 범위, 그리고 두 단어가 경계에서 같은 글자를 반복할 때의 재추첨입니다.
+단어 앞에 수식어를 붙이는 것은 `randNickname`이 대부분의 경우에 하는 일과 같습니다. <Lang js="randModifier(randAnimal())" dart="randModifier(value: randAnimal().first)" py="rand_modifier(rand_animal())" code />와 `randNickname({ theme: 'animal' })`은 같은 곳에서 단어를 꺼냅니다. 닉네임 생성기가 여기에 더하는 것은 형태와 길이 맞추기입니다. 뒤에 붙는 단어, 결과 전체가 들어가야 하는 범위, 그리고 두 단어가 경계에서 같은 글자를 반복할 때의 재추첨입니다.
 
 ## 함께 보기
 
