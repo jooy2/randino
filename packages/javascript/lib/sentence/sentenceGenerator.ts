@@ -2038,16 +2038,22 @@ function kindFor(
 	budget: readonly [number, number],
 	lead: SentenceType | null
 ): readonly [SentenceType, SentenceMark] {
-	const fits = (mark: SentenceMark, room: number) =>
-		framesFor(data, settings, moodFor(mark)).some(
-			(frame) => frameRange(frame, data, bounds)[0] <= room
-		);
+	// Both ends: a shape whose shortest is past the top of the budget overshoots
+	// whatever it draws, and one whose longest is under the bottom falls short of
+	// it however long the words are.
+	const fits = (mark: SentenceMark, room: readonly [number, number]) =>
+		framesFor(data, settings, moodFor(mark)).some((frame) => {
+			const [low, high] = frameRange(frame, data, bounds);
+
+			return low <= room[1] && high >= room[0];
+		});
 	const marksOf = (type: SentenceType) =>
 		type === 'dialogue' || type === 'thought' ? QUOTED_MARKS : [type as SentenceMark];
-	const roomOf = (type: SentenceType) => {
+	const roomOf = (type: SentenceType): readonly [number, number] => {
 		const quote = quoteFor(data, type, settings.quote);
+		const marks = quote ? quote[0].length + quote[1].length : 0;
 
-		return budget[1] - (quote ? quote[0].length + quote[1].length : 0);
+		return [budget[0] - marks, budget[1] - marks];
 	};
 	// A paragraph stays in the register it opened in. A line somebody speaks is a
 	// line, and the next one is another line of the same speech; prose about it may

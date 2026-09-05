@@ -2122,21 +2122,26 @@ List<SentenceType> _kindFor(
   LengthRange budget,
   SentenceType? lead,
 ) {
-  bool fits(SentenceType mark, int room) => _framesFor(
-    data,
-    settings,
-    _moodFor(mark),
-  ).any((frame) => _frameRange(frame, data, bounds, modifierBounds).min <= room);
+  // Both ends: a shape whose shortest is past the top of the budget overshoots
+  // whatever it draws, and one whose longest is under the bottom falls short of
+  // it however long the words are.
+  bool fits(SentenceType mark, LengthRange room) =>
+      _framesFor(data, settings, _moodFor(mark)).any((frame) {
+        final own = _frameRange(frame, data, bounds, modifierBounds);
+
+        return own.min <= room.max && own.max >= room.min;
+      });
 
   List<SentenceType> marksOf(SentenceType type) =>
       type == SentenceType.dialogue || type == SentenceType.thought
           ? _quotedMarks
           : <SentenceType>[type];
 
-  int roomOf(SentenceType type) {
+  LengthRange roomOf(SentenceType type) {
     final quote = _quoteFor(data, type, settings.quote);
+    final marks = quote == null ? 0 : quote[0].length + quote[1].length;
 
-    return budget.max - (quote == null ? 0 : quote[0].length + quote[1].length);
+    return LengthRange(budget.min - marks, budget.max - marks);
   }
 
   // A paragraph stays in the register it opened in. A line somebody speaks is a

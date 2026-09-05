@@ -2080,9 +2080,13 @@ def _kind_for(
         The kind, and the kind whose mark it closes on.
     """
 
-    def fits(mark: SentenceMark, room: int) -> bool:
+    def fits(mark: SentenceMark, room: tuple[int, int]) -> bool:
+        # Both ends: a shape whose shortest is past the top of the budget overshoots
+        # whatever it draws, and one whose longest is under the bottom falls short of it
+        # however long the words are.
         return any(
-            _frame_range(frame, data, bounds)[0] <= room
+            _frame_range(frame, data, bounds)[0] <= room[1]
+            and _frame_range(frame, data, bounds)[1] >= room[0]
             for frame in _frames_for(data, settings, _mood_for(mark))
         )
 
@@ -2092,10 +2096,11 @@ def _kind_for(
 
         return (cast("SentenceMark", type_),)
 
-    def room_of(type_: SentenceType) -> int:
+    def room_of(type_: SentenceType) -> tuple[int, int]:
         quote = _quote_for(data, type_, settings.quote)
+        marks = len(quote[0]) + len(quote[1]) if quote else 0
 
-        return budget[1] - (len(quote[0]) + len(quote[1]) if quote else 0)
+        return (budget[0] - marks, budget[1] - marks)
 
     # A paragraph stays in the register it opened in. A line somebody speaks is a line,
     # and the next one is another line of the same speech; prose about it may ask and
