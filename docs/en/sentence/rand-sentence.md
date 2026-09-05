@@ -47,6 +47,7 @@ Every option is optional, and the defaults are what the empty call above uses.
 | `theme` | <Lang js="WordThemeOption" dart="WordTheme?" py="WordThemeOption" code /> | <Lang js="'all'" dart="null" py="&quot;all&quot;" code /> | What the sentence's **subject** is about. See [Themes](../word/themes). |
 | `type` | <Lang js="SentenceTypeOption" dart="Set&lt;SentenceType&gt;?" py="SentenceTypeOption" code /> | <Lang js="'statement'" dart="null" py="&quot;statement&quot;" code /> | What the sentence is doing. See [Asking, exclaiming, trailing off](#asking-exclaiming-trailing-off). |
 | `quote` | <Lang js="SentenceQuote" dart="SentenceQuote?" py="SentenceQuote &#124; None" code /> | <Lang js="—" dart="null" py="None" code /> | Which marks a quoted line takes. See [Dialogue and thought](#dialogue-and-thought). |
+| `style` | `SentenceStyle` | <Lang js="`'plain'`" dart="`SentenceStyle.plain`" py="`\"plain\"`" /> | How the sentence addresses its reader. See [Politeness](#politeness). |
 | `shape` | <Lang js="SentenceShapeOption" dart="SentenceShape?" py="SentenceShapeOption" code /> | <Lang js="'all'" dart="null" py="&quot;all&quot;" code /> | How much the sentence says. See [How much it says](#how-much-it-says). |
 | `slots` | <Lang js="SentenceSlotOption" dart="Set&lt;SentenceSlot&gt;?" py="SentenceSlotOption" code /> | <Lang js="'all'" dart="null" py="&quot;all&quot;" code /> | Which parts it carries beside the subject. See [Picking the shape](#picking-the-shape). |
 | `include` | <Lang js="string &#124; string[]" dart="List&lt;String&gt;" py="str &#124; Sequence[str]" code /> | <Lang js="—" dart="const []" py="()" code /> | Words every sentence has to contain. See [Words it has to contain](#words-it-has-to-contain). |
@@ -447,6 +448,64 @@ rand_sentence(language="en", type="all", sentences=3)
 :::
 
 A word you named through `include` comes out in the form the type asks for: `include: '달린다'` with `type: 'question'` writes `달리니?`, not `달린다?`. The forms are stored beside the plain words rather than instead of them, one for one, which is what makes the translation possible.
+
+## Politeness {#politeness}
+
+`style` says how the sentence addresses its reader. `'plain'` is the default and everything above — the form a written statement takes. `'polite'` is the form you would use speaking to somebody.
+
+::: lang js
+
+```javascript
+randSentence({ language: 'ko', count: 2 });
+// ['도도한 쓸개가 고요한 촌락에서 움직인다.', '한밤중에 라떼가 녹는다.']
+
+randSentence({ language: 'ko', style: 'polite', count: 2 });
+// ['영겁이 남습니다.', '새벽에 뇌가 항성에서 움직입니다.']
+
+randSentence({ language: 'ja', type: 'question', style: 'polite', count: 2 });
+// ['寂しい腎臓が震えますか？', '森の送球が漂いますか？']
+```
+
+:::
+
+::: lang dart
+
+```dart
+randSentence(language: WordLanguage.ko, count: 2);
+// [도도한 쓸개가 고요한 촌락에서 움직인다., 한밤중에 라떼가 녹는다.]
+
+randSentence(language: WordLanguage.ko, style: SentenceStyle.polite, count: 2);
+// [영겁이 남습니다., 새벽에 뇌가 항성에서 움직입니다.]
+
+randSentence(
+  language: WordLanguage.ja,
+  type: {SentenceType.question},
+  style: SentenceStyle.polite,
+  count: 2,
+);
+// [寂しい腎臓が震えますか？, 森の送球が漂いますか？]
+```
+
+:::
+
+::: lang py
+
+```python
+rand_sentence(language="ko", count=2)
+# ['도도한 쓸개가 고요한 촌락에서 움직인다.', '한밤중에 라떼가 녹는다.']
+
+rand_sentence(language="ko", style="polite", count=2)
+# ['영겁이 남습니다.', '새벽에 뇌가 항성에서 움직입니다.']
+
+rand_sentence(language="ja", type="question", style="polite", count=2)
+# ['寂しい腎臓が震えますか？', '森の送球が漂いますか？']
+```
+
+:::
+
+**Korean and Japanese are the whole of it.** It is the same mechanism `type` uses — another form of the same predicate, stored beside the plain one — so a polite sentence is the plain one said to somebody rather than a different sentence. Korean writes `달린다` → `달립니다` and `달리니?` → `달립니까?`; Japanese writes `走る` → `走ります`, and `か` does the asking either way.
+
+**The other seven write the same sentence either way, and that is not a gap.** Spanish, Italian, German and Russian have a T–V distinction, but it lives in the second person and every sentence here is third — `el león corre` is what you say to anybody. English has no such form at all. Rather than inventing one, those seven declare no polite form and `style` changes nothing in them.
 
 ## Dialogue and thought {#dialogue-and-thought}
 

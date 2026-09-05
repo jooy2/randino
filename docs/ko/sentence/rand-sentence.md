@@ -47,6 +47,7 @@ rand_sentence()
 | `theme` | <Lang js="WordThemeOption" dart="WordTheme?" py="WordThemeOption" code /> | <Lang js="'all'" dart="null" py="&quot;all&quot;" code /> | 문장의 **주어**가 무엇에 관한 것인지. [테마](../word/themes) 참고. |
 | `type` | <Lang js="SentenceTypeOption" dart="Set&lt;SentenceType&gt;?" py="SentenceTypeOption" code /> | <Lang js="'statement'" dart="null" py="&quot;statement&quot;" code /> | 문장이 무엇을 하는지. [묻고, 외치고, 말끝을 흐리기](#asking-exclaiming-trailing-off) 참고. |
 | `quote` | <Lang js="SentenceQuote" dart="SentenceQuote?" py="SentenceQuote &#124; None" code /> | <Lang js="—" dart="null" py="None" code /> | 인용된 문장이 어떤 따옴표를 쓸지. [대사와 생각](#dialogue-and-thought) 참고. |
+| `style` | `SentenceStyle` | <Lang js="`'plain'`" dart="`SentenceStyle.plain`" py="`\"plain\"`" /> | 문장이 읽는 사람을 어떻게 대하는지. [높임](#politeness) 참고. |
 | `shape` | <Lang js="SentenceShapeOption" dart="SentenceShape?" py="SentenceShapeOption" code /> | <Lang js="'all'" dart="null" py="&quot;all&quot;" code /> | 문장이 얼마나 많은 것을 말하는지. [얼마나 말할지](#how-much-it-says) 참고. |
 | `slots` | <Lang js="SentenceSlotOption" dart="Set&lt;SentenceSlot&gt;?" py="SentenceSlotOption" code /> | <Lang js="'all'" dart="null" py="&quot;all&quot;" code /> | 주어 옆에 무엇을 두는지. [형태 고르기](#picking-the-shape) 참고. |
 | `include` | <Lang js="string &#124; string[]" dart="List&lt;String&gt;" py="str &#124; Sequence[str]" code /> | <Lang js="—" dart="const []" py="()" code /> | 모든 문장에 반드시 들어가야 할 단어. [반드시 넣을 단어](#words-it-has-to-contain) 참고. |
@@ -420,6 +421,64 @@ rand_sentence(language="en", type="all", sentences=3)
 :::
 
 `include`로 지정한 단어는 타입이 요구하는 형태로 나옵니다. `include: '달린다'`에 `type: 'question'`이면 `달린다?`가 아니라 `달리니?`입니다. 각 형태는 평서형을 대신하는 것이 아니라 그 옆에 하나씩 짝지어 저장되고, 그것이 이 변환을 가능하게 합니다.
+
+## 높임 {#politeness}
+
+`style`은 문장이 읽는 사람을 어떻게 대하는지 정합니다. 기본값 `'plain'`은 위의 모든 예시이고, 글로 쓰는 서술문의 형태입니다. `'polite'`는 사람에게 말할 때 쓰는 형태입니다.
+
+::: lang js
+
+```javascript
+randSentence({ language: 'ko', count: 2 });
+// ['도도한 쓸개가 고요한 촌락에서 움직인다.', '한밤중에 라떼가 녹는다.']
+
+randSentence({ language: 'ko', style: 'polite', count: 2 });
+// ['영겁이 남습니다.', '새벽에 뇌가 항성에서 움직입니다.']
+
+randSentence({ language: 'ja', type: 'question', style: 'polite', count: 2 });
+// ['寂しい腎臓が震えますか？', '森の送球が漂いますか？']
+```
+
+:::
+
+::: lang dart
+
+```dart
+randSentence(language: WordLanguage.ko, count: 2);
+// [도도한 쓸개가 고요한 촌락에서 움직인다., 한밤중에 라떼가 녹는다.]
+
+randSentence(language: WordLanguage.ko, style: SentenceStyle.polite, count: 2);
+// [영겁이 남습니다., 새벽에 뇌가 항성에서 움직입니다.]
+
+randSentence(
+  language: WordLanguage.ja,
+  type: {SentenceType.question},
+  style: SentenceStyle.polite,
+  count: 2,
+);
+// [寂しい腎臓が震えますか？, 森の送球が漂いますか？]
+```
+
+:::
+
+::: lang py
+
+```python
+rand_sentence(language="ko", count=2)
+# ['도도한 쓸개가 고요한 촌락에서 움직인다.', '한밤중에 라떼가 녹는다.']
+
+rand_sentence(language="ko", style="polite", count=2)
+# ['영겁이 남습니다.', '새벽에 뇌가 항성에서 움직입니다.']
+
+rand_sentence(language="ja", type="question", style="polite", count=2)
+# ['寂しい腎臓が震えますか？', '森の送球が漂いますか？']
+```
+
+:::
+
+**한국어와 일본어가 전부입니다.** `type`이 쓰는 것과 같은 장치입니다. 같은 서술어의 또 다른 형태를 평서형 옆에 저장해 두는 것이고, 그래서 높임말 문장은 다른 문장이 아니라 같은 문장을 사람에게 말한 것입니다. 한국어는 `달린다` → `달립니다`, `달리니?` → `달립니까?`로 쓰고, 일본어는 `走る` → `走ります`로 쓰며 묻는 일은 `か`가 어느 쪽에서든 합니다.
+
+**나머지 일곱 언어는 어느 쪽이든 같은 문장을 씁니다. 빠뜨린 것이 아닙니다.** 스페인어·이탈리아어·독일어·러시아어에는 T–V 구분이 있지만 그것은 2인칭의 일이고, 여기 있는 문장은 모두 3인칭입니다. `el león corre`는 누구에게 하든 같은 말입니다. 영어에는 그런 형태 자체가 없습니다. 없는 것을 지어내는 대신, 그 일곱 언어는 높임 형태를 선언하지 않고 `style`은 그 안에서 아무것도 바꾸지 않습니다.
 
 ## 대사와 생각 {#dialogue-and-thought}
 

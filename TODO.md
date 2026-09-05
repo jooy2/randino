@@ -19,7 +19,7 @@ Everything here is about `randSentence`. It shipped in the vNext section of the 
 - [x] C. A person name where a sentence has room for one
 - [x] D. Questions, exclamations and sentences that trail off
 - [x] E. Dialogue and thought, in the language's own quotation marks
-- [ ] F. Politeness, which is mostly a Korean question
+- [x] F. Politeness, which is mostly a Korean question
 - [ ] G. Numbers, counters and amounts of money
 - [x] H. An invented noun has no gender, so two languages write no article at all
 
@@ -102,14 +102,15 @@ What landed:
 - The plan named only Japanese and Chinese as the interesting cases; German turned out to be one too (`„…“` opens low and closes high, so the pair is not symmetrical), as did Spanish, Italian and Russian, which reach for guillemets before anything else.
 - The mark under a quote is drawn from statement, question and exclamation. `trailing` is left out of that set: a quoted line that trails off reads as an unfinished quotation rather than as somebody trailing off, and three is enough for the property the plan wanted — that a spoken line is as often a question as a statement. The three suites assert exactly that over 200 lines.
 
-## F. Politeness, which is mostly a Korean question
+## F. Politeness, which is mostly a Korean question — done
 
-`style?: 'plain' | 'polite'`, default `'plain'`, which is what every sentence is written in today.
+`style` takes `'plain'` (the default) and `'polite'`, written as two more `forms` entries on each group. The plan called this small once D had landed, and it was: the generator change is one function.
 
-- Korean is the whole reason: `달린다` beside `달립니다`, and `달리니?` beside `달립니까?`. Written as two more `forms` entries on each group, the same mechanism D introduces, so this item is small once D has landed.
-- Japanese is the other one: `走る` beside `走ります`.
-- Spanish, Italian, German and Russian have a T-V distinction, but it lives in the second person and every sentence here is third person, so `style` changes nothing in them. English has no such form at all. Say that on the docs page rather than pretending otherwise.
-- Combined with a mood, the form key is `politeQuestion` and so on. Fall back along the chain — `politeQuestion` → `question` → `words` — so a language that declares only some of them stays correct.
+What landed:
+
+- **Korean and Japanese, and nothing else.** The plan's read was right on all seven other languages, and the suites now assert it rather than the docs merely claiming it: the languages that declare polite forms are exactly the languages whose sentences change under `style`.
+- **The fallback chain is one step longer than planned.** `politeQuestion` → **`polite`** → `question` → `words`, rather than `politeQuestion` → `question` → `words`. That extra step is what lets Japanese declare `polite` alone — `走ります` is its polite question too, because the `か` that asks is the frame's tag rather than part of the verb — instead of duplicating an 88-entry pool under a second key in three packages. Korean declares both keys, so the chain never reaches past `politeQuestion` there.
+- **Korean derives, Japanese does not.** Korean's `-ㅂ니다` / `-습니다` follows from the stem and its coda, with `ㄹ` dropping first (`달다` → `답니다`, `낯설다` → `낯섭니다`); every one of the 308 forms was generated and then read. Japanese's masu form needs the verb's conjugation class, which the plain form does not carry — `集める` is ichidan and `滑る` is godan and both end in `る` — so all 88 are written out by hand. The adjectives derive (`だ` → `です`, else `+ です`).
 
 ## G. Numbers, counters and amounts of money
 

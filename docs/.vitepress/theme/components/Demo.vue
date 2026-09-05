@@ -115,6 +115,7 @@ const sentence = reactive({
 	slots: 'all',
 	sentences: 1,
 	type: 'statement',
+	style: 'plain',
 	includeName: false,
 	count: 8,
 	realism: 'real',
@@ -167,6 +168,7 @@ const options = computed(() => {
 		if (Number(sentence.sentences) > 1) out.sentences = Number(sentence.sentences);
 		if (sentence.includeName) out.includeName = true;
 		if (sentence.type !== 'statement') out.type = sentence.type;
+		if (sentence.style !== 'plain') out.style = sentence.style;
 		if (included.value.length) out.include = included.value;
 		if (sentence.count !== 1) out.count = Number(sentence.count);
 		if (sentence.realism !== 'real') out.realism = sentence.realism;
@@ -606,6 +608,14 @@ async function copy() {
 					<select v-model="sentence.type">
 						<option v-for="item in SENTENCE_TYPES" :key="item" :value="item">{{ item }}</option>
 						<option value="all">all</option>
+					</select>
+				</label>
+
+				<label class="randino-demo-field">
+					<span><code>style</code></span>
+					<select v-model="sentence.style">
+						<option value="plain">plain</option>
+						<option value="polite">polite</option>
 					</select>
 				</label>
 
