@@ -135,16 +135,23 @@ export const VI: SentenceLanguageData = {
 		}
 	],
 	manners: words(`
-		lặng_lẽ chậm_rãi nhanh_chóng nhẹ_nhàng đột_nhiên khẽ lại cùng_nhau một_mình
-		một_lát đều_đặn mạnh_mẽ cẩn_thận háo_hức
+		lặng_lẽ chậm_rãi nhanh_chóng nhẹ_nhàng đột_nhiên khẽ lại cùng_nhau một_mình một_lát đều_đặn
+		mạnh_mẽ cẩn_thận háo_hức từ_từ vội_vã êm_ái chăm_chú thản_nhiên vui_vẻ bình_thản hối_hả
+		kiên_nhẫn thong_thả
 	`),
 	times: words(`
-		lúc_bình_minh vào_buổi_sáng vào_buổi_trưa vào_buổi_chiều vào_ban_đêm hôm_nay hôm_qua
-		ngày_mai vào_mùa_xuân vào_mùa_hè vào_mùa_thu vào_mùa_đông vào_cuối_tuần vừa_rồi
-		đôi_khi mỗi_ngày lúc_hoàng_hôn
+		lúc_bình_minh vào_buổi_sáng vào_buổi_trưa vào_buổi_chiều vào_ban_đêm hôm_nay hôm_qua ngày_mai
+		vào_mùa_xuân vào_mùa_hè vào_mùa_thu vào_mùa_đông vào_cuối_tuần vừa_rồi đôi_khi mỗi_ngày
+		lúc_hoàng_hôn lúc_nửa_đêm vào_giữa_trưa tuần_trước tuần_sau dạo_này ngày_xưa vào_ngày_lễ cả_ngày
+		mỗi_tối
 	`),
-	connectives: words(`rồi và_rồi nhưng thế_là sau_đó cuối_cùng đồng_thời tuy_vậy`),
-	interjections: words(`ôi, chà, ồ, trời_ơi, chao_ôi, này, thật_đấy,`),
+	connectives: words(`
+		rồi và_rồi nhưng thế_là sau_đó cuối_cùng đồng_thời tuy_vậy tuy_nhiên vì_thế ngoài_ra sau_cùng
+		rốt_cuộc thế_rồi dù_vậy
+	`),
+	interjections: words(`
+		ôi, chà, ồ, trời_ơi, chao_ôi, này, thật_đấy, ái_chà, ê, ơ_kìa, khiếp, ối,
+	`),
 	pronouns: { n: ['', 'nó'] },
 	pronounless: ['person'],
 	// Vietnamese writes a date smallest to largest, with a word in front of every

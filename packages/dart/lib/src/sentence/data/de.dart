@@ -148,21 +148,27 @@ final SentenceLanguageData de = SentenceLanguageData(
     ),
   ],
   manners: words(r'''
-      leise langsam schnell sanft plötzlich kaum wieder gemeinsam allein noch kurz stetig kühn
-      sorgsam eifrig
-    '''),
+    leise langsam schnell sanft plötzlich kaum wieder gemeinsam allein noch kurz stetig kühn
+    sorgsam eifrig ruhig heftig geduldig leicht fröhlich munter schwerfällig deutlich gelassen
+    emsig zügig
+  '''),
   times: words(r'''
-      bei_Tagesanbruch am_Morgen am_Mittag am_Abend in_der_Nacht heute gestern morgen
-      im_Frühling im_Sommer im_Herbst im_Winter am_Wochenende gerade_eben manchmal jeden_Tag
-      in_der_Dämmerung
-    '''),
+    bei_Tagesanbruch am_Morgen am_Mittag am_Abend in_der_Nacht heute gestern morgen im_Frühling
+    im_Sommer im_Herbst im_Winter am_Wochenende gerade_eben manchmal jeden_Tag in_der_Dämmerung
+    um_Mitternacht letzte_Woche nächste_Woche heutzutage vor_langer_Zeit an_Feiertagen
+    den_ganzen_Tag jede_Nacht
+  '''),
   // Only the coordinating ones. German puts its finite verb second and counts
   // whatever opens the clause towards that, so `dann` or `danach` in front would
   // need the verb and the subject the other way round — a shape the frames write,
   // not something a connective can bolt on. `und`, `aber`, `doch` and `denn` sit
   // outside the clause and leave the order alone.
-  connectives: words(r'und aber doch denn'),
-  interjections: words(r'oh, ach, na, mensch, oje, sieh_an, wahrhaftig,'),
+  connectives: words(r'''
+    und aber doch denn oder
+  '''),
+  interjections: words(r'''
+    oh, ach, na, mensch, oje, sieh_an, wahrhaftig, hui, herrje, du_meine_Güte, nanu,
+  '''),
   pronouns: <WordGender, WordPool>{
     WordGender.m: words(r'er'),
     WordGender.f: words(r'sie'),
@@ -245,6 +251,18 @@ final SentenceLanguageData de = SentenceLanguageData(
       SentencePart(SentenceSlot.subject, modifiable: true),
       SentencePart(SentenceSlot.manner),
     ], 14),
+    // An adverb can open the clause too, and the verb still stands second.
+    SentenceFrame(<SentencePart>[
+      SentencePart(SentenceSlot.manner),
+      SentencePart(SentenceSlot.verb),
+      SentencePart(SentenceSlot.subject, modifiable: true),
+    ], 16),
+    SentenceFrame(<SentencePart>[
+      SentencePart(SentenceSlot.manner),
+      SentencePart(SentenceSlot.verb),
+      SentencePart(SentenceSlot.subject, modifiable: true),
+      SentencePart(SentenceSlot.time),
+    ], 10),
     // German asks by moving the finite verb to the front, which is the same rule
     // that keeps it second in a statement — the question is what happens when
     // nothing stands in the first position at all.

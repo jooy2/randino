@@ -182,5 +182,22 @@ What the copula turned out to be:
 
 ## F. More shapes, and more ways to say the same thing
 
-- [ ] More frames per language, so one shape does not carry most of the output.
-- [ ] Wider `connectives`, `interjections`, `manners` and `times` pools.
+- [x] More frames per language, so one shape does not carry most of the output.
+- [x] Wider `connectives`, `interjections`, `manners` and `times` pools.
+
+Where the repetition actually was:
+
+- **Not the shapes.** Seven of the nine already spread their output over
+  fourteen to twenty frames with no shape above 16%, and the calendar work
+  added four more to eight of them. Russian at six frames and German at twelve
+  were the two worth widening, and both were widened only where their own word
+  order allows it — an adverb or a time opening the clause. Every other part
+  either language could take would put a noun in a case its own ending changes
+  for, which is the same wall that has kept them narrow from the start.
+- **The adverbials.** Nine manners and eighteen times repeat inside one
+  paragraph, and what a sentence opens on repeats soonest of all: German had
+  four connectives. They are roughly doubled now — Korean and English widest, at
+  35 to 40 manners and 28 to 34 times.
+- German's connectives are the exception and stay at five. Only the
+  coordinating ones can open a German clause without moving the finite verb,
+  and there are only so many of those; `oder` was the one left to add.

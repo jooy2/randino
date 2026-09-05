@@ -100,15 +100,20 @@ export const RU: SentenceLanguageData = {
 		}
 	],
 	manners: words(`
-		тихо медленно быстро мягко вдруг едва снова вместе одиноко ещё ненадолго
-		ровно смело осторожно жадно
+		тихо медленно быстро мягко вдруг едва снова вместе одиноко ещё ненадолго ровно смело осторожно
+		жадно спокойно весело терпеливо легко чётко бодро лениво упрямо охотно шумно мерно
 	`),
 	times: words(`
-		на_рассвете утром днём вечером ночью сегодня вчера завтра весной летом осенью зимой
-		в_выходные только_что иногда каждый_день в_сумерках
+		на_рассвете утром днём вечером ночью сегодня вчера завтра весной летом осенью зимой в_выходные
+		только_что иногда каждый_день в_сумерках в_полночь на_прошлой_неделе на_следующей_неделе нынче
+		давно в_праздники весь_день каждую_ночь
 	`),
-	connectives: words(`и_потом но затем поэтому однако наконец потом тем_временем`),
-	interjections: words(`ах, ох, эх, ух, боже, гляди, право,`),
+	connectives: words(`
+		и_потом но затем поэтому однако наконец потом тем_временем а зато всё_же в_итоге значит
+	`),
+	interjections: words(`
+		ах, ох, эх, ух, боже, гляди, право, ой, ух_ты, батюшки, надо_же, эй,
+	`),
 	pronouns: { m: words(`он`), f: words(`она`), n: words(`оно`) },
 	// Nominative only, which is why there is neither an object nor a place here: a
 	// Russian noun changes its own ending for both, and the endings are the noun's
@@ -142,6 +147,26 @@ export const RU: SentenceLanguageData = {
 				{ slot: 'verb' }
 			],
 			weight: 12
+		},
+		// Russian orders its words freely, so an adverb or a time can open the
+		// sentence without anything else moving. That is the only room it has left:
+		// every other part would put a noun in a case its own ending changes for.
+		{
+			parts: [{ slot: 'manner' }, { slot: 'subject', modifiable: true }, { slot: 'verb' }],
+			weight: 14
+		},
+		{
+			parts: [{ slot: 'time' }, { slot: 'subject', modifiable: true }, { slot: 'state' }],
+			weight: 12
+		},
+		{
+			parts: [
+				{ slot: 'time' },
+				{ slot: 'subject', modifiable: true },
+				{ slot: 'verb' },
+				{ slot: 'manner' }
+			],
+			weight: 10
 		}
 	]
 };

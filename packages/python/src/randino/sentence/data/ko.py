@@ -640,17 +640,21 @@ KO = SentenceLanguageData(
         ),
     ),
     manners=words("""
-        조용히 천천히 빠르게 가만히 슬며시 문득 함께 홀로 다시 계속 잠시 서서히 갑자기 언제나
-        여전히 조심스레 힘차게 나란히 살며시 묵묵히 느긋하게 씩씩하게
+        조용히 천천히 빠르게 가만히 슬며시 문득 함께 홀로 다시 계속 잠시 서서히 갑자기 언제나 여전히 조심스레 힘차게 나란히 살며시 묵묵히 느긋하게 씩씩하게 훌쩍 곧장
+        슬쩍 사뿐히 성큼성큼 부지런히 유유히 냉큼 차분히 은근히 대뜸 나직이 느릿느릿 재빨리 가볍게 얌전히 무심히 덤덤히
     """),
     times=words("""
-        새벽에 아침에 낮에 저녁에 밤에 한밤중에 오늘 어제 내일 봄에 여름에 가을에 겨울에 주말에
-        방금 가끔 매일 해질녘에 이른봄에 늦가을에
+        새벽에 아침에 낮에 저녁에 밤에 한밤중에 오늘 어제 내일 봄에 여름에 가을에 겨울에 주말에 방금 가끔 매일 해질녘에 이른봄에 늦가을에 이른아침에 한낮에 정오에
+        초저녁에 자정에 새해에 장마철에 명절에 휴일에 지난주에 다음주에 요즘 한때 오래전에
     """),
     # What a sentence opens on when it follows another. Written whole, so a
     # language that wants a comma after its connective writes the comma.
-    connectives=words("그리고 그래서 하지만 그런데 이윽고 곧 결국 그러자 한편 이내"),
-    interjections=words("아, 오, 와, 어머, 이런, 저런, 세상에, 아이고, 참,"),
+    connectives=words("""
+        그리고 그래서 하지만 그런데 이윽고 곧 결국 그러자 한편 이내 그러나 그러므로 게다가 다만 오히려 어느새 마침내 그제야 그래도
+    """),
+    interjections=words("""
+        아, 오, 와, 어머, 이런, 저런, 세상에, 아이고, 참, 어이쿠, 아이참, 어라, 우와, 이야,
+    """),
     # Korean leaves the subject out as readily as it writes 그것, and the empty
     # Korean counts anything, because a classifier is what makes a noun countable:
     # `가지` turns an abstraction into kinds of it. The counter is spaced off the

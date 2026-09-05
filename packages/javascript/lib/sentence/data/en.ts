@@ -137,16 +137,24 @@ export const EN: SentenceLanguageData = {
 		}
 	],
 	manners: words(`
-		quietly slowly quickly gently suddenly softly again together alone briefly steadily
-		boldly carefully eagerly warily calmly neatly side_by_side once_more
+		quietly slowly quickly gently suddenly softly again together alone briefly steadily boldly
+		carefully eagerly warily calmly neatly side_by_side once_more warmly roughly firmly patiently
+		lightly sharply wearily cheerfully idly restlessly faintly brightly evenly plainly gladly keenly
 	`),
 	times: words(`
-		at_dawn in_the_morning at_noon in_the_evening at_night today yesterday tomorrow
-		in_spring in_summer in_autumn in_winter on_weekends just_now sometimes every_day
-		at_dusk before_long
+		at_dawn in_the_morning at_noon in_the_evening at_night today yesterday tomorrow in_spring
+		in_summer in_autumn in_winter on_weekends just_now sometimes every_day at_dusk before_long
+		at_midnight at_midday last_week next_week these_days long_ago in_the_small_hours on_holidays
+		all_day every_night
 	`),
-	connectives: words(`and_then so but meanwhile afterwards still later soon even_so at_last`),
-	interjections: words(`oh, ah, wow, well, look, goodness, my, indeed, honestly,`),
+	connectives: words(`
+		and_then so but meanwhile afterwards still later soon even_so at_last however therefore besides
+		yet then_again in_the_end before_long all_the_same even_then
+	`),
+	interjections: words(`
+		oh, ah, wow, well, look, goodness, my, indeed, honestly, gosh, hey, whoa, dear_me, good_grief,
+		alas,
+	`),
 	pronouns: { n: words(`it`) },
 	// English cannot drop a subject, so a sentence about a person names it again.
 	pronounless: ['person'],

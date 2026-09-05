@@ -135,15 +135,20 @@ final SentenceLanguageData ru = SentenceLanguageData(
     ),
   ],
   manners: words(r'''
-      тихо медленно быстро мягко вдруг едва снова вместе одиноко ещё ненадолго ровно смело
-      осторожно жадно
-    '''),
+    тихо медленно быстро мягко вдруг едва снова вместе одиноко ещё ненадолго ровно смело
+    осторожно жадно спокойно весело терпеливо легко чётко бодро лениво упрямо охотно шумно мерно
+  '''),
   times: words(r'''
-      на_рассвете утром днём вечером ночью сегодня вчера завтра весной летом осенью зимой
-      в_выходные только_что иногда каждый_день в_сумерках
-    '''),
-  connectives: words(r'и_потом но затем поэтому однако наконец потом тем_временем'),
-  interjections: words(r'ах, ох, эх, ух, боже, гляди, право,'),
+    на_рассвете утром днём вечером ночью сегодня вчера завтра весной летом осенью зимой
+    в_выходные только_что иногда каждый_день в_сумерках в_полночь на_прошлой_неделе
+    на_следующей_неделе нынче давно в_праздники весь_день каждую_ночь
+  '''),
+  connectives: words(r'''
+    и_потом но затем поэтому однако наконец потом тем_временем а зато всё_же в_итоге значит
+  '''),
+  interjections: words(r'''
+    ах, ох, эх, ух, боже, гляди, право, ой, ух_ты, батюшки, надо_же, эй,
+  '''),
   pronouns: <WordGender, WordPool>{
     WordGender.m: words(r'он'),
     WordGender.f: words(r'она'),
@@ -182,5 +187,24 @@ final SentenceLanguageData ru = SentenceLanguageData(
       SentencePart(SentenceSlot.manner),
       SentencePart(SentenceSlot.verb),
     ], 12),
+    // Russian orders its words freely, so an adverb or a time can open the
+    // sentence without anything else moving. That is the only room it has left:
+    // every other part would put a noun in a case its own ending changes for.
+    SentenceFrame(<SentencePart>[
+      SentencePart(SentenceSlot.manner),
+      SentencePart(SentenceSlot.subject, modifiable: true),
+      SentencePart(SentenceSlot.verb),
+    ], 14),
+    SentenceFrame(<SentencePart>[
+      SentencePart(SentenceSlot.time),
+      SentencePart(SentenceSlot.subject, modifiable: true),
+      SentencePart(SentenceSlot.state),
+    ], 12),
+    SentenceFrame(<SentencePart>[
+      SentencePart(SentenceSlot.time),
+      SentencePart(SentenceSlot.subject, modifiable: true),
+      SentencePart(SentenceSlot.verb),
+      SentencePart(SentenceSlot.manner),
+    ], 10),
   ],
 );

@@ -185,17 +185,25 @@ final SentenceLanguageData es = SentenceLanguageData(
     ),
   ],
   manners: words(r'''
-      en_silencio despacio rápidamente suavemente de_repente apenas otra_vez juntos a_solas
-      todavía brevemente firmemente audazmente con_cuidado ansiosamente de_nuevo
-    '''),
+    en_silencio despacio rápidamente suavemente de_repente apenas otra_vez juntos a_solas
+    todavía brevemente firmemente audazmente con_cuidado ansiosamente de_nuevo tranquilamente
+    alegremente torpemente fuertemente pacientemente ligeramente tercamente serenamente
+    vivamente débilmente claramente
+  '''),
   times: words(r'''
-      al_amanecer por_la_mañana al_mediodía por_la_tarde por_la_noche hoy ayer mañana
-      en_primavera en_verano en_otoño en_invierno los_fines_de_semana hace_poco a_veces cada_día
-      al_anochecer
-    '''),
+    al_amanecer por_la_mañana al_mediodía por_la_tarde por_la_noche hoy ayer mañana en_primavera
+    en_verano en_otoño en_invierno los_fines_de_semana hace_poco a_veces cada_día al_anochecer
+    a_medianoche la_semana_pasada la_semana_que_viene estos_días hace_tiempo
+    en_los_días_festivos todo_el_día cada_noche
+  '''),
   // Written with the comma the ones that need one take.
-  connectives: words(r'y_luego pero entonces además, sin_embargo, después por_fin mientras_tanto,'),
-  interjections: words(r'ay, oh, vaya, caramba, madre_mía, mira, desde_luego,'),
+  connectives: words(r'''
+    y_luego pero entonces además, sin_embargo, después por_fin mientras_tanto, por_eso aun_así
+    más_tarde al_final en_cambio, no_obstante,
+  '''),
+  interjections: words(r'''
+    ay, oh, vaya, caramba, madre_mía, mira, desde_luego, uy, anda, hombre, cielos, vamos,
+  '''),
   // Spanish carries its subject in the verb ending, so a second sentence about
   // Money only, for the reason English has: a counted phrase would need a plural
   // noun, and most of these pools are not countable at all.

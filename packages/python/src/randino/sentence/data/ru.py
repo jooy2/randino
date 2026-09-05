@@ -136,14 +136,19 @@ RU = SentenceLanguageData(
     ),
     manners=words("""
         тихо медленно быстро мягко вдруг едва снова вместе одиноко ещё ненадолго ровно смело
-        осторожно жадно
+        осторожно жадно спокойно весело терпеливо легко чётко бодро лениво упрямо охотно шумно мерно
     """),
     times=words("""
         на_рассвете утром днём вечером ночью сегодня вчера завтра весной летом осенью зимой
-        в_выходные только_что иногда каждый_день в_сумерках
+        в_выходные только_что иногда каждый_день в_сумерках в_полночь на_прошлой_неделе
+        на_следующей_неделе нынче давно в_праздники весь_день каждую_ночь
     """),
-    connectives=words("и_потом но затем поэтому однако наконец потом тем_временем"),
-    interjections=words("ах, ох, эх, ух, боже, гляди, право,"),
+    connectives=words("""
+        и_потом но затем поэтому однако наконец потом тем_временем а зато всё_же в_итоге значит
+    """),
+    interjections=words("""
+        ах, ох, эх, ух, боже, гляди, право, ой, ух_ты, батюшки, надо_же, эй,
+    """),
     pronouns={"m": words("он"), "f": words("она"), "n": words("оно")},
     # Nominative only, which is why there is neither an object nor a place here: a
     # Russian noun changes its own ending for both, and the endings are the noun's
@@ -195,6 +200,34 @@ RU = SentenceLanguageData(
                 SentencePart("verb"),
             ),
             12,
+        ),
+        # Russian orders its words freely, so an adverb or a time can open the sentence
+        # without anything else moving. That is the only room it has left: every other
+        # part would put a noun in a case its own ending changes for.
+        SentenceFrame(
+            (
+                SentencePart("manner"),
+                SentencePart("subject", modifiable=True),
+                SentencePart("verb"),
+            ),
+            14,
+        ),
+        SentenceFrame(
+            (
+                SentencePart("time"),
+                SentencePart("subject", modifiable=True),
+                SentencePart("state"),
+            ),
+            12,
+        ),
+        SentenceFrame(
+            (
+                SentencePart("time"),
+                SentencePart("subject", modifiable=True),
+                SentencePart("verb"),
+                SentencePart("manner"),
+            ),
+            10,
         ),
     ),
 )

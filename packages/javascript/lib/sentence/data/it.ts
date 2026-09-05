@@ -156,16 +156,23 @@ export const IT: SentenceLanguageData = {
 		}
 	],
 	manners: words(`
-		in_silenzio lentamente rapidamente dolcemente improvvisamente appena di_nuovo insieme
-		da_solo ancora brevemente costantemente audacemente con_cura avidamente
+		in_silenzio lentamente rapidamente dolcemente improvvisamente appena di_nuovo insieme da_solo
+		ancora brevemente costantemente audacemente con_cura avidamente tranquillamente allegramente
+		fortemente pazientemente leggermente serenamente vivacemente debolmente chiaramente goffamente
 	`),
 	times: words(`
-		all'alba al_mattino a_mezzogiorno di_sera di_notte oggi ieri domani in_primavera
-		in_estate in_autunno in_inverno nel_fine_settimana poco_fa a_volte ogni_giorno
-		al_tramonto
+		all'alba al_mattino a_mezzogiorno di_sera di_notte oggi ieri domani in_primavera in_estate
+		in_autunno in_inverno nel_fine_settimana poco_fa a_volte ogni_giorno al_tramonto a_mezzanotte
+		la_settimana_scorsa la_settimana_prossima di_questi_tempi tempo_fa nei_giorni_festivi
+		tutto_il_giorno ogni_notte
 	`),
-	connectives: words(`e_poi ma allora inoltre, tuttavia, dopo infine intanto,`),
-	interjections: words(`oh, ah, ehi, caspita, mamma_mia, guarda, davvero,`),
+	connectives: words(`
+		e_poi ma allora inoltre, tuttavia, dopo infine intanto, perciò eppure più_tardi alla_fine
+		invece,
+	`),
+	interjections: words(`
+		oh, ah, ehi, caspita, mamma_mia, guarda, davvero, ohi, accidenti, cavolo, santo_cielo, dai,
+	`),
 	// Pro-drop, the same as Spanish: `esso` exists and nobody writes it.
 	pronouns: { n: [''] },
 	// Every Italian preposition merges with the article behind it, so the phrase a

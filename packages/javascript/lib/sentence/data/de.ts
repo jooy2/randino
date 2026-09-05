@@ -106,21 +106,26 @@ export const DE: SentenceLanguageData = {
 		}
 	],
 	manners: words(`
-		leise langsam schnell sanft plötzlich kaum wieder gemeinsam allein noch kurz
-		stetig kühn sorgsam eifrig
+		leise langsam schnell sanft plötzlich kaum wieder gemeinsam allein noch kurz stetig kühn sorgsam
+		eifrig ruhig heftig geduldig leicht fröhlich munter schwerfällig deutlich gelassen emsig zügig
 	`),
 	times: words(`
-		bei_Tagesanbruch am_Morgen am_Mittag am_Abend in_der_Nacht heute gestern morgen
-		im_Frühling im_Sommer im_Herbst im_Winter am_Wochenende gerade_eben manchmal
-		jeden_Tag in_der_Dämmerung
+		bei_Tagesanbruch am_Morgen am_Mittag am_Abend in_der_Nacht heute gestern morgen im_Frühling
+		im_Sommer im_Herbst im_Winter am_Wochenende gerade_eben manchmal jeden_Tag in_der_Dämmerung
+		um_Mitternacht letzte_Woche nächste_Woche heutzutage vor_langer_Zeit an_Feiertagen
+		den_ganzen_Tag jede_Nacht
 	`),
 	// Only the coordinating ones. German puts its finite verb second and counts
 	// whatever opens the clause towards that, so `dann` or `danach` in front would
 	// need the verb and the subject the other way round — a shape the frames write,
 	// not something a connective can bolt on. `und`, `aber`, `doch` and `denn` sit
 	// outside the clause and leave the order alone.
-	connectives: words(`und aber doch denn`),
-	interjections: words(`oh, ach, na, mensch, oje, sieh_an, wahrhaftig,`),
+	connectives: words(`
+		und aber doch denn oder
+	`),
+	interjections: words(`
+		oh, ach, na, mensch, oje, sieh_an, wahrhaftig, hui, herrje, du_meine_Güte, nanu,
+	`),
 	pronouns: { m: words(`er`), f: words(`sie`), n: words(`es`) },
 	// German declares the fewest shapes here, and both reasons are its cases. An
 	// object would be accusative, which changes the article and the modifier
@@ -203,6 +208,20 @@ export const DE: SentenceLanguageData = {
 				{ slot: 'manner' }
 			],
 			weight: 14
+		},
+		// An adverb can open the clause too, and the verb still stands second.
+		{
+			parts: [{ slot: 'manner' }, { slot: 'verb' }, { slot: 'subject', modifiable: true }],
+			weight: 16
+		},
+		{
+			parts: [
+				{ slot: 'manner' },
+				{ slot: 'verb' },
+				{ slot: 'subject', modifiable: true },
+				{ slot: 'time' }
+			],
+			weight: 10
 		},
 		// German asks by moving the finite verb to the front, which is the same rule
 		// that keeps it second in a statement — the question is what happens when
