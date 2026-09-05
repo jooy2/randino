@@ -354,6 +354,20 @@ export type SentenceType =
 export type SentenceQuote = 'double' | 'single';
 
 /**
+ * How a sentence addresses whoever is reading it:
+ * - `plain`: the form a written statement takes (`사자가 달린다`, `猫が走る`).
+ *   The default, and what every sentence here has been until now.
+ * - `polite`: the form you would use speaking to somebody (`사자가 달립니다`,
+ *   `猫が走ります`).
+ *
+ * Korean and Japanese are the whole of it. Spanish, Italian, German and Russian
+ * have a T–V distinction, but it lives in the second person and every sentence
+ * here is third; English has no such form at all. In those five, `polite` writes
+ * exactly what `plain` does.
+ */
+export type SentenceStyle = 'plain' | 'polite';
+
+/**
  * Which of them a result may be. An array is a set to draw from, decided per
  * sentence, and `'all'` is every one of them.
  */
@@ -409,6 +423,15 @@ export interface RandSentenceOptions extends RandCommonOptions {
 	 * second-level ones. Ignored by every other type.
 	 */
 	quote?: SentenceQuote;
+	/**
+	 * How the sentence addresses its reader. Default `'plain'`.
+	 *
+	 * Korean and Japanese are the two languages this changes: `달린다` becomes
+	 * `달립니다` and `走る` becomes `走ります`, question included (`달립니까?`).
+	 * The other seven write the same sentence either way, which is what their
+	 * grammar actually does with politeness in the third person.
+	 */
+	style?: SentenceStyle;
 	/**
 	 * Whether a sentence about a person writes a generated name where that person
 	 * would go — `Emma runs quietly.`, `민준이 조용히 달린다.` Default `false`.

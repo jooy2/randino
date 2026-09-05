@@ -40,6 +40,7 @@ import type {
 	SentenceSlot,
 	SentenceSlotOption,
 	SentenceQuote,
+	SentenceStyle,
 	SentenceType,
 	SentenceTypeOption,
 	WordLanguage,
@@ -109,6 +110,8 @@ type Settings = {
 	types: readonly SentenceType[];
 	// Which marks a quoted line takes, or undefined for the type's own default.
 	quote?: SentenceQuote;
+	// How the sentences address their reader.
+	style: SentenceStyle;
 };
 
 // The kinds a quoted line can be. Somebody speaking is as often asking as
@@ -1247,7 +1250,7 @@ function compose(
 	// The same predicates, in the form this type of sentence ends on. Index-aligned
 	// with `group.words`, which is what lets a required word be translated rather
 	// than written out in the wrong form.
-	const predicates = formOf(group, draw.mark);
+	const predicates = formOf(group, draw.mark, settings.style);
 	const subjectThemes = themesForClasses(themes, group.subject);
 	const subjectRequired = requiredAt(frame, plan, 'subject');
 	// A theme the caller named is honoured even when no verb group of the language
@@ -1553,9 +1556,28 @@ function predicateFor(
 	return agreed(pickWord(pool, Math.min(min, max), max, '') ?? pick(pool));
 }
 
-/** The predicates of a group, in the form this type of sentence ends on. */
-function formOf(group: StateGroup | VerbGroup, mark: SentenceMark): WordPool {
-	return (mark === 'question' ? group.forms?.question : undefined) ?? group.words;
+/**
+ * The predicates of a group, in the form this sentence ends on.
+ *
+ * The chain is `politeQuestion` → `polite` → `question` → `words`, so a group
+ * declares only what its language actually writes. Japanese declares `polite`
+ * alone and it serves the question too, because the `か` that asks is the frame's
+ * tag rather than part of the verb; Korean declares both, because `달립니까`
+ * is not `달립니다`.
+ */
+function formOf(group: StateGroup | VerbGroup, mark: SentenceMark, style: SentenceStyle): WordPool {
+	const forms = group.forms;
+	const asking = mark === 'question';
+
+	if (style === 'polite') {
+		const polite = asking ? (forms?.politeQuestion ?? forms?.polite) : forms?.polite;
+
+		if (polite) {
+			return polite;
+		}
+	}
+
+	return (asking ? forms?.question : undefined) ?? group.words;
 }
 
 function upper(word: string): string {
@@ -1835,7 +1857,8 @@ function resolveSettings(options: RandSentenceOptions): Settings {
 		realism: options.realism ?? 'real',
 		includeName: options.includeName ?? false,
 		types: resolveTypes(options.type),
-		quote: options.quote
+		quote: options.quote,
+		style: options.style === 'polite' ? 'polite' : 'plain'
 	};
 }
 

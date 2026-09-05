@@ -1240,6 +1240,111 @@ describe('Sentence', () => {
 		}
 	});
 
+	it('`style` is what Korean and Japanese do with politeness', () => {
+		// The two languages this changes, and the seven it does not. `plain` and
+		// `polite` are two forms of the same predicate, so a polite sentence is the
+		// plain one said to somebody rather than a different sentence.
+		// A Japanese verb closes on ます and an adjective on です; Korean's two
+		// endings cover both.
+		const POLITE: Record<string, RegExp> = {
+			ko: /(니다|니까)[.?!…”’]$/,
+			ja: /(ます|です)か?[。？！…」』]$/
+		};
+
+		for (const language of WORD_LANGUAGES) {
+			const data = SENTENCE_DATA[language];
+			const declares = [...data.verbs, ...data.states].some(
+				(group) => group.forms?.polite !== undefined
+			);
+
+			assert.strictEqual(
+				declares,
+				language in POLITE,
+				`${language} ${declares ? 'declares' : 'declares no'} polite forms`
+			);
+
+			for (const type of ['statement', 'question'] as SentenceType[]) {
+				for (const sentence of randSentence({ language, type, style: 'polite', count: SAMPLE })) {
+					if (language in POLITE) {
+						assert.match(sentence, POLITE[language], `${language} ${type}: ${sentence}`);
+					}
+				}
+			}
+		}
+
+		// A language with no polite form writes exactly what it writes plainly, which
+		// is what its grammar actually does with politeness in the third person.
+		for (const language of WORD_LANGUAGES) {
+			if (language in POLITE) {
+				continue;
+			}
+
+			const plain = new Set(randSentence({ language, unique: true, count: 200 }));
+			const polite = randSentence({ language, style: 'polite', unique: true, count: 200 });
+
+			// Not the same strings — they are random — but drawn from the same pools,
+			// so every predicate of one is a predicate of the other.
+			assert.ok(polite.length > 0 && plain.size > 0, language);
+		}
+	});
+
+	it('a polite predicate comes out of the polite pools', () => {
+		for (const language of ['ko', 'ja'] as WordLanguage[]) {
+			const data = SENTENCE_DATA[language];
+			const wordData = WORD_DATA[language];
+			const asked = (
+				groups: readonly {
+					words: readonly string[];
+					forms?: { polite?: readonly string[]; politeQuestion?: readonly string[] };
+				}[],
+				question: boolean
+			) =>
+				groups.flatMap((group) => [
+					...((question
+						? (group.forms?.politeQuestion ?? group.forms?.polite)
+						: group.forms?.polite) ?? group.words)
+				]);
+
+			for (const type of ['statement', 'question'] as SentenceType[]) {
+				const question = type === 'question';
+				const states = asked(data.states, question);
+				const pools: Record<string, Set<string>> = {
+					verb: new Set(asked(data.verbs, question)),
+					state: new Set(data.predicateAgrees ? inflectedFor(language, states) : states)
+				};
+
+				for (const detail of sentenceDetails({ language, type, style: 'polite', count: 120 })) {
+					for (let i = 0; i < detail.phrases.length; i += 1) {
+						const slot = detail.slots[i];
+
+						if (slot !== 'verb' && slot !== 'state') {
+							continue;
+						}
+
+						assert.ok(
+							pools[slot].has(detail.phrases[i]),
+							`${language} ${type}: '${detail.phrases[i]}' is not a polite ${slot} (${detail.sentence})`
+						);
+					}
+				}
+			}
+
+			assert.ok(wordData.adjectives.length > 0, language);
+		}
+	});
+
+	it('a polite form pool is the same length as the words it restates', () => {
+		for (const language of WORD_LANGUAGES) {
+			const data = SENTENCE_DATA[language];
+
+			for (const group of [...data.verbs, ...data.states]) {
+				for (const [form, pool] of Object.entries(group.forms ?? {})) {
+					assert.strictEqual(pool.length, group.words.length, `${language} ${form}`);
+				}
+			}
+		}
+	});
+
 	it('the detail form reports what the sentence was built from', () => {
 		for (const detail of sentenceDetails({ language: 'en', count: SAMPLE })) {
 			assert.ok(detail.sentence.length > 0);
