@@ -6,17 +6,17 @@
 
 ### 📘 [**randino.cdget.com**](https://randino.cdget.com)
 
-Every option, every language and every example — pick **JavaScript**, **Dart** or **Python** in the sidebar. This README is the map; each package has a quick start of its own.
+Every option, every language and every example, with **JavaScript**, **Dart** or **Python** picked in the sidebar. This README is the overview, and each package has a quick start of its own.
 
 ---
 
-**randino** generates random text in the language you ask for. Today that is person names, nicknames, words and whole sentences; the shape it is built in — one function per kind of text, one set of options, per-language datasets — is meant to hold whatever comes next.
+**randino** generates random text in the language you ask for: person names, nicknames, everyday words and whole sentences. One function per kind of text, one set of options, and a dataset per language.
 
-- **Person names** read like names people actually carry — Emma Clover, Jack Reeves — and come with their English pronunciation. 9 languages.
-- **Nicknames** are the handles you would pick for a game or a website — MistyOwl, CraneVoyage, RustyBoot. Built from everyday words across twenty-five themes, never from person names, with over forty million combinations in Korean and English before a random suffix is added.
-- **Words** are those twenty-five themes on their own — `randWord`, and a function per theme: `randAnimal`, `randFood`, `randGem` and twenty-two more.
-- **Sentences** are whole statements in the language's own grammar — `randSentence`. A verb states what can do it and what it can be done to, so the words of one sentence belong together: 여우가 사과를 먹는다, The brave lion runs quietly.
-- **Decorators** attach something to a string you already have rather than generating one: a random token with `randSuffix` and `randPrefix`, a modifier with `randModifier`.
+- **Person names** read like names people carry: Emma Clover, Jack Reeves, each with its English pronunciation. 9 languages.
+- **Nicknames** are handles for a game or a website: MistyOwl, CraneVoyage, RustyBoot. Built from everyday words across twenty-five themes and never from person names, they run to over forty million combinations in Korean and in English before a random suffix is added.
+- **Words** are those twenty-five themes on their own: `randWord`, and a function per theme, from `randAnimal` and `randFood` to `randGem`.
+- **Sentences** are whole statements in the language's own grammar, from `randSentence`. A verb states what can do it and what it can be done to, so the words of one sentence belong together: 여우가 사과를 먹는다, The brave lion runs quietly.
+- **Decorators** attach something to a string you already have rather than generating one: a random token with `randSuffix` and `randPrefix`, a word with `randModifier`.
 - One options set per generator: language, length, count, and a `realism` setting that goes from real words to fully invented ones.
 - **No runtime dependencies**, in any of the packages.
 
