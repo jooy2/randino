@@ -1,0 +1,92 @@
+# randino
+
+> Random person names, nicknames, words and sentences in the language you ask for — Korean, English, Japanese, Chinese and five more. One library, shipped for JavaScript, Dart and Python, with no runtime dependencies.
+
+randino generates two things and keeps them apart on purpose. **Person names** read like names
+a person actually carries (김민준, Emma Clover) and are meant for sample data. **Nicknames** are
+the handles someone would pick for a game or a website (멋진사자, MistyOwl); they are built from
+everyday words and never from person names.
+
+The same library ships as three packages — `randino` on npm, on pub.dev and on PyPI — generating
+the same output from the same datasets. **Everything below is the JavaScript package**, which is
+the reference implementation. The other two differ only in how options are passed: Dart takes
+named parameters (`randName(language: NameLanguage.ko)`), and Python takes keyword arguments with
+snake_case names (`rand_name(language="ko")`, `min_length`, `include_middle_name`).
+
+Every page below also exists in Korean at the same path under `/ko/`.
+
+## Guide
+
+- [Demo](https://randino.cdget.com/demo): Everything below runs in your browser. The controls are the options randName, randNickname, randWord and randSentence actually take, the code block under the…
+- [Getting started](https://randino.cdget.com/guide/getting-started): randino ships as three packages from one set of datasets. Pick your language in the sidebar, and every code sample on this site follows that choice, including…
+- [Supported languages](https://randino.cdget.com/guide/languages): randino generates in nine languages, each with its own pools, its own name order and its own romanization. Every generator takes a language, and mixes all of…
+
+## API: Generators: General
+
+- [randName](https://randino.cdget.com/name/rand-name): Generates person names and returns count of them as strings, written in the script you asked for. With output: 'detail' it returns the native and romanized…
+- [randNickname](https://randino.cdget.com/nickname/rand-nickname): Generates nicknames and returns count of them as strings. Each one is an everyday word with something added to it: an adjective in front, a verb in front, a…
+- [randWord](https://randino.cdget.com/word/rand-word): Generates everyday words and returns count of them as strings. Animals, things, nature and ideas, across twenty-five themes in nine languages, and never a…
+- [randSentence](https://randino.cdget.com/sentence/rand-sentence): Generates whole sentences and returns count of them as strings. Each one is a subject and something said about it, written the way the language writes it: the…
+
+## API: Generators: Words
+
+- [randAnimal](https://randino.cdget.com/word/rand-animal): Animals, the creatures a nickname is most often built around.
+- [randObject](https://randino.cdget.com/word/rand-object): Everyday things: what is on a desk, in a bag, around a house.
+- [randNature](https://randino.cdget.com/word/rand-nature): Nature and its phenomena: sky, weather, water and land.
+- [randPlant](https://randino.cdget.com/word/rand-plant): Plants: trees, flowers, leaves and what grows on them.
+- [randGem](https://randino.cdget.com/word/rand-gem): Stones and metals, precious and ordinary alike.
+- [randConcept](https://randino.cdget.com/word/rand-concept): Ideas out of the humanities and the social world.
+- [randMyth](https://randino.cdget.com/word/rand-myth): Creatures and figures out of myth and folklore.
+- [randJob](https://randino.cdget.com/word/rand-job): The trades and roles people hold. Never a person name, which is why there is no Baker or Hunter here.
+- [randMusic](https://randino.cdget.com/word/rand-music): Music: instruments, forms and the words around them.
+- [randPlace](https://randino.cdget.com/word/rand-place): Places where people gather, live and pass through.
+- [randFood](https://randino.cdget.com/word/rand-food): Food and drink, the everyday kind.
+- [randSport](https://randino.cdget.com/word/rand-sport): Sports and the things people play.
+- [randVehicle](https://randino.cdget.com/word/rand-vehicle): Things that carry you.
+- [randProduct](https://randino.cdget.com/word/rand-product): Things you buy, the manufactured end of the vocabulary.
+- [randColor](https://randino.cdget.com/word/rand-color): Colours, from the plain ones to the ones with a history.
+- [randFinance](https://randino.cdget.com/word/rand-finance): Money, and the words for what is done with it.
+- [randTech](https://randino.cdget.com/word/rand-tech): The vocabulary of computers and the networks between them.
+- [randWeather](https://randino.cdget.com/word/rand-weather): What the sky is doing, from a breeze to a blizzard.
+- [randSpace](https://randino.cdget.com/word/rand-space): What is beyond the sky, from the moon to a galaxy.
+- [randTime](https://randino.cdget.com/word/rand-time): When something happens, from a moment to a season.
+- [randEmotion](https://randino.cdget.com/word/rand-emotion): What someone feels, from joy to a quiet regret.
+- [randBody](https://randino.cdget.com/word/rand-body): The parts of a body, inside and out.
+- [randClothing](https://randino.cdget.com/word/rand-clothing): What people wear, and what it is made of.
+- [randTool](https://randino.cdget.com/word/rand-tool): What a hand works with, from a chisel to a plough.
+- [randDrink](https://randino.cdget.com/word/rand-drink): Something to drink, hot, cold or fermented.
+
+## API: Decorators
+
+- [randSuffix](https://randino.cdget.com/decorate/rand-suffix): Appends a random token to a string, or to every string in an array, so MistyOwl becomes MistyOwl_nVtRC. It turns a nickname that is merely unlikely to collide…
+- [randPrefix](https://randino.cdget.com/decorate/rand-prefix): Prepends a random token to a string, or to every string in an array. It mirrors randSuffix, for the places where the distinguishing part belongs in front: a…
+- [randModifier](https://randino.cdget.com/decorate/rand-modifier): Puts a random modifier in front of a string, or of every string in an array, so Owl becomes MistyOwl. It takes any string rather than only this library's…
+
+## API: Utilities
+
+- [nameLengthRange](https://randino.cdget.com/name/name-length-range): The natural length range of a full name in that language, in characters of the native form. This is what randName falls back to when minLength or maxLength is…
+- [nameSupportsMiddleName](https://randino.cdget.com/name/name-supports-middle-name): Whether the language uses a middle name at all. Korean, Japanese and Chinese names have no middle part, so includeMiddleName is ignored for them. Like the two…
+- [nameSupportsRoman](https://randino.cdget.com/name/name-supports-roman): Whether asking for the romanized script produces anything different from the native one. Only English answers false, because its names are already written in…
+- [nicknameLengthRange](https://randino.cdget.com/nickname/nickname-length-range): Every nickname length the language can produce, in characters. This is what randNickname falls back to when minLength or maxLength is omitted.
+- [sentenceLengthRange](https://randino.cdget.com/sentence/sentence-length-range): Every sentence length the language can produce, in characters. That is what randSentence falls back to when minLength or maxLength is omitted.
+- [wordLengthRange](https://randino.cdget.com/word/word-length-range): Reports the shortest and longest word a language's pools hold, in characters. This is what randWord falls back to when minLength or maxLength is left out.
+
+## Behaviour
+
+- [Person names](https://randino.cdget.com/name/): randino generates names people carry, such as Emma Clover and Jack Reeves, in nine languages, each in its own script and with its English pronunciation…
+- [Nicknames](https://randino.cdget.com/nickname/): A nickname is the handle someone would pick for a game or a website: MistyOwl, CraneVoyage, RustyBoot. randino builds one out of an everyday word with…
+- [Sentences](https://randino.cdget.com/sentence/): randSentence writes a whole statement rather than a name or a handle: a subject, and something said about it. This page is how it decides what may stand where.…
+
+## Reference
+
+- [Themes](https://randino.cdget.com/word/themes): A theme is a slice of everyday vocabulary that a modifier can sit in front of. There are twenty-five of them, every language fills every one, and a word…
+- [Constants](https://randino.cdget.com/reference/constants): The lists the generators accept, and the hard bounds every numeric option is clamped to. Nothing here throws: a count of -10 returns nothing and a count of a…
+- [Changelog](https://randino.cdget.com/changelog): Each package versions on its own, so the lists below do not line up — a release on one side is not a release on the others. Pick a language in the sidebar to…
+
+## Optional
+
+- [Full documentation as one file](https://randino.cdget.com/llms-full.txt): every page above, concatenated.
+- [Source repository](https://github.com/jooy2/randino): the datasets, the three packages and this site.
+- [npm](https://www.npmjs.com/package/randino): the published package.
+- [pub.dev](https://pub.dev/packages/randino): the published package.
+- [PyPI](https://pypi.org/project/randino/): the published package.
