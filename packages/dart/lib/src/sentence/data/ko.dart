@@ -15,6 +15,10 @@ final SentenceLanguageData ko = SentenceLanguageData(
     SentenceType.exclamation: '!',
     SentenceType.trailing: '…',
   },
+  quotes: const <SentenceQuote, List<String>>{
+    SentenceQuote.double: <String>['“', '”'],
+    SentenceQuote.single: <String>['‘', '’'],
+  },
   // Plain declarative — the form a written statement takes, rather than the
   // polite 합니다체 a person would speak.
   verbs: <VerbGroup>[

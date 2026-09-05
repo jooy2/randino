@@ -63,6 +63,7 @@ class _Settings {
     required this.realism,
     required this.includeName,
     required this.types,
+    required this.quote,
   });
 
   final WordTheme? theme;
@@ -93,19 +94,53 @@ class _Settings {
 
   /// What the sentences may be doing, normalized to a set to draw from.
   final List<SentenceType> types;
+
+  /// Which marks a quoted line takes, or null for the type's own default.
+  final SentenceQuote? quote;
 }
 
-/// The one thing a shape has to match to answer a type.
-SentenceMood _moodFor(SentenceType type) =>
-    type == SentenceType.question ? SentenceMood.question : SentenceMood.statement;
+// The kinds a quoted line can be. Somebody speaking is as often asking as
+// telling, and often enough neither, so the mark is drawn rather than fixed.
+const List<SentenceType> _quotedMarks = <SentenceType>[
+  SentenceType.statement,
+  SentenceType.question,
+  SentenceType.exclamation,
+];
+
+/// The kind whose mark a sentence of this type closes on.
+///
+/// Dialogue and thought have no mark of their own: what they quote is a sentence
+/// of another kind, and they take its mark and put quotation marks around it.
+SentenceType _markFor(SentenceType type) =>
+    type == SentenceType.dialogue || type == SentenceType.thought ? pick(_quotedMarks) : type;
+
+/// The marks a quoted line is wrapped in, or null when nothing is quoted.
+List<String>? _quoteFor(SentenceLanguageData data, SentenceType type, SentenceQuote? override) {
+  if (type != SentenceType.dialogue && type != SentenceType.thought) return null;
+
+  return data.quotes[override ??
+      (type == SentenceType.dialogue ? SentenceQuote.double : SentenceQuote.single)];
+}
+
+/// The one thing a shape has to match to answer a kind.
+SentenceMood _moodFor(SentenceType mark) =>
+    mark == SentenceType.question ? SentenceMood.question : SentenceMood.statement;
 
 /// Everything one sentence of a result is drawn against: the room it has, what
 /// it is doing, what it opens on, and — after the first — what it is about.
 class _Draw {
-  const _Draw(this.budget, this.type, this.opener, this.follow);
+  const _Draw(this.budget, this.type, this.mark, this.quote, this.opener, this.follow);
 
   final LengthRange budget;
+
+  /// What the caller asked for, and what the detail reports.
   final SentenceType type;
+
+  /// The kind whose mark it closes on — its own, or the one it is quoting.
+  final SentenceType mark;
+
+  /// The quotation marks it is wrapped in, or null.
+  final List<String>? quote;
 
   /// A connective or an interjection, `''` for neither.
   final String opener;
@@ -1059,7 +1094,7 @@ _Built _compose(
   // with the plain words, which is what lets a required word be translated rather
   // than written out in the wrong form.
   final base = stateGroup?.words ?? verbGroup!.words;
-  final predicates = _formOf(stateGroup, verbGroup, draw.type);
+  final predicates = _formOf(stateGroup, verbGroup, draw.mark);
   final subjectClasses = stateGroup?.subject ?? verbGroup!.subject;
   final subjectThemes = _themesForClasses(themes, subjectClasses);
   final subjectRequired = _requiredAt(frame, plan, SentenceSlot.subject);
@@ -1098,8 +1133,10 @@ _Built _compose(
       follow == null && _isNounSlot(first.slot) && first.head == null && data.articles == null;
   final space = data.space.length;
   final opener = draw.opener;
-  final close = data.terminators[draw.type]!;
-  final open = data.openers[draw.type] ?? '';
+  final close = data.terminators[draw.mark]!;
+  final open = data.openers[draw.mark] ?? '';
+  final quoteOpen = draw.quote?[0] ?? '';
+  final quoteClose = draw.quote?[1] ?? '';
   final tag = frame.tag == null ? '' : data.space + frame.tag!;
   // Every phrase's theme is settled before any of them is drawn, because a length
   // budget is only as good as the pools it was measured against. Left to the loop,
@@ -1334,7 +1371,7 @@ _Built _compose(
   return _Built(
     // The opener is written against the first phrase rather than beside it —
     // Spanish `¿El león corre?`, never `¿ El león corre ?`.
-    open + written.join(data.space) + tag + close,
+    quoteOpen + open + written.join(data.space) + tag + close + quoteClose,
     reported,
     slots,
     names,
@@ -1347,11 +1384,11 @@ _Built _compose(
 }
 
 /// The predicates of a group, in the form this type of sentence ends on.
-WordPool _formOf(StateGroup? stateGroup, VerbGroup? verbGroup, SentenceType type) {
+WordPool _formOf(StateGroup? stateGroup, VerbGroup? verbGroup, SentenceType mark) {
   final forms = stateGroup?.forms ?? verbGroup!.forms;
   final words = stateGroup?.words ?? verbGroup!.words;
 
-  if (type != SentenceType.question) return words;
+  if (mark != SentenceType.question) return words;
 
   return forms[PredicateForm.question] ?? words;
 }
@@ -1421,7 +1458,7 @@ _Built _generateOne(WordLanguage language, _Settings settings, _Draw draw) {
   final data = sentenceData[language]!;
   final bounds = _slotBounds(language);
   final modifierBounds = _modifierBounds[language]!;
-  final allowed = _framesFor(data, settings, _moodFor(draw.type));
+  final allowed = _framesFor(data, settings, _moodFor(draw.mark));
   final requested = _subjectThemesFor(settings, follow);
   // The words a caller required go in the first sentence — once in the result
   // rather than once in every sentence of it.
@@ -1692,7 +1729,7 @@ _Follow _followFor(SentenceLanguageData data, _Topic topic) {
 /// of seventy-five has nowhere to put them.
 String _openerFor(
   SentenceLanguageData data,
-  SentenceType type,
+  SentenceType mark,
   bool following,
   int room,
   int shortest,
@@ -1702,7 +1739,7 @@ String _openerFor(
   List<String> fitting(WordPool pool) =>
       pool.where((word) => word.length <= spare).toList(growable: false);
 
-  if (type == SentenceType.exclamation) {
+  if (mark == SentenceType.exclamation) {
     final usable = fitting(data.interjections);
 
     if (usable.isNotEmpty && chance(_interjectionChance)) return pick(usable);
@@ -1726,8 +1763,14 @@ List<_Built> _generateResult(WordLanguage language, _Settings settings) {
   final modifierBounds = _modifierBounds[language]!;
   // Every shape any of the requested types could take, because the budget is
   // shared out before the first type is even drawn.
+  // A quoted line can be any kind at all, so its shapes are all of them.
   final frames = <SentenceFrame>[
-    for (final type in settings.types) ..._framesFor(data, settings, _moodFor(type)),
+    for (final type in settings.types)
+      for (final mark
+          in type == SentenceType.dialogue || type == SentenceType.thought
+              ? _quotedMarks
+              : <SentenceType>[type])
+        ..._framesFor(data, settings, _moodFor(mark)),
   ];
   final shortest = _naturalSpan(data, frames, bounds, modifierBounds).min;
   final budgets = _shareOut(
@@ -1741,11 +1784,14 @@ List<_Built> _generateResult(WordLanguage language, _Settings settings) {
   for (var i = 0; i < settings.sentences; i += 1) {
     final budget = budgets[i];
     final type = pick(settings.types);
+    final mark = _markFor(type);
     final follow = topic == null ? null : _followFor(data, topic);
     final draw = _Draw(
       budget,
       type,
-      _openerFor(data, type, follow != null, budget.max, shortest),
+      mark,
+      _quoteFor(data, type, settings.quote),
+      _openerFor(data, mark, follow != null, budget.max, shortest),
       follow,
     );
     var one = _generateOne(language, settings, draw);
@@ -1757,7 +1803,11 @@ List<_Built> _generateResult(WordLanguage language, _Settings settings) {
     // giving up: it stands in front of the whole sentence rather than instead of
     // any piece of it.
     if (draw.opener.isNotEmpty && _distanceFrom(one.sentence.length, budget) > 0) {
-      final bare = _generateOne(language, settings, _Draw(draw.budget, draw.type, '', draw.follow));
+      final bare = _generateOne(
+        language,
+        settings,
+        _Draw(draw.budget, draw.type, draw.mark, draw.quote, '', draw.follow),
+      );
 
       if (_distanceFrom(bare.sentence.length, budget) <
           _distanceFrom(one.sentence.length, budget)) {
@@ -1790,6 +1840,7 @@ List<SentenceDetail> generateSentenceDetails({
   int sentences = 1,
   bool includeName = false,
   Set<SentenceType>? type,
+  SentenceQuote? quote,
 }) {
   final settings = _Settings(
     theme: theme,
@@ -1807,6 +1858,7 @@ List<SentenceDetail> generateSentenceDetails({
         type == null || type.isEmpty
             ? const <SentenceType>[SentenceType.statement]
             : type.toList(growable: false),
+    quote: quote,
   );
 
   return collect<SentenceDetail>(

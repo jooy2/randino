@@ -43,6 +43,7 @@ void main() {
           'NicknameDetail',
           'RandRealism',
           'SentenceDetail',
+          'SentenceQuote',
           'SentenceShape',
           'SentenceType',
           'SentenceSlot',

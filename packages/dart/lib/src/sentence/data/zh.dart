@@ -15,6 +15,13 @@ final SentenceLanguageData zh = SentenceLanguageData(
     SentenceType.exclamation: '！',
     SentenceType.trailing: '…',
   },
+  // The curly quotes rather than 「」: these pools are written in simplified
+  // Chinese, and horizontal simplified text uses “” — the corner brackets are
+  // what Taiwan and Hong Kong write.
+  quotes: const <SentenceQuote, List<String>>{
+    SentenceQuote.double: <String>['“', '”'],
+    SentenceQuote.single: <String>['‘', '’'],
+  },
   verbs: <VerbGroup>[
     VerbGroup(
       subject: const <NounClass>[NounClass.creature, NounClass.person],

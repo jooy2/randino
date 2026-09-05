@@ -15,15 +15,15 @@ const int sample = 60;
 
 /// Everything a sentence of the language may be written with, punctuation aside.
 final Map<WordLanguage, RegExp> script = <WordLanguage, RegExp>{
-  WordLanguage.en: RegExp(r"^[A-Za-z' ,.?!…]+$"),
-  WordLanguage.ko: RegExp(r'^[가-힣 ,.?!…]+$'),
-  WordLanguage.ja: RegExp(r'^[々぀-ヿ一-鿿。、？！…]+$'),
-  WordLanguage.zh: RegExp(r'^[々一-鿿。，？！…]+$'),
-  WordLanguage.vi: RegExp(r'^[a-zA-ZÀ-ỹ ,.?!…]+$'),
-  WordLanguage.es: RegExp(r'^[a-zA-ZÀ-ÿ ,.?!…¿¡]+$'),
-  WordLanguage.it: RegExp(r"^[a-zA-ZÀ-ÿ' ,.?!…]+$"),
-  WordLanguage.de: RegExp(r'^[a-zA-ZÀ-ÿß ,.?!…]+$'),
-  WordLanguage.ru: RegExp(r'^[Ѐ-ӿ ,.?!…]+$'),
+  WordLanguage.en: RegExp(r"^[A-Za-z' ,.?!…“”‘’]+$"),
+  WordLanguage.ko: RegExp(r'^[가-힣 ,.?!…“”‘’]+$'),
+  WordLanguage.ja: RegExp(r'^[々぀-ヿ一-鿿。、？！…「」『』]+$'),
+  WordLanguage.zh: RegExp(r'^[々一-鿿。，？！…“”‘’]+$'),
+  WordLanguage.vi: RegExp(r'^[a-zA-ZÀ-ỹ ,.?!…“”‘’]+$'),
+  WordLanguage.es: RegExp(r'^[a-zA-ZÀ-ÿ ,.?!…¿¡«»“”]+$'),
+  WordLanguage.it: RegExp(r"^[a-zA-ZÀ-ÿ' ,.?!…«»“”]+$"),
+  WordLanguage.de: RegExp(r'^[a-zA-ZÀ-ÿß ,.?!…„“‚‘]+$'),
+  WordLanguage.ru: RegExp(r'^[Ѐ-ӿ ,.?!…«»„“]+$'),
 };
 
 /// A word as a sentence writes it — English stores its pools capitalized.
@@ -979,7 +979,14 @@ void main() {
       for (final language in wordLanguages) {
         final data = sentenceData[language]!;
 
-        for (final type in SentenceType.values) {
+        // The four a language writes a mark of its own for; a quoted line takes
+        // the mark of whatever it quotes, and has its own test below.
+        for (final type in <SentenceType>[
+          SentenceType.statement,
+          SentenceType.question,
+          SentenceType.exclamation,
+          SentenceType.trailing,
+        ]) {
           for (final detail in randSentenceDetails(
             language: language,
             type: <SentenceType>{type},
@@ -1019,6 +1026,91 @@ void main() {
       };
 
       expect(seen, hasLength(SentenceType.values.length));
+    });
+
+    test('a quoted line is a sentence in the language`s own marks', () {
+      for (final language in wordLanguages) {
+        final data = sentenceData[language]!;
+        final marks = data.terminators.values.toList(growable: false);
+        final pairs = <SentenceType, SentenceQuote>{
+          SentenceType.dialogue: SentenceQuote.double,
+          SentenceType.thought: SentenceQuote.single,
+        };
+
+        pairs.forEach((type, kind) {
+          final open = data.quotes[kind]![0];
+          final close = data.quotes[kind]![1];
+
+          for (final detail in randSentenceDetails(
+            language: language,
+            type: <SentenceType>{type},
+            count: sample,
+          )) {
+            expect(detail.types, <SentenceType>[type], reason: detail.sentence);
+            expect(detail.sentence, startsWith(open), reason: '$language: ${detail.sentence}');
+            expect(detail.sentence, endsWith(close), reason: '$language: ${detail.sentence}');
+            expect(detail.sentence, matches(script[language]!), reason: detail.sentence);
+
+            // What is quoted is a whole sentence, closed the way its own kind
+            // closes — a spoken line is as often asking as telling.
+            final inner = detail.sentence.substring(
+              open.length,
+              detail.sentence.length - close.length,
+            );
+
+            expect(
+              marks.any(inner.endsWith),
+              isTrue,
+              reason: '$language: "$inner" closes on no mark',
+            );
+          }
+        });
+      }
+    });
+
+    test('a quoted line is as often asking as telling', () {
+      // The mark under a quote is drawn per line rather than fixed, so a hundred
+      // of them are not a hundred statements.
+      final data = sentenceData[WordLanguage.en]!;
+      final closes = <String>{};
+
+      for (final sentence in randSentence(
+        language: WordLanguage.en,
+        type: <SentenceType>{SentenceType.dialogue},
+        count: 200,
+      )) {
+        closes.add(sentence.substring(sentence.length - 2, sentence.length - 1));
+      }
+
+      expect(closes, contains(data.terminators[SentenceType.statement]));
+      expect(closes, contains(data.terminators[SentenceType.question]));
+      expect(closes, contains(data.terminators[SentenceType.exclamation]));
+    });
+
+    test('`quote` picks the marks, whatever the type', () {
+      for (final language in wordLanguages) {
+        final quotes = sentenceData[language]!.quotes;
+
+        for (final kind in SentenceQuote.values) {
+          final open = quotes[kind]![0];
+          final close = quotes[kind]![1];
+
+          for (final type in <SentenceType>[SentenceType.dialogue, SentenceType.thought]) {
+            for (final sentence in randSentence(
+              language: language,
+              type: <SentenceType>{type},
+              quote: kind,
+              count: 20,
+            )) {
+              expect(sentence, startsWith(open), reason: '$language $type $kind: $sentence');
+              expect(sentence, endsWith(close), reason: '$language $type $kind: $sentence');
+            }
+          }
+        }
+
+        // The two levels are two different pairs, or the option means nothing.
+        expect(quotes[SentenceQuote.double], isNot(quotes[SentenceQuote.single]));
+      }
     });
 
     test('a question is a shape, not a mark bolted onto a statement', () {

@@ -15,6 +15,12 @@ final SentenceLanguageData ja = SentenceLanguageData(
     SentenceType.exclamation: '！',
     SentenceType.trailing: '…',
   },
+  // The corner brackets, not the curly quotes: Japanese writes 「」 first and
+  // 『』 for a quote inside one.
+  quotes: const <SentenceQuote, List<String>>{
+    SentenceQuote.double: <String>['「', '」'],
+    SentenceQuote.single: <String>['『', '』'],
+  },
   verbs: <VerbGroup>[
     VerbGroup(
       subject: const <NounClass>[NounClass.creature, NounClass.person],

@@ -43,6 +43,10 @@ import 'package:randino/src/types.dart';
 /// do-support, German's verb moving to the front, Korean's and Japanese's
 /// endings — say so in their own shapes.
 ///
+/// [quote] overrides which quotation marks a `dialogue` or a `thought` is
+/// written in. Left out, dialogue takes the language's first-level marks and
+/// thought its second-level ones.
+///
 /// ```dart
 /// randSentence(language: WordLanguage.ko, count: 2);
 /// // ['검은 고양이가 숲에서 잠잔다.', '여우가 사과를 먹는다.']
@@ -68,6 +72,7 @@ List<String> randSentence({
   int sentences = 1,
   bool includeName = false,
   Set<SentenceType>? type,
+  SentenceQuote? quote,
 }) =>
     generateSentenceDetails(
       language: language,
@@ -84,4 +89,5 @@ List<String> randSentence({
       sentences: sentences,
       includeName: includeName,
       type: type,
+      quote: quote,
     ).map((detail) => detail.sentence).toList();

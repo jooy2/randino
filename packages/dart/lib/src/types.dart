@@ -357,6 +357,29 @@ enum SentenceType {
 
   /// A statement that stops rather than ends: `사자가 달린다…`
   trailing,
+
+  /// A line somebody says, in the language's own quotation marks.
+  ///
+  /// `“Does the lion run?”`, `「猫が走るか？」`. What is quoted is a sentence of
+  /// one of the other kinds, drawn per line, because somebody speaking is as
+  /// often asking as telling.
+  dialogue,
+
+  /// The same, in the marks the language keeps for a second level.
+  thought,
+}
+
+/// Which pair of quotation marks a quoted line takes.
+///
+/// Left out, [SentenceType.dialogue] takes the language's first-level marks and
+/// [SentenceType.thought] the ones it keeps for a second level — `“…”` beside
+/// `‘…’` in English, `«…»` beside `„…“` in Russian.
+enum SentenceQuote {
+  /// The language's first-level marks.
+  double,
+
+  /// The ones it keeps for a quote inside one.
+  single,
 }
 
 /// A generated sentence with the pieces it was built from.

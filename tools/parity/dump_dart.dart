@@ -116,6 +116,9 @@ void main() {
         'openers': <String, Object?>{
           for (final t in entry.value.openers.entries) t.key.name: t.value,
         },
+        'quotes': <String, Object?>{
+          for (final q in entry.value.quotes.entries) q.key.name: <String>[...q.value],
+        },
         // Optional in one package and defaulted in another; written the same way
         // here either way, so the shapes compare.
         'predicateAgrees': entry.value.predicateAgrees,

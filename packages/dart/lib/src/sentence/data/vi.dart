@@ -15,6 +15,10 @@ final SentenceLanguageData vi = SentenceLanguageData(
     SentenceType.exclamation: '!',
     SentenceType.trailing: '…',
   },
+  quotes: const <SentenceQuote, List<String>>{
+    SentenceQuote.double: <String>['“', '”'],
+    SentenceQuote.single: <String>['‘', '’'],
+  },
   verbs: <VerbGroup>[
     VerbGroup(
       subject: const <NounClass>[NounClass.creature, NounClass.person],

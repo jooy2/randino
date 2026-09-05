@@ -15,6 +15,11 @@ final SentenceLanguageData es = SentenceLanguageData(
     SentenceType.exclamation: '!',
     SentenceType.trailing: '…',
   },
+  // Guillemets first, and the curly quotes for a quote inside one.
+  quotes: const <SentenceQuote, List<String>>{
+    SentenceQuote.double: <String>['«', '»'],
+    SentenceQuote.single: <String>['“', '”'],
+  },
   // The one language here that marks a question and an exclamation at both
   // ends, which is why the openers exist at all.
   openers: const <SentenceType, String>{SentenceType.question: '¿', SentenceType.exclamation: '¡'},

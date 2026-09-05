@@ -15,6 +15,10 @@ final SentenceLanguageData it = SentenceLanguageData(
     SentenceType.exclamation: '!',
     SentenceType.trailing: '…',
   },
+  quotes: const <SentenceQuote, List<String>>{
+    SentenceQuote.double: <String>['«', '»'],
+    SentenceQuote.single: <String>['“', '”'],
+  },
   // The definite article, which Italian picks by gender and by the sound the
   // noun opens on: `l'` before a vowel, `lo` before an s plus a consonant, and
   // `il` for everything else. The elided form carries its own boundary.

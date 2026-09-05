@@ -15,6 +15,10 @@ final SentenceLanguageData en = SentenceLanguageData(
     SentenceType.exclamation: '!',
     SentenceType.trailing: '…',
   },
+  quotes: const <SentenceQuote, List<String>>{
+    SentenceQuote.double: <String>['“', '”'],
+    SentenceQuote.single: <String>['‘', '’'],
+  },
   // One article, and a definite one. English has three ways to open a noun
   // phrase and only `the` is right for every noun in the pools: `a` is wrong in
   // front of a mass noun and a bare plural is wrong in front of a count one.

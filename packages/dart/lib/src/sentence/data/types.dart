@@ -243,6 +243,7 @@ class SentenceLanguageData {
     required this.times,
     required this.connectives,
     required this.interjections,
+    required this.quotes,
     required this.pronouns,
     required this.frames,
     this.articles,
@@ -261,7 +262,11 @@ class SentenceLanguageData {
   /// Whether the sentence opens on a capital letter.
   final bool capitalize;
 
-  /// What a sentence of each type closes on.
+  /// What a sentence of each kind closes on.
+  ///
+  /// Keyed by the four kinds a language writes a mark of its own for;
+  /// [SentenceType.dialogue] and [SentenceType.thought] take the mark of
+  /// whatever they are quoting.
   final Map<SentenceType, String> terminators;
 
   /// What it opens on, for a language that marks the type at both ends.
@@ -269,6 +274,13 @@ class SentenceLanguageData {
   /// Spanish `¿` and `¡` are the only ones here, and every other language leaves
   /// it empty.
   final Map<SentenceType, String> openers;
+
+  /// The two levels of quotation marks the language writes, as `[open, close]`.
+  ///
+  /// Per language and not close to universal: Japanese writes `「」` and `『』`,
+  /// German opens low and closes high (`„…“`), and Spanish, Italian and Russian
+  /// reach for guillemets before anything else.
+  final Map<SentenceQuote, List<String>> quotes;
 
   /// The article a noun phrase opens with. Null for a language with no articles.
   final SentenceArticles? articles;
