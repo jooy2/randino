@@ -216,10 +216,12 @@ IT = SentenceLanguageData(
         a_mezzanotte la_settimana_scorsa la_settimana_prossima di_questi_tempi tempo_fa
         nei_giorni_festivi tutto_il_giorno ogni_notte
     """),
-    connectives=words("""
-        e_poi ma allora inoltre, tuttavia, dopo infine intanto, perciò eppure più_tardi alla_fine
-        invece,
-    """),
+    connectives={
+        "additive": words("e_poi inoltre,"),
+        "temporal": words("dopo infine intanto, più_tardi alla_fine"),
+        "contrastive": words("ma tuttavia, eppure invece,"),
+        "causal": words("allora perciò"),
+    },
     interjections=words("""
         oh, ah, ehi, caspita, mamma_mia, guarda, davvero, ohi, accidenti, cavolo, santo_cielo, dai,
     """),

@@ -193,9 +193,12 @@ ZH = SentenceLanguageData(
     times=words("""
         黎明时 早晨 中午 傍晚 夜里 深夜 今天 昨天 明天 春天 夏天 秋天 冬天 周末 刚才 有时 每天 黄昏时 正午 午夜 上周 下周 最近 从前 假日 整天 每晚
     """),
-    connectives=words("""
-        然后 所以 但是 不过 于是 后来 接着 同时 终于 而且 可是 因此 然而 结果 随后
-    """),
+    connectives={
+        "additive": words("而且"),
+        "temporal": words("然后 后来 接着 同时 终于 随后"),
+        "contrastive": words("但是 不过 可是 然而"),
+        "causal": words("所以 于是 因此 结果"),
+    },
     interjections=words("""
         啊， 哎呀， 哇， 唉， 天啊， 瞧， 咦， 呀， 嘿， 哟， 好家伙， 我的天，
     """),

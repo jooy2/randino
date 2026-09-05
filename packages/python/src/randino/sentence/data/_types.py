@@ -227,6 +227,30 @@ rule under `"n"`, which is what the lookup falls back to.
 
 
 SentencePronouns = Mapping[WordGender, WordPool]
+
+ConnectiveKind = Literal["additive", "temporal", "contrastive", "causal"]
+"""What a connective claims about the sentence before it.
+
+- `additive` says here is one more thing (`그리고`, `besides`, `また`).
+- `temporal` says time passed (`이윽고`, `meanwhile`, `やがて`).
+- `contrastive` says this cuts against it (`하지만`, `however`, `しかし`).
+- `causal` says this follows from it (`그러므로`, `therefore`, `だから`).
+
+The first three can open any continuation: time passes whatever is said, one more thing
+is always one more thing, and any two things can be set against each other. `causal` is
+the one that can be false — `그러므로 금빛 하이볼이 식죠?` after a sentence about a
+pretzel claims a consequence that is not there — so the generator writes one only where
+the sentences can carry it.
+"""
+
+SentenceConnectives = Mapping[ConnectiveKind, WordPool]
+"""What a sentence opens on when it follows another one, by what that opening claims.
+
+Written whole, so a language that needs a comma after it writes the comma. A language
+declares only the kinds it can actually write: German declares no `temporal`, because
+`dann` and `danach` are adverbs and an adverb in the first position moves the finite
+verb, so the five coordinating conjunctions are all it has to open a clause with.
+"""
 """The subject pronoun a later sentence refers to the topic with, by its gender.
 
 Nominative only, because a subject is never in another case. `""` is a real entry and
@@ -369,12 +393,8 @@ class SentenceLanguageData:
     times: WordPool
     """When it happens, written whole, particle and all (`새벽에`)."""
 
-    connectives: WordPool
-    """What a sentence opens on when it follows another one of the same result.
-
-    `그리고`, `and then`, `そして`. Written whole, so a language that needs a comma
-    after it writes the comma.
-    """
+    connectives: SentenceConnectives
+    """What a sentence opens on when it follows another one, by what it claims."""
 
     quotes: Mapping[SentenceQuote, tuple[str, str]]
     """The two levels of quotation marks the language writes, as `(open, close)`.

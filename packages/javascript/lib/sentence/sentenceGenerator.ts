@@ -63,6 +63,7 @@ import { drawName } from '../name/nameGenerator.js';
 import { nameLengthRange } from '../name/nameLengthRange.js';
 import { SENTENCE_DATA, THEME_CLASS } from './data/index.js';
 import type {
+	ConnectiveKind,
 	NounClass,
 	PredicateForm,
 	SentenceFrame,
@@ -2159,6 +2160,14 @@ const INTERJECTION_CHANCE = 65;
 // something. Two in a row read as a list of asides rather than as a paragraph.
 const OPENER_DAMP = 0.4;
 
+// Every claim a connective can make, in the order the datasets write them.
+const CONNECTIVE_KINDS: readonly ConnectiveKind[] = [
+	'additive',
+	'temporal',
+	'contrastive',
+	'causal'
+];
+
 // How a sentence refers to the topic, against the other two ways of doing it.
 const REFERENCE_WEIGHT: Record<Reference, number> = { repeat: 25, pronoun: 40, fresh: 35 };
 
@@ -2264,7 +2273,7 @@ function followFor(
 function openerFor(
 	data: SentenceLanguageData,
 	mark: SentenceMark,
-	following: boolean,
+	follow: Follow | null,
 	room: number,
 	shortest: number,
 	flow: Flow
@@ -2282,13 +2291,31 @@ function openerFor(
 		}
 	}
 
-	if (!following) {
+	if (!follow) {
 		return '';
 	}
 
-	const usable = fitting(data.connectives);
+	const usable = fitting(connectivesOf(data, follow, mark));
 
 	return usable.length && chance(CONNECTIVE_CHANCE * damp) ? pick(usable) : '';
+}
+
+/**
+ * The connectives this sentence may open on: the ones whose claim about the
+ * sentence before it can actually be true.
+ *
+ * Three of the four always can. Time passes whatever was said, one more thing is
+ * always one more thing, and any two things can be set against each other. What
+ * `causal` claims is that this sentence follows from the last, which needs the
+ * two of them to be about the same thing and this one to be telling rather than
+ * asking — `그러므로 금빛 하이볼이 식죠?` after a sentence about a pretzel is a
+ * consequence of nothing.
+ */
+function connectivesOf(data: SentenceLanguageData, follow: Follow, mark: SentenceMark): WordPool {
+	const follows = follow.reference !== 'fresh' && (mark === 'statement' || mark === 'trailing');
+	const kinds = follows ? CONNECTIVE_KINDS : CONNECTIVE_KINDS.filter((kind) => kind !== 'causal');
+
+	return kinds.flatMap((kind) => data.connectives[kind] ?? []);
 }
 
 /**
@@ -2487,7 +2514,7 @@ function generateResult(language: WordLanguage, settings: Settings): Built[] {
 			type,
 			mark,
 			quote: quoteFor(data, type, settings.quote),
-			opener: openerFor(data, mark, follow !== null, budget[1], shortest, flow),
+			opener: openerFor(data, mark, follow, budget[1], shortest, flow),
 			style: styleFor(type, settings.style, voice),
 			avoid: spent,
 			follow

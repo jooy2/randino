@@ -198,10 +198,12 @@ ES = SentenceLanguageData(
         en_los_días_festivos todo_el_día cada_noche
     """),
     # Written with the comma the ones that need one take.
-    connectives=words("""
-        y_luego pero entonces además, sin_embargo, después por_fin mientras_tanto, por_eso aun_así
-        más_tarde al_final en_cambio, no_obstante,
-    """),
+    connectives={
+        "additive": words("y_luego además,"),
+        "temporal": words("después por_fin mientras_tanto, más_tarde al_final"),
+        "contrastive": words("pero sin_embargo, aun_así en_cambio, no_obstante,"),
+        "causal": words("entonces por_eso"),
+    },
     interjections=words("""
         ay, oh, vaya, caramba, madre_mía, mira, desde_luego, uy, anda, hombre, cielos, vamos,
     """),

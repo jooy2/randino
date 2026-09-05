@@ -203,6 +203,36 @@ export type SentenceArticles = {
 };
 
 /**
+ * What a connective claims about the sentence before it.
+ *
+ * - `additive` says here is one more thing (`그리고`, `besides`, `また`).
+ * - `temporal` says time passed (`이윽고`, `meanwhile`, `やがて`).
+ * - `contrastive` says this cuts against it (`하지만`, `however`, `しかし`).
+ * - `causal` says this follows from it (`그러므로`, `therefore`, `だから`).
+ *
+ * The first three can open any continuation: time passes whatever is said, one
+ * more thing is always one more thing, and any two things can be set against
+ * each other. `causal` is the one that can be false — `그러므로 금빛 하이볼이
+ * 식죠?` after a sentence about a pretzel claims a consequence that is not
+ * there — so the generator writes one only where the sentences can carry it.
+ */
+export type ConnectiveKind = 'additive' | 'temporal' | 'contrastive' | 'causal';
+
+/**
+ * What a sentence opens on when it follows another one of the same result, by
+ * what that opening claims. Written whole, so a language that needs a comma
+ * after it writes the comma.
+ *
+ * A language declares only the kinds it can actually write. German declares no
+ * `temporal`: `dann` and `danach` are adverbs, and an adverb in the first
+ * position moves the finite verb, so the five coordinating conjunctions are all
+ * it has to open a clause with.
+ */
+export type SentenceConnectives = {
+	[kind in ConnectiveKind]?: WordPool;
+};
+
+/**
  * The subject pronoun a later sentence refers to the topic with, by the topic's
  * gender. Nominative only, because a subject is never in another case.
  *
@@ -343,12 +373,8 @@ export type SentenceLanguageData = {
 	manners: WordPool;
 	/** When it happens, written whole, particle and all (`새벽에`, `at dawn`). */
 	times: WordPool;
-	/**
-	 * What a sentence opens on when it follows another one of the same result
-	 * (`그리고`, `and then`, `そして`). Written whole, so a language that needs a
-	 * comma after it writes the comma.
-	 */
-	connectives: WordPool;
+	/** What a sentence opens on when it follows another one, by what it claims. */
+	connectives: SentenceConnectives;
 	/** How a later sentence refers to the topic without naming it again. */
 	pronouns: SentencePronouns;
 	/**

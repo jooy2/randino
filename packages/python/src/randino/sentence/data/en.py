@@ -201,10 +201,12 @@ EN = SentenceLanguageData(
         at_midnight at_midday last_week next_week these_days long_ago in_the_small_hours on_holidays
         all_day every_night
     """),
-    connectives=words("""
-        and_then so but meanwhile afterwards still later soon even_so at_last however therefore
-        besides yet then_again in_the_end before_long all_the_same even_then
-    """),
+    connectives={
+        "additive": words("and_then besides"),
+        "temporal": words("meanwhile afterwards later soon at_last before_long"),
+        "contrastive": words("but still however yet even_so then_again all_the_same even_then"),
+        "causal": words("so therefore in_the_end"),
+    },
     interjections=words("""
         oh, ah, wow, well, look, goodness, my, indeed, honestly, gosh, hey, whoa, dear_me,
         good_grief, alas,

@@ -197,10 +197,12 @@ final SentenceLanguageData es = SentenceLanguageData(
     en_los_días_festivos todo_el_día cada_noche
   '''),
   // Written with the comma the ones that need one take.
-  connectives: words(r'''
-    y_luego pero entonces además, sin_embargo, después por_fin mientras_tanto, por_eso aun_así
-    más_tarde al_final en_cambio, no_obstante,
-  '''),
+  connectives: <ConnectiveKind, WordPool>{
+    ConnectiveKind.additive: words(r'y_luego además,'),
+    ConnectiveKind.temporal: words(r'después por_fin mientras_tanto, más_tarde al_final'),
+    ConnectiveKind.contrastive: words(r'pero sin_embargo, aun_así en_cambio, no_obstante,'),
+    ConnectiveKind.causal: words(r'entonces por_eso'),
+  },
   interjections: words(r'''
     ay, oh, vaya, caramba, madre_mía, mira, desde_luego, uy, anda, hombre, cielos, vamos,
   '''),

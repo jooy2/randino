@@ -145,10 +145,12 @@ export const VI: SentenceLanguageData = {
 		lúc_hoàng_hôn lúc_nửa_đêm vào_giữa_trưa tuần_trước tuần_sau dạo_này ngày_xưa vào_ngày_lễ cả_ngày
 		mỗi_tối
 	`),
-	connectives: words(`
-		rồi và_rồi nhưng thế_là sau_đó cuối_cùng đồng_thời tuy_vậy tuy_nhiên vì_thế ngoài_ra sau_cùng
-		rốt_cuộc thế_rồi dù_vậy
-	`),
+	connectives: {
+		additive: words(`ngoài_ra`),
+		temporal: words(`rồi và_rồi sau_đó cuối_cùng sau_cùng thế_rồi đồng_thời`),
+		contrastive: words(`nhưng tuy_vậy tuy_nhiên dù_vậy`),
+		causal: words(`thế_là vì_thế rốt_cuộc`)
+	},
 	interjections: words(`
 		ôi, chà, ồ, trời_ơi, chao_ôi, này, thật_đấy, ái_chà, ê, ơ_kìa, khiếp, ối,
 	`),

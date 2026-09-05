@@ -288,6 +288,11 @@ List<int> sentenceOf(SentenceDetail detail) {
   return out;
 }
 
+/// Every connective the language can write, whatever the kind claims.
+List<String> connectivesOf(WordLanguage language) => <String>[
+  for (final pool in sentenceData[language]!.connectives.values) ...pool,
+];
+
 /// Every subject pronoun the language can write, in both cases.
 Set<String> pronounsOf(WordLanguage language) {
   final written = <String>[
@@ -1136,7 +1141,7 @@ void main() {
       // alone, which writes neither an opening mark nor a capital, so what a
       // sentence starts with is the word itself.
       final data = sentenceData[WordLanguage.ko]!;
-      final words = <String>[...data.connectives, ...data.interjections];
+      final words = <String>[...connectivesOf(WordLanguage.ko), ...data.interjections];
       var seen = 0;
 
       for (final detail in randSentenceDetails(
@@ -1380,7 +1385,7 @@ void main() {
     test('a connective opens a sentence that follows another, and only one', () {
       for (final language in wordLanguages) {
         final data = sentenceData[language]!;
-        final openers = data.connectives
+        final openers = connectivesOf(language)
             .map((word) => (data.capitalize ? upperFirst(word) : word) + data.space)
             .toList(growable: false);
         var seen = 0;
@@ -1402,12 +1407,59 @@ void main() {
       }
     });
 
+    test('a connective only claims what the two sentences can carry', () {
+      // Three of the four kinds can open any continuation: time passes whatever was
+      // said, one more thing is one more thing, and any two things can be set against
+      // each other. `causal` is the one that can be false, and a question is where it
+      // is loudest — `그러므로 금빛 하이볼이 식죠?` after a sentence about a pretzel
+      // is a consequence of nothing.
+      final quoted = RegExp('^[“”‘’«»„「『]');
+
+      for (final language in wordLanguages) {
+        final data = sentenceData[language]!;
+        final causal = <String>[
+          for (final word in data.connectives[ConnectiveKind.causal] ?? const <String>[])
+            (data.capitalize ? upperFirst(word) : word) + data.space,
+        ];
+        var seen = 0;
+
+        for (final detail in randSentenceDetails(
+          language: language,
+          includeName: false,
+          sentences: 4,
+          count: 200,
+        )) {
+          for (var at = 0; at < detail.sentences.length; at += 1) {
+            final asks =
+                detail.types[at] == SentenceType.question ||
+                detail.types[at] == SentenceType.exclamation;
+            final body = detail.sentences[at].replaceFirst(quoted, '');
+            final opens = causal.any(body.startsWith);
+
+            expect(
+              asks && opens,
+              isFalse,
+              reason:
+                  '$language: a ${detail.types[at].name} opened on a consequence '
+                  '(${detail.sentences[at]})',
+            );
+
+            if (opens) seen += 1;
+          }
+        }
+
+        // And it is still written where it can be, which is what makes the check
+        // above worth anything.
+        expect(seen, greaterThan(0), reason: '$language never wrote a causal connective');
+      }
+    });
+
     test('a language whose nouns carry a gender has a pronoun for each of them', () {
       for (final language in wordLanguages) {
         final data = sentenceData[language]!;
         final genders = wordData[language]!.agreement?.keys.toList() ?? const <WordGender>[];
 
-        expect(data.connectives, isNotEmpty, reason: '$language has no connectives');
+        expect(connectivesOf(language), isNotEmpty, reason: '$language has no connectives');
         expect(
           data.pronouns[WordGender.n] != null || genders.isNotEmpty,
           isTrue,

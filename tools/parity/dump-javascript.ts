@@ -153,7 +153,9 @@ console.log(
 						})),
 						manners: list(data.manners),
 						times: list(data.times),
-						connectives: list(data.connectives),
+						connectives: Object.fromEntries(
+							Object.entries(data.connectives).map(([kind, pool]) => [kind, list(pool)])
+						),
 						interjections: list(data.interjections),
 						pronouns: Object.fromEntries(
 							Object.entries(data.pronouns).map(([gender, pool]) => [gender, list(pool)])

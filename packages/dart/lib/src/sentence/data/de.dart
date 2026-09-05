@@ -163,9 +163,11 @@ final SentenceLanguageData de = SentenceLanguageData(
   // need the verb and the subject the other way round — a shape the frames write,
   // not something a connective can bolt on. `und`, `aber`, `doch` and `denn` sit
   // outside the clause and leave the order alone.
-  connectives: words(r'''
-    und aber doch denn oder
-  '''),
+  connectives: <ConnectiveKind, WordPool>{
+    ConnectiveKind.additive: words(r'und oder'),
+    ConnectiveKind.contrastive: words(r'aber doch'),
+    ConnectiveKind.causal: words(r'denn'),
+  },
   interjections: words(r'''
     oh, ach, na, mensch, oje, sieh_an, wahrhaftig, hui, herrje, du_meine_Güte, nanu,
   '''),

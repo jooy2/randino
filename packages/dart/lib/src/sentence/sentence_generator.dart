@@ -2237,6 +2237,9 @@ const int _interjectionChance = 65;
 // on something. Two in a row read as a list of asides rather than as a paragraph.
 const double _openerDamp = 0.4;
 
+// Every claim a connective can make, in the order the datasets write them.
+const List<ConnectiveKind> _connectiveKinds = ConnectiveKind.values;
+
 // How a sentence refers to the topic, against the other two ways of doing it.
 const Map<_Reference, int> _referenceWeight = <_Reference, int>{
   _Reference.repeat: 25,
@@ -2344,7 +2347,7 @@ _Follow _followFor(
 String _openerFor(
   SentenceLanguageData data,
   SentenceType mark,
-  bool following,
+  _Follow? follow,
   int room,
   int shortest,
   _Flow flow,
@@ -2363,11 +2366,31 @@ String _openerFor(
     if (usable.isNotEmpty && chance(_interjectionChance * damp)) return pick(usable);
   }
 
-  if (!following) return '';
+  if (follow == null) return '';
 
-  final usable = fitting(data.connectives);
+  final usable = fitting(_connectivesOf(data, follow, mark));
 
   return usable.isNotEmpty && chance(_connectiveChance * damp) ? pick(usable) : '';
+}
+
+/// The connectives this sentence may open on: the ones whose claim about the
+/// sentence before it can actually be true.
+///
+/// Three of the four always can. Time passes whatever was said, one more thing is
+/// always one more thing, and any two things can be set against each other. What
+/// [ConnectiveKind.causal] claims is that this sentence follows from the last,
+/// which needs the two of them to be about the same thing and this one to be
+/// telling rather than asking — `그러므로 금빛 하이볼이 식죠?` after a sentence
+/// about a pretzel is a consequence of nothing.
+WordPool _connectivesOf(SentenceLanguageData data, _Follow follow, SentenceType mark) {
+  final follows =
+      follow.reference != _Reference.fresh &&
+      (mark == SentenceType.statement || mark == SentenceType.trailing);
+
+  return <String>[
+    for (final kind in _connectiveKinds)
+      if (follows || kind != ConnectiveKind.causal) ...?data.connectives[kind],
+  ];
 }
 
 /// Every sentence of one result, in order.
@@ -2586,7 +2609,7 @@ List<_Built> _generateResult(WordLanguage language, _Settings settings) {
       type,
       mark,
       _quoteFor(data, type, settings.quote),
-      _openerFor(data, mark, follow != null, budget.max, shortest, flow),
+      _openerFor(data, mark, follow, budget.max, shortest, flow),
       _styleFor(type, settled.style, voice),
       spent,
       follow,

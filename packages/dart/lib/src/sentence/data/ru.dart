@@ -143,9 +143,12 @@ final SentenceLanguageData ru = SentenceLanguageData(
     в_выходные только_что иногда каждый_день в_сумерках в_полночь на_прошлой_неделе
     на_следующей_неделе нынче давно в_праздники весь_день каждую_ночь
   '''),
-  connectives: words(r'''
-    и_потом но затем поэтому однако наконец потом тем_временем а зато всё_же в_итоге значит
-  '''),
+  connectives: <ConnectiveKind, WordPool>{
+    ConnectiveKind.additive: words(r'и_потом'),
+    ConnectiveKind.temporal: words(r'затем наконец потом тем_временем'),
+    ConnectiveKind.contrastive: words(r'но однако а зато всё_же'),
+    ConnectiveKind.causal: words(r'поэтому в_итоге значит'),
+  },
   interjections: words(r'''
     ах, ох, эх, ух, боже, гляди, право, ой, ух_ты, батюшки, надо_же, эй,
   '''),

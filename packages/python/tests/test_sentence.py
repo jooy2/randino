@@ -763,6 +763,11 @@ def upper_first(word: str) -> str:
     return word[:1].upper() + word[1:]
 
 
+def connectives_of(language: WordLanguage) -> tuple[str, ...]:
+    """Every connective the language can write, whatever the kind claims."""
+    return tuple(word for pool in SENTENCE_DATA[language].connectives.values() for word in pool)
+
+
 def pronouns_of(language: WordLanguage) -> set[str]:
     """Every subject pronoun the language can write, in both cases."""
     written = [word for pool in SENTENCE_DATA[language].pronouns.values() for word in pool if word]
@@ -944,7 +949,7 @@ def test_a_paragraph_is_mostly_statements_and_opens_each_line_its_own_way() -> N
     # writes neither an opening mark nor a capital, so what a sentence starts with is the
     # word itself.
     data = SENTENCE_DATA["ko"]
-    words = (*data.connectives, *data.interjections)
+    words = (*connectives_of("ko"), *data.interjections)
     seen = 0
 
     for detail in rand_sentence(language="ko", sentences=6, count=300, output="detail"):
@@ -1141,7 +1146,7 @@ def test_a_connective_opens_a_sentence_that_follows_another() -> None:
         data = SENTENCE_DATA[language]
         openers = [
             (upper_first(word) if data.capitalize else word) + data.space
-            for word in data.connectives
+            for word in connectives_of(language)
         ]
         seen = 0
 
@@ -1160,12 +1165,48 @@ def test_a_connective_opens_a_sentence_that_follows_another() -> None:
         assert seen > 0, f"{language} never wrote a connective"
 
 
+def test_a_connective_only_claims_what_the_two_sentences_can_carry() -> None:
+    """A consequence is only written where the sentences can carry one."""
+    # Three of the four kinds can open any continuation: time passes whatever was said,
+    # one more thing is one more thing, and any two things can be set against each other.
+    # `causal` is the one that can be false, and a question is where it is loudest —
+    # `그러므로 금빛 하이볼이 식죠?` after a sentence about a pretzel is a consequence of
+    # nothing.
+    quoted = re.compile("^[“”‘’«»„「『]")
+
+    for language in WORD_LANGUAGES:
+        data = SENTENCE_DATA[language]
+        causal = [
+            (upper_first(word) if data.capitalize else word) + data.space
+            for word in data.connectives.get("causal", ())
+        ]
+        seen = 0
+
+        for detail in rand_sentence(
+            language=language, include_name=False, sentences=4, count=200, output="detail"
+        ):
+            for at, sentence in enumerate(detail.sentences):
+                asks = detail.types[at] in ("question", "exclamation")
+                body = quoted.sub("", sentence)
+                opens = any(body.startswith(opener) for opener in causal)
+
+                assert not (asks and opens), (
+                    f"{language}: a {detail.types[at]} opened on a consequence ({sentence})"
+                )
+
+                seen += 1 if opens else 0
+
+        # And it is still written where it can be, which is what makes the check above
+        # worth anything.
+        assert seen > 0, f"{language} never wrote a causal connective"
+
+
 def test_a_language_whose_nouns_carry_a_gender_has_a_pronoun_for_each_of_them() -> None:
     for language in WORD_LANGUAGES:
         data = SENTENCE_DATA[language]
         genders: tuple[WordGender, ...] = tuple((WORD_DATA[language].agreement or {}).keys())
 
-        assert data.connectives, f"{language} has no connectives"
+        assert connectives_of(language), f"{language} has no connectives"
         assert "n" in data.pronouns or genders, f"{language} has no pronoun to fall back to"
 
         for gender in genders:

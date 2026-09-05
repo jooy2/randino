@@ -153,7 +153,9 @@ void main() {
         ],
         'manners': listed(entry.value.manners),
         'times': listed(entry.value.times),
-        'connectives': listed(entry.value.connectives),
+        'connectives': <String, Object?>{
+          for (final k in entry.value.connectives.entries) k.key.name: listed(k.value),
+        },
         'interjections': listed(entry.value.interjections),
         'pronouns': <String, Object?>{
           for (final g in entry.value.pronouns.entries) g.key.name: listed(g.value),

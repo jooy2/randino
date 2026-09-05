@@ -220,10 +220,14 @@ final SentenceLanguageData en = SentenceLanguageData(
     at_midnight at_midday last_week next_week these_days long_ago in_the_small_hours on_holidays
     all_day every_night
   '''),
-  connectives: words(r'''
-    and_then so but meanwhile afterwards still later soon even_so at_last however therefore
-    besides yet then_again in_the_end before_long all_the_same even_then
-  '''),
+  connectives: <ConnectiveKind, WordPool>{
+    ConnectiveKind.additive: words(r'and_then besides'),
+    ConnectiveKind.temporal: words(r'meanwhile afterwards later soon at_last before_long'),
+    ConnectiveKind.contrastive: words(
+      r'but still however yet even_so then_again all_the_same even_then',
+    ),
+    ConnectiveKind.causal: words(r'so therefore in_the_end'),
+  },
   interjections: words(r'''
     oh, ah, wow, well, look, goodness, my, indeed, honestly, gosh, hey, whoa, dear_me,
     good_grief, alas,

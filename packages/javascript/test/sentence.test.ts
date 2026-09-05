@@ -55,6 +55,11 @@ function upperFirst(word: string): string {
 	return word.charAt(0).toUpperCase() + word.slice(1);
 }
 
+/** Every connective the language can write, whatever the kind claims. */
+function connectivesOf(language: WordLanguage): string[] {
+	return Object.values(SENTENCE_DATA[language].connectives).flatMap((pool) => [...(pool ?? [])]);
+}
+
 /** Every subject pronoun the language can write, in both cases. */
 function pronounsOf(language: WordLanguage): Set<string> {
 	const written = Object.values(SENTENCE_DATA[language].pronouns).flatMap((pool) => [
@@ -1079,7 +1084,7 @@ describe('Sentence', () => {
 		// alone, which writes neither an opening mark nor a capital, so what a
 		// sentence starts with is the word itself.
 		const data = SENTENCE_DATA.ko;
-		const words = [...data.connectives, ...data.interjections];
+		const words = [...connectivesOf('ko'), ...data.interjections];
 		let seen = 0;
 
 		for (const detail of randSentence({
@@ -1291,7 +1296,7 @@ describe('Sentence', () => {
 	it('a connective opens a sentence that follows another, and only one', () => {
 		for (const language of WORD_LANGUAGES) {
 			const data = SENTENCE_DATA[language];
-			const openers = data.connectives.map(
+			const openers = connectivesOf(language).map(
 				(word) => (data.capitalize ? upperFirst(word) : word) + data.space
 			);
 			let seen = 0;
@@ -1313,12 +1318,52 @@ describe('Sentence', () => {
 		}
 	});
 
+	it('a connective only claims what the two sentences can carry', () => {
+		// Three of the four kinds can open any continuation: time passes whatever was
+		// said, one more thing is one more thing, and any two things can be set
+		// against each other. `causal` is the one that can be false, and a question is
+		// where it is loudest — `그러므로 금빛 하이볼이 식죠?` after a sentence about
+		// a pretzel is a consequence of nothing.
+		for (const language of WORD_LANGUAGES) {
+			const data = SENTENCE_DATA[language];
+			const opens = (pool: readonly string[] | undefined, sentence: string) =>
+				(pool ?? []).some((word) =>
+					sentence.startsWith((data.capitalize ? upperFirst(word) : word) + data.space)
+				);
+			let seen = 0;
+
+			for (const detail of randSentence({
+				language,
+				sentences: 4,
+				includeName: false,
+				count: 200,
+				output: 'detail'
+			})) {
+				detail.sentences.forEach((sentence, at) => {
+					const asks = detail.types[at] === 'question' || detail.types[at] === 'exclamation';
+					const body = sentence.replace(/^[“”‘’«»„「『]/, '');
+
+					assert.ok(
+						!asks || !opens(data.connectives.causal, body),
+						`${language}: a ${detail.types[at]} opened on a consequence (${sentence})`
+					);
+
+					seen += opens(data.connectives.causal, body) ? 1 : 0;
+				});
+			}
+
+			// And it is still written where it can be, which is what makes the check
+			// above worth anything.
+			assert.ok(seen > 0, `${language} never wrote a causal connective`);
+		}
+	});
+
 	it('a language whose nouns carry a gender has a pronoun for each of them', () => {
 		for (const language of WORD_LANGUAGES) {
 			const data = SENTENCE_DATA[language];
 			const genders = Object.keys(WORD_DATA[language].agreement ?? {}) as WordGender[];
 
-			assert.ok(data.connectives.length > 0, `${language} has no connectives`);
+			assert.ok(connectivesOf(language).length > 0, `${language} has no connectives`);
 			assert.ok(
 				data.pronouns.n !== undefined || genders.length > 0,
 				`${language} has no pronoun to fall back to`

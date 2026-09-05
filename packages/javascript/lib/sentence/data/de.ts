@@ -120,9 +120,11 @@ export const DE: SentenceLanguageData = {
 	// need the verb and the subject the other way round — a shape the frames write,
 	// not something a connective can bolt on. `und`, `aber`, `doch` and `denn` sit
 	// outside the clause and leave the order alone.
-	connectives: words(`
-		und aber doch denn oder
-	`),
+	connectives: {
+		additive: words(`und oder`),
+		contrastive: words(`aber doch`),
+		causal: words(`denn`)
+	},
 	interjections: words(`
 		oh, ach, na, mensch, oje, sieh_an, wahrhaftig, hui, herrje, du_meine_Güte, nanu,
 	`),

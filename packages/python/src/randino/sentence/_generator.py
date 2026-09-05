@@ -55,6 +55,7 @@ from randino.name._generator import draw_name
 from randino.name.name_length_range import name_length_range
 from randino.sentence.data import SENTENCE_DATA, THEME_CLASS
 from randino.sentence.data._types import (
+    ConnectiveKind,
     NounClass,
     PredicateForm,
     SentenceFrame,
@@ -2172,6 +2173,9 @@ OPENER_DAMP = 0.4
 Two in a row read as a list of asides rather than as a paragraph.
 """
 
+CONNECTIVE_KINDS: tuple[ConnectiveKind, ...] = ("additive", "temporal", "contrastive", "causal")
+"""Every claim a connective can make, in the order the datasets write them."""
+
 REFERENCE_WEIGHT = {"repeat": 25, "pronoun": 40, "fresh": 35}
 """How a sentence refers to the topic, against the other two ways of doing it."""
 
@@ -2262,7 +2266,7 @@ def _follow_for(
 def _opener_for(
     data: SentenceLanguageData,
     mark: SentenceMark,
-    following: bool,
+    follow: "Follow | None",
     room: int,
     shortest: int,
     flow: Flow,
@@ -2279,7 +2283,8 @@ def _opener_for(
     Args:
         data: The language's sentence dataset.
         mark: The kind whose mark this sentence closes on.
-        following: Whether it follows another sentence of the same result.
+        follow: How it carries on from the sentence before it, or None when it opens
+            the result.
         room: The longest this sentence may be.
         shortest: The shortest sentence the language's shapes could spell.
         flow: What the result has already opened its sentences on.
@@ -2303,12 +2308,31 @@ def _opener_for(
         if usable and chance(INTERJECTION_CHANCE * damp):
             return pick(usable)
 
-    if not following:
+    if follow is None:
         return ""
 
-    usable = fitting(data.connectives)
+    usable = fitting(_connectives_of(data, follow, mark))
 
     return pick(usable) if usable and chance(CONNECTIVE_CHANCE * damp) else ""
+
+
+def _connectives_of(data: SentenceLanguageData, follow: Follow, mark: SentenceMark) -> WordPool:
+    """The connectives whose claim about the sentence before this one can be true.
+
+    Three of the four always can. Time passes whatever was said, one more thing is always
+    one more thing, and any two things can be set against each other. What `causal`
+    claims is that this sentence follows from the last, which needs the two of them to be
+    about the same thing and this one to be telling rather than asking — `그러므로 금빛
+    하이볼이 식죠?` after a sentence about a pretzel is a consequence of nothing.
+    """
+    follows = follow.reference != "fresh" and mark in ("statement", "trailing")
+
+    return tuple(
+        word
+        for kind in CONNECTIVE_KINDS
+        if follows or kind != "causal"
+        for word in data.connectives.get(kind, ())
+    )
 
 
 def _room_for(language: WordLanguage, include_name: bool | None) -> dict[str, tuple[int, int]]:
@@ -2525,7 +2549,7 @@ def _generate_result(language: WordLanguage, settings: Settings) -> list[Built]:
             type_,
             mark,
             _quote_for(data, type_, settings.quote),
-            _opener_for(data, mark, follow is not None, budget[1], shortest, flow),
+            _opener_for(data, mark, follow, budget[1], shortest, flow),
             _style_for(type_, settings.style, voice),
             frozenset(spent),
             follow,

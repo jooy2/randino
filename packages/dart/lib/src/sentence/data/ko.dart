@@ -606,9 +606,12 @@ final SentenceLanguageData ko = SentenceLanguageData(
   '''),
   // What a sentence opens on when it follows another. Written whole, so a
   // language that wants a comma after its connective writes the comma.
-  connectives: words(r'''
-    그리고 그래서 하지만 그런데 이윽고 곧 결국 그러자 한편 이내 그러나 그러므로 게다가 다만 오히려 어느새 마침내 그제야 그래도
-  '''),
+  connectives: <ConnectiveKind, WordPool>{
+    ConnectiveKind.additive: words(r'그리고 게다가'),
+    ConnectiveKind.temporal: words(r'이윽고 곧 그러자 이내 어느새 마침내 그제야 한편'),
+    ConnectiveKind.contrastive: words(r'하지만 그런데 그러나 다만 오히려 그래도'),
+    ConnectiveKind.causal: words(r'그래서 그러므로 결국'),
+  },
   interjections: words(r'''
     아, 오, 와, 어머, 이런, 저런, 세상에, 아이고, 참, 어이쿠, 아이참, 어라, 우와, 이야,
   '''),

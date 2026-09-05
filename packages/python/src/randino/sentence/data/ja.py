@@ -246,9 +246,12 @@ JA = SentenceLanguageData(
     times=words("""
         夜明けに 朝に 昼に 夕方に 夜に 真夜中に 今日 昨日 明日 春に 夏に 秋に 冬に 週末に さっき 時々 毎日 夕暮れに 真昼に 元日に 先週 来週 近頃 昔 休日に 一日中 毎晩
     """),
-    connectives=words("""
-        そして だから しかし ところが やがて すぐに ついに 一方 また しかも けれども それでも ところで その後 つまり
-    """),
+    connectives={
+        "additive": words("そして また しかも ところで"),
+        "temporal": words("やがて すぐに ついに 一方 その後"),
+        "contrastive": words("しかし ところが けれども それでも"),
+        "causal": words("だから つまり"),
+    },
     interjections=words("""
         ああ、 おお、 まあ、 なんと、 やれやれ、 おや、 ほら、 へえ、 わあ、 あら、 おっと、 いやはや、
     """),

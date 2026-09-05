@@ -839,6 +839,17 @@ rand_sentence(language="ko", sentences=3)
 
 **And it stays in the register it opened in.** Prose about a line never becomes one, so a narrated paragraph never quotes. A quoted one is lines with prose between them: two people talking take turns, and one person saying four things in a row is a paragraph missing everything that happened while they said them. What that prose may not be is a third voice, so it tells rather than asks.
 
+**A connective only claims what the two sentences can carry.** Each one is tagged by what it says about the sentence in front of it, and three of the four can open any continuation — time passed, here is one more thing, this cuts against that. The fourth cannot: `so`, `therefore`, `그러므로` and `だから` say this sentence _follows from_ the last one, which is only true when the two are about the same thing and this one is telling rather than asking. `그러므로 금빛 하이볼이 식죠?` after a sentence about a pretzel is a consequence of nothing.
+
+| Claim           | English               | Korean               | Japanese             |
+| --------------- | --------------------- | -------------------- | -------------------- |
+| one more thing  | `and then`, `besides` | `그리고`, `게다가`   | `そして`, `また`     |
+| time passed     | `meanwhile`, `later`  | `이윽고`, `마침내`   | `やがて`, `その後`   |
+| against that    | `but`, `however`      | `하지만`, `그러나`   | `しかし`, `けれども` |
+| because of that | `so`, `therefore`     | `그래서`, `그러므로` | `だから`, `つまり`   |
+
+A language declares only the kinds it can write. German has none for time passed: `dann` and `danach` are adverbs, and an adverb in the first position moves the finite verb, so the five coordinating conjunctions are all it can open a clause with.
+
 **Nothing in a paragraph is said twice over.** A kind the sentence before it already was is less likely each time it comes round again, so a run of questions ends by itself; a verb group is spent before it starts over, rather than closing three of four lines on the same word; a person is named and then left alone; a fresh subject usually comes from the topic's own theme rather than from anywhere in its class; and no two sentences of one result open on the same connective or interjection.
 
 What a language does for the pronoun is its own business. English writes `it`; Korean, Japanese, Chinese, Spanish and Italian leave the subject out entirely, which is what they actually do in a second sentence; German and Russian pick it by the noun's gender. A language whose written pronoun cannot stand for a person — English `he` and `she` need a gender the word pools do not carry, and `그것`, `それ`, `它` and `nó` are inanimate — names the topic again instead.

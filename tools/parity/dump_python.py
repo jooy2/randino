@@ -179,7 +179,7 @@ sentence = {
         ],
         "manners": listed(data.manners),
         "times": listed(data.times),
-        "connectives": listed(data.connectives),
+        "connectives": {kind: listed(pool) for kind, pool in data.connectives.items()},
         "interjections": listed(data.interjections),
         "pronouns": {gender: listed(pool) for gender, pool in data.pronouns.items()},
         # Optional in one package and defaulted in another; written as a list either

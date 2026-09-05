@@ -319,6 +319,38 @@ typedef SentenceArticles = Map<WordGender, List<List<String>>>;
 /// one rule.
 typedef SentencePronouns = Map<WordGender, WordPool>;
 
+/// What a connective claims about the sentence before it.
+///
+/// The first three can open any continuation: time passes whatever is said, one
+/// more thing is always one more thing, and any two things can be set against
+/// each other. [ConnectiveKind.causal] is the one that can be false —
+/// `그러므로 금빛 하이볼이 식죠?` after a sentence about a pretzel claims a
+/// consequence that is not there — so the generator writes one only where the
+/// sentences can carry it.
+enum ConnectiveKind {
+  /// Here is one more thing (`그리고`, `besides`, `また`).
+  additive,
+
+  /// Time passed (`이윽고`, `meanwhile`, `やがて`).
+  temporal,
+
+  /// This cuts against it (`하지만`, `however`, `しかし`).
+  contrastive,
+
+  /// This follows from it (`그러므로`, `therefore`, `だから`).
+  causal,
+}
+
+/// What a sentence opens on when it follows another one of the same result, by
+/// what that opening claims.
+///
+/// Written whole, so a language that needs a comma after it writes the comma. A
+/// language declares only the kinds it can actually write: German declares no
+/// [ConnectiveKind.temporal], because `dann` and `danach` are adverbs and an
+/// adverb in the first position moves the finite verb, so the five coordinating
+/// conjunctions are all it has to open a clause with.
+typedef SentenceConnectives = Map<ConnectiveKind, WordPool>;
+
 /// Where a number stands relative to the noun it counts.
 enum NumeralOrder {
   /// In front of it, classifier and all: `12 con mèo`.
@@ -468,11 +500,8 @@ class SentenceLanguageData {
   /// When it happens, written whole, particle and all (`새벽에`).
   final WordPool times;
 
-  /// What a sentence opens on when it follows another one of the same result
-  /// (`그리고`, `and then`, `そして`).
-  ///
-  /// Written whole, so a language that needs a comma after it writes the comma.
-  final WordPool connectives;
+  /// What a sentence opens on when it follows another one, by what it claims.
+  final SentenceConnectives connectives;
 
   /// What an exclamation opens on (`와,`, `Wow,`, `ああ、`).
   ///

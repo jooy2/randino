@@ -240,9 +240,12 @@ final SentenceLanguageData ja = SentenceLanguageData(
   times: words(r'''
     夜明けに 朝に 昼に 夕方に 夜に 真夜中に 今日 昨日 明日 春に 夏に 秋に 冬に 週末に さっき 時々 毎日 夕暮れに 真昼に 元日に 先週 来週 近頃 昔 休日に 一日中 毎晩
   '''),
-  connectives: words(r'''
-    そして だから しかし ところが やがて すぐに ついに 一方 また しかも けれども それでも ところで その後 つまり
-  '''),
+  connectives: <ConnectiveKind, WordPool>{
+    ConnectiveKind.additive: words(r'そして また しかも ところで'),
+    ConnectiveKind.temporal: words(r'やがて すぐに ついに 一方 その後'),
+    ConnectiveKind.contrastive: words(r'しかし ところが けれども それでも'),
+    ConnectiveKind.causal: words(r'だから つまり'),
+  },
   interjections: words(r'''
     ああ、 おお、 まあ、 なんと、 やれやれ、 おや、 ほら、 へえ、 わあ、 あら、 おっと、 いやはや、
   '''),

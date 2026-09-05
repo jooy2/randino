@@ -57,7 +57,9 @@ The sentence datasets are the same story on a larger scale: the verbs with the
 noun classes each group takes, the predicate adjectives, the adverbs, the
 articles and the shapes, in nine languages. `THEME_CLASS` is compared with them,
 because a theme moving from one class to another changes what every verb of
-every language will accept.
+every language will accept. The connectives are compared per `ConnectiveKind`
+rather than as one list, so a word that claims a consequence in one package and
+a contrast in another is a difference.
 
 ## Running it
 
