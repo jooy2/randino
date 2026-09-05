@@ -49,7 +49,7 @@ Every option is optional, and the defaults are what the empty call above uses.
 | `quote` | <Lang js="SentenceQuote" dart="SentenceQuote?" py="SentenceQuote &#124; None" code /> | <Lang js="—" dart="null" py="None" code /> | Which marks a quoted line takes. See [Dialogue and thought](#dialogue-and-thought). |
 | `style` | `SentenceStyle` | <Lang js="`'plain'`" dart="`SentenceStyle.plain`" py="`\"plain\"`" /> | How the sentence addresses its reader. See [Politeness](#politeness). |
 | `shape` | <Lang js="SentenceShapeOption" dart="SentenceShape?" py="SentenceShapeOption" code /> | <Lang js="'all'" dart="null" py="&quot;all&quot;" code /> | How much the sentence says. See [How much it says](#how-much-it-says). |
-| `slots` | <Lang js="SentenceSlotOption" dart="Set&lt;SentenceSlot&gt;?" py="SentenceSlotOption" code /> | <Lang js="'all'" dart="null" py="&quot;all&quot;" code /> | Which parts it carries beside the subject. See [Picking the shape](#picking-the-shape). |
+| `slots` | <Lang js="SentenceSlotOption" dart="Set&lt;SentenceSlot&gt;?" py="SentenceSlotOption" code /> | <Lang js="'all'" dart="null" py="&quot;all&quot;" code /> | Which parts it carries beside the subject. See [Picking the shape](#picking-the-shape) and [Counting, and money](#counting-and-money). |
 | `include` | <Lang js="string &#124; string[]" dart="List&lt;String&gt;" py="str &#124; Sequence[str]" code /> | <Lang js="—" dart="const []" py="()" code /> | Words every sentence has to contain. See [Words it has to contain](#words-it-has-to-contain). |
 | `sentences` | <Lang js="number" dart="int" py="int" code /> | `1` | How many sentences one result holds. See [More than one sentence](#more-than-one-sentence). |
 | <Lang js="includeName" dart="includeName" py="include_name" code /> | <Lang js="boolean" dart="bool" py="bool" code /> | <Lang js="false" dart="false" py="False" code /> | Write a person's name where the sentence has room for one. See [A person's name](#a-persons-name). |
@@ -270,6 +270,69 @@ rand_sentence(language="de", slots="object", count=3)
 :::
 
 With no language named, the ones that can answer are preferred over the ones that cannot.
+
+## Counting, and money {#counting-and-money}
+
+Two more parts a shape can carry, reached the same way every other one is — through `slots`. A **quantity** is a noun phrase with a number and the counter its kind takes; **money** is an amount and what the language counts it in.
+
+::: lang js
+
+```javascript
+randSentence({ language: 'ko', slots: 'quantity', count: 2 });
+// ['파란 문어가 녹차 6 개를 줍는다.', '파리가 감주 6 개를 굽는다.']
+
+randSentence({ language: 'vi', slots: 'quantity', count: 2 });
+// ['Kỹ sư hẹp lau 7 cái thư.', '4 chiếc xe nôi chạy.']
+
+randSentence({ language: 'en', slots: 'money', count: 2 });
+// ['The silversmith describes 1,000 dollars.', 'The hollow magistrate remembers 500 dollars.']
+```
+
+:::
+
+::: lang dart
+
+```dart
+randSentence(language: WordLanguage.ko, slots: {SentenceSlot.quantity}, count: 2);
+// [파란 문어가 녹차 6 개를 줍는다., 파리가 감주 6 개를 굽는다.]
+
+randSentence(language: WordLanguage.vi, slots: {SentenceSlot.quantity}, count: 2);
+// [Kỹ sư hẹp lau 7 cái thư., 4 chiếc xe nôi chạy.]
+
+randSentence(language: WordLanguage.en, slots: {SentenceSlot.money}, count: 2);
+// [The silversmith describes 1,000 dollars., The hollow magistrate remembers 500 dollars.]
+```
+
+:::
+
+::: lang py
+
+```python
+rand_sentence(language="ko", slots="quantity", count=2)
+# ['파란 문어가 녹차 6 개를 줍는다.', '파리가 감주 6 개를 굽는다.']
+
+rand_sentence(language="vi", slots="quantity", count=2)
+# ['Kỹ sư hẹp lau 7 cái thư.', '4 chiếc xe nôi chạy.']
+
+rand_sentence(language="en", slots="money", count=2)
+# ['The silversmith describes 1,000 dollars.', 'The hollow magistrate remembers 500 dollars.']
+```
+
+:::
+
+**Four languages count, and it is the four with a classifier.** The counter comes from the noun's class, which is what the classes were worth having for — `마리` for a creature, `대` for a vehicle, `그루` for a plant. Korean, Japanese and Chinese put the number behind the noun; Vietnamese puts it in front, classifier and all.
+
+| Language            | Counts | Names an amount |
+| ------------------- | ------ | --------------- |
+| `ko` `ja` `zh` `vi` | ✅     | ✅              |
+| `en` `es` `it`      | —      | ✅              |
+| `de` `ru`           | —      | —               |
+
+**English, Spanish and Italian do not count, and the reason is not the plural rule.** A plural rule is easy to write; what it produces from these pools is `12 sadnesses`, `12 bacons` and `12 goggleses`, because most nouns in them cannot be counted at all and nothing in the data says which can. A classifier language has no such problem — `슬픔 12 가지` is twelve kinds of sadness, and the classifier is what makes the abstraction countable — so the counted shape is exactly the languages that have one.
+
+**German and Russian do neither.** An amount stands where an object does, and neither declares an object shape, because both would put the noun in a case its own ending has to change for. That is the same rule that has kept them from declaring an object shape all along.
+
+**A counted phrase drops its article and takes no modifier** — `12 apples`, never `the 12 red apples`. And the thousands are grouped the way the language groups them: `,` in English, Korean, Japanese and Chinese, `.` in Vietnamese, Spanish and Italian.
 
 ## Words it has to contain {#words-it-has-to-contain}
 

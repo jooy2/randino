@@ -126,7 +126,7 @@ const sentence = reactive({
 	unique: false
 });
 
-const SENTENCE_SLOTS = ['object', 'place', 'time', 'manner', 'state'];
+const SENTENCE_SLOTS = ['object', 'place', 'time', 'manner', 'state', 'quantity', 'money'];
 
 const SENTENCE_TYPES = ['statement', 'question', 'exclamation', 'trailing', 'dialogue', 'thought'];
 

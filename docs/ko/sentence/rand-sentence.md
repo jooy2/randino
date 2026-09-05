@@ -49,7 +49,7 @@ rand_sentence()
 | `quote` | <Lang js="SentenceQuote" dart="SentenceQuote?" py="SentenceQuote &#124; None" code /> | <Lang js="—" dart="null" py="None" code /> | 인용된 문장이 어떤 따옴표를 쓸지. [대사와 생각](#dialogue-and-thought) 참고. |
 | `style` | `SentenceStyle` | <Lang js="`'plain'`" dart="`SentenceStyle.plain`" py="`\"plain\"`" /> | 문장이 읽는 사람을 어떻게 대하는지. [높임](#politeness) 참고. |
 | `shape` | <Lang js="SentenceShapeOption" dart="SentenceShape?" py="SentenceShapeOption" code /> | <Lang js="'all'" dart="null" py="&quot;all&quot;" code /> | 문장이 얼마나 많은 것을 말하는지. [얼마나 말할지](#how-much-it-says) 참고. |
-| `slots` | <Lang js="SentenceSlotOption" dart="Set&lt;SentenceSlot&gt;?" py="SentenceSlotOption" code /> | <Lang js="'all'" dart="null" py="&quot;all&quot;" code /> | 주어 옆에 무엇을 두는지. [형태 고르기](#picking-the-shape) 참고. |
+| `slots` | <Lang js="SentenceSlotOption" dart="Set&lt;SentenceSlot&gt;?" py="SentenceSlotOption" code /> | <Lang js="'all'" dart="null" py="&quot;all&quot;" code /> | 주어 옆에 무엇을 두는지. [형태 고르기](#picking-the-shape)와 [수량과 금액](#counting-and-money) 참고. |
 | `include` | <Lang js="string &#124; string[]" dart="List&lt;String&gt;" py="str &#124; Sequence[str]" code /> | <Lang js="—" dart="const []" py="()" code /> | 모든 문장에 반드시 들어가야 할 단어. [반드시 넣을 단어](#words-it-has-to-contain) 참고. |
 | `sentences` | <Lang js="number" dart="int" py="int" code /> | `1` | 결과 하나에 담을 문장 수. [문장을 여러 개](#more-than-one-sentence) 참고. |
 | <Lang js="includeName" dart="includeName" py="include_name" code /> | <Lang js="boolean" dart="bool" py="bool" code /> | <Lang js="false" dart="false" py="False" code /> | 사람이 설 자리에 사람 이름을 씁니다. [사람 이름](#a-persons-name) 참고. |
@@ -270,6 +270,69 @@ rand_sentence(language="de", slots="object", count=3)
 :::
 
 언어를 지정하지 않으면 답할 수 있는 언어가 그렇지 못한 언어보다 먼저 뽑힙니다.
+
+## 수량과 금액 {#counting-and-money}
+
+형태가 담을 수 있는 부분이 둘 늘었고, 다른 모든 부분과 똑같이 `slots`로 요청합니다. **quantity**는 숫자와 그 종류가 취하는 수량사가 붙은 명사구이고, **money**는 금액과 그 언어가 돈을 세는 단위입니다.
+
+::: lang js
+
+```javascript
+randSentence({ language: 'ko', slots: 'quantity', count: 2 });
+// ['파란 문어가 녹차 6 개를 줍는다.', '파리가 감주 6 개를 굽는다.']
+
+randSentence({ language: 'vi', slots: 'quantity', count: 2 });
+// ['Kỹ sư hẹp lau 7 cái thư.', '4 chiếc xe nôi chạy.']
+
+randSentence({ language: 'en', slots: 'money', count: 2 });
+// ['The silversmith describes 1,000 dollars.', 'The hollow magistrate remembers 500 dollars.']
+```
+
+:::
+
+::: lang dart
+
+```dart
+randSentence(language: WordLanguage.ko, slots: {SentenceSlot.quantity}, count: 2);
+// [파란 문어가 녹차 6 개를 줍는다., 파리가 감주 6 개를 굽는다.]
+
+randSentence(language: WordLanguage.vi, slots: {SentenceSlot.quantity}, count: 2);
+// [Kỹ sư hẹp lau 7 cái thư., 4 chiếc xe nôi chạy.]
+
+randSentence(language: WordLanguage.en, slots: {SentenceSlot.money}, count: 2);
+// [The silversmith describes 1,000 dollars., The hollow magistrate remembers 500 dollars.]
+```
+
+:::
+
+::: lang py
+
+```python
+rand_sentence(language="ko", slots="quantity", count=2)
+# ['파란 문어가 녹차 6 개를 줍는다.', '파리가 감주 6 개를 굽는다.']
+
+rand_sentence(language="vi", slots="quantity", count=2)
+# ['Kỹ sư hẹp lau 7 cái thư.', '4 chiếc xe nôi chạy.']
+
+rand_sentence(language="en", slots="money", count=2)
+# ['The silversmith describes 1,000 dollars.', 'The hollow magistrate remembers 500 dollars.']
+```
+
+:::
+
+**수량을 세는 언어는 넷이고, 그 넷은 수량사를 가진 언어입니다.** 수량사는 명사의 부류에서 옵니다. 부류를 둔 보람이 여기 있습니다. 생물은 `마리`, 탈것은 `대`, 나무는 `그루`. 한국어·일본어·중국어는 숫자를 명사 뒤에 두고, 베트남어는 수량사까지 함께 앞에 둡니다.
+
+| 언어                | 수량 | 금액 |
+| ------------------- | ---- | ---- |
+| `ko` `ja` `zh` `vi` | ✅   | ✅   |
+| `en` `es` `it`      | —    | ✅   |
+| `de` `ru`           | —    | —    |
+
+**영어·스페인어·이탈리아어가 수량을 세지 않는 이유는 복수형 규칙이 아닙니다.** 복수형 규칙 자체는 쓰기 쉽습니다. 문제는 그 규칙이 이 풀에서 만들어 내는 것이 `12 sadnesses`, `12 bacons`, `12 goggleses`라는 점입니다. 이 풀의 명사 대부분은 애초에 셀 수 없고, 어느 것이 셀 수 있는지 데이터 어디에도 적혀 있지 않습니다. 수량사를 가진 언어에는 그런 문제가 없습니다. `슬픔 12 가지`는 열두 가지 슬픔이고, 추상명사를 셀 수 있게 만드는 것이 바로 수량사입니다. 그래서 수량 형태는 정확히 수량사를 가진 언어들의 것입니다.
+
+**독일어와 러시아어는 둘 다 없습니다.** 금액은 목적어 자리에 서는데, 두 언어 모두 목적어 형태를 선언하지 않습니다. 명사가 제 어미를 바꿔야 하는 격이 필요하기 때문이고, 이는 처음부터 두 언어가 목적어 형태를 두지 않은 것과 같은 이유입니다.
+
+**수량 명사구는 관사를 떼고 수식어를 붙이지 않습니다.** `12 apples`이지 `the 12 red apples`이 아닙니다. 그리고 천 단위 구분은 그 언어의 방식대로입니다. 영어·한국어·일본어·중국어는 `,`, 베트남어·스페인어·이탈리아어는 `.`입니다.
 
 ## 반드시 넣을 단어 {#words-it-has-to-contain}
 

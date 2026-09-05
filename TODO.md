@@ -20,7 +20,7 @@ Everything here is about `randSentence`. It shipped in the vNext section of the 
 - [x] D. Questions, exclamations and sentences that trail off
 - [x] E. Dialogue and thought, in the language's own quotation marks
 - [x] F. Politeness, which is mostly a Korean question
-- [ ] G. Numbers, counters and amounts of money
+- [x] G. Numbers, counters and amounts of money
 - [x] H. An invented noun has no gender, so two languages write no article at all
 
 ---
@@ -112,22 +112,27 @@ What landed:
 - **The fallback chain is one step longer than planned.** `politeQuestion` → **`polite`** → `question` → `words`, rather than `politeQuestion` → `question` → `words`. That extra step is what lets Japanese declare `polite` alone — `走ります` is its polite question too, because the `か` that asks is the frame's tag rather than part of the verb — instead of duplicating an 88-entry pool under a second key in three packages. Korean declares both keys, so the chain never reaches past `politeQuestion` there.
 - **Korean derives, Japanese does not.** Korean's `-ㅂ니다` / `-습니다` follows from the stem and its coda, with `ㄹ` dropping first (`달다` → `답니다`, `낯설다` → `낯섭니다`); every one of the 308 forms was generated and then read. Japanese's masu form needs the verb's conjugation class, which the plain form does not carry — `集める` is ichidan and `滑る` is godan and both end in `る` — so all 88 are written out by hand. The adjectives derive (`だ` → `です`, else `+ です`).
 
-## G. Numbers, counters and amounts of money
+## G. Numbers, counters and amounts of money — done
 
-`사과가 12개 있다`, `100,000원의 빚을 갚았다`. Two shapes, and both need data no language has yet.
+`slots` gains `'quantity'` and `'money'`. `SentenceLanguageData.numeral` says how a language writes a number: where it stands, the counter each noun class takes, what money is counted in, what separates the thousands, and the two number ranges.
 
-**A counted noun phrase.** `SentencePart.counted?: boolean`, and `SentenceLanguageData.numeral` says how the language writes it:
+**The survey rewrote the plan, and this is the item where reading the data first mattered most.** The plan had counted phrases in seven languages with `plural` rules for English, Spanish and Italian. Reading the English pools before writing anything showed the plural is the *smaller* half of that problem:
 
-- `order` — where the number goes. Korean, Japanese and Chinese put a counter after the noun and its particle (`사과가 12개`); English puts the number in front and pluralizes (`12 apples`).
-- `counters` — the counter word per `NounClass`, which is why the classes were worth having: `마리`, `명`, `개`, `권`, `대`. Korean, Japanese, Chinese and Vietnamese.
-- `plural` — ordered suffix rules turning a noun into its plural, written the way `agreement` already is, plus the handful of irregulars. English, Spanish and Italian.
-- German and Russian declare neither and so carry no counted shape: a German plural is not predictable from the singular, and Russian needs the genitive plural after five. That is the same rule that already keeps German from declaring an object shape.
-- A counted phrase drops its article. `12 apples`, not `the 12 apples`.
+- Already-plural entries: `Goggles`, `Scissors`, `Trousers`, `Crossroads`, `Physics`, `Darts`, `Bleachers`.
+- Mass nouns: `Bacon`, `Cotton`, `Spinach`, `Brass`, `Moss`, `Grief`, `Slush`.
+- Abstractions: `Sadness`, `Loneliness`, `Kindness`, `Wistfulness`.
 
-**An amount of money.** `currency` in the same block — `원`, `dollars`, `円`, `元`, `đồng`, `euros`, `рублей` — and a shape that uses it. Digit grouping is `100,000` in every one of the nine, so one rule covers it. This is the smaller half; do the counted phrase first and this after.
+A plural rule turns those into `12 goggleses`, `12 bacons` and `12 sadnesses`. **Nothing in any pool says which nouns are countable**, and adding that tag is 2,700 nouns × nine languages — a dataset the size of the noun pools themselves, for one shape. So `plural` is gone from the design, and the counted shape is the four languages with a `counters` table: a classifier is what makes a noun countable, and `슬픔 12 가지` is twelve kinds of sadness. Every one of the ten classes has a counter in all four, so those languages can count anything in their pools.
 
-The number itself should be drawn from a range that reads naturally: a handful of apples, a large sum of money. One range per class is too fine; one per `numeral` block is too coarse. Two ranges, a small one for counted things and a large one for money, is probably right.
+Money has no countability question — it counts money — so it is every language with an object shape, which is seven. German and Russian have none, for the case reason that already keeps them from declaring an object shape at all.
 
+Three smaller corrections to the plan:
+
+- **Digit grouping is not `100,000` everywhere.** Vietnamese, Spanish and Italian group on a full stop, so `group` is per language. That also cost the multi-sentence test an assumption: `5.000.000` holds three full stops and none of them is a terminator.
+- **Amounts are a pool, not a range.** A range hands back `73,412 dollars`, and nobody writes that. `count` stays a range, because every small integer reads fine.
+- **A quantity is sometimes the subject.** `사과 12 개가 익는다` has no separate subject, so `subjectSlotOf` and `takesObject` read the shape rather than looking for a `subject` part — without that, the counted subject was drawn from the verb's *object* classes and Korean produced `카푸치노 4 개가 먹는다`.
+
+The suites gained `sentenceOf`, which walks the flat `phrases` list back into sentences: a counted phrase is the subject of its own sentence only when that sentence has none, and the flat lists cannot say which sentence a phrase is in without it.
 
 ## H. An invented noun has no gender, so two languages write no article at all — done
 
