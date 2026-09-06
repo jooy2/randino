@@ -581,6 +581,12 @@ export const EN: SentenceLanguageData = {
 		turtle lizard chameleon snake snail ant spider crab earthworm centipede scorpion gecko iguana
 		cobra python newt mantis
 		basilisk wyrm naga amphisbaena lindworm
+		`),
+		// A word of a creature theme that is no creature: it takes no verb and no state.
+		lifeless: words(`
+			spell curse hex rune amulet talisman grimoire potion prophecy sorcery enchantment sigil glyph omen portent blessing
+			incantation invocation summoning banishment divination scrying portal ley sanctum reliquary effigy idol totem phylactery
+			charm warding runestone nightmare
 		`)
 	},
 	interjections: words(`

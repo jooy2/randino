@@ -399,6 +399,10 @@ export const VI: SentenceLanguageData = {
 		`),
 		crawler: words(`
 		cá_sấu rắn thằn_lằn rùa ốc kiến nhện giun sâu tằm cua bọ_ngựa
+		`),
+		// A word of a creature theme that is no creature: it takes no verb and no state.
+		lifeless: words(`
+			phép_thuật ma_lực thần_chú lời_nguyền tiên_tri sấm_truyền kết_giới bùa_hộ_mệnh phong_ấn ảo_giác ma_thuật hình_nhân
 		`)
 	},
 	interjections: words(`

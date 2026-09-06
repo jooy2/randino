@@ -453,6 +453,10 @@ final SentenceLanguageData vi = SentenceLanguageData(
       người_cá mỹ_nhân_ngư hải_quái
     '''),
     NounTrait.crawler: words(r'cá_sấu rắn thằn_lằn rùa ốc kiến nhện giun sâu tằm cua bọ_ngựa'),
+    NounTrait.lifeless: words(r'''
+      phép_thuật ma_lực thần_chú lời_nguyền tiên_tri sấm_truyền kết_giới bùa_hộ_mệnh phong_ấn
+      ảo_giác ma_thuật hình_nhân
+    '''),
   },
   interjections: words(
     r'ôi, chà, ồ, trời_ơi, chao_ôi, này, thật_đấy, ái_chà, ê, ơ_kìa, khiếp, ối,',

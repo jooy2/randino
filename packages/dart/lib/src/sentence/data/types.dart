@@ -663,6 +663,11 @@ enum NounTrait {
 
   /// Crawls: a snake, a snail, a beetle.
   crawler,
+
+  /// A word of a creature theme that is no creature — a spell, a rune, an
+  /// amulet — which takes no verb and no state at all, because it neither does
+  /// anything nor is anything a creature is.
+  lifeless,
 }
 
 /// What a connective claims about the sentence before it.

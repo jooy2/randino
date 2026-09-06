@@ -456,6 +456,10 @@ VI = SentenceLanguageData(
             lươn người_cá mỹ_nhân_ngư hải_quái
         """),
         "crawler": words("cá_sấu rắn thằn_lằn rùa ốc kiến nhện giun sâu tằm cua bọ_ngựa"),
+        "lifeless": words("""
+            phép_thuật ma_lực thần_chú lời_nguyền tiên_tri sấm_truyền kết_giới bùa_hộ_mệnh phong_ấn
+            ảo_giác ma_thuật hình_nhân
+        """),
     },
     interjections=words(
         "ôi, chà, ồ, trời_ơi, chao_ôi, này, thật_đấy, ái_chà, ê, ơ_kìa, khiếp, ối,"

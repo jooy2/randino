@@ -952,7 +952,7 @@ const nounCache = new Map<string, WordPool>();
  * considers reads them for every theme it could take, and filtering two hundred
  * nouns each time is what made a paragraph slow once every language had them.
  */
-const subjectPoolCache = new WeakMap<VerbGroup, Map<WordTheme, WordPool>>();
+const subjectPoolCache = new WeakMap<VerbGroup | StateGroup, Map<WordTheme, WordPool>>();
 const boundsCache = new Map<string, Record<string, readonly [number, number]>>();
 const spanCache = new Map<string, readonly [number, number]>();
 const agreedCache = new Map<string, readonly string[]>();
@@ -1424,12 +1424,22 @@ function traitsOf(data: SentenceLanguageData, noun: string): readonly NounTrait[
  * only a noun that carries it; one that rules some out takes any noun that
  * carries none of them.
  */
-function acceptsNoun(data: SentenceLanguageData, group: VerbGroup, noun: string): boolean {
-	if (!group.subjectTraits && !group.subjectWithout) {
-		return true;
+function acceptsNoun(
+	data: SentenceLanguageData,
+	group: VerbGroup | StateGroup,
+	noun: string
+): boolean {
+	const traits = traitsOf(data, noun);
+
+	// A lifeless noun neither does anything nor is anything a creature is: a spell
+	// casts no spell, and an amulet is never hungry.
+	if (traits.includes('lifeless')) {
+		return false;
 	}
 
-	const traits = traitsOf(data, noun);
+	if (!('field' in group) || (!group.subjectTraits && !group.subjectWithout)) {
+		return true;
+	}
 
 	if (group.subjectTraits && !group.subjectTraits.some((trait) => traits.includes(trait))) {
 		return false;
@@ -1446,8 +1456,11 @@ function subjectPoolFor(
 	theme: WordTheme
 ): WordPool {
 	const pool = nounsOf(language, theme);
+	const narrowed = 'field' in group && (group.subjectTraits || group.subjectWithout);
 
-	if (!('field' in group) || (!group.subjectTraits && !group.subjectWithout)) {
+	// A state group narrows nothing of its own, but a lifeless noun is no subject
+	// of one either.
+	if (!narrowed && !data.traits?.lifeless) {
 		return pool;
 	}
 

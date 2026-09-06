@@ -537,6 +537,10 @@ final SentenceLanguageData es = SentenceLanguageData(
     NounTrait.crawler: words(r'''
       cocodrilo serpiente lagarto tortuga caracol hormiga araña gusano cangrejo basilisco
     '''),
+    NounTrait.lifeless: words(r'''
+      hechizo maldición profecía amuleto talismán runa portal santuario ídolo tótem augurio presagio
+      bestiario
+    '''),
   },
   interjections: words(r'''
     ay, oh, vaya, caramba, madre_mía, mira, desde_luego, uy, anda, hombre, cielos, vamos,

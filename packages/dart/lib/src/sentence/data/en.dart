@@ -785,6 +785,11 @@ final SentenceLanguageData en = SentenceLanguageData(
       turtle lizard chameleon snake snail ant spider crab earthworm centipede scorpion gecko iguana
       cobra python newt mantis basilisk wyrm naga amphisbaena lindworm
     '''),
+    NounTrait.lifeless: words(r'''
+      spell curse hex rune amulet talisman grimoire potion prophecy sorcery enchantment sigil glyph
+      omen portent blessing incantation invocation summoning banishment divination scrying portal
+      ley sanctum reliquary effigy idol totem phylactery charm warding runestone nightmare
+    '''),
   },
   interjections: words(r'''
     oh, ah, wow, well, look, goodness, my, indeed, honestly, gosh, hey, whoa, dear_me, good_grief,

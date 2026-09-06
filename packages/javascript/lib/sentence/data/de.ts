@@ -359,6 +359,10 @@ export const DE: SentenceLanguageData = {
 		crawler: words(`
 		Krokodil Schlange Eidechse Schildkröte Schnecke Ameise Spinne Wurm Krabbe
 		Basilisk
+		`),
+		// A word of a creature theme that is no creature: it takes no verb and no state.
+		lifeless: words(`
+			Zauber Fluch Weissagung Amulett Talisman Rune Pforte Heiligtum Götze Totem Vorzeichen Omen Bestiarium
 		`)
 	},
 	interjections: words(`

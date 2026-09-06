@@ -192,6 +192,9 @@ def accepts_noun(data: SentenceLanguageData, group: VerbGroup, noun: str) -> boo
     """Whether a verb group takes this noun as its subject, by what the noun can do."""
     traits = traits_of(data, noun)
 
+    if "lifeless" in traits:
+        return False
+
     if group.subject_traits is not None and not any(t in traits for t in group.subject_traits):
         return False
 
@@ -1357,6 +1360,37 @@ def test_one_sentence_names_its_object_once() -> None:
                 objects.add(phrase)
 
 
+def test_a_lifeless_word_of_a_creature_theme_never_does_anything() -> None:
+    # `myth` holds spells and amulets beside dragons and elves, and a spell that chooses a
+    # gouge is what the class alone allowed. A language lists them as `lifeless`, and a
+    # sentence about a myth is about the creatures.
+    for language in WORD_LANGUAGES:
+        data = SENTENCE_DATA[language]
+        lifeless = set((data.traits or {}).get("lifeless") or ())
+        pronouns = pronouns_of(language)
+
+        assert lifeless, f"{language} lists nothing lifeless"
+
+        for detail in rand_sentence(
+            type="statement",
+            include_name=False,
+            tense="present",
+            language=language,
+            theme="myth",
+            count=SAMPLE,
+            output="detail",
+        ):
+            for phrase, slot in zip(detail.phrases, detail.slots, strict=True):
+                if slot != "subject" or phrase in pronouns:
+                    continue
+
+                found = nouns_in(language, phrase)
+
+                assert not found or any(noun not in lifeless for noun in found), (
+                    f"{language}: '{phrase}' is lifeless ({detail.sentence})"
+                )
+
+
 def test_a_person_in_a_story_sometimes_speaks_for_themselves_and_nobody_else_does() -> None:
     # A state sentence about a person may be a line they say or think — quoted, in the
     # first person, never the first sentence, never more than two — where the language
@@ -2407,6 +2441,10 @@ def test_every_noun_the_pools_hold_has_a_verb_in_every_field_its_class_has() -> 
 
                 for word in lexicon.nouns[theme]:
                     noun = plain(language, word)
+
+                    # A lifeless noun takes no verb, by design.
+                    if "lifeless" in traits_of(data, noun):
+                        continue
 
                     assert any(accepts_noun(data, group, noun) for group in in_field), (
                         f"{language}: no {field} verb takes '{noun}'"

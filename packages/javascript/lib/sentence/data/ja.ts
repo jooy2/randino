@@ -760,6 +760,10 @@ export const JA: SentenceLanguageData = {
 		カメ トカゲ カメレオン ヘビ カタツムリ アリ クモ カニ ワニ 蟷螂 蚯蚓 百足 馬陸 蠍 壁蝨 蚤 蚕 蛹 芋虫 山椒魚 青大将 蝮 毒蛇 眼鏡蛇
 		響尾蛇 錦蛇 鰐 鬣蜥
 		蛇王
+		`),
+		// A word of a creature theme that is no creature: it takes no verb and no state.
+		lifeless: words(`
+			魔法 魔力 呪文 呪い 予言 神託 結界 護符 封印 幻影 女神像 土偶 傀儡 御守 呪詛 加護 前兆 予兆 予言書 神話集 伝説集 奇譚集
 		`)
 	},
 	interjections: words(`

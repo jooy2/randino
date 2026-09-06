@@ -389,6 +389,10 @@ final SentenceLanguageData ru = SentenceLanguageData(
     NounTrait.crawler: words(
       r'крокодил змея ящерица черепаха улитка муравей паук червь краб василиск',
     ),
+    NounTrait.lifeless: words(r'''
+      заклинание проклятие пророчество амулет талисман руна портал святилище идол тотем примета
+      бестиарий
+    '''),
   },
   interjections: words(r'ах, ох, эх, ух, боже, гляди, право, ой, ух_ты, батюшки, надо_же, эй,'),
   pronouns: const <WordGender, WordPool>{

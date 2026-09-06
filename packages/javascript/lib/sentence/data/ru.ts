@@ -384,6 +384,10 @@ export const RU: SentenceLanguageData = {
 		crawler: words(`
 		крокодил змея ящерица черепаха улитка муравей паук червь краб
 		василиск
+		`),
+		// A word of a creature theme that is no creature: it takes no verb and no state.
+		lifeless: words(`
+			заклинание проклятие пророчество амулет талисман руна портал святилище идол тотем примета бестиарий
 		`)
 	},
 	interjections: words(`

@@ -1142,8 +1142,8 @@ final Map<String, WordPool> _nounCache = <String, WordPool>{};
 /// considers reads them for every theme it could take, and filtering two hundred
 /// nouns each time is what made a paragraph slow once every language had them.
 /// A group is a constant of its language's data, so it is its own key.
-final Map<VerbGroup, Map<WordTheme, WordPool>> _subjectPoolCache =
-    <VerbGroup, Map<WordTheme, WordPool>>{};
+final Map<Object, Map<WordTheme, WordPool>> _subjectPoolCache =
+    <Object, Map<WordTheme, WordPool>>{};
 final Map<WordLanguage, Map<SentenceSlot, LengthRange>> _boundsCache =
     <WordLanguage, Map<SentenceSlot, LengthRange>>{};
 final Map<WordLanguage, LengthRange> _modifierBounds = <WordLanguage, LengthRange>{};
@@ -1569,13 +1569,19 @@ List<NounTrait> _traitsOf(SentenceLanguageData data, String noun) => <NounTrait>
 /// A group that asks for no trait takes any noun; one that asks for one takes
 /// only a noun that carries it; one that rules some out takes any noun that
 /// carries none of them.
-bool _acceptsNoun(SentenceLanguageData data, VerbGroup group, String noun) {
+bool _acceptsNoun(SentenceLanguageData data, Object group, String noun) {
+  final traits = _traitsOf(data, noun);
+
+  // A lifeless noun neither does anything nor is anything a creature is: a
+  // spell casts no spell, and an amulet is never hungry.
+  if (traits.contains(NounTrait.lifeless)) return false;
+
+  if (group is! VerbGroup) return true;
+
   final wanted = group.subjectTraits;
   final barred = group.subjectWithout;
 
   if (wanted == null && barred == null) return true;
-
-  final traits = _traitsOf(data, noun);
 
   if (wanted != null && !wanted.any(traits.contains)) return false;
 
@@ -1590,10 +1596,12 @@ WordPool _subjectPoolFor(
   WordTheme theme,
 ) {
   final pool = _nounsOf(language, theme);
+  final narrowed =
+      group is VerbGroup && (group.subjectTraits != null || group.subjectWithout != null);
 
-  if (group is! VerbGroup || (group.subjectTraits == null && group.subjectWithout == null)) {
-    return pool;
-  }
+  // A state group narrows nothing of its own, but a lifeless noun is no subject
+  // of one either.
+  if (!narrowed && data.traits?[NounTrait.lifeless] == null) return pool;
 
   final byTheme = _subjectPoolCache.putIfAbsent(group, () => <WordTheme, WordPool>{});
   final cached = byTheme[theme];

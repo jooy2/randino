@@ -384,6 +384,10 @@ final SentenceLanguageData de = SentenceLanguageData(
     NounTrait.crawler: words(r'''
       Krokodil Schlange Eidechse Schildkröte Schnecke Ameise Spinne Wurm Krabbe Basilisk
     '''),
+    NounTrait.lifeless: words(r'''
+      Zauber Fluch Weissagung Amulett Talisman Rune Pforte Heiligtum Götze Totem Vorzeichen Omen
+      Bestiarium
+    '''),
   },
   interjections: words(r'''
     oh, ach, na, mensch, oje, sieh_an, wahrhaftig, hui, herrje, du_meine_Güte, nanu,

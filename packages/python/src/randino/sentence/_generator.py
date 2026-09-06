@@ -1660,16 +1660,23 @@ def _traits_of(data: SentenceLanguageData, noun: str) -> tuple[NounTrait, ...]:
     return tuple(trait for trait, pool in (data.traits or {}).items() if noun in pool)
 
 
-def _accepts_noun(data: SentenceLanguageData, group: VerbGroup, noun: str) -> bool:
-    """Whether a verb group takes this noun as its subject, by what the noun can do.
+def _accepts_noun(data: SentenceLanguageData, group: VerbGroup | StateGroup, noun: str) -> bool:
+    """Whether a group takes this noun as its subject, by what the noun can do.
 
     A group that asks for no trait takes any noun; one that asks for one takes only a noun
-    that carries it; one that rules some out takes any noun that carries none of them.
+    that carries it; one that rules some out takes any noun that carries none of them. A
+    lifeless noun neither does anything nor is anything a creature is: a spell casts no
+    spell, and an amulet is never hungry.
     """
-    if group.subject_traits is None and group.subject_without is None:
-        return True
-
     traits = _traits_of(data, noun)
+
+    if "lifeless" in traits:
+        return False
+
+    if not isinstance(group, VerbGroup) or (
+        group.subject_traits is None and group.subject_without is None
+    ):
+        return True
 
     if group.subject_traits is not None and not any(t in traits for t in group.subject_traits):
         return False
@@ -1685,10 +1692,13 @@ def _subject_pool_for(
 ) -> WordPool:
     """The nouns of a theme a group's subject may be drawn from."""
     pool = _nouns_of(language, theme)
+    narrowed = isinstance(group, VerbGroup) and (
+        group.subject_traits is not None or group.subject_without is not None
+    )
 
-    if not isinstance(group, VerbGroup) or (
-        group.subject_traits is None and group.subject_without is None
-    ):
+    # A state group narrows nothing of its own, but a lifeless noun is no subject of one
+    # either.
+    if not narrowed and (data.traits is None or data.traits.get("lifeless") is None):
         return pool
 
     key = (id(group), theme)

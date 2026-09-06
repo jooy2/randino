@@ -391,6 +391,10 @@ function traitsOf(data: SentenceLanguageData, noun: string): string[] {
 function acceptsNoun(data: SentenceLanguageData, group: VerbGroup, noun: string): boolean {
 	const traits = traitsOf(data, noun);
 
+	if (traits.includes('lifeless')) {
+		return false;
+	}
+
 	if (group.subjectTraits && !group.subjectTraits.some((trait) => traits.includes(trait))) {
 		return false;
 	}
@@ -1464,6 +1468,34 @@ describe('Sentence', () => {
 					);
 					objects.add(phrase);
 					named.set(belongs[i], objects);
+				});
+			}
+		}
+	});
+
+	it('a lifeless word of a creature theme never does anything', () => {
+		// `myth` holds spells and amulets beside dragons and elves, and a spell that
+		// chooses a gouge is what the class alone allowed. A language lists them as
+		// `lifeless`, and a sentence about a myth is about the creatures.
+		for (const language of WORD_LANGUAGES) {
+			const data = SENTENCE_DATA[language];
+			const lifeless = new Set(data.traits?.lifeless ?? []);
+			const pronouns = pronounsOf(language);
+
+			assert.ok(lifeless.size > 0, `${language} lists nothing lifeless`);
+
+			for (const detail of sentenceDetails({ language, theme: 'myth', count: SAMPLE })) {
+				detail.phrases.forEach((phrase, i) => {
+					if (detail.slots[i] !== 'subject' || pronouns.has(phrase)) {
+						return;
+					}
+
+					const found = [...nounsIn(language, phrase)];
+
+					assert.ok(
+						found.length === 0 || found.some((noun) => !lifeless.has(noun)),
+						`${language}: '${phrase}' is lifeless (${detail.sentence})`
+					);
 				});
 			}
 		}
@@ -3238,6 +3270,11 @@ describe('Sentence', () => {
 
 					for (const word of wordData.nouns[theme]) {
 						const noun = plain(language, word);
+
+						// A lifeless noun takes no verb, by design.
+						if (traitsOf(data, noun).includes('lifeless')) {
+							continue;
+						}
 
 						assert.ok(
 							inField.some((group) => acceptsNoun(data, group, noun)),

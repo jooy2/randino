@@ -160,14 +160,16 @@ class PredicateTense:
     """The other forms, index-aligned with `words`."""
 
 
-NounTrait = Literal["flier", "swimmer", "crawler"]
+NounTrait = Literal["flier", "swimmer", "crawler", "lifeless"]
 """What a noun can do that its theme does not say.
 
 A fish and a sparrow are both `animal`, and only one of them flies; a snake and a lion are
 both `animal`, and only one of them runs. A language lists the nouns that carry each trait
 under `SentenceLanguageData.traits`, and a verb group asks for one with `subject_traits` or
-rules one out with `subject_without`. A noun listed nowhere has no trait, so it takes any
-group that asks for none.
+rules one out with `subject_without`. `"lifeless"` is the odd one: a word of a creature
+theme that is no creature — a spell, a rune, an amulet — which takes no verb and no state
+at all, because it neither does anything nor is anything a creature is. A noun listed
+nowhere has no trait, so it takes any group that asks for none.
 """
 
 

@@ -416,6 +416,10 @@ DE = SentenceLanguageData(
         "crawler": words("""
             Krokodil Schlange Eidechse Schildkröte Schnecke Ameise Spinne Wurm Krabbe Basilisk
         """),
+        "lifeless": words("""
+            Zauber Fluch Weissagung Amulett Talisman Rune Pforte Heiligtum Götze Totem Vorzeichen
+            Omen Bestiarium
+        """),
     },
     interjections=words("""
         oh, ach, na, mensch, oje, sieh_an, wahrhaftig, hui, herrje, du_meine_Güte, nanu,

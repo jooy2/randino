@@ -554,6 +554,10 @@ final SentenceLanguageData it = SentenceLanguageData(
     NounTrait.crawler: words(r'''
       coccodrillo serpente lucertola tartaruga lumaca formica ragno verme granchio basilisco
     '''),
+    NounTrait.lifeless: words(r'''
+      incantesimo maledizione profezia amuleto talismano runa portale santuario idolo totem augurio
+      presagio bestiario
+    '''),
   },
   interjections: words(r'''
     oh, ah, ehi, caspita, mamma_mia, guarda, davvero, ohi, accidenti, cavolo, santo_cielo, dai,

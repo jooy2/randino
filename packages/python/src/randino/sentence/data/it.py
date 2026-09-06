@@ -621,6 +621,10 @@ IT = SentenceLanguageData(
         "crawler": words("""
             coccodrillo serpente lucertola tartaruga lumaca formica ragno verme granchio basilisco
         """),
+        "lifeless": words("""
+            incantesimo maledizione profezia amuleto talismano runa portale santuario idolo totem
+            augurio presagio bestiario
+        """),
     },
     interjections=words("""
         oh, ah, ehi, caspita, mamma_mia, guarda, davvero, ohi, accidenti, cavolo, santo_cielo, dai,

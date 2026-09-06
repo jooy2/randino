@@ -365,6 +365,10 @@ export const ZH: SentenceLanguageData = {
 		crawler: words(`
 		乌龟 蜥蜴 变色龙 蟒蛇 蜗牛 蚂蚁 蜘蛛 螃蟹 鳄鱼 螳螂 蚯蚓 蜈蚣 马陆 蝎子 壁虱 跳蚤 蚕蛹 毛虫 蝾螈 菜花蛇 蝮蛇 毒蛇 眼镜蛇 响尾蛇 鬣蜥
 		蛇王
+		`),
+		// A word of a creature theme that is no creature: it takes no verb and no state.
+		lifeless: words(`
+			魔法 魔力 咒语 诅咒 预言 神谕 结界 护符 封印 幻影 陶俑 女神像 御守 咒文字 符咒 阵法 巫术 祈福 前兆 预兆 预言书 神话集 传说集 奇谭集
 		`)
 	},
 	interjections: words(`

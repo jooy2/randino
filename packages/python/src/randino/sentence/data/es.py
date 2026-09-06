@@ -605,6 +605,10 @@ ES = SentenceLanguageData(
         "crawler": words("""
             cocodrilo serpiente lagarto tortuga caracol hormiga araña gusano cangrejo basilisco
         """),
+        "lifeless": words("""
+            hechizo maldición profecía amuleto talismán runa portal santuario ídolo tótem augurio
+            presagio bestiario
+        """),
     },
     interjections=words("""
         ay, oh, vaya, caramba, madre_mía, mira, desde_luego, uy, anda, hombre, cielos, vamos,

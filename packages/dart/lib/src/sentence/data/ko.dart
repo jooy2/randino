@@ -1604,6 +1604,10 @@ final SentenceLanguageData ko = SentenceLanguageData(
       거북 도마뱀 카멜레온 뱀 달팽이 개미 거미 소라 게 지렁이 지네 노래기 전갈 진드기 벼룩 누에 번데기 애벌레 도롱뇽 사마귀 악어 구렁이 살모사 독사 코브라 방울뱀 비단뱀
       이구아나
     '''),
+    NounTrait.lifeless: words(r'''
+      마법 마력 주문 저주 예언 신탁 결계 성배 마검 부적 룬 봉인 환영 마술 도술 술법 마법진 명계 장승 호신부 호부 룬문자 인장술 문양술 저주술 축복술 징조 전조 예언서
+      신화집 전설집
+    '''),
   },
   interjections: words(r'아, 오, 와, 어머, 이런, 저런, 세상에, 아이고, 참, 어이쿠, 아이참, 어라, 우와, 이야,'),
   pronouns: const <WordGender, WordPool>{

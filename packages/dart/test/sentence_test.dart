@@ -58,6 +58,9 @@ List<NounTrait> traitsOf(SentenceLanguageData data, String noun) => <NounTrait>[
 /// Whether a verb group takes this noun as its subject, by what the noun can do.
 bool acceptsNoun(SentenceLanguageData data, VerbGroup group, String noun) {
   final traits = traitsOf(data, noun);
+
+  if (traits.contains(NounTrait.lifeless)) return false;
+
   final wanted = group.subjectTraits;
   final barred = group.subjectWithout;
 
@@ -1571,6 +1574,42 @@ void main() {
                   "$language: '$phrase' is named twice in one sentence (${detail.sentences[belongs[i]]})",
             );
             objects.add(phrase);
+          }
+        }
+      }
+    });
+
+    test('a lifeless word of a creature theme never does anything', () {
+      // `myth` holds spells and amulets beside dragons and elves, and a spell that
+      // chooses a gouge is what the class alone allowed. A language lists them as
+      // `lifeless`, and a sentence about a myth is about the creatures.
+      for (final language in wordLanguages) {
+        final data = sentenceData[language]!;
+        final lifeless = (data.traits?[NounTrait.lifeless] ?? const <String>[]).toSet();
+        final pronouns = pronounsOf(language);
+
+        expect(lifeless, isNotEmpty, reason: '$language lists nothing lifeless');
+
+        for (final detail in randSentenceDetails(
+          language: language,
+          theme: WordTheme.myth,
+          type: statementOnly,
+          includeName: false,
+          tense: SentenceTense.present,
+          count: sample,
+        )) {
+          for (var i = 0; i < detail.phrases.length; i += 1) {
+            final phrase = detail.phrases[i];
+
+            if (detail.slots[i] != SentenceSlot.subject || pronouns.contains(phrase)) continue;
+
+            final found = nounsIn(language, phrase);
+
+            expect(
+              found.isEmpty || found.any((noun) => !lifeless.contains(noun)),
+              isTrue,
+              reason: "$language: '$phrase' is lifeless (${detail.sentence})",
+            );
           }
         }
       }
@@ -3575,6 +3614,9 @@ void main() {
 
             for (final word in lexicon.nouns[theme]!) {
               final noun = plain(language, word);
+
+              // A lifeless noun takes no verb, by design.
+              if (traitsOf(data, noun).contains(NounTrait.lifeless)) continue;
 
               expect(
                 inField.any((group) => acceptsNoun(data, group, noun)),

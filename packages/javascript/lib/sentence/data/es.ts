@@ -520,6 +520,10 @@ export const ES: SentenceLanguageData = {
 		crawler: words(`
 		cocodrilo serpiente lagarto tortuga caracol hormiga araña gusano cangrejo
 		basilisco
+		`),
+		// A word of a creature theme that is no creature: it takes no verb and no state.
+		lifeless: words(`
+			hechizo maldición profecía amuleto talismán runa portal santuario ídolo tótem augurio presagio bestiario
 		`)
 	},
 	interjections: words(`

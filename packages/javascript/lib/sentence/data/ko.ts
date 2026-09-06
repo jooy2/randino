@@ -1703,6 +1703,11 @@ export const KO: SentenceLanguageData = {
 		crawler: words(`
 			거북 도마뱀 카멜레온 뱀 달팽이 개미 거미 소라 게 지렁이 지네 노래기 전갈 진드기 벼룩 누에 번데기 애벌레 도롱뇽 사마귀
 			악어 구렁이 살모사 독사 코브라 방울뱀 비단뱀 이구아나
+		`),
+		// A word of a creature theme that is no creature: it takes no verb and no state.
+		lifeless: words(`
+			마법 마력 주문 저주 예언 신탁 결계 성배 마검 부적 룬 봉인 환영 마술 도술 술법 마법진 명계 장승 호신부 호부 룬문자 인장술 문양술 저주술
+			축복술 징조 전조 예언서 신화집 전설집
 		`)
 	},
 	interjections: words(`

@@ -422,10 +422,13 @@ export type ConnectiveKind = 'additive' | 'temporal' | 'contrastive' | 'causal';
  * `animal`, and only one of them flies; a snake and a lion are both `animal`,
  * and only one of them runs. A language lists the nouns that carry each trait
  * under `SentenceLanguageData.traits`, and a verb group asks for one with
- * `subjectTraits` or rules one out with `subjectWithout`. A noun listed nowhere
+ * `subjectTraits` or rules one out with `subjectWithout`. `lifeless` is the odd
+ * one: a word of a creature theme that is no creature — a spell, a rune, an
+ * amulet — which takes no verb and no state at all, because it neither does
+ * anything nor is anything a creature is. A noun listed nowhere
  * has no trait, so it takes any group that asks for none.
  */
-export type NounTrait = 'flier' | 'swimmer' | 'crawler';
+export type NounTrait = 'flier' | 'swimmer' | 'crawler' | 'lifeless';
 
 /** The nouns that carry each trait, written the way the word pools write them. */
 export type SentenceTraits = {
