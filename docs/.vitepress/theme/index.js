@@ -2,6 +2,7 @@ import DefaultTheme from 'vitepress/theme';
 import Layout from './components/Layout.vue';
 import Lang from './components/Lang.vue';
 import Demo from './components/Demo.vue';
+import LangStart from './components/LangStart.vue';
 import WordOptions from './components/WordOptions.vue';
 import PackageLinks from './components/PackageLinks.vue';
 import { syncCodeLanguage } from '../data/language';
@@ -26,6 +27,10 @@ export default {
 		// Used straight from `demo.md`, the same way `Lang` is used from every
 		// reference page.
 		app.component('Demo', Demo);
+
+		// The home page's package picker, which writes the same choice the
+		// sidebar's switch does.
+		app.component('LangStart', LangStart);
 
 		// One table, twenty-six pages: `randWord` and each of its themed forms.
 		app.component('WordOptions', WordOptions);

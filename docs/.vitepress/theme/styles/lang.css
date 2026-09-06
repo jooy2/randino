@@ -307,3 +307,104 @@ html[data-lang='py'] .randino-lang[data-lang]:not([data-lang~='py']) {
 .randino-lang-hidden {
 	display: none;
 }
+
+/* ---------------------------------------------------------------------------
+ * The picker on the home page
+ *
+ * The same choice as the sidebar's switch, laid out for a reader who has not
+ * made it yet: three cards side by side rather than one row that hides two
+ * answers. It sits above the first code sample, so the samples below it change
+ * as soon as it is used.
+ * ------------------------------------------------------------------------- */
+
+.randino-start {
+	margin: 24px 0 32px;
+}
+
+.randino-start-options {
+	display: grid;
+	grid-template-columns: repeat(3, minmax(0, 1fr));
+	gap: 12px;
+}
+
+@media (max-width: 640px) {
+	.randino-start-options {
+		grid-template-columns: minmax(0, 1fr);
+	}
+}
+
+.randino-start-option {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	gap: 6px;
+	padding: 16px;
+	border: 1px solid var(--vp-c-divider);
+	border-radius: 12px;
+	background-color: var(--vp-c-bg-soft);
+	text-align: left;
+	cursor: pointer;
+	transition:
+		border-color 0.16s,
+		background-color 0.16s,
+		transform 0.16s;
+}
+
+.randino-start-option:hover {
+	border-color: var(--vp-c-brand-1);
+	transform: translateY(-2px);
+}
+
+.randino-start-option:focus-visible {
+	outline: 2px solid var(--vp-c-brand-1);
+	outline-offset: 2px;
+}
+
+.randino-start-label {
+	font-size: 16px;
+	font-weight: 700;
+	line-height: 1.2;
+	color: var(--vp-c-text-1);
+}
+
+/* The install line, quiet enough that the language's name is what is read
+   first. `code` rather than plain text because it is a command. */
+.randino-start-install {
+	padding: 2px 6px;
+	border-radius: 6px;
+	background-color: var(--vp-c-bg);
+	color: var(--vp-c-text-2);
+	font-family: var(--vp-font-family-mono);
+	font-size: 12px;
+	line-height: 1.6;
+}
+
+/*
+ * Which card is the current choice, drawn from `html[data-lang]` rather than
+ * from the ref — see the comment at the top of `LangStart.vue`. One rule per
+ * package, the same way the rule at the top of this file is written.
+ */
+html[data-lang='js'] .randino-start-option[data-lang='js'],
+html[data-lang='dart'] .randino-start-option[data-lang='dart'],
+html[data-lang='py'] .randino-start-option[data-lang='py'] {
+	border-color: var(--vp-c-brand-1);
+	background-color: var(--vp-c-bg);
+}
+
+/* Only ever displayed inside the card that is the current choice, which the
+   rule at the top of this file is what does. */
+.randino-start-current {
+	font-size: 11px;
+	font-weight: 700;
+	line-height: 1;
+	color: var(--vp-c-brand-1);
+	letter-spacing: 0.06em;
+	text-transform: uppercase;
+}
+
+.randino-start-hint {
+	margin: 12px 0 0;
+	font-size: 13px;
+	line-height: 1.6;
+	color: var(--vp-c-text-3);
+}

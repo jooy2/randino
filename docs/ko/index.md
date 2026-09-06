@@ -14,9 +14,6 @@ hero:
       text: 시작하기
       link: /ko/guide/getting-started
     - theme: alt
-      text: 가이드
-      link: /ko/guide/languages
-    - theme: alt
       text: 데모
       link: /ko/demo
   image:
@@ -49,6 +46,10 @@ features:
     link: /ko/guide/languages
     linkText: 지원 언어
 ---
+
+## 다음 언어로 시작하세요 {#pick-a-package}
+
+<LangStart />
 
 ## 사용 예시 {#examples}
 

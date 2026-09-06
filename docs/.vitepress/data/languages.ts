@@ -18,6 +18,8 @@ export interface CodeLanguage {
 	label: string;
 	/** The package name in that ecosystem's registry. */
 	pkg: string;
+	/** The one line that installs it, for the home page's package picker. */
+	install: string;
 	/** The fence language its code samples are written in. */
 	fence: string;
 	/**
@@ -30,9 +32,30 @@ export interface CodeLanguage {
 }
 
 export const CODE_LANGUAGES: CodeLanguage[] = [
-	{ id: 'js', label: 'JavaScript', pkg: 'randino', fence: 'javascript', tint: '#F7DF1E' },
-	{ id: 'dart', label: 'Dart', pkg: 'randino', fence: 'dart', tint: '#0175C2' },
-	{ id: 'py', label: 'Python', pkg: 'randino', fence: 'python', tint: '#3776AB' }
+	{
+		id: 'js',
+		label: 'JavaScript',
+		pkg: 'randino',
+		install: 'npm install randino',
+		fence: 'javascript',
+		tint: '#F7DF1E'
+	},
+	{
+		id: 'dart',
+		label: 'Dart',
+		pkg: 'randino',
+		install: 'dart pub add randino',
+		fence: 'dart',
+		tint: '#0175C2'
+	},
+	{
+		id: 'py',
+		label: 'Python',
+		pkg: 'randino',
+		install: 'pip install randino',
+		fence: 'python',
+		tint: '#3776AB'
+	}
 ];
 
 export const CODE_LANGUAGE_IDS: string[] = CODE_LANGUAGES.map((language) => language.id);

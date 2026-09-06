@@ -82,8 +82,9 @@ function flatten(markdown: string): string {
 			.replace(/^::: lang ([^\n]*)\n([\s\S]*?)\n:::$/gm, (_, langs: string, body: string) =>
 				langs.trim().split(/\s+/).includes('js') ? body.trim() : ''
 			)
-			// The demo is a Vue component; in a text file it is nothing at all.
-			.replace(/^<Demo\s*\/>$/gm, '')
+			// The demo and the package picker are Vue components; in a text file
+			// they are nothing at all.
+			.replace(/^<(Demo|LangStart)\s*\/>$/gm, '')
 			// The option table is a component too, but one whose content a reader of
 			// this file needs — so it is drawn out rather than dropped.
 			.replace(/^<WordOptions(\s+theme)?\s*\/>$/gm, (_, theme?: string) =>

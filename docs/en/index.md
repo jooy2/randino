@@ -14,9 +14,6 @@ hero:
       text: Get started
       link: /guide/getting-started
     - theme: alt
-      text: Guide
-      link: /guide/languages
-    - theme: alt
       text: Demo
       link: /demo
   image:
@@ -49,6 +46,10 @@ features:
     link: /guide/languages
     linkText: Supported languages
 ---
+
+## Start with your language {#pick-a-package}
+
+<LangStart />
 
 ## Examples {#examples}
 
