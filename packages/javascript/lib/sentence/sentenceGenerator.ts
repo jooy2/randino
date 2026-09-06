@@ -28,7 +28,7 @@ import {
 	resolvePrefix,
 	resolveRealism
 } from '../_internal/generate.js';
-import { endsWithConsonant } from '../_internal/script.js';
+import { endsWithConsonant, endsWithLiquid } from '../_internal/script.js';
 import { chance, clamp, pick, pickWeighted, randInt } from '../_internal/utils.js';
 import { RAND_SENTENCE_COUNT_MAX, RAND_SENTENCE_LENGTH_MAX } from '../constants.js';
 import type {
@@ -40,7 +40,9 @@ import type {
 	SentenceSlot,
 	SentenceSlotOption,
 	SentenceQuote,
+	SentenceStory,
 	SentenceStyle,
+	SentenceTense,
 	SentenceType,
 	SentenceTypeOption,
 	WordLanguage,
@@ -48,7 +50,7 @@ import type {
 	WordThemeOption
 } from '../_types/global.js';
 import { WORD_DATA, WORD_LANGUAGES, WORD_THEMES } from '../word/data/index.js';
-import type { WordGender, WordLanguageData, WordPool } from '../word/data/types.js';
+import type { WordAgreement, WordGender, WordLanguageData, WordPool } from '../word/data/types.js';
 import {
 	agree,
 	drawWord,
@@ -63,20 +65,32 @@ import { drawName } from '../name/nameGenerator.js';
 import { nameLengthRange } from '../name/nameLengthRange.js';
 import { SENTENCE_DATA, THEME_CLASS } from './data/index.js';
 import type {
+	Condition,
 	ConnectiveKind,
 	NounClass,
 	PredicateForm,
 	SentenceFrame,
+	SentenceJoin,
 	SentenceMark,
 	SentenceMood,
 	SentenceLanguageData,
 	SentencePart,
 	StateGroup,
+	VerbField,
 	VerbGroup
 } from './data/types.js';
+import { heroClassesFor, itemThemesFor, pickStory, plan, storiesFor } from './story.js';
+import type { Beat } from './story.js';
 
 // How many sentences to build before settling for the closest fit found.
 const FIT_ATTEMPTS = 14;
+
+// How many times a story is told before settling for the closest fit found. A
+// story is sentences drawn one after another against a range shared out between
+// them, and a run of short sentences leaves the last one a gap no shape can fill:
+// three Korean sentences at forty to sixty characters fell short once in a
+// hundred and twenty. Telling the whole story again is what closes that.
+const STORY_ATTEMPTS = 3;
 
 // How often a noun phrase that may carry a modifier is given one. Length can
 // override it in both directions — see `modifyChanceFor`.
@@ -87,7 +101,13 @@ const MODIFY_CHANCE = 45;
 const THEME_CHANCE = 65;
 
 /** The slots that are a noun phrase, and so draw from the word pools. */
-const NOUN_SLOTS: readonly SentenceSlot[] = ['subject', 'object', 'place', 'quantity'];
+const NOUN_SLOTS: readonly SentenceSlot[] = [
+	'subject',
+	'object',
+	'place',
+	'destination',
+	'quantity'
+];
 
 function isNounSlot(slot: SentenceSlot): boolean {
 	return NOUN_SLOTS.includes(slot);
@@ -279,6 +299,14 @@ type Settings = {
 	// How the sentences address their reader, or null when the caller left it to
 	// the generator.
 	style: SentenceStyle | null;
+	// When it all happened, or null when the caller left it to the generator, in
+	// which case it is decided once per result.
+	tense: SentenceTense | null;
+	// The story a result of several sentences follows, or null for any of them.
+	story: SentenceStory | null;
+	// Whether the caller named the kinds themselves — `'all'` included, which is a
+	// way of saying every kind is wanted. A story writes statements unless they did.
+	typed: boolean;
 };
 
 // The kinds a quoted line can be. Somebody speaking is as often asking as
@@ -401,6 +429,50 @@ type Draw = {
 	 */
 	avoid: ReadonlySet<string>;
 	follow: Follow | null;
+	/** The tense every sentence of the result is in. */
+	tense: SentenceTense;
+	/**
+	 * What a story asks of this sentence, when it is one of a story. Null for a
+	 * sentence that is drawn on its own terms.
+	 */
+	beat: BeatDraw | null;
+	/**
+	 * Whether this sentence is the first or the second clause of one two-clause
+	 * sentence, or a whole sentence of its own.
+	 */
+	link: 'first' | 'second' | null;
+	/**
+	 * The latest phase of the day the result has reached, as an index into the
+	 * language's `times.day`, and `-1` before it has named one. A story never
+	 * goes back to the morning.
+	 */
+	dayAt: number;
+};
+
+/**
+ * What one sentence of a story has to be: which fields its verb may come from,
+ * which condition a state sentence says, which parts the shape has to carry and
+ * which it is better with, and what the nouns of the story are.
+ */
+type BeatDraw = {
+	/** `verb` for an action or a change, `state` for a description. */
+	headed: 'verb' | 'state';
+	/** The fields the verb may be drawn from. Empty for a state sentence. */
+	fields: readonly VerbField[];
+	/**
+	 * The condition a state sentence asserts, or null for a plain trait. Left
+	 * undefined by an action.
+	 */
+	condition?: Condition | null;
+	/** The parts the shape has to carry, and the ones it is better for carrying. */
+	wants: readonly SentenceSlot[];
+	prefers: readonly SentenceSlot[];
+	/** The theme the story's item comes from, for a phrase that draws it. */
+	item: WordTheme | null;
+	/** The themes the story's places come from. */
+	places: readonly WordTheme[];
+	/** The themes the subject may come from, when the story has decided it. */
+	subject: readonly WordTheme[] | null;
 };
 
 /**
@@ -510,16 +582,19 @@ function matchesSlots(frame: SentenceFrame, slots: readonly SentenceSlot[] | 'no
 function framesFor(
 	data: SentenceLanguageData,
 	settings: Settings,
-	mood: SentenceMood
+	mood: SentenceMood,
+	beat: BeatDraw | null = null
 ): readonly SentenceFrame[] {
 	// A language that writes its question with the mark alone declares no question
 	// shape, and answers with the statement shapes it does have. That is not a
 	// fallback so much as the point: `¿El león corre?` is the statement.
-	const byMood = data.frames.filter((frame) => (frame.mood ?? 'statement') === mood);
+	const storied = beat ? data.frames.filter((frame) => storyFrame(frame, beat)) : data.frames;
+	const shaped = storied.length ? storied : data.frames;
+	const byMood = shaped.filter((frame) => (frame.mood ?? 'statement') === mood);
 	const moody = byMood.length
 		? byMood
-		: data.frames.filter((frame) => (frame.mood ?? 'statement') === 'statement');
-	const moodly = moody.length ? moody : data.frames;
+		: shaped.filter((frame) => (frame.mood ?? 'statement') === 'statement');
+	const moodly = moody.length ? moody : shaped;
 	// Two shapes have no room for a name. A counted one makes its quantity the
 	// subject, and `서호 3명` counts somebody's name; a copular one equates its
 	// subject to a day, and a person is not a day. Asked for a name, both are left
@@ -530,7 +605,15 @@ function framesFor(
 		settings.slots === 'all'
 			? usable
 			: usable.filter((frame) => matchesSlots(frame, settings.slots as never));
-	const allowed = bySlots.length ? bySlots : usable;
+	const sloted = bySlots.length ? bySlots : usable;
+	// A story's sentence has to carry what the story put in it — the thing the hero
+	// is holding, the place they are going — and a shape with no room for that is
+	// a shape that would draw something else. Fallen back on rather than failed,
+	// because a language may have no such shape at all.
+	const wanted = beat?.wants.length
+		? sloted.filter((frame) => beat.wants.every((slot) => frame.parts.some((p) => p.slot === slot)))
+		: sloted;
+	const allowed = wanted.length ? wanted : sloted;
 
 	if (settings.shape === 'all') {
 		return allowed;
@@ -539,6 +622,44 @@ function framesFor(
 	const byShape = allowed.filter((frame) => shapeOf(frame) === settings.shape);
 
 	return byShape.length ? byShape : allowed;
+}
+
+/** The slots a story never writes: an amount, a count, a date and a clock. */
+const UNSTORIED: readonly SentenceSlot[] = ['quantity', 'money', 'date', 'clock'];
+
+/**
+ * Whether a shape can be one sentence of a story. It has to be headed the way
+ * the step is — a verb for something done, a state for a description — it may not
+ * count or price or date anything, its verb has to be one the step's fields can
+ * supply, and a change of scene carries no place of its own: `숲이 숲에서
+ * 조용해졌다` is the sentence that rule keeps out.
+ */
+function storyFrame(frame: SentenceFrame, beat: BeatDraw): boolean {
+	if (frame.parts.some((part) => UNSTORIED.includes(part.slot) || part.copula)) {
+		return false;
+	}
+
+	const headed = frame.parts.some((part) => part.slot === 'state') ? 'state' : 'verb';
+
+	if (headed !== beat.headed) {
+		return false;
+	}
+
+	if (frame.fields && !frame.fields.some((field) => beat.fields.includes(field))) {
+		return false;
+	}
+
+	// A shape that has somewhere the story did not ask for — a destination for a
+	// hero who is not going anywhere, an object for a hero with empty hands — would
+	// draw a noun the story does not know. What the story asked for is in `wants`;
+	// what it can take or leave is in `prefers`; a place beside anything else is
+	// fine, because the story's place is where all of it happens.
+	const drawn = frame.parts
+		.map((part) => part.slot)
+		.filter((slot) => slot === 'object' || slot === 'destination' || slot === 'place');
+	const known = [...beat.wants, ...beat.prefers];
+
+	return drawn.every((slot) => known.includes(slot));
 }
 
 /** Whether a language has a shape that answers the request at all. */
@@ -593,6 +714,8 @@ type Requirement = {
 	theme?: WordTheme;
 	/** False for a word found in none of the pools, which is used as a noun anyway. */
 	known: boolean;
+	/** True for a word written on its own, with no modifier in front of it. */
+	bare?: boolean;
 };
 
 /** Which part of a shape each required word ends up in, by the part's index. */
@@ -656,21 +779,28 @@ function classify(language: WordLanguage, word: string): Requirement {
 		}
 	}
 
-	const manner = entryOf(data.manners, word);
+	const manner = data.manners
+		.map((group) => entryOf(group.words, word))
+		.find((entry) => entry !== null);
 
 	if (manner) {
 		written = manner;
 		slots.push('manner');
 	}
 
-	const time = entryOf(data.times, word);
+	const time = timePools(data)
+		.map((pool) => entryOf(pool, word))
+		.find((entry) => entry !== null);
 
 	if (time) {
 		written = time;
 		slots.push('time');
 	}
 
-	const modifier = entryOf(wordData.adjectives, word) ?? entryOf(wordData.actions, word);
+	const modifier =
+		data.modifiers.map((group) => entryOf(group.words, word)).find((entry) => entry !== null) ??
+		entryOf(wordData.adjectives, word) ??
+		entryOf(wordData.actions, word);
 
 	if (modifier) {
 		written = plain(wordData, modifier);
@@ -841,31 +971,41 @@ function nounSpan(
 }
 
 /**
- * The modifiers of a language, in the form they take beside a noun of `gender`.
+ * The modifiers a noun of `theme` may carry, in the form they take beside a noun
+ * of `gender`. Drawn from the sentence data's own groups rather than from the
+ * nickname pools, so that `맑은` goes in front of a drink and never in front of
+ * a mechanic; a noun no pool holds takes any of them.
  *
  * Written out rather than agreed after the fact, because a length budget has to
  * see the word the sentence will actually carry: German `blau` is `blauer` in
  * front of a masculine noun, and choosing by the four letters and writing the six
  * is how a sentence quietly stepped outside its range.
  */
-function agreedModifiers(
+function modifiersFor(
 	language: WordLanguage,
+	theme: WordTheme | null,
 	gender: WordGender | undefined
 ): readonly string[] {
 	const wordData = WORD_DATA[language];
-
-	if (!gender || !wordData.agreement) {
-		return wordData.adjectives;
-	}
-
-	const key = `${language}:${gender}`;
+	const data = SENTENCE_DATA[language];
+	const cls = theme ? THEME_CLASS[theme] : null;
+	// Keyed by the theme rather than the class, because a group may narrow itself
+	// to themes: a soup and a tea are both edible and take different words.
+	const key = `${language}:${theme ?? '*'}:${gender ?? '-'}`;
 	const cached = agreedCache.get(key);
 
 	if (cached) {
 		return cached;
 	}
 
-	const agreed = wordData.adjectives.map((word) => agree(wordData, word, gender));
+	const groups = cls
+		? data.modifiers.filter(
+				(group) => group.subject.includes(cls) && (!group.themes || group.themes.includes(theme!))
+			)
+		: data.modifiers;
+	const base = [...new Set(groups.flatMap((group) => group.words))];
+	const agreed =
+		gender && wordData.agreement ? base.map((word) => agree(wordData, word, gender)) : base;
 
 	agreedCache.set(key, agreed);
 
@@ -900,20 +1040,13 @@ function slotBounds(language: WordLanguage): Record<string, readonly [number, nu
 		: [undefined];
 	const bounds = {
 		noun: span(WORD_THEMES.map((theme) => nounsOf(language, theme))),
-		modifier: span(genders.map((gender) => agreedModifiers(language, gender))),
+		modifier: span(genders.map((gender) => modifiersFor(language, null, gender))),
 		// Every form a predicate can take, not only the plain statement's: a question
 		// form is a different length, and the shape is chosen against these.
-		verb: span(
-			data.verbs.flatMap((group) => [group.words, ...Object.values(group.forms ?? {}).map(endings)])
-		),
-		state: span(
-			data.states.flatMap((group) => [
-				group.words,
-				...Object.values(group.forms ?? {}).map(endings)
-			])
-		),
-		manner: span([data.manners]),
-		time: span([data.times]),
+		verb: span(data.verbs.flatMap(predicatePools)),
+		state: span(data.states.flatMap(predicatePools)),
+		manner: span(data.manners.map((group) => group.words)),
+		time: span(timePools(data)),
 		money: moneySpan(data),
 		date: calendarSpan(data, 'date'),
 		clock: calendarSpan(data, 'clock')
@@ -922,6 +1055,22 @@ function slotBounds(language: WordLanguage): Record<string, readonly [number, nu
 	boundsCache.set(language, bounds);
 
 	return bounds;
+}
+
+/** Every pool a group's predicate can be written from, in either tense. */
+function predicatePools(group: VerbGroup | StateGroup): readonly WordPool[] {
+	return [
+		group.words,
+		...Object.values(group.forms ?? {}).map(endings),
+		...(group.past ? [group.past.words, ...Object.values(group.past.forms ?? {}).map(endings)] : [])
+	];
+}
+
+/** Every pool a time adverbial can come from, whatever the tense. */
+function timePools(data: SentenceLanguageData): readonly WordPool[] {
+	return [data.times.day, data.times.any, data.times.past ?? [], data.times.present ?? []].filter(
+		(pool) => pool.length > 0
+	);
 }
 
 /** The longest and shortest article the language can open a phrase with. */
@@ -1102,7 +1251,8 @@ function verbGroupsFor(
 	data: SentenceLanguageData,
 	frame: SentenceFrame,
 	themes: readonly WordTheme[],
-	plan: Plan
+	plan: Plan,
+	beat: BeatDraw | null = null
 ): readonly VerbGroup[] {
 	// A quantity is an object with a number on it, and an amount is an object of
 	// the class money belongs to — unless the quantity is what the sentence is
@@ -1112,9 +1262,31 @@ function verbGroupsFor(
 	const subject = requiredAt(frame, plan, 'subject');
 	const object = requiredAt(frame, plan, 'object');
 	const verb = requiredAt(frame, plan, 'verb');
+	// A shape that goes somewhere wants a verb that goes, and a story step wants a
+	// verb of the field it settled on.
+	const fields = beat?.fields.length ? beat.fields : frame.fields;
 
 	const usable = data.verbs.filter((group) => {
 		if (Boolean(group.object) !== wantsObject) {
+			return false;
+		}
+
+		if (fields && !fields.includes(group.field)) {
+			return false;
+		}
+
+		// A group that needs a part is drawn only for a shape that has it — and a
+		// shape that has a destination is drawn only for the groups that go
+		// somewhere, because `leaves to the market` and `回家内院` are what the rest
+		// of the field writes there.
+		if (group.requires && !frame.parts.some((part) => part.slot === group.requires)) {
+			return false;
+		}
+
+		if (
+			frame.parts.some((part) => part.slot === 'destination') &&
+			group.requires !== 'destination'
+		) {
 			return false;
 		}
 
@@ -1130,17 +1302,46 @@ function verbGroupsFor(
 			return false;
 		}
 
-		if (object?.theme && !group.object?.includes(THEME_CLASS[object.theme])) {
+		if (object?.theme && !acceptsObject(group, object.theme)) {
+			return false;
+		}
+
+		if (beat?.item && group.object && !acceptsObject(group, beat.item)) {
 			return false;
 		}
 
 		return (
 			themesForClasses(themes, group.subject).length > 0 &&
-			(!group.object || themesForClasses(WORD_THEMES, group.object).length > 0)
+			(!group.object || objectThemesOf(group, beat).length > 0)
 		);
 	});
 
 	return usable;
+}
+
+/** Whether a verb group takes a noun of this theme as its object. */
+function acceptsObject(group: VerbGroup, theme: WordTheme): boolean {
+	if (!group.object?.includes(THEME_CLASS[theme])) {
+		return false;
+	}
+
+	return !group.objectThemes || group.objectThemes.includes(theme);
+}
+
+/**
+ * The themes a verb group's object may come from: its classes, narrowed to the
+ * themes it names when it names any, and to the story's item when there is one.
+ */
+function objectThemesOf(group: VerbGroup, beat: BeatDraw | null): readonly WordTheme[] {
+	if (beat?.item) {
+		return acceptsObject(group, beat.item) ? [beat.item] : [];
+	}
+
+	const byClass = themesForClasses(WORD_THEMES, group.object ?? []);
+
+	return group.objectThemes
+		? byClass.filter((theme) => group.objectThemes!.includes(theme))
+		: byClass;
 }
 
 /** The same, for a shape headed by an adjective rather than a verb. */
@@ -1148,13 +1349,21 @@ function stateGroupsFor(
 	data: SentenceLanguageData,
 	themes: readonly WordTheme[],
 	frame: SentenceFrame,
-	plan: Plan
+	plan: Plan,
+	beat: BeatDraw | null = null
 ): readonly StateGroup[] {
 	const subject = requiredAt(frame, plan, 'subject');
 	const state = requiredAt(frame, plan, 'state');
 
 	return data.states.filter((group) => {
 		if (state && !group.words.includes(state.word)) {
+			return false;
+		}
+
+		// A story's description says what is true of the hero just now, and a plain
+		// trait where nothing is: `배고프다` where the hero is hungry, and never
+		// `배부르다` there.
+		if (beat?.condition !== undefined && (group.condition ?? null) !== beat.condition) {
 			return false;
 		}
 
@@ -1194,6 +1403,10 @@ type Built = {
 	scene: Map<SentenceSlot, Requirement>;
 	/** What this sentence is doing. Set once the draw it came from is known. */
 	type: SentenceType;
+	/** The field its verb came from, for a story to know what it did. */
+	field: VerbField | null;
+	/** The phase of the day it named, as an index into `times.day`, or `-1`. */
+	dayAt: number;
 };
 
 /** The article a phrase opens with, by the noun's gender and the word after it. */
@@ -1251,13 +1464,16 @@ function nounPhrase(
 	min: number,
 	max: number,
 	span: readonly [number, number],
-	count: string
+	count: string,
+	// The theme the modifier is chosen for, which is the noun's own — or null for a
+	// word no pool holds, which takes any modifier the language has.
+	described: WordTheme | null = theme
 ): Phrase {
 	const wordData = WORD_DATA[language];
 	const pool = nounsOf(language, theme);
 	const space = data.space.length;
 	const [, nounMax] = span;
-	const [modMin, modMax] = poolBounds(wordData.adjectives);
+	const [modMin, modMax] = poolBounds(modifiersFor(language, described, undefined));
 	// Measured against the base forms, because the noun that decides the gender has
 	// not been drawn yet; the modifier itself is chosen from the agreed pool below.
 	const [, articleMax] = bare ? [0, 0] : articleSpan(data);
@@ -1274,7 +1490,7 @@ function nounPhrase(
 	if (modify) {
 		const room = max - overhead - drawn.length - space;
 		const want = min - overhead - drawn.length - space;
-		const agreed = agreedModifiers(language, gender);
+		const agreed = modifiersFor(language, described, gender);
 		const modifier =
 			(forcedModifier ? agree(wordData, forcedModifier, gender) : null) ??
 			plain(
@@ -1364,6 +1580,10 @@ function nameSpan(language: WordLanguage): readonly [number, number] {
 
 /** The particle a part writes after its phrase, in the form the phrase asks for. */
 function tailOf(part: SentencePart, phrase: string): string {
+	if (part.tailLiquid && endsWithLiquid(phrase)) {
+		return part.tailLiquid;
+	}
+
 	if (part.tailAlt && endsWithConsonant(phrase)) {
 		return part.tailAlt;
 	}
@@ -1377,13 +1597,18 @@ function tailOf(part: SentencePart, phrase: string): string {
  * modifiers and one that fell short takes them everywhere, which is how the
  * length range picks the shape rather than truncating a word.
  */
-function modifyChanceFor(distance: number, tooLong: boolean): number {
+function modifyChanceFor(distance: number, tooLong: boolean, storied: boolean): number {
 	if (distance === 0) {
-		return MODIFY_CHANCE;
+		return storied ? STORY_MODIFY_CHANCE : MODIFY_CHANCE;
 	}
 
 	return tooLong ? 0 : 100;
 }
+
+// A story's sentence carries a modifier a little more often than a lone one:
+// its modifiers are chosen for the noun they describe, and a story told in bare
+// nouns reads as a list of events rather than as prose.
+const STORY_MODIFY_CHANCE = 55;
 
 /**
  * The themes a sentence may draw its subject from. A sentence carrying on about
@@ -1424,8 +1649,8 @@ function generateOne(language: WordLanguage, settings: Settings, draw: Draw): Bu
 	const wordData = WORD_DATA[language];
 	const data = SENTENCE_DATA[language];
 	const bounds = roomFor(language, settings.includeName);
-	const allowed = framesFor(data, settings, moodFor(draw.mark));
-	const requested = subjectThemesFor(settings, follow);
+	const allowed = framesFor(data, settings, moodFor(draw.mark), draw.beat);
+	const requested = draw.beat?.subject ?? subjectThemesFor(settings, follow);
 	// The words a caller required go in the first sentence — once in the result
 	// rather than once in every sentence of it.
 	const requirements = follow ? [] : settings.include.map((word) => classify(language, word));
@@ -1441,8 +1666,21 @@ function generateOne(language: WordLanguage, settings: Settings, draw: Draw): Bu
 			known: follow.topic.theme !== null
 		});
 	}
+
+	// The second clause of one sentence shares the first one's subject and writes
+	// nothing where it would stand, the way a dropped subject does.
+	if (draw.link === 'second') {
+		pinned.delete('subject');
+	}
 	const [min, max] = budget;
-	const plans = new Map(allowed.map((frame) => [frame, planFor(frame, requirements, pinned)]));
+	// A result that has reached the last phase of its day has no later one to name,
+	// so a sentence after that carries no time at all rather than a wrong one.
+	const spent = follow !== null && draw.dayAt >= data.times.day.length - 1;
+	const timeless = spent
+		? allowed.filter((frame) => !frame.parts.some((part) => part.slot === 'time'))
+		: allowed;
+	const frames = timeless.length ? timeless : allowed;
+	const plans = new Map(frames.map((frame) => [frame, planFor(frame, requirements, pinned)]));
 	// A shape is only worth drawing when the language has a predicate for it: a
 	// `body` subject has no transitive verb in any language here, so a shape with
 	// an object in it would have to fall back to a verb that means something else.
@@ -1460,18 +1698,18 @@ function generateOne(language: WordLanguage, settings: Settings, draw: Draw): Bu
 		}
 
 		return frame.parts.some((part) => part.slot === 'state')
-			? stateGroupsFor(data, requested, frame, plan).length > 0
-			: verbGroupsFor(data, frame, requested, plan).length > 0;
+			? stateGroupsFor(data, requested, frame, plan, draw.beat).length > 0
+			: verbGroupsFor(data, frame, requested, plan, draw.beat).length > 0;
 	};
 	// Prefer a shape that can land inside the range, then one that has somewhere to
 	// put every word the caller required, and settle for any of them after that.
-	const fitting = allowed.filter((frame) => {
+	const fitting = frames.filter((frame) => {
 		const [low, high] = frameRange(frame, data, bounds);
 
 		return high >= min && low <= max && buildable(frame);
 	});
-	const loose = allowed.filter(buildable);
-	const usable = fitting.length ? fitting : loose.length ? loose : allowed;
+	const loose = frames.filter(buildable);
+	const usable = fitting.length ? fitting : loose.length ? loose : frames;
 	let best: Built | null = null;
 	let bestDistance = Infinity;
 	let bestTooLong = false;
@@ -1482,17 +1720,32 @@ function generateOne(language: WordLanguage, settings: Settings, draw: Draw): Bu
 		// filtered: a shape that missed by two characters can still make it on the
 		// next draw, and dropping it left a language whose short shape was the only
 		// one in range settling for whatever it had.
-		const frame = pickFrame(
-			usable,
-			attempt > 0 && bestDistance > 0
-				? (candidate) => {
-						const [low, high] = frameRange(candidate, data, bounds);
+		const frame = pickFrame(usable, (candidate) => {
+			const fit =
+				attempt > 0 && bestDistance > 0
+					? (() => {
+							const [low, high] = frameRange(candidate, data, bounds);
 
-						return (bestTooLong ? low <= min : high >= max) ? 4 : 1;
-					}
-				: undefined
+							return (bestTooLong ? low <= min : high >= max) ? 4 : 1;
+						})()
+					: 1;
+			// A story's sentence is better for carrying what the story would rather
+			// it carried — the place it is all happening in — and for saying a little
+			// more than the bare subject and verb.
+			const preferred = draw.beat?.prefers.some((slot) =>
+				candidate.parts.some((part) => part.slot === slot)
+			)
+				? 3
+				: 1;
+			const fuller = draw.beat && candidate.parts.length >= 3 ? 2 : 1;
+
+			return fit * preferred * fuller;
+		});
+		const modifyChance = modifyChanceFor(
+			attempt === 0 ? 0 : bestDistance,
+			bestTooLong,
+			draw.beat !== null
 		);
-		const modifyChance = modifyChanceFor(attempt === 0 ? 0 : bestDistance, bestTooLong);
 		const built = compose(
 			language,
 			wordData,
@@ -1629,13 +1882,20 @@ function compose(
 		headed === 'copula'
 			? [data.calendar!.copula as StateGroup | VerbGroup]
 			: headed === 'state'
-				? (stateGroupsFor(data, themes, frame, plan) as (StateGroup | VerbGroup)[])
-				: (verbGroupsFor(data, frame, themes, plan) as (StateGroup | VerbGroup)[]);
+				? (stateGroupsFor(data, themes, frame, plan, draw.beat) as (StateGroup | VerbGroup)[])
+				: (verbGroupsFor(data, frame, themes, plan, draw.beat) as (StateGroup | VerbGroup)[]);
 	const group = pick(groups.length ? groups : headedFallback(data, frame, headed));
-	// The same predicates, in the form this type of sentence ends on. Index-aligned
-	// with `group.words`, which is what lets a required word be translated rather
-	// than written out in the wrong form.
-	const predicates = formOf(group, draw.mark, draw.style);
+	// The same predicates, in the form this type of sentence ends on, in the tense
+	// the result is in — or in the form that links a first clause to the one after
+	// it. Index-aligned with `group.words`, which is what lets a required word be
+	// translated rather than written out in the wrong form.
+	const predicates = formOf(
+		group,
+		draw.mark,
+		draw.style,
+		draw.tense,
+		draw.link === 'first' ? data.join : undefined
+	);
 	const subjectThemes = themesForClasses(themes, group.subject);
 	// Which part is the subject is the shape's business, not the slot's: a counted
 	// shape has no `subject` part and its quantity is the subject. Looking for a
@@ -1654,7 +1914,8 @@ function compose(
 	// modifier or a particle. Written out as its own list so that every budget
 	// below is measured against what the sentence actually writes; `at` is the
 	// index back into the frame, which is what the plan is keyed by.
-	const pronoun = follow?.reference === 'pronoun' ? follow.pronoun : null;
+	const pronoun =
+		draw.link === 'second' ? '' : follow?.reference === 'pronoun' ? follow.pronoun : null;
 	const shape: { part: SentencePart; at: number }[] = [];
 
 	frame.parts.forEach((part, at) => {
@@ -1678,7 +1939,7 @@ function compose(
 		isNounSlot(part.slot)
 			? part.slot === subjectSlot
 				? subjectTheme
-				: (plan.phrase.get(at)?.theme ?? themeForPart(part.slot, group, themes))
+				: (plan.phrase.get(at)?.theme ?? themeForPart(part.slot, group, themes, draw.beat))
 			: null
 	);
 	// What a phrase writes instead of a noun phrase, when it writes one at all: a
@@ -1714,7 +1975,14 @@ function compose(
 	});
 	const parts = shape.map((entry, i) =>
 		proper[i] === null
-			? entry
+			? // A story names its hero once with whatever describes them and then
+				// leaves the name alone: `부지런한 여우가 …. 여우가 …`, not `… 게으른
+				// 여우가 …` two lines later about the same fox. A word required bare —
+				// home, which no modifier fits — is left alone too.
+				(draw.beat && entry.part.slot === subjectSlot && follow?.reference === 'repeat') ||
+				plan.phrase.get(entry.at)?.bare
+				? { ...entry, part: { ...entry.part, modifiable: false } }
+				: entry
 			: { ...entry, part: { ...entry.part, modifiable: false, bare: true } }
 	);
 	// The same for the predicate: `bounds` spans every group the language has, and
@@ -1733,11 +2001,16 @@ function compose(
 			// own syllables and draws from its own pools, and neither is this theme's.
 			const span =
 				proper[i] === '' ? nameSpan(language) : nounSpan(language, theme, settings.invent);
+			// A word no pool holds is described by any modifier; a noun by the ones
+			// that fit what it is.
+			const described = required && !required.known ? null : theme;
 
 			return {
 				...bounds,
 				noun: exact ?? span,
-				modifier: owed ? ([owed.word.length, owed.word.length] as const) : bounds.modifier
+				modifier: owed
+					? ([owed.word.length, owed.word.length] as const)
+					: poolBounds(modifiersFor(language, described, undefined))
 			};
 		}
 
@@ -1754,11 +2027,19 @@ function compose(
 	const first = parts[0].part;
 	const prefixable = !follow && isNounSlot(first.slot) && !first.head && !data.articles;
 	const space = data.space.length;
-	const opener = draw.opener;
-	const close = data.terminators[draw.mark];
+	const opener = draw.link === 'second' ? '' : draw.opener;
+	// The first clause of a two-clause sentence closes on nothing: the mark, the
+	// tag and the quotation marks all belong to the whole sentence, and the second
+	// clause carries them.
+	const closes = draw.link !== 'first';
+	const close = closes ? data.terminators[draw.mark] : '';
 	const open = data.openers?.[draw.mark] ?? '';
-	const [quoteOpen, quoteClose] = draw.quote ?? ['', ''];
-	const tag = frame.tag ? data.space + frame.tag : '';
+	const [quoteOpen, quoteClose] = closes && draw.quote ? draw.quote : ['', ''];
+	const tag = closes && frame.tag ? data.space + frame.tag : '';
+	const past = draw.tense === 'past';
+	// What the language writes beside a verb that does not change for the past:
+	// Vietnamese `đã` in front of it, Chinese `了` behind it.
+	const mark = past && !(group as VerbGroup).past ? data.pastMark : undefined;
 	const spans = parts.map(({ part }, i) => {
 		const [low, high] = partRange(part, data, partBounds[i]);
 		const gap = i === 0 ? 0 : space;
@@ -1778,9 +2059,8 @@ function compose(
 	let named = false;
 	// A pronoun says nothing about its own gender, and neither does a name carried
 	// over, so what agrees with either agrees with the noun it stands for.
-	let gender: WordGender | undefined = proper.some((word) => word)
-		? follow?.topic.gender
-		: undefined;
+	let gender: WordGender | undefined =
+		pronoun !== null || proper.some((word) => word) ? follow?.topic.gender : undefined;
 	let used =
 		close.length +
 		open.length +
@@ -1788,6 +2068,10 @@ function compose(
 		quoteOpen.length +
 		quoteClose.length +
 		(opener ? opener.length + space : 0);
+	// The phase of the day this sentence named, if it named one.
+	let dayAt = -1;
+	// The field the verb came from, for the story's memory.
+	const field = headed === 'verb' ? (group as VerbGroup).field : null;
 
 	if (opener) {
 		written.push(data.capitalize ? upper(opener) : opener);
@@ -1804,7 +2088,18 @@ function compose(
 		}
 
 		const gap = i === 0 ? 0 : space;
-		const headCost = (part.head ? part.head.length + space : 0) + copulaSpan(part, data)[0];
+		// A state group may bring its own copula, which wins over the shape's; a head
+		// that carries the tense changes for the past, and agrees with the subject
+		// where the language's past does (Russian `был` beside `была`).
+		const own = part.slot === 'state' ? (group as StateGroup) : undefined;
+		const presentHead = own?.head ?? part.head;
+		const pastHead = own?.pastHead ?? part.pastHead;
+		const tensedHead = past && pastHead ? pastHead : presentHead;
+		const partHead =
+			past && pastHead && data.pastAgreement
+				? agreeBy(data.pastAgreement, tensedHead!, gender)
+				: tensedHead;
+		const headCost = (partHead ? partHead.length + space : 0) + copulaSpan(part, data)[0];
 		const tailCost = Math.min(
 			part.tail?.length ?? 0,
 			part.tailAlt?.length ?? part.tail?.length ?? 0
@@ -1867,7 +2162,8 @@ function compose(
 				low,
 				high,
 				[nounLow, nounHigh],
-				part.slot === 'quantity' ? countText(data, theme) : ''
+				part.slot === 'quantity' ? countText(data, theme) : '',
+				required && !required.known ? null : theme
 			);
 
 			phrase = built.text;
@@ -1877,10 +2173,11 @@ function compose(
 				gender = genderOf(wordData, capitalizeAsPool(wordData, built.noun));
 			}
 
-			// A place is where the result is happening and an object is what it is
-			// about, so both are kept for the sentences that follow. A quantity is
-			// not: `사과 12개` is an amount of something rather than a thing.
-			if (part.slot === 'place' || part.slot === 'object') {
+			// A place is where the result is happening, an object is what it is about
+			// and a destination is where it is going, so all three are kept for the
+			// sentences that follow. A quantity is not: `사과 12개` is an amount of
+			// something rather than a thing.
+			if (part.slot === 'place' || part.slot === 'object' || part.slot === 'destination') {
 				drawn.set(part.slot, built);
 			}
 		} else {
@@ -1894,13 +2191,42 @@ function compose(
 				gender,
 				low,
 				high,
-				draw.avoid
+				draw.avoid,
+				draw.tense,
+				draw.dayAt,
+				// The first sentence of a result may set its scene in any time it likes;
+				// the ones after it only move the day forward.
+				follow === null && draw.link !== 'second',
+				THEME_CLASS[subjectTheme]
 			);
 
 			phrase = drawn.text;
 
 			if (drawn.base) {
 				spent.push(drawn.base);
+			}
+
+			if (drawn.dayAt >= 0) {
+				dayAt = drawn.dayAt;
+			}
+
+			// A past-tense verb in a language whose verb does not change is written
+			// with the language's own mark beside it; one whose verb agrees with its
+			// subject in the past is agreed with it.
+			if (part.slot === 'verb' && past) {
+				// A mark in front of the verb is written once per sentence: `đã về nhà
+				// rồi ăn táo`, not `đã về nhà rồi đã ăn táo`.
+				if (mark?.head && draw.link !== 'second') {
+					phrase = mark.head + data.space + phrase;
+				}
+
+				if (mark?.tail) {
+					phrase += mark.tail;
+				}
+
+				if (data.pastAgreement && (group as VerbGroup).past) {
+					phrase = agreeBy(data.pastAgreement, phrase, gender);
+				}
 			}
 		}
 
@@ -1913,10 +2239,12 @@ function compose(
 		// is two. Its form comes from the same chain a verb's does, so a copular
 		// question asks and a polite one is polite.
 		const copula = part.copula ? oneOf(pick(predicates)) : '';
-		const opens = data.capitalize && !written.length;
+		// The second clause of a sentence carries on from the first, so it opens on
+		// nothing: `came home and ate the apple`.
+		const opens = data.capitalize && !written.length && draw.link !== 'second';
 		// A copula in front still lets the phrase keep its own preposition, because
 		// German says `ist am 5. März` and English `is on September 5`.
-		const opener = [part.copula === 'head' ? copula : '', part.head ?? '']
+		const opener = [part.copula === 'head' ? copula : '', partHead ?? '']
 			.filter(Boolean)
 			.join(data.space);
 		const head = opens && opener ? upper(opener) : opener;
@@ -1972,13 +2300,39 @@ function compose(
 		scene,
 		theme: named ? null : (subject?.theme ?? null),
 		subject: carried ?? null,
-		gender: subject || named ? gender : pronoun !== null ? follow!.topic.gender : undefined,
-		named: named || (pronoun !== null && (follow?.topic.named ?? false))
+		gender: subject || named ? gender : pronoun !== null ? follow?.topic.gender : undefined,
+		named: named || (pronoun !== null && (follow?.topic.named ?? false)),
+		field,
+		dayAt
 	};
 }
 
-/** What a phrase that is not a noun phrase writes, and the word it is a form of. */
-type Predicate = { text: string; base: string };
+/**
+ * A word reshaped by ordered `[ending, replacement]` rules for a gender — the
+ * same shape `word/data`'s agreement takes, applied to whatever pool a language
+ * says agrees. Russian's past verbs are the reason it is its own function.
+ */
+function agreeBy(rules: WordAgreement, word: string, gender: WordGender | undefined): string {
+	const chosen = gender ? rules[gender] : undefined;
+
+	if (!chosen) {
+		return word;
+	}
+
+	for (const [ending, replacement] of chosen) {
+		if (word.endsWith(ending)) {
+			return word.slice(0, word.length - ending.length) + replacement;
+		}
+	}
+
+	return word;
+}
+
+/**
+ * What a phrase that is not a noun phrase writes, the word it is a form of, and
+ * — for a time — which phase of the day it named, as an index into `times.day`.
+ */
+type Predicate = { text: string; base: string; dayAt: number };
 
 /**
  * The word a phrase that is not a noun phrase writes: the predicate, or an adverb.
@@ -1999,7 +2353,11 @@ function predicateFor(
 	gender: WordGender | undefined,
 	min: number,
 	max: number,
-	avoid: ReadonlySet<string>
+	avoid: ReadonlySet<string>,
+	tense: SentenceTense,
+	dayAt: number,
+	opens: boolean,
+	subject: NounClass
 ): Predicate {
 	const agreed = (word: string) =>
 		slot === 'state' && data.predicateAgrees ? agree(wordData, word, gender) : word;
@@ -2011,19 +2369,24 @@ function predicateFor(
 
 		return {
 			text: agreed(at >= 0 ? (predicates[at] ?? required.word) : required.word),
-			base: required.word
+			base: required.word,
+			dayAt: -1
 		};
 	}
 
 	if (slot === 'date') {
-		return { text: dateText(data), base: '' };
+		return { text: dateText(data), base: '', dayAt: -1 };
 	}
 
 	if (slot === 'clock') {
-		return { text: clockText(data), base: '' };
+		return { text: clockText(data), base: '', dayAt: -1 };
 	}
 
-	const pool = slot === 'manner' ? data.manners : slot === 'time' ? data.times : predicates;
+	if (slot === 'time') {
+		return timeFor(data, tense, dayAt, opens, avoid, Math.min(min, max), max);
+	}
+
+	const pool = slot === 'manner' ? mannersFor(data, subject) : predicates;
 	// A predicate is a form of the word at the same index of the group; an adverbial
 	// is written whole and is its own plain form.
 	const plainly = (at: number) => (pool === predicates ? (base[at] ?? pool[at]) : pool[at]);
@@ -2033,7 +2396,55 @@ function predicateFor(
 	);
 	const drawn = fresh.length ? pick(fresh) : (pickWord(pool, low, max, '') ?? pick(pool));
 
-	return { text: agreed(drawn), base: plainly(pool.indexOf(drawn)) };
+	return { text: agreed(drawn), base: plainly(pool.indexOf(drawn)), dayAt: -1 };
+}
+
+// How many phases of the day one sentence may move on from the last one named.
+const DAY_STRIDE = 4;
+
+/** The manners something of this class can do a thing in. Any of them, failing that. */
+function mannersFor(data: SentenceLanguageData, subject: NounClass): WordPool {
+	const fitting = data.manners.filter((group) => group.subject.includes(subject));
+	const groups = fitting.length ? fitting : data.manners;
+
+	return [...new Set(groups.flatMap((group) => group.words))];
+}
+
+/**
+ * When something happens, chosen against the tense and against where the result
+ * has got to in its day.
+ *
+ * A sentence that opens a result may set it in any time its tense allows: a
+ * season, a habit, `yesterday` in the past and `these days` in the present. One
+ * that follows another only moves the day forward — a phase of the day later
+ * than the last one named, so that a story which has reached the evening does
+ * not return to the morning.
+ */
+function timeFor(
+	data: SentenceLanguageData,
+	tense: SentenceTense,
+	dayAt: number,
+	opens: boolean,
+	avoid: ReadonlySet<string>,
+	min: number,
+	max: number
+): Predicate {
+	const times = data.times;
+	// The next few phases rather than any later one, so a story that opened at
+	// dawn reaches noon before it reaches midnight.
+	const day = times.day
+		.map((word, at) => ({ word, at }))
+		.filter(({ at }) => at > dayAt && at <= dayAt + DAY_STRIDE);
+	const free = opens ? [...times.any, ...(times[tense] ?? [])] : [];
+	const pool = [...day.map(({ word }) => word), ...free];
+	const usable = pool.length ? pool : [...times.day, ...times.any];
+	const fits = usable.filter(
+		(word) => !avoid.has(word) && word.length >= min && word.length <= max
+	);
+	const drawn = fits.length ? pick(fits) : (pickWord(usable, min, max, '') ?? pick(usable));
+	const at = times.day.indexOf(drawn);
+
+	return { text: drawn, base: drawn, dayAt: at };
 }
 
 /**
@@ -2095,8 +2506,27 @@ function endings(pool: WordPool): WordPool {
 	return pool.flatMap((entry) => (entry.includes('|') ? entry.split('|') : [entry]));
 }
 
-function formOf(group: StateGroup | VerbGroup, mark: SentenceMark, style: SentenceStyle): WordPool {
-	const forms = group.forms;
+function formOf(
+	group: StateGroup | VerbGroup,
+	mark: SentenceMark,
+	style: SentenceStyle,
+	tense: SentenceTense,
+	join?: SentenceJoin
+): WordPool {
+	// The first clause of a two-clause sentence takes the form that links it to
+	// the next, in a language that has one — and that form carries no tense, no
+	// mood and no level of its own: `돌아와서` is what it is whatever comes after.
+	if (join?.form === 'linking' && group.forms?.linking) {
+		return group.forms.linking.map(oneOf);
+	}
+
+	// The past has its own statement and its own forms, and a level the past does
+	// not declare falls back along the same chain to the past statement — never to
+	// the present, which would put one tense in the middle of the other. A group
+	// with no past at all is one whose language marks it beside the verb, and it
+	// writes its present forms.
+	const tensed = tense === 'past' && group.past ? group.past : group;
+	const forms = tensed.forms;
 
 	for (const key of FORM_CHAIN[style][mark]) {
 		const pool = forms?.[key];
@@ -2106,7 +2536,7 @@ function formOf(group: StateGroup | VerbGroup, mark: SentenceMark, style: Senten
 		}
 	}
 
-	return group.words;
+	return tensed.words;
 }
 
 function upper(word: string): string {
@@ -2127,22 +2557,32 @@ function headedFallback(
 		return [...data.states];
 	}
 
-	return data.verbs.filter((group) => Boolean(group.object) === takesObject(frame));
+	const wantsDestination = frame.parts.some((part) => part.slot === 'destination');
+
+	return data.verbs.filter(
+		(group) =>
+			Boolean(group.object) === takesObject(frame) &&
+			(!group.requires || frame.parts.some((part) => part.slot === group.requires)) &&
+			(!wantsDestination || group.requires === 'destination')
+	);
 }
 
 /** The theme a phrase other than the subject draws from. */
 function themeForPart(
 	slot: SentenceSlot,
 	group: VerbGroup | StateGroup,
-	themes: readonly WordTheme[]
+	themes: readonly WordTheme[],
+	beat: BeatDraw | null
 ): WordTheme {
 	if (slot === 'object' || slot === 'quantity') {
-		const usable = themesForClasses(WORD_THEMES, (group as VerbGroup).object ?? []);
+		const usable = objectThemesOf(group as VerbGroup, beat);
 
 		return pick(usable.length ? usable : WORD_THEMES);
 	}
 
-	const places = themesForClasses(WORD_THEMES, ['place']);
+	// A story happens somewhere a story can happen — a market, a park — and not
+	// on Pluto, which is a place too as far as the classes know.
+	const places = beat ? beat.places : themesForClasses(WORD_THEMES, ['place']);
 
 	return pick(places.length ? places : themes);
 }
@@ -2229,13 +2669,16 @@ function followFor(
 	data: SentenceLanguageData,
 	topic: Topic,
 	scene: ReadonlyMap<SentenceSlot, Requirement>,
-	repeated: boolean
+	repeated: boolean,
+	storied = false
 ): Follow {
 	const pronouns = pronounsFor(data, topic);
 	// A person is an individual, not a kind of thing: a paragraph about Emma that
 	// draws a `fresh` subject is a paragraph that quietly becomes about Sophie.
-	// Every other topic can be another one of its own class.
-	const ways: Reference[] = topic.named ? ['repeat', 'pronoun'] : ['repeat', 'pronoun', 'fresh'];
+	// Every other topic can be another one of its own class — except in a story,
+	// whose hero is whoever it opened on.
+	const ways: Reference[] =
+		topic.named || storied ? ['repeat', 'pronoun'] : ['repeat', 'pronoun', 'fresh'];
 	const usable = pronouns.length ? ways : ways.filter((way) => way !== 'pronoun');
 	const weightOf = (way: Reference) => {
 		if (way !== 'repeat') {
@@ -2276,7 +2719,8 @@ function openerFor(
 	follow: Follow | null,
 	room: number,
 	shortest: number,
-	flow: Flow
+	flow: Flow,
+	kinds: readonly ConnectiveKind[] | null = null
 ): string {
 	const spare = room - data.space.length - shortest;
 	const fitting = (pool: WordPool) =>
@@ -2295,7 +2739,7 @@ function openerFor(
 		return '';
 	}
 
-	const usable = fitting(connectivesOf(data, follow, mark));
+	const usable = fitting(connectivesOf(data, follow, mark, kinds));
 
 	return usable.length && chance(CONNECTIVE_CHANCE * damp) ? pick(usable) : '';
 }
@@ -2311,9 +2755,18 @@ function openerFor(
  * asking — `그러므로 금빛 하이볼이 식죠?` after a sentence about a pretzel is a
  * consequence of nothing.
  */
-function connectivesOf(data: SentenceLanguageData, follow: Follow, mark: SentenceMark): WordPool {
+function connectivesOf(
+	data: SentenceLanguageData,
+	follow: Follow,
+	mark: SentenceMark,
+	allowed: readonly ConnectiveKind[] | null
+): WordPool {
 	const follows = follow.reference !== 'fresh' && (mark === 'statement' || mark === 'trailing');
-	const kinds = follows ? CONNECTIVE_KINDS : CONNECTIVE_KINDS.filter((kind) => kind !== 'causal');
+	// A story has already decided what each of its sentences may claim about the
+	// one before it, and hands the kinds in; a paragraph with no story lets every
+	// kind in that the two sentences can carry.
+	const wanted = allowed ?? CONNECTIVE_KINDS;
+	const kinds = follows ? wanted : wanted.filter((kind) => kind !== 'causal');
 
 	return kinds.flatMap((kind) => data.connectives[kind] ?? []);
 }
@@ -2457,7 +2910,20 @@ function nameFits(
 	return settings.minLength <= natural * count + gap;
 }
 
-function generateResult(language: WordLanguage, settings: Settings): Built[] {
+/** Everything one result is made of. */
+type Result = {
+	built: Built[];
+	tense: SentenceTense;
+	story: SentenceStory | null;
+	/**
+	 * What the result is about: its hero's theme in a story, and the first
+	 * sentence's subject otherwise. A story may open on its scene, and the scene is
+	 * not what it is about.
+	 */
+	theme: WordTheme | null;
+};
+
+function generateResult(language: WordLanguage, settings: Settings): Result {
 	const data = SENTENCE_DATA[language];
 	const bounds = slotBounds(language);
 	// Every shape any of the requested types could take, because the budget is
@@ -2486,24 +2952,62 @@ function generateResult(language: WordLanguage, settings: Settings): Built[] {
 	const built: Built[] = [];
 	let topic: Topic | null = null;
 	let scene: ReadonlyMap<SentenceSlot, Requirement> = new Map();
-	// What the result has said so far — the register it opened in, and everything
-	// the next sentence has to avoid saying the same way. The first sentence names
-	// the subject itself, which is why `repeated` starts true.
-	const flow: Flow = {
-		lead: null,
-		last: null,
-		run: 0,
-		mark: null,
-		opened: false,
-		openers: new Set(),
-		repeated: true
-	};
-	// What the result has already said with its predicates and its adverbials.
-	const spent = new Set<string>();
 	// The result's own voice, settled once. A caller who named a level gets that
 	// one throughout; one who did not gets a paragraph that is at least consistent
 	// with itself, rather than a level rerolled every sentence.
 	const voice = settings.style ?? pick(STYLES);
+	// And its tense, likewise: a story is told in one tense from start to end.
+	const tense: SentenceTense = settings.tense ?? (chance(50) ? 'past' : 'present');
+	// What one telling of the result says as it goes — the register it opened in,
+	// and everything the next sentence has to avoid saying the same way. Fresh for
+	// every telling, because a story told again starts over.
+	const telling = (): Telling => ({
+		language,
+		data,
+		settings: settled,
+		budgets,
+		room,
+		shortest,
+		flow: freshFlow(),
+		spent: new Set(),
+		voice,
+		tense
+	});
+
+	// More than one sentence is a story, when the language can tell one about the
+	// subject asked for. It always can — every class has a story — so the paragraph
+	// below is what a result falls back to rather than what it usually is. A story
+	// that landed outside the range is told again, and the closest telling is kept.
+	if (settings.sentences > 1) {
+		let closest: Result | null = null;
+		let missed = Infinity;
+
+		for (let attempt = 0; attempt < STORY_ATTEMPTS; attempt += 1) {
+			const story = tellStory(telling());
+
+			if (!story) {
+				break;
+			}
+
+			const miss = distanceFrom(lengthOf(data, story.built), [min, max]);
+
+			if (miss < missed) {
+				closest = story;
+				missed = miss;
+			}
+
+			if (miss === 0) {
+				break;
+			}
+		}
+
+		if (closest) {
+			return closest;
+		}
+	}
+
+	const paragraph = telling();
+	const { flow, spent } = paragraph;
 
 	for (let i = 0; i < settings.sentences; i += 1) {
 		const budget = budgets[i];
@@ -2517,25 +3021,13 @@ function generateResult(language: WordLanguage, settings: Settings): Built[] {
 			opener: openerFor(data, mark, follow, budget[1], shortest, flow),
 			style: styleFor(type, settings.style, voice),
 			avoid: spent,
-			follow
+			follow,
+			tense,
+			beat: null,
+			link: null,
+			dayAt: built.reduce((latest, one) => Math.max(latest, one.dayAt), -1)
 		};
-		let one = generateOne(language, settled, draw);
-		let opened = draw.opener;
-
-		// `openerFor` reserves room against the shortest sentence the shapes could
-		// spell, which is a floor no draw actually reaches — the shortest word of
-		// every pool at once. When the sentence that came back could not be made
-		// short enough to carry what it opens on after all, that is the part worth
-		// giving up: it stands in front of the whole sentence rather than instead of
-		// any piece of it.
-		if (draw.opener && distanceFrom(one.sentence.length, budget) > 0) {
-			const bare = generateOne(language, settled, { ...draw, opener: '' });
-
-			if (distanceFrom(bare.sentence.length, budget) < distanceFrom(one.sentence.length, budget)) {
-				one = bare;
-				opened = '';
-			}
-		}
+		const [one, opened] = drawOne(paragraph, draw);
 
 		built.push(one);
 		scene = one.scene;
@@ -2560,7 +3052,505 @@ function generateResult(language: WordLanguage, settings: Settings): Built[] {
 		}
 	}
 
-	return built;
+	return { built, tense, story: null, theme: built[0].theme };
+}
+
+/** What every sentence of one result is drawn against, settled before the first. */
+/** The whole of a result as one string, which is what the caller's range describes. */
+function lengthOf(data: SentenceLanguageData, built: readonly Built[]): number {
+	return (
+		built.reduce((sum, one) => sum + one.sentence.length, 0) +
+		data.space.length * (built.length - 1)
+	);
+}
+
+/** What a result has said so far, before it has said anything. The first sentence names the subject itself, which is why `repeated` starts true. */
+function freshFlow(): Flow {
+	return {
+		lead: null,
+		last: null,
+		run: 0,
+		mark: null,
+		opened: false,
+		openers: new Set(),
+		repeated: true
+	};
+}
+
+type Telling = {
+	language: WordLanguage;
+	data: SentenceLanguageData;
+	settings: Settings;
+	budgets: readonly (readonly [number, number])[];
+	room: Record<string, readonly [number, number]>;
+	shortest: number;
+	flow: Flow;
+	spent: Set<string>;
+	voice: SentenceStyle;
+	tense: SentenceTense;
+};
+
+/**
+ * One sentence, drawn and then drawn again without what it opened on when that
+ * was what put it outside its range.
+ *
+ * `openerFor` reserves room against the shortest sentence the shapes could
+ * spell, which is a floor no draw actually reaches — the shortest word of every
+ * pool at once. When the sentence that came back could not be made short enough
+ * to carry what it opens on after all, that is the part worth giving up: it
+ * stands in front of the whole sentence rather than instead of any piece of it.
+ */
+function drawOne(telling: Telling, draw: Draw): [Built, string] {
+	let one = generateOne(telling.language, telling.settings, draw);
+	let opened = draw.opener;
+
+	if (draw.opener && distanceFrom(one.sentence.length, draw.budget) > 0) {
+		const bare = generateOne(telling.language, telling.settings, { ...draw, opener: '' });
+
+		if (
+			distanceFrom(bare.sentence.length, draw.budget) <
+			distanceFrom(one.sentence.length, draw.budget)
+		) {
+			one = bare;
+			opened = '';
+		}
+	}
+
+	return [one, opened];
+}
+
+/* --- Telling a story ------------------------------------------------------- */
+
+// What each kind is worth in a sentence of a story, where the caller left the kind
+// to the story. A story is told in statements; a step that allows an exclamation
+// or a trailing end gets one now and then.
+const STORY_KIND_WEIGHT: Partial<Record<SentenceType, number>> = {
+	statement: 100,
+	exclamation: 35,
+	trailing: 30
+};
+
+// What share of a two-clause sentence's range the first clause takes.
+const FIRST_CLAUSE_SHARE = 0.5;
+
+/** The nouns a story has put on the page, by the role each one plays. */
+type Roles = {
+	item?: Requirement;
+	place?: Requirement;
+	home?: Requirement;
+};
+
+// What share of a language's longest sentence one sentence of a result has to
+// be allowed before two clauses are written into it. A joined sentence is two
+// sentences long, and a range asked to be short is answered with short ones.
+const JOIN_ROOM = 0.6;
+
+/**
+ * The story a result follows, the hero it is about and the thing in the hero's
+ * hands — or null when no story can be told about what was asked for, which
+ * every class of noun has one to answer.
+ */
+function storyFor(telling: Telling): {
+	plan: ReturnType<typeof plan>;
+	hero: NounClass;
+	heroThemes: readonly WordTheme[];
+	item: WordTheme | null;
+} | null {
+	const { data, settings, budgets, room } = telling;
+	const heroThemes = subjectThemesFor(settings, null);
+	const heroClasses = [...new Set(heroThemes.map((theme) => THEME_CLASS[theme]))];
+	const stories = [...storiesFor(data, heroClasses, settings.story)];
+	const [, longest] = naturalSpan(data, data.frames, room);
+	const joinable = budgets[0][1] >= longest * JOIN_ROOM;
+
+	while (stories.length) {
+		const story = pickStory(stories);
+
+		stories.splice(stories.indexOf(story), 1);
+
+		const heroes = heroClassesFor(data, story, heroClasses);
+
+		if (!heroes.length) {
+			continue;
+		}
+
+		const hero = pick(heroes);
+		const items = itemThemesFor(data, story, hero);
+		const item = items.length ? pick(items) : null;
+		const planned = plan(data, story, hero, item, settings.sentences, joinable);
+
+		if (planned) {
+			return { plan: planned, hero, heroThemes: themesForClasses(heroThemes, [hero]), item };
+		}
+	}
+
+	return null;
+}
+
+// Where a story happens. `place` alone, and not the two other themes of its
+// class: a hero can walk to the market and not to Pluto, and a sky is not
+// somewhere a fox goes.
+const STORY_PLACES: readonly WordTheme[] = ['place'];
+
+/**
+ * Every sentence of a result that follows a story.
+ *
+ * The plan says what happens in each sentence; this writes it. The hero is the
+ * topic, named in the first sentence and then referred to the way a paragraph
+ * refers to its subject; the thing, the place and home are drawn the first time a
+ * sentence has room for them and pinned into every sentence after; two beats the
+ * plan joined are written as one sentence, the second clause without its subject.
+ */
+function tellStory(telling: Telling): Result | null {
+	const { language, data, settings, budgets, room, shortest, flow, spent, voice, tense } = telling;
+	const found = storyFor(telling);
+
+	if (!found?.plan) {
+		return null;
+	}
+
+	const { plan: planned, heroThemes, item } = found;
+	const { story, beats } = planned;
+	const placeThemes = STORY_PLACES;
+	const roles: Roles = {};
+	const built: Built[] = [];
+	let topic = null as Topic | null;
+	let dayAt = -1;
+	let at = 0;
+
+	/** The nouns this beat's sentence has to write, in the slots it has for them. */
+	const pinnedFor = (beat: Beat): Map<SentenceSlot, Requirement> => {
+		const pinned = new Map<SentenceSlot, Requirement>();
+		const step = beat.step;
+
+		if (step.object && roles.item) {
+			pinned.set('object', roles.item);
+		}
+
+		if (step.place && roles.place) {
+			pinned.set('place', roles.place);
+		}
+
+		if (step.destination === 'place' && roles.place) {
+			pinned.set('destination', roles.place);
+		}
+
+		if (step.destination === 'home') {
+			roles.home ??= { word: pick(data.homes), slots: ['destination'], known: false, bare: true };
+			pinned.set('destination', roles.home);
+		}
+
+		return pinned;
+	};
+
+	/** The place the story is happening in, drawn now if no sentence has named it. */
+	const placeOf = (): Requirement => {
+		if (!roles.place) {
+			const theme = pick(placeThemes);
+			const wordData = WORD_DATA[language];
+
+			roles.place = {
+				word: plain(wordData, pick(nounsOf(language, theme))),
+				slots: ['place'],
+				theme,
+				known: true
+			};
+		}
+
+		return roles.place;
+	};
+
+	/** What a beat asks of its sentence. */
+	const beatDraw = (beat: Beat): BeatDraw => {
+		const step = beat.step;
+		const wants: SentenceSlot[] = [];
+		const prefers: SentenceSlot[] = [];
+
+		if (step.destination) {
+			wants.push('destination');
+		}
+
+		if (step.object) {
+			wants.push('object');
+		}
+
+		if (step.place) {
+			prefers.push('place');
+		}
+
+		return {
+			headed: step.kind === 'state' ? 'state' : 'verb',
+			fields: beat.field ? [beat.field] : [],
+			condition: step.kind === 'state' ? beat.condition : undefined,
+			wants,
+			prefers,
+			item,
+			places: placeThemes,
+			subject: step.kind === 'scene' ? placeThemes : heroThemes
+		};
+	};
+
+	/**
+	 * The shortest sentence a beat could be written as, for deciding whether two
+	 * of them fit into one sentence's range.
+	 */
+	const shortestFor = (beat: Beat): number => {
+		const frames = framesFor(data, settings, 'statement', beatDraw(beat));
+
+		return Math.min(...frames.map((frame) => frameRange(frame, data, room)[0]));
+	};
+
+	/** One beat as one sentence, or as one clause of one. */
+	const tell = (
+		beat: Beat,
+		budget: readonly [number, number],
+		previous: Built | null
+	): [Built, SentenceType, SentenceMark, string, Follow | null] => {
+		const scene = beat.step.kind === 'scene';
+		// What this sentence is doing. A caller who named the kinds gets them; the
+		// story otherwise tells, and lets a step that allows more do more.
+		const [type, mark] = settings.typed
+			? kindFor(data, settings, room, budget, flow)
+			: (() => {
+					const kinds: SentenceType[] =
+						beat.join === null ? ['statement', ...beat.kinds] : ['statement'];
+					const type = pickWeighted(kinds, (kind) => STORY_KIND_WEIGHT[kind] ?? 1);
+
+					return [type, type as SentenceMark] as const;
+				})();
+		let follow: Follow | null;
+
+		if (beat.join === 'second' && previous) {
+			// The second clause carries on from the first: its subject is the first
+			// clause's, and it writes nothing where the subject would stand.
+			const shared = topicOf(previous) ?? topic;
+
+			follow = shared
+				? { topic: shared, reference: 'pronoun', pronoun: '', scene: pinnedFor(beat) }
+				: null;
+		} else if (scene) {
+			// The scene is the one sentence whose subject is not the hero: the place
+			// the story is happening in, named in full.
+			const place = placeOf();
+
+			follow = {
+				topic: {
+					noun: place.word,
+					theme: place.theme ?? null,
+					class: 'place',
+					gender: genderOf(WORD_DATA[language], capitalizeAsPool(WORD_DATA[language], place.word)),
+					named: false
+				},
+				reference: 'repeat',
+				pronoun: '',
+				scene: pinnedFor(beat)
+			};
+		} else {
+			follow = topic ? followFor(data, topic, pinnedFor(beat), flow.repeated, true) : null;
+		}
+
+		const draw: Draw = {
+			budget,
+			type,
+			mark,
+			quote: quoteFor(data, type, settings.quote),
+			opener:
+				beat.join === 'second'
+					? ''
+					: openerFor(data, mark, follow, budget[1], shortest, flow, beat.links),
+			style: styleFor(type, settings.style, voice),
+			avoid: spent,
+			follow,
+			tense,
+			beat: beatDraw(beat),
+			link: beat.join,
+			dayAt
+		};
+		let [one, opened] = drawOne(telling, draw);
+
+		// A sentence that missed its range by more than the tolerance is drawn once
+		// more the other way round about its subject: named, where it was dropped and
+		// came out short; dropped or stood a pronoun for, where it was named and came
+		// out long. The subject is the one phrase of a story's sentence the story does
+		// not fix, so it is the one that can give.
+		if (follow && !scene && beat.join === null && distanceFrom(one.sentence.length, budget) > 1) {
+			const pronouns = pronounsFor(data, follow.topic);
+			const short = one.sentence.length < budget[0];
+			const other: Reference | null =
+				short && follow.reference === 'pronoun'
+					? 'repeat'
+					: !short && follow.reference === 'repeat' && pronouns.length
+						? 'pronoun'
+						: null;
+
+			if (other) {
+				const again: Follow = {
+					...follow,
+					reference: other,
+					pronoun: other === 'pronoun' ? pick(pronouns) : ''
+				};
+				const [two, openedAgain] = drawOne(telling, { ...draw, follow: again });
+
+				if (distanceFrom(two.sentence.length, budget) < distanceFrom(one.sentence.length, budget)) {
+					one = two;
+					opened = openedAgain;
+					follow = again;
+				}
+			}
+		}
+
+		// What this sentence put on the page, for the rest of the story to keep.
+		for (const slot of ['object', 'place', 'destination'] as const) {
+			const drawn = one.scene.get(slot);
+
+			if (!drawn) {
+				continue;
+			}
+
+			if (slot === 'object') {
+				roles.item ??= drawn;
+			} else if (slot === 'place' || beat.step.destination === 'place') {
+				roles.place ??= { ...drawn, slots: ['place'] };
+			}
+		}
+
+		for (const word of one.used) {
+			spent.add(word);
+		}
+
+		dayAt = Math.max(dayAt, one.dayAt);
+
+		if (!topic && !scene) {
+			topic = topicOf(one);
+		}
+
+		return [one, type, mark, opened, follow];
+	};
+
+	// The range is shared out again after every sentence, over the ones still to
+	// come: a sentence that fell short hands what it did not use to the next one,
+	// so the result lands inside its range even when one of its sentences could
+	// not — a named hero who is hungry is nine characters however it is written.
+	const [totalMin, totalMax] = [budgets[0][0], budgets[0][1]].map(
+		(_, side) =>
+			budgets.reduce((sum, range) => sum + range[side], 0) +
+			data.space.length * (budgets.length - 1)
+	);
+	let written = 0;
+
+	for (let i = 0; i < beats.length; i += 1) {
+		const beat = beats[i];
+		const left = beats.filter((each, j) => j >= i && each.join !== 'second').length;
+		const gaps = data.space.length * (at + left - 1);
+		const budget = shareOut(
+			Math.max(left, totalMin - written - gaps),
+			Math.max(left, totalMax - written - gaps),
+			left,
+			data.space.length
+		)[0];
+		let one: Built;
+		let type: SentenceType;
+		let mark: SentenceMark;
+		let opened: string;
+		let follow: Follow | null;
+
+		// Two beats the plan joined are written as one sentence only where the range
+		// has room for both clauses; where it has not, the first is written on its
+		// own and the second — never a step the story needs — is left out, so that
+		// the count still comes out exact.
+		const glue =
+			(data.join?.word ? data.join.word.length + data.space.length : 0) + data.space.length;
+		const fits =
+			beat.join === 'first' &&
+			i + 1 < beats.length &&
+			shortestFor(beat) + shortestFor(beats[i + 1]) + glue <= budget[1];
+
+		if (beat.join === 'first' && i + 1 < beats.length && !fits && !beats[i + 1].step.required) {
+			[one, type, mark, opened, follow] = tell({ ...beat, join: null }, budget, null);
+			i += 1;
+		} else if (beat.join === 'first' && i + 1 < beats.length) {
+			// Two clauses share one sentence's range: the join between them comes off
+			// the top, and each clause gets its share of what is left.
+			const [min, max] = [Math.max(2, budget[0] - glue), Math.max(2, budget[1] - glue)];
+			const firstRange: readonly [number, number] = [
+				Math.max(1, Math.floor(min * FIRST_CLAUSE_SHARE)),
+				Math.max(1, Math.floor(max * FIRST_CLAUSE_SHARE))
+			];
+			const secondRange: readonly [number, number] = [
+				Math.max(1, min - firstRange[0]),
+				Math.max(1, max - firstRange[1])
+			];
+			const [first, , , firstOpened, firstFollow] = tell(beat, firstRange, null);
+			const [second, secondType, secondMark] = tell(beats[i + 1], secondRange, first);
+
+			one = joinClauses(data, first, second);
+			type = secondType;
+			mark = secondMark;
+			opened = firstOpened;
+			follow = firstFollow;
+			i += 1;
+
+			// The estimate above is the shortest the two shapes could be, and the
+			// clauses are drawn against pinned nouns the estimate did not know. A
+			// two-clause sentence that overshoots after all gives up its second clause
+			// where the story can spare it, and is drawn again as one.
+			if (
+				one.sentence.length > budget[1] + 1 &&
+				!beats[i].step.required &&
+				first.sentence.length <= budget[1]
+			) {
+				[one, type, mark, opened, follow] = tell({ ...beat, join: null }, budget, null);
+			}
+		} else {
+			[one, type, mark, opened, follow] = tell(beat, budget, null);
+		}
+
+		built.push(one);
+		written += one.sentence.length + (at > 0 ? data.space.length : 0);
+		at += 1;
+
+		flow.run = type === flow.last ? flow.run + 1 : 1;
+		flow.last = type;
+		flow.mark = mark;
+		flow.opened = Boolean(opened);
+		flow.lead ??= type;
+
+		if (beat.step.kind !== 'scene') {
+			flow.repeated = follow ? follow.reference === 'repeat' : true;
+		}
+
+		if (opened) {
+			flow.openers.add(opened);
+		}
+	}
+
+	// A named hero has no theme, and the scene's place is not what the story is about.
+	return { built, tense, story: story.name, theme: topic ? topic.theme : built[0].theme };
+}
+
+/**
+ * Two clauses as one sentence: the first, then whatever the language writes
+ * between them, then the second. The first clause closed on nothing and the
+ * second opened on nothing, so the seam is the language's own space.
+ */
+function joinClauses(data: SentenceLanguageData, first: Built, second: Built): Built {
+	const glue = data.join?.word ? data.space + data.join.word : '';
+
+	return {
+		sentence: first.sentence + glue + data.space + second.sentence,
+		phrases: [...first.phrases, ...second.phrases],
+		slots: [...first.slots, ...second.slots],
+		theme: first.theme,
+		subject: first.subject ?? second.subject,
+		gender: first.gender ?? second.gender,
+		named: first.named || second.named,
+		names: [...first.names, ...second.names],
+		used: [...first.used, ...second.used],
+		scene: new Map([...first.scene, ...second.scene]),
+		type: second.type,
+		field: second.field,
+		dayAt: Math.max(first.dayAt, second.dayAt)
+	};
 }
 
 /* --- The public entry point's engine --------------------------------------- */
@@ -2617,6 +3607,9 @@ function resolveInclude(include: RandSentenceOptions['include']): readonly strin
 
 function resolveSettings(options: RandSentenceOptions): Settings {
 	return {
+		tense: options.tense ?? null,
+		story: options.story ?? null,
+		typed: options.type !== undefined,
 		theme: options.theme ?? 'all',
 		shape: options.shape ?? 'all',
 		slots: resolveSlots(options.slots),
@@ -2643,7 +3636,7 @@ export function generateSentenceDetails(options: RandSentenceOptions = {}): Sent
 		() => {
 			const code = drawLanguage(language, languagesFor(settings));
 			const data = SENTENCE_DATA[code];
-			const built = generateResult(code, settings);
+			const { built, tense, story, theme } = generateResult(code, settings);
 
 			return {
 				sentence: built.map((one) => one.sentence).join(data.space),
@@ -2652,10 +3645,12 @@ export function generateSentenceDetails(options: RandSentenceOptions = {}): Sent
 				slots: built.flatMap((one) => one.slots),
 				names: built.flatMap((one) => one.names),
 				types: built.map((one) => one.type),
+				tense,
+				story,
 				language: code,
-				// What the result is about is what its first sentence was about; the
-				// ones after it stay inside that noun's class.
-				theme: built[0].theme
+				// What the result is about: its hero in a story, and otherwise what its
+				// first sentence was about, which the ones after it stay inside.
+				theme
 			};
 		},
 		(detail) => detail.sentence

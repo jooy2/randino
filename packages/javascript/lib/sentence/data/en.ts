@@ -1,5 +1,23 @@
 import { words } from '../../_internal/parse.js';
-import type { SentenceLanguageData } from './types.js';
+import type { WordPool } from '../../word/data/types.js';
+import type { PredicateTense, SentenceLanguageData } from './types.js';
+
+// The three forms an English verb group is written in: the third person singular
+// a statement takes, the base form a question falls back to after `does` — and
+// after `did`, which is why the past question is the same pool — and the past.
+function tensed(
+	present: string,
+	base: string,
+	past: string
+): { words: WordPool; forms: { question: WordPool }; past: PredicateTense } {
+	const question = words(base);
+
+	return {
+		words: words(present),
+		forms: { question },
+		past: { words: words(past), forms: { question } }
+	};
+}
 
 export const EN: SentenceLanguageData = {
 	space: ' ',
@@ -12,89 +30,351 @@ export const EN: SentenceLanguageData = {
 	// count one, so choosing between them would need a tag on every noun that
 	// nothing else in the library asks for.
 	articles: { n: [['', 'the']] },
-	// Third person singular, which is the form every subject here takes.
+	// Third person singular, which is the form every subject here takes, and the
+	// past beside it. The verbs are grouped by what they do, which is what a story
+	// asks for: a step that has the hero eat draws from `eat` and nowhere else.
 	verbs: [
 		{
+			field: 'rise',
 			subject: ['creature', 'person'],
-			words: words(`
-				runs walks leaps swims flies crawls returns leaves stops rests sleeps laughs
-				cries sings dances yawns hides waits stands sits tumbles wanders passes
-				approaches dozes stretches listens
-			`),
-			forms: {
-				question: words(`
-					run walk leap swim fly crawl return leave stop rest sleep laugh cry sing dance yawn
-					hide wait stand sit tumble wander pass approach doze stretch listen
-				`)
-			}
+			...tensed(`wakes gets_up rises stirs`, `wake get_up rise stir`, `woke got_up rose stirred`)
 		},
+		// Setting off: the verbs that need somewhere to go, and the ones that stand
+		// on their own. `heads` wants a `to the market` after it; `leaves` does not.
 		{
+			field: 'go',
 			subject: ['creature', 'person'],
-			object: ['edible'],
-			words: words(`eats drinks chews swallows tastes bakes warms shares`),
-			forms: { question: words(`eat drink chew swallow taste bake warm share`) }
+			requires: 'destination',
+			...tensed(
+				`goes heads runs hurries walks wanders climbs`,
+				`go head run hurry walk wander climb`,
+				`went headed ran hurried walked wandered climbed`
+			)
 		},
 		{
+			field: 'go',
 			subject: ['creature', 'person'],
-			object: ['thing', 'plant', 'edible'],
-			words: words(`watches finds carries touches guards chooses moves lifts gathers`),
-			forms: { question: words(`watch find carry touch guard choose move lift gather`) }
+			...tensed(`leaves sets_off departs`, `leave set_off depart`, `left set_off departed`)
 		},
 		{
-			subject: ['person'],
-			object: ['thing', 'vehicle'],
-			words: words(`makes mends cleans sells buys builds paints`),
-			forms: { question: words(`make mend clean sell buy build paint`) }
+			field: 'arrive',
+			subject: ['creature', 'person'],
+			requires: 'destination',
+			...tensed(
+				`returns comes_back gets_back heads_back`,
+				`return come_back get_back head_back`,
+				`returned came_back got_back headed_back`
+			)
 		},
 		{
+			field: 'arrive',
+			subject: ['creature', 'person'],
+			...tensed(
+				`arrives comes_home returns`,
+				`arrive come_home return`,
+				`arrived came_home returned`
+			)
+		},
+		{
+			field: 'move',
+			subject: ['creature', 'person'],
+			...tensed(
+				`runs walks leaps swims flies crawls wanders passes strolls roams paces`,
+				`run walk leap swim fly crawl wander pass stroll roam pace`,
+				`ran walked leapt swam flew crawled wandered passed strolled roamed paced`
+			)
+		},
+		{
+			field: 'wait',
+			subject: ['creature', 'person'],
+			...tensed(
+				`waits hides lingers looks_around hesitates pauses stops`,
+				`wait hide linger look_around hesitate pause stop`,
+				`waited hid lingered looked_around hesitated paused stopped`
+			)
+		},
+		{
+			field: 'rest',
+			subject: ['creature', 'person'],
+			...tensed(
+				`rests sits lies_down leans curls_up stretches_out`,
+				`rest sit lie_down lean curl_up stretch_out`,
+				`rested sat lay_down leaned curled_up stretched_out`
+			)
+		},
+		{
+			field: 'sleep',
+			subject: ['creature', 'person'],
+			...tensed(
+				`sleeps dozes falls_asleep nods_off`,
+				`sleep doze fall_asleep nod_off`,
+				`slept dozed fell_asleep nodded_off`
+			)
+		},
+		{
+			field: 'express',
+			subject: ['creature', 'person'],
+			...tensed(
+				`laughs cries yawns sighs smiles hums mutters shouts`,
+				`laugh cry yawn sigh smile hum mutter shout`,
+				`laughed cried yawned sighed smiled hummed muttered shouted`
+			)
+		},
+		{
+			field: 'play',
+			subject: ['creature', 'person'],
+			...tensed(
+				`dances sings tumbles frolics plays bounces skips`,
+				`dance sing tumble frolic play bounce skip`,
+				`danced sang tumbled frolicked played bounced skipped`
+			)
+		},
+		{
+			field: 'think',
 			subject: ['person', 'creature'],
 			object: ['idea', 'event', 'place'],
-			words: words(`remembers forgets imagines counts describes`),
-			forms: { question: words(`remember forget imagine count describe`) }
+			...tensed(
+				`remembers forgets imagines counts recalls misses wonders_about`,
+				`remember forget imagine count recall miss wonder_about`,
+				`remembered forgot imagined counted recalled missed wondered_about`
+			)
 		},
 		{
-			subject: ['place', 'event'],
-			words: words(`glows flows darkens brightens deepens quiets fades widens`),
-			forms: { question: words(`glow flow darken brighten deepen quiet fade widen`) }
+			field: 'look',
+			subject: ['creature', 'person'],
+			object: ['thing', 'plant', 'edible'],
+			...tensed(
+				`watches looks_at studies examines admires touches strokes`,
+				`watch look_at study examine admire touch stroke`,
+				`watched looked_at studied examined admired touched stroked`
+			)
 		},
 		{
+			field: 'search',
+			subject: ['creature', 'person'],
+			...tensed(
+				`searches looks_around rummages hunts_around`,
+				`search look_around rummage hunt_around`,
+				`searched looked_around rummaged hunted_around`
+			)
+		},
+		{
+			field: 'find',
+			subject: ['creature', 'person'],
+			object: ['thing', 'plant', 'edible'],
+			...tensed(
+				`finds discovers spots picks_up comes_across`,
+				`find discover spot pick_up come_across`,
+				`found discovered spotted picked_up came_across`
+			)
+		},
+		{
+			field: 'take',
+			subject: ['creature', 'person'],
+			object: ['thing', 'plant', 'edible'],
+			...tensed(
+				`takes picks grabs gathers chooses gets`,
+				`take pick grab gather choose get`,
+				`took picked grabbed gathered chose got`
+			)
+		},
+		{
+			field: 'carry',
+			subject: ['creature', 'person'],
+			object: ['thing', 'plant', 'edible'],
+			...tensed(
+				`carries brings hauls lugs`,
+				`carry bring haul lug`,
+				`carried brought hauled lugged`
+			)
+		},
+		{
+			field: 'hide',
+			subject: ['creature', 'person'],
+			object: ['thing', 'plant', 'edible'],
+			...tensed(
+				`hides tucks_away stores puts_away keeps buries`,
+				`hide tuck_away store put_away keep bury`,
+				`hid tucked_away stored put_away kept buried`
+			)
+		},
+		{
+			field: 'make',
+			subject: ['person'],
+			object: ['thing', 'vehicle'],
+			...tensed(
+				`makes builds crafts carves paints weaves shapes`,
+				`make build craft carve paint weave shape`,
+				`made built crafted carved painted wove shaped`
+			)
+		},
+		{
+			field: 'tend',
+			subject: ['person'],
+			object: ['thing', 'vehicle'],
+			...tensed(
+				`mends cleans polishes fixes tidies oils`,
+				`mend clean polish fix tidy oil`,
+				`mended cleaned polished fixed tidied oiled`
+			)
+		},
+		{
+			field: 'sell',
+			subject: ['person'],
+			object: ['thing', 'vehicle'],
+			...tensed(
+				`sells hands_over trades_away offers`,
+				`sell hand_over trade_away offer`,
+				`sold handed_over traded_away offered`
+			)
+		},
+		{
+			field: 'buy',
+			subject: ['person'],
+			object: ['thing', 'vehicle', 'edible'],
+			...tensed(
+				`buys purchases picks_up orders`,
+				`buy purchase pick_up order`,
+				`bought purchased picked_up ordered`
+			)
+		},
+		{
+			field: 'cook',
+			subject: ['creature', 'person'],
+			object: ['edible'],
+			objectThemes: ['food'],
+			...tensed(
+				`bakes warms cooks slices roasts serves`,
+				`bake warm cook slice roast serve`,
+				`baked warmed cooked sliced roasted served`
+			)
+		},
+		{
+			field: 'eat',
+			subject: ['creature', 'person'],
+			object: ['edible'],
+			objectThemes: ['food'],
+			...tensed(
+				`eats chews swallows tastes nibbles devours`,
+				`eat chew swallow taste nibble devour`,
+				`ate chewed swallowed tasted nibbled devoured`
+			)
+		},
+		{
+			field: 'drink',
+			subject: ['creature', 'person'],
+			object: ['edible'],
+			objectThemes: ['drink'],
+			...tensed(`drinks sips gulps savors`, `drink sip gulp savor`, `drank sipped gulped savored`)
+		},
+		// What a place does on its own is what a story's scene is made of, and what
+		// an event does is another list.
+		{
+			field: 'change',
+			subject: ['place'],
+			...tensed(
+				`quiets darkens brightens empties fills_up glows`,
+				`quiet darken brighten empty fill_up glow`,
+				`quieted darkened brightened emptied filled_up glowed`
+			)
+		},
+		{
+			field: 'change',
+			subject: ['event'],
+			...tensed(
+				`glows flows fades deepens begins ends passes`,
+				`glow flow fade deepen begin end pass`,
+				`glowed flowed faded deepened began ended passed`
+			)
+		},
+		{
+			field: 'change',
 			subject: ['thing', 'vehicle'],
-			words: words(`sways glitters falls rolls tilts ages creaks`),
-			forms: { question: words(`sway glitter fall roll tilt age creak`) }
+			...tensed(
+				`sways glitters falls rolls tilts ages creaks`,
+				`sway glitter fall roll tilt age creak`,
+				`swayed glittered fell rolled tilted aged creaked`
+			)
 		},
 		{
+			field: 'move',
 			subject: ['vehicle'],
-			words: words(`runs stops passes returns departs slides`),
-			forms: { question: words(`run stop pass return depart slide`) }
+			...tensed(
+				`runs stops passes returns departs slides`,
+				`run stop pass return depart slide`,
+				`ran stopped passed returned departed slid`
+			)
 		},
 		{
+			field: 'change',
 			subject: ['idea', 'event'],
-			words: words(`spreads vanishes remains lingers returns gathers`),
-			forms: { question: words(`spread vanish remain linger return gather`) }
+			...tensed(
+				`spreads vanishes remains lingers returns gathers`,
+				`spread vanish remain linger return gather`,
+				`spread vanished remained lingered returned gathered`
+			)
 		},
 		{
+			field: 'change',
 			subject: ['plant'],
-			words: words(`grows wilts blooms sways spreads`),
-			forms: { question: words(`grow wilt bloom sway spread`) }
+			...tensed(
+				`grows wilts blooms sways spreads`,
+				`grow wilt bloom sway spread`,
+				`grew wilted bloomed swayed spread`
+			)
 		},
 		{
+			field: 'change',
 			subject: ['body'],
-			words: words(`trembles moves stiffens aches heals`),
-			forms: { question: words(`tremble move stiffen ache heal`) }
+			...tensed(
+				`trembles moves stiffens aches heals`,
+				`tremble move stiffen ache heal`,
+				`trembled moved stiffened ached healed`
+			)
 		},
 		{
+			field: 'change',
 			subject: ['edible'],
-			words: words(`ripens cools boils melts spoils remains`),
-			forms: { question: words(`ripen cool boil melt spoil remain`) }
+			...tensed(
+				`ripens cools boils melts spoils remains`,
+				`ripen cool boil melt spoil remain`,
+				`ripened cooled boiled melted spoiled remained`
+			)
 		}
 	],
+	// The adjective alone: the copula is the frame's `is`, and its past is the
+	// frame's `was`. The groups that carry a `condition` are the ones a story reads
+	// and writes.
 	states: [
 		{
 			subject: ['creature', 'person'],
-			words: words(`
-				big small quick slow quiet loud brave lazy busy hungry sleepy fierce gentle
-				clever restless
-			`)
+			words: words(`big small quick slow quiet loud brave lazy busy fierce gentle clever restless`)
+		},
+		{
+			subject: ['creature', 'person'],
+			condition: 'hungry',
+			words: words(`hungry starving peckish`)
+		},
+		{ subject: ['creature', 'person'], condition: 'full', words: words(`full satisfied`) },
+		{
+			subject: ['creature', 'person'],
+			condition: 'tired',
+			words: words(`tired sleepy weary drowsy`)
+		},
+		{
+			subject: ['creature', 'person'],
+			condition: 'rested',
+			words: words(`refreshed rested lively`)
+		},
+		{
+			subject: ['creature', 'person'],
+			condition: 'content',
+			words: words(`happy glad content pleased cheerful`)
+		},
+		{
+			subject: ['creature', 'person'],
+			condition: 'restless',
+			words: words(`bored curious uneasy`)
 		},
 		{
 			subject: [
@@ -136,17 +416,91 @@ export const EN: SentenceLanguageData = {
 			words: words(`warm cold sore stiff steady`)
 		}
 	],
-	manners: words(`
-		quietly slowly quickly gently suddenly softly again together alone briefly steadily boldly
-		carefully eagerly warily calmly neatly side_by_side once_more warmly roughly firmly patiently
-		lightly sharply wearily cheerfully idly restlessly faintly brightly evenly plainly gladly keenly
-	`),
-	times: words(`
-		at_dawn in_the_morning at_noon in_the_evening at_night today yesterday tomorrow in_spring
-		in_summer in_autumn in_winter on_weekends just_now sometimes every_day at_dusk before_long
-		at_midnight at_midday last_week next_week these_days long_ago in_the_small_hours on_holidays
-		all_day every_night
-	`),
+	// Attributive, grouped by what they can sit in front of. Lowercase, because
+	// a sentence writes them that way; the nickname pools are capitalized.
+	modifiers: [
+		{
+			subject: ['creature', 'person'],
+			words: words(`
+				brave lively gentle busy lazy shy clever young old small big quiet cheerful patient nimble curious
+			`)
+		},
+		{ subject: ['person'], words: words(`young kind strict earnest weary friendly`) },
+		{ subject: ['creature'], words: words(`swift fierce tame plump little`) },
+		{
+			subject: ['edible'],
+			themes: ['food'],
+			words: words(`sweet spicy warm fresh crisp savory fragrant hot salty soft ripe tasty`)
+		},
+		{
+			subject: ['edible'],
+			themes: ['drink'],
+			words: words(`sweet warm cold cool hot fragrant fresh strong`)
+		},
+		{
+			subject: ['thing', 'vehicle'],
+			words: words(
+				`old new small big light heavy shiny smooth clear sturdy pretty precious ancient`
+			)
+		},
+		{ subject: ['vehicle'], words: words(`fast slow rattling`) },
+		{
+			subject: ['place'],
+			words: words(`
+				quiet wide dark bright strange old cozy secluded busy silent remote distant nearby empty lonely sunny
+			`)
+		},
+		{
+			subject: ['plant'],
+			words: words(`green lush fragrant young withered tall small tender fresh`)
+		},
+		{ subject: ['idea'], words: words(`faint old new strange clear precious small odd vague`) },
+		{ subject: ['event'], words: words(`long short quiet sunny cloudy noisy sudden lazy`) },
+		{ subject: ['body'], words: words(`small cold warm slender sturdy tender`) },
+		{
+			subject: [
+				'creature',
+				'person',
+				'plant',
+				'thing',
+				'vehicle',
+				'place',
+				'event',
+				'idea',
+				'body'
+			],
+			words: words(`beautiful mysterious strange new`)
+		}
+	],
+	manners: [
+		{
+			subject: ['creature', 'person'],
+			words: words(`
+				quietly slowly quickly gently suddenly softly alone briefly boldly carefully eagerly
+				warily calmly neatly warmly firmly patiently lightly wearily cheerfully idly restlessly gladly
+				keenly briskly happily
+			`)
+		},
+		{
+			subject: ['plant', 'edible', 'thing', 'vehicle', 'place', 'event', 'idea', 'body'],
+			words: words(`
+				quietly slowly gently suddenly softly again steadily still slightly faintly evenly gradually
+				little_by_little
+			`)
+		}
+	],
+	times: {
+		day: words(`
+			at_dawn in_the_early_morning in_the_morning at_midday at_noon in_the_afternoon at_dusk
+			in_the_evening at_night late_at_night at_midnight
+		`),
+		any: words(`in_spring in_summer in_autumn in_winter on_weekends on_holidays all_day`),
+		past: words(`yesterday last_week long_ago once that_day the_night_before`),
+		present: words(`today these_days just_now tomorrow next_week sometimes every_day every_night`)
+	},
+	// `to the house` rather than `home`, which would want its preposition dropped.
+	homes: words(`house cottage`),
+	join: { word: 'and' },
 	connectives: {
 		additive: words(`and_then besides`),
 		temporal: words(`meanwhile afterwards later soon at_last before_long`),
@@ -174,7 +528,6 @@ export const EN: SentenceLanguageData = {
 		group: ',',
 		gap: ' '
 	},
-	// English puts its verb second, and the sentence grows to the right of it.
 	// English names its months and writes the copula as a word of its own.
 	calendar: {
 		date: 'MMMM D, Y',
@@ -186,9 +539,13 @@ export const EN: SentenceLanguageData = {
 		copula: {
 			// An event is a thing that happens on a day, and a lion is not.
 			subject: ['event'],
-			words: words(`is`)
+			words: words(`is`),
+			past: { words: words(`was`) }
 		}
 	},
+	// English puts its verb second, and the sentence grows to the right of it.
+	// Every `is` and `does` in a head has its past beside it, because those are the
+	// words that carry the tense once the verb has fallen back to its base form.
 	frames: [
 		// A date and a clock, standing where an adverbial stands.
 		{
@@ -242,10 +599,40 @@ export const EN: SentenceLanguageData = {
 			],
 			weight: 14
 		},
+		// Where the subject is going: `goes to the market`, `returns to the house`.
 		{
 			parts: [
 				{ slot: 'subject', modifiable: true },
-				{ slot: 'state', head: 'is' }
+				{ slot: 'verb' },
+				{ slot: 'destination', head: 'to', modifiable: true }
+			],
+			weight: 10,
+			fields: ['go', 'arrive']
+		},
+		{
+			parts: [
+				{ slot: 'time', tail: ',' },
+				{ slot: 'subject', modifiable: true },
+				{ slot: 'verb' },
+				{ slot: 'destination', head: 'to', modifiable: true }
+			],
+			weight: 5,
+			fields: ['go', 'arrive']
+		},
+		{
+			parts: [
+				{ slot: 'subject', modifiable: true },
+				{ slot: 'verb' },
+				{ slot: 'destination', head: 'to', modifiable: true },
+				{ slot: 'manner' }
+			],
+			weight: 4,
+			fields: ['go', 'arrive']
+		},
+		{
+			parts: [
+				{ slot: 'subject', modifiable: true },
+				{ slot: 'state', head: 'is', pastHead: 'was' }
 			],
 			weight: 12
 		},
@@ -284,17 +671,40 @@ export const EN: SentenceLanguageData = {
 			],
 			weight: 5
 		},
+		{
+			parts: [
+				{ slot: 'time', tail: ',' },
+				{ slot: 'subject', modifiable: true },
+				{ slot: 'verb' },
+				{ slot: 'object', modifiable: true }
+			],
+			weight: 4
+		},
+		{
+			parts: [
+				{ slot: 'subject', modifiable: true },
+				{ slot: 'manner' },
+				{ slot: 'verb' },
+				{ slot: 'object', modifiable: true },
+				{ slot: 'place', head: 'in', modifiable: true }
+			],
+			weight: 3
+		},
 		// English asks with do-support, so the auxiliary stands in front of the
 		// subject and the verb falls back to its base form — `Does the lion run?`
-		// rather than `Runs the lion?`. `is` moves the same way.
+		// rather than `Runs the lion?`. `is` moves the same way, and in the past
+		// both auxiliaries carry the tense: `Did the lion run?`, `Was the lion big?`
 		{
-			parts: [{ slot: 'subject', head: 'does', modifiable: true }, { slot: 'verb' }],
+			parts: [
+				{ slot: 'subject', head: 'does', pastHead: 'did', modifiable: true },
+				{ slot: 'verb' }
+			],
 			weight: 20,
 			mood: 'question'
 		},
 		{
 			parts: [
-				{ slot: 'subject', head: 'does', modifiable: true },
+				{ slot: 'subject', head: 'does', pastHead: 'did', modifiable: true },
 				{ slot: 'verb' },
 				{ slot: 'object', modifiable: true }
 			],
@@ -302,13 +712,16 @@ export const EN: SentenceLanguageData = {
 			mood: 'question'
 		},
 		{
-			parts: [{ slot: 'subject', head: 'is', modifiable: true }, { slot: 'state' }],
+			parts: [
+				{ slot: 'subject', head: 'is', pastHead: 'was', modifiable: true },
+				{ slot: 'state' }
+			],
 			weight: 14,
 			mood: 'question'
 		},
 		{
 			parts: [
-				{ slot: 'subject', head: 'does', modifiable: true },
+				{ slot: 'subject', head: 'does', pastHead: 'did', modifiable: true },
 				{ slot: 'verb' },
 				{ slot: 'place', head: 'in', modifiable: true }
 			],
@@ -317,12 +730,22 @@ export const EN: SentenceLanguageData = {
 		},
 		{
 			parts: [
-				{ slot: 'subject', head: 'does', modifiable: true },
+				{ slot: 'subject', head: 'does', pastHead: 'did', modifiable: true },
 				{ slot: 'verb' },
 				{ slot: 'manner' }
 			],
 			weight: 10,
 			mood: 'question'
+		},
+		{
+			parts: [
+				{ slot: 'subject', head: 'does', pastHead: 'did', modifiable: true },
+				{ slot: 'verb' },
+				{ slot: 'destination', head: 'to', modifiable: true }
+			],
+			weight: 6,
+			mood: 'question',
+			fields: ['go', 'arrive']
 		},
 		// Money and nothing else: a counted phrase would need a plural noun, and
 		// most of these pools are not countable at all.

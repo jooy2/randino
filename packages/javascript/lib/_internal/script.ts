@@ -61,3 +61,24 @@ export function endsWithConsonant(text: string): boolean {
 
 	return /\p{Letter}/u.test(last) && !VOWELS.test(last.toLowerCase());
 }
+
+// The final consonant `ㄹ` is the eighth of the twenty-seven a syllable can close
+// on, and the one Korean treats as a vowel for one particle: `마을로`, never
+// `마을으로`.
+const HANGUL_LIQUID = 8;
+
+/**
+ * Whether `text` ends on the Korean liquid `ㄹ`, which is the one coda the
+ * particle `로` does not alternate for: `시장으로` and `마을로`, both from one
+ * particle. Anything that is not a Hangul syllable reports `false`.
+ */
+export function endsWithLiquid(text: string): boolean {
+	const last = text.trim().slice(-1);
+	const code = last ? last.codePointAt(0)! : 0;
+
+	return (
+		code >= HANGUL_BASE &&
+		code <= HANGUL_LAST &&
+		(code - HANGUL_BASE) % HANGUL_FINALS === HANGUL_LIQUID
+	);
+}

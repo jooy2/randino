@@ -292,6 +292,8 @@ export interface NicknameDetail {
  * - `object`: what it does it to (`사과를`).
  * - `state`: what it is like, where the sentence has no verb at all (`파랗다`).
  * - `place`: where it happens (`숲에서`).
+ * - `destination`: where it is going (`시장으로`, `to the market`), which only a
+ *   verb that goes somewhere or arrives can stand beside.
  * - `time`: when (`새벽에`).
  * - `manner`: how (`조용히`).
  * - `quantity`: how many of something (`사과 12개`), which is a noun phrase with a
@@ -309,6 +311,7 @@ export type SentenceSlot =
 	| 'object'
 	| 'state'
 	| 'place'
+	| 'destination'
 	| 'time'
 	| 'manner'
 	| 'quantity'
@@ -390,6 +393,37 @@ export type SentenceQuote = 'double' | 'single';
 export type SentenceStyle = 'plain' | 'casual' | 'polite' | 'formal';
 
 /**
+ * When a sentence happened. `present` is the form the pools are written in
+ * (`달린다`, `runs`); `past` is the tense a story is told in (`달렸다`, `ran`).
+ *
+ * Every language writes it its own way: Korean, Japanese, English, Spanish,
+ * Italian and German change the verb, Russian changes it and makes it agree with
+ * the subject, and Chinese and Vietnamese write a word beside it (`了`, `đã`) and
+ * leave the verb alone. A result keeps one tense throughout.
+ */
+export type SentenceTense = 'present' | 'past';
+
+/**
+ * The story a result of several sentences follows. Each is a short sequence of
+ * things that happen, in an order that makes sense, told with whatever words the
+ * language has for each of them:
+ * - `errand`: the hero goes somewhere, gets something to eat, comes home and eats it.
+ * - `meal`: the hero is hungry, prepares something and eats it.
+ * - `search`: the hero looks for something, finds it and brings it back.
+ * - `outing`: the hero gets up, goes out, plays and comes home tired.
+ * - `craft`: the hero makes something and sells it. People only.
+ * - `stroll`: the hero goes out and wanders, with nothing to carry.
+ * - `evening`: the day ends, the hero comes home and sleeps.
+ * - `passage`: something that is not a person or an animal changes over time —
+ *   an apple ripens and cools, a sky darkens and deepens.
+ *
+ * Which stories a language can tell depends on the shapes it declares: German and
+ * Russian carry no object, so they tell the ones with nothing in the hero's hands.
+ */
+export type SentenceStory =
+	'errand' | 'meal' | 'search' | 'outing' | 'craft' | 'stroll' | 'evening' | 'passage';
+
+/**
  * Which of them a result may be. An array is a set to draw from, decided per
  * sentence, and `'all'` is every one of them.
  */
@@ -462,6 +496,28 @@ export interface RandSentenceOptions extends RandCommonOptions {
 	 */
 	style?: SentenceStyle;
 	/**
+	 * When it happened. Drawn per result when left out, so that a paragraph is told
+	 * in one tense throughout and two calls are not always the same one.
+	 *
+	 * `'past'` is how a story is told: `여우가 시장으로 갔다`, `The fox went to the
+	 * market`. Every language writes it the way its own grammar does — a changed
+	 * verb, a verb that agrees with its subject, or a word beside a verb that does
+	 * not change — and a required predicate is translated into the tense the
+	 * sentence is in, the same way it is translated into its mood and level.
+	 */
+	tense?: SentenceTense;
+	/**
+	 * Which story a result of several sentences tells. Drawn per result when left
+	 * out, from the stories the language can tell about the subject asked for.
+	 *
+	 * With `sentences` above 1 the sentences are not several draws about one
+	 * subject but one sequence of things that happen: the hero goes somewhere,
+	 * finds something there, brings it back, and what each sentence says follows
+	 * from what the ones before it said. Ignored by a result of one sentence,
+	 * which has no story to follow.
+	 */
+	story?: SentenceStory;
+	/**
 	 * Whether a sentence about a person writes a generated name where that person
 	 * would go — `Emma runs quietly.`, `민준이 조용히 달린다.` Default `false`.
 	 *
@@ -487,11 +543,17 @@ export interface RandSentenceOptions extends RandCommonOptions {
 	 * pronoun, or draws a fresh subject of the same kind, and may open on a
 	 * connective.
 	 *
-	 * A result reads as one paragraph rather than as several draws that landed
-	 * together. It keeps the register it opened in, so a scene of speech is lines
-	 * with prose between them and never a quoted line answering a quoted question;
-	 * it spends its verbs before it repeats one; it names a person and then leaves
-	 * them alone; and it never opens two of its sentences on the same word.
+	 * A result reads as one short story rather than as several draws that landed
+	 * together. The sentences follow a `story`: the hero goes somewhere, does
+	 * something there, comes back, and what one sentence leaves true is what the
+	 * next one builds on — a hero eats what an earlier sentence had them buy, and
+	 * rests once a sentence has said they are tired. The place and the thing stay
+	 * the same throughout, the time of day only moves forward, a connective claims
+	 * only what the sentences around it can carry, and two things that happen one
+	 * after the other are sometimes written as one sentence (`집으로 돌아와서 사과를
+	 * 먹었다`). It keeps the tense, the level and the register it opened in, spends
+	 * its verbs before it repeats one, names a person and then leaves them alone,
+	 * and never opens two of its sentences on the same word.
 	 *
 	 * `minLength` and `maxLength` describe the whole string whatever this is, so
 	 * the range is shared out across the sentences before any of them is drawn.
@@ -526,6 +588,13 @@ export interface SentenceDetail {
 	names: string[];
 	/** What each sentence is doing, at the same index as `sentences`. */
 	types: SentenceType[];
+	/** The tense every sentence of the result is in. */
+	tense: SentenceTense;
+	/**
+	 * The story a result of several sentences followed, or `null` for a result of
+	 * one sentence, which follows none.
+	 */
+	story: SentenceStory | null;
 	language: WordLanguage;
 	/**
 	 * Theme the result's subject belongs to — the first sentence's, which is what

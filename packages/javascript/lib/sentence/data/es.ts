@@ -1,5 +1,14 @@
 import { words } from '../../_internal/parse.js';
-import type { SentenceLanguageData } from './types.js';
+import type { WordPool } from '../../word/data/types.js';
+import type { PredicateTense, SentenceLanguageData } from './types.js';
+
+// The two forms a Spanish verb group is written in: the third person singular of
+// the present, and the same person of the pretérito, which is the tense a story
+// is told in. A question is the statement with the marks around it, so there is
+// no third.
+function tensed(present: string, past: string): { words: WordPool; past: PredicateTense } {
+	return { words: words(present), past: { words: words(past) } };
+}
 
 export const ES: SentenceLanguageData = {
 	space: ' ',
@@ -29,73 +38,292 @@ export const ES: SentenceLanguageData = {
 	},
 	predicateAgrees: true,
 	// Third person singular of the present, which is the form every subject here
-	// takes.
+	// takes, and the pretérito beside it.
 	verbs: [
 		{
+			field: 'rise',
 			subject: ['creature', 'person'],
-			words: words(`
-				corre camina salta nada vuela repta regresa parte se_detiene descansa duerme ríe
-				llora canta baila se_esconde espera se_levanta se_sienta rueda vaga pasa
-				se_acerca escucha
-			`)
+			...tensed(`se_despierta se_levanta se_incorpora`, `se_despertó se_levantó se_incorporó`)
 		},
+		// Setting off: the verbs that need somewhere to go, and the ones that stand
+		// on their own. `hacia` rather than `a`, because `a` merges with `el` into
+		// `al` and a preposition here is written in front of whatever article the
+		// noun takes.
 		{
+			field: 'go',
 			subject: ['creature', 'person'],
-			object: ['edible'],
-			words: words(`come bebe mastica prueba hornea calienta`)
+			requires: 'destination',
+			...tensed(`va corre camina se_dirige sube baja`, `fue corrió caminó se_dirigió subió bajó`)
 		},
 		{
+			field: 'go',
 			subject: ['creature', 'person'],
-			object: ['thing', 'plant', 'edible'],
-			words: words(`mira busca recoge lleva toca guarda elige mueve reúne`)
+			...tensed(`parte se_marcha sale`, `partió se_marchó salió`)
 		},
 		{
-			subject: ['person'],
-			object: ['thing', 'vehicle'],
-			words: words(`hace repara limpia vende compra construye`)
+			field: 'arrive',
+			subject: ['creature', 'person'],
+			requires: 'destination',
+			...tensed(`llega vuelve regresa`, `llegó volvió regresó`)
 		},
 		{
+			field: 'arrive',
+			subject: ['creature', 'person'],
+			...tensed(`retorna vuelve_a_casa regresa_a_casa`, `retornó volvió_a_casa regresó_a_casa`)
+		},
+		{
+			field: 'move',
+			subject: ['creature', 'person'],
+			...tensed(
+				`corre camina salta nada vuela repta vaga pasa pasea deambula`,
+				`corrió caminó saltó nadó voló reptó vagó pasó paseó deambuló`
+			)
+		},
+		{
+			field: 'wait',
+			subject: ['creature', 'person'],
+			...tensed(
+				`espera se_esconde mira_alrededor vacila se_detiene aguarda`,
+				`esperó se_escondió miró_alrededor vaciló se_detuvo aguardó`
+			)
+		},
+		{
+			field: 'rest',
+			subject: ['creature', 'person'],
+			...tensed(
+				`descansa se_sienta se_acuesta se_apoya se_acurruca reposa`,
+				`descansó se_sentó se_acostó se_apoyó se_acurrucó reposó`
+			)
+		},
+		{
+			field: 'sleep',
+			subject: ['creature', 'person'],
+			...tensed(`duerme se_adormece se_duerme dormita`, `durmió se_adormeció se_durmió dormitó`)
+		},
+		{
+			field: 'express',
+			subject: ['creature', 'person'],
+			...tensed(
+				`ríe llora bosteza suspira sonríe tararea murmura grita`,
+				`rió lloró bostezó suspiró sonrió tarareó murmuró gritó`
+			)
+		},
+		{
+			field: 'play',
+			subject: ['creature', 'person'],
+			...tensed(`baila canta rueda juega brinca retoza`, `bailó cantó rodó jugó brincó retozó`)
+		},
+		{
+			field: 'think',
 			subject: ['person', 'creature'],
 			object: ['idea', 'event', 'place'],
-			words: words(`recuerda olvida imagina cuenta`)
+			...tensed(
+				`recuerda olvida imagina cuenta evoca añora`,
+				`recordó olvidó imaginó contó evocó añoró`
+			)
 		},
 		{
-			subject: ['place', 'event'],
-			words: words(`brilla fluye oscurece aclara se_ahonda se_calma`)
+			field: 'look',
+			subject: ['creature', 'person'],
+			object: ['thing', 'plant', 'edible'],
+			...tensed(
+				`mira observa contempla examina toca acaricia`,
+				`miró observó contempló examinó tocó acarició`
+			)
 		},
 		{
+			field: 'search',
+			subject: ['creature', 'person'],
+			...tensed(`busca rebusca husmea explora`, `buscó rebuscó husmeó exploró`)
+		},
+		{
+			field: 'find',
+			subject: ['creature', 'person'],
+			object: ['thing', 'plant', 'edible'],
+			...tensed(`encuentra descubre halla recoge`, `encontró descubrió halló recogió`)
+		},
+		{
+			field: 'take',
+			subject: ['creature', 'person'],
+			object: ['thing', 'plant', 'edible'],
+			...tensed(`elige toma agarra coge saca recibe`, `eligió tomó agarró cogió sacó recibió`)
+		},
+		{
+			field: 'carry',
+			subject: ['creature', 'person'],
+			object: ['thing', 'plant', 'edible'],
+			...tensed(`lleva trae carga acarrea`, `llevó trajo cargó acarreó`)
+		},
+		{
+			field: 'hide',
+			subject: ['creature', 'person'],
+			object: ['thing', 'plant', 'edible'],
+			...tensed(
+				`esconde guarda oculta entierra conserva`,
+				`escondió guardó ocultó enterró conservó`
+			)
+		},
+		{
+			field: 'make',
+			subject: ['person'],
+			object: ['thing', 'vehicle'],
+			...tensed(`hace construye talla pinta teje arma`, `hizo construyó talló pintó tejió armó`)
+		},
+		{
+			field: 'tend',
+			subject: ['person'],
+			object: ['thing', 'vehicle'],
+			...tensed(
+				`repara limpia pule arregla ordena ajusta`,
+				`reparó limpió pulió arregló ordenó ajustó`
+			)
+		},
+		{
+			field: 'sell',
+			subject: ['person'],
+			object: ['thing', 'vehicle'],
+			...tensed(`vende entrega cede ofrece`, `vendió entregó cedió ofreció`)
+		},
+		{
+			field: 'buy',
+			subject: ['person'],
+			object: ['thing', 'vehicle', 'edible'],
+			...tensed(`compra adquiere encarga consigue`, `compró adquirió encargó consiguió`)
+		},
+		{
+			field: 'cook',
+			subject: ['creature', 'person'],
+			object: ['edible'],
+			objectThemes: ['food'],
+			...tensed(`hornea calienta cocina corta asa sirve`, `horneó calentó cocinó cortó asó sirvió`)
+		},
+		{
+			field: 'eat',
+			subject: ['creature', 'person'],
+			object: ['edible'],
+			objectThemes: ['food'],
+			...tensed(`come mastica prueba mordisquea devora`, `comió masticó probó mordisqueó devoró`)
+		},
+		{
+			field: 'drink',
+			subject: ['creature', 'person'],
+			object: ['edible'],
+			objectThemes: ['drink'],
+			...tensed(`bebe sorbe apura saborea`, `bebió sorbió apuró saboreó`)
+		},
+		{
+			field: 'change',
+			subject: ['place'],
+			...tensed(
+				`se_calma oscurece se_ilumina se_llena se_vacía se_anima`,
+				`se_calmó oscureció se_iluminó se_llenó se_vació se_animó`
+			)
+		},
+		{
+			field: 'change',
+			subject: ['event'],
+			...tensed(
+				`brilla fluye se_ahonda empieza termina continúa pasa`,
+				`brilló fluyó se_ahondó empezó terminó continuó pasó`
+			)
+		},
+		{
+			field: 'change',
 			subject: ['thing', 'vehicle'],
-			words: words(`se_mece reluce cae rueda se_inclina envejece`)
+			...tensed(
+				`se_mece reluce cae rueda se_inclina envejece`,
+				`se_meció relució cayó rodó se_inclinó envejeció`
+			)
 		},
 		{
+			field: 'move',
 			subject: ['vehicle'],
-			words: words(`circula se_detiene pasa regresa parte resbala`)
+			...tensed(
+				`circula se_detiene pasa regresa parte resbala`,
+				`circuló se_detuvo pasó regresó partió resbaló`
+			)
 		},
 		{
+			field: 'change',
 			subject: ['idea', 'event'],
-			words: words(`se_extiende desaparece permanece flota se_ahonda`)
+			...tensed(
+				`se_extiende desaparece permanece flota se_ahonda`,
+				`se_extendió desapareció permaneció flotó se_ahondó`
+			)
 		},
 		{
+			field: 'change',
 			subject: ['plant'],
-			words: words(`crece se_marchita florece se_mece brota`)
+			...tensed(
+				`crece se_marchita florece se_mece brota`,
+				`creció se_marchitó floreció se_meció brotó`
+			)
 		},
 		{
+			field: 'change',
 			subject: ['body'],
-			words: words(`tiembla se_mueve se_entumece sana`)
+			...tensed(`tiembla se_mueve se_entumece sana`, `tembló se_movió se_entumeció sanó`)
 		},
 		{
+			field: 'change',
 			subject: ['edible'],
-			words: words(`madura se_enfría hierve se_derrite se_estropea`)
+			...tensed(
+				`madura se_enfría hierve se_derrite se_estropea`,
+				`maduró se_enfrió hirvió se_derritió se_estropeó`
+			)
 		}
 	],
-	// Written in the masculine singular, which is what `agreement` reshapes.
+	// Written in the masculine singular, which is what `agreement` reshapes. What
+	// a hero is by nature takes `ser`, and how they are just now takes `estar`,
+	// which is why the groups that carry a condition bring their own copula.
 	states: [
 		{
 			subject: ['creature', 'person'],
-			words: words(`
-				grande pequeño rápido lento silencioso ruidoso valiente perezoso ocupado
-				hambriento soñoliento fiero manso listo
-			`)
+			words: words(
+				`grande pequeño rápido lento silencioso ruidoso valiente perezoso ocupado fiero manso listo`
+			)
+		},
+		{
+			subject: ['creature', 'person'],
+			condition: 'hungry',
+			head: 'está',
+			pastHead: 'estaba',
+			words: words(`hambriento famélico`)
+		},
+		{
+			subject: ['creature', 'person'],
+			condition: 'full',
+			head: 'está',
+			pastHead: 'estaba',
+			words: words(`satisfecho lleno`)
+		},
+		{
+			subject: ['creature', 'person'],
+			condition: 'tired',
+			head: 'está',
+			pastHead: 'estaba',
+			words: words(`cansado soñoliento agotado`)
+		},
+		{
+			subject: ['creature', 'person'],
+			condition: 'rested',
+			head: 'está',
+			pastHead: 'estaba',
+			words: words(`descansado fresco animado`)
+		},
+		{
+			subject: ['creature', 'person'],
+			condition: 'content',
+			head: 'está',
+			pastHead: 'estaba',
+			words: words(`feliz contento alegre tranquilo`)
+		},
+		{
+			subject: ['creature', 'person'],
+			condition: 'restless',
+			head: 'está',
+			pastHead: 'estaba',
+			words: words(`aburrido curioso inquieto nervioso`)
 		},
 		{
 			subject: [
@@ -137,29 +365,108 @@ export const ES: SentenceLanguageData = {
 			words: words(`cálido frío dolorido rígido`)
 		}
 	],
-	manners: words(`
-		en_silencio despacio rápidamente suavemente de_repente apenas otra_vez juntos a_solas todavía
-		brevemente firmemente audazmente con_cuidado ansiosamente de_nuevo tranquilamente alegremente
-		torpemente fuertemente pacientemente ligeramente tercamente serenamente vivamente débilmente
-		claramente
-	`),
-	times: words(`
-		al_amanecer por_la_mañana al_mediodía por_la_tarde por_la_noche hoy ayer mañana en_primavera
-		en_verano en_otoño en_invierno los_fines_de_semana hace_poco a_veces cada_día al_anochecer
-		a_medianoche la_semana_pasada la_semana_que_viene estos_días hace_tiempo en_los_días_festivos
-		todo_el_día cada_noche
-	`),
+	// Masculine singular, the form `agreement` reshapes, after the noun.
+	modifiers: [
+		{
+			subject: ['creature', 'person'],
+			words: words(`
+				valiente animado amable ocupado perezoso tímido listo joven viejo pequeño grande silencioso alegre paciente ágil curioso
+			`)
+		},
+		{ subject: ['person'], words: words(`joven amable severo serio ocupado sincero`) },
+		{ subject: ['creature'], words: words(`veloz feroz manso rechoncho pequeñito`) },
+		{
+			subject: ['edible'],
+			themes: ['food'],
+			words: words(
+				`dulce picante tibio fresco crujiente sabroso fragante caliente salado blando maduro rico`
+			)
+		},
+		{
+			subject: ['edible'],
+			themes: ['drink'],
+			words: words(`dulce tibio frío fresco caliente fragante espumoso fuerte`)
+		},
+		{
+			subject: ['thing', 'vehicle'],
+			words: words(
+				`viejo nuevo pequeño grande ligero pesado brillante liso transparente duro bonito precioso antiguo`
+			)
+		},
+		{ subject: ['vehicle'], words: words(`rápido lento robusto`) },
+		{
+			subject: ['place'],
+			words: words(`
+				tranquilo amplio oscuro luminoso extraño viejo acogedor apartado bullicioso silencioso remoto lejano cercano vacío solitario soleado
+			`)
+		},
+		{
+			subject: ['plant'],
+			words: words(`verde frondoso fragante joven marchito alto pequeño tierno fresco`)
+		},
+		{ subject: ['idea'], words: words(`vago viejo nuevo extraño claro precioso pequeño raro`) },
+		{ subject: ['event'], words: words(`largo breve tranquilo soleado nublado ruidoso repentino`) },
+		{ subject: ['body'], words: words(`pequeño frío cálido esbelto robusto`) },
+		{
+			subject: [
+				'creature',
+				'person',
+				'plant',
+				'thing',
+				'vehicle',
+				'place',
+				'event',
+				'idea',
+				'body'
+			],
+			words: words(`hermoso misterioso extraño nuevo`)
+		}
+	],
+	manners: [
+		{
+			subject: ['creature', 'person'],
+			words: words(`
+				en_silencio despacio rápidamente suavemente de_repente apenas a_solas brevemente firmemente audazmente
+				con_cuidado ansiosamente tranquilamente alegremente torpemente fuertemente pacientemente ligeramente serenamente
+				vivamente con_calma
+			`)
+		},
+		{
+			subject: ['plant', 'edible', 'thing', 'vehicle', 'place', 'event', 'idea', 'body'],
+			words: words(`
+				en_silencio despacio suavemente de_repente apenas otra_vez todavía de_nuevo poco_a_poco lentamente débilmente aún
+				gradualmente
+			`)
+		}
+	],
+	times: {
+		day: words(`
+			al_amanecer de_madrugada por_la_mañana a_mediodía al_mediodía por_la_tarde al_anochecer por_la_noche de_noche
+			a_medianoche
+		`),
+		any: words(
+			`en_primavera en_verano en_otoño en_invierno los_fines_de_semana en_los_días_festivos todo_el_día`
+		),
+		past: words(`ayer la_semana_pasada hace_tiempo aquel_día aquella_noche una_vez`),
+		present: words(
+			`hoy estos_días hace_poco mañana la_semana_que_viene a_veces cada_día cada_noche`
+		)
+	},
+	homes: words(`casa cabaña`),
+	join: { word: 'y' },
 	// Written with the comma the ones that need one take.
 	connectives: {
 		additive: words(`y_luego además,`),
-		temporal: words(`después por_fin mientras_tanto, más_tarde al_final`),
+		temporal: words(`después por_fin mientras_tanto, más_tarde al_final poco_después`),
 		contrastive: words(`pero sin_embargo, aun_así en_cambio, no_obstante,`),
-		causal: words(`entonces por_eso`)
+		causal: words(`entonces por_eso así_que`)
 	},
 	interjections: words(`
 		ay, oh, vaya, caramba, madre_mía, mira, desde_luego, uy, anda, hombre, cielos, vamos,
 	`),
 	// Spanish carries its subject in the verb ending, so a second sentence about
+	// the same thing writes no pronoun at all.
+	pronouns: { n: [''] },
 	// Money only, for the reason English has: a counted phrase would need a plural
 	// noun, and most of these pools are not countable at all.
 	numeral: {
@@ -171,8 +478,6 @@ export const ES: SentenceLanguageData = {
 		group: '.',
 		gap: ' '
 	},
-	// the same thing writes no pronoun at all.
-	pronouns: { n: [''] },
 	// Spanish names its months and writes `de` between every part of a date.
 	calendar: {
 		date: 'D de MMMM de Y',
@@ -184,7 +489,8 @@ export const ES: SentenceLanguageData = {
 		copula: {
 			// An event is a thing that happens on a day, and a lion is not.
 			subject: ['event'],
-			words: words(`es`)
+			words: words(`es`),
+			past: { words: words(`fue`) }
 		}
 	},
 	frames: [
@@ -240,10 +546,50 @@ export const ES: SentenceLanguageData = {
 			],
 			weight: 14
 		},
+		// Where the subject is going, and where it arrives: `va hacia el mercado`,
+		// `vuelve hasta la casa`.
 		{
 			parts: [
 				{ slot: 'subject', modifiable: true },
-				{ slot: 'state', head: 'es' }
+				{ slot: 'verb' },
+				{ slot: 'destination', head: 'hacia', modifiable: true }
+			],
+			weight: 8,
+			fields: ['go']
+		},
+		{
+			parts: [
+				{ slot: 'subject', modifiable: true },
+				{ slot: 'verb' },
+				{ slot: 'destination', head: 'hasta', modifiable: true }
+			],
+			weight: 8,
+			fields: ['arrive']
+		},
+		{
+			parts: [
+				{ slot: 'time', tail: ',' },
+				{ slot: 'subject', modifiable: true },
+				{ slot: 'verb' },
+				{ slot: 'destination', head: 'hacia', modifiable: true }
+			],
+			weight: 4,
+			fields: ['go']
+		},
+		{
+			parts: [
+				{ slot: 'subject', modifiable: true },
+				{ slot: 'verb' },
+				{ slot: 'destination', head: 'hasta', modifiable: true },
+				{ slot: 'manner' }
+			],
+			weight: 3,
+			fields: ['arrive']
+		},
+		{
+			parts: [
+				{ slot: 'subject', modifiable: true },
+				{ slot: 'state', head: 'es', pastHead: 'era' }
 			],
 			weight: 12
 		},
@@ -281,6 +627,15 @@ export const ES: SentenceLanguageData = {
 				{ slot: 'manner' }
 			],
 			weight: 5
+		},
+		{
+			parts: [
+				{ slot: 'time', tail: ',' },
+				{ slot: 'subject', modifiable: true },
+				{ slot: 'verb' },
+				{ slot: 'object', modifiable: true }
+			],
+			weight: 4
 		},
 		{
 			parts: [{ slot: 'subject', modifiable: true }, { slot: 'verb' }, { slot: 'money' }],

@@ -1,5 +1,13 @@
 import { words } from '../../_internal/parse.js';
-import type { SentenceLanguageData } from './types.js';
+import type { WordPool } from '../../word/data/types.js';
+import type { PredicateTense, SentenceLanguageData } from './types.js';
+
+// The two forms a German verb group is written in: the third person singular of
+// the present, and the same person of the Präteritum, which is the tense written
+// prose tells a story in.
+function tensed(present: string, past: string): { words: WordPool; past: PredicateTense } {
+	return { words: words(present), past: { words: words(past) } };
+}
 
 export const DE: SentenceLanguageData = {
 	space: ' ',
@@ -22,48 +30,153 @@ export const DE: SentenceLanguageData = {
 	// `der Wal ist blau`, never `blauer`.
 	predicateAgrees: false,
 	// Third person singular, and none of them with a separable prefix: German
-	// sends that prefix to the end of the clause, which no single slot can carry.
+	// sends that prefix to the end of the clause, which no single slot can carry —
+	// and a shape that opens on a time would write it in front of the subject. A
+	// reflexive is fine, because `sich` stays with the verb: `Am Morgen erhebt sich
+	// ein Fuchs`.
+	//
+	// No verb here takes an object or a destination, because both would put the
+	// noun in a case its article changes for. The stories German tells are the
+	// ones with nothing in the hero's hands.
 	verbs: [
 		{
+			field: 'rise',
 			subject: ['creature', 'person'],
-			words: words(`
-				läuft geht springt schwimmt fliegt kriecht ruht schläft lacht weint singt tanzt
-				wartet steht sitzt rollt wandert lauscht zögert eilt
-			`)
+			...tensed(`erwacht erhebt_sich regt_sich`, `erwachte erhob_sich regte_sich`)
 		},
 		{
-			subject: ['place', 'event'],
-			words: words(`leuchtet fließt dunkelt erhellt vertieft verstummt`)
+			field: 'go',
+			subject: ['creature', 'person'],
+			...tensed(`geht wandert eilt reist`, `ging wanderte eilte reiste`)
 		},
 		{
+			field: 'arrive',
+			subject: ['creature', 'person'],
+			...tensed(`kommt erscheint`, `kam erschien`)
+		},
+		{
+			field: 'move',
+			subject: ['creature', 'person'],
+			...tensed(
+				`läuft springt schwimmt fliegt kriecht streift bummelt trabt spaziert`,
+				`lief sprang schwamm flog kroch streifte bummelte trabte spazierte`
+			)
+		},
+		{
+			field: 'wait',
+			subject: ['creature', 'person'],
+			...tensed(
+				`wartet zögert verharrt lauscht lauert`,
+				`wartete zögerte verharrte lauschte lauerte`
+			)
+		},
+		{
+			field: 'rest',
+			subject: ['creature', 'person'],
+			...tensed(`ruht sitzt liegt rastet lehnt`, `ruhte saß lag rastete lehnte`)
+		},
+		{
+			field: 'sleep',
+			subject: ['creature', 'person'],
+			...tensed(`schläft schlummert dämmert döst`, `schlief schlummerte dämmerte döste`)
+		},
+		{
+			field: 'express',
+			subject: ['creature', 'person'],
+			...tensed(
+				`lacht weint gähnt seufzt lächelt summt murmelt ruft`,
+				`lachte weinte gähnte seufzte lächelte summte murmelte rief`
+			)
+		},
+		{
+			field: 'play',
+			subject: ['creature', 'person'],
+			...tensed(`tanzt singt tollt spielt hüpft rollt`, `tanzte sang tollte spielte hüpfte rollte`)
+		},
+		{
+			field: 'search',
+			subject: ['creature', 'person'],
+			...tensed(`sucht stöbert kramt`, `suchte stöberte kramte`)
+		},
+		{
+			field: 'change',
+			subject: ['place'],
+			...tensed(
+				`verstummt dunkelt erhellt_sich leert_sich füllt_sich belebt_sich`,
+				`verstummte dunkelte erhellte_sich leerte_sich füllte_sich belebte_sich`
+			)
+		},
+		{
+			field: 'change',
+			subject: ['event'],
+			...tensed(
+				`leuchtet fließt vertieft_sich beginnt endet dauert vergeht`,
+				`leuchtete floss vertiefte_sich begann endete dauerte verging`
+			)
+		},
+		{
+			field: 'change',
 			subject: ['thing', 'vehicle'],
-			words: words(`schwankt glänzt fällt rollt neigt altert`)
+			...tensed(
+				`schwankt glänzt fällt rollt neigt_sich altert`,
+				`schwankte glänzte fiel rollte neigte_sich alterte`
+			)
 		},
 		{
+			field: 'move',
 			subject: ['vehicle'],
-			words: words(`fährt hält rollt wendet gleitet`)
+			...tensed(`fährt hält rollt wendet gleitet`, `fuhr hielt rollte wendete glitt`)
 		},
 		{
+			field: 'change',
 			subject: ['idea', 'event'],
-			words: words(`wächst verschwindet bleibt schwebt vertieft`)
+			...tensed(
+				`wächst verschwindet bleibt schwebt vertieft_sich`,
+				`wuchs verschwand blieb schwebte vertiefte_sich`
+			)
 		},
 		{
+			field: 'change',
 			subject: ['plant'],
-			words: words(`wächst welkt blüht schwankt sprießt`)
+			...tensed(`wächst welkt blüht schwankt sprießt`, `wuchs welkte blühte schwankte spross`)
 		},
 		{
+			field: 'change',
 			subject: ['body'],
-			words: words(`zittert bebt erstarrt heilt`)
+			...tensed(`zittert bebt erstarrt heilt`, `zitterte bebte erstarrte heilte`)
 		},
 		{
+			field: 'change',
 			subject: ['edible'],
-			words: words(`reift kühlt kocht schmilzt verdirbt`)
+			...tensed(`reift kühlt kocht schmilzt verdirbt`, `reifte kühlte kochte schmolz verdarb`)
 		}
 	],
 	states: [
 		{
 			subject: ['creature', 'person'],
-			words: words(`groß klein schnell langsam still laut mutig faul müde hungrig sanft klug wild`)
+			words: words(`groß klein schnell langsam still laut mutig faul sanft klug wild`)
+		},
+		{ subject: ['creature', 'person'], condition: 'hungry', words: words(`hungrig ausgehungert`) },
+		{ subject: ['creature', 'person'], condition: 'full', words: words(`satt gesättigt`) },
+		{
+			subject: ['creature', 'person'],
+			condition: 'tired',
+			words: words(`müde schläfrig erschöpft`)
+		},
+		{
+			subject: ['creature', 'person'],
+			condition: 'rested',
+			words: words(`ausgeruht frisch munter`)
+		},
+		{
+			subject: ['creature', 'person'],
+			condition: 'content',
+			words: words(`froh zufrieden glücklich heiter`)
+		},
+		{
+			subject: ['creature', 'person'],
+			condition: 'restless',
+			words: words(`gelangweilt neugierig unruhig rastlos`)
 		},
 		{
 			subject: [
@@ -105,23 +218,99 @@ export const DE: SentenceLanguageData = {
 			words: words(`warm kalt wund steif`)
 		}
 	],
-	manners: words(`
-		leise langsam schnell sanft plötzlich kaum wieder gemeinsam allein noch kurz stetig kühn sorgsam
-		eifrig ruhig heftig geduldig leicht fröhlich munter schwerfällig deutlich gelassen emsig zügig
-	`),
-	times: words(`
-		bei_Tagesanbruch am_Morgen am_Mittag am_Abend in_der_Nacht heute gestern morgen im_Frühling
-		im_Sommer im_Herbst im_Winter am_Wochenende gerade_eben manchmal jeden_Tag in_der_Dämmerung
-		um_Mitternacht letzte_Woche nächste_Woche heutzutage vor_langer_Zeit an_Feiertagen
-		den_ganzen_Tag jede_Nacht
-	`),
+	// Base forms, which `agreement` gives the strong endings after `ein`.
+	modifiers: [
+		{
+			subject: ['creature', 'person'],
+			words: words(`
+				mutig lebhaft sanft fleißig faul schüchtern klug jung alt klein groß still fröhlich geduldig flink neugierig
+			`)
+		},
+		{ subject: ['person'], words: words(`jung freundlich streng ernst beschäftigt aufrichtig`) },
+		{ subject: ['creature'], words: words(`flink wild zahm rundlich winzig`) },
+		{
+			subject: ['edible'],
+			themes: ['food'],
+			words: words(`süß scharf warm frisch knusprig würzig duftend heiß salzig weich reif lecker`)
+		},
+		{
+			subject: ['edible'],
+			themes: ['drink'],
+			words: words(`süß warm kalt kühl heiß duftend frisch stark`)
+		},
+		{
+			subject: ['thing', 'vehicle'],
+			words: words(
+				`alt neu klein groß leicht schwer glänzend glatt klar stabil hübsch kostbar uralt`
+			)
+		},
+		{ subject: ['vehicle'], words: words(`schnell langsam robust`) },
+		{
+			subject: ['place'],
+			words: words(
+				`still weit dunkel hell fremd alt gemütlich abgelegen belebt leise fern nah leer einsam sonnig`
+			)
+		},
+		{ subject: ['plant'], words: words(`grün üppig duftend jung welk klein zart frisch`) },
+		{ subject: ['idea'], words: words(`vage alt neu fremd klar kostbar klein seltsam`) },
+		{ subject: ['event'], words: words(`lang kurz still sonnig trüb laut plötzlich`) },
+		{ subject: ['body'], words: words(`klein kalt warm schlank kräftig`) },
+		{
+			subject: [
+				'creature',
+				'person',
+				'plant',
+				'thing',
+				'vehicle',
+				'place',
+				'event',
+				'idea',
+				'body'
+			],
+			words: words(`schön geheimnisvoll fremd neu`)
+		}
+	],
+	manners: [
+		{
+			subject: ['creature', 'person'],
+			words: words(`
+				leise langsam schnell sanft plötzlich kaum allein kurz kühn sorgsam eifrig ruhig heftig geduldig leicht
+				fröhlich munter schwerfällig gelassen emsig zügig vergnügt
+			`)
+		},
+		{
+			subject: ['plant', 'edible', 'thing', 'vehicle', 'place', 'event', 'idea', 'body'],
+			words: words(
+				`leise langsam sanft plötzlich kaum wieder noch stetig allmählich nach_und_nach schwach weiter`
+			)
+		}
+	],
+	times: {
+		day: words(`
+			bei_Tagesanbruch am_frühen_Morgen am_Morgen am_Vormittag am_Mittag am_Nachmittag in_der_Dämmerung am_Abend
+			in_der_Nacht spät_in_der_Nacht um_Mitternacht
+		`),
+		any: words(
+			`im_Frühling im_Sommer im_Herbst im_Winter am_Wochenende an_Feiertagen den_ganzen_Tag`
+		),
+		past: words(`gestern letzte_Woche vor_langer_Zeit einst an_jenem_Tag in_jener_Nacht`),
+		present: words(
+			`heute heutzutage gerade_eben morgen nächste_Woche manchmal jeden_Tag jede_Nacht`
+		)
+	},
+	// Nowhere a German sentence here can go, because a destination is dative; the
+	// pool is written all the same, so the shape of the data is the same.
+	homes: words(`Haus`),
+	// No `join`: a second clause after `und` drops its subject, and a shape of
+	// German's that opens on a time or an adverb would then put nothing where the
+	// verb's second position needs the subject to be.
 	// Only the coordinating ones. German puts its finite verb second and counts
 	// whatever opens the clause towards that, so `dann` or `danach` in front would
 	// need the verb and the subject the other way round — a shape the frames write,
 	// not something a connective can bolt on. `und`, `aber`, `doch` and `denn` sit
 	// outside the clause and leave the order alone.
 	connectives: {
-		additive: words(`und oder`),
+		additive: words(`und`),
 		contrastive: words(`aber doch`),
 		causal: words(`denn`)
 	},
@@ -129,11 +318,6 @@ export const DE: SentenceLanguageData = {
 		oh, ach, na, mensch, oje, sieh_an, wahrhaftig, hui, herrje, du_meine_Güte, nanu,
 	`),
 	pronouns: { m: words(`er`), f: words(`sie`), n: words(`es`) },
-	// German declares the fewest shapes here, and both reasons are its cases. An
-	// object would be accusative, which changes the article and the modifier
-	// ending together; a place would be dative, which changes them again. What is
-	// left is the nominative, and the second rule German never breaks: the verb
-	// stands second, so a shape that opens on a time puts the subject behind it.
 	// German names its months, writes the day first with a full stop after it, and
 	// puts `Uhr` after a clock time.
 	calendar: {
@@ -146,9 +330,15 @@ export const DE: SentenceLanguageData = {
 		copula: {
 			// An event is a thing that happens on a day, and a lion is not.
 			subject: ['event'],
-			words: words(`ist`)
+			words: words(`ist`),
+			past: { words: words(`war`) }
 		}
 	},
+	// German declares the fewest shapes here, and both reasons are its cases. An
+	// object would be accusative, which changes the article and the modifier
+	// ending together; a place would be dative, which changes them again. What is
+	// left is the nominative, and the second rule German never breaks: the verb
+	// stands second, so a shape that opens on a time puts the subject behind it.
 	frames: [
 		// A date and a clock. German puts its finite verb second and counts whatever
 		// opens the clause towards that, so the subject stands behind the verb.
@@ -194,7 +384,7 @@ export const DE: SentenceLanguageData = {
 		{
 			parts: [
 				{ slot: 'subject', modifiable: true },
-				{ slot: 'state', head: 'ist' }
+				{ slot: 'state', head: 'ist', pastHead: 'war' }
 			],
 			weight: 20
 		},
@@ -239,7 +429,10 @@ export const DE: SentenceLanguageData = {
 			mood: 'question'
 		},
 		{
-			parts: [{ slot: 'subject', head: 'ist', modifiable: true }, { slot: 'state' }],
+			parts: [
+				{ slot: 'subject', head: 'ist', pastHead: 'war', modifiable: true },
+				{ slot: 'state' }
+			],
 			weight: 18,
 			mood: 'question'
 		}

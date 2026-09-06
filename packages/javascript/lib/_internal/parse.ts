@@ -2,6 +2,7 @@
 // separated strings inside a template literal instead of one array entry per
 // line, which keeps a 120-name pool to a handful of lines.
 
+import type { PredicateForm, PredicateTense } from '../sentence/data/types.js';
 import type { WordGender, WordPool } from '../word/data/types.js';
 
 /**
@@ -75,4 +76,35 @@ export function romanMap(source: string): Record<string, string> {
 	}
 
 	return map;
+}
+
+/**
+ * Every form of a tense from one pool of stems and one ending per form, for a
+ * language whose endings are the same whatever the stem: a Korean past stem
+ * closes on `ㅆ`, so `달렸` takes `다`, `니`, `구나`, `어요` and `습니다` exactly
+ * the way `걸었` does. An ending may list alternatives with `|` between them, and
+ * each stem gets every one of them, so the pools stay index-aligned with the
+ * present-tense `words` the stems were written for.
+ */
+export function conjugate(
+	stems: string,
+	endings: { statement: string } & Partial<Record<PredicateForm, string>>
+): PredicateTense {
+	const bases = words(stems);
+	const attach = (ending: string): readonly string[] =>
+		bases.map((stem) =>
+			ending
+				.split('|')
+				.map((each) => stem + each)
+				.join('|')
+		);
+	const forms: Partial<Record<PredicateForm, readonly string[]>> = {};
+
+	for (const key of Object.keys(endings) as (keyof typeof endings)[]) {
+		if (key !== 'statement') {
+			forms[key] = attach(endings[key]!);
+		}
+	}
+
+	return { words: attach(endings.statement), forms };
 }

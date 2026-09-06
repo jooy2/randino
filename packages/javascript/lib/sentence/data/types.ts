@@ -8,8 +8,8 @@
 // allows. So the nouns are still drawn from `word/data`, and everything a
 // sentence adds to them lives here.
 
-import type { SentenceQuote, SentenceSlot, SentenceType } from '../../_types/global.js';
-import type { WordGender, WordPool } from '../../word/data/types.js';
+import type { SentenceQuote, SentenceSlot, SentenceType, WordTheme } from '../../_types/global.js';
+import type { WordAgreement, WordGender, WordPool } from '../../word/data/types.js';
 
 /**
  * The kind of thing a noun names, which is what makes a sentence hold together:
@@ -50,9 +50,15 @@ export type NounClass =
  * part of the verb.
  */
 export type PredicateForm =
-	'question' | 'exclamation' | 'casual' | 'polite' | 'formal' | 'formalQuestion';
+	'question' | 'exclamation' | 'casual' | 'polite' | 'formal' | 'formalQuestion' | 'linking';
 
 /**
+ * `linking` is the form a predicate takes when its clause is not the last one of
+ * the sentence — Korean `돌아오고` or `돌아와서` beside `돌아온다`, Japanese `戻って`
+ * beside `戻る`. It carries no tense of its own, so it lives in the present forms
+ * alone and the clause after it decides when everything happened. A language that
+ * joins its clauses with a word rather than a form (`and`, `y`, `и`) declares none.
+ *
  * The forms a group declares, beside the plain statement its `words` are in.
  * Every one of them is index-aligned with `words`.
  *
@@ -70,16 +76,108 @@ export type PredicateForm =
 export type PredicateForms = Partial<Record<PredicateForm, WordPool>>;
 
 /**
- * Verbs that take the same arguments. Written as a group rather than one tagged
- * entry per verb, because the tag is the interesting part and a group of thirty
- * verbs shares one: they all say what can do the doing, and — when the verb is
- * transitive — what it can be done to.
+ * What a verb does, as coarsely as a story needs to know it. A step of a story
+ * asks for a field rather than for a word — "the hero eats something" — and the
+ * language answers with any verb it has filed there, which is what lets one story
+ * be told in nine languages and never twice the same way.
+ *
+ * - The hero on the move: `rise` (gets up), `go` (sets off, towards a
+ *   destination), `arrive` (comes back, reaches), `move` (runs, swims, wanders,
+ *   with no destination), `wait` (waits, lingers, looks around).
+ * - The hero at rest: `rest`, `sleep`.
+ * - The hero showing something: `express` (laughs, cries, yawns), `play` (dances,
+ *   tumbles, sings), `think` (remembers, imagines — takes an idea).
+ * - The hero and a thing: `look`, `search` (with no object; the place is what is
+ *   searched), `find`, `take`, `carry`, `hide`, `make`, `tend` (mends, cleans),
+ *   `sell`, `buy`, `cook`, `eat`, `drink`.
+ * - `change` is everything that happens to something that is not a hero: a place
+ *   darkens, an apple ripens, a flag sways.
+ *
+ * `FIELD_RULES` in `data/index.ts` says what each field needs to be true first
+ * and what it leaves true afterwards, which is the whole of the story's memory.
+ */
+export type VerbField =
+	| 'rise'
+	| 'go'
+	| 'arrive'
+	| 'move'
+	| 'wait'
+	| 'rest'
+	| 'sleep'
+	| 'express'
+	| 'play'
+	| 'think'
+	| 'look'
+	| 'search'
+	| 'find'
+	| 'take'
+	| 'carry'
+	| 'hide'
+	| 'make'
+	| 'tend'
+	| 'sell'
+	| 'buy'
+	| 'cook'
+	| 'eat'
+	| 'drink'
+	| 'change';
+
+/**
+ * What can be true of a story's hero at one moment, which is what a state
+ * sentence says and what an action changes. `holding` is the one that is about a
+ * thing rather than a feeling: it is what `eat`, `carry` and `sell` need and what
+ * `find`, `take`, `buy` and `make` leave behind.
+ */
+export type Condition =
+	| 'awake'
+	| 'asleep'
+	| 'hungry'
+	| 'full'
+	| 'tired'
+	| 'rested'
+	| 'away'
+	| 'home'
+	| 'holding'
+	| 'content'
+	| 'restless';
+
+/**
+ * The same predicates in another tense: the statement form in `words` and the
+ * moods and levels in `forms`, both index-aligned with the present-tense pools
+ * of the group. A group declares what its language writes — Korean and Japanese
+ * every level, English only the statement and its question's base form — and
+ * leaves the tense out entirely where the language does not inflect for it.
+ */
+export type PredicateTense = {
+	words: WordPool;
+	forms?: PredicateForms;
+};
+
+/**
+ * Verbs that take the same arguments and do the same kind of thing. Written as a
+ * group rather than one tagged entry per verb, because the tags are the
+ * interesting part and a group of ten verbs shares them: they all say what can do
+ * the doing, what it can be done to, and — for a story — what sort of doing it is.
  */
 export type VerbGroup = {
+	/** What these verbs do, as a story asks for it. */
+	field: VerbField;
 	/** Classes a noun has to belong to to be the subject of these verbs. */
 	subject: readonly NounClass[];
 	/** Classes it can take as a direct object. Left out by an intransitive group. */
 	object?: readonly NounClass[];
+	/**
+	 * The themes the object may come from, when a class is too wide: `eat` takes an
+	 * edible and `drink` takes an edible, and a lion that drinks a pretzel is the
+	 * difference. Left out where the class alone is right.
+	 */
+	objectThemes?: readonly WordTheme[];
+	/**
+	 * A part the shape has to carry for these verbs to make sense. `향한다` and
+	 * `heads` want somewhere to head to, where `떠난다` and `leaves` stand on their
+	 * own; a group that names a slot is drawn only for a shape that has it.
+	 */
+	requires?: SentenceSlot;
 	/** The verbs themselves, in the form a plain statement ends on (`달린다`, `runs`). */
 	words: WordPool;
 	/**
@@ -88,6 +186,12 @@ export type VerbGroup = {
 	 * and Russian ask a question with the mark alone.
 	 */
 	forms?: PredicateForms;
+	/**
+	 * The same verbs in the past, index-aligned with `words`. Left out by a language
+	 * that marks the past with a word beside the verb rather than on it — Chinese
+	 * `了`, Vietnamese `đã` — which is `pastMark`'s business.
+	 */
+	past?: PredicateTense;
 };
 
 /**
@@ -99,9 +203,44 @@ export type VerbGroup = {
 export type StateGroup = {
 	/** Classes a noun has to belong to to be described by these. */
 	subject: readonly NounClass[];
+	/**
+	 * What these adjectives say is true of the subject, for a story to read and to
+	 * write. `배고프다` is `hungry` and `피곤하다` is `tired`; `크다` is neither, and a
+	 * group of traits like it leaves this out.
+	 */
+	condition?: Condition;
+	/**
+	 * What is written in front of these instead of the shape's own head, in a
+	 * language whose copula depends on what is said: Spanish `es valiente` and
+	 * `está cansado` are two verbs, and only the group knows which its words take.
+	 * `pastHead` is the same in the past (`era`, `estaba`).
+	 */
+	head?: string;
+	pastHead?: string;
 	words: WordPool;
 	/** The same adjectives in another form, index-aligned with `words`. */
 	forms?: PredicateForms;
+	/** The same adjectives in the past, index-aligned with `words`. */
+	past?: PredicateTense;
+};
+
+/**
+ * Attributive modifiers that fit the same kinds of noun, grouped the way the
+ * states are. `word/data`'s `adjectives` are what a nickname is built from, and
+ * a nickname is allowed to be a joke — `맑은기계공` is a handle. A sentence is
+ * not, so it draws its modifiers from here instead, and `맑은` sits in front of a
+ * place or a drink and never in front of a mechanic.
+ */
+export type ModifierGroup = {
+	/** Classes a noun has to belong to to carry one of these. */
+	subject: readonly NounClass[];
+	/**
+	 * The themes it may belong to, when a class is too wide: a soup is `매콤한`
+	 * and a tea is not, though both are edible.
+	 */
+	themes?: readonly WordTheme[];
+	/** Base forms, which `agree` reshapes in a language that inflects. */
+	words: WordPool;
 };
 
 /**
@@ -115,6 +254,12 @@ export type SentencePart = {
 	slot: SentenceSlot;
 	/** Written in front of the phrase (`in`, `在`, `is`). */
 	head?: string;
+	/**
+	 * What `head` becomes in a past-tense sentence, for a language whose auxiliary
+	 * or copula carries the tense: English `does` is `did` and `is` is `was`,
+	 * Spanish `es` is `era`. Left out where the head does not change.
+	 */
+	pastHead?: string;
 	/** Written after it (`가`, `が`, `里`). */
 	tail?: string;
 	/**
@@ -123,6 +268,13 @@ export type SentencePart = {
 	 * — and a language whose particles do not alternate leaves it out.
 	 */
 	tailAlt?: string;
+	/**
+	 * Used instead of either when the word in front of it ends on `ㄹ`, for the
+	 * one Korean particle that treats that consonant as a vowel: `시장으로` and
+	 * `마을로` are `로` after a vowel, `으로` after a consonant, and `로` again
+	 * after `ㄹ`. Left out by every other particle.
+	 */
+	tailLiquid?: string;
 	/**
 	 * Whether the phrase may carry a modifier when there is room for one. Off for
 	 * a phrase that is already a fixed expression, which is every adverbial.
@@ -179,6 +331,12 @@ export type SentenceFrame = {
 	parts: readonly SentencePart[];
 	/** How often this shape is used, against the other frames of the language. */
 	weight: number;
+	/**
+	 * The fields the verb of this shape may come from, for a shape only some verbs
+	 * can head. A destination is the reason: `시장으로` wants a verb that goes
+	 * somewhere and `시장에` one that arrives, and `시장으로 웃는다` is neither.
+	 */
+	fields?: readonly VerbField[];
 	/** What the shape is for. Left out by a statement. */
 	mood?: SentenceMood;
 	/**
@@ -230,6 +388,46 @@ export type ConnectiveKind = 'additive' | 'temporal' | 'contrastive' | 'causal';
  */
 export type SentenceConnectives = {
 	[kind in ConnectiveKind]?: WordPool;
+};
+
+/**
+ * When something happens, written whole, particle and all, and sorted by what a
+ * paragraph has to know about each one.
+ *
+ * `day` is the phases of a day in the order they come, from dawn to midnight,
+ * because a story told across several sentences moves forward through them and
+ * never back: a paragraph that has reached the evening does not return to the
+ * morning. `any` is what fits every tense — a season, a habit, a weekend. `past`
+ * and `present` are the ones that name a tense (`어제`, `yesterday`; `오늘`,
+ * `these days`), and a sentence takes only the pool of the tense it is in.
+ */
+export type SentenceTimes = {
+	day: WordPool;
+	any: WordPool;
+	past?: WordPool;
+	present?: WordPool;
+};
+
+/**
+ * How the language marks the past when it does not inflect its verb for it.
+ * Vietnamese writes `đã` in front (`con mèo đã chạy`) and Chinese `了` behind
+ * (`狮子跑了`, `狐狸吃了苹果`), and a language that conjugates leaves it out and
+ * writes `past` on its groups instead.
+ */
+export type SentencePastMark = {
+	head?: string;
+	tail?: string;
+};
+
+/**
+ * How two clauses become one sentence: `돌아와서 사과를 먹었다`, `came home and
+ * ate the apple`. Either the first clause's predicate takes the `linking` form
+ * its group declares, or a word is written between the two — a language declares
+ * whichever its grammar does, and one that declares neither joins nothing.
+ */
+export type SentenceJoin = {
+	form?: 'linking';
+	word?: string;
 };
 
 /**
@@ -367,12 +565,39 @@ export type SentenceLanguageData = {
 	 * the attributive form, so `der Wal ist blau` keeps the base word.
 	 */
 	predicateAgrees?: boolean;
+	/**
+	 * How a past-tense verb agrees with its subject, in a language where it does.
+	 * Russian is the one: `бежал` beside `бежала`, and `вернулся` beside
+	 * `вернулась`. The same rule shape `word/data`'s `agreement` has, applied to
+	 * the verb's past form rather than to a modifier.
+	 */
+	pastAgreement?: WordAgreement;
+	/**
+	 * What marks the past beside the verb, for a language that does not put it on
+	 * the verb. Left out by every language that writes `past` on its groups.
+	 */
+	pastMark?: SentencePastMark;
 	verbs: readonly VerbGroup[];
 	states: readonly StateGroup[];
-	/** How something is done, written as the language writes it (`조용히`, `quietly`). */
-	manners: WordPool;
+	/** The modifiers a noun phrase may carry, by what they can describe. */
+	modifiers: readonly ModifierGroup[];
+	/**
+	 * How something is done, written as the language writes it (`조용히`,
+	 * `quietly`), grouped by what can do it that way: a fox walks `부지런히` and a
+	 * river does not flow so.
+	 */
+	manners: readonly ModifierGroup[];
 	/** When it happens, written whole, particle and all (`새벽에`, `at dawn`). */
-	times: WordPool;
+	times: SentenceTimes;
+	/**
+	 * Where the hero of a story comes back to (`집`, `house`, `家`). Bare nouns,
+	 * and the destination frame writes its own particle or preposition around
+	 * one, so English says `to the house` rather than the `home` that would need
+	 * the preposition dropped.
+	 */
+	homes: WordPool;
+	/** How two clauses are written as one sentence. Left out by a language that does not. */
+	join?: SentenceJoin;
 	/** What a sentence opens on when it follows another one, by what it claims. */
 	connectives: SentenceConnectives;
 	/** How a later sentence refers to the topic without naming it again. */

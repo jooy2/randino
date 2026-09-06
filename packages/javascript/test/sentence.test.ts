@@ -13,6 +13,8 @@ import type {
 	SentenceDetail,
 	SentenceShape,
 	SentenceSlot,
+	SentenceStory,
+	SentenceTense,
 	SentenceType,
 	WordLanguage,
 	WordTheme
@@ -23,8 +25,10 @@ import { WORD_DATA } from '../dist/word/data/index.js';
 import { agree } from '../dist/word/wordGenerator.js';
 import type { WordGender } from '../dist/word/data/types.js';
 import { NAME_DATA } from '../dist/name/data/index.js';
-import { SENTENCE_DATA, THEME_CLASS } from '../dist/sentence/data/index.js';
+import { SENTENCE_DATA, STORIES, THEME_CLASS } from '../dist/sentence/data/index.js';
+import type { NounClass, VerbGroup } from '../dist/sentence/data/types.js';
 import { shapeOf } from '../dist/sentence/sentenceGenerator.js';
+import { heroClassesFor, itemThemesFor, tellable } from '../dist/sentence/story.js';
 
 const SAMPLE = 60;
 
@@ -131,22 +135,28 @@ function themeOfNoun(language: WordLanguage, noun: string): WordTheme | null {
 }
 
 /**
- * A detail draw with the two options that are drawn per result pinned, unless
+ * A detail draw with the three options that are drawn per result pinned, unless
  * the test names them itself.
  *
- * `type` and `includeName` are random by default, which is the point of them —
- * but a check about `slots` or a length range wants one thing varying at a time,
- * and a question is a different shape with different parts. The tests that are
- * about those two say so; everything else reads a plain statement about a noun
- * the pools hold. `theDefaults` is where the drawn behaviour is asserted.
+ * `type`, `includeName` and `tense` are random by default, which is the point of
+ * them — but a check about `slots` or a length range wants one thing varying at
+ * a time, a question is a different shape with different parts, and a past verb
+ * is a different pool. The tests that are about those three say so; everything
+ * else reads a plain present statement about a noun the pools hold.
  */
 function sentenceDetails(options: RandSentenceOptions = {}): SentenceDetail[] {
-	return randSentence({ type: 'statement', includeName: false, ...options, output: 'detail' });
+	return randSentence({
+		type: 'statement',
+		includeName: false,
+		tense: 'present',
+		...options,
+		output: 'detail'
+	});
 }
 
 /** The same, for the checks that read the string rather than the detail. */
 function sentences(options: RandSentenceOptions = {}): string[] {
-	return randSentence({ type: 'statement', includeName: false, ...options });
+	return randSentence({ type: 'statement', includeName: false, tense: 'present', ...options });
 }
 
 /** A word as a sentence writes it — English stores its pools capitalized. */
@@ -263,7 +273,11 @@ function inflectedFor(language: WordLanguage, pool: readonly string[]): string[]
 	];
 }
 
-type Group = { words: readonly string[]; forms?: Partial<Record<string, readonly string[]>> };
+type Group = {
+	words: readonly string[];
+	forms?: Partial<Record<string, readonly string[]>>;
+	past?: { words: readonly string[]; forms?: Partial<Record<string, readonly string[]>> };
+};
 
 /** Every ending an entry lists: `달리니|달리나` is one entry and two endings. */
 function endings(pool: readonly string[]): string[] {
@@ -310,9 +324,41 @@ function formsOf(group: Group, style: SentenceStyle, mark: SentenceMark): string
 	return [...group.words];
 }
 
-/** Every predicate a group can write at any level and any mood. */
+/** Every predicate a group can write at any level and any mood, in either tense. */
 function everyForm(group: Group): string[] {
-	return [...group.words, ...endings(Object.values(group.forms ?? {}).flat())];
+	return [
+		...group.words,
+		...endings(Object.values(group.forms ?? {}).flat()),
+		...(group.past
+			? [...group.past.words, ...endings(Object.values(group.past.forms ?? {}).flat())]
+			: [])
+	];
+}
+
+/** The same, for the past alone. */
+function pastForms(group: Group): string[] {
+	return group.past
+		? [...group.past.words, ...endings(Object.values(group.past.forms ?? {}).flat())]
+		: [];
+}
+
+/** A word reshaped by ordered `[ending, replacement]` rules, for every gender. */
+function agreedBy(
+	rules: Partial<Record<string, readonly (readonly [string, string])[]>>,
+	word: string
+): string[] {
+	const out = [word];
+
+	for (const list of Object.values(rules)) {
+		for (const [ending, replacement] of list ?? []) {
+			if (word.endsWith(ending)) {
+				out.push(word.slice(0, word.length - ending.length) + replacement);
+				break;
+			}
+		}
+	}
+
+	return out;
 }
 
 function poolFor(language: WordLanguage, slot: SentenceSlot): Set<string> {
@@ -331,11 +377,16 @@ function poolFor(language: WordLanguage, slot: SentenceSlot): Set<string> {
 	}
 
 	if (slot === 'manner') {
-		return new Set(data.manners);
+		return new Set(data.manners.flatMap((group) => [...group.words]));
 	}
 
 	if (slot === 'time') {
-		return new Set(data.times);
+		return new Set([
+			...data.times.day,
+			...data.times.any,
+			...(data.times.past ?? []),
+			...(data.times.present ?? [])
+		]);
 	}
 
 	return new Set(
@@ -343,11 +394,18 @@ function poolFor(language: WordLanguage, slot: SentenceSlot): Set<string> {
 	);
 }
 
-/** The modifiers a noun phrase may carry, in every form they can take. */
+/**
+ * The modifiers a noun phrase may carry, in every form they can take: the
+ * sentence data's own groups, and the nickname pools a required word may still
+ * come from.
+ */
 function modifiersFor(language: WordLanguage): Set<string> {
 	const wordData = WORD_DATA[language];
 	const genders = Object.keys(wordData.agreement ?? {}) as WordGender[];
-	const pool = [...wordData.adjectives];
+	const pool = [
+		...SENTENCE_DATA[language].modifiers.flatMap((group) => [...group.words]),
+		...wordData.adjectives
+	];
 
 	return new Set(
 		[
@@ -1029,10 +1087,13 @@ describe('Sentence', () => {
 		const quoted = (type: SentenceType) => type === 'dialogue' || type === 'thought';
 		let mixed = 0;
 
+		// `type` is named, because a story told on its own terms is prose and never
+		// quotes: the register is what a caller who asked for every kind gets.
 		for (const detail of randSentence({
 			language: 'ko',
 			sentences: 4,
 			includeName: false,
+			type: 'all',
 			count: 300,
 			output: 'detail'
 		})) {
@@ -1243,6 +1304,9 @@ describe('Sentence', () => {
 				}
 
 				const wanted = THEME_CLASS[detail.theme];
+				// A story's scene is the one sentence whose subject is not the hero: the
+				// place it is happening in does something of its own.
+				const allowed: NounClass[] = detail.story ? [wanted, 'place'] : [wanted];
 				// A shape that counts what it is about has no separate subject, so the
 				// counted phrase is the one that has to stay on topic. Beside a subject
 				// it is an object instead, and belongs to whatever class the verb takes.
@@ -1283,7 +1347,7 @@ describe('Sentence', () => {
 						.filter((theme): theme is WordTheme => theme !== null);
 
 					assert.ok(
-						themes.length === 0 || themes.some((theme) => THEME_CLASS[theme] === wanted),
+						themes.length === 0 || themes.some((theme) => allowed.includes(THEME_CLASS[theme])),
 						`${language}: '${phrase}' reads as ${themes.join('/')} where the result is about a ${wanted} (${detail.sentence})`
 					);
 				}
@@ -1629,10 +1693,21 @@ describe('Sentence', () => {
 				language,
 				type: 'question',
 				style: 'plain',
+				tense: 'present',
 				count: SAMPLE
 			})) {
 				assert.match(sentence, shape, `${language}: ${sentence}`);
 			}
+		}
+
+		// In the past the auxiliary carries the tense: `Did the lion run?`
+		for (const sentence of randSentence({
+			language: 'en',
+			type: 'question',
+			tense: 'past',
+			count: SAMPLE
+		})) {
+			assert.match(sentence, /^(Did|Was) /, sentence);
 		}
 
 		// German moves its finite verb to the front, so the question opens on the
@@ -1645,9 +1720,14 @@ describe('Sentence', () => {
 			style: 'plain',
 			count: SAMPLE
 		})) {
-			const first = sentence.split(' ')[0].toLowerCase();
+			// A reflexive verb is two words, `belebte sich`, so the sentence is matched
+			// against the pool entries rather than split on its first space.
+			const lower = sentence.toLowerCase();
 
-			assert.ok(verbs.has(first) || first === 'ist', `de: ${sentence}`);
+			assert.ok(
+				[...verbs, 'ist', 'war'].some((verb) => lower.startsWith(verb + ' ')),
+				`de: ${sentence}`
+			);
 		}
 	});
 
@@ -1729,6 +1809,7 @@ describe('Sentence', () => {
 				include: '달린다',
 				type: 'question',
 				style,
+				tense: 'present',
 				count: 30
 			})) {
 				assert.ok(
@@ -1744,9 +1825,32 @@ describe('Sentence', () => {
 			include: 'runs',
 			type: 'question',
 			style: 'plain',
+			tense: 'present',
 			count: 30
 		})) {
 			assert.match(sentence, /\brun\b/, sentence);
+		}
+
+		// And the past is one more form it is translated into.
+		for (const sentence of randSentence({
+			language: 'ko',
+			include: '달린다',
+			tense: 'past',
+			style: 'plain',
+			type: 'statement',
+			count: 30
+		})) {
+			assert.ok(sentence.includes('달렸다'), sentence);
+		}
+
+		for (const sentence of randSentence({
+			language: 'en',
+			include: 'runs',
+			tense: 'past',
+			type: 'statement',
+			count: 30
+		})) {
+			assert.match(sentence, /\bran\b/, sentence);
 		}
 	});
 
@@ -1879,11 +1983,14 @@ describe('Sentence', () => {
 		const CLOSES: Partial<Record<WordLanguage, Partial<Record<SentenceStyle, RegExp>>>> = {
 			ko: { polite: /(요|죠)[.?!…”’]$/, formal: /(니다|니까)[.?!…”’]$/ },
 			// A Japanese verb closes on ます and an adjective on です.
-			ja: { polite: /(ます|です)か?[。？！…」』]$/, formal: /(ます|です)か?[。？！…」』]$/ }
+			ja: {
+				polite: /(ます|ました|です|でした)か?[。？！…」』]$/,
+				formal: /(ます|ました|です|でした)か?[。？！…」』]$/
+			}
 		};
 		const ADDRESSED: Partial<Record<WordLanguage, RegExp>> = {
 			ko: /(요|죠|니다|니까)[.?!…”’]$/,
-			ja: /(ます|です)か?[。？！…」』]$/
+			ja: /(ます|ました|です|でした)か?[。？！…」』]$/
 		};
 
 		for (const language of WORD_LANGUAGES) {
@@ -2281,6 +2388,427 @@ describe('Sentence', () => {
 
 		assert.strictEqual(allMin, Math.min(...WORD_LANGUAGES.map((l) => sentenceLengthRange(l)[0])));
 		assert.strictEqual(allMax, Math.max(...WORD_LANGUAGES.map((l) => sentenceLengthRange(l)[1])));
+	});
+
+	it('`tense` decides when it happened, and a result keeps one tense', () => {
+		for (const language of WORD_LANGUAGES) {
+			const data = SENTENCE_DATA[language];
+			const groups: Group[] = [...data.verbs, ...data.states];
+			const present = new Set(
+				groups.flatMap((group) => [
+					...group.words,
+					...endings(Object.values(group.forms ?? {}).flat())
+				])
+			);
+			// A language whose adjectives do not change for the past writes them as they
+			// are and puts the tense on the copula in front.
+			const statesChange = data.states.some((group) => group.past);
+			// Every past form, agreed for every gender where the language's past agrees.
+			const past = new Set(
+				groups
+					.flatMap(pastForms)
+					.flatMap((word) => (data.pastAgreement ? agreedBy(data.pastAgreement, word) : [word]))
+			);
+			// A word the present and the past share — English `spread` — says nothing
+			// about the tense, so only the words that belong to one of them are read.
+			const pastOnly = new Set([...past].filter((word) => !present.has(word)));
+			const marks = data.pastMark !== undefined;
+
+			for (const detail of sentenceDetails({ language, tense: 'past', count: 120 })) {
+				assert.strictEqual(detail.tense, 'past');
+
+				for (let i = 0; i < detail.phrases.length; i += 1) {
+					const slot = detail.slots[i];
+
+					if (slot !== 'verb' && slot !== 'state') {
+						continue;
+					}
+
+					const phrase = detail.phrases[i];
+					const written = i === 0 ? phrase.charAt(0).toLowerCase() + phrase.slice(1) : phrase;
+
+					if (marks) {
+						// Chinese and Vietnamese mark the past beside the verb and leave the
+						// verb itself as it was.
+						if (slot === 'verb') {
+							const head = data.pastMark?.head ? data.pastMark.head + data.space : '';
+							const tail = data.pastMark?.tail ?? '';
+
+							assert.ok(
+								written.startsWith(head) && written.endsWith(tail),
+								`${language}: '${phrase}' carries no past mark (${detail.sentence})`
+							);
+							assert.ok(
+								present.has(written.slice(head.length, written.length - tail.length)),
+								`${language}: '${phrase}' is not a verb the pools hold (${detail.sentence})`
+							);
+						}
+
+						continue;
+					}
+
+					const usable = slot === 'state' && !statesChange ? present : past;
+					const inflected = data.predicateAgrees
+						? inflectedFor(language, [...usable])
+						: [...usable];
+
+					assert.ok(
+						inflected.includes(written) || inflected.includes(phrase) || present.has(written),
+						`${language}: '${phrase}' is not a past ${slot} (${detail.sentence})`
+					);
+
+					if (slot === 'verb' && groups.some((g) => g.past)) {
+						assert.ok(
+							!present.has(written) || past.has(written),
+							`${language}: '${phrase}' is a present verb in a past sentence (${detail.sentence})`
+						);
+					}
+				}
+			}
+
+			// The present never reaches for a past form.
+			for (const detail of sentenceDetails({ language, tense: 'present', count: 60 })) {
+				assert.strictEqual(detail.tense, 'present');
+
+				for (let i = 0; i < detail.phrases.length; i += 1) {
+					if (detail.slots[i] !== 'verb') {
+						continue;
+					}
+
+					const phrase = detail.phrases[i];
+					const written = i === 0 ? phrase.charAt(0).toLowerCase() + phrase.slice(1) : phrase;
+
+					assert.ok(
+						!pastOnly.has(written),
+						`${language}: '${phrase}' is a past verb in a present sentence (${detail.sentence})`
+					);
+				}
+			}
+		}
+
+		// Left out, the tense is drawn, and both come out.
+		const seen = new Set<SentenceTense>(
+			randSentence({ language: 'ko', count: 100, output: 'detail' }).map((detail) => detail.tense)
+		);
+
+		assert.deepStrictEqual([...seen].sort(), ['past', 'present']);
+
+		// And a paragraph is told in one tense from start to end.
+		for (const detail of randSentence({
+			language: 'ko',
+			sentences: 4,
+			count: 80,
+			output: 'detail'
+		})) {
+			const closes = detail.sentences.map((sentence) =>
+				/(었|았|였|렸|웠|쳤|켰|졌|랐|썼|셨|팠|꿨|펐|뻤|왔|갔|났|샀|봤|줬|섰|탔|켯)/.test(sentence)
+			);
+
+			if (detail.tense === 'present') {
+				assert.ok(
+					!closes.some(Boolean),
+					`a present paragraph slipped into the past: ${detail.sentence}`
+				);
+			}
+		}
+	});
+
+	it('more than one sentence tells a story, and one sentence tells none', () => {
+		for (const language of WORD_LANGUAGES) {
+			for (const detail of sentenceDetails({ language, sentences: 4, count: 40 })) {
+				assert.notStrictEqual(detail.story, null, detail.sentence);
+				assert.strictEqual(detail.sentences.length, 4, detail.sentence);
+			}
+
+			for (const detail of sentenceDetails({ language, count: 20 })) {
+				assert.strictEqual(detail.story, null, detail.sentence);
+			}
+		}
+
+		// A story the caller named is the one told, where the language can tell it.
+		for (const detail of sentenceDetails({
+			language: 'ko',
+			sentences: 3,
+			story: 'errand',
+			count: 40
+		})) {
+			assert.strictEqual(detail.story, 'errand', detail.sentence);
+		}
+
+		// German and Russian carry no object, so they tell the stories with nothing in
+		// the hero's hands — and they still tell one.
+		const empty: SentenceStory[] = ['stroll', 'outing', 'evening', 'passage'];
+
+		for (const language of ['de', 'ru'] as WordLanguage[]) {
+			for (const detail of sentenceDetails({ language, sentences: 3, count: 40 })) {
+				assert.ok(
+					empty.includes(detail.story as SentenceStory),
+					`${language}: ${detail.story} (${detail.sentence})`
+				);
+			}
+		}
+
+		// The thing a story is about is one thing throughout: every object phrase of
+		// a result reads as the same noun.
+		for (const language of WORD_LANGUAGES) {
+			for (const detail of sentenceDetails({ language, sentences: 5, count: 60 })) {
+				const objects = detail.phrases
+					.filter((_, i) => detail.slots[i] === 'object')
+					.map((phrase) => nounsIn(language, phrase));
+
+				for (const found of objects.slice(1)) {
+					assert.ok(
+						[...found].some((noun) => objects[0].has(noun)),
+						`${language}: the thing changed (${detail.sentence})`
+					);
+				}
+			}
+		}
+
+		// A story's required steps alone hold together, in every language, about every
+		// hero it names — and every class of noun has a story to be in.
+		for (const language of WORD_LANGUAGES) {
+			const data = SENTENCE_DATA[language];
+			const covered = new Set<NounClass>();
+
+			for (const story of STORIES) {
+				for (const hero of heroClassesFor(data, story, story.hero)) {
+					covered.add(hero);
+
+					if (story.item) {
+						assert.ok(
+							itemThemesFor(data, story, hero).length > 0,
+							`${language}: ${story.name} about a ${hero} has nothing to be about`
+						);
+					} else {
+						assert.ok(
+							tellable(data, story, hero, null),
+							`${language}: ${story.name} about a ${hero}`
+						);
+					}
+				}
+			}
+
+			for (const theme of WORD_THEMES) {
+				assert.ok(
+					covered.has(THEME_CLASS[theme]),
+					`${language}: no story is about a ${THEME_CLASS[theme]}`
+				);
+			}
+		}
+	});
+
+	it('a story moves its day forward, and never back', () => {
+		for (const language of WORD_LANGUAGES) {
+			const day = SENTENCE_DATA[language].times.day;
+			let moved = 0;
+
+			for (const detail of sentenceDetails({ language, sentences: 6, count: 80 })) {
+				let last = -1;
+
+				for (let i = 0; i < detail.phrases.length; i += 1) {
+					if (detail.slots[i] !== 'time') {
+						continue;
+					}
+
+					const phrase = detail.phrases[i];
+					const written = phrase.charAt(0).toLowerCase() + phrase.slice(1);
+					const at = Math.max(day.indexOf(phrase), day.indexOf(written));
+
+					if (at < 0) {
+						continue;
+					}
+
+					assert.ok(
+						at > last,
+						`${language}: the day went back to '${phrase}' (${detail.sentence})`
+					);
+					moved += last >= 0 ? 1 : 0;
+					last = at;
+				}
+			}
+
+			assert.ok(moved > 0, `${language}: no story named two phases of its day`);
+		}
+	});
+
+	it('two neighbouring actions are sometimes written as one sentence', () => {
+		for (const language of WORD_LANGUAGES) {
+			const data = SENTENCE_DATA[language];
+
+			if (!data.join) {
+				continue;
+			}
+
+			let joined = 0;
+
+			for (const detail of sentenceDetails({ language, sentences: 4, count: 80 })) {
+				const belongs = sentenceOf(detail);
+
+				for (let at = 0; at < detail.sentences.length; at += 1) {
+					const predicates = detail.slots.filter(
+						(slot, i) => belongs[i] === at && (slot === 'verb' || slot === 'state')
+					);
+
+					if (predicates.length === 2) {
+						joined += 1;
+
+						if (data.join.word) {
+							assert.ok(
+								detail.sentences[at].includes(data.join.word),
+								`${language}: two clauses and no '${data.join.word}' (${detail.sentences[at]})`
+							);
+						}
+					}
+
+					assert.ok(predicates.length <= 2, `${language}: ${detail.sentences[at]}`);
+				}
+			}
+
+			assert.ok(joined > 0, `${language} never joined two clauses`);
+		}
+
+		// German declares no join, and never writes two clauses.
+		for (const detail of sentenceDetails({ language: 'de', sentences: 4, count: 40 })) {
+			const belongs = sentenceOf(detail);
+
+			for (let at = 0; at < detail.sentences.length; at += 1) {
+				const predicates = detail.slots.filter(
+					(slot, i) => belongs[i] === at && (slot === 'verb' || slot === 'state')
+				);
+
+				assert.strictEqual(predicates.length, 1, `de: ${detail.sentences[at]}`);
+			}
+		}
+	});
+
+	it('a destination follows only a verb that goes somewhere', () => {
+		for (const language of WORD_LANGUAGES) {
+			const data = SENTENCE_DATA[language];
+			const going = new Set(
+				data.verbs
+					.filter((group: VerbGroup) => group.requires === 'destination')
+					.flatMap((group) => everyForm(group))
+			);
+			const carries = data.frames.some((frame) =>
+				frame.parts.some((part) => part.slot === 'destination')
+			);
+
+			if (!carries) {
+				continue;
+			}
+
+			let seen = 0;
+
+			for (const detail of sentenceDetails({ language, slots: 'destination', count: 120 })) {
+				const at = detail.slots.indexOf('destination');
+				const verb = detail.slots.indexOf('verb');
+
+				if (at < 0 || verb < 0) {
+					continue;
+				}
+
+				seen += 1;
+
+				const phrase = detail.phrases[verb];
+				const written = verb === 0 ? phrase.charAt(0).toLowerCase() + phrase.slice(1) : phrase;
+
+				assert.ok(
+					going.has(written) || going.has(phrase),
+					`${language}: '${phrase}' goes nowhere, and has a destination (${detail.sentence})`
+				);
+			}
+
+			assert.ok(seen > 0, `${language} wrote no destination`);
+		}
+	});
+
+	it('a modifier fits the noun it describes', () => {
+		for (const language of WORD_LANGUAGES) {
+			const data = SENTENCE_DATA[language];
+			const space = data.space;
+			const nouns = poolFor(language, 'subject');
+			// Every form each group's words can take, agreed for every gender.
+			const groups = data.modifiers.map((group) => ({
+				group,
+				words: new Set(inflectedFor(language, group.words).map((word) => plain(language, word)))
+			}));
+			let checked = 0;
+
+			for (const detail of sentenceDetails({ language, count: 150 })) {
+				for (let i = 0; i < detail.phrases.length; i += 1) {
+					if (!['subject', 'object', 'place', 'destination'].includes(detail.slots[i])) {
+						continue;
+					}
+
+					let rest =
+						i === 0
+							? detail.phrases[i].charAt(0).toLowerCase() + detail.phrases[i].slice(1)
+							: detail.phrases[i];
+
+					for (const article of articlesFor(language)) {
+						const opening = article.endsWith("'") ? article : article + space;
+
+						if (rest.startsWith(opening)) {
+							rest = rest.slice(opening.length);
+							break;
+						}
+					}
+
+					if (nouns.has(rest)) {
+						continue;
+					}
+
+					// Every way the phrase splits into a modifier and a noun the pools hold.
+					// More than one, because a word can be both — so the phrase is right
+					// when one of its readings is.
+					const readings: [string, string][] = [];
+					const every = new Set(groups.flatMap(({ words }) => [...words]));
+
+					for (let at = 1; at < rest.length; at += 1) {
+						if (space && rest.slice(at, at + space.length) !== space) {
+							continue;
+						}
+
+						const left = rest.slice(0, at);
+						const right = rest.slice(at + space.length);
+
+						if (every.has(left) && nouns.has(right)) {
+							readings.push([left, right]);
+						}
+
+						if (nouns.has(left) && every.has(right)) {
+							readings.push([right, left]);
+						}
+					}
+
+					if (!readings.length) {
+						continue;
+					}
+
+					checked += 1;
+
+					assert.ok(
+						readings.some(([modifier, noun]) => {
+							const theme = themeOfNoun(language, noun);
+
+							return (
+								theme !== null &&
+								groups.some(
+									({ group, words }) =>
+										words.has(modifier) &&
+										group.subject.includes(THEME_CLASS[theme]) &&
+										(!group.themes || group.themes.includes(theme))
+								)
+							);
+						}),
+						`${language}: '${rest}' has no modifier that fits its noun (${detail.sentence})`
+					);
+				}
+			}
+
+			assert.ok(checked > 0, `${language}: no modifier was read`);
+		}
 	});
 
 	it('every noun class the frames can ask for has a predicate to go with it', () => {
