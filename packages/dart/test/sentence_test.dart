@@ -2724,8 +2724,19 @@ void main() {
         WordLanguage.it,
       ]);
 
+      // And it stands beside a verb that handles one: what is found, taken,
+      // carried, hidden or lost — never remembered.
+      const moneyFields = <VerbField>[
+        VerbField.find,
+        VerbField.take,
+        VerbField.carry,
+        VerbField.hide,
+        VerbField.lose,
+      ];
+
       for (final language in paying) {
-        final numeral = sentenceData[language]!.numeral!;
+        final data = sentenceData[language]!;
+        final numeral = data.numeral!;
         final amounts = numeral.amounts.toSet();
 
         for (final detail in randSentenceDetails(
@@ -2737,8 +2748,18 @@ void main() {
           count: sample,
         )) {
           final at = detail.slots.indexOf(SentenceSlot.money);
+          final verb = detail.phrases[detail.slots.indexOf(SentenceSlot.verb)];
 
           expect(at, greaterThanOrEqualTo(0), reason: '$language: ${detail.sentence}');
+          expect(
+            data.verbs.any(
+              (group) =>
+                  moneyFields.contains(group.field) &&
+                  everyForm(group.words, group.forms, group.past).contains(verb),
+            ),
+            isTrue,
+            reason: "$language: '$verb' does not handle money (${detail.sentence})",
+          );
 
           final phrase = detail.phrases[at];
 
@@ -2770,36 +2791,6 @@ void main() {
           count: 30,
         )) {
           expect(detail.slots, isNot(contains(SentenceSlot.money)), reason: detail.sentence);
-        }
-      }
-    });
-
-    test('an amount stands where the verbs that take an idea can take it', () {
-      // Money is an idea, which is what decides the verbs it can stand beside.
-      for (final language in wordLanguages) {
-        final data = sentenceData[language]!;
-
-        for (final detail in randSentenceDetails(
-          language: language,
-          type: statementOnly,
-          includeName: false,
-          tense: SentenceTense.present,
-          slots: <SentenceSlot>{SentenceSlot.money},
-          count: 60,
-        )) {
-          final at = detail.slots.indexOf(SentenceSlot.verb);
-
-          if (at < 0 || !detail.slots.contains(SentenceSlot.money)) continue;
-
-          final groups = data.verbs.where(
-            (group) => everyForm(group.words, group.forms).contains(detail.phrases[at]),
-          );
-
-          expect(
-            groups.any((group) => group.object?.contains(NounClass.idea) ?? false),
-            isTrue,
-            reason: '$language: ${detail.phrases[at]} takes no idea (${detail.sentence})',
-          );
         }
       }
     });

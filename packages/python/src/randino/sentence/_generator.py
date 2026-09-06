@@ -138,11 +138,11 @@ NOUN_SLOTS: tuple[SentenceSlot, ...] = ("subject", "object", "place", "destinati
 UNSTORIED: tuple[SentenceSlot, ...] = ("quantity", "money", "date", "clock")
 """The slots a story never writes: an amount, a count, a date and a clock."""
 
-MONEY_CLASS: NounClass = "idea"
-"""The class money belongs to, which decides the verbs it can stand beside.
+MONEY_FIELDS: tuple[VerbField, ...] = ("find", "take", "carry", "hide", "lose")
+"""The fields an amount of money stands beside: what is found, taken, carried, hidden, lost.
 
-An amount is an idea, so the verbs that remember and count one are the verbs that can
-take it.
+An amount used to go with every verb whose object may be an idea, which is how `remembers
+5,000 dollars` came out.
 """
 
 
@@ -1591,7 +1591,7 @@ def _verb_groups_for(
             continue
         if wants_destination and group.requires != "destination":
             continue
-        if wants_money and MONEY_CLASS not in (group.object or ()):
+        if wants_money and (group.object is None or group.field not in MONEY_FIELDS):
             continue
         if verb is not None and verb.word not in group.words:
             continue

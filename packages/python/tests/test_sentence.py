@@ -2262,8 +2262,13 @@ def test_slots_money_writes_an_amount_the_language_actually_writes() -> None:
 
     assert paying == ["en", "ko", "ja", "zh", "vi", "es", "it"]
 
+    # And it stands beside a verb that handles one: what is found, taken, carried, hidden
+    # or lost — never remembered.
+    money_fields = ("find", "take", "carry", "hide", "lose")
+
     for language in paying:
-        numeral = SENTENCE_DATA[language].numeral
+        data = SENTENCE_DATA[language]
+        numeral = data.numeral
         assert numeral is not None
         amounts = set(numeral.amounts)
 
@@ -2277,6 +2282,14 @@ def test_slots_money_writes_an_amount_the_language_actually_writes() -> None:
             output="detail",
         ):
             assert "money" in detail.slots, f"{language}: {detail.sentence}"
+
+            verb = detail.phrases[detail.slots.index("verb")]
+
+            assert any(
+                group.field in money_fields
+                and verb in every_form(group.words, group.forms, group.past)
+                for group in data.verbs
+            ), f"{language}: '{verb}' does not handle money ({detail.sentence})"
 
             phrase = detail.phrases[detail.slots.index("money")]
 
@@ -2301,31 +2314,6 @@ def test_slots_money_writes_an_amount_the_language_actually_writes() -> None:
             output="detail",
         ):
             assert "money" not in detail.slots, detail.sentence
-
-
-def test_an_amount_stands_where_the_verbs_that_take_an_idea_can_take_it() -> None:
-    # Money is an idea, which is what decides the verbs it can stand beside.
-    for language in WORD_LANGUAGES:
-        data = SENTENCE_DATA[language]
-
-        for detail in rand_sentence(
-            type="statement",
-            include_name=False,
-            tense="present",
-            language=language,
-            slots="money",
-            count=60,
-            output="detail",
-        ):
-            if "verb" not in detail.slots or "money" not in detail.slots:
-                continue
-
-            verb = detail.phrases[detail.slots.index("verb")]
-            groups = [group for group in data.verbs if verb in every_form(group.words, group.forms)]
-
-            assert any("idea" in (group.object or ()) for group in groups), (
-                f"{language}: {verb} takes no idea ({detail.sentence})"
-            )
 
 
 def test_a_grouped_number_is_written_the_way_the_language_groups_it() -> None:

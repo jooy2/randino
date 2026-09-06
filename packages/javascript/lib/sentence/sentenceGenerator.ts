@@ -116,11 +116,11 @@ function isNounSlot(slot: SentenceSlot): boolean {
 }
 
 /**
- * The class money belongs to, which is what decides the verbs it can stand
- * beside: an amount is an idea, so the verbs that remember and count one are the
- * verbs that can take it.
+ * The fields an amount of money stands beside: what is found, taken, carried,
+ * hidden and lost. An amount used to go with every verb whose object may be an
+ * idea, which is how `remembers 5,000 dollars` came out.
  */
-const MONEY_CLASS: NounClass = 'idea';
+const MONEY_FIELDS: readonly VerbField[] = ['find', 'take', 'carry', 'hide', 'lose'];
 
 /**
  * Whether a shape has anywhere a person's name could stand. A counted shape
@@ -1347,7 +1347,7 @@ function verbGroupsFor(
 			return false;
 		}
 
-		if (wantsMoney && !group.object?.includes(MONEY_CLASS)) {
+		if (wantsMoney && (!group.object || !MONEY_FIELDS.includes(group.field))) {
 			return false;
 		}
 

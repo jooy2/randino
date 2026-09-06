@@ -26,7 +26,7 @@ import { agree } from '../dist/word/wordGenerator.js';
 import type { WordGender } from '../dist/word/data/types.js';
 import { NAME_DATA } from '../dist/name/data/index.js';
 import { SENTENCE_DATA, STORIES, THEME_CLASS } from '../dist/sentence/data/index.js';
-import type { NounClass, VerbGroup } from '../dist/sentence/data/types.js';
+import type { NounClass, VerbField, VerbGroup } from '../dist/sentence/data/types.js';
 import { shapeOf } from '../dist/sentence/sentenceGenerator.js';
 import { heroClassesFor, itemThemesFor, propThemesFor, tellable } from '../dist/sentence/story.js';
 
@@ -2516,14 +2516,26 @@ describe('Sentence', () => {
 
 		assert.deepStrictEqual([...PAYING], ['en', 'ko', 'ja', 'zh', 'vi', 'es', 'it']);
 
+		// And it stands beside a verb that handles one: what is found, taken, carried,
+		// hidden or lost — never remembered.
+		const MONEY_FIELDS: readonly VerbField[] = ['find', 'take', 'carry', 'hide', 'lose'];
+
 		for (const language of PAYING) {
-			const numeral = SENTENCE_DATA[language].numeral!;
+			const data = SENTENCE_DATA[language];
+			const numeral = data.numeral!;
 			const amounts = new Set(numeral.amounts);
 
 			for (const detail of sentenceDetails({ language, slots: 'money', count: SAMPLE })) {
 				const at = detail.slots.indexOf('money');
+				const verb = detail.phrases[detail.slots.indexOf('verb')];
 
 				assert.ok(at >= 0, `${language}: ${detail.sentence}`);
+				assert.ok(
+					data.verbs.some(
+						(group) => MONEY_FIELDS.includes(group.field) && everyForm(group).includes(verb)
+					),
+					`${language}: '${verb}' does not handle money (${detail.sentence})`
+				);
 
 				const phrase = detail.phrases[at];
 
@@ -2542,28 +2554,6 @@ describe('Sentence', () => {
 		for (const language of ['de', 'ru'] as WordLanguage[]) {
 			for (const detail of sentenceDetails({ language, slots: 'money', count: 30 })) {
 				assert.ok(!detail.slots.includes('money'), detail.sentence);
-			}
-		}
-	});
-
-	it('an amount stands where the verbs that take an idea can take it', () => {
-		// Money is an idea, which is what decides the verbs it can stand beside.
-		for (const language of WORD_LANGUAGES) {
-			const data = SENTENCE_DATA[language];
-
-			for (const detail of sentenceDetails({ language, slots: 'money', count: 60 })) {
-				const at = detail.slots.indexOf('verb');
-
-				if (at < 0 || !detail.slots.includes('money')) {
-					continue;
-				}
-
-				const groups = data.verbs.filter((group) => everyForm(group).includes(detail.phrases[at]));
-
-				assert.ok(
-					groups.some((group) => group.object?.includes('idea')),
-					`${language}: ${detail.phrases[at]} takes no idea (${detail.sentence})`
-				);
 			}
 		}
 	});

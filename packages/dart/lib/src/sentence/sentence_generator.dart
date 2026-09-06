@@ -77,12 +77,16 @@ const List<SentenceSlot> _unstoried = <SentenceSlot>[
   SentenceSlot.clock,
 ];
 
-/// The class money belongs to, which is what decides the verbs it can stand
-/// beside.
-///
-/// An amount is an idea, so the verbs that remember and count one are the verbs
-/// that can take it.
-const NounClass _moneyClass = NounClass.idea;
+/// The fields an amount of money stands beside: what is found, taken, carried,
+/// hidden and lost. An amount used to go with every verb whose object may be
+/// an idea, which is how `remembers 5,000 dollars` came out.
+const List<VerbField> _moneyFields = <VerbField>[
+  VerbField.find,
+  VerbField.take,
+  VerbField.carry,
+  VerbField.hide,
+  VerbField.lose,
+];
 
 /// Whether a shape has anywhere a person's name could stand.
 ///
@@ -1501,7 +1505,9 @@ List<VerbGroup> _verbGroupsFor(
 
         if (requires != null && !frame.parts.any((part) => part.slot == requires)) return false;
         if (wantsDestination && requires != SentenceSlot.destination) return false;
-        if (wantsMoney && !(group.object?.contains(_moneyClass) ?? false)) return false;
+        if (wantsMoney && (group.object == null || !_moneyFields.contains(group.field))) {
+          return false;
+        }
         if (verb != null && !group.words.contains(verb.word)) return false;
 
         final subjectTheme = subject?.theme;
