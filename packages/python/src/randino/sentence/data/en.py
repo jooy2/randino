@@ -922,6 +922,14 @@ EN = SentenceLanguageData(
             brisket ribeye sirloin tenderloin sausage bacon meatball cutlet schnitzel kebab skewer
             tofu
         """),
+        "placeless": words("""
+            wave tide boulder pebble ember cinder earthquake echo avalanche driftwood fumarole
+            stalactite stalagmite geyser star comet meteor corona zenith eclipse satellite orbit
+            gravity sunspot lightyear stardust supernova quasar pulsar moonrise solarflare
+            perihelion aphelion apogee perigee nadir azimuth parallax redshift starlore cosmology
+            astronomy telescopy gravitas lunation sidereal ecliptic meridian solarsail starburst
+            skyline
+        """),
     },
     interjections=words("""
         oh, ah, wow, well, look, goodness, my, indeed, honestly, gosh, hey, whoa, dear_me,
@@ -937,13 +945,11 @@ EN = SentenceLanguageData(
             wharf quay jetty byway boulevard esplanade rampart drawbridge causeway embankment levee
             viaduct bandstand portico hillside mountain sandbank glacier reef prairie plateau steppe
             savanna sandbar shoal seabed bedrock crag spire pinnacle headland peninsula islet mesa
-            butte moraine scree talus overhang moon planet satellite asteroid moonscape exoplanet
-            skyline
+            butte moraine scree talus overhang moon planet asteroid moonscape exoplanet
         """),
         "at": words("""
             market station airport harbor lighthouse crossroads roundabout waypoint bazaar
-            marketplace depot terminal campsite forum agora harborside gatehouse weir zenith nadir
-            perihelion aphelion apogee perigee equator meridian
+            marketplace depot terminal campsite forum agora harborside gatehouse weir equator
         """),
         "under": words("""
             sky starlight moonbeam firmament starfield fullmoon newmoon halfmoon crescent overpass

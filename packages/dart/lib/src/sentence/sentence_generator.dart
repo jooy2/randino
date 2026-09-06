@@ -1155,6 +1155,7 @@ final Map<Object, Map<WordTheme, WordPool>> _subjectPoolCache =
     <Object, Map<WordTheme, WordPool>>{};
 final Map<VerbGroup, Map<WordTheme, WordPool>> _objectPoolCache =
     <VerbGroup, Map<WordTheme, WordPool>>{};
+final Map<String, WordPool> _placePoolCache = <String, WordPool>{};
 final Map<WordLanguage, Map<SentenceSlot, LengthRange>> _boundsCache =
     <WordLanguage, Map<SentenceSlot, LengthRange>>{};
 final Map<WordLanguage, LengthRange> _modifierBounds = <WordLanguage, LengthRange>{};
@@ -1642,6 +1643,36 @@ WordPool _subjectPoolFor(
   byTheme[theme] = usable;
 
   return usable;
+}
+
+/// The nouns of a theme a place or a destination may be drawn from: the ones a
+/// sentence can happen in.
+///
+/// A wave, a comet and a lightyear are `nature` and `space` the way a river and
+/// a moon are, and their language lists them [NounTrait.placeless]. The whole
+/// theme where nothing is left, which no pool comes to.
+WordPool _placePoolFor(WordLanguage language, SentenceLanguageData data, WordTheme theme) {
+  final pool = _nounsOf(language, theme);
+  final placeless = data.traits?[NounTrait.placeless];
+
+  if (placeless == null) return pool;
+
+  final key = '${language.name}:${theme.name}';
+  final cached = _placePoolCache[key];
+
+  if (cached != null) {
+    return cached;
+  }
+
+  final lexicon = wordData[language]!;
+  final usable = pool
+      .where((entry) => !placeless.contains(_plain(lexicon, entry)))
+      .toList(growable: false);
+  final narrowed = usable.isEmpty ? pool : usable;
+
+  _placePoolCache[key] = narrowed;
+
+  return narrowed;
 }
 
 /// The noun a sentence's subject is already decided to be, for the groups to be
@@ -2528,6 +2559,8 @@ _Built _compose(
                 ? _subjectPoolFor(language, data, group, theme)
                 : part.slot == SentenceSlot.object
                 ? _objectPoolAvoiding(language, data, group, theme, beat?.avoid ?? const <String>[])
+                : part.slot == SentenceSlot.place || part.slot == SentenceSlot.destination
+                ? _placePoolFor(language, data, theme)
                 : null,
       );
 
@@ -3847,7 +3880,7 @@ _Result? _tellStory(_Telling telling) {
       final lexicon = wordData[language]!;
 
       roles.place = _Requirement(
-        _plain(lexicon, pick(_nounsOf(language, theme))),
+        _plain(lexicon, pick(_placePoolFor(language, data, theme))),
         const <SentenceSlot?>[SentenceSlot.place],
         theme: theme,
       );

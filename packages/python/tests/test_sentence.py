@@ -1447,6 +1447,37 @@ def test_a_place_takes_the_preposition_it_takes() -> None:
             ), f"{language}: '{phrase}' takes {'/'.join(expected)} ({detail.sentence})"
 
 
+def test_a_sentence_happens_somewhere() -> None:
+    # `nature` and `space` are the `place` class beside `place` itself, and a wave, a comet
+    # and a lightyear are in them beside a river and a moon. A language with a place shape
+    # lists the ones a sentence cannot happen in as `placeless`, and no place or destination
+    # is drawn from them.
+    for language in WORD_LANGUAGES:
+        data = SENTENCE_DATA[language]
+        slots = {part.slot for frame in data.frames for part in frame.parts}
+        placeless = set((data.traits or {}).get("placeless") or ())
+
+        if "place" not in slots and "destination" not in slots:
+            assert not placeless, f"{language} lists placeless nouns and writes no place"
+            continue
+
+        assert placeless, f"{language} lists nothing placeless"
+
+        for sentences in (1, 3):
+            for detail in rand_sentence(
+                language=language, count=SAMPLE, sentences=sentences, output="detail"
+            ):
+                for phrase, slot in zip(detail.phrases, detail.slots, strict=True):
+                    if slot not in ("place", "destination"):
+                        continue
+
+                    found = nouns_in(language, phrase)
+
+                    assert not found or any(noun not in placeless for noun in found), (
+                        f"{language}: '{phrase}' is placeless ({detail.sentence})"
+                    )
+
+
 def test_a_lifeless_word_of_a_creature_theme_never_does_anything() -> None:
     # `myth` holds spells and amulets beside dragons and elves, and a spell that chooses a
     # gouge is what the class alone allowed. A language lists them as `lifeless`, and a

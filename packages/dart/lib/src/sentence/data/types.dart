@@ -685,6 +685,10 @@ enum NounTrait {
 
   /// What `roasts` and `slices` take: a potato, a steak, a fillet.
   raw,
+
+  /// A word of the `place` class that is no place — a wave, a comet, a
+  /// lightyear — which a sentence never happens in and nobody goes to.
+  placeless,
 }
 
 /// What a connective claims about the sentence before it.

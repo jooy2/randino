@@ -403,6 +403,13 @@ export const VI: SentenceLanguageData = {
 		// A word of a creature theme that is no creature: it takes no verb and no state.
 		lifeless: words(`
 			phép_thuật ma_lực thần_chú lời_nguyền tiên_tri sấm_truyền kết_giới bùa_hộ_mệnh phong_ấn ảo_giác ma_thuật hình_nhân
+		`),
+		// A word of the place class that is no place.
+		placeless: words(`
+			cát đá sỏi động_đất san_hô mạch_nước măng_đá nhũ_đá bóng âm_vang hương lửa than_hồng dòng_chảy
+			sao mặt_trời sao_chổi sao_băng cực_quang bụi_sao nhật_thực nguyệt_thực thiên_đỉnh vệ_tinh cụm_sao chòm_sao quỹ_đạo
+			trọng_lực tự_quay nhật_hoa vết_đen gió_mặt_trời năm_ánh_sáng thiên_thể liên_sao định_tinh thiên_cầu hoàng_đạo
+			mưa_sao_băng bụi_vũ_trụ trăng_khuyết trăng_tròn trăng_non ánh_trăng ánh_sao sao_bắc_cực sao_hôm sao_mai
 		`)
 	},
 	interjections: words(`

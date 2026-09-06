@@ -1596,6 +1596,42 @@ describe('Sentence', () => {
 		}
 	});
 
+	it('a sentence happens somewhere', () => {
+		// `nature` and `space` are the `place` class beside `place` itself, and a
+		// wave, a comet and a lightyear are in them beside a river and a moon. A
+		// language with a place shape lists the ones a sentence cannot happen in as
+		// `placeless`, and no place or destination is drawn from them.
+		for (const language of WORD_LANGUAGES) {
+			const data = SENTENCE_DATA[language];
+			const slots = new Set(data.frames.flatMap((frame) => frame.parts.map((part) => part.slot)));
+			const placeless = new Set(data.traits?.placeless ?? []);
+
+			if (!slots.has('place') && !slots.has('destination')) {
+				assert.equal(placeless.size, 0, `${language} lists placeless nouns and writes no place`);
+				continue;
+			}
+
+			assert.ok(placeless.size > 0, `${language} lists nothing placeless`);
+
+			for (const sentences of [1, 3]) {
+				for (const detail of sentenceDetails({ language, count: SAMPLE, sentences })) {
+					detail.phrases.forEach((phrase, i) => {
+						if (detail.slots[i] !== 'place' && detail.slots[i] !== 'destination') {
+							return;
+						}
+
+						const found = [...nounsIn(language, phrase)];
+
+						assert.ok(
+							found.length === 0 || found.some((noun) => !placeless.has(noun)),
+							`${language}: '${phrase}' is placeless (${detail.sentence})`
+						);
+					});
+				}
+			}
+		}
+	});
+
 	it('a person in a story sometimes speaks for themselves, and nobody else does', () => {
 		// A state sentence about a person may be a line they say or think — quoted,
 		// in the first person, never the first sentence, never more than two — where

@@ -960,6 +960,7 @@ const nounCache = new Map<string, WordPool>();
  */
 const subjectPoolCache = new WeakMap<VerbGroup | StateGroup, Map<WordTheme, WordPool>>();
 const objectPoolCache = new WeakMap<VerbGroup, Map<WordTheme, WordPool>>();
+const placePoolCache = new Map<string, WordPool>();
 const boundsCache = new Map<string, Record<string, readonly [number, number]>>();
 const spanCache = new Map<string, readonly [number, number]>();
 const agreedCache = new Map<string, readonly string[]>();
@@ -1505,6 +1506,40 @@ function subjectPoolFor(
 	byTheme.set(theme, usable);
 
 	return usable;
+}
+
+/**
+ * The nouns of a theme a place or a destination may be drawn from: the ones a
+ * sentence can happen in. A wave, a comet and a lightyear are `nature` and
+ * `space` the way a river and a moon are, and their language lists them
+ * `placeless`. The whole theme where nothing is left, which no pool comes to.
+ */
+function placePoolFor(
+	language: WordLanguage,
+	data: SentenceLanguageData,
+	theme: WordTheme
+): WordPool {
+	const pool = nounsOf(language, theme);
+	const placeless = data.traits?.placeless;
+
+	if (!placeless) {
+		return pool;
+	}
+
+	const key = `${language}:${theme}`;
+	const cached = placePoolCache.get(key);
+
+	if (cached) {
+		return cached;
+	}
+
+	const wordData = WORD_DATA[language];
+	const usable = pool.filter((entry) => !placeless.includes(plain(wordData, entry)));
+	const narrowed = usable.length ? usable : pool;
+
+	placePoolCache.set(key, narrowed);
+
+	return narrowed;
 }
 
 /**
@@ -2535,7 +2570,9 @@ function compose(
 					? subjectPoolFor(language, data, group, theme)
 					: part.slot === 'object'
 						? objectPoolAvoiding(language, data, group, theme, draw.beat?.avoid ?? [])
-						: null
+						: part.slot === 'place' || part.slot === 'destination'
+							? placePoolFor(language, data, theme)
+							: null
 			);
 
 			phrase = built.text;
@@ -3732,7 +3769,7 @@ function tellStory(telling: Telling): Result | null {
 			const wordData = WORD_DATA[language];
 
 			roles.place = {
-				word: plain(wordData, pick(nounsOf(language, theme))),
+				word: plain(wordData, pick(placePoolFor(language, data, theme))),
 				slots: ['place'],
 				theme,
 				known: true

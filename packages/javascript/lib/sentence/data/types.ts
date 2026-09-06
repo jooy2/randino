@@ -434,10 +434,13 @@ export type ConnectiveKind = 'additive' | 'temporal' | 'contrastive' | 'causal';
  * amulet — which takes no verb and no state at all, because it neither does
  * anything nor is anything a creature is. `liquid` and `raw` are what a verb
  * asks of its object: `sips` takes a liquid and `chews` takes none, `roasts`
- * takes something raw. A noun listed nowhere
- * has no trait, so it takes any group that asks for none.
+ * takes something raw. `placeless` is what a place part asks of its noun: a
+ * word of the `place` class that is no place — a wave, a comet, a lightyear —
+ * which a sentence never happens in and nobody goes to. A noun in none of the
+ * lists has no trait, so it takes any group that asks for none.
  */
-export type NounTrait = 'flier' | 'swimmer' | 'crawler' | 'lifeless' | 'liquid' | 'raw';
+export type NounTrait =
+	'flier' | 'swimmer' | 'crawler' | 'lifeless' | 'liquid' | 'raw' | 'placeless';
 
 /** The nouns that carry each trait, written the way the word pools write them. */
 export type SentenceTraits = {
@@ -702,9 +705,10 @@ export type SentenceLanguageData = {
 	/** What a sentence opens on when it follows another one, by what it claims. */
 	connectives: SentenceConnectives;
 	/**
-	 * The nouns that fly, swim or crawl, for the verb groups that ask. Written in
-	 * the plain form — lowercase where the pools capitalize — and left out by a
-	 * language whose verbs ask for no trait.
+	 * The nouns that fly, swim or crawl, for the verb groups that ask, and the
+	 * ones no sentence happens in, for the place parts. Written in the plain form
+	 * — lowercase where the pools capitalize — and left out by a language whose
+	 * verbs ask for no trait and whose shapes name no place.
 	 */
 	traits?: SentenceTraits;
 	/** How a later sentence refers to the topic without naming it again. */

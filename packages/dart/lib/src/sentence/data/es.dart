@@ -541,6 +541,12 @@ final SentenceLanguageData es = SentenceLanguageData(
       hechizo maldición profecía amuleto talismán runa portal santuario ídolo tótem augurio presagio
       bestiario
     '''),
+    NounTrait.placeless: words(r'''
+      arena guijarro terremoto géiser fumarola estalactita estalagmita eco brasa estrella sol
+      meteoro aurora menguante creciente eclipse cenit satélite cúmulo constelación órbita gravedad
+      rotación traslación mancha_solar año_luz astro eclíptica meridiano ingravidez plenilunio
+      novilunio perigeo apogeo lucero supernova cuásar púlsar
+    '''),
   },
   interjections: words(r'''
     ay, oh, vaya, caramba, madre_mía, mira, desde_luego, uy, anda, hombre, cielos, vamos,

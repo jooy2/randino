@@ -1726,6 +1726,51 @@ void main() {
       }
     });
 
+    test('a sentence happens somewhere', () {
+      // `nature` and `space` are the `place` class beside `place` itself, and a
+      // wave, a comet and a lightyear are in them beside a river and a moon. A
+      // language with a place shape lists the ones a sentence cannot happen in as
+      // `placeless`, and no place or destination is drawn from them.
+      for (final language in wordLanguages) {
+        final data = sentenceData[language]!;
+        final slots = <SentenceSlot>{
+          for (final frame in data.frames)
+            for (final part in frame.parts) part.slot,
+        };
+        final placeless = (data.traits?[NounTrait.placeless] ?? const <String>[]).toSet();
+
+        if (!slots.contains(SentenceSlot.place) && !slots.contains(SentenceSlot.destination)) {
+          expect(placeless, isEmpty, reason: '$language lists placeless nouns and writes no place');
+          continue;
+        }
+
+        expect(placeless, isNotEmpty, reason: '$language lists nothing placeless');
+
+        for (final sentences in const <int>[1, 3]) {
+          for (final detail in randSentenceDetails(
+            language: language,
+            count: sample,
+            sentences: sentences,
+          )) {
+            for (var i = 0; i < detail.phrases.length; i += 1) {
+              final phrase = detail.phrases[i];
+              final slot = detail.slots[i];
+
+              if (slot != SentenceSlot.place && slot != SentenceSlot.destination) continue;
+
+              final found = nounsIn(language, phrase);
+
+              expect(
+                found.isEmpty || found.any((noun) => !placeless.contains(noun)),
+                isTrue,
+                reason: "$language: '$phrase' is placeless (${detail.sentence})",
+              );
+            }
+          }
+        }
+      }
+    });
+
     test('a person in a story sometimes speaks for themselves, and nobody else does', () {
       // A state sentence about a person may be a line they say or think — quoted,
       // in the first person, never the first sentence, never more than two — where

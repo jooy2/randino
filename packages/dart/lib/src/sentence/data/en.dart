@@ -858,6 +858,13 @@ final SentenceLanguageData en = SentenceLanguageData(
       potato carrot cabbage spinach broccoli pumpkin garlic mushroom steak fillet drumstick brisket
       ribeye sirloin tenderloin sausage bacon meatball cutlet schnitzel kebab skewer tofu
     '''),
+    NounTrait.placeless: words(r'''
+      wave tide boulder pebble ember cinder earthquake echo avalanche driftwood fumarole stalactite
+      stalagmite geyser star comet meteor corona zenith eclipse satellite orbit gravity sunspot
+      lightyear stardust supernova quasar pulsar moonrise solarflare perihelion aphelion apogee
+      perigee nadir azimuth parallax redshift starlore cosmology astronomy telescopy gravitas
+      lunation sidereal ecliptic meridian solarsail starburst skyline
+    '''),
   },
   interjections: words(r'''
     oh, ah, wow, well, look, goodness, my, indeed, honestly, gosh, hey, whoa, dear_me, good_grief,
@@ -881,12 +888,11 @@ final SentenceLanguageData en = SentenceLanguageData(
       quay jetty byway boulevard esplanade rampart drawbridge causeway embankment levee viaduct
       bandstand portico hillside mountain sandbank glacier reef prairie plateau steppe savanna
       sandbar shoal seabed bedrock crag spire pinnacle headland peninsula islet mesa butte moraine
-      scree talus overhang moon planet satellite asteroid moonscape exoplanet skyline
+      scree talus overhang moon planet asteroid moonscape exoplanet
     '''),
     'at': words(r'''
       market station airport harbor lighthouse crossroads roundabout waypoint bazaar marketplace
-      depot terminal campsite forum agora harborside gatehouse weir zenith nadir perihelion aphelion
-      apogee perigee equator meridian
+      depot terminal campsite forum agora harborside gatehouse weir equator
     '''),
     'under': words(r'''
       sky starlight moonbeam firmament starfield fullmoon newmoon halfmoon crescent overpass

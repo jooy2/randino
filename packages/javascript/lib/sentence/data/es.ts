@@ -524,6 +524,13 @@ export const ES: SentenceLanguageData = {
 		// A word of a creature theme that is no creature: it takes no verb and no state.
 		lifeless: words(`
 			hechizo maldición profecía amuleto talismán runa portal santuario ídolo tótem augurio presagio bestiario
+		`),
+		// A word of the place class that is no place.
+		placeless: words(`
+			arena guijarro terremoto géiser fumarola estalactita estalagmita eco brasa
+			estrella sol meteoro aurora menguante creciente eclipse cenit satélite cúmulo constelación órbita gravedad rotación
+			traslación mancha_solar año_luz astro eclíptica meridiano ingravidez plenilunio novilunio perigeo apogeo lucero
+			supernova cuásar púlsar
 		`)
 	},
 	interjections: words(`

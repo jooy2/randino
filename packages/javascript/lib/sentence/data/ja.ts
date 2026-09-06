@@ -764,6 +764,12 @@ export const JA: SentenceLanguageData = {
 		// A word of a creature theme that is no creature: it takes no verb and no state.
 		lifeless: words(`
 			魔法 魔力 呪文 呪い 予言 神託 結界 護符 封印 幻影 女神像 土偶 傀儡 御守 呪詛 加護 前兆 予兆 予言書 神話集 伝説集 奇譚集
+		`),
+		// A word of the place class that is no place.
+		placeless: words(`
+			氷 波 潮 砂 小石 地震 残り火 珊瑚 木霊 影 氷堆石 岩屑 岩盤 間欠泉 噴気孔 鍾乳石 石筍 地平 水平
+			星 太陽 彗星 流星 極光 三日月 星屑 日食 月食 天頂 星明 衛星 星団 星座 軌道 重力 自転 公転 黒点 太陽風 光年 天体 恒星 天球 黄道 超新星
+			流星群 宇宙塵 満月 新月 半月 上弦 下弦 月光 北極星 星霜 星影 月影 日輪 月輪
 		`)
 	},
 	interjections: words(`

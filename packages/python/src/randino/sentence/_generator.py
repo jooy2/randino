@@ -1171,6 +1171,7 @@ _NOUN_CACHE: dict[tuple[WordLanguage, WordTheme], WordPool] = {}
 # what made a paragraph slow once every language had them. A group is a constant of its
 # language's data and lives as long as the process, so its `id` is a stable key.
 _SUBJECT_POOL_CACHE: dict[tuple[int, WordTheme], WordPool] = {}
+_PLACE_POOL_CACHE: dict[tuple[WordLanguage, WordTheme], WordPool] = {}
 _BOUNDS_CACHE: dict[WordLanguage, dict[str, tuple[int, int]]] = {}
 _SPAN_CACHE: dict[tuple[WordLanguage, WordTheme, int], tuple[int, int]] = {}
 _AGREED_CACHE: dict[tuple[WordLanguage, WordTheme | None, WordGender | None], WordPool] = {}
@@ -1813,6 +1814,35 @@ def _subject_pool_for(
     _SUBJECT_POOL_CACHE[key] = usable
 
     return usable
+
+
+def _place_pool_for(
+    language: WordLanguage, data: SentenceLanguageData, theme: WordTheme
+) -> WordPool:
+    """The nouns of a theme a place or a destination may be drawn from.
+
+    The ones a sentence can happen in: a wave, a comet and a lightyear are `nature` and
+    `space` the way a river and a moon are, and their language lists them `"placeless"`.
+    The whole theme where nothing is left, which no pool comes to.
+    """
+    pool = _nouns_of(language, theme)
+    placeless = (data.traits or {}).get("placeless")
+
+    if placeless is None:
+        return pool
+
+    key = (language, theme)
+    cached = _PLACE_POOL_CACHE.get(key)
+
+    if cached is not None:
+        return cached
+
+    lexicon = WORD_DATA[language]
+    usable = tuple(entry for entry in pool if _plain(lexicon, entry) not in placeless)
+    narrowed = usable or pool
+    _PLACE_POOL_CACHE[key] = narrowed
+
+    return narrowed
 
 
 def _subject_noun_of(frame: SentenceFrame, plan: Plan, follow: Follow | None) -> str | None:
@@ -2751,7 +2781,11 @@ def _compose(
                         language, data, chosen, theme, beat.avoid if beat is not None else ()
                     )
                     if part.slot == "object"
-                    else None
+                    else (
+                        _place_pool_for(language, data, theme)
+                        if part.slot in ("place", "destination")
+                        else None
+                    )
                 ),
             )
             phrase = built.text
@@ -3679,7 +3713,9 @@ def _tell_story(telling: Telling) -> Result | None:
             lexicon = WORD_DATA[language]
 
             roles.place = Requirement(
-                _plain(lexicon, pick(_nouns_of(language, theme))), ("place",), theme=theme
+                _plain(lexicon, pick(_place_pool_for(language, data, theme))),
+                ("place",),
+                theme=theme,
             )
 
         return roles.place

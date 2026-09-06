@@ -160,7 +160,7 @@ class PredicateTense:
     """The other forms, index-aligned with `words`."""
 
 
-NounTrait = Literal["flier", "swimmer", "crawler", "lifeless", "liquid", "raw"]
+NounTrait = Literal["flier", "swimmer", "crawler", "lifeless", "liquid", "raw", "placeless"]
 """What a noun can do that its theme does not say.
 
 A fish and a sparrow are both `animal`, and only one of them flies; a snake and a lion are
@@ -170,7 +170,9 @@ rules one out with `subject_without`. `"lifeless"` is the odd one: a word of a c
 theme that is no creature — a spell, a rune, an amulet — which takes no verb and no state
 at all, because it neither does anything nor is anything a creature is. `"liquid"` and
 `"raw"` are what a verb asks of its object: `sips` takes a liquid and `chews` takes none,
-`roasts` takes something raw. A noun listed nowhere has no trait, so it takes any group
+`roasts` takes something raw. `"placeless"` is what a place part asks of its noun: a word
+of the `place` class that is no place — a wave, a comet, a lightyear — which a sentence never
+happens in and nobody goes to. A noun in none of the lists has no trait, so it takes any group
 that asks for none.
 """
 
