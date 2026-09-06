@@ -28,6 +28,7 @@ import 'package:randino/src/name/name_generator.dart';
 import 'package:randino/src/name/name_length_range.dart';
 import 'package:randino/src/sentence/data/index.dart';
 import 'package:randino/src/sentence/data/types.dart';
+import 'package:randino/src/sentence/story.dart';
 import 'package:randino/src/types.dart';
 import 'package:randino/src/word/data/index.dart';
 import 'package:randino/src/word/data/types.dart';
@@ -36,20 +37,44 @@ import 'package:randino/src/word/word_generator.dart';
 // How many sentences to build before settling for the closest fit found.
 const int _fitAttempts = 14;
 
+/// How many times a story is told before settling for the closest fit found.
+///
+/// A story is sentences drawn one after another against a range shared out
+/// between them, and a run of short sentences leaves the last one a gap no shape
+/// can fill. Telling the whole story again is what closes that.
+const int _storyAttempts = 3;
+
 // How often a noun phrase that may carry a modifier is given one. Length can
 // override it in both directions — see [_modifyChanceFor].
 const int _modifyChance = 45;
 
+// A story's sentence carries a modifier a little more often than a lone one: its
+// modifiers are chosen for the noun they describe, and a story told in bare
+// nouns reads as a list of events rather than as prose.
+const int _storyModifyChance = 55;
+
 // How often a sentence that draws a fresh subject draws it from the topic's own
 // theme rather than from anywhere in the topic's class.
 const int _themeChance = 65;
+
+// How many phases of the day one sentence may move on from the last one named.
+const int _dayStride = 4;
 
 /// The slots that are a noun phrase, and so draw from the word pools.
 const List<SentenceSlot> _nounSlots = <SentenceSlot>[
   SentenceSlot.subject,
   SentenceSlot.object,
   SentenceSlot.place,
+  SentenceSlot.destination,
   SentenceSlot.quantity,
+];
+
+/// The slots a story never writes: an amount, a count, a date and a clock.
+const List<SentenceSlot> _unstoried = <SentenceSlot>[
+  SentenceSlot.quantity,
+  SentenceSlot.money,
+  SentenceSlot.date,
+  SentenceSlot.clock,
 ];
 
 /// The class money belongs to, which is what decides the verbs it can stand
@@ -232,6 +257,9 @@ class _Settings {
     required this.types,
     required this.quote,
     required this.style,
+    required this.tense,
+    required this.story,
+    required this.typed,
   });
 
   final WordTheme? theme;
@@ -271,6 +299,17 @@ class _Settings {
   /// the generator.
   final SentenceStyle? style;
 
+  /// When it all happened, or null when the caller left it to the generator, in
+  /// which case it is decided once per result.
+  final SentenceTense? tense;
+
+  /// The story a result of several sentences follows, or null for any of them.
+  final SentenceStory? story;
+
+  /// Whether the caller named the kinds themselves. A story writes statements
+  /// unless they did.
+  final bool typed;
+
   /// The same settings with [includeName] decided, which is what one result is
   /// drawn against. Dart has no spread for a class, so the copy is written out.
   _Settings naming(bool named) => _Settings(
@@ -288,6 +327,9 @@ class _Settings {
     types: types,
     quote: quote,
     style: style,
+    tense: tense,
+    story: story,
+    typed: typed,
   );
 }
 
@@ -450,16 +492,20 @@ SentenceMood _moodFor(SentenceType mark) =>
 /// Everything one sentence of a result is drawn against: the room it has, what
 /// it is doing, what it opens on, and — after the first — what it is about.
 class _Draw {
-  const _Draw(
-    this.budget,
-    this.type,
-    this.mark,
-    this.quote,
-    this.opener,
-    this.style,
-    this.avoid,
-    this.follow,
-  );
+  const _Draw({
+    required this.budget,
+    required this.type,
+    required this.mark,
+    required this.quote,
+    required this.opener,
+    required this.style,
+    required this.avoid,
+    required this.follow,
+    required this.tense,
+    required this.beat,
+    required this.link,
+    required this.dayAt,
+  });
 
   final LengthRange budget;
 
@@ -486,6 +532,80 @@ class _Draw {
   /// over, rather than rolling `식습니다` three times in four lines.
   final Set<String> avoid;
   final _Follow? follow;
+
+  /// The tense every sentence of the result is in.
+  final SentenceTense tense;
+
+  /// What a story asks of this sentence, when it is one of a story. Null for a
+  /// sentence that is drawn on its own terms.
+  final _BeatDraw? beat;
+
+  /// Whether this sentence is the first or the second clause of one two-clause
+  /// sentence, or a whole sentence of its own.
+  final JoinSide? link;
+
+  /// The latest phase of the day the result has reached, as an index into the
+  /// language's `times.day`, and `-1` before it has named one.
+  final int dayAt;
+
+  /// The same draw with another opener, or another way of referring to the
+  /// topic. Dart has no spread for a class, so the copy is written out.
+  _Draw copyWith({String? opener, _Follow? follow, bool keepFollow = true}) => _Draw(
+    budget: budget,
+    type: type,
+    mark: mark,
+    quote: quote,
+    opener: opener ?? this.opener,
+    style: style,
+    avoid: avoid,
+    follow: keepFollow ? (follow ?? this.follow) : follow,
+    tense: tense,
+    beat: beat,
+    link: link,
+    dayAt: dayAt,
+  );
+}
+
+/// What one sentence of a story has to be: which fields its verb may come from,
+/// which condition a state sentence says, which parts the shape has to carry and
+/// which it is better with, and what the nouns of the story are.
+class _BeatDraw {
+  const _BeatDraw({
+    required this.headedByState,
+    required this.fields,
+    required this.describes,
+    required this.condition,
+    required this.wants,
+    required this.prefers,
+    required this.item,
+    required this.places,
+    required this.subject,
+  });
+
+  /// Whether the shape is headed by a state rather than a verb.
+  final bool headedByState;
+
+  /// The fields the verb may be drawn from. Empty for a state sentence.
+  final List<VerbField> fields;
+
+  /// Whether this is a state sentence, whose predicate has to say [condition].
+  final bool describes;
+
+  /// The condition a state sentence asserts, or null for a plain trait.
+  final Condition? condition;
+
+  /// The parts the shape has to carry, and the ones it is better for carrying.
+  final List<SentenceSlot> wants;
+  final List<SentenceSlot> prefers;
+
+  /// The theme the story's item comes from, for a phrase that draws it.
+  final WordTheme? item;
+
+  /// The themes the story's places come from.
+  final List<WordTheme> places;
+
+  /// The themes the subject may come from, when the story has decided it.
+  final List<WordTheme>? subject;
 }
 
 /// What the sentences of one result are about: the first sentence's subject, and
@@ -600,18 +720,26 @@ bool _matchesSlots(SentenceFrame frame, Set<SentenceSlot> slots) =>
 /// Both filters fall back rather than fail: a language that has no shape
 /// carrying what was asked for answers with the closest it does have, the same
 /// best-effort a too-narrow length range gets.
-List<SentenceFrame> _framesFor(SentenceLanguageData data, _Settings settings, SentenceMood mood) {
+List<SentenceFrame> _framesFor(
+  SentenceLanguageData data,
+  _Settings settings,
+  SentenceMood mood, [
+  _BeatDraw? beat,
+]) {
   // A language that writes its question with the mark alone declares no question
   // shape, and answers with the statement shapes it does have. That is not a
   // fallback so much as the point: `¿El león corre?` is the statement.
-  final byMood = data.frames.where((frame) => frame.mood == mood).toList(growable: false);
+  final storied =
+      beat == null
+          ? data.frames
+          : data.frames.where((frame) => _storyFrame(frame, beat)).toList(growable: false);
+  final shaped = storied.isNotEmpty ? storied : data.frames;
+  final byMood = shaped.where((frame) => frame.mood == mood).toList(growable: false);
   final moody =
       byMood.isNotEmpty
           ? byMood
-          : data.frames
-              .where((frame) => frame.mood == SentenceMood.statement)
-              .toList(growable: false);
-  final moodly = moody.isNotEmpty ? moody : data.frames;
+          : shaped.where((frame) => frame.mood == SentenceMood.statement).toList(growable: false);
+  final moodly = moody.isNotEmpty ? moody : shaped;
   // A counted shape has no room for a name: its quantity is its subject, and
   // `서호 3명` counts somebody's name, which is not a thing a sentence says. Asked
   // for a name, the shapes that cannot carry one are left out.
@@ -625,7 +753,20 @@ List<SentenceFrame> _framesFor(SentenceLanguageData data, _Settings settings, Se
       wanted == null
           ? usable
           : usable.where((frame) => _matchesSlots(frame, wanted)).toList(growable: false);
-  final allowed = bySlots.isNotEmpty ? bySlots : usable;
+  final sloted = bySlots.isNotEmpty ? bySlots : usable;
+  // A story's sentence has to carry what the story put in it — the thing the hero
+  // is holding, the place they are going — and a shape with no room for that is a
+  // shape that would draw something else. Fallen back on rather than failed,
+  // because a language may have no such shape at all.
+  final asked =
+      beat == null || beat.wants.isEmpty
+          ? sloted
+          : sloted
+              .where(
+                (frame) => beat.wants.every((slot) => frame.parts.any((part) => part.slot == slot)),
+              )
+              .toList(growable: false);
+  final allowed = asked.isNotEmpty ? asked : sloted;
   final shape = settings.shape;
 
   if (shape == null) return allowed;
@@ -633,6 +774,41 @@ List<SentenceFrame> _framesFor(SentenceLanguageData data, _Settings settings, Se
   final byShape = allowed.where((frame) => shapeOf(frame) == shape).toList(growable: false);
 
   return byShape.isNotEmpty ? byShape : allowed;
+}
+
+/// Whether a shape can be one sentence of a story.
+///
+/// It has to be headed the way the step is — a verb for something done, a state
+/// for a description — it may not count or price or date anything, its verb has
+/// to be one the step's fields can supply, and a change of scene carries no place
+/// of its own: `숲이 숲에서 조용해졌다` is the sentence that rule keeps out.
+bool _storyFrame(SentenceFrame frame, _BeatDraw beat) {
+  if (frame.parts.any((part) => _unstoried.contains(part.slot) || part.copula != null)) {
+    return false;
+  }
+
+  final headedByState = frame.parts.any((part) => part.slot == SentenceSlot.state);
+
+  if (headedByState != beat.headedByState) return false;
+
+  final fields = frame.fields;
+
+  if (fields != null && !fields.any(beat.fields.contains)) return false;
+
+  // A shape that has somewhere the story did not ask for — a destination for a
+  // hero who is not going anywhere, an object for a hero with empty hands — would
+  // draw a noun the story does not know.
+  final known = <SentenceSlot>[...beat.wants, ...beat.prefers];
+
+  return frame.parts
+      .map((part) => part.slot)
+      .where(
+        (slot) =>
+            slot == SentenceSlot.object ||
+            slot == SentenceSlot.destination ||
+            slot == SentenceSlot.place,
+      )
+      .every(known.contains);
 }
 
 /// Whether a language has a shape that answers the request at all.
@@ -681,9 +857,12 @@ List<WordLanguage> _languagesFor(_Settings settings) {
 /// other required words need. Best first, and the shape takes the first that is
 /// still free.
 class _Requirement {
-  const _Requirement(this.word, this.slots, {this.theme, this.known = true});
+  const _Requirement(this.word, this.slots, {this.theme, this.known = true, this.bare = false});
 
   final String word;
+
+  /// True for a word written on its own, with no modifier in front of it.
+  final bool bare;
 
   /// The phrases it can fill. A null entry stands for the modifier inside one.
   final List<SentenceSlot?> slots;
@@ -770,21 +949,35 @@ _Requirement _classify(WordLanguage language, String word) {
     }
   }
 
-  final manner = _entryOf(data.manners, word);
+  String? manner;
+
+  for (final group in data.manners) {
+    manner ??= _entryOf(group.words, word);
+  }
 
   if (manner != null) {
     written = manner;
     slots.add(SentenceSlot.manner);
   }
 
-  final time = _entryOf(data.times, word);
+  String? time;
+
+  for (final pool in _timePools(data)) {
+    time ??= _entryOf(pool, word);
+  }
 
   if (time != null) {
     written = time;
     slots.add(SentenceSlot.time);
   }
 
-  final modifier = _entryOf(lexicon.adjectives, word) ?? _entryOf(lexicon.actions, word);
+  String? modifier;
+
+  for (final group in data.modifiers) {
+    modifier ??= _entryOf(group.words, word);
+  }
+
+  modifier ??= _entryOf(lexicon.adjectives, word) ?? _entryOf(lexicon.actions, word);
 
   if (modifier != null) {
     written = _plain(lexicon, modifier);
@@ -948,30 +1141,61 @@ LengthRange _nounSpan(WordLanguage language, WordTheme theme, int invent) {
   return span;
 }
 
-/// The modifiers of a language, in the form they take beside a noun of [gender].
+/// The modifiers a noun of [theme] may carry, in the form they take beside a
+/// noun of [gender].
 ///
-/// Written out rather than agreed after the fact, because a length budget has to
-/// see the word the sentence will actually carry: German `blau` is `blauer` in
-/// front of a masculine noun, and choosing by the four letters and writing the
-/// six is how a sentence quietly stepped outside its range.
-WordPool _agreedModifiers(WordLanguage language, WordGender? gender) {
+/// Drawn from the sentence data's own groups rather than from the nickname pools,
+/// so that `맑은` goes in front of a drink and never in front of a mechanic; a
+/// noun no pool holds takes any of them. Written out rather than agreed after the
+/// fact, because a length budget has to see the word the sentence will actually
+/// carry: German `blau` is `blauer` in front of a masculine noun.
+WordPool _modifiersFor(WordLanguage language, WordTheme? theme, WordGender? gender) {
   final lexicon = wordData[language]!;
-
-  if (gender == null || lexicon.agreement == null) return lexicon.adjectives;
-
-  final key = '${language.name}:${gender.name}';
+  final data = sentenceData[language]!;
+  // Keyed by the theme rather than the class, because a group may narrow itself
+  // to themes: a soup and a tea are both edible and take different words.
+  final key = '${language.name}:${theme?.name ?? '*'}:${gender?.name ?? '-'}';
   final cached = _agreedCache[key];
 
   if (cached != null) return cached;
 
-  final agreed = lexicon.adjectives
-      .map((word) => agree(lexicon, word, gender))
-      .toList(growable: false);
+  final cls = theme == null ? null : themeClass[theme];
+  final groups =
+      cls == null
+          ? data.modifiers
+          : data.modifiers
+              .where(
+                (group) =>
+                    group.subject.contains(cls) &&
+                    (group.themes == null || group.themes!.contains(theme)),
+              )
+              .toList(growable: false);
+  final base = <String>{for (final group in groups) ...group.words}.toList(growable: false);
+  final agreed =
+      gender != null && lexicon.agreement != null
+          ? base.map((word) => agree(lexicon, word, gender)).toList(growable: false)
+          : base;
 
   _agreedCache[key] = agreed;
 
   return agreed;
 }
+
+/// Every pool a group's predicate can be written from, in either tense.
+List<WordPool> _predicatePools(WordPool words, PredicateForms forms, PredicateTense? past) =>
+    <WordPool>[
+      words,
+      ...forms.values.map(_endings),
+      if (past != null) ...<WordPool>[past.words, ...past.forms.values.map(_endings)],
+    ];
+
+/// Every pool a time adverbial can come from, whatever the tense.
+List<WordPool> _timePools(SentenceLanguageData data) => <WordPool>[
+  data.times.day,
+  data.times.any,
+  ...?data.times.past == null ? null : <WordPool>[data.times.past!],
+  ...?data.times.present == null ? null : <WordPool>[data.times.present!],
+].where((pool) => pool.isNotEmpty).toList(growable: false);
 
 LengthRange _span(Iterable<WordPool> pools) {
   var min = 1 << 30;
@@ -999,23 +1223,18 @@ Map<SentenceSlot, LengthRange> _slotBounds(WordLanguage language) {
     // Every form a predicate can take, not only the plain statement's: a question
     // form is a different length, and the shape is chosen against these.
     SentenceSlot.verb: _span(<WordPool>[
-      for (final group in data.verbs) ...<WordPool>[
-        group.words,
-        ...group.forms.values.map(_endings),
-      ],
+      for (final group in data.verbs) ..._predicatePools(group.words, group.forms, group.past),
     ]),
     SentenceSlot.state: _span(<WordPool>[
-      for (final group in data.states) ...<WordPool>[
-        group.words,
-        ...group.forms.values.map(_endings),
-      ],
+      for (final group in data.states) ..._predicatePools(group.words, group.forms, group.past),
     ]),
-    SentenceSlot.manner: _span(<WordPool>[data.manners]),
-    SentenceSlot.time: _span(<WordPool>[data.times]),
+    SentenceSlot.manner: _span(<WordPool>[for (final group in data.manners) group.words]),
+    SentenceSlot.time: _span(_timePools(data)),
   };
 
   bounds[SentenceSlot.object] = bounds[SentenceSlot.subject]!;
   bounds[SentenceSlot.place] = bounds[SentenceSlot.subject]!;
+  bounds[SentenceSlot.destination] = bounds[SentenceSlot.subject]!;
   bounds[SentenceSlot.quantity] = bounds[SentenceSlot.subject]!;
   bounds[SentenceSlot.money] = _moneySpan(data);
   bounds[SentenceSlot.date] = _calendarSpan(data, SentenceSlot.date);
@@ -1025,7 +1244,7 @@ Map<SentenceSlot, LengthRange> _slotBounds(WordLanguage language) {
   final lexicon = wordData[language]!;
   final genders = <WordGender?>[null, if (lexicon.agreement != null) ...lexicon.agreement!.keys];
 
-  _modifierBounds[language] = _span(genders.map((gender) => _agreedModifiers(language, gender)));
+  _modifierBounds[language] = _span(genders.map((gender) => _modifiersFor(language, null, gender)));
 
   return bounds;
 }
@@ -1073,7 +1292,7 @@ LengthRange _copulaSpan(SentencePart part, SentenceLanguageData data) {
   if (part.copula == null || data.calendar == null) return const LengthRange(0, 0);
 
   final group = data.calendar!.copula;
-  final own = _span(<WordPool>[group.words, ...group.forms.values.map(_endings)]);
+  final own = _span(_predicatePools(group.words, group.forms, group.past));
   final gap = part.copula == CopulaSide.head ? data.space.length : 0;
 
   return LengthRange(own.min + gap, own.max + gap);
@@ -1184,20 +1403,35 @@ List<VerbGroup> _verbGroupsFor(
   SentenceLanguageData data,
   SentenceFrame frame,
   List<WordTheme> themes,
-  _Plan plan,
-) {
+  _Plan plan, [
+  _BeatDraw? beat,
+]) {
   // A quantity is an object with a number on it, and an amount is an object of
   // the class money belongs to — unless the quantity is what the sentence is
   // about, in which case it is the subject and the verb takes nothing.
   final wantsObject = _takesObject(frame);
   final wantsMoney = frame.parts.any((part) => part.slot == SentenceSlot.money);
+  final wantsDestination = frame.parts.any((part) => part.slot == SentenceSlot.destination);
   final subject = _requiredAt(frame, plan, SentenceSlot.subject);
   final object = _requiredAt(frame, plan, SentenceSlot.object);
   final verb = _requiredAt(frame, plan, SentenceSlot.verb);
+  // A shape that goes somewhere wants a verb that goes, and a story step wants a
+  // verb of the field it settled on.
+  final fields = beat != null && beat.fields.isNotEmpty ? beat.fields : frame.fields;
 
   return data.verbs
       .where((group) {
         if ((group.object != null) != wantsObject) return false;
+        if (fields != null && !fields.contains(group.field)) return false;
+
+        // A group that needs a part is drawn only for a shape that has it — and a
+        // shape that has a destination is drawn only for the groups that go
+        // somewhere, because `leaves to the market` is what the rest of the field
+        // writes there.
+        final requires = group.requires;
+
+        if (requires != null && !frame.parts.any((part) => part.slot == requires)) return false;
+        if (wantsDestination && requires != SentenceSlot.destination) return false;
         if (wantsMoney && !(group.object?.contains(_moneyClass) ?? false)) return false;
         if (verb != null && !group.words.contains(verb.word)) return false;
 
@@ -1207,14 +1441,36 @@ List<VerbGroup> _verbGroupsFor(
 
         final objectTheme = object?.theme;
 
-        if (objectTheme != null && !(group.object?.contains(themeClass[objectTheme]) ?? false)) {
-          return false;
-        }
+        if (objectTheme != null && !_acceptsObject(group, objectTheme)) return false;
+
+        final item = beat?.item;
+
+        if (item != null && group.object != null && !_acceptsObject(group, item)) return false;
 
         return _themesForClasses(themes, group.subject).isNotEmpty &&
-            (group.object == null || _themesForClasses(wordThemes, group.object!).isNotEmpty);
+            (group.object == null || _objectThemesOf(group, beat).isNotEmpty);
       })
       .toList(growable: false);
+}
+
+/// Whether a verb group takes a noun of this theme as its object.
+bool _acceptsObject(VerbGroup group, WordTheme theme) {
+  if (!(group.object?.contains(themeClass[theme]) ?? false)) return false;
+
+  return group.objectThemes == null || group.objectThemes!.contains(theme);
+}
+
+/// The themes a verb group's object may come from: its classes, narrowed to the
+/// themes it names when it names any, and to the story's item when there is one.
+List<WordTheme> _objectThemesOf(VerbGroup group, _BeatDraw? beat) {
+  final item = beat?.item;
+
+  if (item != null) return _acceptsObject(group, item) ? <WordTheme>[item] : const <WordTheme>[];
+
+  final byClass = _themesForClasses(wordThemes, group.object ?? const <NounClass>[]);
+  final named = group.objectThemes;
+
+  return named == null ? byClass : byClass.where(named.contains).toList(growable: false);
 }
 
 /// The same, for a shape headed by an adjective rather than a verb.
@@ -1222,14 +1478,20 @@ List<StateGroup> _stateGroupsFor(
   SentenceLanguageData data,
   List<WordTheme> themes,
   SentenceFrame frame,
-  _Plan plan,
-) {
+  _Plan plan, [
+  _BeatDraw? beat,
+]) {
   final subject = _requiredAt(frame, plan, SentenceSlot.subject);
   final state = _requiredAt(frame, plan, SentenceSlot.state);
 
   return data.states
       .where((group) {
         if (state != null && !group.words.contains(state.word)) return false;
+
+        // A story's description says what is true of the hero just now, and a
+        // plain trait where nothing is: `배고프다` where the hero is hungry, and
+        // never `배부르다` there.
+        if (beat != null && beat.describes && group.condition != beat.condition) return false;
 
         final subjectTheme = subject?.theme;
 
@@ -1271,6 +1533,8 @@ class _Built {
     this.gender,
     this.named,
     this.scene,
+    this.field,
+    this.dayAt,
   );
 
   final String sentence;
@@ -1302,6 +1566,12 @@ class _Built {
 
   /// Whether that subject is a person's name.
   final bool named;
+
+  /// The field its verb came from, for a story to know what it did.
+  final VerbField? field;
+
+  /// The phase of the day it named, as an index into `times.day`, or `-1`.
+  final int dayAt;
 }
 
 /// The article a phrase opens with, by the noun's gender and the word after it.
@@ -1354,13 +1624,16 @@ _Phrase _nounPhrase(
   required int max,
   required LengthRange nouns,
   required String count,
+  // The theme the modifier is chosen for, which is the noun's own — or null for
+  // a word no pool holds, which takes any modifier the language has.
+  required WordTheme? described,
 }) {
   final lexicon = wordData[language]!;
   final pool = _nounsOf(language, theme);
   final space = data.space.length;
   // Measured against the base forms, because the noun that decides the gender
   // has not been drawn yet; the modifier itself is chosen from the agreed pool.
-  final modifiers = poolBounds(lexicon.adjectives);
+  final modifiers = poolBounds(_modifiersFor(language, described, null));
   final article = bare ? const LengthRange(0, 0) : _articleSpan(data);
   final overhead = article.max == 0 ? 0 : article.max + space;
   final modCost = modify ? modifiers.min + space : 0;
@@ -1375,7 +1648,7 @@ _Phrase _nounPhrase(
   if (modify) {
     final room = max - overhead - drawn.length - space;
     final want = min - overhead - drawn.length - space;
-    final agreed = _agreedModifiers(language, gender);
+    final agreed = _modifiersFor(language, described, gender);
     final modifier =
         forcedModifier != null
             ? agree(lexicon, forcedModifier, gender)
@@ -1462,6 +1735,10 @@ LengthRange _nameSpan(WordLanguage language) =>
 
 /// The particle a part writes after its phrase, in the form the phrase asks for.
 String _tailOf(SentencePart part, String phrase) {
+  final liquid = part.tailLiquid;
+
+  if (liquid != null && endsWithLiquid(phrase)) return liquid;
+
   final alt = part.tailAlt;
 
   if (alt != null && endsWithConsonant(phrase)) return alt;
@@ -1474,23 +1751,47 @@ String _tailOf(SentencePart part, String phrase) {
 /// The first attempt leaves it to chance; after that, a sentence that overshot
 /// the range drops its modifiers and one that fell short takes them everywhere,
 /// which is how the length range picks the shape rather than truncating a word.
-int _modifyChanceFor(int distance, bool tooLong) {
-  if (distance == 0) return _modifyChance;
+int _modifyChanceFor(int distance, bool tooLong, bool storied) {
+  if (distance == 0) return storied ? _storyModifyChance : _modifyChance;
 
   return tooLong ? 0 : 100;
 }
 
 /// The theme a phrase other than the subject draws from.
-WordTheme _themeForPart(SentenceSlot slot, List<NounClass>? objectClasses, List<WordTheme> themes) {
+WordTheme _themeForPart(
+  SentenceSlot slot,
+  VerbGroup? group,
+  List<WordTheme> themes,
+  _BeatDraw? beat,
+) {
   if (slot == SentenceSlot.object || slot == SentenceSlot.quantity) {
-    final usable = _themesForClasses(wordThemes, objectClasses ?? const <NounClass>[]);
+    final usable = group == null ? const <WordTheme>[] : _objectThemesOf(group, beat);
 
     return pick(usable.isNotEmpty ? usable : wordThemes);
   }
 
-  final places = _themesForClasses(wordThemes, const <NounClass>[NounClass.place]);
+  // A story happens somewhere a story can happen — a market, a park — and not
+  // on Pluto, which is a place too as far as the classes know.
+  final places = beat?.places ?? _themesForClasses(wordThemes, const <NounClass>[NounClass.place]);
 
   return pick(places.isNotEmpty ? places : themes);
+}
+
+/// A word reshaped by ordered `[ending, replacement]` rules for a gender — the
+/// same shape `word/data`'s agreement takes, applied to whatever pool a language
+/// says agrees. Russian's past verbs are the reason it is its own function.
+String _agreeBy(WordAgreement rules, String word, WordGender? gender) {
+  final chosen = gender == null ? null : rules[gender];
+
+  if (chosen == null) return word;
+
+  for (final rule in chosen) {
+    if (word.endsWith(rule[0])) {
+      return word.substring(0, word.length - rule[0].length) + rule[1];
+    }
+  }
+
+  return word;
 }
 
 /// Fill a shape and write it out.
@@ -1516,6 +1817,7 @@ _Built _compose(
   _Draw draw,
 ) {
   final follow = draw.follow;
+  final beat = draw.beat;
   final lexicon = wordData[language]!;
   final themes = requested.isNotEmpty ? requested : wordThemes;
   // A shape with a `state` part is headed by one and a shape with a `verb` part
@@ -1532,9 +1834,9 @@ _Built _compose(
       copular
           ? <StateGroup>[data.calendar!.copula]
           : headed
-          ? _stateGroupsFor(data, themes, frame, plan)
+          ? _stateGroupsFor(data, themes, frame, plan, beat)
           : const <StateGroup>[];
-  final verbs = headed ? const <VerbGroup>[] : _verbGroupsFor(data, frame, themes, plan);
+  final verbs = headed ? const <VerbGroup>[] : _verbGroupsFor(data, frame, themes, plan, beat);
   final StateGroup? stateGroup = headed ? pick(states.isNotEmpty ? states : data.states) : null;
   final VerbGroup? verbGroup =
       headed
@@ -1543,36 +1845,53 @@ _Built _compose(
             verbs.isNotEmpty
                 ? verbs
                 : data.verbs
-                    .where((group) => (group.object != null) == _takesObject(frame))
+                    .where(
+                      (group) =>
+                          (group.object != null) == _takesObject(frame) &&
+                          (group.requires == null ||
+                              frame.parts.any((part) => part.slot == group.requires)) &&
+                          (!frame.parts.any((part) => part.slot == SentenceSlot.destination) ||
+                              group.requires == SentenceSlot.destination),
+                    )
                     .toList(growable: false),
           );
-  // The same predicates, in the form this type of sentence ends on. Index-aligned
-  // with the plain words, which is what lets a required word be translated rather
-  // than written out in the wrong form.
+  // The same predicates, in the form this type of sentence ends on, in the tense
+  // the result is in — or in the form that links a first clause to the one after
+  // it. Index-aligned with the plain words, which is what lets a required word be
+  // translated rather than written out in the wrong form.
   final base = stateGroup?.words ?? verbGroup!.words;
-  final predicates = _formOf(stateGroup, verbGroup, draw.mark, draw.style);
+  final predicates = _formOf(
+    stateGroup,
+    verbGroup,
+    draw.mark,
+    draw.style,
+    draw.tense,
+    draw.link == JoinSide.first ? data.join : null,
+  );
   final subjectClasses = stateGroup?.subject ?? verbGroup!.subject;
   final subjectThemes = _themesForClasses(themes, subjectClasses);
   // Which part is the subject is the shape's business, not the slot's: a counted
-  // shape has no `subject` part and its quantity is the subject. Looking for a
-  // `subject` part regardless is how a word required into a counted subject lost
-  // its theme, and `사과` came out as `사과 9명` — nine people's worth of apple.
+  // shape has no `subject` part and its quantity is the subject.
   final subjectSlot = _subjectSlotOf(frame);
   final subjectRequired = _requiredAt(frame, plan, subjectSlot);
   // A theme the caller named is honoured even when no verb group of the language
-  // has anything to say about it, the same way a shape it cannot make falls back
-  // rather than being answered with something else entirely.
-  // Written out: `??` would otherwise infer `pick`'s type argument from the
-  // nullable left-hand side, and hand back a `WordTheme?`.
+  // has anything to say about it. Written out: `??` would otherwise infer `pick`'s
+  // type argument from the nullable left-hand side, and hand back a `WordTheme?`.
   final WordTheme subjectTheme =
       subjectRequired?.theme ?? pick<WordTheme>(subjectThemes.isNotEmpty ? subjectThemes : themes);
   // A sentence carrying on about the topic stands a pronoun where its subject
   // would go, and the languages that drop their subject stand nothing there at
   // all — in which case the phrase is not in the shape to carry an article, a
-  // modifier or a particle. Written out as its own list so that every budget
-  // below is measured against what the sentence actually writes; `at` is the
-  // index back into the frame, which is what the plan is keyed by.
-  final String? pronoun = follow?.reference == _Reference.pronoun ? follow!.pronoun : null;
+  // modifier or a particle. The second clause of one sentence shares the first
+  // one's subject and writes nothing where it would stand, the way a dropped
+  // subject does. `at` is the index back into the frame, which the plan is keyed
+  // by.
+  final String? pronoun =
+      draw.link == JoinSide.second
+          ? ''
+          : follow?.reference == _Reference.pronoun
+          ? follow!.pronoun
+          : null;
   final shape = <SentencePart>[];
   final at = <int>[];
 
@@ -1587,37 +1906,39 @@ _Built _compose(
 
   // Only a shape that opens on a noun phrase with nothing in front of it can
   // honour `startsWith`; anywhere else the sentence opens on an article, a
-  // preposition or an adverbial, and `collect` filters what does not match. A
-  // sentence after the first one never opens the result, so it never carries it.
+  // preposition or an adverbial, and `collect` filters what does not match.
   final first = shape.first;
   final prefixable =
       follow == null && _isNounSlot(first.slot) && first.head == null && data.articles == null;
   final space = data.space.length;
-  final opener = draw.opener;
-  final close = data.terminators[draw.mark]!;
+  final opener = draw.link == JoinSide.second ? '' : draw.opener;
+  // The first clause of a two-clause sentence closes on nothing: the mark, the
+  // tag and the quotation marks all belong to the whole sentence, and the second
+  // clause carries them.
+  final closes = draw.link != JoinSide.first;
+  final close = closes ? data.terminators[draw.mark]! : '';
   final open = data.openers[draw.mark] ?? '';
-  final quoteOpen = draw.quote?[0] ?? '';
-  final quoteClose = draw.quote?[1] ?? '';
-  final tag = frame.tag == null ? '' : data.space + frame.tag!;
+  final quoteOpen = closes ? (draw.quote?[0] ?? '') : '';
+  final quoteClose = closes ? (draw.quote?[1] ?? '') : '';
+  final tag = closes && frame.tag != null ? data.space + frame.tag! : '';
+  final past = draw.tense == SentenceTense.past;
+  // What the language writes beside a verb that does not change for the past:
+  // Vietnamese `đã` in front of it, Chinese `了` behind it.
+  final mark = past && verbGroup != null && verbGroup.past == null ? data.pastMark : null;
   // Every phrase's theme is settled before any of them is drawn, because a length
-  // budget is only as good as the pools it was measured against. Left to the loop,
-  // each phrase was given the room the language's longest noun would need and drew
-  // a word out of its own theme, which is how a sentence came out short of a
-  // `minLength` the shape could otherwise have reached.
+  // budget is only as good as the pools it was measured against.
   final partThemes = <WordTheme?>[
     for (var i = 0; i < shape.length; i += 1)
       !_isNounSlot(shape[i].slot)
           ? null
           : shape[i].slot == subjectSlot
           ? subjectTheme
-          : (plan.phrase[at[i]]?.theme ?? _themeForPart(shape[i].slot, verbGroup?.object, themes)),
+          : (plan.phrase[at[i]]?.theme ?? _themeForPart(shape[i].slot, verbGroup, themes, beat)),
   ];
   // What a phrase writes instead of a noun phrase, when it writes one at all: a
   // pronoun standing in for the topic, the name a repeat carries forward, or a
-  // fresh name for a phrase about a person. All three are bare words — no
-  // article, no modifier, nothing but the word and whatever particle the frame
-  // puts after it — and `''` marks the one that has to be drawn against the room
-  // it is given.
+  // fresh name for a phrase about a person. `''` marks the one that has to be
+  // drawn against the room it is given.
   final proper = <String?>[
     for (var i = 0; i < shape.length; i += 1)
       () {
@@ -1634,12 +1955,10 @@ _Built _compose(
         }
 
         // A word the caller required holds its place against all of this.
-        // `include` says the sentence has to contain it, and a name written over
-        // it would be a sentence that does not.
         if (plan.phrase.containsKey(at[i])) return null;
 
-        // A person is one person. `사과 12개` counts apples, and `서호 3명` counts
-        // somebody's name, which is not a thing a sentence says.
+        // A person is one person. `서호 3명` counts somebody's name, which is not
+        // a thing a sentence says.
         if (part.slot == SentenceSlot.quantity) return null;
 
         final theme = partThemes[i];
@@ -1654,12 +1973,31 @@ _Built _compose(
   final parts = <SentencePart>[
     for (var i = 0; i < shape.length; i += 1)
       proper[i] == null
-          ? shape[i]
+          // A story names its hero once with whatever describes them and then
+          // leaves the name alone; a word required bare — home, which no modifier
+          // fits — is left alone too.
+          ? ((beat != null &&
+                      shape[i].slot == subjectSlot &&
+                      follow?.reference == _Reference.repeat) ||
+                  (plan.phrase[at[i]]?.bare ?? false))
+              ? SentencePart(
+                shape[i].slot,
+                head: shape[i].head,
+                pastHead: shape[i].pastHead,
+                tail: shape[i].tail,
+                tailAlt: shape[i].tailAlt,
+                tailLiquid: shape[i].tailLiquid,
+                bare: shape[i].bare,
+                copula: shape[i].copula,
+              )
+              : shape[i]
           : SentencePart(
             shape[i].slot,
             head: shape[i].head,
+            pastHead: shape[i].pastHead,
             tail: shape[i].tail,
             tailAlt: shape[i].tailAlt,
+            tailLiquid: shape[i].tailLiquid,
             bare: true,
           ),
   ];
@@ -1676,26 +2014,34 @@ _Built _compose(
     final exact = word == null ? null : LengthRange(word.length, word.length);
     final own = Map<SentenceSlot, LengthRange>.from(bounds);
     final owed = plan.modifier[at[i]];
+    final theme = partThemes[i];
 
-    if (partThemes[i] != null) {
+    if (theme != null) {
       // A name that has still to be drawn is budgeted against the given names of
-      // the language rather than against its nouns — `randName` invents from its
-      // own syllables and draws from its own pools, and neither is this theme's.
+      // the language rather than against its nouns.
       own[part.slot] =
           exact ??
-          (proper[i] == ''
-              ? _nameSpan(language)
-              : _nounSpan(language, partThemes[i]!, settings.invent));
-    } else if (part.slot == SentenceSlot.verb || part.slot == SentenceSlot.state) {
-      own[part.slot] = exact ?? poolBounds(predicates);
-    } else if (exact != null) {
-      own[part.slot] = exact;
+          (proper[i] == '' ? _nameSpan(language) : _nounSpan(language, theme, settings.invent));
+      // A word no pool holds is described by any modifier; a noun by the ones
+      // that fit what it is.
+      final described = required != null && !required.known ? null : theme;
+
+      partModifier.add(
+        owed == null
+            ? poolBounds(_modifiersFor(language, described, null))
+            : LengthRange(owed.word.length, owed.word.length),
+      );
+    } else {
+      if (part.slot == SentenceSlot.verb || part.slot == SentenceSlot.state) {
+        own[part.slot] = exact ?? poolBounds(predicates);
+      } else if (exact != null) {
+        own[part.slot] = exact;
+      }
+
+      partModifier.add(modifierBounds);
     }
 
     partBounds.add(own);
-    partModifier.add(
-      owed == null ? modifierBounds : LengthRange(owed.word.length, owed.word.length),
-    );
   }
 
   final spans = <LengthRange>[
@@ -1711,18 +2057,25 @@ _Built _compose(
   final reported = <String>[];
   final slots = <SentenceSlot>[];
   final names = <String>[];
-  // The predicates and adverbials this sentence spends, for the next one to leave
-  // alone.
   final spent = <String>[];
-  // The noun phrases this sentence drew for the slots a later one keeps.
   final drawn = <SentenceSlot, _Phrase>{};
   _Phrase? subject;
   var named = false;
+  // The phase of the day this sentence named, if it named one.
+  var dayAt = -1;
   // A pronoun says nothing about its own gender, and neither does a name carried
   // over, so what agrees with either agrees with the noun it stands for.
   WordGender? gender =
-      proper.any((word) => word != null && word.isNotEmpty) ? follow?.topic.gender : null;
-  var used = close.length + open.length + tag.length + (opener.isEmpty ? 0 : opener.length + space);
+      pronoun != null || proper.any((word) => word != null && word.isNotEmpty)
+          ? follow?.topic.gender
+          : null;
+  var used =
+      close.length +
+      open.length +
+      tag.length +
+      quoteOpen.length +
+      quoteClose.length +
+      (opener.isEmpty ? 0 : opener.length + space);
 
   if (opener.isNotEmpty) written.add(data.capitalize ? _upper(opener) : opener);
 
@@ -1737,8 +2090,19 @@ _Built _compose(
     }
 
     final gap = i == 0 ? 0 : space;
-    final headCost =
-        (part.head == null ? 0 : part.head!.length + space) + _copulaSpan(part, data).min;
+    // A state group may bring its own copula, which wins over the shape's; a head
+    // that carries the tense changes for the past, and agrees with the subject
+    // where the language's past does (Russian `был` beside `была`).
+    final own = part.slot == SentenceSlot.state ? stateGroup : null;
+    final presentHead = own?.head ?? part.head;
+    final pastHead = own?.pastHead ?? part.pastHead;
+    final tensedHead = past && pastHead != null ? pastHead : presentHead;
+    final agreement = data.pastAgreement;
+    final partHead =
+        past && pastHead != null && agreement != null && tensedHead != null
+            ? _agreeBy(agreement, tensedHead, gender)
+            : tensedHead;
+    final headCost = (partHead == null ? 0 : partHead.length + space) + _copulaSpan(part, data).min;
     final overhead = gap + headCost + _tailMin(part);
     final high = _atLeast(1, max - used - overhead - restMin);
     final low = _atLeast(1, min - used - overhead - restMax);
@@ -1747,18 +2111,19 @@ _Built _compose(
     if (part.slot == SentenceSlot.money) {
       phrase = _moneyText(data);
     } else if (proper[i] != null) {
-      // A bare proper noun, drawn now if it was not carried in. `high` and `low`
-      // are what the phrase has room for, and the name generator fits them the
-      // same way a noun would.
       if (proper[i]!.isNotEmpty) {
         phrase = proper[i]!;
       } else {
-        final drawn = _properName(language, settings, prefixable && i == 0 ? settings.prefix : '');
+        final drawnName = _properName(
+          language,
+          settings,
+          prefixable && i == 0 ? settings.prefix : '',
+        );
 
-        phrase = drawn.text;
-        names.add(drawn.text);
+        phrase = drawnName.text;
+        names.add(drawnName.text);
 
-        if (part.slot == SentenceSlot.subject) gender = drawn.gender;
+        if (part.slot == SentenceSlot.subject) gender = drawnName.gender;
       }
 
       if (part.slot == SentenceSlot.subject) named = true;
@@ -1771,8 +2136,7 @@ _Built _compose(
       final counted = part.slot == SentenceSlot.quantity ? _countSpan(data).max : 0;
       final room = high - nouns.min - counted;
       // A phrase whose share of the range is longer than any noun of its theme
-      // takes a modifier whatever the roll says, which is the only way it can
-      // reach it — the alternative is a sentence that quietly misses `minLength`.
+      // takes a modifier whatever the roll says.
       final needed = low > (article.max == 0 ? 0 : article.max + space) + nouns.max;
       final modify =
           part.slot != SentenceSlot.quantity &&
@@ -1784,8 +2148,6 @@ _Built _compose(
         theme,
         forced: required?.word,
         modify: modify,
-        // A counted phrase drops its article and takes no modifier: `12 apples`,
-        // never `the 12 red apples`.
         bare: part.slot == SentenceSlot.quantity || part.bare,
         forcedModifier: owed?.word,
         invent: settings.invent,
@@ -1794,6 +2156,7 @@ _Built _compose(
         max: high,
         nouns: nouns,
         count: part.slot == SentenceSlot.quantity ? _countText(data, theme) : '',
+        described: required != null && !required.known ? null : theme,
       );
 
       phrase = built.text;
@@ -1803,14 +2166,16 @@ _Built _compose(
         gender = genderOf(lexicon, _asPool(lexicon, built.noun));
       }
 
-      // A place is where the result is happening and an object is what it is
-      // about, so both are kept for the sentences that follow. A quantity is not:
-      // `사과 12개` is an amount of something rather than a thing.
-      if (part.slot == SentenceSlot.place || part.slot == SentenceSlot.object) {
+      // A place is where the result is happening, an object is what it is about
+      // and a destination is where it is going, so all three are kept for the
+      // sentences that follow.
+      if (part.slot == SentenceSlot.place ||
+          part.slot == SentenceSlot.object ||
+          part.slot == SentenceSlot.destination) {
         drawn[part.slot] = built;
       }
     } else {
-      final drawn = _predicateFor(
+      final predicate = _predicateFor(
         part.slot,
         lexicon,
         data,
@@ -1821,30 +2186,49 @@ _Built _compose(
         low,
         high,
         draw.avoid,
+        draw.tense,
+        draw.dayAt,
+        // The first sentence of a result may set its scene in any time it likes;
+        // the ones after it only move the day forward.
+        follow == null && draw.link != JoinSide.second,
+        themeClass[subjectTheme]!,
       );
 
-      phrase = drawn.text;
+      phrase = predicate.text;
 
-      if (drawn.base.isNotEmpty) spent.add(drawn.base);
+      if (predicate.base.isNotEmpty) spent.add(predicate.base);
+      if (predicate.dayAt >= 0) dayAt = predicate.dayAt;
+
+      // A past-tense verb in a language whose verb does not change is written
+      // with the language's own mark beside it — once per sentence, so the second
+      // clause of one goes without — and one whose verb agrees with its subject in
+      // the past is agreed with it.
+      if (part.slot == SentenceSlot.verb && past) {
+        if (mark?.head != null && draw.link != JoinSide.second) {
+          phrase = mark!.head! + data.space + phrase;
+        }
+
+        if (mark?.tail != null) phrase += mark!.tail!;
+
+        if (agreement != null && verbGroup?.past != null) {
+          phrase = _agreeBy(agreement, phrase, gender);
+        }
+      }
     }
 
     // The opening capital belongs to whatever is written first, and that is the
     // phrase itself unless a connective or a preposition stands in front of it.
-    // Applied here rather than to the finished string, so the phrase the detail
-    // reports is the one the sentence actually shows.
-    // The copula is written onto this phrase rather than beside it, on whichever
-    // side the language puts it: `11시 40분이다` is one word and `is September 5`
-    // is two. Its form comes from the same chain a verb's does, so a copular
-    // question asks and a polite one is polite. A copula in front still lets the
-    // phrase keep its own preposition, because German says `ist am 5. März`.
+    // The second clause of a sentence carries on from the first, so it opens on
+    // nothing. The copula is written onto this phrase rather than beside it, on
+    // whichever side the language puts it.
     final copula = part.copula == null ? '' : _oneOf(pick(predicates));
-    final opens = data.capitalize && written.isEmpty;
-    final opener = <String>[
+    final opens = data.capitalize && written.isEmpty && draw.link != JoinSide.second;
+    final headText = <String>[
       if (part.copula == CopulaSide.head) copula,
-      if (part.head != null) part.head!,
+      if (partHead != null) partHead,
     ].join(data.space);
-    final head = opener.isEmpty ? null : (opens ? _upper(opener) : opener);
-    final text = opens && opener.isEmpty ? _upper(phrase) : phrase;
+    final head = headText.isEmpty ? null : (opens ? _upper(headText) : headText);
+    final text = opens && headText.isEmpty ? _upper(phrase) : phrase;
     final tail = (part.copula == CopulaSide.tail ? copula : '') + _tailOf(part, text);
 
     if (head != null) written.add(head);
@@ -1854,8 +2238,6 @@ _Built _compose(
     slots.add(part.slot);
     used += gap + headCost + text.length + tail.length;
 
-    // The opening capital belongs to the name too, so what the detail reports is
-    // what the sentence shows.
     if (proper[i] != null && proper[i]!.isEmpty && text != phrase) {
       names[names.length - 1] = text;
     }
@@ -1866,10 +2248,7 @@ _Built _compose(
   final carried =
       named
           ? reported[slots.indexOf(SentenceSlot.subject)]
-          : (subject?.noun ?? (pronoun != null && pronoun.isNotEmpty ? follow!.topic.noun : null));
-  // Where this sentence happened and what it was about, for the next one. The
-  // bare noun rather than the phrase, so the next sentence writes its own article
-  // and may put a different modifier in front of the same place.
+          : (subject?.noun ?? (pronoun != null && pronoun.isNotEmpty ? follow?.topic.noun : null));
   final scene = <SentenceSlot, _Requirement>{...?follow?.scene};
 
   drawn.forEach((slot, entry) {
@@ -1885,8 +2264,6 @@ _Built _compose(
   });
 
   return _Built(
-    // The opener is written against the first phrase rather than beside it —
-    // Spanish `¿El león corre?`, never `¿ El león corre ?`.
     quoteOpen + open + written.join(data.space) + tag + close + quoteClose,
     reported,
     slots,
@@ -1895,43 +2272,103 @@ _Built _compose(
     draw.type,
     named ? null : subject?.theme,
     carried,
-    subject != null || named ? gender : (pronoun != null ? follow!.topic.gender : null),
+    subject != null || named ? gender : (pronoun != null ? follow?.topic.gender : null),
     named || (pronoun != null && (follow?.topic.named ?? false)),
     scene,
+    verbGroup?.field,
+    dayAt,
   );
 }
 
-/// The predicates of a group, in the form this sentence ends on.
+/// Which form a level writes for each mood, best first, in the tense the result
+/// is in — or the form that links a first clause to the one after it.
 ///
-/// Each level falls back along its own chain to the plain statement the `words`
-/// already are, so a group declares only what its language actually writes.
-/// Japanese declares `polite` alone and it serves the formal level and the
-/// question too, because the `か` that asks is the frame's tag rather than part
-/// of the verb.
+/// The first clause of a two-clause sentence takes the form that links it to
+/// the next, in a language that has one, and that form carries no tense, no
+/// mood and no level of its own. The past has its own statement and its own
+/// forms, and a level the past does not declare falls back along the same chain
+/// to the past statement — never to the present. A group with no past at all is
+/// one whose language marks it beside the verb, and it writes its present forms.
 WordPool _formOf(
   StateGroup? stateGroup,
   VerbGroup? verbGroup,
   SentenceType mark,
   SentenceStyle style,
+  SentenceTense tense,
+  SentenceJoin? join,
 ) {
   final forms = stateGroup?.forms ?? verbGroup!.forms;
   final words = stateGroup?.words ?? verbGroup!.words;
+  final linking = forms[PredicateForm.linking];
+
+  if (join?.form == PredicateForm.linking && linking != null) {
+    return linking.map(_oneOf).toList(growable: false);
+  }
+
+  final past = stateGroup?.past ?? verbGroup?.past;
+  final tensedForms = tense == SentenceTense.past && past != null ? past.forms : forms;
+  final tensedWords = tense == SentenceTense.past && past != null ? past.words : words;
 
   for (final key in _formChain[style]![mark]!) {
-    final pool = forms[key];
+    final pool = tensedForms[key];
 
     if (pool != null) return pool.map(_oneOf).toList(growable: false);
   }
 
-  return words;
+  return tensedWords;
 }
 
-/// What a phrase that is not a noun phrase writes, and the word it is a form of.
+/// What a phrase that is not a noun phrase writes, the word it is a form of, and
+/// — for a time — which phase of the day it named, as an index into `times.day`.
 class _Predicate {
-  const _Predicate(this.text, this.base);
+  const _Predicate(this.text, this.base, this.dayAt);
 
   final String text;
   final String base;
+  final int dayAt;
+}
+
+/// The manners something of this class can do a thing in. Any of them, failing
+/// that.
+WordPool _mannersFor(SentenceLanguageData data, NounClass subject) {
+  final fitting = data.manners.where((group) => group.subject.contains(subject)).toList();
+  final groups = fitting.isNotEmpty ? fitting : data.manners;
+
+  return <String>{for (final group in groups) ...group.words}.toList(growable: false);
+}
+
+/// When something happens, chosen against the tense and against where the
+/// result has got to in its day.
+///
+/// A sentence that opens a result may set it in any time its tense allows: a
+/// season, a habit, `yesterday` in the past and `these days` in the present. One
+/// that follows another only moves the day forward — the next few phases of the
+/// day, so a story that opened at dawn reaches noon before it reaches midnight.
+_Predicate _timeFor(
+  SentenceLanguageData data,
+  SentenceTense tense,
+  int dayAt,
+  bool opens,
+  Set<String> avoid,
+  int min,
+  int max,
+) {
+  final times = data.times;
+  final day = <String>[
+    for (var at = 0; at < times.day.length; at += 1)
+      if (at > dayAt && at <= dayAt + _dayStride) times.day[at],
+  ];
+  final tensed = tense == SentenceTense.past ? times.past : times.present;
+  final free = opens ? <String>[...times.any, ...?tensed] : const <String>[];
+  final pool = <String>[...day, ...free];
+  final usable = pool.isNotEmpty ? pool : <String>[...times.day, ...times.any];
+  final fits = usable
+      .where((word) => !avoid.contains(word) && word.length >= min && word.length <= max)
+      .toList(growable: false);
+  final String drawn =
+      fits.isNotEmpty ? pick(fits) : (pickWord(usable, min, max, '') ?? pick(usable));
+
+  return _Predicate(drawn, drawn, times.day.indexOf(drawn));
 }
 
 /// The word a phrase that is not a noun phrase writes: the predicate, or an
@@ -1953,6 +2390,10 @@ _Predicate _predicateFor(
   int min,
   int max,
   Set<String> avoid,
+  SentenceTense tense,
+  int dayAt,
+  bool opens,
+  NounClass subject,
 ) {
   String agreed(String word) =>
       slot == SentenceSlot.state && data.predicateAgrees ? agree(wordData, word, gender) : word;
@@ -1965,18 +2406,17 @@ _Predicate _predicateFor(
     return _Predicate(
       agreed(at >= 0 && at < predicates.length ? predicates[at] : required.word),
       required.word,
+      -1,
     );
   }
 
-  if (slot == SentenceSlot.date) return _Predicate(_dateText(data), '');
-  if (slot == SentenceSlot.clock) return _Predicate(_clockText(data), '');
+  if (slot == SentenceSlot.date) return _Predicate(_dateText(data), '', -1);
+  if (slot == SentenceSlot.clock) return _Predicate(_clockText(data), '', -1);
+  if (slot == SentenceSlot.time) {
+    return _timeFor(data, tense, dayAt, opens, avoid, min < max ? min : max, max);
+  }
 
-  final pool =
-      slot == SentenceSlot.manner
-          ? data.manners
-          : slot == SentenceSlot.time
-          ? data.times
-          : predicates;
+  final pool = slot == SentenceSlot.manner ? _mannersFor(data, subject) : predicates;
   // A predicate is a form of the word at the same index of the group; an
   // adverbial is written whole and is its own plain form.
   String plainly(int at) =>
@@ -1990,7 +2430,7 @@ _Predicate _predicateFor(
   final String drawn =
       fresh.isNotEmpty ? pick(fresh) : (pickWord(pool, low, max, '') ?? pick(pool));
 
-  return _Predicate(agreed(drawn), plainly(pool.indexOf(drawn)));
+  return _Predicate(agreed(drawn), plainly(pool.indexOf(drawn)), -1);
 }
 
 /// The themes a sentence may draw its subject from.
@@ -2035,8 +2475,8 @@ _Built _generateOne(WordLanguage language, _Settings settings, _Draw draw) {
   final data = sentenceData[language]!;
   final bounds = _roomFor(language, settings.includeName);
   final modifierBounds = _modifierBounds[language]!;
-  final allowed = _framesFor(data, settings, _moodFor(draw.mark));
-  final requested = _subjectThemesFor(settings, follow);
+  final allowed = _framesFor(data, settings, _moodFor(draw.mark), draw.beat);
+  final requested = draw.beat?.subject ?? _subjectThemesFor(settings, follow);
   // The words a caller required go in the first sentence — once in the result
   // rather than once in every sentence of it.
   final requirements =
@@ -2056,13 +2496,25 @@ _Built _generateOne(WordLanguage language, _Settings settings, _Draw draw) {
     );
   }
 
+  // The second clause of one sentence shares the first one's subject and writes
+  // nothing where it would stand, the way a dropped subject does.
+  if (draw.link == JoinSide.second) pinned.remove(SentenceSlot.subject);
+
+  // A result that has reached the last phase of its day has no later one to
+  // name, so a sentence after that carries no time at all rather than a wrong one.
+  final spent = follow != null && draw.dayAt >= data.times.day.length - 1;
+  final timeless =
+      spent
+          ? allowed
+              .where((frame) => !frame.parts.any((part) => part.slot == SentenceSlot.time))
+              .toList(growable: false)
+          : allowed;
+  final frames = timeless.isNotEmpty ? timeless : allowed;
   final placements = <SentenceFrame, _Placement>{
-    for (final frame in allowed) frame: _planFor(frame, requirements, pinned),
+    for (final frame in frames) frame: _planFor(frame, requirements, pinned),
   };
   final range = budget;
-  // A shape is only worth drawing when the language has a predicate for it: a
-  // `body` subject has no transitive verb in any language here, so a shape with
-  // an object in it would have to fall back to a verb that means something else.
+  // A shape is only worth drawing when the language has a predicate for it.
   bool buildable(SentenceFrame frame) {
     final placement = placements[frame]!;
 
@@ -2077,41 +2529,52 @@ _Built _generateOne(WordLanguage language, _Settings settings, _Draw draw) {
     }
 
     return frame.parts.any((part) => part.slot == SentenceSlot.state)
-        ? _stateGroupsFor(data, requested, frame, placement.plan).isNotEmpty
-        : _verbGroupsFor(data, frame, requested, placement.plan).isNotEmpty;
+        ? _stateGroupsFor(data, requested, frame, placement.plan, draw.beat).isNotEmpty
+        : _verbGroupsFor(data, frame, requested, placement.plan, draw.beat).isNotEmpty;
   }
 
   // Prefer a shape that can land inside the range, then one that has somewhere
   // to put every word the caller required, and settle for any of them after that.
-  final fitting = allowed
+  final fitting = frames
       .where((frame) {
         final own = _frameRange(frame, data, bounds, modifierBounds);
 
         return own.max >= range.min && own.min <= range.max && buildable(frame);
       })
       .toList(growable: false);
-  final loose = allowed.where(buildable).toList(growable: false);
-  final usable = fitting.isNotEmpty ? fitting : (loose.isNotEmpty ? loose : allowed);
+  final loose = frames.where(buildable).toList(growable: false);
+  final usable = fitting.isNotEmpty ? fitting : (loose.isNotEmpty ? loose : frames);
   _Built? best;
   var bestDistance = 1 << 30;
   var bestTooLong = false;
 
   for (var attempt = 0; attempt < _fitAttempts; attempt += 1) {
     // After a miss, a shape whose own range runs past the requested one in the
-    // direction that was missed is four times as likely. Weighted rather than
-    // filtered: a shape that missed by two characters can still make it on the
-    // next draw, and dropping it left a language whose short shape was the only
-    // one in range settling for whatever it had.
-    final frame = _pickFrame(
-      usable,
-      attempt == 0 || bestDistance == 0
-          ? null
-          : (candidate) {
-            final own = _frameRange(candidate, data, bounds, modifierBounds);
+    // direction that was missed is four times as likely. A story's sentence is
+    // better for carrying what the story would rather it carried — the place it
+    // is all happening in — and for saying a little more than the bare subject
+    // and verb.
+    final frame = _pickFrame(usable, (candidate) {
+      var weight = 1;
 
-            return (bestTooLong ? own.min <= range.min : own.max >= range.max) ? 4 : 1;
-          },
-    );
+      if (attempt > 0 && bestDistance > 0) {
+        final own = _frameRange(candidate, data, bounds, modifierBounds);
+
+        weight *= (bestTooLong ? own.min <= range.min : own.max >= range.max) ? 4 : 1;
+      }
+
+      final beat = draw.beat;
+
+      if (beat != null) {
+        if (beat.prefers.any((slot) => candidate.parts.any((part) => part.slot == slot))) {
+          weight *= 3;
+        }
+
+        if (candidate.parts.length >= 3) weight *= 2;
+      }
+
+      return weight;
+    });
     final built = _compose(
       language,
       data,
@@ -2119,7 +2582,7 @@ _Built _generateOne(WordLanguage language, _Settings settings, _Draw draw) {
       placements[frame]!.plan,
       requested,
       settings,
-      _modifyChanceFor(attempt == 0 ? 0 : bestDistance, bestTooLong),
+      _modifyChanceFor(attempt == 0 ? 0 : bestDistance, bestTooLong, draw.beat != null),
       bounds,
       modifierBounds,
       range.min,
@@ -2302,19 +2765,20 @@ WordPool _pronounsFor(SentenceLanguageData data, _Topic topic) {
 /// [repeated] says whether that one already named the topic, and naming it again
 /// straight afterwards is what makes a paragraph read as a caption written ten
 /// times — worst of all with a person's name, which has no pronoun to alternate
-/// with in the languages that leave their subject out.
+/// with in the languages that leave their subject out. A story never draws a
+/// fresh subject: its hero is whoever it opened on.
 _Follow _followFor(
   SentenceLanguageData data,
   _Topic topic,
   Map<SentenceSlot, _Requirement> scene,
-  bool repeated,
-) {
+  bool repeated, [
+  bool storied = false,
+]) {
   final pronouns = _pronounsFor(data, topic);
   // A person is an individual, not a kind of thing: a paragraph about Emma that
   // draws a `fresh` subject is a paragraph that quietly becomes about Sophie.
-  // Every other topic can be another one of its own class.
   final ways =
-      topic.named
+      topic.named || storied
           ? const <_Reference>[_Reference.repeat, _Reference.pronoun]
           : const <_Reference>[_Reference.repeat, _Reference.pronoun, _Reference.fresh];
   final usable =
@@ -2335,23 +2799,20 @@ _Follow _followFor(
 ///
 /// Never both — a sentence that opened on two things at once would be shouting
 /// its own footnote. [room] is what the sentence may be at its longest, and it
-/// is what decides whether it opens on anything at all: what stands in front is
-/// written before a whole sentence rather than instead of any part of it, so one
-/// longer than the budget can spare is a sentence that overshoots by exactly its
-/// length. Russian `тем временем` is thirteen characters, and a third of a range
-/// of seventy-five has nowhere to put them.
-///
-/// [flow] is the other half of the decision, and it is what makes an opener read
-/// as one: never the same word twice in one result, and far less likely at all
-/// when the sentence before this one already opened on something.
+/// is what decides whether it opens on anything at all; [flow] is the other half
+/// of the decision, and it is what makes an opener read as one: never the same
+/// word twice in one result, and far less likely at all when the sentence before
+/// this one already opened on something. [kinds] is what a story lets this
+/// sentence claim, when it is one of a story.
 String _openerFor(
   SentenceLanguageData data,
   SentenceType mark,
   _Follow? follow,
   int room,
   int shortest,
-  _Flow flow,
-) {
+  _Flow flow, [
+  List<ConnectiveKind>? kinds,
+]) {
   final spare = room - data.space.length - shortest;
 
   List<String> fitting(WordPool pool) => pool
@@ -2368,7 +2829,7 @@ String _openerFor(
 
   if (follow == null) return '';
 
-  final usable = fitting(_connectivesOf(data, follow, mark));
+  final usable = fitting(_connectivesOf(data, follow, mark, kinds));
 
   return usable.isNotEmpty && chance(_connectiveChance * damp) ? pick(usable) : '';
 }
@@ -2376,19 +2837,23 @@ String _openerFor(
 /// The connectives this sentence may open on: the ones whose claim about the
 /// sentence before it can actually be true.
 ///
-/// Three of the four always can. Time passes whatever was said, one more thing is
-/// always one more thing, and any two things can be set against each other. What
-/// [ConnectiveKind.causal] claims is that this sentence follows from the last,
-/// which needs the two of them to be about the same thing and this one to be
-/// telling rather than asking — `그러므로 금빛 하이볼이 식죠?` after a sentence
-/// about a pretzel is a consequence of nothing.
-WordPool _connectivesOf(SentenceLanguageData data, _Follow follow, SentenceType mark) {
+/// Three of the four always can. What [ConnectiveKind.causal] claims is that
+/// this sentence follows from the last, which needs the two of them to be about
+/// the same thing and this one to be telling rather than asking. A story has
+/// already decided what each of its sentences may claim, and hands the kinds in.
+WordPool _connectivesOf(
+  SentenceLanguageData data,
+  _Follow follow,
+  SentenceType mark, [
+  List<ConnectiveKind>? allowed,
+]) {
   final follows =
       follow.reference != _Reference.fresh &&
       (mark == SentenceType.statement || mark == SentenceType.trailing);
+  final wanted = allowed ?? _connectiveKinds;
 
   return <String>[
-    for (final kind in _connectiveKinds)
+    for (final kind in wanted)
       if (follows || kind != ConnectiveKind.causal) ...?data.connectives[kind],
   ];
 }
@@ -2552,12 +3017,84 @@ bool _nameFits(
   return settings.minLength! <= natural.max * count + gap;
 }
 
-List<_Built> _generateResult(WordLanguage language, _Settings settings) {
+/// Everything one result is made of.
+class _Result {
+  const _Result(this.built, this.tense, this.story, this.theme);
+
+  final List<_Built> built;
+  final SentenceTense tense;
+  final SentenceStory? story;
+
+  /// What the result is about: its hero's theme in a story, and the first
+  /// sentence's subject otherwise.
+  final WordTheme? theme;
+}
+
+/// What every sentence of one result is drawn against, settled before the first.
+/// The whole of a result as one string, which is what the caller's range describes.
+int _lengthOf(SentenceLanguageData data, List<_Built> built) =>
+    built.fold<int>(0, (sum, one) => sum + one.sentence.length) +
+    data.space.length * (built.length - 1);
+
+class _Telling {
+  const _Telling({
+    required this.language,
+    required this.data,
+    required this.settings,
+    required this.budgets,
+    required this.room,
+    required this.modifierBounds,
+    required this.shortest,
+    required this.flow,
+    required this.spent,
+    required this.voice,
+    required this.tense,
+  });
+
+  final WordLanguage language;
+  final SentenceLanguageData data;
+  final _Settings settings;
+  final List<LengthRange> budgets;
+  final Map<SentenceSlot, LengthRange> room;
+  final LengthRange modifierBounds;
+  final int shortest;
+  final _Flow flow;
+  final Set<String> spent;
+  final SentenceStyle voice;
+  final SentenceTense tense;
+}
+
+/// One sentence, drawn and then drawn again without what it opened on when that
+/// was what put it outside its range.
+///
+/// `_openerFor` reserves room against the shortest sentence the shapes could
+/// spell, which is a floor no draw actually reaches. When the sentence that came
+/// back could not be made short enough to carry what it opens on after all, that
+/// is the part worth giving up: it stands in front of the whole sentence rather
+/// than instead of any piece of it.
+(_Built, String) _drawOne(_Telling telling, _Draw draw) {
+  var one = _generateOne(telling.language, telling.settings, draw);
+  var opened = draw.opener;
+
+  if (draw.opener.isNotEmpty && _distanceFrom(one.sentence.length, draw.budget) > 0) {
+    final bare = _generateOne(telling.language, telling.settings, draw.copyWith(opener: ''));
+
+    if (_distanceFrom(bare.sentence.length, draw.budget) <
+        _distanceFrom(one.sentence.length, draw.budget)) {
+      one = bare;
+      opened = '';
+    }
+  }
+
+  return (one, opened);
+}
+
+_Result _generateResult(WordLanguage language, _Settings settings) {
   final data = sentenceData[language]!;
   final modifierBounds = _modifierSpan(language);
-  // Every shape any of the requested types could take, because the budget is
-  // shared out before the first type is even drawn.
-  // A quoted line can be any kind at all, so its shapes are all of them.
+  // Every shape any of the requested kinds could take, because the budget is
+  // shared out before the first of them is even drawn — and a quoted line can be
+  // any kind at all, so its shapes are all of them.
   final frames = <SentenceFrame>[
     for (final type in settings.types)
       for (final mark
@@ -2567,9 +3104,7 @@ List<_Built> _generateResult(WordLanguage language, _Settings settings) {
         ..._framesFor(data, settings, _moodFor(mark)),
   ];
   // A result either has a person in it or does not; deciding that per sentence
-  // would put a name in one line of a paragraph and not the next. Settled here
-  // because it takes the language's own name lengths to know whether a name can
-  // answer the range that was asked for.
+  // would put a name in one line of a paragraph and not the next.
   final named =
       settings.includeName ??
       (_nameFits(data, frames, modifierBounds, settings, language) && chance(50));
@@ -2583,20 +3118,62 @@ List<_Built> _generateResult(WordLanguage language, _Settings settings) {
     settings.sentences,
     data.space.length,
   );
+  // The result's own voice, settled once, and its tense likewise: a story is told
+  // in one tense from start to end. Written out: `??` would otherwise infer
+  // `pick`'s type argument from the nullable left-hand side.
+  final SentenceStyle voice = settings.style ?? pick<SentenceStyle>(_styles);
+  final SentenceTense tense =
+      settings.tense ?? (chance(50) ? SentenceTense.past : SentenceTense.present);
+  // What one telling of the result says as it goes. Fresh for every telling,
+  // because a story told again starts over.
+  _Telling telling() => _Telling(
+    language: language,
+    data: data,
+    settings: settled,
+    budgets: budgets,
+    room: room,
+    modifierBounds: modifierBounds,
+    shortest: shortest,
+    flow: _Flow(),
+    spent: <String>{},
+    voice: voice,
+    tense: tense,
+  );
+
+  // More than one sentence is a story, when the language can tell one about the
+  // subject asked for. It always can — every class has a story — so the paragraph
+  // below is what a result falls back to rather than what it usually is. A story
+  // that landed outside the range is told again, and the closest telling is kept.
+  if (settings.sentences > 1) {
+    final range = _boundsFor(data, frames, room, modifierBounds, settled);
+    _Result? closest;
+    var missed = 1 << 30;
+
+    for (var attempt = 0; attempt < _storyAttempts; attempt += 1) {
+      final story = _tellStory(telling());
+
+      if (story == null) break;
+
+      final miss = _distanceFrom(_lengthOf(data, story.built), range);
+
+      if (miss < missed) {
+        closest = story;
+        missed = miss;
+      }
+
+      if (miss == 0) break;
+    }
+
+    if (closest != null) return closest;
+  }
+
+  final paragraph = telling();
+  final flow = paragraph.flow;
+  final spent = paragraph.spent;
+
   final built = <_Built>[];
   _Topic? topic;
   var scene = const <SentenceSlot, _Requirement>{};
-  // What the result has said so far — the register it opened in, and everything
-  // the next sentence has to avoid saying the same way.
-  final flow = _Flow();
-  // What it has already said with its predicates and its adverbials.
-  final spent = <String>{};
-  // The result's own voice, settled once. A caller who named a level gets that
-  // one throughout; one who did not gets a paragraph that is at least consistent
-  // with itself, rather than a level rerolled every sentence.
-  // Written out: `??` would otherwise infer `pick`'s type argument from the
-  // nullable left-hand side, and hand back a `SentenceStyle?`.
-  final SentenceStyle voice = settings.style ?? pick<SentenceStyle>(_styles);
 
   for (var i = 0; i < settings.sentences; i += 1) {
     final budget = budgets[i];
@@ -2604,47 +3181,27 @@ List<_Built> _generateResult(WordLanguage language, _Settings settings) {
     final type = kind[0];
     final mark = kind[1];
     final follow = topic == null ? null : _followFor(data, topic, scene, flow.repeated);
-    final draw = _Draw(
-      budget,
-      type,
-      mark,
-      _quoteFor(data, type, settings.quote),
-      _openerFor(data, mark, follow, budget.max, shortest, flow),
-      _styleFor(type, settled.style, voice),
-      spent,
-      follow,
-    );
-    var one = _generateOne(language, settled, draw);
-    var opened = draw.opener;
+    var dayAt = -1;
 
-    // `_openerFor` reserves room against the shortest sentence the shapes could
-    // spell, which is a floor no draw actually reaches — the shortest word of
-    // every pool at once. When the sentence that came back could not be made
-    // short enough to carry what it opens on after all, that is the part worth
-    // giving up: it stands in front of the whole sentence rather than instead of
-    // any piece of it.
-    if (draw.opener.isNotEmpty && _distanceFrom(one.sentence.length, budget) > 0) {
-      final bare = _generateOne(
-        language,
-        settled,
-        _Draw(
-          draw.budget,
-          draw.type,
-          draw.mark,
-          draw.quote,
-          '',
-          draw.style,
-          draw.avoid,
-          draw.follow,
-        ),
-      );
-
-      if (_distanceFrom(bare.sentence.length, budget) <
-          _distanceFrom(one.sentence.length, budget)) {
-        one = bare;
-        opened = '';
-      }
+    for (final one in built) {
+      if (one.dayAt > dayAt) dayAt = one.dayAt;
     }
+
+    final draw = _Draw(
+      budget: budget,
+      type: type,
+      mark: mark,
+      quote: _quoteFor(data, type, settings.quote),
+      opener: _openerFor(data, mark, follow, budget.max, shortest, flow),
+      style: _styleFor(type, settled.style, voice),
+      avoid: spent,
+      follow: follow,
+      tense: tense,
+      beat: null,
+      link: null,
+      dayAt: dayAt,
+    );
+    final (one, opened) = _drawOne(paragraph, draw);
 
     built.add(one);
     scene = one.scene;
@@ -2661,7 +3218,478 @@ List<_Built> _generateResult(WordLanguage language, _Settings settings) {
     topic ??= _topicOf(one);
   }
 
-  return built;
+  return _Result(built, tense, null, built.first.theme);
+}
+
+/* --- Telling a story ------------------------------------------------------- */
+
+// What each kind is worth in a sentence of a story, where the caller left the
+// kind to the story. A story is told in statements; a step that allows an
+// exclamation or a trailing end gets one now and then.
+const Map<SentenceType, int> _storyKindWeight = <SentenceType, int>{
+  SentenceType.statement: 100,
+  SentenceType.exclamation: 35,
+  SentenceType.trailing: 30,
+};
+
+// What share of a two-clause sentence's range the first clause takes.
+const double _firstClauseShare = 0.5;
+
+// What share of a language's longest sentence one sentence of a result has to be
+// allowed before two clauses are written into it.
+const double _joinRoom = 0.6;
+
+// Where a story happens. `place` alone, and not the two other themes of its
+// class: a hero can walk to the market and not to Pluto.
+const List<WordTheme> _storyPlaces = <WordTheme>[WordTheme.place];
+
+/// The nouns a story has put on the page, by the role each one plays.
+class _Roles {
+  _Requirement? item;
+  _Requirement? place;
+  _Requirement? home;
+}
+
+/// The story a result follows, the hero it is about and the thing in the hero's
+/// hands.
+class _Found {
+  const _Found(this.plan, this.hero, this.heroThemes, this.item);
+
+  final Plan plan;
+  final NounClass hero;
+  final List<WordTheme> heroThemes;
+  final WordTheme? item;
+}
+
+_Found? _storyFor(_Telling telling) {
+  final data = telling.data;
+  final settings = telling.settings;
+  final heroThemes = _subjectThemesFor(settings, null);
+  final heroClasses = <NounClass>{for (final theme in heroThemes) themeClass[theme]!}.toList();
+  final candidates = storiesFor(data, heroClasses, settings.story).toList();
+  final longest = _naturalSpan(data, data.frames, telling.room, telling.modifierBounds).max;
+  final joinable = telling.budgets.first.max >= longest * _joinRoom;
+
+  while (candidates.isNotEmpty) {
+    final story = pickStory(candidates);
+
+    candidates.remove(story);
+
+    final heroes = heroClassesFor(data, story, heroClasses);
+
+    if (heroes.isEmpty) continue;
+
+    final hero = pick(heroes);
+    final items = itemThemesFor(data, story, hero);
+    final WordTheme? item = items.isEmpty ? null : pick(items);
+    final planned = plan(data, story, hero, item, settings.sentences, joinable);
+
+    if (planned != null) {
+      return _Found(planned, hero, _themesForClasses(heroThemes, <NounClass>[hero]), item);
+    }
+  }
+
+  return null;
+}
+
+/// One beat told: the sentence, its kind and mark, what it opened on, and how it
+/// referred to the topic.
+class _Told {
+  const _Told(this.one, this.type, this.mark, this.opened, this.follow);
+
+  final _Built one;
+  final SentenceType type;
+  final SentenceType mark;
+  final String opened;
+  final _Follow? follow;
+}
+
+/// Every sentence of a result that follows a story.
+///
+/// The plan says what happens in each sentence; this writes it. The hero is the
+/// topic, named in the first sentence and then referred to the way a paragraph
+/// refers to its subject; the thing, the place and home are drawn the first time
+/// a sentence has room for them and pinned into every sentence after; two beats
+/// the plan joined are written as one sentence, the second clause without its
+/// subject.
+_Result? _tellStory(_Telling telling) {
+  final language = telling.language;
+  final data = telling.data;
+  final settings = telling.settings;
+  final found = _storyFor(telling);
+
+  if (found == null) return null;
+
+  final story = found.plan.story;
+  final beats = found.plan.beats;
+  final heroThemes = found.heroThemes;
+  final roles = _Roles();
+  final built = <_Built>[];
+  _Topic? topic;
+  var dayAt = -1;
+  var at = 0;
+
+  /// The nouns this beat's sentence has to write, in the slots it has for them.
+  Map<SentenceSlot, _Requirement> pinnedFor(Beat beat) {
+    final pinned = <SentenceSlot, _Requirement>{};
+    final step = beat.step;
+    final item = roles.item;
+    final place = roles.place;
+
+    if (step.object && item != null) pinned[SentenceSlot.object] = item;
+    if (step.place && place != null) pinned[SentenceSlot.place] = place;
+    if (step.destination == StoryRole.place && place != null) {
+      pinned[SentenceSlot.destination] = place;
+    }
+
+    if (step.destination == StoryRole.home) {
+      roles.home ??= _Requirement(
+        pick(data.homes),
+        const <SentenceSlot?>[SentenceSlot.destination],
+        known: false,
+        bare: true,
+      );
+      pinned[SentenceSlot.destination] = roles.home!;
+    }
+
+    return pinned;
+  }
+
+  /// The place the story is happening in, drawn now if no sentence has named it.
+  _Requirement placeOf() {
+    if (roles.place == null) {
+      final theme = pick(_storyPlaces);
+      final lexicon = wordData[language]!;
+
+      roles.place = _Requirement(
+        _plain(lexicon, pick(_nounsOf(language, theme))),
+        const <SentenceSlot?>[SentenceSlot.place],
+        theme: theme,
+      );
+    }
+
+    return roles.place!;
+  }
+
+  /// What a beat asks of its sentence.
+  _BeatDraw beatDraw(Beat beat) {
+    final step = beat.step;
+    final wants = <SentenceSlot>[];
+    final prefers = <SentenceSlot>[];
+
+    if (step.destination != null) wants.add(SentenceSlot.destination);
+    if (step.object) wants.add(SentenceSlot.object);
+    if (step.place) prefers.add(SentenceSlot.place);
+
+    return _BeatDraw(
+      headedByState: step.kind == StepKind.state,
+      fields: beat.field == null ? const <VerbField>[] : <VerbField>[beat.field!],
+      describes: step.kind == StepKind.state,
+      condition: beat.condition,
+      wants: wants,
+      prefers: prefers,
+      item: found.item,
+      places: _storyPlaces,
+      subject: step.kind == StepKind.scene ? _storyPlaces : heroThemes,
+    );
+  }
+
+  /// The shortest sentence a beat could be written as.
+  int shortestFor(Beat beat) {
+    final frames = _framesFor(data, settings, SentenceMood.statement, beatDraw(beat));
+    var shortest = 1 << 30;
+
+    for (final frame in frames) {
+      final own = _frameRange(frame, data, telling.room, telling.modifierBounds).min;
+
+      if (own < shortest) shortest = own;
+    }
+
+    return shortest;
+  }
+
+  /// One beat as one sentence, or as one clause of one.
+  _Told tell(Beat beat, LengthRange budget, _Built? previous) {
+    final scene = beat.step.kind == StepKind.scene;
+    // What this sentence is doing. A caller who named the kinds gets them; the
+    // story otherwise tells, and lets a step that allows more do more.
+    SentenceType type;
+    SentenceType mark;
+
+    if (settings.typed) {
+      final kind = _kindFor(
+        data,
+        settings,
+        telling.room,
+        telling.modifierBounds,
+        budget,
+        telling.flow,
+      );
+
+      type = kind[0];
+      mark = kind[1];
+    } else {
+      final kinds = <SentenceType>[SentenceType.statement, if (beat.join == null) ...beat.kinds];
+
+      type = pickWeighted<SentenceType>(kinds, (kind) => _storyKindWeight[kind] ?? 1);
+      mark = type;
+    }
+
+    _Follow? follow;
+
+    if (beat.join == JoinSide.second && previous != null) {
+      // The second clause carries on from the first: its subject is the first
+      // clause's, and it writes nothing where the subject would stand.
+      final shared = _topicOf(previous) ?? topic;
+
+      follow = shared == null ? null : _Follow(shared, _Reference.pronoun, '', pinnedFor(beat));
+    } else if (scene) {
+      // The scene is the one sentence whose subject is not the hero: the place the
+      // story is happening in, named in full.
+      final place = placeOf();
+      final lexicon = wordData[language]!;
+
+      follow = _Follow(
+        _Topic(
+          place.word,
+          place.theme,
+          NounClass.place,
+          genderOf(lexicon, _asPool(lexicon, place.word)),
+          false,
+        ),
+        _Reference.repeat,
+        '',
+        pinnedFor(beat),
+      );
+    } else {
+      follow =
+          topic == null
+              ? null
+              : _followFor(data, topic!, pinnedFor(beat), telling.flow.repeated, true);
+    }
+
+    final draw = _Draw(
+      budget: budget,
+      type: type,
+      mark: mark,
+      quote: _quoteFor(data, type, settings.quote),
+      opener:
+          beat.join == JoinSide.second
+              ? ''
+              : _openerFor(
+                data,
+                mark,
+                follow,
+                budget.max,
+                telling.shortest,
+                telling.flow,
+                beat.links,
+              ),
+      style: _styleFor(type, settings.style, telling.voice),
+      avoid: telling.spent,
+      follow: follow,
+      tense: telling.tense,
+      beat: beatDraw(beat),
+      link: beat.join,
+      dayAt: dayAt,
+    );
+    var (one, opened) = _drawOne(telling, draw);
+
+    // A sentence that missed its range by more than the tolerance is drawn once
+    // more the other way round about its subject: named, where it was dropped and
+    // came out short; dropped or stood a pronoun for, where it was named and came
+    // out long.
+    if (follow != null &&
+        !scene &&
+        beat.join == null &&
+        _distanceFrom(one.sentence.length, budget) > 1) {
+      final pronouns = _pronounsFor(data, follow.topic);
+      final short = one.sentence.length < budget.min;
+      _Reference? other;
+
+      if (short && follow.reference == _Reference.pronoun) {
+        other = _Reference.repeat;
+      } else if (!short && follow.reference == _Reference.repeat && pronouns.isNotEmpty) {
+        other = _Reference.pronoun;
+      }
+
+      if (other != null) {
+        final again = _Follow(
+          follow.topic,
+          other,
+          other == _Reference.pronoun ? pick(pronouns) : '',
+          follow.scene,
+        );
+        final (two, openedAgain) = _drawOne(telling, draw.copyWith(follow: again));
+
+        if (_distanceFrom(two.sentence.length, budget) <
+            _distanceFrom(one.sentence.length, budget)) {
+          one = two;
+          opened = openedAgain;
+          follow = again;
+        }
+      }
+    }
+
+    // What this sentence put on the page, for the rest of the story to keep.
+    for (final slot in <SentenceSlot>[
+      SentenceSlot.object,
+      SentenceSlot.place,
+      SentenceSlot.destination,
+    ]) {
+      final drawn = one.scene[slot];
+
+      if (drawn == null) continue;
+
+      if (slot == SentenceSlot.object) {
+        roles.item ??= drawn;
+      } else if (slot == SentenceSlot.place || beat.step.destination == StoryRole.place) {
+        roles.place ??= _Requirement(
+          drawn.word,
+          const <SentenceSlot?>[SentenceSlot.place],
+          theme: drawn.theme,
+          known: drawn.known,
+        );
+      }
+    }
+
+    telling.spent.addAll(one.used);
+
+    if (one.dayAt > dayAt) dayAt = one.dayAt;
+    if (topic == null && !scene) topic = _topicOf(one);
+
+    return _Told(one, type, mark, opened, follow);
+  }
+
+  // The range is shared out again after every sentence, over the ones still to
+  // come: a sentence that fell short hands what it did not use to the next one.
+  var totalMin = data.space.length * (telling.budgets.length - 1);
+  var totalMax = totalMin;
+
+  for (final range in telling.budgets) {
+    totalMin += range.min;
+    totalMax += range.max;
+  }
+
+  var written = 0;
+
+  for (var i = 0; i < beats.length; i += 1) {
+    final beat = beats[i];
+    var left = 0;
+
+    for (var j = i; j < beats.length; j += 1) {
+      if (beats[j].join != JoinSide.second) left += 1;
+    }
+
+    final gaps = data.space.length * (at + left - 1);
+    final budget =
+        _shareOut(
+          LengthRange(
+            _atLeast(left, totalMin - written - gaps),
+            _atLeast(left, totalMax - written - gaps),
+          ),
+          left,
+          data.space.length,
+        ).first;
+    _Told told;
+
+    // Two beats the plan joined are written as one sentence only where the range
+    // has room for both clauses; where it has not, the first is written on its own
+    // and the second — never a step the story needs — is left out.
+    final join = data.join;
+    final glue =
+        (join?.word == null ? 0 : join!.word!.length + data.space.length) + data.space.length;
+    final joinsNext = beat.join == JoinSide.first && i + 1 < beats.length;
+    final fits = joinsNext && shortestFor(beat) + shortestFor(beats[i + 1]) + glue <= budget.max;
+
+    if (joinsNext && !fits && !beats[i + 1].step.required) {
+      told = tell(beat.unjoined(), budget, null);
+      i += 1;
+    } else if (joinsNext) {
+      // Two clauses share one sentence's range: the join between them comes off
+      // the top, and each clause gets its share of what is left.
+      final min = _atLeast(2, budget.min - glue);
+      final max = _atLeast(2, budget.max - glue);
+      final firstRange = LengthRange(
+        _atLeast(1, (min * _firstClauseShare).floor()),
+        _atLeast(1, (max * _firstClauseShare).floor()),
+      );
+      final secondRange = LengthRange(
+        _atLeast(1, min - firstRange.min),
+        _atLeast(1, max - firstRange.max),
+      );
+      final first = tell(beat, firstRange, null);
+      final second = tell(beats[i + 1], secondRange, first.one);
+
+      told = _Told(
+        _joinClauses(data, first.one, second.one),
+        second.type,
+        second.mark,
+        first.opened,
+        first.follow,
+      );
+      i += 1;
+
+      // The estimate above is the shortest the two shapes could be, and the clauses
+      // are drawn against pinned nouns the estimate did not know. A two-clause
+      // sentence that overshoots after all gives up its second clause where the
+      // story can spare it, and is drawn again as one.
+      if (told.one.sentence.length > budget.max + 1 &&
+          !beats[i].step.required &&
+          first.one.sentence.length <= budget.max) {
+        told = tell(beat.unjoined(), budget, null);
+      }
+    } else {
+      told = tell(beat, budget, null);
+    }
+
+    built.add(told.one);
+    written += told.one.sentence.length + (at > 0 ? data.space.length : 0);
+    at += 1;
+
+    final flow = telling.flow;
+
+    flow.run = told.type == flow.last ? flow.run + 1 : 1;
+    flow.last = told.type;
+    flow.mark = told.mark;
+    flow.opened = told.opened.isNotEmpty;
+    flow.lead ??= told.type;
+
+    if (beat.step.kind != StepKind.scene) {
+      flow.repeated = told.follow == null || told.follow!.reference == _Reference.repeat;
+    }
+
+    if (told.opened.isNotEmpty) flow.openers.add(told.opened);
+  }
+
+  // A named hero has no theme, and the scene's place is not what the story is about.
+  final hero = topic;
+
+  return _Result(built, telling.tense, story.name, hero != null ? hero.theme : built.first.theme);
+}
+
+/// Two clauses as one sentence: the first, then whatever the language writes
+/// between them, then the second. The first clause closed on nothing and the
+/// second opened on nothing, so the seam is the language's own space.
+_Built _joinClauses(SentenceLanguageData data, _Built first, _Built second) {
+  final word = data.join?.word;
+  final glue = word == null ? '' : data.space + word;
+
+  return _Built(
+    first.sentence + glue + data.space + second.sentence,
+    <String>[...first.phrases, ...second.phrases],
+    <SentenceSlot>[...first.slots, ...second.slots],
+    <String>[...first.names, ...second.names],
+    <String>[...first.used, ...second.used],
+    second.type,
+    first.theme,
+    first.subject ?? second.subject,
+    first.gender ?? second.gender,
+    first.named || second.named,
+    <SentenceSlot, _Requirement>{...first.scene, ...second.scene},
+    second.field,
+    first.dayAt > second.dayAt ? first.dayAt : second.dayAt,
+  );
 }
 
 /// Generate sentences with every choice already resolved.
@@ -2684,6 +3712,8 @@ List<SentenceDetail> generateSentenceDetails({
   Set<SentenceType>? type,
   SentenceQuote? quote,
   SentenceStyle? style,
+  SentenceTense? tense,
+  SentenceStory? story,
 }) {
   final settings = _Settings(
     theme: theme,
@@ -2700,6 +3730,11 @@ List<SentenceDetail> generateSentenceDetails({
     types: type == null || type.isEmpty ? SentenceType.values : type.toList(growable: false),
     quote: quote,
     style: style,
+    tense: tense,
+    story: story,
+    // A caller who named the kinds — every one of them included — gets them; a
+    // story writes statements otherwise.
+    typed: type != null && type.isNotEmpty,
   );
 
   return collect<SentenceDetail>(
@@ -2714,7 +3749,8 @@ List<SentenceDetail> generateSentenceDetails({
       final drawn = settings.includeName == null ? settings.naming(chance(50)) : settings;
       final WordLanguage code = language ?? pick(_languagesFor(drawn));
       final data = sentenceData[code]!;
-      final built = _generateResult(code, drawn);
+      final result = _generateResult(code, drawn);
+      final built = result.built;
 
       return SentenceDetail(
         sentence: built.map((one) => one.sentence).join(data.space),
@@ -2725,10 +3761,12 @@ List<SentenceDetail> generateSentenceDetails({
         slots: List<SentenceSlot>.unmodifiable(built.expand((one) => one.slots)),
         names: List<String>.unmodifiable(built.expand((one) => one.names)),
         types: List<SentenceType>.unmodifiable(built.map((one) => one.type)),
+        tense: result.tense,
+        story: result.story,
         language: code,
-        // What the result is about is what its first sentence was about; the
-        // ones after it stay inside that noun's class.
-        theme: built.first.theme,
+        // What the result is about: its hero in a story, and otherwise what its
+        // first sentence was about, which the ones after it stay inside.
+        theme: result.theme,
       );
     },
     keyOf: (detail) => detail.sentence,

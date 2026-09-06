@@ -6,6 +6,7 @@ import 'package:randino/src/name/data/types.dart';
 import 'package:randino/src/sentence/data/index.dart';
 import 'package:randino/src/sentence/data/types.dart';
 import 'package:randino/src/sentence/sentence_generator.dart';
+import 'package:randino/src/sentence/story.dart';
 import 'package:randino/src/word/data/index.dart';
 import 'package:randino/src/word/data/types.dart';
 import 'package:randino/src/word/word_generator.dart';
@@ -115,10 +116,41 @@ List<String> formsOf(WordPool words, PredicateForms forms, SentenceStyle style, 
   return words.toList(growable: false);
 }
 
-/// Every predicate a group can write at any level and any mood.
-List<String> everyForm(WordPool words, PredicateForms forms) => <String>[
+/// Every predicate a group can write at any level and any mood, in either tense.
+List<String> everyForm(WordPool words, PredicateForms forms, [PredicateTense? past]) => <String>[
   ...words,
   for (final pool in forms.values) ...endings(pool),
+  if (past != null) ...pastForms(past),
+];
+
+/// The same, for the past alone.
+List<String> pastForms(PredicateTense? past) =>
+    past == null
+        ? const <String>[]
+        : <String>[...past.words, for (final pool in past.forms.values) ...endings(pool)];
+
+/// A word reshaped by ordered `[ending, replacement]` rules, for every gender.
+List<String> agreedBy(WordAgreement rules, String word) {
+  final out = <String>[word];
+
+  for (final list in rules.values) {
+    for (final rule in list) {
+      if (word.endsWith(rule[0])) {
+        out.add(word.substring(0, word.length - rule[0].length) + rule[1]);
+        break;
+      }
+    }
+  }
+
+  return out;
+}
+
+/// Every time adverbial a language holds, whatever the tense.
+List<String> timesOf(SentenceLanguageData data) => <String>[
+  ...data.times.day,
+  ...data.times.any,
+  ...?data.times.past,
+  ...?data.times.present,
 ];
 
 Set<String> poolFor(WordLanguage language, SentenceSlot slot) {
@@ -126,17 +158,19 @@ Set<String> poolFor(WordLanguage language, SentenceSlot slot) {
 
   switch (slot) {
     case SentenceSlot.verb:
-      return <String>{for (final group in data.verbs) ...everyForm(group.words, group.forms)};
+      return <String>{
+        for (final group in data.verbs) ...everyForm(group.words, group.forms, group.past),
+      };
     case SentenceSlot.state:
       final states = <String>[
-        for (final group in data.states) ...everyForm(group.words, group.forms),
+        for (final group in data.states) ...everyForm(group.words, group.forms, group.past),
       ];
 
       return (data.predicateAgrees ? inflected(language, states) : states).toSet();
     case SentenceSlot.manner:
-      return data.manners.toSet();
+      return <String>{for (final group in data.manners) ...group.words};
     case SentenceSlot.time:
-      return data.times.toSet();
+      return timesOf(data).toSet();
     default:
       return <String>{
         for (final theme in wordThemes)
@@ -145,12 +179,14 @@ Set<String> poolFor(WordLanguage language, SentenceSlot slot) {
   }
 }
 
-/// The modifiers a noun phrase may carry, in every form they can take.
+/// The modifiers a noun phrase may carry, in every form they can take: the
+/// sentence data's own groups, and the nickname pools a required word may still
+/// come from.
 Set<String> modifiersFor(WordLanguage language) =>
-    inflected(
-      language,
-      wordData[language]!.adjectives,
-    ).map((word) => plain(language, word)).toSet();
+    inflected(language, <String>[
+      for (final group in sentenceData[language]!.modifiers) ...group.words,
+      ...wordData[language]!.adjectives,
+    ]).map((word) => plain(language, word)).toSet();
 
 List<String> articlesFor(WordLanguage language) {
   final articles = sentenceData[language]!.articles;
@@ -392,6 +428,7 @@ void main() {
           for (final sentence in randSentence(
             type: statementOnly,
             includeName: false,
+            tense: SentenceTense.present,
             language: language,
             realism: realism,
             count: sample,
@@ -424,6 +461,7 @@ void main() {
           for (final sentence in randSentence(
             type: statementOnly,
             includeName: false,
+            tense: SentenceTense.present,
             language: language,
             realism: realism,
             count: sample,
@@ -478,6 +516,7 @@ void main() {
         for (final detail in randSentenceDetails(
           type: statementOnly,
           includeName: false,
+          tense: SentenceTense.present,
           language: language,
           count: 200,
         )) {
@@ -592,6 +631,7 @@ void main() {
         for (final detail in randSentenceDetails(
           type: statementOnly,
           includeName: false,
+          tense: SentenceTense.present,
           language: language,
           count: 200,
         )) {
@@ -654,6 +694,7 @@ void main() {
         for (final detail in randSentenceDetails(
           type: statementOnly,
           includeName: false,
+          tense: SentenceTense.present,
           language: WordLanguage.ko,
           theme: theme,
           count: 20,
@@ -675,6 +716,7 @@ void main() {
           for (final detail in randSentenceDetails(
             type: statementOnly,
             includeName: false,
+            tense: SentenceTense.present,
             language: language,
             shape: shape,
             count: 30,
@@ -711,6 +753,7 @@ void main() {
           for (final detail in randSentenceDetails(
             type: statementOnly,
             includeName: false,
+            tense: SentenceTense.present,
             language: language,
             slots: <SentenceSlot>{slot},
             count: 30,
@@ -723,6 +766,7 @@ void main() {
       for (final detail in randSentenceDetails(
         type: statementOnly,
         includeName: false,
+        tense: SentenceTense.present,
         slots: const <SentenceSlot>{},
         count: 120,
       )) {
@@ -750,6 +794,7 @@ void main() {
         for (final sentence in randSentence(
           type: statementOnly,
           includeName: false,
+          tense: SentenceTense.present,
           language: language,
           include: include,
           count: 40,
@@ -871,6 +916,7 @@ void main() {
           language: language,
           type: statementOnly,
           includeName: false,
+          tense: SentenceTense.present,
           count: 400,
         ).map((sentence) => sentence.length).toList(growable: false)..sort();
         final lowest = seen[(seen.length * 0.05).floor()];
@@ -884,6 +930,7 @@ void main() {
             language: language,
             type: statementOnly,
             includeName: false,
+            tense: SentenceTense.present,
             minLength: minLength,
             maxLength: maxLength,
             count: 30,
@@ -1079,9 +1126,13 @@ void main() {
           type == SentenceType.dialogue || type == SentenceType.thought;
       var mixed = 0;
 
+      // `type` is named, because a story told on its own terms is prose and never
+      // quotes: the register is what a caller who asked for every kind gets.
       for (final detail in randSentenceDetails(
         language: WordLanguage.ko,
         includeName: false,
+        tense: SentenceTense.present,
+        type: SentenceType.values.toSet(),
         sentences: 4,
         count: 300,
       )) {
@@ -1179,6 +1230,7 @@ void main() {
         for (final detail in randSentenceDetails(
           type: statementOnly,
           includeName: false,
+          tense: SentenceTense.present,
           language: language,
           sentences: 4,
           shape: SentenceShape.simple,
@@ -1215,6 +1267,7 @@ void main() {
         for (final detail in randSentenceDetails(
           type: statementOnly,
           includeName: false,
+          tense: SentenceTense.present,
           language: language,
           sentences: 3,
           count: 40,
@@ -1254,6 +1307,7 @@ void main() {
       for (final detail in randSentenceDetails(
         type: statementOnly,
         includeName: false,
+        tense: SentenceTense.present,
         count: 20,
       )) {
         expect(detail.sentences, hasLength(1));
@@ -1328,12 +1382,22 @@ void main() {
       for (final language in wordLanguages) {
         final pronouns = pronounsOf(language);
 
-        for (final detail in randSentenceDetails(language: language, sentences: 3, count: 60)) {
+        for (final detail in randSentenceDetails(
+          language: language,
+          type: statementOnly,
+          includeName: false,
+          tense: SentenceTense.present,
+          sentences: 3,
+          count: 60,
+        )) {
           final theme = detail.theme;
 
           if (theme == null) continue;
 
           final wanted = themeClass[theme];
+          // A story's scene is the one sentence whose subject is not the hero: the
+          // place it is happening in does something of its own.
+          final allowed = <NounClass?>[wanted, if (detail.story != null) NounClass.place];
           // A shape that counts what it is about has no separate subject, so the
           // counted phrase is the one that has to stay on topic. It is checked
           // only in the opening sentence, and only when that sentence has no
@@ -1370,7 +1434,7 @@ void main() {
                 found.map((noun) => themeOfNoun(language, noun)).whereType<WordTheme>().toList();
 
             expect(
-              themes.isEmpty || themes.any((theme) => themeClass[theme] == wanted),
+              themes.isEmpty || themes.any((theme) => allowed.contains(themeClass[theme])),
               isTrue,
               reason:
                   '$language: "$phrase" reads as $themes where the result is about a $wanted (${detail.sentence})',
@@ -1426,6 +1490,7 @@ void main() {
         for (final detail in randSentenceDetails(
           language: language,
           includeName: false,
+          tense: SentenceTense.present,
           sentences: 4,
           count: 200,
         )) {
@@ -1511,6 +1576,7 @@ void main() {
       for (final detail in randSentenceDetails(
         type: statementOnly,
         includeName: false,
+        tense: SentenceTense.present,
         count: 60,
       )) {
         expect(detail.names, isEmpty, reason: detail.sentence);
@@ -1802,15 +1868,26 @@ void main() {
           language: language,
           type: <SentenceType>{SentenceType.question},
           style: SentenceStyle.plain,
+          tense: SentenceTense.present,
           count: sample,
         )) {
           expect(sentence, matches(shape), reason: '$language: $sentence');
         }
       });
 
+      // In the past the auxiliary carries the tense: `Did the lion run?`
+      for (final sentence in randSentence(
+        language: WordLanguage.en,
+        type: <SentenceType>{SentenceType.question},
+        tense: SentenceTense.past,
+        count: sample,
+      )) {
+        expect(sentence, matches(RegExp(r'^(Did|Was) ')), reason: sentence);
+      }
+
       // German moves its finite verb to the front, so the question opens on the
       // predicate or on the `ist` that stands in for one.
-      final verbs = poolFor(WordLanguage.de, SentenceSlot.verb);
+      final verbs = <String>[...poolFor(WordLanguage.de, SentenceSlot.verb), 'ist', 'war'];
 
       for (final sentence in randSentence(
         language: WordLanguage.de,
@@ -1818,9 +1895,11 @@ void main() {
         style: SentenceStyle.plain,
         count: sample,
       )) {
-        final first = sentence.split(' ').first.toLowerCase();
+        // A reflexive verb is two words, `belebte sich`, so the sentence is matched
+        // against the pool entries rather than split on its first space.
+        final lower = sentence.toLowerCase();
 
-        expect(verbs.contains(first) || first == 'ist', isTrue, reason: 'de: $sentence');
+        expect(verbs.any((verb) => lower.startsWith('$verb ')), isTrue, reason: 'de: $sentence');
       }
     });
 
@@ -1873,6 +1952,7 @@ void main() {
           language: language,
           type: <SentenceType>{SentenceType.question},
           style: SentenceStyle.plain,
+          tense: SentenceTense.present,
           count: 120,
         )) {
           for (var i = 0; i < detail.phrases.length; i += 1) {
@@ -1911,6 +1991,7 @@ void main() {
           include: <String>['달린다'],
           type: <SentenceType>{SentenceType.question},
           style: entry.key,
+          tense: SentenceTense.present,
           count: 30,
         )) {
           expect(entry.value.any(sentence.contains), isTrue, reason: '${entry.key}: $sentence');
@@ -1923,9 +2004,32 @@ void main() {
         include: <String>['runs'],
         type: <SentenceType>{SentenceType.question},
         style: SentenceStyle.plain,
+        tense: SentenceTense.present,
         count: 30,
       )) {
         expect(sentence, matches(RegExp(r'\brun\b')), reason: sentence);
+      }
+
+      // And the past is one more form it is translated into.
+      for (final sentence in randSentence(
+        language: WordLanguage.ko,
+        include: <String>['달린다'],
+        tense: SentenceTense.past,
+        style: SentenceStyle.plain,
+        type: statementOnly,
+        count: 30,
+      )) {
+        expect(sentence, contains('달렸다'), reason: sentence);
+      }
+
+      for (final sentence in randSentence(
+        language: WordLanguage.en,
+        include: <String>['runs'],
+        tense: SentenceTense.past,
+        type: statementOnly,
+        count: 30,
+      )) {
+        expect(sentence, matches(RegExp(r'\bran\b')), reason: sentence);
       }
     });
 
@@ -1958,6 +2062,7 @@ void main() {
         for (final sentence in randSentence(
           type: statementOnly,
           includeName: false,
+          tense: SentenceTense.present,
           language: language,
           count: 120,
         )) {
@@ -2004,13 +2109,13 @@ void main() {
         },
         // A Japanese verb closes on ます and an adjective on です.
         WordLanguage.ja: <SentenceStyle, RegExp>{
-          SentenceStyle.polite: RegExp(r'(ます|です)か?[。？！…」』]$'),
-          SentenceStyle.formal: RegExp(r'(ます|です)か?[。？！…」』]$'),
+          SentenceStyle.polite: RegExp(r'(ます|ました|です|でした)か?[。？！…」』]$'),
+          SentenceStyle.formal: RegExp(r'(ます|ました|です|でした)か?[。？！…」』]$'),
         },
       };
       final addressed = <WordLanguage, RegExp>{
         WordLanguage.ko: RegExp(r'(요|죠|니다|니까)[.?!…”’]$'),
-        WordLanguage.ja: RegExp(r'(ます|です)か?[。？！…」』]$'),
+        WordLanguage.ja: RegExp(r'(ます|ました|です|でした)か?[。？！…」』]$'),
       };
 
       for (final language in wordLanguages) {
@@ -2074,6 +2179,7 @@ void main() {
               language: language,
               type: <SentenceType>{type},
               style: style,
+              tense: SentenceTense.present,
               count: 60,
             )) {
               for (var i = 0; i < detail.phrases.length; i += 1) {
@@ -2156,6 +2262,7 @@ void main() {
             slots: <SentenceSlot>{slot},
             type: statementOnly,
             includeName: false,
+            tense: SentenceTense.present,
             count: sample,
           )) {
             final at = detail.slots.indexOf(slot);
@@ -2179,6 +2286,7 @@ void main() {
         slots: <SentenceSlot>{SentenceSlot.date},
         type: statementOnly,
         includeName: false,
+        tense: SentenceTense.present,
         count: 30,
       )) {
         expect(detail.slots.contains(SentenceSlot.date), isFalse, reason: detail.sentence);
@@ -2201,6 +2309,7 @@ void main() {
           slots: <SentenceSlot>{SentenceSlot.date, SentenceSlot.clock},
           type: statementOnly,
           includeName: false,
+          tense: SentenceTense.present,
           count: 200,
         )) {
           if (detail.slots.contains(SentenceSlot.verb) ||
@@ -2235,6 +2344,7 @@ void main() {
           style: entry.key,
           type: statementOnly,
           includeName: false,
+          tense: SentenceTense.present,
           count: 200,
         )) {
           if (detail.slots.contains(SentenceSlot.verb) ||
@@ -2279,6 +2389,7 @@ void main() {
         for (final detail in randSentenceDetails(
           type: statementOnly,
           includeName: false,
+          tense: SentenceTense.present,
           language: language,
           slots: <SentenceSlot>{SentenceSlot.quantity},
           count: sample,
@@ -2326,6 +2437,7 @@ void main() {
         for (final detail in randSentenceDetails(
           type: statementOnly,
           includeName: false,
+          tense: SentenceTense.present,
           language: language,
           slots: <SentenceSlot>{SentenceSlot.quantity},
           count: 30,
@@ -2357,6 +2469,7 @@ void main() {
         for (final detail in randSentenceDetails(
           type: statementOnly,
           includeName: false,
+          tense: SentenceTense.present,
           language: language,
           slots: <SentenceSlot>{SentenceSlot.money},
           count: sample,
@@ -2389,6 +2502,7 @@ void main() {
         for (final detail in randSentenceDetails(
           type: statementOnly,
           includeName: false,
+          tense: SentenceTense.present,
           language: language,
           slots: <SentenceSlot>{SentenceSlot.money},
           count: 30,
@@ -2405,6 +2519,9 @@ void main() {
 
         for (final detail in randSentenceDetails(
           language: language,
+          type: statementOnly,
+          includeName: false,
+          tense: SentenceTense.present,
           slots: <SentenceSlot>{SentenceSlot.money},
           count: 60,
         )) {
@@ -2434,6 +2551,7 @@ void main() {
         for (final sentence in randSentence(
           type: statementOnly,
           includeName: false,
+          tense: SentenceTense.present,
           language: language,
           slots: <SentenceSlot>{SentenceSlot.money},
           count: 40,
@@ -2475,6 +2593,497 @@ void main() {
             reason: '$language: $sentence (${sentence.length}) outside $range',
           );
         }
+      }
+    });
+
+    test('`tense` decides when it happened, and a result keeps one tense', () {
+      for (final language in wordLanguages) {
+        final data = sentenceData[language]!;
+        final present = <String>{
+          for (final group in data.verbs) ...everyForm(group.words, group.forms),
+          for (final group in data.states) ...everyForm(group.words, group.forms),
+        };
+        // A language whose adjectives do not change for the past writes them as they
+        // are and puts the tense on the copula in front.
+        final statesChange = data.states.any((group) => group.past != null);
+        // Every past form, agreed for every gender where the language's past agrees.
+        final past = <String>{
+          for (final word in <String>[
+            for (final group in data.verbs) ...pastForms(group.past),
+            for (final group in data.states) ...pastForms(group.past),
+          ])
+            ...(data.pastAgreement == null ? <String>[word] : agreedBy(data.pastAgreement!, word)),
+        };
+        // A word the present and the past share — English `spread` — says nothing
+        // about the tense, so only the words that belong to one of them are read.
+        final pastOnly = past.difference(present);
+        final mark = data.pastMark;
+        final verbsChange = data.verbs.any((group) => group.past != null);
+
+        for (final detail in randSentenceDetails(
+          language: language,
+          type: statementOnly,
+          includeName: false,
+          tense: SentenceTense.past,
+          count: 120,
+        )) {
+          expect(detail.tense, SentenceTense.past);
+
+          for (var i = 0; i < detail.phrases.length; i += 1) {
+            final slot = detail.slots[i];
+
+            if (slot != SentenceSlot.verb && slot != SentenceSlot.state) continue;
+
+            final phrase = detail.phrases[i];
+            final written =
+                i == 0 ? phrase.substring(0, 1).toLowerCase() + phrase.substring(1) : phrase;
+
+            if (mark != null) {
+              // Chinese and Vietnamese mark the past beside the verb and leave the
+              // verb itself as it was.
+              if (slot == SentenceSlot.verb) {
+                final head = mark.head == null ? '' : mark.head! + data.space;
+                final tail = mark.tail ?? '';
+
+                expect(
+                  written.startsWith(head) && written.endsWith(tail),
+                  isTrue,
+                  reason: '$language: "$phrase" carries no past mark (${detail.sentence})',
+                );
+                expect(
+                  present,
+                  contains(written.substring(head.length, written.length - tail.length)),
+                  reason: '$language: "$phrase" is not a verb the pools hold (${detail.sentence})',
+                );
+              }
+
+              continue;
+            }
+
+            final usable = slot == SentenceSlot.state && !statesChange ? present : past;
+            final inflectedForms =
+                data.predicateAgrees ? inflected(language, usable.toList()) : usable.toList();
+
+            expect(
+              inflectedForms.contains(written) ||
+                  inflectedForms.contains(phrase) ||
+                  present.contains(written),
+              isTrue,
+              reason: '$language: "$phrase" is not a past $slot (${detail.sentence})',
+            );
+
+            if (slot == SentenceSlot.verb && verbsChange) {
+              expect(
+                !present.contains(written) || past.contains(written),
+                isTrue,
+                reason: '$language: "$phrase" is a present verb in a past sentence',
+              );
+            }
+          }
+        }
+
+        // The present never reaches for a past form.
+        for (final detail in randSentenceDetails(
+          language: language,
+          type: statementOnly,
+          includeName: false,
+          tense: SentenceTense.present,
+          count: 60,
+        )) {
+          expect(detail.tense, SentenceTense.present);
+
+          for (var i = 0; i < detail.phrases.length; i += 1) {
+            if (detail.slots[i] != SentenceSlot.verb) continue;
+
+            final phrase = detail.phrases[i];
+            final written =
+                i == 0 ? phrase.substring(0, 1).toLowerCase() + phrase.substring(1) : phrase;
+
+            expect(
+              pastOnly,
+              isNot(contains(written)),
+              reason: '$language: "$phrase" is a past verb in a present sentence',
+            );
+          }
+        }
+      }
+
+      // Left out, the tense is drawn, and both come out.
+      final seen = <SentenceTense>{
+        for (final detail in randSentenceDetails(language: WordLanguage.ko, count: 100))
+          detail.tense,
+      };
+
+      expect(seen, SentenceTense.values.toSet());
+    });
+
+    test('more than one sentence tells a story, and one sentence tells none', () {
+      for (final language in wordLanguages) {
+        for (final detail in randSentenceDetails(
+          language: language,
+          type: statementOnly,
+          includeName: false,
+          tense: SentenceTense.present,
+          sentences: 4,
+          count: 40,
+        )) {
+          expect(detail.story, isNotNull, reason: detail.sentence);
+          expect(detail.sentences, hasLength(4), reason: detail.sentence);
+        }
+
+        for (final detail in randSentenceDetails(
+          language: language,
+          type: statementOnly,
+          includeName: false,
+          count: 20,
+        )) {
+          expect(detail.story, isNull, reason: detail.sentence);
+        }
+      }
+
+      // A story the caller named is the one told, where the language can tell it.
+      for (final detail in randSentenceDetails(
+        language: WordLanguage.ko,
+        type: statementOnly,
+        includeName: false,
+        sentences: 3,
+        story: SentenceStory.errand,
+        count: 40,
+      )) {
+        expect(detail.story, SentenceStory.errand, reason: detail.sentence);
+      }
+
+      // German and Russian carry no object, so they tell the stories with nothing in
+      // the hero's hands — and they still tell one.
+      const empty = <SentenceStory>[
+        SentenceStory.stroll,
+        SentenceStory.outing,
+        SentenceStory.evening,
+        SentenceStory.passage,
+      ];
+
+      for (final language in <WordLanguage>[WordLanguage.de, WordLanguage.ru]) {
+        for (final detail in randSentenceDetails(
+          language: language,
+          type: statementOnly,
+          includeName: false,
+          sentences: 3,
+          count: 40,
+        )) {
+          expect(empty, contains(detail.story), reason: '$language: ${detail.sentence}');
+        }
+      }
+
+      // The thing a story is about is one thing throughout: every object phrase of
+      // a result reads as the same noun.
+      for (final language in wordLanguages) {
+        for (final detail in randSentenceDetails(
+          language: language,
+          type: statementOnly,
+          includeName: false,
+          tense: SentenceTense.present,
+          sentences: 5,
+          count: 60,
+        )) {
+          final objects = <Set<String>>[
+            for (var i = 0; i < detail.phrases.length; i += 1)
+              if (detail.slots[i] == SentenceSlot.object) nounsIn(language, detail.phrases[i]),
+          ];
+
+          for (final found in objects.skip(1)) {
+            expect(
+              found.any(objects.first.contains),
+              isTrue,
+              reason: '$language: the thing changed (${detail.sentence})',
+            );
+          }
+        }
+      }
+
+      // A story's required steps alone hold together, in every language, about every
+      // hero it names — and every class of noun has a story to be in.
+      for (final language in wordLanguages) {
+        final data = sentenceData[language]!;
+        final covered = <NounClass>{};
+
+        for (final story in stories) {
+          for (final hero in heroClassesFor(data, story, story.hero)) {
+            covered.add(hero);
+
+            if (story.item != null) {
+              expect(
+                itemThemesFor(data, story, hero),
+                isNotEmpty,
+                reason: '$language: ${story.name} about a $hero has nothing to be about',
+              );
+            } else {
+              expect(
+                tellable(data, story, hero, null),
+                isTrue,
+                reason: '$language: ${story.name} about a $hero',
+              );
+            }
+          }
+        }
+
+        for (final theme in wordThemes) {
+          expect(
+            covered,
+            contains(themeClass[theme]),
+            reason: '$language: no story is about a ${themeClass[theme]}',
+          );
+        }
+      }
+    });
+
+    test('a story moves its day forward, and never back', () {
+      for (final language in wordLanguages) {
+        final day = sentenceData[language]!.times.day;
+        var moved = 0;
+
+        for (final detail in randSentenceDetails(
+          language: language,
+          type: statementOnly,
+          includeName: false,
+          tense: SentenceTense.present,
+          sentences: 6,
+          count: 80,
+        )) {
+          var last = -1;
+
+          for (var i = 0; i < detail.phrases.length; i += 1) {
+            if (detail.slots[i] != SentenceSlot.time) continue;
+
+            final phrase = detail.phrases[i];
+            final written = phrase.substring(0, 1).toLowerCase() + phrase.substring(1);
+            final at = <int>[
+              day.indexOf(phrase),
+              day.indexOf(written),
+            ].reduce((a, b) => a > b ? a : b);
+
+            if (at < 0) continue;
+
+            expect(
+              at,
+              greaterThan(last),
+              reason: '$language: the day went back to "$phrase" (${detail.sentence})',
+            );
+
+            if (last >= 0) moved += 1;
+
+            last = at;
+          }
+        }
+
+        expect(moved, greaterThan(0), reason: '$language: no story named two phases of its day');
+      }
+    });
+
+    test('two neighbouring actions are sometimes written as one sentence', () {
+      List<SentenceSlot> predicatesOf(SentenceDetail detail, List<int> belongs, int at) =>
+          <SentenceSlot>[
+            for (var i = 0; i < detail.slots.length; i += 1)
+              if (belongs[i] == at &&
+                  (detail.slots[i] == SentenceSlot.verb || detail.slots[i] == SentenceSlot.state))
+                detail.slots[i],
+          ];
+
+      for (final language in wordLanguages) {
+        final join = sentenceData[language]!.join;
+
+        if (join == null) continue;
+
+        var joined = 0;
+
+        for (final detail in randSentenceDetails(
+          language: language,
+          type: statementOnly,
+          includeName: false,
+          tense: SentenceTense.present,
+          sentences: 4,
+          count: 80,
+        )) {
+          final belongs = sentenceOf(detail);
+
+          for (var at = 0; at < detail.sentences.length; at += 1) {
+            final predicates = predicatesOf(detail, belongs, at);
+
+            if (predicates.length == 2) {
+              joined += 1;
+
+              if (join.word != null) {
+                expect(
+                  detail.sentences[at],
+                  contains(join.word),
+                  reason: '$language: two clauses and no "${join.word}" (${detail.sentences[at]})',
+                );
+              }
+            }
+
+            expect(
+              predicates.length,
+              lessThanOrEqualTo(2),
+              reason: '$language: ${detail.sentences[at]}',
+            );
+          }
+        }
+
+        expect(joined, greaterThan(0), reason: '$language never joined two clauses');
+      }
+
+      // German declares no join, and never writes two clauses.
+      for (final detail in randSentenceDetails(
+        language: WordLanguage.de,
+        type: statementOnly,
+        includeName: false,
+        tense: SentenceTense.present,
+        sentences: 4,
+        count: 40,
+      )) {
+        final belongs = sentenceOf(detail);
+
+        for (var at = 0; at < detail.sentences.length; at += 1) {
+          expect(
+            predicatesOf(detail, belongs, at),
+            hasLength(1),
+            reason: 'de: ${detail.sentences[at]}',
+          );
+        }
+      }
+    });
+
+    test('a destination follows only a verb that goes somewhere', () {
+      for (final language in wordLanguages) {
+        final data = sentenceData[language]!;
+        final going = <String>{
+          for (final group in data.verbs)
+            if (group.requires == SentenceSlot.destination)
+              ...everyForm(group.words, group.forms, group.past),
+        };
+        final carries = data.frames.any(
+          (frame) => frame.parts.any((part) => part.slot == SentenceSlot.destination),
+        );
+
+        if (!carries) continue;
+
+        var seen = 0;
+
+        for (final detail in randSentenceDetails(
+          language: language,
+          type: statementOnly,
+          includeName: false,
+          tense: SentenceTense.present,
+          slots: <SentenceSlot>{SentenceSlot.destination},
+          count: 120,
+        )) {
+          final at = detail.slots.indexOf(SentenceSlot.destination);
+          final verb = detail.slots.indexOf(SentenceSlot.verb);
+
+          if (at < 0 || verb < 0) continue;
+
+          seen += 1;
+
+          final phrase = detail.phrases[verb];
+          final written =
+              verb == 0 ? phrase.substring(0, 1).toLowerCase() + phrase.substring(1) : phrase;
+
+          expect(
+            going.contains(written) || going.contains(phrase),
+            isTrue,
+            reason: '$language: "$phrase" goes nowhere, and has a destination (${detail.sentence})',
+          );
+        }
+
+        expect(seen, greaterThan(0), reason: '$language wrote no destination');
+      }
+    });
+
+    test('a modifier fits the noun it describes', () {
+      const described = <SentenceSlot>{
+        SentenceSlot.subject,
+        SentenceSlot.object,
+        SentenceSlot.place,
+        SentenceSlot.destination,
+      };
+
+      for (final language in wordLanguages) {
+        final data = sentenceData[language]!;
+        final space = data.space;
+        final nouns = poolFor(language, SentenceSlot.subject);
+        // Every form each group's words can take, agreed for every gender.
+        final groups = <(ModifierGroup, Set<String>)>[
+          for (final group in data.modifiers)
+            (group, inflected(language, group.words).map((word) => plain(language, word)).toSet()),
+        ];
+        final every = <String>{for (final entry in groups) ...entry.$2};
+        var checked = 0;
+
+        for (final detail in randSentenceDetails(
+          language: language,
+          type: statementOnly,
+          includeName: false,
+          tense: SentenceTense.present,
+          count: 150,
+        )) {
+          for (var i = 0; i < detail.phrases.length; i += 1) {
+            if (!described.contains(detail.slots[i])) continue;
+
+            final phrase = detail.phrases[i];
+            var rest = i == 0 ? phrase.substring(0, 1).toLowerCase() + phrase.substring(1) : phrase;
+
+            for (final article in articlesFor(language)) {
+              final opening = article.endsWith("'") ? article : article + space;
+
+              if (rest.startsWith(opening)) {
+                rest = rest.substring(opening.length);
+                break;
+              }
+            }
+
+            if (nouns.contains(rest)) continue;
+
+            // Every way the phrase splits into a modifier and a noun the pools hold.
+            // More than one, because a word can be both — so the phrase is right
+            // when one of its readings is.
+            final readings = <(String, String)>[];
+
+            for (var at = 1; at < rest.length; at += 1) {
+              if (space.isNotEmpty &&
+                  (at + space.length > rest.length ||
+                      rest.substring(at, at + space.length) != space)) {
+                continue;
+              }
+
+              final left = rest.substring(0, at);
+              final right = rest.substring(at + space.length);
+
+              if (every.contains(left) && nouns.contains(right)) readings.add((left, right));
+              if (nouns.contains(left) && every.contains(right)) readings.add((right, left));
+            }
+
+            if (readings.isEmpty) continue;
+
+            checked += 1;
+
+            expect(
+              readings.any((reading) {
+                final theme = themeOfNoun(language, reading.$2);
+
+                return theme != null &&
+                    groups.any(
+                      (entry) =>
+                          entry.$2.contains(reading.$1) &&
+                          entry.$1.subject.contains(themeClass[theme]) &&
+                          (entry.$1.themes == null || entry.$1.themes!.contains(theme)),
+                    );
+              }),
+              isTrue,
+              reason: '$language: "$rest" has no modifier that fits its noun (${detail.sentence})',
+            );
+          }
+        }
+
+        expect(checked, greaterThan(0), reason: '$language: no modifier was read');
       }
     });
 

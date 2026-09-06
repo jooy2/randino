@@ -15,15 +15,10 @@ final SentenceLanguageData de = SentenceLanguageData(
     SentenceType.exclamation: '!',
     SentenceType.trailing: '…',
   },
-  // German opens low and closes high, which is why the pair is not symmetrical.
   quotes: const <SentenceQuote, List<String>>{
     SentenceQuote.double: <String>['„', '“'],
     SentenceQuote.single: <String>['‚', '‘'],
   },
-  // The indefinite article, and it is what makes the modifiers come out right:
-  // after `ein` a German adjective takes the same endings it takes with no
-  // article at all — `ein blauer Wal`, `eine blaue Katze`, `ein blaues Haus` —
-  // which is exactly what `word/data`'s agreement already writes.
   articles: const <WordGender, List<List<String>>>{
     WordGender.m: <List<String>>[
       <String>['', 'ein'],
@@ -37,61 +32,156 @@ final SentenceLanguageData de = SentenceLanguageData(
   },
   verbs: <VerbGroup>[
     VerbGroup(
+      field: VerbField.rise,
       subject: const <NounClass>[NounClass.creature, NounClass.person],
-      words: words(r'''
-        läuft geht springt schwimmt fliegt kriecht ruht schläft lacht weint singt tanzt wartet
-        steht sitzt rollt wandert lauscht zögert eilt
-      '''),
+      words: words(r'erwacht erhebt_sich regt_sich'),
+      past: PredicateTense(words: words(r'erwachte erhob_sich regte_sich')),
     ),
     VerbGroup(
-      subject: const <NounClass>[NounClass.place, NounClass.event],
-      words: words(r'''
-        leuchtet fließt dunkelt erhellt vertieft verstummt
-      '''),
+      field: VerbField.go,
+      subject: const <NounClass>[NounClass.creature, NounClass.person],
+      words: words(r'geht wandert eilt reist'),
+      past: PredicateTense(words: words(r'ging wanderte eilte reiste')),
     ),
     VerbGroup(
+      field: VerbField.arrive,
+      subject: const <NounClass>[NounClass.creature, NounClass.person],
+      words: words(r'kommt erscheint'),
+      past: PredicateTense(words: words(r'kam erschien')),
+    ),
+    VerbGroup(
+      field: VerbField.move,
+      subject: const <NounClass>[NounClass.creature, NounClass.person],
+      words: words(r'läuft springt schwimmt fliegt kriecht streift bummelt trabt spaziert'),
+      past: PredicateTense(
+        words: words(r'lief sprang schwamm flog kroch streifte bummelte trabte spazierte'),
+      ),
+    ),
+    VerbGroup(
+      field: VerbField.wait,
+      subject: const <NounClass>[NounClass.creature, NounClass.person],
+      words: words(r'wartet zögert verharrt lauscht lauert'),
+      past: PredicateTense(words: words(r'wartete zögerte verharrte lauschte lauerte')),
+    ),
+    VerbGroup(
+      field: VerbField.rest,
+      subject: const <NounClass>[NounClass.creature, NounClass.person],
+      words: words(r'ruht sitzt liegt rastet lehnt'),
+      past: PredicateTense(words: words(r'ruhte saß lag rastete lehnte')),
+    ),
+    VerbGroup(
+      field: VerbField.sleep,
+      subject: const <NounClass>[NounClass.creature, NounClass.person],
+      words: words(r'schläft schlummert dämmert döst'),
+      past: PredicateTense(words: words(r'schlief schlummerte dämmerte döste')),
+    ),
+    VerbGroup(
+      field: VerbField.express,
+      subject: const <NounClass>[NounClass.creature, NounClass.person],
+      words: words(r'lacht weint gähnt seufzt lächelt summt murmelt ruft'),
+      past: PredicateTense(
+        words: words(r'lachte weinte gähnte seufzte lächelte summte murmelte rief'),
+      ),
+    ),
+    VerbGroup(
+      field: VerbField.play,
+      subject: const <NounClass>[NounClass.creature, NounClass.person],
+      words: words(r'tanzt singt tollt spielt hüpft rollt'),
+      past: PredicateTense(words: words(r'tanzte sang tollte spielte hüpfte rollte')),
+    ),
+    VerbGroup(
+      field: VerbField.search,
+      subject: const <NounClass>[NounClass.creature, NounClass.person],
+      words: words(r'sucht stöbert kramt'),
+      past: PredicateTense(words: words(r'suchte stöberte kramte')),
+    ),
+    VerbGroup(
+      field: VerbField.change,
+      subject: const <NounClass>[NounClass.place],
+      words: words(r'verstummt dunkelt erhellt_sich leert_sich füllt_sich belebt_sich'),
+      past: PredicateTense(
+        words: words(r'verstummte dunkelte erhellte_sich leerte_sich füllte_sich belebte_sich'),
+      ),
+    ),
+    VerbGroup(
+      field: VerbField.change,
+      subject: const <NounClass>[NounClass.event],
+      words: words(r'leuchtet fließt vertieft_sich beginnt endet dauert vergeht'),
+      past: PredicateTense(
+        words: words(r'leuchtete floss vertiefte_sich begann endete dauerte verging'),
+      ),
+    ),
+    VerbGroup(
+      field: VerbField.change,
       subject: const <NounClass>[NounClass.thing, NounClass.vehicle],
-      words: words(r'''
-        schwankt glänzt fällt rollt neigt altert
-      '''),
+      words: words(r'schwankt glänzt fällt rollt neigt_sich altert'),
+      past: PredicateTense(words: words(r'schwankte glänzte fiel rollte neigte_sich alterte')),
     ),
     VerbGroup(
+      field: VerbField.move,
       subject: const <NounClass>[NounClass.vehicle],
-      words: words(r'''
-        fährt hält rollt wendet gleitet
-      '''),
+      words: words(r'fährt hält rollt wendet gleitet'),
+      past: PredicateTense(words: words(r'fuhr hielt rollte wendete glitt')),
     ),
     VerbGroup(
+      field: VerbField.change,
       subject: const <NounClass>[NounClass.idea, NounClass.event],
-      words: words(r'''
-        wächst verschwindet bleibt schwebt vertieft
-      '''),
+      words: words(r'wächst verschwindet bleibt schwebt vertieft_sich'),
+      past: PredicateTense(words: words(r'wuchs verschwand blieb schwebte vertiefte_sich')),
     ),
     VerbGroup(
+      field: VerbField.change,
       subject: const <NounClass>[NounClass.plant],
-      words: words(r'''
-        wächst welkt blüht schwankt sprießt
-      '''),
+      words: words(r'wächst welkt blüht schwankt sprießt'),
+      past: PredicateTense(words: words(r'wuchs welkte blühte schwankte spross')),
     ),
     VerbGroup(
+      field: VerbField.change,
       subject: const <NounClass>[NounClass.body],
-      words: words(r'''
-        zittert bebt erstarrt heilt
-      '''),
+      words: words(r'zittert bebt erstarrt heilt'),
+      past: PredicateTense(words: words(r'zitterte bebte erstarrte heilte')),
     ),
     VerbGroup(
+      field: VerbField.change,
       subject: const <NounClass>[NounClass.edible],
-      words: words(r'''
-        reift kühlt kocht schmilzt verdirbt
-      '''),
+      words: words(r'reift kühlt kocht schmilzt verdirbt'),
+      past: PredicateTense(words: words(r'reifte kühlte kochte schmolz verdarb')),
     ),
   ],
   states: <StateGroup>[
     StateGroup(
       subject: const <NounClass>[NounClass.creature, NounClass.person],
-      words: words(r'''
-        groß klein schnell langsam still laut mutig faul müde hungrig sanft klug wild
-      '''),
+      words: words(r'groß klein schnell langsam still laut mutig faul sanft klug wild'),
+    ),
+    StateGroup(
+      subject: const <NounClass>[NounClass.creature, NounClass.person],
+      condition: Condition.hungry,
+      words: words(r'hungrig ausgehungert'),
+    ),
+    StateGroup(
+      subject: const <NounClass>[NounClass.creature, NounClass.person],
+      condition: Condition.full,
+      words: words(r'satt gesättigt'),
+    ),
+    StateGroup(
+      subject: const <NounClass>[NounClass.creature, NounClass.person],
+      condition: Condition.tired,
+      words: words(r'müde schläfrig erschöpft'),
+    ),
+    StateGroup(
+      subject: const <NounClass>[NounClass.creature, NounClass.person],
+      condition: Condition.rested,
+      words: words(r'ausgeruht frisch munter'),
+    ),
+    StateGroup(
+      subject: const <NounClass>[NounClass.creature, NounClass.person],
+      condition: Condition.content,
+      words: words(r'froh zufrieden glücklich heiter'),
+    ),
+    StateGroup(
+      subject: const <NounClass>[NounClass.creature, NounClass.person],
+      condition: Condition.restless,
+      words: words(r'gelangweilt neugierig unruhig rastlos'),
     ),
     StateGroup(
       subject: const <NounClass>[
@@ -106,110 +196,172 @@ final SentenceLanguageData de = SentenceLanguageData(
         NounClass.idea,
         NounClass.body,
       ],
-      words: words(r'''
-        schön fremd neu häufig selten
-      '''),
+      words: words(r'schön fremd neu häufig selten'),
     ),
     StateGroup(
       subject: const <NounClass>[NounClass.place, NounClass.event],
-      words: words(r'''
-        weit eng ruhig tief dunkel hell fern steil
-      '''),
+      words: words(r'weit eng ruhig tief dunkel hell fern steil'),
     ),
     StateGroup(
       subject: const <NounClass>[NounClass.thing, NounClass.vehicle],
-      words: words(r'''
-        hart leicht schwer alt glatt klar stabil
-      '''),
+      words: words(r'hart leicht schwer alt glatt klar stabil'),
     ),
     StateGroup(
       subject: const <NounClass>[NounClass.edible],
-      words: words(r'''
-        süß salzig scharf sauer heiß kalt herzhaft
-      '''),
+      words: words(r'süß salzig scharf sauer heiß kalt herzhaft'),
     ),
     StateGroup(
       subject: const <NounClass>[NounClass.idea],
-      words: words(r'''
-        einfach deutlich vage ewig flüchtig
-      '''),
+      words: words(r'einfach deutlich vage ewig flüchtig'),
     ),
     StateGroup(
       subject: const <NounClass>[NounClass.plant],
+      words: words(r'grün üppig duftend welk'),
+    ),
+    StateGroup(subject: const <NounClass>[NounClass.body], words: words(r'warm kalt wund steif')),
+  ],
+  modifiers: <ModifierGroup>[
+    ModifierGroup(
+      subject: const <NounClass>[NounClass.creature, NounClass.person],
       words: words(r'''
-        grün üppig duftend welk
+        mutig lebhaft sanft fleißig faul schüchtern klug jung alt klein groß still fröhlich geduldig
+        flink neugierig
       '''),
     ),
-    StateGroup(
-      subject: const <NounClass>[NounClass.body],
+    ModifierGroup(
+      subject: const <NounClass>[NounClass.person],
+      words: words(r'jung freundlich streng ernst beschäftigt aufrichtig'),
+    ),
+    ModifierGroup(
+      subject: const <NounClass>[NounClass.creature],
+      words: words(r'flink wild zahm rundlich winzig'),
+    ),
+    ModifierGroup(
+      subject: const <NounClass>[NounClass.edible],
+      themes: const <WordTheme>[WordTheme.food],
       words: words(r'''
-        warm kalt wund steif
+        süß scharf warm frisch knusprig würzig duftend heiß salzig weich reif lecker
+      '''),
+    ),
+    ModifierGroup(
+      subject: const <NounClass>[NounClass.edible],
+      themes: const <WordTheme>[WordTheme.drink],
+      words: words(r'süß warm kalt kühl heiß duftend frisch stark'),
+    ),
+    ModifierGroup(
+      subject: const <NounClass>[NounClass.thing, NounClass.vehicle],
+      words: words(r'''
+        alt neu klein groß leicht schwer glänzend glatt klar stabil hübsch kostbar uralt
+      '''),
+    ),
+    ModifierGroup(
+      subject: const <NounClass>[NounClass.vehicle],
+      words: words(r'schnell langsam robust'),
+    ),
+    ModifierGroup(
+      subject: const <NounClass>[NounClass.place],
+      words: words(r'''
+        still weit dunkel hell fremd alt gemütlich abgelegen belebt leise fern nah leer einsam
+        sonnig
+      '''),
+    ),
+    ModifierGroup(
+      subject: const <NounClass>[NounClass.plant],
+      words: words(r'grün üppig duftend jung welk klein zart frisch'),
+    ),
+    ModifierGroup(
+      subject: const <NounClass>[NounClass.idea],
+      words: words(r'vage alt neu fremd klar kostbar klein seltsam'),
+    ),
+    ModifierGroup(
+      subject: const <NounClass>[NounClass.event],
+      words: words(r'lang kurz still sonnig trüb laut plötzlich'),
+    ),
+    ModifierGroup(
+      subject: const <NounClass>[NounClass.body],
+      words: words(r'klein kalt warm schlank kräftig'),
+    ),
+    ModifierGroup(
+      subject: const <NounClass>[
+        NounClass.creature,
+        NounClass.person,
+        NounClass.plant,
+        NounClass.thing,
+        NounClass.vehicle,
+        NounClass.place,
+        NounClass.event,
+        NounClass.idea,
+        NounClass.body,
+      ],
+      words: words(r'schön geheimnisvoll fremd neu'),
+    ),
+  ],
+  manners: <ModifierGroup>[
+    ModifierGroup(
+      subject: const <NounClass>[NounClass.creature, NounClass.person],
+      words: words(r'''
+        leise langsam schnell sanft plötzlich kaum allein kurz kühn sorgsam eifrig ruhig heftig
+        geduldig leicht fröhlich munter schwerfällig gelassen emsig zügig vergnügt
+      '''),
+    ),
+    ModifierGroup(
+      subject: const <NounClass>[
+        NounClass.plant,
+        NounClass.edible,
+        NounClass.thing,
+        NounClass.vehicle,
+        NounClass.place,
+        NounClass.event,
+        NounClass.idea,
+        NounClass.body,
+      ],
+      words: words(r'''
+        leise langsam sanft plötzlich kaum wieder noch stetig allmählich nach_und_nach schwach
+        weiter
       '''),
     ),
   ],
-  manners: words(r'''
-    leise langsam schnell sanft plötzlich kaum wieder gemeinsam allein noch kurz stetig kühn
-    sorgsam eifrig ruhig heftig geduldig leicht fröhlich munter schwerfällig deutlich gelassen
-    emsig zügig
-  '''),
-  times: words(r'''
-    bei_Tagesanbruch am_Morgen am_Mittag am_Abend in_der_Nacht heute gestern morgen im_Frühling
-    im_Sommer im_Herbst im_Winter am_Wochenende gerade_eben manchmal jeden_Tag in_der_Dämmerung
-    um_Mitternacht letzte_Woche nächste_Woche heutzutage vor_langer_Zeit an_Feiertagen
-    den_ganzen_Tag jede_Nacht
-  '''),
-  // Only the coordinating ones. German puts its finite verb second and counts
-  // whatever opens the clause towards that, so `dann` or `danach` in front would
-  // need the verb and the subject the other way round — a shape the frames write,
-  // not something a connective can bolt on. `und`, `aber`, `doch` and `denn` sit
-  // outside the clause and leave the order alone.
+  times: SentenceTimes(
+    day: words(r'''
+      bei_Tagesanbruch am_frühen_Morgen am_Morgen am_Vormittag am_Mittag am_Nachmittag
+      in_der_Dämmerung am_Abend in_der_Nacht spät_in_der_Nacht um_Mitternacht
+    '''),
+    any: words(r'''
+      im_Frühling im_Sommer im_Herbst im_Winter am_Wochenende an_Feiertagen den_ganzen_Tag
+    '''),
+    past: words(r'gestern letzte_Woche vor_langer_Zeit einst an_jenem_Tag in_jener_Nacht'),
+    present: words(r'''
+      heute heutzutage gerade_eben morgen nächste_Woche manchmal jeden_Tag jede_Nacht
+    '''),
+  ),
+  homes: words(r'Haus'),
   connectives: <ConnectiveKind, WordPool>{
-    ConnectiveKind.additive: words(r'und oder'),
+    ConnectiveKind.additive: words(r'und'),
     ConnectiveKind.contrastive: words(r'aber doch'),
     ConnectiveKind.causal: words(r'denn'),
   },
   interjections: words(r'''
     oh, ach, na, mensch, oje, sieh_an, wahrhaftig, hui, herrje, du_meine_Güte, nanu,
   '''),
-  pronouns: <WordGender, WordPool>{
-    WordGender.m: words(r'er'),
-    WordGender.f: words(r'sie'),
-    WordGender.n: words(r'es'),
+  pronouns: const <WordGender, WordPool>{
+    WordGender.m: <String>['er'],
+    WordGender.f: <String>['sie'],
+    WordGender.n: <String>['es'],
   },
-  // German declares the fewest shapes here, and both reasons are its cases. An
-  // object would be accusative and a place dative, and each changes the article
-  // and the modifier ending together. What is left is the nominative, and the
-  // rule German never breaks: the verb stands second, so a shape that opens on a
-  // time puts the subject behind it.
-  // German names its months, writes the day first with a full stop after it, and
-  // puts `Uhr` after a clock time.
   calendar: SentenceCalendar(
     date: 'D. MMMM Y',
-    months: <String>[
-      'Januar',
-      'Februar',
-      'März',
-      'April',
-      'Mai',
-      'Juni',
-      'Juli',
-      'August',
-      'September',
-      'Oktober',
-      'November',
-      'Dezember',
-    ],
+    months: words(r'''
+      Januar Februar März April Mai Juni Juli August September Oktober November Dezember
+    '''),
     clock: 'h:mm Uhr',
-    years: LengthRange(2020, 2030),
+    years: const LengthRange(2020, 2030),
     copula: StateGroup(
-      // An event is a thing that happens on a day, and a lion is not.
-      subject: <NounClass>[NounClass.event],
+      subject: const <NounClass>[NounClass.event],
       words: <String>['ist'],
+      past: PredicateTense(words: <String>['war']),
     ),
   ),
   frames: const <SentenceFrame>[
-    // A date and a clock. German puts its finite verb second and counts whatever
-    // opens the clause towards that, so the subject stands behind the verb.
     SentenceFrame(<SentencePart>[
       SentencePart(SentenceSlot.date, head: 'am'),
       SentencePart(SentenceSlot.verb),
@@ -220,7 +372,6 @@ final SentenceLanguageData de = SentenceLanguageData(
       SentencePart(SentenceSlot.verb),
       SentencePart(SentenceSlot.subject, modifiable: true),
     ], 5),
-    // And the shape that equates the subject to one: `Das Spiel ist um 11:40 Uhr.`
     SentenceFrame(<SentencePart>[
       SentencePart(SentenceSlot.subject, modifiable: true),
       SentencePart(SentenceSlot.date, head: 'am', copula: CopulaSide.head),
@@ -240,7 +391,7 @@ final SentenceLanguageData de = SentenceLanguageData(
     ], 22),
     SentenceFrame(<SentencePart>[
       SentencePart(SentenceSlot.subject, modifiable: true),
-      SentencePart(SentenceSlot.state, head: 'ist'),
+      SentencePart(SentenceSlot.state, head: 'ist', pastHead: 'war'),
     ], 20),
     SentenceFrame(<SentencePart>[
       SentencePart(SentenceSlot.time),
@@ -253,7 +404,6 @@ final SentenceLanguageData de = SentenceLanguageData(
       SentencePart(SentenceSlot.subject, modifiable: true),
       SentencePart(SentenceSlot.manner),
     ], 14),
-    // An adverb can open the clause too, and the verb still stands second.
     SentenceFrame(<SentencePart>[
       SentencePart(SentenceSlot.manner),
       SentencePart(SentenceSlot.verb),
@@ -265,9 +415,6 @@ final SentenceLanguageData de = SentenceLanguageData(
       SentencePart(SentenceSlot.subject, modifiable: true),
       SentencePart(SentenceSlot.time),
     ], 10),
-    // German asks by moving the finite verb to the front, which is the same rule
-    // that keeps it second in a statement — the question is what happens when
-    // nothing stands in the first position at all.
     SentenceFrame(
       <SentencePart>[
         SentencePart(SentenceSlot.verb),
@@ -287,7 +434,7 @@ final SentenceLanguageData de = SentenceLanguageData(
     ),
     SentenceFrame(
       <SentencePart>[
-        SentencePart(SentenceSlot.subject, head: 'ist', modifiable: true),
+        SentencePart(SentenceSlot.subject, head: 'ist', pastHead: 'war', modifiable: true),
         SentencePart(SentenceSlot.state),
       ],
       18,

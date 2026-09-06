@@ -319,6 +319,11 @@ enum SentenceSlot {
   /// Where it happens: `숲에서`.
   place,
 
+  /// Where it is going: `시장으로`, `to the market`.
+  ///
+  /// Only a verb that goes somewhere or arrives can stand beside it.
+  destination,
+
   /// When it happens: `새벽에`.
   time,
 
@@ -387,6 +392,56 @@ enum SentenceType {
   thought,
 }
 
+/// When a sentence happened.
+///
+/// [present] is the form the pools are written in (`달린다`, `runs`); [past] is
+/// the tense a story is told in (`달렸다`, `ran`). Every language writes it its
+/// own way: Korean, Japanese, English, Spanish, Italian and German change the
+/// verb, Russian changes it and makes it agree with the subject, and Chinese
+/// and Vietnamese write a word beside it (`了`, `đã`) and leave the verb alone.
+/// A result keeps one tense throughout.
+enum SentenceTense {
+  /// The form the pools are written in.
+  present,
+
+  /// The tense a story is told in.
+  past,
+}
+
+/// The story a result of several sentences follows.
+///
+/// Each is a short sequence of things that happen, in an order that makes
+/// sense, told with whatever words the language has for each of them. Which
+/// stories a language can tell depends on the shapes it declares: German and
+/// Russian carry no object, so they tell the ones with nothing in the hero's
+/// hands.
+enum SentenceStory {
+  /// The hero goes somewhere, gets something to eat, comes home and eats it.
+  errand,
+
+  /// The hero is hungry, prepares something and eats it.
+  meal,
+
+  /// The hero looks for something, finds it and brings it back.
+  search,
+
+  /// The hero gets up, goes out, plays and comes home tired.
+  outing,
+
+  /// The hero makes something and sells it. People only.
+  craft,
+
+  /// The hero goes out and wanders, with nothing to carry.
+  stroll,
+
+  /// The day ends, the hero comes home and sleeps.
+  evening,
+
+  /// Something that is not a person or an animal changes over time — an apple
+  /// ripens and cools, a sky darkens and deepens.
+  passage,
+}
+
 /// Which pair of quotation marks a quoted line takes.
 ///
 /// Left out, [SentenceType.dialogue] takes the language's first-level marks and
@@ -437,6 +492,8 @@ class SentenceDetail {
     required this.slots,
     required this.names,
     required this.types,
+    required this.tense,
+    required this.story,
     required this.language,
     required this.theme,
   });
@@ -470,11 +527,19 @@ class SentenceDetail {
   /// What each sentence is doing, at the same index as [sentences].
   final List<SentenceType> types;
 
+  /// The tense every sentence of the result is in.
+  final SentenceTense tense;
+
+  /// The story a result of several sentences followed, or null for a result of
+  /// one sentence, which follows none.
+  final SentenceStory? story;
+
   /// The language this sentence was generated in.
   final WordLanguage language;
 
-  /// Theme the result's subject belongs to — the first sentence's, which is what
-  /// every sentence after it stays about.
+  /// Theme the result's subject belongs to: its hero's in a story, and the
+  /// first sentence's otherwise, which is what every sentence after it stays
+  /// about.
   ///
   /// Null when that word is not one the generator knows, which happens when it
   /// was invented or was handed in through `include`.

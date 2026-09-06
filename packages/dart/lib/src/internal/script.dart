@@ -58,3 +58,23 @@ bool endsWithConsonant(String text) {
 
   return _letter.hasMatch(last) && !_vowels.hasMatch(last.toLowerCase());
 }
+
+// The final consonant `ㄹ` is the eighth of the twenty-seven a syllable can
+// close on, and the one Korean treats as a vowel for one particle: `마을로`,
+// never `마을으로`.
+const int _hangulLiquid = 8;
+
+/// Whether [text] ends on the Korean liquid `ㄹ`, which is the one coda the
+/// particle `로` does not alternate for: `시장으로` and `마을로`, both from one
+/// particle. Anything that is not a Hangul syllable reports false.
+bool endsWithLiquid(String text) {
+  final trimmed = text.trimRight();
+
+  if (trimmed.isEmpty) return false;
+
+  final code = trimmed.runes.last;
+
+  return code >= _hangulBase &&
+      code <= _hangulLast &&
+      (code - _hangulBase) % _hangulFinals == _hangulLiquid;
+}

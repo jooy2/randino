@@ -2,6 +2,7 @@
 // separated strings inside a raw multi-line string instead of one list entry
 // per line, which keeps a 120-name pool to a handful of lines.
 
+import 'package:randino/src/sentence/data/types.dart';
 import 'package:randino/src/types.dart';
 import 'package:randino/src/word/data/types.dart';
 
@@ -71,4 +72,30 @@ TaggedNouns taggedNouns(Map<WordTheme, String> source) {
   }
 
   return TaggedNouns(pools, gender);
+}
+
+/// Every form of a tense from one pool of stems and one ending per form, for a
+/// language whose endings are the same whatever the stem.
+///
+/// A Korean past stem closes on `ㅆ`, so `달렸` takes `다`, `니`, `구나`, `어요`
+/// and `습니다` exactly the way `걸었` does. An ending may list alternatives with
+/// `|` between them, and each stem gets every one of them, so the pools stay
+/// index-aligned with the present-tense words the stems were written for.
+PredicateTense conjugate(
+  String stems, {
+  required String statement,
+  Map<PredicateForm, String> endings = const <PredicateForm, String>{},
+}) {
+  final bases = words(stems);
+
+  List<String> attach(String ending) => List<String>.unmodifiable(
+    bases.map((stem) => ending.split('|').map((each) => stem + each).join('|')),
+  );
+
+  return PredicateTense(
+    words: attach(statement),
+    forms: <PredicateForm, WordPool>{
+      for (final entry in endings.entries) entry.key: attach(entry.value),
+    },
+  );
 }

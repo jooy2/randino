@@ -82,6 +82,155 @@ enum PredicateForm {
 
   /// What 합쇼체 moves to: `달립니까`.
   formalQuestion,
+
+  /// The form a predicate takes when its clause is not the last one of the
+  /// sentence: Korean `돌아오고` or `돌아와서`, Japanese `戻って`.
+  ///
+  /// It carries no tense of its own, so it lives in the present forms alone and
+  /// the clause after it decides when everything happened. A language that
+  /// joins its clauses with a word rather than a form declares none.
+  linking,
+}
+
+/// What a verb does, as coarsely as a story needs to know it.
+///
+/// A step of a story asks for a field rather than for a word — "the hero eats
+/// something" — and the language answers with any verb it has filed there,
+/// which is what lets one story be told in nine languages and never twice the
+/// same way. `fieldRules` says what each field needs to be true first and what
+/// it leaves true afterwards, which is the whole of the story's memory.
+enum VerbField {
+  /// Gets up.
+  rise,
+
+  /// Sets off, towards a destination.
+  go,
+
+  /// Comes back, reaches.
+  arrive,
+
+  /// Runs, swims, wanders, with no destination.
+  move,
+
+  /// Waits, lingers, looks around.
+  wait,
+
+  /// Rests.
+  rest,
+
+  /// Sleeps.
+  sleep,
+
+  /// Laughs, cries, yawns.
+  express,
+
+  /// Dances, tumbles, sings.
+  play,
+
+  /// Remembers, imagines — takes an idea.
+  think,
+
+  /// Looks at a thing.
+  look,
+
+  /// Searches, with no object; the place is what is searched.
+  search,
+
+  /// Finds a thing.
+  find,
+
+  /// Takes a thing.
+  take,
+
+  /// Carries a thing.
+  carry,
+
+  /// Hides a thing.
+  hide,
+
+  /// Makes a thing.
+  make,
+
+  /// Mends, cleans a thing.
+  tend,
+
+  /// Sells a thing.
+  sell,
+
+  /// Buys a thing.
+  buy,
+
+  /// Cooks something edible.
+  cook,
+
+  /// Eats.
+  eat,
+
+  /// Drinks.
+  drink,
+
+  /// Everything that happens to something that is not a hero: a place darkens,
+  /// an apple ripens, a flag sways.
+  change,
+}
+
+/// What can be true of a story's hero at one moment, which is what a state
+/// sentence says and what an action changes.
+///
+/// [holding] is the one that is about a thing rather than a feeling: it is what
+/// `eat`, `carry` and `sell` need and what `find`, `take`, `buy` and `make`
+/// leave behind.
+enum Condition {
+  /// Awake.
+  awake,
+
+  /// Asleep.
+  asleep,
+
+  /// Hungry.
+  hungry,
+
+  /// Full.
+  full,
+
+  /// Tired.
+  tired,
+
+  /// Rested.
+  rested,
+
+  /// Away from home.
+  away,
+
+  /// At home.
+  home,
+
+  /// Holding the story's thing.
+  holding,
+
+  /// Content.
+  content,
+
+  /// Restless.
+  restless,
+}
+
+/// The same predicates in another tense: the statement form in [words] and the
+/// moods and levels in [forms], both index-aligned with the present-tense pools
+/// of the group.
+///
+/// A group declares what its language writes — Korean and Japanese every level,
+/// English only the statement and its question's base form — and leaves the
+/// tense out entirely where the language does not inflect for it.
+class PredicateTense {
+  /// Creates a tense.
+  const PredicateTense({required this.words, this.forms = const <PredicateForm, WordPool>{}});
+
+  /// The statement form.
+  final WordPool words;
+
+  /// The other forms, index-aligned with [words].
+  final PredicateForms forms;
 }
 
 /// The forms a group declares, beside the plain statement its `words` are in.
@@ -102,17 +251,37 @@ typedef PredicateForms = Map<PredicateForm, WordPool>;
 class VerbGroup {
   /// Creates a group of verbs.
   const VerbGroup({
+    required this.field,
     required this.subject,
     required this.words,
     this.object,
+    this.objectThemes,
+    this.requires,
     this.forms = const <PredicateForm, WordPool>{},
+    this.past,
   });
+
+  /// What these verbs do, as a story asks for it.
+  final VerbField field;
 
   /// Classes a noun has to belong to to be the subject of these verbs.
   final List<NounClass> subject;
 
   /// Classes it can take as a direct object. Null for an intransitive group.
   final List<NounClass>? object;
+
+  /// The themes the object may come from, when a class is too wide.
+  ///
+  /// `eat` takes an edible and `drink` takes an edible, and a lion that drinks a
+  /// pretzel is the difference. Null where the class alone is right.
+  final List<WordTheme>? objectThemes;
+
+  /// A part the shape has to carry for these verbs to make sense.
+  ///
+  /// `향한다` and `heads` want somewhere to head to, where `떠난다` and `leaves`
+  /// stand on their own; a group that names a slot is drawn only for a shape
+  /// that has it.
+  final SentenceSlot? requires;
 
   /// The verbs themselves, in the form a plain statement ends on.
   final WordPool words;
@@ -122,6 +291,12 @@ class VerbGroup {
   /// Empty for a language whose verb does not change — Chinese, Vietnamese,
   /// Spanish, Italian and Russian ask a question with the mark alone.
   final PredicateForms forms;
+
+  /// The same verbs in the past, index-aligned with [words].
+  ///
+  /// Null for a language that marks the past with a word beside the verb rather
+  /// than on it — Chinese `了`, Vietnamese `đã` — which is `pastMark`'s business.
+  final PredicateTense? past;
 }
 
 /// Predicate adjectives that describe the same kinds of thing, grouped the way
@@ -135,17 +310,63 @@ class StateGroup {
   const StateGroup({
     required this.subject,
     required this.words,
+    this.condition,
+    this.head,
+    this.pastHead,
     this.forms = const <PredicateForm, WordPool>{},
+    this.past,
   });
 
   /// Classes a noun has to belong to to be described by these.
   final List<NounClass> subject;
+
+  /// What these adjectives say is true of the subject, for a story to read and
+  /// to write.
+  ///
+  /// `배고프다` is [Condition.hungry] and `피곤하다` is [Condition.tired]; `크다`
+  /// is neither, and a group of traits like it leaves this null.
+  final Condition? condition;
+
+  /// What is written in front of these instead of the shape's own head, in a
+  /// language whose copula depends on what is said.
+  ///
+  /// Spanish `es valiente` and `está cansado` are two verbs, and only the group
+  /// knows which its words take. [pastHead] is the same in the past.
+  final String? head;
+
+  /// What [head] becomes in the past (`era`, `estaba`).
+  final String? pastHead;
 
   /// The adjectives themselves, in the form a plain statement ends on.
   final WordPool words;
 
   /// The same adjectives in another form, index-aligned with [words].
   final PredicateForms forms;
+
+  /// The same adjectives in the past, index-aligned with [words].
+  final PredicateTense? past;
+}
+
+/// Attributive modifiers that fit the same kinds of noun, grouped the way the
+/// states are.
+///
+/// `word/data`'s adjectives are what a nickname is built from, and a nickname is
+/// allowed to be a joke — `맑은기계공` is a handle. A sentence is not, so it
+/// draws its modifiers from here instead, and `맑은` sits in front of a place or
+/// a drink and never in front of a mechanic.
+class ModifierGroup {
+  /// Creates a group of modifiers.
+  const ModifierGroup({required this.subject, required this.words, this.themes});
+
+  /// Classes a noun has to belong to to carry one of these.
+  final List<NounClass> subject;
+
+  /// The themes it may belong to, when a class is too wide: a soup is `매콤한`
+  /// and a tea is not, though both are edible.
+  final List<WordTheme>? themes;
+
+  /// Base forms, which `agree` reshapes in a language that inflects.
+  final WordPool words;
 }
 
 /// One phrase of a shape, with whatever the language writes around it.
@@ -158,8 +379,10 @@ class SentencePart {
   const SentencePart(
     this.slot, {
     this.head,
+    this.pastHead,
     this.tail,
     this.tailAlt,
+    this.tailLiquid,
     this.modifiable = false,
     this.bare = false,
     this.copula,
@@ -171,6 +394,11 @@ class SentencePart {
   /// Written in front of the phrase (`in`, `在`, `is`).
   final String? head;
 
+  /// What [head] becomes in a past-tense sentence, for a language whose
+  /// auxiliary or copula carries the tense: English `does` is `did` and `is` is
+  /// `was`, Spanish `es` is `era`. Null where the head does not change.
+  final String? pastHead;
+
   /// Written after it (`가`, `が`, `里`).
   final String? tail;
 
@@ -179,6 +407,12 @@ class SentencePart {
   /// That is the whole of Korean particle alternation — `사자가` beside
   /// `사슴이` — and a language whose particles do not alternate leaves it null.
   final String? tailAlt;
+
+  /// Used instead of either when the word in front of it ends on `ㄹ`, for the
+  /// one Korean particle that treats that consonant as a vowel: `시장으로` and
+  /// `마을로` are `로` after a vowel, `으로` after a consonant, and `로` again
+  /// after `ㄹ`. Null for every other particle.
+  final String? tailLiquid;
 
   /// Whether the phrase may carry a modifier when there is room for one.
   ///
@@ -279,13 +513,26 @@ enum SentenceMood {
 /// whose articles cannot mark an object has no shape that carries one.
 class SentenceFrame {
   /// Creates a sentence shape.
-  const SentenceFrame(this.parts, this.weight, {this.mood = SentenceMood.statement, this.tag});
+  const SentenceFrame(
+    this.parts,
+    this.weight, {
+    this.mood = SentenceMood.statement,
+    this.tag,
+    this.fields,
+  });
 
   /// The phrases, in the order the language writes them.
   final List<SentencePart> parts;
 
   /// How often this shape is used, against the other frames of the language.
   final int weight;
+
+  /// The fields the verb of this shape may come from, for a shape only some
+  /// verbs can head.
+  ///
+  /// A destination is the reason: `시장으로` wants a verb that goes somewhere and
+  /// `시장에` one that arrives, and `시장으로 웃는다` is neither.
+  final List<VerbField>? fields;
 
   /// What the shape is for. A statement unless it says otherwise.
   final SentenceMood mood;
@@ -350,6 +597,65 @@ enum ConnectiveKind {
 /// adverb in the first position moves the finite verb, so the five coordinating
 /// conjunctions are all it has to open a clause with.
 typedef SentenceConnectives = Map<ConnectiveKind, WordPool>;
+
+/// When something happens, written whole, particle and all, and sorted by what
+/// a paragraph has to know about each one.
+///
+/// [day] is the phases of a day in the order they come, from dawn to midnight,
+/// because a story told across several sentences moves forward through them and
+/// never back. [any] is what fits every tense — a season, a weekend. [past] and
+/// [present] are the ones that name a tense, and a sentence takes only the pool
+/// of the tense it is in.
+class SentenceTimes {
+  /// Creates the time pools.
+  const SentenceTimes({required this.day, required this.any, this.past, this.present});
+
+  /// The phases of a day, in order.
+  final WordPool day;
+
+  /// What fits every tense.
+  final WordPool any;
+
+  /// What names the past (`어제`, `yesterday`).
+  final WordPool? past;
+
+  /// What names the present (`오늘`, `these days`).
+  final WordPool? present;
+}
+
+/// How the language marks the past when it does not inflect its verb for it.
+///
+/// Vietnamese writes `đã` in front (`con mèo đã chạy`) and Chinese `了` behind
+/// (`狮子跑了`), and a language that conjugates leaves it null and writes `past`
+/// on its groups instead.
+class SentencePastMark {
+  /// Creates a past mark.
+  const SentencePastMark({this.head, this.tail});
+
+  /// Written in front of the verb.
+  final String? head;
+
+  /// Written after it.
+  final String? tail;
+}
+
+/// How two clauses become one sentence: `돌아와서 사과를 먹었다`, `came home and
+/// ate the apple`.
+///
+/// Either the first clause's predicate takes the [PredicateForm.linking] form
+/// its group declares, or a word is written between the two — a language
+/// declares whichever its grammar does, and one that declares neither joins
+/// nothing.
+class SentenceJoin {
+  /// Creates a join.
+  const SentenceJoin({this.form, this.word});
+
+  /// The form the first clause's predicate takes, when it is a form.
+  final PredicateForm? form;
+
+  /// The word written between the clauses, when it is a word.
+  final String? word;
+}
 
 /// Where a number stands relative to the noun it counts.
 enum NumeralOrder {
@@ -433,8 +739,10 @@ class SentenceLanguageData {
     required this.terminators,
     required this.verbs,
     required this.states,
+    required this.modifiers,
     required this.manners,
     required this.times,
+    required this.homes,
     required this.connectives,
     required this.interjections,
     required this.quotes,
@@ -442,6 +750,9 @@ class SentenceLanguageData {
     required this.frames,
     this.articles,
     this.predicateAgrees = false,
+    this.pastAgreement,
+    this.pastMark,
+    this.join,
     this.pronounless = const <NounClass>[],
     this.openers = const <SentenceType, String>{},
     this.numeral,
@@ -488,17 +799,43 @@ class SentenceLanguageData {
   /// attributive form, so `der Wal ist blau` keeps the base word.
   final bool predicateAgrees;
 
+  /// How a past-tense verb agrees with its subject, in a language where it does.
+  ///
+  /// Russian is the one: `бежал` beside `бежала`, and `вернулся` beside
+  /// `вернулась`. The same rule shape `word/data`'s agreement has, applied to
+  /// the verb's past form rather than to a modifier.
+  final WordAgreement? pastAgreement;
+
+  /// What marks the past beside the verb, for a language that does not put it
+  /// on the verb. Null for every language that writes `past` on its groups.
+  final SentencePastMark? pastMark;
+
+  /// How two clauses are written as one sentence. Null for a language that does
+  /// not.
+  final SentenceJoin? join;
+
   /// The verbs, grouped by what they can take.
   final List<VerbGroup> verbs;
 
   /// The predicate adjectives, grouped by what they can describe.
   final List<StateGroup> states;
 
-  /// How something is done, written as the language writes it (`조용히`).
-  final WordPool manners;
+  /// The modifiers a noun phrase may carry, by what they can describe.
+  final List<ModifierGroup> modifiers;
+
+  /// How something is done, written as the language writes it (`조용히`),
+  /// grouped by what can do it that way: a fox walks `부지런히` and a river does
+  /// not flow so.
+  final List<ModifierGroup> manners;
 
   /// When it happens, written whole, particle and all (`새벽에`).
-  final WordPool times;
+  final SentenceTimes times;
+
+  /// Where the hero of a story comes back to (`집`, `house`, `家`).
+  ///
+  /// Bare nouns, and the destination frame writes its own particle or
+  /// preposition around one.
+  final WordPool homes;
 
   /// What a sentence opens on when it follows another one, by what it claims.
   final SentenceConnectives connectives;
