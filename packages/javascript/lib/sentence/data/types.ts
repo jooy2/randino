@@ -189,6 +189,16 @@ export type VerbGroup = {
 	 * `test/sentence.test.ts` asserts it is.
 	 */
 	subjectThemes?: readonly WordTheme[];
+	/**
+	 * A trait the subject has to carry, one of these: `날아오른다` takes a `flier`,
+	 * `헤엄친다` a `swimmer`. Left out by a group that asks for none.
+	 */
+	subjectTraits?: readonly NounTrait[];
+	/**
+	 * Traits the subject may not carry: `달린다` and `걷는다` take no `swimmer` and
+	 * no `crawler`. A noun with no trait at all passes.
+	 */
+	subjectWithout?: readonly NounTrait[];
 	/** Classes it can take as a direct object. Left out by an intransitive group. */
 	object?: readonly NounClass[];
 	/**
@@ -402,6 +412,21 @@ export type SentenceArticles = {
  * there — so the generator writes one only where the sentences can carry it.
  */
 export type ConnectiveKind = 'additive' | 'temporal' | 'contrastive' | 'causal';
+
+/**
+ * What a noun can do that its theme does not say. A fish and a sparrow are both
+ * `animal`, and only one of them flies; a snake and a lion are both `animal`,
+ * and only one of them runs. A language lists the nouns that carry each trait
+ * under `SentenceLanguageData.traits`, and a verb group asks for one with
+ * `subjectTraits` or rules one out with `subjectWithout`. A noun listed nowhere
+ * has no trait, so it takes any group that asks for none.
+ */
+export type NounTrait = 'flier' | 'swimmer' | 'crawler';
+
+/** The nouns that carry each trait, written the way the word pools write them. */
+export type SentenceTraits = {
+	[trait in NounTrait]?: WordPool;
+};
 
 /**
  * What a sentence opens on when it follows another one of the same result, by
@@ -633,6 +658,12 @@ export type SentenceLanguageData = {
 	join?: SentenceJoin;
 	/** What a sentence opens on when it follows another one, by what it claims. */
 	connectives: SentenceConnectives;
+	/**
+	 * The nouns that fly, swim or crawl, for the verb groups that ask. Written in
+	 * the plain form — lowercase where the pools capitalize — and left out by a
+	 * language whose verbs ask for no trait.
+	 */
+	traits?: SentenceTraits;
 	/** How a later sentence refers to the topic without naming it again. */
 	pronouns: SentencePronouns;
 	/**

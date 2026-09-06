@@ -263,6 +263,8 @@ class VerbGroup {
     required this.subject,
     required this.words,
     this.subjectThemes,
+    this.subjectTraits,
+    this.subjectWithout,
     this.object,
     this.objectThemes,
     this.requires,
@@ -291,6 +293,15 @@ class VerbGroup {
   /// of one group has to be accepted by another of the same field, and the suite
   /// asserts it is.
   final List<WordTheme>? subjectThemes;
+
+  /// A trait the subject has to carry, one of these: `날아오른다` takes a
+  /// [NounTrait.flier], `헤엄친다` a [NounTrait.swimmer]. Null for a group that
+  /// asks for none.
+  final List<NounTrait>? subjectTraits;
+
+  /// Traits the subject may not carry: `달린다` and `걷는다` take no swimmer and
+  /// no crawler. A noun with no trait at all passes.
+  final List<NounTrait>? subjectWithout;
 
   /// A part the shape has to carry for these verbs to make sense.
   ///
@@ -587,6 +598,25 @@ typedef SentenceArticles = Map<WordGender, List<List<String>>>;
 /// one rule.
 typedef SentencePronouns = Map<WordGender, WordPool>;
 
+/// What a noun can do that its theme does not say.
+///
+/// A fish and a sparrow are both `animal`, and only one of them flies; a snake
+/// and a lion are both `animal`, and only one of them runs. A language lists
+/// the nouns that carry each trait under [SentenceLanguageData.traits], and a
+/// verb group asks for one with [VerbGroup.subjectTraits] or rules one out with
+/// [VerbGroup.subjectWithout]. A noun listed nowhere has no trait, so it takes
+/// any group that asks for none.
+enum NounTrait {
+  /// Takes off: a bird, an insect with wings, a dragon.
+  flier,
+
+  /// Swims: a fish, a whale, a mermaid.
+  swimmer,
+
+  /// Crawls: a snake, a snail, a beetle.
+  crawler,
+}
+
 /// What a connective claims about the sentence before it.
 ///
 /// The first three can open any continuation: time passes whatever is said, one
@@ -776,6 +806,7 @@ class SentenceLanguageData {
     required this.times,
     required this.homes,
     required this.connectives,
+    this.traits,
     required this.interjections,
     required this.quotes,
     required this.pronouns,
@@ -871,6 +902,11 @@ class SentenceLanguageData {
 
   /// What a sentence opens on when it follows another one, by what it claims.
   final SentenceConnectives connectives;
+
+  /// The nouns that fly, swim or crawl, for the verb groups that ask. Written
+  /// in the plain form — lowercase where the pools capitalize — and null for a
+  /// language whose verbs ask for no trait.
+  final Map<NounTrait, WordPool>? traits;
 
   /// What an exclamation opens on (`와,`, `Wow,`, `ああ、`).
   ///

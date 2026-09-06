@@ -44,9 +44,7 @@ def pool(source: Sequence[Any] | None) -> list[dict[str, str | None]] | None:
     if source is None:
         return None
     return [
-        {"n": entry.n, "r": entry.r}
-        if isinstance(entry, NameToken)
-        else {"n": entry, "r": None}
+        {"n": entry.n, "r": entry.r} if isinstance(entry, NameToken) else {"n": entry, "r": None}
         for entry in source
     ]
 
@@ -105,9 +103,7 @@ def step(source: StoryStep) -> dict[str, object]:
 
 def mapped(source: Mapping[Any, Any] | None) -> dict[str, Any] | None:
     """Flatten a lookup, keyed by string so a syllable count compares as one."""
-    return (
-        None if source is None else {str(key): value for key, value in source.items()}
-    )
+    return None if source is None else {str(key): value for key, value in source.items()}
 
 
 word = {
@@ -126,9 +122,7 @@ word = {
         "agreement": (
             None
             if data.agreement is None
-            else {
-                g: [list(rule) for rule in rules] for g, rules in data.agreement.items()
-            }
+            else {g: [list(rule) for rule in rules] for g, rules in data.agreement.items()}
         ),
         # Optional in one package and defaulted in another; written as a list
         # either way so the shapes compare.
@@ -229,6 +223,8 @@ sentence = {
                 "object": None if group.object is None else list(group.object),
                 "field": group.field,
                 "subjectThemes": listed(group.subject_themes),
+                "subjectTraits": listed(group.subject_traits),
+                "subjectWithout": listed(group.subject_without),
                 "objectThemes": listed(group.object_themes),
                 "requires": group.requires or "",
                 "words": listed(group.words),
@@ -261,6 +257,11 @@ sentence = {
         },
         "homes": listed(data.homes),
         "connectives": {kind: listed(pool) for kind, pool in data.connectives.items()},
+        "traits": (
+            None
+            if data.traits is None
+            else {trait: listed(pool) for trait, pool in data.traits.items()}
+        ),
         "interjections": listed(data.interjections),
         "pronouns": {gender: listed(pool) for gender, pool in data.pronouns.items()},
         # Optional in one package and defaulted in another; written as a list either
@@ -284,19 +285,14 @@ sentence = {
             if data.calendar is None
             else {
                 "date": data.calendar.date,
-                "months": (
-                    None
-                    if data.calendar.months is None
-                    else listed(data.calendar.months)
-                ),
+                "months": (None if data.calendar.months is None else listed(data.calendar.months)),
                 "clock": data.calendar.clock,
                 "years": list(data.calendar.years),
                 "copula": {
                     "subject": list(data.calendar.copula.subject),
                     "words": listed(data.calendar.copula.words),
                     "forms": {
-                        form: listed(pool)
-                        for form, pool in data.calendar.copula.forms.items()
+                        form: listed(pool) for form, pool in data.calendar.copula.forms.items()
                     },
                     "past": tense(data.calendar.copula.past),
                 },

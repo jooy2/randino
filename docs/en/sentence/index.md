@@ -27,6 +27,8 @@ A verb that says `creature` and `person` can be done by a lion and by a locksmit
 
 Where a class is too wide, a group narrows it to themes on either side of the verb. `eat` takes `food` and `drink` takes `drink`, though both are `edible`; `익는다` is a thing `food` does and `울린다` a thing `music` does, though a soup and a song are both `edible` and `thing` to the classes. A theme narrowed out of one group is always accepted by another of the same field, so nothing loses its verbs — a song stopped swaying and started ringing.
 
+Below the theme, a noun may carry a **trait**: a language lists which of its nouns fly, swim or crawl, and a verb asks for one or rules one out. `날아오른다` takes a flier, `헤엄친다` a swimmer, and `달린다` takes anything that neither swims nor crawls — so a sparrow takes off, a mackerel swims, a snake crawls, and a lion, which is listed nowhere, runs. The lists name the exceptions and nothing else, and every noun keeps a verb in every field its kind has.
+
 It is not a promise that every sentence means something. A lion can bake a pudding here, and an ocarina can glitter at dusk. What the classes rule out is the sentence that does not parse as a thought at all.
 
 ## The shapes each language declares {#the-shapes-belong-to-the-language}

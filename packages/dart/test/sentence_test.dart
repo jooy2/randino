@@ -49,6 +49,23 @@ List<String> inflected(WordLanguage language, List<String> pool) {
   ];
 }
 
+/// The traits a noun carries, read the way the generator reads them.
+List<NounTrait> traitsOf(SentenceLanguageData data, String noun) => <NounTrait>[
+  for (final entry in (data.traits ?? const <NounTrait, WordPool>{}).entries)
+    if (entry.value.contains(noun)) entry.key,
+];
+
+/// Whether a verb group takes this noun as its subject, by what the noun can do.
+bool acceptsNoun(SentenceLanguageData data, VerbGroup group, String noun) {
+  final traits = traitsOf(data, noun);
+  final wanted = group.subjectTraits;
+  final barred = group.subjectWithout;
+
+  if (wanted != null && !wanted.any(traits.contains)) return false;
+
+  return barred == null || !barred.any(traits.contains);
+}
+
 /// Every word the language may put in a phrase of [slot].
 /// The form keys a level reaches for.
 ///
@@ -660,6 +677,10 @@ void main() {
                   detail.slots.contains(SentenceSlot.subject));
           // A verb can sit in more than one group, so the sentence is right when
           // one of its groups accounts for it.
+          final subjectAt = detail.slots.indexOf(SentenceSlot.subject);
+          final found =
+              subjectAt < 0 ? const <String>{} : nounsIn(language, detail.phrases[subjectAt]);
+          final subjectNoun = found.isEmpty ? null : found.first;
           final groups = data.verbs.where(
             (group) =>
                 everyForm(group.words, group.forms).contains(detail.phrases[at]) &&
@@ -668,12 +689,14 @@ void main() {
 
           expect(groups, isNotEmpty, reason: '$language: ${detail.sentence}');
           expect(
-            // The class, and the theme where the group narrows to themes: `익는다`
-            // is a thing food does and drink does not.
+            // The class, the theme where the group narrows to themes — `익는다` is
+            // a thing food does and drink does not — and the trait where it asks
+            // for one: `날아오른다` takes a sparrow and never a fish.
             groups.any(
               (group) =>
                   group.subject.contains(themeClass[theme]) &&
-                  (group.subjectThemes == null || group.subjectThemes!.contains(theme)),
+                  (group.subjectThemes == null || group.subjectThemes!.contains(theme)) &&
+                  (subjectNoun == null || acceptsNoun(data, group, subjectNoun)),
             ),
             isTrue,
             reason: '$language: ${theme.name} cannot be the subject (${detail.sentence})',
@@ -3317,6 +3340,58 @@ void main() {
             isTrue,
             reason: '$language: no state describes a $theme',
           );
+        }
+      }
+    });
+
+    test('every noun the pools hold has a verb in every field its class has', () {
+      // A trait is a narrowing, not a gap, all the way down to the noun: a fish
+      // lost `달린다` and kept `헤엄친다`, a snake `기어간다`, and nothing lost
+      // `move`. And every trait names nouns the pools actually hold.
+      for (final language in wordLanguages) {
+        final data = sentenceData[language]!;
+        final lexicon = wordData[language]!;
+        final fields = <VerbField>{for (final group in data.verbs) group.field};
+        final every = <String>{
+          for (final theme in wordThemes)
+            for (final word in lexicon.nouns[theme]!) plain(language, word),
+        };
+
+        for (final entry in (data.traits ?? const <NounTrait, WordPool>{}).entries) {
+          for (final noun in entry.value) {
+            expect(
+              every,
+              contains(noun),
+              reason: '$language: the ${entry.key} "$noun" is in no pool',
+            );
+          }
+        }
+
+        for (final theme in wordThemes) {
+          final cls = themeClass[theme];
+
+          for (final field in fields) {
+            final inField = data.verbs
+                .where(
+                  (group) =>
+                      group.field == field &&
+                      group.subject.contains(cls) &&
+                      (group.subjectThemes == null || group.subjectThemes!.contains(theme)),
+                )
+                .toList(growable: false);
+
+            if (inField.isEmpty) continue;
+
+            for (final word in lexicon.nouns[theme]!) {
+              final noun = plain(language, word);
+
+              expect(
+                inField.any((group) => acceptsNoun(data, group, noun)),
+                isTrue,
+                reason: '$language: no $field verb takes "$noun"',
+              );
+            }
+          }
         }
       }
     });

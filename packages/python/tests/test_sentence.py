@@ -183,6 +183,21 @@ def times_of(data: SentenceLanguageData) -> list[str]:
     ]
 
 
+def traits_of(data: SentenceLanguageData, noun: str) -> list[str]:
+    """The traits a noun carries, read the way the generator reads them."""
+    return [trait for trait, pool in (data.traits or {}).items() if noun in pool]
+
+
+def accepts_noun(data: SentenceLanguageData, group: VerbGroup, noun: str) -> bool:
+    """Whether a verb group takes this noun as its subject, by what the noun can do."""
+    traits = traits_of(data, noun)
+
+    if group.subject_traits is not None and not any(t in traits for t in group.subject_traits):
+        return False
+
+    return group.subject_without is None or not any(t in traits for t in group.subject_without)
+
+
 def pool_for(language: WordLanguage, slot: SentenceSlot) -> set[str]:
     """Every word the language may put in a phrase of `slot`."""
     data = SENTENCE_DATA[language]
@@ -478,11 +493,20 @@ def test_a_verb_only_takes_the_subject_and_object_its_group_allows() -> None:
             ]
 
             assert groups, f"{language}: {detail.sentence}"
-            # The class, and the theme where the group narrows to themes: `익는다` is a
-            # thing food does and drink does not.
+            # The class, the theme where the group narrows to themes — `익는다` is a thing
+            # food does and drink does not — and the trait where it asks for one:
+            # `날아오른다` takes a sparrow and never a fish.
+            found = (
+                nouns_in(language, detail.phrases[detail.slots.index("subject")])
+                if "subject" in detail.slots
+                else set()
+            )
+            subject_noun = next(iter(found), None)
+
             assert any(
                 THEME_CLASS[detail.theme] in group.subject
                 and (group.subject_themes is None or detail.theme in group.subject_themes)
+                and (subject_noun is None or accepts_noun(data, group, subject_noun))
                 for group in groups
             ), f"{language}: {detail.theme} cannot be the subject ({detail.sentence})"
 
@@ -2194,6 +2218,43 @@ def test_a_theme_narrowed_out_of_one_group_is_accepted_by_another_of_the_same_fi
             )
 
             assert not described or described_by_theme, f"{language}: no state describes a {theme}"
+
+
+def test_every_noun_the_pools_hold_has_a_verb_in_every_field_its_class_has() -> None:
+    # A trait is a narrowing, not a gap, all the way down to the noun: a fish lost `달린다`
+    # and kept `헤엄친다`, a snake `기어간다`, and nothing lost `move`. And every trait names
+    # nouns the pools actually hold.
+    for language in WORD_LANGUAGES:
+        data = SENTENCE_DATA[language]
+        lexicon = WORD_DATA[language]
+        fields = {group.field for group in data.verbs}
+        every = {plain(language, word) for theme in WORD_THEMES for word in lexicon.nouns[theme]}
+
+        for trait, pool in (data.traits or {}).items():
+            for noun in pool:
+                assert noun in every, f"{language}: the {trait} '{noun}' is in no pool"
+
+        for theme in WORD_THEMES:
+            cls = THEME_CLASS[theme]
+
+            for field in fields:
+                in_field = [
+                    group
+                    for group in data.verbs
+                    if group.field == field
+                    and cls in group.subject
+                    and (group.subject_themes is None or theme in group.subject_themes)
+                ]
+
+                if not in_field:
+                    continue
+
+                for word in lexicon.nouns[theme]:
+                    noun = plain(language, word)
+
+                    assert any(accepts_noun(data, group, noun) for group in in_field), (
+                        f"{language}: no {field} verb takes '{noun}'"
+                    )
 
 
 def test_every_noun_class_the_frames_can_ask_for_has_a_predicate_to_go_with_it() -> None:

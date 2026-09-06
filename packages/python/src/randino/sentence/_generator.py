@@ -72,6 +72,7 @@ from randino.sentence.data._types import (
     Condition,
     ConnectiveKind,
     NounClass,
+    NounTrait,
     PredicateForm,
     PredicateTense,
     SentenceFrame,
@@ -1520,11 +1521,13 @@ def _object_themes_of(group: VerbGroup, beat: BeatDraw | None) -> tuple[WordThem
 
 
 def _verb_groups_for(
+    language: WordLanguage,
     data: SentenceLanguageData,
     frame: SentenceFrame,
     themes: Sequence[WordTheme],
     plan: Plan,
     beat: BeatDraw | None = None,
+    subject_noun: str | None = None,
 ) -> list[VerbGroup]:
     """The verb groups one sentence may use.
 
@@ -1570,6 +1573,8 @@ def _verb_groups_for(
             and not _accepts_subject(group, subject.theme)
         ):
             continue
+        if subject_noun is not None and not _accepts_noun(data, group, subject_noun):
+            continue
         if obj is not None and obj.theme is not None and not _accepts_object(group, obj.theme):
             continue
         if (
@@ -1579,7 +1584,7 @@ def _verb_groups_for(
             and not _accepts_object(group, beat.item)
         ):
             continue
-        if not _subject_themes_of(group, themes):
+        if not _subject_themes_of(language, data, group, themes):
             continue
         if group.object is not None and not _object_themes_of(group, beat):
             continue
@@ -1598,21 +1603,88 @@ def _accepts_subject(group: VerbGroup | StateGroup, theme: WordTheme) -> bool:
 
 
 def _subject_themes_of(
-    group: VerbGroup | StateGroup, themes: Sequence[WordTheme]
+    language: WordLanguage,
+    data: SentenceLanguageData,
+    group: VerbGroup | StateGroup,
+    themes: Sequence[WordTheme],
 ) -> tuple[WordTheme, ...]:
     """The themes a group's subject may come from, out of the ones asked for.
 
-    Its classes, narrowed to the themes it names when it names any.
+    Its classes, narrowed to the themes it names when it names any — and, for a verb group
+    that asks for a trait, to the themes that have a noun with it: `날아오른다` takes an
+    `animal` and no `job`, because no job flies.
     """
     by_class = _themes_for_classes(themes, group.subject)
+    by_theme = (
+        by_class
+        if group.subject_themes is None
+        else tuple(theme for theme in by_class if theme in group.subject_themes)
+    )
 
-    if group.subject_themes is None:
-        return by_class
+    if isinstance(group, VerbGroup) and group.subject_traits is not None:
+        return tuple(theme for theme in by_theme if _subject_pool_for(language, data, group, theme))
 
-    return tuple(theme for theme in by_class if theme in group.subject_themes)
+    return by_theme
+
+
+def _traits_of(data: SentenceLanguageData, noun: str) -> tuple[NounTrait, ...]:
+    """The traits a noun carries: what its language says it can do."""
+    return tuple(trait for trait, pool in (data.traits or {}).items() if noun in pool)
+
+
+def _accepts_noun(data: SentenceLanguageData, group: VerbGroup, noun: str) -> bool:
+    """Whether a verb group takes this noun as its subject, by what the noun can do.
+
+    A group that asks for no trait takes any noun; one that asks for one takes only a noun
+    that carries it; one that rules some out takes any noun that carries none of them.
+    """
+    if group.subject_traits is None and group.subject_without is None:
+        return True
+
+    traits = _traits_of(data, noun)
+
+    if group.subject_traits is not None and not any(t in traits for t in group.subject_traits):
+        return False
+
+    return group.subject_without is None or not any(t in traits for t in group.subject_without)
+
+
+def _subject_pool_for(
+    language: WordLanguage,
+    data: SentenceLanguageData,
+    group: VerbGroup | StateGroup,
+    theme: WordTheme,
+) -> WordPool:
+    """The nouns of a theme a group's subject may be drawn from."""
+    pool = _nouns_of(language, theme)
+
+    if not isinstance(group, VerbGroup) or (
+        group.subject_traits is None and group.subject_without is None
+    ):
+        return pool
+
+    lexicon = WORD_DATA[language]
+
+    return tuple(entry for entry in pool if _accepts_noun(data, group, _plain(lexicon, entry)))
+
+
+def _subject_noun_of(frame: SentenceFrame, plan: Plan, follow: Follow | None) -> str | None:
+    """The noun a sentence's subject is already decided to be, or None.
+
+    A word the caller required or the story pinned, or the topic a later sentence names
+    again, stands a pronoun for, or drops — a fish that is left unsaid is still a fish. None
+    where the subject is still to be drawn.
+    """
+    required = _required_at(frame, plan, _subject_slot_of(frame))
+
+    if required is not None:
+        return required.word
+
+    return follow.topic.noun if follow is not None and follow.reference != "fresh" else None
 
 
 def _state_groups_for(
+    language: WordLanguage,
     data: SentenceLanguageData,
     themes: Sequence[WordTheme],
     frame: SentenceFrame,
@@ -1638,7 +1710,7 @@ def _state_groups_for(
             and not _accepts_subject(group, subject.theme)
         ):
             continue
-        if not _subject_themes_of(group, themes):
+        if not _subject_themes_of(language, data, group, themes):
             continue
 
         usable.append(group)
@@ -1747,6 +1819,7 @@ def _noun_phrase(
     span: tuple[int, int],
     count: str,
     described: WordTheme | None,
+    only: WordPool | None = None,
 ) -> Phrase:
     """Build one noun phrase: an article, the noun, and a modifier where there is room.
 
@@ -1759,7 +1832,9 @@ def _noun_phrase(
     holds, which takes any modifier the language has.
     """
     lexicon = WORD_DATA[language]
-    pool = _nouns_of(language, theme)
+    # `only` is the nouns the group has narrowed the subject to: a flier for a verb that
+    # takes off. The theme's whole pool otherwise.
+    pool = only if only is not None else _nouns_of(language, theme)
     space = len(data.space)
     _, noun_max = span
     # Measured against the base forms, because the noun that decides the gender has not
@@ -2136,13 +2211,15 @@ def _compose(
         states = (
             [data.calendar.copula]
             if copular and data.calendar is not None
-            else _state_groups_for(data, themes, frame, plan, beat) or list(data.states)
+            else _state_groups_for(language, data, themes, frame, plan, beat) or list(data.states)
         )
         state_group = pick(states)
         chosen: VerbGroup | StateGroup = state_group
         base = state_group.words
     else:
-        verbs = _verb_groups_for(data, frame, themes, plan, beat) or [
+        verbs = _verb_groups_for(
+            language, data, frame, themes, plan, beat, _subject_noun_of(frame, plan, follow)
+        ) or [
             group
             for group in data.verbs
             if (group.object is not None) == wants_object
@@ -2165,7 +2242,7 @@ def _compose(
         draw.tense,
         data.join if draw.link == "first" else None,
     )
-    subject_themes = _subject_themes_of(chosen, themes)
+    subject_themes = _subject_themes_of(language, data, chosen, themes)
     # Which part is the subject is the shape's business, not the slot's: a counted
     # shape has no `subject` part and its quantity is the subject.
     subject_slot = _subject_slot_of(frame)
@@ -2442,6 +2519,9 @@ def _compose(
                 span=(noun_low, noun_high),
                 count=_count_text(data, theme) if part.slot == "quantity" else "",
                 described=None if required is not None and not required.known else theme,
+                only=_subject_pool_for(language, data, chosen, theme)
+                if part.slot == subject_slot
+                else None,
             )
             phrase = built.text
 
@@ -3677,9 +3757,13 @@ def _generate_one(language: WordLanguage, settings: Settings, draw: Draw) -> Bui
             return bool(_themes_for_classes(requested, classes))
 
         if any(part.slot == "state" for part in frame.parts):
-            return bool(_state_groups_for(data, requested, frame, plan, beat))
+            return bool(_state_groups_for(language, data, requested, frame, plan, beat))
 
-        return bool(_verb_groups_for(data, frame, requested, plan, beat))
+        return bool(
+            _verb_groups_for(
+                language, data, frame, requested, plan, beat, _subject_noun_of(frame, plan, follow)
+            )
+        )
 
     # Prefer a shape that can land inside the range, then one that has somewhere to
     # put every word the caller required, and settle for any of them after that.

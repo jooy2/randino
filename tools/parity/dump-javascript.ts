@@ -218,6 +218,8 @@ console.log(
 							object: list(group.object),
 							field: group.field,
 							subjectThemes: list(group.subjectThemes),
+							subjectTraits: list(group.subjectTraits),
+							subjectWithout: list(group.subjectWithout),
 							objectThemes: list(group.objectThemes),
 							requires: group.requires ?? '',
 							words: list(group.words),
@@ -247,6 +249,11 @@ console.log(
 						connectives: Object.fromEntries(
 							Object.entries(data.connectives).map(([kind, pool]) => [kind, list(pool)])
 						),
+						traits: data.traits
+							? Object.fromEntries(
+									Object.entries(data.traits).map(([trait, pool]) => [trait, list(pool)])
+								)
+							: null,
 						interjections: list(data.interjections),
 						pronouns: Object.fromEntries(
 							Object.entries(data.pronouns).map(([gender, pool]) => [gender, list(pool)])

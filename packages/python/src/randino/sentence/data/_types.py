@@ -157,6 +157,17 @@ class PredicateTense:
     """The other forms, index-aligned with `words`."""
 
 
+NounTrait = Literal["flier", "swimmer", "crawler"]
+"""What a noun can do that its theme does not say.
+
+A fish and a sparrow are both `animal`, and only one of them flies; a snake and a lion are
+both `animal`, and only one of them runs. A language lists the nouns that carry each trait
+under `SentenceLanguageData.traits`, and a verb group asks for one with `subject_traits` or
+rules one out with `subject_without`. A noun listed nowhere has no trait, so it takes any
+group that asks for none.
+"""
+
+
 @dataclass(frozen=True, slots=True)
 class VerbGroup:
     """Verbs that take the same arguments.
@@ -185,6 +196,19 @@ class VerbGroup:
     and a spoon does not. None where the class alone is right. A theme narrowed out of
     one group has to be accepted by another of the same field, and the suite asserts it
     is.
+    """
+
+    subject_traits: tuple[NounTrait, ...] | None = None
+    """A trait the subject has to carry, one of these.
+
+    `날아오른다` takes a `flier`, `헤엄친다` a `swimmer`. None for a group that asks for none.
+    """
+
+    subject_without: tuple[NounTrait, ...] | None = None
+    """Traits the subject may not carry.
+
+    `달린다` and `걷는다` take no `swimmer` and no `crawler`. A noun with no trait at all
+    passes.
     """
 
     object_themes: tuple[WordTheme, ...] | None = None
@@ -715,6 +739,13 @@ class SentenceLanguageData:
 
     join: SentenceJoin | None = None
     """How two clauses are written as one sentence. Left out by a language that does not."""
+
+    traits: Mapping[NounTrait, WordPool] | None = None
+    """The nouns that fly, swim or crawl, for the verb groups that ask.
+
+    Written in the plain form — lowercase where the pools capitalize — and None for a
+    language whose verbs ask for no trait.
+    """
 
     pronounless: tuple[NounClass, ...] = ()
     """Noun classes the language's written pronouns are wrong for.

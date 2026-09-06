@@ -1422,11 +1422,13 @@ SentenceFrame _pickFrame(List<SentenceFrame> frames, [int Function(SentenceFrame
 /// an object, able to take the subject the shape will be given, and — when a
 /// word was required — the group that word belongs to.
 List<VerbGroup> _verbGroupsFor(
+  WordLanguage language,
   SentenceLanguageData data,
   SentenceFrame frame,
   List<WordTheme> themes,
   _Plan plan, [
   _BeatDraw? beat,
+  String? subjectNoun,
 ]) {
   // A quantity is an object with a number on it, and an amount is an object of
   // the class money belongs to — unless the quantity is what the sentence is
@@ -1464,6 +1466,8 @@ List<VerbGroup> _verbGroupsFor(
           return false;
         }
 
+        if (subjectNoun != null && !_acceptsNoun(data, group, subjectNoun)) return false;
+
         final objectTheme = object?.theme;
 
         if (objectTheme != null && !_acceptsObject(group, objectTheme)) return false;
@@ -1472,7 +1476,7 @@ List<VerbGroup> _verbGroupsFor(
 
         if (item != null && group.object != null && !_acceptsObject(group, item)) return false;
 
-        return _subjectThemesOf(group.subject, group.subjectThemes, themes).isNotEmpty &&
+        return _subjectThemesOf(language, data, group, themes).isNotEmpty &&
             (group.object == null || _objectThemesOf(group, beat).isNotEmpty);
       })
       .toList(growable: false);
@@ -1488,13 +1492,81 @@ bool _acceptsSubject(List<NounClass> classes, List<WordTheme>? named, WordTheme 
 /// The themes a group's subject may come from, out of the ones asked for: its
 /// classes, narrowed to the themes it names when it names any.
 List<WordTheme> _subjectThemesOf(
-  List<NounClass> classes,
-  List<WordTheme>? named,
+  WordLanguage language,
+  SentenceLanguageData data,
+  Object group,
   List<WordTheme> themes,
 ) {
+  final classes = group is VerbGroup ? group.subject : (group as StateGroup).subject;
+  final named = group is VerbGroup ? group.subjectThemes : (group as StateGroup).subjectThemes;
   final byClass = _themesForClasses(themes, classes);
+  final byTheme = named == null ? byClass : byClass.where(named.contains).toList(growable: false);
 
-  return named == null ? byClass : byClass.where(named.contains).toList(growable: false);
+  // A group that asks for a trait is only worth a theme that has a noun with it:
+  // `날아오른다` takes an `animal` and no `job`, because no job flies.
+  if (group is VerbGroup && group.subjectTraits != null) {
+    return byTheme
+        .where((theme) => _subjectPoolFor(language, data, group, theme).isNotEmpty)
+        .toList(growable: false);
+  }
+
+  return byTheme;
+}
+
+/// The traits a noun carries: what its language says it can do.
+List<NounTrait> _traitsOf(SentenceLanguageData data, String noun) => <NounTrait>[
+  for (final entry in (data.traits ?? const <NounTrait, WordPool>{}).entries)
+    if (entry.value.contains(noun)) entry.key,
+];
+
+/// Whether a verb group takes this noun as its subject, by what the noun can do.
+///
+/// A group that asks for no trait takes any noun; one that asks for one takes
+/// only a noun that carries it; one that rules some out takes any noun that
+/// carries none of them.
+bool _acceptsNoun(SentenceLanguageData data, VerbGroup group, String noun) {
+  final wanted = group.subjectTraits;
+  final barred = group.subjectWithout;
+
+  if (wanted == null && barred == null) return true;
+
+  final traits = _traitsOf(data, noun);
+
+  if (wanted != null && !wanted.any(traits.contains)) return false;
+
+  return barred == null || !barred.any(traits.contains);
+}
+
+/// The nouns of a theme a group's subject may be drawn from.
+WordPool _subjectPoolFor(
+  WordLanguage language,
+  SentenceLanguageData data,
+  Object group,
+  WordTheme theme,
+) {
+  final pool = _nounsOf(language, theme);
+
+  if (group is! VerbGroup || (group.subjectTraits == null && group.subjectWithout == null)) {
+    return pool;
+  }
+
+  final lexicon = wordData[language]!;
+
+  return pool
+      .where((entry) => _acceptsNoun(data, group, _plain(lexicon, entry)))
+      .toList(growable: false);
+}
+
+/// The noun a sentence's subject is already decided to be, for the groups to be
+/// chosen against: a word the caller required or the story pinned, or the topic
+/// a later sentence names again, stands a pronoun for, or drops — a fish that is
+/// left unsaid is still a fish. Null where the subject is still to be drawn.
+String? _subjectNounOf(SentenceFrame frame, _Plan plan, _Follow? follow) {
+  final required = _requiredAt(frame, plan, _subjectSlotOf(frame));
+
+  if (required != null) return required.word;
+
+  return follow != null && follow.reference != _Reference.fresh ? follow.topic.noun : null;
 }
 
 /// Whether a verb group takes a noun of this theme as its object.
@@ -1519,6 +1591,7 @@ List<WordTheme> _objectThemesOf(VerbGroup group, _BeatDraw? beat) {
 
 /// The same, for a shape headed by an adjective rather than a verb.
 List<StateGroup> _stateGroupsFor(
+  WordLanguage language,
   SentenceLanguageData data,
   List<WordTheme> themes,
   SentenceFrame frame,
@@ -1544,7 +1617,7 @@ List<StateGroup> _stateGroupsFor(
           return false;
         }
 
-        return _subjectThemesOf(group.subject, group.subjectThemes, themes).isNotEmpty;
+        return _subjectThemesOf(language, data, group, themes).isNotEmpty;
       })
       .toList(growable: false);
 }
@@ -1674,9 +1747,12 @@ _Phrase _nounPhrase(
   // The theme the modifier is chosen for, which is the noun's own — or null for
   // a word no pool holds, which takes any modifier the language has.
   required WordTheme? described,
+  // The nouns to draw from, when the group has narrowed them: a flier for a
+  // verb that takes off. The theme's whole pool otherwise.
+  WordPool? only,
 }) {
   final lexicon = wordData[language]!;
-  final pool = _nounsOf(language, theme);
+  final pool = only ?? _nounsOf(language, theme);
   final space = data.space.length;
   // Measured against the base forms, because the noun that decides the gender
   // has not been drawn yet; the modifier itself is chosen from the agreed pool.
@@ -1889,9 +1965,20 @@ _Built _compose(
       copular
           ? <StateGroup>[data.calendar!.copula]
           : headed
-          ? _stateGroupsFor(data, themes, frame, plan, beat)
+          ? _stateGroupsFor(language, data, themes, frame, plan, beat)
           : const <StateGroup>[];
-  final verbs = headed ? const <VerbGroup>[] : _verbGroupsFor(data, frame, themes, plan, beat);
+  final verbs =
+      headed
+          ? const <VerbGroup>[]
+          : _verbGroupsFor(
+            language,
+            data,
+            frame,
+            themes,
+            plan,
+            beat,
+            _subjectNounOf(frame, plan, follow),
+          );
   final StateGroup? stateGroup = headed ? pick(states.isNotEmpty ? states : data.states) : null;
   final VerbGroup? verbGroup =
       headed
@@ -1923,14 +2010,8 @@ _Built _compose(
     draw.tense,
     draw.link == JoinSide.first ? data.join : null,
   );
-  final subjectClasses = stateGroup?.subject ?? verbGroup!.subject;
-  // Written out rather than with `??`: a state group with no themes of its own
-  // must not fall through to a verb group that is not there.
-  final subjectThemes = _subjectThemesOf(
-    subjectClasses,
-    stateGroup != null ? stateGroup.subjectThemes : verbGroup!.subjectThemes,
-    themes,
-  );
+  final Object group = stateGroup ?? verbGroup!;
+  final subjectThemes = _subjectThemesOf(language, data, group, themes);
   // Which part is the subject is the shape's business, not the slot's: a counted
   // shape has no `subject` part and its quantity is the subject.
   final subjectSlot = _subjectSlotOf(frame);
@@ -2218,6 +2299,7 @@ _Built _compose(
         nouns: nouns,
         count: part.slot == SentenceSlot.quantity ? _countText(data, theme) : '',
         described: required != null && !required.known ? null : theme,
+        only: part.slot == subjectSlot ? _subjectPoolFor(language, data, group, theme) : null,
       );
 
       phrase = built.text;
@@ -2601,8 +2683,16 @@ _Built _generateOne(WordLanguage language, _Settings settings, _Draw draw) {
     }
 
     return frame.parts.any((part) => part.slot == SentenceSlot.state)
-        ? _stateGroupsFor(data, requested, frame, placement.plan, draw.beat).isNotEmpty
-        : _verbGroupsFor(data, frame, requested, placement.plan, draw.beat).isNotEmpty;
+        ? _stateGroupsFor(language, data, requested, frame, placement.plan, draw.beat).isNotEmpty
+        : _verbGroupsFor(
+          language,
+          data,
+          frame,
+          requested,
+          placement.plan,
+          draw.beat,
+          _subjectNounOf(frame, placement.plan, follow),
+        ).isNotEmpty;
   }
 
   // Prefer a shape that can land inside the range, then one that has somewhere

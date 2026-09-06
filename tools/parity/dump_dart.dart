@@ -199,7 +199,19 @@ void main() {
               'field': group.field.name,
               'subjectThemes': group.subjectThemes == null
                   ? null
-                  : <String>[for (final theme in group.subjectThemes!) theme.name],
+                  : <String>[
+                      for (final theme in group.subjectThemes!) theme.name,
+                    ],
+              'subjectTraits': group.subjectTraits == null
+                  ? null
+                  : <String>[
+                      for (final trait in group.subjectTraits!) trait.name,
+                    ],
+              'subjectWithout': group.subjectWithout == null
+                  ? null
+                  : <String>[
+                      for (final trait in group.subjectWithout!) trait.name,
+                    ],
               'objectThemes': group.objectThemes == null
                   ? null
                   : <String>[
@@ -220,7 +232,9 @@ void main() {
               'subject': <String>[for (final noun in group.subject) noun.name],
               'subjectThemes': group.subjectThemes == null
                   ? null
-                  : <String>[for (final theme in group.subjectThemes!) theme.name],
+                  : <String>[
+                      for (final theme in group.subjectThemes!) theme.name,
+                    ],
               'condition': group.condition?.name ?? '',
               'head': group.head ?? '',
               'pastHead': group.pastHead ?? '',
@@ -246,6 +260,12 @@ void main() {
           for (final k in entry.value.connectives.entries)
             k.key.name: listed(k.value),
         },
+        'traits': entry.value.traits == null
+            ? null
+            : <String, Object?>{
+                for (final t in entry.value.traits!.entries)
+                  t.key.name: listed(t.value),
+              },
         'interjections': listed(entry.value.interjections),
         'pronouns': <String, Object?>{
           for (final g in entry.value.pronouns.entries)

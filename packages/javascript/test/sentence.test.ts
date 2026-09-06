@@ -368,6 +368,24 @@ function agreedBy(
 	return out;
 }
 
+/** The traits a noun carries, read the way the generator reads them. */
+function traitsOf(data: SentenceLanguageData, noun: string): string[] {
+	return Object.entries(data.traits ?? {})
+		.filter(([, pool]) => pool?.includes(noun))
+		.map(([trait]) => trait);
+}
+
+/** Whether a verb group takes this noun as its subject, by what the noun can do. */
+function acceptsNoun(data: SentenceLanguageData, group: VerbGroup, noun: string): boolean {
+	const traits = traitsOf(data, noun);
+
+	if (group.subjectTraits && !group.subjectTraits.some((trait) => traits.includes(trait))) {
+		return false;
+	}
+
+	return !group.subjectWithout?.some((trait) => traits.includes(trait));
+}
+
 function poolFor(language: WordLanguage, slot: SentenceSlot): Set<string> {
 	const wordData = WORD_DATA[language];
 	const data = SENTENCE_DATA[language];
@@ -703,13 +721,18 @@ describe('Sentence', () => {
 					groups.length > 0,
 					`${language}: ${detail.phrases[at]} has no ${transitive ? 'transitive' : 'intransitive'} group (${detail.sentence})`
 				);
-				// The class, and the theme where the group narrows to themes: `익는다` is
-				// a thing food does and drink does not.
+				// The class, the theme where the group narrows to themes — `익는다` is a
+				// thing food does and drink does not — and the trait where it asks for
+				// one: `날아오른다` takes a sparrow and never a fish.
+				const subject = detail.phrases[detail.slots.indexOf('subject')];
+				const noun = subject === undefined ? null : ([...nounsIn(language, subject)][0] ?? null);
+
 				assert.ok(
 					groups.some(
 						(group) =>
 							group.subject.includes(THEME_CLASS[detail.theme as WordTheme]) &&
-							(!group.subjectThemes || group.subjectThemes.includes(detail.theme as WordTheme))
+							(!group.subjectThemes || group.subjectThemes.includes(detail.theme as WordTheme)) &&
+							(noun === null || acceptsNoun(data, group, noun))
 					),
 					`${language}: ${detail.theme} cannot be the subject of ${detail.phrases[at]} (${detail.sentence})`
 				);
@@ -2987,6 +3010,52 @@ describe('Sentence', () => {
 				);
 
 				assert.ok(!described || describedByTheme, `${language}: no state describes a ${theme}`);
+			}
+		}
+	});
+
+	it('every noun the pools hold has a verb in every field its class has', () => {
+		// A trait is a narrowing, not a gap, all the way down to the noun: a fish lost
+		// `달린다` and kept `헤엄친다`, a snake `기어간다`, and nothing lost `move`.
+		// And every trait names nouns the pools actually hold.
+		for (const language of WORD_LANGUAGES) {
+			const data = SENTENCE_DATA[language];
+			const wordData = WORD_DATA[language];
+			const fields = new Set(data.verbs.map((group) => group.field));
+			const every = new Set(
+				WORD_THEMES.flatMap((theme) => wordData.nouns[theme].map((word) => plain(language, word)))
+			);
+
+			for (const [trait, pool] of Object.entries(data.traits ?? {})) {
+				for (const noun of pool ?? []) {
+					assert.ok(every.has(noun), `${language}: the ${trait} '${noun}' is in no pool`);
+				}
+			}
+
+			for (const theme of WORD_THEMES) {
+				const cls = THEME_CLASS[theme];
+
+				for (const field of fields) {
+					const inField = data.verbs.filter(
+						(group) =>
+							group.field === field &&
+							group.subject.includes(cls) &&
+							(!group.subjectThemes || group.subjectThemes.includes(theme))
+					);
+
+					if (!inField.length) {
+						continue;
+					}
+
+					for (const word of wordData.nouns[theme]) {
+						const noun = plain(language, word);
+
+						assert.ok(
+							inField.some((group) => acceptsNoun(data, group, noun)),
+							`${language}: no ${field} verb takes '${noun}'`
+						);
+					}
+				}
 			}
 		}
 	});

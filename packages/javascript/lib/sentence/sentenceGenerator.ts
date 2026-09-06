@@ -67,6 +67,7 @@ import { SENTENCE_DATA, THEME_CLASS } from './data/index.js';
 import type {
 	Condition,
 	ConnectiveKind,
+	NounTrait,
 	NounClass,
 	PredicateForm,
 	SentenceFrame,
@@ -1264,11 +1265,13 @@ function pickFrame(
  * was required — the group that word belongs to.
  */
 function verbGroupsFor(
+	language: WordLanguage,
 	data: SentenceLanguageData,
 	frame: SentenceFrame,
 	themes: readonly WordTheme[],
 	plan: Plan,
-	beat: BeatDraw | null = null
+	beat: BeatDraw | null = null,
+	subjectNoun: string | null = null
 ): readonly VerbGroup[] {
 	// A quantity is an object with a number on it, and an amount is an object of
 	// the class money belongs to — unless the quantity is what the sentence is
@@ -1318,6 +1321,10 @@ function verbGroupsFor(
 			return false;
 		}
 
+		if (subjectNoun !== null && !acceptsNoun(data, group, subjectNoun)) {
+			return false;
+		}
+
 		if (object?.theme && !acceptsObject(group, object.theme)) {
 			return false;
 		}
@@ -1327,7 +1334,7 @@ function verbGroupsFor(
 		}
 
 		return (
-			subjectThemesOf(group, themes).length > 0 &&
+			subjectThemesOf(group, themes, language, data).length > 0 &&
 			(!group.object || objectThemesOf(group, beat).length > 0)
 		);
 	});
@@ -1350,13 +1357,81 @@ function acceptsSubject(group: VerbGroup | StateGroup, theme: WordTheme): boolea
  */
 function subjectThemesOf(
 	group: VerbGroup | StateGroup,
-	themes: readonly WordTheme[]
+	themes: readonly WordTheme[],
+	language: WordLanguage,
+	data: SentenceLanguageData
 ): readonly WordTheme[] {
 	const byClass = themesForClasses(themes, group.subject);
-
-	return group.subjectThemes
+	const byTheme = group.subjectThemes
 		? byClass.filter((theme) => group.subjectThemes!.includes(theme))
 		: byClass;
+
+	// A group that asks for a trait is only worth a theme that has a noun with it:
+	// `날아오른다` takes an `animal` and no `job`, because no job flies.
+	return 'field' in group && group.subjectTraits
+		? byTheme.filter((theme) => subjectPoolFor(language, data, group, theme).length > 0)
+		: byTheme;
+}
+
+/** The traits a noun carries: what its language says it can do. */
+function traitsOf(data: SentenceLanguageData, noun: string): readonly NounTrait[] {
+	return (Object.entries(data.traits ?? {}) as [NounTrait, WordPool | undefined][])
+		.filter(([, pool]) => pool?.includes(noun))
+		.map(([trait]) => trait);
+}
+
+/**
+ * Whether a verb group takes this noun as its subject, by what the noun can do.
+ * A group that asks for no trait takes any noun; one that asks for one takes
+ * only a noun that carries it; one that rules some out takes any noun that
+ * carries none of them.
+ */
+function acceptsNoun(data: SentenceLanguageData, group: VerbGroup, noun: string): boolean {
+	if (!group.subjectTraits && !group.subjectWithout) {
+		return true;
+	}
+
+	const traits = traitsOf(data, noun);
+
+	if (group.subjectTraits && !group.subjectTraits.some((trait) => traits.includes(trait))) {
+		return false;
+	}
+
+	return !group.subjectWithout?.some((trait) => traits.includes(trait));
+}
+
+/** The nouns of a theme a group's subject may be drawn from. */
+function subjectPoolFor(
+	language: WordLanguage,
+	data: SentenceLanguageData,
+	group: VerbGroup | StateGroup,
+	theme: WordTheme
+): WordPool {
+	const pool = nounsOf(language, theme);
+
+	if (!('field' in group) || (!group.subjectTraits && !group.subjectWithout)) {
+		return pool;
+	}
+
+	const wordData = WORD_DATA[language];
+
+	return pool.filter((entry) => acceptsNoun(data, group, plain(wordData, entry)));
+}
+
+/**
+ * The noun a sentence's subject is already decided to be, for the groups to be
+ * chosen against: a word the caller required or the story pinned, or the topic
+ * a later sentence names again, stands a pronoun for, or drops — a fish that is
+ * left unsaid is still a fish. Null where the subject is still to be drawn.
+ */
+function subjectNounOf(frame: SentenceFrame, plan: Plan, follow: Follow | null): string | null {
+	const required = requiredAt(frame, plan, subjectSlotOf(frame));
+
+	if (required) {
+		return required.word;
+	}
+
+	return follow && follow.reference !== 'fresh' ? follow.topic.noun : null;
 }
 
 /** Whether a verb group takes a noun of this theme as its object. */
@@ -1386,6 +1461,7 @@ function objectThemesOf(group: VerbGroup, beat: BeatDraw | null): readonly WordT
 
 /** The same, for a shape headed by an adjective rather than a verb. */
 function stateGroupsFor(
+	language: WordLanguage,
 	data: SentenceLanguageData,
 	themes: readonly WordTheme[],
 	frame: SentenceFrame,
@@ -1411,7 +1487,7 @@ function stateGroupsFor(
 			return false;
 		}
 
-		return subjectThemesOf(group, themes).length > 0;
+		return subjectThemesOf(group, themes, language, data).length > 0;
 	});
 }
 
@@ -1507,10 +1583,13 @@ function nounPhrase(
 	count: string,
 	// The theme the modifier is chosen for, which is the noun's own — or null for a
 	// word no pool holds, which takes any modifier the language has.
-	described: WordTheme | null = theme
+	described: WordTheme | null = theme,
+	// The nouns to draw from, when the group has narrowed them: a flier for a verb
+	// that takes off. The theme's whole pool otherwise.
+	only: WordPool | null = null
 ): Phrase {
 	const wordData = WORD_DATA[language];
-	const pool = nounsOf(language, theme);
+	const pool = only ?? nounsOf(language, theme);
 	const space = data.space.length;
 	const [, nounMax] = span;
 	const [modMin, modMax] = poolBounds(modifiersFor(language, described, undefined));
@@ -1742,8 +1821,16 @@ function generateOne(language: WordLanguage, settings: Settings, draw: Draw): Bu
 		}
 
 		return frame.parts.some((part) => part.slot === 'state')
-			? stateGroupsFor(data, requested, frame, plan, draw.beat).length > 0
-			: verbGroupsFor(data, frame, requested, plan, draw.beat).length > 0;
+			? stateGroupsFor(language, data, requested, frame, plan, draw.beat).length > 0
+			: verbGroupsFor(
+					language,
+					data,
+					frame,
+					requested,
+					plan,
+					draw.beat,
+					subjectNounOf(frame, plan, follow)
+				).length > 0;
 	};
 	// Prefer a shape that can land inside the range, then one that has somewhere to
 	// put every word the caller required, and settle for any of them after that.
@@ -1926,8 +2013,18 @@ function compose(
 		headed === 'copula'
 			? [data.calendar!.copula as StateGroup | VerbGroup]
 			: headed === 'state'
-				? (stateGroupsFor(data, themes, frame, plan, draw.beat) as (StateGroup | VerbGroup)[])
-				: (verbGroupsFor(data, frame, themes, plan, draw.beat) as (StateGroup | VerbGroup)[]);
+				? (stateGroupsFor(language, data, themes, frame, plan, draw.beat) as (
+						StateGroup | VerbGroup
+					)[])
+				: (verbGroupsFor(
+						language,
+						data,
+						frame,
+						themes,
+						plan,
+						draw.beat,
+						subjectNounOf(frame, plan, follow)
+					) as (StateGroup | VerbGroup)[]);
 	const group = pick(groups.length ? groups : headedFallback(data, frame, headed));
 	// The same predicates, in the form this type of sentence ends on, in the tense
 	// the result is in — or in the form that links a first clause to the one after
@@ -1940,7 +2037,7 @@ function compose(
 		draw.tense,
 		draw.link === 'first' ? data.join : undefined
 	);
-	const subjectThemes = subjectThemesOf(group, themes);
+	const subjectThemes = subjectThemesOf(group, themes, language, data);
 	// Which part is the subject is the shape's business, not the slot's: a counted
 	// shape has no `subject` part and its quantity is the subject. Looking for a
 	// `subject` part regardless is how a word required into a counted subject lost
@@ -2207,7 +2304,8 @@ function compose(
 				high,
 				[nounLow, nounHigh],
 				part.slot === 'quantity' ? countText(data, theme) : '',
-				required && !required.known ? null : theme
+				required && !required.known ? null : theme,
+				part.slot === subjectSlot ? subjectPoolFor(language, data, group, theme) : null
 			);
 
 			phrase = built.text;

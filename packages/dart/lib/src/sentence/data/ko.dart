@@ -58,23 +58,40 @@ final SentenceLanguageData ko = SentenceLanguageData(
       field: VerbField.go,
       subject: const <NounClass>[NounClass.creature, NounClass.person],
       requires: SentenceSlot.destination,
-      words: words(r'간다 향한다 달려간다 올라간다 내려간다'),
+      words: words(r'간다 향한다 올라간다 내려간다'),
       forms: <PredicateForm, WordPool>{
-        PredicateForm.question: words(
-          r'가니|가나|가는가 향하니|향하나|향하는가 달려가니|달려가나|달려가는가 올라가니|올라가나|올라가는가 내려가니|내려가나|내려가는가',
+        PredicateForm.question: words(r'가니|가나|가는가 향하니|향하나|향하는가 올라가니|올라가나|올라가는가 내려가니|내려가나|내려가는가'),
+        PredicateForm.exclamation: words(
+          r'가는구나|가네|가는군 향하는구나|향하네|향하는군 올라가는구나|올라가네|올라가는군 내려가는구나|내려가네|내려가는군',
         ),
-        PredicateForm.exclamation: words(r'''
-          가는구나|가네|가는군 향하는구나|향하네|향하는군 달려가는구나|달려가네|달려가는군 올라가는구나|올라가네|올라가는군 내려가는구나|내려가네|내려가는군
-        '''),
-        PredicateForm.casual: words(r'가 향해 달려가 올라가 내려가'),
-        PredicateForm.casualQuestion: words(r'가|가지 향해|향하지 달려가|달려가지 올라가|올라가지 내려가|내려가지'),
-        PredicateForm.polite: words(r'가요 향해요 달려가요 올라가요 내려가요'),
-        PredicateForm.politeQuestion: words(r'가요|가죠 향해요|향하죠 달려가요|달려가죠 올라가요|올라가죠 내려가요|내려가죠'),
-        PredicateForm.formal: words(r'갑니다 향합니다 달려갑니다 올라갑니다 내려갑니다'),
-        PredicateForm.formalQuestion: words(r'갑니까 향합니까 달려갑니까 올라갑니까 내려갑니까'),
-        PredicateForm.linking: words(r'가서|가고 향해서|향하고 달려가서|달려가고 올라가서|올라가고 내려가서|내려가고'),
+        PredicateForm.casual: words(r'가 향해 올라가 내려가'),
+        PredicateForm.casualQuestion: words(r'가|가지 향해|향하지 올라가|올라가지 내려가|내려가지'),
+        PredicateForm.polite: words(r'가요 향해요 올라가요 내려가요'),
+        PredicateForm.politeQuestion: words(r'가요|가죠 향해요|향하죠 올라가요|올라가죠 내려가요|내려가죠'),
+        PredicateForm.formal: words(r'갑니다 향합니다 올라갑니다 내려갑니다'),
+        PredicateForm.formalQuestion: words(r'갑니까 향합니까 올라갑니까 내려갑니까'),
+        PredicateForm.linking: words(r'가서|가고 향해서|향하고 올라가서|올라가고 내려가서|내려가고'),
       },
-      past: conjugate(r'갔 향했 달려갔 올라갔 내려갔', statement: '다', endings: _pastEndings),
+      past: conjugate(r'갔 향했 올라갔 내려갔', statement: '다', endings: _pastEndings),
+    ),
+    VerbGroup(
+      field: VerbField.go,
+      subject: const <NounClass>[NounClass.creature, NounClass.person],
+      subjectWithout: const <NounTrait>[NounTrait.swimmer, NounTrait.crawler],
+      requires: SentenceSlot.destination,
+      words: words(r'달려간다'),
+      forms: <PredicateForm, WordPool>{
+        PredicateForm.question: words(r'달려가니|달려가나|달려가는가'),
+        PredicateForm.exclamation: words(r'달려가는구나|달려가네|달려가는군'),
+        PredicateForm.casual: words(r'달려가'),
+        PredicateForm.casualQuestion: words(r'달려가|달려가지'),
+        PredicateForm.polite: words(r'달려가요'),
+        PredicateForm.politeQuestion: words(r'달려가요|달려가죠'),
+        PredicateForm.formal: words(r'달려갑니다'),
+        PredicateForm.formalQuestion: words(r'달려갑니까'),
+        PredicateForm.linking: words(r'달려가서|달려가고'),
+      },
+      past: conjugate(r'달려갔', statement: '다', endings: _pastEndings),
     ),
     VerbGroup(
       field: VerbField.go,
@@ -143,44 +160,71 @@ final SentenceLanguageData ko = SentenceLanguageData(
     VerbGroup(
       field: VerbField.move,
       subject: const <NounClass>[NounClass.creature, NounClass.person],
-      words: words(r'달린다 걷는다 뛴다 헤엄친다 기어간다 서성인다 지나간다 어슬렁댄다 뛰어다닌다 거닌다 산책한다'),
+      subjectWithout: const <NounTrait>[NounTrait.swimmer, NounTrait.crawler],
+      words: words(r'달린다 걷는다 뛴다 기어간다 지나간다 어슬렁댄다 뛰어다닌다 거닌다 산책한다'),
       forms: <PredicateForm, WordPool>{
         PredicateForm.question: words(r'''
-          달리니|달리나|달리는가 걷니|걷나|걷는가 뛰니|뛰나|뛰는가 헤엄치니|헤엄치나|헤엄치는가 기어가니|기어가나|기어가는가 서성이니|서성이나|서성이는가
-          지나가니|지나가나|지나가는가 어슬렁대니|어슬렁대나|어슬렁대는가 뛰어다니니|뛰어다니나|뛰어다니는가 거니니|거니나|거니는가 산책하니|산책하나|산책하는가
+          달리니|달리나|달리는가 걷니|걷나|걷는가 뛰니|뛰나|뛰는가 기어가니|기어가나|기어가는가 지나가니|지나가나|지나가는가 어슬렁대니|어슬렁대나|어슬렁대는가
+          뛰어다니니|뛰어다니나|뛰어다니는가 거니니|거니나|거니는가 산책하니|산책하나|산책하는가
         '''),
         PredicateForm.exclamation: words(r'''
-          달리는구나|달리네|달리는군 걷는구나|걷네|걷는군 뛰는구나|뛰네|뛰는군 헤엄치는구나|헤엄치네|헤엄치는군 기어가는구나|기어가네|기어가는군
-          서성이는구나|서성이네|서성이는군 지나가는구나|지나가네|지나가는군 어슬렁대는구나|어슬렁대네|어슬렁대는군 뛰어다니는구나|뛰어다니네|뛰어다니는군
-          거니는구나|거니네|거니는군 산책하는구나|산책하네|산책하는군
+          달리는구나|달리네|달리는군 걷는구나|걷네|걷는군 뛰는구나|뛰네|뛰는군 기어가는구나|기어가네|기어가는군 지나가는구나|지나가네|지나가는군
+          어슬렁대는구나|어슬렁대네|어슬렁대는군 뛰어다니는구나|뛰어다니네|뛰어다니는군 거니는구나|거니네|거니는군 산책하는구나|산책하네|산책하는군
         '''),
-        PredicateForm.casual: words(r'달려 걸어 뛰어 헤엄쳐 기어가 서성여 지나가 어슬렁대 뛰어다녀 거닐어 산책해'),
+        PredicateForm.casual: words(r'달려 걸어 뛰어 기어가 지나가 어슬렁대 뛰어다녀 거닐어 산책해'),
         PredicateForm.casualQuestion: words(r'''
-          달려|달리지 걸어|걷지 뛰어|뛰지 헤엄쳐|헤엄치지 기어가|기어가지 서성여|서성이지 지나가|지나가지 어슬렁대|어슬렁대지 뛰어다녀|뛰어다니지 거닐어|거닐지
-          산책해|산책하지
+          달려|달리지 걸어|걷지 뛰어|뛰지 기어가|기어가지 지나가|지나가지 어슬렁대|어슬렁대지 뛰어다녀|뛰어다니지 거닐어|거닐지 산책해|산책하지
         '''),
-        PredicateForm.polite: words(r'달려요 걸어요 뛰어요 헤엄쳐요 기어가요 서성여요 지나가요 어슬렁대요 뛰어다녀요 거닐어요 산책해요'),
+        PredicateForm.polite: words(r'달려요 걸어요 뛰어요 기어가요 지나가요 어슬렁대요 뛰어다녀요 거닐어요 산책해요'),
         PredicateForm.politeQuestion: words(r'''
-          달려요|달리죠 걸어요|걷죠 뛰어요|뛰죠 헤엄쳐요|헤엄치죠 기어가요|기어가죠 서성여요|서성이죠 지나가요|지나가죠 어슬렁대요|어슬렁대죠 뛰어다녀요|뛰어다니죠
-          거닐어요|거닐죠 산책해요|산책하죠
+          달려요|달리죠 걸어요|걷죠 뛰어요|뛰죠 기어가요|기어가죠 지나가요|지나가죠 어슬렁대요|어슬렁대죠 뛰어다녀요|뛰어다니죠 거닐어요|거닐죠 산책해요|산책하죠
         '''),
-        PredicateForm.formal: words(
-          r'달립니다 걷습니다 뜁니다 헤엄칩니다 기어갑니다 서성입니다 지나갑니다 어슬렁댑니다 뛰어다닙니다 거닙니다 산책합니다',
-        ),
-        PredicateForm.formalQuestion: words(
-          r'달립니까 걷습니까 뜁니까 헤엄칩니까 기어갑니까 서성입니까 지나갑니까 어슬렁댑니까 뛰어다닙니까 거닙니까 산책합니까',
-        ),
-        PredicateForm.linking: words(r'달리고 걷고 뛰고 헤엄치고 기어가고 서성이고 지나가고 어슬렁대고 뛰어다니고 거닐고 산책하고'),
+        PredicateForm.formal: words(r'달립니다 걷습니다 뜁니다 기어갑니다 지나갑니다 어슬렁댑니다 뛰어다닙니다 거닙니다 산책합니다'),
+        PredicateForm.formalQuestion: words(r'달립니까 걷습니까 뜁니까 기어갑니까 지나갑니까 어슬렁댑니까 뛰어다닙니까 거닙니까 산책합니까'),
+        PredicateForm.linking: words(r'달리고 걷고 뛰고 기어가고 지나가고 어슬렁대고 뛰어다니고 거닐고 산책하고'),
       },
-      past: conjugate(
-        r'달렸 걸었 뛰었 헤엄쳤 기어갔 서성였 지나갔 어슬렁댔 뛰어다녔 거닐었 산책했',
-        statement: '다',
-        endings: _pastEndings,
-      ),
+      past: conjugate(r'달렸 걸었 뛰었 기어갔 지나갔 어슬렁댔 뛰어다녔 거닐었 산책했', statement: '다', endings: _pastEndings),
+    ),
+    VerbGroup(
+      field: VerbField.move,
+      subject: const <NounClass>[NounClass.creature, NounClass.person],
+      subjectTraits: const <NounTrait>[NounTrait.swimmer],
+      words: words(r'헤엄친다'),
+      forms: <PredicateForm, WordPool>{
+        PredicateForm.question: words(r'헤엄치니|헤엄치나|헤엄치는가'),
+        PredicateForm.exclamation: words(r'헤엄치는구나|헤엄치네|헤엄치는군'),
+        PredicateForm.casual: words(r'헤엄쳐'),
+        PredicateForm.casualQuestion: words(r'헤엄쳐|헤엄치지'),
+        PredicateForm.polite: words(r'헤엄쳐요'),
+        PredicateForm.politeQuestion: words(r'헤엄쳐요|헤엄치죠'),
+        PredicateForm.formal: words(r'헤엄칩니다'),
+        PredicateForm.formalQuestion: words(r'헤엄칩니까'),
+        PredicateForm.linking: words(r'헤엄치고'),
+      },
+      past: conjugate(r'헤엄쳤', statement: '다', endings: _pastEndings),
+    ),
+    VerbGroup(
+      field: VerbField.move,
+      subject: const <NounClass>[NounClass.creature, NounClass.person],
+      subjectTraits: const <NounTrait>[NounTrait.crawler],
+      words: words(r'서성인다'),
+      forms: <PredicateForm, WordPool>{
+        PredicateForm.question: words(r'서성이니|서성이나|서성이는가'),
+        PredicateForm.exclamation: words(r'서성이는구나|서성이네|서성이는군'),
+        PredicateForm.casual: words(r'서성여'),
+        PredicateForm.casualQuestion: words(r'서성여|서성이지'),
+        PredicateForm.polite: words(r'서성여요'),
+        PredicateForm.politeQuestion: words(r'서성여요|서성이죠'),
+        PredicateForm.formal: words(r'서성입니다'),
+        PredicateForm.formalQuestion: words(r'서성입니까'),
+        PredicateForm.linking: words(r'서성이고'),
+      },
+      past: conjugate(r'서성였', statement: '다', endings: _pastEndings),
     ),
     VerbGroup(
       field: VerbField.move,
       subject: const <NounClass>[NounClass.creature],
+      subjectTraits: const <NounTrait>[NounTrait.flier],
       words: words(r'날아오른다'),
       forms: <PredicateForm, WordPool>{
         PredicateForm.question: words(r'날아오르니|날아오르나|날아오르는가'),
@@ -1478,6 +1522,21 @@ final SentenceLanguageData ko = SentenceLanguageData(
     ConnectiveKind.temporal: words(r'이윽고 곧 그러자 이내 어느새 마침내 그제야 한편 그러고나서 잠시후 얼마뒤'),
     ConnectiveKind.contrastive: words(r'하지만 그런데 그러나 다만 오히려 그래도'),
     ConnectiveKind.causal: words(r'그래서 그러므로 결국 그러니'),
+  },
+  traits: <NounTrait, WordPool>{
+    NounTrait.flier: words(r'''
+      부엉이 올빼미 참새 까치 제비 독수리 매 학 백조 오리 기러기 딱따구리 앵무새 공작 나비 벌 잠자리 무당벌레 박쥐 갈매기 까마귀 비둘기 꾀꼬리 반딧불이 매미 하루살이
+      풍뎅이 사슴벌레 파리 모기 나방 용 봉황 마룡 비룡 흑룡 백룡 청룡 주작 삼족오 하피 드래곤 와이번 불사조 그리핀 페가수스 천마 천사 선녀 요정 정령 픽시 임프 가고일
+      발키리
+    '''),
+    NounTrait.swimmer: words(r'''
+      고래 돌고래 상어 거북 물개 펭귄 개구리 문어 오징어 해마 불가사리 새우 잉어 연어 고등어 올챙이 악어 붕어 메기 가물치 쏘가리 송사리 미꾸라지 장어 뱀장어 갈치 삼치
+      꽁치 멸치 조기 명태 대구 광어 도미 우럭 볼락 방어 참치 가오리 홍어 복어 인어 세이렌 크라켄 물귀신 나이아드
+    '''),
+    NounTrait.crawler: words(r'''
+      거북 도마뱀 카멜레온 뱀 달팽이 개미 거미 소라 게 지렁이 지네 노래기 전갈 진드기 벼룩 누에 번데기 애벌레 도롱뇽 사마귀 악어 구렁이 살모사 독사 코브라 방울뱀 비단뱀
+      이구아나
+    '''),
   },
   interjections: words(r'아, 오, 와, 어머, 이런, 저런, 세상에, 아이고, 참, 어이쿠, 아이참, 어라, 우와, 이야,'),
   pronouns: const <WordGender, WordPool>{

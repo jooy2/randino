@@ -152,6 +152,14 @@ function dartVerb(group: VerbGroup, indent: string, koPast: boolean): string {
 		lines.push(
 			`${indent}  subjectThemes: const ${dartList(group.subjectThemes, 'WordTheme', indent)},`
 		);
+	if (group.subjectTraits)
+		lines.push(
+			`${indent}  subjectTraits: const ${dartList(group.subjectTraits, 'NounTrait', indent)},`
+		);
+	if (group.subjectWithout)
+		lines.push(
+			`${indent}  subjectWithout: const ${dartList(group.subjectWithout, 'NounTrait', indent)},`
+		);
 	if (group.object)
 		lines.push(`${indent}  object: const ${dartList(group.object, 'NounClass', indent)},`);
 	if (group.objectThemes)
@@ -385,6 +393,17 @@ function emitDart(code: string, data: SentenceLanguageData): string {
 	}
 
 	out.push('  },');
+
+	if (data.traits) {
+		out.push('  traits: <NounTrait, WordPool>{');
+
+		for (const [trait, pool] of Object.entries(data.traits)) {
+			if (pool) out.push(`    NounTrait.${trait}: ${dartWords(pool, '    ')},`);
+		}
+
+		out.push('  },');
+	}
+
 	out.push(`  interjections: ${dartWords(data.interjections, '  ')},`);
 	out.push('  pronouns: const <WordGender, WordPool>{');
 
@@ -491,6 +510,10 @@ function pyVerb(group: VerbGroup, indent: string, koPast: boolean): string {
 
 	if (group.subjectThemes)
 		lines.push(`${indent}    subject_themes=${pyTuple(group.subjectThemes)},`);
+	if (group.subjectTraits)
+		lines.push(`${indent}    subject_traits=${pyTuple(group.subjectTraits)},`);
+	if (group.subjectWithout)
+		lines.push(`${indent}    subject_without=${pyTuple(group.subjectWithout)},`);
 	if (group.object) lines.push(`${indent}    object=${pyTuple(group.object)},`);
 	if (group.objectThemes) lines.push(`${indent}    object_themes=${pyTuple(group.objectThemes)},`);
 	if (group.requires) lines.push(`${indent}    requires=${pq(group.requires)},`);
@@ -685,7 +708,8 @@ function emitPython(code: string, data: SentenceLanguageData): string {
 
 	if (data.times.past) out.push(`        past=${pyWords(data.times.past, '        ')},`);
 	if (data.times.present) out.push(`        present=${pyWords(data.times.present, '        ')},`);
-	if (data.times.habitual) out.push(`        habitual=${pyWords(data.times.habitual, '        ')},`);
+	if (data.times.habitual)
+		out.push(`        habitual=${pyWords(data.times.habitual, '        ')},`);
 
 	out.push('    ),');
 	out.push(`    homes=${pyWords(data.homes, '    ')},`);
@@ -706,6 +730,17 @@ function emitPython(code: string, data: SentenceLanguageData): string {
 	}
 
 	out.push('    },');
+
+	if (data.traits) {
+		out.push('    traits={');
+
+		for (const [trait, pool] of Object.entries(data.traits)) {
+			if (pool) out.push(`        ${pq(trait)}: ${pyWords(pool, '        ')},`);
+		}
+
+		out.push('    },');
+	}
+
 	out.push(`    interjections=${pyWords(data.interjections, '    ')},`);
 	out.push(
 		`    pronouns={${Object.entries(data.pronouns)
