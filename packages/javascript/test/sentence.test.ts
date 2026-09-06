@@ -703,8 +703,14 @@ describe('Sentence', () => {
 					groups.length > 0,
 					`${language}: ${detail.phrases[at]} has no ${transitive ? 'transitive' : 'intransitive'} group (${detail.sentence})`
 				);
+				// The class, and the theme where the group narrows to themes: `익는다` is
+				// a thing food does and drink does not.
 				assert.ok(
-					groups.some((group) => group.subject.includes(THEME_CLASS[detail.theme as WordTheme])),
+					groups.some(
+						(group) =>
+							group.subject.includes(THEME_CLASS[detail.theme as WordTheme]) &&
+							(!group.subjectThemes || group.subjectThemes.includes(detail.theme as WordTheme))
+					),
 					`${language}: ${detail.theme} cannot be the subject of ${detail.phrases[at]} (${detail.sentence})`
 				);
 			}
@@ -2945,6 +2951,42 @@ describe('Sentence', () => {
 					naming.size < detail.sentences.length,
 					`ko: every line names ${noun} (${detail.sentence})`
 				);
+			}
+		}
+	});
+
+	it('a theme narrowed out of one group is accepted by another of the same field', () => {
+		// A group that names its subject themes is a narrowing, not a gap: every theme
+		// whose class a field accepts still has a group in that field that takes it,
+		// and the same for the states. Otherwise a story about a song would have no
+		// `change` verb once the swaying and rolling went to the spoons.
+		for (const language of WORD_LANGUAGES) {
+			const data = SENTENCE_DATA[language];
+			const fields = new Set(data.verbs.map((group) => group.field));
+
+			for (const theme of WORD_THEMES) {
+				const cls = THEME_CLASS[theme];
+
+				for (const field of fields) {
+					const inField = data.verbs.filter((group) => group.field === field);
+					const byClass = inField.some((group) => group.subject.includes(cls));
+					const byTheme = inField.some(
+						(group) =>
+							group.subject.includes(cls) &&
+							(!group.subjectThemes || group.subjectThemes.includes(theme))
+					);
+
+					assert.ok(!byClass || byTheme, `${language}: no ${field} verb takes a ${theme}`);
+				}
+
+				const described = data.states.some((group) => group.subject.includes(cls));
+				const describedByTheme = data.states.some(
+					(group) =>
+						group.subject.includes(cls) &&
+						(!group.subjectThemes || group.subjectThemes.includes(theme))
+				);
+
+				assert.ok(!described || describedByTheme, `${language}: no state describes a ${theme}`);
 			}
 		}
 	});

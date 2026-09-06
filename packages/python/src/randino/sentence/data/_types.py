@@ -178,6 +178,15 @@ class VerbGroup:
     object: tuple[NounClass, ...] | None = None
     """Classes it can take as a direct object. Left out by an intransitive group."""
 
+    subject_themes: tuple[WordTheme, ...] | None = None
+    """The themes the subject may come from, when a class is too wide.
+
+    `익는다` is a thing food does and drink does not, and `울린다` is a thing a song does
+    and a spoon does not. None where the class alone is right. A theme narrowed out of
+    one group has to be accepted by another of the same field, and the suite asserts it
+    is.
+    """
+
     object_themes: tuple[WordTheme, ...] | None = None
     """The themes the object may come from, when a class is too wide.
 
@@ -228,6 +237,9 @@ class StateGroup:
     `배고프다` is `"hungry"` and `피곤하다` is `"tired"`; `크다` is neither, and a group
     of traits like it leaves this out.
     """
+
+    subject_themes: tuple[WordTheme, ...] | None = None
+    """The themes the subject may come from, when a class is too wide — see `VerbGroup`."""
 
     head: str | None = None
     """What is written in front of these instead of the shape's own head.

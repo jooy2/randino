@@ -393,6 +393,8 @@ export const KO: SentenceLanguageData = {
 			field: 'look',
 			subject: ['creature', 'person'],
 			object: ['thing', 'plant', 'edible'],
+			// What one can hold: an instrument is, and a song is not.
+			objectThemes: ['object', 'tool', 'clothing', 'product', 'gem', 'plant', 'food', 'drink'],
 			words: words(`본다 바라본다 살핀다 들여다본다 구경한다 만진다 쓰다듬는다 지켜본다`),
 			forms: {
 				question: words(`
@@ -448,6 +450,8 @@ export const KO: SentenceLanguageData = {
 			field: 'find',
 			subject: ['creature', 'person'],
 			object: ['thing', 'plant', 'edible'],
+			// What one can hold: an instrument is, and a song is not.
+			objectThemes: ['object', 'tool', 'clothing', 'product', 'gem', 'plant', 'food', 'drink'],
 			words: words(`찾는다 발견한다 줍는다 찾아낸다`),
 			forms: {
 				question: words(
@@ -470,6 +474,8 @@ export const KO: SentenceLanguageData = {
 			field: 'take',
 			subject: ['creature', 'person'],
 			object: ['thing', 'plant', 'edible'],
+			// What one can hold: an instrument is, and a song is not.
+			objectThemes: ['object', 'tool', 'clothing', 'product', 'gem', 'plant', 'food', 'drink'],
 			words: words(`챙긴다 고른다 집는다 얻는다 받는다 꺼낸다 움켜쥔다`),
 			forms: {
 				question: words(`
@@ -499,6 +505,8 @@ export const KO: SentenceLanguageData = {
 			field: 'carry',
 			subject: ['creature', 'person'],
 			object: ['thing', 'plant', 'edible'],
+			// What one can hold: an instrument is, and a song is not.
+			objectThemes: ['object', 'tool', 'clothing', 'product', 'gem', 'plant', 'food', 'drink'],
 			words: words(`옮긴다 나른다 가져온다 들고온다 안고온다`),
 			forms: {
 				question: words(`
@@ -525,6 +533,8 @@ export const KO: SentenceLanguageData = {
 			field: 'hide',
 			subject: ['creature', 'person'],
 			object: ['thing', 'plant', 'edible'],
+			// What one can hold: an instrument is, and a song is not.
+			objectThemes: ['object', 'tool', 'clothing', 'product', 'gem', 'plant', 'food', 'drink'],
 			words: words(`감춘다 숨긴다 넣어둔다 간직한다 묻는다 챙겨둔다`),
 			forms: {
 				question: words(`
@@ -552,6 +562,8 @@ export const KO: SentenceLanguageData = {
 			field: 'make',
 			subject: ['person'],
 			object: ['thing', 'vehicle'],
+			// What one can hold: an instrument is, and a song is not.
+			objectThemes: ['object', 'tool', 'clothing', 'product', 'gem', 'vehicle'],
 			words: words(`만든다 짓는다 빚는다 그린다 엮는다`),
 			forms: {
 				question: words(
@@ -594,6 +606,8 @@ export const KO: SentenceLanguageData = {
 			field: 'tend',
 			subject: ['person'],
 			object: ['thing', 'vehicle'],
+			// What one can hold: an instrument is, and a song is not.
+			objectThemes: ['object', 'tool', 'clothing', 'product', 'gem', 'vehicle'],
 			words: words(`고친다 닦는다 손질한다 다듬는다 정리한다 매만진다 수리한다`),
 			forms: {
 				question: words(`
@@ -624,6 +638,8 @@ export const KO: SentenceLanguageData = {
 			field: 'sell',
 			subject: ['person'],
 			object: ['thing', 'vehicle'],
+			// What one can hold: an instrument is, and a song is not.
+			objectThemes: ['object', 'tool', 'clothing', 'product', 'gem', 'vehicle'],
 			words: words(`판다 넘긴다 건넨다 내놓는다`),
 			forms: {
 				question: words(
@@ -646,6 +662,8 @@ export const KO: SentenceLanguageData = {
 			field: 'buy',
 			subject: ['person'],
 			object: ['thing', 'vehicle', 'edible'],
+			// What one can hold: an instrument is, and a song is not.
+			objectThemes: ['object', 'tool', 'clothing', 'product', 'gem', 'vehicle', 'food', 'drink'],
 			words: words(`산다 사온다 구한다 장만한다 사들인다`),
 			forms: {
 				question: words(
@@ -789,37 +807,56 @@ export const KO: SentenceLanguageData = {
 		{
 			field: 'change',
 			subject: ['event'],
-			words: words(`빛난다 흐른다 저문다 깊어진다 시작된다 끝난다 이어진다 지나간다`),
+			words: words(`흐른다 시작된다 끝난다 이어진다 지나간다`),
 			forms: {
-				question: words(`
-					빛나니|빛나나|빛나는가 흐르니|흐르나|흐르는가 저무니|저무나|저무는가 깊어지니|깊어지나|깊어지는가 시작되니|시작되나|시작되는가 끝나니|끝나나|끝나는가
-					이어지니|이어지나|이어지는가 지나가니|지나가나|지나가는가
-				`),
+				question: words(
+					`흐르니|흐르나|흐르는가 시작되니|시작되나|시작되는가 끝나니|끝나나|끝나는가 이어지니|이어지나|이어지는가 지나가니|지나가나|지나가는가`
+				),
 				exclamation: words(`
-					빛나는구나|빛나네|빛나는군 흐르는구나|흐르네|흐르는군 저무는구나|저무네|저무는군 깊어지는구나|깊어지네|깊어지는군 시작되는구나|시작되네|시작되는군
-					끝나는구나|끝나네|끝나는군 이어지는구나|이어지네|이어지는군 지나가는구나|지나가네|지나가는군
+					흐르는구나|흐르네|흐르는군 시작되는구나|시작되네|시작되는군 끝나는구나|끝나네|끝나는군 이어지는구나|이어지네|이어지는군 지나가는구나|지나가네|지나가는군
 				`),
-				casual: words(`빛나 흘러 저물어 깊어져 시작돼 끝나 이어져 지나가`),
+				casual: words(`흘러 시작돼 끝나 이어져 지나가`),
 				casualQuestion: words(
-					`빛나|빛나지 흘러|흐르지 저물어|저물지 깊어져|깊어지지 시작돼|시작되지 끝나|끝나지 이어져|이어지지 지나가|지나가지`
+					`흘러|흐르지 시작돼|시작되지 끝나|끝나지 이어져|이어지지 지나가|지나가지`
 				),
-				polite: words(`빛나요 흘러요 저물어요 깊어져요 시작돼요 끝나요 이어져요 지나가요`),
-				politeQuestion: words(`
-					빛나요|빛나죠 흘러요|흐르죠 저물어요|저물죠 깊어져요|깊어지죠 시작돼요|시작되죠 끝나요|끝나죠 이어져요|이어지죠 지나가요|지나가죠
-				`),
-				formal: words(
-					`빛납니다 흐릅니다 저뭅니다 깊어집니다 시작됩니다 끝납니다 이어집니다 지나갑니다`
+				polite: words(`흘러요 시작돼요 끝나요 이어져요 지나가요`),
+				politeQuestion: words(
+					`흘러요|흐르죠 시작돼요|시작되죠 끝나요|끝나죠 이어져요|이어지죠 지나가요|지나가죠`
 				),
-				formalQuestion: words(
-					`빛납니까 흐릅니까 저뭅니까 깊어집니까 시작됩니까 끝납니까 이어집니까 지나갑니까`
-				),
-				linking: words(`빛나고 흐르고 저물고 깊어지고 시작되고 끝나고 이어지고 지나가고`)
+				formal: words(`흐릅니다 시작됩니다 끝납니다 이어집니다 지나갑니다`),
+				formalQuestion: words(`흐릅니까 시작됩니까 끝납니까 이어집니까 지나갑니까`),
+				linking: words(`흐르고 시작되고 끝나고 이어지고 지나가고`)
 			},
-			past: conjugate(`빛났 흘렀 저물었 깊어졌 시작됐 끝났 이어졌 지나갔`, PAST)
+			past: conjugate(`흘렀 시작됐 끝났 이어졌 지나갔`, PAST)
+		},
+		{
+			field: 'change',
+			subject: ['event'],
+			// A season deepens and a sky shines; a match does neither.
+			subjectThemes: ['time', 'weather'],
+			words: words(`빛난다 저문다 깊어진다`),
+			forms: {
+				question: words(
+					`빛나니|빛나나|빛나는가 저무니|저무나|저무는가 깊어지니|깊어지나|깊어지는가`
+				),
+				exclamation: words(
+					`빛나는구나|빛나네|빛나는군 저무는구나|저무네|저무는군 깊어지는구나|깊어지네|깊어지는군`
+				),
+				casual: words(`빛나 저물어 깊어져`),
+				casualQuestion: words(`빛나|빛나지 저물어|저물지 깊어져|깊어지지`),
+				polite: words(`빛나요 저물어요 깊어져요`),
+				politeQuestion: words(`빛나요|빛나죠 저물어요|저물죠 깊어져요|깊어지죠`),
+				formal: words(`빛납니다 저뭅니다 깊어집니다`),
+				formalQuestion: words(`빛납니까 저뭅니까 깊어집니까`),
+				linking: words(`빛나고 저물고 깊어지고`)
+			},
+			past: conjugate(`빛났 저물었 깊어졌`, PAST)
 		},
 		{
 			field: 'change',
 			subject: ['thing', 'vehicle'],
+			// What a thing one can hold does. A song is a thing of another kind, below.
+			subjectThemes: ['object', 'tool', 'clothing', 'product', 'gem', 'vehicle'],
 			words: words(`흔들린다 반짝인다 떨어진다 굴러간다 기울어진다 낡아간다`),
 			forms: {
 				question: words(`
@@ -845,6 +882,32 @@ export const KO: SentenceLanguageData = {
 				linking: words(`흔들리고 반짝이고 떨어지고 굴러가고 기울어지고 낡아가고`)
 			},
 			past: conjugate(`흔들렸 반짝였 떨어졌 굴러갔 기울어졌 낡아갔`, PAST)
+		},
+		{
+			field: 'change',
+			subject: ['thing'],
+			subjectThemes: ['music'],
+			words: words(`울린다 흐른다 퍼진다 잦아든다 이어진다`),
+			forms: {
+				question: words(`
+					울리니|울리나|울리는가 흐르니|흐르나|흐르는가 퍼지니|퍼지나|퍼지는가 잦아드니|잦아드나|잦아드는가 이어지니|이어지나|이어지는가
+				`),
+				exclamation: words(`
+					울리는구나|울리네|울리는군 흐르는구나|흐르네|흐르는군 퍼지는구나|퍼지네|퍼지는군 잦아드는구나|잦아드네|잦아드는군 이어지는구나|이어지네|이어지는군
+				`),
+				casual: words(`울려 흘러 퍼져 잦아들어 이어져`),
+				casualQuestion: words(
+					`울려|울리지 흘러|흐르지 퍼져|퍼지지 잦아들어|잦아들지 이어져|이어지지`
+				),
+				polite: words(`울려요 흘러요 퍼져요 잦아들어요 이어져요`),
+				politeQuestion: words(
+					`울려요|울리죠 흘러요|흐르죠 퍼져요|퍼지죠 잦아들어요|잦아들죠 이어져요|이어지죠`
+				),
+				formal: words(`울립니다 흐릅니다 퍼집니다 잦아듭니다 이어집니다`),
+				formalQuestion: words(`울립니까 흐릅니까 퍼집니까 잦아듭니까 이어집니까`),
+				linking: words(`울리고 흐르고 퍼지고 잦아들고 이어지고`)
+			},
+			past: conjugate(`울렸 흘렀 퍼졌 잦아들었 이어졌`, PAST)
 		},
 		{
 			field: 'move',
@@ -947,25 +1010,42 @@ export const KO: SentenceLanguageData = {
 		{
 			field: 'change',
 			subject: ['edible'],
-			words: words(`익는다 식는다 끓는다 녹는다 상한다 남는다`),
+			words: words(`식는다 끓는다 상한다 남는다`),
 			forms: {
 				question: words(
-					`익니|익나|익는가 식니|식나|식는가 끓니|끓나|끓는가 녹니|녹나|녹는가 상하니|상하나|상하는가 남니|남나|남는가`
+					`식니|식나|식는가 끓니|끓나|끓는가 상하니|상하나|상하는가 남니|남나|남는가`
 				),
 				exclamation: words(
-					`익는구나|익네|익는군 식는구나|식네|식는군 끓는구나|끓네|끓는군 녹는구나|녹네|녹는군 상하는구나|상하네|상하는군 남는구나|남네|남는군`
+					`식는구나|식네|식는군 끓는구나|끓네|끓는군 상하는구나|상하네|상하는군 남는구나|남네|남는군`
 				),
-				casual: words(`익어 식어 끓어 녹아 상해 남아`),
-				casualQuestion: words(`익어|익지 식어|식지 끓어|끓지 녹아|녹지 상해|상하지 남아|남지`),
-				polite: words(`익어요 식어요 끓어요 녹아요 상해요 남아요`),
-				politeQuestion: words(
-					`익어요|익죠 식어요|식죠 끓어요|끓죠 녹아요|녹죠 상해요|상하죠 남아요|남죠`
-				),
-				formal: words(`익습니다 식습니다 끓습니다 녹습니다 상합니다 남습니다`),
-				formalQuestion: words(`익습니까 식습니까 끓습니까 녹습니까 상합니까 남습니까`),
-				linking: words(`익고 식고 끓고 녹고 상하고 남고`)
+				casual: words(`식어 끓어 상해 남아`),
+				casualQuestion: words(`식어|식지 끓어|끓지 상해|상하지 남아|남지`),
+				polite: words(`식어요 끓어요 상해요 남아요`),
+				politeQuestion: words(`식어요|식죠 끓어요|끓죠 상해요|상하죠 남아요|남죠`),
+				formal: words(`식습니다 끓습니다 상합니다 남습니다`),
+				formalQuestion: words(`식습니까 끓습니까 상합니까 남습니까`),
+				linking: words(`식고 끓고 상하고 남고`)
 			},
-			past: conjugate(`익었 식었 끓었 녹았 상했 남았`, PAST)
+			past: conjugate(`식었 끓었 상했 남았`, PAST)
+		},
+		{
+			field: 'change',
+			subject: ['edible'],
+			// Ripening and melting are what food does; a drink cools, boils and spoils.
+			subjectThemes: ['food'],
+			words: words(`익는다 녹는다`),
+			forms: {
+				question: words(`익니|익나|익는가 녹니|녹나|녹는가`),
+				exclamation: words(`익는구나|익네|익는군 녹는구나|녹네|녹는군`),
+				casual: words(`익어 녹아`),
+				casualQuestion: words(`익어|익지 녹아|녹지`),
+				polite: words(`익어요 녹아요`),
+				politeQuestion: words(`익어요|익죠 녹아요|녹죠`),
+				formal: words(`익습니다 녹습니다`),
+				formalQuestion: words(`익습니까 녹습니까`),
+				linking: words(`익고 녹고`)
+			},
+			past: conjugate(`익었 녹았`, PAST)
 		}
 	],
 	// The same forms for a predicate that describes rather than does. An
@@ -1163,7 +1243,7 @@ export const KO: SentenceLanguageData = {
 			past: conjugate(`아름다웠 낯설었 새로웠 흔했 드물었`, PAST)
 		},
 		{
-			subject: ['place', 'event'],
+			subject: ['place'],
 			words: words(`넓다 좁다 고요하다 깊다 어둡다 밝다 아득하다 가파르다`),
 			forms: {
 				question: words(
@@ -1191,7 +1271,32 @@ export const KO: SentenceLanguageData = {
 			past: conjugate(`넓었 좁았 고요했 깊었 어두웠 밝았 아득했 가팔랐`, PAST)
 		},
 		{
+			subject: ['event'],
+			words: words(`길다 짧다 요란하다 고요하다 갑작스럽다`),
+			forms: {
+				question: words(
+					`기니|긴가 짧니|짧은가 요란하니|요란한가 고요하니|고요한가 갑작스럽니|갑작스러운가`
+				),
+				exclamation: words(`
+					길구나|기네|길군 짧구나|짧네|짧군 요란하구나|요란하네|요란하군 고요하구나|고요하네|고요하군 갑작스럽구나|갑작스럽네|갑작스럽군
+				`),
+				casual: words(`길어 짧아 요란해 고요해 갑작스러워`),
+				casualQuestion: words(
+					`길어|길지 짧아|짧지 요란해|요란하지 고요해|고요하지 갑작스러워|갑작스럽지`
+				),
+				polite: words(`길어요 짧아요 요란해요 고요해요 갑작스러워요`),
+				politeQuestion: words(
+					`길어요|길죠 짧아요|짧죠 요란해요|요란하죠 고요해요|고요하죠 갑작스러워요|갑작스럽죠`
+				),
+				formal: words(`깁니다 짧습니다 요란합니다 고요합니다 갑작스럽습니다`),
+				formalQuestion: words(`깁니까 짧습니까 요란합니까 고요합니까 갑작스럽습니까`)
+			},
+			past: conjugate(`길었 짧았 요란했 고요했 갑작스러웠`, PAST)
+		},
+		{
 			subject: ['thing', 'vehicle'],
+			// What a thing one can hold is like. A song is a thing of another kind, below.
+			subjectThemes: ['object', 'tool', 'clothing', 'product', 'gem', 'vehicle'],
 			words: words(`단단하다 가볍다 무겁다 매끈하다 투명하다 튼튼하다 반들반들하다`),
 			forms: {
 				question: words(
@@ -1219,53 +1324,124 @@ export const KO: SentenceLanguageData = {
 			past: conjugate(`단단했 가벼웠 무거웠 매끈했 투명했 튼튼했 반들반들했`, PAST)
 		},
 		{
-			subject: ['edible'],
-			words: words(`달다 짜다 맵다 시다 뜨겁다 차갑다 고소하다 담백하다`),
+			subject: ['thing'],
+			subjectThemes: ['music'],
+			words: words(`잔잔하다 경쾌하다 구슬프다 감미롭다 흥겹다`),
 			forms: {
 				question: words(
-					`다니|단가 짜니|짠가 매우니|매운가 시니|신가 뜨거우니|뜨거운가 차가우니|차가운가 고소하니|고소한가 담백하니|담백한가`
+					`잔잔하니|잔잔한가 경쾌하니|경쾌한가 구슬프니|구슬픈가 감미롭니|감미로운가 흥겹니|흥겨운가`
 				),
 				exclamation: words(`
-					달구나|다네|달군 짜구나|짜네|짜군 맵구나|맵네|맵군 시구나|시네|시군 뜨겁구나|뜨겁네|뜨겁군 차갑구나|차갑네|차갑군 고소하구나|고소하네|고소하군
-					담백하구나|담백하네|담백하군
+					잔잔하구나|잔잔하네|잔잔하군 경쾌하구나|경쾌하네|경쾌하군 구슬프구나|구슬프네|구슬프군 감미롭구나|감미롭네|감미롭군 흥겹구나|흥겹네|흥겹군
 				`),
-				casual: words(`달아 짜 매워 셔 뜨거워 차가워 고소해 담백해`),
+				casual: words(`잔잔해 경쾌해 구슬퍼 감미로워 흥겨워`),
 				casualQuestion: words(
-					`달아|달지 짜|짜지 매워|맵지 셔|시지 뜨거워|뜨겁지 차가워|차갑지 고소해|고소하지 담백해|담백하지`
+					`잔잔해|잔잔하지 경쾌해|경쾌하지 구슬퍼|구슬프지 감미로워|감미롭지 흥겨워|흥겹지`
 				),
-				polite: words(`달아요 짜요 매워요 셔요 뜨거워요 차가워요 고소해요 담백해요`),
+				polite: words(`잔잔해요 경쾌해요 구슬퍼요 감미로워요 흥겨워요`),
 				politeQuestion: words(
-					`달아요|달죠 짜요|짜죠 매워요|맵죠 셔요|시죠 뜨거워요|뜨겁죠 차가워요|차갑죠 고소해요|고소하죠 담백해요|담백하죠`
+					`잔잔해요|잔잔하죠 경쾌해요|경쾌하죠 구슬퍼요|구슬프죠 감미로워요|감미롭죠 흥겨워요|흥겹죠`
 				),
-				formal: words(`답니다 짭니다 맵습니다 십니다 뜨겁습니다 차갑습니다 고소합니다 담백합니다`),
-				formalQuestion: words(
-					`답니까 짭니까 맵습니까 십니까 뜨겁습니까 차갑습니까 고소합니까 담백합니까`
-				)
+				formal: words(`잔잔합니다 경쾌합니다 구슬픕니다 감미롭습니다 흥겹습니다`),
+				formalQuestion: words(`잔잔합니까 경쾌합니까 구슬픕니까 감미롭습니까 흥겹습니까`)
 			},
-			past: conjugate(`달았 짰 매웠 셨 뜨거웠 차가웠 고소했 담백했`, PAST)
+			past: conjugate(`잔잔했 경쾌했 구슬펐 감미로웠 흥겨웠`, PAST)
+		},
+		{
+			subject: ['edible'],
+			words: words(`달다 시다 뜨겁다 차갑다`),
+			forms: {
+				question: words(`다니|단가 시니|신가 뜨거우니|뜨거운가 차가우니|차가운가`),
+				exclamation: words(
+					`달구나|다네|달군 시구나|시네|시군 뜨겁구나|뜨겁네|뜨겁군 차갑구나|차갑네|차갑군`
+				),
+				casual: words(`달아 셔 뜨거워 차가워`),
+				casualQuestion: words(`달아|달지 셔|시지 뜨거워|뜨겁지 차가워|차갑지`),
+				polite: words(`달아요 셔요 뜨거워요 차가워요`),
+				politeQuestion: words(`달아요|달죠 셔요|시죠 뜨거워요|뜨겁죠 차가워요|차갑죠`),
+				formal: words(`답니다 십니다 뜨겁습니다 차갑습니다`),
+				formalQuestion: words(`답니까 십니까 뜨겁습니까 차갑습니까`)
+			},
+			past: conjugate(`달았 셨 뜨거웠 차가웠`, PAST)
+		},
+		{
+			subject: ['edible'],
+			// Spicy, salty, nutty and plain are a dish's; a drink is sweet, sour, hot or cold.
+			subjectThemes: ['food'],
+			words: words(`짜다 맵다 고소하다 담백하다`),
+			forms: {
+				question: words(`짜니|짠가 매우니|매운가 고소하니|고소한가 담백하니|담백한가`),
+				exclamation: words(
+					`짜구나|짜네|짜군 맵구나|맵네|맵군 고소하구나|고소하네|고소하군 담백하구나|담백하네|담백하군`
+				),
+				casual: words(`짜 매워 고소해 담백해`),
+				casualQuestion: words(`짜|짜지 매워|맵지 고소해|고소하지 담백해|담백하지`),
+				polite: words(`짜요 매워요 고소해요 담백해요`),
+				politeQuestion: words(`짜요|짜죠 매워요|맵죠 고소해요|고소하죠 담백해요|담백하죠`),
+				formal: words(`짭니다 맵습니다 고소합니다 담백합니다`),
+				formalQuestion: words(`짭니까 맵습니까 고소합니까 담백합니까`)
+			},
+			past: conjugate(`짰 매웠 고소했 담백했`, PAST)
 		},
 		{
 			subject: ['idea'],
-			words: words(`어렵다 쉽다 분명하다 흐릿하다 영원하다 덧없다`),
+			words: words(`분명하다 흐릿하다 영원하다 덧없다`),
+			forms: {
+				question: words(`분명하니|분명한가 흐릿하니|흐릿한가 영원하니|영원한가 덧없으니|덧없는가`),
+				exclamation: words(
+					`분명하구나|분명하네|분명하군 흐릿하구나|흐릿하네|흐릿하군 영원하구나|영원하네|영원하군 덧없구나|덧없네|덧없군`
+				),
+				casual: words(`분명해 흐릿해 영원해 덧없어`),
+				casualQuestion: words(`분명해|분명하지 흐릿해|흐릿하지 영원해|영원하지 덧없어|덧없지`),
+				polite: words(`분명해요 흐릿해요 영원해요 덧없어요`),
+				politeQuestion: words(
+					`분명해요|분명하죠 흐릿해요|흐릿하죠 영원해요|영원하죠 덧없어요|덧없죠`
+				),
+				formal: words(`분명합니다 흐릿합니다 영원합니다 덧없습니다`),
+				formalQuestion: words(`분명합니까 흐릿합니까 영원합니까 덧없습니까`)
+			},
+			past: conjugate(`분명했 흐릿했 영원했 덧없었`, PAST)
+		},
+		{
+			subject: ['idea'],
+			// Hard and easy are a thought's, a machine's or a debt's, not a colour's or a mood's.
+			subjectThemes: ['concept', 'tech', 'finance'],
+			words: words(`어렵다 쉽다`),
+			forms: {
+				question: words(`어려우니|어려운가 쉬우니|쉬운가`),
+				exclamation: words(`어렵구나|어렵네|어렵군 쉽구나|쉽네|쉽군`),
+				casual: words(`어려워 쉬워`),
+				casualQuestion: words(`어려워|어렵지 쉬워|쉽지`),
+				polite: words(`어려워요 쉬워요`),
+				politeQuestion: words(`어려워요|어렵죠 쉬워요|쉽죠`),
+				formal: words(`어렵습니다 쉽습니다`),
+				formalQuestion: words(`어렵습니까 쉽습니까`)
+			},
+			past: conjugate(`어려웠 쉬웠`, PAST)
+		},
+		{
+			subject: ['idea'],
+			subjectThemes: ['color'],
+			words: words(`짙다 옅다 선명하다 화사하다 은은하다`),
 			forms: {
 				question: words(
-					`어려우니|어려운가 쉬우니|쉬운가 분명하니|분명한가 흐릿하니|흐릿한가 영원하니|영원한가 덧없으니|덧없는가`
+					`짙니|짙은가 옅니|옅은가 선명하니|선명한가 화사하니|화사한가 은은하니|은은한가`
 				),
-				exclamation: words(
-					`어렵구나|어렵네|어렵군 쉽구나|쉽네|쉽군 분명하구나|분명하네|분명하군 흐릿하구나|흐릿하네|흐릿하군 영원하구나|영원하네|영원하군 덧없구나|덧없네|덧없군`
-				),
-				casual: words(`어려워 쉬워 분명해 흐릿해 영원해 덧없어`),
+				exclamation: words(`
+					짙구나|짙네|짙군 옅구나|옅네|옅군 선명하구나|선명하네|선명하군 화사하구나|화사하네|화사하군 은은하구나|은은하네|은은하군
+				`),
+				casual: words(`짙어 옅어 선명해 화사해 은은해`),
 				casualQuestion: words(
-					`어려워|어렵지 쉬워|쉽지 분명해|분명하지 흐릿해|흐릿하지 영원해|영원하지 덧없어|덧없지`
+					`짙어|짙지 옅어|옅지 선명해|선명하지 화사해|화사하지 은은해|은은하지`
 				),
-				polite: words(`어려워요 쉬워요 분명해요 흐릿해요 영원해요 덧없어요`),
+				polite: words(`짙어요 옅어요 선명해요 화사해요 은은해요`),
 				politeQuestion: words(
-					`어려워요|어렵죠 쉬워요|쉽죠 분명해요|분명하죠 흐릿해요|흐릿하죠 영원해요|영원하죠 덧없어요|덧없죠`
+					`짙어요|짙죠 옅어요|옅죠 선명해요|선명하죠 화사해요|화사하죠 은은해요|은은하죠`
 				),
-				formal: words(`어렵습니다 쉽습니다 분명합니다 흐릿합니다 영원합니다 덧없습니다`),
-				formalQuestion: words(`어렵습니까 쉽습니까 분명합니까 흐릿합니까 영원합니까 덧없습니까`)
+				formal: words(`짙습니다 옅습니다 선명합니다 화사합니다 은은합니다`),
+				formalQuestion: words(`짙습니까 옅습니까 선명합니까 화사합니까 은은합니까`)
 			},
-			past: conjugate(`어려웠 쉬웠 분명했 흐릿했 영원했 덧없었`, PAST)
+			past: conjugate(`짙었 옅었 선명했 화사했 은은했`, PAST)
 		},
 		{
 			subject: ['plant'],

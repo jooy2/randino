@@ -1567,7 +1567,7 @@ def _verb_groups_for(
         if (
             subject is not None
             and subject.theme is not None
-            and THEME_CLASS[subject.theme] not in group.subject
+            and not _accepts_subject(group, subject.theme)
         ):
             continue
         if obj is not None and obj.theme is not None and not _accepts_object(group, obj.theme):
@@ -1579,7 +1579,7 @@ def _verb_groups_for(
             and not _accepts_object(group, beat.item)
         ):
             continue
-        if not _themes_for_classes(themes, group.subject):
+        if not _subject_themes_of(group, themes):
             continue
         if group.object is not None and not _object_themes_of(group, beat):
             continue
@@ -1587,6 +1587,29 @@ def _verb_groups_for(
         usable.append(group)
 
     return usable
+
+
+def _accepts_subject(group: VerbGroup | StateGroup, theme: WordTheme) -> bool:
+    """Whether a group takes a noun of this theme as its subject."""
+    if THEME_CLASS[theme] not in group.subject:
+        return False
+
+    return group.subject_themes is None or theme in group.subject_themes
+
+
+def _subject_themes_of(
+    group: VerbGroup | StateGroup, themes: Sequence[WordTheme]
+) -> tuple[WordTheme, ...]:
+    """The themes a group's subject may come from, out of the ones asked for.
+
+    Its classes, narrowed to the themes it names when it names any.
+    """
+    by_class = _themes_for_classes(themes, group.subject)
+
+    if group.subject_themes is None:
+        return by_class
+
+    return tuple(theme for theme in by_class if theme in group.subject_themes)
 
 
 def _state_groups_for(
@@ -1612,10 +1635,10 @@ def _state_groups_for(
         if (
             subject is not None
             and subject.theme is not None
-            and THEME_CLASS[subject.theme] not in group.subject
+            and not _accepts_subject(group, subject.theme)
         ):
             continue
-        if not _themes_for_classes(themes, group.subject):
+        if not _subject_themes_of(group, themes):
             continue
 
         usable.append(group)
@@ -2116,7 +2139,7 @@ def _compose(
             else _state_groups_for(data, themes, frame, plan, beat) or list(data.states)
         )
         state_group = pick(states)
-        subject_classes = state_group.subject
+        chosen: VerbGroup | StateGroup = state_group
         base = state_group.words
     else:
         verbs = _verb_groups_for(data, frame, themes, plan, beat) or [
@@ -2127,7 +2150,7 @@ def _compose(
             and (not wants_destination or group.requires == "destination")
         ]
         verb_group = pick(verbs)
-        subject_classes = verb_group.subject
+        chosen = verb_group
         base = verb_group.words
 
     # The same predicates, in the form this type of sentence ends on, in the tense the
@@ -2142,7 +2165,7 @@ def _compose(
         draw.tense,
         data.join if draw.link == "first" else None,
     )
-    subject_themes = _themes_for_classes(themes, subject_classes)
+    subject_themes = _subject_themes_of(chosen, themes)
     # Which part is the subject is the shape's business, not the slot's: a counted
     # shape has no `subject` part and its quantity is the subject.
     subject_slot = _subject_slot_of(frame)

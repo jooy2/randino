@@ -1314,7 +1314,7 @@ function verbGroupsFor(
 			return false;
 		}
 
-		if (subject?.theme && !group.subject.includes(THEME_CLASS[subject.theme])) {
+		if (subject?.theme && !acceptsSubject(group, subject.theme)) {
 			return false;
 		}
 
@@ -1327,12 +1327,36 @@ function verbGroupsFor(
 		}
 
 		return (
-			themesForClasses(themes, group.subject).length > 0 &&
+			subjectThemesOf(group, themes).length > 0 &&
 			(!group.object || objectThemesOf(group, beat).length > 0)
 		);
 	});
 
 	return usable;
+}
+
+/** Whether a group takes a noun of this theme as its subject. */
+function acceptsSubject(group: VerbGroup | StateGroup, theme: WordTheme): boolean {
+	if (!group.subject.includes(THEME_CLASS[theme])) {
+		return false;
+	}
+
+	return !group.subjectThemes || group.subjectThemes.includes(theme);
+}
+
+/**
+ * The themes a group's subject may come from, out of the ones asked for: its
+ * classes, narrowed to the themes it names when it names any.
+ */
+function subjectThemesOf(
+	group: VerbGroup | StateGroup,
+	themes: readonly WordTheme[]
+): readonly WordTheme[] {
+	const byClass = themesForClasses(themes, group.subject);
+
+	return group.subjectThemes
+		? byClass.filter((theme) => group.subjectThemes!.includes(theme))
+		: byClass;
 }
 
 /** Whether a verb group takes a noun of this theme as its object. */
@@ -1383,11 +1407,11 @@ function stateGroupsFor(
 			return false;
 		}
 
-		if (subject?.theme && !group.subject.includes(THEME_CLASS[subject.theme])) {
+		if (subject?.theme && !acceptsSubject(group, subject.theme)) {
 			return false;
 		}
 
-		return themesForClasses(themes, group.subject).length > 0;
+		return subjectThemesOf(group, themes).length > 0;
 	});
 }
 
@@ -1916,7 +1940,7 @@ function compose(
 		draw.tense,
 		draw.link === 'first' ? data.join : undefined
 	);
-	const subjectThemes = themesForClasses(themes, group.subject);
+	const subjectThemes = subjectThemesOf(group, themes);
 	// Which part is the subject is the shape's business, not the slot's: a counted
 	// shape has no `subject` part and its quantity is the subject. Looking for a
 	// `subject` part regardless is how a word required into a counted subject lost

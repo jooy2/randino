@@ -478,9 +478,13 @@ def test_a_verb_only_takes_the_subject_and_object_its_group_allows() -> None:
             ]
 
             assert groups, f"{language}: {detail.sentence}"
-            assert any(THEME_CLASS[detail.theme] in group.subject for group in groups), (
-                f"{language}: {detail.theme} cannot be the subject ({detail.sentence})"
-            )
+            # The class, and the theme where the group narrows to themes: `익는다` is a
+            # thing food does and drink does not.
+            assert any(
+                THEME_CLASS[detail.theme] in group.subject
+                and (group.subject_themes is None or detail.theme in group.subject_themes)
+                for group in groups
+            ), f"{language}: {detail.theme} cannot be the subject ({detail.sentence})"
 
 
 def test_korean_picks_the_particle_its_noun_asks_for() -> None:
@@ -2158,6 +2162,38 @@ def test_sentence_length_range_reports_what_the_language_can_produce() -> None:
 
     assert every_low == min(sentence_length_range(code)[0] for code in WORD_LANGUAGES)
     assert every_high == max(sentence_length_range(code)[1] for code in WORD_LANGUAGES)
+
+
+def test_a_theme_narrowed_out_of_one_group_is_accepted_by_another_of_the_same_field() -> None:
+    # A group that names its subject themes is a narrowing, not a gap: every theme whose
+    # class a field accepts still has a group in that field that takes it, and the same
+    # for the states.
+    for language in WORD_LANGUAGES:
+        data = SENTENCE_DATA[language]
+        fields = {group.field for group in data.verbs}
+
+        for theme in WORD_THEMES:
+            cls = THEME_CLASS[theme]
+
+            for field in fields:
+                in_field = [group for group in data.verbs if group.field == field]
+                by_class = any(cls in group.subject for group in in_field)
+                by_theme = any(
+                    cls in group.subject
+                    and (group.subject_themes is None or theme in group.subject_themes)
+                    for group in in_field
+                )
+
+                assert not by_class or by_theme, f"{language}: no {field} verb takes a {theme}"
+
+            described = any(cls in group.subject for group in data.states)
+            described_by_theme = any(
+                cls in group.subject
+                and (group.subject_themes is None or theme in group.subject_themes)
+                for group in data.states
+            )
+
+            assert not described or described_by_theme, f"{language}: no state describes a {theme}"
 
 
 def test_every_noun_class_the_frames_can_ask_for_has_a_predicate_to_go_with_it() -> None:

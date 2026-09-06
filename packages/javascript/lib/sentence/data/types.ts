@@ -181,6 +181,14 @@ export type VerbGroup = {
 	field: VerbField;
 	/** Classes a noun has to belong to to be the subject of these verbs. */
 	subject: readonly NounClass[];
+	/**
+	 * The themes the subject may come from, when a class is too wide: `익는다` is a
+	 * thing food does and drink does not, and `울린다` is a thing a song does and a
+	 * spoon does not. Left out where the class alone is right. A theme narrowed
+	 * out of one group has to be accepted by another of the same field, and
+	 * `test/sentence.test.ts` asserts it is.
+	 */
+	subjectThemes?: readonly WordTheme[];
 	/** Classes it can take as a direct object. Left out by an intransitive group. */
 	object?: readonly NounClass[];
 	/**
@@ -220,6 +228,8 @@ export type VerbGroup = {
 export type StateGroup = {
 	/** Classes a noun has to belong to to be described by these. */
 	subject: readonly NounClass[];
+	/** The themes the subject may come from, when a class is too wide — see `VerbGroup`. */
+	subjectThemes?: readonly WordTheme[];
 	/**
 	 * What these adjectives say is true of the subject, for a story to read and to
 	 * write. `배고프다` is `hungry` and `피곤하다` is `tired`; `크다` is neither, and a

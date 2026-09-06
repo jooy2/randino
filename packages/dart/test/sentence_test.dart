@@ -668,7 +668,13 @@ void main() {
 
           expect(groups, isNotEmpty, reason: '$language: ${detail.sentence}');
           expect(
-            groups.any((group) => group.subject.contains(themeClass[theme])),
+            // The class, and the theme where the group narrows to themes: `익는다`
+            // is a thing food does and drink does not.
+            groups.any(
+              (group) =>
+                  group.subject.contains(themeClass[theme]) &&
+                  (group.subjectThemes == null || group.subjectThemes!.contains(theme)),
+            ),
             isTrue,
             reason: '$language: ${theme.name} cannot be the subject (${detail.sentence})',
           );
@@ -3271,6 +3277,45 @@ void main() {
             naming.length,
             lessThan(detail.sentences.length),
             reason: 'ko: every line names $noun (${detail.sentence})',
+          );
+        }
+      }
+    });
+
+    test('a theme narrowed out of one group is accepted by another of the same field', () {
+      // A group that names its subject themes is a narrowing, not a gap: every
+      // theme whose class a field accepts still has a group in that field that
+      // takes it, and the same for the states.
+      for (final language in wordLanguages) {
+        final data = sentenceData[language]!;
+        final fields = <VerbField>{for (final group in data.verbs) group.field};
+
+        for (final theme in wordThemes) {
+          final cls = themeClass[theme];
+
+          for (final field in fields) {
+            final inField = data.verbs.where((group) => group.field == field);
+            final byClass = inField.any((group) => group.subject.contains(cls));
+            final byTheme = inField.any(
+              (group) =>
+                  group.subject.contains(cls) &&
+                  (group.subjectThemes == null || group.subjectThemes!.contains(theme)),
+            );
+
+            expect(!byClass || byTheme, isTrue, reason: '$language: no $field verb takes a $theme');
+          }
+
+          final described = data.states.any((group) => group.subject.contains(cls));
+          final describedByTheme = data.states.any(
+            (group) =>
+                group.subject.contains(cls) &&
+                (group.subjectThemes == null || group.subjectThemes!.contains(theme)),
+          );
+
+          expect(
+            !described || describedByTheme,
+            isTrue,
+            reason: '$language: no state describes a $theme',
           );
         }
       }

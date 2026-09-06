@@ -217,6 +217,7 @@ console.log(
 							subject: [...group.subject],
 							object: list(group.object),
 							field: group.field,
+							subjectThemes: list(group.subjectThemes),
 							objectThemes: list(group.objectThemes),
 							requires: group.requires ?? '',
 							words: list(group.words),
@@ -225,6 +226,7 @@ console.log(
 						})),
 						states: data.states.map((group) => ({
 							subject: [...group.subject],
+							subjectThemes: list(group.subjectThemes),
 							condition: group.condition ?? '',
 							head: group.head ?? '',
 							pastHead: group.pastHead ?? '',

@@ -148,6 +148,10 @@ function dartVerb(group: VerbGroup, indent: string, koPast: boolean): string {
 		`${indent}  subject: const ${dartList(group.subject, 'NounClass', indent)},`
 	];
 
+	if (group.subjectThemes)
+		lines.push(
+			`${indent}  subjectThemes: const ${dartList(group.subjectThemes, 'WordTheme', indent)},`
+		);
 	if (group.object)
 		lines.push(`${indent}  object: const ${dartList(group.object, 'NounClass', indent)},`);
 	if (group.objectThemes)
@@ -170,6 +174,10 @@ function dartState(group: StateGroup, indent: string, koPast: boolean, plainWord
 		`${indent}  subject: const ${dartList(group.subject, 'NounClass', indent)},`
 	];
 
+	if (group.subjectThemes)
+		lines.push(
+			`${indent}  subjectThemes: const ${dartList(group.subjectThemes, 'WordTheme', indent)},`
+		);
 	if (group.condition) lines.push(`${indent}  condition: Condition.${group.condition},`);
 	if (group.head) lines.push(`${indent}  head: ${dq(group.head)},`);
 	if (group.pastHead) lines.push(`${indent}  pastHead: ${dq(group.pastHead)},`);
@@ -481,6 +489,8 @@ function pyVerb(group: VerbGroup, indent: string, koPast: boolean): string {
 		`${indent}    subject=${pyTuple(group.subject)},`
 	];
 
+	if (group.subjectThemes)
+		lines.push(`${indent}    subject_themes=${pyTuple(group.subjectThemes)},`);
 	if (group.object) lines.push(`${indent}    object=${pyTuple(group.object)},`);
 	if (group.objectThemes) lines.push(`${indent}    object_themes=${pyTuple(group.objectThemes)},`);
 	if (group.requires) lines.push(`${indent}    requires=${pq(group.requires)},`);
@@ -498,6 +508,8 @@ function pyVerb(group: VerbGroup, indent: string, koPast: boolean): string {
 function pyState(group: StateGroup, indent: string, koPast: boolean): string {
 	const lines = [`${indent}StateGroup(`, `${indent}    subject=${pyTuple(group.subject)},`];
 
+	if (group.subjectThemes)
+		lines.push(`${indent}    subject_themes=${pyTuple(group.subjectThemes)},`);
 	if (group.condition) lines.push(`${indent}    condition=${pq(group.condition)},`);
 	if (group.head) lines.push(`${indent}    head=${pq(group.head)},`);
 	if (group.pastHead) lines.push(`${indent}    past_head=${pq(group.pastHead)},`);

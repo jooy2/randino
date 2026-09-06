@@ -228,6 +228,7 @@ sentence = {
                 "subject": list(group.subject),
                 "object": None if group.object is None else list(group.object),
                 "field": group.field,
+                "subjectThemes": listed(group.subject_themes),
                 "objectThemes": listed(group.object_themes),
                 "requires": group.requires or "",
                 "words": listed(group.words),
@@ -239,6 +240,7 @@ sentence = {
         "states": [
             {
                 "subject": list(group.subject),
+                "subjectThemes": listed(group.subject_themes),
                 "condition": group.condition or "",
                 "head": group.head or "",
                 "pastHead": group.past_head or "",

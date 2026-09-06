@@ -197,6 +197,9 @@ void main() {
                   ? null
                   : <String>[for (final noun in group.object!) noun.name],
               'field': group.field.name,
+              'subjectThemes': group.subjectThemes == null
+                  ? null
+                  : <String>[for (final theme in group.subjectThemes!) theme.name],
               'objectThemes': group.objectThemes == null
                   ? null
                   : <String>[
@@ -215,6 +218,9 @@ void main() {
           for (final group in entry.value.states)
             <String, Object?>{
               'subject': <String>[for (final noun in group.subject) noun.name],
+              'subjectThemes': group.subjectThemes == null
+                  ? null
+                  : <String>[for (final theme in group.subjectThemes!) theme.name],
               'condition': group.condition?.name ?? '',
               'head': group.head ?? '',
               'pastHead': group.pastHead ?? '',

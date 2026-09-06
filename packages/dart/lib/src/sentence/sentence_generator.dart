@@ -1459,7 +1459,10 @@ List<VerbGroup> _verbGroupsFor(
 
         final subjectTheme = subject?.theme;
 
-        if (subjectTheme != null && !group.subject.contains(themeClass[subjectTheme])) return false;
+        if (subjectTheme != null &&
+            !_acceptsSubject(group.subject, group.subjectThemes, subjectTheme)) {
+          return false;
+        }
 
         final objectTheme = object?.theme;
 
@@ -1469,10 +1472,29 @@ List<VerbGroup> _verbGroupsFor(
 
         if (item != null && group.object != null && !_acceptsObject(group, item)) return false;
 
-        return _themesForClasses(themes, group.subject).isNotEmpty &&
+        return _subjectThemesOf(group.subject, group.subjectThemes, themes).isNotEmpty &&
             (group.object == null || _objectThemesOf(group, beat).isNotEmpty);
       })
       .toList(growable: false);
+}
+
+/// Whether a group takes a noun of this theme as its subject.
+bool _acceptsSubject(List<NounClass> classes, List<WordTheme>? named, WordTheme theme) {
+  if (!classes.contains(themeClass[theme])) return false;
+
+  return named == null || named.contains(theme);
+}
+
+/// The themes a group's subject may come from, out of the ones asked for: its
+/// classes, narrowed to the themes it names when it names any.
+List<WordTheme> _subjectThemesOf(
+  List<NounClass> classes,
+  List<WordTheme>? named,
+  List<WordTheme> themes,
+) {
+  final byClass = _themesForClasses(themes, classes);
+
+  return named == null ? byClass : byClass.where(named.contains).toList(growable: false);
 }
 
 /// Whether a verb group takes a noun of this theme as its object.
@@ -1517,9 +1539,12 @@ List<StateGroup> _stateGroupsFor(
 
         final subjectTheme = subject?.theme;
 
-        if (subjectTheme != null && !group.subject.contains(themeClass[subjectTheme])) return false;
+        if (subjectTheme != null &&
+            !_acceptsSubject(group.subject, group.subjectThemes, subjectTheme)) {
+          return false;
+        }
 
-        return _themesForClasses(themes, group.subject).isNotEmpty;
+        return _subjectThemesOf(group.subject, group.subjectThemes, themes).isNotEmpty;
       })
       .toList(growable: false);
 }
@@ -1899,7 +1924,13 @@ _Built _compose(
     draw.link == JoinSide.first ? data.join : null,
   );
   final subjectClasses = stateGroup?.subject ?? verbGroup!.subject;
-  final subjectThemes = _themesForClasses(themes, subjectClasses);
+  // Written out rather than with `??`: a state group with no themes of its own
+  // must not fall through to a verb group that is not there.
+  final subjectThemes = _subjectThemesOf(
+    subjectClasses,
+    stateGroup != null ? stateGroup.subjectThemes : verbGroup!.subjectThemes,
+    themes,
+  );
   // Which part is the subject is the shape's business, not the slot's: a counted
   // shape has no `subject` part and its quantity is the subject.
   final subjectSlot = _subjectSlotOf(frame);

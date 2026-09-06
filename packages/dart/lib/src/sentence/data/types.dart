@@ -262,6 +262,7 @@ class VerbGroup {
     required this.field,
     required this.subject,
     required this.words,
+    this.subjectThemes,
     this.object,
     this.objectThemes,
     this.requires,
@@ -283,6 +284,13 @@ class VerbGroup {
   /// `eat` takes an edible and `drink` takes an edible, and a lion that drinks a
   /// pretzel is the difference. Null where the class alone is right.
   final List<WordTheme>? objectThemes;
+
+  /// The themes the subject may come from, when a class is too wide: `익는다` is
+  /// a thing food does and drink does not, and `울린다` is a thing a song does and
+  /// a spoon does not. Null where the class alone is right. A theme narrowed out
+  /// of one group has to be accepted by another of the same field, and the suite
+  /// asserts it is.
+  final List<WordTheme>? subjectThemes;
 
   /// A part the shape has to carry for these verbs to make sense.
   ///
@@ -318,6 +326,7 @@ class StateGroup {
   const StateGroup({
     required this.subject,
     required this.words,
+    this.subjectThemes,
     this.condition,
     this.head,
     this.pastHead,
@@ -334,6 +343,10 @@ class StateGroup {
   /// `배고프다` is [Condition.hungry] and `피곤하다` is [Condition.tired]; `크다`
   /// is neither, and a group of traits like it leaves this null.
   final Condition? condition;
+
+  /// The themes the subject may come from, when a class is too wide — see
+  /// [VerbGroup.subjectThemes].
+  final List<WordTheme>? subjectThemes;
 
   /// What is written in front of these instead of the shape's own head, in a
   /// language whose copula depends on what is said.

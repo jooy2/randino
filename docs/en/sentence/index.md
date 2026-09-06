@@ -25,6 +25,8 @@ No noun carries a tag for this. The twenty-five [themes](../word/themes) already
 
 A verb that says `creature` and `person` can be done by a lion and by a locksmith, and by nothing else. That is the whole mechanism, and it is why the sentences read as sentences rather than as filled-in templates.
 
+Where a class is too wide, a group narrows it to themes on either side of the verb. `eat` takes `food` and `drink` takes `drink`, though both are `edible`; `익는다` is a thing `food` does and `울린다` a thing `music` does, though a soup and a song are both `edible` and `thing` to the classes. A theme narrowed out of one group is always accepted by another of the same field, so nothing loses its verbs — a song stopped swaying and started ringing.
+
 It is not a promise that every sentence means something. A lion can bake a pudding here, and an ocarina can glitter at dusk. What the classes rule out is the sentence that does not parse as a thought at all.
 
 ## The shapes each language declares {#the-shapes-belong-to-the-language}
