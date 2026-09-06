@@ -1,11 +1,17 @@
-"""German sentence grammar: the verbs, the predicates and the shapes."""
+"""The de sentence grammar: the verbs, the predicates and the shapes.
+
+Ported verbatim from the JavaScript package; see CLAUDE.md.
+"""
 
 from randino._internal.parse import words
 from randino.sentence.data._types import (
+    ModifierGroup,
+    PredicateTense,
     SentenceCalendar,
     SentenceFrame,
     SentenceLanguageData,
     SentencePart,
+    SentenceTimes,
     StateGroup,
     VerbGroup,
 )
@@ -13,18 +19,8 @@ from randino.sentence.data._types import (
 DE = SentenceLanguageData(
     space=" ",
     capitalize=True,
-    terminators={
-        "statement": ".",
-        "question": "?",
-        "exclamation": "!",
-        "trailing": "…",
-    },
-    # German opens low and closes high, which is why the pair is not symmetrical.
+    terminators={"statement": ".", "question": "?", "exclamation": "!", "trailing": "…"},
     quotes={"double": ("„", "“"), "single": ("‚", "‘")},
-    # The indefinite article, and it is what makes the modifiers come out right:
-    # after `ein` a German adjective takes the same endings it takes with no
-    # article at all — `ein blauer Wal`, `eine blaue Katze`, `ein blaues Haus` —
-    # which is exactly what `word/data`'s agreement already writes.
     articles={
         "m": (("", "ein"),),
         "f": (("", "eine"),),
@@ -32,61 +28,190 @@ DE = SentenceLanguageData(
     },
     verbs=(
         VerbGroup(
+            field="rise",
+            subject=("creature", "person"),
+            words=words("erwacht erhebt_sich regt_sich"),
+            past=PredicateTense(
+                words=words("erwachte erhob_sich regte_sich"),
+            ),
+        ),
+        VerbGroup(
+            field="go",
+            subject=("creature", "person"),
+            words=words("geht wandert eilt reist"),
+            past=PredicateTense(
+                words=words("ging wanderte eilte reiste"),
+            ),
+        ),
+        VerbGroup(
+            field="arrive",
+            subject=("creature", "person"),
+            words=words("kommt erscheint"),
+            past=PredicateTense(
+                words=words("kam erschien"),
+            ),
+        ),
+        VerbGroup(
+            field="move",
             subject=("creature", "person"),
             words=words("""
-                läuft geht springt schwimmt fliegt kriecht ruht schläft lacht weint singt tanzt
-                wartet steht sitzt rollt wandert lauscht zögert eilt
+                läuft springt schwimmt fliegt kriecht streift bummelt trabt spaziert
             """),
+            past=PredicateTense(
+                words=words("""
+                    lief sprang schwamm flog kroch streifte bummelte trabte spazierte
+                """),
+            ),
         ),
         VerbGroup(
-            subject=("place", "event"),
-            words=words("""
-                leuchtet fließt dunkelt erhellt vertieft verstummt
-            """),
+            field="wait",
+            subject=("creature", "person"),
+            words=words("wartet zögert verharrt lauscht lauert"),
+            past=PredicateTense(
+                words=words("wartete zögerte verharrte lauschte lauerte"),
+            ),
         ),
         VerbGroup(
+            field="rest",
+            subject=("creature", "person"),
+            words=words("ruht sitzt liegt rastet lehnt"),
+            past=PredicateTense(
+                words=words("ruhte saß lag rastete lehnte"),
+            ),
+        ),
+        VerbGroup(
+            field="sleep",
+            subject=("creature", "person"),
+            words=words("schläft schlummert dämmert döst"),
+            past=PredicateTense(
+                words=words("schlief schlummerte dämmerte döste"),
+            ),
+        ),
+        VerbGroup(
+            field="express",
+            subject=("creature", "person"),
+            words=words("lacht weint gähnt seufzt lächelt summt murmelt ruft"),
+            past=PredicateTense(
+                words=words("lachte weinte gähnte seufzte lächelte summte murmelte rief"),
+            ),
+        ),
+        VerbGroup(
+            field="play",
+            subject=("creature", "person"),
+            words=words("tanzt singt tollt spielt hüpft rollt"),
+            past=PredicateTense(
+                words=words("tanzte sang tollte spielte hüpfte rollte"),
+            ),
+        ),
+        VerbGroup(
+            field="search",
+            subject=("creature", "person"),
+            words=words("sucht stöbert kramt"),
+            past=PredicateTense(
+                words=words("suchte stöberte kramte"),
+            ),
+        ),
+        VerbGroup(
+            field="change",
+            subject=("place",),
+            words=words("verstummt dunkelt erhellt_sich leert_sich füllt_sich belebt_sich"),
+            past=PredicateTense(
+                words=words("""
+                    verstummte dunkelte erhellte_sich leerte_sich füllte_sich belebte_sich
+                """),
+            ),
+        ),
+        VerbGroup(
+            field="change",
+            subject=("event",),
+            words=words("leuchtet fließt vertieft_sich beginnt endet dauert vergeht"),
+            past=PredicateTense(
+                words=words("leuchtete floss vertiefte_sich begann endete dauerte verging"),
+            ),
+        ),
+        VerbGroup(
+            field="change",
             subject=("thing", "vehicle"),
-            words=words("""
-                schwankt glänzt fällt rollt neigt altert
-            """),
+            words=words("schwankt glänzt fällt rollt neigt_sich altert"),
+            past=PredicateTense(
+                words=words("schwankte glänzte fiel rollte neigte_sich alterte"),
+            ),
         ),
         VerbGroup(
+            field="move",
             subject=("vehicle",),
-            words=words("""
-                fährt hält rollt wendet gleitet
-            """),
+            words=words("fährt hält rollt wendet gleitet"),
+            past=PredicateTense(
+                words=words("fuhr hielt rollte wendete glitt"),
+            ),
         ),
         VerbGroup(
+            field="change",
             subject=("idea", "event"),
-            words=words("""
-                wächst verschwindet bleibt schwebt vertieft
-            """),
+            words=words("wächst verschwindet bleibt schwebt vertieft_sich"),
+            past=PredicateTense(
+                words=words("wuchs verschwand blieb schwebte vertiefte_sich"),
+            ),
         ),
         VerbGroup(
+            field="change",
             subject=("plant",),
-            words=words("""
-                wächst welkt blüht schwankt sprießt
-            """),
+            words=words("wächst welkt blüht schwankt sprießt"),
+            past=PredicateTense(
+                words=words("wuchs welkte blühte schwankte spross"),
+            ),
         ),
         VerbGroup(
+            field="change",
             subject=("body",),
-            words=words("""
-                zittert bebt erstarrt heilt
-            """),
+            words=words("zittert bebt erstarrt heilt"),
+            past=PredicateTense(
+                words=words("zitterte bebte erstarrte heilte"),
+            ),
         ),
         VerbGroup(
+            field="change",
             subject=("edible",),
-            words=words("""
-                reift kühlt kocht schmilzt verdirbt
-            """),
+            words=words("reift kühlt kocht schmilzt verdirbt"),
+            past=PredicateTense(
+                words=words("reifte kühlte kochte schmolz verdarb"),
+            ),
         ),
     ),
     states=(
         StateGroup(
             subject=("creature", "person"),
-            words=words("""
-                groß klein schnell langsam still laut mutig faul müde hungrig sanft klug wild
-            """),
+            words=words("groß klein schnell langsam still laut mutig faul sanft klug wild"),
+        ),
+        StateGroup(
+            subject=("creature", "person"),
+            condition="hungry",
+            words=words("hungrig ausgehungert"),
+        ),
+        StateGroup(
+            subject=("creature", "person"),
+            condition="full",
+            words=words("satt gesättigt"),
+        ),
+        StateGroup(
+            subject=("creature", "person"),
+            condition="tired",
+            words=words("müde schläfrig erschöpft"),
+        ),
+        StateGroup(
+            subject=("creature", "person"),
+            condition="rested",
+            words=words("ausgeruht frisch munter"),
+        ),
+        StateGroup(
+            subject=("creature", "person"),
+            condition="content",
+            words=words("froh zufrieden glücklich heiter"),
+        ),
+        StateGroup(
+            subject=("creature", "person"),
+            condition="restless",
+            words=words("gelangweilt neugierig unruhig rastlos"),
         ),
         StateGroup(
             subject=(
@@ -101,79 +226,148 @@ DE = SentenceLanguageData(
                 "idea",
                 "body",
             ),
-            words=words("""
-                schön fremd neu häufig selten
-            """),
+            words=words("schön fremd neu häufig selten"),
         ),
         StateGroup(
             subject=("place", "event"),
-            words=words("""
-                weit eng ruhig tief dunkel hell fern steil
-            """),
+            words=words("weit eng ruhig tief dunkel hell fern steil"),
         ),
         StateGroup(
             subject=("thing", "vehicle"),
-            words=words("""
-                hart leicht schwer alt glatt klar stabil
-            """),
+            words=words("hart leicht schwer alt glatt klar stabil"),
         ),
         StateGroup(
             subject=("edible",),
-            words=words("""
-                süß salzig scharf sauer heiß kalt herzhaft
-            """),
+            words=words("süß salzig scharf sauer heiß kalt herzhaft"),
         ),
         StateGroup(
             subject=("idea",),
-            words=words("""
-                einfach deutlich vage ewig flüchtig
-            """),
+            words=words("einfach deutlich vage ewig flüchtig"),
         ),
         StateGroup(
             subject=("plant",),
-            words=words("""
-                grün üppig duftend welk
-            """),
+            words=words("grün üppig duftend welk"),
         ),
         StateGroup(
             subject=("body",),
+            words=words("warm kalt wund steif"),
+        ),
+    ),
+    modifiers=(
+        ModifierGroup(
+            subject=("creature", "person"),
             words=words("""
-                warm kalt wund steif
+                mutig lebhaft sanft fleißig faul schüchtern klug jung alt klein groß still fröhlich
+                geduldig flink neugierig
+            """),
+        ),
+        ModifierGroup(
+            subject=("person",),
+            words=words("jung freundlich streng ernst beschäftigt aufrichtig"),
+        ),
+        ModifierGroup(
+            subject=("creature",),
+            words=words("flink wild zahm rundlich winzig"),
+        ),
+        ModifierGroup(
+            subject=("edible",),
+            themes=("food",),
+            words=words("""
+                süß scharf warm frisch knusprig würzig duftend heiß salzig weich reif lecker
+            """),
+        ),
+        ModifierGroup(
+            subject=("edible",),
+            themes=("drink",),
+            words=words("süß warm kalt kühl heiß duftend frisch stark"),
+        ),
+        ModifierGroup(
+            subject=("thing", "vehicle"),
+            words=words("""
+                alt neu klein groß leicht schwer glänzend glatt klar stabil hübsch kostbar uralt
+            """),
+        ),
+        ModifierGroup(
+            subject=("vehicle",),
+            words=words("schnell langsam robust"),
+        ),
+        ModifierGroup(
+            subject=("place",),
+            words=words("""
+                still weit dunkel hell fremd alt gemütlich abgelegen belebt leise fern nah leer
+                einsam sonnig
+            """),
+        ),
+        ModifierGroup(
+            subject=("plant",),
+            words=words("grün üppig duftend jung welk klein zart frisch"),
+        ),
+        ModifierGroup(
+            subject=("idea",),
+            words=words("vage alt neu fremd klar kostbar klein seltsam"),
+        ),
+        ModifierGroup(
+            subject=("event",),
+            words=words("lang kurz still sonnig trüb laut plötzlich"),
+        ),
+        ModifierGroup(
+            subject=("body",),
+            words=words("klein kalt warm schlank kräftig"),
+        ),
+        ModifierGroup(
+            subject=(
+                "creature",
+                "person",
+                "plant",
+                "thing",
+                "vehicle",
+                "place",
+                "event",
+                "idea",
+                "body",
+            ),
+            words=words("schön geheimnisvoll fremd neu"),
+        ),
+    ),
+    manners=(
+        ModifierGroup(
+            subject=("creature", "person"),
+            words=words("""
+                leise langsam schnell sanft plötzlich kaum allein kurz kühn sorgsam eifrig ruhig
+                heftig geduldig leicht fröhlich munter schwerfällig gelassen emsig zügig vergnügt
+            """),
+        ),
+        ModifierGroup(
+            subject=("plant", "edible", "thing", "vehicle", "place", "event", "idea", "body"),
+            words=words("""
+                leise langsam sanft plötzlich kaum wieder noch stetig allmählich nach_und_nach
+                schwach weiter
             """),
         ),
     ),
-    manners=words("""
-        leise langsam schnell sanft plötzlich kaum wieder gemeinsam allein noch kurz stetig kühn
-        sorgsam eifrig ruhig heftig geduldig leicht fröhlich munter schwerfällig deutlich gelassen
-        emsig zügig
-    """),
-    times=words("""
-        bei_Tagesanbruch am_Morgen am_Mittag am_Abend in_der_Nacht heute gestern morgen im_Frühling
-        im_Sommer im_Herbst im_Winter am_Wochenende gerade_eben manchmal jeden_Tag in_der_Dämmerung
-        um_Mitternacht letzte_Woche nächste_Woche heutzutage vor_langer_Zeit an_Feiertagen
-        den_ganzen_Tag jede_Nacht
-    """),
-    # Only the coordinating ones. German puts its finite verb second and counts
-    # whatever opens the clause towards that, so `dann` or `danach` in front would
-    # need the verb and the subject the other way round — a shape the frames write,
-    # not something a connective can bolt on. `und`, `aber`, `doch` and `denn` sit
-    # outside the clause and leave the order alone.
+    times=SentenceTimes(
+        day=words("""
+            bei_Tagesanbruch am_frühen_Morgen am_Morgen am_Vormittag am_Mittag am_Nachmittag
+            in_der_Dämmerung am_Abend in_der_Nacht spät_in_der_Nacht um_Mitternacht
+        """),
+        any=words("""
+            im_Frühling im_Sommer im_Herbst im_Winter am_Wochenende an_Feiertagen den_ganzen_Tag
+        """),
+        past=words("gestern letzte_Woche vor_langer_Zeit einst an_jenem_Tag in_jener_Nacht"),
+        present=words("""
+            heute heutzutage gerade_eben morgen nächste_Woche manchmal jeden_Tag jede_Nacht
+        """),
+    ),
+    homes=words("Haus"),
     connectives={
-        "additive": words("und oder"),
+        "additive": words("und"),
         "contrastive": words("aber doch"),
         "causal": words("denn"),
     },
     interjections=words("""
         oh, ach, na, mensch, oje, sieh_an, wahrhaftig, hui, herrje, du_meine_Güte, nanu,
     """),
-    pronouns={"m": words("er"), "f": words("sie"), "n": words("es")},
-    # German declares the fewest shapes here, and both reasons are its cases. An
-    # object would be accusative and a place dative, and each changes the article
-    # and the modifier ending together. What is left is the nominative, and the
-    # rule German never breaks: the verb stands second, so a shape that opens on a
-    # time puts the subject behind it.
-    # German names its months, writes the day first with a full stop after it, and puts
-    # `Uhr` after a clock time.
+    pronouns={"m": ("er",), "f": ("sie",), "n": ("es",)},
     calendar=SentenceCalendar(
         date="D. MMMM Y",
         months=words("""
@@ -182,14 +376,14 @@ DE = SentenceLanguageData(
         clock="h:mm Uhr",
         years=(2020, 2030),
         copula=StateGroup(
-            # An event is a thing that happens on a day, and a lion is not.
             subject=("event",),
             words=words("ist"),
+            past=PredicateTense(
+                words=words("war"),
+            ),
         ),
     ),
     frames=(
-        # A date and a clock. German puts its finite verb second and counts whatever
-        # opens the clause towards that, so the subject stands behind the verb.
         SentenceFrame(
             (
                 SentencePart("date", head="am"),
@@ -206,7 +400,6 @@ DE = SentenceLanguageData(
             ),
             5,
         ),
-        # And the shape that equates the subject to one: `Das Spiel ist um 11:40 Uhr.`
         SentenceFrame(
             (
                 SentencePart("subject", modifiable=True),
@@ -239,7 +432,7 @@ DE = SentenceLanguageData(
         SentenceFrame(
             (
                 SentencePart("subject", modifiable=True),
-                SentencePart("state", head="ist"),
+                SentencePart("state", head="ist", past_head="war"),
             ),
             20,
         ),
@@ -260,7 +453,6 @@ DE = SentenceLanguageData(
             ),
             14,
         ),
-        # An adverb can open the clause too, and the verb still stands second.
         SentenceFrame(
             (
                 SentencePart("manner"),
@@ -278,11 +470,11 @@ DE = SentenceLanguageData(
             ),
             10,
         ),
-        # German asks by moving the finite verb to the front, which is the same rule
-        # that keeps it second in a statement — the question is what happens when
-        # nothing stands in the first position at all.
         SentenceFrame(
-            (SentencePart("verb"), SentencePart("subject", modifiable=True)),
+            (
+                SentencePart("verb"),
+                SentencePart("subject", modifiable=True),
+            ),
             26,
             mood="question",
         ),
@@ -296,7 +488,10 @@ DE = SentenceLanguageData(
             mood="question",
         ),
         SentenceFrame(
-            (SentencePart("subject", head="ist", modifiable=True), SentencePart("state")),
+            (
+                SentencePart("subject", head="ist", past_head="war", modifiable=True),
+                SentencePart("state"),
+            ),
             18,
             mood="question",
         ),

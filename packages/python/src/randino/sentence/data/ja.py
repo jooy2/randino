@@ -1,12 +1,19 @@
-"""Japanese sentence grammar: the verbs, the predicates and the shapes."""
+"""The ja sentence grammar: the verbs, the predicates and the shapes.
+
+Ported verbatim from the JavaScript package; see CLAUDE.md.
+"""
 
 from randino._internal.parse import words
 from randino.sentence.data._types import (
+    ModifierGroup,
+    PredicateTense,
     SentenceCalendar,
     SentenceFrame,
+    SentenceJoin,
     SentenceLanguageData,
     SentenceNumeral,
     SentencePart,
+    SentenceTimes,
     StateGroup,
     VerbGroup,
 )
@@ -14,123 +21,925 @@ from randino.sentence.data._types import (
 JA = SentenceLanguageData(
     space="",
     capitalize=False,
-    terminators={
-        "statement": "。",
-        "question": "？",
-        "exclamation": "！",
-        "trailing": "…",
-    },
-    # The corner brackets, not the curly quotes: Japanese writes 「」 first and
-    # 『』 for a quote inside one.
+    terminators={"statement": "。", "question": "？", "exclamation": "！", "trailing": "…"},
     quotes={"double": ("「", "」"), "single": ("『", "』")},
     verbs=(
         VerbGroup(
+            field="rise",
             subject=("creature", "person"),
-            words=words("""
-                走る 歩く 跳ぶ 泳ぐ 飛ぶ 這う 戻る 去る 止まる 休む 眠る 笑う 泣く 歌う 踊る
-                隠れる 待つ 立つ 座る 転がる さまよう 通る 近づく 伸びる 聞く
-            """),
+            words=words("起きる 目覚める 立ち上がる 起き上がる"),
+            forms={
+                "polite": words("起きます 目覚めます 立ち上がります 起き上がります"),
+                "linking": words("起きて 目覚めて 立ち上がって 起き上がって"),
+            },
+            past=PredicateTense(
+                words=words("起きた 目覚めた 立ち上がった 起き上がった"),
+                forms={
+                    "polite": words("起きました 目覚めました 立ち上がりました 起き上がりました"),
+                },
+            ),
+        ),
+        VerbGroup(
+            field="go",
+            subject=("creature", "person"),
+            requires="destination",
+            words=words("行く 向かう 出かける 駆けていく 上る 下りる"),
+            forms={
+                "polite": words("行きます 向かいます 出かけます 駆けていきます 上ります 下ります"),
+                "linking": words("行って 向かって 出かけて 駆けていって 上って 下りて"),
+            },
+            past=PredicateTense(
+                words=words("行った 向かった 出かけた 駆けていった 上った 下りた"),
+                forms={
+                    "polite": words(
+                        "行きました 向かいました 出かけました 駆けていきました 上りました 下りました"
+                    ),
+                },
+            ),
+        ),
+        VerbGroup(
+            field="go",
+            subject=("creature", "person"),
+            words=words("去る 出発する 出ていく"),
+            forms={
+                "polite": words("去ります 出発します 出ていきます"),
+                "linking": words("去って 出発して 出ていって"),
+            },
+            past=PredicateTense(
+                words=words("去った 出発した 出ていった"),
+                forms={
+                    "polite": words("去りました 出発しました 出ていきました"),
+                },
+            ),
+        ),
+        VerbGroup(
+            field="arrive",
+            subject=("creature", "person"),
+            requires="destination",
+            words=words("着く 到着する 入る たどり着く 帰り着く"),
+            forms={
+                "polite": words("着きます 到着します 入ります たどり着きます 帰り着きます"),
+                "linking": words("着いて 到着して 入って たどり着いて 帰り着いて"),
+            },
+            past=PredicateTense(
+                words=words("着いた 到着した 入った たどり着いた 帰り着いた"),
+                forms={
+                    "polite": words(
+                        "着きました 到着しました 入りました たどり着きました 帰り着きました"
+                    ),
+                },
+            ),
+        ),
+        VerbGroup(
+            field="arrive",
+            subject=("creature", "person"),
+            words=words("帰る 戻る 帰宅する"),
+            forms={
+                "polite": words("帰ります 戻ります 帰宅します"),
+                "linking": words("帰って 戻って 帰宅して"),
+            },
+            past=PredicateTense(
+                words=words("帰った 戻った 帰宅した"),
+                forms={
+                    "polite": words("帰りました 戻りました 帰宅しました"),
+                },
+            ),
+        ),
+        VerbGroup(
+            field="move",
+            subject=("creature", "person"),
+            words=words("走る 歩く 跳ぶ 泳ぐ 飛ぶ 這う さまよう 通る 駆け回る 散歩する"),
             forms={
                 "polite": words(
-                    """
-                走ります 歩きます 跳びます 泳ぎます 飛びます 這います 戻ります 去ります 止まります 休みます 眠ります 笑います 泣きます 歌います
-                踊ります 隠れます 待ちます 立ちます 座ります 転がります さまよいます 通ります 近づきます 伸びます 聞きます
-            """
-                )
+                    "走ります 歩きます 跳びます 泳ぎます 飛びます 這います さまよいます 通ります 駆け回ります 散歩します"
+                ),
+                "linking": words(
+                    "走って 歩いて 跳んで 泳いで 飛んで 這って さまよって 通って 駆け回って 散歩して"
+                ),
             },
+            past=PredicateTense(
+                words=words(
+                    "走った 歩いた 跳んだ 泳いだ 飛んだ 這った さまよった 通った 駆け回った 散歩した"
+                ),
+                forms={
+                    "polite": words("""
+                        走りました 歩きました 跳びました 泳ぎました 飛びました 這いました さまよいました 通りました 駆け回りました 散歩しました
+                    """),
+                },
+            ),
         ),
         VerbGroup(
+            field="wait",
             subject=("creature", "person"),
-            object=("edible",),
-            words=words("""
-                食べる 飲む 噛む 味わう 焼く 温める
-            """),
-            forms={"polite": words("食べます 飲みます 噛みます 味わいます 焼きます 温めます")},
-        ),
-        VerbGroup(
-            subject=("creature", "person"),
-            object=("thing", "plant", "edible"),
-            words=words("""
-                見る 探す 拾う 運ぶ 触る 守る 選ぶ 動かす 集める
-            """),
+            words=words("待つ 隠れる 見回す ためらう 立ち止まる うろうろする"),
             forms={
                 "polite": words(
-                    "見ます 探します 拾います 運びます 触ります 守ります 選びます 動かします 集めます"
-                )
+                    "待ちます 隠れます 見回します ためらいます 立ち止まります うろうろします"
+                ),
+                "linking": words("待って 隠れて 見回して ためらって 立ち止まって うろうろして"),
             },
+            past=PredicateTense(
+                words=words("待った 隠れた 見回した ためらった 立ち止まった うろうろした"),
+                forms={
+                    "polite": words(
+                        "待ちました 隠れました 見回しました ためらいました 立ち止まりました うろうろしました"
+                    ),
+                },
+            ),
         ),
         VerbGroup(
-            subject=("person",),
-            object=("thing", "vehicle"),
-            words=words("""
-                作る 直す 磨く 売る 買う 建てる
-            """),
-            forms={"polite": words("作ります 直します 磨きます 売ります 買います 建てます")},
+            field="rest",
+            subject=("creature", "person"),
+            words=words("休む 座る 寝転ぶ もたれる うずくまる 横になる"),
+            forms={
+                "polite": words(
+                    "休みます 座ります 寝転びます もたれます うずくまります 横になります"
+                ),
+                "linking": words("休んで 座って 寝転んで もたれて うずくまって 横になって"),
+            },
+            past=PredicateTense(
+                words=words("休んだ 座った 寝転んだ もたれた うずくまった 横になった"),
+                forms={
+                    "polite": words(
+                        "休みました 座りました 寝転びました もたれました うずくまりました 横になりました"
+                    ),
+                },
+            ),
         ),
         VerbGroup(
+            field="sleep",
+            subject=("creature", "person"),
+            words=words("眠る 寝る 眠り込む うたた寝する"),
+            forms={
+                "polite": words("眠ります 寝ます 眠り込みます うたた寝します"),
+                "linking": words("眠って 寝て 眠り込んで うたた寝して"),
+            },
+            past=PredicateTense(
+                words=words("眠った 寝た 眠り込んだ うたた寝した"),
+                forms={
+                    "polite": words("眠りました 寝ました 眠り込みました うたた寝しました"),
+                },
+            ),
+        ),
+        VerbGroup(
+            field="express",
+            subject=("creature", "person"),
+            words=words("笑う 泣く あくびする 微笑む つぶやく 叫ぶ ため息をつく"),
+            forms={
+                "polite": words(
+                    "笑います 泣きます あくびします 微笑みます つぶやきます 叫びます ため息をつきます"
+                ),
+                "linking": words(
+                    "笑って 泣いて あくびして 微笑んで つぶやいて 叫んで ため息をついて"
+                ),
+            },
+            past=PredicateTense(
+                words=words("笑った 泣いた あくびした 微笑んだ つぶやいた 叫んだ ため息をついた"),
+                forms={
+                    "polite": words(
+                        "笑いました 泣きました あくびしました 微笑みました つぶやきました 叫びました ため息をつきました"
+                    ),
+                },
+            ),
+        ),
+        VerbGroup(
+            field="play",
+            subject=("creature", "person"),
+            words=words("踊る 歌う 転がる 遊ぶ はねる 跳ね回る じゃれる"),
+            forms={
+                "polite": words(
+                    "踊ります 歌います 転がります 遊びます はねます 跳ね回ります じゃれます"
+                ),
+                "linking": words("踊って 歌って 転がって 遊んで はねて 跳ね回って じゃれて"),
+            },
+            past=PredicateTense(
+                words=words("踊った 歌った 転がった 遊んだ はねた 跳ね回った じゃれた"),
+                forms={
+                    "polite": words(
+                        "踊りました 歌いました 転がりました 遊びました はねました 跳ね回りました じゃれました"
+                    ),
+                },
+            ),
+        ),
+        VerbGroup(
+            field="think",
             subject=("person", "creature"),
             object=("idea", "event", "place"),
-            words=words("""
-                覚える 忘れる 想像する 数える
-            """),
-            forms={"polite": words("覚えます 忘れます 想像します 数えます")},
+            words=words("覚える 忘れる 想像する 数える 思い出す 懐かしむ"),
+            forms={
+                "polite": words("覚えます 忘れます 想像します 数えます 思い出します 懐かしみます"),
+                "linking": words("覚えて 忘れて 想像して 数えて 思い出して 懐かしんで"),
+            },
+            past=PredicateTense(
+                words=words("覚えた 忘れた 想像した 数えた 思い出した 懐かしんだ"),
+                forms={
+                    "polite": words(
+                        "覚えました 忘れました 想像しました 数えました 思い出しました 懐かしみました"
+                    ),
+                },
+            ),
         ),
         VerbGroup(
-            subject=("place", "event"),
-            words=words("""
-                光る 流れる 暮れる 明ける 深まる 静まる 色づく
-            """),
+            field="look",
+            subject=("creature", "person"),
+            object=("thing", "plant", "edible"),
+            words=words("見る 見つめる 眺める 調べる 触る なでる"),
+            forms={
+                "polite": words("見ます 見つめます 眺めます 調べます 触ります なでます"),
+                "linking": words("見て 見つめて 眺めて 調べて 触って なでて"),
+            },
+            past=PredicateTense(
+                words=words("見た 見つめた 眺めた 調べた 触った なでた"),
+                forms={
+                    "polite": words(
+                        "見ました 見つめました 眺めました 調べました 触りました なでました"
+                    ),
+                },
+            ),
+        ),
+        VerbGroup(
+            field="search",
+            subject=("creature", "person"),
+            words=words("探し回る 探す うろつく 見て回る"),
+            forms={
+                "polite": words("探し回ります 探します うろつきます 見て回ります"),
+                "linking": words("探し回って 探して うろついて 見て回って"),
+            },
+            past=PredicateTense(
+                words=words("探し回った 探した うろついた 見て回った"),
+                forms={
+                    "polite": words("探し回りました 探しました うろつきました 見て回りました"),
+                },
+            ),
+        ),
+        VerbGroup(
+            field="find",
+            subject=("creature", "person"),
+            object=("thing", "plant", "edible"),
+            words=words("見つける 発見する 拾う 見いだす"),
+            forms={
+                "polite": words("見つけます 発見します 拾います 見いだします"),
+                "linking": words("見つけて 発見して 拾って 見いだして"),
+            },
+            past=PredicateTense(
+                words=words("見つけた 発見した 拾った 見いだした"),
+                forms={
+                    "polite": words("見つけました 発見しました 拾いました 見いだしました"),
+                },
+            ),
+        ),
+        VerbGroup(
+            field="take",
+            subject=("creature", "person"),
+            object=("thing", "plant", "edible"),
+            words=words("選ぶ 取る つかむ 手に取る 受け取る 取り出す"),
             forms={
                 "polite": words(
-                    "光ります 流れます 暮れます 明けます 深まります 静まります 色づきます"
-                )
+                    "選びます 取ります つかみます 手に取ります 受け取ります 取り出します"
+                ),
+                "linking": words("選んで 取って つかんで 手に取って 受け取って 取り出して"),
             },
+            past=PredicateTense(
+                words=words("選んだ 取った つかんだ 手に取った 受け取った 取り出した"),
+                forms={
+                    "polite": words(
+                        "選びました 取りました つかみました 手に取りました 受け取りました 取り出しました"
+                    ),
+                },
+            ),
         ),
         VerbGroup(
+            field="carry",
+            subject=("creature", "person"),
+            object=("thing", "plant", "edible"),
+            words=words("運ぶ 持ち帰る 抱える 持ってくる"),
+            forms={
+                "polite": words("運びます 持ち帰ります 抱えます 持ってきます"),
+                "linking": words("運んで 持ち帰って 抱えて 持ってきて"),
+            },
+            past=PredicateTense(
+                words=words("運んだ 持ち帰った 抱えた 持ってきた"),
+                forms={
+                    "polite": words("運びました 持ち帰りました 抱えました 持ってきました"),
+                },
+            ),
+        ),
+        VerbGroup(
+            field="hide",
+            subject=("creature", "person"),
+            object=("thing", "plant", "edible"),
+            words=words("隠す しまう 守る 埋める 取っておく"),
+            forms={
+                "polite": words("隠します しまいます 守ります 埋めます 取っておきます"),
+                "linking": words("隠して しまって 守って 埋めて 取っておいて"),
+            },
+            past=PredicateTense(
+                words=words("隠した しまった 守った 埋めた 取っておいた"),
+                forms={
+                    "polite": words(
+                        "隠しました しまいました 守りました 埋めました 取っておきました"
+                    ),
+                },
+            ),
+        ),
+        VerbGroup(
+            field="make",
+            subject=("person",),
+            object=("thing", "vehicle"),
+            words=words("作る 建てる 描く 編む 組み立てる 削る"),
+            forms={
+                "polite": words("作ります 建てます 描きます 編みます 組み立てます 削ります"),
+                "linking": words("作って 建てて 描いて 編んで 組み立てて 削って"),
+            },
+            past=PredicateTense(
+                words=words("作った 建てた 描いた 編んだ 組み立てた 削った"),
+                forms={
+                    "polite": words(
+                        "作りました 建てました 描きました 編みました 組み立てました 削りました"
+                    ),
+                },
+            ),
+        ),
+        VerbGroup(
+            field="tend",
+            subject=("person",),
+            object=("thing", "vehicle"),
+            words=words("直す 磨く 手入れする 整える 片付ける 修理する"),
+            forms={
+                "polite": words("直します 磨きます 手入れします 整えます 片付けます 修理します"),
+                "linking": words("直して 磨いて 手入れして 整えて 片付けて 修理して"),
+            },
+            past=PredicateTense(
+                words=words("直した 磨いた 手入れした 整えた 片付けた 修理した"),
+                forms={
+                    "polite": words(
+                        "直しました 磨きました 手入れしました 整えました 片付けました 修理しました"
+                    ),
+                },
+            ),
+        ),
+        VerbGroup(
+            field="sell",
+            subject=("person",),
+            object=("thing", "vehicle"),
+            words=words("売る 手渡す 譲る 並べる"),
+            forms={
+                "polite": words("売ります 手渡します 譲ります 並べます"),
+                "linking": words("売って 手渡して 譲って 並べて"),
+            },
+            past=PredicateTense(
+                words=words("売った 手渡した 譲った 並べた"),
+                forms={
+                    "polite": words("売りました 手渡しました 譲りました 並べました"),
+                },
+            ),
+        ),
+        VerbGroup(
+            field="buy",
+            subject=("person",),
+            object=("thing", "vehicle", "edible"),
+            words=words("買う 買い求める 手に入れる 仕入れる"),
+            forms={
+                "polite": words("買います 買い求めます 手に入れます 仕入れます"),
+                "linking": words("買って 買い求めて 手に入れて 仕入れて"),
+            },
+            past=PredicateTense(
+                words=words("買った 買い求めた 手に入れた 仕入れた"),
+                forms={
+                    "polite": words("買いました 買い求めました 手に入れました 仕入れました"),
+                },
+            ),
+        ),
+        VerbGroup(
+            field="cook",
+            subject=("creature", "person"),
+            object=("edible",),
+            object_themes=("food",),
+            words=words("焼く 温める 煮る 料理する 切る 盛る"),
+            forms={
+                "polite": words("焼きます 温めます 煮ます 料理します 切ります 盛ります"),
+                "linking": words("焼いて 温めて 煮て 料理して 切って 盛って"),
+            },
+            past=PredicateTense(
+                words=words("焼いた 温めた 煮た 料理した 切った 盛った"),
+                forms={
+                    "polite": words(
+                        "焼きました 温めました 煮ました 料理しました 切りました 盛りました"
+                    ),
+                },
+            ),
+        ),
+        VerbGroup(
+            field="eat",
+            subject=("creature", "person"),
+            object=("edible",),
+            object_themes=("food",),
+            words=words("食べる 噛む 味わう かじる 平らげる"),
+            forms={
+                "polite": words("食べます 噛みます 味わいます かじります 平らげます"),
+                "linking": words("食べて 噛んで 味わって かじって 平らげて"),
+            },
+            past=PredicateTense(
+                words=words("食べた 噛んだ 味わった かじった 平らげた"),
+                forms={
+                    "polite": words("食べました 噛みました 味わいました かじりました 平らげました"),
+                },
+            ),
+        ),
+        VerbGroup(
+            field="drink",
+            subject=("creature", "person"),
+            object=("edible",),
+            object_themes=("drink",),
+            words=words("飲む すする 飲み干す 口にする"),
+            forms={
+                "polite": words("飲みます すすります 飲み干します 口にします"),
+                "linking": words("飲んで すすって 飲み干して 口にして"),
+            },
+            past=PredicateTense(
+                words=words("飲んだ すすった 飲み干した 口にした"),
+                forms={
+                    "polite": words("飲みました すすりました 飲み干しました 口にしました"),
+                },
+            ),
+        ),
+        VerbGroup(
+            field="change",
+            subject=("place",),
+            words=words("静まる 暗くなる 明ける 賑わう 色づく 明るくなる"),
+            forms={
+                "polite": words(
+                    "静まります 暗くなります 明けます 賑わいます 色づきます 明るくなります"
+                ),
+                "linking": words("静まって 暗くなって 明けて 賑わって 色づいて 明るくなって"),
+            },
+            past=PredicateTense(
+                words=words("静まった 暗くなった 明けた 賑わった 色づいた 明るくなった"),
+                forms={
+                    "polite": words(
+                        "静まりました 暗くなりました 明けました 賑わいました 色づきました 明るくなりました"
+                    ),
+                },
+            ),
+        ),
+        VerbGroup(
+            field="change",
+            subject=("event",),
+            words=words("光る 流れる 暮れる 深まる 始まる 終わる 続く"),
+            forms={
+                "polite": words(
+                    "光ります 流れます 暮れます 深まります 始まります 終わります 続きます"
+                ),
+                "linking": words("光って 流れて 暮れて 深まって 始まって 終わって 続いて"),
+            },
+            past=PredicateTense(
+                words=words("光った 流れた 暮れた 深まった 始まった 終わった 続いた"),
+                forms={
+                    "polite": words(
+                        "光りました 流れました 暮れました 深まりました 始まりました 終わりました 続きました"
+                    ),
+                },
+            ),
+        ),
+        VerbGroup(
+            field="change",
             subject=("thing", "vehicle"),
-            words=words("""
-                揺れる 輝く 落ちる 転がる 傾く 古びる
-            """),
-            forms={"polite": words("揺れます 輝きます 落ちます 転がります 傾きます 古びます")},
+            words=words("揺れる 輝く 落ちる 転がる 傾く 古びる"),
+            forms={
+                "polite": words("揺れます 輝きます 落ちます 転がります 傾きます 古びます"),
+                "linking": words("揺れて 輝いて 落ちて 転がって 傾いて 古びて"),
+            },
+            past=PredicateTense(
+                words=words("揺れた 輝いた 落ちた 転がった 傾いた 古びた"),
+                forms={
+                    "polite": words(
+                        "揺れました 輝きました 落ちました 転がりました 傾きました 古びました"
+                    ),
+                },
+            ),
         ),
         VerbGroup(
+            field="move",
             subject=("vehicle",),
-            words=words("""
-                走る 止まる 通る 戻る 出発する 滑る
-            """),
-            forms={"polite": words("走ります 止まります 通ります 戻ります 出発します 滑ります")},
+            words=words("走る 止まる 通る 戻る 出発する 滑る"),
+            forms={
+                "polite": words("走ります 止まります 通ります 戻ります 出発します 滑ります"),
+                "linking": words("走って 止まって 通って 戻って 出発して 滑って"),
+            },
+            past=PredicateTense(
+                words=words("走った 止まった 通った 戻った 出発した 滑った"),
+                forms={
+                    "polite": words(
+                        "走りました 止まりました 通りました 戻りました 出発しました 滑りました"
+                    ),
+                },
+            ),
         ),
         VerbGroup(
+            field="change",
             subject=("idea", "event"),
-            words=words("""
-                広がる 消える 残る 漂う 深まる
-            """),
-            forms={"polite": words("広がります 消えます 残ります 漂います 深まります")},
+            words=words("広がる 消える 残る 漂う 深まる"),
+            forms={
+                "polite": words("広がります 消えます 残ります 漂います 深まります"),
+                "linking": words("広がって 消えて 残って 漂って 深まって"),
+            },
+            past=PredicateTense(
+                words=words("広がった 消えた 残った 漂った 深まった"),
+                forms={
+                    "polite": words("広がりました 消えました 残りました 漂いました 深まりました"),
+                },
+            ),
         ),
         VerbGroup(
+            field="change",
             subject=("plant",),
-            words=words("""
-                育つ 枯れる 咲く 揺れる 伸びる
-            """),
-            forms={"polite": words("育ちます 枯れます 咲きます 揺れます 伸びます")},
+            words=words("育つ 枯れる 咲く 揺れる 伸びる"),
+            forms={
+                "polite": words("育ちます 枯れます 咲きます 揺れます 伸びます"),
+                "linking": words("育って 枯れて 咲いて 揺れて 伸びて"),
+            },
+            past=PredicateTense(
+                words=words("育った 枯れた 咲いた 揺れた 伸びた"),
+                forms={
+                    "polite": words("育ちました 枯れました 咲きました 揺れました 伸びました"),
+                },
+            ),
         ),
         VerbGroup(
+            field="change",
             subject=("body",),
-            words=words("""
-                震える 動く 痺れる 固まる
-            """),
-            forms={"polite": words("震えます 動きます 痺れます 固まります")},
+            words=words("震える 動く 痺れる 固まる"),
+            forms={
+                "polite": words("震えます 動きます 痺れます 固まります"),
+                "linking": words("震えて 動いて 痺れて 固まって"),
+            },
+            past=PredicateTense(
+                words=words("震えた 動いた 痺れた 固まった"),
+                forms={
+                    "polite": words("震えました 動きました 痺れました 固まりました"),
+                },
+            ),
         ),
         VerbGroup(
+            field="change",
             subject=("edible",),
-            words=words("""
-                熟れる 冷める 煮える 溶ける 傷む
-            """),
-            forms={"polite": words("熟れます 冷めます 煮えます 溶けます 傷みます")},
+            words=words("熟れる 冷める 煮える 溶ける 傷む"),
+            forms={
+                "polite": words("熟れます 冷めます 煮えます 溶けます 傷みます"),
+                "linking": words("熟れて 冷めて 煮えて 溶けて 傷んで"),
+            },
+            past=PredicateTense(
+                words=words("熟れた 冷めた 煮えた 溶けた 傷んだ"),
+                forms={
+                    "polite": words("熟れました 冷めました 煮えました 溶けました 傷みました"),
+                },
+            ),
         ),
     ),
-    # Plain predicate forms, so a na-adjective closes on だ where an i-adjective
-    # closes on itself. The `word` pools hold the attributive 静かな instead,
+    states=(
+        StateGroup(
+            subject=("creature", "person"),
+            words=words(
+                "大きい 小さい 速い 遅い 静かだ うるさい 勇敢だ 元気だ 賢い 優しい 荒々しい"
+            ),
+            forms={
+                "polite": words(
+                    "大きいです 小さいです 速いです 遅いです 静かです うるさいです 勇敢です 元気です 賢いです 優しいです 荒々しいです"
+                ),
+            },
+            past=PredicateTense(
+                words=words("""
+                    大きかった 小さかった 速かった 遅かった 静かだった うるさかった 勇敢だった 元気だった 賢かった 優しかった 荒々しかった
+                """),
+                forms={
+                    "polite": words("""
+                        大きかったです 小さかったです 速かったです 遅かったです 静かでした うるさかったです 勇敢でした 元気でした 賢かったです 優しかったです
+                        荒々しかったです
+                    """),
+                },
+            ),
+        ),
+        StateGroup(
+            subject=("creature", "person"),
+            condition="hungry",
+            words=words("空腹だ ひもじい"),
+            forms={
+                "polite": words("空腹です ひもじいです"),
+            },
+            past=PredicateTense(
+                words=words("空腹だった ひもじかった"),
+                forms={
+                    "polite": words("空腹でした ひもじかったです"),
+                },
+            ),
+        ),
+        StateGroup(
+            subject=("creature", "person"),
+            condition="full",
+            words=words("満腹だ"),
+            forms={
+                "polite": words("満腹です"),
+            },
+            past=PredicateTense(
+                words=words("満腹だった"),
+                forms={
+                    "polite": words("満腹でした"),
+                },
+            ),
+        ),
+        StateGroup(
+            subject=("creature", "person"),
+            condition="tired",
+            words=words("眠い くたくただ だるい"),
+            forms={
+                "polite": words("眠いです くたくたです だるいです"),
+            },
+            past=PredicateTense(
+                words=words("眠かった くたくただった だるかった"),
+                forms={
+                    "polite": words("眠かったです くたくたでした だるかったです"),
+                },
+            ),
+        ),
+        StateGroup(
+            subject=("creature", "person"),
+            condition="rested",
+            words=words("爽やかだ 元気いっぱいだ"),
+            forms={
+                "polite": words("爽やかです 元気いっぱいです"),
+            },
+            past=PredicateTense(
+                words=words("爽やかだった 元気いっぱいだった"),
+                forms={
+                    "polite": words("爽やかでした 元気いっぱいでした"),
+                },
+            ),
+        ),
+        StateGroup(
+            subject=("creature", "person"),
+            condition="content",
+            words=words("嬉しい 楽しい 満足だ 幸せだ 穏やかだ"),
+            forms={
+                "polite": words("嬉しいです 楽しいです 満足です 幸せです 穏やかです"),
+            },
+            past=PredicateTense(
+                words=words("嬉しかった 楽しかった 満足だった 幸せだった 穏やかだった"),
+                forms={
+                    "polite": words(
+                        "嬉しかったです 楽しかったです 満足でした 幸せでした 穏やかでした"
+                    ),
+                },
+            ),
+        ),
+        StateGroup(
+            subject=("creature", "person"),
+            condition="restless",
+            words=words("退屈だ もどかしい 不安だ 気がかりだ"),
+            forms={
+                "polite": words("退屈です もどかしいです 不安です 気がかりです"),
+            },
+            past=PredicateTense(
+                words=words("退屈だった もどかしかった 不安だった 気がかりだった"),
+                forms={
+                    "polite": words("退屈でした もどかしかったです 不安でした 気がかりでした"),
+                },
+            ),
+        ),
+        StateGroup(
+            subject=(
+                "creature",
+                "person",
+                "plant",
+                "edible",
+                "thing",
+                "vehicle",
+                "place",
+                "event",
+                "idea",
+                "body",
+            ),
+            words=words("美しい 珍しい 新しい 見慣れない"),
+            forms={
+                "polite": words("美しいです 珍しいです 新しいです 見慣れないです"),
+            },
+            past=PredicateTense(
+                words=words("美しかった 珍しかった 新しかった 見慣れなかった"),
+                forms={
+                    "polite": words(
+                        "美しかったです 珍しかったです 新しかったです 見慣れなかったです"
+                    ),
+                },
+            ),
+        ),
+        StateGroup(
+            subject=("place", "event"),
+            words=words("広い 狭い 静かだ 深い 暗い 明るい 遠い 険しい"),
+            forms={
+                "polite": words(
+                    "広いです 狭いです 静かです 深いです 暗いです 明るいです 遠いです 険しいです"
+                ),
+            },
+            past=PredicateTense(
+                words=words(
+                    "広かった 狭かった 静かだった 深かった 暗かった 明るかった 遠かった 険しかった"
+                ),
+                forms={
+                    "polite": words(
+                        "広かったです 狭かったです 静かでした 深かったです 暗かったです 明るかったです 遠かったです 険しかったです"
+                    ),
+                },
+            ),
+        ),
+        StateGroup(
+            subject=("thing", "vehicle"),
+            words=words("硬い 軽い 重い 古い 滑らかだ 透明だ 丈夫だ"),
+            forms={
+                "polite": words("硬いです 軽いです 重いです 古いです 滑らかです 透明です 丈夫です"),
+            },
+            past=PredicateTense(
+                words=words(
+                    "硬かった 軽かった 重かった 古かった 滑らかだった 透明だった 丈夫だった"
+                ),
+                forms={
+                    "polite": words(
+                        "硬かったです 軽かったです 重かったです 古かったです 滑らかでした 透明でした 丈夫でした"
+                    ),
+                },
+            ),
+        ),
+        StateGroup(
+            subject=("edible",),
+            words=words("甘い しょっぱい 辛い 酸っぱい 熱い 冷たい 香ばしい"),
+            forms={
+                "polite": words(
+                    "甘いです しょっぱいです 辛いです 酸っぱいです 熱いです 冷たいです 香ばしいです"
+                ),
+            },
+            past=PredicateTense(
+                words=words(
+                    "甘かった しょっぱかった 辛かった 酸っぱかった 熱かった 冷たかった 香ばしかった"
+                ),
+                forms={
+                    "polite": words(
+                        "甘かったです しょっぱかったです 辛かったです 酸っぱかったです 熱かったです 冷たかったです 香ばしかったです"
+                    ),
+                },
+            ),
+        ),
+        StateGroup(
+            subject=("idea",),
+            words=words("難しい 易しい 明らかだ 曖昧だ 永遠だ はかない"),
+            forms={
+                "polite": words("難しいです 易しいです 明らかです 曖昧です 永遠です はかないです"),
+            },
+            past=PredicateTense(
+                words=words(
+                    "難しかった 易しかった 明らかだった 曖昧だった 永遠だった はかなかった"
+                ),
+                forms={
+                    "polite": words(
+                        "難しかったです 易しかったです 明らかでした 曖昧でした 永遠でした はかなかったです"
+                    ),
+                },
+            ),
+        ),
+        StateGroup(
+            subject=("plant",),
+            words=words("青い 香しい 瑞々しい"),
+            forms={
+                "polite": words("青いです 香しいです 瑞々しいです"),
+            },
+            past=PredicateTense(
+                words=words("青かった 香しかった 瑞々しかった"),
+                forms={
+                    "polite": words("青かったです 香しかったです 瑞々しかったです"),
+                },
+            ),
+        ),
+        StateGroup(
+            subject=("body",),
+            words=words("温かい 冷たい 痛い 硬い"),
+            forms={
+                "polite": words("温かいです 冷たいです 痛いです 硬いです"),
+            },
+            past=PredicateTense(
+                words=words("温かかった 冷たかった 痛かった 硬かった"),
+                forms={
+                    "polite": words("温かかったです 冷たかったです 痛かったです 硬かったです"),
+                },
+            ),
+        ),
+    ),
+    modifiers=(
+        ModifierGroup(
+            subject=("creature", "person"),
+            words=words("""
+                勇敢な 元気な 優しい 働き者の 怠け者の 恥ずかしがりの 賢い 若い 年老いた 小さな 大きな 静かな 陽気な のんびりした 素早い 好奇心旺盛な
+            """),
+        ),
+        ModifierGroup(
+            subject=("person",),
+            words=words("若い 親切な 厳しい 真面目な 忙しい 誠実な"),
+        ),
+        ModifierGroup(
+            subject=("creature",),
+            words=words("素早い 荒々しい 大人しい 小柄な 丸々した"),
+        ),
+        ModifierGroup(
+            subject=("edible",),
+            themes=("food",),
+            words=words(
+                "甘い 辛い 温かい 新鮮な 香ばしい 熱い しょっぱい 柔らかい みずみずしい 熟れた おいしそうな"
+            ),
+        ),
+        ModifierGroup(
+            subject=("edible",),
+            themes=("drink",),
+            words=words("甘い 温かい 冷たい 熱い 香り高い 新鮮な 濃い 苦い"),
+        ),
+        ModifierGroup(
+            subject=("thing", "vehicle"),
+            words=words(
+                "古い 新しい 小さな 大きな 軽い 重い きらめく 滑らかな 透明な 硬い 美しい 大切な 古びた"
+            ),
+        ),
+        ModifierGroup(
+            subject=("vehicle",),
+            words=words("速い 遅い 頑丈な"),
+        ),
+        ModifierGroup(
+            subject=("place",),
+            words=words(
+                "静かな 広い 暗い 明るい 見知らぬ 古い 心地よい ひっそりした 賑やかな 遠い 近い 空っぽの 寂しい 日当たりのよい"
+            ),
+        ),
+        ModifierGroup(
+            subject=("plant",),
+            words=words("青い 茂った 香しい 若い 枯れた 大きな 小さな 瑞々しい"),
+        ),
+        ModifierGroup(
+            subject=("idea",),
+            words=words("かすかな 古い 新しい 見知らぬ 明らかな 大切な 小さな 奇妙な 曖昧な"),
+        ),
+        ModifierGroup(
+            subject=("event",),
+            words=words("長い 短い 静かな 晴れた 曇った 騒がしい 突然の"),
+        ),
+        ModifierGroup(
+            subject=("body",),
+            words=words("小さな 冷たい 温かい 細い 丈夫な"),
+        ),
+        ModifierGroup(
+            subject=(
+                "creature",
+                "person",
+                "plant",
+                "thing",
+                "vehicle",
+                "place",
+                "event",
+                "idea",
+                "body",
+            ),
+            words=words("美しい 不思議な 見知らぬ 新しい"),
+        ),
+    ),
+    manners=(
+        ModifierGroup(
+            subject=("creature", "person"),
+            words=words("""
+                静かに ゆっくり 速く じっと そっと ひとりで しばらく 急に 慎重に 力強く 素早く 黙って 軽やかに 丁寧に 懸命に のんびり ぼんやり しっかり さらりと
+                ひっそり 悠々と きちんと 朗らかに 元気よく こっそり
+            """),
+        ),
+        ModifierGroup(
+            subject=("plant", "edible", "thing", "vehicle", "place", "event", "idea", "body"),
+            words=words(
+                "静かに ゆっくり 次第に ふと また ずっと しばらく 急に いつも まだ そっと じっと 少しずつ 徐々に だんだん ひっそり"
+            ),
+        ),
+    ),
+    times=SentenceTimes(
+        day=words(
+            "夜明けに 早朝に 朝に 昼前に 昼に 真昼に 午後に 夕暮れに 夕方に 夜に 深夜に 真夜中に"
+        ),
+        any=words("春に 夏に 秋に 冬に 週末に 休日に 一日中 元日に"),
+        past=words("昨日 先週 昔 かつて その日 その夜"),
+        present=words("今日 近頃 さっき 明日 来週 時々 毎日 毎晩"),
+    ),
+    homes=words("家"),
+    join=SentenceJoin(form="linking"),
+    connectives={
+        "additive": words("そして また しかも ところで"),
+        "temporal": words("やがて すぐに ついに 一方 その後 しばらくして"),
+        "contrastive": words("しかし ところが けれども それでも"),
+        "causal": words("だから そこで それで"),
+    },
+    interjections=words(
+        "ああ、 おお、 まあ、 なんと、 やれやれ、 おや、 ほら、 へえ、 わあ、 あら、 おっと、 いやはや、"
+    ),
+    pronouns={"n": ("", "それ")},
+    pronounless=("person", "creature"),
     numeral=SentenceNumeral(
         order="after",
         counters={
@@ -151,127 +960,25 @@ JA = SentenceLanguageData(
         group=",",
         gap="",
     ),
-    # which cannot end a sentence.
-    states=(
-        StateGroup(
-            subject=("creature", "person"),
-            words=words("""
-                大きい 小さい 速い 遅い 静かだ うるさい 勇敢だ 元気だ 眠い 賢い 優しい 荒々しい
-            """),
-            forms={
-                "polite": words(
-                    """
-                大きいです 小さいです 速いです 遅いです 静かです うるさいです 勇敢です 元気です 眠いです 賢いです 優しいです 荒々しいです
-            """
-                )
-            },
-        ),
-        StateGroup(
-            subject=(
-                "creature",
-                "person",
-                "plant",
-                "edible",
-                "thing",
-                "vehicle",
-                "place",
-                "event",
-                "idea",
-                "body",
-            ),
-            words=words("""
-                美しい 珍しい 新しい 見慣れない
-            """),
-            forms={"polite": words("美しいです 珍しいです 新しいです 見慣れないです")},
-        ),
-        StateGroup(
-            subject=("place", "event"),
-            words=words("""
-                広い 狭い 静かだ 深い 暗い 明るい 遠い 険しい
-            """),
-            forms={
-                "polite": words(
-                    "広いです 狭いです 静かです 深いです 暗いです 明るいです 遠いです 険しいです"
-                )
-            },
-        ),
-        StateGroup(
-            subject=("thing", "vehicle"),
-            words=words("""
-                硬い 軽い 重い 古い 滑らかだ 透明だ 丈夫だ
-            """),
-            forms={
-                "polite": words("硬いです 軽いです 重いです 古いです 滑らかです 透明です 丈夫です")
-            },
-        ),
-        StateGroup(
-            subject=("edible",),
-            words=words("""
-                甘い しょっぱい 辛い 酸っぱい 熱い 冷たい 香ばしい
-            """),
-            forms={
-                "polite": words(
-                    "甘いです しょっぱいです 辛いです 酸っぱいです 熱いです 冷たいです 香ばしいです"
-                )
-            },
-        ),
-        StateGroup(
-            subject=("idea",),
-            words=words("""
-                難しい 易しい 明らかだ 曖昧だ 永遠だ はかない
-            """),
-            forms={
-                "polite": words("難しいです 易しいです 明らかです 曖昧です 永遠です はかないです")
-            },
-        ),
-        StateGroup(
-            subject=("plant",),
-            words=words("""
-                青い 香しい 瑞々しい
-            """),
-            forms={"polite": words("青いです 香しいです 瑞々しいです")},
-        ),
-        StateGroup(
-            subject=("body",),
-            words=words("""
-                温かい 冷たい 痛い 硬い
-            """),
-            forms={"polite": words("温かいです 冷たいです 痛いです 硬いです")},
-        ),
-    ),
-    manners=words("""
-        静かに ゆっくり 速く じっと そっと ふと 一緒に ひとりで また ずっと しばらく 次第に 急に いつも まだ 慎重に 力強く 並んで 素早く 黙って 軽やかに 丁寧に 懸命に
-        のんびり ぼんやり しっかり さらりと ひっそり 悠々と きちんと ゆるやかに 朗らかに
-    """),
-    times=words("""
-        夜明けに 朝に 昼に 夕方に 夜に 真夜中に 今日 昨日 明日 春に 夏に 秋に 冬に 週末に さっき 時々 毎日 夕暮れに 真昼に 元日に 先週 来週 近頃 昔 休日に 一日中 毎晩
-    """),
-    connectives={
-        "additive": words("そして また しかも ところで"),
-        "temporal": words("やがて すぐに ついに 一方 その後"),
-        "contrastive": words("しかし ところが けれども それでも"),
-        "causal": words("だから つまり"),
-    },
-    interjections=words("""
-        ああ、 おお、 まあ、 なんと、 やれやれ、 おや、 ほら、 へえ、 わあ、 あら、 おっと、 いやはや、
-    """),
-    pronouns={"n": ("", "それ")},
-    pronounless=("person",),
-    # Japanese writes a date largest to smallest with nothing between the parts, and its
-    # copula onto the end of what it equates the subject to.
     calendar=SentenceCalendar(
         date="Y年M月D日",
         clock="h時mm分",
         years=(2020, 2030),
         copula=StateGroup(
-            # An event is a thing that happens on a day, and a lion is not.
             subject=("event",),
             words=words("だ"),
-            forms={"polite": words("です")},
+            forms={
+                "polite": words("です"),
+            },
+            past=PredicateTense(
+                words=words("だった"),
+                forms={
+                    "polite": words("でした"),
+                },
+            ),
         ),
     ),
     frames=(
-        # A date and a clock, standing where an adverbial stands.
         SentenceFrame(
             (
                 SentencePart("date", tail="に"),
@@ -288,13 +995,18 @@ JA = SentenceLanguageData(
             ),
             5,
         ),
-        # And the shape that equates the subject to one: `試合は11時40分だ。`
         SentenceFrame(
-            (SentencePart("subject", tail="は"), SentencePart("date", copula="tail")),
+            (
+                SentencePart("subject", tail="は"),
+                SentencePart("date", copula="tail"),
+            ),
             4,
         ),
         SentenceFrame(
-            (SentencePart("subject", tail="は"), SentencePart("clock", copula="tail")),
+            (
+                SentencePart("subject", tail="は"),
+                SentencePart("clock", copula="tail"),
+            ),
             4,
         ),
         SentenceFrame(
@@ -319,6 +1031,44 @@ JA = SentenceLanguageData(
                 SentencePart("verb"),
             ),
             14,
+        ),
+        SentenceFrame(
+            (
+                SentencePart("subject", tail="が", modifiable=True),
+                SentencePart("destination", tail="へ", modifiable=True),
+                SentencePart("verb"),
+            ),
+            8,
+            fields=("go",),
+        ),
+        SentenceFrame(
+            (
+                SentencePart("subject", tail="が", modifiable=True),
+                SentencePart("destination", tail="に", modifiable=True),
+                SentencePart("verb"),
+            ),
+            8,
+            fields=("arrive",),
+        ),
+        SentenceFrame(
+            (
+                SentencePart("time"),
+                SentencePart("subject", tail="が", modifiable=True),
+                SentencePart("destination", tail="へ", modifiable=True),
+                SentencePart("verb"),
+            ),
+            4,
+            fields=("go",),
+        ),
+        SentenceFrame(
+            (
+                SentencePart("subject", tail="が", modifiable=True),
+                SentencePart("manner"),
+                SentencePart("destination", tail="に", modifiable=True),
+                SentencePart("verb"),
+            ),
+            3,
+            fields=("arrive",),
         ),
         SentenceFrame(
             (
@@ -370,10 +1120,20 @@ JA = SentenceLanguageData(
             ),
             5,
         ),
-        # Japanese asks with か after the predicate, which is a tag rather than a
-        # phrase — no slot could carry it, and the word order does not move.
         SentenceFrame(
-            (SentencePart("subject", tail="が", modifiable=True), SentencePart("verb")),
+            (
+                SentencePart("time"),
+                SentencePart("subject", tail="が", modifiable=True),
+                SentencePart("object", tail="を", modifiable=True),
+                SentencePart("verb"),
+            ),
+            4,
+        ),
+        SentenceFrame(
+            (
+                SentencePart("subject", tail="が", modifiable=True),
+                SentencePart("verb"),
+            ),
             20,
             mood="question",
             tag="か",
@@ -389,7 +1149,10 @@ JA = SentenceLanguageData(
             tag="か",
         ),
         SentenceFrame(
-            (SentencePart("subject", tail="は", modifiable=True), SentencePart("state")),
+            (
+                SentencePart("subject", tail="は", modifiable=True),
+                SentencePart("state"),
+            ),
             14,
             mood="question",
             tag="か",
@@ -407,12 +1170,29 @@ JA = SentenceLanguageData(
         SentenceFrame(
             (
                 SentencePart("subject", tail="が", modifiable=True),
+                SentencePart("destination", tail="へ", modifiable=True),
+                SentencePart("verb"),
+            ),
+            6,
+            mood="question",
+            tag="か",
+            fields=("go",),
+        ),
+        SentenceFrame(
+            (
+                SentencePart("subject", tail="が", modifiable=True),
                 SentencePart("quantity", tail="を"),
                 SentencePart("verb"),
             ),
             6,
         ),
-        SentenceFrame((SentencePart("quantity", tail="が"), SentencePart("verb")), 5),
+        SentenceFrame(
+            (
+                SentencePart("quantity", tail="が"),
+                SentencePart("verb"),
+            ),
+            5,
+        ),
         SentenceFrame(
             (
                 SentencePart("subject", tail="が", modifiable=True),

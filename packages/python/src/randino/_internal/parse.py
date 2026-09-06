@@ -6,10 +6,13 @@ lines.
 """
 
 from collections.abc import Mapping
-from typing import NamedTuple, cast
+from typing import TYPE_CHECKING, NamedTuple, cast
 
 from randino._types import WordTheme
 from randino.word.data._types import WordGender, WordPool
+
+if TYPE_CHECKING:
+    from randino.sentence.data._types import PredicateTense
 
 
 class NameToken(NamedTuple):
@@ -77,3 +80,38 @@ def tagged_nouns(
         pools[theme] = tuple(entries)
 
     return pools, gender
+
+
+def conjugate(stems: str, endings: Mapping[str, str]) -> "PredicateTense":
+    """Every form of a tense from one pool of stems and one ending per form.
+
+    For a language whose endings are the same whatever the stem: a Korean past stem
+    closes on `ㅆ`, so `달렸` takes `다`, `니`, `구나`, `어요` and `습니다` exactly the
+    way `걸었` does. `endings` maps `"statement"` and any form to its ending; an ending
+    may list alternatives with `|` between them, and each stem gets every one of them, so
+    the pools stay index-aligned with the present-tense words the stems were written for.
+
+    Args:
+        stems: The past stems, whitespace-separated.
+        endings: The ending each form takes, `"statement"` included.
+
+    Returns:
+        The tense, with the statement in `words` and the rest in `forms`.
+    """
+    bases = words(stems)
+
+    def attach(ending: str) -> tuple[str, ...]:
+        return tuple("|".join(stem + each for each in ending.split("|")) for stem in bases)
+
+    # Imported here rather than at the top: the sentence package imports this module
+    # through its data files, and a module-level import would be a cycle.
+    from randino.sentence.data._types import PredicateForm, PredicateTense
+
+    return PredicateTense(
+        words=attach(endings["statement"]),
+        forms={
+            cast(PredicateForm, form): attach(ending)
+            for form, ending in endings.items()
+            if form != "statement"
+        },
+    )

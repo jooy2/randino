@@ -9,11 +9,12 @@ are still drawn from `word/data`, and everything a sentence adds to them lives h
 """
 
 from collections.abc import Mapping, Sequence
-from dataclasses import dataclass, field
+from dataclasses import dataclass
+from dataclasses import field as attribute
 from typing import Literal
 
-from randino._types import SentenceQuote, SentenceSlot
-from randino.word.data._types import WordGender, WordPool
+from randino._types import SentenceQuote, SentenceSlot, WordTheme
+from randino.word.data._types import WordAgreement, WordGender, WordPool
 
 NounClass = Literal[
     "creature",
@@ -37,8 +38,16 @@ slice of vocabulary, and which of these it falls into is the same in every langu
 """
 
 
-PredicateForm = Literal["question", "exclamation", "casual", "polite", "formal", "formalQuestion"]
+PredicateForm = Literal[
+    "question", "exclamation", "casual", "polite", "formal", "formalQuestion", "linking"
+]
 """A form a predicate takes beside the one a plain statement ends on.
+
+`"linking"` is the form a predicate takes when its clause is not the last one of the
+sentence — Korean `돌아오고` or `돌아와서`, Japanese `戻って`. It carries no tense of its
+own, so it lives in the present forms alone. A language that joins its clauses with a
+word rather than a form (`and`, `y`, `и`) declares none.
+
 
 `"question"` is Korean `달리니` beside `달린다`, and English `run` beside `runs`;
 `"exclamation"` is `달리는구나`, `"casual"` `달려`, `"polite"` `달려요` and `"formal"`
@@ -65,7 +74,79 @@ That is what keeps a pool index-aligned with `words` while `달리니|달리나|
 still one entry for one verb — a Korean question has several endings and a generator
 that only ever wrote the first would close every sentence the same way.
 """
-"""The forms a group declares, beside the plain statement its `words` are in."""
+
+VerbField = Literal[
+    "rise",
+    "go",
+    "arrive",
+    "move",
+    "wait",
+    "rest",
+    "sleep",
+    "express",
+    "play",
+    "think",
+    "look",
+    "search",
+    "find",
+    "take",
+    "carry",
+    "hide",
+    "make",
+    "tend",
+    "sell",
+    "buy",
+    "cook",
+    "eat",
+    "drink",
+    "change",
+]
+"""What a verb does, as coarsely as a story needs to know it.
+
+A step of a story asks for a field rather than for a word — "the hero eats something" —
+and the language answers with any verb it has filed there, which is what lets one story
+be told in nine languages and never twice the same way. `FIELD_RULES` says what each
+field needs to be true first and what it leaves true afterwards, which is the whole of
+the story's memory. `"change"` is everything that happens to something that is not a
+hero: a place darkens, an apple ripens, a flag sways.
+"""
+
+Condition = Literal[
+    "awake",
+    "asleep",
+    "hungry",
+    "full",
+    "tired",
+    "rested",
+    "away",
+    "home",
+    "holding",
+    "content",
+    "restless",
+]
+"""What can be true of a story's hero at one moment.
+
+What a state sentence says and what an action changes. `"holding"` is the one that is
+about a thing rather than a feeling: it is what `eat`, `carry` and `sell` need and what
+`find`, `take`, `buy` and `make` leave behind.
+"""
+
+
+@dataclass(frozen=True, slots=True)
+class PredicateTense:
+    """The same predicates in another tense.
+
+    The statement form in `words` and the moods and levels in `forms`, both index-aligned
+    with the present-tense pools of the group. A group declares what its language writes
+    — Korean and Japanese every level, English only the statement and its question's base
+    form — and leaves the tense out entirely where the language does not inflect for it.
+    """
+
+    words: WordPool
+    """The statement form."""
+
+    forms: PredicateForms = attribute(default_factory=dict)
+    """The other forms, index-aligned with `words`."""
 
 
 @dataclass(frozen=True, slots=True)
@@ -77,6 +158,9 @@ class VerbGroup:
     the doing, and — when the verb is transitive — what it can be done to.
     """
 
+    field: VerbField
+    """What these verbs do, as a story asks for it."""
+
     subject: tuple[NounClass, ...]
     """Classes a noun has to belong to to be the subject of these verbs."""
 
@@ -86,11 +170,32 @@ class VerbGroup:
     object: tuple[NounClass, ...] | None = None
     """Classes it can take as a direct object. Left out by an intransitive group."""
 
-    forms: PredicateForms = field(default_factory=dict)
+    object_themes: tuple[WordTheme, ...] | None = None
+    """The themes the object may come from, when a class is too wide.
+
+    `eat` takes an edible and `drink` takes an edible, and a lion that drinks a pretzel
+    is the difference. Left out where the class alone is right.
+    """
+
+    requires: SentenceSlot | None = None
+    """A part the shape has to carry for these verbs to make sense.
+
+    `향한다` and `heads` want somewhere to head to, where `떠난다` and `leaves` stand on
+    their own; a group that names a slot is drawn only for a shape that has it.
+    """
+
+    forms: PredicateForms = attribute(default_factory=dict)
     """The same verbs in another form, index-aligned with `words`.
 
     Empty for a language whose verb does not change — Chinese, Vietnamese, Spanish,
     Italian and Russian ask a question with the mark alone.
+    """
+
+    past: PredicateTense | None = None
+    """The same verbs in the past, index-aligned with `words`.
+
+    Left out by a language that marks the past with a word beside the verb rather than
+    on it — Chinese `了`, Vietnamese `đã` — which is `past_mark`'s business.
     """
 
 
@@ -109,8 +214,51 @@ class StateGroup:
     words: WordPool
     """The adjectives themselves, in the form a plain statement ends on."""
 
-    forms: PredicateForms = field(default_factory=dict)
+    condition: Condition | None = None
+    """What these adjectives say is true of the subject, for a story to read and write.
+
+    `배고프다` is `"hungry"` and `피곤하다` is `"tired"`; `크다` is neither, and a group
+    of traits like it leaves this out.
+    """
+
+    head: str | None = None
+    """What is written in front of these instead of the shape's own head.
+
+    In a language whose copula depends on what is said: Spanish `es valiente` and `está
+    cansado` are two verbs, and only the group knows which its words take.
+    """
+
+    past_head: str | None = None
+    """What `head` becomes in the past (`era`, `estaba`)."""
+
+    forms: PredicateForms = attribute(default_factory=dict)
     """The same adjectives in another form, index-aligned with `words`."""
+
+    past: PredicateTense | None = None
+    """The same adjectives in the past, index-aligned with `words`."""
+
+
+@dataclass(frozen=True, slots=True)
+class ModifierGroup:
+    """Attributive modifiers that fit the same kinds of noun, grouped the way states are.
+
+    `word/data`'s `adjectives` are what a nickname is built from, and a nickname is
+    allowed to be a joke — `맑은기계공` is a handle. A sentence is not, so it draws its
+    modifiers from here instead, and `맑은` sits in front of a place or a drink and never
+    in front of a mechanic.
+    """
+
+    subject: tuple[NounClass, ...]
+    """Classes a noun has to belong to to carry one of these."""
+
+    words: WordPool
+    """Base forms, which `agree` reshapes in a language that inflects."""
+
+    themes: tuple[WordTheme, ...] | None = None
+    """The themes it may belong to, when a class is too wide.
+
+    A soup is `매콤한` and a tea is not, though both are edible.
+    """
 
 
 CopulaSide = Literal["head", "tail"]
@@ -136,6 +284,13 @@ class SentencePart:
     head: str = ""
     """Written in front of the phrase (`in`, `在`, `is`)."""
 
+    past_head: str = ""
+    """What `head` becomes in a past-tense sentence.
+
+    For a language whose auxiliary or copula carries the tense: English `does` is `did`
+    and `is` is `was`, Spanish `es` is `era`. Left out where the head does not change.
+    """
+
     tail: str = ""
     """Written after it (`가`, `が`, `里`)."""
 
@@ -144,6 +299,14 @@ class SentencePart:
 
     That is the whole of Korean particle alternation — `사자가` beside `사슴이` — and a
     language whose particles do not alternate leaves it out.
+    """
+
+    tail_liquid: str = ""
+    """Used instead of either when the word in front of it ends on `ㄹ`.
+
+    For the one Korean particle that treats that consonant as a vowel: `시장으로` and
+    `마을로` are `로` after a vowel, `으로` after a consonant, and `로` again after `ㄹ`.
+    Left out by every other particle.
     """
 
     modifiable: bool = False
@@ -214,6 +377,55 @@ class SentenceFrame:
     That is Chinese `吗`, Japanese `か` and Vietnamese `không` — none of which is a
     phrase, and none of which any slot could carry.
     """
+
+    fields: tuple[VerbField, ...] | None = None
+    """The fields the verb of this shape may come from, for a shape only some verbs can head.
+
+    A destination is the reason: `시장으로` wants a verb that goes somewhere and `시장에`
+    one that arrives, and `시장으로 웃는다` is neither.
+    """
+
+
+@dataclass(frozen=True, slots=True)
+class SentenceTimes:
+    """When something happens, written whole, sorted by what a paragraph has to know.
+
+    `day` is the phases of a day in the order they come, from dawn to midnight, because a
+    story told across several sentences moves forward through them and never back. `any`
+    is what fits every tense — a season, a weekend. `past` and `present` are the ones
+    that name a tense, and a sentence takes only the pool of the tense it is in.
+    """
+
+    day: WordPool
+    any: WordPool
+    past: WordPool | None = None
+    present: WordPool | None = None
+
+
+@dataclass(frozen=True, slots=True)
+class SentencePastMark:
+    """How the language marks the past when it does not inflect its verb for it.
+
+    Vietnamese writes `đã` in front (`con mèo đã chạy`) and Chinese `了` behind
+    (`狮子跑了`), and a language that conjugates leaves it out and writes `past` on its
+    groups instead.
+    """
+
+    head: str = ""
+    tail: str = ""
+
+
+@dataclass(frozen=True, slots=True)
+class SentenceJoin:
+    """How two clauses become one sentence: `돌아와서 사과를 먹었다`, `came home and ate`.
+
+    Either the first clause's predicate takes the `"linking"` form its group declares, or
+    a word is written between the two — a language declares whichever its grammar does,
+    and one that declares neither joins nothing.
+    """
+
+    form: PredicateForm | None = None
+    word: str | None = None
 
 
 SentenceArticles = Mapping[WordGender, tuple[tuple[str, str], ...]]
@@ -387,11 +599,24 @@ class SentenceLanguageData:
     states: Sequence[StateGroup]
     """The predicate adjectives, grouped by what they can describe."""
 
-    manners: WordPool
-    """How something is done, written as the language writes it (`조용히`)."""
+    modifiers: Sequence[ModifierGroup]
+    """The modifiers a noun phrase may carry, by what they can describe."""
 
-    times: WordPool
+    manners: Sequence[ModifierGroup]
+    """How something is done (`조용히`), grouped by what can do it that way.
+
+    A fox walks `부지런히` and a river does not flow so.
+    """
+
+    times: SentenceTimes
     """When it happens, written whole, particle and all (`새벽에`)."""
+
+    homes: WordPool
+    """Where the hero of a story comes back to (`집`, `house`, `家`).
+
+    Bare nouns, and the destination frame writes its own particle or preposition around
+    one.
+    """
 
     connectives: SentenceConnectives
     """What a sentence opens on when it follows another one, by what it claims."""
@@ -436,7 +661,7 @@ class SentenceLanguageData:
     a level.
     """
 
-    openers: Mapping[SentenceMark, str] = field(default_factory=dict)
+    openers: Mapping[SentenceMark, str] = attribute(default_factory=dict)
     """What a sentence opens on, for a language that marks the type at both ends.
 
     Spanish `¿` and `¡` are the only ones here, and every other language leaves it out.
@@ -448,6 +673,22 @@ class SentenceLanguageData:
     Spanish, Italian and Russian inflect both; German inflects only the attributive
     form, so `der Wal ist blau` keeps the base word.
     """
+
+    past_agreement: WordAgreement | None = None
+    """How a past-tense verb agrees with its subject, in a language where it does.
+
+    Russian is the one: `бежал` beside `бежала`, and `вернулся` beside `вернулась`. The
+    same rule shape `word/data`'s `agreement` has, applied to the verb's past form.
+    """
+
+    past_mark: SentencePastMark | None = None
+    """What marks the past beside the verb, for a language that does not put it on the verb.
+
+    Left out by every language that writes `past` on its groups.
+    """
+
+    join: SentenceJoin | None = None
+    """How two clauses are written as one sentence. Left out by a language that does not."""
 
     pronounless: tuple[NounClass, ...] = ()
     """Noun classes the language's written pronouns are wrong for.

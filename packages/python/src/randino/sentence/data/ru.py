@@ -1,10 +1,17 @@
-"""Russian sentence grammar: the verbs, the predicates and the shapes."""
+"""The ru sentence grammar: the verbs, the predicates and the shapes.
+
+Ported verbatim from the JavaScript package; see CLAUDE.md.
+"""
 
 from randino._internal.parse import words
 from randino.sentence.data._types import (
+    ModifierGroup,
+    PredicateTense,
     SentenceFrame,
+    SentenceJoin,
     SentenceLanguageData,
     SentencePart,
+    SentenceTimes,
     StateGroup,
     VerbGroup,
 )
@@ -12,73 +19,197 @@ from randino.sentence.data._types import (
 RU = SentenceLanguageData(
     space=" ",
     capitalize=True,
-    terminators={
-        "statement": ".",
-        "question": "?",
-        "exclamation": "!",
-        "trailing": "…",
-    },
+    terminators={"statement": ".", "question": "?", "exclamation": "!", "trailing": "…"},
     quotes={"double": ("«", "»"), "single": ("„", "“")},
     predicate_agrees=True,
+    past_agreement={
+        "f": (("лся", "лась"), ("л", "ла")),
+        "n": (("лся", "лось"), ("л", "ло")),
+    },
     verbs=(
         VerbGroup(
+            field="rise",
             subject=("creature", "person"),
-            words=words("""
-                бежит идёт прыгает плывёт летит ползёт возвращается уходит останавливается
-                отдыхает спит смеётся плачет поёт танцует прячется ждёт стоит сидит катится
-                бродит проходит приближается слушает
-            """),
+            words=words("просыпается встаёт поднимается"),
+            past=PredicateTense(
+                words=words("проснулся встал поднялся"),
+            ),
         ),
         VerbGroup(
-            subject=("place", "event"),
-            words=words("""
-                светится течёт темнеет светлеет углубляется затихает
-            """),
+            field="go",
+            subject=("creature", "person"),
+            words=words("направляется удаляется отправляется спешит"),
+            past=PredicateTense(
+                words=words("направился удалился отправился поспешил"),
+            ),
         ),
         VerbGroup(
+            field="arrive",
+            subject=("creature", "person"),
+            words=words("возвращается прибывает появляется"),
+            past=PredicateTense(
+                words=words("вернулся прибыл появился"),
+            ),
+        ),
+        VerbGroup(
+            field="move",
+            subject=("creature", "person"),
+            words=words("бежит прыгает плывёт летит ползёт бродит проходит гуляет шагает"),
+            past=PredicateTense(
+                words=words("бежал прыгал плыл летел ползал бродил проходил гулял шагал"),
+            ),
+        ),
+        VerbGroup(
+            field="wait",
+            subject=("creature", "person"),
+            words=words("ждёт прячется оглядывается медлит останавливается"),
+            past=PredicateTense(
+                words=words("ждал прятался оглядывался медлил остановился"),
+            ),
+        ),
+        VerbGroup(
+            field="rest",
+            subject=("creature", "person"),
+            words=words("отдыхает сидит лежит прислоняется устраивается"),
+            past=PredicateTense(
+                words=words("отдыхал сидел лежал прислонился устроился"),
+            ),
+        ),
+        VerbGroup(
+            field="sleep",
+            subject=("creature", "person"),
+            words=words("спит дремлет засыпает"),
+            past=PredicateTense(
+                words=words("спал дремал заснул"),
+            ),
+        ),
+        VerbGroup(
+            field="express",
+            subject=("creature", "person"),
+            words=words("смеётся плачет зевает вздыхает улыбается напевает бормочет кричит"),
+            past=PredicateTense(
+                words=words("смеялся плакал зевал вздыхал улыбался напевал бормотал кричал"),
+            ),
+        ),
+        VerbGroup(
+            field="play",
+            subject=("creature", "person"),
+            words=words("танцует поёт катается играет резвится подпрыгивает"),
+            past=PredicateTense(
+                words=words("танцевал пел катался играл резвился подпрыгивал"),
+            ),
+        ),
+        VerbGroup(
+            field="search",
+            subject=("creature", "person"),
+            words=words("ищет роется осматривается шарит"),
+            past=PredicateTense(
+                words=words("искал рылся осматривался шарил"),
+            ),
+        ),
+        VerbGroup(
+            field="change",
+            subject=("place",),
+            words=words("успокаивается темнеет светлеет пустеет наполняется оживает"),
+            past=PredicateTense(
+                words=words("успокоился потемнел посветлел опустел наполнился ожил"),
+            ),
+        ),
+        VerbGroup(
+            field="change",
+            subject=("event",),
+            words=words("""
+                светится струится углубляется начинается заканчивается длится проходит
+            """),
+            past=PredicateTense(
+                words=words("светился струился углубился начался закончился длился проходил"),
+            ),
+        ),
+        VerbGroup(
+            field="change",
             subject=("thing", "vehicle"),
-            words=words("""
-                качается блестит падает катится клонится стареет
-            """),
+            words=words("качается блестит падает катится клонится стареет"),
+            past=PredicateTense(
+                words=words("качался блестел упал катился клонился старел"),
+            ),
         ),
         VerbGroup(
+            field="move",
             subject=("vehicle",),
-            words=words("""
-                едет останавливается проезжает возвращается отправляется скользит
-            """),
+            words=words("едет останавливается проезжает возвращается отправляется скользит"),
+            past=PredicateTense(
+                words=words("ехал останавливался проезжал возвращался отправлялся скользил"),
+            ),
         ),
         VerbGroup(
+            field="change",
             subject=("idea", "event"),
-            words=words("""
-                расходится исчезает остаётся плывёт нарастает
-            """),
+            words=words("расходится исчезает остаётся плывёт нарастает"),
+            past=PredicateTense(
+                words=words("расходился исчезал остался плыл нарастал"),
+            ),
         ),
         VerbGroup(
+            field="change",
             subject=("plant",),
-            words=words("""
-                растёт вянет цветёт качается тянется
-            """),
+            words=words("подрастает вянет расцветает качается тянется"),
+            past=PredicateTense(
+                words=words("подрастал вял расцветал качался тянулся"),
+            ),
         ),
         VerbGroup(
+            field="change",
             subject=("body",),
-            words=words("""
-                дрожит движется немеет твердеет
-            """),
+            words=words("дрожит движется немеет твердеет"),
+            past=PredicateTense(
+                words=words("дрожал двигался немел твердел"),
+            ),
         ),
         VerbGroup(
+            field="change",
             subject=("edible",),
-            words=words("""
-                зреет остывает кипит тает портится
-            """),
+            words=words("зреет остывает кипит тает портится"),
+            past=PredicateTense(
+                words=words("зрел остыл кипел растаял испортился"),
+            ),
         ),
     ),
     states=(
         StateGroup(
             subject=("creature", "person"),
             words=words("""
-                большой маленький быстрый медленный тихий шумный смелый ленивый голодный сонный
-                дикий кроткий умный
+                большой маленький быстрый медленный тихий шумный смелый ленивый дикий кроткий умный
             """),
+        ),
+        StateGroup(
+            subject=("creature", "person"),
+            condition="hungry",
+            words=words("голодный"),
+        ),
+        StateGroup(
+            subject=("creature", "person"),
+            condition="full",
+            words=words("сытый"),
+        ),
+        StateGroup(
+            subject=("creature", "person"),
+            condition="tired",
+            words=words("усталый сонный утомлённый"),
+        ),
+        StateGroup(
+            subject=("creature", "person"),
+            condition="rested",
+            words=words("бодрый свежий отдохнувший"),
+        ),
+        StateGroup(
+            subject=("creature", "person"),
+            condition="content",
+            words=words("довольный счастливый радостный спокойный"),
+        ),
+        StateGroup(
+            subject=("creature", "person"),
+            condition="restless",
+            words=words("скучающий любопытный беспокойный тревожный"),
         ),
         StateGroup(
             subject=(
@@ -93,69 +224,150 @@ RU = SentenceLanguageData(
                 "idea",
                 "body",
             ),
-            words=words("""
-                красивый странный новый редкий
-            """),
+            words=words("красивый странный новый редкий"),
         ),
         StateGroup(
             subject=("place", "event"),
-            words=words("""
-                широкий узкий спокойный глубокий тёмный светлый далёкий крутой
-            """),
+            words=words("широкий узкий спокойный глубокий тёмный светлый далёкий крутой"),
         ),
         StateGroup(
             subject=("thing", "vehicle"),
-            words=words("""
-                твёрдый лёгкий тяжёлый старый гладкий прозрачный прочный
-            """),
+            words=words("твёрдый лёгкий тяжёлый старый гладкий прозрачный прочный"),
         ),
         StateGroup(
             subject=("edible",),
-            words=words("""
-                сладкий солёный острый кислый горячий холодный
-            """),
+            words=words("сладкий солёный острый кислый горячий холодный"),
         ),
         StateGroup(
             subject=("idea",),
-            words=words("""
-                простой ясный смутный вечный мимолётный
-            """),
+            words=words("простой ясный смутный вечный мимолётный"),
         ),
         StateGroup(
             subject=("plant",),
-            words=words("""
-                зелёный пышный душистый увядший
-            """),
+            words=words("зелёный пышный душистый увядший"),
         ),
         StateGroup(
             subject=("body",),
+            words=words("тёплый холодный больной жёсткий"),
+        ),
+    ),
+    modifiers=(
+        ModifierGroup(
+            subject=("creature", "person"),
             words=words("""
-                тёплый холодный больной жёсткий
+                смелый живой добрый занятой ленивый робкий умный молодой старый маленький большой
+                тихий весёлый терпеливый ловкий любопытный
+            """),
+        ),
+        ModifierGroup(
+            subject=("person",),
+            words=words("молодой добрый строгий серьёзный занятой честный"),
+        ),
+        ModifierGroup(
+            subject=("creature",),
+            words=words("быстрый свирепый ручной пухлый крохотный"),
+        ),
+        ModifierGroup(
+            subject=("edible",),
+            themes=("food",),
+            words=words("""
+                сладкий острый тёплый свежий хрустящий вкусный душистый горячий солёный мягкий
+                спелый сытный
+            """),
+        ),
+        ModifierGroup(
+            subject=("edible",),
+            themes=("drink",),
+            words=words("сладкий тёплый холодный прохладный горячий душистый свежий крепкий"),
+        ),
+        ModifierGroup(
+            subject=("thing", "vehicle"),
+            words=words("""
+                старый новый маленький большой лёгкий тяжёлый блестящий гладкий прозрачный твёрдый
+                красивый ценный древний
+            """),
+        ),
+        ModifierGroup(
+            subject=("vehicle",),
+            words=words("быстрый медленный крепкий"),
+        ),
+        ModifierGroup(
+            subject=("place",),
+            words=words("""
+                тихий широкий тёмный светлый чужой старый уютный укромный людный безмолвный далёкий
+                близкий пустой одинокий солнечный
+            """),
+        ),
+        ModifierGroup(
+            subject=("plant",),
+            words=words("""
+                зелёный пышный душистый молодой увядший высокий маленький нежный свежий
+            """),
+        ),
+        ModifierGroup(
+            subject=("idea",),
+            words=words("смутный старый новый чужой ясный ценный маленький странный"),
+        ),
+        ModifierGroup(
+            subject=("event",),
+            words=words("долгий короткий тихий солнечный пасмурный шумный внезапный"),
+        ),
+        ModifierGroup(
+            subject=("body",),
+            words=words("маленький холодный тёплый тонкий крепкий"),
+        ),
+        ModifierGroup(
+            subject=(
+                "creature",
+                "person",
+                "plant",
+                "thing",
+                "vehicle",
+                "place",
+                "event",
+                "idea",
+                "body",
+            ),
+            words=words("красивый таинственный чужой новый"),
+        ),
+    ),
+    manners=(
+        ModifierGroup(
+            subject=("creature", "person"),
+            words=words("""
+                тихо медленно быстро мягко вдруг едва одиноко ненадолго ровно смело осторожно жадно
+                спокойно весело терпеливо легко чётко бодро лениво упрямо охотно шумно неспешно
+            """),
+        ),
+        ModifierGroup(
+            subject=("plant", "edible", "thing", "vehicle", "place", "event", "idea", "body"),
+            words=words("""
+                тихо медленно мягко вдруг едва снова ещё мерно постепенно слабо понемногу всё_ещё
+                чуть
             """),
         ),
     ),
-    manners=words("""
-        тихо медленно быстро мягко вдруг едва снова вместе одиноко ещё ненадолго ровно смело
-        осторожно жадно спокойно весело терпеливо легко чётко бодро лениво упрямо охотно шумно мерно
-    """),
-    times=words("""
-        на_рассвете утром днём вечером ночью сегодня вчера завтра весной летом осенью зимой
-        в_выходные только_что иногда каждый_день в_сумерках в_полночь на_прошлой_неделе
-        на_следующей_неделе нынче давно в_праздники весь_день каждую_ночь
-    """),
+    times=SentenceTimes(
+        day=words("""
+            на_рассвете ранним_утром утром до_полудня в_полдень днём после_полудня в_сумерках
+            вечером ночью поздней_ночью в_полночь
+        """),
+        any=words("весной летом осенью зимой в_выходные в_праздники весь_день"),
+        past=words("вчера на_прошлой_неделе давно однажды в_тот_день в_ту_ночь"),
+        present=words("""
+            сегодня нынче только_что завтра на_следующей_неделе иногда каждый_день каждую_ночь
+        """),
+    ),
+    homes=words("дом"),
+    join=SentenceJoin(word="и"),
     connectives={
-        "additive": words("и_потом"),
-        "temporal": words("затем наконец потом тем_временем"),
+        "additive": words("и_потом кроме_того"),
+        "temporal": words("затем наконец потом тем_временем вскоре"),
         "contrastive": words("но однако а зато всё_же"),
         "causal": words("поэтому в_итоге значит"),
     },
-    interjections=words("""
-        ах, ох, эх, ух, боже, гляди, право, ой, ух_ты, батюшки, надо_же, эй,
-    """),
-    pronouns={"m": words("он"), "f": words("она"), "n": words("оно")},
-    # Nominative only, which is why there is neither an object nor a place here: a
-    # Russian noun changes its own ending for both, and the endings are the noun's
-    # own rather than a rule the pools could carry.
+    interjections=words("ах, ох, эх, ух, боже, гляди, право, ой, ух_ты, батюшки, надо_же, эй,"),
+    pronouns={"m": ("он",), "f": ("она",), "n": ("оно",)},
     frames=(
         SentenceFrame(
             (
@@ -175,7 +387,7 @@ RU = SentenceLanguageData(
         SentenceFrame(
             (
                 SentencePart("subject", modifiable=True),
-                SentencePart("state"),
+                SentencePart("state", past_head="был"),
             ),
             20,
         ),
@@ -204,9 +416,6 @@ RU = SentenceLanguageData(
             ),
             12,
         ),
-        # Russian orders its words freely, so an adverb or a time can open the sentence
-        # without anything else moving. That is the only room it has left: every other
-        # part would put a noun in a case its own ending changes for.
         SentenceFrame(
             (
                 SentencePart("manner"),
@@ -219,7 +428,7 @@ RU = SentenceLanguageData(
             (
                 SentencePart("time"),
                 SentencePart("subject", modifiable=True),
-                SentencePart("state"),
+                SentencePart("state", past_head="был"),
             ),
             12,
         ),

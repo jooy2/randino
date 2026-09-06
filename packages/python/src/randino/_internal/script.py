@@ -81,3 +81,34 @@ def ends_with_consonant(text: str) -> bool:
         return (code - _HANGUL_BASE) % _HANGUL_FINALS != 0
 
     return bool(LETTER.match(last)) and not VOWELS.match(last.lower())
+
+
+# The final consonant `ㄹ` is the eighth of the twenty-seven a syllable can close on, and
+# the one Korean treats as a vowel for one particle: `마을로`, never `마을으로`.
+_HANGUL_LIQUID = 8
+
+
+def ends_with_liquid(text: str) -> bool:
+    """Whether `text` ends on the Korean liquid `ㄹ`.
+
+    That is the one coda the particle `로` does not alternate for: `시장으로` and
+    `마을로`, both from one particle. Anything that is not a Hangul syllable reports
+    False.
+
+    Args:
+        text: The text to judge.
+
+    Returns:
+        True when the last syllable closes on `ㄹ`.
+    """
+    trimmed = text.rstrip()
+
+    if not trimmed:
+        return False
+
+    code = ord(trimmed[-1])
+
+    return (
+        _HANGUL_BASE <= code <= _HANGUL_LAST
+        and (code - _HANGUL_BASE) % _HANGUL_FINALS == _HANGUL_LIQUID
+    )

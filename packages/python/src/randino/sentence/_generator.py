@@ -20,6 +20,7 @@ not — no tag on any noun, because `THEME_CLASS` already knows what a theme nam
 """
 
 import random
+import sys
 from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass, field, replace
 from types import MappingProxyType
@@ -33,7 +34,7 @@ from randino._internal.generate import (
     resolve_prefix,
     resolve_realism,
 )
-from randino._internal.script import ends_with_consonant
+from randino._internal.script import ends_with_consonant, ends_with_liquid
 from randino._internal.utils import chance, clamp, pick, pick_weighted
 from randino._types import (
     RandRealism,
@@ -42,7 +43,9 @@ from randino._types import (
     SentenceShapeOption,
     SentenceSlot,
     SentenceSlotOption,
+    SentenceStory,
     SentenceStyle,
+    SentenceTense,
     SentenceType,
     SentenceTypeOption,
     WordLanguage,
@@ -53,17 +56,32 @@ from randino._types import (
 from randino.constants import RAND_SENTENCE_COUNT_MAX, RAND_SENTENCE_LENGTH_MAX
 from randino.name._generator import draw_name
 from randino.name.name_length_range import name_length_range
+from randino.sentence._story import (
+    Beat,
+    JoinSide,
+    hero_classes_for,
+    item_themes_for,
+    pick_story,
+    plan,
+    stories_for,
+    unjoined,
+)
+from randino.sentence._story import Plan as StoryPlan
 from randino.sentence.data import SENTENCE_DATA, THEME_CLASS
 from randino.sentence.data._types import (
+    Condition,
     ConnectiveKind,
     NounClass,
     PredicateForm,
+    PredicateTense,
     SentenceFrame,
+    SentenceJoin,
     SentenceLanguageData,
     SentenceMark,
     SentenceMood,
     SentencePart,
     StateGroup,
+    VerbField,
     VerbGroup,
 )
 from randino.word._generator import (
@@ -77,10 +95,18 @@ from randino.word._generator import (
     theme_of,
 )
 from randino.word.data import WORD_DATA, WORD_LANGUAGES, WORD_THEMES
-from randino.word.data._types import WordGender, WordLanguageData, WordPool
+from randino.word.data._types import WordAgreement, WordGender, WordLanguageData, WordPool
 
 FIT_ATTEMPTS = 14
 """How many sentences to build before settling for the closest fit found."""
+
+STORY_ATTEMPTS = 3
+"""How many times a story is told before settling for the closest fit found.
+
+A story is sentences drawn one after another against a range shared out between them,
+and a run of short sentences leaves the last one a gap no shape can fill. Telling the
+whole story again is what closes that.
+"""
 
 THEME_CHANCE = 65
 """How often a fresh subject is drawn from the topic's own theme.
@@ -94,8 +120,21 @@ MODIFY_CHANCE = 45
 Length can override it in both directions — see `_modify_chance_for`.
 """
 
-NOUN_SLOTS: tuple[SentenceSlot, ...] = ("subject", "object", "place", "quantity")
+STORY_MODIFY_CHANCE = 55
+"""The same in a sentence of a story, a little more often than in a lone one.
+
+Its modifiers are chosen for the noun they describe, and a story told in bare nouns
+reads as a list of events rather than as prose.
+"""
+
+DAY_STRIDE = 4
+"""How many phases of the day one sentence may move on from the last one named."""
+
+NOUN_SLOTS: tuple[SentenceSlot, ...] = ("subject", "object", "place", "destination", "quantity")
 """The slots that are a noun phrase, and so draw from the word pools."""
+
+UNSTORIED: tuple[SentenceSlot, ...] = ("quantity", "money", "date", "clock")
+"""The slots a story never writes: an amount, a count, a date and a clock."""
 
 MONEY_CLASS: NounClass = "idea"
 """The class money belongs to, which decides the verbs it can stand beside.
@@ -335,6 +374,15 @@ class Settings:
     """How the sentences address their reader, or None when the caller left it to the
     generator.
     """
+
+    tense: SentenceTense | None
+    """When it all happened, or None when the caller left it to the generator."""
+
+    story: SentenceStory | None
+    """The story a result of several sentences follows, or None for any of them."""
+
+    typed: bool
+    """Whether the caller named the kinds themselves. A story writes statements otherwise."""
 
     min_length: int | None = None
     max_length: int | None = None
@@ -584,6 +632,57 @@ class Draw:
     """
 
     follow: "Follow | None"
+    tense: SentenceTense
+    """The tense every sentence of the result is in."""
+
+    beat: "BeatDraw | None"
+    """What a story asks of this sentence, or None for one drawn on its own terms."""
+
+    link: JoinSide | None
+    """Whether this sentence is the first or the second clause of one, or whole."""
+
+    day_at: int
+    """The latest phase of the day the result has reached, as an index into `times.day`.
+
+    -1 before it has named one. A story never goes back to the morning.
+    """
+
+
+@dataclass(frozen=True, slots=True)
+class BeatDraw:
+    """What one sentence of a story has to be.
+
+    Which fields its verb may come from, which condition a state sentence says, which
+    parts the shape has to carry and which it is better with, and what the nouns of the
+    story are.
+    """
+
+    headed_by_state: bool
+    """Whether the shape is headed by a state rather than a verb."""
+
+    fields: tuple[VerbField, ...]
+    """The fields the verb may be drawn from. Empty for a state sentence."""
+
+    describes: bool
+    """Whether this is a state sentence, whose predicate has to say `condition`."""
+
+    condition: Condition | None
+    """The condition a state sentence asserts, or None for a plain trait."""
+
+    wants: tuple[SentenceSlot, ...]
+    """The parts the shape has to carry."""
+
+    prefers: tuple[SentenceSlot, ...]
+    """The parts the shape is better for carrying."""
+
+    item: WordTheme | None
+    """The theme the story's item comes from, for a phrase that draws it."""
+
+    places: tuple[WordTheme, ...]
+    """The themes the story's places come from."""
+
+    subject: tuple[WordTheme, ...] | None
+    """The themes the subject may come from, when the story has decided it."""
 
 
 @dataclass(frozen=True, slots=True)
@@ -693,8 +792,40 @@ def _matches_slots(frame: SentenceFrame, slots: tuple[SentenceSlot, ...] | str) 
     return any(part.slot in slots for part in frame.parts)
 
 
+def _story_frame(frame: SentenceFrame, beat: BeatDraw) -> bool:
+    """Whether a shape can be one sentence of a story.
+
+    It has to be headed the way the step is — a verb for something done, a state for a
+    description — it may not count or price or date anything, its verb has to be one the
+    step's fields can supply, and a change of scene carries no place of its own:
+    `숲이 숲에서 조용해졌다` is the sentence that rule keeps out.
+    """
+    if any(part.slot in UNSTORIED or part.copula is not None for part in frame.parts):
+        return False
+
+    if any(part.slot == "state" for part in frame.parts) != beat.headed_by_state:
+        return False
+
+    if frame.fields is not None and not any(field in beat.fields for field in frame.fields):
+        return False
+
+    # A shape that has somewhere the story did not ask for — a destination for a hero who
+    # is not going anywhere, an object for a hero with empty hands — would draw a noun the
+    # story does not know.
+    known = (*beat.wants, *beat.prefers)
+
+    return all(
+        part.slot in known
+        for part in frame.parts
+        if part.slot in ("object", "destination", "place")
+    )
+
+
 def _frames_for(
-    data: SentenceLanguageData, settings: Settings, mood: SentenceMood
+    data: SentenceLanguageData,
+    settings: Settings,
+    mood: SentenceMood,
+    beat: BeatDraw | None = None,
 ) -> list[SentenceFrame]:
     """The shapes one sentence may take.
 
@@ -705,9 +836,11 @@ def _frames_for(
     have — that is not a fallback so much as the point: `¿El león corre?` is the
     statement.
     """
-    by_mood = [frame for frame in data.frames if frame.mood == mood]
-    moody = by_mood or [frame for frame in data.frames if frame.mood == "statement"]
-    moodly = moody or list(data.frames)
+    storied = [frame for frame in data.frames if _story_frame(frame, beat)] if beat else []
+    shaped = storied or list(data.frames)
+    by_mood = [frame for frame in shaped if frame.mood == mood]
+    moody = by_mood or [frame for frame in shaped if frame.mood == "statement"]
+    moodly = moody or shaped
     # A counted shape has no room for a name: its quantity is its subject, and
     # `서호 3명` counts somebody's name, which is not a thing a sentence says. Asked for
     # a name, the shapes that cannot carry one are left out.
@@ -720,7 +853,20 @@ def _frames_for(
         if settings.slots == "all"
         else [frame for frame in usable if _matches_slots(frame, settings.slots)]
     )
-    allowed = by_slots or usable
+    sloted = by_slots or usable
+    # A story's sentence has to carry what the story put in it — the thing the hero is
+    # holding, the place they are going — and a shape with no room for that is a shape
+    # that would draw something else. Fallen back on rather than failed.
+    asked = (
+        [
+            frame
+            for frame in sloted
+            if all(any(part.slot == slot for part in frame.parts) for slot in beat.wants)
+        ]
+        if beat is not None and beat.wants
+        else sloted
+    )
+    allowed = asked or sloted
 
     if settings.shape == "all":
         return allowed
@@ -783,6 +929,8 @@ class Requirement:
 
     theme: WordTheme | None = None
     known: bool = True
+    bare: bool = False
+    """True for a word written on its own, with no modifier in front of it."""
 
 
 @dataclass(frozen=True, slots=True)
@@ -842,19 +990,36 @@ def _classify(language: WordLanguage, word: str) -> Requirement:
             slots.append("state")
             break
 
-    manner = _entry_of(data.manners, word)
+    manner = next(
+        (found for group in data.manners if (found := _entry_of(group.words, word)) is not None),
+        None,
+    )
 
     if manner is not None:
         written = manner
         slots.append("manner")
 
-    time = _entry_of(data.times, word)
+    time = next(
+        (found for pool in _time_pools(data) if (found := _entry_of(pool, word)) is not None),
+        None,
+    )
 
     if time is not None:
         written = time
         slots.append("time")
 
-    modifier = _entry_of(lexicon.adjectives, word) or _entry_of(lexicon.actions, word)
+    modifier = (
+        next(
+            (
+                found
+                for group in data.modifiers
+                if (found := _entry_of(group.words, word)) is not None
+            ),
+            None,
+        )
+        or _entry_of(lexicon.adjectives, word)
+        or _entry_of(lexicon.actions, word)
+    )
 
     if modifier is not None:
         written = _plain(lexicon, modifier)
@@ -960,7 +1125,7 @@ def _required_at(frame: SentenceFrame, plan: Plan, slot: SentenceSlot) -> Requir
 _NOUN_CACHE: dict[tuple[WordLanguage, WordTheme], WordPool] = {}
 _BOUNDS_CACHE: dict[WordLanguage, dict[str, tuple[int, int]]] = {}
 _SPAN_CACHE: dict[tuple[WordLanguage, WordTheme, int], tuple[int, int]] = {}
-_AGREED_CACHE: dict[tuple[WordLanguage, WordGender], WordPool] = {}
+_AGREED_CACHE: dict[tuple[WordLanguage, WordTheme | None, WordGender | None], WordPool] = {}
 
 
 def _nouns_of(language: WordLanguage, theme: WordTheme) -> WordPool:
@@ -1021,30 +1186,68 @@ def _noun_span(language: WordLanguage, theme: WordTheme, invent: int) -> tuple[i
     return span
 
 
-def _agreed_modifiers(language: WordLanguage, gender: WordGender | None) -> WordPool:
-    """The modifiers of a language, in the form they take beside a noun of `gender`.
+def _modifiers_for(
+    language: WordLanguage, theme: WordTheme | None, gender: WordGender | None
+) -> WordPool:
+    """The modifiers a noun of `theme` may carry, agreed for a noun of `gender`.
 
-    Written out rather than agreed after the fact, because a length budget has to see
-    the word the sentence will actually carry: German `blau` is `blauer` in front of a
-    masculine noun, and choosing by the four letters and writing the six is how a
-    sentence quietly stepped outside its range.
+    Drawn from the sentence data's own groups rather than from the nickname pools, so that
+    `맑은` goes in front of a drink and never in front of a mechanic; a noun no pool holds
+    takes any of them. Written out rather than agreed after the fact, because a length
+    budget has to see the word the sentence will actually carry: German `blau` is
+    `blauer` in front of a masculine noun.
     """
     lexicon = WORD_DATA[language]
-
-    if gender is None or lexicon.agreement is None:
-        return lexicon.adjectives
-
-    key = (language, gender)
+    data = SENTENCE_DATA[language]
+    # Keyed by the theme rather than the class, because a group may narrow itself to
+    # themes: a soup and a tea are both edible and take different words.
+    key = (language, theme, gender)
     cached = _AGREED_CACHE.get(key)
 
     if cached is not None:
         return cached
 
-    agreed = tuple(agree(lexicon, word, gender) for word in lexicon.adjectives)
+    cls = THEME_CLASS[theme] if theme is not None else None
+    groups = (
+        list(data.modifiers)
+        if cls is None
+        else [
+            group
+            for group in data.modifiers
+            if cls in group.subject and (group.themes is None or theme in group.themes)
+        ]
+    )
+    base = tuple(dict.fromkeys(word for group in groups for word in group.words))
+    agreed = (
+        tuple(agree(lexicon, word, gender) for word in base)
+        if gender is not None and lexicon.agreement is not None
+        else base
+    )
 
     _AGREED_CACHE[key] = agreed
 
     return agreed
+
+
+def _predicate_pools(
+    words: WordPool, forms: Mapping[PredicateForm, WordPool], past: PredicateTense | None
+) -> list[WordPool]:
+    """Every pool a group's predicate can be written from, in either tense."""
+    pools = [words, *(_endings(pool) for pool in forms.values())]
+
+    if past is not None:
+        pools.extend([past.words, *(_endings(pool) for pool in past.forms.values())])
+
+    return pools
+
+
+def _time_pools(data: SentenceLanguageData) -> list[WordPool]:
+    """Every pool a time adverbial can come from, whatever the tense."""
+    return [
+        pool
+        for pool in (data.times.day, data.times.any, data.times.past, data.times.present)
+        if pool
+    ]
 
 
 def _span(pools: Sequence[WordPool]) -> tuple[int, int]:
@@ -1074,24 +1277,31 @@ def _slot_bounds(language: WordLanguage) -> dict[str, tuple[int, int]]:
         "object": noun,
         "place": noun,
         "quantity": noun,
+        "destination": noun,
         # Every form a predicate can take, not only the plain statement's: a question
         # form is a different length, and the shape is chosen against these.
         "verb": _span(
-            [group.words for group in data.verbs]
-            + [_endings(pool) for group in data.verbs for pool in group.forms.values()]
+            [
+                pool
+                for group in data.verbs
+                for pool in _predicate_pools(group.words, group.forms, group.past)
+            ]
         ),
         "state": _span(
-            [group.words for group in data.states]
-            + [_endings(pool) for group in data.states for pool in group.forms.values()]
+            [
+                pool
+                for group in data.states
+                for pool in _predicate_pools(group.words, group.forms, group.past)
+            ]
         ),
-        "manner": _span([data.manners]),
-        "time": _span([data.times]),
+        "manner": _span([group.words for group in data.manners]),
+        "time": _span(_time_pools(data)),
         "money": _money_span(data),
         "date": _calendar_span(data, "date"),
         "clock": _calendar_span(data, "clock"),
         "modifier": _span(
             [
-                _agreed_modifiers(language, gender)
+                _modifiers_for(language, None, gender)
                 for gender in (None, *(WORD_DATA[language].agreement or {}))
             ]
         ),
@@ -1138,7 +1348,7 @@ def _copula_span(part: SentencePart, data: SentenceLanguageData) -> tuple[int, i
         return (0, 0)
 
     group = data.calendar.copula
-    low, high = _span([group.words, *(_endings(pool) for pool in group.forms.values())])
+    low, high = _span(_predicate_pools(group.words, group.forms, group.past))
     gap = len(data.space) if part.copula == "head" else 0
 
     return (low + gap, high + gap)
@@ -1270,31 +1480,72 @@ def _pick_frame(
     return frames[-1]
 
 
+def _accepts_object(group: VerbGroup, theme: WordTheme) -> bool:
+    """Whether a verb group takes a noun of this theme as its object."""
+    if group.object is None or THEME_CLASS[theme] not in group.object:
+        return False
+
+    return group.object_themes is None or theme in group.object_themes
+
+
+def _object_themes_of(group: VerbGroup, beat: BeatDraw | None) -> tuple[WordTheme, ...]:
+    """The themes a verb group's object may come from.
+
+    Its classes, narrowed to the themes it names when it names any, and to the story's
+    item when there is one.
+    """
+    if beat is not None and beat.item is not None:
+        return (beat.item,) if _accepts_object(group, beat.item) else ()
+
+    by_class = _themes_for_classes(WORD_THEMES, group.object or ())
+
+    if group.object_themes is None:
+        return by_class
+
+    return tuple(theme for theme in by_class if theme in group.object_themes)
+
+
 def _verb_groups_for(
     data: SentenceLanguageData,
     frame: SentenceFrame,
     themes: Sequence[WordTheme],
     plan: Plan,
+    beat: BeatDraw | None = None,
 ) -> list[VerbGroup]:
     """The verb groups one sentence may use.
 
     Transitive exactly when the shape has an object, able to take the subject the shape
-    will be given, and — when a word was required — the group that word belongs to.
+    will be given, of the field a story step settled on, and — when a word was required —
+    the group that word belongs to.
     """
     # A quantity is an object with a number on it, and an amount is an object of the
     # class money belongs to — unless the quantity is what the sentence is about, in
     # which case it is the subject and the verb takes nothing.
     wants_object = _takes_object(frame)
     wants_money = any(part.slot == "money" for part in frame.parts)
+    wants_destination = any(part.slot == "destination" for part in frame.parts)
     subject = _required_at(frame, plan, "subject")
     obj = _required_at(frame, plan, "object")
     verb = _required_at(frame, plan, "verb")
+    # A shape that goes somewhere wants a verb that goes, and a story step wants a verb
+    # of the field it settled on.
+    fields = beat.fields if beat is not None and beat.fields else frame.fields
     usable = []
 
     for group in data.verbs:
         if (group.object is not None) != wants_object:
             continue
-
+        if fields is not None and group.field not in fields:
+            continue
+        # A group that needs a part is drawn only for a shape that has it — and a shape
+        # that has a destination is drawn only for the groups that go somewhere, because
+        # `leaves to the market` is what the rest of the field writes there.
+        if group.requires is not None and not any(
+            part.slot == group.requires for part in frame.parts
+        ):
+            continue
+        if wants_destination and group.requires != "destination":
+            continue
         if wants_money and MONEY_CLASS not in (group.object or ()):
             continue
         if verb is not None and verb.word not in group.words:
@@ -1305,15 +1556,18 @@ def _verb_groups_for(
             and THEME_CLASS[subject.theme] not in group.subject
         ):
             continue
+        if obj is not None and obj.theme is not None and not _accepts_object(group, obj.theme):
+            continue
         if (
-            obj is not None
-            and obj.theme is not None
-            and (group.object is None or THEME_CLASS[obj.theme] not in group.object)
+            beat is not None
+            and beat.item is not None
+            and group.object is not None
+            and not _accepts_object(group, beat.item)
         ):
             continue
         if not _themes_for_classes(themes, group.subject):
             continue
-        if group.object is not None and not _themes_for_classes(WORD_THEMES, group.object):
+        if group.object is not None and not _object_themes_of(group, beat):
             continue
 
         usable.append(group)
@@ -1326,6 +1580,7 @@ def _state_groups_for(
     themes: Sequence[WordTheme],
     frame: SentenceFrame,
     plan: Plan,
+    beat: BeatDraw | None = None,
 ) -> list[StateGroup]:
     """The same, for a shape headed by an adjective rather than a verb."""
     subject = _required_at(frame, plan, "subject")
@@ -1334,6 +1589,11 @@ def _state_groups_for(
 
     for group in data.states:
         if state is not None and state.word not in group.words:
+            continue
+        # A story's description says what is true of the hero just now, and a plain
+        # trait where nothing is: `배고프다` where the hero is hungry, and never
+        # `배부르다` there.
+        if beat is not None and beat.describes and group.condition != beat.condition:
             continue
         if (
             subject is not None
@@ -1394,6 +1654,12 @@ class Built:
     place changes every line is not one paragraph.
     """
 
+    field: VerbField | None
+    """The field its verb came from, for a story to know what it did."""
+
+    day_at: int
+    """The phase of the day it named, as an index into `times.day`, or -1."""
+
 
 def _article_for(data: SentenceLanguageData, gender: WordGender | None, following: str) -> str:
     """The article a phrase opens with, by the noun's gender and the word after it."""
@@ -1443,6 +1709,7 @@ def _noun_phrase(
     high: int,
     span: tuple[int, int],
     count: str,
+    described: WordTheme | None,
 ) -> Phrase:
     """Build one noun phrase: an article, the noun, and a modifier where there is room.
 
@@ -1450,7 +1717,9 @@ def _noun_phrase(
     before the noun is drawn — its length is not known until the noun's gender is, so
     the longest one the language has is what gets set aside — and whatever the noun
     leaves over is what the modifier is drawn to fit. `count` is what a counted phrase
-    writes beside its noun, on the side the language puts it.
+    writes beside its noun, on the side the language puts it. `described` is the theme
+    the modifier is chosen for, which is the noun's own — or None for a word no pool
+    holds, which takes any modifier the language has.
     """
     lexicon = WORD_DATA[language]
     pool = _nouns_of(language, theme)
@@ -1458,7 +1727,7 @@ def _noun_phrase(
     _, noun_max = span
     # Measured against the base forms, because the noun that decides the gender has not
     # been drawn yet; the modifier itself is chosen from the agreed pool below.
-    mod_min, mod_max = pool_bounds(lexicon.adjectives)
+    mod_min, mod_max = pool_bounds(_modifiers_for(language, described, None))
     _, article_max = (0, 0) if bare else _article_span(data)
     overhead = article_max + space if article_max else 0
     mod_cost = mod_min + space if modify else 0
@@ -1474,7 +1743,7 @@ def _noun_phrase(
     if modify:
         room = high - overhead - len(drawn) - space
         want = low - overhead - len(drawn) - space
-        agreed = _agreed_modifiers(language, gender)
+        agreed = _modifiers_for(language, described, gender)
         modifier = (
             agree(lexicon, forced_modifier, gender)
             if forced_modifier
@@ -1559,13 +1828,16 @@ def _name_span(language: WordLanguage) -> tuple[int, int]:
 
 def _tail_of(part: SentencePart, phrase: str) -> str:
     """The particle a part writes after its phrase, in the form the phrase asks for."""
+    if part.tail_liquid and ends_with_liquid(phrase):
+        return part.tail_liquid
+
     if part.tail_alt and ends_with_consonant(phrase):
         return part.tail_alt
 
     return part.tail
 
 
-def _modify_chance_for(distance: int, too_long: bool) -> int:
+def _modify_chance_for(distance: int, too_long: bool, storied: bool) -> int:
     """How often a noun phrase carries a modifier on this attempt.
 
     The first attempt leaves it to chance; after that, a sentence that overshot the
@@ -1573,25 +1845,46 @@ def _modify_chance_for(distance: int, too_long: bool) -> int:
     how the length range picks the shape rather than truncating a word.
     """
     if distance == 0:
-        return MODIFY_CHANCE
+        return STORY_MODIFY_CHANCE if storied else MODIFY_CHANCE
 
     return 0 if too_long else 100
 
 
 def _theme_for_part(
     slot: SentenceSlot,
-    object_classes: Sequence[NounClass] | None,
+    group: VerbGroup | None,
     themes: Sequence[WordTheme],
+    beat: BeatDraw | None,
 ) -> WordTheme:
     """The theme a phrase other than the subject draws from."""
     if slot in ("object", "quantity"):
-        usable = _themes_for_classes(WORD_THEMES, object_classes or ())
+        usable = _object_themes_of(group, beat) if group is not None else ()
 
         return pick(usable or WORD_THEMES)
 
-    places = _themes_for_classes(WORD_THEMES, ("place",))
+    # A story happens somewhere a story can happen — a market, a park — and not on Pluto,
+    # which is a place too as far as the classes know.
+    places = beat.places if beat is not None else _themes_for_classes(WORD_THEMES, ("place",))
 
     return pick(places or tuple(themes))
+
+
+def _agree_by(rules: WordAgreement, word: str, gender: WordGender | None) -> str:
+    """A word reshaped by ordered `(ending, replacement)` rules for a gender.
+
+    The same shape `word/data`'s agreement takes, applied to whatever pool a language
+    says agrees. Russian's past verbs are the reason it is its own function.
+    """
+    chosen = rules.get(gender) if gender is not None else None
+
+    if not chosen:
+        return word
+
+    for ending, replacement in chosen:
+        if word.endswith(ending):
+            return word[: len(word) - len(ending)] + replacement
+
+    return word
 
 
 def _form_of(
@@ -1599,32 +1892,80 @@ def _form_of(
     verb_group: VerbGroup | None,
     mark: SentenceMark,
     style: SentenceStyle,
+    tense: SentenceTense,
+    join: SentenceJoin | None,
 ) -> WordPool:
     """The predicates of a group, in the form this sentence ends on.
 
-    Each level falls back along its own chain to the plain statement the `words` already
-    are, so a group declares only what its language actually writes. Japanese declares
-    `"polite"` alone and it serves the formal level and the question too, because the
-    `か` that asks is the frame's tag rather than part of the verb.
+    The first clause of a two-clause sentence takes the form that links it to the next,
+    in a language that has one, and that form carries no tense, no mood and no level of
+    its own. The past has its own statement and its own forms, and a level the past does
+    not declare falls back along the same chain to the past statement — never to the
+    present. A group with no past at all is one whose language marks it beside the verb,
+    and it writes its present forms.
 
     Args:
         state_group: The state group heading the shape, or None.
         verb_group: The verb group heading it, or None.
         mark: The kind whose mark the sentence closes on.
         style: How the sentence addresses its reader.
+        tense: When the sentence happened.
+        join: How a first clause links to the next, when this is one.
 
     Returns:
         The pool the predicate is drawn from.
     """
     group: StateGroup | VerbGroup = state_group if state_group is not None else verb_group  # type: ignore[assignment]
+    linking = group.forms.get("linking")
+
+    if join is not None and join.form == "linking" and linking:
+        return tuple(_one_of(entry) for entry in linking)
+
+    tensed = group.past if tense == "past" and group.past is not None else group
 
     for key in FORM_CHAIN[style][mark]:
-        pool = group.forms.get(key)
+        pool = tensed.forms.get(key)
 
         if pool:
             return tuple(_one_of(entry) for entry in pool)
 
-    return group.words
+    return tensed.words
+
+
+def _manners_for(data: SentenceLanguageData, subject: NounClass) -> WordPool:
+    """The manners something of this class can do a thing in. Any of them, failing that."""
+    fitting = [group for group in data.manners if subject in group.subject]
+    groups = fitting or list(data.manners)
+
+    return tuple(dict.fromkeys(word for group in groups for word in group.words))
+
+
+def _time_for(
+    data: SentenceLanguageData,
+    tense: SentenceTense,
+    day_at: int,
+    opens: bool,
+    avoid: frozenset[str],
+    low: int,
+    high: int,
+) -> tuple[str, str, int]:
+    """When something happens, chosen against the tense and where the result is in its day.
+
+    A sentence that opens a result may set it in any time its tense allows: a season, a
+    habit, `yesterday` in the past and `these days` in the present. One that follows
+    another only moves the day forward — the next few phases of the day, so a story that
+    opened at dawn reaches noon before it reaches midnight.
+    """
+    times = data.times
+    day = [word for at, word in enumerate(times.day) if day_at < at <= day_at + DAY_STRIDE]
+    tensed = times.past if tense == "past" else times.present
+    free = [*times.any, *(tensed or ())] if opens else []
+    pool = [*day, *free]
+    usable = pool or [*times.day, *times.any]
+    fits = [word for word in usable if word not in avoid and low <= len(word) <= high]
+    drawn = pick(fits) if fits else (pick_word(tuple(usable), low, high, "") or pick(usable))
+
+    return drawn, drawn, times.day.index(drawn) if drawn in times.day else -1
 
 
 def _predicate_for(
@@ -1638,13 +1979,18 @@ def _predicate_for(
     low: int,
     high: int,
     avoid: frozenset[str],
-) -> tuple[str, str]:
-    """What a phrase that is not a noun phrase writes, and the word it is a form of.
+    tense: SentenceTense,
+    day_at: int,
+    opens: bool,
+    subject: NounClass,
+) -> tuple[str, str, int]:
+    """What a phrase that is not a noun phrase writes, its plain form, and its day phase.
 
     `avoid` holds what the result has already said, and the plain form is what it holds:
     `끓습니까` and `끓어` are one verb said twice, so remembering the written form would
     remember nothing. It is a preference and not a filter — the range comes first, and a
-    pool with nothing unused left inside it is drawn from as it always was.
+    pool with nothing unused left inside it is drawn from as it always was. The third
+    value is the phase of the day a time named, as an index into `times.day`, or -1.
     """
 
     def agreed(word: str) -> str:
@@ -1661,15 +2007,19 @@ def _predicate_for(
         return (
             agreed(predicates[at] if 0 <= at < len(predicates) else required.word),
             required.word,
+            -1,
         )
 
     if slot == "date":
-        return _date_text(data), ""
+        return _date_text(data), "", -1
 
     if slot == "clock":
-        return _clock_text(data), ""
+        return _clock_text(data), "", -1
 
-    pool = data.manners if slot == "manner" else data.times if slot == "time" else predicates
+    if slot == "time":
+        return _time_for(data, tense, day_at, opens, avoid, min(low, high), high)
+
+    pool = _manners_for(data, subject) if slot == "manner" else predicates
 
     def plainly(at: int) -> str:
         # A predicate is a form of the word at the same index of the group; an adverbial
@@ -1687,7 +2037,7 @@ def _predicate_for(
     )
     drawn = pick(fresh) if fresh else (pick_word(pool, least, high, "") or pick(pool))
 
-    return agreed(drawn), plainly(pool.index(drawn))
+    return agreed(drawn), plainly(pool.index(drawn)), -1
 
 
 def _compose(
@@ -1712,6 +2062,7 @@ def _compose(
     how the subject's gender is in hand before the adjective that has to agree with it.
     """
     follow = draw.follow
+    beat = draw.beat
     lexicon = WORD_DATA[language]
     themes = tuple(requested) or WORD_THEMES
     # A shape with a `state` part is headed by one and a shape with a `verb` part by
@@ -1720,6 +2071,7 @@ def _compose(
     copular = not any(part.slot in ("state", "verb") for part in frame.parts)
     headed = copular or any(part.slot == "state" for part in frame.parts)
     wants_object = _takes_object(frame)
+    wants_destination = any(part.slot == "destination" for part in frame.parts)
     # A shape whose predicate has nothing to say about the requested subject only
     # gets this far when no shape of the language did, so the fallback is the same
     # best effort every other narrowing here makes.
@@ -1730,34 +2082,42 @@ def _compose(
         states = (
             [data.calendar.copula]
             if copular and data.calendar is not None
-            else _state_groups_for(data, themes, frame, plan) or list(data.states)
+            else _state_groups_for(data, themes, frame, plan, beat) or list(data.states)
         )
         state_group = pick(states)
         subject_classes = state_group.subject
-        predicates = state_group.words
+        base = state_group.words
     else:
-        verbs = _verb_groups_for(data, frame, themes, plan) or [
-            group for group in data.verbs if (group.object is not None) == wants_object
+        verbs = _verb_groups_for(data, frame, themes, plan, beat) or [
+            group
+            for group in data.verbs
+            if (group.object is not None) == wants_object
+            and (group.requires is None or any(part.slot == group.requires for part in frame.parts))
+            and (not wants_destination or group.requires == "destination")
         ]
         verb_group = pick(verbs)
         subject_classes = verb_group.subject
-        predicates = verb_group.words
+        base = verb_group.words
 
-    # The same predicates, in the form this type of sentence ends on. Index-aligned
-    # with the plain words, which is what lets a required word be translated rather than
-    # written out in the wrong form.
-    base = predicates
-    predicates = _form_of(state_group, verb_group, draw.mark, draw.style)
+    # The same predicates, in the form this type of sentence ends on, in the tense the
+    # result is in — or in the form that links a first clause to the one after it.
+    # Index-aligned with the plain words, which is what lets a required word be
+    # translated rather than written out in the wrong form.
+    predicates = _form_of(
+        state_group,
+        verb_group,
+        draw.mark,
+        draw.style,
+        draw.tense,
+        data.join if draw.link == "first" else None,
+    )
     subject_themes = _themes_for_classes(themes, subject_classes)
     # Which part is the subject is the shape's business, not the slot's: a counted
-    # shape has no `subject` part and its quantity is the subject. Looking for a
-    # `subject` part regardless is how a word required into a counted subject lost its
-    # theme, and `사과` came out as `사과 9명` — nine people's worth of apple.
+    # shape has no `subject` part and its quantity is the subject.
     subject_slot = _subject_slot_of(frame)
     subject_required = _required_at(frame, plan, subject_slot)
     # A theme the caller named is honoured even when no verb group of the language
-    # has anything to say about it, the same way a shape it cannot make falls back
-    # rather than being answered with something else entirely.
+    # has anything to say about it.
     subject_theme = (
         subject_required.theme
         if subject_required is not None and subject_required.theme is not None
@@ -1766,10 +2126,15 @@ def _compose(
     # A sentence carrying on about the topic stands a pronoun where its subject would
     # go, and the languages that drop their subject stand nothing there at all — in
     # which case the phrase is not in the shape to carry an article, a modifier or a
-    # particle. Written out as its own list so that every budget below is measured
-    # against what the sentence actually writes; `at` is the index back into the frame,
-    # which is what the plan is keyed by.
-    pronoun = follow.pronoun if follow is not None and follow.reference == "pronoun" else None
+    # particle. The second clause of one sentence shares the first one's subject and
+    # writes nothing where it would stand, the way a dropped subject does.
+    if draw.link == "second":
+        pronoun: str | None = ""
+    elif follow is not None and follow.reference == "pronoun":
+        pronoun = follow.pronoun
+    else:
+        pronoun = None
+
     shape: list[SentencePart] = []
     at: list[int] = []
 
@@ -1778,25 +2143,29 @@ def _compose(
             shape.append(part)
             at.append(index)
 
-    # Only a shape that opens on a noun phrase with nothing in front of it can
-    # honour `starts_with`; anywhere else the sentence opens on an article, a
-    # preposition or an adverbial, and `collect` filters what does not match. A
-    # sentence after the first one never opens the result, so it never carries it.
+    # Only a shape that opens on a noun phrase with nothing in front of it can honour
+    # `starts_with`; anywhere else the sentence opens on an article, a preposition or an
+    # adverbial, and `collect` filters what does not match.
     first = shape[0]
     prefixable = (
         follow is None and first.slot in NOUN_SLOTS and not first.head and data.articles is None
     )
     space = len(data.space)
-    opener = draw.opener
-    close = data.terminators[draw.mark]
+    opener = "" if draw.link == "second" else draw.opener
+    # The first clause of a two-clause sentence closes on nothing: the mark, the tag and
+    # the quotation marks all belong to the whole sentence, and the second clause
+    # carries them.
+    closes = draw.link != "first"
+    close = data.terminators[draw.mark] if closes else ""
     open_mark = data.openers.get(draw.mark, "")
-    quote_open, quote_close = draw.quote or ("", "")
-    tag = data.space + frame.tag if frame.tag else ""
+    quote_open, quote_close = (draw.quote or ("", "")) if closes else ("", "")
+    tag = data.space + frame.tag if closes and frame.tag else ""
+    past = draw.tense == "past"
+    # What the language writes beside a verb that does not change for the past:
+    # Vietnamese `đã` in front of it, Chinese `了` behind it.
+    mark = data.past_mark if past and verb_group is not None and verb_group.past is None else None
     # Every phrase's theme is settled before any of them is drawn, because a length
-    # budget is only as good as the pools it was measured against. Left to the loop, each
-    # phrase was given the room the language's longest noun would need and drew a word
-    # out of its own theme, which is how a sentence came out short of a `min_length` the
-    # shape could otherwise have reached.
+    # budget is only as good as the pools it was measured against.
     part_themes: list[WordTheme | None] = []
 
     for index, part in enumerate(shape):
@@ -1812,18 +2181,13 @@ def _compose(
         part_themes.append(
             required.theme
             if required is not None and required.theme is not None
-            else _theme_for_part(
-                part.slot,
-                verb_group.object if verb_group is not None else None,
-                themes,
-            )
+            else _theme_for_part(part.slot, verb_group, themes, beat)
         )
 
     # What a phrase writes instead of a noun phrase, when it writes one at all: a
     # pronoun standing in for the topic, the name a repeat carries forward, or a fresh
-    # name for a phrase about a person. All three are bare words — no article, no
-    # modifier, nothing but the word and whatever particle the frame puts after it —
-    # and `""` marks the one that has to be drawn against the room it is given.
+    # name for a phrase about a person. `""` marks the one that has to be drawn against
+    # the room it is given.
     proper: list[str | None] = []
 
     for index, part in enumerate(shape):
@@ -1838,30 +2202,44 @@ def _compose(
             proper.append(follow.topic.noun)
         elif plan.phrase.get(at[index]) is not None:
             # A word the caller required holds its place against all of this.
-            # `include` says the sentence has to contain it, and a name written over
-            # it would be a sentence that does not.
             proper.append(None)
         elif part.slot == "quantity":
-            # A person is one person. `사과 12개` counts apples, and `서호 3명` counts
-            # somebody's name, which is not a thing a sentence says.
+            # A person is one person: `서호 3명` counts somebody's name.
             proper.append(None)
         else:
             theme = part_themes[index]
             person = theme is not None and THEME_CLASS[theme] == "person"
             proper.append("" if settings.include_name and person else None)
 
-    parts = [
-        part
-        if proper[index] is None
-        else SentencePart(
-            part.slot,
-            head=part.head,
-            tail=part.tail,
-            tail_alt=part.tail_alt,
-            bare=True,
-        )
-        for index, part in enumerate(shape)
-    ]
+    parts: list[SentencePart] = []
+
+    for index, part in enumerate(shape):
+        required = plan.phrase.get(at[index])
+
+        if proper[index] is not None:
+            parts.append(
+                SentencePart(
+                    part.slot,
+                    head=part.head,
+                    past_head=part.past_head,
+                    tail=part.tail,
+                    tail_alt=part.tail_alt,
+                    tail_liquid=part.tail_liquid,
+                    bare=True,
+                )
+            )
+        elif (
+            beat is not None
+            and part.slot == subject_slot
+            and follow is not None
+            and follow.reference == "repeat"
+        ) or (required is not None and required.bare):
+            # A story names its hero once with whatever describes them and then leaves
+            # the name alone; a word required bare — home, which no modifier fits — is
+            # left alone too.
+            parts.append(replace(part, modifiable=False))
+        else:
+            parts.append(part)
 
     # The same for the predicate: `bounds` spans every group the language has, and one
     # sentence draws from one of them. A word the caller required is narrower still — its
@@ -1878,17 +2256,21 @@ def _compose(
         if theme is not None:
             owed = plan.modifier.get(at[index])
             # A name that has still to be drawn is budgeted against the given names of
-            # the language rather than against its nouns — `rand_name` invents from its
-            # own syllables and draws from its own pools, and neither is this theme's.
+            # the language rather than against its nouns.
             span = (
                 _name_span(language)
                 if proper[index] == ""
                 else _noun_span(language, theme, settings.invent)
             )
             own[part.slot] = exact or span
-
-            if owed is not None:
-                own["modifier"] = (len(owed.word), len(owed.word))
+            # A word no pool holds is described by any modifier; a noun by the ones that
+            # fit what it is.
+            described = None if required is not None and not required.known else theme
+            own["modifier"] = (
+                (len(owed.word), len(owed.word))
+                if owed is not None
+                else pool_bounds(_modifiers_for(language, described, None))
+            )
         elif part.slot in ("verb", "state"):
             own[part.slot] = exact or pool_bounds(predicates)
         elif exact is not None:
@@ -1909,16 +2291,17 @@ def _compose(
     reported: list[str] = []
     slots: list[SentenceSlot] = []
     names: list[str] = []
-    # The predicates and adverbials this sentence spends, for the next one to leave
-    # alone.
     spent: list[str] = []
-    # The noun phrases this sentence drew for the slots a later one keeps.
     drawn: dict[SentenceSlot, Phrase] = {}
     subject: Phrase | None = None
     named = False
+    # The phase of the day this sentence named, if it named one.
+    day_at = -1
     # A pronoun says nothing about its own gender, and neither does a name carried
     # over, so what agrees with either agrees with the noun it stands for.
-    gender: WordGender | None = follow.topic.gender if follow is not None and any(proper) else None
+    gender: WordGender | None = (
+        follow.topic.gender if follow is not None and (pronoun is not None or any(proper)) else None
+    )
     used = (
         len(close)
         + len(open_mark)
@@ -1935,7 +2318,19 @@ def _compose(
         rest_min = sum(span[0] for span in spans[index + 1 :])
         rest_max = sum(span[1] for span in spans[index + 1 :])
         gap = 0 if index == 0 else space
-        head_cost = (len(part.head) + space if part.head else 0) + _copula_span(part, data)[0]
+        # A state group may bring its own copula, which wins over the shape's; a head
+        # that carries the tense changes for the past, and agrees with the subject where
+        # the language's past does (Russian `был` beside `была`).
+        own_group = state_group if part.slot == "state" else None
+        present_head = (own_group.head if own_group is not None else None) or part.head
+        past_head = (own_group.past_head if own_group is not None else None) or part.past_head
+        tensed_head = past_head if past and past_head else present_head
+        part_head = (
+            _agree_by(data.past_agreement, tensed_head, gender)
+            if past and past_head and data.past_agreement is not None and tensed_head
+            else tensed_head
+        )
+        head_cost = (len(part_head) + space if part_head else 0) + _copula_span(part, data)[0]
         overhead = gap + head_cost + _tail_min(part)
         part_high = max(1, high - used - overhead - rest_min)
         part_low = max(1, low - used - overhead - rest_max)
@@ -1943,9 +2338,6 @@ def _compose(
         if part.slot == "money":
             phrase = _money_text(data)
         elif proper[index] is not None:
-            # A bare proper noun, drawn now if it was not carried in. `part_high` and
-            # `part_low` are what the phrase has room for, and the name generator fits
-            # them the same way a noun would.
             carried_in = proper[index]
 
             if carried_in:
@@ -1970,8 +2362,7 @@ def _compose(
             counted = _count_span(data)[1] if part.slot == "quantity" else 0
             room = part_high - noun_low - counted
             # A phrase whose share of the range is longer than any noun of its theme
-            # takes a modifier whatever the roll says, which is the only way it can
-            # reach it — the alternative is a sentence that misses `min_length`.
+            # takes a modifier whatever the roll says.
             needed = part_low > (article_max + space if article_max else 0) + noun_high
             modify = (
                 part.slot != "quantity"
@@ -1988,8 +2379,6 @@ def _compose(
                 theme,
                 forced=required.word if required is not None else None,
                 modify=modify,
-                # A counted phrase drops its article and takes no modifier: `12 apples`,
-                # never `the 12 red apples`.
                 bare=part.slot == "quantity" or part.bare,
                 forced_modifier=owed.word if owed is not None else None,
                 invent=settings.invent,
@@ -1998,6 +2387,7 @@ def _compose(
                 high=part_high,
                 span=(noun_low, noun_high),
                 count=_count_text(data, theme) if part.slot == "quantity" else "",
+                described=None if required is not None and not required.known else theme,
             )
             phrase = built.text
 
@@ -2005,13 +2395,13 @@ def _compose(
                 subject = built
                 gender = gender_of(lexicon, _as_pool(lexicon, built.noun))
 
-            # A place is where the result is happening and an object is what it is
-            # about, so both are kept for the sentences that follow. A quantity is
-            # not: `사과 12개` is an amount of something rather than a thing.
-            if part.slot in ("place", "object"):
+            # A place is where the result is happening, an object is what it is about and
+            # a destination is where it is going, so all three are kept for the sentences
+            # that follow.
+            if part.slot in ("place", "object", "destination"):
                 drawn[part.slot] = built
         else:
-            phrase, plain_form = _predicate_for(
+            phrase, plain_form, named_day = _predicate_for(
                 part.slot,
                 lexicon,
                 data,
@@ -2022,27 +2412,49 @@ def _compose(
                 part_low,
                 part_high,
                 draw.avoid,
+                draw.tense,
+                draw.day_at,
+                # The first sentence of a result may set its scene in any time it
+                # likes; the ones after it only move the day forward.
+                follow is None and draw.link != "second",
+                THEME_CLASS[subject_theme],
             )
 
             if plain_form:
                 spent.append(plain_form)
 
+            if named_day >= 0:
+                day_at = named_day
+
+            # A past-tense verb in a language whose verb does not change is written with
+            # the language's own mark beside it — once per sentence, so the second clause
+            # of one goes without — and one whose verb agrees with its subject in the
+            # past is agreed with it.
+            if part.slot == "verb" and past:
+                if mark is not None and mark.head and draw.link != "second":
+                    phrase = mark.head + data.space + phrase
+
+                if mark is not None and mark.tail:
+                    phrase += mark.tail
+
+                if (
+                    data.past_agreement is not None
+                    and verb_group is not None
+                    and verb_group.past is not None
+                ):
+                    phrase = _agree_by(data.past_agreement, phrase, gender)
+
         # The opening capital belongs to whatever is written first, and that is the
-        # phrase itself unless a connective or a preposition stands in front of it.
-        # Applied here rather than to the finished string, so the phrase the detail
-        # reports is the one the sentence actually shows.
-        # The copula is written onto this phrase rather than beside it, on whichever
-        # side the language puts it: `11시 40분이다` is one word and `is September 5` is
-        # two. Its form comes from the same chain a verb's does, so a copular question
-        # asks and a polite one is polite. A copula in front still lets the phrase keep
-        # its own preposition, because German says `ist am 5. März`.
+        # phrase itself unless a connective or a preposition stands in front of it. The
+        # second clause of a sentence carries on from the first, so it opens on nothing.
+        # The copula is written onto this phrase rather than beside it.
         copula = _one_of(pick(predicates)) if part.copula else ""
-        opens = data.capitalize and not written
-        opener = data.space.join(
-            piece for piece in (copula if part.copula == "head" else "", part.head) if piece
+        opens = data.capitalize and not written and draw.link != "second"
+        head_text = data.space.join(
+            piece for piece in (copula if part.copula == "head" else "", part_head) if piece
         )
-        head = (_upper(opener) if opens else opener) if opener else ""
-        text = _upper(phrase) if opens and not opener else phrase
+        head = (_upper(head_text) if opens else head_text) if head_text else ""
+        text = _upper(phrase) if opens and not head_text else phrase
         tail = (copula if part.copula == "tail" else "") + _tail_of(part, text)
 
         if head:
@@ -2053,15 +2465,13 @@ def _compose(
         slots.append(part.slot)
         used += gap + head_cost + len(text) + len(tail)
 
-        # The opening capital belongs to the name too, so what the detail reports is
-        # what the sentence shows.
         if proper[index] == "" and text != phrase:
             names[-1] = text
 
     # A dropped subject leaves no phrase behind, so what the next sentence carries on
     # about is the topic this one was already handed.
     carried = follow.topic if pronoun is not None and follow is not None else None
-    # A sentence whose subject is a name carries that name forward.
+
     if named:
         subject_word: str | None = reported[slots.index("subject")]
     elif subject is not None:
@@ -2069,9 +2479,6 @@ def _compose(
     else:
         subject_word = carried.noun if carried is not None and pronoun else None
 
-    # Where this sentence happened and what it was about, for the next one. The bare
-    # noun rather than the phrase, so the next sentence writes its own article and may
-    # put a different modifier in front of the same place.
     scene: dict[SentenceSlot, Requirement] = dict(follow.scene) if follow is not None else {}
 
     for slot, entry in drawn.items():
@@ -2080,8 +2487,6 @@ def _compose(
         )
 
     return Built(
-        # The opener is written against the first phrase rather than beside it —
-        # Spanish `¿El león corre?`, never `¿ El león corre ?`.
         quote_open + open_mark + data.space.join(written) + tag + close + quote_close,
         tuple(reported),
         tuple(slots),
@@ -2095,6 +2500,8 @@ def _compose(
         else (carried.gender if carried is not None else None),
         named or (carried is not None and carried.named),
         scene,
+        verb_group.field if verb_group is not None else None,
+        day_at,
     )
 
 
@@ -2233,19 +2640,20 @@ def _follow_for(
     topic: Topic,
     scene: Mapping[SentenceSlot, Requirement],
     repeated: bool,
+    storied: bool = False,
 ) -> Follow:
     """How one sentence carries on from the one before it.
 
     `repeated` says whether that one already named the topic, and naming it again
     straight afterwards is what makes a paragraph read as a caption written ten times —
     worst of all with a person's name, which has no pronoun to alternate with in the
-    languages that leave their subject out.
+    languages that leave their subject out. A story never draws a fresh subject: its
+    hero is whoever it opened on.
     """
     pronouns = _pronouns_for(data, topic)
     # A person is an individual, not a kind of thing: a paragraph about Emma that draws
-    # a `fresh` subject is a paragraph that quietly becomes about Sophie. Every other
-    # topic can be another one of its own class.
-    ways = ("repeat", "pronoun") if topic.named else ("repeat", "pronoun", "fresh")
+    # a `fresh` subject is a paragraph that quietly becomes about Sophie.
+    ways = ("repeat", "pronoun") if topic.named or storied else ("repeat", "pronoun", "fresh")
     usable = ways if pronouns else tuple(way for way in ways if way != "pronoun")
 
     def weight_of(way: str) -> float:
@@ -2270,15 +2678,16 @@ def _opener_for(
     room: int,
     shortest: int,
     flow: Flow,
+    kinds: Sequence[ConnectiveKind] | None = None,
 ) -> str:
     """What a sentence opens on: an interjection for an exclamation, else a connective.
 
     Never both — a sentence that opened on two things at once would be shouting its own
     footnote. `room` is what the sentence may be at its longest, and it is what decides
-    whether it opens on anything at all: what stands in front is written before a whole
-    sentence rather than instead of any part of it, so one longer than the budget can
-    spare is a sentence that overshoots by exactly its length. Russian `тем временем` is
-    thirteen characters, and a third of a range of seventy-five has nowhere to put them.
+    whether it opens on anything at all. `flow` is the other half of the decision, and it
+    is what makes an opener read as one: never the same word twice in one result, and far
+    less likely at all when the sentence before this one already opened on something.
+    `kinds` is what a story lets this sentence claim, when it is one of a story.
 
     Args:
         data: The language's sentence dataset.
@@ -2288,6 +2697,7 @@ def _opener_for(
         room: The longest this sentence may be.
         shortest: The shortest sentence the language's shapes could spell.
         flow: What the result has already opened its sentences on.
+        kinds: The kinds of connective a story allows here, or None for every kind.
 
     Returns:
         What the sentence opens on, or `""`.
@@ -2298,8 +2708,6 @@ def _opener_for(
         # Never the same one twice in one result.
         return tuple(word for word in pool if len(word) <= spare and word not in flow.openers)
 
-    # Far less likely at all when the sentence before this one already opened on
-    # something.
     damp = OPENER_DAMP if flow.opened else 1
 
     if mark == "exclamation":
@@ -2311,25 +2719,30 @@ def _opener_for(
     if follow is None:
         return ""
 
-    usable = fitting(_connectives_of(data, follow, mark))
+    usable = fitting(_connectives_of(data, follow, mark, kinds))
 
     return pick(usable) if usable and chance(CONNECTIVE_CHANCE * damp) else ""
 
 
-def _connectives_of(data: SentenceLanguageData, follow: Follow, mark: SentenceMark) -> WordPool:
+def _connectives_of(
+    data: SentenceLanguageData,
+    follow: Follow,
+    mark: SentenceMark,
+    allowed: Sequence[ConnectiveKind] | None = None,
+) -> WordPool:
     """The connectives whose claim about the sentence before this one can be true.
 
-    Three of the four always can. Time passes whatever was said, one more thing is always
-    one more thing, and any two things can be set against each other. What `causal`
-    claims is that this sentence follows from the last, which needs the two of them to be
-    about the same thing and this one to be telling rather than asking — `그러므로 금빛
-    하이볼이 식죠?` after a sentence about a pretzel is a consequence of nothing.
+    Three of the four always can. What `causal` claims is that this sentence follows from
+    the last, which needs the two of them to be about the same thing and this one to be
+    telling rather than asking. A story has already decided what each of its sentences
+    may claim, and hands the kinds in.
     """
     follows = follow.reference != "fresh" and mark in ("statement", "trailing")
+    wanted = CONNECTIVE_KINDS if allowed is None else tuple(allowed)
 
     return tuple(
         word
-        for kind in CONNECTIVE_KINDS
+        for kind in wanted
         if follows or kind != "causal"
         for word in data.connectives.get(kind, ())
     )
@@ -2494,17 +2907,75 @@ def _mark_weight_for(mark: SentenceMark, flow: Flow) -> float:
     return base * REPEAT_DAMP if mark == flow.mark and mark != "statement" else base
 
 
-def _generate_result(language: WordLanguage, settings: Settings) -> list[Built]:
+@dataclass(frozen=True, slots=True)
+class Result:
+    """Everything one result is made of."""
+
+    built: list[Built]
+    tense: SentenceTense
+    story: SentenceStory | None
+    theme: WordTheme | None
+    """What the result is about: its hero's theme in a story, else the first sentence's."""
+
+
+def _length_of(data: SentenceLanguageData, built: Sequence[Built]) -> int:
+    """The whole of a result as one string, which is what the caller's range describes."""
+    return sum(len(one.sentence) for one in built) + len(data.space) * (len(built) - 1)
+
+
+@dataclass(frozen=True, slots=True)
+class Telling:
+    """What every sentence of one result is drawn against, settled before the first."""
+
+    language: WordLanguage
+    data: SentenceLanguageData
+    settings: Settings
+    budgets: list[tuple[int, int]]
+    room: dict[str, tuple[int, int]]
+    shortest: int
+    flow: Flow
+    spent: set[str]
+    voice: SentenceStyle
+    tense: SentenceTense
+
+
+def _draw_one(telling: Telling, draw: Draw) -> tuple[Built, str]:
+    """One sentence, drawn again without what it opened on when that put it out of range.
+
+    `_opener_for` reserves room against the shortest sentence the shapes could spell,
+    which is a floor no draw actually reaches. When the sentence that came back could not
+    be made short enough to carry what it opens on after all, that is the part worth
+    giving up: it stands in front of the whole sentence rather than instead of any piece
+    of it.
+    """
+    one = _generate_one(telling.language, telling.settings, draw)
+    opened = draw.opener
+
+    if draw.opener and _distance_from(len(one.sentence), draw.budget) > 0:
+        bare = _generate_one(telling.language, telling.settings, replace(draw, opener=""))
+
+        if _distance_from(len(bare.sentence), draw.budget) < _distance_from(
+            len(one.sentence), draw.budget
+        ):
+            one = bare
+            opened = ""
+
+    return one, opened
+
+
+def _generate_result(language: WordLanguage, settings: Settings) -> Result:
     """Every sentence of one result, in order.
 
     The range is shared out before the first of them is drawn, and the topic is taken
     from that first sentence — so what follows is about the same thing rather than
-    another draw that happened to land beside it.
+    another draw that happened to land beside it. More than one sentence is a story, when
+    the language can tell one about the subject asked for; it always can, so the plain
+    paragraph is what a result falls back to rather than what it usually is.
     """
     data = SENTENCE_DATA[language]
-    # Every shape any of the requested types could take, because the budget is shared
-    # out before the first type is even drawn.
-    # A quoted line can be any kind at all, so its shapes are all of them.
+    # Every shape any of the requested kinds could take, because the budget is shared
+    # out before the first of them is even drawn — and a quoted line can be any kind at
+    # all, so its shapes are all of them.
     frames = [
         frame
         for type_ in settings.types
@@ -2512,34 +2983,67 @@ def _generate_result(language: WordLanguage, settings: Settings) -> list[Built]:
         for frame in _frames_for(data, settings, _mood_for(cast("SentenceMark", mark)))
     ]
     # A result either has a person in it or does not; deciding that per sentence would
-    # put a name in one line of a paragraph and not the next. Settled here because it
-    # takes the language's own name lengths to know whether a name can answer the range
-    # that was asked for.
+    # put a name in one line of a paragraph and not the next.
     named = (
         settings.include_name
         if settings.include_name is not None
         else (_name_fits(data, frames, settings, language) and chance(50))
     )
     settled = settings if settings.include_name == named else replace(settings, include_name=named)
-    # And the budget is measured against what a named result actually writes: one word
-    # where a noun phrase would have written an article, a modifier and a noun.
+    # And the budget is measured against what a named result actually writes.
     room = _room_for(language, named)
     shortest = _natural_span(data, frames, room)[0]
     budgets = _share_out(
         _bounds_for(data, frames, room, settled), settings.sentences, len(data.space)
     )
+    # The result's own voice, settled once, and its tense likewise: a story is told in
+    # one tense from start to end.
+    voice = settings.style if settings.style is not None else pick(STYLES)
+    tense: SentenceTense = (
+        settings.tense if settings.tense is not None else ("past" if chance(50) else "present")
+    )
+
+    def telling() -> Telling:
+        # What one telling of the result says as it goes. Fresh for every telling,
+        # because a story told again starts over.
+        return Telling(
+            language, data, settled, budgets, room, shortest, Flow(), set(), voice, tense
+        )
+
+    # More than one sentence is a story, when the language can tell one about the
+    # subject asked for. It always can — every class has a story — so the paragraph
+    # below is what a result falls back to rather than what it usually is. A story that
+    # landed outside the range is told again, and the closest telling is kept.
+    if settings.sentences > 1:
+        whole = _bounds_for(data, frames, room, settled)
+        closest: Result | None = None
+        missed = sys.maxsize
+
+        for _ in range(STORY_ATTEMPTS):
+            story = _tell_story(telling())
+
+            if story is None:
+                break
+
+            miss = _distance_from(_length_of(data, story.built), whole)
+
+            if miss < missed:
+                closest = story
+                missed = miss
+
+            if miss == 0:
+                break
+
+        if closest is not None:
+            return closest
+
+    paragraph = telling()
+    flow = paragraph.flow
+    spent = paragraph.spent
+
     built: list[Built] = []
     topic: Topic | None = None
     scene: Mapping[SentenceSlot, Requirement] = {}
-    # What the result has said so far — the register it opened in, and everything the
-    # next sentence has to avoid saying the same way.
-    flow = Flow()
-    # What it has already said with its predicates and its adverbials.
-    spent: set[str] = set()
-    # The result's own voice, settled once. A caller who named a level gets that one
-    # throughout; one who did not gets a paragraph that is at least consistent with
-    # itself, rather than a level rerolled every sentence.
-    voice = settings.style if settings.style is not None else pick(STYLES)
 
     for budget in budgets:
         type_, mark = _kind_for(data, settled, room, budget, flow)
@@ -2553,27 +3057,12 @@ def _generate_result(language: WordLanguage, settings: Settings) -> list[Built]:
             _style_for(type_, settings.style, voice),
             frozenset(spent),
             follow,
+            tense,
+            None,
+            None,
+            max((one.day_at for one in built), default=-1),
         )
-        one = _generate_one(language, settled, draw)
-        opened = draw.opener
-
-        # `_opener_for` reserves room against the shortest sentence the shapes could
-        # spell, which is a floor no draw actually reaches — the shortest word of every
-        # pool at once. When the sentence that came back could not be made short enough
-        # to carry what it opens on after all, that is the part worth giving up: it
-        # stands in front of the whole sentence rather than instead of any piece of it.
-        if draw.opener and _distance_from(len(one.sentence), budget) > 0:
-            bare = _generate_one(
-                language,
-                settled,
-                Draw(budget, type_, mark, draw.quote, "", draw.style, draw.avoid, follow),
-            )
-
-            if _distance_from(len(bare.sentence), budget) < _distance_from(
-                len(one.sentence), budget
-            ):
-                one = bare
-                opened = ""
+        one, opened = _draw_one(paragraph, draw)
 
         built.append(one)
         scene = one.scene
@@ -2593,7 +3082,425 @@ def _generate_result(language: WordLanguage, settings: Settings) -> list[Built]:
         if topic is None:
             topic = _topic_of(one)
 
-    return built
+    return Result(built, tense, None, built[0].theme)
+
+
+# --- Telling a story --------------------------------------------------------
+
+STORY_KIND_WEIGHT: dict[SentenceType, int] = {"statement": 100, "exclamation": 35, "trailing": 30}
+"""What each kind is worth in a sentence of a story, where the caller left it to the story.
+
+A story is told in statements; a step that allows an exclamation or a trailing end gets
+one now and then.
+"""
+
+FIRST_CLAUSE_SHARE = 0.5
+"""What share of a two-clause sentence's range the first clause takes."""
+
+JOIN_ROOM = 0.6
+"""What share of a language's longest sentence one sentence must be allowed to join two."""
+
+STORY_PLACES: tuple[WordTheme, ...] = ("place",)
+"""Where a story happens: `place` alone, and not the two other themes of its class.
+
+A hero can walk to the market and not to Pluto.
+"""
+
+
+@dataclass(slots=True)
+class Roles:
+    """The nouns a story has put on the page, by the role each one plays."""
+
+    item: Requirement | None = None
+    place: Requirement | None = None
+    home: Requirement | None = None
+
+
+@dataclass(frozen=True, slots=True)
+class Found:
+    """The story a result follows, the hero it is about and the thing in the hero's hands."""
+
+    plan: StoryPlan
+    hero: NounClass
+    hero_themes: tuple[WordTheme, ...]
+    item: WordTheme | None
+
+
+def _story_for(telling: Telling) -> Found | None:
+    """The story a result follows, or None when no story can be told about what was asked."""
+    data = telling.data
+    settings = telling.settings
+    hero_themes = _subject_themes_for(settings, None)
+    hero_classes = tuple(dict.fromkeys(THEME_CLASS[theme] for theme in hero_themes))
+    candidates = list(stories_for(data, hero_classes, settings.story))
+    longest = _natural_span(data, data.frames, telling.room)[1]
+    joinable = telling.budgets[0][1] >= longest * JOIN_ROOM
+
+    while candidates:
+        story = pick_story(candidates)
+
+        candidates.remove(story)
+
+        heroes = hero_classes_for(data, story, hero_classes)
+
+        if not heroes:
+            continue
+
+        hero = pick(heroes)
+        items = item_themes_for(data, story, hero)
+        item = pick(items) if items else None
+        planned = plan(data, story, hero, item, settings.sentences, joinable)
+
+        if planned is not None:
+            return Found(planned, hero, _themes_for_classes(hero_themes, (hero,)), item)
+
+    return None
+
+
+@dataclass(frozen=True, slots=True)
+class Told:
+    """One beat told: the sentence, its kind and mark, what it opened on, and its follow."""
+
+    one: Built
+    type: SentenceType
+    mark: SentenceMark
+    opened: str
+    follow: Follow | None
+
+
+def _tell_story(telling: Telling) -> Result | None:
+    """Every sentence of a result that follows a story.
+
+    The plan says what happens in each sentence; this writes it. The hero is the topic,
+    named in the first sentence and then referred to the way a paragraph refers to its
+    subject; the thing, the place and home are drawn the first time a sentence has room
+    for them and pinned into every sentence after; two beats the plan joined are written
+    as one sentence, the second clause without its subject.
+    """
+    language = telling.language
+    data = telling.data
+    settings = telling.settings
+    found = _story_for(telling)
+
+    if found is None:
+        return None
+
+    story = found.plan.story
+    beats = found.plan.beats
+    hero_themes = found.hero_themes
+    roles = Roles()
+    built: list[Built] = []
+    topic: Topic | None = None
+    day_at = -1
+    at = 0
+
+    def pinned_for(beat: Beat) -> dict[SentenceSlot, Requirement]:
+        # The nouns this beat's sentence has to write, in the slots it has for them.
+        pinned: dict[SentenceSlot, Requirement] = {}
+        step = beat.step
+
+        if step.object and roles.item is not None:
+            pinned["object"] = roles.item
+
+        if step.place and roles.place is not None:
+            pinned["place"] = roles.place
+
+        if step.destination == "place" and roles.place is not None:
+            pinned["destination"] = roles.place
+
+        if step.destination == "home":
+            if roles.home is None:
+                roles.home = Requirement(pick(data.homes), ("destination",), known=False, bare=True)
+
+            pinned["destination"] = roles.home
+
+        return pinned
+
+    def place_of() -> Requirement:
+        # The place the story is happening in, drawn now if no sentence has named it.
+        if roles.place is None:
+            theme = pick(STORY_PLACES)
+            lexicon = WORD_DATA[language]
+
+            roles.place = Requirement(
+                _plain(lexicon, pick(_nouns_of(language, theme))), ("place",), theme=theme
+            )
+
+        return roles.place
+
+    def beat_draw(beat: Beat) -> BeatDraw:
+        # What a beat asks of its sentence.
+        step = beat.step
+        wants: list[SentenceSlot] = []
+        prefers: list[SentenceSlot] = []
+
+        if step.destination is not None:
+            wants.append("destination")
+
+        if step.object:
+            wants.append("object")
+
+        if step.place:
+            prefers.append("place")
+
+        return BeatDraw(
+            headed_by_state=step.kind == "state",
+            fields=(beat.field,) if beat.field is not None else (),
+            describes=step.kind == "state",
+            condition=beat.condition,
+            wants=tuple(wants),
+            prefers=tuple(prefers),
+            item=found.item,
+            places=STORY_PLACES,
+            subject=STORY_PLACES if step.kind == "scene" else hero_themes,
+        )
+
+    def shortest_for(beat: Beat) -> int:
+        # The shortest sentence a beat could be written as.
+        frames = _frames_for(data, settings, "statement", beat_draw(beat))
+
+        return min(_frame_range(frame, data, telling.room)[0] for frame in frames)
+
+    def tell(beat: Beat, budget: tuple[int, int], previous: Built | None) -> Told:
+        # One beat as one sentence, or as one clause of one.
+        nonlocal topic, day_at
+        scene = beat.step.kind == "scene"
+
+        # What this sentence is doing. A caller who named the kinds gets them; the story
+        # otherwise tells, and lets a step that allows more do more.
+        if settings.typed:
+            type_, mark = _kind_for(data, settings, telling.room, budget, telling.flow)
+        else:
+            kinds: tuple[SentenceType, ...] = (
+                ("statement", *beat.kinds) if beat.join is None else ("statement",)
+            )
+            type_ = pick_weighted(kinds, lambda kind: STORY_KIND_WEIGHT.get(kind, 1))
+            mark = cast("SentenceMark", type_)
+
+        follow: Follow | None
+
+        if beat.join == "second" and previous is not None:
+            # The second clause carries on from the first: its subject is the first
+            # clause's, and it writes nothing where the subject would stand.
+            shared = _topic_of(previous) or topic
+
+            follow = Follow(shared, "pronoun", "", pinned_for(beat)) if shared is not None else None
+        elif scene:
+            # The scene is the one sentence whose subject is not the hero: the place the
+            # story is happening in, named in full.
+            place = place_of()
+            lexicon = WORD_DATA[language]
+
+            follow = Follow(
+                Topic(
+                    place.word,
+                    place.theme,
+                    "place",
+                    gender_of(lexicon, _as_pool(lexicon, place.word)),
+                    False,
+                ),
+                "repeat",
+                "",
+                pinned_for(beat),
+            )
+        else:
+            follow = (
+                None
+                if topic is None
+                else _follow_for(data, topic, pinned_for(beat), telling.flow.repeated, True)
+            )
+
+        draw = Draw(
+            budget,
+            type_,
+            mark,
+            _quote_for(data, type_, settings.quote),
+            ""
+            if beat.join == "second"
+            else _opener_for(
+                data, mark, follow, budget[1], telling.shortest, telling.flow, beat.links
+            ),
+            _style_for(type_, settings.style, telling.voice),
+            frozenset(telling.spent),
+            follow,
+            telling.tense,
+            beat_draw(beat),
+            beat.join,
+            day_at,
+        )
+        one, opened = _draw_one(telling, draw)
+
+        # A sentence that missed its range by more than the tolerance is drawn once more
+        # the other way round about its subject: named, where it was dropped and came
+        # out short; dropped or stood a pronoun for, where it was named and came out
+        # long.
+        if (
+            follow is not None
+            and not scene
+            and beat.join is None
+            and _distance_from(len(one.sentence), budget) > 1
+        ):
+            pronouns = _pronouns_for(data, follow.topic)
+            short = len(one.sentence) < budget[0]
+            other: str | None = None
+
+            if short and follow.reference == "pronoun":
+                other = "repeat"
+            elif not short and follow.reference == "repeat" and pronouns:
+                other = "pronoun"
+
+            if other is not None:
+                again = Follow(
+                    follow.topic, other, pick(pronouns) if other == "pronoun" else "", follow.scene
+                )
+                two, opened_again = _draw_one(telling, replace(draw, follow=again))
+
+                if _distance_from(len(two.sentence), budget) < _distance_from(
+                    len(one.sentence), budget
+                ):
+                    one = two
+                    opened = opened_again
+                    follow = again
+
+        # What this sentence put on the page, for the rest of the story to keep.
+        for slot in ("object", "place", "destination"):
+            drawn = one.scene.get(slot)
+
+            if drawn is None:
+                continue
+
+            if slot == "object":
+                if roles.item is None:
+                    roles.item = drawn
+            elif (slot == "place" or beat.step.destination == "place") and roles.place is None:
+                roles.place = replace(drawn, slots=("place",))
+
+        telling.spent.update(one.used)
+        day_at = max(day_at, one.day_at)
+
+        if topic is None and not scene:
+            topic = _topic_of(one)
+
+        return Told(one, type_, mark, opened, follow)
+
+    # The range is shared out again after every sentence, over the ones still to come: a
+    # sentence that fell short hands what it did not use to the next one.
+    total_min = sum(budget[0] for budget in telling.budgets) + len(data.space) * (
+        len(telling.budgets) - 1
+    )
+    total_max = sum(budget[1] for budget in telling.budgets) + len(data.space) * (
+        len(telling.budgets) - 1
+    )
+    written = 0
+    i = 0
+
+    while i < len(beats):
+        beat = beats[i]
+        left = sum(1 for each in beats[i:] if each.join != "second")
+        gaps = len(data.space) * (at + left - 1)
+        budget = _share_out(
+            (max(left, total_min - written - gaps), max(left, total_max - written - gaps)),
+            left,
+            len(data.space),
+        )[0]
+        # Two beats the plan joined are written as one sentence only where the range has
+        # room for both clauses; where it has not, the first is written on its own and
+        # the second — never a step the story needs — is left out.
+        join = data.join
+        glue = (len(join.word) + len(data.space) if join is not None and join.word else 0) + len(
+            data.space
+        )
+        joins_next = beat.join == "first" and i + 1 < len(beats)
+        fits = joins_next and shortest_for(beat) + shortest_for(beats[i + 1]) + glue <= budget[1]
+
+        if joins_next and not fits and not beats[i + 1].step.required:
+            told = tell(unjoined(beat), budget, None)
+            i += 1
+        elif joins_next:
+            # Two clauses share one sentence's range: the join between them comes off the
+            # top, and each clause gets its share of what is left.
+            low = max(2, budget[0] - glue)
+            high = max(2, budget[1] - glue)
+            first_range = (
+                max(1, int(low * FIRST_CLAUSE_SHARE)),
+                max(1, int(high * FIRST_CLAUSE_SHARE)),
+            )
+            second_range = (max(1, low - first_range[0]), max(1, high - first_range[1]))
+            first = tell(beat, first_range, None)
+            second = tell(beats[i + 1], second_range, first.one)
+
+            told = Told(
+                _join_clauses(data, first.one, second.one),
+                second.type,
+                second.mark,
+                first.opened,
+                first.follow,
+            )
+            i += 1
+
+            # The estimate above is the shortest the two shapes could be, and the clauses
+            # are drawn against pinned nouns the estimate did not know. A two-clause
+            # sentence that overshoots after all gives up its second clause where the
+            # story can spare it, and is drawn again as one.
+            if (
+                len(told.one.sentence) > budget[1] + 1
+                and not beats[i].step.required
+                and len(first.one.sentence) <= budget[1]
+            ):
+                told = tell(unjoined(beat), budget, None)
+        else:
+            told = tell(beat, budget, None)
+
+        built.append(told.one)
+        written += len(told.one.sentence) + (len(data.space) if at > 0 else 0)
+        at += 1
+        i += 1
+
+        flow = telling.flow
+
+        flow.run = flow.run + 1 if told.type == flow.last else 1
+        flow.last = told.type
+        flow.mark = told.mark
+        flow.opened = bool(told.opened)
+
+        if flow.lead is None:
+            flow.lead = told.type
+
+        if beat.step.kind != "scene":
+            flow.repeated = told.follow is None or told.follow.reference == "repeat"
+
+        if told.opened:
+            flow.openers.add(told.opened)
+
+    # A named hero has no theme, and the scene's place is not what the story is about.
+    return Result(
+        built, telling.tense, story.name, topic.theme if topic is not None else built[0].theme
+    )
+
+
+def _join_clauses(data: SentenceLanguageData, first: Built, second: Built) -> Built:
+    """Two clauses as one sentence: the first, the language's join, then the second.
+
+    The first clause closed on nothing and the second opened on nothing, so the seam is
+    the language's own space.
+    """
+    glue = data.space + data.join.word if data.join is not None and data.join.word else ""
+
+    return Built(
+        first.sentence + glue + data.space + second.sentence,
+        (*first.phrases, *second.phrases),
+        (*first.slots, *second.slots),
+        (*first.names, *second.names),
+        (*first.used, *second.used),
+        second.type,
+        first.theme,
+        first.subject if first.subject is not None else second.subject,
+        first.gender if first.gender is not None else second.gender,
+        first.named or second.named,
+        {**first.scene, **second.scene},
+        second.field,
+        max(first.day_at, second.day_at),
+    )
 
 
 def _subject_themes_for(settings: Settings, follow: Follow | None) -> tuple[WordTheme, ...]:
@@ -2632,10 +3539,15 @@ def _generate_one(language: WordLanguage, settings: Settings, draw: Draw) -> Bui
     """Build one sentence, as close to what was asked for as the language allows."""
     follow = draw.follow
     budget = draw.budget
+    beat = draw.beat
     data = SENTENCE_DATA[language]
     bounds = _room_for(language, settings.include_name)
-    allowed = _frames_for(data, settings, _mood_for(draw.mark))
-    requested = _subject_themes_for(settings, follow)
+    allowed = _frames_for(data, settings, _mood_for(draw.mark), beat)
+    requested = (
+        beat.subject
+        if beat is not None and beat.subject is not None
+        else _subject_themes_for(settings, follow)
+    )
     # The words a caller required go in the first sentence — once in the result rather
     # than once in every sentence of it.
     requirements = [] if follow is not None else [_classify(language, w) for w in settings.include]
@@ -2651,14 +3563,25 @@ def _generate_one(language: WordLanguage, settings: Settings, draw: Draw) -> Bui
             known=follow.topic.theme is not None,
         )
 
-    plans = {id(frame): _plan_for(frame, requirements, pinned) for frame in allowed}
+    # The second clause of one sentence shares the first one's subject and writes
+    # nothing where it would stand, the way a dropped subject does.
+    if draw.link == "second":
+        pinned.pop("subject", None)
+
+    # A result that has reached the last phase of its day has no later one to name, so a
+    # sentence after that carries no time at all rather than a wrong one.
+    spent = follow is not None and draw.day_at >= len(data.times.day) - 1
+    timeless = (
+        [frame for frame in allowed if not any(part.slot == "time" for part in frame.parts)]
+        if spent
+        else allowed
+    )
+    frames = timeless or allowed
+    plans = {id(frame): _plan_for(frame, requirements, pinned) for frame in frames}
     low, high = budget
 
     def buildable(frame: SentenceFrame) -> bool:
-        # A shape is only worth drawing when the language has a predicate for it:
-        # a `body` subject has no transitive verb in any language here, so a shape
-        # with an object in it would have to fall back to a verb that means
-        # something else.
+        # A shape is only worth drawing when the language has a predicate for it.
         plan, complete = plans[id(frame)]
 
         if not complete:
@@ -2672,37 +3595,49 @@ def _generate_one(language: WordLanguage, settings: Settings, draw: Draw) -> Bui
             return bool(_themes_for_classes(requested, classes))
 
         if any(part.slot == "state" for part in frame.parts):
-            return bool(_state_groups_for(data, requested, frame, plan))
+            return bool(_state_groups_for(data, requested, frame, plan, beat))
 
-        return bool(_verb_groups_for(data, frame, requested, plan))
+        return bool(_verb_groups_for(data, frame, requested, plan, beat))
 
     # Prefer a shape that can land inside the range, then one that has somewhere to
     # put every word the caller required, and settle for any of them after that.
     fitting = [
         frame
-        for frame in allowed
+        for frame in frames
         if _frame_range(frame, data, bounds)[1] >= low
         and _frame_range(frame, data, bounds)[0] <= high
         and buildable(frame)
     ]
-    loose = [frame for frame in allowed if buildable(frame)]
-    usable = fitting or loose or allowed
+    loose = [frame for frame in frames if buildable(frame)]
+    usable = fitting or loose or frames
     best: Built | None = None
     best_distance = None
     best_too_long = False
 
-    def reaching(candidate: SentenceFrame) -> int:
+    def weigh(candidate: SentenceFrame, attempt: int) -> int:
         # After a miss, a shape whose own range runs past the requested one in the
-        # direction that was missed is four times as likely. Weighted rather than
-        # filtered: a shape that missed by two characters can still make it on the next
-        # draw, and dropping it left a language whose short shape was the only one in
-        # range settling for whatever it had.
-        own_low, own_high = _frame_range(candidate, data, bounds)
+        # direction that was missed is four times as likely. A story's sentence is
+        # better for carrying what the story would rather it carried — the place it is
+        # all happening in — and for saying a little more than the bare subject and verb.
+        weight = 1
 
-        return 4 if (own_low <= low if best_too_long else own_high >= high) else 1
+        if attempt > 0 and best_distance:
+            own_low, own_high = _frame_range(candidate, data, bounds)
+
+            weight *= 4 if (own_low <= low if best_too_long else own_high >= high) else 1
+
+        if beat is not None:
+            if any(part.slot in beat.prefers for part in candidate.parts):
+                weight *= 3
+
+            if len(candidate.parts) >= 3:
+                weight *= 2
+
+        return weight
 
     for attempt in range(FIT_ATTEMPTS):
-        frame = _pick_frame(usable, None if attempt == 0 else reaching)
+        at = attempt
+        frame = _pick_frame(usable, lambda candidate: weigh(candidate, at))  # noqa: B023
         built = _compose(
             language,
             data,
@@ -2710,7 +3645,9 @@ def _generate_one(language: WordLanguage, settings: Settings, draw: Draw) -> Bui
             plans[id(frame)][0],
             requested,
             settings,
-            _modify_chance_for(0 if attempt == 0 else (best_distance or 0), best_too_long),
+            _modify_chance_for(
+                0 if attempt == 0 else (best_distance or 0), best_too_long, beat is not None
+            ),
             bounds,
             low,
             high,
@@ -2788,6 +3725,8 @@ def generate_sentence_details(
     type: SentenceTypeOption | None = None,
     quote: SentenceQuote | None = None,
     style: SentenceStyle | None = None,
+    tense: SentenceTense | None = None,
+    story: SentenceStory | None = None,
 ) -> list[SentenceDetail]:
     """Generate sentences with every choice already resolved.
 
@@ -2808,6 +3747,8 @@ def generate_sentence_details(
         type: What the sentences are doing.
         quote: Which quotation marks a quoted line takes.
         style: How the sentences address their reader.
+        tense: When it happened, or None to draw it per result.
+        story: Which story a result of several sentences tells, or None to draw it.
 
     Returns:
         One `SentenceDetail` per result.
@@ -2828,6 +3769,11 @@ def generate_sentence_details(
         types=_resolve_types(type),
         quote=quote,
         style=style,
+        tense=tense,
+        story=story,
+        # A caller who named the kinds — `"all"` included — gets them; a story writes
+        # statements otherwise.
+        typed=type is not None,
     )
 
     def draw() -> SentenceDetail:
@@ -2842,7 +3788,8 @@ def generate_sentence_details(
         )
         code = draw_language(language, _languages_for(drawn))
         data = SENTENCE_DATA[code]
-        built = _generate_result(code, drawn)
+        result = _generate_result(code, drawn)
+        built = result.built
 
         return SentenceDetail(
             sentence=data.space.join(one.sentence for one in built),
@@ -2851,10 +3798,12 @@ def generate_sentence_details(
             slots=tuple(slot for one in built for slot in one.slots),
             names=tuple(name for one in built for name in one.names),
             types=tuple(one.type for one in built),
+            tense=result.tense,
+            story=result.story,
             language=code,
-            # What the result is about is what its first sentence was about; the ones
-            # after it stay inside that noun's class.
-            theme=built[0].theme,
+            # What the result is about: its hero in a story, and otherwise what its first
+            # sentence was about, which the ones after it stay inside.
+            theme=result.theme,
         )
 
     return collect(

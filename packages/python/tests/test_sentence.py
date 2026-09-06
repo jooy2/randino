@@ -16,6 +16,7 @@ from randino import (
     SentenceQuote,
     SentenceShape,
     SentenceSlot,
+    SentenceStory,
     SentenceStyle,
     SentenceType,
     WordLanguage,
@@ -29,11 +30,22 @@ from randino.name.data import NAME_DATA
 # The datasets are internal, but a sentence is only as good as the grammar behind
 # it — these checks read the pools a sentence is allowed to draw from.
 from randino.sentence._generator import shape_of
-from randino.sentence.data import SENTENCE_DATA, THEME_CLASS
-from randino.sentence.data._types import PredicateForm, PredicateForms, SentenceMark
+from randino.sentence._story import hero_classes_for, item_themes_for, tellable
+from randino.sentence.data import SENTENCE_DATA, STORIES, THEME_CLASS
+from randino.sentence.data._types import (
+    ModifierGroup,
+    NounClass,
+    PredicateForm,
+    PredicateForms,
+    PredicateTense,
+    SentenceLanguageData,
+    SentenceMark,
+    StateGroup,
+    VerbGroup,
+)
 from randino.word._generator import agree
 from randino.word.data import WORD_DATA
-from randino.word.data._types import WordGender, WordPool
+from randino.word.data._types import WordAgreement, WordGender, WordPool
 
 SAMPLE = 60
 
@@ -121,9 +133,41 @@ def forms_of(
     return list(words)
 
 
-def every_form(words: WordPool, forms: PredicateForms) -> list[str]:
-    """Every predicate a group can write at any level and any mood."""
-    return [*words, *(ending for pool in forms.values() for ending in endings(pool))]
+def every_form(
+    words: WordPool, forms: PredicateForms, past: PredicateTense | None = None
+) -> list[str]:
+    """Every predicate a group can write at any level and any mood, in either tense."""
+    return [
+        *words,
+        *(ending for pool in forms.values() for ending in endings(pool)),
+        *past_forms(past),
+    ]
+
+
+def past_forms(past: PredicateTense | None) -> list[str]:
+    """The same, for the past alone."""
+    if past is None:
+        return []
+
+    return [*past.words, *(ending for pool in past.forms.values() for ending in endings(pool))]
+
+
+def agreed_by(rules: WordAgreement, word: str) -> list[str]:
+    """A word reshaped by ordered `(ending, replacement)` rules, for every gender."""
+    out = [word]
+
+    for rules_of_gender in rules.values():
+        for ending, replacement in rules_of_gender:
+            if word.endswith(ending):
+                out.append(word[: len(word) - len(ending)] + replacement)
+                break
+
+    return out
+
+
+def times_of(data: SentenceLanguageData) -> list[str]:
+    """Every time adverbial a language holds, whatever the tense."""
+    return [*data.times.day, *data.times.any, *(data.times.past or ()), *(data.times.present or ())]
 
 
 def pool_for(language: WordLanguage, slot: SentenceSlot) -> set[str]:
@@ -131,20 +175,26 @@ def pool_for(language: WordLanguage, slot: SentenceSlot) -> set[str]:
     data = SENTENCE_DATA[language]
 
     if slot == "verb":
-        return {word for group in data.verbs for word in every_form(group.words, group.forms)}
+        return {
+            word
+            for group in data.verbs
+            for word in every_form(group.words, group.forms, group.past)
+        }
 
     if slot == "state":
         states = tuple(
-            word for group in data.states for word in every_form(group.words, group.forms)
+            word
+            for group in data.states
+            for word in every_form(group.words, group.forms, group.past)
         )
 
         return set(inflected(language, states) if data.predicate_agrees else states)
 
     if slot == "manner":
-        return set(data.manners)
+        return {word for group in data.manners for word in group.words}
 
     if slot == "time":
-        return set(data.times)
+        return set(times_of(data))
 
     return {
         plain(language, word) for theme in WORD_THEMES for word in WORD_DATA[language].nouns[theme]
@@ -152,8 +202,17 @@ def pool_for(language: WordLanguage, slot: SentenceSlot) -> set[str]:
 
 
 def modifiers_for(language: WordLanguage) -> set[str]:
-    """The modifiers a noun phrase may carry, in every form they can take."""
-    return {plain(language, word) for word in inflected(language, WORD_DATA[language].adjectives)}
+    """The modifiers a noun phrase may carry, in every form they can take.
+
+    The sentence data's own groups, and the nickname pools a required word may still
+    come from.
+    """
+    pool = (
+        *(word for group in SENTENCE_DATA[language].modifiers for word in group.words),
+        *WORD_DATA[language].adjectives,
+    )
+
+    return {plain(language, word) for word in inflected(language, pool)}
 
 
 def articles_for(language: WordLanguage) -> list[str]:
@@ -225,6 +284,7 @@ def test_every_language_writes_sentences_in_its_own_script_and_closes_them() -> 
             for sentence in rand_sentence(
                 type="statement",
                 include_name=False,
+                tense="present",
                 language=language,
                 realism=realism,
                 count=SAMPLE,
@@ -254,6 +314,7 @@ def test_a_language_with_articles_writes_one_invented_word_or_not() -> None:
             for sentence in rand_sentence(
                 type="statement",
                 include_name=False,
+                tense="present",
                 language=language,
                 realism=realism,
                 count=SAMPLE,
@@ -296,7 +357,12 @@ def test_every_phrase_is_written_out_of_the_languages_own_pools() -> None:
         }
 
         for detail in rand_sentence(
-            type="statement", include_name=False, output="detail", language=language, count=200
+            type="statement",
+            include_name=False,
+            tense="present",
+            output="detail",
+            language=language,
+            count=200,
         ):
             assert len(detail.phrases) == len(detail.slots), detail.sentence
 
@@ -371,7 +437,12 @@ def test_a_verb_only_takes_the_subject_and_object_its_group_allows() -> None:
         data = SENTENCE_DATA[language]
 
         for detail in rand_sentence(
-            type="statement", include_name=False, output="detail", language=language, count=200
+            type="statement",
+            include_name=False,
+            tense="present",
+            output="detail",
+            language=language,
+            count=200,
         ):
             if "verb" not in detail.slots or detail.theme is None:
                 continue
@@ -425,6 +496,7 @@ def test_theme_decides_what_the_subject_is_about() -> None:
         for detail in rand_sentence(
             type="statement",
             include_name=False,
+            tense="present",
             output="detail",
             language="ko",
             theme=theme,
@@ -443,6 +515,7 @@ def test_shape_decides_how_much_the_sentence_says() -> None:
             for detail in rand_sentence(
                 type="statement",
                 include_name=False,
+                tense="present",
                 output="detail",
                 language=language,
                 shape=shape,
@@ -471,6 +544,7 @@ def test_slots_decides_what_the_sentence_carries_beside_its_subject() -> None:
             for detail in rand_sentence(
                 type="statement",
                 include_name=False,
+                tense="present",
                 output="detail",
                 language=language,
                 slots=slot,
@@ -479,7 +553,7 @@ def test_slots_decides_what_the_sentence_carries_beside_its_subject() -> None:
                 assert slot in detail.slots, f"{language} {slot}: {detail.sentence}"
 
     for detail in rand_sentence(
-        type="statement", include_name=False, output="detail", slots=(), count=120
+        type="statement", include_name=False, tense="present", output="detail", slots=(), count=120
     ):
         assert len(detail.phrases) <= 2, detail.sentence
 
@@ -502,7 +576,12 @@ def test_include_puts_every_word_it_was_given_into_every_sentence() -> None:
 
     for language, include in cases:
         for sentence in rand_sentence(
-            type="statement", include_name=False, language=language, include=include, count=40
+            type="statement",
+            include_name=False,
+            tense="present",
+            language=language,
+            include=include,
+            count=40,
         ):
             for word in include:
                 assert word.lower() in sentence.lower(), (
@@ -583,7 +662,7 @@ def test_a_narrow_range_is_met_anywhere_in_the_language_s_own_range() -> None:
         seen = sorted(
             len(sentence)
             for sentence in rand_sentence(
-                language=language, type="statement", include_name=False, count=400
+                language=language, type="statement", include_name=False, tense="present", count=400
             )
         )
         lowest = seen[int(len(seen) * 0.05)]
@@ -597,6 +676,7 @@ def test_a_narrow_range_is_met_anywhere_in_the_language_s_own_range() -> None:
                 language=language,
                 type="statement",
                 include_name=False,
+                tense="present",
                 min_length=min_length,
                 max_length=max_length,
                 count=30,
@@ -901,8 +981,10 @@ def test_a_paragraph_keeps_its_scene_its_person_and_its_register() -> None:
     # else asking.
     mixed = 0
 
+    # `type` is named, because a story told on its own terms is prose and never
+    # quotes: the register is what a caller who asked for every kind gets.
     for detail in rand_sentence(
-        language="ko", sentences=4, include_name=False, count=300, output="detail"
+        language="ko", sentences=4, include_name=False, type="all", count=300, output="detail"
     ):
         lead = detail.types[0]
         quoted = lead in ("dialogue", "thought")
@@ -989,6 +1071,7 @@ def test_a_paragraph_spends_its_predicates_before_it_repeats_one() -> None:
         for detail in rand_sentence(
             type="statement",
             include_name=False,
+            tense="present",
             language=language,
             sentences=4,
             shape="simple",
@@ -1021,6 +1104,7 @@ def test_sentences_puts_more_than_one_sentence_in_one_result() -> None:
         for detail in rand_sentence(
             type="statement",
             include_name=False,
+            tense="present",
             language=language,
             sentences=3,
             count=40,
@@ -1044,7 +1128,9 @@ def test_sentences_puts_more_than_one_sentence_in_one_result() -> None:
                 assert counted.count(data.terminators["statement"]) == 1, f"{language}: {sentence}"
                 assert "  " not in sentence, f"{language}: {sentence}"
 
-    for detail in rand_sentence(type="statement", include_name=False, count=20, output="detail"):
+    for detail in rand_sentence(
+        type="statement", include_name=False, tense="present", count=20, output="detail"
+    ):
         assert len(detail.sentences) == 1
         assert detail.sentences[0] == detail.sentence
 
@@ -1099,11 +1185,22 @@ def test_the_sentences_of_one_result_are_about_the_same_kind_of_thing() -> None:
     for language in WORD_LANGUAGES:
         pronouns = pronouns_of(language)
 
-        for detail in rand_sentence(language=language, sentences=3, count=60, output="detail"):
+        for detail in rand_sentence(
+            type="statement",
+            include_name=False,
+            tense="present",
+            language=language,
+            sentences=3,
+            count=60,
+            output="detail",
+        ):
             if detail.theme is None:
                 continue
 
             wanted = THEME_CLASS[detail.theme]
+            # A story's scene is the one sentence whose subject is not the hero: the
+            # place it is happening in does something of its own.
+            allowed: tuple[NounClass, ...] = (wanted, "place") if detail.story else (wanted,)
             # A shape that counts what it is about has no separate subject, so the
             # counted phrase is the one that has to stay on topic. It is checked only in
             # the opening sentence, and only when that sentence has no subject of its
@@ -1133,7 +1230,7 @@ def test_the_sentences_of_one_result_are_about_the_same_kind_of_thing() -> None:
                     if theme is not None
                 ]
 
-                assert not themes or any(THEME_CLASS[theme] == wanted for theme in themes), (
+                assert not themes or any(THEME_CLASS[theme] in allowed for theme in themes), (
                     f"{language}: '{phrase}' reads as {themes} where the result is about a "
                     f"{wanted} ({detail.sentence})"
                 )
@@ -1256,7 +1353,9 @@ def test_include_name_writes_a_person_name_where_a_sentence_has_room_for_one() -
                     )
 
     # Off when it is asked to be off, and drawn when it is not asked at all.
-    for detail in rand_sentence(type="statement", include_name=False, count=60, output="detail"):
+    for detail in rand_sentence(
+        type="statement", include_name=False, tense="present", count=60, output="detail"
+    ):
         assert detail.names == (), detail.sentence
 
     carried = sum(
@@ -1418,18 +1517,24 @@ def test_a_question_is_a_shape_not_a_mark_bolted_onto_a_statement() -> None:
 
     for language, shape in carries.items():
         for sentence in rand_sentence(
-            language=language, type="question", style="plain", count=SAMPLE
+            language=language, type="question", style="plain", tense="present", count=SAMPLE
         ):
             assert re.search(shape, sentence), f"{language}: {sentence}"
 
+    # In the past the auxiliary carries the tense: `Did the lion run?`
+    for sentence in rand_sentence(language="en", type="question", tense="past", count=SAMPLE):
+        assert re.match(r"^(Did|Was) ", sentence), sentence
+
     # German moves its finite verb to the front, so the question opens on the predicate
     # or on the `ist` that stands in for one.
-    verbs = pool_for("de", "verb")
+    verbs = [*pool_for("de", "verb"), "ist", "war"]
 
     for sentence in rand_sentence(language="de", type="question", count=SAMPLE):
-        first = sentence.split(" ")[0].lower()
+        # A reflexive verb is two words, `belebte sich`, so the sentence is matched
+        # against the pool entries rather than split on its first space.
+        lower = sentence.lower()
 
-        assert first in verbs or first == "ist", f"de: {sentence}"
+        assert any(lower.startswith(verb + " ") for verb in verbs), f"de: {sentence}"
 
 
 def test_a_question_form_pool_is_the_same_length_as_the_words_it_restates() -> None:
@@ -1473,7 +1578,12 @@ def test_a_predicate_is_written_in_the_form_its_type_asks_for() -> None:
         }
 
         for detail in rand_sentence(
-            language=language, type="question", style="plain", count=120, output="detail"
+            language=language,
+            type="question",
+            style="plain",
+            tense="present",
+            count=120,
+            output="detail",
         ):
             for index, (phrase, slot) in enumerate(zip(detail.phrases, detail.slots, strict=True)):
                 if slot not in ("verb", "state"):
@@ -1499,15 +1609,31 @@ def test_include_puts_a_required_predicate_in_the_form_the_type_asks_for() -> No
 
     for style, forms in written.items():
         for sentence in rand_sentence(
-            language="ko", include="달린다", type="question", style=style, count=30
+            language="ko",
+            include="달린다",
+            type="question",
+            style=style,
+            tense="present",
+            count=30,
         ):
             assert any(form in sentence for form in forms), f"{style}: {sentence}"
             assert "달린다" not in sentence, sentence
 
     for sentence in rand_sentence(
-        language="en", include="runs", type="question", style="plain", count=30
+        language="en", include="runs", type="question", style="plain", tense="present", count=30
     ):
         assert re.search(r"\brun\b", sentence), sentence
+
+    # And the past is one more form it is translated into.
+    for sentence in rand_sentence(
+        language="ko", include="달린다", tense="past", style="plain", type="statement", count=30
+    ):
+        assert "달렸다" in sentence, sentence
+
+    for sentence in rand_sentence(
+        language="en", include="runs", tense="past", type="statement", count=30
+    ):
+        assert re.search(r"\bran\b", sentence), sentence
 
 
 def test_an_interjection_opens_an_exclamation_and_nothing_else() -> None:
@@ -1533,7 +1659,7 @@ def test_an_interjection_opens_an_exclamation_and_nothing_else() -> None:
         assert seen > 0, f"{language} never wrote an interjection"
 
         for sentence in rand_sentence(
-            type="statement", include_name=False, language=language, count=120
+            type="statement", include_name=False, tense="present", language=language, count=120
         ):
             assert not opens(sentence), f"{language}: a statement opened on one ({sentence})"
 
@@ -1616,13 +1742,13 @@ def test_style_is_the_speech_level_and_korean_is_the_one_with_four_of_them() -> 
         "ko": {"polite": r"(요|죠)[.?!…”’]$", "formal": r"(니다|니까)[.?!…”’]$"},
         # A Japanese verb closes on ます and an adjective on です.
         "ja": {
-            "polite": r"(ます|です)か?[。？！…」』]$",
-            "formal": r"(ます|です)か?[。？！…」』]$",
+            "polite": r"(ます|ました|です|でした)か?[。？！…」』]$",
+            "formal": r"(ます|ました|です|でした)か?[。？！…」』]$",
         },
     }
     addressed: dict[WordLanguage, str] = {
         "ko": r"(요|죠|니다|니까)[.?!…”’]$",
-        "ja": r"(ます|です)か?[。？！…」』]$",
+        "ja": r"(ます|ました|です|でした)か?[。？！…」』]$",
     }
     types: tuple[SentenceType, ...] = ("statement", "question")
 
@@ -1677,7 +1803,12 @@ def test_a_predicate_comes_out_of_the_pool_its_level_and_mood_land_on() -> None:
                 }
 
                 for detail in rand_sentence(
-                    language=language, type=mark, style=style, count=60, output="detail"
+                    language=language,
+                    type=mark,
+                    style=style,
+                    tense="present",
+                    count=60,
+                    output="detail",
                 ):
                     for phrase, slot in zip(detail.phrases, detail.slots, strict=True):
                         if slot not in ("verb", "state"):
@@ -1736,6 +1867,7 @@ def test_slots_date_and_slots_clock_write_the_languages_own_calendar() -> None:
                 slots=slot,
                 type="statement",
                 include_name=False,
+                tense="present",
                 count=SAMPLE,
                 output="detail",
             ):
@@ -1752,7 +1884,13 @@ def test_slots_date_and_slots_clock_write_the_languages_own_calendar() -> None:
             assert seen > 0, f"{language} never wrote a {slot}"
 
     for detail in rand_sentence(
-        language="ru", slots="date", type="statement", include_name=False, count=30, output="detail"
+        language="ru",
+        slots="date",
+        type="statement",
+        include_name=False,
+        tense="present",
+        count=30,
+        output="detail",
     ):
         assert "date" not in detail.slots, detail.sentence
 
@@ -1772,6 +1910,7 @@ def test_a_copular_shape_equates_a_subject_that_can_be_a_day() -> None:
             slots=["date", "clock"],
             type="statement",
             include_name=False,
+            tense="present",
             count=200,
             output="detail",
         ):
@@ -1801,6 +1940,7 @@ def test_a_copular_shape_equates_a_subject_that_can_be_a_day() -> None:
             style=style,
             type="statement",
             include_name=False,
+            tense="present",
             count=200,
             output="detail",
         ):
@@ -1839,6 +1979,7 @@ def test_slots_quantity_counts_a_noun_with_the_counter_its_kind_takes() -> None:
         for detail in rand_sentence(
             type="statement",
             include_name=False,
+            tense="present",
             language=language,
             slots="quantity",
             count=SAMPLE,
@@ -1876,6 +2017,7 @@ def test_slots_quantity_counts_a_noun_with_the_counter_its_kind_takes() -> None:
         for detail in rand_sentence(
             type="statement",
             include_name=False,
+            tense="present",
             language=language,
             slots="quantity",
             count=30,
@@ -1897,6 +2039,7 @@ def test_slots_money_writes_an_amount_the_language_actually_writes() -> None:
         for detail in rand_sentence(
             type="statement",
             include_name=False,
+            tense="present",
             language=language,
             slots="money",
             count=SAMPLE,
@@ -1920,6 +2063,7 @@ def test_slots_money_writes_an_amount_the_language_actually_writes() -> None:
         for detail in rand_sentence(
             type="statement",
             include_name=False,
+            tense="present",
             language=language,
             slots="money",
             count=30,
@@ -1933,7 +2077,15 @@ def test_an_amount_stands_where_the_verbs_that_take_an_idea_can_take_it() -> Non
     for language in WORD_LANGUAGES:
         data = SENTENCE_DATA[language]
 
-        for detail in rand_sentence(language=language, slots="money", count=60, output="detail"):
+        for detail in rand_sentence(
+            type="statement",
+            include_name=False,
+            tense="present",
+            language=language,
+            slots="money",
+            count=60,
+            output="detail",
+        ):
             if "verb" not in detail.slots or "money" not in detail.slots:
                 continue
 
@@ -1953,7 +2105,12 @@ def test_a_grouped_number_is_written_the_way_the_language_groups_it() -> None:
             continue
 
         for sentence in rand_sentence(
-            type="statement", include_name=False, language=language, slots="money", count=40
+            type="statement",
+            include_name=False,
+            tense="present",
+            language=language,
+            slots="money",
+            count=40,
         ):
             found = re.search(r"\d[\d.,\s]*\d", sentence)
             digits = found.group(0) if found else ""
@@ -2001,3 +2158,411 @@ def test_every_noun_class_the_frames_can_ask_for_has_a_predicate_to_go_with_it()
 
             assert noun in subjects, f"{language}: no verb takes a {noun} subject"
             assert noun in described, f"{language}: no state describes a {noun}"
+
+
+def test_tense_decides_when_it_happened_and_a_result_keeps_one_tense() -> None:
+    for language in WORD_LANGUAGES:
+        data = SENTENCE_DATA[language]
+        groups: list[VerbGroup | StateGroup] = [*data.verbs, *data.states]
+        present = {word for group in groups for word in every_form(group.words, group.forms)}
+        # A language whose adjectives do not change for the past writes them as they are
+        # and puts the tense on the copula in front.
+        states_change = any(group.past is not None for group in data.states)
+        # Every past form, agreed for every gender where the language's past agrees.
+        past = {
+            agreed
+            for group in groups
+            for word in past_forms(group.past)
+            for agreed in (agreed_by(data.past_agreement, word) if data.past_agreement else [word])
+        }
+        # A word the present and the past share — English `spread` — says nothing about
+        # the tense, so only the words that belong to one of them are read.
+        past_only = past - present
+        mark = data.past_mark
+        verbs_change = any(group.past is not None for group in data.verbs)
+
+        for detail in rand_sentence(
+            type="statement",
+            include_name=False,
+            tense="past",
+            language=language,
+            count=120,
+            output="detail",
+        ):
+            assert detail.tense == "past"
+
+            for index, (phrase, slot) in enumerate(zip(detail.phrases, detail.slots, strict=True)):
+                if slot not in ("verb", "state"):
+                    continue
+
+                written = phrase[:1].lower() + phrase[1:] if index == 0 else phrase
+
+                if mark is not None:
+                    # Chinese and Vietnamese mark the past beside the verb and leave the
+                    # verb itself as it was.
+                    if slot == "verb":
+                        head = mark.head + data.space if mark.head else ""
+                        tail = mark.tail or ""
+
+                        assert written.startswith(head) and written.endswith(tail), (
+                            f"{language}: '{phrase}' carries no past mark ({detail.sentence})"
+                        )
+                        assert written[len(head) : len(written) - len(tail)] in present, (
+                            f"{language}: '{phrase}' is not a verb the pools hold"
+                        )
+
+                    continue
+
+                usable = present if slot == "state" and not states_change else past
+                forms = inflected(language, tuple(usable)) if data.predicate_agrees else usable
+
+                assert written in forms or phrase in forms or written in present, (
+                    f"{language}: '{phrase}' is not a past {slot} ({detail.sentence})"
+                )
+
+                if slot == "verb" and verbs_change:
+                    assert written not in present or written in past, (
+                        f"{language}: '{phrase}' is a present verb in a past sentence"
+                    )
+
+        # The present never reaches for a past form.
+        for detail in rand_sentence(
+            type="statement",
+            include_name=False,
+            tense="present",
+            language=language,
+            count=60,
+            output="detail",
+        ):
+            assert detail.tense == "present"
+
+            for index, (phrase, slot) in enumerate(zip(detail.phrases, detail.slots, strict=True)):
+                if slot != "verb":
+                    continue
+
+                written = phrase[:1].lower() + phrase[1:] if index == 0 else phrase
+
+                assert written not in past_only, (
+                    f"{language}: '{phrase}' is a past verb in a present sentence"
+                )
+
+    # Left out, the tense is drawn, and both come out.
+    seen = {detail.tense for detail in rand_sentence(language="ko", count=100, output="detail")}
+
+    assert seen == {"past", "present"}
+
+
+def test_more_than_one_sentence_tells_a_story_and_one_sentence_tells_none() -> None:
+    for language in WORD_LANGUAGES:
+        for detail in rand_sentence(
+            type="statement",
+            include_name=False,
+            tense="present",
+            language=language,
+            sentences=4,
+            count=40,
+            output="detail",
+        ):
+            assert detail.story is not None, detail.sentence
+            assert len(detail.sentences) == 4, detail.sentence
+
+        for detail in rand_sentence(
+            type="statement", include_name=False, language=language, count=20, output="detail"
+        ):
+            assert detail.story is None, detail.sentence
+
+    # A story the caller named is the one told, where the language can tell it.
+    for detail in rand_sentence(
+        type="statement",
+        include_name=False,
+        language="ko",
+        sentences=3,
+        story="errand",
+        count=40,
+        output="detail",
+    ):
+        assert detail.story == "errand", detail.sentence
+
+    # German and Russian carry no object, so they tell the stories with nothing in the
+    # hero's hands — and they still tell one.
+    empty: tuple[SentenceStory, ...] = ("stroll", "outing", "evening", "passage")
+
+    for language in ("de", "ru"):
+        for detail in rand_sentence(
+            type="statement",
+            include_name=False,
+            language=language,
+            sentences=3,
+            count=40,
+            output="detail",
+        ):
+            assert detail.story in empty, f"{language}: {detail.story} ({detail.sentence})"
+
+    # The thing a story is about is one thing throughout: every object phrase of a
+    # result reads as the same noun.
+    for language in WORD_LANGUAGES:
+        for detail in rand_sentence(
+            type="statement",
+            include_name=False,
+            tense="present",
+            language=language,
+            sentences=5,
+            count=60,
+            output="detail",
+        ):
+            objects = [
+                nouns_in(language, phrase)
+                for phrase, slot in zip(detail.phrases, detail.slots, strict=True)
+                if slot == "object"
+            ]
+
+            for found in objects[1:]:
+                assert found & objects[0], f"{language}: the thing changed ({detail.sentence})"
+
+    # A story's required steps alone hold together, in every language, about every hero
+    # it names — and every class of noun has a story to be in.
+    for language in WORD_LANGUAGES:
+        data = SENTENCE_DATA[language]
+        covered: set[NounClass] = set()
+
+        for story in STORIES:
+            for hero in hero_classes_for(data, story, story.hero):
+                covered.add(hero)
+
+                if story.item is not None:
+                    assert item_themes_for(data, story, hero), (
+                        f"{language}: {story.name} about a {hero} has nothing to be about"
+                    )
+                else:
+                    assert tellable(data, story, hero, None), (
+                        f"{language}: {story.name} about a {hero}"
+                    )
+
+        for theme in WORD_THEMES:
+            assert THEME_CLASS[theme] in covered, (
+                f"{language}: no story is about a {THEME_CLASS[theme]}"
+            )
+
+
+def test_a_story_moves_its_day_forward_and_never_back() -> None:
+    for language in WORD_LANGUAGES:
+        day = SENTENCE_DATA[language].times.day
+        moved = 0
+
+        for detail in rand_sentence(
+            type="statement",
+            include_name=False,
+            tense="present",
+            language=language,
+            sentences=6,
+            count=80,
+            output="detail",
+        ):
+            last = -1
+
+            for phrase, slot in zip(detail.phrases, detail.slots, strict=True):
+                if slot != "time":
+                    continue
+
+                written = phrase[:1].lower() + phrase[1:]
+                at = max(
+                    day.index(phrase) if phrase in day else -1,
+                    day.index(written) if written in day else -1,
+                )
+
+                if at < 0:
+                    continue
+
+                assert at > last, f"{language}: the day went back to '{phrase}' ({detail.sentence})"
+
+                moved += 1 if last >= 0 else 0
+                last = at
+
+        assert moved > 0, f"{language}: no story named two phases of its day"
+
+
+def predicates_of(detail: SentenceDetail, belongs: list[int], at: int) -> list[SentenceSlot]:
+    """The predicate slots of one sentence of a result."""
+    return [
+        slot
+        for i, slot in enumerate(detail.slots)
+        if belongs[i] == at and slot in ("verb", "state")
+    ]
+
+
+def test_two_neighbouring_actions_are_sometimes_written_as_one_sentence() -> None:
+    for language in WORD_LANGUAGES:
+        join = SENTENCE_DATA[language].join
+
+        if join is None:
+            continue
+
+        joined = 0
+
+        for detail in rand_sentence(
+            type="statement",
+            include_name=False,
+            tense="present",
+            language=language,
+            sentences=4,
+            count=80,
+            output="detail",
+        ):
+            belongs = sentence_of(detail)
+
+            for at, sentence in enumerate(detail.sentences):
+                predicates = predicates_of(detail, belongs, at)
+
+                if len(predicates) == 2:
+                    joined += 1
+
+                    if join.word:
+                        assert join.word in sentence, (
+                            f"{language}: two clauses and no '{join.word}' ({sentence})"
+                        )
+
+                assert len(predicates) <= 2, f"{language}: {sentence}"
+
+        assert joined > 0, f"{language} never joined two clauses"
+
+    # German declares no join, and never writes two clauses.
+    for detail in rand_sentence(
+        type="statement",
+        include_name=False,
+        tense="present",
+        language="de",
+        sentences=4,
+        count=40,
+        output="detail",
+    ):
+        belongs = sentence_of(detail)
+
+        for at, sentence in enumerate(detail.sentences):
+            assert len(predicates_of(detail, belongs, at)) == 1, f"de: {sentence}"
+
+
+def test_a_destination_follows_only_a_verb_that_goes_somewhere() -> None:
+    for language in WORD_LANGUAGES:
+        data = SENTENCE_DATA[language]
+        going = {
+            word
+            for group in data.verbs
+            if group.requires == "destination"
+            for word in every_form(group.words, group.forms, group.past)
+        }
+        carries = any(part.slot == "destination" for frame in data.frames for part in frame.parts)
+
+        if not carries:
+            continue
+
+        seen = 0
+
+        for detail in rand_sentence(
+            type="statement",
+            include_name=False,
+            tense="present",
+            language=language,
+            slots="destination",
+            count=120,
+            output="detail",
+        ):
+            if "destination" not in detail.slots or "verb" not in detail.slots:
+                continue
+
+            seen += 1
+
+            verb = detail.slots.index("verb")
+            phrase = detail.phrases[verb]
+            written = phrase[:1].lower() + phrase[1:] if verb == 0 else phrase
+
+            assert written in going or phrase in going, (
+                f"{language}: '{phrase}' goes nowhere, and has a destination ({detail.sentence})"
+            )
+
+        assert seen > 0, f"{language} wrote no destination"
+
+
+def modifier_fits(
+    language: WordLanguage,
+    groups: list[tuple[ModifierGroup, set[str]]],
+    modifier: str,
+    noun: str,
+) -> bool:
+    """Whether one of the groups puts this modifier in front of a noun of this theme."""
+    theme = theme_of_noun(language, noun)
+
+    return theme is not None and any(
+        modifier in words
+        and THEME_CLASS[theme] in group.subject
+        and (group.themes is None or theme in group.themes)
+        for group, words in groups
+    )
+
+
+def test_a_modifier_fits_the_noun_it_describes() -> None:
+    described: tuple[SentenceSlot, ...] = ("subject", "object", "place", "destination")
+
+    for language in WORD_LANGUAGES:
+        data = SENTENCE_DATA[language]
+        space = data.space
+        nouns = pool_for(language, "subject")
+        # Every form each group's words can take, agreed for every gender.
+        groups = [
+            (group, {plain(language, word) for word in inflected(language, group.words)})
+            for group in data.modifiers
+        ]
+        every = {word for _, words in groups for word in words}
+        checked = 0
+
+        for detail in rand_sentence(
+            type="statement",
+            include_name=False,
+            tense="present",
+            language=language,
+            count=150,
+            output="detail",
+        ):
+            for index, (phrase, slot) in enumerate(zip(detail.phrases, detail.slots, strict=True)):
+                if slot not in described:
+                    continue
+
+                rest = phrase[:1].lower() + phrase[1:] if index == 0 else phrase
+
+                for article in articles_for(language):
+                    opening = article if article.endswith("'") else article + space
+
+                    if rest.startswith(opening):
+                        rest = rest[len(opening) :]
+                        break
+
+                if rest in nouns:
+                    continue
+
+                # Every way the phrase splits into a modifier and a noun the pools hold.
+                # More than one, because a word can be both — so the phrase is right when
+                # one of its readings is.
+                readings: list[tuple[str, str]] = []
+
+                for at in range(1, len(rest)):
+                    if space and rest[at : at + len(space)] != space:
+                        continue
+
+                    left = rest[:at]
+                    right = rest[at + len(space) :]
+
+                    if left in every and right in nouns:
+                        readings.append((left, right))
+
+                    if left in nouns and right in every:
+                        readings.append((right, left))
+
+                if not readings:
+                    continue
+
+                checked += 1
+
+                assert any(
+                    modifier_fits(language, groups, modifier, noun) for modifier, noun in readings
+                ), f"{language}: '{rest}' has no modifier that fits its noun ({detail.sentence})"
+
+        assert checked > 0, f"{language}: no modifier was read"

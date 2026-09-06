@@ -168,6 +168,7 @@ SentenceSlot = Literal[
     "object",
     "state",
     "place",
+    "destination",
     "time",
     "manner",
     "quantity",
@@ -181,6 +182,9 @@ SentenceSlot = Literal[
 (`잠잔다`), `object` what it does it to (`사과를`), and `state` what it is like where
 the sentence has no verb at all (`파랗다`). The rest frame the action: `place` where it
 happens (`숲에서`), `time` when (`새벽에`), `manner` how (`조용히`).
+
+`destination` is where it is going (`시장으로`, `to the market`), which only a verb that
+goes somewhere or arrives can stand beside.
 
 `quantity` is how many of something (`사과 12개`), which is a noun phrase with a number
 and the counter its kind takes, and `money` is how much (`100,000원`, `12,000 dollars`).
@@ -245,6 +249,34 @@ third; English has no such form at all. In those seven all four levels write exa
 same sentence.
 """
 
+SentenceTense = Literal["present", "past"]
+"""When a sentence happened.
+
+`"present"` is the form the pools are written in (`달린다`, `runs`); `"past"` is the
+tense a story is told in (`달렸다`, `ran`). Every language writes it its own way: Korean,
+Japanese, English, Spanish, Italian and German change the verb, Russian changes it and
+makes it agree with the subject, and Chinese and Vietnamese write a word beside it
+(`了`, `đã`) and leave the verb alone. A result keeps one tense throughout.
+"""
+
+SentenceStory = Literal[
+    "errand", "meal", "search", "outing", "craft", "stroll", "evening", "passage"
+]
+"""The story a result of several sentences follows.
+
+Each is a short sequence of things that happen, in an order that makes sense, told with
+whatever words the language has for each of them: `"errand"` — the hero goes somewhere,
+gets something to eat, comes home and eats it; `"meal"` — the hero is hungry, prepares
+something and eats it; `"search"` — the hero looks for something, finds it and brings it
+back; `"outing"` — the hero gets up, goes out, plays and comes home tired; `"craft"` —
+the hero makes something and sells it, people only; `"stroll"` — the hero goes out and
+wanders, with nothing to carry; `"evening"` — the day ends, the hero comes home and
+sleeps; `"passage"` — something that is not a person or an animal changes over time.
+
+Which stories a language can tell depends on the shapes it declares: German and Russian
+carry no object, so they tell the ones with nothing in the hero's hands.
+"""
+
 SentenceQuote = Literal["double", "single"]
 """Which pair of quotation marks a quoted line takes.
 
@@ -295,11 +327,20 @@ class SentenceDetail:
     types: tuple[SentenceType, ...]
     """What each sentence is doing, at the same index as `sentences`."""
 
+    tense: SentenceTense
+    """The tense every sentence of the result is in."""
+
+    story: SentenceStory | None
+    """The story a result of several sentences followed.
+
+    None for a result of one sentence, which follows none.
+    """
+
     language: WordLanguage
     """The language this sentence was generated in."""
 
     theme: WordTheme | None
-    """Theme the result's subject belongs to — the first sentence's.
+    """Theme the result's subject belongs to: its hero's in a story, else the first sentence's.
 
     That is what every sentence after it stays about. None when the word is not one the
     generator knows, which happens when it was invented or was handed in through

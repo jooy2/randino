@@ -10,7 +10,9 @@ from randino._types import (
     SentenceQuote,
     SentenceShapeOption,
     SentenceSlotOption,
+    SentenceStory,
     SentenceStyle,
+    SentenceTense,
     SentenceTypeOption,
     WordLanguageOption,
     WordThemeOption,
@@ -37,6 +39,8 @@ def rand_sentence(
     type: SentenceTypeOption | None = ...,
     quote: SentenceQuote | None = ...,
     style: SentenceStyle | None = ...,
+    tense: SentenceTense | None = ...,
+    story: SentenceStory | None = ...,
     output: Literal["value"] = ...,
 ) -> list[str]: ...
 
@@ -60,6 +64,8 @@ def rand_sentence(
     type: SentenceTypeOption | None = ...,
     quote: SentenceQuote | None = ...,
     style: SentenceStyle | None = ...,
+    tense: SentenceTense | None = ...,
+    story: SentenceStory | None = ...,
     output: Literal["detail"],
 ) -> list[SentenceDetail]: ...
 
@@ -82,6 +88,8 @@ def rand_sentence(
     type: SentenceTypeOption | None = None,
     quote: SentenceQuote | None = None,
     style: SentenceStyle | None = None,
+    tense: SentenceTense | None = None,
+    story: SentenceStory | None = None,
     output: RandOutput = "value",
 ) -> list[str] | list[SentenceDetail]:
     """Generate whole sentences, written the way the language writes them.
@@ -117,15 +125,14 @@ def rand_sentence(
             sentences once the pools run out of combinations.
         sentences: How many sentences one result holds, up to `RAND_SENTENCE_COUNT_MAX`.
             They come back as one string — `count` is still how many strings there are
-            — and they are about the same thing: a later sentence names the first one's
-            subject again, refers to it with a pronoun, or draws a fresh subject of the
-            same kind, and may open on a connective. `min_length` and `max_length`
+            — and they tell one story: a later sentence is about the first one's
+            subject, names it again or refers to it with a pronoun, and what it says
+            follows from what the ones before it said. `min_length` and `max_length`
             describe the whole string whatever this is. A result of several reads as
-            one paragraph rather than as several draws that landed together: it keeps
-            the register it opened in, so a scene of speech is lines with prose between
-            them; it spends its verbs before it repeats one; it names a person and then
-            leaves them alone; and it never opens two of its sentences on the same
-            word.
+            one short story rather than as several draws that landed together: the
+            place and the thing stay the same, the time of day only moves forward, two
+            things that happen one after the other are sometimes one sentence, and it
+            keeps the tense, the level and the register it opened in.
         include_name: Whether a sentence about a person writes a generated name where
             that person would go — `Emma runs quietly.`, `민준이 조용히 달린다.`
             Turning it on narrows the subject to the themes that name people; a `theme`
@@ -149,6 +156,17 @@ def rand_sentence(
             the two languages this changes — `달린다` becomes `달려`, `달려요` or
             `달립니다`, question and exclamation included — and the other seven write
             the same sentence at every level.
+        tense: When it happened, drawn per result when left out so that a paragraph is
+            told in one tense throughout. `"past"` is how a story is told: `여우가
+            시장으로 갔다`, `The fox went to the market`. Every language writes it the
+            way its own grammar does — a changed verb, a verb that agrees with its
+            subject, or a word beside a verb that does not change.
+        story: Which story a result of several sentences tells, drawn per result when
+            left out from the stories the language can tell about the subject asked
+            for. With `sentences` above 1 the sentences are one sequence of things that
+            happen — the hero goes somewhere, finds something there, brings it back —
+            and what each sentence says follows from what the ones before it said.
+            Ignored by a result of one sentence.
         output: `"value"` for strings, `"detail"` for a `SentenceDetail` per sentence —
             the phrases in order, what each of them does, the language and the theme.
 
@@ -185,6 +203,8 @@ def rand_sentence(
         type=type,
         quote=quote,
         style=style,
+        tense=tense,
+        story=story,
     )
 
     if output == "detail":
