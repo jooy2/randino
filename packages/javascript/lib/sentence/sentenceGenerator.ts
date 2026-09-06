@@ -2568,6 +2568,12 @@ function headedFallback(
 }
 
 /** The theme a phrase other than the subject draws from. */
+// Where a subject can go, and where a story happens. `place` alone, and not the
+// two other themes of its class: a hero can walk to the market and not to Pluto,
+// and a sky is not somewhere a fox goes. A `place` part on its own still spans
+// the class, because a fox can sleep under a sky.
+const DESTINATION_THEMES: readonly WordTheme[] = ['place'];
+
 function themeForPart(
 	slot: SentenceSlot,
 	group: VerbGroup | StateGroup,
@@ -2578,6 +2584,10 @@ function themeForPart(
 		const usable = objectThemesOf(group as VerbGroup, beat);
 
 		return pick(usable.length ? usable : WORD_THEMES);
+	}
+
+	if (slot === 'destination') {
+		return pick(DESTINATION_THEMES);
 	}
 
 	// A story happens somewhere a story can happen — a market, a park — and not
@@ -3187,11 +3197,6 @@ function storyFor(telling: Telling): {
 	return null;
 }
 
-// Where a story happens. `place` alone, and not the two other themes of its
-// class: a hero can walk to the market and not to Pluto, and a sky is not
-// somewhere a fox goes.
-const STORY_PLACES: readonly WordTheme[] = ['place'];
-
 /**
  * Every sentence of a result that follows a story.
  *
@@ -3211,7 +3216,7 @@ function tellStory(telling: Telling): Result | null {
 
 	const { plan: planned, heroThemes, item } = found;
 	const { story, beats } = planned;
-	const placeThemes = STORY_PLACES;
+	const placeThemes = DESTINATION_THEMES;
 	const roles: Roles = {};
 	const built: Built[] = [];
 	let topic = null as Topic | null;

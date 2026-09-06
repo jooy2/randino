@@ -275,16 +275,16 @@ rand_sentence(language="de", slots="object", count=3)
 
 ### 어디로 가는지 {#destination}
 
-`destination`은 주어가 향하는 곳이며, 어디론가 가는 동사만 이 구를 받습니다. `향한다`, `들어선다`, `heads to`, `gets back to`는 받고, `leaves to the market` 같은 문장은 나오지 않습니다. 이야기에서 주인공이 나설 때와 집에 돌아올 때 쓰는 구입니다.
+`destination`은 주어가 향하는 곳이며, 어디론가 가는 동사만 이 구를 받습니다. `향한다`, `들어선다`, `heads to`, `gets back to`는 받고, `leaves to the market` 같은 문장은 나오지 않습니다. 시장이나 다락처럼 `place` 테마에서만 뽑고, 같은 부류인 하늘이나 행성에서는 뽑지 않습니다. 여우는 하늘 아래에서 잘 수는 있어도 하늘로 걸어갈 수는 없기 때문입니다. 이야기에서 주인공이 나설 때와 집에 돌아올 때 쓰는 구입니다.
 
 ::: lang js
 
 ```javascript
 randSentence({ language: 'en', slots: 'destination', count: 2 });
-// ['The brewer heads back to the terminal gently.', 'The stonemason gets back to the shadow.']
+// ['The patient eagle returns to the attic.', 'The clever osprey goes to the promenade.']
 
 randSentence({ language: 'ko', slots: 'destination', count: 2 });
-// ['새해에 나이아드가 복도로 향한다.', '타조가 외딴 싱크홀에 들어선다.']
+// ['농부가 침실로 간다.', '공주가 가볍게 누각에 들어선다.']
 ```
 
 :::
@@ -293,10 +293,10 @@ randSentence({ language: 'ko', slots: 'destination', count: 2 });
 
 ```dart
 randSentence(language: WordLanguage.en, slots: {SentenceSlot.destination}, count: 2);
-// [The brewer heads back to the terminal gently., The stonemason gets back to the shadow.]
+// [The patient eagle returns to the attic., The clever osprey goes to the promenade.]
 
 randSentence(language: WordLanguage.ko, slots: {SentenceSlot.destination}, count: 2);
-// [새해에 나이아드가 복도로 향한다., 타조가 외딴 싱크홀에 들어선다.]
+// [농부가 침실로 간다., 공주가 가볍게 누각에 들어선다.]
 ```
 
 :::
@@ -305,10 +305,10 @@ randSentence(language: WordLanguage.ko, slots: {SentenceSlot.destination}, count
 
 ```python
 rand_sentence(language="en", slots="destination", count=2)
-# ['The brewer heads back to the terminal gently.', 'The stonemason gets back to the shadow.']
+# ['The patient eagle returns to the attic.', 'The clever osprey goes to the promenade.']
 
 rand_sentence(language="ko", slots="destination", count=2)
-# ['새해에 나이아드가 복도로 향한다.', '타조가 외딴 싱크홀에 들어선다.']
+# ['농부가 침실로 간다.', '공주가 가볍게 누각에 들어선다.']
 ```
 
 :::

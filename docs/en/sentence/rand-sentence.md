@@ -275,16 +275,16 @@ With no language named, the ones that can answer are preferred over the ones tha
 
 ### Going somewhere {#destination}
 
-`destination` is where the subject is going, and only a verb that goes somewhere takes one: `heads to`, `gets back to`, `향한다`, `들어선다`, never `leaves to the market`. It is the part a story writes when its hero sets out and when they come home.
+`destination` is where the subject is going, and only a verb that goes somewhere takes one: `heads to`, `gets back to`, `향한다`, `들어선다`, never `leaves to the market`. It is drawn from the `place` theme alone, a market or an attic, and never from the sky or the planets that share its class: a fox can sleep under a sky, and cannot walk to one. It is the part a story writes when its hero sets out and when they come home.
 
 ::: lang js
 
 ```javascript
 randSentence({ language: 'en', slots: 'destination', count: 2 });
-// ['The brewer heads back to the terminal gently.', 'The stonemason gets back to the shadow.']
+// ['The patient eagle returns to the attic.', 'The clever osprey goes to the promenade.']
 
 randSentence({ language: 'ko', slots: 'destination', count: 2 });
-// ['새해에 나이아드가 복도로 향한다.', '타조가 외딴 싱크홀에 들어선다.']
+// ['농부가 침실로 간다.', '공주가 가볍게 누각에 들어선다.']
 ```
 
 :::
@@ -293,10 +293,10 @@ randSentence({ language: 'ko', slots: 'destination', count: 2 });
 
 ```dart
 randSentence(language: WordLanguage.en, slots: {SentenceSlot.destination}, count: 2);
-// [The brewer heads back to the terminal gently., The stonemason gets back to the shadow.]
+// [The patient eagle returns to the attic., The clever osprey goes to the promenade.]
 
 randSentence(language: WordLanguage.ko, slots: {SentenceSlot.destination}, count: 2);
-// [새해에 나이아드가 복도로 향한다., 타조가 외딴 싱크홀에 들어선다.]
+// [농부가 침실로 간다., 공주가 가볍게 누각에 들어선다.]
 ```
 
 :::
@@ -305,10 +305,10 @@ randSentence(language: WordLanguage.ko, slots: {SentenceSlot.destination}, count
 
 ```python
 rand_sentence(language="en", slots="destination", count=2)
-# ['The brewer heads back to the terminal gently.', 'The stonemason gets back to the shadow.']
+# ['The patient eagle returns to the attic.', 'The clever osprey goes to the promenade.']
 
 rand_sentence(language="ko", slots="destination", count=2)
-# ['새해에 나이아드가 복도로 향한다.', '타조가 외딴 싱크홀에 들어선다.']
+# ['농부가 침실로 간다.', '공주가 가볍게 누각에 들어선다.']
 ```
 
 :::

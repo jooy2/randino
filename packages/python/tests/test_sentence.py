@@ -2479,6 +2479,14 @@ def test_a_destination_follows_only_a_verb_that_goes_somewhere() -> None:
                 f"{language}: '{phrase}' goes nowhere, and has a destination ({detail.sentence})"
             )
 
+            # And it goes somewhere one can go: a market, never Pluto or a sky.
+            where_to = detail.phrases[detail.slots.index("destination")]
+            where = {theme_of_noun(language, noun) for noun in nouns_in(language, where_to)}
+
+            assert not where or "place" in where, (
+                f"{language}: '{where_to}' is nowhere to go ({detail.sentence})"
+            )
+
         assert seen > 0, f"{language} wrote no destination"
 
 

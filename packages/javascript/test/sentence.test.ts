@@ -2717,6 +2717,16 @@ describe('Sentence', () => {
 					going.has(written) || going.has(phrase),
 					`${language}: '${phrase}' goes nowhere, and has a destination (${detail.sentence})`
 				);
+
+				// And it goes somewhere one can go: a market, never Pluto or a sky.
+				const where = [...nounsIn(language, detail.phrases[at])].map((noun) =>
+					themeOfNoun(language, noun)
+				);
+
+				assert.ok(
+					where.length === 0 || where.includes('place'),
+					`${language}: '${detail.phrases[at]}' is nowhere to go (${detail.sentence})`
+				);
 			}
 
 			assert.ok(seen > 0, `${language} wrote no destination`);

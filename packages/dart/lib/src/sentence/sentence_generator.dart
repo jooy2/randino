@@ -1758,6 +1758,12 @@ int _modifyChanceFor(int distance, bool tooLong, bool storied) {
 }
 
 /// The theme a phrase other than the subject draws from.
+/// Where a subject can go, and where a story happens. `place` alone, and not
+/// the two other themes of its class: a hero can walk to the market and not to
+/// Pluto, and a sky is not somewhere a fox goes. A `place` part on its own
+/// still spans the class, because a fox can sleep under a sky.
+const List<WordTheme> _destinationThemes = <WordTheme>[WordTheme.place];
+
 WordTheme _themeForPart(
   SentenceSlot slot,
   VerbGroup? group,
@@ -1769,6 +1775,8 @@ WordTheme _themeForPart(
 
     return pick(usable.isNotEmpty ? usable : wordThemes);
   }
+
+  if (slot == SentenceSlot.destination) return pick(_destinationThemes);
 
   // A story happens somewhere a story can happen — a market, a park — and not
   // on Pluto, which is a place too as far as the classes know.
@@ -3241,8 +3249,6 @@ const double _joinRoom = 0.6;
 
 // Where a story happens. `place` alone, and not the two other themes of its
 // class: a hero can walk to the market and not to Pluto.
-const List<WordTheme> _storyPlaces = <WordTheme>[WordTheme.place];
-
 /// The nouns a story has put on the page, by the role each one plays.
 class _Roles {
   _Requirement? item;
@@ -3358,7 +3364,7 @@ _Result? _tellStory(_Telling telling) {
   /// The place the story is happening in, drawn now if no sentence has named it.
   _Requirement placeOf() {
     if (roles.place == null) {
-      final theme = pick(_storyPlaces);
+      final theme = pick(_destinationThemes);
       final lexicon = wordData[language]!;
 
       roles.place = _Requirement(
@@ -3389,8 +3395,8 @@ _Result? _tellStory(_Telling telling) {
       wants: wants,
       prefers: prefers,
       item: found.item,
-      places: _storyPlaces,
-      subject: step.kind == StepKind.scene ? _storyPlaces : heroThemes,
+      places: _destinationThemes,
+      subject: step.kind == StepKind.scene ? _destinationThemes : heroThemes,
     );
   }
 

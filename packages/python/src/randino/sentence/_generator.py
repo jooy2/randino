@@ -1850,6 +1850,15 @@ def _modify_chance_for(distance: int, too_long: bool, storied: bool) -> int:
     return 0 if too_long else 100
 
 
+DESTINATION_THEMES: tuple[WordTheme, ...] = ("place",)
+"""Where a subject can go, and where a story happens.
+
+`place` alone, and not the two other themes of its class: a hero can walk to the market
+and not to Pluto, and a sky is not somewhere a fox goes. A `place` part on its own still
+spans the class, because a fox can sleep under a sky.
+"""
+
+
 def _theme_for_part(
     slot: SentenceSlot,
     group: VerbGroup | None,
@@ -1861,6 +1870,9 @@ def _theme_for_part(
         usable = _object_themes_of(group, beat) if group is not None else ()
 
         return pick(usable or WORD_THEMES)
+
+    if slot == "destination":
+        return pick(DESTINATION_THEMES)
 
     # A story happens somewhere a story can happen — a market, a park — and not on Pluto,
     # which is a place too as far as the classes know.
@@ -3100,12 +3112,6 @@ FIRST_CLAUSE_SHARE = 0.5
 JOIN_ROOM = 0.6
 """What share of a language's longest sentence one sentence must be allowed to join two."""
 
-STORY_PLACES: tuple[WordTheme, ...] = ("place",)
-"""Where a story happens: `place` alone, and not the two other themes of its class.
-
-A hero can walk to the market and not to Pluto.
-"""
-
 
 @dataclass(slots=True)
 class Roles:
@@ -3219,7 +3225,7 @@ def _tell_story(telling: Telling) -> Result | None:
     def place_of() -> Requirement:
         # The place the story is happening in, drawn now if no sentence has named it.
         if roles.place is None:
-            theme = pick(STORY_PLACES)
+            theme = pick(DESTINATION_THEMES)
             lexicon = WORD_DATA[language]
 
             roles.place = Requirement(
@@ -3251,8 +3257,8 @@ def _tell_story(telling: Telling) -> Result | None:
             wants=tuple(wants),
             prefers=tuple(prefers),
             item=found.item,
-            places=STORY_PLACES,
-            subject=STORY_PLACES if step.kind == "scene" else hero_themes,
+            places=DESTINATION_THEMES,
+            subject=DESTINATION_THEMES if step.kind == "scene" else hero_themes,
         )
 
     def shortest_for(beat: Beat) -> int:

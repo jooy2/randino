@@ -2992,6 +2992,18 @@ void main() {
             isTrue,
             reason: '$language: "$phrase" goes nowhere, and has a destination (${detail.sentence})',
           );
+
+          // And it goes somewhere one can go: a market, never Pluto or a sky.
+          final where = nounsIn(
+            language,
+            detail.phrases[at],
+          ).map((noun) => themeOfNoun(language, noun));
+
+          expect(
+            where.isEmpty || where.contains(WordTheme.place),
+            isTrue,
+            reason: '$language: "${detail.phrases[at]}" is nowhere to go (${detail.sentence})',
+          );
         }
 
         expect(seen, greaterThan(0), reason: '$language wrote no destination');
