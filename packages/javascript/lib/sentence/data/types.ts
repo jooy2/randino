@@ -516,6 +516,20 @@ export type SentenceObjectPronouns = {
 };
 
 /**
+ * How the hero of a story speaks for themselves, in a line the story quotes
+ * rather than narrates. `subject` is what stands where the subject would: `''`
+ * for a language that drops it (`“배고프다.”`), `我`, `Tôi`, `I`. `head` is the
+ * copula the first person takes where a state's head changes for it — English
+ * `am` beside `is`. Left out by a language whose predicates would have to change
+ * for the first person, which is Spanish, Italian, German and Russian; their
+ * stories are narrated all the way through.
+ */
+export type SentenceSpeech = {
+	subject: string;
+	head?: string;
+};
+
+/**
  * How a language writes a number beside a noun, and beside money.
  *
  * Left out by a language that cannot write either correctly, which is what
@@ -711,6 +725,8 @@ export type SentenceLanguageData = {
 	 * by a language that names it again.
 	 */
 	objectPronouns?: SentenceObjectPronouns;
+	/** How a story's hero speaks for themselves. Left out by a language that cannot write it. */
+	speech?: SentenceSpeech;
 	/**
 	 * How the language writes a number. Left out by one that cannot, which then
 	 * declares no `quantity` and no `money` shape either.

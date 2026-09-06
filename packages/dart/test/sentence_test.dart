@@ -364,6 +364,7 @@ Set<String> pronounsOf(WordLanguage language) {
     for (final pool in data.pronouns.values) ...pool,
     for (final pool in (data.objectPronouns?.words ?? const <WordGender, WordPool>{}).values)
       ...pool,
+    data.speech?.subject ?? '',
   ].where((word) => word.isNotEmpty);
 
   return <String>{...written, ...written.map(upperFirst)};
@@ -1570,6 +1571,73 @@ void main() {
             );
             objects.add(phrase);
           }
+        }
+      }
+    });
+
+    test('a person in a story sometimes speaks for themselves, and nobody else does', () {
+      // A state sentence about a person may be a line they say or think — quoted,
+      // in the first person, never the first sentence, never more than two — where
+      // the language can write one. An animal is narrated, and so is everybody in
+      // a language that cannot.
+      bool quoted(SentenceType type) =>
+          type == SentenceType.dialogue || type == SentenceType.thought;
+
+      List<SentenceDetail> untyped(WordLanguage language, WordTheme theme) => randSentenceDetails(
+        language: language,
+        theme: theme,
+        sentences: 5,
+        includeName: false,
+        tense: SentenceTense.present,
+        count: 150,
+      );
+
+      for (final language in wordLanguages) {
+        final data = sentenceData[language]!;
+        var lines = 0;
+
+        for (final detail in untyped(language, WordTheme.job)) {
+          final spoken = detail.types.where(quoted).length;
+
+          lines += spoken;
+          expect(spoken <= 2, isTrue, reason: '$language: $spoken lines (${detail.sentence})');
+          expect(
+            quoted(detail.types.first),
+            isFalse,
+            reason: '$language: opened on a line (${detail.sentence})',
+          );
+
+          for (var i = 0; i < detail.types.length; i += 1) {
+            if (!quoted(detail.types[i])) continue;
+
+            final line = detail.sentences[i];
+            final inner = line.substring(1, line.length - 1);
+
+            expect(
+              data.quotes.values.any((pair) => line.startsWith(pair[0]) && line.endsWith(pair[1])),
+              isTrue,
+              reason: "$language: '$line' is not quoted",
+            );
+            expect(
+              data.speech!.subject.isEmpty || inner.startsWith(data.speech!.subject),
+              isTrue,
+              reason: "$language: '$line' does not speak in the first person",
+            );
+          }
+        }
+
+        if (data.speech != null) {
+          expect(lines, greaterThan(0), reason: '$language: nobody ever spoke');
+        } else {
+          expect(lines, 0, reason: '$language: somebody spoke');
+        }
+
+        for (final detail in untyped(language, WordTheme.animal)) {
+          expect(
+            detail.types.any(quoted),
+            isFalse,
+            reason: '$language: an animal spoke (${detail.sentence})',
+          );
         }
       }
     });

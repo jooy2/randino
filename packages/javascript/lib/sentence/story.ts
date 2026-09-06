@@ -12,7 +12,7 @@
 // what nobody picked up, and a "so" is written only where the sentence before it
 // is actually the reason.
 
-import { pick, pickWeighted, randInt } from '../_internal/utils.js';
+import { chance, pick, pickWeighted, randInt } from '../_internal/utils.js';
 import type { SentenceStory, SentenceType, WordTheme } from '../_types/global.js';
 import {
 	AGENT_CLASSES,
@@ -39,6 +39,12 @@ import type {
 // monotonous as none. How many a telling makes is drawn between none and this.
 const JOIN_SHARE = 0.5;
 
+// How often a state sentence about a person becomes a line of their own, and how
+// many of them one telling may have. A paragraph that speaks in every other line
+// is a script, not a story.
+const VOICE_CHANCE = 40;
+const VOICE_MAX = 2;
+
 /** What is true of the hero at one moment. */
 export type StoryState = ReadonlySet<Condition>;
 
@@ -61,6 +67,12 @@ export type Beat = {
 	kinds: readonly SentenceType[];
 	/** Whether this beat is the first or the second clause of one sentence. */
 	join: 'first' | 'second' | null;
+	/**
+	 * Whether the hero says this one themselves: a state sentence quoted in the
+	 * first person — `“배고프다.”` — rather than narrated. Only a person's, only
+	 * after the first sentence, and only where the language can write it.
+	 */
+	voiced: boolean;
 };
 
 export type Plan = {
@@ -636,20 +648,40 @@ export function plan(
 		}
 	}
 
-	const beats: Beat[] = settled!.map((one, i) => ({
-		step: one.step,
-		field: one.field,
-		condition: one.condition,
-		before: one.before,
-		links: linksFor(i > 0 ? settled![i - 1] : null, one),
-		// A kind beside the statement is the step's own, and `trailing` is kept for
-		// the sentence that closes the result — a paragraph that trails off in the
-		// middle has not trailed off.
-		kinds: (one.step.kinds ?? []).filter(
-			(kind) => kind !== 'trailing' || i === settled!.length - 1
-		),
-		join: joined.has(i) ? 'first' : joined.has(i - 1) ? 'second' : null
-	}));
+	let voiced = 0;
+	const beats: Beat[] = settled!.map((one, i) => {
+		// A person says some of what is true of them in their own words: a state
+		// sentence after the first, in a language that writes the first person, is
+		// now and then a line the story quotes rather than narrates.
+		const voice =
+			hero === 'person' &&
+			data.speech !== undefined &&
+			i > 0 &&
+			one.step.kind === 'state' &&
+			one.condition !== null &&
+			voiced < VOICE_MAX &&
+			chance(VOICE_CHANCE);
+
+		if (voice) {
+			voiced += 1;
+		}
+
+		return {
+			step: one.step,
+			field: one.field,
+			condition: one.condition,
+			before: one.before,
+			links: linksFor(i > 0 ? settled![i - 1] : null, one),
+			// A kind beside the statement is the step's own, and `trailing` is kept for
+			// the sentence that closes the result — a paragraph that trails off in the
+			// middle has not trailed off.
+			kinds: (one.step.kinds ?? []).filter(
+				(kind) => kind !== 'trailing' || i === settled!.length - 1
+			),
+			join: joined.has(i) ? 'first' : joined.has(i - 1) ? 'second' : null,
+			voiced: voice
+		};
+	});
 
 	return { story, beats, prop };
 }

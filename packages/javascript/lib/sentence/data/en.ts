@@ -573,6 +573,8 @@ export const EN: SentenceLanguageData = {
 	pronouns: { m: words(`he`), f: words(`she`), n: words(`it`) },
 	// An object named once is `it` the next time: `cooked the sausage and ate it`.
 	objectPronouns: { words: { n: words(`it`) } },
+	// A line of the hero's own opens on `I`, and `is` is `am` for it.
+	speech: { subject: 'I', head: 'am' },
 	// English cannot drop a subject, so a sentence about a person names it again —
 	// unless that person has a name, which is the one thing that says whether `he`
 	// or `she` is the right word.

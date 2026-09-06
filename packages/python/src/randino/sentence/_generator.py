@@ -81,6 +81,7 @@ from randino.sentence.data._types import (
     SentenceMark,
     SentenceMood,
     SentencePart,
+    SentenceSpeech,
     StateGroup,
     VerbField,
     VerbGroup,
@@ -646,6 +647,13 @@ class Draw:
     """The latest phase of the day the result has reached, as an index into `times.day`.
 
     -1 before it has named one. A story never goes back to the morning.
+    """
+
+    speech: SentenceSpeech | None = None
+    """Set for a line the hero says or thinks in their own voice.
+
+    What stands for the subject, and the head a state takes in the first person. None for
+    a sentence the result narrates.
     """
 
     object: "ObjectReference | None" = None
@@ -2314,8 +2322,10 @@ def _compose(
     # which case the phrase is not in the shape to carry an article, a modifier or a
     # particle. The second clause of one sentence shares the first one's subject and
     # writes nothing where it would stand, the way a dropped subject does.
-    if draw.link == "second":
-        pronoun: str | None = ""
+    if draw.speech is not None:
+        pronoun: str | None = draw.speech.subject
+    elif draw.link == "second":
+        pronoun = ""
     elif follow is not None and follow.reference == "pronoun":
         pronoun = follow.pronoun
     else:
@@ -2338,6 +2348,11 @@ def _compose(
 
     for index, part in enumerate(frame.parts):
         if part.slot == "object" and referred_out:
+            continue
+
+        # A line is what the hero says and nothing around it: no time, no place, no
+        # manner. `“배고프다.”`, not `“한낮에 배고프다.”`
+        if draw.speech is not None and part.slot in ("time", "place", "manner"):
             continue
 
         if part.slot != "subject" or pronoun is None or pronoun:
@@ -2534,7 +2549,12 @@ def _compose(
         # that carries the tense changes for the past, and agrees with the subject where
         # the language's past does (Russian `был` beside `была`).
         own_group = state_group if part.slot == "state" else None
-        present_head = (own_group.head if own_group is not None else None) or part.head
+        # The first person takes its own copula where the language has one: `I am`.
+        present_head = (
+            draw.speech.head
+            if draw.speech is not None and draw.speech.head is not None and part.slot == "state"
+            else (own_group.head if own_group is not None else None) or part.head
+        )
         past_head = (own_group.past_head if own_group is not None else None) or part.past_head
         tensed_head = past_head if past and past_head else present_head
         part_head = (
@@ -3369,6 +3389,12 @@ def _generate_result(language: WordLanguage, settings: Settings) -> Result:
 # --- Telling a story --------------------------------------------------------
 
 STORY_KIND_WEIGHT: dict[SentenceType, int] = {"statement": 100, "exclamation": 35, "trailing": 30}
+
+# What a line of the hero's own is: said aloud more often than thought, and exclaimed now
+# and then — `“배고파!”` beside `“배고파.”`.
+LINE_KINDS: tuple[SentenceType, ...] = ("dialogue", "thought")
+LINE_WEIGHT: dict[SentenceType, int] = {"dialogue": 60, "thought": 40}
+LINE_EXCLAIM = 30
 """What each kind is worth in a sentence of a story, where the caller left it to the story.
 
 A story is told in statements; a step that allows an exclamation or a trailing end gets
@@ -3569,10 +3595,20 @@ def _tell_story(telling: Telling) -> Result | None:
             and (opened_before in data.connectives.get("temporal", ()) or "time" in previous.slots)
         )
 
+        # A line the hero says or thinks, in their own voice: the first person where the
+        # language writes one, the present tense whatever the story's, a level a person
+        # speaks at, and nothing in front of it — nobody opens a line on "meanwhile". A
+        # caller who named the kinds gets those instead.
+        voiced = (
+            beat.voiced and not settings.typed and topic is not None and data.speech is not None
+        )
         # What this sentence is doing. A caller who named the kinds gets them; the story
         # otherwise tells, and lets a step that allows more do more.
         if settings.typed:
             type_, mark = _kind_for(data, settings, telling.room, budget, telling.flow)
+        elif voiced:
+            type_ = pick_weighted(LINE_KINDS, lambda kind: LINE_WEIGHT.get(kind, 1))
+            mark = "exclamation" if chance(LINE_EXCLAIM) else "statement"
         else:
             kinds: tuple[SentenceType, ...] = (
                 ("statement", *beat.kinds) if beat.join is None else ("statement",)
@@ -3622,6 +3658,11 @@ def _tell_story(telling: Telling) -> Result | None:
                 "",
                 pinned,
             )
+        elif voiced:
+            # The hero speaks: the subject is theirs, written the way the language writes
+            # a first person.
+            assert topic is not None and data.speech is not None
+            follow = Follow(topic, "pronoun", data.speech.subject, pinned)
         else:
             follow = (
                 None
@@ -3635,19 +3676,20 @@ def _tell_story(telling: Telling) -> Result | None:
             mark,
             _quote_for(data, type_, settings.quote),
             ""
-            if beat.join == "second"
+            if beat.join == "second" or voiced
             else _opener_for(
                 data, mark, follow, budget[1], telling.shortest, telling.flow, beat.links
             ),
             _style_for(type_, settings.style, telling.voice),
             frozenset(telling.spent),
             follow,
-            telling.tense,
+            "present" if voiced else telling.tense,
             beat_draw(beat),
             beat.join,
             day_at,
             object=reference,
             dated=dated,
+            speech=data.speech if voiced else None,
         )
         one, opened = _draw_one(telling, draw)
 
@@ -3658,6 +3700,7 @@ def _tell_story(telling: Telling) -> Result | None:
         if (
             follow is not None
             and not scene
+            and not voiced
             and beat.join is None
             and _distance_from(len(one.sentence), budget) > 1
         ):

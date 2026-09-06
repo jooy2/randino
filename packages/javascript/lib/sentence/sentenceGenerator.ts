@@ -75,6 +75,7 @@ import type {
 	SentenceMark,
 	SentenceMood,
 	SentenceLanguageData,
+	SentenceSpeech,
 	SentencePart,
 	StateGroup,
 	VerbField,
@@ -460,6 +461,12 @@ type Draw = {
 	 * named in full.
 	 */
 	object: ObjectReference | null;
+	/**
+	 * Set for a line the hero says or thinks in their own voice: what stands for
+	 * the subject, and the head a state takes in the first person. Null for a
+	 * sentence the result narrates.
+	 */
+	speech: SentenceSpeech | null;
 };
 
 /**
@@ -2107,8 +2114,13 @@ function compose(
 	// modifier or a particle. Written out as its own list so that every budget
 	// below is measured against what the sentence actually writes; `at` is the
 	// index back into the frame, which is what the plan is keyed by.
-	const pronoun =
-		draw.link === 'second' ? '' : follow?.reference === 'pronoun' ? follow.pronoun : null;
+	const pronoun = draw.speech
+		? draw.speech.subject
+		: draw.link === 'second'
+			? ''
+			: follow?.reference === 'pronoun'
+				? follow.pronoun
+				: null;
 	// And the object the sentence before named is referred to rather than named
 	// again, where this shape puts the same noun in its object slot: left out, or
 	// stood a pronoun for where the object would go or in front of the verb.
@@ -2119,6 +2131,12 @@ function compose(
 
 	frame.parts.forEach((part, at) => {
 		if (part.slot === 'object' && referredOut) {
+			return;
+		}
+
+		// A line is what the hero says and nothing around it: no time, no place, no
+		// manner. `“배고프다.”`, not `“한낮에 배고프다.”`
+		if (draw.speech && (part.slot === 'time' || part.slot === 'place' || part.slot === 'manner')) {
 			return;
 		}
 
@@ -2306,7 +2324,11 @@ function compose(
 		// that carries the tense changes for the past, and agrees with the subject
 		// where the language's past does (Russian `был` beside `была`).
 		const own = part.slot === 'state' ? (group as StateGroup) : undefined;
-		const presentHead = own?.head ?? part.head;
+		// The first person takes its own copula where the language has one: `I am`.
+		const presentHead =
+			draw.speech?.head !== undefined && part.slot === 'state'
+				? draw.speech.head
+				: (own?.head ?? part.head);
 		const pastHead = own?.pastHead ?? part.pastHead;
 		const tensedHead = past && pastHead ? pastHead : presentHead;
 		const partHead =
@@ -3320,7 +3342,8 @@ function generateResult(language: WordLanguage, settings: Settings): Result {
 			object:
 				item && last?.object?.noun === item.word
 					? objectReferenceFor(language, data, item.word, false, last.object.named)
-					: null
+					: null,
+			speech: null
 		};
 		const [one, opened] = drawOne(paragraph, draw);
 
@@ -3424,6 +3447,12 @@ const STORY_KIND_WEIGHT: Partial<Record<SentenceType, number>> = {
 	exclamation: 35,
 	trailing: 30
 };
+
+// What a line of the hero's own is: said aloud more often than thought, and
+// exclaimed now and then — `“배고파!”` beside `“배고파.”`.
+const LINE_KINDS: readonly SentenceType[] = ['dialogue', 'thought'];
+const LINE_WEIGHT: Partial<Record<SentenceType, number>> = { dialogue: 60, thought: 40 };
+const LINE_EXCLAIM = 30;
 
 // What share of a two-clause sentence's range the first clause takes.
 const FIRST_CLAUSE_SHARE = 0.5;
@@ -3618,17 +3647,27 @@ function tellStory(telling: Telling): Result | null {
 			beat.join === 'second' &&
 			previous !== null &&
 			((data.connectives.temporal ?? []).includes(openedBefore) || previous.slots.includes('time'));
+		// A line the hero says or thinks, in their own voice: the first person where
+		// the language writes one, the present tense whatever the story's, a level a
+		// person speaks at, and nothing in front of it — nobody opens a line on
+		// "meanwhile". A caller who named the kinds gets those instead.
+		const voiced = beat.voiced && !settings.typed && topic !== null && data.speech !== undefined;
 		// What this sentence is doing. A caller who named the kinds gets them; the
 		// story otherwise tells, and lets a step that allows more do more.
 		const [type, mark] = settings.typed
 			? kindFor(data, settings, room, budget, flow)
-			: (() => {
-					const kinds: SentenceType[] =
-						beat.join === null ? ['statement', ...beat.kinds] : ['statement'];
-					const type = pickWeighted(kinds, (kind) => STORY_KIND_WEIGHT[kind] ?? 1);
+			: voiced
+				? ([
+						pickWeighted(LINE_KINDS, (kind) => LINE_WEIGHT[kind] ?? 1),
+						chance(LINE_EXCLAIM) ? 'exclamation' : 'statement'
+					] as const)
+				: (() => {
+						const kinds: SentenceType[] =
+							beat.join === null ? ['statement', ...beat.kinds] : ['statement'];
+						const type = pickWeighted(kinds, (kind) => STORY_KIND_WEIGHT[kind] ?? 1);
 
-					return [type, type as SentenceMark] as const;
-				})();
+						return [type, type as SentenceMark] as const;
+					})();
 		const pinned = pinnedFor(beat);
 		// The sentence this one follows: the first clause for a second one, and the
 		// sentence before for a whole one. What it named is what this one may refer
@@ -3664,6 +3703,15 @@ function tellStory(telling: Telling): Result | null {
 				pronoun: '',
 				scene: pinned
 			};
+		} else if (voiced) {
+			// The hero speaks: the subject is theirs, written the way the language
+			// writes a first person.
+			follow = {
+				topic: topic!,
+				reference: 'pronoun',
+				pronoun: data.speech!.subject,
+				scene: pinned
+			};
 		} else {
 			follow = topic ? followFor(data, topic, pinned, flow.repeated, true) : null;
 		}
@@ -3674,18 +3722,19 @@ function tellStory(telling: Telling): Result | null {
 			mark,
 			quote: quoteFor(data, type, settings.quote),
 			opener:
-				beat.join === 'second'
+				beat.join === 'second' || voiced
 					? ''
 					: openerFor(data, mark, follow, budget[1], shortest, flow, beat.links),
 			style: styleFor(type, settings.style, voice),
 			avoid: spent,
 			follow,
-			tense,
+			tense: voiced ? 'present' : tense,
 			beat: beatDraw(beat),
 			link: beat.join,
 			dayAt,
 			dated,
-			object
+			object,
+			speech: voiced ? data.speech! : null
 		};
 		let [one, opened] = drawOne(telling, draw);
 
@@ -3694,7 +3743,13 @@ function tellStory(telling: Telling): Result | null {
 		// came out short; dropped or stood a pronoun for, where it was named and came
 		// out long. The subject is the one phrase of a story's sentence the story does
 		// not fix, so it is the one that can give.
-		if (follow && !scene && beat.join === null && distanceFrom(one.sentence.length, budget) > 1) {
+		if (
+			follow &&
+			!scene &&
+			!voiced &&
+			beat.join === null &&
+			distanceFrom(one.sentence.length, budget) > 1
+		) {
 			const pronouns = pronounsFor(data, follow.topic);
 			const short = one.sentence.length < budget[0];
 			const other: Reference | null =

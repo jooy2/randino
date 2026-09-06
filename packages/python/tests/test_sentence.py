@@ -895,6 +895,7 @@ def pronouns_of(language: WordLanguage) -> set[str]:
     pools = [
         *data.pronouns.values(),
         *(data.object_pronouns.words.values() if data.object_pronouns is not None else ()),
+        (data.speech.subject,) if data.speech is not None else (),
     ]
     written = [word for pool in pools for word in pool if word]
 
@@ -1353,6 +1354,62 @@ def test_one_sentence_names_its_object_once() -> None:
                     f"({detail.sentences[belongs[i]]})"
                 )
                 objects.add(phrase)
+
+
+def test_a_person_in_a_story_sometimes_speaks_for_themselves_and_nobody_else_does() -> None:
+    # A state sentence about a person may be a line they say or think — quoted, in the
+    # first person, never the first sentence, never more than two — where the language
+    # can write one. An animal is narrated, and so is everybody in a language that cannot.
+    def quoted(type_: SentenceType) -> bool:
+        return type_ in ("dialogue", "thought")
+
+    def untyped(language: WordLanguage, theme: WordTheme) -> list[SentenceDetail]:
+        return rand_sentence(
+            language=language,
+            theme=theme,
+            sentences=5,
+            include_name=False,
+            tense="present",
+            count=150,
+            output="detail",
+        )
+
+    for language in WORD_LANGUAGES:
+        data = SENTENCE_DATA[language]
+        lines = 0
+
+        for detail in untyped(language, "job"):
+            spoken = sum(1 for type_ in detail.types if quoted(type_))
+
+            lines += spoken
+            assert spoken <= 2, f"{language}: {spoken} lines ({detail.sentence})"
+            assert not quoted(detail.types[0]), f"{language}: opened on a line ({detail.sentence})"
+
+            for i, type_ in enumerate(detail.types):
+                if not quoted(type_):
+                    continue
+
+                line = detail.sentences[i]
+                inner = line[1:-1]
+
+                assert any(
+                    line.startswith(pair[0]) and line.endswith(pair[1])
+                    for pair in data.quotes.values()
+                ), f"{language}: '{line}' is not quoted"
+                assert data.speech is not None
+                assert not data.speech.subject or inner.startswith(data.speech.subject), (
+                    f"{language}: '{line}' does not speak in the first person"
+                )
+
+        if data.speech is not None:
+            assert lines > 0, f"{language}: nobody ever spoke"
+        else:
+            assert lines == 0, f"{language}: somebody spoke"
+
+        for detail in untyped(language, "animal"):
+            assert not any(quoted(type_) for type_ in detail.types), (
+                f"{language}: an animal spoke ({detail.sentence})"
+            )
 
 
 def test_a_connective_opens_a_sentence_that_follows_another() -> None:

@@ -76,7 +76,8 @@ function pronounsOf(language: WordLanguage): Set<string> {
 	const data = SENTENCE_DATA[language];
 	const written = [
 		...Object.values(data.pronouns),
-		...Object.values(data.objectPronouns?.words ?? {})
+		...Object.values(data.objectPronouns?.words ?? {}),
+		[data.speech?.subject ?? '']
 	].flatMap((pool) => [...(pool ?? [])]);
 
 	return new Set([...written, ...written.map(upperFirst)].filter(Boolean));
@@ -1463,6 +1464,67 @@ describe('Sentence', () => {
 					objects.add(phrase);
 					named.set(belongs[i], objects);
 				});
+			}
+		}
+	});
+
+	it('a person in a story sometimes speaks for themselves, and nobody else does', () => {
+		// A state sentence about a person may be a line they say or think — quoted,
+		// in the first person, never the first sentence, never more than two — where
+		// the language can write one. An animal is narrated, and so is everybody in
+		// a language that cannot.
+		const quoted = (type: SentenceType) => type === 'dialogue' || type === 'thought';
+		const untyped = (language: WordLanguage, theme: WordTheme) =>
+			randSentence({
+				language,
+				theme,
+				sentences: 5,
+				includeName: false,
+				tense: 'present',
+				count: 150,
+				output: 'detail'
+			});
+
+		for (const language of WORD_LANGUAGES) {
+			const data = SENTENCE_DATA[language];
+			let lines = 0;
+
+			for (const detail of untyped(language, 'job')) {
+				const spoken = detail.types.filter(quoted).length;
+
+				lines += spoken;
+				assert.ok(spoken <= 2, `${language}: ${spoken} lines (${detail.sentence})`);
+				assert.ok(!quoted(detail.types[0]), `${language}: opened on a line (${detail.sentence})`);
+
+				detail.types.forEach((type, i) => {
+					if (!quoted(type)) {
+						return;
+					}
+
+					const line = detail.sentences[i];
+					const inner = line.slice(1, -1);
+
+					assert.ok(
+						Object.values(data.quotes).some(
+							([open, close]) => line.startsWith(open) && line.endsWith(close)
+						),
+						`${language}: '${line}' is not quoted`
+					);
+					assert.ok(
+						!data.speech!.subject || inner.startsWith(data.speech!.subject),
+						`${language}: '${line}' does not speak in the first person`
+					);
+				});
+			}
+
+			if (data.speech) {
+				assert.ok(lines > 0, `${language}: nobody ever spoke`);
+			} else {
+				assert.strictEqual(lines, 0, `${language}: somebody spoke`);
+			}
+
+			for (const detail of untyped(language, 'animal')) {
+				assert.ok(!detail.types.some(quoted), `${language}: an animal spoke (${detail.sentence})`);
 			}
 		}
 	});

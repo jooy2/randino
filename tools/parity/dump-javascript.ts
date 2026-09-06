@@ -274,6 +274,9 @@ console.log(
 									clitic: data.objectPronouns.clitic ?? false
 								}
 							: null,
+						speech: data.speech
+							? { subject: data.speech.subject, head: data.speech.head ?? '' }
+							: null,
 						numeral: data.numeral
 							? {
 									order: data.numeral.order,

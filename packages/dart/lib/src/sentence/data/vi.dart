@@ -449,6 +449,7 @@ final SentenceLanguageData vi = SentenceLanguageData(
       WordGender.n: <String>[''],
     },
   ),
+  speech: const SentenceSpeech(subject: 'Tôi'),
   numeral: const SentenceNumeral(
     order: NumeralOrder.before,
     counters: <NounClass, String>{

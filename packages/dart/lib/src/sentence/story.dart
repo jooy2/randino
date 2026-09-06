@@ -23,6 +23,12 @@ import 'package:randino/src/types.dart';
 // monotonous as none. How many a telling makes is drawn between none and this.
 const double _joinShare = 0.5;
 
+// How often a state sentence about a person becomes a line of their own, and
+// how many of them one telling may have. A paragraph that speaks in every other
+// line is a script, not a story.
+const int _voiceChance = 40;
+const int _voiceMax = 2;
+
 /// Whether a beat is the first or the second clause of one sentence.
 enum JoinSide {
   /// The first clause, which closes on nothing.
@@ -45,6 +51,7 @@ class Beat {
     required this.links,
     required this.kinds,
     required this.join,
+    required this.voiced,
   });
 
   /// The step this sentence tells.
@@ -68,6 +75,11 @@ class Beat {
   /// Whether this beat is the first or the second clause of one sentence.
   final JoinSide? join;
 
+  /// Whether the hero says this one themselves: a state sentence quoted in the
+  /// first person — `“배고프다.”` — rather than narrated. Only a person's, only
+  /// after the first sentence, and only where the language can write it.
+  final bool voiced;
+
   /// The same beat, written as a whole sentence rather than as a clause.
   Beat unjoined() => Beat(
     step: step,
@@ -77,6 +89,7 @@ class Beat {
     links: links,
     kinds: kinds,
     join: null,
+    voiced: voiced,
   );
 }
 
@@ -574,17 +587,35 @@ Plan? plan(
       ..addAll(shifted);
   }
 
-  final beats = <Beat>[
-    for (var i = 0; i < walked!.length; i += 1)
+  // A person says some of what is true of them in their own words: a state
+  // sentence after the first, in a language that writes the first person, is
+  // now and then a line the story quotes rather than narrates.
+  var voiced = 0;
+  final beats = <Beat>[];
+
+  for (var i = 0; i < walked!.length; i += 1) {
+    final one = walked![i];
+    final voice =
+        hero == NounClass.person &&
+        data.speech != null &&
+        i > 0 &&
+        one.step.kind == StepKind.state &&
+        one.condition != null &&
+        voiced < _voiceMax &&
+        chance(_voiceChance);
+
+    if (voice) voiced += 1;
+
+    beats.add(
       Beat(
-        step: walked![i].step,
-        field: walked![i].field,
-        condition: walked![i].condition,
-        before: walked![i].before,
-        links: _linksFor(i > 0 ? walked![i - 1] : null, walked![i]),
+        step: one.step,
+        field: one.field,
+        condition: one.condition,
+        before: one.before,
+        links: _linksFor(i > 0 ? walked![i - 1] : null, one),
         // A kind beside the statement is the step's own, and `trailing` is kept
         // for the sentence that closes the result.
-        kinds: walked![i].step.kinds
+        kinds: one.step.kinds
             .where((kind) => kind != SentenceType.trailing || i == walked!.length - 1)
             .toList(growable: false),
         join:
@@ -593,8 +624,10 @@ Plan? plan(
                 : joined.contains(i - 1)
                 ? JoinSide.second
                 : null,
+        voiced: voice,
       ),
-  ];
+    );
+  }
 
   return Plan(story, beats, prop);
 }

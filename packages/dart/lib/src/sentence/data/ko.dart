@@ -1548,6 +1548,7 @@ final SentenceLanguageData ko = SentenceLanguageData(
       WordGender.n: <String>[''],
     },
   ),
+  speech: const SentenceSpeech(subject: ''),
   numeral: const SentenceNumeral(
     order: NumeralOrder.after,
     counters: <NounClass, String>{

@@ -769,6 +769,7 @@ final SentenceLanguageData en = SentenceLanguageData(
       WordGender.n: <String>['it'],
     },
   ),
+  speech: const SentenceSpeech(subject: 'I', head: 'am'),
   numeral: const SentenceNumeral(
     order: NumeralOrder.before,
     counters: <NounClass, String>{},

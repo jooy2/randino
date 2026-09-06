@@ -617,6 +617,26 @@ class SentenceObjectPronouns {
   final bool clitic;
 }
 
+/// How the hero of a story speaks for themselves, in a line the story quotes
+/// rather than narrates.
+///
+/// [subject] is what stands where the subject would: `''` for a language that
+/// drops it (`“배고프다.”`), `我`, `Tôi`, `I`. [head] is the copula the first
+/// person takes where a state's head changes for it — English `am` beside `is`.
+/// Left out by a language whose predicates would have to change for the first
+/// person, which is Spanish, Italian, German and Russian; their stories are
+/// narrated all the way through.
+class SentenceSpeech {
+  /// Creates the first person of one language.
+  const SentenceSpeech({required this.subject, this.head});
+
+  /// What stands where the subject would, `''` for nothing.
+  final String subject;
+
+  /// The copula a state takes in the first person, where it changes.
+  final String? head;
+}
+
 /// What a noun can do that its theme does not say.
 ///
 /// A fish and a sparrow are both `animal`, and only one of them flies; a snake
@@ -837,6 +857,7 @@ class SentenceLanguageData {
     this.join,
     this.pronounless = const <NounClass>[],
     this.objectPronouns,
+    this.speech,
     this.openers = const <SentenceType, String>{},
     this.numeral,
     this.calendar,
@@ -960,6 +981,10 @@ class SentenceLanguageData {
   /// How a later sentence refers to the object the one before it named. Null
   /// for a language that names it again.
   final SentenceObjectPronouns? objectPronouns;
+
+  /// How a story's hero speaks for themselves. Null for a language that cannot
+  /// write it.
+  final SentenceSpeech? speech;
 
   /// How the language writes a number.
   ///

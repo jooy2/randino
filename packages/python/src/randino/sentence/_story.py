@@ -17,7 +17,7 @@ from collections.abc import Callable, Sequence
 from dataclasses import dataclass, replace
 from typing import Literal
 
-from randino._internal.utils import pick, pick_weighted, rand_int
+from randino._internal.utils import chance, pick, pick_weighted, rand_int
 from randino._types import SentenceStory, SentenceType, WordTheme
 from randino.sentence.data import (
     AGENT_CLASSES,
@@ -40,6 +40,12 @@ from randino.sentence.data._types import (
 )
 
 JOIN_SHARE = 0.5
+
+# How often a state sentence about a person becomes a line of their own, and how many of
+# them one telling may have. A paragraph that speaks in every other line is a script, not
+# a story.
+VOICE_CHANCE = 40
+VOICE_MAX = 2
 """The most joins one result makes, against its sentence count.
 
 A story told in nothing but short sentences reads as stage directions, and `집에
@@ -77,6 +83,14 @@ class Beat:
 
     join: JoinSide | None
     """Whether this beat is the first or the second clause of one sentence."""
+
+    voiced: bool = False
+    """Whether the hero says this one themselves.
+
+    A state sentence quoted in the first person — `“배고프다.”` — rather than narrated.
+    Only a person's, only after the first sentence, and only where the language can
+    write it.
+    """
 
 
 @dataclass(frozen=True, slots=True)
@@ -588,24 +602,44 @@ def plan(
         walked = trimmed
         joined = {each - 1 if each > at else each for each in joined}
 
-    beats = tuple(
-        Beat(
-            step=one.step,
-            field=one.field,
-            condition=one.condition,
-            before=one.before,
-            links=_links_for(walked[i - 1] if i > 0 else None, one),
-            # A kind beside the statement is the step's own, and `trailing` is kept for
-            # the sentence that closes the result.
-            kinds=tuple(
-                kind for kind in one.step.kinds if kind != "trailing" or i == len(walked) - 1
-            ),
-            join="first" if i in joined else "second" if i - 1 in joined else None,
-        )
-        for i, one in enumerate(walked)
-    )
+    # A person says some of what is true of them in their own words: a state sentence
+    # after the first, in a language that writes the first person, is now and then a
+    # line the story quotes rather than narrates.
+    voiced = 0
+    beats: list[Beat] = []
 
-    return Plan(story, beats, prop)
+    for i, one in enumerate(walked):
+        voice = (
+            hero == "person"
+            and data.speech is not None
+            and i > 0
+            and one.step.kind == "state"
+            and one.condition is not None
+            and voiced < VOICE_MAX
+            and chance(VOICE_CHANCE)
+        )
+
+        if voice:
+            voiced += 1
+
+        beats.append(
+            Beat(
+                step=one.step,
+                field=one.field,
+                condition=one.condition,
+                before=one.before,
+                links=_links_for(walked[i - 1] if i > 0 else None, one),
+                # A kind beside the statement is the step's own, and `trailing` is kept
+                # for the sentence that closes the result.
+                kinds=tuple(
+                    kind for kind in one.step.kinds if kind != "trailing" or i == len(walked) - 1
+                ),
+                join="first" if i in joined else "second" if i - 1 in joined else None,
+                voiced=voice,
+            )
+        )
+
+    return Plan(story, tuple(beats), prop)
 
 
 def unjoined(beat: Beat) -> Beat:

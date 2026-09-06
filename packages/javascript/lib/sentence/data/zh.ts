@@ -356,6 +356,8 @@ export const ZH: SentenceLanguageData = {
 	pronouns: { n: ['', '它'] },
 	// And an object it has named is left out the next time: `煮了，然后吃了`.
 	objectPronouns: { words: { n: [''] } },
+	// A line of the hero's own opens on 我.
+	speech: { subject: '我' },
 	// 它 is a thing: a person is referred to by leaving the subject out, and an
 	// animal is left out too, because the stories it is in read that way.
 	pronounless: ['person', 'creature'],

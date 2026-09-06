@@ -277,6 +277,11 @@ sentence = {
                 "clitic": data.object_pronouns.clitic,
             }
         ),
+        "speech": (
+            None
+            if data.speech is None
+            else {"subject": data.speech.subject, "head": data.speech.head or ""}
+        ),
         "numeral": (
             None
             if data.numeral is None

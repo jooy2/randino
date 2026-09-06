@@ -390,6 +390,8 @@ export const VI: SentenceLanguageData = {
 	pronouns: { n: ['', 'nó'] },
 	// And an object it has named is left out the next time: `nấu rồi ăn`.
 	objectPronouns: { words: { n: [''] } },
+	// A line of the hero's own opens on tôi.
+	speech: { subject: 'Tôi' },
 	// nó is a thing, and rude of a person: a person is referred to by leaving the
 	// subject out. An animal may be nó.
 	pronounless: ['person'],

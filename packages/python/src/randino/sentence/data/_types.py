@@ -506,6 +506,21 @@ class SentenceObjectPronouns:
     clitic: bool = False
 
 
+@dataclass(frozen=True, slots=True)
+class SentenceSpeech:
+    """How the hero of a story speaks for themselves, in a line the story quotes.
+
+    `subject` is what stands where the subject would: `""` for a language that drops it
+    (`“배고프다.”`), `我`, `Tôi`, `I`. `head` is the copula the first person takes where a
+    state's head changes for it — English `am` beside `is`. Left out by a language whose
+    predicates would have to change for the first person, which is Spanish, Italian,
+    German and Russian; their stories are narrated all the way through.
+    """
+
+    subject: str
+    head: str | None = None
+
+
 ConnectiveKind = Literal["additive", "temporal", "contrastive", "causal"]
 """What a connective claims about the sentence before it.
 
@@ -769,6 +784,9 @@ class SentenceLanguageData:
 
     None for a language that names it again.
     """
+
+    speech: SentenceSpeech | None = None
+    """How a story's hero speaks for themselves. None for a language that cannot write it."""
     """Noun classes the language's written pronouns are wrong for.
 
     A sentence about one of them leaves the subject out where the language can, and

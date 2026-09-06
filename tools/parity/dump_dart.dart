@@ -285,6 +285,12 @@ void main() {
                 },
                 'clitic': entry.value.objectPronouns!.clitic,
               },
+        'speech': entry.value.speech == null
+            ? null
+            : <String, Object?>{
+                'subject': entry.value.speech!.subject,
+                'head': entry.value.speech!.head ?? '',
+              },
         'numeral': entry.value.numeral == null
             ? null
             : <String, Object?>{

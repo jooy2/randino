@@ -418,6 +418,7 @@ final SentenceLanguageData zh = SentenceLanguageData(
       WordGender.n: <String>[''],
     },
   ),
+  speech: const SentenceSpeech(subject: '我'),
   numeral: const SentenceNumeral(
     order: NumeralOrder.after,
     counters: <NounClass, String>{

@@ -431,6 +431,12 @@ function emitDart(code: string, data: SentenceLanguageData): string {
 		out.push('  ),');
 	}
 
+	if (data.speech) {
+		const head = data.speech.head === undefined ? '' : `, head: ${dq(data.speech.head)}`;
+
+		out.push(`  speech: const SentenceSpeech(subject: ${dq(data.speech.subject)}${head}),`);
+	}
+
 	if (data.numeral) {
 		const n = data.numeral;
 
@@ -776,6 +782,12 @@ function emitPython(code: string, data: SentenceLanguageData): string {
 		out.push(`    object_pronouns=SentenceObjectPronouns(words={${words}}${clitic}),`);
 	}
 
+	if (data.speech) {
+		const head = data.speech.head === undefined ? '' : `, head=${pq(data.speech.head)}`;
+
+		out.push(`    speech=SentenceSpeech(subject=${pq(data.speech.subject)}${head}),`);
+	}
+
 	if (data.numeral) {
 		const n = data.numeral;
 
@@ -821,6 +833,7 @@ function emitPython(code: string, data: SentenceLanguageData): string {
 
 	if (body.includes('PredicateTense(')) imports.push('PredicateTense');
 	if (body.includes('SentenceObjectPronouns(')) imports.push('SentenceObjectPronouns');
+	if (body.includes('SentenceSpeech(')) imports.push('SentenceSpeech');
 
 	return body.replace(
 		'__IMPORTS__',

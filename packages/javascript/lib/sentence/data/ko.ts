@@ -1650,6 +1650,8 @@ export const KO: SentenceLanguageData = {
 	pronouns: { n: ['', '그것'] },
 	// And an object it has named is left out the next time: `소시지를 끓여서 먹었다`.
 	objectPronouns: { words: { n: [''] } },
+	// A line of the hero's own drops its subject, the way a spoken sentence does.
+	speech: { subject: '' },
 	// And 그것 is a thing: a person and an animal are referred to by leaving the
 	// subject out.
 	pronounless: ['person', 'creature'],

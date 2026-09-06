@@ -14,6 +14,7 @@ from randino.sentence.data._types import (
     SentenceNumeral,
     SentenceObjectPronouns,
     SentencePart,
+    SentenceSpeech,
     SentenceTimes,
     StateGroup,
     VerbGroup,
@@ -802,6 +803,7 @@ EN = SentenceLanguageData(
     pronouns={"m": ("he",), "f": ("she",), "n": ("it",)},
     pronounless=("person",),
     object_pronouns=SentenceObjectPronouns(words={"n": ("it",)}),
+    speech=SentenceSpeech(subject="I", head="am"),
     numeral=SentenceNumeral(
         order="before",
         counters={},

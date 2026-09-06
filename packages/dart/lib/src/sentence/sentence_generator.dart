@@ -515,6 +515,7 @@ class _Draw {
     required this.dayAt,
     this.dated = false,
     this.object,
+    this.speech,
   });
 
   final LengthRange budget;
@@ -568,6 +569,11 @@ class _Draw {
   /// named in full.
   final _ObjectReference? object;
 
+  /// Set for a line the hero says or thinks in their own voice: what stands for
+  /// the subject, and the head a state takes in the first person. Null for a
+  /// sentence the result narrates.
+  final SentenceSpeech? speech;
+
   /// The same draw with another opener, or another way of referring to the
   /// topic. Dart has no spread for a class, so the copy is written out.
   _Draw copyWith({String? opener, _Follow? follow, bool keepFollow = true}) => _Draw(
@@ -585,6 +591,7 @@ class _Draw {
     dayAt: dayAt,
     dated: dated,
     object: object,
+    speech: speech,
   );
 }
 
@@ -2082,7 +2089,9 @@ _Built _compose(
   // subject does. `at` is the index back into the frame, which the plan is keyed
   // by.
   final String? pronoun =
-      draw.link == JoinSide.second
+      draw.speech != null
+          ? draw.speech!.subject
+          : draw.link == JoinSide.second
           ? ''
           : follow?.reference == _Reference.pronoun
           ? follow!.pronoun
@@ -2101,6 +2110,15 @@ _Built _compose(
     final part = frame.parts[i];
 
     if (part.slot == SentenceSlot.object && referredOut) continue;
+
+    // A line is what the hero says and nothing around it: no time, no place, no
+    // manner. `“배고프다.”`, not `“한낮에 배고프다.”`
+    if (draw.speech != null &&
+        (part.slot == SentenceSlot.time ||
+            part.slot == SentenceSlot.place ||
+            part.slot == SentenceSlot.manner)) {
+      continue;
+    }
 
     if (part.slot != SentenceSlot.subject || pronoun == null || pronoun.isNotEmpty) {
       shape.add(part);
@@ -2314,7 +2332,11 @@ _Built _compose(
     // that carries the tense changes for the past, and agrees with the subject
     // where the language's past does (Russian `был` beside `была`).
     final own = part.slot == SentenceSlot.state ? stateGroup : null;
-    final presentHead = own?.head ?? part.head;
+    // The first person takes its own copula where the language has one: `I am`.
+    final presentHead =
+        draw.speech?.head != null && part.slot == SentenceSlot.state
+            ? draw.speech!.head
+            : own?.head ?? part.head;
     final pastHead = own?.pastHead ?? part.pastHead;
     final tensedHead = past && pastHead != null ? pastHead : presentHead;
     final agreement = data.pastAgreement;
@@ -3525,6 +3547,15 @@ _Result _generateResult(WordLanguage language, _Settings settings) {
 // What each kind is worth in a sentence of a story, where the caller left the
 // kind to the story. A story is told in statements; a step that allows an
 // exclamation or a trailing end gets one now and then.
+// What a line of the hero's own is: said aloud more often than thought, and
+// exclaimed now and then — `“배고파!”` beside `“배고파.”`.
+const List<SentenceType> _lineKinds = <SentenceType>[SentenceType.dialogue, SentenceType.thought];
+const Map<SentenceType, int> _lineWeight = <SentenceType, int>{
+  SentenceType.dialogue: 60,
+  SentenceType.thought: 40,
+};
+const int _lineExclaim = 30;
+
 const Map<SentenceType, int> _storyKindWeight = <SentenceType, int>{
   SentenceType.statement: 100,
   SentenceType.exclamation: 35,
@@ -3736,6 +3767,11 @@ _Result? _tellStory(_Telling telling) {
             previous.slots.contains(SentenceSlot.time));
     // What this sentence is doing. A caller who named the kinds gets them; the
     // story otherwise tells, and lets a step that allows more do more.
+    // A line the hero says or thinks, in their own voice: the first person where
+    // the language writes one, the present tense whatever the story's, a level a
+    // person speaks at, and nothing in front of it — nobody opens a line on
+    // "meanwhile". A caller who named the kinds gets those instead.
+    final voiced = beat.voiced && !settings.typed && topic != null && data.speech != null;
     SentenceType type;
     SentenceType mark;
 
@@ -3751,6 +3787,9 @@ _Result? _tellStory(_Telling telling) {
 
       type = kind[0];
       mark = kind[1];
+    } else if (voiced) {
+      type = pickWeighted<SentenceType>(_lineKinds, (kind) => _lineWeight[kind] ?? 1);
+      mark = chance(_lineExclaim) ? SentenceType.exclamation : SentenceType.statement;
     } else {
       final kinds = <SentenceType>[SentenceType.statement, if (beat.join == null) ...beat.kinds];
 
@@ -3800,6 +3839,10 @@ _Result? _tellStory(_Telling telling) {
         '',
         pinned,
       );
+    } else if (voiced) {
+      // The hero speaks: the subject is theirs, written the way the language
+      // writes a first person.
+      follow = _Follow(topic!, _Reference.pronoun, data.speech!.subject, pinned);
     } else {
       follow = topic == null ? null : _followFor(data, topic!, pinned, telling.flow.repeated, true);
     }
@@ -3810,7 +3853,7 @@ _Result? _tellStory(_Telling telling) {
       mark: mark,
       quote: _quoteFor(data, type, settings.quote),
       opener:
-          beat.join == JoinSide.second
+          beat.join == JoinSide.second || voiced
               ? ''
               : _openerFor(
                 data,
@@ -3824,12 +3867,13 @@ _Result? _tellStory(_Telling telling) {
       style: _styleFor(type, settings.style, telling.voice),
       avoid: telling.spent,
       follow: follow,
-      tense: telling.tense,
+      tense: voiced ? SentenceTense.present : telling.tense,
       beat: beatDraw(beat),
       link: beat.join,
       dayAt: dayAt,
       dated: dated,
       object: object,
+      speech: voiced ? data.speech : null,
     );
     var (one, opened) = _drawOne(telling, draw);
 
@@ -3839,6 +3883,7 @@ _Result? _tellStory(_Telling telling) {
     // out long.
     if (follow != null &&
         !scene &&
+        !voiced &&
         beat.join == null &&
         _distanceFrom(one.sentence.length, budget) > 1) {
       final pronouns = _pronounsFor(data, follow.topic);
