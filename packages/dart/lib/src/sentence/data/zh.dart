@@ -24,233 +24,350 @@ final SentenceLanguageData zh = SentenceLanguageData(
     VerbGroup(
       field: VerbField.rise,
       subject: const <NounClass>[NounClass.creature, NounClass.person],
-      words: words(r'起床 醒来 起身 站起来'),
+      words: words(r'起床 醒来 起身 站起来 苏醒 坐起来 爬起来 醒过来 睁开眼 翻身起来 伸懒腰'),
     ),
     VerbGroup(
       field: VerbField.go,
       subject: const <NounClass>[NounClass.creature, NounClass.person],
       requires: SentenceSlot.destination,
-      words: words(r'去 前往 赶往'),
+      words: words(r'去 前往 赶往 去往 前去 奔赴 走进 进入 走过去 赶去 转到 靠近 溜达到'),
     ),
     VerbGroup(
       field: VerbField.go,
       subject: const <NounClass>[NounClass.creature, NounClass.person],
       subjectWithout: const <NounTrait>[NounTrait.swimmer, NounTrait.crawler],
       requires: SentenceSlot.destination,
-      words: words(r'走向 跑向'),
+      words: words(r'走向 跑向 跑到 走去 跑去 跑进 走上 爬上 冲向 冲进 奔向 步行去'),
     ),
     VerbGroup(
       field: VerbField.go,
       subject: const <NounClass>[NounClass.creature, NounClass.person],
-      words: words(r'出发 离开 出门 动身'),
+      words: words(r'出发 离开 出门 动身 起程 启程 上路 离去 走开 走掉 溜走 跑开 出去 走出去 迈开步子'),
     ),
     VerbGroup(
       field: VerbField.arrive,
       subject: const <NounClass>[NounClass.creature, NounClass.person],
       requires: SentenceSlot.destination,
-      words: words(r'到达 抵达 回到 来到'),
+      words: words(r'到达 抵达 回到 来到 赶到 走到 跑到 返回到 转回 溜回 赶回 跑回 走回'),
     ),
     VerbGroup(
       field: VerbField.arrive,
       subject: const <NounClass>[NounClass.creature, NounClass.person],
-      words: words(r'返回 归来 回家'),
+      words: words(r'返回 归来 回家 回来 归家 到家 返家 现身 露面 回到家 归去 返程'),
     ),
     VerbGroup(
       field: VerbField.move,
       subject: const <NounClass>[NounClass.creature, NounClass.person],
       subjectWithout: const <NounTrait>[NounTrait.swimmer, NounTrait.crawler],
-      words: words(r'奔跑 行走 跳跃 散步 溜达'),
+      words: words(r'''
+        奔跑 行走 跳跃 散步 溜达 慢跑 快跑 小跑 踱步 漫步 疾走 大步走 蹦跳 跳 跑 走 闲逛 踮脚走 蹒跚 昂首阔步 转悠 跑来跑去 蹦蹦跳跳 疾跑 拔腿就跑
+      '''),
     ),
     VerbGroup(
       field: VerbField.move,
       subject: const <NounClass>[NounClass.creature, NounClass.person],
-      words: words(r'徘徊 经过'),
+      words: words(r'徘徊 经过 移动 转身 打转 走动 挪动 后退 来回走 掠过 穿过 游荡 漂泊 兜圈子'),
     ),
     VerbGroup(
       field: VerbField.move,
       subject: const <NounClass>[NounClass.creature, NounClass.person],
       subjectTraits: const <NounTrait>[NounTrait.swimmer],
-      words: words(r'游泳'),
+      words: words(r'游泳 游 潜水 浮出水面 漂浮 游动 划水 游来游去 扑腾'),
     ),
     VerbGroup(
       field: VerbField.move,
       subject: const <NounClass>[NounClass.creature],
       subjectTraits: const <NounTrait>[NounTrait.flier],
-      words: words(r'飞翔'),
+      words: words(r'飞翔 飞 起飞 飞起 盘旋 滑翔 扑腾翅膀 拍打翅膀 飞走 飞过 掠过 降落 落下 栖息 飞来飞去 振翅 翱翔'),
     ),
     VerbGroup(
       field: VerbField.move,
       subject: const <NounClass>[NounClass.creature, NounClass.person],
       subjectTraits: const <NounTrait>[NounTrait.crawler],
-      words: words(r'爬行'),
+      words: words(r'爬行 爬 蠕动 蜿蜒 爬来爬去 爬出来 爬上去 缠绕 钻洞 匍匐 扭动'),
     ),
     VerbGroup(
       field: VerbField.wait,
       subject: const <NounClass>[NounClass.creature, NounClass.person],
-      words: words(r'等待 躲藏 环顾 犹豫 停下 张望'),
+      words: words(r'等待 躲藏 环顾 犹豫 停下 张望 倾听 屏息 静候 停留 逗留 徘徊不前 站着不动 偷看 窥视 观望 发呆 迟疑 磨蹭 守候 呆立 张望四周'),
     ),
     VerbGroup(
       field: VerbField.rest,
       subject: const <NounClass>[NounClass.creature, NounClass.person],
-      words: words(r'休息 坐下 躺下 靠着 蜷缩 歇息'),
+      words: words(r'休息 坐下 躺下 靠着 蜷缩 歇息 歇一歇 歇脚 坐着 躺着 斜靠 倚靠 跪下 蹲下 伸腿 舒展 放松 趴下 仰躺 歇口气 喘口气 小憩'),
     ),
     VerbGroup(
       field: VerbField.sleep,
       subject: const <NounClass>[NounClass.creature, NounClass.person],
-      words: words(r'睡觉 入睡 打盹 睡着'),
+      words: words(r'睡觉 入睡 打盹 睡着 睡 小睡 午睡 打瞌睡 昏睡 熟睡 沉睡 打呼噜 做梦 闭眼 进入梦乡 睡熟 迷迷糊糊睡去 酣睡'),
     ),
     VerbGroup(
       field: VerbField.express,
       subject: const <NounClass>[NounClass.creature, NounClass.person],
-      words: words(r'微笑 哭泣 打哈欠 叹气 哼歌 咕哝 喊叫 大笑'),
+      words: words(r'''
+        微笑 哭泣 打哈欠 叹气 哼歌 咕哝 喊叫 大笑 咯咯笑 傻笑 抽泣 呜咽 抱怨 嘀咕 吹口哨 欢呼 倒吸一口气 耸肩 点头 皱眉 摇头 挥手 打喷嚏 打嗝 拍手 眨眼 脸红 自言自语
+        咧嘴笑 流泪 尖叫 叫喊
+      '''),
     ),
     VerbGroup(
       field: VerbField.talk,
       subject: const <NounClass>[NounClass.creature, NounClass.person],
-      words: words(r'聊天 说话 谈话'),
+      words: words(r'聊天 说话 谈话 交谈 闲聊 攀谈 低语 耳语 絮叨 唠叨 闲谈 寒暄 打招呼 谈天 叙旧 说笑 交流'),
     ),
     VerbGroup(
       field: VerbField.play,
       subject: const <NounClass>[NounClass.creature, NounClass.person],
-      words: words(r'跳舞 歌唱 打滚 玩耍 蹦跳 嬉戏'),
+      words: words(r'跳舞 歌唱 打滚 玩耍 蹦跳 嬉戏 玩 唱歌 翻滚 转圈 撒欢 玩闹 嬉闹 捉迷藏 踢球 戏水 翻跟头 蹦来蹦去 打闹 撒野 疯玩'),
     ),
     VerbGroup(
       field: VerbField.think,
       subject: const <NounClass>[NounClass.person, NounClass.creature],
       object: const <NounClass>[NounClass.idea, NounClass.event, NounClass.place],
-      words: words(r'记得 忘记 想象 数 想起 惦记'),
+      words: words(r'''
+        记得 忘记 想象 数 想起 惦记 思考 想 回忆 回想 琢磨 担心 相信 期待 理解 明白 梦见 怀念 向往 思念 牵挂 惦念 领悟 揣摩 憧憬 记住 忘掉 想念
+      '''),
     ),
     VerbGroup(
       field: VerbField.look,
       subject: const <NounClass>[NounClass.creature, NounClass.person],
       object: const <NounClass>[NounClass.thing, NounClass.plant, NounClass.edible],
-      words: words(r'观看 注视 打量 检查 触摸 抚摸 端详'),
+      words: words(r'''
+        观看 注视 打量 检查 触摸 抚摸 端详 看 瞧 盯着 瞅 细看 凝视 审视 观察 瞥 扫视 察看 查看 摸 拍 敲 闻 摆弄 掂量 欣赏 翻看 瞧瞧 摸摸 看看
+      '''),
     ),
     VerbGroup(
       field: VerbField.search,
       subject: const <NounClass>[NounClass.creature, NounClass.person],
-      words: words(r'寻找 搜寻 翻找 找寻'),
+      words: words(r'寻找 搜寻 翻找 找寻 找 搜索 搜查 摸索 探索 探寻 四处找 到处找 翻箱倒柜 觅食 寻觅 搜罗 查找 挖掘 探路'),
     ),
     VerbGroup(
       field: VerbField.find,
       subject: const <NounClass>[NounClass.creature, NounClass.person],
       object: const <NounClass>[NounClass.thing, NounClass.plant, NounClass.edible],
-      words: words(r'找到 发现 捡起 寻得'),
+      words: words(r'找到 发现 捡起 寻得 找出 找回 拾起 拾到 挖出 掏出 翻出 找着 觅得 搜到 捡到 发掘 寻到 撞见 得到 捞到'),
     ),
     VerbGroup(
       field: VerbField.take,
       subject: const <NounClass>[NounClass.creature, NounClass.person],
       object: const <NounClass>[NounClass.thing, NounClass.plant, NounClass.edible],
-      words: words(r'挑选 拿起 抓住 拿 取出 收下'),
+      words: words(r'''
+        挑选 拿起 抓住 拿 取出 收下 拿走 拿到 抓起 抓取 握住 握着 拾取 取 选 挑 捡 摘 领取 接过 接住 提起 端起 捧起 举起 攥住 拽住 抱起 叼起 拿下
+      '''),
     ),
     VerbGroup(
       field: VerbField.carry,
       subject: const <NounClass>[NounClass.creature, NounClass.person],
       object: const <NounClass>[NounClass.thing, NounClass.plant, NounClass.edible],
-      words: words(r'搬运 带回 抱着 提着 拿回'),
+      words: words(r'''
+        搬运 带回 抱着 提着 拿回 搬 带 带走 带来 带上 拿着 扛 扛着 背 背着 拖 拉 推 提 抱 端 捧 运 运送 运走 搬走 搬来 扛走 背回 拖走 驮
+      '''),
     ),
     VerbGroup(
       field: VerbField.hide,
       subject: const <NounClass>[NounClass.creature, NounClass.person],
       object: const <NounClass>[NounClass.thing, NounClass.plant, NounClass.edible],
-      words: words(r'藏起 收好 守护 埋起 藏好'),
+      words: words(r'''
+        藏起 收好 守护 埋起 藏好 藏 收起 收藏 保存 储存 储藏 保管 存放 放好 塞进 塞好 掩藏 遮住 盖住 包好 包起来 藏起来 收起来 埋好 珍藏 留着 看守 藏匿 掖好
+      '''),
     ),
     VerbGroup(
       field: VerbField.lose,
       subject: const <NounClass>[NounClass.creature, NounClass.person],
       object: const <NounClass>[NounClass.thing, NounClass.plant, NounClass.edible],
-      words: words(r'弄丢 丢失 丢下'),
+      words: words(r'弄丢 丢失 丢下 丢 丢掉 掉落 遗失 遗落 弄掉 遗忘 弄没 忘带 弄不见'),
     ),
     VerbGroup(
       field: VerbField.meet,
       subject: const <NounClass>[NounClass.creature, NounClass.person],
       object: const <NounClass>[NounClass.person],
-      words: words(r'遇见 碰见 见到'),
+      words: words(r'遇见 碰见 见到 遇到 碰到 遇上 碰上 看见 会见 拜访 探望 看望 迎接 欢迎 问候 招呼 拥抱 邂逅 结识 约见 会面'),
     ),
     VerbGroup(
       field: VerbField.make,
       subject: const <NounClass>[NounClass.person],
       object: const <NounClass>[NounClass.thing, NounClass.vehicle],
-      words: words(r'制作 建造 雕刻 绘制 编织 组装'),
+      words: words(r'制作 建造 雕刻 绘制 编织 组装 做 造 制造 打造 建 修建 搭建 拼装 设计 创作 做出 造出 做成 做好 完成 装饰 塑造 捏 刻 雕 画'),
+    ),
+    VerbGroup(
+      field: VerbField.make,
+      subject: const <NounClass>[NounClass.person],
+      object: const <NounClass>[NounClass.thing, NounClass.vehicle],
+      objectThemes: const <WordTheme>[WordTheme.object, WordTheme.tool, WordTheme.vehicle],
+      words: words(r'锻造 铸造 焊接 打制 钉 拼接 组合 加工'),
+    ),
+    VerbGroup(
+      field: VerbField.make,
+      subject: const <NounClass>[NounClass.person],
+      object: const <NounClass>[NounClass.thing],
+      objectThemes: const <WordTheme>[WordTheme.clothing],
+      words: words(r'缝制 缝 织 编 裁剪 绣 钩织 缝合'),
     ),
     VerbGroup(
       field: VerbField.tend,
       subject: const <NounClass>[NounClass.person],
       object: const <NounClass>[NounClass.thing, NounClass.vehicle],
-      words: words(r'修理 擦拭 保养 整理 打磨 修补'),
+      words: words(r'''
+        修理 擦拭 保养 整理 打磨 修补 修 修好 擦 擦干净 清洗 清洁 打扫 洗 刷 抹 擦亮 上油 拧紧 调整 校准 检查 检修 维修 维护 照料 打理 收拾 晾干 擦掉灰尘 缝补 熨
+        整修 翻新
+      '''),
     ),
     VerbGroup(
       field: VerbField.sell,
       subject: const <NounClass>[NounClass.person],
       object: const <NounClass>[NounClass.thing, NounClass.vehicle],
-      words: words(r'出售 卖掉 转让 摆卖'),
+      words: words(r'出售 卖掉 转让 摆卖 卖 卖出 售出 贩卖 兜售 叫卖 转手 出手 让出 拍卖 交易 议价 标价 摆出 陈列 摆摊卖 交出 递出 递交'),
     ),
     VerbGroup(
       field: VerbField.buy,
       subject: const <NounClass>[NounClass.person],
       object: const <NounClass>[NounClass.thing, NounClass.vehicle, NounClass.edible],
-      words: words(r'购买 买下 买回 采购'),
+      words: words(r'购买 买下 买回 采购 买 买到 买来 买进 购入 订购 预订 选购 采买 置办 添置 囤 抢购 付款买下 买好 买上'),
     ),
     VerbGroup(
       field: VerbField.cook,
       subject: const <NounClass>[NounClass.creature, NounClass.person],
       object: const <NounClass>[NounClass.edible],
       objectThemes: const <WordTheme>[WordTheme.food],
-      words: words(r'烘烤 加热 煮 烹饪 切 盛上'),
+      words: words(r'''
+        烘烤 加热 煮 烹饪 切 盛上 烤 炒 炸 蒸 炖 煎 煮熟 焖 烧 煲 熬 拌 腌 调味 加盐 撒盐 翻炒 搅拌 翻面 端上 端出 盛出 摆盘 准备 热一热 温热 切碎 切片 剁
+        削皮 洗净 烹调 烧好 熘 涮 焯 烩 卤 煨 烙 烹
+      '''),
     ),
     VerbGroup(
       field: VerbField.eat,
       subject: const <NounClass>[NounClass.creature, NounClass.person],
       object: const <NounClass>[NounClass.edible],
       objectThemes: const <WordTheme>[WordTheme.food],
-      words: words(r'吃 咀嚼 品尝 啃 吃光'),
+      words: words(r'''
+        吃 咀嚼 品尝 啃 吃光 吃掉 吃完 尝 尝尝 吃下 咬 咬一口 嚼 大口吃 狼吞虎咽 细嚼慢咽 吞下 吞 舔 啃食 嚼着 尝一口 吃个精光 吃个饱 慢慢吃 大快朵颐 享用 品味 咬下
+        撕咬 吸溜 舀着吃 吃起来
+      '''),
     ),
     VerbGroup(
       field: VerbField.drink,
       subject: const <NounClass>[NounClass.creature, NounClass.person],
       object: const <NounClass>[NounClass.edible],
       objectThemes: const <WordTheme>[WordTheme.drink],
-      words: words(r'喝 啜饮 喝光 品饮'),
+      words: words(r'''
+        喝 啜饮 喝光 品饮 喝掉 喝完 喝下 饮 饮用 品 抿 抿一口 喝一口 小口喝 大口喝 猛喝 灌 灌下 咕咚咕咚喝 一饮而尽 慢慢喝 喝干 啜 呷 品尝 享用 慢饮 畅饮 痛饮
+        喝起来
+      '''),
     ),
     VerbGroup(
       field: VerbField.change,
       subject: const <NounClass>[NounClass.place],
-      words: words(r'安静下来 变暗 变亮 热闹起来 沉寂 亮起来'),
+      words: words(r'''
+        安静下来 变暗 变亮 热闹起来 沉寂 亮起来 苏醒 醒来 入睡 沉睡 静下来 热闹 喧闹起来 冷清下来 空了 空下来 挤满人 人来人往 闪烁 发亮 发光 结冰 融化 变湿 变干
+        被雾笼罩 变了样 焕然一新 忙碌起来 沸腾起来 暗下来 明亮起来 生机勃勃 热闹非凡
+      '''),
     ),
     VerbGroup(
       field: VerbField.change,
       subject: const <NounClass>[NounClass.event],
-      words: words(r'发光 流淌 加深 开始 结束 持续 过去'),
+      words: words(r'''
+        发光 流淌 加深 开始 结束 持续 过去 继续 停止 临近 到来 来临 降临 逼近 远去 消退 平息 展开 进行 延续 重复 拖延 落幕 接近尾声 反复 流逝 推进
+      '''),
+    ),
+    VerbGroup(
+      field: VerbField.change,
+      subject: const <NounClass>[NounClass.event],
+      subjectThemes: const <WordTheme>[WordTheme.time],
+      words: words(r'破晓 变深 转凉 转暖 消逝 溜走 更替 交替 悄然来临 渐渐过去 慢慢流逝 迎来 逝去'),
+    ),
+    VerbGroup(
+      field: VerbField.change,
+      subject: const <NounClass>[NounClass.event],
+      subjectThemes: const <WordTheme>[WordTheme.weather],
+      words: words(r'袭来 散去 消散 减弱 增强 加剧 放晴 停歇 肆虐 弥漫 笼罩 飘过 掠过 涌来 席卷 减退 转晴 变大 变小'),
+    ),
+    VerbGroup(
+      field: VerbField.change,
+      subject: const <NounClass>[NounClass.event],
+      subjectThemes: const <WordTheme>[WordTheme.sport],
+      words: words(r'开赛 开幕 白热化 升温 闭幕 收场 重新开始 恢复 举行 举办 延长 进入高潮 进入尾声 开打 开场 收官'),
     ),
     VerbGroup(
       field: VerbField.change,
       subject: const <NounClass>[NounClass.thing, NounClass.vehicle],
-      words: words(r'摇晃 闪耀 掉落 滚动 倾斜 老化'),
+      subjectThemes: const <WordTheme>[
+        WordTheme.object,
+        WordTheme.tool,
+        WordTheme.clothing,
+        WordTheme.product,
+        WordTheme.gem,
+        WordTheme.vehicle,
+      ],
+      words: words(r'''
+        摇晃 闪耀 掉落 滚动 倾斜 老化 发亮 晃动 晃 摆动 摇摆 晃来晃去 滑落 滑下 掉下 落下 翻倒 倒下 翻滚 滚落 转动 旋转 停下 静止 移动 褪色 磨损 变旧 蒙尘 失去光泽
+        变形 弯曲 飞走 飞起 弹起 弹跳 抖动 颤动
+      '''),
+    ),
+    VerbGroup(
+      field: VerbField.change,
+      subject: const <NounClass>[NounClass.thing, NounClass.vehicle],
+      subjectThemes: const <WordTheme>[WordTheme.object, WordTheme.tool, WordTheme.vehicle],
+      words: words(r'生锈 嘎吱作响 咯吱响 吱嘎作响 损坏 坏掉 破损 破碎 碎裂 开裂 断裂 折断 卡住 松动 脱落 散架 报废 失灵 冒烟 哐当响 叮当响'),
+    ),
+    VerbGroup(
+      field: VerbField.change,
+      subject: const <NounClass>[NounClass.thing],
+      subjectThemes: const <WordTheme>[WordTheme.music],
+      words: words(r'''
+        响起 奏响 回荡 回响 飘荡 飘扬 传来 播放 响 鸣响 停止 停下 消失 渐渐消失 变响 变轻 高涨 低沉下去 重复 延续 继续 萦绕 缭绕 荡漾 传遍 奏起 唱响
+      '''),
     ),
     VerbGroup(
       field: VerbField.move,
       subject: const <NounClass>[NounClass.vehicle],
-      words: words(r'行驶 停下 经过 返回 出发 滑行'),
+      words: words(r'''
+        行驶 停下 经过 返回 出发 滑行 开动 启动 开走 驶离 驶过 驶来 驶入 驶出 驶向 开来 开过 开进 开出 加速 减速 转弯 拐弯 掉头 倒车 停车 停靠 靠站 到站 到达 离开
+        前进 后退 缓缓前行 疾驰 飞驰 颠簸 摇晃 摇摇晃晃 滑动 滑过 靠近 远去 熄火 空转 鸣笛 减慢 冲过去
+      '''),
     ),
     VerbGroup(
       field: VerbField.change,
       subject: const <NounClass>[NounClass.idea, NounClass.event],
-      words: words(r'蔓延 消失 留下 飘荡 加深'),
+      words: words(r'''
+        蔓延 消失 留下 飘荡 加深 扩散 传播 散去 消散 淡去 淡化 褪去 变淡 变浓 增强 减弱 上升 下降 浮现 涌现 涌起 涌上心头 涌来 复苏 苏醒 重现 回来 回归 消退 平息
+        沉淀 积累 堆积 弥漫 萦绕 盘旋 闪现 闪过 扎根 生根 滋长 滋生 减退 升温 降温 波动 起伏 延续 持续
+      '''),
     ),
     VerbGroup(
       field: VerbField.change,
       subject: const <NounClass>[NounClass.plant],
-      words: words(r'生长 枯萎 开花 摇曳 舒展'),
+      words: words(r'''
+        生长 枯萎 开花 摇曳 舒展 发芽 抽芽 出芽 萌芽 长出 长大 长高 绽放 盛开 开放 怒放 凋谢 凋零 枯黄 干枯 变黄 变绿 转绿 泛黄 摆动 摇动 摇晃 摇摆 随风摇曳
+        随风摆动 飘动 招展 伸展 蔓延 攀爬 攀缘 扎根 生根 结果 结果子 挂果 成熟 散发香气 飘香 低垂 垂下 弯下 挺立 变茂盛 落叶 掉叶 抽枝 长叶 吐蕊 含苞 打苞 枯死 复苏
+        返青
+      '''),
     ),
     VerbGroup(
       field: VerbField.change,
       subject: const <NounClass>[NounClass.body],
-      words: words(r'颤抖 移动 麻木 僵硬'),
+      words: words(r'''
+        颤抖 移动 麻木 僵硬 发抖 哆嗦 抖动 抽搐 抽动 刺痛 疼痛 疼 痛 酸痛 发酸 发麻 发痒 痒 发热 发烫 发冷 发凉 变冷 变暖 变热 放松 松弛 绷紧 紧绷 僵住 舒展 伸展
+        弯曲 出汗 冒汗 肿 肿胀 肿起来 消肿 愈合 康复 恢复 发软 发沉 变沉 变轻 跳动 抖 缩 蜷缩 伸直 弯下 抬起 垂下 眨动 转动 摆动 挥动 晃动 颤动 动弹 舒缓 恢复过来
+      '''),
     ),
     VerbGroup(
       field: VerbField.change,
       subject: const <NounClass>[NounClass.edible],
-      words: words(r'成熟 冷却 沸腾 融化 变质'),
+      words: words(r'''
+        成熟 冷却 沸腾 融化 变质 变凉 变冷 变热 变温 变烫 热起来 凉下来 冒热气 冒气 冒烟 飘香 散发香气 散发香味 香气四溢 变少 减少 剩下 剩余 用完 用光 变多 端上来
+        上桌 摆上桌 摆好 准备好 做好 凝固 变硬 变软 变坏 变馊 发酵 结冰 变稠 变稀 沉淀 冒着热气
+      '''),
+    ),
+    VerbGroup(
+      field: VerbField.change,
+      subject: const <NounClass>[NounClass.edible],
+      subjectThemes: const <WordTheme>[WordTheme.food],
+      words: words(r'烤焦 烧焦 烧糊 变脆 变酥 变干 受潮 发霉 变酸 膨胀 发起来 煮熟 煮烂 烤好 烤熟 蒸熟 炸酥 出炉 出锅 上色 掉渣 散开 碎掉 塌下去'),
+    ),
+    VerbGroup(
+      field: VerbField.change,
+      subject: const <NounClass>[NounClass.edible],
+      subjectThemes: const <WordTheme>[WordTheme.drink],
+      words: words(r'冒泡 起泡 冒气泡 起泡沫 泛起泡沫 洒出 泼出 晃荡 荡漾 晃出来 变浑 变浊 澄清 走气 跑气 变淡 变浓 冒着泡 溢出'),
     ),
   ],
   states: <StateGroup>[

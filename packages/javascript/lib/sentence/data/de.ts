@@ -42,143 +42,266 @@ export const DE: SentenceLanguageData = {
 		{
 			field: 'rise',
 			subject: ['creature', 'person'],
-			...tensed(`erwacht erhebt_sich regt_sich`, `erwachte erhob_sich regte_sich`)
+			...tensed(
+				`erwacht erhebt_sich regt_sich reckt_sich streckt_sich räkelt_sich rührt_sich ermuntert_sich`,
+				`erwachte erhob_sich regte_sich reckte_sich streckte_sich räkelte_sich rührte_sich ermunterte_sich`
+			)
 		},
 		{
 			field: 'go',
 			subject: ['creature', 'person'],
-			...tensed(`geht wandert eilt reist`, `ging wanderte eilte reiste`)
+			...tensed(
+				`geht wandert eilt reist zieht entfernt_sich trollt_sich schleicht flieht flüchtet enteilt entschwindet verabschiedet_sich entweicht entflieht verschwindet`,
+				`ging wanderte eilte reiste zog entfernte_sich trollte_sich schlich floh flüchtete enteilte entschwand verabschiedete_sich entwich entfloh verschwand`
+			)
 		},
 		{
 			field: 'arrive',
 			subject: ['creature', 'person'],
-			...tensed(`kommt erscheint`, `kam erschien`)
+			...tensed(
+				`kommt erscheint naht nähert_sich landet`,
+				`kam erschien nahte näherte_sich landete`
+			)
 		},
 		{
 			field: 'move',
 			subject: ['creature', 'person'],
 			// Running and walking are for legs: a fish and a snake do neither.
 			subjectWithout: ['swimmer', 'crawler'],
-			...tensed(`läuft springt bummelt trabt spaziert`, `lief sprang bummelte trabte spazierte`)
+			...tensed(
+				`läuft springt bummelt trabt spaziert rennt tänzelt schlendert stolziert stapft trottet stakst joggt marschiert tippelt watschelt humpelt galoppiert flitzt hetzt hastet trippelt stiefelt tobt flaniert schreitet wandelt sprintet hopst`,
+				`lief sprang bummelte trabte spazierte rannte tänzelte schlenderte stolzierte stapfte trottete stakste joggte marschierte tippelte watschelte humpelte galoppierte flitzte hetzte hastete trippelte stiefelte tobte flanierte schritt wandelte sprintete hopste`
+			)
 		},
 		{
 			field: 'move',
 			subject: ['creature', 'person'],
-			...tensed(`streift`, `streifte`)
+			...tensed(
+				`streift bewegt_sich wendet_sich dreht_sich kreist treibt gleitet huscht schweift streunt weicht rückt`,
+				`streifte bewegte_sich wandte_sich drehte_sich kreiste trieb glitt huschte schweifte streunte wich rückte`
+			)
 		},
 		{
 			field: 'move',
 			subject: ['creature', 'person'],
 			// A fish's, a whale's and a mermaid's; a lion does not swim here.
 			subjectTraits: ['swimmer'],
-			...tensed(`schwimmt`, `schwamm`)
+			...tensed(
+				`schwimmt taucht plantscht paddelt strampelt krault`,
+				`schwamm tauchte plantschte paddelte strampelte kraulte`
+			)
 		},
 		{
 			field: 'move',
 			// Flying is a flier's alone: a sparrow's, a dragon's, never a fish's.
 			subject: ['creature'],
 			subjectTraits: ['flier'],
-			...tensed(`fliegt`, `flog`)
+			...tensed(
+				`fliegt flattert schwebt segelt schwirrt steigt sinkt schwingt_sich stürzt`,
+				`flog flatterte schwebte segelte schwirrte stieg sank schwang_sich stürzte`
+			)
 		},
 		{
 			field: 'move',
 			subject: ['creature', 'person'],
 			// A snake's, a snail's and a beetle's.
 			subjectTraits: ['crawler'],
-			...tensed(`kriecht`, `kroch`)
+			...tensed(
+				`kriecht schlängelt_sich windet_sich robbt krabbelt ringelt_sich gräbt wühlt`,
+				`kroch schlängelte_sich wand_sich robbte krabbelte ringelte_sich grub wühlte`
+			)
 		},
 		{
 			field: 'wait',
 			subject: ['creature', 'person'],
 			...tensed(
-				`wartet zögert verharrt lauscht lauert`,
-				`wartete zögerte verharrte lauschte lauerte`
+				`wartet zögert verharrt lauscht lauert horcht verweilt harrt zaudert duckt_sich versteckt_sich späht trödelt bleibt stockt schweigt wacht`,
+				`wartete zögerte verharrte lauschte lauerte horchte verweilte harrte zauderte duckte_sich versteckte_sich spähte trödelte blieb stockte schwieg wachte`
 			)
 		},
 		{
 			field: 'rest',
 			subject: ['creature', 'person'],
-			...tensed(`ruht sitzt liegt rastet lehnt`, `ruhte saß lag rastete lehnte`)
+			...tensed(
+				`ruht sitzt liegt rastet lehnt setzt_sich legt_sich entspannt_sich kauert kniet hockt lümmelt fläzt_sich verschnauft lagert bettet_sich erholt_sich pausiert`,
+				`ruhte saß lag rastete lehnte setzte_sich legte_sich entspannte_sich kauerte kniete hockte lümmelte fläzte_sich verschnaufte lagerte bettete_sich erholte_sich pausierte`
+			)
 		},
 		{
 			field: 'sleep',
 			subject: ['creature', 'person'],
-			...tensed(`schläft schlummert dämmert döst`, `schlief schlummerte dämmerte döste`)
+			...tensed(
+				`schläft schlummert dämmert döst schnarcht träumt pennt entschlummert duselt`,
+				`schlief schlummerte dämmerte döste schnarchte träumte pennte entschlummerte duselte`
+			)
 		},
 		{
 			field: 'express',
 			subject: ['creature', 'person'],
 			...tensed(
-				`lacht weint gähnt seufzt lächelt summt murmelt ruft`,
-				`lachte weinte gähnte seufzte lächelte summte murmelte rief`
+				`lacht weint gähnt seufzt lächelt summt murmelt ruft kichert grinst schluchzt stöhnt murrt brummt pfeift schreit jauchzt jubelt keucht nickt niest klatscht zwinkert errötet prustet schnieft schnaubt kreischt stammelt winkt strahlt schmunzelt gluckst schnalzt hustet räuspert_sich wimmert heult grunzt jammert flucht`,
+				`lachte weinte gähnte seufzte lächelte summte murmelte rief kicherte grinste schluchzte stöhnte murrte brummte pfiff schrie jauchzte jubelte keuchte nickte nieste klatschte zwinkerte errötete prustete schniefte schnaubte kreischte stammelte winkte strahlte schmunzelte gluckste schnalzte hustete räusperte_sich wimmerte heulte grunzte jammerte fluchte`
 			)
 		},
 		{
 			field: 'talk',
 			subject: ['creature', 'person'],
-			...tensed(`plaudert redet schwatzt`, `plauderte redete schwatzte`)
+			...tensed(
+				`plaudert redet schwatzt spricht quatscht tratscht klönt tuschelt flüstert unterhält_sich ratscht palavert erzählt grüßt plauscht schnattert quasselt labert`,
+				`plauderte redete schwatzte sprach quatschte tratschte klönte tuschelte flüsterte unterhielt_sich ratschte palaverte erzählte grüßte plauschte schnatterte quasselte laberte`
+			)
 		},
 		{
 			field: 'play',
 			subject: ['creature', 'person'],
-			...tensed(`tanzt singt tollt spielt hüpft rollt`, `tanzte sang tollte spielte hüpfte rollte`)
+			...tensed(
+				`tanzt singt tollt spielt hüpft rollt purzelt wirbelt kugelt_sich albert balgt_sich vergnügt_sich schaukelt wälzt_sich springt tummelt_sich kaspert trällert scherzt`,
+				`tanzte sang tollte spielte hüpfte rollte purzelte wirbelte kugelte_sich alberte balgte_sich vergnügte_sich schaukelte wälzte_sich sprang tummelte_sich kasperte trällerte scherzte`
+			)
 		},
 		{
 			field: 'search',
 			subject: ['creature', 'person'],
-			...tensed(`sucht stöbert kramt`, `suchte stöberte kramte`)
+			...tensed(
+				`sucht stöbert kramt wühlt forscht schnüffelt buddelt fahndet erkundet tastet stochert schnuppert`,
+				`suchte stöberte kramte wühlte forschte schnüffelte buddelte fahndete erkundete tastete stocherte schnupperte`
+			)
 		},
 		{
 			field: 'change',
 			subject: ['place'],
 			...tensed(
-				`verstummt dunkelt erhellt_sich leert_sich füllt_sich belebt_sich`,
-				`verstummte dunkelte erhellte_sich leerte_sich füllte_sich belebte_sich`
+				`verstummt dunkelt erhellt_sich leert_sich füllt_sich belebt_sich erwacht summt brummt wimmelt glänzt glitzert funkelt taut trocknet versinkt erstrahlt verändert_sich wandelt_sich verblasst dämmert erblüht leuchtet ergraut verödet verstaubt vereist brodelt lärmt tost rauscht flimmert erglüht verdunkelt_sich beruhigt_sich`,
+				`verstummte dunkelte erhellte_sich leerte_sich füllte_sich belebte_sich erwachte summte brummte wimmelte glänzte glitzerte funkelte taute trocknete versank erstrahlte veränderte_sich wandelte_sich verblasste dämmerte erblühte leuchtete ergraute verödete verstaubte vereiste brodelte lärmte toste rauschte flimmerte erglühte verdunkelte_sich beruhigte_sich`
 			)
 		},
 		{
 			field: 'change',
 			subject: ['event'],
 			...tensed(
-				`leuchtet fließt vertieft_sich beginnt endet dauert vergeht`,
-				`leuchtete floss vertiefte_sich begann endete dauerte verging`
+				`leuchtet fließt vertieft_sich beginnt endet dauert vergeht verstreicht naht verklingt verläuft steigert_sich verebbt entfaltet_sich wiederholt_sich verrinnt währt schwindet erlischt eskaliert verfliegt nähert_sich verlängert_sich verkürzt_sich`,
+				`leuchtete floss vertiefte_sich begann endete dauerte verging verstrich nahte verklang verlief steigerte_sich verebbte entfaltete_sich wiederholte_sich verrann währte schwand erlosch eskalierte verflog näherte_sich verlängerte_sich verkürzte_sich`
+			)
+		},
+		{
+			field: 'change',
+			subject: ['event'],
+			// What a time of day or a season does: it breaks, wears away, draws in.
+			subjectThemes: ['time'],
+			...tensed(
+				`dämmert graut neigt_sich senkt_sich kippt kommt geht erwacht erblüht weicht entschwindet verglüht ergraut`,
+				`dämmerte graute neigte_sich senkte_sich kippte kam ging erwachte erblühte wich entschwand verglühte ergraute`
+			)
+		},
+		{
+			field: 'change',
+			subject: ['event'],
+			// What weather does: it rolls in, sets in, lets up.
+			subjectThemes: ['weather'],
+			...tensed(
+				`tobt wütet braust peitscht prasselt rieselt nieselt tröpfelt weht bläst fegt legt_sich verzieht_sich lichtet_sich verdichtet_sich dräut lastet hängt liegt`,
+				`tobte wütete brauste peitschte prasselte rieselte nieselte tröpfelte wehte blies fegte legte_sich verzog_sich lichtete_sich verdichtete_sich dräute lastete hing lag`
+			)
+		},
+		{
+			field: 'change',
+			subject: ['event'],
+			// What a match does: it kicks off, heats up, wraps up.
+			subjectThemes: ['sport'],
+			...tensed(
+				`läuft startet entscheidet_sich steigt verzögert_sich wogt`,
+				`lief startete entschied_sich stieg verzögerte_sich wogte`
 			)
 		},
 		{
 			field: 'change',
 			subject: ['thing', 'vehicle'],
+			// What a thing one can hold does. A song is a thing of another kind, below.
+			subjectThemes: ['object', 'tool', 'clothing', 'product', 'gem', 'vehicle'],
 			...tensed(
-				`schwankt glänzt fällt rollt neigt_sich altert`,
-				`schwankte glänzte fiel rollte neigte_sich alterte`
+				`schwankt glänzt fällt rollt neigt_sich altert schimmert wackelt rutscht kullert stoppt steht verschleißt verbiegt_sich verformt_sich flattert wippt erzittert taumelt ruckelt sackt pendelt baumelt`,
+				`schwankte glänzte fiel rollte neigte_sich alterte schimmerte wackelte rutschte kullerte stoppte stand verschliss verbog_sich verformte_sich flatterte wippte erzitterte taumelte ruckelte sackte pendelte baumelte`
+			)
+		},
+		{
+			field: 'change',
+			subject: ['thing', 'vehicle'],
+			// What only something made of metal and wood does: a jewel never rusts.
+			subjectThemes: ['object', 'tool', 'vehicle'],
+			...tensed(
+				`rostet quietscht knarrt klappert rattert scheppert klirrt bricht zerbricht splittert reißt platzt klemmt hakt lockert_sich löst_sich zerfällt versagt qualmt poltert rumpelt`,
+				`rostete quietschte knarrte klapperte ratterte schepperte klirrte brach zerbrach splitterte riss platzte klemmte hakte lockerte_sich löste_sich zerfiel versagte qualmte polterte rumpelte`
+			)
+		},
+		{
+			field: 'change',
+			subject: ['thing'],
+			// What a song or a drum does: it plays, rings out, dies away.
+			subjectThemes: ['music'],
+			...tensed(
+				`klingt erklingt ertönt hallt verhallt schallt dröhnt tönt erschallt widerhallt dudelt plärrt leiert klimpert perlt`,
+				`klang erklang ertönte hallte verhallte schallte dröhnte tönte erschallte widerhallte dudelte plärrte leierte klimperte perlte`
 			)
 		},
 		{
 			field: 'move',
 			subject: ['vehicle'],
-			...tensed(`fährt hält rollt wendet gleitet`, `fuhr hielt rollte wendete glitt`)
+			...tensed(
+				`fährt hält rollt wendet gleitet bremst beschleunigt parkt rangiert kurvt schlingert rast tuckert zuckelt hupt ankert kreuzt`,
+				`fuhr hielt rollte wendete glitt bremste beschleunigte parkte rangierte kurvte schlingerte raste tuckerte zuckelte hupte ankerte kreuzte`
+			)
 		},
 		{
 			field: 'change',
 			subject: ['idea', 'event'],
 			...tensed(
-				`wächst verschwindet bleibt schwebt vertieft_sich`,
-				`wuchs verschwand blieb schwebte vertiefte_sich`
+				`wächst verschwindet bleibt schwebt vertieft_sich verblasst verfliegt keimt wuchert erstarkt verstärkt_sich brennt lodert glimmt flackert schwelt gärt verfestigt_sich verankert_sich verwurzelt_sich hält wirkt wallt schwankt beruhigt_sich`,
+				`wuchs verschwand blieb schwebte vertiefte_sich verblasste verflog keimte wucherte erstarkte verstärkte_sich brannte loderte glomm flackerte schwelte gärte verfestigte_sich verankerte_sich verwurzelte_sich hielt wirkte wallte schwankte beruhigte_sich`
 			)
 		},
 		{
 			field: 'change',
 			subject: ['plant'],
-			...tensed(`wächst welkt blüht schwankt sprießt`, `wuchs welkte blühte schwankte spross`)
+			...tensed(
+				`wächst welkt blüht schwankt sprießt keimt knospt verblüht verdorrt vertrocknet vergilbt ergrünt grünt rankt klettert wiegt_sich raschelt duftet fruchtet gedeiht wurzelt entlaubt_sich biegt_sich krümmt_sich`,
+				`wuchs welkte blühte schwankte spross keimte knospte verblühte verdorrte vertrocknete vergilbte ergrünte grünte rankte kletterte wiegte_sich raschelte duftete fruchtete gedieh wurzelte entlaubte_sich bog_sich krümmte_sich`
+			)
 		},
 		{
 			field: 'change',
 			subject: ['body'],
-			...tensed(`zittert bebt erstarrt heilt`, `zitterte bebte erstarrte heilte`)
+			...tensed(
+				`zittert bebt erstarrt heilt zuckt kribbelt pocht pulsiert schmerzt sticht juckt schwitzt friert erwärmt_sich kühlt verkrampft_sich verspannt_sich ermüdet erlahmt versteift_sich beugt_sich hebt_sich erschlafft prickelt schaudert bibbert zappelt`,
+				`zitterte bebte erstarrte heilte zuckte kribbelte pochte pulsierte schmerzte stach juckte schwitzte fror erwärmte_sich kühlte verkrampfte_sich verspannte_sich ermüdete erlahmte versteifte_sich beugte_sich hob_sich erschlaffte prickelte schauderte bibberte zappelte`
+			)
 		},
 		{
 			field: 'change',
 			subject: ['edible'],
-			...tensed(`reift kühlt kocht schmilzt verdirbt`, `reifte kühlte kochte schmolz verdarb`)
+			...tensed(
+				`reift kühlt kocht schmilzt verdirbt erkaltet dampft riecht schmeckt gerinnt verdunstet gefriert verdickt_sich klärt_sich köchelt siedet zischt`,
+				`reifte kühlte kochte schmolz verdarb erkaltete dampfte roch schmeckte gerann verdunstete gefror verdickte_sich klärte_sich köchelte siedete zischte`
+			)
+		},
+		{
+			field: 'change',
+			subject: ['edible'],
+			// What a dish does and a drink does not: it sizzles, crumbles, goes stale.
+			subjectThemes: ['food'],
+			...tensed(
+				`brutzelt bräunt verbrennt verkohlt zerbröselt verschimmelt säuert quillt gart zerläuft trieft krümelt bröckelt schrumpft schrumpelt`,
+				`brutzelte bräunte verbrannte verkohlte zerbröselte verschimmelte säuerte quoll garte zerlief triefte krümelte bröckelte schrumpfte schrumpelte`
+			)
+		},
+		{
+			field: 'change',
+			subject: ['edible'],
+			// What a drink does and a dish does not: it fizzes, spills, goes flat.
+			subjectThemes: ['drink'],
+			...tensed(
+				`sprudelt schäumt spritzt schwappt plätschert kräuselt_sich trübt_sich tropft rinnt gluckert blubbert moussiert`,
+				`sprudelte schäumte spritzte schwappte plätscherte kräuselte_sich trübte_sich tropfte rann gluckerte blubberte moussierte`
+			)
 		}
 	],
 	states: [

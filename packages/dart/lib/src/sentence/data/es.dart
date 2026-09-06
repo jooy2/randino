@@ -40,273 +40,785 @@ final SentenceLanguageData es = SentenceLanguageData(
     VerbGroup(
       field: VerbField.rise,
       subject: const <NounClass>[NounClass.creature, NounClass.person],
-      words: words(r'se_despierta se_levanta se_incorpora'),
-      past: PredicateTense(words: words(r'se_despertó se_levantó se_incorporó')),
+      words: words(r'''
+        se_despierta se_levanta se_incorpora despierta se_espabila se_endereza abre_los_ojos
+        se_estira se_pone_en_pie
+      '''),
+      past: PredicateTense(
+        words: words(r'''
+          se_despertó se_levantó se_incorporó despertó se_espabiló se_enderezó abrió_los_ojos
+          se_estiró se_puso_en_pie
+        '''),
+      ),
     ),
     VerbGroup(
       field: VerbField.go,
       subject: const <NounClass>[NounClass.creature, NounClass.person],
       requires: SentenceSlot.destination,
-      words: words(r'va se_dirige'),
-      past: PredicateTense(words: words(r'fue se_dirigió')),
+      words: words(r'''
+        va se_dirige se_encamina se_acerca avanza marcha viaja se_aproxima se_desplaza se_apresura
+        se_lanza se_mueve
+      '''),
+      past: PredicateTense(
+        words: words(r'''
+          fue se_dirigió se_encaminó se_acercó avanzó marchó viajó se_aproximó se_desplazó
+          se_apresuró se_lanzó se_movió
+        '''),
+      ),
     ),
     VerbGroup(
       field: VerbField.go,
       subject: const <NounClass>[NounClass.creature, NounClass.person],
       subjectWithout: const <NounTrait>[NounTrait.swimmer, NounTrait.crawler],
       requires: SentenceSlot.destination,
-      words: words(r'corre camina sube baja'),
-      past: PredicateTense(words: words(r'corrió caminó subió bajó')),
+      words: words(r'corre camina sube baja trota anda pasea salta cojea trepa'),
+      past: PredicateTense(
+        words: words(r'corrió caminó subió bajó trotó anduvo paseó saltó cojeó trepó'),
+      ),
     ),
     VerbGroup(
       field: VerbField.go,
       subject: const <NounClass>[NounClass.creature, NounClass.person],
-      words: words(r'parte se_marcha sale'),
-      past: PredicateTense(words: words(r'partió se_marchó salió')),
+      words: words(r'''
+        parte se_marcha sale se_va se_aleja se_retira emprende_la_marcha se_pone_en_camino
+        se_escabulle se_esfuma se_larga echa_a_andar arranca
+      '''),
+      past: PredicateTense(
+        words: words(r'''
+          partió se_marchó salió se_fue se_alejó se_retiró emprendió_la_marcha se_puso_en_camino
+          se_escabulló se_esfumó se_largó echó_a_andar arrancó
+        '''),
+      ),
     ),
     VerbGroup(
       field: VerbField.arrive,
       subject: const <NounClass>[NounClass.creature, NounClass.person],
       requires: SentenceSlot.destination,
-      words: words(r'llega vuelve regresa'),
-      past: PredicateTense(words: words(r'llegó volvió regresó')),
+      words: words(r'llega vuelve regresa viene se_acerca avanza se_aproxima se_desplaza'),
+      past: PredicateTense(
+        words: words(r'llegó volvió regresó vino se_acercó avanzó se_aproximó se_desplazó'),
+      ),
     ),
     VerbGroup(
       field: VerbField.arrive,
       subject: const <NounClass>[NounClass.creature, NounClass.person],
-      words: words(r'retorna vuelve_a_casa regresa_a_casa'),
-      past: PredicateTense(words: words(r'retornó volvió_a_casa regresó_a_casa')),
+      words: words(r'''
+        retorna vuelve_a_casa regresa_a_casa llega_a_casa aparece reaparece se_presenta asoma entra
+        se_asoma
+      '''),
+      past: PredicateTense(
+        words: words(r'''
+          retornó volvió_a_casa regresó_a_casa llegó_a_casa apareció reapareció se_presentó asomó
+          entró se_asomó
+        '''),
+      ),
     ),
     VerbGroup(
       field: VerbField.move,
       subject: const <NounClass>[NounClass.creature, NounClass.person],
       subjectWithout: const <NounTrait>[NounTrait.swimmer, NounTrait.crawler],
-      words: words(r'corre camina salta pasea deambula'),
-      past: PredicateTense(words: words(r'corrió caminó saltó paseó deambuló')),
+      words: words(r'''
+        corre camina salta pasea deambula trota corretea brinca marcha anda cojea zapatea se_pasea
+        trepa da_saltos da_brincos camina_de_puntillas avanza_a_zancadas
+      '''),
+      past: PredicateTense(
+        words: words(r'''
+          corrió caminó saltó paseó deambuló trotó correteó brincó marchó anduvo cojeó zapateó
+          se_paseó trepó dio_saltos dio_brincos caminó_de_puntillas avanzó_a_zancadas
+        '''),
+      ),
     ),
     VerbGroup(
       field: VerbField.move,
       subject: const <NounClass>[NounClass.creature, NounClass.person],
-      words: words(r'vaga pasa'),
-      past: PredicateTense(words: words(r'vagó pasó')),
+      words: words(r'''
+        vaga pasa se_mueve avanza retrocede gira da_vueltas se_desplaza se_desliza merodea ronda
+        se_acerca se_aleja cruza se_escurre
+      '''),
+      past: PredicateTense(
+        words: words(r'''
+          vagó pasó se_movió avanzó retrocedió giró dio_vueltas se_desplazó se_deslizó merodeó rondó
+          se_acercó se_alejó cruzó se_escurrió
+        '''),
+      ),
     ),
     VerbGroup(
       field: VerbField.move,
       subject: const <NounClass>[NounClass.creature, NounClass.person],
       subjectTraits: const <NounTrait>[NounTrait.swimmer],
-      words: words(r'nada'),
-      past: PredicateTense(words: words(r'nadó')),
+      words: words(r'nada bucea chapotea flota se_sumerge emerge bracea'),
+      past: PredicateTense(words: words(r'nadó buceó chapoteó flotó se_sumergió emergió braceó')),
     ),
     VerbGroup(
       field: VerbField.move,
       subject: const <NounClass>[NounClass.creature],
       subjectTraits: const <NounTrait>[NounTrait.flier],
-      words: words(r'vuela'),
-      past: PredicateTense(words: words(r'voló')),
+      words: words(r'''
+        vuela despega planea revolotea aletea se_eleva se_posa aterriza desciende_en_picado
+        sobrevuela alza_el_vuelo se_cierne emprende_el_vuelo
+      '''),
+      past: PredicateTense(
+        words: words(r'''
+          voló despegó planeó revoloteó aleteó se_elevó se_posó aterrizó descendió_en_picado
+          sobrevoló alzó_el_vuelo se_cernió emprendió_el_vuelo
+        '''),
+      ),
     ),
     VerbGroup(
       field: VerbField.move,
       subject: const <NounClass>[NounClass.creature, NounClass.person],
       subjectTraits: const <NounTrait>[NounTrait.crawler],
-      words: words(r'repta'),
-      past: PredicateTense(words: words(r'reptó')),
+      words: words(r'''
+        repta se_arrastra serpentea se_desliza se_enrosca se_retuerce gatea se_escurre
+        avanza_a_rastras excava
+      '''),
+      past: PredicateTense(
+        words: words(r'''
+          reptó se_arrastró serpenteó se_deslizó se_enroscó se_retorció gateó se_escurrió
+          avanzó_a_rastras excavó
+        '''),
+      ),
     ),
     VerbGroup(
       field: VerbField.wait,
       subject: const <NounClass>[NounClass.creature, NounClass.person],
-      words: words(r'espera se_esconde mira_alrededor vacila se_detiene aguarda'),
+      words: words(r'''
+        espera se_esconde mira_alrededor vacila se_detiene aguarda escucha titubea duda
+        se_queda_quieto permanece_inmóvil se_agazapa acecha se_asoma echa_un_vistazo se_demora
+        holgazanea remolonea se_para hace_una_pausa observa_en_silencio se_queda_esperando
+      '''),
       past: PredicateTense(
-        words: words(r'esperó se_escondió miró_alrededor vaciló se_detuvo aguardó'),
+        words: words(r'''
+          esperó se_escondió miró_alrededor vaciló se_detuvo aguardó escuchó titubeó dudó
+          se_quedó_quieto permaneció_inmóvil se_agazapó acechó se_asomó echó_un_vistazo se_demoró
+          holgazaneó remoloneó se_paró hizo_una_pausa observó_en_silencio se_quedó_esperando
+        '''),
       ),
     ),
     VerbGroup(
       field: VerbField.rest,
       subject: const <NounClass>[NounClass.creature, NounClass.person],
-      words: words(r'descansa se_sienta se_acuesta se_apoya se_acurruca reposa'),
+      words: words(r'''
+        descansa se_sienta se_acuesta se_apoya se_acurruca reposa se_tumba se_recuesta se_relaja
+        se_arrodilla se_agacha se_estira se_desploma toma_aliento recupera_el_aliento se_echa
+        se_repantiga se_pone_cómodo hace_un_alto se_tiende reposa_un_rato
+      '''),
       past: PredicateTense(
-        words: words(r'descansó se_sentó se_acostó se_apoyó se_acurrucó reposó'),
+        words: words(r'''
+          descansó se_sentó se_acostó se_apoyó se_acurrucó reposó se_tumbó se_recostó se_relajó
+          se_arrodilló se_agachó se_estiró se_desplomó tomó_aliento recuperó_el_aliento se_echó
+          se_repantigó se_puso_cómodo hizo_un_alto se_tendió reposó_un_rato
+        '''),
       ),
     ),
     VerbGroup(
       field: VerbField.sleep,
       subject: const <NounClass>[NounClass.creature, NounClass.person],
-      words: words(r'duerme se_adormece se_duerme dormita'),
-      past: PredicateTense(words: words(r'durmió se_adormeció se_durmió dormitó')),
+      words: words(r'''
+        duerme se_adormece se_duerme dormita echa_una_siesta cabecea se_queda_dormido ronca sueña
+        da_una_cabezada se_amodorra descansa_profundamente cierra_los_ojos duerme_a_pierna_suelta
+      '''),
+      past: PredicateTense(
+        words: words(r'''
+          durmió se_adormeció se_durmió dormitó echó_una_siesta cabeceó se_quedó_dormido roncó soñó
+          dio_una_cabezada se_amodorró descansó_profundamente cerró_los_ojos durmió_a_pierna_suelta
+        '''),
+      ),
     ),
     VerbGroup(
       field: VerbField.express,
       subject: const <NounClass>[NounClass.creature, NounClass.person],
-      words: words(r'ríe llora bosteza suspira sonríe tararea murmura grita'),
-      past: PredicateTense(words: words(r'rió lloró bostezó suspiró sonrió tarareó murmuró gritó')),
+      words: words(r'''
+        ríe llora bosteza suspira sonríe tararea murmura grita se_ríe solloza gime gruñe refunfuña
+        silba exclama vitorea jadea se_encoge_de_hombros asiente frunce_el_ceño estornuda tiene_hipo
+        aplaude guiña_un_ojo se_sonroja se_ríe_a_carcajadas lloriquea resopla chilla balbucea
+        canturrea hace_una_mueca niega_con_la_cabeza saluda_con_la_mano
+      '''),
+      past: PredicateTense(
+        words: words(r'''
+          rió lloró bostezó suspiró sonrió tarareó murmuró gritó se_rió sollozó gimió gruñó
+          refunfuñó silbó exclamó vitoreó jadeó se_encogió_de_hombros asintió frunció_el_ceño
+          estornudó tuvo_hipo aplaudió guiñó_un_ojo se_sonrojó se_rió_a_carcajadas lloriqueó resopló
+          chilló balbuceó canturreó hizo_una_mueca negó_con_la_cabeza saludó_con_la_mano
+        '''),
+      ),
     ),
     VerbGroup(
       field: VerbField.talk,
       subject: const <NounClass>[NounClass.creature, NounClass.person],
-      words: words(r'charla conversa platica'),
-      past: PredicateTense(words: words(r'charló conversó platicó')),
+      words: words(r'''
+        charla conversa platica habla parlotea cotillea chismea susurra cuchichea dialoga se_explaya
+        cuenta_historias saluda charlotea intercambia_palabras
+      '''),
+      past: PredicateTense(
+        words: words(r'''
+          charló conversó platicó habló parloteó cotilleó chismeó susurró cuchicheó dialogó
+          se_explayó contó_historias saludó charloteó intercambió_palabras
+        '''),
+      ),
     ),
     VerbGroup(
       field: VerbField.play,
       subject: const <NounClass>[NounClass.creature, NounClass.person],
-      words: words(r'baila canta rueda juega brinca retoza'),
-      past: PredicateTense(words: words(r'bailó cantó rodó jugó brincó retozó')),
+      words: words(r'''
+        baila canta rueda juega brinca retoza salta da_volteretas gira da_vueltas se_revuelca
+        juguetea travesea hace_el_tonto se_divierte juega_al_escondite da_saltitos hace_piruetas
+        se_columpia
+      '''),
+      past: PredicateTense(
+        words: words(r'''
+          bailó cantó rodó jugó brincó retozó saltó dio_volteretas giró dio_vueltas se_revolcó
+          jugueteó traveseó hizo_el_tonto se_divirtió jugó_al_escondite dio_saltitos hizo_piruetas
+          se_columpió
+        '''),
+      ),
     ),
     VerbGroup(
       field: VerbField.think,
       subject: const <NounClass>[NounClass.person, NounClass.creature],
       object: const <NounClass>[NounClass.idea, NounClass.event, NounClass.place],
-      words: words(r'recuerda olvida imagina cuenta evoca añora'),
-      past: PredicateTense(words: words(r'recordó olvidó imaginó contó evocó añoró')),
+      words: words(r'''
+        recuerda olvida imagina cuenta evoca añora piensa_en sueña_con medita_sobre reflexiona_sobre
+        considera contempla cree_en confía_en anhela extraña echa_de_menos rememora se_acuerda_de
+        se_pregunta_por se_preocupa_por entiende comprende visualiza se_imagina teme
+      '''),
+      past: PredicateTense(
+        words: words(r'''
+          recordó olvidó imaginó contó evocó añoró pensó_en soñó_con meditó_sobre reflexionó_sobre
+          consideró contempló creyó_en confió_en anheló extrañó echó_de_menos rememoró se_acordó_de
+          se_preguntó_por se_preocupó_por entendió comprendió visualizó se_imaginó temió
+        '''),
+      ),
     ),
     VerbGroup(
       field: VerbField.look,
       subject: const <NounClass>[NounClass.creature, NounClass.person],
       object: const <NounClass>[NounClass.thing, NounClass.plant, NounClass.edible],
-      words: words(r'mira observa contempla examina toca acaricia'),
-      past: PredicateTense(words: words(r'miró observó contempló examinó tocó acarició')),
+      words: words(r'''
+        mira observa contempla examina toca acaricia ve vigila estudia inspecciona escruta ojea
+        echa_un_vistazo_a admira analiza revisa palpa roza tantea golpea huele olfatea sopesa
+        manosea escudriña vislumbra repasa
+      '''),
+      past: PredicateTense(
+        words: words(r'''
+          miró observó contempló examinó tocó acarició vio vigiló estudió inspeccionó escrutó ojeó
+          echó_un_vistazo_a admiró analizó revisó palpó rozó tanteó golpeó olió olfateó sopesó
+          manoseó escudriñó vislumbró repasó
+        '''),
+      ),
     ),
     VerbGroup(
       field: VerbField.search,
       subject: const <NounClass>[NounClass.creature, NounClass.person],
-      words: words(r'busca rebusca husmea explora'),
-      past: PredicateTense(words: words(r'buscó rebuscó husmeó exploró')),
+      words: words(r'''
+        busca rebusca husmea explora hurga escarba curiosea rastrea indaga fisgonea revuelve_todo
+        mira_por_todas_partes olisquea escudriña_los_rincones sondea inspecciona_el_lugar
+      '''),
+      past: PredicateTense(
+        words: words(r'''
+          buscó rebuscó husmeó exploró hurgó escarbó curioseó rastreó indagó fisgoneó revolvió_todo
+          miró_por_todas_partes olisqueó escudriñó_los_rincones sondeó inspeccionó_el_lugar
+        '''),
+      ),
     ),
     VerbGroup(
       field: VerbField.find,
       subject: const <NounClass>[NounClass.creature, NounClass.person],
       object: const <NounClass>[NounClass.thing, NounClass.plant, NounClass.edible],
-      words: words(r'encuentra descubre halla recoge'),
-      past: PredicateTense(words: words(r'encontró descubrió halló recogió')),
+      words: words(r'''
+        encuentra descubre halla recoge localiza desentierra tropieza_con da_con se_topa_con
+        recupera rescata saca_a_la_luz levanta_del_suelo descubre_por_casualidad
+      '''),
+      past: PredicateTense(
+        words: words(r'''
+          encontró descubrió halló recogió localizó desenterró tropezó_con dio_con se_topó_con
+          recuperó rescató sacó_a_la_luz levantó_del_suelo descubrió_por_casualidad
+        '''),
+      ),
     ),
     VerbGroup(
       field: VerbField.take,
       subject: const <NounClass>[NounClass.creature, NounClass.person],
       object: const <NounClass>[NounClass.thing, NounClass.plant, NounClass.edible],
-      words: words(r'elige toma agarra coge saca recibe'),
-      past: PredicateTense(words: words(r'eligió tomó agarró cogió sacó recibió')),
+      words: words(r'''
+        elige toma agarra coge saca recibe atrapa sujeta sostiene levanta alza reúne junta escoge
+        selecciona acepta obtiene consigue se_lleva se_queda_con guarda_en_el_bolsillo empuña aferra
+        pilla arrebata se_apodera_de acapara
+      '''),
+      past: PredicateTense(
+        words: words(r'''
+          eligió tomó agarró cogió sacó recibió atrapó sujetó sostuvo levantó alzó reunió juntó
+          escogió seleccionó aceptó obtuvo consiguió se_llevó se_quedó_con guardó_en_el_bolsillo
+          empuñó aferró pilló arrebató se_apoderó_de acaparó
+        '''),
+      ),
     ),
     VerbGroup(
       field: VerbField.carry,
       subject: const <NounClass>[NounClass.creature, NounClass.person],
       object: const <NounClass>[NounClass.thing, NounClass.plant, NounClass.edible],
-      words: words(r'lleva trae carga acarrea'),
-      past: PredicateTense(words: words(r'llevó trajo cargó acarreó')),
+      words: words(r'''
+        lleva trae carga acarrea transporta arrastra remolca empuja tira_de lleva_a_cuestas
+        carga_al_hombro trae_consigo lleva_consigo traslada mueve
+      '''),
+      past: PredicateTense(
+        words: words(r'''
+          llevó trajo cargó acarreó transportó arrastró remolcó empujó tiró_de llevó_a_cuestas
+          cargó_al_hombro trajo_consigo llevó_consigo trasladó movió
+        '''),
+      ),
     ),
     VerbGroup(
       field: VerbField.hide,
       subject: const <NounClass>[NounClass.creature, NounClass.person],
       object: const <NounClass>[NounClass.thing, NounClass.plant, NounClass.edible],
-      words: words(r'esconde guarda oculta entierra conserva'),
-      past: PredicateTense(words: words(r'escondió guardó ocultó enterró conservó')),
+      words: words(r'''
+        esconde guarda oculta entierra conserva almacena atesora acumula aparta reserva envuelve
+        cubre tapa disimula pone_a_salvo guarda_bajo_llave mete_en_un_cajón deja_a_buen_recaudo
+        custodia protege encierra archiva empaqueta
+      '''),
+      past: PredicateTense(
+        words: words(r'''
+          escondió guardó ocultó enterró conservó almacenó atesoró acumuló apartó reservó envolvió
+          cubrió tapó disimuló puso_a_salvo guardó_bajo_llave metió_en_un_cajón dejó_a_buen_recaudo
+          custodió protegió encerró archivó empaquetó
+        '''),
+      ),
     ),
     VerbGroup(
       field: VerbField.lose,
       subject: const <NounClass>[NounClass.creature, NounClass.person],
       object: const <NounClass>[NounClass.thing, NounClass.plant, NounClass.edible],
-      words: words(r'pierde extravía olvida'),
-      past: PredicateTense(words: words(r'perdió extravió olvidó')),
+      words: words(r'''
+        pierde extravía olvida deja_caer suelta deja_atrás traspapela se_olvida_de descuida
+        deja_olvidado pierde_de_vista
+      '''),
+      past: PredicateTense(
+        words: words(r'''
+          perdió extravió olvidó dejó_caer soltó dejó_atrás traspapeló se_olvidó_de descuidó
+          dejó_olvidado perdió_de_vista
+        '''),
+      ),
     ),
     VerbGroup(
       field: VerbField.make,
       subject: const <NounClass>[NounClass.person],
       object: const <NounClass>[NounClass.thing, NounClass.vehicle],
-      words: words(r'hace construye talla pinta teje arma'),
-      past: PredicateTense(words: words(r'hizo construyó talló pintó tejió armó')),
+      words: words(r'''
+        hace construye talla pinta teje arma fabrica crea diseña elabora monta ensambla moldea
+        esculpe dibuja inventa produce termina idea concibe da_forma_a completa perfecciona decora
+        adorna
+      '''),
+      past: PredicateTense(
+        words: words(r'''
+          hizo construyó talló pintó tejió armó fabricó creó diseñó elaboró montó ensambló moldeó
+          esculpió dibujó inventó produjo terminó ideó concibió dio_forma_a completó perfeccionó
+          decoró adornó
+        '''),
+      ),
+    ),
+    VerbGroup(
+      field: VerbField.make,
+      subject: const <NounClass>[NounClass.person],
+      object: const <NounClass>[NounClass.thing, NounClass.vehicle],
+      objectThemes: const <WordTheme>[WordTheme.object, WordTheme.tool, WordTheme.vehicle],
+      words: words(r'forja funde suelda martillea remacha atornilla labra lima'),
+      past: PredicateTense(
+        words: words(r'forjó fundió soldó martilleó remachó atornilló labró limó'),
+      ),
+    ),
+    VerbGroup(
+      field: VerbField.make,
+      subject: const <NounClass>[NounClass.person],
+      object: const <NounClass>[NounClass.thing],
+      objectThemes: const <WordTheme>[WordTheme.clothing],
+      words: words(r'cose confecciona borda zurce hilvana cose_a_mano tricota'),
+      past: PredicateTense(
+        words: words(r'cosió confeccionó bordó zurció hilvanó cosió_a_mano tricotó'),
+      ),
     ),
     VerbGroup(
       field: VerbField.tend,
       subject: const <NounClass>[NounClass.person],
       object: const <NounClass>[NounClass.thing, NounClass.vehicle],
-      words: words(r'repara limpia pule arregla ordena ajusta'),
-      past: PredicateTense(words: words(r'reparó limpió pulió arregló ordenó ajustó')),
+      words: words(r'''
+        repara limpia pule arregla ordena ajusta friega lava frota sacude desempolva enjuaga seca
+        lustra abrillanta afina aprieta engrasa lubrica parchea remienda restaura renueva revisa
+        mantiene cuida atiende barniza cepilla plancha recompone retoca
+      '''),
+      past: PredicateTense(
+        words: words(r'''
+          reparó limpió pulió arregló ordenó ajustó fregó lavó frotó sacudió desempolvó enjuagó secó
+          lustró abrillantó afinó apretó engrasó lubricó parcheó remendó restauró renovó revisó
+          mantuvo cuidó atendió barnizó cepilló planchó recompuso retocó
+        '''),
+      ),
     ),
     VerbGroup(
       field: VerbField.sell,
       subject: const <NounClass>[NounClass.person],
       object: const <NounClass>[NounClass.thing, NounClass.vehicle],
-      words: words(r'vende entrega cede ofrece'),
-      past: PredicateTense(words: words(r'vendió entregó cedió ofreció')),
+      words: words(r'''
+        vende entrega cede ofrece despacha subasta comercia_con negocia_con liquida coloca remata
+        pone_a_la_venta saca_a_la_venta se_deshace_de traspasa vende_a_buen_precio malvende revende
+        exhibe expone
+      '''),
+      past: PredicateTense(
+        words: words(r'''
+          vendió entregó cedió ofreció despachó subastó comerció_con negoció_con liquidó colocó
+          remató puso_a_la_venta sacó_a_la_venta se_deshizo_de traspasó vendió_a_buen_precio
+          malvendió revendió exhibió expuso
+        '''),
+      ),
     ),
     VerbGroup(
       field: VerbField.buy,
       subject: const <NounClass>[NounClass.person],
       object: const <NounClass>[NounClass.thing, NounClass.vehicle, NounClass.edible],
-      words: words(r'compra adquiere encarga consigue'),
-      past: PredicateTense(words: words(r'compró adquirió encargó consiguió')),
+      words: words(r'''
+        compra adquiere encarga consigue paga se_hace_con se_agencia pide se_compra se_procura
+        invierte_en se_provee_de se_abastece_de
+      '''),
+      past: PredicateTense(
+        words: words(r'''
+          compró adquirió encargó consiguió pagó se_hizo_con se_agenció pidió se_compró se_procuró
+          invirtió_en se_proveyó_de se_abasteció_de
+        '''),
+      ),
     ),
     VerbGroup(
       field: VerbField.cook,
       subject: const <NounClass>[NounClass.creature, NounClass.person],
       object: const <NounClass>[NounClass.edible],
       objectThemes: const <WordTheme>[WordTheme.food],
-      words: words(r'hornea calienta cocina corta asa sirve'),
-      past: PredicateTense(words: words(r'horneó calentó cocinó cortó asó sirvió')),
+      words: words(r'''
+        hornea calienta cocina corta asa sirve guisa fríe hierve cuece saltea sazona adereza
+        condimenta sala remueve mezcla bate rehoga estofa tuesta gratina pela pica trocea ralla
+        lamina recalienta aliña prepara emplata adoba marina escalfa
+      '''),
+      past: PredicateTense(
+        words: words(r'''
+          horneó calentó cocinó cortó asó sirvió guisó frió hirvió coció salteó sazonó aderezó
+          condimentó saló removió mezcló batió rehogó estofó tostó gratinó peló picó troceó ralló
+          laminó recalentó aliñó preparó emplató adobó marinó escalfó
+        '''),
+      ),
     ),
     VerbGroup(
       field: VerbField.eat,
       subject: const <NounClass>[NounClass.creature, NounClass.person],
       object: const <NounClass>[NounClass.edible],
       objectThemes: const <WordTheme>[WordTheme.food],
-      words: words(r'come mastica prueba mordisquea devora'),
-      past: PredicateTense(words: words(r'comió masticó probó mordisqueó devoró')),
+      words: words(r'''
+        come mastica prueba mordisquea devora saborea degusta traga engulle zampa muerde roe lame
+        picotea da_un_bocado_a se_zampa se_come termina se_traga se_come_entero da_cuenta_de
+        merienda cena almuerza desayuna
+      '''),
+      past: PredicateTense(
+        words: words(r'''
+          comió masticó probó mordisqueó devoró saboreó degustó tragó engulló zampó mordió royó
+          lamió picoteó dio_un_bocado_a se_zampó se_comió terminó se_tragó se_comió_entero
+          dio_cuenta_de merendó cenó almorzó desayunó
+        '''),
+      ),
     ),
     VerbGroup(
       field: VerbField.drink,
       subject: const <NounClass>[NounClass.creature, NounClass.person],
       object: const <NounClass>[NounClass.edible],
       objectThemes: const <WordTheme>[WordTheme.drink],
-      words: words(r'bebe sorbe apura saborea'),
-      past: PredicateTense(words: words(r'bebió sorbió apuró saboreó')),
+      words: words(r'''
+        bebe sorbe apura saborea traga se_bebe se_toma toma degusta prueba paladea trasiega
+        bebe_a_sorbos bebe_de_un_trago da_un_sorbo_a vacía termina se_termina se_traga_de_golpe
+      '''),
+      past: PredicateTense(
+        words: words(r'''
+          bebió sorbió apuró saboreó tragó se_bebió se_tomó tomó degustó probó paladeó trasegó
+          bebió_a_sorbos bebió_de_un_trago dio_un_sorbo_a vació terminó se_terminó se_tragó_de_golpe
+        '''),
+      ),
     ),
     VerbGroup(
       field: VerbField.change,
       subject: const <NounClass>[NounClass.place],
-      words: words(r'se_calma oscurece se_ilumina se_llena se_vacía se_anima'),
+      words: words(r'''
+        se_calma oscurece se_ilumina se_llena se_vacía se_anima despierta se_despierta se_duerme
+        se_silencia enmudece se_aquieta se_agita bulle se_abarrota se_llena_de_gente
+        se_queda_desierto se_queda_en_silencio brilla resplandece reluce se_congela se_hiela
+        se_descongela se_moja se_seca se_inunda se_apaga se_enciende se_transforma cambia amanece
+        anochece se_cubre_de_niebla se_cubre_de_nieve se_vuelve_a_llenar se_tranquiliza se_alboroza
+      '''),
       past: PredicateTense(
-        words: words(r'se_calmó oscureció se_iluminó se_llenó se_vació se_animó'),
+        words: words(r'''
+          se_calmó oscureció se_iluminó se_llenó se_vació se_animó despertó se_despertó se_durmió
+          se_silenció enmudeció se_aquietó se_agitó bulló se_abarrotó se_llenó_de_gente
+          se_quedó_desierto se_quedó_en_silencio brilló resplandeció relució se_congeló se_heló
+          se_descongeló se_mojó se_secó se_inundó se_apagó se_encendió se_transformó cambió amaneció
+          anocheció se_cubrió_de_niebla se_cubrió_de_nieve se_volvió_a_llenar se_tranquilizó
+          se_alborozó
+        '''),
       ),
     ),
     VerbGroup(
       field: VerbField.change,
       subject: const <NounClass>[NounClass.event],
-      words: words(r'brilla fluye se_ahonda empieza termina continúa pasa'),
-      past: PredicateTense(words: words(r'brilló fluyó se_ahondó empezó terminó continuó pasó')),
+      words: words(r'''
+        brilla fluye se_ahonda empieza termina continúa pasa sigue transcurre avanza se_acerca llega
+        se_aleja se_prolonga se_alarga se_demora se_repite se_desvanece concluye acaba finaliza
+        se_desarrolla se_intensifica se_calma se_atenúa persiste dura cesa
+      '''),
+      past: PredicateTense(
+        words: words(r'''
+          brilló fluyó se_ahondó empezó terminó continuó pasó siguió transcurrió avanzó se_acercó
+          llegó se_alejó se_prolongó se_alargó se_demoró se_repitió se_desvaneció concluyó acabó
+          finalizó se_desarrolló se_intensificó se_calmó se_atenuó persistió duró cesó
+        '''),
+      ),
+    ),
+    VerbGroup(
+      field: VerbField.change,
+      subject: const <NounClass>[NounClass.event],
+      subjectThemes: const <WordTheme>[WordTheme.time],
+      words: words(r'''
+        amanece anochece atardece clarea despunta declina cae se_agota se_va se_escapa vuela
+        se_desliza avanza_despacio se_instala se_asienta cambia se_acorta se_alarga se_apaga muere
+        renace
+      '''),
+      past: PredicateTense(
+        words: words(r'''
+          amaneció anocheció atardeció clareó despuntó declinó cayó se_agotó se_fue se_escapó voló
+          se_deslizó avanzó_despacio se_instaló se_asentó cambió se_acortó se_alargó se_apagó murió
+          renació
+        '''),
+      ),
+    ),
+    VerbGroup(
+      field: VerbField.change,
+      subject: const <NounClass>[NounClass.event],
+      subjectThemes: const <WordTheme>[WordTheme.weather],
+      words: words(r'''
+        llega se_acerca se_avecina estalla arrecia amaina escampa despeja se_disipa se_levanta
+        se_aleja pasa_de_largo azota arrasa se_desata se_calma cesa se_intensifica se_debilita
+        cubre_el_cielo envuelve_todo cae remite
+      '''),
+      past: PredicateTense(
+        words: words(r'''
+          llegó se_acercó se_avecinó estalló arreció amainó escampó despejó se_disipó se_levantó
+          se_alejó pasó_de_largo azotó arrasó se_desató se_calmó cesó se_intensificó se_debilitó
+          cubrió_el_cielo envolvió_todo cayó remitió
+        '''),
+      ),
+    ),
+    VerbGroup(
+      field: VerbField.change,
+      subject: const <NounClass>[NounClass.event],
+      subjectThemes: const <WordTheme>[WordTheme.sport],
+      words: words(r'''
+        comienza arranca se_inicia se_reanuda se_interrumpe se_suspende se_alarga se_calienta
+        se_decide se_disputa se_celebra se_juega se_acaba llega_a_su_fin entra_en_su_recta_final
+        se_pone_emocionante
+      '''),
+      past: PredicateTense(
+        words: words(r'''
+          comenzó arrancó se_inició se_reanudó se_interrumpió se_suspendió se_alargó se_calentó
+          se_decidió se_disputó se_celebró se_jugó se_acabó llegó_a_su_fin entró_en_su_recta_final
+          se_puso_emocionante
+        '''),
+      ),
     ),
     VerbGroup(
       field: VerbField.change,
       subject: const <NounClass>[NounClass.thing, NounClass.vehicle],
-      words: words(r'se_mece reluce cae rueda se_inclina envejece'),
-      past: PredicateTense(words: words(r'se_meció relució cayó rodó se_inclinó envejeció')),
+      subjectThemes: const <WordTheme>[
+        WordTheme.object,
+        WordTheme.tool,
+        WordTheme.clothing,
+        WordTheme.product,
+        WordTheme.gem,
+        WordTheme.vehicle,
+      ],
+      words: words(r'''
+        se_mece reluce cae rueda se_inclina envejece brilla resplandece destella tiembla vibra
+        se_tambalea se_bambolea se_vuelca se_derrumba se_desliza resbala se_desploma gira da_vueltas
+        se_detiene se_para se_mueve se_desplaza se_desgasta se_decolora se_apaga se_empaña
+        se_deforma se_dobla se_tuerce sale_volando rebota salta se_estremece se_balancea oscila
+        se_asienta se_queda_quieto se_aja se_ensucia se_cubre_de_polvo
+      '''),
+      past: PredicateTense(
+        words: words(r'''
+          se_meció relució cayó rodó se_inclinó envejeció brilló resplandeció destelló tembló vibró
+          se_tambaleó se_bamboleó se_volcó se_derrumbó se_deslizó resbaló se_desplomó giró
+          dio_vueltas se_detuvo se_paró se_movió se_desplazó se_desgastó se_decoloró se_apagó
+          se_empañó se_deformó se_dobló se_torció salió_volando rebotó saltó se_estremeció
+          se_balanceó osciló se_asentó se_quedó_quieto se_ajó se_ensució se_cubrió_de_polvo
+        '''),
+      ),
+    ),
+    VerbGroup(
+      field: VerbField.change,
+      subject: const <NounClass>[NounClass.thing, NounClass.vehicle],
+      subjectThemes: const <WordTheme>[WordTheme.object, WordTheme.tool, WordTheme.vehicle],
+      words: words(r'''
+        se_oxida chirría cruje traquetea rechina tintinea se_rompe se_quiebra se_agrieta se_raja
+        se_parte se_atasca se_traba se_afloja se_suelta se_desarma se_estropea se_avería echa_humo
+        se_abolla se_desmonta
+      '''),
+      past: PredicateTense(
+        words: words(r'''
+          se_oxidó chirrió crujió traqueteó rechinó tintineó se_rompió se_quebró se_agrietó se_rajó
+          se_partió se_atascó se_trabó se_aflojó se_soltó se_desarmó se_estropeó se_averió echó_humo
+          se_abolló se_desmontó
+        '''),
+      ),
+    ),
+    VerbGroup(
+      field: VerbField.change,
+      subject: const <NounClass>[NounClass.thing],
+      subjectThemes: const <WordTheme>[WordTheme.music],
+      words: words(r'''
+        suena resuena retumba flota se_eleva se_apaga se_desvanece se_extingue calla se_detiene
+        se_repite continúa sigue se_prolonga se_propaga se_extiende se_oye llega_de_lejos hace_eco
+        resuena_a_lo_lejos crece decrece sube baja se_alza se_impone
+      '''),
+      past: PredicateTense(
+        words: words(r'''
+          sonó resonó retumbó flotó se_elevó se_apagó se_desvaneció se_extinguió calló se_detuvo
+          se_repitió continuó siguió se_prolongó se_propagó se_extendió se_oyó llegó_de_lejos
+          hizo_eco resonó_a_lo_lejos creció decreció subió bajó se_alzó se_impuso
+        '''),
+      ),
     ),
     VerbGroup(
       field: VerbField.move,
       subject: const <NounClass>[NounClass.vehicle],
-      words: words(r'circula se_detiene pasa regresa parte resbala'),
-      past: PredicateTense(words: words(r'circuló se_detuvo pasó regresó partió resbaló')),
+      words: words(r'''
+        circula se_detiene pasa regresa parte resbala arranca avanza rueda se_desliza acelera frena
+        se_para se_aleja se_acerca gira dobla da_la_vuelta retrocede se_estaciona aparca llega sale
+        entra se_mueve traquetea vibra derrapa patina zumba ruge se_pone_en_marcha
+        se_detiene_en_seco sigue_su_camino va_despacio
+      '''),
+      past: PredicateTense(
+        words: words(r'''
+          circuló se_detuvo pasó regresó partió resbaló arrancó avanzó rodó se_deslizó aceleró frenó
+          se_paró se_alejó se_acercó giró dobló dio_la_vuelta retrocedió se_estacionó aparcó llegó
+          salió entró se_movió traqueteó vibró derrapó patinó zumbó rugió se_puso_en_marcha
+          se_detuvo_en_seco siguió_su_camino fue_despacio
+        '''),
+      ),
     ),
     VerbGroup(
       field: VerbField.change,
       subject: const <NounClass>[NounClass.idea, NounClass.event],
-      words: words(r'se_extiende desaparece permanece flota se_ahonda'),
-      past: PredicateTense(words: words(r'se_extendió desapareció permaneció flotó se_ahondó')),
+      words: words(r'''
+        se_extiende desaparece permanece flota se_ahonda crece se_desvanece se_esfuma se_diluye
+        se_debilita se_fortalece se_intensifica surge aflora emerge resurge renace vuelve regresa
+        se_apaga se_asienta se_instala se_acumula se_arraiga echa_raíces se_agita se_calma
+        se_apacigua se_aviva se_enciende se_propaga se_difunde persiste perdura se_disipa sube baja
+        cambia oscila fluctúa se_agranda se_reduce se_transforma se_pierde se_borra
+      '''),
+      past: PredicateTense(
+        words: words(r'''
+          se_extendió desapareció permaneció flotó se_ahondó creció se_desvaneció se_esfumó
+          se_diluyó se_debilitó se_fortaleció se_intensificó surgió afloró emergió resurgió renació
+          volvió regresó se_apagó se_asentó se_instaló se_acumuló se_arraigó echó_raíces se_agitó
+          se_calmó se_apaciguó se_avivó se_encendió se_propagó se_difundió persistió perduró
+          se_disipó subió bajó cambió osciló fluctuó se_agrandó se_redujo se_transformó se_perdió
+          se_borró
+        '''),
+      ),
     ),
     VerbGroup(
       field: VerbField.change,
       subject: const <NounClass>[NounClass.plant],
-      words: words(r'crece se_marchita florece se_mece brota'),
-      past: PredicateTense(words: words(r'creció se_marchitó floreció se_meció brotó')),
+      words: words(r'''
+        crece se_marchita florece se_mece brota germina retoña echa_brotes echa_hojas echa_raíces
+        se_abre se_despliega reverdece amarillea se_seca se_agosta se_dobla se_inclina se_curva
+        se_estira se_alarga trepa se_enreda se_extiende da_fruto da_flores fructifica perfuma
+        se_agita tiembla susurra se_balancea oscila se_yergue se_endereza pierde_las_hojas
+        suelta_las_hojas se_deshoja revive resucita se_espesa prospera se_desarrolla
+      '''),
+      past: PredicateTense(
+        words: words(r'''
+          creció se_marchitó floreció se_meció brotó germinó retoñó echó_brotes echó_hojas
+          echó_raíces se_abrió se_desplegó reverdeció amarilleó se_secó se_agostó se_dobló
+          se_inclinó se_curvó se_estiró se_alargó trepó se_enredó se_extendió dio_fruto dio_flores
+          fructificó perfumó se_agitó tembló susurró se_balanceó osciló se_irguió se_enderezó
+          perdió_las_hojas soltó_las_hojas se_deshojó revivió resucitó se_espesó prosperó
+          se_desarrolló
+        '''),
+      ),
     ),
     VerbGroup(
       field: VerbField.change,
       subject: const <NounClass>[NounClass.body],
-      words: words(r'tiembla se_mueve se_entumece sana'),
-      past: PredicateTense(words: words(r'tembló se_movió se_entumeció sanó')),
+      words: words(r'''
+        tiembla se_mueve se_entumece sana se_estremece tirita se_sacude late palpita se_crispa
+        se_tensa se_relaja se_afloja se_agarrota se_endurece se_ablanda se_calienta se_enfría
+        se_hincha se_deshincha se_inflama duele escuece pica hormiguea arde suda se_cansa se_agota
+        se_recupera se_repone se_estira se_encoge se_dobla se_flexiona se_alza se_baja se_eleva
+        se_gira se_agita cede se_adormece se_despierta cosquillea se_abre se_cierra
+      '''),
+      past: PredicateTense(
+        words: words(r'''
+          tembló se_movió se_entumeció sanó se_estremeció tiritó se_sacudió latió palpitó se_crispó
+          se_tensó se_relajó se_aflojó se_agarrotó se_endureció se_ablandó se_calentó se_enfrió
+          se_hinchó se_deshinchó se_inflamó dolió escoció picó hormigueó ardió sudó se_cansó
+          se_agotó se_recuperó se_repuso se_estiró se_encogió se_dobló se_flexionó se_alzó se_bajó
+          se_elevó se_giró se_agitó cedió se_adormeció se_despertó cosquilleó se_abrió se_cerró
+        '''),
+      ),
     ),
     VerbGroup(
       field: VerbField.change,
       subject: const <NounClass>[NounClass.edible],
-      words: words(r'madura se_enfría hierve se_derrite se_estropea'),
-      past: PredicateTense(words: words(r'maduró se_enfrió hirvió se_derritió se_estropeó')),
+      words: words(r'''
+        madura se_enfría hierve se_derrite se_estropea se_calienta se_entibia se_templa humea
+        echa_vapor huele_bien desprende_aroma se_acaba se_termina se_agota sobra queda se_reduce
+        llega_a_la_mesa se_sirve se_cuaja se_endurece se_ablanda se_pudre se_echa_a_perder fermenta
+        se_congela se_espesa se_aclara se_asienta reposa se_enfría_del_todo
+      '''),
+      past: PredicateTense(
+        words: words(r'''
+          maduró se_enfrió hirvió se_derritió se_estropeó se_calentó se_entibió se_templó humeó
+          echó_vapor olió_bien desprendió_aroma se_acabó se_terminó se_agotó sobró quedó se_redujo
+          llegó_a_la_mesa se_sirvió se_cuajó se_endureció se_ablandó se_pudrió se_echó_a_perder
+          fermentó se_congeló se_espesó se_aclaró se_asentó reposó se_enfrió_del_todo
+        '''),
+      ),
+    ),
+    VerbGroup(
+      field: VerbField.change,
+      subject: const <NounClass>[NounClass.edible],
+      subjectThemes: const <WordTheme>[WordTheme.food],
+      words: words(r'''
+        chisporrotea se_dora se_tuesta se_quema se_chamusca se_desmigaja se_desmorona se_pone_duro
+        se_pone_rancio se_seca se_reseca se_humedece se_enmohece se_agria se_infla sube se_cuece
+        se_hornea se_asa se_fríe se_deshace se_desmenuza se_derrumba
+      '''),
+      past: PredicateTense(
+        words: words(r'''
+          chisporroteó se_doró se_tostó se_quemó se_chamuscó se_desmigajó se_desmoronó se_puso_duro
+          se_puso_rancio se_secó se_resecó se_humedeció se_enmoheció se_agrió se_infló subió
+          se_coció se_horneó se_asó se_frió se_deshizo se_desmenuzó se_derrumbó
+        '''),
+      ),
+    ),
+    VerbGroup(
+      field: VerbField.change,
+      subject: const <NounClass>[NounClass.edible],
+      subjectThemes: const <WordTheme>[WordTheme.drink],
+      words: words(r'''
+        burbujea espuma hace_espuma se_derrama se_vierte salpica chapotea se_agita se_revuelve
+        se_enturbia se_aclara se_asienta pierde_el_gas se_evapora se_desborda gotea chorrea
+        se_aguada se_concentra se_hiela
+      '''),
+      past: PredicateTense(
+        words: words(r'''
+          burbujeó espumó hizo_espuma se_derramó se_vertió salpicó chapoteó se_agitó se_revolvió
+          se_enturbió se_aclaró se_asentó perdió_el_gas se_evaporó se_desbordó goteó chorreó
+          se_aguadó se_concentró se_heló
+        '''),
+      ),
     ),
   ],
   states: <StateGroup>[

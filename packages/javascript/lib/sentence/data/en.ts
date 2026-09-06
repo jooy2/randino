@@ -37,7 +37,11 @@ export const EN: SentenceLanguageData = {
 		{
 			field: 'rise',
 			subject: ['creature', 'person'],
-			...tensed(`wakes gets_up rises`, `wake get_up rise`, `woke got_up rose`)
+			...tensed(
+				`wakes gets_up rises awakens sits_up rouses wakes_up`,
+				`wake get_up rise awaken sit_up rouse wake_up`,
+				`woke got_up rose awakened sat_up roused woke_up`
+			)
 		},
 		// Setting off: the verbs that need somewhere to go, and the ones that stand
 		// on their own. `heads` wants a `to the market` after it; `leaves` does not.
@@ -46,9 +50,9 @@ export const EN: SentenceLanguageData = {
 			subject: ['creature', 'person'],
 			requires: 'destination',
 			...tensed(
-				`goes heads hurries wanders`,
-				`go head hurry wander`,
-				`went headed hurried wandered`
+				`goes heads hurries wanders travels sets_out journeys drifts proceeds ventures rushes`,
+				`go head hurry wander travel set_out journey drift proceed venture rush`,
+				`went headed hurried wandered traveled set_out journeyed drifted proceeded ventured rushed`
 			)
 		},
 		{
@@ -57,30 +61,38 @@ export const EN: SentenceLanguageData = {
 			requires: 'destination',
 			// Running somewhere is for legs: a fish and a snake go, and do not run.
 			subjectWithout: ['swimmer', 'crawler'],
-			...tensed(`runs walks climbs`, `run walk climb`, `ran walked climbed`)
+			...tensed(
+				`runs walks climbs strolls trots dashes marches sprints jogs hikes tiptoes hops`,
+				`run walk climb stroll trot dash march sprint jog hike tiptoe hop`,
+				`ran walked climbed strolled trotted dashed marched sprinted jogged hiked tiptoed hopped`
+			)
 		},
 		{
 			field: 'go',
 			subject: ['creature', 'person'],
-			...tensed(`leaves sets_off departs`, `leave set_off depart`, `left set_off departed`)
+			...tensed(
+				`leaves sets_off departs heads_out steps_out goes_out slips_away slips_out wanders_off strides_off sneaks_out hurries_off moves_on`,
+				`leave set_off depart head_out step_out go_out slip_away slip_out wander_off stride_off sneak_out hurry_off move_on`,
+				`left set_off departed headed_out stepped_out went_out slipped_away slipped_out wandered_off strode_off sneaked_out hurried_off moved_on`
+			)
 		},
 		{
 			field: 'arrive',
 			subject: ['creature', 'person'],
 			requires: 'destination',
 			...tensed(
-				`returns comes_back gets_back heads_back`,
-				`return come_back get_back head_back`,
-				`returned came_back got_back headed_back`
+				`returns comes_back gets_back heads_back comes gets makes_it goes_back turns_back drifts_back hurries_back comes_over`,
+				`return come_back get_back head_back come get make_it go_back turn_back drift_back hurry_back come_over`,
+				`returned came_back got_back headed_back came got made_it went_back turned_back drifted_back hurried_back came_over`
 			)
 		},
 		{
 			field: 'arrive',
 			subject: ['creature', 'person'],
 			...tensed(
-				`arrives comes_home returns`,
-				`arrive come_home return`,
-				`arrived came_home returned`
+				`arrives comes_home returns gets_home turns_up shows_up gets_in reappears comes_in settles_in heads_home makes_it_home`,
+				`arrive come_home return get_home turn_up show_up get_in reappear come_in settle_in head_home make_it_home`,
+				`arrived came_home returned got_home turned_up showed_up got_in reappeared came_in settled_in headed_home made_it_home`
 			)
 		},
 		{
@@ -89,85 +101,105 @@ export const EN: SentenceLanguageData = {
 			// Running and walking are for legs: a fish and a snake do neither.
 			subjectWithout: ['swimmer', 'crawler'],
 			...tensed(
-				`runs walks leaps strolls roams paces`,
-				`run walk leap stroll roam pace`,
-				`ran walked leapt strolled roamed paced`
+				`runs walks leaps strolls roams paces jogs trots marches hops sprints dashes stomps tiptoes ambles wanders_about scampers scurries prances struts limps saunters strides plods trudges`,
+				`run walk leap stroll roam pace jog trot march hop sprint dash stomp tiptoe amble wander_about scamper scurry prance strut limp saunter stride plod trudge`,
+				`ran walked leapt strolled roamed paced jogged trotted marched hopped sprinted dashed stomped tiptoed ambled wandered_about scampered scurried pranced strutted limped sauntered strode plodded trudged`
 			)
 		},
 		{
 			field: 'move',
 			subject: ['creature', 'person'],
-			...tensed(`wanders passes`, `wander pass`, `wandered passed`)
+			...tensed(
+				`wanders passes moves drifts turns circles slips_by moves_along darts glides twists`,
+				`wander pass move drift turn circle slip_by move_along dart glide twist`,
+				`wandered passed moved drifted turned circled slipped_by moved_along darted glided twisted`
+			)
 		},
 		{
 			field: 'move',
 			subject: ['creature', 'person'],
 			// A fish's, a whale's and a mermaid's; a lion does not swim here.
 			subjectTraits: ['swimmer'],
-			...tensed(`swims`, `swim`, `swam`)
+			...tensed(
+				`swims paddles dives splashes floats surfaces swims_about swims_by`,
+				`swim paddle dive splash float surface swim_about swim_by`,
+				`swam paddled dove splashed floated surfaced swam_about swam_by`
+			)
 		},
 		{
 			field: 'move',
 			// Flying is a flier's alone: a sparrow's, a dragon's, never a fish's.
 			subject: ['creature'],
 			subjectTraits: ['flier'],
-			...tensed(`flies`, `fly`, `flew`)
+			...tensed(
+				`flies soars flutters flaps takes_off glides swoops hovers circles_overhead lands alights flits flies_off flies_by perches`,
+				`fly soar flutter flap take_off glide swoop hover circle_overhead land alight flit fly_off fly_by perch`,
+				`flew soared fluttered flapped took_off glided swooped hovered circled_overhead landed alighted flitted flew_off flew_by perched`
+			)
 		},
 		{
 			field: 'move',
 			subject: ['creature', 'person'],
 			// A snake's, a snail's and a beetle's.
 			subjectTraits: ['crawler'],
-			...tensed(`crawls`, `crawl`, `crawled`)
+			...tensed(
+				`crawls creeps wriggles inches_along crawls_about squirms coils burrows slithers`,
+				`crawl creep wriggle inch_along crawl_about squirm coil burrow slither`,
+				`crawled crept wriggled inched_along crawled_about squirmed coiled burrowed slithered`
+			)
 		},
 		{
 			field: 'wait',
 			subject: ['creature', 'person'],
 			...tensed(
-				`waits hides lingers looks_around hesitates pauses stops`,
-				`wait hide linger look_around hesitate pause stop`,
-				`waited hid lingered looked_around hesitated paused stopped`
+				`waits hides lingers looks_around hesitates pauses stops listens waits_around holds_back hangs_back stands_still keeps_still idles loiters halts peeks_out glances_around stands_by dawdles`,
+				`wait hide linger look_around hesitate pause stop listen wait_around hold_back hang_back stand_still keep_still idle loiter halt peek_out glance_around stand_by dawdle`,
+				`waited hid lingered looked_around hesitated paused stopped listened waited_around held_back hung_back stood_still kept_still idled loitered halted peeked_out glanced_around stood_by dawdled`
 			)
 		},
 		{
 			field: 'rest',
 			subject: ['creature', 'person'],
 			...tensed(
-				`rests sits lies_down leans curls_up stretches_out`,
-				`rest sit lie_down lean curl_up stretch_out`,
-				`rested sat lay_down leaned curled_up stretched_out`
+				`rests sits lies_down leans curls_up stretches_out settles_down reclines sprawls lounges relaxes sits_down sits_back lies_back kneels crouches squats perches slumps unwinds takes_a_break`,
+				`rest sit lie_down lean curl_up stretch_out settle_down recline sprawl lounge relax sit_down sit_back lie_back kneel crouch squat perch slump unwind take_a_break`,
+				`rested sat lay_down leaned curled_up stretched_out settled_down reclined sprawled lounged relaxed sat_down sat_back lay_back knelt crouched squatted perched slumped unwound took_a_break`
 			)
 		},
 		{
 			field: 'sleep',
 			subject: ['creature', 'person'],
 			...tensed(
-				`sleeps dozes falls_asleep nods_off`,
-				`sleep doze fall_asleep nod_off`,
-				`slept dozed fell_asleep nodded_off`
+				`sleeps dozes falls_asleep nods_off naps snoozes drifts_off dozes_off slumbers drowses sleeps_in drops_off nods drifts_to_sleep snores`,
+				`sleep doze fall_asleep nod_off nap snooze drift_off doze_off slumber drowse sleep_in drop_off nod drift_to_sleep snore`,
+				`slept dozed fell_asleep nodded_off napped snoozed drifted_off dozed_off slumbered drowsed slept_in dropped_off nodded drifted_to_sleep snored`
 			)
 		},
 		{
 			field: 'express',
 			subject: ['creature', 'person'],
 			...tensed(
-				`laughs cries yawns sighs smiles hums mutters shouts`,
-				`laugh cry yawn sigh smile hum mutter shout`,
-				`laughed cried yawned sighed smiled hummed muttered shouted`
+				`laughs cries yawns sighs smiles hums mutters shouts giggles chuckles grins sobs weeps groans grumbles whistles whimpers snorts cheers gasps shrugs nods frowns beams sniffles sneezes hiccups claps winks blushes`,
+				`laugh cry yawn sigh smile hum mutter shout giggle chuckle grin sob weep groan grumble whistle whimper snort cheer gasp shrug nod frown beam sniffle sneeze hiccup clap wink blush`,
+				`laughed cried yawned sighed smiled hummed muttered shouted giggled chuckled grinned sobbed wept groaned grumbled whistled whimpered snorted cheered gasped shrugged nodded frowned beamed sniffled sneezed hiccuped clapped winked blushed`
 			)
 		},
 		{
 			field: 'talk',
 			subject: ['creature', 'person'],
-			...tensed(`chats talks chatters`, `chat talk chatter`, `chatted talked chattered`)
+			...tensed(
+				`chats talks chatters speaks converses gossips babbles jabbers natters prattles whispers murmurs rambles chats_away talks_on`,
+				`chat talk chatter speak converse gossip babble jabber natter prattle whisper murmur ramble chat_away talk_on`,
+				`chatted talked chattered spoke conversed gossiped babbled jabbered nattered prattled whispered murmured rambled chatted_away talked_on`
+			)
 		},
 		{
 			field: 'play',
 			subject: ['creature', 'person'],
 			...tensed(
-				`dances sings tumbles frolics plays bounces skips`,
-				`dance sing tumble frolic play bounce skip`,
-				`danced sang tumbled frolicked played bounced skipped`
+				`dances sings tumbles frolics plays bounces skips romps skips_about capers gambols hops_about leaps_about rolls_about twirls spins cavorts jumps_around plays_about fools_around larks_about horses_around`,
+				`dance sing tumble frolic play bounce skip romp skip_about caper gambol hop_about leap_about roll_about twirl spin cavort jump_around play_about fool_around lark_about horse_around`,
+				`danced sang tumbled frolicked played bounced skipped romped skipped_about capered gamboled hopped_about leapt_about rolled_about twirled spun cavorted jumped_around played_about fooled_around larked_about horsed_around`
 			)
 		},
 		{
@@ -175,9 +207,9 @@ export const EN: SentenceLanguageData = {
 			subject: ['person', 'creature'],
 			object: ['idea', 'event', 'place'],
 			...tensed(
-				`remembers forgets imagines counts recalls misses wonders_about`,
-				`remember forget imagine count recall miss wonder_about`,
-				`remembered forgot imagined counted recalled missed wondered_about`
+				`remembers forgets imagines counts recalls misses wonders_about considers ponders recollects pictures dreams_of dreams_about thinks_of thinks_about believes_in longs_for yearns_for worries_about muses_on reflects_on dwells_on contemplates fancies envisions`,
+				`remember forget imagine count recall miss wonder_about consider ponder recollect picture dream_of dream_about think_of think_about believe_in long_for yearn_for worry_about muse_on reflect_on dwell_on contemplate fancy envision`,
+				`remembered forgot imagined counted recalled missed wondered_about considered pondered recollected pictured dreamed_of dreamed_about thought_of thought_about believed_in longed_for yearned_for worried_about mused_on reflected_on dwelt_on contemplated fancied envisioned`
 			)
 		},
 		{
@@ -185,18 +217,18 @@ export const EN: SentenceLanguageData = {
 			subject: ['creature', 'person'],
 			object: ['thing', 'plant', 'edible'],
 			...tensed(
-				`watches looks_at studies examines admires touches strokes`,
-				`watch look_at study examine admire touch stroke`,
-				`watched looked_at studied examined admired touched stroked`
+				`watches looks_at studies examines admires touches strokes eyes inspects gazes_at stares_at peers_at glances_at scans surveys checks pokes prods pats sniffs handles feels fingers turns_over looks_over sizes_up observes regards`,
+				`watch look_at study examine admire touch stroke eye inspect gaze_at stare_at peer_at glance_at scan survey check poke prod pat sniff handle feel finger turn_over look_over size_up observe regard`,
+				`watched looked_at studied examined admired touched stroked eyed inspected gazed_at stared_at peered_at glanced_at scanned surveyed checked poked prodded patted sniffed handled felt fingered turned_over looked_over sized_up observed regarded`
 			)
 		},
 		{
 			field: 'search',
 			subject: ['creature', 'person'],
 			...tensed(
-				`searches looks_around rummages hunts_around`,
-				`search look_around rummage hunt_around`,
-				`searched looked_around rummaged hunted_around`
+				`searches looks_around rummages hunts_around scours forages digs_around pokes_around noses_around casts_about roots_around ferrets_about explores prowls scouts_around looks_about hunts`,
+				`search look_around rummage hunt_around scour forage dig_around poke_around nose_around cast_about root_around ferret_about explore prowl scout_around look_about hunt`,
+				`searched looked_around rummaged hunted_around scoured foraged dug_around poked_around nosed_around cast_about rooted_around ferreted_about explored prowled scouted_around looked_about hunted`
 			)
 		},
 		{
@@ -204,9 +236,9 @@ export const EN: SentenceLanguageData = {
 			subject: ['creature', 'person'],
 			object: ['thing', 'plant', 'edible'],
 			...tensed(
-				`finds discovers spots picks_up comes_across`,
-				`find discover spot pick_up come_across`,
-				`found discovered spotted picked_up came_across`
+				`finds discovers spots picks_up comes_across uncovers unearths locates stumbles_on stumbles_upon happens_upon retrieves recovers digs_up fishes_out turns_up scoops_up snatches_up`,
+				`find discover spot pick_up come_across uncover unearth locate stumble_on stumble_upon happen_upon retrieve recover dig_up fish_out turn_up scoop_up snatch_up`,
+				`found discovered spotted picked_up came_across uncovered unearthed located stumbled_on stumbled_upon happened_upon retrieved recovered dug_up fished_out turned_up scooped_up snatched_up`
 			)
 		},
 		{
@@ -214,9 +246,9 @@ export const EN: SentenceLanguageData = {
 			subject: ['creature', 'person'],
 			object: ['thing', 'plant', 'edible'],
 			...tensed(
-				`takes picks grabs gathers chooses gets`,
-				`take pick grab gather choose get`,
-				`took picked grabbed gathered chose got`
+				`takes picks grabs gathers chooses gets seizes snatches clutches grips holds lifts collects selects picks_out gathers_up takes_up takes_hold_of accepts receives obtains acquires claims pockets bags hoists`,
+				`take pick grab gather choose get seize snatch clutch grip hold lift collect select pick_out gather_up take_up take_hold_of accept receive obtain acquire claim pocket bag hoist`,
+				`took picked grabbed gathered chose got seized snatched clutched gripped held lifted collected selected picked_out gathered_up took_up took_hold_of accepted received obtained acquired claimed pocketed bagged hoisted`
 			)
 		},
 		{
@@ -224,9 +256,9 @@ export const EN: SentenceLanguageData = {
 			subject: ['creature', 'person'],
 			object: ['thing', 'plant', 'edible'],
 			...tensed(
-				`carries brings hauls lugs`,
-				`carry bring haul lug`,
-				`carried brought hauled lugged`
+				`carries brings hauls lugs totes drags tows shoulders bears transports fetches ferries hauls_along carries_off carries_along brings_along takes_along drags_along`,
+				`carry bring haul lug tote drag tow shoulder bear transport fetch ferry haul_along carry_off carry_along bring_along take_along drag_along`,
+				`carried brought hauled lugged toted dragged towed shouldered bore transported fetched ferried hauled_along carried_off carried_along brought_along took_along dragged_along`
 			)
 		},
 		{
@@ -234,31 +266,63 @@ export const EN: SentenceLanguageData = {
 			subject: ['creature', 'person'],
 			object: ['thing', 'plant', 'edible'],
 			...tensed(
-				`hides tucks_away stores puts_away keeps buries`,
-				`hide tuck_away store put_away keep bury`,
-				`hid tucked_away stored put_away kept buried`
+				`hides tucks_away stores puts_away keeps buries stashes conceals stows squirrels_away hoards locks_away packs_away sets_aside puts_aside tucks_in covers_up wraps_up stores_away hides_away salts_away keeps_back saves`,
+				`hide tuck_away store put_away keep bury stash conceal stow squirrel_away hoard lock_away pack_away set_aside put_aside tuck_in cover_up wrap_up store_away hide_away salt_away keep_back save`,
+				`hid tucked_away stored put_away kept buried stashed concealed stowed squirreled_away hoarded locked_away packed_away set_aside put_aside tucked_in covered_up wrapped_up stored_away hid_away salted_away kept_back saved`
 			)
 		},
 		{
 			field: 'lose',
 			subject: ['creature', 'person'],
 			object: ['thing', 'plant', 'edible'],
-			...tensed(`loses drops misplaces`, `lose drop misplace`, `lost dropped misplaced`)
+			...tensed(
+				`loses drops misplaces mislays leaves_behind forgets lets_slip lets_fall fumbles lets_go_of loses_track_of`,
+				`lose drop misplace mislay leave_behind forget let_slip let_fall fumble let_go_of lose_track_of`,
+				`lost dropped misplaced mislaid left_behind forgot let_slip let_fall fumbled let_go_of lost_track_of`
+			)
 		},
 		{
 			field: 'meet',
 			subject: ['creature', 'person'],
 			object: ['person'],
-			...tensed(`meets runs_into greets`, `meet run_into greet`, `met ran_into greeted`)
+			...tensed(
+				`meets runs_into greets bumps_into encounters comes_upon catches_up_with joins welcomes visits calls_on drops_in_on sees waves_to nods_to hugs`,
+				`meet run_into greet bump_into encounter come_upon catch_up_with join welcome visit call_on drop_in_on see wave_to nod_to hug`,
+				`met ran_into greeted bumped_into encountered came_upon caught_up_with joined welcomed visited called_on dropped_in_on saw waved_to nodded_to hugged`
+			)
 		},
 		{
 			field: 'make',
 			subject: ['person'],
 			object: ['thing', 'vehicle'],
 			...tensed(
-				`makes builds crafts carves paints weaves shapes`,
-				`make build craft carve paint weave shape`,
-				`made built crafted carved painted wove shaped`
+				`makes builds crafts carves paints weaves shapes assembles fashions designs constructs puts_together pieces_together draws sketches invents devises creates produces finishes`,
+				`make build craft carve paint weave shape assemble fashion design construct put_together piece_together draw sketch invent devise create produce finish`,
+				`made built crafted carved painted wove shaped assembled fashioned designed constructed put_together pieced_together drew sketched invented devised created produced finished`
+			)
+		},
+		{
+			field: 'make',
+			subject: ['person'],
+			object: ['thing', 'vehicle'],
+			// Forged, cast and welded: metal and wood, never a coat or a jewel.
+			objectThemes: ['object', 'tool', 'vehicle'],
+			...tensed(
+				`forges casts hammers_out welds rivets bolts_together`,
+				`forge cast hammer_out weld rivet bolt_together`,
+				`forged cast hammered_out welded riveted bolted_together`
+			)
+		},
+		{
+			field: 'make',
+			subject: ['person'],
+			object: ['thing'],
+			// Knitted and sewn: what is worn.
+			objectThemes: ['clothing'],
+			...tensed(
+				`knits sews stitches tailors embroiders hems darns`,
+				`knit sew stitch tailor embroider hem darn`,
+				`knitted sewed stitched tailored embroidered hemmed darned`
 			)
 		},
 		{
@@ -266,9 +330,9 @@ export const EN: SentenceLanguageData = {
 			subject: ['person'],
 			object: ['thing', 'vehicle'],
 			...tensed(
-				`mends cleans polishes fixes tidies oils`,
-				`mend clean polish fix tidy oil`,
-				`mended cleaned polished fixed tidied oiled`
+				`mends cleans polishes fixes tidies oils repairs scrubs wipes dusts adjusts tightens patches restores brushes rinses washes sorts_out looks_after cares_for maintains buffs shines`,
+				`mend clean polish fix tidy oil repair scrub wipe dust adjust tighten patch restore brush rinse wash sort_out look_after care_for maintain buff shine`,
+				`mended cleaned polished fixed tidied oiled repaired scrubbed wiped dusted adjusted tightened patched restored brushed rinsed washed sorted_out looked_after cared_for maintained buffed shined`
 			)
 		},
 		{
@@ -276,9 +340,9 @@ export const EN: SentenceLanguageData = {
 			subject: ['person'],
 			object: ['thing', 'vehicle'],
 			...tensed(
-				`sells hands_over trades_away offers`,
-				`sell hand_over trade_away offer`,
-				`sold handed_over traded_away offered`
+				`sells hands_over trades_away offers peddles hawks auctions trades sells_off parts_with passes_on hands_on lets_go_of markets unloads exchanges bargains_away`,
+				`sell hand_over trade_away offer peddle hawk auction trade sell_off part_with pass_on hand_on let_go_of market unload exchange bargain_away`,
+				`sold handed_over traded_away offered peddled hawked auctioned traded sold_off parted_with passed_on handed_on let_go_of marketed unloaded exchanged bargained_away`
 			)
 		},
 		{
@@ -286,9 +350,9 @@ export const EN: SentenceLanguageData = {
 			subject: ['person'],
 			object: ['thing', 'vehicle', 'edible'],
 			...tensed(
-				`buys purchases picks_up orders`,
-				`buy purchase pick_up order`,
-				`bought purchased picked_up ordered`
+				`buys purchases picks_up orders acquires pays_for gets shops_for splurges_on snaps_up bargains_for haggles_over stocks_up_on picks_out invests_in`,
+				`buy purchase pick_up order acquire pay_for get shop_for splurge_on snap_up bargain_for haggle_over stock_up_on pick_out invest_in`,
+				`bought purchased picked_up ordered acquired paid_for got shopped_for splurged_on snapped_up bargained_for haggled_over stocked_up_on picked_out invested_in`
 			)
 		},
 		{
@@ -297,9 +361,9 @@ export const EN: SentenceLanguageData = {
 			object: ['edible'],
 			objectThemes: ['food'],
 			...tensed(
-				`warms cooks serves prepares heats`,
-				`warm cook serve prepare heat`,
-				`warmed cooked served prepared heated`
+				`warms cooks serves prepares heats reheats seasons plates fixes_up dishes_up whips_up rustles_up makes cooks_up garnishes salts peppers spices sweetens`,
+				`warm cook serve prepare heat reheat season plate fix_up dish_up whip_up rustle_up make cook_up garnish salt pepper spice sweeten`,
+				`warmed cooked served prepared heated reheated seasoned plated fixed_up dished_up whipped_up rustled_up made cooked_up garnished salted peppered spiced sweetened`
 			)
 		},
 		{
@@ -310,9 +374,9 @@ export const EN: SentenceLanguageData = {
 			// What goes in the oven or under the knife: a potato, a steak, never a curry.
 			objectTraits: ['raw'],
 			...tensed(
-				`bakes roasts grills fries slices chops peels`,
-				`bake roast grill fry slice chop peel`,
-				`baked roasted grilled fried sliced chopped peeled`
+				`bakes roasts grills fries slices chops peels dices minces grates shreds sears browns steams broils barbecues marinates skewers`,
+				`bake roast grill fry slice chop peel dice mince grate shred sear brown steam broil barbecue marinate skewer`,
+				`baked roasted grilled fried sliced chopped peeled diced minced grated shredded seared browned steamed broiled barbecued marinated skewered`
 			)
 		},
 		{
@@ -323,9 +387,9 @@ export const EN: SentenceLanguageData = {
 			// What goes in the pot.
 			objectTraits: ['liquid'],
 			...tensed(
-				`stirs simmers boils ladles`,
-				`stir simmer boil ladle`,
-				`stirred simmered boiled ladled`
+				`stirs simmers boils ladles stews pours spoons_out whisks blends thickens reduces heats_up warms_up dishes_out`,
+				`stir simmer boil ladle stew pour spoon_out whisk blend thicken reduce heat_up warm_up dish_out`,
+				`stirred simmered boiled ladled stewed poured spooned_out whisked blended thickened reduced heated_up warmed_up dished_out`
 			)
 		},
 		{
@@ -334,9 +398,9 @@ export const EN: SentenceLanguageData = {
 			object: ['edible'],
 			objectThemes: ['food'],
 			...tensed(
-				`eats tastes swallows devours finishes`,
-				`eat taste swallow devour finish`,
-				`ate tasted swallowed devoured finished`
+				`eats tastes swallows devours finishes gobbles wolfs_down scoffs polishes_off bolts tucks_into samples savors digs_into feasts_on snacks_on picks_at gulps_down downs`,
+				`eat taste swallow devour finish gobble wolf_down scoff polish_off bolt tuck_into sample savor dig_into feast_on snack_on pick_at gulp_down down`,
+				`ate tasted swallowed devoured finished gobbled wolfed_down scoffed polished_off bolted tucked_into sampled savored dug_into feasted_on snacked_on picked_at gulped_down downed`
 			)
 		},
 		{
@@ -347,9 +411,9 @@ export const EN: SentenceLanguageData = {
 			// Nobody chews a syrup.
 			objectWithout: ['liquid'],
 			...tensed(
-				`chews bites nibbles crunches munches`,
-				`chew bite nibble crunch munch`,
-				`chewed bit nibbled crunched munched`
+				`chews bites nibbles crunches munches gnaws crunches_on chomps chews_on bites_into tears_into licks nibbles_at`,
+				`chew bite nibble crunch munch gnaw crunch_on chomp chew_on bite_into tear_into lick nibble_at`,
+				`chewed bit nibbled crunched munched gnawed crunched_on chomped chewed_on bit_into tore_into licked nibbled_at`
 			)
 		},
 		{
@@ -358,14 +422,22 @@ export const EN: SentenceLanguageData = {
 			object: ['edible'],
 			objectThemes: ['food'],
 			objectTraits: ['liquid'],
-			...tensed(`sips slurps spoons`, `sip slurp spoon`, `sipped slurped spooned`)
+			...tensed(
+				`sips slurps spoons spoons_up laps_up sups sucks_up scoops_up`,
+				`sip slurp spoon spoon_up lap_up sup suck_up scoop_up`,
+				`sipped slurped spooned spooned_up lapped_up supped sucked_up scooped_up`
+			)
 		},
 		{
 			field: 'drink',
 			subject: ['creature', 'person'],
 			object: ['edible'],
 			objectThemes: ['drink'],
-			...tensed(`drinks sips gulps savors`, `drink sip gulp savor`, `drank sipped gulped savored`)
+			...tensed(
+				`drinks sips gulps savors swigs downs quaffs slurps laps_up drains gulps_down sips_at nurses tastes swallows knocks_back polishes_off`,
+				`drink sip gulp savor swig down quaff slurp lap_up drain gulp_down sip_at nurse taste swallow knock_back polish_off`,
+				`drank sipped gulped savored swigged downed quaffed slurped lapped_up drained gulped_down sipped_at nursed tasted swallowed knocked_back polished_off`
+			)
 		},
 		// What a place does on its own is what a story's scene is made of, and what
 		// an event does is another list.
@@ -373,72 +445,151 @@ export const EN: SentenceLanguageData = {
 			field: 'change',
 			subject: ['place'],
 			...tensed(
-				`quiets darkens brightens empties fills_up glows`,
-				`quiet darken brighten empty fill_up glow`,
-				`quieted darkened brightened emptied filled_up glowed`
+				`quiets darkens brightens empties fills_up glows stirs wakes falls_silent falls_still hushes settles comes_alive livens_up bustles hums buzzes sleeps dims lights_up shimmers glistens freezes_over thaws warms cools floods drains fades sparkles crowds_up empties_out`,
+				`quiet darken brighten empty fill_up glow stir wake fall_silent fall_still hush settle come_alive liven_up bustle hum buzz sleep dim light_up shimmer glisten freeze_over thaw warm cool flood drain fade sparkle crowd_up empty_out`,
+				`quieted darkened brightened emptied filled_up glowed stirred woke fell_silent fell_still hushed settled came_alive livened_up bustled hummed buzzed slept dimmed lit_up shimmered glistened froze_over thawed warmed cooled flooded drained faded sparkled crowded_up emptied_out`
 			)
 		},
 		{
 			field: 'change',
 			subject: ['event'],
 			...tensed(
-				`glows flows fades deepens begins ends passes`,
-				`glow flow fade deepen begin end pass`,
-				`glowed flowed faded deepened began ended passed`
+				`glows flows fades deepens begins ends passes lingers unfolds draws_on wears_on drags_on goes_on carries_on winds_down dies_down builds gathers approaches nears`,
+				`glow flow fade deepen begin end pass linger unfold draw_on wear_on drag_on go_on carry_on wind_down die_down build gather approach near`,
+				`glowed flowed faded deepened began ended passed lingered unfolded drew_on wore_on dragged_on went_on carried_on wound_down died_down built gathered approached neared`
+			)
+		},
+		{
+			field: 'change',
+			subject: ['event'],
+			// What a time of day or a season does: it breaks, wears away, draws in.
+			subjectThemes: ['time'],
+			...tensed(
+				`dawns breaks wanes wears_away slips_by creeps_on turns settles_in draws_in draws_to_a_close`,
+				`dawn break wane wear_away slip_by creep_on turn settle_in draw_in draw_to_a_close`,
+				`dawned broke waned wore_away slipped_by crept_on turned settled_in drew_in drew_to_a_close`
+			)
+		},
+		{
+			field: 'change',
+			subject: ['event'],
+			// What weather does: it rolls in, sets in, lets up.
+			subjectThemes: ['weather'],
+			...tensed(
+				`rolls_in sets_in blows_over clears lets_up eases picks_up sweeps_through moves_in`,
+				`roll_in set_in blow_over clear let_up ease pick_up sweep_through move_in`,
+				`rolled_in set_in blew_over cleared let_up eased picked_up swept_through moved_in`
+			)
+		},
+		{
+			field: 'change',
+			subject: ['event'],
+			// What a match does: it kicks off, heats up, wraps up.
+			subjectThemes: ['sport'],
+			...tensed(
+				`kicks_off starts gets_underway heats_up wraps_up goes_ahead resumes runs_late overruns`,
+				`kick_off start get_underway heat_up wrap_up go_ahead resume run_late overrun`,
+				`kicked_off started got_underway heated_up wrapped_up went_ahead resumed ran_late overran`
 			)
 		},
 		{
 			field: 'change',
 			subject: ['thing', 'vehicle'],
+			// What a thing one can hold does. A song is a thing of another kind, below.
+			subjectThemes: ['object', 'tool', 'clothing', 'product', 'gem', 'vehicle'],
 			...tensed(
-				`sways glitters falls rolls tilts ages creaks`,
-				`sway glitter fall roll tilt age creak`,
-				`swayed glittered fell rolled tilted aged creaked`
+				`sways glitters falls rolls tilts ages creaks shines gleams wobbles teeters topples tumbles slips slides drops spins turns settles shifts fades wears dulls`,
+				`sway glitter fall roll tilt age creak shine gleam wobble teeter topple tumble slip slide drop spin turn settle shift fade wear dull`,
+				`swayed glittered fell rolled tilted aged creaked shone gleamed wobbled teetered toppled tumbled slipped slid dropped spun turned settled shifted faded wore dulled`
+			)
+		},
+		{
+			field: 'change',
+			subject: ['thing', 'vehicle'],
+			// What only something made of metal and wood does: a jewel never rusts.
+			subjectThemes: ['object', 'tool', 'vehicle'],
+			...tensed(
+				`rattles clatters rusts cracks breaks snaps jams sticks squeaks clanks`,
+				`rattle clatter rust crack break snap jam stick squeak clank`,
+				`rattled clattered rusted cracked broke snapped jammed stuck squeaked clanked`
+			)
+		},
+		{
+			field: 'change',
+			subject: ['thing'],
+			// What a song or a drum does: it plays, rings out, dies away.
+			subjectThemes: ['music'],
+			...tensed(
+				`plays rings_out drifts swells fades_out echoes carries floats sounds resounds lingers dies_away builds stops`,
+				`play ring_out drift swell fade_out echo carry float sound resound linger die_away build stop`,
+				`played rang_out drifted swelled faded_out echoed carried floated sounded resounded lingered died_away built stopped`
 			)
 		},
 		{
 			field: 'move',
 			subject: ['vehicle'],
 			...tensed(
-				`runs stops passes returns departs slides`,
-				`run stop pass return depart slide`,
-				`ran stopped passed returned departed slid`
+				`runs stops passes returns departs slides rolls glides speeds rumbles rattles_along trundles cruises drives_by pulls_in pulls_out pulls_up sets_off arrives turns swerves brakes idles crawls_along zooms roars_past coasts drifts`,
+				`run stop pass return depart slide roll glide speed rumble rattle_along trundle cruise drive_by pull_in pull_out pull_up set_off arrive turn swerve brake idle crawl_along zoom roar_past coast drift`,
+				`ran stopped passed returned departed slid rolled glided sped rumbled rattled_along trundled cruised drove_by pulled_in pulled_out pulled_up set_off arrived turned swerved braked idled crawled_along zoomed roared_past coasted drifted`
 			)
 		},
 		{
 			field: 'change',
 			subject: ['idea', 'event'],
 			...tensed(
-				`spreads vanishes remains lingers returns gathers`,
-				`spread vanish remain linger return gather`,
-				`spread vanished remained lingered returned gathered`
+				`spreads vanishes remains lingers returns gathers grows fades deepens surfaces stirs settles passes builds swells recedes drifts_back comes_back creeps_in seeps_in takes_hold wears_off dies_away ebbs flickers rises falls shifts`,
+				`spread vanish remain linger return gather grow fade deepen surface stir settle pass build swell recede drift_back come_back creep_in seep_in take_hold wear_off die_away ebb flicker rise fall shift`,
+				`spread vanished remained lingered returned gathered grew faded deepened surfaced stirred settled passed built swelled receded drifted_back came_back crept_in seeped_in took_hold wore_off died_away ebbed flickered rose fell shifted`
 			)
 		},
 		{
 			field: 'change',
 			subject: ['plant'],
 			...tensed(
-				`grows wilts blooms sways spreads`,
-				`grow wilt bloom sway spread`,
-				`grew wilted bloomed swayed spread`
+				`grows wilts blooms sways spreads sprouts buds flowers blossoms unfurls stretches climbs droops withers fades thrives flourishes rustles bends leans shoots_up springs_up takes_root bears_fruit sheds greens turns_gold reaches_up`,
+				`grow wilt bloom sway spread sprout bud flower blossom unfurl stretch climb droop wither fade thrive flourish rustle bend lean shoot_up spring_up take_root bear_fruit shed green turn_gold reach_up`,
+				`grew wilted bloomed swayed spread sprouted budded flowered blossomed unfurled stretched climbed drooped withered faded thrived flourished rustled bent leaned shot_up sprang_up took_root bore_fruit shed greened turned_gold reached_up`
 			)
 		},
 		{
 			field: 'change',
 			subject: ['body'],
 			...tensed(
-				`trembles moves stiffens aches heals`,
-				`tremble move stiffen ache heal`,
-				`trembled moved stiffened ached healed`
+				`trembles moves stiffens aches heals twitches shivers tingles throbs quivers relaxes loosens tenses tightens warms cools numbs goes_numb swells shakes flexes stretches rests tires wakes settles jerks flinches sags droops`,
+				`tremble move stiffen ache heal twitch shiver tingle throb quiver relax loosen tense tighten warm cool numb go_numb swell shake flex stretch rest tire wake settle jerk flinch sag droop`,
+				`trembled moved stiffened ached healed twitched shivered tingled throbbed quivered relaxed loosened tensed tightened warmed cooled numbed went_numb swelled shook flexed stretched rested tired woke settled jerked flinched sagged drooped`
 			)
 		},
 		{
 			field: 'change',
 			subject: ['edible'],
 			...tensed(
-				`ripens cools boils melts spoils remains`,
-				`ripen cool boil melt spoil remain`,
-				`ripened cooled boiled melted spoiled remained`
+				`ripens cools boils melts spoils remains warms steams cools_down goes_cold turns goes_off runs_out sits waits smells_good`,
+				`ripen cool boil melt spoil remain warm steam cool_down go_cold turn go_off run_out sit wait smell_good`,
+				`ripened cooled boiled melted spoiled remained warmed steamed cooled_down went_cold turned went_off ran_out sat waited smelled_good`
+			)
+		},
+		{
+			field: 'change',
+			subject: ['edible'],
+			// What a dish does and a drink does not: it sizzles, crumbles, goes stale.
+			subjectThemes: ['food'],
+			...tensed(
+				`sizzles crumbles goes_stale dries_out hardens softens browns burns bakes toasts rises`,
+				`sizzle crumble go_stale dry_out harden soften brown burn bake toast rise`,
+				`sizzled crumbled went_stale dried_out hardened softened browned burned baked toasted rose`
+			)
+		},
+		{
+			field: 'change',
+			subject: ['edible'],
+			// What a drink does and a dish does not: it fizzes, spills, goes flat.
+			subjectThemes: ['drink'],
+			...tensed(
+				`bubbles fizzes foams froths spills sloshes swirls settles goes_flat overflows`,
+				`bubble fizz foam froth spill slosh swirl settle go_flat overflow`,
+				`bubbled fizzed foamed frothed spilled sloshed swirled settled went_flat overflowed`
 			)
 		}
 	],
