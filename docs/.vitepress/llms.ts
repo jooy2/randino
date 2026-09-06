@@ -96,12 +96,15 @@ function flatten(markdown: string): string {
 }
 
 const PREAMBLE = [
-	'randino generates two things and keeps them apart on purpose. **Person names** read like names',
-	'a person actually carries (김민준, Emma Clover) and are meant for sample data. **Nicknames** are',
-	'the handles someone would pick for a game or a website (멋진사자, MistyOwl); they are built from',
-	'everyday words and never from person names.',
+	'randino generates random text for sample data, in four kinds and nine languages.',
+	'**Person names** read like names a person actually carries (김민준, Emma Clover).',
+	'**Nicknames** are the handles someone would pick for a game or a website (멋진사자, MistyOwl),',
+	'built from everyday words and never from person names. **Words** are those everyday words on',
+	"their own, across twenty-five themes. **Sentences** are whole statements in the language's own",
+	'grammar (여우가 사과를 먹는다), and **decorators** attach a token or a modifier to a string you',
+	'already have.',
 	'',
-	'The same library ships as three packages — `randino` on npm, on pub.dev and on PyPI — generating',
+	'The same library ships as three packages (`randino` on npm, on pub.dev and on PyPI), generating',
 	'the same output from the same datasets. **Everything below is the JavaScript package**, which is',
 	'the reference implementation. The other two differ only in how options are passed: Dart takes',
 	'named parameters (`randName(language: NameLanguage.ko)`), and Python takes keyword arguments with',

@@ -27,7 +27,7 @@ export default {
 		// reference page.
 		app.component('Demo', Demo);
 
-		// One table, fifteen pages: `randWord` and each of its themed forms.
+		// One table, twenty-six pages: `randWord` and each of its themed forms.
 		app.component('WordOptions', WordOptions);
 
 		// Reads the stored choice into the reactive copy the components use, and
