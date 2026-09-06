@@ -14,6 +14,7 @@ import 'package:randino/src/name/data/index.dart';
 import 'package:randino/src/name/data/ko.dart';
 import 'package:randino/src/name/data/types.dart';
 import 'package:randino/src/sentence/data/index.dart';
+import 'package:randino/src/sentence/data/types.dart';
 import 'package:randino/src/word/data/index.dart';
 import 'package:randino/src/word/data/types.dart';
 
@@ -24,6 +25,53 @@ List<Map<String, String?>>? pool(NamePool? source) => source
 
 /// Flattens a word pool.
 List<String>? listed(List<String>? source) => source?.toList();
+
+/// A predicate's past forms, or null where the language's predicate does not change.
+Map<String, Object?>? tense(PredicateTense? source) => source == null
+    ? null
+    : <String, Object?>{
+        'words': listed(source.words),
+        'forms': <String, Object?>{
+          for (final f in source.forms.entries) f.key.name: listed(f.value),
+        },
+      };
+
+/// A group of modifiers or manners, narrowed by class and optionally by theme.
+List<Object?> groups(List<ModifierGroup> source) => <Object?>[
+  for (final group in source)
+    <String, Object?>{
+      'subject': <String>[for (final noun in group.subject) noun.name],
+      'themes': group.themes == null
+          ? null
+          : <String>[for (final theme in group.themes!) theme.name],
+      'words': listed(group.words),
+    },
+];
+
+/// Agreement rules per gender, as lists of `[ending, replacement]` pairs.
+Map<String, Object?>? rules(Map<WordGender, List<List<String>>>? source) =>
+    source == null
+    ? null
+    : <String, Object?>{
+        for (final g in source.entries)
+          g.key.name: <Object?>[
+            for (final rule in g.value) <String>[...rule],
+          ],
+      };
+
+/// A story step, in the shape every package writes.
+Map<String, Object?> step(StoryStep source) => <String, Object?>{
+  'kind': source.kind.name,
+  'fields': <String>[for (final field in source.fields) field.name],
+  'condition': source.condition?.name ?? '',
+  'object': source.object,
+  'place': source.place,
+  'destination': source.destination?.name ?? '',
+  'needs': <String>[for (final c in source.needs) c.name],
+  'required': source.required,
+  'link': source.link?.name ?? '',
+  'kinds': <String>[for (final kind in source.kinds) kind.name],
+};
 
 /// Flattens a lookup, keyed by string so a syllable count compares as one.
 Map<String, Object>? mapped(Map<Object, Object>? source) =>
@@ -54,18 +102,22 @@ void main() {
         'nounGender': entry.value.nounGender == null
             ? null
             : <String, Object?>{
-                for (final g in entry.value.nounGender!.entries) g.key: g.value.name,
+                for (final g in entry.value.nounGender!.entries)
+                  g.key: g.value.name,
               },
         'genderRules': entry.value.genderRules == null
             ? null
             : <Object?>[
-                for (final rule in entry.value.genderRules!) <String>[rule.$1, rule.$2.name],
+                for (final rule in entry.value.genderRules!)
+                  <String>[rule.$1, rule.$2.name],
               ],
         'agreement': entry.value.agreement == null
             ? null
             : <String, Object?>{
                 for (final g in entry.value.agreement!.entries)
-                  g.key.name: <Object?>[for (final rule in g.value) <String>[...rule]],
+                  g.key.name: <Object?>[
+                    for (final rule in g.value) <String>[...rule],
+                  ],
               },
         // Optional in one package and defaulted in another; written as a list
         // either way so the shapes compare.
@@ -117,17 +169,26 @@ void main() {
           for (final t in entry.value.openers.entries) t.key.name: t.value,
         },
         'quotes': <String, Object?>{
-          for (final q in entry.value.quotes.entries) q.key.name: <String>[...q.value],
+          for (final q in entry.value.quotes.entries)
+            q.key.name: <String>[...q.value],
         },
         // Optional in one package and defaulted in another; written the same way
         // here either way, so the shapes compare.
         'predicateAgrees': entry.value.predicateAgrees,
-        'articles': entry.value.articles == null
+        'pastAgreement': rules(entry.value.pastAgreement),
+        'pastMark': entry.value.pastMark == null
             ? null
             : <String, Object?>{
-                for (final g in entry.value.articles!.entries)
-                  g.key.name: <Object?>[for (final rule in g.value) <String>[...rule]],
+                'head': entry.value.pastMark!.head ?? '',
+                'tail': entry.value.pastMark!.tail ?? '',
               },
+        'join': entry.value.join == null
+            ? null
+            : <String, Object?>{
+                'form': entry.value.join!.form?.name ?? '',
+                'word': entry.value.join!.word ?? '',
+              },
+        'articles': rules(entry.value.articles),
         'verbs': <Object?>[
           for (final group in entry.value.verbs)
             <String, Object?>{
@@ -135,42 +196,71 @@ void main() {
               'object': group.object == null
                   ? null
                   : <String>[for (final noun in group.object!) noun.name],
+              'field': group.field.name,
+              'objectThemes': group.objectThemes == null
+                  ? null
+                  : <String>[
+                      for (final theme in group.objectThemes!) theme.name,
+                    ],
+              'requires': group.requires?.name ?? '',
               'words': listed(group.words),
               'forms': <String, Object?>{
-                for (final f in group.forms.entries) f.key.name: listed(f.value),
+                for (final f in group.forms.entries)
+                  f.key.name: listed(f.value),
               },
+              'past': tense(group.past),
             },
         ],
         'states': <Object?>[
           for (final group in entry.value.states)
             <String, Object?>{
               'subject': <String>[for (final noun in group.subject) noun.name],
+              'condition': group.condition?.name ?? '',
+              'head': group.head ?? '',
+              'pastHead': group.pastHead ?? '',
               'words': listed(group.words),
               'forms': <String, Object?>{
-                for (final f in group.forms.entries) f.key.name: listed(f.value),
+                for (final f in group.forms.entries)
+                  f.key.name: listed(f.value),
               },
+              'past': tense(group.past),
             },
         ],
-        'manners': listed(entry.value.manners),
-        'times': listed(entry.value.times),
+        'modifiers': groups(entry.value.modifiers),
+        'manners': groups(entry.value.manners),
+        'times': <String, Object?>{
+          'day': listed(entry.value.times.day),
+          'any': listed(entry.value.times.any),
+          'past': listed(entry.value.times.past),
+          'present': listed(entry.value.times.present),
+        },
+        'homes': listed(entry.value.homes),
         'connectives': <String, Object?>{
-          for (final k in entry.value.connectives.entries) k.key.name: listed(k.value),
+          for (final k in entry.value.connectives.entries)
+            k.key.name: listed(k.value),
         },
         'interjections': listed(entry.value.interjections),
         'pronouns': <String, Object?>{
-          for (final g in entry.value.pronouns.entries) g.key.name: listed(g.value),
+          for (final g in entry.value.pronouns.entries)
+            g.key.name: listed(g.value),
         },
         // Optional in one package and defaulted in another; written as a list
         // either way so the shapes compare.
-        'pronounless': <String>[for (final noun in entry.value.pronounless) noun.name],
+        'pronounless': <String>[
+          for (final noun in entry.value.pronounless) noun.name,
+        ],
         'numeral': entry.value.numeral == null
             ? null
             : <String, Object?>{
                 'order': entry.value.numeral!.order.name,
                 'counters': <String, Object?>{
-                  for (final c in entry.value.numeral!.counters.entries) c.key.name: c.value,
+                  for (final c in entry.value.numeral!.counters.entries)
+                    c.key.name: c.value,
                 },
-                'count': <int>[entry.value.numeral!.count.min, entry.value.numeral!.count.max],
+                'count': <int>[
+                  entry.value.numeral!.count.min,
+                  entry.value.numeral!.count.max,
+                ],
                 'currency': entry.value.numeral!.currency,
                 'amounts': <int>[...entry.value.numeral!.amounts],
                 'group': entry.value.numeral!.group,
@@ -190,13 +280,15 @@ void main() {
                 ],
                 'copula': <String, Object?>{
                   'subject': <String>[
-                    for (final noun in entry.value.calendar!.copula.subject) noun.name,
+                    for (final noun in entry.value.calendar!.copula.subject)
+                      noun.name,
                   ],
                   'words': listed(entry.value.calendar!.copula.words),
                   'forms': <String, Object?>{
                     for (final f in entry.value.calendar!.copula.forms.entries)
                       f.key.name: listed(f.value),
                   },
+                  'past': tense(entry.value.calendar!.copula.past),
                 },
               },
         'frames': <Object?>[
@@ -207,8 +299,10 @@ void main() {
                   <String, Object?>{
                     'slot': part.slot.name,
                     'head': part.head ?? '',
+                    'pastHead': part.pastHead ?? '',
                     'tail': part.tail ?? '',
                     'tailAlt': part.tailAlt ?? '',
+                    'tailLiquid': part.tailLiquid ?? '',
                     'modifiable': part.modifiable,
                     'bare': part.bare,
                     'copula': part.copula?.name ?? '',
@@ -217,6 +311,9 @@ void main() {
               'weight': frame.weight,
               'mood': frame.mood.name,
               'tag': frame.tag ?? '',
+              'fields': frame.fields == null
+                  ? null
+                  : <String>[for (final field in frame.fields!) field.name],
             },
         ],
       },
@@ -282,8 +379,40 @@ void main() {
       },
       'sentence': <String, Object?>{
         'themeClass': <String, Object?>{
-          for (final entry in themeClass.entries) entry.key.name: entry.value.name,
+          for (final entry in themeClass.entries)
+            entry.key.name: entry.value.name,
         },
+        'agentClasses': <String>[for (final noun in agentClasses) noun.name],
+        'fieldRules': <String, Object?>{
+          for (final entry in fieldRules.entries)
+            entry.key.name: <String, Object?>{
+              'needs': <String>[for (final c in entry.value.needs) c.name],
+              'gives': <String>[for (final c in entry.value.gives) c.name],
+              'takes': <String>[for (final c in entry.value.takes) c.name],
+              'after': <String>[for (final c in entry.value.after) c.name],
+            },
+        },
+        'opposites': <String, Object?>{
+          for (final entry in opposites.entries)
+            entry.key.name: entry.value.name,
+        },
+        'stories': <Object?>[
+          for (final story in stories)
+            <String, Object?>{
+              'name': story.name.name,
+              'hero': <String>[for (final noun in story.hero) noun.name],
+              'item': story.item == null
+                  ? null
+                  : <String>[for (final noun in story.item!) noun.name],
+              'itemThemes': story.itemThemes == null
+                  ? null
+                  : <String>[for (final theme in story.itemThemes!) theme.name],
+              'start': <String>[for (final c in story.start) c.name],
+              'steps': <Object?>[for (final each in story.steps) step(each)],
+              'weight': story.weight,
+            },
+        ],
+        'interludes': <Object?>[for (final each in interludes) step(each)],
         'data': sentence,
       },
       'name': <String, Object?>{

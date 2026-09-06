@@ -15,9 +15,19 @@ import {
 } from '../../packages/javascript/lib/decorate/data/index.js';
 import { NAME_DATA, NAME_LANGUAGES } from '../../packages/javascript/lib/name/data/index.js';
 import {
+	AGENT_CLASSES,
+	FIELD_RULES,
+	INTERLUDES,
+	OPPOSITES,
 	SENTENCE_DATA,
+	STORIES,
 	THEME_CLASS
 } from '../../packages/javascript/lib/sentence/data/index.js';
+import type { StoryStep } from '../../packages/javascript/lib/sentence/data/index.js';
+import type {
+	ModifierGroup,
+	PredicateTense
+} from '../../packages/javascript/lib/sentence/data/types.js';
 import { KO_SURNAME_ROMAN } from '../../packages/javascript/lib/name/data/ko.js';
 import {
 	LOOSE_THEMES,
@@ -47,6 +57,50 @@ const map = (source: Readonly<Record<string | number, unknown>> | undefined) =>
 		? null
 		: Object.fromEntries(Object.entries(source).map(([key, value]) => [String(key), value]));
 
+// A predicate's past forms, or null where the language's predicate does not change.
+const tense = (source: PredicateTense | undefined) =>
+	source === undefined ? null : { words: list(source.words), forms: forms(source.forms) };
+
+// A group of modifiers or manners, narrowed by class and optionally by theme.
+const groups = (source: readonly ModifierGroup[]) =>
+	source.map((group) => ({
+		subject: [...group.subject],
+		themes: list(group.themes),
+		words: list(group.words)
+	}));
+
+const rules = (
+	source: Readonly<Record<string, readonly (readonly string[])[] | undefined>> | undefined
+) =>
+	source === undefined
+		? null
+		: Object.fromEntries(
+				Object.entries(source).map(([gender, list]) => [
+					gender,
+					(list ?? []).map((rule) => [...rule])
+				])
+			);
+
+// A story step. `field` is one or several in this package and always a list in the
+// other two; `object` is a role name here and a flag there.
+const step = (source: StoryStep) => ({
+	kind: source.kind,
+	fields:
+		source.field === undefined
+			? []
+			: typeof source.field === 'string'
+				? [source.field]
+				: [...source.field],
+	condition: source.condition ?? '',
+	object: source.object !== undefined,
+	place: source.place ?? false,
+	destination: source.destination ?? '',
+	needs: [...(source.needs ?? [])],
+	required: source.required ?? false,
+	link: source.link ?? '',
+	kinds: [...(source.kinds ?? [])]
+});
+
 console.log(
 	JSON.stringify({
 		constants: {
@@ -73,9 +127,7 @@ console.log(
 						actions: list(data.actions),
 						parts: list(data.parts),
 						nounGender: map(data.nounGender),
-						genderRules: data.genderRules
-							? data.genderRules.map((rule) => [...rule])
-							: null,
+						genderRules: data.genderRules ? data.genderRules.map((rule) => [...rule]) : null,
 						agreement: data.agreement
 							? Object.fromEntries(
 									Object.entries(data.agreement).map(([gender, rules]) => [
@@ -116,6 +168,29 @@ console.log(
 		},
 		sentence: {
 			themeClass: map(THEME_CLASS),
+			agentClasses: [...AGENT_CLASSES],
+			fieldRules: Object.fromEntries(
+				Object.entries(FIELD_RULES).map(([field, rule]) => [
+					field,
+					{
+						needs: [...(rule.needs ?? [])],
+						gives: [...(rule.gives ?? [])],
+						takes: [...(rule.takes ?? [])],
+						after: [...(rule.after ?? [])]
+					}
+				])
+			),
+			opposites: map(OPPOSITES),
+			stories: STORIES.map((story) => ({
+				name: story.name,
+				hero: [...story.hero],
+				item: list(story.item),
+				itemThemes: list(story.itemThemes),
+				start: [...story.start],
+				steps: story.steps.map(step),
+				weight: story.weight
+			})),
+			interludes: INTERLUDES.map(step),
 			data: Object.fromEntries(
 				Object.entries(SENTENCE_DATA).map(([code, data]) => [
 					code,
@@ -132,27 +207,40 @@ console.log(
 						// Optional in one package and defaulted in another; written the same
 						// way here either way, so the shapes compare.
 						predicateAgrees: data.predicateAgrees ?? false,
-						articles: data.articles
-							? Object.fromEntries(
-									Object.entries(data.articles).map(([gender, rules]) => [
-										gender,
-										(rules ?? []).map((rule) => [...rule])
-									])
-								)
+						pastAgreement: rules(data.pastAgreement),
+						pastMark: data.pastMark
+							? { head: data.pastMark.head ?? '', tail: data.pastMark.tail ?? '' }
 							: null,
+						join: data.join ? { form: data.join.form ?? '', word: data.join.word ?? '' } : null,
+						articles: rules(data.articles),
 						verbs: data.verbs.map((group) => ({
 							subject: [...group.subject],
 							object: list(group.object),
+							field: group.field,
+							objectThemes: list(group.objectThemes),
+							requires: group.requires ?? '',
 							words: list(group.words),
-							forms: forms(group.forms)
+							forms: forms(group.forms),
+							past: tense(group.past)
 						})),
 						states: data.states.map((group) => ({
 							subject: [...group.subject],
+							condition: group.condition ?? '',
+							head: group.head ?? '',
+							pastHead: group.pastHead ?? '',
 							words: list(group.words),
-							forms: forms(group.forms)
+							forms: forms(group.forms),
+							past: tense(group.past)
 						})),
-						manners: list(data.manners),
-						times: list(data.times),
+						modifiers: groups(data.modifiers),
+						manners: groups(data.manners),
+						times: {
+							day: list(data.times.day),
+							any: list(data.times.any),
+							past: list(data.times.past),
+							present: list(data.times.present)
+						},
+						homes: list(data.homes),
 						connectives: Object.fromEntries(
 							Object.entries(data.connectives).map(([kind, pool]) => [kind, list(pool)])
 						),
@@ -183,7 +271,8 @@ console.log(
 									copula: {
 										subject: [...data.calendar.copula.subject],
 										words: list(data.calendar.copula.words),
-										forms: forms(data.calendar.copula.forms)
+										forms: forms(data.calendar.copula.forms),
+										past: tense(data.calendar.copula.past)
 									}
 								}
 							: null,
@@ -191,15 +280,18 @@ console.log(
 							parts: frame.parts.map((part) => ({
 								slot: part.slot,
 								head: part.head ?? '',
+								pastHead: part.pastHead ?? '',
 								tail: part.tail ?? '',
 								tailAlt: part.tailAlt ?? '',
+								tailLiquid: part.tailLiquid ?? '',
 								modifiable: part.modifiable ?? false,
 								bare: part.bare ?? false,
 								copula: part.copula ?? ''
 							})),
 							weight: frame.weight,
 							mood: frame.mood ?? 'statement',
-							tag: frame.tag ?? ''
+							tag: frame.tag ?? '',
+							fields: list(frame.fields)
 						}))
 					}
 				])

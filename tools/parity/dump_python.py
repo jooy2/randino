@@ -24,9 +24,19 @@ from randino.decorate.data import (
 )
 from randino.name.data import NAME_DATA, NAME_LANGUAGES
 from randino.name.data.ko import KO_SURNAME_ROMAN
-from randino.sentence.data import SENTENCE_DATA, THEME_CLASS
+from randino.sentence.data import (
+    AGENT_CLASSES,
+    FIELD_RULES,
+    INTERLUDES,
+    OPPOSITES,
+    SENTENCE_DATA,
+    STORIES,
+    THEME_CLASS,
+    StoryStep,
+)
+from randino.sentence.data._types import ModifierGroup, PredicateTense
 from randino.word.data import LOOSE_THEMES, WORD_DATA, WORD_LANGUAGES, WORD_THEMES
-from randino.word.data._types import SyllableSynthesis
+from randino.word.data._types import SyllableSynthesis, WordAgreement
 
 
 def pool(source: Sequence[Any] | None) -> list[dict[str, str | None]] | None:
@@ -44,6 +54,53 @@ def pool(source: Sequence[Any] | None) -> list[dict[str, str | None]] | None:
 def listed(source: Sequence[str] | None) -> list[str] | None:
     """Flatten a word pool."""
     return None if source is None else list(source)
+
+
+def tense(source: PredicateTense | None) -> dict[str, object] | None:
+    """A predicate's past forms, or None where the language's predicate does not change."""
+    if source is None:
+        return None
+
+    return {
+        "words": listed(source.words),
+        "forms": {form: listed(pool) for form, pool in source.forms.items()},
+    }
+
+
+def groups(source: Sequence[ModifierGroup]) -> list[dict[str, object]]:
+    """A group of modifiers or manners, narrowed by class and optionally by theme."""
+    return [
+        {
+            "subject": list(group.subject),
+            "themes": listed(group.themes),
+            "words": listed(group.words),
+        }
+        for group in source
+    ]
+
+
+def rules(source: WordAgreement | None) -> dict[str, object] | None:
+    """Agreement rules per gender, as lists of `[ending, replacement]` pairs."""
+    if source is None:
+        return None
+
+    return {gender: [list(rule) for rule in each] for gender, each in source.items()}
+
+
+def step(source: StoryStep) -> dict[str, object]:
+    """A story step, in the shape every package writes."""
+    return {
+        "kind": source.kind,
+        "fields": list(source.fields),
+        "condition": source.condition or "",
+        "object": source.object,
+        "place": source.place,
+        "destination": source.destination or "",
+        "needs": list(source.needs),
+        "required": source.required,
+        "link": source.link or "",
+        "kinds": list(source.kinds),
+    }
 
 
 def mapped(source: Mapping[Any, Any] | None) -> dict[str, Any] | None:
@@ -69,7 +126,9 @@ word = {
         "agreement": (
             None
             if data.agreement is None
-            else {g: [list(rule) for rule in rules] for g, rules in data.agreement.items()}
+            else {
+                g: [list(rule) for rule in rules] for g, rules in data.agreement.items()
+            }
         ),
         # Optional in one package and defaulted in another; written as a list
         # either way so the shapes compare.
@@ -152,33 +211,52 @@ sentence = {
         # Optional in one package and defaulted in another; written the same way
         # here either way, so the shapes compare.
         "predicateAgrees": data.predicate_agrees,
-        "articles": (
+        "pastAgreement": rules(data.past_agreement),
+        "pastMark": (
             None
-            if data.articles is None
-            else {
-                gender: [list(rule) for rule in rules]
-                for gender, rules in data.articles.items()
-            }
+            if data.past_mark is None
+            else {"head": data.past_mark.head, "tail": data.past_mark.tail}
         ),
+        "join": (
+            None
+            if data.join is None
+            else {"form": data.join.form or "", "word": data.join.word or ""}
+        ),
+        "articles": rules(data.articles),
         "verbs": [
             {
                 "subject": list(group.subject),
                 "object": None if group.object is None else list(group.object),
+                "field": group.field,
+                "objectThemes": listed(group.object_themes),
+                "requires": group.requires or "",
                 "words": listed(group.words),
                 "forms": {form: listed(pool) for form, pool in group.forms.items()},
+                "past": tense(group.past),
             }
             for group in data.verbs
         ],
         "states": [
             {
                 "subject": list(group.subject),
+                "condition": group.condition or "",
+                "head": group.head or "",
+                "pastHead": group.past_head or "",
                 "words": listed(group.words),
                 "forms": {form: listed(pool) for form, pool in group.forms.items()},
+                "past": tense(group.past),
             }
             for group in data.states
         ],
-        "manners": listed(data.manners),
-        "times": listed(data.times),
+        "modifiers": groups(data.modifiers),
+        "manners": groups(data.manners),
+        "times": {
+            "day": listed(data.times.day),
+            "any": listed(data.times.any),
+            "past": listed(data.times.past),
+            "present": listed(data.times.present),
+        },
+        "homes": listed(data.homes),
         "connectives": {kind: listed(pool) for kind, pool in data.connectives.items()},
         "interjections": listed(data.interjections),
         "pronouns": {gender: listed(pool) for gender, pool in data.pronouns.items()},
@@ -204,7 +282,9 @@ sentence = {
             else {
                 "date": data.calendar.date,
                 "months": (
-                    None if data.calendar.months is None else listed(data.calendar.months)
+                    None
+                    if data.calendar.months is None
+                    else listed(data.calendar.months)
                 ),
                 "clock": data.calendar.clock,
                 "years": list(data.calendar.years),
@@ -215,6 +295,7 @@ sentence = {
                         form: listed(pool)
                         for form, pool in data.calendar.copula.forms.items()
                     },
+                    "past": tense(data.calendar.copula.past),
                 },
             }
         ),
@@ -224,8 +305,10 @@ sentence = {
                     {
                         "slot": part.slot,
                         "head": part.head,
+                        "pastHead": part.past_head,
                         "tail": part.tail,
                         "tailAlt": part.tail_alt,
+                        "tailLiquid": part.tail_liquid,
                         "modifiable": part.modifiable,
                         "bare": part.bare,
                         "copula": part.copula or "",
@@ -235,6 +318,7 @@ sentence = {
                 "weight": frame.weight,
                 "mood": frame.mood,
                 "tag": frame.tag,
+                "fields": listed(frame.fields),
             }
             for frame in data.frames
         ],
@@ -263,6 +347,30 @@ print(
             },
             "sentence": {
                 "themeClass": dict(THEME_CLASS),
+                "agentClasses": list(AGENT_CLASSES),
+                "fieldRules": {
+                    field: {
+                        "needs": list(rule.needs),
+                        "gives": list(rule.gives),
+                        "takes": list(rule.takes),
+                        "after": list(rule.after),
+                    }
+                    for field, rule in FIELD_RULES.items()
+                },
+                "opposites": dict(OPPOSITES),
+                "stories": [
+                    {
+                        "name": story.name,
+                        "hero": list(story.hero),
+                        "item": listed(story.item),
+                        "itemThemes": listed(story.item_themes),
+                        "start": list(story.start),
+                        "steps": [step(each) for each in story.steps],
+                        "weight": story.weight,
+                    }
+                    for story in STORIES
+                ],
+                "interludes": [step(each) for each in INTERLUDES],
                 "data": sentence,
             },
             "name": {

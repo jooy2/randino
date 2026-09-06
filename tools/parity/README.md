@@ -52,7 +52,7 @@ That includes the nickname shapes. They are `WordLanguageData.frames`, one set
 per language with the particle each gap needs, so the slots, the particles and
 the weights are all data and all compared.
 
-The sentence datasets are the same story on a larger scale: the verbs with the
+The stories are data too — `STORIES`, `INTERLUDES`, `FIELD_RULES`, `OPPOSITES` and `AGENT_CLASSES` — and a step that one package requires and another leaves optional changes what every paragraph of that story can be, so they are in the comparison beside the datasets. The sentence datasets are the same story on a larger scale: the verbs with the
 noun classes each group takes, the predicate adjectives, the adverbs, the
 articles and the shapes, in nine languages. `THEME_CLASS` is compared with them,
 because a theme moving from one class to another changes what every verb of
