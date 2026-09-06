@@ -1115,8 +1115,8 @@ final SentenceLanguageData ko = SentenceLanguageData(
       words: words(r'크다 작다 빠르다 느리다 조용하다 시끄럽다 용감하다 게으르다 부지런하다 사납다 순하다 영리하다'),
       forms: <PredicateForm, WordPool>{
         PredicateForm.question: words(r'''
-          크니|큰가 작으니|작은가 빠르니|빠른가 느리니|느린가 조용하니|조용한가 시끄러우니|시끄러운가 용감하니|용감한가 게으르니|게으른가 부지런하니|부지런한가
-          사나우니|사나운가 순하니|순한가 영리하니|영리한가
+          크니|큰가 작니|작은가 빠르니|빠른가 느리니|느린가 조용하니|조용한가 시끄럽니|시끄러운가 용감하니|용감한가 게으르니|게으른가 부지런하니|부지런한가 사납니|사나운가
+          순하니|순한가 영리하니|영리한가
         '''),
         PredicateForm.exclamation: words(r'''
           크구나|크네|크군 작구나|작네|작군 빠르구나|빠르네|빠르군 느리구나|느리네|느리군 조용하구나|조용하네|조용하군 시끄럽구나|시끄럽네|시끄럽군
@@ -1270,7 +1270,7 @@ final SentenceLanguageData ko = SentenceLanguageData(
       ],
       words: words(r'아름답다 낯설다 새롭다 흔하다 드물다'),
       forms: <PredicateForm, WordPool>{
-        PredicateForm.question: words(r'아름다우니|아름다운가 낯서니|낯선가 새로우니|새로운가 흔하니|흔한가 드무니|드문가'),
+        PredicateForm.question: words(r'아름답니|아름다운가 낯서니|낯선가 새롭니|새로운가 흔하니|흔한가 드무니|드문가'),
         PredicateForm.exclamation: words(
           r'아름답구나|아름답네|아름답군 낯설구나|낯서네|낯설군 새롭구나|새롭네|새롭군 흔하구나|흔하네|흔하군 드물구나|드무네|드물군',
         ),
@@ -1288,7 +1288,7 @@ final SentenceLanguageData ko = SentenceLanguageData(
       words: words(r'넓다 좁다 고요하다 깊다 어둡다 밝다 아득하다 가파르다'),
       forms: <PredicateForm, WordPool>{
         PredicateForm.question: words(
-          r'넓으니|넓은가 좁으니|좁은가 고요하니|고요한가 깊으니|깊은가 어두우니|어두운가 밝으니|밝은가 아득하니|아득한가 가파르니|가파른가',
+          r'넓니|넓은가 좁니|좁은가 고요하니|고요한가 깊니|깊은가 어둡니|어두운가 밝니|밝은가 아득하니|아득한가 가파르니|가파른가',
         ),
         PredicateForm.exclamation: words(r'''
           넓구나|넓네|넓군 좁구나|좁네|좁군 고요하구나|고요하네|고요하군 깊구나|깊네|깊군 어둡구나|어둡네|어둡군 밝구나|밝네|밝군 아득하구나|아득하네|아득하군
@@ -1336,9 +1336,9 @@ final SentenceLanguageData ko = SentenceLanguageData(
       ],
       words: words(r'단단하다 가볍다 무겁다 매끈하다 투명하다 튼튼하다 반들반들하다'),
       forms: <PredicateForm, WordPool>{
-        PredicateForm.question: words(r'''
-          단단하니|단단한가 가벼우니|가벼운가 무거우니|무거운가 매끈하니|매끈한가 투명하니|투명한가 튼튼하니|튼튼한가 반들반들하니|반들반들한가
-        '''),
+        PredicateForm.question: words(
+          r'단단하니|단단한가 가볍니|가벼운가 무겁니|무거운가 매끈하니|매끈한가 투명하니|투명한가 튼튼하니|튼튼한가 반들반들하니|반들반들한가',
+        ),
         PredicateForm.exclamation: words(r'''
           단단하구나|단단하네|단단하군 가볍구나|가볍네|가볍군 무겁구나|무겁네|무겁군 매끈하구나|매끈하네|매끈하군 투명하구나|투명하네|투명하군 튼튼하구나|튼튼하네|튼튼하군
           반들반들하구나|반들반들하네|반들반들하군
@@ -1378,7 +1378,7 @@ final SentenceLanguageData ko = SentenceLanguageData(
       subject: const <NounClass>[NounClass.edible],
       words: words(r'달다 시다 뜨겁다 차갑다'),
       forms: <PredicateForm, WordPool>{
-        PredicateForm.question: words(r'다니|단가 시니|신가 뜨거우니|뜨거운가 차가우니|차가운가'),
+        PredicateForm.question: words(r'다니|단가 시니|신가 뜨겁니|뜨거운가 차갑니|차가운가'),
         PredicateForm.exclamation: words(r'달구나|다네|달군 시구나|시네|시군 뜨겁구나|뜨겁네|뜨겁군 차갑구나|차갑네|차갑군'),
         PredicateForm.casual: words(r'달아 셔 뜨거워 차가워'),
         PredicateForm.casualQuestion: words(r'달아|달지 셔|시지 뜨거워|뜨겁지 차가워|차갑지'),
@@ -1394,7 +1394,7 @@ final SentenceLanguageData ko = SentenceLanguageData(
       subjectThemes: const <WordTheme>[WordTheme.food],
       words: words(r'짜다 맵다 고소하다 담백하다'),
       forms: <PredicateForm, WordPool>{
-        PredicateForm.question: words(r'짜니|짠가 매우니|매운가 고소하니|고소한가 담백하니|담백한가'),
+        PredicateForm.question: words(r'짜니|짠가 맵니|매운가 고소하니|고소한가 담백하니|담백한가'),
         PredicateForm.exclamation: words(r'짜구나|짜네|짜군 맵구나|맵네|맵군 고소하구나|고소하네|고소하군 담백하구나|담백하네|담백하군'),
         PredicateForm.casual: words(r'짜 매워 고소해 담백해'),
         PredicateForm.casualQuestion: words(r'짜|짜지 매워|맵지 고소해|고소하지 담백해|담백하지'),
@@ -1409,7 +1409,7 @@ final SentenceLanguageData ko = SentenceLanguageData(
       subject: const <NounClass>[NounClass.idea],
       words: words(r'분명하다 흐릿하다 영원하다 덧없다'),
       forms: <PredicateForm, WordPool>{
-        PredicateForm.question: words(r'분명하니|분명한가 흐릿하니|흐릿한가 영원하니|영원한가 덧없으니|덧없는가'),
+        PredicateForm.question: words(r'분명하니|분명한가 흐릿하니|흐릿한가 영원하니|영원한가 덧없니|덧없는가'),
         PredicateForm.exclamation: words(
           r'분명하구나|분명하네|분명하군 흐릿하구나|흐릿하네|흐릿하군 영원하구나|영원하네|영원하군 덧없구나|덧없네|덧없군',
         ),
@@ -1427,7 +1427,7 @@ final SentenceLanguageData ko = SentenceLanguageData(
       subjectThemes: const <WordTheme>[WordTheme.concept, WordTheme.tech, WordTheme.finance],
       words: words(r'어렵다 쉽다'),
       forms: <PredicateForm, WordPool>{
-        PredicateForm.question: words(r'어려우니|어려운가 쉬우니|쉬운가'),
+        PredicateForm.question: words(r'어렵니|어려운가 쉽니|쉬운가'),
         PredicateForm.exclamation: words(r'어렵구나|어렵네|어렵군 쉽구나|쉽네|쉽군'),
         PredicateForm.casual: words(r'어려워 쉬워'),
         PredicateForm.casualQuestion: words(r'어려워|어렵지 쉬워|쉽지'),
@@ -1460,7 +1460,7 @@ final SentenceLanguageData ko = SentenceLanguageData(
       subject: const <NounClass>[NounClass.plant],
       words: words(r'푸르다 무성하다 향기롭다 시들하다'),
       forms: <PredicateForm, WordPool>{
-        PredicateForm.question: words(r'푸르니|푸른가 무성하니|무성한가 향기로우니|향기로운가 시들하니|시들한가'),
+        PredicateForm.question: words(r'푸르니|푸른가 무성하니|무성한가 향기롭니|향기로운가 시들하니|시들한가'),
         PredicateForm.exclamation: words(
           r'푸르구나|푸르네|푸르군 무성하구나|무성하네|무성하군 향기롭구나|향기롭네|향기롭군 시들하구나|시들하네|시들하군',
         ),
@@ -1477,7 +1477,7 @@ final SentenceLanguageData ko = SentenceLanguageData(
       subject: const <NounClass>[NounClass.body],
       words: words(r'따뜻하다 차갑다 아프다 뻣뻣하다'),
       forms: <PredicateForm, WordPool>{
-        PredicateForm.question: words(r'따뜻하니|따뜻한가 차가우니|차가운가 아프니|아픈가 뻣뻣하니|뻣뻣한가'),
+        PredicateForm.question: words(r'따뜻하니|따뜻한가 차갑니|차가운가 아프니|아픈가 뻣뻣하니|뻣뻣한가'),
         PredicateForm.exclamation: words(
           r'따뜻하구나|따뜻하네|따뜻하군 차갑구나|차갑네|차갑군 아프구나|아프네|아프군 뻣뻣하구나|뻣뻣하네|뻣뻣하군',
         ),
