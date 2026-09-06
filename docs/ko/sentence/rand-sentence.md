@@ -52,6 +52,8 @@ rand_sentence()
 | `slots` | <Lang js="SentenceSlotOption" dart="Set&lt;SentenceSlot&gt;?" py="SentenceSlotOption" code /> | <Lang js="'all'" dart="null" py="&quot;all&quot;" code /> | 주어 옆에 무엇을 두는지. [형태 고르기](#picking-the-shape), [수량과 금액](#counting-and-money), [날짜와 시각](#a-day-and-a-time) 참고. |
 | `include` | <Lang js="string &#124; string[]" dart="List&lt;String&gt;" py="str &#124; Sequence[str]" code /> | <Lang js="—" dart="const []" py="()" code /> | 모든 문장에 반드시 들어가야 할 단어. [반드시 넣을 단어](#words-it-has-to-contain) 참고. |
 | `sentences` | <Lang js="number" dart="int" py="int" code /> | `1` | 결과 하나에 담을 문장 수. [한 결과에 여러 문장](#more-than-one-sentence) 참고. |
+| `tense` | <Lang js="SentenceTense" dart="SentenceTense?" py="SentenceTense &#124; None" code /> | 무작위 | 언제 일어난 일인지. [시제](#tense) 참고. |
+| `story` | <Lang js="SentenceStory" dart="SentenceStory?" py="SentenceStory &#124; None" code /> | 무작위 | 여러 문장짜리 결과가 어떤 이야기를 따를지. [한 결과에 여러 문장](#more-than-one-sentence) 참고. |
 | <Lang js="includeName" dart="includeName" py="include_name" code /> | <Lang js="boolean" dart="bool" py="bool" code /> | 무작위 | 사람이 설 자리에 사람 이름을 씁니다. [사람 이름](#a-persons-name) 참고. |
 | `count` | <Lang js="number" dart="int" py="int" code /> | `1` | 돌려줄 문장 개수. `0` … `10000`으로 제한됩니다. |
 | `realism` | `RandRealism` | <Lang js="`'real'`" dart="`RandRealism.real`" py="`\"real\"`" /> | `real`은 실제 단어를, `invented`는 그 언어처럼 읽히기만 하는 단어를 씁니다. `mixed`는 단어마다 정합니다. 문법은 어느 쪽이든 실제 그대로입니다. |
@@ -270,6 +272,48 @@ rand_sentence(language="de", slots="object", count=3)
 :::
 
 언어를 지정하지 않으면 답할 수 있는 언어가 그렇지 못한 언어보다 먼저 뽑힙니다.
+
+### 어디로 가는지 {#destination}
+
+`destination`은 주어가 향하는 곳이며, 어디론가 가는 동사만 이 구를 받습니다. `향한다`, `들어선다`, `heads to`, `gets back to`는 받고, `leaves to the market` 같은 문장은 나오지 않습니다. 이야기에서 주인공이 나설 때와 집에 돌아올 때 쓰는 구입니다.
+
+::: lang js
+
+```javascript
+randSentence({ language: 'en', slots: 'destination', count: 2 });
+// ['The brewer heads back to the terminal gently.', 'The stonemason gets back to the shadow.']
+
+randSentence({ language: 'ko', slots: 'destination', count: 2 });
+// ['새해에 나이아드가 복도로 향한다.', '타조가 외딴 싱크홀에 들어선다.']
+```
+
+:::
+
+::: lang dart
+
+```dart
+randSentence(language: WordLanguage.en, slots: {SentenceSlot.destination}, count: 2);
+// [The brewer heads back to the terminal gently., The stonemason gets back to the shadow.]
+
+randSentence(language: WordLanguage.ko, slots: {SentenceSlot.destination}, count: 2);
+// [새해에 나이아드가 복도로 향한다., 타조가 외딴 싱크홀에 들어선다.]
+```
+
+:::
+
+::: lang py
+
+```python
+rand_sentence(language="en", slots="destination", count=2)
+# ['The brewer heads back to the terminal gently.', 'The stonemason gets back to the shadow.']
+
+rand_sentence(language="ko", slots="destination", count=2)
+# ['새해에 나이아드가 복도로 향한다.', '타조가 외딴 싱크홀에 들어선다.']
+```
+
+:::
+
+한국어는 여기서도 앞말에 따라 조사를 고릅니다. `복도로`와 `서울로`, 그리고 `ㄹ` 아닌 받침 뒤에는 `시장으로`입니다. 독일어와 러시아어는 목적어와 장소가 없는 것과 같은 이유로 목적지 형태도 선언하지 않습니다.
 
 ## 수량과 금액 {#counting-and-money}
 
@@ -761,19 +805,75 @@ rand_sentence(language="ru", type="thought", quote="double")
 
 인용 표지는 붙지 않습니다. `…라고 그는 말했다`를 쓰려면 말한 사람과 말하는 동사가 있어야 하는데, 사람은 [`includeName`](#a-persons-name)이 붙여 주지만 말하는 동사는 아홉 언어 어느 풀에도 없습니다. 돌려받는 것은 대사 자체이고, 누가 말했는지는 담기지 않습니다.
 
+## 시제 {#tense}
+
+`tense`는 언제 일어난 일인지를 정합니다. <Lang js="'present'" dart="SentenceTense.present" py="&quot;present&quot;" code /> 또는 <Lang js="'past'" dart="SentenceTense.past" py="&quot;past&quot;" code />입니다. 지정하지 않으면 결과마다 뽑으므로, 한 문단은 첫 문장부터 마지막 문장까지 한 시제로 쓰입니다.
+
+::: lang js
+
+```javascript
+randSentence({ language: 'en', tense: 'past', count: 3 });
+// ['The prosecutor looked around.', 'The impala missed 500 dollars.', '“Was the karst dark?”']
+
+randSentence({ language: 'ko', tense: 'past', count: 3 });
+// ['친절한 약사는 뿌듯했다.', '가벼운 무인기가 달렸다.', '아침에 게으른 좀비가 신선한 온수를 마셨다.']
+```
+
+:::
+
+::: lang dart
+
+```dart
+randSentence(language: WordLanguage.en, tense: SentenceTense.past, count: 3);
+// [The prosecutor looked around., The impala missed 500 dollars., “Was the karst dark?”]
+
+randSentence(language: WordLanguage.ko, tense: SentenceTense.past, count: 3);
+// [친절한 약사는 뿌듯했다., 가벼운 무인기가 달렸다., 아침에 게으른 좀비가 신선한 온수를 마셨다.]
+```
+
+:::
+
+::: lang py
+
+```python
+rand_sentence(language="en", tense="past", count=3)
+# ['The prosecutor looked around.', 'The impala missed 500 dollars.', '“Was the karst dark?”']
+
+rand_sentence(language="ko", tense="past", count=3)
+# ['친절한 약사는 뿌듯했다.', '가벼운 무인기가 달렸다.', '아침에 게으른 좀비가 신선한 온수를 마셨다.']
+```
+
+:::
+
+과거형은 언어마다 자기 문법대로 씁니다. 규칙으로 추측하지 않고 단어 풀에 형태를 직접 담아 둡니다.
+
+| 언어 | 무엇이 바뀌는지 | 예 |
+| --- | --- | --- |
+| `en` | 동사, 그리고 의문문의 조동사 | `The lion ran.`, `Did the lion run?` |
+| `ko` `ja` | 어미. 모든 화계에서 바뀝니다 | `달렸다`, `달렸어요`, `走った`, `走りました` |
+| `es` `it` | 동사. 형용사는 그대로 두고 앞의 동사(copula)가 바뀝니다 | `El cochero guardó la pantufla.`, `Il carro scivolò.` |
+| `de` | 동사 | `Ein Smoothie kochte.` |
+| `ru` | 동사. 주어의 성에 따라 일치합니다 | `Берёза тянулась.`, `Паланкин скользил.` |
+| `zh` | 동사는 그대로, 뒤에 `了`를 씁니다 | `峡谷悄悄地沉寂了。` |
+| `vi` | 동사는 그대로, 앞에 `đã`를 씁니다 | `Đại bàng đã tìm quanh.` |
+
+시간 부사어도 시제를 따릅니다. `어제`와 `yesterday`는 과거 문장만 열고, `내일`과 `tomorrow`는 현재 문장만 열며, 하루의 때는 어느 쪽에도 옵니다.
+
+`include`에 서술형으로 적은 단어는 의문문으로 옮기듯 과거형으로도 옮깁니다. `include: '달린다'`에 `tense: 'past'`를 주면 `달렸다`가 쓰이고, `include: 'runs'`는 `ran`이 됩니다. 결과가 어느 시제로 쓰였는지는 `SentenceDetail.tense`가 알려 줍니다.
+
 ## 한 결과에 여러 문장 {#more-than-one-sentence}
 
-`sentences`는 결과 하나에 문장을 여러 개 담습니다. 결과는 문자열 하나이고, 문자열이 몇 개인지는 `count`가 정합니다. 담기는 문장들은 따로 뽑은 것이 아니라 같은 화제를 이어 가는 이야기입니다.
+`sentences`는 결과 하나에 문장을 여러 개 담습니다. 결과는 문자열 하나이고, 문자열이 몇 개인지는 `count`가 정합니다. 담기는 문장들은 따로 뽑은 것이 아니라 하나의 짧은 이야기입니다.
 
 ::: lang js
 
 ```javascript
 randSentence({ language: 'en', sentences: 3, count: 2 });
-// ['Tomorrow, the gentle shepherd stretches. The juggler guards the wild coda. But the cheerful miner walks softly.',
-//  'The temperance remains in the avalanche. Later the temperance gathers. It lingers once more.']
+// ['On weekends, the barkeep went to the empty hallway. The barkeep bought the sushi in the hallway. The barkeep came back to the cottage.',
+//  'The cathedral brightens. The strange botanist comes back to the pavilion and nods off. At dawn, the cathedral fills up.']
 
 randSentence({ language: 'ko', sentences: 3 });
-// ['수상한 단술이 익는다. 하지만 옅은 단술이 식는다. 순진한 단술이 식는다.']
+// ['신비한 항해사가 옥상으로 향했다. 고요한 옥상에서 묵묵히 향긋한 미트볼을 사왔다. 집에 들어섰다.']
 ```
 
 :::
@@ -782,11 +882,11 @@ randSentence({ language: 'ko', sentences: 3 });
 
 ```dart
 randSentence(language: WordLanguage.en, sentences: 3, count: 2);
-// [Tomorrow, the gentle shepherd stretches. The juggler guards the wild coda. But the cheerful miner walks softly.,
-//  The temperance remains in the avalanche. Later the temperance gathers. It lingers once more.]
+// [On weekends, the barkeep went to the empty hallway. The barkeep bought the sushi in the hallway. The barkeep came back to the cottage.,
+//  The cathedral brightens. The strange botanist comes back to the pavilion and nods off. At dawn, the cathedral fills up.]
 
 randSentence(language: WordLanguage.ko, sentences: 3);
-// [수상한 단술이 익는다. 하지만 옅은 단술이 식는다. 순진한 단술이 식는다.]
+// [신비한 항해사가 옥상으로 향했다. 고요한 옥상에서 묵묵히 향긋한 미트볼을 사왔다. 집에 들어섰다.]
 ```
 
 :::
@@ -795,20 +895,75 @@ randSentence(language: WordLanguage.ko, sentences: 3);
 
 ```python
 rand_sentence(language="en", sentences=3, count=2)
-# ['Tomorrow, the gentle shepherd stretches. The juggler guards the wild coda. But the cheerful miner walks softly.',
-#  'The temperance remains in the avalanche. Later the temperance gathers. It lingers once more.']
+# ['On weekends, the barkeep went to the empty hallway. The barkeep bought the sushi in the hallway. The barkeep came back to the cottage.',
+#  'The cathedral brightens. The strange botanist comes back to the pavilion and nods off. At dawn, the cathedral fills up.']
 
 rand_sentence(language="ko", sentences=3)
-# ['수상한 단술이 익는다. 하지만 옅은 단술이 식는다. 순진한 단술이 식는다.']
+# ['신비한 항해사가 옥상으로 향했다. 고요한 옥상에서 묵묵히 향긋한 미트볼을 사왔다. 집에 들어섰다.']
 ```
 
 :::
 
-화제는 첫 문장이 정합니다. 뒤따르는 문장은 그 주어를 다시 부르거나, 그 자리에 대명사를 세우거나, 같은 부류의 다른 명사를 뽑습니다. 생물로 시작한 문단이 중간에 개념으로 새지 않는다는 뜻입니다. 접속사(`But`, `하지만`, `そして`)로 시작하기도 합니다.
+문장들은 **이야기**를 따릅니다. 주인공 한 명에게 일어나는 일을 앞뒤가 맞는 순서로 적는 것입니다. 이야기의 각 단계는 그 전에 주인공이 어떤 상태여야 하고 그 뒤에 어떤 상태가 되는지를 적어 두므로, 먹을 것을 구하기 전에 먹는 일도, 나갔다가 돌아오지 않고 잠드는 일도 없습니다. 이야기에 꼭 필요한 단계는 언제나 들어가고, 나머지는 남은 문장 수만큼 채우며, 들어갈 자리가 없는 단계는 억지로 넣지 않고 뺍니다.
+
+| 이야기    | 무슨 일이 일어나는지                                                       |
+| --------- | -------------------------------------------------------------------------- |
+| `errand`  | 주인공이 어딘가로 가서 먹을 것을 사거나 찾고, 집에 가져와 먹습니다.        |
+| `meal`    | 주인공이 배고파서 먹을 것을 꺼내 먹고 배가 찹니다.                         |
+| `search`  | 주인공이 어딘가를 살펴 물건을 찾아내고, 집에 가져와 간직합니다.            |
+| `outing`  | 주인공이 일어나 밖으로 나가 하루를 보내고, 지쳐 돌아와 쉽니다.             |
+| `craft`   | 사람이 물건을 만들어 손질하고, 팔거나 건네고 만족합니다.                   |
+| `stroll`  | 주인공이 어딘가로 가서 거닐다 집에 돌아옵니다.                             |
+| `evening` | 장소가 조용해지고, 주인공이 집에 돌아와 먹고, 피곤해져 잠듭니다.           |
+| `passage` | 사물이나 식물이나 장소가 하루 동안 변해 가고, 아무도 무엇을 하지 않습니다. |
+
+`story`는 이 가운데 하나를 지정합니다. 지정하지 않으면 요청한 주어에 대해 그 언어가 들려줄 수 있는 이야기 중에서 뽑습니다. 주인공이 누구인지는 `theme`이 정하므로 `theme: 'animal'`은 사자 이야기가 되고, `theme: 'plant'`는 `passage`만 될 수 있습니다. 독일어와 러시아어는 목적어가 있는 형태를 선언하지 않으므로 주인공이 아무것도 들지 않는 이야기만 들려줍니다. `stroll`, `outing`, `evening`, `passage`입니다. 문장 하나짜리 결과는 이야기가 없고, 여러 문장짜리 결과가 어느 이야기를 따랐는지는 `SentenceDetail.story`가 알려 줍니다.
+
+::: lang js
+
+```javascript
+randSentence({ language: 'ko', sentences: 4, story: 'errand', tense: 'past' });
+// ['낙타가 터미널로 갔다. 게다가 고요한 터미널에서 사뿐히 신선한 냉면을 봤다. 얼마뒤 냉면을 꺼내고 부리나케 집에 다다랐다. 한낮에 냉면을 먹었다.']
+
+randSentence({ language: 'en', sentences: 4, story: 'meal', includeName: true });
+// ['Zoe was starving. Therefore she picked the crisp ceviche. She nibbled the crisp ceviche alone. In the morning, she shouted.']
+```
+
+:::
+
+::: lang dart
+
+```dart
+randSentence(language: WordLanguage.ko, sentences: 4, story: SentenceStory.errand, tense: SentenceTense.past);
+// [낙타가 터미널로 갔다. 게다가 고요한 터미널에서 사뿐히 신선한 냉면을 봤다. 얼마뒤 냉면을 꺼내고 부리나케 집에 다다랐다. 한낮에 냉면을 먹었다.]
+
+randSentence(language: WordLanguage.en, sentences: 4, story: SentenceStory.meal, includeName: true);
+// [Zoe was starving. Therefore she picked the crisp ceviche. She nibbled the crisp ceviche alone. In the morning, she shouted.]
+```
+
+:::
+
+::: lang py
+
+```python
+rand_sentence(language="ko", sentences=4, story="errand", tense="past")
+# ['낙타가 터미널로 갔다. 게다가 고요한 터미널에서 사뿐히 신선한 냉면을 봤다. 얼마뒤 냉면을 꺼내고 부리나케 집에 다다랐다. 한낮에 냉면을 먹었다.']
+
+rand_sentence(language="en", sentences=4, story="meal", include_name=True)
+# ['Zoe was starving. Therefore she picked the crisp ceviche. She nibbled the crisp ceviche alone. In the morning, she shouted.']
+```
+
+:::
+
+이야기가 한 번 꺼낸 것은 끝까지 그대로입니다. 주인공이 찾은 물건이 집에 가져와 먹는 물건이고, 간 곳이 둘러보는 곳이며, 집은 집입니다. 뒤 문장은 관사와 수식어를 새로 쓰므로 `안개 나루터에서`가 `나루터에서`가 되기는 해도 `금고에서`가 되지는 않습니다. 주인공은 첫 문장에서 이름을 부르고, 그 뒤로는 문단이 주어를 가리키는 방식대로 다시 부르거나 대명사를 세우거나, 주어를 생략하는 언어라면 생략합니다. 주어가 주인공이 아닌 문장은 장면이 바뀌는 문장 하나입니다. `우체국이 서서히 조용해졌다.`, `The cathedral brightens.`처럼 이야기가 벌어지는 장소가 주어가 됩니다.
+
+하루는 앞으로만 흐릅니다. `새벽에`로 연 이야기는 `아침에`나 `한낮에`로 이어지고 다시 새벽으로 돌아가지 않으며, 부르는 때와 때 사이는 하루가 아니라 몇 시간입니다.
+
+이웃한 두 단계는 때로 한 문장이 됩니다. 뒤 절은 주어 없이 씁니다. `사원에서 멈춰서고 천천히 집에 들어섰다`, `The broker heads back to the cottage and leans warily`, `記念館へ下りる。のんびり家に帰り着いてさらりともたれる。`처럼 됩니다. 두 절을 어떻게 잇는지는 언어가 선언합니다. 한국어는 앞 동사의 `-고`, 영어는 `and`, 일본어는 `-て`이고, 독일어는 선언하지 않아 절을 잇지 않습니다. 이음새도 다른 요소와 같이 길이 범위에서 값을 치르므로, 좁은 범위에서는 짧은 두 문장이 되고 넓은 범위에서는 긴 한 문장이 됩니다.
 
 주어가 사람 이름일 때는 다릅니다. 민준으로 시작한 문단은 이름을 다시 부르거나 그 자리에 대명사를 세울 뿐, 같은 부류의 다른 사람을 뽑지 않습니다. 그랬다가는 문단이 도중에 다른 사람 이야기가 되기 때문입니다.
 
-장면도 유지합니다. 첫 문장이 부른 장소에서 나머지 문장이 벌어지고, 다루던 사물도 그대로 이어집니다. 뒤 문장은 관사와 수식어를 새로 쓰므로 `안개 나루터에서`가 `나루터에서`가 되기는 해도 `금고에서`가 되지는 않습니다.
+수식어는 꾸미는 명사에 맞게 고릅니다. 음료는 `뜨거운`, `맑은`, `향긋한`이고 정비사는 `친절한`이나 `조용한`이어서, `맑은 정비사`나 `the patient tea`는 나오지 않습니다. 이야기 안에서만이 아니라 문장 하나에서도 그렇습니다.
 
 어투도 처음 것을 지킵니다. 서술로 연 문단에는 대사가 섞이지 않고, 인용으로 연 문단은 대사 사이에 서술이 들어갑니다. 한 사람이 내리 네 마디를 하면 그동안 벌어진 일이 통째로 빠지기 때문입니다. 사이에 들어가는 서술은 묻지 않고 말합니다. 물으면 두 사람뿐인 장면에 제3의 목소리가 끼어들게 됩니다.
 
@@ -819,7 +974,9 @@ rand_sentence(language="ko", sentences=3)
 | 하나 더       | `그리고`, `게다가`   | `and then`, `besides` | `そして`, `また`     |
 | 시간이 흘렀다 | `이윽고`, `마침내`   | `meanwhile`, `later`  | `やがて`, `その後`   |
 | 그것과 반대   | `하지만`, `그러나`   | `but`, `however`      | `しかし`, `けれども` |
-| 그래서        | `그래서`, `그러므로` | `so`, `therefore`     | `だから`, `つまり`   |
+| 그래서        | `그래서`, `그러므로` | `so`, `therefore`     | `だから`, `そこで`   |
+
+이야기에서는 접속사를 이야기가 고릅니다. 먹을 것을 찾은 뒤에 먹는 것처럼 앞 단계에서 비롯되는 단계는 `그래서`나 `so`로 열 수 있고, 그저 다음에 오는 단계는 `이윽고`나 `later`로 열거나 아무것도 없이 시작합니다.
 
 언어는 자기가 쓸 수 있는 종류만 선언합니다. 독일어에는 시간을 나타내는 접속사가 없습니다. `dann`과 `danach`는 부사인데, 부사가 첫 자리에 서면 정동사가 자리를 옮기므로 절을 열 수 있는 것은 등위접속사 다섯 개뿐입니다.
 
@@ -835,7 +992,7 @@ rand_sentence(language="ko", sentences=3)
 
 ```javascript
 randSentence({ language: 'ko', sentences: 3, minLength: 40, maxLength: 55 });
-// ['반달이 함께 깊어진다. 그리고 별똥별이 역에서 물든다. 아침에 그것이 조용해진다.'] // 45자
+// ['집사가 골방으로 향했다. 그러자 어두운 골방에서 물을 샀다. 집사가 집에 들어왔다.'] // 44자
 ```
 
 :::
@@ -844,7 +1001,7 @@ randSentence({ language: 'ko', sentences: 3, minLength: 40, maxLength: 55 });
 
 ```dart
 randSentence(language: WordLanguage.ko, sentences: 3, minLength: 40, maxLength: 55);
-// [반달이 함께 깊어진다. 그리고 별똥별이 역에서 물든다. 아침에 그것이 조용해진다.] // 45자
+// [집사가 골방으로 향했다. 그러자 어두운 골방에서 물을 샀다. 집사가 집에 들어왔다.] // 44자
 ```
 
 :::
@@ -853,7 +1010,7 @@ randSentence(language: WordLanguage.ko, sentences: 3, minLength: 40, maxLength: 
 
 ```python
 rand_sentence(language="ko", sentences=3, min_length=40, max_length=55)
-# ['반달이 함께 깊어진다. 그리고 별똥별이 역에서 물든다. 아침에 그것이 조용해진다.']  # 45자
+# ['집사가 골방으로 향했다. 그러자 어두운 골방에서 물을 샀다. 집사가 집에 들어왔다.']  # 44자
 ```
 
 :::
@@ -954,7 +1111,7 @@ rand_sentence(language="en", theme="animal", include_name=True, count=2)
 
 ## 상세 출력 {#the-detail-output}
 
-`output: 'detail'`은 문자열 대신 각 문장을 이루는 요소를 알려 줍니다. 구를 순서대로, 각 구가 하는 일, 언어, 그리고 주어의 테마입니다.
+`output: 'detail'`은 문자열 대신 각 문장을 이루는 요소를 알려 줍니다. 구를 순서대로, 각 구가 하는 일, 시제, 이야기, 언어, 그리고 주어의 테마입니다.
 
 ::: lang dart
 
@@ -971,6 +1128,10 @@ randSentence({ language: 'ko', output: 'detail', count: 1 });
 //   sentences: ['그리핀이 자줏빛 숲에서 총명한 고량주를 삼킨다.'],
 //   phrases: ['그리핀', '자줏빛 숲', '총명한 고량주', '삼킨다'],
 //   slots: ['subject', 'place', 'object', 'verb'],
+//   names: [],
+//   types: ['statement'],
+//   tense: 'present',
+//   story: null,
 //   language: 'ko',
 //   theme: 'myth'
 // }]
@@ -998,6 +1159,7 @@ rand_sentence(language="ko", output="detail", count=1)
 #                 sentences=('그리핀이 자줏빛 숲에서 총명한 고량주를 삼킨다.',),
 #                 phrases=('그리핀', '자줏빛 숲', '총명한 고량주', '삼킨다'),
 #                 slots=('subject', 'place', 'object', 'verb'),
+#                 names=(), types=('statement',), tense='present', story=None,
 #                 language='ko', theme='myth')]
 ```
 
@@ -1011,8 +1173,10 @@ rand_sentence(language="ko", output="detail", count=1)
 | `slots` | <Lang js="SentenceSlot[]" dart="List&lt;SentenceSlot&gt;" py="tuple[SentenceSlot, ...]" code /> | 각 구가 하는 일. `phrases`와 같은 인덱스입니다. |
 | `names` | <Lang js="string[]" dart="List&lt;String&gt;" py="tuple[str, ...]" code /> | 결과에 쓰인 사람 이름을 순서대로. `includeName`으로 요청하지 않았다면 비어 있습니다. |
 | `types` | <Lang js="SentenceType[]" dart="List&lt;SentenceType&gt;" py="tuple[SentenceType, ...]" code /> | 각 문장이 무엇을 하는지. `sentences`와 같은 자리입니다. |
+| `tense` | `SentenceTense` | 언제 일어난 일인지. 결과 전체가 한 시제입니다. |
+| `story` | <Lang js="SentenceStory &#124; null" dart="SentenceStory?" py="SentenceStory &#124; None" code /> | 여러 문장짜리 결과가 따른 이야기. 문장 하나짜리 결과에서는 null입니다. |
 | `language` | `WordLanguage` | 이 문장을 만든 언어. |
-| `theme` | <Lang js="WordTheme &#124; null" dart="WordTheme?" py="WordTheme &#124; None" code /> | 주어의 테마. 첫 문장의 것이고, 나머지 문장이 계속 이야기하는 대상입니다. 생성기가 모르는 단어면 null입니다. |
+| `theme` | <Lang js="WordTheme &#124; null" dart="WordTheme?" py="WordTheme &#124; None" code /> | 주어의 테마. 이야기에서는 주인공의 테마이고, 그 밖에는 첫 문장의 것으로 나머지 문장이 계속 이야기하는 대상입니다. 생성기가 모르는 단어면 null이며, 사람 이름도 그렇습니다. |
 
 `phrases`에는 구만 들어 있습니다. 구를 표시하는 조사나 전치사는 `sentence`에만 있으므로, `그리핀이 …`는 `그리핀`으로 보고되고 구를 다시 이어 붙여도 원래 문장이 되지 않습니다. 완성된 문자열은 `sentence`에서, 문장을 이루는 요소는 `phrases`에서 읽으면 됩니다.
 

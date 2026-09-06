@@ -59,6 +59,16 @@ So a narrow range drops a modifier rather than truncating a word, and a wide one
 
 So the vocabulary of `수줍은 노오가 안개 파저멜을 챙긴다.` is not Korean, while its grammar is.
 
+## What a paragraph follows {#a-story}
+
+A result of more than one sentence follows a **story**, and a story is a list of steps. Each step names what the hero does, or what is true of them, and what has to hold before it: `eat` needs the hero to be holding something, `go` needs them awake and leaves them away from home, `arrive` brings them back. A planner walks the steps against those conditions, keeps the ones the story cannot do without, fills the remaining sentences with the optional ones, and drops a step that would contradict what came before it.
+
+So `여우가 시장으로 갔다. 사과를 샀다. 집에 들어와서 사과를 먹었다.` is a story the generator can tell and `여우가 사과를 먹었다. 사과를 샀다.` is not: nobody eats what they have not yet got.
+
+Three things follow from a step being a step rather than a sentence. The verb of each sentence is drawn from the **field** the step names, `buy`, `eat`, `arrive`, so the sentence says what the step says. The nouns a step puts on the page, the thing and the place, are pinned into every step after it. And two neighbouring steps may be written as one sentence, joined the way the language joins two clauses, where the range has room for both.
+
+`randSentence` [describes the stories](./rand-sentence#more-than-one-sentence), and `tense` on the same page is what a story is told in.
+
 ## Where a sentence differs from a nickname
 
 [`randNickname`](../nickname/rand-nickname) puts words beside each other; a sentence says something about one of them. Three things follow:

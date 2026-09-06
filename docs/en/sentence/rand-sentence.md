@@ -52,6 +52,8 @@ Every option is optional, and the defaults are what the empty call above uses.
 | `slots` | <Lang js="SentenceSlotOption" dart="Set&lt;SentenceSlot&gt;?" py="SentenceSlotOption" code /> | <Lang js="'all'" dart="null" py="&quot;all&quot;" code /> | Which parts it carries beside the subject. See [Picking the shape](#picking-the-shape), [Counting, and money](#counting-and-money) and [A day and a time](#a-day-and-a-time). |
 | `include` | <Lang js="string &#124; string[]" dart="List&lt;String&gt;" py="str &#124; Sequence[str]" code /> | <Lang js="—" dart="const []" py="()" code /> | Words every sentence has to contain. See [Words it has to contain](#words-it-has-to-contain). |
 | `sentences` | <Lang js="number" dart="int" py="int" code /> | `1` | How many sentences one result holds. See [More than one sentence](#more-than-one-sentence). |
+| `tense` | <Lang js="SentenceTense" dart="SentenceTense?" py="SentenceTense &#124; None" code /> | drawn | When it happened. See [When it happened](#tense). |
+| `story` | <Lang js="SentenceStory" dart="SentenceStory?" py="SentenceStory &#124; None" code /> | drawn | Which story a result of several sentences tells. See [More than one sentence](#more-than-one-sentence). |
 | <Lang js="includeName" dart="includeName" py="include_name" code /> | <Lang js="boolean" dart="bool" py="bool" code /> | drawn | Write a person's name where the sentence has room for one. See [A person's name](#a-persons-name). |
 | `count` | <Lang js="number" dart="int" py="int" code /> | `1` | How many sentences to return. Clamped to `0` … `10000`. |
 | `realism` | `RandRealism` | <Lang js="`'real'`" dart="`RandRealism.real`" py="`\"real\"`" /> | `real` uses real words, `invented` builds words that only read like the language, and `mixed` decides per word. The grammar stays real either way. |
@@ -270,6 +272,48 @@ rand_sentence(language="de", slots="object", count=3)
 :::
 
 With no language named, the ones that can answer are preferred over the ones that cannot.
+
+### Going somewhere {#destination}
+
+`destination` is where the subject is going, and only a verb that goes somewhere takes one: `heads to`, `gets back to`, `향한다`, `들어선다`, never `leaves to the market`. It is the part a story writes when its hero sets out and when they come home.
+
+::: lang js
+
+```javascript
+randSentence({ language: 'en', slots: 'destination', count: 2 });
+// ['The brewer heads back to the terminal gently.', 'The stonemason gets back to the shadow.']
+
+randSentence({ language: 'ko', slots: 'destination', count: 2 });
+// ['새해에 나이아드가 복도로 향한다.', '타조가 외딴 싱크홀에 들어선다.']
+```
+
+:::
+
+::: lang dart
+
+```dart
+randSentence(language: WordLanguage.en, slots: {SentenceSlot.destination}, count: 2);
+// [The brewer heads back to the terminal gently., The stonemason gets back to the shadow.]
+
+randSentence(language: WordLanguage.ko, slots: {SentenceSlot.destination}, count: 2);
+// [새해에 나이아드가 복도로 향한다., 타조가 외딴 싱크홀에 들어선다.]
+```
+
+:::
+
+::: lang py
+
+```python
+rand_sentence(language="en", slots="destination", count=2)
+# ['The brewer heads back to the terminal gently.', 'The stonemason gets back to the shadow.']
+
+rand_sentence(language="ko", slots="destination", count=2)
+# ['새해에 나이아드가 복도로 향한다.', '타조가 외딴 싱크홀에 들어선다.']
+```
+
+:::
+
+Korean picks the particle by the word in front of it here too: `복도로` but `서울로`, and `시장으로` after a consonant other than `ㄹ`. German and Russian declare no destination shape, for the same reason they declare no object and no place.
 
 ## Counting and money {#counting-and-money}
 
@@ -788,19 +832,75 @@ rand_sentence(language="ru", type="thought", quote="double")
 
 There is no speech tag. `…라고 그는 말했다` needs a speaker, which [`includeName`](#a-persons-name) has, and a verb of speaking, which none of the nine languages' pools hold. What you get is the line, not who said it.
 
+## When it happened {#tense}
+
+`tense` says when it happened: <Lang js="'present'" dart="SentenceTense.present" py="&quot;present&quot;" code /> or <Lang js="'past'" dart="SentenceTense.past" py="&quot;past&quot;" code />. Left out, it is drawn per result, so a paragraph is told in one tense from its first sentence to its last.
+
+::: lang js
+
+```javascript
+randSentence({ language: 'en', tense: 'past', count: 3 });
+// ['The prosecutor looked around.', 'The impala missed 500 dollars.', '“Was the karst dark?”']
+
+randSentence({ language: 'ko', tense: 'past', count: 3 });
+// ['친절한 약사는 뿌듯했다.', '가벼운 무인기가 달렸다.', '아침에 게으른 좀비가 신선한 온수를 마셨다.']
+```
+
+:::
+
+::: lang dart
+
+```dart
+randSentence(language: WordLanguage.en, tense: SentenceTense.past, count: 3);
+// [The prosecutor looked around., The impala missed 500 dollars., “Was the karst dark?”]
+
+randSentence(language: WordLanguage.ko, tense: SentenceTense.past, count: 3);
+// [친절한 약사는 뿌듯했다., 가벼운 무인기가 달렸다., 아침에 게으른 좀비가 신선한 온수를 마셨다.]
+```
+
+:::
+
+::: lang py
+
+```python
+rand_sentence(language="en", tense="past", count=3)
+# ['The prosecutor looked around.', 'The impala missed 500 dollars.', '“Was the karst dark?”']
+
+rand_sentence(language="ko", tense="past", count=3)
+# ['친절한 약사는 뿌듯했다.', '가벼운 무인기가 달렸다.', '아침에 게으른 좀비가 신선한 온수를 마셨다.']
+```
+
+:::
+
+Every language writes the past the way its own grammar does, and the pools hold the forms rather than a rule guessing at them.
+
+| Language | What changes | Example |
+| --- | --- | --- |
+| `en` | the verb, and the auxiliary of a question | `The lion ran.`, `Did the lion run?` |
+| `ko` `ja` | the ending, at every speech level | `달렸다`, `달렸어요`, `走った`, `走りました` |
+| `es` `it` | the verb; an adjective keeps its form and the copula moves instead | `El cochero guardó la pantufla.`, `Il carro scivolò.` |
+| `de` | the verb | `Ein Smoothie kochte.` |
+| `ru` | the verb, which then agrees with the subject's gender | `Берёза тянулась.`, `Паланкин скользил.` |
+| `zh` | nothing on the verb; `了` is written after it | `峡谷悄悄地沉寂了。` |
+| `vi` | nothing on the verb; `đã` is written before it | `Đại bàng đã tìm quanh.` |
+
+A time adverbial follows the tense too. `yesterday` and `어제` only open a past sentence, `tomorrow` and `내일` only a present one, and the phases of the day go with either.
+
+A word `include` named in its statement form is translated into the past the same way it is translated into a question: `include: '달린다'` with `tense: 'past'` writes `달렸다`, and `include: 'runs'` writes `ran`. `SentenceDetail.tense` reports which tense a result was written in.
+
 ## More than one sentence {#more-than-one-sentence}
 
-`sentences` puts more than one sentence in one result. They come back as a single string, `count` is still how many strings there are, and they are about the same thing rather than being that many separate draws.
+`sentences` puts more than one sentence in one result. They come back as a single string, `count` is still how many strings there are, and they tell one short story rather than being that many separate draws.
 
 ::: lang js
 
 ```javascript
 randSentence({ language: 'en', sentences: 3, count: 2 });
-// ['Tomorrow, the gentle shepherd stretches. The juggler guards the wild coda. But the cheerful miner walks softly.',
-//  'The temperance remains in the avalanche. Later the temperance gathers. It lingers once more.']
+// ['On weekends, the barkeep went to the empty hallway. The barkeep bought the sushi in the hallway. The barkeep came back to the cottage.',
+//  'The cathedral brightens. The strange botanist comes back to the pavilion and nods off. At dawn, the cathedral fills up.']
 
 randSentence({ language: 'ko', sentences: 3 });
-// ['수상한 단술이 익는다. 하지만 옅은 단술이 식는다. 순진한 단술이 식는다.']
+// ['신비한 항해사가 옥상으로 향했다. 고요한 옥상에서 묵묵히 향긋한 미트볼을 사왔다. 집에 들어섰다.']
 ```
 
 :::
@@ -809,11 +909,11 @@ randSentence({ language: 'ko', sentences: 3 });
 
 ```dart
 randSentence(language: WordLanguage.en, sentences: 3, count: 2);
-// [Tomorrow, the gentle shepherd stretches. The juggler guards the wild coda. But the cheerful miner walks softly.,
-//  The temperance remains in the avalanche. Later the temperance gathers. It lingers once more.]
+// [On weekends, the barkeep went to the empty hallway. The barkeep bought the sushi in the hallway. The barkeep came back to the cottage.,
+//  The cathedral brightens. The strange botanist comes back to the pavilion and nods off. At dawn, the cathedral fills up.]
 
 randSentence(language: WordLanguage.ko, sentences: 3);
-// [수상한 단술이 익는다. 하지만 옅은 단술이 식는다. 순진한 단술이 식는다.]
+// [신비한 항해사가 옥상으로 향했다. 고요한 옥상에서 묵묵히 향긋한 미트볼을 사왔다. 집에 들어섰다.]
 ```
 
 :::
@@ -822,20 +922,75 @@ randSentence(language: WordLanguage.ko, sentences: 3);
 
 ```python
 rand_sentence(language="en", sentences=3, count=2)
-# ['Tomorrow, the gentle shepherd stretches. The juggler guards the wild coda. But the cheerful miner walks softly.',
-#  'The temperance remains in the avalanche. Later the temperance gathers. It lingers once more.']
+# ['On weekends, the barkeep went to the empty hallway. The barkeep bought the sushi in the hallway. The barkeep came back to the cottage.',
+#  'The cathedral brightens. The strange botanist comes back to the pavilion and nods off. At dawn, the cathedral fills up.']
 
 rand_sentence(language="ko", sentences=3)
-# ['수상한 단술이 익는다. 하지만 옅은 단술이 식는다. 순진한 단술이 식는다.']
+# ['신비한 항해사가 옥상으로 향했다. 고요한 옥상에서 묵묵히 향긋한 미트볼을 사왔다. 집에 들어섰다.']
 ```
 
 :::
 
-The first sentence sets the topic, and every sentence after it stays on it. It names that subject again, stands a pronoun where it was, or draws a fresh noun of the same kind, so a paragraph that opens on a creature never wanders into an idea halfway through. It may also open on a connective (`But`, `하지만`, `そして`).
+The sentences follow a **story**: things that happen to one subject, the hero, in an order that holds together. Every step of a story says what has to be true of the hero before it and what is true afterwards, so nobody eats before they have something to eat, and a hero who went out comes home before going to sleep. The steps a story cannot do without are always told; the rest fill the sentences that are left, and a step that fits nowhere is left out rather than forced in.
+
+| Story | What happens |
+| --- | --- |
+| `errand` | The hero goes somewhere, buys or finds something to eat there, brings it home and eats it. |
+| `meal` | The hero is hungry, takes something to eat, eats it and is full. |
+| `search` | The hero looks around somewhere, finds a thing, carries it home and puts it away. |
+| `outing` | The hero wakes, goes out, spends the day somewhere, comes home tired and rests. |
+| `craft` | A person makes a thing, tends it, sells it or hands it over, and is content. |
+| `stroll` | The hero goes somewhere, moves about there, and comes home. |
+| `evening` | A place quietens, the hero comes home, eats, grows tired and sleeps. |
+| `passage` | A thing, a plant or a place changes over the day, and nobody does anything. |
+
+`story` names one of them. Left out, it is drawn from the stories the language can tell about the subject you asked for: `theme` decides who the hero is, so `theme: 'animal'` is a story about a lion and `theme: 'plant'` can only be a `passage`. German and Russian declare no shape with an object, so they tell the stories with nothing in the hero's hands: `stroll`, `outing`, `evening` and `passage`. A result of one sentence tells no story, and `SentenceDetail.story` says which one a longer result told.
+
+::: lang js
+
+```javascript
+randSentence({ language: 'ko', sentences: 4, story: 'errand', tense: 'past' });
+// ['낙타가 터미널로 갔다. 게다가 고요한 터미널에서 사뿐히 신선한 냉면을 봤다. 얼마뒤 냉면을 꺼내고 부리나케 집에 다다랐다. 한낮에 냉면을 먹었다.']
+
+randSentence({ language: 'en', sentences: 4, story: 'meal', includeName: true });
+// ['Zoe was starving. Therefore she picked the crisp ceviche. She nibbled the crisp ceviche alone. In the morning, she shouted.']
+```
+
+:::
+
+::: lang dart
+
+```dart
+randSentence(language: WordLanguage.ko, sentences: 4, story: SentenceStory.errand, tense: SentenceTense.past);
+// [낙타가 터미널로 갔다. 게다가 고요한 터미널에서 사뿐히 신선한 냉면을 봤다. 얼마뒤 냉면을 꺼내고 부리나케 집에 다다랐다. 한낮에 냉면을 먹었다.]
+
+randSentence(language: WordLanguage.en, sentences: 4, story: SentenceStory.meal, includeName: true);
+// [Zoe was starving. Therefore she picked the crisp ceviche. She nibbled the crisp ceviche alone. In the morning, she shouted.]
+```
+
+:::
+
+::: lang py
+
+```python
+rand_sentence(language="ko", sentences=4, story="errand", tense="past")
+# ['낙타가 터미널로 갔다. 게다가 고요한 터미널에서 사뿐히 신선한 냉면을 봤다. 얼마뒤 냉면을 꺼내고 부리나케 집에 다다랐다. 한낮에 냉면을 먹었다.']
+
+rand_sentence(language="en", sentences=4, story="meal", include_name=True)
+# ['Zoe was starving. Therefore she picked the crisp ceviche. She nibbled the crisp ceviche alone. In the morning, she shouted.']
+```
+
+:::
+
+What a story puts on the page stays there. The thing the hero found is the thing they carry home and eat, the place they went to is the place they look around in, and home is home. A later sentence writes its own article and may put a different modifier in front, so `in the icy hamlet` becomes `in the hamlet`, not `in the vault`. The hero is named in the first sentence and then referred to the way a paragraph refers to its subject: named again, stood a pronoun for, or left out where the language leaves a subject out. The one sentence whose subject is not the hero is a change of scene, `The cathedral brightens.`, `우체국이 서서히 조용해졌다.`, and its subject is the place the story is happening in.
+
+The day only moves forward. A story that opened `at dawn` goes on `in the morning` or `at midday`, never back to the dawn, and the phases it names are a few hours apart rather than a whole day.
+
+Two neighbouring steps are sometimes one sentence, with the second clause written without its subject: `사원에서 멈춰서고 천천히 집에 들어섰다`, `The broker heads back to the cottage and leans warily`, `記念館へ下りる。のんびり家に帰り着いてさらりともたれる。` A language declares how it joins two clauses — Korean's `-고` on the first verb, English's `and`, Japanese's `-て` — and German declares nothing, so it never joins. The joins come off the length budget like everything else, so a narrow range writes two short sentences where a wide one writes one long one.
 
 A person is not a kind of thing. A paragraph about Emma is about Emma: it names her again or stands a pronoun where she was, and never draws somebody else of the same kind. That last one would be a paragraph that quietly becomes about Sophie.
 
-It keeps its scene too. A place the first sentence named is where the rest of it happens, and a thing it was about is the thing it stays about. A later sentence writes its own article and may put a different modifier in front, so `in the icy hamlet` becomes `in the hamlet`, not `in the vault`.
+A modifier is chosen for the noun it describes. A drink is `hot`, `clear` or `fragrant` and a mechanic is `patient` or `gentle`, rather than either being anything in the language's adjective pool, so `맑은 정비사` and `the patient tea` do not come out. This holds in a sentence on its own as well as in a story.
 
 And it stays in the register it opened in. Prose about a line never becomes one, so a narrated paragraph never quotes. A quoted one is lines with prose between them: two people talking take turns, and one person saying four things in a row is a paragraph missing everything that happened while they said them. What that prose may not be is a third voice, so it tells rather than asks.
 
@@ -846,7 +1001,9 @@ A connective only claims what the two sentences can carry. Each one is tagged by
 | one more thing  | `and then`, `besides` | `그리고`, `게다가`   | `そして`, `また`     |
 | time passed     | `meanwhile`, `later`  | `이윽고`, `마침내`   | `やがて`, `その後`   |
 | against that    | `but`, `however`      | `하지만`, `그러나`   | `しかし`, `けれども` |
-| because of that | `so`, `therefore`     | `그래서`, `그러므로` | `だから`, `つまり`   |
+| because of that | `so`, `therefore`     | `그래서`, `그러므로` | `だから`, `そこで`   |
+
+In a story the connective is the story's to choose. A step that follows from the one before it, eating after finding something to eat, may open on `so` or `그래서`; a step that merely comes next opens on `later`, `이윽고`, or on nothing at all.
 
 A language declares only the kinds it can write. German has none for time passed: `dann` and `danach` are adverbs, and an adverb in the first position moves the finite verb, so the five coordinating conjunctions are all it can open a clause with.
 
@@ -862,7 +1019,7 @@ The length range describes the whole string, whatever the sentence count. It is 
 
 ```javascript
 randSentence({ language: 'ko', sentences: 3, minLength: 40, maxLength: 55 });
-// ['반달이 함께 깊어진다. 그리고 별똥별이 역에서 물든다. 아침에 그것이 조용해진다.'] // 45 characters
+// ['집사가 골방으로 향했다. 그러자 어두운 골방에서 물을 샀다. 집사가 집에 들어왔다.'] // 44 characters
 ```
 
 :::
@@ -871,7 +1028,7 @@ randSentence({ language: 'ko', sentences: 3, minLength: 40, maxLength: 55 });
 
 ```dart
 randSentence(language: WordLanguage.ko, sentences: 3, minLength: 40, maxLength: 55);
-// [반달이 함께 깊어진다. 그리고 별똥별이 역에서 물든다. 아침에 그것이 조용해진다.] // 45 characters
+// [집사가 골방으로 향했다. 그러자 어두운 골방에서 물을 샀다. 집사가 집에 들어왔다.] // 44 characters
 ```
 
 :::
@@ -880,7 +1037,7 @@ randSentence(language: WordLanguage.ko, sentences: 3, minLength: 40, maxLength: 
 
 ```python
 rand_sentence(language="ko", sentences=3, min_length=40, max_length=55)
-# ['반달이 함께 깊어진다. 그리고 별똥별이 역에서 물든다. 아침에 그것이 조용해진다.']  # 45 characters
+# ['집사가 골방으로 향했다. 그러자 어두운 골방에서 물을 샀다. 집사가 집에 들어왔다.']  # 44 characters
 ```
 
 :::
@@ -981,7 +1138,7 @@ If you never write a name and the size matters, there is nothing to do about it 
 
 ## The detail output {#the-detail-output}
 
-`output: 'detail'` reports the pieces each sentence was built from instead of returning a string: the phrases in order, what each of them does, the language, and the subject's theme.
+`output: 'detail'` reports the pieces each sentence was built from instead of returning a string: the phrases in order, what each of them does, the tense, the story, the language, and the subject's theme.
 
 ::: lang dart
 
@@ -998,6 +1155,10 @@ randSentence({ language: 'ko', output: 'detail', count: 1 });
 //   sentences: ['그리핀이 자줏빛 숲에서 총명한 고량주를 삼킨다.'],
 //   phrases: ['그리핀', '자줏빛 숲', '총명한 고량주', '삼킨다'],
 //   slots: ['subject', 'place', 'object', 'verb'],
+//   names: [],
+//   types: ['statement'],
+//   tense: 'present',
+//   story: null,
 //   language: 'ko',
 //   theme: 'myth'
 // }]
@@ -1025,6 +1186,7 @@ rand_sentence(language="ko", output="detail", count=1)
 #                 sentences=('그리핀이 자줏빛 숲에서 총명한 고량주를 삼킨다.',),
 #                 phrases=('그리핀', '자줏빛 숲', '총명한 고량주', '삼킨다'),
 #                 slots=('subject', 'place', 'object', 'verb'),
+#                 names=(), types=('statement',), tense='present', story=None,
 #                 language='ko', theme='myth')]
 ```
 
@@ -1038,8 +1200,10 @@ rand_sentence(language="ko", output="detail", count=1)
 | `slots` | <Lang js="SentenceSlot[]" dart="List&lt;SentenceSlot&gt;" py="tuple[SentenceSlot, ...]" code /> | What each phrase does, at the same index as `phrases`. |
 | `names` | <Lang js="string[]" dart="List&lt;String&gt;" py="tuple[str, ...]" code /> | The person names the result was written with, in order. Empty unless `includeName` asked for them. |
 | `types` | <Lang js="SentenceType[]" dart="List&lt;SentenceType&gt;" py="tuple[SentenceType, ...]" code /> | What each sentence is doing, at the same index as `sentences`. |
+| `tense` | `SentenceTense` | When it happened. One tense for the whole result. |
+| `story` | <Lang js="SentenceStory &#124; null" dart="SentenceStory?" py="SentenceStory &#124; None" code /> | The story a result of several sentences told. Null for a result of one. |
 | `language` | `WordLanguage` | The language this sentence was generated in. |
-| `theme` | <Lang js="WordTheme &#124; null" dart="WordTheme?" py="WordTheme &#124; None" code /> | Theme of the subject — the first sentence's, which is what the rest stay about. Null when that word is not one the generator knows. |
+| `theme` | <Lang js="WordTheme &#124; null" dart="WordTheme?" py="WordTheme &#124; None" code /> | Theme of the subject — the hero's in a story, and otherwise the first sentence's, which is what the rest stay about. Null when that word is not one the generator knows, a person's name included. |
 
 `phrases` holds the phrases and nothing else. The particle or preposition that marks one lives in `sentence` alone, so `그리핀이 …` reports `그리핀` and joining the phrases back together does not reproduce the sentence. Read `sentence` for the finished string, and `phrases` for what it was built from.
 
