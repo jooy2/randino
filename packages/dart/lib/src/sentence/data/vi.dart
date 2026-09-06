@@ -444,6 +444,11 @@ final SentenceLanguageData vi = SentenceLanguageData(
     WordGender.n: <String>['', 'nó'],
   },
   pronounless: const <NounClass>[NounClass.person],
+  objectPronouns: const SentenceObjectPronouns(
+    words: <WordGender, WordPool>{
+      WordGender.n: <String>[''],
+    },
+  ),
   numeral: const SentenceNumeral(
     order: NumeralOrder.before,
     counters: <NounClass, String>{

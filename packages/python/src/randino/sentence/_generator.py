@@ -648,6 +648,13 @@ class Draw:
     -1 before it has named one. A story never goes back to the morning.
     """
 
+    object: "ObjectReference | None" = None
+    """How this sentence refers to the object the one before it named.
+
+    When its shape puts that noun in the object slot again. None where the object is
+    named in full.
+    """
+
     dated: bool = False
     """Whether the sentence this clause belongs to has said when already.
 
@@ -946,6 +953,13 @@ class Requirement:
     known: bool = True
     bare: bool = False
     """True for a word written on its own, with no modifier in front of it."""
+
+    settled: bool = False
+    """True for a noun the result has already described.
+
+    It is written again with its article and nothing else in front of it, because
+    `the icy hamlet` described a second time as `the quiet hamlet` reads as another hamlet.
+    """
 
 
 @dataclass(frozen=True, slots=True)
@@ -1783,6 +1797,33 @@ class Built:
     day_at: int
     """The phase of the day it named, as an index into `times.day`, or -1."""
 
+    object: "ObjectMention | None" = None
+    """The object noun this sentence wrote, and whether it named it.
+
+    Or stood a pronoun for it — or left it out, which is a pronoun that writes nothing.
+    """
+
+
+@dataclass(frozen=True, slots=True)
+class ObjectMention:
+    """An object noun a sentence wrote, and whether it named it or referred to it."""
+
+    noun: str
+    named: bool
+
+
+@dataclass(frozen=True, slots=True)
+class ObjectReference:
+    """The object the sentence before named, referred to rather than named again.
+
+    `text` is what stands for it — `""` where the language leaves the object out — and
+    `clitic` puts it in front of the verb rather than where the object stood.
+    """
+
+    noun: str
+    text: str
+    clitic: bool
+
 
 def _article_for(data: SentenceLanguageData, gender: WordGender | None, following: str) -> str:
     """The article a phrase opens with, by the noun's gender and the word after it."""
@@ -2280,10 +2321,25 @@ def _compose(
     else:
         pronoun = None
 
+    # And the object the sentence before named is referred to rather than named again,
+    # where this shape puts the same noun in its object slot: left out, or stood a
+    # pronoun for where the object would go or in front of the verb.
+    object_required = _required_at(frame, plan, "object")
+    reference = (
+        draw.object
+        if draw.object is not None
+        and object_required is not None
+        and object_required.word == draw.object.noun
+        else None
+    )
+    referred_out = reference is not None and (reference.text == "" or reference.clitic)
     shape: list[SentencePart] = []
     at: list[int] = []
 
     for index, part in enumerate(frame.parts):
+        if part.slot == "object" and referred_out:
+            continue
+
         if part.slot != "subject" or pronoun is None or pronoun:
             shape.append(part)
             at.append(index)
@@ -2338,6 +2394,8 @@ def _compose(
     for index, part in enumerate(shape):
         if part.slot == "subject" and pronoun:
             proper.append(pronoun)
+        elif part.slot == "object" and reference is not None and not referred_out:
+            proper.append(reference.text)
         elif (
             part.slot == "subject"
             and follow is not None
@@ -2378,7 +2436,7 @@ def _compose(
             and part.slot == subject_slot
             and follow is not None
             and follow.reference == "repeat"
-        ) or (required is not None and required.bare):
+        ) or (required is not None and (required.bare or required.settled)):
             # A story names its hero once with whatever describes them and then leaves
             # the name alone; a word required bare — home, which no modifier fits — is
             # left alone too.
@@ -2444,9 +2502,17 @@ def _compose(
     day_at = -1
     # A pronoun says nothing about its own gender, and neither does a name carried
     # over, so what agrees with either agrees with the noun it stands for.
-    gender: WordGender | None = (
-        follow.topic.gender if follow is not None and (pronoun is not None or any(proper)) else None
+    carries_name = any(
+        word and part.slot == "subject" for word, part in zip(proper, parts, strict=True)
     )
+    gender: WordGender | None = (
+        follow.topic.gender
+        if follow is not None and (pronoun is not None or carries_name)
+        else None
+    )
+    # A clitic is written in front of the verb, and paid for here because it belongs to
+    # no part's share of the range.
+    clitic = reference.text if reference is not None and reference.clitic else ""
     used = (
         len(close)
         + len(open_mark)
@@ -2454,6 +2520,7 @@ def _compose(
         + len(quote_open)
         + len(quote_close)
         + (len(opener) + space if opener else 0)
+        + (len(clitic) + space if clitic else 0)
     )
 
     if opener:
@@ -2599,8 +2666,16 @@ def _compose(
         # The copula is written onto this phrase rather than beside it.
         copula = _one_of(pick(predicates)) if part.copula else ""
         opens = data.capitalize and not written and draw.link != "second"
+        # A clitic goes in front of the verb, after whatever else stands there — Spanish
+        # `la comió` — and is reported with neither, the way a particle is.
         head_text = data.space.join(
-            piece for piece in (copula if part.copula == "head" else "", part_head) if piece
+            piece
+            for piece in (
+                copula if part.copula == "head" else "",
+                part_head,
+                clitic if part.slot == "verb" else "",
+            )
+            if piece
         )
         head = (_upper(head_text) if opens else head_text) if head_text else ""
         text = _upper(phrase) if opens and not head_text else phrase
@@ -2631,8 +2706,12 @@ def _compose(
     scene: dict[SentenceSlot, Requirement] = dict(follow.scene) if follow is not None else {}
 
     for slot, entry in drawn.items():
+        # Described once, here, and never again.
         scene.setdefault(
-            slot, Requirement(entry.noun, (slot,), theme=entry.theme, known=entry.theme is not None)
+            slot,
+            Requirement(
+                entry.noun, (slot,), theme=entry.theme, known=entry.theme is not None, settled=True
+            ),
         )
 
     return Built(
@@ -2651,6 +2730,9 @@ def _compose(
         scene,
         verb_group.field if verb_group is not None else None,
         day_at,
+        ObjectMention(drawn["object"].noun, True)
+        if "object" in drawn
+        else (ObjectMention(reference.noun, False) if reference is not None else None),
     )
 
 
@@ -2818,6 +2900,48 @@ def _follow_for(
     reference = pick_weighted(usable, weight_of)
 
     return Follow(topic, reference, pick(pronouns) if reference == "pronoun" else "", scene)
+
+
+def _object_reference_for(
+    language: WordLanguage,
+    data: SentenceLanguageData,
+    noun: str,
+    forced: bool,
+    named: bool,
+) -> ObjectReference | None:
+    """How a sentence refers to the object the sentence before it named.
+
+    When its shape puts that noun in the object slot again. `forced` is the second clause
+    of one sentence, which never names the noun its first clause just did: `소시지를
+    끓여서 먹었다`, not `소시지를 끓여서 소시지를 먹었다`. A whole sentence draws between
+    the two the way a subject does, and `named` damps naming it straight after the
+    sentence before named it. None names the noun again, and a language with no object
+    pronoun always does.
+    """
+    pronouns = data.object_pronouns
+
+    if pronouns is None:
+        return None
+
+    lexicon = WORD_DATA[language]
+    gender = gender_of(lexicon, _as_pool(lexicon, noun))
+    pool = (pronouns.words.get(gender) if gender is not None else None) or pronouns.words.get(
+        "n", ()
+    )
+
+    if not pool:
+        return None
+
+    def weight_of(way: str) -> float:
+        if way == "repeat":
+            return REFERENCE_WEIGHT[way] * (REPEAT_DAMP if named else 1)
+
+        return REFERENCE_WEIGHT[way]
+
+    if not forced and pick_weighted(["repeat", "pronoun"], weight_of) == "repeat":
+        return None
+
+    return ObjectReference(noun, pick(pool), pronouns.clitic)
 
 
 def _opener_for(
@@ -3197,6 +3321,8 @@ def _generate_result(language: WordLanguage, settings: Settings) -> Result:
     for budget in budgets:
         type_, mark = _kind_for(data, settled, room, budget, flow)
         follow = None if topic is None else _follow_for(data, topic, scene, flow.repeated)
+        item = scene.get("object")
+        last = built[-1] if built else None
         draw = Draw(
             budget,
             type_,
@@ -3210,6 +3336,12 @@ def _generate_result(language: WordLanguage, settings: Settings) -> Result:
             None,
             None,
             max((one.day_at for one in built), default=-1),
+            object=_object_reference_for(language, data, item.word, False, last.object.named)
+            if item is not None
+            and last is not None
+            and last.object is not None
+            and last.object.noun == item.word
+            else None,
         )
         one, opened = _draw_one(paragraph, draw)
 
@@ -3414,6 +3546,9 @@ def _tell_story(telling: Telling) -> Result | None:
 
         return min(_frame_range(frame, data, telling.room)[0] for frame in frames)
 
+    # The sentence written last, for the next one to carry on from.
+    last: Built | None = None
+
     def tell(
         beat: Beat, budget: tuple[int, int], previous: Built | None, opened_before: str = ""
     ) -> Told:
@@ -3439,6 +3574,22 @@ def _tell_story(telling: Telling) -> Result | None:
             type_ = pick_weighted(kinds, lambda kind: STORY_KIND_WEIGHT.get(kind, 1))
             mark = cast("SentenceMark", type_)
 
+        pinned = pinned_for(beat)
+        # The sentence this one follows: the first clause for a second one, and the
+        # sentence before for a whole one. What it named is what this one may refer to
+        # rather than name again.
+        before = previous if beat.join == "second" else last
+        item = pinned.get("object")
+        reference = (
+            _object_reference_for(
+                language, data, item.word, beat.join == "second", before.object.named
+            )
+            if item is not None
+            and before is not None
+            and before.object is not None
+            and before.object.noun == item.word
+            else None
+        )
         follow: Follow | None
 
         if beat.join == "second" and previous is not None:
@@ -3446,7 +3597,7 @@ def _tell_story(telling: Telling) -> Result | None:
             # clause's, and it writes nothing where the subject would stand.
             shared = _topic_of(previous) or topic
 
-            follow = Follow(shared, "pronoun", "", pinned_for(beat)) if shared is not None else None
+            follow = Follow(shared, "pronoun", "", pinned) if shared is not None else None
         elif scene:
             # The scene is the one sentence whose subject is not the hero: the place the
             # story is happening in, named in full.
@@ -3463,13 +3614,13 @@ def _tell_story(telling: Telling) -> Result | None:
                 ),
                 "repeat",
                 "",
-                pinned_for(beat),
+                pinned,
             )
         else:
             follow = (
                 None
                 if topic is None
-                else _follow_for(data, topic, pinned_for(beat), telling.flow.repeated, True)
+                else _follow_for(data, topic, pinned, telling.flow.repeated, True)
             )
 
         draw = Draw(
@@ -3489,7 +3640,8 @@ def _tell_story(telling: Telling) -> Result | None:
             beat_draw(beat),
             beat.join,
             day_at,
-            dated,
+            object=reference,
+            dated=dated,
         )
         one, opened = _draw_one(telling, draw)
 
@@ -3534,9 +3686,9 @@ def _tell_story(telling: Telling) -> Result | None:
 
             if slot == "object":
                 if roles.item is None:
-                    roles.item = drawn
+                    roles.item = replace(drawn, settled=True)
             elif (slot == "place" or beat.step.destination == "place") and roles.place is None:
-                roles.place = replace(drawn, slots=("place",))
+                roles.place = replace(drawn, slots=("place",), settled=True)
 
         telling.spent.update(one.used)
         placed = (
@@ -3620,6 +3772,7 @@ def _tell_story(telling: Telling) -> Result | None:
             told = tell(beat, budget, None)
 
         built.append(told.one)
+        last = told.one
         written += len(told.one.sentence) + (len(data.space) if at > 0 else 0)
         at += 1
         i += 1
@@ -3668,6 +3821,7 @@ def _join_clauses(data: SentenceLanguageData, first: Built, second: Built) -> Bu
         {**first.scene, **second.scene},
         second.field,
         max(first.day_at, second.day_at),
+        second.object if second.object is not None else first.object,
     )
 
 

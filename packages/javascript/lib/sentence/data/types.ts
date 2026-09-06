@@ -503,6 +503,19 @@ export type SentencePronouns = {
 };
 
 /**
+ * How a later sentence refers to a noun it has already put in the object slot,
+ * rather than naming it a second time. `words` is by the noun's gender the way
+ * `SentencePronouns` is, and `''` is a real entry meaning the language leaves
+ * the object out altogether (`끓여서 먹었다`); `clitic` is set where the pronoun
+ * is written in front of the verb rather than where the object stood (Spanish
+ * `la comió`). Left out by a language that names the noun again.
+ */
+export type SentenceObjectPronouns = {
+	words: SentencePronouns;
+	clitic?: boolean;
+};
+
+/**
  * How a language writes a number beside a noun, and beside money.
  *
  * Left out by a language that cannot write either correctly, which is what
@@ -693,6 +706,11 @@ export type SentenceLanguageData = {
 	 * somebody.
 	 */
 	pronounless?: readonly NounClass[];
+	/**
+	 * How a later sentence refers to the object the one before it named. Left out
+	 * by a language that names it again.
+	 */
+	objectPronouns?: SentenceObjectPronouns;
 	/**
 	 * How the language writes a number. Left out by one that cannot, which then
 	 * declares no `quantity` and no `money` shape either.

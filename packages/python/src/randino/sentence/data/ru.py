@@ -10,6 +10,7 @@ from randino.sentence.data._types import (
     SentenceFrame,
     SentenceJoin,
     SentenceLanguageData,
+    SentenceObjectPronouns,
     SentencePart,
     SentenceTimes,
     StateGroup,
@@ -415,6 +416,7 @@ RU = SentenceLanguageData(
     },
     interjections=words("ах, ох, эх, ух, боже, гляди, право, ой, ух_ты, батюшки, надо_же, эй,"),
     pronouns={"m": ("он",), "f": ("она",), "n": ("оно",)},
+    object_pronouns=SentenceObjectPronouns(words={"m": ("его",), "f": ("её",), "n": ("его",)}),
     frames=(
         SentenceFrame(
             (

@@ -490,6 +490,22 @@ rule under `"n"`, which is what the lookup falls back to.
 
 SentencePronouns = Mapping[WordGender, WordPool]
 
+
+@dataclass(frozen=True, slots=True)
+class SentenceObjectPronouns:
+    """How a later sentence refers to a noun it has already put in the object slot.
+
+    Rather than naming it a second time. `words` is by the noun's gender the way
+    `SentencePronouns` is, and `""` is a real entry meaning the language leaves the object
+    out altogether (`끓여서 먹었다`); `clitic` is set where the pronoun is written in front
+    of the verb rather than where the object stood (Spanish `la comió`). Left out by a
+    language that names the noun again.
+    """
+
+    words: SentencePronouns
+    clitic: bool = False
+
+
 ConnectiveKind = Literal["additive", "temporal", "contrastive", "causal"]
 """What a connective claims about the sentence before it.
 
@@ -748,6 +764,11 @@ class SentenceLanguageData:
     """
 
     pronounless: tuple[NounClass, ...] = ()
+    object_pronouns: SentenceObjectPronouns | None = None
+    """How a later sentence refers to the object the one before it named.
+
+    None for a language that names it again.
+    """
     """Noun classes the language's written pronouns are wrong for.
 
     A sentence about one of them leaves the subject out where the language can, and

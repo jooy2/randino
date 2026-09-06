@@ -390,6 +390,13 @@ final SentenceLanguageData ru = SentenceLanguageData(
     WordGender.f: <String>['она'],
     WordGender.n: <String>['оно'],
   },
+  objectPronouns: const SentenceObjectPronouns(
+    words: <WordGender, WordPool>{
+      WordGender.m: <String>['его'],
+      WordGender.f: <String>['её'],
+      WordGender.n: <String>['его'],
+    },
+  ),
   frames: const <SentenceFrame>[
     SentenceFrame(<SentencePart>[
       SentencePart(SentenceSlot.subject, modifiable: true),

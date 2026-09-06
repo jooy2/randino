@@ -532,6 +532,9 @@ export const IT: SentenceLanguageData = {
 	`),
 	// Pro-drop, the same as Spanish: `esso` exists and nobody writes it.
 	pronouns: { n: [''] },
+	// An object named once is a clitic the next time, in front of the verb and
+	// agreeing with the noun: `cucinò la salsiccia e la mangiò`.
+	objectPronouns: { words: { m: words(`lo`), f: words(`la`) }, clitic: true },
 	numeral: {
 		order: 'before',
 		counters: {},

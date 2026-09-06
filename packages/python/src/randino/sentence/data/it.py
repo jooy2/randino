@@ -12,6 +12,7 @@ from randino.sentence.data._types import (
     SentenceJoin,
     SentenceLanguageData,
     SentenceNumeral,
+    SentenceObjectPronouns,
     SentencePart,
     SentenceTimes,
     StateGroup,
@@ -599,6 +600,7 @@ IT = SentenceLanguageData(
         oh, ah, ehi, caspita, mamma_mia, guarda, davvero, ohi, accidenti, cavolo, santo_cielo, dai,
     """),
     pronouns={"n": ("",)},
+    object_pronouns=SentenceObjectPronouns(words={"m": ("lo",), "f": ("la",)}, clitic=True),
     numeral=SentenceNumeral(
         order="before",
         counters={},

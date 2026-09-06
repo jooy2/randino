@@ -531,6 +531,13 @@ final SentenceLanguageData es = SentenceLanguageData(
   pronouns: const <WordGender, WordPool>{
     WordGender.n: <String>[''],
   },
+  objectPronouns: const SentenceObjectPronouns(
+    words: <WordGender, WordPool>{
+      WordGender.m: <String>['lo'],
+      WordGender.f: <String>['la'],
+    },
+    clitic: true,
+  ),
   numeral: const SentenceNumeral(
     order: NumeralOrder.before,
     counters: <NounClass, String>{},

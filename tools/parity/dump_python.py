@@ -267,6 +267,16 @@ sentence = {
         # Optional in one package and defaulted in another; written as a list either
         # way so the shapes compare.
         "pronounless": list(data.pronounless),
+        "objectPronouns": (
+            None
+            if data.object_pronouns is None
+            else {
+                "words": {
+                    gender: listed(pool) for gender, pool in data.object_pronouns.words.items()
+                },
+                "clitic": data.object_pronouns.clitic,
+            }
+        ),
         "numeral": (
             None
             if data.numeral is None

@@ -276,6 +276,15 @@ void main() {
         'pronounless': <String>[
           for (final noun in entry.value.pronounless) noun.name,
         ],
+        'objectPronouns': entry.value.objectPronouns == null
+            ? null
+            : <String, Object?>{
+                'words': <String, Object?>{
+                  for (final g in entry.value.objectPronouns!.words.entries)
+                    g.key.name: listed(g.value),
+                },
+                'clitic': entry.value.objectPronouns!.clitic,
+              },
         'numeral': entry.value.numeral == null
             ? null
             : <String, Object?>{

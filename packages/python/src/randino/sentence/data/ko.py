@@ -12,6 +12,7 @@ from randino.sentence.data._types import (
     SentenceJoin,
     SentenceLanguageData,
     SentenceNumeral,
+    SentenceObjectPronouns,
     SentencePart,
     SentenceTimes,
     StateGroup,
@@ -1804,6 +1805,7 @@ KO = SentenceLanguageData(
     ),
     pronouns={"n": ("", "그것")},
     pronounless=("person", "creature"),
+    object_pronouns=SentenceObjectPronouns(words={"n": ("",)}),
     numeral=SentenceNumeral(
         order="after",
         counters={

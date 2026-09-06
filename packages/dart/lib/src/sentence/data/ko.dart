@@ -1543,6 +1543,11 @@ final SentenceLanguageData ko = SentenceLanguageData(
     WordGender.n: <String>['', '그것'],
   },
   pronounless: const <NounClass>[NounClass.person, NounClass.creature],
+  objectPronouns: const SentenceObjectPronouns(
+    words: <WordGender, WordPool>{
+      WordGender.n: <String>[''],
+    },
+  ),
   numeral: const SentenceNumeral(
     order: NumeralOrder.after,
     counters: <NounClass, String>{

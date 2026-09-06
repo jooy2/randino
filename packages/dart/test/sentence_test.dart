@@ -359,8 +359,11 @@ List<String> connectivesOf(WordLanguage language) => <String>[
 
 /// Every subject pronoun the language can write, in both cases.
 Set<String> pronounsOf(WordLanguage language) {
+  final data = sentenceData[language]!;
   final written = <String>[
-    for (final pool in sentenceData[language]!.pronouns.values) ...pool,
+    for (final pool in data.pronouns.values) ...pool,
+    for (final pool in (data.objectPronouns?.words ?? const <WordGender, WordPool>{}).values)
+      ...pool,
   ].where((word) => word.isNotEmpty);
 
   return <String>{...written, ...written.map(upperFirst)};
@@ -1486,6 +1489,87 @@ void main() {
       }
     });
 
+    test('a noun the result has described is not described again', () {
+      // `반듯한 소쿠리 … 소중한 소쿠리 … 예쁜 소쿠리` is three baskets. Korean, because a
+      // phrase of its is a modifier and a noun with a space between and nothing
+      // else, so the noun is the last word and a described one has two.
+      const nounSlots = <SentenceSlot>{
+        SentenceSlot.subject,
+        SentenceSlot.object,
+        SentenceSlot.place,
+        SentenceSlot.destination,
+        SentenceSlot.quantity,
+      };
+
+      for (final detail in randSentenceDetails(
+        language: WordLanguage.ko,
+        type: statementOnly,
+        includeName: false,
+        tense: SentenceTense.present,
+        sentences: 5,
+        count: sample,
+      )) {
+        final described = <String, String>{};
+
+        for (var i = 0; i < detail.phrases.length; i += 1) {
+          final phrase = detail.phrases[i];
+
+          if (!nounSlots.contains(detail.slots[i]) || phrase.contains(RegExp(r'\d'))) continue;
+
+          final words = phrase.split(' ');
+
+          if (words.length < 2) continue;
+
+          final noun = words.last;
+
+          expect(
+            described.containsKey(noun),
+            isFalse,
+            reason:
+                "'${described[noun]}' and '$phrase' describe one $noun twice (${detail.sentence})",
+          );
+          described[noun] = phrase;
+        }
+      }
+    });
+
+    test('one sentence names its object once', () {
+      // The second clause of a two-clause sentence refers to the object its first
+      // clause named — left out, or a pronoun — rather than naming it again. A
+      // pronoun may stand twice: `roasts it and swallows it`.
+      for (final language in wordLanguages) {
+        final pronouns = pronounsOf(language);
+
+        for (final detail in randSentenceDetails(
+          language: language,
+          type: statementOnly,
+          includeName: false,
+          tense: SentenceTense.present,
+          sentences: 3,
+          count: sample,
+        )) {
+          final belongs = sentenceOf(detail);
+          final named = <int, Set<String>>{};
+
+          for (var i = 0; i < detail.slots.length; i += 1) {
+            final phrase = detail.phrases[i];
+
+            if (detail.slots[i] != SentenceSlot.object || pronouns.contains(phrase)) continue;
+
+            final objects = named.putIfAbsent(belongs[i], () => <String>{});
+
+            expect(
+              objects.contains(phrase),
+              isFalse,
+              reason:
+                  "$language: '$phrase' is named twice in one sentence (${detail.sentences[belongs[i]]})",
+            );
+            objects.add(phrase);
+          }
+        }
+      }
+    });
+
     test('a connective opens a sentence that follows another, and only one', () {
       for (final language in wordLanguages) {
         final data = sentenceData[language]!;
@@ -1556,6 +1640,32 @@ void main() {
         // And it is still written where it can be, which is what makes the check
         // above worth anything.
         expect(seen, greaterThan(0), reason: '$language never wrote a causal connective');
+      }
+    });
+
+    test('a language that joins two clauses can refer to an object without naming it', () {
+      // A join with no way to refer writes the noun twice in one sentence. And an
+      // object pronoun is one word or nothing — a clitic is always a word, because
+      // it is written in front of the verb.
+      for (final language in wordLanguages) {
+        final data = sentenceData[language]!;
+
+        expect(
+          data.join == null || data.objectPronouns != null,
+          isTrue,
+          reason: '$language joins clauses and has no object pronoun',
+        );
+
+        for (final pool in (data.objectPronouns?.words ?? const <WordGender, WordPool>{}).values) {
+          for (final word in pool) {
+            expect(word.contains(' '), isFalse, reason: "$language: '$word' is not one word");
+            expect(
+              !(data.objectPronouns?.clitic ?? false) || word.isNotEmpty,
+              isTrue,
+              reason: '$language: a clitic cannot be nothing',
+            );
+          }
+        }
       }
     });
 
@@ -2815,8 +2925,11 @@ void main() {
       }
 
       // The thing a story is about is one thing throughout: every object phrase of
-      // a result reads as the same noun.
+      // a result reads as the same noun. A pronoun standing where the thing stood
+      // is the thing, not another one.
       for (final language in wordLanguages) {
+        final pronouns = pronounsOf(language);
+
         for (final detail in randSentenceDetails(
           language: language,
           type: statementOnly,
@@ -2827,7 +2940,8 @@ void main() {
         )) {
           final objects = <Set<String>>[
             for (var i = 0; i < detail.phrases.length; i += 1)
-              if (detail.slots[i] == SentenceSlot.object) nounsIn(language, detail.phrases[i]),
+              if (detail.slots[i] == SentenceSlot.object && !pronouns.contains(detail.phrases[i]))
+                nounsIn(language, detail.phrases[i]),
           ];
 
           for (final found in objects.skip(1)) {

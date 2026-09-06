@@ -514,6 +514,7 @@ class _Draw {
     required this.link,
     required this.dayAt,
     this.dated = false,
+    this.object,
   });
 
   final LengthRange budget;
@@ -562,6 +563,11 @@ class _Draw {
   /// this clause names none.
   final bool dated;
 
+  /// How this sentence refers to the object the one before it named, when its
+  /// shape puts that noun in the object slot again. Null where the object is
+  /// named in full.
+  final _ObjectReference? object;
+
   /// The same draw with another opener, or another way of referring to the
   /// topic. Dart has no spread for a class, so the copy is written out.
   _Draw copyWith({String? opener, _Follow? follow, bool keepFollow = true}) => _Draw(
@@ -578,6 +584,7 @@ class _Draw {
     link: link,
     dayAt: dayAt,
     dated: dated,
+    object: object,
   );
 }
 
@@ -672,6 +679,18 @@ class _Follow {
   /// A sentence with one of those slots writes what is here rather than drawing
   /// again — a paragraph whose place changes every line is not one paragraph.
   final Map<SentenceSlot, _Requirement> scene;
+}
+
+/// The object the sentence before named, referred to rather than named again:
+/// [text] is what stands for it — `''` where the language leaves the object
+/// out — and [clitic] puts it in front of the verb rather than where the object
+/// stood.
+class _ObjectReference {
+  const _ObjectReference(this.noun, this.text, this.clitic);
+
+  final String noun;
+  final String text;
+  final bool clitic;
 }
 
 /// What the result has written so far, and the whole of what keeps the next
@@ -879,12 +898,24 @@ List<WordLanguage> _languagesFor(_Settings settings) {
 /// other required words need. Best first, and the shape takes the first that is
 /// still free.
 class _Requirement {
-  const _Requirement(this.word, this.slots, {this.theme, this.known = true, this.bare = false});
+  const _Requirement(
+    this.word,
+    this.slots, {
+    this.theme,
+    this.known = true,
+    this.bare = false,
+    this.settled = false,
+  });
 
   final String word;
 
   /// True for a word written on its own, with no modifier in front of it.
   final bool bare;
+
+  /// True for a noun the result has already described. It is written again with
+  /// its article and nothing else in front of it, because `the icy hamlet`
+  /// described a second time as `the quiet hamlet` reads as another hamlet.
+  final bool settled;
 
   /// The phrases it can fill. A null entry stands for the modifier inside one.
   final List<SentenceSlot?> slots;
@@ -1672,6 +1703,7 @@ class _Built {
     this.scene,
     this.field,
     this.dayAt,
+    this.object,
   );
 
   final String sentence;
@@ -1709,6 +1741,10 @@ class _Built {
 
   /// The phase of the day it named, as an index into `times.day`, or `-1`.
   final int dayAt;
+
+  /// The object noun this sentence wrote, and whether it named it or stood a
+  /// pronoun for it — or left it out, which is a pronoun that writes nothing.
+  final ({String noun, bool named})? object;
 }
 
 /// The article a phrase opens with, by the noun's gender and the word after it.
@@ -2051,11 +2087,20 @@ _Built _compose(
           : follow?.reference == _Reference.pronoun
           ? follow!.pronoun
           : null;
+  // And the object the sentence before named is referred to rather than named
+  // again, where this shape puts the same noun in its object slot: left out, or
+  // stood a pronoun for where the object would go or in front of the verb.
+  final objectRequired = _requiredAt(frame, plan, SentenceSlot.object);
+  final reference =
+      draw.object != null && objectRequired?.word == draw.object!.noun ? draw.object : null;
+  final referredOut = reference != null && (reference.text.isEmpty || reference.clitic);
   final shape = <SentencePart>[];
   final at = <int>[];
 
   for (var i = 0; i < frame.parts.length; i += 1) {
     final part = frame.parts[i];
+
+    if (part.slot == SentenceSlot.object && referredOut) continue;
 
     if (part.slot != SentenceSlot.subject || pronoun == null || pronoun.isNotEmpty) {
       shape.add(part);
@@ -2107,6 +2152,10 @@ _Built _compose(
           return pronoun;
         }
 
+        if (part.slot == SentenceSlot.object && reference != null && !referredOut) {
+          return reference.text;
+        }
+
         if (part.slot == SentenceSlot.subject &&
             follow?.reference == _Reference.repeat &&
             follow!.topic.named) {
@@ -2138,7 +2187,8 @@ _Built _compose(
           ? ((beat != null &&
                       shape[i].slot == subjectSlot &&
                       follow?.reference == _Reference.repeat) ||
-                  (plan.phrase[at[i]]?.bare ?? false))
+                  (plan.phrase[at[i]]?.bare ?? false) ||
+                  (plan.phrase[at[i]]?.settled ?? false))
               ? SentencePart(
                 shape[i].slot,
                 head: shape[i].head,
@@ -2224,17 +2274,28 @@ _Built _compose(
   var dayAt = -1;
   // A pronoun says nothing about its own gender, and neither does a name carried
   // over, so what agrees with either agrees with the noun it stands for.
-  WordGender? gender =
-      pronoun != null || proper.any((word) => word != null && word.isNotEmpty)
-          ? follow?.topic.gender
-          : null;
+  var carriesName = false;
+
+  for (var i = 0; i < proper.length; i += 1) {
+    final word = proper[i];
+
+    if (word != null && word.isNotEmpty && parts[i].slot == SentenceSlot.subject) {
+      carriesName = true;
+    }
+  }
+
+  WordGender? gender = pronoun != null || carriesName ? follow?.topic.gender : null;
+  // A clitic is written in front of the verb, and paid for here because it
+  // belongs to no part's share of the range.
+  final clitic = reference != null && reference.clitic ? reference.text : '';
   var used =
       close.length +
       open.length +
       tag.length +
       quoteOpen.length +
       quoteClose.length +
-      (opener.isEmpty ? 0 : opener.length + space);
+      (opener.isEmpty ? 0 : opener.length + space) +
+      (clitic.isEmpty ? 0 : clitic.length + space);
 
   if (opener.isNotEmpty) written.add(data.capitalize ? _upper(opener) : opener);
 
@@ -2384,9 +2445,12 @@ _Built _compose(
     // whichever side the language puts it.
     final copula = part.copula == null ? '' : _oneOf(pick(predicates));
     final opens = data.capitalize && written.isEmpty && draw.link != JoinSide.second;
+    // A clitic goes in front of the verb, after whatever else stands there —
+    // Spanish `la comió` — and is reported with neither, the way a particle is.
     final headText = <String>[
       if (part.copula == CopulaSide.head) copula,
       if (partHead != null) partHead,
+      if (part.slot == SentenceSlot.verb && clitic.isNotEmpty) clitic,
     ].join(data.space);
     final head = headText.isEmpty ? null : (opens ? _upper(headText) : headText);
     final text = opens && headText.isEmpty ? _upper(phrase) : phrase;
@@ -2420,6 +2484,8 @@ _Built _compose(
         <SentenceSlot?>[slot],
         theme: entry.theme,
         known: entry.theme != null,
+        // Described once, here, and never again.
+        settled: true,
       ),
     );
   });
@@ -2438,6 +2504,11 @@ _Built _compose(
     scene,
     verbGroup?.field,
     dayAt,
+    drawn.containsKey(SentenceSlot.object)
+        ? (noun: drawn[SentenceSlot.object]!.noun, named: true)
+        : reference != null
+        ? (noun: reference.noun, named: false)
+        : null,
   );
 }
 
@@ -2973,6 +3044,48 @@ _Follow _followFor(
   return _Follow(topic, reference, reference == _Reference.pronoun ? pick(pronouns) : '', scene);
 }
 
+/// How a sentence refers to the object the sentence before it named, when its
+/// shape puts that noun in the object slot again.
+///
+/// `forced` is the second clause of one sentence, which never names the noun
+/// its first clause just did: `소시지를 끓여서 먹었다`, not `소시지를 끓여서
+/// 소시지를 먹었다`. A whole sentence draws between the two the way a subject
+/// does, and `named` damps naming it straight after the sentence before named
+/// it. Null names the noun again, and a language with no object pronoun always
+/// does.
+_ObjectReference? _objectReferenceFor(
+  WordLanguage language,
+  SentenceLanguageData data,
+  String noun,
+  bool forced,
+  bool named,
+) {
+  final pronouns = data.objectPronouns;
+
+  if (pronouns == null) return null;
+
+  final lexicon = wordData[language]!;
+  final gender = genderOf(lexicon, _asPool(lexicon, noun));
+  final pool =
+      (gender == null ? null : pronouns.words[gender]) ??
+      pronouns.words[WordGender.n] ??
+      const <String>[];
+
+  if (pool.isEmpty) return null;
+
+  final way = pickWeighted<_Reference>(
+    const <_Reference>[_Reference.repeat, _Reference.pronoun],
+    (way) =>
+        way == _Reference.repeat
+            ? _referenceWeight[way]! * (named ? _repeatDamp : 1)
+            : _referenceWeight[way]!,
+  );
+
+  if (!forced && way == _Reference.repeat) return null;
+
+  return _ObjectReference(noun, pick(pool), pronouns.clitic);
+}
+
 /// What a sentence opens on: an interjection when it is an exclamation, and a
 /// connective when it follows another.
 ///
@@ -3360,6 +3473,12 @@ _Result _generateResult(WordLanguage language, _Settings settings) {
     final type = kind[0];
     final mark = kind[1];
     final follow = topic == null ? null : _followFor(data, topic, scene, flow.repeated);
+    final item = scene[SentenceSlot.object];
+    final last = built.isEmpty ? null : built.last;
+    final object =
+        item != null && last?.object?.noun == item.word
+            ? _objectReferenceFor(language, data, item.word, false, last!.object!.named)
+            : null;
     var dayAt = -1;
 
     for (final one in built) {
@@ -3379,6 +3498,7 @@ _Result _generateResult(WordLanguage language, _Settings settings) {
       beat: null,
       link: null,
       dayAt: dayAt,
+      object: object,
     );
     final (one, opened) = _drawOne(paragraph, draw);
 
@@ -3595,6 +3715,9 @@ _Result? _tellStory(_Telling telling) {
   }
 
   /// One beat as one sentence, or as one clause of one.
+  // The sentence written last, for the next one to carry on from.
+  _Built? last;
+
   _Told tell(Beat beat, LengthRange budget, _Built? previous, [String openedBefore = '']) {
     final scene = beat.step.kind == StepKind.scene;
     // A second clause whose sentence has said when already — opened on `later`,
@@ -3628,6 +3751,22 @@ _Result? _tellStory(_Telling telling) {
       mark = type;
     }
 
+    final pinned = pinnedFor(beat);
+    // The sentence this one follows: the first clause for a second one, and the
+    // sentence before for a whole one. What it named is what this one may refer
+    // to rather than name again.
+    final before = beat.join == JoinSide.second ? previous : last;
+    final item = pinned[SentenceSlot.object];
+    final object =
+        item != null && before?.object?.noun == item.word
+            ? _objectReferenceFor(
+              language,
+              data,
+              item.word,
+              beat.join == JoinSide.second,
+              before!.object!.named,
+            )
+            : null;
     _Follow? follow;
 
     if (beat.join == JoinSide.second && previous != null) {
@@ -3635,7 +3774,7 @@ _Result? _tellStory(_Telling telling) {
       // clause's, and it writes nothing where the subject would stand.
       final shared = _topicOf(previous) ?? topic;
 
-      follow = shared == null ? null : _Follow(shared, _Reference.pronoun, '', pinnedFor(beat));
+      follow = shared == null ? null : _Follow(shared, _Reference.pronoun, '', pinned);
     } else if (scene) {
       // The scene is the one sentence whose subject is not the hero: the place the
       // story is happening in, named in full.
@@ -3652,13 +3791,10 @@ _Result? _tellStory(_Telling telling) {
         ),
         _Reference.repeat,
         '',
-        pinnedFor(beat),
+        pinned,
       );
     } else {
-      follow =
-          topic == null
-              ? null
-              : _followFor(data, topic!, pinnedFor(beat), telling.flow.repeated, true);
+      follow = topic == null ? null : _followFor(data, topic!, pinned, telling.flow.repeated, true);
     }
 
     final draw = _Draw(
@@ -3686,6 +3822,7 @@ _Result? _tellStory(_Telling telling) {
       link: beat.join,
       dayAt: dayAt,
       dated: dated,
+      object: object,
     );
     var (one, opened) = _drawOne(telling, draw);
 
@@ -3736,13 +3873,20 @@ _Result? _tellStory(_Telling telling) {
       if (drawn == null) continue;
 
       if (slot == SentenceSlot.object) {
-        roles.item ??= drawn;
+        roles.item ??= _Requirement(
+          drawn.word,
+          drawn.slots,
+          theme: drawn.theme,
+          known: drawn.known,
+          settled: true,
+        );
       } else if (slot == SentenceSlot.place || beat.step.destination == StoryRole.place) {
         roles.place ??= _Requirement(
           drawn.word,
           const <SentenceSlot?>[SentenceSlot.place],
           theme: drawn.theme,
           known: drawn.known,
+          settled: true,
         );
       }
     }
@@ -3843,6 +3987,7 @@ _Result? _tellStory(_Telling telling) {
     }
 
     built.add(told.one);
+    last = told.one;
     written += told.one.sentence.length + (at > 0 ? data.space.length : 0);
     at += 1;
 
@@ -3888,6 +4033,7 @@ _Built _joinClauses(SentenceLanguageData data, _Built first, _Built second) {
     <SentenceSlot, _Requirement>{...first.scene, ...second.scene},
     second.field,
     first.dayAt > second.dayAt ? first.dayAt : second.dayAt,
+    second.object ?? first.object,
   );
 }
 

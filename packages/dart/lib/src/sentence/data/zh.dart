@@ -413,6 +413,11 @@ final SentenceLanguageData zh = SentenceLanguageData(
     WordGender.n: <String>['', '它'],
   },
   pronounless: const <NounClass>[NounClass.person, NounClass.creature],
+  objectPronouns: const SentenceObjectPronouns(
+    words: <WordGender, WordPool>{
+      WordGender.n: <String>[''],
+    },
+  ),
   numeral: const SentenceNumeral(
     order: NumeralOrder.after,
     counters: <NounClass, String>{

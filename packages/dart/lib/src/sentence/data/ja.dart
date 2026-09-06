@@ -890,6 +890,11 @@ final SentenceLanguageData ja = SentenceLanguageData(
     WordGender.n: <String>['', 'それ'],
   },
   pronounless: const <NounClass>[NounClass.person, NounClass.creature],
+  objectPronouns: const SentenceObjectPronouns(
+    words: <WordGender, WordPool>{
+      WordGender.n: <String>[''],
+    },
+  ),
   numeral: const SentenceNumeral(
     order: NumeralOrder.after,
     counters: <NounClass, String>{

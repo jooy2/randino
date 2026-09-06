@@ -598,6 +598,25 @@ typedef SentenceArticles = Map<WordGender, List<List<String>>>;
 /// one rule.
 typedef SentencePronouns = Map<WordGender, WordPool>;
 
+/// How a later sentence refers to a noun it has already put in the object slot,
+/// rather than naming it a second time.
+///
+/// [words] is by the noun's gender the way [SentencePronouns] is, and `''` is a
+/// real entry meaning the language leaves the object out altogether
+/// (`끓여서 먹었다`); [clitic] is set where the pronoun is written in front of
+/// the verb rather than where the object stood (Spanish `la comió`). Left out
+/// by a language that names the noun again.
+class SentenceObjectPronouns {
+  /// Creates the object pronouns of one language.
+  const SentenceObjectPronouns({required this.words, this.clitic = false});
+
+  /// The pronoun by the noun's gender, with `''` for leaving the object out.
+  final SentencePronouns words;
+
+  /// Whether the pronoun is written in front of the verb.
+  final bool clitic;
+}
+
 /// What a noun can do that its theme does not say.
 ///
 /// A fish and a sparrow are both `animal`, and only one of them flies; a snake
@@ -817,6 +836,7 @@ class SentenceLanguageData {
     this.pastMark,
     this.join,
     this.pronounless = const <NounClass>[],
+    this.objectPronouns,
     this.openers = const <SentenceType, String>{},
     this.numeral,
     this.calendar,
@@ -936,6 +956,10 @@ class SentenceLanguageData {
   /// which is why Korean drops the subject rather than writing `그것` about
   /// somebody.
   final List<NounClass> pronounless;
+
+  /// How a later sentence refers to the object the one before it named. Null
+  /// for a language that names it again.
+  final SentenceObjectPronouns? objectPronouns;
 
   /// How the language writes a number.
   ///

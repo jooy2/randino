@@ -1648,6 +1648,8 @@ export const KO: SentenceLanguageData = {
 	// Korean leaves the subject out as readily as it writes 그것, and the empty
 	// entry is how the data says so.
 	pronouns: { n: ['', '그것'] },
+	// And an object it has named is left out the next time: `소시지를 끓여서 먹었다`.
+	objectPronouns: { words: { n: [''] } },
 	// And 그것 is a thing: a person and an animal are referred to by leaving the
 	// subject out.
 	pronounless: ['person', 'creature'],

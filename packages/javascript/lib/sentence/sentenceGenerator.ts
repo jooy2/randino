@@ -454,6 +454,12 @@ type Draw = {
 	 * goes back to the morning.
 	 */
 	dayAt: number;
+	/**
+	 * How this sentence refers to the object the one before it named, when its
+	 * shape puts that noun in the object slot again. Null where the object is
+	 * named in full.
+	 */
+	object: ObjectReference | null;
 };
 
 /**
@@ -527,6 +533,18 @@ type Follow = {
 	 * again — a paragraph whose place changes every line is not one paragraph.
 	 */
 	scene: ReadonlyMap<SentenceSlot, Requirement>;
+};
+
+/**
+ * The object the sentence before named, referred to rather than named again:
+ * `text` is what stands for it — `''` where the language leaves the object out
+ * — and `clitic` puts it in front of the verb rather than where the object
+ * stood.
+ */
+type ObjectReference = {
+	noun: string;
+	text: string;
+	clitic: boolean;
 };
 
 /**
@@ -729,6 +747,12 @@ type Requirement = {
 	known: boolean;
 	/** True for a word written on its own, with no modifier in front of it. */
 	bare?: boolean;
+	/**
+	 * True for a noun the result has already described. It is written again with
+	 * its article and nothing else in front of it, because `the icy hamlet`
+	 * described a second time as `the quiet hamlet` reads as another hamlet.
+	 */
+	settled?: boolean;
 };
 
 /** Which part of a shape each required word ends up in, by the part's index. */
@@ -1546,6 +1570,11 @@ type Built = {
 	field: VerbField | null;
 	/** The phase of the day it named, as an index into `times.day`, or `-1`. */
 	dayAt: number;
+	/**
+	 * The object noun this sentence wrote, and whether it named it or stood a
+	 * pronoun for it — or left it out, which is a pronoun that writes nothing.
+	 */
+	object: { noun: string; named: boolean } | null;
 };
 
 /** The article a phrase opens with, by the noun's gender and the word after it. */
@@ -2080,9 +2109,19 @@ function compose(
 	// index back into the frame, which is what the plan is keyed by.
 	const pronoun =
 		draw.link === 'second' ? '' : follow?.reference === 'pronoun' ? follow.pronoun : null;
+	// And the object the sentence before named is referred to rather than named
+	// again, where this shape puts the same noun in its object slot: left out, or
+	// stood a pronoun for where the object would go or in front of the verb.
+	const objectRequired = requiredAt(frame, plan, 'object');
+	const reference = draw.object && objectRequired?.word === draw.object.noun ? draw.object : null;
+	const referredOut = reference !== null && (reference.text === '' || reference.clitic);
 	const shape: { part: SentencePart; at: number }[] = [];
 
 	frame.parts.forEach((part, at) => {
+		if (part.slot === 'object' && referredOut) {
+			return;
+		}
+
 		if (part.slot !== 'subject' || pronoun === null) {
 			shape.push({ part, at });
 
@@ -2116,6 +2155,10 @@ function compose(
 			return pronoun;
 		}
 
+		if (part.slot === 'object' && reference && !referredOut) {
+			return reference.text;
+		}
+
 		if (part.slot === 'subject' && follow?.reference === 'repeat' && follow.topic.named) {
 			return follow.topic.noun;
 		}
@@ -2144,7 +2187,8 @@ function compose(
 				// 여우가 …` two lines later about the same fox. A word required bare —
 				// home, which no modifier fits — is left alone too.
 				(draw.beat && entry.part.slot === subjectSlot && follow?.reference === 'repeat') ||
-				plan.phrase.get(entry.at)?.bare
+				plan.phrase.get(entry.at)?.bare ||
+				plan.phrase.get(entry.at)?.settled
 				? { ...entry, part: { ...entry.part, modifiable: false } }
 				: entry
 			: { ...entry, part: { ...entry.part, modifiable: false, bare: true } }
@@ -2224,14 +2268,20 @@ function compose(
 	// A pronoun says nothing about its own gender, and neither does a name carried
 	// over, so what agrees with either agrees with the noun it stands for.
 	let gender: WordGender | undefined =
-		pronoun !== null || proper.some((word) => word) ? follow?.topic.gender : undefined;
+		pronoun !== null || proper.some((word, i) => word && parts[i].part.slot === 'subject')
+			? follow?.topic.gender
+			: undefined;
+	// A clitic is written in front of the verb, and paid for here because it
+	// belongs to no part's share of the range.
+	const clitic = reference?.clitic ? reference.text : '';
 	let used =
 		close.length +
 		open.length +
 		tag.length +
 		quoteOpen.length +
 		quoteClose.length +
-		(opener ? opener.length + space : 0);
+		(opener ? opener.length + space : 0) +
+		(clitic ? clitic.length + space : 0);
 	// The phase of the day this sentence named, if it named one.
 	let dayAt = -1;
 	// The field the verb came from, for the story's memory.
@@ -2410,7 +2460,13 @@ function compose(
 		const opens = data.capitalize && !written.length && draw.link !== 'second';
 		// A copula in front still lets the phrase keep its own preposition, because
 		// German says `ist am 5. März` and English `is on September 5`.
-		const opener = [part.copula === 'head' ? copula : '', partHead ?? '']
+		// A clitic goes in front of the verb, after whatever else stands there —
+		// Spanish `la comió` — and is reported with neither, the way a particle is.
+		const opener = [
+			part.copula === 'head' ? copula : '',
+			partHead ?? '',
+			part.slot === 'verb' ? clitic : ''
+		]
 			.filter(Boolean)
 			.join(data.space);
 		const head = opens && opener ? upper(opener) : opener;
@@ -2449,7 +2505,9 @@ function compose(
 				word: entry.noun,
 				slots: [slot],
 				theme: entry.theme ?? undefined,
-				known: entry.theme !== null
+				known: entry.theme !== null,
+				// Described once, here, and never again.
+				settled: true
 			});
 		}
 	}
@@ -2465,6 +2523,11 @@ function compose(
 		type: draw.type,
 		scene,
 		theme: named ? null : (subject?.theme ?? null),
+		object: drawn.has('object')
+			? { noun: drawn.get('object')!.noun, named: true }
+			: reference
+				? { noun: reference.noun, named: false }
+				: null,
 		subject: carried ?? null,
 		gender: subject || named ? gender : pronoun !== null ? follow?.topic.gender : undefined,
 		named: named || (pronoun !== null && (follow?.topic.named ?? false)),
@@ -2879,6 +2942,50 @@ function followFor(
 }
 
 /**
+ * How a sentence refers to the object the sentence before it named, when its
+ * shape puts that noun in the object slot again.
+ *
+ * `forced` is the second clause of one sentence, which never names the noun its
+ * first clause just did: `소시지를 끓여서 먹었다`, not `소시지를 끓여서 소시지를
+ * 먹었다`. A whole sentence draws between the two the way a subject does, and
+ * `named` damps naming it straight after the sentence before named it. Null
+ * names the noun again, and a language with no object pronoun always does.
+ */
+function objectReferenceFor(
+	language: WordLanguage,
+	data: SentenceLanguageData,
+	noun: string,
+	forced: boolean,
+	named: boolean
+): ObjectReference | null {
+	const pronouns = data.objectPronouns;
+
+	if (!pronouns) {
+		return null;
+	}
+
+	const wordData = WORD_DATA[language];
+	const gender = genderOf(wordData, capitalizeAsPool(wordData, noun));
+	const pool = (gender ? pronouns.words[gender] : undefined) ?? pronouns.words.n ?? [];
+
+	if (!pool.length) {
+		return null;
+	}
+
+	const ways: Reference[] = ['repeat', 'pronoun'];
+	const weightOf = (way: Reference) =>
+		way === 'repeat'
+			? REFERENCE_WEIGHT.repeat * (named ? REPEAT_DAMP : 1)
+			: REFERENCE_WEIGHT.pronoun;
+
+	if (!forced && pickWeighted(ways, weightOf) === 'repeat') {
+		return null;
+	}
+
+	return { noun, text: pick(pool), clitic: pronouns.clitic ?? false };
+}
+
+/**
  * What a sentence opens on: an interjection when it is an exclamation, and a
  * connective when it follows another. Never both — a sentence that opened on two
  * things at once would be shouting its own footnote.
@@ -3194,6 +3301,8 @@ function generateResult(language: WordLanguage, settings: Settings): Result {
 		const budget = budgets[i];
 		const [type, mark] = kindFor(data, settled, room, budget, flow);
 		const follow = topic ? followFor(data, topic, scene, flow.repeated) : null;
+		const item = scene.get('object');
+		const last = built.length ? built[built.length - 1] : null;
 		const draw: Draw = {
 			budget,
 			type,
@@ -3207,7 +3316,11 @@ function generateResult(language: WordLanguage, settings: Settings): Result {
 			beat: null,
 			link: null,
 			dayAt: built.reduce((latest, one) => Math.max(latest, one.dayAt), -1),
-			dated: false
+			dated: false,
+			object:
+				item && last?.object?.noun === item.word
+					? objectReferenceFor(language, data, item.word, false, last.object.named)
+					: null
 		};
 		const [one, opened] = drawOne(paragraph, draw);
 
@@ -3510,6 +3623,16 @@ function tellStory(telling: Telling): Result | null {
 
 					return [type, type as SentenceMark] as const;
 				})();
+		const pinned = pinnedFor(beat);
+		// The sentence this one follows: the first clause for a second one, and the
+		// sentence before for a whole one. What it named is what this one may refer
+		// to rather than name again.
+		const before = beat.join === 'second' ? previous : last;
+		const item = pinned.get('object');
+		const object =
+			item && before?.object?.noun === item.word
+				? objectReferenceFor(language, data, item.word, beat.join === 'second', before.object.named)
+				: null;
 		let follow: Follow | null;
 
 		if (beat.join === 'second' && previous) {
@@ -3517,9 +3640,7 @@ function tellStory(telling: Telling): Result | null {
 			// clause's, and it writes nothing where the subject would stand.
 			const shared = topicOf(previous) ?? topic;
 
-			follow = shared
-				? { topic: shared, reference: 'pronoun', pronoun: '', scene: pinnedFor(beat) }
-				: null;
+			follow = shared ? { topic: shared, reference: 'pronoun', pronoun: '', scene: pinned } : null;
 		} else if (scene) {
 			// The scene is the one sentence whose subject is not the hero: the place
 			// the story is happening in, named in full.
@@ -3535,10 +3656,10 @@ function tellStory(telling: Telling): Result | null {
 				},
 				reference: 'repeat',
 				pronoun: '',
-				scene: pinnedFor(beat)
+				scene: pinned
 			};
 		} else {
-			follow = topic ? followFor(data, topic, pinnedFor(beat), flow.repeated, true) : null;
+			follow = topic ? followFor(data, topic, pinned, flow.repeated, true) : null;
 		}
 
 		const draw: Draw = {
@@ -3557,7 +3678,8 @@ function tellStory(telling: Telling): Result | null {
 			beat: beatDraw(beat),
 			link: beat.join,
 			dayAt,
-			dated
+			dated,
+			object
 		};
 		let [one, opened] = drawOne(telling, draw);
 
@@ -3601,9 +3723,9 @@ function tellStory(telling: Telling): Result | null {
 			}
 
 			if (slot === 'object') {
-				roles.item ??= drawn;
+				roles.item ??= { ...drawn, settled: true };
 			} else if (slot === 'place' || beat.step.destination === 'place') {
-				roles.place ??= { ...drawn, slots: ['place'] };
+				roles.place ??= { ...drawn, slots: ['place'], settled: true };
 			}
 		}
 
@@ -3634,6 +3756,8 @@ function tellStory(telling: Telling): Result | null {
 			data.space.length * (budgets.length - 1)
 	);
 	let written = 0;
+	// The sentence written last, for the next one to carry on from.
+	let last: Built | null = null;
 
 	for (let i = 0; i < beats.length; i += 1) {
 		const beat = beats[i];
@@ -3703,6 +3827,7 @@ function tellStory(telling: Telling): Result | null {
 		}
 
 		built.push(one);
+		last = one;
 		written += one.sentence.length + (at > 0 ? data.space.length : 0);
 		at += 1;
 
@@ -3744,6 +3869,7 @@ function joinClauses(data: SentenceLanguageData, first: Built, second: Built): B
 		names: [...first.names, ...second.names],
 		used: [...first.used, ...second.used],
 		scene: new Map([...first.scene, ...second.scene]),
+		object: second.object ?? first.object,
 		type: second.type,
 		field: second.field,
 		dayAt: Math.max(first.dayAt, second.dayAt)

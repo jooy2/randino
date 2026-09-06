@@ -416,6 +416,21 @@ function emitDart(code: string, data: SentenceLanguageData): string {
 	if (data.pronounless)
 		out.push(`  pronounless: const ${dartList(data.pronounless, 'NounClass', '  ')},`);
 
+	if (data.objectPronouns) {
+		out.push('  objectPronouns: const SentenceObjectPronouns(');
+		out.push('    words: <WordGender, WordPool>{');
+
+		for (const [gender, pool] of Object.entries(data.objectPronouns.words)) {
+			if (pool) out.push(`      WordGender.${gender}: ${dartStrings(pool)},`);
+		}
+
+		out.push('    },');
+
+		if (data.objectPronouns.clitic) out.push('    clitic: true,');
+
+		out.push('  ),');
+	}
+
 	if (data.numeral) {
 		const n = data.numeral;
 
@@ -751,6 +766,16 @@ function emitPython(code: string, data: SentenceLanguageData): string {
 
 	if (data.pronounless) out.push(`    pronounless=${pyTuple(data.pronounless)},`);
 
+	if (data.objectPronouns) {
+		const words = Object.entries(data.objectPronouns.words)
+			.filter(([, p]) => p)
+			.map(([g, p]) => `${pq(g)}: ${pyTuple(p!)}`)
+			.join(', ');
+		const clitic = data.objectPronouns.clitic ? ', clitic=True' : '';
+
+		out.push(`    object_pronouns=SentenceObjectPronouns(words={${words}}${clitic}),`);
+	}
+
 	if (data.numeral) {
 		const n = data.numeral;
 
@@ -795,6 +820,7 @@ function emitPython(code: string, data: SentenceLanguageData): string {
 	const body = out.join('\n') + '\n';
 
 	if (body.includes('PredicateTense(')) imports.push('PredicateTense');
+	if (body.includes('SentenceObjectPronouns(')) imports.push('SentenceObjectPronouns');
 
 	return body.replace(
 		'__IMPORTS__',

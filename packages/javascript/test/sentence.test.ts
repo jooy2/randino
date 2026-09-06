@@ -73,9 +73,11 @@ function connectivesOf(language: WordLanguage): string[] {
 
 /** Every subject pronoun the language can write, in both cases. */
 function pronounsOf(language: WordLanguage): Set<string> {
-	const written = Object.values(SENTENCE_DATA[language].pronouns).flatMap((pool) => [
-		...(pool ?? [])
-	]);
+	const data = SENTENCE_DATA[language];
+	const written = [
+		...Object.values(data.pronouns),
+		...Object.values(data.objectPronouns?.words ?? {})
+	].flatMap((pool) => [...(pool ?? [])]);
 
 	return new Set([...written, ...written.map(upperFirst)].filter(Boolean));
 }
@@ -250,6 +252,15 @@ function isMoney(language: WordLanguage, phrase: string): boolean {
  * own sentence" needs the boundaries back, and the phrases appear in order, so
  * walking them against `sentences` finds them.
  */
+/** The slots a noun phrase can stand in. */
+const NOUN_SLOTS: readonly SentenceSlot[] = [
+	'subject',
+	'object',
+	'place',
+	'destination',
+	'quantity'
+];
+
 function sentenceOf(detail: SentenceDetail): number[] {
 	const out: number[] = [];
 	let at = 0;
@@ -1394,6 +1405,65 @@ describe('Sentence', () => {
 		}
 	});
 
+	it('a noun the result has described is not described again', () => {
+		// `반듯한 소쿠리 … 소중한 소쿠리 … 예쁜 소쿠리` is three baskets. Korean, because a
+		// phrase of its is a modifier and a noun with a space between and nothing
+		// else, so the noun is the last word and a described one has two.
+		for (const detail of sentenceDetails({ language: 'ko', sentences: 5, count: SAMPLE })) {
+			const described = new Map<string, string>();
+
+			detail.phrases.forEach((phrase, i) => {
+				if (!NOUN_SLOTS.includes(detail.slots[i]) || /\d/.test(phrase)) {
+					return;
+				}
+
+				const words = phrase.split(' ');
+
+				if (words.length < 2) {
+					return;
+				}
+
+				const noun = words[words.length - 1];
+
+				assert.ok(
+					!described.has(noun),
+					`'${described.get(noun)}' and '${phrase}' describe one ${noun} twice (${detail.sentence})`
+				);
+				described.set(noun, phrase);
+			});
+		}
+	});
+
+	it('one sentence names its object once', () => {
+		// The second clause of a two-clause sentence refers to the object its first
+		// clause named — left out, or a pronoun — rather than naming it again. A
+		// pronoun may stand twice: `roasts it and swallows it`.
+		for (const language of WORD_LANGUAGES) {
+			const pronouns = pronounsOf(language);
+
+			for (const detail of sentenceDetails({ language, sentences: 3, count: SAMPLE })) {
+				const belongs = sentenceOf(detail);
+				const named = new Map<number, Set<string>>();
+
+				detail.slots.forEach((slot, i) => {
+					const phrase = detail.phrases[i];
+
+					if (slot !== 'object' || pronouns.has(phrase)) {
+						return;
+					}
+					const objects = named.get(belongs[i]) ?? new Set<string>();
+
+					assert.ok(
+						!objects.has(phrase),
+						`${language}: '${phrase}' is named twice in one sentence (${detail.sentences[belongs[i]]})`
+					);
+					objects.add(phrase);
+					named.set(belongs[i], objects);
+				});
+			}
+		}
+	});
+
 	it('a connective opens a sentence that follows another, and only one', () => {
 		for (const language of WORD_LANGUAGES) {
 			const data = SENTENCE_DATA[language];
@@ -1456,6 +1526,30 @@ describe('Sentence', () => {
 			// And it is still written where it can be, which is what makes the check
 			// above worth anything.
 			assert.ok(seen > 0, `${language} never wrote a causal connective`);
+		}
+	});
+
+	it('a language that joins two clauses can refer to an object without naming it', () => {
+		// A join with no way to refer writes the noun twice in one sentence. And an
+		// object pronoun is one word or nothing — a clitic is always a word, because
+		// it is written in front of the verb.
+		for (const language of WORD_LANGUAGES) {
+			const data = SENTENCE_DATA[language];
+
+			assert.ok(
+				data.join === undefined || data.objectPronouns !== undefined,
+				`${language} joins clauses and has no object pronoun`
+			);
+
+			for (const pool of Object.values(data.objectPronouns?.words ?? {})) {
+				for (const word of pool ?? []) {
+					assert.ok(!word.includes(' '), `${language}: '${word}' is not one word`);
+					assert.ok(
+						!data.objectPronouns?.clitic || word,
+						`${language}: a clitic cannot be nothing`
+					);
+				}
+			}
 		}
 	});
 
@@ -2588,9 +2682,12 @@ describe('Sentence', () => {
 		// The thing a story is about is one thing throughout: every object phrase of
 		// a result reads as the same noun.
 		for (const language of WORD_LANGUAGES) {
+			const pronouns = pronounsOf(language);
+
 			for (const detail of sentenceDetails({ language, sentences: 5, count: 60 })) {
+				// A pronoun standing where the thing stood is the thing, not another one.
 				const objects = detail.phrases
-					.filter((_, i) => detail.slots[i] === 'object')
+					.filter((phrase, i) => detail.slots[i] === 'object' && !pronouns.has(phrase))
 					.map((phrase) => nounsIn(language, phrase));
 
 				for (const found of objects.slice(1)) {

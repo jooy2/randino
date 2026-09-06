@@ -764,6 +764,11 @@ final SentenceLanguageData en = SentenceLanguageData(
     WordGender.n: <String>['it'],
   },
   pronounless: const <NounClass>[NounClass.person],
+  objectPronouns: const SentenceObjectPronouns(
+    words: <WordGender, WordPool>{
+      WordGender.n: <String>['it'],
+    },
+  ),
   numeral: const SentenceNumeral(
     order: NumeralOrder.before,
     counters: <NounClass, String>{},

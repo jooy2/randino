@@ -890,8 +890,13 @@ def connectives_of(language: WordLanguage) -> tuple[str, ...]:
 
 
 def pronouns_of(language: WordLanguage) -> set[str]:
-    """Every subject pronoun the language can write, in both cases."""
-    written = [word for pool in SENTENCE_DATA[language].pronouns.values() for word in pool if word]
+    """Every subject and object pronoun the language can write, in both cases."""
+    data = SENTENCE_DATA[language]
+    pools = [
+        *data.pronouns.values(),
+        *(data.object_pronouns.words.values() if data.object_pronouns is not None else ()),
+    ]
+    written = [word for pool in pools for word in pool if word]
 
     return {*written, *(upper_first(word) for word in written)}
 
@@ -1279,6 +1284,74 @@ def test_the_sentences_of_one_result_are_about_the_same_kind_of_thing() -> None:
             assert subjects >= 1, detail.sentence
 
 
+def test_a_noun_the_result_has_described_is_not_described_again() -> None:
+    # `반듯한 소쿠리 … 소중한 소쿠리 … 예쁜 소쿠리` is three baskets. Korean, because a phrase
+    # of its is a modifier and a noun with a space between and nothing else, so the noun
+    # is the last word and a described one has two.
+    noun_slots = {"subject", "object", "place", "destination", "quantity"}
+
+    for detail in rand_sentence(
+        type="statement",
+        include_name=False,
+        tense="present",
+        language="ko",
+        sentences=5,
+        count=SAMPLE,
+        output="detail",
+    ):
+        described: dict[str, str] = {}
+
+        for phrase, slot in zip(detail.phrases, detail.slots, strict=True):
+            if slot not in noun_slots or any(char.isdigit() for char in phrase):
+                continue
+
+            words = phrase.split(" ")
+
+            if len(words) < 2:
+                continue
+
+            noun = words[-1]
+
+            assert noun not in described, (
+                f"'{described[noun]}' and '{phrase}' describe one {noun} twice ({detail.sentence})"
+            )
+            described[noun] = phrase
+
+
+def test_one_sentence_names_its_object_once() -> None:
+    # The second clause of a two-clause sentence refers to the object its first clause
+    # named — left out, or a pronoun — rather than naming it again. A pronoun may stand
+    # twice: `roasts it and swallows it`.
+    for language in WORD_LANGUAGES:
+        pronouns = pronouns_of(language)
+
+        for detail in rand_sentence(
+            type="statement",
+            include_name=False,
+            tense="present",
+            language=language,
+            sentences=3,
+            count=SAMPLE,
+            output="detail",
+        ):
+            belongs = sentence_of(detail)
+            named: dict[int, set[str]] = {}
+
+            for i, slot in enumerate(detail.slots):
+                phrase = detail.phrases[i]
+
+                if slot != "object" or phrase in pronouns:
+                    continue
+
+                objects = named.setdefault(belongs[i], set())
+
+                assert phrase not in objects, (
+                    f"{language}: '{phrase}' is named twice in one sentence "
+                    f"({detail.sentences[belongs[i]]})"
+                )
+                objects.add(phrase)
+
+
 def test_a_connective_opens_a_sentence_that_follows_another() -> None:
     for language in WORD_LANGUAGES:
         data = SENTENCE_DATA[language]
@@ -1337,6 +1410,28 @@ def test_a_connective_only_claims_what_the_two_sentences_can_carry() -> None:
         # And it is still written where it can be, which is what makes the check above
         # worth anything.
         assert seen > 0, f"{language} never wrote a causal connective"
+
+
+def test_a_language_that_joins_two_clauses_can_refer_to_an_object_without_naming_it() -> None:
+    # A join with no way to refer writes the noun twice in one sentence. And an object
+    # pronoun is one word or nothing — a clitic is always a word, because it is written
+    # in front of the verb.
+    for language in WORD_LANGUAGES:
+        data = SENTENCE_DATA[language]
+
+        assert data.join is None or data.object_pronouns is not None, (
+            f"{language} joins clauses and has no object pronoun"
+        )
+
+        if data.object_pronouns is None:
+            continue
+
+        for pool in data.object_pronouns.words.values():
+            for word in pool:
+                assert " " not in word, f"{language}: '{word}' is not one word"
+                assert not data.object_pronouns.clitic or word, (
+                    f"{language}: a clitic cannot be nothing"
+                )
 
 
 def test_a_language_whose_nouns_carry_a_gender_has_a_pronoun_for_each_of_them() -> None:
@@ -2409,8 +2504,11 @@ def test_more_than_one_sentence_tells_a_story_and_one_sentence_tells_none() -> N
             assert detail.story in empty, f"{language}: {detail.story} ({detail.sentence})"
 
     # The thing a story is about is one thing throughout: every object phrase of a
-    # result reads as the same noun.
+    # result reads as the same noun. A pronoun standing where the thing stood is the
+    # thing, not another one.
     for language in WORD_LANGUAGES:
+        pronouns = pronouns_of(language)
+
         for detail in rand_sentence(
             type="statement",
             include_name=False,
@@ -2423,7 +2521,7 @@ def test_more_than_one_sentence_tells_a_story_and_one_sentence_tells_none() -> N
             objects = [
                 nouns_in(language, phrase)
                 for phrase, slot in zip(detail.phrases, detail.slots, strict=True)
-                if slot == "object"
+                if slot == "object" and phrase not in pronouns
             ]
 
             for found in objects[1:]:

@@ -12,6 +12,7 @@ from randino.sentence.data._types import (
     SentenceJoin,
     SentenceLanguageData,
     SentenceNumeral,
+    SentenceObjectPronouns,
     SentencePart,
     SentenceTimes,
     StateGroup,
@@ -592,6 +593,7 @@ ES = SentenceLanguageData(
         ay, oh, vaya, caramba, madre_mía, mira, desde_luego, uy, anda, hombre, cielos, vamos,
     """),
     pronouns={"n": ("",)},
+    object_pronouns=SentenceObjectPronouns(words={"m": ("lo",), "f": ("la",)}, clitic=True),
     numeral=SentenceNumeral(
         order="before",
         counters={},

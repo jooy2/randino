@@ -261,6 +261,17 @@ console.log(
 						// Optional in one package and defaulted in another; written as a list
 						// either way so the shapes compare.
 						pronounless: [...(data.pronounless ?? [])],
+						objectPronouns: data.objectPronouns
+							? {
+									words: Object.fromEntries(
+										Object.entries(data.objectPronouns.words).map(([gender, pool]) => [
+											gender,
+											list(pool)
+										])
+									),
+									clitic: data.objectPronouns.clitic ?? false
+								}
+							: null,
 						numeral: data.numeral
 							? {
 									order: data.numeral.order,

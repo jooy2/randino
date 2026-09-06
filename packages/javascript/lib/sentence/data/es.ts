@@ -517,6 +517,9 @@ export const ES: SentenceLanguageData = {
 	// Spanish carries its subject in the verb ending, so a second sentence about
 	// the same thing writes no pronoun at all.
 	pronouns: { n: [''] },
+	// An object named once is a clitic the next time, in front of the verb and
+	// agreeing with the noun: `cocinó la salchicha y la comió`.
+	objectPronouns: { words: { m: words(`lo`), f: words(`la`) }, clitic: true },
 	// Money only, for the reason English has: a counted phrase would need a plural
 	// noun, and most of these pools are not countable at all.
 	numeral: {

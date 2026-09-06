@@ -11,6 +11,7 @@ from randino.sentence.data._types import (
     SentenceJoin,
     SentenceLanguageData,
     SentenceNumeral,
+    SentenceObjectPronouns,
     SentencePart,
     SentencePastMark,
     SentenceTimes,
@@ -434,6 +435,7 @@ ZH = SentenceLanguageData(
     interjections=words("啊， 哎呀， 哇， 唉， 天啊， 瞧， 咦， 呀， 嘿， 哟， 好家伙， 我的天，"),
     pronouns={"n": ("", "它")},
     pronounless=("person", "creature"),
+    object_pronouns=SentenceObjectPronouns(words={"n": ("",)}),
     numeral=SentenceNumeral(
         order="after",
         counters={

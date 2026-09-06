@@ -385,6 +385,9 @@ export const RU: SentenceLanguageData = {
 		ах, ох, эх, ух, боже, гляди, право, ой, ух_ты, батюшки, надо_же, эй,
 	`),
 	pronouns: { m: words(`он`), f: words(`она`), n: words(`оно`) },
+	// An object named once is a pronoun the next time, where the object stood:
+	// `сварил колбасу и съел её`.
+	objectPronouns: { words: { m: words(`его`), f: words(`её`), n: words(`его`) } },
 	// Nominative only, which is why there is neither an object nor a place here: a
 	// Russian noun changes its own ending for both, and the endings are the noun's
 	// own rather than a rule the pools could carry. A state in the past takes

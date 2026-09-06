@@ -730,6 +730,8 @@ export const JA: SentenceLanguageData = {
 		ああ、 おお、 まあ、 なんと、 やれやれ、 おや、 ほら、 へえ、 わあ、 あら、 おっと、 いやはや、
 	`),
 	pronouns: { n: ['', 'それ'] },
+	// And an object it has named is left out the next time: `煮て食べた`.
+	objectPronouns: { words: { n: [''] } },
 	// それ is a thing: a person and an animal are referred to by leaving the
 	// subject out.
 	pronounless: ['person', 'creature'],
