@@ -2909,6 +2909,8 @@ void main() {
         SentenceStory.stroll,
         SentenceStory.outing,
         SentenceStory.evening,
+        SentenceStory.idle,
+        SentenceStory.waking,
         SentenceStory.passage,
       ];
 

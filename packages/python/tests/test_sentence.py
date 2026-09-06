@@ -2490,7 +2490,7 @@ def test_more_than_one_sentence_tells_a_story_and_one_sentence_tells_none() -> N
 
     # German and Russian carry no object, so they tell the stories with nothing in the
     # hero's hands — and they still tell one.
-    empty: tuple[SentenceStory, ...] = ("stroll", "outing", "evening", "passage")
+    empty: tuple[SentenceStory, ...] = ("stroll", "outing", "evening", "idle", "waking", "passage")
 
     for language in ("de", "ru"):
         for detail in rand_sentence(

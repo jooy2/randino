@@ -2668,7 +2668,7 @@ describe('Sentence', () => {
 
 		// German and Russian carry no object, so they tell the stories with nothing in
 		// the hero's hands — and they still tell one.
-		const empty: SentenceStory[] = ['stroll', 'outing', 'evening', 'passage'];
+		const empty: SentenceStory[] = ['stroll', 'outing', 'evening', 'idle', 'waking', 'passage'];
 
 		for (const language of ['de', 'ru'] as WordLanguage[]) {
 			for (const detail of sentenceDetails({ language, sentences: 3, count: 40 })) {

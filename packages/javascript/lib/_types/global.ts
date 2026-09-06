@@ -414,6 +414,11 @@ export type SentenceTense = 'present' | 'past';
  * - `craft`: the hero makes something and sells it. People only.
  * - `stroll`: the hero goes out and wanders, with nothing to carry.
  * - `evening`: the day ends, the hero comes home and sleeps.
+ * - `chores`: a person gets up, takes a thing out and sees to it. People only.
+ * - `stash`: the hero carries something somewhere and hides it there.
+ * - `idle`: the hero is at a loose end at home, and plays.
+ * - `waking`: the place wakes before the hero does, and the day begins.
+ * - `picnic`: the hero gets something to eat somewhere and eats it there.
  * - `passage`: something that is not a person or an animal changes over time —
  *   an apple ripens and cools, a sky darkens and deepens.
  *
@@ -421,7 +426,19 @@ export type SentenceTense = 'present' | 'past';
  * Russian carry no object, so they tell the ones with nothing in the hero's hands.
  */
 export type SentenceStory =
-	'errand' | 'meal' | 'search' | 'outing' | 'craft' | 'stroll' | 'evening' | 'passage';
+	| 'errand'
+	| 'meal'
+	| 'search'
+	| 'outing'
+	| 'craft'
+	| 'stroll'
+	| 'evening'
+	| 'chores'
+	| 'stash'
+	| 'idle'
+	| 'waking'
+	| 'picnic'
+	| 'passage';
 
 /**
  * Which of them a result may be. An array is a set to draw from, decided per

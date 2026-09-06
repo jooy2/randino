@@ -244,7 +244,12 @@ STORIES: tuple[Story, ...] = (
             StoryStep("act", fields=("cook",), object=True),
             StoryStep("act", fields=("eat", "drink"), object=True, required=True, link="causal"),
             StoryStep("state", condition="full", link="causal"),
-            StoryStep("act", fields=("rest", "sleep"), link="temporal", kinds=("trailing",)),
+            StoryStep(
+                "act",
+                fields=("express", "think", "rest"),
+                link="temporal",
+                kinds=("trailing", "exclamation"),
+            ),
         ),
     ),
     Story(
@@ -260,8 +265,8 @@ STORIES: tuple[Story, ...] = (
             StoryStep("act", fields=("look",), object=True),
             StoryStep("act", fields=("eat", "drink"), object=True, required=True, link="temporal"),
             StoryStep("state", condition="full", link="causal"),
-            StoryStep("act", fields=("express",)),
-            StoryStep("act", fields=("rest", "sleep"), link="temporal", kinds=("trailing",)),
+            StoryStep("act", fields=("express",), kinds=("exclamation",)),
+            StoryStep("act", fields=("think", "play"), link="temporal", kinds=("trailing",)),
         ),
     ),
     Story(
@@ -287,7 +292,12 @@ STORIES: tuple[Story, ...] = (
             StoryStep("act", fields=("arrive",), destination="home", link="temporal"),
             StoryStep("act", fields=("hide",), object=True),
             StoryStep("state", condition="content", link="causal"),
-            StoryStep("act", fields=("rest",), link="temporal", kinds=("trailing",)),
+            StoryStep(
+                "act",
+                fields=("think", "express"),
+                link="temporal",
+                kinds=("trailing", "exclamation"),
+            ),
         ),
     ),
     Story(
@@ -307,7 +317,9 @@ STORIES: tuple[Story, ...] = (
             StoryStep(
                 "act", fields=("arrive",), destination="home", required=True, link="temporal"
             ),
-            StoryStep("act", fields=("rest", "sleep"), link="causal", kinds=("trailing",)),
+            StoryStep(
+                "act", fields=("rest", "sleep", "express"), link="causal", kinds=("trailing",)
+            ),
         ),
     ),
     Story(
@@ -325,7 +337,12 @@ STORIES: tuple[Story, ...] = (
             StoryStep("act", fields=("sell", "carry"), object=True, required=True, link="temporal"),
             StoryStep("state", condition="content", link="causal"),
             StoryStep("act", fields=("arrive",), destination="home", link="temporal"),
-            StoryStep("act", fields=("rest",), link="temporal", kinds=("trailing",)),
+            StoryStep(
+                "act",
+                fields=("express", "think"),
+                link="temporal",
+                kinds=("trailing", "exclamation"),
+            ),
         ),
     ),
     Story(
@@ -344,7 +361,12 @@ STORIES: tuple[Story, ...] = (
             StoryStep(
                 "act", fields=("arrive",), destination="home", required=True, link="temporal"
             ),
-            StoryStep("act", fields=("rest", "sleep"), link="causal", kinds=("trailing",)),
+            StoryStep(
+                "act",
+                fields=("rest", "sleep", "think", "express"),
+                link="causal",
+                kinds=("trailing",),
+            ),
         ),
     ),
     Story(
@@ -362,6 +384,110 @@ STORIES: tuple[Story, ...] = (
             StoryStep("state", condition="tired"),
             StoryStep("act", fields=("sleep",), required=True, link="temporal"),
             StoryStep("scene", fields=("change",), link="temporal", kinds=("trailing",)),
+        ),
+    ),
+    # A day at home: a person gets up, takes a thing out and sees to it.
+    Story(
+        name="chores",
+        hero=("person",),
+        item=("thing",),
+        item_themes=("object", "tool", "clothing"),
+        start=("asleep", "rested", "home"),
+        weight=12,
+        steps=(
+            StoryStep("act", fields=("rise",), required=True),
+            StoryStep("act", fields=("take",), object=True, required=True, link="temporal"),
+            StoryStep("act", fields=("look",), object=True),
+            StoryStep("act", fields=("tend",), object=True, required=True, link="additive"),
+            StoryStep("act", fields=("carry",), object=True, link="temporal"),
+            StoryStep("state", condition="content", link="causal"),
+            StoryStep(
+                "act",
+                fields=("express", "think"),
+                link="temporal",
+                kinds=("trailing", "exclamation"),
+            ),
+        ),
+    ),
+    # The hero carries something somewhere and hides it there.
+    Story(
+        name="stash",
+        hero=AGENT_CLASSES,
+        item=("edible", "thing"),
+        start=("awake", "rested", "home", "holding"),
+        weight=12,
+        steps=(
+            StoryStep("act", fields=("carry",), object=True, required=True),
+            StoryStep("act", fields=("go",), destination="place", required=True, link="temporal"),
+            StoryStep("act", fields=("look",), object=True, place=True),
+            StoryStep(
+                "act", fields=("hide",), object=True, place=True, required=True, link="temporal"
+            ),
+            StoryStep("act", fields=("wait",), place=True),
+            StoryStep("scene", fields=("change",), link="temporal"),
+            StoryStep("act", fields=("think",), link="additive"),
+            StoryStep("act", fields=("arrive",), destination="home", link="temporal"),
+            StoryStep("state", condition="content", link="causal", kinds=("trailing",)),
+        ),
+    ),
+    # Nothing happens: the hero is at a loose end, and plays.
+    Story(
+        name="idle",
+        hero=AGENT_CLASSES,
+        start=("awake", "rested", "home"),
+        weight=10,
+        steps=(
+            StoryStep("state", condition="restless"),
+            StoryStep("act", fields=("wait",), required=True),
+            StoryStep("act", fields=("think",), link="additive"),
+            StoryStep("act", fields=("play",), required=True, link="temporal"),
+            StoryStep("act", fields=("express",), link="causal", kinds=("exclamation",)),
+            StoryStep("state", condition="content", link="causal"),
+            StoryStep("act", fields=("rest", "think"), link="temporal", kinds=("trailing",)),
+        ),
+    ),
+    # The place wakes before the hero does, and the day begins.
+    Story(
+        name="waking",
+        hero=AGENT_CLASSES,
+        start=("asleep", "rested", "home"),
+        weight=10,
+        steps=(
+            StoryStep("scene", fields=("change",), required=True),
+            StoryStep("act", fields=("rise",), required=True, link="temporal"),
+            StoryStep("act", fields=("express",), link="additive"),
+            StoryStep("act", fields=("move", "play"), link="additive"),
+            StoryStep("act", fields=("think",)),
+            StoryStep("act", fields=("wait",), link="temporal"),
+            StoryStep("scene", fields=("change",), link="temporal", kinds=("trailing",)),
+        ),
+    ),
+    # The hero eats out: gets something somewhere and eats it there.
+    Story(
+        name="picnic",
+        hero=AGENT_CLASSES,
+        item=("edible",),
+        start=("awake", "hungry", "home"),
+        weight=12,
+        steps=(
+            StoryStep("act", fields=("go",), destination="place", required=True),
+            StoryStep(
+                "act", fields=("buy", "take", "find"), object=True, place=True, required=True
+            ),
+            StoryStep("act", fields=("look",), object=True),
+            StoryStep(
+                "act",
+                fields=("eat", "drink"),
+                object=True,
+                place=True,
+                required=True,
+                link="temporal",
+            ),
+            StoryStep("state", condition="full", link="causal"),
+            StoryStep("act", fields=("express",), link="causal", kinds=("exclamation",)),
+            StoryStep("scene", fields=("change",), link="temporal"),
+            StoryStep("act", fields=("arrive",), destination="home", link="temporal"),
+            StoryStep("act", fields=("think", "express"), kinds=("trailing",)),
         ),
     ),
     Story(
@@ -388,6 +514,11 @@ INTERLUDES: tuple[StoryStep, ...] = (
     StoryStep("state", link="causal"),
     StoryStep("act", fields=("express", "wait", "think"), link="additive"),
     StoryStep("act", fields=("look",), object=True, needs=("holding",)),
+    # Out of the house, the hero may move about where they are, and the place may do
+    # something of its own. At home neither: a scene is the place the story is happening
+    # in, and a home story has none.
+    StoryStep("act", fields=("move", "play"), place=True, needs=("away",), link="additive"),
+    StoryStep("scene", fields=("change",), needs=("away",), link="temporal"),
 )
 """What a telling may put between the steps of its story when asked for more sentences."""
 

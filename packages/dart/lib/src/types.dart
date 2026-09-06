@@ -437,6 +437,21 @@ enum SentenceStory {
   /// The day ends, the hero comes home and sleeps.
   evening,
 
+  /// A person gets up, takes a thing out and sees to it. People only.
+  chores,
+
+  /// The hero carries something somewhere and hides it there.
+  stash,
+
+  /// The hero is at a loose end at home, and plays.
+  idle,
+
+  /// The place wakes before the hero does, and the day begins.
+  waking,
+
+  /// The hero gets something to eat somewhere and eats it there.
+  picnic,
+
   /// Something that is not a person or an animal changes over time — an apple
   /// ripens and cools, a sky darkens and deepens.
   passage,

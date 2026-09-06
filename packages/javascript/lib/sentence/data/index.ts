@@ -227,7 +227,12 @@ export const STORIES: readonly Story[] = [
 			{ kind: 'act', field: 'cook', object: 'item' },
 			{ kind: 'act', field: ['eat', 'drink'], object: 'item', required: true, link: 'causal' },
 			{ kind: 'state', condition: 'full', link: 'causal' },
-			{ kind: 'act', field: ['rest', 'sleep'], link: 'temporal', kinds: ['trailing'] }
+			{
+				kind: 'act',
+				field: ['express', 'think', 'rest'],
+				link: 'temporal',
+				kinds: ['trailing', 'exclamation']
+			}
 		]
 	},
 	{
@@ -243,8 +248,8 @@ export const STORIES: readonly Story[] = [
 			{ kind: 'act', field: 'look', object: 'item' },
 			{ kind: 'act', field: ['eat', 'drink'], object: 'item', required: true, link: 'temporal' },
 			{ kind: 'state', condition: 'full', link: 'causal' },
-			{ kind: 'act', field: 'express' },
-			{ kind: 'act', field: ['rest', 'sleep'], link: 'temporal', kinds: ['trailing'] }
+			{ kind: 'act', field: 'express', kinds: ['exclamation'] },
+			{ kind: 'act', field: ['think', 'play'], link: 'temporal', kinds: ['trailing'] }
 		]
 	},
 	{
@@ -270,7 +275,12 @@ export const STORIES: readonly Story[] = [
 			{ kind: 'act', field: 'arrive', destination: 'home', link: 'temporal' },
 			{ kind: 'act', field: 'hide', object: 'item' },
 			{ kind: 'state', condition: 'content', link: 'causal' },
-			{ kind: 'act', field: 'rest', link: 'temporal', kinds: ['trailing'] }
+			{
+				kind: 'act',
+				field: ['think', 'express'],
+				link: 'temporal',
+				kinds: ['trailing', 'exclamation']
+			}
 		]
 	},
 	{
@@ -288,7 +298,7 @@ export const STORIES: readonly Story[] = [
 			{ kind: 'scene', field: 'change', link: 'temporal' },
 			{ kind: 'state', condition: 'tired', link: 'causal' },
 			{ kind: 'act', field: 'arrive', destination: 'home', required: true, link: 'temporal' },
-			{ kind: 'act', field: ['rest', 'sleep'], link: 'causal', kinds: ['trailing'] }
+			{ kind: 'act', field: ['rest', 'sleep', 'express'], link: 'causal', kinds: ['trailing'] }
 		]
 	},
 	{
@@ -306,7 +316,12 @@ export const STORIES: readonly Story[] = [
 			{ kind: 'act', field: ['sell', 'carry'], object: 'item', required: true, link: 'temporal' },
 			{ kind: 'state', condition: 'content', link: 'causal' },
 			{ kind: 'act', field: 'arrive', destination: 'home', link: 'temporal' },
-			{ kind: 'act', field: 'rest', link: 'temporal', kinds: ['trailing'] }
+			{
+				kind: 'act',
+				field: ['express', 'think'],
+				link: 'temporal',
+				kinds: ['trailing', 'exclamation']
+			}
 		]
 	},
 	{
@@ -323,7 +338,12 @@ export const STORIES: readonly Story[] = [
 			{ kind: 'act', field: 'think' },
 			{ kind: 'state', condition: 'tired', link: 'causal' },
 			{ kind: 'act', field: 'arrive', destination: 'home', required: true, link: 'temporal' },
-			{ kind: 'act', field: ['rest', 'sleep'], link: 'causal', kinds: ['trailing'] }
+			{
+				kind: 'act',
+				field: ['rest', 'sleep', 'think', 'express'],
+				link: 'causal',
+				kinds: ['trailing']
+			}
 		]
 	},
 	{
@@ -341,6 +361,106 @@ export const STORIES: readonly Story[] = [
 			{ kind: 'state', condition: 'tired' },
 			{ kind: 'act', field: 'sleep', required: true, link: 'temporal' },
 			{ kind: 'scene', field: 'change', link: 'temporal', kinds: ['trailing'] }
+		]
+	},
+	{
+		// A day at home: a person gets up, takes a thing out and sees to it.
+		name: 'chores',
+		hero: ['person'],
+		item: ['thing'],
+		itemThemes: ['object', 'tool', 'clothing'],
+		start: ['asleep', 'rested', 'home'],
+		weight: 12,
+		steps: [
+			{ kind: 'act', field: 'rise', required: true },
+			{ kind: 'act', field: 'take', object: 'item', required: true, link: 'temporal' },
+			{ kind: 'act', field: 'look', object: 'item' },
+			{ kind: 'act', field: 'tend', object: 'item', required: true, link: 'additive' },
+			{ kind: 'act', field: 'carry', object: 'item', link: 'temporal' },
+			{ kind: 'state', condition: 'content', link: 'causal' },
+			{
+				kind: 'act',
+				field: ['express', 'think'],
+				link: 'temporal',
+				kinds: ['trailing', 'exclamation']
+			}
+		]
+	},
+	{
+		// The hero carries something somewhere and hides it there.
+		name: 'stash',
+		hero: AGENT_CLASSES,
+		item: ['edible', 'thing'],
+		start: ['awake', 'rested', 'home', 'holding'],
+		weight: 12,
+		steps: [
+			{ kind: 'act', field: 'carry', object: 'item', required: true },
+			{ kind: 'act', field: 'go', destination: 'place', required: true, link: 'temporal' },
+			{ kind: 'act', field: 'look', object: 'item', place: true },
+			{ kind: 'act', field: 'hide', object: 'item', place: true, required: true, link: 'temporal' },
+			{ kind: 'act', field: 'wait', place: true },
+			{ kind: 'scene', field: 'change', link: 'temporal' },
+			{ kind: 'act', field: 'think', link: 'additive' },
+			{ kind: 'act', field: 'arrive', destination: 'home', link: 'temporal' },
+			{ kind: 'state', condition: 'content', link: 'causal', kinds: ['trailing'] }
+		]
+	},
+	{
+		// Nothing happens: the hero is at a loose end, and plays.
+		name: 'idle',
+		hero: AGENT_CLASSES,
+		start: ['awake', 'rested', 'home'],
+		weight: 10,
+		steps: [
+			{ kind: 'state', condition: 'restless' },
+			{ kind: 'act', field: 'wait', required: true },
+			{ kind: 'act', field: 'think', link: 'additive' },
+			{ kind: 'act', field: 'play', required: true, link: 'temporal' },
+			{ kind: 'act', field: 'express', link: 'causal', kinds: ['exclamation'] },
+			{ kind: 'state', condition: 'content', link: 'causal' },
+			{ kind: 'act', field: ['rest', 'think'], link: 'temporal', kinds: ['trailing'] }
+		]
+	},
+	{
+		// The place wakes before the hero does, and the day begins.
+		name: 'waking',
+		hero: AGENT_CLASSES,
+		start: ['asleep', 'rested', 'home'],
+		weight: 10,
+		steps: [
+			{ kind: 'scene', field: 'change', required: true },
+			{ kind: 'act', field: 'rise', required: true, link: 'temporal' },
+			{ kind: 'act', field: 'express', link: 'additive' },
+			{ kind: 'act', field: ['move', 'play'], link: 'additive' },
+			{ kind: 'act', field: 'think' },
+			{ kind: 'act', field: 'wait', link: 'temporal' },
+			{ kind: 'scene', field: 'change', link: 'temporal', kinds: ['trailing'] }
+		]
+	},
+	{
+		// The hero eats out: gets something somewhere and eats it there.
+		name: 'picnic',
+		hero: AGENT_CLASSES,
+		item: ['edible'],
+		start: ['awake', 'hungry', 'home'],
+		weight: 12,
+		steps: [
+			{ kind: 'act', field: 'go', destination: 'place', required: true },
+			{ kind: 'act', field: ['buy', 'take', 'find'], object: 'item', place: true, required: true },
+			{ kind: 'act', field: 'look', object: 'item' },
+			{
+				kind: 'act',
+				field: ['eat', 'drink'],
+				object: 'item',
+				place: true,
+				required: true,
+				link: 'temporal'
+			},
+			{ kind: 'state', condition: 'full', link: 'causal' },
+			{ kind: 'act', field: 'express', link: 'causal', kinds: ['exclamation'] },
+			{ kind: 'scene', field: 'change', link: 'temporal' },
+			{ kind: 'act', field: 'arrive', destination: 'home', link: 'temporal' },
+			{ kind: 'act', field: ['think', 'express'], kinds: ['trailing'] }
 		]
 	},
 	{
@@ -366,7 +486,12 @@ export const STORIES: readonly Story[] = [
 export const INTERLUDES: readonly StoryStep[] = [
 	{ kind: 'state', link: 'causal' },
 	{ kind: 'act', field: ['express', 'wait', 'think'], link: 'additive' },
-	{ kind: 'act', field: 'look', object: 'item', needs: ['holding'] }
+	{ kind: 'act', field: 'look', object: 'item', needs: ['holding'] },
+	// Out of the house, the hero may move about where they are, and the place may
+	// do something of its own. At home neither: a scene is the place the story is
+	// happening in, and a home story has none.
+	{ kind: 'act', field: ['move', 'play'], place: true, needs: ['away'], link: 'additive' },
+	{ kind: 'scene', field: 'change', needs: ['away'], link: 'temporal' }
 ];
 
 export const SENTENCE_DATA: Record<WordLanguage, SentenceLanguageData> = {

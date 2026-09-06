@@ -260,7 +260,19 @@ makes it agree with the subject, and Chinese and Vietnamese write a word beside 
 """
 
 SentenceStory = Literal[
-    "errand", "meal", "search", "outing", "craft", "stroll", "evening", "passage"
+    "errand",
+    "meal",
+    "search",
+    "outing",
+    "craft",
+    "stroll",
+    "evening",
+    "chores",
+    "stash",
+    "idle",
+    "waking",
+    "picnic",
+    "passage",
 ]
 """The story a result of several sentences follows.
 
@@ -271,7 +283,11 @@ something and eats it; `"search"` — the hero looks for something, finds it and
 back; `"outing"` — the hero gets up, goes out, plays and comes home tired; `"craft"` —
 the hero makes something and sells it, people only; `"stroll"` — the hero goes out and
 wanders, with nothing to carry; `"evening"` — the day ends, the hero comes home and
-sleeps; `"passage"` — something that is not a person or an animal changes over time.
+sleeps; `"chores"` — a person gets up, takes a thing out and sees to it; `"stash"` — the
+hero carries something somewhere and hides it there; `"idle"` — the hero is at a loose
+end at home, and plays; `"waking"` — the place wakes before the hero does, and the day
+begins; `"picnic"` — the hero gets something to eat somewhere and eats it there;
+`"passage"` — something that is not a person or an animal changes over time.
 
 Which stories a language can tell depends on the shapes it declares: German and Russian
 carry no object, so they tell the ones with nothing in the hero's hands.

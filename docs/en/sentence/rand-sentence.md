@@ -942,9 +942,14 @@ The sentences follow a **story**: things that happen to one subject, the hero, i
 | `craft` | A person makes a thing, tends it, sells it or hands it over, and is content. |
 | `stroll` | The hero goes somewhere, moves about there, and comes home. |
 | `evening` | A place quietens, the hero comes home, eats, grows tired and sleeps. |
+| `chores` | A person gets up, takes a thing out, sees to it and is content. |
+| `stash` | The hero carries a thing somewhere, hides it there and comes home. |
+| `idle` | The hero is at a loose end at home, waits, plays and is content. |
+| `waking` | A place wakes before the hero does; the hero gets up and the day begins. |
+| `picnic` | The hero goes somewhere, gets something to eat there and eats it on the spot. |
 | `passage` | A thing, a plant or a place changes over the day, and nobody does anything. |
 
-`story` names one of them. Left out, it is drawn from the stories the language can tell about the subject you asked for: `theme` decides who the hero is, so `theme: 'animal'` is a story about a lion and `theme: 'plant'` can only be a `passage`. German and Russian declare no shape with an object, so they tell the stories with nothing in the hero's hands: `stroll`, `outing`, `evening` and `passage`. A result of one sentence tells no story, and `SentenceDetail.story` says which one a longer result told.
+`story` names one of them. Left out, it is drawn from the stories the language can tell about the subject you asked for: `theme` decides who the hero is, so `theme: 'animal'` is a story about a lion and `theme: 'plant'` can only be a `passage`. German and Russian declare no shape with an object, so they tell the stories with nothing in the hero's hands: `stroll`, `outing`, `evening`, `idle`, `waking` and `passage`. A result of one sentence tells no story, and `SentenceDetail.story` says which one a longer result told.
 
 ::: lang js
 
