@@ -3543,6 +3543,9 @@ const double _joinRoom = 0.6;
 /// The nouns a story has put on the page, by the role each one plays.
 class _Roles {
   _Requirement? item;
+
+  /// The story's second thing, once a sentence has written it.
+  _Requirement? prop;
   _Requirement? place;
   _Requirement? home;
 }
@@ -3619,6 +3622,7 @@ _Result? _tellStory(_Telling telling) {
 
   final story = found.plan.story;
   final beats = found.plan.beats;
+  final prop = found.plan.prop;
   final heroThemes = found.heroThemes;
   final roles = _Roles();
   final built = <_Built>[];
@@ -3641,7 +3645,10 @@ _Result? _tellStory(_Telling telling) {
     final item = roles.item;
     final place = roles.place;
 
-    if (step.object && item != null) pinned[SentenceSlot.object] = item;
+    if (step.object == StoryRole.item && item != null) pinned[SentenceSlot.object] = item;
+    if (step.object == StoryRole.prop && roles.prop != null) {
+      pinned[SentenceSlot.object] = roles.prop!;
+    }
     if (placeable(beat) && place != null) pinned[SentenceSlot.place] = place;
     if (step.destination == StoryRole.place && place != null) {
       pinned[SentenceSlot.destination] = place;
@@ -3683,7 +3690,7 @@ _Result? _tellStory(_Telling telling) {
     final prefers = <SentenceSlot>[];
 
     if (step.destination != null) wants.add(SentenceSlot.destination);
-    if (step.object) wants.add(SentenceSlot.object);
+    if (step.object != null) wants.add(SentenceSlot.object);
     if (placeable(beat)) prefers.add(SentenceSlot.place);
 
     return _BeatDraw(
@@ -3693,7 +3700,7 @@ _Result? _tellStory(_Telling telling) {
       condition: beat.condition,
       wants: wants,
       prefers: prefers,
-      item: found.item,
+      item: step.object == StoryRole.prop ? prop : found.item,
       places: _destinationThemes,
       subject: step.kind == StepKind.scene ? _destinationThemes : heroThemes,
       pinned: pinnedFor(beat),
@@ -3873,9 +3880,24 @@ _Result? _tellStory(_Telling telling) {
       if (drawn == null) continue;
 
       if (slot == SentenceSlot.object) {
-        roles.item ??= _Requirement(
+        final written = _Requirement(
           drawn.word,
           drawn.slots,
+          theme: drawn.theme,
+          known: drawn.known,
+          settled: true,
+        );
+
+        if (beat.step.object == StoryRole.prop) {
+          roles.prop ??= written;
+        } else {
+          roles.item ??= written;
+        }
+      } else if (slot == SentenceSlot.destination && beat.step.destination == StoryRole.elsewhere) {
+        // The story moved on: where it went is where it happens from here.
+        roles.place = _Requirement(
+          drawn.word,
+          const <SentenceSlot?>[SentenceSlot.place],
           theme: drawn.theme,
           known: drawn.known,
           settled: true,
@@ -3895,7 +3917,8 @@ _Result? _tellStory(_Telling telling) {
     placed =
         scene ||
         one.scene.containsKey(SentenceSlot.place) ||
-        (beat.step.destination == StoryRole.place &&
+        ((beat.step.destination == StoryRole.place ||
+                beat.step.destination == StoryRole.elsewhere) &&
             one.scene.containsKey(SentenceSlot.destination));
 
     if (one.dayAt > dayAt) dayAt = one.dayAt;

@@ -166,9 +166,18 @@ export type StoryStep = {
 	kind: 'act' | 'state' | 'scene';
 	field?: VerbField | readonly VerbField[];
 	condition?: Condition;
-	object?: 'item';
+	/**
+	 * The noun in the object slot: the thing the story is about, or its prop — a
+	 * second thing the hero picks up or looks at on the way, which is never what
+	 * the story needs and so is never in a required step.
+	 */
+	object?: 'item' | 'prop';
 	place?: boolean;
-	destination?: 'place' | 'home';
+	/**
+	 * Where the hero goes: the story's place, home, or `'elsewhere'` — a fresh
+	 * place the story moves on to, which is its place from then on.
+	 */
+	destination?: 'place' | 'home' | 'elsewhere';
 	/**
 	 * What has to be true of the hero for this step, beside what its field needs.
 	 * An interlude that has the hero look at the thing needs them to be holding
@@ -194,6 +203,13 @@ export type Story = {
 	 * makes a bowl and not a melody, though both are things.
 	 */
 	itemThemes?: readonly WordTheme[];
+	/**
+	 * Classes a second thing may belong to, for a story that has a step with
+	 * `object: 'prop'`: a tool picked up before the making, something looked at
+	 * on the way. Narrowed to `propThemes` the way the item is.
+	 */
+	prop?: readonly NounClass[];
+	propThemes?: readonly WordTheme[];
 	/** What is true of the hero before the first sentence. */
 	start: readonly Condition[];
 	steps: readonly StoryStep[];
@@ -216,11 +232,14 @@ export const STORIES: readonly Story[] = [
 		name: 'errand',
 		hero: AGENT_CLASSES,
 		item: ['edible'],
+		// Something else on the stall, looked at and left there.
+		prop: ['edible'],
 		start: ['awake', 'hungry', 'home'],
 		weight: 20,
 		steps: [
 			{ kind: 'state', condition: 'hungry' },
 			{ kind: 'act', field: 'go', destination: 'place', required: true },
+			{ kind: 'act', field: 'look', object: 'prop', place: true, link: 'additive' },
 			{ kind: 'act', field: 'look', object: 'item', place: true },
 			{ kind: 'act', field: ['buy', 'take', 'find'], object: 'item', place: true, required: true },
 			{ kind: 'act', field: 'arrive', destination: 'home', required: true, link: 'temporal' },
@@ -257,12 +276,17 @@ export const STORIES: readonly Story[] = [
 		hero: AGENT_CLASSES,
 		item: ['thing', 'plant'],
 		itemThemes: ['object', 'tool', 'clothing', 'gem', 'plant'],
+		// What the search turns up first, which is not what it was for.
+		prop: ['thing'],
+		propThemes: ['object', 'clothing'],
 		start: ['awake', 'restless', 'home'],
 		weight: 16,
 		steps: [
 			{ kind: 'state', condition: 'restless' },
 			{ kind: 'act', field: 'search', place: true, required: true },
+			{ kind: 'act', field: 'look', object: 'prop', place: true, link: 'additive' },
 			{ kind: 'act', field: 'wait', place: true },
+			{ kind: 'act', field: 'go', destination: 'elsewhere', link: 'temporal' },
 			{
 				kind: 'act',
 				field: 'find',
@@ -295,6 +319,7 @@ export const STORIES: readonly Story[] = [
 			{ kind: 'act', field: ['move', 'play'], place: true, link: 'additive' },
 			{ kind: 'act', field: 'look', object: 'item', place: true },
 			{ kind: 'act', field: 'wait', place: true },
+			{ kind: 'act', field: 'go', destination: 'elsewhere', link: 'temporal' },
 			{ kind: 'scene', field: 'change', link: 'temporal' },
 			{ kind: 'state', condition: 'tired', link: 'causal' },
 			{ kind: 'act', field: 'arrive', destination: 'home', required: true, link: 'temporal' },
@@ -306,10 +331,14 @@ export const STORIES: readonly Story[] = [
 		hero: ['person'],
 		item: ['thing'],
 		itemThemes: ['object', 'tool', 'clothing', 'product', 'gem'],
+		// The tool in hand before the making.
+		prop: ['thing'],
+		propThemes: ['tool'],
 		start: ['awake', 'rested', 'home'],
 		weight: 12,
 		steps: [
 			{ kind: 'act', field: 'go', destination: 'place' },
+			{ kind: 'act', field: 'take', object: 'prop', place: true, link: 'additive' },
 			{ kind: 'act', field: 'make', object: 'item', place: true, required: true },
 			{ kind: 'act', field: 'tend', object: 'item', link: 'temporal' },
 			{ kind: 'act', field: 'look', object: 'item' },
@@ -327,11 +356,16 @@ export const STORIES: readonly Story[] = [
 	{
 		name: 'stroll',
 		hero: AGENT_CLASSES,
+		// Something seen on the way.
+		prop: ['plant', 'thing'],
+		propThemes: ['plant', 'object'],
 		start: ['awake', 'rested', 'home'],
 		weight: 12,
 		steps: [
 			{ kind: 'act', field: 'go', destination: 'place', required: true },
 			{ kind: 'act', field: 'move', place: true, required: true, link: 'additive' },
+			{ kind: 'act', field: 'look', object: 'prop', place: true },
+			{ kind: 'act', field: 'go', destination: 'elsewhere', link: 'temporal' },
 			{ kind: 'act', field: ['wait', 'express'], place: true },
 			{ kind: 'act', field: 'play', place: true },
 			{ kind: 'scene', field: 'change', link: 'temporal' },
@@ -409,11 +443,15 @@ export const STORIES: readonly Story[] = [
 		// Nothing happens: the hero is at a loose end, and plays.
 		name: 'idle',
 		hero: AGENT_CLASSES,
+		// Something in the room.
+		prop: ['thing'],
+		propThemes: ['object', 'music'],
 		start: ['awake', 'rested', 'home'],
 		weight: 10,
 		steps: [
 			{ kind: 'state', condition: 'restless' },
 			{ kind: 'act', field: 'wait', required: true },
+			{ kind: 'act', field: 'look', object: 'prop', link: 'additive' },
 			{ kind: 'act', field: 'think', link: 'additive' },
 			{ kind: 'act', field: 'play', required: true, link: 'temporal' },
 			{ kind: 'act', field: 'express', link: 'causal', kinds: ['exclamation'] },
@@ -442,11 +480,15 @@ export const STORIES: readonly Story[] = [
 		name: 'picnic',
 		hero: AGENT_CLASSES,
 		item: ['edible'],
+		// Something else on the stall, looked at and left there.
+		prop: ['edible'],
 		start: ['awake', 'hungry', 'home'],
 		weight: 12,
 		steps: [
 			{ kind: 'act', field: 'go', destination: 'place', required: true },
+			{ kind: 'act', field: 'look', object: 'prop', place: true, link: 'additive' },
 			{ kind: 'act', field: ['buy', 'take', 'find'], object: 'item', place: true, required: true },
+			{ kind: 'act', field: 'go', destination: 'elsewhere', link: 'temporal' },
 			{ kind: 'act', field: 'look', object: 'item' },
 			{
 				kind: 'act',

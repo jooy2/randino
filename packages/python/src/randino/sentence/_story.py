@@ -85,6 +85,8 @@ class Plan:
 
     story: Story
     beats: tuple[Beat, ...]
+    prop: WordTheme | None
+    """The theme the story's prop comes from, when it has one and the language can write it."""
 
 
 def _has(state: frozenset[Condition], needs: Sequence[Condition]) -> bool:
@@ -143,19 +145,24 @@ def _fields_for(
     step: StoryStep,
     hero: NounClass,
     item: WordTheme | None,
+    prop: WordTheme | None,
     state: frozenset[Condition],
 ) -> list[VerbField]:
     """The fields of an action step the language can write for this hero just now."""
     subject: NounClass = "place" if step.kind == "scene" else hero
 
-    if not _has(state, step.needs):
+    # A prop step with no prop to write is not a step: the sentence would draw anything
+    # at all into the object slot.
+    if not _has(state, step.needs) or (step.object == "prop" and prop is None):
         return []
+
+    theme = prop if step.object == "prop" else item
 
     return [
         field
         for field in step.fields
         if _has(state, FIELD_RULES[field].needs)
-        and groups_of(data, field, subject, item, step.object)
+        and groups_of(data, field, subject, theme, step.object is not None)
     ]
 
 
@@ -217,6 +224,7 @@ def _settle(
     step: StoryStep,
     hero: NounClass,
     item: WordTheme | None,
+    prop: WordTheme | None,
     memory: _Memory,
 ) -> tuple[VerbField | None, Condition | None] | None:
     """Settle one step against the state, or None when it cannot be told here."""
@@ -231,7 +239,7 @@ def _settle(
 
         return (None, condition)  # type: ignore[return-value]
 
-    fields = _fields_for(data, step, hero, item, memory.state)
+    fields = _fields_for(data, step, hero, item, prop, memory.state)
 
     return (fields[0], None) if fields else None
 
@@ -288,6 +296,7 @@ def _walk(
     steps: Sequence[StoryStep],
     hero: NounClass,
     item: WordTheme | None,
+    prop: WordTheme | None,
 ) -> list[_Walked] | None:
     """Walk a sequence of steps from the story's start, settling each in turn.
 
@@ -298,7 +307,7 @@ def _walk(
     walked: list[_Walked] = []
 
     for step in steps:
-        one = _settle(data, step, hero, item, memory)
+        one = _settle(data, step, hero, item, prop, memory)
 
         if one is None:
             return None
@@ -314,7 +323,8 @@ def tellable(
 ) -> bool:
     """Whether the language can tell this story about this hero at all."""
     return (
-        _walk(data, story, [step for step in story.steps if step.required], hero, item) is not None
+        _walk(data, story, [step for step in story.steps if step.required], hero, item, None)
+        is not None
     )
 
 
@@ -333,6 +343,29 @@ def item_themes_for(data: SentenceLanguageData, story: Story, hero: NounClass) -
         if THEME_CLASS[theme] in story.item
         and (story.item_themes is None or theme in story.item_themes)
         and tellable(data, story, hero, theme)
+    ]
+
+
+def prop_themes_for(data: SentenceLanguageData, story: Story, hero: NounClass) -> list[WordTheme]:
+    """The themes the story's prop may come from, for this hero.
+
+    Every theme of the classes the story names that some verb of every prop step takes.
+    Empty for a story with no prop, and for a language that cannot write one of its steps.
+    """
+    steps = [step for step in story.steps if step.object == "prop"]
+
+    if story.prop is None or not steps:
+        return []
+
+    return [
+        theme
+        for theme in THEME_CLASS
+        if THEME_CLASS[theme] in story.prop
+        and (story.prop_themes is None or theme in story.prop_themes)
+        and all(
+            any(groups_of(data, field, hero, theme, True) for field in step.fields)
+            for step in steps
+        )
     ]
 
 
@@ -437,8 +470,11 @@ def plan(
     stands.
     """
     required = [step for step in story.steps if step.required]
+    # The prop is drawn once per telling, the way the item is drawn once per story.
+    props = prop_themes_for(data, story, hero)
+    prop = pick(props) if props else None
     chosen = required[:count]
-    walked = _walk(data, story, chosen, hero, item)
+    walked = _walk(data, story, chosen, hero, item, prop)
 
     if walked is None:
         return None
@@ -474,7 +510,7 @@ def plan(
             own.append(place)
 
         for step in INTERLUDES:
-            if (step.object and story.item is None) or (not again and step in chosen):
+            if (step.object == "item" and story.item is None) or (not again and step in chosen):
                 continue
 
             def insert(step: StoryStep = step) -> list[StoryStep]:
@@ -489,7 +525,7 @@ def plan(
 
         for attempt in [*own, *filler]:
             candidate = attempt()
-            walked_next = _walk(data, story, candidate, hero, item)
+            walked_next = _walk(data, story, candidate, hero, item, prop)
 
             if walked_next is not None:
                 chosen = candidate
@@ -539,7 +575,7 @@ def plan(
             if walked[i].step.required or i in joined or i - 1 in joined:
                 continue
 
-            trimmed = _walk(data, story, [*chosen[:i], *chosen[i + 1 :]], hero, item)
+            trimmed = _walk(data, story, [*chosen[:i], *chosen[i + 1 :]], hero, item, prop)
             at = i
 
             if trimmed is not None:
@@ -569,7 +605,7 @@ def plan(
         for i, one in enumerate(walked)
     )
 
-    return Plan(story, beats)
+    return Plan(story, beats, prop)
 
 
 def unjoined(beat: Beat) -> Beat:

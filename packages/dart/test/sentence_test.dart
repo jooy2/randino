@@ -1064,9 +1064,11 @@ void main() {
     });
 
     test('a paragraph keeps its scene, its person and its register', () {
-      // A place named in the first sentence is where the rest of it happens, and a
-      // thing it was about is the thing it stays about. Before this the topic was
-      // the subject and nothing else, so the place changed every line.
+      // A place named in the first sentence is where the rest of it happens — unless
+      // the story moves on, which it does at most once — and a thing it was about
+      // is the thing it stays about, beside the one other thing a story may carry.
+      // Before this the topic was the subject and nothing else, so the place
+      // changed every line.
       for (final detail in randSentenceDetails(
         language: WordLanguage.ko,
         sentences: 4,
@@ -1079,13 +1081,15 @@ void main() {
               if (detail.slots[i] == slot) nounsIn(WordLanguage.ko, detail.phrases[i]),
           ];
 
-          // Every one of them reads as the same noun: a later sentence writes its
-          // own modifier, so the phrases differ and the noun does not.
-          for (final found in drawn.skip(1)) {
+          // Every one of them reads as one of two nouns: a later sentence writes
+          // its own article, so the phrases may differ and the noun does not.
+          final others = drawn.skip(1).where((found) => !found.any(drawn.first.contains));
+
+          for (final found in others.skip(1)) {
             expect(
-              found.any(drawn.first.contains),
+              found.any(others.first.contains),
               isTrue,
-              reason: '$slot changed: ${detail.sentence}',
+              reason: '$slot changed twice: ${detail.sentence}',
             );
           }
         }
@@ -2926,9 +2930,9 @@ void main() {
         }
       }
 
-      // The thing a story is about is one thing throughout: every object phrase of
-      // a result reads as the same noun. A pronoun standing where the thing stood
-      // is the thing, not another one.
+      // The thing a story is about is one thing throughout, and its prop is one
+      // other: every object phrase of a result reads as one of two nouns. A pronoun
+      // standing where the thing stood is the thing, not another one.
       for (final language in wordLanguages) {
         final pronouns = pronounsOf(language);
 
@@ -2946,11 +2950,13 @@ void main() {
                 nounsIn(language, detail.phrases[i]),
           ];
 
-          for (final found in objects.skip(1)) {
+          final others = objects.skip(1).where((found) => !found.any(objects.first.contains));
+
+          for (final found in others.skip(1)) {
             expect(
-              found.any(objects.first.contains),
+              found.any(others.first.contains),
               isTrue,
-              reason: '$language: the thing changed (${detail.sentence})',
+              reason: '$language: the thing changed twice (${detail.sentence})',
             );
           }
         }

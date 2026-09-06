@@ -3387,6 +3387,9 @@ class Roles:
     """The nouns a story has put on the page, by the role each one plays."""
 
     item: Requirement | None = None
+    prop: Requirement | None = None
+    """The story's second thing, once a sentence has written it."""
+
     place: Requirement | None = None
     home: Requirement | None = None
 
@@ -3483,8 +3486,11 @@ def _tell_story(telling: Telling) -> Result | None:
         pinned: dict[SentenceSlot, Requirement] = {}
         step = beat.step
 
-        if step.object and roles.item is not None:
+        if step.object == "item" and roles.item is not None:
             pinned["object"] = roles.item
+
+        if step.object == "prop" and roles.prop is not None:
+            pinned["object"] = roles.prop
 
         if placeable(beat) and roles.place is not None:
             pinned["place"] = roles.place
@@ -3521,7 +3527,7 @@ def _tell_story(telling: Telling) -> Result | None:
         if step.destination is not None:
             wants.append("destination")
 
-        if step.object:
+        if step.object is not None:
             wants.append("object")
 
         if placeable(beat):
@@ -3534,7 +3540,7 @@ def _tell_story(telling: Telling) -> Result | None:
             condition=beat.condition,
             wants=tuple(wants),
             prefers=tuple(prefers),
-            item=found.item,
+            item=found.plan.prop if step.object == "prop" else found.item,
             places=DESTINATION_THEMES,
             subject=DESTINATION_THEMES if step.kind == "scene" else hero_themes,
             pinned=pinned_for(beat),
@@ -3685,8 +3691,14 @@ def _tell_story(telling: Telling) -> Result | None:
                 continue
 
             if slot == "object":
-                if roles.item is None:
+                if beat.step.object == "prop":
+                    if roles.prop is None:
+                        roles.prop = replace(drawn, settled=True)
+                elif roles.item is None:
                     roles.item = replace(drawn, settled=True)
+            elif slot == "destination" and beat.step.destination == "elsewhere":
+                # The story moved on: where it went is where it happens from here.
+                roles.place = replace(drawn, slots=("place",), settled=True)
             elif (slot == "place" or beat.step.destination == "place") and roles.place is None:
                 roles.place = replace(drawn, slots=("place",), settled=True)
 
@@ -3694,7 +3706,7 @@ def _tell_story(telling: Telling) -> Result | None:
         placed = (
             scene
             or "place" in one.scene
-            or (beat.step.destination == "place" and "destination" in one.scene)
+            or (beat.step.destination in ("place", "elsewhere") and "destination" in one.scene)
         )
         day_at = max(day_at, one.day_at)
 

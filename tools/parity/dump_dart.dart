@@ -64,7 +64,7 @@ Map<String, Object?> step(StoryStep source) => <String, Object?>{
   'kind': source.kind.name,
   'fields': <String>[for (final field in source.fields) field.name],
   'condition': source.condition?.name ?? '',
-  'object': source.object,
+  'object': source.object?.name ?? '',
   'place': source.place,
   'destination': source.destination?.name ?? '',
   'needs': <String>[for (final c in source.needs) c.name],
@@ -443,6 +443,12 @@ void main() {
               'itemThemes': story.itemThemes == null
                   ? null
                   : <String>[for (final theme in story.itemThemes!) theme.name],
+              'prop': story.prop == null
+                  ? null
+                  : <String>[for (final noun in story.prop!) noun.name],
+              'propThemes': story.propThemes == null
+                  ? null
+                  : <String>[for (final theme in story.propThemes!) theme.name],
               'start': <String>[for (final c in story.start) c.name],
               'steps': <Object?>[for (final each in story.steps) step(each)],
               'weight': story.weight,

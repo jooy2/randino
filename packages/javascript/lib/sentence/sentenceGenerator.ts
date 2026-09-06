@@ -3431,6 +3431,8 @@ const FIRST_CLAUSE_SHARE = 0.5;
 /** The nouns a story has put on the page, by the role each one plays. */
 type Roles = {
 	item?: Requirement;
+	/** The story's second thing, once a sentence has written it. */
+	prop?: Requirement;
 	place?: Requirement;
 	home?: Requirement;
 };
@@ -3500,7 +3502,7 @@ function tellStory(telling: Telling): Result | null {
 	}
 
 	const { plan: planned, heroThemes, item } = found;
-	const { story, beats } = planned;
+	const { story, beats, prop } = planned;
 	const placeThemes = DESTINATION_THEMES;
 	const roles: Roles = {};
 	const built: Built[] = [];
@@ -3520,8 +3522,12 @@ function tellStory(telling: Telling): Result | null {
 		const pinned = new Map<SentenceSlot, Requirement>();
 		const step = beat.step;
 
-		if (step.object && roles.item) {
+		if (step.object === 'item' && roles.item) {
 			pinned.set('object', roles.item);
+		}
+
+		if (step.object === 'prop' && roles.prop) {
+			pinned.set('object', roles.prop);
 		}
 
 		if (placeable(beat) && roles.place) {
@@ -3581,7 +3587,7 @@ function tellStory(telling: Telling): Result | null {
 			condition: step.kind === 'state' ? beat.condition : undefined,
 			wants,
 			prefers,
-			item,
+			item: step.object === 'prop' ? prop : item,
 			places: placeThemes,
 			subject: step.kind === 'scene' ? placeThemes : heroThemes,
 			pinned: pinnedFor(beat)
@@ -3723,7 +3729,14 @@ function tellStory(telling: Telling): Result | null {
 			}
 
 			if (slot === 'object') {
-				roles.item ??= { ...drawn, settled: true };
+				if (beat.step.object === 'prop') {
+					roles.prop ??= { ...drawn, settled: true };
+				} else {
+					roles.item ??= { ...drawn, settled: true };
+				}
+			} else if (slot === 'destination' && beat.step.destination === 'elsewhere') {
+				// The story moved on: where it went is where it happens from here.
+				roles.place = { ...drawn, slots: ['place'], settled: true };
 			} else if (slot === 'place' || beat.step.destination === 'place') {
 				roles.place ??= { ...drawn, slots: ['place'], settled: true };
 			}
@@ -3736,7 +3749,8 @@ function tellStory(telling: Telling): Result | null {
 		placed =
 			scene ||
 			one.scene.has('place') ||
-			(beat.step.destination === 'place' && one.scene.has('destination'));
+			((beat.step.destination === 'place' || beat.step.destination === 'elsewhere') &&
+				one.scene.has('destination'));
 		dayAt = Math.max(dayAt, one.dayAt);
 
 		if (!topic && !scene) {

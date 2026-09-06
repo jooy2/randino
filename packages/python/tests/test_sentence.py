@@ -953,9 +953,10 @@ def theme_of_noun(language: WordLanguage, noun: str) -> WordTheme | None:
 
 def test_a_paragraph_keeps_its_scene_its_person_and_its_register() -> None:
     """A place, a thing and a person named once are the same ones all the way down."""
-    # A place named in the first sentence is where the rest of it happens, and a thing it
-    # was about is the thing it stays about. Before this the topic was the subject and
-    # nothing else, so the place changed every line.
+    # A place named in the first sentence is where the rest of it happens — unless the
+    # story moves on, which it does at most once — and a thing it was about is the thing
+    # it stays about, beside the one other thing a story may carry. Before this the topic
+    # was the subject and nothing else, so the place changed every line.
     for detail in rand_sentence(
         language="ko", sentences=4, slots=["place", "object"], count=120, output="detail"
     ):
@@ -966,10 +967,12 @@ def test_a_paragraph_keeps_its_scene_its_person_and_its_register() -> None:
                 if each == slot
             ]
 
-            # Every one of them reads as the same noun: a later sentence writes its own
-            # modifier, so the phrases differ and the noun does not.
-            for found in drawn[1:]:
-                assert found & drawn[0], f"{slot} changed: {detail.sentence}"
+            # Every one of them reads as one of two nouns: a later sentence writes its
+            # own article, so the phrases may differ and the noun does not.
+            others = [found for found in drawn[1:] if not found & drawn[0]]
+
+            for found in others[1:]:
+                assert found & others[0], f"{slot} changed twice: {detail.sentence}"
 
     # A person is an individual rather than a kind of thing, so a paragraph about one is
     # about that one. `fresh` would quietly make it about somebody else.
@@ -2503,9 +2506,9 @@ def test_more_than_one_sentence_tells_a_story_and_one_sentence_tells_none() -> N
         ):
             assert detail.story in empty, f"{language}: {detail.story} ({detail.sentence})"
 
-    # The thing a story is about is one thing throughout: every object phrase of a
-    # result reads as the same noun. A pronoun standing where the thing stood is the
-    # thing, not another one.
+    # The thing a story is about is one thing throughout, and its prop is one other:
+    # every object phrase of a result reads as one of two nouns. A pronoun standing where
+    # the thing stood is the thing, not another one.
     for language in WORD_LANGUAGES:
         pronouns = pronouns_of(language)
 
@@ -2524,8 +2527,10 @@ def test_more_than_one_sentence_tells_a_story_and_one_sentence_tells_none() -> N
                 if slot == "object" and phrase not in pronouns
             ]
 
-            for found in objects[1:]:
-                assert found & objects[0], f"{language}: the thing changed ({detail.sentence})"
+            others = [found for found in objects[1:] if not found & objects[0]]
+
+            for found in others[1:]:
+                assert found & others[0], f"{language}: the thing changed twice ({detail.sentence})"
 
     # A story's required steps alone hold together, in every language, about every hero
     # it names — and every class of noun has a story to be in.

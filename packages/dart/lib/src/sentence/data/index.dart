@@ -226,6 +226,13 @@ enum StoryRole {
 
   /// Where the hero comes back to.
   home,
+
+  /// A second thing the hero picks up or looks at on the way, which is never
+  /// what the story needs and so is never in a required step.
+  prop,
+
+  /// A fresh place the story moves on to, which is its place from then on.
+  elsewhere,
 }
 
 /// One thing that happens in a story.
@@ -241,7 +248,7 @@ class StoryStep {
     this.kind, {
     this.fields = const <VerbField>[],
     this.condition,
-    this.object = false,
+    this.object,
     this.place = false,
     this.destination,
     this.needs = const <Condition>[],
@@ -260,7 +267,7 @@ class StoryStep {
   final Condition? condition;
 
   /// Whether the story's item is written as the object.
-  final bool object;
+  final StoryRole? object;
 
   /// Whether the story's place is written where the shape has room for one.
   final bool place;
@@ -292,6 +299,8 @@ class Story {
     required this.weight,
     this.item,
     this.itemThemes,
+    this.prop,
+    this.propThemes,
   });
 
   /// Which story this is.
@@ -305,6 +314,13 @@ class Story {
 
   /// The themes it may come from, when the classes are too wide.
   final List<WordTheme>? itemThemes;
+
+  /// Classes a second thing may belong to, for a story that has a step with
+  /// `object: StoryRole.prop`, narrowed to [propThemes] the way the item is.
+  final List<NounClass>? prop;
+
+  /// The themes the prop may come from, when the classes are too wide.
+  final List<WordTheme>? propThemes;
 
   /// What is true of the hero before the first sentence.
   final List<Condition> start;
@@ -326,6 +342,8 @@ const List<Story> stories = <Story>[
     name: SentenceStory.errand,
     hero: agentClasses,
     item: <NounClass>[NounClass.edible],
+    // Something else on the stall, looked at and left there.
+    prop: <NounClass>[NounClass.edible],
     start: <Condition>[Condition.awake, Condition.hungry, Condition.home],
     weight: 20,
     steps: <StoryStep>[
@@ -336,11 +354,23 @@ const List<Story> stories = <Story>[
         destination: StoryRole.place,
         required: true,
       ),
-      StoryStep(StepKind.act, fields: <VerbField>[VerbField.look], object: true, place: true),
+      StoryStep(
+        StepKind.act,
+        fields: <VerbField>[VerbField.look],
+        object: StoryRole.prop,
+        place: true,
+        link: ConnectiveKind.additive,
+      ),
+      StoryStep(
+        StepKind.act,
+        fields: <VerbField>[VerbField.look],
+        object: StoryRole.item,
+        place: true,
+      ),
       StoryStep(
         StepKind.act,
         fields: <VerbField>[VerbField.buy, VerbField.take, VerbField.find],
-        object: true,
+        object: StoryRole.item,
         place: true,
         required: true,
       ),
@@ -351,11 +381,11 @@ const List<Story> stories = <Story>[
         required: true,
         link: ConnectiveKind.temporal,
       ),
-      StoryStep(StepKind.act, fields: <VerbField>[VerbField.cook], object: true),
+      StoryStep(StepKind.act, fields: <VerbField>[VerbField.cook], object: StoryRole.item),
       StoryStep(
         StepKind.act,
         fields: <VerbField>[VerbField.eat, VerbField.drink],
-        object: true,
+        object: StoryRole.item,
         required: true,
         link: ConnectiveKind.causal,
       ),
@@ -379,16 +409,16 @@ const List<Story> stories = <Story>[
       StoryStep(
         StepKind.act,
         fields: <VerbField>[VerbField.take, VerbField.find],
-        object: true,
+        object: StoryRole.item,
         required: true,
         link: ConnectiveKind.causal,
       ),
-      StoryStep(StepKind.act, fields: <VerbField>[VerbField.cook], object: true),
-      StoryStep(StepKind.act, fields: <VerbField>[VerbField.look], object: true),
+      StoryStep(StepKind.act, fields: <VerbField>[VerbField.cook], object: StoryRole.item),
+      StoryStep(StepKind.act, fields: <VerbField>[VerbField.look], object: StoryRole.item),
       StoryStep(
         StepKind.act,
         fields: <VerbField>[VerbField.eat, VerbField.drink],
-        object: true,
+        object: StoryRole.item,
         required: true,
         link: ConnectiveKind.temporal,
       ),
@@ -418,15 +448,31 @@ const List<Story> stories = <Story>[
       WordTheme.plant,
     ],
     start: <Condition>[Condition.awake, Condition.restless, Condition.home],
+    // What the search turns up first, which is not what it was for.
+    prop: <NounClass>[NounClass.thing],
+    propThemes: <WordTheme>[WordTheme.object, WordTheme.clothing],
     weight: 16,
     steps: <StoryStep>[
       StoryStep(StepKind.state, condition: Condition.restless),
       StoryStep(StepKind.act, fields: <VerbField>[VerbField.search], place: true, required: true),
+      StoryStep(
+        StepKind.act,
+        fields: <VerbField>[VerbField.look],
+        object: StoryRole.prop,
+        place: true,
+        link: ConnectiveKind.additive,
+      ),
       StoryStep(StepKind.act, fields: <VerbField>[VerbField.wait], place: true),
       StoryStep(
         StepKind.act,
+        fields: <VerbField>[VerbField.go],
+        destination: StoryRole.elsewhere,
+        link: ConnectiveKind.temporal,
+      ),
+      StoryStep(
+        StepKind.act,
         fields: <VerbField>[VerbField.find],
-        object: true,
+        object: StoryRole.item,
         place: true,
         required: true,
         kinds: <SentenceType>[SentenceType.exclamation],
@@ -434,7 +480,7 @@ const List<Story> stories = <Story>[
       StoryStep(
         StepKind.act,
         fields: <VerbField>[VerbField.carry, VerbField.take],
-        object: true,
+        object: StoryRole.item,
         link: ConnectiveKind.temporal,
       ),
       StoryStep(
@@ -443,7 +489,7 @@ const List<Story> stories = <Story>[
         destination: StoryRole.home,
         link: ConnectiveKind.temporal,
       ),
-      StoryStep(StepKind.act, fields: <VerbField>[VerbField.hide], object: true),
+      StoryStep(StepKind.act, fields: <VerbField>[VerbField.hide], object: StoryRole.item),
       StoryStep(StepKind.state, condition: Condition.content, link: ConnectiveKind.causal),
       StoryStep(
         StepKind.act,
@@ -474,8 +520,19 @@ const List<Story> stories = <Story>[
         place: true,
         link: ConnectiveKind.additive,
       ),
-      StoryStep(StepKind.act, fields: <VerbField>[VerbField.look], object: true, place: true),
+      StoryStep(
+        StepKind.act,
+        fields: <VerbField>[VerbField.look],
+        object: StoryRole.item,
+        place: true,
+      ),
       StoryStep(StepKind.act, fields: <VerbField>[VerbField.wait], place: true),
+      StoryStep(
+        StepKind.act,
+        fields: <VerbField>[VerbField.go],
+        destination: StoryRole.elsewhere,
+        link: ConnectiveKind.temporal,
+      ),
       StoryStep(
         StepKind.scene,
         fields: <VerbField>[VerbField.change],
@@ -508,28 +565,38 @@ const List<Story> stories = <Story>[
       WordTheme.product,
       WordTheme.gem,
     ],
+    // The tool in hand before the making.
+    prop: <NounClass>[NounClass.thing],
+    propThemes: <WordTheme>[WordTheme.tool],
     start: <Condition>[Condition.awake, Condition.rested, Condition.home],
     weight: 12,
     steps: <StoryStep>[
       StoryStep(StepKind.act, fields: <VerbField>[VerbField.go], destination: StoryRole.place),
       StoryStep(
         StepKind.act,
+        fields: <VerbField>[VerbField.take],
+        object: StoryRole.prop,
+        place: true,
+        link: ConnectiveKind.additive,
+      ),
+      StoryStep(
+        StepKind.act,
         fields: <VerbField>[VerbField.make],
-        object: true,
+        object: StoryRole.item,
         place: true,
         required: true,
       ),
       StoryStep(
         StepKind.act,
         fields: <VerbField>[VerbField.tend],
-        object: true,
+        object: StoryRole.item,
         link: ConnectiveKind.temporal,
       ),
-      StoryStep(StepKind.act, fields: <VerbField>[VerbField.look], object: true),
+      StoryStep(StepKind.act, fields: <VerbField>[VerbField.look], object: StoryRole.item),
       StoryStep(
         StepKind.act,
         fields: <VerbField>[VerbField.sell, VerbField.carry],
-        object: true,
+        object: StoryRole.item,
         required: true,
         link: ConnectiveKind.temporal,
       ),
@@ -551,6 +618,9 @@ const List<Story> stories = <Story>[
   Story(
     name: SentenceStory.stroll,
     hero: agentClasses,
+    // Something seen on the way.
+    prop: <NounClass>[NounClass.plant, NounClass.thing],
+    propThemes: <WordTheme>[WordTheme.plant, WordTheme.object],
     start: <Condition>[Condition.awake, Condition.rested, Condition.home],
     weight: 12,
     steps: <StoryStep>[
@@ -566,6 +636,18 @@ const List<Story> stories = <Story>[
         place: true,
         required: true,
         link: ConnectiveKind.additive,
+      ),
+      StoryStep(
+        StepKind.act,
+        fields: <VerbField>[VerbField.look],
+        object: StoryRole.prop,
+        place: true,
+      ),
+      StoryStep(
+        StepKind.act,
+        fields: <VerbField>[VerbField.go],
+        destination: StoryRole.elsewhere,
+        link: ConnectiveKind.temporal,
       ),
       StoryStep(StepKind.act, fields: <VerbField>[VerbField.wait, VerbField.express], place: true),
       StoryStep(StepKind.act, fields: <VerbField>[VerbField.play], place: true),
@@ -609,7 +691,7 @@ const List<Story> stories = <Story>[
       StoryStep(
         StepKind.act,
         fields: <VerbField>[VerbField.eat, VerbField.drink],
-        object: true,
+        object: StoryRole.item,
         link: ConnectiveKind.temporal,
       ),
       StoryStep(StepKind.act, fields: <VerbField>[VerbField.express]),
@@ -642,22 +724,22 @@ const List<Story> stories = <Story>[
       StoryStep(
         StepKind.act,
         fields: <VerbField>[VerbField.take],
-        object: true,
+        object: StoryRole.item,
         required: true,
         link: ConnectiveKind.temporal,
       ),
-      StoryStep(StepKind.act, fields: <VerbField>[VerbField.look], object: true),
+      StoryStep(StepKind.act, fields: <VerbField>[VerbField.look], object: StoryRole.item),
       StoryStep(
         StepKind.act,
         fields: <VerbField>[VerbField.tend],
-        object: true,
+        object: StoryRole.item,
         required: true,
         link: ConnectiveKind.additive,
       ),
       StoryStep(
         StepKind.act,
         fields: <VerbField>[VerbField.carry],
-        object: true,
+        object: StoryRole.item,
         link: ConnectiveKind.temporal,
       ),
       StoryStep(StepKind.state, condition: Condition.content, link: ConnectiveKind.causal),
@@ -677,7 +759,12 @@ const List<Story> stories = <Story>[
     start: <Condition>[Condition.awake, Condition.rested, Condition.home, Condition.holding],
     weight: 12,
     steps: <StoryStep>[
-      StoryStep(StepKind.act, fields: <VerbField>[VerbField.carry], object: true, required: true),
+      StoryStep(
+        StepKind.act,
+        fields: <VerbField>[VerbField.carry],
+        object: StoryRole.item,
+        required: true,
+      ),
       StoryStep(
         StepKind.act,
         fields: <VerbField>[VerbField.go],
@@ -685,11 +772,16 @@ const List<Story> stories = <Story>[
         required: true,
         link: ConnectiveKind.temporal,
       ),
-      StoryStep(StepKind.act, fields: <VerbField>[VerbField.look], object: true, place: true),
+      StoryStep(
+        StepKind.act,
+        fields: <VerbField>[VerbField.look],
+        object: StoryRole.item,
+        place: true,
+      ),
       StoryStep(
         StepKind.act,
         fields: <VerbField>[VerbField.hide],
-        object: true,
+        object: StoryRole.item,
         place: true,
         required: true,
         link: ConnectiveKind.temporal,
@@ -719,11 +811,20 @@ const List<Story> stories = <Story>[
   Story(
     name: SentenceStory.idle,
     hero: agentClasses,
+    // Something in the room.
+    prop: <NounClass>[NounClass.thing],
+    propThemes: <WordTheme>[WordTheme.object, WordTheme.music],
     start: <Condition>[Condition.awake, Condition.rested, Condition.home],
     weight: 10,
     steps: <StoryStep>[
       StoryStep(StepKind.state, condition: Condition.restless),
       StoryStep(StepKind.act, fields: <VerbField>[VerbField.wait], required: true),
+      StoryStep(
+        StepKind.act,
+        fields: <VerbField>[VerbField.look],
+        object: StoryRole.prop,
+        link: ConnectiveKind.additive,
+      ),
       StoryStep(StepKind.act, fields: <VerbField>[VerbField.think], link: ConnectiveKind.additive),
       StoryStep(
         StepKind.act,
@@ -785,6 +886,8 @@ const List<Story> stories = <Story>[
     name: SentenceStory.picnic,
     hero: agentClasses,
     item: <NounClass>[NounClass.edible],
+    // Something else on the stall, looked at and left there.
+    prop: <NounClass>[NounClass.edible],
     start: <Condition>[Condition.awake, Condition.hungry, Condition.home],
     weight: 12,
     steps: <StoryStep>[
@@ -796,16 +899,29 @@ const List<Story> stories = <Story>[
       ),
       StoryStep(
         StepKind.act,
+        fields: <VerbField>[VerbField.look],
+        object: StoryRole.prop,
+        place: true,
+        link: ConnectiveKind.additive,
+      ),
+      StoryStep(
+        StepKind.act,
         fields: <VerbField>[VerbField.buy, VerbField.take, VerbField.find],
-        object: true,
+        object: StoryRole.item,
         place: true,
         required: true,
       ),
-      StoryStep(StepKind.act, fields: <VerbField>[VerbField.look], object: true),
+      StoryStep(
+        StepKind.act,
+        fields: <VerbField>[VerbField.go],
+        destination: StoryRole.elsewhere,
+        link: ConnectiveKind.temporal,
+      ),
+      StoryStep(StepKind.act, fields: <VerbField>[VerbField.look], object: StoryRole.item),
       StoryStep(
         StepKind.act,
         fields: <VerbField>[VerbField.eat, VerbField.drink],
-        object: true,
+        object: StoryRole.item,
         place: true,
         required: true,
         link: ConnectiveKind.temporal,
@@ -888,7 +1004,7 @@ const List<StoryStep> interludes = <StoryStep>[
   StoryStep(
     StepKind.act,
     fields: <VerbField>[VerbField.look],
-    object: true,
+    object: StoryRole.item,
     needs: <Condition>[Condition.holding],
   ),
   // Out of the house, the hero may move about where they are, and the place may

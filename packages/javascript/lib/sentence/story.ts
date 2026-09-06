@@ -66,6 +66,8 @@ export type Beat = {
 export type Plan = {
 	story: Story;
 	beats: Beat[];
+	/** The theme the story's prop comes from, when it has one and the language can write it. */
+	prop: WordTheme | null;
 };
 
 /** The fields a step may draw from, as a list. */
@@ -131,18 +133,23 @@ function fieldsFor(
 	step: StoryStep,
 	hero: NounClass,
 	item: WordTheme | null,
+	prop: WordTheme | null,
 	state: StoryState
 ): readonly VerbField[] {
 	const subject = step.kind === 'scene' ? 'place' : hero;
 
-	if (!has(state, step.needs)) {
+	// A prop step with no prop to write is not a step: the sentence would draw
+	// anything at all into the object slot.
+	if (!has(state, step.needs) || (step.object === 'prop' && prop === null)) {
 		return [];
 	}
+
+	const object = step.object === 'prop' ? prop : item;
 
 	return fieldsOf(step).filter(
 		(field) =>
 			has(state, FIELD_RULES[field].needs) &&
-			groupsOf(data, field, subject, item, step.object !== undefined).length > 0
+			groupsOf(data, field, subject, object, step.object !== undefined).length > 0
 	);
 }
 
@@ -203,6 +210,7 @@ function settle(
 	step: StoryStep,
 	hero: NounClass,
 	item: WordTheme | null,
+	prop: WordTheme | null,
 	memory: Memory
 ): { field: VerbField | null; condition: Condition | null } | null {
 	if (step.kind === 'state') {
@@ -215,7 +223,7 @@ function settle(
 		return condition === undefined ? null : { field: null, condition };
 	}
 
-	const fields = fieldsFor(data, step, hero, item, memory.state);
+	const fields = fieldsFor(data, step, hero, item, prop, memory.state);
 
 	return fields.length ? { field: fields[0], condition: null } : null;
 }
@@ -274,13 +282,14 @@ function walk(
 	story: Story,
 	steps: readonly StoryStep[],
 	hero: NounClass,
-	item: WordTheme | null
+	item: WordTheme | null,
+	prop: WordTheme | null
 ): Settled[] | null {
 	let memory: Memory = { state: new Set(story.start), given: new Set(), said: new Set() };
 	const settled: Settled[] = [];
 
 	for (const step of steps) {
-		const one = settle(data, step, hero, item, memory);
+		const one = settle(data, step, hero, item, prop, memory);
 
 		if (!one) {
 			return null;
@@ -300,13 +309,15 @@ export function tellable(
 	hero: NounClass,
 	item: WordTheme | null
 ): boolean {
+	// A prop is never in a required step, so none is needed to tell the story.
 	return (
 		walk(
 			data,
 			story,
 			story.steps.filter((step) => step.required),
 			hero,
-			item
+			item,
+			null
 		) !== null
 	);
 }
@@ -360,6 +371,33 @@ export function itemThemesFor(
 	);
 
 	return themes.filter((theme) => tellable(data, story, hero, theme));
+}
+
+/**
+ * The themes the story's prop may come from, for this hero: every theme of the
+ * classes the story names that some verb of every prop step takes. Empty for a
+ * story with no prop, and for a language that cannot write one of its steps —
+ * German and Russian, which carry no object at all.
+ */
+export function propThemesFor(
+	data: SentenceLanguageData,
+	story: Story,
+	hero: NounClass
+): readonly WordTheme[] {
+	const steps = story.steps.filter((step) => step.object === 'prop');
+
+	if (!story.prop || !steps.length) {
+		return [];
+	}
+
+	return (Object.keys(THEME_CLASS) as WordTheme[]).filter(
+		(theme) =>
+			story.prop!.includes(THEME_CLASS[theme]) &&
+			(!story.propThemes || story.propThemes.includes(theme)) &&
+			steps.every((step) =>
+				fieldsOf(step).some((field) => groupsOf(data, field, hero, theme, true).length > 0)
+			)
+	);
 }
 
 /** Whether a step is something the hero does, which is what two clauses share. */
@@ -426,8 +464,11 @@ export function plan(
 	joinable: boolean
 ): Plan | null {
 	const required = story.steps.filter((step) => step.required);
+	// The prop is drawn once per telling, the way the item is drawn once per story.
+	const props = propThemesFor(data, story, hero);
+	const prop = props.length ? pick(props) : null;
 	let chosen: StoryStep[] = required.slice(0, count);
-	let settled = walk(data, story, chosen, hero, item);
+	let settled = walk(data, story, chosen, hero, item, prop);
 
 	if (!settled) {
 		return null;
@@ -471,7 +512,7 @@ export function plan(
 		// An interlude goes anywhere after the opening sentence, and each kind of
 		// interlude goes in once.
 		for (const step of INTERLUDES) {
-			if ((step.object && !story.item) || (!again && chosen.includes(step))) {
+			if ((step.object === 'item' && !story.item) || (!again && chosen.includes(step))) {
 				continue;
 			}
 
@@ -502,7 +543,7 @@ export function plan(
 				continue;
 			}
 
-			const walked = walk(data, story, candidate, hero, item);
+			const walked = walk(data, story, candidate, hero, item, prop);
 
 			if (walked) {
 				chosen = candidate;
@@ -571,7 +612,7 @@ export function plan(
 
 			const without = [...chosen.slice(0, i), ...chosen.slice(i + 1)];
 
-			trimmed = walk(data, story, without, hero, item);
+			trimmed = walk(data, story, without, hero, item, prop);
 			at = i;
 		}
 
@@ -610,7 +651,7 @@ export function plan(
 		join: joined.has(i) ? 'first' : joined.has(i - 1) ? 'second' : null
 	}));
 
-	return { story, beats };
+	return { story, beats, prop };
 }
 
 /** One story out of several, by weight. */

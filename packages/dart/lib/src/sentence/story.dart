@@ -83,13 +83,17 @@ class Beat {
 /// A telling: the story and its beats, one per sentence or per clause.
 class Plan {
   /// Creates a plan.
-  const Plan(this.story, this.beats);
+  const Plan(this.story, this.beats, this.prop);
 
   /// The story told.
   final Story story;
 
   /// Its sentences, in order.
   final List<Beat> beats;
+
+  /// The theme the story's prop comes from, when it has one and the language
+  /// can write it.
+  final WordTheme? prop;
 }
 
 bool _has(Set<Condition> state, List<Condition> needs) => needs.every(state.contains);
@@ -139,17 +143,24 @@ List<VerbField> _fieldsFor(
   StoryStep step,
   NounClass hero,
   WordTheme? item,
+  WordTheme? prop,
   Set<Condition> state,
 ) {
   final subject = step.kind == StepKind.scene ? NounClass.place : hero;
 
-  if (!_has(state, step.needs)) return const <VerbField>[];
+  // A prop step with no prop to write is not a step: the sentence would draw
+  // anything at all into the object slot.
+  if (!_has(state, step.needs) || (step.object == StoryRole.prop && prop == null)) {
+    return const <VerbField>[];
+  }
+
+  final object = step.object == StoryRole.prop ? prop : item;
 
   return step.fields
       .where(
         (field) =>
             _has(state, fieldRules[field]!.needs) &&
-            groupsOf(data, field, subject, item, step.object).isNotEmpty,
+            groupsOf(data, field, subject, object, step.object != null).isNotEmpty,
       )
       .toList(growable: false);
 }
@@ -213,6 +224,7 @@ _Settled? _settle(
   StoryStep step,
   NounClass hero,
   WordTheme? item,
+  WordTheme? prop,
   _Memory memory,
 ) {
   if (step.kind == StepKind.state) {
@@ -225,7 +237,7 @@ _Settled? _settle(
     return _Settled(null, condition as Condition?);
   }
 
-  final fields = _fieldsFor(data, step, hero, item, memory.state);
+  final fields = _fieldsFor(data, step, hero, item, prop, memory.state);
 
   return fields.isEmpty ? null : _Settled(fields.first, null);
 }
@@ -283,12 +295,13 @@ List<_Walked>? _walk(
   List<StoryStep> steps,
   NounClass hero,
   WordTheme? item,
+  WordTheme? prop,
 ) {
   var memory = _Memory(<Condition>{...story.start}, <Condition>{}, <Condition>{});
   final walked = <_Walked>[];
 
   for (final step in steps) {
-    final one = _settle(data, step, hero, item, memory);
+    final one = _settle(data, step, hero, item, prop, memory);
 
     if (one == null) return null;
 
@@ -307,6 +320,8 @@ bool tellable(SentenceLanguageData data, Story story, NounClass hero, WordTheme?
       story.steps.where((step) => step.required).toList(growable: false),
       hero,
       item,
+      // A prop is never in a required step, so none is needed to tell the story.
+      null,
     ) !=
     null;
 
@@ -323,6 +338,28 @@ List<WordTheme> itemThemesFor(SentenceLanguageData data, Story story, NounClass 
             item.contains(themeClass[theme]) &&
             (story.itemThemes == null || story.itemThemes!.contains(theme)) &&
             tellable(data, story, hero, theme),
+      )
+      .toList(growable: false);
+}
+
+/// The themes the story's prop may come from, for this hero: every theme of the
+/// classes the story names that some verb of every prop step takes. Empty for a
+/// story with no prop, and for a language that cannot write one of its steps.
+List<WordTheme> propThemesFor(SentenceLanguageData data, Story story, NounClass hero) {
+  final prop = story.prop;
+  final steps = story.steps.where((step) => step.object == StoryRole.prop).toList(growable: false);
+
+  if (prop == null || steps.isEmpty) return const <WordTheme>[];
+
+  return themeClass.keys
+      .where(
+        (theme) =>
+            prop.contains(themeClass[theme]) &&
+            (story.propThemes?.contains(theme) ?? true) &&
+            steps.every(
+              (step) =>
+                  step.fields.any((field) => groupsOf(data, field, hero, theme, true).isNotEmpty),
+            ),
       )
       .toList(growable: false);
 }
@@ -412,8 +449,11 @@ Plan? plan(
   bool joinable,
 ) {
   final required = story.steps.where((step) => step.required).toList(growable: false);
+  // The prop is drawn once per telling, the way the item is drawn once per story.
+  final props = propThemesFor(data, story, hero);
+  final WordTheme? prop = props.isEmpty ? null : pick(props);
   var chosen = required.take(count).toList();
-  var walked = _walk(data, story, chosen, hero, item);
+  var walked = _walk(data, story, chosen, hero, item, null);
 
   if (walked == null) return null;
 
@@ -446,7 +486,10 @@ Plan? plan(
     }
 
     for (final step in interludes) {
-      if ((step.object && story.item == null) || (!again && chosen.contains(step))) continue;
+      if ((step.object == StoryRole.item && story.item == null) ||
+          (!again && chosen.contains(step))) {
+        continue;
+      }
 
       filler.add(() {
         final at = randInt(1, chosen.length);
@@ -460,7 +503,7 @@ Plan? plan(
 
     for (final attempt in <List<StoryStep> Function()>[...own, ...filler]) {
       final candidate = attempt();
-      final next = _walk(data, story, candidate, hero, item);
+      final next = _walk(data, story, candidate, hero, item, prop);
 
       if (next != null) {
         chosen = candidate;
@@ -514,6 +557,7 @@ Plan? plan(
         <StoryStep>[...chosen.sublist(0, i), ...chosen.sublist(i + 1)],
         hero,
         item,
+        prop,
       );
       at = i;
     }
@@ -552,7 +596,7 @@ Plan? plan(
       ),
   ];
 
-  return Plan(story, beats);
+  return Plan(story, beats, prop);
 }
 
 /// One story out of several, by weight.

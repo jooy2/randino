@@ -28,7 +28,7 @@ import { NAME_DATA } from '../dist/name/data/index.js';
 import { SENTENCE_DATA, STORIES, THEME_CLASS } from '../dist/sentence/data/index.js';
 import type { NounClass, VerbGroup } from '../dist/sentence/data/types.js';
 import { shapeOf } from '../dist/sentence/sentenceGenerator.js';
-import { heroClassesFor, itemThemesFor, tellable } from '../dist/sentence/story.js';
+import { heroClassesFor, itemThemesFor, propThemesFor, tellable } from '../dist/sentence/story.js';
 
 const SAMPLE = 60;
 
@@ -1036,9 +1036,11 @@ describe('Sentence', () => {
 	});
 
 	it('a paragraph keeps its scene, its person and its register', () => {
-		// A place named in the first sentence is where the rest of it happens, and a
-		// thing it was about is the thing it stays about. Before this the topic was
-		// the subject and nothing else, so the place changed every line.
+		// A place named in the first sentence is where the rest of it happens — unless
+		// the story moves on, which it does at most once — and a thing it was about
+		// is the thing it stays about, beside the one other thing a story may carry.
+		// Before this the topic was the subject and nothing else, so the place
+		// changed every line.
 		for (const detail of sentenceDetails({
 			language: 'ko',
 			sentences: 4,
@@ -1050,13 +1052,14 @@ describe('Sentence', () => {
 					.filter((_, i) => detail.slots[i] === slot)
 					.map((phrase) => nounsIn('ko', phrase));
 
-				// Every one of them reads as the same noun: a later sentence writes its
-				// own modifier, so the phrases differ and the noun does not.
-				for (const found of drawn.slice(1)) {
-					assert.ok(
-						[...found].some((noun) => drawn[0].has(noun)),
-						`${slot} changed: ${detail.sentence}`
-					);
+				// Every one of them reads as one of two nouns: a later sentence writes
+				// its own article, so the phrases may differ and the noun does not.
+				const shares = (found: Set<string>, other: Set<string>) =>
+					[...found].some((noun) => other.has(noun));
+				const others = drawn.slice(1).filter((found) => !shares(found, drawn[0]));
+
+				for (const found of others.slice(1)) {
+					assert.ok(shares(found, others[0]), `${slot} changed twice: ${detail.sentence}`);
 				}
 			}
 		}
@@ -2679,23 +2682,49 @@ describe('Sentence', () => {
 			}
 		}
 
-		// The thing a story is about is one thing throughout: every object phrase of
-		// a result reads as the same noun.
+		// The thing a story is about is one thing throughout, and its prop is one
+		// other: every object phrase of a result reads as one of two nouns. A pronoun
+		// standing where the thing stood is the thing, not another one.
 		for (const language of WORD_LANGUAGES) {
 			const pronouns = pronounsOf(language);
 
 			for (const detail of sentenceDetails({ language, sentences: 5, count: 60 })) {
-				// A pronoun standing where the thing stood is the thing, not another one.
 				const objects = detail.phrases
 					.filter((phrase, i) => detail.slots[i] === 'object' && !pronouns.has(phrase))
 					.map((phrase) => nounsIn(language, phrase));
+				const shares = (found: Set<string>, other: Set<string>) =>
+					[...found].some((noun) => other.has(noun));
+				const others = objects.slice(1).filter((found) => !shares(found, objects[0]));
 
-				for (const found of objects.slice(1)) {
+				for (const found of others.slice(1)) {
 					assert.ok(
-						[...found].some((noun) => objects[0].has(noun)),
-						`${language}: the thing changed (${detail.sentence})`
+						shares(found, others[0]),
+						`${language}: the thing changed twice (${detail.sentence})`
 					);
 				}
+			}
+		}
+
+		// A prop is never what a story needs, and a story that moves on does not
+		// need to. Every story with a prop step says what its prop may be, and
+		// Korean can write every one of them.
+		for (const story of STORIES) {
+			for (const step of story.steps) {
+				assert.ok(
+					step.object !== 'prop' || (!step.required && story.prop !== undefined),
+					`${story.name}: a prop step is required, or the story names no prop`
+				);
+				assert.ok(
+					step.destination !== 'elsewhere' || !step.required,
+					`${story.name}: a step that moves on is required`
+				);
+			}
+
+			if (story.prop) {
+				assert.ok(
+					propThemesFor(SENTENCE_DATA.ko, story, story.hero[0]).length > 0,
+					`ko: ${story.name} has no theme for its prop`
+				);
 			}
 		}
 

@@ -92,7 +92,7 @@ const step = (source: StoryStep) => ({
 				? [source.field]
 				: [...source.field],
 	condition: source.condition ?? '',
-	object: source.object !== undefined,
+	object: source.object ?? '',
 	place: source.place ?? false,
 	destination: source.destination ?? '',
 	needs: [...(source.needs ?? [])],
@@ -186,6 +186,8 @@ console.log(
 				hero: [...story.hero],
 				item: list(story.item),
 				itemThemes: list(story.itemThemes),
+				prop: list(story.prop),
+				propThemes: list(story.propThemes),
 				start: [...story.start],
 				steps: story.steps.map(step),
 				weight: story.weight
