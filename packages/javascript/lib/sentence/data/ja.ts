@@ -61,11 +61,25 @@ export const JA: SentenceLanguageData = {
 			subject: ['creature', 'person'],
 			requires: 'destination',
 			...tensed(
-				`行く 向かう 出かける 駆けていく 上る 下りる`,
-				`行きます 向かいます 出かけます 駆けていきます 上ります 下ります`,
-				`行った 向かった 出かけた 駆けていった 上った 下りた`,
-				`行きました 向かいました 出かけました 駆けていきました 上りました 下りました`,
-				`行って 向かって 出かけて 駆けていって 上って 下りて`
+				`行く 向かう 出かける`,
+				`行きます 向かいます 出かけます`,
+				`行った 向かった 出かけた`,
+				`行きました 向かいました 出かけました`,
+				`行って 向かって 出かけて`
+			)
+		},
+		{
+			field: 'go',
+			subject: ['creature', 'person'],
+			requires: 'destination',
+			// Running somewhere is for legs: a fish and a snake go, and do not run.
+			subjectWithout: ['swimmer', 'crawler'],
+			...tensed(
+				`駆けていく 上る 下りる`,
+				`駆けていきます 上ります 下ります`,
+				`駆けていった 上った 下りた`,
+				`駆けていきました 上りました 下りました`,
+				`駆けていって 上って 下りて`
 			)
 		},
 		{
@@ -105,13 +119,47 @@ export const JA: SentenceLanguageData = {
 		{
 			field: 'move',
 			subject: ['creature', 'person'],
+			// Running and walking are for legs: a fish and a snake do neither.
+			subjectWithout: ['swimmer', 'crawler'],
 			...tensed(
-				`走る 歩く 跳ぶ 泳ぐ 飛ぶ 這う さまよう 通る 駆け回る 散歩する`,
-				`走ります 歩きます 跳びます 泳ぎます 飛びます 這います さまよいます 通ります 駆け回ります 散歩します`,
-				`走った 歩いた 跳んだ 泳いだ 飛んだ 這った さまよった 通った 駆け回った 散歩した`,
-				`走りました 歩きました 跳びました 泳ぎました 飛びました 這いました さまよいました 通りました 駆け回りました 散歩しました`,
-				`走って 歩いて 跳んで 泳いで 飛んで 這って さまよって 通って 駆け回って 散歩して`
+				`走る 歩く 跳ぶ 駆け回る 散歩する`,
+				`走ります 歩きます 跳びます 駆け回ります 散歩します`,
+				`走った 歩いた 跳んだ 駆け回った 散歩した`,
+				`走りました 歩きました 跳びました 駆け回りました 散歩しました`,
+				`走って 歩いて 跳んで 駆け回って 散歩して`
 			)
+		},
+		{
+			field: 'move',
+			subject: ['creature', 'person'],
+			...tensed(
+				`さまよう 通る`,
+				`さまよいます 通ります`,
+				`さまよった 通った`,
+				`さまよいました 通りました`,
+				`さまよって 通って`
+			)
+		},
+		{
+			field: 'move',
+			subject: ['creature', 'person'],
+			// A fish's, a whale's and a mermaid's; a lion does not swim here.
+			subjectTraits: ['swimmer'],
+			...tensed(`泳ぐ`, `泳ぎます`, `泳いだ`, `泳ぎました`, `泳いで`)
+		},
+		{
+			field: 'move',
+			// Flying is a flier's alone: a sparrow's, a dragon's, never a fish's.
+			subject: ['creature'],
+			subjectTraits: ['flier'],
+			...tensed(`飛ぶ`, `飛びます`, `飛んだ`, `飛びました`, `飛んで`)
+		},
+		{
+			field: 'move',
+			subject: ['creature', 'person'],
+			// A snake's, a snail's and a beetle's.
+			subjectTraits: ['crawler'],
+			...tensed(`這う`, `這います`, `這った`, `這いました`, `這って`)
 		},
 		{
 			field: 'wait',
@@ -658,6 +706,25 @@ export const JA: SentenceLanguageData = {
 		temporal: words(`やがて すぐに ついに 一方 その後 しばらくして`),
 		contrastive: words(`しかし ところが けれども それでも`),
 		causal: words(`だから そこで それで`)
+	},
+	// What a noun can do that its theme does not say. A noun listed nowhere has no
+	// trait, and takes any verb that asks for none.
+	traits: {
+		flier: words(`
+		フクロウ スズメ カササギ ツバメ ワシ ハヤブサ ツル ハクチョウ カモ キツツキ インコ クジャク チョウ ガ ハチ トンボ テントウムシ コウモリ サギ
+		ペリカン カラス ウグイス カワセミ カブトムシ ホタル 犬鷲 蝉 蜉蝣 黄金虫 鍬形虫 蛍火 蠅 蚊 蛾
+		竜 鳳凰 天狗 妖精 精霊 天使 ドラゴン グリフォン 不死鳥 黒竜 白竜 青竜 朱雀 八咫烏 蛟竜 鳥女 天馬 小悪魔 小妖精 戦乙女 石像鬼
+		`),
+		swimmer: words(`
+		クジラ イルカ サメ カメ アザラシ ペンギン カエル タコ イカ ヒトデ カニ エビ コイ サケ ワニ クラゲ 御玉杓子 蟇 雨蛙 鰐 鮒 鯰 雷魚 桂魚 目高
+		泥鰌 鰻 穴子 太刀魚 鰆 秋刀魚 片口鰯 石持 介党鱈
+		人魚 海妖 巨烏賊 海獣王 河童
+		`),
+		crawler: words(`
+		カメ トカゲ カメレオン ヘビ カタツムリ アリ クモ カニ ワニ 蟷螂 蚯蚓 百足 馬陸 蠍 壁蝨 蚤 蚕 蛹 芋虫 山椒魚 青大将 蝮 毒蛇 眼鏡蛇
+		響尾蛇 錦蛇 鰐 鬣蜥
+		蛇王
+		`)
 	},
 	interjections: words(`
 		ああ、 おお、 まあ、 なんと、 やれやれ、 おや、 ほら、 へえ、 わあ、 あら、 おっと、 いやはや、

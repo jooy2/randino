@@ -52,10 +52,36 @@ final SentenceLanguageData ru = SentenceLanguageData(
     VerbGroup(
       field: VerbField.move,
       subject: const <NounClass>[NounClass.creature, NounClass.person],
-      words: words(r'бежит прыгает плывёт летит ползёт бродит проходит гуляет шагает'),
-      past: PredicateTense(
-        words: words(r'бежал прыгал плыл летел ползал бродил проходил гулял шагал'),
-      ),
+      subjectWithout: const <NounTrait>[NounTrait.swimmer, NounTrait.crawler],
+      words: words(r'бежит прыгает гуляет шагает'),
+      past: PredicateTense(words: words(r'бежал прыгал гулял шагал')),
+    ),
+    VerbGroup(
+      field: VerbField.move,
+      subject: const <NounClass>[NounClass.creature, NounClass.person],
+      words: words(r'бродит проходит'),
+      past: PredicateTense(words: words(r'бродил проходил')),
+    ),
+    VerbGroup(
+      field: VerbField.move,
+      subject: const <NounClass>[NounClass.creature, NounClass.person],
+      subjectTraits: const <NounTrait>[NounTrait.swimmer],
+      words: words(r'плывёт'),
+      past: PredicateTense(words: words(r'плыл')),
+    ),
+    VerbGroup(
+      field: VerbField.move,
+      subject: const <NounClass>[NounClass.creature],
+      subjectTraits: const <NounTrait>[NounTrait.flier],
+      words: words(r'летит'),
+      past: PredicateTense(words: words(r'летел')),
+    ),
+    VerbGroup(
+      field: VerbField.move,
+      subject: const <NounClass>[NounClass.creature, NounClass.person],
+      subjectTraits: const <NounTrait>[NounTrait.crawler],
+      words: words(r'ползёт'),
+      past: PredicateTense(words: words(r'ползал')),
     ),
     VerbGroup(
       field: VerbField.wait,
@@ -343,6 +369,20 @@ final SentenceLanguageData ru = SentenceLanguageData(
     ConnectiveKind.temporal: words(r'затем наконец потом тем_временем вскоре'),
     ConnectiveKind.contrastive: words(r'но однако а зато всё_же'),
     ConnectiveKind.causal: words(r'поэтому в_итоге значит'),
+  },
+  traits: <NounTrait, WordPool>{
+    NounTrait.flier: words(r'''
+      птица ласточка воробей ворон сокол орёл павлин попугай сова голубь журавль лебедь утка гусь
+      бабочка пчела стрекоза цикада муха комар летучая_мышь цапля пеликан дракон феникс фея грифон
+      пегас ангел валькирия
+    '''),
+    NounTrait.swimmer: words(r'''
+      крокодил черепаха лягушка жаба рыба кит дельфин акула осьминог кальмар креветка краб морж
+      тюлень пингвин русалка кракен наяда
+    '''),
+    NounTrait.crawler: words(
+      r'крокодил змея ящерица черепаха улитка муравей паук червь краб василиск',
+    ),
   },
   interjections: words(r'ах, ох, эх, ух, боже, гляди, право, ой, ух_ты, батюшки, надо_же, эй,'),
   pronouns: const <WordGender, WordPool>{

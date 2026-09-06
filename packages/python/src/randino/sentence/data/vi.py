@@ -34,7 +34,14 @@ VI = SentenceLanguageData(
             field="go",
             subject=("creature", "person"),
             requires="destination",
-            words=words("đi chạy hướng lên_đường rảo_bước"),
+            words=words("đi hướng lên_đường"),
+        ),
+        VerbGroup(
+            field="go",
+            subject=("creature", "person"),
+            subject_without=("swimmer", "crawler"),
+            requires="destination",
+            words=words("chạy rảo_bước"),
         ),
         VerbGroup(
             field="go",
@@ -55,7 +62,31 @@ VI = SentenceLanguageData(
         VerbGroup(
             field="move",
             subject=("creature", "person"),
-            words=words("chạy đi_bộ nhảy bơi bay bò lang_thang đi_qua dạo_chơi đi_dạo"),
+            subject_without=("swimmer", "crawler"),
+            words=words("chạy đi_bộ nhảy dạo_chơi đi_dạo"),
+        ),
+        VerbGroup(
+            field="move",
+            subject=("creature", "person"),
+            words=words("lang_thang đi_qua"),
+        ),
+        VerbGroup(
+            field="move",
+            subject=("creature", "person"),
+            subject_traits=("swimmer",),
+            words=words("bơi"),
+        ),
+        VerbGroup(
+            field="move",
+            subject=("creature",),
+            subject_traits=("flier",),
+            words=words("bay"),
+        ),
+        VerbGroup(
+            field="move",
+            subject=("creature", "person"),
+            subject_traits=("crawler",),
+            words=words("bò"),
         ),
         VerbGroup(
             field="wait",
@@ -394,6 +425,18 @@ VI = SentenceLanguageData(
         "temporal": words("rồi và_rồi sau_đó cuối_cùng sau_cùng thế_rồi đồng_thời lát_sau"),
         "contrastive": words("nhưng tuy_vậy tuy_nhiên dù_vậy"),
         "causal": words("thế_là vì_thế rốt_cuộc"),
+    },
+    traits={
+        "flier": words("""
+            chim én sẻ quạ chim_ưng đại_bàng công vẹt cú bồ_câu hạc thiên_nga vịt ngỗng bướm ong
+            chuồn_chuồn ve muỗi ruồi dơi rồng phượng_hoàng tiên thiên_thần hắc_long bạch_long
+            thanh_long chu_tước chim_lửa thiên_mã thần_điểu tinh_linh
+        """),
+        "swimmer": words("""
+            cá_sấu rùa ếch cóc cá cá_voi cá_heo cá_mập mực bạch_tuộc tôm cua sứa hải_cẩu cá_chép
+            lươn người_cá mỹ_nhân_ngư hải_quái
+        """),
+        "crawler": words("cá_sấu rắn thằn_lằn rùa ốc kiến nhện giun sâu tằm cua bọ_ngựa"),
     },
     interjections=words(
         "ôi, chà, ồ, trời_ơi, chao_ôi, này, thật_đấy, ái_chà, ê, ơ_kìa, khiếp, ối,"

@@ -54,13 +54,45 @@ DE = SentenceLanguageData(
         VerbGroup(
             field="move",
             subject=("creature", "person"),
-            words=words("""
-                läuft springt schwimmt fliegt kriecht streift bummelt trabt spaziert
-            """),
+            subject_without=("swimmer", "crawler"),
+            words=words("läuft springt bummelt trabt spaziert"),
             past=PredicateTense(
-                words=words("""
-                    lief sprang schwamm flog kroch streifte bummelte trabte spazierte
-                """),
+                words=words("lief sprang bummelte trabte spazierte"),
+            ),
+        ),
+        VerbGroup(
+            field="move",
+            subject=("creature", "person"),
+            words=words("streift"),
+            past=PredicateTense(
+                words=words("streifte"),
+            ),
+        ),
+        VerbGroup(
+            field="move",
+            subject=("creature", "person"),
+            subject_traits=("swimmer",),
+            words=words("schwimmt"),
+            past=PredicateTense(
+                words=words("schwamm"),
+            ),
+        ),
+        VerbGroup(
+            field="move",
+            subject=("creature",),
+            subject_traits=("flier",),
+            words=words("fliegt"),
+            past=PredicateTense(
+                words=words("flog"),
+            ),
+        ),
+        VerbGroup(
+            field="move",
+            subject=("creature", "person"),
+            subject_traits=("crawler",),
+            words=words("kriecht"),
+            past=PredicateTense(
+                words=words("kroch"),
             ),
         ),
         VerbGroup(
@@ -362,6 +394,20 @@ DE = SentenceLanguageData(
         "additive": words("und"),
         "contrastive": words("aber doch"),
         "causal": words("denn"),
+    },
+    traits={
+        "flier": words("""
+            Vogel Schwalbe Spatz Rabe Falke Adler Pfau Papagei Eule Taube Kranich Schwan Ente Gans
+            Biene Libelle Zikade Fliege Mücke Fledermaus Reiher Pelikan Drache Phönix Fee Greif
+            Pegasus Engel Walküre
+        """),
+        "swimmer": words("""
+            Krokodil Schildkröte Frosch Kröte Fisch Wal Delfin Hai Krake Tintenfisch Garnele Krabbe
+            Walross Robbe Pinguin Meerjungfrau Najade
+        """),
+        "crawler": words("""
+            Krokodil Schlange Eidechse Schildkröte Schnecke Ameise Spinne Wurm Krabbe Basilisk
+        """),
     },
     interjections=words("""
         oh, ach, na, mensch, oje, sieh_an, wahrhaftig, hui, herrje, du_meine_Güte, nanu,

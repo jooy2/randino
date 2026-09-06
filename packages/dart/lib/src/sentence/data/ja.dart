@@ -39,16 +39,29 @@ final SentenceLanguageData ja = SentenceLanguageData(
       field: VerbField.go,
       subject: const <NounClass>[NounClass.creature, NounClass.person],
       requires: SentenceSlot.destination,
-      words: words(r'行く 向かう 出かける 駆けていく 上る 下りる'),
+      words: words(r'行く 向かう 出かける'),
       forms: <PredicateForm, WordPool>{
-        PredicateForm.polite: words(r'行きます 向かいます 出かけます 駆けていきます 上ります 下ります'),
-        PredicateForm.linking: words(r'行って 向かって 出かけて 駆けていって 上って 下りて'),
+        PredicateForm.polite: words(r'行きます 向かいます 出かけます'),
+        PredicateForm.linking: words(r'行って 向かって 出かけて'),
       },
       past: PredicateTense(
-        words: words(r'行った 向かった 出かけた 駆けていった 上った 下りた'),
-        forms: <PredicateForm, WordPool>{
-          PredicateForm.polite: words(r'行きました 向かいました 出かけました 駆けていきました 上りました 下りました'),
-        },
+        words: words(r'行った 向かった 出かけた'),
+        forms: <PredicateForm, WordPool>{PredicateForm.polite: words(r'行きました 向かいました 出かけました')},
+      ),
+    ),
+    VerbGroup(
+      field: VerbField.go,
+      subject: const <NounClass>[NounClass.creature, NounClass.person],
+      subjectWithout: const <NounTrait>[NounTrait.swimmer, NounTrait.crawler],
+      requires: SentenceSlot.destination,
+      words: words(r'駆けていく 上る 下りる'),
+      forms: <PredicateForm, WordPool>{
+        PredicateForm.polite: words(r'駆けていきます 上ります 下ります'),
+        PredicateForm.linking: words(r'駆けていって 上って 下りて'),
+      },
+      past: PredicateTense(
+        words: words(r'駆けていった 上った 下りた'),
+        forms: <PredicateForm, WordPool>{PredicateForm.polite: words(r'駆けていきました 上りました 下りました')},
       ),
     ),
     VerbGroup(
@@ -96,18 +109,72 @@ final SentenceLanguageData ja = SentenceLanguageData(
     VerbGroup(
       field: VerbField.move,
       subject: const <NounClass>[NounClass.creature, NounClass.person],
-      words: words(r'走る 歩く 跳ぶ 泳ぐ 飛ぶ 這う さまよう 通る 駆け回る 散歩する'),
+      subjectWithout: const <NounTrait>[NounTrait.swimmer, NounTrait.crawler],
+      words: words(r'走る 歩く 跳ぶ 駆け回る 散歩する'),
       forms: <PredicateForm, WordPool>{
-        PredicateForm.polite: words(r'走ります 歩きます 跳びます 泳ぎます 飛びます 這います さまよいます 通ります 駆け回ります 散歩します'),
-        PredicateForm.linking: words(r'走って 歩いて 跳んで 泳いで 飛んで 這って さまよって 通って 駆け回って 散歩して'),
+        PredicateForm.polite: words(r'走ります 歩きます 跳びます 駆け回ります 散歩します'),
+        PredicateForm.linking: words(r'走って 歩いて 跳んで 駆け回って 散歩して'),
       },
       past: PredicateTense(
-        words: words(r'走った 歩いた 跳んだ 泳いだ 飛んだ 這った さまよった 通った 駆け回った 散歩した'),
+        words: words(r'走った 歩いた 跳んだ 駆け回った 散歩した'),
         forms: <PredicateForm, WordPool>{
-          PredicateForm.polite: words(
-            r'走りました 歩きました 跳びました 泳ぎました 飛びました 這いました さまよいました 通りました 駆け回りました 散歩しました',
-          ),
+          PredicateForm.polite: words(r'走りました 歩きました 跳びました 駆け回りました 散歩しました'),
         },
+      ),
+    ),
+    VerbGroup(
+      field: VerbField.move,
+      subject: const <NounClass>[NounClass.creature, NounClass.person],
+      words: words(r'さまよう 通る'),
+      forms: <PredicateForm, WordPool>{
+        PredicateForm.polite: words(r'さまよいます 通ります'),
+        PredicateForm.linking: words(r'さまよって 通って'),
+      },
+      past: PredicateTense(
+        words: words(r'さまよった 通った'),
+        forms: <PredicateForm, WordPool>{PredicateForm.polite: words(r'さまよいました 通りました')},
+      ),
+    ),
+    VerbGroup(
+      field: VerbField.move,
+      subject: const <NounClass>[NounClass.creature, NounClass.person],
+      subjectTraits: const <NounTrait>[NounTrait.swimmer],
+      words: words(r'泳ぐ'),
+      forms: <PredicateForm, WordPool>{
+        PredicateForm.polite: words(r'泳ぎます'),
+        PredicateForm.linking: words(r'泳いで'),
+      },
+      past: PredicateTense(
+        words: words(r'泳いだ'),
+        forms: <PredicateForm, WordPool>{PredicateForm.polite: words(r'泳ぎました')},
+      ),
+    ),
+    VerbGroup(
+      field: VerbField.move,
+      subject: const <NounClass>[NounClass.creature],
+      subjectTraits: const <NounTrait>[NounTrait.flier],
+      words: words(r'飛ぶ'),
+      forms: <PredicateForm, WordPool>{
+        PredicateForm.polite: words(r'飛びます'),
+        PredicateForm.linking: words(r'飛んで'),
+      },
+      past: PredicateTense(
+        words: words(r'飛んだ'),
+        forms: <PredicateForm, WordPool>{PredicateForm.polite: words(r'飛びました')},
+      ),
+    ),
+    VerbGroup(
+      field: VerbField.move,
+      subject: const <NounClass>[NounClass.creature, NounClass.person],
+      subjectTraits: const <NounTrait>[NounTrait.crawler],
+      words: words(r'這う'),
+      forms: <PredicateForm, WordPool>{
+        PredicateForm.polite: words(r'這います'),
+        PredicateForm.linking: words(r'這って'),
+      },
+      past: PredicateTense(
+        words: words(r'這った'),
+        forms: <PredicateForm, WordPool>{PredicateForm.polite: words(r'這いました')},
       ),
     ),
     VerbGroup(
@@ -803,6 +870,20 @@ final SentenceLanguageData ja = SentenceLanguageData(
     ConnectiveKind.temporal: words(r'やがて すぐに ついに 一方 その後 しばらくして'),
     ConnectiveKind.contrastive: words(r'しかし ところが けれども それでも'),
     ConnectiveKind.causal: words(r'だから そこで それで'),
+  },
+  traits: <NounTrait, WordPool>{
+    NounTrait.flier: words(r'''
+      フクロウ スズメ カササギ ツバメ ワシ ハヤブサ ツル ハクチョウ カモ キツツキ インコ クジャク チョウ ガ ハチ トンボ テントウムシ コウモリ サギ ペリカン カラス ウグイス
+      カワセミ カブトムシ ホタル 犬鷲 蝉 蜉蝣 黄金虫 鍬形虫 蛍火 蠅 蚊 蛾 竜 鳳凰 天狗 妖精 精霊 天使 ドラゴン グリフォン 不死鳥 黒竜 白竜 青竜 朱雀 八咫烏 蛟竜 鳥女
+      天馬 小悪魔 小妖精 戦乙女 石像鬼
+    '''),
+    NounTrait.swimmer: words(r'''
+      クジラ イルカ サメ カメ アザラシ ペンギン カエル タコ イカ ヒトデ カニ エビ コイ サケ ワニ クラゲ 御玉杓子 蟇 雨蛙 鰐 鮒 鯰 雷魚 桂魚 目高 泥鰌 鰻 穴子 太刀魚
+      鰆 秋刀魚 片口鰯 石持 介党鱈 人魚 海妖 巨烏賊 海獣王 河童
+    '''),
+    NounTrait.crawler: words(r'''
+      カメ トカゲ カメレオン ヘビ カタツムリ アリ クモ カニ ワニ 蟷螂 蚯蚓 百足 馬陸 蠍 壁蝨 蚤 蚕 蛹 芋虫 山椒魚 青大将 蝮 毒蛇 眼鏡蛇 響尾蛇 錦蛇 鰐 鬣蜥 蛇王
+    '''),
   },
   interjections: words(r'ああ、 おお、 まあ、 なんと、 やれやれ、 おや、 ほら、 へえ、 わあ、 あら、 おっと、 いやはや、'),
   pronouns: const <WordGender, WordPool>{

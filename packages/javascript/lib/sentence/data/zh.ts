@@ -23,7 +23,15 @@ export const ZH: SentenceLanguageData = {
 			field: 'go',
 			subject: ['creature', 'person'],
 			requires: 'destination',
-			words: words(`去 前往 走向 跑向 赶往`)
+			words: words(`去 前往 赶往`)
+		},
+		{
+			field: 'go',
+			subject: ['creature', 'person'],
+			requires: 'destination',
+			// Running somewhere is for legs: a fish and a snake go, and do not run.
+			subjectWithout: ['swimmer', 'crawler'],
+			words: words(`走向 跑向`)
 		},
 		{ field: 'go', subject: ['creature', 'person'], words: words(`出发 离开 出门 动身`) },
 		{
@@ -36,7 +44,35 @@ export const ZH: SentenceLanguageData = {
 		{
 			field: 'move',
 			subject: ['creature', 'person'],
-			words: words(`奔跑 行走 跳跃 游泳 飞翔 爬行 徘徊 经过 散步 溜达`)
+			// Running and walking are for legs: a fish and a snake do neither.
+			subjectWithout: ['swimmer', 'crawler'],
+			words: words(`奔跑 行走 跳跃 散步 溜达`)
+		},
+		{
+			field: 'move',
+			subject: ['creature', 'person'],
+			words: words(`徘徊 经过`)
+		},
+		{
+			field: 'move',
+			subject: ['creature', 'person'],
+			// A fish's, a whale's and a mermaid's; a lion does not swim here.
+			subjectTraits: ['swimmer'],
+			words: words(`游泳`)
+		},
+		{
+			field: 'move',
+			// Flying is a flier's alone: a sparrow's, a dragon's, never a fish's.
+			subject: ['creature'],
+			subjectTraits: ['flier'],
+			words: words(`飞翔`)
+		},
+		{
+			field: 'move',
+			subject: ['creature', 'person'],
+			// A snake's, a snail's and a beetle's.
+			subjectTraits: ['crawler'],
+			words: words(`爬行`)
 		},
 		{
 			field: 'wait',
@@ -295,6 +331,24 @@ export const ZH: SentenceLanguageData = {
 		temporal: words(`然后 后来 接着 同时 终于 随后 不久`),
 		contrastive: words(`但是 不过 可是 然而`),
 		causal: words(`所以 于是 因此 结果`)
+	},
+	// What a noun can do that its theme does not say. A noun listed nowhere has no
+	// trait, and takes any verb that asks for none.
+	traits: {
+		flier: words(`
+		猫头鹰 麻雀 喜鹊 燕子 老鹰 游隼 仙鹤 天鹅 鸭子 啄木鸟 鹦鹉 孔雀 蝴蝶 飞蛾 蜜蜂 蜻蜓 瓢虫 蝙蝠 白鹭 鹈鹕 大雁 乌鸦 云雀 夜莺 翠鸟
+		火烈鸟 萤火虫 金龟子 锹甲 萤火 蜉蝣 苍蝇 蚊子
+		神龙 火龙 冰龙 黑龙 白龙 青龙 凤凰 妖精 精灵 仙女 天使 天马 神鸟 朱雀 三足乌 蛟龙 鸟女 石像鬼 小恶魔 小妖精 女武神
+		`),
+		swimmer: words(`
+		鲸鱼 海豚 鲨鱼 乌龟 海豹 企鹅 青蛙 章鱼 乌贼 海星 螃蟹 龙虾 鲤鱼 三文鱼 鳄鱼 蝌蚪 蟾蜍 雨蛙 鲫鱼 鲶鱼 黑鱼 鳜鱼 青鳉 泥鳅 鳗鱼
+		海鳗 带鱼 鲅鱼 秋刀鱼 凤尾鱼 黄鱼 明太鱼
+		人鱼 美人鱼 海妖 巨乌贼 海兽王
+		`),
+		crawler: words(`
+		乌龟 蜥蜴 变色龙 蟒蛇 蜗牛 蚂蚁 蜘蛛 螃蟹 鳄鱼 螳螂 蚯蚓 蜈蚣 马陆 蝎子 壁虱 跳蚤 蚕蛹 毛虫 蝾螈 菜花蛇 蝮蛇 毒蛇 眼镜蛇 响尾蛇 鬣蜥
+		蛇王
+		`)
 	},
 	interjections: words(`
 		啊， 哎呀， 哇， 唉， 天啊， 瞧， 咦， 呀， 嘿， 哟， 好家伙， 我的天，

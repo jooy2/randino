@@ -30,7 +30,14 @@ final SentenceLanguageData zh = SentenceLanguageData(
       field: VerbField.go,
       subject: const <NounClass>[NounClass.creature, NounClass.person],
       requires: SentenceSlot.destination,
-      words: words(r'去 前往 走向 跑向 赶往'),
+      words: words(r'去 前往 赶往'),
+    ),
+    VerbGroup(
+      field: VerbField.go,
+      subject: const <NounClass>[NounClass.creature, NounClass.person],
+      subjectWithout: const <NounTrait>[NounTrait.swimmer, NounTrait.crawler],
+      requires: SentenceSlot.destination,
+      words: words(r'走向 跑向'),
     ),
     VerbGroup(
       field: VerbField.go,
@@ -51,7 +58,31 @@ final SentenceLanguageData zh = SentenceLanguageData(
     VerbGroup(
       field: VerbField.move,
       subject: const <NounClass>[NounClass.creature, NounClass.person],
-      words: words(r'奔跑 行走 跳跃 游泳 飞翔 爬行 徘徊 经过 散步 溜达'),
+      subjectWithout: const <NounTrait>[NounTrait.swimmer, NounTrait.crawler],
+      words: words(r'奔跑 行走 跳跃 散步 溜达'),
+    ),
+    VerbGroup(
+      field: VerbField.move,
+      subject: const <NounClass>[NounClass.creature, NounClass.person],
+      words: words(r'徘徊 经过'),
+    ),
+    VerbGroup(
+      field: VerbField.move,
+      subject: const <NounClass>[NounClass.creature, NounClass.person],
+      subjectTraits: const <NounTrait>[NounTrait.swimmer],
+      words: words(r'游泳'),
+    ),
+    VerbGroup(
+      field: VerbField.move,
+      subject: const <NounClass>[NounClass.creature],
+      subjectTraits: const <NounTrait>[NounTrait.flier],
+      words: words(r'飞翔'),
+    ),
+    VerbGroup(
+      field: VerbField.move,
+      subject: const <NounClass>[NounClass.creature, NounClass.person],
+      subjectTraits: const <NounTrait>[NounTrait.crawler],
+      words: words(r'爬行'),
     ),
     VerbGroup(
       field: VerbField.wait,
@@ -363,6 +394,19 @@ final SentenceLanguageData zh = SentenceLanguageData(
     ConnectiveKind.temporal: words(r'然后 后来 接着 同时 终于 随后 不久'),
     ConnectiveKind.contrastive: words(r'但是 不过 可是 然而'),
     ConnectiveKind.causal: words(r'所以 于是 因此 结果'),
+  },
+  traits: <NounTrait, WordPool>{
+    NounTrait.flier: words(r'''
+      猫头鹰 麻雀 喜鹊 燕子 老鹰 游隼 仙鹤 天鹅 鸭子 啄木鸟 鹦鹉 孔雀 蝴蝶 飞蛾 蜜蜂 蜻蜓 瓢虫 蝙蝠 白鹭 鹈鹕 大雁 乌鸦 云雀 夜莺 翠鸟 火烈鸟 萤火虫 金龟子 锹甲 萤火
+      蜉蝣 苍蝇 蚊子 神龙 火龙 冰龙 黑龙 白龙 青龙 凤凰 妖精 精灵 仙女 天使 天马 神鸟 朱雀 三足乌 蛟龙 鸟女 石像鬼 小恶魔 小妖精 女武神
+    '''),
+    NounTrait.swimmer: words(r'''
+      鲸鱼 海豚 鲨鱼 乌龟 海豹 企鹅 青蛙 章鱼 乌贼 海星 螃蟹 龙虾 鲤鱼 三文鱼 鳄鱼 蝌蚪 蟾蜍 雨蛙 鲫鱼 鲶鱼 黑鱼 鳜鱼 青鳉 泥鳅 鳗鱼 海鳗 带鱼 鲅鱼 秋刀鱼 凤尾鱼
+      黄鱼 明太鱼 人鱼 美人鱼 海妖 巨乌贼 海兽王
+    '''),
+    NounTrait.crawler: words(r'''
+      乌龟 蜥蜴 变色龙 蟒蛇 蜗牛 蚂蚁 蜘蛛 螃蟹 鳄鱼 螳螂 蚯蚓 蜈蚣 马陆 蝎子 壁虱 跳蚤 蚕蛹 毛虫 蝾螈 菜花蛇 蝮蛇 毒蛇 眼镜蛇 响尾蛇 鬣蜥 蛇王
+    '''),
   },
   interjections: words(r'啊， 哎呀， 哇， 唉， 天啊， 瞧， 咦， 呀， 嘿， 哟， 好家伙， 我的天，'),
   pronouns: const <WordGender, WordPool>{

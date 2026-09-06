@@ -45,14 +45,30 @@ EN = SentenceLanguageData(
             field="go",
             subject=("creature", "person"),
             requires="destination",
-            words=words("goes heads runs hurries walks wanders climbs"),
+            words=words("goes heads hurries wanders"),
             forms={
-                "question": words("go head run hurry walk wander climb"),
+                "question": words("go head hurry wander"),
             },
             past=PredicateTense(
-                words=words("went headed ran hurried walked wandered climbed"),
+                words=words("went headed hurried wandered"),
                 forms={
-                    "question": words("go head run hurry walk wander climb"),
+                    "question": words("go head hurry wander"),
+                },
+            ),
+        ),
+        VerbGroup(
+            field="go",
+            subject=("creature", "person"),
+            subject_without=("swimmer", "crawler"),
+            requires="destination",
+            words=words("runs walks climbs"),
+            forms={
+                "question": words("run walk climb"),
+            },
+            past=PredicateTense(
+                words=words("ran walked climbed"),
+                forms={
+                    "question": words("run walk climb"),
                 },
             ),
         ),
@@ -102,18 +118,74 @@ EN = SentenceLanguageData(
         VerbGroup(
             field="move",
             subject=("creature", "person"),
-            words=words("""
-                runs walks leaps swims flies crawls wanders passes strolls roams paces
-            """),
+            subject_without=("swimmer", "crawler"),
+            words=words("runs walks leaps strolls roams paces"),
             forms={
-                "question": words("run walk leap swim fly crawl wander pass stroll roam pace"),
+                "question": words("run walk leap stroll roam pace"),
             },
             past=PredicateTense(
-                words=words("""
-                    ran walked leapt swam flew crawled wandered passed strolled roamed paced
-                """),
+                words=words("ran walked leapt strolled roamed paced"),
                 forms={
-                    "question": words("run walk leap swim fly crawl wander pass stroll roam pace"),
+                    "question": words("run walk leap stroll roam pace"),
+                },
+            ),
+        ),
+        VerbGroup(
+            field="move",
+            subject=("creature", "person"),
+            words=words("wanders passes"),
+            forms={
+                "question": words("wander pass"),
+            },
+            past=PredicateTense(
+                words=words("wandered passed"),
+                forms={
+                    "question": words("wander pass"),
+                },
+            ),
+        ),
+        VerbGroup(
+            field="move",
+            subject=("creature", "person"),
+            subject_traits=("swimmer",),
+            words=words("swims"),
+            forms={
+                "question": words("swim"),
+            },
+            past=PredicateTense(
+                words=words("swam"),
+                forms={
+                    "question": words("swim"),
+                },
+            ),
+        ),
+        VerbGroup(
+            field="move",
+            subject=("creature",),
+            subject_traits=("flier",),
+            words=words("flies"),
+            forms={
+                "question": words("fly"),
+            },
+            past=PredicateTense(
+                words=words("flew"),
+                forms={
+                    "question": words("fly"),
+                },
+            ),
+        ),
+        VerbGroup(
+            field="move",
+            subject=("creature", "person"),
+            subject_traits=("crawler",),
+            words=words("crawls"),
+            forms={
+                "question": words("crawl"),
+            },
+            past=PredicateTense(
+                words=words("crawled"),
+                forms={
+                    "question": words("crawl"),
                 },
             ),
         ),
@@ -701,6 +773,26 @@ EN = SentenceLanguageData(
         "temporal": words("meanwhile afterwards later soon at_last before_long"),
         "contrastive": words("but still however yet even_so then_again all_the_same even_then"),
         "causal": words("so therefore in_the_end"),
+    },
+    traits={
+        "flier": words("""
+            owl sparrow magpie swallow eagle falcon crane swan duck goose woodpecker parrot peacock
+            butterfly moth bee dragonfly ladybug bat heron pelican raven kestrel puffin flamingo
+            firefly osprey vulture condor stork ibis cormorant albatross petrel sandpiper plover
+            lapwing starling finch warbler thrush cuckoo hoopoe kingfisher toucan macaw cockatoo
+            canary nightingale cicada beetle dragon wyvern phoenix griffin harpy pegasus hippogriff
+            roc simurgh thunderbird fairy pixie sprite sylph angel seraph valkyrie imp gargoyle
+            drake peryton
+        """),
+        "swimmer": words("""
+            whale dolphin shark turtle seal penguin frog octopus squid seahorse starfish crab shrimp
+            carp salmon mackerel walrus narwhal jellyfish tadpole siren mermaid kraken leviathan
+            naiad undine selkie kelpie
+        """),
+        "crawler": words("""
+            turtle lizard chameleon snake snail ant spider crab earthworm centipede scorpion gecko
+            iguana cobra python newt mantis basilisk wyrm naga amphisbaena lindworm
+        """),
     },
     interjections=words("""
         oh, ah, wow, well, look, goodness, my, indeed, honestly, gosh, hey, whoa, dear_me,

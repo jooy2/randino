@@ -54,9 +54,45 @@ RU = SentenceLanguageData(
         VerbGroup(
             field="move",
             subject=("creature", "person"),
-            words=words("бежит прыгает плывёт летит ползёт бродит проходит гуляет шагает"),
+            subject_without=("swimmer", "crawler"),
+            words=words("бежит прыгает гуляет шагает"),
             past=PredicateTense(
-                words=words("бежал прыгал плыл летел ползал бродил проходил гулял шагал"),
+                words=words("бежал прыгал гулял шагал"),
+            ),
+        ),
+        VerbGroup(
+            field="move",
+            subject=("creature", "person"),
+            words=words("бродит проходит"),
+            past=PredicateTense(
+                words=words("бродил проходил"),
+            ),
+        ),
+        VerbGroup(
+            field="move",
+            subject=("creature", "person"),
+            subject_traits=("swimmer",),
+            words=words("плывёт"),
+            past=PredicateTense(
+                words=words("плыл"),
+            ),
+        ),
+        VerbGroup(
+            field="move",
+            subject=("creature",),
+            subject_traits=("flier",),
+            words=words("летит"),
+            past=PredicateTense(
+                words=words("летел"),
+            ),
+        ),
+        VerbGroup(
+            field="move",
+            subject=("creature", "person"),
+            subject_traits=("crawler",),
+            words=words("ползёт"),
+            past=PredicateTense(
+                words=words("ползал"),
             ),
         ),
         VerbGroup(
@@ -364,6 +400,18 @@ RU = SentenceLanguageData(
         "temporal": words("затем наконец потом тем_временем вскоре"),
         "contrastive": words("но однако а зато всё_же"),
         "causal": words("поэтому в_итоге значит"),
+    },
+    traits={
+        "flier": words("""
+            птица ласточка воробей ворон сокол орёл павлин попугай сова голубь журавль лебедь утка
+            гусь бабочка пчела стрекоза цикада муха комар летучая_мышь цапля пеликан дракон феникс
+            фея грифон пегас ангел валькирия
+        """),
+        "swimmer": words("""
+            крокодил черепаха лягушка жаба рыба кит дельфин акула осьминог кальмар креветка краб
+            морж тюлень пингвин русалка кракен наяда
+        """),
+        "crawler": words("крокодил змея ящерица черепаха улитка муравей паук червь краб василиск"),
     },
     interjections=words("ах, ох, эх, ух, боже, гляди, право, ой, ух_ты, батюшки, надо_же, эй,"),
     pronouns={"m": ("он",), "f": ("она",), "n": ("оно",)},

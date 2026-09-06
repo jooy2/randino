@@ -915,6 +915,13 @@ function requiredAt(frame: SentenceFrame, plan: Plan, slot: SentenceSlot): Requi
 
 // Pools and their bounds never change, so they are worth holding on to.
 const nounCache = new Map<string, WordPool>();
+
+/**
+ * The subject pools a trait narrows, by group and theme. Every group a sentence
+ * considers reads them for every theme it could take, and filtering two hundred
+ * nouns each time is what made a paragraph slow once every language had them.
+ */
+const subjectPoolCache = new WeakMap<VerbGroup, Map<WordTheme, WordPool>>();
 const boundsCache = new Map<string, Record<string, readonly [number, number]>>();
 const spanCache = new Map<string, readonly [number, number]>();
 const agreedCache = new Map<string, readonly string[]>();
@@ -1413,9 +1420,25 @@ function subjectPoolFor(
 		return pool;
 	}
 
-	const wordData = WORD_DATA[language];
+	let byTheme = subjectPoolCache.get(group);
 
-	return pool.filter((entry) => acceptsNoun(data, group, plain(wordData, entry)));
+	if (!byTheme) {
+		byTheme = new Map();
+		subjectPoolCache.set(group, byTheme);
+	}
+
+	const cached = byTheme.get(theme);
+
+	if (cached) {
+		return cached;
+	}
+
+	const wordData = WORD_DATA[language];
+	const usable = pool.filter((entry) => acceptsNoun(data, group, plain(wordData, entry)));
+
+	byTheme.set(theme, usable);
+
+	return usable;
 }
 
 /**

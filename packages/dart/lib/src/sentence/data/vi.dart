@@ -30,7 +30,14 @@ final SentenceLanguageData vi = SentenceLanguageData(
       field: VerbField.go,
       subject: const <NounClass>[NounClass.creature, NounClass.person],
       requires: SentenceSlot.destination,
-      words: words(r'đi chạy hướng lên_đường rảo_bước'),
+      words: words(r'đi hướng lên_đường'),
+    ),
+    VerbGroup(
+      field: VerbField.go,
+      subject: const <NounClass>[NounClass.creature, NounClass.person],
+      subjectWithout: const <NounTrait>[NounTrait.swimmer, NounTrait.crawler],
+      requires: SentenceSlot.destination,
+      words: words(r'chạy rảo_bước'),
     ),
     VerbGroup(
       field: VerbField.go,
@@ -51,7 +58,31 @@ final SentenceLanguageData vi = SentenceLanguageData(
     VerbGroup(
       field: VerbField.move,
       subject: const <NounClass>[NounClass.creature, NounClass.person],
-      words: words(r'chạy đi_bộ nhảy bơi bay bò lang_thang đi_qua dạo_chơi đi_dạo'),
+      subjectWithout: const <NounTrait>[NounTrait.swimmer, NounTrait.crawler],
+      words: words(r'chạy đi_bộ nhảy dạo_chơi đi_dạo'),
+    ),
+    VerbGroup(
+      field: VerbField.move,
+      subject: const <NounClass>[NounClass.creature, NounClass.person],
+      words: words(r'lang_thang đi_qua'),
+    ),
+    VerbGroup(
+      field: VerbField.move,
+      subject: const <NounClass>[NounClass.creature, NounClass.person],
+      subjectTraits: const <NounTrait>[NounTrait.swimmer],
+      words: words(r'bơi'),
+    ),
+    VerbGroup(
+      field: VerbField.move,
+      subject: const <NounClass>[NounClass.creature],
+      subjectTraits: const <NounTrait>[NounTrait.flier],
+      words: words(r'bay'),
+    ),
+    VerbGroup(
+      field: VerbField.move,
+      subject: const <NounClass>[NounClass.creature, NounClass.person],
+      subjectTraits: const <NounTrait>[NounTrait.crawler],
+      words: words(r'bò'),
     ),
     VerbGroup(
       field: VerbField.wait,
@@ -393,6 +424,18 @@ final SentenceLanguageData vi = SentenceLanguageData(
     ),
     ConnectiveKind.contrastive: words(r'nhưng tuy_vậy tuy_nhiên dù_vậy'),
     ConnectiveKind.causal: words(r'thế_là vì_thế rốt_cuộc'),
+  },
+  traits: <NounTrait, WordPool>{
+    NounTrait.flier: words(r'''
+      chim én sẻ quạ chim_ưng đại_bàng công vẹt cú bồ_câu hạc thiên_nga vịt ngỗng bướm ong
+      chuồn_chuồn ve muỗi ruồi dơi rồng phượng_hoàng tiên thiên_thần hắc_long bạch_long thanh_long
+      chu_tước chim_lửa thiên_mã thần_điểu tinh_linh
+    '''),
+    NounTrait.swimmer: words(r'''
+      cá_sấu rùa ếch cóc cá cá_voi cá_heo cá_mập mực bạch_tuộc tôm cua sứa hải_cẩu cá_chép lươn
+      người_cá mỹ_nhân_ngư hải_quái
+    '''),
+    NounTrait.crawler: words(r'cá_sấu rắn thằn_lằn rùa ốc kiến nhện giun sâu tằm cua bọ_ngựa'),
   },
   interjections: words(
     r'ôi, chà, ồ, trời_ơi, chao_ôi, này, thật_đấy, ái_chà, ê, ơ_kìa, khiếp, ối,',

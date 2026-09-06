@@ -57,10 +57,35 @@ export const DE: SentenceLanguageData = {
 		{
 			field: 'move',
 			subject: ['creature', 'person'],
-			...tensed(
-				`läuft springt schwimmt fliegt kriecht streift bummelt trabt spaziert`,
-				`lief sprang schwamm flog kroch streifte bummelte trabte spazierte`
-			)
+			// Running and walking are for legs: a fish and a snake do neither.
+			subjectWithout: ['swimmer', 'crawler'],
+			...tensed(`läuft springt bummelt trabt spaziert`, `lief sprang bummelte trabte spazierte`)
+		},
+		{
+			field: 'move',
+			subject: ['creature', 'person'],
+			...tensed(`streift`, `streifte`)
+		},
+		{
+			field: 'move',
+			subject: ['creature', 'person'],
+			// A fish's, a whale's and a mermaid's; a lion does not swim here.
+			subjectTraits: ['swimmer'],
+			...tensed(`schwimmt`, `schwamm`)
+		},
+		{
+			field: 'move',
+			// Flying is a flier's alone: a sparrow's, a dragon's, never a fish's.
+			subject: ['creature'],
+			subjectTraits: ['flier'],
+			...tensed(`fliegt`, `flog`)
+		},
+		{
+			field: 'move',
+			subject: ['creature', 'person'],
+			// A snake's, a snail's and a beetle's.
+			subjectTraits: ['crawler'],
+			...tensed(`kriecht`, `kroch`)
 		},
 		{
 			field: 'wait',
@@ -312,6 +337,24 @@ export const DE: SentenceLanguageData = {
 		additive: words(`und`),
 		contrastive: words(`aber doch`),
 		causal: words(`denn`)
+	},
+	// What a noun can do that its theme does not say. A noun listed nowhere has no
+	// trait, and takes any verb that asks for none.
+	traits: {
+		flier: words(`
+		Vogel Schwalbe Spatz Rabe Falke Adler Pfau Papagei Eule Taube Kranich Schwan Ente Gans Biene
+		Libelle Zikade Fliege Mücke Fledermaus Reiher Pelikan
+		Drache Phönix Fee Greif Pegasus Engel Walküre
+		`),
+		swimmer: words(`
+		Krokodil Schildkröte Frosch Kröte Fisch Wal Delfin Hai Krake Tintenfisch Garnele Krabbe Walross
+		Robbe Pinguin
+		Meerjungfrau Najade
+		`),
+		crawler: words(`
+		Krokodil Schlange Eidechse Schildkröte Schnecke Ameise Spinne Wurm Krabbe
+		Basilisk
+		`)
 	},
 	interjections: words(`
 		oh, ach, na, mensch, oje, sieh_an, wahrhaftig, hui, herrje, du_meine_Güte, nanu,

@@ -70,10 +70,15 @@ export const IT: SentenceLanguageData = {
 			field: 'go',
 			subject: ['creature', 'person'],
 			requires: 'destination',
-			...tensed(
-				`va corre cammina si_dirige sale scende`,
-				`andò corse camminò si_diresse salì scese`
-			)
+			...tensed(`va si_dirige`, `andò si_diresse`)
+		},
+		{
+			field: 'go',
+			subject: ['creature', 'person'],
+			requires: 'destination',
+			// Running somewhere is for legs: a fish and a snake go, and do not run.
+			subjectWithout: ['swimmer', 'crawler'],
+			...tensed(`corre cammina sale scende`, `corse camminò salì scese`)
 		},
 		{
 			field: 'go',
@@ -94,10 +99,38 @@ export const IT: SentenceLanguageData = {
 		{
 			field: 'move',
 			subject: ['creature', 'person'],
+			// Running and walking are for legs: a fish and a snake do neither.
+			subjectWithout: ['swimmer', 'crawler'],
 			...tensed(
-				`corre cammina salta nuota vola striscia vaga passa passeggia gironzola`,
-				`corse camminò saltò nuotò volò strisciò vagò passò passeggiò gironzolò`
+				`corre cammina salta passeggia gironzola`,
+				`corse camminò saltò passeggiò gironzolò`
 			)
+		},
+		{
+			field: 'move',
+			subject: ['creature', 'person'],
+			...tensed(`vaga passa`, `vagò passò`)
+		},
+		{
+			field: 'move',
+			subject: ['creature', 'person'],
+			// A fish's, a whale's and a mermaid's; a lion does not swim here.
+			subjectTraits: ['swimmer'],
+			...tensed(`nuota`, `nuotò`)
+		},
+		{
+			field: 'move',
+			// Flying is a flier's alone: a sparrow's, a dragon's, never a fish's.
+			subject: ['creature'],
+			subjectTraits: ['flier'],
+			...tensed(`vola`, `volò`)
+		},
+		{
+			field: 'move',
+			subject: ['creature', 'person'],
+			// A snake's, a snail's and a beetle's.
+			subjectTraits: ['crawler'],
+			...tensed(`striscia`, `strisciò`)
 		},
 		{
 			field: 'wait',
@@ -475,6 +508,24 @@ export const IT: SentenceLanguageData = {
 		temporal: words(`dopo infine intanto, più_tardi alla_fine poco_dopo`),
 		contrastive: words(`ma tuttavia, eppure invece,`),
 		causal: words(`allora perciò così`)
+	},
+	// What a noun can do that its theme does not say. A noun listed nowhere has no
+	// trait, and takes any verb that asks for none.
+	traits: {
+		flier: words(`
+		uccello rondine passero corvo falco aquila pavone pappagallo gufo colomba gru cigno anatra oca
+		farfalla ape libellula cicala mosca zanzara pipistrello airone pellicano
+		drago fenice fata pegaso grifone angelo valchiria
+		`),
+		swimmer: words(`
+		coccodrillo tartaruga rana rospo pesce balena delfino squalo polpo calamaro gambero granchio
+		tricheco foca pinguino
+		sirena kraken naiade
+		`),
+		crawler: words(`
+		coccodrillo serpente lucertola tartaruga lumaca formica ragno verme granchio
+		basilisco
+		`)
 	},
 	interjections: words(`
 		oh, ah, ehi, caspita, mamma_mia, guarda, davvero, ohi, accidenti, cavolo, santo_cielo, dai,

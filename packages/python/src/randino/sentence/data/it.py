@@ -67,9 +67,19 @@ IT = SentenceLanguageData(
             field="go",
             subject=("creature", "person"),
             requires="destination",
-            words=words("va corre cammina si_dirige sale scende"),
+            words=words("va si_dirige"),
             past=PredicateTense(
-                words=words("andò corse camminò si_diresse salì scese"),
+                words=words("andò si_diresse"),
+            ),
+        ),
+        VerbGroup(
+            field="go",
+            subject=("creature", "person"),
+            subject_without=("swimmer", "crawler"),
+            requires="destination",
+            words=words("corre cammina sale scende"),
+            past=PredicateTense(
+                words=words("corse camminò salì scese"),
             ),
         ),
         VerbGroup(
@@ -100,13 +110,45 @@ IT = SentenceLanguageData(
         VerbGroup(
             field="move",
             subject=("creature", "person"),
-            words=words("""
-                corre cammina salta nuota vola striscia vaga passa passeggia gironzola
-            """),
+            subject_without=("swimmer", "crawler"),
+            words=words("corre cammina salta passeggia gironzola"),
             past=PredicateTense(
-                words=words("""
-                    corse camminò saltò nuotò volò strisciò vagò passò passeggiò gironzolò
-                """),
+                words=words("corse camminò saltò passeggiò gironzolò"),
+            ),
+        ),
+        VerbGroup(
+            field="move",
+            subject=("creature", "person"),
+            words=words("vaga passa"),
+            past=PredicateTense(
+                words=words("vagò passò"),
+            ),
+        ),
+        VerbGroup(
+            field="move",
+            subject=("creature", "person"),
+            subject_traits=("swimmer",),
+            words=words("nuota"),
+            past=PredicateTense(
+                words=words("nuotò"),
+            ),
+        ),
+        VerbGroup(
+            field="move",
+            subject=("creature",),
+            subject_traits=("flier",),
+            words=words("vola"),
+            past=PredicateTense(
+                words=words("volò"),
+            ),
+        ),
+        VerbGroup(
+            field="move",
+            subject=("creature", "person"),
+            subject_traits=("crawler",),
+            words=words("striscia"),
+            past=PredicateTense(
+                words=words("strisciò"),
             ),
         ),
         VerbGroup(
@@ -538,6 +580,20 @@ IT = SentenceLanguageData(
         "temporal": words("dopo infine intanto, più_tardi alla_fine poco_dopo"),
         "contrastive": words("ma tuttavia, eppure invece,"),
         "causal": words("allora perciò così"),
+    },
+    traits={
+        "flier": words("""
+            uccello rondine passero corvo falco aquila pavone pappagallo gufo colomba gru cigno
+            anatra oca farfalla ape libellula cicala mosca zanzara pipistrello airone pellicano
+            drago fenice fata pegaso grifone angelo valchiria
+        """),
+        "swimmer": words("""
+            coccodrillo tartaruga rana rospo pesce balena delfino squalo polpo calamaro gambero
+            granchio tricheco foca pinguino sirena kraken naiade
+        """),
+        "crawler": words("""
+            coccodrillo serpente lucertola tartaruga lumaca formica ragno verme granchio basilisco
+        """),
     },
     interjections=words("""
         oh, ah, ehi, caspita, mamma_mia, guarda, davvero, ohi, accidenti, cavolo, santo_cielo, dai,

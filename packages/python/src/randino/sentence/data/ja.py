@@ -43,17 +43,32 @@ JA = SentenceLanguageData(
             field="go",
             subject=("creature", "person"),
             requires="destination",
-            words=words("行く 向かう 出かける 駆けていく 上る 下りる"),
+            words=words("行く 向かう 出かける"),
             forms={
-                "polite": words("行きます 向かいます 出かけます 駆けていきます 上ります 下ります"),
-                "linking": words("行って 向かって 出かけて 駆けていって 上って 下りて"),
+                "polite": words("行きます 向かいます 出かけます"),
+                "linking": words("行って 向かって 出かけて"),
             },
             past=PredicateTense(
-                words=words("行った 向かった 出かけた 駆けていった 上った 下りた"),
+                words=words("行った 向かった 出かけた"),
                 forms={
-                    "polite": words(
-                        "行きました 向かいました 出かけました 駆けていきました 上りました 下りました"
-                    ),
+                    "polite": words("行きました 向かいました 出かけました"),
+                },
+            ),
+        ),
+        VerbGroup(
+            field="go",
+            subject=("creature", "person"),
+            subject_without=("swimmer", "crawler"),
+            requires="destination",
+            words=words("駆けていく 上る 下りる"),
+            forms={
+                "polite": words("駆けていきます 上ります 下ります"),
+                "linking": words("駆けていって 上って 下りて"),
+            },
+            past=PredicateTense(
+                words=words("駆けていった 上った 下りた"),
+                forms={
+                    "polite": words("駆けていきました 上りました 下りました"),
                 },
             ),
         ),
@@ -108,23 +123,79 @@ JA = SentenceLanguageData(
         VerbGroup(
             field="move",
             subject=("creature", "person"),
-            words=words("走る 歩く 跳ぶ 泳ぐ 飛ぶ 這う さまよう 通る 駆け回る 散歩する"),
+            subject_without=("swimmer", "crawler"),
+            words=words("走る 歩く 跳ぶ 駆け回る 散歩する"),
             forms={
-                "polite": words(
-                    "走ります 歩きます 跳びます 泳ぎます 飛びます 這います さまよいます 通ります 駆け回ります 散歩します"
-                ),
-                "linking": words(
-                    "走って 歩いて 跳んで 泳いで 飛んで 這って さまよって 通って 駆け回って 散歩して"
-                ),
+                "polite": words("走ります 歩きます 跳びます 駆け回ります 散歩します"),
+                "linking": words("走って 歩いて 跳んで 駆け回って 散歩して"),
             },
             past=PredicateTense(
-                words=words(
-                    "走った 歩いた 跳んだ 泳いだ 飛んだ 這った さまよった 通った 駆け回った 散歩した"
-                ),
+                words=words("走った 歩いた 跳んだ 駆け回った 散歩した"),
                 forms={
-                    "polite": words("""
-                        走りました 歩きました 跳びました 泳ぎました 飛びました 這いました さまよいました 通りました 駆け回りました 散歩しました
-                    """),
+                    "polite": words("走りました 歩きました 跳びました 駆け回りました 散歩しました"),
+                },
+            ),
+        ),
+        VerbGroup(
+            field="move",
+            subject=("creature", "person"),
+            words=words("さまよう 通る"),
+            forms={
+                "polite": words("さまよいます 通ります"),
+                "linking": words("さまよって 通って"),
+            },
+            past=PredicateTense(
+                words=words("さまよった 通った"),
+                forms={
+                    "polite": words("さまよいました 通りました"),
+                },
+            ),
+        ),
+        VerbGroup(
+            field="move",
+            subject=("creature", "person"),
+            subject_traits=("swimmer",),
+            words=words("泳ぐ"),
+            forms={
+                "polite": words("泳ぎます"),
+                "linking": words("泳いで"),
+            },
+            past=PredicateTense(
+                words=words("泳いだ"),
+                forms={
+                    "polite": words("泳ぎました"),
+                },
+            ),
+        ),
+        VerbGroup(
+            field="move",
+            subject=("creature",),
+            subject_traits=("flier",),
+            words=words("飛ぶ"),
+            forms={
+                "polite": words("飛びます"),
+                "linking": words("飛んで"),
+            },
+            past=PredicateTense(
+                words=words("飛んだ"),
+                forms={
+                    "polite": words("飛びました"),
+                },
+            ),
+        ),
+        VerbGroup(
+            field="move",
+            subject=("creature", "person"),
+            subject_traits=("crawler",),
+            words=words("這う"),
+            forms={
+                "polite": words("這います"),
+                "linking": words("這って"),
+            },
+            past=PredicateTense(
+                words=words("這った"),
+                forms={
+                    "polite": words("這いました"),
                 },
             ),
         ),
@@ -933,6 +1004,21 @@ JA = SentenceLanguageData(
         "temporal": words("やがて すぐに ついに 一方 その後 しばらくして"),
         "contrastive": words("しかし ところが けれども それでも"),
         "causal": words("だから そこで それで"),
+    },
+    traits={
+        "flier": words("""
+            フクロウ スズメ カササギ ツバメ ワシ ハヤブサ ツル ハクチョウ カモ キツツキ インコ クジャク チョウ ガ ハチ トンボ テントウムシ コウモリ サギ ペリカン カラス
+            ウグイス カワセミ カブトムシ ホタル 犬鷲 蝉 蜉蝣 黄金虫 鍬形虫 蛍火 蠅 蚊 蛾 竜 鳳凰 天狗 妖精 精霊 天使 ドラゴン グリフォン 不死鳥 黒竜 白竜 青竜 朱雀
+            八咫烏 蛟竜 鳥女 天馬 小悪魔 小妖精 戦乙女 石像鬼
+        """),
+        "swimmer": words("""
+            クジラ イルカ サメ カメ アザラシ ペンギン カエル タコ イカ ヒトデ カニ エビ コイ サケ ワニ クラゲ 御玉杓子 蟇 雨蛙 鰐 鮒 鯰 雷魚 桂魚 目高 泥鰌 鰻
+            穴子 太刀魚 鰆 秋刀魚 片口鰯 石持 介党鱈 人魚 海妖 巨烏賊 海獣王 河童
+        """),
+        "crawler": words("""
+            カメ トカゲ カメレオン ヘビ カタツムリ アリ クモ カニ ワニ 蟷螂 蚯蚓 百足 馬陸 蠍 壁蝨 蚤 蚕 蛹 芋虫 山椒魚 青大将 蝮 毒蛇 眼鏡蛇 響尾蛇 錦蛇 鰐 鬣蜥
+            蛇王
+        """),
     },
     interjections=words(
         "ああ、 おお、 まあ、 なんと、 やれやれ、 おや、 ほら、 へえ、 わあ、 あら、 おっと、 いやはや、"

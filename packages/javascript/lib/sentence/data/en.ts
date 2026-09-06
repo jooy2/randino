@@ -46,10 +46,18 @@ export const EN: SentenceLanguageData = {
 			subject: ['creature', 'person'],
 			requires: 'destination',
 			...tensed(
-				`goes heads runs hurries walks wanders climbs`,
-				`go head run hurry walk wander climb`,
-				`went headed ran hurried walked wandered climbed`
+				`goes heads hurries wanders`,
+				`go head hurry wander`,
+				`went headed hurried wandered`
 			)
+		},
+		{
+			field: 'go',
+			subject: ['creature', 'person'],
+			requires: 'destination',
+			// Running somewhere is for legs: a fish and a snake go, and do not run.
+			subjectWithout: ['swimmer', 'crawler'],
+			...tensed(`runs walks climbs`, `run walk climb`, `ran walked climbed`)
 		},
 		{
 			field: 'go',
@@ -78,11 +86,39 @@ export const EN: SentenceLanguageData = {
 		{
 			field: 'move',
 			subject: ['creature', 'person'],
+			// Running and walking are for legs: a fish and a snake do neither.
+			subjectWithout: ['swimmer', 'crawler'],
 			...tensed(
-				`runs walks leaps swims flies crawls wanders passes strolls roams paces`,
-				`run walk leap swim fly crawl wander pass stroll roam pace`,
-				`ran walked leapt swam flew crawled wandered passed strolled roamed paced`
+				`runs walks leaps strolls roams paces`,
+				`run walk leap stroll roam pace`,
+				`ran walked leapt strolled roamed paced`
 			)
+		},
+		{
+			field: 'move',
+			subject: ['creature', 'person'],
+			...tensed(`wanders passes`, `wander pass`, `wandered passed`)
+		},
+		{
+			field: 'move',
+			subject: ['creature', 'person'],
+			// A fish's, a whale's and a mermaid's; a lion does not swim here.
+			subjectTraits: ['swimmer'],
+			...tensed(`swims`, `swim`, `swam`)
+		},
+		{
+			field: 'move',
+			// Flying is a flier's alone: a sparrow's, a dragon's, never a fish's.
+			subject: ['creature'],
+			subjectTraits: ['flier'],
+			...tensed(`flies`, `fly`, `flew`)
+		},
+		{
+			field: 'move',
+			subject: ['creature', 'person'],
+			// A snake's, a snail's and a beetle's.
+			subjectTraits: ['crawler'],
+			...tensed(`crawls`, `crawl`, `crawled`)
 		},
 		{
 			field: 'wait',
@@ -507,6 +543,28 @@ export const EN: SentenceLanguageData = {
 		temporal: words(`meanwhile afterwards later soon at_last before_long`),
 		contrastive: words(`but still however yet even_so then_again all_the_same even_then`),
 		causal: words(`so therefore in_the_end`)
+	},
+	// What a noun can do that its theme does not say. A noun listed nowhere has no
+	// trait, and takes any verb that asks for none.
+	traits: {
+		flier: words(`
+		owl sparrow magpie swallow eagle falcon crane swan duck goose woodpecker parrot peacock butterfly
+		moth bee dragonfly ladybug bat heron pelican raven kestrel puffin flamingo firefly osprey vulture
+		condor stork ibis cormorant albatross petrel sandpiper plover lapwing starling finch warbler thrush
+		cuckoo hoopoe kingfisher toucan macaw cockatoo canary nightingale cicada beetle
+		dragon wyvern phoenix griffin harpy pegasus hippogriff roc simurgh thunderbird fairy pixie sprite
+		sylph angel seraph valkyrie imp gargoyle drake peryton
+		`),
+		swimmer: words(`
+		whale dolphin shark turtle seal penguin frog octopus squid seahorse starfish crab shrimp carp
+		salmon mackerel walrus narwhal jellyfish tadpole
+		siren mermaid kraken leviathan naiad undine selkie kelpie
+		`),
+		crawler: words(`
+		turtle lizard chameleon snake snail ant spider crab earthworm centipede scorpion gecko iguana
+		cobra python newt mantis
+		basilisk wyrm naga amphisbaena lindworm
+		`)
 	},
 	interjections: words(`
 		oh, ah, wow, well, look, goodness, my, indeed, honestly, gosh, hey, whoa, dear_me, good_grief,

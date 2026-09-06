@@ -39,15 +39,23 @@ final SentenceLanguageData en = SentenceLanguageData(
       field: VerbField.go,
       subject: const <NounClass>[NounClass.creature, NounClass.person],
       requires: SentenceSlot.destination,
-      words: words(r'goes heads runs hurries walks wanders climbs'),
-      forms: <PredicateForm, WordPool>{
-        PredicateForm.question: words(r'go head run hurry walk wander climb'),
-      },
+      words: words(r'goes heads hurries wanders'),
+      forms: <PredicateForm, WordPool>{PredicateForm.question: words(r'go head hurry wander')},
       past: PredicateTense(
-        words: words(r'went headed ran hurried walked wandered climbed'),
-        forms: <PredicateForm, WordPool>{
-          PredicateForm.question: words(r'go head run hurry walk wander climb'),
-        },
+        words: words(r'went headed hurried wandered'),
+        forms: <PredicateForm, WordPool>{PredicateForm.question: words(r'go head hurry wander')},
+      ),
+    ),
+    VerbGroup(
+      field: VerbField.go,
+      subject: const <NounClass>[NounClass.creature, NounClass.person],
+      subjectWithout: const <NounTrait>[NounTrait.swimmer, NounTrait.crawler],
+      requires: SentenceSlot.destination,
+      words: words(r'runs walks climbs'),
+      forms: <PredicateForm, WordPool>{PredicateForm.question: words(r'run walk climb')},
+      past: PredicateTense(
+        words: words(r'ran walked climbed'),
+        forms: <PredicateForm, WordPool>{PredicateForm.question: words(r'run walk climb')},
       ),
     ),
     VerbGroup(
@@ -88,19 +96,59 @@ final SentenceLanguageData en = SentenceLanguageData(
     VerbGroup(
       field: VerbField.move,
       subject: const <NounClass>[NounClass.creature, NounClass.person],
-      words: words(r'runs walks leaps swims flies crawls wanders passes strolls roams paces'),
+      subjectWithout: const <NounTrait>[NounTrait.swimmer, NounTrait.crawler],
+      words: words(r'runs walks leaps strolls roams paces'),
       forms: <PredicateForm, WordPool>{
-        PredicateForm.question: words(r'run walk leap swim fly crawl wander pass stroll roam pace'),
+        PredicateForm.question: words(r'run walk leap stroll roam pace'),
       },
       past: PredicateTense(
-        words: words(r'''
-          ran walked leapt swam flew crawled wandered passed strolled roamed paced
-        '''),
+        words: words(r'ran walked leapt strolled roamed paced'),
         forms: <PredicateForm, WordPool>{
-          PredicateForm.question: words(
-            r'run walk leap swim fly crawl wander pass stroll roam pace',
-          ),
+          PredicateForm.question: words(r'run walk leap stroll roam pace'),
         },
+      ),
+    ),
+    VerbGroup(
+      field: VerbField.move,
+      subject: const <NounClass>[NounClass.creature, NounClass.person],
+      words: words(r'wanders passes'),
+      forms: <PredicateForm, WordPool>{PredicateForm.question: words(r'wander pass')},
+      past: PredicateTense(
+        words: words(r'wandered passed'),
+        forms: <PredicateForm, WordPool>{PredicateForm.question: words(r'wander pass')},
+      ),
+    ),
+    VerbGroup(
+      field: VerbField.move,
+      subject: const <NounClass>[NounClass.creature, NounClass.person],
+      subjectTraits: const <NounTrait>[NounTrait.swimmer],
+      words: words(r'swims'),
+      forms: <PredicateForm, WordPool>{PredicateForm.question: words(r'swim')},
+      past: PredicateTense(
+        words: words(r'swam'),
+        forms: <PredicateForm, WordPool>{PredicateForm.question: words(r'swim')},
+      ),
+    ),
+    VerbGroup(
+      field: VerbField.move,
+      subject: const <NounClass>[NounClass.creature],
+      subjectTraits: const <NounTrait>[NounTrait.flier],
+      words: words(r'flies'),
+      forms: <PredicateForm, WordPool>{PredicateForm.question: words(r'fly')},
+      past: PredicateTense(
+        words: words(r'flew'),
+        forms: <PredicateForm, WordPool>{PredicateForm.question: words(r'fly')},
+      ),
+    ),
+    VerbGroup(
+      field: VerbField.move,
+      subject: const <NounClass>[NounClass.creature, NounClass.person],
+      subjectTraits: const <NounTrait>[NounTrait.crawler],
+      words: words(r'crawls'),
+      forms: <PredicateForm, WordPool>{PredicateForm.question: words(r'crawl')},
+      past: PredicateTense(
+        words: words(r'crawled'),
+        forms: <PredicateForm, WordPool>{PredicateForm.question: words(r'crawl')},
       ),
     ),
     VerbGroup(
@@ -686,6 +734,25 @@ final SentenceLanguageData en = SentenceLanguageData(
       r'but still however yet even_so then_again all_the_same even_then',
     ),
     ConnectiveKind.causal: words(r'so therefore in_the_end'),
+  },
+  traits: <NounTrait, WordPool>{
+    NounTrait.flier: words(r'''
+      owl sparrow magpie swallow eagle falcon crane swan duck goose woodpecker parrot peacock
+      butterfly moth bee dragonfly ladybug bat heron pelican raven kestrel puffin flamingo firefly
+      osprey vulture condor stork ibis cormorant albatross petrel sandpiper plover lapwing starling
+      finch warbler thrush cuckoo hoopoe kingfisher toucan macaw cockatoo canary nightingale cicada
+      beetle dragon wyvern phoenix griffin harpy pegasus hippogriff roc simurgh thunderbird fairy
+      pixie sprite sylph angel seraph valkyrie imp gargoyle drake peryton
+    '''),
+    NounTrait.swimmer: words(r'''
+      whale dolphin shark turtle seal penguin frog octopus squid seahorse starfish crab shrimp carp
+      salmon mackerel walrus narwhal jellyfish tadpole siren mermaid kraken leviathan naiad undine
+      selkie kelpie
+    '''),
+    NounTrait.crawler: words(r'''
+      turtle lizard chameleon snake snail ant spider crab earthworm centipede scorpion gecko iguana
+      cobra python newt mantis basilisk wyrm naga amphisbaena lindworm
+    '''),
   },
   interjections: words(r'''
     oh, ah, wow, well, look, goodness, my, indeed, honestly, gosh, hey, whoa, dear_me, good_grief,

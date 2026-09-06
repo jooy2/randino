@@ -52,10 +52,36 @@ final SentenceLanguageData de = SentenceLanguageData(
     VerbGroup(
       field: VerbField.move,
       subject: const <NounClass>[NounClass.creature, NounClass.person],
-      words: words(r'läuft springt schwimmt fliegt kriecht streift bummelt trabt spaziert'),
-      past: PredicateTense(
-        words: words(r'lief sprang schwamm flog kroch streifte bummelte trabte spazierte'),
-      ),
+      subjectWithout: const <NounTrait>[NounTrait.swimmer, NounTrait.crawler],
+      words: words(r'läuft springt bummelt trabt spaziert'),
+      past: PredicateTense(words: words(r'lief sprang bummelte trabte spazierte')),
+    ),
+    VerbGroup(
+      field: VerbField.move,
+      subject: const <NounClass>[NounClass.creature, NounClass.person],
+      words: words(r'streift'),
+      past: PredicateTense(words: words(r'streifte')),
+    ),
+    VerbGroup(
+      field: VerbField.move,
+      subject: const <NounClass>[NounClass.creature, NounClass.person],
+      subjectTraits: const <NounTrait>[NounTrait.swimmer],
+      words: words(r'schwimmt'),
+      past: PredicateTense(words: words(r'schwamm')),
+    ),
+    VerbGroup(
+      field: VerbField.move,
+      subject: const <NounClass>[NounClass.creature],
+      subjectTraits: const <NounTrait>[NounTrait.flier],
+      words: words(r'fliegt'),
+      past: PredicateTense(words: words(r'flog')),
+    ),
+    VerbGroup(
+      field: VerbField.move,
+      subject: const <NounClass>[NounClass.creature, NounClass.person],
+      subjectTraits: const <NounTrait>[NounTrait.crawler],
+      words: words(r'kriecht'),
+      past: PredicateTense(words: words(r'kroch')),
     ),
     VerbGroup(
       field: VerbField.wait,
@@ -338,6 +364,20 @@ final SentenceLanguageData de = SentenceLanguageData(
     ConnectiveKind.additive: words(r'und'),
     ConnectiveKind.contrastive: words(r'aber doch'),
     ConnectiveKind.causal: words(r'denn'),
+  },
+  traits: <NounTrait, WordPool>{
+    NounTrait.flier: words(r'''
+      Vogel Schwalbe Spatz Rabe Falke Adler Pfau Papagei Eule Taube Kranich Schwan Ente Gans Biene
+      Libelle Zikade Fliege Mücke Fledermaus Reiher Pelikan Drache Phönix Fee Greif Pegasus Engel
+      Walküre
+    '''),
+    NounTrait.swimmer: words(r'''
+      Krokodil Schildkröte Frosch Kröte Fisch Wal Delfin Hai Krake Tintenfisch Garnele Krabbe
+      Walross Robbe Pinguin Meerjungfrau Najade
+    '''),
+    NounTrait.crawler: words(r'''
+      Krokodil Schlange Eidechse Schildkröte Schnecke Ameise Spinne Wurm Krabbe Basilisk
+    '''),
   },
   interjections: words(r'''
     oh, ach, na, mensch, oje, sieh_an, wahrhaftig, hui, herrje, du_meine_Güte, nanu,

@@ -1099,6 +1099,13 @@ _Requirement? _requiredAt(SentenceFrame frame, _Plan plan, SentenceSlot slot) {
 
 // Pools and their bounds never change, so they are worth holding on to.
 final Map<String, WordPool> _nounCache = <String, WordPool>{};
+
+/// The subject pools a trait narrows, by group and theme. Every group a sentence
+/// considers reads them for every theme it could take, and filtering two hundred
+/// nouns each time is what made a paragraph slow once every language had them.
+/// A group is a constant of its language's data, so it is its own key.
+final Map<VerbGroup, Map<WordTheme, WordPool>> _subjectPoolCache =
+    <VerbGroup, Map<WordTheme, WordPool>>{};
 final Map<WordLanguage, Map<SentenceSlot, LengthRange>> _boundsCache =
     <WordLanguage, Map<SentenceSlot, LengthRange>>{};
 final Map<WordLanguage, LengthRange> _modifierBounds = <WordLanguage, LengthRange>{};
@@ -1550,11 +1557,21 @@ WordPool _subjectPoolFor(
     return pool;
   }
 
-  final lexicon = wordData[language]!;
+  final byTheme = _subjectPoolCache.putIfAbsent(group, () => <WordTheme, WordPool>{});
+  final cached = byTheme[theme];
 
-  return pool
+  if (cached != null) {
+    return cached;
+  }
+
+  final lexicon = wordData[language]!;
+  final usable = pool
       .where((entry) => _acceptsNoun(data, group, _plain(lexicon, entry)))
       .toList(growable: false);
+
+  byTheme[theme] = usable;
+
+  return usable;
 }
 
 /// The noun a sentence's subject is already decided to be, for the groups to be

@@ -23,7 +23,15 @@ export const VI: SentenceLanguageData = {
 			field: 'go',
 			subject: ['creature', 'person'],
 			requires: 'destination',
-			words: words(`đi chạy hướng lên_đường rảo_bước`)
+			words: words(`đi hướng lên_đường`)
+		},
+		{
+			field: 'go',
+			subject: ['creature', 'person'],
+			requires: 'destination',
+			// Running somewhere is for legs: a fish and a snake go, and do not run.
+			subjectWithout: ['swimmer', 'crawler'],
+			words: words(`chạy rảo_bước`)
 		},
 		{
 			field: 'go',
@@ -40,7 +48,35 @@ export const VI: SentenceLanguageData = {
 		{
 			field: 'move',
 			subject: ['creature', 'person'],
-			words: words(`chạy đi_bộ nhảy bơi bay bò lang_thang đi_qua dạo_chơi đi_dạo`)
+			// Running and walking are for legs: a fish and a snake do neither.
+			subjectWithout: ['swimmer', 'crawler'],
+			words: words(`chạy đi_bộ nhảy dạo_chơi đi_dạo`)
+		},
+		{
+			field: 'move',
+			subject: ['creature', 'person'],
+			words: words(`lang_thang đi_qua`)
+		},
+		{
+			field: 'move',
+			subject: ['creature', 'person'],
+			// A fish's, a whale's and a mermaid's; a lion does not swim here.
+			subjectTraits: ['swimmer'],
+			words: words(`bơi`)
+		},
+		{
+			field: 'move',
+			// Flying is a flier's alone: a sparrow's, a dragon's, never a fish's.
+			subject: ['creature'],
+			subjectTraits: ['flier'],
+			words: words(`bay`)
+		},
+		{
+			field: 'move',
+			subject: ['creature', 'person'],
+			// A snake's, a snail's and a beetle's.
+			subjectTraits: ['crawler'],
+			words: words(`bò`)
 		},
 		{
 			field: 'wait',
@@ -331,6 +367,22 @@ export const VI: SentenceLanguageData = {
 		temporal: words(`rồi và_rồi sau_đó cuối_cùng sau_cùng thế_rồi đồng_thời lát_sau`),
 		contrastive: words(`nhưng tuy_vậy tuy_nhiên dù_vậy`),
 		causal: words(`thế_là vì_thế rốt_cuộc`)
+	},
+	// What a noun can do that its theme does not say. A noun listed nowhere has no
+	// trait, and takes any verb that asks for none.
+	traits: {
+		flier: words(`
+		chim én sẻ quạ chim_ưng đại_bàng công vẹt cú bồ_câu hạc thiên_nga vịt ngỗng bướm ong chuồn_chuồn ve muỗi
+		ruồi dơi
+		rồng phượng_hoàng tiên thiên_thần hắc_long bạch_long thanh_long chu_tước chim_lửa thiên_mã thần_điểu tinh_linh
+		`),
+		swimmer: words(`
+		cá_sấu rùa ếch cóc cá cá_voi cá_heo cá_mập mực bạch_tuộc tôm cua sứa hải_cẩu cá_chép lươn
+		người_cá mỹ_nhân_ngư hải_quái
+		`),
+		crawler: words(`
+		cá_sấu rắn thằn_lằn rùa ốc kiến nhện giun sâu tằm cua bọ_ngựa
+		`)
 	},
 	interjections: words(`
 		ôi, chà, ồ, trời_ơi, chao_ôi, này, thật_đấy, ái_chà, ê, ơ_kìa, khiếp, ối,

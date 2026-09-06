@@ -57,10 +57,35 @@ export const RU: SentenceLanguageData = {
 		{
 			field: 'move',
 			subject: ['creature', 'person'],
-			...tensed(
-				`бежит прыгает плывёт летит ползёт бродит проходит гуляет шагает`,
-				`бежал прыгал плыл летел ползал бродил проходил гулял шагал`
-			)
+			// Running and walking are for legs: a fish and a snake do neither.
+			subjectWithout: ['swimmer', 'crawler'],
+			...tensed(`бежит прыгает гуляет шагает`, `бежал прыгал гулял шагал`)
+		},
+		{
+			field: 'move',
+			subject: ['creature', 'person'],
+			...tensed(`бродит проходит`, `бродил проходил`)
+		},
+		{
+			field: 'move',
+			subject: ['creature', 'person'],
+			// A fish's, a whale's and a mermaid's; a lion does not swim here.
+			subjectTraits: ['swimmer'],
+			...tensed(`плывёт`, `плыл`)
+		},
+		{
+			field: 'move',
+			// Flying is a flier's alone: a sparrow's, a dragon's, never a fish's.
+			subject: ['creature'],
+			subjectTraits: ['flier'],
+			...tensed(`летит`, `летел`)
+		},
+		{
+			field: 'move',
+			subject: ['creature', 'person'],
+			// A snake's, a snail's and a beetle's.
+			subjectTraits: ['crawler'],
+			...tensed(`ползёт`, `ползал`)
 		},
 		{
 			field: 'wait',
@@ -337,6 +362,24 @@ export const RU: SentenceLanguageData = {
 		temporal: words(`затем наконец потом тем_временем вскоре`),
 		contrastive: words(`но однако а зато всё_же`),
 		causal: words(`поэтому в_итоге значит`)
+	},
+	// What a noun can do that its theme does not say. A noun listed nowhere has no
+	// trait, and takes any verb that asks for none.
+	traits: {
+		flier: words(`
+		птица ласточка воробей ворон сокол орёл павлин попугай сова голубь журавль лебедь утка гусь
+		бабочка пчела стрекоза цикада муха комар летучая_мышь цапля пеликан
+		дракон феникс фея грифон пегас ангел валькирия
+		`),
+		swimmer: words(`
+		крокодил черепаха лягушка жаба рыба кит дельфин акула осьминог кальмар креветка краб морж тюлень
+		пингвин
+		русалка кракен наяда
+		`),
+		crawler: words(`
+		крокодил змея ящерица черепаха улитка муравей паук червь краб
+		василиск
+		`)
 	},
 	interjections: words(`
 		ах, ох, эх, ух, боже, гляди, право, ой, ух_ты, батюшки, надо_же, эй,

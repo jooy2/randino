@@ -1138,6 +1138,12 @@ def _required_at(frame: SentenceFrame, plan: Plan, slot: SentenceSlot) -> Requir
 # --- Pools and bounds -------------------------------------------------------
 
 _NOUN_CACHE: dict[tuple[WordLanguage, WordTheme], WordPool] = {}
+
+# The subject pools a trait narrows, by group and theme. Every group a sentence considers
+# reads them for every theme it could take, and filtering two hundred nouns each time is
+# what made a paragraph slow once every language had them. A group is a constant of its
+# language's data and lives as long as the process, so its `id` is a stable key.
+_SUBJECT_POOL_CACHE: dict[tuple[int, WordTheme], WordPool] = {}
 _BOUNDS_CACHE: dict[WordLanguage, dict[str, tuple[int, int]]] = {}
 _SPAN_CACHE: dict[tuple[WordLanguage, WordTheme, int], tuple[int, int]] = {}
 _AGREED_CACHE: dict[tuple[WordLanguage, WordTheme | None, WordGender | None], WordPool] = {}
@@ -1663,9 +1669,17 @@ def _subject_pool_for(
     ):
         return pool
 
-    lexicon = WORD_DATA[language]
+    key = (id(group), theme)
+    cached = _SUBJECT_POOL_CACHE.get(key)
 
-    return tuple(entry for entry in pool if _accepts_noun(data, group, _plain(lexicon, entry)))
+    if cached is not None:
+        return cached
+
+    lexicon = WORD_DATA[language]
+    usable = tuple(entry for entry in pool if _accepts_noun(data, group, _plain(lexicon, entry)))
+    _SUBJECT_POOL_CACHE[key] = usable
+
+    return usable
 
 
 def _subject_noun_of(frame: SentenceFrame, plan: Plan, follow: Follow | None) -> str | None:

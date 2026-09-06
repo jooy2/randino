@@ -51,9 +51,19 @@ ES = SentenceLanguageData(
             field="go",
             subject=("creature", "person"),
             requires="destination",
-            words=words("va corre camina se_dirige sube baja"),
+            words=words("va se_dirige"),
             past=PredicateTense(
-                words=words("fue corrió caminó se_dirigió subió bajó"),
+                words=words("fue se_dirigió"),
+            ),
+        ),
+        VerbGroup(
+            field="go",
+            subject=("creature", "person"),
+            subject_without=("swimmer", "crawler"),
+            requires="destination",
+            words=words("corre camina sube baja"),
+            past=PredicateTense(
+                words=words("corrió caminó subió bajó"),
             ),
         ),
         VerbGroup(
@@ -84,9 +94,45 @@ ES = SentenceLanguageData(
         VerbGroup(
             field="move",
             subject=("creature", "person"),
-            words=words("corre camina salta nada vuela repta vaga pasa pasea deambula"),
+            subject_without=("swimmer", "crawler"),
+            words=words("corre camina salta pasea deambula"),
             past=PredicateTense(
-                words=words("corrió caminó saltó nadó voló reptó vagó pasó paseó deambuló"),
+                words=words("corrió caminó saltó paseó deambuló"),
+            ),
+        ),
+        VerbGroup(
+            field="move",
+            subject=("creature", "person"),
+            words=words("vaga pasa"),
+            past=PredicateTense(
+                words=words("vagó pasó"),
+            ),
+        ),
+        VerbGroup(
+            field="move",
+            subject=("creature", "person"),
+            subject_traits=("swimmer",),
+            words=words("nada"),
+            past=PredicateTense(
+                words=words("nadó"),
+            ),
+        ),
+        VerbGroup(
+            field="move",
+            subject=("creature",),
+            subject_traits=("flier",),
+            words=words("vuela"),
+            past=PredicateTense(
+                words=words("voló"),
+            ),
+        ),
+        VerbGroup(
+            field="move",
+            subject=("creature", "person"),
+            subject_traits=("crawler",),
+            words=words("repta"),
+            past=PredicateTense(
+                words=words("reptó"),
             ),
         ),
         VerbGroup(
@@ -527,6 +573,20 @@ ES = SentenceLanguageData(
         "temporal": words("después por_fin mientras_tanto, más_tarde al_final poco_después"),
         "contrastive": words("pero sin_embargo, aun_así en_cambio, no_obstante,"),
         "causal": words("entonces por_eso así_que"),
+    },
+    traits={
+        "flier": words("""
+            pájaro golondrina gorrión cuervo halcón águila pavo_real loro búho paloma grulla cisne
+            pato ganso mariposa abeja libélula cigarra mosca mosquito murciélago garza pelícano
+            dragón fénix hada pegaso grifo ángel valquiria
+        """),
+        "swimmer": words("""
+            cocodrilo tortuga rana sapo pez ballena delfín tiburón pulpo calamar gamba cangrejo
+            morsa foca pingüino sirena kraken náyade
+        """),
+        "crawler": words("""
+            cocodrilo serpiente lagarto tortuga caracol hormiga araña gusano cangrejo basilisco
+        """),
     },
     interjections=words("""
         ay, oh, vaya, caramba, madre_mía, mira, desde_luego, uy, anda, hombre, cielos, vamos,

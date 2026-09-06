@@ -68,8 +68,16 @@ final SentenceLanguageData it = SentenceLanguageData(
       field: VerbField.go,
       subject: const <NounClass>[NounClass.creature, NounClass.person],
       requires: SentenceSlot.destination,
-      words: words(r'va corre cammina si_dirige sale scende'),
-      past: PredicateTense(words: words(r'andò corse camminò si_diresse salì scese')),
+      words: words(r'va si_dirige'),
+      past: PredicateTense(words: words(r'andò si_diresse')),
+    ),
+    VerbGroup(
+      field: VerbField.go,
+      subject: const <NounClass>[NounClass.creature, NounClass.person],
+      subjectWithout: const <NounTrait>[NounTrait.swimmer, NounTrait.crawler],
+      requires: SentenceSlot.destination,
+      words: words(r'corre cammina sale scende'),
+      past: PredicateTense(words: words(r'corse camminò salì scese')),
     ),
     VerbGroup(
       field: VerbField.go,
@@ -93,10 +101,36 @@ final SentenceLanguageData it = SentenceLanguageData(
     VerbGroup(
       field: VerbField.move,
       subject: const <NounClass>[NounClass.creature, NounClass.person],
-      words: words(r'corre cammina salta nuota vola striscia vaga passa passeggia gironzola'),
-      past: PredicateTense(
-        words: words(r'corse camminò saltò nuotò volò strisciò vagò passò passeggiò gironzolò'),
-      ),
+      subjectWithout: const <NounTrait>[NounTrait.swimmer, NounTrait.crawler],
+      words: words(r'corre cammina salta passeggia gironzola'),
+      past: PredicateTense(words: words(r'corse camminò saltò passeggiò gironzolò')),
+    ),
+    VerbGroup(
+      field: VerbField.move,
+      subject: const <NounClass>[NounClass.creature, NounClass.person],
+      words: words(r'vaga passa'),
+      past: PredicateTense(words: words(r'vagò passò')),
+    ),
+    VerbGroup(
+      field: VerbField.move,
+      subject: const <NounClass>[NounClass.creature, NounClass.person],
+      subjectTraits: const <NounTrait>[NounTrait.swimmer],
+      words: words(r'nuota'),
+      past: PredicateTense(words: words(r'nuotò')),
+    ),
+    VerbGroup(
+      field: VerbField.move,
+      subject: const <NounClass>[NounClass.creature],
+      subjectTraits: const <NounTrait>[NounTrait.flier],
+      words: words(r'vola'),
+      past: PredicateTense(words: words(r'volò')),
+    ),
+    VerbGroup(
+      field: VerbField.move,
+      subject: const <NounClass>[NounClass.creature, NounClass.person],
+      subjectTraits: const <NounTrait>[NounTrait.crawler],
+      words: words(r'striscia'),
+      past: PredicateTense(words: words(r'strisciò')),
     ),
     VerbGroup(
       field: VerbField.wait,
@@ -486,6 +520,20 @@ final SentenceLanguageData it = SentenceLanguageData(
     ConnectiveKind.temporal: words(r'dopo infine intanto, più_tardi alla_fine poco_dopo'),
     ConnectiveKind.contrastive: words(r'ma tuttavia, eppure invece,'),
     ConnectiveKind.causal: words(r'allora perciò così'),
+  },
+  traits: <NounTrait, WordPool>{
+    NounTrait.flier: words(r'''
+      uccello rondine passero corvo falco aquila pavone pappagallo gufo colomba gru cigno anatra oca
+      farfalla ape libellula cicala mosca zanzara pipistrello airone pellicano drago fenice fata
+      pegaso grifone angelo valchiria
+    '''),
+    NounTrait.swimmer: words(r'''
+      coccodrillo tartaruga rana rospo pesce balena delfino squalo polpo calamaro gambero granchio
+      tricheco foca pinguino sirena kraken naiade
+    '''),
+    NounTrait.crawler: words(r'''
+      coccodrillo serpente lucertola tartaruga lumaca formica ragno verme granchio basilisco
+    '''),
   },
   interjections: words(r'''
     oh, ah, ehi, caspita, mamma_mia, guarda, davvero, ohi, accidenti, cavolo, santo_cielo, dai,

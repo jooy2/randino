@@ -174,35 +174,35 @@ export const KO: SentenceLanguageData = {
 			subject: ['creature', 'person'],
 			// Running and walking are for legs: a fish and a snake do neither.
 			subjectWithout: ['swimmer', 'crawler'],
-			words: words(`달린다 걷는다 뛴다 기어간다 지나간다 어슬렁댄다 뛰어다닌다 거닌다 산책한다`),
+			words: words(`달린다 걷는다 뛴다 서성인다 지나간다 어슬렁댄다 뛰어다닌다 거닌다 산책한다`),
 			forms: {
 				question: words(`
-					달리니|달리나|달리는가 걷니|걷나|걷는가 뛰니|뛰나|뛰는가 기어가니|기어가나|기어가는가 지나가니|지나가나|지나가는가 어슬렁대니|어슬렁대나|어슬렁대는가
+					달리니|달리나|달리는가 걷니|걷나|걷는가 뛰니|뛰나|뛰는가 서성이니|서성이나|서성이는가 지나가니|지나가나|지나가는가 어슬렁대니|어슬렁대나|어슬렁대는가
 					뛰어다니니|뛰어다니나|뛰어다니는가 거니니|거니나|거니는가 산책하니|산책하나|산책하는가
 				`),
 				exclamation: words(`
-					달리는구나|달리네|달리는군 걷는구나|걷네|걷는군 뛰는구나|뛰네|뛰는군 기어가는구나|기어가네|기어가는군 지나가는구나|지나가네|지나가는군
+					달리는구나|달리네|달리는군 걷는구나|걷네|걷는군 뛰는구나|뛰네|뛰는군 서성이는구나|서성이네|서성이는군 지나가는구나|지나가네|지나가는군
 					어슬렁대는구나|어슬렁대네|어슬렁대는군 뛰어다니는구나|뛰어다니네|뛰어다니는군 거니는구나|거니네|거니는군 산책하는구나|산책하네|산책하는군
 				`),
-				casual: words(`달려 걸어 뛰어 기어가 지나가 어슬렁대 뛰어다녀 거닐어 산책해`),
+				casual: words(`달려 걸어 뛰어 서성여 지나가 어슬렁대 뛰어다녀 거닐어 산책해`),
 				casualQuestion: words(`
-					달려|달리지 걸어|걷지 뛰어|뛰지 기어가|기어가지 지나가|지나가지 어슬렁대|어슬렁대지 뛰어다녀|뛰어다니지 거닐어|거닐지 산책해|산책하지
+					달려|달리지 걸어|걷지 뛰어|뛰지 서성여|서성이지 지나가|지나가지 어슬렁대|어슬렁대지 뛰어다녀|뛰어다니지 거닐어|거닐지 산책해|산책하지
 				`),
 				polite: words(
-					`달려요 걸어요 뛰어요 기어가요 지나가요 어슬렁대요 뛰어다녀요 거닐어요 산책해요`
+					`달려요 걸어요 뛰어요 서성여요 지나가요 어슬렁대요 뛰어다녀요 거닐어요 산책해요`
 				),
 				politeQuestion: words(`
-					달려요|달리죠 걸어요|걷죠 뛰어요|뛰죠 기어가요|기어가죠 지나가요|지나가죠 어슬렁대요|어슬렁대죠 뛰어다녀요|뛰어다니죠 거닐어요|거닐죠 산책해요|산책하죠
+					달려요|달리죠 걸어요|걷죠 뛰어요|뛰죠 서성여요|서성이죠 지나가요|지나가죠 어슬렁대요|어슬렁대죠 뛰어다녀요|뛰어다니죠 거닐어요|거닐죠 산책해요|산책하죠
 				`),
 				formal: words(
-					`달립니다 걷습니다 뜁니다 기어갑니다 지나갑니다 어슬렁댑니다 뛰어다닙니다 거닙니다 산책합니다`
+					`달립니다 걷습니다 뜁니다 서성입니다 지나갑니다 어슬렁댑니다 뛰어다닙니다 거닙니다 산책합니다`
 				),
 				formalQuestion: words(
-					`달립니까 걷습니까 뜁니까 기어갑니까 지나갑니까 어슬렁댑니까 뛰어다닙니까 거닙니까 산책합니까`
+					`달립니까 걷습니까 뜁니까 서성입니까 지나갑니까 어슬렁댑니까 뛰어다닙니까 거닙니까 산책합니까`
 				),
-				linking: words(`달리고 걷고 뛰고 기어가고 지나가고 어슬렁대고 뛰어다니고 거닐고 산책하고`)
+				linking: words(`달리고 걷고 뛰고 서성이고 지나가고 어슬렁대고 뛰어다니고 거닐고 산책하고`)
 			},
-			past: conjugate(`달렸 걸었 뛰었 기어갔 지나갔 어슬렁댔 뛰어다녔 거닐었 산책했`, PAST)
+			past: conjugate(`달렸 걸었 뛰었 서성였 지나갔 어슬렁댔 뛰어다녔 거닐었 산책했`, PAST)
 		},
 		{
 			field: 'move',
@@ -228,19 +228,19 @@ export const KO: SentenceLanguageData = {
 			subject: ['creature', 'person'],
 			// A snake's, a snail's and a beetle's.
 			subjectTraits: ['crawler'],
-			words: words(`서성인다`),
+			words: words(`기어간다`),
 			forms: {
-				question: words(`서성이니|서성이나|서성이는가`),
-				exclamation: words(`서성이는구나|서성이네|서성이는군`),
-				casual: words(`서성여`),
-				casualQuestion: words(`서성여|서성이지`),
-				polite: words(`서성여요`),
-				politeQuestion: words(`서성여요|서성이죠`),
-				formal: words(`서성입니다`),
-				formalQuestion: words(`서성입니까`),
-				linking: words(`서성이고`)
+				question: words(`기어가니|기어가나|기어가는가`),
+				exclamation: words(`기어가는구나|기어가네|기어가는군`),
+				casual: words(`기어가`),
+				casualQuestion: words(`기어가|기어가지`),
+				polite: words(`기어가요`),
+				politeQuestion: words(`기어가요|기어가죠`),
+				formal: words(`기어갑니다`),
+				formalQuestion: words(`기어갑니까`),
+				linking: words(`기어가고`)
 			},
-			past: conjugate(`서성였`, PAST)
+			past: conjugate(`기어갔`, PAST)
 		},
 		{
 			// Taking off is a flier's alone: a sparrow's, a dragon's, never a fish's.
