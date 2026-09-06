@@ -110,6 +110,12 @@ final SentenceLanguageData de = SentenceLanguageData(
       ),
     ),
     VerbGroup(
+      field: VerbField.talk,
+      subject: const <NounClass>[NounClass.creature, NounClass.person],
+      words: words(r'plaudert redet schwatzt'),
+      past: PredicateTense(words: words(r'plauderte redete schwatzte')),
+    ),
+    VerbGroup(
       field: VerbField.play,
       subject: const <NounClass>[NounClass.creature, NounClass.person],
       words: words(r'tanzt singt tollt spielt hüpft rollt'),

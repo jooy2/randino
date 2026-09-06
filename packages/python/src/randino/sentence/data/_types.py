@@ -107,6 +107,9 @@ VerbField = Literal[
     "cook",
     "eat",
     "drink",
+    "lose",
+    "meet",
+    "talk",
     "change",
 ]
 """What a verb does, as coarsely as a story needs to know it.

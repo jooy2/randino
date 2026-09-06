@@ -104,9 +104,10 @@ export type PredicateForms = Partial<Record<PredicateForm, WordPool>>;
  * - The hero at rest: `rest`, `sleep`.
  * - The hero showing something: `express` (laughs, cries, yawns), `play` (dances,
  *   tumbles, sings), `think` (remembers, imagines — takes an idea).
+ * - The hero and somebody: `meet` (takes a person), `talk` (with nobody named).
  * - The hero and a thing: `look`, `search` (with no object; the place is what is
  *   searched), `find`, `take`, `carry`, `hide`, `make`, `tend` (mends, cleans),
- *   `sell`, `buy`, `cook`, `eat`, `drink`.
+ *   `sell`, `buy`, `cook`, `eat`, `drink`, `lose`.
  * - `change` is everything that happens to something that is not a hero: a place
  *   darkens, an apple ripens, a flag sways.
  *
@@ -137,6 +138,9 @@ export type VerbField =
 	| 'cook'
 	| 'eat'
 	| 'drink'
+	| 'lose'
+	| 'meet'
+	| 'talk'
 	| 'change';
 
 /**

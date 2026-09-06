@@ -126,6 +126,10 @@ export const FIELD_RULES: Record<VerbField, FieldRule> = {
 		takes: ['hungry', 'holding'],
 		after: ['hungry']
 	},
+	// Losing what one holds is what makes a hero restless enough to search.
+	lose: { needs: ['awake', 'holding'], gives: ['restless'], takes: ['holding', 'content'] },
+	meet: { needs: ['awake'], gives: ['content'], takes: ['restless'], after: ['restless'] },
+	talk: { needs: ['awake'], after: ['content'] },
 	change: {}
 };
 
@@ -503,6 +507,64 @@ export const STORIES: readonly Story[] = [
 			{ kind: 'scene', field: 'change', link: 'temporal' },
 			{ kind: 'act', field: 'arrive', destination: 'home', link: 'temporal' },
 			{ kind: 'act', field: ['think', 'express'], kinds: ['trailing'] }
+		]
+	},
+	{
+		// The hero loses what they carried, looks for it, and may or may not find it.
+		name: 'mishap',
+		hero: AGENT_CLASSES,
+		item: ['thing', 'edible'],
+		itemThemes: ['object', 'tool', 'clothing', 'gem', 'food'],
+		start: ['awake', 'rested', 'home', 'holding'],
+		weight: 12,
+		steps: [
+			{ kind: 'act', field: 'carry', object: 'item', link: 'additive' },
+			{ kind: 'act', field: 'go', destination: 'place', required: true },
+			{
+				kind: 'act',
+				field: 'lose',
+				object: 'item',
+				place: true,
+				required: true,
+				link: 'temporal'
+			},
+			{ kind: 'state', condition: 'restless', link: 'causal' },
+			{ kind: 'act', field: 'search', place: true, required: true, link: 'causal' },
+			{ kind: 'act', field: 'wait', place: true },
+			{
+				kind: 'act',
+				field: 'find',
+				object: 'item',
+				place: true,
+				link: 'temporal',
+				kinds: ['exclamation']
+			},
+			{ kind: 'act', field: 'arrive', destination: 'home', required: true, link: 'temporal' },
+			{
+				kind: 'act',
+				field: ['express', 'think', 'rest'],
+				link: 'temporal',
+				kinds: ['trailing', 'exclamation']
+			}
+		]
+	},
+	{
+		// The hero goes to see somebody, and they talk. The person met is the thing
+		// this story is about.
+		name: 'visit',
+		hero: AGENT_CLASSES,
+		item: ['person'],
+		start: ['awake', 'rested', 'home'],
+		weight: 12,
+		steps: [
+			{ kind: 'act', field: 'go', destination: 'place', required: true },
+			{ kind: 'act', field: 'meet', object: 'item', place: true, required: true, link: 'temporal' },
+			{ kind: 'act', field: 'talk', link: 'additive' },
+			{ kind: 'act', field: 'express', link: 'causal', kinds: ['exclamation'] },
+			{ kind: 'act', field: 'wait', place: true },
+			{ kind: 'state', condition: 'content', link: 'causal' },
+			{ kind: 'act', field: 'arrive', destination: 'home', required: true, link: 'temporal' },
+			{ kind: 'act', field: ['think', 'express'], link: 'temporal', kinds: ['trailing'] }
 		]
 	},
 	{

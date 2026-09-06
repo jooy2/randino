@@ -125,6 +125,14 @@ FIELD_RULES: dict[VerbField, FieldRule] = {
     "drink": FieldRule(
         needs=("awake", "holding"), gives=("full",), takes=("hungry", "holding"), after=("hungry",)
     ),
+    # Losing what one holds is what makes a hero restless enough to search.
+    "lose": FieldRule(
+        needs=("awake", "holding"), gives=("restless",), takes=("holding", "content")
+    ),
+    "meet": FieldRule(
+        needs=("awake",), gives=("content",), takes=("restless",), after=("restless",)
+    ),
+    "talk": FieldRule(needs=("awake",), after=("content",)),
     "change": FieldRule(),
 }
 """The rule of every field.
@@ -527,6 +535,65 @@ STORIES: tuple[Story, ...] = (
             StoryStep("scene", fields=("change",), link="temporal"),
             StoryStep("act", fields=("arrive",), destination="home", link="temporal"),
             StoryStep("act", fields=("think", "express"), kinds=("trailing",)),
+        ),
+    ),
+    # The hero loses what they carried, looks for it, and may or may not find it.
+    Story(
+        name="mishap",
+        hero=AGENT_CLASSES,
+        item=("thing", "edible"),
+        item_themes=("object", "tool", "clothing", "gem", "food"),
+        start=("awake", "rested", "home", "holding"),
+        weight=12,
+        steps=(
+            StoryStep("act", fields=("carry",), object="item", link="additive"),
+            StoryStep("act", fields=("go",), destination="place", required=True),
+            StoryStep(
+                "act", fields=("lose",), object="item", place=True, required=True, link="temporal"
+            ),
+            StoryStep("state", condition="restless", link="causal"),
+            StoryStep("act", fields=("search",), place=True, required=True, link="causal"),
+            StoryStep("act", fields=("wait",), place=True),
+            StoryStep(
+                "act",
+                fields=("find",),
+                object="item",
+                place=True,
+                link="temporal",
+                kinds=("exclamation",),
+            ),
+            StoryStep(
+                "act", fields=("arrive",), destination="home", required=True, link="temporal"
+            ),
+            StoryStep(
+                "act",
+                fields=("express", "think", "rest"),
+                link="temporal",
+                kinds=("trailing", "exclamation"),
+            ),
+        ),
+    ),
+    # The hero goes to see somebody, and they talk. The person met is the thing this
+    # story is about.
+    Story(
+        name="visit",
+        hero=AGENT_CLASSES,
+        item=("person",),
+        start=("awake", "rested", "home"),
+        weight=12,
+        steps=(
+            StoryStep("act", fields=("go",), destination="place", required=True),
+            StoryStep(
+                "act", fields=("meet",), object="item", place=True, required=True, link="temporal"
+            ),
+            StoryStep("act", fields=("talk",), link="additive"),
+            StoryStep("act", fields=("express",), link="causal", kinds=("exclamation",)),
+            StoryStep("act", fields=("wait",), place=True),
+            StoryStep("state", condition="content", link="causal"),
+            StoryStep(
+                "act", fields=("arrive",), destination="home", required=True, link="temporal"
+            ),
+            StoryStep("act", fields=("think", "express"), link="temporal", kinds=("trailing",)),
         ),
     ),
     Story(

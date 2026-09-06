@@ -276,6 +276,21 @@ JA = SentenceLanguageData(
             ),
         ),
         VerbGroup(
+            field="talk",
+            subject=("creature", "person"),
+            words=words("話す おしゃべりする 語り合う"),
+            forms={
+                "polite": words("話します おしゃべりします 語り合います"),
+                "linking": words("話して おしゃべりして 語り合って"),
+            },
+            past=PredicateTense(
+                words=words("話した おしゃべりした 語り合った"),
+                forms={
+                    "polite": words("話しました おしゃべりしました 語り合いました"),
+                },
+            ),
+        ),
+        VerbGroup(
             field="play",
             subject=("creature", "person"),
             words=words("踊る 歌う 転がる 遊ぶ はねる 跳ね回る じゃれる"),
@@ -412,6 +427,38 @@ JA = SentenceLanguageData(
                     "polite": words(
                         "隠しました しまいました 守りました 埋めました 取っておきました"
                     ),
+                },
+            ),
+        ),
+        VerbGroup(
+            field="lose",
+            subject=("creature", "person"),
+            object=("thing", "plant", "edible"),
+            words=words("なくす 落とす"),
+            forms={
+                "polite": words("なくします 落とします"),
+                "linking": words("なくして 落として"),
+            },
+            past=PredicateTense(
+                words=words("なくした 落とした"),
+                forms={
+                    "polite": words("なくしました 落としました"),
+                },
+            ),
+        ),
+        VerbGroup(
+            field="meet",
+            subject=("creature", "person"),
+            object=("person",),
+            words=words("訪ねる 見かける 迎える"),
+            forms={
+                "polite": words("訪ねます 見かけます 迎えます"),
+                "linking": words("訪ねて 見かけて 迎えて"),
+            },
+            past=PredicateTense(
+                words=words("訪ねた 見かけた 迎えた"),
+                forms={
+                    "polite": words("訪ねました 見かけました 迎えました"),
                 },
             ),
         ),

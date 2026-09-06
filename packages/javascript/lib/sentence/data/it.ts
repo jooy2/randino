@@ -165,6 +165,11 @@ export const IT: SentenceLanguageData = {
 			)
 		},
 		{
+			field: 'talk',
+			subject: ['creature', 'person'],
+			...tensed(`chiacchiera parla conversa`, `chiacchierò parlò conversò`)
+		},
+		{
 			field: 'play',
 			subject: ['creature', 'person'],
 			...tensed(
@@ -224,6 +229,18 @@ export const IT: SentenceLanguageData = {
 				`nasconde ripone custodisce sotterra conserva`,
 				`nascose ripose custodì sotterrò conservò`
 			)
+		},
+		{
+			field: 'lose',
+			subject: ['creature', 'person'],
+			object: ['thing', 'plant', 'edible'],
+			...tensed(`perde smarrisce dimentica`, `perse smarrì dimenticò`)
+		},
+		{
+			field: 'meet',
+			subject: ['creature', 'person'],
+			object: ['person'],
+			...tensed(`incontra saluta`, `incontrò salutò`)
 		},
 		{
 			field: 'make',

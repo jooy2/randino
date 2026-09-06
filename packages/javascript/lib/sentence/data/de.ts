@@ -114,6 +114,11 @@ export const DE: SentenceLanguageData = {
 			)
 		},
 		{
+			field: 'talk',
+			subject: ['creature', 'person'],
+			...tensed(`plaudert redet schwatzt`, `plauderte redete schwatzte`)
+		},
+		{
 			field: 'play',
 			subject: ['creature', 'person'],
 			...tensed(`tanzt singt tollt spielt hüpft rollt`, `tanzte sang tollte spielte hüpfte rollte`)

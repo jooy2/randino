@@ -372,6 +372,27 @@ export const KO: SentenceLanguageData = {
 			past: conjugate(`웃었 울었 하품했 한숨지었 미소지었 콧노래했 중얼거렸 소리쳤`, PAST)
 		},
 		{
+			field: 'talk',
+			subject: ['creature', 'person'],
+			words: words(`이야기한다 수다떤다 대화한다`),
+			forms: {
+				question: words(`
+					이야기하니|이야기하나|이야기하는가 수다떠니|수다떠나|수다떠는가 대화하니|대화하나|대화하는가
+				`),
+				exclamation: words(`
+					이야기하는구나|이야기하네|이야기하는군 수다떠는구나|수다떠네|수다떠는군 대화하는구나|대화하네|대화하는군
+				`),
+				casual: words(`이야기해 수다떨어 대화해`),
+				casualQuestion: words(`이야기해|이야기하지 수다떨어|수다떨지 대화해|대화하지`),
+				polite: words(`이야기해요 수다떨어요 대화해요`),
+				politeQuestion: words(`이야기해요|이야기하죠 수다떨어요|수다떨죠 대화해요|대화하죠`),
+				formal: words(`이야기합니다 수다떱니다 대화합니다`),
+				formalQuestion: words(`이야기합니까 수다떱니까 대화합니까`),
+				linking: words(`이야기하고 수다떨고 대화하고`)
+			},
+			past: conjugate(`이야기했 수다떨었 대화했`, PAST)
+		},
+		{
 			field: 'play',
 			subject: ['creature', 'person'],
 			words: words(`춤춘다 노래한다 뒹군다 뛰논다 장난친다 뛰어오른다 폴짝거린다 구른다`),
@@ -602,6 +623,48 @@ export const KO: SentenceLanguageData = {
 				linking: words(`감추고 숨기고 넣어두고 간직하고 묻고 챙겨두고`)
 			},
 			past: conjugate(`감췄 숨겼 넣어뒀 간직했 묻었 챙겨뒀`, PAST)
+		},
+		{
+			field: 'lose',
+			subject: ['creature', 'person'],
+			object: ['thing', 'plant', 'edible'],
+			// What one can hold, and so can lose.
+			objectThemes: ['object', 'tool', 'clothing', 'product', 'gem', 'plant', 'food', 'drink'],
+			words: words(`잃어버린다 떨어뜨린다 놓친다`),
+			forms: {
+				question: words(`
+					잃어버리니|잃어버리나|잃어버리는가 떨어뜨리니|떨어뜨리나|떨어뜨리는가 놓치니|놓치나|놓치는가
+				`),
+				exclamation: words(`
+					잃어버리는구나|잃어버리네|잃어버리는군 떨어뜨리는구나|떨어뜨리네|떨어뜨리는군 놓치는구나|놓치네|놓치는군
+				`),
+				casual: words(`잃어버려 떨어뜨려 놓쳐`),
+				casualQuestion: words(`잃어버려|잃어버리지 떨어뜨려|떨어뜨리지 놓쳐|놓치지`),
+				polite: words(`잃어버려요 떨어뜨려요 놓쳐요`),
+				politeQuestion: words(`잃어버려요|잃어버리죠 떨어뜨려요|떨어뜨리죠 놓쳐요|놓치죠`),
+				formal: words(`잃어버립니다 떨어뜨립니다 놓칩니다`),
+				formalQuestion: words(`잃어버립니까 떨어뜨립니까 놓칩니까`),
+				linking: words(`잃어버리고 떨어뜨리고 놓치고`)
+			},
+			past: conjugate(`잃어버렸 떨어뜨렸 놓쳤`, PAST)
+		},
+		{
+			field: 'meet',
+			subject: ['creature', 'person'],
+			object: ['person'],
+			words: words(`만난다 마주친다`),
+			forms: {
+				question: words(`만나니|만나나|만나는가 마주치니|마주치나|마주치는가`),
+				exclamation: words(`만나는구나|만나네|만나는군 마주치는구나|마주치네|마주치는군`),
+				casual: words(`만나 마주쳐`),
+				casualQuestion: words(`만나|만나지 마주쳐|마주치지`),
+				polite: words(`만나요 마주쳐요`),
+				politeQuestion: words(`만나요|만나죠 마주쳐요|마주치죠`),
+				formal: words(`만납니다 마주칩니다`),
+				formalQuestion: words(`만납니까 마주칩니까`),
+				linking: words(`만나고 마주치고`)
+			},
+			past: conjugate(`만났 마주쳤`, PAST)
 		},
 		{
 			field: 'make',

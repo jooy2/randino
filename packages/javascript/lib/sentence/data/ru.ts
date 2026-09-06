@@ -117,6 +117,11 @@ export const RU: SentenceLanguageData = {
 			)
 		},
 		{
+			field: 'talk',
+			subject: ['creature', 'person'],
+			...tensed(`болтает беседует разговаривает`, `болтал беседовал разговаривал`)
+		},
+		{
 			field: 'play',
 			subject: ['creature', 'person'],
 			...tensed(

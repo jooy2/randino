@@ -99,6 +99,11 @@ export const VI: SentenceLanguageData = {
 			words: words(`cười khóc ngáp thở_dài mỉm_cười ngâm_nga lầm_bầm la_lên`)
 		},
 		{
+			field: 'talk',
+			subject: ['creature', 'person'],
+			words: words(`trò_chuyện nói_chuyện tán_gẫu`)
+		},
+		{
 			field: 'play',
 			subject: ['creature', 'person'],
 			words: words(`nhảy_múa hát lăn_lộn nô_đùa tung_tăng vui_chơi`)
@@ -143,6 +148,18 @@ export const VI: SentenceLanguageData = {
 			subject: ['creature', 'person'],
 			object: ['thing', 'plant', 'edible'],
 			words: words(`giấu cất giữ chôn cất_kỹ`)
+		},
+		{
+			field: 'lose',
+			subject: ['creature', 'person'],
+			object: ['thing', 'plant', 'edible'],
+			words: words(`làm_mất đánh_rơi bỏ_quên`)
+		},
+		{
+			field: 'meet',
+			subject: ['creature', 'person'],
+			object: ['person'],
+			words: words(`gặp gặp_gỡ chào`)
 		},
 		{
 			field: 'make',

@@ -105,6 +105,11 @@ final SentenceLanguageData vi = SentenceLanguageData(
       words: words(r'cười khóc ngáp thở_dài mỉm_cười ngâm_nga lầm_bầm la_lên'),
     ),
     VerbGroup(
+      field: VerbField.talk,
+      subject: const <NounClass>[NounClass.creature, NounClass.person],
+      words: words(r'trò_chuyện nói_chuyện tán_gẫu'),
+    ),
+    VerbGroup(
       field: VerbField.play,
       subject: const <NounClass>[NounClass.creature, NounClass.person],
       words: words(r'nhảy_múa hát lăn_lộn nô_đùa tung_tăng vui_chơi'),
@@ -149,6 +154,18 @@ final SentenceLanguageData vi = SentenceLanguageData(
       subject: const <NounClass>[NounClass.creature, NounClass.person],
       object: const <NounClass>[NounClass.thing, NounClass.plant, NounClass.edible],
       words: words(r'giấu cất giữ chôn cất_kỹ'),
+    ),
+    VerbGroup(
+      field: VerbField.lose,
+      subject: const <NounClass>[NounClass.creature, NounClass.person],
+      object: const <NounClass>[NounClass.thing, NounClass.plant, NounClass.edible],
+      words: words(r'làm_mất đánh_rơi bỏ_quên'),
+    ),
+    VerbGroup(
+      field: VerbField.meet,
+      subject: const <NounClass>[NounClass.creature, NounClass.person],
+      object: const <NounClass>[NounClass.person],
+      words: words(r'gặp gặp_gỡ chào'),
     ),
     VerbGroup(
       field: VerbField.make,

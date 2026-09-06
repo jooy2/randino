@@ -248,6 +248,20 @@ EN = SentenceLanguageData(
             ),
         ),
         VerbGroup(
+            field="talk",
+            subject=("creature", "person"),
+            words=words("chats talks chatters"),
+            forms={
+                "question": words("chat talk chatter"),
+            },
+            past=PredicateTense(
+                words=words("chatted talked chattered"),
+                forms={
+                    "question": words("chat talk chatter"),
+                },
+            ),
+        ),
+        VerbGroup(
             field="play",
             subject=("creature", "person"),
             words=words("dances sings tumbles frolics plays bounces skips"),
@@ -364,6 +378,36 @@ EN = SentenceLanguageData(
                 words=words("hid tucked_away stored put_away kept buried"),
                 forms={
                     "question": words("hide tuck_away store put_away keep bury"),
+                },
+            ),
+        ),
+        VerbGroup(
+            field="lose",
+            subject=("creature", "person"),
+            object=("thing", "plant", "edible"),
+            words=words("loses drops misplaces"),
+            forms={
+                "question": words("lose drop misplace"),
+            },
+            past=PredicateTense(
+                words=words("lost dropped misplaced"),
+                forms={
+                    "question": words("lose drop misplace"),
+                },
+            ),
+        ),
+        VerbGroup(
+            field="meet",
+            subject=("creature", "person"),
+            object=("person",),
+            words=words("meets runs_into greets"),
+            forms={
+                "question": words("meet run_into greet"),
+            },
+            past=PredicateTense(
+                words=words("met ran_into greeted"),
+                forms={
+                    "question": words("meet run_into greet"),
                 },
             ),
         ),

@@ -177,6 +177,15 @@ enum VerbField {
   /// Drinks.
   drink,
 
+  /// Loses, drops, misplaces — what one holds.
+  lose,
+
+  /// Meets, greets, visits — takes a person.
+  meet,
+
+  /// Chats, talks — with nobody named.
+  talk,
+
   /// Everything that happens to something that is not a hero: a place darkens,
   /// an apple ripens, a flag sways.
   change,

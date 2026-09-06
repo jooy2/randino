@@ -206,6 +206,17 @@ export const JA: SentenceLanguageData = {
 			)
 		},
 		{
+			field: 'talk',
+			subject: ['creature', 'person'],
+			...tensed(
+				`話す おしゃべりする 語り合う`,
+				`話します おしゃべりします 語り合います`,
+				`話した おしゃべりした 語り合った`,
+				`話しました おしゃべりしました 語り合いました`,
+				`話して おしゃべりして 語り合って`
+			)
+		},
+		{
 			field: 'play',
 			subject: ['creature', 'person'],
 			...tensed(
@@ -297,6 +308,31 @@ export const JA: SentenceLanguageData = {
 				`隠した しまった 守った 埋めた 取っておいた`,
 				`隠しました しまいました 守りました 埋めました 取っておきました`,
 				`隠して しまって 守って 埋めて 取っておいて`
+			)
+		},
+		{
+			field: 'lose',
+			subject: ['creature', 'person'],
+			object: ['thing', 'plant', 'edible'],
+			...tensed(
+				`なくす 落とす`,
+				`なくします 落とします`,
+				`なくした 落とした`,
+				`なくしました 落としました`,
+				`なくして 落として`
+			)
+		},
+		{
+			field: 'meet',
+			subject: ['creature', 'person'],
+			object: ['person'],
+			// Verbs that take を: 会う takes に, and the object frame writes を.
+			...tensed(
+				`訪ねる 見かける 迎える`,
+				`訪ねます 見かけます 迎えます`,
+				`訪ねた 見かけた 迎えた`,
+				`訪ねました 見かけました 迎えました`,
+				`訪ねて 見かけて 迎えて`
 			)
 		},
 		{

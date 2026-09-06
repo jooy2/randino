@@ -185,6 +185,14 @@ IT = SentenceLanguageData(
             ),
         ),
         VerbGroup(
+            field="talk",
+            subject=("creature", "person"),
+            words=words("chiacchiera parla conversa"),
+            past=PredicateTense(
+                words=words("chiacchierò parlò conversò"),
+            ),
+        ),
+        VerbGroup(
             field="play",
             subject=("creature", "person"),
             words=words("balla canta rotola gioca saltella scherza"),
@@ -252,6 +260,24 @@ IT = SentenceLanguageData(
             words=words("nasconde ripone custodisce sotterra conserva"),
             past=PredicateTense(
                 words=words("nascose ripose custodì sotterrò conservò"),
+            ),
+        ),
+        VerbGroup(
+            field="lose",
+            subject=("creature", "person"),
+            object=("thing", "plant", "edible"),
+            words=words("perde smarrisce dimentica"),
+            past=PredicateTense(
+                words=words("perse smarrì dimenticò"),
+            ),
+        ),
+        VerbGroup(
+            field="meet",
+            subject=("creature", "person"),
+            object=("person",),
+            words=words("incontra saluta"),
+            past=PredicateTense(
+                words=words("incontrò salutò"),
             ),
         ),
         VerbGroup(

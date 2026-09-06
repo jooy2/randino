@@ -157,6 +157,11 @@ export const EN: SentenceLanguageData = {
 			)
 		},
 		{
+			field: 'talk',
+			subject: ['creature', 'person'],
+			...tensed(`chats talks chatters`, `chat talk chatter`, `chatted talked chattered`)
+		},
+		{
 			field: 'play',
 			subject: ['creature', 'person'],
 			...tensed(
@@ -233,6 +238,18 @@ export const EN: SentenceLanguageData = {
 				`hide tuck_away store put_away keep bury`,
 				`hid tucked_away stored put_away kept buried`
 			)
+		},
+		{
+			field: 'lose',
+			subject: ['creature', 'person'],
+			object: ['thing', 'plant', 'edible'],
+			...tensed(`loses drops misplaces`, `lose drop misplace`, `lost dropped misplaced`)
+		},
+		{
+			field: 'meet',
+			subject: ['creature', 'person'],
+			object: ['person'],
+			...tensed(`meets runs_into greets`, `meet run_into greet`, `met ran_into greeted`)
 		},
 		{
 			field: 'make',

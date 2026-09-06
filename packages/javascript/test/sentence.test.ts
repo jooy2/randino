@@ -1073,9 +1073,10 @@ describe('Sentence', () => {
 			includeName: true,
 			count: 120
 		})) {
+			// A `visit` is the one story with a second person in it: the one met.
 			assert.strictEqual(
 				new Set(detail.names).size,
-				Math.min(1, detail.names.length),
+				Math.min(detail.story === 'visit' ? 2 : 1, detail.names.length),
 				detail.sentence
 			);
 		}

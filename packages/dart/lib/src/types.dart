@@ -452,6 +452,12 @@ enum SentenceStory {
   /// The hero gets something to eat somewhere and eats it there.
   picnic,
 
+  /// The hero loses what they carried, looks for it, and may or may not find it.
+  mishap,
+
+  /// The hero goes to see somebody, and they talk.
+  visit,
+
   /// Something that is not a person or an animal changes over time — an apple
   /// ripens and cools, a sky darkens and deepens.
   passage,

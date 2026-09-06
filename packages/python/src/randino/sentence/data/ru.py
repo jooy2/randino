@@ -129,6 +129,14 @@ RU = SentenceLanguageData(
             ),
         ),
         VerbGroup(
+            field="talk",
+            subject=("creature", "person"),
+            words=words("болтает беседует разговаривает"),
+            past=PredicateTense(
+                words=words("болтал беседовал разговаривал"),
+            ),
+        ),
+        VerbGroup(
             field="play",
             subject=("creature", "person"),
             words=words("танцует поёт катается играет резвится подпрыгивает"),

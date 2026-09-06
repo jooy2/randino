@@ -980,7 +980,8 @@ def test_a_paragraph_keeps_its_scene_its_person_and_its_register() -> None:
     for detail in rand_sentence(
         language="ko", sentences=4, include_name=True, count=120, output="detail"
     ):
-        assert len(set(detail.names)) == min(1, len(detail.names)), detail.sentence
+        # A `visit` is the one story with a second person in it: the one met.
+        assert len(set(detail.names)) <= (2 if detail.story == "visit" else 1), detail.sentence
 
     # And it names them and then leaves them alone. A name is the most conspicuous word a
     # sentence can carry and the one a reader is least likely to lose track of, so

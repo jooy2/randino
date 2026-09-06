@@ -142,6 +142,11 @@ export const ES: SentenceLanguageData = {
 			)
 		},
 		{
+			field: 'talk',
+			subject: ['creature', 'person'],
+			...tensed(`charla conversa platica`, `charló conversó platicó`)
+		},
+		{
 			field: 'play',
 			subject: ['creature', 'person'],
 			...tensed(`baila canta rueda juega brinca retoza`, `bailó cantó rodó jugó brincó retozó`)
@@ -195,6 +200,12 @@ export const ES: SentenceLanguageData = {
 				`esconde guarda oculta entierra conserva`,
 				`escondió guardó ocultó enterró conservó`
 			)
+		},
+		{
+			field: 'lose',
+			subject: ['creature', 'person'],
+			object: ['thing', 'plant', 'edible'],
+			...tensed(`pierde extravía olvida`, `perdió extravió olvidó`)
 		},
 		{
 			field: 'make',

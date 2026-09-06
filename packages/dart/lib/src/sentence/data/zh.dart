@@ -105,6 +105,11 @@ final SentenceLanguageData zh = SentenceLanguageData(
       words: words(r'微笑 哭泣 打哈欠 叹气 哼歌 咕哝 喊叫 大笑'),
     ),
     VerbGroup(
+      field: VerbField.talk,
+      subject: const <NounClass>[NounClass.creature, NounClass.person],
+      words: words(r'聊天 说话 谈话'),
+    ),
+    VerbGroup(
       field: VerbField.play,
       subject: const <NounClass>[NounClass.creature, NounClass.person],
       words: words(r'跳舞 歌唱 打滚 玩耍 蹦跳 嬉戏'),
@@ -149,6 +154,18 @@ final SentenceLanguageData zh = SentenceLanguageData(
       subject: const <NounClass>[NounClass.creature, NounClass.person],
       object: const <NounClass>[NounClass.thing, NounClass.plant, NounClass.edible],
       words: words(r'藏起 收好 守护 埋起 藏好'),
+    ),
+    VerbGroup(
+      field: VerbField.lose,
+      subject: const <NounClass>[NounClass.creature, NounClass.person],
+      object: const <NounClass>[NounClass.thing, NounClass.plant, NounClass.edible],
+      words: words(r'弄丢 丢失 丢下'),
+    ),
+    VerbGroup(
+      field: VerbField.meet,
+      subject: const <NounClass>[NounClass.creature, NounClass.person],
+      object: const <NounClass>[NounClass.person],
+      words: words(r'遇见 碰见 见到'),
     ),
     VerbGroup(
       field: VerbField.make,

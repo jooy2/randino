@@ -2427,7 +2427,18 @@ def _compose(
         else:
             theme = part_themes[index]
             person = theme is not None and THEME_CLASS[theme] == "person"
-            proper.append("" if settings.include_name and person else None)
+            # A name stands where a person would — and, outside the subject, only beside
+            # a subject that is a person too: 성재 meets 유하, and a fox meets the baker.
+            person_subject = THEME_CLASS[subject_theme] == "person" or (
+                follow is not None and follow.topic.noun_class == "person"
+            )
+            proper.append(
+                ""
+                if settings.include_name
+                and person
+                and (part.slot == subject_slot or person_subject)
+                else None
+            )
 
     parts: list[SentencePart] = []
 

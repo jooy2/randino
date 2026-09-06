@@ -1104,9 +1104,10 @@ void main() {
         includeName: true,
         count: 120,
       )) {
+        // A `visit` is the one story with a second person in it: the one met.
         expect(
-          detail.names.toSet(),
-          hasLength(detail.names.isEmpty ? 0 : 1),
+          detail.names.toSet().length,
+          lessThanOrEqualTo(detail.story == SentenceStory.visit ? 2 : 1),
           reason: detail.sentence,
         );
       }

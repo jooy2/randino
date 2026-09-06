@@ -91,6 +91,11 @@ export const ZH: SentenceLanguageData = {
 			words: words(`微笑 哭泣 打哈欠 叹气 哼歌 咕哝 喊叫 大笑`)
 		},
 		{
+			field: 'talk',
+			subject: ['creature', 'person'],
+			words: words(`聊天 说话 谈话`)
+		},
+		{
 			field: 'play',
 			subject: ['creature', 'person'],
 			words: words(`跳舞 歌唱 打滚 玩耍 蹦跳 嬉戏`)
@@ -131,6 +136,18 @@ export const ZH: SentenceLanguageData = {
 			subject: ['creature', 'person'],
 			object: ['thing', 'plant', 'edible'],
 			words: words(`藏起 收好 守护 埋起 藏好`)
+		},
+		{
+			field: 'lose',
+			subject: ['creature', 'person'],
+			object: ['thing', 'plant', 'edible'],
+			words: words(`弄丢 丢失 丢下`)
+		},
+		{
+			field: 'meet',
+			subject: ['creature', 'person'],
+			object: ['person'],
+			words: words(`遇见 碰见 见到`)
 		},
 		{
 			field: 'make',

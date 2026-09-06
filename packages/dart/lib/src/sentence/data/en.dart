@@ -208,6 +208,16 @@ final SentenceLanguageData en = SentenceLanguageData(
       ),
     ),
     VerbGroup(
+      field: VerbField.talk,
+      subject: const <NounClass>[NounClass.creature, NounClass.person],
+      words: words(r'chats talks chatters'),
+      forms: <PredicateForm, WordPool>{PredicateForm.question: words(r'chat talk chatter')},
+      past: PredicateTense(
+        words: words(r'chatted talked chattered'),
+        forms: <PredicateForm, WordPool>{PredicateForm.question: words(r'chat talk chatter')},
+      ),
+    ),
+    VerbGroup(
       field: VerbField.play,
       subject: const <NounClass>[NounClass.creature, NounClass.person],
       words: words(r'dances sings tumbles frolics plays bounces skips'),
@@ -319,6 +329,28 @@ final SentenceLanguageData en = SentenceLanguageData(
         forms: <PredicateForm, WordPool>{
           PredicateForm.question: words(r'hide tuck_away store put_away keep bury'),
         },
+      ),
+    ),
+    VerbGroup(
+      field: VerbField.lose,
+      subject: const <NounClass>[NounClass.creature, NounClass.person],
+      object: const <NounClass>[NounClass.thing, NounClass.plant, NounClass.edible],
+      words: words(r'loses drops misplaces'),
+      forms: <PredicateForm, WordPool>{PredicateForm.question: words(r'lose drop misplace')},
+      past: PredicateTense(
+        words: words(r'lost dropped misplaced'),
+        forms: <PredicateForm, WordPool>{PredicateForm.question: words(r'lose drop misplace')},
+      ),
+    ),
+    VerbGroup(
+      field: VerbField.meet,
+      subject: const <NounClass>[NounClass.creature, NounClass.person],
+      object: const <NounClass>[NounClass.person],
+      words: words(r'meets runs_into greets'),
+      forms: <PredicateForm, WordPool>{PredicateForm.question: words(r'meet run_into greet')},
+      past: PredicateTense(
+        words: words(r'met ran_into greeted'),
+        forms: <PredicateForm, WordPool>{PredicateForm.question: words(r'meet run_into greet')},
       ),
     ),
     VerbGroup(

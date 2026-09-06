@@ -2195,8 +2195,17 @@ function compose(
 		}
 
 		const theme = partThemes[i];
+		// A name stands where a person would — and, outside the subject, only beside
+		// a subject that is a person too: 성재 meets 유하, and a fox meets the baker.
+		const personSubject =
+			THEME_CLASS[subjectTheme] === 'person' || follow?.topic.class === 'person';
 
-		return settings.includeName && theme && THEME_CLASS[theme] === 'person' ? '' : null;
+		return settings.includeName &&
+			theme &&
+			THEME_CLASS[theme] === 'person' &&
+			(part.slot === subjectSlot || personSubject)
+			? ''
+			: null;
 	});
 	const parts = shape.map((entry, i) =>
 		proper[i] === null

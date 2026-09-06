@@ -163,6 +163,12 @@ final SentenceLanguageData it = SentenceLanguageData(
       ),
     ),
     VerbGroup(
+      field: VerbField.talk,
+      subject: const <NounClass>[NounClass.creature, NounClass.person],
+      words: words(r'chiacchiera parla conversa'),
+      past: PredicateTense(words: words(r'chiacchierò parlò conversò')),
+    ),
+    VerbGroup(
       field: VerbField.play,
       subject: const <NounClass>[NounClass.creature, NounClass.person],
       words: words(r'balla canta rotola gioca saltella scherza'),
@@ -215,6 +221,20 @@ final SentenceLanguageData it = SentenceLanguageData(
       object: const <NounClass>[NounClass.thing, NounClass.plant, NounClass.edible],
       words: words(r'nasconde ripone custodisce sotterra conserva'),
       past: PredicateTense(words: words(r'nascose ripose custodì sotterrò conservò')),
+    ),
+    VerbGroup(
+      field: VerbField.lose,
+      subject: const <NounClass>[NounClass.creature, NounClass.person],
+      object: const <NounClass>[NounClass.thing, NounClass.plant, NounClass.edible],
+      words: words(r'perde smarrisce dimentica'),
+      past: PredicateTense(words: words(r'perse smarrì dimenticò')),
+    ),
+    VerbGroup(
+      field: VerbField.meet,
+      subject: const <NounClass>[NounClass.creature, NounClass.person],
+      object: const <NounClass>[NounClass.person],
+      words: words(r'incontra saluta'),
+      past: PredicateTense(words: words(r'incontrò salutò')),
     ),
     VerbGroup(
       field: VerbField.make,

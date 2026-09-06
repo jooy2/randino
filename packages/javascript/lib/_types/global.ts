@@ -419,6 +419,8 @@ export type SentenceTense = 'present' | 'past';
  * - `idle`: the hero is at a loose end at home, and plays.
  * - `waking`: the place wakes before the hero does, and the day begins.
  * - `picnic`: the hero gets something to eat somewhere and eats it there.
+ * - `mishap`: the hero loses what they carried, looks for it, and may or may not find it.
+ * - `visit`: the hero goes to see somebody, and they talk.
  * - `passage`: something that is not a person or an animal changes over time —
  *   an apple ripens and cools, a sky darkens and deepens.
  *
@@ -438,6 +440,8 @@ export type SentenceStory =
 	| 'idle'
 	| 'waking'
 	| 'picnic'
+	| 'mishap'
+	| 'visit'
 	| 'passage';
 
 /**

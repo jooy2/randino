@@ -169,6 +169,14 @@ ES = SentenceLanguageData(
             ),
         ),
         VerbGroup(
+            field="talk",
+            subject=("creature", "person"),
+            words=words("charla conversa platica"),
+            past=PredicateTense(
+                words=words("charló conversó platicó"),
+            ),
+        ),
+        VerbGroup(
             field="play",
             subject=("creature", "person"),
             words=words("baila canta rueda juega brinca retoza"),
@@ -236,6 +244,15 @@ ES = SentenceLanguageData(
             words=words("esconde guarda oculta entierra conserva"),
             past=PredicateTense(
                 words=words("escondió guardó ocultó enterró conservó"),
+            ),
+        ),
+        VerbGroup(
+            field="lose",
+            subject=("creature", "person"),
+            object=("thing", "plant", "edible"),
+            words=words("pierde extravía olvida"),
+            past=PredicateTense(
+                words=words("perdió extravió olvidó"),
             ),
         ),
         VerbGroup(

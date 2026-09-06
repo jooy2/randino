@@ -2189,9 +2189,17 @@ _Built _compose(
 
         final theme = partThemes[i];
 
+        // A name stands where a person would — and, outside the subject, only
+        // beside a subject that is a person too: 성재 meets 유하, and a fox meets
+        // the baker.
+        final personSubject =
+            themeClass[subjectTheme] == NounClass.person ||
+            follow?.topic.nounClass == NounClass.person;
+
         return (settings.includeName ?? false) &&
                 theme != null &&
-                themeClass[theme] == NounClass.person
+                themeClass[theme] == NounClass.person &&
+                (part.slot == subjectSlot || personSubject)
             ? ''
             : null;
       }(),

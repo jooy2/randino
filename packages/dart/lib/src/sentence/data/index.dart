@@ -186,6 +186,22 @@ const Map<VerbField, FieldRule> fieldRules = <VerbField, FieldRule>{
     takes: <Condition>[Condition.hungry, Condition.holding],
     after: <Condition>[Condition.hungry],
   ),
+  // Losing what one holds is what makes a hero restless enough to search.
+  VerbField.lose: FieldRule(
+    needs: <Condition>[Condition.awake, Condition.holding],
+    gives: <Condition>[Condition.restless],
+    takes: <Condition>[Condition.holding, Condition.content],
+  ),
+  VerbField.meet: FieldRule(
+    needs: <Condition>[Condition.awake],
+    gives: <Condition>[Condition.content],
+    takes: <Condition>[Condition.restless],
+    after: <Condition>[Condition.restless],
+  ),
+  VerbField.talk: FieldRule(
+    needs: <Condition>[Condition.awake],
+    after: <Condition>[Condition.content],
+  ),
   VerbField.change: FieldRule(),
 };
 
@@ -947,6 +963,120 @@ const List<Story> stories = <Story>[
       StoryStep(
         StepKind.act,
         fields: <VerbField>[VerbField.think, VerbField.express],
+        kinds: <SentenceType>[SentenceType.trailing],
+      ),
+    ],
+  ),
+  // The hero loses what they carried, looks for it, and may or may not find it.
+  Story(
+    name: SentenceStory.mishap,
+    hero: agentClasses,
+    item: <NounClass>[NounClass.thing, NounClass.edible],
+    itemThemes: <WordTheme>[
+      WordTheme.object,
+      WordTheme.tool,
+      WordTheme.clothing,
+      WordTheme.gem,
+      WordTheme.food,
+    ],
+    start: <Condition>[Condition.awake, Condition.rested, Condition.home, Condition.holding],
+    weight: 12,
+    steps: <StoryStep>[
+      StoryStep(
+        StepKind.act,
+        fields: <VerbField>[VerbField.carry],
+        object: StoryRole.item,
+        link: ConnectiveKind.additive,
+      ),
+      StoryStep(
+        StepKind.act,
+        fields: <VerbField>[VerbField.go],
+        destination: StoryRole.place,
+        required: true,
+      ),
+      StoryStep(
+        StepKind.act,
+        fields: <VerbField>[VerbField.lose],
+        object: StoryRole.item,
+        place: true,
+        required: true,
+        link: ConnectiveKind.temporal,
+      ),
+      StoryStep(StepKind.state, condition: Condition.restless, link: ConnectiveKind.causal),
+      StoryStep(
+        StepKind.act,
+        fields: <VerbField>[VerbField.search],
+        place: true,
+        required: true,
+        link: ConnectiveKind.causal,
+      ),
+      StoryStep(StepKind.act, fields: <VerbField>[VerbField.wait], place: true),
+      StoryStep(
+        StepKind.act,
+        fields: <VerbField>[VerbField.find],
+        object: StoryRole.item,
+        place: true,
+        link: ConnectiveKind.temporal,
+        kinds: <SentenceType>[SentenceType.exclamation],
+      ),
+      StoryStep(
+        StepKind.act,
+        fields: <VerbField>[VerbField.arrive],
+        destination: StoryRole.home,
+        required: true,
+        link: ConnectiveKind.temporal,
+      ),
+      StoryStep(
+        StepKind.act,
+        fields: <VerbField>[VerbField.express, VerbField.think, VerbField.rest],
+        link: ConnectiveKind.temporal,
+        kinds: <SentenceType>[SentenceType.trailing, SentenceType.exclamation],
+      ),
+    ],
+  ),
+  // The hero goes to see somebody, and they talk. The person met is the thing
+  // this story is about.
+  Story(
+    name: SentenceStory.visit,
+    hero: agentClasses,
+    item: <NounClass>[NounClass.person],
+    start: <Condition>[Condition.awake, Condition.rested, Condition.home],
+    weight: 12,
+    steps: <StoryStep>[
+      StoryStep(
+        StepKind.act,
+        fields: <VerbField>[VerbField.go],
+        destination: StoryRole.place,
+        required: true,
+      ),
+      StoryStep(
+        StepKind.act,
+        fields: <VerbField>[VerbField.meet],
+        object: StoryRole.item,
+        place: true,
+        required: true,
+        link: ConnectiveKind.temporal,
+      ),
+      StoryStep(StepKind.act, fields: <VerbField>[VerbField.talk], link: ConnectiveKind.additive),
+      StoryStep(
+        StepKind.act,
+        fields: <VerbField>[VerbField.express],
+        link: ConnectiveKind.causal,
+        kinds: <SentenceType>[SentenceType.exclamation],
+      ),
+      StoryStep(StepKind.act, fields: <VerbField>[VerbField.wait], place: true),
+      StoryStep(StepKind.state, condition: Condition.content, link: ConnectiveKind.causal),
+      StoryStep(
+        StepKind.act,
+        fields: <VerbField>[VerbField.arrive],
+        destination: StoryRole.home,
+        required: true,
+        link: ConnectiveKind.temporal,
+      ),
+      StoryStep(
+        StepKind.act,
+        fields: <VerbField>[VerbField.think, VerbField.express],
+        link: ConnectiveKind.temporal,
         kinds: <SentenceType>[SentenceType.trailing],
       ),
     ],

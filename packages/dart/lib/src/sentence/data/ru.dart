@@ -110,6 +110,12 @@ final SentenceLanguageData ru = SentenceLanguageData(
       ),
     ),
     VerbGroup(
+      field: VerbField.talk,
+      subject: const <NounClass>[NounClass.creature, NounClass.person],
+      words: words(r'болтает беседует разговаривает'),
+      past: PredicateTense(words: words(r'болтал беседовал разговаривал')),
+    ),
+    VerbGroup(
       field: VerbField.play,
       subject: const <NounClass>[NounClass.creature, NounClass.person],
       words: words(r'танцует поёт катается играет резвится подпрыгивает'),

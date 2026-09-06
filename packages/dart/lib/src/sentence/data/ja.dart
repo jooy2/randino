@@ -238,6 +238,19 @@ final SentenceLanguageData ja = SentenceLanguageData(
       ),
     ),
     VerbGroup(
+      field: VerbField.talk,
+      subject: const <NounClass>[NounClass.creature, NounClass.person],
+      words: words(r'話す おしゃべりする 語り合う'),
+      forms: <PredicateForm, WordPool>{
+        PredicateForm.polite: words(r'話します おしゃべりします 語り合います'),
+        PredicateForm.linking: words(r'話して おしゃべりして 語り合って'),
+      },
+      past: PredicateTense(
+        words: words(r'話した おしゃべりした 語り合った'),
+        forms: <PredicateForm, WordPool>{PredicateForm.polite: words(r'話しました おしゃべりしました 語り合いました')},
+      ),
+    ),
+    VerbGroup(
       field: VerbField.play,
       subject: const <NounClass>[NounClass.creature, NounClass.person],
       words: words(r'踊る 歌う 転がる 遊ぶ はねる 跳ね回る じゃれる'),
@@ -361,6 +374,34 @@ final SentenceLanguageData ja = SentenceLanguageData(
         forms: <PredicateForm, WordPool>{
           PredicateForm.polite: words(r'隠しました しまいました 守りました 埋めました 取っておきました'),
         },
+      ),
+    ),
+    VerbGroup(
+      field: VerbField.lose,
+      subject: const <NounClass>[NounClass.creature, NounClass.person],
+      object: const <NounClass>[NounClass.thing, NounClass.plant, NounClass.edible],
+      words: words(r'なくす 落とす'),
+      forms: <PredicateForm, WordPool>{
+        PredicateForm.polite: words(r'なくします 落とします'),
+        PredicateForm.linking: words(r'なくして 落として'),
+      },
+      past: PredicateTense(
+        words: words(r'なくした 落とした'),
+        forms: <PredicateForm, WordPool>{PredicateForm.polite: words(r'なくしました 落としました')},
+      ),
+    ),
+    VerbGroup(
+      field: VerbField.meet,
+      subject: const <NounClass>[NounClass.creature, NounClass.person],
+      object: const <NounClass>[NounClass.person],
+      words: words(r'訪ねる 見かける 迎える'),
+      forms: <PredicateForm, WordPool>{
+        PredicateForm.polite: words(r'訪ねます 見かけます 迎えます'),
+        PredicateForm.linking: words(r'訪ねて 見かけて 迎えて'),
+      },
+      past: PredicateTense(
+        words: words(r'訪ねた 見かけた 迎えた'),
+        forms: <PredicateForm, WordPool>{PredicateForm.polite: words(r'訪ねました 見かけました 迎えました')},
       ),
     ),
     VerbGroup(

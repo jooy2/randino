@@ -128,6 +128,14 @@ DE = SentenceLanguageData(
             ),
         ),
         VerbGroup(
+            field="talk",
+            subject=("creature", "person"),
+            words=words("plaudert redet schwatzt"),
+            past=PredicateTense(
+                words=words("plauderte redete schwatzte"),
+            ),
+        ),
+        VerbGroup(
             field="play",
             subject=("creature", "person"),
             words=words("tanzt singt tollt spielt hüpft rollt"),
