@@ -549,10 +549,18 @@ def test_korean_picks_the_particle_its_noun_asks_for() -> None:
     alternating = {"가": "이", "를": "을", "는": "은"}
 
     for detail in rand_sentence(output="detail", language="ko", count=300):
-        for phrase in detail.phrases:
-            ends = detail.sentence.find(phrase) + len(phrase)
+        # The phrases come in order, so each is looked for after the one before it: `가`
+        # found inside `가을에` is not the verb `가`.
+        cursor = 0
 
-            if ends >= len(detail.sentence):
+        for phrase in detail.phrases:
+            found = detail.sentence.find(phrase, cursor)
+            ends = found + len(phrase)
+
+            if found >= 0:
+                cursor = ends
+
+            if found < 0 or ends >= len(detail.sentence):
                 continue
 
             after = detail.sentence[ends]
@@ -1389,6 +1397,54 @@ def test_one_sentence_names_its_object_once() -> None:
                     f"({detail.sentences[belongs[i]]})"
                 )
                 objects.add(phrase)
+
+
+def test_a_place_takes_the_preposition_it_takes() -> None:
+    # `on the balcony`, `at the market`, `under the sky`, and the frame's own `in`
+    # everywhere else. The lists name places the pools actually hold.
+    for language in WORD_LANGUAGES:
+        data = SENTENCE_DATA[language]
+        heads = dict(data.place_heads or {})
+        lexicon = WORD_DATA[language]
+        places = {
+            plain(language, word)
+            for theme in WORD_THEMES
+            if THEME_CLASS[theme] == "place"
+            for word in lexicon.nouns[theme]
+        }
+
+        for head, pool in heads.items():
+            for noun in pool:
+                assert noun in places, (
+                    f"{language}: '{noun}' takes '{head}' and is in no place pool"
+                )
+
+        if not heads:
+            continue
+
+        for detail in rand_sentence(
+            type="statement",
+            include_name=False,
+            tense="present",
+            language=language,
+            slots="place",
+            count=SAMPLE,
+            output="detail",
+        ):
+            if "place" not in detail.slots:
+                continue
+
+            phrase = detail.phrases[detail.slots.index("place")]
+            expected = [
+                next((head for head, pool in heads.items() if noun in pool), "in")
+                for noun in nouns_in(language, phrase)
+            ]
+
+            assert any(
+                f"{head} {phrase}" in detail.sentence
+                or f"{upper_first(head)} {phrase}" in detail.sentence
+                for head in expected
+            ), f"{language}: '{phrase}' takes {'/'.join(expected)} ({detail.sentence})"
 
 
 def test_a_lifeless_word_of_a_creature_theme_never_does_anything() -> None:

@@ -1422,6 +1422,17 @@ function subjectThemesOf(
 		: byTheme;
 }
 
+/** The preposition this place takes, where the language lists one; null for the frame's own. */
+function placeHeadFor(data: SentenceLanguageData, noun: string): string | null {
+	for (const [head, pool] of Object.entries(data.placeHeads ?? {})) {
+		if (pool.includes(noun)) {
+			return head;
+		}
+	}
+
+	return null;
+}
+
 /** The traits a noun carries: what its language says it can do. */
 function traitsOf(data: SentenceLanguageData, noun: string): readonly NounTrait[] {
 	return (Object.entries(data.traits ?? {}) as [NounTrait, WordPool | undefined][])
@@ -2451,7 +2462,7 @@ function compose(
 				: (own?.head ?? part.head);
 		const pastHead = own?.pastHead ?? part.pastHead;
 		const tensedHead = past && pastHead ? pastHead : presentHead;
-		const partHead =
+		let partHead =
 			past && pastHead && data.pastAgreement
 				? agreeBy(data.pastAgreement, tensedHead!, gender)
 				: tensedHead;
@@ -2528,6 +2539,19 @@ function compose(
 			);
 
 			phrase = built.text;
+
+			// A place takes the preposition it takes — `on the balcony`, `at the
+			// market`, `under the sky` — where the language says so, and the frame's
+			// own otherwise. The budget was measured against the frame's, so the
+			// difference is paid here.
+			if (part.slot === 'place' && partHead) {
+				const own = placeHeadFor(data, built.noun);
+
+				if (own && own !== partHead) {
+					used += own.length - partHead.length;
+					partHead = own;
+				}
+			}
 
 			if (part.slot === subjectSlot) {
 				subject = built;

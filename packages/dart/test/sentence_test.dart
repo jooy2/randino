@@ -761,10 +761,16 @@ void main() {
       const alternating = <String, String>{'가': '이', '를': '을', '는': '은'};
 
       for (final detail in randSentenceDetails(language: WordLanguage.ko, count: 300)) {
-        for (final phrase in detail.phrases) {
-          final ends = detail.sentence.indexOf(phrase) + phrase.length;
+        // The phrases come in order, so each is looked for after the one before
+        // it: `가` found inside `가을에` is not the verb `가`.
+        var cursor = 0;
 
-          if (ends >= detail.sentence.length) continue;
+        for (final phrase in detail.phrases) {
+          final found = detail.sentence.indexOf(phrase, cursor);
+          final ends = found + phrase.length;
+
+          if (found >= 0) cursor = ends;
+          if (found < 0 || ends >= detail.sentence.length) continue;
 
           final after = detail.sentence.substring(ends, ends + 1);
           final last = phrase.codeUnitAt(phrase.length - 1);
@@ -1620,6 +1626,66 @@ void main() {
             );
             objects.add(phrase);
           }
+        }
+      }
+    });
+
+    test('a place takes the preposition it takes', () {
+      // `on the balcony`, `at the market`, `under the sky`, and the frame's own
+      // `in` everywhere else. The lists name places the pools actually hold.
+      for (final language in wordLanguages) {
+        final data = sentenceData[language]!;
+        final heads = data.placeHeads ?? const <String, WordPool>{};
+        final lexicon = wordData[language]!;
+        final places = <String>{
+          for (final theme in wordThemes)
+            if (themeClass[theme] == NounClass.place)
+              for (final word in lexicon.nouns[theme]!) plain(language, word),
+        };
+
+        for (final entry in heads.entries) {
+          for (final noun in entry.value) {
+            expect(
+              places.contains(noun),
+              isTrue,
+              reason: "$language: '$noun' takes '${entry.key}' and is in no place pool",
+            );
+          }
+        }
+
+        if (heads.isEmpty) continue;
+
+        for (final detail in randSentenceDetails(
+          language: language,
+          type: statementOnly,
+          includeName: false,
+          tense: SentenceTense.present,
+          slots: <SentenceSlot>{SentenceSlot.place},
+          count: sample,
+        )) {
+          final at = detail.slots.indexOf(SentenceSlot.place);
+
+          if (at < 0) continue;
+
+          final phrase = detail.phrases[at];
+          final expected = <String>[
+            for (final noun in nounsIn(language, phrase))
+              heads.entries
+                      .where((entry) => entry.value.contains(noun))
+                      .map((entry) => entry.key)
+                      .firstOrNull ??
+                  'in',
+          ];
+
+          expect(
+            expected.any(
+              (head) =>
+                  detail.sentence.contains('$head $phrase') ||
+                  detail.sentence.contains('${upperFirst(head)} $phrase'),
+            ),
+            isTrue,
+            reason: "$language: '$phrase' takes ${expected.join('/')} (${detail.sentence})",
+          );
         }
       }
     });

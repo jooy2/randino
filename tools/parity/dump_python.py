@@ -284,6 +284,11 @@ sentence = {
             if data.speech is None
             else {"subject": data.speech.subject, "head": data.speech.head or ""}
         ),
+        "placeHeads": (
+            None
+            if data.place_heads is None
+            else {head: listed(pool) for head, pool in data.place_heads.items()}
+        ),
         "numeral": (
             None
             if data.numeral is None

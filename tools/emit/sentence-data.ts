@@ -445,6 +445,16 @@ function emitDart(code: string, data: SentenceLanguageData): string {
 		out.push(`  speech: const SentenceSpeech(subject: ${dq(data.speech.subject)}${head}),`);
 	}
 
+	if (data.placeHeads) {
+		out.push('  placeHeads: <String, WordPool>{');
+
+		for (const [head, pool] of Object.entries(data.placeHeads)) {
+			out.push(`    ${dq(head)}: ${dartWords(pool, '    ')},`);
+		}
+
+		out.push('  },');
+	}
+
 	if (data.numeral) {
 		const n = data.numeral;
 
@@ -797,6 +807,16 @@ function emitPython(code: string, data: SentenceLanguageData): string {
 		const head = data.speech.head === undefined ? '' : `, head=${pq(data.speech.head)}`;
 
 		out.push(`    speech=SentenceSpeech(subject=${pq(data.speech.subject)}${head}),`);
+	}
+
+	if (data.placeHeads) {
+		out.push('    place_heads={');
+
+		for (const [head, pool] of Object.entries(data.placeHeads)) {
+			out.push(`        ${pq(head)}: ${pyWords(pool, '        ')},`);
+		}
+
+		out.push('    },');
 	}
 
 	if (data.numeral) {

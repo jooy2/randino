@@ -889,6 +889,7 @@ class SentenceLanguageData {
     this.pronounless = const <NounClass>[],
     this.objectPronouns,
     this.speech,
+    this.placeHeads,
     this.openers = const <SentenceType, String>{},
     this.numeral,
     this.calendar,
@@ -1016,6 +1017,12 @@ class SentenceLanguageData {
   /// How a story's hero speaks for themselves. Null for a language that cannot
   /// write it.
   final SentenceSpeech? speech;
+
+  /// The preposition a place takes where it is not the frame's own, by
+  /// preposition: English `on the balcony`, `at the market`, `under the sky`
+  /// where every place frame writes `in`. A place listed nowhere takes the
+  /// frame's. Null for a language whose one head is right for every place.
+  final Map<String, WordPool>? placeHeads;
 
   /// How the language writes a number.
   ///

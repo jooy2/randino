@@ -655,6 +655,22 @@ export const EN: SentenceLanguageData = {
 	objectPronouns: { words: { n: words(`it`) } },
 	// A line of the hero's own opens on `I`, and `is` is `am` for it.
 	speech: { subject: 'I', head: 'am' },
+	// Where `in` is the wrong word: on a bridge, at a station, under a sky.
+	placeHeads: {
+		on: words(`
+			bridge rooftop balcony veranda boardwalk promenade playground terrace staircase pier wharf quay jetty byway
+			boulevard esplanade rampart drawbridge causeway embankment levee viaduct bandstand portico hillside mountain
+			sandbank glacier reef prairie plateau steppe savanna sandbar shoal seabed bedrock crag spire pinnacle headland
+			peninsula islet mesa butte moraine scree talus overhang moon planet satellite asteroid moonscape exoplanet skyline
+		`),
+		at: words(`
+			market station airport harbor lighthouse crossroads roundabout waypoint bazaar marketplace depot terminal
+			campsite forum agora harborside gatehouse weir zenith nadir perihelion aphelion apogee perigee equator meridian
+		`),
+		under: words(
+			`sky starlight moonbeam firmament starfield fullmoon newmoon halfmoon crescent overpass aqueduct`
+		)
+	},
 	// English cannot drop a subject, so a sentence about a person names it again —
 	// unless that person has a name, which is the one thing that says whether `he`
 	// or `she` is the right word.

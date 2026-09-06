@@ -29,6 +29,8 @@ Where a class is too wide, a group narrows it to themes on either side of the ve
 
 Below the theme, a noun may carry a **trait**: a language lists which of its nouns fly, swim or crawl, and a verb asks for one or rules one out. `날아오른다` takes a flier, `헤엄친다` a swimmer, and `달린다` takes anything that neither swims nor crawls — so a sparrow takes off, a mackerel swims, a snake crawls, and a lion, which is listed nowhere, runs. Every language lists its own: `the heron flew`, `der Basilisk kriecht`, `el sapo nada`. The lists name the exceptions and nothing else, and every noun keeps a verb in every field its kind has. One trait takes everything away: a word of a creature theme that is no creature — a spell, a rune, an amulet, `마력` — is `lifeless`, and a sentence about a myth is about the dragons and the elves, never `the charm chooses`. A verb may ask the same of its object: in English `sips` takes a `liquid`, `chews` takes none, and `roasts` and `slices` take something `raw`, so a curry is simmered and a steak is grilled, and nobody chews a syrup.
 
+A place takes the preposition it takes. Every English place frame writes `in`, and a language may list where that is the wrong word: `on the balcony`, `at the market`, `under the sky`. A place listed nowhere keeps the frame's own.
+
 It is not a promise that every sentence means something. A lion can bake a pudding here, and an ocarina can glitter at dusk. What the classes rule out is the sentence that does not parse as a thought at all.
 
 ## The shapes each language declares {#the-shapes-belong-to-the-language}

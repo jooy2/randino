@@ -1573,6 +1573,16 @@ List<WordTheme> _subjectThemesOf(
 }
 
 /// The traits a noun carries: what its language says it can do.
+/// The preposition this place takes, where the language lists one; null for
+/// the frame's own.
+String? _placeHeadFor(SentenceLanguageData data, String noun) {
+  for (final entry in (data.placeHeads ?? const <String, WordPool>{}).entries) {
+    if (entry.value.contains(noun)) return entry.key;
+  }
+
+  return null;
+}
+
 List<NounTrait> _traitsOf(SentenceLanguageData data, String noun) => <NounTrait>[
   for (final entry in (data.traits ?? const <NounTrait, WordPool>{}).entries)
     if (entry.value.contains(noun)) entry.key,
@@ -2454,7 +2464,7 @@ _Built _compose(
     final pastHead = own?.pastHead ?? part.pastHead;
     final tensedHead = past && pastHead != null ? pastHead : presentHead;
     final agreement = data.pastAgreement;
-    final partHead =
+    var partHead =
         past && pastHead != null && agreement != null && tensedHead != null
             ? _agreeBy(agreement, tensedHead, gender)
             : tensedHead;
@@ -2522,6 +2532,19 @@ _Built _compose(
       );
 
       phrase = built.text;
+
+      // A place takes the preposition it takes — `on the balcony`, `at the
+      // market`, `under the sky` — where the language says so, and the frame's
+      // own otherwise. The budget was measured against the frame's, so the
+      // difference is paid here.
+      if (part.slot == SentenceSlot.place && partHead != null) {
+        final own = _placeHeadFor(data, built.noun);
+
+        if (own != null && own != partHead) {
+          used += own.length - partHead.length;
+          partHead = own;
+        }
+      }
 
       if (part.slot == subjectSlot) {
         subject = built;

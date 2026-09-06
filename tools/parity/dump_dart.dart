@@ -301,6 +301,11 @@ void main() {
                 'subject': entry.value.speech!.subject,
                 'head': entry.value.speech!.head ?? '',
               },
+        'placeHeads': entry.value.placeHeads == null
+            ? null
+            : <String, Object?>{
+                for (final h in entry.value.placeHeads!.entries) h.key: listed(h.value),
+              },
         'numeral': entry.value.numeral == null
             ? null
             : <String, Object?>{

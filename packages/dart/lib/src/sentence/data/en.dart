@@ -875,6 +875,24 @@ final SentenceLanguageData en = SentenceLanguageData(
     },
   ),
   speech: const SentenceSpeech(subject: 'I', head: 'am'),
+  placeHeads: <String, WordPool>{
+    'on': words(r'''
+      bridge rooftop balcony veranda boardwalk promenade playground terrace staircase pier wharf
+      quay jetty byway boulevard esplanade rampart drawbridge causeway embankment levee viaduct
+      bandstand portico hillside mountain sandbank glacier reef prairie plateau steppe savanna
+      sandbar shoal seabed bedrock crag spire pinnacle headland peninsula islet mesa butte moraine
+      scree talus overhang moon planet satellite asteroid moonscape exoplanet skyline
+    '''),
+    'at': words(r'''
+      market station airport harbor lighthouse crossroads roundabout waypoint bazaar marketplace
+      depot terminal campsite forum agora harborside gatehouse weir zenith nadir perihelion aphelion
+      apogee perigee equator meridian
+    '''),
+    'under': words(r'''
+      sky starlight moonbeam firmament starfield fullmoon newmoon halfmoon crescent overpass
+      aqueduct
+    '''),
+  },
   numeral: const SentenceNumeral(
     order: NumeralOrder.before,
     counters: <NounClass, String>{},

@@ -804,6 +804,14 @@ class SentenceLanguageData:
 
     speech: SentenceSpeech | None = None
     """How a story's hero speaks for themselves. None for a language that cannot write it."""
+
+    place_heads: Mapping[str, WordPool] | None = None
+    """The preposition a place takes where it is not the frame's own, by preposition.
+
+    English `on the balcony`, `at the market`, `under the sky` where every place frame
+    writes `in`. A place listed nowhere takes the frame's. None for a language whose one
+    head is right for every place.
+    """
     """Noun classes the language's written pronouns are wrong for.
 
     A sentence about one of them leaves the subject out where the language can, and

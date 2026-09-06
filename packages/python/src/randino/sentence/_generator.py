@@ -1747,6 +1747,15 @@ def _subject_themes_of(
     return by_theme
 
 
+def _place_head_for(data: SentenceLanguageData, noun: str) -> str | None:
+    """The preposition this place takes, where the language lists one; None for the frame's."""
+    for head, pool in (data.place_heads or {}).items():
+        if noun in pool:
+            return head
+
+    return None
+
+
 def _traits_of(data: SentenceLanguageData, noun: str) -> tuple[NounTrait, ...]:
     """The traits a noun carries: what its language says it can do."""
     return tuple(trait for trait, pool in (data.traits or {}).items() if noun in pool)
@@ -2746,6 +2755,16 @@ def _compose(
                 ),
             )
             phrase = built.text
+
+            # A place takes the preposition it takes — `on the balcony`, `at the market`,
+            # `under the sky` — where the language says so, and the frame's own otherwise.
+            # The budget was measured against the frame's, so the difference is paid here.
+            if part.slot == "place" and part_head:
+                place_head = _place_head_for(data, built.noun)
+
+                if place_head is not None and place_head != part_head:
+                    used += len(place_head) - len(part_head)
+                    part_head = place_head
 
             if part.slot == subject_slot:
                 subject = built

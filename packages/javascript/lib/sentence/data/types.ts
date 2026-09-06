@@ -744,6 +744,13 @@ export type SentenceLanguageData = {
 	/** How a story's hero speaks for themselves. Left out by a language that cannot write it. */
 	speech?: SentenceSpeech;
 	/**
+	 * The preposition a place takes where it is not the frame's own, by
+	 * preposition: English `on the balcony`, `at the market`, `under the sky`
+	 * where every place frame writes `in`. A place listed nowhere takes the
+	 * frame's. Left out by a language whose one head is right for every place.
+	 */
+	placeHeads?: Record<string, WordPool>;
+	/**
 	 * How the language writes a number. Left out by one that cannot, which then
 	 * declares no `quantity` and no `money` shape either.
 	 */

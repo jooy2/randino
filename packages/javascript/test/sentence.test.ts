@@ -800,12 +800,17 @@ describe('Sentence', () => {
 		const ALTERNATING: Record<string, string> = { 가: '이', 를: '을', 는: '은' };
 
 		for (const detail of sentenceDetails({ language: 'ko', count: 300 })) {
+			// The phrases come in order, so each is looked for after the one before
+			// it: `가` found inside `가을에` is not the verb `가`.
+			let cursor = 0;
+
 			for (let i = 0; i < detail.phrases.length; i += 1) {
 				const phrase = detail.phrases[i];
-				const after = detail.sentence.slice(
-					detail.sentence.indexOf(phrase) + phrase.length,
-					detail.sentence.indexOf(phrase) + phrase.length + 1
-				);
+				const found = detail.sentence.indexOf(phrase, cursor);
+				const ends = found + phrase.length;
+				const after = detail.sentence.slice(ends, ends + 1);
+
+				cursor = found < 0 ? cursor : ends;
 				const expected = ALTERNATING[after];
 				const last = phrase.charCodeAt(phrase.length - 1);
 				const coda = last >= 0xac00 && last <= 0xd7a3 && (last - 0xac00) % 28 !== 0;
@@ -1509,6 +1514,56 @@ describe('Sentence', () => {
 					objects.add(phrase);
 					named.set(belongs[i], objects);
 				});
+			}
+		}
+	});
+
+	it('a place takes the preposition it takes', () => {
+		// `on the balcony`, `at the market`, `under the sky`, and the frame's own `in`
+		// everywhere else. The lists name places the pools actually hold.
+		for (const language of WORD_LANGUAGES) {
+			const data = SENTENCE_DATA[language];
+			const heads = Object.entries(data.placeHeads ?? {});
+			const wordData = WORD_DATA[language];
+			const places = new Set(
+				WORD_THEMES.filter((theme) => THEME_CLASS[theme] === 'place').flatMap((theme) =>
+					wordData.nouns[theme].map((word) => plain(language, word))
+				)
+			);
+
+			for (const [head, pool] of heads) {
+				for (const noun of pool) {
+					assert.ok(
+						places.has(noun),
+						`${language}: '${noun}' takes '${head}' and is in no place pool`
+					);
+				}
+			}
+
+			if (!heads.length) {
+				continue;
+			}
+
+			for (const detail of sentenceDetails({ language, slots: 'place', count: SAMPLE })) {
+				const at = detail.slots.indexOf('place');
+
+				if (at < 0) {
+					continue;
+				}
+
+				const phrase = detail.phrases[at];
+				const expected = [...nounsIn(language, phrase)].map(
+					(noun) => heads.find(([, pool]) => pool.includes(noun))?.[0] ?? 'in'
+				);
+
+				assert.ok(
+					expected.some(
+						(head) =>
+							detail.sentence.includes(`${head} ${phrase}`) ||
+							detail.sentence.includes(`${upperFirst(head)} ${phrase}`)
+					),
+					`${language}: '${phrase}' takes ${expected.join('/')} (${detail.sentence})`
+				);
 			}
 		}
 	});

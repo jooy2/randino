@@ -279,6 +279,11 @@ console.log(
 						speech: data.speech
 							? { subject: data.speech.subject, head: data.speech.head ?? '' }
 							: null,
+						placeHeads: data.placeHeads
+							? Object.fromEntries(
+									Object.entries(data.placeHeads).map(([head, pool]) => [head, list(pool)])
+								)
+							: null,
 						numeral: data.numeral
 							? {
 									order: data.numeral.order,
