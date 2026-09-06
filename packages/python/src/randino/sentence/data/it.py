@@ -528,9 +528,8 @@ IT = SentenceLanguageData(
             tutto_il_giorno
         """),
         past=words("ieri la_settimana_scorsa tempo_fa quel_giorno quella_notte una_volta"),
-        present=words("""
-            oggi di_questi_tempi poco_fa domani la_settimana_prossima a_volte ogni_giorno ogni_notte
-        """),
+        present=words("oggi poco_fa domani la_settimana_prossima"),
+        habitual=words("di_questi_tempi a_volte ogni_giorno ogni_notte"),
     ),
     homes=words("casa"),
     join=SentenceJoin(word="e"),

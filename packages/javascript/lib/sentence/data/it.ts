@@ -458,16 +458,15 @@ export const IT: SentenceLanguageData = {
 	],
 	times: {
 		day: words(`
-			all'alba di_prima_mattina al_mattino a_mezzogiorno nel_pomeriggio al_tramonto di_sera di_notte a_notte_fonda
-			a_mezzanotte
+			all'alba di_prima_mattina al_mattino a_mezzogiorno nel_pomeriggio al_tramonto di_sera di_notte
+			a_notte_fonda a_mezzanotte
 		`),
 		any: words(
 			`in_primavera in_estate in_autunno in_inverno nel_fine_settimana nei_giorni_festivi tutto_il_giorno`
 		),
 		past: words(`ieri la_settimana_scorsa tempo_fa quel_giorno quella_notte una_volta`),
-		present: words(
-			`oggi di_questi_tempi poco_fa domani la_settimana_prossima a_volte ogni_giorno ogni_notte`
-		)
+		present: words(`oggi poco_fa domani la_settimana_prossima`),
+		habitual: words(`di_questi_tempi a_volte ogni_giorno ogni_notte`)
 	},
 	homes: words(`casa`),
 	join: { word: 'e' },

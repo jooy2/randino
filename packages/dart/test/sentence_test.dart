@@ -56,7 +56,9 @@ List<String> inflected(WordLanguage language, List<String> pool) {
 /// language has levels at all — English declares `question` and has none.
 const List<PredicateForm> styleForms = <PredicateForm>[
   PredicateForm.casual,
+  PredicateForm.casualQuestion,
   PredicateForm.polite,
+  PredicateForm.politeQuestion,
   PredicateForm.formal,
   PredicateForm.formalQuestion,
 ];
@@ -76,13 +78,21 @@ const Map<SentenceStyle, Map<SentenceType, List<PredicateForm>>> formChain =
       SentenceStyle.casual: <SentenceType, List<PredicateForm>>{
         SentenceType.statement: <PredicateForm>[PredicateForm.casual],
         SentenceType.trailing: <PredicateForm>[PredicateForm.casual],
-        SentenceType.question: <PredicateForm>[PredicateForm.casual, PredicateForm.question],
+        SentenceType.question: <PredicateForm>[
+          PredicateForm.casualQuestion,
+          PredicateForm.casual,
+          PredicateForm.question,
+        ],
         SentenceType.exclamation: <PredicateForm>[PredicateForm.casual, PredicateForm.exclamation],
       },
       SentenceStyle.polite: <SentenceType, List<PredicateForm>>{
         SentenceType.statement: <PredicateForm>[PredicateForm.polite],
         SentenceType.trailing: <PredicateForm>[PredicateForm.polite],
-        SentenceType.question: <PredicateForm>[PredicateForm.polite, PredicateForm.question],
+        SentenceType.question: <PredicateForm>[
+          PredicateForm.politeQuestion,
+          PredicateForm.polite,
+          PredicateForm.question,
+        ],
         SentenceType.exclamation: <PredicateForm>[PredicateForm.polite, PredicateForm.exclamation],
       },
       SentenceStyle.formal: <SentenceType, List<PredicateForm>>{
@@ -151,6 +161,7 @@ List<String> timesOf(SentenceLanguageData data) => <String>[
   ...data.times.any,
   ...?data.times.past,
   ...?data.times.present,
+  ...?data.times.habitual,
 ];
 
 Set<String> poolFor(WordLanguage language, SentenceSlot slot) {
@@ -3096,6 +3107,172 @@ void main() {
         }
 
         expect(checked, greaterThan(0), reason: '$language: no modifier was read');
+      }
+    });
+
+    test('해체 and 해요체 ask with `-지` and `-죠`, and never tell with them', () {
+      // The agreeing ending invites a nod, and a paragraph closing on it in every
+      // line reads as somebody looking for one. So it asks, and a statement closes
+      // on the plain ending.
+      final endings = <SentenceStyle, RegExp>{
+        SentenceStyle.casual: RegExp(r'지[.…]$'),
+        SentenceStyle.polite: RegExp(r'죠[.…]$'),
+      };
+
+      endings.forEach((style, ending) {
+        for (final type in <SentenceType>[SentenceType.statement, SentenceType.trailing]) {
+          for (final sentence in randSentence(
+            language: WordLanguage.ko,
+            style: style,
+            type: <SentenceType>{type},
+            count: 120,
+          )) {
+            expect(sentence, isNot(matches(ending)), reason: '$style: $sentence');
+          }
+        }
+
+        var agreeing = 0;
+
+        for (final sentence in randSentence(
+          language: WordLanguage.ko,
+          style: style,
+          type: <SentenceType>{SentenceType.question},
+          count: 120,
+        )) {
+          if (RegExp(r'(지|죠)\?$').hasMatch(sentence)) agreeing += 1;
+        }
+
+        expect(agreeing, greaterThan(0), reason: '$style never asked with the agreeing ending');
+      });
+    });
+
+    test('a sentence that opens on `later` does not also say when', () {
+      for (final language in <WordLanguage>[WordLanguage.ko, WordLanguage.en, WordLanguage.ja]) {
+        final data = sentenceData[language]!;
+        final temporal = <String>[
+          for (final word in data.connectives[ConnectiveKind.temporal] ?? const <String>[])
+            data.capitalize ? upperFirst(word) : word,
+        ];
+        final times = poolFor(language, SentenceSlot.time);
+        var opened = 0;
+
+        for (final detail in randSentenceDetails(
+          language: language,
+          type: statementOnly,
+          includeName: false,
+          tense: SentenceTense.present,
+          sentences: 4,
+          count: 150,
+        )) {
+          final belongs = sentenceOf(detail);
+
+          for (var at = 0; at < detail.sentences.length; at += 1) {
+            final sentence = detail.sentences[at];
+
+            if (!temporal.any((word) => sentence.startsWith('$word${data.space}'))) continue;
+
+            opened += 1;
+
+            var dated = false;
+
+            for (var i = 0; i < detail.phrases.length; i += 1) {
+              if (belongs[i] == at &&
+                  detail.slots[i] == SentenceSlot.time &&
+                  times.contains(detail.phrases[i])) {
+                dated = true;
+              }
+            }
+
+            expect(dated, isFalse, reason: '$language: says when twice ($sentence)');
+          }
+        }
+
+        expect(opened, greaterThan(0), reason: '$language never opened on a temporal connective');
+      }
+    });
+
+    test('a story tells of one time, and never of a habit', () {
+      for (final language in wordLanguages) {
+        final habits = (sentenceData[language]!.times.habitual ?? const <String>[]).toSet();
+
+        for (final detail in randSentenceDetails(
+          language: language,
+          type: statementOnly,
+          includeName: false,
+          tense: SentenceTense.present,
+          sentences: 4,
+          count: 60,
+        )) {
+          for (final phrase in detail.phrases) {
+            final written = phrase.substring(0, 1).toLowerCase() + phrase.substring(1);
+
+            expect(
+              habits.contains(phrase) || habits.contains(written),
+              isFalse,
+              reason: '$language: a story said "$phrase" (${detail.sentence})',
+            );
+          }
+        }
+      }
+
+      // A sentence on its own still can.
+      final habits = (sentenceData[WordLanguage.ko]!.times.habitual ?? const <String>[]).toSet();
+      var seen = 0;
+
+      for (final detail in randSentenceDetails(
+        language: WordLanguage.ko,
+        type: statementOnly,
+        includeName: false,
+        tense: SentenceTense.present,
+        count: 300,
+      )) {
+        if (detail.phrases.any(habits.contains)) seen += 1;
+      }
+
+      expect(seen, greaterThan(0), reason: 'no lone sentence ever spoke of a habit');
+    });
+
+    test('a story does not name its place in every line', () {
+      final homes = sentenceData[WordLanguage.ko]!.homes.toSet();
+
+      for (final story in <SentenceStory>[SentenceStory.stroll, SentenceStory.outing]) {
+        for (final detail in randSentenceDetails(
+          language: WordLanguage.ko,
+          type: statementOnly,
+          includeName: false,
+          tense: SentenceTense.present,
+          sentences: 5,
+          story: story,
+          count: 80,
+        )) {
+          final belongs = sentenceOf(detail);
+          String? where;
+
+          for (var i = 0; i < detail.phrases.length; i += 1) {
+            final slot = detail.slots[i];
+
+            if ((slot == SentenceSlot.destination || slot == SentenceSlot.place) &&
+                !homes.contains(detail.phrases[i])) {
+              where = detail.phrases[i];
+              break;
+            }
+          }
+
+          if (where == null) continue;
+
+          final found = nounsIn(WordLanguage.ko, where);
+          final noun = found.isEmpty ? where : found.first;
+          final naming = <int>{
+            for (var i = 0; i < detail.phrases.length; i += 1)
+              if (nounsIn(WordLanguage.ko, detail.phrases[i]).contains(noun)) belongs[i],
+          };
+
+          expect(
+            naming.length,
+            lessThan(detail.sentences.length),
+            reason: 'ko: every line names $noun (${detail.sentence})',
+          );
+        }
       }
     });
 

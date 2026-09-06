@@ -430,13 +430,21 @@ const Map<SentenceStyle, Map<SentenceType, List<PredicateForm>>> _formChain =
       SentenceStyle.casual: <SentenceType, List<PredicateForm>>{
         SentenceType.statement: <PredicateForm>[PredicateForm.casual],
         SentenceType.trailing: <PredicateForm>[PredicateForm.casual],
-        SentenceType.question: <PredicateForm>[PredicateForm.casual, PredicateForm.question],
+        SentenceType.question: <PredicateForm>[
+          PredicateForm.casualQuestion,
+          PredicateForm.casual,
+          PredicateForm.question,
+        ],
         SentenceType.exclamation: <PredicateForm>[PredicateForm.casual, PredicateForm.exclamation],
       },
       SentenceStyle.polite: <SentenceType, List<PredicateForm>>{
         SentenceType.statement: <PredicateForm>[PredicateForm.polite],
         SentenceType.trailing: <PredicateForm>[PredicateForm.polite],
-        SentenceType.question: <PredicateForm>[PredicateForm.polite, PredicateForm.question],
+        SentenceType.question: <PredicateForm>[
+          PredicateForm.politeQuestion,
+          PredicateForm.polite,
+          PredicateForm.question,
+        ],
         SentenceType.exclamation: <PredicateForm>[PredicateForm.polite, PredicateForm.exclamation],
       },
       SentenceStyle.formal: <SentenceType, List<PredicateForm>>{
@@ -505,6 +513,7 @@ class _Draw {
     required this.beat,
     required this.link,
     required this.dayAt,
+    this.dated = false,
   });
 
   final LengthRange budget;
@@ -548,6 +557,11 @@ class _Draw {
   /// language's `times.day`, and `-1` before it has named one.
   final int dayAt;
 
+  /// Whether the sentence this clause belongs to has said when already — it
+  /// opened on a temporal connective, or its first clause named a time — so
+  /// this clause names none.
+  final bool dated;
+
   /// The same draw with another opener, or another way of referring to the
   /// topic. Dart has no spread for a class, so the copy is written out.
   _Draw copyWith({String? opener, _Follow? follow, bool keepFollow = true}) => _Draw(
@@ -563,6 +577,7 @@ class _Draw {
     beat: beat,
     link: link,
     dayAt: dayAt,
+    dated: dated,
   );
 }
 
@@ -580,6 +595,7 @@ class _BeatDraw {
     required this.item,
     required this.places,
     required this.subject,
+    this.pinned = const <SentenceSlot, _Requirement>{},
   });
 
   /// Whether the shape is headed by a state rather than a verb.
@@ -606,6 +622,12 @@ class _BeatDraw {
 
   /// The themes the subject may come from, when the story has decided it.
   final List<WordTheme>? subject;
+
+  /// The nouns the story has put on the page that this sentence writes again,
+  /// by slot. What `_Follow.scene` carries once there is a topic to follow; this
+  /// is how the first sentence about the hero gets them when a scene came
+  /// before it.
+  final Map<SentenceSlot, _Requirement> pinned;
 }
 
 /// What the sentences of one result are about: the first sentence's subject, and
@@ -2200,6 +2222,7 @@ _Built _compose(
         // the ones after it only move the day forward.
         follow == null && draw.link != JoinSide.second,
         themeClass[subjectTheme]!,
+        draw.beat != null,
       );
 
       phrase = predicate.text;
@@ -2360,6 +2383,7 @@ _Predicate _timeFor(
   Set<String> avoid,
   int min,
   int max,
+  bool storied,
 ) {
   final times = data.times;
   final day = <String>[
@@ -2367,7 +2391,10 @@ _Predicate _timeFor(
       if (at > dayAt && at <= dayAt + _dayStride) times.day[at],
   ];
   final tensed = tense == SentenceTense.past ? times.past : times.present;
-  final free = opens ? <String>[...times.any, ...?tensed] : const <String>[];
+  // A habit — `every day`, `요즘` — is a thing a lone sentence can say and a
+  // story cannot: a story tells of the one time something happened.
+  final habits = storied ? const <String>[] : times.habitual ?? const <String>[];
+  final free = opens ? <String>[...times.any, ...?tensed, ...habits] : const <String>[];
   final pool = <String>[...day, ...free];
   final usable = pool.isNotEmpty ? pool : <String>[...times.day, ...times.any];
   final fits = usable
@@ -2402,6 +2429,7 @@ _Predicate _predicateFor(
   int dayAt,
   bool opens,
   NounClass subject,
+  bool storied,
 ) {
   String agreed(String word) =>
       slot == SentenceSlot.state && data.predicateAgrees ? agree(wordData, word, gender) : word;
@@ -2421,7 +2449,7 @@ _Predicate _predicateFor(
   if (slot == SentenceSlot.date) return _Predicate(_dateText(data), '', -1);
   if (slot == SentenceSlot.clock) return _Predicate(_clockText(data), '', -1);
   if (slot == SentenceSlot.time) {
-    return _timeFor(data, tense, dayAt, opens, avoid, min < max ? min : max, max);
+    return _timeFor(data, tense, dayAt, opens, avoid, min < max ? min : max, max, storied);
   }
 
   final pool = slot == SentenceSlot.manner ? _mannersFor(data, subject) : predicates;
@@ -2493,7 +2521,7 @@ _Built _generateOne(WordLanguage language, _Settings settings, _Draw draw) {
           : settings.include.map((word) => _classify(language, word)).toList(growable: false);
   // What the result has already put on the page and this sentence keeps: its
   // subject when the topic is being named again, and every noun of its scene.
-  final pinned = <SentenceSlot, _Requirement>{...?follow?.scene};
+  final pinned = <SentenceSlot, _Requirement>{...(follow?.scene ?? draw.beat?.pinned ?? const {})};
 
   if (follow?.reference == _Reference.repeat) {
     pinned[SentenceSlot.subject] = _Requirement(
@@ -2510,9 +2538,14 @@ _Built _generateOne(WordLanguage language, _Settings settings, _Draw draw) {
 
   // A result that has reached the last phase of its day has no later one to
   // name, so a sentence after that carries no time at all rather than a wrong one.
+  // And a sentence that opens on `later` or `잠시후` has said when already:
+  // `잠시후 한낮에` says it twice.
   final spent = follow != null && draw.dayAt >= data.times.day.length - 1;
+  final dated =
+      draw.dated ||
+      (data.connectives[ConnectiveKind.temporal] ?? const <String>[]).contains(draw.opener);
   final timeless =
-      spent
+      spent || dated
           ? allowed
               .where((frame) => !frame.parts.any((part) => part.slot == SentenceSlot.time))
               .toList(growable: false)
@@ -3334,6 +3367,14 @@ _Result? _tellStory(_Telling telling) {
   _Topic? topic;
   var dayAt = -1;
   var at = 0;
+  // Whether the clause just written named the place. A story happens in one
+  // place, and it does not have to say so in every line: `운동장으로 달려가서
+  // 운동장에서 날아오른다` names it twice in one sentence, so a clause that
+  // follows one that named the place leaves it out.
+  var placed = false;
+
+  /// Whether this beat may write the place: not straight after a clause that did.
+  bool placeable(Beat beat) => beat.step.place && !placed;
 
   /// The nouns this beat's sentence has to write, in the slots it has for them.
   Map<SentenceSlot, _Requirement> pinnedFor(Beat beat) {
@@ -3343,7 +3384,7 @@ _Result? _tellStory(_Telling telling) {
     final place = roles.place;
 
     if (step.object && item != null) pinned[SentenceSlot.object] = item;
-    if (step.place && place != null) pinned[SentenceSlot.place] = place;
+    if (placeable(beat) && place != null) pinned[SentenceSlot.place] = place;
     if (step.destination == StoryRole.place && place != null) {
       pinned[SentenceSlot.destination] = place;
     }
@@ -3385,7 +3426,7 @@ _Result? _tellStory(_Telling telling) {
 
     if (step.destination != null) wants.add(SentenceSlot.destination);
     if (step.object) wants.add(SentenceSlot.object);
-    if (step.place) prefers.add(SentenceSlot.place);
+    if (placeable(beat)) prefers.add(SentenceSlot.place);
 
     return _BeatDraw(
       headedByState: step.kind == StepKind.state,
@@ -3397,6 +3438,7 @@ _Result? _tellStory(_Telling telling) {
       item: found.item,
       places: _destinationThemes,
       subject: step.kind == StepKind.scene ? _destinationThemes : heroThemes,
+      pinned: pinnedFor(beat),
     );
   }
 
@@ -3415,8 +3457,15 @@ _Result? _tellStory(_Telling telling) {
   }
 
   /// One beat as one sentence, or as one clause of one.
-  _Told tell(Beat beat, LengthRange budget, _Built? previous) {
+  _Told tell(Beat beat, LengthRange budget, _Built? previous, [String openedBefore = '']) {
     final scene = beat.step.kind == StepKind.scene;
+    // A second clause whose sentence has said when already — opened on `later`,
+    // or named a time in its first clause — says it no second time.
+    final dated =
+        beat.join == JoinSide.second &&
+        previous != null &&
+        ((data.connectives[ConnectiveKind.temporal] ?? const <String>[]).contains(openedBefore) ||
+            previous.slots.contains(SentenceSlot.time));
     // What this sentence is doing. A caller who named the kinds gets them; the
     // story otherwise tells, and lets a step that allows more do more.
     SentenceType type;
@@ -3498,6 +3547,7 @@ _Result? _tellStory(_Telling telling) {
       beat: beatDraw(beat),
       link: beat.join,
       dayAt: dayAt,
+      dated: dated,
     );
     var (one, opened) = _drawOne(telling, draw);
 
@@ -3560,6 +3610,11 @@ _Result? _tellStory(_Telling telling) {
     }
 
     telling.spent.addAll(one.used);
+    placed =
+        scene ||
+        one.scene.containsKey(SentenceSlot.place) ||
+        (beat.step.destination == StoryRole.place &&
+            one.scene.containsKey(SentenceSlot.destination));
 
     if (one.dayAt > dayAt) dayAt = one.dayAt;
     if (topic == null && !scene) topic = _topicOf(one);
@@ -3625,7 +3680,7 @@ _Result? _tellStory(_Telling telling) {
         _atLeast(1, max - firstRange.max),
       );
       final first = tell(beat, firstRange, null);
-      final second = tell(beats[i + 1], secondRange, first.one);
+      final second = tell(beats[i + 1], secondRange, first.one, first.opened);
 
       told = _Told(
         _joinClauses(data, first.one, second.one),

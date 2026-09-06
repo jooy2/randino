@@ -287,16 +287,15 @@ export const DE: SentenceLanguageData = {
 	],
 	times: {
 		day: words(`
-			bei_Tagesanbruch am_frühen_Morgen am_Morgen am_Vormittag am_Mittag am_Nachmittag in_der_Dämmerung am_Abend
-			in_der_Nacht spät_in_der_Nacht um_Mitternacht
+			bei_Tagesanbruch am_frühen_Morgen am_Morgen am_Vormittag am_Mittag am_Nachmittag in_der_Dämmerung
+			am_Abend in_der_Nacht spät_in_der_Nacht um_Mitternacht
 		`),
 		any: words(
 			`im_Frühling im_Sommer im_Herbst im_Winter am_Wochenende an_Feiertagen den_ganzen_Tag`
 		),
 		past: words(`gestern letzte_Woche vor_langer_Zeit einst an_jenem_Tag in_jener_Nacht`),
-		present: words(
-			`heute heutzutage gerade_eben morgen nächste_Woche manchmal jeden_Tag jede_Nacht`
-		)
+		present: words(`heute gerade_eben morgen nächste_Woche`),
+		habitual: words(`heutzutage manchmal jeden_Tag jede_Nacht`)
 	},
 	// Nowhere a German sentence here can go, because a destination is dative; the
 	// pool is written all the same, so the shape of the data is the same.

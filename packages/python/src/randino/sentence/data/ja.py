@@ -920,12 +920,11 @@ JA = SentenceLanguageData(
         ),
     ),
     times=SentenceTimes(
-        day=words(
-            "夜明けに 早朝に 朝に 昼前に 昼に 真昼に 午後に 夕暮れに 夕方に 夜に 深夜に 真夜中に"
-        ),
+        day=words("夜明けに 早朝に 朝に 昼前に 昼に 午後に 夕暮れに 夕方に 夜に 深夜に 真夜中に"),
         any=words("春に 夏に 秋に 冬に 週末に 休日に 一日中 元日に"),
         past=words("昨日 先週 昔 かつて その日 その夜"),
-        present=words("今日 近頃 さっき 明日 来週 時々 毎日 毎晩"),
+        present=words("今日 さっき 明日 来週"),
+        habitual=words("近頃 時々 毎日 毎晩"),
     ),
     homes=words("家"),
     join=SentenceJoin(form="linking"),

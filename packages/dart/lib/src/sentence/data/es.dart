@@ -456,17 +456,16 @@ final SentenceLanguageData es = SentenceLanguageData(
   ],
   times: SentenceTimes(
     day: words(r'''
-      al_amanecer de_madrugada por_la_mañana a_mediodía al_mediodía por_la_tarde al_anochecer
-      por_la_noche de_noche a_medianoche
+      al_amanecer de_madrugada por_la_mañana a_mediodía por_la_tarde al_anochecer por_la_noche
+      a_medianoche
     '''),
     any: words(r'''
       en_primavera en_verano en_otoño en_invierno los_fines_de_semana en_los_días_festivos
       todo_el_día
     '''),
     past: words(r'ayer la_semana_pasada hace_tiempo aquel_día aquella_noche una_vez'),
-    present: words(r'''
-      hoy estos_días hace_poco mañana la_semana_que_viene a_veces cada_día cada_noche
-    '''),
+    present: words(r'hoy hace_poco mañana la_semana_que_viene'),
+    habitual: words(r'estos_días a_veces cada_día cada_noche'),
   ),
   homes: words(r'casa cabaña'),
   join: const SentenceJoin(word: 'y'),

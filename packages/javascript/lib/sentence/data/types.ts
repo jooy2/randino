@@ -50,7 +50,24 @@ export type NounClass =
  * part of the verb.
  */
 export type PredicateForm =
-	'question' | 'exclamation' | 'casual' | 'polite' | 'formal' | 'formalQuestion' | 'linking';
+	| 'question'
+	| 'exclamation'
+	| 'casual'
+	| 'casualQuestion'
+	| 'polite'
+	| 'politeQuestion'
+	| 'formal'
+	| 'formalQuestion'
+	| 'linking';
+
+/**
+ * `casualQuestion` and `politeQuestion` are 해체 and 해요체 asking. Those two
+ * levels have no question of their own — `달려?` asks with the mark alone — but
+ * they have an ending that only asks well: `달리지?` and `달리죠?` invite the
+ * listener to agree, and a statement closing on it in every other line reads as
+ * somebody looking for a nod. So the plain pool holds `달려` and `달려요`, and the
+ * question pool holds both endings.
+ */
 
 /**
  * `linking` is the form a predicate takes when its clause is not the last one of
@@ -406,6 +423,12 @@ export type SentenceTimes = {
 	any: WordPool;
 	past?: WordPool;
 	present?: WordPool;
+	/**
+	 * What happens as a habit: `every day`, `sometimes`, `these days`. Right in a
+	 * sentence on its own and wrong in a story, which tells of one time something
+	 * happened, so a story never draws from it.
+	 */
+	habitual?: WordPool;
 };
 
 /**

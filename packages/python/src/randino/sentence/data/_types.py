@@ -39,7 +39,15 @@ slice of vocabulary, and which of these it falls into is the same in every langu
 
 
 PredicateForm = Literal[
-    "question", "exclamation", "casual", "polite", "formal", "formalQuestion", "linking"
+    "question",
+    "exclamation",
+    "casual",
+    "casualQuestion",
+    "polite",
+    "politeQuestion",
+    "formal",
+    "formalQuestion",
+    "linking",
 ]
 """A form a predicate takes beside the one a plain statement ends on.
 
@@ -400,6 +408,12 @@ class SentenceTimes:
     any: WordPool
     past: WordPool | None = None
     present: WordPool | None = None
+    habitual: WordPool | None = None
+    """What happens as a habit: `every day`, `sometimes`, `these days`.
+
+    Right in a sentence on its own and wrong in a story, which tells of one time something
+    happened, so a story never draws from it.
+    """
 
 
 @dataclass(frozen=True, slots=True)

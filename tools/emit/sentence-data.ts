@@ -19,7 +19,9 @@ const FORMS = [
 	'question',
 	'exclamation',
 	'casual',
+	'casualQuestion',
 	'polite',
+	'politeQuestion',
 	'formal',
 	'formalQuestion',
 	'linking'
@@ -354,6 +356,7 @@ function emitDart(code: string, data: SentenceLanguageData): string {
 
 	if (data.times.past) out.push(`    past: ${dartWords(data.times.past, '    ')},`);
 	if (data.times.present) out.push(`    present: ${dartWords(data.times.present, '    ')},`);
+	if (data.times.habitual) out.push(`    habitual: ${dartWords(data.times.habitual, '    ')},`);
 
 	out.push('  ),');
 	out.push(`  homes: ${dartWords(data.homes, '  ')},`);
@@ -670,6 +673,7 @@ function emitPython(code: string, data: SentenceLanguageData): string {
 
 	if (data.times.past) out.push(`        past=${pyWords(data.times.past, '        ')},`);
 	if (data.times.present) out.push(`        present=${pyWords(data.times.present, '        ')},`);
+	if (data.times.habitual) out.push(`        habitual=${pyWords(data.times.habitual, '        ')},`);
 
 	out.push('    ),');
 	out.push(`    homes=${pyWords(data.homes, '    ')},`);

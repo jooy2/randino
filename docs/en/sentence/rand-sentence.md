@@ -686,7 +686,7 @@ rand_sentence(language="ko", style="formal", count=2)
 
 :::
 
-The level reaches the mood as well as the ending. 해체 and 해요체 have no separate question or exclamation, since `달려` asks and tells alike and only the mark after it differs, so those two levels write one form for everything. 해라체 and 합쇼체 do change, and they change differently: 해라체 asks with `-니`, `-나` and `-(으)ㄴ가` and exclaims with `-구나`, `-네` and `-군`, while 합쇼체 turns `달립니다` into `달립니까`.
+The level reaches the mood as well as the ending. 해체 and 해요체 have no exclamation of their own, since `달려` asks and tells alike and only the mark after it differs. What they do have is an ending that only asks well: `달리지?` and `달리죠?` invite the listener to agree, so the two levels write `달려` and `달려요` in a statement and draw between the two endings in a question. 해라체 and 합쇼체 do change, and they change differently: 해라체 asks with `-니`, `-나` and `-(으)ㄴ가` and exclaims with `-구나`, `-네` and `-군`, while 합쇼체 turns `달립니다` into `달립니까`.
 
 ::: lang js
 

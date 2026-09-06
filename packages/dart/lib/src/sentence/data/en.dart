@@ -669,14 +669,13 @@ final SentenceLanguageData en = SentenceLanguageData(
   ],
   times: SentenceTimes(
     day: words(r'''
-      at_dawn in_the_early_morning in_the_morning at_midday at_noon in_the_afternoon at_dusk
-      in_the_evening at_night late_at_night at_midnight
+      at_dawn in_the_early_morning in_the_morning at_midday in_the_afternoon at_dusk in_the_evening
+      at_night late_at_night at_midnight
     '''),
     any: words(r'in_spring in_summer in_autumn in_winter on_weekends on_holidays all_day'),
     past: words(r'yesterday last_week long_ago once that_day the_night_before'),
-    present: words(r'''
-      today these_days just_now tomorrow next_week sometimes every_day every_night
-    '''),
+    present: words(r'today just_now tomorrow next_week'),
+    habitual: words(r'these_days sometimes every_day every_night'),
   ),
   homes: words(r'house cottage'),
   join: const SentenceJoin(word: 'and'),

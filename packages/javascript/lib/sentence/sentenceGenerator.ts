@@ -442,6 +442,12 @@ type Draw = {
 	 */
 	link: 'first' | 'second' | null;
 	/**
+	 * Whether the sentence this clause belongs to has said when already — it opened
+	 * on a temporal connective, or its first clause named a time — so this clause
+	 * names none.
+	 */
+	dated: boolean;
+	/**
 	 * The latest phase of the day the result has reached, as an index into the
 	 * language's `times.day`, and `-1` before it has named one. A story never
 	 * goes back to the morning.
@@ -473,6 +479,12 @@ type BeatDraw = {
 	places: readonly WordTheme[];
 	/** The themes the subject may come from, when the story has decided it. */
 	subject: readonly WordTheme[] | null;
+	/**
+	 * The nouns the story has put on the page that this sentence writes again, by
+	 * slot. What `Follow.scene` carries once there is a topic to follow; this is
+	 * how the first sentence about the hero gets them when a scene came before it.
+	 */
+	pinned: ReadonlyMap<SentenceSlot, Requirement>;
 };
 
 /**
@@ -1068,9 +1080,13 @@ function predicatePools(group: VerbGroup | StateGroup): readonly WordPool[] {
 
 /** Every pool a time adverbial can come from, whatever the tense. */
 function timePools(data: SentenceLanguageData): readonly WordPool[] {
-	return [data.times.day, data.times.any, data.times.past ?? [], data.times.present ?? []].filter(
-		(pool) => pool.length > 0
-	);
+	return [
+		data.times.day,
+		data.times.any,
+		data.times.past ?? [],
+		data.times.present ?? [],
+		data.times.habitual ?? []
+	].filter((pool) => pool.length > 0);
 }
 
 /** The longest and shortest article the language can open a phrase with. */
@@ -1656,7 +1672,7 @@ function generateOne(language: WordLanguage, settings: Settings, draw: Draw): Bu
 	const requirements = follow ? [] : settings.include.map((word) => classify(language, word));
 	// What the result has already put on the page and this sentence keeps: its
 	// subject when the topic is being named again, and every noun of its scene.
-	const pinned = new Map<SentenceSlot, Requirement>(follow?.scene ?? []);
+	const pinned = new Map<SentenceSlot, Requirement>(follow?.scene ?? draw.beat?.pinned ?? []);
 
 	if (follow?.reference === 'repeat') {
 		pinned.set('subject', {
@@ -1674,11 +1690,15 @@ function generateOne(language: WordLanguage, settings: Settings, draw: Draw): Bu
 	}
 	const [min, max] = budget;
 	// A result that has reached the last phase of its day has no later one to name,
-	// so a sentence after that carries no time at all rather than a wrong one.
+	// so a sentence after that carries no time at all rather than a wrong one. And a
+	// sentence that opens on `later` or `잠시후` has said when already: `잠시후
+	// 한낮에` says it twice.
 	const spent = follow !== null && draw.dayAt >= data.times.day.length - 1;
-	const timeless = spent
-		? allowed.filter((frame) => !frame.parts.some((part) => part.slot === 'time'))
-		: allowed;
+	const dated = draw.dated || (data.connectives.temporal ?? []).includes(draw.opener);
+	const timeless =
+		spent || dated
+			? allowed.filter((frame) => !frame.parts.some((part) => part.slot === 'time'))
+			: allowed;
 	const frames = timeless.length ? timeless : allowed;
 	const plans = new Map(frames.map((frame) => [frame, planFor(frame, requirements, pinned)]));
 	// A shape is only worth drawing when the language has a predicate for it: a
@@ -2197,7 +2217,8 @@ function compose(
 				// The first sentence of a result may set its scene in any time it likes;
 				// the ones after it only move the day forward.
 				follow === null && draw.link !== 'second',
-				THEME_CLASS[subjectTheme]
+				THEME_CLASS[subjectTheme],
+				draw.beat !== null
 			);
 
 			phrase = drawn.text;
@@ -2357,7 +2378,8 @@ function predicateFor(
 	tense: SentenceTense,
 	dayAt: number,
 	opens: boolean,
-	subject: NounClass
+	subject: NounClass,
+	storied: boolean
 ): Predicate {
 	const agreed = (word: string) =>
 		slot === 'state' && data.predicateAgrees ? agree(wordData, word, gender) : word;
@@ -2383,7 +2405,7 @@ function predicateFor(
 	}
 
 	if (slot === 'time') {
-		return timeFor(data, tense, dayAt, opens, avoid, Math.min(min, max), max);
+		return timeFor(data, tense, dayAt, opens, avoid, Math.min(min, max), max, storied);
 	}
 
 	const pool = slot === 'manner' ? mannersFor(data, subject) : predicates;
@@ -2427,7 +2449,8 @@ function timeFor(
 	opens: boolean,
 	avoid: ReadonlySet<string>,
 	min: number,
-	max: number
+	max: number,
+	storied: boolean
 ): Predicate {
 	const times = data.times;
 	// The next few phases rather than any later one, so a story that opened at
@@ -2435,7 +2458,10 @@ function timeFor(
 	const day = times.day
 		.map((word, at) => ({ word, at }))
 		.filter(({ at }) => at > dayAt && at <= dayAt + DAY_STRIDE);
-	const free = opens ? [...times.any, ...(times[tense] ?? [])] : [];
+	// A habit — `every day`, `요즘` — is a thing a lone sentence can say and a story
+	// cannot: a story tells of the one time something happened.
+	const habits = storied ? [] : (times.habitual ?? []);
+	const free = opens ? [...times.any, ...(times[tense] ?? []), ...habits] : [];
 	const pool = [...day.map(({ word }) => word), ...free];
 	const usable = pool.length ? pool : [...times.day, ...times.any];
 	const fits = usable.filter(
@@ -2475,13 +2501,13 @@ const FORM_CHAIN: Record<SentenceStyle, Record<SentenceMark, readonly PredicateF
 	casual: {
 		statement: ['casual'],
 		trailing: ['casual'],
-		question: ['casual', 'question'],
+		question: ['casualQuestion', 'casual', 'question'],
 		exclamation: ['casual', 'exclamation']
 	},
 	polite: {
 		statement: ['polite'],
 		trailing: ['polite'],
-		question: ['polite', 'question'],
+		question: ['politeQuestion', 'polite', 'question'],
 		exclamation: ['polite', 'exclamation']
 	},
 	formal: {
@@ -3035,7 +3061,8 @@ function generateResult(language: WordLanguage, settings: Settings): Result {
 			tense,
 			beat: null,
 			link: null,
-			dayAt: built.reduce((latest, one) => Math.max(latest, one.dayAt), -1)
+			dayAt: built.reduce((latest, one) => Math.max(latest, one.dayAt), -1),
+			dated: false
 		};
 		const [one, opened] = drawOne(paragraph, draw);
 
@@ -3222,6 +3249,13 @@ function tellStory(telling: Telling): Result | null {
 	let topic = null as Topic | null;
 	let dayAt = -1;
 	let at = 0;
+	// Whether the clause just written named the place. A story happens in one place,
+	// and it does not have to say so in every line: `운동장으로 달려가서 운동장에서
+	// 날아오른다` names it twice in one sentence, so a clause that follows one that
+	// named the place leaves it out.
+	let placed = false;
+	/** Whether this beat may write the place: not straight after a clause that did. */
+	const placeable = (beat: Beat): boolean => Boolean(beat.step.place) && !placed;
 
 	/** The nouns this beat's sentence has to write, in the slots it has for them. */
 	const pinnedFor = (beat: Beat): Map<SentenceSlot, Requirement> => {
@@ -3232,7 +3266,7 @@ function tellStory(telling: Telling): Result | null {
 			pinned.set('object', roles.item);
 		}
 
-		if (step.place && roles.place) {
+		if (placeable(beat) && roles.place) {
 			pinned.set('place', roles.place);
 		}
 
@@ -3279,7 +3313,7 @@ function tellStory(telling: Telling): Result | null {
 			wants.push('object');
 		}
 
-		if (step.place) {
+		if (placeable(beat)) {
 			prefers.push('place');
 		}
 
@@ -3291,7 +3325,8 @@ function tellStory(telling: Telling): Result | null {
 			prefers,
 			item,
 			places: placeThemes,
-			subject: step.kind === 'scene' ? placeThemes : heroThemes
+			subject: step.kind === 'scene' ? placeThemes : heroThemes,
+			pinned: pinnedFor(beat)
 		};
 	};
 
@@ -3309,9 +3344,16 @@ function tellStory(telling: Telling): Result | null {
 	const tell = (
 		beat: Beat,
 		budget: readonly [number, number],
-		previous: Built | null
+		previous: Built | null,
+		openedBefore = ''
 	): [Built, SentenceType, SentenceMark, string, Follow | null] => {
 		const scene = beat.step.kind === 'scene';
+		// A second clause whose sentence has said when already — opened on `later`,
+		// or named a time in its first clause — says it no second time.
+		const dated =
+			beat.join === 'second' &&
+			previous !== null &&
+			((data.connectives.temporal ?? []).includes(openedBefore) || previous.slots.includes('time'));
 		// What this sentence is doing. A caller who named the kinds gets them; the
 		// story otherwise tells, and lets a step that allows more do more.
 		const [type, mark] = settings.typed
@@ -3369,7 +3411,8 @@ function tellStory(telling: Telling): Result | null {
 			tense,
 			beat: beatDraw(beat),
 			link: beat.join,
-			dayAt
+			dayAt,
+			dated
 		};
 		let [one, opened] = drawOne(telling, draw);
 
@@ -3423,6 +3466,10 @@ function tellStory(telling: Telling): Result | null {
 			spent.add(word);
 		}
 
+		placed =
+			scene ||
+			one.scene.has('place') ||
+			(beat.step.destination === 'place' && one.scene.has('destination'));
 		dayAt = Math.max(dayAt, one.dayAt);
 
 		if (!topic && !scene) {
@@ -3486,7 +3533,7 @@ function tellStory(telling: Telling): Result | null {
 				Math.max(1, max - firstRange[1])
 			];
 			const [first, , , firstOpened, firstFollow] = tell(beat, firstRange, null);
-			const [second, secondType, secondMark] = tell(beats[i + 1], secondRange, first);
+			const [second, secondType, secondMark] = tell(beats[i + 1], secondRange, first, firstOpened);
 
 			one = joinClauses(data, first, second);
 			type = secondType;

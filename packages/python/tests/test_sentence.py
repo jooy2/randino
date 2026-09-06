@@ -79,7 +79,14 @@ def inflected(language: WordLanguage, pool: tuple[str, ...]) -> list[str]:
 
 STYLES: tuple[SentenceStyle, ...] = ("plain", "casual", "polite", "formal")
 
-STYLE_FORMS: tuple[PredicateForm, ...] = ("casual", "polite", "formal", "formalQuestion")
+STYLE_FORMS: tuple[PredicateForm, ...] = (
+    "casual",
+    "casualQuestion",
+    "polite",
+    "politeQuestion",
+    "formal",
+    "formalQuestion",
+)
 """The form keys a level reaches for.
 
 `question` and `exclamation` are 해라체's own and say nothing about whether a language
@@ -96,13 +103,13 @@ FORM_CHAIN: dict[SentenceStyle, dict[SentenceMark, tuple[PredicateForm, ...]]] =
     "casual": {
         "statement": ("casual",),
         "trailing": ("casual",),
-        "question": ("casual", "question"),
+        "question": ("casualQuestion", "casual", "question"),
         "exclamation": ("casual", "exclamation"),
     },
     "polite": {
         "statement": ("polite",),
         "trailing": ("polite",),
-        "question": ("polite", "question"),
+        "question": ("politeQuestion", "polite", "question"),
         "exclamation": ("polite", "exclamation"),
     },
     "formal": {
@@ -167,7 +174,13 @@ def agreed_by(rules: WordAgreement, word: str) -> list[str]:
 
 def times_of(data: SentenceLanguageData) -> list[str]:
     """Every time adverbial a language holds, whatever the tense."""
-    return [*data.times.day, *data.times.any, *(data.times.past or ()), *(data.times.present or ())]
+    return [
+        *data.times.day,
+        *data.times.any,
+        *(data.times.past or ()),
+        *(data.times.present or ()),
+        *(data.times.habitual or ()),
+    ]
 
 
 def pool_for(language: WordLanguage, slot: SentenceSlot) -> set[str]:
@@ -2574,3 +2587,138 @@ def test_a_modifier_fits_the_noun_it_describes() -> None:
                 ), f"{language}: '{rest}' has no modifier that fits its noun ({detail.sentence})"
 
         assert checked > 0, f"{language}: no modifier was read"
+
+
+def test_haeche_and_haeyoche_ask_with_ji_and_jyo_and_never_tell_with_them() -> None:
+    # The agreeing ending invites a nod, and a paragraph closing on it in every line reads
+    # as somebody looking for one. So it asks, and a statement closes on the plain ending.
+    endings: dict[SentenceStyle, str] = {"casual": r"지[.…]$", "polite": r"죠[.…]$"}
+
+    for style, ending in endings.items():
+        for type_ in ("statement", "trailing"):
+            for sentence in rand_sentence(language="ko", style=style, type=type_, count=120):
+                assert not re.search(ending, sentence), f"{style}: {sentence}"
+
+        agreeing = sum(
+            1
+            for sentence in rand_sentence(language="ko", style=style, type="question", count=120)
+            if re.search(r"(지|죠)\?$", sentence)
+        )
+
+        assert agreeing > 0, f"{style} never asked with the agreeing ending"
+
+
+def test_a_sentence_that_opens_on_later_does_not_also_say_when() -> None:
+    for language in ("ko", "en", "ja"):
+        data = SENTENCE_DATA[language]
+        temporal = [
+            upper_first(word) if data.capitalize else word
+            for word in data.connectives.get("temporal", ())
+        ]
+        times = pool_for(language, "time")
+        opened = 0
+
+        for detail in rand_sentence(
+            type="statement",
+            include_name=False,
+            tense="present",
+            language=language,
+            sentences=4,
+            count=150,
+            output="detail",
+        ):
+            belongs = sentence_of(detail)
+
+            for at, sentence in enumerate(detail.sentences):
+                if not any(sentence.startswith(word + data.space) for word in temporal):
+                    continue
+
+                opened += 1
+                dated = any(
+                    belongs[i] == at and slot == "time" and phrase in times
+                    for i, (phrase, slot) in enumerate(
+                        zip(detail.phrases, detail.slots, strict=True)
+                    )
+                )
+
+                assert not dated, f"{language}: says when twice ({sentence})"
+
+        assert opened > 0, f"{language} never opened on a temporal connective"
+
+
+def test_a_story_tells_of_one_time_and_never_of_a_habit() -> None:
+    for language in WORD_LANGUAGES:
+        habits = set(SENTENCE_DATA[language].times.habitual or ())
+
+        for detail in rand_sentence(
+            type="statement",
+            include_name=False,
+            tense="present",
+            language=language,
+            sentences=4,
+            count=60,
+            output="detail",
+        ):
+            for phrase in detail.phrases:
+                written = phrase[:1].lower() + phrase[1:]
+
+                assert phrase not in habits and written not in habits, (
+                    f"{language}: a story said '{phrase}' ({detail.sentence})"
+                )
+
+    # A sentence on its own still can.
+    habits = set(SENTENCE_DATA["ko"].times.habitual or ())
+    seen = sum(
+        1
+        for detail in rand_sentence(
+            type="statement",
+            include_name=False,
+            tense="present",
+            language="ko",
+            count=300,
+            output="detail",
+        )
+        if any(phrase in habits for phrase in detail.phrases)
+    )
+
+    assert seen > 0, "no lone sentence ever spoke of a habit"
+
+
+def test_a_story_does_not_name_its_place_in_every_line() -> None:
+    homes = set(SENTENCE_DATA["ko"].homes)
+
+    for story in ("stroll", "outing"):
+        for detail in rand_sentence(
+            type="statement",
+            include_name=False,
+            tense="present",
+            language="ko",
+            sentences=5,
+            story=story,
+            count=80,
+            output="detail",
+        ):
+            belongs = sentence_of(detail)
+            where = next(
+                (
+                    phrase
+                    for phrase, slot in zip(detail.phrases, detail.slots, strict=True)
+                    if slot in ("destination", "place") and phrase not in homes
+                ),
+                None,
+            )
+
+            if where is None:
+                continue
+
+            found = nouns_in("ko", where)
+            noun = next(iter(found)) if found else where
+            naming = {
+                belongs[i]
+                for i, phrase in enumerate(detail.phrases)
+                if noun in nouns_in("ko", phrase)
+            }
+
+            assert len(naming) < len(detail.sentences), (
+                f"ko: every line names {noun} ({detail.sentence})"
+            )

@@ -52,7 +52,14 @@ const STYLES: readonly SentenceStyle[] = ['plain', 'casual', 'polite', 'formal']
 // The form keys a level reaches for. `question` and `exclamation` are 해라체's
 // own and say nothing about whether a language has levels at all — English
 // declares `question` and has none.
-const STYLE_FORMS = ['casual', 'polite', 'formal', 'formalQuestion'] as const;
+const STYLE_FORMS = [
+	'casual',
+	'casualQuestion',
+	'polite',
+	'politeQuestion',
+	'formal',
+	'formalQuestion'
+] as const;
 
 /** How a capitalizing language writes the first word of a sentence. */
 function upperFirst(word: string): string {
@@ -294,13 +301,13 @@ const FORM_CHAIN: Record<SentenceStyle, Record<SentenceMark, readonly string[]>>
 	casual: {
 		statement: ['casual'],
 		trailing: ['casual'],
-		question: ['casual', 'question'],
+		question: ['casualQuestion', 'casual', 'question'],
 		exclamation: ['casual', 'exclamation']
 	},
 	polite: {
 		statement: ['polite'],
 		trailing: ['polite'],
-		question: ['polite', 'question'],
+		question: ['politeQuestion', 'polite', 'question'],
 		exclamation: ['polite', 'exclamation']
 	},
 	formal: {
@@ -385,7 +392,8 @@ function poolFor(language: WordLanguage, slot: SentenceSlot): Set<string> {
 			...data.times.day,
 			...data.times.any,
 			...(data.times.past ?? []),
-			...(data.times.present ?? [])
+			...(data.times.present ?? []),
+			...(data.times.habitual ?? [])
 		]);
 	}
 
@@ -2818,6 +2826,126 @@ describe('Sentence', () => {
 			}
 
 			assert.ok(checked > 0, `${language}: no modifier was read`);
+		}
+	});
+
+	it('해체 and 해요체 ask with `-지` and `-죠`, and never tell with them', () => {
+		// The agreeing ending invites a nod, and a paragraph closing on it in every
+		// line reads as somebody looking for one. So it asks, and a statement closes
+		// on the plain ending.
+		for (const [style, ending] of [
+			['casual', /지[.…]$/],
+			['polite', /죠[.…]$/]
+		] as const) {
+			for (const type of ['statement', 'trailing'] as const) {
+				for (const sentence of randSentence({ language: 'ko', style, type, count: 120 })) {
+					assert.doesNotMatch(sentence, ending, `${style}: ${sentence}`);
+				}
+			}
+
+			let agreeing = 0;
+
+			for (const sentence of randSentence({
+				language: 'ko',
+				style,
+				type: 'question',
+				count: 120
+			})) {
+				agreeing += /(지|죠)\?$/.test(sentence) ? 1 : 0;
+			}
+
+			assert.ok(agreeing > 0, `${style} never asked with the agreeing ending`);
+		}
+	});
+
+	it('a sentence that opens on `later` does not also say when', () => {
+		for (const language of ['ko', 'en', 'ja'] as WordLanguage[]) {
+			const data = SENTENCE_DATA[language];
+			const temporal = (data.connectives.temporal ?? []).map((word) =>
+				data.capitalize ? word.charAt(0).toUpperCase() + word.slice(1) : word
+			);
+			const times = poolFor(language, 'time');
+			let opened = 0;
+
+			for (const detail of sentenceDetails({ language, sentences: 4, count: 150 })) {
+				const belongs = sentenceOf(detail);
+
+				for (let at = 0; at < detail.sentences.length; at += 1) {
+					const sentence = detail.sentences[at];
+
+					if (!temporal.some((word) => sentence.startsWith(word + data.space))) {
+						continue;
+					}
+
+					opened += 1;
+
+					const dated = detail.phrases.some(
+						(phrase, i) => belongs[i] === at && detail.slots[i] === 'time' && times.has(phrase)
+					);
+
+					assert.ok(!dated, `${language}: says when twice (${sentence})`);
+				}
+			}
+
+			assert.ok(opened > 0, `${language} never opened on a temporal connective`);
+		}
+	});
+
+	it('a story tells of one time, and never of a habit', () => {
+		for (const language of WORD_LANGUAGES) {
+			const habits = new Set(SENTENCE_DATA[language].times.habitual ?? []);
+
+			for (const detail of sentenceDetails({ language, sentences: 4, count: 60 })) {
+				for (let i = 0; i < detail.phrases.length; i += 1) {
+					const phrase = detail.phrases[i];
+					const written = phrase.charAt(0).toLowerCase() + phrase.slice(1);
+
+					assert.ok(
+						!habits.has(phrase) && !habits.has(written),
+						`${language}: a story said '${phrase}' (${detail.sentence})`
+					);
+				}
+			}
+		}
+
+		// A sentence on its own still can.
+		const habits = new Set(SENTENCE_DATA.ko.times.habitual ?? []);
+		let seen = 0;
+
+		for (const detail of sentenceDetails({ language: 'ko', count: 300 })) {
+			seen += detail.phrases.some((phrase) => habits.has(phrase)) ? 1 : 0;
+		}
+
+		assert.ok(seen > 0, 'no lone sentence ever spoke of a habit');
+	});
+
+	it('a story does not name its place in every line', () => {
+		const homes = new Set(SENTENCE_DATA.ko.homes);
+
+		for (const story of ['stroll', 'outing'] as SentenceStory[]) {
+			for (const detail of sentenceDetails({ language: 'ko', sentences: 5, story, count: 80 })) {
+				const belongs = sentenceOf(detail);
+				const where = detail.phrases.find(
+					(phrase, i) =>
+						(detail.slots[i] === 'destination' || detail.slots[i] === 'place') && !homes.has(phrase)
+				);
+
+				if (where === undefined) {
+					continue;
+				}
+
+				const noun = [...nounsIn('ko', where)][0] ?? where;
+				const naming = new Set(
+					detail.phrases
+						.map((phrase, i) => (nounsIn('ko', phrase).has(noun) ? belongs[i] : -1))
+						.filter((at) => at >= 0)
+				);
+
+				assert.ok(
+					naming.size < detail.sentences.length,
+					`ko: every line names ${noun} (${detail.sentence})`
+				);
+			}
 		}
 	});
 

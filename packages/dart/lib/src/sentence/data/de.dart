@@ -330,9 +330,8 @@ final SentenceLanguageData de = SentenceLanguageData(
       im_Frühling im_Sommer im_Herbst im_Winter am_Wochenende an_Feiertagen den_ganzen_Tag
     '''),
     past: words(r'gestern letzte_Woche vor_langer_Zeit einst an_jenem_Tag in_jener_Nacht'),
-    present: words(r'''
-      heute heutzutage gerade_eben morgen nächste_Woche manchmal jeden_Tag jede_Nacht
-    '''),
+    present: words(r'heute gerade_eben morgen nächste_Woche'),
+    habitual: words(r'heutzutage manchmal jeden_Tag jede_Nacht'),
   ),
   homes: words(r'Haus'),
   connectives: <ConnectiveKind, WordPool>{

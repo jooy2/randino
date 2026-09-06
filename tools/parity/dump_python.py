@@ -255,6 +255,7 @@ sentence = {
             "any": listed(data.times.any),
             "past": listed(data.times.past),
             "present": listed(data.times.present),
+            "habitual": listed(data.times.habitual),
         },
         "homes": listed(data.homes),
         "connectives": {kind: listed(pool) for kind, pool in data.connectives.items()},

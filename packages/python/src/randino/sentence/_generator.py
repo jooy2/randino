@@ -480,13 +480,13 @@ FORM_CHAIN: Mapping[SentenceStyle, Mapping[SentenceMark, tuple[PredicateForm, ..
     "casual": {
         "statement": ("casual",),
         "trailing": ("casual",),
-        "question": ("casual", "question"),
+        "question": ("casualQuestion", "casual", "question"),
         "exclamation": ("casual", "exclamation"),
     },
     "polite": {
         "statement": ("polite",),
         "trailing": ("polite",),
-        "question": ("polite", "question"),
+        "question": ("politeQuestion", "polite", "question"),
         "exclamation": ("polite", "exclamation"),
     },
     "formal": {
@@ -647,6 +647,13 @@ class Draw:
     -1 before it has named one. A story never goes back to the morning.
     """
 
+    dated: bool = False
+    """Whether the sentence this clause belongs to has said when already.
+
+    It opened on a temporal connective, or its first clause named a time, so this clause
+    names none.
+    """
+
 
 @dataclass(frozen=True, slots=True)
 class BeatDraw:
@@ -683,6 +690,13 @@ class BeatDraw:
 
     subject: tuple[WordTheme, ...] | None
     """The themes the subject may come from, when the story has decided it."""
+
+    pinned: "Mapping[SentenceSlot, Requirement]" = field(default_factory=dict)
+    """The nouns the story has put on the page that this sentence writes again, by slot.
+
+    What `Follow.scene` carries once there is a topic to follow; this is how the first
+    sentence about the hero gets them when a scene came before it.
+    """
 
 
 @dataclass(frozen=True, slots=True)
@@ -1960,6 +1974,7 @@ def _time_for(
     avoid: frozenset[str],
     low: int,
     high: int,
+    storied: bool,
 ) -> tuple[str, str, int]:
     """When something happens, chosen against the tense and where the result is in its day.
 
@@ -1971,7 +1986,10 @@ def _time_for(
     times = data.times
     day = [word for at, word in enumerate(times.day) if day_at < at <= day_at + DAY_STRIDE]
     tensed = times.past if tense == "past" else times.present
-    free = [*times.any, *(tensed or ())] if opens else []
+    # A habit — `every day`, `요즘` — is a thing a lone sentence can say and a story
+    # cannot: a story tells of the one time something happened.
+    habits = () if storied else (times.habitual or ())
+    free = [*times.any, *(tensed or ()), *habits] if opens else []
     pool = [*day, *free]
     usable = pool or [*times.day, *times.any]
     fits = [word for word in usable if word not in avoid and low <= len(word) <= high]
@@ -1995,6 +2013,7 @@ def _predicate_for(
     day_at: int,
     opens: bool,
     subject: NounClass,
+    storied: bool,
 ) -> tuple[str, str, int]:
     """What a phrase that is not a noun phrase writes, its plain form, and its day phase.
 
@@ -2029,7 +2048,7 @@ def _predicate_for(
         return _clock_text(data), "", -1
 
     if slot == "time":
-        return _time_for(data, tense, day_at, opens, avoid, min(low, high), high)
+        return _time_for(data, tense, day_at, opens, avoid, min(low, high), high, storied)
 
     pool = _manners_for(data, subject) if slot == "manner" else predicates
 
@@ -2430,6 +2449,7 @@ def _compose(
                 # likes; the ones after it only move the day forward.
                 follow is None and draw.link != "second",
                 THEME_CLASS[subject_theme],
+                draw.beat is not None,
             )
 
             if plain_form:
@@ -3199,6 +3219,15 @@ def _tell_story(telling: Telling) -> Result | None:
     topic: Topic | None = None
     day_at = -1
     at = 0
+    # Whether the clause just written named the place. A story happens in one place, and
+    # it does not have to say so in every line: `운동장으로 달려가서 운동장에서 날아오른다`
+    # names it twice in one sentence, so a clause that follows one that named the place
+    # leaves it out.
+    placed = False
+
+    def placeable(beat: Beat) -> bool:
+        # Whether this beat may write the place: not straight after a clause that did.
+        return beat.step.place and not placed
 
     def pinned_for(beat: Beat) -> dict[SentenceSlot, Requirement]:
         # The nouns this beat's sentence has to write, in the slots it has for them.
@@ -3208,7 +3237,7 @@ def _tell_story(telling: Telling) -> Result | None:
         if step.object and roles.item is not None:
             pinned["object"] = roles.item
 
-        if step.place and roles.place is not None:
+        if placeable(beat) and roles.place is not None:
             pinned["place"] = roles.place
 
         if step.destination == "place" and roles.place is not None:
@@ -3246,7 +3275,7 @@ def _tell_story(telling: Telling) -> Result | None:
         if step.object:
             wants.append("object")
 
-        if step.place:
+        if placeable(beat):
             prefers.append("place")
 
         return BeatDraw(
@@ -3259,6 +3288,7 @@ def _tell_story(telling: Telling) -> Result | None:
             item=found.item,
             places=DESTINATION_THEMES,
             subject=DESTINATION_THEMES if step.kind == "scene" else hero_themes,
+            pinned=pinned_for(beat),
         )
 
     def shortest_for(beat: Beat) -> int:
@@ -3267,10 +3297,19 @@ def _tell_story(telling: Telling) -> Result | None:
 
         return min(_frame_range(frame, data, telling.room)[0] for frame in frames)
 
-    def tell(beat: Beat, budget: tuple[int, int], previous: Built | None) -> Told:
+    def tell(
+        beat: Beat, budget: tuple[int, int], previous: Built | None, opened_before: str = ""
+    ) -> Told:
         # One beat as one sentence, or as one clause of one.
-        nonlocal topic, day_at
+        nonlocal topic, day_at, placed
         scene = beat.step.kind == "scene"
+        # A second clause whose sentence has said when already — opened on `later`, or
+        # named a time in its first clause — says it no second time.
+        dated = (
+            beat.join == "second"
+            and previous is not None
+            and (opened_before in data.connectives.get("temporal", ()) or "time" in previous.slots)
+        )
 
         # What this sentence is doing. A caller who named the kinds gets them; the story
         # otherwise tells, and lets a step that allows more do more.
@@ -3333,6 +3372,7 @@ def _tell_story(telling: Telling) -> Result | None:
             beat_draw(beat),
             beat.join,
             day_at,
+            dated,
         )
         one, opened = _draw_one(telling, draw)
 
@@ -3382,6 +3422,11 @@ def _tell_story(telling: Telling) -> Result | None:
                 roles.place = replace(drawn, slots=("place",))
 
         telling.spent.update(one.used)
+        placed = (
+            scene
+            or "place" in one.scene
+            or (beat.step.destination == "place" and "destination" in one.scene)
+        )
         day_at = max(day_at, one.day_at)
 
         if topic is None and not scene:
@@ -3433,7 +3478,7 @@ def _tell_story(telling: Telling) -> Result | None:
             )
             second_range = (max(1, low - first_range[0]), max(1, high - first_range[1]))
             first = tell(beat, first_range, None)
-            second = tell(beats[i + 1], second_range, first.one)
+            second = tell(beats[i + 1], second_range, first.one, first.opened)
 
             told = Told(
                 _join_clauses(data, first.one, second.one),
@@ -3559,7 +3604,13 @@ def _generate_one(language: WordLanguage, settings: Settings, draw: Draw) -> Bui
     requirements = [] if follow is not None else [_classify(language, w) for w in settings.include]
     # What the result has already put on the page and this sentence keeps: its subject
     # when the topic is being named again, and every noun of its scene.
-    pinned: dict[SentenceSlot, Requirement] = dict(follow.scene) if follow is not None else {}
+    pinned: dict[SentenceSlot, Requirement] = (
+        dict(follow.scene)
+        if follow is not None
+        else dict(draw.beat.pinned)
+        if draw.beat is not None
+        else {}
+    )
 
     if follow is not None and follow.reference == "repeat":
         pinned["subject"] = Requirement(
@@ -3575,11 +3626,13 @@ def _generate_one(language: WordLanguage, settings: Settings, draw: Draw) -> Bui
         pinned.pop("subject", None)
 
     # A result that has reached the last phase of its day has no later one to name, so a
-    # sentence after that carries no time at all rather than a wrong one.
+    # sentence after that carries no time at all rather than a wrong one. And a sentence
+    # that opens on `later` or `잠시후` has said when already: `잠시후 한낮에` says it twice.
     spent = follow is not None and draw.day_at >= len(data.times.day) - 1
+    dated = draw.dated or draw.opener in data.connectives.get("temporal", ())
     timeless = (
         [frame for frame in allowed if not any(part.slot == "time" for part in frame.parts)]
-        if spent
+        if spent or dated
         else allowed
     )
     frames = timeless or allowed

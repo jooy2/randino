@@ -74,8 +74,16 @@ enum PredicateForm {
   /// 해체, which serves every mood at once: `달려` asks and tells alike.
   casual,
 
+  /// 해체 asking, where the level has an ending that only asks well: `달리지?`
+  /// invites the listener to agree, and a statement closing on it in every
+  /// other line reads as somebody looking for a nod.
+  casualQuestion,
+
   /// 해요체, which likewise serves every mood: `달려요`.
   polite,
+
+  /// 해요체 asking, for the same ending: `달리죠?`.
+  politeQuestion,
 
   /// 합쇼체, the one level that does move for a question: `달립니다`.
   formal,
@@ -608,7 +616,13 @@ typedef SentenceConnectives = Map<ConnectiveKind, WordPool>;
 /// of the tense it is in.
 class SentenceTimes {
   /// Creates the time pools.
-  const SentenceTimes({required this.day, required this.any, this.past, this.present});
+  const SentenceTimes({
+    required this.day,
+    required this.any,
+    this.past,
+    this.present,
+    this.habitual,
+  });
 
   /// The phases of a day, in order.
   final WordPool day;
@@ -621,6 +635,11 @@ class SentenceTimes {
 
   /// What names the present (`오늘`, `these days`).
   final WordPool? present;
+
+  /// What happens as a habit: `every day`, `sometimes`, `these days`. Right in a
+  /// sentence on its own and wrong in a story, which tells of one time something
+  /// happened, so a story never draws from it.
+  final WordPool? habitual;
 }
 
 /// How the language marks the past when it does not inflect its verb for it.

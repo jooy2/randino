@@ -238,7 +238,8 @@ console.log(
 							day: list(data.times.day),
 							any: list(data.times.any),
 							past: list(data.times.past),
-							present: list(data.times.present)
+							present: list(data.times.present),
+							habitual: list(data.times.habitual)
 						},
 						homes: list(data.homes),
 						connectives: Object.fromEntries(

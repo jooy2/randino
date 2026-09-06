@@ -281,10 +281,11 @@ export const ZH: SentenceLanguageData = {
 		}
 	],
 	times: {
-		day: words(`黎明时 清晨 早晨 上午 中午 正午 下午 黄昏时 傍晚 夜里 深夜 午夜`),
+		day: words(`黎明时 清晨 早晨 上午 中午 下午 黄昏时 傍晚 夜里 深夜 午夜`),
 		any: words(`春天 夏天 秋天 冬天 周末 假日 整天`),
 		past: words(`昨天 上周 从前 那天 当年 那晚`),
-		present: words(`今天 最近 刚才 明天 下周 有时 每天 每晚`)
+		present: words(`今天 刚才 明天 下周`),
+		habitual: words(`最近 有时 每天 每晚`)
 	},
 	homes: words(`家`),
 	// Two clauses are joined on a comma and 然后: `狐狸回到了家，然后吃了苹果。`

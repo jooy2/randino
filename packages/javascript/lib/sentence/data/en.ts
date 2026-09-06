@@ -491,12 +491,13 @@ export const EN: SentenceLanguageData = {
 	],
 	times: {
 		day: words(`
-			at_dawn in_the_early_morning in_the_morning at_midday at_noon in_the_afternoon at_dusk
-			in_the_evening at_night late_at_night at_midnight
+			at_dawn in_the_early_morning in_the_morning at_midday in_the_afternoon at_dusk in_the_evening
+			at_night late_at_night at_midnight
 		`),
 		any: words(`in_spring in_summer in_autumn in_winter on_weekends on_holidays all_day`),
 		past: words(`yesterday last_week long_ago once that_day the_night_before`),
-		present: words(`today these_days just_now tomorrow next_week sometimes every_day every_night`)
+		present: words(`today just_now tomorrow next_week`),
+		habitual: words(`these_days sometimes every_day every_night`)
 	},
 	// `to the house` rather than `home`, which would want its preposition dropped.
 	homes: words(`house cottage`),

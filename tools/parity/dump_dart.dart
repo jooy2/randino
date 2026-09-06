@@ -233,6 +233,7 @@ void main() {
           'any': listed(entry.value.times.any),
           'past': listed(entry.value.times.past),
           'present': listed(entry.value.times.present),
+          'habitual': listed(entry.value.times.habitual),
         },
         'homes': listed(entry.value.homes),
         'connectives': <String, Object?>{

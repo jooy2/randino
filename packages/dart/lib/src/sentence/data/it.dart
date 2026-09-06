@@ -476,9 +476,8 @@ final SentenceLanguageData it = SentenceLanguageData(
       tutto_il_giorno
     '''),
     past: words(r'ieri la_settimana_scorsa tempo_fa quel_giorno quella_notte una_volta'),
-    present: words(r'''
-      oggi di_questi_tempi poco_fa domani la_settimana_prossima a_volte ogni_giorno ogni_notte
-    '''),
+    present: words(r'oggi poco_fa domani la_settimana_prossima'),
+    habitual: words(r'di_questi_tempi a_volte ogni_giorno ogni_notte'),
   ),
   homes: words(r'casa'),
   join: const SentenceJoin(word: 'e'),

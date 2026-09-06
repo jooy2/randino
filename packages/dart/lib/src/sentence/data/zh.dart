@@ -350,10 +350,11 @@ final SentenceLanguageData zh = SentenceLanguageData(
     ),
   ],
   times: SentenceTimes(
-    day: words(r'黎明时 清晨 早晨 上午 中午 正午 下午 黄昏时 傍晚 夜里 深夜 午夜'),
+    day: words(r'黎明时 清晨 早晨 上午 中午 下午 黄昏时 傍晚 夜里 深夜 午夜'),
     any: words(r'春天 夏天 秋天 冬天 周末 假日 整天'),
     past: words(r'昨天 上周 从前 那天 当年 那晚'),
-    present: words(r'今天 最近 刚才 明天 下周 有时 每天 每晚'),
+    present: words(r'今天 刚才 明天 下周'),
+    habitual: words(r'最近 有时 每天 每晚'),
   ),
   homes: words(r'家'),
   join: const SentenceJoin(word: '，然后'),

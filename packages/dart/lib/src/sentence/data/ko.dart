@@ -10,8 +10,10 @@ import 'package:randino/src/word/data/types.dart';
 const Map<PredicateForm, String> _pastEndings = <PredicateForm, String>{
   PredicateForm.question: '니|나|는가',
   PredicateForm.exclamation: '구나|네|군',
-  PredicateForm.casual: '어|지',
-  PredicateForm.polite: '어요|죠',
+  PredicateForm.casual: '어',
+  PredicateForm.casualQuestion: '어|지',
+  PredicateForm.polite: '어요',
+  PredicateForm.politeQuestion: '어요|죠',
   PredicateForm.formal: '습니다',
   PredicateForm.formalQuestion: '습니까',
 };
@@ -42,8 +44,10 @@ final SentenceLanguageData ko = SentenceLanguageData(
         PredicateForm.exclamation: words(
           r'일어나는구나|일어나네|일어나는군 일어서는구나|일어서네|일어서는군 깨어나는구나|깨어나네|깨어나는군 눈뜨는구나|눈뜨네|눈뜨는군',
         ),
-        PredicateForm.casual: words(r'일어나|일어나지 일어서|일어서지 깨어나|깨어나지 눈떠|눈뜨지'),
-        PredicateForm.polite: words(r'일어나요|일어나죠 일어서요|일어서죠 깨어나요|깨어나죠 눈떠요|눈뜨죠'),
+        PredicateForm.casual: words(r'일어나 일어서 깨어나 눈떠'),
+        PredicateForm.casualQuestion: words(r'일어나|일어나지 일어서|일어서지 깨어나|깨어나지 눈떠|눈뜨지'),
+        PredicateForm.polite: words(r'일어나요 일어서요 깨어나요 눈떠요'),
+        PredicateForm.politeQuestion: words(r'일어나요|일어나죠 일어서요|일어서죠 깨어나요|깨어나죠 눈떠요|눈뜨죠'),
         PredicateForm.formal: words(r'일어납니다 일어섭니다 깨어납니다 눈뜹니다'),
         PredicateForm.formalQuestion: words(r'일어납니까 일어섭니까 깨어납니까 눈뜹니까'),
         PredicateForm.linking: words(r'일어나서|일어나고 일어서서|일어서고 깨어나서|깨어나고 눈떠서|눈뜨고'),
@@ -62,8 +66,10 @@ final SentenceLanguageData ko = SentenceLanguageData(
         PredicateForm.exclamation: words(r'''
           가는구나|가네|가는군 향하는구나|향하네|향하는군 달려가는구나|달려가네|달려가는군 올라가는구나|올라가네|올라가는군 내려가는구나|내려가네|내려가는군
         '''),
-        PredicateForm.casual: words(r'가|가지 향해|향하지 달려가|달려가지 올라가|올라가지 내려가|내려가지'),
-        PredicateForm.polite: words(r'가요|가죠 향해요|향하죠 달려가요|달려가죠 올라가요|올라가죠 내려가요|내려가죠'),
+        PredicateForm.casual: words(r'가 향해 달려가 올라가 내려가'),
+        PredicateForm.casualQuestion: words(r'가|가지 향해|향하지 달려가|달려가지 올라가|올라가지 내려가|내려가지'),
+        PredicateForm.polite: words(r'가요 향해요 달려가요 올라가요 내려가요'),
+        PredicateForm.politeQuestion: words(r'가요|가죠 향해요|향하죠 달려가요|달려가죠 올라가요|올라가죠 내려가요|내려가죠'),
         PredicateForm.formal: words(r'갑니다 향합니다 달려갑니다 올라갑니다 내려갑니다'),
         PredicateForm.formalQuestion: words(r'갑니까 향합니까 달려갑니까 올라갑니까 내려갑니까'),
         PredicateForm.linking: words(r'가서|가고 향해서|향하고 달려가서|달려가고 올라가서|올라가고 내려가서|내려가고'),
@@ -81,8 +87,10 @@ final SentenceLanguageData ko = SentenceLanguageData(
         PredicateForm.exclamation: words(
           r'떠나는구나|떠나네|떠나는군 나서는구나|나서네|나서는군 출발하는구나|출발하네|출발하는군 길을떠나는구나|길을떠나네|길을떠나는군',
         ),
-        PredicateForm.casual: words(r'떠나|떠나지 나서|나서지 출발해|출발하지 길을떠나|길을떠나지'),
-        PredicateForm.polite: words(r'떠나요|떠나죠 나서요|나서죠 출발해요|출발하죠 길을떠나요|길을떠나죠'),
+        PredicateForm.casual: words(r'떠나 나서 출발해 길을떠나'),
+        PredicateForm.casualQuestion: words(r'떠나|떠나지 나서|나서지 출발해|출발하지 길을떠나|길을떠나지'),
+        PredicateForm.polite: words(r'떠나요 나서요 출발해요 길을떠나요'),
+        PredicateForm.politeQuestion: words(r'떠나요|떠나죠 나서요|나서죠 출발해요|출발하죠 길을떠나요|길을떠나죠'),
         PredicateForm.formal: words(r'떠납니다 나섭니다 출발합니다 길을떠납니다'),
         PredicateForm.formalQuestion: words(r'떠납니까 나섭니까 출발합니까 길을떠납니까'),
         PredicateForm.linking: words(r'떠나서|떠나고 나서서|나서고 출발해서|출발하고 길을떠나서|길을떠나고'),
@@ -101,8 +109,10 @@ final SentenceLanguageData ko = SentenceLanguageData(
         PredicateForm.exclamation: words(r'''
           들어오는구나|들어오네|들어오는군 닿는구나|닿네|닿는군 이르는구나|이르네|이르는군 다다르는구나|다다르네|다다르는군 들어서는구나|들어서네|들어서는군
         '''),
-        PredicateForm.casual: words(r'들어와|들어오지 닿아|닿지 이르러|이르지 다다라|다다르지 들어서|들어서지'),
-        PredicateForm.polite: words(r'들어와요|들어오죠 닿아요|닿죠 이르러요|이르죠 다다라요|다다르죠 들어서요|들어서죠'),
+        PredicateForm.casual: words(r'들어와 닿아 이르러 다다라 들어서'),
+        PredicateForm.casualQuestion: words(r'들어와|들어오지 닿아|닿지 이르러|이르지 다다라|다다르지 들어서|들어서지'),
+        PredicateForm.polite: words(r'들어와요 닿아요 이르러요 다다라요 들어서요'),
+        PredicateForm.politeQuestion: words(r'들어와요|들어오죠 닿아요|닿죠 이르러요|이르죠 다다라요|다다르죠 들어서요|들어서죠'),
         PredicateForm.formal: words(r'들어옵니다 닿습니다 이릅니다 다다릅니다 들어섭니다'),
         PredicateForm.formalQuestion: words(r'들어옵니까 닿습니까 이릅니까 다다릅니까 들어섭니까'),
         PredicateForm.linking: words(r'들어와서|들어오고 닿아서|닿고 이르러서|이르고 다다라서|다다르고 들어서서|들어서고'),
@@ -120,8 +130,10 @@ final SentenceLanguageData ko = SentenceLanguageData(
         PredicateForm.exclamation: words(
           r'돌아오는구나|돌아오네|돌아오는군 도착하는구나|도착하네|도착하는군 돌아가는구나|돌아가네|돌아가는군 귀가하는구나|귀가하네|귀가하는군',
         ),
-        PredicateForm.casual: words(r'돌아와|돌아오지 도착해|도착하지 돌아가|돌아가지 귀가해|귀가하지'),
-        PredicateForm.polite: words(r'돌아와요|돌아오죠 도착해요|도착하죠 돌아가요|돌아가죠 귀가해요|귀가하죠'),
+        PredicateForm.casual: words(r'돌아와 도착해 돌아가 귀가해'),
+        PredicateForm.casualQuestion: words(r'돌아와|돌아오지 도착해|도착하지 돌아가|돌아가지 귀가해|귀가하지'),
+        PredicateForm.polite: words(r'돌아와요 도착해요 돌아가요 귀가해요'),
+        PredicateForm.politeQuestion: words(r'돌아와요|돌아오죠 도착해요|도착하죠 돌아가요|돌아가죠 귀가해요|귀가하죠'),
         PredicateForm.formal: words(r'돌아옵니다 도착합니다 돌아갑니다 귀가합니다'),
         PredicateForm.formalQuestion: words(r'돌아옵니까 도착합니까 돌아갑니까 귀가합니까'),
         PredicateForm.linking: words(r'돌아와서|돌아오고 도착해서|도착하고 돌아가서|돌아가고 귀가해서|귀가하고'),
@@ -131,39 +143,57 @@ final SentenceLanguageData ko = SentenceLanguageData(
     VerbGroup(
       field: VerbField.move,
       subject: const <NounClass>[NounClass.creature, NounClass.person],
-      words: words(r'달린다 걷는다 뛴다 헤엄친다 날아오른다 기어간다 서성인다 지나간다 어슬렁댄다 뛰어다닌다 거닌다 산책한다'),
+      words: words(r'달린다 걷는다 뛴다 헤엄친다 기어간다 서성인다 지나간다 어슬렁댄다 뛰어다닌다 거닌다 산책한다'),
       forms: <PredicateForm, WordPool>{
         PredicateForm.question: words(r'''
-          달리니|달리나|달리는가 걷니|걷나|걷는가 뛰니|뛰나|뛰는가 헤엄치니|헤엄치나|헤엄치는가 날아오르니|날아오르나|날아오르는가 기어가니|기어가나|기어가는가
-          서성이니|서성이나|서성이는가 지나가니|지나가나|지나가는가 어슬렁대니|어슬렁대나|어슬렁대는가 뛰어다니니|뛰어다니나|뛰어다니는가 거니니|거니나|거니는가
-          산책하니|산책하나|산책하는가
+          달리니|달리나|달리는가 걷니|걷나|걷는가 뛰니|뛰나|뛰는가 헤엄치니|헤엄치나|헤엄치는가 기어가니|기어가나|기어가는가 서성이니|서성이나|서성이는가
+          지나가니|지나가나|지나가는가 어슬렁대니|어슬렁대나|어슬렁대는가 뛰어다니니|뛰어다니나|뛰어다니는가 거니니|거니나|거니는가 산책하니|산책하나|산책하는가
         '''),
         PredicateForm.exclamation: words(r'''
-          달리는구나|달리네|달리는군 걷는구나|걷네|걷는군 뛰는구나|뛰네|뛰는군 헤엄치는구나|헤엄치네|헤엄치는군 날아오르는구나|날아오르네|날아오르는군
-          기어가는구나|기어가네|기어가는군 서성이는구나|서성이네|서성이는군 지나가는구나|지나가네|지나가는군 어슬렁대는구나|어슬렁대네|어슬렁대는군
-          뛰어다니는구나|뛰어다니네|뛰어다니는군 거니는구나|거니네|거니는군 산책하는구나|산책하네|산책하는군
+          달리는구나|달리네|달리는군 걷는구나|걷네|걷는군 뛰는구나|뛰네|뛰는군 헤엄치는구나|헤엄치네|헤엄치는군 기어가는구나|기어가네|기어가는군
+          서성이는구나|서성이네|서성이는군 지나가는구나|지나가네|지나가는군 어슬렁대는구나|어슬렁대네|어슬렁대는군 뛰어다니는구나|뛰어다니네|뛰어다니는군
+          거니는구나|거니네|거니는군 산책하는구나|산책하네|산책하는군
         '''),
-        PredicateForm.casual: words(r'''
-          달려|달리지 걸어|걷지 뛰어|뛰지 헤엄쳐|헤엄치지 날아올라|날아오르지 기어가|기어가지 서성여|서성이지 지나가|지나가지 어슬렁대|어슬렁대지 뛰어다녀|뛰어다니지
-          거닐어|거닐지 산책해|산책하지
+        PredicateForm.casual: words(r'달려 걸어 뛰어 헤엄쳐 기어가 서성여 지나가 어슬렁대 뛰어다녀 거닐어 산책해'),
+        PredicateForm.casualQuestion: words(r'''
+          달려|달리지 걸어|걷지 뛰어|뛰지 헤엄쳐|헤엄치지 기어가|기어가지 서성여|서성이지 지나가|지나가지 어슬렁대|어슬렁대지 뛰어다녀|뛰어다니지 거닐어|거닐지
+          산책해|산책하지
         '''),
-        PredicateForm.polite: words(r'''
-          달려요|달리죠 걸어요|걷죠 뛰어요|뛰죠 헤엄쳐요|헤엄치죠 날아올라요|날아오르죠 기어가요|기어가죠 서성여요|서성이죠 지나가요|지나가죠 어슬렁대요|어슬렁대죠
-          뛰어다녀요|뛰어다니죠 거닐어요|거닐죠 산책해요|산책하죠
+        PredicateForm.polite: words(r'달려요 걸어요 뛰어요 헤엄쳐요 기어가요 서성여요 지나가요 어슬렁대요 뛰어다녀요 거닐어요 산책해요'),
+        PredicateForm.politeQuestion: words(r'''
+          달려요|달리죠 걸어요|걷죠 뛰어요|뛰죠 헤엄쳐요|헤엄치죠 기어가요|기어가죠 서성여요|서성이죠 지나가요|지나가죠 어슬렁대요|어슬렁대죠 뛰어다녀요|뛰어다니죠
+          거닐어요|거닐죠 산책해요|산책하죠
         '''),
         PredicateForm.formal: words(
-          r'달립니다 걷습니다 뜁니다 헤엄칩니다 날아오릅니다 기어갑니다 서성입니다 지나갑니다 어슬렁댑니다 뛰어다닙니다 거닙니다 산책합니다',
+          r'달립니다 걷습니다 뜁니다 헤엄칩니다 기어갑니다 서성입니다 지나갑니다 어슬렁댑니다 뛰어다닙니다 거닙니다 산책합니다',
         ),
         PredicateForm.formalQuestion: words(
-          r'달립니까 걷습니까 뜁니까 헤엄칩니까 날아오릅니까 기어갑니까 서성입니까 지나갑니까 어슬렁댑니까 뛰어다닙니까 거닙니까 산책합니까',
+          r'달립니까 걷습니까 뜁니까 헤엄칩니까 기어갑니까 서성입니까 지나갑니까 어슬렁댑니까 뛰어다닙니까 거닙니까 산책합니까',
         ),
-        PredicateForm.linking: words(r'달리고 걷고 뛰고 헤엄치고 날아오르고 기어가고 서성이고 지나가고 어슬렁대고 뛰어다니고 거닐고 산책하고'),
+        PredicateForm.linking: words(r'달리고 걷고 뛰고 헤엄치고 기어가고 서성이고 지나가고 어슬렁대고 뛰어다니고 거닐고 산책하고'),
       },
       past: conjugate(
-        r'달렸 걸었 뛰었 헤엄쳤 날아올랐 기어갔 서성였 지나갔 어슬렁댔 뛰어다녔 거닐었 산책했',
+        r'달렸 걸었 뛰었 헤엄쳤 기어갔 서성였 지나갔 어슬렁댔 뛰어다녔 거닐었 산책했',
         statement: '다',
         endings: _pastEndings,
       ),
+    ),
+    VerbGroup(
+      field: VerbField.move,
+      subject: const <NounClass>[NounClass.creature],
+      words: words(r'날아오른다'),
+      forms: <PredicateForm, WordPool>{
+        PredicateForm.question: words(r'날아오르니|날아오르나|날아오르는가'),
+        PredicateForm.exclamation: words(r'날아오르는구나|날아오르네|날아오르는군'),
+        PredicateForm.casual: words(r'날아올라'),
+        PredicateForm.casualQuestion: words(r'날아올라|날아오르지'),
+        PredicateForm.polite: words(r'날아올라요'),
+        PredicateForm.politeQuestion: words(r'날아올라요|날아오르죠'),
+        PredicateForm.formal: words(r'날아오릅니다'),
+        PredicateForm.formalQuestion: words(r'날아오릅니까'),
+        PredicateForm.linking: words(r'날아오르고'),
+      },
+      past: conjugate(r'날아올랐', statement: '다', endings: _pastEndings),
     ),
     VerbGroup(
       field: VerbField.wait,
@@ -178,10 +208,12 @@ final SentenceLanguageData ko = SentenceLanguageData(
           기다리는구나|기다리네|기다리는군 두리번거리는구나|두리번거리네|두리번거리는군 숨는구나|숨네|숨는군 뒤척이는구나|뒤척이네|뒤척이는군
           머뭇거리는구나|머뭇거리네|머뭇거리는군 기웃거리는구나|기웃거리네|기웃거리는군 멈추는구나|멈추네|멈추는군 멈춰서는구나|멈춰서네|멈춰서는군
         '''),
-        PredicateForm.casual: words(r'''
+        PredicateForm.casual: words(r'기다려 두리번거려 숨어 뒤척여 머뭇거려 기웃거려 멈춰 멈춰서'),
+        PredicateForm.casualQuestion: words(r'''
           기다려|기다리지 두리번거려|두리번거리지 숨어|숨지 뒤척여|뒤척이지 머뭇거려|머뭇거리지 기웃거려|기웃거리지 멈춰|멈추지 멈춰서|멈춰서지
         '''),
-        PredicateForm.polite: words(r'''
+        PredicateForm.polite: words(r'기다려요 두리번거려요 숨어요 뒤척여요 머뭇거려요 기웃거려요 멈춰요 멈춰서요'),
+        PredicateForm.politeQuestion: words(r'''
           기다려요|기다리죠 두리번거려요|두리번거리죠 숨어요|숨죠 뒤척여요|뒤척이죠 머뭇거려요|머뭇거리죠 기웃거려요|기웃거리죠 멈춰요|멈추죠 멈춰서요|멈춰서죠
         '''),
         PredicateForm.formal: words(r'기다립니다 두리번거립니다 숨습니다 뒤척입니다 머뭇거립니다 기웃거립니다 멈춥니다 멈춰섭니다'),
@@ -193,21 +225,23 @@ final SentenceLanguageData ko = SentenceLanguageData(
     VerbGroup(
       field: VerbField.rest,
       subject: const <NounClass>[NounClass.creature, NounClass.person],
-      words: words(r'쉰다 앉는다 눕는다 기댄다 웅크린다 드러눕는다'),
+      words: words(r'쉰다 앉는다 눕는다 웅크린다 드러눕는다'),
       forms: <PredicateForm, WordPool>{
-        PredicateForm.question: words(r'''
-          쉬니|쉬나|쉬는가 앉니|앉나|앉는가 눕니|눕나|눕는가 기대니|기대나|기대는가 웅크리니|웅크리나|웅크리는가 드러눕니|드러눕나|드러눕는가
-        '''),
-        PredicateForm.exclamation: words(r'''
-          쉬는구나|쉬네|쉬는군 앉는구나|앉네|앉는군 눕는구나|눕네|눕는군 기대는구나|기대네|기대는군 웅크리는구나|웅크리네|웅크리는군 드러눕는구나|드러눕네|드러눕는군
-        '''),
-        PredicateForm.casual: words(r'쉬어|쉬지 앉아|앉지 누워|눕지 기대|기대지 웅크려|웅크리지 드러누워|드러눕지'),
-        PredicateForm.polite: words(r'쉬어요|쉬죠 앉아요|앉죠 누워요|눕죠 기대요|기대죠 웅크려요|웅크리죠 드러누워요|드러눕죠'),
-        PredicateForm.formal: words(r'쉽니다 앉습니다 눕습니다 기댑니다 웅크립니다 드러눕습니다'),
-        PredicateForm.formalQuestion: words(r'쉽니까 앉습니까 눕습니까 기댑니까 웅크립니까 드러눕습니까'),
-        PredicateForm.linking: words(r'쉬고 앉아서|앉고 누워서|눕고 기대고 웅크리고 드러누워서|드러눕고'),
+        PredicateForm.question: words(
+          r'쉬니|쉬나|쉬는가 앉니|앉나|앉는가 눕니|눕나|눕는가 웅크리니|웅크리나|웅크리는가 드러눕니|드러눕나|드러눕는가',
+        ),
+        PredicateForm.exclamation: words(
+          r'쉬는구나|쉬네|쉬는군 앉는구나|앉네|앉는군 눕는구나|눕네|눕는군 웅크리는구나|웅크리네|웅크리는군 드러눕는구나|드러눕네|드러눕는군',
+        ),
+        PredicateForm.casual: words(r'쉬어 앉아 누워 웅크려 드러누워'),
+        PredicateForm.casualQuestion: words(r'쉬어|쉬지 앉아|앉지 누워|눕지 웅크려|웅크리지 드러누워|드러눕지'),
+        PredicateForm.polite: words(r'쉬어요 앉아요 누워요 웅크려요 드러누워요'),
+        PredicateForm.politeQuestion: words(r'쉬어요|쉬죠 앉아요|앉죠 누워요|눕죠 웅크려요|웅크리죠 드러누워요|드러눕죠'),
+        PredicateForm.formal: words(r'쉽니다 앉습니다 눕습니다 웅크립니다 드러눕습니다'),
+        PredicateForm.formalQuestion: words(r'쉽니까 앉습니까 눕습니까 웅크립니까 드러눕습니까'),
+        PredicateForm.linking: words(r'쉬고 앉아서|앉고 누워서|눕고 웅크리고 드러누워서|드러눕고'),
       },
-      past: conjugate(r'쉬었 앉았 누웠 기댔 웅크렸 드러누웠', statement: '다', endings: _pastEndings),
+      past: conjugate(r'쉬었 앉았 누웠 웅크렸 드러누웠', statement: '다', endings: _pastEndings),
     ),
     VerbGroup(
       field: VerbField.sleep,
@@ -218,8 +252,10 @@ final SentenceLanguageData ko = SentenceLanguageData(
         PredicateForm.exclamation: words(
           r'잠자는구나|잠자네|잠자는군 잠드는구나|잠드네|잠드는군 조는구나|조네|조는군 꾸벅이는구나|꾸벅이네|꾸벅이는군',
         ),
-        PredicateForm.casual: words(r'잠자|잠자지 잠들어|잠들지 졸아|졸지 꾸벅여|꾸벅이지'),
-        PredicateForm.polite: words(r'잠자요|잠자죠 잠들어요|잠들죠 졸아요|졸죠 꾸벅여요|꾸벅이죠'),
+        PredicateForm.casual: words(r'잠자 잠들어 졸아 꾸벅여'),
+        PredicateForm.casualQuestion: words(r'잠자|잠자지 잠들어|잠들지 졸아|졸지 꾸벅여|꾸벅이지'),
+        PredicateForm.polite: words(r'잠자요 잠들어요 졸아요 꾸벅여요'),
+        PredicateForm.politeQuestion: words(r'잠자요|잠자죠 잠들어요|잠들죠 졸아요|졸죠 꾸벅여요|꾸벅이죠'),
         PredicateForm.formal: words(r'잠잡니다 잠듭니다 좁니다 꾸벅입니다'),
         PredicateForm.formalQuestion: words(r'잠잡니까 잠듭니까 좁니까 꾸벅입니까'),
         PredicateForm.linking: words(r'잠자고 잠들고 졸고 꾸벅이고'),
@@ -239,10 +275,12 @@ final SentenceLanguageData ko = SentenceLanguageData(
           웃는구나|웃네|웃는군 우는구나|우네|우는군 하품하는구나|하품하네|하품하는군 한숨짓는구나|한숨짓네|한숨짓는군 미소짓는구나|미소짓네|미소짓는군
           콧노래하는구나|콧노래하네|콧노래하는군 중얼거리는구나|중얼거리네|중얼거리는군 소리치는구나|소리치네|소리치는군
         '''),
-        PredicateForm.casual: words(
+        PredicateForm.casual: words(r'웃어 울어 하품해 한숨지어 미소지어 콧노래해 중얼거려 소리쳐'),
+        PredicateForm.casualQuestion: words(
           r'웃어|웃지 울어|울지 하품해|하품하지 한숨지어|한숨짓지 미소지어|미소짓지 콧노래해|콧노래하지 중얼거려|중얼거리지 소리쳐|소리치지',
         ),
-        PredicateForm.polite: words(r'''
+        PredicateForm.polite: words(r'웃어요 울어요 하품해요 한숨지어요 미소지어요 콧노래해요 중얼거려요 소리쳐요'),
+        PredicateForm.politeQuestion: words(r'''
           웃어요|웃죠 울어요|울죠 하품해요|하품하죠 한숨지어요|한숨짓죠 미소지어요|미소짓죠 콧노래해요|콧노래하죠 중얼거려요|중얼거리죠 소리쳐요|소리치죠
         '''),
         PredicateForm.formal: words(r'웃습니다 웁니다 하품합니다 한숨짓습니다 미소짓습니다 콧노래합니다 중얼거립니다 소리칩니다'),
@@ -264,10 +302,12 @@ final SentenceLanguageData ko = SentenceLanguageData(
           춤추는구나|춤추네|춤추는군 노래하는구나|노래하네|노래하는군 뒹구는구나|뒹구네|뒹구는군 뛰노는구나|뛰노네|뛰노는군 장난치는구나|장난치네|장난치는군
           뛰어오르는구나|뛰어오르네|뛰어오르는군 폴짝거리는구나|폴짝거리네|폴짝거리는군 구르는구나|구르네|구르는군
         '''),
-        PredicateForm.casual: words(
+        PredicateForm.casual: words(r'춤춰 노래해 뒹굴어 뛰놀아 장난쳐 뛰어올라 폴짝거려 굴러'),
+        PredicateForm.casualQuestion: words(
           r'춤춰|춤추지 노래해|노래하지 뒹굴어|뒹굴지 뛰놀아|뛰놀지 장난쳐|장난치지 뛰어올라|뛰어오르지 폴짝거려|폴짝거리지 굴러|구르지',
         ),
-        PredicateForm.polite: words(r'''
+        PredicateForm.polite: words(r'춤춰요 노래해요 뒹굴어요 뛰놀아요 장난쳐요 뛰어올라요 폴짝거려요 굴러요'),
+        PredicateForm.politeQuestion: words(r'''
           춤춰요|춤추죠 노래해요|노래하죠 뒹굴어요|뒹굴죠 뛰놀아요|뛰놀죠 장난쳐요|장난치죠 뛰어올라요|뛰어오르죠 폴짝거려요|폴짝거리죠 굴러요|구르죠
         '''),
         PredicateForm.formal: words(r'춤춥니다 노래합니다 뒹굽니다 뛰놉니다 장난칩니다 뛰어오릅니다 폴짝거립니다 구릅니다'),
@@ -290,10 +330,12 @@ final SentenceLanguageData ko = SentenceLanguageData(
           꿈꾸는구나|꿈꾸네|꿈꾸는군 기억하는구나|기억하네|기억하는군 잊는구나|잊네|잊는군 상상하는구나|상상하네|상상하는군 헤아리는구나|헤아리네|헤아리는군
           떠올리는구나|떠올리네|떠올리는군 그리워하는구나|그리워하네|그리워하는군 궁금해하는구나|궁금해하네|궁금해하는군
         '''),
-        PredicateForm.casual: words(
+        PredicateForm.casual: words(r'꿈꿔 기억해 잊어 상상해 헤아려 떠올려 그리워해 궁금해해'),
+        PredicateForm.casualQuestion: words(
           r'꿈꿔|꿈꾸지 기억해|기억하지 잊어|잊지 상상해|상상하지 헤아려|헤아리지 떠올려|떠올리지 그리워해|그리워하지 궁금해해|궁금해하지',
         ),
-        PredicateForm.polite: words(r'''
+        PredicateForm.polite: words(r'꿈꿔요 기억해요 잊어요 상상해요 헤아려요 떠올려요 그리워해요 궁금해해요'),
+        PredicateForm.politeQuestion: words(r'''
           꿈꿔요|꿈꾸죠 기억해요|기억하죠 잊어요|잊죠 상상해요|상상하죠 헤아려요|헤아리죠 떠올려요|떠올리죠 그리워해요|그리워하죠 궁금해해요|궁금해하죠
         '''),
         PredicateForm.formal: words(r'꿈꿉니다 기억합니다 잊습니다 상상합니다 헤아립니다 떠올립니다 그리워합니다 궁금해합니다'),
@@ -316,10 +358,12 @@ final SentenceLanguageData ko = SentenceLanguageData(
           보는구나|보네|보는군 바라보는구나|바라보네|바라보는군 살피는구나|살피네|살피는군 들여다보는구나|들여다보네|들여다보는군 구경하는구나|구경하네|구경하는군
           만지는구나|만지네|만지는군 쓰다듬는구나|쓰다듬네|쓰다듬는군 지켜보는구나|지켜보네|지켜보는군
         '''),
-        PredicateForm.casual: words(
+        PredicateForm.casual: words(r'봐 바라봐 살펴 들여다봐 구경해 만져 쓰다듬어 지켜봐'),
+        PredicateForm.casualQuestion: words(
           r'봐|보지 바라봐|바라보지 살펴|살피지 들여다봐|들여다보지 구경해|구경하지 만져|만지지 쓰다듬어|쓰다듬지 지켜봐|지켜보지',
         ),
-        PredicateForm.polite: words(r'''
+        PredicateForm.polite: words(r'봐요 바라봐요 살펴요 들여다봐요 구경해요 만져요 쓰다듬어요 지켜봐요'),
+        PredicateForm.politeQuestion: words(r'''
           봐요|보죠 바라봐요|바라보죠 살펴요|살피죠 들여다봐요|들여다보죠 구경해요|구경하죠 만져요|만지죠 쓰다듬어요|쓰다듬죠 지켜봐요|지켜보죠
         '''),
         PredicateForm.formal: words(r'봅니다 바라봅니다 살핍니다 들여다봅니다 구경합니다 만집니다 쓰다듬습니다 지켜봅니다'),
@@ -339,8 +383,10 @@ final SentenceLanguageData ko = SentenceLanguageData(
         PredicateForm.exclamation: words(
           r'찾아다니는구나|찾아다니네|찾아다니는군 헤매는구나|헤매네|헤매는군 둘러보는구나|둘러보네|둘러보는군 살펴보는구나|살펴보네|살펴보는군',
         ),
-        PredicateForm.casual: words(r'찾아다녀|찾아다니지 헤매|헤매지 둘러봐|둘러보지 살펴봐|살펴보지'),
-        PredicateForm.polite: words(r'찾아다녀요|찾아다니죠 헤매요|헤매죠 둘러봐요|둘러보죠 살펴봐요|살펴보죠'),
+        PredicateForm.casual: words(r'찾아다녀 헤매 둘러봐 살펴봐'),
+        PredicateForm.casualQuestion: words(r'찾아다녀|찾아다니지 헤매|헤매지 둘러봐|둘러보지 살펴봐|살펴보지'),
+        PredicateForm.polite: words(r'찾아다녀요 헤매요 둘러봐요 살펴봐요'),
+        PredicateForm.politeQuestion: words(r'찾아다녀요|찾아다니죠 헤매요|헤매죠 둘러봐요|둘러보죠 살펴봐요|살펴보죠'),
         PredicateForm.formal: words(r'찾아다닙니다 헤맵니다 둘러봅니다 살펴봅니다'),
         PredicateForm.formalQuestion: words(r'찾아다닙니까 헤맵니까 둘러봅니까 살펴봅니까'),
         PredicateForm.linking: words(r'찾아다니고 헤매고 둘러보고 살펴보고'),
@@ -357,8 +403,10 @@ final SentenceLanguageData ko = SentenceLanguageData(
         PredicateForm.exclamation: words(
           r'찾는구나|찾네|찾는군 발견하는구나|발견하네|발견하는군 줍는구나|줍네|줍는군 찾아내는구나|찾아내네|찾아내는군',
         ),
-        PredicateForm.casual: words(r'찾아|찾지 발견해|발견하지 주워|줍지 찾아내|찾아내지'),
-        PredicateForm.polite: words(r'찾아요|찾죠 발견해요|발견하죠 주워요|줍죠 찾아내요|찾아내죠'),
+        PredicateForm.casual: words(r'찾아 발견해 주워 찾아내'),
+        PredicateForm.casualQuestion: words(r'찾아|찾지 발견해|발견하지 주워|줍지 찾아내|찾아내지'),
+        PredicateForm.polite: words(r'찾아요 발견해요 주워요 찾아내요'),
+        PredicateForm.politeQuestion: words(r'찾아요|찾죠 발견해요|발견하죠 주워요|줍죠 찾아내요|찾아내죠'),
         PredicateForm.formal: words(r'찾습니다 발견합니다 줍습니다 찾아냅니다'),
         PredicateForm.formalQuestion: words(r'찾습니까 발견합니까 줍습니까 찾아냅니까'),
         PredicateForm.linking: words(r'찾아서|찾고 발견하고 주워서|줍고 찾아내서|찾아내고'),
@@ -378,8 +426,12 @@ final SentenceLanguageData ko = SentenceLanguageData(
           챙기는구나|챙기네|챙기는군 고르는구나|고르네|고르는군 집는구나|집네|집는군 얻는구나|얻네|얻는군 받는구나|받네|받는군 꺼내는구나|꺼내네|꺼내는군
           움켜쥐는구나|움켜쥐네|움켜쥐는군
         '''),
-        PredicateForm.casual: words(r'챙겨|챙기지 골라|고르지 집어|집지 얻어|얻지 받아|받지 꺼내|꺼내지 움켜쥐어|움켜쥐지'),
-        PredicateForm.polite: words(r'챙겨요|챙기죠 골라요|고르죠 집어요|집죠 얻어요|얻죠 받아요|받죠 꺼내요|꺼내죠 움켜쥐어요|움켜쥐죠'),
+        PredicateForm.casual: words(r'챙겨 골라 집어 얻어 받아 꺼내 움켜쥐어'),
+        PredicateForm.casualQuestion: words(r'챙겨|챙기지 골라|고르지 집어|집지 얻어|얻지 받아|받지 꺼내|꺼내지 움켜쥐어|움켜쥐지'),
+        PredicateForm.polite: words(r'챙겨요 골라요 집어요 얻어요 받아요 꺼내요 움켜쥐어요'),
+        PredicateForm.politeQuestion: words(
+          r'챙겨요|챙기죠 골라요|고르죠 집어요|집죠 얻어요|얻죠 받아요|받죠 꺼내요|꺼내죠 움켜쥐어요|움켜쥐죠',
+        ),
         PredicateForm.formal: words(r'챙깁니다 고릅니다 집습니다 얻습니다 받습니다 꺼냅니다 움켜쥡니다'),
         PredicateForm.formalQuestion: words(r'챙깁니까 고릅니까 집습니까 얻습니까 받습니까 꺼냅니까 움켜쥡니까'),
         PredicateForm.linking: words(r'챙겨서|챙기고 골라서|고르고 집어서|집고 얻어서|얻고 받아서|받고 꺼내서|꺼내고 움켜쥐고'),
@@ -398,8 +450,10 @@ final SentenceLanguageData ko = SentenceLanguageData(
         PredicateForm.exclamation: words(r'''
           옮기는구나|옮기네|옮기는군 나르는구나|나르네|나르는군 가져오는구나|가져오네|가져오는군 들고오는구나|들고오네|들고오는군 안고오는구나|안고오네|안고오는군
         '''),
-        PredicateForm.casual: words(r'옮겨|옮기지 날라|나르지 가져와|가져오지 들고와|들고오지 안고와|안고오지'),
-        PredicateForm.polite: words(r'옮겨요|옮기죠 날라요|나르죠 가져와요|가져오죠 들고와요|들고오죠 안고와요|안고오죠'),
+        PredicateForm.casual: words(r'옮겨 날라 가져와 들고와 안고와'),
+        PredicateForm.casualQuestion: words(r'옮겨|옮기지 날라|나르지 가져와|가져오지 들고와|들고오지 안고와|안고오지'),
+        PredicateForm.polite: words(r'옮겨요 날라요 가져와요 들고와요 안고와요'),
+        PredicateForm.politeQuestion: words(r'옮겨요|옮기죠 날라요|나르죠 가져와요|가져오죠 들고와요|들고오죠 안고와요|안고오죠'),
         PredicateForm.formal: words(r'옮깁니다 나릅니다 가져옵니다 들고옵니다 안고옵니다'),
         PredicateForm.formalQuestion: words(r'옮깁니까 나릅니까 가져옵니까 들고옵니까 안고옵니까'),
         PredicateForm.linking: words(r'옮기고 나르고 가져와서|가져오고 들고와서|들고오고 안고와서|안고오고'),
@@ -419,8 +473,12 @@ final SentenceLanguageData ko = SentenceLanguageData(
           감추는구나|감추네|감추는군 숨기는구나|숨기네|숨기는군 넣어두는구나|넣어두네|넣어두는군 간직하는구나|간직하네|간직하는군 묻는구나|묻네|묻는군
           챙겨두는구나|챙겨두네|챙겨두는군
         '''),
-        PredicateForm.casual: words(r'감춰|감추지 숨겨|숨기지 넣어둬|넣어두지 간직해|간직하지 묻어|묻지 챙겨둬|챙겨두지'),
-        PredicateForm.polite: words(r'감춰요|감추죠 숨겨요|숨기죠 넣어둬요|넣어두죠 간직해요|간직하죠 묻어요|묻죠 챙겨둬요|챙겨두죠'),
+        PredicateForm.casual: words(r'감춰 숨겨 넣어둬 간직해 묻어 챙겨둬'),
+        PredicateForm.casualQuestion: words(r'감춰|감추지 숨겨|숨기지 넣어둬|넣어두지 간직해|간직하지 묻어|묻지 챙겨둬|챙겨두지'),
+        PredicateForm.polite: words(r'감춰요 숨겨요 넣어둬요 간직해요 묻어요 챙겨둬요'),
+        PredicateForm.politeQuestion: words(
+          r'감춰요|감추죠 숨겨요|숨기죠 넣어둬요|넣어두죠 간직해요|간직하죠 묻어요|묻죠 챙겨둬요|챙겨두죠',
+        ),
         PredicateForm.formal: words(r'감춥니다 숨깁니다 넣어둡니다 간직합니다 묻습니다 챙겨둡니다'),
         PredicateForm.formalQuestion: words(r'감춥니까 숨깁니까 넣어둡니까 간직합니까 묻습니까 챙겨둡니까'),
         PredicateForm.linking: words(r'감추고 숨기고 넣어두고 간직하고 묻고 챙겨두고'),
@@ -431,22 +489,40 @@ final SentenceLanguageData ko = SentenceLanguageData(
       field: VerbField.make,
       subject: const <NounClass>[NounClass.person],
       object: const <NounClass>[NounClass.thing, NounClass.vehicle],
-      words: words(r'만든다 짓는다 빚는다 그린다 엮는다 조립한다 깎는다'),
+      words: words(r'만든다 짓는다 빚는다 그린다 엮는다'),
       forms: <PredicateForm, WordPool>{
-        PredicateForm.question: words(r'''
-          만드니|만드나|만드는가 짓니|짓나|짓는가 빚니|빚나|빚는가 그리니|그리나|그리는가 엮니|엮나|엮는가 조립하니|조립하나|조립하는가 깎니|깎나|깎는가
-        '''),
-        PredicateForm.exclamation: words(r'''
-          만드는구나|만드네|만드는군 짓는구나|짓네|짓는군 빚는구나|빚네|빚는군 그리는구나|그리네|그리는군 엮는구나|엮네|엮는군 조립하는구나|조립하네|조립하는군
-          깎는구나|깎네|깎는군
-        '''),
-        PredicateForm.casual: words(r'만들어|만들지 지어|짓지 빚어|빚지 그려|그리지 엮어|엮지 조립해|조립하지 깎아|깎지'),
-        PredicateForm.polite: words(r'만들어요|만들죠 지어요|짓죠 빚어요|빚죠 그려요|그리죠 엮어요|엮죠 조립해요|조립하죠 깎아요|깎죠'),
-        PredicateForm.formal: words(r'만듭니다 짓습니다 빚습니다 그립니다 엮습니다 조립합니다 깎습니다'),
-        PredicateForm.formalQuestion: words(r'만듭니까 짓습니까 빚습니까 그립니까 엮습니까 조립합니까 깎습니까'),
-        PredicateForm.linking: words(r'만들고 짓고 빚고 그리고 엮고 조립하고 깎고'),
+        PredicateForm.question: words(r'만드니|만드나|만드는가 짓니|짓나|짓는가 빚니|빚나|빚는가 그리니|그리나|그리는가 엮니|엮나|엮는가'),
+        PredicateForm.exclamation: words(
+          r'만드는구나|만드네|만드는군 짓는구나|짓네|짓는군 빚는구나|빚네|빚는군 그리는구나|그리네|그리는군 엮는구나|엮네|엮는군',
+        ),
+        PredicateForm.casual: words(r'만들어 지어 빚어 그려 엮어'),
+        PredicateForm.casualQuestion: words(r'만들어|만들지 지어|짓지 빚어|빚지 그려|그리지 엮어|엮지'),
+        PredicateForm.polite: words(r'만들어요 지어요 빚어요 그려요 엮어요'),
+        PredicateForm.politeQuestion: words(r'만들어요|만들죠 지어요|짓죠 빚어요|빚죠 그려요|그리죠 엮어요|엮죠'),
+        PredicateForm.formal: words(r'만듭니다 짓습니다 빚습니다 그립니다 엮습니다'),
+        PredicateForm.formalQuestion: words(r'만듭니까 짓습니까 빚습니까 그립니까 엮습니까'),
+        PredicateForm.linking: words(r'만들고 짓고 빚고 그리고 엮고'),
       },
-      past: conjugate(r'만들었 지었 빚었 그렸 엮었 조립했 깎았', statement: '다', endings: _pastEndings),
+      past: conjugate(r'만들었 지었 빚었 그렸 엮었', statement: '다', endings: _pastEndings),
+    ),
+    VerbGroup(
+      field: VerbField.make,
+      subject: const <NounClass>[NounClass.person],
+      object: const <NounClass>[NounClass.thing, NounClass.vehicle],
+      objectThemes: const <WordTheme>[WordTheme.object, WordTheme.tool, WordTheme.vehicle],
+      words: words(r'조립한다 깎는다'),
+      forms: <PredicateForm, WordPool>{
+        PredicateForm.question: words(r'조립하니|조립하나|조립하는가 깎니|깎나|깎는가'),
+        PredicateForm.exclamation: words(r'조립하는구나|조립하네|조립하는군 깎는구나|깎네|깎는군'),
+        PredicateForm.casual: words(r'조립해 깎아'),
+        PredicateForm.casualQuestion: words(r'조립해|조립하지 깎아|깎지'),
+        PredicateForm.polite: words(r'조립해요 깎아요'),
+        PredicateForm.politeQuestion: words(r'조립해요|조립하죠 깎아요|깎죠'),
+        PredicateForm.formal: words(r'조립합니다 깎습니다'),
+        PredicateForm.formalQuestion: words(r'조립합니까 깎습니까'),
+        PredicateForm.linking: words(r'조립하고 깎고'),
+      },
+      past: conjugate(r'조립했 깎았', statement: '다', endings: _pastEndings),
     ),
     VerbGroup(
       field: VerbField.tend,
@@ -462,8 +538,12 @@ final SentenceLanguageData ko = SentenceLanguageData(
           고치는구나|고치네|고치는군 닦는구나|닦네|닦는군 손질하는구나|손질하네|손질하는군 다듬는구나|다듬네|다듬는군 정리하는구나|정리하네|정리하는군
           매만지는구나|매만지네|매만지는군 수리하는구나|수리하네|수리하는군
         '''),
-        PredicateForm.casual: words(r'고쳐|고치지 닦아|닦지 손질해|손질하지 다듬어|다듬지 정리해|정리하지 매만져|매만지지 수리해|수리하지'),
-        PredicateForm.polite: words(
+        PredicateForm.casual: words(r'고쳐 닦아 손질해 다듬어 정리해 매만져 수리해'),
+        PredicateForm.casualQuestion: words(
+          r'고쳐|고치지 닦아|닦지 손질해|손질하지 다듬어|다듬지 정리해|정리하지 매만져|매만지지 수리해|수리하지',
+        ),
+        PredicateForm.polite: words(r'고쳐요 닦아요 손질해요 다듬어요 정리해요 매만져요 수리해요'),
+        PredicateForm.politeQuestion: words(
           r'고쳐요|고치죠 닦아요|닦죠 손질해요|손질하죠 다듬어요|다듬죠 정리해요|정리하죠 매만져요|매만지죠 수리해요|수리하죠',
         ),
         PredicateForm.formal: words(r'고칩니다 닦습니다 손질합니다 다듬습니다 정리합니다 매만집니다 수리합니다'),
@@ -482,8 +562,10 @@ final SentenceLanguageData ko = SentenceLanguageData(
         PredicateForm.exclamation: words(
           r'파는구나|파네|파는군 넘기는구나|넘기네|넘기는군 건네는구나|건네네|건네는군 내놓는구나|내놓네|내놓는군',
         ),
-        PredicateForm.casual: words(r'팔아|팔지 넘겨|넘기지 건네|건네지 내놓아|내놓지'),
-        PredicateForm.polite: words(r'팔아요|팔죠 넘겨요|넘기죠 건네요|건네죠 내놓아요|내놓죠'),
+        PredicateForm.casual: words(r'팔아 넘겨 건네 내놓아'),
+        PredicateForm.casualQuestion: words(r'팔아|팔지 넘겨|넘기지 건네|건네지 내놓아|내놓지'),
+        PredicateForm.polite: words(r'팔아요 넘겨요 건네요 내놓아요'),
+        PredicateForm.politeQuestion: words(r'팔아요|팔죠 넘겨요|넘기죠 건네요|건네죠 내놓아요|내놓죠'),
         PredicateForm.formal: words(r'팝니다 넘깁니다 건넵니다 내놓습니다'),
         PredicateForm.formalQuestion: words(r'팝니까 넘깁니까 건넵니까 내놓습니까'),
         PredicateForm.linking: words(r'팔고 넘기고 건네고 내놓고'),
@@ -502,8 +584,10 @@ final SentenceLanguageData ko = SentenceLanguageData(
         PredicateForm.exclamation: words(r'''
           사는구나|사네|사는군 사오는구나|사오네|사오는군 구하는구나|구하네|구하는군 장만하는구나|장만하네|장만하는군 사들이는구나|사들이네|사들이는군
         '''),
-        PredicateForm.casual: words(r'사|사지 사와|사오지 구해|구하지 장만해|장만하지 사들여|사들이지'),
-        PredicateForm.polite: words(r'사요|사죠 사와요|사오죠 구해요|구하죠 장만해요|장만하죠 사들여요|사들이죠'),
+        PredicateForm.casual: words(r'사 사와 구해 장만해 사들여'),
+        PredicateForm.casualQuestion: words(r'사|사지 사와|사오지 구해|구하지 장만해|장만하지 사들여|사들이지'),
+        PredicateForm.polite: words(r'사요 사와요 구해요 장만해요 사들여요'),
+        PredicateForm.politeQuestion: words(r'사요|사죠 사와요|사오죠 구해요|구하죠 장만해요|장만하죠 사들여요|사들이죠'),
         PredicateForm.formal: words(r'삽니다 사옵니다 구합니다 장만합니다 사들입니다'),
         PredicateForm.formalQuestion: words(r'삽니까 사옵니까 구합니까 장만합니까 사들입니까'),
         PredicateForm.linking: words(r'사서|사고 사와서|사오고 구해서|구하고 장만해서|장만하고 사들여서|사들이고'),
@@ -523,8 +607,10 @@ final SentenceLanguageData ko = SentenceLanguageData(
         PredicateForm.exclamation: words(r'''
           굽는구나|굽네|굽는군 데우는구나|데우네|데우는군 끓이는구나|끓이네|끓이는군 요리하는구나|요리하네|요리하는군 써는구나|써네|써는군 담는구나|담네|담는군
         '''),
-        PredicateForm.casual: words(r'구워|굽지 데워|데우지 끓여|끓이지 요리해|요리하지 썰어|썰지 담아|담지'),
-        PredicateForm.polite: words(r'구워요|굽죠 데워요|데우죠 끓여요|끓이죠 요리해요|요리하죠 썰어요|썰죠 담아요|담죠'),
+        PredicateForm.casual: words(r'구워 데워 끓여 요리해 썰어 담아'),
+        PredicateForm.casualQuestion: words(r'구워|굽지 데워|데우지 끓여|끓이지 요리해|요리하지 썰어|썰지 담아|담지'),
+        PredicateForm.polite: words(r'구워요 데워요 끓여요 요리해요 썰어요 담아요'),
+        PredicateForm.politeQuestion: words(r'구워요|굽죠 데워요|데우죠 끓여요|끓이죠 요리해요|요리하죠 썰어요|썰죠 담아요|담죠'),
         PredicateForm.formal: words(r'굽습니다 데웁니다 끓입니다 요리합니다 썹니다 담습니다'),
         PredicateForm.formalQuestion: words(r'굽습니까 데웁니까 끓입니까 요리합니까 썹니까 담습니까'),
         PredicateForm.linking: words(r'구워서|굽고 데워서|데우고 끓여서|끓이고 요리해서|요리하고 썰어서|썰고 담아서|담고'),
@@ -545,8 +631,12 @@ final SentenceLanguageData ko = SentenceLanguageData(
           먹는구나|먹네|먹는군 씹는구나|씹네|씹는군 삼키는구나|삼키네|삼키는군 맛보는구나|맛보네|맛보는군 베어먹는구나|베어먹네|베어먹는군
           먹어치우는구나|먹어치우네|먹어치우는군
         '''),
-        PredicateForm.casual: words(r'먹어|먹지 씹어|씹지 삼켜|삼키지 맛봐|맛보지 베어먹어|베어먹지 먹어치워|먹어치우지'),
-        PredicateForm.polite: words(r'먹어요|먹죠 씹어요|씹죠 삼켜요|삼키죠 맛봐요|맛보죠 베어먹어요|베어먹죠 먹어치워요|먹어치우죠'),
+        PredicateForm.casual: words(r'먹어 씹어 삼켜 맛봐 베어먹어 먹어치워'),
+        PredicateForm.casualQuestion: words(r'먹어|먹지 씹어|씹지 삼켜|삼키지 맛봐|맛보지 베어먹어|베어먹지 먹어치워|먹어치우지'),
+        PredicateForm.polite: words(r'먹어요 씹어요 삼켜요 맛봐요 베어먹어요 먹어치워요'),
+        PredicateForm.politeQuestion: words(
+          r'먹어요|먹죠 씹어요|씹죠 삼켜요|삼키죠 맛봐요|맛보죠 베어먹어요|베어먹죠 먹어치워요|먹어치우죠',
+        ),
         PredicateForm.formal: words(r'먹습니다 씹습니다 삼킵니다 맛봅니다 베어먹습니다 먹어치웁니다'),
         PredicateForm.formalQuestion: words(r'먹습니까 씹습니까 삼킵니까 맛봅니까 베어먹습니까 먹어치웁니까'),
         PredicateForm.linking: words(r'먹고 씹고 삼키고 맛보고 베어먹고 먹어치우고'),
@@ -566,8 +656,10 @@ final SentenceLanguageData ko = SentenceLanguageData(
         PredicateForm.exclamation: words(
           r'마시는구나|마시네|마시는군 들이키는구나|들이키네|들이키는군 홀짝이는구나|홀짝이네|홀짝이는군 음미하는구나|음미하네|음미하는군',
         ),
-        PredicateForm.casual: words(r'마셔|마시지 들이켜|들이키지 홀짝여|홀짝이지 음미해|음미하지'),
-        PredicateForm.polite: words(r'마셔요|마시죠 들이켜요|들이키죠 홀짝여요|홀짝이죠 음미해요|음미하죠'),
+        PredicateForm.casual: words(r'마셔 들이켜 홀짝여 음미해'),
+        PredicateForm.casualQuestion: words(r'마셔|마시지 들이켜|들이키지 홀짝여|홀짝이지 음미해|음미하지'),
+        PredicateForm.polite: words(r'마셔요 들이켜요 홀짝여요 음미해요'),
+        PredicateForm.politeQuestion: words(r'마셔요|마시죠 들이켜요|들이키죠 홀짝여요|홀짝이죠 음미해요|음미하죠'),
         PredicateForm.formal: words(r'마십니다 들이킵니다 홀짝입니다 음미합니다'),
         PredicateForm.formalQuestion: words(r'마십니까 들이킵니까 홀짝입니까 음미합니까'),
         PredicateForm.linking: words(r'마시고 들이키고 홀짝이고 음미하고'),
@@ -587,10 +679,12 @@ final SentenceLanguageData ko = SentenceLanguageData(
           조용해지는구나|조용해지네|조용해지는군 어두워지는구나|어두워지네|어두워지는군 밝아오는구나|밝아오네|밝아오는군 고요해지는구나|고요해지네|고요해지는군
           붐비는구나|붐비네|붐비는군 물드는구나|물드네|물드는군 환해지는구나|환해지네|환해지는군 잠잠해지는구나|잠잠해지네|잠잠해지는군
         '''),
-        PredicateForm.casual: words(r'''
+        PredicateForm.casual: words(r'조용해져 어두워져 밝아와 고요해져 붐벼 물들어 환해져 잠잠해져'),
+        PredicateForm.casualQuestion: words(r'''
           조용해져|조용해지지 어두워져|어두워지지 밝아와|밝아오지 고요해져|고요해지지 붐벼|붐비지 물들어|물들지 환해져|환해지지 잠잠해져|잠잠해지지
         '''),
-        PredicateForm.polite: words(r'''
+        PredicateForm.polite: words(r'조용해져요 어두워져요 밝아와요 고요해져요 붐벼요 물들어요 환해져요 잠잠해져요'),
+        PredicateForm.politeQuestion: words(r'''
           조용해져요|조용해지죠 어두워져요|어두워지죠 밝아와요|밝아오죠 고요해져요|고요해지죠 붐벼요|붐비죠 물들어요|물들죠 환해져요|환해지죠 잠잠해져요|잠잠해지죠
         '''),
         PredicateForm.formal: words(r'조용해집니다 어두워집니다 밝아옵니다 고요해집니다 붐빕니다 물듭니다 환해집니다 잠잠해집니다'),
@@ -612,10 +706,12 @@ final SentenceLanguageData ko = SentenceLanguageData(
           빛나는구나|빛나네|빛나는군 흐르는구나|흐르네|흐르는군 저무는구나|저무네|저무는군 깊어지는구나|깊어지네|깊어지는군 시작되는구나|시작되네|시작되는군
           끝나는구나|끝나네|끝나는군 이어지는구나|이어지네|이어지는군 지나가는구나|지나가네|지나가는군
         '''),
-        PredicateForm.casual: words(
+        PredicateForm.casual: words(r'빛나 흘러 저물어 깊어져 시작돼 끝나 이어져 지나가'),
+        PredicateForm.casualQuestion: words(
           r'빛나|빛나지 흘러|흐르지 저물어|저물지 깊어져|깊어지지 시작돼|시작되지 끝나|끝나지 이어져|이어지지 지나가|지나가지',
         ),
-        PredicateForm.polite: words(r'''
+        PredicateForm.polite: words(r'빛나요 흘러요 저물어요 깊어져요 시작돼요 끝나요 이어져요 지나가요'),
+        PredicateForm.politeQuestion: words(r'''
           빛나요|빛나죠 흘러요|흐르죠 저물어요|저물죠 깊어져요|깊어지죠 시작돼요|시작되죠 끝나요|끝나죠 이어져요|이어지죠 지나가요|지나가죠
         '''),
         PredicateForm.formal: words(r'빛납니다 흐릅니다 저뭅니다 깊어집니다 시작됩니다 끝납니다 이어집니다 지나갑니다'),
@@ -637,8 +733,12 @@ final SentenceLanguageData ko = SentenceLanguageData(
           흔들리는구나|흔들리네|흔들리는군 반짝이는구나|반짝이네|반짝이는군 떨어지는구나|떨어지네|떨어지는군 굴러가는구나|굴러가네|굴러가는군
           기울어지는구나|기울어지네|기울어지는군 낡아가는구나|낡아가네|낡아가는군
         '''),
-        PredicateForm.casual: words(r'흔들려|흔들리지 반짝여|반짝이지 떨어져|떨어지지 굴러가|굴러가지 기울어져|기울어지지 낡아가|낡아가지'),
-        PredicateForm.polite: words(
+        PredicateForm.casual: words(r'흔들려 반짝여 떨어져 굴러가 기울어져 낡아가'),
+        PredicateForm.casualQuestion: words(
+          r'흔들려|흔들리지 반짝여|반짝이지 떨어져|떨어지지 굴러가|굴러가지 기울어져|기울어지지 낡아가|낡아가지',
+        ),
+        PredicateForm.polite: words(r'흔들려요 반짝여요 떨어져요 굴러가요 기울어져요 낡아가요'),
+        PredicateForm.politeQuestion: words(
           r'흔들려요|흔들리죠 반짝여요|반짝이죠 떨어져요|떨어지죠 굴러가요|굴러가죠 기울어져요|기울어지죠 낡아가요|낡아가죠',
         ),
         PredicateForm.formal: words(r'흔들립니다 반짝입니다 떨어집니다 굴러갑니다 기울어집니다 낡아갑니다'),
@@ -660,8 +760,12 @@ final SentenceLanguageData ko = SentenceLanguageData(
           달리는구나|달리네|달리는군 멈추는구나|멈추네|멈추는군 지나가는구나|지나가네|지나가는군 돌아오는구나|돌아오네|돌아오는군 출발하는구나|출발하네|출발하는군
           미끄러지는구나|미끄러지네|미끄러지는군
         '''),
-        PredicateForm.casual: words(r'달려|달리지 멈춰|멈추지 지나가|지나가지 돌아와|돌아오지 출발해|출발하지 미끄러져|미끄러지지'),
-        PredicateForm.polite: words(r'달려요|달리죠 멈춰요|멈추죠 지나가요|지나가죠 돌아와요|돌아오죠 출발해요|출발하죠 미끄러져요|미끄러지죠'),
+        PredicateForm.casual: words(r'달려 멈춰 지나가 돌아와 출발해 미끄러져'),
+        PredicateForm.casualQuestion: words(r'달려|달리지 멈춰|멈추지 지나가|지나가지 돌아와|돌아오지 출발해|출발하지 미끄러져|미끄러지지'),
+        PredicateForm.polite: words(r'달려요 멈춰요 지나가요 돌아와요 출발해요 미끄러져요'),
+        PredicateForm.politeQuestion: words(
+          r'달려요|달리죠 멈춰요|멈추죠 지나가요|지나가죠 돌아와요|돌아오죠 출발해요|출발하죠 미끄러져요|미끄러지죠',
+        ),
         PredicateForm.formal: words(r'달립니다 멈춥니다 지나갑니다 돌아옵니다 출발합니다 미끄러집니다'),
         PredicateForm.formalQuestion: words(r'달립니까 멈춥니까 지나갑니까 돌아옵니까 출발합니까 미끄러집니까'),
         PredicateForm.linking: words(r'달리고 멈추고 지나가고 돌아오고 출발하고 미끄러지고'),
@@ -680,8 +784,12 @@ final SentenceLanguageData ko = SentenceLanguageData(
           번지는구나|번지네|번지는군 사라지는구나|사라지네|사라지는군 남는구나|남네|남는군 스며드는구나|스며드네|스며드는군 되풀이되는구나|되풀이되네|되풀이되는군
           짙어지는구나|짙어지네|짙어지는군
         '''),
-        PredicateForm.casual: words(r'번져|번지지 사라져|사라지지 남아|남지 스며들어|스며들지 되풀이돼|되풀이되지 짙어져|짙어지지'),
-        PredicateForm.polite: words(r'번져요|번지죠 사라져요|사라지죠 남아요|남죠 스며들어요|스며들죠 되풀이돼요|되풀이되죠 짙어져요|짙어지죠'),
+        PredicateForm.casual: words(r'번져 사라져 남아 스며들어 되풀이돼 짙어져'),
+        PredicateForm.casualQuestion: words(r'번져|번지지 사라져|사라지지 남아|남지 스며들어|스며들지 되풀이돼|되풀이되지 짙어져|짙어지지'),
+        PredicateForm.polite: words(r'번져요 사라져요 남아요 스며들어요 되풀이돼요 짙어져요'),
+        PredicateForm.politeQuestion: words(
+          r'번져요|번지죠 사라져요|사라지죠 남아요|남죠 스며들어요|스며들죠 되풀이돼요|되풀이되죠 짙어져요|짙어지죠',
+        ),
         PredicateForm.formal: words(r'번집니다 사라집니다 남습니다 스며듭니다 되풀이됩니다 짙어집니다'),
         PredicateForm.formalQuestion: words(r'번집니까 사라집니까 남습니까 스며듭니까 되풀이됩니까 짙어집니까'),
         PredicateForm.linking: words(r'번지고 사라지고 남고 스며들고 되풀이되고 짙어지고'),
@@ -699,8 +807,10 @@ final SentenceLanguageData ko = SentenceLanguageData(
         PredicateForm.exclamation: words(r'''
           자라는구나|자라네|자라는군 시드는구나|시드네|시드는군 피어나는구나|피어나네|피어나는군 흔들리는구나|흔들리네|흔들리는군 뿌리내리는구나|뿌리내리네|뿌리내리는군
         '''),
-        PredicateForm.casual: words(r'자라|자라지 시들어|시들지 피어나|피어나지 흔들려|흔들리지 뿌리내려|뿌리내리지'),
-        PredicateForm.polite: words(r'자라요|자라죠 시들어요|시들죠 피어나요|피어나죠 흔들려요|흔들리죠 뿌리내려요|뿌리내리죠'),
+        PredicateForm.casual: words(r'자라 시들어 피어나 흔들려 뿌리내려'),
+        PredicateForm.casualQuestion: words(r'자라|자라지 시들어|시들지 피어나|피어나지 흔들려|흔들리지 뿌리내려|뿌리내리지'),
+        PredicateForm.polite: words(r'자라요 시들어요 피어나요 흔들려요 뿌리내려요'),
+        PredicateForm.politeQuestion: words(r'자라요|자라죠 시들어요|시들죠 피어나요|피어나죠 흔들려요|흔들리죠 뿌리내려요|뿌리내리죠'),
         PredicateForm.formal: words(r'자랍니다 시듭니다 피어납니다 흔들립니다 뿌리내립니다'),
         PredicateForm.formalQuestion: words(r'자랍니까 시듭니까 피어납니까 흔들립니까 뿌리내립니까'),
         PredicateForm.linking: words(r'자라고 시들고 피어나고 흔들리고 뿌리내리고'),
@@ -716,8 +826,10 @@ final SentenceLanguageData ko = SentenceLanguageData(
         PredicateForm.exclamation: words(
           r'떨리는구나|떨리네|떨리는군 움직이는구나|움직이네|움직이는군 저리는구나|저리네|저리는군 굳는구나|굳네|굳는군',
         ),
-        PredicateForm.casual: words(r'떨려|떨리지 움직여|움직이지 저려|저리지 굳어|굳지'),
-        PredicateForm.polite: words(r'떨려요|떨리죠 움직여요|움직이죠 저려요|저리죠 굳어요|굳죠'),
+        PredicateForm.casual: words(r'떨려 움직여 저려 굳어'),
+        PredicateForm.casualQuestion: words(r'떨려|떨리지 움직여|움직이지 저려|저리지 굳어|굳지'),
+        PredicateForm.polite: words(r'떨려요 움직여요 저려요 굳어요'),
+        PredicateForm.politeQuestion: words(r'떨려요|떨리죠 움직여요|움직이죠 저려요|저리죠 굳어요|굳죠'),
         PredicateForm.formal: words(r'떨립니다 움직입니다 저립니다 굳습니다'),
         PredicateForm.formalQuestion: words(r'떨립니까 움직입니까 저립니까 굳습니까'),
         PredicateForm.linking: words(r'떨리고 움직이고 저리고 굳고'),
@@ -735,8 +847,10 @@ final SentenceLanguageData ko = SentenceLanguageData(
         PredicateForm.exclamation: words(r'''
           익는구나|익네|익는군 식는구나|식네|식는군 끓는구나|끓네|끓는군 녹는구나|녹네|녹는군 상하는구나|상하네|상하는군 남는구나|남네|남는군
         '''),
-        PredicateForm.casual: words(r'익어|익지 식어|식지 끓어|끓지 녹아|녹지 상해|상하지 남아|남지'),
-        PredicateForm.polite: words(r'익어요|익죠 식어요|식죠 끓어요|끓죠 녹아요|녹죠 상해요|상하죠 남아요|남죠'),
+        PredicateForm.casual: words(r'익어 식어 끓어 녹아 상해 남아'),
+        PredicateForm.casualQuestion: words(r'익어|익지 식어|식지 끓어|끓지 녹아|녹지 상해|상하지 남아|남지'),
+        PredicateForm.polite: words(r'익어요 식어요 끓어요 녹아요 상해요 남아요'),
+        PredicateForm.politeQuestion: words(r'익어요|익죠 식어요|식죠 끓어요|끓죠 녹아요|녹죠 상해요|상하죠 남아요|남죠'),
         PredicateForm.formal: words(r'익습니다 식습니다 끓습니다 녹습니다 상합니다 남습니다'),
         PredicateForm.formalQuestion: words(r'익습니까 식습니까 끓습니까 녹습니까 상합니까 남습니까'),
         PredicateForm.linking: words(r'익고 식고 끓고 녹고 상하고 남고'),
@@ -758,11 +872,13 @@ final SentenceLanguageData ko = SentenceLanguageData(
           용감하구나|용감하네|용감하군 게으르구나|게으르네|게으르군 부지런하구나|부지런하네|부지런하군 사납구나|사납네|사납군 순하구나|순하네|순하군
           영리하구나|영리하네|영리하군
         '''),
-        PredicateForm.casual: words(r'''
+        PredicateForm.casual: words(r'커 작아 빨라 느려 조용해 시끄러워 용감해 게을러 부지런해 사나워 순해 영리해'),
+        PredicateForm.casualQuestion: words(r'''
           커|크지 작아|작지 빨라|빠르지 느려|느리지 조용해|조용하지 시끄러워|시끄럽지 용감해|용감하지 게을러|게으르지 부지런해|부지런하지 사나워|사납지 순해|순하지
           영리해|영리하지
         '''),
-        PredicateForm.polite: words(r'''
+        PredicateForm.polite: words(r'커요 작아요 빨라요 느려요 조용해요 시끄러워요 용감해요 게을러요 부지런해요 사나워요 순해요 영리해요'),
+        PredicateForm.politeQuestion: words(r'''
           커요|크죠 작아요|작죠 빨라요|빠르죠 느려요|느리죠 조용해요|조용하죠 시끄러워요|시끄럽죠 용감해요|용감하죠 게을러요|게으르죠 부지런해요|부지런하죠 사나워요|사납죠
           순해요|순하죠 영리해요|영리하죠
         '''),
@@ -786,8 +902,10 @@ final SentenceLanguageData ko = SentenceLanguageData(
       forms: <PredicateForm, WordPool>{
         PredicateForm.question: words(r'배고프니|배고픈가 허기지니|허기진가'),
         PredicateForm.exclamation: words(r'배고프구나|배고프네|배고프군 허기지구나|허기지네|허기지군'),
-        PredicateForm.casual: words(r'배고파|배고프지 허기져|허기지지'),
-        PredicateForm.polite: words(r'배고파요|배고프죠 허기져요|허기지죠'),
+        PredicateForm.casual: words(r'배고파 허기져'),
+        PredicateForm.casualQuestion: words(r'배고파|배고프지 허기져|허기지지'),
+        PredicateForm.polite: words(r'배고파요 허기져요'),
+        PredicateForm.politeQuestion: words(r'배고파요|배고프죠 허기져요|허기지죠'),
         PredicateForm.formal: words(r'배고픕니다 허기집니다'),
         PredicateForm.formalQuestion: words(r'배고픕니까 허기집니까'),
       },
@@ -800,8 +918,10 @@ final SentenceLanguageData ko = SentenceLanguageData(
       forms: <PredicateForm, WordPool>{
         PredicateForm.question: words(r'배부르니|배부른가 든든하니|든든한가'),
         PredicateForm.exclamation: words(r'배부르구나|배부르네|배부르군 든든하구나|든든하네|든든하군'),
-        PredicateForm.casual: words(r'배불러|배부르지 든든해|든든하지'),
-        PredicateForm.polite: words(r'배불러요|배부르죠 든든해요|든든하죠'),
+        PredicateForm.casual: words(r'배불러 든든해'),
+        PredicateForm.casualQuestion: words(r'배불러|배부르지 든든해|든든하지'),
+        PredicateForm.polite: words(r'배불러요 든든해요'),
+        PredicateForm.politeQuestion: words(r'배불러요|배부르죠 든든해요|든든하죠'),
         PredicateForm.formal: words(r'배부릅니다 든든합니다'),
         PredicateForm.formalQuestion: words(r'배부릅니까 든든합니까'),
       },
@@ -816,8 +936,10 @@ final SentenceLanguageData ko = SentenceLanguageData(
         PredicateForm.exclamation: words(
           r'피곤하구나|피곤하네|피곤하군 졸리구나|졸리네|졸리군 나른하구나|나른하네|나른하군 고단하구나|고단하네|고단하군',
         ),
-        PredicateForm.casual: words(r'피곤해|피곤하지 졸려|졸리지 나른해|나른하지 고단해|고단하지'),
-        PredicateForm.polite: words(r'피곤해요|피곤하죠 졸려요|졸리죠 나른해요|나른하죠 고단해요|고단하죠'),
+        PredicateForm.casual: words(r'피곤해 졸려 나른해 고단해'),
+        PredicateForm.casualQuestion: words(r'피곤해|피곤하지 졸려|졸리지 나른해|나른하지 고단해|고단하지'),
+        PredicateForm.polite: words(r'피곤해요 졸려요 나른해요 고단해요'),
+        PredicateForm.politeQuestion: words(r'피곤해요|피곤하죠 졸려요|졸리죠 나른해요|나른하죠 고단해요|고단하죠'),
         PredicateForm.formal: words(r'피곤합니다 졸립니다 나른합니다 고단합니다'),
         PredicateForm.formalQuestion: words(r'피곤합니까 졸립니까 나른합니까 고단합니까'),
       },
@@ -830,8 +952,10 @@ final SentenceLanguageData ko = SentenceLanguageData(
       forms: <PredicateForm, WordPool>{
         PredicateForm.question: words(r'상쾌하니|상쾌한가 개운하니|개운한가 활기차니|활기찬가'),
         PredicateForm.exclamation: words(r'상쾌하구나|상쾌하네|상쾌하군 개운하구나|개운하네|개운하군 활기차구나|활기차네|활기차군'),
-        PredicateForm.casual: words(r'상쾌해|상쾌하지 개운해|개운하지 활기차|활기차지'),
-        PredicateForm.polite: words(r'상쾌해요|상쾌하죠 개운해요|개운하죠 활기차요|활기차죠'),
+        PredicateForm.casual: words(r'상쾌해 개운해 활기차'),
+        PredicateForm.casualQuestion: words(r'상쾌해|상쾌하지 개운해|개운하지 활기차|활기차지'),
+        PredicateForm.polite: words(r'상쾌해요 개운해요 활기차요'),
+        PredicateForm.politeQuestion: words(r'상쾌해요|상쾌하죠 개운해요|개운하죠 활기차요|활기차죠'),
         PredicateForm.formal: words(r'상쾌합니다 개운합니다 활기찹니다'),
         PredicateForm.formalQuestion: words(r'상쾌합니까 개운합니까 활기찹니까'),
       },
@@ -849,8 +973,14 @@ final SentenceLanguageData ko = SentenceLanguageData(
           기쁘구나|기쁘네|기쁘군 즐겁구나|즐겁네|즐겁군 편안하구나|편안하네|편안하군 만족스럽구나|만족스럽네|만족스럽군 행복하구나|행복하네|행복하군
           뿌듯하구나|뿌듯하네|뿌듯하군
         '''),
-        PredicateForm.casual: words(r'기뻐|기쁘지 즐거워|즐겁지 편안해|편안하지 만족스러워|만족스럽지 행복해|행복하지 뿌듯해|뿌듯하지'),
-        PredicateForm.polite: words(r'기뻐요|기쁘죠 즐거워요|즐겁죠 편안해요|편안하죠 만족스러워요|만족스럽죠 행복해요|행복하죠 뿌듯해요|뿌듯하죠'),
+        PredicateForm.casual: words(r'기뻐 즐거워 편안해 만족스러워 행복해 뿌듯해'),
+        PredicateForm.casualQuestion: words(
+          r'기뻐|기쁘지 즐거워|즐겁지 편안해|편안하지 만족스러워|만족스럽지 행복해|행복하지 뿌듯해|뿌듯하지',
+        ),
+        PredicateForm.polite: words(r'기뻐요 즐거워요 편안해요 만족스러워요 행복해요 뿌듯해요'),
+        PredicateForm.politeQuestion: words(
+          r'기뻐요|기쁘죠 즐거워요|즐겁죠 편안해요|편안하죠 만족스러워요|만족스럽죠 행복해요|행복하죠 뿌듯해요|뿌듯하죠',
+        ),
         PredicateForm.formal: words(r'기쁩니다 즐겁습니다 편안합니다 만족스럽습니다 행복합니다 뿌듯합니다'),
         PredicateForm.formalQuestion: words(r'기쁩니까 즐겁습니까 편안합니까 만족스럽습니까 행복합니까 뿌듯합니까'),
       },
@@ -865,8 +995,10 @@ final SentenceLanguageData ko = SentenceLanguageData(
         PredicateForm.exclamation: words(
           r'심심하구나|심심하네|심심하군 궁금하구나|궁금하네|궁금하군 초조하구나|초조하네|초조하군 답답하구나|답답하네|답답하군',
         ),
-        PredicateForm.casual: words(r'심심해|심심하지 궁금해|궁금하지 초조해|초조하지 답답해|답답하지'),
-        PredicateForm.polite: words(r'심심해요|심심하죠 궁금해요|궁금하죠 초조해요|초조하죠 답답해요|답답하죠'),
+        PredicateForm.casual: words(r'심심해 궁금해 초조해 답답해'),
+        PredicateForm.casualQuestion: words(r'심심해|심심하지 궁금해|궁금하지 초조해|초조하지 답답해|답답하지'),
+        PredicateForm.polite: words(r'심심해요 궁금해요 초조해요 답답해요'),
+        PredicateForm.politeQuestion: words(r'심심해요|심심하죠 궁금해요|궁금하죠 초조해요|초조하죠 답답해요|답답하죠'),
         PredicateForm.formal: words(r'심심합니다 궁금합니다 초조합니다 답답합니다'),
         PredicateForm.formalQuestion: words(r'심심합니까 궁금합니까 초조합니까 답답합니까'),
       },
@@ -891,8 +1023,10 @@ final SentenceLanguageData ko = SentenceLanguageData(
         PredicateForm.exclamation: words(
           r'아름답구나|아름답네|아름답군 낯설구나|낯서네|낯설군 새롭구나|새롭네|새롭군 흔하구나|흔하네|흔하군 드물구나|드무네|드물군',
         ),
-        PredicateForm.casual: words(r'아름다워|아름답지 낯설어|낯설지 새로워|새롭지 흔해|흔하지 드물어|드물지'),
-        PredicateForm.polite: words(r'아름다워요|아름답죠 낯설어요|낯설죠 새로워요|새롭죠 흔해요|흔하죠 드물어요|드물죠'),
+        PredicateForm.casual: words(r'아름다워 낯설어 새로워 흔해 드물어'),
+        PredicateForm.casualQuestion: words(r'아름다워|아름답지 낯설어|낯설지 새로워|새롭지 흔해|흔하지 드물어|드물지'),
+        PredicateForm.polite: words(r'아름다워요 낯설어요 새로워요 흔해요 드물어요'),
+        PredicateForm.politeQuestion: words(r'아름다워요|아름답죠 낯설어요|낯설죠 새로워요|새롭죠 흔해요|흔하죠 드물어요|드물죠'),
         PredicateForm.formal: words(r'아름답습니다 낯섭니다 새롭습니다 흔합니다 드뭅니다'),
         PredicateForm.formalQuestion: words(r'아름답습니까 낯섭니까 새롭습니까 흔합니까 드뭅니까'),
       },
@@ -909,8 +1043,12 @@ final SentenceLanguageData ko = SentenceLanguageData(
           넓구나|넓네|넓군 좁구나|좁네|좁군 고요하구나|고요하네|고요하군 깊구나|깊네|깊군 어둡구나|어둡네|어둡군 밝구나|밝네|밝군 아득하구나|아득하네|아득하군
           가파르구나|가파르네|가파르군
         '''),
-        PredicateForm.casual: words(r'넓어|넓지 좁아|좁지 고요해|고요하지 깊어|깊지 어두워|어둡지 밝아|밝지 아득해|아득하지 가팔라|가파르지'),
-        PredicateForm.polite: words(
+        PredicateForm.casual: words(r'넓어 좁아 고요해 깊어 어두워 밝아 아득해 가팔라'),
+        PredicateForm.casualQuestion: words(
+          r'넓어|넓지 좁아|좁지 고요해|고요하지 깊어|깊지 어두워|어둡지 밝아|밝지 아득해|아득하지 가팔라|가파르지',
+        ),
+        PredicateForm.polite: words(r'넓어요 좁아요 고요해요 깊어요 어두워요 밝아요 아득해요 가팔라요'),
+        PredicateForm.politeQuestion: words(
           r'넓어요|넓죠 좁아요|좁죠 고요해요|고요하죠 깊어요|깊죠 어두워요|어둡죠 밝아요|밝죠 아득해요|아득하죠 가팔라요|가파르죠',
         ),
         PredicateForm.formal: words(r'넓습니다 좁습니다 고요합니다 깊습니다 어둡습니다 밝습니다 아득합니다 가파릅니다'),
@@ -929,10 +1067,12 @@ final SentenceLanguageData ko = SentenceLanguageData(
           단단하구나|단단하네|단단하군 가볍구나|가볍네|가볍군 무겁구나|무겁네|무겁군 매끈하구나|매끈하네|매끈하군 투명하구나|투명하네|투명하군 튼튼하구나|튼튼하네|튼튼하군
           반들반들하구나|반들반들하네|반들반들하군
         '''),
-        PredicateForm.casual: words(
+        PredicateForm.casual: words(r'단단해 가벼워 무거워 매끈해 투명해 튼튼해 반들반들해'),
+        PredicateForm.casualQuestion: words(
           r'단단해|단단하지 가벼워|가볍지 무거워|무겁지 매끈해|매끈하지 투명해|투명하지 튼튼해|튼튼하지 반들반들해|반들반들하지',
         ),
-        PredicateForm.polite: words(
+        PredicateForm.polite: words(r'단단해요 가벼워요 무거워요 매끈해요 투명해요 튼튼해요 반들반들해요'),
+        PredicateForm.politeQuestion: words(
           r'단단해요|단단하죠 가벼워요|가볍죠 무거워요|무겁죠 매끈해요|매끈하죠 투명해요|투명하죠 튼튼해요|튼튼하죠 반들반들해요|반들반들하죠',
         ),
         PredicateForm.formal: words(r'단단합니다 가볍습니다 무겁습니다 매끈합니다 투명합니다 튼튼합니다 반들반들합니다'),
@@ -951,8 +1091,12 @@ final SentenceLanguageData ko = SentenceLanguageData(
           달구나|다네|달군 짜구나|짜네|짜군 맵구나|맵네|맵군 시구나|시네|시군 뜨겁구나|뜨겁네|뜨겁군 차갑구나|차갑네|차갑군 고소하구나|고소하네|고소하군
           담백하구나|담백하네|담백하군
         '''),
-        PredicateForm.casual: words(r'달아|달지 짜|짜지 매워|맵지 셔|시지 뜨거워|뜨겁지 차가워|차갑지 고소해|고소하지 담백해|담백하지'),
-        PredicateForm.polite: words(
+        PredicateForm.casual: words(r'달아 짜 매워 셔 뜨거워 차가워 고소해 담백해'),
+        PredicateForm.casualQuestion: words(
+          r'달아|달지 짜|짜지 매워|맵지 셔|시지 뜨거워|뜨겁지 차가워|차갑지 고소해|고소하지 담백해|담백하지',
+        ),
+        PredicateForm.polite: words(r'달아요 짜요 매워요 셔요 뜨거워요 차가워요 고소해요 담백해요'),
+        PredicateForm.politeQuestion: words(
           r'달아요|달죠 짜요|짜죠 매워요|맵죠 셔요|시죠 뜨거워요|뜨겁죠 차가워요|차갑죠 고소해요|고소하죠 담백해요|담백하죠',
         ),
         PredicateForm.formal: words(r'답니다 짭니다 맵습니다 십니다 뜨겁습니다 차갑습니다 고소합니다 담백합니다'),
@@ -968,8 +1112,12 @@ final SentenceLanguageData ko = SentenceLanguageData(
         PredicateForm.exclamation: words(r'''
           어렵구나|어렵네|어렵군 쉽구나|쉽네|쉽군 분명하구나|분명하네|분명하군 흐릿하구나|흐릿하네|흐릿하군 영원하구나|영원하네|영원하군 덧없구나|덧없네|덧없군
         '''),
-        PredicateForm.casual: words(r'어려워|어렵지 쉬워|쉽지 분명해|분명하지 흐릿해|흐릿하지 영원해|영원하지 덧없어|덧없지'),
-        PredicateForm.polite: words(r'어려워요|어렵죠 쉬워요|쉽죠 분명해요|분명하죠 흐릿해요|흐릿하죠 영원해요|영원하죠 덧없어요|덧없죠'),
+        PredicateForm.casual: words(r'어려워 쉬워 분명해 흐릿해 영원해 덧없어'),
+        PredicateForm.casualQuestion: words(r'어려워|어렵지 쉬워|쉽지 분명해|분명하지 흐릿해|흐릿하지 영원해|영원하지 덧없어|덧없지'),
+        PredicateForm.polite: words(r'어려워요 쉬워요 분명해요 흐릿해요 영원해요 덧없어요'),
+        PredicateForm.politeQuestion: words(
+          r'어려워요|어렵죠 쉬워요|쉽죠 분명해요|분명하죠 흐릿해요|흐릿하죠 영원해요|영원하죠 덧없어요|덧없죠',
+        ),
         PredicateForm.formal: words(r'어렵습니다 쉽습니다 분명합니다 흐릿합니다 영원합니다 덧없습니다'),
         PredicateForm.formalQuestion: words(r'어렵습니까 쉽습니까 분명합니까 흐릿합니까 영원합니까 덧없습니까'),
       },
@@ -983,8 +1131,10 @@ final SentenceLanguageData ko = SentenceLanguageData(
         PredicateForm.exclamation: words(
           r'푸르구나|푸르네|푸르군 무성하구나|무성하네|무성하군 향기롭구나|향기롭네|향기롭군 시들하구나|시들하네|시들하군',
         ),
-        PredicateForm.casual: words(r'푸르러|푸르지 무성해|무성하지 향기로워|향기롭지 시들해|시들하지'),
-        PredicateForm.polite: words(r'푸르러요|푸르죠 무성해요|무성하죠 향기로워요|향기롭죠 시들해요|시들하죠'),
+        PredicateForm.casual: words(r'푸르러 무성해 향기로워 시들해'),
+        PredicateForm.casualQuestion: words(r'푸르러|푸르지 무성해|무성하지 향기로워|향기롭지 시들해|시들하지'),
+        PredicateForm.polite: words(r'푸르러요 무성해요 향기로워요 시들해요'),
+        PredicateForm.politeQuestion: words(r'푸르러요|푸르죠 무성해요|무성하죠 향기로워요|향기롭죠 시들해요|시들하죠'),
         PredicateForm.formal: words(r'푸릅니다 무성합니다 향기롭습니다 시들합니다'),
         PredicateForm.formalQuestion: words(r'푸릅니까 무성합니까 향기롭습니까 시들합니까'),
       },
@@ -998,8 +1148,10 @@ final SentenceLanguageData ko = SentenceLanguageData(
         PredicateForm.exclamation: words(
           r'따뜻하구나|따뜻하네|따뜻하군 차갑구나|차갑네|차갑군 아프구나|아프네|아프군 뻣뻣하구나|뻣뻣하네|뻣뻣하군',
         ),
-        PredicateForm.casual: words(r'따뜻해|따뜻하지 차가워|차갑지 아파|아프지 뻣뻣해|뻣뻣하지'),
-        PredicateForm.polite: words(r'따뜻해요|따뜻하죠 차가워요|차갑죠 아파요|아프죠 뻣뻣해요|뻣뻣하죠'),
+        PredicateForm.casual: words(r'따뜻해 차가워 아파 뻣뻣해'),
+        PredicateForm.casualQuestion: words(r'따뜻해|따뜻하지 차가워|차갑지 아파|아프지 뻣뻣해|뻣뻣하지'),
+        PredicateForm.polite: words(r'따뜻해요 차가워요 아파요 뻣뻣해요'),
+        PredicateForm.politeQuestion: words(r'따뜻해요|따뜻하죠 차가워요|차갑죠 아파요|아프죠 뻣뻣해요|뻣뻣하죠'),
         PredicateForm.formal: words(r'따뜻합니다 차갑습니다 아픕니다 뻣뻣합니다'),
         PredicateForm.formalQuestion: words(r'따뜻합니까 차갑습니까 아픕니까 뻣뻣합니까'),
       },
@@ -1024,7 +1176,7 @@ final SentenceLanguageData ko = SentenceLanguageData(
     ModifierGroup(
       subject: const <NounClass>[NounClass.edible],
       themes: const <WordTheme>[WordTheme.food],
-      words: words(r'달콤한 매콤한 따뜻한 신선한 바삭한 고소한 향긋한 뜨거운 짭짤한 말랑한 촉촉한 새콤한 잘익은 먹음직한 담백한'),
+      words: words(r'달콤한 매콤한 따뜻한 신선한 바삭한 고소한 향긋한 뜨거운 짭짤한 말랑한 촉촉한 새콤한 먹음직한 담백한'),
     ),
     ModifierGroup(
       subject: const <NounClass>[NounClass.edible],
@@ -1052,10 +1204,7 @@ final SentenceLanguageData ko = SentenceLanguageData(
       subject: const <NounClass>[NounClass.event],
       words: words(r'긴 짧은 조용한 화창한 흐린 요란한 갑작스러운 느긋한'),
     ),
-    ModifierGroup(
-      subject: const <NounClass>[NounClass.body],
-      words: words(r'작은 차가운 따뜻한 가느다란 튼튼한 여린'),
-    ),
+    ModifierGroup(subject: const <NounClass>[NounClass.body], words: words(r'작은 차가운 따뜻한 튼튼한 여린')),
     ModifierGroup(
       subject: const <NounClass>[
         NounClass.creature,
@@ -1094,10 +1243,11 @@ final SentenceLanguageData ko = SentenceLanguageData(
     ),
   ],
   times: SentenceTimes(
-    day: words(r'새벽에 이른아침에 아침에 한낮에 정오에 낮에 오후에 해질녘에 초저녁에 저녁에 밤에 한밤중에 자정에'),
+    day: words(r'새벽에 이른아침에 아침에 한낮에 오후에 해질녘에 초저녁에 저녁에 밤에 한밤중에'),
     any: words(r'봄에 여름에 가을에 겨울에 주말에 휴일에 명절에 장마철에 이른봄에 늦가을에 새해에'),
     past: words(r'어제 지난주에 오래전에 한때 그날 그때 며칠전에 지난밤에'),
-    present: words(r'오늘 요즘 방금 이제 내일 다음주에 가끔 매일'),
+    present: words(r'오늘 방금 이제 내일 다음주에'),
+    habitual: words(r'요즘 가끔 매일 자주 이따금'),
   ),
   homes: words(r'집'),
   join: const SentenceJoin(form: PredicateForm.linking),
@@ -1142,8 +1292,10 @@ final SentenceLanguageData ko = SentenceLanguageData(
       forms: <PredicateForm, WordPool>{
         PredicateForm.question: <String>['이니|인가'],
         PredicateForm.exclamation: <String>['이구나|이네'],
-        PredicateForm.casual: <String>['이야|이지'],
-        PredicateForm.polite: <String>['이에요|이죠'],
+        PredicateForm.casual: <String>['이야'],
+        PredicateForm.casualQuestion: <String>['이야|이지'],
+        PredicateForm.polite: <String>['이에요'],
+        PredicateForm.politeQuestion: <String>['이에요|이죠'],
         PredicateForm.formal: <String>['입니다'],
         PredicateForm.formalQuestion: <String>['입니까'],
       },
@@ -1152,8 +1304,10 @@ final SentenceLanguageData ko = SentenceLanguageData(
         forms: <PredicateForm, WordPool>{
           PredicateForm.question: <String>['이었니|이었나|이었는가'],
           PredicateForm.exclamation: <String>['이었구나|이었네|이었군'],
-          PredicateForm.casual: <String>['이었어|이었지'],
-          PredicateForm.polite: <String>['이었어요|이었죠'],
+          PredicateForm.casual: <String>['이었어'],
+          PredicateForm.casualQuestion: <String>['이었어|이었지'],
+          PredicateForm.polite: <String>['이었어요'],
+          PredicateForm.politeQuestion: <String>['이었어요|이었죠'],
           PredicateForm.formal: <String>['이었습니다'],
           PredicateForm.formalQuestion: <String>['이었습니까'],
         },

@@ -377,14 +377,15 @@ VI = SentenceLanguageData(
     ),
     times=SentenceTimes(
         day=words("""
-            lúc_bình_minh sáng_sớm vào_buổi_sáng gần_trưa vào_buổi_trưa vào_giữa_trưa vào_buổi_chiều
-            lúc_hoàng_hôn vào_buổi_tối vào_ban_đêm đêm_khuya lúc_nửa_đêm
+            lúc_bình_minh sáng_sớm vào_buổi_sáng gần_trưa vào_buổi_trưa vào_buổi_chiều lúc_hoàng_hôn
+            vào_buổi_tối vào_ban_đêm đêm_khuya lúc_nửa_đêm
         """),
         any=words("""
             vào_mùa_xuân vào_mùa_hè vào_mùa_thu vào_mùa_đông vào_cuối_tuần vào_ngày_lễ cả_ngày
         """),
         past=words("hôm_qua tuần_trước ngày_xưa hôm_ấy đêm_qua"),
-        present=words("hôm_nay dạo_này vừa_rồi ngày_mai tuần_sau đôi_khi mỗi_ngày mỗi_tối"),
+        present=words("hôm_nay vừa_rồi ngày_mai tuần_sau"),
+        habitual=words("dạo_này đôi_khi mỗi_ngày mỗi_tối"),
     ),
     homes=words("nhà"),
     join=SentenceJoin(word="rồi"),
