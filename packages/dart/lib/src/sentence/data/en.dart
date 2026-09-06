@@ -418,14 +418,60 @@ final SentenceLanguageData en = SentenceLanguageData(
       subject: const <NounClass>[NounClass.creature, NounClass.person],
       object: const <NounClass>[NounClass.edible],
       objectThemes: const <WordTheme>[WordTheme.food],
-      words: words(r'bakes warms cooks slices roasts serves'),
+      words: words(r'warms cooks serves prepares heats'),
       forms: <PredicateForm, WordPool>{
-        PredicateForm.question: words(r'bake warm cook slice roast serve'),
+        PredicateForm.question: words(r'warm cook serve prepare heat'),
       },
       past: PredicateTense(
-        words: words(r'baked warmed cooked sliced roasted served'),
+        words: words(r'warmed cooked served prepared heated'),
         forms: <PredicateForm, WordPool>{
-          PredicateForm.question: words(r'bake warm cook slice roast serve'),
+          PredicateForm.question: words(r'warm cook serve prepare heat'),
+        },
+      ),
+    ),
+    VerbGroup(
+      field: VerbField.cook,
+      subject: const <NounClass>[NounClass.creature, NounClass.person],
+      object: const <NounClass>[NounClass.edible],
+      objectThemes: const <WordTheme>[WordTheme.food],
+      objectTraits: const <NounTrait>[NounTrait.raw],
+      words: words(r'bakes roasts grills fries slices chops peels'),
+      forms: <PredicateForm, WordPool>{
+        PredicateForm.question: words(r'bake roast grill fry slice chop peel'),
+      },
+      past: PredicateTense(
+        words: words(r'baked roasted grilled fried sliced chopped peeled'),
+        forms: <PredicateForm, WordPool>{
+          PredicateForm.question: words(r'bake roast grill fry slice chop peel'),
+        },
+      ),
+    ),
+    VerbGroup(
+      field: VerbField.cook,
+      subject: const <NounClass>[NounClass.creature, NounClass.person],
+      object: const <NounClass>[NounClass.edible],
+      objectThemes: const <WordTheme>[WordTheme.food],
+      objectTraits: const <NounTrait>[NounTrait.liquid],
+      words: words(r'stirs simmers boils ladles'),
+      forms: <PredicateForm, WordPool>{PredicateForm.question: words(r'stir simmer boil ladle')},
+      past: PredicateTense(
+        words: words(r'stirred simmered boiled ladled'),
+        forms: <PredicateForm, WordPool>{PredicateForm.question: words(r'stir simmer boil ladle')},
+      ),
+    ),
+    VerbGroup(
+      field: VerbField.eat,
+      subject: const <NounClass>[NounClass.creature, NounClass.person],
+      object: const <NounClass>[NounClass.edible],
+      objectThemes: const <WordTheme>[WordTheme.food],
+      words: words(r'eats tastes swallows devours finishes'),
+      forms: <PredicateForm, WordPool>{
+        PredicateForm.question: words(r'eat taste swallow devour finish'),
+      },
+      past: PredicateTense(
+        words: words(r'ate tasted swallowed devoured finished'),
+        forms: <PredicateForm, WordPool>{
+          PredicateForm.question: words(r'eat taste swallow devour finish'),
         },
       ),
     ),
@@ -434,15 +480,29 @@ final SentenceLanguageData en = SentenceLanguageData(
       subject: const <NounClass>[NounClass.creature, NounClass.person],
       object: const <NounClass>[NounClass.edible],
       objectThemes: const <WordTheme>[WordTheme.food],
-      words: words(r'eats chews swallows tastes nibbles devours'),
+      objectWithout: const <NounTrait>[NounTrait.liquid],
+      words: words(r'chews bites nibbles crunches munches'),
       forms: <PredicateForm, WordPool>{
-        PredicateForm.question: words(r'eat chew swallow taste nibble devour'),
+        PredicateForm.question: words(r'chew bite nibble crunch munch'),
       },
       past: PredicateTense(
-        words: words(r'ate chewed swallowed tasted nibbled devoured'),
+        words: words(r'chewed bit nibbled crunched munched'),
         forms: <PredicateForm, WordPool>{
-          PredicateForm.question: words(r'eat chew swallow taste nibble devour'),
+          PredicateForm.question: words(r'chew bite nibble crunch munch'),
         },
+      ),
+    ),
+    VerbGroup(
+      field: VerbField.eat,
+      subject: const <NounClass>[NounClass.creature, NounClass.person],
+      object: const <NounClass>[NounClass.edible],
+      objectThemes: const <WordTheme>[WordTheme.food],
+      objectTraits: const <NounTrait>[NounTrait.liquid],
+      words: words(r'sips slurps spoons'),
+      forms: <PredicateForm, WordPool>{PredicateForm.question: words(r'sip slurp spoon')},
+      past: PredicateTense(
+        words: words(r'sipped slurped spooned'),
+        forms: <PredicateForm, WordPool>{PredicateForm.question: words(r'sip slurp spoon')},
       ),
     ),
     VerbGroup(
@@ -789,6 +849,14 @@ final SentenceLanguageData en = SentenceLanguageData(
       spell curse hex rune amulet talisman grimoire potion prophecy sorcery enchantment sigil glyph
       omen portent blessing incantation invocation summoning banishment divination scrying portal
       ley sanctum reliquary effigy idol totem phylactery charm warding runestone nightmare
+    '''),
+    NounTrait.liquid: words(r'''
+      porridge stew chowder curry bisque consomme goulash congee pho ramen udon soba pudding custard
+      yogurt honey syrup lemonade salsa chutney relish marmalade hummus guacamole
+    '''),
+    NounTrait.raw: words(r'''
+      potato carrot cabbage spinach broccoli pumpkin garlic mushroom steak fillet drumstick brisket
+      ribeye sirloin tenderloin sausage bacon meatball cutlet schnitzel kebab skewer tofu
     '''),
   },
   interjections: words(r'''

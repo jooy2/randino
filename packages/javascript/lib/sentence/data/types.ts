@@ -212,6 +212,13 @@ export type VerbGroup = {
 	 */
 	objectThemes?: readonly WordTheme[];
 	/**
+	 * A trait the object has to carry, one of these: `sips` takes a `liquid`,
+	 * `roasts` something `raw`. Left out by a group that asks for none.
+	 */
+	objectTraits?: readonly NounTrait[];
+	/** Traits the object may not carry: `chews` takes no `liquid`. A noun with no trait at all passes. */
+	objectWithout?: readonly NounTrait[];
+	/**
 	 * A part the shape has to carry for these verbs to make sense. `향한다` and
 	 * `heads` want somewhere to head to, where `떠난다` and `leaves` stand on their
 	 * own; a group that names a slot is drawn only for a shape that has it.
@@ -425,10 +432,12 @@ export type ConnectiveKind = 'additive' | 'temporal' | 'contrastive' | 'causal';
  * `subjectTraits` or rules one out with `subjectWithout`. `lifeless` is the odd
  * one: a word of a creature theme that is no creature — a spell, a rune, an
  * amulet — which takes no verb and no state at all, because it neither does
- * anything nor is anything a creature is. A noun listed nowhere
+ * anything nor is anything a creature is. `liquid` and `raw` are what a verb
+ * asks of its object: `sips` takes a liquid and `chews` takes none, `roasts`
+ * takes something raw. A noun listed nowhere
  * has no trait, so it takes any group that asks for none.
  */
-export type NounTrait = 'flier' | 'swimmer' | 'crawler' | 'lifeless';
+export type NounTrait = 'flier' | 'swimmer' | 'crawler' | 'lifeless' | 'liquid' | 'raw';
 
 /** The nouns that carry each trait, written the way the word pools write them. */
 export type SentenceTraits = {

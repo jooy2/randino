@@ -188,6 +188,16 @@ def traits_of(data: SentenceLanguageData, noun: str) -> list[str]:
     return [trait for trait, pool in (data.traits or {}).items() if noun in pool]
 
 
+def accepts_object_noun(data: SentenceLanguageData, group: VerbGroup, noun: str) -> bool:
+    """Whether a verb group takes this noun as its object, by what the noun is."""
+    traits = traits_of(data, noun)
+
+    if group.object_traits is not None and not any(t in traits for t in group.object_traits):
+        return False
+
+    return group.object_without is None or not any(t in traits for t in group.object_without)
+
+
 def accepts_noun(data: SentenceLanguageData, group: VerbGroup, noun: str) -> bool:
     """Whether a verb group takes this noun as its subject, by what the noun can do."""
     traits = traits_of(data, noun)
@@ -512,6 +522,27 @@ def test_a_verb_only_takes_the_subject_and_object_its_group_allows() -> None:
                 and (subject_noun is None or accepts_noun(data, group, subject_noun))
                 for group in groups
             ), f"{language}: {detail.theme} cannot be the subject ({detail.sentence})"
+
+            # And the object, where the group asks something of it: `sips` takes a liquid,
+            # `chews` takes none, `roasts` takes something raw.
+            if "object" in detail.slots:
+                phrase = detail.phrases[detail.slots.index("object")]
+                objects = nouns_in(language, phrase)
+
+                assert not objects or any(
+                    accepts_object_noun(data, group, noun) for noun in objects for group in groups
+                ), f"{language}: {detail.phrases[at]} does not take '{phrase}' ({detail.sentence})"
+
+    # A group that asks something of its object asks for a trait the language lists, or it
+    # could never draw one.
+    for language in WORD_LANGUAGES:
+        data = SENTENCE_DATA[language]
+
+        for group in data.verbs:
+            for trait in (*(group.object_traits or ()), *(group.object_without or ())):
+                assert (data.traits or {}).get(trait), (
+                    f"{language}: {group.words[0]} asks for '{trait}', which nothing carries"
+                )
 
 
 def test_korean_picks_the_particle_its_noun_asks_for() -> None:

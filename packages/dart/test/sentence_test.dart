@@ -56,6 +56,17 @@ List<NounTrait> traitsOf(SentenceLanguageData data, String noun) => <NounTrait>[
 ];
 
 /// Whether a verb group takes this noun as its subject, by what the noun can do.
+/// Whether a verb group takes this noun as its object, by what the noun is.
+bool acceptsObjectNoun(SentenceLanguageData data, VerbGroup group, String noun) {
+  final traits = traitsOf(data, noun);
+  final wanted = group.objectTraits;
+  final barred = group.objectWithout;
+
+  if (wanted != null && !wanted.any(traits.contains)) return false;
+
+  return barred == null || !barred.any(traits.contains);
+}
+
 bool acceptsNoun(SentenceLanguageData data, VerbGroup group, String noun) {
   final traits = traitsOf(data, noun);
 
@@ -708,6 +719,40 @@ void main() {
             isTrue,
             reason: '$language: ${theme.name} cannot be the subject (${detail.sentence})',
           );
+
+          // And the object, where the group asks something of it: `sips` takes a
+          // liquid, `chews` takes none, `roasts` takes something raw.
+          final objectAt = detail.slots.indexOf(SentenceSlot.object);
+
+          if (objectAt >= 0) {
+            final objects = nounsIn(language, detail.phrases[objectAt]);
+
+            expect(
+              objects.isEmpty ||
+                  objects.any(
+                    (noun) => groups.any((group) => acceptsObjectNoun(data, group, noun)),
+                  ),
+              isTrue,
+              reason:
+                  "$language: ${detail.phrases[at]} does not take '${detail.phrases[objectAt]}' (${detail.sentence})",
+            );
+          }
+        }
+      }
+
+      // A group that asks something of its object asks for a trait the language
+      // lists, or it could never draw one.
+      for (final language in wordLanguages) {
+        final data = sentenceData[language]!;
+
+        for (final group in data.verbs) {
+          for (final trait in <NounTrait>[...?group.objectTraits, ...?group.objectWithout]) {
+            expect(
+              data.traits?[trait],
+              isNotEmpty,
+              reason: "$language: ${group.words.first} asks for '$trait', which nothing carries",
+            );
+          }
         }
       }
     });

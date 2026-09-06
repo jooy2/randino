@@ -388,6 +388,17 @@ function traitsOf(data: SentenceLanguageData, noun: string): string[] {
 }
 
 /** Whether a verb group takes this noun as its subject, by what the noun can do. */
+/** Whether a verb group takes this noun as its object, by what the noun is. */
+function acceptsObjectNoun(data: SentenceLanguageData, group: VerbGroup, noun: string): boolean {
+	const traits = traitsOf(data, noun);
+
+	if (group.objectTraits && !group.objectTraits.some((trait) => traits.includes(trait))) {
+		return false;
+	}
+
+	return !group.objectWithout?.some((trait) => traits.includes(trait));
+}
+
 function acceptsNoun(data: SentenceLanguageData, group: VerbGroup, noun: string): boolean {
 	const traits = traitsOf(data, noun);
 
@@ -752,6 +763,35 @@ describe('Sentence', () => {
 					),
 					`${language}: ${detail.theme} cannot be the subject of ${detail.phrases[at]} (${detail.sentence})`
 				);
+
+				// And the object, where the group asks something of it: `sips` takes a
+				// liquid, `chews` takes none, `roasts` takes something raw.
+				const objectAt = detail.slots.indexOf('object');
+
+				if (objectAt >= 0) {
+					const objects = [...nounsIn(language, detail.phrases[objectAt])];
+
+					assert.ok(
+						objects.length === 0 ||
+							objects.some((noun) => groups.some((group) => acceptsObjectNoun(data, group, noun))),
+						`${language}: ${detail.phrases[at]} does not take '${detail.phrases[objectAt]}' (${detail.sentence})`
+					);
+				}
+			}
+		}
+
+		// A group that asks something of its object asks for a trait the language
+		// lists, or it could never draw one.
+		for (const language of WORD_LANGUAGES) {
+			const data = SENTENCE_DATA[language];
+
+			for (const group of data.verbs) {
+				for (const trait of [...(group.objectTraits ?? []), ...(group.objectWithout ?? [])]) {
+					assert.ok(
+						data.traits?.[trait]?.length,
+						`${language}: ${group.words[0]} asks for '${trait}', which nothing carries`
+					);
+				}
 			}
 		}
 	});

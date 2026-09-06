@@ -166,6 +166,14 @@ function dartVerb(group: VerbGroup, indent: string, koPast: boolean): string {
 		lines.push(
 			`${indent}  objectThemes: const ${dartList(group.objectThemes, 'WordTheme', indent)},`
 		);
+	if (group.objectTraits)
+		lines.push(
+			`${indent}  objectTraits: const ${dartList(group.objectTraits, 'NounTrait', indent)},`
+		);
+	if (group.objectWithout)
+		lines.push(
+			`${indent}  objectWithout: const ${dartList(group.objectWithout, 'NounTrait', indent)},`
+		);
 	if (group.requires) lines.push(`${indent}  requires: SentenceSlot.${group.requires},`);
 
 	lines.push(`${indent}  words: ${dartWords(group.words, indent + '  ')},`);
@@ -537,6 +545,9 @@ function pyVerb(group: VerbGroup, indent: string, koPast: boolean): string {
 		lines.push(`${indent}    subject_without=${pyTuple(group.subjectWithout)},`);
 	if (group.object) lines.push(`${indent}    object=${pyTuple(group.object)},`);
 	if (group.objectThemes) lines.push(`${indent}    object_themes=${pyTuple(group.objectThemes)},`);
+	if (group.objectTraits) lines.push(`${indent}    object_traits=${pyTuple(group.objectTraits)},`);
+	if (group.objectWithout)
+		lines.push(`${indent}    object_without=${pyTuple(group.objectWithout)},`);
 	if (group.requires) lines.push(`${indent}    requires=${pq(group.requires)},`);
 
 	lines.push(`${indent}    words=${pyWords(group.words, indent + '    ')},`);

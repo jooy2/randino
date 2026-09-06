@@ -708,6 +708,11 @@ class BeatDraw:
     """The themes the subject may come from, when the story has decided it."""
 
     pinned: "Mapping[SentenceSlot, Requirement]" = field(default_factory=dict)
+    avoid: tuple[str, ...] = ()
+    """Nouns this sentence's object must not be: the story's other thing.
+
+    A prop is never the item and the item never the prop.
+    """
     """The nouns the story has put on the page that this sentence writes again, by slot.
 
     What `Follow.scene` carries once there is a topic to follow; this is how the first
@@ -1531,21 +1536,106 @@ def _accepts_object(group: VerbGroup, theme: WordTheme) -> bool:
     return group.object_themes is None or theme in group.object_themes
 
 
-def _object_themes_of(group: VerbGroup, beat: BeatDraw | None) -> tuple[WordTheme, ...]:
+def _accepts_object_noun(data: SentenceLanguageData, group: VerbGroup, noun: str) -> bool:
+    """Whether a verb group takes this noun as its object, by what the noun is.
+
+    The same question `_accepts_noun` asks of the subject: `sips` takes a liquid, `chews`
+    takes none, and `roasts` takes something raw.
+    """
+    if group.object_traits is None and group.object_without is None:
+        return True
+
+    traits = _traits_of(data, noun)
+
+    if group.object_traits is not None and not any(t in traits for t in group.object_traits):
+        return False
+
+    return group.object_without is None or not any(t in traits for t in group.object_without)
+
+
+_OBJECT_POOL_CACHE: dict[tuple[int, WordTheme], WordPool] = {}
+
+
+def _object_pool_avoiding(
+    language: WordLanguage,
+    data: SentenceLanguageData,
+    group: VerbGroup | StateGroup,
+    theme: WordTheme,
+    avoid: tuple[str, ...],
+) -> WordPool:
+    """The object pool without the story's other thing.
+
+    A prop is never the item and the item never the prop. The whole pool where nothing else
+    is left.
+    """
+    pool = _object_pool_for(language, data, group, theme)
+
+    if not avoid:
+        return pool
+
+    lexicon = WORD_DATA[language]
+    kept = tuple(entry for entry in pool if _plain(lexicon, entry) not in avoid)
+
+    return kept or pool
+
+
+def _object_pool_for(
+    language: WordLanguage,
+    data: SentenceLanguageData,
+    group: VerbGroup | StateGroup,
+    theme: WordTheme,
+) -> WordPool:
+    """The nouns of a theme a group's object may be drawn from."""
+    pool = _nouns_of(language, theme)
+
+    if not isinstance(group, VerbGroup) or (
+        group.object_traits is None and group.object_without is None
+    ):
+        return pool
+
+    key = (id(group), theme)
+    cached = _OBJECT_POOL_CACHE.get(key)
+
+    if cached is not None:
+        return cached
+
+    lexicon = WORD_DATA[language]
+    usable = tuple(
+        entry for entry in pool if _accepts_object_noun(data, group, _plain(lexicon, entry))
+    )
+    _OBJECT_POOL_CACHE[key] = usable
+
+    return usable
+
+
+def _object_themes_of(
+    language: WordLanguage,
+    data: SentenceLanguageData,
+    group: VerbGroup,
+    beat: BeatDraw | None,
+) -> tuple[WordTheme, ...]:
     """The themes a verb group's object may come from.
 
-    Its classes, narrowed to the themes it names when it names any, and to the story's
-    item when there is one.
+    Its classes, narrowed to the themes it names when it names any, to the story's item
+    when there is one, and — for a group that asks something of its object — to the
+    themes that have a noun with it.
     """
+    by_theme: tuple[WordTheme, ...]
+
     if beat is not None and beat.item is not None:
-        return (beat.item,) if _accepts_object(group, beat.item) else ()
+        by_theme = (beat.item,) if _accepts_object(group, beat.item) else ()
+    else:
+        by_class = _themes_for_classes(WORD_THEMES, group.object or ())
+        by_theme = (
+            by_class
+            if group.object_themes is None
+            else tuple(theme for theme in by_class if theme in group.object_themes)
+        )
 
-    by_class = _themes_for_classes(WORD_THEMES, group.object or ())
+    if group.object_traits is None and group.object_without is None:
+        return by_theme
 
-    if group.object_themes is None:
-        return by_class
-
-    return tuple(theme for theme in by_class if theme in group.object_themes)
+    return tuple(theme for theme in by_theme if _object_pool_for(language, data, group, theme))
 
 
 def _verb_groups_for(
@@ -1605,6 +1695,8 @@ def _verb_groups_for(
             continue
         if obj is not None and obj.theme is not None and not _accepts_object(group, obj.theme):
             continue
+        if obj is not None and not _accepts_object_noun(data, group, obj.word):
+            continue
         if (
             beat is not None
             and beat.item is not None
@@ -1614,7 +1706,7 @@ def _verb_groups_for(
             continue
         if not _subject_themes_of(language, data, group, themes):
             continue
-        if group.object is not None and not _object_themes_of(group, beat):
+        if group.object is not None and not _object_themes_of(language, data, group, beat):
             continue
 
         usable.append(group)
@@ -2045,6 +2137,8 @@ spans the class, because a fox can sleep under a sky.
 
 
 def _theme_for_part(
+    language: WordLanguage,
+    data: SentenceLanguageData,
     slot: SentenceSlot,
     group: VerbGroup | None,
     themes: Sequence[WordTheme],
@@ -2052,7 +2146,7 @@ def _theme_for_part(
 ) -> WordTheme:
     """The theme a phrase other than the subject draws from."""
     if slot in ("object", "quantity"):
-        usable = _object_themes_of(group, beat) if group is not None else ()
+        usable = _object_themes_of(language, data, group, beat) if group is not None else ()
 
         return pick(usable or WORD_THEMES)
 
@@ -2407,7 +2501,7 @@ def _compose(
         part_themes.append(
             required.theme
             if required is not None and required.theme is not None
-            else _theme_for_part(part.slot, verb_group, themes, beat)
+            else _theme_for_part(language, data, part.slot, verb_group, themes, beat)
         )
 
     # What a phrase writes instead of a noun phrase, when it writes one at all: a
@@ -2643,7 +2737,13 @@ def _compose(
                 described=None if required is not None and not required.known else theme,
                 only=_subject_pool_for(language, data, chosen, theme)
                 if part.slot == subject_slot
-                else None,
+                else (
+                    _object_pool_avoiding(
+                        language, data, chosen, theme, beat.avoid if beat is not None else ()
+                    )
+                    if part.slot == "object"
+                    else None
+                ),
             )
             phrase = built.text
 
@@ -3591,6 +3691,14 @@ def _tell_story(telling: Telling) -> Result | None:
             places=DESTINATION_THEMES,
             subject=DESTINATION_THEMES if step.kind == "scene" else hero_themes,
             pinned=pinned_for(beat),
+            avoid=tuple(
+                word
+                for word in (
+                    roles.item.word if step.object == "prop" and roles.item is not None else None,
+                    roles.prop.word if step.object != "prop" and roles.prop is not None else None,
+                )
+                if word is not None
+            ),
         )
 
     def shortest_for(beat: Beat) -> int:

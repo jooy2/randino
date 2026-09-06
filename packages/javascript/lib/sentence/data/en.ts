@@ -297,9 +297,35 @@ export const EN: SentenceLanguageData = {
 			object: ['edible'],
 			objectThemes: ['food'],
 			...tensed(
-				`bakes warms cooks slices roasts serves`,
-				`bake warm cook slice roast serve`,
-				`baked warmed cooked sliced roasted served`
+				`warms cooks serves prepares heats`,
+				`warm cook serve prepare heat`,
+				`warmed cooked served prepared heated`
+			)
+		},
+		{
+			field: 'cook',
+			subject: ['creature', 'person'],
+			object: ['edible'],
+			objectThemes: ['food'],
+			// What goes in the oven or under the knife: a potato, a steak, never a curry.
+			objectTraits: ['raw'],
+			...tensed(
+				`bakes roasts grills fries slices chops peels`,
+				`bake roast grill fry slice chop peel`,
+				`baked roasted grilled fried sliced chopped peeled`
+			)
+		},
+		{
+			field: 'cook',
+			subject: ['creature', 'person'],
+			object: ['edible'],
+			objectThemes: ['food'],
+			// What goes in the pot.
+			objectTraits: ['liquid'],
+			...tensed(
+				`stirs simmers boils ladles`,
+				`stir simmer boil ladle`,
+				`stirred simmered boiled ladled`
 			)
 		},
 		{
@@ -308,10 +334,31 @@ export const EN: SentenceLanguageData = {
 			object: ['edible'],
 			objectThemes: ['food'],
 			...tensed(
-				`eats chews swallows tastes nibbles devours`,
-				`eat chew swallow taste nibble devour`,
-				`ate chewed swallowed tasted nibbled devoured`
+				`eats tastes swallows devours finishes`,
+				`eat taste swallow devour finish`,
+				`ate tasted swallowed devoured finished`
 			)
+		},
+		{
+			field: 'eat',
+			subject: ['creature', 'person'],
+			object: ['edible'],
+			objectThemes: ['food'],
+			// Nobody chews a syrup.
+			objectWithout: ['liquid'],
+			...tensed(
+				`chews bites nibbles crunches munches`,
+				`chew bite nibble crunch munch`,
+				`chewed bit nibbled crunched munched`
+			)
+		},
+		{
+			field: 'eat',
+			subject: ['creature', 'person'],
+			object: ['edible'],
+			objectThemes: ['food'],
+			objectTraits: ['liquid'],
+			...tensed(`sips slurps spoons`, `sip slurp spoon`, `sipped slurped spooned`)
 		},
 		{
 			field: 'drink',
@@ -587,6 +634,16 @@ export const EN: SentenceLanguageData = {
 			spell curse hex rune amulet talisman grimoire potion prophecy sorcery enchantment sigil glyph omen portent blessing
 			incantation invocation summoning banishment divination scrying portal ley sanctum reliquary effigy idol totem phylactery
 			charm warding runestone nightmare
+		`),
+		// What a verb asks of its object: `sips` takes a liquid and `chews` takes
+		// none, `roasts` takes something raw.
+		liquid: words(`
+			porridge stew chowder curry bisque consomme goulash congee pho ramen udon soba pudding custard yogurt honey syrup
+			lemonade salsa chutney relish marmalade hummus guacamole
+		`),
+		raw: words(`
+			potato carrot cabbage spinach broccoli pumpkin garlic mushroom steak fillet drumstick brisket ribeye sirloin
+			tenderloin sausage bacon meatball cutlet schnitzel kebab skewer tofu
 		`)
 	},
 	interjections: words(`

@@ -614,6 +614,7 @@ class _BeatDraw {
     required this.places,
     required this.subject,
     this.pinned = const <SentenceSlot, _Requirement>{},
+    this.avoid = const <String>[],
   });
 
   /// Whether the shape is headed by a state rather than a verb.
@@ -646,6 +647,10 @@ class _BeatDraw {
   /// is how the first sentence about the hero gets them when a scene came
   /// before it.
   final Map<SentenceSlot, _Requirement> pinned;
+
+  /// Nouns this sentence's object must not be: the story's other thing. A prop
+  /// is never the item and the item never the prop.
+  final List<String> avoid;
 }
 
 /// What the sentences of one result are about: the first sentence's subject, and
@@ -1148,6 +1153,8 @@ final Map<String, WordPool> _nounCache = <String, WordPool>{};
 /// A group is a constant of its language's data, so it is its own key.
 final Map<Object, Map<WordTheme, WordPool>> _subjectPoolCache =
     <Object, Map<WordTheme, WordPool>>{};
+final Map<VerbGroup, Map<WordTheme, WordPool>> _objectPoolCache =
+    <VerbGroup, Map<WordTheme, WordPool>>{};
 final Map<WordLanguage, Map<SentenceSlot, LengthRange>> _boundsCache =
     <WordLanguage, Map<SentenceSlot, LengthRange>>{};
 final Map<WordLanguage, LengthRange> _modifierBounds = <WordLanguage, LengthRange>{};
@@ -1522,13 +1529,14 @@ List<VerbGroup> _verbGroupsFor(
         final objectTheme = object?.theme;
 
         if (objectTheme != null && !_acceptsObject(group, objectTheme)) return false;
+        if (object != null && !_acceptsObjectNoun(data, group, object.word)) return false;
 
         final item = beat?.item;
 
         if (item != null && group.object != null && !_acceptsObject(group, item)) return false;
 
         return _subjectThemesOf(language, data, group, themes).isNotEmpty &&
-            (group.object == null || _objectThemesOf(group, beat).isNotEmpty);
+            (group.object == null || _objectThemesOf(language, data, group, beat).isNotEmpty);
       })
       .toList(growable: false);
 }
@@ -1645,17 +1653,97 @@ bool _acceptsObject(VerbGroup group, WordTheme theme) {
   return group.objectThemes == null || group.objectThemes!.contains(theme);
 }
 
+/// Whether a verb group takes this noun as its object, by what the noun is:
+/// the same question [_acceptsNoun] asks of the subject. `sips` takes a liquid,
+/// `chews` takes none, and `roasts` takes something raw.
+bool _acceptsObjectNoun(SentenceLanguageData data, VerbGroup group, String noun) {
+  final wanted = group.objectTraits;
+  final barred = group.objectWithout;
+
+  if (wanted == null && barred == null) return true;
+
+  final traits = _traitsOf(data, noun);
+
+  if (wanted != null && !wanted.any(traits.contains)) return false;
+
+  return barred == null || !barred.any(traits.contains);
+}
+
+/// The object pool without the story's other thing: a prop is never the item
+/// and the item never the prop. The whole pool where nothing else is left.
+WordPool _objectPoolAvoiding(
+  WordLanguage language,
+  SentenceLanguageData data,
+  Object group,
+  WordTheme theme,
+  List<String> avoid,
+) {
+  final pool = _objectPoolFor(language, data, group, theme);
+
+  if (avoid.isEmpty) return pool;
+
+  final lexicon = wordData[language]!;
+  final kept = pool
+      .where((entry) => !avoid.contains(_plain(lexicon, entry)))
+      .toList(growable: false);
+
+  return kept.isEmpty ? pool : kept;
+}
+
+/// The nouns of a theme a group's object may be drawn from.
+WordPool _objectPoolFor(
+  WordLanguage language,
+  SentenceLanguageData data,
+  Object group,
+  WordTheme theme,
+) {
+  final pool = _nounsOf(language, theme);
+
+  if (group is! VerbGroup || (group.objectTraits == null && group.objectWithout == null)) {
+    return pool;
+  }
+
+  final byTheme = _objectPoolCache.putIfAbsent(group, () => <WordTheme, WordPool>{});
+  final cached = byTheme[theme];
+
+  if (cached != null) return cached;
+
+  final lexicon = wordData[language]!;
+  final usable = pool
+      .where((entry) => _acceptsObjectNoun(data, group, _plain(lexicon, entry)))
+      .toList(growable: false);
+
+  byTheme[theme] = usable;
+
+  return usable;
+}
+
 /// The themes a verb group's object may come from: its classes, narrowed to the
 /// themes it names when it names any, and to the story's item when there is one.
-List<WordTheme> _objectThemesOf(VerbGroup group, _BeatDraw? beat) {
+List<WordTheme> _objectThemesOf(
+  WordLanguage language,
+  SentenceLanguageData data,
+  VerbGroup group,
+  _BeatDraw? beat,
+) {
   final item = beat?.item;
-
-  if (item != null) return _acceptsObject(group, item) ? <WordTheme>[item] : const <WordTheme>[];
-
-  final byClass = _themesForClasses(wordThemes, group.object ?? const <NounClass>[]);
   final named = group.objectThemes;
+  final byTheme =
+      item != null
+          ? (_acceptsObject(group, item) ? <WordTheme>[item] : const <WordTheme>[])
+          : named == null
+          ? _themesForClasses(wordThemes, group.object ?? const <NounClass>[])
+          : _themesForClasses(
+            wordThemes,
+            group.object ?? const <NounClass>[],
+          ).where(named.contains).toList(growable: false);
 
-  return named == null ? byClass : byClass.where(named.contains).toList(growable: false);
+  // A group that asks for a trait is only worth a theme that has a noun with it.
+  if (group.objectTraits == null && group.objectWithout == null) return byTheme;
+
+  return byTheme
+      .where((theme) => _objectPoolFor(language, data, group, theme).isNotEmpty)
+      .toList(growable: false);
 }
 
 /// The same, for a shape headed by an adjective rather than a verb.
@@ -1962,13 +2050,16 @@ int _modifyChanceFor(int distance, bool tooLong, bool storied) {
 const List<WordTheme> _destinationThemes = <WordTheme>[WordTheme.place];
 
 WordTheme _themeForPart(
+  WordLanguage language,
+  SentenceLanguageData data,
   SentenceSlot slot,
   VerbGroup? group,
   List<WordTheme> themes,
   _BeatDraw? beat,
 ) {
   if (slot == SentenceSlot.object || slot == SentenceSlot.quantity) {
-    final usable = group == null ? const <WordTheme>[] : _objectThemesOf(group, beat);
+    final usable =
+        group == null ? const <WordTheme>[] : _objectThemesOf(language, data, group, beat);
 
     return pick(usable.isNotEmpty ? usable : wordThemes);
   }
@@ -2169,7 +2260,8 @@ _Built _compose(
           ? null
           : shape[i].slot == subjectSlot
           ? subjectTheme
-          : (plan.phrase[at[i]]?.theme ?? _themeForPart(shape[i].slot, verbGroup, themes, beat)),
+          : (plan.phrase[at[i]]?.theme ??
+              _themeForPart(language, data, shape[i].slot, verbGroup, themes, beat)),
   ];
   // What a phrase writes instead of a noun phrase, when it writes one at all: a
   // pronoun standing in for the topic, the name a repeat carries forward, or a
@@ -2421,7 +2513,12 @@ _Built _compose(
         nouns: nouns,
         count: part.slot == SentenceSlot.quantity ? _countText(data, theme) : '',
         described: required != null && !required.known ? null : theme,
-        only: part.slot == subjectSlot ? _subjectPoolFor(language, data, group, theme) : null,
+        only:
+            part.slot == subjectSlot
+                ? _subjectPoolFor(language, data, group, theme)
+                : part.slot == SentenceSlot.object
+                ? _objectPoolAvoiding(language, data, group, theme, beat?.avoid ?? const <String>[])
+                : null,
       );
 
       phrase = built.text;
@@ -3757,6 +3854,10 @@ _Result? _tellStory(_Telling telling) {
       places: _destinationThemes,
       subject: step.kind == StepKind.scene ? _destinationThemes : heroThemes,
       pinned: pinnedFor(beat),
+      avoid: <String>[
+        if (step.object == StoryRole.prop && roles.item != null) roles.item!.word,
+        if (step.object != StoryRole.prop && roles.prop != null) roles.prop!.word,
+      ],
     );
   }
 

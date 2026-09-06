@@ -226,6 +226,8 @@ sentence = {
                 "subjectTraits": listed(group.subject_traits),
                 "subjectWithout": listed(group.subject_without),
                 "objectThemes": listed(group.object_themes),
+                "objectTraits": listed(group.object_traits),
+                "objectWithout": listed(group.object_without),
                 "requires": group.requires or "",
                 "words": listed(group.words),
                 "forms": {form: listed(pool) for form, pool in group.forms.items()},

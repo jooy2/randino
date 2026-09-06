@@ -476,14 +476,48 @@ EN = SentenceLanguageData(
             subject=("creature", "person"),
             object=("edible",),
             object_themes=("food",),
-            words=words("bakes warms cooks slices roasts serves"),
+            words=words("warms cooks serves prepares heats"),
             forms={
-                "question": words("bake warm cook slice roast serve"),
+                "question": words("warm cook serve prepare heat"),
             },
             past=PredicateTense(
-                words=words("baked warmed cooked sliced roasted served"),
+                words=words("warmed cooked served prepared heated"),
                 forms={
-                    "question": words("bake warm cook slice roast serve"),
+                    "question": words("warm cook serve prepare heat"),
+                },
+            ),
+        ),
+        VerbGroup(
+            field="cook",
+            subject=("creature", "person"),
+            object=("edible",),
+            object_themes=("food",),
+            object_traits=("raw",),
+            words=words("bakes roasts grills fries slices chops peels"),
+            forms={
+                "question": words("bake roast grill fry slice chop peel"),
+            },
+            past=PredicateTense(
+                words=words("baked roasted grilled fried sliced chopped peeled"),
+                forms={
+                    "question": words("bake roast grill fry slice chop peel"),
+                },
+            ),
+        ),
+        VerbGroup(
+            field="cook",
+            subject=("creature", "person"),
+            object=("edible",),
+            object_themes=("food",),
+            object_traits=("liquid",),
+            words=words("stirs simmers boils ladles"),
+            forms={
+                "question": words("stir simmer boil ladle"),
+            },
+            past=PredicateTense(
+                words=words("stirred simmered boiled ladled"),
+                forms={
+                    "question": words("stir simmer boil ladle"),
                 },
             ),
         ),
@@ -492,14 +526,48 @@ EN = SentenceLanguageData(
             subject=("creature", "person"),
             object=("edible",),
             object_themes=("food",),
-            words=words("eats chews swallows tastes nibbles devours"),
+            words=words("eats tastes swallows devours finishes"),
             forms={
-                "question": words("eat chew swallow taste nibble devour"),
+                "question": words("eat taste swallow devour finish"),
             },
             past=PredicateTense(
-                words=words("ate chewed swallowed tasted nibbled devoured"),
+                words=words("ate tasted swallowed devoured finished"),
                 forms={
-                    "question": words("eat chew swallow taste nibble devour"),
+                    "question": words("eat taste swallow devour finish"),
+                },
+            ),
+        ),
+        VerbGroup(
+            field="eat",
+            subject=("creature", "person"),
+            object=("edible",),
+            object_themes=("food",),
+            object_without=("liquid",),
+            words=words("chews bites nibbles crunches munches"),
+            forms={
+                "question": words("chew bite nibble crunch munch"),
+            },
+            past=PredicateTense(
+                words=words("chewed bit nibbled crunched munched"),
+                forms={
+                    "question": words("chew bite nibble crunch munch"),
+                },
+            ),
+        ),
+        VerbGroup(
+            field="eat",
+            subject=("creature", "person"),
+            object=("edible",),
+            object_themes=("food",),
+            object_traits=("liquid",),
+            words=words("sips slurps spoons"),
+            forms={
+                "question": words("sip slurp spoon"),
+            },
+            past=PredicateTense(
+                words=words("sipped slurped spooned"),
+                forms={
+                    "question": words("sip slurp spoon"),
                 },
             ),
         ),
@@ -844,6 +912,15 @@ EN = SentenceLanguageData(
             glyph omen portent blessing incantation invocation summoning banishment divination
             scrying portal ley sanctum reliquary effigy idol totem phylactery charm warding
             runestone nightmare
+        """),
+        "liquid": words("""
+            porridge stew chowder curry bisque consomme goulash congee pho ramen udon soba pudding
+            custard yogurt honey syrup lemonade salsa chutney relish marmalade hummus guacamole
+        """),
+        "raw": words("""
+            potato carrot cabbage spinach broccoli pumpkin garlic mushroom steak fillet drumstick
+            brisket ribeye sirloin tenderloin sausage bacon meatball cutlet schnitzel kebab skewer
+            tofu
         """),
     },
     interjections=words("""

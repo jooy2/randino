@@ -160,7 +160,7 @@ class PredicateTense:
     """The other forms, index-aligned with `words`."""
 
 
-NounTrait = Literal["flier", "swimmer", "crawler", "lifeless"]
+NounTrait = Literal["flier", "swimmer", "crawler", "lifeless", "liquid", "raw"]
 """What a noun can do that its theme does not say.
 
 A fish and a sparrow are both `animal`, and only one of them flies; a snake and a lion are
@@ -168,8 +168,10 @@ both `animal`, and only one of them runs. A language lists the nouns that carry 
 under `SentenceLanguageData.traits`, and a verb group asks for one with `subject_traits` or
 rules one out with `subject_without`. `"lifeless"` is the odd one: a word of a creature
 theme that is no creature — a spell, a rune, an amulet — which takes no verb and no state
-at all, because it neither does anything nor is anything a creature is. A noun listed
-nowhere has no trait, so it takes any group that asks for none.
+at all, because it neither does anything nor is anything a creature is. `"liquid"` and
+`"raw"` are what a verb asks of its object: `sips` takes a liquid and `chews` takes none,
+`roasts` takes something raw. A noun listed nowhere has no trait, so it takes any group
+that asks for none.
 """
 
 
@@ -222,6 +224,16 @@ class VerbGroup:
     `eat` takes an edible and `drink` takes an edible, and a lion that drinks a pretzel
     is the difference. Left out where the class alone is right.
     """
+
+    object_traits: tuple[NounTrait, ...] | None = None
+    """A trait the object has to carry, one of these.
+
+    `sips` takes a `"liquid"`, `roasts` something `"raw"`. None for a group that asks for
+    none.
+    """
+
+    object_without: tuple[NounTrait, ...] | None = None
+    """Traits the object may not carry: `chews` takes no liquid. A noun with none passes."""
 
     requires: SentenceSlot | None = None
     """A part the shape has to carry for these verbs to make sense.

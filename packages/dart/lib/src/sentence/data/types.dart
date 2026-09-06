@@ -276,6 +276,8 @@ class VerbGroup {
     this.subjectWithout,
     this.object,
     this.objectThemes,
+    this.objectTraits,
+    this.objectWithout,
     this.requires,
     this.forms = const <PredicateForm, WordPool>{},
     this.past,
@@ -295,6 +297,15 @@ class VerbGroup {
   /// `eat` takes an edible and `drink` takes an edible, and a lion that drinks a
   /// pretzel is the difference. Null where the class alone is right.
   final List<WordTheme>? objectThemes;
+
+  /// A trait the object has to carry, one of these: `sips` takes a
+  /// [NounTrait.liquid], `roasts` something [NounTrait.raw]. Null for a group
+  /// that asks for none.
+  final List<NounTrait>? objectTraits;
+
+  /// Traits the object may not carry: `chews` takes no liquid. A noun with no
+  /// trait at all passes.
+  final List<NounTrait>? objectWithout;
 
   /// The themes the subject may come from, when a class is too wide: `익는다` is
   /// a thing food does and drink does not, and `울린다` is a thing a song does and
@@ -668,6 +679,12 @@ enum NounTrait {
   /// amulet — which takes no verb and no state at all, because it neither does
   /// anything nor is anything a creature is.
   lifeless,
+
+  /// What `sips` takes and `chews` does not: a soup, a syrup, a custard.
+  liquid,
+
+  /// What `roasts` and `slices` take: a potato, a steak, a fillet.
+  raw,
 }
 
 /// What a connective claims about the sentence before it.

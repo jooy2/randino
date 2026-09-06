@@ -217,6 +217,16 @@ void main() {
                   : <String>[
                       for (final theme in group.objectThemes!) theme.name,
                     ],
+              'objectTraits': group.objectTraits == null
+                  ? null
+                  : <String>[
+                      for (final trait in group.objectTraits!) trait.name,
+                    ],
+              'objectWithout': group.objectWithout == null
+                  ? null
+                  : <String>[
+                      for (final trait in group.objectWithout!) trait.name,
+                    ],
               'requires': group.requires?.name ?? '',
               'words': listed(group.words),
               'forms': <String, Object?>{

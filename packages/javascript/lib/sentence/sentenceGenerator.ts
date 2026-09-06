@@ -499,6 +499,12 @@ type BeatDraw = {
 	 * how the first sentence about the hero gets them when a scene came before it.
 	 */
 	pinned: ReadonlyMap<SentenceSlot, Requirement>;
+	/**
+	 * Nouns this sentence's object must not be: the story's other thing. A prop
+	 * is never the item and the item never the prop, or `작은 스웨터` is looked at
+	 * and `가벼운 스웨터` found three lines later.
+	 */
+	avoid: readonly string[];
 };
 
 /**
@@ -953,6 +959,7 @@ const nounCache = new Map<string, WordPool>();
  * nouns each time is what made a paragraph slow once every language had them.
  */
 const subjectPoolCache = new WeakMap<VerbGroup | StateGroup, Map<WordTheme, WordPool>>();
+const objectPoolCache = new WeakMap<VerbGroup, Map<WordTheme, WordPool>>();
 const boundsCache = new Map<string, Record<string, readonly [number, number]>>();
 const spanCache = new Map<string, readonly [number, number]>();
 const agreedCache = new Map<string, readonly string[]>();
@@ -1367,13 +1374,17 @@ function verbGroupsFor(
 			return false;
 		}
 
+		if (object && !acceptsObjectNoun(data, group, object.word)) {
+			return false;
+		}
+
 		if (beat?.item && group.object && !acceptsObject(group, beat.item)) {
 			return false;
 		}
 
 		return (
 			subjectThemesOf(group, themes, language, data).length > 0 &&
-			(!group.object || objectThemesOf(group, beat).length > 0)
+			(!group.object || objectThemesOf(group, beat, language, data).length > 0)
 		);
 	});
 
@@ -1511,19 +1522,105 @@ function acceptsObject(group: VerbGroup, theme: WordTheme): boolean {
 }
 
 /**
+ * Whether a verb group takes this noun as its object, by what the noun is: the
+ * same question `acceptsNoun` asks of the subject. `sips` takes a liquid,
+ * `chews` takes none, and `roasts` takes something raw.
+ */
+function acceptsObjectNoun(data: SentenceLanguageData, group: VerbGroup, noun: string): boolean {
+	if (!group.objectTraits && !group.objectWithout) {
+		return true;
+	}
+
+	const traits = traitsOf(data, noun);
+
+	if (group.objectTraits && !group.objectTraits.some((trait) => traits.includes(trait))) {
+		return false;
+	}
+
+	return !group.objectWithout?.some((trait) => traits.includes(trait));
+}
+
+/**
+ * The object pool without the story's other thing: a prop is never the item
+ * and the item never the prop. The whole pool where nothing else is left.
+ */
+function objectPoolAvoiding(
+	language: WordLanguage,
+	data: SentenceLanguageData,
+	group: VerbGroup | StateGroup,
+	theme: WordTheme,
+	avoid: readonly string[]
+): WordPool {
+	const pool = objectPoolFor(language, data, group, theme);
+
+	if (!avoid.length) {
+		return pool;
+	}
+
+	const wordData = WORD_DATA[language];
+	const kept = pool.filter((entry) => !avoid.includes(plain(wordData, entry)));
+
+	return kept.length ? kept : pool;
+}
+
+/** The nouns of a theme a group's object may be drawn from. */
+function objectPoolFor(
+	language: WordLanguage,
+	data: SentenceLanguageData,
+	group: VerbGroup | StateGroup,
+	theme: WordTheme
+): WordPool {
+	const pool = nounsOf(language, theme);
+
+	if (!('field' in group) || (!group.objectTraits && !group.objectWithout)) {
+		return pool;
+	}
+
+	let byTheme = objectPoolCache.get(group);
+
+	if (!byTheme) {
+		byTheme = new Map();
+		objectPoolCache.set(group, byTheme);
+	}
+
+	const cached = byTheme.get(theme);
+
+	if (cached) {
+		return cached;
+	}
+
+	const wordData = WORD_DATA[language];
+	const usable = pool.filter((entry) => acceptsObjectNoun(data, group, plain(wordData, entry)));
+
+	byTheme.set(theme, usable);
+
+	return usable;
+}
+
+/**
  * The themes a verb group's object may come from: its classes, narrowed to the
  * themes it names when it names any, and to the story's item when there is one.
  */
-function objectThemesOf(group: VerbGroup, beat: BeatDraw | null): readonly WordTheme[] {
-	if (beat?.item) {
-		return acceptsObject(group, beat.item) ? [beat.item] : [];
-	}
+function objectThemesOf(
+	group: VerbGroup,
+	beat: BeatDraw | null,
+	language: WordLanguage,
+	data: SentenceLanguageData
+): readonly WordTheme[] {
+	const byClass = beat?.item
+		? acceptsObject(group, beat.item)
+			? [beat.item]
+			: []
+		: themesForClasses(WORD_THEMES, group.object ?? []);
+	const byTheme =
+		group.objectThemes && !beat?.item
+			? byClass.filter((theme) => group.objectThemes!.includes(theme))
+			: byClass;
 
-	const byClass = themesForClasses(WORD_THEMES, group.object ?? []);
-
-	return group.objectThemes
-		? byClass.filter((theme) => group.objectThemes!.includes(theme))
-		: byClass;
+	// A group that asks for a trait is only worth a theme that has a noun with it.
+	return group.objectTraits || group.objectWithout
+		? byTheme.filter((theme) => objectPoolFor(language, data, group, theme).length > 0)
+		: byTheme;
 }
 
 /** The same, for a shape headed by an adjective rather than a verb. */
@@ -2173,7 +2270,8 @@ function compose(
 		isNounSlot(part.slot)
 			? part.slot === subjectSlot
 				? subjectTheme
-				: (plan.phrase.get(at)?.theme ?? themeForPart(part.slot, group, themes, draw.beat))
+				: (plan.phrase.get(at)?.theme ??
+					themeForPart(part.slot, group, themes, draw.beat, language, data))
 			: null
 	);
 	// What a phrase writes instead of a noun phrase, when it writes one at all: a
@@ -2422,7 +2520,11 @@ function compose(
 				[nounLow, nounHigh],
 				part.slot === 'quantity' ? countText(data, theme) : '',
 				required && !required.known ? null : theme,
-				part.slot === subjectSlot ? subjectPoolFor(language, data, group, theme) : null
+				part.slot === subjectSlot
+					? subjectPoolFor(language, data, group, theme)
+					: part.slot === 'object'
+						? objectPoolAvoiding(language, data, group, theme, draw.beat?.avoid ?? [])
+						: null
 			);
 
 			phrase = built.text;
@@ -2856,10 +2958,12 @@ function themeForPart(
 	slot: SentenceSlot,
 	group: VerbGroup | StateGroup,
 	themes: readonly WordTheme[],
-	beat: BeatDraw | null
+	beat: BeatDraw | null,
+	language: WordLanguage,
+	data: SentenceLanguageData
 ): WordTheme {
 	if (slot === 'object' || slot === 'quantity') {
-		const usable = objectThemesOf(group as VerbGroup, beat);
+		const usable = objectThemesOf(group as VerbGroup, beat, language, data);
 
 		return pick(usable.length ? usable : WORD_THEMES);
 	}
@@ -3641,7 +3745,10 @@ function tellStory(telling: Telling): Result | null {
 			item: step.object === 'prop' ? prop : item,
 			places: placeThemes,
 			subject: step.kind === 'scene' ? placeThemes : heroThemes,
-			pinned: pinnedFor(beat)
+			pinned: pinnedFor(beat),
+			avoid: [step.object === 'prop' ? roles.item?.word : roles.prop?.word].filter(
+				(word): word is string => word !== undefined
+			)
 		};
 	};
 

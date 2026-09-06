@@ -223,6 +223,8 @@ console.log(
 							subjectTraits: list(group.subjectTraits),
 							subjectWithout: list(group.subjectWithout),
 							objectThemes: list(group.objectThemes),
+							objectTraits: list(group.objectTraits),
+							objectWithout: list(group.objectWithout),
 							requires: group.requires ?? '',
 							words: list(group.words),
 							forms: forms(group.forms),
