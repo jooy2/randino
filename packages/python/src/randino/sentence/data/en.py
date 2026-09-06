@@ -32,14 +32,14 @@ EN = SentenceLanguageData(
         VerbGroup(
             field="rise",
             subject=("creature", "person"),
-            words=words("wakes gets_up rises stirs"),
+            words=words("wakes gets_up rises"),
             forms={
-                "question": words("wake get_up rise stir"),
+                "question": words("wake get_up rise"),
             },
             past=PredicateTense(
-                words=words("woke got_up rose stirred"),
+                words=words("woke got_up rose"),
                 forms={
-                    "question": words("wake get_up rise stir"),
+                    "question": words("wake get_up rise"),
                 },
             ),
         ),

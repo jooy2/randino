@@ -37,7 +37,7 @@ export const EN: SentenceLanguageData = {
 		{
 			field: 'rise',
 			subject: ['creature', 'person'],
-			...tensed(`wakes gets_up rises stirs`, `wake get_up rise stir`, `woke got_up rose stirred`)
+			...tensed(`wakes gets_up rises`, `wake get_up rise`, `woke got_up rose`)
 		},
 		// Setting off: the verbs that need somewhere to go, and the ones that stand
 		// on their own. `heads` wants a `to the market` after it; `leaves` does not.

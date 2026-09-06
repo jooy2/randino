@@ -28,11 +28,11 @@ final SentenceLanguageData en = SentenceLanguageData(
     VerbGroup(
       field: VerbField.rise,
       subject: const <NounClass>[NounClass.creature, NounClass.person],
-      words: words(r'wakes gets_up rises stirs'),
-      forms: <PredicateForm, WordPool>{PredicateForm.question: words(r'wake get_up rise stir')},
+      words: words(r'wakes gets_up rises'),
+      forms: <PredicateForm, WordPool>{PredicateForm.question: words(r'wake get_up rise')},
       past: PredicateTense(
-        words: words(r'woke got_up rose stirred'),
-        forms: <PredicateForm, WordPool>{PredicateForm.question: words(r'wake get_up rise stir')},
+        words: words(r'woke got_up rose'),
+        forms: <PredicateForm, WordPool>{PredicateForm.question: words(r'wake get_up rise')},
       ),
     ),
     VerbGroup(
