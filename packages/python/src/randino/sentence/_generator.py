@@ -4901,7 +4901,7 @@ def generate_sentence_details(
     include: str | Sequence[str] = (),
     count: int = 1,
     realism: RandRealism = "real",
-    vocabulary: RandVocabulary = "full",
+    vocabulary: RandVocabulary = "common",
     min_length: int | None = None,
     max_length: int | None = None,
     starts_with: str = "",

@@ -4792,7 +4792,9 @@ function resolveSettings(options: RandSentenceOptions): Settings {
 		prefix: resolvePrefix(options.startsWith),
 		include: resolveInclude(options.include),
 		sentences: clamp(Math.floor(options.sentences ?? 1), 1, RAND_SENTENCE_COUNT_MAX),
-		vocabulary: resolveVocabulary(options.vocabulary),
+		// A sentence is read, so it keeps to the words people use unless asked
+		// otherwise; a word asked for on its own is a word.
+		vocabulary: resolveVocabulary(options.vocabulary ?? 'common'),
 		realism: options.realism ?? 'real',
 		includeName: typeof options.includeName === 'boolean' ? options.includeName : null,
 		types: resolveTypes(options.type),

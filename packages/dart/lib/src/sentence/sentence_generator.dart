@@ -4983,7 +4983,7 @@ List<SentenceDetail> generateSentenceDetails({
   SentenceStyle? style,
   SentenceTense? tense,
   SentenceStory? story,
-  RandVocabulary vocabulary = RandVocabulary.full,
+  RandVocabulary vocabulary = RandVocabulary.common,
 }) {
   final settings = _Settings(
     theme: theme,

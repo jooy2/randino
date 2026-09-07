@@ -176,7 +176,7 @@ sentence_length_range("en")  # (12, 92)
 | `include_name`              | `bool \| None`                      | _drawn_   |
 | `count`                     | `int`                               | `1`       |
 | `realism`                   | `RandRealism`                       | `"real"`  |
-| `vocabulary`                | `RandVocabulary`                    | `"full"`  |
+| `vocabulary`                | `RandVocabulary`                    | `"common"`  |
 | `min_length` / `max_length` | `int \| None`                       | _language_ |
 | `starts_with`               | `str`                               | `""`      |
 | `unique`                    | `bool`                              | `False`   |

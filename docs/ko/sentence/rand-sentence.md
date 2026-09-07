@@ -57,7 +57,7 @@ rand_sentence()
 | <Lang js="includeName" dart="includeName" py="include_name" code /> | <Lang js="boolean" dart="bool" py="bool" code /> | 무작위 | 사람이 설 자리에 사람 이름을 씁니다. [사람 이름](#a-persons-name) 참고. |
 | `count` | <Lang js="number" dart="int" py="int" code /> | `1` | 돌려줄 문장 개수. `0` … `10000`으로 제한됩니다. |
 | `realism` | `RandRealism` | <Lang js="`'real'`" dart="`RandRealism.real`" py="`\"real\"`" /> | `real`은 실제 단어를, `invented`는 그 언어처럼 읽히기만 하는 단어를 씁니다. `mixed`는 단어마다 정합니다. 문법은 어느 쪽이든 실제 그대로입니다. |
-| `vocabulary` | `RandVocabulary` | <Lang js="`'full'`" dart="`RandVocabulary.full`" py="`\"full\"`" /> | 명사가 얼마나 흔해야 하는지 정합니다. 주어, 목적어, 장소, 이야기의 물건이 모두 해당하며 `basic`, `common`, `full` 중 하나입니다. [흔한 단어](../word/rand-word#vocabulary)를 보세요. |
+| `vocabulary` | `RandVocabulary` | <Lang js="`'common'`" dart="`RandVocabulary.common`" py="`\"common\"`" /> | 명사가 얼마나 흔해야 하는지 정합니다. 주어, 목적어, 장소, 이야기의 물건이 모두 해당하며 `basic`, `common`, `full` 중 하나입니다. 문장은 읽히는 것이므로 따로 정하지 않으면 사람들이 쓰는 단어로 씁니다. [흔한 단어](../word/rand-word#vocabulary)를 보세요. |
 | <Lang js="minLength" dart="minLength" py="min_length" code /> | <Lang js="number" dart="int?" py="int &#124; None" code /> | _언어_ | 문장 부호를 포함한 최소 글자 수. |
 | <Lang js="maxLength" dart="maxLength" py="max_length" code /> | <Lang js="number" dart="int?" py="int &#124; None" code /> | _언어_ | 최대 글자 수. |
 | <Lang js="startsWith" dart="startsWith" py="starts_with" code /> | <Lang js="string" dart="String?" py="str" code /> | <Lang js="—" dart="null" py="&quot;&quot;" code /> | 이 글자로 시작하는 문장만 남깁니다. 관사를 쓰는 언어에서는 그 글자가 관사의 첫 글자입니다. |

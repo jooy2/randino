@@ -76,7 +76,7 @@ List<SentenceDetail> randSentenceDetails({
   List<String> include = const <String>[],
   int count = 1,
   RandRealism realism = RandRealism.real,
-  RandVocabulary vocabulary = RandVocabulary.full,
+  RandVocabulary vocabulary = RandVocabulary.common,
   int? minLength,
   int? maxLength,
   String? startsWith,

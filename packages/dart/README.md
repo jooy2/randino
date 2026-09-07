@@ -167,7 +167,7 @@ sentenceLengthRange(WordLanguage.en); // LengthRange(12, 92)
 | `includeName`             | `bool?`               | `null` — drawn     |
 | `count`                   | `int`                 | `1`                |
 | `realism`                 | `RandRealism`         | `RandRealism.real` |
-| `vocabulary`              | `RandVocabulary`      | `RandVocabulary.full` |
+| `vocabulary`              | `RandVocabulary`      | `RandVocabulary.common` |
 | `minLength` / `maxLength` | `int?`                | _language_         |
 | `startsWith`              | `String?`             | `null`             |
 | `unique`                  | `bool`                | `false`            |

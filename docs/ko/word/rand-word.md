@@ -203,7 +203,7 @@ rand_word(language="ko", vocabulary="basic", count=5)
 
 :::
 
-등급은 언어마다 그 언어의 단어를 두고 매긴 판단입니다. `탈륨`이 드문 것은 탈륨이 낯선 물질이어서가 아니라 아무도 그 말을 입에 올리지 않기 때문입니다. 모든 테마에 기본 단어가 몇 개씩은 남아 있어서 `randGem({ vocabulary: 'basic' })`도 답을 냅니다. [`randNickname`](../nickname/rand-nickname)은 기준이 되는 명사에, [`randSentence`](../sentence/rand-sentence)는 문장의 모든 명사에 같은 옵션을 받습니다. 호출자가 요구한 단어, 만들어낸 단어, 사람 이름은 풀의 단어가 아니므로 등급이 없습니다.
+등급은 언어마다 그 언어의 단어를 두고 매긴 판단입니다. `탈륨`이 드문 것은 탈륨이 낯선 물질이어서가 아니라 아무도 그 말을 입에 올리지 않기 때문입니다. 모든 테마에 기본 단어가 몇 개씩은 남아 있어서 `randGem({ vocabulary: 'basic' })`도 답을 냅니다. [`randNickname`](../nickname/rand-nickname)은 기준이 되는 명사에, [`randSentence`](../sentence/rand-sentence)는 문장의 모든 명사에 같은 옵션을 받습니다. 문장은 읽히는 것이므로 `randSentence`의 기본값만은 `full`이 아니라 `common`입니다. 호출자가 요구한 단어, 만들어낸 단어, 사람 이름은 풀의 단어가 아니므로 등급이 없습니다.
 
 ## 상세 출력 {#the-detail-output}
 

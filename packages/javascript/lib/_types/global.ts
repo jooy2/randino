@@ -50,7 +50,9 @@ export type RandRealism = 'real' | 'mixed' | 'invented';
  * - `common`: those and the words an adult speaker knows and uses now and then —
  *   `두더지`, `탐정`, `badger`, `interpreter`.
  * - `full`: every word the pools hold, the specialist's and the dictionary's
- *   included — `탈륨`, `통메장이`, `thallium`, `cooper`. The default.
+ *   included — `탈륨`, `통메장이`, `thallium`, `cooper`. The default for `randWord`
+ *   and `randNickname`, which are asked for a word; `randSentence` defaults to
+ *   `common`, because a sentence is read.
  *
  * Each level holds the ones below it, so `common` is the pools with the rare
  * words left out, not a band of middling ones. The levels are a judgement made
@@ -499,8 +501,8 @@ export interface RandSentenceOptions extends RandCommonOptions {
 	theme?: WordThemeOption;
 	/**
 	 * How common the nouns have to be — the subject, the object, the place, the
-	 * thing a story is about. Default `'full'`, which is every word the pools
-	 * hold. The verbs, the
+	 * thing a story is about. Default `'common'`, which is every word the pools
+	 * hold but the rare ones; `'full'` is the pools as they are. The verbs, the
 	 * modifiers and the adverbials are the sentence data's own and are drawn as
 	 * they always were.
 	 */

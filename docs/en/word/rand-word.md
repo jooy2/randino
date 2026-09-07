@@ -203,7 +203,7 @@ rand_word(language="ko", vocabulary="basic", count=5)
 
 :::
 
-The levels are a judgement made per language about that language's own words — `탈륨` is rare because nobody says it, not because thallium is obscure — and every theme keeps a handful of basic words, so `randGem({ vocabulary: 'basic' })` still answers. [`randNickname`](../nickname/rand-nickname) takes the same option for the noun it is built around, and [`randSentence`](../sentence/rand-sentence) for every noun of the sentence; a word the caller required, an invented word and a person's name are not the pools', and have no level.
+The levels are a judgement made per language about that language's own words — `탈륨` is rare because nobody says it, not because thallium is obscure — and every theme keeps a handful of basic words, so `randGem({ vocabulary: 'basic' })` still answers. [`randNickname`](../nickname/rand-nickname) takes the same option for the noun it is built around, and [`randSentence`](../sentence/rand-sentence) for every noun of the sentence — where the default is `common` rather than `full`, because a sentence is read; a word the caller required, an invented word and a person's name are not the pools', and have no level.
 
 ## The detail output {#the-detail-output}
 
