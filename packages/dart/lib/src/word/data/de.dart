@@ -18,6 +18,16 @@ final TaggedNouns _nouns = taggedNouns(<WordTheme, String>{
     Waschbär:m Dachs:m Luchs:m Bison:m Elch:m Kamel:n Koala:m Faultier:n Frettchen:n
     Maulwurf:m Reiher:m Pelikan:m Walross:n Wiesel:n Gazelle:f Zebra:n Büffel:m Robbe:f
     Pinguin:m Strauß:m
+    Wildschwein:n Rentier:n Antilope:f Gnu:n Giraffe:f Nilpferd:n Nashorn:n
+    Erdmännchen:n Gürteltier:n Biber:m Schnabeltier:n Känguru:n Lemur:m Schimpanse:m
+    Pavian:m Tapir:m Iltis:m Marder:m Amsel:f Nachtigall:f Lerche:f Wachtel:f Fasan:m
+    Rebhuhn:n Kolibri:m Tukan:m Flamingo:m Storch:m Wiedehopf:m Distelfink:m Elster:f
+    Häher:m Kauz:m Bussard:m Möwe:f Specht:m Zaunkönig:m Aal:m Sardine:f Thunfisch:m
+    Dorsch:m Seehecht:m Forelle:f Karpfen:m Rochen:m Qualle:f Muschel:f
+    Auster:f Hummer:m Seestern:m Käfer:m Heuschrecke:f Grille:f Wespe:f Motte:f
+    Leuchtkäfer:m Tausendfüßer:m Skorpion:m Floh:m Raupe:f Hummel:f Marienkäfer:m
+    Leguan:m Chamäleon:n Salamander:m Molch:m Boa:f Viper:f Kobra:f Python:m
+    Meerforelle:f
   ''',
   WordTheme.object: r'''
     Flasche:f Bleistift:m Radierer:m Regenschirm:m Lampe:f Laterne:f Spiegel:m
@@ -28,15 +38,24 @@ final TaggedNouns _nouns = taggedNouns(<WordTheme, String>{
     Teller:m Zahnrad:n Feder:f Magnet:m Band:n Umschlag:m Kissen:n Decke:f Korb:m
     Besen:m Pfeife:f Seil:n Eimer:m Fächer:m Schild:m Netz:n Angel:f Krug:m Kamm:m
     Glöckchen:n Trichter:m Tablett:n Schachtel:f Fass:n Dose:f Fläschchen:n
+    Kompass:m Stecknadel:f Fingerhut:m Knäuel:n Bindfaden:m Strick:m Haken:m Nagel:m
+    Schraube:f Scharnier:n Riegel:m Kette:f Schnalle:f Brosche:f Armreif:m Ring:m
+    Aktentasche:f Rucksack:m Truhe:f Kiste:f Bottich:m Schale:f Mörser:m Klammer:f
+    Schleife:f Kordel:f Docht:m Öse:f Zwirn:m Lupe:f Wecker:m Kanister:m Zwinge:f
   ''',
   WordTheme.nature: r'''
     Meer:n Fluss:m See:m Wasserfall:m Tal:n Berg:m Hügel:m Wiese:f Wald:m Höhle:f
     Wüste:f Sand:m Fels:m Kiesel:m Vulkan:m Erdbeben:n Gletscher:m Riff:n Sumpf:m Bach:m
     Bucht:f Düne:f Gipfel:m Heide:f Steppe:f Savanne:f Mündung:f Delta:n Lagune:f
     Atoll:n Fjord:m Landzunge:f Halbinsel:f Landenge:f Inselgruppe:f Eiland:n
-    Hochebene:f Schlucht:f Klippe:f Spalte:f Moräne:f Geröll:n Findling:m Sandbank:f
+    Hochebene:f Schlucht:f Klippe:f Moräne:f Geröll:n Findling:m Sandbank:f
     Untiefe:f Abgrund:m Geysir:m Doline:f Tropfstein:m Grotte:f Sims:n Hang:m Schatten:m
     Echo:n Glut:f Quelle:f Ufer:n Küste:f
+    Urwald:m Ebene:f Tundra:f Moor:n Oase:f Aue:f Furt:f Strand:m
+    Meerbusen:m Meerenge:f Kanal:m Strömung:f Gezeiten:p Welle:f Schaum:m Brandung:f
+    Steilhang:m Zinne:f Mulde:f Senke:f Kessel:m Kluft:f Karst:m Geröllhalde:f
+    Steilküste:f Lichtung:f Dickicht:n
+    Salzwiese:f Meeresarm:m Felsspalte:f
   ''',
   WordTheme.plant: r'''
     Baum:m Blatt:n Blume:f Wurzel:f Samen:m Frucht:f Moos:n Farn:m Bambus:m Föhre:f
@@ -46,6 +65,12 @@ final TaggedNouns _nouns = taggedNouns(<WordTheme, String>{
     Walnuss:f Rasen:m Alge:f Hecke:f Blumenstrauß:m Kaktus:m Aloe:f Basilikum:n
     Thymian:m Oregano:m Petersilie:f Koriander:m Schnittlauch:m Fenchel:m Dill:m
     Salbei:m Estragon:m Minze:f Kamille:f Lavendel:m Efeu:m Palme:f
+    Stamm:m Rinde:f Saft:m Dorn:m Brombeere:f Mistel:f Stechpalme:f Lorbeer:m
+    Ölbaum:m Apfelbaum:m Mandelbaum:m Pappel:f Esche:f Ulme:f Linde:f Buche:f
+    Lärche:f Mammutbaum:m Eukalyptus:m Akazie:f Magnolie:f Kamelie:f Begonie:f
+    Petunie:f Geranie:f Nelke:f Gänseblume:f Mohn:m Hyazinthe:f Narzisse:f Tulpe:f
+    Lilie:f Dahlie:f Pfingstrose:f Klee:m Binse:f Brennnessel:f Distel:f
+    Maiglöckchen:n Glyzinie:f
   ''',
   WordTheme.gem: r'''
     Gold:n Silber:n Kupfer:n Eisen:n Stahl:m Bronze:f Messing:n Zinn:n Zink:n Platin:n
@@ -55,6 +80,10 @@ final TaggedNouns _nouns = taggedNouns(<WordTheme, String>{
     Nugget:n Graphit:m Quecksilber:n Gips:m Ader:f Olivin:m Turmalin:m Rubin:m Saphir:m
     Smaragd:m Topas:m Zirkon:m Pyrit:m Magnetit:m Hämatit:m Zinnober:m Bleiglanz:m
     Talk:m Wismut:n
+    Nickel:n Titan:n Aluminium:n Blei:n Wolfram:n Kobalt:n Chrom:n Mangan:n Lithium:n
+    Uran:n Lapislazuli:m Karneol:m Jaspis:m Onyx:m Beryll:m Spinell:m Peridot:m
+    Alabaster:m Schiefer:m Sandstein:m Gneis:m Quarzit:m Tuff:m Dolomit:m Apatit:m
+    Baryt:m Korund:m Feldspat:m Muskovit:m Siderit:m Limonit:m Bauxit:m
   ''',
   WordTheme.concept: r'''
     Freiheit:f Frieden:m Wahrheit:f Weisheit:f Erinnerung:f Fantasie:f Erzählung:f
@@ -67,6 +96,11 @@ final TaggedNouns _nouns = taggedNouns(<WordTheme, String>{
     Hypothese:f Paradox:n Dilemma:n Vorbild:n Prämisse:f Ableitung:f Analogie:f
     Metapher:f Sinnbild:n Chronik:f Zeugnis:n Manifest:n Vertrag:m Bündnis:n
     Abstammung:f Erbe:n Zeremonie:f Schwelle:f
+    Vers:m Prosa:f Novelle:f Essay:n These:f Synthese:f Analyse:f Methode:f Theorie:f
+    Praxis:f Technik:f Kunst:f Ethik:f Ästhetik:f Rhetorik:f Dialektik:f Semantik:f
+    Orthografie:f Kalligrafie:f Gewissheit:f Zufall:m Schicksal:n Los:n Wille:m
+    Gewissen:n Identität:f Wesen:n Materie:f Form:f Ursache:f Wirkung:f Ordnung:f
+    Chaos:n Grenze:f Ursprung:m Absicht:f Einsicht:f
   ''',
   WordTheme.myth: r'''
     Drache:m Phönix:m Einhorn:n Meerjungfrau:f Fee:f Kobold:m Elf:m Zwerg:m Troll:m
@@ -76,6 +110,10 @@ final TaggedNouns _nouns = taggedNouns(<WordTheme, String>{
     Talisman:m Rune:f Pforte:f Heiligtum:n Götze:m Totem:n Nymphe:f Najade:f Dryade:f
     Walküre:f Muse:f Hexer:m Hexe:f Nekromant:m Alchemist:m Weiser:m Vorzeichen:n Omen:n
     Bestiarium:n
+    Satyr:m Faun:m Harpyie:f Gorgone:f Zyklop:m Koloss:m Leviathan:m Gnom:m Wichtel:m
+    Undine:f Sylphe:f Dschinn:m Erscheinung:f Beschwörung:f Zauberbuch:n Pentagramm:n
+    Reliquie:f Kelch:m Gral:m Zauberstab:m Stab:m Zepter:n Krone:f Hippogreif:m
+    Mantikor:m Lindwurm:m Unhold:m Waldgeist:m
   ''',
   WordTheme.job: r'''
     Ritter:m Jäger:m Dieb:m Pirat:m Matrose:m Kapitän:m Koch:m Gärtner:m Schmied:m
@@ -88,6 +126,13 @@ final TaggedNouns _nouns = taggedNouns(<WordTheme, String>{
     Schauspieler:m Regisseur:m Musiker:m Bergmann:m Tischler:m Töpfer:m Schneider:m
     Wahrsager:m Prophet:m Priester:m Gelehrter:m Doktor:m Erfinder:m Forscher:m
     Sportler:m Akrobat:m Bildhauer:m Uhrmacher:m Bäcker:m Brauer:m Gerber:m Weber:m
+    Anwalt:m Richter:m Notar:m Buchhalter:m Bankier:m Kassierer:m Verkäufer:m
+    Kellner:m Hausmeister:m Lotse:m Fahrer:m Mechaniker:m Klempner:m Maurer:m Glaser:m
+    Juwelier:m Schuster:m Hutmacher:m Friseur:m Barbier:m Konditor:m Metzger:m
+    Florist:m Buchhändler:m Archäologe:m Astronom:m Biologe:m Geologe:m Botaniker:m
+    Historiker:m Philosoph:m Archivar:m Winzer:m Müller:m Imker:m Zimmerer:m Küfer:m
+    Seiler:m
+    Kosmonaut:m Astronaut:m
   ''',
   WordTheme.music: r'''
     Klavier:n Gitarre:f Trommel:f Glocke:f Harfe:f Lied:n Tanz:m Rhythmus:m Melodie:f
@@ -98,6 +143,10 @@ final TaggedNouns _nouns = taggedNouns(<WordTheme, String>{
     Orchester:n Satz:m Ouvertüre:f Fuge:f Etüde:f Nachtstück:n Ständchen:n Rhapsodie:f
     Hymne:f Requiem:n Kantate:f Arie:f Duett:n Trio:n Quartett:n Quintett:n Dirigent:m
     Oktave:f Halbton:m Notenlinie:f Metronom:n Pedal:n Saite:f Mundstück:n
+    Kontrabass:m Fagott:n Horn:n Posaune:f Tuba:f Dudelsack:m Okarina:f Zither:f
+    Psalter:m Rassel:f Kastagnette:f Kuhglocke:f Gong:m Pauke:f Kontrapunkt:m Kadenz:f
+    Arpeggio:n Triller:m Glissando:n Legato:n Tempo:n Refrain:m Strophe:f Volkslied:n
+    Choral:m Motette:f Kanon:m Präludium:n Ton:m Klang:m Dreiklang:m Leier:f Schalmei:f
   ''',
   WordTheme.place: r'''
     Markt:m Platz:m Stadt:f Dorf:n Gasse:f Brücke:f Garten:m Bücherei:f Museum:n
@@ -108,6 +157,12 @@ final TaggedNouns _nouns = taggedNouns(<WordTheme, String>{
     Bäckerei:f Café:n Gasthaus:n Küche:f Schlafzimmer:n Wohnzimmer:n Flur:m Treppe:f
     Tunnel:m Steg:m Kreuzung:f Allee:f Festung:f Bauernhof:m Obstgarten:m Abtei:f
     Kreuzgang:m Bastion:f Warte:f Graben:m Werft:f Lager:n Villa:f Landhaus:n Weiler:m
+    Dom:m Kapelle:f Kloster:n Friedhof:m Mausoleum:n Gruft:f Moschee:f Synagoge:f
+    Pagode:f Herberge:f Wirtshaus:n Schenke:f Taverne:f Jahrmarkt:m Viertel:n
+    Vorstadt:f Vorort:m Boulevard:m Pfad:m Steig:m Abkürzung:f Damm:m Schleuse:f Wehr:n
+    Mühle:f Schmiede:f Werkstatt:f Silo:n Stall:m Pferch:m Heuboden:m Gaststube:f
+    Anlegestelle:f Zollhaus:n
+    Sternwarte:f
   ''',
   WordTheme.food: r'''
     Reis:m Brot:n Nudel:f Suppe:f Eintopf:m Salat:m Salz:n Zucker:m Pfeffer:m
@@ -118,6 +173,12 @@ final TaggedNouns _nouns = taggedNouns(<WordTheme, String>{
     Curry:n Omelett:n Brezel:f Brötchen:n Semmel:f Strudel:m Torte:f Wurst:f Schinken:m
     Speck:m Salami:f Frikadelle:f Schnitzel:n Braten:m Marmelade:f Honig:m Sahne:f
     Quark:m Sauerkraut:n Knödel:m
+    Roggen:m Gerste:f Hafer:m Mais:m Linse:f Kichererbse:f Bohne:f Erbse:f Sojabohne:f
+    Tomate:f Paprika:f Aubergine:f Zucchini:f Brokkoli:m Blumenkohl:m Artischocke:f
+    Spargel:m Lauch:m Radieschen:n Rübe:f Sellerie:m Birne:f Pflaume:f Feige:f
+    Granatapfel:m Quitte:f Mispel:f Aprikose:f Nektarine:f Pampelmuse:f Mandarine:f
+    Kiwi:f Nuss:f Pistazie:f Erdnuss:f Marone:f Lebkuchen:m Stollen:m Krapfen:m
+    Auflauf:m
   ''',
   WordTheme.sport: r'''
     Fußball:m Baseball:m Basketball:m Volleyball:m Tischtennis:n Tennis:n Federball:m
@@ -127,6 +188,10 @@ final TaggedNouns _nouns = taggedNouns(<WordTheme, String>{
     Endspiel:n Vorrunde:f Training:n Polo:n Eislauf:m Tauchen:n Dart:m Hürde:f Speer:m
     Diskus:m Staffel:f Anzeigetafel:f Helm:m Foul:n Gewichtheben:n Schlitten:m
     Aufschlag:m Sprung:m Lauf:m Ziel:n Podest:n Umkleide:f Tribüne:f Anhänger:m
+    Kanusport:m Regatta:f Triathlon:m Zehnkampf:m Fünfkampf:m Wurf:m Sprungbrett:n
+    Matte:f Ringe:p Bock:m Schachspiel:n Domino:n Stürmer:m Verteidiger:m Trainer:m
+    Stadion:n Spielfeld:n Bahn:f Elfmeter:m Ecke:f Punktestand:m Sieg:m Niederlage:f
+    Rekord:m Turnier:n Liga:f Wettkampf:m Zielgerade:f Vorlage:f
   ''',
   WordTheme.vehicle: r'''
     Fahrrad:n Zug:m Boot:n Auto:n Bus:m Taxi:n Lastwagen:m Motorrad:n Roller:m
@@ -136,6 +201,11 @@ final TaggedNouns _nouns = taggedNouns(<WordTheme, String>{
     Luftschiff:n Fallschirm:m Sänfte:f Dreirad:n Lieferwagen:m Limousine:f Schneepflug:m
     Katamaran:m Eisbrecher:m Tanker:m Lastkahn:m Fischkutter:m Doppeldecker:m Sonde:f
     Fähre:f Pistenraupe:f Einrad:n Schlepper:m Gondel:f Waggon:m
+    Kalesche:f Postkutsche:f Karosse:f Cabrio:n Kipper:m Betonmischer:m Kran:m Walze:f
+    Mähdrescher:m Schlittschuh:m Rollbrett:n Mofa:n Beiwagen:m Kreuzfahrer:m Galeere:f
+    Galeone:f Fregatte:f Korvette:f Brigg:f Schoner:m Einbaum:m Schaluppe:f Barkasse:f
+    Segelflieger:m Jagdflieger:m Bomber:m Trittroller:m Reisebus:m
+    Planwagen:m
   ''',
   WordTheme.product: r'''
     Rechner:m Tastatur:f Maus:f Bildschirm:m Drucker:m Lautsprecher:m Kopfhörer:m
@@ -147,6 +217,11 @@ final TaggedNouns _nouns = taggedNouns(<WordTheme, String>{
     Glühbirne:f Steckdose:f Steckleiste:f Bettdecke:f Bezug:m Handtuch:n Waschbecken:n
     Waschmittel:n Weichspüler:m Pfanne:f Schneebesen:m Schäler:m Korkenzieher:m
     Thermoskanne:f Fußmatte:f Kleiderbügel:m Schrank:m Regal:n Nachttisch:m
+    Fernseher:m Konsole:f Verstärker:m Waage:f Bügeleisen:n Toaster:m Fritteuse:f
+    Entsafter:m Wasserkocher:m Heizkörper:m Thermostat:n Teppich:m Jalousie:f Leuchter:m
+    Besteck:n Geschirr:n Tischdecke:f Serviette:f Abtropfsieb:n Spülbecken:n
+    Wasserhahn:m Dusche:f Wanne:f Handspiegel:m Nagelfeile:f Rasierpinsel:m
+    Kaffeemühle:f Eierbecher:m Salzstreuer:m Untersetzer:m
   ''',
   WordTheme.color: r'''
     Karmesin:n Scharlach:n Zinnoberrot:n Purpur:n Magenta:n Fuchsia:n Rosa:n Lachs:n
@@ -157,10 +232,15 @@ final TaggedNouns _nouns = taggedNouns(<WordTheme, String>{
     Goldgelb:n Silbergrau:n Bronzeton:m Aschgrau:n Rauchgrau:n Sandton:m Weizengelb:n
     Zimtbraun:n Muskatbraun:n Paprikarot:n Nachtblau:n Moosgrün:n Tannengrün:n
     Schneeweiß:n
+    Amarant:n Korallenrot:n Karmin:n Bordeauxrot:n Mahagoni:n Rotbraun:n Blaugrün:n
+    Graublau:n Blassgelb:n Dunkelgrün:n Hellblau:n Tiefschwarz:n
+    Kobaltblau:n Zitronengelb:n Pfirsichton:m Blaugrau:n Gelbgrün:n Braunrot:n
+    Perlweiß:n Nebelgrau:n Lindgrün:n
+    Beinweiß:n
   ''',
   WordTheme.finance: r'''
     Rechnung:f Quittung:f Anleihe:f Aktie:f Dividende:f Zins:m Darlehen:n Hypothek:f
-    Einlage:f Ersparnis:f Konto:n Saldo:m Haushalt:m Prüfung:f Vermögen:n Schuldposten:m
+    Einlage:f Ersparnis:f Konto:n Saldo:m Haushalt:m Vermögen:n Schuldposten:m
     Kapital:n Ertrag:m Gewinn:m Spanne:f Überschuss:m Fehlbetrag:m Schuld:f Kredit:m
     Lastschrift:f Scheck:m Münze:f Währung:f Rendite:f Depot:n Zoll:m Erstattung:f
     Prämie:f Rente:f Lohnliste:f Gehalt:n Lohn:m Bonus:m Provision:f Lizenzgebühr:f
@@ -169,6 +249,11 @@ final TaggedNouns _nouns = taggedNouns(<WordTheme, String>{
     Sparbuch:n Verwahrung:f Gläubiger:m Schuldner:m Verleiher:m Bürge:m Bewertung:f
     Schätzung:f Inflation:f Rezession:f Liquidität:f Konkurs:m Spende:f Zuschuss:m
     Ausgabe:f Rabatt:m Rate:f
+    Kasse:f Urkunde:f Wechsel:m Zinssatz:m Quote:f Beitrag:m Abgabe:f Steuer:f
+    Umlage:f Freibetrag:m Bußgeld:n Verzug:m Wucher:m Kaution:f Mitgift:f Erbschaft:f
+    Miete:f Pacht:f Wegezoll:m Zehnt:m Beute:f Schatz:m Reichtum:m Armut:f Kupon:m
+    Pfand:n Bilanzbuch:n Tarif:m Notgroschen:m Rücklage:f
+    Zuschlag:m Nachprüfung:f
   ''',
   WordTheme.tech: r'''
     Server:m Puffer:m Bildpunkt:m Codec:m Paket:n Protokoll:n Stapel:m Halde:f Zeiger:m
@@ -180,6 +265,11 @@ final TaggedNouns _nouns = taggedNouns(<WordTheme, String>{
     Textur:f Vieleck:n Gitternetz:n Oktett:n Wegewahl:f Vermittlung:f Rundruf:m
     Datagramm:n Bootloader:m Dateisystem:n Partition:f Verzeichnis:n Prüfpunkt:m
     Rollback:n Migration:f
+    Kern:m Prozess:m Sitzung:f Abfrage:f Index:m Tabelle:f Sicht:f Spalte:f Zeile:f
+    Knoten:m Graph:m Liste:f Menge:f Modul:n Bibliothek:f Zusatz:m Flicken:m
+    Etikett:n Version:f Bauwerk:n Prüfung:f Spur:f Profil:n
+    Auslöser:m Ereignis:n Signal:n Thema:n Zeitstempel:m Nutzerkonto:n
+    Suchbaum:m Nebenzweig:m Grenzwert:m
   ''',
   WordTheme.weather: r'''
     Wolke:f Wind:m Regen:m Schnee:m Reif:m Nebel:m Tau:m Regenbogen:m Blitz:m Donner:m
@@ -189,6 +279,11 @@ final TaggedNouns _nouns = taggedNouns(<WordTheme, String>{
     Windstoß:m Brise:f Zephir:m Passat:m Fallwind:m Hochdruck:m Tiefdruck:m Klima:n
     Temperatur:f Luftdruck:m Wolkenbruch:m Schwüle:f Raureif:m Morgentau:m Abendrot:n
     Wetter:n
+    Hundstage:p Bise:f Westwind:m Ostwind:m Nordwind:m Südwind:m
+    Orkan:m Tornado:m Windhose:f Staubwolke:f Sprühregen:m Landregen:m Schneefall:m
+    Hagelschlag:m Platzregen:m Wolkendecke:f Dürre:f Windstille:f Kälte:f Hitze:f
+    Wetterlage:f Regenzeit:f
+    Fallböe:f
   ''',
   WordTheme.space: r'''
     Stern:m Mond:m Sonne:f Galaxie:f Komet:m Meteor:m Polarlicht:n Mondsichel:f
@@ -198,6 +293,10 @@ final TaggedNouns _nouns = taggedNouns(<WordTheme, String>{
     Meridian:m Stratosphäre:f Lufthülle:f Leere:f Vollmond:m Neumond:m Halbmond:m
     Mondlicht:n Sternenlicht:n Polarstern:m Abendstern:m Morgenstern:m Mars:m Venus:f
     Jupiter:m Saturn:m Merkur:m Uranus:m Neptun:m Pluto:m Supernova:f Weltraum:m
+    Quadrant:m Parallaxe:f Parsec:n Nadir:n Azimut:n Ellipse:f Perihel:n Aphel:n
+    Fotosphäre:f Chromosphäre:f Ionosphäre:f Exosphäre:f Mesosphäre:f Troposphäre:f
+    Gravitation:f Halo:m Zwergstern:m
+    Feuerkugel:m Raumsonde:f Sternenmeer:n Weltenraum:m
   ''',
   WordTheme.time: r'''
     Morgengrauen:n Morgenröte:f Dämmerung:f Einbruch:m Sonnenwende:f Jahreszeit:f
@@ -207,6 +306,10 @@ final TaggedNouns _nouns = taggedNouns(<WordTheme, String>{
     Ära:f Zeitalter:n Frühling:m Sommer:m Herbst:m Winter:m Vorzeit:f Jetzt:n Kindheit:f
     Jugend:f Reife:f Alter:n Frist:f Zeitraum:m Dauer:f Zeitspanne:f Jahrestag:m
     Gedenktag:m Saison:f Tagesanbruch:m
+    Minute:f Sekunde:f Stunde:f Weile:f Atempause:f Wartezeit:f Kreislauf:m
+    Schicht:f Runde:f Phase:f Etappe:f Abschnitt:m Vormittag:m Frühjahr:n Spätsommer:m
+    Gegenwart:f Morgenluft:f Jahrgang:m Jahrfünft:n Wochenende:n Feiertag:m Werktag:m
+    Vorjahr:n Folgejahr:n
   ''',
   WordTheme.emotion: r'''
     Freude:f Trauer:f Zorn:m Furcht:f Überraschung:f Frohsinn:m Jubel:m Glück:n Rausch:m
@@ -217,6 +320,10 @@ final TaggedNouns _nouns = taggedNouns(<WordTheme, String>{
     Stille:f Vertrauen:n Zweifel:m Verdacht:m Sorge:f Angst:f Schrecken:m Panik:f Wut:f
     Ärger:m Verdruss:m Langeweile:f Begeisterung:f Eifer:m Inbrunst:f Gefühl:n
     Illusion:f Mut:m Scham:f Stolz:m Neid:m Eifersucht:f Gier:f Laune:f
+    Bitterkeit:f Groll:m Hass:m Verachtung:f Misstrauen:n Überdruss:m Beklemmung:f
+    Betrübnis:f Entsetzen:n Andacht:f Milde:f Nachsicht:f Wohlwollen:n Sympathie:f
+    Abneigung:f Frohlocken:n Unruhe:f Bangen:n Verblüffung:f Reue:f Wonne:f Sehnen:n
+    Übermut:m Wehklage:f
   ''',
   WordTheme.body: r'''
     Kopf:m Stirn:f Braue:f Wimper:f Lid:n Nase:f Wange:f Kinn:n Kiefer:m Lippe:f Zunge:f
@@ -229,6 +336,10 @@ final TaggedNouns _nouns = taggedNouns(<WordTheme, String>{
     Schweiß:m Speichel:m Atem:m Puls:m Herzschlag:m Kniescheibe:f Jochbein:n
     Trommelfell:n Augapfel:m Falte:f Grübchen:n Narbe:f Bluterguss:m
     Schwiele:f
+    Schläfe:f Gaumen:m Mandel:f Kehlkopf:m Rachen:m Luftröhre:f Speiseröhre:f
+    Zwerchfell:n Brustbein:n Wirbel:m Oberschenkel:m Wadenbein:n
+    Oberarm:m Unterarm:m Fingerglied:n Fußwurzel:f Spann:m Achsel:f Leiste:f Kniekehle:f
+    Pupille:f Hornhaut:f Netzhaut:f Zäpfchen:n Rachenmandel:f
   ''',
   WordTheme.clothing: r'''
     Hut:m Schuh:m Handschuh:m Schal:m Brille:f Mantel:m Jacke:f Hemd:n Bluse:f Kittel:m
@@ -239,6 +350,11 @@ final TaggedNouns _nouns = taggedNouns(<WordTheme, String>{
     Overall:m Ärmel:m Kragen:m Manschette:f Saum:m Futter:n Stoff:m Leinen:n Seide:f
     Baumwolle:f Wolle:f Samt:m Kord:m Flanell:m Leder:n Barett:n Mütze:f Kappe:f
      Turban:m Schleier:m Tuch:n
+    Gehrock:m Frack:m Smoking:m Wams:n Kutte:f Unterrock:m Mieder:n Gamasche:f
+    Holzschuh:m Espadrille:f Fäustling:m Armstulpe:f Hosenträger:m Korsett:n
+    Reifrock:m Mantilla:f Haube:f Dreispitz:m Kapuze:f Halstuch:n Stulpe:f
+    Litze:f Borte:f
+    Sturzhelm:m
   ''',
   WordTheme.tool: r'''
     Axt:f Schaufel:f Säge:f Leiter:f Zange:f Meißel:m Amboss:m Blasebalg:m Ahle:f
@@ -249,15 +365,24 @@ final TaggedNouns _nouns = taggedNouns(<WordTheme, String>{
     Reibe:f Sieb:n Spaten:m Egge:f Dreschflegel:m Spindel:f Spule:f Griff:m Klinge:f
     Niete:f Stichsäge:f Bandsäge:f Drehbank:f Kettensäge:f Handsäge:f Hohleisen:n
     Reißnadel:f Winkel:m Fase:f Werkbank:f
+    Handbohrer:m Stemmeisen:n Raspel:f Streichmaß:n Senklot:n Kneifzange:f
+    Wagenheber:m Tacker:m Lötlampe:f Feuerstahl:m Gussform:f Stanze:f Schleifstein:m
+    Bohrfutter:n Fräse:f Hippe:f Handbeil:n Zugmesser:n
+    Anreißnadel:f Ösenzange:f
   ''',
   WordTheme.drink: r'''
-    Kaffee:m Tee:m Saft:m Milch:f Wasser:n Limonade:f Apfelwein:m Kakao:m Punsch:m
+    Kaffee:m Tee:m Milch:f Wasser:n Limonade:f Apfelwein:m Kakao:m Punsch:m
     Aufguss:m Kamillentee:m Kräutertee:m Milchkaffee:m Cappuccino:m Espresso:m Bier:n
     Pils:n Weizenbier:n Schwarzbier:n Wein:m Rotwein:m Weißwein:m Roséwein:m Sekt:m
     Champagner:m Sherry:m Portwein:m Wermut:m Likör:m Schnaps:m Obstler:m Rum:m Gin:m
     Wodka:m Whisky:m Weinbrand:m Tequila:m Sake:m Met:m Cocktail:m Nektar:m Sirup:m
     Sprudel:m Tonic:n Eistee:m Molke:f Buttermilch:f Kefir:m Smoothie:m Milchshake:m
     Zuckerwasser:n Eiswasser:n Heißgetränk:n
+    Malzbier:n Bockbier:n Radler:n Schorle:f Traubensaft:m Obstbrand:m Kirschwasser:n
+    Enzian:m Absinth:m Glühwein:m Federweißer:m Apfelsaft:m Birnensaft:m
+    Rübensaft:m Zitronentee:m Sauermilch:f Dickmilch:f Brause:f Quellwasser:n
+    Tafelwasser:n
+    Fruchtsaft:m
   ''',
 });
 
@@ -276,6 +401,15 @@ final WordLanguageData de = WordLanguageData(
      flink stachelig ruhelos kräftig verworren lebhaft zart grau blass innig
     eisig glühend düster leuchtend erhaben schlicht zierlich drollig schlau kühn faul
     wach glatt dicht knapp
+    treu geduldig wachsam geschickt standhaft mild offen verschlossen stur schroff
+    zottig pummelig massiv luftig dampfend würzig honigsüß
+    gefleckt gestreift abgenutzt poliert nagelneu gereift dick dünn flach spitzig krumm
+    gerade schlank gedrungen gedämpft schrill klangvoll dumpf melodisch heiser bebend
+    flüsternd lau schwül bedeckt klar bereift sternenklar mondhell moosig
+    rankend grünend blühend duftend smaragden korallen elfenbeinern kristallen
+    bronzen zinnern bleiern achatfarben purpurn zinnoberrot ockerfarben indigoblau
+    türkis lavendelfarben malvenfarben rabenschwarz entlegen winzig prächtig karg
+    kunstvoll grob gebrechlich kraftvoll geräumig abschüssig
   '''),
   actions: words(r'''
     schlafend rennend fliegend schwimmend singend tanzend lachend weinend gehend stehend
@@ -288,6 +422,13 @@ final WordLanguageData de = WordLanguageData(
     jubelnd grüßend umarmend streichelnd tröstend weckend reisend fliehend landend
     spähend lauschend zählend messend schmiedend schnitzend polierend gießend schneidend
     hackend faltend wickelnd siegelnd klingend summend
+    erwachend hockend kauernd lehnend umkehrend nahend zurückweichend
+    innehaltend schreitend eilend querend heimkehrend aufbrechend entschwindend
+    pirschend schwankend hopsend blickend hinaufschauend beobachtend bewachend streifend
+    glättend ordnend pflegend waschend trocknend flechtend zuschneidend klebend
+    entfaltend füllend leerend eingießend rührend schmorend bratend wärmend kühlend
+    kostend schluckend ritzend färbend lackierend feilend wägend nachschmeckend
+    wiederkäuend
   '''),
   nouns: _nouns.pools,
   nounGender: _nouns.gender,

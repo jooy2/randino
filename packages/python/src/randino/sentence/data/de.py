@@ -32,12 +32,13 @@ DE = SentenceLanguageData(
             subject=("creature", "person"),
             words=words("""
                 erwacht erhebt_sich regt_sich reckt_sich streckt_sich räkelt_sich rührt_sich
-                ermuntert_sich
+                ermuntert_sich besinnt_sich sammelt_sich belebt_sich erfrischt_sich
             """),
             past=PredicateTense(
                 words=words("""
                     erwachte erhob_sich regte_sich reckte_sich streckte_sich räkelte_sich
-                    rührte_sich ermunterte_sich
+                    rührte_sich ermunterte_sich besann_sich sammelte_sich belebte_sich
+                    erfrischte_sich
                 """),
             ),
         ),
@@ -46,12 +47,14 @@ DE = SentenceLanguageData(
             subject=("creature", "person"),
             words=words("""
                 geht wandert eilt reist zieht entfernt_sich trollt_sich schleicht flieht flüchtet
-                enteilt entschwindet verabschiedet_sich entweicht entflieht verschwindet
+                enteilt entschwindet verabschiedet_sich entweicht entflieht verschwindet entrinnt
+                entkommt verreist türmt
             """),
             past=PredicateTense(
                 words=words("""
                     ging wanderte eilte reiste zog entfernte_sich trollte_sich schlich floh
                     flüchtete enteilte entschwand verabschiedete_sich entwich entfloh verschwand
+                    entrann entkam verreiste türmte
                 """),
             ),
         ),
@@ -70,14 +73,16 @@ DE = SentenceLanguageData(
             words=words("""
                 läuft springt bummelt trabt spaziert rennt tänzelt schlendert stolziert stapft
                 trottet stakst joggt marschiert tippelt watschelt humpelt galoppiert flitzt hetzt
-                hastet trippelt stiefelt tobt flaniert schreitet wandelt sprintet hopst
+                hastet trippelt stiefelt tobt flaniert schreitet wandelt sprintet hopst schlurft
+                stolpert taumelt wankt hoppelt latscht pirscht wetzt düst watet klettert
             """),
             past=PredicateTense(
                 words=words("""
                     lief sprang bummelte trabte spazierte rannte tänzelte schlenderte stolzierte
                     stapfte trottete stakste joggte marschierte tippelte watschelte humpelte
                     galoppierte flitzte hetzte hastete trippelte stiefelte tobte flanierte schritt
-                    wandelte sprintete hopste
+                    wandelte sprintete hopste schlurfte stolperte taumelte wankte hoppelte latschte
+                    pirschte wetzte düste watete kletterte
                 """),
             ),
         ),
@@ -86,12 +91,12 @@ DE = SentenceLanguageData(
             subject=("creature", "person"),
             words=words("""
                 streift bewegt_sich wendet_sich dreht_sich kreist treibt gleitet huscht schweift
-                streunt weicht rückt
+                streunt weicht rückt schwankt wogt pendelt kreiselt
             """),
             past=PredicateTense(
                 words=words("""
                     streifte bewegte_sich wandte_sich drehte_sich kreiste trieb glitt huschte
-                    schweifte streunte wich rückte
+                    schweifte streunte wich rückte schwankte wogte pendelte kreiselte
                 """),
             ),
         ),
@@ -99,9 +104,13 @@ DE = SentenceLanguageData(
             field="move",
             subject=("creature", "person"),
             subject_traits=("swimmer",),
-            words=words("schwimmt taucht plantscht paddelt strampelt krault"),
+            words=words("""
+                schwimmt taucht plantscht paddelt strampelt krault schnorchelt badet
+            """),
             past=PredicateTense(
-                words=words("schwamm tauchte plantschte paddelte strampelte kraulte"),
+                words=words("""
+                    schwamm tauchte plantschte paddelte strampelte kraulte schnorchelte badete
+                """),
             ),
         ),
         VerbGroup(
@@ -109,11 +118,13 @@ DE = SentenceLanguageData(
             subject=("creature",),
             subject_traits=("flier",),
             words=words("""
-                fliegt flattert schwebt segelt schwirrt steigt sinkt schwingt_sich stürzt
+                fliegt flattert schwebt segelt schwirrt steigt sinkt schwingt_sich stürzt gaukelt
+                surrt
             """),
             past=PredicateTense(
                 words=words("""
                     flog flatterte schwebte segelte schwirrte stieg sank schwang_sich stürzte
+                    gaukelte surrte
                 """),
             ),
         ),
@@ -135,12 +146,14 @@ DE = SentenceLanguageData(
             subject=("creature", "person"),
             words=words("""
                 wartet zögert verharrt lauscht lauert horcht verweilt harrt zaudert duckt_sich
-                versteckt_sich späht trödelt bleibt stockt schweigt wacht
+                versteckt_sich späht trödelt bleibt stockt schweigt wacht grübelt sinniert stutzt
+                lugt äugt
             """),
             past=PredicateTense(
                 words=words("""
                     wartete zögerte verharrte lauschte lauerte horchte verweilte harrte zauderte
                     duckte_sich versteckte_sich spähte trödelte blieb stockte schwieg wachte
+                    grübelte sinnierte stutzte lugte äugte
                 """),
             ),
         ),
@@ -149,13 +162,14 @@ DE = SentenceLanguageData(
             subject=("creature", "person"),
             words=words("""
                 ruht sitzt liegt rastet lehnt setzt_sich legt_sich entspannt_sich kauert kniet hockt
-                lümmelt fläzt_sich verschnauft lagert bettet_sich erholt_sich pausiert
+                lümmelt fläzt_sich verschnauft lagert bettet_sich erholt_sich pausiert schnauft
+                faulenzt gammelt dehnt_sich
             """),
             past=PredicateTense(
                 words=words("""
                     ruhte saß lag rastete lehnte setzte_sich legte_sich entspannte_sich kauerte
                     kniete hockte lümmelte fläzte_sich verschnaufte lagerte bettete_sich
-                    erholte_sich pausierte
+                    erholte_sich pausierte schnaufte faulenzte gammelte dehnte_sich
                 """),
             ),
         ),
@@ -163,12 +177,12 @@ DE = SentenceLanguageData(
             field="sleep",
             subject=("creature", "person"),
             words=words("""
-                schläft schlummert dämmert döst schnarcht träumt pennt entschlummert duselt
+                schläft schlummert dämmert döst schnarcht träumt pennt entschlummert duselt ratzt
             """),
             past=PredicateTense(
                 words=words("""
                     schlief schlummerte dämmerte döste schnarchte träumte pennte entschlummerte
-                    duselte
+                    duselte ratzte
                 """),
             ),
         ),
@@ -179,7 +193,8 @@ DE = SentenceLanguageData(
                 lacht weint gähnt seufzt lächelt summt murmelt ruft kichert grinst schluchzt stöhnt
                 murrt brummt pfeift schreit jauchzt jubelt keucht nickt niest klatscht zwinkert
                 errötet prustet schnieft schnaubt kreischt stammelt winkt strahlt schmunzelt gluckst
-                schnalzt hustet räuspert_sich wimmert heult grunzt jammert flucht
+                schnalzt hustet räuspert_sich wimmert heult grunzt jammert flucht schluckt zittert
+                bebt blinzelt schmatzt quiekt fiept kräht zirpt brüllt faucht knurrt jault winselt
             """),
             past=PredicateTense(
                 words=words("""
@@ -187,7 +202,8 @@ DE = SentenceLanguageData(
                     schluchzte stöhnte murrte brummte pfiff schrie jauchzte jubelte keuchte nickte
                     nieste klatschte zwinkerte errötete prustete schniefte schnaubte kreischte
                     stammelte winkte strahlte schmunzelte gluckste schnalzte hustete räusperte_sich
-                    wimmerte heulte grunzte jammerte fluchte
+                    wimmerte heulte grunzte jammerte fluchte schluckte zitterte bebte blinzelte
+                    schmatzte quiekte fiepte krähte zirpte brüllte fauchte knurrte jaulte winselte
                 """),
             ),
         ),
@@ -197,12 +213,14 @@ DE = SentenceLanguageData(
             words=words("""
                 plaudert redet schwatzt spricht quatscht tratscht klönt tuschelt flüstert
                 unterhält_sich ratscht palavert erzählt grüßt plauscht schnattert quasselt labert
+                berichtet diskutiert schwadroniert fabuliert parliert nuschelt brabbelt plappert
             """),
             past=PredicateTense(
                 words=words("""
                     plauderte redete schwatzte sprach quatschte tratschte klönte tuschelte flüsterte
                     unterhielt_sich ratschte palaverte erzählte grüßte plauschte schnatterte
-                    quasselte laberte
+                    quasselte laberte berichtete diskutierte schwadronierte fabulierte parlierte
+                    nuschelte brabbelte plapperte
                 """),
             ),
         ),
@@ -212,12 +230,13 @@ DE = SentenceLanguageData(
             words=words("""
                 tanzt singt tollt spielt hüpft rollt purzelt wirbelt kugelt_sich albert balgt_sich
                 vergnügt_sich schaukelt wälzt_sich springt tummelt_sich kaspert trällert scherzt
+                turnt jongliert klimpert trommelt musiziert
             """),
             past=PredicateTense(
                 words=words("""
                     tanzte sang tollte spielte hüpfte rollte purzelte wirbelte kugelte_sich alberte
                     balgte_sich vergnügte_sich schaukelte wälzte_sich sprang tummelte_sich kasperte
-                    trällerte scherzte
+                    trällerte scherzte turnte jonglierte klimperte trommelte musizierte
                 """),
             ),
         ),
@@ -226,12 +245,12 @@ DE = SentenceLanguageData(
             subject=("creature", "person"),
             words=words("""
                 sucht stöbert kramt wühlt forscht schnüffelt buddelt fahndet erkundet tastet
-                stochert schnuppert
+                stochert schnuppert sondiert wittert spioniert kundschaftet
             """),
             past=PredicateTense(
                 words=words("""
                     suchte stöberte kramte wühlte forschte schnüffelte buddelte fahndete erkundete
-                    tastete stocherte schnupperte
+                    tastete stocherte schnupperte sondierte witterte spionierte kundschaftete
                 """),
             ),
         ),
@@ -474,37 +493,42 @@ DE = SentenceLanguageData(
     states=(
         StateGroup(
             subject=("creature", "person"),
-            words=words("groß klein schnell langsam still laut mutig faul sanft klug wild"),
+            words=words("""
+                groß klein schnell langsam still laut mutig faul sanft klug wild jung alt stark
+                schwach kühn scheu stolz lebhaft gelassen stur flink wachsam kräftig ehrlich schlau
+            """),
         ),
         StateGroup(
             subject=("creature", "person"),
             condition="hungry",
-            words=words("hungrig ausgehungert"),
+            words=words("hungrig ausgehungert heißhungrig"),
         ),
         StateGroup(
             subject=("creature", "person"),
             condition="full",
-            words=words("satt gesättigt"),
+            words=words("satt gesättigt pappsatt"),
         ),
         StateGroup(
             subject=("creature", "person"),
             condition="tired",
-            words=words("müde schläfrig erschöpft"),
+            words=words("müde schläfrig erschöpft matt abgespannt schlapp"),
         ),
         StateGroup(
             subject=("creature", "person"),
             condition="rested",
-            words=words("ausgeruht frisch munter"),
+            words=words("ausgeruht frisch munter wach erholt tatkräftig"),
         ),
         StateGroup(
             subject=("creature", "person"),
             condition="content",
-            words=words("froh zufrieden glücklich heiter"),
+            words=words("froh zufrieden glücklich heiter vergnügt selig wohlgemut behaglich"),
         ),
         StateGroup(
             subject=("creature", "person"),
             condition="restless",
-            words=words("gelangweilt neugierig unruhig rastlos"),
+            words=words("""
+                gelangweilt neugierig unruhig rastlos ungeduldig nervös zappelig bang
+            """),
         ),
         StateGroup(
             subject=(
@@ -519,31 +543,45 @@ DE = SentenceLanguageData(
                 "idea",
                 "body",
             ),
-            words=words("schön fremd neu häufig selten"),
+            words=words("""
+                schön fremd neu häufig selten hübsch vertraut sonderbar gewöhnlich prächtig kostbar
+            """),
         ),
         StateGroup(
             subject=("place", "event"),
-            words=words("weit eng ruhig tief dunkel hell fern steil"),
+            words=words("""
+                weit eng ruhig tief dunkel hell fern steil belebt verlassen schmal leer riesig
+                düster flach lang kurz sonnig
+            """),
         ),
         StateGroup(
             subject=("thing", "vehicle"),
-            words=words("hart leicht schwer alt glatt klar stabil"),
+            words=words("""
+                hart leicht schwer alt glatt klar stabil rund flach spitz dünn dick zerbrechlich
+                prunkvoll schlicht fein rau blank
+            """),
         ),
         StateGroup(
             subject=("edible",),
-            words=words("süß salzig scharf sauer heiß kalt herzhaft"),
+            words=words("""
+                süß salzig scharf sauer heiß kalt herzhaft bitter dickflüssig weich lauwarm saftig
+                knusprig lecker fade
+            """),
         ),
         StateGroup(
             subject=("idea",),
-            words=words("einfach deutlich vage ewig flüchtig"),
+            words=words("""
+                einfach deutlich vage ewig flüchtig verwickelt klar tief vertraut wertvoll heimlich
+                winzig schwierig
+            """),
         ),
         StateGroup(
             subject=("plant",),
-            words=words("grün üppig duftend welk"),
+            words=words("grün üppig duftend welk hoch zart schlank blühend licht dicht"),
         ),
         StateGroup(
             subject=("body",),
-            words=words("warm kalt wund steif"),
+            words=words("warm kalt wund steif weich rau glatt blass stark taub schwer"),
         ),
     ),
     modifiers=(
@@ -551,61 +589,89 @@ DE = SentenceLanguageData(
             subject=("creature", "person"),
             words=words("""
                 mutig lebhaft sanft fleißig faul schüchtern klug jung alt klein groß still fröhlich
-                geduldig flink neugierig
+                geduldig flink neugierig kühn ängstlich vorsichtig stur zahm laut kräftig hager
+                rundlich schläfrig schlau wachsam schweigsam stolz arglos ehrlich wach gelassen
             """),
         ),
         ModifierGroup(
             subject=("person",),
-            words=words("jung freundlich streng ernst beschäftigt aufrichtig"),
+            words=words("""
+                jung freundlich streng ernst beschäftigt aufrichtig weise bescheiden höflich
+                geschickt berühmt arm reich betagt heiter scharfsinnig leutselig fleißig
+            """),
         ),
         ModifierGroup(
             subject=("creature",),
-            words=words("flink wild zahm rundlich winzig"),
+            words=words("""
+                flink wild zahm rundlich winzig zottig gefleckt gestreift mager riesig geschickt
+                pummelig glänzend langgestreckt
+            """),
         ),
         ModifierGroup(
             subject=("edible",),
             themes=("food",),
             words=words("""
                 süß scharf warm frisch knusprig würzig duftend heiß salzig weich reif lecker
+                goldbraun geräuchert sahnig zart saftig deftig dampfend geröstet klebrig fade
+                gewürzt
             """),
         ),
         ModifierGroup(
             subject=("edible",),
             themes=("drink",),
-            words=words("süß warm kalt kühl heiß duftend frisch stark"),
+            words=words("""
+                süß warm kalt kühl heiß duftend frisch stark bitter sahnig eisig milchig trüb klar
+                sprudelnd mild lauwarm
+            """),
         ),
         ModifierGroup(
             subject=("thing", "vehicle"),
             words=words("""
                 alt neu klein groß leicht schwer glänzend glatt klar stabil hübsch kostbar uralt
+                rostig abgenutzt poliert schlicht prunkvoll schmal breit rund flach spitz stumpf
+                zerbrechlich hohl staubig krumm
             """),
         ),
         ModifierGroup(
             subject=("vehicle",),
-            words=words("schnell langsam robust"),
+            words=words("""
+                schnell langsam robust knarrend blinkend rostig klapprig wuchtig laut nagelneu
+            """),
         ),
         ModifierGroup(
             subject=("place",),
             words=words("""
                 still weit dunkel hell fremd alt gemütlich abgelegen belebt leise fern nah leer
-                einsam sonnig
+                einsam sonnig schmal überfüllt windig neblig schattig staubig feucht felsig steil
+                flach öde grün menschenleer luftig
             """),
         ),
         ModifierGroup(
             subject=("plant",),
-            words=words("grün üppig duftend jung welk klein zart frisch"),
+            words=words("""
+                grün üppig duftend jung welk klein zart frisch dornig blühend knospend rankend wild
+                schlank blass hängend dicht
+            """),
         ),
         ModifierGroup(
             subject=("idea",),
-            words=words("vage alt neu fremd klar kostbar klein seltsam"),
+            words=words("""
+                vage alt neu fremd klar kostbar klein seltsam schwach einfach verworren hartnäckig
+                flüchtig fern kühn heimlich leise vertraut
+            """),
         ),
         ModifierGroup(
             subject=("event",),
-            words=words("lang kurz still sonnig trüb laut plötzlich"),
+            words=words("""
+                lang kurz still sonnig trüb laut plötzlich feierlich heiter langweilig regnerisch
+                stürmisch ruhig belebt überfüllt prächtig schlicht
+            """),
         ),
         ModifierGroup(
             subject=("body",),
-            words=words("klein kalt warm schlank kräftig"),
+            words=words("""
+                klein kalt warm schlank kräftig weich steif wund rau glatt blass stark
+            """),
         ),
         ModifierGroup(
             subject=(
@@ -619,7 +685,10 @@ DE = SentenceLanguageData(
                 "idea",
                 "body",
             ),
-            words=words("schön geheimnisvoll fremd neu"),
+            words=words("""
+                schön geheimnisvoll fremd neu hübsch vertraut sonderbar gewöhnlich prächtig
+                bescheiden
+            """),
         ),
     ),
     manners=(
@@ -628,13 +697,18 @@ DE = SentenceLanguageData(
             words=words("""
                 leise langsam schnell sanft plötzlich kaum allein kurz kühn sorgsam eifrig ruhig
                 heftig geduldig leicht fröhlich munter schwerfällig gelassen emsig zügig vergnügt
+                verstohlen auf_Zehenspitzen hastig eilig behutsam aufmerksam zerstreut nervös
+                neugierig stolz schüchtern freundlich zärtlich bitter streng schläfrig gierig
+                achtlos barsch geschickt entschlossen glücklich traurig lebhaft mit_Mühe widerwillig
+                absichtlich wortlos mit_einem_Satz ohne_Eile mit_Genuss halblaut unablässig
             """),
         ),
         ModifierGroup(
             subject=("plant", "edible", "thing", "vehicle", "place", "event", "idea", "body"),
             words=words("""
                 leise langsam sanft plötzlich kaum wieder noch stetig allmählich nach_und_nach
-                schwach weiter
+                schwach weiter still sacht rasch tief weit hell matt warm kalt süß dicht fest schwer
+                leicht endlos unaufhörlich ständig noch_einmal eine_Weile mit_einem_Mal überall
             """),
         ),
     ),
@@ -645,10 +719,27 @@ DE = SentenceLanguageData(
         """),
         any=words("""
             im_Frühling im_Sommer im_Herbst im_Winter am_Wochenende an_Feiertagen den_ganzen_Tag
+            im_Frühsommer im_Hochsommer im_Spätsommer im_Frühherbst im_Spätherbst im_Hochwinter
+            im_Spätwinter im_zeitigen_Frühjahr im_Spätfrühling in_der_Regenzeit zur_Erntezeit
+            auf_dem_Fest am_Markttag bei_Vollmond an_einem_Regentag an_einem_Schneetag
+            an_einem_windigen_Tag an_einem_klaren_Tag an_einem_trüben_Tag an_einem_Nebeltag
+            in_den_Ferien
         """),
-        past=words("gestern letzte_Woche vor_langer_Zeit einst an_jenem_Tag in_jener_Nacht"),
-        present=words("heute gerade_eben morgen nächste_Woche"),
-        habitual=words("heutzutage manchmal jeden_Tag jede_Nacht"),
+        past=words("""
+            gestern letzte_Woche vor_langer_Zeit einst an_jenem_Tag in_jener_Nacht vorgestern
+            letzten_Monat letztes_Jahr vor_Jahren vor_einer_Weile an_jenem_Morgen an_jenem_Abend
+            damals in_jenen_Tagen die_Woche_zuvor letzten_Frühling letzten_Sommer letzten_Herbst
+            letzten_Winter vor_einigen_Tagen
+        """),
+        present=words("""
+            heute gerade_eben morgen nächste_Woche jetzt heute_Morgen heute_Abend heute_Nacht
+            übermorgen nächsten_Monat nächstes_Jahr dieses_Jahr diese_Woche dieses_Wochenende gleich
+            bald
+        """),
+        habitual=words("""
+            heutzutage manchmal jeden_Tag jede_Nacht immer oft meistens kaum_je gelegentlich
+            alle_paar_Tage ab_und_zu jeden_Morgen jede_Woche jedes_Jahr für_gewöhnlich fast_immer
+        """),
     ),
     homes=words("Haus"),
     connectives={
@@ -660,22 +751,30 @@ DE = SentenceLanguageData(
         "flier": words("""
             Vogel Schwalbe Spatz Rabe Falke Adler Pfau Papagei Eule Taube Kranich Schwan Ente Gans
             Biene Libelle Zikade Fliege Mücke Fledermaus Reiher Pelikan Drache Phönix Fee Greif
-            Pegasus Engel Walküre
+            Pegasus Engel Walküre Amsel Nachtigall Lerche Wachtel Fasan Rebhuhn Kolibri Tukan
+            Flamingo Storch Wiedehopf Distelfink Elster Häher Kauz Bussard Möwe Specht Zaunkönig
+            Wespe Motte Leuchtkäfer Hummel Marienkäfer Hippogreif
         """),
         "swimmer": words("""
             Krokodil Schildkröte Frosch Kröte Fisch Wal Delfin Hai Krake Tintenfisch Garnele Krabbe
-            Walross Robbe Pinguin Meerjungfrau Najade
+            Walross Robbe Pinguin Meerjungfrau Najade Aal Sardine Thunfisch Dorsch Seehecht Forelle
+            Karpfen Rochen Qualle Muschel Auster Hummer Seestern Salamander Molch Biber Nilpferd
+            Schnabeltier Meerforelle
         """),
         "crawler": words("""
             Krokodil Schlange Eidechse Schildkröte Schnecke Ameise Spinne Wurm Krabbe Basilisk
+            Leguan Chamäleon Salamander Molch Boa Viper Kobra Python Käfer Heuschrecke Grille Floh
+            Raupe Tausendfüßer Skorpion
         """),
         "lifeless": words("""
             Zauber Fluch Weissagung Amulett Talisman Rune Pforte Heiligtum Götze Totem Vorzeichen
-            Omen Bestiarium
+            Omen Bestiarium Zauberbuch Pentagramm Reliquie Kelch Gral Zauberstab Stab Zepter Krone
+            Beschwörung
         """),
     },
     interjections=words("""
-        oh, ach, na, mensch, oje, sieh_an, wahrhaftig, hui, herrje, du_meine_Güte, nanu,
+        oh, ach, na, mensch, oje, sieh_an, wahrhaftig, hui, herrje, du_meine_Güte, nanu, aha, oha,
+        ei, tja, nun, wahrlich, potztausend, um_Himmels_willen, ach_je, sieh_da, tatsächlich,
     """),
     pronouns={"m": ("er",), "f": ("sie",), "n": ("es",)},
     calendar=SentenceCalendar(

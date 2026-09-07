@@ -36,11 +36,12 @@ final SentenceLanguageData de = SentenceLanguageData(
       subject: const <NounClass>[NounClass.creature, NounClass.person],
       words: words(r'''
         erwacht erhebt_sich regt_sich reckt_sich streckt_sich räkelt_sich rührt_sich ermuntert_sich
+        besinnt_sich sammelt_sich belebt_sich erfrischt_sich
       '''),
       past: PredicateTense(
         words: words(r'''
           erwachte erhob_sich regte_sich reckte_sich streckte_sich räkelte_sich rührte_sich
-          ermunterte_sich
+          ermunterte_sich besann_sich sammelte_sich belebte_sich erfrischte_sich
         '''),
       ),
     ),
@@ -49,12 +50,13 @@ final SentenceLanguageData de = SentenceLanguageData(
       subject: const <NounClass>[NounClass.creature, NounClass.person],
       words: words(r'''
         geht wandert eilt reist zieht entfernt_sich trollt_sich schleicht flieht flüchtet enteilt
-        entschwindet verabschiedet_sich entweicht entflieht verschwindet
+        entschwindet verabschiedet_sich entweicht entflieht verschwindet entrinnt entkommt verreist
+        türmt
       '''),
       past: PredicateTense(
         words: words(r'''
           ging wanderte eilte reiste zog entfernte_sich trollte_sich schlich floh flüchtete enteilte
-          entschwand verabschiedete_sich entwich entfloh verschwand
+          entschwand verabschiedete_sich entwich entfloh verschwand entrann entkam verreiste türmte
         '''),
       ),
     ),
@@ -71,13 +73,16 @@ final SentenceLanguageData de = SentenceLanguageData(
       words: words(r'''
         läuft springt bummelt trabt spaziert rennt tänzelt schlendert stolziert stapft trottet
         stakst joggt marschiert tippelt watschelt humpelt galoppiert flitzt hetzt hastet trippelt
-        stiefelt tobt flaniert schreitet wandelt sprintet hopst
+        stiefelt tobt flaniert schreitet wandelt sprintet hopst schlurft stolpert taumelt wankt
+        hoppelt latscht pirscht wetzt düst watet klettert
       '''),
       past: PredicateTense(
         words: words(r'''
           lief sprang bummelte trabte spazierte rannte tänzelte schlenderte stolzierte stapfte
           trottete stakste joggte marschierte tippelte watschelte humpelte galoppierte flitzte
           hetzte hastete trippelte stiefelte tobte flanierte schritt wandelte sprintete hopste
+          schlurfte stolperte taumelte wankte hoppelte latschte pirschte wetzte düste watete
+          kletterte
         '''),
       ),
     ),
@@ -86,12 +91,12 @@ final SentenceLanguageData de = SentenceLanguageData(
       subject: const <NounClass>[NounClass.creature, NounClass.person],
       words: words(r'''
         streift bewegt_sich wendet_sich dreht_sich kreist treibt gleitet huscht schweift streunt
-        weicht rückt
+        weicht rückt schwankt wogt pendelt kreiselt
       '''),
       past: PredicateTense(
         words: words(r'''
           streifte bewegte_sich wandte_sich drehte_sich kreiste trieb glitt huschte schweifte
-          streunte wich rückte
+          streunte wich rückte schwankte wogte pendelte kreiselte
         '''),
       ),
     ),
@@ -99,17 +104,23 @@ final SentenceLanguageData de = SentenceLanguageData(
       field: VerbField.move,
       subject: const <NounClass>[NounClass.creature, NounClass.person],
       subjectTraits: const <NounTrait>[NounTrait.swimmer],
-      words: words(r'schwimmt taucht plantscht paddelt strampelt krault'),
-      past: PredicateTense(words: words(r'schwamm tauchte plantschte paddelte strampelte kraulte')),
+      words: words(r'schwimmt taucht plantscht paddelt strampelt krault schnorchelt badet'),
+      past: PredicateTense(
+        words: words(r'''
+          schwamm tauchte plantschte paddelte strampelte kraulte schnorchelte badete
+        '''),
+      ),
     ),
     VerbGroup(
       field: VerbField.move,
       subject: const <NounClass>[NounClass.creature],
       subjectTraits: const <NounTrait>[NounTrait.flier],
-      words: words(r'fliegt flattert schwebt segelt schwirrt steigt sinkt schwingt_sich stürzt'),
+      words: words(r'''
+        fliegt flattert schwebt segelt schwirrt steigt sinkt schwingt_sich stürzt gaukelt surrt
+      '''),
       past: PredicateTense(
         words: words(r'''
-          flog flatterte schwebte segelte schwirrte stieg sank schwang_sich stürzte
+          flog flatterte schwebte segelte schwirrte stieg sank schwang_sich stürzte gaukelte surrte
         '''),
       ),
     ),
@@ -131,12 +142,13 @@ final SentenceLanguageData de = SentenceLanguageData(
       subject: const <NounClass>[NounClass.creature, NounClass.person],
       words: words(r'''
         wartet zögert verharrt lauscht lauert horcht verweilt harrt zaudert duckt_sich
-        versteckt_sich späht trödelt bleibt stockt schweigt wacht
+        versteckt_sich späht trödelt bleibt stockt schweigt wacht grübelt sinniert stutzt lugt äugt
       '''),
       past: PredicateTense(
         words: words(r'''
           wartete zögerte verharrte lauschte lauerte horchte verweilte harrte zauderte duckte_sich
-          versteckte_sich spähte trödelte blieb stockte schwieg wachte
+          versteckte_sich spähte trödelte blieb stockte schwieg wachte grübelte sinnierte stutzte
+          lugte äugte
         '''),
       ),
     ),
@@ -145,12 +157,14 @@ final SentenceLanguageData de = SentenceLanguageData(
       subject: const <NounClass>[NounClass.creature, NounClass.person],
       words: words(r'''
         ruht sitzt liegt rastet lehnt setzt_sich legt_sich entspannt_sich kauert kniet hockt lümmelt
-        fläzt_sich verschnauft lagert bettet_sich erholt_sich pausiert
+        fläzt_sich verschnauft lagert bettet_sich erholt_sich pausiert schnauft faulenzt gammelt
+        dehnt_sich
       '''),
       past: PredicateTense(
         words: words(r'''
           ruhte saß lag rastete lehnte setzte_sich legte_sich entspannte_sich kauerte kniete hockte
-          lümmelte fläzte_sich verschnaufte lagerte bettete_sich erholte_sich pausierte
+          lümmelte fläzte_sich verschnaufte lagerte bettete_sich erholte_sich pausierte schnaufte
+          faulenzte gammelte dehnte_sich
         '''),
       ),
     ),
@@ -158,11 +172,11 @@ final SentenceLanguageData de = SentenceLanguageData(
       field: VerbField.sleep,
       subject: const <NounClass>[NounClass.creature, NounClass.person],
       words: words(r'''
-        schläft schlummert dämmert döst schnarcht träumt pennt entschlummert duselt
+        schläft schlummert dämmert döst schnarcht träumt pennt entschlummert duselt ratzt
       '''),
       past: PredicateTense(
         words: words(r'''
-          schlief schlummerte dämmerte döste schnarchte träumte pennte entschlummerte duselte
+          schlief schlummerte dämmerte döste schnarchte träumte pennte entschlummerte duselte ratzte
         '''),
       ),
     ),
@@ -173,7 +187,8 @@ final SentenceLanguageData de = SentenceLanguageData(
         lacht weint gähnt seufzt lächelt summt murmelt ruft kichert grinst schluchzt stöhnt murrt
         brummt pfeift schreit jauchzt jubelt keucht nickt niest klatscht zwinkert errötet prustet
         schnieft schnaubt kreischt stammelt winkt strahlt schmunzelt gluckst schnalzt hustet
-        räuspert_sich wimmert heult grunzt jammert flucht
+        räuspert_sich wimmert heult grunzt jammert flucht schluckt zittert bebt blinzelt schmatzt
+        quiekt fiept kräht zirpt brüllt faucht knurrt jault winselt
       '''),
       past: PredicateTense(
         words: words(r'''
@@ -181,7 +196,8 @@ final SentenceLanguageData de = SentenceLanguageData(
           stöhnte murrte brummte pfiff schrie jauchzte jubelte keuchte nickte nieste klatschte
           zwinkerte errötete prustete schniefte schnaubte kreischte stammelte winkte strahlte
           schmunzelte gluckste schnalzte hustete räusperte_sich wimmerte heulte grunzte jammerte
-          fluchte
+          fluchte schluckte zitterte bebte blinzelte schmatzte quiekte fiepte krähte zirpte brüllte
+          fauchte knurrte jaulte winselte
         '''),
       ),
     ),
@@ -190,12 +206,14 @@ final SentenceLanguageData de = SentenceLanguageData(
       subject: const <NounClass>[NounClass.creature, NounClass.person],
       words: words(r'''
         plaudert redet schwatzt spricht quatscht tratscht klönt tuschelt flüstert unterhält_sich
-        ratscht palavert erzählt grüßt plauscht schnattert quasselt labert
+        ratscht palavert erzählt grüßt plauscht schnattert quasselt labert berichtet diskutiert
+        schwadroniert fabuliert parliert nuschelt brabbelt plappert
       '''),
       past: PredicateTense(
         words: words(r'''
           plauderte redete schwatzte sprach quatschte tratschte klönte tuschelte flüsterte
           unterhielt_sich ratschte palaverte erzählte grüßte plauschte schnatterte quasselte laberte
+          berichtete diskutierte schwadronierte fabulierte parlierte nuschelte brabbelte plapperte
         '''),
       ),
     ),
@@ -204,13 +222,14 @@ final SentenceLanguageData de = SentenceLanguageData(
       subject: const <NounClass>[NounClass.creature, NounClass.person],
       words: words(r'''
         tanzt singt tollt spielt hüpft rollt purzelt wirbelt kugelt_sich albert balgt_sich
-        vergnügt_sich schaukelt wälzt_sich springt tummelt_sich kaspert trällert scherzt
+        vergnügt_sich schaukelt wälzt_sich springt tummelt_sich kaspert trällert scherzt turnt
+        jongliert klimpert trommelt musiziert
       '''),
       past: PredicateTense(
         words: words(r'''
           tanzte sang tollte spielte hüpfte rollte purzelte wirbelte kugelte_sich alberte
           balgte_sich vergnügte_sich schaukelte wälzte_sich sprang tummelte_sich kasperte trällerte
-          scherzte
+          scherzte turnte jonglierte klimperte trommelte musizierte
         '''),
       ),
     ),
@@ -219,12 +238,12 @@ final SentenceLanguageData de = SentenceLanguageData(
       subject: const <NounClass>[NounClass.creature, NounClass.person],
       words: words(r'''
         sucht stöbert kramt wühlt forscht schnüffelt buddelt fahndet erkundet tastet stochert
-        schnuppert
+        schnuppert sondiert wittert spioniert kundschaftet
       '''),
       past: PredicateTense(
         words: words(r'''
           suchte stöberte kramte wühlte forschte schnüffelte buddelte fahndete erkundete tastete
-          stocherte schnupperte
+          stocherte schnupperte sondierte witterte spionierte kundschaftete
         '''),
       ),
     ),
@@ -467,37 +486,40 @@ final SentenceLanguageData de = SentenceLanguageData(
   states: <StateGroup>[
     StateGroup(
       subject: const <NounClass>[NounClass.creature, NounClass.person],
-      words: words(r'groß klein schnell langsam still laut mutig faul sanft klug wild'),
+      words: words(r'''
+        groß klein schnell langsam still laut mutig faul sanft klug wild jung alt stark schwach kühn
+        scheu stolz lebhaft gelassen stur flink wachsam kräftig ehrlich schlau
+      '''),
     ),
     StateGroup(
       subject: const <NounClass>[NounClass.creature, NounClass.person],
       condition: Condition.hungry,
-      words: words(r'hungrig ausgehungert'),
+      words: words(r'hungrig ausgehungert heißhungrig'),
     ),
     StateGroup(
       subject: const <NounClass>[NounClass.creature, NounClass.person],
       condition: Condition.full,
-      words: words(r'satt gesättigt'),
+      words: words(r'satt gesättigt pappsatt'),
     ),
     StateGroup(
       subject: const <NounClass>[NounClass.creature, NounClass.person],
       condition: Condition.tired,
-      words: words(r'müde schläfrig erschöpft'),
+      words: words(r'müde schläfrig erschöpft matt abgespannt schlapp'),
     ),
     StateGroup(
       subject: const <NounClass>[NounClass.creature, NounClass.person],
       condition: Condition.rested,
-      words: words(r'ausgeruht frisch munter'),
+      words: words(r'ausgeruht frisch munter wach erholt tatkräftig'),
     ),
     StateGroup(
       subject: const <NounClass>[NounClass.creature, NounClass.person],
       condition: Condition.content,
-      words: words(r'froh zufrieden glücklich heiter'),
+      words: words(r'froh zufrieden glücklich heiter vergnügt selig wohlgemut behaglich'),
     ),
     StateGroup(
       subject: const <NounClass>[NounClass.creature, NounClass.person],
       condition: Condition.restless,
-      words: words(r'gelangweilt neugierig unruhig rastlos'),
+      words: words(r'gelangweilt neugierig unruhig rastlos ungeduldig nervös zappelig bang'),
     ),
     StateGroup(
       subject: const <NounClass>[
@@ -512,90 +534,132 @@ final SentenceLanguageData de = SentenceLanguageData(
         NounClass.idea,
         NounClass.body,
       ],
-      words: words(r'schön fremd neu häufig selten'),
+      words: words(r'''
+        schön fremd neu häufig selten hübsch vertraut sonderbar gewöhnlich prächtig kostbar
+      '''),
     ),
     StateGroup(
       subject: const <NounClass>[NounClass.place, NounClass.event],
-      words: words(r'weit eng ruhig tief dunkel hell fern steil'),
+      words: words(r'''
+        weit eng ruhig tief dunkel hell fern steil belebt verlassen schmal leer riesig düster flach
+        lang kurz sonnig
+      '''),
     ),
     StateGroup(
       subject: const <NounClass>[NounClass.thing, NounClass.vehicle],
-      words: words(r'hart leicht schwer alt glatt klar stabil'),
+      words: words(r'''
+        hart leicht schwer alt glatt klar stabil rund flach spitz dünn dick zerbrechlich prunkvoll
+        schlicht fein rau blank
+      '''),
     ),
     StateGroup(
       subject: const <NounClass>[NounClass.edible],
-      words: words(r'süß salzig scharf sauer heiß kalt herzhaft'),
+      words: words(r'''
+        süß salzig scharf sauer heiß kalt herzhaft bitter dickflüssig weich lauwarm saftig knusprig
+        lecker fade
+      '''),
     ),
     StateGroup(
       subject: const <NounClass>[NounClass.idea],
-      words: words(r'einfach deutlich vage ewig flüchtig'),
+      words: words(r'''
+        einfach deutlich vage ewig flüchtig verwickelt klar tief vertraut wertvoll heimlich winzig
+        schwierig
+      '''),
     ),
     StateGroup(
       subject: const <NounClass>[NounClass.plant],
-      words: words(r'grün üppig duftend welk'),
+      words: words(r'grün üppig duftend welk hoch zart schlank blühend licht dicht'),
     ),
-    StateGroup(subject: const <NounClass>[NounClass.body], words: words(r'warm kalt wund steif')),
+    StateGroup(
+      subject: const <NounClass>[NounClass.body],
+      words: words(r'warm kalt wund steif weich rau glatt blass stark taub schwer'),
+    ),
   ],
   modifiers: <ModifierGroup>[
     ModifierGroup(
       subject: const <NounClass>[NounClass.creature, NounClass.person],
       words: words(r'''
         mutig lebhaft sanft fleißig faul schüchtern klug jung alt klein groß still fröhlich geduldig
-        flink neugierig
+        flink neugierig kühn ängstlich vorsichtig stur zahm laut kräftig hager rundlich schläfrig
+        schlau wachsam schweigsam stolz arglos ehrlich wach gelassen
       '''),
     ),
     ModifierGroup(
       subject: const <NounClass>[NounClass.person],
-      words: words(r'jung freundlich streng ernst beschäftigt aufrichtig'),
+      words: words(r'''
+        jung freundlich streng ernst beschäftigt aufrichtig weise bescheiden höflich geschickt
+        berühmt arm reich betagt heiter scharfsinnig leutselig fleißig
+      '''),
     ),
     ModifierGroup(
       subject: const <NounClass>[NounClass.creature],
-      words: words(r'flink wild zahm rundlich winzig'),
+      words: words(r'''
+        flink wild zahm rundlich winzig zottig gefleckt gestreift mager riesig geschickt pummelig
+        glänzend langgestreckt
+      '''),
     ),
     ModifierGroup(
       subject: const <NounClass>[NounClass.edible],
       themes: const <WordTheme>[WordTheme.food],
       words: words(r'''
-        süß scharf warm frisch knusprig würzig duftend heiß salzig weich reif lecker
+        süß scharf warm frisch knusprig würzig duftend heiß salzig weich reif lecker goldbraun
+        geräuchert sahnig zart saftig deftig dampfend geröstet klebrig fade gewürzt
       '''),
     ),
     ModifierGroup(
       subject: const <NounClass>[NounClass.edible],
       themes: const <WordTheme>[WordTheme.drink],
-      words: words(r'süß warm kalt kühl heiß duftend frisch stark'),
+      words: words(r'''
+        süß warm kalt kühl heiß duftend frisch stark bitter sahnig eisig milchig trüb klar sprudelnd
+        mild lauwarm
+      '''),
     ),
     ModifierGroup(
       subject: const <NounClass>[NounClass.thing, NounClass.vehicle],
       words: words(r'''
-        alt neu klein groß leicht schwer glänzend glatt klar stabil hübsch kostbar uralt
+        alt neu klein groß leicht schwer glänzend glatt klar stabil hübsch kostbar uralt rostig
+        abgenutzt poliert schlicht prunkvoll schmal breit rund flach spitz stumpf zerbrechlich hohl
+        staubig krumm
       '''),
     ),
     ModifierGroup(
       subject: const <NounClass>[NounClass.vehicle],
-      words: words(r'schnell langsam robust'),
+      words: words(r'''
+        schnell langsam robust knarrend blinkend rostig klapprig wuchtig laut nagelneu
+      '''),
     ),
     ModifierGroup(
       subject: const <NounClass>[NounClass.place],
       words: words(r'''
         still weit dunkel hell fremd alt gemütlich abgelegen belebt leise fern nah leer einsam
-        sonnig
+        sonnig schmal überfüllt windig neblig schattig staubig feucht felsig steil flach öde grün
+        menschenleer luftig
       '''),
     ),
     ModifierGroup(
       subject: const <NounClass>[NounClass.plant],
-      words: words(r'grün üppig duftend jung welk klein zart frisch'),
+      words: words(r'''
+        grün üppig duftend jung welk klein zart frisch dornig blühend knospend rankend wild schlank
+        blass hängend dicht
+      '''),
     ),
     ModifierGroup(
       subject: const <NounClass>[NounClass.idea],
-      words: words(r'vage alt neu fremd klar kostbar klein seltsam'),
+      words: words(r'''
+        vage alt neu fremd klar kostbar klein seltsam schwach einfach verworren hartnäckig flüchtig
+        fern kühn heimlich leise vertraut
+      '''),
     ),
     ModifierGroup(
       subject: const <NounClass>[NounClass.event],
-      words: words(r'lang kurz still sonnig trüb laut plötzlich'),
+      words: words(r'''
+        lang kurz still sonnig trüb laut plötzlich feierlich heiter langweilig regnerisch stürmisch
+        ruhig belebt überfüllt prächtig schlicht
+      '''),
     ),
     ModifierGroup(
       subject: const <NounClass>[NounClass.body],
-      words: words(r'klein kalt warm schlank kräftig'),
+      words: words(r'klein kalt warm schlank kräftig weich steif wund rau glatt blass stark'),
     ),
     ModifierGroup(
       subject: const <NounClass>[
@@ -609,7 +673,9 @@ final SentenceLanguageData de = SentenceLanguageData(
         NounClass.idea,
         NounClass.body,
       ],
-      words: words(r'schön geheimnisvoll fremd neu'),
+      words: words(r'''
+        schön geheimnisvoll fremd neu hübsch vertraut sonderbar gewöhnlich prächtig bescheiden
+      '''),
     ),
   ],
   manners: <ModifierGroup>[
@@ -617,7 +683,11 @@ final SentenceLanguageData de = SentenceLanguageData(
       subject: const <NounClass>[NounClass.creature, NounClass.person],
       words: words(r'''
         leise langsam schnell sanft plötzlich kaum allein kurz kühn sorgsam eifrig ruhig heftig
-        geduldig leicht fröhlich munter schwerfällig gelassen emsig zügig vergnügt
+        geduldig leicht fröhlich munter schwerfällig gelassen emsig zügig vergnügt verstohlen
+        auf_Zehenspitzen hastig eilig behutsam aufmerksam zerstreut nervös neugierig stolz
+        schüchtern freundlich zärtlich bitter streng schläfrig gierig achtlos barsch geschickt
+        entschlossen glücklich traurig lebhaft mit_Mühe widerwillig absichtlich wortlos
+        mit_einem_Satz ohne_Eile mit_Genuss halblaut unablässig
       '''),
     ),
     ModifierGroup(
@@ -633,7 +703,8 @@ final SentenceLanguageData de = SentenceLanguageData(
       ],
       words: words(r'''
         leise langsam sanft plötzlich kaum wieder noch stetig allmählich nach_und_nach schwach
-        weiter
+        weiter still sacht rasch tief weit hell matt warm kalt süß dicht fest schwer leicht endlos
+        unaufhörlich ständig noch_einmal eine_Weile mit_einem_Mal überall
       '''),
     ),
   ],
@@ -644,10 +715,25 @@ final SentenceLanguageData de = SentenceLanguageData(
     '''),
     any: words(r'''
       im_Frühling im_Sommer im_Herbst im_Winter am_Wochenende an_Feiertagen den_ganzen_Tag
+      im_Frühsommer im_Hochsommer im_Spätsommer im_Frühherbst im_Spätherbst im_Hochwinter
+      im_Spätwinter im_zeitigen_Frühjahr im_Spätfrühling in_der_Regenzeit zur_Erntezeit auf_dem_Fest
+      am_Markttag bei_Vollmond an_einem_Regentag an_einem_Schneetag an_einem_windigen_Tag
+      an_einem_klaren_Tag an_einem_trüben_Tag an_einem_Nebeltag in_den_Ferien
     '''),
-    past: words(r'gestern letzte_Woche vor_langer_Zeit einst an_jenem_Tag in_jener_Nacht'),
-    present: words(r'heute gerade_eben morgen nächste_Woche'),
-    habitual: words(r'heutzutage manchmal jeden_Tag jede_Nacht'),
+    past: words(r'''
+      gestern letzte_Woche vor_langer_Zeit einst an_jenem_Tag in_jener_Nacht vorgestern
+      letzten_Monat letztes_Jahr vor_Jahren vor_einer_Weile an_jenem_Morgen an_jenem_Abend damals
+      in_jenen_Tagen die_Woche_zuvor letzten_Frühling letzten_Sommer letzten_Herbst letzten_Winter
+      vor_einigen_Tagen
+    '''),
+    present: words(r'''
+      heute gerade_eben morgen nächste_Woche jetzt heute_Morgen heute_Abend heute_Nacht übermorgen
+      nächsten_Monat nächstes_Jahr dieses_Jahr diese_Woche dieses_Wochenende gleich bald
+    '''),
+    habitual: words(r'''
+      heutzutage manchmal jeden_Tag jede_Nacht immer oft meistens kaum_je gelegentlich
+      alle_paar_Tage ab_und_zu jeden_Morgen jede_Woche jedes_Jahr für_gewöhnlich fast_immer
+    '''),
   ),
   homes: words(r'Haus'),
   connectives: <ConnectiveKind, WordPool>{
@@ -659,22 +745,29 @@ final SentenceLanguageData de = SentenceLanguageData(
     NounTrait.flier: words(r'''
       Vogel Schwalbe Spatz Rabe Falke Adler Pfau Papagei Eule Taube Kranich Schwan Ente Gans Biene
       Libelle Zikade Fliege Mücke Fledermaus Reiher Pelikan Drache Phönix Fee Greif Pegasus Engel
-      Walküre
+      Walküre Amsel Nachtigall Lerche Wachtel Fasan Rebhuhn Kolibri Tukan Flamingo Storch Wiedehopf
+      Distelfink Elster Häher Kauz Bussard Möwe Specht Zaunkönig Wespe Motte Leuchtkäfer Hummel
+      Marienkäfer Hippogreif
     '''),
     NounTrait.swimmer: words(r'''
       Krokodil Schildkröte Frosch Kröte Fisch Wal Delfin Hai Krake Tintenfisch Garnele Krabbe
-      Walross Robbe Pinguin Meerjungfrau Najade
+      Walross Robbe Pinguin Meerjungfrau Najade Aal Sardine Thunfisch Dorsch Seehecht Forelle
+      Karpfen Rochen Qualle Muschel Auster Hummer Seestern Salamander Molch Biber Nilpferd
+      Schnabeltier Meerforelle
     '''),
     NounTrait.crawler: words(r'''
-      Krokodil Schlange Eidechse Schildkröte Schnecke Ameise Spinne Wurm Krabbe Basilisk
+      Krokodil Schlange Eidechse Schildkröte Schnecke Ameise Spinne Wurm Krabbe Basilisk Leguan
+      Chamäleon Salamander Molch Boa Viper Kobra Python Käfer Heuschrecke Grille Floh Raupe
+      Tausendfüßer Skorpion
     '''),
     NounTrait.lifeless: words(r'''
       Zauber Fluch Weissagung Amulett Talisman Rune Pforte Heiligtum Götze Totem Vorzeichen Omen
-      Bestiarium
+      Bestiarium Zauberbuch Pentagramm Reliquie Kelch Gral Zauberstab Stab Zepter Krone Beschwörung
     '''),
   },
   interjections: words(r'''
-    oh, ach, na, mensch, oje, sieh_an, wahrhaftig, hui, herrje, du_meine_Güte, nanu,
+    oh, ach, na, mensch, oje, sieh_an, wahrhaftig, hui, herrje, du_meine_Güte, nanu, aha, oha, ei,
+    tja, nun, wahrlich, potztausend, um_Himmels_willen, ach_je, sieh_da, tatsächlich,
   '''),
   pronouns: const <WordGender, WordPool>{
     WordGender.m: <String>['er'],

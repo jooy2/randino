@@ -905,38 +905,41 @@ IT = SentenceLanguageData(
             subject=("creature", "person"),
             words=words("""
                 grande piccolo veloce lento silenzioso rumoroso coraggioso pigro feroce mite arguto
-                sveglio
+                sveglio giovane anziano forte debole audace timido orgoglioso vivace sereno testardo
+                agile attento robusto onesto astuto
             """),
         ),
         StateGroup(
             subject=("creature", "person"),
             condition="hungry",
-            words=words("affamato famelico"),
+            words=words("affamato famelico digiuno vorace"),
         ),
         StateGroup(
             subject=("creature", "person"),
             condition="full",
-            words=words("sazio pieno"),
+            words=words("sazio pieno appagato satollo"),
         ),
         StateGroup(
             subject=("creature", "person"),
             condition="tired",
-            words=words("stanco assonnato esausto"),
+            words=words("stanco assonnato esausto sfinito spossato affaticato"),
         ),
         StateGroup(
             subject=("creature", "person"),
             condition="rested",
-            words=words("riposato fresco vispo"),
+            words=words("riposato fresco vispo arzillo leggero vigoroso"),
         ),
         StateGroup(
             subject=("creature", "person"),
             condition="content",
-            words=words("felice contento allegro sereno"),
+            words=words("felice contento allegro sereno lieto gioioso soddisfatto raggiante"),
         ),
         StateGroup(
             subject=("creature", "person"),
             condition="restless",
-            words=words("annoiato curioso inquieto agitato"),
+            words=words("""
+                annoiato curioso inquieto agitato impaziente ansioso irrequieto trepidante
+            """),
         ),
         StateGroup(
             subject=(
@@ -951,31 +954,50 @@ IT = SentenceLanguageData(
                 "idea",
                 "body",
             ),
-            words=words("bello strano nuovo comune raro"),
+            words=words("""
+                bello strano nuovo comune raro grazioso familiare singolare ordinario splendido
+                prezioso
+            """),
         ),
         StateGroup(
             subject=("place", "event"),
-            words=words("ampio stretto tranquillo profondo scuro chiaro lontano ripido"),
+            words=words("""
+                ampio stretto tranquillo profondo scuro chiaro lontano ripido affollato deserto
+                angusto vuoto immenso cupo pianeggiante lungo breve luminoso
+            """),
         ),
         StateGroup(
             subject=("thing", "vehicle"),
-            words=words("duro leggero pesante vecchio liscio trasparente robusto"),
+            words=words("""
+                duro leggero pesante vecchio liscio trasparente robusto rotondo piatto appuntito
+                sottile grosso fragile lussuoso semplice delicato ruvido lucente
+            """),
         ),
         StateGroup(
             subject=("edible",),
-            words=words("dolce salato piccante aspro caldo freddo saporito"),
+            words=words("""
+                dolce salato piccante aspro caldo freddo saporito amaro denso morbido tiepido
+                succoso croccante gustoso insipido
+            """),
         ),
         StateGroup(
             subject=("idea",),
-            words=words("semplice evidente vago eterno fugace"),
+            words=words("""
+                semplice evidente vago eterno fugace complesso limpido profondo familiare prezioso
+                segreto minuto difficile facile
+            """),
         ),
         StateGroup(
             subject=("plant",),
-            words=words("verde rigoglioso profumato appassito"),
+            words=words("""
+                verde rigoglioso profumato appassito alto tenero snello florido rado fitto
+            """),
         ),
         StateGroup(
             subject=("body",),
-            words=words("caldo freddo dolente rigido"),
+            words=words("""
+                caldo freddo dolente rigido morbido ruvido liscio pallido forte intorpidito pesante
+            """),
         ),
     ),
     modifiers=(
@@ -983,65 +1005,93 @@ IT = SentenceLanguageData(
             subject=("creature", "person"),
             words=words("""
                 coraggioso vivace gentile occupato pigro timido sveglio giovane vecchio piccolo
-                grande silenzioso allegro paziente agile curioso
+                grande silenzioso allegro paziente agile curioso audace timoroso cauto testardo mite
+                rumoroso robusto magro assonnato astuto attento taciturno orgoglioso innocente
+                onesto desto sereno
             """),
         ),
         ModifierGroup(
             subject=("person",),
-            words=words("giovane gentile severo serio occupato sincero"),
+            words=words("""
+                giovane gentile severo serio occupato sincero saggio umile educato abile famoso
+                povero ricco anziano sorridente arguto affabile laborioso
+            """),
         ),
         ModifierGroup(
             subject=("creature",),
-            words=words("veloce feroce mansueto paffuto piccolino"),
+            words=words("""
+                veloce feroce mansueto paffuto piccolino peloso maculato striato smilzo enorme
+                destro tondeggiante lucido allungato
+            """),
         ),
         ModifierGroup(
             subject=("edible",),
             themes=("food",),
             words=words("""
                 dolce piccante tiepido fresco croccante saporito fragrante caldo salato morbido
-                maturo gustoso
+                maturo gustoso dorato affumicato cremoso tenero succoso sostanzioso fumante tostato
+                appiccicoso insipido speziato
             """),
         ),
         ModifierGroup(
             subject=("edible",),
             themes=("drink",),
-            words=words("dolce tiepido freddo fresco caldo fragrante forte amaro"),
+            words=words("""
+                dolce tiepido freddo fresco caldo fragrante forte amaro cremoso ghiacciato
+                lattiginoso torbido limpido frizzante morbido temperato
+            """),
         ),
         ModifierGroup(
             subject=("thing", "vehicle"),
             words=words("""
                 vecchio nuovo piccolo grande leggero pesante lucente liscio trasparente duro bello
-                prezioso antico
+                prezioso antico arrugginito consumato lucidato semplice sfarzoso stretto largo
+                rotondo piatto appuntito smussato fragile cavo polveroso storto
             """),
         ),
         ModifierGroup(
             subject=("vehicle",),
-            words=words("veloce lento robusto"),
+            words=words("""
+                veloce lento robusto cigolante rilucente arrugginito sgangherato enorme rumoroso
+                malandato
+            """),
         ),
         ModifierGroup(
             subject=("place",),
             words=words("""
                 tranquillo ampio scuro luminoso strano vecchio accogliente isolato affollato
-                silenzioso remoto lontano vicino vuoto solitario soleggiato
+                silenzioso remoto lontano vicino vuoto solitario soleggiato angusto gremito ventoso
+                nebbioso ombroso polveroso umido roccioso ripido pianeggiante desolato verdeggiante
+                deserto sgombro
             """),
         ),
         ModifierGroup(
             subject=("plant",),
             words=words("""
-                verde rigoglioso profumato giovane appassito alto piccolo tenero fresco
+                verde rigoglioso profumato giovane appassito alto piccolo tenero fresco spinoso
+                fiorito germogliante rampicante selvatico snello pallido cadente folto
             """),
         ),
         ModifierGroup(
             subject=("idea",),
-            words=words("vago vecchio nuovo strano chiaro prezioso piccolo curioso"),
+            words=words("""
+                vago vecchio nuovo strano chiaro prezioso piccolo curioso tenue semplice
+                aggrovigliato ostinato fugace lontano audace segreto silenzioso familiare
+            """),
         ),
         ModifierGroup(
             subject=("event",),
-            words=words("lungo breve tranquillo soleggiato nuvoloso rumoroso improvviso"),
+            words=words("""
+                lungo breve tranquillo soleggiato nuvoloso rumoroso improvviso solenne allegro
+                noioso piovoso tempestoso sereno gremito animato splendido sobrio
+            """),
         ),
         ModifierGroup(
             subject=("body",),
-            words=words("piccolo freddo caldo esile robusto"),
+            words=words("""
+                piccolo freddo caldo esile robusto morbido rigido dolente ruvido liscio pallido
+                forte
+            """),
         ),
         ModifierGroup(
             subject=(
@@ -1055,7 +1105,10 @@ IT = SentenceLanguageData(
                 "idea",
                 "body",
             ),
-            words=words("bello misterioso strano nuovo"),
+            words=words("""
+                bello misterioso strano nuovo grazioso familiare singolare ordinario splendido
+                modesto
+            """),
         ),
     ),
     manners=(
@@ -1065,14 +1118,22 @@ IT = SentenceLanguageData(
                 in_silenzio lentamente rapidamente dolcemente improvvisamente appena da_solo
                 brevemente costantemente audacemente con_cura avidamente tranquillamente
                 allegramente fortemente pazientemente leggermente serenamente vivacemente goffamente
-                con_calma
+                con_calma furtivamente in_punta_di_piedi affannosamente frettolosamente attentamente
+                distrattamente nervosamente curiosamente orgogliosamente timidamente amabilmente
+                amaramente severamente sonnolentamente sbadatamente teneramente bruscamente
+                abilmente destramente decisamente felicemente tristemente pesantemente animatamente
+                a_stento di_malavoglia apposta senza_dire_nulla di_slancio senza_fretta di_gusto
+                a_bassa_voce senza_sosta
             """),
         ),
         ModifierGroup(
             subject=("plant", "edible", "thing", "vehicle", "place", "event", "idea", "body"),
             words=words("""
                 in_silenzio lentamente dolcemente improvvisamente appena di_nuovo ancora piano_piano
-                debolmente a_poco_a_poco gradualmente
+                debolmente a_poco_a_poco gradualmente silenziosamente lievemente intensamente
+                vivacemente profondamente ampiamente fiocamente calorosamente freddamente soavemente
+                densamente fermamente pesantemente leggermente incessantemente costantemente
+                eternamente ancora_una_volta per_un_po' di_colpo ovunque
             """),
         ),
     ),
@@ -1083,46 +1144,78 @@ IT = SentenceLanguageData(
         """),
         any=words("""
             in_primavera in_estate in_autunno in_inverno nel_fine_settimana nei_giorni_festivi
-            tutto_il_giorno
+            tutto_il_giorno in_piena_primavera a_fine_primavera a_inizio_estate in_piena_estate
+            a_fine_estate a_inizio_autunno a_fine_autunno in_pieno_inverno a_fine_inverno
+            nella_stagione_delle_piogge al_raccolto alla_festa nel_giorno_di_mercato
+            con_la_luna_piena in_un_giorno_di_pioggia in_un_giorno_di_neve in_un_giorno_di_vento
+            in_una_giornata_limpida in_una_giornata_nuvolosa in_un_giorno_di_nebbia in_vacanza
         """),
-        past=words("ieri la_settimana_scorsa tempo_fa quel_giorno quella_notte una_volta"),
-        present=words("oggi poco_fa domani la_settimana_prossima"),
-        habitual=words("di_questi_tempi a_volte ogni_giorno ogni_notte"),
+        past=words("""
+            ieri la_settimana_scorsa tempo_fa quel_giorno quella_notte una_volta l'altro_ieri
+            il_mese_scorso l'anno_scorso anni_fa qualche_tempo_fa quella_mattina quella_sera
+            a_quel_tempo a_quei_tempi la_settimana_prima la_primavera_scorsa l'estate_scorsa
+            l'autunno_scorso l'inverno_scorso qualche_giorno_fa
+        """),
+        present=words("""
+            oggi poco_fa domani la_settimana_prossima adesso stamattina stasera stanotte dopodomani
+            il_mese_prossimo l'anno_prossimo quest'anno questa_settimana questo_fine_settimana
+            tra_poco subito
+        """),
+        habitual=words("""
+            di_questi_tempi a_volte ogni_giorno ogni_notte sempre spesso di_solito raramente di_rado
+            ogni_tanto ogni_mattina ogni_settimana ogni_anno in_genere quasi_sempre
+        """),
     ),
     homes=words("casa"),
     join=SentenceJoin(word="e"),
     connectives={
-        "additive": words("e_poi inoltre,"),
-        "temporal": words("dopo infine intanto, più_tardi alla_fine poco_dopo"),
-        "contrastive": words("ma tuttavia, eppure invece,"),
-        "causal": words("allora perciò così"),
+        "additive": words("e_poi inoltre, e_ancora, per_di_più, in_aggiunta, oltretutto,"),
+        "temporal": words("""
+            dopo infine intanto, più_tardi alla_fine poco_dopo subito_dopo, dopo_un_po'
+            nel_frattempo, a_quel_punto, in_men_che_non_si_dica, di_lì_a_poco
+        """),
+        "contrastive": words("""
+            ma tuttavia, eppure invece, ciò_nonostante, al_contrario, nondimeno, con_tutto_ciò,
+        """),
+        "causal": words("""
+            allora perciò così pertanto, di_conseguenza, per_questo per_tale_ragione,
+        """),
     },
     traits={
         "flier": words("""
             uccello rondine passero corvo falco aquila pavone pappagallo gufo colomba gru cigno
             anatra oca farfalla ape libellula cicala mosca zanzara pipistrello airone pellicano
-            drago fenice fata pegaso grifone angelo valchiria
+            drago fenice fata pegaso grifone angelo valchiria merlo usignolo allodola quaglia
+            fagiano pernice colibrì tucano fenicottero cicogna upupa cardellino gazza ghiandaia
+            civetta poiana vespa tarma lucciola ippogrifo
         """),
         "swimmer": words("""
             coccodrillo tartaruga rana rospo pesce balena delfino squalo polpo calamaro gambero
-            granchio tricheco foca pinguino sirena kraken naiade
+            granchio tricheco foca pinguino sirena kraken naiade anguilla sardina tonno merluzzo
+            nasello trota salmone carpa razza medusa vongola cozza ostrica aragosta totano
+            salamandra tritone castoro ippopotamo ornitorinco
         """),
         "crawler": words("""
             coccodrillo serpente lucertola tartaruga lumaca formica ragno verme granchio basilisco
+            iguana camaleonte salamandra tritone boa vipera cobra pitone scarabeo cavalletta grillo
+            pulce bruco millepiedi scorpione
         """),
         "lifeless": words("""
             incantesimo maledizione profezia amuleto talismano runa portale santuario idolo totem
-            augurio presagio bestiario
+            augurio presagio bestiario sortilegio grimorio pentacolo reliquia calice graal bacchetta
+            bastone scettro corona
         """),
         "placeless": words("""
             sabbia ciottolo terremoto masso geyser fumarola stalattite stalagmite eco brace stella
             cometa meteora aurora falce_lunare eclissi zenit satellite ammasso orbita gravità
             rotazione rivoluzione anno_luce astro eclittica meridiano plenilunio novilunio perigeo
-            vespro supernova quasar pulsar
+            vespro supernova quasar pulsar corrente marea onda schiuma frangente parallasse parsec
+            azimut perielio afelio ellisse quadrante nadir gravitazione alone bolide nana
         """),
     },
     interjections=words("""
         oh, ah, ehi, caspita, mamma_mia, guarda, davvero, ohi, accidenti, cavolo, santo_cielo, dai,
+        ahimè, uffa, però, senti, ecco, toh, perbacco, figurati, macché, magari, urca, meno_male,
     """),
     pronouns={"n": ("",)},
     object_pronouns=SentenceObjectPronouns(words={"m": ("lo",), "f": ("la",)}, clitic=True),

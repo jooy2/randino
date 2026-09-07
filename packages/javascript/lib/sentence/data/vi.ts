@@ -411,29 +411,43 @@ export const VI: SentenceLanguageData = {
 	states: [
 		{
 			subject: ['creature', 'person'],
-			words: words(`to nhỏ nhanh chậm im_lặng ồn_ào dũng_cảm lười bận dữ hiền thông_minh`)
+			words: words(`
+				to nhỏ nhanh chậm im_lặng ồn_ào dũng_cảm lười bận dữ hiền thông_minh
+				trẻ già khỏe yếu bạo_dạn nhút_nhát e_thẹn kiêu_hãnh hoạt_bát điềm_tĩnh bướng_bỉnh
+				nhanh_nhẹn cảnh_giác chắc_chắn thật_thà lanh_lợi
+			`)
 		},
-		{ subject: ['creature', 'person'], condition: 'hungry', words: words(`đói đói_bụng`) },
-		{ subject: ['creature', 'person'], condition: 'full', words: words(`no no_nê`) },
+		{
+			subject: ['creature', 'person'],
+			condition: 'hungry',
+			words: words(`đói đói_bụng đói_meo đói_cồn_cào`)
+		},
+		{
+			subject: ['creature', 'person'],
+			condition: 'full',
+			words: words(`no no_nê no_căng no_bụng`)
+		},
 		{
 			subject: ['creature', 'person'],
 			condition: 'tired',
-			words: words(`mệt buồn_ngủ mệt_mỏi uể_oải`)
+			words: words(`mệt buồn_ngủ mệt_mỏi uể_oải kiệt_sức bơ_phờ rã_rời lử_khử`)
 		},
 		{
 			subject: ['creature', 'person'],
 			condition: 'rested',
-			words: words(`sảng_khoái khoan_khoái tràn_đầy_sức_sống`)
+			words: words(`sảng_khoái khoan_khoái tràn_đầy_sức_sống tỉnh_táo nhẹ_nhõm hăng_hái`)
 		},
 		{
 			subject: ['creature', 'person'],
 			condition: 'content',
-			words: words(`vui hạnh_phúc hài_lòng vui_vẻ thoải_mái`)
+			words: words(
+				`vui hạnh_phúc hài_lòng vui_vẻ thoải_mái hân_hoan mãn_nguyện an_lòng phấn_khởi sung_sướng`
+			)
 		},
 		{
 			subject: ['creature', 'person'],
 			condition: 'restless',
-			words: words(`buồn_chán tò_mò bồn_chồn lo_lắng`)
+			words: words(`buồn_chán tò_mò bồn_chồn lo_lắng sốt_ruột nôn_nao thấp_thỏm băn_khoăn`)
 		},
 		{
 			subject: [
@@ -448,31 +462,43 @@ export const VI: SentenceLanguageData = {
 				'idea',
 				'body'
 			],
-			words: words(`đẹp lạ mới phổ_biến hiếm`)
+			words: words(
+				`đẹp lạ mới phổ_biến hiếm đáng_yêu quen_thuộc kỳ_lạ bình_thường đặc_biệt quý_hiếm`
+			)
 		},
 		{
 			subject: ['place', 'event'],
-			words: words(`rộng hẹp yên_tĩnh sâu tối sáng xa dốc`)
+			words: words(`
+				rộng hẹp yên_tĩnh sâu tối sáng xa dốc
+				đông_đúc vắng_vẻ chật_chội trống_trải bát_ngát thăm_thẳm mờ_tối bằng_phẳng dài ngắn rực_nắng
+			`)
 		},
 		{
 			subject: ['thing', 'vehicle'],
-			words: words(`cứng nhẹ nặng cũ trơn trong_suốt chắc`)
+			words: words(`
+				cứng nhẹ nặng cũ trơn trong_suốt chắc
+				tròn dẹt nhọn mỏng dày mong_manh lộng_lẫy giản_dị tinh_xảo thô_ráp bóng_loáng
+			`)
 		},
 		{
 			subject: ['edible'],
-			words: words(`ngọt mặn cay chua nóng lạnh bùi`)
+			words: words(
+				`ngọt mặn cay chua nóng lạnh bùi đắng đậm nhạt âm_ấm ngon giòn mềm béo thanh_mát`
+			)
 		},
 		{
 			subject: ['idea'],
-			words: words(`đơn_giản rõ_ràng mơ_hồ vĩnh_cửu thoáng_qua`)
+			words: words(
+				`đơn_giản rõ_ràng mơ_hồ vĩnh_cửu thoáng_qua phức_tạp sâu_sắc quen_thuộc quý_báu kín_đáo nhỏ_nhặt thú_vị khó dễ`
+			)
 		},
 		{
 			subject: ['plant'],
-			words: words(`xanh um_tùm thơm héo_úa`)
+			words: words(`xanh um_tùm thơm héo_úa cao non mảnh_khảnh xanh_mướt thưa_thớt rậm_rạp`)
 		},
 		{
 			subject: ['body'],
-			words: words(`ấm lạnh đau cứng`)
+			words: words(`ấm lạnh đau cứng mềm thô_ráp nhẵn xanh_xao khỏe tê nặng`)
 		}
 	],
 	// Vietnamese puts the modifier after its noun, which the word frames already
@@ -482,31 +508,85 @@ export const VI: SentenceLanguageData = {
 			subject: ['creature', 'person'],
 			words: words(`
 				dũng_cảm hiền_lành chăm_chỉ lười_biếng nhút_nhát thông_minh trẻ già nhỏ to hoạt_bát thong_thả nhanh_nhẹn hiếu_kỳ
+				bạo_dạn e_dè thận_trọng bướng_bỉnh ngoan_ngoãn ầm_ĩ vạm_vỡ gầy_gò mũm_mĩm buồn_ngủ ranh_mãnh
+				cảnh_giác lặng_lẽ kiêu_hãnh ngây_thơ thật_thà lanh_lợi điềm_đạm
 			`)
 		},
-		{ subject: ['person'], words: words(`trẻ tốt_bụng nghiêm_khắc nghiêm_túc bận_rộn tận_tâm`) },
-		{ subject: ['creature'], words: words(`nhanh_nhẹn hung_dữ hiền nhỏ_bé mập_mạp`) },
+		{
+			subject: ['person'],
+			words: words(`
+				trẻ tốt_bụng nghiêm_khắc nghiêm_túc bận_rộn tận_tâm
+				khôn_ngoan khiêm_tốn ít_nói hoạt_ngôn lành_nghề nổi_tiếng nghèo giàu ngay_thẳng hòa_nhã đứng_tuổi cởi_mở sắc_sảo
+			`)
+		},
+		{
+			subject: ['creature'],
+			words: words(`
+				nhanh_nhẹn hung_dữ hiền nhỏ_bé mập_mạp
+				lông_xù đốm_đốm vằn_vện gầy_nhom khổng_lồ khéo_léo tròn_trịa bóng_mượt thon_dài
+			`)
+		},
 		{
 			subject: ['edible'],
 			themes: ['food'],
-			words: words(`ngọt cay ấm tươi giòn thơm nóng mặn mềm chín ngon_lành`)
+			words: words(`
+				ngọt cay ấm tươi giòn thơm nóng mặn mềm chín ngon_lành
+				vàng_ruộm thơm_lừng dẻo_thơm đậm_đà thanh_đạm mới_ra_lò nghi_ngút chua_ngọt béo_ngậy mộc_mạc
+			`)
 		},
-		{ subject: ['edible'], themes: ['drink'], words: words(`ngọt ấm lạnh mát nóng thơm tươi đậm`) },
+		{
+			subject: ['edible'],
+			themes: ['drink'],
+			words: words(`
+				ngọt ấm lạnh mát nóng thơm tươi đậm
+				âm_ấm sủi_bọt trong_veo đục đắng nhạt chua_dịu nóng_hổi mát_lạnh
+			`)
+		},
 		{
 			subject: ['thing', 'vehicle'],
-			words: words(`cũ mới nhỏ to nhẹ nặng sáng_bóng nhẵn trong_suốt cứng đẹp quý cổ`)
+			words: words(`
+				cũ mới nhỏ to nhẹ nặng sáng_bóng nhẵn trong_suốt cứng đẹp quý cổ
+				han_gỉ sờn mòn đánh_bóng giản_dị lộng_lẫy thon_dài dẹt tròn nhọn mỏng dày mong_manh bụi_bặm cong tinh_xảo
+			`)
 		},
-		{ subject: ['vehicle'], words: words(`nhanh chậm chắc_chắn`) },
+		{
+			subject: ['vehicle'],
+			words: words(`nhanh chậm chắc_chắn kẽo_kẹt bóng_loáng han_gỉ lắc_lư đồ_sộ cũ_kỹ mới_tinh`)
+		},
 		{
 			subject: ['place'],
+			words: words(`
+				yên_tĩnh rộng tối sáng lạ cũ ấm_cúng vắng_vẻ đông_đúc xa gần trống_trải hiu_quạnh đầy_nắng
+				chật_hẹp chen_chúc lộng_gió mù_sương râm_mát bụi_bặm ẩm_ướt lởm_chởm dốc bằng_phẳng hoang_vắng xanh_mướt thoáng_đãng
+			`)
+		},
+		{
+			subject: ['plant'],
+			words: words(`
+				xanh um_tùm thơm non héo cao nhỏ tươi
+				gai_góc nở_rộ chớm_nở leo hoang_dại mảnh_khảnh nhạt_màu rủ_xuống sum_suê
+			`)
+		},
+		{
+			subject: ['idea'],
+			words: words(`
+				mờ_nhạt cũ mới lạ rõ_ràng quý_giá nhỏ kỳ_lạ
+				nhạt_nhòa đơn_sơ rối_rắm dai_dẳng thoáng_qua xa_xôi táo_bạo thầm_kín lặng_lẽ quen_thuộc
+			`)
+		},
+		{
+			subject: ['event'],
+			words: words(`
+				dài ngắn yên_ả nắng âm_u ồn_ào bất_ngờ
+				linh_đình giản_dị trang_nghiêm vui_nhộn tẻ_nhạt mưa_gió lặng_gió tất_bật chen_chúc rộn_ràng
+			`)
+		},
+		{
+			subject: ['body'],
 			words: words(
-				`yên_tĩnh rộng tối sáng lạ cũ ấm_cúng vắng_vẻ đông_đúc xa gần trống_trải hiu_quạnh đầy_nắng`
+				`nhỏ lạnh ấm mảnh_mai khỏe mềm_mại cứng_đờ ê_ẩm thô_ráp nhẵn_nhụi xanh_xao rắn_rỏi`
 			)
 		},
-		{ subject: ['plant'], words: words(`xanh um_tùm thơm non héo cao nhỏ tươi`) },
-		{ subject: ['idea'], words: words(`mờ_nhạt cũ mới lạ rõ_ràng quý_giá nhỏ kỳ_lạ`) },
-		{ subject: ['event'], words: words(`dài ngắn yên_ả nắng âm_u ồn_ào bất_ngờ`) },
-		{ subject: ['body'], words: words(`nhỏ lạnh ấm mảnh_mai khỏe`) },
 		{
 			subject: [
 				'creature',
@@ -519,7 +599,7 @@ export const VI: SentenceLanguageData = {
 				'idea',
 				'body'
 			],
-			words: words(`đẹp bí_ẩn lạ mới`)
+			words: words(`đẹp bí_ẩn lạ mới đáng_yêu quen_mắt kỳ_quặc bình_dị tuyệt_vời mộc_mạc`)
 		}
 	],
 	manners: [
@@ -528,13 +608,20 @@ export const VI: SentenceLanguageData = {
 			words: words(`
 				lặng_lẽ chậm_rãi nhanh_chóng nhẹ_nhàng khẽ một_mình một_lát mạnh_mẽ cẩn_thận háo_hức từ_từ vội_vã
 				êm_ái chăm_chú thản_nhiên vui_vẻ bình_thản hối_hả kiên_nhẫn thong_thả hớn_hở
+				rón_rén lấm_lét lững_thững hấp_tấp luống_cuống ngập_ngừng láo_liên loanh_quanh tỉ_mỉ trầm_ngâm
+				cố_ý vô_tình bất_giác thoăn_thoắt thoắt_cái phăm_phăm lừ_đừ chậm_chạp đường_hoàng hãnh_diện
+				ngượng_ngùng tươi_cười buồn_bã điềm_nhiên lặng_thinh cần_mẫn khéo_léo vụng_về liều_lĩnh
+				chật_vật miễn_cưỡng tự_nhiên dịu_dàng thô_bạo lạnh_lùng say_sưa lí_nhí
 			`)
 		},
 		{
 			subject: ['plant', 'edible', 'thing', 'vehicle', 'place', 'event', 'idea', 'body'],
-			words: words(
-				`lặng_lẽ chậm_rãi từ_từ đột_nhiên khẽ lại đều_đặn dần_dần vẫn mãi nhẹ_nhàng chầm_chậm dần`
-			)
+			words: words(`
+				lặng_lẽ chậm_rãi từ_từ đột_nhiên khẽ lại đều_đặn dần_dần vẫn mãi nhẹ_nhàng chầm_chậm dần
+				bất_chợt thoáng_chốc hồi_lâu suốt lạ_thường đặc_biệt hẳn hoàn_toàn nhàn_nhạt thoang_thoảng
+				mờ_ảo rõ_rệt rành_rọt lờ_mờ dịu_dàng liên_tục không_ngừng từng_chút lớp_lớp khe_khẽ
+				lắc_lư lấp_lánh rì_rào phập_phồng bồng_bềnh êm_đềm
+			`)
 		}
 	],
 	times: {
@@ -542,21 +629,37 @@ export const VI: SentenceLanguageData = {
 			lúc_bình_minh sáng_sớm vào_buổi_sáng gần_trưa vào_buổi_trưa vào_buổi_chiều lúc_hoàng_hôn
 			vào_buổi_tối vào_ban_đêm đêm_khuya lúc_nửa_đêm
 		`),
-		any: words(
-			`vào_mùa_xuân vào_mùa_hè vào_mùa_thu vào_mùa_đông vào_cuối_tuần vào_ngày_lễ cả_ngày`
-		),
-		past: words(`hôm_qua tuần_trước ngày_xưa hôm_ấy đêm_qua`),
-		present: words(`hôm_nay vừa_rồi ngày_mai tuần_sau`),
-		habitual: words(`dạo_này đôi_khi mỗi_ngày mỗi_tối`)
+		any: words(`
+			vào_mùa_xuân vào_mùa_hè vào_mùa_thu vào_mùa_đông vào_cuối_tuần vào_ngày_lễ cả_ngày
+			đầu_xuân cuối_xuân đầu_hè giữa_hè cuối_hè đầu_thu cuối_thu giữa_đông cuối_đông vào_mùa_mưa
+			vào_mùa_gặt vào_ngày_hội vào_ngày_chợ_phiên vào_đêm_trăng_tròn vào_ngày_mưa vào_ngày_nắng
+			vào_ngày_gió vào_ngày_sương_mù vào_kỳ_nghỉ
+		`),
+		past: words(`
+			hôm_qua tuần_trước ngày_xưa hôm_ấy đêm_qua
+			hôm_kia tháng_trước năm_ngoái năm_kia tuần_trước_nữa lâu_lắm_rồi mới_đây sáng_hôm_ấy tối_hôm_ấy
+			dạo_ấy thuở_ấy mùa_xuân_năm_ngoái mùa_hè_năm_ngoái mùa_thu_năm_ngoái mùa_đông_năm_ngoái vài_ngày_trước
+		`),
+		present: words(`
+			hôm_nay vừa_rồi ngày_mai tuần_sau
+			bây_giờ sáng_nay tối_nay đêm_nay ngày_kia tháng_sau năm_sau năm_nay tuần_này cuối_tuần_này chốc_nữa
+		`),
+		habitual: words(`
+			dạo_này đôi_khi mỗi_ngày mỗi_tối
+			luôn_luôn thường thường_xuyên hiếm_khi ít_khi thỉnh_thoảng đôi_lúc mỗi_sáng mỗi_tuần mỗi_năm ngày_thường thông_thường
+		`)
 	},
 	homes: words(`nhà`),
 	// Two clauses are joined on rồi: `Con mèo về đến nhà rồi ăn táo.`
 	join: { word: 'rồi' },
 	connectives: {
-		additive: words(`ngoài_ra hơn_nữa`),
-		temporal: words(`rồi và_rồi sau_đó cuối_cùng sau_cùng thế_rồi đồng_thời lát_sau`),
-		contrastive: words(`nhưng tuy_vậy tuy_nhiên dù_vậy`),
-		causal: words(`thế_là vì_thế rốt_cuộc`)
+		additive: words(`ngoài_ra hơn_nữa và thêm_vào_đó bên_cạnh_đó vả_lại`),
+		temporal: words(`
+			rồi và_rồi sau_đó cuối_cùng sau_cùng thế_rồi đồng_thời lát_sau
+			tiếp_đó chẳng_bao_lâu ít_lâu_sau bấy_giờ trong_chốc_lát ngay_sau_đó
+		`),
+		contrastive: words(`nhưng tuy_vậy tuy_nhiên dù_vậy thế_mà trái_lại ngược_lại có_điều dẫu_vậy`),
+		causal: words(`thế_là vì_thế rốt_cuộc do_đó bởi_vậy cho_nên vì_vậy`)
 	},
 	// What a noun can do that its theme does not say. A noun listed nowhere has no
 	// trait, and takes any verb that asks for none.
@@ -565,17 +668,24 @@ export const VI: SentenceLanguageData = {
 		chim én sẻ quạ chim_ưng đại_bàng công vẹt cú bồ_câu hạc thiên_nga vịt ngỗng bướm ong chuồn_chuồn ve muỗi
 		ruồi dơi
 		rồng phượng_hoàng tiên thiên_thần hắc_long bạch_long thanh_long chu_tước chim_lửa thiên_mã thần_điểu tinh_linh
+		sơn_ca chim_cút gà_lôi đa_đa chim_ruồi hồng_hạc cò chim_gõ_kiến chim_sáo chim_chích chim_cắt hải_âu bồ_nông
+		ong_bắp_cày bướm_đêm đom_đóm ong_nghệ bọ_rùa
 		`),
 		swimmer: words(`
 		cá_sấu rùa ếch cóc cá cá_voi cá_heo cá_mập mực bạch_tuộc tôm cua sứa hải_cẩu cá_chép lươn
 		người_cá mỹ_nhân_ngư hải_quái
+		cá_trích cá_ngừ cá_tuyết cá_hồi cá_trê cá_rô cá_thu cá_đuối hàu trai vẹm tôm_hùm sao_biển
+		cá_kiếm cá_ngựa kỳ_giông hải_ly thú_mỏ_vịt
 		`),
 		crawler: words(`
 		cá_sấu rắn thằn_lằn rùa ốc kiến nhện giun sâu tằm cua bọ_ngựa
+		kỳ_nhông tắc_kè kỳ_giông trăn rắn_hổ_mang rắn_lục
+		bọ_cánh_cứng châu_chấu dế bọ_chét rết bọ_cạp
 		`),
 		// A word of a creature theme that is no creature: it takes no verb and no state.
 		lifeless: words(`
 			phép_thuật ma_lực thần_chú lời_nguyền tiên_tri sấm_truyền kết_giới bùa_hộ_mệnh phong_ấn ảo_giác ma_thuật hình_nhân
+			sách_phép chén_thánh gậy_phép trượng vương_trượng
 		`),
 		// A word of the place class that is no place.
 		placeless: words(`
@@ -583,10 +693,12 @@ export const VI: SentenceLanguageData = {
 			sao mặt_trời sao_chổi sao_băng cực_quang bụi_sao nhật_thực nguyệt_thực thiên_đỉnh vệ_tinh cụm_sao chòm_sao quỹ_đạo
 			trọng_lực tự_quay nhật_hoa vết_đen gió_mặt_trời năm_ánh_sáng thiên_thể liên_sao định_tinh thiên_cầu hoàng_đạo
 			mưa_sao_băng bụi_vũ_trụ trăng_khuyết trăng_tròn trăng_non ánh_trăng ánh_sao sao_bắc_cực sao_hôm sao_mai
+			dòng_nước thủy_triều sóng bọt sóng_vỗ thị_sai parsec phương_vị cận_nhật viễn_nhật trọng_trường sao_lùn
 		`)
 	},
 	interjections: words(`
 		ôi, chà, ồ, trời_ơi, chao_ôi, này, thật_đấy, ái_chà, ê, ơ_kìa, khiếp, ối,
+		ôi_chao, à, ừ, hả, ơ, ái_dà, ơ_hay, thôi_chết, lạ_chưa, quả_nhiên, hóa_ra, coi_kìa,
 	`),
 	pronouns: { n: ['', 'nó'] },
 	// And an object it has named is left out the next time: `nấu rồi ăn`.

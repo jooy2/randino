@@ -347,9 +347,9 @@ describe('Nickname', () => {
 	});
 
 	it('omitted length bounds fall back to what the language can produce', () => {
-		assert.deepStrictEqual(nicknameLengthRange('zh'), [2, 8]);
+		assert.deepStrictEqual(nicknameLengthRange('zh'), [2, 9]);
 		assert.deepStrictEqual(nicknameLengthRange('ko'), [1, 13]);
-		assert.deepStrictEqual(nicknameLengthRange('en'), [3, 31]);
+		assert.deepStrictEqual(nicknameLengthRange('en'), [3, 33]);
 
 		for (const language of WORD_LANGUAGES) {
 			const [min, max] = nicknameLengthRange(language);
@@ -394,7 +394,7 @@ describe('Nickname', () => {
 
 		// The separator is part of the nickname, so it counts toward the length.
 		assert.deepStrictEqual(nicknameLengthRange('ko', '-'), [1, 15]);
-		assert.deepStrictEqual(nicknameLengthRange('en', ' '), [3, 33]);
+		assert.deepStrictEqual(nicknameLengthRange('en', ' '), [3, 35]);
 
 		for (const [language, wordSeparator, minLength, maxLength] of [
 			['ko', ' ', 5, 8],

@@ -368,9 +368,9 @@ void main() {
     });
 
     test('omitted length bounds fall back to what the language can produce', () {
-      expect(nicknameLengthRange(language: WordLanguage.zh), const LengthRange(2, 8));
+      expect(nicknameLengthRange(language: WordLanguage.zh), const LengthRange(2, 9));
       expect(nicknameLengthRange(language: WordLanguage.ko), const LengthRange(1, 13));
-      expect(nicknameLengthRange(language: WordLanguage.en), const LengthRange(3, 31));
+      expect(nicknameLengthRange(language: WordLanguage.en), const LengthRange(3, 33));
 
       for (final language in wordLanguages) {
         final range = nicknameLengthRange(language: language);
@@ -434,7 +434,7 @@ void main() {
       );
       expect(
         nicknameLengthRange(language: WordLanguage.en, wordSeparator: ' '),
-        const LengthRange(3, 33),
+        const LengthRange(3, 35),
       );
 
       const cases = <(WordLanguage, String, int, int)>[

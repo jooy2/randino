@@ -43,16 +43,20 @@ export const DE: SentenceLanguageData = {
 			field: 'rise',
 			subject: ['creature', 'person'],
 			...tensed(
-				`erwacht erhebt_sich regt_sich reckt_sich streckt_sich räkelt_sich rührt_sich ermuntert_sich`,
-				`erwachte erhob_sich regte_sich reckte_sich streckte_sich räkelte_sich rührte_sich ermunterte_sich`
+				`erwacht erhebt_sich regt_sich reckt_sich streckt_sich räkelt_sich rührt_sich ermuntert_sich
+				besinnt_sich sammelt_sich belebt_sich erfrischt_sich`,
+				`erwachte erhob_sich regte_sich reckte_sich streckte_sich räkelte_sich rührte_sich ermunterte_sich
+				besann_sich sammelte_sich belebte_sich erfrischte_sich`
 			)
 		},
 		{
 			field: 'go',
 			subject: ['creature', 'person'],
 			...tensed(
-				`geht wandert eilt reist zieht entfernt_sich trollt_sich schleicht flieht flüchtet enteilt entschwindet verabschiedet_sich entweicht entflieht verschwindet`,
-				`ging wanderte eilte reiste zog entfernte_sich trollte_sich schlich floh flüchtete enteilte entschwand verabschiedete_sich entwich entfloh verschwand`
+				`geht wandert eilt reist zieht entfernt_sich trollt_sich schleicht flieht flüchtet enteilt entschwindet verabschiedet_sich entweicht entflieht verschwindet
+				entrinnt entkommt verreist türmt`,
+				`ging wanderte eilte reiste zog entfernte_sich trollte_sich schlich floh flüchtete enteilte entschwand verabschiedete_sich entwich entfloh verschwand
+				entrann entkam verreiste türmte`
 			)
 		},
 		{
@@ -69,16 +73,20 @@ export const DE: SentenceLanguageData = {
 			// Running and walking are for legs: a fish and a snake do neither.
 			subjectWithout: ['swimmer', 'crawler'],
 			...tensed(
-				`läuft springt bummelt trabt spaziert rennt tänzelt schlendert stolziert stapft trottet stakst joggt marschiert tippelt watschelt humpelt galoppiert flitzt hetzt hastet trippelt stiefelt tobt flaniert schreitet wandelt sprintet hopst`,
-				`lief sprang bummelte trabte spazierte rannte tänzelte schlenderte stolzierte stapfte trottete stakste joggte marschierte tippelte watschelte humpelte galoppierte flitzte hetzte hastete trippelte stiefelte tobte flanierte schritt wandelte sprintete hopste`
+				`läuft springt bummelt trabt spaziert rennt tänzelt schlendert stolziert stapft trottet stakst joggt marschiert tippelt watschelt humpelt galoppiert flitzt hetzt hastet trippelt stiefelt tobt flaniert schreitet wandelt sprintet hopst
+				schlurft stolpert taumelt wankt hoppelt latscht pirscht wetzt düst watet klettert`,
+				`lief sprang bummelte trabte spazierte rannte tänzelte schlenderte stolzierte stapfte trottete stakste joggte marschierte tippelte watschelte humpelte galoppierte flitzte hetzte hastete trippelte stiefelte tobte flanierte schritt wandelte sprintete hopste
+				schlurfte stolperte taumelte wankte hoppelte latschte pirschte wetzte düste watete kletterte`
 			)
 		},
 		{
 			field: 'move',
 			subject: ['creature', 'person'],
 			...tensed(
-				`streift bewegt_sich wendet_sich dreht_sich kreist treibt gleitet huscht schweift streunt weicht rückt`,
-				`streifte bewegte_sich wandte_sich drehte_sich kreiste trieb glitt huschte schweifte streunte wich rückte`
+				`streift bewegt_sich wendet_sich dreht_sich kreist treibt gleitet huscht schweift streunt weicht rückt
+				schwankt wogt pendelt kreiselt`,
+				`streifte bewegte_sich wandte_sich drehte_sich kreiste trieb glitt huschte schweifte streunte wich rückte
+				schwankte wogte pendelte kreiselte`
 			)
 		},
 		{
@@ -87,8 +95,8 @@ export const DE: SentenceLanguageData = {
 			// A fish's, a whale's and a mermaid's; a lion does not swim here.
 			subjectTraits: ['swimmer'],
 			...tensed(
-				`schwimmt taucht plantscht paddelt strampelt krault`,
-				`schwamm tauchte plantschte paddelte strampelte kraulte`
+				`schwimmt taucht plantscht paddelt strampelt krault schnorchelt badet`,
+				`schwamm tauchte plantschte paddelte strampelte kraulte schnorchelte badete`
 			)
 		},
 		{
@@ -97,8 +105,8 @@ export const DE: SentenceLanguageData = {
 			subject: ['creature'],
 			subjectTraits: ['flier'],
 			...tensed(
-				`fliegt flattert schwebt segelt schwirrt steigt sinkt schwingt_sich stürzt`,
-				`flog flatterte schwebte segelte schwirrte stieg sank schwang_sich stürzte`
+				`fliegt flattert schwebt segelt schwirrt steigt sinkt schwingt_sich stürzt gaukelt surrt`,
+				`flog flatterte schwebte segelte schwirrte stieg sank schwang_sich stürzte gaukelte surrte`
 			)
 		},
 		{
@@ -115,56 +123,68 @@ export const DE: SentenceLanguageData = {
 			field: 'wait',
 			subject: ['creature', 'person'],
 			...tensed(
-				`wartet zögert verharrt lauscht lauert horcht verweilt harrt zaudert duckt_sich versteckt_sich späht trödelt bleibt stockt schweigt wacht`,
-				`wartete zögerte verharrte lauschte lauerte horchte verweilte harrte zauderte duckte_sich versteckte_sich spähte trödelte blieb stockte schwieg wachte`
+				`wartet zögert verharrt lauscht lauert horcht verweilt harrt zaudert duckt_sich versteckt_sich späht trödelt bleibt stockt schweigt wacht
+				grübelt sinniert stutzt lugt äugt`,
+				`wartete zögerte verharrte lauschte lauerte horchte verweilte harrte zauderte duckte_sich versteckte_sich spähte trödelte blieb stockte schwieg wachte
+				grübelte sinnierte stutzte lugte äugte`
 			)
 		},
 		{
 			field: 'rest',
 			subject: ['creature', 'person'],
 			...tensed(
-				`ruht sitzt liegt rastet lehnt setzt_sich legt_sich entspannt_sich kauert kniet hockt lümmelt fläzt_sich verschnauft lagert bettet_sich erholt_sich pausiert`,
-				`ruhte saß lag rastete lehnte setzte_sich legte_sich entspannte_sich kauerte kniete hockte lümmelte fläzte_sich verschnaufte lagerte bettete_sich erholte_sich pausierte`
+				`ruht sitzt liegt rastet lehnt setzt_sich legt_sich entspannt_sich kauert kniet hockt lümmelt fläzt_sich verschnauft lagert bettet_sich erholt_sich pausiert
+				schnauft faulenzt gammelt dehnt_sich`,
+				`ruhte saß lag rastete lehnte setzte_sich legte_sich entspannte_sich kauerte kniete hockte lümmelte fläzte_sich verschnaufte lagerte bettete_sich erholte_sich pausierte
+				schnaufte faulenzte gammelte dehnte_sich`
 			)
 		},
 		{
 			field: 'sleep',
 			subject: ['creature', 'person'],
 			...tensed(
-				`schläft schlummert dämmert döst schnarcht träumt pennt entschlummert duselt`,
-				`schlief schlummerte dämmerte döste schnarchte träumte pennte entschlummerte duselte`
+				`schläft schlummert dämmert döst schnarcht träumt pennt entschlummert duselt ratzt`,
+				`schlief schlummerte dämmerte döste schnarchte träumte pennte entschlummerte duselte ratzte`
 			)
 		},
 		{
 			field: 'express',
 			subject: ['creature', 'person'],
 			...tensed(
-				`lacht weint gähnt seufzt lächelt summt murmelt ruft kichert grinst schluchzt stöhnt murrt brummt pfeift schreit jauchzt jubelt keucht nickt niest klatscht zwinkert errötet prustet schnieft schnaubt kreischt stammelt winkt strahlt schmunzelt gluckst schnalzt hustet räuspert_sich wimmert heult grunzt jammert flucht`,
-				`lachte weinte gähnte seufzte lächelte summte murmelte rief kicherte grinste schluchzte stöhnte murrte brummte pfiff schrie jauchzte jubelte keuchte nickte nieste klatschte zwinkerte errötete prustete schniefte schnaubte kreischte stammelte winkte strahlte schmunzelte gluckste schnalzte hustete räusperte_sich wimmerte heulte grunzte jammerte fluchte`
+				`lacht weint gähnt seufzt lächelt summt murmelt ruft kichert grinst schluchzt stöhnt murrt brummt pfeift schreit jauchzt jubelt keucht nickt niest klatscht zwinkert errötet prustet schnieft schnaubt kreischt stammelt winkt strahlt schmunzelt gluckst schnalzt hustet räuspert_sich wimmert heult grunzt jammert flucht
+				schluckt zittert bebt blinzelt schmatzt quiekt fiept kräht zirpt brüllt faucht knurrt jault winselt`,
+				`lachte weinte gähnte seufzte lächelte summte murmelte rief kicherte grinste schluchzte stöhnte murrte brummte pfiff schrie jauchzte jubelte keuchte nickte nieste klatschte zwinkerte errötete prustete schniefte schnaubte kreischte stammelte winkte strahlte schmunzelte gluckste schnalzte hustete räusperte_sich wimmerte heulte grunzte jammerte fluchte
+				schluckte zitterte bebte blinzelte schmatzte quiekte fiepte krähte zirpte brüllte fauchte knurrte jaulte winselte`
 			)
 		},
 		{
 			field: 'talk',
 			subject: ['creature', 'person'],
 			...tensed(
-				`plaudert redet schwatzt spricht quatscht tratscht klönt tuschelt flüstert unterhält_sich ratscht palavert erzählt grüßt plauscht schnattert quasselt labert`,
-				`plauderte redete schwatzte sprach quatschte tratschte klönte tuschelte flüsterte unterhielt_sich ratschte palaverte erzählte grüßte plauschte schnatterte quasselte laberte`
+				`plaudert redet schwatzt spricht quatscht tratscht klönt tuschelt flüstert unterhält_sich ratscht palavert erzählt grüßt plauscht schnattert quasselt labert
+				berichtet diskutiert schwadroniert fabuliert parliert nuschelt brabbelt plappert`,
+				`plauderte redete schwatzte sprach quatschte tratschte klönte tuschelte flüsterte unterhielt_sich ratschte palaverte erzählte grüßte plauschte schnatterte quasselte laberte
+				berichtete diskutierte schwadronierte fabulierte parlierte nuschelte brabbelte plapperte`
 			)
 		},
 		{
 			field: 'play',
 			subject: ['creature', 'person'],
 			...tensed(
-				`tanzt singt tollt spielt hüpft rollt purzelt wirbelt kugelt_sich albert balgt_sich vergnügt_sich schaukelt wälzt_sich springt tummelt_sich kaspert trällert scherzt`,
-				`tanzte sang tollte spielte hüpfte rollte purzelte wirbelte kugelte_sich alberte balgte_sich vergnügte_sich schaukelte wälzte_sich sprang tummelte_sich kasperte trällerte scherzte`
+				`tanzt singt tollt spielt hüpft rollt purzelt wirbelt kugelt_sich albert balgt_sich vergnügt_sich schaukelt wälzt_sich springt tummelt_sich kaspert trällert scherzt
+				turnt jongliert klimpert trommelt musiziert`,
+				`tanzte sang tollte spielte hüpfte rollte purzelte wirbelte kugelte_sich alberte balgte_sich vergnügte_sich schaukelte wälzte_sich sprang tummelte_sich kasperte trällerte scherzte
+				turnte jonglierte klimperte trommelte musizierte`
 			)
 		},
 		{
 			field: 'search',
 			subject: ['creature', 'person'],
 			...tensed(
-				`sucht stöbert kramt wühlt forscht schnüffelt buddelt fahndet erkundet tastet stochert schnuppert`,
-				`suchte stöberte kramte wühlte forschte schnüffelte buddelte fahndete erkundete tastete stocherte schnupperte`
+				`sucht stöbert kramt wühlt forscht schnüffelt buddelt fahndet erkundet tastet stochert schnuppert
+				sondiert wittert spioniert kundschaftet`,
+				`suchte stöberte kramte wühlte forschte schnüffelte buddelte fahndete erkundete tastete stocherte schnupperte
+				sondierte witterte spionierte kundschaftete`
 			)
 		},
 		{
@@ -307,29 +327,36 @@ export const DE: SentenceLanguageData = {
 	states: [
 		{
 			subject: ['creature', 'person'],
-			words: words(`groß klein schnell langsam still laut mutig faul sanft klug wild`)
+			words: words(`
+				groß klein schnell langsam still laut mutig faul sanft klug wild
+				jung alt stark schwach kühn scheu stolz lebhaft gelassen stur flink wachsam kräftig ehrlich schlau
+			`)
 		},
-		{ subject: ['creature', 'person'], condition: 'hungry', words: words(`hungrig ausgehungert`) },
-		{ subject: ['creature', 'person'], condition: 'full', words: words(`satt gesättigt`) },
+		{
+			subject: ['creature', 'person'],
+			condition: 'hungry',
+			words: words(`hungrig ausgehungert heißhungrig`)
+		},
+		{ subject: ['creature', 'person'], condition: 'full', words: words(`satt gesättigt pappsatt`) },
 		{
 			subject: ['creature', 'person'],
 			condition: 'tired',
-			words: words(`müde schläfrig erschöpft`)
+			words: words(`müde schläfrig erschöpft matt abgespannt schlapp`)
 		},
 		{
 			subject: ['creature', 'person'],
 			condition: 'rested',
-			words: words(`ausgeruht frisch munter`)
+			words: words(`ausgeruht frisch munter wach erholt tatkräftig`)
 		},
 		{
 			subject: ['creature', 'person'],
 			condition: 'content',
-			words: words(`froh zufrieden glücklich heiter`)
+			words: words(`froh zufrieden glücklich heiter vergnügt selig wohlgemut behaglich`)
 		},
 		{
 			subject: ['creature', 'person'],
 			condition: 'restless',
-			words: words(`gelangweilt neugierig unruhig rastlos`)
+			words: words(`gelangweilt neugierig unruhig rastlos ungeduldig nervös zappelig bang`)
 		},
 		{
 			subject: [
@@ -344,31 +371,43 @@ export const DE: SentenceLanguageData = {
 				'idea',
 				'body'
 			],
-			words: words(`schön fremd neu häufig selten`)
+			words: words(
+				`schön fremd neu häufig selten hübsch vertraut sonderbar gewöhnlich prächtig kostbar`
+			)
 		},
 		{
 			subject: ['place', 'event'],
-			words: words(`weit eng ruhig tief dunkel hell fern steil`)
+			words: words(`
+				weit eng ruhig tief dunkel hell fern steil
+				belebt verlassen schmal leer riesig düster flach lang kurz sonnig
+			`)
 		},
 		{
 			subject: ['thing', 'vehicle'],
-			words: words(`hart leicht schwer alt glatt klar stabil`)
+			words: words(`
+				hart leicht schwer alt glatt klar stabil
+				rund flach spitz dünn dick zerbrechlich prunkvoll schlicht fein rau blank
+			`)
 		},
 		{
 			subject: ['edible'],
-			words: words(`süß salzig scharf sauer heiß kalt herzhaft`)
+			words: words(
+				`süß salzig scharf sauer heiß kalt herzhaft bitter dickflüssig weich lauwarm saftig knusprig lecker fade`
+			)
 		},
 		{
 			subject: ['idea'],
-			words: words(`einfach deutlich vage ewig flüchtig`)
+			words: words(
+				`einfach deutlich vage ewig flüchtig verwickelt klar tief vertraut wertvoll heimlich winzig schwierig`
+			)
 		},
 		{
 			subject: ['plant'],
-			words: words(`grün üppig duftend welk`)
+			words: words(`grün üppig duftend welk hoch zart schlank blühend licht dicht`)
 		},
 		{
 			subject: ['body'],
-			words: words(`warm kalt wund steif`)
+			words: words(`warm kalt wund steif weich rau glatt blass stark taub schwer`)
 		}
 	],
 	// Base forms, which `agreement` gives the strong endings after `ein`.
@@ -377,37 +416,80 @@ export const DE: SentenceLanguageData = {
 			subject: ['creature', 'person'],
 			words: words(`
 				mutig lebhaft sanft fleißig faul schüchtern klug jung alt klein groß still fröhlich geduldig flink neugierig
+				kühn ängstlich vorsichtig stur zahm laut kräftig hager rundlich schläfrig schlau wachsam schweigsam stolz arglos ehrlich wach gelassen
 			`)
 		},
-		{ subject: ['person'], words: words(`jung freundlich streng ernst beschäftigt aufrichtig`) },
-		{ subject: ['creature'], words: words(`flink wild zahm rundlich winzig`) },
+		{
+			subject: ['person'],
+			words: words(`
+				jung freundlich streng ernst beschäftigt aufrichtig
+				weise bescheiden höflich geschickt berühmt arm reich betagt heiter scharfsinnig leutselig fleißig
+			`)
+		},
+		{
+			subject: ['creature'],
+			words: words(
+				`flink wild zahm rundlich winzig zottig gefleckt gestreift mager riesig geschickt pummelig glänzend langgestreckt`
+			)
+		},
 		{
 			subject: ['edible'],
 			themes: ['food'],
-			words: words(`süß scharf warm frisch knusprig würzig duftend heiß salzig weich reif lecker`)
+			words: words(`
+				süß scharf warm frisch knusprig würzig duftend heiß salzig weich reif lecker
+				goldbraun geräuchert sahnig zart saftig deftig dampfend geröstet klebrig fade gewürzt
+			`)
 		},
 		{
 			subject: ['edible'],
 			themes: ['drink'],
-			words: words(`süß warm kalt kühl heiß duftend frisch stark`)
+			words: words(
+				`süß warm kalt kühl heiß duftend frisch stark bitter sahnig eisig milchig trüb klar sprudelnd mild lauwarm`
+			)
 		},
 		{
 			subject: ['thing', 'vehicle'],
-			words: words(
-				`alt neu klein groß leicht schwer glänzend glatt klar stabil hübsch kostbar uralt`
-			)
+			words: words(`
+				alt neu klein groß leicht schwer glänzend glatt klar stabil hübsch kostbar uralt
+				rostig abgenutzt poliert schlicht prunkvoll schmal breit rund flach spitz stumpf zerbrechlich hohl staubig krumm
+			`)
 		},
-		{ subject: ['vehicle'], words: words(`schnell langsam robust`) },
+		{
+			subject: ['vehicle'],
+			words: words(`schnell langsam robust knarrend blinkend rostig klapprig wuchtig laut nagelneu`)
+		},
 		{
 			subject: ['place'],
-			words: words(
-				`still weit dunkel hell fremd alt gemütlich abgelegen belebt leise fern nah leer einsam sonnig`
-			)
+			words: words(`
+				still weit dunkel hell fremd alt gemütlich abgelegen belebt leise fern nah leer einsam sonnig
+				schmal überfüllt windig neblig schattig staubig feucht felsig steil flach öde grün menschenleer luftig
+			`)
 		},
-		{ subject: ['plant'], words: words(`grün üppig duftend jung welk klein zart frisch`) },
-		{ subject: ['idea'], words: words(`vage alt neu fremd klar kostbar klein seltsam`) },
-		{ subject: ['event'], words: words(`lang kurz still sonnig trüb laut plötzlich`) },
-		{ subject: ['body'], words: words(`klein kalt warm schlank kräftig`) },
+		{
+			subject: ['plant'],
+			words: words(`
+				grün üppig duftend jung welk klein zart frisch
+				dornig blühend knospend rankend wild schlank blass hängend dicht
+			`)
+		},
+		{
+			subject: ['idea'],
+			words: words(`
+				vage alt neu fremd klar kostbar klein seltsam
+				schwach einfach verworren hartnäckig flüchtig fern kühn heimlich leise vertraut
+			`)
+		},
+		{
+			subject: ['event'],
+			words: words(`
+				lang kurz still sonnig trüb laut plötzlich
+				feierlich heiter langweilig regnerisch stürmisch ruhig belebt überfüllt prächtig schlicht
+			`)
+		},
+		{
+			subject: ['body'],
+			words: words(`klein kalt warm schlank kräftig weich steif wund rau glatt blass stark`)
+		},
 		{
 			subject: [
 				'creature',
@@ -420,7 +502,9 @@ export const DE: SentenceLanguageData = {
 				'idea',
 				'body'
 			],
-			words: words(`schön geheimnisvoll fremd neu`)
+			words: words(
+				`schön geheimnisvoll fremd neu hübsch vertraut sonderbar gewöhnlich prächtig bescheiden`
+			)
 		}
 	],
 	manners: [
@@ -429,13 +513,19 @@ export const DE: SentenceLanguageData = {
 			words: words(`
 				leise langsam schnell sanft plötzlich kaum allein kurz kühn sorgsam eifrig ruhig heftig geduldig leicht
 				fröhlich munter schwerfällig gelassen emsig zügig vergnügt
+				verstohlen auf_Zehenspitzen hastig eilig behutsam aufmerksam zerstreut nervös neugierig stolz
+				schüchtern freundlich zärtlich bitter streng schläfrig gierig achtlos barsch geschickt entschlossen
+				glücklich traurig lebhaft mit_Mühe widerwillig absichtlich wortlos mit_einem_Satz ohne_Eile
+				mit_Genuss halblaut unablässig
 			`)
 		},
 		{
 			subject: ['plant', 'edible', 'thing', 'vehicle', 'place', 'event', 'idea', 'body'],
-			words: words(
-				`leise langsam sanft plötzlich kaum wieder noch stetig allmählich nach_und_nach schwach weiter`
-			)
+			words: words(`
+				leise langsam sanft plötzlich kaum wieder noch stetig allmählich nach_und_nach schwach weiter
+				still sacht rasch tief weit hell matt warm kalt süß dicht fest schwer leicht endlos
+				unaufhörlich ständig noch_einmal eine_Weile mit_einem_Mal überall
+			`)
 		}
 	],
 	times: {
@@ -443,12 +533,29 @@ export const DE: SentenceLanguageData = {
 			bei_Tagesanbruch am_frühen_Morgen am_Morgen am_Vormittag am_Mittag am_Nachmittag in_der_Dämmerung
 			am_Abend in_der_Nacht spät_in_der_Nacht um_Mitternacht
 		`),
-		any: words(
-			`im_Frühling im_Sommer im_Herbst im_Winter am_Wochenende an_Feiertagen den_ganzen_Tag`
-		),
-		past: words(`gestern letzte_Woche vor_langer_Zeit einst an_jenem_Tag in_jener_Nacht`),
-		present: words(`heute gerade_eben morgen nächste_Woche`),
-		habitual: words(`heutzutage manchmal jeden_Tag jede_Nacht`)
+		any: words(`
+			im_Frühling im_Sommer im_Herbst im_Winter am_Wochenende an_Feiertagen den_ganzen_Tag
+			im_Frühsommer im_Hochsommer im_Spätsommer im_Frühherbst im_Spätherbst im_Hochwinter im_Spätwinter
+			im_zeitigen_Frühjahr im_Spätfrühling in_der_Regenzeit zur_Erntezeit auf_dem_Fest am_Markttag
+			bei_Vollmond an_einem_Regentag an_einem_Schneetag an_einem_windigen_Tag an_einem_klaren_Tag
+			an_einem_trüben_Tag an_einem_Nebeltag in_den_Ferien
+		`),
+		past: words(`
+			gestern letzte_Woche vor_langer_Zeit einst an_jenem_Tag in_jener_Nacht
+			vorgestern letzten_Monat letztes_Jahr vor_Jahren vor_einer_Weile an_jenem_Morgen an_jenem_Abend
+			damals in_jenen_Tagen die_Woche_zuvor letzten_Frühling letzten_Sommer letzten_Herbst letzten_Winter
+			vor_einigen_Tagen
+		`),
+		present: words(`
+			heute gerade_eben morgen nächste_Woche
+			jetzt heute_Morgen heute_Abend heute_Nacht übermorgen nächsten_Monat nächstes_Jahr dieses_Jahr
+			diese_Woche dieses_Wochenende gleich bald
+		`),
+		habitual: words(`
+			heutzutage manchmal jeden_Tag jede_Nacht
+			immer oft meistens kaum_je gelegentlich alle_paar_Tage ab_und_zu jeden_Morgen jede_Woche jedes_Jahr
+			für_gewöhnlich fast_immer
+		`)
 	},
 	// Nowhere a German sentence here can go, because a destination is dative; the
 	// pool is written all the same, so the shape of the data is the same.
@@ -473,23 +580,32 @@ export const DE: SentenceLanguageData = {
 		Vogel Schwalbe Spatz Rabe Falke Adler Pfau Papagei Eule Taube Kranich Schwan Ente Gans Biene
 		Libelle Zikade Fliege Mücke Fledermaus Reiher Pelikan
 		Drache Phönix Fee Greif Pegasus Engel Walküre
+		Amsel Nachtigall Lerche Wachtel Fasan Rebhuhn Kolibri Tukan Flamingo Storch Wiedehopf
+		Distelfink Elster Häher Kauz Bussard Möwe Specht Zaunkönig Wespe Motte Leuchtkäfer Hummel
+		Marienkäfer Hippogreif
 		`),
 		swimmer: words(`
 		Krokodil Schildkröte Frosch Kröte Fisch Wal Delfin Hai Krake Tintenfisch Garnele Krabbe Walross
 		Robbe Pinguin
 		Meerjungfrau Najade
+		Aal Sardine Thunfisch Dorsch Seehecht Forelle Karpfen Rochen Qualle Muschel Auster Hummer
+		Seestern Salamander Molch Biber Nilpferd Schnabeltier Meerforelle
 		`),
 		crawler: words(`
 		Krokodil Schlange Eidechse Schildkröte Schnecke Ameise Spinne Wurm Krabbe
 		Basilisk
+		Leguan Chamäleon Salamander Molch Boa Viper Kobra Python Käfer
+		Heuschrecke Grille Floh Raupe Tausendfüßer Skorpion
 		`),
 		// A word of a creature theme that is no creature: it takes no verb and no state.
 		lifeless: words(`
 			Zauber Fluch Weissagung Amulett Talisman Rune Pforte Heiligtum Götze Totem Vorzeichen Omen Bestiarium
+			Zauberbuch Pentagramm Reliquie Kelch Gral Zauberstab Stab Zepter Krone Beschwörung
 		`)
 	},
 	interjections: words(`
 		oh, ach, na, mensch, oje, sieh_an, wahrhaftig, hui, herrje, du_meine_Güte, nanu,
+		aha, oha, ei, tja, nun, wahrlich, potztausend, um_Himmels_willen, ach_je, sieh_da, tatsächlich,
 	`),
 	pronouns: { m: words(`er`), f: words(`sie`), n: words(`es`) },
 	// German names its months, writes the day first with a full stop after it, and

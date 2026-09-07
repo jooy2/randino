@@ -373,37 +373,39 @@ final SentenceLanguageData zh = SentenceLanguageData(
   states: <StateGroup>[
     StateGroup(
       subject: const <NounClass>[NounClass.creature, NounClass.person],
-      words: words(r'大 小 快 慢 安静 吵闹 勇敢 懒 忙 凶 温和 聪明'),
+      words: words(r'''
+        大 小 快 慢 安静 吵闹 勇敢 懒 忙 凶 温和 聪明 年轻 年老 强壮 虚弱 大胆 胆小 害羞 骄傲 活泼 稳重 固执 敏捷 警觉 结实 老实 机灵
+      '''),
     ),
     StateGroup(
       subject: const <NounClass>[NounClass.creature, NounClass.person],
       condition: Condition.hungry,
-      words: words(r'饿 饥饿'),
+      words: words(r'饿 饥饿 饥肠辘辘'),
     ),
     StateGroup(
       subject: const <NounClass>[NounClass.creature, NounClass.person],
       condition: Condition.full,
-      words: words(r'饱 饱足'),
+      words: words(r'饱 饱足 饱胀 满腹'),
     ),
     StateGroup(
       subject: const <NounClass>[NounClass.creature, NounClass.person],
       condition: Condition.tired,
-      words: words(r'累 困 疲倦 乏'),
+      words: words(r'累 困 疲倦 乏 疲惫 疲乏 困倦 乏力'),
     ),
     StateGroup(
       subject: const <NounClass>[NounClass.creature, NounClass.person],
       condition: Condition.rested,
-      words: words(r'精神 神清气爽 有精神'),
+      words: words(r'精神 神清气爽 有精神 清爽 轻松 精力充沛'),
     ),
     StateGroup(
       subject: const <NounClass>[NounClass.creature, NounClass.person],
       condition: Condition.content,
-      words: words(r'高兴 开心 快乐 满足 舒心'),
+      words: words(r'高兴 开心 快乐 满足 舒心 愉快 欣喜 惬意 得意 安心'),
     ),
     StateGroup(
       subject: const <NounClass>[NounClass.creature, NounClass.person],
       condition: Condition.restless,
-      words: words(r'无聊 好奇 焦急 不安'),
+      words: words(r'无聊 好奇 焦急 不安 烦躁 忐忑 心慌 心神不宁'),
     ),
     StateGroup(
       subject: const <NounClass>[
@@ -418,66 +420,97 @@ final SentenceLanguageData zh = SentenceLanguageData(
         NounClass.idea,
         NounClass.body,
       ],
-      words: words(r'美丽 陌生 新 常见 罕见'),
+      words: words(r'美丽 陌生 新 常见 罕见 可爱 眼熟 奇特 普通 特别 珍稀'),
     ),
     StateGroup(
       subject: const <NounClass>[NounClass.place, NounClass.event],
-      words: words(r'宽阔 狭窄 平静 深 暗 亮 遥远 陡峭'),
+      words: words(r'宽阔 狭窄 平静 深 暗 亮 遥远 陡峭 热闹 冷清 拥挤 空旷 辽阔 幽深 昏暗 平坦 漫长 短暂 明媚'),
     ),
     StateGroup(
       subject: const <NounClass>[NounClass.thing, NounClass.vehicle],
-      words: words(r'坚硬 轻 重 旧 光滑 透明 结实'),
+      words: words(r'坚硬 轻 重 旧 光滑 透明 结实 圆 扁 尖 薄 厚 脆弱 华丽 朴素 精致 粗糙 沉甸甸'),
     ),
-    StateGroup(subject: const <NounClass>[NounClass.edible], words: words(r'甜 咸 辣 酸 烫 凉 香')),
-    StateGroup(subject: const <NounClass>[NounClass.idea], words: words(r'简单 明显 模糊 永恒 短暂')),
-    StateGroup(subject: const <NounClass>[NounClass.plant], words: words(r'青翠 茂盛 芬芳 枯黄')),
-    StateGroup(subject: const <NounClass>[NounClass.body], words: words(r'温暖 冰凉 酸痛 僵硬')),
+    StateGroup(
+      subject: const <NounClass>[NounClass.edible],
+      words: words(r'甜 咸 辣 酸 烫 凉 香 苦 浓 淡 温热 鲜美 清爽 油腻 软 脆'),
+    ),
+    StateGroup(
+      subject: const <NounClass>[NounClass.idea],
+      words: words(r'简单 明显 模糊 永恒 短暂 复杂 清晰 深奥 熟悉 珍贵 隐秘 微小 有趣 难 容易'),
+    ),
+    StateGroup(
+      subject: const <NounClass>[NounClass.plant],
+      words: words(r'青翠 茂盛 芬芳 枯黄 高大 娇嫩 细长 苍翠 稀疏 繁密'),
+    ),
+    StateGroup(
+      subject: const <NounClass>[NounClass.body],
+      words: words(r'温暖 冰凉 酸痛 僵硬 柔软 粗糙 光滑 苍白 有力 麻木 沉重'),
+    ),
   ],
   modifiers: <ModifierGroup>[
     ModifierGroup(
       subject: const <NounClass>[NounClass.creature, NounClass.person],
-      words: words(r'勇敢的 安静的 勤劳的 懒惰的 害羞的 聪明的 年轻的 年老的 小 大 活泼的 悠闲的 敏捷的 好奇的'),
+      words: words(r'''
+        勇敢的 安静的 勤劳的 懒惰的 害羞的 聪明的 年轻的 年老的 小 大 活泼的 悠闲的 敏捷的 好奇的 大胆的 胆小的 谨慎的 固执的 温顺的 吵闹的 强壮的 瘦弱的 胖乎乎的 困倦的
+        狡黠的 警觉的 沉默的 骄傲的 天真的 老实的 机灵的 稳重的
+      '''),
     ),
     ModifierGroup(
       subject: const <NounClass>[NounClass.person],
-      words: words(r'年轻的 亲切的 严厉的 认真的 忙碌的 诚实的'),
+      words: words(r'''
+        年轻的 亲切的 严厉的 认真的 忙碌的 诚实的 睿智的 谦逊的 沉默寡言的 健谈的 熟练的 有名的 贫穷的 富有的 正直的 和气的 严肃的 年迈的 爽朗的 精明的
+      '''),
     ),
     ModifierGroup(
       subject: const <NounClass>[NounClass.creature],
-      words: words(r'敏捷的 凶猛的 温顺的 胖胖的 小小的'),
+      words: words(r'敏捷的 凶猛的 温顺的 胖胖的 小小的 毛茸茸的 斑驳的 有条纹的 瘦削的 巨大的 灵巧的 圆滚滚的 油亮的 细长的'),
     ),
     ModifierGroup(
       subject: const <NounClass>[NounClass.edible],
       themes: const <WordTheme>[WordTheme.food],
-      words: words(r'甜甜的 香辣的 温热的 新鲜的 酥脆的 香喷喷的 热乎乎的 咸香的 软软的 熟透的 美味的'),
+      words: words(r'''
+        甜甜的 香辣的 温热的 新鲜的 酥脆的 香喷喷的 热乎乎的 咸香的 软软的 熟透的 美味的 金黄的 焦香的 绵软的 弹牙的 浓郁的 清淡的 刚出炉的 冒着热气的 酸甜的 油润的 朴素的
+      '''),
     ),
     ModifierGroup(
       subject: const <NounClass>[NounClass.edible],
       themes: const <WordTheme>[WordTheme.drink],
-      words: words(r'甜甜的 温热的 冰凉的 清凉的 热的 芬芳的 新鲜的 浓浓的 苦涩的'),
+      words: words(r'甜甜的 温热的 冰凉的 清凉的 热的 芬芳的 新鲜的 浓浓的 苦涩的 温吞的 冒泡的 澄澈的 浑浊的 醇厚的 清淡的 酸甜的 滚烫的 微凉的'),
     ),
     ModifierGroup(
       subject: const <NounClass>[NounClass.thing, NounClass.vehicle],
-      words: words(r'旧 新 小 大 轻巧的 沉重的 闪亮的 光滑的 透明的 坚硬的 漂亮的 珍贵的 古老的'),
+      words: words(r'''
+        旧 新 小 大 轻巧的 沉重的 闪亮的 光滑的 透明的 坚硬的 漂亮的 珍贵的 古老的 生锈的 磨损的 擦亮的 朴素的 华丽的 细长的 扁平的 圆圆的 尖尖的 薄薄的 厚厚的 易碎的
+        蒙尘的 弯曲的 精巧的
+      '''),
     ),
-    ModifierGroup(subject: const <NounClass>[NounClass.vehicle], words: words(r'快速的 缓慢的 结实的')),
+    ModifierGroup(
+      subject: const <NounClass>[NounClass.vehicle],
+      words: words(r'快速的 缓慢的 结实的 吱呀作响的 锃亮的 锈迹斑斑的 摇晃的 庞大的 破旧的 崭新的'),
+    ),
     ModifierGroup(
       subject: const <NounClass>[NounClass.place],
-      words: words(r'安静的 宽阔的 昏暗的 明亮的 陌生的 古老的 温馨的 僻静的 热闹的 遥远的 附近的 空荡荡的 冷清的 阳光明媚的'),
+      words: words(r'''
+        安静的 宽阔的 昏暗的 明亮的 陌生的 古老的 温馨的 僻静的 热闹的 遥远的 附近的 空荡荡的 冷清的 阳光明媚的 狭窄的 拥挤的 多风的 雾蒙蒙的 阴凉的 尘土飞扬的 潮湿的
+        布满岩石的 陡峭的 平坦的 荒凉的 绿意盎然的 无人的 开阔的
+      '''),
     ),
     ModifierGroup(
       subject: const <NounClass>[NounClass.plant],
-      words: words(r'翠绿的 茂盛的 芬芳的 幼小的 枯萎的 高大的 小小的 娇嫩的'),
+      words: words(r'翠绿的 茂盛的 芬芳的 幼小的 枯萎的 高大的 小小的 娇嫩的 带刺的 盛开的 初绽的 攀爬的 野生的 细长的 苍白的 低垂的 繁茂的'),
     ),
     ModifierGroup(
       subject: const <NounClass>[NounClass.idea],
-      words: words(r'模糊的 古老的 新 陌生的 清晰的 珍贵的 小小的 奇怪的'),
+      words: words(r'模糊的 古老的 新 陌生的 清晰的 珍贵的 小小的 奇怪的 淡淡的 简单的 复杂的 固执的 短暂的 遥远的 大胆的 隐秘的 安静的 熟悉的'),
     ),
     ModifierGroup(
       subject: const <NounClass>[NounClass.event],
-      words: words(r'漫长的 短暂的 安静的 晴朗的 阴沉的 喧闹的 突然的'),
+      words: words(r'漫长的 短暂的 安静的 晴朗的 阴沉的 喧闹的 突然的 盛大的 简朴的 庄严的 欢乐的 无聊的 下雨的 平静的 忙碌的 拥挤的 热闹的'),
     ),
-    ModifierGroup(subject: const <NounClass>[NounClass.body], words: words(r'小小的 冰凉的 温暖的 纤细的 结实的')),
+    ModifierGroup(
+      subject: const <NounClass>[NounClass.body],
+      words: words(r'小小的 冰凉的 温暖的 纤细的 结实的 柔软的 僵硬的 酸痛的 粗糙的 光滑的 苍白的 有力的'),
+    ),
     ModifierGroup(
       subject: const <NounClass>[
         NounClass.creature,
@@ -490,14 +523,16 @@ final SentenceLanguageData zh = SentenceLanguageData(
         NounClass.idea,
         NounClass.body,
       ],
-      words: words(r'美丽的 神秘的 陌生的 新'),
+      words: words(r'美丽的 神秘的 陌生的 新 可爱的 眼熟的 奇特的 普通的 出色的 朴素的'),
     ),
   ],
   manners: <ModifierGroup>[
     ModifierGroup(
       subject: const <NounClass>[NounClass.creature, NounClass.person],
       words: words(r'''
-        安静地 慢慢地 迅速地 静静地 悄悄地 独自 稍稍 小心地 有力地 轻轻地 用力地 认真地 匆匆地 缓缓地 默默地 从容地 欢快地 稳稳地 淡淡地 欣然 悠然
+        安静地 慢慢地 迅速地 静静地 悄悄地 独自 稍稍 小心地 有力地 轻轻地 用力地 认真地 匆匆地 缓缓地 默默地 从容地 欢快地 稳稳地 淡淡地 欣然 悠然 蹑手蹑脚地 慌慌张张地
+        犹犹豫豫地 东张西望地 一步一步地 大步地 快步地 慢吞吞地 急急忙忙地 小心翼翼地 全神贯注地 若无其事地 得意地 骄傲地 羞怯地 温柔地 粗鲁地 笨拙地 灵巧地 熟练地 勉强地
+        特意地 顺手地 轻快地 沉稳地 兴冲冲地 气呼呼地 乐呵呵地 静悄悄地 一声不响地 头也不回地 满心欢喜地 无精打采地 心不在焉地
       '''),
     ),
     ModifierGroup(
@@ -511,23 +546,31 @@ final SentenceLanguageData zh = SentenceLanguageData(
         NounClass.idea,
         NounClass.body,
       ],
-      words: words(r'慢慢地 渐渐地 忽然 又 一直 总是 仍然 静静地 悄悄地 缓缓地 依旧 反复 逐渐 悄然'),
+      words: words(r'''
+        慢慢地 渐渐地 忽然 又 一直 总是 仍然 静静地 悄悄地 缓缓地 依旧 反复 逐渐 悄然 突然 顷刻间 许久 良久 格外 分外 越发 渐次 隐隐地 淡淡地 清晰地 隐约地 轻柔地
+        缓慢地 不断地 持续地 一点点地 层层地 微微地 摇摇晃晃地 闪闪地 悠悠地 沙沙地 飘飘地
+      '''),
     ),
   ],
   times: SentenceTimes(
     day: words(r'黎明时 清晨 早晨 上午 中午 下午 黄昏时 傍晚 夜里 深夜 午夜'),
-    any: words(r'春天 夏天 秋天 冬天 周末 假日 整天'),
-    past: words(r'昨天 上周 从前 那天 当年 那晚'),
-    present: words(r'今天 刚才 明天 下周'),
-    habitual: words(r'最近 有时 每天 每晚'),
+    any: words(r'''
+      春天 夏天 秋天 冬天 周末 假日 整天 初春 暮春 初夏 盛夏 晚夏 初秋 深秋 隆冬 残冬 梅雨季 花开时节 红叶时节 收获时节 节日里 集市日 满月之夜 雨天 雪天 大风天 晴天
+      阴天 雾天 长假里
+    '''),
+    past: words(r'''
+      昨天 上周 从前 那天 当年 那晚 前天 上个月 去年 前年 上上周 很久以前 前不久 那天早上 那天晚上 那会儿 当时 去年春天 去年夏天 去年秋天 去年冬天 几天前 片刻前
+    '''),
+    present: words(r'今天 刚才 明天 下周 现在 今早 今晚 后天 下个月 明年 今年 这周 这个周末 马上 一会儿'),
+    habitual: words(r'最近 有时 每天 每晚 常常 时常 偶尔 很少 难得 每早 每周 每年 平时 通常 一向 素来'),
   ),
   homes: words(r'家'),
   join: const SentenceJoin(word: '，然后'),
   connectives: <ConnectiveKind, WordPool>{
-    ConnectiveKind.additive: words(r'而且 此外'),
-    ConnectiveKind.temporal: words(r'然后 后来 接着 同时 终于 随后 不久'),
-    ConnectiveKind.contrastive: words(r'但是 不过 可是 然而'),
-    ConnectiveKind.causal: words(r'所以 于是 因此 结果'),
+    ConnectiveKind.additive: words(r'而且 此外 并且 再者 另外 还有'),
+    ConnectiveKind.temporal: words(r'然后 后来 接着 同时 终于 随后 不久 那时 转眼间 过了一会儿 稍后 紧接着 不多时'),
+    ConnectiveKind.contrastive: words(r'但是 不过 可是 然而 反倒 相反 尽管如此 话说回来 只是'),
+    ConnectiveKind.causal: words(r'所以 于是 因此 结果 因而 故而 由此'),
   },
   traits: <NounTrait, WordPool>{
     NounTrait.flier: words(r'''
@@ -549,7 +592,9 @@ final SentenceLanguageData zh = SentenceLanguageData(
       星明 卫星 星团 星座 轨道 引力 自转 公转 黑子 太阳风 光年 天体 恒星 天球 黄道 超新星 流星雨 宇宙尘 失重 满月 朔月 半月 上弦 下弦 月光 星光 北极星 日冕 月晕 星轨
     '''),
   },
-  interjections: words(r'啊， 哎呀， 哇， 唉， 天啊， 瞧， 咦， 呀， 嘿， 哟， 好家伙， 我的天，'),
+  interjections: words(r'''
+    啊， 哎呀， 哇， 唉， 天啊， 瞧， 咦， 呀， 嘿， 哟， 好家伙， 我的天， 哎哟， 嗬， 呵， 噢， 唔， 原来如此， 不得了， 真是的， 哈， 喔， 竟然， 果然，
+  '''),
   pronouns: const <WordGender, WordPool>{
     WordGender.n: <String>['', '它'],
   },

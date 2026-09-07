@@ -495,51 +495,52 @@ export const ES: SentenceLanguageData = {
 	states: [
 		{
 			subject: ['creature', 'person'],
-			words: words(
-				`grande pequeño rápido lento silencioso ruidoso valiente perezoso ocupado fiero manso listo`
-			)
+			words: words(`
+				grande pequeño rápido lento silencioso ruidoso valiente perezoso ocupado fiero manso listo
+				joven viejo fuerte débil audaz tímido orgulloso vivaz sereno terco ágil alerta robusto honesto astuto
+			`)
 		},
 		{
 			subject: ['creature', 'person'],
 			condition: 'hungry',
 			head: 'está',
 			pastHead: 'estaba',
-			words: words(`hambriento famélico`)
+			words: words(`hambriento famélico voraz ávido`)
 		},
 		{
 			subject: ['creature', 'person'],
 			condition: 'full',
 			head: 'está',
 			pastHead: 'estaba',
-			words: words(`satisfecho lleno`)
+			words: words(`satisfecho lleno saciado repleto`)
 		},
 		{
 			subject: ['creature', 'person'],
 			condition: 'tired',
 			head: 'está',
 			pastHead: 'estaba',
-			words: words(`cansado soñoliento agotado`)
+			words: words(`cansado soñoliento agotado exhausto rendido fatigado`)
 		},
 		{
 			subject: ['creature', 'person'],
 			condition: 'rested',
 			head: 'está',
 			pastHead: 'estaba',
-			words: words(`descansado fresco animado`)
+			words: words(`descansado fresco animado despejado ligero vigoroso`)
 		},
 		{
 			subject: ['creature', 'person'],
 			condition: 'content',
 			head: 'está',
 			pastHead: 'estaba',
-			words: words(`feliz contento alegre tranquilo`)
+			words: words(`feliz contento alegre tranquilo dichoso risueño encantado gozoso`)
 		},
 		{
 			subject: ['creature', 'person'],
 			condition: 'restless',
 			head: 'está',
 			pastHead: 'estaba',
-			words: words(`aburrido curioso inquieto nervioso`)
+			words: words(`aburrido curioso inquieto nervioso impaciente ansioso desasosegado intranquilo`)
 		},
 		{
 			subject: [
@@ -554,31 +555,43 @@ export const ES: SentenceLanguageData = {
 				'idea',
 				'body'
 			],
-			words: words(`hermoso extraño nuevo común raro`)
+			words: words(
+				`hermoso extraño nuevo común raro bonito conocido singular ordinario espléndido precioso`
+			)
 		},
 		{
 			subject: ['place', 'event'],
-			words: words(`ancho estrecho tranquilo profundo oscuro claro lejano empinado`)
+			words: words(`
+				ancho estrecho tranquilo profundo oscuro claro lejano empinado
+				amplio angosto concurrido vacío inmenso sombrío llano largo breve luminoso
+			`)
 		},
 		{
 			subject: ['thing', 'vehicle'],
-			words: words(`duro ligero pesado viejo liso transparente robusto`)
+			words: words(`
+				duro ligero pesado viejo liso transparente robusto
+				redondo plano afilado delgado grueso frágil lujoso sencillo delicado áspero brillante
+			`)
 		},
 		{
 			subject: ['edible'],
-			words: words(`dulce salado picante ácido caliente frío sabroso`)
+			words: words(
+				`dulce salado picante ácido caliente frío sabroso amargo espeso suave tibio jugoso crujiente rico soso`
+			)
 		},
 		{
 			subject: ['idea'],
-			words: words(`sencillo evidente vago eterno fugaz`)
+			words: words(
+				`sencillo evidente vago eterno fugaz complejo claro profundo familiar valioso secreto menudo difícil fácil`
+			)
 		},
 		{
 			subject: ['plant'],
-			words: words(`verde frondoso fragante marchito`)
+			words: words(`verde frondoso fragante marchito alto tierno esbelto lozano ralo tupido`)
 		},
 		{
 			subject: ['body'],
-			words: words(`cálido frío dolorido rígido`)
+			words: words(`cálido frío dolorido rígido suave áspero terso pálido fuerte entumecido pesado`)
 		}
 	],
 	// Masculine singular, the form `agreement` reshapes, after the noun.
@@ -587,42 +600,84 @@ export const ES: SentenceLanguageData = {
 			subject: ['creature', 'person'],
 			words: words(`
 				valiente animado amable ocupado perezoso tímido listo joven viejo pequeño grande silencioso alegre paciente ágil curioso
+				audaz temeroso cauto terco manso ruidoso fornido flaco soñoliento astuto alerta callado orgulloso inocente honrado despierto sereno
 			`)
 		},
-		{ subject: ['person'], words: words(`joven amable severo serio ocupado sincero`) },
-		{ subject: ['creature'], words: words(`veloz feroz manso rechoncho pequeñito`) },
+		{
+			subject: ['person'],
+			words: words(`
+				joven amable severo serio ocupado sincero
+				sabio humilde educado hábil famoso pobre rico anciano risueño perspicaz afable trabajador
+			`)
+		},
+		{
+			subject: ['creature'],
+			words: words(
+				`veloz feroz manso rechoncho pequeñito peludo moteado rayado escuálido enorme diestro rollizo lustroso alargado`
+			)
+		},
 		{
 			subject: ['edible'],
 			themes: ['food'],
-			words: words(
-				`dulce picante tibio fresco crujiente sabroso fragante caliente salado blando maduro rico`
-			)
+			words: words(`
+				dulce picante tibio fresco crujiente sabroso fragante caliente salado blando maduro rico
+				dorado ahumado cremoso tierno jugoso sustancioso humeante tostado pegajoso soso especiado
+			`)
 		},
 		{
 			subject: ['edible'],
 			themes: ['drink'],
-			words: words(`dulce tibio frío fresco caliente fragante espumoso fuerte`)
+			words: words(
+				`dulce tibio frío fresco caliente fragante espumoso fuerte amargo cremoso helado lechoso turbio claro burbujeante suave templado`
+			)
 		},
 		{
 			subject: ['thing', 'vehicle'],
+			words: words(`
+				viejo nuevo pequeño grande ligero pesado brillante liso transparente duro bonito precioso antiguo
+				oxidado gastado pulido sencillo recargado estrecho ancho redondo plano afilado romo frágil hueco polvoriento torcido
+			`)
+		},
+		{
+			subject: ['vehicle'],
 			words: words(
-				`viejo nuevo pequeño grande ligero pesado brillante liso transparente duro bonito precioso antiguo`
+				`rápido lento robusto chirriante reluciente oxidado destartalado enorme ruidoso vetusto`
 			)
 		},
-		{ subject: ['vehicle'], words: words(`rápido lento robusto`) },
 		{
 			subject: ['place'],
 			words: words(`
 				tranquilo amplio oscuro luminoso extraño viejo acogedor apartado bullicioso silencioso remoto lejano cercano vacío solitario soleado
+				angosto concurrido ventoso brumoso sombreado polvoriento húmedo rocoso empinado llano desolado frondoso desierto despejado
 			`)
 		},
 		{
 			subject: ['plant'],
-			words: words(`verde frondoso fragante joven marchito alto pequeño tierno fresco`)
+			words: words(`
+				verde frondoso fragante joven marchito alto pequeño tierno fresco
+				espinoso florido incipiente trepador silvestre esbelto pálido caído tupido
+			`)
 		},
-		{ subject: ['idea'], words: words(`vago viejo nuevo extraño claro precioso pequeño raro`) },
-		{ subject: ['event'], words: words(`largo breve tranquilo soleado nublado ruidoso repentino`) },
-		{ subject: ['body'], words: words(`pequeño frío cálido esbelto robusto`) },
+		{
+			subject: ['idea'],
+			words: words(`
+				vago viejo nuevo extraño claro precioso pequeño raro
+				tenue sencillo enredado terco fugaz lejano audaz secreto callado familiar
+			`)
+		},
+		{
+			subject: ['event'],
+			words: words(`
+				largo breve tranquilo soleado nublado ruidoso repentino
+				solemne alegre aburrido lluvioso tormentoso sereno concurrido animado espléndido sencillo
+			`)
+		},
+		{
+			subject: ['body'],
+			words: words(
+				`pequeño frío cálido esbelto robusto suave rígido dolorido áspero terso pálido fuerte`
+			)
+		},
 		{
 			subject: [
 				'creature',
@@ -635,7 +690,9 @@ export const ES: SentenceLanguageData = {
 				'idea',
 				'body'
 			],
-			words: words(`hermoso misterioso extraño nuevo`)
+			words: words(
+				`hermoso misterioso extraño nuevo bonito conocido curioso corriente espléndido humilde`
+			)
 		}
 	],
 	manners: [
@@ -645,6 +702,11 @@ export const ES: SentenceLanguageData = {
 				en_silencio despacio rápidamente suavemente de_repente apenas a_solas brevemente firmemente audazmente
 				con_cuidado ansiosamente tranquilamente alegremente torpemente fuertemente pacientemente ligeramente serenamente
 				vivamente con_calma
+				sigilosamente de_puntillas atropelladamente apresuradamente cuidadosamente atentamente distraídamente
+				nerviosamente curiosamente orgullosamente tímidamente amablemente dulcemente amargamente severamente
+				ávidamente descuidadamente tiernamente bruscamente hábilmente diestramente decididamente felizmente
+				tristemente pesadamente animadamente a_duras_penas de_mala_gana adrede sin_decir_nada de_un_salto
+				sin_prisa con_ganas en_voz_baja sin_pausa
 			`)
 		},
 		{
@@ -652,6 +714,9 @@ export const ES: SentenceLanguageData = {
 			words: words(`
 				en_silencio despacio suavemente de_repente apenas otra_vez todavía de_nuevo poco_a_poco lentamente débilmente aún
 				gradualmente
+				silenciosamente levemente intensamente vivamente profundamente ampliamente tenuemente cálidamente
+				fríamente dulcemente espesamente firmemente pesadamente ligeramente sin_cesar constantemente
+				eternamente una_vez_más durante_un_rato de_golpe por_todas_partes
 			`)
 		}
 	],
@@ -660,21 +725,43 @@ export const ES: SentenceLanguageData = {
 			al_amanecer de_madrugada por_la_mañana a_mediodía por_la_tarde al_anochecer por_la_noche
 			a_medianoche
 		`),
-		any: words(
-			`en_primavera en_verano en_otoño en_invierno los_fines_de_semana en_los_días_festivos todo_el_día`
-		),
-		past: words(`ayer la_semana_pasada hace_tiempo aquel_día aquella_noche una_vez`),
-		present: words(`hoy hace_poco mañana la_semana_que_viene`),
-		habitual: words(`estos_días a_veces cada_día cada_noche`)
+		any: words(`
+			en_primavera en_verano en_otoño en_invierno los_fines_de_semana en_los_días_festivos todo_el_día
+			en_plena_primavera a_finales_de_primavera a_principios_de_verano en_pleno_verano a_finales_de_verano
+			a_principios_de_otoño a_finales_de_otoño en_pleno_invierno a_finales_de_invierno en_la_época_de_lluvias
+			en_la_cosecha en_la_fiesta en_día_de_mercado en_luna_llena en_un_día_de_lluvia en_un_día_de_nieve
+			en_un_día_de_viento en_un_día_claro en_un_día_nublado en_un_día_de_niebla en_vacaciones
+		`),
+		past: words(`
+			ayer la_semana_pasada hace_tiempo aquel_día aquella_noche una_vez
+			anteayer el_mes_pasado el_año_pasado hace_años hace_un_rato aquella_mañana aquella_tarde por_entonces
+			en_aquellos_días la_semana_anterior la_primavera_pasada el_verano_pasado el_otoño_pasado
+			el_invierno_pasado hace_unos_días
+		`),
+		present: words(`
+			hoy hace_poco mañana la_semana_que_viene
+			ahora_mismo esta_mañana esta_tarde esta_noche pasado_mañana el_mes_que_viene el_año_que_viene
+			este_año esta_semana este_fin_de_semana en_un_momento enseguida
+		`),
+		habitual: words(`
+			estos_días a_veces cada_día cada_noche
+			siempre a_menudo normalmente rara_vez de_vez_en_cuando cada_mañana cada_semana cada_año
+			por_lo_general casi_siempre
+		`)
 	},
 	homes: words(`casa cabaña`),
 	join: { word: 'y' },
 	// Written with the comma the ones that need one take.
 	connectives: {
-		additive: words(`y_luego además,`),
-		temporal: words(`después por_fin mientras_tanto, más_tarde al_final poco_después`),
-		contrastive: words(`pero sin_embargo, aun_así en_cambio, no_obstante,`),
-		causal: words(`entonces por_eso así_que`)
+		additive: words(`y_luego además, también asimismo, es_más, encima,`),
+		temporal: words(`
+			después por_fin mientras_tanto, más_tarde al_final poco_después
+			acto_seguido, al_rato en_seguida, para_entonces, al_cabo_de_un_rato, momentos_después,
+		`),
+		contrastive: words(
+			`pero sin_embargo, aun_así en_cambio, no_obstante, con_todo, por_el_contrario, aun_entonces,`
+		),
+		causal: words(`entonces por_eso así_que por_tanto, en_consecuencia, de_ahí_que por_esa_razón,`)
 	},
 	// What a noun can do that its theme does not say. A noun listed nowhere has no
 	// trait, and takes any verb that asks for none.
@@ -683,19 +770,26 @@ export const ES: SentenceLanguageData = {
 		pájaro golondrina gorrión cuervo halcón águila pavo_real loro búho paloma grulla cisne pato ganso
 		mariposa abeja libélula cigarra mosca mosquito murciélago garza pelícano
 		dragón fénix hada pegaso grifo ángel valquiria
+		mirlo ruiseñor alondra codorniz faisán perdiz colibrí tucán flamenco cigüeña abubilla jilguero
+		urraca arrendajo avispa polilla luciérnaga hipogrifo
 		`),
 		swimmer: words(`
 		cocodrilo tortuga rana sapo pez ballena delfín tiburón pulpo calamar gamba cangrejo morsa foca
 		pingüino
 		sirena kraken náyade
+		anguila sardina atún bacalao merluza trucha salmón carpa raya medusa almeja mejillón ostra
+		salamandra tritón castor hipopótamo ornitorrinco
 		`),
 		crawler: words(`
 		cocodrilo serpiente lagarto tortuga caracol hormiga araña gusano cangrejo
 		basilisco
+		iguana camaleón salamandra tritón boa víbora cobra pitón escarabajo
+		saltamontes grillo pulga oruga ciempiés escorpión
 		`),
 		// A word of a creature theme that is no creature: it takes no verb and no state.
 		lifeless: words(`
 			hechizo maldición profecía amuleto talismán runa portal santuario ídolo tótem augurio presagio bestiario
+			conjuro sortilegio grimorio pentáculo reliquia cáliz grial varita báculo cetro corona
 		`),
 		// A word of the place class that is no place.
 		placeless: words(`
@@ -703,10 +797,13 @@ export const ES: SentenceLanguageData = {
 			estrella sol meteoro aurora menguante creciente eclipse cenit satélite cúmulo constelación órbita gravedad rotación
 			traslación mancha_solar año_luz astro eclíptica meridiano ingravidez plenilunio novilunio perigeo apogeo lucero
 			supernova cuásar púlsar
+			corriente marea oleaje espuma rompiente paralaje parsec acimut perihelio afelio elipse cuadrante nadir gravitación
+			halo bólido enana coma
 		`)
 	},
 	interjections: words(`
 		ay, oh, vaya, caramba, madre_mía, mira, desde_luego, uy, anda, hombre, cielos, vamos,
+		ajá, ea, huy, válgame, por_fin, claro, qué_va, ojalá, atiza, hala, oye, menos_mal,
 	`),
 	// Spanish carries its subject in the verb ending, so a second sentence about
 	// the same thing writes no pronoun at all.

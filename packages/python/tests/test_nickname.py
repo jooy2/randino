@@ -309,9 +309,9 @@ def test_nicknames_stay_inside_the_requested_length_range() -> None:
 
 
 def test_omitted_length_bounds_fall_back_to_what_the_language_can_produce() -> None:
-    assert nickname_length_range("zh") == (2, 8)
+    assert nickname_length_range("zh") == (2, 9)
     assert nickname_length_range("ko") == (1, 13)
-    assert nickname_length_range("en") == (3, 31)
+    assert nickname_length_range("en") == (3, 33)
 
     for language in WORD_LANGUAGES:
         low, high = nickname_length_range(language)
@@ -347,7 +347,7 @@ def test_word_separator_goes_between_the_words() -> None:
 
     # The separator is part of the nickname, so it counts toward the length.
     assert nickname_length_range("ko", "-") == (1, 15)
-    assert nickname_length_range("en", " ") == (3, 33)
+    assert nickname_length_range("en", " ") == (3, 35)
 
     separated: list[tuple[WordLanguage, str, int, int]] = [
         ("ko", " ", 5, 8),

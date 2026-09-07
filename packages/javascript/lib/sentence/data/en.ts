@@ -599,33 +599,40 @@ export const EN: SentenceLanguageData = {
 	states: [
 		{
 			subject: ['creature', 'person'],
-			words: words(`big small quick slow quiet loud brave lazy busy fierce gentle clever restless`)
+			words: words(`
+				big small quick slow quiet loud brave lazy busy fierce gentle clever restless
+				young old strong weak bold timid shy proud cheerful patient stubborn nimble watchful sturdy
+			`)
 		},
 		{
 			subject: ['creature', 'person'],
 			condition: 'hungry',
-			words: words(`hungry starving peckish`)
+			words: words(`hungry starving peckish ravenous famished`)
 		},
-		{ subject: ['creature', 'person'], condition: 'full', words: words(`full satisfied`) },
+		{
+			subject: ['creature', 'person'],
+			condition: 'full',
+			words: words(`full satisfied stuffed sated`)
+		},
 		{
 			subject: ['creature', 'person'],
 			condition: 'tired',
-			words: words(`tired sleepy weary drowsy`)
+			words: words(`tired sleepy weary drowsy exhausted footsore sluggish`)
 		},
 		{
 			subject: ['creature', 'person'],
 			condition: 'rested',
-			words: words(`refreshed rested lively`)
+			words: words(`refreshed rested lively alert energetic`)
 		},
 		{
 			subject: ['creature', 'person'],
 			condition: 'content',
-			words: words(`happy glad content pleased cheerful`)
+			words: words(`happy glad content pleased cheerful cheery joyful merry delighted`)
 		},
 		{
 			subject: ['creature', 'person'],
 			condition: 'restless',
-			words: words(`bored curious uneasy`)
+			words: words(`bored curious uneasy impatient anxious fidgety unsettled`)
 		},
 		{
 			subject: [
@@ -640,31 +647,45 @@ export const EN: SentenceLanguageData = {
 				'idea',
 				'body'
 			],
-			words: words(`beautiful strange new common rare`)
+			words: words(
+				`beautiful strange new common rare lovely familiar odd ordinary remarkable splendid`
+			)
 		},
 		{
 			subject: ['place', 'event'],
-			words: words(`wide narrow calm deep dark bright distant steep`)
+			words: words(`
+				wide narrow calm deep dark bright distant steep
+				quiet noisy crowded empty vast shallow gloomy sunny lively dull long short
+			`)
 		},
 		{
 			subject: ['thing', 'vehicle'],
-			words: words(`hard light heavy old smooth clear sturdy hollow`)
+			words: words(`
+				hard light heavy old smooth clear sturdy hollow
+				new small large round flat sharp blunt fragile shiny worn rusty plain ornate
+			`)
 		},
 		{
 			subject: ['edible'],
-			words: words(`sweet salty spicy sour hot cold nutty mild`)
+			words: words(`
+				sweet salty spicy sour hot cold nutty mild
+				bitter rich creamy crisp tender juicy fresh stale bland tangy smoky
+			`)
 		},
 		{
 			subject: ['idea'],
-			words: words(`simple obvious vague endless fleeting stubborn`)
+			words: words(`
+				simple obvious vague endless fleeting stubborn
+				clear complex familiar precious secret timeless useful difficult easy
+			`)
 		},
 		{
 			subject: ['plant'],
-			words: words(`green lush fragrant withered`)
+			words: words(`green lush fragrant withered tall leafy thorny tender wild pale bare`)
 		},
 		{
 			subject: ['body'],
-			words: words(`warm cold sore stiff steady`)
+			words: words(`warm cold sore stiff steady strong weak numb tender rough smooth heavy`)
 		}
 	],
 	// Attributive, grouped by what they can sit in front of. Lowercase, because
@@ -674,40 +695,89 @@ export const EN: SentenceLanguageData = {
 			subject: ['creature', 'person'],
 			words: words(`
 				brave lively gentle busy lazy shy clever young old small big quiet cheerful patient nimble curious
+				bold timid restless weary stout slender lean wiry graceful clumsy sleepy cunning watchful eager
+				solemn merry gruff stubborn playful quick silent proud
 			`)
 		},
-		{ subject: ['person'], words: words(`young kind strict earnest weary friendly`) },
-		{ subject: ['creature'], words: words(`swift fierce tame plump little`) },
+		{
+			subject: ['person'],
+			words: words(`
+				young kind strict earnest weary friendly
+				wise humble stern polite learned skilled ragged wealthy honest shrewd hearty solitary
+				weathered thoughtful generous
+			`)
+		},
+		{
+			subject: ['creature'],
+			words: words(`
+				swift fierce tame plump little
+				shaggy sleek spotted striped scrawny bristly wary tiny hulking glossy speckled
+			`)
+		},
 		{
 			subject: ['edible'],
 			themes: ['food'],
-			words: words(`sweet spicy warm fresh crisp savory fragrant hot salty soft ripe tasty`)
+			words: words(`
+				sweet spicy warm fresh crisp savory fragrant hot salty soft ripe tasty
+				buttery smoky tangy creamy crunchy tender juicy hearty golden steaming toasted rich sticky
+				flaky peppery bland
+			`)
 		},
 		{
 			subject: ['edible'],
 			themes: ['drink'],
-			words: words(`sweet warm cold cool hot fragrant fresh strong`)
+			words: words(`
+				sweet warm cold cool hot fragrant fresh strong
+				bitter creamy frothy icy milky cloudy clear sparkling weak spiced tepid
+			`)
 		},
 		{
 			subject: ['thing', 'vehicle'],
-			words: words(
-				`old new small big light heavy shiny smooth clear sturdy pretty precious ancient`
-			)
+			words: words(`
+				old new small big light heavy shiny smooth clear sturdy pretty precious ancient
+				battered worn rusty polished plain ornate narrow wide round flat sharp blunt fragile hollow
+				dusty crooked
+			`)
 		},
-		{ subject: ['vehicle'], words: words(`fast slow rattling`) },
+		{
+			subject: ['vehicle'],
+			words: words(`fast slow rattling creaking gleaming rusted humming lumbering sleek swaying`)
+		},
 		{
 			subject: ['place'],
 			words: words(`
 				quiet wide dark bright strange old cozy secluded busy silent remote distant nearby empty lonely sunny
+				narrow crowded windy misty shady leafy dusty muddy rocky steep grand bustling deserted damp airy
 			`)
 		},
 		{
 			subject: ['plant'],
-			words: words(`green lush fragrant young withered tall small tender fresh`)
+			words: words(`
+				green lush fragrant young withered tall small tender fresh
+				thorny leafy blooming budding creeping wild slender pale drooping climbing
+			`)
 		},
-		{ subject: ['idea'], words: words(`faint old new strange clear precious small odd vague`) },
-		{ subject: ['event'], words: words(`long short quiet sunny cloudy noisy sudden lazy`) },
-		{ subject: ['body'], words: words(`small cold warm slender sturdy tender`) },
+		{
+			subject: ['idea'],
+			words: words(`
+				faint old new strange clear precious small odd vague
+				dim simple tangled stubborn fleeting distant bold secret quiet
+			`)
+		},
+		{
+			subject: ['event'],
+			words: words(`
+				long short quiet sunny cloudy noisy sudden lazy
+				brief lively solemn merry grand dull rainy stormy calm busy crowded splendid
+			`)
+		},
+		{
+			subject: ['body'],
+			words: words(`
+				small cold warm slender sturdy tender
+				steady weary stiff sore rough smooth pale thin strong
+			`)
+		},
 		{
 			subject: [
 				'creature',
@@ -720,7 +790,7 @@ export const EN: SentenceLanguageData = {
 				'idea',
 				'body'
 			],
-			words: words(`beautiful mysterious strange new`)
+			words: words(`beautiful mysterious strange new lovely familiar odd ordinary splendid humble`)
 		}
 	],
 	manners: [
@@ -730,6 +800,13 @@ export const EN: SentenceLanguageData = {
 				quietly slowly quickly gently suddenly softly alone briefly boldly carefully eagerly
 				warily calmly neatly warmly firmly patiently lightly wearily cheerfully idly restlessly gladly
 				keenly briskly happily
+				swiftly silently sternly proudly bravely shyly politely clumsily awkwardly gracefully stubbornly
+				hastily hurriedly abruptly promptly deliberately absently anxiously nervously curiously merrily
+				wistfully solemnly fondly kindly sweetly bitterly grimly sleepily drowsily hungrily greedily
+				carelessly recklessly cautiously tenderly roughly gruffly cheerily sadly earnestly intently
+				thoughtfully dreamily lazily nimbly stealthily plainly bluntly smoothly heavily wildly fiercely
+				meekly tirelessly
+				at_once straight_away for_a_while once_more in_silence on_tiptoe without_a_word in_a_hurry
 			`)
 		},
 		{
@@ -737,6 +814,10 @@ export const EN: SentenceLanguageData = {
 			words: words(`
 				quietly slowly gently suddenly softly again steadily still slightly faintly evenly gradually
 				little_by_little
+				silently smoothly quickly briefly barely deeply widely brightly dimly warmly coldly sweetly
+				richly thickly loosely firmly heavily lightly endlessly ceaselessly constantly
+				once_more for_a_while all_at_once bit_by_bit in_silence without_a_sound ever_so_slightly
+				here_and_there
 			`)
 		}
 	],
@@ -745,19 +826,44 @@ export const EN: SentenceLanguageData = {
 			at_dawn in_the_early_morning in_the_morning at_midday in_the_afternoon at_dusk in_the_evening
 			at_night late_at_night at_midnight
 		`),
-		any: words(`in_spring in_summer in_autumn in_winter on_weekends on_holidays all_day`),
-		past: words(`yesterday last_week long_ago once that_day the_night_before`),
-		present: words(`today just_now tomorrow next_week`),
-		habitual: words(`these_days sometimes every_day every_night`)
+		any: words(`
+			in_spring in_summer in_autumn in_winter on_weekends on_holidays all_day
+			in_early_spring in_late_spring in_early_summer in_midsummer in_late_summer in_early_autumn
+			in_late_autumn in_midwinter in_late_winter at_harvest in_the_rainy_season on_a_clear_day
+			on_a_cloudy_day on_a_rainy_day on_a_snowy_day on_a_windy_day on_a_foggy_day on_a_market_day
+			at_the_festival during_the_holidays at_the_full_moon
+		`),
+		past: words(`
+			yesterday last_week long_ago once that_day the_night_before
+			the_day_before_yesterday last_month last_year last_spring last_summer last_autumn last_winter
+			years_ago a_while_ago moments_ago that_morning that_evening back_then in_those_days
+			the_week_before the_year_before not_long_ago
+		`),
+		present: words(`
+			today just_now tomorrow next_week
+			right_now this_morning this_evening tonight the_day_after_tomorrow next_month next_year
+			this_year this_week this_weekend in_a_moment shortly
+		`),
+		habitual: words(`
+			these_days sometimes every_day every_night
+			always often usually rarely seldom now_and_then from_time_to_time once_in_a_while
+			every_morning every_evening every_week every_year on_most_days as_a_rule
+		`)
 	},
 	// `to the house` rather than `home`, which would want its preposition dropped.
 	homes: words(`house cottage`),
 	join: { word: 'and' },
 	connectives: {
-		additive: words(`and_then besides`),
-		temporal: words(`meanwhile afterwards later soon at_last before_long`),
-		contrastive: words(`but still however yet even_so then_again all_the_same even_then`),
-		causal: words(`so therefore in_the_end`)
+		additive: words(`and_then besides also moreover furthermore in_addition`),
+		temporal: words(`
+			meanwhile afterwards later soon at_last before_long
+			then presently by_then in_time after_a_while shortly_after moments_later
+		`),
+		contrastive: words(`
+			but still however yet even_so then_again all_the_same even_then
+			nevertheless nonetheless instead on_the_other_hand
+		`),
+		causal: words(`so therefore in_the_end thus hence as_a_result for_that_reason consequently`)
 	},
 	// What a noun can do that its theme does not say. A noun listed nowhere has no
 	// trait, and takes any verb that asks for none.
@@ -806,7 +912,8 @@ export const EN: SentenceLanguageData = {
 	},
 	interjections: words(`
 		oh, ah, wow, well, look, goodness, my, indeed, honestly, gosh, hey, whoa, dear_me, good_grief,
-		alas,
+		alas, oho, aha, hush, listen, why, heavens, mercy, bless_me, of_course, no_wonder, oh_dear,
+		good_heavens, my_word, at_last,
 	`),
 	pronouns: { m: words(`he`), f: words(`she`), n: words(`it`) },
 	// An object named once is `it` the next time: `cooked the sausage and ate it`.

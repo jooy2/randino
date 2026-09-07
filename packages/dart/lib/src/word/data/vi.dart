@@ -19,6 +19,18 @@ final WordLanguageData vi = WordLanguageData(
     gồ_ghề mượt_mà óng_ánh trầm_mặc thảnh_thơi tinh_nghịch nghiêm_trang ung_dung
     hồn_nhiên táo_bạo thận_trọng khôn_ngoan lanh_lợi cần_mẫn lười_biếng nhút_nhát vô_tư
     thẳng_thắn kín_đáo lộng_lẫy giản_dị
+    gan_dạ trung_thành kiên_nhẫn cảnh_giác khéo_léo vững_vàng ôn_hòa phóng_khoáng cởi_mở
+    trầm_lặng bướng_bỉnh chất_phác ranh_mãnh kiên_cường đài_các lông_xù bóng_loáng
+    tròn_trịa nặng_trịch nhẹ_bẫng lạnh_ngắt nóng_hổi thơm_phức ngọt_lịm chua_lè
+    đắng_ngắt loang_lổ kẻ_sọc han_gỉ sờn_cũ mới_tinh cũ_kỹ dày_dặn mỏng_manh dẹt
+    nhọn_hoắt cong_queo thẳng_tắp thon_dài ngắn_ngủn êm_dịu ồn_ã lặng_thinh trong_trẻo
+    vang_dội trầm_đục du_dương réo_rắt khàn_khàn ấm_áp buốt_giá oi_ả khô_ráo ẩm_lạnh
+    u_ám quang_đãng lộng_gió mù_mịt đẫm_sương trắng_sương ánh_sao ánh_trăng rêu_phong
+    dây_leo bóng_trúc thông_reo phong_đỏ sen_thơm cúc_nhạt lan_u lau_trắng sậy_vàng
+    ngọc_bích san_hô ngà_voi hắc_diện pha_lê bạc_trắng đồng_xanh thiếc_bạc chì_xám
+    mã_não son_phấn xanh_đá vàng_nghệ đất_son chàm_đậm nguyệt_bạch thiên_thanh cánh_sen
+    xa_xăm nhỏ_nhặt tráng_lệ mộc_mạc tinh_xảo thô_mộc mảnh_dẻ cường_tráng rộng_rãi
+    dốc_đứng
   '''),
   actions: words(r'''
     ngủ chạy bay bơi hát nhảy cười khóc đi đứng ngồi nằm ăn uống đọc viết vẽ học làm
@@ -28,6 +40,13 @@ final WordLanguageData vi = WordLanguageData(
     thêu nhuộm phơi giặt quét lau rửa xay giã sàng lọc đo đếm ghi kể ngâm ngân gảy thổi
     đánh vỗ reo hò thầm_thì lang_thang bay_lượn tỏa_sáng nhấp_nháy đung_đưa dập_dờn
     rung_rinh thấp_thoáng vụt_qua ngẩng_lên cúi_xuống quay_lại bước_tới dừng_lại
+    tỉnh_giấc trở_dậy đứng_lên ngồi_xuống thu_mình nép_vào lùi_lại dừng_chân rảo_bước
+    sải_bước băng_qua quay_về rời_đi khuất_dạng rón_bước loạng_choạng nhảy_nhót
+    ngó_quanh ngước_nhìn nhìn_xuống dõi_theo chăm_chú chạm_khẽ vuốt_phẳng sắp_xếp
+    chăm_chút cọ_rửa lau_chùi đánh_bóng đan_kết khâu_vá cắt_tỉa dán_lại gấp_lại mở_ra
+    khép_lại lấp_đầy dốc_cạn rót_đầy bày_biện khuấy_đều ninh_nhừ xào_nấu hâm_nóng
+    để_nguội nếm_thử nuốt_chửng khắc_chạm nhuộm_màu quét_sơn mài_giũa cân_nhắc ngẫm_lại
+    nhấm_nháp
   '''),
   nouns: <WordTheme, WordPool>{
     WordTheme.animal: words(r'''
@@ -37,6 +56,13 @@ final WordLanguageData vi = WordLanguageData(
       bạch_tuộc tôm cua sò ốc bướm ong kiến nhện chuồn_chuồn ve muỗi ruồi giun sâu tằm
       dơi chồn nhím lạc_đà hà_mã tê_giác hươu_cao_cổ chuột sứa hải_cẩu đà_điểu bọ_ngựa
       cá_chép lươn
+      lợn_rừng tuần_lộc linh_dương hải_ly thú_mỏ_vịt chuột_túi vượn_cáo tinh_tinh
+      khỉ_đầu_chó heo_vòi sóc_bay chuột_chũi lửng cầy sơn_ca chim_cút gà_lôi đa_đa
+      chim_ruồi hồng_hạc cò chim_gõ_kiến chim_sáo chim_chích chim_cắt hải_âu bồ_nông
+      cá_trích cá_ngừ cá_tuyết cá_hồi cá_trê cá_rô cá_thu cá_đuối hàu trai vẹm tôm_hùm
+      sao_biển cá_kiếm cá_ngựa bọ_cánh_cứng châu_chấu dế ong_bắp_cày bướm_đêm đom_đóm
+      rết bọ_cạp bọ_chét ong_nghệ bọ_rùa kỳ_nhông tắc_kè kỳ_giông trăn rắn_hổ_mang
+      rắn_lục
     '''),
     WordTheme.object: words(r'''
       chai bút tẩy ô đèn gương chìa_khóa ổ_khóa túi cúc kim chỉ cọ giấy vở thư tem
@@ -45,6 +71,9 @@ final WordLanguageData vi = WordLanguageData(
       bánh_răng dây_cót ruy_băng gối chăn giỏ chổi còi dây xô quạt khiên lưới cần_câu lọ
       lược chuông_gió hạc_giấy đồng_hồ_cát ống_khói phễu bình gáo mẹt nia rổ khay hộp
       thùng vại chum
+      la_bàn móc_khóa ghim cuộn_chỉ dây_thừng móc đinh ốc_vít đai_ốc vòng_đệm bản_lề
+      then_cài xích khóa_kéo trâm_cài vòng_tay nhẫn cặp_sách ba_lô rương thùng_gỗ bát
+      chày cối kẹp bấc kính_lúp mảnh_vải khuy_bấm
     '''),
     WordTheme.nature: words(r'''
       biển sông hồ thác thung_lũng núi đồi đồng_cỏ rừng hang sa_mạc cát đá sỏi núi_lửa
@@ -53,6 +82,9 @@ final WordLanguageData vi = WordLanguageData(
       vách_đá khe_núi bãi_cát bãi_đá rạn_san_hô đáy_biển vực_sâu mạch_nước hố_sụt
       măng_đá nhũ_đá hang_động gờ_đá bóng âm_vang hương lửa than_hồng dòng_chảy bờ_biển
       bãi_bồi
+      rừng_rậm đồng_bằng lãnh_nguyên đầm_phá ốc_đảo hẻm_núi bãi_biển eo_biển kênh
+      dòng_nước thủy_triều sóng bọt sóng_vỗ khe_hở lòng_chảo trũng đèo núi_đá chân_núi
+      bãi_lầy gành_đá vũng cửa_hang
     '''),
     WordTheme.plant: words(r'''
       cây lá hoa rễ hạt quả rêu dương_xỉ tre thông phong anh_đào hoa_hồng hoa_sen
@@ -61,6 +93,10 @@ final WordLanguageData vi = WordLanguageData(
       dẻ óc_chó thảm_cỏ tảo rong_biển bồn_cây hàng_rào_cây
       bó_hoa cỏ_dại xương_rồng lô_hội húng_quế hương_thảo bạc_hà thì_là mùi_tây nghệ_tây
       rau_mùi hẹ me sim ổi
+      thân_cây vỏ_cây nhựa_cây gai mâm_xôi tầm_gửi nguyệt_quế ô_liu cây_táo hạnh_nhân
+      bạch_đàn tần_bì du đoạn cây_gạo keo mộc_lan trà_mi thược_dược phong_lữ cẩm_chướng
+      cúc_họa_mi anh_túc dạ_lan_hương thủy_tiên hoa_ly cỏ_ba_lá sậy tầm_ma kế linh_lan
+      tử_đằng
     '''),
     WordTheme.gem: words(r'''
       vàng bạc đồng sắt thép đồng_thau thiếc kẽm bạch_kim thủy_tinh pha_lê thạch_anh
@@ -69,6 +105,9 @@ final WordLanguageData vi = WordLanguageData(
       huỳnh_thạch lưu_huỳnh ngà sa_khoáng lá_vàng lá_bạc than_chì thủy_ngân thạch_cao
       đá_phiến mạch_quặng hồng_ngọc ngọc_đen lục_bảo đá_mắt_mèo đá_mặt_trăng
       ngọc_lam kim_cương san_hô_đỏ
+      niken titan nhôm chì vonfram coban crom mangan liti urani ngọc_bội đá_cẩm_thạch
+      đá_sa_thạch đá_phiến_sét đá_ong đá_bọt đá_cuội khoáng_vật tinh_thể đá_hoa_cương
+      bô_xít than_đá muối_mỏ đá_bùn đá_tảng
     '''),
     WordTheme.concept: words(r'''
       tự_do hòa_bình công_lý chân_lý trí_tuệ ký_ức tưởng_tượng câu_chuyện thơ phác_họa
@@ -80,6 +119,10 @@ final WordLanguageData vi = WordLanguageData(
       nghịch_lý khuôn_mẫu tiền_đề suy_luận diễn_dịch quy_nạp loại_suy ẩn_dụ biểu_tượng
       chủ_đề tự_sự biên_niên chứng_ngôn tuyên_ngôn đồng_thuận thỏa_hiệp giao_ước
       hiệp_ước liên_minh huyết_thống di_sản truyền_thống ngưỡng_cửa mở_đầu kết_cục
+      vần_thơ văn_xuôi tiểu_thuyết tiểu_luận luận_đề tổng_hợp phân_tích phương_pháp
+      lý_thuyết thực_hành kỹ_thuật nghệ_thuật khoa_học đạo_đức mỹ_học hùng_biện
+      ngữ_nghĩa chính_tả thư_pháp xác_tín ngẫu_nhiên số_phận vận_may lương_tâm bản_thể
+      vật_chất hình_thức nguyên_nhân kết_quả trật_tự hỗn_độn giới_hạn nguồn_cội
     '''),
     WordTheme.myth: words(r'''
       rồng phượng_hoàng kỳ_lân tiên yêu_tinh ma hồn oan_hồn thần thiên_thần ác_quỷ
@@ -90,6 +133,9 @@ final WordLanguageData vi = WordLanguageData(
       quỷ_lùn tinh_linh thủy_thần sơn_thần hải_thần lôi_thần phong_thần
       mỹ_nhân_ngư nhân_mã nhân_sư thiên_mã hải_quái thần_điểu linh_hồn ma_thuật đạo_sĩ
       pháp_sư thầy_bói nhà_tiên_tri hiền_giả
+      yêu_nữ mãng_xà khổng_lồ thủy_quái yêu_ma quỷ_dữ thổ_địa hà_bá tiên_nữ tiên_ông
+      sách_phép chén_thánh gậy_phép trượng vương_trượng hồ_ly bạch_xà thanh_xà
+      thần_hộ_mệnh linh_thú ma_trơi quỷ_sứ thiên_binh
     '''),
     WordTheme.job: words(r'''
       hiệp_sĩ thợ_săn kẻ_trộm hải_tặc thủy_thủ đầu_bếp thợ_rèn thám_tử nhà_thơ họa_sĩ
@@ -99,6 +145,11 @@ final WordLanguageData vi = WordLanguageData(
       phi_công kỹ_sư lao_công lính_cứu_hỏa cảnh_sát bác_sĩ y_tá dược_sĩ thú_y giáo_viên
       học_sinh thủ_thư nhà_báo nhà_văn dịch_giả ca_sĩ diễn_viên đạo_diễn nhạc_công
       thợ_mỏ thợ_mộc thợ_gốm thợ_may thầy_tế học_giả tiến_sĩ trọng_tài nghệ_sĩ_xiếc
+      luật_sư thẩm_phán kế_toán thủ_quỹ người_bán bồi_bàn gác_cổng tài_xế thợ_máy
+      thợ_ống_nước thợ_hồ thợ_kính thợ_kim_hoàn thợ_giày thợ_cắt_tóc thợ_cạo thợ_bánh
+      đồ_tể nhà_khảo_cổ nhà_sinh_học nhà_địa_chất nhà_thực_vật sử_gia triết_gia văn_thư
+      thợ_xay thợ_thùng thợ_dệt thợ_sơn
+      nhà_du_hành
     '''),
     WordTheme.music: words(r'''
       đàn_piano ghi_ta trống chuông đàn_tranh bài_hát điệu_múa nhịp_điệu giai_điệu
@@ -109,6 +160,9 @@ final WordLanguageData vi = WordLanguageData(
       khúc_kết âm_sắc nhịp_phách dàn_nhạc chương_nhạc khúc_mở_màn dạ_khúc biến_tấu
       thánh_ca tụng_ca cầu_hồn_khúc song_ca tam_ca tứ_tấu ngũ_tấu nhạc_trưởng quãng_tám
       bán_âm khóa_nhạc khuông_nhạc tổng_phổ máy_nhịp
+      đại_hồ_cầm kèn_trombone kèn_tuba kèn_túi đàn_cầm cồng chiêng đàn_đá sáo_mèo
+      đàn_tỳ_bà đàn_tam trống_cơm đối_âm luyến_âm nhịp_độ điệp_khúc khổ_thơ ca_khúc
+      thánh_thi hợp_ca đồng_dao ngâm_thơ cao_độ trường_độ âm_vực đàn_sến kèn_lá
     '''),
     WordTheme.place: words(r'''
       chợ quảng_trường thành_phố làng ngõ cầu vườn thư_viện bảo_tàng nhà_hát trường_học
@@ -119,6 +173,9 @@ final WordLanguageData vi = WordLanguageData(
       phòng_ngủ phòng_khách hành_lang cầu_thang đường_hầm cầu_vượt ngã_tư đường_dạo
       pháo_đài nông_trại trang_trại vườn_cây nhà_thờ tu_viện thành_lũy hào bến_phà đê
       bãi_cắm_trại biệt_thự dinh_thự xóm
+      nhà_thờ_lớn nhà_nguyện am nghĩa_trang lăng_mộ hầm_mộ thánh_đường nhà_trọ quán_trọ
+      quán_ăn quán_rượu hội_chợ khu_phố ngoại_ô đại_lộ lối_đi lối_tắt ngã_ba bến_đò
+      đập_nước cống cầu_dẫn cối_xay_gió lò_rèn xưởng nhà_kho chuồng nhà_sàn trạm_gác
     '''),
     WordTheme.food: words(r'''
       cơm mì phở bún bánh_mì bánh_bao bánh_xèo bánh_chưng nem chả giò_lụa muối đường
@@ -127,6 +184,10 @@ final WordLanguageData vi = WordLanguageData(
       xoài sô_cô_la kẹo thạch bánh_quy bánh_ngọt bánh_pudding bánh_rán bánh_kếp bánh_kem
       mứt tương_ớt nước_mắm mắm_tôm dưa_muối kim_chi cháo xôi chè bánh_trôi thịt_nướng
       gỏi_cuốn bánh_cuốn bánh_đúc bánh_gai bánh_tét canh súp lẩu
+      lúa_mạch_đen lúa_mạch yến_mạch ngô đậu_lăng đậu_gà đậu_xanh đậu_nành cà_chua
+      ớt_chuông cà_tím bí_ngòi súp_lơ bông_cải atisô măng_tây tỏi_tây củ_cải củ_dền
+      cần_tây lê mận lựu mộc_qua mơ bưởi kiwi hạt_dẻ đậu_phộng hạt_điều bánh_nướng
+      bánh_khúc bánh_tro bánh_bèo bánh_nậm bún_bò bún_riêu miến hủ_tiếu
     '''),
     WordTheme.sport: words(r'''
       bóng_đá bóng_chày bóng_rổ bóng_chuyền bóng_bàn quần_vợt cầu_lông gôn bowling bi_a
@@ -137,6 +198,9 @@ final WordLanguageData vi = WordLanguageData(
       ném_đĩa tiếp_sức bảng_điểm mũ_bảo_hiểm phạm_lỗi nhảy_xa nhảy_cao xà_kép
       lễ_khai_mạc lễ_bế_mạc nhảy_dù bóng_nước đấu_tập cú_móc hạ_đo_ván vật_ngã lộn_nhào
       khởi_động hội_ý
+      đua_thuyền ném_tạ nhảy_sào ván_nhún thảm_tập ngựa_gỗ cờ_vua cờ_tướng đô_mi_nô
+      tiền_đạo hậu_vệ sân_bóng đường_chạy phạt_đền phạt_góc thẻ_vàng tỷ_số hòa
+      chiến_thắng thất_bại kỷ_lục giải_đấu giải_vô_địch cầu_môn
     '''),
     WordTheme.vehicle: words(r'''
       xe_đạp tàu_hỏa thuyền xe_trượt ô_tô xe_buýt taxi xe_tải xe_máy xe_ga máy_bay
@@ -146,6 +210,9 @@ final WordLanguageData vi = WordLanguageData(
       xe_bán_tải xe_limousine xe_ủi_tuyết tàu_một_ray tàu_hai_thân tàu_phá_băng tàu_dầu
       sà_lan tàu_thăm_dò tàu_đổ_bộ tàu_con_thoi xe_địa_hình xe_một_bánh xe_tang xe_nôi
       xe_con xe_chở_hàng xe_tưới_nước tàu_tuần_tra tàu_lặn xuồng toa_giường
+      xe_thổ_mộ xe_mui_trần xe_ben xe_trộn cần_cẩu xe_lu máy_gặt ván_trượt xe_đạp_điện
+      thuyền_thúng ghe xuồng_ba_lá tàu_hộ_tống tàu_khu_trục tàu_cao_tốc tàu_lượn xe_bồn
+      xe_rác xe_khách xe_ôm xe_thồ thuyền_nan bè_tre
     '''),
     WordTheme.product: words(r'''
       máy_tính bàn_phím màn_hình máy_in loa tai_nghe micrô điện_thoại sạc pin điều_khiển
@@ -156,6 +223,9 @@ final WordLanguageData vi = WordLanguageData(
       ổ_cắm nước_giặt nước_xả móc_áo tủ_áo giá_sách ghế_tựa ghế_đẩu khung_giường
       chăn_bông ga_giường vỏ_gối khăn_tắm áo_tắm_dài vòi_sen vòi_nước cây_lau_nhà
       cốc_đong thìa_đong cây_cán_bột máy_trộn
+      ti_vi loa_thùng cân bàn_là máy_nướng nồi_chiên máy_ép ấm_điện thảm rèm_sáo
+      đèn_chùm đèn_bàn bộ_đồ_ăn khăn_ăn giá_bát bồn_rửa vòi_hoa_sen bồn_tắm gương_soi
+      dũa_móng hộp_đựng lọ_muối đế_lót khay_đá
     '''),
     WordTheme.color: words(r'''
       đỏ_son đỏ_thẫm hồng_đào cam_đất vàng_nghệ vàng_chanh xanh_lá xanh_rêu xanh_ngọc
@@ -165,6 +235,9 @@ final WordLanguageData vi = WordLanguageData(
       lục_nhạt lam_sẫm lam_nhạt tím_nhạt tím_sẫm nâu_sẫm nâu_nhạt xám_bạc trắng_tinh
       đen_nhánh đỏ_tươi cam_tươi vàng_tươi xanh_tươi màu_ngọc_lam màu_hổ_phách màu_đồng
       màu_cát màu_tro màu_khói màu_đất màu_trời màu_biển màu_mực màu_máu
+      đỏ_thắm đỏ_bầm hồng_nhạt cam_nhạt vàng_nhạt xanh_thẫm lam_biếc tím_biếc nâu_đỏ
+      xám_xanh trắng_ngần đen_thẫm bạc_xám hồng_cam vàng_hoe xanh_lục lục_thẫm chàm_đen
+      huyết_dụ đỏ_cam vàng_óng trắng_xanh
     '''),
     WordTheme.finance: words(r'''
       sổ_cái hóa_đơn biên_lai trái_phiếu cổ_phiếu cổ_tức lãi_suất khoản_vay thế_chấp
@@ -175,6 +248,9 @@ final WordLanguageData vi = WordLanguageData(
       quyết_toán thấu_chi sao_kê sổ_tiết_kiệm chủ_nợ con_nợ người_đi_vay định_giá
       thẩm_định lạm_phát suy_thoái thanh_khoản phá_sản của_trời_cho trợ_cấp phụ_cấp
       chi_phí vòng_quay chiết_khấu trả_góp nợ_quá_hạn
+      sổ_quỹ hợp_đồng văn_tự hối_phiếu lãi hạn_ngạch khoản_phí thuế tiền_phạt
+      tiền_cọc của_hồi_môn thừa_kế tiền_thuê kho_báu giàu_có nghèo_khó tích_lũy
+      phụ_thu doanh_số lỗ vốn quỹ tiền_lãi sổ_nợ tiền_mặt
     '''),
     WordTheme.tech: words(r'''
       máy_chủ bộ_nhớ_đệm bộ_đệm điểm_ảnh mã_hóa gói_tin giao_thức hàng_đợi ngăn_xếp
@@ -185,6 +261,10 @@ final WordLanguageData vi = WordLanguageData(
       điểm_cuối giải_mã băm kết_xuất bộ_tô_bóng kết_cấu đa_giác khung_dây khung_nhìn
       bộ_đệm_khung tám_bit đường_lên đường_xuống định_tuyến chuyển_mạch bắc_cầu
       gói_dữ_liệu hệ_thống_tệp phân_vùng thư_mục liên_kết_mềm khôi_phục di_trú
+      nhân tiến_trình phiên truy_vấn chỉ_mục bảng cột hàng trường nút đồ_thị danh_sách
+      tập_hợp mô_đun tiện_ích bản_vá nhánh phiên_bản bản_dựng kiểm_thử hồ_sơ
+      ngưỡng sự_kiện tín_hiệu luồng bộ_lọc gói_cài
+      kho_lệnh mã_nguồn nhãn_dán
     '''),
     WordTheme.weather: words(r'''
       mây gió mưa tuyết sương_giá sương_mù sương cầu_vồng hoàng_hôn sét sấm mưa_rào
@@ -194,6 +274,9 @@ final WordLanguageData vi = WordLanguageData(
       gió_lào mây_đen vầng_mây áp_thấp áp_cao thời_tiết khí_hậu nhiệt_độ độ_ẩm khí_áp
       trời_quang trời_râm trời_mưa nắng_gắt bóng_râm nắng_chiều gió_biển gió_núi
       cơn_giông chớp nắng_sớm
+      nắng_hạn gió_xoáy vòi_rồng mưa_bụi mưa_ngâu mưa_dầm sương_sa băng_tan trời_nồm
+      oi_bức rét_đậm rét_hại nắng_hanh trời_âm_u mây_mù quầng_trăng ráng_chiều tia_chớp
+      hạn_hán lũ_lụt triều_cường gió_chướng mưa_ngâu_dài
     '''),
     WordTheme.space: words(r'''
       sao mặt_trăng mặt_trời thiên_hà sao_chổi sao_băng cực_quang bụi_sao dải_ngân_hà
@@ -203,6 +286,9 @@ final WordLanguageData vi = WordLanguageData(
       mưa_sao_băng bụi_vũ_trụ hệ_mặt_trời chân_không trăng_khuyết trăng_tròn trăng_non
       ánh_trăng ánh_sao sao_bắc_cực sao_hôm sao_mai sao_hỏa sao_kim sao_mộc sao_thổ
       sao_thủy
+      thị_sai parsec thiên_để phương_vị cận_nhật viễn_nhật quang_cầu sắc_cầu
+      tầng_điện_ly tầng_đối_lưu trọng_trường sao_lùn sao_đôi tàu_vũ_trụ
+      thiên_văn vành_đai_sao đĩa_sao lỗ_sâu sao_siêu_mới
     '''),
     WordTheme.time: words(r'''
       bình_minh chạng_vạng hạ_chí đông_chí xuân_phân thu_phân mùa khoảnh_khắc vĩnh_hằng
@@ -213,6 +299,9 @@ final WordLanguageData vi = WordLanguageData(
       chốc_lát giữa_hè giao_thừa rằm cuối_thu sinh_nhật thời_hạn ngày_xưa tiết_khí
       lập_xuân lập_hạ lập_thu lập_đông thời_khắc thời_gian thiên_thu thời_thơ_ấu
       tuổi_trẻ tuổi_già xế_chiều quãng_đời thuở_xưa bây_giờ sau_này
+      phút giây giờ chu_kỳ ca vòng giai_đoạn chặng buổi_sớm dĩ_vãng mai_sau niên_đại
+      thập_niên thế_hệ tuần_trăng khắc chiều_tà đầu_hè cuối_đông ngày_thường ngày_nghỉ
+      nửa_ngày độ_dài
     '''),
     WordTheme.emotion: words(r'''
       can_đảm tò_mò cô_độc hoài_niệm khát_khao đồng_cảm trắc_ẩn lòng_biết_ơn
@@ -225,6 +314,10 @@ final WordLanguageData vi = WordLanguageData(
       lo_lắng bồn_chồn khiếp_sợ hoảng_loạn thịnh_nộ phẫn_nộ bực_bội khó_chịu chán_nản
       thờ_ơ nhiệt_huyết hăng_hái phấn_khích háo_hức quyết_tâm ý_chí tự_tin khiêm_tốn
       điềm_tĩnh bình_tĩnh can_trường rụt_rè hớn_hở tâm_trạng
+      đắng_cay oán_hận căm_ghét khinh_thường ngờ_vực chán_chường sầu_muộn tủi_hờn
+      khuây_khỏa sùng_kính khoan_dung độ_lượng thiện_chí mến_mộ ác_cảm hoan_hỉ
+      mãn_nguyện thấp_thỏm bồi_hồi sửng_sốt hối_hận day_dứt khát_vọng rạo_rực nôn_nao
+      ngưỡng_mộ
     '''),
     WordTheme.body: words(r'''
       đầu trán lông_mày lông_mi mí_mắt mũi lỗ_mũi má cằm hàm môi lưỡi răng lợi tai
@@ -235,6 +328,9 @@ final WordLanguageData vi = WordLanguageData(
       mao_mạch máu thịt da lỗ_chân_lông tóc râu nước_mắt mồ_hôi nước_bọt hơi_thở mạch
       nhịp_tim lồng_ngực xương_sống xương_đòn xương_gò_má màng_nhĩ nhãn_cầu nếp_nhăn
       tàn_nhang sẹo vết_bầm phồng_rộp chai_tay
+      thái_dương vòm_miệng amidan thanh_quản hầu khí_quản thực_quản cơ_hoành xương_ức
+      xương_bả đốt_sống khung_chậu xương_đùi xương_chày xương_mác cánh_tay cẳng_tay
+      mu_bàn_chân nách bẹn khoeo mống_mắt con_ngươi giác_mạc võng_mạc vách_ngăn lưỡi_gà
     '''),
     WordTheme.clothing: words(r'''
       mũ giày găng khăn_quàng kính_mắt dép_lê dép_xăng_đan quần_áo áo_khoác áo_măng_tô
@@ -244,15 +340,21 @@ final WordLanguageData vi = WordLanguageData(
       áo_tơi áo_mưa đồ_bơi đồ_lặn đồ_bảo_hộ áo_ấm áo_leo_núi đồ_thể_thao tay_áo cổ_áo
       vạt_áo lớp_lót vải vải_lanh lụa bông nhung dạ da_thuộc lông_thú mũ_lưỡi_trai
       mũ_bảo_hộ khăn_voan khăn_choàng bao_tay bịt_tai
+      áo_đuôi_tôm áo_lễ áo_chẽn váy_lót yếm xà_cạp guốc dép_xỏ_ngón áo_nịt váy_phồng
+      khăn_trùm mũ_ba_góc mũ_trụ mũ_trùm khăn_cổ ống_tay viền dải_viền khố váy_xòe
+      áo_choàng quần_lửng
     '''),
     WordTheme.tool: words(r'''
-      rìu xẻng cưa thang cờ_lê kìm đục đe ống_bễ dùi kẹp ê_tô thước_thủy thước_cặp
+      rìu xẻng cưa thang cờ_lê kìm đục đe ống_bễ dùi ê_tô thước_thủy thước_cặp
       thước_đo_góc thước_kẻ kéo búa búa_gỗ máy_khoan giấy_nhám bào cuốc liềm hái bừa cào
       mỏ_lết tua_vít mỏ_hàn máy_mài máy_cắt máy_hàn thước_dây dây_mực com_pa rìu_nhỏ
       xà_beng đòn_bẩy nêm ròng_rọc tay_quay búa_tạ bay đá_mài giũa bàn_nạo cái_sàng mai
       cày cối_xay thoi ống_chỉ cán lưỡi_dao bộ_dụng_cụ hộp_đồ_nghề đinh_vít
       máy_bắn_đinh cưa_lọng cưa_vòng máy_tiện máy_chà_nhám cưa_xích cưa_tay mũi_vạch
       thước_vuông ke_góc bàn_thợ
+      khoan_tay giũa_thô thước_vạch dây_dọi kìm_cắt kích máy_bấm đèn_khò khuôn_đúc
+      khuôn_dập đá_ráp mũi_khoan dao_tỉa rìu_tay dao_bào dùi_đục mỏ_cặp cưa_cắt bàn_kẹp
+      kìm_kẹp
     '''),
     WordTheme.drink: words(r'''
       cà_phê trà_xanh trà_đen nước_ép sữa nước nước_suối nước_có_ga trà_lúa_mạch
@@ -262,6 +364,9 @@ final WordLanguageData vi = WordLanguageData(
       rượu_mạnh sâm_banh cốc_tai nước_đường
       nước_sâm nước_rau_má nước_vối nước_sấu trà_bí_đao nước_yến
       nước_khoáng sữa_tươi sữa_đặc
+      nước_lọc trà_ô_long trà_nhài trà_bạc_hà nước_cam nước_táo nước_nho nước_gạo
+      rượu_vang_đỏ rượu_táo rượu_mơ rượu_sim rượu_đế nước_ngô chè_đỗ_đen rượu_ngâm
+      nước_me nước_nhãn trà_hoa_nhài
     '''),
   },
   parts: words(r'''

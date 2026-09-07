@@ -22,6 +22,19 @@ export const EN: WordLanguageData = {
 		Petite Slender Chunky Stout Lanky Narrow Curved Spiral Zigzag Twisted Pointed
 		Blunt Oval Astral Stellar Nebular Orbital Twilight Midnight Autumnal Wintry
 		Vernal Timeless Antique
+		Fearless Daring Gallant Loyal Patient Restive Watchful Sprightly
+		Feathery Furry Scaly Bristly Silken Glossy Matte Speckled Dappled Mottled
+		Striped Ringed Freckled Weathered Battered Polished Burnished Gilded Lacquered
+		Braided Woven Knotted Frayed Tattered Pristine Hushed Muffled Clangorous Chiming
+		Ringing Booming Murmuring Rippling Balmy Brisk Sultry Muggy Crisp Bracing
+		Blustery Drizzly Sleety Hazy Overcast Starlit Moonlit Sunlit Grassy Mossy Ferny
+		Thorny Leafy Boughy Reedy Briny Pebbly Silty Loamy Chalky Flinty Peppery Tangy
+		Zingy Nutty Toasty Yeasty Fizzy Frothy Honeyed Minty Citrus Vanilla Caramel
+		Topaz Garnet Quartz Obsidian Alabaster Porcelain Granite Basalt Iron Pewter
+		Brassy Tin Vermilion Cerulean Viridian Magenta Sepia Ecru Fawn Dun Bistre Puce
+		Wistful Pensive Sanguine Jaunty Chipper Buoyant Sullen Brooding Fretful Wary
+		Skittish Impish Roguish Ample Scant Squat Willowy Gaunt Burly Rangy Compact Vast
+		Broad Sheer Craggy Sloped Tapered
 	`),
 	// The same attributive slot, for what the noun is doing rather than what it is
 	// like: Studying + Fox, Tear + Of + Lion.
@@ -43,6 +56,17 @@ export const EN: WordLanguageData = {
 		Slinking Hovering Swaying Bobbing Drumming Strumming Whistling Chanting Weaving
 		Carving Forging Sailing Rowing Paddling Marching Racing Juggling Vanishing
 		Returning
+		Rousing Stirring Straightening Slouching Crouching Kneeling
+		Sprawling Reclining Trudging Ambling Sauntering Loping Trotting Galloping
+		Scampering Scurrying Shuffling Limping Wading Swooping Wheeling Fluttering
+		Flapping Alighting Plunging Surfacing Wallowing Wriggling Slithering Peering
+		Squinting Gazing Glancing Inspecting Sniffing Tasting Touching Stroking Patting
+		Gathering Sorting Stacking Packing Unpacking Wrapping Tying Untying Folding
+		Unfolding Sealing Opening Kneading Chopping Slicing Grating
+		Simmering Steaming Frying Cooling Serving Sharing Sketching Etching Stitching
+		Sewing Polishing Sanding Hammering Sawing Drilling Tuning Winding Mapping
+		Charting Naming Numbering Tallying Recording Archiving Wishing
+		Hoping Doubting Trusting Forgiving Promising Vowing Recalling Forgetting
 	`),
 	nouns: {
 		animal: words(`

@@ -826,6 +826,8 @@ final SentenceLanguageData es = SentenceLanguageData(
       subject: const <NounClass>[NounClass.creature, NounClass.person],
       words: words(r'''
         grande pequeño rápido lento silencioso ruidoso valiente perezoso ocupado fiero manso listo
+        joven viejo fuerte débil audaz tímido orgulloso vivaz sereno terco ágil alerta robusto
+        honesto astuto
       '''),
     ),
     StateGroup(
@@ -833,42 +835,44 @@ final SentenceLanguageData es = SentenceLanguageData(
       condition: Condition.hungry,
       head: 'está',
       pastHead: 'estaba',
-      words: words(r'hambriento famélico'),
+      words: words(r'hambriento famélico voraz ávido'),
     ),
     StateGroup(
       subject: const <NounClass>[NounClass.creature, NounClass.person],
       condition: Condition.full,
       head: 'está',
       pastHead: 'estaba',
-      words: words(r'satisfecho lleno'),
+      words: words(r'satisfecho lleno saciado repleto'),
     ),
     StateGroup(
       subject: const <NounClass>[NounClass.creature, NounClass.person],
       condition: Condition.tired,
       head: 'está',
       pastHead: 'estaba',
-      words: words(r'cansado soñoliento agotado'),
+      words: words(r'cansado soñoliento agotado exhausto rendido fatigado'),
     ),
     StateGroup(
       subject: const <NounClass>[NounClass.creature, NounClass.person],
       condition: Condition.rested,
       head: 'está',
       pastHead: 'estaba',
-      words: words(r'descansado fresco animado'),
+      words: words(r'descansado fresco animado despejado ligero vigoroso'),
     ),
     StateGroup(
       subject: const <NounClass>[NounClass.creature, NounClass.person],
       condition: Condition.content,
       head: 'está',
       pastHead: 'estaba',
-      words: words(r'feliz contento alegre tranquilo'),
+      words: words(r'feliz contento alegre tranquilo dichoso risueño encantado gozoso'),
     ),
     StateGroup(
       subject: const <NounClass>[NounClass.creature, NounClass.person],
       condition: Condition.restless,
       head: 'está',
       pastHead: 'estaba',
-      words: words(r'aburrido curioso inquieto nervioso'),
+      words: words(r'''
+        aburrido curioso inquieto nervioso impaciente ansioso desasosegado intranquilo
+      '''),
     ),
     StateGroup(
       subject: const <NounClass>[
@@ -883,31 +887,47 @@ final SentenceLanguageData es = SentenceLanguageData(
         NounClass.idea,
         NounClass.body,
       ],
-      words: words(r'hermoso extraño nuevo común raro'),
+      words: words(r'''
+        hermoso extraño nuevo común raro bonito conocido singular ordinario espléndido precioso
+      '''),
     ),
     StateGroup(
       subject: const <NounClass>[NounClass.place, NounClass.event],
-      words: words(r'ancho estrecho tranquilo profundo oscuro claro lejano empinado'),
+      words: words(r'''
+        ancho estrecho tranquilo profundo oscuro claro lejano empinado amplio angosto concurrido
+        vacío inmenso sombrío llano largo breve luminoso
+      '''),
     ),
     StateGroup(
       subject: const <NounClass>[NounClass.thing, NounClass.vehicle],
-      words: words(r'duro ligero pesado viejo liso transparente robusto'),
+      words: words(r'''
+        duro ligero pesado viejo liso transparente robusto redondo plano afilado delgado grueso
+        frágil lujoso sencillo delicado áspero brillante
+      '''),
     ),
     StateGroup(
       subject: const <NounClass>[NounClass.edible],
-      words: words(r'dulce salado picante ácido caliente frío sabroso'),
+      words: words(r'''
+        dulce salado picante ácido caliente frío sabroso amargo espeso suave tibio jugoso crujiente
+        rico soso
+      '''),
     ),
     StateGroup(
       subject: const <NounClass>[NounClass.idea],
-      words: words(r'sencillo evidente vago eterno fugaz'),
+      words: words(r'''
+        sencillo evidente vago eterno fugaz complejo claro profundo familiar valioso secreto menudo
+        difícil fácil
+      '''),
     ),
     StateGroup(
       subject: const <NounClass>[NounClass.plant],
-      words: words(r'verde frondoso fragante marchito'),
+      words: words(r'verde frondoso fragante marchito alto tierno esbelto lozano ralo tupido'),
     ),
     StateGroup(
       subject: const <NounClass>[NounClass.body],
-      words: words(r'cálido frío dolorido rígido'),
+      words: words(r'''
+        cálido frío dolorido rígido suave áspero terso pálido fuerte entumecido pesado
+      '''),
     ),
   ],
   modifiers: <ModifierGroup>[
@@ -915,62 +935,88 @@ final SentenceLanguageData es = SentenceLanguageData(
       subject: const <NounClass>[NounClass.creature, NounClass.person],
       words: words(r'''
         valiente animado amable ocupado perezoso tímido listo joven viejo pequeño grande silencioso
-        alegre paciente ágil curioso
+        alegre paciente ágil curioso audaz temeroso cauto terco manso ruidoso fornido flaco
+        soñoliento astuto alerta callado orgulloso inocente honrado despierto sereno
       '''),
     ),
     ModifierGroup(
       subject: const <NounClass>[NounClass.person],
-      words: words(r'joven amable severo serio ocupado sincero'),
+      words: words(r'''
+        joven amable severo serio ocupado sincero sabio humilde educado hábil famoso pobre rico
+        anciano risueño perspicaz afable trabajador
+      '''),
     ),
     ModifierGroup(
       subject: const <NounClass>[NounClass.creature],
-      words: words(r'veloz feroz manso rechoncho pequeñito'),
+      words: words(r'''
+        veloz feroz manso rechoncho pequeñito peludo moteado rayado escuálido enorme diestro rollizo
+        lustroso alargado
+      '''),
     ),
     ModifierGroup(
       subject: const <NounClass>[NounClass.edible],
       themes: const <WordTheme>[WordTheme.food],
       words: words(r'''
         dulce picante tibio fresco crujiente sabroso fragante caliente salado blando maduro rico
+        dorado ahumado cremoso tierno jugoso sustancioso humeante tostado pegajoso soso especiado
       '''),
     ),
     ModifierGroup(
       subject: const <NounClass>[NounClass.edible],
       themes: const <WordTheme>[WordTheme.drink],
-      words: words(r'dulce tibio frío fresco caliente fragante espumoso fuerte'),
+      words: words(r'''
+        dulce tibio frío fresco caliente fragante espumoso fuerte amargo cremoso helado lechoso
+        turbio claro burbujeante suave templado
+      '''),
     ),
     ModifierGroup(
       subject: const <NounClass>[NounClass.thing, NounClass.vehicle],
       words: words(r'''
         viejo nuevo pequeño grande ligero pesado brillante liso transparente duro bonito precioso
-        antiguo
+        antiguo oxidado gastado pulido sencillo recargado estrecho ancho redondo plano afilado romo
+        frágil hueco polvoriento torcido
       '''),
     ),
     ModifierGroup(
       subject: const <NounClass>[NounClass.vehicle],
-      words: words(r'rápido lento robusto'),
+      words: words(r'''
+        rápido lento robusto chirriante reluciente oxidado destartalado enorme ruidoso vetusto
+      '''),
     ),
     ModifierGroup(
       subject: const <NounClass>[NounClass.place],
       words: words(r'''
         tranquilo amplio oscuro luminoso extraño viejo acogedor apartado bullicioso silencioso
-        remoto lejano cercano vacío solitario soleado
+        remoto lejano cercano vacío solitario soleado angosto concurrido ventoso brumoso sombreado
+        polvoriento húmedo rocoso empinado llano desolado frondoso desierto despejado
       '''),
     ),
     ModifierGroup(
       subject: const <NounClass>[NounClass.plant],
-      words: words(r'verde frondoso fragante joven marchito alto pequeño tierno fresco'),
+      words: words(r'''
+        verde frondoso fragante joven marchito alto pequeño tierno fresco espinoso florido
+        incipiente trepador silvestre esbelto pálido caído tupido
+      '''),
     ),
     ModifierGroup(
       subject: const <NounClass>[NounClass.idea],
-      words: words(r'vago viejo nuevo extraño claro precioso pequeño raro'),
+      words: words(r'''
+        vago viejo nuevo extraño claro precioso pequeño raro tenue sencillo enredado terco fugaz
+        lejano audaz secreto callado familiar
+      '''),
     ),
     ModifierGroup(
       subject: const <NounClass>[NounClass.event],
-      words: words(r'largo breve tranquilo soleado nublado ruidoso repentino'),
+      words: words(r'''
+        largo breve tranquilo soleado nublado ruidoso repentino solemne alegre aburrido lluvioso
+        tormentoso sereno concurrido animado espléndido sencillo
+      '''),
     ),
     ModifierGroup(
       subject: const <NounClass>[NounClass.body],
-      words: words(r'pequeño frío cálido esbelto robusto'),
+      words: words(r'''
+        pequeño frío cálido esbelto robusto suave rígido dolorido áspero terso pálido fuerte
+      '''),
     ),
     ModifierGroup(
       subject: const <NounClass>[
@@ -984,7 +1030,9 @@ final SentenceLanguageData es = SentenceLanguageData(
         NounClass.idea,
         NounClass.body,
       ],
-      words: words(r'hermoso misterioso extraño nuevo'),
+      words: words(r'''
+        hermoso misterioso extraño nuevo bonito conocido curioso corriente espléndido humilde
+      '''),
     ),
   ],
   manners: <ModifierGroup>[
@@ -993,7 +1041,12 @@ final SentenceLanguageData es = SentenceLanguageData(
       words: words(r'''
         en_silencio despacio rápidamente suavemente de_repente apenas a_solas brevemente firmemente
         audazmente con_cuidado ansiosamente tranquilamente alegremente torpemente fuertemente
-        pacientemente ligeramente serenamente vivamente con_calma
+        pacientemente ligeramente serenamente vivamente con_calma sigilosamente de_puntillas
+        atropelladamente apresuradamente cuidadosamente atentamente distraídamente nerviosamente
+        curiosamente orgullosamente tímidamente amablemente dulcemente amargamente severamente
+        ávidamente descuidadamente tiernamente bruscamente hábilmente diestramente decididamente
+        felizmente tristemente pesadamente animadamente a_duras_penas de_mala_gana adrede
+        sin_decir_nada de_un_salto sin_prisa con_ganas en_voz_baja sin_pausa
       '''),
     ),
     ModifierGroup(
@@ -1009,7 +1062,10 @@ final SentenceLanguageData es = SentenceLanguageData(
       ],
       words: words(r'''
         en_silencio despacio suavemente de_repente apenas otra_vez todavía de_nuevo poco_a_poco
-        lentamente débilmente aún gradualmente
+        lentamente débilmente aún gradualmente silenciosamente levemente intensamente vivamente
+        profundamente ampliamente tenuemente cálidamente fríamente dulcemente espesamente firmemente
+        pesadamente ligeramente sin_cesar constantemente eternamente una_vez_más durante_un_rato
+        de_golpe por_todas_partes
       '''),
     ),
   ],
@@ -1020,48 +1076,77 @@ final SentenceLanguageData es = SentenceLanguageData(
     '''),
     any: words(r'''
       en_primavera en_verano en_otoño en_invierno los_fines_de_semana en_los_días_festivos
-      todo_el_día
+      todo_el_día en_plena_primavera a_finales_de_primavera a_principios_de_verano en_pleno_verano
+      a_finales_de_verano a_principios_de_otoño a_finales_de_otoño en_pleno_invierno
+      a_finales_de_invierno en_la_época_de_lluvias en_la_cosecha en_la_fiesta en_día_de_mercado
+      en_luna_llena en_un_día_de_lluvia en_un_día_de_nieve en_un_día_de_viento en_un_día_claro
+      en_un_día_nublado en_un_día_de_niebla en_vacaciones
     '''),
-    past: words(r'ayer la_semana_pasada hace_tiempo aquel_día aquella_noche una_vez'),
-    present: words(r'hoy hace_poco mañana la_semana_que_viene'),
-    habitual: words(r'estos_días a_veces cada_día cada_noche'),
+    past: words(r'''
+      ayer la_semana_pasada hace_tiempo aquel_día aquella_noche una_vez anteayer el_mes_pasado
+      el_año_pasado hace_años hace_un_rato aquella_mañana aquella_tarde por_entonces
+      en_aquellos_días la_semana_anterior la_primavera_pasada el_verano_pasado el_otoño_pasado
+      el_invierno_pasado hace_unos_días
+    '''),
+    present: words(r'''
+      hoy hace_poco mañana la_semana_que_viene ahora_mismo esta_mañana esta_tarde esta_noche
+      pasado_mañana el_mes_que_viene el_año_que_viene este_año esta_semana este_fin_de_semana
+      en_un_momento enseguida
+    '''),
+    habitual: words(r'''
+      estos_días a_veces cada_día cada_noche siempre a_menudo normalmente rara_vez de_vez_en_cuando
+      cada_mañana cada_semana cada_año por_lo_general casi_siempre
+    '''),
   ),
   homes: words(r'casa cabaña'),
   join: const SentenceJoin(word: 'y'),
   connectives: <ConnectiveKind, WordPool>{
-    ConnectiveKind.additive: words(r'y_luego además,'),
-    ConnectiveKind.temporal: words(
-      r'después por_fin mientras_tanto, más_tarde al_final poco_después',
-    ),
-    ConnectiveKind.contrastive: words(r'pero sin_embargo, aun_así en_cambio, no_obstante,'),
-    ConnectiveKind.causal: words(r'entonces por_eso así_que'),
+    ConnectiveKind.additive: words(r'y_luego además, también asimismo, es_más, encima,'),
+    ConnectiveKind.temporal: words(r'''
+      después por_fin mientras_tanto, más_tarde al_final poco_después acto_seguido, al_rato
+      en_seguida, para_entonces, al_cabo_de_un_rato, momentos_después,
+    '''),
+    ConnectiveKind.contrastive: words(r'''
+      pero sin_embargo, aun_así en_cambio, no_obstante, con_todo, por_el_contrario, aun_entonces,
+    '''),
+    ConnectiveKind.causal: words(r'''
+      entonces por_eso así_que por_tanto, en_consecuencia, de_ahí_que por_esa_razón,
+    '''),
   },
   traits: <NounTrait, WordPool>{
     NounTrait.flier: words(r'''
       pájaro golondrina gorrión cuervo halcón águila pavo_real loro búho paloma grulla cisne pato
       ganso mariposa abeja libélula cigarra mosca mosquito murciélago garza pelícano dragón fénix
-      hada pegaso grifo ángel valquiria
+      hada pegaso grifo ángel valquiria mirlo ruiseñor alondra codorniz faisán perdiz colibrí tucán
+      flamenco cigüeña abubilla jilguero urraca arrendajo avispa polilla luciérnaga hipogrifo
     '''),
     NounTrait.swimmer: words(r'''
       cocodrilo tortuga rana sapo pez ballena delfín tiburón pulpo calamar gamba cangrejo morsa foca
-      pingüino sirena kraken náyade
+      pingüino sirena kraken náyade anguila sardina atún bacalao merluza trucha salmón carpa raya
+      medusa almeja mejillón ostra salamandra tritón castor hipopótamo ornitorrinco
     '''),
     NounTrait.crawler: words(r'''
-      cocodrilo serpiente lagarto tortuga caracol hormiga araña gusano cangrejo basilisco
+      cocodrilo serpiente lagarto tortuga caracol hormiga araña gusano cangrejo basilisco iguana
+      camaleón salamandra tritón boa víbora cobra pitón escarabajo saltamontes grillo pulga oruga
+      ciempiés escorpión
     '''),
     NounTrait.lifeless: words(r'''
       hechizo maldición profecía amuleto talismán runa portal santuario ídolo tótem augurio presagio
-      bestiario
+      bestiario conjuro sortilegio grimorio pentáculo reliquia cáliz grial varita báculo cetro
+      corona
     '''),
     NounTrait.placeless: words(r'''
       arena guijarro terremoto géiser fumarola estalactita estalagmita eco brasa estrella sol
       meteoro aurora menguante creciente eclipse cenit satélite cúmulo constelación órbita gravedad
       rotación traslación mancha_solar año_luz astro eclíptica meridiano ingravidez plenilunio
-      novilunio perigeo apogeo lucero supernova cuásar púlsar
+      novilunio perigeo apogeo lucero supernova cuásar púlsar corriente marea oleaje espuma
+      rompiente paralaje parsec acimut perihelio afelio elipse cuadrante nadir gravitación halo
+      bólido enana coma
     '''),
   },
   interjections: words(r'''
-    ay, oh, vaya, caramba, madre_mía, mira, desde_luego, uy, anda, hombre, cielos, vamos,
+    ay, oh, vaya, caramba, madre_mía, mira, desde_luego, uy, anda, hombre, cielos, vamos, ajá, ea,
+    huy, válgame, por_fin, claro, qué_va, ojalá, atiza, hala, oye, menos_mal,
   '''),
   pronouns: const <WordGender, WordPool>{
     WordGender.n: <String>[''],
