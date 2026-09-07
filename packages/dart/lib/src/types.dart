@@ -458,6 +458,19 @@ enum SentenceStory {
   /// The hero goes to see somebody, and they talk.
   visit,
 
+
+  /// The hero goes out, sits down somewhere, and watches what happens around
+  /// them — a sparrow, a passer-by, the light changing.
+  watch,
+
+  /// The weather turns while the hero is out; they wait it out and go on once
+  /// it passes.
+  shelter,
+
+  /// Nothing happens to anybody. A place is described, and the things in it do
+  /// what they do: the wind, the leaves, a bird, the evening.
+  sketch,
+
   /// Something that is not a person or an animal changes over time — an apple
   /// ripens and cools, a sky darkens and deepens.
   passage,

@@ -139,6 +139,45 @@ List<VerbGroup> groupsOf(
     )
     .toList(growable: false);
 
+/// The intransitive verb groups of a field that can take somebody else as their
+/// subject: one of these classes, narrowed to these themes where the group
+/// narrows itself. What a [StepKind.other] step draws from.
+List<VerbGroup> groupsForActor(
+  SentenceLanguageData data,
+  VerbField field,
+  List<NounClass> classes,
+  List<WordTheme>? themes,
+) => data.verbs
+    .where(
+      (group) =>
+          group.field == field &&
+          group.object == null &&
+          group.subject.any(classes.contains) &&
+          (themes == null ||
+              group.subjectThemes == null ||
+              themes.any(group.subjectThemes!.contains)) &&
+          (group.requires == null ||
+              data.frames.any((frame) => frame.parts.any((part) => part.slot == group.requires))),
+    )
+    .toList(growable: false);
+
+/// The classes a [StepKind.other] step's actor may belong to: the item's, or
+/// the ones listed.
+List<NounClass> actorClassesOf(StoryStep step, WordTheme? item) {
+  if (step.actor == StoryRole.item) {
+    return item == null ? const <NounClass>[] : <NounClass>[themeClass[item]!];
+  }
+
+  return step.actorClasses ?? const <NounClass>[];
+}
+
+/// The themes it may come from, or null for any of its classes.
+List<WordTheme>? actorThemesOf(StoryStep step, WordTheme? item) {
+  if (step.actor == StoryRole.item) return item == null ? null : <WordTheme>[item];
+
+  return step.actorThemes;
+}
+
 /// The state groups that can describe this subject, and say this condition.
 List<StateGroup> statesOf(SentenceLanguageData data, NounClass subject, Condition? condition) =>
     data.states
@@ -165,6 +204,18 @@ List<VerbField> _fieldsFor(
   // anything at all into the object slot.
   if (!_has(state, step.needs) || (step.object == StoryRole.prop && prop == null)) {
     return const <VerbField>[];
+  }
+
+  // Somebody else's doing needs nothing of the hero, only a verb that takes them.
+  if (step.kind == StepKind.other) {
+    final classes = actorClassesOf(step, item);
+    final themes = actorThemesOf(step, item);
+
+    if (classes.isEmpty) return const <VerbField>[];
+
+    return step.fields
+        .where((field) => groupsForActor(data, field, classes, themes).isNotEmpty)
+        .toList(growable: false);
   }
 
   final object = step.object == StoryRole.prop ? prop : item;
@@ -262,7 +313,8 @@ _Memory _after(_Memory memory, StoryStep step, _Settled settled) {
   final said = <Condition>{...memory.said};
   final field = settled.field;
 
-  if (field != null && step.kind != StepKind.scene) {
+  // What the place or somebody else does changes nothing of the hero.
+  if (field != null && step.kind != StepKind.scene && step.kind != StepKind.other) {
     final rule = fieldRules[field]!;
 
     state.removeAll(rule.takes);

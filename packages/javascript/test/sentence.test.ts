@@ -25,7 +25,7 @@ import { WORD_DATA } from '../dist/word/data/index.js';
 import { agree } from '../dist/word/wordGenerator.js';
 import type { WordGender } from '../dist/word/data/types.js';
 import { NAME_DATA } from '../dist/name/data/index.js';
-import { SENTENCE_DATA, STORIES, THEME_CLASS } from '../dist/sentence/data/index.js';
+import { INTERLUDES, SENTENCE_DATA, STORIES, THEME_CLASS } from '../dist/sentence/data/index.js';
 import type { NounClass, VerbField, VerbGroup } from '../dist/sentence/data/types.js';
 import { shapeOf } from '../dist/sentence/sentenceGenerator.js';
 import { heroClassesFor, itemThemesFor, propThemesFor, tellable } from '../dist/sentence/story.js';
@@ -261,6 +261,26 @@ const NOUN_SLOTS: readonly SentenceSlot[] = [
 	'destination',
 	'quantity'
 ];
+
+/**
+ * Every class a story may put in a subject beside its hero: the place, what an
+ * `other` step names — the item, when the story is about a person — and the
+ * thing and the prop a remark can be about, in the story and in the interludes.
+ */
+function castOf(name: SentenceStory): NounClass[] {
+	const story = STORIES.find((each) => each.name === name)!;
+	const classes = new Set<NounClass>(['place', ...(story.item ?? []), ...(story.prop ?? [])]);
+
+	for (const step of [...story.steps, ...INTERLUDES]) {
+		if (step.kind === 'other' && step.actor !== 'item') {
+			for (const cls of step.actor ?? []) {
+				classes.add(cls);
+			}
+		}
+	}
+
+	return [...classes];
+}
 
 function sentenceOf(detail: SentenceDetail): number[] {
 	const out: number[] = [];
@@ -1125,7 +1145,7 @@ describe('Sentence', () => {
 			// A `visit` is the one story with a second person in it: the one met.
 			assert.strictEqual(
 				new Set(detail.names).size,
-				Math.min(detail.story === 'visit' ? 2 : 1, detail.names.length),
+				Math.min(detail.story === 'visit' || detail.story === 'chat' ? 2 : 1, detail.names.length),
 				detail.sentence
 			);
 		}
@@ -1406,9 +1426,13 @@ describe('Sentence', () => {
 				}
 
 				const wanted = THEME_CLASS[detail.theme];
-				// A story's scene is the one sentence whose subject is not the hero: the
-				// place it is happening in does something of its own.
-				const allowed: NounClass[] = detail.story ? [wanted, 'place'] : [wanted];
+				// A story's scene is a sentence whose subject is not the hero: the place
+				// it is happening in does something of its own. So is an `other` step —
+				// the person met, a passer-by, the weather — and a remark about the thing
+				// the story is about; the classes those may be are the story's own.
+				const allowed: NounClass[] = detail.story
+					? [wanted, 'place', ...castOf(detail.story)]
+					: [wanted];
 				// A shape that counts what it is about has no separate subject, so the
 				// counted phrase is the one that has to stay on topic. Beside a subject
 				// it is an object instead, and belongs to whatever class the verb takes.
@@ -1674,6 +1698,10 @@ describe('Sentence', () => {
 						),
 						`${language}: '${line}' is not quoted`
 					);
+
+					// One mouth speaks once, and then somebody else answers or the story
+					// goes on: two lines in a row are a line and its answer, or an answer
+					// and the hero going on.
 					assert.ok(
 						!data.speech!.subject || inner.startsWith(data.speech!.subject),
 						`${language}: '${line}' does not speak in the first person`
@@ -2887,7 +2915,17 @@ describe('Sentence', () => {
 
 		// German and Russian carry no object, so they tell the stories with nothing in
 		// the hero's hands — and they still tell one.
-		const empty: SentenceStory[] = ['stroll', 'outing', 'evening', 'idle', 'waking', 'passage'];
+		const empty: SentenceStory[] = [
+			'stroll',
+			'outing',
+			'evening',
+			'idle',
+			'waking',
+			'watch',
+			'shelter',
+			'sketch',
+			'passage'
+		];
 
 		for (const language of ['de', 'ru'] as WordLanguage[]) {
 			for (const detail of sentenceDetails({ language, sentences: 3, count: 40 })) {

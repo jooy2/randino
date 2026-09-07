@@ -99,6 +99,11 @@ const step = (source: StoryStep) => ({
 	required: source.required ?? false,
 	link: source.link ?? '',
 	kinds: [...(source.kinds ?? [])]
+	// Who an `other` step is about: the item, or the classes listed — one field
+	// here and two in the ports, written as two everywhere.
+	actor: source.actor === 'item' ? 'item' : '',
+	actorClasses: Array.isArray(source.actor) ? [...source.actor] : [],
+	actorThemes: list(source.actorThemes)
 });
 
 console.log(
@@ -188,6 +193,8 @@ console.log(
 				itemThemes: list(story.itemThemes),
 				prop: list(story.prop),
 				propThemes: list(story.propThemes),
+				heroThemes: list(story.heroThemes),
+				lines: story.lines ?? 0,
 				start: [...story.start],
 				steps: story.steps.map(step),
 				weight: story.weight

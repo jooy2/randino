@@ -59,6 +59,7 @@ from randino.name.name_length_range import name_length_range
 from randino.sentence._story import (
     Beat,
     JoinSide,
+    actor_classes_of,
     hero_classes_for,
     item_themes_for,
     pick_story,
@@ -713,6 +714,8 @@ class BeatDraw:
 
     A prop is never the item and the item never the prop.
     """
+    nameless: bool = False
+    """Whether this sentence's subject is somebody the story never introduces.
     """The nouns the story has put on the page that this sentence writes again, by slot.
 
     What `Follow.scene` carries once there is a topic to follow; this is how the first
@@ -2578,6 +2581,7 @@ def _compose(
             proper.append(
                 ""
                 if settings.include_name
+                and not (beat is not None and beat.nameless)
                 and person
                 and (part.slot == subject_slot or person_subject)
                 else None
@@ -3569,6 +3573,8 @@ STORY_KIND_WEIGHT: dict[SentenceType, int] = {"statement": 100, "exclamation": 3
 LINE_KINDS: tuple[SentenceType, ...] = ("dialogue", "thought")
 LINE_WEIGHT: dict[SentenceType, int] = {"dialogue": 60, "thought": 40}
 LINE_EXCLAIM = 30
+NOTICE_EXCLAIM = 55
+"""What somebody says of what they see somebody else doing is more often an exclamation."""
 """What each kind is worth in a sentence of a story, where the caller left it to the story.
 
 A story is told in statements; a step that allows an exclamation or a trailing end gets
@@ -3676,6 +3682,11 @@ def _tell_story(telling: Telling) -> Result | None:
     # names it twice in one sentence, so a clause that follows one that named the place
     # leaves it out.
     placed = False
+    # Whether the sentence just written was the hero's. After one that was not — the
+    # place changing, somebody else doing something, an answer — the hero is named again
+    # rather than dropped or stood a pronoun for: `바람이 분다. 조용해진다.` leaves the
+    # reader asking who.
+    hero_last = True
 
     def placeable(beat: Beat) -> bool:
         # Whether this beat may write the place: not straight after a clause that did.
@@ -3720,7 +3731,23 @@ def _tell_story(telling: Telling) -> Result | None:
 
         return roles.place
 
-    def beat_draw(beat: Beat) -> BeatDraw:
+    def actor_themes_for(step: StoryStep) -> tuple[WordTheme, ...]:
+        # The themes an `other` step's actor is drawn from.
+        if step.actor == "item":
+            return (
+                (found.item,)
+                if found.item is not None
+                else _themes_for_classes(WORD_THEMES, ("person",))
+            )
+
+        in_class = _themes_for_classes(WORD_THEMES, actor_classes_of(step, found.item))
+        own = (
+            tuple(theme for theme in in_class if theme in step.actor_themes)
+            if step.actor_themes is not None
+            else tuple(in_class)
+        )
+
+        return own or tuple(in_class)
         # What a beat asks of its sentence.
         step = beat.step
         wants: list[SentenceSlot] = []
@@ -3735,6 +3762,15 @@ def _tell_story(telling: Telling) -> Result | None:
         if placeable(beat):
             prefers.append("place")
 
+        # Whose sentence this is: the hero's, the place's, or somebody else's — the
+        # person the story is about, or a fresh noun of the classes the step names.
+        if step.kind == "scene":
+            subject: tuple[WordTheme, ...] = DESTINATION_THEMES
+        elif step.kind == "other":
+            subject = actor_themes_for(step)
+        else:
+            subject = hero_themes
+
         return BeatDraw(
             headed_by_state=step.kind == "state",
             fields=(beat.field,) if beat.field is not None else (),
@@ -3744,7 +3780,7 @@ def _tell_story(telling: Telling) -> Result | None:
             prefers=tuple(prefers),
             item=found.plan.prop if step.object == "prop" else found.item,
             places=DESTINATION_THEMES,
-            subject=DESTINATION_THEMES if step.kind == "scene" else hero_themes,
+            subject=subject,
             pinned=pinned_for(beat),
             avoid=tuple(
                 word
@@ -3754,6 +3790,11 @@ def _tell_story(telling: Telling) -> Result | None:
                 )
                 if word is not None
             ),
+            # What is true of the hero, for the verb to be drawn by; nothing for a
+            # sentence that is not about the hero.
+            state=beat.before if step.kind == "act" else None,
+            nameless=step.kind == "other" and step.actor != "item",
+        )
         )
 
     def shortest_for(beat: Beat) -> int:
@@ -3769,8 +3810,9 @@ def _tell_story(telling: Telling) -> Result | None:
         beat: Beat, budget: tuple[int, int], previous: Built | None, opened_before: str = ""
     ) -> Told:
         # One beat as one sentence, or as one clause of one.
-        nonlocal topic, day_at, placed
+        nonlocal topic, day_at, placed, hero_last
         scene = beat.step.kind == "scene"
+        aside = beat.step.kind == "other"
         # A second clause whose sentence has said when already — opened on `later`, or
         # named a time in its first clause — says it no second time.
         dated = (
@@ -3842,11 +3884,17 @@ def _tell_story(telling: Telling) -> Result | None:
                 "",
                 pinned,
             )
-        elif voiced:
+        elif aside:
+            # Somebody else's sentence: the person the story is about, named again, or a
+            # fresh noun of whatever the step names — and the hero stays the topic.
+            actor = roles.item if beat.step.actor == "item" else None
             # The hero speaks: the subject is theirs, written the way the language writes
             # a first person.
             assert topic is not None and data.speech is not None
             follow = Follow(topic, "pronoun", data.speech.subject, pinned)
+        elif topic is not None and not hero_last:
+            # After a sentence that was not the hero's, the hero is named again.
+            follow = Follow(topic, "repeat", "", pinned)
         else:
             follow = (
                 None

@@ -949,6 +949,10 @@ The sentences follow a **story**: things that happen to one subject, the hero, i
 | `picnic` | The hero goes somewhere, gets something to eat there and eats it on the spot. |
 | `mishap` | The hero loses what they carried somewhere, looks for it, and may or may not find it. |
 | `visit` | The hero goes somewhere, meets somebody and they talk. |
+| `chat` | A person goes out, meets somebody, and the two of them talk. The story with the most lines in it. |
+| `watch` | The hero goes out, sits down somewhere, and watches what happens around them: a sparrow, a passer-by, the light changing. |
+| `shelter` | The weather turns while the hero is out; they wait it out and go on once it passes. |
+| `sketch` | Nothing happens to anybody. A place is described, and the things in it do what they do: the wind, the leaves, a bird, the evening. |
 | `passage` | A thing, a plant or a place changes over the day, and nobody does anything. |
 
 `story` names one of them. Left out, it is drawn from the stories the language can tell about the subject you asked for: `theme` decides who the hero is, so `theme: 'animal'` is a story about a lion and `theme: 'plant'` can only be a `passage`. German and Russian declare no shape with an object, so they tell the stories with nothing in the hero's hands: `stroll`, `outing`, `evening`, `idle`, `waking` and `passage`. A result of one sentence tells no story, and `SentenceDetail.story` says which one a longer result told.

@@ -119,11 +119,18 @@ FIELD_RULES: dict[VerbField, FieldRule] = {
     "sell": FieldRule(needs=("awake", "holding"), takes=("holding",)),
     "buy": FieldRule(needs=("awake",), gives=("holding",), after=("hungry",)),
     "cook": FieldRule(needs=("awake", "holding"), after=("hungry",)),
+    # A meal leaves the hero full and pleased, which is what they show afterwards.
     "eat": FieldRule(
-        needs=("awake", "holding"), gives=("full",), takes=("hungry", "holding"), after=("hungry",)
+        needs=("awake", "holding"),
+        gives=("full", "content"),
+        takes=("hungry", "holding"),
+        after=("hungry",),
     ),
     "drink": FieldRule(
-        needs=("awake", "holding"), gives=("full",), takes=("hungry", "holding"), after=("hungry",)
+        needs=("awake", "holding"),
+        gives=("full", "content"),
+        takes=("hungry", "holding"),
+        after=("hungry",),
     ),
     # Losing what one holds is what makes a hero restless enough to search.
     "lose": FieldRule(
@@ -159,12 +166,14 @@ Saying the hero is full is saying they are no longer hungry, so a state sentence
 opposite of what it asserts.
 """
 
-StepKind = Literal["act", "state", "scene"]
+StepKind = Literal["act", "state", "scene", "other"]
 """What kind of step a story writes.
 
 `"act"`: the hero does something, drawn from the step's fields. `"state"`: the hero is
 described, with a predicate that says a condition. `"scene"`: the place the story is
-happening in does something of its own.
+happening in does something of its own. `"other"`: somebody or something else does — the
+person the hero met, a sparrow on the fence, the wind — and nothing of the hero's state
+changes.
 """
 
 StoryRole = Literal["item", "place", "home", "prop", "elsewhere"]
@@ -214,6 +223,15 @@ class StoryStep:
     kinds: tuple[SentenceType, ...] = ()
     """Kinds this sentence may be beside a statement."""
 
+    actor: Literal["item"] | None = None
+    """Whom an `"other"` step is about when it is the story's item: the person met."""
+
+    actor_classes: tuple[NounClass, ...] | None = None
+    """The classes a fresh actor of an `"other"` step may belong to."""
+
+    actor_themes: tuple[WordTheme, ...] | None = None
+    """The themes it may come from, when its classes are too wide."""
+
 
 @dataclass(frozen=True, slots=True)
 class Story:
@@ -239,6 +257,16 @@ class Story:
 
     prop_themes: tuple[WordTheme, ...] | None = None
     """The themes it may come from, when the classes are too wide."""
+
+    hero_themes: tuple[WordTheme, ...] | None = None
+    """The themes the hero may come from, when the classes are too wide.
+
+    A sketch is of a forest or a market, not of Pluto, though all three are the `"place"`
+    class.
+    """
+
+    lines: int | None = None
+    """The most lines one telling may quote. None for the usual two."""
 
 
 STORIES: tuple[Story, ...] = (

@@ -98,6 +98,9 @@ def step(source: StoryStep) -> dict[str, object]:
         "required": source.required,
         "link": source.link or "",
         "kinds": list(source.kinds),
+        "actor": source.actor or "",
+        "actorClasses": list(source.actor_classes or ()),
+        "actorThemes": listed(source.actor_themes),
     }
 
 
@@ -387,6 +390,8 @@ print(
                         "itemThemes": listed(story.item_themes),
                         "prop": listed(story.prop),
                         "propThemes": listed(story.prop_themes),
+                        "heroThemes": listed(story.hero_themes),
+                        "lines": story.lines or 0,
                         "start": list(story.start),
                         "steps": [step(each) for each in story.steps],
                         "weight": story.weight,

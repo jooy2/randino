@@ -274,6 +274,10 @@ SentenceStory = Literal[
     "picnic",
     "mishap",
     "visit",
+    "chat",
+    "watch",
+    "shelter",
+    "sketch",
     "passage",
 ]
 """The story a result of several sentences follows.
@@ -294,7 +298,11 @@ begins; `"picnic"` — the hero gets something to eat somewhere and eats it ther
 not a person or an animal changes over time.
 
 Which stories a language can tell depends on the shapes it declares: German and Russian
-carry no object, so they tell the ones with nothing in the hero's hands.
+carry no object, so they tell the ones with nothing in the hero's hands. `"chat"` — a person goes out, meets somebody, and the two of them talk, the
+story with the most lines in it; `"watch"` — the hero goes out, sits down somewhere, and
+watches what happens around them; `"shelter"` — the weather turns while the hero is out,
+and they wait it out; `"sketch"` — nothing happens to anybody: a place is described, and
+the things in it do what they do.
 """
 
 SentenceQuote = Literal["double", "single"]

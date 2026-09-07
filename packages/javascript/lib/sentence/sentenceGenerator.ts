@@ -81,7 +81,14 @@ import type {
 	VerbField,
 	VerbGroup
 } from './data/types.js';
-import { heroClassesFor, itemThemesFor, pickStory, plan, storiesFor } from './story.js';
+import {
+	actorClassesOf,
+	heroClassesFor,
+	itemThemesFor,
+	pickStory,
+	plan,
+	storiesFor
+} from './story.js';
 import type { Beat } from './story.js';
 
 // How many sentences to build before settling for the closest fit found.
@@ -493,6 +500,7 @@ type BeatDraw = {
 	places: readonly WordTheme[];
 	/** The themes the subject may come from, when the story has decided it. */
 	subject: readonly WordTheme[] | null;
+	nameless: boolean;
 	/**
 	 * The nouns the story has put on the page that this sentence writes again, by
 	 * slot. What `Follow.scene` carries once there is a topic to follow; this is
@@ -2358,6 +2366,7 @@ function compose(
 			THEME_CLASS[subjectTheme] === 'person' || follow?.topic.class === 'person';
 
 		return settings.includeName &&
+			!draw.beat?.nameless &&
 			theme &&
 			THEME_CLASS[theme] === 'person' &&
 			(part.slot === subjectSlot || personSubject)
@@ -3641,6 +3650,10 @@ const LINE_KINDS: readonly SentenceType[] = ['dialogue', 'thought'];
 const LINE_WEIGHT: Partial<Record<SentenceType, number>> = { dialogue: 60, thought: 40 };
 const LINE_EXCLAIM = 30;
 
+// And what somebody says of what they see somebody else doing is more often an
+// exclamation than not: `“새가 날아가네!”`
+const NOTICE_EXCLAIM = 55;
+
 // What share of a two-clause sentence's range the first clause takes.
 const FIRST_CLAUSE_SHARE = 0.5;
 
@@ -3694,6 +3707,8 @@ function storyFor(telling: Telling): {
 
 		if (planned) {
 			return { plan: planned, hero, heroThemes: themesForClasses(heroThemes, [hero]), item };
+
+			return { plan: planned, hero, heroThemes: own.length ? own : inClass, item };
 		}
 	}
 
@@ -3730,6 +3745,11 @@ function tellStory(telling: Telling): Result | null {
 	// 날아오른다` names it twice in one sentence, so a clause that follows one that
 	// named the place leaves it out.
 	let placed = false;
+	// Whether the sentence just written was the hero's. After one that was not —
+	// the place changing, somebody else doing something, an answer — the hero is
+	// named again rather than dropped or stood a pronoun for: `바람이 분다.
+	// 조용해진다.` leaves the reader asking who.
+	let heroLast = true;
 	/** Whether this beat may write the place: not straight after a clause that did. */
 	const placeable = (beat: Beat): boolean => Boolean(beat.step.place) && !placed;
 
@@ -3779,6 +3799,19 @@ function tellStory(telling: Telling): Result | null {
 		return roles.place;
 	};
 
+	/** The themes an `other` step's actor is drawn from. */
+	const actorThemesFor = (step: StoryStep): readonly WordTheme[] => {
+		if (step.actor === 'item') {
+			return item ? [item] : themesForClasses(WORD_THEMES, ['person']);
+		}
+
+		const inClass = themesForClasses(WORD_THEMES, actorClassesOf(step, item));
+		const own = step.actorThemes
+			? inClass.filter((theme) => step.actorThemes!.includes(theme))
+			: inClass;
+
+		return own.length ? own : inClass;
+	};
 	/** What a beat asks of its sentence. */
 	const beatDraw = (beat: Beat): BeatDraw => {
 		const step = beat.step;
@@ -3797,6 +3830,15 @@ function tellStory(telling: Telling): Result | null {
 			prefers.push('place');
 		}
 
+		// Whose sentence this is: the hero's, the place's, or somebody else's — the
+		// person the story is about, or a fresh noun of the classes the step names.
+		const subject =
+			step.kind === 'scene'
+				? placeThemes
+				: step.kind === 'other'
+					? actorThemesFor(step)
+					: heroThemes;
+
 		return {
 			headed: step.kind === 'state' ? 'state' : 'verb',
 			fields: beat.field ? [beat.field] : [],
@@ -3805,7 +3847,11 @@ function tellStory(telling: Telling): Result | null {
 			prefers,
 			item: step.object === 'prop' ? prop : item,
 			places: placeThemes,
-			subject: step.kind === 'scene' ? placeThemes : heroThemes,
+			subject,
+			// What is true of the hero, for the verb to be drawn by; nothing for a
+			// sentence that is not about the hero.
+			state: step.kind === 'act' ? beat.before : null,
+			nameless: step.kind === 'other' && step.actor !== 'item',
 			pinned: pinnedFor(beat),
 			avoid: [step.object === 'prop' ? roles.item?.word : roles.prop?.word].filter(
 				(word): word is string => word !== undefined
@@ -3893,7 +3939,11 @@ function tellStory(telling: Telling): Result | null {
 				pronoun: '',
 				scene: pinned
 			};
-		} else if (voiced) {
+		} else if (other) {
+			// Somebody else's sentence: the person the story is about, named again,
+			// or a fresh noun of whatever the step names — and the hero stays the
+			// topic either way.
+			const actor = beat.step.actor === 'item' ? roles.item : undefined;
 			// The hero speaks: the subject is theirs, written the way the language
 			// writes a first person.
 			follow = {
@@ -3902,6 +3952,8 @@ function tellStory(telling: Telling): Result | null {
 				pronoun: data.speech!.subject,
 				scene: pinned
 			};
+		} else if (topic && !heroLast) {
+			follow = { topic, reference: 'repeat', pronoun: '', scene: pinned };
 		} else {
 			follow = topic ? followFor(data, topic, pinned, flow.repeated, true) : null;
 		}

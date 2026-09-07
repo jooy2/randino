@@ -615,6 +615,8 @@ class _BeatDraw {
     required this.subject,
     this.pinned = const <SentenceSlot, _Requirement>{},
     this.avoid = const <String>[],
+    this.state,
+    this.nameless = false,
   });
 
   /// Whether the shape is headed by a state rather than a verb.
@@ -2344,6 +2346,7 @@ _Built _compose(
             follow?.topic.nounClass == NounClass.person;
 
         return (settings.includeName ?? false) &&
+                !(draw.beat?.nameless ?? false) &&
                 theme != null &&
                 themeClass[theme] == NounClass.person &&
                 (part.slot == subjectSlot || personSubject)
@@ -3731,6 +3734,10 @@ const Map<SentenceType, int> _lineWeight = <SentenceType, int>{
 };
 const int _lineExclaim = 30;
 
+// And what somebody says of what they see somebody else doing is more often an
+// exclamation than not: `“새가 날아가네!”`
+const int _noticeExclaim = 55;
+
 const Map<SentenceType, int> _storyKindWeight = <SentenceType, int>{
   SentenceType.statement: 100,
   SentenceType.exclamation: 35,
@@ -3840,6 +3847,11 @@ _Result? _tellStory(_Telling telling) {
   // 운동장에서 날아오른다` names it twice in one sentence, so a clause that
   // follows one that named the place leaves it out.
   var placed = false;
+  // Whether the sentence just written was the hero's. After one that was not —
+  // the place changing, somebody else doing something, an answer — the hero is
+  // named again rather than dropped or stood a pronoun for: `바람이 분다.
+  // 조용해진다.` leaves the reader asking who.
+  var heroLast = true;
 
   /// Whether this beat may write the place: not straight after a clause that did.
   bool placeable(Beat beat) => beat.step.place && !placed;
@@ -3889,6 +3901,24 @@ _Result? _tellStory(_Telling telling) {
     return roles.place!;
   }
 
+  /// The themes an `other` step's actor is drawn from.
+  List<WordTheme> actorThemesFor(StoryStep step) {
+    if (step.actor == StoryRole.item) {
+      final item = found.item;
+
+      return item == null
+          ? _themesForClasses(wordThemes, const <NounClass>[NounClass.person])
+          : <WordTheme>[item];
+    }
+
+    final inClass = _themesForClasses(wordThemes, actorClassesOf(step, found.item));
+    final own =
+        step.actorThemes == null
+            ? inClass
+            : inClass.where(step.actorThemes!.contains).toList(growable: false);
+
+    return own.isNotEmpty ? own : inClass;
+  }
   /// What a beat asks of its sentence.
   _BeatDraw beatDraw(Beat beat) {
     final step = beat.step;
@@ -3899,6 +3929,15 @@ _Result? _tellStory(_Telling telling) {
     if (step.object != null) wants.add(SentenceSlot.object);
     if (placeable(beat)) prefers.add(SentenceSlot.place);
 
+    // Whose sentence this is: the hero's, the place's, or somebody else's — the
+    // person the story is about, or a fresh noun of the classes the step names.
+    final subject =
+        step.kind == StepKind.scene
+            ? _destinationThemes
+            : step.kind == StepKind.other
+            ? actorThemesFor(step)
+            : heroThemes;
+
     return _BeatDraw(
       headedByState: step.kind == StepKind.state,
       fields: beat.field == null ? const <VerbField>[] : <VerbField>[beat.field!],
@@ -3908,12 +3947,18 @@ _Result? _tellStory(_Telling telling) {
       prefers: prefers,
       item: step.object == StoryRole.prop ? prop : found.item,
       places: _destinationThemes,
-      subject: step.kind == StepKind.scene ? _destinationThemes : heroThemes,
+      subject: subject,
       pinned: pinnedFor(beat),
       avoid: <String>[
         if (step.object == StoryRole.prop && roles.item != null) roles.item!.word,
         if (step.object != StoryRole.prop && roles.prop != null) roles.prop!.word,
       ],
+      // What is true of the hero, for the verb to be drawn by; nothing for a
+      // sentence that is not about the hero.
+      state: step.kind == StepKind.act ? beat.before : null,
+      nameless: step.kind == StepKind.other && step.actor != StoryRole.item,
+    );
+  }
     );
   }
 
@@ -3937,6 +3982,7 @@ _Result? _tellStory(_Telling telling) {
 
   _Told tell(Beat beat, LengthRange budget, _Built? previous, [String openedBefore = '']) {
     final scene = beat.step.kind == StepKind.scene;
+    final aside = beat.step.kind == StepKind.other;
     // A second clause whose sentence has said when already — opened on `later`,
     // or named a time in its first clause — says it no second time.
     final dated =
@@ -4018,10 +4064,17 @@ _Result? _tellStory(_Telling telling) {
         '',
         pinned,
       );
-    } else if (voiced) {
+    } else if (aside) {
+      // Somebody else's sentence: the person the story is about, named again,
+      // or a fresh noun of whatever the step names — and the hero stays the
+      // topic either way.
+      final actor = beat.step.actor == StoryRole.item ? roles.item : null;
       // The hero speaks: the subject is theirs, written the way the language
       // writes a first person.
       follow = _Follow(topic!, _Reference.pronoun, data.speech!.subject, pinned);
+    } else if (topic != null && !heroLast) {
+      // After a sentence that was not the hero's, the hero is named again.
+      follow = _Follow(topic!, _Reference.repeat, '', pinned);
     } else {
       follow = topic == null ? null : _followFor(data, topic!, pinned, telling.flow.repeated, true);
     }

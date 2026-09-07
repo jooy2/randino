@@ -346,6 +346,22 @@ bool isMoney(WordLanguage language, String phrase) {
 /// they are for — but a question like "is this counted phrase the subject of its
 /// own sentence" needs the boundaries back, and the phrases appear in order, so
 /// walking them against `sentences` finds them.
+/// Every class a story may put in a subject beside its hero: the place, what an
+/// `other` step names — the item, when the story is about a person — and the
+/// thing and the prop a remark can be about, in the story and in the interludes.
+List<NounClass> castOf(SentenceStory name) {
+  final story = stories.firstWhere((each) => each.name == name);
+  final classes = <NounClass>{NounClass.place, ...?story.item, ...?story.prop};
+
+  for (final step in <StoryStep>[...story.steps, ...interludes]) {
+    if (step.kind == StepKind.other && step.actor != StoryRole.item) {
+      classes.addAll(step.actorClasses ?? const <NounClass>[]);
+    }
+  }
+
+  return classes.toList(growable: false);
+}
+
 List<int> sentenceOf(SentenceDetail detail) {
   final out = <int>[];
   var at = 0;
@@ -1161,7 +1177,9 @@ void main() {
         // A `visit` is the one story with a second person in it: the one met.
         expect(
           detail.names.toSet().length,
-          lessThanOrEqualTo(detail.story == SentenceStory.visit ? 2 : 1),
+          lessThanOrEqualTo(
+            detail.story == SentenceStory.visit || detail.story == SentenceStory.chat ? 2 : 1,
+          ),
           reason: detail.sentence,
         );
       }
@@ -1500,7 +1518,11 @@ void main() {
           final wanted = themeClass[theme];
           // A story's scene is the one sentence whose subject is not the hero: the
           // place it is happening in does something of its own.
-          final allowed = <NounClass?>[wanted, if (detail.story != null) NounClass.place];
+          // A story's scene is a sentence whose subject is not the hero: the place
+          // it is happening in does something of its own. So is an `other` step —
+          // the person met, a passer-by, the weather — and a remark about the thing
+          // the story is about; the classes those may be are the story's own.
+          final allowed = <NounClass?>[wanted, if (detail.story != null) ...castOf(detail.story!)];
           // A shape that counts what it is about has no separate subject, so the
           // counted phrase is the one that has to stay on topic. It is checked
           // only in the opening sentence, and only when that sentence has no
@@ -1814,6 +1836,10 @@ void main() {
               isTrue,
               reason: "$language: '$line' is not quoted",
             );
+
+            // One mouth speaks once, and then somebody else answers or the story
+            // goes on: two lines in a row are a line and its answer, or an answer
+            // and the hero going on.
             expect(
               data.speech!.subject.isEmpty || inner.startsWith(data.speech!.subject),
               isTrue,
@@ -3170,6 +3196,9 @@ void main() {
         SentenceStory.evening,
         SentenceStory.idle,
         SentenceStory.waking,
+        SentenceStory.watch,
+        SentenceStory.shelter,
+        SentenceStory.sketch,
         SentenceStory.passage,
       ];
 

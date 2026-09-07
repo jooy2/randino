@@ -142,6 +142,51 @@ def groups_of(
     ]
 
 
+def groups_for_actor(
+    data: SentenceLanguageData,
+    field: VerbField,
+    classes: Sequence[NounClass],
+    themes: Sequence[WordTheme] | None,
+) -> list[VerbGroup]:
+    """The intransitive verb groups of a field that can take somebody else as subject.
+
+    One of these classes, narrowed to these themes where the group narrows itself. What
+    an `"other"` step draws from.
+    """
+    return [
+        group
+        for group in data.verbs
+        if group.field == field
+        and group.object is None
+        and any(cls in classes for cls in group.subject)
+        and (
+            themes is None
+            or group.subject_themes is None
+            or any(theme in group.subject_themes for theme in themes)
+        )
+        and (
+            group.requires is None
+            or any(part.slot == group.requires for frame in data.frames for part in frame.parts)
+        )
+    ]
+
+
+def actor_classes_of(step: StoryStep, item: WordTheme | None) -> tuple[NounClass, ...]:
+    """The classes an `"other"` step's actor may belong to: the item's, or the ones listed."""
+    if step.actor == "item":
+        return (THEME_CLASS[item],) if item is not None else ()
+
+    return step.actor_classes or ()
+
+
+def actor_themes_of(step: StoryStep, item: WordTheme | None) -> tuple[WordTheme, ...] | None:
+    """The themes it may come from, or None for any of its classes."""
+    if step.actor == "item":
+        return (item,) if item is not None else None
+
+    return step.actor_themes
+
+
 def states_of(
     data: SentenceLanguageData, subject: NounClass, condition: Condition | None
 ) -> list[StateGroup]:
@@ -169,6 +214,18 @@ def _fields_for(
     # at all into the object slot.
     if not _has(state, step.needs) or (step.object == "prop" and prop is None):
         return []
+
+    # Somebody else's doing needs nothing of the hero, only a verb that takes them.
+    if step.kind == "other":
+        classes = actor_classes_of(step, item)
+        actor_themes = actor_themes_of(step, item)
+
+        if not classes:
+            return []
+
+        return [
+            field for field in step.fields if groups_for_actor(data, field, classes, actor_themes)
+        ]
 
     theme = prop if step.object == "prop" else item
 
@@ -275,7 +332,8 @@ def _after(
     said = set(memory.said)
     field, condition = settled
 
-    if field is not None and step.kind != "scene":
+    # What the place or somebody else does changes nothing of the hero.
+    if field is not None and step.kind not in ("scene", "other"):
         rule = FIELD_RULES[field]
 
         state.difference_update(rule.takes)

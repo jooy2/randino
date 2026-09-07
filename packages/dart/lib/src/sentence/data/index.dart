@@ -174,15 +174,16 @@ const Map<VerbField, FieldRule> fieldRules = <VerbField, FieldRule>{
     needs: <Condition>[Condition.awake, Condition.holding],
     after: <Condition>[Condition.hungry],
   ),
+  // A meal leaves the hero full and pleased, which is what they show afterwards.
   VerbField.eat: FieldRule(
     needs: <Condition>[Condition.awake, Condition.holding],
-    gives: <Condition>[Condition.full],
+    gives: <Condition>[Condition.full, Condition.content],
     takes: <Condition>[Condition.hungry, Condition.holding],
     after: <Condition>[Condition.hungry],
   ),
   VerbField.drink: FieldRule(
     needs: <Condition>[Condition.awake, Condition.holding],
-    gives: <Condition>[Condition.full],
+    gives: <Condition>[Condition.full, Condition.content],
     takes: <Condition>[Condition.hungry, Condition.holding],
     after: <Condition>[Condition.hungry],
   ),
@@ -230,6 +231,10 @@ enum StepKind {
 
   /// The place the story is happening in does something of its own.
   scene,
+
+  /// Somebody or something else does — the person the hero met, a sparrow on
+  /// the fence, the wind — and nothing of the hero's state changes.
+  other,
 }
 
 /// What the story's nouns a step names: the thing, the place, or home.
@@ -271,10 +276,23 @@ class StoryStep {
     this.required = false,
     this.link,
     this.kinds = const <SentenceType>[],
+    this.actor,
+    this.actorClasses,
+    this.actorThemes,
   });
 
   /// What kind of step this is.
   final StepKind kind;
+
+  /// Whom a [StepKind.other] step is about when it is the story's item: the
+  /// person met. Only [StoryRole.item] means anything here.
+  final StoryRole? actor;
+
+  /// The classes a fresh actor of a [StepKind.other] step may belong to.
+  final List<NounClass>? actorClasses;
+
+  /// The themes it may come from, when its classes are too wide.
+  final List<WordTheme>? actorThemes;
 
   /// The fields an action may draw from, best first.
   final List<VerbField> fields;
@@ -317,10 +335,20 @@ class Story {
     this.itemThemes,
     this.prop,
     this.propThemes,
+    this.heroThemes,
+    this.lines,
   });
 
   /// Which story this is.
   final SentenceStory name;
+
+  /// The themes the hero may come from, when the classes are too wide: a
+  /// sketch is of a forest or a market, not of Pluto, though all three are the
+  /// place class.
+  final List<WordTheme>? heroThemes;
+
+  /// The most lines one telling may quote. Null for the usual two.
+  final int? lines;
 
   /// Classes the hero may belong to.
   final List<NounClass> hero;
@@ -1081,6 +1109,29 @@ const List<Story> stories = <Story>[
       ),
     ],
   ),
+  // Two people talk. The hero goes out, meets somebody, and what the two of them
+  // say to each other is most of the story — it is the one that allows the most
+  // lines, and the person met is the one who answers them.
+  Story(
+    name: SentenceStory.chat,
+    hero: <NounClass>[NounClass.person],
+    item: <NounClass>[NounClass.person],
+    // Something at the place, looked at while they talk.
+    prop: <NounClass>[NounClass.thing, NounClass.plant, NounClass.edible],
+    propThemes: <WordTheme>[WordTheme.object, WordTheme.plant, WordTheme.food, WordTheme.drink],
+    lines: 5,
+    name: SentenceStory.watch,
+    hero: agentClasses,
+    // Something seen from where they sit.
+    prop: <NounClass>[NounClass.plant, NounClass.thing],
+    propThemes: <WordTheme>[WordTheme.plant, WordTheme.object],
+    name: SentenceStory.shelter,
+    hero: agentClasses,
+    name: SentenceStory.sketch,
+    hero: <NounClass>[NounClass.place],
+    heroThemes: <WordTheme>[WordTheme.place, WordTheme.nature],
+    start: <Condition>[],
+    weight: 16,
   Story(
     name: SentenceStory.passage,
     hero: <NounClass>[
@@ -1153,6 +1204,11 @@ const List<StoryStep> interludes = <StoryStep>[
     needs: <Condition>[Condition.away],
     link: ConnectiveKind.temporal,
   ),
+  // And somebody else is about: a passer-by, a bird on a fence.
+  StoryStep(
+    StepKind.other,
+    actorClasses: <NounClass>[NounClass.creature, NounClass.person],
+    actorThemes: <WordTheme>[WordTheme.animal, WordTheme.job],
 ];
 
 /// The sentence dataset for each language the word pools cover.

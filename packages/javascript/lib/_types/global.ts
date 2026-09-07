@@ -421,6 +421,14 @@ export type SentenceTense = 'present' | 'past';
  * - `picnic`: the hero gets something to eat somewhere and eats it there.
  * - `mishap`: the hero loses what they carried, looks for it, and may or may not find it.
  * - `visit`: the hero goes to see somebody, and they talk.
+ * - `chat`: a person goes out, meets somebody, and the two of them talk — the
+ *   story with the most lines in it. People only.
+ * - `watch`: the hero goes out, sits down somewhere, and watches what happens
+ *   around them — a sparrow, a passer-by, the light changing.
+ * - `shelter`: the weather turns while the hero is out; they wait it out and
+ *   go on once it passes.
+ * - `sketch`: nothing happens to anybody. A place is described, and the things
+ *   in it do what they do: the wind, the leaves, a bird, the evening.
  * - `passage`: something that is not a person or an animal changes over time —
  *   an apple ripens and cools, a sky darkens and deepens.
  *
@@ -442,6 +450,10 @@ export type SentenceStory =
 	| 'picnic'
 	| 'mishap'
 	| 'visit'
+	| 'chat'
+	| 'watch'
+	| 'shelter'
+	| 'sketch'
 	| 'passage';
 
 /**
@@ -575,6 +587,14 @@ export interface RandSentenceOptions extends RandCommonOptions {
 	 * 먹었다`). It keeps the tense, the level and the register it opened in, spends
 	 * its verbs before it repeats one, names a person and then leaves them alone,
 	 * and never opens two of its sentences on the same word.
+	 *
+	 * Not every story is about somebody doing things: one describes a place and
+	 * what moves in it, one has the hero sit and watch. Somebody else may turn up
+	 * in any of them — a passer-by, the person met — and do something of their
+	 * own. Whether anybody speaks is drawn per result: a paragraph may be narrated
+	 * all the way through, quote a line or two, or carry a short exchange, in
+	 * which a person says what they feel, what they just did, or what they make
+	 * of the thing in front of them, and somebody answers.
 	 *
 	 * `minLength` and `maxLength` describe the whole string whatever this is, so
 	 * the range is shared out across the sentences before any of them is drawn.

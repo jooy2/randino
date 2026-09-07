@@ -31,7 +31,7 @@ from randino.name.data import NAME_DATA
 # it — these checks read the pools a sentence is allowed to draw from.
 from randino.sentence._generator import shape_of
 from randino.sentence._story import hero_classes_for, item_themes_for, tellable
-from randino.sentence.data import SENTENCE_DATA, STORIES, THEME_CLASS
+from randino.sentence.data import INTERLUDES, SENTENCE_DATA, STORIES, THEME_CLASS
 from randino.sentence.data._types import (
     ModifierGroup,
     NounClass,
@@ -833,6 +833,22 @@ def test_unique_never_repeats_a_sentence() -> None:
     assert len(set(sentences)) == len(sentences)
 
 
+def cast_of(name: SentenceStory) -> tuple[NounClass, ...]:
+    """Every class a story may put in a subject beside its hero.
+
+    The place, what an `other` step names — the item, when the story is about a person —
+    and the thing and the prop a remark can be about, in the story and the interludes.
+    """
+    story = next(each for each in STORIES if each.name == name)
+    classes: set[NounClass] = {"place", *(story.item or ()), *(story.prop or ())}
+
+    for step in (*story.steps, *INTERLUDES):
+        if step.kind == "other" and step.actor != "item":
+            classes.update(step.actor_classes or ())
+
+    return tuple(sorted(classes))
+
+
 def sentence_of(detail: SentenceDetail) -> list[int]:
     """Which sentence of a result each phrase belongs to.
 
@@ -1291,9 +1307,13 @@ def test_the_sentences_of_one_result_are_about_the_same_kind_of_thing() -> None:
                 continue
 
             wanted = THEME_CLASS[detail.theme]
-            # A story's scene is the one sentence whose subject is not the hero: the
-            # place it is happening in does something of its own.
-            allowed: tuple[NounClass, ...] = (wanted, "place") if detail.story else (wanted,)
+            # A story's scene is a sentence whose subject is not the hero: the place it
+            # is happening in does something of its own. So is an `other` step — the
+            # person met, a passer-by, the weather — and a remark about the thing the
+            # story is about; the classes those may be are the story's own.
+            allowed: tuple[NounClass, ...] = (
+                (wanted, "place", *cast_of(detail.story)) if detail.story else (wanted,)
+            )
             # A shape that counts what it is about has no separate subject, so the
             # counted phrase is the one that has to stay on topic. It is checked only in
             # the opening sentence, and only when that sentence has no subject of its
@@ -1533,6 +1553,8 @@ def test_a_person_in_a_story_sometimes_speaks_for_themselves_and_nobody_else_doe
 
         for detail in untyped(language, "job"):
             spoken = sum(1 for type_ in detail.types if quoted(type_))
+            story = next(each for each in STORIES if each.name == detail.story)
+            most = story.lines or 2
 
             lines += spoken
             assert spoken <= 2, f"{language}: {spoken} lines ({detail.sentence})"
@@ -2695,7 +2717,17 @@ def test_more_than_one_sentence_tells_a_story_and_one_sentence_tells_none() -> N
 
     # German and Russian carry no object, so they tell the stories with nothing in the
     # hero's hands — and they still tell one.
-    empty: tuple[SentenceStory, ...] = ("stroll", "outing", "evening", "idle", "waking", "passage")
+    empty: tuple[SentenceStory, ...] = (
+        "stroll",
+        "outing",
+        "evening",
+        "idle",
+        "waking",
+        "watch",
+        "shelter",
+        "sketch",
+        "passage",
+    )
 
     for language in ("de", "ru"):
         for detail in rand_sentence(

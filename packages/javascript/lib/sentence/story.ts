@@ -122,6 +122,51 @@ export function takesTheme(group: VerbGroup, theme: WordTheme): boolean {
 	);
 }
 
+/**
+ * The intransitive verb groups of a field that can take somebody else as their
+ * subject: one of these classes, narrowed to these themes where the group narrows
+ * itself. What an `other` step draws from.
+ */
+export function groupsForActor(
+	data: SentenceLanguageData,
+	field: VerbField,
+	classes: readonly NounClass[],
+	themes: readonly WordTheme[] | null
+): readonly VerbGroup[] {
+	return data.verbs.filter(
+		(group) =>
+			group.field === field &&
+			!group.object &&
+			group.subject.some((cls) => classes.includes(cls)) &&
+			(!themes ||
+				!group.subjectThemes ||
+				themes.some((theme) => group.subjectThemes!.includes(theme))) &&
+			(!group.requires ||
+				data.frames.some((frame) => frame.parts.some((part) => part.slot === group.requires)))
+	);
+}
+
+/** The classes an `other` step's actor may belong to: the item's, or the ones listed. */
+export function actorClassesOf(step: StoryStep, item: WordTheme | null): readonly NounClass[] {
+	if (step.actor === 'item') {
+		return item ? [THEME_CLASS[item]] : [];
+	}
+
+	return step.actor ?? [];
+}
+
+/** The themes it may come from, or null for any of its classes. */
+export function actorThemesOf(
+	step: StoryStep,
+	item: WordTheme | null
+): readonly WordTheme[] | null {
+	if (step.actor === 'item') {
+		return item ? [item] : null;
+	}
+
+	return step.actorThemes ?? null;
+}
+
 /** The state groups that can describe this subject, and say this condition. */
 export function statesOf(
 	data: SentenceLanguageData,
@@ -154,6 +199,17 @@ function fieldsFor(
 	// anything at all into the object slot.
 	if (!has(state, step.needs) || (step.object === 'prop' && prop === null)) {
 		return [];
+	}
+
+	// Somebody else's doing needs nothing of the hero, only a verb that takes
+	// them — and, for the story's item, an item the story has to be about.
+	if (step.kind === 'other') {
+		const classes = actorClassesOf(step, item);
+		const themes = actorThemesOf(step, item);
+
+		return classes.length
+			? fieldsOf(step).filter((field) => groupsForActor(data, field, classes, themes).length > 0)
+			: [];
 	}
 
 	const object = step.object === 'prop' ? prop : item;
@@ -250,7 +306,8 @@ function after(
 	const given = new Set(memory.given);
 	const said = new Set(memory.said);
 
-	if (settled.field && step.kind !== 'scene') {
+	// What the place or somebody else does changes nothing of the hero.
+	if (settled.field && step.kind !== 'scene' && step.kind !== 'other') {
 		const rule = FIELD_RULES[settled.field];
 
 		for (const condition of rule.takes ?? []) {

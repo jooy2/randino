@@ -71,6 +71,11 @@ Map<String, Object?> step(StoryStep source) => <String, Object?>{
   'required': source.required,
   'link': source.link?.name ?? '',
   'kinds': <String>[for (final kind in source.kinds) kind.name],
+  'actor': source.actor?.name ?? '',
+  'actorClasses': <String>[for (final noun in source.actorClasses ?? const <NounClass>[]) noun.name],
+  'actorThemes': source.actorThemes == null
+      ? null
+      : <String>[for (final theme in source.actorThemes!) theme.name],
 };
 
 /// Flattens a lookup, keyed by string so a syllable count compares as one.
@@ -470,6 +475,10 @@ void main() {
               'propThemes': story.propThemes == null
                   ? null
                   : <String>[for (final theme in story.propThemes!) theme.name],
+              'heroThemes': story.heroThemes == null
+                  ? null
+                  : <String>[for (final theme in story.heroThemes!) theme.name],
+              'lines': story.lines ?? 0,
               'start': <String>[for (final c in story.start) c.name],
               'steps': <Object?>[for (final each in story.steps) step(each)],
               'weight': story.weight,

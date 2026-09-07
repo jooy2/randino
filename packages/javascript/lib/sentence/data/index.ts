@@ -114,15 +114,16 @@ export const FIELD_RULES: Record<VerbField, FieldRule> = {
 	sell: { needs: ['awake', 'holding'], takes: ['holding'] },
 	buy: { needs: ['awake'], gives: ['holding'], after: ['hungry'] },
 	cook: { needs: ['awake', 'holding'], after: ['hungry'] },
+	// A meal leaves the hero full and pleased, which is what they show afterwards.
 	eat: {
 		needs: ['awake', 'holding'],
-		gives: ['full'],
+		gives: ['full', 'content'],
 		takes: ['hungry', 'holding'],
 		after: ['hungry']
 	},
 	drink: {
 		needs: ['awake', 'holding'],
-		gives: ['full'],
+		gives: ['full', 'content'],
 		takes: ['hungry', 'holding'],
 		after: ['hungry']
 	},
@@ -158,7 +159,11 @@ export const OPPOSITES: Partial<Record<Condition, Condition>> = {
  * - `state`: the hero is described, with a predicate that says `condition`, which
  *   the story then knows to be true.
  * - `scene`: the place the story is happening in does something of its own
- *   (`숲이 조용해졌다`), which is the one step whose subject is not the hero.
+ *   (`숲이 조용해졌다`), which is a step whose subject is not the hero.
+ * - `other`: somebody or something else does — the person the hero met, a
+ *   sparrow on the fence, the wind. `actor` says who: the story's item (`'item'`,
+ *   for a story whose item is a person) or a fresh noun of the classes listed,
+ *   narrowed to `actorThemes`. What they do changes nothing of the hero's state.
  *
  * `object`, `place` and `destination` name the story's own nouns rather than
  * themes: the `item` is one thing throughout, the `place` is where it all happens
@@ -167,9 +172,16 @@ export const OPPOSITES: Partial<Record<Condition, Condition>> = {
  * drawn afresh.
  */
 export type StoryStep = {
-	kind: 'act' | 'state' | 'scene';
+	kind: 'act' | 'state' | 'scene' | 'other';
 	field?: VerbField | readonly VerbField[];
 	condition?: Condition;
+	/**
+	 * Who an `other` step is about: the story's item, or a fresh noun of one of
+	 * these classes. Left out by every other kind of step.
+	 */
+	actor?: 'item' | readonly NounClass[];
+	/** The themes a fresh actor may come from, when its classes are too wide. */
+	actorThemes?: readonly WordTheme[];
 	/**
 	 * The noun in the object slot: the thing the story is about, or its prop — a
 	 * second thing the hero picks up or looks at on the way, which is never what
@@ -200,6 +212,18 @@ export type Story = {
 	name: SentenceStory;
 	/** Classes the hero may belong to. */
 	hero: readonly NounClass[];
+	/**
+	 * The themes the hero may come from, when the classes are too wide: a sketch
+	 * is of a forest or a market, not of Pluto, though all three are the `place`
+	 * class.
+	 */
+	heroThemes?: readonly WordTheme[];
+	/**
+	 * The most lines one telling may quote — what somebody says or thinks, and
+	 * what somebody answers. Left out for the usual two; a story about two people
+	 * talking allows more.
+	 */
+	lines?: number;
 	/** Classes the thing the story is about may belong to, for a story with one. */
 	item?: readonly NounClass[];
 	/**
