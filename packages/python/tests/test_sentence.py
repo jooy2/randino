@@ -13,6 +13,7 @@ from randino import (
     WORD_LANGUAGES,
     WORD_THEMES,
     RandRealism,
+    RandVocabulary,
     SentenceDetail,
     SentenceQuote,
     SentenceShape,
@@ -2891,6 +2892,47 @@ def test_vocabulary_decides_how_common_the_nouns_are() -> None:
     # assertions read a phrase: every noun the phrase could have been built around, and
     # one of them has to be at the level asked for.
     nounish = ("subject", "object", "place", "destination")
+
+    for language in WORD_LANGUAGES:
+        # In the form a sentence writes a noun, which is lowercase where the pools
+        # capitalize.
+        basic = {plain(language, word) for word in WORD_DATA[language].levels.basic}
+        rare = {plain(language, word) for word in WORD_DATA[language].levels.rare}
+        # Home is the sentence data's own word, not a noun of the pools.
+        homes = set(SENTENCE_DATA[language].homes)
+
+        def check(
+            vocabulary: RandVocabulary,
+            fits: Callable[[str], bool],
+            language: WordLanguage = language,
+            homes: set[str] = homes,
+        ) -> None:
+            for detail in rand_sentence(
+                output="detail",
+                language=language,
+                vocabulary=vocabulary,
+                sentences=3,
+                include_name=False,
+                count=40,
+            ):
+                for i, slot in enumerate(detail.slots):
+                    if slot not in nounish:
+                        continue
+
+                    found = nouns_in(language, detail.phrases[i])
+
+                    if found and not any(word in homes for word in found):
+                        assert any(fits(word) for word in found), (
+                            f"{language}: {detail.phrases[i]} is not {vocabulary} ({detail.sentence})"
+                        )
+
+        def unrare(word: str, rare: set[str] = rare) -> bool:
+            return word not in rare
+
+        check("basic", basic.__contains__)
+        check("common", unrare)
+
+
 def test_a_story_moves_its_day_forward_and_never_back() -> None:
     for language in WORD_LANGUAGES:
         day = SENTENCE_DATA[language].times.day

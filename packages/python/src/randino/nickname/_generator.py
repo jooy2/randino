@@ -38,11 +38,13 @@ from randino._internal.generate import (
     resolve_length,
     resolve_prefix,
     resolve_realism,
+    resolve_vocabulary,
 )
 from randino._internal.utils import pick
 from randino._types import (
     NicknameDetail,
     RandRealism,
+    RandVocabulary,
     WordLanguage,
     WordLanguageOption,
     WordSlot,
@@ -54,6 +56,7 @@ from randino.word._generator import (
     agree,
     draw_word,
     gender_of,
+    levelled_nouns,
     pool_bounds,
     theme_of,
     themes_of,
@@ -79,6 +82,7 @@ class Settings:
     slots: tuple[WordSlot, ...] | Literal["all", "none"]
     invent: int
     loose: bool
+    vocabulary: RandVocabulary
     prefix: str
     min_length: int | None = None
     max_length: int | None = None
@@ -386,7 +390,13 @@ def natural_range(language: WordLanguage, separator: str | None = None) -> tuple
     """
     data = WORD_DATA[language]
     settings = Settings(
-        theme="all", slots="all", invent=0, loose=True, prefix="", separator=separator
+        theme="all",
+        slots="all",
+        invent=0,
+        loose=True,
+        vocabulary="full",
+        prefix="",
+        separator=separator,
     )
     joiner = len(joiner_of(data, settings))
     ranges = [
@@ -413,7 +423,7 @@ def generate_one(language: WordLanguage, settings: Settings) -> Built:
     for _attempt in range(FIT_ATTEMPTS):
         # One theme per nickname, so a mixed request spreads over all of them.
         theme = pick(themes)
-        nouns = data.nouns[theme]
+        nouns = levelled_nouns(data, theme, settings.vocabulary)
         bounds = slot_bounds(language, data, theme)
         low, high = bounds_for(data, allowed, bounds, settings)
         # Prefer a shape that can actually land inside the range.
@@ -461,6 +471,7 @@ def generate_nickname_details(
     slots: WordSlotOption = "all",
     count: int = 1,
     realism: RandRealism = "real",
+    vocabulary: RandVocabulary = "full",
     min_length: int | None = None,
     max_length: int | None = None,
     word_separator: str | None = None,
@@ -473,6 +484,7 @@ def generate_nickname_details(
         slots=resolve_slots(slots),
         invent=resolve_realism(realism),
         loose=realism != "real",
+        vocabulary=resolve_vocabulary(vocabulary),
         min_length=resolve_length(min_length),
         max_length=resolve_length(max_length),
         prefix=resolve_prefix(starts_with),

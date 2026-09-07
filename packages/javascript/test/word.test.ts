@@ -35,6 +35,7 @@ import {
 import type {
 	RandRealism,
 	RandThemedWordOptions,
+	RandVocabulary,
 	WordDetail,
 	WordLanguage,
 	WordTheme
@@ -338,6 +339,58 @@ describe('Word', () => {
 				}
 			}
 		}
+	});
+
+	it('vocabulary narrows the pools to the words people use', () => {
+		// Every noun is basic, common or rare, and the two ends are listed per
+		// language. `basic` draws the everyday words, `common` leaves the rare ones
+		// out, and `full` is the pools as they are. A word in a list has to be in a
+		// pool, no word is in both lists, and every theme keeps enough everyday words
+		// to draw from.
+		for (const language of WORD_LANGUAGES) {
+			const data = WORD_DATA[language];
+			const pool = new Set(nounsOf(language));
+			const basic = new Set(data.levels.basic);
+			const rare = new Set(data.levels.rare);
+
+			for (const word of [...basic, ...rare]) {
+				assert.ok(pool.has(word), `${language}: ${word} is in a level and in no pool`);
+			}
+
+			for (const word of basic) {
+				assert.ok(!rare.has(word), `${language}: ${word} is both basic and rare`);
+			}
+
+			for (const theme of WORD_THEMES) {
+				const everyday = nounsOf(language, theme).filter((word) => basic.has(word));
+
+				assert.ok(everyday.length >= 8, `${language}: ${theme} has ${everyday.length} basic words`);
+			}
+
+			for (const detail of details({ language, vocabulary: 'basic', count: 200 })) {
+				assert.ok(basic.has(detail.word), `${language}: ${detail.word} is not basic`);
+			}
+
+			for (const detail of details({ language, vocabulary: 'common', count: 200 })) {
+				assert.ok(!rare.has(detail.word), `${language}: ${detail.word} is rare`);
+			}
+		}
+
+		// The full pool is the default, and `basic` reaches every theme.
+		const themes = new Set(
+			details({ language: 'ko', vocabulary: 'basic', count: 600 }).map((d) => d.theme)
+		);
+
+		assert.strictEqual(themes.size, WORD_THEMES.length);
+
+		const rare = new Set(WORD_DATA.ko.levels.rare);
+
+		assert.ok(details({ language: 'ko', count: 600 }).some((detail) => rare.has(detail.word)));
+
+		// A level the type rules out falls back to every word rather than throwing.
+		const unknown = 'sparse' as unknown as RandVocabulary;
+
+		assert.strictEqual(randWord({ language: 'ko', vocabulary: unknown, count: 5 }).length, 5);
 	});
 
 	it('unique never repeats a word', () => {

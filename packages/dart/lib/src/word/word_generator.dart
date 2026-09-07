@@ -213,6 +213,39 @@ bool poolCapitalizes(WordPool pool) {
   return false;
 }
 
+final Map<WordLanguageData, Map<String, WordPool>> _levelCache =
+    <WordLanguageData, Map<String, WordPool>>{};
+
+/// The nouns of one theme as common as the caller asked: the whole pool at
+/// [RandVocabulary.full], the pool without its rare words at
+/// [RandVocabulary.common], and its everyday words alone at
+/// [RandVocabulary.basic]. The whole pool where a level would leave nothing,
+/// which no theme of any language comes to — `test/word_test.dart` asserts it.
+WordPool levelledNouns(WordLanguageData data, WordTheme theme, RandVocabulary vocabulary) {
+  final pool = data.nouns[theme]!;
+
+  if (vocabulary == RandVocabulary.full) return pool;
+
+  final byTheme = _levelCache.putIfAbsent(data, () => <String, WordPool>{});
+  final key = '${theme.name}:${vocabulary.name}';
+  final cached = byTheme[key];
+
+  if (cached != null) return cached;
+
+  final basic = data.levels.basic.toSet();
+  final rare = data.levels.rare.toSet();
+  final kept = pool
+      .where(
+        (word) => vocabulary == RandVocabulary.basic ? basic.contains(word) : !rare.contains(word),
+      )
+      .toList(growable: false);
+  final usable = kept.isEmpty ? pool : kept;
+
+  byTheme[key] = usable;
+
+  return usable;
+}
+
 /// Theme a word belongs to, across every theme of the language.
 WordTheme? themeOf(WordLanguageData data, String word) {
   for (final theme in wordThemes) {
@@ -390,6 +423,7 @@ WordDetail _generateOne(
   WordLanguage language,
   WordTheme? theme,
   int invent,
+  RandVocabulary vocabulary,
   int? minLength,
   int? maxLength,
   String prefix,
@@ -402,7 +436,7 @@ WordDetail _generateOne(
   for (var attempt = 0; attempt < _fitAttempts; attempt += 1) {
     // One theme per word, so a mixed request spreads over all of them.
     final drawnTheme = pick(themes);
-    final pool = data.nouns[drawnTheme]!;
+    final pool = levelledNouns(data, drawnTheme, vocabulary);
     final natural = poolBounds(pool);
     final range = lengthBounds(minLength, maxLength, natural.min, natural.max);
     final drawn = drawWord(data, pool, invent, range.min, range.max, prefix);
@@ -443,6 +477,7 @@ List<WordDetail> generateWordDetails({
   WordTheme? theme,
   int count = 1,
   RandRealism realism = RandRealism.real,
+  RandVocabulary vocabulary = RandVocabulary.full,
   int? minLength,
   int? maxLength,
   String? startsWith,
@@ -460,7 +495,7 @@ List<WordDetail> generateWordDetails({
     draw: () {
       final WordLanguage code = language ?? pick(wordLanguages);
 
-      return _generateOne(code, theme, invent, minLength, maxLength, prefix);
+      return _generateOne(code, theme, invent, vocabulary, minLength, maxLength, prefix);
     },
     keyOf: (detail) => detail.word,
   );

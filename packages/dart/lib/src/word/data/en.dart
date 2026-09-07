@@ -413,6 +413,130 @@ final WordLanguageData en = WordLanguageData(
   // English compounds without a particle (OwlFeather), so there is no possessive
   // shape here: `Of` would be a word rather than something that attaches to the
   // word in front of it, and a word separator would land on the wrong side.
+  // How common each noun is, for `vocabulary` to draw by: the everyday words,
+  // and the ones a specialist or a dictionary would know. Every noun in neither
+  // list is common.
+  levels: WordLevels(
+    basic: words(r'''
+      Lion Tiger Leopard Cheetah Fox Wolf Bear Panda Rabbit Squirrel Cat Puppy Whale Dolphin Shark
+      Turtle Seal Penguin Owl Eagle Swan Duck Goose Parrot Peacock Horse Deer Elephant Giraffe Hippo
+      Monkey Gorilla Frog Lizard Snake Butterfly Bee Ladybug Snail Ant Spider Octopus Starfish Crab
+      Shrimp Salmon Camel Koala Bat Zebra Buffalo Jellyfish Donkey Pony Lamb Kitten Beetle Bottle
+      Pencil Eraser Umbrella Lamp Clock Mirror Keyring Padlock Cap Boot Goggles Button Thread Brush
+      Paint Paper Notebook Bookmark Letter Postcard Compass Telescope Camera Radio Balloon Kite
+      Marbles Dice Card Puzzle Blocks Anchor Tent Backpack Torch Candle Kettle Spoon Plate Magnet
+      Ribbon Envelope Cushion Basket Broom Whistle Knot Bucket File Folder Paperclip Bolt Screw
+      Chain Rope Zipper Badge Jar Sky Wave Tide Ocean River Lake Waterfall Mountain Hillside Meadow
+      Forest Desert Boulder Pebble Volcano Earthquake Glacier Canyon Echo Shadow Avalanche Treetop
+      Leaf Blossom Petal Seedling Berry Moss Fern Bamboo Pinecone Maple Dandelion Sunflower Lotus
+      Orchid Tulip Lavender Pine Oak Acorn Chestnut Walnut Sprout Stem Twig Bark Bud Pollen Nectar
+      Cactus Seaweed Hedge Vine Olive Palm Basil Parsley Gold Silver Copper Iron Steel Bronze Brass
+      Tin Platinum Crystal Sapphire Emerald Marble Coral Chalk Diamond Freedom Peace Justice Truth
+      Wisdom Memory Story Poem Grammar Physics Chemistry Biology Mathematics History Legend Riddle
+      Secret Promise Journey Adventure Discovery Experiment Question Answer Festival Balance Culture
+      Language Alphabet Calendar Symbol Tradition Ceremony Dragon Phoenix Goblin Troll Elf Dwarf
+      Fairy Mermaid Ogre Demon Angel Ghost Vampire Werewolf Zombie Mummy Unicorn Genie Spell Curse
+      Potion Witch Nightmare Portal Charm Blessing Wizard Thief Pirate Sailor Captain Chef Gardener
+      Poet Painter Dancer Clown Warrior Soldier Guard Queen Prince Princess Emperor Servant Maid
+      Farmer Pilot Engineer Firefighter Officer Doctor Nurse Teacher Student Librarian Reporter
+      Writer Singer Actor Director Miner Carpenter Priest Inventor Explorer Traveler Athlete Referee
+      Piano Guitar Drum Melody Rhythm Chord Lullaby Flute Clarinet Trumpet Saxophone Harp Cello
+      Violin Harmonica Xylophone Tambourine Cymbal Organ Chorus Duet Orchestra Choir Conductor Verse
+      Scale Key Sheet Pedal Bow String Market Village Bridge Garden Library Museum Theater
+      Schoolyard Harbor Pier Station Airport Lighthouse Palace Temple Tower Attic Rooftop Balcony
+      Greenhouse Barn Cottage Cabin Bakery Kitchen Bedroom Hallway Staircase Tunnel Playground
+      Stadium Clinic Pharmacy Bookshop Aquarium Basement Lobby Workshop Studio Windmill Warehouse
+      Campsite Crossroads Roundabout Rice Porridge Noodle Dumpling Bread Toast Cheese Yogurt Omelet
+      Pancake Waffle Doughnut Cookie Biscuit Cupcake Brownie Pudding Pastry Croissant Bagel Pretzel
+      Sandwich Burger Pizza Pasta Spaghetti Lasagna Curry Stew Salad Pickle Sausage Bacon Steak
+      Meatball Barbecue Taco Burrito Sushi Tofu Potato Carrot Cabbage Lettuce Spinach Broccoli
+      Pumpkin Cucumber Garlic Mushroom Apple Strawberry Grape Watermelon Peach Lemon Banana Mango
+      Pineapple Blueberry Chocolate Candy Honey Syrup Lemonade Popcorn Muffin Ramen Cheesecake
+      Soccer Football Baseball Basketball Volleyball Tennis Badminton Golf Bowling Swimming Marathon
+      Sprint Gymnastics Taekwondo Judo Karate Boxing Wrestling Sailing Surfing Skiing Snowboard
+      Hockey Rugby Cricket Cycling Climbing Racket Medal Trophy Champion Skating Diving Jogging
+      Relay Scoreboard Penalty Halftime Kickoff Homerun Dunk Somersault Cartwheel Handstand Backflip
+      Warmup Timeout Bicycle Boat Bus Taxi Truck Motorbike Scooter Skateboard Airplane Helicopter
+      Spaceship Rocket Submarine Sailboat Raft Kayak Ferry Wagon Cart Tractor Bulldozer Firetruck
+      Ambulance Subway Sleigh Parachute Minivan Pickup Limousine Yacht Shuttle Tricycle Trailer
+      Laptop Computer Keyboard Monitor Printer Speaker Earbuds Headphone Microphone Drone Tablet
+      Smartphone Charger Battery Remote Fridge Vacuum Heater Toaster Blender Oven Microwave
+      Television Razor Toothbrush Shampoo Perfume Lipstick Sneakers Dishwasher Dryer Hairdryer
+      Lotion Sunscreen Mattress Curtain Doorbell Calculator Whiteboard Lightbulb Stapler Towel
+      Hanger Bookshelf Pillowcase Apricot Mustard Lime Mint Navy Plum Rust Cream Beige Charcoal Jet
+      Blonde Ginger Bone Smoke Denim Wine Brick Clay Sand Straw Powder Ice Ash Coal Cinnamon Wheat
+      Receipt Share Interest Loan Deposit Savings Account Budget Capital Profit Debt Credit Check
+      Exchange Refund Wage Salary Bonus Coupon Vault Withdrawal Statement Allowance Expense Discount
+      Server Buffer Pixel Packet Queue Stack Cursor Backup Cluster Snapshot Container Pipeline
+      Commit Array Matrix Instruction Register Texture Broadcast Directory Cloud Breeze Rain Snow
+      Frost Icicle Mist Rainbow Sunset Lightning Thunder Typhoon Drizzle Blizzard Raindrop Shower
+      Rainstorm Snowstorm Sandstorm Hurricane Tornado Smog Humidity Forecast Sunshine Heatwave Chill
+      Snowflake Star Moon Galaxy Comet Meteor Starlight Moonbeam Eclipse Universe Planet Satellite
+      Asteroid Orbit Gravity Crater Blackhole Milkyway Fullmoon Newmoon Halfmoon Skyline Astronomy
+      Equator Sunrise Dawn Dusk Season Moment Holiday Morning Noon Afternoon Evening Night Midnight
+      Midday Yesterday Today Tomorrow Weekday Weekend Decade Century Instant Springtime Summertime
+      Winter Daytime Nighttime Lifetime Childhood Youth Nowadays Courage Curiosity Patience Wonder
+      Friendship Joy Anger Fear Surprise Delight Cheer Comfort Relief Sadness Loneliness Regret
+      Guilt Shame Pride Envy Jealousy Greed Passion Warmth Kindness Trust Doubt Worry Anxiety Terror
+      Panic Rage Boredom Excitement Confidence Bravery Emotion Mood Temper Head Forehead Eyebrow
+      Eyelash Eyelid Nose Cheek Chin Jaw Lip Tongue Tooth Gum Ear Neck Shoulder Elbow Wrist Knuckle
+      Finger Thumb Fingernail Fist Chest Rib Belly Spine Waist Hip Thigh Knee Ankle Heel Toe Toenail
+      Skull Muscle Heart Lung Liver Stomach Kidney Brain Blood Skin Hair Beard Tear Sweat Breath
+      Pulse Heartbeat Backbone Kneecap Eyeball Wrinkle Freckle Dimple Scar Bruise Blister Glove
+      Scarf Bathrobe Coat Jacket Shirt Blouse Trousers Jeans Shorts Skirt Dress Gown Vest Cardigan
+      Sweater Jumper Hoodie Sock Tights Underwear Pajamas Apron Necktie Bowtie Belt Sneaker Sandal
+      Slipper Uniform Costume Robe Raincoat Swimsuit Overalls Sleeve Collar Fabric Silk Cotton Wool
+      Leather Helmet Hat Shoe Glasses Boots Mitten Shovel Ladder Wrench Pliers Level Ruler Scissors
+      Needle Punch Hammer Drill Sandpaper Plane Pickaxe Rake Screwdriver Crowbar Lever Wedge Grater
+      Spade Handle Blade Toolkit Toolbox Chainsaw Axe Saw Coffee Cocoa Water Soda Cider Smoothie
+      Milkshake Latte Espresso Cappuccino Beer Whiskey Vodka Rum Tequila Gin Cocktail Champagne
+      Icewater Hotwater Milk Juice Tea Sparkling
+    '''),
+    rare: words(r'''
+      Kestrel Marten Marmoset Tapir Okapi Ibex Chamois Cygnet Osprey Ibis Cormorant Petrel Sandpiper
+      Plover Lapwing Warbler Hoopoe Macaque Spindle Bedroll Cogwheel Mainspring Bobbin Rasp Inkpot
+      Nib Blotter Steppe Atoll Headland Isthmus Islet Mesa Butte Crevasse Moraine Scree Talus Shoal
+      Fumarole Karst Crag Rootlet Cowslip Columbine Larkspur Zinnia Freesia Alder Frond Bulrush
+      Sedge Larch Linden Duckweed Wormwood Foxtail Sepal Stamen Pistil Calyx Rhizome Tuber Arbor
+      Bough Gladiolus Oleander Blackthorn Delphinium Lupine Aster Ranunculus Gorse Bracken Horsetail
+      Liverwort Sorrel Marjoram Tarragon Carnelian Peridot Zircon Malachite Lapis Mica Pyrite Gypsum
+      Tourmaline Tanzanite Sunstone Bloodstone Azurite Chalcedony Citrine Morganite Kunzite Spinel
+      Alexandrite Chrysoprase Rhodonite Sodalite Labradorite Amazonite Aventurine Hematite Magnetite
+      Galena Bauxite Cinnabar Realgar Orpiment Barite Celestite Apatite Beryl Corundum Olivine
+      Pyroxene Amphibole Serpentine Chlorite Kaolin Bentonite Zeolite Antimony Bismuth Cadmium
+      Iridium Osmium Palladium Rhodium Ruthenium Tantalum Niobium Vanadium Tellurium Germanium
+      Gallium Indium Thallium Rubidium Caesium Strontium Barium Almanac Axiom Corollary Allegory
+      Annal Covenant Catharsis Wyvern Cockatrice Manticore Satyr Seraph Djinn Grimoire Revenant Lich
+      Wyrm Dryad Naiad Gorgon Faun Norn Augur Sigil Glyph Portent Homunculus Kobold Ifrit Barghest
+      Selkie Kelpie Wendigo Roc Simurgh Undine Sylph Efreet Marid Naga Rakshasa Oni Tengu Kitsune
+      Kappa Bunyip Lindworm Amphisbaena Catoblepas Peryton Scrying Ley Reliquary Phylactery Warding
+      Coachman Minstrel Cavalier Stonecutter Conservator Actuary Philologist Typesetter Notary
+      Underwriter Draftsman Millwright Machinist Fitter Rigger Glazier Upholsterer Cobbler Milliner
+      Dyer Tanner Glassblower Silversmith Luthier Perfumer Vintner Kalimba Zither Nocturne Etude
+      Fugue Cantata Oratorio Madrigal Coda Diminuendo Legato Tremolo Glissando Arpeggio Semitone
+      Stave Soundhole Syncopation Toccata Partita Minuet Mazurka Bolero Chorale Motet Ostinato
+      Consonance Cadenza Backbeat Timbre Contralto Descant Obbligato Byway Esplanade Larder
+      Meadowland Pastureland Farmstead Belfry Cloister Rampart Quay Rotunda Colonnade Portico Agora
+      Necropolis Cenotaph Weir Congee Bisque Consomme Terrine Kendo Biathlon Velodrome Pommel
+      Palanquin Dredger Palfrey Skiff Sampan Coracle Outrigger Turboprop Sailplane Autogyro
+      Tiltrotor Halftrack Snowcat Railbus Percolator Slipmat Vermilion Carmine Cerise Ocher Umber
+      Chartreuse Cerulean Ultramarine Viridian Bister Ecru Puce Russet Sable Gamboge Verdigris
+      Celadon Escrow Levy Annuity Lien Bullion Exchequer Remittance Arbitrage Debenture Passbook
+      Guarantor Liquidity Solvency Outlay Arrears Daemon Subnet Hostname Checksum Boolean Parser
+      Lexer Bytecode Assembler Throughput Namespace Middleware Webhook Hashing Salting Sharding
+      Rasterizer Shader Viewport Framebuffer Bitfield Octet Downlink Multicast Datagram Bootloader
+      Symlink Zephyr Squall Hoarfrost Rime Graupel Nimbus Cirrus Stratus Quasar Pulsar Firmament
+      Perihelion Aphelion Apogee Perigee Nadir Azimuth Parallax Redshift Starlore Telescopy Lunation
+      Sidereal Ecliptic Solarsail Aeon Dotage Dayspring Eventide Forenoon Gloaming Nightlong
+      Sennight Vesper Springtide Wintertide Autumntide Prudence Temperance Fortitude Reverie Rapture
+      Ardor Fervor Timidity Gladness Mirth Levity Rancor Wistfulness Sinew Espadrille Brogue
+      Kerchief Petticoat Bodice Doublet Kaftan Topcoat Awl Caliper Plumbline Chalkline Adze
+      Whetstone Harrow Flail Rivetgun Lathe Ripsaw Coping Gouge Burin Scriber Setsquare Tsquare
+      Bevel Jointer Miter Ballpeen Screwjack Pincer Bradawl Burnisher Drawknife Spokeshave Miterbox
+      Nailset Plumbbob Ristretto Digestif Grog Wassail Sweetwater Nitrobrew Curacao Ouzo Raki Arrack
+      Verjuice Switchel Barleywater Ricewater
+    '''),
+  ),
   frames: const <WordFrame>[
     WordFrame(<WordSlot>[WordSlot.noun], 10),
     WordFrame(<WordSlot>[WordSlot.adjective, WordSlot.noun], 34),

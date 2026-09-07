@@ -22,6 +22,7 @@ from randino._internal.utils import capitalize_first, chance, clamp, pick, rand_
 from randino._types import (
     ModifierKind,
     RandRealism,
+    RandVocabulary,
     WordDetail,
     WordLanguage,
     WordLanguageOption,
@@ -235,6 +236,40 @@ def pool_capitalizes(pool: WordPool) -> bool:
     return False
 
 
+_LEVEL_CACHE: dict[tuple[int, WordTheme, RandVocabulary], WordPool] = {}
+
+
+def levelled_nouns(
+    data: WordLanguageData, theme: WordTheme, vocabulary: RandVocabulary
+) -> WordPool:
+    """The nouns of one theme as common as the caller asked.
+
+    The whole pool at `"full"`, the pool without its rare words at `"common"`, and its
+    everyday words alone at `"basic"`. The whole pool where a level would leave nothing,
+    which no theme of any language comes to — `tests/test_word.py` asserts it.
+    """
+    pool = data.nouns[theme]
+
+    if vocabulary == "full":
+        return pool
+
+    key = (id(data), theme, vocabulary)
+    cached = _LEVEL_CACHE.get(key)
+
+    if cached is not None:
+        return cached
+
+    basic = set(data.levels.basic)
+    rare = set(data.levels.rare)
+    kept = tuple(
+        word for word in pool if (word in basic if vocabulary == "basic" else word not in rare)
+    )
+    usable = kept or pool
+    _LEVEL_CACHE[key] = usable
+
+    return usable
+
+
 def theme_of(data: WordLanguageData, word: str) -> WordTheme | None:
     """Theme a word belongs to, across every theme of the language."""
     for theme in WORD_THEMES:
@@ -388,6 +423,7 @@ class Settings(NamedTuple):
 
     theme: WordThemeOption
     invent: int
+    vocabulary: RandVocabulary
     min_length: int | None
     max_length: int | None
     prefix: str
@@ -403,7 +439,7 @@ def generate_one(language: WordLanguage, settings: Settings) -> WordDetail:
     for _attempt in range(FIT_ATTEMPTS):
         # One theme per word, so a mixed request spreads over all of them.
         theme = pick(themes)
-        pool = data.nouns[theme]
+        pool = levelled_nouns(data, theme, settings.vocabulary)
         natural_low, natural_high = pool_bounds(pool)
         low, high = length_bounds(
             settings.min_length, settings.max_length, natural_low, natural_high
@@ -441,6 +477,7 @@ def generate_word_details(
     theme: WordThemeOption = "all",
     count: int = 1,
     realism: RandRealism = "real",
+    vocabulary: RandVocabulary = "full",
     min_length: int | None = None,
     max_length: int | None = None,
     starts_with: str = "",
@@ -450,6 +487,7 @@ def generate_word_details(
     settings = Settings(
         theme=theme,
         invent=resolve_realism(realism),
+        vocabulary=resolve_vocabulary(vocabulary),
         min_length=min_length,
         max_length=max_length,
         prefix=resolve_prefix(starts_with),

@@ -271,6 +271,28 @@ describe('Nickname', () => {
 		}
 	});
 
+	it('vocabulary decides how common the noun is', () => {
+		// The noun a nickname is built around is drawn as common as the caller asked;
+		// the modifier in front of it is drawn as it always was.
+		for (const language of WORD_LANGUAGES) {
+			const basic = new Set(WORD_DATA[language].levels.basic);
+			const rare = new Set(WORD_DATA[language].levels.rare);
+			const nouns = new Set(nounsOf(language));
+
+			for (const detail of nicknameDetails({ language, vocabulary: 'basic', count: 120 })) {
+				const noun = detail.words[detail.slots.indexOf('noun')];
+
+				assert.ok(basic.has(noun), `${language}: ${noun} is not basic (${detail.nickname})`);
+			}
+
+			for (const detail of nicknameDetails({ language, vocabulary: 'common', count: 120 })) {
+				const noun = detail.words[detail.slots.indexOf('noun')];
+
+				assert.ok(nouns.has(noun) && !rare.has(noun), `${language}: ${noun} is rare`);
+			}
+		}
+	});
+
 	it('a word belongs to exactly one theme', () => {
 		// Two themes claiming one word make `theme` ambiguous, and make
 		// `randNickname`'s detail form report a theme the caller never asked about.

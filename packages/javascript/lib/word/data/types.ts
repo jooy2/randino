@@ -75,6 +75,21 @@ export type WordFrame = {
 	weight: number;
 };
 
+/**
+ * How common each noun is, for `vocabulary` to draw by. `basic` lists the words
+ * nearly every speaker uses daily, `rare` the ones a specialist or a dictionary
+ * would know, and every noun in neither is common. Two lists rather than a tag
+ * on every noun: they name the two ends, and the middle is what is left. The
+ * lists are a judgement about the language's own words — `탈륨` is rare because
+ * nobody says it, not because thallium is obscure — and `test/word.test.ts`
+ * asserts every word in them is in a pool, and that every theme keeps a handful
+ * of basic words.
+ */
+export type WordLevels = {
+	basic: WordPool;
+	rare: WordPool;
+};
+
 export type WordLanguageData = {
 	// Joins words that are put together. '' everywhere so far — Korean and CJK
 	// words run together, and alphabetic ones read as CamelCase (BraveLion).
@@ -84,6 +99,9 @@ export type WordLanguageData = {
 	// The words themselves, grouped by theme. Deliberately common nouns — never
 	// person names.
 	nouns: Record<WordTheme, WordPool>;
+	// How common each noun is: the everyday ones and the rare ones, listed; the
+	// rest are common. What `vocabulary` narrows the pools by.
+	levels: WordLevels;
 	// The gender of each noun, for a language whose modifiers agree with it.
 	// Written as a `gato:m` tag on the pool and split out by `taggedNouns`, so
 	// each word is still typed once.

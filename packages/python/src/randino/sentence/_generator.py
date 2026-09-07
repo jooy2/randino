@@ -39,6 +39,7 @@ from randino._internal.script import ends_with_consonant, ends_with_liquid
 from randino._internal.utils import chance, clamp, pick, pick_weighted
 from randino._types import (
     RandRealism,
+    RandVocabulary,
     SentenceDetail,
     SentenceQuote,
     SentenceShapeOption,
@@ -93,6 +94,7 @@ from randino.word._generator import (
     agree,
     draw_word,
     gender_of,
+    levelled_nouns,
     modifier_follows,
     pick_word,
     pool_bounds,
@@ -351,6 +353,9 @@ class Settings:
 
     invent: int
     """How often one word is invented rather than drawn, as a percentage."""
+
+    vocabulary: RandVocabulary
+    """How common the nouns have to be."""
 
     prefix: str
     include: tuple[str, ...]
@@ -1197,34 +1202,34 @@ def _required_at(frame: SentenceFrame, plan: Plan, slot: SentenceSlot) -> Requir
 
 # --- Pools and bounds -------------------------------------------------------
 
-_NOUN_CACHE: dict[tuple[WordLanguage, WordTheme], WordPool] = {}
+_NOUN_CACHE: dict[tuple[WordLanguage, WordTheme, RandVocabulary], WordPool] = {}
 
 # The subject pools a trait narrows, by group and theme. Every group a sentence considers
 # reads them for every theme it could take, and filtering two hundred nouns each time is
 # what made a paragraph slow once every language had them. A group is a constant of its
 # language's data and lives as long as the process, so its `id` is a stable key.
-_SUBJECT_POOL_CACHE: dict[tuple[int, WordTheme], WordPool] = {}
-_PLACE_POOL_CACHE: dict[tuple[WordLanguage, WordTheme], WordPool] = {}
+_SUBJECT_POOL_CACHE: dict[tuple[int, WordTheme, RandVocabulary], WordPool] = {}
+_PLACE_POOL_CACHE: dict[tuple[WordLanguage, WordTheme, RandVocabulary], WordPool] = {}
 _BOUNDS_CACHE: dict[WordLanguage, dict[str, tuple[int, int]]] = {}
-_SPAN_CACHE: dict[tuple[WordLanguage, WordTheme, int], tuple[int, int]] = {}
+_SPAN_CACHE: dict[tuple[WordLanguage, WordTheme, int, RandVocabulary], tuple[int, int]] = {}
 _AGREED_CACHE: dict[tuple[WordLanguage, WordTheme | None, WordGender | None], WordPool] = {}
 
 
-def _nouns_of(language: WordLanguage, theme: WordTheme) -> WordPool:
-    """The nouns of one theme a sentence may use.
+def _nouns_of(language: WordLanguage, theme: WordTheme, vocabulary: RandVocabulary) -> WordPool:
+    """The nouns of one theme a sentence may use, as common as the caller asked.
 
     A language that inflects leaves out the nouns with no singular: `ножницы` and
     `Jeans` would need a plural verb beside them, and a verb pool written twice over is
     a lot of data for a dozen words.
     """
-    key = (language, theme)
+    key = (language, theme, vocabulary)
     cached = _NOUN_CACHE.get(key)
 
     if cached is not None:
         return cached
 
     data = WORD_DATA[language]
-    every = data.nouns[theme]
+    every = levelled_nouns(data, theme, vocabulary)
     gender = data.noun_gender
     pool = (
         every
@@ -1238,7 +1243,9 @@ def _nouns_of(language: WordLanguage, theme: WordTheme) -> WordPool:
     return usable
 
 
-def _noun_span(language: WordLanguage, theme: WordTheme, invent: int) -> tuple[int, int]:
+def _noun_span(
+    language: WordLanguage, theme: WordTheme, invent: int, vocabulary: RandVocabulary
+) -> tuple[int, int]:
     """Shortest and longest noun one phrase can actually be given.
 
     Not the same question `pool_bounds` answers: at `realism="invented"` the word comes
@@ -1246,13 +1253,13 @@ def _noun_span(language: WordLanguage, theme: WordTheme, invent: int) -> tuple[i
     at most two syllables where its pools hold words of twelve letters. A budget
     measured against the wrong one of those is a `min_length` the phrase cannot reach.
     """
-    key = (language, theme, invent)
+    key = (language, theme, invent, vocabulary)
     cached = _SPAN_CACHE.get(key)
 
     if cached is not None:
         return cached
 
-    pool_low, pool_high = pool_bounds(_nouns_of(language, theme))
+    pool_low, pool_high = pool_bounds(_nouns_of(language, theme, vocabulary))
     syn_low, syn_high = synth_bounds(WORD_DATA[language].syn)
 
     if invent >= 100:
@@ -1353,7 +1360,7 @@ def _slot_bounds(language: WordLanguage) -> dict[str, tuple[int, int]]:
         return cached
 
     data = SENTENCE_DATA[language]
-    noun = _span([_nouns_of(language, theme) for theme in WORD_THEMES])
+    noun = _span([_nouns_of(language, theme, "full") for theme in WORD_THEMES])
     bounds = {
         "subject": noun,
         "object": noun,
@@ -1588,7 +1595,7 @@ def _accepts_object_noun(data: SentenceLanguageData, group: VerbGroup, noun: str
     return group.object_without is None or not any(t in traits for t in group.object_without)
 
 
-_OBJECT_POOL_CACHE: dict[tuple[int, WordTheme], WordPool] = {}
+_OBJECT_POOL_CACHE: dict[tuple[int, WordTheme, RandVocabulary], WordPool] = {}
 
 
 def _object_pool_avoiding(
@@ -1596,6 +1603,7 @@ def _object_pool_avoiding(
     data: SentenceLanguageData,
     group: VerbGroup | StateGroup,
     theme: WordTheme,
+    vocabulary: RandVocabulary,
     avoid: tuple[str, ...],
 ) -> WordPool:
     """The object pool without the story's other thing.
@@ -1603,7 +1611,7 @@ def _object_pool_avoiding(
     A prop is never the item and the item never the prop. The whole pool where nothing else
     is left.
     """
-    pool = _object_pool_for(language, data, group, theme)
+    pool = _object_pool_for(language, data, group, theme, vocabulary)
 
     if not avoid:
         return pool
@@ -1619,16 +1627,17 @@ def _object_pool_for(
     data: SentenceLanguageData,
     group: VerbGroup | StateGroup,
     theme: WordTheme,
+    vocabulary: RandVocabulary,
 ) -> WordPool:
     """The nouns of a theme a group's object may be drawn from."""
-    pool = _nouns_of(language, theme)
+    pool = _nouns_of(language, theme, vocabulary)
 
     if not isinstance(group, VerbGroup) or (
         group.object_traits is None and group.object_without is None
     ):
         return pool
 
-    key = (id(group), theme)
+    key = (id(group), theme, vocabulary)
     cached = _OBJECT_POOL_CACHE.get(key)
 
     if cached is not None:
@@ -1648,6 +1657,7 @@ def _object_themes_of(
     data: SentenceLanguageData,
     group: VerbGroup,
     beat: BeatDraw | None,
+    vocabulary: RandVocabulary,
 ) -> tuple[WordTheme, ...]:
     """The themes a verb group's object may come from.
 
@@ -1670,12 +1680,15 @@ def _object_themes_of(
     if group.object_traits is None and group.object_without is None:
         return by_theme
 
-    return tuple(theme for theme in by_theme if _object_pool_for(language, data, group, theme))
+    return tuple(
+        theme for theme in by_theme if _object_pool_for(language, data, group, theme, vocabulary)
+    )
 
 
 def _verb_groups_for(
     language: WordLanguage,
     data: SentenceLanguageData,
+    vocabulary: RandVocabulary,
     frame: SentenceFrame,
     themes: Sequence[WordTheme],
     plan: Plan,
@@ -1739,9 +1752,21 @@ def _verb_groups_for(
             and not _accepts_object(group, beat.item)
         ):
             continue
-        if not _subject_themes_of(language, data, group, themes):
+        # A group that shows a condition is drawn only for a hero it is true of — and,
+        # for somebody else in a story whose state nobody knows, only where it shows
+        # nothing worse than being pleased: a passer-by may smile, and never clutches
+        # their stomach.
+        if beat is not None and group.condition is not None:
+            if beat.state is not None:
+                if group.condition not in beat.state:
+                    continue
+            elif group.condition != "content":
+                continue
+        if not _subject_themes_of(language, data, group, themes, vocabulary):
             continue
-        if group.object is not None and not _object_themes_of(language, data, group, beat):
+        if group.object is not None and not _object_themes_of(
+            language, data, group, beat, vocabulary
+        ):
             continue
 
         usable.append(group)
@@ -1770,6 +1795,7 @@ def _subject_themes_of(
     data: SentenceLanguageData,
     group: VerbGroup | StateGroup,
     themes: Sequence[WordTheme],
+    vocabulary: RandVocabulary,
 ) -> tuple[WordTheme, ...]:
     """The themes a group's subject may come from, out of the ones asked for.
 
@@ -1785,7 +1811,11 @@ def _subject_themes_of(
     )
 
     if isinstance(group, VerbGroup) and group.subject_traits is not None:
-        return tuple(theme for theme in by_theme if _subject_pool_for(language, data, group, theme))
+        return tuple(
+            theme
+            for theme in by_theme
+            if _subject_pool_for(language, data, group, theme, vocabulary)
+        )
 
     return by_theme
 
@@ -1833,9 +1863,10 @@ def _subject_pool_for(
     data: SentenceLanguageData,
     group: VerbGroup | StateGroup,
     theme: WordTheme,
+    vocabulary: RandVocabulary,
 ) -> WordPool:
     """The nouns of a theme a group's subject may be drawn from."""
-    pool = _nouns_of(language, theme)
+    pool = _nouns_of(language, theme, vocabulary)
     narrowed = isinstance(group, VerbGroup) and (
         group.subject_traits is not None or group.subject_without is not None
     )
@@ -1845,7 +1876,7 @@ def _subject_pool_for(
     if not narrowed and (data.traits is None or data.traits.get("lifeless") is None):
         return pool
 
-    key = (id(group), theme)
+    key = (id(group), theme, vocabulary)
     cached = _SUBJECT_POOL_CACHE.get(key)
 
     if cached is not None:
@@ -1859,7 +1890,7 @@ def _subject_pool_for(
 
 
 def _place_pool_for(
-    language: WordLanguage, data: SentenceLanguageData, theme: WordTheme
+    language: WordLanguage, data: SentenceLanguageData, theme: WordTheme, vocabulary: RandVocabulary
 ) -> WordPool:
     """The nouns of a theme a place or a destination may be drawn from.
 
@@ -1867,13 +1898,13 @@ def _place_pool_for(
     `space` the way a river and a moon are, and their language lists them `"placeless"`.
     The whole theme where nothing is left, which no pool comes to.
     """
-    pool = _nouns_of(language, theme)
+    pool = _nouns_of(language, theme, vocabulary)
     placeless = (data.traits or {}).get("placeless")
 
     if placeless is None:
         return pool
 
-    key = (language, theme)
+    key = (language, theme, vocabulary)
     cached = _PLACE_POOL_CACHE.get(key)
 
     if cached is not None:
@@ -1905,6 +1936,7 @@ def _subject_noun_of(frame: SentenceFrame, plan: Plan, follow: Follow | None) ->
 def _state_groups_for(
     language: WordLanguage,
     data: SentenceLanguageData,
+    vocabulary: RandVocabulary,
     themes: Sequence[WordTheme],
     frame: SentenceFrame,
     plan: Plan,
@@ -1929,7 +1961,7 @@ def _state_groups_for(
             and not _accepts_subject(group, subject.theme)
         ):
             continue
-        if not _subject_themes_of(language, data, group, themes):
+        if not _subject_themes_of(language, data, group, themes, vocabulary):
             continue
 
         usable.append(group)
@@ -2066,6 +2098,7 @@ def _noun_phrase(
     count: str,
     described: WordTheme | None,
     only: WordPool | None = None,
+    vocabulary: RandVocabulary = "full",
 ) -> Phrase:
     """Build one noun phrase: an article, the noun, and a modifier where there is room.
 
@@ -2080,7 +2113,7 @@ def _noun_phrase(
     lexicon = WORD_DATA[language]
     # `only` is the nouns the group has narrowed the subject to: a flier for a verb that
     # takes off. The theme's whole pool otherwise.
-    pool = only if only is not None else _nouns_of(language, theme)
+    pool = only if only is not None else _nouns_of(language, theme, vocabulary)
     space = len(data.space)
     _, noun_max = span
     # Measured against the base forms, because the noun that decides the gender has not
@@ -2224,10 +2257,13 @@ def _theme_for_part(
     group: VerbGroup | None,
     themes: Sequence[WordTheme],
     beat: BeatDraw | None,
+    vocabulary: RandVocabulary,
 ) -> WordTheme:
     """The theme a phrase other than the subject draws from."""
     if slot in ("object", "quantity"):
-        usable = _object_themes_of(language, data, group, beat) if group is not None else ()
+        usable = (
+            _object_themes_of(language, data, group, beat, vocabulary) if group is not None else ()
+        )
 
         return pick(usable or WORD_THEMES)
 
@@ -2484,14 +2520,22 @@ def _compose(
         states = (
             [data.calendar.copula]
             if copular and data.calendar is not None
-            else _state_groups_for(language, data, themes, frame, plan, beat) or list(data.states)
+            else _state_groups_for(language, data, settings.vocabulary, themes, frame, plan, beat)
+            or list(data.states)
         )
         state_group = pick(states)
         chosen: VerbGroup | StateGroup = state_group
         base = state_group.words
     else:
         verbs = _verb_groups_for(
-            language, data, frame, themes, plan, beat, _subject_noun_of(frame, plan, follow)
+            language,
+            data,
+            settings.vocabulary,
+            frame,
+            themes,
+            plan,
+            beat,
+            _subject_noun_of(frame, plan, follow),
         ) or [
             group
             for group in data.verbs
@@ -2515,7 +2559,7 @@ def _compose(
         draw.tense,
         data.join if draw.link == "first" else None,
     )
-    subject_themes = _subject_themes_of(language, data, chosen, themes)
+    subject_themes = _subject_themes_of(language, data, chosen, themes, settings.vocabulary)
     # Which part is the subject is the shape's business, not the slot's: a counted
     # shape has no `subject` part and its quantity is the subject.
     subject_slot = _subject_slot_of(frame)
@@ -2612,7 +2656,9 @@ def _compose(
         part_themes.append(
             required.theme
             if required is not None and required.theme is not None
-            else _theme_for_part(language, data, part.slot, verb_group, themes, beat)
+            else _theme_for_part(
+                language, data, part.slot, verb_group, themes, beat, settings.vocabulary
+            )
         )
 
     # What a phrase writes instead of a noun phrase, when it writes one at all: a
@@ -2706,7 +2752,7 @@ def _compose(
             span = (
                 _name_span(language)
                 if proper[index] == ""
-                else _noun_span(language, theme, settings.invent)
+                else _noun_span(language, theme, settings.invent, settings.vocabulary)
             )
             own[part.slot] = exact or span
             # A word no pool holds is described by any modifier; a noun by the ones that
@@ -2876,15 +2922,20 @@ def _compose(
                 span=(noun_low, noun_high),
                 count=_count_text(data, theme) if part.slot == "quantity" else "",
                 described=None if required is not None and not required.known else theme,
-                only=_subject_pool_for(language, data, chosen, theme)
+                only=_subject_pool_for(language, data, chosen, theme, settings.vocabulary)
                 if part.slot == subject_slot
                 else (
                     _object_pool_avoiding(
-                        language, data, chosen, theme, beat.avoid if beat is not None else ()
+                        language,
+                        data,
+                        chosen,
+                        theme,
+                        settings.vocabulary,
+                        beat.avoid if beat is not None else (),
                     )
                     if part.slot == "object"
                     else (
-                        _place_pool_for(language, data, theme)
+                        _place_pool_for(language, data, theme, settings.vocabulary)
                         if part.slot in ("place", "destination")
                         else None
                     )
@@ -3927,7 +3978,7 @@ def _tell_story(telling: Telling) -> Result | None:
             lexicon = WORD_DATA[language]
 
             roles.place = Requirement(
-                _plain(lexicon, pick(_place_pool_for(language, data, theme))),
+                _plain(lexicon, pick(_place_pool_for(language, data, theme, settings.vocabulary))),
                 ("place",),
                 theme=theme,
             )
@@ -4716,11 +4767,20 @@ def _generate_one(language: WordLanguage, settings: Settings, draw: Draw) -> Bui
             return bool(_themes_for_classes(requested, classes))
 
         if any(part.slot == "state" for part in frame.parts):
-            return bool(_state_groups_for(language, data, requested, frame, plan, beat))
+            return bool(
+                _state_groups_for(language, data, settings.vocabulary, requested, frame, plan, beat)
+            )
 
         return bool(
             _verb_groups_for(
-                language, data, frame, requested, plan, beat, _subject_noun_of(frame, plan, follow)
+                language,
+                data,
+                settings.vocabulary,
+                frame,
+                requested,
+                plan,
+                beat,
+                _subject_noun_of(frame, plan, follow),
             )
         )
 
@@ -4841,6 +4901,7 @@ def generate_sentence_details(
     include: str | Sequence[str] = (),
     count: int = 1,
     realism: RandRealism = "real",
+    vocabulary: RandVocabulary = "full",
     min_length: int | None = None,
     max_length: int | None = None,
     starts_with: str = "",
@@ -4863,6 +4924,7 @@ def generate_sentence_details(
         include: Words the sentence has to contain, each at least once.
         count: How many sentences to return.
         realism: Whether the words are real ones or invented to read like the language.
+        vocabulary: How common the nouns have to be.
         min_length: Minimum length in characters.
         max_length: Maximum length in characters.
         starts_with: Keep only sentences whose first character is this one.
@@ -4884,6 +4946,7 @@ def generate_sentence_details(
         shape=shape,
         slots=_resolve_slots(slots),
         invent=resolve_realism(realism),
+        vocabulary=resolve_vocabulary(vocabulary),
         min_length=resolve_length(min_length),
         max_length=resolve_length(max_length),
         prefix=resolve_prefix(starts_with),

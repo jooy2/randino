@@ -6,6 +6,7 @@ from typing import Literal, overload
 from randino._types import (
     RandOutput,
     RandRealism,
+    RandVocabulary,
     SentenceDetail,
     SentenceQuote,
     SentenceShapeOption,
@@ -30,6 +31,7 @@ def rand_sentence(
     include: str | Sequence[str] = ...,
     count: int = ...,
     realism: RandRealism = ...,
+    vocabulary: RandVocabulary = ...,
     min_length: int | None = ...,
     max_length: int | None = ...,
     starts_with: str = ...,
@@ -55,6 +57,7 @@ def rand_sentence(
     include: str | Sequence[str] = ...,
     count: int = ...,
     realism: RandRealism = ...,
+    vocabulary: RandVocabulary = ...,
     min_length: int | None = ...,
     max_length: int | None = ...,
     starts_with: str = ...,
@@ -79,6 +82,7 @@ def rand_sentence(
     include: str | Sequence[str] = (),
     count: int = 1,
     realism: RandRealism = "real",
+    vocabulary: RandVocabulary = "full",
     min_length: int | None = None,
     max_length: int | None = None,
     starts_with: str = "",
@@ -117,6 +121,9 @@ def rand_sentence(
         count: How many sentences to return. Held inside `0`..`RAND_COUNT_MAX`.
         realism: Whether the words are real ones or invented to read like the language.
             The grammar stays real either way; only the vocabulary changes.
+        vocabulary: How common the nouns have to be — the subject, the object, the
+            place, the thing a story is about. See `rand_word`. The verbs, the
+            modifiers and the adverbials are the sentence data's own.
         min_length: Minimum length in characters. Defaults to the language's own range.
         max_length: Maximum length in characters.
         starts_with: Keep only sentences whose first character is this one. In a
@@ -194,6 +201,7 @@ def rand_sentence(
         include=include,
         count=count,
         realism=realism,
+        vocabulary=vocabulary,
         min_length=min_length,
         max_length=max_length,
         starts_with=starts_with,

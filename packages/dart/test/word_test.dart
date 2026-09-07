@@ -344,6 +344,67 @@ void main() {
       }
     });
 
+    test('vocabulary narrows the pools to the words people use', () {
+      // Every noun is basic, common or rare, and the two ends are listed per
+      // language. `basic` draws the everyday words, `common` leaves the rare
+      // ones out, and `full` is the pools as they are. A word in a list has to
+      // be in a pool, no word is in both lists, and every theme keeps enough
+      // everyday words to draw from.
+      for (final language in wordLanguages) {
+        final data = wordData[language]!;
+        final pool = poolOf(language).toSet();
+        final basic = data.levels.basic.toSet();
+        final rare = data.levels.rare.toSet();
+
+        for (final word in <String>[...basic, ...rare]) {
+          expect(pool, contains(word), reason: '$language: $word is in a level and in no pool');
+        }
+
+        for (final word in basic) {
+          expect(rare, isNot(contains(word)), reason: '$language: $word is both basic and rare');
+        }
+
+        for (final theme in wordThemes) {
+          final everyday = poolOf(language, theme).where(basic.contains).length;
+
+          expect(everyday, greaterThanOrEqualTo(8), reason: '$language: $theme');
+        }
+
+        for (final detail in randWordDetails(
+          language: language,
+          vocabulary: RandVocabulary.basic,
+          count: 200,
+        )) {
+          expect(basic, contains(detail.word), reason: '$language: ${detail.word} is not basic');
+        }
+
+        for (final detail in randWordDetails(
+          language: language,
+          vocabulary: RandVocabulary.common,
+          count: 200,
+        )) {
+          expect(rare, isNot(contains(detail.word)), reason: '$language: ${detail.word} is rare');
+        }
+      }
+
+      // The full pool is the default, and `basic` reaches every theme.
+      final themes =
+          randWordDetails(
+            language: WordLanguage.ko,
+            vocabulary: RandVocabulary.basic,
+            count: 600,
+          ).map((detail) => detail.theme).toSet();
+
+      expect(themes, hasLength(wordThemes.length));
+
+      final rare = wordData[WordLanguage.ko]!.levels.rare.toSet();
+
+      expect(
+        randWordDetails(language: WordLanguage.ko, count: 600).any((d) => rare.contains(d.word)),
+        isTrue,
+      );
+    });
+
     test('unique never repeats a word', () {
       final words = randWord(language: WordLanguage.ko, count: 400, unique: true);
 

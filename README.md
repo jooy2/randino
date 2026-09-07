@@ -17,7 +17,7 @@ Every option, every language and every example, with **JavaScript**, **Dart** or
 - **Words** are those twenty-five themes on their own: `randWord`, and a function per theme, from `randAnimal` and `randFood` to `randGem`.
 - **Sentences** are whole statements in the language's own grammar, from `randSentence`. A verb states what can do it and what it can be done to, so the words of one sentence belong together: 여우가 사과를 먹는다, The brave lion runs quietly.
 - **Decorators** attach something to a string you already have rather than generating one: a random token with `randSuffix` and `randPrefix`, a word with `randModifier`.
-- One options set per generator: language, length, count, and a `realism` setting that goes from real words to fully invented ones.
+- One options set per generator: language, length, count, a `realism` setting that goes from real words to fully invented ones, and a `vocabulary` setting that keeps to the everyday words.
 - **No runtime dependencies**, in any of the packages.
 
 ## Packages

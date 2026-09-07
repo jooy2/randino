@@ -13,11 +13,13 @@ import {
 	lengthBounds,
 	resolveLength,
 	resolvePrefix,
-	resolveRealism
+	resolveRealism,
+	resolveVocabulary
 } from '../_internal/generate.js';
 import { capitalizeFirst } from '../_internal/utils.js';
 import type {
 	ModifierKind,
+	RandVocabulary,
 	RandWordOptions,
 	WordDetail,
 	WordLanguage,
@@ -190,6 +192,49 @@ export function genderOf(data: WordLanguageData, word: string): WordGender | und
 	}
 
 	return undefined;
+}
+
+const levelCache = new WeakMap<WordLanguageData, Map<string, WordPool>>();
+
+/**
+ * The nouns of one theme as common as the caller asked: the whole pool at
+ * `full`, the pool without its rare words at `common`, and its everyday words
+ * alone at `basic`. The whole pool where a level would leave nothing, which no
+ * theme of any language comes to — `test/word.test.ts` asserts it.
+ */
+export function levelledNouns(
+	data: WordLanguageData,
+	theme: WordTheme,
+	vocabulary: RandVocabulary
+): WordPool {
+	const pool = data.nouns[theme];
+
+	if (vocabulary === 'full') {
+		return pool;
+	}
+
+	let byTheme = levelCache.get(data);
+
+	if (!byTheme) {
+		byTheme = new Map();
+		levelCache.set(data, byTheme);
+	}
+
+	const key = `${theme}:${vocabulary}`;
+	const cached = byTheme.get(key);
+
+	if (cached) {
+		return cached;
+	}
+
+	const basic = new Set(data.levels.basic);
+	const rare = new Set(data.levels.rare);
+	const kept = pool.filter((word) => (vocabulary === 'basic' ? basic.has(word) : !rare.has(word)));
+	const usable = kept.length ? kept : pool;
+
+	byTheme.set(key, usable);
+
+	return usable;
 }
 
 /** Theme a word belongs to, across every theme of the language. */
@@ -416,6 +461,8 @@ type Settings = {
 	theme: WordThemeOption;
 	// How often one part is invented rather than drawn, as a percentage.
 	invent: number;
+	// How common a drawn word has to be.
+	vocabulary: RandVocabulary;
 	minLength?: number;
 	maxLength?: number;
 	prefix: string;
@@ -430,7 +477,7 @@ function generateOne(language: WordLanguage, settings: Settings): WordDetail {
 	for (let attempt = 0; attempt < FIT_ATTEMPTS; attempt += 1) {
 		// One theme per word, so a mixed request spreads over all of them.
 		const theme = pick(themes);
-		const pool = data.nouns[theme];
+		const pool = levelledNouns(data, theme, settings.vocabulary);
 		const [low, high] = poolBounds(pool);
 		const [min, max] = lengthBounds(settings.minLength, settings.maxLength, low, high);
 		const { word, missed } = drawWord(data, pool, settings.invent, min, max, settings.prefix);
@@ -465,6 +512,7 @@ export function generateWordDetails(options: RandWordOptions = {}): WordDetail[]
 	const settings: Settings = {
 		theme: options.theme ?? 'all',
 		invent: resolveRealism(options.realism),
+		vocabulary: resolveVocabulary(options.vocabulary),
 		minLength: resolveLength(options.minLength),
 		maxLength: resolveLength(options.maxLength),
 		prefix: resolvePrefix(options.startsWith)

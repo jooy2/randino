@@ -79,6 +79,28 @@ enum RandRealism {
   invented,
 }
 
+/// How common the words a result is built from have to be.
+///
+/// Each level holds the ones below it, so [common] is the pools with the rare
+/// words left out, not a band of middling ones. The levels are a judgement made
+/// per language about that language's own words — a word is basic because
+/// people say it, not because what it names is familiar — and they only ever
+/// narrow what is drawn: a word the caller required, an invented word and a
+/// person's name are not the pools', and have no level.
+enum RandVocabulary {
+  /// The everyday words, which nearly every speaker uses and a child already
+  /// knows — `사과`, `개`, `의사`, `apple`, `doctor`, `computer`.
+  basic,
+
+  /// Those and the words an adult speaker knows and uses now and then —
+  /// `두더지`, `탐정`, `badger`, `interpreter`.
+  common,
+
+  /// Every word the pools hold, the specialist's and the dictionary's included
+  /// — `탈륨`, `통메장이`, `thallium`, `cooper`. The default.
+  full,
+}
+
 /// A language the word pools cover.
 ///
 /// The same nine [NameLanguage] holds: what used to keep a language out was word

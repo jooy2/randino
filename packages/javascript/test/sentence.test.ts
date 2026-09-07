@@ -10,6 +10,7 @@ import {
 } from '../dist/index.js';
 import type {
 	RandSentenceOptions,
+	RandVocabulary,
 	SentenceDetail,
 	SentenceShape,
 	SentenceSlot,
@@ -3094,6 +3095,51 @@ describe('Sentence', () => {
 					`${language}: no story is about a ${THEME_CLASS[theme]}`
 				);
 			}
+		}
+	});
+
+	it('vocabulary decides how common the nouns are', () => {
+		// Every noun phrase of a sentence — the subject, the object, the place — is
+		// built around a noun as common as the caller asked. Read back the way the
+		// other assertions read a phrase: every noun the phrase could have been built
+		// around, and one of them has to be at the level asked for.
+		const nounish: readonly SentenceSlot[] = ['subject', 'object', 'place', 'destination'];
+
+		for (const language of WORD_LANGUAGES) {
+			// In the form a sentence writes a noun, which is lowercase where the pools
+			// capitalize.
+			const basic = new Set(WORD_DATA[language].levels.basic.map((word) => plain(language, word)));
+			const rare = new Set(WORD_DATA[language].levels.rare.map((word) => plain(language, word)));
+			// Home is the sentence data's own word, not a noun of the pools.
+			const homes = new Set(SENTENCE_DATA[language].homes);
+			const check = (vocabulary: RandVocabulary, fits: (word: string) => boolean) => {
+				for (const detail of randSentence({
+					language,
+					vocabulary,
+					sentences: 3,
+					includeName: false,
+					count: 40,
+					output: 'detail'
+				})) {
+					detail.slots.forEach((slot, i) => {
+						if (!nounish.includes(slot)) {
+							return;
+						}
+
+						const found = nounsIn(language, detail.phrases[i]);
+
+						if (found.size && ![...found].some((word) => homes.has(word))) {
+							assert.ok(
+								[...found].some(fits),
+								`${language}: ${detail.phrases[i]} is not ${vocabulary} (${detail.sentence})`
+							);
+						}
+					});
+				}
+			};
+
+			check('basic', (word) => basic.has(word));
+			check('common', (word) => !rare.has(word));
 		}
 	});
 

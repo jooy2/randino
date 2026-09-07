@@ -11,7 +11,7 @@ from collections.abc import Callable, Sequence
 from typing import TypeVar
 
 from randino._internal.utils import clamp, pick
-from randino._types import RandRealism
+from randino._types import RandRealism, RandVocabulary
 from randino.constants import RAND_COUNT_MAX, RAND_LENGTH_MAX, RAND_LENGTH_MIN
 
 T = TypeVar("T")
@@ -43,6 +43,19 @@ def resolve_realism(realism: RandRealism) -> int:
     unchecked caller can still pass falls back to the default rather than raising.
     """
     return _INVENT_CHANCE.get(realism, 0)
+
+
+_VOCABULARIES: tuple[RandVocabulary, ...] = ("basic", "common", "full")
+
+
+def resolve_vocabulary(vocabulary: RandVocabulary) -> RandVocabulary:
+    """Return `vocabulary` as one of the three levels, falling back to every word.
+
+    What `rand_word`, `rand_nickname` and `rand_sentence` narrow their noun pools by. A
+    level the type rules out but an unchecked caller can still pass falls back to the
+    default rather than raising.
+    """
+    return vocabulary if vocabulary in _VOCABULARIES else "full"
 
 
 def resolve_length(value: int | None) -> int | None:

@@ -42,6 +42,7 @@ void main() {
           'NameScript',
           'NicknameDetail',
           'RandRealism',
+          'RandVocabulary',
           'SentenceDetail',
           'SentenceQuote',
           'SentenceShape',

@@ -46,6 +46,7 @@ rand_nickname()
 | `slots` | <Lang js="WordSlotOption" dart="Set&lt;WordSlot&gt;?" py="WordSlotOption" code /> | <Lang js="'all'" dart="null" py="&quot;all&quot;" code /> | 명사 옆에 무엇을 두는 형태를 받을지. [형태 고르기](#picking-the-shape)를 참고하세요. |
 | `count` | <Lang js="number" dart="int" py="int" code /> | `1` | 반환할 닉네임의 개수. `0` … `10000` 범위로 제한됩니다. |
 | `realism` | `RandRealism` | <Lang js="`'real'`" dart="`RandRealism.real`" py="`\"real\"`" /> | `real`은 실제 단어를, `invented`는 그 언어처럼 읽히기만 하는 단어를 만들어 씁니다. `mixed`는 단어마다 판단합니다. |
+| `vocabulary` | `RandVocabulary` | <Lang js="`'full'`" dart="`RandVocabulary.full`" py="`\"full\"`" /> | 기준이 되는 명사가 얼마나 흔해야 하는지 정합니다. `basic`, `common`, `full` 중 하나입니다. [흔한 단어](../word/rand-word#vocabulary)를 보세요. |
 | <Lang js="minLength" dart="minLength" py="min_length" code /> | <Lang js="number" dart="int?" py="int &#124; None" code /> | _언어별_ | 최소 글자 수. |
 | <Lang js="maxLength" dart="maxLength" py="max_length" code /> | <Lang js="number" dart="int?" py="int &#124; None" code /> | _언어별_ | 최대 글자 수. |
 | <Lang js="wordSeparator" dart="wordSeparator" py="word_separator" code /> | <Lang js="string" dart="String?" py="str &#124; None" code /> | _언어별_ | 단어 사이에 넣습니다. 길이 범위에 포함됩니다. 기본값은 붙여 쓰는 것입니다. |

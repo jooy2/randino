@@ -44,6 +44,24 @@ export type RandOutput = 'value' | 'detail';
 export type RandRealism = 'real' | 'mixed' | 'invented';
 
 /**
+ * How common the words a result is built from have to be:
+ * - `basic`: the everyday words, which nearly every speaker uses and a child
+ *   already knows — `사과`, `개`, `의사`, `apple`, `doctor`, `computer`.
+ * - `common`: those and the words an adult speaker knows and uses now and then —
+ *   `두더지`, `탐정`, `badger`, `interpreter`.
+ * - `full`: every word the pools hold, the specialist's and the dictionary's
+ *   included — `탈륨`, `통메장이`, `thallium`, `cooper`. The default.
+ *
+ * Each level holds the ones below it, so `common` is the pools with the rare
+ * words left out, not a band of middling ones. The levels are a judgement made
+ * per language about that language's own words — a word is basic because people
+ * say it, not because what it names is familiar — and they only ever narrow what
+ * is drawn: a word the caller required, an invented word and a person's name are
+ * not the pools', and have no level.
+ */
+export type RandVocabulary = 'basic' | 'common' | 'full';
+
+/**
  * The options every generator takes, whatever it generates. `randName`,
  * `randNickname` and `randWord` each add their own on top of these — a gender, a
  * theme, a word separator — but they all count, filter, deduplicate and report
@@ -154,6 +172,8 @@ export interface RandWordOptions extends RandCommonOptions {
 	language?: WordLanguageOption;
 	/** What the words should be about. Default `'all'`. */
 	theme?: WordThemeOption;
+	/** How common the words have to be. Default `'full'`, which is every word the pools hold. */
+	vocabulary?: RandVocabulary;
 }
 
 /**
@@ -206,6 +226,7 @@ export interface RandNicknameOptions extends RandCommonOptions {
 	 * which is every word the pools hold; the modifier in front of it is drawn as
 	 * it always was.
 	 */
+	vocabulary?: RandVocabulary;
 	/**
 	 * Which shapes the nicknames may take. Default `'all'`, which is every shape
 	 * the language declares, drawn by its own weights.
@@ -476,6 +497,14 @@ export interface RandSentenceOptions extends RandCommonOptions {
 	language?: WordLanguageOption;
 	/** What the sentence's subject is about. Default `'all'`. */
 	theme?: WordThemeOption;
+	/**
+	 * How common the nouns have to be — the subject, the object, the place, the
+	 * thing a story is about. Default `'full'`, which is every word the pools
+	 * hold. The verbs, the
+	 * modifiers and the adverbials are the sentence data's own and are drawn as
+	 * they always were.
+	 */
+	vocabulary?: RandVocabulary;
 	/** How much the sentence says. Default `'all'`. */
 	shape?: SentenceShapeOption;
 	/**

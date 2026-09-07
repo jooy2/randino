@@ -109,6 +109,25 @@ class WordFrame:
 
 
 @dataclass(frozen=True, slots=True)
+class WordLevels:
+    """How common each noun is, for `vocabulary` to draw by.
+
+    `basic` lists the words nearly every speaker uses daily, `rare` the ones a specialist
+    or a dictionary would know, and every noun in neither is common. Two lists rather
+    than a tag on every noun: they name the two ends, and the middle is what is left. The
+    lists are a judgement about the language's own words — `탈륨` is rare because nobody
+    says it, not because thallium is obscure — and `tests/test_word.py` asserts every word
+    in them is in a pool, and that every theme keeps a handful of basic words.
+    """
+
+    basic: WordPool
+    """The everyday words."""
+
+    rare: WordPool
+    """The specialist's and the dictionary's words."""
+
+
+@dataclass(frozen=True, slots=True)
 class WordLanguageData:
     """Everything the generators know about one word language."""
 
@@ -126,6 +145,12 @@ class WordLanguageData:
     """The words themselves, grouped by theme.
 
     Deliberately common nouns — never person names.
+    """
+
+    levels: WordLevels
+    """How common each noun is: the everyday ones and the rare ones, listed.
+
+    The rest are common. What `vocabulary` narrows the pools by.
     """
 
     adjectives: WordPool

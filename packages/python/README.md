@@ -93,6 +93,7 @@ rand_nickname(language="en", output="detail")[0]
 | `slots`                     | `WordSlotOption`              | `"all"`    |
 | `count`                     | `int`                             | `1`        |
 | `realism`                   | `RandRealism`                     | `"real"`   |
+| `vocabulary`                | `RandVocabulary`                  | `"full"`   |
 | `min_length` / `max_length` | `int \| None`                     | _language_ |
 | `word_separator`            | `str \| None`                     | _language_ |
 | `starts_with`               | `str`                             | `""`       |
@@ -128,6 +129,7 @@ word_length_range("en")  # (3, 11)
 | `theme`                     | `WordThemeOption`                | `"all"`   |
 | `count`                     | `int`                            | `1`       |
 | `realism`                   | `RandRealism`                    | `"real"`  |
+| `vocabulary`                | `RandVocabulary`                 | `"full"`  |
 | `min_length` / `max_length` | `int \| None`                    | _pools_   |
 | `starts_with`               | `str`                            | `""`      |
 | `unique`                    | `bool`                           | `False`   |
@@ -174,6 +176,7 @@ sentence_length_range("en")  # (12, 92)
 | `include_name`              | `bool \| None`                      | _drawn_   |
 | `count`                     | `int`                               | `1`       |
 | `realism`                   | `RandRealism`                       | `"real"`  |
+| `vocabulary`                | `RandVocabulary`                    | `"full"`  |
 | `min_length` / `max_length` | `int \| None`                       | _language_ |
 | `starts_with`               | `str`                               | `""`      |
 | `unique`                    | `bool`                              | `False`   |

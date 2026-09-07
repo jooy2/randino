@@ -169,6 +169,42 @@ rand_word(language="en", realism="invented", count=4)
 
 An invented word can spell a real one by accident, since the syllable templates do come out as `Snake` now and then. The theme is then reported rather than hidden.
 
+## Common words {#vocabulary}
+
+The pools hold `apple` and `thallium`, `doctor` and `cooper`, `사과` and `탈륨`, and a draw over all of them comes back with a specialist's word about as often as an everyday one. `vocabulary` says how common the words have to be. `basic` is the everyday words, which nearly every speaker uses and a child already knows; `common` is those and the words an adult knows and uses now and then; `full` is every word the pools hold, and the default. Each level holds the ones below it, so `common` is the pools with the rare words left out rather than a band of middling ones.
+
+::: lang js
+
+```javascript
+randWord({ language: 'ko', vocabulary: 'basic', count: 5 });
+// ['사과', '고양이', '의사', '컴퓨터', '가위']
+
+randWord({ language: 'en', theme: 'gem', vocabulary: 'basic', count: 4 });
+// ['Gold', 'Diamond', 'Pearl', 'Silver']
+```
+
+:::
+
+::: lang dart
+
+```dart
+randWord(language: WordLanguage.ko, vocabulary: RandVocabulary.basic, count: 5);
+// [사과, 고양이, 의사, 컴퓨터, 가위]
+```
+
+:::
+
+::: lang py
+
+```python
+rand_word(language="ko", vocabulary="basic", count=5)
+# ['사과', '고양이', '의사', '컴퓨터', '가위']
+```
+
+:::
+
+The levels are a judgement made per language about that language's own words — `탈륨` is rare because nobody says it, not because thallium is obscure — and every theme keeps a handful of basic words, so `randGem({ vocabulary: 'basic' })` still answers. [`randNickname`](../nickname/rand-nickname) takes the same option for the noun it is built around, and [`randSentence`](../sentence/rand-sentence) for every noun of the sentence; a word the caller required, an invented word and a person's name are not the pools', and have no level.
+
 ## The detail output {#the-detail-output}
 
 ::: lang js

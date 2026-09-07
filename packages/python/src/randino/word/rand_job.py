@@ -2,7 +2,13 @@
 
 from typing import Literal, overload
 
-from randino._types import RandRealism, WordDetail, WordLanguageOption, WordThemeOption
+from randino._types import (
+    RandRealism,
+    RandVocabulary,
+    WordDetail,
+    WordLanguageOption,
+    WordThemeOption,
+)
 from randino.word.rand_word import rand_word
 
 
@@ -12,6 +18,7 @@ def rand_job(
     language: WordLanguageOption = ...,
     count: int = ...,
     realism: RandRealism = ...,
+    vocabulary: RandVocabulary = ...,
     min_length: int | None = ...,
     max_length: int | None = ...,
     starts_with: str = ...,
@@ -26,6 +33,7 @@ def rand_job(
     language: WordLanguageOption = ...,
     count: int = ...,
     realism: RandRealism = ...,
+    vocabulary: RandVocabulary = ...,
     min_length: int | None = ...,
     max_length: int | None = ...,
     starts_with: str = ...,
@@ -39,6 +47,7 @@ def rand_job(
     language: WordLanguageOption = "all",
     count: int = 1,
     realism: RandRealism = "real",
+    vocabulary: RandVocabulary = "full",
     min_length: int | None = None,
     max_length: int | None = None,
     starts_with: str = "",
@@ -67,6 +76,7 @@ def rand_job(
             theme=theme,
             count=count,
             realism=realism,
+            vocabulary=vocabulary,
             min_length=min_length,
             max_length=max_length,
             starts_with=starts_with,
@@ -79,6 +89,7 @@ def rand_job(
         theme=theme,
         count=count,
         realism=realism,
+        vocabulary=vocabulary,
         min_length=min_length,
         max_length=max_length,
         starts_with=starts_with,

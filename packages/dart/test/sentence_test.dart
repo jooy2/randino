@@ -3373,6 +3373,55 @@ void main() {
       }
     });
 
+    test('vocabulary decides how common the nouns are', () {
+      // Every noun phrase of a sentence — the subject, the object, the place —
+      // is built around a noun as common as the caller asked. Read back the way
+      // the other assertions read a phrase: every noun the phrase could have
+      // been built around, and one of them has to be at the level asked for.
+      const nounish = <SentenceSlot>{
+        SentenceSlot.subject,
+        SentenceSlot.object,
+        SentenceSlot.place,
+        SentenceSlot.destination,
+      };
+
+      for (final language in wordLanguages) {
+        // In the form a sentence writes a noun, which is lowercase where the
+        // pools capitalize.
+        final basic = wordData[language]!.levels.basic.map((word) => plain(language, word)).toSet();
+        final rare = wordData[language]!.levels.rare.map((word) => plain(language, word)).toSet();
+        // Home is the sentence data's own word, not a noun of the pools.
+        final homes = sentenceData[language]!.homes.toSet();
+
+        void check(RandVocabulary vocabulary, bool Function(String word) fits) {
+          for (final detail in randSentenceDetails(
+            language: language,
+            vocabulary: vocabulary,
+            sentences: 3,
+            includeName: false,
+            count: 40,
+          )) {
+            for (var i = 0; i < detail.slots.length; i += 1) {
+              if (!nounish.contains(detail.slots[i])) continue;
+
+              final found = nounsIn(language, detail.phrases[i]);
+
+              if (found.isEmpty || found.any(homes.contains)) continue;
+
+              expect(
+                found.any(fits),
+                isTrue,
+                reason: '$language: ${detail.phrases[i]} is not $vocabulary (${detail.sentence})',
+              );
+            }
+          }
+        }
+
+        check(RandVocabulary.basic, basic.contains);
+        check(RandVocabulary.common, (word) => !rare.contains(word));
+      }
+    });
+
     test('a story moves its day forward, and never back', () {
       for (final language in wordLanguages) {
         final day = sentenceData[language]!.times.day;

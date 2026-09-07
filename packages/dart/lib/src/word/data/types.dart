@@ -120,6 +120,26 @@ class WordFrame {
   }
 }
 
+/// How common each noun is, for `vocabulary` to draw by.
+///
+/// [basic] lists the words nearly every speaker uses daily, [rare] the ones a
+/// specialist or a dictionary would know, and every noun in neither is common.
+/// Two lists rather than a tag on every noun: they name the two ends, and the
+/// middle is what is left. The lists are a judgement about the language's own
+/// words — `탈륨` is rare because nobody says it, not because thallium is
+/// obscure — and `test/word_test.dart` asserts every word in them is in a pool,
+/// and that every theme keeps a handful of basic words.
+class WordLevels {
+  /// Creates the two lists.
+  const WordLevels({required this.basic, required this.rare});
+
+  /// The everyday words.
+  final WordPool basic;
+
+  /// The specialist's and the dictionary's words.
+  final WordPool rare;
+}
+
 /// Everything the generators know about one word language.
 class WordLanguageData {
   /// Creates a language dataset.
@@ -127,6 +147,7 @@ class WordLanguageData {
     required this.joiner,
     required this.capitalize,
     required this.nouns,
+    required this.levels,
     required this.adjectives,
     required this.actions,
     required this.frames,
@@ -148,6 +169,10 @@ class WordLanguageData {
   /// person names. Every theme has a pool; a language that could not fill one
   /// would not be a language these generators support.
   final Map<WordTheme, WordPool> nouns;
+
+  /// How common each noun is: the everyday ones and the rare ones, listed; the
+  /// rest are common. What `vocabulary` narrows the pools by.
+  final WordLevels levels;
 
   /// Words that say what the noun is like, in the form that can sit straight in
   /// front of it (Korean attributive: 멋진, Japanese: 青い / 静かな). A handful

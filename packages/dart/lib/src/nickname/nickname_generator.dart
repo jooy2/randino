@@ -45,6 +45,7 @@ class _Settings {
     required this.slots,
     required this.invent,
     required this.loose,
+    required this.vocabulary,
     required this.minLength,
     required this.maxLength,
     required this.prefix,
@@ -63,6 +64,9 @@ class _Settings {
   /// Whether the themes that make an awkward nickname are in play. Off at
   /// [RandRealism.real], which is what keeps a null theme readable.
   final bool loose;
+
+  /// How common the noun has to be.
+  final RandVocabulary vocabulary;
   final int? minLength;
   final int? maxLength;
   final String prefix;
@@ -364,6 +368,7 @@ LengthRange naturalRange(WordLanguage language, String? separator) {
     slots: null,
     invent: 0,
     loose: true,
+    vocabulary: RandVocabulary.full,
     minLength: null,
     maxLength: null,
     prefix: '',
@@ -401,7 +406,7 @@ _Built _generateOne(WordLanguage language, _Settings settings) {
   for (var attempt = 0; attempt < _fitAttempts; attempt += 1) {
     // One theme per nickname, so a mixed request spreads over all of them.
     final theme = pick(themes);
-    final nouns = data.nouns[theme]!;
+    final nouns = levelledNouns(data, theme, settings.vocabulary);
     final bounds = _slotBounds(language, data, theme);
     final range = _lengthBounds(data, allowed, bounds, settings);
     // Prefer a shape that can actually land inside the range.
@@ -458,6 +463,7 @@ List<NicknameDetail> generateNicknameDetails({
   Set<WordSlot>? slots,
   int count = 1,
   RandRealism realism = RandRealism.real,
+  RandVocabulary vocabulary = RandVocabulary.full,
   int? minLength,
   int? maxLength,
   String? wordSeparator,
@@ -469,6 +475,7 @@ List<NicknameDetail> generateNicknameDetails({
     slots: slots,
     invent: resolveRealism(realism),
     loose: realism != RandRealism.real,
+    vocabulary: vocabulary,
     minLength: minLength,
     maxLength: maxLength,
     prefix: resolvePrefix(startsWith),

@@ -93,6 +93,7 @@ randNicknameDetails(language: WordLanguage.en).first;
 | `slots`                   | `Set<WordSlot>?` | `null` — every shape  |
 | `count`                   | `int`               | `1`                    |
 | `realism`                 | `RandRealism`             | `RandRealism.real` |
+| `vocabulary`              | `RandVocabulary`          | `RandVocabulary.full` |
 | `minLength` / `maxLength` | `int?`              | _language_             |
 | `wordSeparator`           | `String?`           | _language_             |
 | `startsWith`              | `String?`           | `null`                 |
@@ -123,6 +124,7 @@ wordLengthRange(language: WordLanguage.en); // LengthRange(3, 11)
 | `theme`                   | `WordTheme?`    | `null` — every one |
 | `count`                   | `int`           | `1`                |
 | `realism`                 | `RandRealism`   | `RandRealism.real` |
+| `vocabulary`              | `RandVocabulary`| `RandVocabulary.full` |
 | `minLength` / `maxLength` | `int?`          | _pools_            |
 | `startsWith`              | `String?`       | `null`             |
 | `unique`                  | `bool`          | `false`            |
@@ -165,6 +167,7 @@ sentenceLengthRange(WordLanguage.en); // LengthRange(12, 92)
 | `includeName`             | `bool?`               | `null` — drawn     |
 | `count`                   | `int`                 | `1`                |
 | `realism`                 | `RandRealism`         | `RandRealism.real` |
+| `vocabulary`              | `RandVocabulary`      | `RandVocabulary.full` |
 | `minLength` / `maxLength` | `int?`                | _language_         |
 | `startsWith`              | `String?`             | `null`             |
 | `unique`                  | `bool`                | `false`            |

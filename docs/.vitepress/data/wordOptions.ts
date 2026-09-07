@@ -77,6 +77,12 @@ export const WORD_OPTIONS: readonly WordOptionRow[] = [
 		about: 'optionRealism'
 	},
 	{
+		name: 'vocabulary',
+		type: { js: 'RandVocabulary', dart: 'RandVocabulary', py: 'RandVocabulary' },
+		fallback: { js: "'full'", dart: 'RandVocabulary.full', py: '"full"' },
+		about: 'optionVocabulary'
+	},
+	{
 		name: { js: 'minLength', dart: 'minLength', py: 'min_length' },
 		type: { js: 'number', dart: 'int?', py: 'int | None' },
 		fallback: { i18n: 'optionFromPools' },

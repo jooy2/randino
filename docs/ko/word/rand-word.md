@@ -169,6 +169,42 @@ rand_word(language="en", realism="invented", count=4)
 
 만들어낸 단어가 우연히 실제 단어를 이루기도 합니다. 음절 템플릿이 `Snake`를 만들어내는 일이 있는데, 그럴 때는 테마를 감추지 않고 그대로 보고합니다.
 
+## 흔한 단어 {#vocabulary}
+
+풀에는 `사과`와 `탈륨`, `의사`와 `통메장이`, `apple`과 `thallium`이 함께 들어 있어서, 전체에서 뽑으면 일상 단어만큼이나 전문 용어가 나옵니다. `vocabulary`는 단어가 얼마나 흔해야 하는지 정합니다. `basic`은 거의 모든 화자가 쓰고 아이도 아는 일상 단어, `common`은 거기에 어른이 알고 이따금 쓰는 단어까지, `full`은 풀에 있는 모든 단어이며 기본값입니다. 각 단계는 아래 단계를 포함하므로, `common`은 중간 단어만 모은 것이 아니라 드문 단어를 뺀 풀입니다.
+
+::: lang js
+
+```javascript
+randWord({ language: 'ko', vocabulary: 'basic', count: 5 });
+// ['사과', '고양이', '의사', '컴퓨터', '가위']
+
+randWord({ language: 'en', theme: 'gem', vocabulary: 'basic', count: 4 });
+// ['Gold', 'Diamond', 'Pearl', 'Silver']
+```
+
+:::
+
+::: lang dart
+
+```dart
+randWord(language: WordLanguage.ko, vocabulary: RandVocabulary.basic, count: 5);
+// [사과, 고양이, 의사, 컴퓨터, 가위]
+```
+
+:::
+
+::: lang py
+
+```python
+rand_word(language="ko", vocabulary="basic", count=5)
+# ['사과', '고양이', '의사', '컴퓨터', '가위']
+```
+
+:::
+
+등급은 언어마다 그 언어의 단어를 두고 매긴 판단입니다. `탈륨`이 드문 것은 탈륨이 낯선 물질이어서가 아니라 아무도 그 말을 입에 올리지 않기 때문입니다. 모든 테마에 기본 단어가 몇 개씩은 남아 있어서 `randGem({ vocabulary: 'basic' })`도 답을 냅니다. [`randNickname`](../nickname/rand-nickname)은 기준이 되는 명사에, [`randSentence`](../sentence/rand-sentence)는 문장의 모든 명사에 같은 옵션을 받습니다. 호출자가 요구한 단어, 만들어낸 단어, 사람 이름은 풀의 단어가 아니므로 등급이 없습니다.
+
 ## 상세 출력 {#the-detail-output}
 
 ::: lang js

@@ -1,7 +1,7 @@
 """Vietnamese word pools."""
 
 from randino._internal.parse import words
-from randino.word.data._types import SyllableSynthesis, WordFrame, WordLanguageData
+from randino.word.data._types import SyllableSynthesis, WordFrame, WordLanguageData, WordLevels
 
 VI = WordLanguageData(
     joiner=" ",
@@ -398,6 +398,126 @@ VI = WordLanguageData(
     # Vietnamese puts the modifier after the noun (mèo xanh) and the possessed
     # thing in front of its owner (đuôi mèo), so its frames run the other way
     # round from the ones above.
+    # How common each noun is, for `vocabulary` to draw by: the everyday words,
+    # and the ones a specialist or a dictionary would know. Every noun in neither
+    # list is common.
+    levels=WordLevels(
+        basic=words("""
+            mèo chó hổ sư_tử cáo sói gấu gấu_trúc thỏ sóc voi hươu nai ngựa lừa bò trâu dê cừu lợn
+            khỉ cá_sấu rắn thằn_lằn rùa ếch cóc chim én sẻ quạ đại_bàng công vẹt cú bồ_câu thiên_nga
+            vịt ngỗng gà cá cá_voi cá_heo cá_mập mực bạch_tuộc tôm cua sò ốc bướm ong kiến nhện
+            chuồn_chuồn ve muỗi ruồi giun sâu dơi lạc_đà hà_mã tê_giác hươu_cao_cổ chuột cá_chép
+            lươn chuột_túi cò châu_chấu dế đom_đóm chai bút tẩy ô đèn gương chìa_khóa ổ_khóa túi cúc
+            kim chỉ giấy vở thư bản_đồ máy_ảnh phim bóng_bay diều thẻ đèn_pin diêm nến chậu ấm chén
+            thìa đĩa nồi gối chăn giỏ chổi dây xô quạt lưới lọ lược bình rổ khay hộp thùng móc_khóa
+            đinh khóa_kéo vòng_tay nhẫn cặp_sách ba_lô bát kẹp biển sông hồ thác thung_lũng núi đồi
+            rừng hang sa_mạc cát đá sỏi núi_lửa động_đất san_hô suối vịnh đỉnh_núi đảo cao_nguyên
+            bãi_cát hang_động bóng hương lửa bờ_biển rừng_rậm đồng_bằng bãi_biển kênh sóng bọt đèo
+            cây lá hoa rễ hạt quả tre thông anh_đào hoa_hồng hoa_sen hoa_cúc hoa_mai hoa_lan
+            bồ_công_anh hướng_dương cỏ cành mầm chồi nụ cánh_hoa rong_biển bó_hoa cỏ_dại xương_rồng
+            húng_quế bạc_hà rau_mùi hẹ me ổi thân_cây vỏ_cây gai cây_táo vàng bạc đồng sắt thép
+            thủy_tinh pha_lê ngọc_trai ngọc đá_vôi đá_quý kim_cương nhôm chì đá_cuội than_đá đá_tảng
+            tự_do hòa_bình trí_tuệ ký_ức tưởng_tượng câu_chuyện thơ ngữ_pháp vật_lý hóa_học sinh_học
+            toán_học lịch_sử thần_thoại câu_đố bí_mật lời_hứa chuyến_đi phiêu_lưu khám_phá
+            thí_nghiệm câu_hỏi câu_trả_lời lễ_hội văn_hóa ngôn_ngữ chữ_cái mật_mã lịch chân_trời
+            chủ_đề truyền_thống kỹ_thuật nghệ_thuật khoa_học chính_tả vận_may nguyên_nhân kết_quả
+            rồng phượng_hoàng kỳ_lân tiên yêu_tinh ma hồn thần thiên_thần ác_quỷ người_cá quái_vật
+            phép_thuật thần_chú lời_nguyền người_sói ma_cà_rồng linh_hồn pháp_sư thầy_bói khổng_lồ
+            thổ_địa tiên_nữ tiên_ông thợ_săn kẻ_trộm thủy_thủ đầu_bếp thám_tử nhà_thơ họa_sĩ chú_hề
+            võ_sĩ vua nữ_hoàng hoàng_tử công_chúa hoàng_đế nông_dân phi_công kỹ_sư lính_cứu_hỏa
+            cảnh_sát bác_sĩ y_tá thú_y giáo_viên học_sinh nhà_báo nhà_văn ca_sĩ diễn_viên đạo_diễn
+            thợ_mộc thợ_may trọng_tài luật_sư kế_toán người_bán bồi_bàn tài_xế thợ_cắt_tóc đàn_piano
+            ghi_ta trống chuông đàn_tranh bài_hát điệu_múa nhịp_điệu giai_điệu sáo kèn đàn_bầu
+            sáo_trúc bản_nhạc nốt_nhạc buổi_diễn sân_khấu dân_ca dàn_nhạc song_ca chiêng điệp_khúc
+            ca_khúc chợ thành_phố làng ngõ cầu vườn thư_viện bảo_tàng nhà_hát trường_học công_viên
+            cảng nhà_ga sân_bay lâu_đài chùa đền tầng_hầm mái_nhà sân_vận_động bể_bơi vườn_thú
+            bưu_điện ngân_hàng bệnh_viện hiệu_thuốc quán_cà_phê nhà_hàng bếp phòng_ngủ phòng_khách
+            hành_lang cầu_thang ngã_tư nhà_thờ biệt_thự xóm nghĩa_trang quán_ăn khu_phố cơm mì phở
+            bún bánh_mì bánh_bao bánh_chưng nem chả giò_lụa muối đường tiêu tỏi hành khoai cà_rốt
+            dưa_chuột bí_đỏ rau_xà_lách nấm đậu_phụ trứng phô_mai bơ sữa_chua táo dâu nho dưa_hấu
+            quýt chanh chuối xoài sô_cô_la kẹo bánh_quy bánh_ngọt bánh_kem mứt tương_ớt nước_mắm
+            cháo xôi chè canh súp lẩu ngô cà_chua lê bưởi đậu_phộng bóng_đá bóng_rổ bóng_chuyền
+            bóng_bàn quần_vợt cầu_lông bi_a bơi_lội thể_dục karate judo đấu_vật leo_núi nhảy_dây vợt
+            khung_thành huy_chương cúp vô_địch chung_kết cổ_vũ luyện_tập chạy_bộ mũ_bảo_hiểm
+            khởi_động cờ_vua cờ_tướng sân_bóng phạt_đền thẻ_vàng tỷ_số hòa chiến_thắng thất_bại
+            kỷ_lục xe_đạp tàu_hỏa thuyền ô_tô xe_buýt taxi xe_tải xe_máy xe_ga máy_bay trực_thăng
+            tên_lửa tàu_ngầm bè xe_tăng xe_ngựa xe_đẩy xe_cứu_hỏa xe_cảnh_sát cáp_treo tàu_điện dù
+            xe_con cần_cẩu xe_đạp_điện ghe xe_rác xe_khách xe_ôm máy_tính bàn_phím màn_hình máy_in
+            loa tai_nghe điện_thoại sạc pin điều_khiển tủ_lạnh máy_giặt máy_hút_bụi quạt_máy
+            điều_hòa nồi_cơm_điện lò_vi_sóng lò_nướng máy_xay bàn_chải xà_phòng dầu_gội nước_hoa
+            máy_sấy_tóc bóng_đèn ổ_cắm móc_áo tủ_áo giá_sách khăn_tắm vòi_nước ti_vi cân bàn_là thảm
+            đèn_bàn bồn_tắm đỏ_thẫm hồng_đào vàng_chanh xanh_lá xanh_rêu xanh_ngọc xanh_lam
+            xanh_biển xanh_da_trời chàm tím_than nâu_đất be xám_tro trắng_ngà đen_tuyền đỏ_gạch
+            hồng_phấn tím_nhạt nâu_nhạt trắng_tinh đỏ_tươi vàng_tươi hồng_nhạt vàng_nhạt xanh_lục
+            đỏ_cam hóa_đơn lãi_suất khoản_vay tiết_kiệm tài_khoản lương_hưu tiền_lương tiền_thưởng
+            két_sắt chuyển_tiền sổ_tiết_kiệm trả_góp hợp_đồng thuế tiền_phạt tiền_cọc tiền_thuê
+            kho_báu giàu_có nghèo_khó lỗ vốn tiền_lãi tiền_mặt bản_sao ảnh_chụp lệnh thư_mục
+            khôi_phục bảng cột hàng nút đồ_thị danh_sách tập_hợp tiện_ích phiên_bản hồ_sơ sự_kiện
+            tín_hiệu bộ_lọc nhãn_dán mây gió mưa tuyết sương_mù sương cầu_vồng hoàng_hôn sét sấm
+            mưa_rào gió_mùa bão mưa_phùn mưa_lớn mưa_đá tia_nắng giọt_mưa nắng_nóng mây_đen
+            thời_tiết khí_hậu nhiệt_độ độ_ẩm trời_mưa nắng_gắt bóng_râm chớp hạn_hán lũ_lụt sao
+            mặt_trăng mặt_trời thiên_hà sao_chổi sao_băng dải_ngân_hà nhật_thực nguyệt_thực vũ_trụ
+            hành_tinh vệ_tinh chòm_sao trọng_lực hố_đen hệ_mặt_trời trăng_khuyết trăng_tròn
+            ánh_trăng sao_hỏa sao_kim sao_mộc tàu_vũ_trụ bình_minh mùa tương_lai ngày_lễ buổi_sáng
+            buổi_trưa buổi_chiều buổi_tối ban_đêm nửa_đêm sáng_sớm hôm_qua hôm_nay ngày_mai ngày_kia
+            hôm_kia quá_khứ hiện_tại thế_kỷ tuần_lễ cuối_tuần năm_nay năm_ngoái năm_sau mùa_xuân
+            mùa_hè mùa_thu mùa_đông giao_thừa rằm sinh_nhật ngày_xưa thời_gian tuổi_trẻ bây_giờ
+            sau_này phút giây giờ ngày_thường ngày_nghỉ can_đảm tò_mò lòng_biết_ơn kiên_nhẫn
+            tình_bạn niềm_vui nỗi_buồn cơn_giận nỗi_sợ ngạc_nhiên hạnh_phúc sung_sướng an_ủi hy_vọng
+            tuyệt_vọng tội_lỗi xấu_hổ tự_hào ghen_tuông tham_lam tình_cảm dịu_dàng ấm_áp tử_tế
+            tin_tưởng nghi_ngờ lo_lắng bực_bội khó_chịu chán_nản háo_hức tự_tin khiêm_tốn bình_tĩnh
+            tâm_trạng hối_hận đầu trán lông_mày lông_mi mũi má cằm hàm môi lưỡi răng lợi tai cổ gáy
+            vai khuỷu_tay cổ_tay ngón_tay ngón_cái móng_tay ngực bụng rốn eo đùi đầu_gối gót
+            ngón_chân móng_chân xương tim phổi gan dạ_dày thận ruột não máu thịt da tóc râu nước_mắt
+            mồ_hôi nước_bọt hơi_thở sẹo cánh_tay nách mũ giày găng khăn_quàng kính_mắt dép_lê
+            quần_áo áo_khoác áo_vest áo_sơ_mi áo_dài quần quần_bò quần_soóc váy váy_đầm áo_len tất
+            đồ_lót đồ_ngủ cà_vạt thắt_lưng dây_lưng ủng đồng_phục nón_lá áo_mưa đồ_bơi áo_ấm tay_áo
+            cổ_áo vải rìu xẻng cưa thang cờ_lê kìm thước_kẻ kéo búa máy_khoan cuốc liềm cào mỏ_lết
+            tua_vít thước_dây com_pa xà_beng đòn_bẩy ròng_rọc cày lưỡi_dao bộ_dụng_cụ cà_phê
+            trà_xanh nước_ép sữa nước nước_suối sữa_đậu_nành cà_phê_sữa cà_phê_đen nước_dừa nước_mía
+            nước_chanh sinh_tố nước_ngọt trà_sữa trà_đá bia bia_hơi rượu_vang nước_khoáng sữa_tươi
+            sữa_đặc nước_lọc nước_cam
+        """),
+        rare=words("""
+            hải_ly thú_mỏ_vịt vượn_cáo khỉ_đầu_chó heo_vòi sóc_bay lửng gà_lôi đa_đa chim_cắt
+            cá_tuyết ong_nghệ kỳ_giông mẹt nia đai_ốc vòng_đệm then_cài trâm_cài bấc khuy_bấm
+            rừng_thưa phá eo_đất hố_sụt măng_đá gờ_đá bãi_bồi lãnh_nguyên đầm_phá bãi_lầy gành_đá
+            vòng_gỗ nghệ_tây tần_bì du đoạn phong_lữ dạ_lan_hương tầm_ma kế linh_lan tử_đằng mã_não
+            bạch_ngọc đá_thô vân_mẫu huỳnh_thạch sa_khoáng lá_bạc đá_phiến mạch_quặng ngọc_đen
+            đá_mắt_mèo đá_mặt_trăng ngọc_lam san_hô_đỏ vonfram coban mangan liti ngọc_bội
+            đá_sa_thạch đá_phiến_sét đá_bọt muối_mỏ đá_bùn hải_trình chiều_kích học_thuyết tiên_đề
+            tiền_đề diễn_dịch quy_nạp loại_suy tự_sự biên_niên chứng_ngôn giao_ước luận_đề mỹ_học
+            ngữ_nghĩa xác_tín bản_thể thánh_thú thần_thú sấm_truyền kết_giới phong_ấn hắc_long
+            bạch_long chu_tước huyền_vũ cửu_vĩ_hồ hình_nhân quỷ_lùn tinh_linh hải_thần lôi_thần
+            phong_thần thiên_mã hải_quái thần_điểu hiền_giả yêu_nữ sách_phép chén_thánh trượng
+            vương_trượng bạch_xà thanh_xà linh_thú nhà_giả_kim mục_đồng phu_xe hoa_tiêu thầy_tế
+            thị_nữ thợ_kính nhà_thực_vật văn_thư thợ_xay thợ_thùng đàn_viola chũm_chọe trống_lắc
+            mộc_cầm phong_cầm khẩu_cầm âm_giai khúc_kết âm_sắc nhịp_phách chương_nhạc khúc_mở_màn
+            dạ_khúc tụng_ca cầu_hồn_khúc tứ_tấu ngũ_tấu quãng_tám bán_âm tổng_phổ máy_nhịp
+            đại_hồ_cầm kèn_trombone kèn_tuba kèn_túi đàn_cầm sáo_mèo đàn_tỳ_bà đàn_tam đối_âm
+            luyến_âm thánh_thi trường_độ đàn_sến kèn_lá thành_lũy hào nhà_nguyện am cầu_dẫn
+            lúa_mạch_đen đậu_lăng đậu_gà mộc_qua kiếm_đạo xà_kép cú_móc ván_nhún ngựa_gỗ xe_ủi_tuyết
+            tàu_một_ray tàu_hai_thân tàu_phá_băng tàu_thăm_dò tàu_đổ_bộ xe_một_bánh xe_tưới_nước
+            tàu_lặn toa_giường xe_thổ_mộ xe_trộn tàu_hộ_tống tàu_khu_trục thuyền_nan máy_ảnh_web
+            áo_tắm_dài bạc_kim đỏ_ruby màu_lục_bảo lục_nhạt màu_ngọc_lam màu_hổ_phách lam_biếc
+            tím_biếc bạc_xám lục_thẫm chàm_đen huyết_dụ sổ_cái nợ_phải_trả thặng_dư lợi_suất
+            thấu_chi thanh_khoản vòng_quay sổ_quỹ văn_tự hối_phiếu hạn_ngạch bộ_đệm gói_tin hàng_đợi
+            ngăn_xếp phần_sụn sổ_đăng_ký mạng_con tên_máy mã_kiểm_tra lược_đồ cụm_máy phân_mảnh
+            vùng_chứa hộp_cát kho_mã trình_gỡ_lỗi mã_máy ngắt thanh_ghi tốc_độ_bit thông_lượng
+            điểm_cuối băm kết_xuất bộ_tô_bóng khung_dây khung_nhìn bộ_đệm_khung tám_bit đường_lên
+            đường_xuống định_tuyến chuyển_mạch hệ_thống_tệp liên_kết_mềm di_trú bản_dựng gói_cài
+            kho_lệnh khí_áp sương_sa quầng_trăng ráng_chiều gió_chướng mưa_ngâu_dài thiên_đỉnh
+            nhật_hoa gió_mặt_trời liên_sao định_tinh thiên_cầu thị_sai parsec thiên_để phương_vị
+            cận_nhật viễn_nhật quang_cầu sắc_cầu tầng_điện_ly vành_đai_sao đĩa_sao lỗ_sâu
+            sao_siêu_mới sát_na chính_ngọ tiết_khí lập_hạ lập_thu lập_đông thiên_thu niên_đại
+            tuần_trăng trắc_ẩn kính_sợ can_trường sầu_muộn tủi_hờn sùng_kính độ_lượng hoan_hỉ
+            mao_mạch hầu cơ_hoành xương_ức xương_bả khung_chậu xương_chày xương_mác khoeo mống_mắt
+            lưỡi_gà áo_tơi áo_leo_núi áo_đuôi_tôm áo_lễ áo_chẽn xà_cạp áo_nịt mũ_ba_góc mũ_trụ
+            dải_viền ống_bễ ê_tô thước_cặp dây_mực mai thoi cưa_lọng cưa_vòng máy_chà_nhám mũi_vạch
+            thước_vuông ke_góc bàn_thợ giũa_thô thước_vạch dây_dọi khuôn_dập đá_ráp rìu_tay dao_bào
+            dùi_đục mỏ_cặp cưa_cắt bàn_kẹp trà_lúa_mạch rượu_táo rượu_sim nước_nhãn
+        """),
+    ),
     frames=(
         WordFrame(("noun",), 10),
         WordFrame(("noun", "adjective"), 34),

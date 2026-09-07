@@ -6,6 +6,7 @@ from randino._types import (
     NicknameDetail,
     RandOutput,
     RandRealism,
+    RandVocabulary,
     WordLanguageOption,
     WordSlotOption,
     WordThemeOption,
@@ -21,6 +22,7 @@ def rand_nickname(
     slots: WordSlotOption = ...,
     count: int = ...,
     realism: RandRealism = ...,
+    vocabulary: RandVocabulary = ...,
     min_length: int | None = ...,
     max_length: int | None = ...,
     word_separator: str | None = ...,
@@ -38,6 +40,7 @@ def rand_nickname(
     slots: WordSlotOption = ...,
     count: int = ...,
     realism: RandRealism = ...,
+    vocabulary: RandVocabulary = ...,
     min_length: int | None = ...,
     max_length: int | None = ...,
     word_separator: str | None = ...,
@@ -54,6 +57,7 @@ def rand_nickname(
     slots: WordSlotOption = "all",
     count: int = 1,
     realism: RandRealism = "real",
+    vocabulary: RandVocabulary = "full",
     min_length: int | None = None,
     max_length: int | None = None,
     word_separator: str | None = None,
@@ -79,6 +83,8 @@ def rand_nickname(
         count: How many nicknames to return. Held inside `0`..`RAND_COUNT_MAX`.
         realism: whether the words are real ones or invented to read like the
             language. `"mixed"` decides per word.
+        vocabulary: How common the noun a nickname is built around has to be — see
+            `rand_word`. The modifier in front of it is drawn as it always was.
         min_length: Minimum length in characters. Defaults to the language's own
             range.
         max_length: Maximum length in characters.
@@ -117,6 +123,7 @@ def rand_nickname(
         slots=slots,
         count=count,
         realism=realism,
+        vocabulary=vocabulary,
         min_length=min_length,
         max_length=max_length,
         word_separator=word_separator,

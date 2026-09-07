@@ -53,6 +53,7 @@ export 'src/types.dart'
         NameScript,
         NicknameDetail,
         RandRealism,
+        RandVocabulary,
         SentenceDetail,
         SentenceShape,
         SentenceQuote,

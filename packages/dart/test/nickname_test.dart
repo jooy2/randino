@@ -278,6 +278,36 @@ void main() {
       }
     });
 
+    test('vocabulary decides how common the noun is', () {
+      // The noun a nickname is built around is drawn as common as the caller
+      // asked; the modifier in front of it is drawn as it always was.
+      for (final language in wordLanguages) {
+        final basic = wordData[language]!.levels.basic.toSet();
+        final rare = wordData[language]!.levels.rare.toSet();
+        final nouns = nounsOf(language).toSet();
+
+        for (final detail in randNicknameDetails(
+          language: language,
+          vocabulary: RandVocabulary.basic,
+          count: 120,
+        )) {
+          final noun = detail.words[detail.slots.indexOf(WordSlot.noun)];
+
+          expect(basic, contains(noun), reason: '$language: $noun (${detail.nickname})');
+        }
+
+        for (final detail in randNicknameDetails(
+          language: language,
+          vocabulary: RandVocabulary.common,
+          count: 120,
+        )) {
+          final noun = detail.words[detail.slots.indexOf(WordSlot.noun)];
+
+          expect(nouns.contains(noun) && !rare.contains(noun), isTrue, reason: '$language: $noun');
+        }
+      }
+    });
+
     test('a word belongs to exactly one theme', () {
       // Two themes claiming one word make `theme` ambiguous, and
       // make `randNicknameDetails` report a theme the caller never asked about.

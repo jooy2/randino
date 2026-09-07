@@ -36,6 +36,7 @@ import type {
 	NameGender,
 	RandRealism,
 	RandSentenceOptions,
+	RandVocabulary,
 	SentenceDetail,
 	SentenceQuote,
 	SentenceShapeOption,
@@ -56,6 +57,7 @@ import {
 	agree,
 	drawWord,
 	genderOf,
+	levelledNouns,
 	modifierFollows,
 	pickWord,
 	poolBounds,
@@ -294,6 +296,8 @@ type Settings = {
 	// The same thing again, in the form `randName` takes it. A sentence that writes
 	// a person's name hands the name generator the level the caller asked for.
 	realism: RandRealism;
+	// How common the nouns have to be.
+	vocabulary: RandVocabulary;
 	minLength?: number;
 	maxLength?: number;
 	prefix: string;
@@ -997,8 +1001,8 @@ const nounCache = new Map<string, WordPool>();
  * considers reads them for every theme it could take, and filtering two hundred
  * nouns each time is what made a paragraph slow once every language had them.
  */
-const subjectPoolCache = new WeakMap<VerbGroup | StateGroup, Map<WordTheme, WordPool>>();
-const objectPoolCache = new WeakMap<VerbGroup, Map<WordTheme, WordPool>>();
+const subjectPoolCache = new WeakMap<VerbGroup | StateGroup, Map<string, WordPool>>();
+const objectPoolCache = new WeakMap<VerbGroup, Map<string, WordPool>>();
 const placePoolCache = new Map<string, WordPool>();
 const boundsCache = new Map<string, Record<string, readonly [number, number]>>();
 const spanCache = new Map<string, readonly [number, number]>();
@@ -1010,8 +1014,8 @@ const agreedCache = new Map<string, readonly string[]>();
  * beside them, and a verb pool written twice over is a lot of data for a dozen
  * words.
  */
-function nounsOf(language: WordLanguage, theme: WordTheme): WordPool {
-	const key = `${language}:${theme}`;
+function nounsOf(language: WordLanguage, theme: WordTheme, vocabulary: RandVocabulary): WordPool {
+	const key = `${language}:${theme}:${vocabulary}`;
 	const cached = nounCache.get(key);
 
 	if (cached) {
@@ -1019,14 +1023,17 @@ function nounsOf(language: WordLanguage, theme: WordTheme): WordPool {
 	}
 
 	const data = WORD_DATA[language];
+	// As common as the caller asked, and then only the nouns a singular verb can
+	// stand beside.
+	const levelled = levelledNouns(data, theme, vocabulary);
 	const pool = data.nounGender
-		? data.nouns[theme].filter((word) => {
+		? levelled.filter((word) => {
 				const gender = data.nounGender![word];
 
 				return gender !== 'p' && gender !== 'fp';
 			})
-		: data.nouns[theme];
-	const usable = pool.length ? pool : data.nouns[theme];
+		: levelled;
+	const usable = pool.length ? pool : levelled;
 
 	nounCache.set(key, usable);
 
@@ -1044,16 +1051,17 @@ function nounsOf(language: WordLanguage, theme: WordTheme): WordPool {
 function nounSpan(
 	language: WordLanguage,
 	theme: WordTheme,
-	invent: number
+	invent: number,
+	vocabulary: RandVocabulary
 ): readonly [number, number] {
-	const key = `${language}:${theme}:${invent}`;
+	const key = `${language}:${theme}:${invent}:${vocabulary}`;
 	const cached = spanCache.get(key);
 
 	if (cached) {
 		return cached;
 	}
 
-	const [poolLow, poolHigh] = poolBounds(nounsOf(language, theme));
+	const [poolLow, poolHigh] = poolBounds(nounsOf(language, theme, vocabulary));
 	const [synLow, synHigh] = synthBounds(WORD_DATA[language].syn);
 	// `'mixed'` draws from both, so both lengths are on the table.
 	const span: readonly [number, number] =
@@ -1137,7 +1145,7 @@ function slotBounds(language: WordLanguage): Record<string, readonly [number, nu
 		? [undefined, ...(Object.keys(wordData.agreement) as WordGender[])]
 		: [undefined];
 	const bounds = {
-		noun: span(WORD_THEMES.map((theme) => nounsOf(language, theme))),
+		noun: span(WORD_THEMES.map((theme) => nounsOf(language, theme, 'full'))),
 		modifier: span(genders.map((gender) => modifiersFor(language, null, gender))),
 		// Every form a predicate can take, not only the plain statement's: a question
 		// form is a different length, and the shape is chosen against these.
@@ -1353,6 +1361,7 @@ function pickFrame(
 function verbGroupsFor(
 	language: WordLanguage,
 	data: SentenceLanguageData,
+	vocabulary: RandVocabulary,
 	frame: SentenceFrame,
 	themes: readonly WordTheme[],
 	plan: Plan,
@@ -1434,8 +1443,8 @@ function verbGroupsFor(
 		}
 
 		return (
-			subjectThemesOf(group, themes, language, data).length > 0 &&
-			(!group.object || objectThemesOf(group, beat, language, data).length > 0)
+			subjectThemesOf(group, themes, language, data, vocabulary).length > 0 &&
+			(!group.object || objectThemesOf(group, beat, language, data, vocabulary).length > 0)
 		);
 	});
 
@@ -1463,7 +1472,8 @@ function subjectThemesOf(
 	group: VerbGroup | StateGroup,
 	themes: readonly WordTheme[],
 	language: WordLanguage,
-	data: SentenceLanguageData
+	data: SentenceLanguageData,
+	vocabulary: RandVocabulary
 ): readonly WordTheme[] {
 	const byClass = themesForClasses(themes, group.subject);
 	const byTheme = group.subjectThemes
@@ -1473,7 +1483,7 @@ function subjectThemesOf(
 	// A group that asks for a trait is only worth a theme that has a noun with it:
 	// `날아오른다` takes an `animal` and no `job`, because no job flies.
 	return 'field' in group && group.subjectTraits
-		? byTheme.filter((theme) => subjectPoolFor(language, data, group, theme).length > 0)
+		? byTheme.filter((theme) => subjectPoolFor(language, data, group, theme, vocabulary).length > 0)
 		: byTheme;
 }
 
@@ -1530,9 +1540,10 @@ function subjectPoolFor(
 	language: WordLanguage,
 	data: SentenceLanguageData,
 	group: VerbGroup | StateGroup,
-	theme: WordTheme
+	theme: WordTheme,
+	vocabulary: RandVocabulary
 ): WordPool {
-	const pool = nounsOf(language, theme);
+	const pool = nounsOf(language, theme, vocabulary);
 	const narrowed = 'field' in group && (group.subjectTraits || group.subjectWithout);
 
 	// A state group narrows nothing of its own, but a lifeless noun is no subject
@@ -1548,7 +1559,8 @@ function subjectPoolFor(
 		subjectPoolCache.set(group, byTheme);
 	}
 
-	const cached = byTheme.get(theme);
+	const key = `${theme}:${vocabulary}`;
+	const cached = byTheme.get(key);
 
 	if (cached) {
 		return cached;
@@ -1557,7 +1569,7 @@ function subjectPoolFor(
 	const wordData = WORD_DATA[language];
 	const usable = pool.filter((entry) => acceptsNoun(data, group, plain(wordData, entry)));
 
-	byTheme.set(theme, usable);
+	byTheme.set(key, usable);
 
 	return usable;
 }
@@ -1571,16 +1583,17 @@ function subjectPoolFor(
 function placePoolFor(
 	language: WordLanguage,
 	data: SentenceLanguageData,
-	theme: WordTheme
+	theme: WordTheme,
+	vocabulary: RandVocabulary
 ): WordPool {
-	const pool = nounsOf(language, theme);
+	const pool = nounsOf(language, theme, vocabulary);
 	const placeless = data.traits?.placeless;
 
 	if (!placeless) {
 		return pool;
 	}
 
-	const key = `${language}:${theme}`;
+	const key = `${language}:${theme}:${vocabulary}`;
 	const cached = placePoolCache.get(key);
 
 	if (cached) {
@@ -1649,9 +1662,10 @@ function objectPoolAvoiding(
 	data: SentenceLanguageData,
 	group: VerbGroup | StateGroup,
 	theme: WordTheme,
+	vocabulary: RandVocabulary,
 	avoid: readonly string[]
 ): WordPool {
-	const pool = objectPoolFor(language, data, group, theme);
+	const pool = objectPoolFor(language, data, group, theme, vocabulary);
 
 	if (!avoid.length) {
 		return pool;
@@ -1668,9 +1682,10 @@ function objectPoolFor(
 	language: WordLanguage,
 	data: SentenceLanguageData,
 	group: VerbGroup | StateGroup,
-	theme: WordTheme
+	theme: WordTheme,
+	vocabulary: RandVocabulary
 ): WordPool {
-	const pool = nounsOf(language, theme);
+	const pool = nounsOf(language, theme, vocabulary);
 
 	if (!('field' in group) || (!group.objectTraits && !group.objectWithout)) {
 		return pool;
@@ -1683,7 +1698,8 @@ function objectPoolFor(
 		objectPoolCache.set(group, byTheme);
 	}
 
-	const cached = byTheme.get(theme);
+	const key = `${theme}:${vocabulary}`;
+	const cached = byTheme.get(key);
 
 	if (cached) {
 		return cached;
@@ -1692,7 +1708,7 @@ function objectPoolFor(
 	const wordData = WORD_DATA[language];
 	const usable = pool.filter((entry) => acceptsObjectNoun(data, group, plain(wordData, entry)));
 
-	byTheme.set(theme, usable);
+	byTheme.set(key, usable);
 
 	return usable;
 }
@@ -1705,7 +1721,8 @@ function objectThemesOf(
 	group: VerbGroup,
 	beat: BeatDraw | null,
 	language: WordLanguage,
-	data: SentenceLanguageData
+	data: SentenceLanguageData,
+	vocabulary: RandVocabulary
 ): readonly WordTheme[] {
 	const byClass = beat?.item
 		? acceptsObject(group, beat.item)
@@ -1719,7 +1736,7 @@ function objectThemesOf(
 
 	// A group that asks for a trait is only worth a theme that has a noun with it.
 	return group.objectTraits || group.objectWithout
-		? byTheme.filter((theme) => objectPoolFor(language, data, group, theme).length > 0)
+		? byTheme.filter((theme) => objectPoolFor(language, data, group, theme, vocabulary).length > 0)
 		: byTheme;
 }
 
@@ -1727,6 +1744,7 @@ function objectThemesOf(
 function stateGroupsFor(
 	language: WordLanguage,
 	data: SentenceLanguageData,
+	vocabulary: RandVocabulary,
 	themes: readonly WordTheme[],
 	frame: SentenceFrame,
 	plan: Plan,
@@ -1751,7 +1769,7 @@ function stateGroupsFor(
 			return false;
 		}
 
-		return subjectThemesOf(group, themes, language, data).length > 0;
+		return subjectThemesOf(group, themes, language, data, vocabulary).length > 0;
 	});
 }
 
@@ -1854,11 +1872,12 @@ function nounPhrase(
 	// word no pool holds, which takes any modifier the language has.
 	described: WordTheme | null = theme,
 	// The nouns to draw from, when the group has narrowed them: a flier for a verb
-	// that takes off. The theme's whole pool otherwise.
-	only: WordPool | null = null
+	// that takes off. The theme's whole pool otherwise, as common as was asked.
+	only: WordPool | null = null,
+	vocabulary: RandVocabulary = 'full'
 ): Phrase {
 	const wordData = WORD_DATA[language];
-	const pool = only ?? nounsOf(language, theme);
+	const pool = only ?? nounsOf(language, theme, vocabulary);
 	const space = data.space.length;
 	const [, nounMax] = span;
 	const [modMin, modMax] = poolBounds(modifiersFor(language, described, undefined));
@@ -2113,10 +2132,12 @@ function generateOne(language: WordLanguage, settings: Settings, draw: Draw): Bu
 		}
 
 		return frame.parts.some((part) => part.slot === 'state')
-			? stateGroupsFor(language, data, requested, frame, plan, draw.beat).length > 0
+			? stateGroupsFor(language, data, settings.vocabulary, requested, frame, plan, draw.beat)
+					.length > 0
 			: verbGroupsFor(
 					language,
 					data,
+					settings.vocabulary,
 					frame,
 					requested,
 					plan,
@@ -2305,12 +2326,13 @@ function compose(
 		headed === 'copula'
 			? [data.calendar!.copula as StateGroup | VerbGroup]
 			: headed === 'state'
-				? (stateGroupsFor(language, data, themes, frame, plan, draw.beat) as (
+				? (stateGroupsFor(language, data, settings.vocabulary, themes, frame, plan, draw.beat) as (
 						StateGroup | VerbGroup
 					)[])
 				: (verbGroupsFor(
 						language,
 						data,
+						settings.vocabulary,
 						frame,
 						themes,
 						plan,
@@ -2329,7 +2351,7 @@ function compose(
 		draw.tense,
 		draw.link === 'first' ? data.join : undefined
 	);
-	const subjectThemes = subjectThemesOf(group, themes, language, data);
+	const subjectThemes = subjectThemesOf(group, themes, language, data, settings.vocabulary);
 	// Which part is the subject is the shape's business, not the slot's: a counted
 	// shape has no `subject` part and its quantity is the subject. Looking for a
 	// `subject` part regardless is how a word required into a counted subject lost
@@ -2395,7 +2417,7 @@ function compose(
 			? part.slot === subjectSlot
 				? subjectTheme
 				: (plan.phrase.get(at)?.theme ??
-					themeForPart(part.slot, group, themes, draw.beat, language, data))
+					themeForPart(part.slot, group, themes, draw.beat, language, data, settings.vocabulary))
 			: null
 	);
 	// What a phrase writes instead of a noun phrase, when it writes one at all: a
@@ -2472,7 +2494,9 @@ function compose(
 			// the language rather than against its nouns — `randName` invents from its
 			// own syllables and draws from its own pools, and neither is this theme's.
 			const span =
-				proper[i] === '' ? nameSpan(language) : nounSpan(language, theme, settings.invent);
+				proper[i] === ''
+					? nameSpan(language)
+					: nounSpan(language, theme, settings.invent, settings.vocabulary);
 			// A word no pool holds is described by any modifier; a noun by the ones
 			// that fit what it is.
 			const described = required && !required.known ? null : theme;
@@ -2671,12 +2695,20 @@ function compose(
 				part.slot === 'quantity' ? countText(data, theme) : '',
 				required && !required.known ? null : theme,
 				part.slot === subjectSlot
-					? subjectPoolFor(language, data, group, theme)
+					? subjectPoolFor(language, data, group, theme, settings.vocabulary)
 					: part.slot === 'object'
-						? objectPoolAvoiding(language, data, group, theme, draw.beat?.avoid ?? [])
+						? objectPoolAvoiding(
+								language,
+								data,
+								group,
+								theme,
+								settings.vocabulary,
+								draw.beat?.avoid ?? []
+							)
 						: part.slot === 'place' || part.slot === 'destination'
-							? placePoolFor(language, data, theme)
-							: null
+							? placePoolFor(language, data, theme, settings.vocabulary)
+							: null,
+				settings.vocabulary
 			);
 
 			phrase = built.text;
@@ -3148,10 +3180,11 @@ function themeForPart(
 	themes: readonly WordTheme[],
 	beat: BeatDraw | null,
 	language: WordLanguage,
-	data: SentenceLanguageData
+	data: SentenceLanguageData,
+	vocabulary: RandVocabulary
 ): WordTheme {
 	if (slot === 'object' || slot === 'quantity') {
-		const usable = objectThemesOf(group as VerbGroup, beat, language, data);
+		const usable = objectThemesOf(group as VerbGroup, beat, language, data, vocabulary);
 
 		return pick(usable.length ? usable : WORD_THEMES);
 	}
@@ -4013,7 +4046,7 @@ function tellStory(telling: Telling): Result | null {
 			const wordData = WORD_DATA[language];
 
 			roles.place = {
-				word: plain(wordData, pick(placePoolFor(language, data, theme))),
+				word: plain(wordData, pick(placePoolFor(language, data, theme, settings.vocabulary))),
 				slots: ['place'],
 				theme,
 				known: true
@@ -4759,6 +4792,7 @@ function resolveSettings(options: RandSentenceOptions): Settings {
 		prefix: resolvePrefix(options.startsWith),
 		include: resolveInclude(options.include),
 		sentences: clamp(Math.floor(options.sentences ?? 1), 1, RAND_SENTENCE_COUNT_MAX),
+		vocabulary: resolveVocabulary(options.vocabulary),
 		realism: options.realism ?? 'real',
 		includeName: typeof options.includeName === 'boolean' ? options.includeName : null,
 		types: resolveTypes(options.type),

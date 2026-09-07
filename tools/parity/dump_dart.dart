@@ -150,6 +150,10 @@ void main() {
           for (final noun in entry.value.nouns.entries)
             noun.key.name: listed(noun.value),
         },
+        'levels': <String, Object?>{
+          'basic': listed(entry.value.levels.basic),
+          'rare': listed(entry.value.levels.rare),
+        },
         // The npm package tags the two shapes with `kind`; here they are two
         // classes, so the tag is written back out for the comparison.
         'syn': switch (entry.value.syn) {

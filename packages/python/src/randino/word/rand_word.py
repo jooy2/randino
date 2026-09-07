@@ -2,7 +2,13 @@
 
 from typing import Literal, overload
 
-from randino._types import RandRealism, WordDetail, WordLanguageOption, WordThemeOption
+from randino._types import (
+    RandRealism,
+    RandVocabulary,
+    WordDetail,
+    WordLanguageOption,
+    WordThemeOption,
+)
 from randino.word._generator import generate_word_details
 
 
@@ -13,6 +19,7 @@ def rand_word(
     theme: WordThemeOption = ...,
     count: int = ...,
     realism: RandRealism = ...,
+    vocabulary: RandVocabulary = ...,
     min_length: int | None = ...,
     max_length: int | None = ...,
     starts_with: str = ...,
@@ -28,6 +35,7 @@ def rand_word(
     theme: WordThemeOption = ...,
     count: int = ...,
     realism: RandRealism = ...,
+    vocabulary: RandVocabulary = ...,
     min_length: int | None = ...,
     max_length: int | None = ...,
     starts_with: str = ...,
@@ -42,6 +50,7 @@ def rand_word(
     theme: WordThemeOption = "all",
     count: int = 1,
     realism: RandRealism = "real",
+    vocabulary: RandVocabulary = "full",
     min_length: int | None = None,
     max_length: int | None = None,
     starts_with: str = "",
@@ -60,6 +69,9 @@ def rand_word(
         count: How many words to return. Held inside `0`..`RAND_COUNT_MAX`.
         realism: whether the word is a real one or invented to read like the
             language. `"mixed"` decides per word.
+        vocabulary: How common the words have to be: `"basic"` for the everyday ones,
+            `"common"` for those and the ones an adult uses now and then, `"full"` for
+            every word the pools hold.
         min_length: Minimum length in characters. Defaults to what the pools hold.
         max_length: Maximum length in characters.
         starts_with: Keep only words whose first character is this one.
@@ -85,6 +97,7 @@ def rand_word(
         theme=theme,
         count=count,
         realism=realism,
+        vocabulary=vocabulary,
         min_length=min_length,
         max_length=max_length,
         starts_with=starts_with,

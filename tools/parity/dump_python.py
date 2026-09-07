@@ -151,6 +151,7 @@ word = {
             for frame in data.frames
         ],
         "nouns": {theme: listed(words) for theme, words in data.nouns.items()},
+        "levels": {"basic": listed(data.levels.basic), "rare": listed(data.levels.rare)},
         # The npm package tags the two shapes with `kind`; here they are two
         # classes, so the tag is written back out for the comparison.
         "syn": {

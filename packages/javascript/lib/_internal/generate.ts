@@ -7,7 +7,7 @@
 // a new generator gets all of it by calling `collect`.
 
 import { RAND_COUNT_MAX, RAND_LENGTH_MAX, RAND_LENGTH_MIN } from '../constants.js';
-import type { RandCommonOptions, RandRealism } from '../_types/global.js';
+import type { RandCommonOptions, RandRealism, RandVocabulary } from '../_types/global.js';
 import { clamp, pick } from './utils.js';
 
 /** `count`, floored and clamped to what a generator will serve. */
@@ -38,6 +38,18 @@ const INVENT_CHANCE: Record<RandRealism, number> = {
  */
 export function resolveRealism(realism?: RandRealism): number {
 	return INVENT_CHANCE[realism as RandRealism] ?? INVENT_CHANCE.real;
+}
+
+const VOCABULARIES: readonly RandVocabulary[] = ['basic', 'common', 'full'];
+
+/**
+ * `vocabulary` as one of the three levels, which is what `randWord`,
+ * `randNickname` and `randSentence` narrow their noun pools by. A level the type
+ * rules out but a JavaScript caller can still pass falls back to the default —
+ * every word — rather than throwing.
+ */
+export function resolveVocabulary(vocabulary?: RandVocabulary): RandVocabulary {
+	return VOCABULARIES.includes(vocabulary as RandVocabulary) ? vocabulary! : 'full';
 }
 
 /**

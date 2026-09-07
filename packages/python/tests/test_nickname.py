@@ -242,6 +242,29 @@ def test_realism_decides_which_themes_all_spans() -> None:
             assert detail.theme == theme, detail.nickname
 
 
+def test_vocabulary_decides_how_common_the_noun_is() -> None:
+    # The noun a nickname is built around is drawn as common as the caller asked; the
+    # modifier in front of it is drawn as it always was.
+    for language in WORD_LANGUAGES:
+        basic = set(WORD_DATA[language].levels.basic)
+        rare = set(WORD_DATA[language].levels.rare)
+        nouns = set(nouns_of(language))
+
+        for detail in rand_nickname(
+            output="detail", language=language, vocabulary="basic", count=120
+        ):
+            noun = detail.words[detail.slots.index("noun")]
+
+            assert noun in basic, f"{language}: {noun} is not basic ({detail.nickname})"
+
+        for detail in rand_nickname(
+            output="detail", language=language, vocabulary="common", count=120
+        ):
+            noun = detail.words[detail.slots.index("noun")]
+
+            assert noun in nouns and noun not in rare, f"{language}: {noun} is rare"
+
+
 def test_a_word_belongs_to_exactly_one_theme() -> None:
     # Two themes claiming one word make `theme` ambiguous, and make
     # `rand_nickname(output="detail")` report a theme the caller never asked about.

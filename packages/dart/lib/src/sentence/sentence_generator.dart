@@ -264,10 +264,14 @@ class _Settings {
     required this.tense,
     required this.story,
     required this.typed,
+    required this.vocabulary,
   });
 
   final WordTheme? theme;
   final SentenceShape? shape;
+
+  /// How common the nouns have to be.
+  final RandVocabulary vocabulary;
 
   /// The parts a shape may carry beside the subject. Null is every shape the
   /// language has; an empty set is the subject and its predicate alone.
@@ -334,6 +338,7 @@ class _Settings {
     tense: tense,
     story: story,
     typed: typed,
+    vocabulary: vocabulary,
   );
 }
 
@@ -1181,10 +1186,8 @@ final Map<String, WordPool> _nounCache = <String, WordPool>{};
 /// considers reads them for every theme it could take, and filtering two hundred
 /// nouns each time is what made a paragraph slow once every language had them.
 /// A group is a constant of its language's data, so it is its own key.
-final Map<Object, Map<WordTheme, WordPool>> _subjectPoolCache =
-    <Object, Map<WordTheme, WordPool>>{};
-final Map<VerbGroup, Map<WordTheme, WordPool>> _objectPoolCache =
-    <VerbGroup, Map<WordTheme, WordPool>>{};
+final Map<Object, Map<String, WordPool>> _subjectPoolCache = <Object, Map<String, WordPool>>{};
+final Map<VerbGroup, Map<String, WordPool>> _objectPoolCache = <VerbGroup, Map<String, WordPool>>{};
 final Map<String, WordPool> _placePoolCache = <String, WordPool>{};
 final Map<WordLanguage, Map<SentenceSlot, LengthRange>> _boundsCache =
     <WordLanguage, Map<SentenceSlot, LengthRange>>{};
@@ -1197,15 +1200,17 @@ final Map<String, WordPool> _agreedCache = <String, WordPool>{};
 /// A language that inflects leaves out the nouns with no singular: `ножницы`
 /// and `Jeans` would need a plural verb beside them, and a verb pool written
 /// twice over is a lot of data for a dozen words.
-WordPool _nounsOf(WordLanguage language, WordTheme theme) {
-  final key = '${language.name}:${theme.name}';
+WordPool _nounsOf(WordLanguage language, WordTheme theme, RandVocabulary vocabulary) {
+  final key = '${language.name}:${theme.name}:${vocabulary.name}';
   final cached = _nounCache[key];
 
   if (cached != null) return cached;
 
   final data = wordData[language]!;
   final gender = data.nounGender;
-  final all = data.nouns[theme]!;
+  // As common as the caller asked, and then only the nouns a singular verb can
+  // stand beside.
+  final all = levelledNouns(data, theme, vocabulary);
   final pool =
       gender == null
           ? all
@@ -1226,13 +1231,18 @@ WordPool _nounsOf(WordLanguage language, WordTheme theme) {
 /// template rather than its pools, and English invents at most two syllables
 /// where its pools hold words of twelve letters. A budget measured against the
 /// wrong one of those is a `minLength` the phrase cannot reach.
-LengthRange _nounSpan(WordLanguage language, WordTheme theme, int invent) {
-  final key = '${language.name}:${theme.name}:$invent';
+LengthRange _nounSpan(
+  WordLanguage language,
+  WordTheme theme,
+  int invent,
+  RandVocabulary vocabulary,
+) {
+  final key = '${language.name}:${theme.name}:$invent:${vocabulary.name}';
   final cached = _spanCache[key];
 
   if (cached != null) return cached;
 
-  final pool = poolBounds(_nounsOf(language, theme));
+  final pool = poolBounds(_nounsOf(language, theme, vocabulary));
   final syn = synthBounds(wordData[language]!.syn);
   // `RandRealism.mixed` draws from both, so both lengths are on the table.
   final span =
@@ -1328,7 +1338,9 @@ Map<SentenceSlot, LengthRange> _slotBounds(WordLanguage language) {
 
   final data = sentenceData[language]!;
   final bounds = <SentenceSlot, LengthRange>{
-    SentenceSlot.subject: _span(wordThemes.map((theme) => _nounsOf(language, theme))),
+    SentenceSlot.subject: _span(
+      wordThemes.map((theme) => _nounsOf(language, theme, RandVocabulary.full)),
+    ),
     // Every form a predicate can take, not only the plain statement's: a question
     // form is a different length, and the shape is chosen against these.
     SentenceSlot.verb: _span(<WordPool>[
@@ -1513,6 +1525,7 @@ SentenceFrame _pickFrame(List<SentenceFrame> frames, [int Function(SentenceFrame
 List<VerbGroup> _verbGroupsFor(
   WordLanguage language,
   SentenceLanguageData data,
+  RandVocabulary vocabulary,
   SentenceFrame frame,
   List<WordTheme> themes,
   _Plan plan, [
@@ -1581,6 +1594,10 @@ List<VerbGroup> _verbGroupsFor(
             return false;
           }
         }
+
+        return _subjectThemesOf(language, data, group, themes, vocabulary).isNotEmpty &&
+            (group.object == null ||
+                _objectThemesOf(language, data, group, beat, vocabulary).isNotEmpty);
       })
       .toList(growable: false);
   // And where some group shows what is true of the hero, those are what the
@@ -1607,6 +1624,7 @@ List<WordTheme> _subjectThemesOf(
   SentenceLanguageData data,
   Object group,
   List<WordTheme> themes,
+  RandVocabulary vocabulary,
 ) {
   final classes = group is VerbGroup ? group.subject : (group as StateGroup).subject;
   final named = group is VerbGroup ? group.subjectThemes : (group as StateGroup).subjectThemes;
@@ -1617,7 +1635,7 @@ List<WordTheme> _subjectThemesOf(
   // `날아오른다` takes an `animal` and no `job`, because no job flies.
   if (group is VerbGroup && group.subjectTraits != null) {
     return byTheme
-        .where((theme) => _subjectPoolFor(language, data, group, theme).isNotEmpty)
+        .where((theme) => _subjectPoolFor(language, data, group, theme, vocabulary).isNotEmpty)
         .toList(growable: false);
   }
 
@@ -1670,8 +1688,9 @@ WordPool _subjectPoolFor(
   SentenceLanguageData data,
   Object group,
   WordTheme theme,
+  RandVocabulary vocabulary,
 ) {
-  final pool = _nounsOf(language, theme);
+  final pool = _nounsOf(language, theme, vocabulary);
   final narrowed =
       group is VerbGroup && (group.subjectTraits != null || group.subjectWithout != null);
 
@@ -1679,8 +1698,9 @@ WordPool _subjectPoolFor(
   // of one either.
   if (!narrowed && data.traits?[NounTrait.lifeless] == null) return pool;
 
-  final byTheme = _subjectPoolCache.putIfAbsent(group, () => <WordTheme, WordPool>{});
-  final cached = byTheme[theme];
+  final byTheme = _subjectPoolCache.putIfAbsent(group, () => <String, WordPool>{});
+  final key = '${theme.name}:${vocabulary.name}';
+  final cached = byTheme[key];
 
   if (cached != null) {
     return cached;
@@ -1691,7 +1711,7 @@ WordPool _subjectPoolFor(
       .where((entry) => _acceptsNoun(data, group, _plain(lexicon, entry)))
       .toList(growable: false);
 
-  byTheme[theme] = usable;
+  byTheme[key] = usable;
 
   return usable;
 }
@@ -1702,13 +1722,18 @@ WordPool _subjectPoolFor(
 /// A wave, a comet and a lightyear are `nature` and `space` the way a river and
 /// a moon are, and their language lists them [NounTrait.placeless]. The whole
 /// theme where nothing is left, which no pool comes to.
-WordPool _placePoolFor(WordLanguage language, SentenceLanguageData data, WordTheme theme) {
-  final pool = _nounsOf(language, theme);
+WordPool _placePoolFor(
+  WordLanguage language,
+  SentenceLanguageData data,
+  WordTheme theme,
+  RandVocabulary vocabulary,
+) {
+  final pool = _nounsOf(language, theme, vocabulary);
   final placeless = data.traits?[NounTrait.placeless];
 
   if (placeless == null) return pool;
 
-  final key = '${language.name}:${theme.name}';
+  final key = '${language.name}:${theme.name}:${vocabulary.name}';
   final cached = _placePoolCache[key];
 
   if (cached != null) {
@@ -1768,9 +1793,10 @@ WordPool _objectPoolAvoiding(
   SentenceLanguageData data,
   Object group,
   WordTheme theme,
+  RandVocabulary vocabulary,
   List<String> avoid,
 ) {
-  final pool = _objectPoolFor(language, data, group, theme);
+  final pool = _objectPoolFor(language, data, group, theme, vocabulary);
 
   if (avoid.isEmpty) return pool;
 
@@ -1788,15 +1814,17 @@ WordPool _objectPoolFor(
   SentenceLanguageData data,
   Object group,
   WordTheme theme,
+  RandVocabulary vocabulary,
 ) {
-  final pool = _nounsOf(language, theme);
+  final pool = _nounsOf(language, theme, vocabulary);
 
   if (group is! VerbGroup || (group.objectTraits == null && group.objectWithout == null)) {
     return pool;
   }
 
-  final byTheme = _objectPoolCache.putIfAbsent(group, () => <WordTheme, WordPool>{});
-  final cached = byTheme[theme];
+  final byTheme = _objectPoolCache.putIfAbsent(group, () => <String, WordPool>{});
+  final key = '${theme.name}:${vocabulary.name}';
+  final cached = byTheme[key];
 
   if (cached != null) return cached;
 
@@ -1805,7 +1833,7 @@ WordPool _objectPoolFor(
       .where((entry) => _acceptsObjectNoun(data, group, _plain(lexicon, entry)))
       .toList(growable: false);
 
-  byTheme[theme] = usable;
+  byTheme[key] = usable;
 
   return usable;
 }
@@ -1817,6 +1845,7 @@ List<WordTheme> _objectThemesOf(
   SentenceLanguageData data,
   VerbGroup group,
   _BeatDraw? beat,
+  RandVocabulary vocabulary,
 ) {
   final item = beat?.item;
   final named = group.objectThemes;
@@ -1834,7 +1863,7 @@ List<WordTheme> _objectThemesOf(
   if (group.objectTraits == null && group.objectWithout == null) return byTheme;
 
   return byTheme
-      .where((theme) => _objectPoolFor(language, data, group, theme).isNotEmpty)
+      .where((theme) => _objectPoolFor(language, data, group, theme, vocabulary).isNotEmpty)
       .toList(growable: false);
 }
 
@@ -1842,6 +1871,7 @@ List<WordTheme> _objectThemesOf(
 List<StateGroup> _stateGroupsFor(
   WordLanguage language,
   SentenceLanguageData data,
+  RandVocabulary vocabulary,
   List<WordTheme> themes,
   SentenceFrame frame,
   _Plan plan, [
@@ -1866,7 +1896,7 @@ List<StateGroup> _stateGroupsFor(
           return false;
         }
 
-        return _subjectThemesOf(language, data, group, themes).isNotEmpty;
+        return _subjectThemesOf(language, data, group, themes, vocabulary).isNotEmpty;
       })
       .toList(growable: false);
 }
@@ -2004,9 +2034,10 @@ _Phrase _nounPhrase(
   // The nouns to draw from, when the group has narrowed them: a flier for a
   // verb that takes off. The theme's whole pool otherwise.
   WordPool? only,
+  RandVocabulary vocabulary = RandVocabulary.full,
 }) {
   final lexicon = wordData[language]!;
-  final pool = only ?? _nounsOf(language, theme);
+  final pool = only ?? _nounsOf(language, theme, vocabulary);
   final space = data.space.length;
   // Measured against the base forms, because the noun that decides the gender
   // has not been drawn yet; the modifier itself is chosen from the agreed pool.
@@ -2148,10 +2179,13 @@ WordTheme _themeForPart(
   VerbGroup? group,
   List<WordTheme> themes,
   _BeatDraw? beat,
+  RandVocabulary vocabulary,
 ) {
   if (slot == SentenceSlot.object || slot == SentenceSlot.quantity) {
     final usable =
-        group == null ? const <WordTheme>[] : _objectThemesOf(language, data, group, beat);
+        group == null
+            ? const <WordTheme>[]
+            : _objectThemesOf(language, data, group, beat, vocabulary);
 
     return pick(usable.isNotEmpty ? usable : wordThemes);
   }
@@ -2222,7 +2256,7 @@ _Built _compose(
       copular
           ? <StateGroup>[data.calendar!.copula]
           : headed
-          ? _stateGroupsFor(language, data, themes, frame, plan, beat)
+          ? _stateGroupsFor(language, data, settings.vocabulary, themes, frame, plan, beat)
           : const <StateGroup>[];
   final verbs =
       headed
@@ -2230,6 +2264,7 @@ _Built _compose(
           : _verbGroupsFor(
             language,
             data,
+            settings.vocabulary,
             frame,
             themes,
             plan,
@@ -2268,7 +2303,7 @@ _Built _compose(
     draw.link == JoinSide.first ? data.join : null,
   );
   final Object group = stateGroup ?? verbGroup!;
-  final subjectThemes = _subjectThemesOf(language, data, group, themes);
+  final subjectThemes = _subjectThemesOf(language, data, group, themes, settings.vocabulary);
   // Which part is the subject is the shape's business, not the slot's: a counted
   // shape has no `subject` part and its quantity is the subject.
   final subjectSlot = _subjectSlotOf(frame);
@@ -2351,7 +2386,15 @@ _Built _compose(
           : shape[i].slot == subjectSlot
           ? subjectTheme
           : (plan.phrase[at[i]]?.theme ??
-              _themeForPart(language, data, shape[i].slot, verbGroup, themes, beat)),
+              _themeForPart(
+                language,
+                data,
+                shape[i].slot,
+                verbGroup,
+                themes,
+                beat,
+                settings.vocabulary,
+              )),
   ];
   // What a phrase writes instead of a noun phrase, when it writes one at all: a
   // pronoun standing in for the topic, the name a repeat carries forward, or a
@@ -2454,7 +2497,9 @@ _Built _compose(
       // the language rather than against its nouns.
       own[part.slot] =
           exact ??
-          (proper[i] == '' ? _nameSpan(language) : _nounSpan(language, theme, settings.invent));
+          (proper[i] == ''
+              ? _nameSpan(language)
+              : _nounSpan(language, theme, settings.invent, settings.vocabulary));
       // A word no pool holds is described by any modifier; a noun by the ones
       // that fit what it is.
       final described = required != null && !required.known ? null : theme;
@@ -2630,12 +2675,20 @@ _Built _compose(
         described: required != null && !required.known ? null : theme,
         only:
             part.slot == subjectSlot
-                ? _subjectPoolFor(language, data, group, theme)
+                ? _subjectPoolFor(language, data, group, theme, settings.vocabulary)
                 : part.slot == SentenceSlot.object
-                ? _objectPoolAvoiding(language, data, group, theme, beat?.avoid ?? const <String>[])
+                ? _objectPoolAvoiding(
+                  language,
+                  data,
+                  group,
+                  theme,
+                  settings.vocabulary,
+                  beat?.avoid ?? const <String>[],
+                )
                 : part.slot == SentenceSlot.place || part.slot == SentenceSlot.destination
-                ? _placePoolFor(language, data, theme)
+                ? _placePoolFor(language, data, theme, settings.vocabulary)
                 : null,
+        vocabulary: settings.vocabulary,
       );
 
       phrase = built.text;
@@ -3101,10 +3154,19 @@ _Built _generateOne(WordLanguage language, _Settings settings, _Draw draw) {
     }
 
     return frame.parts.any((part) => part.slot == SentenceSlot.state)
-        ? _stateGroupsFor(language, data, requested, frame, placement.plan, draw.beat).isNotEmpty
+        ? _stateGroupsFor(
+          language,
+          data,
+          settings.vocabulary,
+          requested,
+          frame,
+          placement.plan,
+          draw.beat,
+        ).isNotEmpty
         : _verbGroupsFor(
           language,
           data,
+          settings.vocabulary,
           frame,
           requested,
           placement.plan,
@@ -4144,7 +4206,7 @@ _Result? _tellStory(_Telling telling) {
       final lexicon = wordData[language]!;
 
       roles.place = _Requirement(
-        _plain(lexicon, pick(_placePoolFor(language, data, theme))),
+        _plain(lexicon, pick(_placePoolFor(language, data, theme, settings.vocabulary))),
         const <SentenceSlot?>[SentenceSlot.place],
         theme: theme,
       );
@@ -4921,6 +4983,7 @@ List<SentenceDetail> generateSentenceDetails({
   SentenceStyle? style,
   SentenceTense? tense,
   SentenceStory? story,
+  RandVocabulary vocabulary = RandVocabulary.full,
 }) {
   final settings = _Settings(
     theme: theme,
@@ -4942,6 +5005,7 @@ List<SentenceDetail> generateSentenceDetails({
     // A caller who named the kinds — every one of them included — gets them; a
     // story writes statements otherwise.
     typed: type != null && type.isNotEmpty,
+    vocabulary: vocabulary,
   );
 
   return collect<SentenceDetail>(

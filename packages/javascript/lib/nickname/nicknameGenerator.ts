@@ -29,21 +29,31 @@ import {
 	lengthBounds,
 	resolveLength,
 	resolvePrefix,
-	resolveRealism
+	resolveRealism,
+	resolveVocabulary
 } from '../_internal/generate.js';
 import { pick } from '../_internal/utils.js';
 import type {
 	NicknameDetail,
+	RandNicknameOptions,
+	RandVocabulary,
 	WordLanguage,
 	WordSlot,
 	WordSlotOption,
 	WordTheme,
-	WordThemeOption,
-	RandNicknameOptions
+	WordThemeOption
 } from '../_types/global.js';
 import { LOOSE_THEMES, WORD_DATA, WORD_LANGUAGES, WORD_THEMES } from '../word/data/index.js';
 import type { WordFrame, WordGender, WordLanguageData, WordPool } from '../word/data/types.js';
-import { agree, drawWord, genderOf, poolBounds, themeOf, themesOf } from '../word/wordGenerator.js';
+import {
+	agree,
+	drawWord,
+	genderOf,
+	levelledNouns,
+	poolBounds,
+	themeOf,
+	themesOf
+} from '../word/wordGenerator.js';
 
 // How many shapes to try before settling for the closest fit found.
 const FIT_ATTEMPTS = 12;
@@ -63,6 +73,8 @@ type Settings = {
 	// Whether the themes that make an awkward nickname are in play. Off at
 	// `realism: 'real'`, which is what keeps `theme: 'all'` readable.
 	loose: boolean;
+	// How common the noun has to be.
+	vocabulary: RandVocabulary;
 	minLength?: number;
 	maxLength?: number;
 	prefix: string;
@@ -362,6 +374,7 @@ export function naturalRange(
 		slots: 'all',
 		invent: 0,
 		loose: true,
+		vocabulary: 'full',
 		prefix: '',
 		separator
 	};
@@ -404,7 +417,7 @@ function generateOne(language: WordLanguage, settings: Settings): Built {
 	for (let attempt = 0; attempt < FIT_ATTEMPTS; attempt += 1) {
 		// One theme per nickname, so a mixed request spreads over all of them.
 		const theme = pick(themes);
-		const nouns = data.nouns[theme];
+		const nouns = levelledNouns(data, theme, settings.vocabulary);
 		const bounds = slotBounds(language, data, theme);
 		const [min, max] = boundsFor(data, allowed, bounds, settings);
 		// Prefer a shape that can actually land inside the range.
@@ -476,6 +489,7 @@ function resolveSettings(options: RandNicknameOptions): Settings {
 		slots: resolveSlots(options.slots),
 		invent: resolveRealism(options.realism),
 		loose: (options.realism ?? 'real') !== 'real',
+		vocabulary: resolveVocabulary(options.vocabulary),
 		minLength: resolveLength(options.minLength),
 		maxLength: resolveLength(options.maxLength),
 		prefix: resolvePrefix(options.startsWith),

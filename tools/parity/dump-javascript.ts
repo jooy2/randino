@@ -157,6 +157,7 @@ console.log(
 						nouns: Object.fromEntries(
 							Object.entries(data.nouns).map(([theme, words]) => [theme, list(words)])
 						),
+						levels: { basic: list(data.levels.basic), rare: list(data.levels.rare) },
 						syn:
 							data.syn.kind === 'syllable'
 								? {

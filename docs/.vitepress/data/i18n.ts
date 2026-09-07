@@ -67,6 +67,10 @@ const strings = {
 		ko: 'real은 풀에서 단어를 뽑고, invented는 그 언어처럼 읽히기만 하는 단어를 만들어냅니다. mixed는 단어마다 정합니다.',
 		en: 'real draws from the pools, invented builds words that only read like the language, and mixed decides per word.'
 	},
+	optionVocabulary: {
+		ko: 'basic은 누구나 매일 쓰는 단어만, common은 거기에 어른이 이따금 쓰는 단어까지, full은 풀에 있는 모든 단어를 씁니다.',
+		en: 'basic draws the everyday words, common those and the ones an adult uses now and then, full every word the pools hold.'
+	},
 	optionMinLength: {
 		ko: '최소 글자 수. 생략하면 단어 풀이 담고 있는 범위를 따릅니다.',
 		en: 'Minimum length in characters. Left out, it follows what the pools hold.'

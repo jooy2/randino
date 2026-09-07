@@ -1,13 +1,14 @@
 """The word generators: `rand_word` and the fourteen themed ones."""
 
 import re
-from typing import get_args
+from typing import cast, get_args
 
 from randino import (
     RAND_COUNT_MAX,
     WORD_LANGUAGES,
     WORD_THEMES,
     RandRealism,
+    RandVocabulary,
     WordLanguage,
     WordTheme,
     rand_animal,
@@ -307,6 +308,54 @@ def test_an_invented_word_is_capitalized_the_way_its_pool_is() -> None:
                     continue
 
                 assert (first == first.upper()) == capitalized, f"{language} {theme}: {word}"
+
+
+def test_vocabulary_narrows_the_pools_to_the_words_people_use() -> None:
+    # Every noun is basic, common or rare, and the two ends are listed per language.
+    # `basic` draws the everyday words, `common` leaves the rare ones out, and `full` is
+    # the pools as they are. A word in a list has to be in a pool, no word is in both
+    # lists, and every theme keeps enough everyday words to draw from.
+    for language in WORD_LANGUAGES:
+        data = WORD_DATA[language]
+        pool = set(pool_of(language))
+        basic = set(data.levels.basic)
+        rare = set(data.levels.rare)
+
+        for word in [*basic, *rare]:
+            assert word in pool, f"{language}: {word} is in a level and in no pool"
+
+        for word in basic:
+            assert word not in rare, f"{language}: {word} is both basic and rare"
+
+        for theme in WORD_THEMES:
+            everyday = [word for word in pool_of(language, theme) if word in basic]
+
+            assert len(everyday) >= 8, f"{language}: {theme} has {len(everyday)} basic words"
+
+        for detail in rand_word(output="detail", language=language, vocabulary="basic", count=200):
+            assert detail.word in basic, f"{language}: {detail.word} is not basic"
+
+        for detail in rand_word(output="detail", language=language, vocabulary="common", count=200):
+            assert detail.word not in rare, f"{language}: {detail.word} is rare"
+
+    # The full pool is the default, and `basic` reaches every theme.
+    themes = {
+        detail.theme
+        for detail in rand_word(output="detail", language="ko", vocabulary="basic", count=600)
+    }
+
+    assert len(themes) == len(WORD_THEMES)
+
+    rare = set(WORD_DATA["ko"].levels.rare)
+
+    assert any(
+        detail.word in rare for detail in rand_word(output="detail", language="ko", count=600)
+    )
+
+    # A level the type rules out falls back to every word rather than raising.
+    unknown = cast("RandVocabulary", "sparse")
+
+    assert len(rand_word(language="ko", vocabulary=unknown, count=5)) == 5
 
 
 def test_unique_never_repeats_a_word() -> None:
