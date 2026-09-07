@@ -1144,8 +1144,13 @@ function slotBounds(language: WordLanguage): Record<string, readonly [number, nu
 	const genders: (WordGender | undefined)[] = wordData.agreement
 		? [undefined, ...(Object.keys(wordData.agreement) as WordGender[])]
 		: [undefined];
+	// Every noun slot gets its own entry rather than one shared `noun`, because a
+	// result that writes a name narrows the subject alone: `Yvonne` stands where a
+	// noun phrase would have written `die schlanke Wolke`, and the object beside it
+	// is still a noun.
+	const noun = span(WORD_THEMES.map((theme) => nounsOf(language, theme, 'full')));
 	const bounds = {
-		noun: span(WORD_THEMES.map((theme) => nounsOf(language, theme, 'full'))),
+		...Object.fromEntries(NOUN_SLOTS.map((slot) => [slot, noun])),
 		modifier: span(genders.map((gender) => modifiersFor(language, null, gender))),
 		// Every form a predicate can take, not only the plain statement's: a question
 		// form is a different length, and the shape is chosen against these.
@@ -1245,13 +1250,12 @@ function partRange(
 	const tailMax =
 		Math.max(part.tail?.length ?? 0, part.tailAlt?.length ?? 0) + (copulaHigh - copulaLow);
 
-	if (!isNounSlot(part.slot)) {
-		const [low, high] = bounds[part.slot];
+	const [low, high] = bounds[part.slot];
 
+	if (!isNounSlot(part.slot)) {
 		return [head + low + tail, head + high + tailMax];
 	}
 
-	const [low, high] = bounds.noun;
 	const [articleMin, articleMax] = part.bare ? [0, 0] : articleSpan(data);
 	const article = (size: number) => (size ? size + space : 0);
 	const modifier = part.modifiable ? bounds.modifier[1] + space : 0;
@@ -2231,14 +2235,21 @@ function generateOne(language: WordLanguage, settings: Settings, draw: Draw): Bu
  * with ten sentences of twenty characters.
  */
 function boundsFor(
+	language: WordLanguage,
 	data: SentenceLanguageData,
 	frames: readonly SentenceFrame[],
-	bounds: Record<string, readonly [number, number]>,
+	room: Record<string, readonly [number, number]>,
 	settings: Settings
 ): [number, number] {
 	const count = settings.sentences;
 	const gap = data.space.length * (count - 1);
-	const [naturalMin, naturalMax] = naturalSpan(data, frames, bounds);
+	// The top is what the result can reach, and a name lowers it: `Yvonne` where a
+	// noun phrase would have written `die schlanke Wolke`. The bottom is measured
+	// against the language's own nouns even then, because `sentenceLengthRange` is a
+	// promise about the language — a name standing in the subject is no reason to
+	// write a sentence shorter than the language says it writes.
+	const [, naturalMax] = naturalSpan(data, frames, room);
+	const [naturalMin] = naturalSpan(data, frames, slotBounds(language));
 
 	return lengthBounds(
 		settings.minLength,
@@ -2503,7 +2514,7 @@ function compose(
 
 			return {
 				...bounds,
-				noun: exact ?? span,
+				[part.slot]: exact ?? span,
 				modifier: owed
 					? ([owed.word.length, owed.word.length] as const)
 					: poolBounds(modifiersFor(language, described, undefined))
@@ -2665,7 +2676,7 @@ function compose(
 			const required = plan.phrase.get(at);
 			const owed = plan.modifier.get(at);
 			const theme = partThemes[i]!;
-			const [nounLow, nounHigh] = partBounds[i].noun;
+			const [nounLow, nounHigh] = partBounds[i][part.slot];
 			const [, articleMax] = part.bare ? [0, 0] : articleSpan(data);
 			const counted = part.slot === 'quantity' ? countSpan(data)[1] : 0;
 			const room = high - nounLow - counted;
@@ -3604,7 +3615,7 @@ function generateResult(language: WordLanguage, settings: Settings): Result {
 	// word where a noun phrase would have written an article, a modifier and a noun.
 	const room = roomFor(language, named);
 	const [shortest] = naturalSpan(data, frames, room);
-	const [min, max] = boundsFor(data, frames, room, settled);
+	const [min, max] = boundsFor(language, data, frames, room, settled);
 	const budgets = shareOut(min, max, settings.sentences, data.space.length);
 	const built: Built[] = [];
 	let topic: Topic | null = null;

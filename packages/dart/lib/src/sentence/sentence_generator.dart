@@ -3276,21 +3276,28 @@ LengthRange _naturalSpan(
 /// sentences long, and capping it at what one of them may be would answer the
 /// ask with ten sentences of twenty characters.
 LengthRange _boundsFor(
+  WordLanguage language,
   SentenceLanguageData data,
   List<SentenceFrame> frames,
-  Map<SentenceSlot, LengthRange> bounds,
+  Map<SentenceSlot, LengthRange> room,
   LengthRange modifier,
   _Settings settings,
 ) {
   final count = settings.sentences;
   final gap = data.space.length * (count - 1);
-  final natural = _naturalSpan(data, frames, bounds, modifier);
+  // The top is what the result can reach, and a name lowers it: `Yvonne` where a
+  // noun phrase would have written `die schlanke Wolke`. The bottom is measured
+  // against the language's own nouns even then, because `sentenceLengthRange` is
+  // a promise about the language — a name standing in the subject is no reason to
+  // write a sentence shorter than the language says it writes.
+  final high = _naturalSpan(data, frames, room, modifier).max;
+  final low = _naturalSpan(data, frames, _slotBounds(language), modifier).min;
 
   return lengthBounds(
     settings.minLength,
     settings.maxLength,
-    natural.min * count + gap,
-    natural.max * count + gap,
+    low * count + gap,
+    high * count + gap,
     ceiling: randSentenceLengthMax * count + gap,
   );
 }
@@ -3813,7 +3820,7 @@ _Result _generateResult(WordLanguage language, _Settings settings) {
   final room = _roomFor(language, named);
   final shortest = _naturalSpan(data, frames, room, modifierBounds).min;
   final budgets = _shareOut(
-    _boundsFor(data, frames, room, modifierBounds, settled),
+    _boundsFor(language, data, frames, room, modifierBounds, settled),
     settings.sentences,
     data.space.length,
   );
@@ -3844,7 +3851,7 @@ _Result _generateResult(WordLanguage language, _Settings settings) {
   // below is what a result falls back to rather than what it usually is. A story
   // that landed outside the range is told again, and the closest telling is kept.
   if (settings.sentences > 1) {
-    final range = _boundsFor(data, frames, room, modifierBounds, settled);
+    final range = _boundsFor(language, data, frames, room, modifierBounds, settled);
     _Result? closest;
     var missed = 1 << 30;
 

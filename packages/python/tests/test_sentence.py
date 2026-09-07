@@ -2130,6 +2130,20 @@ def test_an_interjection_opens_an_exclamation_and_nothing_else() -> None:
             assert not opens(sentence), f"{language}: a statement opened on one ({sentence})"
 
 
+def test_a_name_never_takes_a_sentence_under_the_languages_own_floor() -> None:
+    # A name is one word and no article, so a shape measured against it is shorter than
+    # one measured against a noun phrase. `sentence_length_range` is a promise about the
+    # language rather than about the subject a result happened to draw, and `彤找。` at
+    # three characters is Chinese saying it writes four.
+    for language in WORD_LANGUAGES:
+        low, high = sentence_length_range(language)
+
+        for sentence in rand_sentence(language=language, include_name=True, count=SAMPLE):
+            assert low <= len(sentence) <= high, (
+                f"{language}: {sentence} ({len(sentence)}) outside {low}-{high}"
+            )
+
+
 def test_every_language_can_write_every_type_inside_its_own_length_range() -> None:
     for language in WORD_LANGUAGES:
         low, high = sentence_length_range(language)

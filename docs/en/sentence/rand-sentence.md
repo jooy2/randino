@@ -1153,6 +1153,8 @@ rand_sentence(language="es", include_name=True, count=3)
 
 It is a bare given name rather than a full one or a noun phrase: no article, no modifier, and the particle Korean puts after it chosen from its own last character the way any other word's is (`소한이`, `은영이`). It carries the gender it was drawn for, so a Spanish, Italian or Russian predicate agrees with it, as in `Celeste è affamata` beside `Ivano è raro`. That gender is the one thing the generator could not read off a name, since a name is in none of the word pools.
 
+A name is shorter than a noun phrase, so a result that writes one cannot reach the top of what the language writes: `Yvonne` stands where `die schlanke Wolke` would have. It never falls under the bottom of it either. The shapes are chosen against the name at the high end and against the language's own nouns at the low end, so what <Lang js="sentenceLengthRange" dart="sentenceLengthRange" py="sentence_length_range" code /> reports holds whoever the subject turns out to be.
+
 A name only stands where a person could. Turning the option on narrows the subject to the themes that name people, so that the sentence has somewhere to put one. A `theme` you named yourself still wins, and then no name is written at all:
 
 ::: lang js

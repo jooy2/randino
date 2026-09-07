@@ -3085,9 +3085,10 @@ def _compose(
 
 
 def _bounds_for(
+    language: WordLanguage,
     data: SentenceLanguageData,
     frames: Sequence[SentenceFrame],
-    bounds: dict[str, tuple[int, int]],
+    room: dict[str, tuple[int, int]],
     settings: Settings,
 ) -> tuple[int, int]:
     """The length range one whole result has to land in.
@@ -3099,7 +3100,13 @@ def _bounds_for(
     """
     count = settings.sentences
     gap = len(data.space) * (count - 1)
-    natural_low, natural_high = _natural_span(data, frames, bounds)
+    # The top is what the result can reach, and a name lowers it: `Yvonne` where a noun
+    # phrase would have written `die schlanke Wolke`. The bottom is measured against the
+    # language's own nouns even then, because `sentence_length_range` is a promise about
+    # the language — a name standing in the subject is no reason to write a sentence
+    # shorter than the language says it writes.
+    natural_high = _natural_span(data, frames, room)[1]
+    natural_low = _natural_span(data, frames, _slot_bounds(language))[0]
 
     return length_bounds(
         settings.min_length,
@@ -3634,7 +3641,9 @@ def _generate_result(language: WordLanguage, settings: Settings) -> Result:
     room = _room_for(language, named)
     shortest = _natural_span(data, frames, room)[0]
     budgets = _share_out(
-        _bounds_for(data, frames, room, settled), settings.sentences, len(data.space)
+        _bounds_for(language, data, frames, room, settled),
+        settings.sentences,
+        len(data.space),
     )
     # The result's own voice, settled once, and its tense likewise: a story is told in
     # one tense from start to end.
@@ -3655,7 +3664,7 @@ def _generate_result(language: WordLanguage, settings: Settings) -> Result:
     # below is what a result falls back to rather than what it usually is. A story that
     # landed outside the range is told again, and the closest telling is kept.
     if settings.sentences > 1:
-        whole = _bounds_for(data, frames, room, settled)
+        whole = _bounds_for(language, data, frames, room, settled)
         closest: Result | None = None
         missed = sys.maxsize
 

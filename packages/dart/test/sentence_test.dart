@@ -2606,6 +2606,25 @@ void main() {
       }
     });
 
+    test("a name never takes a sentence under the language's own floor", () {
+      // A name is one word and no article, so a shape measured against it is
+      // shorter than one measured against a noun phrase. `sentenceLengthRange` is
+      // a promise about the language rather than about the subject a result
+      // happened to draw, and `彤找。` at three characters is Chinese saying it
+      // writes four.
+      for (final language in wordLanguages) {
+        final range = sentenceLengthRange(language);
+
+        for (final sentence in randSentence(language: language, includeName: true, count: sample)) {
+          expect(
+            sentence.length,
+            allOf(greaterThanOrEqualTo(range.min), lessThanOrEqualTo(range.max)),
+            reason: '$language: $sentence',
+          );
+        }
+      }
+    });
+
     test('every language can write every type inside its own length range', () {
       for (final language in wordLanguages) {
         final range = sentenceLengthRange(language);

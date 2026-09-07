@@ -2349,6 +2349,23 @@ describe('Sentence', () => {
 		}
 	});
 
+	it("a name never takes a sentence under the language's own floor", () => {
+		// A name is one word and no article, so a shape measured against it is shorter
+		// than one measured against a noun phrase. `sentenceLengthRange` is a promise
+		// about the language rather than about the subject a result happened to draw,
+		// and `彤找。` at three characters is Chinese saying it writes four.
+		for (const language of WORD_LANGUAGES) {
+			const [min, max] = sentenceLengthRange(language);
+
+			for (const sentence of randSentence({ language, includeName: true, count: SAMPLE })) {
+				assert.ok(
+					sentence.length >= min && sentence.length <= max,
+					`${language}: ${sentence} (${sentence.length}) outside ${min}-${max}`
+				);
+			}
+		}
+	});
+
 	it('every language can write every type inside its own length range', () => {
 		for (const language of WORD_LANGUAGES) {
 			const [min, max] = sentenceLengthRange(language);
