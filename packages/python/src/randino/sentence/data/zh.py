@@ -683,6 +683,26 @@ ZH = SentenceLanguageData(
     pronounless=("person", "creature"),
     object_pronouns=SentenceObjectPronouns(words={"n": ("",)}),
     speech=SentenceSpeech(subject="我"),
+    replies={
+        "casual": {
+            "agree": words("是啊 对 就是 我也是 说得对 没错 是这样 可不是嘛 嗯 确实"),
+            "cheer": words("太好了! 真棒! 厉害! 真羡慕 干得好 不错嘛! 恭喜 辛苦了 好极了! 真行!"),
+            "care": words(
+                "还好吗? 歇一会儿吧 别太累了 吃点东西吧 真辛苦 慢慢来 别担心 小心点 加油 坐一下吧 喝点水 我帮你"
+            ),
+            "wonder": words(
+                "真的? 是吗? 在哪儿? 什么时候? 然后呢? 不会吧! 怎么弄的? 为什么? 是这样? 后来呢? 你说什么?"
+            ),
+            "answer": words(
+                "嗯，有点 不，还好 嗯，很 一般般 不，还没 嗯，太 有一点 不太 嗯，非常 不，一点也不 还行吧 嗯，其实"
+            ),
+        },
+    },
+    listener=SentenceSpeech(subject="你"),
+    homecomings={
+        "casual": words("我回来了 到家了 终于到家了! 我到家了 回来啦"),
+    },
+    degrees=words("非常 特别 真 有点 相当 十分 挺 极其 格外 稍微 蛮 分外"),
     numeral=SentenceNumeral(
         order="after",
         counters={

@@ -665,6 +665,13 @@ export const DE: SentenceLanguageData = {
 	// where the question shape puts it. The first person would have to conjugate
 	// every verb, so there is no `speech`.
 	listener: { subject: 'du', head: 'bist' },
+	// What somebody says on coming home — said whole, so no verb has to be
+	// conjugated for a first person the language otherwise leaves unwritten.
+	homecomings: {
+		casual: words(
+			`ich_bin_zu_Hause ich_bin_zurück endlich_zu_Hause! da_bin_ich_wieder wieder_daheim`
+		)
+	},
 	// How much a state holds, in front of it: `ist sehr müde`.
 	degrees: words(`sehr ziemlich wirklich ganz recht etwas äußerst ungemein reichlich furchtbar`),
 	// German names its months, writes the day first with a full stop after it, and

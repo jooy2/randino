@@ -1693,6 +1693,18 @@ describe('Sentence', () => {
 
 		for (const language of WORD_LANGUAGES) {
 			const data = SENTENCE_DATA[language];
+			const whole = (pools: readonly (readonly string[] | undefined)[]) =>
+				new Set(
+					pools
+						.flatMap((pool) => [...(pool ?? [])])
+						.map((entry) => entry.replace(/[!?]$/, ''))
+						.map((entry) => (data.capitalize ? upperFirst(entry) : entry))
+				);
+			const replies = whole(
+				Object.values(data.replies ?? {}).flatMap((pools) => Object.values(pools))
+			);
+			// And what the hero says on coming home, which is said whole too.
+			const homecomings = whole(Object.values(data.homecomings ?? {}));
 			let lines = 0;
 			let first = 0;
 			let answered = 0;
@@ -1705,6 +1717,16 @@ describe('Sentence', () => {
 				lines += spoken;
 				assert.ok(spoken <= most + 2, `${language}: ${spoken} lines (${detail.sentence})`);
 				assert.ok(!quoted(detail.types[0]), `${language}: opened on a line (${detail.sentence})`);
+
+				const belongs = sentenceOf(detail);
+				// An answer is one of the language's replies, written whole; a line the
+				// hero says is built from phrases. Told apart by the replies rather than
+				// by the phrases, because a reply can contain a phrase by accident — `I
+				// thought so` holds the `I` a line after it opens on.
+				const isReply = (i: number) =>
+					quoted(detail.types[i]) && replies.has(stripped(language, detail.sentences[i]));
+				const isHomecoming = (i: number) =>
+					quoted(detail.types[i]) && homecomings.has(stripped(language, detail.sentences[i]));
 
 				detail.types.forEach((type, i) => {
 					if (!quoted(type)) {
@@ -1733,6 +1755,15 @@ describe('Sentence', () => {
 						return;
 					}
 
+					// Coming home is said whole, in every language that has the words for
+					// it, and it is said aloud.
+					if (isHomecoming(i)) {
+						assert.strictEqual(type, 'dialogue', `${language}: '${line}' is a homecoming thought`);
+						homecame += 1;
+					} else {
+						assert.ok(belongs.includes(i), `${language}: '${line}' is built from nothing`);
+					}
+
 					// One mouth speaks once, and then somebody else answers or the story
 					// goes on: two lines in a row are a line and its answer, or an answer
 					// and the hero going on.
@@ -1756,6 +1787,9 @@ describe('Sentence', () => {
 			if (data.replies) {
 				assert.ok(answered > 0, `${language}: nobody ever answered`);
 			}
+
+			if (data.homecomings) {
+				assert.ok(homecame > 0, `${language}: nobody ever came home in their own words`);
 			}
 
 			for (const detail of untyped(language, 'animal')) {

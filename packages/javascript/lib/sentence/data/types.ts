@@ -832,6 +832,20 @@ export type SentenceLanguageData = {
 	 * How the hero speaks to somebody — the second person a question is asked in
 	 * (`“배고파?”`, `“Are you tired?”`). Left out by a language that cannot write it.
 	 */
+	listener?: SentenceSpeech;
+	/**
+	 * What somebody says on coming home, by speech level: `다녀왔어`, `ただいま`,
+	 * `I'm home`. Written whole, because it is an idiom and not a sentence about
+	 * arriving — `집에 도달했습니다` is grammar and nobody says it. A line that
+	 * reports coming home is drawn from here, in every language that declares it,
+	 * whether or not the language writes a first person. Left out by a language
+	 * that has no such saying.
+	 */
+	homecomings?: SentenceLevelPools;
+	/**
+	 * What somebody answers a line with, by speech level. Left out by a language
+	 * that writes no exchange, whose stories quote a line and never an answer.
+	 */
 	replies?: SentenceReplies;
 	/**
 	 * How much a state holds, written in front of it: `무척`, `very`, `とても`. A

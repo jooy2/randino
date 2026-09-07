@@ -476,6 +476,16 @@ function emitDart(code: string, data: SentenceLanguageData): string {
 
 	if (data.listener) out.push(`  listener: ${dartSpeech(data.listener)},`);
 
+	if (data.homecomings) {
+		out.push('  homecomings: <SentenceStyle, WordPool>{');
+
+		for (const [level, pool] of Object.entries(data.homecomings)) {
+			if (pool) out.push(`    SentenceStyle.${level}: ${dartWords(pool, '    ')},`);
+		}
+
+		out.push('  },');
+	}
+
 	if (data.degrees) out.push(`  degrees: ${dartWords(data.degrees, '  ')},`);
 
 	if (data.placeHeads) {
@@ -872,7 +882,14 @@ function emitPython(code: string, data: SentenceLanguageData): string {
 
 	if (data.listener) out.push(`    listener=${pySpeech(data.listener)},`);
 
-		out.push(`    speech=SentenceSpeech(subject=${pq(data.speech.subject)}${head}),`);
+	if (data.homecomings) {
+		out.push('    homecomings={');
+
+		for (const [level, pool] of Object.entries(data.homecomings)) {
+			if (pool) out.push(`        ${pq(level)}: ${pyWords(pool, '        ')},`);
+		}
+
+		out.push('    },');
 	}
 
 	if (data.degrees) out.push(`    degrees=${pyWords(data.degrees, '    ')},`);

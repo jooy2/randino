@@ -866,6 +866,11 @@ final SentenceLanguageData vi = SentenceLanguageData(
     },
   },
   listener: const SentenceSpeech(subject: 'bạn'),
+  homecomings: <SentenceStyle, WordPool>{
+    SentenceStyle.casual: words(
+      r'tôi_về_rồi về_đến_nhà_rồi cuối_cùng_cũng_về_nhà_rồi! tôi_đã_về về_rồi_đây',
+    ),
+  },
   degrees: words(r'khá hơi thật cực_kỳ vô_cùng hết_sức thật_là khá_là quá_là siêu'),
   numeral: const SentenceNumeral(
     order: NumeralOrder.before,

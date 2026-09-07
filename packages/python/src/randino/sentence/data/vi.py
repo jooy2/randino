@@ -856,6 +856,37 @@ VI = SentenceLanguageData(
     pronounless=("person",),
     object_pronouns=SentenceObjectPronouns(words={"n": ("",)}),
     speech=SentenceSpeech(subject="Tôi"),
+    replies={
+        "casual": {
+            "agree": words("""
+                ừ đúng_rồi phải_đấy tôi_cũng_vậy đúng_là_vậy chuẩn_luôn ừ_nhỉ thật_đấy công_nhận
+                đúng_thế
+            """),
+            "cheer": words("""
+                tuyệt_quá! giỏi_quá! hay_lắm! ghen_tị_quá làm_tốt_lắm tốt_quá! chúc_mừng_nhé
+                vất_vả_rồi tuyệt_vời!
+            """),
+            "care": words("""
+                ổn_không? nghỉ_một_chút_đi đừng_cố_quá ăn_gì_đó_đi mệt_nhỉ cứ_từ_từ đừng_lo
+                cẩn_thận_nhé cố_lên ngồi_xuống_đi uống_chút_nước_đi để_tôi_giúp
+            """),
+            "wonder": words("""
+                thật_à? thật_không? ở_đâu? khi_nào? rồi_sao? không_thể_nào! làm_thế_nào? tại_sao?
+                vậy_sao? thế_à? rồi_thì? gì_cơ?
+            """),
+            "answer": words("""
+                ừ,_hơi_hơi không,_ổn_mà ừ,_nhiều_lắm cũng_tạm không,_chưa ừ,_quá_luôn một_chút_thôi
+                không_hẳn ừ,_rất không,_không_hề cũng_thế ừ,_thật_ra
+            """),
+        },
+    },
+    listener=SentenceSpeech(subject="bạn"),
+    homecomings={
+        "casual": words("""
+            tôi_về_rồi về_đến_nhà_rồi cuối_cùng_cũng_về_nhà_rồi! tôi_đã_về về_rồi_đây
+        """),
+    },
+    degrees=words("khá hơi thật cực_kỳ vô_cùng hết_sức thật_là khá_là quá_là siêu"),
     numeral=SentenceNumeral(
         order="before",
         counters={

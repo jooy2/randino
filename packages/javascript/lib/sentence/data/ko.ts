@@ -1136,6 +1136,12 @@ export const KO: SentenceLanguageData = {
 	// And the person beside them is spoken to the way a spoken sentence is: with no
 	// subject written — `“배고파?”`, `“피곤하세요?”`.
 	listener: { subject: '' },
+	// What somebody says on coming home, at the three levels: `다녀왔어`.
+	homecomings: {
+		casual: words(`다녀왔어 나_왔어 집이다! 드디어_집이다! 나_돌아왔어`),
+		polite: words(`다녀왔어요 저_왔어요 집이에요! 드디어_집이에요 저_돌아왔어요`),
+		formal: words(`다녀왔습니다 집에_왔습니다 저_돌아왔습니다`)
+	},
 	// How much a state holds, in front of it: `무척 피곤하다`.
 	degrees: words(`
 		무척 아주 정말 몹시 꽤 조금 너무 한층 제법 참 유난히 사뭇 퍽 살짝 다소 상당히 매우 유독 한결 더없이 워낙 되게 엄청

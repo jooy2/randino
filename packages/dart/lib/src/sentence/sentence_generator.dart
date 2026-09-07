@@ -3997,6 +3997,22 @@ const Map<SentenceStyle, List<SentenceStyle>> _replyChain = <SentenceStyle, List
   ],
 };
 
+/// The replies a language writes at this level, or the nearest level it does
+/// write, that fit what was said: the pool for the cue, and every pool but the
+/// answers where the level has none for it — an answer to nothing is odd, and
+/// the rest fit most things.
+/// What the language says on coming home at this level, or the nearest level
+/// it says it at.
+WordPool _homecomingsOf(SentenceLanguageData data, SentenceStyle style) {
+  for (final level in _replyChain[style]!) {
+    final pool = data.homecomings?[level];
+
+    if (pool != null && pool.isNotEmpty) return pool;
+  }
+
+  return const <String>[];
+}
+
 WordPool _repliesOf(SentenceLanguageData data, SentenceStyle style, ReplyCue cue) {
   for (final level in _replyChain[style]!) {
     final pools = data.replies?[level];
@@ -4213,6 +4229,13 @@ _Result? _tellStory(_Telling telling) {
     );
   }
 
+  /// Somebody's answer to the line before: one of the language's replies, at
+  /// the level that line was said in, in the marks a line of dialogue takes.
+  /// Written whole, and built from no phrase at all. Null where the language
+  /// has none.
+  (_Built, SentenceType)? sayingFor(LengthRange budget, WordPool pool) {
+    if (pool.isEmpty) return null;
+
     final quote = _quoteFor(data, SentenceType.dialogue, settings.quote)!;
     final entries = pool.map(_replyOf).toList(growable: false);
     final fresh = entries.where((entry) => !telling.spent.contains(entry.text)).toList();
@@ -4278,12 +4301,43 @@ _Result? _tellStory(_Telling telling) {
     final scene = beat.step.kind == StepKind.scene;
     final aside = beat.step.kind == StepKind.other;
 
+    // Somebody answers the line before. Not a sentence of the story's own, and
+    // not drawn: written whole, at the level the line was said in. Only after a
+    // line that was actually quoted; a beat the story narrated after all is
+    // answered by nobody, and the beat here is told as its own step instead.
+    if (beat.voice == Voice.reply &&
+        topic != null &&
+        last != null &&
+        _quotedTypes.contains(last.type)) {
+      final reply = sayingFor(
+        budget,
+        _repliesOf(
+          data,
+          telling.flow.line ??= pick<SentenceStyle>(_spokenLevels),
+          beat.cue ?? ReplyCue.agree,
+        ),
+      );
+
       if (reply != null) {
         heroLast = false;
 
         return _Told(reply.$1, SentenceType.dialogue, reply.$2, '', null);
       }
     }
+
+    // Coming home is said in the language's own words — `다녀왔어`, `ただいま`,
+    // `I'm home` — rather than reported as arriving somewhere, which nobody
+    // says. A line, so the hero's own, and said aloud: it is said to whoever
+    // is there.
+    if (beat.voice == Voice.line &&
+        beat.field == VerbField.arrive &&
+        beat.step.destination == StoryRole.home &&
+        topic != null &&
+        beat.join == null) {
+      final said = sayingFor(
+        budget,
+        _homecomingsOf(data, telling.flow.line ??= pick<SentenceStyle>(_spokenLevels)),
+      );
 
       if (said != null) {
         heroLast = true;

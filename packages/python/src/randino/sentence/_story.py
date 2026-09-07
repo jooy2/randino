@@ -900,6 +900,25 @@ def _voices_for(
         # Whether this beat is a whole sentence: not one clause of a two-clause one.
         return i not in joined and i - 1 not in joined
 
+    def homecoming(one: _Walked) -> bool:
+        # Whether this beat is the hero coming home, which the language says whole.
+        return one.field == "arrive" and one.step.destination == "home"
+
+    def reportable(one: _Walked) -> bool:
+        # Whether the hero could report this beat in their own words. Coming home is
+        # never reported — `집에 도달했습니다` is nothing anybody says — but said in the
+        # language's own words where it has them, first person or not.
+        return (
+            data.speech is not None
+            and one.step.kind == "act"
+            and one.field is not None
+            and one.field in LINE_FIELDS
+            and not homecoming(one)
+        )
+
+    def sayable(one: _Walked) -> bool:
+        return data.homecomings is not None and one.step.kind == "act" and homecoming(one)
+
     def pair(i: int) -> bool:
         # Whether this beat and the one the plan joined it to are both things the hero
         # could report, which makes the two of them one line.
@@ -921,6 +940,13 @@ def _voices_for(
 
             if company and askable:
                 out.append("ask")
+
+        if step.kind == "act" and one.field is not None:
+            if reportable(one) or sayable(one):
+                out.append("line")
+
+            if one.field in COMMENT_FIELDS and (one.field == "talk" or step.object is not None):
+                out.append("comment")
 
             if one.field == "talk" and company and askable:
                 out.append("ask")
@@ -1013,6 +1039,11 @@ def _voices_for(
         if kind is None:
             i += 1
             continue
+
+        # What the hero makes of the person beside them is thought rather than said, and
+        # nobody answers a thought.
+        # And nobody answers `다녀왔어` with `정말?`.
+        aside = (kind == "notice" and one.step.actor == "item") or homecoming(one)
 
         if (
             kind != "ask"

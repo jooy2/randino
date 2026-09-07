@@ -300,8 +300,12 @@ console.log(
 									clitic: data.objectPronouns.clitic ?? false
 								}
 							: null,
-						speech: data.speech
-							? { subject: data.speech.subject, head: data.speech.head ?? '' }
+						speech: speech(data.speech),
+						listener: speech(data.listener),
+						homecomings: data.homecomings
+							? Object.fromEntries(
+									Object.entries(data.homecomings).map(([level, pool]) => [level, list(pool)])
+								)
 							: null,
 						placeHeads: data.placeHeads
 							? Object.fromEntries(

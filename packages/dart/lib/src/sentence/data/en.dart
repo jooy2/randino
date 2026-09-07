@@ -1873,6 +1873,11 @@ final SentenceLanguageData en = SentenceLanguageData(
     },
   },
   listener: const SentenceSpeech(subject: 'you', head: 'are'),
+  homecomings: <SentenceStyle, WordPool>{
+    SentenceStyle.casual: words(r"""
+      I'm_home I'm_back home_at_last! made_it_home back_at_last home_again
+    """),
+  },
   placeHeads: <String, WordPool>{
     'on': words(r'''
       bridge rooftop balcony veranda boardwalk promenade playground terrace staircase pier wharf

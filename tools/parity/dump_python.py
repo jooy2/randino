@@ -304,10 +304,12 @@ sentence = {
                 "clitic": data.object_pronouns.clitic,
             }
         ),
-        "speech": (
+        "speech": speech(data.speech),
+        "listener": speech(data.listener),
+        "homecomings": (
             None
-            if data.speech is None
-            else {"subject": data.speech.subject, "head": data.speech.head or ""}
+            if data.homecomings is None
+            else {level: listed(pool) for level, pool in data.homecomings.items()}
         ),
         "placeHeads": (
             None

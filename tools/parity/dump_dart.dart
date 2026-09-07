@@ -319,11 +319,13 @@ void main() {
                 },
                 'clitic': entry.value.objectPronouns!.clitic,
               },
-        'speech': entry.value.speech == null
+        'speech': speech(entry.value.speech),
+        'listener': speech(entry.value.listener),
+        'homecomings': entry.value.homecomings == null
             ? null
             : <String, Object?>{
-                'subject': entry.value.speech!.subject,
-                'head': entry.value.speech!.head ?? '',
+                for (final level in entry.value.homecomings!.entries)
+                  level.key.name: listed(level.value),
               },
         'placeHeads': entry.value.placeHeads == null
             ? null

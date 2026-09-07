@@ -1282,6 +1282,11 @@ final SentenceLanguageData it = SentenceLanguageData(
     },
   },
   listener: const SentenceSpeech(subject: '', heads: <String, String>{'è': 'sei'}),
+  homecomings: <SentenceStyle, WordPool>{
+    SentenceStyle.casual: words(
+      r'sono_a_casa eccomi_a_casa finalmente_a_casa! sono_di_ritorno eccomi_qui',
+    ),
+  },
   degrees: words(r"""
     molto abbastanza un_po' davvero proprio piuttosto assai parecchio decisamente alquanto
   """),

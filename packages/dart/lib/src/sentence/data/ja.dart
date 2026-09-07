@@ -1820,6 +1820,10 @@ final SentenceLanguageData ja = SentenceLanguageData(
     },
   },
   listener: const SentenceSpeech(subject: ''),
+  homecomings: <SentenceStyle, WordPool>{
+    SentenceStyle.casual: words(r'ただいま ただいま！ 帰ったよ やっと家だ 戻ったよ'),
+    SentenceStyle.polite: words(r'ただいま戻りました 帰りました ただいまです やっと帰りました'),
+  },
   degrees: words(r'とても すごく かなり 少し 本当に ずいぶん 実に なんとも ひどく やけに 大変 相当 ちょっと なかなか 割と 極めて'),
   numeral: const SentenceNumeral(
     order: NumeralOrder.after,

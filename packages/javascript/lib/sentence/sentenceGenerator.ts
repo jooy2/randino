@@ -3823,6 +3823,19 @@ function repliesOf(data: SentenceLanguageData, style: SentenceStyle, cue: ReplyC
 	return [];
 }
 
+/** What the language says on coming home at this level, or the nearest level it says it at. */
+function homecomingsOf(data: SentenceLanguageData, style: SentenceStyle): WordPool {
+	for (const level of REPLY_CHAIN[style]) {
+		const pool = data.homecomings?.[level];
+
+		if (pool?.length) {
+			return pool;
+		}
+	}
+
+	return [];
+}
+
 /**
  * A reply entry, read: `잘됐다!` is exclaimed and `정말?` asked, and the tag is
  * taken off so the language's own mark can be written in its place.
@@ -4111,6 +4124,19 @@ function tellStory(telling: Telling): Result | null {
 		};
 	};
 
+	/**
+	 * A line said whole — one of the language's replies, or what it says on
+	 * coming home — at the level the result's lines are said in, in the marks a
+	 * line of dialogue takes. Built from no phrase at all. Null where the pool is
+	 * empty.
+	 */
+	const sayingFor = (
+		budget: readonly [number, number],
+		pool: WordPool
+	): [Built, SentenceMark] | null => {
+		if (!pool.length) {
+			return null;
+		}
 
 		const quote = quoteFor(data, 'dialogue', settings.quote)!;
 		const entries = pool.map(replyOf);
@@ -4174,12 +4200,40 @@ function tellStory(telling: Telling): Result | null {
 		const scene = beat.step.kind === 'scene';
 		const other = beat.step.kind === 'other';
 
+		// Somebody answers the line before. Not a sentence of the story's own, and
+		// not drawn: written whole, at the level the line was said in. Only after a
+		// line that was actually quoted; a beat the story narrated after all is
+		// answered by nobody, and the beat here is told as its own step instead.
+		if (
+			beat.voice === 'reply' &&
+			topic !== null &&
+			last !== null &&
+			QUOTED_TYPES.includes(last.type)
+		) {
+			const answered = sayingFor(
+				budget,
+				repliesOf(data, (flow.line ??= pick(SPOKEN_LEVELS)), beat.cue ?? 'agree')
+			);
+
 			if (answered) {
 				heroLast = false;
 
 				return [answered[0], 'dialogue', answered[1], '', null];
 			}
 		}
+
+		// Coming home is said in the language's own words — `다녀왔어`, `ただいま`,
+		// `I'm home` — rather than reported as arriving somewhere, which nobody
+		// says. A line, so the hero's own, and said aloud: it is said to whoever is
+		// there.
+		if (
+			beat.voice === 'line' &&
+			beat.field === 'arrive' &&
+			beat.step.destination === 'home' &&
+			topic !== null &&
+			beat.join === null
+		) {
+			const said = sayingFor(budget, homecomingsOf(data, (flow.line ??= pick(SPOKEN_LEVELS))));
 
 			if (said) {
 				heroLast = true;

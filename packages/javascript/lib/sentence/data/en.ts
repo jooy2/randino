@@ -983,6 +983,11 @@ export const EN: SentenceLanguageData = {
 	// And a question to the person beside them is `are you`, with the copula in
 	// front where the question shape puts it.
 	listener: { subject: 'you', head: 'are' },
+	// What somebody says on coming home. The one line the hero says whole rather
+	// than reports: `I arrived at the house` is nothing anybody says.
+	homecomings: {
+		casual: words(`I'm_home I'm_back home_at_last! made_it_home back_at_last home_again`)
+	},
 	// How much a state holds, in front of it: `is very tired`.
 	degrees: words(`
 		very quite rather  really truly awfully terribly pretty fairly a_little somewhat extremely deeply utterly

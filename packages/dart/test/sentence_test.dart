@@ -1834,6 +1834,18 @@ void main() {
 
           return data.capitalize ? upperFirst(plain) : plain;
         }
+
+        final replies = <String>{
+          for (final pools
+              in (data.replies ?? const <SentenceStyle, Map<ReplyCue, WordPool>>{}).values)
+            for (final pool in pools.values)
+              for (final entry in pool) whole(entry),
+        };
+        // And what the hero says on coming home, which is said whole too.
+        final homecomings = <String>{
+          for (final pool in (data.homecomings ?? const <SentenceStyle, WordPool>{}).values)
+            for (final entry in pool) whole(entry),
+        };
         var lines = 0;
         var first = 0;
         var answered = 0;
@@ -1856,6 +1868,17 @@ void main() {
           );
 
           final belongs = sentenceOf(detail);
+
+          // An answer is one of the language's replies, written whole; a line
+          // the hero says is built from phrases. Told apart by the replies rather
+          // than by the phrases, because a reply can contain a phrase by
+          // accident — `I thought so` holds the `I` a line after it opens on.
+          bool isReply(int i) =>
+              quoted(detail.types[i]) && replies.contains(stripped(language, detail.sentences[i]));
+          bool isHomecoming(int i) =>
+              quoted(detail.types[i]) &&
+              homecomings.contains(stripped(language, detail.sentences[i]));
+
           for (var i = 0; i < detail.types.length; i += 1) {
             if (!quoted(detail.types[i])) continue;
 
@@ -1878,6 +1901,15 @@ void main() {
               expect(detail.types[i], SentenceType.dialogue, reason: "$language: '$line'");
               answered += 1;
               continue;
+            }
+
+            // Coming home is said whole, in every language that has the words
+            // for it, and it is said aloud.
+            if (isHomecoming(i)) {
+              expect(detail.types[i], SentenceType.dialogue, reason: "$language: '$line'");
+              homecame += 1;
+            } else {
+              expect(belongs, contains(i), reason: "$language: '$line' is built from nothing");
             }
 
             // One mouth speaks once, and then somebody else answers or the story
@@ -1908,6 +1940,9 @@ void main() {
         if (data.replies != null) {
           expect(answered, greaterThan(0), reason: '$language: nobody ever answered');
         }
+
+        if (data.homecomings != null) {
+          expect(homecame, greaterThan(0), reason: '$language: nobody ever came home');
         }
 
         for (final detail in untyped(language, WordTheme.animal)) {

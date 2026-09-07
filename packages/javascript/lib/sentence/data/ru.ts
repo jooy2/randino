@@ -693,6 +693,11 @@ export const RU: SentenceLanguageData = {
 	// them: `Ты усталый?`, `Ты усталая?`. The first person would have to conjugate
 	// every verb, so there is no `speech`.
 	listener: { subject: 'ты' },
+	// What somebody says on coming home — said whole, so no verb has to agree
+	// with a first person the language otherwise leaves unwritten.
+	homecomings: {
+		casual: words(`я_дома наконец-то_дома! вот_я_и_дома снова_дома ну_вот_и_дома`)
+	},
 	// How much a state holds, in front of it: `очень устала`.
 	degrees: words(`очень довольно слишком весьма немного совсем крайне чрезвычайно ужасно слегка`),
 	// An object named once is a pronoun the next time, where the object stood:

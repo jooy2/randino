@@ -879,6 +879,11 @@ export const IT: SentenceLanguageData = {
 	// copula: `Sei stanco?`. The first person would have to conjugate every verb,
 	// so there is no `speech`.
 	listener: { subject: '', heads: { è: 'sei' } },
+	// What somebody says on coming home — said whole, so no verb has to be
+	// conjugated for a first person the language otherwise leaves unwritten.
+	homecomings: {
+		casual: words(`sono_a_casa eccomi_a_casa finalmente_a_casa! sono_di_ritorno eccomi_qui`)
+	},
 	// How much a state holds, in front of it: `è molto stanco`.
 	degrees: words(
 		`molto abbastanza un_po' davvero proprio piuttosto assai parecchio decisamente alquanto`

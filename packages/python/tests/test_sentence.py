@@ -1571,6 +1571,15 @@ def test_a_person_in_a_story_sometimes_speaks_and_nobody_else_does() -> None:
 
         def whole(entry: str, data: SentenceLanguageData = data) -> str:
             return upper_first(entry.rstrip("!?")) if data.capitalize else entry.rstrip("!?")
+
+        replies = {
+            whole(entry)
+            for pools in (data.replies or {}).values()
+            for pool in pools.values()
+            for entry in pool
+        }
+        # And what the hero says on coming home, which is said whole too.
+        homecomings = {whole(entry) for pool in (data.homecomings or {}).values() for entry in pool}
         lines = 0
         first = 0
         answered = 0
@@ -1600,6 +1609,18 @@ def test_a_person_in_a_story_sometimes_speaks_and_nobody_else_does() -> None:
                 return (
                     quoted(detail.types[i]) and stripped(language, detail.sentences[i]) in replies
                 )
+
+            def is_homecoming(
+                i: int,
+                detail: SentenceDetail = detail,
+                language: WordLanguage = language,
+                homecomings: set[str] = homecomings,
+            ) -> bool:
+                return (
+                    quoted(detail.types[i])
+                    and stripped(language, detail.sentences[i]) in homecomings
+                )
+
             for i, type_ in enumerate(detail.types):
                 if not quoted(type_):
                     continue
@@ -1620,6 +1641,14 @@ def test_a_person_in_a_story_sometimes_speaks_and_nobody_else_does() -> None:
                     assert type_ == "dialogue", f"{language}: '{line}' is an answer thought"
                     answered += 1
                     continue
+
+                # Coming home is said whole, in every language that has the words for
+                # it, and it is said aloud.
+                if is_homecoming(i):
+                    assert type_ == "dialogue", f"{language}: '{line}' is a homecoming thought"
+                    homecame += 1
+                else:
+                    assert i in belongs, f"{language}: '{line}' is built from nothing"
 
                 # One mouth speaks once, and then somebody else answers or the story goes
                 # on: two lines in a row are a line and its answer, or an answer and the
@@ -1642,6 +1671,9 @@ def test_a_person_in_a_story_sometimes_speaks_and_nobody_else_does() -> None:
 
         if data.replies is not None:
             assert answered > 0, f"{language}: nobody ever answered"
+
+        if data.homecomings is not None:
+            assert homecame > 0, f"{language}: nobody ever came home in their own words"
 
         for detail in untyped(language, "animal"):
             assert not any(quoted(type_) for type_ in detail.types), (

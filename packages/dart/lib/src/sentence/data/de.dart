@@ -838,6 +838,11 @@ final SentenceLanguageData de = SentenceLanguageData(
     },
   },
   listener: const SentenceSpeech(subject: 'du', head: 'bist'),
+  homecomings: <SentenceStyle, WordPool>{
+    SentenceStyle.casual: words(r'''
+      ich_bin_zu_Hause ich_bin_zurück endlich_zu_Hause! da_bin_ich_wieder wieder_daheim
+    '''),
+  },
   degrees: words(r'sehr ziemlich wirklich ganz recht etwas äußerst ungemein reichlich furchtbar'),
   calendar: SentenceCalendar(
     date: 'D. MMMM Y',

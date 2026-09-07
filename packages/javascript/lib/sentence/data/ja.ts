@@ -1053,6 +1053,11 @@ export const JA: SentenceLanguageData = {
 	},
 	// And the person beside them is asked with no subject written either: 「疲れた？」.
 	listener: { subject: '' },
+	// What somebody says on coming home: ただいま.
+	homecomings: {
+		casual: words(`ただいま ただいま！ 帰ったよ やっと家だ 戻ったよ`),
+		polite: words(`ただいま戻りました 帰りました ただいまです やっと帰りました`)
+	},
 	// How much a state holds, in front of it: `とても疲れた`.
 	degrees: words(`
 		とても すごく かなり 少し 本当に ずいぶん 実に なんとも ひどく やけに 大変 相当 ちょっと なかなか 割と 極めて

@@ -947,6 +947,36 @@ function voicesFor(
 		: [];
 	let lines = 0;
 
+	/** Whether this beat is a whole sentence: not one clause of a two-clause one. */
+	const whole = (i: number) => !joined.has(i) && !joined.has(i - 1);
+	/** Whether this beat is the hero coming home, which the language says whole. */
+	const homecoming = (one: Settled): boolean =>
+		one.field === 'arrive' && one.step.destination === 'home';
+	/**
+	 * Whether the hero could report this beat in their own words. Coming home is
+	 * never reported — `집에 도달했습니다` is nothing anybody says — but said in
+	 * the language's own words where it has them, first person or not.
+	 */
+	const reportable = (one: Settled): boolean =>
+		data.speech !== undefined &&
+		one.step.kind === 'act' &&
+		one.field !== null &&
+		LINE_FIELDS.includes(one.field) &&
+		!homecoming(one);
+	const sayable = (one: Settled): boolean =>
+		data.homecomings !== undefined && one.step.kind === 'act' && homecoming(one);
+	/**
+	 * Whether this beat and the one the plan joined it to are both things the
+	 * hero could report, which makes the two of them one line: `“시장에 가서
+	 * 빵을 샀어.”`
+	 */
+	const pair = (i: number): boolean =>
+		joined.has(i) && i + 1 < settled.length && reportable(settled[i]) && reportable(settled[i + 1]);
+	/** The ways this beat could be spoken, if any. */
+	const voicesOf = (one: Settled): Voice[] => {
+		const step = one.step;
+		const out: Voice[] = [];
+
 		if (step.kind === 'state' && one.condition !== null) {
 			if (data.speech) {
 				out.push('line');
@@ -956,6 +986,18 @@ function voicesFor(
 				out.push('ask');
 			}
 		}
+
+		if (step.kind === 'act' && one.field) {
+			if (reportable(one) || sayable(one)) {
+				out.push('line');
+			}
+
+			if (
+				COMMENT_FIELDS.includes(one.field) &&
+				(one.field === 'talk' || step.object !== undefined)
+			) {
+				out.push('comment');
+			}
 
 			if (one.field === 'talk' && company && askable.length) {
 				out.push('ask');
@@ -1046,6 +1088,10 @@ function voicesFor(
 		if (kind === null) {
 			continue;
 		}
+
+		// What the hero makes of the person beside them is thought rather than said,
+		// and nobody answers a thought; and nobody answers `다녀왔어` with `정말?`.
+		const aside = (kind === 'notice' && one.step.actor === 'item') || homecoming(one);
 
 		if (kind !== 'ask' && !aside && answerable(next, one) && chance(REPLY_CHANCE[mode])) {
 			rest = walkFrom(data, chosen.slice(next + 1), hero, item, prop, settled[next].memory);

@@ -925,6 +925,26 @@ _Voices _voicesFor(
   /// Whether this beat is a whole sentence: not one clause of a two-clause one.
   bool whole(int i) => !joined.contains(i) && !joined.contains(i - 1);
 
+  /// Whether this beat is the hero coming home, which the language says whole.
+  bool homecoming(_Walked one) =>
+      one.field == VerbField.arrive && one.step.destination == StoryRole.home;
+
+  /// Whether the hero could report this beat in their own words. Coming home
+  /// is never reported — `집에 도달했습니다` is nothing anybody says — but said in
+  /// the language's own words where it has them, first person or not.
+  bool reportable(_Walked one) {
+    final field = one.field;
+
+    return data.speech != null &&
+        one.step.kind == StepKind.act &&
+        field != null &&
+        _lineFields.contains(field) &&
+        !homecoming(one);
+  }
+
+  bool sayable(_Walked one) =>
+      data.homecomings != null && one.step.kind == StepKind.act && homecoming(one);
+
   /// Whether this beat and the one the plan joined it to are both things the
   /// hero could report, which makes the two of them one line.
   bool pair(int i) =>
@@ -943,6 +963,9 @@ _Voices _voicesFor(
       if (data.speech != null) out.add(Voice.line);
       if (company && askable.isNotEmpty) out.add(Voice.ask);
     }
+
+    if (step.kind == StepKind.act && field != null) {
+      if (reportable(one) || sayable(one)) out.add(Voice.line);
 
       if (_commentFields.contains(field) && (field == VerbField.talk || step.object != null)) {
         out.add(Voice.comment);
@@ -1038,6 +1061,11 @@ _Voices _voicesFor(
       i += 1;
       continue;
     }
+
+    // What the hero makes of the person beside them is thought rather than
+    // said, and nobody answers a thought.
+    // And nobody answers `다녀왔어` with `정말?`.
+    final aside = (kind == Voice.notice && one.step.actor == StoryRole.item) || homecoming(one);
 
     if (kind != Voice.ask && !aside && answerable(next, one) && chance(_replyChance[mode]!)) {
       rest = _walkFrom(data, chosen.sublist(next + 1), hero, item, prop, walked[next].memory);

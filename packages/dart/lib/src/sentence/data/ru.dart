@@ -889,6 +889,9 @@ final SentenceLanguageData ru = SentenceLanguageData(
     },
   },
   listener: const SentenceSpeech(subject: 'ты'),
+  homecomings: <SentenceStyle, WordPool>{
+    SentenceStyle.casual: words(r'я_дома наконец-то_дома! вот_я_и_дома снова_дома ну_вот_и_дома'),
+  },
   degrees: words(r'очень довольно слишком весьма немного совсем крайне чрезвычайно ужасно слегка'),
   frames: const <SentenceFrame>[
     SentenceFrame(<SentencePart>[

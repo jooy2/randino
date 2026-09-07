@@ -3695,6 +3695,17 @@ A level a language does not write falls back the way a predicate form does, and
 """
 
 
+def _homecomings_of(data: SentenceLanguageData, style: SentenceStyle) -> WordPool:
+    """What the language says on coming home at this level, or the nearest level it says it at."""
+    for level in REPLY_CHAIN[style]:
+        pool = (data.homecomings or {}).get(level)
+
+        if pool:
+            return pool
+
+    return ()
+
+
 def _replies_of(data: SentenceLanguageData, style: SentenceStyle, cue: ReplyCue) -> WordPool:
     """The replies at this level, or the nearest level written, that fit what was said.
 
@@ -4002,6 +4013,13 @@ def _tell_story(telling: Telling) -> Result | None:
             nameless=step.kind == "other" and step.actor != "item",
         )
 
+    def saying_for(budget: tuple[int, int], pool: WordPool) -> tuple[Built, SentenceMark] | None:
+        # A line said whole — one of the language's replies, or what it says on coming
+        # home — at the level the result's lines are said in, in the marks a line of
+        # dialogue takes. Built from no phrase at all. None where the pool is empty.
+        if not pool:
+            return None
+
         quote = _quote_for(data, "dialogue", settings.quote)
         assert quote is not None
         entries = [_reply_of(entry) for entry in pool]
@@ -4060,10 +4078,38 @@ def _tell_story(telling: Telling) -> Result | None:
         scene = beat.step.kind == "scene"
         aside = beat.step.kind == "other"
 
+        # Somebody answers the line before. Not a sentence of the story's own, and not
+        # drawn: written whole, at the level the line was said in. Only after a line that
+        # was actually quoted; a beat the story narrated after all is answered by nobody,
+        # and the beat here is told as its own step instead.
+        if (
+            beat.voice == "reply"
+            and topic is not None
+            and last is not None
+            and last.type in QUOTED_TYPES
+        ):
+            level = telling.flow.line if telling.flow.line is not None else pick(SPOKEN_LEVELS)
+            telling.flow.line = level
+            reply = saying_for(budget, _replies_of(data, level, beat.cue or "agree"))
+
             if reply is not None:
                 hero_last = False
 
                 return Told(reply[0], "dialogue", reply[1], "", None)
+
+        # Coming home is said in the language's own words — `다녀왔어`, `ただいま`, `I'm
+        # home` — rather than reported as arriving somewhere, which nobody says. A line,
+        # so the hero's own, and said aloud: it is said to whoever is there.
+        if (
+            beat.voice == "line"
+            and beat.field == "arrive"
+            and beat.step.destination == "home"
+            and topic is not None
+            and beat.join is None
+        ):
+            level = telling.flow.line if telling.flow.line is not None else pick(SPOKEN_LEVELS)
+            telling.flow.line = level
+            said = saying_for(budget, _homecomings_of(data, level))
 
             if said is not None:
                 hero_last = True
