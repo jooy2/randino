@@ -1547,10 +1547,29 @@ List<VerbGroup> _verbGroupsFor(
 
         if (item != null && group.object != null && !_acceptsObject(group, item)) return false;
 
-        return _subjectThemesOf(language, data, group, themes).isNotEmpty &&
-            (group.object == null || _objectThemesOf(language, data, group, beat).isNotEmpty);
+        // A group that shows a condition is drawn only for a hero it is true of —
+        // and, for somebody else in a story whose state nobody knows, only where
+        // it shows nothing worse than being pleased: a passer-by may smile, and
+        // never clutches their stomach.
+        final condition = group.condition;
+
+        if (beat != null && condition != null) {
+          final state = beat.state;
+
+          if (state != null ? !state.contains(condition) : condition != Condition.content) {
+            return false;
+          }
+        }
       })
       .toList(growable: false);
+  // And where some group shows what is true of the hero, those are what the
+  // sentence says: the hero laughs after the meal rather than sneezing after it.
+  final showing =
+      beat?.state == null
+          ? const <VerbGroup>[]
+          : usable.where((group) => group.condition != null).toList(growable: false);
+
+  return showing.isNotEmpty ? showing : usable;
 }
 
 /// Whether a group takes a noun of this theme as its subject.
@@ -3590,6 +3609,21 @@ class _Telling {
   return (one, opened);
 }
 
+// How many of a result's sentences may say when, as a share of its count: one
+// in four, and never two in a row. `아침에 … 한낮에 … 저녁에 … 밤에` in a paragraph
+// of six is a timetable rather than a paragraph.
+const int _timeShare = 4;
+
+/// Whether the next sentence of a result has to leave the time out: the one
+/// before it named one, or the result has named its share already.
+bool _timeSpent(List<_Built> built, int count) {
+  final named = built.where((one) => one.slots.contains(SentenceSlot.time)).length;
+  final share = (count + _timeShare - 1) ~/ _timeShare;
+
+  return (built.isNotEmpty && built.last.slots.contains(SentenceSlot.time)) ||
+      named >= (share < 1 ? 1 : share);
+}
+
 _Result _generateResult(WordLanguage language, _Settings settings) {
   final data = sentenceData[language]!;
   final modifierBounds = _modifierSpan(language);
@@ -3708,6 +3742,7 @@ _Result _generateResult(WordLanguage language, _Settings settings) {
       link: null,
       dayAt: dayAt,
       object: object,
+      dated: _timeSpent(built, settings.sentences),
     );
     final (one, opened) = _drawOne(paragraph, draw);
 
@@ -3995,12 +4030,13 @@ _Result? _tellStory(_Telling telling) {
     // A second clause whose sentence has said when already — opened on `later`,
     // or named a time in its first clause — says it no second time.
     final dated =
-        beat.join == JoinSide.second &&
-        previous != null &&
-        ((data.connectives[ConnectiveKind.temporal] ?? const <String>[]).contains(openedBefore) ||
-            previous.slots.contains(SentenceSlot.time));
-    // What this sentence is doing. A caller who named the kinds gets them; the
-    // story otherwise tells, and lets a step that allows more do more.
+        _timeSpent(built, beats.length) ||
+        (beat.join == JoinSide.second &&
+            previous != null &&
+            ((data.connectives[ConnectiveKind.temporal] ?? const <String>[]).contains(
+                  openedBefore,
+                ) ||
+                previous.slots.contains(SentenceSlot.time)));
     // A line the hero says or thinks, in their own voice: the first person where
     // the language writes one, the present tense whatever the story's, a level a
     // person speaks at, and nothing in front of it — nobody opens a line on

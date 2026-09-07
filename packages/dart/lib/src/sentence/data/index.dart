@@ -411,6 +411,13 @@ const List<Story> stories = <Story>[
         object: StoryRole.item,
         place: true,
       ),
+      // Somebody at the market, doing what people at a market do.
+      StoryStep(
+        StepKind.other,
+        actorClasses: <NounClass>[NounClass.person],
+        fields: <VerbField>[VerbField.talk, VerbField.express, VerbField.wait, VerbField.move],
+        link: ConnectiveKind.additive,
+      ),
       StoryStep(
         StepKind.act,
         fields: <VerbField>[VerbField.buy, VerbField.take, VerbField.find],
@@ -1085,6 +1092,13 @@ const List<Story> stories = <Story>[
         required: true,
         link: ConnectiveKind.temporal,
       ),
+      // The person met, doing something of their own.
+      StoryStep(
+        StepKind.other,
+        actor: StoryRole.item,
+        fields: <VerbField>[VerbField.express, VerbField.talk, VerbField.wait],
+        link: ConnectiveKind.additive,
+      ),
       StoryStep(StepKind.act, fields: <VerbField>[VerbField.talk], link: ConnectiveKind.additive),
       StoryStep(
         StepKind.act,
@@ -1120,18 +1134,298 @@ const List<Story> stories = <Story>[
     prop: <NounClass>[NounClass.thing, NounClass.plant, NounClass.edible],
     propThemes: <WordTheme>[WordTheme.object, WordTheme.plant, WordTheme.food, WordTheme.drink],
     lines: 5,
+    start: <Condition>[Condition.awake, Condition.rested, Condition.home],
+    weight: 14,
+    steps: <StoryStep>[
+      StoryStep(
+        StepKind.act,
+        fields: <VerbField>[VerbField.go],
+        destination: StoryRole.place,
+        required: true,
+      ),
+      StoryStep(
+        StepKind.act,
+        fields: <VerbField>[VerbField.meet],
+        object: StoryRole.item,
+        place: true,
+        required: true,
+        link: ConnectiveKind.temporal,
+      ),
+      StoryStep(
+        StepKind.other,
+        actor: StoryRole.item,
+        fields: <VerbField>[VerbField.express, VerbField.talk],
+        link: ConnectiveKind.additive,
+      ),
+      StoryStep(StepKind.state, condition: Condition.content, link: ConnectiveKind.causal),
+      StoryStep(
+        StepKind.act,
+        fields: <VerbField>[VerbField.talk],
+        required: true,
+        link: ConnectiveKind.additive,
+      ),
+      StoryStep(
+        StepKind.act,
+        fields: <VerbField>[VerbField.look],
+        object: StoryRole.prop,
+        place: true,
+      ),
+      StoryStep(
+        StepKind.other,
+        actor: StoryRole.item,
+        fields: <VerbField>[VerbField.express, VerbField.talk, VerbField.wait, VerbField.move],
+        link: ConnectiveKind.additive,
+      ),
+      StoryStep(
+        StepKind.act,
+        fields: <VerbField>[VerbField.express],
+        link: ConnectiveKind.causal,
+        kinds: <SentenceType>[SentenceType.exclamation],
+      ),
+      StoryStep(StepKind.act, fields: <VerbField>[VerbField.talk], link: ConnectiveKind.temporal),
+      StoryStep(StepKind.act, fields: <VerbField>[VerbField.wait], place: true),
+      StoryStep(
+        StepKind.act,
+        fields: <VerbField>[VerbField.arrive],
+        destination: StoryRole.home,
+        required: true,
+        link: ConnectiveKind.temporal,
+      ),
+      StoryStep(
+        StepKind.act,
+        fields: <VerbField>[VerbField.think, VerbField.express],
+        link: ConnectiveKind.temporal,
+        kinds: <SentenceType>[SentenceType.trailing],
+      ),
+    ],
+  ),
+  // The hero goes out, sits down somewhere, and watches: what turns up, what the
+  // light does. The hero does little, and that is the point of it.
+  Story(
     name: SentenceStory.watch,
     hero: agentClasses,
     // Something seen from where they sit.
     prop: <NounClass>[NounClass.plant, NounClass.thing],
     propThemes: <WordTheme>[WordTheme.plant, WordTheme.object],
+    start: <Condition>[Condition.awake, Condition.rested, Condition.home],
+    weight: 14,
+    steps: <StoryStep>[
+      StoryStep(
+        StepKind.act,
+        fields: <VerbField>[VerbField.go],
+        destination: StoryRole.place,
+        required: true,
+      ),
+      StoryStep(
+        StepKind.act,
+        fields: <VerbField>[VerbField.rest],
+        place: true,
+        required: true,
+        link: ConnectiveKind.temporal,
+      ),
+      StoryStep(
+        StepKind.other,
+        actorClasses: <NounClass>[NounClass.creature],
+        actorThemes: <WordTheme>[WordTheme.animal],
+        fields: <VerbField>[
+          VerbField.move,
+          VerbField.play,
+          VerbField.wait,
+          VerbField.express,
+          VerbField.rest,
+        ],
+        link: ConnectiveKind.additive,
+      ),
+      StoryStep(
+        StepKind.act,
+        fields: <VerbField>[VerbField.look],
+        object: StoryRole.prop,
+        place: true,
+      ),
+      StoryStep(
+        StepKind.scene,
+        fields: <VerbField>[VerbField.change],
+        link: ConnectiveKind.temporal,
+      ),
+      StoryStep(
+        StepKind.other,
+        actorClasses: <NounClass>[NounClass.person],
+        fields: <VerbField>[
+          VerbField.move,
+          VerbField.talk,
+          VerbField.express,
+          VerbField.wait,
+          VerbField.play,
+        ],
+        link: ConnectiveKind.additive,
+      ),
+      StoryStep(StepKind.act, fields: <VerbField>[VerbField.think], link: ConnectiveKind.additive),
+      StoryStep(StepKind.state, condition: Condition.rested, link: ConnectiveKind.causal),
+      StoryStep(
+        StepKind.scene,
+        fields: <VerbField>[VerbField.change],
+        link: ConnectiveKind.temporal,
+      ),
+      StoryStep(
+        StepKind.act,
+        fields: <VerbField>[VerbField.arrive],
+        destination: StoryRole.home,
+        required: true,
+        link: ConnectiveKind.temporal,
+      ),
+      StoryStep(
+        StepKind.act,
+        fields: <VerbField>[VerbField.express, VerbField.think, VerbField.sleep],
+        link: ConnectiveKind.temporal,
+        kinds: <SentenceType>[SentenceType.trailing],
+      ),
+    ],
+  ),
+  // The weather turns while the hero is out. They wait it out, and go on once it
+  // has passed.
+  Story(
     name: SentenceStory.shelter,
     hero: agentClasses,
+    start: <Condition>[Condition.awake, Condition.rested, Condition.home],
+    weight: 12,
+    steps: <StoryStep>[
+      StoryStep(
+        StepKind.act,
+        fields: <VerbField>[VerbField.go],
+        destination: StoryRole.place,
+        required: true,
+      ),
+      StoryStep(
+        StepKind.act,
+        fields: <VerbField>[VerbField.move, VerbField.play, VerbField.wait],
+        place: true,
+        link: ConnectiveKind.additive,
+      ),
+      StoryStep(
+        StepKind.other,
+        actorClasses: <NounClass>[NounClass.event],
+        actorThemes: <WordTheme>[WordTheme.weather],
+        fields: <VerbField>[VerbField.change],
+        required: true,
+        link: ConnectiveKind.temporal,
+      ),
+      StoryStep(
+        StepKind.act,
+        fields: <VerbField>[VerbField.wait],
+        place: true,
+        required: true,
+        link: ConnectiveKind.causal,
+      ),
+      StoryStep(
+        StepKind.act,
+        fields: <VerbField>[VerbField.think, VerbField.express],
+        link: ConnectiveKind.additive,
+      ),
+      StoryStep(
+        StepKind.other,
+        actorClasses: <NounClass>[NounClass.event],
+        actorThemes: <WordTheme>[WordTheme.weather],
+        fields: <VerbField>[VerbField.change],
+        link: ConnectiveKind.temporal,
+      ),
+      StoryStep(
+        StepKind.scene,
+        fields: <VerbField>[VerbField.change],
+        link: ConnectiveKind.temporal,
+      ),
+      StoryStep(
+        StepKind.act,
+        fields: <VerbField>[VerbField.move, VerbField.play],
+        place: true,
+        link: ConnectiveKind.causal,
+      ),
+      StoryStep(
+        StepKind.act,
+        fields: <VerbField>[VerbField.arrive],
+        destination: StoryRole.home,
+        required: true,
+        link: ConnectiveKind.temporal,
+      ),
+      StoryStep(
+        StepKind.act,
+        fields: <VerbField>[VerbField.rest, VerbField.express, VerbField.think],
+        link: ConnectiveKind.temporal,
+        kinds: <SentenceType>[SentenceType.trailing],
+      ),
+    ],
+  ),
+  // Nothing happens to anybody. A place is described, and the things in it do
+  // what they do — the wind, the leaves, a bird, the evening. The hero is the
+  // place.
+  Story(
     name: SentenceStory.sketch,
     hero: <NounClass>[NounClass.place],
     heroThemes: <WordTheme>[WordTheme.place, WordTheme.nature],
     start: <Condition>[],
     weight: 16,
+    steps: <StoryStep>[
+      StoryStep(StepKind.state, required: true),
+      StoryStep(
+        StepKind.other,
+        actorClasses: <NounClass>[NounClass.event],
+        actorThemes: <WordTheme>[WordTheme.weather],
+        fields: <VerbField>[VerbField.change],
+        link: ConnectiveKind.additive,
+      ),
+      StoryStep(
+        StepKind.other,
+        actorClasses: <NounClass>[NounClass.creature],
+        actorThemes: <WordTheme>[WordTheme.animal],
+        fields: <VerbField>[
+          VerbField.move,
+          VerbField.rest,
+          VerbField.express,
+          VerbField.wait,
+          VerbField.play,
+          VerbField.sleep,
+        ],
+        link: ConnectiveKind.additive,
+      ),
+      StoryStep(
+        StepKind.act,
+        fields: <VerbField>[VerbField.change],
+        required: true,
+        link: ConnectiveKind.temporal,
+      ),
+      StoryStep(
+        StepKind.other,
+        actorClasses: <NounClass>[NounClass.plant],
+        fields: <VerbField>[VerbField.change],
+        link: ConnectiveKind.additive,
+      ),
+      StoryStep(
+        StepKind.other,
+        actorClasses: <NounClass>[NounClass.event],
+        actorThemes: <WordTheme>[WordTheme.time],
+        fields: <VerbField>[VerbField.change],
+        link: ConnectiveKind.temporal,
+      ),
+      StoryStep(
+        StepKind.other,
+        actorClasses: <NounClass>[NounClass.creature, NounClass.person],
+        actorThemes: <WordTheme>[WordTheme.animal, WordTheme.job],
+        fields: <VerbField>[
+          VerbField.move,
+          VerbField.rest,
+          VerbField.wait,
+          VerbField.sleep,
+          VerbField.express,
+        ],
+        link: ConnectiveKind.temporal,
+      ),
+      StoryStep(StepKind.act, fields: <VerbField>[VerbField.change], link: ConnectiveKind.temporal),
+      StoryStep(
+        StepKind.state,
+        link: ConnectiveKind.causal,
+        kinds: <SentenceType>[SentenceType.trailing],
+      ),
+    ],
+  ),
   Story(
     name: SentenceStory.passage,
     hero: <NounClass>[
@@ -1209,6 +1503,16 @@ const List<StoryStep> interludes = <StoryStep>[
     StepKind.other,
     actorClasses: <NounClass>[NounClass.creature, NounClass.person],
     actorThemes: <WordTheme>[WordTheme.animal, WordTheme.job],
+    fields: <VerbField>[
+      VerbField.move,
+      VerbField.express,
+      VerbField.wait,
+      VerbField.talk,
+      VerbField.play,
+    ],
+    needs: <Condition>[Condition.away],
+    link: ConnectiveKind.additive,
+  ),
 ];
 
 /// The sentence dataset for each language the word pools cover.

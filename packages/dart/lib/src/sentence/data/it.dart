@@ -263,21 +263,73 @@ final SentenceLanguageData it = SentenceLanguageData(
     VerbGroup(
       field: VerbField.express,
       subject: const <NounClass>[NounClass.creature, NounClass.person],
+      condition: Condition.content,
       words: words(r"""
-        ride piange sbadiglia sospira sorride canticchia borbotta grida ridacchia singhiozza geme
-        brontola fischietta esclama esulta ansima si_stringe_nelle_spalle annuisce
-        aggrotta_la_fronte starnutisce ha_il_singhiozzo applaude fa_l'occhiolino arrossisce
-        scoppia_a_ridere piagnucola sbuffa strilla balbetta fa_una_smorfia scuote_la_testa
-        saluta_con_la_mano mugugna
+        ride sorride canticchia ridacchia fischietta esulta annuisce applaude fa_l'occhiolino
+        scoppia_a_ridere sorride_a_trentadue_denti
       """),
       past: PredicateTense(
         words: words(r"""
-          rise pianse sbadigliò sospirò sorrise canticchiò borbottò gridò ridacchiò singhiozzò
-          gemette brontolò fischiettò esclamò esultò ansimò si_strinse_nelle_spalle annuì
-          aggrottò_la_fronte starnutì ebbe_il_singhiozzo applaudì fece_l'occhiolino arrossì
-          scoppiò_a_ridere piagnucolò sbuffò strillò balbettò fece_una_smorfia scosse_la_testa
-          salutò_con_la_mano mugugnò
+          rise sorrise canticchiò ridacchiò fischiettò esultò annuì applaudì fece_l'occhiolino
+          scoppiò_a_ridere sorrise_a_trentadue_denti
         """),
+      ),
+    ),
+    VerbGroup(
+      field: VerbField.express,
+      subject: const <NounClass>[NounClass.creature, NounClass.person],
+      condition: Condition.restless,
+      words: words(r'''
+        piange sospira borbotta singhiozza geme brontola piagnucola sbuffa balbetta fa_una_smorfia
+        scuote_la_testa aggrotta_la_fronte mugugna si_morde_il_labbro si_gratta_la_testa
+        cammina_avanti_e_indietro
+      '''),
+      past: PredicateTense(
+        words: words(r'''
+          pianse sospirò borbottò singhiozzò gemette brontolò piagnucolò sbuffò balbettò
+          fece_una_smorfia scosse_la_testa aggrottò_la_fronte mugugnò si_morse_il_labbro
+          si_grattò_la_testa camminò_avanti_e_indietro
+        '''),
+      ),
+    ),
+    VerbGroup(
+      field: VerbField.express,
+      subject: const <NounClass>[NounClass.creature, NounClass.person],
+      condition: Condition.tired,
+      words: words(r'''
+        sbadiglia si_stropiccia_gli_occhi si_stira si_massaggia_le_spalle sbatte_le_palpebre
+      '''),
+      past: PredicateTense(
+        words: words(r'''
+          sbadigliò si_stropicciò_gli_occhi si_stirò si_massaggiò_le_spalle sbatté_le_palpebre
+        '''),
+      ),
+    ),
+    VerbGroup(
+      field: VerbField.express,
+      subject: const <NounClass>[NounClass.creature, NounClass.person],
+      condition: Condition.hungry,
+      words: words(r"""
+        deglutisce si_lecca_le_labbra si_strofina_la_pancia annusa_l'aria
+      """),
+      past: PredicateTense(
+        words: words(r"""
+          deglutì si_leccò_le_labbra si_strofinò_la_pancia annusò_l'aria
+        """),
+      ),
+    ),
+    VerbGroup(
+      field: VerbField.express,
+      subject: const <NounClass>[NounClass.creature, NounClass.person],
+      words: words(r'''
+        grida esclama ansima si_stringe_nelle_spalle starnutisce arrossisce strilla
+        saluta_con_la_mano inclina_la_testa sgrana_gli_occhi sussulta
+      '''),
+      past: PredicateTense(
+        words: words(r'''
+          gridò esclamò ansimò si_strinse_nelle_spalle starnutì arrossì strillò salutò_con_la_mano
+          inclinò_la_testa sgranò_gli_occhi sussultò
+        '''),
       ),
     ),
     VerbGroup(

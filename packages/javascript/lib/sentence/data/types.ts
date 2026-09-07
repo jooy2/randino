@@ -224,6 +224,7 @@ export type VerbGroup = {
 	 * own; a group that names a slot is drawn only for a shape that has it.
 	 */
 	requires?: SentenceSlot;
+	condition?: Condition;
 	/** The verbs themselves, in the form a plain statement ends on (`달린다`, `runs`). */
 	words: WordPool;
 	/**

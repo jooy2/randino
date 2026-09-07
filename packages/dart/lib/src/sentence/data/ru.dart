@@ -204,20 +204,56 @@ final SentenceLanguageData ru = SentenceLanguageData(
     VerbGroup(
       field: VerbField.express,
       subject: const <NounClass>[NounClass.creature, NounClass.person],
+      condition: Condition.content,
       words: words(r'''
-        смеётся плачет зевает вздыхает улыбается напевает бормочет кричит хихикает хохочет
-        ухмыляется всхлипывает рыдает стонет ворчит свистит восклицает ликует ахает кивает хмурится
-        чихает икает подмигивает краснеет фыркает визжит лепечет морщится сияет усмехается мурлычет
-        хмыкает охает кряхтит шмыгает пыхтит жмурится причмокивает ойкает бледнеет дрожит
-        вздрагивает ёжится
+        смеётся улыбается напевает хихикает хохочет ухмыляется свистит ликует кивает подмигивает
+        сияет усмехается мурлычет
       '''),
       past: PredicateTense(
         words: words(r'''
-          смеялся плакал зевал вздыхал улыбался напевал бормотал кричал хихикал хохотал ухмыльнулся
-          всхлипнул рыдал стонал ворчал свистел воскликнул ликовал ахнул кивнул нахмурился чихнул
-          икнул подмигнул покраснел фыркнул визжал лепетал поморщился сиял усмехнулся мурлыкал
-          хмыкал охал кряхтел шмыгал пыхтел жмурился причмокивал ойкал бледнел дрожал вздрагивал
-          ёжился
+          смеялся улыбался напевал хихикал хохотал ухмылялся свистел ликовал кивал подмигивал сиял
+          усмехался мурлыкал
+        '''),
+      ),
+    ),
+    VerbGroup(
+      field: VerbField.express,
+      subject: const <NounClass>[NounClass.creature, NounClass.person],
+      condition: Condition.restless,
+      words: words(r'''
+        плачет вздыхает бормочет всхлипывает рыдает стонет ворчит хмурится фыркает морщится хмыкает
+        кряхтит охает ойкает дрожит вздрагивает ёжится бледнеет
+      '''),
+      past: PredicateTense(
+        words: words(r'''
+          плакал вздыхал бормотал всхлипывал рыдал стонал ворчал хмурился фыркал морщился хмыкал
+          кряхтел охал ойкал дрожал вздрагивал ёжился бледнел
+        '''),
+      ),
+    ),
+    VerbGroup(
+      field: VerbField.express,
+      subject: const <NounClass>[NounClass.creature, NounClass.person],
+      condition: Condition.tired,
+      words: words(r'зевает жмурится потягивается моргает'),
+      past: PredicateTense(words: words(r'зевал жмурился потягивался моргал')),
+    ),
+    VerbGroup(
+      field: VerbField.express,
+      subject: const <NounClass>[NounClass.creature, NounClass.person],
+      condition: Condition.hungry,
+      words: words(r'сглатывает облизывается принюхивается причмокивает'),
+      past: PredicateTense(words: words(r'сглатывал облизывался принюхивался причмокивал')),
+    ),
+    VerbGroup(
+      field: VerbField.express,
+      subject: const <NounClass>[NounClass.creature, NounClass.person],
+      words: words(r'''
+        кричит восклицает ахает чихает икает краснеет визжит лепечет шмыгает пыхтит оглядывается
+      '''),
+      past: PredicateTense(
+        words: words(r'''
+          кричал восклицал ахал чихал икал краснел визжал лепетал шмыгал пыхтел оглядывался
         '''),
       ),
     ),

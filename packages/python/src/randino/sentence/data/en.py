@@ -379,10 +379,10 @@ EN = SentenceLanguageData(
         VerbGroup(
             field="express",
             subject=("creature", "person"),
+            condition="content",
             words=words("""
-                laughs cries yawns sighs smiles hums mutters shouts giggles chuckles grins sobs
-                weeps groans grumbles whistles whimpers snorts cheers gasps shrugs nods frowns beams
-                sniffles sneezes hiccups claps winks blushes
+                laughs smiles hums giggles chuckles grins whistles cheers beams claps nods winks
+                chortles brightens
             """),
             forms={
                 "question": words("""
@@ -1687,15 +1687,12 @@ EN = SentenceLanguageData(
             subject=("creature", "person"),
             words=words("""
                 quietly slowly quickly gently suddenly softly alone briefly boldly carefully eagerly
-                warily calmly neatly warmly firmly patiently lightly wearily cheerfully idly
-                restlessly gladly keenly briskly happily swiftly silently sternly proudly bravely
-                shyly politely clumsily awkwardly gracefully stubbornly hastily hurriedly abruptly
-                promptly deliberately absently anxiously nervously curiously merrily wistfully
-                solemnly fondly kindly sweetly bitterly grimly sleepily drowsily hungrily greedily
-                carelessly recklessly cautiously tenderly roughly gruffly cheerily sadly earnestly
-                intently thoughtfully dreamily lazily nimbly stealthily plainly bluntly smoothly
-                heavily wildly fiercely meekly tirelessly at_once straight_away for_a_while
-                once_more in_silence on_tiptoe without_a_word in_a_hurry
+                warily calmly warmly firmly patiently lightly wearily cheerfully idly restlessly
+                gladly keenly happily swiftly silently proudly bravely shyly clumsily awkwardly
+                gracefully stubbornly hastily hurriedly abruptly promptly deliberately absently
+                anxiously nervously curiously merrily solemnly sleepily drowsily carelessly
+                recklessly cautiously roughly cheerily earnestly lazily wildly meekly tirelessly
+                at_once straight_away for_a_while once_more in_silence without_a_word in_a_hurry
             """),
         ),
         ModifierGroup(

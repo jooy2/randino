@@ -232,6 +232,7 @@ sentence = {
                 "objectTraits": listed(group.object_traits),
                 "objectWithout": listed(group.object_without),
                 "requires": group.requires or "",
+                "condition": group.condition or "",
                 "words": listed(group.words),
                 "forms": {form: listed(pool) for form, pool in group.forms.items()},
                 "past": tense(group.past),

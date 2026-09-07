@@ -1399,13 +1399,27 @@ function verbGroupsFor(
 			return false;
 		}
 
+		// A group that shows a condition is drawn only for a hero it is true of —
+		// and, for somebody else in a story whose state nobody knows, only where it
+		// shows nothing worse than being pleased: a passer-by may smile, and never
+		// clutches their stomach.
+		if (beat && group.condition) {
+			if (beat.state ? !beat.state.has(group.condition) : group.condition !== 'content') {
+				return false;
+			}
+		}
+
 		return (
 			subjectThemesOf(group, themes, language, data).length > 0 &&
 			(!group.object || objectThemesOf(group, beat, language, data).length > 0)
 		);
 	});
 
-	return usable;
+	// And where some group shows what is true of the hero, those are what the
+	// sentence says: the hero laughs after the meal rather than sneezing after it.
+	const showing = beat?.state ? usable.filter((group) => group.condition) : [];
+
+	return showing.length ? showing : usable;
 }
 
 /** Whether a group takes a noun of this theme as its subject. */
@@ -3542,7 +3556,7 @@ function generateResult(language: WordLanguage, settings: Settings): Result {
 			beat: null,
 			link: null,
 			dayAt: built.reduce((latest, one) => Math.max(latest, one.dayAt), -1),
-			dated: false,
+			dated: timeSpent(built, settings.sentences),
 			object:
 				item && last?.object?.noun === item.word
 					? objectReferenceFor(language, data, item.word, false, last.object.named)
@@ -3577,7 +3591,24 @@ function generateResult(language: WordLanguage, settings: Settings): Result {
 	return { built, tense, story: null, theme: built[0].theme };
 }
 
-/** What every sentence of one result is drawn against, settled before the first. */
+// How many of a result's sentences may say when, as a share of its count: one in
+// four, and never two in a row. `아침에 … 한낮에 … 저녁에 … 밤에` in a paragraph of
+// six is a timetable rather than a paragraph.
+const TIME_SHARE = 4;
+
+/**
+ * Whether the next sentence of a result has to leave the time out: the one
+ * before it named one, or the result has named its share already.
+ */
+function timeSpent(built: readonly Built[], count: number): boolean {
+	const last = built.length ? built[built.length - 1] : null;
+	const named = built.filter((one) => one.slots.includes('time')).length;
+
+	return (
+		(last?.slots.includes('time') ?? false) || named >= Math.max(1, Math.ceil(count / TIME_SHARE))
+	);
+}
+
 /** The whole of a result as one string, which is what the caller's range describes. */
 function lengthOf(data: SentenceLanguageData, built: readonly Built[]): number {
 	return (
@@ -3888,9 +3919,11 @@ function tellStory(telling: Telling): Result | null {
 		// A second clause whose sentence has said when already — opened on `later`,
 		// or named a time in its first clause — says it no second time.
 		const dated =
-			beat.join === 'second' &&
-			previous !== null &&
-			((data.connectives.temporal ?? []).includes(openedBefore) || previous.slots.includes('time'));
+			timeSpent(built, beats.length) ||
+			(beat.join === 'second' &&
+				previous !== null &&
+				((data.connectives.temporal ?? []).includes(openedBefore) ||
+					previous.slots.includes('time')));
 		// A line the hero says or thinks, in their own voice: the first person where
 		// the language writes one, the present tense whatever the story's, a level a
 		// person speaks at, and nothing in front of it — nobody opens a line on

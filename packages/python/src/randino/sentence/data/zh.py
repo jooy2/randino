@@ -122,10 +122,35 @@ ZH = SentenceLanguageData(
         VerbGroup(
             field="express",
             subject=("creature", "person"),
-            words=words("""
-                微笑 哭泣 打哈欠 叹气 哼歌 咕哝 喊叫 大笑 咯咯笑 傻笑 抽泣 呜咽 抱怨 嘀咕 吹口哨 欢呼 倒吸一口气 耸肩 点头 皱眉 摇头 挥手 打喷嚏 打嗝 拍手 眨眼
-                脸红 自言自语 咧嘴笑 流泪 尖叫 叫喊
-            """),
+            condition="content",
+            words=words(
+                "微笑 哼歌 大笑 咯咯笑 傻笑 欢呼 点头 拍手 眨眼 咧嘴笑 眉开眼笑 笑出声 轻笑 哼着小曲"
+            ),
+        ),
+        VerbGroup(
+            field="express",
+            subject=("creature", "person"),
+            condition="restless",
+            words=words(
+                "哭泣 叹气 咕哝 抽泣 呜咽 抱怨 嘀咕 皱眉 摇头 自言自语 流泪 踱步 咬嘴唇 挠头 撇嘴 坐立不安 唉声叹气 发牢骚"
+            ),
+        ),
+        VerbGroup(
+            field="express",
+            subject=("creature", "person"),
+            condition="tired",
+            words=words("打哈欠 揉眼睛 伸懒腰 揉肩膀 转脖子 捶背"),
+        ),
+        VerbGroup(
+            field="express",
+            subject=("creature", "person"),
+            condition="hungry",
+            words=words("咽口水 舔嘴唇 摸肚子 吸鼻子 流口水"),
+        ),
+        VerbGroup(
+            field="express",
+            subject=("creature", "person"),
+            words=words("喊叫 倒吸一口气 耸肩 挥手 脸红 尖叫 叫喊 歪头 瞪大眼睛 回头 抬头 一愣"),
         ),
         VerbGroup(
             field="talk",

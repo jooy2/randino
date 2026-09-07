@@ -147,14 +147,47 @@ export const DE: SentenceLanguageData = {
 				`schlief schlummerte dämmerte döste schnarchte träumte pennte entschlummerte duselte ratzte`
 			)
 		},
+		// What somebody shows, split by what it shows — see the Korean data. One
+		// word or a reflexive each, because a question moves the whole token.
+		{
+			field: 'express',
+			subject: ['creature', 'person'],
+			condition: 'content',
+			...tensed(
+				`lacht lächelt summt kichert grinst pfeift jauchzt jubelt nickt klatscht zwinkert strahlt schmunzelt gluckst`,
+				`lachte lächelte summte kicherte grinste pfiff jauchzte jubelte nickte klatschte zwinkerte strahlte schmunzelte gluckste`
+			)
+		},
+		{
+			field: 'express',
+			subject: ['creature', 'person'],
+			condition: 'restless',
+			...tensed(
+				`weint seufzt murmelt schluchzt stöhnt murrt brummt schnieft schnaubt stammelt wimmert heult jammert flucht zappelt grummelt zittert bebt`,
+				`weinte seufzte murmelte schluchzte stöhnte murrte brummte schniefte schnaubte stammelte wimmerte heulte jammerte fluchte zappelte grummelte zitterte bebte`
+			)
+		},
+		{
+			field: 'express',
+			subject: ['creature', 'person'],
+			condition: 'tired',
+			...tensed(
+				`gähnt blinzelt reckt_sich streckt_sich`,
+				`gähnte blinzelte reckte_sich streckte_sich`
+			)
+		},
+		{
+			field: 'express',
+			subject: ['creature', 'person'],
+			condition: 'hungry',
+			...tensed(`schluckt schmatzt schnuppert sabbert`, `schluckte schmatzte schnupperte sabberte`)
+		},
 		{
 			field: 'express',
 			subject: ['creature', 'person'],
 			...tensed(
-				`lacht weint gähnt seufzt lächelt summt murmelt ruft kichert grinst schluchzt stöhnt murrt brummt pfeift schreit jauchzt jubelt keucht nickt niest klatscht zwinkert errötet prustet schnieft schnaubt kreischt stammelt winkt strahlt schmunzelt gluckst schnalzt hustet räuspert_sich wimmert heult grunzt jammert flucht
-				schluckt zittert bebt blinzelt schmatzt quiekt fiept kräht zirpt brüllt faucht knurrt jault winselt`,
-				`lachte weinte gähnte seufzte lächelte summte murmelte rief kicherte grinste schluchzte stöhnte murrte brummte pfiff schrie jauchzte jubelte keuchte nickte nieste klatschte zwinkerte errötete prustete schniefte schnaubte kreischte stammelte winkte strahlte schmunzelte gluckste schnalzte hustete räusperte_sich wimmerte heulte grunzte jammerte fluchte
-				schluckte zitterte bebte blinzelte schmatzte quiekte fiepte krähte zirpte brüllte fauchte knurrte jaulte winselte`
+				`ruft schreit keucht niest prustet kreischt hustet räuspert_sich grunzt quiekt fiept kräht zirpt brüllt faucht knurrt jault winselt errötet schnalzt winkt zuckt stutzt`,
+				`rief schrie keuchte nieste prustete kreischte hustete räusperte_sich grunzte quiekte fiepte krähte zirpte brüllte fauchte knurrte jaulte winselte errötete schnalzte winkte zuckte stutzte`
 			)
 		},
 		{

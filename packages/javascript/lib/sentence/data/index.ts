@@ -269,6 +269,13 @@ export const STORIES: readonly Story[] = [
 			{ kind: 'act', field: 'go', destination: 'place', required: true },
 			{ kind: 'act', field: 'look', object: 'prop', place: true, link: 'additive' },
 			{ kind: 'act', field: 'look', object: 'item', place: true },
+			// Somebody at the market, doing what people at a market do.
+			{
+				kind: 'other',
+				actor: ['person'],
+				field: ['talk', 'express', 'wait', 'move'],
+				link: 'additive'
+			},
 			{ kind: 'act', field: ['buy', 'take', 'find'], object: 'item', place: true, required: true },
 			{ kind: 'act', field: 'arrive', destination: 'home', required: true, link: 'temporal' },
 			{ kind: 'act', field: 'cook', object: 'item' },
@@ -583,12 +590,154 @@ export const STORIES: readonly Story[] = [
 		steps: [
 			{ kind: 'act', field: 'go', destination: 'place', required: true },
 			{ kind: 'act', field: 'meet', object: 'item', place: true, required: true, link: 'temporal' },
+			// The person met, doing something of their own.
+			{ kind: 'other', actor: 'item', field: ['express', 'talk', 'wait'], link: 'additive' },
 			{ kind: 'act', field: 'talk', link: 'additive' },
 			{ kind: 'act', field: 'express', link: 'causal', kinds: ['exclamation'] },
 			{ kind: 'act', field: 'wait', place: true },
 			{ kind: 'state', condition: 'content', link: 'causal' },
 			{ kind: 'act', field: 'arrive', destination: 'home', required: true, link: 'temporal' },
 			{ kind: 'act', field: ['think', 'express'], link: 'temporal', kinds: ['trailing'] }
+		]
+	},
+	{
+		// Two people talk. The hero goes out, meets somebody, and what the two of
+		// them say to each other is most of the story — it is the one that allows
+		// the most lines, and the person met is the one who answers them.
+		name: 'chat',
+		hero: ['person'],
+		item: ['person'],
+		// Something at the place, looked at while they talk.
+		prop: ['thing', 'plant', 'edible'],
+		propThemes: ['object', 'plant', 'food', 'drink'],
+		lines: 5,
+		start: ['awake', 'rested', 'home'],
+		weight: 14,
+		steps: [
+			{ kind: 'act', field: 'go', destination: 'place', required: true },
+			{ kind: 'act', field: 'meet', object: 'item', place: true, required: true, link: 'temporal' },
+			{ kind: 'other', actor: 'item', field: ['express', 'talk'], link: 'additive' },
+			{ kind: 'state', condition: 'content', link: 'causal' },
+			{ kind: 'act', field: 'talk', required: true, link: 'additive' },
+			{ kind: 'act', field: 'look', object: 'prop', place: true },
+			{
+				kind: 'other',
+				actor: 'item',
+				field: ['express', 'talk', 'wait', 'move'],
+				link: 'additive'
+			},
+			{ kind: 'act', field: 'express', link: 'causal', kinds: ['exclamation'] },
+			{ kind: 'act', field: 'talk', link: 'temporal' },
+			{ kind: 'act', field: 'wait', place: true },
+			{ kind: 'act', field: 'arrive', destination: 'home', required: true, link: 'temporal' },
+			{ kind: 'act', field: ['think', 'express'], link: 'temporal', kinds: ['trailing'] }
+		]
+	},
+	{
+		// The hero goes out, sits down somewhere, and watches: what turns up, what
+		// the light does. The hero does little, and that is the point of it.
+		name: 'watch',
+		hero: AGENT_CLASSES,
+		// Something seen from where they sit.
+		prop: ['plant', 'thing'],
+		propThemes: ['plant', 'object'],
+		start: ['awake', 'rested', 'home'],
+		weight: 14,
+		steps: [
+			{ kind: 'act', field: 'go', destination: 'place', required: true },
+			{ kind: 'act', field: 'rest', place: true, required: true, link: 'temporal' },
+			{
+				kind: 'other',
+				actor: ['creature'],
+				actorThemes: ['animal'],
+				field: ['move', 'play', 'wait', 'express', 'rest'],
+				link: 'additive'
+			},
+			{ kind: 'act', field: 'look', object: 'prop', place: true },
+			{ kind: 'scene', field: 'change', link: 'temporal' },
+			{
+				kind: 'other',
+				actor: ['person'],
+				field: ['move', 'talk', 'express', 'wait', 'play'],
+				link: 'additive'
+			},
+			{ kind: 'act', field: 'think', link: 'additive' },
+			{ kind: 'state', condition: 'rested', link: 'causal' },
+			{ kind: 'scene', field: 'change', link: 'temporal' },
+			{ kind: 'act', field: 'arrive', destination: 'home', required: true, link: 'temporal' },
+			{ kind: 'act', field: ['express', 'think', 'sleep'], link: 'temporal', kinds: ['trailing'] }
+		]
+	},
+	{
+		// The weather turns while the hero is out. They wait it out, and go on
+		// once it has passed.
+		name: 'shelter',
+		hero: AGENT_CLASSES,
+		start: ['awake', 'rested', 'home'],
+		weight: 12,
+		steps: [
+			{ kind: 'act', field: 'go', destination: 'place', required: true },
+			{ kind: 'act', field: ['move', 'play', 'wait'], place: true, link: 'additive' },
+			{
+				kind: 'other',
+				actor: ['event'],
+				actorThemes: ['weather'],
+				field: 'change',
+				required: true,
+				link: 'temporal'
+			},
+			{ kind: 'act', field: 'wait', place: true, required: true, link: 'causal' },
+			{ kind: 'act', field: ['think', 'express'], link: 'additive' },
+			{
+				kind: 'other',
+				actor: ['event'],
+				actorThemes: ['weather'],
+				field: 'change',
+				link: 'temporal'
+			},
+			{ kind: 'scene', field: 'change', link: 'temporal' },
+			{ kind: 'act', field: ['move', 'play'], place: true, link: 'causal' },
+			{ kind: 'act', field: 'arrive', destination: 'home', required: true, link: 'temporal' },
+			{ kind: 'act', field: ['rest', 'express', 'think'], link: 'temporal', kinds: ['trailing'] }
+		]
+	},
+	{
+		// Nothing happens to anybody. A place is described, and the things in it do
+		// what they do — the wind, the leaves, a bird, the evening. The hero is the
+		// place, and nobody is the story's subject for long.
+		name: 'sketch',
+		hero: ['place'],
+		heroThemes: ['place', 'nature'],
+		start: [],
+		weight: 16,
+		steps: [
+			{ kind: 'state', required: true },
+			{
+				kind: 'other',
+				actor: ['event'],
+				actorThemes: ['weather'],
+				field: 'change',
+				link: 'additive'
+			},
+			{
+				kind: 'other',
+				actor: ['creature'],
+				actorThemes: ['animal'],
+				field: ['move', 'rest', 'express', 'wait', 'play', 'sleep'],
+				link: 'additive'
+			},
+			{ kind: 'act', field: 'change', required: true, link: 'temporal' },
+			{ kind: 'other', actor: ['plant'], field: 'change', link: 'additive' },
+			{ kind: 'other', actor: ['event'], actorThemes: ['time'], field: 'change', link: 'temporal' },
+			{
+				kind: 'other',
+				actor: ['creature', 'person'],
+				actorThemes: ['animal', 'job'],
+				field: ['move', 'rest', 'wait', 'sleep', 'express'],
+				link: 'temporal'
+			},
+			{ kind: 'act', field: 'change', link: 'temporal' },
+			{ kind: 'state', link: 'causal', kinds: ['trailing'] }
 		]
 	},
 	{
@@ -619,7 +768,16 @@ export const INTERLUDES: readonly StoryStep[] = [
 	// do something of its own. At home neither: a scene is the place the story is
 	// happening in, and a home story has none.
 	{ kind: 'act', field: ['move', 'play'], place: true, needs: ['away'], link: 'additive' },
-	{ kind: 'scene', field: 'change', needs: ['away'], link: 'temporal' }
+	{ kind: 'scene', field: 'change', needs: ['away'], link: 'temporal' },
+	// And somebody else is about: a passer-by, a bird on a fence.
+	{
+		kind: 'other',
+		actor: ['creature', 'person'],
+		actorThemes: ['animal', 'job'],
+		field: ['move', 'express', 'wait', 'talk', 'play'],
+		needs: ['away'],
+		link: 'additive'
+	}
 ];
 
 export const SENTENCE_DATA: Record<WordLanguage, SentenceLanguageData> = {

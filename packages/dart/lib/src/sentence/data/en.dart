@@ -367,10 +367,10 @@ final SentenceLanguageData en = SentenceLanguageData(
     VerbGroup(
       field: VerbField.express,
       subject: const <NounClass>[NounClass.creature, NounClass.person],
+      condition: Condition.content,
       words: words(r'''
-        laughs cries yawns sighs smiles hums mutters shouts giggles chuckles grins sobs weeps groans
-        grumbles whistles whimpers snorts cheers gasps shrugs nods frowns beams sniffles sneezes
-        hiccups claps winks blushes
+        laughs smiles hums giggles chuckles grins whistles cheers beams claps nods winks chortles
+        brightens
       '''),
       forms: <PredicateForm, WordPool>{
         PredicateForm.question: words(r'''
@@ -381,9 +381,8 @@ final SentenceLanguageData en = SentenceLanguageData(
       },
       past: PredicateTense(
         words: words(r'''
-          laughed cried yawned sighed smiled hummed muttered shouted giggled chuckled grinned sobbed
-          wept groaned grumbled whistled whimpered snorted cheered gasped shrugged nodded frowned
-          beamed sniffled sneezed hiccuped clapped winked blushed
+          laughed smiled hummed giggled chuckled grinned whistled cheered beamed clapped nodded
+          winked chortled brightened
         '''),
         forms: <PredicateForm, WordPool>{
           PredicateForm.question: words(r'''
@@ -391,6 +390,85 @@ final SentenceLanguageData en = SentenceLanguageData(
             whistle whimper snort cheer gasp shrug nod frown beam sniffle sneeze hiccup clap wink
             blush
           '''),
+        },
+      ),
+    ),
+    VerbGroup(
+      field: VerbField.express,
+      subject: const <NounClass>[NounClass.creature, NounClass.person],
+      condition: Condition.restless,
+      words: words(r'''
+        cries sighs mutters sobs weeps groans grumbles whimpers snorts frowns sniffles fidgets paces
+        grimaces scowls pouts fumes sulks
+      '''),
+      forms: <PredicateForm, WordPool>{
+        PredicateForm.question: words(r'''
+          cry sigh mutter sob weep groan grumble whimper snort frown sniffle fidget pace grimace
+          scowl pout fume sulk
+        '''),
+      },
+      past: PredicateTense(
+        words: words(r'''
+          cried sighed muttered sobbed wept groaned grumbled whimpered snorted frowned sniffled
+          fidgeted paced grimaced scowled pouted fumed sulked
+        '''),
+        forms: <PredicateForm, WordPool>{
+          PredicateForm.question: words(r'''
+            cry sigh mutter sob weep groan grumble whimper snort frown sniffle fidget pace grimace
+            scowl pout fume sulk
+          '''),
+        },
+      ),
+    ),
+    VerbGroup(
+      field: VerbField.express,
+      subject: const <NounClass>[NounClass.creature, NounClass.person],
+      condition: Condition.tired,
+      words: words(r'yawns stretches blinks slumps droops sags'),
+      forms: <PredicateForm, WordPool>{
+        PredicateForm.question: words(r'yawn stretch blink slump droop sag'),
+      },
+      past: PredicateTense(
+        words: words(r'yawned stretched blinked slumped drooped sagged'),
+        forms: <PredicateForm, WordPool>{
+          PredicateForm.question: words(r'yawn stretch blink slump droop sag'),
+        },
+      ),
+    ),
+    VerbGroup(
+      field: VerbField.express,
+      subject: const <NounClass>[NounClass.creature, NounClass.person],
+      condition: Condition.hungry,
+      words: words(r'drools salivates sniffs_the_air swallows_hard gulps'),
+      forms: <PredicateForm, WordPool>{
+        PredicateForm.question: words(r'drool salivate sniff_the_air swallow_hard gulp'),
+      },
+      past: PredicateTense(
+        words: words(r'drooled salivated sniffed_the_air swallowed_hard gulped'),
+        forms: <PredicateForm, WordPool>{
+          PredicateForm.question: words(r'drool salivate sniff_the_air swallow_hard gulp'),
+        },
+      ),
+    ),
+    VerbGroup(
+      field: VerbField.express,
+      subject: const <NounClass>[NounClass.creature, NounClass.person],
+      words: words(r'''
+        shouts gasps shrugs blushes squints flinches exclaims looks_up looks_round
+      '''),
+      forms: <PredicateForm, WordPool>{
+        PredicateForm.question: words(
+          r'shout gasp shrug blush squint flinch exclaim look_up look_round',
+        ),
+      },
+      past: PredicateTense(
+        words: words(r'''
+          shouted gasped shrugged blushed squinted flinched exclaimed looked_up looked_round
+        '''),
+        forms: <PredicateForm, WordPool>{
+          PredicateForm.question: words(
+            r'shout gasp shrug blush squint flinch exclaim look_up look_round',
+          ),
         },
       ),
     ),
@@ -1645,14 +1723,12 @@ final SentenceLanguageData en = SentenceLanguageData(
       subject: const <NounClass>[NounClass.creature, NounClass.person],
       words: words(r'''
         quietly slowly quickly gently suddenly softly alone briefly boldly carefully eagerly warily
-        calmly neatly warmly firmly patiently lightly wearily cheerfully idly restlessly gladly
-        keenly briskly happily swiftly silently sternly proudly bravely shyly politely clumsily
-        awkwardly gracefully stubbornly hastily hurriedly abruptly promptly deliberately absently
-        anxiously nervously curiously merrily wistfully solemnly fondly kindly sweetly bitterly
-        grimly sleepily drowsily hungrily greedily carelessly recklessly cautiously tenderly roughly
-        gruffly cheerily sadly earnestly intently thoughtfully dreamily lazily nimbly stealthily
-        plainly bluntly smoothly heavily wildly fiercely meekly tirelessly at_once straight_away
-        for_a_while once_more in_silence on_tiptoe without_a_word in_a_hurry
+        calmly warmly firmly patiently lightly wearily cheerfully idly restlessly gladly keenly
+        happily swiftly silently proudly bravely shyly clumsily awkwardly gracefully stubbornly
+        hastily hurriedly abruptly promptly deliberately absently anxiously nervously curiously
+        merrily solemnly sleepily drowsily carelessly recklessly cautiously roughly cheerily
+        earnestly lazily wildly meekly tirelessly at_once straight_away for_a_while once_more
+        in_silence without_a_word in_a_hurry
       '''),
     ),
     ModifierGroup(

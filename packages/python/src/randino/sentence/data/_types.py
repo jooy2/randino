@@ -244,6 +244,15 @@ class VerbGroup:
     their own; a group that names a slot is drawn only for a shape that has it.
     """
 
+    condition: Condition | None = None
+    """What these verbs show of the one doing them, for a story to draw them by.
+
+    `웃는다` and `콧노래한다` are what somebody `"content"` does, `한숨짓는다` what somebody
+    `"restless"` does, `하품한다` somebody `"tired"`. A story's hero laughs after the meal
+    and sighs after losing the key. A group that shows nothing in particular leaves it
+    out, and is what a story falls back on; outside a story every group is drawn alike.
+    """
+
     forms: PredicateForms = attribute(default_factory=dict)
     """The same verbs in another form, index-aligned with `words`.
 

@@ -53,6 +53,25 @@ A story told in nothing but short sentences reads as stage directions, and `ì§‘ì
 monotonous as none. How many a telling makes is drawn between none and this.
 """
 
+
+REPEATABLE_FIELDS: tuple[VerbField, ...] = (
+    "express",
+    "think",
+    "wait",
+    "look",
+    "play",
+    "move",
+    "talk",
+    "search",
+    "tend",
+    "change",
+)
+"""The fields a step may be told twice in one story.
+
+Going, arriving, rising, sleeping and getting hold of the thing happen once; the rest is
+what a hero does in between.
+"""
+
 JoinSide = Literal["first", "second"]
 """Whether a beat is the first or the second clause of one sentence."""
 
@@ -390,6 +409,13 @@ def _walk(
     return walked
 
 
+def _repeatable(step: StoryStep) -> bool:
+    """Whether a step can happen a second time in one telling."""
+    return step.destination is None and (
+        step.kind != "act" or all(field in REPEATABLE_FIELDS for field in step.fields)
+    )
+
+
 def tellable(
     data: SentenceLanguageData, story: Story, hero: NounClass, item: WordTheme | None
 ) -> bool:
@@ -563,7 +589,9 @@ def plan(
         # interludes, each once; then any of them again.
         nonlocal chosen, walked
         optional = [
-            step for step in story.steps if not step.required and (again or step not in chosen)
+            step
+            for step in story.steps
+            if not step.required and (step not in chosen or (again and _repeatable(step)))
         ]
         own: list[Callable[[], list[StoryStep]]] = []
         filler: list[Callable[[], list[StoryStep]]] = []

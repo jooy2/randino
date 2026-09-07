@@ -233,6 +233,7 @@ void main() {
                       for (final trait in group.objectWithout!) trait.name,
                     ],
               'requires': group.requires?.name ?? '',
+              'condition': group.condition?.name ?? '',
               'words': listed(group.words),
               'forms': <String, Object?>{
                 for (final f in group.forms.entries)

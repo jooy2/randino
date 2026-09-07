@@ -189,21 +189,63 @@ DE = SentenceLanguageData(
         VerbGroup(
             field="express",
             subject=("creature", "person"),
+            condition="content",
             words=words("""
-                lacht weint gähnt seufzt lächelt summt murmelt ruft kichert grinst schluchzt stöhnt
-                murrt brummt pfeift schreit jauchzt jubelt keucht nickt niest klatscht zwinkert
-                errötet prustet schnieft schnaubt kreischt stammelt winkt strahlt schmunzelt gluckst
-                schnalzt hustet räuspert_sich wimmert heult grunzt jammert flucht schluckt zittert
-                bebt blinzelt schmatzt quiekt fiept kräht zirpt brüllt faucht knurrt jault winselt
+                lacht lächelt summt kichert grinst pfeift jauchzt jubelt nickt klatscht zwinkert
+                strahlt schmunzelt gluckst
             """),
             past=PredicateTense(
                 words=words("""
-                    lachte weinte gähnte seufzte lächelte summte murmelte rief kicherte grinste
-                    schluchzte stöhnte murrte brummte pfiff schrie jauchzte jubelte keuchte nickte
-                    nieste klatschte zwinkerte errötete prustete schniefte schnaubte kreischte
-                    stammelte winkte strahlte schmunzelte gluckste schnalzte hustete räusperte_sich
-                    wimmerte heulte grunzte jammerte fluchte schluckte zitterte bebte blinzelte
-                    schmatzte quiekte fiepte krähte zirpte brüllte fauchte knurrte jaulte winselte
+                    lachte lächelte summte kicherte grinste pfiff jauchzte jubelte nickte klatschte
+                    zwinkerte strahlte schmunzelte gluckste
+                """),
+            ),
+        ),
+        VerbGroup(
+            field="express",
+            subject=("creature", "person"),
+            condition="restless",
+            words=words("""
+                weint seufzt murmelt schluchzt stöhnt murrt brummt schnieft schnaubt stammelt
+                wimmert heult jammert flucht zappelt grummelt zittert bebt
+            """),
+            past=PredicateTense(
+                words=words("""
+                    weinte seufzte murmelte schluchzte stöhnte murrte brummte schniefte schnaubte
+                    stammelte wimmerte heulte jammerte fluchte zappelte grummelte zitterte bebte
+                """),
+            ),
+        ),
+        VerbGroup(
+            field="express",
+            subject=("creature", "person"),
+            condition="tired",
+            words=words("gähnt blinzelt reckt_sich streckt_sich"),
+            past=PredicateTense(
+                words=words("gähnte blinzelte reckte_sich streckte_sich"),
+            ),
+        ),
+        VerbGroup(
+            field="express",
+            subject=("creature", "person"),
+            condition="hungry",
+            words=words("schluckt schmatzt schnuppert sabbert"),
+            past=PredicateTense(
+                words=words("schluckte schmatzte schnupperte sabberte"),
+            ),
+        ),
+        VerbGroup(
+            field="express",
+            subject=("creature", "person"),
+            words=words("""
+                ruft schreit keucht niest prustet kreischt hustet räuspert_sich grunzt quiekt fiept
+                kräht zirpt brüllt faucht knurrt jault winselt errötet schnalzt winkt zuckt stutzt
+            """),
+            past=PredicateTense(
+                words=words("""
+                    rief schrie keuchte nieste prustete kreischte hustete räusperte_sich grunzte
+                    quiekte fiepte krähte zirpte brüllte fauchte knurrte jaulte winselte errötete
+                    schnalzte winkte zuckte stutzte
                 """),
             ),
         ),

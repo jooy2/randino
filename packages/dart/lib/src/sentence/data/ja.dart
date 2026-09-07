@@ -332,31 +332,106 @@ final SentenceLanguageData ja = SentenceLanguageData(
     VerbGroup(
       field: VerbField.express,
       subject: const <NounClass>[NounClass.creature, NounClass.person],
-      words: words(r'''
-        笑う 泣く あくびする 微笑む つぶやく 叫ぶ ため息をつく くすくす笑う にっこりする 泣きじゃくる うめく ぼやく 口笛を吹く 声を上げる 歓声を上げる はっとする 肩をすくめる
-        うなずく 顔をしかめる 鼻をすする くしゃみする しゃっくりする 手を叩く ウインクする 赤面する 独り言を言う 涙ぐむ 首を振る 手を振る
-      '''),
+      condition: Condition.content,
+      words: words(r'笑う 微笑む くすくす笑う にっこりする 口笛を吹く 歓声を上げる うなずく 手を叩く ウインクする 鼻歌を歌う にやりとする 手を振る ほほえむ'),
       forms: <PredicateForm, WordPool>{
         PredicateForm.polite: words(r'''
-          笑います 泣きます あくびします 微笑みます つぶやきます 叫びます ため息をつきます くすくす笑います にっこりします 泣きじゃきます うめきます ぼやきます 口笛を吹きます
-          声を上げます 歓声を上げます はっとします 肩をすくめます うなずきます 顔をしかめます 鼻をすします くしゃみします しゃっくりします 手を叩きます ウインクします 赤面します
-          独り言を言います 涙ぐみます 首を振ります 手を振ります
+          笑います 微笑みます くすくす笑います にっこりします 口笛を吹きます 歓声を上げます うなずきます 手を叩きます ウインクします 鼻歌を歌います にやりとします 手を振ります
+          ほほえみます
         '''),
         PredicateForm.linking: words(r'''
-          笑って 泣いて あくびして 微笑んで つぶやいて 叫んで ため息をついて くすくす笑って にっこりして 泣きじゃきて うめいて ぼやいて 口笛を吹いて 声を上げて 歓声を上げて
-          はっとして 肩をすくめて うなずいて 顔をしかめて 鼻をすして くしゃみして しゃっくりして 手を叩いて ウインクして 赤面して 独り言を言って 涙ぐんで 首を振って 手を振って
+          笑って 微笑んで くすくす笑って にっこりして 口笛を吹いて 歓声を上げて うなずいて 手を叩いて ウインクして 鼻歌を歌って にやりとして 手を振って ほほえんで
         '''),
       },
       past: PredicateTense(
         words: words(r'''
-          笑った 泣いた あくびした 微笑んだ つぶやいた 叫んだ ため息をついた くすくす笑った にっこりした 泣きじゃきた うめいた ぼやいた 口笛を吹いた 声を上げた 歓声を上げた
-          はっとした 肩をすくめた うなずいた 顔をしかめた 鼻をすした くしゃみした しゃっくりした 手を叩いた ウインクした 赤面した 独り言を言った 涙ぐんだ 首を振った 手を振った
+          笑った 微笑んだ くすくす笑った にっこりした 口笛を吹いた 歓声を上げた うなずいた 手を叩いた ウインクした 鼻歌を歌った にやりとした 手を振った ほほえんだ
         '''),
         forms: <PredicateForm, WordPool>{
           PredicateForm.polite: words(r'''
-            笑いました 泣きました あくびしました 微笑みました つぶやきました 叫びました ため息をつきました くすくす笑いました にっこりしました 泣きじゃきました うめきました
-            ぼやきました 口笛を吹きました 声を上げました 歓声を上げました はっとしました 肩をすくめました うなずきました 顔をしかめました 鼻をすしました くしゃみしました
-            しゃっくりしました 手を叩きました ウインクしました 赤面しました 独り言を言いました 涙ぐみました 首を振りました 手を振りました
+            笑いました 微笑みました くすくす笑いました にっこりしました 口笛を吹きました 歓声を上げました うなずきました 手を叩きました ウインクしました 鼻歌を歌いました
+            にやりとしました 手を振りました ほほえみました
+          '''),
+        },
+      ),
+    ),
+    VerbGroup(
+      field: VerbField.express,
+      subject: const <NounClass>[NounClass.creature, NounClass.person],
+      condition: Condition.restless,
+      words: words(r'''
+        泣く つぶやく ため息をつく 泣きじゃくる うめく ぼやく 顔をしかめる 鼻をすする 独り言を言う 涙ぐむ 首を振る 舌打ちする 眉をひそめる そわそわする 唇をかむ 頭をかく
+      '''),
+      forms: <PredicateForm, WordPool>{
+        PredicateForm.polite: words(r'''
+          泣きます つぶやきます ため息をつきます 泣きじゃくります うめきます ぼやきます 顔をしかめます 鼻をすすります 独り言を言います 涙ぐみます 首を振ります 舌打ちします
+          眉をひそめます そわそわします 唇をかみます 頭をかきます
+        '''),
+        PredicateForm.linking: words(r'''
+          泣いて つぶやいて ため息をついて 泣きじゃくって うめいて ぼやいて 顔をしかめて 鼻をすすって 独り言を言って 涙ぐんで 首を振って 舌打ちして 眉をひそめて そわそわして
+          唇をかんで 頭をかいて
+        '''),
+      },
+      past: PredicateTense(
+        words: words(r'''
+          泣いた つぶやいた ため息をついた 泣きじゃくった うめいた ぼやいた 顔をしかめた 鼻をすすった 独り言を言った 涙ぐんだ 首を振った 舌打ちした 眉をひそめた そわそわした
+          唇をかんだ 頭をかいた
+        '''),
+        forms: <PredicateForm, WordPool>{
+          PredicateForm.polite: words(r'''
+            泣きました つぶやきました ため息をつきました 泣きじゃくりました うめきました ぼやきました 顔をしかめました 鼻をすすりました 独り言を言いました 涙ぐみました
+            首を振りました 舌打ちしました 眉をひそめました そわそわしました 唇をかみました 頭をかきました
+          '''),
+        },
+      ),
+    ),
+    VerbGroup(
+      field: VerbField.express,
+      subject: const <NounClass>[NounClass.creature, NounClass.person],
+      condition: Condition.tired,
+      words: words(r'あくびする 目をこする 伸びをする 肩を回す 首を回す まばたきする'),
+      forms: <PredicateForm, WordPool>{
+        PredicateForm.polite: words(r'あくびします 目をこすります 伸びをします 肩を回します 首を回します まばたきします'),
+        PredicateForm.linking: words(r'あくびして 目をこすって 伸びをして 肩を回して 首を回して まばたきして'),
+      },
+      past: PredicateTense(
+        words: words(r'あくびした 目をこすった 伸びをした 肩を回した 首を回した まばたきした'),
+        forms: <PredicateForm, WordPool>{
+          PredicateForm.polite: words(r'あくびしました 目をこすりました 伸びをしました 肩を回しました 首を回しました まばたきしました'),
+        },
+      ),
+    ),
+    VerbGroup(
+      field: VerbField.express,
+      subject: const <NounClass>[NounClass.creature, NounClass.person],
+      condition: Condition.hungry,
+      words: words(r'つばを飲み込む お腹をさする 舌なめずりする 鼻をひくつかせる'),
+      forms: <PredicateForm, WordPool>{
+        PredicateForm.polite: words(r'つばを飲み込みます お腹をさすります 舌なめずりします 鼻をひくつかせます'),
+        PredicateForm.linking: words(r'つばを飲み込んで お腹をさすって 舌なめずりして 鼻をひくつかせて'),
+      },
+      past: PredicateTense(
+        words: words(r'つばを飲み込んだ お腹をさすった 舌なめずりした 鼻をひくつかせた'),
+        forms: <PredicateForm, WordPool>{
+          PredicateForm.polite: words(r'つばを飲み込みました お腹をさすりました 舌なめずりしました 鼻をひくつかせました'),
+        },
+      ),
+    ),
+    VerbGroup(
+      field: VerbField.express,
+      subject: const <NounClass>[NounClass.creature, NounClass.person],
+      words: words(r'叫ぶ 声を上げる はっとする 肩をすくめる 首をかしげる 目を丸くする 息をのむ 振り返る 顔を上げる'),
+      forms: <PredicateForm, WordPool>{
+        PredicateForm.polite: words(
+          r'叫びます 声を上げます はっとします 肩をすくめます 首をかしげます 目を丸くします 息をのみます 振り返ります 顔を上げます',
+        ),
+        PredicateForm.linking: words(r'叫んで 声を上げて はっとして 肩をすくめて 首をかしげて 目を丸くして 息をのんで 振り返って 顔を上げて'),
+      },
+      past: PredicateTense(
+        words: words(r'叫んだ 声を上げた はっとした 肩をすくめた 首をかしげた 目を丸くした 息をのんだ 振り返った 顔を上げた'),
+        forms: <PredicateForm, WordPool>{
+          PredicateForm.polite: words(r'''
+            叫びました 声を上げました はっとしました 肩をすくめました 首をかしげました 目を丸くしました 息をのみました 振り返りました 顔を上げました
           '''),
         },
       ),

@@ -233,6 +233,7 @@ console.log(
 							objectTraits: list(group.objectTraits),
 							objectWithout: list(group.objectWithout),
 							requires: group.requires ?? '',
+							condition: group.condition ?? '',
 							words: list(group.words),
 							forms: forms(group.forms),
 							past: tense(group.past)

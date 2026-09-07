@@ -29,6 +29,33 @@ const double _joinShare = 0.5;
 const int _voiceChance = 40;
 const int _voiceMax = 2;
 
+// What is true of the hero that somebody would ask after: whether they are
+// hungry, tired, restless, and the rest of it. The conditions that are about
+// where the hero is or what they hold are nobody's question.
+const List<Condition> _askable = <Condition>[
+  Condition.hungry,
+  Condition.full,
+  Condition.tired,
+  Condition.rested,
+  Condition.content,
+  Condition.restless,
+];
+
+// The fields a step may be told twice in one story. Going, arriving, rising,
+// sleeping and getting hold of the thing happen once.
+const List<VerbField> _repeatableFields = <VerbField>[
+  VerbField.express,
+  VerbField.think,
+  VerbField.wait,
+  VerbField.look,
+  VerbField.play,
+  VerbField.move,
+  VerbField.talk,
+  VerbField.search,
+  VerbField.tend,
+  VerbField.change,
+];
+
 /// Whether a beat is the first or the second clause of one sentence.
 enum JoinSide {
   /// The first clause, which closes on nothing.
@@ -377,6 +404,11 @@ List<_Walked>? _walk(
   return walked;
 }
 
+/// Whether a step can happen a second time in one telling.
+bool _repeatable(StoryStep step) =>
+    step.destination == null &&
+    (step.kind != StepKind.act || step.fields.every(_repeatableFields.contains));
+
 /// Whether the language can tell this story about this hero at all.
 bool tellable(SentenceLanguageData data, Story story, NounClass hero, WordTheme? item) =>
     _walk(
@@ -535,7 +567,7 @@ Plan? plan(
   // interludes, each once; then any of them again.
   bool grow(bool again) {
     final optional = story.steps
-        .where((step) => !step.required && (again || !chosen.contains(step)))
+        .where((step) => !step.required && (!chosen.contains(step) || (again && _repeatable(step))))
         .toList(growable: false);
     final own = <List<StoryStep> Function()>[];
     final filler = <List<StoryStep> Function()>[];

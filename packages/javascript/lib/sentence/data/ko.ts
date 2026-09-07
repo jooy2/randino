@@ -313,16 +313,57 @@ export const KO: SentenceLanguageData = {
 				`잠자:잠자 잠들:잠들어 졸:졸아 꾸벅이:꾸벅여 잠에빠지:잠에빠져 곯아떨어지:곯아떨어져 눈을붙이:눈을붙여 낮잠자:낮잠자 선잠들:선잠들어 잠을청하:잠을청해 코를골:코를골아 꿈나라로가:꿈나라로가`
 			)
 		},
+		// What somebody shows, split by what it shows: a story draws the group that
+		// matches what is true of its hero, so the hero laughs after the meal and
+		// sighs after losing the key. The last group shows nothing in particular and
+		// is what a story falls back on.
+		{
+			field: 'express',
+			subject: ['creature', 'person'],
+			condition: 'content',
+			...koVerbs(
+				`
+				웃:웃어 미소짓:미소지어 콧노래하:콧노래해 킥킥거리:킥킥거려 깔깔대:깔깔대 환호하:환호해 히죽거리:히죽거려 흥얼거리:흥얼거려 웃음짓:웃음지어 손뼉치:손뼉쳐
+				감탄하:감탄해 안도하:안도해 고개를끄덕이:고개를끄덕여 싱글벙글하:싱글벙글해 방긋웃:방긋웃어 활짝웃:활짝웃어 빙긋거리:빙긋거려 기뻐하:기뻐해 함박웃음짓:함박웃음지어
+				콧노래를부르:콧노래를불러 어깨를들썩이:어깨를들썩여
+			`
+			)
+		},
+		{
+			field: 'express',
+			subject: ['creature', 'person'],
+			condition: 'restless',
+			...koVerbs(
+				`
+				한숨짓:한숨지어 중얼거리:중얼거려 투덜거리:투덜거려 혼잣말하:혼잣말해 탄식하:탄식해 고개를젓:고개를저어 짜증내:짜증내 씩씩거리:씩씩거려 입을삐죽이:입을삐죽여
+				발을구르:발을굴러 안절부절못하:안절부절못해 손톱을물어뜯:손톱을물어뜯어 입술을깨물:입술을깨물어 눈살을찌푸리:눈살을찌푸려 머리를긁:머리를긁어 볼멘소리하:볼멘소리해
+				울:울어 흐느끼:흐느껴 훌쩍이:훌쩍여 눈물짓:눈물지어 화내:화내 성내:성내 눈을흘기:눈을흘겨 코웃음치:코웃음쳐 한숨을내쉬:한숨을내쉬어 이마를짚:이마를짚어
+			`
+			)
+		},
+		{
+			field: 'express',
+			subject: ['creature', 'person'],
+			condition: 'tired',
+			...koVerbs(
+				`하품하:하품해 눈을비비:눈을비벼 어깨를주무르:어깨를주물러 목을돌리:목을돌려 허리를두드리:허리를두드려 눈을깜빡이:눈을깜빡여 고개를떨구:고개를떨궈 하품을참:하품을참아`
+			)
+		},
+		{
+			field: 'express',
+			subject: ['creature', 'person'],
+			condition: 'hungry',
+			...koVerbs(
+				`침을삼키:침을삼켜 군침을흘리:군침을흘려 배를문지르:배를문질러 입맛을다시:입맛을다셔 코를킁킁거리:코를킁킁거려 배를움켜쥐:배를움켜쥐어 입을다시:입을다셔`
+			)
+		},
 		{
 			field: 'express',
 			subject: ['creature', 'person'],
 			...koVerbs(
 				`
-				웃:웃어 울:울어 하품하:하품해 한숨짓:한숨지어 미소짓:미소지어 콧노래하:콧노래해 중얼거리:중얼거려 소리치:소리쳐 킥킥거리:킥킥거려 깔깔대:깔깔대 흐느끼:흐느껴
-				투덜거리:투덜거려 혼잣말하:혼잣말해 환호하:환호해 탄식하:탄식해 히죽거리:히죽거려 훌쩍이:훌쩍여 고개를끄덕이:고개를끄덕여 어깨를으쓱하:어깨를으쓱해 흥얼거리:흥얼거려
-				재채기하:재채기해 눈물짓:눈물지어 외치:외쳐 웃음짓:웃음지어 고개를젓:고개를저어 손뼉치:손뼉쳐
-				짜증내:짜증내 화내:화내 성내:성내 놀라:놀라 감탄하:감탄해 씩씩거리:씩씩거려 헛기침하:헛기침해 눈을흘기:눈을흘겨 입을삐죽이:입을삐죽여 코웃음치:코웃음쳐
-				안도하:안도해 낯을붉히:낯을붉혀 몸서리치:몸서리쳐 어리둥절하:어리둥절해
+				소리치:소리쳐 외치:외쳐 놀라:놀라 어리둥절하:어리둥절해 헛기침하:헛기침해 어깨를으쓱하:어깨를으쓱해
+				고개를갸웃하:고개를갸웃해 눈을크게뜨:눈을크게떠 숨을들이켜:숨을들이켜 멈칫하:멈칫해 기지개켜:기지개켜 심호흡하:심호흡해 뒤돌아보:뒤돌아봐 고개를들:고개를들어
 			`
 			)
 		},
@@ -730,9 +771,14 @@ export const KO: SentenceLanguageData = {
 				'body'
 			],
 			...koStates(`
-				아름답:아름다워:아름다운 낯설:낯설어:낯선 새롭:새로워:새로운 흔하:흔해:흔한 드물:드물어:드문
-				신비롭:신비로워:신비로운 낯익:낯익어:낯익은 특별하:특별해:특별한 평범하:평범해:평범한 소중하:소중해:소중한 이상하:이상해:이상한 귀하:귀해:귀한
+				아름답:아름다워:아름다운 낯설:낯설어:낯선 새롭:새로워:새로운
+				신비롭:신비로워:신비로운 낯익:낯익어:낯익은 특별하:특별해:특별한 평범하:평범해:평범한 이상하:이상해:이상한
 			`)
+		},
+		{
+			// Rare, common and precious are things a thing is, and a place is not.
+			subject: ['creature', 'plant', 'edible', 'thing', 'vehicle', 'idea', 'body'],
+			...koStates(`흔하:흔해:흔한 드물:드물어:드문 소중하:소중해:소중한 귀하:귀해:귀한`)
 		},
 		{
 			subject: ['place'],
@@ -934,13 +980,7 @@ export const KO: SentenceLanguageData = {
 		{
 			subject: ['creature', 'person'],
 			words: words(`
-				조용히 천천히 빠르게 가만히 슬며시 홀로 잠시 갑자기 조심스레 힘차게 살며시 묵묵히 느긋하게 씩씩하게 훌쩍 곧장 슬쩍 사뿐히 성큼성큼 부지런히 유유히
-				냉큼 차분히 은근히 대뜸 나직이 느릿느릿 재빨리 가볍게 얌전히 무심히 덤덤히 성실히 신나게 살짝 부리나케 천연덕스럽게
-				조심조심 살금살금 슬금슬금 뚜벅뚜벅 터벅터벅 허둥지둥 헐레벌떡 우물쭈물 쭈뼛쭈뼛 두리번두리번 가만가만 사뿐사뿐 총총히 후다닥 벌떡 냅다 용케
-				골똘히 곰곰이 찬찬히 꼼꼼히 신중히 정성껏 야무지게 능숙하게 서투르게 어색하게 자연스럽게 애써 마지못해 간신히 겨우 힘겹게 기어이 짐짓
-				활기차게 다급히 급히 서둘러 넌지시 지그시 물끄러미 빤히 흔쾌히 선뜻 태연히 홀연히 우두커니 꼼짝없이 소리없이 조용조용 나긋나긋
-				상냥하게 다정하게 정답게 공손히 정중히 무뚝뚝하게 퉁명스럽게 심드렁하게 당당하게 의젓하게 늠름하게 뿌듯하게 즐겁게 기쁘게 슬프게 간절히
-				연신 자꾸 내내 줄곧 한동안
+				씩씩하게 훌쩍 사뿐히 성큼성큼 부지런히 유유히 살금살금 슬금슬금 뚜벅뚜벅 터벅터벅 허둥지둥 헐레벌떡 사뿐사뿐 총총히 벌떡
 			`)
 		},
 		{
@@ -1045,6 +1085,10 @@ export const KO: SentenceLanguageData = {
 	degrees: words(`
 		무척 아주 정말 몹시 꽤 조금 너무 한층 제법 참 유난히 사뭇 퍽 살짝 다소 상당히 매우 유독 한결 더없이 워낙 되게 엄청
 	`),
+	// And 그것 is a thing: a person, an animal, a place and what happens are
+	// referred to by leaving the subject out — `그것이 안개에 잠긴다` is no way to
+	// say a valley does.
+	pronounless: ['person', 'creature', 'place', 'event'],
 	// Korean counts anything, because a classifier is what makes a noun countable:
 	// `가지` turns an abstraction into kinds of it. The counter is spaced off the
 	// number, which is what 한글 맞춤법 prescribes as the default.

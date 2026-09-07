@@ -152,11 +152,39 @@ VI = SentenceLanguageData(
         VerbGroup(
             field="express",
             subject=("creature", "person"),
+            condition="content",
             words=words("""
-                cười khóc ngáp thở_dài mỉm_cười ngâm_nga lầm_bầm la_lên cười_khúc_khích cười_khẩy
-                cười_toe_toét cười_phá_lên nức_nở sụt_sịt rên_rỉ càu_nhàu lẩm_bẩm huýt_sáo reo_hò
-                hét la_hét thở_hắt_ra nhún_vai gật_đầu lắc_đầu cau_mày nhăn_mặt hắt_hơi nấc vỗ_tay
-                nháy_mắt đỏ_mặt vẫy_tay rưng_rưng hò_reo thút_thít cười_ngặt_nghẽo
+                cười mỉm_cười ngâm_nga cười_khúc_khích cười_toe_toét cười_phá_lên huýt_sáo reo_hò
+                gật_đầu vỗ_tay nháy_mắt hò_reo cười_ngặt_nghẽo hớn_hở cười_tươi
+            """),
+        ),
+        VerbGroup(
+            field="express",
+            subject=("creature", "person"),
+            condition="restless",
+            words=words("""
+                khóc thở_dài lầm_bầm nức_nở sụt_sịt rên_rỉ càu_nhàu lẩm_bẩm cau_mày nhăn_mặt lắc_đầu
+                rưng_rưng thút_thít bứt_rứt đi_đi_lại_lại cắn_môi gãi_đầu bồn_chồn
+            """),
+        ),
+        VerbGroup(
+            field="express",
+            subject=("creature", "person"),
+            condition="tired",
+            words=words("ngáp dụi_mắt vươn_vai xoa_vai xoay_cổ chớp_mắt"),
+        ),
+        VerbGroup(
+            field="express",
+            subject=("creature", "person"),
+            condition="hungry",
+            words=words("nuốt_nước_bọt liếm_môi xoa_bụng hít_hà chảy_nước_miếng"),
+        ),
+        VerbGroup(
+            field="express",
+            subject=("creature", "person"),
+            words=words("""
+                la_lên cười_khẩy hét la_hét thở_hắt_ra nhún_vai đỏ_mặt vẫy_tay nghiêng_đầu tròn_mắt
+                ngoảnh_lại ngẩng_đầu giật_mình
             """),
         ),
         VerbGroup(

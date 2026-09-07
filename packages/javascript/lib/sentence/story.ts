@@ -469,6 +469,30 @@ export function propThemesFor(
 	);
 }
 
+// The fields a step may be told twice in one story. Going, arriving, rising,
+// sleeping and getting hold of the thing happen once; the rest is what a hero
+// does in between.
+const REPEATABLE_FIELDS: readonly VerbField[] = [
+	'express',
+	'think',
+	'wait',
+	'look',
+	'play',
+	'move',
+	'talk',
+	'search',
+	'tend',
+	'change'
+];
+
+/** Whether a step can happen a second time in one telling. */
+function repeatable(step: StoryStep): boolean {
+	return (
+		step.destination === undefined &&
+		(step.kind !== 'act' || fieldsOf(step).every((field) => REPEATABLE_FIELDS.includes(field)))
+	);
+}
+
 /** Whether a step is something the hero does, which is what two clauses share. */
 function isAction(step: StoryStep): boolean {
 	return step.kind === 'act';
@@ -560,7 +584,9 @@ export function plan(
 		// any of them a second time, because ten sentences about a bowl of soup are
 		// ten sentences whatever the soup has left to do.
 		const optional = story.steps.filter(
-			(step) => !step.required && (again || !chosen.includes(step))
+			(step) =>
+				!step.required &&
+				(again ? !chosen.includes(step) || repeatable(step) : !chosen.includes(step))
 		);
 		const own: (() => StoryStep[])[] = [];
 		const filler: (() => StoryStep[])[] = [];

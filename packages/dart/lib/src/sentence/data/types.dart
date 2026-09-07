@@ -286,6 +286,16 @@ class VerbGroup {
   /// What these verbs do, as a story asks for it.
   final VerbField field;
 
+  /// What these verbs show of the one doing them, for a story to draw them by.
+  ///
+  /// `웃는다` and `콧노래한다` are what somebody [Condition.content] does,
+  /// `한숨짓는다` what somebody [Condition.restless] does, `하품한다` somebody
+  /// [Condition.tired]. A story's hero laughs after the meal and sighs after
+  /// losing the key. A group that shows nothing in particular leaves it out,
+  /// and is what a story falls back on; outside a story every group is drawn
+  /// alike.
+  final Condition? condition;
+
   /// Classes a noun has to belong to to be the subject of these verbs.
   final List<NounClass> subject;
 

@@ -228,18 +228,63 @@ final SentenceLanguageData es = SentenceLanguageData(
     VerbGroup(
       field: VerbField.express,
       subject: const <NounClass>[NounClass.creature, NounClass.person],
+      condition: Condition.content,
       words: words(r'''
-        ríe llora bosteza suspira sonríe tararea murmura grita se_ríe solloza gime gruñe refunfuña
-        silba exclama vitorea jadea se_encoge_de_hombros asiente frunce_el_ceño estornuda tiene_hipo
-        aplaude guiña_un_ojo se_sonroja se_ríe_a_carcajadas lloriquea resopla chilla balbucea
-        canturrea hace_una_mueca niega_con_la_cabeza saluda_con_la_mano
+        ríe sonríe tararea se_ríe silba vitorea asiente aplaude guiña_un_ojo se_ríe_a_carcajadas
+        canturrea sonríe_de_oreja_a_oreja
       '''),
       past: PredicateTense(
         words: words(r'''
-          rió lloró bostezó suspiró sonrió tarareó murmuró gritó se_rió sollozó gimió gruñó
-          refunfuñó silbó exclamó vitoreó jadeó se_encogió_de_hombros asintió frunció_el_ceño
-          estornudó tuvo_hipo aplaudió guiñó_un_ojo se_sonrojó se_rió_a_carcajadas lloriqueó resopló
-          chilló balbuceó canturreó hizo_una_mueca negó_con_la_cabeza saludó_con_la_mano
+          rió sonrió tarareó se_rió silbó vitoreó asintió aplaudió guiñó_un_ojo se_rió_a_carcajadas
+          canturreó sonrió_de_oreja_a_oreja
+        '''),
+      ),
+    ),
+    VerbGroup(
+      field: VerbField.express,
+      subject: const <NounClass>[NounClass.creature, NounClass.person],
+      condition: Condition.restless,
+      words: words(r'''
+        llora suspira murmura solloza gime gruñe refunfuña lloriquea resopla balbucea hace_una_mueca
+        niega_con_la_cabeza frunce_el_ceño se_muerde_el_labio se_rasca_la_cabeza da_vueltas
+      '''),
+      past: PredicateTense(
+        words: words(r'''
+          lloró suspiró murmuró sollozó gimió gruñó refunfuñó lloriqueó resopló balbuceó
+          hizo_una_mueca negó_con_la_cabeza frunció_el_ceño se_mordió_el_labio se_rascó_la_cabeza
+          dio_vueltas
+        '''),
+      ),
+    ),
+    VerbGroup(
+      field: VerbField.express,
+      subject: const <NounClass>[NounClass.creature, NounClass.person],
+      condition: Condition.tired,
+      words: words(r'bosteza se_frota_los_ojos se_estira se_masajea_los_hombros parpadea'),
+      past: PredicateTense(
+        words: words(r'bostezó se_frotó_los_ojos se_estiró se_masajeó_los_hombros parpadeó'),
+      ),
+    ),
+    VerbGroup(
+      field: VerbField.express,
+      subject: const <NounClass>[NounClass.creature, NounClass.person],
+      condition: Condition.hungry,
+      words: words(r'traga_saliva se_relame se_frota_la_barriga olfatea_el_aire'),
+      past: PredicateTense(
+        words: words(r'tragó_saliva se_relamió se_frotó_la_barriga olfateó_el_aire'),
+      ),
+    ),
+    VerbGroup(
+      field: VerbField.express,
+      subject: const <NounClass>[NounClass.creature, NounClass.person],
+      words: words(r'''
+        grita exclama jadea se_encoge_de_hombros estornuda se_sonroja chilla saluda_con_la_mano
+        ladea_la_cabeza abre_los_ojos_como_platos se_sobresalta
+      '''),
+      past: PredicateTense(
+        words: words(r'''
+          gritó exclamó jadeó se_encogió_de_hombros estornudó se_sonrojó chilló saludó_con_la_mano
+          ladeó_la_cabeza abrió_los_ojos_como_platos se_sobresaltó
         '''),
       ),
     ),

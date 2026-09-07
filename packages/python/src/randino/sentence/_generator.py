@@ -1722,7 +1722,15 @@ def _verb_groups_for(
 
         usable.append(group)
 
-    return usable
+    # And where some group shows what is true of the hero, those are what the sentence
+    # says: the hero laughs after the meal rather than sneezing after it.
+    showing = (
+        [group for group in usable if group.condition is not None]
+        if beat is not None and beat.state is not None
+        else []
+    )
+
+    return showing or usable
 
 
 def _accepts_subject(group: VerbGroup | StateGroup, theme: WordTheme) -> bool:
@@ -3396,6 +3404,25 @@ class Result:
     """What the result is about: its hero's theme in a story, else the first sentence's."""
 
 
+TIME_SHARE = 4
+"""How many of a result's sentences may say when, as a share of its count.
+
+One in four, and never two in a row: `아침에 … 한낮에 … 저녁에 … 밤에` in a paragraph of
+six is a timetable rather than a paragraph.
+"""
+
+
+def _time_spent(built: Sequence[Built], count: int) -> bool:
+    """Whether the next sentence of a result has to leave the time out.
+
+    The one before it named one, or the result has named its share already.
+    """
+    last = built[-1] if built else None
+    named = sum(1 for one in built if "time" in one.slots)
+
+    return (last is not None and "time" in last.slots) or named >= max(1, -(-count // TIME_SHARE))
+
+
 def _length_of(data: SentenceLanguageData, built: Sequence[Built]) -> int:
     """The whole of a result as one string, which is what the caller's range describes."""
     return sum(len(one.sentence) for one in built) + len(data.space) * (len(built) - 1)
@@ -3547,6 +3574,7 @@ def _generate_result(language: WordLanguage, settings: Settings) -> Result:
             and last.object is not None
             and last.object.noun == item.word
             else None,
+            dated=_time_spent(built, settings.sentences),
         )
         one, opened = _draw_one(paragraph, draw)
 

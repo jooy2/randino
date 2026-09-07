@@ -175,6 +175,7 @@ function dartVerb(group: VerbGroup, indent: string, koPast: boolean): string {
 			`${indent}  objectWithout: const ${dartList(group.objectWithout, 'NounTrait', indent)},`
 		);
 	if (group.requires) lines.push(`${indent}  requires: SentenceSlot.${group.requires},`);
+	if (group.condition) lines.push(`${indent}  condition: Condition.${group.condition},`);
 
 	lines.push(`${indent}  words: ${dartWords(group.words, indent + '  ')},`);
 
@@ -562,6 +563,7 @@ function pyVerb(group: VerbGroup, indent: string, koPast: boolean): string {
 	if (group.objectWithout)
 		lines.push(`${indent}    object_without=${pyTuple(group.objectWithout)},`);
 	if (group.requires) lines.push(`${indent}    requires=${pq(group.requires)},`);
+	if (group.condition) lines.push(`${indent}    condition=${pq(group.condition)},`);
 
 	lines.push(`${indent}    words=${pyWords(group.words, indent + '    ')},`);
 
