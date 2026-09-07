@@ -584,6 +584,9 @@ def plan(
     while len(walked) - len(joined) > count:
         trimmed: list[_Walked] | None = None
         at = -1
+        # The join a trimmed clause was one half of, given up with it: the other clause
+        # is a sentence of its own then.
+        unjoined = -1
 
         for i in range(len(walked) - 1, -1, -1):
             if walked[i].step.required or i in joined or i - 1 in joined:
@@ -595,11 +598,27 @@ def plan(
             if trimmed is not None:
                 break
 
+        # Nothing stands alone: every optional step left is one clause of a two-clause
+        # sentence, and a join is not worth a sentence the caller did not ask for. One
+        # clause goes, and its join with it.
+        if trimmed is None:
+            for i in range(len(walked) - 1, -1, -1):
+                if walked[i].step.required or not (i in joined or i - 1 in joined):
+                    continue
+
+                trimmed = _walk(data, story, [*chosen[:i], *chosen[i + 1 :]], hero, item, prop)
+                at = i
+                unjoined = i if i in joined else i - 1
+
+                if trimmed is not None:
+                    break
+
         if trimmed is None:
             break
 
         chosen.pop(at)
         walked = trimmed
+        joined.discard(unjoined)
         joined = {each - 1 if each > at else each for each in joined}
 
     # A person says some of what is true of them in their own words: a state sentence

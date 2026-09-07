@@ -616,6 +616,9 @@ export function plan(
 	while (settled!.length - joined.size > count) {
 		let trimmed: Settled[] | null = null;
 		let at = -1;
+		// The join a trimmed clause was one half of, given up with it: the other
+		// clause is a sentence of its own then.
+		let unjoined = -1;
 
 		for (let i = settled!.length - 1; i >= 0 && !trimmed; i -= 1) {
 			if (settled![i].step.required || joined.has(i) || joined.has(i - 1)) {
@@ -628,12 +631,31 @@ export function plan(
 			at = i;
 		}
 
+		// Nothing stands alone: every optional step left is one clause of a
+		// two-clause sentence, and a join is not worth a sentence the caller did not
+		// ask for. One clause goes, and its join with it.
+		for (let i = settled!.length - 1; i >= 0 && !trimmed; i -= 1) {
+			if (settled![i].step.required || !(joined.has(i) || joined.has(i - 1))) {
+				continue;
+			}
+
+			const without = [...chosen.slice(0, i), ...chosen.slice(i + 1)];
+
+			trimmed = walk(data, story, without, hero, item, prop);
+			at = i;
+			unjoined = joined.has(i) ? i : i - 1;
+		}
+
 		if (!trimmed) {
 			break;
 		}
 
 		chosen.splice(at, 1);
 		settled = trimmed;
+
+		if (unjoined >= 0) {
+			joined.delete(unjoined);
+		}
 
 		const shifted = new Set<number>();
 

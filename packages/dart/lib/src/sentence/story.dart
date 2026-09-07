@@ -560,6 +560,9 @@ Plan? plan(
   while (walked!.length - joined.length > count) {
     List<_Walked>? trimmed;
     var at = -1;
+    // The join a trimmed clause was one half of, given up with it: the other
+    // clause is a sentence of its own then.
+    var unjoined = -1;
 
     for (var i = walked!.length - 1; i >= 0 && trimmed == null; i -= 1) {
       if (walked![i].step.required || joined.contains(i) || joined.contains(i - 1)) continue;
@@ -575,10 +578,30 @@ Plan? plan(
       at = i;
     }
 
+    // Nothing stands alone: every optional step left is one clause of a
+    // two-clause sentence, and a join is not worth a sentence the caller did
+    // not ask for. One clause goes, and its join with it.
+    for (var i = walked!.length - 1; i >= 0 && trimmed == null; i -= 1) {
+      if (walked![i].step.required || !(joined.contains(i) || joined.contains(i - 1))) continue;
+
+      trimmed = _walk(
+        data,
+        story,
+        <StoryStep>[...chosen.sublist(0, i), ...chosen.sublist(i + 1)],
+        hero,
+        item,
+        prop,
+      );
+      at = i;
+      unjoined = joined.contains(i) ? i : i - 1;
+    }
+
     if (trimmed == null) break;
 
     chosen.removeAt(at);
     walked = trimmed;
+
+    if (unjoined >= 0) joined.remove(unjoined);
 
     final shifted = <int>{for (final each in joined) each > at ? each - 1 : each};
 
