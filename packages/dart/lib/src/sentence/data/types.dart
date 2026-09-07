@@ -279,6 +279,7 @@ class VerbGroup {
     this.objectTraits,
     this.objectWithout,
     this.requires,
+    this.condition,
     this.forms = const <PredicateForm, WordPool>{},
     this.past,
   });
@@ -657,14 +658,47 @@ class SentenceObjectPronouns {
 /// person, which is Spanish, Italian, German and Russian; their stories are
 /// narrated all the way through.
 class SentenceSpeech {
-  /// Creates the first person of one language.
-  const SentenceSpeech({required this.subject, this.head});
+  /// Creates the first or the second person of one language.
+  const SentenceSpeech({required this.subject, this.head, this.heads});
 
   /// What stands where the subject would, `''` for nothing.
   final String subject;
 
-  /// The copula a state takes in the first person, where it changes.
+  /// The copula a state takes for this person, where it changes: English `am`
+  /// and `are` beside `is`, German `bist` beside `ist`.
   final String? head;
+
+  /// The same by the head a state group brings of its own, for a language
+  /// whose copula depends on what is said: Spanish `estás` for `está` and
+  /// `eres` for `es`.
+  final Map<String, String>? heads;
+}
+
+/// What an answer is answering, which is what decides which of the language's
+/// replies fit.
+///
+/// `그러게` fits a remark and `잘됐다!` fits a piece of news, and `괜찮아?` fits
+/// somebody who just said they are tired; a pool that has to fit anything can
+/// only hold what says nothing.
+enum ReplyCue {
+  /// Goes along with a remark, or with something good that was said: `그러게`,
+  /// `맞아`, `right`.
+  agree,
+
+  /// Greets a piece of good news, what was found, bought, made or done:
+  /// `잘됐다!`, `well done!`.
+  cheer,
+
+  /// Answers somebody who is tired, hungry, restless, or has lost something:
+  /// `괜찮아?`, `take it easy`.
+  care,
+
+  /// Asks for more of what was just reported: `정말?`, `어디서?`, `and then?`.
+  wonder,
+
+  /// What somebody says when asked whether they are tired or hungry: `응, 조금`,
+  /// `yes, a little`.
+  answer,
 }
 
 /// What a noun can do that its theme does not say.
@@ -1032,6 +1066,24 @@ class SentenceLanguageData {
   /// write it.
   final SentenceSpeech? speech;
 
+  /// What somebody answers a line with, by speech level and by what it answers:
+  /// `“그러게.”`, `“Really?”`.
+  ///
+  /// A reply is written whole rather than built, because what it has to do is
+  /// fit whatever was just said — and it is sorted by [ReplyCue] so that it
+  /// does. Keyed by [SentenceStyle.casual], [SentenceStyle.polite] and
+  /// [SentenceStyle.formal]; a language with no levels writes `casual` alone,
+  /// and a level a language does not declare falls back to the next warmer one.
+  /// A cue a level does not declare falls back to the other cues of that
+  /// level. An entry closes on its own ASCII mark where it is not a statement —
+  /// `잘됐다!` is exclaimed and `정말?` asked — and the generator writes the
+  /// language's own terminator in its place. Null for a language that writes
+  /// no exchange.
+  final Map<SentenceStyle, Map<ReplyCue, WordPool>>? replies;
+
+  /// How the hero speaks to somebody — the second person a question is asked in
+  /// (`“배고파?”`, `“Are you tired?”`). Null for a language that cannot write it.
+  final SentenceSpeech? listener;
 
   /// How much a state holds, written in front of it: `무척`, `very`, `とても`.
   ///

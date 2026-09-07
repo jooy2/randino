@@ -397,6 +397,7 @@ Set<String> pronounsOf(WordLanguage language) {
     for (final pool in (data.objectPronouns?.words ?? const <WordGender, WordPool>{}).values)
       ...pool,
     data.speech?.subject ?? '',
+    data.listener?.subject ?? '',
   ].where((word) => word.isNotEmpty);
 
   return <String>{...written, ...written.map(upperFirst)};
@@ -1177,7 +1178,8 @@ void main() {
         includeName: true,
         count: 120,
       )) {
-        // A `visit` is the one story with a second person in it: the one met.
+        // A `visit` and a `chat` are the stories with a second person in them:
+        // the one met. Anybody else who turns up is written as what they are.
         expect(
           detail.names.toSet().length,
           lessThanOrEqualTo(
@@ -1796,13 +1798,25 @@ void main() {
       }
     });
 
-    test('a person in a story sometimes speaks for themselves, and nobody else does', () {
-      // A state sentence about a person may be a line they say or think — quoted,
-      // in the first person, never the first sentence, never more than two — where
-      // the language can write one. An animal is narrated, and so is everybody in
-      // a language that cannot.
+    test('a person in a story sometimes speaks, and nobody else does', () {
+      // A sentence about a person may be a line — quoted, never the first
+      // sentence, never two in a row from one mouth, and never more than a story
+      // allows. What is said is one of three things: what is true of them or what
+      // they just did, in the first person where the language writes one; a
+      // remark about the thing or the place, in the third; or somebody's answer,
+      // which is one of the language's replies written whole. An animal is
+      // narrated.
       bool quoted(SentenceType type) =>
           type == SentenceType.dialogue || type == SentenceType.thought;
+
+      String stripped(WordLanguage language, String line) {
+        final data = sentenceData[language]!;
+        final inner = line.substring(1, line.length - 1);
+        final closed = data.terminators.values.firstWhere(inner.endsWith, orElse: () => '');
+        final opened = data.openers.values.firstWhere(inner.startsWith, orElse: () => '');
+
+        return inner.substring(opened.length, inner.length - closed.length);
+      }
 
       List<SentenceDetail> untyped(WordLanguage language, WordTheme theme) => randSentenceDetails(
         language: language,
@@ -1815,24 +1829,37 @@ void main() {
 
       for (final language in wordLanguages) {
         final data = sentenceData[language]!;
+        String whole(String entry) {
+          final plain = entry.replaceAll(RegExp(r'[!?]$'), '');
+
+          return data.capitalize ? upperFirst(plain) : plain;
+        }
         var lines = 0;
+        var first = 0;
+        var answered = 0;
+        var homecame = 0;
 
         for (final detail in untyped(language, WordTheme.job)) {
           final spoken = detail.types.where(quoted).length;
+          final most = stories.firstWhere((story) => story.name == detail.story).lines ?? 2;
 
           lines += spoken;
-          expect(spoken <= 2, isTrue, reason: '$language: $spoken lines (${detail.sentence})');
+          expect(
+            spoken <= most + 2,
+            isTrue,
+            reason: '$language: $spoken lines (${detail.sentence})',
+          );
           expect(
             quoted(detail.types.first),
             isFalse,
             reason: '$language: opened on a line (${detail.sentence})',
           );
 
+          final belongs = sentenceOf(detail);
           for (var i = 0; i < detail.types.length; i += 1) {
             if (!quoted(detail.types[i])) continue;
 
             final line = detail.sentences[i];
-            final inner = line.substring(1, line.length - 1);
 
             expect(
               data.quotes.values.any((pair) => line.startsWith(pair[0]) && line.endsWith(pair[1])),
@@ -1840,21 +1867,47 @@ void main() {
               reason: "$language: '$line' is not quoted",
             );
 
+            // An answer is said after a line and never on its own, and it is
+            // built from no phrase.
+            if (isReply(i)) {
+              expect(
+                i > 0 && quoted(detail.types[i - 1]) && !isReply(i - 1),
+                isTrue,
+                reason: "$language: '$line' answers nothing",
+              );
+              expect(detail.types[i], SentenceType.dialogue, reason: "$language: '$line'");
+              answered += 1;
+              continue;
+            }
+
             // One mouth speaks once, and then somebody else answers or the story
             // goes on: two lines in a row are a line and its answer, or an answer
             // and the hero going on.
             expect(
-              data.speech!.subject.isEmpty || inner.startsWith(data.speech!.subject),
+              i == 0 || !quoted(detail.types[i - 1]) || isReply(i - 1),
               isTrue,
-              reason: "$language: '$line' does not speak in the first person",
+              reason: '$language: two lines in a row (${detail.sentence})',
             );
+
+            final subject = data.speech?.subject;
+
+            if (subject != null &&
+                subject.isNotEmpty &&
+                stripped(language, line).startsWith(subject)) {
+              first += 1;
+            }
           }
         }
 
-        if (data.speech != null) {
-          expect(lines, greaterThan(0), reason: '$language: nobody ever spoke');
-        } else {
-          expect(lines, 0, reason: '$language: somebody spoke');
+        expect(lines, greaterThan(0), reason: '$language: nobody ever spoke');
+
+        if (data.speech != null && data.speech!.subject.isNotEmpty) {
+          expect(first, greaterThan(0), reason: '$language: nobody spoke in the first person');
+        }
+
+        if (data.replies != null) {
+          expect(answered, greaterThan(0), reason: '$language: nobody ever answered');
+        }
         }
 
         for (final detail in untyped(language, WordTheme.animal)) {

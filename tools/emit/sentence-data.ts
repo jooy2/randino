@@ -10,6 +10,7 @@ import type {
 	PredicateTense,
 	SentenceFrame,
 	SentenceLanguageData,
+	SentenceSpeech,
 	StateGroup,
 	VerbGroup
 } from '../../packages/javascript/lib/sentence/data/types.js';
@@ -89,6 +90,19 @@ function stemsOf(
 }
 
 /* --- Dart ------------------------------------------------------------------ */
+
+/** A `SentenceSpeech` as a Dart constructor call. */
+function dartSpeech(speech: SentenceSpeech): string {
+	const head = speech.head === undefined ? '' : `, head: ${dq(speech.head)}`;
+	const heads =
+		speech.heads === undefined
+			? ''
+			: `, heads: <String, String>{${Object.entries(speech.heads)
+					.map(([from, to]) => `${dq(from)}: ${dq(to)}`)
+					.join(', ')}}`;
+
+	return `const SentenceSpeech(subject: ${dq(speech.subject)}${head}${heads})`;
+}
 
 const dq = (text: string) =>
 	text.includes("'") ? `"${text.replace(/\$/g, '\\$')}"` : `'${text.replace(/\$/g, '\\$')}'`;
@@ -440,12 +454,27 @@ function emitDart(code: string, data: SentenceLanguageData): string {
 		out.push('  ),');
 	}
 
-	if (data.speech) {
-		const head = data.speech.head === undefined ? '' : `, head: ${dq(data.speech.head)}`;
+	if (data.speech) out.push(`  speech: ${dartSpeech(data.speech)},`);
 
-		out.push(`  speech: const SentenceSpeech(subject: ${dq(data.speech.subject)}${head}),`);
+	if (data.replies) {
+		out.push('  replies: <SentenceStyle, Map<ReplyCue, WordPool>>{');
+
+		for (const [level, pools] of Object.entries(data.replies)) {
+			if (!pools) continue;
+
+			out.push(`    SentenceStyle.${level}: <ReplyCue, WordPool>{`);
+
+			for (const [cue, pool] of Object.entries(pools)) {
+				if (pool) out.push(`      ReplyCue.${cue}: ${dartWords(pool, '      ')},`);
+			}
+
+			out.push('    },');
+		}
+
+		out.push('  },');
 	}
 
+	if (data.listener) out.push(`  listener: ${dartSpeech(data.listener)},`);
 
 	if (data.degrees) out.push(`  degrees: ${dartWords(data.degrees, '  ')},`);
 
@@ -505,6 +534,19 @@ function emitDart(code: string, data: SentenceLanguageData): string {
 /* --- Python ---------------------------------------------------------------- */
 
 const pq = (text: string) => JSON.stringify(text);
+
+/** A `SentenceSpeech` as a Python constructor call. */
+function pySpeech(speech: SentenceSpeech): string {
+	const head = speech.head === undefined ? '' : `, head=${pq(speech.head)}`;
+	const heads =
+		speech.heads === undefined
+			? ''
+			: `, heads={${Object.entries(speech.heads)
+					.map(([from, to]) => `${pq(from)}: ${pq(to)}`)
+					.join(', ')}}`;
+
+	return `SentenceSpeech(subject=${pq(speech.subject)}${head}${heads})`;
+}
 
 function pyWords(pool: readonly string[], indent: string): string {
 	const joined = pool.map(entry).join(' ');
@@ -808,8 +850,27 @@ function emitPython(code: string, data: SentenceLanguageData): string {
 		out.push(`    object_pronouns=SentenceObjectPronouns(words={${words}}${clitic}),`);
 	}
 
-	if (data.speech) {
-		const head = data.speech.head === undefined ? '' : `, head=${pq(data.speech.head)}`;
+	if (data.speech) out.push(`    speech=${pySpeech(data.speech)},`);
+
+	if (data.replies) {
+		out.push('    replies={');
+
+		for (const [level, pools] of Object.entries(data.replies)) {
+			if (!pools) continue;
+
+			out.push(`        ${pq(level)}: {`);
+
+			for (const [cue, pool] of Object.entries(pools)) {
+				if (pool) out.push(`            ${pq(cue)}: ${pyWords(pool, '            ')},`);
+			}
+
+			out.push('        },');
+		}
+
+		out.push('    },');
+	}
+
+	if (data.listener) out.push(`    listener=${pySpeech(data.listener)},`);
 
 		out.push(`    speech=SentenceSpeech(subject=${pq(data.speech.subject)}${head}),`);
 	}

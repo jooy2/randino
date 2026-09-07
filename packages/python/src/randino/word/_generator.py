@@ -16,6 +16,7 @@ from randino._internal.generate import (
     length_bounds,
     resolve_prefix,
     resolve_realism,
+    resolve_vocabulary,
 )
 from randino._internal.utils import capitalize_first, chance, clamp, pick, rand_int
 from randino._types import (

@@ -33,6 +33,7 @@ from randino.sentence.data._types import (
     Condition,
     ConnectiveKind,
     NounClass,
+    ReplyCue,
     SentenceLanguageData,
     StateGroup,
     VerbField,
@@ -40,12 +41,6 @@ from randino.sentence.data._types import (
 )
 
 JOIN_SHARE = 0.5
-
-# How often a state sentence about a person becomes a line of their own, and how many of
-# them one telling may have. A paragraph that speaks in every other line is a script, not
-# a story.
-VOICE_CHANCE = 40
-VOICE_MAX = 2
 """The most joins one result makes, against its sentence count.
 
 A story told in nothing but short sentences reads as stage directions, and `집에
@@ -53,6 +48,78 @@ A story told in nothing but short sentences reads as stage directions, and `집�
 monotonous as none. How many a telling makes is drawn between none and this.
 """
 
+VoiceMode = Literal["none", "some", "scene"]
+"""Whether anybody speaks in a telling, drawn once per telling.
+
+Narrated all the way through, a line or two, or a scene of speech with an answer or two
+in it. Per telling rather than per line, so that two results are not the same amount of
+talking twice.
+"""
+
+VOICE_MODE_WEIGHT: dict[VoiceMode, int] = {"none": 30, "some": 45, "scene": 25}
+
+VOICE_CHANCE: dict[VoiceMode, int] = {"none": 0, "some": 40, "scene": 75}
+"""How often a sentence that could be a line is one, per mode."""
+
+VOICE_MAX = 2
+"""The most lines a telling may have beside the story's own allowance."""
+
+SCENE_EXTRA = 2
+"""How many more a scene of speech may hold, because a scene is where the talking is."""
+
+REPLY_CHANCE: dict[VoiceMode, int] = {"none": 0, "some": 35, "scene": 70}
+"""How often a line is answered, per mode.
+
+An answer takes the place of an optional step, which is what keeps the count exact. In
+a scene of speech the hero may go on after being answered, which is how an exchange gets
+to be one.
+"""
+
+ASK_CHANCE = 40
+"""How often a hero with somebody beside them asks how they are, where they could speak."""
+
+LINE_FIELDS: tuple[VerbField, ...] = (
+    "go",
+    "arrive",
+    "wait",
+    "rest",
+    "search",
+    "find",
+    "take",
+    "carry",
+    "hide",
+    "make",
+    "tend",
+    "sell",
+    "buy",
+    "cook",
+    "eat",
+    "drink",
+    "lose",
+    "meet",
+    "play",
+    "move",
+)
+"""The fields a person may report in their own words: `“열쇠를 찾았어!”`, `“빵을 먹었어.”`.
+
+As against the ones nobody says aloud. Told in the past, as a report of what just
+happened, whatever tense the story is in.
+"""
+
+COMMENT_FIELDS: tuple[VerbField, ...] = ("look", "talk")
+"""The fields a person may answer with a remark about the thing instead of doing.
+
+Looking at it (`“사과가 참 달다!”`), or talking, which is about the place.
+"""
+
+ASKABLE: tuple[Condition, ...] = ("hungry", "full", "tired", "rested", "content", "restless")
+"""What is true of the hero that somebody would ask after.
+
+The conditions that are about where the hero is or what they hold are nobody's question.
+"""
+
+LOW: tuple[Condition, ...] = ("hungry", "tired", "restless")
+"""The conditions somebody answers with concern rather than with cheer."""
 
 REPEATABLE_FIELDS: tuple[VerbField, ...] = (
     "express",
@@ -74,6 +141,18 @@ what a hero does in between.
 
 JoinSide = Literal["first", "second"]
 """Whether a beat is the first or the second clause of one sentence."""
+
+Voice = Literal["line", "comment", "notice", "ask", "reply"]
+"""How a sentence of a story is spoken, when it is.
+
+`"line"`: the hero says it themselves, in the first person — two beats the plan joined
+are one line when both are things the hero could report. `"comment"`: the hero says
+something about the thing in front of them or the place around them, in the third
+person, instead of the step's own action. `"notice"`: the hero says what somebody else is
+doing, which is the `"other"` step told in their voice. `"ask"`: the hero asks the person
+beside them how they are, in the second person, and is always answered. `"reply"`:
+somebody answers the line before, which is not a step of the story at all.
+"""
 
 
 @dataclass(frozen=True, slots=True)
@@ -103,13 +182,21 @@ class Beat:
     join: JoinSide | None
     """Whether this beat is the first or the second clause of one sentence."""
 
-    voiced: bool = False
-    """Whether the hero says this one themselves.
+    voice: Voice | None = None
+    """How this sentence is spoken, or None for one the story narrates.
 
-    A state sentence quoted in the first person — `“배고프다.”` — rather than narrated.
-    Only a person's, only after the first sentence, and only where the language can
-    write it.
+    Never the first sentence, because a line needs a topic to speak. For a `"reply"`,
+    `step` is the line's, kept for bookkeeping.
     """
+
+    asked: Condition | None = None
+    """What is being asked about, for an `"ask"`. None otherwise."""
+
+    cue: ReplyCue | None = None
+    """What a `"reply"` answers, which decides which of the language's replies fit."""
+
+    answered: bool = False
+    """Whether the sentence after this line answers it, which makes it said aloud."""
 
 
 @dataclass(frozen=True, slots=True)
@@ -380,6 +467,9 @@ class _Walked:
     given: frozenset[Condition]
     """What the story itself had made true by then."""
 
+    memory: _Memory
+    """Everything the telling knew before this step, for walking on from here."""
+
 
 def _walk(
     data: SentenceLanguageData,
@@ -394,7 +484,21 @@ def _walk(
     None when a step cannot be told where it stands, which is what rejects an optional
     step that would take away what a later required one needs.
     """
-    memory = _Memory(frozenset(story.start), frozenset(), frozenset())
+    return _walk_from(
+        data, steps, hero, item, prop, _Memory(frozenset(story.start), frozenset(), frozenset())
+    )
+
+
+def _walk_from(
+    data: SentenceLanguageData,
+    steps: Sequence[StoryStep],
+    hero: NounClass,
+    item: WordTheme | None,
+    prop: WordTheme | None,
+    start: _Memory,
+) -> list[_Walked] | None:
+    """The same, from what a telling knew at some point rather than from the start."""
+    memory = start
     walked: list[_Walked] = []
 
     for step in steps:
@@ -403,7 +507,7 @@ def _walk(
         if one is None:
             return None
 
-        walked.append(_Walked(step, one[0], one[1], memory.state, memory.given))
+        walked.append(_Walked(step, one[0], one[1], memory.state, memory.given, memory))
         memory = _after(memory, step, one)
 
     return walked
@@ -557,6 +661,7 @@ def plan(
     item: WordTheme | None,
     count: int,
     joinable: bool,
+    spoken: bool = True,
 ) -> Plan | None:
     """Plan a telling of `story` in exactly `count` sentences.
 
@@ -588,6 +693,8 @@ def plan(
         # Add a step: the story's own optional steps first, each once; then the
         # interludes, each once; then any of them again.
         nonlocal chosen, walked
+        # A step goes in again only if it can happen twice: a hero who looks, waits or
+        # laughs again is still in the story, and one who comes home again never left.
         optional = [
             step
             for step in story.steps
@@ -707,26 +814,12 @@ def plan(
         joined.discard(unjoined)
         joined = {each - 1 if each > at else each for each in joined}
 
-    # A person says some of what is true of them in their own words: a state sentence
-    # after the first, in a language that writes the first person, is now and then a
-    # line the story quotes rather than narrates.
-    voiced = 0
+    voice, asked, cue, answered, walked = _voices_for(
+        data, story, hero, item, prop, chosen, walked, joined, spoken
+    )
     beats: list[Beat] = []
 
     for i, one in enumerate(walked):
-        voice = (
-            hero == "person"
-            and data.speech is not None
-            and i > 0
-            and one.step.kind == "state"
-            and one.condition is not None
-            and voiced < VOICE_MAX
-            and chance(VOICE_CHANCE)
-        )
-
-        if voice:
-            voiced += 1
-
         beats.append(
             Beat(
                 step=one.step,
@@ -740,11 +833,230 @@ def plan(
                     kind for kind in one.step.kinds if kind != "trailing" or i == len(walked) - 1
                 ),
                 join="first" if i in joined else "second" if i - 1 in joined else None,
-                voiced=voice,
+                voice=voice[i],
+                asked=asked[i],
+                cue=cue[i],
+                answered=answered[i],
             )
         )
 
     return Plan(story, tuple(beats), prop)
+
+
+def _voices_for(
+    data: SentenceLanguageData,
+    story: Story,
+    hero: NounClass,
+    item: WordTheme | None,
+    prop: WordTheme | None,
+    chosen: list[StoryStep],
+    walked: list[_Walked],
+    joined: set[int],
+    spoken: bool,
+) -> tuple[
+    list[Voice | None], list[Condition | None], list[ReplyCue | None], list[bool], list[_Walked]
+]:
+    """Which sentences of a telling are spoken, and which of those are answered.
+
+    Only a person speaks, and only after the first sentence. What they can say is what is
+    true of them or what they just did (a field in `LINE_FIELDS`) — both in the first
+    person, where the language writes one — what they make of the thing, the place or
+    what somebody else is doing (a `look`, a `talk`, a scene or an `"other"` step, said in
+    the third person, which any language can write), or, with somebody beside them, a
+    question about how that somebody is. An answer takes the place of the optional step
+    after a line, where the story can spare it and somebody is there to answer: the hero
+    is out, or the story is about a person. A question is only asked where it can be
+    answered. Whether anybody speaks at all is one draw per telling, and in a scene of
+    speech the hero may go on after being answered, which is what an exchange is.
+    """
+    voice: list[Voice | None] = [None] * len(walked)
+    asked: list[Condition | None] = [None] * len(walked)
+    cue: list[ReplyCue | None] = [None] * len(walked)
+    answered = [False] * len(walked)
+
+    if hero != "person" or not spoken:
+        return voice, asked, cue, answered, walked
+
+    mode = pick_weighted(list(VOICE_MODE_WEIGHT), lambda each: VOICE_MODE_WEIGHT[each])
+    most = (story.lines or VOICE_MAX) + (SCENE_EXTRA if mode == "scene" else 0)
+    # Somebody to answer: the person the story is about, if it is about one.
+    company = story.item is not None and "person" in story.item
+    # What the hero may ask that person: a condition the language can describe a person
+    # as being in.
+    askable: tuple[Condition, ...] = (
+        tuple(
+            condition
+            for condition in ASKABLE
+            if any(
+                group.condition == condition and "person" in group.subject for group in data.states
+            )
+        )
+        if data.listener is not None
+        else ()
+    )
+    lines = 0
+
+    def whole(i: int) -> bool:
+        # Whether this beat is a whole sentence: not one clause of a two-clause one.
+        return i not in joined and i - 1 not in joined
+
+    def pair(i: int) -> bool:
+        # Whether this beat and the one the plan joined it to are both things the hero
+        # could report, which makes the two of them one line.
+        return (
+            i in joined
+            and i + 1 < len(walked)
+            and reportable(walked[i])
+            and reportable(walked[i + 1])
+        )
+
+    def voices_of(one: _Walked) -> list[Voice]:
+        # The ways this beat could be spoken, if any.
+        step = one.step
+        out: list[Voice] = []
+
+        if step.kind == "state" and one.condition is not None:
+            if data.speech is not None:
+                out.append("line")
+
+            if company and askable:
+                out.append("ask")
+
+            if one.field == "talk" and company and askable:
+                out.append("ask")
+
+        if step.kind == "scene":
+            out.append("comment")
+
+        if step.kind == "other":
+            out.append("notice")
+
+        return out
+
+    def cue_for(kind: Voice, one: _Walked) -> ReplyCue:
+        # What an answer to this line has to fit.
+        if kind == "ask":
+            return "answer"
+
+        if kind in ("comment", "notice"):
+            return "agree"
+
+        if one.step.kind == "state":
+            return (
+                pick(("care", "care", "agree"))
+                if one.condition is not None and one.condition in LOW
+                else pick(("cheer", "agree"))
+            )
+
+        return (
+            pick(("care", "wonder")) if one.field == "lose" else pick(("cheer", "wonder", "agree"))
+        )
+
+    def answerable(following: int, one: _Walked) -> bool:
+        # Whether the beat at `following` can give way to an answer: the story can spare
+        # it, it is a whole sentence, and somebody is there to answer.
+        return (
+            data.replies is not None
+            and following < len(walked)
+            and lines + 1 < most
+            and not walked[following].step.required
+            and whole(following)
+            and ("away" in one.before or company)
+        )
+
+    i = 1
+
+    while i < len(walked) and lines < most:
+        one = walked[i]
+        # Never two lines in a row from the same mouth: what follows a line is prose, or
+        # somebody else's answer — and, in a scene of speech, the hero again after that
+        # answer.
+        after = voice[i - 1]
+
+        if after is not None and not (mode == "scene" and after == "reply"):
+            i += 1
+            continue
+
+        twin = pair(i)
+
+        if not twin and not whole(i):
+            i += 1
+            continue
+
+        options: list[Voice] = ["line"] if twin else voices_of(one)
+
+        if not options or not chance(VOICE_CHANCE[mode]):
+            i += 1
+            continue
+
+        others = [each for each in options if each != "ask"]
+        following = i + 2 if twin else i + 1
+        kind: Voice | None = (
+            "ask" if "ask" in options and chance(ASK_CHANCE) else pick(others) if others else None
+        )
+        rest: list[_Walked] | None = None
+
+        # A question has to be answered, so it is asked only where it can be; where it
+        # cannot, the beat is spoken some other way, or narrated.
+        if kind == "ask":
+            rest = (
+                _walk_from(
+                    data, chosen[following + 1 :], hero, item, prop, walked[following].memory
+                )
+                if answerable(following, one)
+                else None
+            )
+
+            if rest is None:
+                kind = pick(others) if others else None
+
+        if kind is None:
+            i += 1
+            continue
+
+        if (
+            kind != "ask"
+            and not aside
+            and answerable(following, one)
+            and chance(REPLY_CHANCE[mode])
+        ):
+            rest = _walk_from(
+                data, chosen[following + 1 :], hero, item, prop, walked[following].memory
+            )
+
+        voice[i] = kind
+        asked[i] = pick(askable) if kind == "ask" else None
+
+        if twin:
+            voice[i + 1] = kind
+
+        lines += 1
+
+        if rest is None:
+            i += 1
+            continue
+
+        # The line's step stands in for the answered one, so that `chosen` and `walked`
+        # stay the same length and a later answer walks on from the right place.
+        chosen[following] = one.step
+        walked[following:] = [
+            _Walked(
+                one.step,
+                None,
+                None,
+                walked[following].before,
+                walked[following].given,
+                walked[following].memory,
+            ),
+            *rest,
+        ]
+        voice[following] = "reply"
+        cue[following] = cue_for(kind, one)
+        answered[i] = True
+        lines += 1
+        i = following + 1
+
+    return voice, asked, cue, answered, walked
 
 
 def unjoined(beat: Beat) -> Beat:

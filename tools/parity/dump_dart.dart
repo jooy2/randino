@@ -26,6 +26,15 @@ List<Map<String, String?>>? pool(NamePool? source) => source
 /// Flattens a word pool.
 List<String>? listed(List<String>? source) => source?.toList();
 
+/// A first or second person in the canonical shape, with an empty map for no heads.
+Map<String, Object?>? speech(SentenceSpeech? person) => person == null
+    ? null
+    : <String, Object?>{
+        'subject': person.subject,
+        'head': person.head ?? '',
+        'heads': person.heads ?? const <String, String>{},
+      };
+
 /// A predicate's past forms, or null where the language's predicate does not change.
 Map<String, Object?>? tense(PredicateTense? source) => source == null
     ? null
@@ -272,6 +281,15 @@ void main() {
           'habitual': listed(entry.value.times.habitual),
         },
         'homes': listed(entry.value.homes),
+        'replies': entry.value.replies == null
+            ? null
+            : <String, Object?>{
+                for (final level in entry.value.replies!.entries)
+                  level.key.name: <String, Object?>{
+                    for (final cue in level.value.entries) cue.key.name: listed(cue.value),
+                  },
+              },
+        'degrees': listed(entry.value.degrees),
         'connectives': <String, Object?>{
           for (final k in entry.value.connectives.entries)
             k.key.name: listed(k.value),

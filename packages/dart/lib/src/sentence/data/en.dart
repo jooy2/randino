@@ -374,9 +374,7 @@ final SentenceLanguageData en = SentenceLanguageData(
       '''),
       forms: <PredicateForm, WordPool>{
         PredicateForm.question: words(r'''
-          laugh cry yawn sigh smile hum mutter shout giggle chuckle grin sob weep groan grumble
-          whistle whimper snort cheer gasp shrug nod frown beam sniffle sneeze hiccup clap wink
-          blush
+          laugh smile hum giggle chuckle grin whistle cheer beam clap nod wink chortle brighten
         '''),
       },
       past: PredicateTense(
@@ -386,9 +384,7 @@ final SentenceLanguageData en = SentenceLanguageData(
         '''),
         forms: <PredicateForm, WordPool>{
           PredicateForm.question: words(r'''
-            laugh cry yawn sigh smile hum mutter shout giggle chuckle grin sob weep groan grumble
-            whistle whimper snort cheer gasp shrug nod frown beam sniffle sneeze hiccup clap wink
-            blush
+            laugh smile hum giggle chuckle grin whistle cheer beam clap nod wink chortle brighten
           '''),
         },
       ),
@@ -1852,6 +1848,31 @@ final SentenceLanguageData en = SentenceLanguageData(
     },
   ),
   speech: const SentenceSpeech(subject: 'I', head: 'am'),
+  replies: <SentenceStyle, Map<ReplyCue, WordPool>>{
+    SentenceStyle.casual: <ReplyCue, WordPool>{
+      ReplyCue.agree: words(r"""
+        right true I_know so_it_is same_here indeed that's_right you're_right it_is quite_so
+        no_doubt I_thought_so
+      """),
+      ReplyCue.cheer: words(r'''
+        well_done! good_for_you! great! lucky_you nice_one wonderful! congratulations well_earned
+        brilliant! splendid! at_last!
+      '''),
+      ReplyCue.care: words(r"""
+        are_you_all_right? take_a_rest don't_overdo_it let's_get_you_something_to_eat poor_you
+        take_your_time don't_worry be_careful cheer_up sit_down_a_moment have_some_water let_me_help
+      """),
+      ReplyCue.wonder: words(r'''
+        really? seriously? where? when? and_then? no_way! how? why? is_that_so? did_you_now?
+        what_happened_next? what?
+      '''),
+      ReplyCue.answer: words(r"""
+        yes,_a_little no,_I'm_fine yes,_quite so-so not_yet yes,_terribly a_bit not_really yes,_very
+        not_at_all more_or_less yes,_actually
+      """),
+    },
+  },
+  listener: const SentenceSpeech(subject: 'you', head: 'are'),
   placeHeads: <String, WordPool>{
     'on': words(r'''
       bridge rooftop balcony veranda boardwalk promenade playground terrace staircase pier wharf

@@ -77,7 +77,8 @@ function pronounsOf(language: WordLanguage): Set<string> {
 	const written = [
 		...Object.values(data.pronouns),
 		...Object.values(data.objectPronouns?.words ?? {}),
-		[data.speech?.subject ?? '']
+		[data.speech?.subject ?? ''],
+		[data.listener?.subject ?? '']
 	].flatMap((pool) => [...(pool ?? [])]);
 
 	return new Set([...written, ...written.map(upperFirst)].filter(Boolean));
@@ -1146,7 +1147,8 @@ describe('Sentence', () => {
 			includeName: true,
 			count: 120
 		})) {
-			// A `visit` is the one story with a second person in it: the one met.
+			// A `visit` and a `chat` are the stories with a second person in them: the
+			// one met. Anybody else who turns up is written as what they are.
 			assert.strictEqual(
 				new Set(detail.names).size,
 				Math.min(detail.story === 'visit' || detail.story === 'chat' ? 2 : 1, detail.names.length),
@@ -1660,12 +1662,24 @@ describe('Sentence', () => {
 		}
 	});
 
-	it('a person in a story sometimes speaks for themselves, and nobody else does', () => {
-		// A state sentence about a person may be a line they say or think — quoted,
-		// in the first person, never the first sentence, never more than two — where
-		// the language can write one. An animal is narrated, and so is everybody in
-		// a language that cannot.
+	it('a person in a story sometimes speaks, and nobody else does', () => {
+		// A sentence about a person may be a line — quoted, never the first sentence,
+		// never two in a row from one mouth, and never more than a story allows.
+		// What is said is one of four things: what is true of them or what they
+		// just did, in the first person where the language writes one; a remark
+		// about the thing, the place or what somebody else is doing, in the third;
+		// a question to the person beside them; or somebody's answer, which is one
+		// of the language's replies written whole. An animal is narrated.
 		const quoted = (type: SentenceType) => type === 'dialogue' || type === 'thought';
+		const stripped = (language: WordLanguage, line: string) => {
+			const data = SENTENCE_DATA[language];
+			const inner = line.slice(1, -1);
+			const marks = Object.values(data.terminators);
+			const closed = marks.find((mark) => inner.endsWith(mark)) ?? '';
+			const opened = Object.values(data.openers ?? {}).find((mark) => inner.startsWith(mark)) ?? '';
+
+			return inner.slice(opened.length, inner.length - closed.length);
+		};
 		const untyped = (language: WordLanguage, theme: WordTheme) =>
 			randSentence({
 				language,
@@ -1680,12 +1694,16 @@ describe('Sentence', () => {
 		for (const language of WORD_LANGUAGES) {
 			const data = SENTENCE_DATA[language];
 			let lines = 0;
+			let first = 0;
+			let answered = 0;
+			let homecame = 0;
 
 			for (const detail of untyped(language, 'job')) {
 				const spoken = detail.types.filter(quoted).length;
+				const most = STORIES.find((story) => story.name === detail.story)?.lines ?? 2;
 
 				lines += spoken;
-				assert.ok(spoken <= 2, `${language}: ${spoken} lines (${detail.sentence})`);
+				assert.ok(spoken <= most + 2, `${language}: ${spoken} lines (${detail.sentence})`);
 				assert.ok(!quoted(detail.types[0]), `${language}: opened on a line (${detail.sentence})`);
 
 				detail.types.forEach((type, i) => {
@@ -1694,7 +1712,6 @@ describe('Sentence', () => {
 					}
 
 					const line = detail.sentences[i];
-					const inner = line.slice(1, -1);
 
 					assert.ok(
 						Object.values(data.quotes).some(
@@ -1703,20 +1720,42 @@ describe('Sentence', () => {
 						`${language}: '${line}' is not quoted`
 					);
 
+					// An answer is said after a line and never on its own, and it is built
+					// from no phrase.
+					if (isReply(i)) {
+						assert.ok(
+							i > 0 && quoted(detail.types[i - 1]) && !isReply(i - 1),
+							`${language}: '${line}' answers nothing`
+						);
+						assert.strictEqual(type, 'dialogue', `${language}: '${line}' is an answer thought`);
+						answered += 1;
+
+						return;
+					}
+
 					// One mouth speaks once, and then somebody else answers or the story
 					// goes on: two lines in a row are a line and its answer, or an answer
 					// and the hero going on.
 					assert.ok(
-						!data.speech!.subject || inner.startsWith(data.speech!.subject),
-						`${language}: '${line}' does not speak in the first person`
+						i === 0 || !quoted(detail.types[i - 1]) || isReply(i - 1),
+						`${language}: two lines in a row (${detail.sentence})`
 					);
+
+					if (data.speech?.subject && stripped(language, line).startsWith(data.speech.subject)) {
+						first += 1;
+					}
 				});
 			}
 
-			if (data.speech) {
-				assert.ok(lines > 0, `${language}: nobody ever spoke`);
-			} else {
-				assert.strictEqual(lines, 0, `${language}: somebody spoke`);
+			assert.ok(lines > 0, `${language}: nobody ever spoke`);
+
+			if (data.speech?.subject) {
+				assert.ok(first > 0, `${language}: nobody spoke in the first person`);
+			}
+
+			if (data.replies) {
+				assert.ok(answered > 0, `${language}: nobody ever answered`);
+			}
 			}
 
 			for (const detail of untyped(language, 'animal')) {
@@ -2875,15 +2914,20 @@ describe('Sentence', () => {
 
 		assert.deepStrictEqual([...seen].sort(), ['past', 'present']);
 
-		// And a paragraph is told in one tense from start to end.
+		// And a paragraph is told in one tense from start to end. A line somebody
+		// says is the exception: what they just did is reported in the past
+		// whatever the story is told in.
 		for (const detail of randSentence({
 			language: 'ko',
 			sentences: 4,
 			count: 80,
 			output: 'detail'
 		})) {
-			const closes = detail.sentences.map((sentence) =>
-				/(었|았|였|렸|웠|쳤|켰|졌|랐|썼|셨|팠|꿨|펐|뻤|왔|갔|났|샀|봤|줬|섰|탔|켯)/.test(sentence)
+			const closes = detail.sentences.map(
+				(sentence, i) =>
+					detail.types[i] !== 'dialogue' &&
+					detail.types[i] !== 'thought' &&
+					/(었|았|였|렸|웠|쳤|켰|졌|랐|썼|셨|팠|꿨|펐|뻤|왔|갔|났|샀|봤|줬|섰|탔|켯)/.test(sentence)
 			);
 
 			if (detail.tense === 'present') {

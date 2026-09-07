@@ -520,6 +520,7 @@ class _Draw {
     this.dated = false,
     this.object,
     this.speech,
+    this.spoken = false,
   });
 
   final LengthRange budget;
@@ -578,6 +579,12 @@ class _Draw {
   /// sentence the result narrates.
   final SentenceSpeech? speech;
 
+  /// Whether this sentence is a line somebody says or thinks inside a story —
+  /// in the first person, or about the thing in front of them — which is what
+  /// is said and nothing around it: no time, no place, no manner, and nothing
+  /// in front of it. A quoted line drawn on its own terms is not one of these.
+  final bool spoken;
+
   /// The same draw with another opener, or another way of referring to the
   /// topic. Dart has no spread for a class, so the copy is written out.
   _Draw copyWith({String? opener, _Follow? follow, bool keepFollow = true}) => _Draw(
@@ -596,6 +603,7 @@ class _Draw {
     dated: dated,
     object: object,
     speech: speech,
+    spoken: spoken,
   );
 }
 
@@ -621,6 +629,16 @@ class _BeatDraw {
 
   /// Whether the shape is headed by a state rather than a verb.
   final bool headedByState;
+
+  /// What is true of the hero before this sentence, for a verb group that
+  /// shows a condition to be drawn by. Null for a sentence that is not the
+  /// hero's.
+  final Set<Condition>? state;
+
+  /// Whether this sentence's subject is somebody the story never introduces —
+  /// a passer-by, a bird on a fence — who is written as what they are and never
+  /// by a name, whatever `includeName` asked.
+  final bool nameless;
 
   /// The fields the verb may be drawn from. Empty for a state sentence.
   final List<VerbField> fields;
@@ -742,6 +760,9 @@ class _Flow {
   /// The opening sentence names the subject itself, which is why this starts
   /// true.
   bool repeated = true;
+
+  /// The level the last quoted line was said at, for an answer to be said at too.
+  SentenceStyle? line;
 }
 
 /* --- Shapes ---------------------------------------------------------------- */
@@ -1511,7 +1532,7 @@ List<VerbGroup> _verbGroupsFor(
   // verb of the field it settled on.
   final fields = beat != null && beat.fields.isNotEmpty ? beat.fields : frame.fields;
 
-  return data.verbs
+  final usable = data.verbs
       .where((group) {
         if ((group.object != null) != wantsObject) return false;
         if (fields != null && !fields.contains(group.field)) return false;
@@ -2265,10 +2286,10 @@ _Built _compose(
   // subject does. `at` is the index back into the frame, which the plan is keyed
   // by.
   final String? pronoun =
-      draw.speech != null
-          ? draw.speech!.subject
-          : draw.link == JoinSide.second
+      draw.link == JoinSide.second
           ? ''
+          : draw.speech != null
+          ? draw.speech!.subject
           : follow?.reference == _Reference.pronoun
           ? follow!.pronoun
           : null;
@@ -2287,14 +2308,9 @@ _Built _compose(
 
     if (part.slot == SentenceSlot.object && referredOut) continue;
 
-    // A line is what the hero says and nothing around it: no time, no place, no
-    // manner. `“배고프다.”`, not `“한낮에 배고프다.”`
-    if (draw.speech != null &&
-        (part.slot == SentenceSlot.time ||
-            part.slot == SentenceSlot.place ||
-            part.slot == SentenceSlot.manner)) {
-      continue;
-    }
+    // A line is said in its own time, so it names none: `“배고프다.”`, not
+    // `“한낮에 배고프다.”` — where `“부엌에서 열쇠를 찾았어!”` is what somebody says.
+    if (draw.spoken && part.slot == SentenceSlot.time) continue;
 
     if (part.slot != SentenceSlot.subject || pronoun == null || pronoun.isNotEmpty) {
       shape.add(part);
@@ -2316,7 +2332,10 @@ _Built _compose(
   final closes = draw.link != JoinSide.first;
   final close = closes ? data.terminators[draw.mark]! : '';
   final open = data.openers[draw.mark] ?? '';
-  final quoteOpen = closes ? (draw.quote?[0] ?? '') : '';
+  // The quotation marks belong to the whole sentence too, but one goes on each
+  // end of it: a two-clause line opens its quote on the first clause and closes
+  // it on the second — `“시장에 가서 빵을 샀어.”`
+  final quoteOpen = draw.link == JoinSide.second ? '' : (draw.quote?[0] ?? '');
   final quoteClose = closes ? (draw.quote?[1] ?? '') : '';
   final tag = closes && frame.tag != null ? data.space + frame.tag! : '';
   final past = draw.tense == SentenceTense.past;
@@ -2373,6 +2392,7 @@ _Built _compose(
             themeClass[subjectTheme] == NounClass.person ||
             follow?.topic.nounClass == NounClass.person;
 
+        // Never for somebody the story never introduced.
         return (settings.includeName ?? false) &&
                 !(draw.beat?.nameless ?? false) &&
                 theme != null &&
@@ -2517,13 +2537,36 @@ _Built _compose(
     // A state group may bring its own copula, which wins over the shape's; a head
     // that carries the tense changes for the past, and agrees with the subject
     // where the language's past does (Russian `был` beside `была`).
-    final own = part.slot == SentenceSlot.state ? stateGroup : null;
-    // The first person takes its own copula where the language has one: `I am`.
-    final presentHead =
-        draw.speech?.head != null && part.slot == SentenceSlot.state
-            ? draw.speech!.head
-            : own?.head ?? part.head;
-    final pastHead = own?.pastHead ?? part.pastHead;
+    // A degree stands between the copula and the state it measures — `is very
+    // tired`, `está muy cansado` — so whatever the state part would have written
+    // in front of itself is written in front of the degree instead.
+    final stateAt = parts.indexWhere((entry) => entry.slot == SentenceSlot.state);
+    final measured = part.slot == SentenceSlot.degree && stateAt == i + 1;
+    final SentencePart? headOf =
+        part.slot == SentenceSlot.state && i > 0 && parts[i - 1].slot == SentenceSlot.degree
+            ? null
+            : measured
+            ? parts[stateAt]
+            : part;
+    final own = headOf?.slot == SentenceSlot.state ? stateGroup : null;
+    final ownHead = own?.head ?? headOf?.head;
+    // The first and the second person take their own copula where the language
+    // has one: `I am`, `are you`, `bist du`, `estás` — wherever the shape writes
+    // the state's copula, which is in front of the state in a statement and in
+    // front of the subject in a question.
+    final speech = draw.speech;
+    final copular =
+        headed &&
+        ownHead != null &&
+        (headOf?.slot == SentenceSlot.state || headOf?.slot == SentenceSlot.subject);
+    final String? presentHead;
+
+    if (speech != null && copular) {
+      presentHead = speech.heads?[ownHead] ?? speech.head ?? ownHead;
+    } else {
+      presentHead = ownHead;
+    }
+    final pastHead = own?.pastHead ?? headOf?.pastHead;
     final tensedHead = past && pastHead != null ? pastHead : presentHead;
     final agreement = data.pastAgreement;
     var partHead =
@@ -2788,7 +2831,9 @@ class _Predicate {
   final int dayAt;
 }
 
-/// The manners something of this class can do a thing in. Any of them, failing
+/// The manners something of this class can do this kind of thing in: the
+/// groups for the class, narrowed to the ones that go with the verb's field
+/// where they name any. The class alone failing that, and any of them failing
 /// that.
 WordPool _mannersFor(SentenceLanguageData data, NounClass subject) {
   final fitting = data.manners.where((group) => group.subject.contains(subject)).toList();
@@ -2979,7 +3024,43 @@ _Built _generateOne(WordLanguage language, _Settings settings, _Draw draw) {
               .where((frame) => !frame.parts.any((part) => part.slot == SentenceSlot.time))
               .toList(growable: false)
           : allowed;
-  final frames = timeless.isNotEmpty ? timeless : allowed;
+  // A sentence that drops its subject and carries nothing else is one word —
+  // `놀아요.`, `울어.` — and a paragraph with three of those in it reads as a
+  // list. So one that will write no subject takes a shape with something beside
+  // the predicate. A quoted line is the exception, and so is the second clause
+  // of one sentence. An object the sentence before named, which this one leaves
+  // out, counts as a phrase gone too.
+  final dropped =
+      draw.link != JoinSide.second &&
+      follow?.reference == _Reference.pronoun &&
+      follow!.pronoun.isEmpty;
+  final reference = draw.object;
+  final elided =
+      reference != null &&
+              pinned[SentenceSlot.object]?.word == reference.noun &&
+              (reference.text.isEmpty || reference.clitic)
+          ? 1
+          : 0;
+  // A quoted line is the one exception, by half: `“배고파요.”` is what people
+  // say, where `“찾았어.”` is not — a report of what was done says what was done
+  // to what, or where. So a line about a state may be the state alone, and a
+  // line that reports carries one thing beside its verb.
+  final least =
+      !draw.spoken
+          ? 3
+          : draw.beat?.headedByState == false
+          ? 2
+          : 1;
+  final roomy =
+      dropped
+          ? timeless.where((frame) => frame.parts.length - elided >= least).toList(growable: false)
+          : timeless;
+  final frames =
+      roomy.isNotEmpty
+          ? roomy
+          : timeless.isNotEmpty
+          ? timeless
+          : allowed;
   final placements = <SentenceFrame, _Placement>{
     for (final frame in frames) frame: _planFor(frame, requirements, pinned),
   };
@@ -3839,10 +3920,22 @@ _Found? _storyFor(_Telling telling) {
     final hero = pick(heroes);
     final items = itemThemesFor(data, story, hero);
     final WordTheme? item = items.isEmpty ? null : pick(items);
-    final planned = plan(data, story, hero, item, settings.sentences, joinable);
+    // A story is spoken in only where the caller left the kinds to it: a story
+    // told on its own terms is prose, and a caller who asked for every kind gets
+    // the register they asked for.
+    final planned = plan(data, story, hero, item, settings.sentences, joinable, !settings.typed);
 
     if (planned != null) {
-      return _Found(planned, hero, _themesForClasses(heroThemes, <NounClass>[hero]), item);
+      // The hero's themes: the ones asked for, in the hero's class, and — where
+      // the story narrows them — the story's own. A sketch is of a forest, not of
+      // Pluto.
+      final inClass = _themesForClasses(heroThemes, <NounClass>[hero]);
+      final own =
+          story.heroThemes == null
+              ? inClass
+              : inClass.where(story.heroThemes!.contains).toList(growable: false);
+
+      return _Found(planned, hero, own.isNotEmpty ? own : inClass, item);
     }
   }
 
@@ -3859,6 +3952,84 @@ class _Told {
   final SentenceType mark;
   final String opened;
   final _Follow? follow;
+}
+
+/// What a remark is about: a noun the story has written, or null for one still
+/// to be drawn out of [themes].
+class _Commented {
+  const _Commented(this.noun, this.themes);
+
+  final _Requirement? noun;
+  final List<WordTheme> themes;
+}
+
+/// One of a language's replies: what is said, and the mark it closes on.
+class _Reply {
+  const _Reply(this.text, this.mark);
+
+  final String text;
+  final SentenceType mark;
+}
+
+// Which pool an answer at each level is drawn from, best first. A level a
+// language does not write falls back the way a predicate form does, and plain
+// is never spoken.
+const Map<SentenceStyle, List<SentenceStyle>> _replyChain = <SentenceStyle, List<SentenceStyle>>{
+  SentenceStyle.plain: <SentenceStyle>[
+    SentenceStyle.casual,
+    SentenceStyle.polite,
+    SentenceStyle.formal,
+  ],
+  SentenceStyle.casual: <SentenceStyle>[
+    SentenceStyle.casual,
+    SentenceStyle.polite,
+    SentenceStyle.formal,
+  ],
+  SentenceStyle.polite: <SentenceStyle>[
+    SentenceStyle.polite,
+    SentenceStyle.casual,
+    SentenceStyle.formal,
+  ],
+  SentenceStyle.formal: <SentenceStyle>[
+    SentenceStyle.formal,
+    SentenceStyle.polite,
+    SentenceStyle.casual,
+  ],
+};
+
+WordPool _repliesOf(SentenceLanguageData data, SentenceStyle style, ReplyCue cue) {
+  for (final level in _replyChain[style]!) {
+    final pools = data.replies?[level];
+
+    if (pools == null) continue;
+
+    final own = pools[cue];
+
+    if (own != null && own.isNotEmpty) return own;
+
+    final rest = <String>[
+      for (final entry in pools.entries)
+        if (entry.key != ReplyCue.answer) ...entry.value,
+    ];
+
+    if (rest.isNotEmpty) return rest;
+  }
+
+  return const <String>[];
+}
+
+/// A reply entry, read: `잘됐다!` is exclaimed and `정말?` asked, and the tag is
+/// taken off so the language's own mark can be written in its place.
+_Reply _replyOf(String entry) {
+  if (entry.endsWith('!')) {
+    return _Reply(entry.substring(0, entry.length - 1), SentenceType.exclamation);
+  }
+
+  if (entry.endsWith('?')) {
+    return _Reply(entry.substring(0, entry.length - 1), SentenceType.question);
+  }
+
+  return _Reply(entry, SentenceType.statement);
 }
 
 /// Every sentence of a result that follows a story.
@@ -3963,12 +4134,50 @@ _Result? _tellStory(_Telling telling) {
 
     return own.isNotEmpty ? own : inClass;
   }
+
+  /// What a remark is about: the thing looked at, or the place — as a noun the
+  /// story has already written, or as a theme to draw one from.
+  _Commented? commentFor(Beat beat) {
+    final step = beat.step;
+
+    if (step.kind == StepKind.scene) return _Commented(placeOf(), _destinationThemes);
+
+    if (step.object != null) {
+      final noun = step.object == StoryRole.prop ? roles.prop : roles.item;
+      final theme = step.object == StoryRole.prop ? prop : found.item;
+
+      return theme == null ? null : _Commented(noun, <WordTheme>[theme]);
+    }
+
+    // Talking is about the place, which is drawn now if no sentence has named it.
+    return _Commented(placeOf(), _destinationThemes);
+  }
+
+  /// A noun the story has written, as the topic of a sentence about it.
+  _Topic topicFor(_Requirement noun, NounClass? fallback) {
+    final lexicon = wordData[language]!;
+    final theme = noun.theme;
+
+    return _Topic(
+      noun.word,
+      theme,
+      theme == null ? fallback : themeClass[theme],
+      genderOf(lexicon, _asPool(lexicon, noun.word)),
+      // A person met by name is written bare wherever they go again.
+      noun.bare,
+    );
+  }
+
   /// What a beat asks of its sentence.
-  _BeatDraw beatDraw(Beat beat) {
+  _BeatDraw beatDraw(Beat beat, [_Commented? commented]) {
     final step = beat.step;
     final wants = <SentenceSlot>[];
     final prefers = <SentenceSlot>[];
 
+    // A remark is about one thing and says what it is like: nothing beside the
+    // subject and its state, and the subject pinned where the story has it.
+    if (commented != null) {
+      final noun = commented.noun;
     if (step.destination != null) wants.add(SentenceSlot.destination);
     if (step.object != null) wants.add(SentenceSlot.object);
     if (placeable(beat)) prefers.add(SentenceSlot.place);
@@ -4003,6 +4212,47 @@ _Result? _tellStory(_Telling telling) {
       nameless: step.kind == StepKind.other && step.actor != StoryRole.item,
     );
   }
+
+    final quote = _quoteFor(data, SentenceType.dialogue, settings.quote)!;
+    final entries = pool.map(_replyOf).toList(growable: false);
+    final fresh = entries.where((entry) => !telling.spent.contains(entry.text)).toList();
+    final usable = fresh.isNotEmpty ? fresh : entries;
+
+    int lengthOf(_Reply entry) =>
+        quote[0].length +
+        (data.openers[entry.mark]?.length ?? 0) +
+        entry.text.length +
+        data.terminators[entry.mark]!.length +
+        quote[1].length;
+
+    final fitting = usable.where((entry) => lengthOf(entry) <= budget.max).toList();
+    final chosen = pick(fitting.isNotEmpty ? fitting : usable);
+    final text = data.capitalize ? _upper(chosen.text) : chosen.text;
+
+    telling.spent.add(chosen.text);
+
+    return (
+      _Built(
+        quote[0] +
+            (data.openers[chosen.mark] ?? '') +
+            text +
+            data.terminators[chosen.mark]! +
+            quote[1],
+        const <String>[],
+        const <SentenceSlot>[],
+        const <String>[],
+        const <String>[],
+        SentenceType.dialogue,
+        null,
+        null,
+        null,
+        false,
+        const <SentenceSlot, _Requirement>{},
+        null,
+        -1,
+        null,
+      ),
+      chosen.mark,
     );
   }
 
@@ -4027,8 +4277,25 @@ _Result? _tellStory(_Telling telling) {
   _Told tell(Beat beat, LengthRange budget, _Built? previous, [String openedBefore = '']) {
     final scene = beat.step.kind == StepKind.scene;
     final aside = beat.step.kind == StepKind.other;
+
+      if (reply != null) {
+        heroLast = false;
+
+        return _Told(reply.$1, SentenceType.dialogue, reply.$2, '', null);
+      }
+    }
+
+      if (said != null) {
+        heroLast = true;
+
+        return _Told(said.$1, SentenceType.dialogue, said.$2, '', null);
+      }
+    }
+
     // A second clause whose sentence has said when already — opened on `later`,
-    // or named a time in its first clause — says it no second time.
+    // or named a time in its first clause — says it no second time. A whole
+    // sentence says none straight after one that did, or once the result has
+    // said when as often as a paragraph should.
     final dated =
         _timeSpent(built, beats.length) ||
         (beat.join == JoinSide.second &&
@@ -4038,10 +4305,35 @@ _Result? _tellStory(_Telling telling) {
                 ) ||
                 previous.slots.contains(SentenceSlot.time)));
     // A line the hero says or thinks, in their own voice: the first person where
-    // the language writes one, the present tense whatever the story's, a level a
-    // person speaks at, and nothing in front of it — nobody opens a line on
-    // "meanwhile". A caller who named the kinds gets those instead.
-    final voiced = beat.voiced && !settings.typed && topic != null && data.speech != null;
+    // the language writes one, a level a person speaks at, and nothing in front
+    // of it — nobody opens a line on "meanwhile". What is true of them is said
+    // now, and what they just did is reported in the past.
+    // A line needs a topic to speak, which the first sentence about the hero
+    // gives it; and the second clause of a sentence speaks exactly where its
+    // first clause did, because the quotation marks are the whole sentence's.
+    final speakable =
+        beat.join == JoinSide.second
+            ? previous != null && _quotedTypes.contains(previous.type)
+            : topic != null;
+    final line = beat.voice == Voice.line && speakable && data.speech != null;
+    // A remark about the thing in front of them or the place around them, in
+    // the third person: `“사과가 참 달다!”`, `“숲이 조용하네.”`
+    final commented = beat.voice == Voice.comment && speakable ? commentFor(beat) : null;
+    // What somebody else is doing, said by the hero as they see it: the `other`
+    // step told in the hero's voice, and in the present, because it is what is
+    // in front of them — `“새가 날아가네!”`
+    final noticed = beat.voice == Voice.notice && speakable && aside;
+    // A question to the person beside them, in the second person: `“배고파?”`,
+    // `“Are you tired?”`. Only once the story has put that person on the page.
+    final listener = data.listener;
+    final company = roles.item;
+    final asked =
+        beat.voice == Voice.ask &&
+        beat.asked != null &&
+        speakable &&
+        listener != null &&
+        company != null;
+    final spoken = line || commented != null || noticed || asked;
     SentenceType type;
     SentenceType mark;
 
@@ -4057,9 +4349,23 @@ _Result? _tellStory(_Telling telling) {
 
       type = kind[0];
       mark = kind[1];
-    } else if (voiced) {
-      type = pickWeighted<SentenceType>(_lineKinds, (kind) => _lineWeight[kind] ?? 1);
-      mark = chance(_lineExclaim) ? SentenceType.exclamation : SentenceType.statement;
+    } else if (asked) {
+      type = SentenceType.dialogue;
+      mark = SentenceType.question;
+    } else if (spoken) {
+      // What was just done is reported to somebody, and an answered line was
+      // heard; what is true of oneself may be thought — and what the hero makes
+      // of the person beside them is thought, not said to their face.
+      type =
+          beat.answered || (line && beat.step.kind == StepKind.act)
+              ? SentenceType.dialogue
+              : noticed && beat.step.actor == StoryRole.item
+              ? SentenceType.thought
+              : pickWeighted<SentenceType>(_lineKinds, (kind) => _lineWeight[kind] ?? 1);
+      mark =
+          chance(noticed ? _noticeExclaim : _lineExclaim)
+              ? SentenceType.exclamation
+              : SentenceType.statement;
     } else {
       final kinds = <SentenceType>[SentenceType.statement, if (beat.join == null) ...beat.kinds];
 
@@ -4067,7 +4373,7 @@ _Result? _tellStory(_Telling telling) {
       mark = type;
     }
 
-    final pinned = pinnedFor(beat);
+    final pinned = commented != null ? <SentenceSlot, _Requirement>{} : pinnedFor(beat);
     // The sentence this one follows: the first clause for a second one, and the
     // sentence before for a whole one. What it named is what this one may refer
     // to rather than name again.
@@ -4114,6 +4420,32 @@ _Result? _tellStory(_Telling telling) {
       // or a fresh noun of whatever the step names — and the hero stays the
       // topic either way.
       final actor = beat.step.actor == StoryRole.item ? roles.item : null;
+
+      follow =
+          actor != null
+              ? _Follow(topicFor(actor, NounClass.person), _Reference.repeat, '', pinned)
+              : topic == null
+              ? null
+              : _Follow(topic!, _Reference.fresh, '', pinned);
+    } else if (asked) {
+      // The hero asks the person beside them: the subject is that person,
+      // written the way the language writes a second person.
+      follow = _Follow(
+        topicFor(company, NounClass.person),
+        _Reference.pronoun,
+        listener.subject,
+        pinned,
+      );
+    } else if (commented != null) {
+      // A remark is about the thing, which is named in full where the story has
+      // it, and drawn from its theme where it has not.
+      final noun = commented.noun;
+
+      follow =
+          noun != null
+              ? _Follow(topicFor(noun, null), _Reference.repeat, '', pinned)
+              : _Follow(topic!, _Reference.fresh, '', pinned);
+    } else if (line) {
       // The hero speaks: the subject is theirs, written the way the language
       // writes a first person.
       follow = _Follow(topic!, _Reference.pronoun, data.speech!.subject, pinned);
@@ -4124,13 +4456,23 @@ _Result? _tellStory(_Telling telling) {
       follow = topic == null ? null : _followFor(data, topic!, pinned, telling.flow.repeated, true);
     }
 
+    // The people of one story speak at one level: a line and its answer, and
+    // the next line, are said the way the first was.
+    final SentenceStyle style;
+
+    if (type == SentenceType.dialogue && settings.style == null) {
+      style = telling.flow.line ??= pick<SentenceStyle>(_spokenLevels);
+    } else {
+      style = _styleFor(type, settings.style, telling.voice);
+    }
+
     final draw = _Draw(
       budget: budget,
       type: type,
       mark: mark,
       quote: _quoteFor(data, type, settings.quote),
       opener:
-          beat.join == JoinSide.second || voiced
+          beat.join == JoinSide.second || spoken
               ? ''
               : _openerFor(
                 data,
@@ -4141,7 +4483,7 @@ _Result? _tellStory(_Telling telling) {
                 telling.flow,
                 beat.links,
               ),
-      style: _styleFor(type, settings.style, telling.voice),
+      style: style,
       avoid: telling.spent,
       follow: follow,
       tense: voiced ? SentenceTense.present : telling.tense,
@@ -4150,7 +4492,13 @@ _Result? _tellStory(_Telling telling) {
       dayAt: dayAt,
       dated: dated,
       object: object,
-      speech: voiced ? data.speech : null,
+      speech:
+          line
+              ? data.speech
+              : asked
+              ? listener
+              : null,
+      spoken: spoken,
     );
     var (one, opened) = _drawOne(telling, draw);
 
@@ -4160,7 +4508,8 @@ _Result? _tellStory(_Telling telling) {
     // out long.
     if (follow != null &&
         !scene &&
-        !voiced &&
+        !aside &&
+        !spoken &&
         beat.join == null &&
         _distanceFrom(one.sentence.length, budget) > 1) {
       final pronouns = _pronounsFor(data, follow.topic);
@@ -4235,6 +4584,44 @@ _Result? _tellStory(_Telling telling) {
       }
     }
 
+    // A remark that drew the thing it is about has named it: that is the story's
+    // thing from here on. And a person met by name — which no scene records,
+    // because a name is no noun phrase — is the story's person.
+    final subject = one.subject;
+
+    if (commented != null &&
+        commented.noun == null &&
+        subject != null &&
+        beat.step.object != null) {
+      final role = _Requirement(
+        subject,
+        const <SentenceSlot?>[SentenceSlot.object],
+        theme: one.theme,
+        known: one.theme != null,
+        settled: true,
+      );
+
+      if (beat.step.object == StoryRole.prop) {
+        roles.prop ??= role;
+      } else {
+        roles.item ??= role;
+      }
+    } else if (beat.step.object == StoryRole.item &&
+        roles.item == null &&
+        !one.scene.containsKey(SentenceSlot.object)) {
+      final met = one.names.where((name) => name != one.subject).firstOrNull;
+
+      if (met != null) {
+        roles.item = _Requirement(
+          met,
+          const <SentenceSlot?>[SentenceSlot.object],
+          known: false,
+          bare: true,
+          settled: true,
+        );
+      }
+    }
+
     telling.spent.addAll(one.used);
     placed =
         scene ||
@@ -4244,7 +4631,9 @@ _Result? _tellStory(_Telling telling) {
             one.scene.containsKey(SentenceSlot.destination));
 
     if (one.dayAt > dayAt) dayAt = one.dayAt;
-    if (topic == null && !scene) topic = _topicOf(one);
+    if (topic == null && !scene && !aside && commented == null) topic = _topicOf(one);
+
+    heroLast = !scene && !aside && commented == null;
 
     return _Told(one, type, mark, opened, follow);
   }
@@ -4344,7 +4733,11 @@ _Result? _tellStory(_Telling telling) {
     flow.opened = told.opened.isNotEmpty;
     flow.lead ??= told.type;
 
-    if (beat.step.kind != StepKind.scene) {
+    // Whether the topic was just named is about the hero's own sentences: a
+    // scene, somebody else's doing, a remark and an answer say nothing of it.
+    if (beat.step.kind != StepKind.scene &&
+        beat.step.kind != StepKind.other &&
+        beat.voice == null) {
       flow.repeated = told.follow == null || told.follow!.reference == _Reference.repeat;
     }
 

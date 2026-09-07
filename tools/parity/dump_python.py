@@ -34,7 +34,7 @@ from randino.sentence.data import (
     THEME_CLASS,
     StoryStep,
 )
-from randino.sentence.data._types import ModifierGroup, PredicateTense
+from randino.sentence.data._types import ModifierGroup, PredicateTense, SentenceSpeech
 from randino.word.data import LOOSE_THEMES, WORD_DATA, WORD_LANGUAGES, WORD_THEMES
 from randino.word.data._types import SyllableSynthesis, WordAgreement
 
@@ -52,6 +52,18 @@ def pool(source: Sequence[Any] | None) -> list[dict[str, str | None]] | None:
 def listed(source: Sequence[str] | None) -> list[str] | None:
     """Flatten a word pool."""
     return None if source is None else list(source)
+
+
+def speech(person: SentenceSpeech | None) -> dict[str, object] | None:
+    """A first or second person in the canonical shape, with an empty map for no heads."""
+    if person is None:
+        return None
+
+    return {
+        "subject": person.subject,
+        "head": person.head or "",
+        "heads": dict(person.heads or {}),
+    }
 
 
 def tense(source: PredicateTense | None) -> dict[str, object] | None:
@@ -262,6 +274,15 @@ sentence = {
             "habitual": listed(data.times.habitual),
         },
         "homes": listed(data.homes),
+        "replies": (
+            None
+            if data.replies is None
+            else {
+                level: {cue: listed(pool) for cue, pool in pools.items()}
+                for level, pools in data.replies.items()
+            }
+        ),
+        "degrees": listed(data.degrees),
         "connectives": {kind: listed(pool) for kind, pool in data.connectives.items()},
         "traits": (
             None

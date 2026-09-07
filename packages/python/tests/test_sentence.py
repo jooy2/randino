@@ -5,6 +5,7 @@ have, over a sample large enough that a broken option cannot pass by luck.
 """
 
 import re
+from collections.abc import Callable
 
 from randino import (
     RAND_COUNT_MAX,
@@ -957,6 +958,7 @@ def pronouns_of(language: WordLanguage) -> set[str]:
         *data.pronouns.values(),
         *(data.object_pronouns.words.values() if data.object_pronouns is not None else ()),
         (data.speech.subject,) if data.speech is not None else (),
+        (data.listener.subject,) if data.listener is not None else (),
     ]
     written = [word for pool in pools for word in pool if word]
 
@@ -1041,8 +1043,11 @@ def test_a_paragraph_keeps_its_scene_its_person_and_its_register() -> None:
     for detail in rand_sentence(
         language="ko", sentences=4, include_name=True, count=120, output="detail"
     ):
-        # A `visit` is the one story with a second person in it: the one met.
-        assert len(set(detail.names)) <= (2 if detail.story == "visit" else 1), detail.sentence
+        # A `visit` and a `chat` are the stories with a second person in them: the one
+        # met. Anybody else who turns up is written as what they are.
+        assert len(set(detail.names)) <= (2 if detail.story in ("visit", "chat") else 1), (
+            detail.sentence
+        )
 
     # And it names them and then leaves them alone. A name is the most conspicuous word a
     # sentence can carry and the one a reader is least likely to lose track of, so
@@ -1532,12 +1537,23 @@ def test_a_lifeless_word_of_a_creature_theme_never_does_anything() -> None:
                 )
 
 
-def test_a_person_in_a_story_sometimes_speaks_for_themselves_and_nobody_else_does() -> None:
-    # A state sentence about a person may be a line they say or think — quoted, in the
-    # first person, never the first sentence, never more than two — where the language
-    # can write one. An animal is narrated, and so is everybody in a language that cannot.
+def test_a_person_in_a_story_sometimes_speaks_and_nobody_else_does() -> None:
+    # A sentence about a person may be a line — quoted, never the first sentence, never
+    # two in a row from one mouth, and never more than a story allows. What is said is
+    # one of three things: what is true of them or what they just did, in the first
+    # person where the language writes one; a remark about the thing or the place, in
+    # the third; or somebody's answer, which is one of the language's replies written
+    # whole. An animal is narrated.
     def quoted(type_: SentenceType) -> bool:
         return type_ in ("dialogue", "thought")
+
+    def stripped(language: WordLanguage, line: str) -> str:
+        data = SENTENCE_DATA[language]
+        inner = line[1:-1]
+        closed = next((mark for mark in data.terminators.values() if inner.endswith(mark)), "")
+        opened = next((mark for mark in data.openers.values() if inner.startswith(mark)), "")
+
+        return inner[len(opened) : len(inner) - len(closed)]
 
     def untyped(language: WordLanguage, theme: WordTheme) -> list[SentenceDetail]:
         return rand_sentence(
@@ -1552,7 +1568,13 @@ def test_a_person_in_a_story_sometimes_speaks_for_themselves_and_nobody_else_doe
 
     for language in WORD_LANGUAGES:
         data = SENTENCE_DATA[language]
+
+        def whole(entry: str, data: SentenceLanguageData = data) -> str:
+            return upper_first(entry.rstrip("!?")) if data.capitalize else entry.rstrip("!?")
         lines = 0
+        first = 0
+        answered = 0
+        homecame = 0
 
         for detail in untyped(language, "job"):
             spoken = sum(1 for type_ in detail.types if quoted(type_))
@@ -1560,29 +1582,66 @@ def test_a_person_in_a_story_sometimes_speaks_for_themselves_and_nobody_else_doe
             most = story.lines or 2
 
             lines += spoken
-            assert spoken <= 2, f"{language}: {spoken} lines ({detail.sentence})"
+            assert spoken <= most + 2, f"{language}: {spoken} lines ({detail.sentence})"
             assert not quoted(detail.types[0]), f"{language}: opened on a line ({detail.sentence})"
 
+            belongs = sentence_of(detail)
+
+            # An answer is one of the language's replies, written whole; a line the hero
+            # says is built from phrases. Told apart by the replies rather than by the
+            # phrases, because a reply can contain a phrase by accident — `I thought so`
+            # holds the `I` a line after it opens on.
+            def is_reply(
+                i: int,
+                detail: SentenceDetail = detail,
+                language: WordLanguage = language,
+                replies: set[str] = replies,
+            ) -> bool:
+                return (
+                    quoted(detail.types[i]) and stripped(language, detail.sentences[i]) in replies
+                )
             for i, type_ in enumerate(detail.types):
                 if not quoted(type_):
                     continue
 
                 line = detail.sentences[i]
-                inner = line[1:-1]
 
                 assert any(
                     line.startswith(pair[0]) and line.endswith(pair[1])
                     for pair in data.quotes.values()
                 ), f"{language}: '{line}' is not quoted"
-                assert data.speech is not None
-                assert not data.speech.subject or inner.startswith(data.speech.subject), (
-                    f"{language}: '{line}' does not speak in the first person"
+
+                # An answer is said after a line and never on its own, and it is built
+                # from no phrase.
+                if is_reply(i):
+                    assert i > 0 and quoted(detail.types[i - 1]) and not is_reply(i - 1), (
+                        f"{language}: '{line}' answers nothing"
+                    )
+                    assert type_ == "dialogue", f"{language}: '{line}' is an answer thought"
+                    answered += 1
+                    continue
+
+                # One mouth speaks once, and then somebody else answers or the story goes
+                # on: two lines in a row are a line and its answer, or an answer and the
+                # hero going on.
+                assert i == 0 or not quoted(detail.types[i - 1]) or is_reply(i - 1), (
+                    f"{language}: two lines in a row ({detail.sentence})"
                 )
 
-        if data.speech is not None:
-            assert lines > 0, f"{language}: nobody ever spoke"
-        else:
-            assert lines == 0, f"{language}: somebody spoke"
+                if (
+                    data.speech is not None
+                    and data.speech.subject
+                    and stripped(language, line).startswith(data.speech.subject)
+                ):
+                    first += 1
+
+        assert lines > 0, f"{language}: nobody ever spoke"
+
+        if data.speech is not None and data.speech.subject:
+            assert first > 0, f"{language}: nobody spoke in the first person"
+
+        if data.replies is not None:
+            assert answered > 0, f"{language}: nobody ever answered"
 
         for detail in untyped(language, "animal"):
             assert not any(quoted(type_) for type_ in detail.types), (
@@ -2794,6 +2853,12 @@ def test_more_than_one_sentence_tells_a_story_and_one_sentence_tells_none() -> N
             )
 
 
+def test_vocabulary_decides_how_common_the_nouns_are() -> None:
+    # Every noun phrase of a sentence — the subject, the object, the place — is built
+    # around a noun as common as the caller asked. Read back the way the other
+    # assertions read a phrase: every noun the phrase could have been built around, and
+    # one of them has to be at the level asked for.
+    nounish = ("subject", "object", "place", "destination")
 def test_a_story_moves_its_day_forward_and_never_back() -> None:
     for language in WORD_LANGUAGES:
         day = SENTENCE_DATA[language].times.day

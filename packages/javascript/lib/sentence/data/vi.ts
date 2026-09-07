@@ -734,6 +734,30 @@ export const VI: SentenceLanguageData = {
 	objectPronouns: { words: { n: [''] } },
 	// A line of the hero's own opens on tôi.
 	speech: { subject: 'Tôi' },
+	// What somebody answers with, written lowercase like every pool here; the
+	// sentence capitalizes it.
+	replies: {
+		casual: {
+			agree: words(`
+				ừ đúng_rồi phải_đấy tôi_cũng_vậy đúng_là_vậy chuẩn_luôn ừ_nhỉ thật_đấy công_nhận đúng_thế
+			`),
+			cheer: words(`
+				tuyệt_quá! giỏi_quá! hay_lắm! ghen_tị_quá làm_tốt_lắm tốt_quá! chúc_mừng_nhé vất_vả_rồi tuyệt_vời!
+			`),
+			care: words(`
+				ổn_không? nghỉ_một_chút_đi đừng_cố_quá ăn_gì_đó_đi mệt_nhỉ cứ_từ_từ đừng_lo cẩn_thận_nhé cố_lên ngồi_xuống_đi uống_chút_nước_đi để_tôi_giúp
+			`),
+			wonder: words(`
+				thật_à? thật_không? ở_đâu? khi_nào? rồi_sao? không_thể_nào! làm_thế_nào? tại_sao? vậy_sao? thế_à? rồi_thì? gì_cơ?
+			`),
+			answer: words(`
+				ừ,_hơi_hơi không,_ổn_mà ừ,_nhiều_lắm cũng_tạm không,_chưa ừ,_quá_luôn một_chút_thôi không_hẳn ừ,_rất không,_không_hề cũng_thế ừ,_thật_ra
+			`)
+		}
+	},
+	// And the person beside them is `bạn`, with the question's own `có … không`
+	// around the state: `Bạn có mệt không?`
+	listener: { subject: 'bạn' },
 	// How much a state holds, in front of it, standing where `rất` stands: `con mèo khá mệt`.
 	degrees: words(`khá hơi thật cực_kỳ vô_cùng hết_sức thật_là khá_là quá_là siêu`),
 	// nó is a thing, and rude of a person: a person is referred to by leaving the

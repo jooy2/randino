@@ -1258,6 +1258,30 @@ final SentenceLanguageData it = SentenceLanguageData(
     },
     clitic: true,
   ),
+  replies: <SentenceStyle, Map<ReplyCue, WordPool>>{
+    SentenceStyle.casual: <ReplyCue, WordPool>{
+      ReplyCue.agree: words(r"""
+        già certo è_vero anch'io proprio_così senza_dubbio infatti esatto eccome lo_credo_bene
+      """),
+      ReplyCue.cheer: words(r'''
+        che_bello! ben_fatto! stupendo! che_fortuna fantastico! complimenti che_gioia! magnifico!
+        finalmente! mi_fa_piacere
+      '''),
+      ReplyCue.care: words(r"""
+        stai_bene? riposati_un_po' non_strafare mangiamo_qualcosa che_peccato fai_con_calma
+        non_preoccuparti stai_attento coraggio siediti_un_attimo bevi_un_po'_d'acqua ti_aiuto_io
+      """),
+      ReplyCue.wonder: words(r"""
+        davvero? sul_serio? dove? quando? e_poi? non_ci_credo! come? perché? ah_sì? e_dopo?
+        cos'è_successo? cosa?
+      """),
+      ReplyCue.answer: words(r"""
+        sì,_un_po' no,_sto_bene sì,_parecchio così_così no,_non_ancora sì,_molto un_pochino
+        non_tanto sì,_moltissimo no,_per_niente insomma sì,_in_effetti
+      """),
+    },
+  },
+  listener: const SentenceSpeech(subject: '', heads: <String, String>{'è': 'sei'}),
   degrees: words(r"""
     molto abbastanza un_po' davvero proprio piuttosto assai parecchio decisamente alquanto
   """),

@@ -1203,6 +1203,35 @@ final SentenceLanguageData es = SentenceLanguageData(
     },
     clitic: true,
   ),
+  replies: <SentenceStyle, Map<ReplyCue, WordPool>>{
+    SentenceStyle.casual: <ReplyCue, WordPool>{
+      ReplyCue.agree: words(r'''
+        ya claro es_verdad yo_también así_es sin_duda desde_luego eso_mismo y_que_lo_digas
+        ya_lo_creo
+      '''),
+      ReplyCue.cheer: words(r'''
+        qué_bien! bien_hecho! estupendo! qué_suerte genial! enhorabuena qué_alegría! fantástico!
+        por_fin! me_alegro
+      '''),
+      ReplyCue.care: words(r'''
+        estás_bien? descansa_un_poco no_te_esfuerces_tanto vamos_a_comer_algo qué_pena
+        tómate_tu_tiempo no_te_preocupes ten_cuidado ánimo siéntate_un_momento bebe_un_poco_de_agua
+        te_ayudo
+      '''),
+      ReplyCue.wonder: words(r'''
+        de_verdad? en_serio? dónde? cuándo? y_luego? no_puede_ser! cómo? por_qué? ah_sí? y_después?
+        qué_pasó? qué?
+      '''),
+      ReplyCue.answer: words(r'''
+        sí,_un_poco no,_estoy_bien sí,_bastante más_o_menos no,_todavía_no sí,_mucho un_poquito
+        no_mucho sí,_muchísimo no,_para_nada regular sí,_la_verdad
+      '''),
+    },
+  },
+  listener: const SentenceSpeech(
+    subject: '',
+    heads: <String, String>{'es': 'eres', 'está': 'estás'},
+  ),
   degrees: words(r'muy bastante un_poco realmente algo demasiado sumamente verdaderamente'),
   numeral: const SentenceNumeral(
     order: NumeralOrder.before,

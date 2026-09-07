@@ -845,6 +845,31 @@ export const ES: SentenceLanguageData = {
 	// Spanish carries its subject in the verb ending, so a second sentence about
 	// the same thing writes no pronoun at all.
 	pronouns: { n: [''] },
+	// What somebody answers with. The opening ¿ and ¡ are the language's own
+	// openers, written by the sentence rather than in the entry.
+	replies: {
+		casual: {
+			agree: words(`
+				ya claro es_verdad yo_también así_es sin_duda desde_luego eso_mismo y_que_lo_digas ya_lo_creo
+			`),
+			cheer: words(`
+				qué_bien! bien_hecho! estupendo! qué_suerte genial! enhorabuena qué_alegría! fantástico! por_fin! me_alegro
+			`),
+			care: words(`
+				estás_bien? descansa_un_poco no_te_esfuerces_tanto vamos_a_comer_algo qué_pena tómate_tu_tiempo no_te_preocupes ten_cuidado ánimo siéntate_un_momento bebe_un_poco_de_agua te_ayudo
+			`),
+			wonder: words(`
+				de_verdad? en_serio? dónde? cuándo? y_luego? no_puede_ser! cómo? por_qué? ah_sí? y_después? qué_pasó? qué?
+			`),
+			answer: words(`
+				sí,_un_poco no,_estoy_bien sí,_bastante más_o_menos no,_todavía_no sí,_mucho un_poquito no_mucho sí,_muchísimo no,_para_nada regular sí,_la_verdad
+			`)
+		}
+	},
+	// A question to the person beside them drops its subject and conjugates the
+	// copula: `¿Estás cansado?`, `¿Eres valiente?`. The first person would have to
+	// conjugate every verb, so there is no `speech`.
+	listener: { subject: '', heads: { es: 'eres', está: 'estás' } },
 	// How much a state holds, in front of it: `está muy cansado`.
 	degrees: words(`muy bastante un_poco realmente algo demasiado sumamente verdaderamente`),
 	// An object named once is a clitic the next time, in front of the verb and

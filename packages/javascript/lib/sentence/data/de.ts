@@ -641,6 +641,30 @@ export const DE: SentenceLanguageData = {
 		aha, oha, ei, tja, nun, wahrlich, potztausend, um_Himmels_willen, ach_je, sieh_da, tatsächlich,
 	`),
 	pronouns: { m: words(`er`), f: words(`sie`), n: words(`es`) },
+	// What somebody answers with.
+	replies: {
+		casual: {
+			agree: words(`
+				stimmt genau eben ich_auch so_ist_es allerdings in_der_Tat richtig ganz_genau das_finde_ich_auch da_ist_was_dran
+			`),
+			cheer: words(`
+				wie_schön! gut_gemacht! großartig! du_Glückspilz prima! Glückwunsch was_für_eine_Freude! wunderbar! endlich! das_freut_mich
+			`),
+			care: words(`
+				alles_in_Ordnung? ruh_dich_aus übertreib_es_nicht lass_uns_etwas_essen das_klingt_anstrengend lass_dir_Zeit keine_Sorge pass_auf Kopf_hoch setz_dich_kurz trink_etwas_Wasser ich_helfe_dir
+			`),
+			wonder: words(`
+				wirklich? im_Ernst? wo? wann? und_dann? das_gibt's_nicht! wie? warum? ach_ja? und_danach? was_ist_passiert? was?
+			`),
+			answer: words(`
+				ja,_ein_bisschen nein,_alles_gut ja,_ziemlich geht_so nein,_noch_nicht ja,_sehr ein_wenig nicht_wirklich ja,_total nein,_gar_nicht so_lala ja,_ehrlich_gesagt
+			`)
+		}
+	},
+	// A question to the person beside them is `bist du`, with the copula in front
+	// where the question shape puts it. The first person would have to conjugate
+	// every verb, so there is no `speech`.
+	listener: { subject: 'du', head: 'bist' },
 	// How much a state holds, in front of it: `ist sehr müde`.
 	degrees: words(`sehr ziemlich wirklich ganz recht etwas äußerst ungemein reichlich furchtbar`),
 	// German names its months, writes the day first with a full stop after it, and

@@ -386,22 +386,99 @@ EN = SentenceLanguageData(
             """),
             forms={
                 "question": words("""
-                    laugh cry yawn sigh smile hum mutter shout giggle chuckle grin sob weep groan
-                    grumble whistle whimper snort cheer gasp shrug nod frown beam sniffle sneeze
-                    hiccup clap wink blush
+                    laugh smile hum giggle chuckle grin whistle cheer beam clap nod wink chortle
+                    brighten
                 """),
             },
             past=PredicateTense(
                 words=words("""
-                    laughed cried yawned sighed smiled hummed muttered shouted giggled chuckled
-                    grinned sobbed wept groaned grumbled whistled whimpered snorted cheered gasped
-                    shrugged nodded frowned beamed sniffled sneezed hiccuped clapped winked blushed
+                    laughed smiled hummed giggled chuckled grinned whistled cheered beamed clapped
+                    nodded winked chortled brightened
                 """),
                 forms={
                     "question": words("""
-                        laugh cry yawn sigh smile hum mutter shout giggle chuckle grin sob weep
-                        groan grumble whistle whimper snort cheer gasp shrug nod frown beam sniffle
-                        sneeze hiccup clap wink blush
+                        laugh smile hum giggle chuckle grin whistle cheer beam clap nod wink chortle
+                        brighten
+                    """),
+                },
+            ),
+        ),
+        VerbGroup(
+            field="express",
+            subject=("creature", "person"),
+            condition="restless",
+            words=words("""
+                cries sighs mutters sobs weeps groans grumbles whimpers snorts frowns sniffles
+                fidgets paces grimaces scowls pouts fumes sulks
+            """),
+            forms={
+                "question": words("""
+                    cry sigh mutter sob weep groan grumble whimper snort frown sniffle fidget pace
+                    grimace scowl pout fume sulk
+                """),
+            },
+            past=PredicateTense(
+                words=words("""
+                    cried sighed muttered sobbed wept groaned grumbled whimpered snorted frowned
+                    sniffled fidgeted paced grimaced scowled pouted fumed sulked
+                """),
+                forms={
+                    "question": words("""
+                        cry sigh mutter sob weep groan grumble whimper snort frown sniffle fidget
+                        pace grimace scowl pout fume sulk
+                    """),
+                },
+            ),
+        ),
+        VerbGroup(
+            field="express",
+            subject=("creature", "person"),
+            condition="tired",
+            words=words("yawns stretches blinks slumps droops sags"),
+            forms={
+                "question": words("yawn stretch blink slump droop sag"),
+            },
+            past=PredicateTense(
+                words=words("yawned stretched blinked slumped drooped sagged"),
+                forms={
+                    "question": words("yawn stretch blink slump droop sag"),
+                },
+            ),
+        ),
+        VerbGroup(
+            field="express",
+            subject=("creature", "person"),
+            condition="hungry",
+            words=words("drools salivates sniffs_the_air swallows_hard gulps"),
+            forms={
+                "question": words("drool salivate sniff_the_air swallow_hard gulp"),
+            },
+            past=PredicateTense(
+                words=words("drooled salivated sniffed_the_air swallowed_hard gulped"),
+                forms={
+                    "question": words("drool salivate sniff_the_air swallow_hard gulp"),
+                },
+            ),
+        ),
+        VerbGroup(
+            field="express",
+            subject=("creature", "person"),
+            words=words("""
+                shouts gasps shrugs blushes squints flinches exclaims looks_up looks_round
+            """),
+            forms={
+                "question": words(
+                    "shout gasp shrug blush squint flinch exclaim look_up look_round"
+                ),
+            },
+            past=PredicateTense(
+                words=words("""
+                    shouted gasped shrugged blushed squinted flinched exclaimed looked_up
+                    looked_round
+                """),
+                forms={
+                    "question": words("""
+                        shout gasp shrug blush squint flinch exclaim look_up look_round
                     """),
                 },
             ),

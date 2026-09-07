@@ -26,7 +26,8 @@ import {
 	lengthBounds,
 	resolveLength,
 	resolvePrefix,
-	resolveRealism
+	resolveRealism,
+	resolveVocabulary
 } from '../_internal/generate.js';
 import { endsWithConsonant, endsWithLiquid } from '../_internal/script.js';
 import { chance, clamp, pick, pickWeighted, randInt } from '../_internal/utils.js';
@@ -36,10 +37,10 @@ import type {
 	RandRealism,
 	RandSentenceOptions,
 	SentenceDetail,
+	SentenceQuote,
 	SentenceShapeOption,
 	SentenceSlot,
 	SentenceSlotOption,
-	SentenceQuote,
 	SentenceStory,
 	SentenceStyle,
 	SentenceTense,
@@ -64,19 +65,21 @@ import {
 import { drawName } from '../name/nameGenerator.js';
 import { nameLengthRange } from '../name/nameLengthRange.js';
 import { SENTENCE_DATA, THEME_CLASS } from './data/index.js';
+import type { StoryStep } from './data/index.js';
 import type {
 	Condition,
 	ConnectiveKind,
-	NounTrait,
 	NounClass,
+	NounTrait,
 	PredicateForm,
+	ReplyCue,
 	SentenceFrame,
 	SentenceJoin,
+	SentenceLanguageData,
 	SentenceMark,
 	SentenceMood,
-	SentenceLanguageData,
-	SentenceSpeech,
 	SentencePart,
+	SentenceSpeech,
 	StateGroup,
 	VerbField,
 	VerbGroup
@@ -474,6 +477,14 @@ type Draw = {
 	 * sentence the result narrates.
 	 */
 	speech: SentenceSpeech | null;
+	/**
+	 * Whether this sentence is a line somebody says or thinks inside a story — in
+	 * the first person, about the thing in front of them, or to the person beside
+	 * them — which is said in its own time: it names no time of day, and nothing
+	 * stands in front of it. A quoted line drawn on its own terms is not one of
+	 * these.
+	 */
+	spoken: boolean;
 };
 
 /**
@@ -500,6 +511,17 @@ type BeatDraw = {
 	places: readonly WordTheme[];
 	/** The themes the subject may come from, when the story has decided it. */
 	subject: readonly WordTheme[] | null;
+	/**
+	 * What is true of the hero before this sentence, for a verb group that shows
+	 * a condition to be drawn by. Null for a sentence that is not the hero's.
+	 */
+	state: ReadonlySet<Condition> | null;
+	/**
+	 * Whether this sentence's subject is somebody the story never introduces — a
+	 * passer-by, a bird on a fence — who is written as what they are and never
+	 * by a name, whatever `includeName` asked: a name out of nowhere in the
+	 * middle of a story is somebody the reader was supposed to know.
+	 */
 	nameless: boolean;
 	/**
 	 * The nouns the story has put on the page that this sentence writes again, by
@@ -591,6 +613,8 @@ type Flow = {
 	openers: Set<string>;
 	/** Whether it named the topic rather than standing a pronoun where it was. */
 	repeated: boolean;
+	/** The level the last quoted line was said at, for an answer to be said at too. */
+	line: SentenceStyle | null;
 };
 
 /* --- Shapes ---------------------------------------------------------------- */
@@ -2047,7 +2071,30 @@ function generateOne(language: WordLanguage, settings: Settings, draw: Draw): Bu
 		spent || dated
 			? allowed.filter((frame) => !frame.parts.some((part) => part.slot === 'time'))
 			: allowed;
-	const frames = timeless.length ? timeless : allowed;
+	// A sentence that drops its subject and carries nothing else is one word —
+	// `놀아요.`, `울어.` — and a paragraph with three of those in it reads as a list.
+	// So one that will write no subject takes a shape with something beside the
+	// predicate. A quoted line is the exception: `“배고파요.”` is what people say,
+	// and so is the second clause of one sentence, which its first clause carries.
+	const dropped =
+		draw.link !== 'second' && follow?.reference === 'pronoun' && follow.pronoun === '';
+	// The same for an object the sentence before named, which this one leaves out
+	// or stands a clitic for: `냄새맡는다.` is a subject and an object gone.
+	const elided =
+		draw.object !== null &&
+		pinned.get('object')?.word === draw.object.noun &&
+		(draw.object.text === '' || draw.object.clitic)
+			? 1
+			: 0;
+	// A quoted line is the one exception, by half: `“배고파요.”` is what people say,
+	// where `“찾았어.”` is not — a report of what was done says what was done to
+	// what, or where. So a line about a state may be the state alone, and a line
+	// that reports carries one thing beside its verb.
+	const least = !draw.spoken ? 3 : draw.beat?.headed === 'verb' ? 2 : 1;
+	const roomy = dropped
+		? timeless.filter((frame) => frame.parts.length - elided >= least)
+		: timeless;
+	const frames = roomy.length ? roomy : timeless.length ? timeless : allowed;
 	const plans = new Map(frames.map((frame) => [frame, planFor(frame, requirements, pinned)]));
 	// A shape is only worth drawing when the language has a predicate for it: a
 	// `body` subject has no transitive verb in any language here, so a shape with
@@ -2300,13 +2347,14 @@ function compose(
 	// modifier or a particle. Written out as its own list so that every budget
 	// below is measured against what the sentence actually writes; `at` is the
 	// index back into the frame, which is what the plan is keyed by.
-	const pronoun = draw.speech
-		? draw.speech.subject
-		: draw.link === 'second'
+	const pronoun =
+		draw.link === 'second'
 			? ''
-			: follow?.reference === 'pronoun'
-				? follow.pronoun
-				: null;
+			: draw.speech
+				? draw.speech.subject
+				: follow?.reference === 'pronoun'
+					? follow.pronoun
+					: null;
 	// And the object the sentence before named is referred to rather than named
 	// again, where this shape puts the same noun in its object slot: left out, or
 	// stood a pronoun for where the object would go or in front of the verb.
@@ -2320,9 +2368,9 @@ function compose(
 			return;
 		}
 
-		// A line is what the hero says and nothing around it: no time, no place, no
-		// manner. `“배고프다.”`, not `“한낮에 배고프다.”`
-		if (draw.speech && (part.slot === 'time' || part.slot === 'place' || part.slot === 'manner')) {
+		// A line is said in its own time, so it names none: `“배고프다.”`, not
+		// `“한낮에 배고프다.”` — where `“부엌에서 열쇠를 찾았어!”` is what somebody says.
+		if (draw.spoken && part.slot === 'time') {
 			return;
 		}
 
@@ -2384,6 +2432,7 @@ function compose(
 		const theme = partThemes[i];
 		// A name stands where a person would — and, outside the subject, only beside
 		// a subject that is a person too: 성재 meets 유하, and a fox meets the baker.
+		// Never for somebody the story never introduced.
 		const personSubject =
 			THEME_CLASS[subjectTheme] === 'person' || follow?.topic.class === 'person';
 
@@ -2457,7 +2506,12 @@ function compose(
 	const closes = draw.link !== 'first';
 	const close = closes ? data.terminators[draw.mark] : '';
 	const open = data.openers?.[draw.mark] ?? '';
-	const [quoteOpen, quoteClose] = closes && draw.quote ? draw.quote : ['', ''];
+	// The quotation marks belong to the whole sentence too, but one goes on each
+	// end of it: a two-clause line opens its quote on the first clause and closes
+	// it on the second — `“시장에 가서 빵을 샀어.”`
+	const [quoteOpen, quoteClose] = draw.quote
+		? [draw.link === 'second' ? '' : draw.quote[0], closes ? draw.quote[1] : '']
+		: ['', ''];
 	const tag = closes && frame.tag ? data.space + frame.tag : '';
 	const past = draw.tense === 'past';
 	// What the language writes beside a verb that does not change for the past:
@@ -2520,13 +2574,32 @@ function compose(
 		// A state group may bring its own copula, which wins over the shape's; a head
 		// that carries the tense changes for the past, and agrees with the subject
 		// where the language's past does (Russian `был` beside `была`).
-		const own = part.slot === 'state' ? (group as StateGroup) : undefined;
-		// The first person takes its own copula where the language has one: `I am`.
+		// A degree stands between the copula and the state it measures — `is very
+		// tired`, `está muy cansado` — so whatever the state part would have written
+		// in front of itself is written in front of the degree instead.
+		const stateAt = parts.findIndex((entry) => entry.part.slot === 'state');
+		const measured = part.slot === 'degree' && stateAt === i + 1;
+		const headOf =
+			part.slot === 'state' && i > 0 && parts[i - 1].part.slot === 'degree'
+				? undefined
+				: measured
+					? parts[stateAt].part
+					: part;
+		const own = headOf?.slot === 'state' ? (group as StateGroup) : undefined;
+		const ownHead = own?.head ?? headOf?.head;
+		// The first and the second person take their own copula where the language
+		// has one: `I am`, `are you`, `bist du`, `estás` — wherever the shape writes
+		// the state's copula, which is in front of the state in a statement and in
+		// front of the subject in a question.
+		const copular =
+			headed === 'state' &&
+			ownHead !== undefined &&
+			(headOf?.slot === 'state' || headOf?.slot === 'subject');
 		const presentHead =
-			draw.speech?.head !== undefined && part.slot === 'state'
-				? draw.speech.head
-				: (own?.head ?? part.head);
-		const pastHead = own?.pastHead ?? part.pastHead;
+			draw.speech && copular
+				? (draw.speech.heads?.[ownHead] ?? draw.speech.head ?? ownHead)
+				: ownHead;
+		const pastHead = own?.pastHead ?? headOf?.pastHead;
 		const tensedHead = past && pastHead ? pastHead : presentHead;
 		let partHead =
 			past && pastHead && data.pastAgreement
@@ -2651,7 +2724,8 @@ function compose(
 				// the ones after it only move the day forward.
 				follow === null && draw.link !== 'second',
 				THEME_CLASS[subjectTheme],
-				draw.beat !== null
+				draw.beat !== null,
+				field
 			);
 
 			phrase = drawn.text;
@@ -3561,7 +3635,8 @@ function generateResult(language: WordLanguage, settings: Settings): Result {
 				item && last?.object?.noun === item.word
 					? objectReferenceFor(language, data, item.word, false, last.object.named)
 					: null,
-			speech: null
+			speech: null,
+			spoken: false
 		};
 		const [one, opened] = drawOne(paragraph, draw);
 
@@ -3626,7 +3701,8 @@ function freshFlow(): Flow {
 		mark: null,
 		opened: false,
 		openers: new Set(),
-		repeated: true
+		repeated: true,
+		line: null
 	};
 }
 
@@ -3696,6 +3772,71 @@ const NOTICE_EXCLAIM = 55;
 // What share of a two-clause sentence's range the first clause takes.
 const FIRST_CLAUSE_SHARE = 0.5;
 
+/**
+ * What a remark is about: a noun the story has written, or null for one still
+ * to be drawn out of `themes`.
+ */
+type Commented = { noun: Requirement | null; themes: readonly WordTheme[] };
+
+/** One of a language's replies: what is said, and the mark it closes on. */
+type Reply = { text: string; mark: SentenceMark };
+
+// Which pool an answer at each level is drawn from, best first. A level a
+// language does not write falls back the way a predicate form does, and `plain`
+// is never spoken.
+const REPLY_CHAIN: Record<SentenceStyle, readonly Exclude<SentenceStyle, 'plain'>[]> = {
+	plain: ['casual', 'polite', 'formal'],
+	casual: ['casual', 'polite', 'formal'],
+	polite: ['polite', 'casual', 'formal'],
+	formal: ['formal', 'polite', 'casual']
+};
+
+/**
+ * The replies a language writes at this level, or the nearest level it does
+ * write, that fit what was said: the pool for the cue, and every pool but the
+ * answers where the level has none for it — an answer to nothing is odd, and the
+ * rest fit most things.
+ */
+function repliesOf(data: SentenceLanguageData, style: SentenceStyle, cue: ReplyCue): WordPool {
+	for (const level of REPLY_CHAIN[style]) {
+		const pools = data.replies?.[level];
+
+		if (!pools) {
+			continue;
+		}
+
+		const own = pools[cue];
+
+		if (own?.length) {
+			return own;
+		}
+
+		const rest = (Object.keys(pools) as ReplyCue[])
+			.filter((each) => each !== 'answer')
+			.flatMap((each) => pools[each] ?? []);
+
+		if (rest.length) {
+			return rest;
+		}
+	}
+
+	return [];
+}
+
+/**
+ * A reply entry, read: `잘됐다!` is exclaimed and `정말?` asked, and the tag is
+ * taken off so the language's own mark can be written in its place.
+ */
+function replyOf(entry: string): Reply {
+	const last = entry.charAt(entry.length - 1);
+
+	if (last === '!' || last === '?') {
+		return { text: entry.slice(0, -1), mark: last === '!' ? 'exclamation' : 'question' };
+	}
+
+	return { text: entry, mark: 'statement' };
+}
+
 /** The nouns a story has put on the page, by the role each one plays. */
 type Roles = {
 	item?: Requirement;
@@ -3742,10 +3883,19 @@ function storyFor(telling: Telling): {
 		const hero = pick(heroes);
 		const items = itemThemesFor(data, story, hero);
 		const item = items.length ? pick(items) : null;
-		const planned = plan(data, story, hero, item, settings.sentences, joinable);
+		// A story is spoken in only where the caller left the kinds to it: a story
+		// told on its own terms is prose, and a caller who asked for every kind gets
+		// the register they asked for.
+		const planned = plan(data, story, hero, item, settings.sentences, joinable, !settings.typed);
 
 		if (planned) {
-			return { plan: planned, hero, heroThemes: themesForClasses(heroThemes, [hero]), item };
+			// The hero's themes: the ones asked for, in the hero's class, and — where
+			// the story narrows them — the story's own. A sketch is of a forest, not
+			// of Pluto.
+			const inClass = themesForClasses(heroThemes, [hero]);
+			const own = story.heroThemes
+				? inClass.filter((theme) => story.heroThemes!.includes(theme))
+				: inClass;
 
 			return { plan: planned, hero, heroThemes: own.length ? own : inClass, item };
 		}
@@ -3851,11 +4001,74 @@ function tellStory(telling: Telling): Result | null {
 
 		return own.length ? own : inClass;
 	};
+
+	/**
+	 * What a remark is about: the thing looked at, or the place — as a noun the
+	 * story has already written, or as a theme to draw one from. Null where there
+	 * is nothing yet to remark on, and the step is narrated instead.
+	 */
+	const commentFor = (beat: Beat): Commented | null => {
+		const step = beat.step;
+
+		if (step.kind === 'scene') {
+			return { noun: placeOf(), themes: placeThemes };
+		}
+
+		if (step.object) {
+			const noun = step.object === 'prop' ? roles.prop : roles.item;
+			const theme = step.object === 'prop' ? prop : item;
+
+			return theme ? { noun: noun ?? null, themes: [theme] } : null;
+		}
+
+		// Talking is about the place, which is drawn now if no sentence has named it.
+		return { noun: placeOf(), themes: placeThemes };
+	};
+
+	/** A noun the story has written, as the topic of a sentence about it. */
+	const topicFor = (noun: Requirement, fallback: NounClass | null): Topic => {
+		const wordData = WORD_DATA[language];
+
+		return {
+			noun: noun.word,
+			theme: noun.theme ?? null,
+			class: noun.theme ? THEME_CLASS[noun.theme] : fallback,
+			gender: genderOf(wordData, capitalizeAsPool(wordData, noun.word)),
+			// A person met by name is written bare wherever they go again.
+			named: noun.bare ?? false
+		};
+	};
+
 	/** What a beat asks of its sentence. */
-	const beatDraw = (beat: Beat): BeatDraw => {
+	const beatDraw = (beat: Beat, commented: Commented | null = null): BeatDraw => {
 		const step = beat.step;
 		const wants: SentenceSlot[] = [];
 		const prefers: SentenceSlot[] = [];
+
+		// A remark is about one thing and says what it is like: nothing beside the
+		// subject and its state, and the subject pinned where the story has it.
+		if (commented) {
+			const pinned = new Map<SentenceSlot, Requirement>();
+
+			if (commented.noun) {
+				pinned.set('subject', { ...commented.noun, slots: ['subject'], settled: true });
+			}
+
+			return {
+				headed: 'state',
+				fields: [],
+				condition: null,
+				wants,
+				prefers,
+				item: null,
+				places: placeThemes,
+				subject: commented.themes,
+				state: null,
+				nameless: true,
+				pinned,
+				avoid: []
+			};
+		}
 
 		if (step.destination) {
 			wants.push('destination');
@@ -3898,6 +4111,49 @@ function tellStory(telling: Telling): Result | null {
 		};
 	};
 
+
+		const quote = quoteFor(data, 'dialogue', settings.quote)!;
+		const entries = pool.map(replyOf);
+		const fresh = entries.filter((entry) => !spent.has(entry.text));
+		const usable = fresh.length ? fresh : entries;
+		const lengthOf = (entry: Reply) =>
+			quote[0].length +
+			(data.openers?.[entry.mark]?.length ?? 0) +
+			entry.text.length +
+			data.terminators[entry.mark].length +
+			quote[1].length;
+		const fitting = usable.filter((entry) => lengthOf(entry) <= budget[1]);
+		const chosen = pick(fitting.length ? fitting : usable);
+		const text = data.capitalize ? upper(chosen.text) : chosen.text;
+
+		spent.add(chosen.text);
+
+		return [
+			{
+				sentence:
+					quote[0] +
+					(data.openers?.[chosen.mark] ?? '') +
+					text +
+					data.terminators[chosen.mark] +
+					quote[1],
+				phrases: [],
+				slots: [],
+				theme: null,
+				subject: null,
+				gender: undefined,
+				named: false,
+				names: [],
+				used: [],
+				scene: new Map(),
+				type: 'dialogue',
+				field: null,
+				dayAt: -1,
+				object: null
+			},
+			chosen.mark
+		];
+	};
+
 	/**
 	 * The shortest sentence a beat could be written as, for deciding whether two
 	 * of them fit into one sentence's range.
@@ -3916,8 +4172,26 @@ function tellStory(telling: Telling): Result | null {
 		openedBefore = ''
 	): [Built, SentenceType, SentenceMark, string, Follow | null] => {
 		const scene = beat.step.kind === 'scene';
+		const other = beat.step.kind === 'other';
+
+			if (answered) {
+				heroLast = false;
+
+				return [answered[0], 'dialogue', answered[1], '', null];
+			}
+		}
+
+			if (said) {
+				heroLast = true;
+
+				return [said[0], 'dialogue', said[1], '', null];
+			}
+		}
+
 		// A second clause whose sentence has said when already — opened on `later`,
-		// or named a time in its first clause — says it no second time.
+		// or named a time in its first clause — says it no second time. A whole
+		// sentence says none straight after one that did, or once the result has
+		// said when as often as a paragraph should.
 		const dated =
 			timeSpent(built, beats.length) ||
 			(beat.join === 'second' &&
@@ -3925,27 +4199,61 @@ function tellStory(telling: Telling): Result | null {
 				((data.connectives.temporal ?? []).includes(openedBefore) ||
 					previous.slots.includes('time')));
 		// A line the hero says or thinks, in their own voice: the first person where
-		// the language writes one, the present tense whatever the story's, a level a
-		// person speaks at, and nothing in front of it — nobody opens a line on
-		// "meanwhile". A caller who named the kinds gets those instead.
-		const voiced = beat.voiced && !settings.typed && topic !== null && data.speech !== undefined;
+		// the language writes one, a level a person speaks at, and nothing in front
+		// of it — nobody opens a line on "meanwhile". What is true of them is said
+		// now, and what they just did is reported in the past.
+		// A line needs a topic to speak, which the first sentence about the hero
+		// gives it; and the second clause of a sentence speaks exactly where its
+		// first clause did, because the quotation marks are the whole sentence's.
+		const speakable =
+			beat.join === 'second'
+				? previous !== null && QUOTED_TYPES.includes(previous.type)
+				: topic !== null;
+		const line = beat.voice === 'line' && speakable && data.speech !== undefined;
+		// A remark about the thing in front of them or the place around them, in
+		// the third person: `“사과가 참 달다!”`, `“숲이 조용하네.”`
+		const commented = beat.voice === 'comment' && speakable ? commentFor(beat) : null;
+		// What somebody else is doing, said by the hero as they see it: the `other`
+		// step told in the hero's voice, and in the present, because it is what is
+		// in front of them — `“새가 날아가네!”`
+		const noticed = beat.voice === 'notice' && speakable && other;
+		// A question to the person beside them, in the second person: `“배고파?”`,
+		// `“Are you tired?”`. Only once the story has put that person on the page.
+		const asked =
+			beat.voice === 'ask' &&
+			beat.asked !== null &&
+			speakable &&
+			data.listener !== undefined &&
+			roles.item !== undefined;
+		const spoken = line || commented !== null || noticed || asked;
 		// What this sentence is doing. A caller who named the kinds gets them; the
-		// story otherwise tells, and lets a step that allows more do more.
+		// story otherwise tells, and lets a step that allows more do more. A line
+		// that is answered is said aloud, because nobody answers a thought.
 		const [type, mark] = settings.typed
 			? kindFor(data, settings, room, budget, flow)
-			: voiced
-				? ([
-						pickWeighted(LINE_KINDS, (kind) => LINE_WEIGHT[kind] ?? 1),
-						chance(LINE_EXCLAIM) ? 'exclamation' : 'statement'
-					] as const)
-				: (() => {
-						const kinds: SentenceType[] =
-							beat.join === null ? ['statement', ...beat.kinds] : ['statement'];
-						const type = pickWeighted(kinds, (kind) => STORY_KIND_WEIGHT[kind] ?? 1);
+			: asked
+				? (['dialogue', 'question'] as const)
+				: spoken
+					? ([
+							// What was just done is reported to somebody, and an answered line
+							// was heard; what is true of oneself may be thought.
+							// And what the hero makes of the person beside them is thought, not
+							// said to their face.
+							beat.answered || (line && beat.step.kind === 'act')
+								? 'dialogue'
+								: noticed && beat.step.actor === 'item'
+									? 'thought'
+									: pickWeighted(LINE_KINDS, (kind) => LINE_WEIGHT[kind] ?? 1),
+							chance(noticed ? NOTICE_EXCLAIM : LINE_EXCLAIM) ? 'exclamation' : 'statement'
+						] as const)
+					: (() => {
+							const kinds: SentenceType[] =
+								beat.join === null ? ['statement', ...beat.kinds] : ['statement'];
+							const type = pickWeighted(kinds, (kind) => STORY_KIND_WEIGHT[kind] ?? 1);
 
-						return [type, type as SentenceMark] as const;
-					})();
-		const pinned = pinnedFor(beat);
+							return [type, type as SentenceMark] as const;
+						})();
+		const pinned = commented ? new Map<SentenceSlot, Requirement>() : pinnedFor(beat);
 		// The sentence this one follows: the first clause for a second one, and the
 		// sentence before for a whole one. What it named is what this one may refer
 		// to rather than name again.
@@ -3985,6 +4293,28 @@ function tellStory(telling: Telling): Result | null {
 			// or a fresh noun of whatever the step names — and the hero stays the
 			// topic either way.
 			const actor = beat.step.actor === 'item' ? roles.item : undefined;
+
+			follow = actor
+				? { topic: topicFor(actor, 'person'), reference: 'repeat', pronoun: '', scene: pinned }
+				: topic
+					? { topic, reference: 'fresh', pronoun: '', scene: pinned }
+					: null;
+		} else if (asked) {
+			// The hero asks the person beside them: the subject is that person, written
+			// the way the language writes a second person.
+			follow = {
+				topic: topicFor(roles.item!, 'person'),
+				reference: 'pronoun',
+				pronoun: data.listener!.subject,
+				scene: pinned
+			};
+		} else if (commented) {
+			// A remark is about the thing, which is named in full where the story has
+			// it, and drawn from its theme where it has not.
+			follow = commented.noun
+				? { topic: topicFor(commented.noun, null), reference: 'repeat', pronoun: '', scene: pinned }
+				: { topic: topic!, reference: 'fresh', pronoun: '', scene: pinned };
+		} else if (line) {
 			// The hero speaks: the subject is theirs, written the way the language
 			// writes a first person.
 			follow = {
@@ -4005,19 +4335,48 @@ function tellStory(telling: Telling): Result | null {
 			mark,
 			quote: quoteFor(data, type, settings.quote),
 			opener:
-				beat.join === 'second' || voiced
+				beat.join === 'second' || spoken
 					? ''
 					: openerFor(data, mark, follow, budget[1], shortest, flow, beat.links),
-			style: styleFor(type, settings.style, voice),
+			// The people of one story speak at one level: a line and its answer, and
+			// the next line, are said the way the first was.
+			style:
+				type === 'dialogue' && !settings.style
+					? (flow.line ??= pick(SPOKEN_LEVELS))
+					: styleFor(type, settings.style, voice),
 			avoid: spent,
 			follow,
-			tense: voiced ? 'present' : tense,
-			beat: beatDraw(beat),
+			// A line says now what is true, and reports in the past what was just
+			// done; a remark, a question and what is noticed are about now.
+			tense: line
+				? beat.step.kind === 'act'
+					? 'past'
+					: 'present'
+				: commented || noticed || asked
+					? 'present'
+					: tense,
+			beat: asked
+				? {
+						headed: 'state',
+						fields: [],
+						condition: beat.asked,
+						wants: [],
+						prefers: [],
+						item: null,
+						places: placeThemes,
+						subject: themesForClasses(WORD_THEMES, ['person']),
+						state: null,
+						nameless: true,
+						pinned: new Map(),
+						avoid: []
+					}
+				: beatDraw(beat, commented),
 			link: beat.join,
 			dayAt,
 			dated,
 			object,
-			speech: voiced ? data.speech! : null
+			speech: line ? data.speech! : asked ? data.listener! : null,
+			spoken
 		};
 		let [one, opened] = drawOne(telling, draw);
 
@@ -4029,7 +4388,8 @@ function tellStory(telling: Telling): Result | null {
 		if (
 			follow &&
 			!scene &&
-			!voiced &&
+			!other &&
+			!spoken &&
 			beat.join === null &&
 			distanceFrom(one.sentence.length, budget) > 1
 		) {
@@ -4080,6 +4440,31 @@ function tellStory(telling: Telling): Result | null {
 			}
 		}
 
+		// A remark that drew the thing it is about has named it: that is the story's
+		// thing from here on. And a person met by name — which no scene records,
+		// because a name is no noun phrase — is the story's person.
+		if (commented && !commented.noun && one.subject && beat.step.object) {
+			const role: Requirement = {
+				word: one.subject,
+				slots: ['object'],
+				theme: one.theme ?? undefined,
+				known: one.theme !== null,
+				settled: true
+			};
+
+			if (beat.step.object === 'prop') {
+				roles.prop ??= role;
+			} else {
+				roles.item ??= role;
+			}
+		} else if (beat.step.object === 'item' && !roles.item && !one.scene.has('object')) {
+			const met = one.names.find((name) => name !== one.subject);
+
+			if (met) {
+				roles.item = { word: met, slots: ['object'], known: false, bare: true, settled: true };
+			}
+		}
+
 		for (const word of one.used) {
 			spent.add(word);
 		}
@@ -4091,9 +4476,11 @@ function tellStory(telling: Telling): Result | null {
 				one.scene.has('destination'));
 		dayAt = Math.max(dayAt, one.dayAt);
 
-		if (!topic && !scene) {
+		if (!topic && !scene && !other && !commented) {
 			topic = topicOf(one);
 		}
+
+		heroLast = !scene && !other && !commented;
 
 		return [one, type, mark, opened, follow];
 	};
@@ -4189,7 +4576,9 @@ function tellStory(telling: Telling): Result | null {
 		flow.opened = Boolean(opened);
 		flow.lead ??= type;
 
-		if (beat.step.kind !== 'scene') {
+		// Whether the topic was just named is about the hero's own sentences: a
+		// scene, somebody else's doing, a remark and an answer say nothing of it.
+		if (beat.step.kind !== 'scene' && beat.step.kind !== 'other' && beat.voice === null) {
 			flow.repeated = follow ? follow.reference === 'repeat' : true;
 		}
 

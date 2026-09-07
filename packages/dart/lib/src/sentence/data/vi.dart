@@ -842,6 +842,30 @@ final SentenceLanguageData vi = SentenceLanguageData(
     },
   ),
   speech: const SentenceSpeech(subject: 'Tôi'),
+  replies: <SentenceStyle, Map<ReplyCue, WordPool>>{
+    SentenceStyle.casual: <ReplyCue, WordPool>{
+      ReplyCue.agree: words(r'''
+        ừ đúng_rồi phải_đấy tôi_cũng_vậy đúng_là_vậy chuẩn_luôn ừ_nhỉ thật_đấy công_nhận đúng_thế
+      '''),
+      ReplyCue.cheer: words(r'''
+        tuyệt_quá! giỏi_quá! hay_lắm! ghen_tị_quá làm_tốt_lắm tốt_quá! chúc_mừng_nhé vất_vả_rồi
+        tuyệt_vời!
+      '''),
+      ReplyCue.care: words(r'''
+        ổn_không? nghỉ_một_chút_đi đừng_cố_quá ăn_gì_đó_đi mệt_nhỉ cứ_từ_từ đừng_lo cẩn_thận_nhé
+        cố_lên ngồi_xuống_đi uống_chút_nước_đi để_tôi_giúp
+      '''),
+      ReplyCue.wonder: words(r'''
+        thật_à? thật_không? ở_đâu? khi_nào? rồi_sao? không_thể_nào! làm_thế_nào? tại_sao? vậy_sao?
+        thế_à? rồi_thì? gì_cơ?
+      '''),
+      ReplyCue.answer: words(r'''
+        ừ,_hơi_hơi không,_ổn_mà ừ,_nhiều_lắm cũng_tạm không,_chưa ừ,_quá_luôn một_chút_thôi
+        không_hẳn ừ,_rất không,_không_hề cũng_thế ừ,_thật_ra
+      '''),
+    },
+  },
+  listener: const SentenceSpeech(subject: 'bạn'),
   degrees: words(r'khá hơi thật cực_kỳ vô_cùng hết_sức thật_là khá_là quá_là siêu'),
   numeral: const SentenceNumeral(
     order: NumeralOrder.before,

@@ -33,6 +33,7 @@ from randino._internal.generate import (
     resolve_length,
     resolve_prefix,
     resolve_realism,
+    resolve_vocabulary,
 )
 from randino._internal.script import ends_with_consonant, ends_with_liquid
 from randino._internal.utils import chance, clamp, pick, pick_weighted
@@ -68,7 +69,7 @@ from randino.sentence._story import (
     unjoined,
 )
 from randino.sentence._story import Plan as StoryPlan
-from randino.sentence.data import SENTENCE_DATA, THEME_CLASS
+from randino.sentence.data import SENTENCE_DATA, THEME_CLASS, StoryStep
 from randino.sentence.data._types import (
     Condition,
     ConnectiveKind,
@@ -76,6 +77,7 @@ from randino.sentence.data._types import (
     NounTrait,
     PredicateForm,
     PredicateTense,
+    ReplyCue,
     SentenceFrame,
     SentenceJoin,
     SentenceLanguageData,
@@ -668,7 +670,16 @@ class Draw:
     """Whether the sentence this clause belongs to has said when already.
 
     It opened on a temporal connective, or its first clause named a time, so this clause
-    names none.
+    names none — and a whole sentence names none straight after one that did, or once the
+    result has said when as often as a paragraph should.
+    """
+
+    spoken: bool = False
+    """Whether this sentence is a line somebody says or thinks inside a story.
+
+    In the first person, or about the thing in front of them — which is what is said and
+    nothing around it: no time, no place, no manner, and nothing in front of it. A quoted
+    line drawn on its own terms is not one of these.
     """
 
 
@@ -714,8 +725,18 @@ class BeatDraw:
 
     A prop is never the item and the item never the prop.
     """
+
+    state: frozenset[Condition] | None = None
+    """What is true of the hero before this sentence, for a verb group that shows a
+    condition to be drawn by. None for a sentence that is not the hero's."""
+
     nameless: bool = False
     """Whether this sentence's subject is somebody the story never introduces.
+
+    A passer-by, a bird on a fence — written as what they are and never by a name,
+    whatever `include_name` asked: a name out of nowhere in the middle of a story is
+    somebody the reader was supposed to know.
+    """
     """The nouns the story has put on the page that this sentence writes again, by slot.
 
     What `Follow.scene` carries once there is a topic to follow; this is how the first
@@ -800,6 +821,9 @@ class Flow:
 
     The opening sentence names the subject itself, which is why this starts True.
     """
+
+    line: SentenceStyle | None = None
+    """The level the last quoted line was said at, for an answer to be said at too."""
 
 
 # --- Shapes -----------------------------------------------------------------
@@ -2285,7 +2309,7 @@ def _manners_for(data: SentenceLanguageData, subject: NounClass) -> WordPool:
     fitting = [group for group in data.manners if subject in group.subject]
     groups = fitting or list(data.manners)
 
-    return tuple(dict.fromkeys(word for group in groups for word in group.words))
+    return tuple(seen)
 
 
 def _time_for(
@@ -2336,6 +2360,7 @@ def _predicate_for(
     opens: bool,
     subject: NounClass,
     storied: bool,
+    field: VerbField | None,
 ) -> tuple[str, str, int]:
     """What a phrase that is not a noun phrase writes, its plain form, and its day phase.
 
@@ -2483,10 +2508,10 @@ def _compose(
     # which case the phrase is not in the shape to carry an article, a modifier or a
     # particle. The second clause of one sentence shares the first one's subject and
     # writes nothing where it would stand, the way a dropped subject does.
-    if draw.speech is not None:
-        pronoun: str | None = draw.speech.subject
-    elif draw.link == "second":
-        pronoun = ""
+    if draw.link == "second":
+        pronoun: str | None = ""
+    elif draw.speech is not None:
+        pronoun = draw.speech.subject
     elif follow is not None and follow.reference == "pronoun":
         pronoun = follow.pronoun
     else:
@@ -2511,9 +2536,9 @@ def _compose(
         if part.slot == "object" and referred_out:
             continue
 
-        # A line is what the hero says and nothing around it: no time, no place, no
-        # manner. `“배고프다.”`, not `“한낮에 배고프다.”`
-        if draw.speech is not None and part.slot in ("time", "place", "manner"):
+        # A line is said in its own time, so it names none: `“배고프다.”`, not `“한낮에
+        # 배고프다.”` — where `“부엌에서 열쇠를 찾았어!”` is what somebody says.
+        if draw.spoken and part.slot == "time":
             continue
 
         if part.slot != "subject" or pronoun is None or pronoun:
@@ -2535,7 +2560,12 @@ def _compose(
     closes = draw.link != "first"
     close = data.terminators[draw.mark] if closes else ""
     open_mark = data.openers.get(draw.mark, "")
-    quote_open, quote_close = (draw.quote or ("", "")) if closes else ("", "")
+    # The quotation marks belong to the whole sentence too, but one goes on each end of
+    # it: a two-clause line opens its quote on the first clause and closes it on the
+    # second — `“시장에 가서 빵을 샀어.”`
+    quote_pair = draw.quote or ("", "")
+    quote_open = "" if draw.link == "second" else quote_pair[0]
+    quote_close = quote_pair[1] if closes else ""
     tag = data.space + frame.tag if closes and frame.tag else ""
     past = draw.tense == "past"
     # What the language writes beside a verb that does not change for the past:
@@ -2593,6 +2623,7 @@ def _compose(
             person_subject = THEME_CLASS[subject_theme] == "person" or (
                 follow is not None and follow.topic.noun_class == "person"
             )
+            # Never for somebody the story never introduced.
             proper.append(
                 ""
                 if settings.include_name
@@ -2721,14 +2752,42 @@ def _compose(
         # A state group may bring its own copula, which wins over the shape's; a head
         # that carries the tense changes for the past, and agrees with the subject where
         # the language's past does (Russian `был` beside `была`).
-        own_group = state_group if part.slot == "state" else None
-        # The first person takes its own copula where the language has one: `I am`.
-        present_head = (
-            draw.speech.head
-            if draw.speech is not None and draw.speech.head is not None and part.slot == "state"
-            else (own_group.head if own_group is not None else None) or part.head
+        # A degree stands between the copula and the state it measures — `is very
+        # tired`, `está muy cansado` — so whatever the state part would have written in
+        # front of itself is written in front of the degree instead.
+        state_at = next((k for k, each in enumerate(parts) if each.slot == "state"), -1)
+        measured = part.slot == "degree" and state_at == index + 1
+        head_of: SentencePart | None = (
+            None
+            if part.slot == "state" and index > 0 and parts[index - 1].slot == "degree"
+            else parts[state_at]
+            if measured
+            else part
         )
-        past_head = (own_group.past_head if own_group is not None else None) or part.past_head
+        own_group = state_group if head_of is not None and head_of.slot == "state" else None
+        own_head = (own_group.head if own_group is not None else None) or (
+            head_of.head if head_of is not None else None
+        )
+        # The first and the second person take their own copula where the language has
+        # one: `I am`, `are you`, `bist du`, `estás` — wherever the shape writes the
+        # state's copula, which is in front of the state in a statement and in front of
+        # the subject in a question.
+        copular_head = (
+            headed
+            and own_head is not None
+            and head_of is not None
+            and head_of.slot in ("state", "subject")
+        )
+
+        if draw.speech is not None and copular_head:
+            present_head: str | None = (
+                (draw.speech.heads or {}).get(own_head or "") or draw.speech.head or own_head
+            )
+        else:
+            present_head = own_head
+        past_head = (own_group.past_head if own_group is not None else None) or (
+            head_of.past_head if head_of is not None else None
+        )
         tensed_head = past_head if past and past_head else present_head
         part_head = (
             _agree_by(data.past_agreement, tensed_head, gender)
@@ -3623,6 +3682,67 @@ JOIN_ROOM = 0.6
 """What share of a language's longest sentence one sentence must be allowed to join two."""
 
 
+REPLY_CHAIN: dict[SentenceStyle, tuple[str, ...]] = {
+    "plain": ("casual", "polite", "formal"),
+    "casual": ("casual", "polite", "formal"),
+    "polite": ("polite", "casual", "formal"),
+    "formal": ("formal", "polite", "casual"),
+}
+"""Which pool an answer at each level is drawn from, best first.
+
+A level a language does not write falls back the way a predicate form does, and
+`"plain"` is never spoken.
+"""
+
+
+def _replies_of(data: SentenceLanguageData, style: SentenceStyle, cue: ReplyCue) -> WordPool:
+    """The replies at this level, or the nearest level written, that fit what was said.
+
+    The pool for the cue, and every pool but the answers where the level has none for
+    it — an answer to nothing is odd, and the rest fit most things.
+    """
+    for level in REPLY_CHAIN[style]:
+        pools = (data.replies or {}).get(level)
+
+        if pools is None:
+            continue
+
+        own = pools.get(cue)
+
+        if own:
+            return own
+
+        rest = tuple(word for each, pool in pools.items() if each != "answer" for word in pool)
+
+        if rest:
+            return rest
+
+    return ()
+
+
+def _reply_of(entry: str) -> tuple[str, SentenceMark]:
+    """A reply entry, read: what is said, and the mark it closes on.
+
+    `잘됐다!` is exclaimed and `정말?` asked, and the tag is taken off so the language's
+    own mark can be written in its place.
+    """
+    if entry.endswith("!"):
+        return entry[:-1], "exclamation"
+
+    if entry.endswith("?"):
+        return entry[:-1], "question"
+
+    return entry, "statement"
+
+
+@dataclass(frozen=True, slots=True)
+class Commented:
+    """What a remark is about: a noun the story has written, or None for one to draw."""
+
+    noun: Requirement | None
+    themes: tuple[WordTheme, ...]
+
+
 @dataclass(slots=True)
 class Roles:
     """The nouns a story has put on the page, by the role each one plays."""
@@ -3668,10 +3788,22 @@ def _story_for(telling: Telling) -> Found | None:
         hero = pick(heroes)
         items = item_themes_for(data, story, hero)
         item = pick(items) if items else None
-        planned = plan(data, story, hero, item, settings.sentences, joinable)
+        # A story is spoken in only where the caller left the kinds to it: a story told
+        # on its own terms is prose, and a caller who asked for every kind gets the
+        # register they asked for.
+        planned = plan(data, story, hero, item, settings.sentences, joinable, not settings.typed)
 
         if planned is not None:
-            return Found(planned, hero, _themes_for_classes(hero_themes, (hero,)), item)
+            # The hero's themes: the ones asked for, in the hero's class, and — where the
+            # story narrows them — the story's own. A sketch is of a forest, not of Pluto.
+            in_class = _themes_for_classes(hero_themes, (hero,))
+            own = (
+                tuple(theme for theme in in_class if theme in story.hero_themes)
+                if story.hero_themes is not None
+                else tuple(in_class)
+            )
+
+            return Found(planned, hero, own or tuple(in_class), item)
 
     return None
 
@@ -3783,11 +3915,50 @@ def _tell_story(telling: Telling) -> Result | None:
         )
 
         return own or tuple(in_class)
+
+    def comment_for(beat: Beat) -> Commented | None:
+        # What a remark is about: the thing looked at, or the place — as a noun the story
+        # has already written, or as a theme to draw one from.
+        step = beat.step
+
+        if step.kind == "scene":
+            return Commented(place_of(), DESTINATION_THEMES)
+
+        if step.object is not None:
+            noun = roles.prop if step.object == "prop" else roles.item
+            theme = found.plan.prop if step.object == "prop" else found.item
+
+            return Commented(noun, (theme,)) if theme is not None else None
+
+        # Talking is about the place, which is drawn now if no sentence has named it.
+        return Commented(place_of(), DESTINATION_THEMES)
+
+    def topic_for(noun: Requirement, fallback: NounClass | None) -> Topic:
+        # A noun the story has written, as the topic of a sentence about it.
+        lexicon = WORD_DATA[language]
+
+        return Topic(
+            noun.word,
+            noun.theme,
+            THEME_CLASS[noun.theme] if noun.theme is not None else fallback,
+            gender_of(lexicon, _as_pool(lexicon, noun.word)),
+            # A person met by name is written bare wherever they go again.
+            noun.bare,
+        )
+
+    def beat_draw(beat: Beat, commented: Commented | None = None) -> BeatDraw:
         # What a beat asks of its sentence.
         step = beat.step
         wants: list[SentenceSlot] = []
         prefers: list[SentenceSlot] = []
 
+        # A remark is about one thing and says what it is like: nothing beside the
+        # subject and its state, and the subject pinned where the story has it.
+        if commented is not None:
+            pinned: dict[SentenceSlot, Requirement] = {}
+
+            if commented.noun is not None:
+                pinned["subject"] = replace(commented.noun, slots=("subject",), settled=True)
         if step.destination is not None:
             wants.append("destination")
 
@@ -3830,6 +4001,46 @@ def _tell_story(telling: Telling) -> Result | None:
             state=beat.before if step.kind == "act" else None,
             nameless=step.kind == "other" and step.actor != "item",
         )
+
+        quote = _quote_for(data, "dialogue", settings.quote)
+        assert quote is not None
+        entries = [_reply_of(entry) for entry in pool]
+        fresh = [entry for entry in entries if entry[0] not in telling.spent]
+        usable = fresh or entries
+
+        def length_of(entry: tuple[str, SentenceMark]) -> int:
+            return (
+                len(quote[0])
+                + len(data.openers.get(entry[1], ""))
+                + len(entry[0])
+                + len(data.terminators[entry[1]])
+                + len(quote[1])
+            )
+
+        fitting = [entry for entry in usable if length_of(entry) <= budget[1]]
+        text, mark = pick(fitting or usable)
+        written = _upper(text) if data.capitalize else text
+
+        telling.spent.add(text)
+
+        return (
+            Built(
+                quote[0] + data.openers.get(mark, "") + written + data.terminators[mark] + quote[1],
+                (),
+                (),
+                (),
+                (),
+                "dialogue",
+                None,
+                None,
+                None,
+                False,
+                {},
+                None,
+                -1,
+                None,
+            ),
+            mark,
         )
 
     def shortest_for(beat: Beat) -> int:
@@ -3848,28 +4059,81 @@ def _tell_story(telling: Telling) -> Result | None:
         nonlocal topic, day_at, placed, hero_last
         scene = beat.step.kind == "scene"
         aside = beat.step.kind == "other"
+
+            if reply is not None:
+                hero_last = False
+
+                return Told(reply[0], "dialogue", reply[1], "", None)
+
+            if said is not None:
+                hero_last = True
+
+                return Told(said[0], "dialogue", said[1], "", None)
+
         # A second clause whose sentence has said when already — opened on `later`, or
-        # named a time in its first clause — says it no second time.
-        dated = (
+        # named a time in its first clause — says it no second time. A whole sentence
+        # says none straight after one that did, or once the result has said when as
+        # often as a paragraph should.
+        dated = _time_spent(built, len(beats)) or (
             beat.join == "second"
             and previous is not None
             and (opened_before in data.connectives.get("temporal", ()) or "time" in previous.slots)
         )
-
         # A line the hero says or thinks, in their own voice: the first person where the
-        # language writes one, the present tense whatever the story's, a level a person
-        # speaks at, and nothing in front of it — nobody opens a line on "meanwhile". A
-        # caller who named the kinds gets those instead.
-        voiced = (
-            beat.voiced and not settings.typed and topic is not None and data.speech is not None
+        # language writes one, a level a person speaks at, and nothing in front of it —
+        # nobody opens a line on "meanwhile". What is true of them is said now, and what
+        # they just did is reported in the past.
+        # A line needs a topic to speak, which the first sentence about the hero gives
+        # it; and the second clause of a sentence speaks exactly where its first clause
+        # did, because the quotation marks are the whole sentence's.
+        speakable = (
+            previous is not None and previous.type in QUOTED_TYPES
+            if beat.join == "second"
+            else topic is not None
         )
+        line = beat.voice == "line" and speakable and data.speech is not None
+        # A remark about the thing in front of them or the place around them, in the
+        # third person: `“사과가 참 달다!”`, `“숲이 조용하네.”`
+        commented = comment_for(beat) if beat.voice == "comment" and speakable else None
+        # What somebody else is doing, said by the hero as they see it: the `"other"`
+        # step told in the hero's voice, and in the present, because it is what is in
+        # front of them — `“새가 날아가네!”`
+        noticed = beat.voice == "notice" and speakable and aside
+        # A question to the person beside them, in the second person: `“배고파?”`,
+        # `“Are you tired?”`. Only once the story has put that person on the page.
+        listener = data.listener
+        company = roles.item
+        asked = (
+            beat.voice == "ask"
+            and beat.asked is not None
+            and speakable
+            and listener is not None
+            and company is not None
+        )
+        spoken = line or commented is not None or noticed or asked
         # What this sentence is doing. A caller who named the kinds gets them; the story
-        # otherwise tells, and lets a step that allows more do more.
+        # otherwise tells, and lets a step that allows more do more. A line that is
+        # answered is said aloud, because nobody answers a thought — and so is a report
+        # of what was just done.
         if settings.typed:
             type_, mark = _kind_for(data, settings, telling.room, budget, telling.flow)
-        elif voiced:
-            type_ = pick_weighted(LINE_KINDS, lambda kind: LINE_WEIGHT.get(kind, 1))
-            mark = "exclamation" if chance(LINE_EXCLAIM) else "statement"
+        elif asked:
+            type_, mark = "dialogue", "question"
+        elif spoken:
+            # What the hero makes of the person beside them is thought, not said to
+            # their face.
+            type_ = (
+                "dialogue"
+                if beat.answered or (line and beat.step.kind == "act")
+                else "thought"
+                if noticed and beat.step.actor == "item"
+                else pick_weighted(LINE_KINDS, lambda kind: LINE_WEIGHT.get(kind, 1))
+            )
+            mark = (
+                "exclamation"
+                if chance(NOTICE_EXCLAIM if noticed else LINE_EXCLAIM)
+                else "statement"
+            )
         else:
             kinds: tuple[SentenceType, ...] = (
                 ("statement", *beat.kinds) if beat.join is None else ("statement",)
@@ -3877,7 +4141,7 @@ def _tell_story(telling: Telling) -> Result | None:
             type_ = pick_weighted(kinds, lambda kind: STORY_KIND_WEIGHT.get(kind, 1))
             mark = cast("SentenceMark", type_)
 
-        pinned = pinned_for(beat)
+        pinned = {} if commented is not None else pinned_for(beat)
         # The sentence this one follows: the first clause for a second one, and the
         # sentence before for a whole one. What it named is what this one may refer to
         # rather than name again.
@@ -3923,6 +4187,26 @@ def _tell_story(telling: Telling) -> Result | None:
             # Somebody else's sentence: the person the story is about, named again, or a
             # fresh noun of whatever the step names — and the hero stays the topic.
             actor = roles.item if beat.step.actor == "item" else None
+
+            if actor is not None:
+                follow = Follow(topic_for(actor, "person"), "repeat", "", pinned)
+            else:
+                follow = Follow(topic, "fresh", "", pinned) if topic is not None else None
+        elif asked:
+            # The hero asks the person beside them: the subject is that person, written
+            # the way the language writes a second person.
+            assert company is not None and listener is not None
+            follow = Follow(topic_for(company, "person"), "pronoun", listener.subject, pinned)
+        elif commented is not None:
+            # A remark is about the thing, which is named in full where the story has it,
+            # and drawn from its theme where it has not.
+            assert topic is not None
+            follow = (
+                Follow(topic_for(commented.noun, None), "repeat", "", pinned)
+                if commented.noun is not None
+                else Follow(topic, "fresh", "", pinned)
+            )
+        elif line:
             # The hero speaks: the subject is theirs, written the way the language writes
             # a first person.
             assert topic is not None and data.speech is not None
@@ -3937,17 +4221,26 @@ def _tell_story(telling: Telling) -> Result | None:
                 else _follow_for(data, topic, pinned, telling.flow.repeated, True)
             )
 
+        # The people of one story speak at one level: a line and its answer, and the
+        # next line, are said the way the first was.
+        if type_ == "dialogue" and settings.style is None:
+            level = telling.flow.line if telling.flow.line is not None else pick(SPOKEN_LEVELS)
+            telling.flow.line = level
+            style = level
+        else:
+            style = _style_for(type_, settings.style, telling.voice)
+
         draw = Draw(
             budget,
             type_,
             mark,
             _quote_for(data, type_, settings.quote),
             ""
-            if beat.join == "second" or voiced
+            if beat.join == "second" or spoken
             else _opener_for(
                 data, mark, follow, budget[1], telling.shortest, telling.flow, beat.links
             ),
-            _style_for(type_, settings.style, telling.voice),
+            style,
             frozenset(telling.spent),
             follow,
             "present" if voiced else telling.tense,
@@ -3956,7 +4249,8 @@ def _tell_story(telling: Telling) -> Result | None:
             day_at,
             object=reference,
             dated=dated,
-            speech=data.speech if voiced else None,
+            speech=data.speech if line else listener if asked else None,
+            spoken=spoken,
         )
         one, opened = _draw_one(telling, draw)
 
@@ -3967,7 +4261,8 @@ def _tell_story(telling: Telling) -> Result | None:
         if (
             follow is not None
             and not scene
-            and not voiced
+            and not aside
+            and not spoken
             and beat.join is None
             and _distance_from(len(one.sentence), budget) > 1
         ):
@@ -4012,6 +4307,34 @@ def _tell_story(telling: Telling) -> Result | None:
             elif (slot == "place" or beat.step.destination == "place") and roles.place is None:
                 roles.place = replace(drawn, slots=("place",), settled=True)
 
+        # A remark that drew the thing it is about has named it: that is the story's
+        # thing from here on. And a person met by name — which no scene records, because
+        # a name is no noun phrase — is the story's person.
+        if (
+            commented is not None
+            and commented.noun is None
+            and one.subject is not None
+            and beat.step.object is not None
+        ):
+            role = Requirement(
+                one.subject,
+                ("object",),
+                theme=one.theme,
+                known=one.theme is not None,
+                settled=True,
+            )
+
+            if beat.step.object == "prop":
+                if roles.prop is None:
+                    roles.prop = role
+            elif roles.item is None:
+                roles.item = role
+        elif beat.step.object == "item" and roles.item is None and "object" not in one.scene:
+            met = next((name for name in one.names if name != one.subject), None)
+
+            if met is not None:
+                roles.item = Requirement(met, ("object",), known=False, bare=True, settled=True)
+
         telling.spent.update(one.used)
         placed = (
             scene
@@ -4020,8 +4343,10 @@ def _tell_story(telling: Telling) -> Result | None:
         )
         day_at = max(day_at, one.day_at)
 
-        if topic is None and not scene:
+        if topic is None and not scene and not aside and commented is None:
             topic = _topic_of(one)
+
+        hero_last = not scene and not aside and commented is None
 
         return Told(one, type_, mark, opened, follow)
 
@@ -4109,7 +4434,9 @@ def _tell_story(telling: Telling) -> Result | None:
         if flow.lead is None:
             flow.lead = told.type
 
-        if beat.step.kind != "scene":
+        # Whether the topic was just named is about the hero's own sentences: a scene,
+        # somebody else's doing, a remark and an answer say nothing of it.
+        if beat.step.kind not in ("scene", "other") and beat.voice is None:
             flow.repeated = told.follow is None or told.follow.reference == "repeat"
 
         if told.opened:
@@ -4228,7 +4555,19 @@ def _generate_one(language: WordLanguage, settings: Settings, draw: Draw) -> Bui
         if spent or dated
         else allowed
     )
-    frames = timeless or allowed
+    # A sentence that drops its subject and carries nothing else is one word — `놀아요.`,
+    # `울어.` — and a paragraph with three of those in it reads as a list. So one that
+    # will write no subject takes a shape with something beside the predicate. A quoted
+    # line is the exception: `“배고파요.”` is what people say, and so is the second
+    # clause of one sentence, which its first clause carries. An object the sentence
+    # before named, which this one leaves out, counts as a phrase gone too.
+    dropped = (
+        draw.link != "second"
+        and follow is not None
+        and follow.reference == "pronoun"
+        and follow.pronoun == ""
+    )
+    pinned_object = pinned.get("object")
     elided = (
         1
         if draw.object is not None
@@ -4236,6 +4575,17 @@ def _generate_one(language: WordLanguage, settings: Settings, draw: Draw) -> Bui
         and pinned_object.word == draw.object.noun
         and (draw.object.text == "" or draw.object.clitic)
         else 0
+    )
+    # A quoted line is the one exception, by half: `“배고파요.”` is what people say, where
+    # `“찾았어.”` is not — a report of what was done says what was done to what, or
+    # where. So a line about a state may be the state alone, and a line that reports
+    # carries one thing beside its verb.
+    least = (
+        3
+        if not draw.spoken
+        else 2
+        if draw.beat is not None and not draw.beat.headed_by_state
+        else 1
     )
     roomy = (
         [frame for frame in timeless if len(frame.parts) - elided >= least] if dropped else timeless

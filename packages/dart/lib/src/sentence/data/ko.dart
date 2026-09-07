@@ -3674,6 +3674,40 @@ final SentenceLanguageData ko = SentenceLanguageData(
     },
   ),
   speech: const SentenceSpeech(subject: ''),
+  replies: <SentenceStyle, Map<ReplyCue, WordPool>>{
+    SentenceStyle.casual: <ReplyCue, WordPool>{
+      ReplyCue.agree: words(r'그러게 맞아 그렇네 그러니까 응 나도_그래 그렇지? 진짜_그래 내_말이 그런가_봐 그렇긴_해 그런_것_같아'),
+      ReplyCue.cheer: words(r'잘됐다! 잘했어! 다행이다 좋겠다! 대단하다! 부럽다 역시! 고생했어 멋지다! 축하해 잘_됐네 훌륭해!'),
+      ReplyCue.care: words(r'괜찮아? 좀_쉬어 무리하지_마 뭐_좀_먹자 힘들겠다 천천히_해 걱정_마 조심해 힘내 잠깐_앉아 물_좀_마셔 내가_도와줄게'),
+      ReplyCue.wonder: words(r'정말? 진짜? 어디서? 언제? 그래서? 설마! 어떻게? 왜? 그래? 그랬어? 그러고는? 뭐라고?'),
+      ReplyCue.answer: words(
+        r'응,_조금 아니,_괜찮아 응,_많이 그럭저럭 아니,_아직 응,_너무 조금은 별로 응,_엄청 아니,_전혀 좀_그래 응,_사실은',
+      ),
+    },
+    SentenceStyle.polite: <ReplyCue, WordPool>{
+      ReplyCue.agree: words(r'그러게요 맞아요 그렇네요 그러니까요 네 저도요 그렇죠? 정말_그래요 그런_것_같아요 그렇긴_해요'),
+      ReplyCue.cheer: words(r'잘됐네요! 잘하셨어요! 다행이에요 좋겠어요! 대단하네요! 부럽네요 역시요! 고생하셨어요 멋져요! 축하해요 훌륭해요!'),
+      ReplyCue.care: words(r'''
+        괜찮아요? 좀_쉬세요 무리하지_마세요 뭐_좀_드세요 힘드시겠어요 천천히_하세요 걱정_마세요 조심하세요 힘내세요 잠깐_앉으세요 물_좀_드세요 제가_도와드릴게요
+      '''),
+      ReplyCue.wonder: words(r'정말요? 진짜요? 어디서요? 언제요? 그래서요? 설마요! 어떻게요? 왜요? 그래요? 그랬어요? 그러고는요? 뭐라고요?'),
+      ReplyCue.answer: words(r'''
+        네,_조금요 아니요,_괜찮아요 네,_많이요 그럭저럭요 아니요,_아직요 네,_너무요 조금은요 별로요 네,_엄청요 아니요,_전혀요 좀_그래요 네,_사실은요
+      '''),
+    },
+    SentenceStyle.formal: <ReplyCue, WordPool>{
+      ReplyCue.agree: words(r'그렇습니다 맞습니다 그렇군요 저도_그렇습니다 네 그렇지요? 정말_그렇습니다 그런_것_같습니다'),
+      ReplyCue.cheer: words(r'잘됐습니다! 잘하셨습니다! 다행입니다 좋으시겠습니다! 대단합니다! 부럽습니다 고생하셨습니다 훌륭합니다! 축하합니다'),
+      ReplyCue.care: words(r'''
+        괜찮으십니까? 좀_쉬십시오 무리하지_마십시오 뭐_좀_드십시오 힘드시겠습니다 천천히_하십시오 걱정_마십시오 조심하십시오 힘내십시오 잠시_앉으십시오 제가_돕겠습니다
+      '''),
+      ReplyCue.wonder: words(r'정말입니까? 어디서요? 언제요? 그래서요? 설마요! 어떻게요? 왜_그렇습니까? 그렇습니까? 그랬습니까? 뭐라고요?'),
+      ReplyCue.answer: words(r'''
+        네,_조금요 아닙니다,_괜찮습니다 네,_많이요 그럭저럭입니다 아닙니다,_아직입니다 네,_그렇습니다 조금은요 별로요 아닙니다,_전혀요 네,_사실은_그렇습니다
+      '''),
+    },
+  },
+  listener: const SentenceSpeech(subject: ''),
   degrees: words(r'무척 아주 정말 몹시 꽤 조금 너무 한층 제법 참 유난히 사뭇 퍽 살짝 다소 상당히 매우 유독 한결 더없이 워낙 되게 엄청'),
   numeral: const SentenceNumeral(
     order: NumeralOrder.after,

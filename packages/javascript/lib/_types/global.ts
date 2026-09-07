@@ -202,6 +202,11 @@ export interface RandNicknameOptions extends RandCommonOptions {
 	/** What the nickname should be about. Default `'all'`. */
 	theme?: WordThemeOption;
 	/**
+	 * How common the noun a nickname is built around has to be. Default `'full'`,
+	 * which is every word the pools hold; the modifier in front of it is drawn as
+	 * it always was.
+	 */
+	/**
 	 * Which shapes the nicknames may take. Default `'all'`, which is every shape
 	 * the language declares, drawn by its own weights.
 	 *
@@ -618,7 +623,9 @@ export interface SentenceDetail {
 	 * reports `['검은 고양이', '잠잔다']`.
 	 *
 	 * One flat list across every sentence of the result, the same way `slots` is.
-	 * A connective a sentence opens on is not a phrase and is not in here.
+	 * A connective a sentence opens on is not a phrase and is not in here, and
+	 * neither is a line somebody answers with (`“그러게.”`, `“Really?”`), which is
+	 * written whole and is built from no phrase at all.
 	 */
 	phrases: string[];
 	/** What each phrase does in the sentence, at the same index as `phrases`. */

@@ -175,13 +175,56 @@ export const EN: SentenceLanguageData = {
 				`slept dozed fell_asleep nodded_off napped snoozed drifted_off dozed_off slumbered drowsed slept_in dropped_off nodded drifted_to_sleep snored`
 			)
 		},
+		// What somebody shows, split by what it shows: a story draws the group that
+		// matches what is true of its hero, so the hero laughs after the meal and
+		// sighs after losing the key. The last group shows nothing in particular.
+		{
+			field: 'express',
+			subject: ['creature', 'person'],
+			condition: 'content',
+			...tensed(
+				`laughs smiles hums giggles chuckles grins whistles cheers beams claps nods winks chortles brightens`,
+				`laugh smile hum giggle chuckle grin whistle cheer beam clap nod wink chortle brighten`,
+				`laughed smiled hummed giggled chuckled grinned whistled cheered beamed clapped nodded winked chortled brightened`
+			)
+		},
+		{
+			field: 'express',
+			subject: ['creature', 'person'],
+			condition: 'restless',
+			...tensed(
+				`cries sighs mutters sobs weeps groans grumbles whimpers snorts frowns sniffles fidgets paces grimaces scowls pouts fumes sulks`,
+				`cry sigh mutter sob weep groan grumble whimper snort frown sniffle fidget pace grimace scowl pout fume sulk`,
+				`cried sighed muttered sobbed wept groaned grumbled whimpered snorted frowned sniffled fidgeted paced grimaced scowled pouted fumed sulked`
+			)
+		},
+		{
+			field: 'express',
+			subject: ['creature', 'person'],
+			condition: 'tired',
+			...tensed(
+				`yawns stretches blinks slumps droops sags`,
+				`yawn stretch blink slump droop sag`,
+				`yawned stretched blinked slumped drooped sagged`
+			)
+		},
+		{
+			field: 'express',
+			subject: ['creature', 'person'],
+			condition: 'hungry',
+			...tensed(
+				`drools salivates sniffs_the_air swallows_hard gulps`,
+				`drool salivate sniff_the_air swallow_hard gulp`,
+				`drooled salivated sniffed_the_air swallowed_hard gulped`
+			)
+		},
 		{
 			field: 'express',
 			subject: ['creature', 'person'],
 			...tensed(
-				`laughs cries yawns sighs smiles hums mutters shouts giggles chuckles grins sobs weeps groans grumbles whistles whimpers snorts cheers gasps shrugs nods frowns beams sniffles sneezes hiccups claps winks blushes`,
-				`laugh cry yawn sigh smile hum mutter shout giggle chuckle grin sob weep groan grumble whistle whimper snort cheer gasp shrug nod frown beam sniffle sneeze hiccup clap wink blush`,
-				`laughed cried yawned sighed smiled hummed muttered shouted giggled chuckled grinned sobbed wept groaned grumbled whistled whimpered snorted cheered gasped shrugged nodded frowned beamed sniffled sneezed hiccuped clapped winked blushed`
+				`shouts gasps shrugs blushes squints flinches exclaims looks_up looks_round`,
+				`shout gasp shrug blush squint flinch exclaim look_up look_round`,
+				`shouted gasped shrugged blushed squinted flinched exclaimed looked_up looked_round`
 			)
 		},
 		{
@@ -917,6 +960,29 @@ export const EN: SentenceLanguageData = {
 	objectPronouns: { words: { n: words(`it`) } },
 	// A line of the hero's own opens on `I`, and `is` is `am` for it.
 	speech: { subject: 'I', head: 'am' },
+	// What somebody answers with. English has no levels, so one pool serves all.
+	replies: {
+		casual: {
+			agree: words(`
+				right true I_know so_it_is same_here indeed that's_right you're_right it_is quite_so no_doubt I_thought_so
+			`),
+			cheer: words(`
+				well_done! good_for_you! great! lucky_you nice_one wonderful! congratulations well_earned brilliant! splendid! at_last!
+			`),
+			care: words(`
+				are_you_all_right? take_a_rest don't_overdo_it let's_get_you_something_to_eat poor_you take_your_time don't_worry be_careful cheer_up sit_down_a_moment have_some_water let_me_help
+			`),
+			wonder: words(`
+				really? seriously? where? when? and_then? no_way! how? why? is_that_so? did_you_now? what_happened_next? what?
+			`),
+			answer: words(`
+				yes,_a_little no,_I'm_fine yes,_quite so-so not_yet yes,_terribly a_bit not_really yes,_very not_at_all more_or_less yes,_actually
+			`)
+		}
+	},
+	// And a question to the person beside them is `are you`, with the copula in
+	// front where the question shape puts it.
+	listener: { subject: 'you', head: 'are' },
 	// How much a state holds, in front of it: `is very tired`.
 	degrees: words(`
 		very quite rather  really truly awfully terribly pretty fairly a_little somewhat extremely deeply utterly

@@ -11,6 +11,7 @@ from randino.sentence.data._types import (
     SentenceFrame,
     SentenceLanguageData,
     SentencePart,
+    SentenceSpeech,
     SentenceTimes,
     StateGroup,
     VerbGroup,

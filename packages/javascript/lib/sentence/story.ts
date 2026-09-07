@@ -27,6 +27,7 @@ import type {
 	Condition,
 	ConnectiveKind,
 	NounClass,
+	ReplyCue,
 	SentenceLanguageData,
 	StateGroup,
 	VerbField,
@@ -39,11 +40,69 @@ import type {
 // monotonous as none. How many a telling makes is drawn between none and this.
 const JOIN_SHARE = 0.5;
 
-// How often a state sentence about a person becomes a line of their own, and how
-// many of them one telling may have. A paragraph that speaks in every other line
-// is a script, not a story.
-const VOICE_CHANCE = 40;
+// Whether anybody speaks in a telling, drawn once per telling: narrated all the
+// way through, a line or two, or a scene of speech with an answer or two in it.
+// Per telling rather than per line, so that two results are not the same amount
+// of talking twice, and a paragraph that speaks in every other line is one that
+// was drawn to.
+type VoiceMode = 'none' | 'some' | 'scene';
+
+const VOICE_MODE_WEIGHT: Record<VoiceMode, number> = { none: 30, some: 45, scene: 25 };
+
+// How often a sentence that could be a line is one, per mode, and the most lines
+// a telling may have beside the story's own allowance — a scene of speech gets
+// `SCENE_EXTRA` more, because a scene is where the talking is.
+const VOICE_CHANCE: Record<VoiceMode, number> = { none: 0, some: 40, scene: 75 };
 const VOICE_MAX = 2;
+const SCENE_EXTRA = 2;
+
+// How often a line is answered, per mode. An answer takes the place of an
+// optional step, which is what keeps the count exact. In a scene of speech the
+// hero may go on after being answered, which is how an exchange gets to be one.
+const REPLY_CHANCE: Record<VoiceMode, number> = { none: 0, some: 35, scene: 70 };
+
+// How often a hero with somebody beside them turns to that person and asks how
+// they are, where the step could be a line of their own instead.
+const ASK_CHANCE = 40;
+
+// The fields a person may report in their own words — `“열쇠를 찾았어!”`, `“I
+// went to the market.”`, `“빵을 먹었어.”` — as against the ones nobody says aloud:
+// nobody reports having laughed or having looked. Told in the past, as a report
+// of what just happened, whatever tense the story is in.
+const LINE_FIELDS: readonly VerbField[] = [
+	'go',
+	'arrive',
+	'wait',
+	'rest',
+	'search',
+	'find',
+	'take',
+	'carry',
+	'hide',
+	'make',
+	'tend',
+	'sell',
+	'buy',
+	'cook',
+	'eat',
+	'drink',
+	'lose',
+	'meet',
+	'play',
+	'move'
+];
+
+// The fields a person may answer with a remark about the thing instead of doing:
+// looking at it (`“사과가 참 달다!”`), or talking, which is about the place.
+const COMMENT_FIELDS: readonly VerbField[] = ['look', 'talk'];
+
+// What is true of the hero that somebody would ask after, or ask them about:
+// whether they are hungry, tired, restless, and the rest of it. The conditions
+// that are about where the hero is or what they hold are nobody's question.
+const ASKABLE: readonly Condition[] = ['hungry', 'full', 'tired', 'rested', 'content', 'restless'];
+
+// The conditions somebody answers with concern rather than with cheer.
+const LOW: readonly Condition[] = ['hungry', 'tired', 'restless'];
 
 /** What is true of the hero at one moment. */
 export type StoryState = ReadonlySet<Condition>;
@@ -68,12 +127,36 @@ export type Beat = {
 	/** Whether this beat is the first or the second clause of one sentence. */
 	join: 'first' | 'second' | null;
 	/**
-	 * Whether the hero says this one themselves: a state sentence quoted in the
-	 * first person — `“배고프다.”` — rather than narrated. Only a person's, only
-	 * after the first sentence, and only where the language can write it.
+	 * How this sentence is spoken, when it is:
+	 * - `line`: the hero says it themselves, in the first person — `“배고프다.”`,
+	 *   `“열쇠를 찾았어요!”`, `“시장에 가서 빵을 샀어.”`. Only a person's, and only
+	 *   where the language writes a first person. Two beats the plan joined are
+	 *   one line when both are things the hero could report.
+	 * - `comment`: the hero says something about the thing in front of them or
+	 *   the place around them — `“사과가 참 달다!”`, `“숲이 조용하네.”` — instead of
+	 *   the step's own action. In the third person, so any language can.
+	 * - `notice`: the hero says what somebody else is doing — `“새가 날아가네!”`,
+	 *   `“광수가 흥얼거려.”` — which is the `other` step told in their voice.
+	 * - `ask`: the hero asks the person beside them how they are — `“배고파?”`,
+	 *   `“Are you tired?”` — in the second person, where the language writes one.
+	 *   Always answered: `asked` is what was asked about.
+	 * - `reply`: somebody answers the line before — `“그러게.”`, `“Really?”`. Not a
+	 *   step of the story at all; `step` is the line's, kept for bookkeeping, and
+	 *   `cue` is what the answer has to fit.
+	 *
+	 * Null for a sentence the story narrates, which is most of them. Never the
+	 * first sentence, because a line needs a topic to speak.
 	 */
-	voiced: boolean;
+	voice: Voice | null;
+	/** What is being asked about, for an `ask`. Null otherwise. */
+	asked: Condition | null;
+	/** What a `reply` answers, which decides which of the language's replies fit. */
+	cue: ReplyCue | null;
+	/** Whether the sentence after this line answers it, which makes it said aloud. */
+	answered: boolean;
 };
+
+export type Voice = 'line' | 'comment' | 'notice' | 'ask' | 'reply';
 
 export type Plan = {
 	story: Story;
@@ -338,6 +421,8 @@ type Settled = {
 	before: StoryState;
 	/** What the story itself had made true by then, as against what was true at the start. */
 	given: ReadonlySet<Condition>;
+	/** Everything the telling knew before this step, for walking on from here. */
+	memory: Memory;
 };
 
 /**
@@ -354,7 +439,23 @@ function walk(
 	item: WordTheme | null,
 	prop: WordTheme | null
 ): Settled[] | null {
-	let memory: Memory = { state: new Set(story.start), given: new Set(), said: new Set() };
+	return walkFrom(data, steps, hero, item, prop, {
+		state: new Set(story.start),
+		given: new Set(),
+		said: new Set()
+	});
+}
+
+/** The same, from what a telling knew at some point rather than from the start. */
+function walkFrom(
+	data: SentenceLanguageData,
+	steps: readonly StoryStep[],
+	hero: NounClass,
+	item: WordTheme | null,
+	prop: WordTheme | null,
+	start: Memory
+): Settled[] | null {
+	let memory = start;
 	const settled: Settled[] = [];
 
 	for (const step of steps) {
@@ -364,7 +465,7 @@ function walk(
 			return null;
 		}
 
-		settled.push({ step, ...one, before: memory.state, given: memory.given });
+		settled.push({ step, ...one, before: memory.state, given: memory.given, memory });
 		memory = after(memory, step, one);
 	}
 
@@ -554,7 +655,8 @@ export function plan(
 	hero: NounClass,
 	item: WordTheme | null,
 	count: number,
-	joinable: boolean
+	joinable: boolean,
+	spoken = true
 ): Plan | null {
 	const required = story.steps.filter((step) => step.required);
 	// The prop is drawn once per telling, the way the item is drawn once per story.
@@ -582,7 +684,9 @@ export function plan(
 		// What may still go in: the story's own optional steps and the interludes,
 		// each once — or, when every one of them is in and the count is not reached,
 		// any of them a second time, because ten sentences about a bowl of soup are
-		// ten sentences whatever the soup has left to do.
+		// ten sentences whatever the soup has left to do. A second time only for a
+		// step that can happen twice: a hero who looks, waits or laughs again is
+		// still in the story, and one who comes home again never left.
 		const optional = story.steps.filter(
 			(step) =>
 				!step.required &&
@@ -753,42 +857,238 @@ export function plan(
 		}
 	}
 
-	let voiced = 0;
-	const beats: Beat[] = settled!.map((one, i) => {
-		// A person says some of what is true of them in their own words: a state
-		// sentence after the first, in a language that writes the first person, is
-		// now and then a line the story quotes rather than narrates.
-		const voice =
-			hero === 'person' &&
-			data.speech !== undefined &&
-			i > 0 &&
-			one.step.kind === 'state' &&
-			one.condition !== null &&
-			voiced < VOICE_MAX &&
-			chance(VOICE_CHANCE);
+	const voices = voicesFor(data, story, hero, item, prop, chosen, settled!, joined, spoken);
 
-		if (voice) {
-			voiced += 1;
-		}
+	settled = voices.settled;
 
-		return {
-			step: one.step,
-			field: one.field,
-			condition: one.condition,
-			before: one.before,
-			links: linksFor(i > 0 ? settled![i - 1] : null, one),
-			// A kind beside the statement is the step's own, and `trailing` is kept for
-			// the sentence that closes the result — a paragraph that trails off in the
-			// middle has not trailed off.
-			kinds: (one.step.kinds ?? []).filter(
-				(kind) => kind !== 'trailing' || i === settled!.length - 1
-			),
-			join: joined.has(i) ? 'first' : joined.has(i - 1) ? 'second' : null,
-			voiced: voice
-		};
-	});
+	const beats: Beat[] = settled!.map((one, i) => ({
+		step: one.step,
+		field: one.field,
+		condition: one.condition,
+		before: one.before,
+		links: linksFor(i > 0 ? settled![i - 1] : null, one),
+		// A kind beside the statement is the step's own, and `trailing` is kept for
+		// the sentence that closes the result — a paragraph that trails off in the
+		// middle has not trailed off.
+		kinds: (one.step.kinds ?? []).filter(
+			(kind) => kind !== 'trailing' || i === settled!.length - 1
+		),
+		join: joined.has(i) ? 'first' : joined.has(i - 1) ? 'second' : null,
+		voice: voices.voice[i],
+		asked: voices.asked[i],
+		cue: voices.cue[i],
+		answered: voices.answered[i]
+	}));
 
 	return { story, beats, prop };
+}
+
+/** What a telling's voices came to: who speaks in each sentence, and what of. */
+type Voices = {
+	voice: (Voice | null)[];
+	asked: (Condition | null)[];
+	cue: (ReplyCue | null)[];
+	answered: boolean[];
+	settled: Settled[];
+};
+
+/**
+ * Which sentences of a telling are spoken, and which of those are answered.
+ *
+ * Only a person speaks, and only after the first sentence. What they can say is
+ * what is true of them or what they just did (a field in `LINE_FIELDS`) — both
+ * in the first person, where the language writes one — what they make of the
+ * thing, the place or what somebody else is doing (a `look`, a `talk`, a scene
+ * or an `other` step, said in the third person, which any language can write),
+ * or, with somebody beside them, a question about how that somebody is. An
+ * answer takes the place of the optional step after a line, where the story can
+ * spare it and somebody is there to answer: the hero is out, or the story is
+ * about a person. A question is only asked where it can be answered.
+ *
+ * Whether anybody speaks at all is one draw per telling, so a paragraph is
+ * narrated through, quotes a line or two, or is a scene of speech — where the
+ * hero may go on after being answered, which is what an exchange is.
+ */
+function voicesFor(
+	data: SentenceLanguageData,
+	story: Story,
+	hero: NounClass,
+	item: WordTheme | null,
+	prop: WordTheme | null,
+	chosen: StoryStep[],
+	settled: Settled[],
+	joined: ReadonlySet<number>,
+	spoken: boolean
+): Voices {
+	const voice: (Voice | null)[] = settled.map(() => null);
+	const asked: (Condition | null)[] = settled.map(() => null);
+	const cue: (ReplyCue | null)[] = settled.map(() => null);
+	const answered: boolean[] = settled.map(() => false);
+
+	if (hero !== 'person' || !spoken) {
+		return { voice, asked, cue, answered, settled };
+	}
+
+	const mode = pickWeighted(
+		Object.keys(VOICE_MODE_WEIGHT) as VoiceMode[],
+		(each) => VOICE_MODE_WEIGHT[each]
+	);
+	const most = (story.lines ?? VOICE_MAX) + (mode === 'scene' ? SCENE_EXTRA : 0);
+	// Somebody to answer: the person the story is about, if it is about one.
+	const company = story.item?.includes('person') ?? false;
+	// What the hero may ask that person: a condition the language can describe a
+	// person as being in.
+	const askable = data.listener
+		? ASKABLE.filter((condition) =>
+				data.states.some(
+					(group) => group.condition === condition && group.subject.includes('person')
+				)
+			)
+		: [];
+	let lines = 0;
+
+		if (step.kind === 'state' && one.condition !== null) {
+			if (data.speech) {
+				out.push('line');
+			}
+
+			if (company && askable.length) {
+				out.push('ask');
+			}
+		}
+
+			if (one.field === 'talk' && company && askable.length) {
+				out.push('ask');
+			}
+		}
+
+		if (step.kind === 'scene') {
+			out.push('comment');
+		}
+
+		if (step.kind === 'other') {
+			out.push('notice');
+		}
+
+		return out;
+	};
+	/** What an answer to this line has to fit. */
+	const cueFor = (kind: Voice, one: Settled): ReplyCue => {
+		if (kind === 'ask') {
+			return 'answer';
+		}
+
+		if (kind === 'comment' || kind === 'notice') {
+			return 'agree';
+		}
+
+		if (one.step.kind === 'state') {
+			return one.condition !== null && LOW.includes(one.condition)
+				? pick(['care', 'care', 'agree'])
+				: pick(['cheer', 'agree']);
+		}
+
+		return one.field === 'lose' ? pick(['care', 'wonder']) : pick(['cheer', 'wonder', 'agree']);
+	};
+	/**
+	 * Whether the beat at `next` can give way to an answer: the story can spare
+	 * it, it is a whole sentence, and somebody is there to answer.
+	 */
+	const answerable = (next: number, one: Settled): boolean =>
+		data.replies !== undefined &&
+		next < settled.length &&
+		lines + 1 < most &&
+		!settled[next].step.required &&
+		whole(next) &&
+		(one.before.has('away') || company);
+
+	for (let i = 1; i < settled.length && lines < most; i += 1) {
+		const one = settled[i];
+		// Never two lines in a row from the same mouth: what follows a line is
+		// prose, or somebody else's answer — and, in a scene of speech, the hero
+		// again after that answer.
+		const after = voice[i - 1];
+
+		if (after !== null && !(mode === 'scene' && after === 'reply')) {
+			continue;
+		}
+
+		const twin = pair(i);
+
+		if (!twin && !whole(i)) {
+			continue;
+		}
+
+		const options: Voice[] = twin ? ['line'] : voicesOf(one);
+
+		if (!options.length || !chance(VOICE_CHANCE[mode])) {
+			continue;
+		}
+
+		const others = options.filter((each) => each !== 'ask');
+		const next = twin ? i + 2 : i + 1;
+		let kind: Voice | null =
+			options.includes('ask') && chance(ASK_CHANCE) ? 'ask' : others.length ? pick(others) : null;
+		let rest: Settled[] | null = null;
+
+		// A question has to be answered, so it is asked only where it can be; where
+		// it cannot, the beat is spoken some other way, or narrated.
+		if (kind === 'ask') {
+			rest = answerable(next, one)
+				? walkFrom(data, chosen.slice(next + 1), hero, item, prop, settled[next].memory)
+				: null;
+
+			if (!rest) {
+				kind = others.length ? pick(others) : null;
+			}
+		}
+
+		if (kind === null) {
+			continue;
+		}
+
+		if (kind !== 'ask' && !aside && answerable(next, one) && chance(REPLY_CHANCE[mode])) {
+			rest = walkFrom(data, chosen.slice(next + 1), hero, item, prop, settled[next].memory);
+		}
+
+		voice[i] = kind;
+		asked[i] = kind === 'ask' ? pick(askable) : null;
+
+		if (twin) {
+			voice[i + 1] = kind;
+		}
+
+		lines += 1;
+
+		if (!rest) {
+			continue;
+		}
+
+		// The line's step stands in for the answered one, so that `chosen` and
+		// `settled` stay the same length and a later answer walks on from the right
+		// place; nothing reads it back.
+		chosen[next] = one.step;
+		settled.splice(
+			next,
+			settled.length - next,
+			{
+				step: one.step,
+				field: null,
+				condition: null,
+				before: settled[next].before,
+				given: settled[next].given,
+				memory: settled[next].memory
+			},
+			...rest
+		);
+		voice[next] = 'reply';
+		cue[next] = cueFor(kind, one);
+		answered[i] = true;
+		lines += 1;
+		i = next;
+	}
+
+	return { voice, asked, cue, answered, settled };
 }
 
 /** One story out of several, by weight. */

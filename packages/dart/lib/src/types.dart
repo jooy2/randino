@@ -461,6 +461,9 @@ enum SentenceStory {
   /// The hero goes to see somebody, and they talk.
   visit,
 
+  /// A person goes out, meets somebody, and the two of them talk — the story
+  /// with the most lines in it. People only.
+  chat,
 
   /// The hero goes out, sits down somewhere, and watches what happens around
   /// them — a sparrow, a passer-by, the light changing.

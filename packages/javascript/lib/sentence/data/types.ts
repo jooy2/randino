@@ -8,7 +8,13 @@
 // allows. So the nouns are still drawn from `word/data`, and everything a
 // sentence adds to them lives here.
 
-import type { SentenceQuote, SentenceSlot, SentenceType, WordTheme } from '../../_types/global.js';
+import type {
+	SentenceQuote,
+	SentenceSlot,
+	SentenceStyle,
+	SentenceType,
+	WordTheme
+} from '../../_types/global.js';
 import type { WordAgreement, WordGender, WordPool } from '../../word/data/types.js';
 
 /**
@@ -224,6 +230,15 @@ export type VerbGroup = {
 	 * own; a group that names a slot is drawn only for a shape that has it.
 	 */
 	requires?: SentenceSlot;
+	/**
+	 * What these verbs show of the one doing them, for a story to draw them by:
+	 * `웃는다` and `콧노래한다` are what somebody `content` does, `한숨짓는다` what
+	 * somebody `restless` does, `하품한다` somebody `tired`. A story's hero laughs
+	 * after the meal and sighs after losing the key, rather than sneezing after
+	 * either. A group that shows nothing in particular leaves it out, and is what a
+	 * story falls back on when no group shows what is true of the hero just then.
+	 * Outside a story every group is drawn alike.
+	 */
 	condition?: Condition;
 	/** The verbs themselves, in the form a plain statement ends on (`달린다`, `runs`). */
 	words: WordPool;
@@ -288,6 +303,12 @@ export type ModifierGroup = {
 	 * and a tea is not, though both are edible.
 	 */
 	themes?: readonly WordTheme[];
+	/**
+	 * The fields the verb may come from, for a manner that goes with some doings
+	 * and not others: `골똘히` is how somebody looks or thinks, `성큼성큼` how they
+	 * walk, and nobody runs `골똘히` or yawns `성큼성큼`. Read for manners alone,
+	 * and left out by a group that fits any doing.
+	 */
 	/** Base forms, which `agree` reshapes in a language that inflects. */
 	words: WordPool;
 };
@@ -536,17 +557,76 @@ export type SentenceObjectPronouns = {
 };
 
 /**
- * How the hero of a story speaks for themselves, in a line the story quotes
- * rather than narrates. `subject` is what stands where the subject would: `''`
- * for a language that drops it (`“배고프다.”`), `我`, `Tôi`, `I`. `head` is the
- * copula the first person takes where a state's head changes for it — English
- * `am` beside `is`. Left out by a language whose predicates would have to change
- * for the first person, which is Spanish, Italian, German and Russian; their
- * stories are narrated all the way through.
+ * How a person speaks for themselves, or is spoken to, in a line the story
+ * quotes rather than narrates. `subject` is what stands where the subject would:
+ * `''` for a language that drops it (`“배고프다.”`, `“배고파?”`), `我`, `Tôi`, `I`,
+ * `you`, `du`. `head` is the copula that person takes where a state's head
+ * changes for them — English `am` and `are` beside `is`, German `bist` beside
+ * `ist`. `heads` is the same by the head a state group brings of its own, for a
+ * language whose copula depends on what is said: Spanish `estás` for `está` and
+ * `eres` for `es`.
+ *
+ * `speech` is the first person and `listener` the second. A language declares
+ * only what it can write: Spanish, Italian, German and Russian would have to
+ * conjugate every verb for the first person, so they declare no `speech` and
+ * their heroes report nothing in their own words — but a question to somebody is
+ * a state and a copula, which is why all nine declare a `listener`.
  */
 export type SentenceSpeech = {
 	subject: string;
 	head?: string;
+	heads?: Record<string, string>;
+};
+
+/**
+ * What an answer is answering, which is what decides which of the language's
+ * replies fit. `그러게` fits a remark and `잘됐다!` fits a piece of news, and
+ * `괜찮아?` fits somebody who just said they are tired; a pool that has to fit
+ * anything can only hold what says nothing.
+ *
+ * - `agree` goes along with a remark about the thing or the place, or with
+ *   something good that was said: `그러게`, `맞아`, `right`.
+ * - `cheer` greets a piece of good news, what was found, bought, made or done:
+ *   `잘됐다!`, `잘했어`, `well done!`.
+ * - `care` answers somebody who is tired, hungry, restless, or has lost
+ *   something: `괜찮아?`, `좀 쉬어`, `take it easy`.
+ * - `wonder` asks for more of what was just reported: `정말?`, `어디서?`,
+ *   `really?`, `and then?`.
+ * - `answer` is what somebody says when asked whether they are tired or hungry:
+ *   `응, 조금`, `아니, 괜찮아`, `yes, a little`.
+ */
+export type ReplyCue = 'agree' | 'cheer' | 'care' | 'wonder' | 'answer';
+
+/**
+ * What somebody answers a line with: `“그러게.”`, `“Really?”`, `「よかった！」`. A
+ * reply is written whole rather than built, because what it has to do is fit
+ * whatever was just said — and it is sorted by `ReplyCue` so that it does.
+ *
+ * By speech level, because a reply is spoken: Korean and Japanese write one
+ * pool per level they distinguish, and a language with no levels writes
+ * `casual` alone. A level a language does not declare falls back to the next
+ * warmer one — `formal` to `polite` to `casual` — the way the predicate forms
+ * do, and `plain` is never spoken, so it takes `casual`. A cue a level does not
+ * declare falls back to the other cues of that level.
+ *
+ * An entry closes on its own mark where it is not a statement: `잘됐다!` is
+ * exclaimed and `정말?` asked, and the generator writes the language's own
+ * terminator in place of the ASCII tag. Every other entry is a statement.
+ */
+export type SentenceReplyPools = {
+	[cue in ReplyCue]?: WordPool;
+};
+
+export type SentenceReplies = {
+	[level in Exclude<SentenceStyle, 'plain'>]?: SentenceReplyPools;
+};
+
+/**
+ * What is said whole, by speech level: a pool per level a person speaks at,
+ * with the same fallback the replies have. `plain` is never spoken.
+ */
+export type SentenceLevelPools = {
+	[level in Exclude<SentenceStyle, 'plain'>]?: WordPool;
 };
 
 /**
@@ -748,6 +828,17 @@ export type SentenceLanguageData = {
 	objectPronouns?: SentenceObjectPronouns;
 	/** How a story's hero speaks for themselves. Left out by a language that cannot write it. */
 	speech?: SentenceSpeech;
+	/**
+	 * How the hero speaks to somebody — the second person a question is asked in
+	 * (`“배고파?”`, `“Are you tired?”`). Left out by a language that cannot write it.
+	 */
+	replies?: SentenceReplies;
+	/**
+	 * How much a state holds, written in front of it: `무척`, `very`, `とても`. A
+	 * state sentence is a subject and one word otherwise, and a paragraph of
+	 * them is a list of one-word lines. A shape that carries a `degree` part is
+	 * what draws from here. Left out by a language whose state shapes carry none.
+	 */
 	degrees?: WordPool;
 	/**
 	 * The preposition a place takes where it is not the frame's own, by

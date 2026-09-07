@@ -26,7 +26,8 @@ import {
 import type { StoryStep } from '../../packages/javascript/lib/sentence/data/index.js';
 import type {
 	ModifierGroup,
-	PredicateTense
+	PredicateTense,
+	SentenceSpeech
 } from '../../packages/javascript/lib/sentence/data/types.js';
 import { KO_SURNAME_ROMAN } from '../../packages/javascript/lib/name/data/ko.js';
 import {
@@ -46,6 +47,10 @@ const pool = (source: readonly Entry[] | undefined) =>
 			);
 
 const list = (source: readonly string[] | undefined) => (source === undefined ? null : [...source]);
+
+/** A first or second person in the canonical shape, with an empty map for no heads. */
+const speech = (person: SentenceSpeech | undefined) =>
+	person ? { subject: person.subject, head: person.head ?? '', heads: person.heads ?? {} } : null;
 
 // Optional in one package and defaulted in another; written as a map of lists
 // either way, so the shapes compare.
@@ -98,7 +103,7 @@ const step = (source: StoryStep) => ({
 	needs: [...(source.needs ?? [])],
 	required: source.required ?? false,
 	link: source.link ?? '',
-	kinds: [...(source.kinds ?? [])]
+	kinds: [...(source.kinds ?? [])],
 	// Who an `other` step is about: the item, or the classes listed — one field
 	// here and two in the ports, written as two everywhere.
 	actor: source.actor === 'item' ? 'item' : '',
@@ -258,6 +263,17 @@ console.log(
 							habitual: list(data.times.habitual)
 						},
 						homes: list(data.homes),
+						replies: data.replies
+							? Object.fromEntries(
+									Object.entries(data.replies).map(([level, pools]) => [
+										level,
+										Object.fromEntries(
+											Object.entries(pools ?? {}).map(([cue, pool]) => [cue, list(pool)])
+										)
+									])
+								)
+							: null,
+						degrees: list(data.degrees),
 						connectives: Object.fromEntries(
 							Object.entries(data.connectives).map(([kind, pool]) => [kind, list(pool)])
 						),

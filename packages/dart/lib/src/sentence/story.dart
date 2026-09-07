@@ -23,11 +23,71 @@ import 'package:randino/src/types.dart';
 // monotonous as none. How many a telling makes is drawn between none and this.
 const double _joinShare = 0.5;
 
-// How often a state sentence about a person becomes a line of their own, and
-// how many of them one telling may have. A paragraph that speaks in every other
-// line is a script, not a story.
-const int _voiceChance = 40;
+// Whether anybody speaks in a telling, drawn once per telling: narrated all the
+// way through, a line or two, or a scene of speech with an answer or two in it.
+// Per telling rather than per line, so that two results are not the same amount
+// of talking twice.
+enum _VoiceMode { none, some, scene }
+
+const Map<_VoiceMode, int> _voiceModeWeight = <_VoiceMode, int>{
+  _VoiceMode.none: 30,
+  _VoiceMode.some: 45,
+  _VoiceMode.scene: 25,
+};
+
+// How often a sentence that could be a line is one, per mode, and the most
+// lines a telling may have beside the story's own allowance — a scene of speech
+// gets `_sceneExtra` more, because a scene is where the talking is.
+const Map<_VoiceMode, int> _voiceChance = <_VoiceMode, int>{
+  _VoiceMode.none: 0,
+  _VoiceMode.some: 40,
+  _VoiceMode.scene: 75,
+};
 const int _voiceMax = 2;
+const int _sceneExtra = 2;
+
+// How often a line is answered, per mode. An answer takes the place of an
+// optional step, which is what keeps the count exact. In a scene of speech the
+// hero may go on after being answered, which is how an exchange gets to be one.
+const Map<_VoiceMode, int> _replyChance = <_VoiceMode, int>{
+  _VoiceMode.none: 0,
+  _VoiceMode.some: 35,
+  _VoiceMode.scene: 70,
+};
+
+// How often a hero with somebody beside them turns to that person and asks how
+// they are, where the step could be a line of their own instead.
+const int _askChance = 40;
+
+// The fields a person may report in their own words — `“열쇠를 찾았어!”`, `“I
+// went to the market.”` — as against the ones nobody says aloud. Told in the
+// past whatever tense the story is in.
+const List<VerbField> _lineFields = <VerbField>[
+  VerbField.go,
+  VerbField.arrive,
+  VerbField.wait,
+  VerbField.rest,
+  VerbField.search,
+  VerbField.find,
+  VerbField.take,
+  VerbField.carry,
+  VerbField.hide,
+  VerbField.make,
+  VerbField.tend,
+  VerbField.sell,
+  VerbField.buy,
+  VerbField.cook,
+  VerbField.eat,
+  VerbField.drink,
+  VerbField.lose,
+  VerbField.meet,
+  VerbField.play,
+  VerbField.move,
+];
+
+// The fields a person may answer with a remark about the thing instead of
+// doing: looking at it, or talking, which is about the place.
+const List<VerbField> _commentFields = <VerbField>[VerbField.look, VerbField.talk];
 
 // What is true of the hero that somebody would ask after: whether they are
 // hungry, tired, restless, and the rest of it. The conditions that are about
@@ -40,6 +100,9 @@ const List<Condition> _askable = <Condition>[
   Condition.content,
   Condition.restless,
 ];
+
+// The conditions somebody answers with concern rather than with cheer.
+const List<Condition> _low = <Condition>[Condition.hungry, Condition.tired, Condition.restless];
 
 // The fields a step may be told twice in one story. Going, arriving, rising,
 // sleeping and getting hold of the thing happen once.
@@ -55,6 +118,29 @@ const List<VerbField> _repeatableFields = <VerbField>[
   VerbField.tend,
   VerbField.change,
 ];
+
+/// How a sentence of a story is spoken, when it is.
+enum Voice {
+  /// The hero says it themselves, in the first person: `“배고프다.”`, `“열쇠를
+  /// 찾았어요!”`. Two beats the plan joined are one line when both are things
+  /// the hero could report.
+  line,
+
+  /// The hero says something about the thing in front of them or the place
+  /// around them, in the third person, instead of the step's own action.
+  comment,
+
+  /// The hero says what somebody else is doing — `“새가 날아가네!”` — which is
+  /// the `other` step told in their voice.
+  notice,
+
+  /// The hero asks the person beside them how they are — `“배고파?”`, `“Are you
+  /// tired?”` — in the second person. Always answered.
+  ask,
+
+  /// Somebody answers the line before, which is not a step of the story at all.
+  reply,
+}
 
 /// Whether a beat is the first or the second clause of one sentence.
 enum JoinSide {
@@ -78,7 +164,10 @@ class Beat {
     required this.links,
     required this.kinds,
     required this.join,
-    required this.voiced,
+    required this.voice,
+    required this.asked,
+    required this.cue,
+    required this.answered,
   });
 
   /// The step this sentence tells.
@@ -102,10 +191,20 @@ class Beat {
   /// Whether this beat is the first or the second clause of one sentence.
   final JoinSide? join;
 
-  /// Whether the hero says this one themselves: a state sentence quoted in the
-  /// first person — `“배고프다.”` — rather than narrated. Only a person's, only
-  /// after the first sentence, and only where the language can write it.
-  final bool voiced;
+  /// How this sentence is spoken, or null for one the story narrates. Never the
+  /// first sentence, because a line needs a topic to speak. For a
+  /// [Voice.reply], [step] is the line's, kept for bookkeeping.
+  final Voice? voice;
+
+  /// What is being asked about, for a [Voice.ask]. Null otherwise.
+  final Condition? asked;
+
+  /// What a [Voice.reply] answers, which decides which of the language's
+  /// replies fit.
+  final ReplyCue? cue;
+
+  /// Whether the sentence after this line answers it, which makes it said aloud.
+  final bool answered;
 
   /// The same beat, written as a whole sentence rather than as a clause.
   Beat unjoined() => Beat(
@@ -116,7 +215,10 @@ class Beat {
     links: links,
     kinds: kinds,
     join: null,
-    voiced: voiced,
+    voice: voice,
+    asked: asked,
+    cue: cue,
+    answered: answered,
   );
 }
 
@@ -366,7 +468,7 @@ _Memory _after(_Memory memory, StoryStep step, _Settled settled) {
 }
 
 class _Walked {
-  const _Walked(this.step, this.field, this.condition, this.before, this.given);
+  const _Walked(this.step, this.field, this.condition, this.before, this.given, this.memory);
 
   final StoryStep step;
   final VerbField? field;
@@ -375,6 +477,9 @@ class _Walked {
 
   /// What the story itself had made true by then.
   final Set<Condition> given;
+
+  /// Everything the telling knew before this step, for walking on from here.
+  final _Memory memory;
 }
 
 /// Walk a sequence of steps from the story's start, settling each against the
@@ -388,8 +493,25 @@ List<_Walked>? _walk(
   NounClass hero,
   WordTheme? item,
   WordTheme? prop,
+) => _walkFrom(
+  data,
+  steps,
+  hero,
+  item,
+  prop,
+  _Memory(<Condition>{...story.start}, <Condition>{}, <Condition>{}),
+);
+
+/// The same, from what a telling knew at some point rather than from the start.
+List<_Walked>? _walkFrom(
+  SentenceLanguageData data,
+  List<StoryStep> steps,
+  NounClass hero,
+  WordTheme? item,
+  WordTheme? prop,
+  _Memory start,
 ) {
-  var memory = _Memory(<Condition>{...story.start}, <Condition>{}, <Condition>{});
+  var memory = start;
   final walked = <_Walked>[];
 
   for (final step in steps) {
@@ -397,7 +519,7 @@ List<_Walked>? _walk(
 
     if (one == null) return null;
 
-    walked.add(_Walked(step, one.field, one.condition, memory.state, memory.given));
+    walked.add(_Walked(step, one.field, one.condition, memory.state, memory.given, memory));
     memory = _after(memory, step, one);
   }
 
@@ -543,8 +665,9 @@ Plan? plan(
   NounClass hero,
   WordTheme? item,
   int count,
-  bool joinable,
-) {
+  bool joinable, [
+  bool spoken = true,
+]) {
   final required = story.steps.where((step) => step.required).toList(growable: false);
   // The prop is drawn once per telling, the way the item is drawn once per story.
   final props = propThemesFor(data, story, hero);
@@ -566,6 +689,9 @@ Plan? plan(
   // joins give way. The story's own optional steps go first, each once; then the
   // interludes, each once; then any of them again.
   bool grow(bool again) {
+    // A step goes in again only if it can happen twice: a hero who looks, waits
+    // or laughs again is still in the story, and one who comes home again never
+    // left.
     final optional = story.steps
         .where((step) => !step.required && (!chosen.contains(step) || (again && _repeatable(step))))
         .toList(growable: false);
@@ -694,24 +820,13 @@ Plan? plan(
       ..addAll(shifted);
   }
 
-  // A person says some of what is true of them in their own words: a state
-  // sentence after the first, in a language that writes the first person, is
-  // now and then a line the story quotes rather than narrates.
-  var voiced = 0;
+  final voices = _voicesFor(data, story, hero, item, prop, chosen, walked!, joined, spoken);
   final beats = <Beat>[];
+
+  walked = voices.walked;
 
   for (var i = 0; i < walked!.length; i += 1) {
     final one = walked![i];
-    final voice =
-        hero == NounClass.person &&
-        data.speech != null &&
-        i > 0 &&
-        one.step.kind == StepKind.state &&
-        one.condition != null &&
-        voiced < _voiceMax &&
-        chance(_voiceChance);
-
-    if (voice) voiced += 1;
 
     beats.add(
       Beat(
@@ -731,12 +846,231 @@ Plan? plan(
                 : joined.contains(i - 1)
                 ? JoinSide.second
                 : null,
-        voiced: voice,
+        voice: voices.voice[i],
+        asked: voices.asked[i],
+        cue: voices.cue[i],
+        answered: voices.answered[i],
       ),
     );
   }
 
   return Plan(story, beats, prop);
+}
+
+/// What a telling's voices came to: who speaks in each sentence, and what of.
+class _Voices {
+  const _Voices(this.voice, this.asked, this.cue, this.answered, this.walked);
+
+  final List<Voice?> voice;
+  final List<Condition?> asked;
+  final List<ReplyCue?> cue;
+  final List<bool> answered;
+  final List<_Walked> walked;
+}
+
+/// Which sentences of a telling are spoken, and which of those are answered.
+///
+/// Only a person speaks, and only after the first sentence. What they can say is
+/// what is true of them or what they just did (a field in `_lineFields`) — both
+/// in the first person, where the language writes one — what they make of the
+/// thing, the place or what somebody else is doing (a `look`, a `talk`, a scene
+/// or an `other` step, said in the third person, which any language can write),
+/// or, with somebody beside them, a question about how that somebody is. An
+/// answer takes the place of the optional step after a line, where the story
+/// can spare it and somebody is there to answer: the hero is out, or the story
+/// is about a person. A question is only asked where it can be answered.
+///
+/// Whether anybody speaks at all is one draw per telling, so a paragraph is
+/// narrated through, quotes a line or two, or is a scene of speech — where the
+/// hero may go on after being answered, which is what an exchange is.
+_Voices _voicesFor(
+  SentenceLanguageData data,
+  Story story,
+  NounClass hero,
+  WordTheme? item,
+  WordTheme? prop,
+  List<StoryStep> chosen,
+  List<_Walked> walked,
+  Set<int> joined,
+  bool spoken,
+) {
+  final voice = List<Voice?>.filled(walked.length, null);
+  final asked = List<Condition?>.filled(walked.length, null);
+  final cue = List<ReplyCue?>.filled(walked.length, null);
+  final answered = List<bool>.filled(walked.length, false);
+
+  if (hero != NounClass.person || !spoken) {
+    return _Voices(voice, asked, cue, answered, walked);
+  }
+
+  final mode = pickWeighted<_VoiceMode>(_VoiceMode.values, (each) => _voiceModeWeight[each]!);
+  final most = (story.lines ?? _voiceMax) + (mode == _VoiceMode.scene ? _sceneExtra : 0);
+  // Somebody to answer: the person the story is about, if it is about one.
+  final company = story.item?.contains(NounClass.person) ?? false;
+  // What the hero may ask that person: a condition the language can describe a
+  // person as being in.
+  final askable =
+      data.listener == null
+          ? const <Condition>[]
+          : _askable
+              .where(
+                (condition) => data.states.any(
+                  (group) =>
+                      group.condition == condition && group.subject.contains(NounClass.person),
+                ),
+              )
+              .toList(growable: false);
+  var lines = 0;
+
+  /// Whether this beat is a whole sentence: not one clause of a two-clause one.
+  bool whole(int i) => !joined.contains(i) && !joined.contains(i - 1);
+
+  /// Whether this beat and the one the plan joined it to are both things the
+  /// hero could report, which makes the two of them one line.
+  bool pair(int i) =>
+      joined.contains(i) &&
+      i + 1 < walked.length &&
+      reportable(walked[i]) &&
+      reportable(walked[i + 1]);
+
+  /// The ways this beat could be spoken, if any.
+  List<Voice> voicesOf(_Walked one) {
+    final step = one.step;
+    final field = one.field;
+    final out = <Voice>[];
+
+    if (step.kind == StepKind.state && one.condition != null) {
+      if (data.speech != null) out.add(Voice.line);
+      if (company && askable.isNotEmpty) out.add(Voice.ask);
+    }
+
+      if (_commentFields.contains(field) && (field == VerbField.talk || step.object != null)) {
+        out.add(Voice.comment);
+      }
+
+      if (field == VerbField.talk && company && askable.isNotEmpty) out.add(Voice.ask);
+    }
+
+    if (step.kind == StepKind.scene) out.add(Voice.comment);
+    if (step.kind == StepKind.other) out.add(Voice.notice);
+
+    return out;
+  }
+
+  /// What an answer to this line has to fit.
+  ReplyCue cueFor(Voice kind, _Walked one) {
+    if (kind == Voice.ask) return ReplyCue.answer;
+    if (kind == Voice.comment || kind == Voice.notice) return ReplyCue.agree;
+
+    final condition = one.condition;
+
+    if (one.step.kind == StepKind.state) {
+      return condition != null && _low.contains(condition)
+          ? pick(const <ReplyCue>[ReplyCue.care, ReplyCue.care, ReplyCue.agree])
+          : pick(const <ReplyCue>[ReplyCue.cheer, ReplyCue.agree]);
+    }
+
+    return one.field == VerbField.lose
+        ? pick(const <ReplyCue>[ReplyCue.care, ReplyCue.wonder])
+        : pick(const <ReplyCue>[ReplyCue.cheer, ReplyCue.wonder, ReplyCue.agree]);
+  }
+
+  /// Whether the beat at [next] can give way to an answer: the story can spare
+  /// it, it is a whole sentence, and somebody is there to answer.
+  bool answerable(int next, _Walked one) =>
+      data.replies != null &&
+      next < walked.length &&
+      lines + 1 < most &&
+      !walked[next].step.required &&
+      whole(next) &&
+      (one.before.contains(Condition.away) || company);
+
+  var i = 1;
+
+  while (i < walked.length && lines < most) {
+    final one = walked[i];
+    // Never two lines in a row from the same mouth: what follows a line is
+    // prose, or somebody else's answer — and, in a scene of speech, the hero
+    // again after that answer.
+    final after = voice[i - 1];
+
+    if (after != null && !(mode == _VoiceMode.scene && after == Voice.reply)) {
+      i += 1;
+      continue;
+    }
+
+    final twin = pair(i);
+
+    if (!twin && !whole(i)) {
+      i += 1;
+      continue;
+    }
+
+    final options = twin ? const <Voice>[Voice.line] : voicesOf(one);
+
+    if (options.isEmpty || !chance(_voiceChance[mode]!)) {
+      i += 1;
+      continue;
+    }
+
+    final others = options.where((each) => each != Voice.ask).toList(growable: false);
+    final next = twin ? i + 2 : i + 1;
+    Voice? kind =
+        options.contains(Voice.ask) && chance(_askChance)
+            ? Voice.ask
+            : others.isNotEmpty
+            ? pick(others)
+            : null;
+    List<_Walked>? rest;
+
+    // A question has to be answered, so it is asked only where it can be; where
+    // it cannot, the beat is spoken some other way, or narrated.
+    if (kind == Voice.ask) {
+      rest =
+          answerable(next, one)
+              ? _walkFrom(data, chosen.sublist(next + 1), hero, item, prop, walked[next].memory)
+              : null;
+
+      if (rest == null) kind = others.isNotEmpty ? pick(others) : null;
+    }
+
+    if (kind == null) {
+      i += 1;
+      continue;
+    }
+
+    if (kind != Voice.ask && !aside && answerable(next, one) && chance(_replyChance[mode]!)) {
+      rest = _walkFrom(data, chosen.sublist(next + 1), hero, item, prop, walked[next].memory);
+    }
+
+    voice[i] = kind;
+    asked[i] = kind == Voice.ask ? pick(askable) : null;
+
+    if (twin) voice[i + 1] = kind;
+
+    lines += 1;
+
+    if (rest == null) {
+      i += 1;
+      continue;
+    }
+
+    // The line's step stands in for the answered one, so that `chosen` and
+    // `walked` stay the same length and a later answer walks on from the right
+    // place; nothing reads it back.
+    chosen[next] = one.step;
+    walked.replaceRange(next, walked.length, <_Walked>[
+      _Walked(one.step, null, null, walked[next].before, walked[next].given, walked[next].memory),
+      ...rest,
+    ]);
+    voice[next] = Voice.reply;
+    cue[next] = cueFor(kind, one);
+    answered[i] = true;
+    lines += 1;
+    i = next + 1;
+  }
+
+  return _Voices(voice, asked, cue, answered, walked);
 }
 
 /// One story out of several, by weight.

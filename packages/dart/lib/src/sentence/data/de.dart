@@ -812,6 +812,32 @@ final SentenceLanguageData de = SentenceLanguageData(
     WordGender.f: <String>['sie'],
     WordGender.n: <String>['es'],
   },
+  replies: <SentenceStyle, Map<ReplyCue, WordPool>>{
+    SentenceStyle.casual: <ReplyCue, WordPool>{
+      ReplyCue.agree: words(r'''
+        stimmt genau eben ich_auch so_ist_es allerdings in_der_Tat richtig ganz_genau
+        das_finde_ich_auch da_ist_was_dran
+      '''),
+      ReplyCue.cheer: words(r'''
+        wie_schön! gut_gemacht! großartig! du_Glückspilz prima! Glückwunsch was_für_eine_Freude!
+        wunderbar! endlich! das_freut_mich
+      '''),
+      ReplyCue.care: words(r'''
+        alles_in_Ordnung? ruh_dich_aus übertreib_es_nicht lass_uns_etwas_essen
+        das_klingt_anstrengend lass_dir_Zeit keine_Sorge pass_auf Kopf_hoch setz_dich_kurz
+        trink_etwas_Wasser ich_helfe_dir
+      '''),
+      ReplyCue.wonder: words(r"""
+        wirklich? im_Ernst? wo? wann? und_dann? das_gibt's_nicht! wie? warum? ach_ja? und_danach?
+        was_ist_passiert? was?
+      """),
+      ReplyCue.answer: words(r'''
+        ja,_ein_bisschen nein,_alles_gut ja,_ziemlich geht_so nein,_noch_nicht ja,_sehr ein_wenig
+        nicht_wirklich ja,_total nein,_gar_nicht so_lala ja,_ehrlich_gesagt
+      '''),
+    },
+  },
+  listener: const SentenceSpeech(subject: 'du', head: 'bist'),
   degrees: words(r'sehr ziemlich wirklich ganz recht etwas äußerst ungemein reichlich furchtbar'),
   calendar: SentenceCalendar(
     date: 'D. MMMM Y',

@@ -1790,6 +1790,36 @@ final SentenceLanguageData ja = SentenceLanguageData(
     },
   ),
   speech: const SentenceSpeech(subject: ''),
+  replies: <SentenceStyle, Map<ReplyCue, WordPool>>{
+    SentenceStyle.casual: <ReplyCue, WordPool>{
+      ReplyCue.agree: words(r'そうだね そうだよね 私も だよね たしかに そっか なるほど そうそう うん ほんとだね'),
+      ReplyCue.cheer: words(r'よかった! やったね! すごい! いいなあ よくやった さすが! おめでとう おつかれ 最高! えらい!'),
+      ReplyCue.care: words(r'''
+        大丈夫? 少し休んで 無理しないで 何か食べよう 大変だね ゆっくりでいいよ 心配しないで 気をつけて 元気出して ちょっと座って 水飲んで 手伝うよ
+      '''),
+      ReplyCue.wonder: words(r'本当? まじで? どこで? いつ? それで? まさか! どうやって? どうして? そう? そうなの? それから? なんて?'),
+      ReplyCue.answer: words(r'''
+        うん、少し ううん、大丈夫 うん、かなり まあまあ ううん、まだ うん、すごく ちょっとね あんまり うん、とても ううん、全然 まあね うん、実は
+      '''),
+    },
+    SentenceStyle.polite: <ReplyCue, WordPool>{
+      ReplyCue.agree: words(r'そうですね そうですよね 私もです たしかに なるほど はい 本当ですね そうなんですね'),
+      ReplyCue.cheer: words(r'''
+        よかったですね! やりましたね! すごいですね! いいですね よくやりましたね さすがですね! おめでとうございます お疲れさまでした 最高ですね!
+      '''),
+      ReplyCue.care: words(r'''
+        大丈夫ですか? 少し休んでください 無理しないでください 何か食べましょう 大変ですね ゆっくりでいいですよ 心配しないでください 気をつけてください 元気を出してください
+        少し座ってください 水を飲んでください 手伝いますよ
+      '''),
+      ReplyCue.wonder: words(r'''
+        本当ですか? どこでですか? いつですか? それで? まさか! どうやって? どうしてですか? そうですか? そうなんですか? それから? なんですって?
+      '''),
+      ReplyCue.answer: words(r'''
+        はい、少し いいえ、大丈夫です はい、かなり まあまあです いいえ、まだです はい、とても 少しだけ あまり はい、すごく いいえ、全然 まあ、そうですね はい、実は
+      '''),
+    },
+  },
+  listener: const SentenceSpeech(subject: ''),
   degrees: words(r'とても すごく かなり 少し 本当に ずいぶん 実に なんとも ひどく やけに 大変 相当 ちょっと なかなか 割と 極めて'),
   numeral: const SentenceNumeral(
     order: NumeralOrder.after,

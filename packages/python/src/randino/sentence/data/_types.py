@@ -547,6 +547,33 @@ class SentenceSpeech:
 
     subject: str
     head: str | None = None
+    heads: Mapping[str, str] | None = None
+    """The same by the head a state group brings of its own, for a language whose copula
+    depends on what is said: Spanish `estás` for `está` and `eres` for `es`."""
+
+
+ReplyCue = Literal["agree", "cheer", "care", "wonder", "answer"]
+"""What an answer is answering, which is what decides which of the language's replies fit.
+
+`"agree"` goes along with a remark, or with something good that was said (`그러게`,
+`맞아`, `right`); `"cheer"` greets a piece of good news (`잘됐다!`, `well done!`);
+`"care"` answers somebody who is tired, hungry, restless, or has lost something
+(`괜찮아?`, `take it easy`); `"wonder"` asks for more of what was just reported
+(`정말?`, `어디서?`, `and then?`); `"answer"` is what somebody says when asked whether
+they are tired or hungry (`응, 조금`, `yes, a little`).
+"""
+
+SentenceReplies = Mapping[str, Mapping[str, WordPool]]
+"""What somebody answers a line with, by speech level and by what it answers.
+
+A reply is written whole rather than built, because what it has to do is fit whatever
+was just said — and it is sorted by `ReplyCue` so that it does. Keyed by `"casual"`,
+`"polite"` and `"formal"`, then by cue; a language with no levels writes `"casual"`
+alone, a level a language does not declare falls back to the next warmer one, and a cue a
+level does not declare falls back to the other cues of that level. An entry closes on
+its own ASCII mark where it is not a statement — `잘됐다!` is exclaimed and `정말?`
+asked — and the generator writes the language's own terminator in its place.
+"""
 
 
 ConnectiveKind = Literal["additive", "temporal", "contrastive", "causal"]
@@ -815,6 +842,19 @@ class SentenceLanguageData:
 
     speech: SentenceSpeech | None = None
     """How a story's hero speaks for themselves. None for a language that cannot write it."""
+
+    replies: SentenceReplies | None = None
+    """What somebody answers a line with, by speech level and by what it answers.
+
+    None for a language that writes no exchange, whose stories quote a line and never an
+    answer.
+    """
+
+    listener: SentenceSpeech | None = None
+    """How the hero speaks to somebody — the second person a question is asked in.
+
+    `“배고파?”`, `“Are you tired?”`. None for a language that cannot write it.
+    """
 
     degrees: WordPool | None = None
     """How much a state holds, written in front of it: `무척`, `very`, `とても`.
