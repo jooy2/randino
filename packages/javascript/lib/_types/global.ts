@@ -314,6 +314,7 @@ export type SentenceSlot =
 	| 'destination'
 	| 'time'
 	| 'manner'
+	| 'degree'
 	| 'quantity'
 	| 'money'
 	| 'date'

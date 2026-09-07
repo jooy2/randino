@@ -959,6 +959,22 @@ VI = SentenceLanguageData(
         SentenceFrame(
             (
                 SentencePart("subject", modifiable=True),
+                SentencePart("degree"),
+                SentencePart("state"),
+            ),
+            9,
+        ),
+        SentenceFrame(
+            (
+                SentencePart("time", tail=","),
+                SentencePart("subject", modifiable=True),
+                SentencePart("state", head="rất"),
+            ),
+            5,
+        ),
+        SentenceFrame(
+            (
+                SentencePart("subject", modifiable=True),
                 SentencePart("verb"),
                 SentencePart("manner"),
             ),

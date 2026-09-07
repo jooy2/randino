@@ -636,6 +636,8 @@ export const RU: SentenceLanguageData = {
 		ага, ого, увы, ну, вот_так, батюшки_светы, силы_небесные, вот_те_на, гляди_ка, поди_ж_ты, ишь,
 	`),
 	pronouns: { m: words(`он`), f: words(`она`), n: words(`оно`) },
+	// How much a state holds, in front of it: `очень устала`.
+	degrees: words(`очень довольно слишком весьма немного совсем крайне чрезвычайно ужасно слегка`),
 	// An object named once is a pronoun the next time, where the object stood:
 	// `сварил колбасу и съел её`.
 	objectPronouns: { words: { m: words(`его`), f: words(`её`), n: words(`его`) } },
@@ -658,6 +660,16 @@ export const RU: SentenceLanguageData = {
 				{ slot: 'state', pastHead: 'был' }
 			],
 			weight: 20
+		},
+		// A state with how much of it: `Лиса очень тихая`, `Лиса была очень тихой`.
+		// The `был` of the past moves in front of the degree, agreed as it was.
+		{
+			parts: [
+				{ slot: 'subject', modifiable: true },
+				{ slot: 'degree' },
+				{ slot: 'state', pastHead: 'был' }
+			],
+			weight: 9
 		},
 		{
 			parts: [{ slot: 'time' }, { slot: 'subject', modifiable: true }, { slot: 'verb' }],

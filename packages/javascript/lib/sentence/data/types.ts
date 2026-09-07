@@ -747,6 +747,7 @@ export type SentenceLanguageData = {
 	objectPronouns?: SentenceObjectPronouns;
 	/** How a story's hero speaks for themselves. Left out by a language that cannot write it. */
 	speech?: SentenceSpeech;
+	degrees?: WordPool;
 	/**
 	 * The preposition a place takes where it is not the frame's own, by
 	 * preposition: English `on the balcony`, `at the market`, `under the sky`

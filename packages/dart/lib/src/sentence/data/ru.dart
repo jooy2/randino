@@ -828,6 +828,7 @@ final SentenceLanguageData ru = SentenceLanguageData(
       WordGender.n: <String>['его'],
     },
   ),
+  degrees: words(r'очень довольно слишком весьма немного совсем крайне чрезвычайно ужасно слегка'),
   frames: const <SentenceFrame>[
     SentenceFrame(<SentencePart>[
       SentencePart(SentenceSlot.subject, modifiable: true),
@@ -842,6 +843,11 @@ final SentenceLanguageData ru = SentenceLanguageData(
       SentencePart(SentenceSlot.subject, modifiable: true),
       SentencePart(SentenceSlot.state, pastHead: 'был'),
     ], 20),
+    SentenceFrame(<SentencePart>[
+      SentencePart(SentenceSlot.subject, modifiable: true),
+      SentencePart(SentenceSlot.degree),
+      SentencePart(SentenceSlot.state, pastHead: 'был'),
+    ], 9),
     SentenceFrame(<SentencePart>[
       SentencePart(SentenceSlot.time),
       SentencePart(SentenceSlot.subject, modifiable: true),

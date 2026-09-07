@@ -1940,6 +1940,22 @@ EN = SentenceLanguageData(
         SentenceFrame(
             (
                 SentencePart("subject", modifiable=True),
+                SentencePart("degree"),
+                SentencePart("state", head="is", past_head="was"),
+            ),
+            9,
+        ),
+        SentenceFrame(
+            (
+                SentencePart("time", tail=","),
+                SentencePart("subject", modifiable=True),
+                SentencePart("state", head="is", past_head="was"),
+            ),
+            5,
+        ),
+        SentenceFrame(
+            (
+                SentencePart("subject", modifiable=True),
                 SentencePart("verb"),
                 SentencePart("manner"),
             ),
@@ -2022,6 +2038,15 @@ EN = SentenceLanguageData(
                 SentencePart("state"),
             ),
             14,
+            mood="question",
+        ),
+        SentenceFrame(
+            (
+                SentencePart("subject", head="is", past_head="was", modifiable=True),
+                SentencePart("degree"),
+                SentencePart("state"),
+            ),
+            6,
             mood="question",
         ),
         SentenceFrame(

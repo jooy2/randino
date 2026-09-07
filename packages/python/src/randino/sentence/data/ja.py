@@ -2034,6 +2034,22 @@ JA = SentenceLanguageData(
         ),
         SentenceFrame(
             (
+                SentencePart("subject", tail="は", modifiable=True),
+                SentencePart("degree"),
+                SentencePart("state"),
+            ),
+            9,
+        ),
+        SentenceFrame(
+            (
+                SentencePart("time"),
+                SentencePart("subject", tail="は", modifiable=True),
+                SentencePart("state"),
+            ),
+            5,
+        ),
+        SentenceFrame(
+            (
                 SentencePart("subject", tail="が", modifiable=True),
                 SentencePart("manner"),
                 SentencePart("verb"),
@@ -2109,6 +2125,16 @@ JA = SentenceLanguageData(
                 SentencePart("state"),
             ),
             14,
+            mood="question",
+            tag="か",
+        ),
+        SentenceFrame(
+            (
+                SentencePart("subject", tail="は", modifiable=True),
+                SentencePart("degree"),
+                SentencePart("state"),
+            ),
+            6,
             mood="question",
             tag="か",
         ),

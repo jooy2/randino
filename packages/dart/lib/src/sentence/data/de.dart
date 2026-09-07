@@ -774,6 +774,7 @@ final SentenceLanguageData de = SentenceLanguageData(
     WordGender.f: <String>['sie'],
     WordGender.n: <String>['es'],
   },
+  degrees: words(r'sehr ziemlich wirklich ganz recht etwas äußerst ungemein reichlich furchtbar'),
   calendar: SentenceCalendar(
     date: 'D. MMMM Y',
     months: words(r'''
@@ -820,6 +821,16 @@ final SentenceLanguageData de = SentenceLanguageData(
       SentencePart(SentenceSlot.state, head: 'ist', pastHead: 'war'),
     ], 20),
     SentenceFrame(<SentencePart>[
+      SentencePart(SentenceSlot.subject, modifiable: true),
+      SentencePart(SentenceSlot.degree),
+      SentencePart(SentenceSlot.state, head: 'ist', pastHead: 'war'),
+    ], 9),
+    SentenceFrame(<SentencePart>[
+      SentencePart(SentenceSlot.time),
+      SentencePart(SentenceSlot.subject, head: 'ist', pastHead: 'war', modifiable: true),
+      SentencePart(SentenceSlot.state),
+    ], 5),
+    SentenceFrame(<SentencePart>[
       SentencePart(SentenceSlot.time),
       SentencePart(SentenceSlot.verb),
       SentencePart(SentenceSlot.subject, modifiable: true),
@@ -864,6 +875,15 @@ final SentenceLanguageData de = SentenceLanguageData(
         SentencePart(SentenceSlot.state),
       ],
       18,
+      mood: SentenceMood.question,
+    ),
+    SentenceFrame(
+      <SentencePart>[
+        SentencePart(SentenceSlot.subject, head: 'ist', pastHead: 'war', modifiable: true),
+        SentencePart(SentenceSlot.degree),
+        SentencePart(SentenceSlot.state),
+      ],
+      6,
       mood: SentenceMood.question,
     ),
   ],

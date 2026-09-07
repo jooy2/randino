@@ -237,6 +237,9 @@ def pool_for(language: WordLanguage, slot: SentenceSlot) -> set[str]:
     if slot == "time":
         return set(times_of(data))
 
+    if slot == "degree":
+        return set(data.degrees or ())
+
     return {
         plain(language, word) for theme in WORD_THEMES for word in WORD_DATA[language].nouns[theme]
     }
@@ -392,7 +395,7 @@ def test_the_mixed_language_uses_every_language_it_knows() -> None:
 
 def test_every_phrase_is_written_out_of_the_languages_own_pools() -> None:
     for language in WORD_LANGUAGES:
-        predicates: tuple[SentenceSlot, ...] = ("verb", "state", "manner", "time")
+        predicates: tuple[SentenceSlot, ...] = ("verb", "state", "manner", "time", "degree")
         fixed: dict[SentenceSlot, set[str]] = {
             slot: pool_for(language, slot) for slot in predicates
         }

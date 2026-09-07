@@ -1042,6 +1042,13 @@ _Requirement _classify(WordLanguage language, String word) {
     slots.add(SentenceSlot.time);
   }
 
+  final degree = data.degrees == null ? null : _entryOf(data.degrees!, word);
+
+  if (degree != null) {
+    written = degree;
+    slots.add(SentenceSlot.degree);
+  }
+
   String? modifier;
 
   for (final group in data.modifiers) {
@@ -1310,6 +1317,8 @@ Map<SentenceSlot, LengthRange> _slotBounds(WordLanguage language) {
       for (final group in data.states) ..._predicatePools(group.words, group.forms, group.past),
     ]),
     SentenceSlot.manner: _span(<WordPool>[for (final group in data.manners) group.words]),
+    SentenceSlot.degree:
+        data.degrees == null ? const LengthRange(1, 1) : _span(<WordPool>[data.degrees!]),
     SentenceSlot.time: _span(_timePools(data)),
   };
 

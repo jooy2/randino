@@ -845,6 +845,14 @@ RU = SentenceLanguageData(
         ),
         SentenceFrame(
             (
+                SentencePart("subject", modifiable=True),
+                SentencePart("degree"),
+                SentencePart("state", past_head="был"),
+            ),
+            9,
+        ),
+        SentenceFrame(
+            (
                 SentencePart("time"),
                 SentencePart("subject", modifiable=True),
                 SentencePart("verb"),

@@ -3483,6 +3483,7 @@ final SentenceLanguageData ko = SentenceLanguageData(
     },
   ),
   speech: const SentenceSpeech(subject: ''),
+  degrees: words(r'무척 아주 정말 몹시 꽤 조금 너무 한층 제법 참 유난히 사뭇 퍽 살짝 다소 상당히 매우 유독 한결 더없이 워낙 되게 엄청'),
   numeral: const SentenceNumeral(
     order: NumeralOrder.after,
     counters: <NounClass, String>{
@@ -3623,6 +3624,16 @@ final SentenceLanguageData ko = SentenceLanguageData(
       SentencePart(SentenceSlot.state),
     ], 12),
     SentenceFrame(<SentencePart>[
+      SentencePart(SentenceSlot.subject, tail: '는', tailAlt: '은', modifiable: true),
+      SentencePart(SentenceSlot.degree),
+      SentencePart(SentenceSlot.state),
+    ], 9),
+    SentenceFrame(<SentencePart>[
+      SentencePart(SentenceSlot.time),
+      SentencePart(SentenceSlot.subject, tail: '는', tailAlt: '은', modifiable: true),
+      SentencePart(SentenceSlot.state),
+    ], 5),
+    SentenceFrame(<SentencePart>[
       SentencePart(SentenceSlot.subject, tail: '가', tailAlt: '이', modifiable: true),
       SentencePart(SentenceSlot.manner),
       SentencePart(SentenceSlot.verb),
@@ -3686,6 +3697,15 @@ final SentenceLanguageData ko = SentenceLanguageData(
         SentencePart(SentenceSlot.state),
       ],
       14,
+      mood: SentenceMood.question,
+    ),
+    SentenceFrame(
+      <SentencePart>[
+        SentencePart(SentenceSlot.subject, tail: '는', tailAlt: '은', modifiable: true),
+        SentencePart(SentenceSlot.degree),
+        SentencePart(SentenceSlot.state),
+      ],
+      6,
       mood: SentenceMood.question,
     ),
     SentenceFrame(

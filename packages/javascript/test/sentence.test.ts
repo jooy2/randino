@@ -462,6 +462,10 @@ function poolFor(language: WordLanguage, slot: SentenceSlot): Set<string> {
 		]);
 	}
 
+	if (slot === 'degree') {
+		return new Set(data.degrees ?? []);
+	}
+
 	return new Set(
 		WORD_THEMES.flatMap((theme) => [...wordData.nouns[theme]]).map((word) => plain(language, word))
 	);
@@ -643,7 +647,7 @@ describe('Sentence', () => {
 	it('every phrase is written out of the language`s own pools', () => {
 		for (const language of WORD_LANGUAGES) {
 			const fixed = new Map(
-				(['verb', 'state', 'manner', 'time'] as SentenceSlot[]).map((slot) => [
+				(['verb', 'state', 'manner', 'time', 'degree'] as SentenceSlot[]).map((slot) => [
 					slot,
 					poolFor(language, slot)
 				])

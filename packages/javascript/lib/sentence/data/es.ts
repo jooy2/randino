@@ -808,6 +808,8 @@ export const ES: SentenceLanguageData = {
 	// Spanish carries its subject in the verb ending, so a second sentence about
 	// the same thing writes no pronoun at all.
 	pronouns: { n: [''] },
+	// How much a state holds, in front of it: `está muy cansado`.
+	degrees: words(`muy bastante un_poco realmente algo demasiado sumamente verdaderamente`),
 	// An object named once is a clitic the next time, in front of the verb and
 	// agreeing with the noun: `cocinó la salchicha y la comió`.
 	objectPronouns: { words: { m: words(`lo`), f: words(`la`) }, clitic: true },
@@ -936,6 +938,25 @@ export const ES: SentenceLanguageData = {
 				{ slot: 'state', head: 'es', pastHead: 'era' }
 			],
 			weight: 12
+		},
+		// A state with how much of it, and one with when: `El gato está muy cansado`,
+		// `Por la mañana, el gato estaba cansado`. The copula moves in front of the
+		// degree, whichever one the group brings.
+		{
+			parts: [
+				{ slot: 'subject', modifiable: true },
+				{ slot: 'degree' },
+				{ slot: 'state', head: 'es', pastHead: 'era' }
+			],
+			weight: 9
+		},
+		{
+			parts: [
+				{ slot: 'time', tail: ',' },
+				{ slot: 'subject', modifiable: true },
+				{ slot: 'state', head: 'es', pastHead: 'era' }
+			],
+			weight: 5
 		},
 		{
 			parts: [{ slot: 'subject', modifiable: true }, { slot: 'verb' }, { slot: 'manner' }],

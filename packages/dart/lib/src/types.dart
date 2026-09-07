@@ -330,6 +330,9 @@ enum SentenceSlot {
   /// How it is done: `조용히`.
   manner,
 
+  /// How much a state holds, in front of it: `무척`, `very`.
+  degree,
+
   /// How many of something: `사과 12개`.
   ///
   /// A noun phrase with a number and the counter its kind takes.

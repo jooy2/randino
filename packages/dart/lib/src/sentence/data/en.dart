@@ -1883,6 +1883,16 @@ final SentenceLanguageData en = SentenceLanguageData(
     ], 12),
     SentenceFrame(<SentencePart>[
       SentencePart(SentenceSlot.subject, modifiable: true),
+      SentencePart(SentenceSlot.degree),
+      SentencePart(SentenceSlot.state, head: 'is', pastHead: 'was'),
+    ], 9),
+    SentenceFrame(<SentencePart>[
+      SentencePart(SentenceSlot.time, tail: ','),
+      SentencePart(SentenceSlot.subject, modifiable: true),
+      SentencePart(SentenceSlot.state, head: 'is', pastHead: 'was'),
+    ], 5),
+    SentenceFrame(<SentencePart>[
+      SentencePart(SentenceSlot.subject, modifiable: true),
       SentencePart(SentenceSlot.verb),
       SentencePart(SentenceSlot.manner),
     ], 10),
@@ -1945,6 +1955,15 @@ final SentenceLanguageData en = SentenceLanguageData(
         SentencePart(SentenceSlot.state),
       ],
       14,
+      mood: SentenceMood.question,
+    ),
+    SentenceFrame(
+      <SentencePart>[
+        SentencePart(SentenceSlot.subject, head: 'is', pastHead: 'was', modifiable: true),
+        SentencePart(SentenceSlot.degree),
+        SentencePart(SentenceSlot.state),
+      ],
+      6,
       mood: SentenceMood.question,
     ),
     SentenceFrame(

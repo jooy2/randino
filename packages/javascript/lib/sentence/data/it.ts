@@ -818,6 +818,10 @@ export const IT: SentenceLanguageData = {
 	`),
 	// Pro-drop, the same as Spanish: `esso` exists and nobody writes it.
 	pronouns: { n: [''] },
+	// How much a state holds, in front of it: `è molto stanco`.
+	degrees: words(
+		`molto abbastanza un_po' davvero proprio piuttosto assai parecchio decisamente alquanto`
+	),
 	// An object named once is a clitic the next time, in front of the verb and
 	// agreeing with the noun: `cucinò la salsiccia e la mangiò`.
 	objectPronouns: { words: { m: words(`lo`), f: words(`la`) }, clitic: true },
@@ -950,6 +954,24 @@ export const IT: SentenceLanguageData = {
 				{ slot: 'state', head: 'è', pastHead: 'era' }
 			],
 			weight: 12
+		},
+		// A state with how much of it, and one with when: `Il gatto è molto stanco`,
+		// `La mattina, il gatto era stanco`. The copula moves in front of the degree.
+		{
+			parts: [
+				{ slot: 'subject', modifiable: true },
+				{ slot: 'degree' },
+				{ slot: 'state', head: 'è', pastHead: 'era' }
+			],
+			weight: 9
+		},
+		{
+			parts: [
+				{ slot: 'time', tail: ',' },
+				{ slot: 'subject', modifiable: true },
+				{ slot: 'state', head: 'è', pastHead: 'era' }
+			],
+			weight: 5
 		},
 		{
 			parts: [{ slot: 'subject', modifiable: true }, { slot: 'verb' }, { slot: 'manner' }],

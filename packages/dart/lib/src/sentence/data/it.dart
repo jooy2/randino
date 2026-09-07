@@ -1206,6 +1206,9 @@ final SentenceLanguageData it = SentenceLanguageData(
     },
     clitic: true,
   ),
+  degrees: words(r"""
+    molto abbastanza un_po' davvero proprio piuttosto assai parecchio decisamente alquanto
+  """),
   numeral: const SentenceNumeral(
     order: NumeralOrder.before,
     counters: <NounClass, String>{},
@@ -1303,6 +1306,16 @@ final SentenceLanguageData it = SentenceLanguageData(
       SentencePart(SentenceSlot.subject, modifiable: true),
       SentencePart(SentenceSlot.state, head: 'è', pastHead: 'era'),
     ], 12),
+    SentenceFrame(<SentencePart>[
+      SentencePart(SentenceSlot.subject, modifiable: true),
+      SentencePart(SentenceSlot.degree),
+      SentencePart(SentenceSlot.state, head: 'è', pastHead: 'era'),
+    ], 9),
+    SentenceFrame(<SentencePart>[
+      SentencePart(SentenceSlot.time, tail: ','),
+      SentencePart(SentenceSlot.subject, modifiable: true),
+      SentencePart(SentenceSlot.state, head: 'è', pastHead: 'era'),
+    ], 5),
     SentenceFrame(<SentencePart>[
       SentencePart(SentenceSlot.subject, modifiable: true),
       SentencePart(SentenceSlot.verb),

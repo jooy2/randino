@@ -1041,6 +1041,10 @@ export const KO: SentenceLanguageData = {
 	// And 그것 is a thing: a person and an animal are referred to by leaving the
 	// subject out.
 	pronounless: ['person', 'creature'],
+	// How much a state holds, in front of it: `무척 피곤하다`.
+	degrees: words(`
+		무척 아주 정말 몹시 꽤 조금 너무 한층 제법 참 유난히 사뭇 퍽 살짝 다소 상당히 매우 유독 한결 더없이 워낙 되게 엄청
+	`),
 	// Korean counts anything, because a classifier is what makes a noun countable:
 	// `가지` turns an abstraction into kinds of it. The counter is spaced off the
 	// number, which is what 한글 맞춤법 prescribes as the default.
@@ -1187,6 +1191,25 @@ export const KO: SentenceLanguageData = {
 			parts: [{ slot: 'subject', tail: '는', tailAlt: '은', modifiable: true }, { slot: 'state' }],
 			weight: 12
 		},
+		// A state with how much of it in front, and one with when: `여우는 무척
+		// 피곤하다`, `저녁에 여우는 피곤했다`. A state sentence is a subject and one
+		// word otherwise, and a paragraph of those is a list.
+		{
+			parts: [
+				{ slot: 'subject', tail: '는', tailAlt: '은', modifiable: true },
+				{ slot: 'degree' },
+				{ slot: 'state' }
+			],
+			weight: 9
+		},
+		{
+			parts: [
+				{ slot: 'time' },
+				{ slot: 'subject', tail: '는', tailAlt: '은', modifiable: true },
+				{ slot: 'state' }
+			],
+			weight: 5
+		},
 		{
 			parts: [
 				{ slot: 'subject', tail: '가', tailAlt: '이', modifiable: true },
@@ -1268,6 +1291,15 @@ export const KO: SentenceLanguageData = {
 		{
 			parts: [{ slot: 'subject', tail: '는', tailAlt: '은', modifiable: true }, { slot: 'state' }],
 			weight: 14,
+			mood: 'question'
+		},
+		{
+			parts: [
+				{ slot: 'subject', tail: '는', tailAlt: '은', modifiable: true },
+				{ slot: 'degree' },
+				{ slot: 'state' }
+			],
+			weight: 6,
 			mood: 'question'
 		},
 		{

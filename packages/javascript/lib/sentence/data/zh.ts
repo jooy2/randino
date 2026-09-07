@@ -660,6 +660,8 @@ export const ZH: SentenceLanguageData = {
 	objectPronouns: { words: { n: [''] } },
 	// A line of the hero's own opens on 我.
 	speech: { subject: '我' },
+	// How much a state holds, in front of it, standing where 很 stands: `狮子非常勇敢`.
+	degrees: words(`非常 特别 真 有点 相当 十分 挺 极其 格外 稍微 蛮 分外`),
 	// 它 is a thing: a person is referred to by leaving the subject out, and an
 	// animal is left out too, because the stories it is in read that way.
 	pronounless: ['person', 'creature'],
@@ -787,6 +789,20 @@ export const ZH: SentenceLanguageData = {
 			],
 			weight: 12
 		},
+		// A state with how much of it, and one with when: `狮子非常勇敢`, `傍晚狮子很累`.
+		// The degree stands where 很 stood, so the shape writes no 很 of its own.
+		{
+			parts: [{ slot: 'subject', modifiable: true }, { slot: 'degree' }, { slot: 'state' }],
+			weight: 9
+		},
+		{
+			parts: [
+				{ slot: 'time' },
+				{ slot: 'subject', modifiable: true },
+				{ slot: 'state', head: '很' }
+			],
+			weight: 5
+		},
 		{
 			parts: [{ slot: 'subject', modifiable: true }, { slot: 'manner' }, { slot: 'verb' }],
 			weight: 10
@@ -855,6 +871,12 @@ export const ZH: SentenceLanguageData = {
 				{ slot: 'state', head: '很' }
 			],
 			weight: 14,
+			mood: 'question',
+			tag: '吗'
+		},
+		{
+			parts: [{ slot: 'subject', modifiable: true }, { slot: 'degree' }, { slot: 'state' }],
+			weight: 6,
 			mood: 'question',
 			tag: '吗'
 		},

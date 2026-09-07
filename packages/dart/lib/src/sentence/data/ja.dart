@@ -1715,6 +1715,7 @@ final SentenceLanguageData ja = SentenceLanguageData(
     },
   ),
   speech: const SentenceSpeech(subject: ''),
+  degrees: words(r'とても すごく かなり 少し 本当に ずいぶん 実に なんとも ひどく やけに 大変 相当 ちょっと なかなか 割と 極めて'),
   numeral: const SentenceNumeral(
     order: NumeralOrder.after,
     counters: <NounClass, String>{
@@ -1829,6 +1830,16 @@ final SentenceLanguageData ja = SentenceLanguageData(
       SentencePart(SentenceSlot.state),
     ], 12),
     SentenceFrame(<SentencePart>[
+      SentencePart(SentenceSlot.subject, tail: 'は', modifiable: true),
+      SentencePart(SentenceSlot.degree),
+      SentencePart(SentenceSlot.state),
+    ], 9),
+    SentenceFrame(<SentencePart>[
+      SentencePart(SentenceSlot.time),
+      SentencePart(SentenceSlot.subject, tail: 'は', modifiable: true),
+      SentencePart(SentenceSlot.state),
+    ], 5),
+    SentenceFrame(<SentencePart>[
       SentencePart(SentenceSlot.subject, tail: 'が', modifiable: true),
       SentencePart(SentenceSlot.manner),
       SentencePart(SentenceSlot.verb),
@@ -1887,6 +1898,16 @@ final SentenceLanguageData ja = SentenceLanguageData(
         SentencePart(SentenceSlot.state),
       ],
       14,
+      mood: SentenceMood.question,
+      tag: 'か',
+    ),
+    SentenceFrame(
+      <SentencePart>[
+        SentencePart(SentenceSlot.subject, tail: 'は', modifiable: true),
+        SentencePart(SentenceSlot.degree),
+        SentencePart(SentenceSlot.state),
+      ],
+      6,
       mood: SentenceMood.question,
       tag: 'か',
     ),

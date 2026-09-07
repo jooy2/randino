@@ -705,6 +705,8 @@ export const VI: SentenceLanguageData = {
 	objectPronouns: { words: { n: [''] } },
 	// A line of the hero's own opens on tôi.
 	speech: { subject: 'Tôi' },
+	// How much a state holds, in front of it, standing where `rất` stands: `con mèo khá mệt`.
+	degrees: words(`khá hơi thật cực_kỳ vô_cùng hết_sức thật_là khá_là quá_là siêu`),
 	// nó is a thing, and rude of a person: a person is referred to by leaving the
 	// subject out. An animal may be nó.
 	pronounless: ['person'],
@@ -841,6 +843,20 @@ export const VI: SentenceLanguageData = {
 				{ slot: 'state', head: 'rất' }
 			],
 			weight: 12
+		},
+		// A state with how much of it, and one with when: `Con mèo khá mệt`, `Buổi
+		// tối, con mèo rất mệt`. The degree stands where `rất` stood.
+		{
+			parts: [{ slot: 'subject', modifiable: true }, { slot: 'degree' }, { slot: 'state' }],
+			weight: 9
+		},
+		{
+			parts: [
+				{ slot: 'time', tail: ',' },
+				{ slot: 'subject', modifiable: true },
+				{ slot: 'state', head: 'rất' }
+			],
+			weight: 5
 		},
 		{
 			parts: [{ slot: 'subject', modifiable: true }, { slot: 'verb' }, { slot: 'manner' }],

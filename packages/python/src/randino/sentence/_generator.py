@@ -1053,6 +1053,12 @@ def _classify(language: WordLanguage, word: str) -> Requirement:
         written = time
         slots.append("time")
 
+    degree = _entry_of(data.degrees, word) if data.degrees is not None else None
+
+    if degree is not None:
+        written = degree
+        slots.append("degree")
+
     modifier = (
         next(
             (
@@ -1347,6 +1353,7 @@ def _slot_bounds(language: WordLanguage) -> dict[str, tuple[int, int]]:
             ]
         ),
         "manner": _span([group.words for group in data.manners]),
+        "degree": _span([data.degrees]) if data.degrees else (1, 1),
         "time": _span(_time_pools(data)),
         "money": _money_span(data),
         "date": _calendar_span(data, "date"),
@@ -4194,6 +4201,18 @@ def _generate_one(language: WordLanguage, settings: Settings, draw: Draw) -> Bui
         else allowed
     )
     frames = timeless or allowed
+    elided = (
+        1
+        if draw.object is not None
+        and pinned_object is not None
+        and pinned_object.word == draw.object.noun
+        and (draw.object.text == "" or draw.object.clitic)
+        else 0
+    )
+    roomy = (
+        [frame for frame in timeless if len(frame.parts) - elided >= least] if dropped else timeless
+    )
+    frames = roomy or timeless or allowed
     plans = {id(frame): _plan_for(frame, requirements, pinned) for frame in frames}
     low, high = budget
 

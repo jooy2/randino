@@ -847,6 +847,22 @@ DE = SentenceLanguageData(
         ),
         SentenceFrame(
             (
+                SentencePart("subject", modifiable=True),
+                SentencePart("degree"),
+                SentencePart("state", head="ist", past_head="war"),
+            ),
+            9,
+        ),
+        SentenceFrame(
+            (
+                SentencePart("time"),
+                SentencePart("subject", head="ist", past_head="war", modifiable=True),
+                SentencePart("state"),
+            ),
+            5,
+        ),
+        SentenceFrame(
+            (
                 SentencePart("time"),
                 SentencePart("verb"),
                 SentencePart("subject", modifiable=True),
@@ -902,6 +918,15 @@ DE = SentenceLanguageData(
                 SentencePart("state"),
             ),
             18,
+            mood="question",
+        ),
+        SentenceFrame(
+            (
+                SentencePart("subject", head="ist", past_head="war", modifiable=True),
+                SentencePart("degree"),
+                SentencePart("state"),
+            ),
+            6,
             mood="question",
         ),
     ),

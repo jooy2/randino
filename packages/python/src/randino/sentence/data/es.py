@@ -1309,6 +1309,22 @@ ES = SentenceLanguageData(
         SentenceFrame(
             (
                 SentencePart("subject", modifiable=True),
+                SentencePart("degree"),
+                SentencePart("state", head="es", past_head="era"),
+            ),
+            9,
+        ),
+        SentenceFrame(
+            (
+                SentencePart("time", tail=","),
+                SentencePart("subject", modifiable=True),
+                SentencePart("state", head="es", past_head="era"),
+            ),
+            5,
+        ),
+        SentenceFrame(
+            (
+                SentencePart("subject", modifiable=True),
                 SentencePart("verb"),
                 SentencePart("manner"),
             ),

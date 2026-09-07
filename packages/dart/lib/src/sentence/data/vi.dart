@@ -814,6 +814,7 @@ final SentenceLanguageData vi = SentenceLanguageData(
     },
   ),
   speech: const SentenceSpeech(subject: 'Tôi'),
+  degrees: words(r'khá hơi thật cực_kỳ vô_cùng hết_sức thật_là khá_là quá_là siêu'),
   numeral: const SentenceNumeral(
     order: NumeralOrder.before,
     counters: <NounClass, String>{
@@ -915,6 +916,16 @@ final SentenceLanguageData vi = SentenceLanguageData(
       SentencePart(SentenceSlot.subject, modifiable: true),
       SentencePart(SentenceSlot.state, head: 'rất'),
     ], 12),
+    SentenceFrame(<SentencePart>[
+      SentencePart(SentenceSlot.subject, modifiable: true),
+      SentencePart(SentenceSlot.degree),
+      SentencePart(SentenceSlot.state),
+    ], 9),
+    SentenceFrame(<SentencePart>[
+      SentencePart(SentenceSlot.time, tail: ','),
+      SentencePart(SentenceSlot.subject, modifiable: true),
+      SentencePart(SentenceSlot.state, head: 'rất'),
+    ], 5),
     SentenceFrame(<SentencePart>[
       SentencePart(SentenceSlot.subject, modifiable: true),
       SentencePart(SentenceSlot.verb),

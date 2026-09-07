@@ -920,6 +920,10 @@ export const EN: SentenceLanguageData = {
 	objectPronouns: { words: { n: words(`it`) } },
 	// A line of the hero's own opens on `I`, and `is` is `am` for it.
 	speech: { subject: 'I', head: 'am' },
+	// How much a state holds, in front of it: `is very tired`.
+	degrees: words(`
+		very quite rather  really truly awfully terribly pretty fairly a_little somewhat extremely deeply utterly
+	`),
 	// Where `in` is the wrong word: on a bridge, at a station, under a sky.
 	placeHeads: {
 		on: words(`
@@ -1060,6 +1064,25 @@ export const EN: SentenceLanguageData = {
 			],
 			weight: 12
 		},
+		// A state with how much of it, and one with when: `The fox is very tired`,
+		// `In the evening, the fox was tired`. A state sentence is a subject and one
+		// word otherwise, and a paragraph of those is a list.
+		{
+			parts: [
+				{ slot: 'subject', modifiable: true },
+				{ slot: 'degree' },
+				{ slot: 'state', head: 'is', pastHead: 'was' }
+			],
+			weight: 9
+		},
+		{
+			parts: [
+				{ slot: 'time', tail: ',' },
+				{ slot: 'subject', modifiable: true },
+				{ slot: 'state', head: 'is', pastHead: 'was' }
+			],
+			weight: 5
+		},
 		{
 			parts: [{ slot: 'subject', modifiable: true }, { slot: 'verb' }, { slot: 'manner' }],
 			weight: 10
@@ -1141,6 +1164,15 @@ export const EN: SentenceLanguageData = {
 				{ slot: 'state' }
 			],
 			weight: 14,
+			mood: 'question'
+		},
+		{
+			parts: [
+				{ slot: 'subject', head: 'is', pastHead: 'was', modifiable: true },
+				{ slot: 'degree' },
+				{ slot: 'state' }
+			],
+			weight: 6,
 			mood: 'question'
 		},
 		{

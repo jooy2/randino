@@ -855,6 +855,13 @@ function classify(language: WordLanguage, word: string): Requirement {
 		slots.push('time');
 	}
 
+	const degree = entryOf(data.degrees ?? [], word);
+
+	if (degree) {
+		written = degree;
+		slots.push('degree');
+	}
+
 	const modifier =
 		data.modifiers.map((group) => entryOf(group.words, word)).find((entry) => entry !== null) ??
 		entryOf(wordData.adjectives, word) ??
@@ -1113,6 +1120,7 @@ function slotBounds(language: WordLanguage): Record<string, readonly [number, nu
 		verb: span(data.verbs.flatMap(predicatePools)),
 		state: span(data.states.flatMap(predicatePools)),
 		manner: span(data.manners.map((group) => group.words)),
+		degree: span([data.degrees ?? []]),
 		time: span(timePools(data)),
 		money: moneySpan(data),
 		date: calendarSpan(data, 'date'),

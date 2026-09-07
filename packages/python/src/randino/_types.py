@@ -171,6 +171,7 @@ SentenceSlot = Literal[
     "destination",
     "time",
     "manner",
+    "degree",
     "quantity",
     "money",
     "date",
@@ -181,7 +182,8 @@ SentenceSlot = Literal[
 `subject` is who or what the sentence is about (`검은 고양이가`), `verb` what it does
 (`잠잔다`), `object` what it does it to (`사과를`), and `state` what it is like where
 the sentence has no verb at all (`파랗다`). The rest frame the action: `place` where it
-happens (`숲에서`), `time` when (`새벽에`), `manner` how (`조용히`).
+happens (`숲에서`), `time` when (`새벽에`), `manner` how (`조용히`), and `degree` how
+much a state holds (`무척`, `very`), written in front of it.
 
 `destination` is where it is going (`시장으로`, `to the market`), which only a verb that
 goes somewhere or arrives can stand beside.

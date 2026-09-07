@@ -964,6 +964,10 @@ export const JA: SentenceLanguageData = {
 	objectPronouns: { words: { n: [''] } },
 	// A line of the hero's own drops its subject, the way a spoken sentence does.
 	speech: { subject: '' },
+	// How much a state holds, in front of it: `とても疲れた`.
+	degrees: words(`
+		とても すごく かなり 少し 本当に ずいぶん 実に なんとも ひどく やけに 大変 相当 ちょっと なかなか 割と 極めて
+	`),
 	// それ is a thing: a person and an animal are referred to by leaving the
 	// subject out.
 	pronounless: ['person', 'creature'],
@@ -1097,6 +1101,24 @@ export const JA: SentenceLanguageData = {
 			parts: [{ slot: 'subject', tail: 'は', modifiable: true }, { slot: 'state' }],
 			weight: 12
 		},
+		// A state with how much of it, and one with when: `狐はとても静かだ`, `夕方に
+		// 狐は静かだった`.
+		{
+			parts: [
+				{ slot: 'subject', tail: 'は', modifiable: true },
+				{ slot: 'degree' },
+				{ slot: 'state' }
+			],
+			weight: 9
+		},
+		{
+			parts: [
+				{ slot: 'time' },
+				{ slot: 'subject', tail: 'は', modifiable: true },
+				{ slot: 'state' }
+			],
+			weight: 5
+		},
 		{
 			parts: [
 				{ slot: 'subject', tail: 'が', modifiable: true },
@@ -1170,6 +1192,16 @@ export const JA: SentenceLanguageData = {
 		{
 			parts: [{ slot: 'subject', tail: 'は', modifiable: true }, { slot: 'state' }],
 			weight: 14,
+			mood: 'question',
+			tag: 'か'
+		},
+		{
+			parts: [
+				{ slot: 'subject', tail: 'は', modifiable: true },
+				{ slot: 'degree' },
+				{ slot: 'state' }
+			],
+			weight: 6,
 			mood: 'question',
 			tag: 'か'
 		},

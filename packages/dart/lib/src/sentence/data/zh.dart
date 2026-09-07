@@ -605,6 +605,7 @@ final SentenceLanguageData zh = SentenceLanguageData(
     },
   ),
   speech: const SentenceSpeech(subject: '我'),
+  degrees: words(r'非常 特别 真 有点 相当 十分 挺 极其 格外 稍微 蛮 分外'),
   numeral: const SentenceNumeral(
     order: NumeralOrder.after,
     counters: <NounClass, String>{
@@ -699,6 +700,16 @@ final SentenceLanguageData zh = SentenceLanguageData(
     ], 12),
     SentenceFrame(<SentencePart>[
       SentencePart(SentenceSlot.subject, modifiable: true),
+      SentencePart(SentenceSlot.degree),
+      SentencePart(SentenceSlot.state),
+    ], 9),
+    SentenceFrame(<SentencePart>[
+      SentencePart(SentenceSlot.time),
+      SentencePart(SentenceSlot.subject, modifiable: true),
+      SentencePart(SentenceSlot.state, head: '很'),
+    ], 5),
+    SentenceFrame(<SentencePart>[
+      SentencePart(SentenceSlot.subject, modifiable: true),
       SentencePart(SentenceSlot.manner),
       SentencePart(SentenceSlot.verb),
     ], 10),
@@ -756,6 +767,16 @@ final SentenceLanguageData zh = SentenceLanguageData(
         SentencePart(SentenceSlot.state, head: '很'),
       ],
       14,
+      mood: SentenceMood.question,
+      tag: '吗',
+    ),
+    SentenceFrame(
+      <SentencePart>[
+        SentencePart(SentenceSlot.subject, modifiable: true),
+        SentencePart(SentenceSlot.degree),
+        SentencePart(SentenceSlot.state),
+      ],
+      6,
       mood: SentenceMood.question,
       tag: '吗',
     ),

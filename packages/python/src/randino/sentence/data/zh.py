@@ -780,6 +780,22 @@ ZH = SentenceLanguageData(
         SentenceFrame(
             (
                 SentencePart("subject", modifiable=True),
+                SentencePart("degree"),
+                SentencePart("state"),
+            ),
+            9,
+        ),
+        SentenceFrame(
+            (
+                SentencePart("time"),
+                SentencePart("subject", modifiable=True),
+                SentencePart("state", head="很"),
+            ),
+            5,
+        ),
+        SentenceFrame(
+            (
+                SentencePart("subject", modifiable=True),
                 SentencePart("manner"),
                 SentencePart("verb"),
             ),
@@ -854,6 +870,16 @@ ZH = SentenceLanguageData(
                 SentencePart("state", head="很"),
             ),
             14,
+            mood="question",
+            tag="吗",
+        ),
+        SentenceFrame(
+            (
+                SentencePart("subject", modifiable=True),
+                SentencePart("degree"),
+                SentencePart("state"),
+            ),
+            6,
             mood="question",
             tag="吗",
         ),

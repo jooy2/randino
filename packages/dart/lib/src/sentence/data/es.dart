@@ -1158,6 +1158,7 @@ final SentenceLanguageData es = SentenceLanguageData(
     },
     clitic: true,
   ),
+  degrees: words(r'muy bastante un_poco realmente algo demasiado sumamente verdaderamente'),
   numeral: const SentenceNumeral(
     order: NumeralOrder.before,
     counters: <NounClass, String>{},
@@ -1255,6 +1256,16 @@ final SentenceLanguageData es = SentenceLanguageData(
       SentencePart(SentenceSlot.subject, modifiable: true),
       SentencePart(SentenceSlot.state, head: 'es', pastHead: 'era'),
     ], 12),
+    SentenceFrame(<SentencePart>[
+      SentencePart(SentenceSlot.subject, modifiable: true),
+      SentencePart(SentenceSlot.degree),
+      SentencePart(SentenceSlot.state, head: 'es', pastHead: 'era'),
+    ], 9),
+    SentenceFrame(<SentencePart>[
+      SentencePart(SentenceSlot.time, tail: ','),
+      SentencePart(SentenceSlot.subject, modifiable: true),
+      SentencePart(SentenceSlot.state, head: 'es', pastHead: 'era'),
+    ], 5),
     SentenceFrame(<SentencePart>[
       SentencePart(SentenceSlot.subject, modifiable: true),
       SentencePart(SentenceSlot.verb),

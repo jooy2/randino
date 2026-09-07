@@ -3904,6 +3904,22 @@ KO = SentenceLanguageData(
         ),
         SentenceFrame(
             (
+                SentencePart("subject", tail="는", tail_alt="은", modifiable=True),
+                SentencePart("degree"),
+                SentencePart("state"),
+            ),
+            9,
+        ),
+        SentenceFrame(
+            (
+                SentencePart("time"),
+                SentencePart("subject", tail="는", tail_alt="은", modifiable=True),
+                SentencePart("state"),
+            ),
+            5,
+        ),
+        SentenceFrame(
+            (
                 SentencePart("subject", tail="가", tail_alt="이", modifiable=True),
                 SentencePart("manner"),
                 SentencePart("verb"),
@@ -3987,6 +4003,15 @@ KO = SentenceLanguageData(
                 SentencePart("state"),
             ),
             14,
+            mood="question",
+        ),
+        SentenceFrame(
+            (
+                SentencePart("subject", tail="는", tail_alt="은", modifiable=True),
+                SentencePart("degree"),
+                SentencePart("state"),
+            ),
+            6,
             mood="question",
         ),
         SentenceFrame(

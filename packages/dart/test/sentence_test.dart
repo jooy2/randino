@@ -213,6 +213,8 @@ Set<String> poolFor(WordLanguage language, SentenceSlot slot) {
       return <String>{for (final group in data.manners) ...group.words};
     case SentenceSlot.time:
       return timesOf(data).toSet();
+    case SentenceSlot.degree:
+      return (data.degrees ?? const <String>[]).toSet();
     default:
       return <String>{
         for (final theme in wordThemes)
@@ -571,6 +573,7 @@ void main() {
             SentenceSlot.state,
             SentenceSlot.manner,
             SentenceSlot.time,
+            SentenceSlot.degree,
           ])
             slot: poolFor(language, slot),
         };

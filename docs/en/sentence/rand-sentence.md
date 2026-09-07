@@ -273,6 +273,46 @@ rand_sentence(language="de", slots="object", count=3)
 
 With no language named, the ones that can answer are preferred over the ones that cannot.
 
+### How much a state holds {#degree}
+
+`degree` is a word in front of a state that says how much of it there is: `무척`, `very`, `とても`. Every language has a shape that carries one, and the copula the state takes moves in front of it — `is very tired`, `está muy cansado` — so a state sentence has somewhere to grow beyond its subject and one word.
+
+::: lang js
+
+```javascript
+randSentence({ language: 'en', slots: 'degree', count: 3 });
+// ['James is a little sated.', 'The valuation is terribly vague.', 'Orson is quite splendid.']
+
+randSentence({ language: 'ko', slots: 'degree', count: 3 });
+// ['상민은 엄청 졸리다.', '동욱은 퍽 건강하다.', '작은 홍옥은 조금 소중해.']
+```
+
+:::
+
+::: lang dart
+
+```dart
+randSentence(language: WordLanguage.en, slots: {SentenceSlot.degree}, count: 3);
+// [James is a little sated., The valuation is terribly vague., Orson is quite splendid.]
+
+randSentence(language: WordLanguage.ko, slots: {SentenceSlot.degree}, count: 3);
+// [상민은 엄청 졸리다., 동욱은 퍽 건강하다., 작은 홍옥은 조금 소중해.]
+```
+
+:::
+
+::: lang py
+
+```python
+rand_sentence(language="en", slots="degree", count=3)
+# ['James is a little sated.', 'The valuation is terribly vague.', 'Orson is quite splendid.']
+
+rand_sentence(language="ko", slots="degree", count=3)
+# ['상민은 엄청 졸리다.', '동욱은 퍽 건강하다.', '작은 홍옥은 조금 소중해.']
+```
+
+:::
+
 ### Going somewhere {#destination}
 
 `destination` is where the subject is going, and only a verb that goes somewhere takes one: `heads to`, `gets back to`, `향한다`, `들어선다`, never `leaves to the market`. It is drawn from the `place` theme alone, a market or an attic, and never from the sky or the planets that share its class: a fox can sleep under a sky, and cannot walk to one. It is the part a story writes when its hero sets out and when they come home.

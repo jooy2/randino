@@ -273,6 +273,46 @@ rand_sentence(language="de", slots="object", count=3)
 
 언어를 지정하지 않으면 답할 수 있는 언어가 그렇지 못한 언어보다 먼저 뽑힙니다.
 
+### 상태의 정도 {#degree}
+
+`degree`는 상태 앞에 붙어 그 정도를 말하는 단어입니다. `무척`, `very`, `とても` 같은 것들입니다. 모든 언어에 이것을 담는 형태가 있고, 상태가 취하는 계사는 그 앞으로 옮겨 갑니다. `is very tired`, `está muy cansado`처럼 적히므로, 상태문이 주어와 단어 하나로 끝나지 않고 더 자랄 자리가 생깁니다.
+
+::: lang js
+
+```javascript
+randSentence({ language: 'en', slots: 'degree', count: 3 });
+// ['James is a little sated.', 'The valuation is terribly vague.', 'Orson is quite splendid.']
+
+randSentence({ language: 'ko', slots: 'degree', count: 3 });
+// ['상민은 엄청 졸리다.', '동욱은 퍽 건강하다.', '작은 홍옥은 조금 소중해.']
+```
+
+:::
+
+::: lang dart
+
+```dart
+randSentence(language: WordLanguage.en, slots: {SentenceSlot.degree}, count: 3);
+// [James is a little sated., The valuation is terribly vague., Orson is quite splendid.]
+
+randSentence(language: WordLanguage.ko, slots: {SentenceSlot.degree}, count: 3);
+// [상민은 엄청 졸리다., 동욱은 퍽 건강하다., 작은 홍옥은 조금 소중해.]
+```
+
+:::
+
+::: lang py
+
+```python
+rand_sentence(language="en", slots="degree", count=3)
+# ['James is a little sated.', 'The valuation is terribly vague.', 'Orson is quite splendid.']
+
+rand_sentence(language="ko", slots="degree", count=3)
+# ['상민은 엄청 졸리다.', '동욱은 퍽 건강하다.', '작은 홍옥은 조금 소중해.']
+```
+
+:::
+
 ### 어디로 가는지 {#destination}
 
 `destination`은 주어가 향하는 곳이며, 어디론가 가는 동사만 이 구를 받습니다. `향한다`, `들어선다`, `heads to`, `gets back to`는 받고, `leaves to the market` 같은 문장은 나오지 않습니다. 시장이나 다락처럼 `place` 테마에서만 뽑고, 같은 부류인 하늘이나 행성에서는 뽑지 않습니다. 여우는 하늘 아래에서 잘 수는 있어도 하늘로 걸어갈 수는 없기 때문입니다. 이야기에서 주인공이 나설 때와 집에 돌아올 때 쓰는 구입니다.

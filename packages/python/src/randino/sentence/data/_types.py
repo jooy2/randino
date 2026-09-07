@@ -807,6 +807,14 @@ class SentenceLanguageData:
     speech: SentenceSpeech | None = None
     """How a story's hero speaks for themselves. None for a language that cannot write it."""
 
+    degrees: WordPool | None = None
+    """How much a state holds, written in front of it: `무척`, `very`, `とても`.
+
+    A state sentence is a subject and one word otherwise, and a paragraph of them is a
+    list of one-word lines. A shape that carries a `"degree"` part draws from here. None
+    for a language whose state shapes carry none.
+    """
+
     place_heads: Mapping[str, WordPool] | None = None
     """The preposition a place takes where it is not the frame's own, by preposition.
 

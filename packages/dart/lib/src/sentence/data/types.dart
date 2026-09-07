@@ -1022,6 +1022,15 @@ class SentenceLanguageData {
   /// write it.
   final SentenceSpeech? speech;
 
+
+  /// How much a state holds, written in front of it: `무척`, `very`, `とても`.
+  ///
+  /// A state sentence is a subject and one word otherwise, and a paragraph of
+  /// them is a list of one-word lines. A shape that carries a
+  /// [SentenceSlot.degree] part draws from here. Null for a language whose
+  /// state shapes carry none.
+  final WordPool? degrees;
+
   /// The preposition a place takes where it is not the frame's own, by
   /// preposition: English `on the balcony`, `at the market`, `under the sky`
   /// where every place frame writes `in`. A place listed nowhere takes the

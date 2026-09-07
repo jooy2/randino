@@ -608,6 +608,8 @@ export const DE: SentenceLanguageData = {
 		aha, oha, ei, tja, nun, wahrlich, potztausend, um_Himmels_willen, ach_je, sieh_da, tatsächlich,
 	`),
 	pronouns: { m: words(`er`), f: words(`sie`), n: words(`es`) },
+	// How much a state holds, in front of it: `ist sehr müde`.
+	degrees: words(`sehr ziemlich wirklich ganz recht etwas äußerst ungemein reichlich furchtbar`),
 	// German names its months, writes the day first with a full stop after it, and
 	// puts `Uhr` after a clock time.
 	calendar: {
@@ -678,6 +680,25 @@ export const DE: SentenceLanguageData = {
 			],
 			weight: 20
 		},
+		// A state with how much of it, and one with when: `Der Fuchs ist sehr müde`,
+		// `Am Morgen ist der Fuchs müde` — the verb second, so the copula stands on
+		// the subject the way the question's does.
+		{
+			parts: [
+				{ slot: 'subject', modifiable: true },
+				{ slot: 'degree' },
+				{ slot: 'state', head: 'ist', pastHead: 'war' }
+			],
+			weight: 9
+		},
+		{
+			parts: [
+				{ slot: 'time' },
+				{ slot: 'subject', head: 'ist', pastHead: 'war', modifiable: true },
+				{ slot: 'state' }
+			],
+			weight: 5
+		},
 		{
 			parts: [{ slot: 'time' }, { slot: 'verb' }, { slot: 'subject', modifiable: true }],
 			weight: 18
@@ -724,6 +745,15 @@ export const DE: SentenceLanguageData = {
 				{ slot: 'state' }
 			],
 			weight: 18,
+			mood: 'question'
+		},
+		{
+			parts: [
+				{ slot: 'subject', head: 'ist', pastHead: 'war', modifiable: true },
+				{ slot: 'degree' },
+				{ slot: 'state' }
+			],
+			weight: 6,
 			mood: 'question'
 		}
 	]
