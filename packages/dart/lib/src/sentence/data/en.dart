@@ -1728,6 +1728,75 @@ final SentenceLanguageData en = SentenceLanguageData(
       '''),
     ),
     ModifierGroup(
+      subject: const <NounClass>[NounClass.creature, NounClass.person],
+      fields: const <VerbField>[
+        VerbField.rise,
+        VerbField.go,
+        VerbField.arrive,
+        VerbField.move,
+        VerbField.play,
+        VerbField.search,
+        VerbField.carry,
+        VerbField.take,
+      ],
+      words: words(r'briskly nimbly stealthily smoothly heavily fiercely on_tiptoe'),
+    ),
+    ModifierGroup(
+      subject: const <NounClass>[NounClass.creature, NounClass.person],
+      fields: const <VerbField>[
+        VerbField.look,
+        VerbField.search,
+        VerbField.wait,
+        VerbField.tend,
+        VerbField.make,
+        VerbField.cook,
+        VerbField.hide,
+        VerbField.buy,
+        VerbField.sell,
+        VerbField.take,
+        VerbField.carry,
+        VerbField.find,
+      ],
+      words: words(r'neatly intently thoughtfully deliberately'),
+    ),
+    ModifierGroup(
+      subject: const <NounClass>[NounClass.creature, NounClass.person],
+      fields: const <VerbField>[
+        VerbField.look,
+        VerbField.think,
+        VerbField.wait,
+        VerbField.search,
+        VerbField.rest,
+      ],
+      words: words(r'intently thoughtfully dreamily wistfully absently'),
+    ),
+    ModifierGroup(
+      subject: const <NounClass>[NounClass.creature, NounClass.person],
+      fields: const <VerbField>[
+        VerbField.talk,
+        VerbField.meet,
+        VerbField.sell,
+        VerbField.buy,
+        VerbField.express,
+      ],
+      words: words(r'politely sternly kindly sweetly bluntly gruffly plainly fondly tenderly'),
+    ),
+    ModifierGroup(
+      subject: const <NounClass>[NounClass.creature, NounClass.person],
+      fields: const <VerbField>[
+        VerbField.express,
+        VerbField.play,
+        VerbField.think,
+        VerbField.talk,
+        VerbField.wait,
+        VerbField.look,
+        VerbField.rest,
+        VerbField.eat,
+        VerbField.drink,
+      ],
+      words: words(r'sadly bitterly grimly fondly hungrily greedily'),
+    ),
+    ModifierGroup(
       subject: const <NounClass>[
         NounClass.plant,
         NounClass.edible,
@@ -1739,7 +1808,7 @@ final SentenceLanguageData en = SentenceLanguageData(
         NounClass.body,
       ],
       words: words(r'''
-        quietly slowly gently suddenly softly again steadily still slightly faintly evenly gradually
+        quietly slowly gently suddenly softly again steadily slightly faintly evenly gradually
         little_by_little silently smoothly quickly briefly barely deeply widely brightly dimly
         warmly coldly sweetly richly thickly loosely firmly heavily lightly endlessly ceaselessly
         constantly once_more for_a_while all_at_once bit_by_bit in_silence without_a_sound
@@ -1878,6 +1947,10 @@ final SentenceLanguageData en = SentenceLanguageData(
       I'm_home I'm_back home_at_last! made_it_home back_at_last home_again
     """),
   },
+  degrees: words(r'''
+    very quite rather really truly awfully terribly pretty fairly a_little somewhat extremely deeply
+    utterly
+  '''),
   placeHeads: <String, WordPool>{
     'on': words(r'''
       bridge rooftop balcony veranda boardwalk promenade playground terrace staircase pier wharf

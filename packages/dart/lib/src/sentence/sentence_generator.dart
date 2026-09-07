@@ -2685,6 +2685,7 @@ _Built _compose(
         follow == null && draw.link != JoinSide.second,
         themeClass[subjectTheme]!,
         draw.beat != null,
+        verbGroup?.field,
       );
 
       phrase = predicate.text;
@@ -2835,9 +2836,20 @@ class _Predicate {
 /// groups for the class, narrowed to the ones that go with the verb's field
 /// where they name any. The class alone failing that, and any of them failing
 /// that.
-WordPool _mannersFor(SentenceLanguageData data, NounClass subject) {
-  final fitting = data.manners.where((group) => group.subject.contains(subject)).toList();
-  final groups = fitting.isNotEmpty ? fitting : data.manners;
+WordPool _mannersFor(SentenceLanguageData data, NounClass subject, VerbField? field) {
+  final byClass = data.manners.where((group) => group.subject.contains(subject)).toList();
+  final byField =
+      byClass
+          .where(
+            (group) => group.fields == null || (field != null && group.fields!.contains(field)),
+          )
+          .toList();
+  final groups =
+      byField.isNotEmpty
+          ? byField
+          : byClass.isNotEmpty
+          ? byClass
+          : data.manners;
 
   return <String>{for (final group in groups) ...group.words}.toList(growable: false);
 }
@@ -2904,6 +2916,7 @@ _Predicate _predicateFor(
   bool opens,
   NounClass subject,
   bool storied,
+  VerbField? field,
 ) {
   String agreed(String word) =>
       slot == SentenceSlot.state && data.predicateAgrees ? agree(wordData, word, gender) : word;
@@ -2926,7 +2939,15 @@ _Predicate _predicateFor(
     return _timeFor(data, tense, dayAt, opens, avoid, min < max ? min : max, max, storied);
   }
 
-  final pool = slot == SentenceSlot.manner ? _mannersFor(data, subject) : predicates;
+  final pool =
+      slot == SentenceSlot.manner
+          ? _mannersFor(data, subject, field)
+          : slot == SentenceSlot.degree
+          ? (data.degrees ?? const <String>[])
+          : predicates;
+
+  if (pool.isEmpty) return const _Predicate('', '', -1);
+
   // A predicate is a form of the word at the same index of the group; an
   // adverbial is written whole and is its own plain form.
   String plainly(int at) =>
@@ -4194,6 +4215,34 @@ _Result? _tellStory(_Telling telling) {
     // subject and its state, and the subject pinned where the story has it.
     if (commented != null) {
       final noun = commented.noun;
+
+      return _BeatDraw(
+        headedByState: true,
+        fields: const <VerbField>[],
+        describes: true,
+        condition: null,
+        wants: wants,
+        prefers: prefers,
+        item: null,
+        places: _destinationThemes,
+        subject: commented.themes,
+        pinned:
+            noun == null
+                ? const <SentenceSlot, _Requirement>{}
+                : <SentenceSlot, _Requirement>{
+                  SentenceSlot.subject: _Requirement(
+                    noun.word,
+                    const <SentenceSlot?>[SentenceSlot.subject],
+                    theme: noun.theme,
+                    known: noun.known,
+                    bare: noun.bare,
+                    settled: true,
+                  ),
+                },
+        nameless: true,
+      );
+    }
+
     if (step.destination != null) wants.add(SentenceSlot.destination);
     if (step.object != null) wants.add(SentenceSlot.object);
     if (placeable(beat)) prefers.add(SentenceSlot.place);
@@ -4540,8 +4589,29 @@ _Result? _tellStory(_Telling telling) {
       style: style,
       avoid: telling.spent,
       follow: follow,
-      tense: voiced ? SentenceTense.present : telling.tense,
-      beat: beatDraw(beat),
+      // A line says now what is true, and reports in the past what was just
+      // done; a remark, a question and what is noticed are about now.
+      tense:
+          line
+              ? (beat.step.kind == StepKind.act ? SentenceTense.past : SentenceTense.present)
+              : commented != null || noticed || asked
+              ? SentenceTense.present
+              : telling.tense,
+      beat:
+          asked
+              ? _BeatDraw(
+                headedByState: true,
+                fields: const <VerbField>[],
+                describes: true,
+                condition: beat.asked,
+                wants: const <SentenceSlot>[],
+                prefers: const <SentenceSlot>[],
+                item: null,
+                places: _destinationThemes,
+                subject: _themesForClasses(wordThemes, const <NounClass>[NounClass.person]),
+                nameless: true,
+              )
+              : beatDraw(beat, commented),
       link: beat.join,
       dayAt: dayAt,
       dated: dated,

@@ -1773,9 +1773,49 @@ EN = SentenceLanguageData(
             """),
         ),
         ModifierGroup(
+            subject=("creature", "person"),
+            fields=("rise", "go", "arrive", "move", "play", "search", "carry", "take"),
+            words=words("briskly nimbly stealthily smoothly heavily fiercely on_tiptoe"),
+        ),
+        ModifierGroup(
+            subject=("creature", "person"),
+            fields=(
+                "look",
+                "search",
+                "wait",
+                "tend",
+                "make",
+                "cook",
+                "hide",
+                "buy",
+                "sell",
+                "take",
+                "carry",
+                "find",
+            ),
+            words=words("neatly intently thoughtfully deliberately"),
+        ),
+        ModifierGroup(
+            subject=("creature", "person"),
+            fields=("look", "think", "wait", "search", "rest"),
+            words=words("intently thoughtfully dreamily wistfully absently"),
+        ),
+        ModifierGroup(
+            subject=("creature", "person"),
+            fields=("talk", "meet", "sell", "buy", "express"),
+            words=words("""
+                politely sternly kindly sweetly bluntly gruffly plainly fondly tenderly
+            """),
+        ),
+        ModifierGroup(
+            subject=("creature", "person"),
+            fields=("express", "play", "think", "talk", "wait", "look", "rest", "eat", "drink"),
+            words=words("sadly bitterly grimly fondly hungrily greedily"),
+        ),
+        ModifierGroup(
             subject=("plant", "edible", "thing", "vehicle", "place", "event", "idea", "body"),
             words=words("""
-                quietly slowly gently suddenly softly again steadily still slightly faintly evenly
+                quietly slowly gently suddenly softly again steadily slightly faintly evenly
                 gradually little_by_little silently smoothly quickly briefly barely deeply widely
                 brightly dimly warmly coldly sweetly richly thickly loosely firmly heavily lightly
                 endlessly ceaselessly constantly once_more for_a_while all_at_once bit_by_bit
@@ -1880,6 +1920,39 @@ EN = SentenceLanguageData(
     pronounless=("person",),
     object_pronouns=SentenceObjectPronouns(words={"n": ("it",)}),
     speech=SentenceSpeech(subject="I", head="am"),
+    replies={
+        "casual": {
+            "agree": words("""
+                right true I_know so_it_is same_here indeed that's_right you're_right it_is quite_so
+                no_doubt I_thought_so
+            """),
+            "cheer": words("""
+                well_done! good_for_you! great! lucky_you nice_one wonderful! congratulations
+                well_earned brilliant! splendid! at_last!
+            """),
+            "care": words("""
+                are_you_all_right? take_a_rest don't_overdo_it let's_get_you_something_to_eat
+                poor_you take_your_time don't_worry be_careful cheer_up sit_down_a_moment
+                have_some_water let_me_help
+            """),
+            "wonder": words("""
+                really? seriously? where? when? and_then? no_way! how? why? is_that_so? did_you_now?
+                what_happened_next? what?
+            """),
+            "answer": words("""
+                yes,_a_little no,_I'm_fine yes,_quite so-so not_yet yes,_terribly a_bit not_really
+                yes,_very not_at_all more_or_less yes,_actually
+            """),
+        },
+    },
+    listener=SentenceSpeech(subject="you", head="are"),
+    homecomings={
+        "casual": words("I'm_home I'm_back home_at_last! made_it_home back_at_last home_again"),
+    },
+    degrees=words("""
+        very quite rather really truly awfully terribly pretty fairly a_little somewhat extremely
+        deeply utterly
+    """),
     place_heads={
         "on": words("""
             bridge rooftop balcony veranda boardwalk promenade playground terrace staircase pier

@@ -309,6 +309,7 @@ export type ModifierGroup = {
 	 * walk, and nobody runs `골똘히` or yawns `성큼성큼`. Read for manners alone,
 	 * and left out by a group that fits any doing.
 	 */
+	fields?: readonly VerbField[];
 	/** Base forms, which `agree` reshapes in a language that inflects. */
 	words: WordPool;
 };

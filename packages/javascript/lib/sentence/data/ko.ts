@@ -977,18 +977,73 @@ export const KO: SentenceLanguageData = {
 	// and a river may not; a river flows 서서히 and 여전히, which a fox arriving
 	// somewhere does not.
 	manners: [
+		// How somebody does anything at all.
 		{
 			subject: ['creature', 'person'],
 			words: words(`
+				조용히 천천히 빠르게 가만히 슬며시 홀로 잠시 갑자기 조심스레 힘차게 살며시 묵묵히 느긋하게 곧장 슬쩍 냉큼 차분히 은근히 대뜸
+				나직이 느릿느릿 재빨리 가볍게 얌전히 무심히 덤덤히 살짝 부리나케 천연덕스럽게 조심조심 가만가만 후다닥 냅다 용케 애써 마지못해
+				간신히 겨우 힘겹게 기어이 짐짓 다급히 급히 서둘러 넌지시 흔쾌히 선뜻 태연히 홀연히 소리없이 조용조용 연신 한참 한동안 신나게
+				즐겁게 기쁘게 활기차게 당당하게 의젓하게 늠름하게
+			`)
+		},
+		// How somebody moves: nobody yawns `성큼성큼`.
+		{
+			subject: ['creature', 'person'],
+			fields: ['rise', 'go', 'arrive', 'move', 'play', 'search', 'carry', 'take'],
+			words: words(`
 				씩씩하게 훌쩍 사뿐히 성큼성큼 부지런히 유유히 살금살금 슬금슬금 뚜벅뚜벅 터벅터벅 허둥지둥 헐레벌떡 사뿐사뿐 총총히 벌떡
 			`)
+		},
+		// How somebody handles a thing, or sees to it.
+		{
+			subject: ['creature', 'person'],
+			fields: [
+				'look',
+				'search',
+				'wait',
+				'tend',
+				'make',
+				'cook',
+				'hide',
+				'buy',
+				'sell',
+				'take',
+				'carry',
+				'find'
+			],
+			words: words(`꼼꼼히 찬찬히 신중히 정성껏 야무지게 능숙하게 서투르게`)
+		},
+		// How somebody looks, or thinks: `골똘히` is nothing anybody runs.
+		{
+			subject: ['creature', 'person'],
+			fields: ['look', 'think', 'wait', 'search', 'rest'],
+			words: words(`골똘히 곰곰이 물끄러미 빤히 지그시 우두커니 꼼짝없이 간절히`)
+		},
+		// How somebody hesitates, or looks about.
+		{
+			subject: ['creature', 'person'],
+			fields: ['wait', 'look', 'search', 'talk', 'meet', 'buy', 'express'],
+			words: words(`우물쭈물 쭈뼛쭈뼛 두리번두리번 어색하게 자연스럽게`)
+		},
+		// How somebody is with somebody else.
+		{
+			subject: ['creature', 'person'],
+			fields: ['talk', 'meet', 'sell', 'buy', 'express'],
+			words: words(`상냥하게 다정하게 정답게 공손히 정중히 무뚝뚝하게 퉁명스럽게 심드렁하게`)
+		},
+		// How somebody feels while they do it.
+		{
+			subject: ['creature', 'person'],
+			fields: ['express', 'play', 'think', 'talk', 'wait', 'look', 'rest', 'eat', 'drink'],
+			words: words(`뿌듯하게 슬프게 흐뭇하게 서글프게 아쉽게 설레며 느긋이`)
 		},
 		{
 			subject: ['plant', 'edible', 'thing', 'vehicle', 'place', 'event', 'idea', 'body'],
 			words: words(
 				`
-				조용히 천천히 서서히 문득 다시 계속 잠시 갑자기 언제나 여전히 은은히 살며시 가만히 슬며시 조금씩 차츰 점점 어느새 고요히
-				불현듯 금세 한참 오래도록 내내 줄곧 한동안 잔뜩 유난히 부쩍 사뭇 자못 흠뻑 그득히 자욱이
+				조용히 천천히 서서히 문득 다시 잠시 갑자기 여전히 은은히 살며시 가만히 슬며시 조금씩 차츰 점점  고요히
+				불현듯 금세 한참 오래도록 한동안 잔뜩 부쩍 흠뻑 그득히 자욱이
 				나직이 잔잔히 아득히 그윽이 곱게 소복이 촉촉이 나른하게 느슨하게 묵직하게 가볍게 조용조용 소리없이
 				흐릿하게 뚜렷하게 선명하게 희미하게 스르르 사르르 스멀스멀 뭉게뭉게 넘실넘실 일렁일렁 반짝반짝 하늘하늘 살랑살랑 나풀나풀 몽글몽글 우수수
 			`
@@ -1034,7 +1089,9 @@ export const KO: SentenceLanguageData = {
 		contrastive: words(
 			`하지만 그런데 그러나 다만 오히려 그래도 그렇지만 반면에 도리어 그럼에도 그런데도`
 		),
-		causal: words(`그래서 그러므로 결국 그러니 따라서 그리하여 그러니까 그러기에 그런탓에`)
+		// `그러므로`, `따라서` and `그리하여` are what a proof or a sermon says, and
+		// `그러니까` is somebody insisting; a story says `그래서`.
+		causal: words(`그래서 결국 그러니 그러기에 그런탓에 그바람에 그덕에`)
 	},
 	// What a noun can do that its theme does not say. A noun listed nowhere has no
 	// trait, and takes any verb that asks for none.

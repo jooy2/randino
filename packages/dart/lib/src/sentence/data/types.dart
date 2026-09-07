@@ -419,7 +419,7 @@ class StateGroup {
 /// a drink and never in front of a mechanic.
 class ModifierGroup {
   /// Creates a group of modifiers.
-  const ModifierGroup({required this.subject, required this.words, this.themes});
+  const ModifierGroup({required this.subject, required this.words, this.themes, this.fields});
 
   /// Classes a noun has to belong to to carry one of these.
   final List<NounClass> subject;
@@ -427,6 +427,12 @@ class ModifierGroup {
   /// The themes it may belong to, when a class is too wide: a soup is `매콤한`
   /// and a tea is not, though both are edible.
   final List<WordTheme>? themes;
+
+  /// The fields the verb may come from, for a manner that goes with some doings
+  /// and not others: `골똘히` is how somebody looks or thinks, `성큼성큼` how they
+  /// walk, and nobody runs `골똘히` or yawns `성큼성큼`. Read for manners alone,
+  /// and null for a group that fits any doing.
+  final List<VerbField>? fields;
 
   /// Base forms, which `agree` reshapes in a language that inflects.
   final WordPool words;

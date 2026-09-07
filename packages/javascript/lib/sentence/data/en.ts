@@ -837,6 +837,7 @@ export const EN: SentenceLanguageData = {
 		}
 	],
 	manners: [
+		// How somebody does anything at all.
 		{
 			subject: ['creature', 'person'],
 			words: words(`
@@ -849,10 +850,53 @@ export const EN: SentenceLanguageData = {
 				at_once straight_away for_a_while once_more in_silence without_a_word in_a_hurry
 			`)
 		},
+		// How somebody moves: nobody yawns on tiptoe.
+		{
+			subject: ['creature', 'person'],
+			fields: ['rise', 'go', 'arrive', 'move', 'play', 'search', 'carry', 'take'],
+			words: words(`briskly nimbly stealthily smoothly heavily fiercely on_tiptoe`)
+		},
+		// How somebody handles a thing, or sees to it.
+		{
+			subject: ['creature', 'person'],
+			fields: [
+				'look',
+				'search',
+				'wait',
+				'tend',
+				'make',
+				'cook',
+				'hide',
+				'buy',
+				'sell',
+				'take',
+				'carry',
+				'find'
+			],
+			words: words(`neatly intently thoughtfully deliberately`)
+		},
+		// How somebody looks, or thinks.
+		{
+			subject: ['creature', 'person'],
+			fields: ['look', 'think', 'wait', 'search', 'rest'],
+			words: words(`intently thoughtfully dreamily wistfully absently`)
+		},
+		// How somebody is with somebody else.
+		{
+			subject: ['creature', 'person'],
+			fields: ['talk', 'meet', 'sell', 'buy', 'express'],
+			words: words(`politely sternly kindly sweetly bluntly gruffly plainly fondly tenderly`)
+		},
+		// How somebody feels while they do it.
+		{
+			subject: ['creature', 'person'],
+			fields: ['express', 'play', 'think', 'talk', 'wait', 'look', 'rest', 'eat', 'drink'],
+			words: words(`sadly bitterly grimly fondly hungrily greedily`)
+		},
 		{
 			subject: ['plant', 'edible', 'thing', 'vehicle', 'place', 'event', 'idea', 'body'],
 			words: words(`
-				quietly slowly gently suddenly softly again steadily still slightly faintly evenly gradually
+				quietly slowly gently suddenly softly again steadily  slightly faintly evenly gradually
 				little_by_little
 				silently smoothly quickly briefly barely deeply widely brightly dimly warmly coldly sweetly
 				richly thickly loosely firmly heavily lightly endlessly ceaselessly constantly

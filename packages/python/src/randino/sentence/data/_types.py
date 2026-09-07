@@ -326,6 +326,12 @@ class ModifierGroup:
     words: WordPool
     """Base forms, which `agree` reshapes in a language that inflects."""
 
+    fields: tuple[VerbField, ...] | None = None
+    """The fields the verb may come from, for a manner that goes with some doings and not
+    others: `골똘히` is how somebody looks or thinks, `성큼성큼` how they walk, and nobody
+    runs `골똘히` or yawns `성큼성큼`. Read for manners alone, and None for a group that
+    fits any doing."""
+
     themes: tuple[WordTheme, ...] | None = None
     """The themes it may belong to, when a class is too wide.
 

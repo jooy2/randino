@@ -3587,6 +3587,88 @@ final SentenceLanguageData ko = SentenceLanguageData(
       '''),
     ),
     ModifierGroup(
+      subject: const <NounClass>[NounClass.creature, NounClass.person],
+      fields: const <VerbField>[
+        VerbField.rise,
+        VerbField.go,
+        VerbField.arrive,
+        VerbField.move,
+        VerbField.play,
+        VerbField.search,
+        VerbField.carry,
+        VerbField.take,
+      ],
+      words: words(r'씩씩하게 훌쩍 사뿐히 성큼성큼 부지런히 유유히 살금살금 슬금슬금 뚜벅뚜벅 터벅터벅 허둥지둥 헐레벌떡 사뿐사뿐 총총히 벌떡'),
+    ),
+    ModifierGroup(
+      subject: const <NounClass>[NounClass.creature, NounClass.person],
+      fields: const <VerbField>[
+        VerbField.look,
+        VerbField.search,
+        VerbField.wait,
+        VerbField.tend,
+        VerbField.make,
+        VerbField.cook,
+        VerbField.hide,
+        VerbField.buy,
+        VerbField.sell,
+        VerbField.take,
+        VerbField.carry,
+        VerbField.find,
+      ],
+      words: words(r'꼼꼼히 찬찬히 신중히 정성껏 야무지게 능숙하게 서투르게'),
+    ),
+    ModifierGroup(
+      subject: const <NounClass>[NounClass.creature, NounClass.person],
+      fields: const <VerbField>[
+        VerbField.look,
+        VerbField.think,
+        VerbField.wait,
+        VerbField.search,
+        VerbField.rest,
+      ],
+      words: words(r'골똘히 곰곰이 물끄러미 빤히 지그시 우두커니 꼼짝없이 간절히'),
+    ),
+    ModifierGroup(
+      subject: const <NounClass>[NounClass.creature, NounClass.person],
+      fields: const <VerbField>[
+        VerbField.wait,
+        VerbField.look,
+        VerbField.search,
+        VerbField.talk,
+        VerbField.meet,
+        VerbField.buy,
+        VerbField.express,
+      ],
+      words: words(r'우물쭈물 쭈뼛쭈뼛 두리번두리번 어색하게 자연스럽게'),
+    ),
+    ModifierGroup(
+      subject: const <NounClass>[NounClass.creature, NounClass.person],
+      fields: const <VerbField>[
+        VerbField.talk,
+        VerbField.meet,
+        VerbField.sell,
+        VerbField.buy,
+        VerbField.express,
+      ],
+      words: words(r'상냥하게 다정하게 정답게 공손히 정중히 무뚝뚝하게 퉁명스럽게 심드렁하게'),
+    ),
+    ModifierGroup(
+      subject: const <NounClass>[NounClass.creature, NounClass.person],
+      fields: const <VerbField>[
+        VerbField.express,
+        VerbField.play,
+        VerbField.think,
+        VerbField.talk,
+        VerbField.wait,
+        VerbField.look,
+        VerbField.rest,
+        VerbField.eat,
+        VerbField.drink,
+      ],
+      words: words(r'뿌듯하게 슬프게 흐뭇하게 서글프게 아쉽게 설레며 느긋이'),
+    ),
+    ModifierGroup(
       subject: const <NounClass>[
         NounClass.plant,
         NounClass.edible,
@@ -3598,9 +3680,9 @@ final SentenceLanguageData ko = SentenceLanguageData(
         NounClass.body,
       ],
       words: words(r'''
-        조용히 천천히 서서히 문득 다시 계속 잠시 갑자기 언제나 여전히 은은히 살며시 가만히 슬며시 조금씩 차츰 점점 어느새 고요히 불현듯 금세 한참 오래도록 내내 줄곧
-        한동안 잔뜩 유난히 부쩍 사뭇 자못 흠뻑 그득히 자욱이 나직이 잔잔히 아득히 그윽이 곱게 소복이 촉촉이 나른하게 느슨하게 묵직하게 가볍게 조용조용 소리없이 흐릿하게
-        뚜렷하게 선명하게 희미하게 스르르 사르르 스멀스멀 뭉게뭉게 넘실넘실 일렁일렁 반짝반짝 하늘하늘 살랑살랑 나풀나풀 몽글몽글 우수수
+        조용히 천천히 서서히 문득 다시 잠시 갑자기 여전히 은은히 살며시 가만히 슬며시 조금씩 차츰 점점 고요히 불현듯 금세 한참 오래도록 한동안 잔뜩 부쩍 흠뻑 그득히
+        자욱이 나직이 잔잔히 아득히 그윽이 곱게 소복이 촉촉이 나른하게 느슨하게 묵직하게 가볍게 조용조용 소리없이 흐릿하게 뚜렷하게 선명하게 희미하게 스르르 사르르 스멀스멀
+        뭉게뭉게 넘실넘실 일렁일렁 반짝반짝 하늘하늘 살랑살랑 나풀나풀 몽글몽글 우수수
       '''),
     ),
   ],
@@ -3629,7 +3711,7 @@ final SentenceLanguageData ko = SentenceLanguageData(
       이윽고 곧 그러자 이내 어느새 마침내 그제야 한편 그러고나서 잠시후 얼마뒤 그러는사이 곧이어 뒤이어 그런다음 그러더니 어느덧 드디어 그무렵 잠시뒤 한참뒤 그때부터
     '''),
     ConnectiveKind.contrastive: words(r'하지만 그런데 그러나 다만 오히려 그래도 그렇지만 반면에 도리어 그럼에도 그런데도'),
-    ConnectiveKind.causal: words(r'그래서 그러므로 결국 그러니 따라서 그리하여 그러니까 그러기에 그런탓에'),
+    ConnectiveKind.causal: words(r'그래서 결국 그러니 그러기에 그런탓에 그바람에 그덕에'),
   },
   traits: <NounTrait, WordPool>{
     NounTrait.flier: words(r'''

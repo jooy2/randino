@@ -71,6 +71,7 @@ const groups = (source: readonly ModifierGroup[]) =>
 	source.map((group) => ({
 		subject: [...group.subject],
 		themes: list(group.themes),
+		fields: list(group.fields),
 		words: list(group.words)
 	}));
 

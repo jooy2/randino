@@ -2304,10 +2304,26 @@ def _form_of(
     return tensed.words
 
 
-def _manners_for(data: SentenceLanguageData, subject: NounClass) -> WordPool:
-    """The manners something of this class can do a thing in. Any of them, failing that."""
-    fitting = [group for group in data.manners if subject in group.subject]
-    groups = fitting or list(data.manners)
+def _manners_for(
+    data: SentenceLanguageData, subject: NounClass, field: VerbField | None
+) -> WordPool:
+    """The manners something of this class can do this kind of thing in.
+
+    The groups for the class, narrowed to the ones that go with the verb's field where
+    they name any. The class alone failing that, and any of them failing that.
+    """
+    by_class = [group for group in data.manners if subject in group.subject]
+    by_field = [
+        group
+        for group in by_class
+        if group.fields is None or (field is not None and field in group.fields)
+    ]
+    groups = by_field or by_class or data.manners
+    seen: dict[str, None] = {}
+
+    for group in groups:
+        for word in group.words:
+            seen.setdefault(word, None)
 
     return tuple(seen)
 
@@ -2397,7 +2413,15 @@ def _predicate_for(
     if slot == "time":
         return _time_for(data, tense, day_at, opens, avoid, min(low, high), high, storied)
 
-    pool = _manners_for(data, subject) if slot == "manner" else predicates
+    if slot == "manner":
+        pool: WordPool = _manners_for(data, subject, field)
+    elif slot == "degree":
+        pool = data.degrees or ()
+    else:
+        pool = predicates
+
+    if not pool:
+        return "", "", -1
 
     def plainly(at: int) -> str:
         # A predicate is a form of the word at the same index of the group; an adverbial
@@ -2906,6 +2930,7 @@ def _compose(
                 follow is None and draw.link != "second",
                 THEME_CLASS[subject_theme],
                 draw.beat is not None,
+                verb_group.field if verb_group is not None else None,
             )
 
             if plain_form:
@@ -3970,6 +3995,23 @@ def _tell_story(telling: Telling) -> Result | None:
 
             if commented.noun is not None:
                 pinned["subject"] = replace(commented.noun, slots=("subject",), settled=True)
+
+            return BeatDraw(
+                headed_by_state=True,
+                fields=(),
+                describes=True,
+                condition=None,
+                wants=(),
+                prefers=(),
+                item=None,
+                places=DESTINATION_THEMES,
+                subject=commented.themes,
+                pinned=pinned,
+                avoid=(),
+                state=None,
+                nameless=True,
+            )
+
         if step.destination is not None:
             wants.append("destination")
 
@@ -4289,8 +4331,27 @@ def _tell_story(telling: Telling) -> Result | None:
             style,
             frozenset(telling.spent),
             follow,
-            "present" if voiced else telling.tense,
-            beat_draw(beat),
+            # A line says now what is true, and reports in the past what was just done;
+            # a remark, a question and what is noticed are about now.
+            ("past" if beat.step.kind == "act" else "present")
+            if line
+            else "present"
+            if commented is not None or noticed or asked
+            else telling.tense,
+            BeatDraw(
+                headed_by_state=True,
+                fields=(),
+                describes=True,
+                condition=beat.asked,
+                wants=(),
+                prefers=(),
+                item=None,
+                places=DESTINATION_THEMES,
+                subject=_themes_for_classes(WORD_THEMES, ("person",)),
+                nameless=True,
+            )
+            if asked
+            else beat_draw(beat, commented),
             beat.join,
             day_at,
             object=reference,

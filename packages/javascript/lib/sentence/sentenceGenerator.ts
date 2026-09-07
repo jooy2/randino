@@ -2899,7 +2899,8 @@ function predicateFor(
 	dayAt: number,
 	opens: boolean,
 	subject: NounClass,
-	storied: boolean
+	storied: boolean,
+	field: VerbField | null
 ): Predicate {
 	const agreed = (word: string) =>
 		slot === 'state' && data.predicateAgrees ? agree(wordData, word, gender) : word;
@@ -2928,7 +2929,17 @@ function predicateFor(
 		return timeFor(data, tense, dayAt, opens, avoid, Math.min(min, max), max, storied);
 	}
 
-	const pool = slot === 'manner' ? mannersFor(data, subject) : predicates;
+	const pool =
+		slot === 'manner'
+			? mannersFor(data, subject, field)
+			: slot === 'degree'
+				? (data.degrees ?? [])
+				: predicates;
+
+	if (!pool.length) {
+		return { text: '', base: '', dayAt: -1 };
+	}
+
 	// A predicate is a form of the word at the same index of the group; an adverbial
 	// is written whole and is its own plain form.
 	const plainly = (at: number) => (pool === predicates ? (base[at] ?? pool[at]) : pool[at]);
@@ -2944,10 +2955,21 @@ function predicateFor(
 // How many phases of the day one sentence may move on from the last one named.
 const DAY_STRIDE = 4;
 
-/** The manners something of this class can do a thing in. Any of them, failing that. */
-function mannersFor(data: SentenceLanguageData, subject: NounClass): WordPool {
-	const fitting = data.manners.filter((group) => group.subject.includes(subject));
-	const groups = fitting.length ? fitting : data.manners;
+/**
+ * The manners something of this class can do this kind of thing in: the groups
+ * for the class, narrowed to the ones that go with the verb's field where they
+ * name any. The class alone failing that, and any of them failing that.
+ */
+function mannersFor(
+	data: SentenceLanguageData,
+	subject: NounClass,
+	field: VerbField | null
+): WordPool {
+	const byClass = data.manners.filter((group) => group.subject.includes(subject));
+	const byField = byClass.filter(
+		(group) => !group.fields || (field !== null && group.fields.includes(field))
+	);
+	const groups = byField.length ? byField : byClass.length ? byClass : data.manners;
 
 	return [...new Set(groups.flatMap((group) => group.words))];
 }

@@ -283,6 +283,13 @@ STORIES: tuple[Story, ...] = (
             StoryStep("act", fields=("go",), destination="place", required=True),
             StoryStep("act", fields=("look",), object="prop", place=True, link="additive"),
             StoryStep("act", fields=("look",), object="item", place=True),
+            # Somebody at the market, doing what people at a market do.
+            StoryStep(
+                "other",
+                actor_classes=("person",),
+                fields=("talk", "express", "wait", "move"),
+                link="additive",
+            ),
             StoryStep(
                 "act", fields=("buy", "take", "find"), object="item", place=True, required=True
             ),
@@ -614,6 +621,8 @@ STORIES: tuple[Story, ...] = (
             StoryStep(
                 "act", fields=("meet",), object="item", place=True, required=True, link="temporal"
             ),
+            # The person met, doing something of their own.
+            StoryStep("other", actor="item", fields=("express", "talk", "wait"), link="additive"),
             StoryStep("act", fields=("talk",), link="additive"),
             StoryStep("act", fields=("express",), link="causal", kinds=("exclamation",)),
             StoryStep("act", fields=("wait",), place=True),
@@ -622,6 +631,160 @@ STORIES: tuple[Story, ...] = (
                 "act", fields=("arrive",), destination="home", required=True, link="temporal"
             ),
             StoryStep("act", fields=("think", "express"), link="temporal", kinds=("trailing",)),
+        ),
+    ),
+    # Two people talk. The hero goes out, meets somebody, and what the two of them say to
+    # each other is most of the story — it is the one that allows the most lines, and the
+    # person met is the one who answers them.
+    Story(
+        name="chat",
+        hero=("person",),
+        item=("person",),
+        # Something at the place, looked at while they talk.
+        prop=("thing", "plant", "edible"),
+        prop_themes=("object", "plant", "food", "drink"),
+        lines=5,
+        start=("awake", "rested", "home"),
+        weight=14,
+        steps=(
+            StoryStep("act", fields=("go",), destination="place", required=True),
+            StoryStep(
+                "act", fields=("meet",), object="item", place=True, required=True, link="temporal"
+            ),
+            StoryStep("other", actor="item", fields=("express", "talk"), link="additive"),
+            StoryStep("state", condition="content", link="causal"),
+            StoryStep("act", fields=("talk",), required=True, link="additive"),
+            StoryStep("act", fields=("look",), object="prop", place=True),
+            StoryStep(
+                "other", actor="item", fields=("express", "talk", "wait", "move"), link="additive"
+            ),
+            StoryStep("act", fields=("express",), link="causal", kinds=("exclamation",)),
+            StoryStep("act", fields=("talk",), link="temporal"),
+            StoryStep("act", fields=("wait",), place=True),
+            StoryStep(
+                "act", fields=("arrive",), destination="home", required=True, link="temporal"
+            ),
+            StoryStep("act", fields=("think", "express"), link="temporal", kinds=("trailing",)),
+        ),
+    ),
+    # The hero goes out, sits down somewhere, and watches: what turns up, what the light
+    # does. The hero does little, and that is the point of it.
+    Story(
+        name="watch",
+        hero=AGENT_CLASSES,
+        # Something seen from where they sit.
+        prop=("plant", "thing"),
+        prop_themes=("plant", "object"),
+        start=("awake", "rested", "home"),
+        weight=14,
+        steps=(
+            StoryStep("act", fields=("go",), destination="place", required=True),
+            StoryStep("act", fields=("rest",), place=True, required=True, link="temporal"),
+            StoryStep(
+                "other",
+                actor_classes=("creature",),
+                actor_themes=("animal",),
+                fields=("move", "play", "wait", "express", "rest"),
+                link="additive",
+            ),
+            StoryStep("act", fields=("look",), object="prop", place=True),
+            StoryStep("scene", fields=("change",), link="temporal"),
+            StoryStep(
+                "other",
+                actor_classes=("person",),
+                fields=("move", "talk", "express", "wait", "play"),
+                link="additive",
+            ),
+            StoryStep("act", fields=("think",), link="additive"),
+            StoryStep("state", condition="rested", link="causal"),
+            StoryStep("scene", fields=("change",), link="temporal"),
+            StoryStep(
+                "act", fields=("arrive",), destination="home", required=True, link="temporal"
+            ),
+            StoryStep(
+                "act", fields=("express", "think", "sleep"), link="temporal", kinds=("trailing",)
+            ),
+        ),
+    ),
+    # The weather turns while the hero is out. They wait it out, and go on once it has
+    # passed.
+    Story(
+        name="shelter",
+        hero=AGENT_CLASSES,
+        start=("awake", "rested", "home"),
+        weight=12,
+        steps=(
+            StoryStep("act", fields=("go",), destination="place", required=True),
+            StoryStep("act", fields=("move", "play", "wait"), place=True, link="additive"),
+            StoryStep(
+                "other",
+                actor_classes=("event",),
+                actor_themes=("weather",),
+                fields=("change",),
+                required=True,
+                link="temporal",
+            ),
+            StoryStep("act", fields=("wait",), place=True, required=True, link="causal"),
+            StoryStep("act", fields=("think", "express"), link="additive"),
+            StoryStep(
+                "other",
+                actor_classes=("event",),
+                actor_themes=("weather",),
+                fields=("change",),
+                link="temporal",
+            ),
+            StoryStep("scene", fields=("change",), link="temporal"),
+            StoryStep("act", fields=("move", "play"), place=True, link="causal"),
+            StoryStep(
+                "act", fields=("arrive",), destination="home", required=True, link="temporal"
+            ),
+            StoryStep(
+                "act", fields=("rest", "express", "think"), link="temporal", kinds=("trailing",)
+            ),
+        ),
+    ),
+    # Nothing happens to anybody. A place is described, and the things in it do what they
+    # do — the wind, the leaves, a bird, the evening. The hero is the place.
+    Story(
+        name="sketch",
+        hero=("place",),
+        hero_themes=("place", "nature"),
+        start=(),
+        weight=16,
+        steps=(
+            StoryStep("state", required=True),
+            StoryStep(
+                "other",
+                actor_classes=("event",),
+                actor_themes=("weather",),
+                fields=("change",),
+                link="additive",
+            ),
+            StoryStep(
+                "other",
+                actor_classes=("creature",),
+                actor_themes=("animal",),
+                fields=("move", "rest", "express", "wait", "play", "sleep"),
+                link="additive",
+            ),
+            StoryStep("act", fields=("change",), required=True, link="temporal"),
+            StoryStep("other", actor_classes=("plant",), fields=("change",), link="additive"),
+            StoryStep(
+                "other",
+                actor_classes=("event",),
+                actor_themes=("time",),
+                fields=("change",),
+                link="temporal",
+            ),
+            StoryStep(
+                "other",
+                actor_classes=("creature", "person"),
+                actor_themes=("animal", "job"),
+                fields=("move", "rest", "wait", "sleep", "express"),
+                link="temporal",
+            ),
+            StoryStep("act", fields=("change",), link="temporal"),
+            StoryStep("state", link="causal", kinds=("trailing",)),
         ),
     ),
     Story(
@@ -653,6 +816,15 @@ INTERLUDES: tuple[StoryStep, ...] = (
     # in, and a home story has none.
     StoryStep("act", fields=("move", "play"), place=True, needs=("away",), link="additive"),
     StoryStep("scene", fields=("change",), needs=("away",), link="temporal"),
+    # And somebody else is about: a passer-by, a bird on a fence.
+    StoryStep(
+        "other",
+        actor_classes=("creature", "person"),
+        actor_themes=("animal", "job"),
+        fields=("move", "express", "wait", "talk", "play"),
+        needs=("away",),
+        link="additive",
+    ),
 )
 """What a telling may put between the steps of its story when asked for more sentences."""
 

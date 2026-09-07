@@ -288,6 +288,9 @@ function dartModifiers(
 			if (group.themes)
 				lines.push(`${indent}  themes: const ${dartList(group.themes, 'WordTheme', indent)},`);
 
+			if (group.fields)
+				lines.push(`${indent}  fields: const ${dartList(group.fields, 'VerbField', indent)},`);
+
 			lines.push(`${indent}  words: ${dartWords(group.words, indent + '  ')},`, `${indent}),`);
 
 			return lines.join('\n');
@@ -687,6 +690,7 @@ function pyModifiers(
 			const lines = [`${indent}ModifierGroup(`, `${indent}    subject=${pyTuple(group.subject)},`];
 
 			if (group.themes) lines.push(`${indent}    themes=${pyTuple(group.themes)},`);
+			if (group.fields) lines.push(`${indent}    fields=${pyTuple(group.fields)},`);
 
 			lines.push(`${indent}    words=${pyWords(group.words, indent + '    ')},`, `${indent}),`);
 

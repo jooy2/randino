@@ -53,6 +53,9 @@ List<Object?> groups(List<ModifierGroup> source) => <Object?>[
       'themes': group.themes == null
           ? null
           : <String>[for (final theme in group.themes!) theme.name],
+      'fields': group.fields == null
+          ? null
+          : <String>[for (final field in group.fields!) field.name],
       'words': listed(group.words),
     },
 ];

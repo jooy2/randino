@@ -83,6 +83,7 @@ def groups(source: Sequence[ModifierGroup]) -> list[dict[str, object]]:
         {
             "subject": list(group.subject),
             "themes": listed(group.themes),
+            "fields": listed(group.fields),
             "words": listed(group.words),
         }
         for group in source
