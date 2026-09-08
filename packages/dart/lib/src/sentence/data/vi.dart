@@ -806,20 +806,23 @@ final SentenceLanguageData vi = SentenceLanguageData(
       chuồn_chuồn ve muỗi ruồi dơi rồng phượng_hoàng tiên thiên_thần hắc_long bạch_long thanh_long
       chu_tước chim_lửa thiên_mã thần_điểu tinh_linh sơn_ca chim_cút gà_lôi đa_đa chim_ruồi hồng_hạc
       cò chim_gõ_kiến chim_sáo chim_chích chim_cắt hải_âu bồ_nông ong_bắp_cày bướm_đêm đom_đóm
-      ong_nghệ bọ_rùa
+      ong_nghệ bọ_rùa gà_tây diều_hâu
     '''),
     NounTrait.swimmer: words(r'''
       cá_sấu rùa ếch cóc cá cá_voi cá_heo cá_mập mực bạch_tuộc tôm cua sứa hải_cẩu cá_chép lươn
       người_cá mỹ_nhân_ngư hải_quái cá_trích cá_ngừ cá_tuyết cá_hồi cá_trê cá_rô cá_thu cá_đuối hàu
-      trai vẹm tôm_hùm sao_biển cá_kiếm cá_ngựa kỳ_giông hải_ly thú_mỏ_vịt
+      trai vẹm tôm_hùm sao_biển cá_kiếm cá_ngựa kỳ_giông hải_ly thú_mỏ_vịt chim_cánh_cụt hải_mã
+      cá_vàng cá_lóc ba_ba thuồng_luồng
     '''),
     NounTrait.crawler: words(r'''
       cá_sấu rắn thằn_lằn rùa ốc kiến nhện giun sâu tằm cua bọ_ngựa kỳ_nhông tắc_kè kỳ_giông trăn
-      rắn_hổ_mang rắn_lục bọ_cánh_cứng châu_chấu dế bọ_chét rết bọ_cạp
+      rắn_hổ_mang rắn_lục bọ_cánh_cứng châu_chấu dế bọ_chét rết bọ_cạp ốc_sên gián mối
     '''),
     NounTrait.lifeless: words(r'''
       phép_thuật ma_lực thần_chú lời_nguyền tiên_tri sấm_truyền kết_giới bùa_hộ_mệnh phong_ấn
-      ảo_giác ma_thuật hình_nhân sách_phép chén_thánh gậy_phép trượng vương_trượng
+      ảo_giác ma_thuật hình_nhân sách_phép chén_thánh gậy_phép trượng vương_trượng bùa_yêu thần_dược
+      thuốc_tiên đũa_thần thảm_bay đèn_thần gương_thần ngọc_ước điềm_báo phép_lạ thiên_đường
+      địa_ngục âm_phủ long_cung
     '''),
     NounTrait.placeless: words(r'''
       cát đá sỏi động_đất san_hô mạch_nước măng_đá nhũ_đá bóng âm_vang hương lửa than_hồng dòng_chảy
@@ -827,7 +830,11 @@ final SentenceLanguageData vi = SentenceLanguageData(
       cụm_sao chòm_sao quỹ_đạo trọng_lực tự_quay nhật_hoa vết_đen gió_mặt_trời năm_ánh_sáng
       thiên_thể liên_sao định_tinh thiên_cầu hoàng_đạo mưa_sao_băng bụi_vũ_trụ trăng_khuyết
       trăng_tròn trăng_non ánh_trăng ánh_sao sao_bắc_cực sao_hôm sao_mai dòng_nước thủy_triều sóng
-      bọt sóng_vỗ thị_sai parsec phương_vị cận_nhật viễn_nhật trọng_trường sao_lùn
+      bọt sóng_vỗ thị_sai parsec phương_vị cận_nhật viễn_nhật trọng_trường sao_lùn đất_sét phù_sa
+      bụi tro khói hơi_nước bóng_tối ánh_sáng hóa_thạch dung_nham sạt_lở sóng_thần sao_neutron
+      sao_thiên_lang sao_xung chuẩn_tinh tinh_tú tinh_cầu vụ_nổ_lớn vật_chất_tối bão_mặt_trời
+      bắc_đẩu trục không_trọng_lực tia_vũ_trụ bức_xạ người_ngoài_hành_tinh kính_thiên_văn trăng_máu
+      siêu_trăng sao_thần_nông
     '''),
   },
   interjections: words(r'''

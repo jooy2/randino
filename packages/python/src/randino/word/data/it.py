@@ -29,6 +29,8 @@ _POOLS, _GENDER = tagged_nouns(
         tarma:f lucciola:f millepiedi:m scorpione:m pulce:f bruco:m iguana:f
         camaleonte:m salamandra:f tritone:m boa:m vipera:f cobra:m pitone:m
         totano:m
+        gabbiano:m topo:m criceto:m gallo:m tacchino:m pulcino:m agnello:m coccinella:f
+        scarafaggio:m lepre:f marmotta:f pantera:f iena:f orca:f dinosauro:m
     """,
         "object": """
         bottiglia:f matita:f gomma:f ombrello:m lampada:f lanterna:f specchio:m chiave:f
@@ -47,6 +49,13 @@ _POOLS, _GENDER = tagged_nouns(
         baule:m cassone:m tino:m orcio:m boccale:m ciotola:f colino:m mortaio:m
         molletta:f paletta:f
         telescopio:m
+        forchetta:f coltello:m bicchiere:m mestolo:m coperchio:m tagliere:m teglia:f borraccia:f
+        cannuccia:f tappo:m penna:f pennarello:m temperino:m graffetta:f puntina:f colla:f foglio:m
+        libro:m rivista:f giornale:m fumetto:m album:m agenda:f calendario:m diario:m segnalibro:m
+        biglietto:m fazzoletto:m sacchetto:m spugna:f straccio:m bidone:m bandiera:f cartello:m
+        targa:f sigillo:m pergamena:f rotolo:m tela:f cavalletto:m tavolozza:f lavagna:f binocolo:m
+        clessidra:f pendolo:m sveglia:f caraffa:f elastico:m adesivo:m accendino:m stuzzicadenti:m
+        collana:f orecchino:m ciondolo:m pastello:m acquerello:m
     """,
         "nature": """
         mare:m fiume:m lago:m cascata:f valle:f montagna:f collina:f prato:m bosco:m
@@ -61,6 +70,12 @@ _POOLS, _GENDER = tagged_nouns(
         torrente:m ansa:f guado:m sponda:f spiaggia:f costa:f golfo:m insenatura:f
         stretto:m canale:m corrente:f marea:f onda:f schiuma:f frangente:m falesia:f
         dirupo:m cima:f conca:f burrone:m voragine:f antro:m
+        cielo:m terra:f fango:m polvere:f pietra:f ghiaia:f argilla:f foresta:f giungla:f radura:f
+        campagna:f isola:f oceano:m pozzanghera:f fossa:f cresta:f picco:m versante:m altura:f
+        vortice:m fondale:m lava:f magma:m fuoco:m fiamma:f scintilla:f buio:m riflesso:m raggio:m
+        bagliore:m bolla:f goccia:f ghiaccio:m iceberg:m valanga:f frana:f eruzione:f maremoto:m
+        alluvione:f incendio:m paesaggio:m prateria:f foce:f affluente:m nido:m tana:f alveare:m
+        ragnatela:f sottobosco:m
     """,
         "plant": """
         albero:m foglia:f fiore:m radice:f seme:m frutto:m muschio:m felce:f bambù:m
@@ -76,6 +91,11 @@ _POOLS, _GENDER = tagged_nouns(
         camelia:f begonia:f petunia:f geranio:m garofano:m margherita:f papavero:m
         giacinto:m narciso:m tulipano:m giglio:m dalia:f peonia:f trifoglio:m
         giunco:m ortica:f cardo:m mughetto:m glicine:m
+        cipresso:m platano:m leccio:m ippocastano:m pesco:m susino:m melograno:m gelso:m sambuco:m
+        ginestra:f erica:f bosso:m ciclamino:m primula:f mimosa:f gelsomino:m iris:m ortensia:f
+        azalea:f oleandro:m bucaneve:m fiordaliso:m ranuncolo:m anemone:m calendula:f rosmarino:m
+        maggiorana:f cespuglio:m tronco:m stelo:m spiga:f chicco:m baccello:m ceppo:m tubero:m
+        lichene:m spora:f gramigna:f fronda:f
     """,
         "gem": """
         oro:m argento:m rame:m ferro:m acciaio:m bronzo:m ottone:m stagno:m zinco:m
@@ -90,6 +110,9 @@ _POOLS, _GENDER = tagged_nouns(
         berillo:m spinello:m peridoto:m alabastro:m ardesia:f arenaria:f scisto:m
         gneiss:m quarzite:f tufo:m dolomite:f apatite:f barite:f corindone:m feldspato:m
         muscovite:f siderite:f limonite:f bauxite:f
+        diamante:m carbone:m metallo:m lega:f ghisa:f silicio:m silice:f carbonio:m magnesio:m
+        sodio:m potassio:m cadmio:m vanadio:m palladio:m molibdeno:m iridio:m citrino:m travertino:m
+        porfido:m pomice:f marna:f breccia:f geode:m fossile:m salgemma:m serpentino:m allume:m
     """,
         "concept": """
         libertà:f pace:f giustizia:f verità:f saggezza:f memoria:f fantasia:f racconto:m
@@ -109,6 +132,11 @@ _POOLS, _GENDER = tagged_nouns(
         sorte:f fortuna:f volontà:f coscienza:f identità:f essenza:f materia:f forma:f
         causa:f effetto:m ordine:m caos:m limite:m origine:f
         discorso:m disamina:f
+        idea:f pensiero:m parola:f frase:f nome:m numero:m significato:m opinione:f conoscenza:f
+        regola:f legge:f diritto:m valore:m virtù:f talento:m esempio:m modello:m progetto:m piano:m
+        obiettivo:m strategia:f principio:m sonetto:m romanzo:m capitolo:m pagina:f titolo:m trama:f
+        dialogo:m epilogo:m religione:f fede:f politica:f economia:f geografia:f medicina:f
+        letteratura:f
     """,
         "myth": """
         drago:m fenice:f unicorno:m sirena:f fata:f folletto:m elfo:m nano:m troll:m
@@ -123,6 +151,10 @@ _POOLS, _GENDER = tagged_nouns(
         gnomo:m ondina:f silfide:f genio:m apparizione:f sortilegio:m grimorio:m
         pentacolo:m reliquia:f calice:m graal:m bacchetta:f bastone:m scettro:m
         corona:f ippogrifo:m mantìcora:f
+        mostro:m mago:m mummia:f zombie:m goblin:m cerbero:m viverna:f gargolla:f befana:f diavolo:m
+        cherubino:m divinità:f yeti:m paradiso:m inferno:m purgatorio:m olimpo:m aldilà:m limbo:m
+        pozione:f elisir:m malocchio:m maleficio:m scongiuro:m magia:f stregoneria:f alchimia:f
+        calderone:m veggente:m sibilla:f mandragola:f lamia:f
     """,
         "job": """
         cavaliere:m cacciatore:m ladro:m pirata:m marinaio:m capitano:m cuoco:m
@@ -145,6 +177,11 @@ _POOLS, _GENDER = tagged_nouns(
         archeologo:m astronomo:m biologo:m geologo:m botanico:m storico:m filosofo:m
         archivista:m
         cosmonauta:m astronauta:m
+        insegnante:m professore:m studente:m operaio:m impiegato:m segretario:m imprenditore:m
+        elettricista:m pizzaiolo:m gelataio:m barista:m scienziato:m architetto:m fotografo:m
+        dentista:m chirurgo:m sindaco:m ministro:m presidente:m carabiniere:m vigile:m bagnino:m
+        prestigiatore:m giocoliere:m giullare:m mugnaio:m artigiano:m orafo:m pescivendolo:m
+        fruttivendolo:m
     """,
         "music": """
         pianoforte:m chitarra:f tamburo:m campana:f arpa:f canzone:f danza:f ritmo:m
@@ -162,6 +199,11 @@ _POOLS, _GENDER = tagged_nouns(
         gong:m grancassa:f contrappunto:m cadenza:f arpeggio:m trillo:m
         glissando:m legato:m tempo:m ritornello:m strofa:f stornello:m tarantella:f
         bolero:m tango:m rumba:f operetta:f melodramma:m
+        musica:f canto:m strumento:m plettro:m archetto:m opera:f rock:m pop:m rap:m blues:m
+        flamenco:m polka:f mazurca:f madrigale:m minuetto:m romanza:f tenore:m soprano:m baritono:m
+        ukulele:m clavicembalo:m carillon:m bongo:m cornetta:f ottavino:m piffero:m zufolo:m
+        sintetizzatore:m triangolo:m battuta:f tonalità:f bemolle:m diesis:m crescendo:m vibrato:m
+        solista:m
     """,
         "place": """
         mercato:m piazza:f città:f villaggio:m vicolo:m ponte:m giardino:m biblioteca:f
@@ -178,6 +220,12 @@ _POOLS, _GENDER = tagged_nouns(
         enoteca:f fiera:f rione:m sobborgo:m periferia:f corso:m selciato:m sentiero:m
         scorciatoia:f crocevia:m imbarcadero:m diga:f chiusa:f acquedotto:m mulino:m
         fucina:f officina:f magazzino:m silo:m stalla:f recinto:m pagliaio:m
+        casa:f appartamento:m bagno:m garage:m balcone:m ingresso:m aula:f ufficio:m negozio:m
+        supermercato:m bar:m pizzeria:f gelateria:f pasticceria:f edicola:f banca:f chiesa:f
+        cinema:m campanile:m prigione:f tribunale:m università:f asilo:m parcheggio:m autostrada:f
+        strada:f marciapiede:m fermata:f binario:m fabbrica:f miniera:f rifugio:m capanna:f
+        grattacielo:m centro:m paese:m labirinto:m arena:f circo:m luna_park:m pozzo:m fontana:f
+        monumento:m camino:m
     """,
         "food": """
         riso:m pane:m pasta:f zuppa:f stufato:m insalata:f sale:m zucchero:m pepe:m
@@ -195,6 +243,11 @@ _POOLS, _GENDER = tagged_nouns(
         prugna:f melagrana:f cotogna:f nespola:f albicocca:f pompelmo:m mandarino:m
         kiwi:m pistacchio:m arachide:f castagna:f pandoro:m panettone:m crostata:f
         frittura:f minestra:f ribollita:f caponata:f
+        pollo:m manzo:m spaghetti:p tagliatelle:fp sugo:m ragù:m pesto:m salsa:f olio:m aceto:m
+        farina:f cornetto:m brioche:f bruschetta:f piadina:f arancino:m torrone:m gelato:m
+        panna_cotta:f meringa:f parmigiana:f arrosto:m spezzatino:m polpettone:m minestrone:m
+        brodo:m purè:m parmigiano:m mozzarella:f ricotta:f gorgonzola:m rucola:f radicchio:m
+        lampone:m mirtillo:m melone:m mandorla:f peperoncino:m vaniglia:f liquirizia:f
     """,
         "sport": """
         calcio:m baseball:m pallavolo:f tennis:m badminton:m golf:m bowling:m biliardo:m
@@ -211,6 +264,12 @@ _POOLS, _GENDER = tagged_nouns(
         attaccante:m difensore:m allenatore:m tifoso:m stadio:m campo:m pista:f rigore:m
         angolo:m cartellino:m punteggio:m pareggio:m vittoria:f sconfitta:f record:m
         torneo:m campionato:m coppa:f
+        pallacanestro:f pallamano:f pallanuoto:f taekwondo:m sumo:m pallone:m canestro:m guantone:m
+        cronometro:m bocce:fp motociclismo:m immersione:f apnea:f paracadutismo:m alpinismo:m
+        escursione:f mezzofondo:m gara:f partita:f incontro:m semifinale:f girone:m classifica:f
+        giocatore:m punizione:f gol:m parata:f passaggio:m contropiede:m fuorigioco:m espulsione:f
+        ammonizione:f olimpiade:f mondiale:m scudetto:m bilanciere:m pinne:fp boccaglio:m
+        sostituzione:f
     """,
         "vehicle": """
         bicicletta:f treno:m barca:f automobile:f autobus:m taxi:m camion:m moto:f
@@ -226,6 +285,11 @@ _POOLS, _GENDER = tagged_nouns(
         ciclomotore:m sidecar:m traghetto:m crociera:f galea:f galeone:m fregata:f
         corvetta:f brigantino:m goletta:f piroga:f scialuppa:f lancia:f aliante:m
         ultraleggero:m caccia:m bombardiere:m rimorchio:m
+        nave:f pullman:m corriera:f metropolitana:f filobus:m seggiovia:f teleferica:f passeggino:m
+        carrozzina:f carrello:m risciò:m portaerei:f incrociatore:m aliscafo:m motoscafo:m gommone:m
+        pedalò:m vaporetto:m battello:m rimorchiatore:m rompighiaccio:m transatlantico:m jet:m
+        deltaplano:m parapendio:m capsula:f autobotte:f camper:m roulotte:f carro_attrezzi:m ruspa:f
+        muletto:m biga:f tandem:m carro_armato:m fuoristrada:m pulmino:m
     """,
         "product": """
         computer:m tastiera:f mouse:m schermo:m stampante:f altoparlante:m auricolare:m
@@ -242,6 +306,13 @@ _POOLS, _GENDER = tagged_nouns(
         posateria:f stoviglia:f cristalleria:f
         tovaglia:f tovagliolo:m scolapiatti:m lavandino:m rubinetto:m doccia:f vasca:f
         lavabo:m lente:f piastra:f
+        portatile:m fotocamera:f videocamera:f giradischi:m cavo:m adattatore:m prolunga:f
+        interruttore:m faretto:m aspirapolvere:m lavastoviglie:f ferro_da_stiro:m asse_da_stiro:f
+        condizionatore:m umidificatore:m scaldabagno:m caldaia:f fornello:m cappa:f macinacaffè:m
+        tritatutto:m affettatrice:f gelatiera:f moka:f spazzola:f phon:m deodorante:m balsamo:m
+        bagnoschiuma:m cerotto:m garza:f pillola:f carta_igienica:f barattolo:m lattina:f valigia:f
+        borsone:m chiavetta:f scheda:f candeggina:f pannolino:m biberon:m ciuccio:m water:m bidè:m
+        sigaretta:f barometro:m
     """,
         "color": """
         cremisi:m scarlatto:m vermiglio:m magenta:m fucsia:m rosato:m arancione:m
@@ -255,6 +326,9 @@ _POOLS, _GENDER = tagged_nouns(
         antracite:f malva:f verdeazzurro:m azzurrino:m
         grigiastro:m violaceo:m giallino:m brunito:m dorato:m nerastro:m biancastro:m
         rosaceo:m incarnato:m
+        rosso:m verde:m giallo:m nero:m bianco:m azzurro:m grigio:m blu:m marrone:m castano:m
+        biondo:m bruno:m tortora:m nocciola:m mattone:m tabacco:m caramello:m pervinca:m oltremare:m
+        oliva:m petrolio:m cipria:m ottanio:m turchino:m granata:m verdeacqua:m
     """,
         "finance": """
         fattura:f ricevuta:f obbligazione:f azione:f dividendo:m interesse:m prestito:m
@@ -273,6 +347,11 @@ _POOLS, _GENDER = tagged_nouns(
         ritenuta:f esenzione:f multa:f mora:f usura:f cauzione:f apporto:m dote:f
         successione:f rendita:f affitto:m pedaggio:m decima:f bottino:m tesoro:m
         ricchezza:f povertà:f cedola:f pegno:m ipoteca:f
+        soldi:p denaro:m banconota:f spiccioli:p contanti:p resto:m mancia:f prezzo:m costo:m
+        tassa:f bolletta:f scontrino:m bancomat:m carta_di_credito:f bonifico:m prelievo:m
+        investimento:m fondo:m patrimonio:m tariffa:f offerta:f vendita:f acquisto:m commercio:m
+        affare:m perdita:f fatturato:m incasso:m salvadanaio:m cambio:m euro:m dollaro:m sterlina:f
+        centesimo:m lira:f borsellino:m finanziamento:m caparra:f
     """,
         "tech": """
         server:m cache:f buffer:m pixel:m codec:m pacchetto:m protocollo:m coda:f
@@ -291,6 +370,12 @@ _POOLS, _GENDER = tagged_nouns(
         traccia:f profilo:m trigger:m evento:m argomento:m
         thread:m kernel:m
         istanza:f
+        bit:m byte:m chip:m processore:m circuito:m modem:m antenna:f segnale:m connessione:f
+        indirizzo:m dominio:m sito:m password:f utente:m file:m programma:m applicazione:f
+        software:m hardware:m algoritmo:m codice:m errore:m virus:m database:m dato:m linguaggio:m
+        variabile:f funzione:f classe:f interfaccia:f pulsante:m icona:f risoluzione:f
+        aggiornamento:m installazione:f video:m audio:m immagine:f robot:m sensore:m terminale:m
+        comando:m ricorsione:f
     """,
         "weather": """
         nuvola:f vento:m pioggia:f neve:f brina:f nebbia:f rugiada:f arcobaleno:m
@@ -305,6 +390,9 @@ _POOLS, _GENDER = tagged_nouns(
         nevicata:f spolverata:f grandinata:f rovescio:m guazza:f nuvolosità:f siccità:f
         magra:f bonaccia:f gelo:m calura:f
         libecciata:f groppo:m
+        caldo:m freddo:m fresco:m tepore:m frescura:f arsura:f vampa:f smog:m ventata:f folata:f
+        bora:f perturbazione:f tormenta:f fiocco:m meteo:m bollettino:m maltempo:m intemperie:fp
+        favonio:m acquata:f piovasco:m ondata:f nube:f cirro:m nembo:m
     """,
         "space": """
         stella:f luna:f galassia:f cometa:f meteora:f aurora:f
@@ -318,6 +406,10 @@ _POOLS, _GENDER = tagged_nouns(
         fotosfera:f cromosfera:f magnetosfera:f ionosfera:f esosfera:f mesosfera:f
         troposfera:f eliosfera:f osservatorio:m
         gravitazione:f alone:m nana:f bolide:m luce:f
+        spazio:m costellazione:f zodiaco:m radiazione:f traiettoria:f allunaggio:m decollo:m
+        missione:f alieno:m apogeo:m congiunzione:f propulsore:m etere:m astronomia:f astrologia:f
+        planetario:m nova:f magnetar:f brillamento:m occultazione:f radiotelescopio:m cosmologia:f
+        astrofisica:f
     """,
         "time": """
         alba:f crepuscolo:m imbrunire:m solstizio:m
@@ -332,6 +424,11 @@ _POOLS, _GENDER = tagged_nouns(
         turno:m ronda:f fase:f tappa:f tratto:m mattinata:f serata:f nottata:f
         passato:m presente:m avvenire:m albore:m annata:f
         centenario:m quadriennio:m sessennio:m
+        giorno:m domani:m dopodomani:m fine_settimana:m vacanza:f ferie:fp ritardo:m anticipo:m
+        orario:m termine:m appuntamento:m data:f medioevo:m rinascimento:m antichità:f preistoria:f
+        compleanno:m capodanno:m carnevale:m sosta:f veglia:f siesta:f pisolino:m pranzo:m cena:f
+        colazione:f merenda:f adolescenza:f ventennio:m fuso_orario:m posterità:f giubileo:m
+        attimo:m
     """,
         "emotion": """
         gioia:f tristezza:f rabbia:f paura:f sorpresa:f allegria:f giubilo:m felicità:f
@@ -349,6 +446,12 @@ _POOLS, _GENDER = tagged_nouns(
         clemenza:f indulgenza:f benevolenza:f simpatia:f antipatia:f
         tripudio:m contentezza:f inquietudine:f trepidazione:f soprassalto:m
         stupefazione:f rimorso:m pentimento:m brama:f smania:f
+        amore:m amicizia:f delusione:f frustrazione:f nervosismo:m curiosità:f meraviglia:f
+        ammirazione:f rispetto:m stima:f disgusto:m imbarazzo:m rimpianto:m depressione:f
+        preoccupazione:f spavento:m orrore:m soddisfazione:f vanità:f superbia:f arroganza:f
+        pigrizia:f voglia:f timore:m commozione:f dolcezza:f perdono:m vendetta:f indignazione:f
+        irritazione:f impazienza:f confusione:f beatitudine:f letizia:f gaudio:m ilarità:f
+        divertimento:m infatuazione:f altruismo:m egoismo:m generosità:f avarizia:f accidia:f ira:f
     """,
         "body": """
         testa:f fronte:f sopracciglio:m ciglio:m palpebra:f naso:m guancia:f mento:m
@@ -365,6 +468,11 @@ _POOLS, _GENDER = tagged_nouns(
         diaframma:m sterno:m scapola:f vertebra:f bacino:m femore:m tibia:f perone:m
         omero:m falange:f metatarso:m ascella:f inguine:m iride:f
         pupilla:f cornea:f retina:f setto:m frenulo:m avambraccio:m
+        occhio:m bocca:f mano:f braccio:m gamba:f piede:m corpo:m viso:m pelo:m gluteo:m fianco:m
+        torace:m seno:m spina_dorsale:f midollo:m scheletro:m articolazione:f alluce:m mignolo:m
+        anulare:m cuticola:f narice:f neurone:m cellula:f globulo:m ormone:m gene:m cromosoma:m
+        ghiandola:f tiroide:f pancreas:m cistifellea:f appendice:f utero:m molare:m canino:m
+        incisivo:m ugola:f bronco:m alveolo:m aorta:f battito:m
     """,
         "clothing": """
         cappello:m scarpa:f guanto:m sciarpa:f occhiali:p cappotto:m giaccone:m giacca:f
@@ -380,6 +488,11 @@ _POOLS, _GENDER = tagged_nouns(
         ghetta:f zoccolo:m espadrilla:f infradito:m babbuccia:f calzoncini:p
         mezzoguanto:m manopola:f polsiera:f bretella:f busto:m crinolina:f mantiglia:f
         cuffietta:f tricorno:m elmo:m cappuccio:m sciarpone:m
+        maglia:f maglietta:f vestito:m canottiera:f reggiseno:m mutande:fp collant:m calzamaglia:f
+        salopette:f piumino:m kimono:m scarpone:m tacco:m suola:f stringa:f paraorecchie:m
+        passamontagna:m cerchietto:m fermaglio:m forcina:f foulard:m tasca:f bavaglino:m camice:m
+        tailleur:m completo:m pareo:m bikini:m accappatoio:m pizzo:m raso:m tulle:m pelliccia:f
+        poliestere:m feltro:m panno:m camoscio:m
     """,
         "tool": """
         ascia:f pala:f sega:f pinza:f scalpello:m incudine:f mantice:m
@@ -395,6 +508,12 @@ _POOLS, _GENDER = tagged_nouns(
         piombino:m tenaglia:f cric:m graffatrice:f pistola:f cannello:m acciarino:m
         crogiolo:m stampo:m fustella:f mola:f arrotino:m mandrino:m fresa:f roncola:f
         accettino:m subbio:m
+        chiave_inglese:f avvitatore:m smerigliatrice:f carta_vetrata:f bulino:m spada:f pugnale:m
+        arco:m freccia:f machete:m forcone:m annaffiatoio:m cesoie:fp tosaerba:m spatola:f
+        frattazzo:m bisturi:m siringa:f pinzetta:f uncinetto:m telaio:m arcolaio:m cesello:m pompa:f
+        argano:m paranco:m maglio:m piccozza:f schiacciapatate:m apriscatole:m schiaccianoci:m
+        tritacarne:m mattarello:m mannaia:f raschietto:m bullone:m tassello:m perforatrice:f
+        taglierino:m
     """,
         "drink": """
         caffè:m tè:m succo:m latte:m acqua:f gassosa:f limonata:f sidro:m orzata:f
@@ -408,6 +527,11 @@ _POOLS, _GENDER = tagged_nouns(
         limoncello:m chinotto:m spuma:f sorbetto:m aranciata:f cedrata:f
         moscato:m lambrusco:m barbera:f chianti:m marsala:m passito:m vinsanto:m
         mosto:m rosolio:m nocino:m ratafià:m centerbe:m
+        spremuta:f cola:f caffelatte:m ristretto:m marocchino:m karkadè:m frappè:m centrifugato:m
+        aperitivo:m spritz:m barolo:m brunello:m nebbiolo:m amarone:m trebbiano:m vermentino:m
+        sangiovese:m aglianico:m falanghina:f verdicchio:m pinot:m merlot:m bitter:m assenzio:m
+        genepì:m amaretto:m maraschino:m alchermes:m latticello:m tamarindo:m granatina:f
+        shakerato:m affogato:m
     """,
         "toy": """
         palloncino:m aquilone:m trottola:f biglia:f dado:m puzzle:m scacchi:p domino:m giocattolo:m
@@ -669,6 +793,45 @@ IT = WordLanguageData(
             cassettiera credenza dispensa vetrina mobile attaccapanni scarpiera comò seggiolone
             sdraio amaca lenzuolo trapunta zanzariera cornice quadro persiana tapparella bancone
             cattedra
+            gabbiano topo gallo tacchino pulcino agnello coccinella lepre dinosauro forchetta
+            coltello bicchiere tappo penna pennarello colla foglio libro rivista giornale fumetto
+            calendario diario biglietto fazzoletto sacchetto spugna bandiera cartello sveglia
+            accendino collana orecchino cielo terra fango polvere pietra foresta campagna isola
+            oceano pozzanghera fuoco fiamma buio goccia ghiaccio valanga frana incendio nido tana
+            cipresso pesco melograno mimosa gelsomino rosmarino cespuglio tronco spiga chicco
+            diamante carbone metallo idea pensiero parola frase nome numero significato opinione
+            regola legge esempio progetto piano obiettivo romanzo capitolo pagina titolo religione
+            politica mostro mago mummia zombie befana diavolo paradiso inferno pozione magia
+            insegnante professore studente operaio impiegato segretario elettricista pizzaiolo
+            gelataio barista scienziato architetto fotografo dentista chirurgo sindaco ministro
+            presidente carabiniere vigile bagnino musica canto strumento opera rock pop rap casa
+            appartamento bagno garage balcone ingresso aula ufficio negozio supermercato bar
+            pizzeria gelateria pasticceria edicola banca chiesa cinema prigione università asilo
+            parcheggio autostrada strada marciapiede fermata binario fabbrica grattacielo centro
+            paese circo pozzo fontana camino pollo manzo spaghetti tagliatelle sugo ragù pesto salsa
+            olio aceto farina cornetto brioche bruschetta piadina gelato arrosto minestrone brodo
+            purè parmigiano mozzarella ricotta melone mandorla peperoncino vaniglia pallacanestro
+            pallone canestro gara partita giocatore gol olimpiade mondiale scudetto nave pullman
+            metropolitana passeggino carrello gommone jet camper roulotte portatile fotocamera cavo
+            prolunga interruttore aspirapolvere lavastoviglie ferro_da_stiro condizionatore fornello
+            cappa moka spazzola phon deodorante bagnoschiuma cerotto pillola carta_igienica
+            barattolo lattina valigia chiavetta pannolino biberon ciuccio water sigaretta rosso
+            verde giallo nero bianco azzurro grigio blu marrone castano biondo soldi denaro
+            banconota spiccioli contanti resto mancia prezzo costo tassa bolletta scontrino bancomat
+            carta_di_credito bonifico prelievo offerta vendita acquisto affare salvadanaio euro
+            dollaro centesimo chip antenna segnale connessione indirizzo sito password utente file
+            programma applicazione software codice errore virus pulsante icona aggiornamento video
+            audio immagine robot caldo freddo fresco smog meteo maltempo spazio costellazione
+            decollo missione alieno giorno domani dopodomani fine_settimana vacanza ferie ritardo
+            orario appuntamento data compleanno capodanno carnevale pisolino pranzo cena colazione
+            merenda attimo amore amicizia delusione curiosità meraviglia rispetto disgusto imbarazzo
+            preoccupazione spavento orrore soddisfazione pigrizia voglia vendetta confusione
+            divertimento egoismo generosità occhio bocca mano braccio gamba piede corpo viso pelo
+            fianco seno scheletro mignolo narice cellula maglia maglietta vestito canottiera
+            reggiseno mutande collant piumino scarpone tacco suola stringa cerchietto forcina tasca
+            bavaglino camice bikini accappatoio pizzo pelliccia chiave_inglese spada arco freccia
+            annaffiatoio tosaerba siringa pinzetta pompa apriscatole schiaccianoci mattarello
+            bullone spremuta cola caffelatte ristretto aperitivo spritz amaretto
         """),
         rare=words("""
             donnola gnu suricato armadillo istrice ornitorinco lemure tapiro allodola pernice upupa
@@ -717,6 +880,30 @@ IT = WordLanguageData(
             guastafeste baldacchino arazzo pendola piantana candelabro paralume soprammobile
             scrittoio portagioie cofanetto fasciatoio tappezzeria leggio stuoia drappo cassapanca
             guanciale
+            pergamena stuzzicadenti altura fondale magma eruzione maremoto affluente sottobosco
+            leccio ippocastano susino bosso bucaneve fiordaliso ranuncolo anemone calendula
+            maggiorana baccello tubero lichene spora gramigna fronda ghisa silice carbonio magnesio
+            sodio potassio cadmio vanadio palladio molibdeno iridio citrino travertino porfido
+            pomice marna breccia geode salgemma serpentino allume sonetto epilogo cerbero viverna
+            gargolla cherubino purgatorio olimpo limbo maleficio scongiuro alchimia calderone
+            sibilla mandragola lamia giullare mugnaio orafo plettro archetto mazurca madrigale
+            minuetto romanza baritono clavicembalo ottavino piffero zufolo bemolle diesis labirinto
+            polpettone gorgonzola taekwondo sumo mezzofondo contropiede bilanciere boccaglio filobus
+            teleferica risciò portaerei incrociatore aliscafo rompighiaccio transatlantico
+            deltaplano parapendio autobotte muletto biga umidificatore scaldabagno affettatrice
+            gelatiera barometro tortora pervinca oltremare cipria ottanio turchino granata
+            verdeacqua fatturato borsellino caparra bit byte processore circuito modem dominio
+            algoritmo database variabile funzione classe interfaccia risoluzione terminale
+            ricorsione favonio acquata piovasco cirro nembo zodiaco apogeo congiunzione propulsore
+            etere nova magnetar brillamento occultazione radiotelescopio cosmologia astrofisica
+            posterità giubileo ventennio beatitudine letizia gaudio infatuazione accidia gluteo
+            midollo articolazione alluce anulare cuticola neurone globulo ormone cromosoma ghiandola
+            tiroide pancreas cistifellea molare canino incisivo ugola bronco alveolo aorta salopette
+            kimono paraorecchie tailleur raso tulle poliestere feltro camoscio smerigliatrice bulino
+            machete forcone frattazzo bisturi uncinetto telaio arcolaio cesello argano paranco
+            maglio piccozza mannaia tassello perforatrice karkadè centrifugato nebbiolo trebbiano
+            vermentino sangiovese aglianico falanghina verdicchio assenzio genepì maraschino
+            alchermes latticello granatina shakerato
         """),
     ),
     frames=(

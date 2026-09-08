@@ -44,6 +44,10 @@ const int _fitAttempts = 14;
 /// can fill. Telling the whole story again is what closes that.
 const int _storyAttempts = 3;
 
+/// How many times a name is drawn again when it is one the result already
+/// carries. Two people in one story sharing a name reads as a mistake.
+const int _nameAttempts = 6;
+
 // How often a noun phrase that may carry a modifier is given one. Length can
 // override it in both directions — see [_modifyChanceFor].
 const int _modifyChance = 45;
@@ -2137,6 +2141,19 @@ int _atMost(int ceiling, int value) => value > ceiling ? ceiling : value;
 
 /// A person's name for a phrase that has room for one, and the gender it carries.
 ///
+/// A name nobody in this result carries yet. Two people in one story sharing a
+/// name reads as a mistake rather than as a coincidence, and the pools are small
+/// enough that an unsteered draw repeats one now and then.
+_Named _freshName(WordLanguage language, _Settings settings, String prefix, List<String> taken) {
+  var drawn = _properName(language, settings, prefix);
+
+  for (var attempt = 1; attempt < _nameAttempts && taken.contains(drawn.text); attempt += 1) {
+    drawn = _properName(language, settings, prefix);
+  }
+
+  return drawn;
+}
+
 /// A bare given name rather than a full one: a sentence about someone uses the
 /// name they are called by, and `randName`'s default would put a surname in
 /// every clause. The gender is the one the name was drawn for, translated into
@@ -2658,10 +2675,11 @@ _Built _compose(
       if (proper[i]!.isNotEmpty) {
         phrase = proper[i]!;
       } else {
-        final drawnName = _properName(
+        final drawnName = _freshName(
           language,
           settings,
           prefixable && i == 0 ? settings.prefix : '',
+          names,
         );
 
         phrase = drawnName.text;

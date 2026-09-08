@@ -106,6 +106,10 @@ const FIT_ATTEMPTS = 14;
 // hundred and twenty. Telling the whole story again is what closes that.
 const STORY_ATTEMPTS = 3;
 
+// How many times a name is drawn again when it is one the result already
+// carries. Two people in one story sharing a name reads as a mistake.
+const NAME_ATTEMPTS = 6;
+
 // How often a noun phrase that may carry a modifier is given one. Length can
 // override it in both directions — see `modifyChanceFor`.
 const MODIFY_CHANCE = 45;
@@ -1971,6 +1975,25 @@ function nounPhrase(
 }
 
 /**
+ * A name nobody in this result carries yet. Two people in one story sharing a
+ * name reads as a mistake rather than as a coincidence, and the pools are small
+ * enough that an unsteered draw repeats one now and then.
+ */
+function freshName(
+	language: WordLanguage,
+	settings: Settings,
+	prefix: string,
+	taken: readonly string[]
+): { text: string; gender: WordGender } {
+	let drawn = properName(language, settings, prefix);
+
+	for (let attempt = 1; attempt < NAME_ATTEMPTS && taken.includes(drawn.text); attempt += 1) {
+		drawn = properName(language, settings, prefix);
+	}
+
+	return drawn;
+}
+/**
  * A person's name for a phrase that has room for one, and the gender it carries.
  *
  * A bare given name rather than a full one: a sentence about someone uses the
@@ -2684,7 +2707,12 @@ function compose(
 			if (proper[i]) {
 				phrase = proper[i] as string;
 			} else {
-				const drawn = properName(language, settings, prefixable && i === 0 ? settings.prefix : '');
+				const drawn = freshName(
+					language,
+					settings,
+					prefixable && i === 0 ? settings.prefix : '',
+					names
+				);
 
 				phrase = drawn.text;
 				names.push(drawn.text);

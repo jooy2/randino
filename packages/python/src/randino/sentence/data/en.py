@@ -1885,31 +1885,33 @@ EN = SentenceLanguageData(
             lapwing starling finch warbler thrush cuckoo hoopoe kingfisher toucan macaw cockatoo
             canary nightingale cicada beetle dragon wyvern phoenix griffin harpy pegasus hippogriff
             roc simurgh thunderbird fairy pixie sprite sylph angel seraph valkyrie imp gargoyle
-            drake peryton
+            drake peryton crow pigeon mosquito
         """),
         "swimmer": words("""
             whale dolphin shark turtle seal penguin frog octopus squid seahorse starfish crab shrimp
             carp salmon mackerel walrus narwhal jellyfish tadpole siren mermaid kraken leviathan
-            naiad undine selkie kelpie
+            naiad undine selkie kelpie crocodile lobster
         """),
         "crawler": words("""
             turtle lizard chameleon snake snail ant spider crab earthworm centipede scorpion gecko
-            iguana cobra python newt mantis basilisk wyrm naga amphisbaena lindworm
+            iguana cobra python newt mantis basilisk wyrm naga amphisbaena lindworm crocodile
+            lobster
         """),
         "lifeless": words("""
             spell curse hex rune amulet talisman grimoire potion prophecy sorcery enchantment sigil
             glyph omen portent blessing incantation invocation summoning banishment divination
             scrying portal ley sanctum reliquary effigy idol totem phylactery charm warding
-            runestone nightmare
+            runestone nightmare wand elixir magic jinx
         """),
         "liquid": words("""
             porridge stew chowder curry bisque consomme goulash congee pho ramen udon soba pudding
-            custard yogurt honey syrup lemonade salsa chutney relish marmalade hummus guacamole
+            custard yogurt honey syrup lemonade salsa chutney relish marmalade hummus guacamole soup
+            broth sauce
         """),
         "raw": words("""
             potato carrot cabbage spinach broccoli pumpkin garlic mushroom steak fillet drumstick
             brisket ribeye sirloin tenderloin sausage bacon meatball cutlet schnitzel kebab skewer
-            tofu
+            tofu onion tomato bean beef pork dough
         """),
         "placeless": words("""
             wave tide boulder pebble ember cinder earthquake echo avalanche driftwood fumarole
@@ -1917,7 +1919,10 @@ EN = SentenceLanguageData(
             gravity sunspot lightyear stardust supernova quasar pulsar moonrise solarflare
             perihelion aphelion apogee perigee nadir azimuth parallax redshift starlore cosmology
             astronomy telescopy gravitas lunation sidereal ecliptic meridian solarsail starburst
-            skyline
+            skyline mud soil dust current foam surf whirlpool lava magma flame fire spark glow
+            wildfire flood landslide tsunami eruption tremor ripple sun zodiac spacewalk liftoff
+            probe orbiter supergiant magnetar photon radiation moonrock moondust moonwalk solarwind
+            starchart astrology protostar
         """),
     },
     interjections=words("""

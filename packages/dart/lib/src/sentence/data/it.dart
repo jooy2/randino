@@ -1220,30 +1220,35 @@ final SentenceLanguageData it = SentenceLanguageData(
       farfalla ape libellula cicala mosca zanzara pipistrello airone pellicano drago fenice fata
       pegaso grifone angelo valchiria merlo usignolo allodola quaglia fagiano pernice colibrì tucano
       fenicottero cicogna upupa cardellino gazza ghiandaia civetta poiana vespa tarma lucciola
-      ippogrifo
+      ippogrifo gabbiano coccinella cherubino viverna gargolla
     '''),
     NounTrait.swimmer: words(r'''
       coccodrillo tartaruga rana rospo pesce balena delfino squalo polpo calamaro gambero granchio
       tricheco foca pinguino sirena kraken naiade anguilla sardina tonno merluzzo nasello trota
       salmone carpa razza medusa vongola cozza ostrica aragosta totano salamandra tritone castoro
-      ippopotamo ornitorinco
+      ippopotamo ornitorinco orca
     '''),
     NounTrait.crawler: words(r'''
       coccodrillo serpente lucertola tartaruga lumaca formica ragno verme granchio basilisco iguana
       camaleonte salamandra tritone boa vipera cobra pitone scarabeo cavalletta grillo pulce bruco
-      millepiedi scorpione
+      millepiedi scorpione scarafaggio dinosauro lamia
     '''),
     NounTrait.lifeless: words(r'''
       incantesimo maledizione profezia amuleto talismano runa portale santuario idolo totem augurio
       presagio bestiario sortilegio grimorio pentacolo reliquia calice graal bacchetta bastone
-      scettro corona
+      scettro corona paradiso inferno purgatorio olimpo aldilà limbo pozione elisir malocchio
+      maleficio scongiuro magia stregoneria alchimia calderone mandragola
     '''),
     NounTrait.placeless: words(r'''
       sabbia ciottolo terremoto masso geyser fumarola stalattite stalagmite eco brace stella cometa
       meteora aurora falce_lunare eclissi zenit satellite ammasso orbita gravità rotazione
       rivoluzione anno_luce astro eclittica meridiano plenilunio novilunio perigeo vespro supernova
       quasar pulsar corrente marea onda schiuma frangente parallasse parsec azimut perielio afelio
-      ellisse quadrante nadir gravitazione alone bolide nana
+      ellisse quadrante nadir gravitazione alone bolide nana fango polvere pietra ghiaia argilla
+      vortice lava magma fuoco fiamma scintilla riflesso raggio bagliore bolla goccia ghiaccio
+      valanga frana eruzione maremoto alluvione incendio ragnatela zodiaco radiazione traiettoria
+      allunaggio decollo missione alieno apogeo congiunzione propulsore etere astronomia astrologia
+      nova magnetar brillamento occultazione radiotelescopio cosmologia astrofisica
     '''),
   },
   interjections: words(r'''

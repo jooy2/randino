@@ -29,6 +29,8 @@ _POOLS, _GENDER = tagged_nouns(
         Marienkäfer:m Leguan:m Chamäleon:n Salamander:m Molch:m Boa:f Viper:f Kobra:f
         Python:m
         Meerforelle:f
+        Ratte:f Hamster:m Meerschweinchen:n Hase:m Eisbär:m Puma:m Jaguar:m Hyäne:f Lama:n Krähe:f
+        Schmetterling:m Hering:m Hecht:m
     """,
         "object": """
         Flasche:f Bleistift:m Radierer:m Regenschirm:m Lampe:f Laterne:f Spiegel:m
@@ -43,6 +45,12 @@ _POOLS, _GENDER = tagged_nouns(
         Schraube:f Scharnier:n Riegel:m Kette:f Schnalle:f Brosche:f Armreif:m Ring:m
         Aktentasche:f Rucksack:m Truhe:f Kiste:f Bottich:m Schale:f Mörser:m Klammer:f
         Schleife:f Kordel:f Docht:m Öse:f Zwirn:m Lupe:f Wecker:m Kanister:m Zwinge:f
+        Buch:n Zeitung:f Uhr:f Koffer:m Glas:n Schüssel:f Gabel:f Messer:n Becher:m Taschenlampe:f
+        Feuerzeug:n Notizbuch:n Ordner:m Mappe:f Tinte:f Füller:m Kreide:f Klebstoff:m Gummiband:n
+        Reißzwecke:f Schwamm:m Lappen:m Bürste:f Schnur:f Draht:m Tüte:f Beutel:m Sack:m Deckel:m
+        Korken:m Globus:m Sanduhr:f Fernglas:n Zettel:m Stempel:m Siegel:n Foto:n Bild:n Stock:m
+        Pfeil:m Bogen:m Schwert:n Dolch:m Ohrring:m Armband:n Medaillon:n Geschenk:n Kugel:f Brett:n
+        Geldbeutel:m Brieftasche:f Lesezeichen:n Strohhalm:m Klebeband:n Leine:f
     """,
         "nature": """
         Meer:n Fluss:m See:m Wasserfall:m Tal:n Berg:m Hügel:m Wiese:f Wald:m Höhle:f
@@ -57,6 +65,12 @@ _POOLS, _GENDER = tagged_nouns(
         Brandung:f Steilhang:m Zinne:f Mulde:f Senke:f Kessel:m Kluft:f Karst:m
         Geröllhalde:f Steilküste:f Lichtung:f Dickicht:n
         Salzwiese:f Meeresarm:m Felsspalte:f
+        Himmel:m Insel:f Stein:m Teich:m Tümpel:m Flut:f Ebbe:f Feuer:n Flamme:f Rauch:m Asche:f
+        Staub:m Schlamm:m Lehm:m Kies:m Boden:m Lawine:f Erdrutsch:m Tsunami:m Gischt:f
+        Sonnenaufgang:m Sonnenuntergang:m Luft:f Eis:n Eiszapfen:m Eisscholle:f Eisberg:m Wildnis:f
+        Hain:m Busch:m Gebirge:n Grat:m Felswand:f Rinnsal:n Sonnenstrahl:m Tropfen:m Pfütze:f
+        Watt:n Treibholz:n Funke:m Landschaft:f Stromschnelle:f Kap:n Meeresgrund:m Tiefsee:f
+        Spiegelung:f Dunkelheit:f Licht:n Lava:f
     """,
         "plant": """
         Baum:m Blatt:n Blume:f Wurzel:f Samen:m Frucht:f Moos:n Farn:m Bambus:m
@@ -73,6 +87,12 @@ _POOLS, _GENDER = tagged_nouns(
         Petunie:f Geranie:f Nelke:f Gänseblume:f Mohn:m Hyazinthe:f Narzisse:f Tulpe:f
         Lilie:f Dahlie:f Pfingstrose:f Klee:m Binse:f Brennnessel:f Distel:f
         Maiglöckchen:n Glyzinie:f
+        Fichte:f Schilf:n Rebe:f Flechte:f Strauch:m Blüte:f Stängel:m Halm:m Ähre:f Schote:f
+        Beere:f Holunder:m Hagebutte:f Hasel:f Jasmin:m Krokus:m Schneeglöckchen:n
+        Vergissmeinnicht:n Butterblume:f Kornblume:f Stiefmütterchen:n Iris:f Gladiole:f
+        Ringelblume:f Primel:f Edelweiß:n Ginster:m Wacholder:m Eibe:f Platane:f Zypresse:f Hopfen:m
+        Raps:m Zuckerrohr:n Kraut:n Unkraut:n Rosmarin:m Majoran:m Kresse:f Setzling:m Keim:m
+        Ranke:f Laub:n Ast:m Baumstumpf:m Knolle:f Tang:m
     """,
         "gem": """
         Gold:n Silber:n Kupfer:n Eisen:n Stahl:m Bronze:f Messing:n Zinn:n Zink:n
@@ -86,6 +106,9 @@ _POOLS, _GENDER = tagged_nouns(
         Lithium:n Uran:n Lapislazuli:m Karneol:m Jaspis:m Onyx:m Beryll:m Spinell:m
         Peridot:m Alabaster:m Schiefer:m Sandstein:m Gneis:m Quarzit:m Tuff:m Dolomit:m
         Apatit:m Baryt:m Korund:m Feldspat:m Muskovit:m Siderit:m Limonit:m Bauxit:m
+        Diamant:m Kohle:f Mondstein:m Tigerauge:n Kalk:m Mineral:n Gestein:n Koralle:f Metall:n
+        Legierung:f Magnesium:n Natrium:n Kalium:n Kalzium:n Silizium:n Radium:n Plutonium:n
+        Palladium:n Arsen:n Thallium:n Strass:m Speckstein:m
     """,
         "concept": """
         Freiheit:f Frieden:m Wahrheit:f Weisheit:f Erinnerung:f Fantasie:f Erzählung:f
@@ -103,6 +126,10 @@ _POOLS, _GENDER = tagged_nouns(
         Semantik:f Orthografie:f Kalligrafie:f Gewissheit:f Zufall:m Schicksal:n Los:n
         Wille:m Gewissen:n Identität:f Wesen:n Materie:f Form:f Ursache:f Wirkung:f
         Ordnung:f Chaos:n Grenze:f Ursprung:m Absicht:f Einsicht:f
+        Idee:f Gedanke:m Meinung:f Wissen:n Bildung:f Glaube:m Plan:m Regel:f Gesetz:n Recht:n
+        Pflicht:f Ehre:f Ruhm:m Traum:m Witz:m Märchen:n Roman:m Drama:n Komödie:f Tragödie:f Wort:n
+        Buchstabe:m Zahl:f Bedeutung:f Sinn:m Prinzip:n Tugend:f Gerechtigkeit:f Religion:f
+        Astronomie:f Medizin:f Literatur:f Epos:n Parabel:f Ironie:f Anekdote:f Zitat:n Rede:f
     """,
         "myth": """
         Drache:m Phönix:m Einhorn:n Meerjungfrau:f Fee:f Kobold:m Elf:m Zwerg:m Troll:m
@@ -116,6 +143,12 @@ _POOLS, _GENDER = tagged_nouns(
         Wichtel:m Undine:f Sylphe:f Dschinn:m Erscheinung:f Beschwörung:f Zauberbuch:n
         Pentagramm:n Reliquie:f Kelch:m Gral:m Zauberstab:m Stab:m Zepter:n Krone:f
         Hippogreif:m Mantikor:m Lindwurm:m Unhold:m Waldgeist:m
+        Zauberer:m Wassermann:m Zauberspruch:m Zaubertrank:m Elixier:n Kristallkugel:f Bann:m
+        Segen:m Monster:n Mumie:f Zombie:m Yeti:m Poltergeist:m Irrlicht:n Alraune:f Seeschlange:f
+        Klabautermann:m Sandmann:m Osterhase:m Höllenhund:m Hölle:f Paradies:n Unterwelt:f
+        Jenseits:n Tarnkappe:f Schriftrolle:f Wunder:n Altar:m Verwandlung:f Horoskop:n Tarot:n
+        Wünschelrute:f Geisterschiff:n Spuk:m Fabelwesen:n Sirene:f Jungbrunnen:m Ork:m
+        Gestaltwandler:m Ghul:m Teufel:m Halbgott:m
     """,
         "job": """
         Ritter:m Jäger:m Dieb:m Pirat:m Matrose:m Kapitän:m Koch:m Gärtner:m Schmied:m
@@ -135,6 +168,11 @@ _POOLS, _GENDER = tagged_nouns(
         Botaniker:m Historiker:m Philosoph:m Archivar:m Winzer:m Müller:m Imker:m
         Zimmerer:m Küfer:m Seiler:m
         Kosmonaut:m Astronaut:m
+        Zahnarzt:m Krankenschwester:f Feuerwehrmann:m Bauarbeiter:m Elektriker:m Programmierer:m
+        Journalist:m Fotograf:m Architekt:m Professor:m Student:m Bürgermeister:m Schamane:m
+        Druide:m Barde:m Schornsteinfeger:m Knappe:m Nachtwächter:m Gaukler:m Narr:m Förster:m
+        Chirurg:m Hebamme:f Sanitäter:m Pfarrer:m Nonne:f Graf:m Herzog:m Fürst:m Schiedsrichter:m
+        Spion:m Offizier:m
     """,
         "music": """
         Klavier:n Gitarre:f Trommel:f Glocke:f Harfe:f Lied:n Tanz:m Rhythmus:m
@@ -151,6 +189,10 @@ _POOLS, _GENDER = tagged_nouns(
         Kadenz:f Arpeggio:n Triller:m Glissando:n Legato:n Tempo:n Refrain:m Strophe:f
         Volkslied:n Choral:m Motette:f Kanon:m Präludium:n Ton:m Klang:m Dreiklang:m
         Leier:f Schalmei:f
+        Schlagzeug:n Bass:m Ukulele:f Synthesizer:m Keyboard:n Mundharmonika:f Triangel:f Cembalo:n
+        Sitar:f Blockflöte:f Oper:f Musical:n Ballett:n Tango:m Polka:f Jazz:m Blues:m Rap:m
+        Schlager:m Menuett:n Gesang:m Sopran:m Tenor:m Tonart:f Dur:n Moll:n Taktstock:m
+        Notenschlüssel:m Zugabe:f Probe:f Auftritt:m Ensemble:n
     """,
         "place": """
         Markt:m Platz:m Stadt:f Dorf:n Gasse:f Brücke:f Garten:m Bücherei:f Museum:n
@@ -168,6 +210,12 @@ _POOLS, _GENDER = tagged_nouns(
         Wehr:n Mühle:f Schmiede:f Werkstatt:f Silo:n Stall:m Pferch:m Heuboden:m
         Gaststube:f Anlegestelle:f Zollhaus:n
         Sternwarte:f
+        Haus:n Wohnung:f Zimmer:n Bad:n Balkon:m Dach:n Dachboden:m Garage:f Laden:m Supermarkt:m
+        Kaufhaus:n Kino:n Restaurant:n Hotel:n Kirche:f Universität:f Büro:n Fabrik:f Haltestelle:f
+        Parkplatz:m Tankstelle:f Straße:f Weg:m Autobahn:f Acker:m Weinberg:m Steinbruch:m
+        Bergwerk:n Kaserne:f Gefängnis:n Kindergarten:m Klassenzimmer:n Kneipe:f Arena:f Zirkus:m
+        Hochhaus:n Ruine:f Denkmal:n Brunnen:m Schuppen:m Labyrinth:n Labor:n Sauna:f Speisekammer:f
+        Esszimmer:n
     """,
         "food": """
         Reis:m Brot:n Nudel:f Suppe:f Eintopf:m Salat:m Salz:n Zucker:m Pfeffer:m
@@ -184,6 +232,12 @@ _POOLS, _GENDER = tagged_nouns(
         Pflaume:f Feige:f Granatapfel:m Quitte:f Mispel:f Aprikose:f Nektarine:f
         Pampelmuse:f Mandarine:f Kiwi:f Nuss:f Pistazie:f Erdnuss:f Marone:f
         Lebkuchen:m Stollen:m Krapfen:m Auflauf:m
+        Weizen:m Mehl:n Teig:m Öl:n Essig:m Senf:m Soße:f Brühe:f Pommes:p Chips:p Eiscreme:f
+        Müsli:n Toast:m Sandwich:n Döner:m Gulasch:n Spätzle:p Spiegelei:n Lasagne:f Spaghetti:p
+        Sushi:n Tofu:m Muffin:m Croissant:n Baguette:n Praline:f Gummibärchen:n Kaugummi:m
+        Marzipan:n Vanille:f Zimt:m Ingwer:m Chili:f Olive:f Avocado:f Kokosnuss:f Haselnuss:f
+        Rosine:f Dattel:f Himbeere:f Heidelbeere:f Hähnchen:n Steak:n Hackfleisch:n Nachtisch:m
+        Zuckerwatte:f
     """,
         "sport": """
         Fußball:m Baseball:m Basketball:m Volleyball:m Tischtennis:n Tennis:n
@@ -198,6 +252,12 @@ _POOLS, _GENDER = tagged_nouns(
         Matte:f Ringe:p Bock:m Stürmer:m Verteidiger:m Trainer:m
         Stadion:n Spielfeld:n Bahn:f Elfmeter:m Ecke:f Punktestand:m Sieg:m Niederlage:f
         Rekord:m Turnier:n Liga:f Wettkampf:m Zielgerade:f Vorlage:f
+        Handball:m Eishockey:n Squash:n Leichtathletik:f Weitsprung:m Hochsprung:m Sprint:m
+        Kugelstoßen:n Bogenschießen:n Segeln:n Wandern:n Joggen:n Yoga:n Taekwondo:n Bergsteigen:n
+        Skispringen:n Snowboarden:n Langlauf:m Biathlon:m Rodeln:n Eiskunstlauf:m Curling:n
+        Bowling:n Minigolf:n Wasserball:m Rallye:f Rennen:n Mannschaft:f Gegner:m Torwart:m Ball:m
+        Puck:m Stoppuhr:f Hantel:f Trampolin:n Halbzeit:f Abseits:n Freistoß:m Olympiade:f
+        Weltmeisterschaft:f Sieger:m Läufer:m Schwimmer:m Reiter:m Turner:m Boxer:m Meisterschaft:f
     """,
         "vehicle": """
         Fahrrad:n Zug:m Boot:n Auto:n Bus:m Taxi:n Lastwagen:m Motorrad:n Roller:m
@@ -214,6 +274,11 @@ _POOLS, _GENDER = tagged_nouns(
         Einbaum:m Schaluppe:f Barkasse:f Segelflieger:m Jagdflieger:m Bomber:m
         Trittroller:m Reisebus:m
         Planwagen:m
+        Schiff:n Dampfer:m Wagen:m Wohnwagen:m Wohnmobil:n Geländewagen:m Kombi:m Sportwagen:m
+        Rennwagen:m Oldtimer:m Rikscha:f Tretboot:n Rollstuhl:m Kinderwagen:m Bollerwagen:m
+        Rollschuh:m Rennrad:n Mountainbike:n Tandem:n Heißluftballon:m Jet:m Gleitschirm:m
+        Raumfähre:f Aufzug:m Rolltreppe:f Sessellift:m Gabelstapler:m Müllwagen:m Feuerwehrauto:n
+        Flugzeugträger:m Dschunke:f Kogge:f Schlauchboot:n Schneemobil:n
     """,
         "product": """
         Rechner:m Tastatur:f Maus:f Bildschirm:m Drucker:m Lautsprecher:m Kopfhörer:m
@@ -230,6 +295,13 @@ _POOLS, _GENDER = tagged_nouns(
         Besteck:n Geschirr:n Tischdecke:f Serviette:f Abtropfsieb:n
         Spülbecken:n Wasserhahn:m Dusche:f Wanne:f Handspiegel:m Nagelfeile:f
         Rasierpinsel:m Kaffeemühle:f Eierbecher:m Salzstreuer:m Untersetzer:m
+        Fernbedienung:f Laptop:m Kabel:n Stecker:m Adapter:m Festplatte:f Webcam:f Objektiv:n
+        Stativ:n Plattenspieler:m Schallplatte:f Kassette:f Taschenrechner:m Nähmaschine:f
+        Waschmaschine:f Spülmaschine:f Herd:m Gefrierschrank:m Kaffeemaschine:f Grill:m
+        Klimaanlage:f Rauchmelder:m Pinzette:f Lippenstift:m Nagellack:m Deo:n Zahnseide:f
+        Duschgel:n Taschentuch:n Toilettenpapier:n Mülleimer:m Spülmittel:n Wischmopp:m Bügelbrett:n
+        Zeitschrift:f Comic:m Ohrstöpsel:p Windel:f Schnuller:m Rasenmäher:m Lockenstab:m Pflaster:n
+        Verband:m Tablette:f Kontaktlinse:f Hörgerät:n Wärmflasche:f
     """,
         "color": """
         Karmesin:n Scharlach:n Zinnoberrot:n Purpur:n Magenta:n Fuchsia:n Rosa:n Lachs:n
@@ -245,6 +317,12 @@ _POOLS, _GENDER = tagged_nouns(
         Kobaltblau:n Zitronengelb:n Pfirsichton:m Blaugrau:n Gelbgrün:n Braunrot:n
         Perlweiß:n Nebelgrau:n Lindgrün:n
         Beinweiß:n
+        Rot:n Blau:n Grün:n Gelb:n Schwarz:n Weiß:n Braun:n Grau:n Violett:n Lila:n Pink:n
+        Dunkelblau:n Hellgrün:n Dunkelrot:n Hellgrau:n Dunkelgrau:n Hellbraun:n Dunkelbraun:n
+        Feuerrot:n Blutrot:n Kirschrot:n Ziegelrot:n Altrosa:n Marineblau:n Königsblau:n Stahlblau:n
+        Eisblau:n Taubenblau:n Ultramarin:n Petrol:n Mintgrün:n Giftgrün:n Grasgrün:n Flaschengrün:n
+        Apfelgrün:n Sonnengelb:n Kanariengelb:n Honiggelb:n Nussbraun:n Umbra:n Pechschwarz:n
+        Mausgrau:n Neongrün:n Pastell:n
     """,
         "finance": """
         Rechnung:f Quittung:f Anleihe:f Aktie:f Dividende:f Zins:m Darlehen:n Hypothek:f
@@ -262,6 +340,11 @@ _POOLS, _GENDER = tagged_nouns(
         Erbschaft:f Miete:f Pacht:f Wegezoll:m Zehnt:m Beute:f Schatz:m Reichtum:m
         Armut:f Kupon:m Pfand:n Bilanzbuch:n Tarif:m Notgroschen:m Rücklage:f
         Zuschlag:m Nachprüfung:f
+        Geld:n Bargeld:n Schein:m Preis:m Kosten:p Umsatz:m Einkommen:n Einnahme:f Sparschwein:n
+        Börse:f Kurs:m Investition:f Anleger:m Aktionär:m Fonds:m Trinkgeld:n Taschengeld:n
+        Kreditkarte:f Geldautomat:m Dauerauftrag:m Buchung:f Bilanz:f Verlust:m Tilgung:f
+        Versicherung:f Stipendium:n Honorar:n Wertpapier:n Handel:m Tausch:m Ware:f Angebot:n
+        Nachfrage:f Kauf:m Lotterie:f Wette:f
     """,
         "tech": """
         Server:m Puffer:m Bildpunkt:m Codec:m Paket:n Protokoll:n Stapel:m Halde:f
@@ -278,6 +361,12 @@ _POOLS, _GENDER = tagged_nouns(
         Flicken:m Etikett:n Version:f Bauwerk:n Prüfung:f Spur:f Profil:n
         Auslöser:m Ereignis:n Signal:n Thema:n Zeitstempel:m Nutzerkonto:n
         Suchbaum:m Nebenzweig:m Grenzwert:m
+        Internet:n Netzwerk:n Webseite:f Browser:m Suchmaschine:f Link:m Datei:f Datenbank:f Daten:p
+        Software:f Hardware:f Programm:n App:f Algorithmus:m Code:m Fehler:m Absturz:m Virus:n
+        Passwort:n Cloud:f Download:m Update:n Cache:m Cookie:n Prozessor:m Chip:m Platine:f
+        Transistor:m Schaltkreis:m Sensor:m Roboter:m Byte:n Bit:n Terminal:n Skript:n Compiler:m
+        Variable:f Funktion:f Klasse:f Schnittstelle:f Treiber:m Betriebssystem:n Domain:f Spam:m
+        Chat:m Menü:n Modem:n Antenne:f Funk:m Frequenz:f Glasfaser:f
     """,
         "weather": """
         Wolke:f Wind:m Regen:m Schnee:m Reif:m Nebel:m Tau:m Regenbogen:m Blitz:m
@@ -292,6 +381,11 @@ _POOLS, _GENDER = tagged_nouns(
         Hagelschlag:m Platzregen:m Wolkendecke:f Dürre:f Windstille:f Kälte:f Hitze:f
         Wetterlage:f Regenzeit:f
         Fallböe:f
+        Schneeflocke:f Regentropfen:m Glatteis:n Schneematsch:m Schneewehe:f Eisregen:m Flaute:f
+        Rückenwind:m Gegenwind:m Luftfeuchtigkeit:f Niederschlag:m Kaltfront:f Warmfront:f
+        Trockenzeit:f Kältewelle:f Smog:m Eisblume:f Kugelblitz:m Wetterleuchten:n Sandsturm:m
+        Hurrikan:m Aufheiterung:f Abkühlung:f Erwärmung:f Klimawandel:m Mistral:m Schirokko:m
+        Wetterwarnung:f Sturmflut:f Bodenfrost:m Aprilwetter:n Altweibersommer:m
     """,
         "space": """
         Stern:m Mond:m Sonne:f Galaxie:f Komet:m Meteor:m Polarlicht:n Mondsichel:f
@@ -306,6 +400,11 @@ _POOLS, _GENDER = tagged_nouns(
         Fotosphäre:f Chromosphäre:f Ionosphäre:f Exosphäre:f Mesosphäre:f Troposphäre:f
         Gravitation:f Halo:m
         Zwergstern:m Feuerkugel:m Raumsonde:f Sternenmeer:n Weltenraum:m
+        Erde:f Sternschnuppe:f Asteroid:m Satellit:m Raumstation:f Sonnensystem:n Schwarzes_Loch:n
+        Mondfinsternis:f Sonnenfinsternis:f Sonnenwind:m Raumkapsel:f Gasriese:m Zwergplanet:m
+        Neutronenstern:m Pulsar:m Quasar:m Urknall:m Schwerelosigkeit:f Vakuum:n Strahlung:f
+        Tierkreis:m Sternzeichen:n Nachthimmel:m Mondphase:f Himmelskörper:m Raumfahrt:f
+        Weltraumschrott:m Schweif:m Korona:f Nova:f
     """,
         "time": """
         Morgengrauen:n Morgenröte:f Dämmerung:f Einbruch:m Sonnenwende:f Jahreszeit:f
@@ -319,6 +418,13 @@ _POOLS, _GENDER = tagged_nouns(
         Kreislauf:m Schicht:f Runde:f Phase:f Etappe:f Abschnitt:m Vormittag:m
         Frühjahr:n Spätsommer:m Gegenwart:f Morgenluft:f Jahrgang:m Jahrfünft:n
         Wochenende:n Feiertag:m Werktag:m Vorjahr:n Folgejahr:n
+        Tag:m Zeit:f Datum:n Termin:m Uhrzeit:f Ferien:p Urlaub:m Wochentag:m Montag:m Dienstag:m
+        Mittwoch:m Donnerstag:m Freitag:m Samstag:m Sonntag:m Januar:m Februar:m März:m April:m
+        Mai:m Juni:m Juli:m August:m September:m Oktober:m November:m Dezember:m Schlafenszeit:f
+        Freizeit:f Geburtstag:m Jubiläum:n Neujahr:n Silvester:n Weihnachten:n Ostern:n Advent:m
+        Karneval:m Mittsommer:m Schaltjahr:n Vergangenheit:f Anfang:m Ende:n Zeitpunkt:m
+        Verspätung:f Semester:n Schuljahr:n Generation:f Steinzeit:f Mittelalter:n Antike:f
+        Neuzeit:f Geisterstunde:f Übermorgen:n Vorgestern:n Feierabend:m
     """,
         "emotion": """
         Freude:f Trauer:f Zorn:m Furcht:f Überraschung:f Frohsinn:m Jubel:m Glück:n
@@ -334,6 +440,15 @@ _POOLS, _GENDER = tagged_nouns(
         Betrübnis:f Entsetzen:n Andacht:f Milde:f Nachsicht:f Wohlwollen:n Sympathie:f
         Abneigung:f Frohlocken:n Unruhe:f Bangen:n Verblüffung:f Reue:f Wonne:f Sehnen:n
         Übermut:m Wehklage:f
+        Liebe:f Spaß:m Lust:f Ekel:m Scheu:f Heimweh:n Fernweh:n Erleichterung:f Enttäuschung:f
+        Frust:m Stress:m Nervosität:f Aufregung:f Vorfreude:f Schadenfreude:f Zufriedenheit:f
+        Genugtuung:f Verwirrung:f Unsicherheit:f Schüchternheit:f Neugier:f Interesse:n
+        Gleichgültigkeit:f Müdigkeit:f Erschöpfung:f Schmerz:m Leid:n Qual:f Heiterkeit:f
+        Vergnügen:n Trotz:m Rache:f Schuldgefühl:n Peinlichkeit:f Verlegenheit:f Hochmut:m
+        Eitelkeit:f Geiz:m Großzügigkeit:f Zuversicht:f Optimismus:m Nostalgie:f Ehrgeiz:m
+        Motivation:f Tatendrang:m Lampenfieber:n Schock:m Grauen:n Grusel:m Unbehagen:n Argwohn:m
+        Faszination:f Bewunderung:f Respekt:m Verehrung:f Liebeskummer:m Gnade:f Barmherzigkeit:f
+        Vergebung:f Behagen:n Seligkeit:f
     """,
         "body": """
         Kopf:m Stirn:f Braue:f Wimper:f Lid:n Nase:f Wange:f Kinn:n Kiefer:m Lippe:f
@@ -350,6 +465,11 @@ _POOLS, _GENDER = tagged_nouns(
         Zwerchfell:n Brustbein:n Wirbel:m Oberschenkel:m
         Wadenbein:n Oberarm:m Unterarm:m Fingerglied:n Fußwurzel:f Spann:m Achsel:f
         Leiste:f Kniekehle:f Pupille:f Hornhaut:f Netzhaut:f Zäpfchen:n Rachenmandel:f
+        Auge:n Mund:m Arm:m Bein:n Hand:f Fuß:m Gesicht:n Körper:m Skelett:n Wirbelsäule:f Po:m
+        Schoß:m Sohle:f Nasenloch:n Ohrmuschel:f Kehle:f Locke:f Zopf:m Glatze:f Scheitel:m
+        Fingerkuppe:f Fingerabdruck:m Brustkorb:m Schlüsselbein:n Schulterblatt:n Steißbein:n
+        Organ:n Bauchspeicheldrüse:f Gallenblase:f Galle:f Blinddarm:m Rückenmark:n Zelle:f Hormon:n
+        Drüse:f Gewebe:n Fett:n Lymphe:f Wunde:f Pickel:m Sommersprosse:f Muttermal:n Warze:f
     """,
         "clothing": """
         Hut:m Schuh:m Handschuh:m Schal:m Brille:f Mantel:m Jacke:f Hemd:n Bluse:f
@@ -365,6 +485,13 @@ _POOLS, _GENDER = tagged_nouns(
         Korsett:n Reifrock:m Mantilla:f Haube:f Dreispitz:m Kapuze:f
         Halstuch:n Stulpe:f Litze:f Borte:f
         Sturzhelm:m
+        Shirt:n Sweatshirt:n Shorts:p Leggings:p Strumpfhose:f Bikini:m Badehose:f Bademantel:m
+        Nachthemd:n Latzhose:f Anzug:m Sakko:n Blazer:m Dirndl:n Lederhose:f Tracht:f Kimono:m
+        Sari:m Toga:f Tunika:f Trenchcoat:m Stirnband:n Haarspange:f Reißverschluss:m Schnürsenkel:m
+        Absatz:m Gummistiefel:m Pumps:p Strampler:m Trikot:n Trainingsanzug:m Badekappe:f
+        Sonnenbrille:f Monokel:n Zylinder:m Tiara:f Diadem:n Perücke:f Maske:f Rüstung:f
+        Kettenhemd:n Kilt:m Raumanzug:m Pelz:m Nylon:n Polyester:n Kaschmir:m Tweed:m Satin:m
+        Brokat:m Tüll:m Filz:m Naht:f
     """,
         "tool": """
         Axt:f Schaufel:f Säge:f Leiter:f Zange:f Meißel:m Amboss:m Blasebalg:m Ahle:f
@@ -379,6 +506,14 @@ _POOLS, _GENDER = tagged_nouns(
         Wagenheber:m Tacker:m Lötlampe:f Feuerstahl:m Gussform:f Stanze:f
         Schleifstein:m Bohrfutter:n Fräse:f Hippe:f Handbeil:n Zugmesser:n
         Anreißnadel:f Ösenzange:f
+        Schraubenzieher:m Schraubenschlüssel:m Bohrmaschine:f Akkuschrauber:m Spachtel:m Farbrolle:f
+        Gerüst:n Gießkanne:f Gartenschlauch:m Heckenschere:f Mistgabel:f Vorschlaghammer:m Dübel:m
+        Bolzen:m Seitenschneider:m Teppichmesser:n Skalpell:n Laubsäge:f Kreissäge:f Körner:m
+        Winkelschleifer:m Schweißgerät:n Multimeter:n Zollstock:m Stricknadel:f Webstuhl:m
+        Spinnrad:n Töpferscheibe:f Brennofen:m Nudelholz:n Pfannenwender:m Kochlöffel:m
+        Dosenöffner:m Flaschenöffner:m Nussknacker:m Stößel:m Schrubber:m Kehrblech:n Handfeger:m
+        Geodreieck:n Spritze:f Stethoskop:n Sextant:m Harpune:f Falle:f Lasso:n Peitsche:f Joch:n
+        Ölkanne:f
     """,
         "drink": """
         Kaffee:m Tee:m Milch:f Wasser:n Limonade:f Apfelwein:m Kakao:m Punsch:m
@@ -393,6 +528,10 @@ _POOLS, _GENDER = tagged_nouns(
         Apfelsaft:m Birnensaft:m Rübensaft:m Zitronentee:m Sauermilch:f Dickmilch:f
         Brause:f Quellwasser:n Tafelwasser:n
         Fruchtsaft:m
+        Orangensaft:m Cola:f Energydrink:m Mineralwasser:n Spezi:n Mokka:m Grüntee:m Schwarztee:m
+        Matcha:m Chai:m Mate:m Kombucha:m Ayran:m Lassi:m Eierlikör:m Korn:m Grappa:m Ouzo:m
+        Cognac:m Prosecco:m Bowle:f Sangria:f Grog:m Aperitif:m Kölsch:n Most:m Eiswein:m Reiswein:m
+        Kokosmilch:f Eiskaffee:m Pfefferminztee:m Zitronensaft:m
     """,
         "toy": """
         Drachen:m Kreisel:m Murmel:f Würfel:m Puzzle:n Ballon:m Schachspiel:n Domino:n Puppe:f
@@ -632,6 +771,62 @@ DE = WordLanguageData(
             Liegestuhl Liege Tresen Arbeitsplatte Kamin Tapete Blumentopf Laufstall Wickeltisch
             Hochstuhl Sitzsack Spind Wäschekorb Papierkorb Wäscheständer Markise Fensterbank
             Fensterladen
+            Ratte Hamster Meerschweinchen Hase Eisbär Krähe Schmetterling Buch Zeitung Uhr Koffer
+            Glas Schüssel Gabel Messer Becher Taschenlampe Feuerzeug Tinte Kreide Schwamm Lappen
+            Bürste Schnur Draht Tüte Beutel Sack Deckel Foto Bild Stock Pfeil Schwert Geschenk Kugel
+            Brett Geldbeutel Himmel Insel Stein Teich Feuer Flamme Rauch Asche Staub Boden Luft Eis
+            Busch Gebirge Sonnenaufgang Sonnenuntergang Licht Dunkelheit Pfütze Tropfen Lawine
+            Fichte Strauch Blüte Beere Laub Ast Kraut Unkraut Rosmarin Krokus Diamant Kohle Metall
+            Idee Gedanke Meinung Wissen Plan Regel Gesetz Recht Pflicht Traum Witz Märchen Roman
+            Wort Buchstabe Zahl Rede Zauberer Monster Mumie Zombie Hölle Paradies Teufel Wunder
+            Zaubertrank Zauberspruch Zahnarzt Krankenschwester Feuerwehrmann Bauarbeiter Elektriker
+            Programmierer Journalist Fotograf Architekt Professor Student Bürgermeister Pfarrer
+            Nonne Schiedsrichter Chirurg Schlagzeug Bass Keyboard Mundharmonika Triangel Blockflöte
+            Oper Musical Ballett Tango Jazz Rap Schlager Gesang Probe Auftritt Haus Wohnung Zimmer
+            Bad Balkon Dach Dachboden Garage Laden Supermarkt Kaufhaus Kino Restaurant Hotel Kirche
+            Universität Büro Fabrik Haltestelle Parkplatz Tankstelle Straße Weg Autobahn
+            Kindergarten Klassenzimmer Kneipe Zirkus Brunnen Schuppen Labor Sauna Esszimmer Weizen
+            Mehl Teig Öl Essig Senf Soße Pommes Chips Eiscreme Müsli Toast Sandwich Döner Gulasch
+            Spätzle Spiegelei Lasagne Spaghetti Muffin Croissant Baguette Gummibärchen Kaugummi
+            Marzipan Vanille Zimt Olive Kokosnuss Haselnuss Rosine Himbeere Heidelbeere Hähnchen
+            Steak Hackfleisch Nachtisch Handball Eishockey Leichtathletik Weitsprung Hochsprung
+            Sprint Segeln Wandern Joggen Yoga Snowboarden Rodeln Bowling Minigolf Rennen Mannschaft
+            Gegner Torwart Ball Halbzeit Olympiade Weltmeisterschaft Sieger Läufer Schwimmer Reiter
+            Turner Boxer Meisterschaft Trampolin Schiff Dampfer Wagen Wohnwagen Wohnmobil
+            Geländewagen Kombi Sportwagen Rennwagen Oldtimer Tretboot Rollstuhl Kinderwagen
+            Bollerwagen Rollschuh Rennrad Mountainbike Heißluftballon Jet Aufzug Rolltreppe
+            Müllwagen Feuerwehrauto Schlauchboot Fernbedienung Laptop Kabel Stecker Festplatte
+            Plattenspieler Schallplatte Kassette Taschenrechner Nähmaschine Waschmaschine
+            Spülmaschine Herd Gefrierschrank Kaffeemaschine Grill Klimaanlage Rauchmelder Pinzette
+            Lippenstift Nagellack Deo Zahnseide Duschgel Taschentuch Toilettenpapier Mülleimer
+            Spülmittel Bügelbrett Zeitschrift Comic Windel Schnuller Rasenmäher Pflaster Verband
+            Tablette Wärmflasche Rot Blau Grün Gelb Schwarz Weiß Braun Grau Violett Lila Pink
+            Dunkelblau Hellgrün Dunkelrot Hellgrau Dunkelgrau Hellbraun Dunkelbraun Geld Bargeld
+            Schein Preis Kosten Einkommen Sparschwein Börse Kurs Trinkgeld Taschengeld Kreditkarte
+            Geldautomat Verlust Versicherung Handel Ware Angebot Kauf Lotterie Wette Internet
+            Netzwerk Webseite Browser Suchmaschine Link Datei Daten Software Programm App Code
+            Fehler Absturz Virus Passwort Download Update Chip Roboter Menü Chat Antenne
+            Schneeflocke Regentropfen Glatteis Schneematsch Rückenwind Gegenwind Niederschlag Smog
+            Hurrikan Klimawandel Sandsturm Erde Sternschnuppe Asteroid Satellit Raumstation
+            Sonnensystem Schwarzes_Loch Sonnenfinsternis Mondfinsternis Urknall Schwerelosigkeit
+            Nachthimmel Sternzeichen Raumfahrt Tag Zeit Datum Termin Uhrzeit Ferien Urlaub Montag
+            Dienstag Mittwoch Donnerstag Freitag Samstag Sonntag Januar Februar März April Mai Juni
+            Juli August September Oktober November Dezember Geburtstag Neujahr Silvester Weihnachten
+            Ostern Vergangenheit Anfang Ende Übermorgen Vorgestern Feierabend Freizeit Schlafenszeit
+            Liebe Spaß Lust Ekel Heimweh Erleichterung Enttäuschung Frust Stress Aufregung Vorfreude
+            Schadenfreude Zufriedenheit Neugier Interesse Müdigkeit Schmerz Vergnügen Trotz Rache
+            Schock Respekt Ehrgeiz Lampenfieber Auge Mund Arm Bein Hand Fuß Gesicht Körper Skelett
+            Wirbelsäule Po Sohle Nasenloch Kehle Locke Zopf Glatze Fingerabdruck Brustkorb
+            Schlüsselbein Schulterblatt Organ Galle Blinddarm Zelle Wunde Pickel Sommersprosse
+            Muttermal Warze Fett Shirt Sweatshirt Shorts Leggings Strumpfhose Bikini Badehose
+            Bademantel Nachthemd Latzhose Anzug Sakko Blazer Dirndl Lederhose Kimono Stirnband
+            Haarspange Reißverschluss Schnürsenkel Absatz Gummistiefel Pumps Trikot Trainingsanzug
+            Badekappe Sonnenbrille Zylinder Perücke Maske Rüstung Pelz Schraubenzieher
+            Schraubenschlüssel Bohrmaschine Akkuschrauber Spachtel Gerüst Gießkanne Gartenschlauch
+            Heckenschere Dübel Zollstock Stricknadel Nudelholz Pfannenwender Kochlöffel Dosenöffner
+            Flaschenöffner Nussknacker Schrubber Kehrblech Handfeger Geodreieck Spritze Falle
+            Peitsche Orangensaft Cola Energydrink Mineralwasser Spezi Grüntee Schwarztee Prosecco
+            Bowle Sangria Kölsch Eiskaffee Pfefferminztee Zitronensaft Kokosmilch
         """),
         rare=words("""
             Zikade Gnu Gürteltier Schnabeltier Lemur Tapir Iltis Rebhuhn Wiedehopf Distelfink Häher
@@ -677,6 +872,19 @@ DE = WordLanguageData(
             Ösenzange Wermut Enzian Rübensaft Sauermilch Dickmilch
             Halma Mikado Tangram Zinnsoldat Steckenpferd Kaleidoskop Seifenkiste Hall Schall
             Nesthäkchen Nachkomme Paravent Anrichte Wandteppich Schemel
+            Rinnsal Grat Gischt Stromschnelle Treibholz Flechte Hagebutte Ginster Platane Gladiole
+            Setzling Tang Medaillon Mondstein Tigerauge Legierung Radium Plutonium Palladium Arsen
+            Thallium Strass Speckstein Silizium Kalium Epos Parabel Alraune Klabautermann
+            Wünschelrute Ghul Gestaltwandler Halbgott Irrlicht Schamane Druide Barde Knappe
+            Nachtwächter Gaukler Narr Cembalo Sitar Menuett Taktstock Dschunke Kogge Umbra
+            Ultramarin Taubenblau Kanariengelb Stahlblau Pechschwarz Tilgung Dauerauftrag Fonds
+            Wertpapier Transistor Schaltkreis Platine Compiler Terminal Skript Schnittstelle Mistral
+            Schirokko Kugelblitz Wetterleuchten Eisblume Aufheiterung Altweibersommer Gasriese
+            Pulsar Quasar Neutronenstern Korona Nova Weltraumschrott Zwergplanet Geisterstunde
+            Genugtuung Argwohn Behagen Seligkeit Tatendrang Hochmut Barmherzigkeit Lymphe Steißbein
+            Bauchspeicheldrüse Monokel Tiara Diadem Brokat Tüll Toga Tunika Sari Kettenhemd
+            Seitenschneider Körner Stößel Sextant Joch Multimeter Winkelschleifer Töpferscheibe
+            Webstuhl Spinnrad Brennofen Harpune Mate Lassi Grog Most Eiswein Reiswein
         """),
     ),
     frames=(

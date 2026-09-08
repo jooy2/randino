@@ -805,13 +805,13 @@ DE = SentenceLanguageData(
             Biene Libelle Zikade Fliege Mücke Fledermaus Reiher Pelikan Drache Phönix Fee Greif
             Pegasus Engel Walküre Amsel Nachtigall Lerche Wachtel Fasan Rebhuhn Kolibri Tukan
             Flamingo Storch Wiedehopf Distelfink Elster Häher Kauz Bussard Möwe Specht Zaunkönig
-            Wespe Motte Leuchtkäfer Hummel Marienkäfer Hippogreif
+            Wespe Motte Leuchtkäfer Hummel Marienkäfer Hippogreif Krähe Schmetterling
         """),
         "swimmer": words("""
             Krokodil Schildkröte Frosch Kröte Fisch Wal Delfin Hai Krake Tintenfisch Garnele Krabbe
             Walross Robbe Pinguin Meerjungfrau Najade Aal Sardine Thunfisch Dorsch Seehecht Forelle
             Karpfen Rochen Qualle Muschel Auster Hummer Seestern Salamander Molch Biber Nilpferd
-            Schnabeltier Meerforelle
+            Schnabeltier Meerforelle Hering Hecht Wassermann Seeschlange Sirene
         """),
         "crawler": words("""
             Krokodil Schlange Eidechse Schildkröte Schnecke Ameise Spinne Wurm Krabbe Basilisk
@@ -821,7 +821,9 @@ DE = SentenceLanguageData(
         "lifeless": words("""
             Zauber Fluch Weissagung Amulett Talisman Rune Pforte Heiligtum Götze Totem Vorzeichen
             Omen Bestiarium Zauberbuch Pentagramm Reliquie Kelch Gral Zauberstab Stab Zepter Krone
-            Beschwörung
+            Beschwörung Zauberspruch Zaubertrank Elixier Kristallkugel Bann Segen Alraune Hölle
+            Paradies Unterwelt Jenseits Tarnkappe Schriftrolle Wunder Altar Verwandlung Horoskop
+            Tarot Wünschelrute Geisterschiff Spuk Jungbrunnen
         """),
     },
     interjections=words("""

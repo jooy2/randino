@@ -21,6 +21,8 @@ const NOUNS = taggedNouns({
 		bacalao:m merluza:f trucha:f salmón:m carpa:f raya:f medusa:f almeja:f mejillón:m ostra:f
 		escarabajo:m saltamontes:m grillo:m avispa:f polilla:f luciérnaga:f ciempiés:m escorpión:m
 		pulga:f oruga:f iguana:f camaleón:m salamandra:f tritón:m boa:f víbora:f cobra:f pitón:f
+		gallo:m pavo:m rata:f hámster:m liebre:f gaviota:f lechuza:f pantera:f jaguar:m hiena:f cucaracha:f langosta:f
+		orca:f
 	`,
 	object: `
 		botella:f lápiz:m goma:f paraguas:m lámpara:f farol:m espejo:m llave:f candado:m bolsa:f
@@ -36,6 +38,11 @@ const NOUNS = taggedNouns({
 		hebilla:f broche:m pulsera:f anillo:m maletín:m mochila:f baúl:m arcón:m tonel:m
 		vasija:f cántaro:m botijo:m cuenco:m colador:m mortero:m pinza:f
 		telescopio:m
+		libro:m revista:f periódico:m calendario:m agenda:f foto:f bolígrafo:m tiza:f pegamento:m carpeta:f tinta:f
+		pluma:f lupa:f cantimplora:f mechero:m esponja:f trapo:m fregona:f alambre:m palo:m bastón:m sombrilla:f
+		ladrillo:m teja:f estatua:f despertador:m tenedor:m cuchillo:m vaso:m cazuela:f cazo:m pajita:f salero:m
+		tarro:m tapón:m corcho:m pegatina:f lazo:m saco:m cofre:m estuche:m horquilla:f bolso:m maleta:f monedero:m
+		pasaporte:m collar:m pendiente:m colgante:m cascabel:m reloj_de_arena:m papelera:f
 	`,
 	nature: `
 		mar:m río:m lago:m cascada:f valle:m montaña:f colina:f pradera:f bosque:m cueva:f
@@ -49,6 +56,11 @@ const NOUNS = taggedNouns({
 		remanso:m vado:m ribera:f playa:f costa:f golfo:m ensenada:f estrecho:m canal:m
 		corriente:f marea:f oleaje:m espuma:f rompiente:f farallón:m risco:m cima:f hondonada:f
 		barranco:m sima:f caverna:f
+		cielo:m tierra:f isla:f océano:m piedra:f polvo:m barro:m hielo:m fuego:m chispa:f ola:f charco:m estanque:m
+		precipicio:m cordillera:f desfiladero:m pozo:m nido:m madriguera:f guarida:f paisaje:m luz:f oscuridad:f
+		aire:m lava:f magma:m erupción:f avalancha:f inundación:f incendio:m hoguera:f reflejo:m huella:f surco:m
+		fósil:m concha:f grava:f arcilla:f iceberg:m témpano:m meandro:m afluente:m cauce:m desembocadura:f taiga:f
+		manglar:m arboleda:f matorral:m maleza:f cerro:m burbuja:f espejismo:m
 	`,
 	plant: `
 		árbol:m hoja:f flor:f raíz:f semilla:f fruto:m musgo:m helecho:m bambú:m pino:m arce:m
@@ -62,6 +74,10 @@ const NOUNS = taggedNouns({
 		haya:f alerce:m secuoya:f eucalipto:m acacia:f magnolia:f camelia:f begonia:f petunia:f
 		geranio:m clavel:m margarita:f amapola:f jacinto:m narciso:m tulipán:m azucena:f dalia:f
 		peonía:f trébol:m junco:m carrizo:m ortiga:f cardo:m
+		tronco:m hongo:m liquen:m espiga:f vid:f arbusto:m paja:f heno:m bulbo:m tubérculo:m resina:f espora:f moho:m
+		follaje:m ciprés:m encina:f alcornoque:m limonero:m peral:m ciruelo:m granado:m morera:f cocotero:m baobab:m
+		tejo:m boj:m brezo:m retama:f lirio:m jazmín:m hortensia:f azalea:f gardenia:f buganvilla:f mimosa:f
+		caléndula:f adelfa:f romero:m lúpulo:m vainilla:f diente_de_león:m esqueje:m
 	`,
 	gem: `
 		oro:m plata:f cobre:m hierro:m acero:m bronce:m latón:m estaño:m zinc:m platino:m
@@ -74,6 +90,10 @@ const NOUNS = taggedNouns({
 		uranio:m lapislázuli:m cornalina:f jaspe:m ónice:m berilo:m espinela:f peridoto:m
 		alabastro:m pizarra:f arenisca:f esquisto:m gneis:m cuarcita:f toba:f dolomita:f apatito:m
 		barita:f corindón:m feldespato:m moscovita:f siderita:f limonita:f bauxita:f
+		diamante:m joya:f vidrio:m porcelana:f cerámica:f sodio:m potasio:m calcio:m magnesio:m silicio:m carbono:m
+		paladio:m iridio:m vanadio:m citrino:m aventurina:f heliotropo:m azurita:f rodonita:f sodalita:f labradorita:f
+		tanzanita:f alejandrita:f piedra_pómez:f piedra_lunar:f ojo_de_tigre:m escoria:f filón:m adoquín:m losa:f
+		travertino:m pórfido:m hulla:f lignito:m sílice:f cal:f
 	`,
 	concept: `
 		libertad:f paz:f justicia:f verdad:f sabiduría:f memoria:f imaginación:f cuento:m poema:m
@@ -90,6 +110,10 @@ const NOUNS = taggedNouns({
 		semántica:f ortografía:f caligrafía:f enigma:m certeza:f azar:m destino:m suerte:f
 		fortuna:f voluntad:f conciencia:f identidad:f esencia:f materia:f forma:f causa:f efecto:m
 		orden:m caos:m límite:m origen:m
+		honor:m gloria:f fama:f valor:m milagro:m misterio:m sueño:m idea:f pensamiento:m opinión:f fe:f problema:m
+		solución:f plan:m proyecto:m política:f economía:f sociedad:f guerra:f novela:f palabra:f frase:f número:m
+		círculo:m triángulo:m medicina:f literatura:f poesía:f conocimiento:m lección:f misión:f amistad:f belleza:f
+		ley:f derecho:m poder:m
 	`,
 	myth: `
 		dragón:m fénix:m unicornio:m sirena:f hada:f duende:m elfo:m enano:m trol:m ogro:m
@@ -103,6 +127,10 @@ const NOUNS = taggedNouns({
 		gnomo:m trasgo:m ondina:f silfo:m sílfide:f genio:m aparición:f conjuro:m sortilegio:m
 		grimorio:m pentáculo:m reliquia:f cáliz:m grial:m varita:f báculo:m cetro:m corona:f
 		hipogrifo:m mantícora:f
+		mago:m druida:m momia:f zombi:m monstruo:m bestia:f criatura:f nereida:f yeti:m orco:m semidiós:m querubín:m
+		serafín:m súcubo:m íncubo:m poción:f elixir:m bendición:f magia:f alquimia:f brujería:f caldero:m
+		bola_de_cristal:f tridente:m piedra_filosofal:f vellocino:m ambrosía:f inframundo:m paraíso:m infierno:m
+		limbo:m purgatorio:m ofrenda:f invocación:f exorcismo:m aura:f inmortalidad:f reencarnación:f ánima:f
 	`,
 	job: `
 		caballero:m cazador:m ladrón:m pirata:m marinero:m capitán:m cocinero:m jardinero:m
@@ -121,6 +149,10 @@ const NOUNS = taggedNouns({
 		carnicero:m frutero:m florista:m librero:m arqueólogo:m astrónomo:m biólogo:m geólogo:m
 		botánico:m historiador:m filósofo:m archivero:m
 		cosmonauta:m astronauta:m
+		profesor:m científico:m programador:m arquitecto:m dentista:m cirujano:m electricista:m ganadero:m
+		recepcionista:m secretario:m vendedor:m empresario:m alcalde:m ministro:m embajador:m espía:m verdugo:m
+		mensajero:m bufón:m juglar:m malabarista:m fotógrafo:m diseñador:m socorrista:m guardabosques:m centinela:m
+		navegante:m almirante:m sargento:m coronel:m
 	`,
 	music: `
 		piano:m guitarra:f tambor:m campana:f arpa:f canción:f danza:f ritmo:m melodía:f acorde:m
@@ -136,6 +168,10 @@ const NOUNS = taggedNouns({
 		cencerro:m gong:m timbal:m bombo:m contrapunto:m cadencia:f arpegio:m trino:m glisando:m
 		legato:m tempo:m ritornelo:m estribillo:m estrofa:f copla:f fandango:m bolero:m tango:m
 		rumba:f zarzuela:f ópera:f
+		canto:m tono:m tonalidad:f tenor:m soprano:f barítono:m solista:m banda:f álbum:m recital:m gira:f bis:m
+		diapasón:m atril:m púa:f tecla:f baqueta:f batuta:f sintetizador:m ukelele:m bandoneón:m charango:m bongó:m
+		conga:f marimba:f corneta:f clarín:m lira:f carillón:m jota:f cumbia:f samba:f mambo:m pasodoble:m polca:f
+		rock:m pop:m rap:m blues:m karaoke:m
 	`,
 	place: `
 		mercado:m plaza:f ciudad:f aldea:f callejón:m puente:m jardín:m biblioteca:f museo:m
@@ -152,6 +188,10 @@ const NOUNS = taggedNouns({
 		feria:f barrio:m arrabal:m suburbio:m avenida:f bulevar:m calzada:f vereda:f senda:f
 		atajo:m encrucijada:f embarcadero:m dique:m esclusa:f presa:f acueducto:m molino:m
 		fragua:f taller:m almacén:m silo:m establo:m corral:m pajar:m
+		casa:f hogar:m habitación:f baño:m garaje:m balcón:m terraza:f tejado:m chimenea:f puerta:f ventana:f pared:f
+		muro:m oficina:f fábrica:f supermercado:m hotel:m iglesia:f universidad:f cine:m circo:m bar:m gasolinera:f
+		carretera:f autopista:f camino:m acera:f calle:f semáforo:m fuente:f monumento:m pirámide:f laberinto:m
+		refugio:m prisión:f anfiteatro:m planetario:m
 	`,
 	food: `
 		arroz:m pan:m fideo:m sopa:f guiso:m ensalada:f sal:f azúcar:m pimienta:f ajo:m cebolla:f
@@ -168,6 +208,10 @@ const NOUNS = taggedNouns({
 		níspero:m albaricoque:m nectarina:f pomelo:m mandarina:f kiwi:m nuez:f pistacho:m
 		cacahuete:m castaña:f bizcocho:m buñuelo:m torrija:f natilla:f cocido:m potaje:m fabada:f
 		migas:fp
+		pollo:m pescado:m marisco:m ternera:f lomo:m chuleta:f salchichón:m sushi:m taco:m guacamole:m cruasán:m
+		bollo:m tarta:f bombón:m chicle:m sándwich:m kebab:m lasaña:f espagueti:m macarrón:m salsa:f mayonesa:f
+		vinagre:m aceite:m harina:f masa:f caldo:m puré:m palomitas:fp nata:f melón:m coco:m aguacate:m frambuesa:f
+		arándano:m almendra:f avellana:f
 	`,
 	sport: `
 		fútbol:m béisbol:m baloncesto:m voleibol:m tenis:m bádminton:m golf:m boliche:m billar:m
@@ -182,6 +226,12 @@ const NOUNS = taggedNouns({
 		delantero:m defensa:f entrenador:m hincha:m estadio:m cancha:f pista:f penalti:m
 		córner:m tarjeta:f tanteo:m empate:m victoria:f derrota:f récord:m torneo:m liga:f
 		copa:f
+		equipo:m jugador:m gol:m balón:m canasta:f ring:m entrenamiento:m calentamiento:m flexión:f sentadilla:f
+		pesa:f mancuerna:f pádel:m frontón:m petanca:f taekwondo:m sumo:m aikido:m senderismo:m montañismo:m
+		paracaidismo:m parapente:m biatlón:m waterpolo:m vuelta:f pelotón:m maillot:m dorsal:m cronómetro:m
+		banquillo:m palco:m suplente:m fichaje:m campeonato:m mundial:m olimpiada:f semifinal:f clasificación:f
+		puntuación:f goleada:f remontada:f pase:m regate:m remate:m cabezazo:m bloqueo:m triple:m set:m revés:m
+		volea:f
 	`,
 	vehicle: `
 		bicicleta:f tren:m barco:m coche:m autobús:m taxi:m camión:m moto:f patinete:m avión:m
@@ -195,6 +245,11 @@ const NOUNS = taggedNouns({
 		volquete:m hormigonera:f grúa:f segadora:f cosechadora:f patín:m monopatín:m ciclomotor:m
 		sidecar:m crucero:m galera:f galeón:m fragata:f corbeta:f bergantín:m goleta:f piragua:f
 		chalupa:f bote:m lancha:f planeador:m ultraligero:m avioneta:f caza:m bombardero:m
+		autocar:m todoterreno:m descapotable:m caravana:f remolque:m tráiler:m quad:m kart:m silla_de_ruedas:f
+		funicular:m telesilla:m ascensor:m montacargas:m globo_aerostático:m jet:m transbordador:m ferry:m
+		portaaviones:m destructor:m ballenero:m trasatlántico:m carabela:f trirreme:m aerodeslizador:m batiscafo:m
+		apisonadora:f tándem:m carromato:m cuadriga:f tartana:f ranchera:f monovolumen:m utilitario:m cupé:m
+		vagoneta:f barcaza:f trolebús:m
 	`,
 	product: `
 		ordenador:m teclado:m ratón:m pantalla:f impresora:f altavoz:m auricular:m micrófono:m
@@ -210,6 +265,12 @@ const NOUNS = taggedNouns({
 		cubertería:f vajilla:f cristalería:f mantel:m servilleta:f
 		escurridor:m fregadero:m ducha:f bañera:f inodoro:m lavabo:m botiquín:m lentilla:f
 		tocadiscos:m
+		portátil:m monitor:m cable:m disco_duro:m videojuego:m reproductor:m grabadora:f gramófono:m vinilo:m casete:m
+		adaptador:m alargador:m interruptor:m congelador:m lavavajillas:m vitrocerámica:f extractor:m batidora:f
+		sandwichera:f wok:m parrilla:f barbacoa:f rizador:m cortaúñas:m desodorante:m colonia:f maquillaje:m
+		pintalabios:m esmalte:m rímel:m mascarilla:f pañal:m chupete:m biberón:m papel_higiénico:m lejía:f
+		ambientador:m insecticida:m bombona:f aire_acondicionado:m humidificador:m calentador:m bidé:m antena:f
+		módem:m teléfono:m fotocopiadora:f acondicionador:m gel:m pomada:f tirita:f venda:f pastilla:f vitamina:f
 	`,
 	color: `
 		carmesí:m escarlata:m bermellón:m magenta:m fucsia:m rosado:m
@@ -223,6 +284,9 @@ const NOUNS = taggedNouns({
 		tostado:m verdemar:m azulón:m grisáceo:m morado:m corinto:m
 		salmonado:m amarillento:m rojizo:m plomizo:m dorado:m
 		purpurina:f cárdeno:m garzo:m ambarino:m níveo:m
+		marrón:m celeste:m ultramar:m grana:f azulete:m verdoso:m azulado:m blanquecino:m negruzco:m anaranjado:m
+		violáceo:m rosáceo:m perlado:m ahumado:m tornasol:m matiz:m tinte:m pigmento:m colorante:m laca:f barniz:m
+		acuarela:f témpera:f óleo:m gama:f hollín:m tabaco:m
 	`,
 	finance: `
 		factura:f recibo:m bono:m dividendo:m interés:m préstamo:m hipoteca:f
@@ -238,6 +302,11 @@ const NOUNS = taggedNouns({
 		cuota:f canon:m tributo:m impuesto:m gravamen:m retención:f exención:f multa:f mora:f
 		usura:f fianza:f aporte:m dote:f herencia:f renta:f alquiler:m
 		arriendo:m peaje:m portazgo:m diezmo:m botín:m tesoro:m riqueza:f pobreza:f
+		dinero:m billete:m efectivo:m pago:m cobro:m precio:m coste:m pérdida:f inversión:f inversor:m accionista:m
+		acción:f banca:f transferencia:f propina:f paga:f limosna:f beca:f subasta:f oferta:f demanda:f venta:f
+		compra:f trueque:m negocio:m empresa:f lotería:f apuesta:f premio:m jubilación:f seguro:m póliza:f
+		patrimonio:m lujo:m embargo:m desahucio:m devaluación:f cotización:f hucha:f calderilla:f céntimo:m euro:m
+		dólar:m libra:f
 	`,
 	tech: `
 		servidor:m caché:f búfer:m píxel:m códec:m paquete:m protocolo:m
@@ -253,6 +322,12 @@ const NOUNS = taggedNouns({
 		conjunto:m módulo:m complemento:m parche:m
 		confirmación:f etiqueta:f versión:f compilación:f prueba:f traza:f perfil:m
 		disparador:m evento:m señal:f tema:m suscriptor:m
+		internet:m web:f navegador:m buscador:m enlace:m correo:m mensaje:m chat:m contraseña:f usuario:m fichero:m
+		programa:m aplicación:f software:m hardware:m sistema:m algoritmo:m código:m variable:f función:f bucle:m
+		clase:f base_de_datos:f dato:m bit:m procesador:m chip:m circuito:m transistor:m placa:f terminal:f icono:m
+		descarga:f actualización:f instalación:f virus:m dominio:m ancho_de_banda:m wifi:m fibra:f conexión:f
+		resolución:f formato:m compresión:f robot:m androide:m autómata:m sensor:m bot:m blog:m foro:m captura:f
+		comando:m lenguaje:m error:m excepción:f vector:m
 	`,
 	weather: `
 		nube:f viento:m lluvia:f nieve:f escarcha:f niebla:f rocío:m arcoíris:m ocaso:m rayo:m
@@ -266,6 +341,8 @@ const NOUNS = taggedNouns({
 		ábrego:m alisio:m huracán:m tornado:m tolvanera:f polvareda:f rociada:f
 		orvallo:m calabobos:m sirimiri:m nevada:f nevisca:f granizada:f tormentón:m relente:m
 		gota:f nubosidad:f humedad:f sequía:f estiaje:m bonanza:f
+		temporal:m tromba:f ola_de_frío:f calor:m frescor:m copo:m carámbano:m pedrisco:m mistral:m cirro:m nimbo:m
+		precipitación:f visibilidad:f ventarrón:m terral:m celaje:m arrebol:m ventolera:f
 	`,
 	space: `
 		estrella:f luna:f sol:m galaxia:f meteoro:m aurora:f menguante:m
@@ -281,6 +358,9 @@ const NOUNS = taggedNouns({
 		observatorio:m
 		gravitación:f
 		halo:m enana:f coma:f bólido:m
+		sistema_solar:m agujero_negro:m estación_espacial:f radiación:f viento_solar:m llamarada:f materia_oscura:f
+		espacio:m nova:f zodíaco:m extraterrestre:m ovni:m alunizaje:m despegue:m hemisferio:m eje:m magnetar:m
+		singularidad:f cuerpo_celeste:m marciano:m
 	`,
 	time: `
 		amanecer:m alba:f crepúsculo:m anochecer:m solsticio:m equinoccio:m momento:m
@@ -294,6 +374,10 @@ const NOUNS = taggedNouns({
 		ciclo:m turno:m ronda:f fase:f etapa:f tramo:m jornal:m matinal:m
 		vespertino:m antaño:m hogaño:m pasado:m presente:m porvenir:m albor:m
 		sazón:f añada:f decenio:m centuria:f cuatrienio:m sexenio:m
+		día:m fin_de_semana:m lunes:m martes:m miércoles:m jueves:m viernes:m sábado:m domingo:m enero:m febrero:m
+		marzo:m abril:m mayo:m junio:m julio:m agosto:m septiembre:m octubre:m noviembre:m diciembre:m festivo:m
+		vacaciones:fp descanso:m siesta:f cumpleaños:m vendimia:f fecha:f horario:m cita:f prisa:f rato:m antigüedad:f
+		prehistoria:f actualidad:f milisegundo:m
 	`,
 	emotion: `
 		alegría:f tristeza:f ira:f miedo:m sorpresa:f gozo:m júbilo:m dicha:f felicidad:f
@@ -310,6 +394,10 @@ const NOUNS = taggedNouns({
 		arrebato:m arrobo:m devoción:f piedad:f clemencia:f indulgencia:f benevolencia:f
 		afecto:m apego:m simpatía:f antipatía:f alborozo:m regocijo:m contento:m desazón:f
 		zozobra:f sobresalto:m estupor:m pasmo:m
+		amor:m placer:m satisfacción:f lealtad:f generosidad:f amabilidad:f crueldad:f egoísmo:m pereza:f gula:f
+		lujuria:f soberbia:f vanidad:f inseguridad:f nerviosismo:m estrés:m agobio:m tensión:f desesperación:f
+		frustración:f decepción:f indignación:f remordimiento:m arrepentimiento:m admiración:f respeto:m fascinación:f
+		curiosidad:f indiferencia:f desgana:f cansancio:m dolor:m susto:m inquietud:f desconfianza:f
 	`,
 	body: `
 		cabeza:f frente:f ceja:f pestaña:f párpado:m nariz:f mejilla:f barbilla:f mandíbula:f
@@ -325,6 +413,9 @@ const NOUNS = taggedNouns({
 		esternón:m omóplato:m vértebra:f pelvis:f fémur:m tibia:f peroné:m húmero:m
 		cúbito:m falange:f metatarso:m empeine:m planta:f dorso:m axila:f ingle:f corva:f
 		iris:m pupila:f córnea:f retina:f esclerótica:f tabique:m frenillo:m
+		ojo:m boca:f mano:f pie:m brazo:m pierna:f cara:f cuerpo:m garganta:f esqueleto:m médula:f neurona:f célula:f
+		hormona:f glándula:f páncreas:m apéndice:m útero:m bigote:m patilla:f flequillo:m melena:f trenza:f verruga:f
+		lunar:m herida:f bíceps:m torso:m costado:m glúteo:m meñique:m anular:m aorta:f oído:m tripa:f
 	`,
 	clothing: `
 		sombrero:m zapato:m guante:m bufanda:f gafas:fp abrigo:m gabán:m chaqueta:f americana:f
@@ -339,6 +430,10 @@ const NOUNS = taggedNouns({
 		corpiño:m polaina:f zueco:m alpargata:f chancla:f babucha:f escarpín:m
 		calzón:m taparrabos:m mitón:m manopla:f muñequera:f tirante:m ligero:m corsé:m
 		miriñaque:m mantilla:f pamela:f tricornio:m bicornio:m yelmo:m cofia:f capucha:f
+		traje:m camiseta:f tacón:m calzoncillos:p bragas:fp sujetador:m camisón:m albornoz:m chándal:m mallas:fp
+		bermudas:fp peto:m cazadora:f gabardina:f kimono:m sari:m toga:f hábito:m sotana:f armadura:f coraza:f tiara:f
+		diadema:f visera:f pasamontañas:m orejeras:fp pantis:p leotardo:m bolsillo:m costura:f nailon:m poliéster:m
+		licra:f cachemir:m encaje:m lentejuela:f pañoleta:f fular:m cordón:m suela:f plantilla:f
 	`,
 	tool: `
 		hacha:f pala:f sierra:f alicate:m cincel:m yunque:m fuelle:m lezna:f abrazadera:f nivel:m
@@ -351,6 +446,10 @@ const NOUNS = taggedNouns({
 		plomada:f tenaza:f tenazas:fp cric:m grapadora:f engrapadora:f pistola:f
 		soplete:m yesquero:m crisol:m molde:m troquel:m esmeril:m muela:f
 		afilador:m mandril:m broca:f macheta:f azuela:f
+		destornillador:m llave_inglesa:f cúter:m navaja:f machete:m cortacésped:m desbrozadora:f horca:f regadera:f
+		manguera:f pulverizador:m sembradora:f podadora:f andamio:m cinta_métrica:f cartabón:m transportador:m llana:f
+		espátula:f rodillo:m brocha:f rascador:m fresadora:f prensa:f caballete:m caja_de_herramientas:f pelacables:m
+		multímetro:m carraca:f pie_de_cabra:m cepillo_de_carpintero:m
 	`,
 	drink: `
 		café:m té:m zumo:m leche:f agua:f gaseosa:f limonada:f sidra:f horchata:f batido:m
@@ -363,6 +462,8 @@ const NOUNS = taggedNouns({
 		bíter:m amargo:m anís:m pacharán:m licorcillo:m aguamiel:f rompope:m
 		sorbete:m clarete:m albariño:m
 		espumoso:m mosto:m garnacha:f fino:m amontillado:m
+		naranjada:f moscatel:m chupito:m trago:m mojito:m daiquiri:m piña_colada:f cubata:m absenta:f pisco:m
+		cachaza:f grappa:f moca:m sifón:m agua_de_coco:f consomé:m
 	`,
 	toy: `
 		canica:f dado:m naipe:m rompecabezas:m peonza:f cometa:f globo:m ajedrez:m dominó:m parchís:m muñeco:m
@@ -589,6 +690,31 @@ export const ES: WordLanguageData = {
 			anciano señor sobrino nieto gemelo pareja enemigo invitado extranjero desconocido villano líder jefe
 			compañero testigo víctima prisionero mendigo padrino madrina suegro cuñado yerno nuera pariente taburete
 			pupitre cómoda cajón mueble perchero litera hamaca mecedora tumbona encimera marco póster jarrón adorno
+			gallo pavo rata hámster gaviota cucaracha langosta foto bolígrafo tiza pegamento tenedor cuchillo vaso
+			bolso maleta collar cielo tierra isla océano piedra polvo barro hielo fuego ola luz oscuridad aire tronco
+			hongo arbusto diamante joya vidrio sueño idea pensamiento fe problema solución guerra palabra frase número
+			círculo triángulo medicina literatura poesía ley mago momia zombi monstruo magia profesor dentista rock
+			pop rap casa habitación baño puerta ventana oficina supermercado hotel iglesia cine bar carretera camino
+			calle pollo pescado tarta chicle salsa mayonesa aceite melón equipo jugador gol balón ascensor ferry
+			portátil videojuego papel_higiénico teléfono pastilla marrón dinero billete precio lotería euro dólar
+			internet web mensaje chat contraseña wifi robot error calor espacio día fin_de_semana lunes martes
+			miércoles jueves viernes sábado domingo enero febrero marzo abril mayo junio julio agosto septiembre
+			octubre noviembre diciembre vacaciones amor dolor ojo boca mano pie brazo pierna cara cuerpo traje
+			camiseta calzoncillos bragas sujetador bolsillo destornillador libro revista periódico calendario carpeta
+			esponja trapo cazo tarro pasaporte papelera charco estanque pozo nido paisaje incendio huella concha paja
+			honor fama milagro misterio opinión plan proyecto política economía sociedad novela lección amistad poder
+			científico arquitecto cirujano electricista vendedor empresario alcalde espía fotógrafo banda álbum hogar
+			garaje balcón terraza tejado chimenea pared muro fábrica universidad circo gasolinera autopista acera
+			semáforo fuente monumento pirámide prisión marisco ternera chuleta bollo bombón sándwich lasaña espagueti
+			macarrón vinagre harina caldo puré palomitas nata coco aguacate almendra canasta entrenamiento pesa
+			campeonato mundial monitor cable congelador lavavajillas batidora barbacoa desodorante colonia maquillaje
+			pañal chupete biberón lejía antena tirita venda efectivo pago pérdida inversión transferencia propina beca
+			oferta venta compra negocio empresa premio jubilación seguro hucha céntimo navegador buscador enlace
+			correo usuario programa aplicación sistema código dato chip descarga actualización virus conexión blog
+			foro festivo descanso siesta cumpleaños fecha horario cita prisa rato placer pereza estrés tensión
+			frustración decepción respeto curiosidad cansancio susto garganta esqueleto bigote flequillo melena trenza
+			herida meñique oído tripa tacón chándal cazadora cordón suela navaja cortacésped regadera manguera rodillo
+			brocha chupito trago
 		`),
 		rare: words(`
 			ñu suricata ornitorrinco lémur babuino tapir alondra abubilla jilguero arrendajo tritón dedal
@@ -630,6 +756,27 @@ export const ES: WordLanguageData = {
 			banqueta vitrina aparador tocador paragüero catre somier cabecero colcha diván puf biombo mampara alacena
 			moqueta estera tapete tapiz portarretratos candelabro candil quinqué plafón lámpara_de_araña visillo
 			mosquitera dosel cenefa
+			témpano meandro afluente desembocadura taiga manglar arboleda espejismo liquen tubérculo espora alcornoque
+			cocotero baobab tejo boj brezo retama caléndula adelfa lúpulo esqueje sodio potasio magnesio silicio
+			carbono paladio iridio vanadio citrino aventurina heliotropo azurita rodonita sodalita labradorita
+			tanzanita alejandrita piedra_lunar ojo_de_tigre escoria filón travertino pórfido hulla lignito sílice
+			druida nereida semidiós querubín serafín súcubo íncubo elixir alquimia vellocino ambrosía inframundo limbo
+			purgatorio invocación exorcismo aura reencarnación ánima piedra_filosofal juglar malabarista guardabosques
+			centinela almirante tonalidad barítono diapasón atril baqueta batuta bandoneón charango bongó conga
+			marimba clarín lira carillón anfiteatro planetario frontón petanca biatlón pelotón maillot dorsal fichaje
+			regate volea trirreme aerodeslizador batiscafo apisonadora carromato cuadriga tartana monovolumen
+			utilitario cupé vagoneta barcaza trolebús carabela ballenero trasatlántico portaaviones destructor
+			montacargas telesilla funicular gramófono vinilo casete vitrocerámica sandwichera rizador humidificador
+			bidé módem acondicionador ultramar grana azulete perlado ahumado tornasol témpera hollín tabaco accionista
+			banca devaluación cotización calderilla embargo desahucio fichero bucle transistor autómata compresión
+			excepción vector ancho_de_banda tromba frescor carámbano pedrisco mistral cirro nimbo ventarrón terral
+			celaje arrebol ventolera viento_solar llamarada materia_oscura nova alunizaje magnetar singularidad
+			cuerpo_celeste hemisferio vendimia antigüedad prehistoria milisegundo lujuria soberbia vanidad desgana
+			indiferencia remordimiento fascinación médula neurona glándula páncreas apéndice útero aorta bíceps glúteo
+			anular sari toga sotana coraza tiara leotardo cachemir licra poliéster nailon lentejuela pañoleta fular
+			hábito desbrozadora pulverizador sembradora podadora andamio cartabón transportador llana rascador
+			fresadora prensa caballete pelacables multímetro carraca pie_de_cabra cepillo_de_carpintero moscatel
+			absenta pisco cachaza grappa moca sifón agua_de_coco consomé
 		`)
 	},
 	frames: [

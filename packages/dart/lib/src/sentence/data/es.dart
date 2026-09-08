@@ -1166,21 +1166,25 @@ final SentenceLanguageData es = SentenceLanguageData(
       ganso mariposa abeja libélula cigarra mosca mosquito murciélago garza pelícano dragón fénix
       hada pegaso grifo ángel valquiria mirlo ruiseñor alondra codorniz faisán perdiz colibrí tucán
       flamenco cigüeña abubilla jilguero urraca arrendajo avispa polilla luciérnaga hipogrifo
+      gaviota lechuza querubín serafín
     '''),
     NounTrait.swimmer: words(r'''
       cocodrilo tortuga rana sapo pez ballena delfín tiburón pulpo calamar gamba cangrejo morsa foca
       pingüino sirena kraken náyade anguila sardina atún bacalao merluza trucha salmón carpa raya
-      medusa almeja mejillón ostra salamandra tritón castor hipopótamo ornitorrinco
+      medusa almeja mejillón ostra salamandra tritón castor hipopótamo ornitorrinco langosta orca
+      nereida
     '''),
     NounTrait.crawler: words(r'''
       cocodrilo serpiente lagarto tortuga caracol hormiga araña gusano cangrejo basilisco iguana
       camaleón salamandra tritón boa víbora cobra pitón escarabajo saltamontes grillo pulga oruga
-      ciempiés escorpión
+      ciempiés escorpión cucaracha
     '''),
     NounTrait.lifeless: words(r'''
       hechizo maldición profecía amuleto talismán runa portal santuario ídolo tótem augurio presagio
       bestiario conjuro sortilegio grimorio pentáculo reliquia cáliz grial varita báculo cetro
-      corona
+      corona poción elixir bendición magia alquimia brujería caldero bola_de_cristal tridente
+      piedra_filosofal vellocino ambrosía inframundo paraíso infierno limbo purgatorio ofrenda
+      invocación exorcismo aura inmortalidad reencarnación
     '''),
     NounTrait.placeless: words(r'''
       arena guijarro terremoto géiser fumarola estalactita estalagmita eco brasa estrella sol
@@ -1188,7 +1192,11 @@ final SentenceLanguageData es = SentenceLanguageData(
       rotación traslación mancha_solar año_luz astro eclíptica meridiano ingravidez plenilunio
       novilunio perigeo apogeo lucero supernova cuásar púlsar corriente marea oleaje espuma
       rompiente paralaje parsec acimut perihelio afelio elipse cuadrante nadir gravitación halo
-      bólido enana coma
+      bólido enana coma piedra polvo barro hielo fuego chispa ola luz oscuridad aire lava magma
+      erupción avalancha inundación incendio hoguera reflejo huella surco fósil concha grava arcilla
+      témpano burbuja espejismo agujero_negro radiación viento_solar llamarada materia_oscura nova
+      zodíaco extraterrestre ovni alunizaje despegue eje magnetar singularidad cuerpo_celeste
+      marciano
     '''),
   },
   interjections: words(r'''

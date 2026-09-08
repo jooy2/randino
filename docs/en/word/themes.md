@@ -99,7 +99,7 @@ Leave the theme out and each result draws from one theme picked at random, so a 
 
 **No person names, and no word that is only a name.** For English this is enforced against the person-name pools automatically, which is why `job` has no `Knight`, `Baker` or `Hunter` and `plant` no `Rose` or `Ivy`. Korean and Japanese cannot be held to the same check, because 하늘, 별 and 森 are everyday nouns that happen also to be names. A modifier in front of one is still nobody's name.
 
-**Pool sizes are uneven on purpose.** Most themes hold sixty or more nouns per language, and the thinnest sit in the forties. Some of these slices of vocabulary hold fewer words to begin with, and padding a pool with near-synonyms reads worse than a shorter pool.
+**Pool sizes are uneven on purpose.** Most themes hold a hundred or more nouns per language, and the thinnest sit in the sixties. Some of these slices of vocabulary hold fewer words to begin with, and padding a pool with near-synonyms reads worse than a shorter pool.
 
 ## The theme a word reports {#where-a-theme-comes-from}
 

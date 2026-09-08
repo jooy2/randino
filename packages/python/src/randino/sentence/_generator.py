@@ -108,6 +108,12 @@ FIT_ATTEMPTS = 14
 """How many sentences to build before settling for the closest fit found."""
 
 STORY_ATTEMPTS = 3
+
+NAME_ATTEMPTS = 6
+"""How many times a name is drawn again when it is one the result already carries.
+
+Two people in one story sharing a name reads as a mistake.
+"""
 """How many times a story is told before settling for the closest fit found.
 
 A story is sentences drawn one after another against a range shared out between them,
@@ -2197,6 +2203,26 @@ def _noun_phrase(
     )
 
 
+def _fresh_name(
+    language: WordLanguage, settings: Settings, prefix: str, taken: list[str]
+) -> tuple[str, WordGender]:
+    """Draw a name nobody in this result carries yet.
+
+    Two people in one story sharing a name reads as a mistake rather than as a
+    coincidence, and the pools are small enough that an unsteered draw repeats one
+    now and then.
+    """
+    text, gender = _proper_name(language, settings, prefix)
+
+    for _ in range(NAME_ATTEMPTS - 1):
+        if text not in taken:
+            break
+
+        text, gender = _proper_name(language, settings, prefix)
+
+    return text, gender
+
+
 def _proper_name(language: WordLanguage, settings: Settings, prefix: str) -> tuple[str, WordGender]:
     """A person's name for a phrase that has room for one, and the gender it carries.
 
@@ -2900,8 +2926,11 @@ def _compose(
             if carried_in:
                 phrase = carried_in
             else:
-                phrase, drawn_gender = _proper_name(
-                    language, settings, settings.prefix if prefixable and index == 0 else ""
+                phrase, drawn_gender = _fresh_name(
+                    language,
+                    settings,
+                    settings.prefix if prefixable and index == 0 else "",
+                    names,
                 )
                 names.append(phrase)
 

@@ -10,18 +10,18 @@ So `여우가 사과를 먹는다` is a sentence the generator can build and `�
 
 No noun carries a tag for this. The twenty-nine [themes](../word/themes) already say what a word is, so each theme maps to one **noun class**, the same way in every language:
 
-| Class      | Themes                                                  |
-| ---------- | ------------------------------------------------------- |
-| `creature` | `animal`, `myth`                                        |
-| `person`   | `job`, `person`                                         |
-| `plant`    | `plant`                                                 |
-| `edible`   | `food`, `drink`                                         |
+| Class      | Themes                                                                      |
+| ---------- | --------------------------------------------------------------------------- |
+| `creature` | `animal`, `myth`                                                            |
+| `person`   | `job`, `person`                                                             |
+| `plant`    | `plant`                                                                     |
+| `edible`   | `food`, `drink`                                                             |
 | `thing`    | `object`, `tool`, `clothing`, `product`, `gem`, `music`, `toy`, `furniture` |
-| `vehicle`  | `vehicle`                                               |
-| `place`    | `place`, `nature`, `space`                              |
-| `event`    | `weather`, `sport`, `time`, `sound`                     |
-| `idea`     | `concept`, `emotion`, `finance`, `tech`, `color`        |
-| `body`     | `body`                                                  |
+| `vehicle`  | `vehicle`                                                                   |
+| `place`    | `place`, `nature`, `space`                                                  |
+| `event`    | `weather`, `sport`, `time`, `sound`                                         |
+| `idea`     | `concept`, `emotion`, `finance`, `tech`, `color`                            |
+| `body`     | `body`                                                                      |
 
 A verb that says `creature` and `person` can be done by a lion and by a locksmith, and by nothing else. That is the whole mechanism, and it is why the sentences read as sentences rather than as filled-in templates.
 

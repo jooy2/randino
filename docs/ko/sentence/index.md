@@ -10,18 +10,18 @@
 
 이를 위해 명사에 따로 붙인 표시는 없습니다. 29개 [테마](../word/themes)가 이미 그 단어가 무엇인지 알려 주므로, 테마마다 **명사 부류**를 하나씩 대응시킵니다. 모든 언어가 같은 대응을 씁니다.
 
-| 부류       | 테마                                                    |
-| ---------- | ------------------------------------------------------- |
-| `creature` | `animal`, `myth`                                        |
-| `person`   | `job`, `person`                                         |
-| `plant`    | `plant`                                                 |
-| `edible`   | `food`, `drink`                                         |
+| 부류       | 테마                                                                        |
+| ---------- | --------------------------------------------------------------------------- |
+| `creature` | `animal`, `myth`                                                            |
+| `person`   | `job`, `person`                                                             |
+| `plant`    | `plant`                                                                     |
+| `edible`   | `food`, `drink`                                                             |
 | `thing`    | `object`, `tool`, `clothing`, `product`, `gem`, `music`, `toy`, `furniture` |
-| `vehicle`  | `vehicle`                                               |
-| `place`    | `place`, `nature`, `space`                              |
-| `event`    | `weather`, `sport`, `time`, `sound`                     |
-| `idea`     | `concept`, `emotion`, `finance`, `tech`, `color`        |
-| `body`     | `body`                                                  |
+| `vehicle`  | `vehicle`                                                                   |
+| `place`    | `place`, `nature`, `space`                                                  |
+| `event`    | `weather`, `sport`, `time`, `sound`                                         |
+| `idea`     | `concept`, `emotion`, `finance`, `tech`, `color`                            |
+| `body`     | `body`                                                                      |
 
 `creature`와 `person`을 받는 동사는 사자도 자물쇠공도 할 수 있고, 그 밖의 것은 할 수 없습니다. 결과가 빈칸을 채운 틀이 아니라 문장으로 읽히는 것은 이 규칙 하나 덕분입니다.
 
