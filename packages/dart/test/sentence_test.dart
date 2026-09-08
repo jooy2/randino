@@ -403,6 +403,14 @@ Set<String> pronounsOf(WordLanguage language) {
   return <String>{...written, ...written.map(upperFirst)};
 }
 
+/// The longest of several parses, which is the most of the phrase any of them reads.
+String? longest(Iterable<String> words) {
+  final sorted =
+      words.toList()..sort((a, b) => b.length != a.length ? b.length - a.length : a.compareTo(b));
+
+  return sorted.isEmpty ? null : sorted.first;
+}
+
 /// Every noun a phrase could have been built around, as far as the pools can
 /// tell — the same decomposition [explains] makes, kept instead of thrown away.
 ///
@@ -718,7 +726,6 @@ void main() {
           final subjectAt = detail.slots.indexOf(SentenceSlot.subject);
           final found =
               subjectAt < 0 ? const <String>{} : nounsIn(language, detail.phrases[subjectAt]);
-          final subjectNoun = found.isEmpty ? null : found.first;
           final groups = data.verbs.where(
             (group) =>
                 everyForm(group.words, group.forms).contains(detail.phrases[at]) &&
@@ -734,7 +741,10 @@ void main() {
               (group) =>
                   group.subject.contains(themeClass[theme]) &&
                   (group.subjectThemes == null || group.subjectThemes!.contains(theme)) &&
-                  (subjectNoun == null || acceptsNoun(data, group, subjectNoun)),
+                  // Every noun the phrase could have been built around, not one of
+                  // them: `小恶魔` is a noun and so is the `恶魔` inside it, and only
+                  // one of the two is the flier the verb asked for.
+                  (found.isEmpty || found.any((noun) => acceptsNoun(data, group, noun))),
             ),
             isTrue,
             reason: '$language: ${theme.name} cannot be the subject (${detail.sentence})',
@@ -1343,6 +1353,25 @@ void main() {
       expect(seen, greaterThan(0), reason: 'no sentence opened on anything at all');
     });
 
+    test('a homecoming never opens on a word a sentence opens on', () {
+      // `드디어 집이다!` is a whole sentence of the result, so a paragraph that
+      // opened one sentence on `드디어` and closed on this one says the word twice.
+      // Read as data rather than as output, because the collision is rare enough
+      // that a draw finds it once in twenty runs.
+      for (final language in wordLanguages) {
+        final data = sentenceData[language]!;
+        final words = <String>[...connectivesOf(language), ...data.interjections];
+
+        for (final pool in (data.homecomings ?? const <SentenceStyle, WordPool>{}).values) {
+          for (final entry in pool) {
+            final opener = words.where((word) => entry.startsWith(word + data.space));
+
+            expect(opener, isEmpty, reason: "\$language: '\$entry' opens on \${opener.join()}");
+          }
+        }
+      }
+    });
+
     test('a paragraph spends its predicates before it repeats one', () {
       // A verb group holds four words and a paragraph holds four sentences, so the
       // group is drawn down rather than rolled afresh each time — `식습니다` three
@@ -1818,14 +1847,20 @@ void main() {
         return inner.substring(opened.length, inner.length - closed.length);
       }
 
-      List<SentenceDetail> untyped(WordLanguage language, WordTheme theme) => randSentenceDetails(
-        language: language,
-        theme: theme,
-        sentences: 5,
-        includeName: false,
-        tense: SentenceTense.present,
-        count: 150,
-      );
+      // A language that writes no first person reports nothing in its own words,
+      // so most of what it says aloud is a homecoming or a remark made alone —
+      // and only a line somebody is there to hear is ever answered. German
+      // answers about one line in twenty, which is why the check below draws more
+      // than the other ones need.
+      List<SentenceDetail> untyped(WordLanguage language, WordTheme theme, [int count = 150]) =>
+          randSentenceDetails(
+            language: language,
+            theme: theme,
+            sentences: 5,
+            includeName: false,
+            tense: SentenceTense.present,
+            count: count,
+          );
 
       for (final language in wordLanguages) {
         final data = sentenceData[language]!;
@@ -1851,7 +1886,7 @@ void main() {
         var answered = 0;
         var homecame = 0;
 
-        for (final detail in untyped(language, WordTheme.job)) {
+        for (final detail in untyped(language, WordTheme.job, 400)) {
           final spoken = detail.types.where(quoted).length;
           final most = stories.firstWhere((story) => story.name == detail.story).lines ?? 2;
 
@@ -2625,6 +2660,45 @@ void main() {
       }
     });
 
+    test("a required word never takes a sentence outside the language's own floor", () {
+      // `include` pins a word of the caller's own length rather than one the
+      // generator drew, so the phrase it stands in is not the span the shapes
+      // were measured against. The longest noun of the language is the end that
+      // pushes, and the shortest is the end that leaves a gap nothing has to fill.
+      for (final language in wordLanguages) {
+        final range = sentenceLengthRange(language);
+        final nouns = poolFor(language, SentenceSlot.subject).toList(growable: false);
+        var longest = nouns.first;
+        var shortest = nouns.first;
+
+        for (final noun in nouns) {
+          if (noun.length > longest.length) longest = noun;
+          if (noun.length < shortest.length) shortest = noun;
+        }
+
+        for (final word in <String>[longest, shortest]) {
+          for (final sentence in randSentence(
+            language: language,
+            include: <String>[word],
+            count: sample,
+          )) {
+            expect(
+              sentence.length,
+              allOf(greaterThanOrEqualTo(range.min), lessThanOrEqualTo(range.max)),
+              reason: "\$language '\$word': \$sentence",
+            );
+            // Compared without case: a language that capitalizes writes the word
+            // it was given with a capital where the sentence opens on it.
+            expect(
+              sentence.toLowerCase().contains(word.toLowerCase()),
+              isTrue,
+              reason: "\$language: \$sentence left out '\$word'",
+            );
+          }
+        }
+      }
+    });
+
     test('every language can write every type inside its own length range', () {
       for (final language in wordLanguages) {
         final range = sentenceLengthRange(language);
@@ -2707,6 +2781,39 @@ void main() {
             }
           }
         }
+      }
+    });
+
+    test('no plain Japanese predicate closes the way a polite one does', () {
+      // A level is told apart by the ending a sentence closes on, so a plain form
+      // that spells a polite one is a level nothing can read. `こだまする` is
+      // ordinary Japanese and its past is `こだました`, which is the polite past of
+      // a verb nobody has. Read as data: a draw finds it once in twelve runs.
+      final data = sentenceData[WordLanguage.ja]!;
+      final polite = RegExp(r'(ます|ました|です|でした)$');
+
+      List<String> plainOf(WordPool words, PredicateForms forms, PredicateTense? past) => <String>[
+        ...words,
+        for (final entry in forms.entries)
+          if (entry.key != PredicateForm.polite) ...endings(entry.value),
+        if (past != null) ...<String>[
+          ...past.words,
+          for (final entry in past.forms.entries)
+            if (entry.key != PredicateForm.polite) ...endings(entry.value),
+        ],
+      ];
+
+      final words = <String>[
+        for (final group in data.verbs) ...plainOf(group.words, group.forms, group.past),
+        for (final group in data.states) ...plainOf(group.words, group.forms, group.past),
+      ];
+
+      for (final word in words) {
+        expect(
+          polite.hasMatch(word),
+          isFalse,
+          reason: "ja: '\$word' is a plain form that closes politely",
+        );
       }
     });
 
@@ -3797,7 +3904,13 @@ void main() {
           sentences: 4,
           count: 60,
         )) {
-          for (final phrase in detail.phrases) {
+          for (var i = 0; i < detail.phrases.length; i += 1) {
+            // The time slot alone: a language that writes its adverbials bare
+            // spells them the way it spells the nouns, and Vietnamese
+            // `ngày thường` is a weekday as well as `usually`.
+            if (detail.slots[i] != SentenceSlot.time) continue;
+
+            final phrase = detail.phrases[i];
             final written = phrase.substring(0, 1).toLowerCase() + phrase.substring(1);
 
             expect(
@@ -3820,7 +3933,13 @@ void main() {
         tense: SentenceTense.present,
         count: 300,
       )) {
-        if (detail.phrases.any(habits.contains)) seen += 1;
+        for (var i = 0; i < detail.phrases.length; i += 1) {
+          if (detail.slots[i] == SentenceSlot.time && habits.contains(detail.phrases[i])) {
+            seen += 1;
+
+            break;
+          }
+        }
       }
 
       expect(seen, greaterThan(0), reason: 'no lone sentence ever spoke of a habit');
@@ -3855,7 +3974,9 @@ void main() {
           if (where == null) continue;
 
           final found = nounsIn(WordLanguage.ko, where);
-          final noun = found.isEmpty ? where : found.first;
+          // The longest parse, so that the three suites read the same noun out of one
+          // phrase: `小恶魔` holds `恶魔`, and the whole of it is the place that was named.
+          final noun = longest(found) ?? where;
           final naming = <int>{
             for (var i = 0; i < detail.phrases.length; i += 1)
               if (nounsIn(WordLanguage.ko, detail.phrases[i]).contains(noun)) belongs[i],

@@ -514,17 +514,19 @@ def test_a_verb_only_takes_the_subject_and_object_its_group_allows() -> None:
             # The class, the theme where the group narrows to themes — `익는다` is a thing
             # food does and drink does not — and the trait where it asks for one:
             # `날아오른다` takes a sparrow and never a fish.
+            # Every noun the phrase could have been built around, not one of them:
+            # `小恶魔` is a noun and so is the `恶魔` inside it, and only one of the two is
+            # the flier the verb asked for.
             found = (
                 nouns_in(language, detail.phrases[detail.slots.index("subject")])
                 if "subject" in detail.slots
                 else set()
             )
-            subject_noun = next(iter(found), None)
 
             assert any(
                 THEME_CLASS[detail.theme] in group.subject
                 and (group.subject_themes is None or detail.theme in group.subject_themes)
-                and (subject_noun is None or accepts_noun(data, group, subject_noun))
+                and (not found or any(accepts_noun(data, group, noun) for noun in found))
                 for group in groups
             ), f"{language}: {detail.theme} cannot be the subject ({detail.sentence})"
 
@@ -1176,6 +1178,22 @@ def test_a_paragraph_is_mostly_statements_and_opens_each_line_its_own_way() -> N
     assert seen > 0, "no sentence opened on anything at all"
 
 
+def test_a_homecoming_never_opens_on_a_word_a_sentence_opens_on() -> None:
+    """`드디어 집이다!` after a sentence that opened on `드디어` says the word twice."""
+    # A homecoming is a whole sentence of the result, and what a result opens a sentence
+    # on is written once. Read as data rather than as output, because the collision is
+    # rare enough that a draw finds it once in twenty runs.
+    for language in WORD_LANGUAGES:
+        data = SENTENCE_DATA[language]
+        words = (*connectives_of(language), *data.interjections)
+
+        for pool in (data.homecomings or {}).values():
+            for entry in pool:
+                opener = next((word for word in words if entry.startswith(word + data.space)), None)
+
+                assert opener is None, f"{language}: '{entry}' opens on '{opener}'"
+
+
 def test_a_paragraph_spends_its_predicates_before_it_repeats_one() -> None:
     """A verb group is drawn down rather than rolled afresh every sentence."""
     # A verb group holds four words and a paragraph holds four sentences, so the group is
@@ -1556,14 +1574,18 @@ def test_a_person_in_a_story_sometimes_speaks_and_nobody_else_does() -> None:
 
         return inner[len(opened) : len(inner) - len(closed)]
 
-    def untyped(language: WordLanguage, theme: WordTheme) -> list[SentenceDetail]:
+    def untyped(language: WordLanguage, theme: WordTheme, count: int = 150) -> list[SentenceDetail]:
+        # A language that writes no first person reports nothing in its own words, so most
+        # of what it says aloud is a homecoming or a remark made alone — and only a line
+        # somebody is there to hear is ever answered. German answers about one line in
+        # twenty, which is why the check below draws more than the other ones need.
         return rand_sentence(
             language=language,
             theme=theme,
             sentences=5,
             include_name=False,
             tense="present",
-            count=150,
+            count=count,
             output="detail",
         )
 
@@ -1586,7 +1608,7 @@ def test_a_person_in_a_story_sometimes_speaks_and_nobody_else_does() -> None:
         answered = 0
         homecame = 0
 
-        for detail in untyped(language, "job"):
+        for detail in untyped(language, "job", 400):
             spoken = sum(1 for type_ in detail.types if quoted(type_))
             story = next(each for each in STORIES if each.name == detail.story)
             most = story.lines or 2
@@ -2144,6 +2166,27 @@ def test_a_name_never_takes_a_sentence_under_the_languages_own_floor() -> None:
             )
 
 
+def test_a_required_word_never_takes_a_sentence_outside_the_languages_own_floor() -> None:
+    """`include` pins a word of the caller's own length rather than one the generator drew."""
+    # The phrase it stands in is not the span the shapes were measured against. The
+    # longest noun of the language is the end that pushes, and the shortest is the end
+    # that leaves a gap nothing has to fill.
+    for language in WORD_LANGUAGES:
+        low, high = sentence_length_range(language)
+        nouns = pool_for(language, "subject")
+        longest = max(nouns, key=len)
+        shortest = min(nouns, key=len)
+
+        for word in (longest, shortest):
+            for sentence in rand_sentence(language=language, include=word, count=SAMPLE):
+                assert low <= len(sentence) <= high, (
+                    f"{language} '{word}': {sentence} ({len(sentence)}) outside {low}-{high}"
+                )
+                # Compared without case: a language that capitalizes writes the word it
+                # was given with a capital where the sentence opens on it.
+                assert word.lower() in sentence.lower(), f"{language}: {sentence} left out '{word}'"
+
+
 def test_every_language_can_write_every_type_inside_its_own_length_range() -> None:
     for language in WORD_LANGUAGES:
         low, high = sentence_length_range(language)
@@ -2262,6 +2305,44 @@ def test_style_is_the_speech_level_and_korean_is_the_one_with_four_of_them() -> 
                         assert not re.search(addressed[language], sentence), (
                             f"{language} {style} {type_} addresses somebody: {sentence}"
                         )
+
+
+def test_no_plain_japanese_predicate_closes_the_way_a_polite_one_does() -> None:
+    """A plain form that spells a polite one is a level nothing can read."""
+    # `こだまする` is ordinary Japanese and its past is `こだました`, which is the polite
+    # past of a verb nobody has. Read as data: a draw finds it once in twelve runs.
+    data = SENTENCE_DATA["ja"]
+    polite = re.compile(r"(ます|ました|です|でした)$")
+
+    def plain_of(words: WordPool, forms: PredicateForms, past: PredicateTense | None) -> list[str]:
+        return [
+            *words,
+            *(ending for key, pool in forms.items() if key != "polite" for ending in endings(pool)),
+            *(
+                []
+                if past is None
+                else [
+                    *past.words,
+                    *(
+                        ending
+                        for key, pool in past.forms.items()
+                        if key != "polite"
+                        for ending in endings(pool)
+                    ),
+                ]
+            ),
+        ]
+
+    written: list[str] = []
+
+    for verb in data.verbs:
+        written += plain_of(verb.words, verb.forms, verb.past)
+
+    for state in data.states:
+        written += plain_of(state.words, state.forms, state.past)
+
+    for word in written:
+        assert not polite.search(word), f"ja: '{word}' is a plain form that closes politely"
 
 
 def test_a_predicate_comes_out_of_the_pool_its_level_and_mood_land_on() -> None:
@@ -3249,7 +3330,13 @@ def test_a_story_tells_of_one_time_and_never_of_a_habit() -> None:
             count=60,
             output="detail",
         ):
-            for phrase in detail.phrases:
+            for phrase, slot in zip(detail.phrases, detail.slots, strict=True):
+                # The time slot alone: a language that writes its adverbials bare spells
+                # them the way it spells the nouns, and Vietnamese `ngày thường` is a
+                # weekday as well as `usually`.
+                if slot != "time":
+                    continue
+
                 written = phrase[:1].lower() + phrase[1:]
 
                 assert phrase not in habits and written not in habits, (
@@ -3268,7 +3355,10 @@ def test_a_story_tells_of_one_time_and_never_of_a_habit() -> None:
             count=300,
             output="detail",
         )
-        if any(phrase in habits for phrase in detail.phrases)
+        if any(
+            slot == "time" and phrase in habits
+            for phrase, slot in zip(detail.phrases, detail.slots, strict=True)
+        )
     )
 
     assert seen > 0, "no lone sentence ever spoke of a habit"
@@ -3302,7 +3392,10 @@ def test_a_story_does_not_name_its_place_in_every_line() -> None:
                 continue
 
             found = nouns_in("ko", where)
-            noun = next(iter(found)) if found else where
+            # The longest parse, so that the three suites read the same noun out of one
+            # phrase: `小恶魔` holds `恶魔`, and the whole of it is the place that was
+            # named. Sorted first, because a set has no order of its own.
+            noun = max(sorted(found), key=len) if found else where
             naming = {
                 belongs[i]
                 for i, phrase in enumerate(detail.phrases)

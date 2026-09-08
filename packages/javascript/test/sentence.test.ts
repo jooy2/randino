@@ -95,6 +95,11 @@ function pronounsOf(language: WordLanguage): Set<string> {
  * meant. Empty for a phrase built on a word no pool holds, which is what an
  * invented subject is.
  */
+/** The longest of several parses, which is the most of the phrase any of them reads. */
+function longest(words: readonly string[]): string | null {
+	return [...words].sort((a, b) => b.length - a.length || (a < b ? -1 : 1))[0] ?? null;
+}
+
 function nounsIn(language: WordLanguage, phrase: string): Set<string> {
 	const space = SENTENCE_DATA[language].space;
 	const nouns = poolFor(language, 'subject');
@@ -778,14 +783,17 @@ describe('Sentence', () => {
 				// thing food does and drink does not — and the trait where it asks for
 				// one: `날아오른다` takes a sparrow and never a fish.
 				const subject = detail.phrases[detail.slots.indexOf('subject')];
-				const noun = subject === undefined ? null : ([...nounsIn(language, subject)][0] ?? null);
+				// Every noun the phrase could have been built around, not one of them:
+				// `小恶魔` is a noun and so is the `恶魔` inside it, and only one of the
+				// two is the flier the verb asked for.
+				const nouns = subject === undefined ? [] : [...nounsIn(language, subject)];
 
 				assert.ok(
 					groups.some(
 						(group) =>
 							group.subject.includes(THEME_CLASS[detail.theme as WordTheme]) &&
 							(!group.subjectThemes || group.subjectThemes.includes(detail.theme as WordTheme)) &&
-							(noun === null || acceptsNoun(data, group, noun))
+							(!nouns.length || nouns.some((noun) => acceptsNoun(data, group, noun)))
 					),
 					`${language}: ${detail.theme} cannot be the subject of ${detail.phrases[at]} (${detail.sentence})`
 				);
@@ -1296,6 +1304,25 @@ describe('Sentence', () => {
 		assert.ok(seen > 0, 'no sentence opened on anything at all');
 	});
 
+	it('a homecoming never opens on a word a sentence opens on', () => {
+		// `드디어 집이다!` is a whole sentence of the result, so a paragraph that
+		// opened one sentence on `드디어` and closed on this one says the word twice.
+		// Read as data rather than as output, because the collision is rare enough
+		// that a draw finds it once in twenty runs.
+		for (const language of WORD_LANGUAGES) {
+			const data = SENTENCE_DATA[language];
+			const words = [...connectivesOf(language), ...data.interjections];
+
+			for (const pool of Object.values(data.homecomings ?? {})) {
+				for (const entry of pool) {
+					const opener = words.find((word) => entry.startsWith(word + data.space));
+
+					assert.ok(!opener, `${language}: '${entry}' opens on '${opener}'`);
+				}
+			}
+		}
+	});
+
 	it('a paragraph spends its predicates before it repeats one', () => {
 		// A verb group holds four words and a paragraph holds four sentences, so the
 		// group is drawn down rather than rolled afresh each time — `식습니다` three
@@ -1681,14 +1708,18 @@ describe('Sentence', () => {
 
 			return inner.slice(opened.length, inner.length - closed.length);
 		};
-		const untyped = (language: WordLanguage, theme: WordTheme) =>
+		// A language that writes no first person reports nothing in its own words, so
+		// most of what it says aloud is a homecoming or a remark made alone — and only
+		// a line somebody is there to hear is ever answered. German answers about one
+		// line in twenty, which is why this draws more than the other checks need.
+		const untyped = (language: WordLanguage, theme: WordTheme, count = 150) =>
 			randSentence({
 				language,
 				theme,
 				sentences: 5,
 				includeName: false,
 				tense: 'present',
-				count: 150,
+				count,
 				output: 'detail'
 			});
 
@@ -1711,7 +1742,7 @@ describe('Sentence', () => {
 			let answered = 0;
 			let homecame = 0;
 
-			for (const detail of untyped(language, 'job')) {
+			for (const detail of untyped(language, 'job', 400)) {
 				const spoken = detail.types.filter(quoted).length;
 				const most = STORIES.find((story) => story.name === detail.story)?.lines ?? 2;
 
@@ -2366,6 +2397,34 @@ describe('Sentence', () => {
 		}
 	});
 
+	it("a required word never takes a sentence outside the language's own floor", () => {
+		// `include` pins a word of the caller's own length rather than one the
+		// generator drew, so the phrase it stands in is not the span the shapes were
+		// measured against. The longest noun of the language is the end that pushes,
+		// and the shortest is the end that leaves a gap nothing has to fill.
+		for (const language of WORD_LANGUAGES) {
+			const [min, max] = sentenceLengthRange(language);
+			const nouns = [...poolFor(language, 'subject')];
+			const longest = nouns.reduce((a, b) => (b.length > a.length ? b : a));
+			const shortest = nouns.reduce((a, b) => (b.length < a.length ? b : a));
+
+			for (const word of [longest, shortest]) {
+				for (const sentence of randSentence({ language, include: word, count: SAMPLE })) {
+					assert.ok(
+						sentence.length >= min && sentence.length <= max,
+						`${language} '${word}': ${sentence} (${sentence.length}) outside ${min}-${max}`
+					);
+					// Compared without case: a language that capitalizes writes the word
+					// it was given with a capital where the sentence opens on it.
+					assert.ok(
+						sentence.toLowerCase().includes(word.toLowerCase()),
+						`${language}: ${sentence} left out '${word}'`
+					);
+				}
+			}
+		}
+	});
+
 	it('every language can write every type inside its own length range', () => {
 		for (const language of WORD_LANGUAGES) {
 			const [min, max] = sentenceLengthRange(language);
@@ -2526,6 +2585,36 @@ describe('Sentence', () => {
 						assert.ok(pools.has(detail.phrases[at]), `${language} ${style}: ${detail.sentence}`);
 					}
 				}
+			}
+		}
+	});
+
+	it('no plain Japanese predicate closes the way a polite one does', () => {
+		// A level is told apart by the ending a sentence closes on, so a plain form
+		// that spells a polite one is a level nothing can read. `こだまする` is
+		// ordinary Japanese and its past is `こだました`, which is the polite past of
+		// a verb nobody has. Read as data: a draw finds it once in twelve runs.
+		const data = SENTENCE_DATA.ja;
+		const polite = /(ます|ました|です|でした)$/;
+
+		for (const group of [...data.verbs, ...data.states]) {
+			const plain = [
+				...group.words,
+				...Object.entries(group.forms ?? {}).flatMap(([form, pool]) =>
+					form === 'polite' ? [] : endings([...pool])
+				),
+				...(group.past
+					? [
+							...group.past.words,
+							...Object.entries(group.past.forms ?? {}).flatMap(([form, pool]) =>
+								form === 'polite' ? [] : endings([...pool])
+							)
+						]
+					: [])
+			];
+
+			for (const word of plain) {
+				assert.doesNotMatch(word, polite, `ja: '${word}' is a plain form that closes politely`);
 			}
 		}
 	});
@@ -3451,6 +3540,13 @@ describe('Sentence', () => {
 
 			for (const detail of sentenceDetails({ language, sentences: 4, count: 60 })) {
 				for (let i = 0; i < detail.phrases.length; i += 1) {
+					// The time slot alone: a language that writes its adverbials bare
+					// spells them the way it spells the nouns, and Vietnamese
+					// `ngày thường` is a weekday as well as `usually`.
+					if (detail.slots[i] !== 'time') {
+						continue;
+					}
+
 					const phrase = detail.phrases[i];
 					const written = phrase.charAt(0).toLowerCase() + phrase.slice(1);
 
@@ -3467,7 +3563,9 @@ describe('Sentence', () => {
 		let seen = 0;
 
 		for (const detail of sentenceDetails({ language: 'ko', count: 300 })) {
-			seen += detail.phrases.some((phrase) => habits.has(phrase)) ? 1 : 0;
+			seen += detail.phrases.some((phrase, i) => detail.slots[i] === 'time' && habits.has(phrase))
+				? 1
+				: 0;
 		}
 
 		assert.ok(seen > 0, 'no lone sentence ever spoke of a habit');
@@ -3488,7 +3586,10 @@ describe('Sentence', () => {
 					continue;
 				}
 
-				const noun = [...nounsIn('ko', where)][0] ?? where;
+				// The longest parse, so that the three suites read the same noun out of
+				// one phrase: `小恶魔` holds `恶魔`, and the whole of it is the place that
+				// was named.
+				const noun = longest([...nounsIn('ko', where)]) ?? where;
 				const naming = new Set(
 					detail.phrases
 						.map((phrase, i) => (nounsIn('ko', phrase).has(noun) ? belongs[i] : -1))
