@@ -841,6 +841,11 @@ export type SentenceLanguageData = {
 	 * reports coming home is drawn from here, in every language that declares it,
 	 * whether or not the language writes a first person. Left out by a language
 	 * that has no such saying.
+	 *
+	 * An entry may not open on a connective or an interjection. It is a whole
+	 * sentence of the result, so `드디어 집이다!` after a sentence that opened on
+	 * `드디어` says the word twice — and what a result opens a sentence on is
+	 * written once.
 	 */
 	homecomings?: SentenceLevelPools;
 	/**

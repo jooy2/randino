@@ -882,9 +882,7 @@ VI = SentenceLanguageData(
     },
     listener=SentenceSpeech(subject="bạn"),
     homecomings={
-        "casual": words("""
-            tôi_về_rồi về_đến_nhà_rồi cuối_cùng_cũng_về_nhà_rồi! tôi_đã_về về_rồi_đây
-        """),
+        "casual": words("tôi_về_rồi về_đến_nhà_rồi! tôi_đã_về về_rồi_đây"),
     },
     degrees=words("khá hơi thật cực_kỳ vô_cùng hết_sức thật_là khá_là quá_là siêu"),
     numeral=SentenceNumeral(

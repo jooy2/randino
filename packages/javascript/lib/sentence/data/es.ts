@@ -873,7 +873,7 @@ export const ES: SentenceLanguageData = {
 	// What somebody says on coming home — said whole, so no verb has to be
 	// conjugated for a first person the language otherwise leaves unwritten.
 	homecomings: {
-		casual: words(`ya_estoy_en_casa ya_llegué por_fin_en_casa! ya_estoy_de_vuelta en_casa_por_fin`)
+		casual: words(`ya_estoy_en_casa ya_llegué ya_estoy_de_vuelta en_casa_por_fin!`)
 	},
 	// How much a state holds, in front of it: `está muy cansado`.
 	degrees: words(`muy bastante un_poco realmente algo demasiado sumamente verdaderamente`),

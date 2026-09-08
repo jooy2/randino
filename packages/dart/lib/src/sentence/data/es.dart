@@ -1233,9 +1233,7 @@ final SentenceLanguageData es = SentenceLanguageData(
     heads: <String, String>{'es': 'eres', 'está': 'estás'},
   ),
   homecomings: <SentenceStyle, WordPool>{
-    SentenceStyle.casual: words(r'''
-      ya_estoy_en_casa ya_llegué por_fin_en_casa! ya_estoy_de_vuelta en_casa_por_fin
-    '''),
+    SentenceStyle.casual: words(r'ya_estoy_en_casa ya_llegué ya_estoy_de_vuelta en_casa_por_fin!'),
   },
   degrees: words(r'muy bastante un_poco realmente algo demasiado sumamente verdaderamente'),
   numeral: const SentenceNumeral(

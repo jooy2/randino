@@ -1257,9 +1257,7 @@ ES = SentenceLanguageData(
     },
     listener=SentenceSpeech(subject="", heads={"es": "eres", "está": "estás"}),
     homecomings={
-        "casual": words("""
-            ya_estoy_en_casa ya_llegué por_fin_en_casa! ya_estoy_de_vuelta en_casa_por_fin
-        """),
+        "casual": words("ya_estoy_en_casa ya_llegué ya_estoy_de_vuelta en_casa_por_fin!"),
     },
     degrees=words("muy bastante un_poco realmente algo demasiado sumamente verdaderamente"),
     numeral=SentenceNumeral(

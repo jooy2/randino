@@ -1195,8 +1195,8 @@ export const KO: SentenceLanguageData = {
 	listener: { subject: '' },
 	// What somebody says on coming home, at the three levels: `다녀왔어`.
 	homecomings: {
-		casual: words(`다녀왔어 나_왔어 집이다! 드디어_집이다! 나_돌아왔어`),
-		polite: words(`다녀왔어요 저_왔어요 집이에요! 드디어_집이에요 저_돌아왔어요`),
+		casual: words(`다녀왔어 나_왔어 집이다! 나_돌아왔어`),
+		polite: words(`다녀왔어요 저_왔어요 집이에요! 저_돌아왔어요`),
 		formal: words(`다녀왔습니다 집에_왔습니다 저_돌아왔습니다`)
 	},
 	// How much a state holds, in front of it: `무척 피곤하다`.

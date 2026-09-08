@@ -711,7 +711,7 @@ export const ZH: SentenceLanguageData = {
 	listener: { subject: '你' },
 	// What somebody says on coming home: 我回来了.
 	homecomings: {
-		casual: words(`我回来了 到家了 终于到家了! 我到家了 回来啦`)
+		casual: words(`我回来了 到家了! 我到家了 回来啦`)
 	},
 	// How much a state holds, in front of it, standing where 很 stands: `狮子非常勇敢`.
 	degrees: words(`非常 特别 真 有点 相当 十分 挺 极其 格外 稍微 蛮 分外`),

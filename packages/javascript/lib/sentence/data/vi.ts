@@ -760,7 +760,7 @@ export const VI: SentenceLanguageData = {
 	listener: { subject: 'bạn' },
 	// What somebody says on coming home.
 	homecomings: {
-		casual: words(`tôi_về_rồi về_đến_nhà_rồi cuối_cùng_cũng_về_nhà_rồi! tôi_đã_về về_rồi_đây`)
+		casual: words(`tôi_về_rồi về_đến_nhà_rồi! tôi_đã_về về_rồi_đây`)
 	},
 	// How much a state holds, in front of it, standing where `rất` stands: `con mèo khá mệt`.
 	degrees: words(`khá hơi thật cực_kỳ vô_cùng hết_sức thật_là khá_là quá_là siêu`),
