@@ -13,8 +13,8 @@ Every option and every example, with **JavaScript** picked in the sidebar. This 
 **randino** generates random person names, nicknames, words and sentences in the language you ask for.
 
 - **Person names** read like names people carry: Emma Clover, Jack Reeves, each with its English pronunciation. 9 languages.
-- **Nicknames** are handles for a game or a website: MistyOwl, CraneVoyage, RustyBoot. Built from everyday words across twenty-five themes, and never from person names.
-- **Words** are those themes on their own: `randWord`, plus `randAnimal`, `randFood` and twenty-three more.
+- **Nicknames** are handles for a game or a website: MistyOwl, CraneVoyage, RustyBoot. Built from everyday words across twenty-nine themes, and never from person names.
+- **Words** are those themes on their own: `randWord`, plus `randAnimal`, `randFood` and twenty-seven more.
 - **Sentences** are whole statements in the language's own grammar, from `randSentence`. The verb decides what can stand beside it, so the words of one sentence belong together.
 - **Decorators** attach something to a string you already have: `randSuffix`, `randPrefix` and `randModifier`.
 - One options object per generator, every option optional: `randName()` on its own works.
@@ -106,11 +106,11 @@ randNickname({ language: 'en', output: 'detail' });
 | `unique`                  | `boolean`                  | `false`    |
 | `output`                  | `'value' \| 'detail'`      | `'value'`  |
 
-Themes: `animal`, `object`, `nature`, `plant`, `gem`, `concept`, `myth`, `job`, `music`, `place`, `food`, `sport`, `vehicle`, `product`, `color`, `finance`, `tech`, `weather`, `space`, `time`, `emotion`, `body`, `clothing`, `tool`, `drink`.
+Themes: `animal`, `object`, `nature`, `plant`, `gem`, `concept`, `myth`, `job`, `music`, `place`, `food`, `sport`, `vehicle`, `product`, `color`, `finance`, `tech`, `weather`, `space`, `time`, `emotion`, `body`, `clothing`, `tool`, `drink`, `toy`, `sound`, `person`, `furniture`.
 
 ## Words
 
-The pools the nicknames are built from, on their own. Twenty-five themes, nine languages, and a function per theme.
+The pools the nicknames are built from, on their own. Twenty-nine themes, nine languages, and a function per theme.
 
 ```javascript
 import { randAnimal, randFood, randWord, wordLengthRange } from 'randino';

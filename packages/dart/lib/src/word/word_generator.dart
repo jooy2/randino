@@ -470,7 +470,7 @@ WordDetail _generateOne(
 
 /// Generate words with every choice already resolved.
 ///
-/// `randWord`, `randWordDetails` and the twenty-five themed functions are the
+/// `randWord`, `randWordDetails` and the twenty-nine themed functions are the
 /// public shapes over this.
 List<WordDetail> generateWordDetails({
   WordLanguage? language,

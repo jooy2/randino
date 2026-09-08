@@ -65,9 +65,9 @@ VI = WordLanguageData(
         """),
         "object": words("""
             chai bút tẩy ô đèn gương chìa_khóa ổ_khóa túi cúc kim chỉ cọ giấy vở thư tem
-            con_dấu bản_đồ ống_nhòm kính_hiển_vi máy_ảnh phim bóng_bay diều con_quay bi
-            xúc_xắc thẻ mảnh_ghép buồm neo lều đèn_pin diêm nến chậu ấm chén thìa đĩa
-            nồi bánh_răng dây_cót ruy_băng gối chăn giỏ chổi còi dây xô quạt khiên lưới
+            con_dấu bản_đồ ống_nhòm kính_hiển_vi máy_ảnh phim
+            thẻ buồm neo lều đèn_pin diêm nến chậu ấm chén thìa đĩa
+            nồi bánh_răng dây_cót ruy_băng giỏ chổi còi dây xô quạt khiên lưới
             cần_câu lọ lược chuông_gió hạc_giấy đồng_hồ_cát ống_khói phễu bình gáo mẹt
             nia rổ khay hộp thùng vại chum
             la_bàn móc_khóa ghim cuộn_chỉ dây_thừng móc đinh ốc_vít đai_ốc vòng_đệm
@@ -206,8 +206,8 @@ VI = WordLanguageData(
             nhảy_cầu phi_tiêu chạy_bộ vượt_rào ném_lao ném_đĩa tiếp_sức bảng_điểm
             mũ_bảo_hiểm phạm_lỗi nhảy_xa nhảy_cao xà_kép lễ_khai_mạc lễ_bế_mạc nhảy_dù
             bóng_nước đấu_tập cú_móc hạ_đo_ván vật_ngã lộn_nhào khởi_động hội_ý
-            đua_thuyền ném_tạ nhảy_sào ván_nhún thảm_tập ngựa_gỗ cờ_vua cờ_tướng
-            đô_mi_nô tiền_đạo hậu_vệ sân_bóng đường_chạy phạt_đền phạt_góc thẻ_vàng
+            đua_thuyền ném_tạ nhảy_sào ván_nhún thảm_tập ngựa_gỗ
+            tiền_đạo hậu_vệ sân_bóng đường_chạy phạt_đền phạt_góc thẻ_vàng
             tỷ_số hòa chiến_thắng thất_bại kỷ_lục giải_đấu giải_vô_địch cầu_môn
         """),
         "vehicle": words("""
@@ -228,13 +228,13 @@ VI = WordLanguageData(
             điều_khiển tủ_lạnh máy_giặt máy_hút_bụi quạt_máy điều_hòa lò_sưởi
             máy_lọc_nước nồi_cơm_điện lò_vi_sóng lò_nướng máy_xay máy_tạo_ẩm máy_hút_ẩm
             dao_cạo bàn_chải xà_phòng dầu_gội nước_hoa máy_chiếu máy_quét máy_ảnh_web
-            nồi_hấp máy_rửa_bát máy_sấy máy_sấy_tóc kem_dưỡng rèm_cửa chuông_cửa
-            nhiệt_kế bình_cứu_hỏa bóng_đèn dây_nối ổ_cắm nước_giặt nước_xả móc_áo tủ_áo
-            giá_sách ghế_tựa ghế_đẩu khung_giường chăn_bông ga_giường vỏ_gối khăn_tắm
+            nồi_hấp máy_rửa_bát máy_sấy máy_sấy_tóc kem_dưỡng chuông_cửa
+            nhiệt_kế bình_cứu_hỏa bóng_đèn dây_nối ổ_cắm nước_giặt nước_xả móc_áo
+            khăn_tắm
             áo_tắm_dài vòi_sen vòi_nước cây_lau_nhà cốc_đong thìa_đong cây_cán_bột
             máy_trộn
-            ti_vi loa_thùng cân bàn_là máy_nướng nồi_chiên máy_ép ấm_điện thảm rèm_sáo
-            đèn_chùm đèn_bàn bộ_đồ_ăn khăn_ăn giá_bát bồn_rửa vòi_hoa_sen bồn_tắm
+            ti_vi loa_thùng cân bàn_là máy_nướng nồi_chiên máy_ép ấm_điện
+            bộ_đồ_ăn khăn_ăn giá_bát bồn_rửa vòi_hoa_sen bồn_tắm
             gương_soi dũa_móng hộp_đựng lọ_muối đế_lót khay_đá
         """),
         "color": words("""
@@ -387,6 +387,47 @@ VI = WordLanguageData(
             rượu_vang_đỏ rượu_táo rượu_mơ rượu_sim rượu_đế nước_ngô chè_đỗ_đen
             rượu_ngâm nước_me nước_nhãn trà_hoa_nhài
         """),
+        "toy": words("""
+            bóng_bay diều con_quay bi xúc_xắc mảnh_ghép cờ_vua cờ_tướng đô_mi_nô đồ_chơi búp_bê
+            gấu_bông xếp_hình lego rubik trò_chơi cờ_caro cờ_cá_ngựa cờ_vây bộ_bài quân_bài quân_cờ
+            bàn_cờ ô_ăn_quan trốn_tìm bịt_mắt_bắt_dê rồng_rắn_lên_mây nhảy_lò_cò kéo_co oẳn_tù_tì
+            chong_chóng lật_đật bong_bóng_xà_phòng súng_nước kiếm_gỗ ná tò_he đèn_ông_sao
+            đèn_kéo_quân mặt_nạ đồ_hàng nhà_búp_bê bập_bênh cầu_trượt xích_đu đu_quay nhà_bóng
+            hố_cát nhà_phao tàu_lượn_siêu_tốc xe_điện_đụng thú_nhún yoyo bi_lắc tam_cúc tổ_tôm
+            thẻ_bài mô_hình máy_bay_giấy thuyền_giấy đánh_khăng đất_nặn kính_vạn_hoa con_rối cà_kheo
+            vòng_lắc thả_đỉa_ba_ba ném_vòng siêu_nhân cờ_tỷ_phú bầu_cua sudoku ô_chữ
+        """),
+        "sound": words("""
+            âm_thanh tiếng_động tiếng_ồn giọng tiếng_cười tiếng_khóc tiếng_hét lời_thì_thầm
+            tiếng_thở_dài tiếng_sủa tiếng_kêu tiếng_hót tiếng_gáy tiếng_gầm tiếng_rít vo_ve rì_rào
+            xào_xạc róc_rách lộp_độp tí_tách ào_ào vù_vù leng_keng lách_cách cót_két kẽo_kẹt
+            thình_thịch bịch bùm đùng_đoàng ầm_ầm rào_rào rỉ_rả oe_oe khúc_khích tiếng_ho
+            tiếng_hắt_hơi tiếng_ngáy tiếng_nấc tiếng_gõ tiếng_chuông tiếng_còi tiếng_trống tiếng_sấm
+            tiếng_súng tiếng_nổ tiếng_vỗ_tay bước_chân tiếng_rên tiếng_gọi tiếng_lẩm_bẩm xì_xào
+            tiếng_reo_hò tiếng_hát gừ_gừ meo_meo gâu_gâu ò_ó_o chiêm_chiếp ủn_ỉn be_be ộp_ộp cạp_cạp
+            tích_tắc âm_lượng tần_số sóng_âm tiếng_rè tiếng_hú tiếng_hí tiếng_rống
+        """),
+        "person": words("""
+            người đàn_ông phụ_nữ con_trai con_gái trẻ_em em_bé thiếu_niên thanh_niên người_lớn
+            người_già ông bà bố mẹ con_cái anh_trai chị_gái em_trai em_gái ông_nội bà_nội ông_ngoại
+            bà_ngoại chú bác cô dì cậu mợ thím dượng cháu cụ chắt vợ chồng mẹ_chồng con_dâu con_rể
+            anh_rể chị_dâu họ_hàng gia_đình tổ_tiên hàng_xóm bạn bạn_thân người_yêu người_lạ khách
+            chủ_nhà người_qua_đường kẻ_lang_thang anh_hùng kẻ_thù đối_thủ đồng_nghiệp đồng_đội
+            ông_chủ bệnh_nhân nạn_nhân nhân_chứng trẻ_mồ_côi góa_phụ cô_dâu chú_rể song_sinh
+            thiên_tài kẻ_ngốc mọt_sách kẻ_mơ_mộng kẻ_nói_dối kẻ_phản_bội kẻ_hèn_nhát thần_đồng
+            bợm_nhậu người_hâm_mộ người_quen bạn_học bạn_cùng_phòng mỹ_nhân công_tử tiểu_thư cậu_bé
+            cô_bé chàng_trai cô_gái nhóc người_dân người_nước_ngoài du_khách khách_hàng con_một
+            con_út
+        """),
+        "furniture": words("""
+            gối chăn rèm_cửa tủ_áo giá_sách ghế_tựa ghế_đẩu khung_giường chăn_bông ga_giường vỏ_gối
+            thảm rèm_sáo đèn_chùm đèn_bàn bàn ghế giường tủ kệ ngăn_kéo ghế_sofa ghế_bành ghế_xoay
+            ghế_dài bàn_ăn bàn_học bàn_làm_việc bàn_trang_điểm bàn_trà tủ_bếp tủ_giày tủ_đầu_giường
+            kệ_tivi nôi võng đệm thảm_chùi_chân màn gối_ôm đệm_ngồi khăn_trải_bàn chao_đèn đèn_ngủ
+            đèn_sàn bình_hoa khung_ảnh tranh đồng_hồ_treo_tường bàn_thờ tủ_kính cây_treo_đồ quầy_bar
+            ghế_đu ghế_gấp ghế_mây giường_tầng cũi bình_phong mành sập tràng_kỷ phản tủ_chè đôn
+            chân_nến
+        """),
     },
     parts=words("""
         đuôi chân cánh bóng mắt tay tiếng hơi_thở hương vảy bờm sừng mỏ vây tổ hang
@@ -477,6 +518,16 @@ VI = WordLanguageData(
             trà_xanh nước_ép sữa nước nước_suối sữa_đậu_nành cà_phê_sữa cà_phê_đen nước_dừa nước_mía
             nước_chanh sinh_tố nước_ngọt trà_sữa trà_đá bia bia_hơi rượu_vang nước_khoáng sữa_tươi
             sữa_đặc nước_lọc nước_cam
+            đồ_chơi búp_bê gấu_bông xếp_hình lego rubik trò_chơi bộ_bài trốn_tìm kéo_co chong_chóng
+            bong_bóng_xà_phòng súng_nước cầu_trượt xích_đu đu_quay bập_bênh đất_nặn mặt_nạ âm_thanh
+            tiếng_động tiếng_ồn giọng tiếng_cười tiếng_khóc tiếng_hét lời_thì_thầm tiếng_sủa
+            tiếng_kêu tiếng_hót tiếng_gõ tiếng_chuông tiếng_còi tiếng_nổ tiếng_vỗ_tay bước_chân
+            meo_meo gâu_gâu tích_tắc tiếng_hát người đàn_ông phụ_nữ con_trai con_gái trẻ_em em_bé
+            người_lớn người_già ông bà bố mẹ anh_trai chị_gái em_trai em_gái ông_nội bà_nội
+            ông_ngoại bà_ngoại chú bác cô dì cậu cháu vợ chồng gia_đình hàng_xóm bạn bạn_thân
+            người_yêu khách anh_hùng kẻ_thù đồng_nghiệp bệnh_nhân cô_dâu chú_rể cậu_bé cô_bé
+            chàng_trai cô_gái nhóc du_khách khách_hàng bàn ghế giường tủ kệ ngăn_kéo ghế_sofa bàn_ăn
+            bàn_học nôi võng đệm màn khung_ảnh tranh bàn_thờ đèn_ngủ
         """),
         rare=words("""
             hải_ly thú_mỏ_vịt vượn_cáo khỉ_đầu_chó heo_vòi sóc_bay lửng gà_lôi đa_đa chim_cắt
@@ -516,6 +567,8 @@ VI = WordLanguageData(
             dải_viền ống_bễ ê_tô thước_cặp dây_mực mai thoi cưa_lọng cưa_vòng máy_chà_nhám mũi_vạch
             thước_vuông ke_góc bàn_thợ giũa_thô thước_vạch dây_dọi khuôn_dập đá_ráp rìu_tay dao_bào
             dùi_đục mỏ_cặp cưa_cắt bàn_kẹp trà_lúa_mạch rượu_táo rượu_sim nước_nhãn
+            tam_cúc tổ_tôm đánh_khăng thả_đỉa_ba_ba đèn_kéo_quân rỉ_rả tần_số sóng_âm sập tràng_kỷ
+            tủ_chè đôn
         """),
     ),
     frames=(

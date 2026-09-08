@@ -315,6 +315,8 @@ final SentenceLanguageData zh = SentenceLanguageData(
         WordTheme.tool,
         WordTheme.clothing,
         WordTheme.product,
+        WordTheme.toy,
+        WordTheme.furniture,
         WordTheme.gem,
         WordTheme.vehicle,
       ],
@@ -331,8 +333,8 @@ final SentenceLanguageData zh = SentenceLanguageData(
     ),
     VerbGroup(
       field: VerbField.change,
-      subject: const <NounClass>[NounClass.thing],
-      subjectThemes: const <WordTheme>[WordTheme.music],
+      subject: const <NounClass>[NounClass.thing, NounClass.event],
+      subjectThemes: const <WordTheme>[WordTheme.music, WordTheme.sound],
       words: words(r'''
         响起 奏响 回荡 回响 飘荡 飘扬 传来 播放 响 鸣响 停止 停下 消失 渐渐消失 变响 变轻 高涨 低沉下去 重复 延续 继续 萦绕 缭绕 荡漾 传遍 奏起 唱响
       '''),

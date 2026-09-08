@@ -554,7 +554,16 @@ export const JA: SentenceLanguageData = {
 			field: 'change',
 			subject: ['thing', 'vehicle'],
 			// What a thing one can hold does. A song is a thing of another kind, below.
-			subjectThemes: ['object', 'tool', 'clothing', 'product', 'gem', 'vehicle'],
+			subjectThemes: [
+				'object',
+				'tool',
+				'clothing',
+				'product',
+				'toy',
+				'furniture',
+				'gem',
+				'vehicle'
+			],
 			...tensed(
 				`揺れる 輝く 落ちる 転がる 傾く 古びる 光る きらめく ぐらつく 倒れる 滑る 落下する 回る 止まる 揺らめく 色あせる すり減る 曇る くすむ 転がり落ちる 飛んでいく 跳ね上がる 動く 静止する 揺れ動く ずれる`,
 				`揺れます 輝きます 落ちます 転がります 傾きます 古びます 光ります きらめきます ぐらつきます 倒れます 滑ります 落下します 回ります 止まります 揺らめきます 色あせます すり減ります 曇ります くすみます 転がり落ちます 飛んでいきます 跳ね上がります 動きます 静止します 揺れ動きます ずれます`,
@@ -578,9 +587,9 @@ export const JA: SentenceLanguageData = {
 		},
 		{
 			field: 'change',
-			subject: ['thing'],
+			subject: ['thing', 'event'],
 			// What a song or a drum does: it plays, rings out, dies away.
-			subjectThemes: ['music'],
+			subjectThemes: ['music', 'sound'],
 			...tensed(
 				`響く 鳴る 流れる 響き渡る 聞こえてくる 止まる 静まる 消えていく 高まる 弱まる 繰り返す 漂う 反響する 鳴り響く 続く 始まる 終わる 沈む 広がる 満ちる`,
 				`響きます 鳴ります 流れます 響き渡ります 聞こえてきます 止まります 静まります 消えていきます 高まります 弱まります 繰り返します 漂います 反響します 鳴り響きます 続きます 始まります 終わります 沈みます 広がります 満ちます`,

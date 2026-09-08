@@ -348,7 +348,16 @@ export const ZH: SentenceLanguageData = {
 			field: 'change',
 			subject: ['thing', 'vehicle'],
 			// What a thing one can hold does. A song is a thing of another kind, below.
-			subjectThemes: ['object', 'tool', 'clothing', 'product', 'gem', 'vehicle'],
+			subjectThemes: [
+				'object',
+				'tool',
+				'clothing',
+				'product',
+				'toy',
+				'furniture',
+				'gem',
+				'vehicle'
+			],
 			words: words(
 				`摇晃 闪耀 掉落 滚动 倾斜 老化 发亮 晃动 晃 摆动 摇摆 晃来晃去 滑落 滑下 掉下 落下 翻倒 倒下 翻滚 滚落 转动 旋转 停下 静止 移动 褪色 磨损 变旧 蒙尘 失去光泽 变形 弯曲 飞走 飞起 弹起 弹跳 抖动 颤动`
 			)
@@ -364,9 +373,9 @@ export const ZH: SentenceLanguageData = {
 		},
 		{
 			field: 'change',
-			subject: ['thing'],
+			subject: ['thing', 'event'],
 			// What a song or a drum does: it plays, rings out, dies away.
-			subjectThemes: ['music'],
+			subjectThemes: ['music', 'sound'],
 			words: words(
 				`响起 奏响 回荡 回响 飘荡 飘扬 传来 播放 响 鸣响 停止 停下 消失 渐渐消失 变响 变轻 高涨 低沉下去 重复 延续 继续 萦绕 缭绕 荡漾 传遍 奏起 唱响`
 			)

@@ -59,8 +59,8 @@ def rand_word(
 ) -> list[str] | list[WordDetail]:
     """Generate everyday words: animals, things, nature, ideas.
 
-    Twenty-five themes, in nine languages. Person names are never used. `theme` picks
-    what the words are about; the twenty-five `rand_…` functions beside this one are the
+    Twenty-nine themes, in nine languages. Person names are never used. `theme` picks
+    what the words are about; the twenty-nine `rand_…` functions beside this one are the
     same generator with one theme already chosen.
 
     Args:

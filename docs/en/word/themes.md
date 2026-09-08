@@ -1,8 +1,8 @@
 # Themes
 
-A theme is a slice of everyday vocabulary that a modifier can sit in front of. There are twenty-five of them, every language fills every one, and **a word belongs to exactly one**, which is what makes the theme a word reports unambiguous.
+A theme is a slice of everyday vocabulary that a modifier can sit in front of. There are twenty-nine of them, every language fills every one, and **a word belongs to exactly one**, which is what makes the theme a word reports unambiguous.
 
-Each theme is also a generator of its own. `randWord` takes the theme as an option; the twenty-five functions in the third column are the same generator with the theme already chosen, and `randNickname` builds on the same pools.
+Each theme is also a generator of its own. `randWord` takes the theme as an option; the twenty-nine functions in the third column are the same generator with the theme already chosen, and `randNickname` builds on the same pools.
 
 | Theme | Function | What it holds | Korean | English |
 | --- | --- | --- | --- | --- |
@@ -31,6 +31,10 @@ Each theme is also a generator of its own. `randWord` takes the theme as an opti
 | `clothing` | [`randClothing`](./rand-clothing) | what people wear | 두루마기, 양말 | Cardigan, Linen |
 | `tool` | [`randTool`](./rand-tool) | what a hand works with | 대패, 곡괭이 | Chisel, Trowel |
 | `drink` | [`randDrink`](./rand-drink) | something to drink | 식혜, 보리차 | Cider, Cordial |
+| `toy` | [`randToy`](./rand-toy) | toys and games | 팽이, 연 | Kite, Yoyo |
+| `sound` | [`randSound`](./rand-sound) | sounds, voices and onomatopoeia | 속삭임, 함성 | Whisper, Chime |
+| `person` | [`randPerson`](./rand-person) | people by age, kinship and character | 꼬마, 이웃 | Toddler, Neighbor |
+| `furniture` | [`randFurniture`](./rand-furniture) | furniture and furnishings | 흔들의자, 요람 | Hammock, Cradle |
 
 ::: lang js
 
@@ -41,7 +45,7 @@ WORD_THEMES;
 // ['animal', 'object', 'nature', 'plant', 'gem', 'concept', 'myth', 'job',
 //  'music', 'place', 'food', 'sport', 'vehicle', 'product', 'color', 'finance',
 //  'tech', 'weather', 'space', 'time', 'emotion', 'body', 'clothing', 'tool',
-//  'drink']
+//  'drink', 'toy', 'sound', 'person', 'furniture']
 
 randWord({ theme: 'food', language: 'en', count: 3 });
 // ['Dumpling', 'Cocoa', 'Pancake']
@@ -75,7 +79,7 @@ WORD_THEMES
 # ('animal', 'object', 'nature', 'plant', 'gem', 'concept', 'myth', 'job',
 #  'music', 'place', 'food', 'sport', 'vehicle', 'product', 'color', 'finance',
 #  'tech', 'weather', 'space', 'time', 'emotion', 'body', 'clothing', 'tool',
-#  'drink')
+#  'drink', 'toy', 'sound', 'person', 'furniture')
 
 rand_word(theme="food", language="en", count=3)
 # ['Dumpling', 'Cocoa', 'Pancake']
@@ -85,13 +89,13 @@ rand_food(language="en", count=3)  # the same thing
 
 :::
 
-Leave the theme out and each result draws from one theme picked at random, so a batch spreads across all twenty-five.
+Leave the theme out and each result draws from one theme picked at random, so a batch spreads across all twenty-nine.
 
-`randNickname` is the exception: at the default `realism` it spans twenty-two of them, leaving out `color`, `finance` and `tech`, because a word in front of a colour or a loan reads as a joke rather than a handle. Loosening `realism` puts them back, and naming one of them works at any realism. See [How a nickname behaves](../nickname/#realism-invents-words-rather-than-drawing-them).
+`randNickname` is the exception: at the default `realism` it spans twenty-six of them, leaving out `color`, `finance` and `tech`, because a word in front of a colour or a loan reads as a joke rather than a handle. Loosening `realism` puts them back, and naming one of them works at any realism. See [How a nickname behaves](../nickname/#realism-invents-words-rather-than-drawing-them).
 
 ## The rules a theme follows
 
-**Themes are disjoint.** A word in two of them would make the reported theme ambiguous, and would make the detail output name a theme the caller never asked about. When a new theme claims a word an older one already held, the word **moves** rather than being copied: `place` took the twelve places that were sitting in `concept`, `vehicle` took the bicycle and the train out of `object`, `plant` took the flowers and the trees out of `nature`, and `music` took the instruments out of `object`. Where the two senses are genuinely different words, the word is renamed instead: the English toy became `Marbles` so that `gem` could keep `Marble`.
+**Themes are disjoint.** A word in two of them would make the reported theme ambiguous, and would make the detail output name a theme the caller never asked about. When a new theme claims a word an older one already held, the word **moves** rather than being copied: `place` took the twelve places that were sitting in `concept`, `vehicle` took the bicycle and the train out of `object`, `plant` took the flowers and the trees out of `nature`, `music` took the instruments out of `object`, `toy` took the tops and the dice out of it, and `furniture` took the wardrobe and the bookshelf out of `product`. Where the two senses are genuinely different words, the word is renamed instead: the English toy became `Marbles` so that `gem` could keep `Marble`.
 
 **No person names, and no word that is only a name.** For English this is enforced against the person-name pools automatically, which is why `job` has no `Knight`, `Baker` or `Hunter` and `plant` no `Rose` or `Ivy`. Korean and Japanese cannot be held to the same check, because 하늘, 별 and 森 are everyday nouns that happen also to be names. A modifier in front of one is still nobody's name.
 
@@ -108,6 +112,6 @@ That last row is a real coincidence rather than a bug: the syllable templates sp
 
 ## See also
 
-- [`randWord`](./rand-word) — the generator the theme belongs to, and the twenty-five functions beside it.
+- [`randWord`](./rand-word) — the generator the theme belongs to, and the twenty-nine functions beside it.
 - [`randNickname`](../nickname/rand-nickname) — the same pools, put together.
 - [Constants](../reference/constants) — the theme list at runtime.

@@ -383,6 +383,8 @@ final SentenceLanguageData ru = SentenceLanguageData(
         WordTheme.tool,
         WordTheme.clothing,
         WordTheme.product,
+        WordTheme.toy,
+        WordTheme.furniture,
         WordTheme.gem,
         WordTheme.vehicle,
       ],
@@ -419,8 +421,8 @@ final SentenceLanguageData ru = SentenceLanguageData(
     ),
     VerbGroup(
       field: VerbField.change,
-      subject: const <NounClass>[NounClass.thing],
-      subjectThemes: const <WordTheme>[WordTheme.music],
+      subject: const <NounClass>[NounClass.thing, NounClass.event],
+      subjectThemes: const <WordTheme>[WordTheme.music, WordTheme.sound],
       words: words(r'''
         звучит раздаётся льётся разносится доносится гремит замолкает смолкает растекается
         переливается заливается играет слышится обрывается

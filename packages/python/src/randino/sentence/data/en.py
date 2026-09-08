@@ -1284,7 +1284,16 @@ EN = SentenceLanguageData(
         VerbGroup(
             field="change",
             subject=("thing", "vehicle"),
-            subject_themes=("object", "tool", "clothing", "product", "gem", "vehicle"),
+            subject_themes=(
+                "object",
+                "tool",
+                "clothing",
+                "product",
+                "toy",
+                "furniture",
+                "gem",
+                "vehicle",
+            ),
             words=words("""
                 sways glitters falls rolls tilts ages creaks shines gleams wobbles teeters topples
                 tumbles slips slides drops spins turns settles shifts fades wears dulls
@@ -1332,8 +1341,8 @@ EN = SentenceLanguageData(
         ),
         VerbGroup(
             field="change",
-            subject=("thing",),
-            subject_themes=("music",),
+            subject=("thing", "event"),
+            subject_themes=("music", "sound"),
             words=words("""
                 plays rings_out drifts swells fades_out echoes carries floats sounds resounds
                 lingers dies_away builds stops

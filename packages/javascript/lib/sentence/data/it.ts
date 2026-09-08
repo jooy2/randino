@@ -465,7 +465,16 @@ export const IT: SentenceLanguageData = {
 			field: 'change',
 			subject: ['thing', 'vehicle'],
 			// What a thing one can hold does. A song is a thing of another kind, below.
-			subjectThemes: ['object', 'tool', 'clothing', 'product', 'gem', 'vehicle'],
+			subjectThemes: [
+				'object',
+				'tool',
+				'clothing',
+				'product',
+				'toy',
+				'furniture',
+				'gem',
+				'vehicle'
+			],
 			...tensed(
 				`oscilla luccica cade rotola si_inclina invecchia brilla risplende scintilla trema vibra barcolla traballa si_ribalta crolla scivola sdrucciola precipita gira ruota si_ferma si_arresta si_muove si_sposta si_consuma sbiadisce si_spegne si_appanna si_deforma si_piega si_storce vola_via rimbalza salta sussulta dondola si_assesta resta_fermo si_sciupa si_sporca si_copre_di_polvere`,
 				`oscillò luccicò cadde rotolò si_inclinò invecchiò brillò risplendette scintillò tremò vibrò barcollò traballò si_ribaltò crollò scivolò sdrucciolò precipitò girò ruotò si_fermò si_arrestò si_mosse si_spostò si_consumò sbiadì si_spense si_appannò si_deformò si_piegò si_storse volò_via rimbalzò saltò sussultò dondolò si_assestò restò_fermo si_sciupò si_sporcò si_coprì_di_polvere`
@@ -483,9 +492,9 @@ export const IT: SentenceLanguageData = {
 		},
 		{
 			field: 'change',
-			subject: ['thing'],
+			subject: ['thing', 'event'],
 			// What a song or a drum does: it plays, rings out, dies away.
-			subjectThemes: ['music'],
+			subjectThemes: ['music', 'sound'],
 			...tensed(
 				`suona risuona rimbomba fluttua si_leva si_spegne svanisce si_estingue tace si_ferma si_ripete continua prosegue si_prolunga si_propaga si_espande si_sente arriva_da_lontano fa_eco riecheggia cresce cala sale scende si_alza si_impone`,
 				`suonò risuonò rimbombò fluttuò si_levò si_spense svanì si_estinse tacque si_fermò si_ripeté continuò proseguì si_prolungò si_propagò si_espanse si_sentì arrivò_da_lontano fece_eco riecheggiò crebbe calò salì scese si_alzò si_impose`

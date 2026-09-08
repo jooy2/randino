@@ -85,7 +85,7 @@ English is the one language where romanizing changes nothing, because the names 
 
 ## Words and nicknames {#words-and-nicknames}
 
-The word pools cover every one of the nine, and so do `randWord`, the twenty-five themed generators and `randNickname`. What differs between the languages is where the modifier goes and whether it changes shape beside the noun, and each language says both in its own frames and agreement rules.
+The word pools cover every one of the nine, and so do `randWord`, the twenty-nine themed generators and `randNickname`. What differs between the languages is where the modifier goes and whether it changes shape beside the noun, and each language says both in its own frames and agreement rules.
 
 | Code | Language   | Shapes                         | Example                    |
 | ---- | ---------- | ------------------------------ | -------------------------- |

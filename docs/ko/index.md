@@ -26,11 +26,11 @@ features:
     link: /ko/name/
     linkText: 사람 이름
   - title: 일상 단어로 만드는 닉네임
-    details: 25개 테마의 명사에 수식어를 붙여 만듭니다. 사람 이름은 쓰지 않으므로 닉네임이 누군가의 실명처럼 읽히지 않습니다.
+    details: 29개 테마의 명사에 수식어를 붙여 만듭니다. 사람 이름은 쓰지 않으므로 닉네임이 누군가의 실명처럼 읽히지 않습니다.
     link: /ko/nickname/
     linkText: 닉네임
   - title: 테마별 단어
-    details: 동물, 음식, 보석부터 날씨와 감정까지 25개 테마마다 함수가 하나씩 있습니다. randAnimal, randFood, randGem처럼 쓰면 됩니다.
+    details: 동물, 음식, 보석부터 날씨와 감정까지 29개 테마마다 함수가 하나씩 있습니다. randAnimal, randFood, randGem처럼 쓰면 됩니다.
     link: /ko/word/rand-word
     linkText: randWord
   - title: 문법을 갖춘 문장
@@ -180,4 +180,4 @@ Python 3.10 이상에서 동작합니다. 표준 라이브러리 외에는 아�
 - [**데모**](./demo) — 브라우저에서 옵션을 직접 바꿔 보기.
 - [**지원 언어**](./guide/languages) — 9개 언어가 각각 무엇을 할 수 있는지.
 - [**사람 이름**](./name/)과 [**닉네임**](./nickname/) — 옵션이 출력에 미치는 영향.
-- [**테마**](./word/themes) — 25개 테마와 각 테마가 담은 단어.
+- [**테마**](./word/themes) — 29개 테마와 각 테마가 담은 단어.

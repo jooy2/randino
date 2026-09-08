@@ -679,6 +679,8 @@ final SentenceLanguageData es = SentenceLanguageData(
         WordTheme.tool,
         WordTheme.clothing,
         WordTheme.product,
+        WordTheme.toy,
+        WordTheme.furniture,
         WordTheme.gem,
         WordTheme.vehicle,
       ],
@@ -718,8 +720,8 @@ final SentenceLanguageData es = SentenceLanguageData(
     ),
     VerbGroup(
       field: VerbField.change,
-      subject: const <NounClass>[NounClass.thing],
-      subjectThemes: const <WordTheme>[WordTheme.music],
+      subject: const <NounClass>[NounClass.thing, NounClass.event],
+      subjectThemes: const <WordTheme>[WordTheme.music, WordTheme.sound],
       words: words(r'''
         suena resuena retumba flota se_eleva se_apaga se_desvanece se_extingue calla se_detiene
         se_repite continúa sigue se_prolonga se_propaga se_extiende se_oye llega_de_lejos hace_eco

@@ -756,7 +756,16 @@ IT = SentenceLanguageData(
         VerbGroup(
             field="change",
             subject=("thing", "vehicle"),
-            subject_themes=("object", "tool", "clothing", "product", "gem", "vehicle"),
+            subject_themes=(
+                "object",
+                "tool",
+                "clothing",
+                "product",
+                "toy",
+                "furniture",
+                "gem",
+                "vehicle",
+            ),
             words=words("""
                 oscilla luccica cade rotola si_inclina invecchia brilla risplende scintilla trema
                 vibra barcolla traballa si_ribalta crolla scivola sdrucciola precipita gira ruota
@@ -793,8 +802,8 @@ IT = SentenceLanguageData(
         ),
         VerbGroup(
             field="change",
-            subject=("thing",),
-            subject_themes=("music",),
+            subject=("thing", "event"),
+            subject_themes=("music", "sound"),
             words=words("""
                 suona risuona rimbomba fluttua si_leva si_spegne svanisce si_estingue tace si_ferma
                 si_ripete continua prosegue si_prolunga si_propaga si_espande si_sente

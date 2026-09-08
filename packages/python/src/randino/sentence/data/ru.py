@@ -395,7 +395,16 @@ RU = SentenceLanguageData(
         VerbGroup(
             field="change",
             subject=("thing", "vehicle"),
-            subject_themes=("object", "tool", "clothing", "product", "gem", "vehicle"),
+            subject_themes=(
+                "object",
+                "tool",
+                "clothing",
+                "product",
+                "toy",
+                "furniture",
+                "gem",
+                "vehicle",
+            ),
             words=words("""
                 качается блестит падает катится клонится стареет сияет сверкает мерцает шатается
                 опрокидывается валится соскальзывает скатывается вертится вращается крутится
@@ -430,8 +439,8 @@ RU = SentenceLanguageData(
         ),
         VerbGroup(
             field="change",
-            subject=("thing",),
-            subject_themes=("music",),
+            subject=("thing", "event"),
+            subject_themes=("music", "sound"),
             words=words("""
                 звучит раздаётся льётся разносится доносится гремит замолкает смолкает растекается
                 переливается заливается играет слышится обрывается

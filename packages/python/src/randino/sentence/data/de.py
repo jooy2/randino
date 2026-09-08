@@ -378,7 +378,16 @@ DE = SentenceLanguageData(
         VerbGroup(
             field="change",
             subject=("thing", "vehicle"),
-            subject_themes=("object", "tool", "clothing", "product", "gem", "vehicle"),
+            subject_themes=(
+                "object",
+                "tool",
+                "clothing",
+                "product",
+                "toy",
+                "furniture",
+                "gem",
+                "vehicle",
+            ),
             words=words("""
                 schwankt glänzt fällt rollt neigt_sich altert schimmert wackelt rutscht kullert
                 stoppt steht verschleißt verbiegt_sich verformt_sich flattert wippt erzittert
@@ -411,8 +420,8 @@ DE = SentenceLanguageData(
         ),
         VerbGroup(
             field="change",
-            subject=("thing",),
-            subject_themes=("music",),
+            subject=("thing", "event"),
+            subject_themes=("music", "sound"),
             words=words("""
                 klingt erklingt ertönt hallt verhallt schallt dröhnt tönt erschallt widerhallt
                 dudelt plärrt leiert klimpert perlt

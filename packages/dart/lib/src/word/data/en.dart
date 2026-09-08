@@ -94,9 +94,9 @@ final WordLanguageData en = WordLanguageData(
       Bottle Pencil Eraser Umbrella Lantern Lamp Clock Mirror Keyring Padlock Satchel
       Cap Boot Goggles Bangle Button Thread Brush Paint Paper Notebook Bookmark Letter
       Postcard Postage Compass Atlas Telescope Microscope Camera Reel Radio Gramophone
-      Balloon Kite Spindle Marbles Dice Card Puzzle Blocks Sail Anchor Beacon Tent
+      Spindle Sail Anchor Beacon Tent
       Backpack Bedroll Torch Matchbox Candle Flowerpot Kettle Teacup Spoon Plate
-      Saucepan Hatchet Handsaw Cogwheel Mainspring Magnet Ribbon Envelope Cushion Quilt
+      Saucepan Hatchet Handsaw Cogwheel Mainspring Magnet Ribbon Envelope
       Basket Broom Whistle Knot Bucket Easel Flask Goblet Hourglass Inkwell Quiver
       Sundial Parasol Thimble Bobbin Loom Tongs Mallet Rasp File Sharpener Inkpot Quill
       Nib Blotter Folder Binder Clipboard Notepad Paperclip Pushpin Tack Rivet Bolt
@@ -276,12 +276,12 @@ final WordLanguageData en = WordLanguageData(
       Heater Cooler Purifier Toaster Blender Oven Microwave Television Humidifier Razor
       Toothbrush Shampoo Perfume Lipstick Sneakers Wristwatch Console Projector Router
       Modem Scanner Webcam Joystick Gamepad Powerbank Amplifier Turntable Grinder Fryer
-      Steamer Dishwasher Dryer Hairdryer Lotion Sunscreen Mattress Curtain Doorbell
+      Steamer Dishwasher Dryer Hairdryer Lotion Sunscreen Doorbell
       Thermostat Nightlight Calculator Whiteboard Socket Adapter Lightbulb Extension
       Stapler Organizer Diffuser Sanitizer Detergent Conditioner Softener Freshener
       Percolator Griddle Skillet Colander Whisk Peeler Corkscrew Thermos Tumbler Doormat
-      Hanger Wardrobe Bookshelf Nightstand Recliner Beanbag Footstool Ottoman Bedframe
-      Duvet Bedsheet Pillowcase Towel Slipmat Showerhead Faucet Plunger Squeegee
+      Hanger
+      Towel Slipmat Showerhead Faucet Plunger Squeegee
     '''),
     WordTheme.color: words(r'''
       Crimson Scarlet Vermilion Carmine Magenta Fuchsia Cerise Blush Apricot Tangerine
@@ -401,6 +401,45 @@ final WordLanguageData en = WordLanguageData(
       Tea Buttermilk Malt Shandy Sangria Bourbon Scotch Rye Amaretto Curacao Ouzo Raki
       Arrack Verjuice Switchel Barleywater Ricewater Sodawater Sparkling
     '''),
+    WordTheme.toy: words(r'''
+      Balloon Kite Marbles Dice Card Puzzle Blocks Toy Game Doll Teddybear Ball Yoyo Frisbee
+      Boomerang Chess Checkers Domino Backgammon Bingo Poker Solitaire Charades Hopscotch Peekaboo
+      Leapfrog Hangman Tictactoe Sudoku Crossword Trivia Mahjong Roulette Pinata Slide Swing Seesaw
+      Carousel Sandpit Sandcastle Trampoline Dollhouse Puppet Marionette Rattle Hobbyhorse Pogostick
+      Stilts Jumprope Hulahoop Pinwheel Whirligig Figurine Spinner Snowglobe Bubble Slingshot
+      Pinball Foosball Origami Rubberduck Trainset Toysoldier Glowstick Sparkler Confetti
+    '''),
+    WordTheme.sound: words(r'''
+      Sound Noise Voice Silence Tone Whisper Murmur Shout Yell Scream Shriek Screech Cry Sob Wail
+      Whimper Sigh Gasp Groan Moan Grunt Snort Laughter Giggle Chuckle Cackle Hum Buzz Hiss Rustle
+      Whir Roar Growl Howl Snarl Woof Purr Meow Moo Oink Quack Cluck Neigh Bleat Croak Ribbit Squeak
+      Squeal Tweet Chirp Trill Warble Coo Caw Hoot Yodel Rumble Thud Thump Bang Boom Crash Clang
+      Clatter Clink Jingle Ding Peal Beep Honk Click Tick Knock Patter Footstep Thunderclap Applause
+      Clap Hiccup Sneeze Cough Yawn Burp Snore Babble Chatter Mumble Splash Plop Crunch Crackle
+      Sizzle Fizz Pop Whoosh Swish Ping Zap Drip Trickle Gurgle Twang Static Din Clamor Uproar
+      Hubbub Commotion
+    '''),
+    WordTheme.person: words(r'''
+      Person Human Child Baby Newborn Toddler Kid Boy Girl Teenager Youngster Adult Elder Man Woman
+      Lady Gentleman Mother Father Parent Son Daughter Brother Sister Sibling Twin Grandmother
+      Grandfather Grandchild Uncle Aunt Nephew Niece Cousin Husband Wife Bride Groom Widow Orphan
+      Ancestor Relative Neighbor Friend Companion Rival Enemy Stranger Guest Host Visitor Newcomer
+      Villager Citizen Roommate Classmate Teammate Playmate Spectator Bystander Passerby Witness
+      Customer Patient Passenger Tourist Nomad Pioneer Hermit Loner Outcast Refugee Outlaw Prisoner
+      Beggar Hero Heroine Villain Rascal Prankster Sleepyhead Bookworm Daydreamer Dreamer Genius
+      Fool Coward Bully Brat Crybaby Tattletale Braggart Chatterbox Gossip Grouch Optimist Pessimist
+      Romantic Rebel Leader Boss Veteran Beginner Expert Winner Loser Volunteer Lad Lass Maiden
+      Daredevil Sleepwalker Castaway Sweetheart
+    '''),
+    WordTheme.furniture: words(r'''
+      Cushion Quilt Mattress Curtain Wardrobe Bookshelf Nightstand Recliner Beanbag Footstool
+      Ottoman Bedframe Duvet Bedsheet Pillowcase Chair Desk Bed Sofa Table Stool Bench Shelf Drawer
+      Cradle Crib Cot Hammock Rug Carpet Blanket Pillow Bolster Lampshade Chandelier Sconce
+      Candlestick Candelabra Vase Urn Frame Cabinet Cupboard Dresser Bureau Sideboard Armchair
+      Rocker Loveseat Futon Daybed Bunkbed Headboard Bedpost Bedspread Tablecloth Doily Rack
+      Hatstand Mantelpiece Bookend Toybox Hamper Shutter Valance Tapestry Wallpaper Highchair
+      Playpen Bassinet Divan Armoire Pew Throne Locker
+    '''),
   },
   parts: words(r'''
     Tail Paw Track Wing Shade Whisker Feather Scale Mane Horn Beak Fin Nest Den Egg
@@ -491,6 +530,17 @@ final WordLanguageData en = WordLanguageData(
       Spade Handle Blade Toolkit Toolbox Chainsaw Axe Saw Coffee Cocoa Water Soda Cider Smoothie
       Milkshake Latte Espresso Cappuccino Beer Whiskey Vodka Rum Tequila Gin Cocktail Champagne
       Icewater Hotwater Milk Juice Tea Sparkling
+      Toy Game Doll Teddybear Ball Yoyo Frisbee Chess Checkers Domino Bingo Poker Hopscotch Peekaboo
+      Slide Swing Seesaw Carousel Sandcastle Trampoline Dollhouse Puppet Rattle Jumprope Hulahoop
+      Bubble Sound Noise Voice Silence Whisper Shout Yell Scream Cry Sigh Laughter Giggle Hum Buzz
+      Roar Woof Meow Moo Oink Quack Squeak Bang Boom Crash Beep Honk Click Knock Applause Clap
+      Hiccup Sneeze Cough Yawn Burp Snore Splash Pop Drip Person Human Child Baby Toddler Kid Boy
+      Girl Teenager Adult Man Woman Lady Gentleman Mother Father Parent Son Daughter Brother Sister
+      Twin Grandmother Grandfather Uncle Aunt Nephew Niece Cousin Husband Wife Bride Groom Neighbor
+      Friend Enemy Stranger Guest Visitor Customer Patient Passenger Tourist Hero Villain Genius
+      Fool Bully Leader Boss Winner Loser Chair Desk Bed Sofa Table Stool Bench Shelf Drawer Crib
+      Hammock Rug Carpet Blanket Pillow Lampshade Vase Frame Cabinet Cupboard Dresser Armchair
+      Wardrobe Toybox Wallpaper
     '''),
     rare: words(r'''
       Kestrel Marten Marmoset Tapir Okapi Ibex Chamois Cygnet Osprey Ibis Cormorant Petrel Sandpiper
@@ -535,6 +585,15 @@ final WordLanguageData en = WordLanguageData(
       Bevel Jointer Miter Ballpeen Screwjack Pincer Bradawl Burnisher Drawknife Spokeshave Miterbox
       Nailset Plumbbob Ristretto Digestif Grog Wassail Sweetwater Nitrobrew Curacao Ouzo Raki Arrack
       Verjuice Switchel Barleywater Ricewater
+      Backgammon Solitaire Charades Mahjong Roulette Marionette Hobbyhorse Pogostick Whirligig
+      Figurine Snowglobe Foosball Origami Toysoldier Glowstick Murmur Shriek Screech Whimper Cackle
+      Whir Snarl Bleat Ribbit Trill Warble Caw Yodel Clang Clatter Clink Peal Patter Thunderclap
+      Babble Plop Crackle Gurgle Twang Static Din Clamor Uproar Hubbub Commotion Newborn Youngster
+      Sibling Grandchild Ancestor Companion Villager Citizen Spectator Bystander Passerby Nomad
+      Pioneer Hermit Outcast Refugee Outlaw Heroine Rascal Prankster Braggart Grouch Optimist
+      Pessimist Veteran Lad Lass Maiden Daredevil Sleepwalker Castaway Cot Bolster Sconce
+      Candlestick Candelabra Urn Bureau Sideboard Loveseat Futon Daybed Headboard Bedpost Bedspread
+      Doily Hatstand Mantelpiece Bookend Valance Tapestry Bassinet Divan Armoire Pew
     '''),
   ),
   frames: const <WordFrame>[

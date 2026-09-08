@@ -217,6 +217,18 @@ enum WordTheme {
 
   /// Something to drink: 식혜, Cider.
   drink,
+
+  /// Toys and games: 팽이, Kite.
+  toy,
+
+  /// Sounds and voices: 속삭임, Whisper.
+  sound,
+
+  /// People by age, kinship and character: 꼬마, Toddler.
+  person,
+
+  /// Furniture and furnishings: 요람, Hammock.
+  furniture,
 }
 
 /// What one word does inside a nickname.

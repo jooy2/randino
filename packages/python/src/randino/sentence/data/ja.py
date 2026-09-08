@@ -1230,7 +1230,16 @@ JA = SentenceLanguageData(
         VerbGroup(
             field="change",
             subject=("thing", "vehicle"),
-            subject_themes=("object", "tool", "clothing", "product", "gem", "vehicle"),
+            subject_themes=(
+                "object",
+                "tool",
+                "clothing",
+                "product",
+                "toy",
+                "furniture",
+                "gem",
+                "vehicle",
+            ),
             words=words("""
                 揺れる 輝く 落ちる 転がる 傾く 古びる 光る きらめく ぐらつく 倒れる 滑る 落下する 回る 止まる 揺らめく 色あせる すり減る 曇る くすむ 転がり落ちる
                 飛んでいく 跳ね上がる 動く 静止する 揺れ動く ずれる
@@ -1288,8 +1297,8 @@ JA = SentenceLanguageData(
         ),
         VerbGroup(
             field="change",
-            subject=("thing",),
-            subject_themes=("music",),
+            subject=("thing", "event"),
+            subject_themes=("music", "sound"),
             words=words("""
                 響く 鳴る 流れる 響き渡る 聞こえてくる 止まる 静まる 消えていく 高まる 弱まる 繰り返す 漂う 反響する 鳴り響く 続く 始まる 終わる 沈む 広がる 満ちる
             """),

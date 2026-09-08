@@ -13,8 +13,8 @@ Every option and every example, with **Dart** picked in the sidebar. This README
 **randino** generates random person names, nicknames, words and sentences in the language you ask for.
 
 - **Person names** read like names people carry: Emma Clover, Jack Reeves, each with its English pronunciation. 9 languages.
-- **Nicknames** are handles for a game or a website: MistyOwl, CraneVoyage, RustyBoot. Built from everyday words across twenty-five themes, and never from person names.
-- **Words** are those twenty-five themes on their own: `randWord`, plus `randAnimal`, `randFood` and twenty-three more.
+- **Nicknames** are handles for a game or a website: MistyOwl, CraneVoyage, RustyBoot. Built from everyday words across twenty-nine themes, and never from person names.
+- **Words** are those twenty-nine themes on their own: `randWord`, plus `randAnimal`, `randFood` and twenty-seven more.
 - **Sentences** are whole statements in the language's own grammar, from `randSentence`. The verb decides what can stand beside it, so the words of one sentence belong together.
 - **Decorators** attach something to a string you already have: `randSuffix`, `randPrefix` and `randModifier`.
 - Every parameter is named and optional, and a **null enum means "every one of them"**, so `randName()` on its own works.
@@ -99,11 +99,11 @@ randNicknameDetails(language: WordLanguage.en).first;
 | `startsWith`              | `String?`           | `null`                 |
 | `unique`                  | `bool`              | `false`                |
 
-Themes: `animal`, `object`, `nature`, `plant`, `gem`, `concept`, `myth`, `job`, `music`, `place`, `food`, `sport`, `vehicle`, `product`, `color`, `finance`, `tech`, `weather`, `space`, `time`, `emotion`, `body`, `clothing`, `tool`, `drink`.
+Themes: `animal`, `object`, `nature`, `plant`, `gem`, `concept`, `myth`, `job`, `music`, `place`, `food`, `sport`, `vehicle`, `product`, `color`, `finance`, `tech`, `weather`, `space`, `time`, `emotion`, `body`, `clothing`, `tool`, `drink`, `toy`, `sound`, `person`, `furniture`.
 
 ## Words
 
-The pools the nicknames are built from, on their own. Twenty-five themes, nine languages, and a function per theme.
+The pools the nicknames are built from, on their own. Twenty-nine themes, nine languages, and a function per theme.
 
 ```dart
 randWord(language: WordLanguage.en, theme: WordTheme.animal, count: 3);
@@ -129,7 +129,7 @@ wordLengthRange(language: WordLanguage.en); // LengthRange(3, 11)
 | `startsWith`              | `String?`       | `null`             |
 | `unique`                  | `bool`          | `false`            |
 
-One function per theme: `randAnimal`, `randObject`, `randNature`, `randPlant`, `randGem`, `randConcept`, `randMyth`, `randJob`, `randMusic`, `randPlace`, `randFood`, `randSport`, `randVehicle`, `randProduct`, `randColor`, `randFinance`, `randTech`, `randWeather`, `randSpace`, `randTime`, `randEmotion`, `randBody`, `randClothing`, `randTool`, `randDrink`. They return `List<String>`; for the detail form, pass the theme to `randWordDetails`.
+One function per theme: `randAnimal`, `randObject`, `randNature`, `randPlant`, `randGem`, `randConcept`, `randMyth`, `randJob`, `randMusic`, `randPlace`, `randFood`, `randSport`, `randVehicle`, `randProduct`, `randColor`, `randFinance`, `randTech`, `randWeather`, `randSpace`, `randTime`, `randEmotion`, `randBody`, `randClothing`, `randTool`, `randDrink`, `randToy`, `randSound`, `randPerson`, `randFurniture`. They return `List<String>`; for the detail form, pass the theme to `randWordDetails`.
 
 ## Sentences
 

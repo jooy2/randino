@@ -441,7 +441,16 @@ VI = SentenceLanguageData(
         VerbGroup(
             field="change",
             subject=("thing", "vehicle"),
-            subject_themes=("object", "tool", "clothing", "product", "gem", "vehicle"),
+            subject_themes=(
+                "object",
+                "tool",
+                "clothing",
+                "product",
+                "toy",
+                "furniture",
+                "gem",
+                "vehicle",
+            ),
             words=words("""
                 lung_lay lấp_lánh rơi lăn nghiêng cũ_đi sáng_lên lóe_sáng sáng_lấp_lánh đung_đưa
                 đu_đưa lắc_lư rung rung_rinh chao_đảo trượt trượt_xuống rơi_xuống đổ đổ_xuống ngã
@@ -462,8 +471,8 @@ VI = SentenceLanguageData(
         ),
         VerbGroup(
             field="change",
-            subject=("thing",),
-            subject_themes=("music",),
+            subject=("thing", "event"),
+            subject_themes=("music", "sound"),
             words=words("""
                 vang_lên vang vọng vang_vọng ngân ngân_vang ngân_nga văng_vẳng vọng_lại phát_ra
                 cất_lên trỗi_dậy nổi_lên tắt_dần lịm_dần tan_dần dứt ngưng_bặt to_dần nhỏ_dần

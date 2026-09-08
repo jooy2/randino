@@ -13,8 +13,8 @@ Every option and every example, with **Python** picked in the sidebar. This READ
 **randino** generates random person names, nicknames, words and sentences in the language you ask for.
 
 - **Person names** read like names people carry: Emma Clover, Jack Reeves, each with its English pronunciation. 9 languages.
-- **Nicknames** are handles for a game or a website: MistyOwl, CraneVoyage, RustyBoot. Built from everyday words across twenty-five themes, and never from person names.
-- **Words** are those twenty-five themes on their own: `rand_word`, plus `rand_animal`, `rand_food` and twenty-three more.
+- **Nicknames** are handles for a game or a website: MistyOwl, CraneVoyage, RustyBoot. Built from everyday words across twenty-nine themes, and never from person names.
+- **Words** are those twenty-nine themes on their own: `rand_word`, plus `rand_animal`, `rand_food` and twenty-seven more.
 - **Sentences** are whole statements in the language's own grammar, from `rand_sentence`. The verb decides what can stand beside it, so the words of one sentence belong together.
 - **Decorators** attach something to a string you already have: `rand_suffix`, `rand_prefix` and `rand_modifier`.
 - Every argument is keyword-only and optional, so `rand_name()` on its own works.
@@ -102,11 +102,11 @@ rand_nickname(language="en", output="detail")[0]
 
 `output="detail"` returns a `NicknameDetail` for each nickname instead of a string, carrying `nickname`, `words`, `slots`, `language` and `theme`.
 
-Themes: `animal`, `object`, `nature`, `plant`, `gem`, `concept`, `myth`, `job`, `music`, `place`, `food`, `sport`, `vehicle`, `product`, `color`, `finance`, `tech`, `weather`, `space`, `time`, `emotion`, `body`, `clothing`, `tool`, `drink`.
+Themes: `animal`, `object`, `nature`, `plant`, `gem`, `concept`, `myth`, `job`, `music`, `place`, `food`, `sport`, `vehicle`, `product`, `color`, `finance`, `tech`, `weather`, `space`, `time`, `emotion`, `body`, `clothing`, `tool`, `drink`, `toy`, `sound`, `person`, `furniture`.
 
 ## Words
 
-The pools the nicknames are built from, on their own. Twenty-five themes, nine languages, and a function per theme.
+The pools the nicknames are built from, on their own. Twenty-nine themes, nine languages, and a function per theme.
 
 ```python
 from randino import rand_animal, rand_food, rand_word, word_length_range

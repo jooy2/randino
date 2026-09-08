@@ -29,9 +29,9 @@ const NOUNS = taggedNouns({
 		bottiglia:f matita:f gomma:f ombrello:m lampada:f lanterna:f specchio:m chiave:f
 		lucchetto:m borsa:f bottone:m ago:m filo:m pennello:m vernice:f carta:f quaderno:m
 		lettera:f cartolina:f francobollo:m mappa:f cannocchiale:m microscopio:m macchina:f
-		pellicola:f radio:f palloncino:m aquilone:m trottola:f biglia:f dado:m
-		puzzle:m vela:f ancora:f tenda:f torcia:f fiammifero:m candela:f vaso:m teiera:f tazza:f
-		cucchiaio:m pentola:f ingranaggio:m molla:f magnete:m nastro:m busta:f cuscino:m coperta:f
+		pellicola:f radio:f
+		vela:f ancora:f tenda:f torcia:f fiammifero:m candela:f vaso:m teiera:f tazza:f
+		cucchiaio:m pentola:f ingranaggio:m molla:f magnete:m nastro:m busta:f
 		cesto:m scopa:f fischietto:m corda:f secchio:m ventaglio:m scudo:m rete:f canna:f brocca:f
 		pettine:m campanella:f imbuto:m vassoio:m scatola:f barile:m latta:f fiala:f
 		bussola:f portachiavi:m spillo:m ditale:m gomitolo:m spago:m fune:f gancio:m chiodo:m
@@ -180,12 +180,12 @@ const NOUNS = taggedNouns({
 		atletica:f maratona:f ginnastica:f karate:m judo:m scherma:f lotta:f pugilato:m tiro:m
 		equitazione:f canottaggio:m surf:m sci:m hockey:m rugby:m cricket:m ciclismo:m
 		arrampicata:f racchetta:f porta:f medaglia:f trofeo:m campione:m
-		 eliminatoria:f allenamento:m polo:m pattinaggio:m tuffo:m freccetta:f
+		eliminatoria:f allenamento:m polo:m pattinaggio:m tuffo:m freccetta:f
 		ostacolo:m giavellotto:m disco:m staffetta:f tabellone:m casco:m fallo:m dorso:m
-		 sollevamento:m slitta:f servizio:m rimbalzo:m salto:m corsa:f traguardo:m
+		sollevamento:m slitta:f servizio:m rimbalzo:m salto:m corsa:f traguardo:m
 		podio:m spogliatoio:m tribuna:f tifoseria:f
 		canoismo:m regata:f triathlon:m pentathlon:m decathlon:m lancio:m asta:f trampolino:m
-		materassino:m anelli:p tatami:m scacchi:p domino:m attaccante:m difensore:m
+		materassino:m anelli:p tatami:m attaccante:m difensore:m
 		allenatore:m tifoso:m stadio:m campo:m pista:f rigore:m angolo:m cartellino:m
 		punteggio:m pareggio:m vittoria:f sconfitta:f record:m torneo:m campionato:m coppa:f
 	`,
@@ -208,13 +208,12 @@ const NOUNS = taggedNouns({
 		lavatrice:f ventilatore:m stufa:f depuratore:m cuociriso:m microonde:m forno:m
 		frullatore:m rasoio:m spazzolino:m dentifricio:m sapone:m shampoo:m profumo:m orologio:m
 		proiettore:m router:m scanner:m asciugatrice:f lozione:f crema_solare:f pantofola:f
-		sandalo:m materasso:m campanello:m termometro:m estintore:m calcolatrice:f lampadina:f
-		presa:f ciabatta:f piumone:m federa:f asciugamano:m catino:m detersivo:m ammorbidente:m
-		padella:f caffettiera:f frusta:f pelapatate:m cavatappi:m thermos:m zerbino:m gruccia:f
-		armadio:m scaffale:m comodino:m
+		sandalo:m campanello:m termometro:m estintore:m calcolatrice:f lampadina:f
+		presa:f ciabatta:f federa:f asciugamano:m catino:m detersivo:m ammorbidente:m
+		padella:f caffettiera:f frusta:f pelapatate:m cavatappi:m thermos:m gruccia:f
 		televisore:m console:f bilancia:f tostapane:m friggitrice:f spremiagrumi:m
-		bollitore:m radiatore:m termostato:m tappeto:m veneziana:f lampadario:m
-		abatjour:m posateria:f stoviglia:f cristalleria:f tovaglia:f tovagliolo:m scolapiatti:m
+		bollitore:m radiatore:m termostato:m
+		posateria:f stoviglia:f cristalleria:f tovaglia:f tovagliolo:m scolapiatti:m
 		lavandino:m rubinetto:m doccia:f vasca:f lavabo:m lente:f piastra:f
 	`,
 	color: `
@@ -368,6 +367,50 @@ const NOUNS = taggedNouns({
 		limoncello:m chinotto:m spuma:f sorbetto:m aranciata:f cedrata:f moscato:m
 		lambrusco:m barbera:f chianti:m marsala:m passito:m vinsanto:m mosto:m rosolio:m
 		nocino:m ratafià:m centerbe:m
+	`,
+	toy: `
+		palloncino:m aquilone:m trottola:f biglia:f dado:m puzzle:m scacchi:p domino:m giocattolo:m gioco:m palla:f
+		bambola:f peluche:m orsacchiotto:m pupazzo:m burattino:m marionetta:f soldatino:m macchinina:f trenino:m
+		modellino:m cavallo_a_dondolo:m altalena:f scivolo:m giostra:f sabbiera:f secchiello:m girello:m tombola:f
+		dama:f scacchiera:f briscola:f tressette:m solitario:m cruciverba:m rebus:m sudoku:m rompicapo:m cubo:m
+		costruzioni:fp yoyo:m fionda:f cerbottana:f sonaglio:m girandola:f caleidoscopio:m plastilina:f trombetta:f
+		nascondino:m acchiapparello:m mosca_cieca:f girotondo:m rubabandiera:m caccia_al_tesoro:f trampoli:p
+		coriandoli:p maschera:f gonfiabile:m braccioli:p flipper:m videogioco:m biliardino:m birilli:p figurina:f
+		pedina:f alfiere:m
+	`,
+	sound: `
+		suono:m rumore:m voce:f grido:m urlo:m strillo:m sussurro:m sospiro:m risata:f pianto:m singhiozzo:m
+		sbadiglio:m starnuto:m tosse:f lamento:m gemito:m mormorio:m brusio:m silenzio:m rimbombo:m boato:m fragore:m
+		frastuono:m baccano:m chiasso:m clamore:m abbaio:m miagolio:m muggito:m belato:m nitrito:m ruggito:m ringhio:m
+		cinguettio:m gracidio:m ronzio:m fruscio:m cigolio:m scricchiolio:m crepitio:m sibilo:m fischio:m ululato:m
+		grugnito:m raglio:m squillo:m rintocco:m scampanio:m ticchettio:m tic_tac:m tonfo:m schianto:m scoppio:m
+		botto:m sparo:m scoppiettio:m gorgoglio:m sciabordio:m bum:m toc_toc:m din_don:m bau:m miao:m chicchirichì:m
+		coccodè:m cip_cip:m etciù:m applauso:m urrà:m risonanza:f vibrazione:f richiamo:m allarme:m clacson:m
+		suoneria:f bip:m brontolio:m borbottio:m balbettio:m tintinnio:m stridore:m scalpiccio:m sciacquio:m
+		scroscio:m picchiettio:m rombo:m pigolio:m squittio:m sbuffo:m soffio:m rutto:m schiocco:m clic:m
+	`,
+	person: `
+		bambino:m neonato:m ragazzo:m adolescente:m adulto:m anziano:m nonno:m nonna:f bisnonno:m mamma:f papà:m
+		madre:f padre:m genitore:m figlio:m figlia:f fratello:m sorella:f gemello:m zio:m zia:f cugino:m nipote:m
+		marito:m moglie:f fidanzato:m innamorato:m scapolo:m vedovo:m orfano:m antenato:m discendente:m erede:m
+		parente:m suocero:m cognato:m vicino:m amico:m nemico:m compagno:m collega:m ospite:m sconosciuto:m
+		straniero:m viandante:m vagabondo:m nomade:m profugo:m cittadino:m abitante:m passante:m turista:m rivale:m
+		avversario:m alleato:m testimone:m vittima:f colpevole:m prigioniero:m fuggitivo:m vincitore:m protagonista:m
+		eroe:m furfante:m birbante:m monello:m bugiardo:m buffone:m sognatore:m dormiglione:m pigrone:m mangione:m
+		topo_di_biblioteca:m secchione:m saputello:m chiacchierone:m pettegolo:m piagnucolone:m fifone:m codardo:m
+		spaccone:m sbruffone:m attaccabrighe:m guastafeste:m rompiscatole:m ficcanaso:m bonaccione:m simpaticone:m
+		brontolone:m musone:m ottimista:m pessimista:m pasticcione:m signore:m signora:f sonnambulo:m
+	`,
+	furniture: `
+		cuscino:m coperta:f materasso:m piumone:m armadio:m scaffale:m comodino:m tappeto:m veneziana:f lampadario:m
+		abatjour:m zerbino:m sedia:f tavolo:m tavolino:m scrivania:f letto:m culla:f divano:m poltrona:f sgabello:m
+		panca:f panchina:f mensola:f ripiano:m cassetto:m cassettiera:f credenza:f dispensa:f vetrina:f mobile:m
+		guardaroba:m attaccapanni:m portaombrelli:m specchiera:f cassapanca:f scarpiera:f comò:m pensile:m
+		seggiolone:m sdraio:f amaca:f dondolo:m pouf:m lenzuolo:m trapunta:f guanciale:m testiera:f baldacchino:m
+		zanzariera:f drappo:m moquette:f stuoia:f cornice:f quadro:m arazzo:m pendola:f piantana:f lume:m candelabro:m
+		paralume:m fioriera:f soprammobile:m statuetta:f portafoto:m paravento:m persiana:f tapparella:f bancone:m
+		cattedra:f leggio:m scrittoio:m portagioie:m cofanetto:m bacheca:f fasciatoio:m tappezzeria:f
+		carta_da_parati:f parquet:m
 	`
 });
 
@@ -550,6 +593,16 @@ export const IT: WordLanguageData = {
 			bionda rossa vino spumante prosecco champagne sangria liquore grappa rum gin vodka whisky tequila
 			cocktail sciroppo bibita granita cacao panna amaro sambuca limoncello chinotto sorbetto aranciata
 			moscato lambrusco chianti
+			giocattolo gioco palla bambola peluche orsacchiotto pupazzo burattino soldatino macchinina trenino
+			altalena scivolo giostra secchiello tombola dama briscola cruciverba costruzioni fionda nascondino
+			coriandoli maschera braccioli videogioco figurina suono rumore voce grido urlo sussurro sospiro risata
+			pianto singhiozzo sbadiglio starnuto tosse silenzio botto sparo applauso allarme clacson suoneria fischio
+			bau miao bambino neonato ragazzo adolescente adulto anziano nonno nonna bisnonno mamma papà madre padre
+			genitore figlio figlia fratello sorella gemello zio zia cugino nipote marito moglie fidanzato parente
+			suocero cognato vicino amico nemico compagno collega ospite sconosciuto straniero turista vittima eroe
+			bugiardo signore signora sedia tavolo tavolino scrivania letto culla divano poltrona sgabello panca
+			panchina mensola cassetto cassettiera credenza dispensa vetrina mobile attaccapanni scarpiera comò
+			seggiolone sdraio amaca lenzuolo trapunta zanzariera cornice quadro persiana tapparella bancone cattedra
 		`),
 		rare: words(`
 			donnola gnu suricato armadillo istrice ornitorinco lemure tapiro allodola pernice upupa
@@ -588,6 +641,11 @@ export const IT: WordLanguageData = {
 			rivettatrice chiodatrice sgorbia smusso succhiello pialletto scalpellino graffietto graffatrice
 			acciarino crogiolo fustella mandrino roncola accettino subbio idromele rosolio nocino ratafià
 			centerbe
+			tressette cerbottana caleidoscopio trampoli acchiapparello alfiere pedina gracidio sciabordio scampanio
+			scalpiccio sciacquio picchiettio balbettio stridore raglio crepitio risonanza scoppiettio viandante nomade
+			profugo discendente sonnambulo attaccabrighe guastafeste baldacchino arazzo pendola piantana candelabro
+			paralume soprammobile scrittoio portagioie cofanetto fasciatoio tappezzeria leggio stuoia drappo
+			cassapanca guanciale
 		`)
 	},
 	frames: [

@@ -25,10 +25,10 @@ const NOUNS = taggedNouns({
 	object: `
 		botella:f lápiz:m goma:f paraguas:m lámpara:f farol:m espejo:m llave:f candado:m bolsa:f
 		botón:m aguja:f hilo:m pincel:m pintura:f papel:m cuaderno:m carta:f postal:f sello:m
-		mapa:m catalejo:m microscopio:m cámara:f película:f radio:f globo:m cometa:f peonza:f
-		canica:f dado:m naipe:m rompecabezas:m vela:f ancla:f tienda:f linterna:f cerilla:f
+		mapa:m catalejo:m microscopio:m cámara:f película:f radio:f
+		vela:f ancla:f tienda:f linterna:f cerilla:f
 		maceta:f tetera:f taza:f cuchara:f plato:m olla:f engranaje:m resorte:m imán:m cinta:f
-		sobre:m almohada:f manta:f cesta:f escoba:f silbato:m cuerda:f cubo:m abanico:m escudo:m
+		sobre:m cesta:f escoba:f silbato:m cuerda:f cubo:m abanico:m escudo:m
 		red:f caña:f jarra:f peine:m campanilla:f embudo:m bandeja:f caja:f barril:m lata:f
 		frasco:m
 		brújula:f llavero:m alfiler:m dedal:m ovillo:m cordel:m soga:f gancho:m clavo:m
@@ -178,7 +178,7 @@ const NOUNS = taggedNouns({
 		relevo:m marcador:m casco:m falta:f jonrón:m espalda:f braza:f halterofilia:f trineo:m
 		saque:m rebote:m salto:m carrera:f meta:f podio:m vestuario:m grada:f afición:f
 		piragüismo:m regata:f triatlón:m pentatlón:m decatlón:m lanzamiento:m pértiga:f
-		trampolín:m colchoneta:f anillas:fp potro:m tatami:m ajedrez:m dominó:m parchís:m
+		trampolín:m colchoneta:f anillas:fp potro:m tatami:m
 		delantero:m defensa:f entrenador:m hincha:m estadio:m cancha:f pista:f penalti:m
 		córner:m tarjeta:f tanteo:m empate:m victoria:f derrota:f récord:m torneo:m liga:f
 		copa:f
@@ -202,13 +202,12 @@ const NOUNS = taggedNouns({
 		ventilador:m estufa:f purificador:m arrocera:f microondas:m horno:m licuadora:f
 		maquinilla:f cepillo:m dentífrico:m jabón:m champú:m perfume:m reloj:m proyector:m
 		enrutador:m escáner:m secadora:f secador:m loción:f protector:m zapatilla:f sandalia:f
-		colchón:m cortina:f timbre:m termómetro:m extintor:m calculadora:f bombilla:f enchufe:m
-		regleta:f edredón:m funda:f toalla:f palangana:f detergente:m suavizante:m olla_exprés:f
-		sartén:f cafetera:f batidor:m pelador:m sacacorchos:m termo:m felpudo:m percha:f armario:m
-		estante:m mesilla:f
+		timbre:m termómetro:m extintor:m calculadora:f bombilla:f enchufe:m
+		regleta:f funda:f toalla:f palangana:f detergente:m suavizante:m olla_exprés:f
+		sartén:f cafetera:f batidor:m pelador:m sacacorchos:m termo:m percha:f
 		televisor:m consola:f amplificador:m ecualizador:m báscula:f plancha:f tostadora:f
-		freidora:f exprimidor:m hervidor:m calefactor:m radiador:m termostato:m alfombra:f estor:m
-		persiana:f aplique:m flexo:m cubertería:f vajilla:f cristalería:f mantel:m servilleta:f
+		freidora:f exprimidor:m hervidor:m calefactor:m radiador:m termostato:m
+		cubertería:f vajilla:f cristalería:f mantel:m servilleta:f
 		escurridor:m fregadero:m ducha:f bañera:f inodoro:m lavabo:m botiquín:m lentilla:f
 		tocadiscos:m
 	`,
@@ -364,6 +363,45 @@ const NOUNS = taggedNouns({
 		bíter:m amargo:m anís:m pacharán:m licorcillo:m aguamiel:f rompope:m
 		sorbete:m clarete:m albariño:m
 		espumoso:m mosto:m garnacha:f fino:m amontillado:m
+	`,
+	toy: `
+		canica:f dado:m naipe:m rompecabezas:m peonza:f cometa:f globo:m ajedrez:m dominó:m parchís:m muñeco:m
+		peluche:m juguete:m juego:m partida:f pelota:f comba:f escondite:m rayuela:f columpio:m tobogán:m balancín:m
+		tiovivo:m noria:f montaña_rusa:f arenero:m yoyó:m diábolo:m bumerán:m frisbi:m aro:m sonajero:m bloque:m
+		plastilina:f papiroflexia:f pompa:f tirachinas:m petardo:m bengala:f confeti:m serpentina:f piñata:f máscara:f
+		títere:m marioneta:f maqueta:f zancos:p cama_elástica:f tirolina:f castillo_hinchable:m damas:fp bingo:m
+		ruleta:f tres_en_raya:m crucigrama:m sudoku:m sopa_de_letras:f trabalenguas:m baraja:f comodín:m ficha:f
+		tablero:m cubilete:m caleidoscopio:m
+	`,
+	sound: `
+		sonido:m ruido:m voz:f grito:m susurro:m murmullo:m suspiro:m risa:f carcajada:f llanto:m sollozo:m gemido:m
+		quejido:m lamento:m bostezo:m estornudo:m tos:f ronquido:m silbido:m chillido:m alarido:m aullido:m ladrido:m
+		maullido:m rugido:m gruñido:m bramido:m relincho:m mugido:m balido:m cacareo:m graznido:m gorjeo:m ronroneo:m
+		zumbido:m siseo:m crujido:m chirrido:m chasquido:m chapoteo:m goteo:m borboteo:m tintineo:m repique:m
+		campanada:f tañido:m redoble:m retumbo:m estruendo:m estallido:m explosión:f portazo:m golpe:m golpeteo:m
+		traqueteo:m zapateo:m pisada:f aplauso:m palmada:f ovación:f abucheo:m bocinazo:m pitido:m clic:m tictac:m
+		runrún:m quiquiriquí:m guau:m miau:m pío:m chinchín:m pum:m bullicio:m alboroto:m jaleo:m algarabía:f
+		griterío:m clamor:m cuchicheo:m parloteo:m tartamudeo:m balbuceo:m arrullo:m tarareo:m jadeo:m hipo:m eructo:m
+		carraspeo:m soplido:m bufido:m rumor:m resonancia:f vibración:f acústica:f
+	`,
+	person: `
+		niño:m bebé:m adolescente:m adulto:m anciano:m hombre:m mujer:f chico:m señor:m dama:f abuelo:m abuela:f
+		madre:f padre:m hijo:m hermano:m tío:m primo:m sobrino:m nieto:m marido:m gemelo:m huérfano:m viudo:m
+		soltero:m novio:m novia:f pareja:f amigo:m enemigo:m rival:m vecino:m invitado:m huésped:m extranjero:m
+		desconocido:m vagabundo:m nómada:m héroe:m villano:m pícaro:m granuja:m mocoso:m dormilón:m glotón:m
+		empollón:m sabelotodo:m charlatán:m parlanchín:m gruñón:m llorón:m soñador:m aventurero:m holgazán:m
+		bromista:m mentiroso:m tramposo:m cobarde:m líder:m jefe:m compañero:m testigo:m víctima:f rehén:m
+		prisionero:m fugitivo:m ciudadano:m habitante:m aldeano:m mendigo:m ermitaño:m heredero:m ahijado:m padrino:m
+		madrina:f suegro:m cuñado:m yerno:m nuera:f padrastro:m madrastra:f antepasado:m pariente:m
+	`,
+	furniture: `
+		almohada:f manta:f colchón:m cortina:f edredón:m armario:m estante:m mesilla:f alfombra:f estor:m persiana:f
+		aplique:m flexo:m felpudo:m silla:f mesa:f cama:f sofá:m sillón:m taburete:m banqueta:f escritorio:m pupitre:m
+		estantería:f cómoda:f cajón:m vitrina:f aparador:m mueble:m tocador:m perchero:m paragüero:m cuna:f litera:f
+		catre:m somier:m cabecero:m sábana:f colcha:f cojín:m hamaca:f mecedora:f tumbona:f diván:m puf:m biombo:m
+		mampara:f encimera:f alacena:f moqueta:f estera:f tapete:m tapiz:m cuadro:m marco:m póster:m portarretratos:m
+		jarrón:m candelabro:m candil:m quinqué:m plafón:m lámpara_de_araña:f visillo:m mosquitera:f dosel:m adorno:m
+		cenefa:f
 	`
 });
 
@@ -542,6 +580,15 @@ export const ES: WordLanguageData = {
 			martillo mazo taladro lija pico rastrillo palanca rallador cuchilla motosierra serrucho escuadra
 			grapadora pistola molde café té zumo leche agua gaseosa limonada batido mate cortado cerveza vino
 			tinto champán sangría licor ron ginebra vodka whisky tequila cóctel jarabe refresco cacao
+			muñeco peluche juguete juego pelota comba escondite columpio tobogán baraja sonido ruido voz grito susurro
+			suspiro risa llanto bostezo estornudo tos silbido ladrido maullido explosión golpe aplauso guau miau niño
+			bebé hombre mujer chico abuelo abuela madre padre hijo hermano tío primo marido novio novia amigo vecino
+			héroe silla mesa cama sofá sillón escritorio estantería cuna sábana cojín cuadro balancín tiovivo noria
+			aro sonajero plastilina pompa petardo confeti piñata máscara títere marioneta ficha tablero carcajada
+			ronquido chillido rugido zumbido portazo pisada palmada pitido jaleo hipo eructo adolescente adulto
+			anciano señor sobrino nieto gemelo pareja enemigo invitado extranjero desconocido villano líder jefe
+			compañero testigo víctima prisionero mendigo padrino madrina suegro cuñado yerno nuera pariente taburete
+			pupitre cómoda cajón mueble perchero litera hamaca mecedora tumbona encimera marco póster jarrón adorno
 		`),
 		rare: words(`
 			ñu suricata ornitorrinco lémur babuino tapir alondra abubilla jilguero arrendajo tritón dedal
@@ -576,6 +623,13 @@ export const ES: WordLanguageData = {
 			clavadora caladora gubia bisel berbiquí barrena formón garlopa escofina escoplo gramil plomada
 			cric yesquero troquel esmeril mandril macheta azuela hidromiel atole pulque tepache bíter
 			licorcillo aguamiel rompope clarete amontillado
+			rayuela diábolo bumerán papiroflexia tirachinas tirolina cubilete caleidoscopio trabalenguas gorjeo
+			borboteo tañido redoble retumbo estruendo traqueteo zapateo abucheo runrún algarabía griterío clamor
+			cuchicheo parloteo tartamudeo balbuceo arrullo carraspeo bufido resonancia acústica chinchín nómada
+			ermitaño heredero ahijado antepasado aldeano rehén fugitivo holgazán sabelotodo empollón parlanchín
+			banqueta vitrina aparador tocador paragüero catre somier cabecero colcha diván puf biombo mampara alacena
+			moqueta estera tapete tapiz portarretratos candelabro candil quinqué plafón lámpara_de_araña visillo
+			mosquitera dosel cenefa
 		`)
 	},
 	frames: [

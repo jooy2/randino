@@ -229,6 +229,6 @@ rand_name(count=5)  # 9개 언어 중 하나씩, 이름 다섯 개
 - [**지원 언어**](./languages) — 9개 언어 코드가 무엇을 다루는지, 그리고 언어마다 무엇이 다른지.
 - [**사람 이름**](../name/) — 모든 옵션과 각 옵션이 출력에 미치는 영향.
 - [**닉네임**](../nickname/) — 모든 옵션과 형태를 고르는 방식.
-- [**`randWord`**](../word/rand-word) — 25개 테마의 단어와 테마마다 하나씩 있는 함수.
+- [**`randWord`**](../word/rand-word) — 29개 테마의 단어와 테마마다 하나씩 있는 함수.
 - [**`randSentence`**](../sentence/rand-sentence) — 그 언어의 문법으로 쓴 완결된 문장.
 - [**`randModifier`**](../decorate/rand-modifier) — 어떤 문자열 앞에든 수식어를 붙이는 함수.

@@ -402,7 +402,18 @@ export const KO: SentenceLanguageData = {
 			subject: ['creature', 'person'],
 			object: ['thing', 'plant', 'edible'],
 			// What one can hold: an instrument is, and a song is not.
-			objectThemes: ['object', 'tool', 'clothing', 'product', 'gem', 'plant', 'food', 'drink'],
+			objectThemes: [
+				'object',
+				'tool',
+				'clothing',
+				'product',
+				'toy',
+				'furniture',
+				'gem',
+				'plant',
+				'food',
+				'drink'
+			],
 			...koVerbs(
 				`보:봐 바라보:바라봐 살피:살펴 들여다보:들여다봐 구경하:구경해 만지:만져 쓰다듬:쓰다듬어 지켜보:지켜봐 쳐다보:쳐다봐 훑어보:훑어봐 노려보:노려봐 응시하:응시해 관찰하:관찰해 뜯어보:뜯어봐 눈여겨보:눈여겨봐 어루만지:어루만져 만져보:만져봐 내려다보:내려다봐 올려다보:올려다봐 두드리:두드려 냄새맡:냄새맡아 감상하:감상해`
 			)
@@ -423,7 +434,18 @@ export const KO: SentenceLanguageData = {
 			subject: ['creature', 'person'],
 			object: ['thing', 'plant', 'edible'],
 			// What one can hold: an instrument is, and a song is not.
-			objectThemes: ['object', 'tool', 'clothing', 'product', 'gem', 'plant', 'food', 'drink'],
+			objectThemes: [
+				'object',
+				'tool',
+				'clothing',
+				'product',
+				'toy',
+				'furniture',
+				'gem',
+				'plant',
+				'food',
+				'drink'
+			],
 			...koVerbs(
 				`
 				찾:찾아:서 발견하:발견해 줍:주워:서 찾아내:찾아내:서 건지:건져:서 집어들:집어들어:서 알아보:알아봐:서 캐내:캐내:서 손에넣:손에넣어:서 주워들:주워들어:서 되찾:되찾아:서
@@ -436,7 +458,18 @@ export const KO: SentenceLanguageData = {
 			subject: ['creature', 'person'],
 			object: ['thing', 'plant', 'edible'],
 			// What one can hold: an instrument is, and a song is not.
-			objectThemes: ['object', 'tool', 'clothing', 'product', 'gem', 'plant', 'food', 'drink'],
+			objectThemes: [
+				'object',
+				'tool',
+				'clothing',
+				'product',
+				'toy',
+				'furniture',
+				'gem',
+				'plant',
+				'food',
+				'drink'
+			],
 			...koVerbs(
 				`챙기:챙겨:서 고르:골라:서 집:집어:서 얻:얻어:서 받:받아:서 꺼내:꺼내:서 움켜쥐:움켜쥐어 잡:잡아:서 쥐:쥐어:서 들:들어:서 가지:가져:서 붙잡:붙잡아:서 붙들:붙들어:서 낚아채:낚아채:서 집어올리:집어올려:서 건네받:건네받아:서 추리:추려:서 골라잡:골라잡아:서 챙겨들:챙겨들어:서 물:물어:서`
 			)
@@ -446,7 +479,18 @@ export const KO: SentenceLanguageData = {
 			subject: ['creature', 'person'],
 			object: ['thing', 'plant', 'edible'],
 			// What one can hold: an instrument is, and a song is not.
-			objectThemes: ['object', 'tool', 'clothing', 'product', 'gem', 'plant', 'food', 'drink'],
+			objectThemes: [
+				'object',
+				'tool',
+				'clothing',
+				'product',
+				'toy',
+				'furniture',
+				'gem',
+				'plant',
+				'food',
+				'drink'
+			],
 			...koVerbs(
 				`옮기:옮겨 나르:날라 가져오:가져와:서 들고오:들고와:서 안고오:안고와:서 짊어지:짊어져:서 둘러메:둘러메:서 들고가:들고가:서 가져가:가져가:서 끌고가:끌고가:서 끌:끌어 밀:밀어 운반하:운반해 들어올리:들어올려 안:안아 품:품어 실어나르:실어날라 날라오:날라와:서`
 			)
@@ -456,7 +500,18 @@ export const KO: SentenceLanguageData = {
 			subject: ['creature', 'person'],
 			object: ['thing', 'plant', 'edible'],
 			// What one can hold: an instrument is, and a song is not.
-			objectThemes: ['object', 'tool', 'clothing', 'product', 'gem', 'plant', 'food', 'drink'],
+			objectThemes: [
+				'object',
+				'tool',
+				'clothing',
+				'product',
+				'toy',
+				'furniture',
+				'gem',
+				'plant',
+				'food',
+				'drink'
+			],
 			...koVerbs(
 				`감추:감춰 숨기:숨겨 넣어두:넣어둬 간직하:간직해 묻:묻어 챙겨두:챙겨둬 보관하:보관해 저장하:저장해 모아두:모아둬 쟁여두:쟁여둬 파묻:파묻어 덮어두:덮어둬 집어넣:집어넣어 밀어넣:밀어넣어 지키:지켜 간수하:간수해 싸두:싸둬 숨겨두:숨겨둬 담아두:담아둬 놓아두:놓아둬 치우:치워`
 			)
@@ -466,7 +521,18 @@ export const KO: SentenceLanguageData = {
 			subject: ['creature', 'person'],
 			object: ['thing', 'plant', 'edible'],
 			// What one can hold, and so can lose.
-			objectThemes: ['object', 'tool', 'clothing', 'product', 'gem', 'plant', 'food', 'drink'],
+			objectThemes: [
+				'object',
+				'tool',
+				'clothing',
+				'product',
+				'toy',
+				'furniture',
+				'gem',
+				'plant',
+				'food',
+				'drink'
+			],
 			...koVerbs(
 				`잃어버리:잃어버려 떨어뜨리:떨어뜨려 놓치:놓쳐 잃:잃어 흘리:흘려 빠뜨리:빠뜨려 두고오:두고와 놓고오:놓고와 분실하:분실해 떨구:떨궈 놓아버리:놓아버려 흘려버리:흘려버려`
 			)
@@ -487,7 +553,7 @@ export const KO: SentenceLanguageData = {
 			subject: ['person'],
 			object: ['thing', 'vehicle'],
 			// What one can hold: an instrument is, and a song is not.
-			objectThemes: ['object', 'tool', 'clothing', 'product', 'gem', 'vehicle'],
+			objectThemes: ['object', 'tool', 'clothing', 'product', 'toy', 'furniture', 'gem', 'vehicle'],
 			...koVerbs(
 				`
 				만들:만들어 짓:지어 빚:빚어 그리:그려 엮:엮어 만들어내:만들어내 완성하:완성해 꾸미:꾸며 빚어내:빚어내 손수만들:손수만들어 창작하:창작해 그려내:그려내 장식하:장식해
@@ -510,7 +576,7 @@ export const KO: SentenceLanguageData = {
 			subject: ['person'],
 			object: ['thing', 'vehicle'],
 			// What one can hold: an instrument is, and a song is not.
-			objectThemes: ['object', 'tool', 'clothing', 'product', 'gem', 'vehicle'],
+			objectThemes: ['object', 'tool', 'clothing', 'product', 'toy', 'furniture', 'gem', 'vehicle'],
 			...koVerbs(
 				`고치:고쳐 닦:닦아 손질하:손질해 다듬:다듬어 정리하:정리해 매만지:매만져 수리하:수리해 손보:손봐 씻:씻어 문지르:문질러 털:털어 닦아내:닦아내 윤내:윤내 광내:광내 조이:조여 기름치:기름쳐 정돈하:정돈해 관리하:관리해 돌보:돌봐 보수하:보수해 점검하:점검해 헹구:헹궈 말리:말려`
 			)
@@ -520,7 +586,7 @@ export const KO: SentenceLanguageData = {
 			subject: ['person'],
 			object: ['thing', 'vehicle'],
 			// What one can hold: an instrument is, and a song is not.
-			objectThemes: ['object', 'tool', 'clothing', 'product', 'gem', 'vehicle'],
+			objectThemes: ['object', 'tool', 'clothing', 'product', 'toy', 'furniture', 'gem', 'vehicle'],
 			...koVerbs(
 				`팔:팔아 넘기:넘겨 건네:건네 내놓:내놓아 판매하:판매해 처분하:처분해 팔아치우:팔아치워 내다팔:내다팔아 팔아넘기:팔아넘겨 넘겨주:넘겨줘 건네주:건네줘 거래하:거래해 진열하:진열해 늘어놓:늘어놓아 값을매기:값을매겨`
 			)
@@ -530,7 +596,18 @@ export const KO: SentenceLanguageData = {
 			subject: ['person'],
 			object: ['thing', 'vehicle', 'edible'],
 			// What one can hold: an instrument is, and a song is not.
-			objectThemes: ['object', 'tool', 'clothing', 'product', 'gem', 'vehicle', 'food', 'drink'],
+			objectThemes: [
+				'object',
+				'tool',
+				'clothing',
+				'product',
+				'toy',
+				'furniture',
+				'gem',
+				'vehicle',
+				'food',
+				'drink'
+			],
 			...koVerbs(
 				`사:사:서 사오:사와:서 구하:구해:서 장만하:장만해:서 사들이:사들여:서 구입하:구입해:서 구매하:구매해:서 주문하:주문해:서 골라사:골라사:서 값을치르:값을치러:서 마련하:마련해:서 사가지고오:사가지고와:서 흥정하:흥정해:서 사두:사둬:서 사모으:사모아:서`
 			)
@@ -621,7 +698,16 @@ export const KO: SentenceLanguageData = {
 			field: 'change',
 			subject: ['thing', 'vehicle'],
 			// What a thing one can hold does. A song is a thing of another kind, below.
-			subjectThemes: ['object', 'tool', 'clothing', 'product', 'gem', 'vehicle'],
+			subjectThemes: [
+				'object',
+				'tool',
+				'clothing',
+				'product',
+				'toy',
+				'furniture',
+				'gem',
+				'vehicle'
+			],
 			...koVerbs(
 				`흔들리:흔들려 반짝이:반짝여 떨어지:떨어져 굴러가:굴러가 기울어지:기울어져 낡아가:낡아가 빛나:빛나 닳:닳아 빛바래:빛바래 흔들거리:흔들거려 넘어지:넘어져 날아가:날아가 미끄러지:미끄러져 튀어오르:튀어올라 돌:돌아 멈추:멈춰 놓이:놓여 흔들흔들하:흔들흔들해`
 			)
@@ -637,8 +723,8 @@ export const KO: SentenceLanguageData = {
 		},
 		{
 			field: 'change',
-			subject: ['thing'],
-			subjectThemes: ['music'],
+			subject: ['thing', 'event'],
+			subjectThemes: ['music', 'sound'],
 			...koVerbs(
 				`울리:울려 흐르:흘러 퍼지:퍼져 잦아들:잦아들어 이어지:이어져 울려퍼지:울려퍼져 들려오:들려와 멈추:멈춰 잠잠해지:잠잠해져 메아리치:메아리쳐 감돌:감돌아 흘러나오:흘러나와 반복되:반복돼 가라앉:가라앉아 커지:커져`
 			)
@@ -798,7 +884,16 @@ export const KO: SentenceLanguageData = {
 		{
 			subject: ['thing', 'vehicle'],
 			// What a thing one can hold is like. A song is a thing of another kind, below.
-			subjectThemes: ['object', 'tool', 'clothing', 'product', 'gem', 'vehicle'],
+			subjectThemes: [
+				'object',
+				'tool',
+				'clothing',
+				'product',
+				'toy',
+				'furniture',
+				'gem',
+				'vehicle'
+			],
 			...koStates(`
 				단단하:단단해:단단한 가볍:가벼워:가벼운 무겁:무거워:무거운 매끈하:매끈해:매끈한 투명하:투명해:투명한 튼튼하:튼튼해:튼튼한 반들반들하:반들반들해:반들반들한
 				낡:낡아:낡은 두껍:두꺼워:두꺼운 얇:얇아:얇은 둥글:둥글어:둥근 뾰족하:뾰족해:뾰족한 납작하:납작해:납작한 화려하:화려해:화려한 투박하:투박해:투박한
@@ -806,8 +901,8 @@ export const KO: SentenceLanguageData = {
 			`)
 		},
 		{
-			subject: ['thing'],
-			subjectThemes: ['music'],
+			subject: ['thing', 'event'],
+			subjectThemes: ['music', 'sound'],
 			...koStates(`
 				잔잔하:잔잔해:잔잔한 경쾌하:경쾌해:경쾌한 구슬프:구슬퍼:구슬픈 감미롭:감미로워:감미로운 흥겹:흥겨워:흥겨운
 				웅장하:웅장해:웅장한 애절하:애절해:애절한 은은하:은은해:은은한 청아하:청아해:청아한 우렁차:우렁차:우렁찬 나직하:나직해:나직한

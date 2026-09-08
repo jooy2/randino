@@ -51,7 +51,11 @@ export const WORD_THEMES: readonly WordTheme[] = [
 	'body',
 	'clothing',
 	'tool',
-	'drink'
+	'drink',
+	'toy',
+	'sound',
+	'person',
+	'furniture'
 ];
 
 /**

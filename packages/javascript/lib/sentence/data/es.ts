@@ -439,7 +439,16 @@ export const ES: SentenceLanguageData = {
 			field: 'change',
 			subject: ['thing', 'vehicle'],
 			// What a thing one can hold does. A song is a thing of another kind, below.
-			subjectThemes: ['object', 'tool', 'clothing', 'product', 'gem', 'vehicle'],
+			subjectThemes: [
+				'object',
+				'tool',
+				'clothing',
+				'product',
+				'toy',
+				'furniture',
+				'gem',
+				'vehicle'
+			],
 			...tensed(
 				`se_mece reluce cae rueda se_inclina envejece brilla resplandece destella tiembla vibra se_tambalea se_bambolea se_vuelca se_derrumba se_desliza resbala se_desploma gira da_vueltas se_detiene se_para se_mueve se_desplaza se_desgasta se_decolora se_apaga se_empaña se_deforma se_dobla se_tuerce sale_volando rebota salta se_estremece se_balancea oscila se_asienta se_queda_quieto se_aja se_ensucia se_cubre_de_polvo`,
 				`se_meció relució cayó rodó se_inclinó envejeció brilló resplandeció destelló tembló vibró se_tambaleó se_bamboleó se_volcó se_derrumbó se_deslizó resbaló se_desplomó giró dio_vueltas se_detuvo se_paró se_movió se_desplazó se_desgastó se_decoloró se_apagó se_empañó se_deformó se_dobló se_torció salió_volando rebotó saltó se_estremeció se_balanceó osciló se_asentó se_quedó_quieto se_ajó se_ensució se_cubrió_de_polvo`
@@ -457,9 +466,9 @@ export const ES: SentenceLanguageData = {
 		},
 		{
 			field: 'change',
-			subject: ['thing'],
+			subject: ['thing', 'event'],
 			// What a song or a drum does: it plays, rings out, dies away.
-			subjectThemes: ['music'],
+			subjectThemes: ['music', 'sound'],
 			...tensed(
 				`suena resuena retumba flota se_eleva se_apaga se_desvanece se_extingue calla se_detiene se_repite continúa sigue se_prolonga se_propaga se_extiende se_oye llega_de_lejos hace_eco resuena_a_lo_lejos crece decrece sube baja se_alza se_impone`,
 				`sonó resonó retumbó flotó se_elevó se_apagó se_desvaneció se_extinguió calló se_detuvo se_repitió continuó siguió se_prolongó se_propagó se_extendió se_oyó llegó_de_lejos hizo_eco resonó_a_lo_lejos creció decreció subió bajó se_alzó se_impuso`

@@ -33,9 +33,9 @@ final TaggedNouns _nouns = taggedNouns(<WordTheme, String>{
     Flasche:f Bleistift:m Radierer:m Regenschirm:m Lampe:f Laterne:f Spiegel:m
     Schlüssel:m Schloss:n Tasche:f Knopf:m Nadel:f Faden:m Pinsel:m Farbe:f Papier:n
     Heft:n Brief:m Postkarte:f Briefmarke:f Karte:f Fernrohr:n Mikroskop:n Kamera:f
-    Film:m Radio:n Ballon:m Drachen:m Kreisel:m Murmel:f Würfel:m Puzzle:n Segel:n
+    Film:m Radio:n Segel:n
     Anker:m Zelt:n Fackel:f Streichholz:n Kerze:f Topf:m Kanne:f Tasse:f Löffel:m
-    Teller:m Zahnrad:n Feder:f Magnet:m Band:n Umschlag:m Kissen:n Decke:f Korb:m
+    Teller:m Zahnrad:n Feder:f Magnet:m Band:n Umschlag:m Korb:m
     Besen:m Pfeife:f Seil:n Eimer:m Fächer:m Schild:m Netz:n Angel:f Krug:m Kamm:m
     Glöckchen:n Trichter:m Tablett:n Schachtel:f Fass:n Dose:f Fläschchen:n
     Kompass:m Stecknadel:f Fingerhut:m Knäuel:n Bindfaden:m Strick:m Haken:m Nagel:m
@@ -189,7 +189,7 @@ final TaggedNouns _nouns = taggedNouns(<WordTheme, String>{
     Diskus:m Staffel:f Anzeigetafel:f Helm:m Foul:n Gewichtheben:n Schlitten:m
     Aufschlag:m Sprung:m Lauf:m Ziel:n Podest:n Umkleide:f Tribüne:f Anhänger:m
     Kanusport:m Regatta:f Triathlon:m Zehnkampf:m Fünfkampf:m Wurf:m Sprungbrett:n
-    Matte:f Ringe:p Bock:m Schachspiel:n Domino:n Stürmer:m Verteidiger:m Trainer:m
+    Matte:f Ringe:p Bock:m Stürmer:m Verteidiger:m Trainer:m
     Stadion:n Spielfeld:n Bahn:f Elfmeter:m Ecke:f Punktestand:m Sieg:m Niederlage:f
     Rekord:m Turnier:n Liga:f Wettkampf:m Zielgerade:f Vorlage:f
   ''',
@@ -213,12 +213,12 @@ final TaggedNouns _nouns = taggedNouns(<WordTheme, String>{
     Staubsauger:m Ventilator:m Ofen:m Wasserfilter:m Reiskocher:m Mikrowelle:f
     Backofen:m Mixer:m Rasierer:m Zahnbürste:f Zahnpasta:f Seife:f Shampoo:n Parfüm:n
     Armbanduhr:f Beamer:m Router:m Scanner:m Trockner:m Föhn:m Lotion:f Sonnencreme:f
-    Hausschuh:m Sandale:f Matratze:f Vorhang:m Türklingel:f Thermometer:n Feuerlöscher:m
-    Glühbirne:f Steckdose:f Steckleiste:f Bettdecke:f Bezug:m Handtuch:n Waschbecken:n
+    Hausschuh:m Sandale:f Türklingel:f Thermometer:n Feuerlöscher:m
+    Glühbirne:f Steckdose:f Steckleiste:f Bezug:m Handtuch:n Waschbecken:n
     Waschmittel:n Weichspüler:m Pfanne:f Schneebesen:m Schäler:m Korkenzieher:m
-    Thermoskanne:f Fußmatte:f Kleiderbügel:m Schrank:m Regal:n Nachttisch:m
+    Thermoskanne:f Fußmatte:f Kleiderbügel:m
     Fernseher:m Konsole:f Verstärker:m Waage:f Bügeleisen:n Toaster:m Fritteuse:f
-    Entsafter:m Wasserkocher:m Heizkörper:m Thermostat:n Teppich:m Jalousie:f Leuchter:m
+    Entsafter:m Wasserkocher:m Heizkörper:m Thermostat:n
     Besteck:n Geschirr:n Tischdecke:f Serviette:f Abtropfsieb:n Spülbecken:n
     Wasserhahn:m Dusche:f Wanne:f Handspiegel:m Nagelfeile:f Rasierpinsel:m
     Kaffeemühle:f Eierbecher:m Salzstreuer:m Untersetzer:m
@@ -383,6 +383,55 @@ final TaggedNouns _nouns = taggedNouns(<WordTheme, String>{
     Rübensaft:m Zitronentee:m Sauermilch:f Dickmilch:f Brause:f Quellwasser:n
     Tafelwasser:n
     Fruchtsaft:m
+  ''',
+  WordTheme.toy: r'''
+    Drachen:m Kreisel:m Murmel:f Würfel:m Puzzle:n Ballon:m Schachspiel:n Domino:n Puppe:f
+    Teddybär:m Kuscheltier:n Bauklotz:m Spielkarte:f Kartenspiel:n Brettspiel:n Halma:n Skat:m
+    Poker:n Bingo:n Quiz:n Kreuzworträtsel:n Sudoku:n Jojo:n Springseil:n Hüpfburg:f Schaukel:f
+    Rutsche:f Wippe:f Karussell:n Sandburg:f Schneemann:m Schneeball:m Seifenblase:f Wasserpistole:f
+    Spielzeugauto:n Modelleisenbahn:f Puppenhaus:n Handpuppe:f Marionette:f Spieluhr:f Kaleidoskop:n
+    Zauberwürfel:m Stelzen:p Reifen:m Steckenpferd:n Schaukelpferd:n Klettergerüst:n Planschbecken:n
+    Gokart:n Frisbee:f Bumerang:m Flummi:m Kicker:m Flipper:m Spielautomat:m Videospiel:n
+    Spielfigur:f Spielbrett:n Spielstein:m Knete:f Malbuch:n Mikado:n Tangram:n Baukasten:m
+    Papierflieger:m Verstecken:n Fangen:n Blindekuh:f Sackhüpfen:n Topfschlagen:n Schnitzeljagd:f
+    Schatzsuche:f Mobile:n Beißring:m Modellflugzeug:n Zinnsoldat:m Ritterburg:f Kaufladen:m
+    Seifenkiste:f
+  ''',
+  WordTheme.sound: r'''
+    Flüstern:n Rascheln:n Knarren:n Schrei:m Seufzer:m Gelächter:n Lachen:n Ruf:m Stimme:f
+    Geräusch:n Lärm:m Laut:m Hall:m Knall:m Knacken:n Knistern:n Knirschen:n Klappern:n Klirren:n
+    Klingeln:n Klopfen:n Ticken:n Summen:n Brummen:n Zischen:n Rauschen:n Plätschern:n Platsch:m
+    Pfeifen:n Pfiff:m Heulen:n Jaulen:n Bellen:n Miauen:n Schnurren:n Zwitschern:n Krächzen:n
+    Gackern:n Grunzen:n Wiehern:n Brüllen:n Knurren:n Fauchen:n Quaken:n Zirpen:n Schnarchen:n
+    Husten:m Niesen:n Gähnen:n Schluchzen:n Weinen:n Kichern:n Stöhnen:n Murmeln:n Geschrei:n
+    Applaus:m Klatschen:n Trommelwirbel:m Grollen:n Rumpeln:n Poltern:n Krachen:n Dröhnen:n
+    Scheppern:n Quietschen:n Rattern:n Hupen:n Alarm:m Läuten:n Piepen:n Klimpern:n Schmatzen:n
+    Rülpsen:n Räuspern:n Herzklopfen:n Schweigen:n Geplapper:n Geschnatter:n Gejammer:n Kikeriki:n
+    Tatütata:n Plumps:m Klick:m Schnaufen:n Keuchen:n Wimmern:n Winseln:n Stampfen:n Schritt:m
+    Schuss:m Explosion:f Schall:m
+  ''',
+  WordTheme.person: r'''
+    Kind:n Baby:n Zwilling:m Großmutter:f Großvater:m Oma:f Opa:m Mutter:f Vater:m Mama:f Papa:m
+    Eltern:p Geschwister:p Bruder:m Schwester:f Sohn:m Tochter:f Enkel:m Neffe:m Nichte:f Onkel:m
+    Tante:f Cousin:m Mann:m Frau:f Braut:f Witwe:f Waise:f Nachbar:m Gast:m Fremder:m Wanderer:m
+    Held:m Schlingel:m Frechdachs:m Schlafmütze:f Bücherwurm:m Träumer:m Tollpatsch:m Faulpelz:m
+    Angsthase:m Spaßvogel:m Nervensäge:f Besserwisser:m Streber:m Sturkopf:m Glückspilz:m
+    Pechvogel:m Liebling:m Freund:m Freundin:f Kumpel:m Feind:m Kollege:m Teenager:m Senior:m
+    Rentner:m Junge:m Mädchen:n Kleinkind:n Nesthäkchen:n Nachkomme:m Familie:f Mensch:m Zuschauer:m
+    Besucher:m Dame:f Herr:m Kerl:m Schurke:m Feigling:m Genie:n Witzbold:m Draufgänger:m
+    Abenteurer:m Optimist:m Pessimist:m Einzelgänger:m Stubenhocker:m Frühaufsteher:m Nachteule:f
+    Morgenmuffel:m Naschkatze:f Vielfraß:m Tourist:m Anfänger:m Paar:n
+  ''',
+  WordTheme.furniture: r'''
+    Kissen:n Decke:f Matratze:f Vorhang:m Bettdecke:f Schrank:m Regal:n Nachttisch:m Teppich:m
+    Jalousie:f Leuchter:m Stuhl:m Tisch:m Bett:n Sofa:n Sessel:m Hocker:m Bank:f Schreibtisch:m
+    Kommode:f Vitrine:f Schublade:f Wiege:f Hängematte:f Bettgestell:n Lattenrost:m Laken:n
+    Bettwäsche:f Polster:n Gardine:f Rollo:n Lampenschirm:m Kronleuchter:m Stehlampe:f
+    Kerzenständer:m Vase:f Bilderrahmen:m Garderobe:f Kleiderständer:m Schaukelstuhl:m Liegestuhl:m
+    Liege:f Futon:m Tresen:m Arbeitsplatte:f Raumteiler:m Paravent:m Standuhr:f Kamin:m Tapete:f
+    Wandteppich:m Blumentopf:m Laufstall:m Wickeltisch:m Hochstuhl:m Schemel:m Sitzsack:m Spind:m
+    Anrichte:f Pult:n Lichterkette:f Wäschekorb:m Papierkorb:m Schirmständer:m Wäscheständer:m
+    Markise:f Fensterbank:f Fensterladen:m
   ''',
 });
 
@@ -565,6 +614,23 @@ final WordLanguageData de = WordLanguageData(
       Cappuccino Espresso Bier Pils Weizenbier Wein Rotwein Weißwein Sekt Champagner Schnaps Rum
       Wodka Whisky Cocktail Sirup Sprudel Eistee Buttermilch Smoothie Milchshake Radler Schorle
       Glühwein Apfelsaft Fruchtsaft
+      Puppe Teddybär Kuscheltier Bauklotz Spielkarte Kartenspiel Brettspiel Springseil Hüpfburg
+      Schaukel Rutsche Wippe Karussell Sandburg Schneemann Schneeball Seifenblase Wasserpistole
+      Spielzeugauto Puppenhaus Frisbee Flummi Kicker Videospiel Spielfigur Knete Malbuch Verstecken
+      Fangen Sackhüpfen Schnitzeljagd Schatzsuche Papierflieger Jojo Poker Quiz Sudoku Bingo Skat
+      Flüstern Schrei Lachen Ruf Stimme Geräusch Lärm Knall Klingeln Klopfen Ticken Summen Brummen
+      Zischen Rauschen Pfiff Heulen Bellen Miauen Schnurren Zwitschern Brüllen Knurren Quaken
+      Schnarchen Husten Niesen Gähnen Weinen Kichern Applaus Klatschen Hupen Alarm Piepen Schuss
+      Explosion Klick Plumps Kikeriki Tatütata Schritt Kind Baby Zwilling Großmutter Großvater Oma
+      Opa Mutter Vater Mama Papa Eltern Geschwister Bruder Schwester Sohn Tochter Enkel Neffe Nichte
+      Onkel Tante Cousin Mann Frau Braut Witwe Nachbar Gast Held Freund Freundin Kumpel Feind
+      Kollege Teenager Senior Rentner Junge Mädchen Kleinkind Familie Mensch Zuschauer Besucher Dame
+      Herr Kerl Genie Optimist Tourist Anfänger Paar Liebling Streber Träumer Angsthase Glückspilz
+      Pechvogel Spaßvogel Faulpelz Stuhl Tisch Bett Sofa Sessel Hocker Bank Schreibtisch Kommode
+      Schublade Wiege Hängematte Laken Bettwäsche Gardine Rollo Lampenschirm Kronleuchter Stehlampe
+      Kerzenständer Vase Bilderrahmen Garderobe Kleiderständer Schaukelstuhl Liegestuhl Liege Tresen
+      Arbeitsplatte Kamin Tapete Blumentopf Laufstall Wickeltisch Hochstuhl Sitzsack Spind
+      Wäschekorb Papierkorb Wäscheständer Markise Fensterbank Fensterladen
     '''),
     rare: words(r'''
       Zikade Gnu Gürteltier Schnabeltier Lemur Tapir Iltis Rebhuhn Wiedehopf Distelfink Häher
@@ -605,6 +671,8 @@ final WordLanguageData de = WordLanguageData(
       Wetzstein Egge Dreschflegel Spindel Bandsäge Drehbank Hohleisen Reißnadel Fase Handbohrer
       Stemmeisen Streichmaß Senklot Lötlampe Feuerstahl Gussform Stanze Bohrfutter Fräse Hippe
       Handbeil Zugmesser Anreißnadel Ösenzange Wermut Enzian Rübensaft Sauermilch Dickmilch
+      Halma Mikado Tangram Zinnsoldat Steckenpferd Kaleidoskop Seifenkiste Hall Schall Nesthäkchen
+      Nachkomme Paravent Anrichte Wandteppich Schemel
     '''),
   ),
   frames: const <WordFrame>[

@@ -25,6 +25,7 @@ const Map<WordTheme, NounClass> themeClass = <WordTheme, NounClass>{
   WordTheme.animal: NounClass.creature,
   WordTheme.myth: NounClass.creature,
   WordTheme.job: NounClass.person,
+  WordTheme.person: NounClass.person,
   WordTheme.plant: NounClass.plant,
   WordTheme.food: NounClass.edible,
   WordTheme.drink: NounClass.edible,
@@ -34,6 +35,8 @@ const Map<WordTheme, NounClass> themeClass = <WordTheme, NounClass>{
   WordTheme.product: NounClass.thing,
   WordTheme.gem: NounClass.thing,
   WordTheme.music: NounClass.thing,
+  WordTheme.toy: NounClass.thing,
+  WordTheme.furniture: NounClass.thing,
   WordTheme.vehicle: NounClass.vehicle,
   WordTheme.place: NounClass.place,
   WordTheme.nature: NounClass.place,
@@ -41,6 +44,7 @@ const Map<WordTheme, NounClass> themeClass = <WordTheme, NounClass>{
   WordTheme.weather: NounClass.event,
   WordTheme.sport: NounClass.event,
   WordTheme.time: NounClass.event,
+  WordTheme.sound: NounClass.event,
   WordTheme.concept: NounClass.idea,
   WordTheme.emotion: NounClass.idea,
   WordTheme.finance: NounClass.idea,
@@ -1408,7 +1412,7 @@ const List<Story> stories = <Story>[
       StoryStep(
         StepKind.other,
         actorClasses: <NounClass>[NounClass.creature, NounClass.person],
-        actorThemes: <WordTheme>[WordTheme.animal, WordTheme.job],
+        actorThemes: <WordTheme>[WordTheme.animal, WordTheme.job, WordTheme.person],
         fields: <VerbField>[
           VerbField.move,
           VerbField.rest,
@@ -1502,7 +1506,7 @@ const List<StoryStep> interludes = <StoryStep>[
   StoryStep(
     StepKind.other,
     actorClasses: <NounClass>[NounClass.creature, NounClass.person],
-    actorThemes: <WordTheme>[WordTheme.animal, WordTheme.job],
+    actorThemes: <WordTheme>[WordTheme.animal, WordTheme.job, WordTheme.person],
     fields: <VerbField>[
       VerbField.move,
       VerbField.express,

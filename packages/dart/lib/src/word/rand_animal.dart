@@ -5,7 +5,7 @@ import 'package:randino/src/word/rand_word.dart';
 ///
 /// [randWord] with the theme already chosen; every other parameter is the same.
 /// For the detail form, pass [WordTheme.animal] to `randWordDetails` — Dart has
-/// no overloads, and twenty-four more functions for it would be twenty-four too many.
+/// no overloads, and twenty-eight more functions for it would be twenty-eight too many.
 ///
 /// ```dart
 /// randAnimal(language: WordLanguage.ko, count: 3); // [사자, 호랑이, 수달]

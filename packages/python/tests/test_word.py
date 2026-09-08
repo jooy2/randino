@@ -1,4 +1,4 @@
-"""The word generators: `rand_word` and the fourteen themed ones."""
+"""The word generators: `rand_word` and the twenty-nine themed ones."""
 
 import re
 from typing import cast, get_args
@@ -20,20 +20,24 @@ from randino import (
     rand_emotion,
     rand_finance,
     rand_food,
+    rand_furniture,
     rand_gem,
     rand_job,
     rand_music,
     rand_myth,
     rand_nature,
     rand_object,
+    rand_person,
     rand_place,
     rand_plant,
     rand_product,
+    rand_sound,
     rand_space,
     rand_sport,
     rand_tech,
     rand_time,
     rand_tool,
+    rand_toy,
     rand_vehicle,
     rand_weather,
     rand_word,
@@ -85,8 +89,12 @@ THEMED = {
     "clothing": rand_clothing,
     "tool": rand_tool,
     "drink": rand_drink,
+    "toy": rand_toy,
+    "sound": rand_sound,
+    "person": rand_person,
+    "furniture": rand_furniture,
 }
-"""The themed generator for each theme, which is what the seventeen of them are."""
+"""The themed generator for each theme, which is what the twenty-nine of them are."""
 
 
 def pool_of(language: WordLanguage, theme: WordTheme | None = None) -> tuple[str, ...]:

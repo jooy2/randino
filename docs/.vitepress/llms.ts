@@ -101,7 +101,7 @@ const PREAMBLE = [
 	'**Person names** read like names a person actually carries (김민준, Emma Clover).',
 	'**Nicknames** are the handles someone would pick for a game or a website (멋진사자, MistyOwl),',
 	'built from everyday words and never from person names. **Words** are those everyday words on',
-	"their own, across twenty-five themes. **Sentences** are whole statements in the language's own",
+	"their own, across twenty-nine themes. **Sentences** are whole statements in the language's own",
 	'grammar (여우가 사과를 먹는다), and **decorators** attach a token or a modifier to a string you',
 	'already have.',
 	'',

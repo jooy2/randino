@@ -4,10 +4,10 @@ import 'package:randino/src/word/word_generator.dart';
 /// Generate everyday words — the vocabulary a nickname is built from, on its
 /// own.
 ///
-/// Animals, things, nature, ideas: twenty-five themes, in nine languages. Person
+/// Animals, things, nature, ideas: twenty-nine themes, in nine languages. Person
 /// names are never used.
 ///
-/// [theme] picks what the words are about; the twenty-five `rand…` functions
+/// [theme] picks what the words are about; the twenty-nine `rand…` functions
 /// beside this one are the same generator with one theme already chosen. A null
 /// [language] or [theme] means every one of them.
 ///

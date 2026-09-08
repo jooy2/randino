@@ -539,7 +539,16 @@ export const EN: SentenceLanguageData = {
 			field: 'change',
 			subject: ['thing', 'vehicle'],
 			// What a thing one can hold does. A song is a thing of another kind, below.
-			subjectThemes: ['object', 'tool', 'clothing', 'product', 'gem', 'vehicle'],
+			subjectThemes: [
+				'object',
+				'tool',
+				'clothing',
+				'product',
+				'toy',
+				'furniture',
+				'gem',
+				'vehicle'
+			],
 			...tensed(
 				`sways glitters falls rolls tilts ages creaks shines gleams wobbles teeters topples tumbles slips slides drops spins turns settles shifts fades wears dulls`,
 				`sway glitter fall roll tilt age creak shine gleam wobble teeter topple tumble slip slide drop spin turn settle shift fade wear dull`,
@@ -559,9 +568,9 @@ export const EN: SentenceLanguageData = {
 		},
 		{
 			field: 'change',
-			subject: ['thing'],
+			subject: ['thing', 'event'],
 			// What a song or a drum does: it plays, rings out, dies away.
-			subjectThemes: ['music'],
+			subjectThemes: ['music', 'sound'],
 			...tensed(
 				`plays rings_out drifts swells fades_out echoes carries floats sounds resounds lingers dies_away builds stops`,
 				`play ring_out drift swell fade_out echo carry float sound resound linger die_away build stop`,

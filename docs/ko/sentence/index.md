@@ -8,18 +8,18 @@
 
 그래서 `여우가 사과를 먹는다`는 생성기가 만들 수 있는 문장이고 `여우가 철학을 먹는다`는 아닙니다. `먹는다`는 먹을 수 있는 것만 받기 때문입니다.
 
-이를 위해 명사에 따로 붙인 표시는 없습니다. 25개 [테마](../word/themes)가 이미 그 단어가 무엇인지 알려 주므로, 테마마다 **명사 부류**를 하나씩 대응시킵니다. 모든 언어가 같은 대응을 씁니다.
+이를 위해 명사에 따로 붙인 표시는 없습니다. 29개 [테마](../word/themes)가 이미 그 단어가 무엇인지 알려 주므로, 테마마다 **명사 부류**를 하나씩 대응시킵니다. 모든 언어가 같은 대응을 씁니다.
 
 | 부류       | 테마                                                    |
 | ---------- | ------------------------------------------------------- |
 | `creature` | `animal`, `myth`                                        |
-| `person`   | `job`                                                   |
+| `person`   | `job`, `person`                                         |
 | `plant`    | `plant`                                                 |
 | `edible`   | `food`, `drink`                                         |
-| `thing`    | `object`, `tool`, `clothing`, `product`, `gem`, `music` |
+| `thing`    | `object`, `tool`, `clothing`, `product`, `gem`, `music`, `toy`, `furniture` |
 | `vehicle`  | `vehicle`                                               |
 | `place`    | `place`, `nature`, `space`                              |
-| `event`    | `weather`, `sport`, `time`                              |
+| `event`    | `weather`, `sport`, `time`, `sound`                     |
 | `idea`     | `concept`, `emotion`, `finance`, `tech`, `color`        |
 | `body`     | `body`                                                  |
 

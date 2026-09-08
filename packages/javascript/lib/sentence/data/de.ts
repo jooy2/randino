@@ -270,7 +270,16 @@ export const DE: SentenceLanguageData = {
 			field: 'change',
 			subject: ['thing', 'vehicle'],
 			// What a thing one can hold does. A song is a thing of another kind, below.
-			subjectThemes: ['object', 'tool', 'clothing', 'product', 'gem', 'vehicle'],
+			subjectThemes: [
+				'object',
+				'tool',
+				'clothing',
+				'product',
+				'toy',
+				'furniture',
+				'gem',
+				'vehicle'
+			],
 			...tensed(
 				`schwankt glänzt fällt rollt neigt_sich altert schimmert wackelt rutscht kullert stoppt steht verschleißt verbiegt_sich verformt_sich flattert wippt erzittert taumelt ruckelt sackt pendelt baumelt`,
 				`schwankte glänzte fiel rollte neigte_sich alterte schimmerte wackelte rutschte kullerte stoppte stand verschliss verbog_sich verformte_sich flatterte wippte erzitterte taumelte ruckelte sackte pendelte baumelte`
@@ -288,9 +297,9 @@ export const DE: SentenceLanguageData = {
 		},
 		{
 			field: 'change',
-			subject: ['thing'],
+			subject: ['thing', 'event'],
 			// What a song or a drum does: it plays, rings out, dies away.
-			subjectThemes: ['music'],
+			subjectThemes: ['music', 'sound'],
 			...tensed(
 				`klingt erklingt ertönt hallt verhallt schallt dröhnt tönt erschallt widerhallt dudelt plärrt leiert klimpert perlt`,
 				`klang erklang ertönte hallte verhallte schallte dröhnte tönte erschallte widerhallte dudelte plärrte leierte klimperte perlte`

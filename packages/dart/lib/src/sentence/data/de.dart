@@ -367,6 +367,8 @@ final SentenceLanguageData de = SentenceLanguageData(
         WordTheme.tool,
         WordTheme.clothing,
         WordTheme.product,
+        WordTheme.toy,
+        WordTheme.furniture,
         WordTheme.gem,
         WordTheme.vehicle,
       ],
@@ -401,8 +403,8 @@ final SentenceLanguageData de = SentenceLanguageData(
     ),
     VerbGroup(
       field: VerbField.change,
-      subject: const <NounClass>[NounClass.thing],
-      subjectThemes: const <WordTheme>[WordTheme.music],
+      subject: const <NounClass>[NounClass.thing, NounClass.event],
+      subjectThemes: const <WordTheme>[WordTheme.music, WordTheme.sound],
       words: words(r'''
         klingt erklingt ertönt hallt verhallt schallt dröhnt tönt erschallt widerhallt dudelt plärrt
         leiert klimpert perlt

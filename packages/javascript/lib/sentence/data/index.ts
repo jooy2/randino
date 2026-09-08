@@ -30,6 +30,7 @@ export const THEME_CLASS: Record<WordTheme, NounClass> = {
 	animal: 'creature',
 	myth: 'creature',
 	job: 'person',
+	person: 'person',
 	plant: 'plant',
 	food: 'edible',
 	drink: 'edible',
@@ -39,6 +40,8 @@ export const THEME_CLASS: Record<WordTheme, NounClass> = {
 	product: 'thing',
 	gem: 'thing',
 	music: 'thing',
+	toy: 'thing',
+	furniture: 'thing',
 	vehicle: 'vehicle',
 	place: 'place',
 	nature: 'place',
@@ -46,6 +49,7 @@ export const THEME_CLASS: Record<WordTheme, NounClass> = {
 	weather: 'event',
 	sport: 'event',
 	time: 'event',
+	sound: 'event',
 	concept: 'idea',
 	emotion: 'idea',
 	finance: 'idea',
@@ -732,7 +736,7 @@ export const STORIES: readonly Story[] = [
 			{
 				kind: 'other',
 				actor: ['creature', 'person'],
-				actorThemes: ['animal', 'job'],
+				actorThemes: ['animal', 'job', 'person'],
 				field: ['move', 'rest', 'wait', 'sleep', 'express'],
 				link: 'temporal'
 			},
@@ -773,7 +777,7 @@ export const INTERLUDES: readonly StoryStep[] = [
 	{
 		kind: 'other',
 		actor: ['creature', 'person'],
-		actorThemes: ['animal', 'job'],
+		actorThemes: ['animal', 'job', 'person'],
 		field: ['move', 'express', 'wait', 'talk', 'play'],
 		needs: ['away'],
 		link: 'additive'

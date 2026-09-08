@@ -424,6 +424,8 @@ final SentenceLanguageData vi = SentenceLanguageData(
         WordTheme.tool,
         WordTheme.clothing,
         WordTheme.product,
+        WordTheme.toy,
+        WordTheme.furniture,
         WordTheme.gem,
         WordTheme.vehicle,
       ],
@@ -447,8 +449,8 @@ final SentenceLanguageData vi = SentenceLanguageData(
     ),
     VerbGroup(
       field: VerbField.change,
-      subject: const <NounClass>[NounClass.thing],
-      subjectThemes: const <WordTheme>[WordTheme.music],
+      subject: const <NounClass>[NounClass.thing, NounClass.event],
+      subjectThemes: const <WordTheme>[WordTheme.music, WordTheme.sound],
       words: words(r'''
         vang_lên vang vọng vang_vọng ngân ngân_vang ngân_nga văng_vẳng vọng_lại phát_ra cất_lên
         trỗi_dậy nổi_lên tắt_dần lịm_dần tan_dần dứt ngưng_bặt to_dần nhỏ_dần lặp_lại kéo_dài

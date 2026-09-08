@@ -360,7 +360,16 @@ export const VI: SentenceLanguageData = {
 			field: 'change',
 			subject: ['thing', 'vehicle'],
 			// What a thing one can hold does. A song is a thing of another kind, below.
-			subjectThemes: ['object', 'tool', 'clothing', 'product', 'gem', 'vehicle'],
+			subjectThemes: [
+				'object',
+				'tool',
+				'clothing',
+				'product',
+				'toy',
+				'furniture',
+				'gem',
+				'vehicle'
+			],
 			words: words(
 				`lung_lay lấp_lánh rơi lăn nghiêng cũ_đi sáng_lên lóe_sáng sáng_lấp_lánh đung_đưa đu_đưa lắc_lư rung rung_rinh chao_đảo trượt trượt_xuống rơi_xuống đổ đổ_xuống ngã lật lật_nhào lăn_xuống lăn_tròn quay xoay xoay_tròn dừng_lại đứng_yên di_chuyển dịch_chuyển phai_màu bạc_màu sờn mòn cũ_kỹ_đi phủ_bụi bám_bụi mờ_đi xỉn_màu biến_dạng cong cong_vênh bay_đi bay_lên nảy nảy_lên bật_lên run_rẩy rung_lắc`
 			)
@@ -376,9 +385,9 @@ export const VI: SentenceLanguageData = {
 		},
 		{
 			field: 'change',
-			subject: ['thing'],
+			subject: ['thing', 'event'],
 			// What a song or a drum does: it plays, rings out, dies away.
-			subjectThemes: ['music'],
+			subjectThemes: ['music', 'sound'],
 			words: words(
 				`vang_lên vang vọng vang_vọng ngân ngân_vang ngân_nga văng_vẳng vọng_lại phát_ra cất_lên trỗi_dậy nổi_lên tắt_dần lịm_dần tan_dần dứt ngưng_bặt to_dần nhỏ_dần lặp_lại kéo_dài tiếp_tục vấn_vương lan_tỏa lan_xa trầm_xuống bổng_lên vút_lên ngân_dài`
 			)

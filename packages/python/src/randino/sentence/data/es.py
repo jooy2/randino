@@ -703,7 +703,16 @@ ES = SentenceLanguageData(
         VerbGroup(
             field="change",
             subject=("thing", "vehicle"),
-            subject_themes=("object", "tool", "clothing", "product", "gem", "vehicle"),
+            subject_themes=(
+                "object",
+                "tool",
+                "clothing",
+                "product",
+                "toy",
+                "furniture",
+                "gem",
+                "vehicle",
+            ),
             words=words("""
                 se_mece reluce cae rueda se_inclina envejece brilla resplandece destella tiembla
                 vibra se_tambalea se_bambolea se_vuelca se_derrumba se_desliza resbala se_desploma
@@ -742,8 +751,8 @@ ES = SentenceLanguageData(
         ),
         VerbGroup(
             field="change",
-            subject=("thing",),
-            subject_themes=("music",),
+            subject=("thing", "event"),
+            subject_themes=("music", "sound"),
             words=words("""
                 suena resuena retumba flota se_eleva se_apaga se_desvanece se_extingue calla
                 se_detiene se_repite continúa sigue se_prolonga se_propaga se_extiende se_oye

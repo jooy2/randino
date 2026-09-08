@@ -13,8 +13,8 @@ Every option, every language and every example, with **JavaScript**, **Dart** or
 **randino** generates random text in the language you ask for: person names, nicknames, everyday words and whole sentences. One function per kind of text, one set of options, and a dataset per language.
 
 - **Person names** read like names people carry: Emma Clover, Jack Reeves, each with its English pronunciation. 9 languages.
-- **Nicknames** are handles for a game or a website: MistyOwl, CraneVoyage, RustyBoot. Built from everyday words across twenty-five themes and never from person names, they run to over forty million combinations in Korean and in English before a random suffix is added.
-- **Words** are those twenty-five themes on their own: `randWord`, and a function per theme, from `randAnimal` and `randFood` to `randGem`.
+- **Nicknames** are handles for a game or a website: MistyOwl, CraneVoyage, RustyBoot. Built from everyday words across twenty-nine themes and never from person names, they run to over forty million combinations in Korean and in English before a random suffix is added.
+- **Words** are those twenty-nine themes on their own: `randWord`, and a function per theme, from `randAnimal` and `randFood` to `randGem`.
 - **Sentences** are whole statements in the language's own grammar, from `randSentence`. A verb states what can do it and what it can be done to, so the words of one sentence belong together: 여우가 사과를 먹는다, The brave lion runs quietly.
 - **Decorators** attach something to a string you already have rather than generating one: a random token with `randSuffix` and `randPrefix`, a word with `randModifier`.
 - One options set per generator: language, length, count, a `realism` setting that goes from real words to fully invented ones, and a `vocabulary` setting that keeps to the everyday words.
@@ -134,7 +134,7 @@ A sentence is the one place where a language can be narrower than the others. Ea
 
 Each generator returns strings by default, or one detail object per result with <code>output: 'detail'</code>: both scripts of a name, or the words a nickname was built from. The Dart package spells that as a second function (`randNameDetails`), because Dart has no way to make one function's return type depend on an argument.
 
-The full option tables, the twenty-five word themes and the romanization rules are on the [documentation site](https://randino.cdget.com).
+The full option tables, the twenty-nine word themes and the romanization rules are on the [documentation site](https://randino.cdget.com).
 
 ## Repository layout
 

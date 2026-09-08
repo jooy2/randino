@@ -10,20 +10,24 @@ from randino.word.rand_drink import rand_drink
 from randino.word.rand_emotion import rand_emotion
 from randino.word.rand_finance import rand_finance
 from randino.word.rand_food import rand_food
+from randino.word.rand_furniture import rand_furniture
 from randino.word.rand_gem import rand_gem
 from randino.word.rand_job import rand_job
 from randino.word.rand_music import rand_music
 from randino.word.rand_myth import rand_myth
 from randino.word.rand_nature import rand_nature
 from randino.word.rand_object import rand_object
+from randino.word.rand_person import rand_person
 from randino.word.rand_place import rand_place
 from randino.word.rand_plant import rand_plant
 from randino.word.rand_product import rand_product
+from randino.word.rand_sound import rand_sound
 from randino.word.rand_space import rand_space
 from randino.word.rand_sport import rand_sport
 from randino.word.rand_tech import rand_tech
 from randino.word.rand_time import rand_time
 from randino.word.rand_tool import rand_tool
+from randino.word.rand_toy import rand_toy
 from randino.word.rand_vehicle import rand_vehicle
 from randino.word.rand_weather import rand_weather
 from randino.word.rand_word import rand_word
@@ -41,20 +45,24 @@ __all__ = [
     "rand_emotion",
     "rand_finance",
     "rand_food",
+    "rand_furniture",
     "rand_gem",
     "rand_job",
     "rand_music",
     "rand_myth",
     "rand_nature",
     "rand_object",
+    "rand_person",
     "rand_place",
     "rand_plant",
     "rand_product",
+    "rand_sound",
     "rand_space",
     "rand_sport",
     "rand_tech",
     "rand_time",
     "rand_tool",
+    "rand_toy",
     "rand_vehicle",
     "rand_weather",
     "rand_word",

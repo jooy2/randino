@@ -1104,6 +1104,8 @@ final SentenceLanguageData ja = SentenceLanguageData(
         WordTheme.tool,
         WordTheme.clothing,
         WordTheme.product,
+        WordTheme.toy,
+        WordTheme.furniture,
         WordTheme.gem,
         WordTheme.vehicle,
       ],
@@ -1159,8 +1161,8 @@ final SentenceLanguageData ja = SentenceLanguageData(
     ),
     VerbGroup(
       field: VerbField.change,
-      subject: const <NounClass>[NounClass.thing],
-      subjectThemes: const <WordTheme>[WordTheme.music],
+      subject: const <NounClass>[NounClass.thing, NounClass.event],
+      subjectThemes: const <WordTheme>[WordTheme.music, WordTheme.sound],
       words: words(r'''
         響く 鳴る 流れる 響き渡る 聞こえてくる 止まる 静まる 消えていく 高まる 弱まる 繰り返す 漂う 反響する 鳴り響く 続く 始まる 終わる 沈む 広がる 満ちる
       '''),

@@ -26,11 +26,11 @@ features:
     link: /name/
     linkText: Person names
   - title: Nicknames from everyday words
-    details: A modifier and a noun, across twenty-five themes. Person names are never used, so a handle never reads as somebody's.
+    details: A modifier and a noun, across twenty-nine themes. Person names are never used, so a handle never reads as somebody's.
     link: /nickname/
     linkText: Nicknames
   - title: Words by theme
-    details: Animals, food and gems through to weather and feelings, twenty-five themes with a function each. randAnimal, randFood, randGem.
+    details: Animals, food and gems through to weather and feelings, twenty-nine themes with a function each. randAnimal, randFood, randGem.
     link: /word/rand-word
     linkText: randWord
   - title: Sentences with grammar
@@ -180,4 +180,4 @@ There are no network calls and no data files to set up. The same code runs on a 
 - [**Demo**](./demo) — change the options in your browser and watch the output.
 - [**Supported languages**](./guide/languages) — what each of the nine can do.
 - [**Person names**](./name/) and [**Nicknames**](./nickname/) — what each option does to the output.
-- [**Themes**](./word/themes) — the twenty-five of them, and the words each one holds.
+- [**Themes**](./word/themes) — the twenty-nine of them, and the words each one holds.

@@ -8,18 +8,18 @@ What keeps the words of one sentence together is the verb. Every verb states whi
 
 So `여우가 사과를 먹는다` is a sentence the generator can build and `여우가 철학을 먹는다` is not: `먹는다` accepts something edible and nothing else.
 
-No noun carries a tag for this. The twenty-five [themes](../word/themes) already say what a word is, so each theme maps to one **noun class**, the same way in every language:
+No noun carries a tag for this. The twenty-nine [themes](../word/themes) already say what a word is, so each theme maps to one **noun class**, the same way in every language:
 
 | Class      | Themes                                                  |
 | ---------- | ------------------------------------------------------- |
 | `creature` | `animal`, `myth`                                        |
-| `person`   | `job`                                                   |
+| `person`   | `job`, `person`                                         |
 | `plant`    | `plant`                                                 |
 | `edible`   | `food`, `drink`                                         |
-| `thing`    | `object`, `tool`, `clothing`, `product`, `gem`, `music` |
+| `thing`    | `object`, `tool`, `clothing`, `product`, `gem`, `music`, `toy`, `furniture` |
 | `vehicle`  | `vehicle`                                               |
 | `place`    | `place`, `nature`, `space`                              |
-| `event`    | `weather`, `sport`, `time`                              |
+| `event`    | `weather`, `sport`, `time`, `sound`                     |
 | `idea`     | `concept`, `emotion`, `finance`, `tech`, `color`        |
 | `body`     | `body`                                                  |
 

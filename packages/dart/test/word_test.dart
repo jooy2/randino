@@ -19,7 +19,7 @@ final Map<WordLanguage, RegExp> script = <WordLanguage, RegExp>{
   WordLanguage.ru: RegExp(r'^[\u0400-\u04FF]+(?: [\u0400-\u04FF]+)*$'),
 };
 
-/// The themed generator for each theme, which is what the seventeen of them are.
+/// The themed generator for each theme, which is what the twenty-nine of them are.
 final Map<WordTheme, List<String> Function({WordLanguage? language, int count})>
 themed = <WordTheme, List<String> Function({WordLanguage? language, int count})>{
   WordTheme.animal:
@@ -72,6 +72,14 @@ themed = <WordTheme, List<String> Function({WordLanguage? language, int count})>
       ({WordLanguage? language, int count = 1}) => randTool(language: language, count: count),
   WordTheme.drink:
       ({WordLanguage? language, int count = 1}) => randDrink(language: language, count: count),
+  WordTheme.toy:
+      ({WordLanguage? language, int count = 1}) => randToy(language: language, count: count),
+  WordTheme.sound:
+      ({WordLanguage? language, int count = 1}) => randSound(language: language, count: count),
+  WordTheme.person:
+      ({WordLanguage? language, int count = 1}) => randPerson(language: language, count: count),
+  WordTheme.furniture:
+      ({WordLanguage? language, int count = 1}) => randFurniture(language: language, count: count),
 };
 
 List<String> poolOf(WordLanguage language, [WordTheme? theme]) {

@@ -43,7 +43,7 @@ const strings = {
 	languageSelect: { ko: '언어 선택', en: 'Select a language' },
 	/** Inside the home page's picker, on whichever card is the current choice. */
 	languageCurrent: { ko: '선택됨', en: 'Selected' },
-	/* `WordOptions.vue` — the table `randWord` and its twenty-five themed forms share.
+	/* `WordOptions.vue` — the table `randWord` and its twenty-nine themed forms share.
 	   The option names themselves are not here, by the rule above; what is left is
 	   the column headings and one sentence per option. */
 	optionName: { ko: '옵션', en: 'Option' },

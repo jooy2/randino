@@ -220,7 +220,7 @@ rand_nickname(language="en", theme="gem", count=3)
 
 :::
 
-25개 테마와 각 테마가 담고 있는 것은 [테마](../word/themes)에 있습니다.
+29개 테마와 각 테마가 담고 있는 것은 [테마](../word/themes)에 있습니다.
 
 ### 형태 고르기 {#picking-the-shape}
 
@@ -562,5 +562,5 @@ for detail in rand_nickname(language="en", count=100, output="detail"):
 ## 함께 보기
 
 - [`randSuffix`](../decorate/rand-suffix) — 닉네임이 겹치면 안 될 때 붙이는 무작위 토큰.
-- [테마](../word/themes) — 닉네임을 만드는 25개 어휘 묶음.
+- [테마](../word/themes) — 닉네임을 만드는 29개 어휘 묶음.
 - [`nicknameLengthRange`](./nickname-length-range) — 각 언어가 만들 수 있는 모든 길이.

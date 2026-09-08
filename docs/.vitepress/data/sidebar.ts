@@ -19,13 +19,13 @@
  * decides nothing but its URL.
  *
  * **Generators** is the one that goes a level deeper, into **General** — the
- * four that generate a kind of text — and **Words**, the twenty-five themed forms
- * of `randWord`. Twenty-nine entries in one list would bury the four, and the
- * twenty-five are `randWord` with its argument decided rather than twenty-five
+ * four that generate a kind of text — and **Words**, the twenty-nine themed forms
+ * of `randWord`. Thirty-three entries in one list would bury the four, and the
+ * twenty-nine are `randWord` with its argument decided rather than twenty-nine
  * separate ideas, so they sit beside the four rather than among them.
  *
  * Words is also the one group the navbar's API dropdown leaves out, which it
- * says itself with `sidebarOnly`: twenty-five names for one function is a wall in
+ * says itself with `sidebarOnly`: twenty-nine names for one function is a wall in
  * a menu, and the dropdown already points at the function they all are.
  *
  * **Behaviour** holds the prose explaining how a generator's options behave,
@@ -55,7 +55,7 @@ export interface SidebarGroup {
 	/**
 	 * Kept out of the navbar's dropdown, pages and all. For a group that is long
 	 * enough to be a wall in a menu while still being worth a place in the
-	 * sidebar — **Words**, the twenty-five themed forms of one function, is why this
+	 * sidebar — **Words**, the twenty-nine themed forms of one function, is why this
 	 * exists.
 	 */
 	sidebarOnly?: boolean;
@@ -125,7 +125,11 @@ export const SIDEBAR: SidebarGroup[] = [
 							{ path: 'word/rand-body', en: 'randBody', ko: 'randBody' },
 							{ path: 'word/rand-clothing', en: 'randClothing', ko: 'randClothing' },
 							{ path: 'word/rand-tool', en: 'randTool', ko: 'randTool' },
-							{ path: 'word/rand-drink', en: 'randDrink', ko: 'randDrink' }
+							{ path: 'word/rand-drink', en: 'randDrink', ko: 'randDrink' },
+							{ path: 'word/rand-toy', en: 'randToy', ko: 'randToy' },
+							{ path: 'word/rand-sound', en: 'randSound', ko: 'randSound' },
+							{ path: 'word/rand-person', en: 'randPerson', ko: 'randPerson' },
+							{ path: 'word/rand-furniture', en: 'randFurniture', ko: 'randFurniture' }
 						]
 					}
 				]

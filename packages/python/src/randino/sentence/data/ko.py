@@ -1244,6 +1244,8 @@ KO = SentenceLanguageData(
                 "tool",
                 "clothing",
                 "product",
+                "toy",
+                "furniture",
                 "gem",
                 "plant",
                 "food",
@@ -1378,6 +1380,8 @@ KO = SentenceLanguageData(
                 "tool",
                 "clothing",
                 "product",
+                "toy",
+                "furniture",
                 "gem",
                 "plant",
                 "food",
@@ -1439,6 +1443,8 @@ KO = SentenceLanguageData(
                 "tool",
                 "clothing",
                 "product",
+                "toy",
+                "furniture",
                 "gem",
                 "plant",
                 "food",
@@ -1507,6 +1513,8 @@ KO = SentenceLanguageData(
                 "tool",
                 "clothing",
                 "product",
+                "toy",
+                "furniture",
                 "gem",
                 "plant",
                 "food",
@@ -1572,6 +1580,8 @@ KO = SentenceLanguageData(
                 "tool",
                 "clothing",
                 "product",
+                "toy",
+                "furniture",
                 "gem",
                 "plant",
                 "food",
@@ -1642,6 +1652,8 @@ KO = SentenceLanguageData(
                 "tool",
                 "clothing",
                 "product",
+                "toy",
+                "furniture",
                 "gem",
                 "plant",
                 "food",
@@ -1744,7 +1756,16 @@ KO = SentenceLanguageData(
             field="make",
             subject=("person",),
             object=("thing", "vehicle"),
-            object_themes=("object", "tool", "clothing", "product", "gem", "vehicle"),
+            object_themes=(
+                "object",
+                "tool",
+                "clothing",
+                "product",
+                "toy",
+                "furniture",
+                "gem",
+                "vehicle",
+            ),
             words=words("""
                 만든다 짓는다 빚는다 그린다 엮는다 만들어낸다 완성한다 꾸민다 빚어낸다 손수만든다 창작한다 그려낸다 장식한다 세운다 쌓는다 새긴다 이어붙인다 짠다 뜬다
                 매듭짓는다
@@ -1850,7 +1871,16 @@ KO = SentenceLanguageData(
             field="tend",
             subject=("person",),
             object=("thing", "vehicle"),
-            object_themes=("object", "tool", "clothing", "product", "gem", "vehicle"),
+            object_themes=(
+                "object",
+                "tool",
+                "clothing",
+                "product",
+                "toy",
+                "furniture",
+                "gem",
+                "vehicle",
+            ),
             words=words("""
                 고친다 닦는다 손질한다 다듬는다 정리한다 매만진다 수리한다 손본다 씻는다 문지른다 턴다 닦아낸다 윤낸다 광낸다 조인다 기름친다 정돈한다 관리한다 돌본다
                 보수한다 점검한다 헹군다 말린다
@@ -1911,7 +1941,16 @@ KO = SentenceLanguageData(
             field="sell",
             subject=("person",),
             object=("thing", "vehicle"),
-            object_themes=("object", "tool", "clothing", "product", "gem", "vehicle"),
+            object_themes=(
+                "object",
+                "tool",
+                "clothing",
+                "product",
+                "toy",
+                "furniture",
+                "gem",
+                "vehicle",
+            ),
             words=words("""
                 판다 넘긴다 건넨다 내놓는다 판매한다 처분한다 팔아치운다 내다판다 팔아넘긴다 넘겨준다 건네준다 거래한다 진열한다 늘어놓는다 값을매긴다
             """),
@@ -1968,6 +2007,8 @@ KO = SentenceLanguageData(
                 "tool",
                 "clothing",
                 "product",
+                "toy",
+                "furniture",
                 "gem",
                 "vehicle",
                 "food",
@@ -2469,7 +2510,16 @@ KO = SentenceLanguageData(
         VerbGroup(
             field="change",
             subject=("thing", "vehicle"),
-            subject_themes=("object", "tool", "clothing", "product", "gem", "vehicle"),
+            subject_themes=(
+                "object",
+                "tool",
+                "clothing",
+                "product",
+                "toy",
+                "furniture",
+                "gem",
+                "vehicle",
+            ),
             words=words("""
                 흔들린다 반짝인다 떨어진다 굴러간다 기울어진다 낡아간다 빛난다 닳는다 빛바랜다 흔들거린다 넘어진다 날아간다 미끄러진다 튀어오른다 돈다 멈춘다 놓인다
                 흔들흔들한다
@@ -2573,8 +2623,8 @@ KO = SentenceLanguageData(
         ),
         VerbGroup(
             field="change",
-            subject=("thing",),
-            subject_themes=("music",),
+            subject=("thing", "event"),
+            subject_themes=("music", "sound"),
             words=words("""
                 울린다 흐른다 퍼진다 잦아든다 이어진다 울려퍼진다 들려온다 멈춘다 잠잠해진다 메아리친다 감돈다 흘러나온다 반복된다 가라앉는다 커진다
             """),
@@ -3429,7 +3479,16 @@ KO = SentenceLanguageData(
         ),
         StateGroup(
             subject=("thing", "vehicle"),
-            subject_themes=("object", "tool", "clothing", "product", "gem", "vehicle"),
+            subject_themes=(
+                "object",
+                "tool",
+                "clothing",
+                "product",
+                "toy",
+                "furniture",
+                "gem",
+                "vehicle",
+            ),
             words=words("""
                 단단하다 가볍다 무겁다 매끈하다 투명하다 튼튼하다 반들반들하다 낡다 두껍다 얇다 둥글다 뾰족하다 납작하다 화려하다 투박하다 정교하다 값비싸다 길쭉하다
             """),
@@ -3478,8 +3537,8 @@ KO = SentenceLanguageData(
             ),
         ),
         StateGroup(
-            subject=("thing",),
-            subject_themes=("music",),
+            subject=("thing", "event"),
+            subject_themes=("music", "sound"),
             words=words(
                 "잔잔하다 경쾌하다 구슬프다 감미롭다 흥겹다 웅장하다 애절하다 은은하다 청아하다 우렁차다 나직하다"
             ),

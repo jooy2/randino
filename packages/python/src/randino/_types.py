@@ -105,6 +105,10 @@ WordTheme = Literal[
     "clothing",
     "tool",
     "drink",
+    "toy",
+    "sound",
+    "person",
+    "furniture",
 ]
 """What a word is about.
 
@@ -112,8 +116,9 @@ Animals (`사자`), everyday things (`물병`), nature and its phenomena (`노�
 (`민들레`), stones and metals (`흑요석`), ideas from the humanities and social world
 (`철학`), creatures out of myth (`구미호`), the trades and roles people hold
 (`대장장이`), music (`교향곡`), places (`광장`), food (`떡볶이`), sports (`양궁`),
-things that carry you (`열기구`), or things you buy (`이어폰`). Person names are
-never used.
+things that carry you (`열기구`), things you buy (`이어폰`), toys and games (`팽이`),
+sounds (`속삭임`), people by age and kinship (`꼬마`), or furniture (`요람`). Person
+names are never used.
 
 Each one is also a generator of its own — `"animal"` is `rand_animal`.
 """
