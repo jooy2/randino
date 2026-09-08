@@ -641,6 +641,14 @@ class Draw:
     than rolling `식습니다` three times in four lines.
     """
 
+    described: frozenset[str]
+    """The nouns the result has already described.
+
+    A noun is described once: `반듯한 소쿠리 … 소중한 소쿠리 … 예쁜 소쿠리` is three baskets
+    rather than one, and the pinned nouns of a story are not the only ones a telling
+    draws twice.
+    """
+
     follow: "Follow | None"
     tense: SentenceTense
     """The tense every sentence of the result is in."""
@@ -1979,6 +1987,8 @@ class Phrase:
     text: str
     noun: str
     theme: WordTheme | None
+    modified: bool
+    """Whether a modifier was written in front of the noun, or behind it."""
 
 
 @dataclass(frozen=True, slots=True)
@@ -1993,6 +2003,9 @@ class Built:
 
     used: tuple[str, ...]
     """The predicates and adverbials it used, in their plain form."""
+
+    described: tuple[str, ...]
+    """The nouns it wrote a modifier in front of, for a later sentence to leave alone."""
 
     type: SentenceType
     """What this sentence is doing."""
@@ -2099,6 +2112,7 @@ def _noun_phrase(
     described: WordTheme | None,
     only: WordPool | None = None,
     vocabulary: RandVocabulary = "full",
+    settled: frozenset[str] | set[str] = frozenset(),
 ) -> Phrase:
     """Build one noun phrase: an article, the noun, and a modifier where there is room.
 
@@ -2108,7 +2122,8 @@ def _noun_phrase(
     leaves over is what the modifier is drawn to fit. `count` is what a counted phrase
     writes beside its noun, on the side the language puts it. `described` is the theme
     the modifier is chosen for, which is the noun's own — or None for a word no pool
-    holds, which takes any modifier the language has.
+    holds, which takes any modifier the language has. `settled` is the nouns the result
+    has already described, which are written bare however they come round again.
     """
     lexicon = WORD_DATA[language]
     # `only` is the nouns the group has narrowed the subject to: a flier for a verb that
@@ -2130,8 +2145,11 @@ def _noun_phrase(
     )
     gender = gender_of(lexicon, _as_pool(lexicon, drawn))
     parts = [drawn]
+    # The budget reserved room for a modifier, and a noun the result has already
+    # described gives it back rather than being described a second time.
+    modified = modify and drawn not in settled
 
-    if modify:
+    if modified:
         room = high - overhead - len(drawn) - space
         want = low - overhead - len(drawn) - space
         agreed = _modifiers_for(language, described, gender)
@@ -2175,6 +2193,7 @@ def _noun_phrase(
         theme
         if any(_plain(lexicon, entry) == drawn for entry in pool)
         else theme_of(lexicon, _as_pool(lexicon, drawn)),
+        modified,
     )
 
 
@@ -2784,6 +2803,10 @@ def _compose(
     slots: list[SentenceSlot] = []
     names: list[str] = []
     spent: list[str] = []
+    # The nouns the result has described, this sentence's own among them: two phrases of
+    # one sentence describe one noun no more than two sentences do.
+    settled = set(draw.described)
+    described_nouns: list[str] = []
     drawn: dict[SentenceSlot, Phrase] = {}
     subject: Phrase | None = None
     named = False
@@ -2940,8 +2963,13 @@ def _compose(
                         else None
                     )
                 ),
+                settled=settled,
             )
             phrase = built.text
+
+            if built.modified:
+                settled.add(built.noun)
+                described_nouns.append(built.noun)
 
             # A place takes the preposition it takes — `on the balcony`, `at the market`,
             # `under the sky` — where the language says so, and the frame's own otherwise.
@@ -3068,6 +3096,7 @@ def _compose(
         tuple(slots),
         tuple(names),
         tuple(spent),
+        tuple(described_nouns),
         draw.type,
         None if named else (subject.theme if subject is not None else None),
         subject_word,
@@ -3582,6 +3611,7 @@ class Telling:
     shortest: int
     flow: Flow
     spent: set[str]
+    described: set[str]
     voice: SentenceStyle
     tense: SentenceTense
 
@@ -3656,7 +3686,17 @@ def _generate_result(language: WordLanguage, settings: Settings) -> Result:
         # What one telling of the result says as it goes. Fresh for every telling,
         # because a story told again starts over.
         return Telling(
-            language, data, settled, budgets, room, shortest, Flow(), set(), voice, tense
+            language,
+            data,
+            settled,
+            budgets,
+            room,
+            shortest,
+            Flow(),
+            set(),
+            set(),
+            voice,
+            tense,
         )
 
     # More than one sentence is a story, when the language can tell one about the
@@ -3689,6 +3729,7 @@ def _generate_result(language: WordLanguage, settings: Settings) -> Result:
     paragraph = telling()
     flow = paragraph.flow
     spent = paragraph.spent
+    described = paragraph.described
 
     built: list[Built] = []
     topic: Topic | None = None
@@ -3707,6 +3748,7 @@ def _generate_result(language: WordLanguage, settings: Settings) -> Result:
             _opener_for(data, mark, follow, budget[1], shortest, flow),
             _style_for(type_, settings.style, voice),
             frozenset(spent),
+            frozenset(described),
             follow,
             tense,
             None,
@@ -3725,6 +3767,7 @@ def _generate_result(language: WordLanguage, settings: Settings) -> Result:
         built.append(one)
         scene = one.scene
         spent.update(one.used)
+        described.update(one.described)
         flow.run = flow.run + 1 if type_ == flow.last else 1
         flow.last = type_
         flow.mark = mark
@@ -4150,6 +4193,7 @@ def _tell_story(telling: Telling) -> Result | None:
                 (),
                 (),
                 (),
+                (),
                 "dialogue",
                 None,
                 None,
@@ -4390,6 +4434,7 @@ def _tell_story(telling: Telling) -> Result | None:
             ),
             style,
             frozenset(telling.spent),
+            frozenset(telling.described),
             follow,
             # A line says now what is true, and reports in the past what was just done;
             # a remark, a question and what is noticed are about now.
@@ -4503,6 +4548,7 @@ def _tell_story(telling: Telling) -> Result | None:
                 roles.item = Requirement(met, ("object",), known=False, bare=True, settled=True)
 
         telling.spent.update(one.used)
+        telling.described.update(one.described)
         placed = (
             scene
             or "place" in one.scene
@@ -4629,6 +4675,7 @@ def _join_clauses(data: SentenceLanguageData, first: Built, second: Built) -> Bu
         (*first.slots, *second.slots),
         (*first.names, *second.names),
         (*first.used, *second.used),
+        (*first.described, *second.described),
         second.type,
         first.theme,
         first.subject if first.subject is not None else second.subject,

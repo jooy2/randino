@@ -517,6 +517,7 @@ class _Draw {
     required this.opener,
     required this.style,
     required this.avoid,
+    required this.described,
     required this.follow,
     required this.tense,
     required this.beat,
@@ -552,6 +553,13 @@ class _Draw {
   /// cannot always be honoured — what it does is spend the group before it starts
   /// over, rather than rolling `식습니다` three times in four lines.
   final Set<String> avoid;
+
+  /// The nouns the result has already described.
+  ///
+  /// A noun is described once: `반듯한 소쿠리 … 소중한 소쿠리 … 예쁜 소쿠리` is three
+  /// baskets rather than one, and the pinned nouns of a story are not the only
+  /// ones a telling draws twice.
+  final Set<String> described;
   final _Follow? follow;
 
   /// The tense every sentence of the result is in.
@@ -600,6 +608,7 @@ class _Draw {
     opener: opener ?? this.opener,
     style: style,
     avoid: avoid,
+    described: described,
     follow: keepFollow ? (follow ?? this.follow) : follow,
     tense: tense,
     beat: beat,
@@ -1912,11 +1921,14 @@ class _Named {
 }
 
 class _Phrase {
-  const _Phrase(this.text, this.noun, this.theme);
+  const _Phrase(this.text, this.noun, this.theme, this.modified);
 
   final String text;
   final String noun;
   final WordTheme? theme;
+
+  /// Whether a modifier was written in front of the noun, or behind it.
+  final bool modified;
 }
 
 class _Built {
@@ -1926,6 +1938,7 @@ class _Built {
     this.slots,
     this.names,
     this.used,
+    this.described,
     this.type,
     this.theme,
     this.subject,
@@ -1946,6 +1959,10 @@ class _Built {
 
   /// The predicates and adverbials it used, in their plain form.
   final List<String> used;
+
+  /// The nouns it wrote a modifier in front of, for a later sentence to leave
+  /// alone.
+  final List<String> described;
 
   /// What this sentence is doing.
   final SentenceType type;
@@ -2035,6 +2052,9 @@ _Phrase _nounPhrase(
   // verb that takes off. The theme's whole pool otherwise.
   WordPool? only,
   RandVocabulary vocabulary = RandVocabulary.full,
+  // The nouns the result has already described, which are written bare however
+  // they come round again.
+  Set<String> settled = const <String>{},
 }) {
   final lexicon = wordData[language]!;
   final pool = only ?? _nounsOf(language, theme, vocabulary);
@@ -2052,8 +2072,11 @@ _Phrase _nounPhrase(
       _plain(lexicon, drawWord(lexicon, pool, invent, low < high ? low : high, high, prefix).word);
   final gender = genderOf(lexicon, _asPool(lexicon, drawn));
   final parts = <String>[drawn];
+  // The budget reserved room for a modifier, and a noun the result has already
+  // described gives it back rather than being described a second time.
+  final modified = modify && !settled.contains(drawn);
 
-  if (modify) {
+  if (modified) {
     final room = max - overhead - drawn.length - space;
     final want = min - overhead - drawn.length - space;
     final agreed = _modifiersFor(language, described, gender);
@@ -2104,6 +2127,7 @@ _Phrase _nounPhrase(
     pool.any((entry) => _plain(lexicon, entry) == drawn)
         ? theme
         : themeOf(lexicon, _asPool(lexicon, drawn)),
+    modified,
   );
 }
 
@@ -2536,6 +2560,10 @@ _Built _compose(
   final slots = <SentenceSlot>[];
   final names = <String>[];
   final spent = <String>[];
+  // The nouns the result has described, this sentence's own among them: two
+  // phrases of one sentence describe one noun no more than two sentences do.
+  final settled = <String>{...draw.described};
+  final describedNouns = <String>[];
   final drawn = <SentenceSlot, _Phrase>{};
   _Phrase? subject;
   var named = false;
@@ -2689,9 +2717,15 @@ _Built _compose(
                 ? _placePoolFor(language, data, theme, settings.vocabulary)
                 : null,
         vocabulary: settings.vocabulary,
+        settled: settled,
       );
 
       phrase = built.text;
+
+      if (built.modified) {
+        settled.add(built.noun);
+        describedNouns.add(built.noun);
+      }
 
       // A place takes the preposition it takes — `on the balcony`, `at the
       // market`, `under the sky` — where the language says so, and the frame's
@@ -2821,6 +2855,7 @@ _Built _compose(
     slots,
     names,
     spent,
+    describedNouns,
     draw.type,
     named ? null : subject?.theme,
     carried,
@@ -3738,6 +3773,7 @@ class _Telling {
     required this.shortest,
     required this.flow,
     required this.spent,
+    required this.described,
     required this.voice,
     required this.tense,
   });
@@ -3751,6 +3787,7 @@ class _Telling {
   final int shortest;
   final _Flow flow;
   final Set<String> spent;
+  final Set<String> described;
   final SentenceStyle voice;
   final SentenceTense tense;
 }
@@ -3842,6 +3879,7 @@ _Result _generateResult(WordLanguage language, _Settings settings) {
     shortest: shortest,
     flow: _Flow(),
     spent: <String>{},
+    described: <String>{},
     voice: voice,
     tense: tense,
   );
@@ -3876,6 +3914,7 @@ _Result _generateResult(WordLanguage language, _Settings settings) {
   final paragraph = telling();
   final flow = paragraph.flow;
   final spent = paragraph.spent;
+  final described = paragraph.described;
 
   final built = <_Built>[];
   _Topic? topic;
@@ -3907,6 +3946,7 @@ _Result _generateResult(WordLanguage language, _Settings settings) {
       opener: _openerFor(data, mark, follow, budget.max, shortest, flow),
       style: _styleFor(type, settled.style, voice),
       avoid: spent,
+      described: described,
       follow: follow,
       tense: tense,
       beat: null,
@@ -3920,6 +3960,7 @@ _Result _generateResult(WordLanguage language, _Settings settings) {
     built.add(one);
     scene = one.scene;
     spent.addAll(one.used);
+    described.addAll(one.described);
     flow.run = type == flow.last ? flow.run + 1 : 1;
     flow.last = type;
     flow.mark = mark;
@@ -4383,6 +4424,7 @@ _Result? _tellStory(_Telling telling) {
         const <SentenceSlot>[],
         const <String>[],
         const <String>[],
+        const <String>[],
         SentenceType.dialogue,
         null,
         null,
@@ -4657,6 +4699,7 @@ _Result? _tellStory(_Telling telling) {
               ),
       style: style,
       avoid: telling.spent,
+      described: telling.described,
       follow: follow,
       // A line says now what is true, and reports in the past what was just
       // done; a remark, a question and what is noticed are about now.
@@ -4816,6 +4859,7 @@ _Result? _tellStory(_Telling telling) {
     }
 
     telling.spent.addAll(one.used);
+    telling.described.addAll(one.described);
     placed =
         scene ||
         one.scene.containsKey(SentenceSlot.place) ||
@@ -4956,6 +5000,7 @@ _Built _joinClauses(SentenceLanguageData data, _Built first, _Built second) {
     <SentenceSlot>[...first.slots, ...second.slots],
     <String>[...first.names, ...second.names],
     <String>[...first.used, ...second.used],
+    <String>[...first.described, ...second.described],
     second.type,
     first.theme,
     first.subject ?? second.subject,

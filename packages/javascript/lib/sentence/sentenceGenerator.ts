@@ -444,6 +444,12 @@ type Draw = {
 	 * starts over, rather than rolling `식습니다` three times in four lines.
 	 */
 	avoid: ReadonlySet<string>;
+	/**
+	 * The nouns the result has already described. A noun is described once: `반듯한
+	 * 소쿠리 … 소중한 소쿠리 … 예쁜 소쿠리` is three baskets rather than one, and the
+	 * pinned nouns of a story are not the only ones a telling draws twice.
+	 */
+	described: ReadonlySet<string>;
 	follow: Follow | null;
 	/** The tense every sentence of the result is in. */
 	tense: SentenceTense;
@@ -1780,7 +1786,13 @@ function stateGroupsFor(
 /* --- Building one sentence ------------------------------------------------- */
 
 /** One noun phrase, and the noun it was built around. */
-type Phrase = { text: string; noun: string; theme: WordTheme | null };
+type Phrase = {
+	text: string;
+	noun: string;
+	theme: WordTheme | null;
+	/** Whether a modifier was written in front of the noun, or behind it. */
+	modified: boolean;
+};
 
 type Built = {
 	sentence: string;
@@ -1797,6 +1809,8 @@ type Built = {
 	names: string[];
 	/** The predicates and adverbials it used, in their plain form. */
 	used: string[];
+	/** The nouns it wrote a modifier in front of, for a later sentence to leave alone. */
+	described: string[];
 	/**
 	 * The nouns this sentence put on the page that a later one keeps: where it is
 	 * happening, and what it is about beside its subject. A paragraph whose place
@@ -1878,7 +1892,10 @@ function nounPhrase(
 	// The nouns to draw from, when the group has narrowed them: a flier for a verb
 	// that takes off. The theme's whole pool otherwise, as common as was asked.
 	only: WordPool | null = null,
-	vocabulary: RandVocabulary = 'full'
+	vocabulary: RandVocabulary = 'full',
+	// The nouns the result has already described, which are written bare however
+	// they come round again.
+	settled: ReadonlySet<string> = new Set()
 ): Phrase {
 	const wordData = WORD_DATA[language];
 	const pool = only ?? nounsOf(language, theme, vocabulary);
@@ -1897,8 +1914,11 @@ function nounPhrase(
 		plain(wordData, drawWord(wordData, pool, invent, Math.min(low, high), high, prefix).word);
 	const gender = genderOf(wordData, capitalizeAsPool(wordData, drawn));
 	const parts = [drawn];
+	// The budget reserved room for a modifier, and a noun the result has already
+	// described gives it back rather than being described a second time.
+	const modified = modify && !settled.has(drawn);
 
-	if (modify) {
+	if (modified) {
 		const room = max - overhead - drawn.length - space;
 		const want = min - overhead - drawn.length - space;
 		const agreed = modifiersFor(language, described, gender);
@@ -1941,6 +1961,7 @@ function nounPhrase(
 	return {
 		text: written,
 		noun: drawn,
+		modified,
 		// Compared in the form the sentence writes rather than the form the pool
 		// stores, which is the same word for every language but English.
 		theme: pool.some((entry) => plain(wordData, entry) === drawn)
@@ -2565,6 +2586,10 @@ function compose(
 	// The predicates and adverbials this sentence spends, for the next one to leave
 	// alone.
 	const spent: string[] = [];
+	// The nouns the result has described, this sentence's own among them: two
+	// phrases of one sentence describe one noun no more than two sentences do.
+	const settled = new Set(draw.described);
+	const described: string[] = [];
 	// The noun phrases this sentence drew for the slots a later one keeps.
 	const drawn = new Map<SentenceSlot, Phrase>();
 	let subject: Phrase | undefined;
@@ -2719,10 +2744,16 @@ function compose(
 						: part.slot === 'place' || part.slot === 'destination'
 							? placePoolFor(language, data, theme, settings.vocabulary)
 							: null,
-				settings.vocabulary
+				settings.vocabulary,
+				settled
 			);
 
 			phrase = built.text;
+
+			if (built.modified) {
+				settled.add(built.noun);
+				described.push(built.noun);
+			}
 
 			// A place takes the preposition it takes — `on the balcony`, `at the
 			// market`, `under the sky` — where the language says so, and the frame's
@@ -2875,6 +2906,7 @@ function compose(
 		slots,
 		names,
 		used: spent,
+		described,
 		type: draw.type,
 		scene,
 		theme: named ? null : (subject?.theme ?? null),
@@ -3638,6 +3670,7 @@ function generateResult(language: WordLanguage, settings: Settings): Result {
 		shortest,
 		flow: freshFlow(),
 		spent: new Set(),
+		described: new Set(),
 		voice,
 		tense
 	});
@@ -3675,7 +3708,7 @@ function generateResult(language: WordLanguage, settings: Settings): Result {
 	}
 
 	const paragraph = telling();
-	const { flow, spent } = paragraph;
+	const { flow, spent, described } = paragraph;
 
 	for (let i = 0; i < settings.sentences; i += 1) {
 		const budget = budgets[i];
@@ -3691,6 +3724,7 @@ function generateResult(language: WordLanguage, settings: Settings): Result {
 			opener: openerFor(data, mark, follow, budget[1], shortest, flow),
 			style: styleFor(type, settings.style, voice),
 			avoid: spent,
+			described,
 			follow,
 			tense,
 			beat: null,
@@ -3711,6 +3745,10 @@ function generateResult(language: WordLanguage, settings: Settings): Result {
 
 		for (const word of one.used) {
 			spent.add(word);
+		}
+
+		for (const noun of one.described) {
+			described.add(noun);
 		}
 
 		flow.run = type === flow.last ? flow.run + 1 : 1;
@@ -3781,6 +3819,7 @@ type Telling = {
 	shortest: number;
 	flow: Flow;
 	spent: Set<string>;
+	described: Set<string>;
 	voice: SentenceStyle;
 	tense: SentenceTense;
 };
@@ -3993,7 +4032,19 @@ function storyFor(telling: Telling): {
  * plan joined are written as one sentence, the second clause without its subject.
  */
 function tellStory(telling: Telling): Result | null {
-	const { language, data, settings, budgets, room, shortest, flow, spent, voice, tense } = telling;
+	const {
+		language,
+		data,
+		settings,
+		budgets,
+		room,
+		shortest,
+		flow,
+		spent,
+		described,
+		voice,
+		tense
+	} = telling;
 	const found = storyFor(telling);
 
 	if (!found?.plan) {
@@ -4236,6 +4287,7 @@ function tellStory(telling: Telling): Result | null {
 				named: false,
 				names: [],
 				used: [],
+				described: [],
 				scene: new Map(),
 				type: 'dialogue',
 				field: null,
@@ -4465,6 +4517,7 @@ function tellStory(telling: Telling): Result | null {
 					? (flow.line ??= pick(SPOKEN_LEVELS))
 					: styleFor(type, settings.style, voice),
 			avoid: spent,
+			described,
 			follow,
 			// A line says now what is true, and reports in the past what was just
 			// done; a remark, a question and what is noticed are about now.
@@ -4587,6 +4640,10 @@ function tellStory(telling: Telling): Result | null {
 
 		for (const word of one.used) {
 			spent.add(word);
+		}
+
+		for (const noun of one.described) {
+			described.add(noun);
 		}
 
 		placed =
@@ -4729,6 +4786,7 @@ function joinClauses(data: SentenceLanguageData, first: Built, second: Built): B
 		named: first.named || second.named,
 		names: [...first.names, ...second.names],
 		used: [...first.used, ...second.used],
+		described: [...first.described, ...second.described],
 		scene: new Map([...first.scene, ...second.scene]),
 		object: second.object ?? first.object,
 		type: second.type,
