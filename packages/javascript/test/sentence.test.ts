@@ -997,6 +997,41 @@ describe('Sentence', () => {
 		}
 	});
 
+	it('a range only a noun phrase can reach is not answered with a name', () => {
+		// A name is one word and no article — `Yvonne` where a noun phrase would
+		// write `die schlanke Wolke` — so a range only the longer one can reach is a
+		// range a name cannot be in. Drawn rather than asked for, it is one more
+		// thing to decide against the room, and deciding it before the range is even
+		// known is what both ports were doing.
+		for (const [language, minLength] of [
+			['ko', 54],
+			['zh', 33],
+			['ja', 58],
+			['de', 92]
+		] as [WordLanguage, number][]) {
+			const named = randSentence({ language, minLength, count: 60, output: 'detail' }).filter(
+				(detail) => detail.names.length
+			);
+
+			assert.strictEqual(named.length, 0, `${language}: ${named[0]?.sentence}`);
+		}
+
+		// Asked for outright, a name is still written — the same best effort a range
+		// too narrow for the parts it was told to carry gets.
+		const asked = randSentence({
+			language: 'ko',
+			minLength: 54,
+			includeName: true,
+			count: 20,
+			output: 'detail'
+		});
+
+		assert.ok(
+			asked.some((detail) => detail.names.length),
+			'`includeName: true` wrote no name at all'
+		);
+	});
+
 	it('`include` picks the language the word is written in', () => {
 		for (const detail of sentenceDetails({ include: '고양이', count: 40 })) {
 			assert.strictEqual(detail.language, 'ko', detail.sentence);

@@ -1007,6 +1007,41 @@ void main() {
       }
     });
 
+    test('a range only a noun phrase can reach is not answered with a name', () {
+      // A name is one word and no article — `Yvonne` where a noun phrase would
+      // write `die schlanke Wolke` — so a range only the longer one can reach is
+      // a range a name cannot be in. Drawn rather than asked for, it is one more
+      // thing to decide against the room, and deciding it before the range was
+      // even known left [_nameFits] unreachable.
+      const asks = <(WordLanguage, int)>[
+        (WordLanguage.ko, 54),
+        (WordLanguage.zh, 33),
+        (WordLanguage.ja, 58),
+        (WordLanguage.de, 92),
+      ];
+
+      for (final (language, minLength) in asks) {
+        final named = randSentenceDetails(
+          language: language,
+          minLength: minLength,
+          count: 60,
+        ).where((detail) => detail.names.isNotEmpty);
+
+        expect(named, isEmpty, reason: '${language.name}: ${named.firstOrNull?.sentence}');
+      }
+
+      // Asked for outright, a name is still written — the same best effort a
+      // range too narrow for the parts it was told to carry gets.
+      final asked = randSentenceDetails(
+        language: WordLanguage.ko,
+        minLength: 54,
+        includeName: true,
+        count: 20,
+      );
+
+      expect(asked.any((detail) => detail.names.isNotEmpty), isTrue);
+    });
+
     test('`include` picks the language the word is written in', () {
       for (final detail in randSentenceDetails(include: const <String>['고양이'], count: 40)) {
         expect(detail.language, WordLanguage.ko, reason: detail.sentence);

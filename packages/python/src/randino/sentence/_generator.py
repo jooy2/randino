@@ -5062,16 +5062,15 @@ def generate_sentence_details(
         return []
 
     def draw() -> SentenceDetail:
-        # A result either has a person in it or does not; deciding that per sentence
-        # would put a name in one line of a paragraph and not the next.
-        drawn = (
-            settings
-            if settings.include_name is not None
-            else replace(settings, include_name=chance(50))
-        )
+        # Whether the result writes a person's name is settled inside
+        # `_generate_result`, which is where the language's own name lengths are in
+        # hand: a range only a noun phrase can reach is a range no name can answer.
+        # Deciding it here left `_name_fits` unreachable, and a `min_length` of 54
+        # Korean characters wrote a name in half of its results where the reference
+        # implementation wrote none.
         code = pick(languages)
         data = SENTENCE_DATA[code]
-        result = _generate_result(code, drawn)
+        result = _generate_result(code, settings)
         built = result.built
 
         return SentenceDetail(

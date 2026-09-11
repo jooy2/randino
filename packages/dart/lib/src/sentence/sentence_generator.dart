@@ -5096,12 +5096,15 @@ List<SentenceDetail> generateSentenceDetails({
     unique: unique,
     startsWith: settings.prefix,
     draw: () {
-      // A result either has a person in it or does not; deciding that per sentence
-      // would put a name in one line of a paragraph and not the next.
-      final drawn = settings.includeName == null ? settings.naming(chance(50)) : settings;
+      // Whether the result writes a person's name is settled inside
+      // [_generateResult], which is where the language's own name lengths are in
+      // hand: a range only a noun phrase can reach is a range no name can answer.
+      // Deciding it here left [_nameFits] unreachable, and a `minLength` of 54
+      // Korean characters wrote a name in half of its results where the reference
+      // implementation wrote none.
       final WordLanguage code = pick(languages);
       final data = sentenceData[code]!;
-      final result = _generateResult(code, drawn);
+      final result = _generateResult(code, settings);
       final built = result.built;
 
       return SentenceDetail(

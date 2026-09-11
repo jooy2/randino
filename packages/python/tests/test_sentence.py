@@ -719,6 +719,34 @@ def test_a_name_in_a_sentence_is_as_long_as_the_languages_names_are() -> None:
                 )
 
 
+def test_a_range_only_a_noun_phrase_can_reach_is_not_answered_with_a_name() -> None:
+    # A name is one word and no article — `Yvonne` where a noun phrase would write
+    # `die schlanke Wolke` — so a range only the longer one can reach is a range a
+    # name cannot be in. Drawn rather than asked for, it is one more thing to decide
+    # against the room, and deciding it before the range was even known left
+    # `_name_fits` unreachable.
+    asks: list[tuple[WordLanguage, int]] = [("ko", 54), ("zh", 33), ("ja", 58), ("de", 92)]
+
+    for language, min_length in asks:
+        named = [
+            detail
+            for detail in rand_sentence(
+                output="detail", language=language, min_length=min_length, count=60
+            )
+            if detail.names
+        ]
+
+        assert not named, f"{language}: {named[0].sentence if named else ''}"
+
+    # Asked for outright, a name is still written — the same best effort a range too
+    # narrow for the parts it was told to carry gets.
+    asked = rand_sentence(
+        output="detail", language="ko", min_length=54, include_name=True, count=20
+    )
+
+    assert any(detail.names for detail in asked)
+
+
 def test_include_picks_the_language_the_word_is_written_in() -> None:
     for detail in rand_sentence(output="detail", include="고양이", count=40):
         assert detail.language == "ko", detail.sentence
