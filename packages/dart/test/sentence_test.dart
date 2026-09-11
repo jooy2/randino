@@ -1140,6 +1140,23 @@ void main() {
           expect(sentence, startsWith(prefix));
         }
       }
+
+      // A character from another script is one the language can never begin a
+      // sentence with. Glueing it on anyway produced `Q라는 귀하니?`.
+      const unwritable = <(WordLanguage, String)>[
+        (WordLanguage.ko, 'Q'),
+        (WordLanguage.zh, 'A'),
+        (WordLanguage.ru, 'Q'),
+        (WordLanguage.en, '사'),
+      ];
+
+      for (final (language, prefix) in unwritable) {
+        expect(
+          randSentence(language: language, startsWith: prefix, count: 20),
+          isEmpty,
+          reason: '${language.name} $prefix',
+        );
+      }
     });
 
     test('`unique` never repeats a sentence', () {

@@ -28,7 +28,7 @@ from typing import cast
 
 from randino._internal.generate import (
     collect,
-    draw_language,
+    languages_writing,
     length_bounds,
     resolve_length,
     resolve_prefix,
@@ -5049,17 +5049,27 @@ def generate_sentence_details(
         typed=type is not None,
     )
 
+    # Settled once rather than per draw. Neither the shapes a language has nor the
+    # words it holds changes between one result and the next, and `_classify` walks
+    # every pool of every language to answer `include` — which is nine walks per
+    # result when this sits inside the loop.
+    able = _languages_for(settings)
+    # And a requested first character the language does not write is one it can never
+    # lead a sentence with, so those languages are out before a draw is made.
+    languages = languages_writing(language, able, settings.prefix)
+
+    if not languages:
+        return []
+
     def draw() -> SentenceDetail:
         # A result either has a person in it or does not; deciding that per sentence
-        # would put a name in one line of a paragraph and not the next. It is settled
-        # before the language is drawn, because `_languages_for` reads it to prefer the
-        # languages that can answer.
+        # would put a name in one line of a paragraph and not the next.
         drawn = (
             settings
             if settings.include_name is not None
             else replace(settings, include_name=chance(50))
         )
-        code = draw_language(language, _languages_for(drawn))
+        code = pick(languages)
         data = SENTENCE_DATA[code]
         result = _generate_result(code, drawn)
         built = result.built

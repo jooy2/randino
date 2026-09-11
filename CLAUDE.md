@@ -555,10 +555,11 @@ Every word language has sentence data too, so this is only for a language being 
 4. If it needs a new romanization mode, add it to `RomanMode` and handle it in `lib/name/romanize.ts`.
 5. `lengthSpec` must be **measured, not estimated** — it is the default length range, and a wrong value is silent. Too narrow and the generator re-draws real names away; too wide and it aims at lengths nothing can spell. The `given` span is the given-name pool's, narrowed to the lengths `givenLenWeights` actually asks for where the language has a table; `last` and `middle` are their pools', and Russian's `last` adds the character feminization can put on it. The joiner is **not** in these numbers — `nameLengthRange` adds one per part it switches on. `test/name.test.ts` checks all of it against the pools.
 6. Add the language to the README table and to the script regexes in `test/name.test.ts`; the existing per-language tests then cover it.
-7. Port all of it to `packages/dart`: the code goes in `NameLanguage`, the dataset in `lib/src/name/data/<code>.dart` and `index.dart`, the regex in `test/name_test.dart`.
-8. Port all of it to `packages/python`: the code goes in the `NameLanguage` `Literal` in `src/randino/_types.py`, the dataset in `src/randino/name/data/<code>.py` and `__init__.py`, the script check in `SCRIPT` in `tests/test_name.py`. A language that exists in one package and not another is the failure mode this repository has to avoid, and the three suites are what catch it.
-9. Add the row to the tables in `docs/en/guide/languages.md` and `docs/ko/guide/languages.md`, and to the one in the root `README.md`.
-10. Run `node tools/parity/index.mjs` from the repository root. The three suites catch a language that exists in one package and not another; only this catches a pool that is one entry short in one of them.
+7. Add its script to `SCRIPTS` in `lib/_internal/script.ts`, in all three packages. That table is what `startsWith` is checked against, and a language left out of it accepts any character — which is how `randName({ language: 'ko', startsWith: 'Q' })` used to answer `Q대겸`. One table answers for both name and word languages, because the nine codes are the same.
+8. Port all of it to `packages/dart`: the code goes in `NameLanguage`, the dataset in `lib/src/name/data/<code>.dart` and `index.dart`, the regex in `test/name_test.dart`.
+9. Port all of it to `packages/python`: the code goes in the `NameLanguage` `Literal` in `src/randino/_types.py`, the dataset in `src/randino/name/data/<code>.py` and `__init__.py`, the script check in `SCRIPT` in `tests/test_name.py`. A language that exists in one package and not another is the failure mode this repository has to avoid, and the three suites are what catch it.
+10. Add the row to the tables in `docs/en/guide/languages.md` and `docs/ko/guide/languages.md`, and to the one in the root `README.md`.
+11. Run `node tools/parity/index.mjs` from the repository root. The three suites catch a language that exists in one package and not another; only this catches a pool that is one entry short in one of them.
 
 ## Adding a word language
 
@@ -577,11 +578,12 @@ To add one that clears the bar:
 3. Register it in `WORD_DATA` and `WORD_LANGUAGES` in `lib/word/data/index.ts`.
 4. Write the frames before the pools. A shape is only worth a pool if the grammar carries it: `ja` and `zh` reach `parts` through の and 的 because a bare noun-noun compound does not read, and `en` has no possessive frame because `of` is a word rather than a particle.
 5. Aim for 100+ nouns per theme, and more where the vocabulary is there. Every language holds around 3,500 to 3,800 nouns, and the thinnest theme in any language sits in the sixties. The pools are what make the output varied, and the combination count is roughly `(adjectives + actions) × nouns × (1 + parts)` — around 90M for the four with a `parts` pool, 0.6M for `es`, `it`, `de` and `ru`, which have none. **Padding a theme with near-synonyms reads worse than a shorter pool**, and inventing a compound to fill it is how `棒麺麭` and `대로변` got in; both were replaced. See the compound rule below — a pool grows by finding words the theme does not have yet, never by qualifying one it already holds.
-6. No person names, and no word that is only a name — for `en` this is enforced against the person-name pools, which is why `job` has no `Knight`, `Baker` or `Hunter` and `plant` no `Rose` or `Ivy`. Add the language to the README tables and to `SCRIPT` in `test/word.test.ts` **and** `test/nickname.test.ts`; the existing per-language tests then cover it.
-7. A language that inflects tags its nouns and lists its endings: write `nouns` as a `theme -> \`gato:m luna:f\`` map through `taggedNouns`, and give `agreement` the rules per form, `p` (and `fp` where the plural inflects for gender) included if any noun has no singular. Put the noun **first** in the frames where the grammar allows it; where it cannot (`blauer Wal`), `buildWords` draws the noun ahead of its turn instead.
-8. Port all of it to `packages/dart` and `packages/python`, the same way a name language is ported.
-9. Add the row to the tables in `docs/*/guide/languages.md` and to the root `README.md`.
-10. Run `node tools/parity/index.mjs` from the repository root — twenty-nine pools in three packages are exactly where one word goes missing unnoticed.
+6. Add its script to `SCRIPTS` in `lib/_internal/script.ts` if the language is new to the repository — see step 7 of the name-language list, which is the same table.
+7. No person names, and no word that is only a name — for `en` this is enforced against the person-name pools, which is why `job` has no `Knight`, `Baker` or `Hunter` and `plant` no `Rose` or `Ivy`. Add the language to the README tables and to `SCRIPT` in `test/word.test.ts` **and** `test/nickname.test.ts`; the existing per-language tests then cover it.
+8. A language that inflects tags its nouns and lists its endings: write `nouns` as a `theme -> \`gato:m luna:f\`` map through `taggedNouns`, and give `agreement` the rules per form, `p` (and `fp` where the plural inflects for gender) included if any noun has no singular. Put the noun **first** in the frames where the grammar allows it; where it cannot (`blauer Wal`), `buildWords` draws the noun ahead of its turn instead.
+9. Port all of it to `packages/dart` and `packages/python`, the same way a name language is ported.
+10. Add the row to the tables in `docs/*/guide/languages.md` and to the root `README.md`.
+11. Run `node tools/parity/index.mjs` from the repository root — twenty-nine pools in three packages are exactly where one word goes missing unnoticed.
 
 ### The compound rule: one entry per thing
 

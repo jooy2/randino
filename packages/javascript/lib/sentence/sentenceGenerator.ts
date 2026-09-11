@@ -22,7 +22,7 @@
 
 import {
 	collect,
-	drawLanguage,
+	languagesWriting,
 	lengthBounds,
 	resolveLength,
 	resolvePrefix,
@@ -4903,11 +4903,23 @@ function resolveSettings(options: RandSentenceOptions): Settings {
 export function generateSentenceDetails(options: RandSentenceOptions = {}): SentenceDetail[] {
 	const settings = resolveSettings(options);
 	const language = options.language ?? 'all';
+	// Settled once rather than per draw. Neither the shapes a language has nor the
+	// words it holds changes between one result and the next, and `classify` walks
+	// every pool of every language to answer `include` — which is nine walks per
+	// result when this sits inside the loop.
+	const able = languagesFor(settings);
+	// And a requested first character the language does not write is one it can
+	// never lead a sentence with, so those languages are out before a draw is made.
+	const languages = languagesWriting(language, able, settings.prefix);
+
+	if (!languages.length) {
+		return [];
+	}
 
 	return collect(
 		options,
 		() => {
-			const code = drawLanguage(language, languagesFor(settings));
+			const code = pick(languages);
 			const data = SENTENCE_DATA[code];
 			const { built, tense, story, theme } = generateResult(code, settings);
 

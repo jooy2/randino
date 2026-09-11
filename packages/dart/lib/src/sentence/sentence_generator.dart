@@ -5078,17 +5078,28 @@ List<SentenceDetail> generateSentenceDetails({
     vocabulary: vocabulary,
   );
 
+  // Settled once rather than per draw. Neither the shapes a language has nor the
+  // words it holds changes between one result and the next, and `_classify` walks
+  // every pool of every language to answer `include` — which is nine walks per
+  // result when this sits inside the loop.
+  final able = _languagesFor(settings);
+  // And a requested first character the language does not write is one it can
+  // never lead a sentence with, so those languages are out before a draw is made.
+  final languages = languagesWriting(language, able, settings.prefix);
+
+  if (languages.isEmpty) {
+    return <SentenceDetail>[];
+  }
+
   return collect<SentenceDetail>(
     count: count,
     unique: unique,
     startsWith: settings.prefix,
     draw: () {
       // A result either has a person in it or does not; deciding that per sentence
-      // would put a name in one line of a paragraph and not the next. It is
-      // settled before the language is drawn, because `_languagesFor` reads it to
-      // prefer the languages that can answer.
+      // would put a name in one line of a paragraph and not the next.
       final drawn = settings.includeName == null ? settings.naming(chance(50)) : settings;
-      final WordLanguage code = language ?? pick(_languagesFor(drawn));
+      final WordLanguage code = pick(languages);
       final data = sentenceData[code]!;
       final result = _generateResult(code, drawn);
       final built = result.built;

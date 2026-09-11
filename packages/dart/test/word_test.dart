@@ -242,6 +242,29 @@ void main() {
       }
     });
 
+    test('a startsWith the language does not write is answered with nothing', () {
+      // A character from another script is one the language can never begin a
+      // word with. Glueing it on anyway produced `q피` and `A淑华`.
+      const asks = <(WordLanguage, String)>[
+        (WordLanguage.ko, 'q'),
+        (WordLanguage.zh, 'A'),
+        (WordLanguage.ru, 'Q'),
+        (WordLanguage.en, '바'),
+      ];
+
+      for (final (language, character) in asks) {
+        expect(
+          randWord(language: language, count: sample, startsWith: character),
+          isEmpty,
+          reason: '${language.name} $character',
+        );
+      }
+
+      for (final detail in randWordDetails(count: sample, startsWith: 'ж')) {
+        expect(detail.language, WordLanguage.ru, reason: detail.word);
+      }
+    });
+
     test('realism invents words instead of drawing them', () {
       final pool = poolOf(WordLanguage.ko).toSet();
       final invented = randWordDetails(

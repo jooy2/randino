@@ -453,6 +453,23 @@ describe('Nickname', () => {
 		}
 	});
 
+	it('a startsWith the language does not write is answered with nothing', () => {
+		// A character from another script is one the language can never begin a
+		// nickname with. Glueing it on anyway produced `zヌソいたずらっ子`.
+		for (const [language, character] of [
+			['ja', 'z'],
+			['ko', 'q'],
+			['zh', 'A'],
+			['en', '파']
+		] as const) {
+			assert.deepEqual(randNickname({ language, count: SAMPLE, startsWith: character }), []);
+		}
+
+		for (const detail of nicknameDetails({ count: SAMPLE, startsWith: 'ж' })) {
+			assert.equal(detail.language, 'ru', detail.nickname);
+		}
+	});
+
 	it('realism invents words instead of drawing them', () => {
 		const pool = new Set(allWords('ko'));
 		const invented = nicknameDetails({ language: 'ko', realism: 'invented', count: 200 });

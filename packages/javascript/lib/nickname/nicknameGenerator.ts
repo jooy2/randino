@@ -25,7 +25,7 @@
 
 import {
 	collect,
-	drawLanguage,
+	languagesWriting,
 	lengthBounds,
 	resolveLength,
 	resolvePrefix,
@@ -500,11 +500,21 @@ function resolveSettings(options: RandNicknameOptions): Settings {
 export function generateNicknameDetails(options: RandNicknameOptions = {}): NicknameDetail[] {
 	const settings = resolveSettings(options);
 	const language = options.language ?? 'all';
+	// Settled once rather than per draw: neither the shapes a language has nor the
+	// script it writes changes between one nickname and the next.
+	const able = languagesFor(settings);
+	// And a requested first character the language does not write is one it can
+	// never lead a nickname with, so those languages are out before a draw is made.
+	const languages = languagesWriting(language, able, settings.prefix);
+
+	if (!languages.length) {
+		return [];
+	}
 
 	return collect(
 		options,
 		() => {
-			const code = drawLanguage(language, languagesFor(settings));
+			const code = pick(languages);
 			const { words, slots, nickname, theme } = generateOne(code, settings);
 
 			return { nickname, words, slots, language: code, theme };

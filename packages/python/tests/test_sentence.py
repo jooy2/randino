@@ -833,6 +833,18 @@ def test_sentences_start_with_starts_with() -> None:
         for sentence in sentences:
             assert sentence.startswith(prefix), f"{language}: {sentence}"
 
+    # A character from another script is one the language can never begin a sentence
+    # with. Glueing it on anyway produced `Q라는 귀하니?`.
+    unwritable: list[tuple[WordLanguage, str]] = [
+        ("ko", "Q"),
+        ("zh", "A"),
+        ("ru", "Q"),
+        ("en", "사"),
+    ]
+
+    for language, prefix in unwritable:
+        assert rand_sentence(language=language, starts_with=prefix, count=20) == []
+
 
 def test_unique_never_repeats_a_sentence() -> None:
     sentences = rand_sentence(language="ko", unique=True, count=300)

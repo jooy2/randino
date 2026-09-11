@@ -13,7 +13,7 @@
 
 import {
 	collect,
-	drawLanguage,
+	languagesWriting,
 	lengthBounds,
 	resolveLength,
 	resolvePrefix,
@@ -194,6 +194,10 @@ function synthEntry(data: NameLanguageData, prefix?: string): Entry {
  * character. Prefers a real name that already starts with it; otherwise invents
  * one (Latin/Cyrillic) or uses the character verbatim (CJK, where any syllable is
  * a usable name part — so 앙 + 지수 -> 앙지수).
+ *
+ * The verbatim branch is only ever reached with a character of the language's own
+ * script: `languagesWriting` has already dropped a language that does not write
+ * the requested one, which is what keeps `앙지수` a name and `Q대겸` out.
  */
 function leadEntry(
 	data: NameLanguageData,
@@ -667,10 +671,17 @@ export function drawName(language: NameLanguage, options: RandNameOptions = {}):
 export function generateNameDetails(options: RandNameOptions = {}): NameDetail[] {
 	const language = options.language ?? 'all';
 	const settings = resolveSettings(options);
+	// A requested first character the language does not write is one it can never
+	// lead a name with, so the languages that cannot are out before a draw is made.
+	const languages = languagesWriting(language, NAME_LANGUAGES, settings.prefix);
+
+	if (!languages.length) {
+		return [];
+	}
 
 	return collect(
 		options,
-		() => generateOne(drawLanguage(language, NAME_LANGUAGES), settings),
+		() => generateOne(pick(languages), settings),
 		(detail) => detail.native
 	);
 }

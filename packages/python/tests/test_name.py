@@ -385,6 +385,31 @@ def test_starts_with_leads_every_name_with_the_requested_character() -> None:
         assert name.startswith("B"), name
 
 
+def test_a_starts_with_the_language_does_not_write_is_answered_with_nothing() -> None:
+    # A character from another script is one the language can never begin a name
+    # with. Glueing it on anyway produced `Q대겸` — a Latin letter and a Korean given
+    # name in one string, and a name in neither language.
+    asks: list[tuple[NameLanguage, str]] = [
+        ("ko", "Q"),
+        ("zh", "A"),
+        ("ja", "z"),
+        ("en", "김"),
+        ("ru", "Q"),
+        ("de", "ж"),
+    ]
+
+    for language, character in asks:
+        assert rand_name(language=language, count=SAMPLE, starts_with=character) == []
+
+    # And `"all"` narrows to the languages that can answer rather than spending most
+    # of its draws on the ones that cannot.
+    for detail in rand_name(output="detail", count=SAMPLE, starts_with="ж"):
+        assert detail.language == "ru", detail.native
+
+    for detail in rand_name(output="detail", count=SAMPLE, starts_with="김"):
+        assert detail.language == "ko", detail.native
+
+
 def test_realism_invents_names_without_breaking_the_script_or_the_structure() -> None:
     for realism in get_args(RandRealism):
         for language in NAME_LANGUAGES:

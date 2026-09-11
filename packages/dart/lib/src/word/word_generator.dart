@@ -486,17 +486,21 @@ List<WordDetail> generateWordDetails({
   final invent = resolveRealism(realism);
   final prefix = resolvePrefix(startsWith);
 
+  // A requested first character the language does not write is one it can never
+  // lead a word with, so the languages that cannot are out before a draw is made.
+  final languages = languagesWriting(language, wordLanguages, prefix);
+
+  if (languages.isEmpty) {
+    return <WordDetail>[];
+  }
+
   return collect<WordDetail>(
     count: count,
     unique: unique,
     startsWith: prefix,
-    // Written out: `??` would otherwise infer `pick`'s type argument from the
-    // nullable left-hand side, and hand back a `WordLanguage?`.
-    draw: () {
-      final WordLanguage code = language ?? pick(wordLanguages);
-
-      return _generateOne(code, theme, invent, vocabulary, minLength, maxLength, prefix);
-    },
+    draw:
+        () =>
+            _generateOne(pick(languages), theme, invent, vocabulary, minLength, maxLength, prefix),
     keyOf: (detail) => detail.word,
   );
 }

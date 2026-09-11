@@ -682,17 +682,19 @@ List<NameDetail> generateNameDetails({
     prefix: resolvePrefix(startsWith),
   );
 
+  // A requested first character the language does not write is one it can never
+  // lead a name with, so the languages that cannot are out before a draw is made.
+  final languages = languagesWriting(language, nameLanguages, settings.prefix);
+
+  if (languages.isEmpty) {
+    return <NameDetail>[];
+  }
+
   return collect<NameDetail>(
     count: count,
     unique: unique,
     startsWith: settings.prefix,
-    // Written out: `??` would otherwise infer `pick`'s type argument from the
-    // nullable left-hand side, and hand back a `NameLanguage?`.
-    draw: () {
-      final NameLanguage code = language ?? pick(nameLanguages);
-
-      return _generateOne(code, settings);
-    },
+    draw: () => _generateOne(pick(languages), settings),
     keyOf: (detail) => detail.native,
   );
 }

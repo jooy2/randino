@@ -513,6 +513,29 @@ void main() {
       }
     });
 
+    test('a startsWith the language does not write is answered with nothing', () {
+      // A character from another script is one the language can never begin a
+      // nickname with. Glueing it on anyway produced `zヌソいたずらっ子`.
+      const asks = <(WordLanguage, String)>[
+        (WordLanguage.ja, 'z'),
+        (WordLanguage.ko, 'q'),
+        (WordLanguage.zh, 'A'),
+        (WordLanguage.en, '파'),
+      ];
+
+      for (final (language, character) in asks) {
+        expect(
+          randNickname(language: language, count: sample, startsWith: character),
+          isEmpty,
+          reason: '${language.name} $character',
+        );
+      }
+
+      for (final detail in randNicknameDetails(count: sample, startsWith: 'ж')) {
+        expect(detail.language, WordLanguage.ru, reason: detail.nickname);
+      }
+    });
+
     test('realism invents words instead of drawing them', () {
       final pool = allWords(WordLanguage.ko).toSet();
       final invented = randNicknameDetails(

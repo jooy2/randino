@@ -420,6 +420,33 @@ describe('Name', () => {
 		}
 	});
 
+	it('a startsWith the language does not write is answered with nothing', () => {
+		// A character from another script is one the language can never begin a
+		// name with. Glueing it on anyway produced `Q대겸` — a Latin letter and a
+		// Korean given name in one string, and a name in neither language.
+		for (const [language, character] of [
+			['ko', 'Q'],
+			['zh', 'A'],
+			['ja', 'z'],
+			['en', '김'],
+			['ru', 'Q'],
+			['de', 'ж']
+		] as const) {
+			assert.deepEqual(randName({ language, count: SAMPLE, startsWith: character }), []);
+		}
+
+		// And `'all'` narrows to the languages that can answer rather than spending
+		// most of its draws on the ones that cannot.
+		for (const detail of nameDetails({ count: SAMPLE, startsWith: 'ж' })) {
+			assert.equal(detail.language, 'ru', detail.native);
+			assert.match(detail.native, /^[жЖ]/, detail.native);
+		}
+
+		for (const detail of nameDetails({ count: SAMPLE, startsWith: '김' })) {
+			assert.equal(detail.language, 'ko', detail.native);
+		}
+	});
+
 	it('realism invents names without breaking the script or the structure', () => {
 		for (const realism of ['real', 'mixed', 'invented', 'wild' as RandRealism]) {
 			for (const language of NAME_LANGUAGES) {

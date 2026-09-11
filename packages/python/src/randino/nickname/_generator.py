@@ -33,7 +33,7 @@ from typing import Literal, NamedTuple, cast
 
 from randino._internal.generate import (
     collect,
-    draw_language,
+    languages_writing,
     length_bounds,
     resolve_length,
     resolve_prefix,
@@ -491,8 +491,18 @@ def generate_nickname_details(
         separator=word_separator,
     )
 
+    # Settled once rather than per draw: neither the shapes a language has nor the
+    # script it writes changes between one nickname and the next.
+    able = languages_for(settings)
+    # And a requested first character the language does not write is one it can never
+    # lead a nickname with, so those languages are out before a draw is made.
+    languages = languages_writing(language, able, settings.prefix)
+
+    if not languages:
+        return []
+
     def draw() -> NicknameDetail:
-        code = draw_language(language, languages_for(settings))
+        code = pick(languages)
         words, built_slots, nickname, built_theme = generate_one(code, settings)
 
         return NicknameDetail(

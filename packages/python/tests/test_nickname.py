@@ -403,6 +403,18 @@ def test_starts_with_leads_every_nickname_with_the_requested_character() -> None
         assert re.fullmatch(r"Z[A-Za-z]+", nickname), nickname
 
 
+def test_a_starts_with_the_language_does_not_write_is_answered_with_nothing() -> None:
+    # A character from another script is one the language can never begin a nickname
+    # with. Glueing it on anyway produced `zヌソいたずらっ子`.
+    asks: list[tuple[WordLanguage, str]] = [("ja", "z"), ("ko", "q"), ("zh", "A"), ("en", "파")]
+
+    for language, character in asks:
+        assert rand_nickname(language=language, count=SAMPLE, starts_with=character) == []
+
+    for detail in rand_nickname(output="detail", count=SAMPLE, starts_with="ж"):
+        assert detail.language == "ru", detail.nickname
+
+
 def test_realism_invents_words_instead_of_drawing_them() -> None:
     pool = set(all_words("ko"))
     invented = rand_nickname(output="detail", language="ko", realism="invented", count=200)

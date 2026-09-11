@@ -468,6 +468,38 @@ void main() {
       }
     });
 
+    test('a startsWith the language does not write is answered with nothing', () {
+      // A character from another script is one the language can never begin a
+      // name with. Glueing it on anyway produced `Q대겸` — a Latin letter and a
+      // Korean given name in one string, and a name in neither language.
+      const asks = <(NameLanguage, String)>[
+        (NameLanguage.ko, 'Q'),
+        (NameLanguage.zh, 'A'),
+        (NameLanguage.ja, 'z'),
+        (NameLanguage.en, '김'),
+        (NameLanguage.ru, 'Q'),
+        (NameLanguage.de, 'ж'),
+      ];
+
+      for (final (language, character) in asks) {
+        expect(
+          randName(language: language, count: sample, startsWith: character),
+          isEmpty,
+          reason: '${language.name} $character',
+        );
+      }
+
+      // And every language narrows to the ones that can answer rather than
+      // spending most of its draws on the ones that cannot.
+      for (final detail in randNameDetails(count: sample, startsWith: 'ж')) {
+        expect(detail.language, NameLanguage.ru, reason: detail.native);
+      }
+
+      for (final detail in randNameDetails(count: sample, startsWith: '김')) {
+        expect(detail.language, NameLanguage.ko, reason: detail.native);
+      }
+    });
+
     test('realism invents names without breaking the script or the structure', () {
       for (final realism in RandRealism.values) {
         for (final language in nameLanguages) {

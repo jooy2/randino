@@ -8,6 +8,7 @@
 
 import { RAND_COUNT_MAX, RAND_LENGTH_MAX, RAND_LENGTH_MIN } from '../constants.js';
 import type { RandCommonOptions, RandRealism, RandVocabulary } from '../_types/global.js';
+import { writesScript } from './script.js';
 import { clamp, pick } from './utils.js';
 
 /** `count`, floored and clamped to what a generator will serve. */
@@ -84,6 +85,32 @@ export function lengthBounds(
 /** The language one draw uses: the requested one, or any of them for `'all'`. */
 export function drawLanguage<T extends string>(option: T | 'all', languages: readonly T[]): T {
 	return option === 'all' ? pick(languages) : option;
+}
+
+/**
+ * The languages a draw may come from once `startsWith` has had its say: the
+ * requested one, or every one of them for `'all'`, minus the ones that do not
+ * write the requested character's script.
+ *
+ * A character a language does not write is a character it can never lead a
+ * result with, and a generator asked for one anyway used to answer with the
+ * character glued to the front — `randName({ language: 'ko', startsWith: 'Q' })`
+ * came back `Q대겸`, which is a Latin letter and a Korean given name in one
+ * string and a name in neither language.
+ *
+ * Empty when nothing can answer, which the generators pass on as no results at
+ * all. That is the same answer `unique` already gives when a pool runs out:
+ * fewer results than were asked for, rather than results that are not what was
+ * asked for.
+ */
+export function languagesWriting<T extends string>(
+	option: T | 'all',
+	languages: readonly T[],
+	prefix: string
+): readonly T[] {
+	const wanted = option === 'all' ? languages : [option];
+
+	return prefix ? wanted.filter((code) => writesScript(code, prefix)) : wanted;
 }
 
 /**

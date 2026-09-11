@@ -1111,6 +1111,17 @@ describe('Sentence', () => {
 				assert.ok(sentence.startsWith(prefix), `${language}: ${sentence}`);
 			}
 		}
+
+		// A character from another script is one the language can never begin a
+		// sentence with. Glueing it on anyway produced `Q라는 귀하니?`.
+		for (const [language, prefix] of [
+			['ko', 'Q'],
+			['zh', 'A'],
+			['ru', 'Q'],
+			['en', '사']
+		] as [WordLanguage, string][]) {
+			assert.deepEqual(randSentence({ language, startsWith: prefix, count: 20 }), []);
+		}
 	});
 
 	it('`unique` never repeats a sentence', () => {

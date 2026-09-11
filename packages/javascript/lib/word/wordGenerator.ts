@@ -9,7 +9,7 @@
 import { chance, clamp, pick, randInt } from '../_internal/utils.js';
 import {
 	collect,
-	drawLanguage,
+	languagesWriting,
 	lengthBounds,
 	resolveLength,
 	resolvePrefix,
@@ -518,9 +518,17 @@ export function generateWordDetails(options: RandWordOptions = {}): WordDetail[]
 		prefix: resolvePrefix(options.startsWith)
 	};
 
+	// A requested first character the language does not write is one it can never
+	// lead a word with, so the languages that cannot are out before a draw is made.
+	const languages = languagesWriting(language, WORD_LANGUAGES, settings.prefix);
+
+	if (!languages.length) {
+		return [];
+	}
+
 	return collect(
 		options,
-		() => generateOne(drawLanguage(language, WORD_LANGUAGES), settings),
+		() => generateOne(pick(languages), settings),
 		(detail) => detail.word
 	);
 }

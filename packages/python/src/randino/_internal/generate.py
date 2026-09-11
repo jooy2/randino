@@ -10,6 +10,7 @@ import math
 from collections.abc import Callable, Sequence
 from typing import TypeVar
 
+from randino._internal.script import writes_script
 from randino._internal.utils import clamp, pick
 from randino._types import RandRealism, RandVocabulary
 from randino.constants import RAND_COUNT_MAX, RAND_LENGTH_MAX, RAND_LENGTH_MIN
@@ -85,6 +86,34 @@ def length_bounds(
 def draw_language(option: str, languages: Sequence[L]) -> L:
     """Return the language one draw uses: the requested one, or any for `"all"`."""
     return pick(languages) if option == "all" else option  # type: ignore[return-value]
+
+
+def languages_writing(option: str, languages: Sequence[L], prefix: str) -> tuple[L, ...]:
+    """The languages a draw may come from once `starts_with` has had its say.
+
+    The requested one, or every one of them for `"all"`, minus the ones that do not
+    write the requested character's script. A character a language does not write is
+    a character it can never lead a result with, and a generator asked for one anyway
+    used to answer with the character glued to the front — `rand_name(language="ko",
+    starts_with="Q")` came back `Q대겸`, which is a Latin letter and a Korean given
+    name in one string and a name in neither language.
+
+    Args:
+        option: The language the caller asked for, or `"all"`.
+        languages: Every language the generator knows.
+        prefix: The requested first character, or `""`.
+
+    Returns:
+        The languages that can answer, which is empty when none can — and the
+        generators pass that on as no results at all, the way `unique` already
+        answers an exhausted pool with fewer results rather than with wrong ones.
+    """
+    wanted: tuple[L, ...] = tuple(languages) if option == "all" else (option,)  # type: ignore[assignment]
+
+    if not prefix:
+        return wanted
+
+    return tuple(code for code in wanted if writes_script(code, prefix))
 
 
 def collect(

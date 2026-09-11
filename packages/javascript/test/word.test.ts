@@ -251,6 +251,24 @@ describe('Word', () => {
 		}
 	});
 
+	it('a startsWith the language does not write is answered with nothing', () => {
+		// A character from another script is one the language can never begin a word
+		// with. Glueing it on anyway produced `q피` and `A淑华`.
+		for (const [language, character] of [
+			['ko', 'q'],
+			['zh', 'A'],
+			['ru', 'Q'],
+			['en', '바']
+		] as const) {
+			assert.deepEqual(randWord({ language, count: SAMPLE, startsWith: character }), []);
+		}
+
+		// And `'all'` narrows to the languages that can answer.
+		for (const detail of details({ count: SAMPLE, startsWith: 'ж' })) {
+			assert.equal(detail.language, 'ru', detail.word);
+		}
+	});
+
 	it('realism invents words instead of drawing them', () => {
 		const pool = new Set(nounsOf('ko'));
 		const invented = details({ language: 'ko', realism: 'invented', count: 200 });

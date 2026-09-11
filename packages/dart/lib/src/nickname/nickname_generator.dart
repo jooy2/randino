@@ -482,14 +482,23 @@ List<NicknameDetail> generateNicknameDetails({
     separator: wordSeparator,
   );
 
+  // Settled once rather than per draw: neither the shapes a language has nor the
+  // script it writes changes between one nickname and the next.
+  final able = _languagesFor(settings);
+  // And a requested first character the language does not write is one it can
+  // never lead a nickname with, so those languages are out before a draw is made.
+  final languages = languagesWriting(language, able, settings.prefix);
+
+  if (languages.isEmpty) {
+    return <NicknameDetail>[];
+  }
+
   return collect<NicknameDetail>(
     count: count,
     unique: unique,
     startsWith: settings.prefix,
-    // Written out: `??` would otherwise infer `pick`'s type argument from the
-    // nullable left-hand side, and hand back a `WordLanguage?`.
     draw: () {
-      final WordLanguage code = language ?? pick(_languagesFor(settings));
+      final WordLanguage code = pick(languages);
       final built = _generateOne(code, settings);
 
       return NicknameDetail(

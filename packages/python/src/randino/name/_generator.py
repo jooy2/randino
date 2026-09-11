@@ -22,7 +22,7 @@ from typing import Literal, NamedTuple
 
 from randino._internal.generate import (
     collect,
-    draw_language,
+    languages_writing,
     length_bounds,
     resolve_length,
     resolve_prefix,
@@ -705,10 +705,17 @@ def generate_name_details(
         prefix=resolve_prefix(starts_with),
     )
 
+    # A requested first character the language does not write is one it can never
+    # lead a name with, so the languages that cannot are out before a draw is made.
+    languages = languages_writing(language, NAME_LANGUAGES, settings.prefix)
+
+    if not languages:
+        return []
+
     return collect(
         count=count,
         unique=unique,
         starts_with=settings.prefix,
-        draw=lambda: generate_one(draw_language(language, NAME_LANGUAGES), settings),
+        draw=lambda: generate_one(pick(languages), settings),
         key_of=lambda detail: detail.native,
     )

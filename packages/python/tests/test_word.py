@@ -230,6 +230,18 @@ def test_starts_with_leads_every_word_with_the_requested_character() -> None:
         assert re.fullmatch(r"Z[A-Za-z]+", word), word
 
 
+def test_a_starts_with_the_language_does_not_write_is_answered_with_nothing() -> None:
+    # A character from another script is one the language can never begin a word
+    # with. Glueing it on anyway produced `q피` and `A淑华`.
+    asks: list[tuple[WordLanguage, str]] = [("ko", "q"), ("zh", "A"), ("ru", "Q"), ("en", "바")]
+
+    for language, character in asks:
+        assert rand_word(language=language, count=SAMPLE, starts_with=character) == []
+
+    for detail in rand_word(output="detail", count=SAMPLE, starts_with="ж"):
+        assert detail.language == "ru", detail.word
+
+
 def test_realism_invents_words_instead_of_drawing_them() -> None:
     pool = set(pool_of("ko"))
     invented = rand_word(output="detail", language="ko", realism="invented", count=200)

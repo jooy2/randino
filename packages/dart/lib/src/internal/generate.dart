@@ -7,6 +7,7 @@
 // once here, a new generator gets all of it by calling [collect].
 
 import 'package:randino/src/constants.dart';
+import 'package:randino/src/internal/script.dart';
 import 'package:randino/src/internal/utils.dart';
 import 'package:randino/src/types.dart';
 
@@ -48,6 +49,28 @@ LengthRange lengthBounds(
   final high = clampInt(max ?? naturalMax, randLengthMin, ceiling);
 
   return LengthRange(low, high < low ? low : high);
+}
+
+/// The languages a draw may come from once `startsWith` has had its say: the
+/// requested one, or every one of them for a null [option], minus the ones that
+/// do not write the requested character's script.
+///
+/// A character a language does not write is a character it can never lead a
+/// result with, and a generator asked for one anyway used to answer with the
+/// character glued to the front — `randName(language: NameLanguage.ko,
+/// startsWith: 'Q')` came back `Q대겸`, which is a Latin letter and a Korean
+/// given name in one string and a name in neither language.
+///
+/// Empty when nothing can answer, which the generators pass on as no results at
+/// all. That is the same answer `unique` already gives when a pool runs out:
+/// fewer results than were asked for, rather than results that are not what was
+/// asked for.
+List<T> languagesWriting<T extends Enum>(T? option, List<T> languages, String prefix) {
+  final wanted = option == null ? languages : <T>[option];
+
+  return prefix.isEmpty
+      ? wanted
+      : wanted.where((code) => writesScript(code.name, prefix)).toList(growable: false);
 }
 
 /// Draw until there are [count] results, discarding what the filters reject.
