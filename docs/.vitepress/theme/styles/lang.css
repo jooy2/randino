@@ -27,7 +27,16 @@
  * from this file at all, so whatever it would otherwise be, it stays.
  *
  * One rule per package — there is no way to write this once for a list.
+ *
+ * The first rule is the default, and it is not redundant. `data-lang` is written
+ * onto `<html>` by the inline head script, so the pre-rendered page carries no
+ * such attribute at all: a reader with JavaScript off, and a crawler that does
+ * not run it, match none of the three rules below and are shown every package's
+ * half at once — `includeMiddleNameincludeMiddleNameinclude_middle_name` in the
+ * middle of a sentence. `:not([data-lang])` is that state, and it reads as the
+ * default package, which is what the head script would have written anyway.
  */
+html:not([data-lang]) .randino-lang[data-lang]:not([data-lang~='js']),
 html[data-lang='js'] .randino-lang[data-lang]:not([data-lang~='js']),
 html[data-lang='dart'] .randino-lang[data-lang]:not([data-lang~='dart']),
 html[data-lang='py'] .randino-lang[data-lang]:not([data-lang~='py']) {
@@ -384,6 +393,7 @@ html[data-lang='py'] .randino-lang[data-lang]:not([data-lang~='py']) {
  * from the ref — see the comment at the top of `LangStart.vue`. One rule per
  * package, the same way the rule at the top of this file is written.
  */
+html:not([data-lang]) .randino-start-option[data-lang='js'],
 html[data-lang='js'] .randino-start-option[data-lang='js'],
 html[data-lang='dart'] .randino-start-option[data-lang='dart'],
 html[data-lang='py'] .randino-start-option[data-lang='py'] {
