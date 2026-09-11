@@ -24,7 +24,7 @@ import 'package:randino/randino.dart';
 randProduct(language: WordLanguage.en, count: 3); // [Laptop, Keyboard, Earbuds]
 ```
 
-Returns `List<String>`. For the detail form, pass `WordTheme.product` to `randWordDetails`. Dart has no overloads, and a detail twin for each of the twenty-five themes would be twenty-five functions too many.
+Returns `List<String>`. For the detail form, pass `WordTheme.product` to `randWordDetails`. Dart has no overloads, and a detail twin for each of the twenty-nine themes would be twenty-nine functions too many.
 
 :::
 

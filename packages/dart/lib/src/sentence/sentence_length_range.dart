@@ -13,8 +13,8 @@ import 'package:randino/src/word/data/index.dart';
 /// [language] spans every language at once.
 ///
 /// ```dart
-/// sentenceLengthRange(WordLanguage.ko); // LengthRange(6, 41)
-/// sentenceLengthRange(WordLanguage.en); // LengthRange(13, 92)
+/// sentenceLengthRange(WordLanguage.ko); // LengthRange(5, 55)
+/// sentenceLengthRange(WordLanguage.en); // LengthRange(11, 118)
 /// ```
 LengthRange sentenceLengthRange([WordLanguage? language]) {
   final languages = language == null ? wordLanguages : <WordLanguage>[language];

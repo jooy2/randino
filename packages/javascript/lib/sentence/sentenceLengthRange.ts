@@ -12,8 +12,8 @@ import { naturalRange } from './sentenceGenerator.js';
  * purpose — the shape of each sentence is picked inside it.
  *
  * @example
- * sentenceLengthRange('ko'); // [5, 45]
- * sentenceLengthRange('en'); // [10, 84]
+ * sentenceLengthRange('ko'); // [5, 55]
+ * sentenceLengthRange('en'); // [11, 118]
  */
 export function sentenceLengthRange(language: WordLanguageOption = 'all'): [number, number] {
 	const wanted = resolveWordLanguage(language);

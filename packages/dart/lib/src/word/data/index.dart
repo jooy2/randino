@@ -10,11 +10,12 @@ import 'package:randino/src/word/data/types.dart';
 import 'package:randino/src/word/data/vi.dart';
 import 'package:randino/src/word/data/zh.dart';
 
-/// Languages the word pools cover.
+/// Languages the word pools cover — the same nine the name generator knows.
 ///
-/// Fewer than the name generator: a modifier has to sit in front of a noun
-/// exactly as it is written in the dictionary, which only works without
-/// grammatical agreement — see CLAUDE.md before adding one.
+/// A modifier has to sit beside a noun in the form that language puts it in,
+/// which each of them says in its own `frames` and `agreement` rather than in a
+/// rule here: Vietnamese writes `mèo xanh`, German `blauer Wal`. See CLAUDE.md
+/// before adding one.
 final List<WordLanguage> wordLanguages = List<WordLanguage>.unmodifiable(<WordLanguage>[
   WordLanguage.en,
   WordLanguage.ko,

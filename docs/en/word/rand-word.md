@@ -1,6 +1,6 @@
 # randWord
 
-Generates everyday words and returns `count` of them as strings. Animals, things, nature and ideas, across twenty-five [themes](./themes) in nine languages, and **never a person name**. With [`output: 'detail'`](#the-detail-output) it reports the language and theme behind each word.
+Generates everyday words and returns `count` of them as strings. Animals, things, nature and ideas, across twenty-nine [themes](./themes) in nine languages, and **never a person name**. With [`output: 'detail'`](#the-detail-output) it reports the language and theme behind each word.
 
 These are the pools [`randNickname`](../nickname/rand-nickname) is built from, handed back with nothing added to them.
 
@@ -43,13 +43,13 @@ Every option is optional, and the defaults are what the empty call above uses.
 
 <WordOptions theme />
 
-The same table is on each of the twenty-five pages below, drawn from one component rather than written out twenty-six times. Everything but `language` and `theme` is an option every generator in the package takes, and means the same thing on each of them.
+The same table is on each of the twenty-nine pages below, drawn from one component rather than written out thirty times. Everything but `language` and `theme` is an option every generator in the package takes, and means the same thing on each of them.
 
 Dart has no `output`; [the detail output](#the-detail-output) is `randWordDetails` there.
 
 ## One function per theme
 
-A theme is an option and a function both. Each of the twenty-five is `randWord` with the theme already chosen, and each has a page of its own. The words each theme holds are on [Themes](./themes).
+A theme is an option and a function both. Each of the twenty-nine is `randWord` with the theme already chosen, and each has a page of its own. The words each theme holds are on [Themes](./themes).
 
 [`randAnimal`](./rand-animal) · [`randObject`](./rand-object) · [`randNature`](./rand-nature) · [`randPlant`](./rand-plant) · [`randGem`](./rand-gem) · [`randConcept`](./rand-concept) · [`randMyth`](./rand-myth) · [`randJob`](./rand-job) · [`randMusic`](./rand-music) · [`randPlace`](./rand-place) · [`randFood`](./rand-food) · [`randSport`](./rand-sport) · [`randVehicle`](./rand-vehicle) · [`randProduct`](./rand-product) · [`randColor`](./rand-color) · [`randFinance`](./rand-finance) · [`randTech`](./rand-tech) · [`randWeather`](./rand-weather) · [`randSpace`](./rand-space) · [`randTime`](./rand-time) · [`randEmotion`](./rand-emotion) · [`randBody`](./rand-body) · [`randClothing`](./rand-clothing) · [`randTool`](./rand-tool) · [`randDrink`](./rand-drink)
 
@@ -75,7 +75,7 @@ randFood(language: WordLanguage.en, count: 2); // [Dumpling, Cocoa]
 randGem(language: WordLanguage.en, count: 2, unique: true); // [Obsidian, Bronze]
 ```
 
-The themed functions return `List<String>` only. For the detail form, pass the theme to `randWordDetails`. Dart has no overloads, and a detail twin for each of the twenty-five themes would be twenty-five functions too many.
+The themed functions return `List<String>` only. For the detail form, pass the theme to `randWordDetails`. Dart has no overloads, and a detail twin for each of the twenty-nine themes would be twenty-nine functions too many.
 
 :::
 
@@ -240,7 +240,7 @@ rand_word(language="en", theme="plant", output="detail")
 
 ## See also
 
-- [Themes](./themes) — the twenty-five of them, and the function each one has.
+- [Themes](./themes) — the twenty-nine of them, and the function each one has.
 - [`wordLengthRange`](./word-length-range) — what a language's pools can produce.
 - [`randNickname`](../nickname/rand-nickname) — the same words, put together.
 - [`randModifier`](../decorate/rand-modifier) — a modifier in front of a word you already have.

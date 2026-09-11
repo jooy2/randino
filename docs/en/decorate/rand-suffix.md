@@ -178,7 +178,6 @@ It comes from the platform's ordinary random number generator — `Math.random`,
 
 So a suffix is right for telling two nicknames apart, and wrong for anything that has to be unguessable: a session token, an invite code, a password reset link, an object key somebody must not be able to enumerate. Use the platform's own secure generator for those — `crypto.getRandomValues`, `Random.secure()`, `secrets` — and use a database constraint rather than a token when a value has to be unique with certainty.
 
-
 ## A separate function rather than an option {#why-this-is-not-a-nickname-option}
 
 Attaching a token to a string is a thing about strings rather than about nicknames. As its own function it works on a name, on an order number, on anything you already have, and the nickname generator's length options describe the whole nickname rather than the part before the suffix.

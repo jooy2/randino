@@ -23,7 +23,7 @@ def nickname_length_range(
         >>> nickname_length_range("ko")
         (1, 13)
         >>> nickname_length_range("en")
-        (3, 31)
+        (3, 33)
         >>> nickname_length_range("ko", "-")
         (1, 15)
     """

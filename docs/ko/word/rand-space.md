@@ -24,7 +24,7 @@ import 'package:randino/randino.dart';
 randSpace(language: WordLanguage.en, count: 3); // [Galaxy, Comet, Nebula]
 ```
 
-`List<String>`을 돌려줍니다. 상세 출력이 필요하면 `randWordDetails`에 `WordTheme.space`를 넘기세요. Dart에는 오버로드가 없어서, 이것만을 위해 함수를 스물다섯 개 더 두는 것은 과합니다.
+`List<String>`을 돌려줍니다. 상세 출력이 필요하면 `randWordDetails`에 `WordTheme.space`를 넘기세요. Dart에는 오버로드가 없어서, 이것만을 위해 함수를 스물아홉 개 더 두는 것은 과합니다.
 
 :::
 

@@ -23,9 +23,9 @@ def sentence_length_range(language: WordLanguageOption = "all") -> tuple[int, in
 
     Example:
         >>> sentence_length_range("ko")
-        (6, 41)
+        (5, 55)
         >>> sentence_length_range("en")
-        (13, 92)
+        (11, 118)
     """
     wanted = resolve_word_language(language)
     languages = WORD_LANGUAGES if wanted == "all" else (wanted,)

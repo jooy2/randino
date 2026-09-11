@@ -8,8 +8,8 @@
 import { nicknameLengthRange } from 'randino';
 
 nicknameLengthRange('ko'); // [1, 13]
-nicknameLengthRange('en'); // [3, 31]
-nicknameLengthRange('zh'); // [2, 8]
+nicknameLengthRange('en'); // [3, 33]
+nicknameLengthRange('zh'); // [2, 9]
 nicknameLengthRange('ko', '-'); // [1, 15]
 ```
 
@@ -28,8 +28,8 @@ nicknameLengthRange('ko', '-'); // [1, 15]
 import 'package:randino/randino.dart';
 
 nicknameLengthRange(language: WordLanguage.ko); // LengthRange(1, 13)
-nicknameLengthRange(language: WordLanguage.en); // LengthRange(3, 31)
-nicknameLengthRange(language: WordLanguage.zh); // LengthRange(2, 8)
+nicknameLengthRange(language: WordLanguage.en); // LengthRange(3, 33)
+nicknameLengthRange(language: WordLanguage.zh); // LengthRange(2, 9)
 nicknameLengthRange(language: WordLanguage.ko, wordSeparator: '-'); // LengthRange(1, 15)
 ```
 
@@ -48,8 +48,8 @@ nicknameLengthRange(language: WordLanguage.ko, wordSeparator: '-'); // LengthRan
 from randino import nickname_length_range
 
 nickname_length_range("ko")  # (1, 13)
-nickname_length_range("en")  # (3, 31)
-nickname_length_range("zh")  # (2, 8)
+nickname_length_range("en")  # (3, 33)
+nickname_length_range("zh")  # (2, 9)
 nickname_length_range("ko", "-")  # (1, 15)
 ```
 
@@ -69,7 +69,7 @@ nickname_length_range("ko", "-")  # (1, 15)
 ::: lang js
 
 ```javascript
-nicknameLengthRange('en'); // [3, 31] — 모든 형태
+nicknameLengthRange('en'); // [3, 33] — 모든 형태
 randNickname({ language: 'en', maxLength: 8, count: 3 });
 // ['CoolPoem', 'MaidClaw', 'RustyBus'] — 세 단어가 들어갈 자리가 없습니다
 ```
@@ -79,7 +79,7 @@ randNickname({ language: 'en', maxLength: 8, count: 3 });
 ::: lang dart
 
 ```dart
-nicknameLengthRange(language: WordLanguage.en); // LengthRange(3, 31) — 모든 형태
+nicknameLengthRange(language: WordLanguage.en); // LengthRange(3, 33) — 모든 형태
 randNickname(language: WordLanguage.en, maxLength: 8, count: 3);
 // ['CoolPoem', 'MaidClaw', 'RustyBus'] — 세 단어가 들어갈 자리가 없습니다
 ```
@@ -89,7 +89,7 @@ randNickname(language: WordLanguage.en, maxLength: 8, count: 3);
 ::: lang py
 
 ```python
-nickname_length_range("en")  # (3, 31) — 모든 형태
+nickname_length_range("en")  # (3, 33) — 모든 형태
 rand_nickname(language="en", max_length=8, count=3)
 # ['CoolPoem', 'MaidClaw', 'RustyBus'] — 세 단어가 들어갈 자리가 없습니다
 ```
@@ -105,7 +105,7 @@ rand_nickname(language="en", max_length=8, count=3)
 ```javascript
 nicknameLengthRange('ko'); // [1, 13]
 nicknameLengthRange('ko', '-'); // [1, 15] — 가장 긴 형태에는 구분자가 두 개
-nicknameLengthRange('en', ' '); // [3, 33]
+nicknameLengthRange('en', ' '); // [3, 35]
 ```
 
 :::
@@ -115,7 +115,7 @@ nicknameLengthRange('en', ' '); // [3, 33]
 ```dart
 nicknameLengthRange(language: WordLanguage.ko); // LengthRange(1, 13)
 nicknameLengthRange(language: WordLanguage.ko, wordSeparator: '-'); // LengthRange(1, 15)
-nicknameLengthRange(language: WordLanguage.en, wordSeparator: ' '); // LengthRange(3, 33)
+nicknameLengthRange(language: WordLanguage.en, wordSeparator: ' '); // LengthRange(3, 35)
 ```
 
 :::

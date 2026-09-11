@@ -8,8 +8,8 @@ Every nickname length the language can produce, in characters. This is what [`ra
 import { nicknameLengthRange } from 'randino';
 
 nicknameLengthRange('ko'); // [1, 13]
-nicknameLengthRange('en'); // [3, 31]
-nicknameLengthRange('zh'); // [2, 8]
+nicknameLengthRange('en'); // [3, 33]
+nicknameLengthRange('zh'); // [2, 9]
 nicknameLengthRange('ko', '-'); // [1, 15]
 ```
 
@@ -28,8 +28,8 @@ Returns `[min, max]`.
 import 'package:randino/randino.dart';
 
 nicknameLengthRange(language: WordLanguage.ko); // LengthRange(1, 13)
-nicknameLengthRange(language: WordLanguage.en); // LengthRange(3, 31)
-nicknameLengthRange(language: WordLanguage.zh); // LengthRange(2, 8)
+nicknameLengthRange(language: WordLanguage.en); // LengthRange(3, 33)
+nicknameLengthRange(language: WordLanguage.zh); // LengthRange(2, 9)
 nicknameLengthRange(language: WordLanguage.ko, wordSeparator: '-'); // LengthRange(1, 15)
 ```
 
@@ -48,8 +48,8 @@ Returns a `LengthRange`, which compares by value.
 from randino import nickname_length_range
 
 nickname_length_range("ko")  # (1, 13)
-nickname_length_range("en")  # (3, 31)
-nickname_length_range("zh")  # (2, 8)
+nickname_length_range("en")  # (3, 33)
+nickname_length_range("zh")  # (2, 9)
 nickname_length_range("ko", "-")  # (1, 15)
 ```
 
@@ -69,7 +69,7 @@ The lower end is a bare noun and the upper end a modifier, a noun and a trailing
 ::: lang js
 
 ```javascript
-nicknameLengthRange('en'); // [3, 31] — every shape
+nicknameLengthRange('en'); // [3, 33] — every shape
 randNickname({ language: 'en', maxLength: 8, count: 3 });
 // ['CoolPoem', 'MaidClaw', 'RustyBus'] — no room for three words
 ```
@@ -79,7 +79,7 @@ randNickname({ language: 'en', maxLength: 8, count: 3 });
 ::: lang dart
 
 ```dart
-nicknameLengthRange(language: WordLanguage.en); // LengthRange(3, 31) — every shape
+nicknameLengthRange(language: WordLanguage.en); // LengthRange(3, 33) — every shape
 randNickname(language: WordLanguage.en, maxLength: 8, count: 3);
 // ['CoolPoem', 'MaidClaw', 'RustyBus'] — no room for three words
 ```
@@ -89,7 +89,7 @@ randNickname(language: WordLanguage.en, maxLength: 8, count: 3);
 ::: lang py
 
 ```python
-nickname_length_range("en")  # (3, 31) — every shape
+nickname_length_range("en")  # (3, 33) — every shape
 rand_nickname(language="en", max_length=8, count=3)
 # ['CoolPoem', 'MaidClaw', 'RustyBus'] — no room for three words
 ```
@@ -105,7 +105,7 @@ A separator is part of the nickname. Its length counts toward <Lang js="minLengt
 ```javascript
 nicknameLengthRange('ko'); // [1, 13]
 nicknameLengthRange('ko', '-'); // [1, 15] — two separators in the longest shape
-nicknameLengthRange('en', ' '); // [3, 33]
+nicknameLengthRange('en', ' '); // [3, 35]
 ```
 
 :::
@@ -115,7 +115,7 @@ nicknameLengthRange('en', ' '); // [3, 33]
 ```dart
 nicknameLengthRange(language: WordLanguage.ko); // LengthRange(1, 13)
 nicknameLengthRange(language: WordLanguage.ko, wordSeparator: '-'); // LengthRange(1, 15)
-nicknameLengthRange(language: WordLanguage.en, wordSeparator: ' '); // LengthRange(3, 33)
+nicknameLengthRange(language: WordLanguage.en, wordSeparator: ' '); // LengthRange(3, 35)
 ```
 
 :::

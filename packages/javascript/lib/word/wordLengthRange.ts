@@ -10,9 +10,9 @@ import { naturalRange } from './wordGenerator.js';
  * Narrowing the theme narrows the range, because a theme is a pool of its own.
  *
  * @example
- * wordLengthRange('ko'); // [1, 5]
- * wordLengthRange('ko', 'animal'); // [2, 4]
- * wordLengthRange('en'); // [2, 12]
+ * wordLengthRange('ko'); // [1, 4]
+ * wordLengthRange('ko', 'animal'); // [1, 4]
+ * wordLengthRange('en'); // [3, 11]
  */
 export function wordLengthRange(
 	language: WordLanguageOption = 'all',

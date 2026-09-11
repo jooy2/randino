@@ -24,7 +24,7 @@ import 'package:randino/randino.dart';
 randPlace(language: WordLanguage.en, count: 3); // [Market, Plaza, Village]
 ```
 
-Returns `List<String>`. For the detail form, pass `WordTheme.place` to `randWordDetails`. Dart has no overloads, and a detail twin for each of the twenty-five themes would be twenty-five functions too many.
+Returns `List<String>`. For the detail form, pass `WordTheme.place` to `randWordDetails`. Dart has no overloads, and a detail twin for each of the twenty-nine themes would be twenty-nine functions too many.
 
 :::
 

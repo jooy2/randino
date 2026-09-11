@@ -1,6 +1,6 @@
 # randWord
 
-일상 단어를 만들어 `count`개만큼 문자열로 돌려줍니다. 동물, 사물, 자연, 개념을 비롯한 25개 [테마](./themes)를 9개 언어로 제공하며, **사람 이름은 쓰지 않습니다.** [`output: 'detail'`](#the-detail-output)을 주면 각 단어의 언어와 테마까지 알려 줍니다.
+일상 단어를 만들어 `count`개만큼 문자열로 돌려줍니다. 동물, 사물, 자연, 개념을 비롯한 29개 [테마](./themes)를 9개 언어로 제공하며, **사람 이름은 쓰지 않습니다.** [`output: 'detail'`](#the-detail-output)을 주면 각 단어의 언어와 테마까지 알려 줍니다.
 
 [`randNickname`](../nickname/rand-nickname)이 조합해서 쓰는 것과 같은 단어 풀이며, 여기서는 아무것도 덧붙이지 않은 단어를 그대로 돌려줍니다.
 
@@ -43,13 +43,13 @@ rand_word()
 
 <WordOptions theme />
 
-같은 표가 아래 25개 페이지에도 들어 있어서, 26번 따로 쓰는 대신 컴포넌트 하나로 그립니다. `language`와 `theme`을 뺀 나머지는 이 패키지의 모든 생성 함수가 공통으로 받는 옵션이며, 어느 함수에서든 같은 뜻입니다.
+같은 표가 아래 29개 페이지에도 들어 있어서, 30번 따로 쓰는 대신 컴포넌트 하나로 그립니다. `language`와 `theme`을 뺀 나머지는 이 패키지의 모든 생성 함수가 공통으로 받는 옵션이며, 어느 함수에서든 같은 뜻입니다.
 
 Dart에는 `output`이 없습니다. 거기서는 [상세 출력](#the-detail-output)이 `randWordDetails`입니다.
 
 ## 테마마다 함수가 하나씩
 
-테마는 옵션이면서 함수이기도 합니다. 25개 각각이 테마를 미리 정해 둔 `randWord`이고, 문서 페이지도 하나씩 있습니다. 각 테마가 담고 있는 단어는 [테마](./themes)에 있습니다.
+테마는 옵션이면서 함수이기도 합니다. 29개 각각이 테마를 미리 정해 둔 `randWord`이고, 문서 페이지도 하나씩 있습니다. 각 테마가 담고 있는 단어는 [테마](./themes)에 있습니다.
 
 [`randAnimal`](./rand-animal) · [`randObject`](./rand-object) · [`randNature`](./rand-nature) · [`randPlant`](./rand-plant) · [`randGem`](./rand-gem) · [`randConcept`](./rand-concept) · [`randMyth`](./rand-myth) · [`randJob`](./rand-job) · [`randMusic`](./rand-music) · [`randPlace`](./rand-place) · [`randFood`](./rand-food) · [`randSport`](./rand-sport) · [`randVehicle`](./rand-vehicle) · [`randProduct`](./rand-product) · [`randColor`](./rand-color) · [`randFinance`](./rand-finance) · [`randTech`](./rand-tech) · [`randWeather`](./rand-weather) · [`randSpace`](./rand-space) · [`randTime`](./rand-time) · [`randEmotion`](./rand-emotion) · [`randBody`](./rand-body) · [`randClothing`](./rand-clothing) · [`randTool`](./rand-tool) · [`randDrink`](./rand-drink)
 
@@ -75,7 +75,7 @@ randFood(language: WordLanguage.en, count: 2); // [Dumpling, Cocoa]
 randGem(language: WordLanguage.en, count: 2, unique: true); // [Obsidian, Bronze]
 ```
 
-테마 함수는 `List<String>`만 돌려줍니다. 상세 출력이 필요하면 `randWordDetails`에 테마를 넘기세요. Dart에는 오버로드가 없어서, 이것만을 위해 함수를 스물다섯 개 더 두는 것은 과합니다.
+테마 함수는 `List<String>`만 돌려줍니다. 상세 출력이 필요하면 `randWordDetails`에 테마를 넘기세요. Dart에는 오버로드가 없어서, 이것만을 위해 함수를 스물아홉 개 더 두는 것은 과합니다.
 
 :::
 
@@ -240,7 +240,7 @@ rand_word(language="en", theme="plant", output="detail")
 
 ## 함께 보기 {#see-also}
 
-- [테마](./themes) — 25개 테마와 테마마다 있는 함수.
+- [테마](./themes) — 29개 테마와 테마마다 있는 함수.
 - [`wordLengthRange`](./word-length-range) — 언어의 단어 풀이 담고 있는 길이 범위.
 - [`randNickname`](../nickname/rand-nickname) — 같은 단어를 조합해서 쓰는 생성 함수.
 - [`randModifier`](../decorate/rand-modifier) — 이미 만들어 둔 단어 앞에 수식어를 붙이는 함수.

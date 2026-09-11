@@ -14,7 +14,7 @@ import { naturalRange } from './nicknameGenerator.js';
  *
  * @example
  * nicknameLengthRange('ko'); // [1, 13]
- * nicknameLengthRange('en'); // [3, 31]
+ * nicknameLengthRange('en'); // [3, 33]
  * nicknameLengthRange('ko', '-'); // [1, 15]
  */
 export function nicknameLengthRange(

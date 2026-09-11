@@ -14,7 +14,7 @@ import 'package:randino/src/word/data/index.dart';
 ///
 /// ```dart
 /// nicknameLengthRange(language: WordLanguage.ko); // LengthRange(1, 13)
-/// nicknameLengthRange(language: WordLanguage.en); // LengthRange(3, 31)
+/// nicknameLengthRange(language: WordLanguage.en); // LengthRange(3, 33)
 /// nicknameLengthRange(language: WordLanguage.ko, wordSeparator: '-'); // LengthRange(1, 15)
 /// ```
 LengthRange nicknameLengthRange({WordLanguage? language, String? wordSeparator}) {

@@ -238,7 +238,7 @@ function structuredData(description: string, url: string) {
 		description,
 		url,
 		codeRepository: repoUrl,
-		programmingLanguage: ['TypeScript', 'Dart'],
+		programmingLanguage: ['TypeScript', 'Dart', 'Python'],
 		license: 'https://opensource.org/licenses/MIT',
 		author: { '@type': 'Organization', name: 'CDGet', url: 'https://cdget.com' },
 		sameAs: [repoUrl, npmUrl, pubUrl, pypiUrl]
