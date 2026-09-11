@@ -29,7 +29,13 @@ from randino._types import (
     WordTheme,
     WordThemeOption,
 )
-from randino.word.data import WORD_DATA, WORD_LANGUAGES, WORD_THEMES
+from randino.word.data import (
+    WORD_DATA,
+    WORD_LANGUAGES,
+    WORD_THEMES,
+    resolve_theme,
+    resolve_word_language,
+)
 from randino.word.data._types import (
     PoolSynthesis,
     SyllableSynthesis,
@@ -517,7 +523,7 @@ def generate_word_details(
 ) -> list[WordDetail]:
     """Generate `count` words, applied to every option the caller passed."""
     settings = Settings(
-        theme=theme,
+        theme=resolve_theme(theme),
         invent=resolve_realism(realism),
         vocabulary=resolve_vocabulary(vocabulary),
         min_length=min_length,
@@ -527,7 +533,7 @@ def generate_word_details(
 
     # A requested first character the language does not write is one it can never
     # lead a word with, so the languages that cannot are out before a draw is made.
-    languages = languages_writing(language, WORD_LANGUAGES, settings.prefix)
+    languages = languages_writing(resolve_word_language(language), WORD_LANGUAGES, settings.prefix)
 
     if not languages:
         return []

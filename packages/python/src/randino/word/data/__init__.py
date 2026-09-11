@@ -1,6 +1,12 @@
 """The per-language word datasets: the pools every generator draws from."""
 
-from randino._types import WordLanguage, WordTheme
+from randino._internal.generate import resolve_option
+from randino._types import (
+    WordLanguage,
+    WordLanguageOption,
+    WordTheme,
+    WordThemeOption,
+)
 from randino.word.data._types import WordLanguageData
 from randino.word.data.de import DE
 from randino.word.data.en import EN
@@ -78,3 +84,22 @@ WORD_DATA: dict[WordLanguage, WordLanguageData] = {
     "ru": RU,
 }
 """Each language's pools and rules, keyed by its code."""
+
+
+_WORD_LANGUAGE_OPTIONS: tuple[WordLanguageOption, ...] = (*WORD_LANGUAGES, "all")
+_WORD_THEME_OPTIONS: tuple[WordThemeOption, ...] = (*WORD_THEMES, "all")
+"""Every value `language` and `theme` accept, and what an unknown one falls back to.
+
+The types rule one out and an unchecked caller can still pass it; answering with
+`WORD_DATA["xx"]` names the value and not the option.
+"""
+
+
+def resolve_word_language(language: object) -> WordLanguageOption:
+    """The caller's `language`, or `"all"` for one this package does not know."""
+    return resolve_option(language, _WORD_LANGUAGE_OPTIONS, "all")
+
+
+def resolve_theme(theme: object) -> WordThemeOption:
+    """The caller's `theme`, or `"all"` for one this package does not know."""
+    return resolve_option(theme, _WORD_THEME_OPTIONS, "all")

@@ -1,4 +1,10 @@
-import type { WordLanguage, WordTheme } from '../../_types/global.js';
+import { resolveOption } from '../../_internal/generate.js';
+import type {
+	WordLanguage,
+	WordLanguageOption,
+	WordTheme,
+	WordThemeOption
+} from '../../_types/global.js';
 import { DE } from './de.js';
 import { EN } from './en.js';
 import { ES } from './es.js';
@@ -83,3 +89,19 @@ export const WORD_DATA: Record<WordLanguage, WordLanguageData> = {
 	de: DE,
 	ru: RU
 };
+
+// Every value `language` and `theme` accept, and what an unknown one falls back
+// to. The types rule one out and a JavaScript caller can still pass it;
+// answering with `WORD_DATA['xx'].nouns` names neither the option nor the value.
+const WORD_LANGUAGE_OPTIONS: readonly WordLanguageOption[] = [...WORD_LANGUAGES, 'all'];
+const WORD_THEME_OPTIONS: readonly WordThemeOption[] = [...WORD_THEMES, 'all'];
+
+/** The caller's `language`, or `'all'` for one this package does not know. */
+export function resolveWordLanguage(language: unknown): WordLanguageOption {
+	return resolveOption(language, WORD_LANGUAGE_OPTIONS, 'all');
+}
+
+/** The caller's `theme`, or `'all'` for one this package does not know. */
+export function resolveTheme(theme: unknown): WordThemeOption {
+	return resolveOption(theme, WORD_THEME_OPTIONS, 'all');
+}

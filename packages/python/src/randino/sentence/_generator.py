@@ -31,12 +31,16 @@ from randino._internal.generate import (
     languages_writing,
     length_bounds,
     resolve_length,
+    resolve_many,
+    resolve_option,
+    resolve_optional,
     resolve_prefix,
     resolve_realism,
     resolve_vocabulary,
+    resolve_whole,
 )
 from randino._internal.script import ends_with_consonant, ends_with_liquid
-from randino._internal.utils import chance, clamp, pick, pick_weighted
+from randino._internal.utils import chance, pick, pick_weighted
 from randino._types import (
     RandRealism,
     RandVocabulary,
@@ -70,7 +74,7 @@ from randino.sentence._story import (
     unjoined,
 )
 from randino.sentence._story import Plan as StoryPlan
-from randino.sentence.data import SENTENCE_DATA, THEME_CLASS, StoryStep
+from randino.sentence.data import SENTENCE_DATA, STORIES, THEME_CLASS, StoryStep
 from randino.sentence.data._types import (
     Condition,
     ConnectiveKind,
@@ -101,7 +105,13 @@ from randino.word._generator import (
     synth_bounds,
     theme_of,
 )
-from randino.word.data import WORD_DATA, WORD_LANGUAGES, WORD_THEMES
+from randino.word.data import (
+    WORD_DATA,
+    WORD_LANGUAGES,
+    WORD_THEMES,
+    resolve_theme,
+    resolve_word_language,
+)
 from randino.word.data._types import WordAgreement, WordGender, WordLanguageData, WordPool
 
 FIT_ATTEMPTS = 14
@@ -5046,28 +5056,50 @@ def _generate_one(language: WordLanguage, settings: Settings, draw: Draw) -> Bui
     return cast("Built", best)
 
 
+# Every value the fixed-set options accept. A caller the type does not check can pass
+# anything; these are what is answered with rather than a shape drawn against a mood no
+# frame declares, or quotation marks silently left off.
+_SENTENCE_TYPES: tuple[SentenceType, ...] = (
+    "statement",
+    "question",
+    "exclamation",
+    "trailing",
+    "dialogue",
+    "thought",
+)
+_SENTENCE_SLOTS: tuple[SentenceSlot, ...] = (
+    "subject",
+    "verb",
+    "object",
+    "state",
+    "place",
+    "destination",
+    "time",
+    "manner",
+    "degree",
+    "quantity",
+    "money",
+    "date",
+    "clock",
+)
+_SHAPES: tuple[SentenceShapeOption, ...] = ("all", "simple", "detailed", "complex")
+_TENSES: tuple[SentenceTense, ...] = ("present", "past")
+_QUOTES: tuple[SentenceQuote, ...] = ("single", "double")
+_REALISMS: tuple[RandRealism, ...] = ("real", "mixed", "invented")
+_STYLES: tuple[SentenceStyle, ...] = ("plain", "casual", "polite", "formal")
+_STORIES_BY_NAME: tuple[SentenceStory, ...] = tuple(story.name for story in STORIES)
+
+
 def _resolve_types(type_: SentenceTypeOption | None) -> tuple[SentenceType, ...]:
     """The caller's `type`, as the set one sentence is drawn from.
 
     Left out, or asked for something none of these are, the set is every one of them:
     a sentence with nothing said about it is as likely to ask as to tell.
     """
-    every: tuple[SentenceType, ...] = (
-        "statement",
-        "question",
-        "exclamation",
-        "trailing",
-        "dialogue",
-        "thought",
-    )
-
     if type_ is None or type_ == "all":
-        return every
+        return _SENTENCE_TYPES
 
-    wanted = (type_,) if isinstance(type_, str) else tuple(type_)
-    usable = tuple(each for each in wanted if each in every)
-
-    return usable or every
+    return resolve_many(type_, _SENTENCE_TYPES, _SENTENCE_TYPES)
 
 
 def _resolve_slots(slots: SentenceSlotOption) -> tuple[SentenceSlot, ...] | str:
@@ -5079,9 +5111,11 @@ def _resolve_slots(slots: SentenceSlotOption) -> tuple[SentenceSlot, ...] | str:
     if slots in ("all", "none"):
         return cast("str", slots)
 
-    wanted = (slots,) if isinstance(slots, str) else tuple(slots)
+    wanted = resolve_many(slots, _SENTENCE_SLOTS, ())
 
-    return cast("tuple[SentenceSlot, ...]", wanted) if wanted else "none"
+    # An empty set asks the same thing `"none"` does, and so does a set of slots this
+    # package does not know: neither leaves any part allowed beside the subject.
+    return wanted or "none"
 
 
 def generate_sentence_details(
@@ -5132,25 +5166,36 @@ def generate_sentence_details(
     Returns:
         One `SentenceDetail` per result.
     """
-    listed = (include,) if isinstance(include, str) else tuple(include)
+    # Anything that is not a word is dropped with the blanks: a required word is
+    # looked up in the pools, and `None.strip()` says nothing about which entry of the
+    # list was wrong.
+    if isinstance(include, str):
+        listed: Sequence[object] = (include,)
+    elif isinstance(include, Sequence):
+        listed = tuple(include)
+    else:
+        listed = ()
+
     settings = Settings(
-        theme=theme,
-        shape=shape,
+        theme=resolve_theme(theme),
+        shape=resolve_option(shape, _SHAPES, "all"),
         slots=_resolve_slots(slots),
         invent=resolve_realism(realism),
         vocabulary=resolve_vocabulary(vocabulary),
         min_length=resolve_length(min_length),
         max_length=resolve_length(max_length),
         prefix=resolve_prefix(starts_with),
-        include=tuple(word.strip() for word in listed if word.strip()),
-        sentences=clamp(sentences, 1, RAND_SENTENCE_COUNT_MAX),
-        realism=realism,
-        include_name=include_name,
+        include=tuple(word.strip() for word in listed if isinstance(word, str) and word.strip()),
+        sentences=resolve_whole(sentences, 1, 1, RAND_SENTENCE_COUNT_MAX),
+        realism=resolve_option(realism, _REALISMS, "real"),
+        include_name=include_name if isinstance(include_name, bool) else None,
         types=_resolve_types(type),
-        quote=quote,
-        style=style,
-        tense=tense,
-        story=story,
+        # A mark the language does not write is no quotation mark at all, and a quoted
+        # line that came back without one was the whole of what went wrong.
+        quote=resolve_optional(quote, _QUOTES),
+        style=resolve_optional(style, _STYLES),
+        tense=resolve_optional(tense, _TENSES),
+        story=resolve_optional(story, _STORIES_BY_NAME),
         # A caller who named the kinds — `"all"` included — gets them; a story writes
         # statements otherwise.
         typed=type is not None,
@@ -5163,7 +5208,7 @@ def generate_sentence_details(
     able = _languages_for(settings)
     # And a requested first character the language does not write is one it can never
     # lead a sentence with, so those languages are out before a draw is made.
-    languages = languages_writing(language, able, settings.prefix)
+    languages = languages_writing(resolve_word_language(language), able, settings.prefix)
 
     if not languages:
         return []

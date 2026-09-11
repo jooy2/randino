@@ -3,7 +3,7 @@
 from randino._internal.utils import clamp
 from randino._types import NameLanguageOption
 from randino.constants import RAND_LENGTH_MAX, RAND_LENGTH_MIN
-from randino.name.data import NAME_DATA, NAME_LANGUAGES
+from randino.name.data import NAME_DATA, NAME_LANGUAGES, resolve_name_language
 
 
 def name_length_range(
@@ -26,7 +26,8 @@ def name_length_range(
         >>> name_length_range("en")
         (7, 21)
     """
-    languages = NAME_LANGUAGES if language == "all" else (language,)
+    wanted = resolve_name_language(language)
+    languages = NAME_LANGUAGES if wanted == "all" else (wanted,)
     low = RAND_LENGTH_MAX
     high = 0
 

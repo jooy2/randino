@@ -1,7 +1,7 @@
 import { clamp } from '../_internal/utils.js';
 import { RAND_LENGTH_MIN, RAND_SENTENCE_LENGTH_MAX } from '../constants.js';
 import type { WordLanguageOption } from '../_types/global.js';
-import { WORD_LANGUAGES } from '../word/data/index.js';
+import { WORD_LANGUAGES, resolveWordLanguage } from '../word/data/index.js';
 import { naturalRange } from './sentenceGenerator.js';
 
 /**
@@ -16,7 +16,8 @@ import { naturalRange } from './sentenceGenerator.js';
  * sentenceLengthRange('en'); // [10, 84]
  */
 export function sentenceLengthRange(language: WordLanguageOption = 'all'): [number, number] {
-	const languages = language === 'all' ? WORD_LANGUAGES : [language];
+	const wanted = resolveWordLanguage(language);
+	const languages = wanted === 'all' ? WORD_LANGUAGES : [wanted];
 	let min = Infinity;
 	let max = 0;
 

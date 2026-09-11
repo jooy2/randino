@@ -1,4 +1,5 @@
-import type { NameLanguage } from '../../_types/global.js';
+import { resolveOption } from '../../_internal/generate.js';
+import type { NameLanguage, NameLanguageOption } from '../../_types/global.js';
 import { DE } from './de.js';
 import { EN } from './en.js';
 import { ES } from './es.js';
@@ -35,3 +36,13 @@ export const NAME_DATA: Record<NameLanguage, NameLanguageData> = {
 	es: ES,
 	vi: VI
 };
+
+// Every value `language` accepts, and what an unknown one falls back to. The
+// type rules one out and a JavaScript caller can still pass it; answering with
+// `NAME_DATA['xx'].lengthSpec` names neither the option nor the value.
+const NAME_LANGUAGE_OPTIONS: readonly NameLanguageOption[] = [...NAME_LANGUAGES, 'all'];
+
+/** The caller's `language`, or `'all'` for one this package does not know. */
+export function resolveNameLanguage(language: unknown): NameLanguageOption {
+	return resolveOption(language, NAME_LANGUAGE_OPTIONS, 'all');
+}

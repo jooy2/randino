@@ -1,10 +1,10 @@
 """Shared by `rand_suffix` and `rand_prefix`."""
 
-import math
 from collections.abc import Callable
 
-from randino._internal.utils import clamp, rand_token
-from randino.decorate.data import AFFIX_CHARSET, AFFIX_LENGTH_MAX
+from randino._internal.generate import resolve_whole
+from randino._internal.utils import rand_token
+from randino.decorate.data import AFFIX_CHARSET, AFFIX_LENGTH_DEFAULT, AFFIX_LENGTH_MAX
 
 
 def attach(
@@ -31,8 +31,11 @@ def attach(
     Returns:
         A string when `value` is a string or None, a list when it is a list.
     """
-    size = clamp(math.floor(length), 1, AFFIX_LENGTH_MAX)
-    alphabet = charset or AFFIX_CHARSET
+    # A `length` that is not a whole number is the default rather than an error:
+    # `math.floor(nan)` raises, and the message names neither the option nor the
+    # value.
+    size = resolve_whole(length, AFFIX_LENGTH_DEFAULT, 1, AFFIX_LENGTH_MAX)
+    alphabet = charset if isinstance(charset, str) and charset else AFFIX_CHARSET
 
     def token() -> str:
         return rand_token(size, alphabet)

@@ -4,7 +4,7 @@ from randino._internal.utils import clamp
 from randino._types import WordLanguageOption
 from randino.constants import RAND_LENGTH_MIN, RAND_SENTENCE_LENGTH_MAX
 from randino.sentence._generator import natural_range
-from randino.word.data import WORD_LANGUAGES
+from randino.word.data import WORD_LANGUAGES, resolve_word_language
 
 
 def sentence_length_range(language: WordLanguageOption = "all") -> tuple[int, int]:
@@ -27,7 +27,8 @@ def sentence_length_range(language: WordLanguageOption = "all") -> tuple[int, in
         >>> sentence_length_range("en")
         (13, 92)
     """
-    languages = WORD_LANGUAGES if language == "all" else (language,)
+    wanted = resolve_word_language(language)
+    languages = WORD_LANGUAGES if wanted == "all" else (wanted,)
     low = None
     high = 0
 

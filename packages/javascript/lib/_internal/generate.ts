@@ -11,9 +11,73 @@ import type { RandCommonOptions, RandRealism, RandVocabulary } from '../_types/g
 import { writesScript } from './script.js';
 import { clamp, pick } from './utils.js';
 
+/**
+ * A whole number, or `undefined` for anything that is not one.
+ *
+ * TypeScript rules a `NaN` out of every option that takes a number; a JavaScript
+ * caller can still pass one, and `NaN` is the value that does not announce
+ * itself — it compares false against every bound it is checked against, so a
+ * generator handed one quietly produced nothing, or reached `new Array(NaN)` and
+ * threw from somewhere that says nothing about which option was wrong.
+ */
+function whole(value: unknown): number | undefined {
+	const number = Math.floor(Number(value));
+
+	return Number.isFinite(number) ? number : undefined;
+}
+
 /** `count`, floored and clamped to what a generator will serve. */
 export function resolveCount(count?: number): number {
-	return clamp(Math.floor(count ?? 1), 0, RAND_COUNT_MAX);
+	return clamp(whole(count) ?? 1, 0, RAND_COUNT_MAX);
+}
+
+/** A count of its own, for the options that carry one — `sentences`. */
+export function resolveWhole(value: unknown, fallback: number, min: number, max: number): number {
+	return clamp(whole(value) ?? fallback, min, max);
+}
+
+/**
+ * A caller's option narrowed to a value the generator knows, or the default it
+ * falls back to.
+ *
+ * The same reasoning as `resolveRealism`: the type rules the wrong value out,
+ * and a JavaScript caller can still pass one. Answering that with a crash from
+ * inside a pool lookup — `Cannot read properties of undefined (reading 'nouns')`
+ * — names neither the option nor the value, so every option that takes one of a
+ * fixed set falls back instead.
+ */
+export function resolveOption<T extends string>(
+	value: unknown,
+	allowed: readonly T[],
+	fallback: T
+): T {
+	return allowed.includes(value as T) ? (value as T) : fallback;
+}
+
+/**
+ * The same, for an option whose absence means something of its own: a `style`
+ * left out is a level drawn per result rather than a default level. An unknown
+ * value reads as absent, which is the only answer that keeps "left out" and
+ * "wrong" apart without inventing a level the caller did not ask for.
+ */
+export function resolveOptional<T extends string>(value: unknown, allowed: readonly T[]): T | null {
+	return allowed.includes(value as T) ? (value as T) : null;
+}
+
+/**
+ * The same for an option that takes one value or several. Unknown entries are
+ * dropped, and a list left with none of them falls back the way a single value
+ * does.
+ */
+export function resolveMany<T extends string>(
+	value: unknown,
+	allowed: readonly T[],
+	fallback: readonly T[]
+): readonly T[] {
+	const listed = typeof value === 'string' ? [value] : Array.isArray(value) ? value : [];
+	const known = listed.filter((each): each is T => allowed.includes(each as T));
+
+	return known.length ? known : fallback;
 }
 
 /**
@@ -22,7 +86,7 @@ export function resolveCount(count?: number): number {
  * built from, and a two-character prefix would rule out most pools entirely.
  */
 export function resolvePrefix(startsWith?: string): string {
-	return (startsWith ?? '').trim().slice(0, 1);
+	return typeof startsWith === 'string' ? startsWith.trim().slice(0, 1) : '';
 }
 
 // How often a part is invented rather than drawn, per level, as a percentage.
@@ -58,7 +122,7 @@ export function resolveVocabulary(vocabulary?: RandVocabulary): RandVocabulary {
  * which every generator answers by resolving the bound per language instead.
  */
 export function resolveLength(value?: number): number | undefined {
-	return value === undefined ? undefined : Math.floor(value);
+	return value === undefined ? undefined : whole(value);
 }
 
 /**

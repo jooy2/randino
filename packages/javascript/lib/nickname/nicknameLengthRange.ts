@@ -1,7 +1,7 @@
 import { clamp } from '../_internal/utils.js';
 import { RAND_LENGTH_MAX, RAND_LENGTH_MIN } from '../constants.js';
 import type { WordLanguageOption } from '../_types/global.js';
-import { WORD_LANGUAGES } from '../word/data/index.js';
+import { WORD_LANGUAGES, resolveWordLanguage } from '../word/data/index.js';
 import { naturalRange } from './nicknameGenerator.js';
 
 /**
@@ -21,7 +21,8 @@ export function nicknameLengthRange(
 	language: WordLanguageOption = 'all',
 	wordSeparator?: string
 ): [number, number] {
-	const languages = language === 'all' ? WORD_LANGUAGES : [language];
+	const wanted = resolveWordLanguage(language);
+	const languages = wanted === 'all' ? WORD_LANGUAGES : [wanted];
 	let min = Infinity;
 	let max = 0;
 

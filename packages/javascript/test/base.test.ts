@@ -110,4 +110,47 @@ describe('base test', () => {
 		assert.strictEqual(randino.AFFIX_SEPARATOR_DEFAULT, '_');
 		assert.match(randino.AFFIX_CHARSET, /^[0-9A-Za-z]+$/);
 	});
+
+	it('an option the types rule out falls back rather than throwing', () => {
+		// TypeScript rules every one of these out and a JavaScript caller can still
+		// pass them. Each used to reach a pool lookup or an array length and throw
+		// from somewhere that named neither the option nor the value.
+		const asks: (() => unknown)[] = [
+			() => randino.randName({ language: 'xx' as never }),
+			() => randino.randName({ gender: 'other' as never }),
+			() => randino.randName({ count: NaN }),
+			() => randino.randName({ minLength: NaN }),
+			() => randino.randWord({ theme: 'nope' as never }),
+			() => randino.randWord({ language: 'xx' as never }),
+			() => randino.randNickname({ theme: 'nope' as never }),
+			() => randino.randNickname({ slots: 123 as never }),
+			() => randino.randSentence({ language: 'xx' as never }),
+			() => randino.randSentence({ type: 123 as never }),
+			() => randino.randSentence({ include: 123 as never }),
+			() => randino.randSentence({ include: [null] as never }),
+			() => randino.randSentence({ slots: 123 as never }),
+			() => randino.randSentence({ shape: 'huge' as never }),
+			() => randino.randSentence({ story: 'nope' as never }),
+			() => randino.randSentence({ style: 'shouty' as never }),
+			() => randino.randSentence({ tense: 'future' as never }),
+			() => randino.randSentence({ sentences: NaN }),
+			() => randino.nameLengthRange('xx' as never),
+			() => randino.wordLengthRange('xx' as never),
+			() => randino.nicknameLengthRange('xx' as never),
+			() => randino.sentenceLengthRange('xx' as never),
+			() => randino.nameSupportsMiddleName('xx' as never)
+		];
+
+		for (const ask of asks) {
+			assert.doesNotThrow(ask);
+		}
+
+		// And the fallback is the option's own default, not silence: `count: NaN`
+		// asked for one name and used to hand back none.
+		assert.strictEqual(randino.randName({ count: NaN }).length, 1);
+		assert.strictEqual(randino.randSentence({ sentences: NaN })[0].split('. ').length, 1);
+		// A token of no length is not a token. `NaN` clamped to `NaN`, and a loop
+		// that runs `NaN` times wrote nothing at all.
+		assert.strictEqual(randino.randSuffix('x', { length: NaN }).length, 'x_'.length + 5);
+	});
 });

@@ -4,7 +4,7 @@ from randino._internal.utils import clamp
 from randino._types import WordLanguageOption
 from randino.constants import RAND_LENGTH_MAX, RAND_LENGTH_MIN
 from randino.nickname._generator import natural_range
-from randino.word.data import WORD_LANGUAGES
+from randino.word.data import WORD_LANGUAGES, resolve_word_language
 
 
 def nickname_length_range(
@@ -27,7 +27,8 @@ def nickname_length_range(
         >>> nickname_length_range("ko", "-")
         (1, 15)
     """
-    languages = WORD_LANGUAGES if language == "all" else (language,)
+    wanted = resolve_word_language(language)
+    languages = WORD_LANGUAGES if wanted == "all" else (wanted,)
     ranges = [natural_range(code, word_separator) for code in languages]
 
     return (

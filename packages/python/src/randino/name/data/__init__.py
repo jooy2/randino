@@ -1,6 +1,7 @@
 """The per-language name datasets, and the bounds the generator works inside."""
 
-from randino._types import NameLanguage
+from randino._internal.generate import resolve_option
+from randino._types import NameLanguage, NameLanguageOption
 from randino.name.data._types import NameLanguageData
 from randino.name.data.de import DE
 from randino.name.data.en import EN
@@ -30,3 +31,16 @@ NAME_DATA: dict[NameLanguage, NameLanguageData] = {
     "vi": VI,
 }
 """Each language's pools and rules, keyed by its code."""
+
+
+_NAME_LANGUAGE_OPTIONS: tuple[NameLanguageOption, ...] = (*NAME_LANGUAGES, "all")
+"""Every value `language` accepts, and what an unknown one falls back to.
+
+The type rules one out and an unchecked caller can still pass it; answering with
+`NAME_DATA["xx"]` names the value and not the option.
+"""
+
+
+def resolve_name_language(language: object) -> NameLanguageOption:
+    """The caller's `language`, or `"all"` for one this package does not know."""
+    return resolve_option(language, _NAME_LANGUAGE_OPTIONS, "all")

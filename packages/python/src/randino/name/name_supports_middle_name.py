@@ -1,7 +1,7 @@
 """Whether a language uses a middle name."""
 
 from randino._types import NameLanguageOption
-from randino.name.data import NAME_DATA
+from randino.name.data import NAME_DATA, resolve_name_language
 
 
 def name_supports_middle_name(language: NameLanguageOption = "all") -> bool:
@@ -16,9 +16,9 @@ def name_supports_middle_name(language: NameLanguageOption = "all") -> bool:
         >>> name_supports_middle_name("ko")
         False
     """
-    if language == "all":
+    wanted = resolve_name_language(language)
+
+    if wanted == "all":
         return True
 
-    data = NAME_DATA.get(language)
-
-    return bool(data and data.has_middle)
+    return NAME_DATA[wanted].has_middle

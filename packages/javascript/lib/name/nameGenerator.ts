@@ -16,12 +16,13 @@ import {
 	languagesWriting,
 	lengthBounds,
 	resolveLength,
+	resolveOption,
 	resolvePrefix,
 	resolveRealism
 } from '../_internal/generate.js';
 import { capitalizeFirst, chance, clamp, pick, pickWeighted, randInt } from '../_internal/utils.js';
 import type { NameDetail, NameGender, NameLanguage, RandNameOptions } from '../_types/global.js';
-import { NAME_DATA, NAME_LANGUAGES } from './data/index.js';
+import { NAME_DATA, NAME_LANGUAGES, resolveNameLanguage } from './data/index.js';
 import type { NameLanguageData, NamePool, NameToken, SyllableSet } from './data/types.js';
 import { nameLengthRange } from './nameLengthRange.js';
 import { romanize, romanizeHangul } from './romanize.js';
@@ -644,10 +645,15 @@ function generateOne(language: NameLanguage, settings: Settings): NameDetail {
 	return { native: entry.n, roman: entry.r, language, gender };
 }
 
+// Every value an option of `randName` accepts, for the ones that take one of a
+// fixed set. A JavaScript caller can pass anything; these are what is answered
+// with rather than a crash from inside a pool lookup.
+const GENDERS: readonly ('male' | 'female' | 'all')[] = ['male', 'female', 'all'];
+
 /** Resolve the caller's options into the settings a single name is built from. */
 function resolveSettings(options: RandNameOptions): Settings {
 	return {
-		gender: options.gender ?? 'all',
+		gender: resolveOption(options.gender, GENDERS, 'all'),
 		includeSurname: options.includeSurname ?? true,
 		includeMiddleName: options.includeMiddleName ?? false,
 		minLength: resolveLength(options.minLength),
@@ -669,7 +675,7 @@ export function drawName(language: NameLanguage, options: RandNameOptions = {}):
 }
 
 export function generateNameDetails(options: RandNameOptions = {}): NameDetail[] {
-	const language = options.language ?? 'all';
+	const language = resolveNameLanguage(options.language);
 	const settings = resolveSettings(options);
 	// A requested first character the language does not write is one it can never
 	// lead a name with, so the languages that cannot are out before a draw is made.

@@ -1,7 +1,8 @@
 // Shared by `randSuffix` and `randPrefix`. Internal — the two of them differ by
 // one line, which is the side the token lands on.
 
-import { clamp, randToken } from '../_internal/utils.js';
+import { resolveWhole } from '../_internal/generate.js';
+import { randToken } from '../_internal/utils.js';
 import type { RandAffixOptions } from '../_types/global.js';
 import {
 	AFFIX_CHARSET,
@@ -40,9 +41,14 @@ export function attach(
 	join: (value: string, token: string, separator: string) => string
 ): string | string[] {
 	const { target, settings } = firstArgument<RandAffixOptions>(value, options, {});
-	const length = clamp(Math.floor(settings.length ?? AFFIX_LENGTH_DEFAULT), 1, AFFIX_LENGTH_MAX);
-	const charset = settings.charset || AFFIX_CHARSET;
-	const separator = settings.separator ?? AFFIX_SEPARATOR_DEFAULT;
+	// A `length` that is not a whole number is the default rather than no token at
+	// all: `NaN` clamps to `NaN`, and a loop that runs `NaN` times writes nothing,
+	// so `randSuffix('x', { length: NaN })` used to hand back `'x_'`.
+	const length = resolveWhole(settings.length, AFFIX_LENGTH_DEFAULT, 1, AFFIX_LENGTH_MAX);
+	const charset =
+		typeof settings.charset === 'string' && settings.charset ? settings.charset : AFFIX_CHARSET;
+	const separator =
+		typeof settings.separator === 'string' ? settings.separator : AFFIX_SEPARATOR_DEFAULT;
 	const token = () => randToken(length, charset);
 
 	if (target === undefined) {

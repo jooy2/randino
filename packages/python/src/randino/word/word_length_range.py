@@ -4,7 +4,7 @@ from randino._internal.utils import clamp
 from randino._types import WordLanguageOption, WordThemeOption
 from randino.constants import RAND_LENGTH_MAX, RAND_LENGTH_MIN
 from randino.word._generator import natural_range
-from randino.word.data import WORD_LANGUAGES
+from randino.word.data import WORD_LANGUAGES, resolve_theme, resolve_word_language
 
 
 def word_length_range(
@@ -32,8 +32,10 @@ def word_length_range(
         >>> word_length_range("ko", "animal")
         (1, 4)
     """
-    languages = WORD_LANGUAGES if language == "all" else (language,)
-    ranges = [natural_range(code, theme) for code in languages]
+    wanted = resolve_word_language(language)
+    languages = WORD_LANGUAGES if wanted == "all" else (wanted,)
+    slice_ = resolve_theme(theme)
+    ranges = [natural_range(code, slice_) for code in languages]
 
     return (
         clamp(min(low for low, _ in ranges), RAND_LENGTH_MIN, RAND_LENGTH_MAX),

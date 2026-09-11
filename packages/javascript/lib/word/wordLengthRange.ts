@@ -1,7 +1,7 @@
 import { clamp } from '../_internal/utils.js';
 import { RAND_LENGTH_MAX, RAND_LENGTH_MIN } from '../constants.js';
 import type { WordLanguageOption, WordThemeOption } from '../_types/global.js';
-import { WORD_LANGUAGES } from './data/index.js';
+import { WORD_LANGUAGES, resolveTheme, resolveWordLanguage } from './data/index.js';
 import { naturalRange } from './wordGenerator.js';
 
 /**
@@ -18,12 +18,14 @@ export function wordLengthRange(
 	language: WordLanguageOption = 'all',
 	theme: WordThemeOption = 'all'
 ): [number, number] {
-	const languages = language === 'all' ? WORD_LANGUAGES : [language];
+	const wanted = resolveWordLanguage(language);
+	const languages = wanted === 'all' ? WORD_LANGUAGES : [wanted];
+	const slice = resolveTheme(theme);
 	let min = Infinity;
 	let max = 0;
 
 	for (const code of languages) {
-		const [low, high] = naturalRange(code, theme);
+		const [low, high] = naturalRange(code, slice);
 
 		min = Math.min(min, low);
 		max = Math.max(max, high);

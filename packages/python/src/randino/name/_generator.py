@@ -46,7 +46,7 @@ from randino._types import (
     RandRealism,
 )
 from randino.name._romanize import romanize, romanize_hangul
-from randino.name.data import NAME_DATA, NAME_LANGUAGES
+from randino.name.data import NAME_DATA, NAME_LANGUAGES, resolve_name_language
 from randino.name.data._types import NameLanguageData, NamePool, SyllableSet
 from randino.name.name_length_range import name_length_range
 
@@ -707,7 +707,7 @@ def generate_name_details(
 
     # A requested first character the language does not write is one it can never
     # lead a name with, so the languages that cannot are out before a draw is made.
-    languages = languages_writing(language, NAME_LANGUAGES, settings.prefix)
+    languages = languages_writing(resolve_name_language(language), NAME_LANGUAGES, settings.prefix)
 
     if not languages:
         return []

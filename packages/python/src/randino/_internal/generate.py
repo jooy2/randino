@@ -19,9 +19,101 @@ T = TypeVar("T")
 L = TypeVar("L", bound=str)
 
 
+def _whole(value: object) -> int | None:
+    """A whole number, or None for anything that is not one.
+
+    The type rules a `nan` out of every option that takes a number; an unchecked caller
+    can still pass one, and `nan` is the value that does not announce itself — it
+    compares false against every bound it is checked against, so a generator handed one
+    quietly produced nothing, or reached a negative list length and raised from
+    somewhere that says nothing about which option was wrong.
+
+    Args:
+        value: Whatever the caller passed.
+
+    Returns:
+        The floor of the number, or None when it is not a finite one.
+    """
+    try:
+        number = float(value)  # type: ignore[arg-type]
+    except (TypeError, ValueError):
+        return None
+
+    return math.floor(number) if math.isfinite(number) else None
+
+
+def resolve_whole(value: object, fallback: int, low: int, high: int) -> int:
+    """A whole number clamped to a range, for `count` and for `sentences`."""
+    number = _whole(value)
+
+    return clamp(fallback if number is None else number, low, high)
+
+
 def resolve_count(count: int) -> int:
     """Return `count`, floored and clamped to what a generator will serve."""
-    return clamp(math.floor(count), 0, RAND_COUNT_MAX)
+    return resolve_whole(count, 1, 0, RAND_COUNT_MAX)
+
+
+def resolve_option(value: object, allowed: Sequence[L], fallback: L) -> L:
+    """A caller's option narrowed to a value the generator knows, or the default.
+
+    The same reasoning as `resolve_realism`: the type rules the wrong value out, and an
+    unchecked caller can still pass one. Answering that with a `KeyError` from inside a
+    pool lookup names the value and not the option, so every option that takes one of a
+    fixed set falls back instead.
+
+    Args:
+        value: Whatever the caller passed.
+        allowed: Every value the option accepts.
+        fallback: What an unknown value reads as.
+
+    Returns:
+        The caller's value when the option accepts it, and `fallback` otherwise.
+    """
+    return value if value in allowed else fallback  # type: ignore[return-value]
+
+
+def resolve_optional(value: object, allowed: Sequence[L]) -> L | None:
+    """The same, for an option whose absence means something of its own.
+
+    A `style` left out is a level drawn per result rather than a default level. An
+    unknown value reads as absent, which is the only answer that keeps "left out" and
+    "wrong" apart without inventing a level the caller did not ask for.
+
+    Args:
+        value: Whatever the caller passed.
+        allowed: Every value the option accepts.
+
+    Returns:
+        The caller's value when the option accepts it, and None otherwise.
+    """
+    return value if value in allowed else None  # type: ignore[return-value]
+
+
+def resolve_many(value: object, allowed: Sequence[L], fallback: Sequence[L]) -> tuple[L, ...]:
+    """The same for an option that takes one value or several.
+
+    Unknown entries are dropped, and a list left with none of them falls back the way a
+    single value does.
+
+    Args:
+        value: Whatever the caller passed — one value, or several.
+        allowed: Every value the option accepts.
+        fallback: What a list with nothing usable left in it reads as.
+
+    Returns:
+        The entries the option accepts, or `fallback` when none are left.
+    """
+    if isinstance(value, str):
+        listed: Sequence[object] = (value,)
+    elif isinstance(value, Sequence):
+        listed = value
+    else:
+        listed = ()
+
+    known = tuple(entry for entry in listed if entry in allowed)
+
+    return known or tuple(fallback)  # type: ignore[return-value]
 
 
 def resolve_prefix(starts_with: str) -> str:
@@ -30,7 +122,7 @@ def resolve_prefix(starts_with: str) -> str:
     One character rather than a string: it is applied to the first *word* a
     result is built from, and a two-character prefix would rule out most pools.
     """
-    return starts_with.strip()[:1]
+    return starts_with.strip()[:1] if isinstance(starts_with, str) else ""
 
 
 _INVENT_CHANCE: dict[str, int] = {"real": 0, "mixed": 50, "invented": 100}
@@ -61,7 +153,7 @@ def resolve_vocabulary(vocabulary: RandVocabulary) -> RandVocabulary:
 
 def resolve_length(value: int | None) -> int | None:
     """Return a length bound as a whole number, or None when it was left out."""
-    return None if value is None else math.floor(value)
+    return None if value is None else _whole(value)
 
 
 def length_bounds(

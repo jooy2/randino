@@ -25,12 +25,16 @@ import {
 	languagesWriting,
 	lengthBounds,
 	resolveLength,
+	resolveMany,
+	resolveOption,
+	resolveOptional,
 	resolvePrefix,
 	resolveRealism,
-	resolveVocabulary
+	resolveVocabulary,
+	resolveWhole
 } from '../_internal/generate.js';
 import { endsWithConsonant, endsWithLiquid } from '../_internal/script.js';
-import { chance, clamp, pick, pickWeighted, randInt } from '../_internal/utils.js';
+import { chance, pick, pickWeighted, randInt } from '../_internal/utils.js';
 import { RAND_SENTENCE_COUNT_MAX, RAND_SENTENCE_LENGTH_MAX } from '../constants.js';
 import type {
 	NameGender,
@@ -51,7 +55,13 @@ import type {
 	WordTheme,
 	WordThemeOption
 } from '../_types/global.js';
-import { WORD_DATA, WORD_LANGUAGES, WORD_THEMES } from '../word/data/index.js';
+import {
+	WORD_DATA,
+	WORD_LANGUAGES,
+	WORD_THEMES,
+	resolveTheme,
+	resolveWordLanguage
+} from '../word/data/index.js';
 import type { WordAgreement, WordGender, WordLanguageData, WordPool } from '../word/data/types.js';
 import {
 	agree,
@@ -66,7 +76,7 @@ import {
 } from '../word/wordGenerator.js';
 import { drawName } from '../name/nameGenerator.js';
 import { nameLengthRange } from '../name/nameLengthRange.js';
-import { SENTENCE_DATA, THEME_CLASS } from './data/index.js';
+import { SENTENCE_DATA, STORIES, THEME_CLASS } from './data/index.js';
 import type { StoryStep } from './data/index.js';
 import type {
 	Condition,
@@ -1224,7 +1234,9 @@ function articleSpan(data: SentenceLanguageData): readonly [number, number] {
 		}
 	}
 
-	const span: readonly [number, number] = data.articles ? [min === Infinity ? 0 : min, max] : [0, 0];
+	const span: readonly [number, number] = data.articles
+		? [min === Infinity ? 0 : min, max]
+		: [0, 0];
 
 	articleCache.set(data, span);
 
@@ -4934,13 +4946,31 @@ function joinClauses(data: SentenceLanguageData, first: Built, second: Built): B
  * The caller's `slots`, in the form the generator wants: one slot becomes a
  * one-entry set, and an empty set asks the same thing `'none'` does.
  */
+const SENTENCE_SLOTS: readonly SentenceSlot[] = [
+	'subject',
+	'verb',
+	'object',
+	'state',
+	'place',
+	'destination',
+	'time',
+	'manner',
+	'degree',
+	'quantity',
+	'money',
+	'date',
+	'clock'
+];
+
 function resolveSlots(slots: SentenceSlotOption | undefined): Settings['slots'] {
 	if (slots === undefined || slots === 'all' || slots === 'none') {
 		return slots ?? 'all';
 	}
 
-	const wanted = typeof slots === 'string' ? [slots] : slots;
+	const wanted = resolveMany(slots, SENTENCE_SLOTS, []);
 
+	// An empty set asks the same thing `'none'` does, and so does a set of slots
+	// this package does not know.
 	return wanted.length ? wanted : 'none';
 }
 
@@ -4949,65 +4979,75 @@ function resolveSlots(slots: SentenceSlotOption | undefined): Settings['slots'] 
  * for something none of these are, the set is every one of them: a sentence with
  * nothing said about it is as likely to ask as to tell.
  */
+const SENTENCE_TYPES: readonly SentenceType[] = [
+	'statement',
+	'question',
+	'exclamation',
+	'trailing',
+	'dialogue',
+	'thought'
+];
+
 function resolveTypes(type: SentenceTypeOption | undefined): readonly SentenceType[] {
-	const all: readonly SentenceType[] = [
-		'statement',
-		'question',
-		'exclamation',
-		'trailing',
-		'dialogue',
-		'thought'
-	];
-
-	if (type === undefined || type === 'all') {
-		return all;
-	}
-
-	const wanted = typeof type === 'string' ? [type] : type;
-	const usable = wanted.filter((each) => all.includes(each));
-
-	return usable.length ? usable : all;
+	return type === undefined || type === 'all'
+		? SENTENCE_TYPES
+		: resolveMany(type, SENTENCE_TYPES, SENTENCE_TYPES);
 }
 
-/** The caller's `include`, as a list with the blanks taken out. */
+/**
+ * The caller's `include`, as a list with the blanks taken out — and with
+ * anything that is not a word taken out with them, because a required word is
+ * looked up in the pools and `null.trim()` says nothing about which entry of the
+ * list was wrong.
+ */
 function resolveInclude(include: RandSentenceOptions['include']): readonly string[] {
-	if (include === undefined) {
-		return [];
-	}
+	const listed = typeof include === 'string' ? [include] : Array.isArray(include) ? include : [];
 
-	const listed = typeof include === 'string' ? [include] : include;
-
-	return listed.map((word) => word.trim()).filter(Boolean);
+	return listed
+		.filter((word): word is string => typeof word === 'string')
+		.map((word) => word.trim())
+		.filter(Boolean);
 }
+
+// Every value the remaining fixed-set options accept. A JavaScript caller can
+// pass anything; these are what is answered with rather than a shape drawn
+// against a mood no frame declares, or quotation marks silently left off.
+const SHAPES: readonly SentenceShapeOption[] = ['all', 'simple', 'detailed', 'complex'];
+const TENSES: readonly SentenceTense[] = ['present', 'past'];
+const QUOTES: readonly SentenceQuote[] = ['single', 'double'];
+const REALISMS: readonly RandRealism[] = ['real', 'mixed', 'invented'];
+const STORIES_BY_NAME: readonly SentenceStory[] = STORIES.map((story) => story.name);
 
 function resolveSettings(options: RandSentenceOptions): Settings {
 	return {
-		tense: options.tense ?? null,
-		story: options.story ?? null,
+		tense: resolveOptional(options.tense, TENSES),
+		story: resolveOptional(options.story, STORIES_BY_NAME),
 		typed: options.type !== undefined,
-		theme: options.theme ?? 'all',
-		shape: options.shape ?? 'all',
+		theme: resolveTheme(options.theme),
+		shape: resolveOption(options.shape, SHAPES, 'all'),
 		slots: resolveSlots(options.slots),
 		invent: resolveRealism(options.realism),
 		minLength: resolveLength(options.minLength),
 		maxLength: resolveLength(options.maxLength),
 		prefix: resolvePrefix(options.startsWith),
 		include: resolveInclude(options.include),
-		sentences: clamp(Math.floor(options.sentences ?? 1), 1, RAND_SENTENCE_COUNT_MAX),
+		sentences: resolveWhole(options.sentences, 1, 1, RAND_SENTENCE_COUNT_MAX),
 		// A sentence is read, so it keeps to the words people use unless asked
 		// otherwise; a word asked for on its own is a word.
 		vocabulary: resolveVocabulary(options.vocabulary ?? 'common'),
-		realism: options.realism ?? 'real',
+		realism: resolveOption(options.realism, REALISMS, 'real'),
 		includeName: typeof options.includeName === 'boolean' ? options.includeName : null,
 		types: resolveTypes(options.type),
-		quote: options.quote,
-		style: STYLES.includes(options.style as SentenceStyle) ? (options.style as SentenceStyle) : null
+		// A mark the language does not write is no quotation mark at all, and a
+		// quoted line that came back without one was the whole of what went wrong.
+		quote: resolveOptional(options.quote, QUOTES) ?? undefined,
+		style: resolveOptional(options.style, STYLES)
 	};
 }
 
 export function generateSentenceDetails(options: RandSentenceOptions = {}): SentenceDetail[] {
 	const settings = resolveSettings(options);
-	const language = options.language ?? 'all';
+	const language = resolveWordLanguage(options.language);
 	// Settled once rather than per draw. Neither the shapes a language has nor the
 	// words it holds changes between one result and the next, and `classify` walks
 	// every pool of every language to answer `include` — which is nine walks per

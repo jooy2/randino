@@ -29,13 +29,14 @@ import math
 import random
 from collections.abc import Sequence
 from dataclasses import dataclass
-from typing import Literal, NamedTuple, cast
+from typing import Literal, NamedTuple
 
 from randino._internal.generate import (
     collect,
     languages_writing,
     length_bounds,
     resolve_length,
+    resolve_many,
     resolve_prefix,
     resolve_realism,
     resolve_vocabulary,
@@ -61,7 +62,14 @@ from randino.word._generator import (
     theme_of,
     themes_of,
 )
-from randino.word.data import LOOSE_THEMES, WORD_DATA, WORD_LANGUAGES, WORD_THEMES
+from randino.word.data import (
+    LOOSE_THEMES,
+    WORD_DATA,
+    WORD_LANGUAGES,
+    WORD_THEMES,
+    resolve_theme,
+    resolve_word_language,
+)
 from randino.word.data._types import WordFrame, WordGender, WordLanguageData, WordPool
 
 FIT_ATTEMPTS = 12
@@ -156,6 +164,9 @@ def languages_for(settings: Settings) -> tuple[WordLanguage, ...]:
     return able or WORD_LANGUAGES
 
 
+_WORD_SLOTS: tuple[WordSlot, ...] = ("adjective", "action", "noun", "part")
+
+
 def resolve_slots(slots: WordSlotOption) -> tuple[WordSlot, ...] | Literal["all", "none"]:
     """The caller's `slots`, in the form the generator wants.
 
@@ -165,9 +176,11 @@ def resolve_slots(slots: WordSlotOption) -> tuple[WordSlot, ...] | Literal["all"
     if slots in ("all", "none"):
         return slots
 
-    wanted = (slots,) if isinstance(slots, str) else tuple(slots)
+    wanted = resolve_many(slots, _WORD_SLOTS, ())
 
-    return cast("tuple[WordSlot, ...]", wanted) or "none"
+    # An empty set asks the same thing `"none"` does, and so does a set of slots this
+    # package does not know: neither leaves any slot allowed beside the noun.
+    return wanted or "none"
 
 
 def joiner_of(data: WordLanguageData, settings: Settings) -> str:
@@ -480,7 +493,7 @@ def generate_nickname_details(
 ) -> list[NicknameDetail]:
     """Generate `count` nicknames, applied to every option the caller passed."""
     settings = Settings(
-        theme=theme,
+        theme=resolve_theme(theme),
         slots=resolve_slots(slots),
         invent=resolve_realism(realism),
         loose=realism != "real",
@@ -496,7 +509,7 @@ def generate_nickname_details(
     able = languages_for(settings)
     # And a requested first character the language does not write is one it can never
     # lead a nickname with, so those languages are out before a draw is made.
-    languages = languages_writing(language, able, settings.prefix)
+    languages = languages_writing(resolve_word_language(language), able, settings.prefix)
 
     if not languages:
         return []

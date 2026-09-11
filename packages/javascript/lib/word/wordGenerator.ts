@@ -26,7 +26,13 @@ import type {
 	WordTheme,
 	WordThemeOption
 } from '../_types/global.js';
-import { WORD_DATA, WORD_LANGUAGES, WORD_THEMES } from './data/index.js';
+import {
+	WORD_DATA,
+	WORD_LANGUAGES,
+	WORD_THEMES,
+	resolveTheme,
+	resolveWordLanguage
+} from './data/index.js';
 import type { WordGender, WordLanguageData, WordPool, WordSynthesis } from './data/types.js';
 
 // How many themes to try before settling for the closest word found.
@@ -535,9 +541,9 @@ function generateOne(language: WordLanguage, settings: Settings): WordDetail {
 }
 
 export function generateWordDetails(options: RandWordOptions = {}): WordDetail[] {
-	const language = options.language ?? 'all';
+	const language = resolveWordLanguage(options.language);
 	const settings: Settings = {
-		theme: options.theme ?? 'all',
+		theme: resolveTheme(options.theme),
 		invent: resolveRealism(options.realism),
 		vocabulary: resolveVocabulary(options.vocabulary),
 		minLength: resolveLength(options.minLength),

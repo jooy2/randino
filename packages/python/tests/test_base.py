@@ -4,6 +4,8 @@ import ast
 import pathlib
 import re
 import sys
+from collections.abc import Callable
+from typing import Any
 
 import randino
 
@@ -174,3 +176,51 @@ def test_the_package_ships_its_type_marker() -> None:
     # Without `py.typed`, PEP 561 tells type checkers to ignore every annotation in
     # here, and the package silently reads as untyped to everyone installing it.
     assert (SOURCE / "py.typed").is_file()
+
+
+def test_an_option_the_types_rule_out_falls_back_rather_than_raising() -> None:
+    """Every option that takes one of a fixed set falls back to its default.
+
+    The `Literal` types rule each of these out and an unchecked caller can still pass
+    them. Each used to reach a pool lookup or a float conversion and raise from
+    somewhere that named neither the option nor the value.
+
+    Reached through `Any` on purpose: the caller this is about is the one the types do
+    not describe, and writing each call out with its own `type: ignore` would be two
+    dozen ignores whose codes drift with every release of the type checker.
+    """
+    loose: Any = randino
+    asks: list[Callable[[], object]] = [
+        lambda: loose.rand_name(language="xx"),
+        lambda: loose.rand_name(gender="other"),
+        lambda: loose.rand_name(count=float("nan")),
+        lambda: loose.rand_name(min_length=float("nan")),
+        lambda: loose.rand_word(theme="nope"),
+        lambda: loose.rand_word(language="xx"),
+        lambda: loose.rand_nickname(theme="nope"),
+        lambda: loose.rand_nickname(slots=123),
+        lambda: loose.rand_sentence(language="xx"),
+        lambda: loose.rand_sentence(type=123),
+        lambda: loose.rand_sentence(include=123),
+        lambda: loose.rand_sentence(include=[None]),
+        lambda: loose.rand_sentence(slots=123),
+        lambda: loose.rand_sentence(shape="huge"),
+        lambda: loose.rand_sentence(story="nope"),
+        lambda: loose.rand_sentence(style="shouty"),
+        lambda: loose.rand_sentence(tense="future"),
+        lambda: loose.rand_sentence(sentences=float("nan")),
+        lambda: loose.name_length_range("xx"),
+        lambda: loose.word_length_range("xx"),
+        lambda: loose.nickname_length_range("xx"),
+        lambda: loose.sentence_length_range("xx"),
+        lambda: loose.name_supports_middle_name("xx"),
+    ]
+
+    for ask in asks:
+        ask()
+
+    # And the fallback is the option's own default, not silence: `count=nan` asked for
+    # one name and used to hand back none.
+    assert len(loose.rand_name(count=float("nan"))) == 1
+    # A token of no length is not a token.
+    assert len(loose.rand_suffix("x", length=float("nan"))) == len("x_") + 5

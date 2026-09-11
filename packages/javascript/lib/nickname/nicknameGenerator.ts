@@ -28,6 +28,7 @@ import {
 	languagesWriting,
 	lengthBounds,
 	resolveLength,
+	resolveMany,
 	resolvePrefix,
 	resolveRealism,
 	resolveVocabulary
@@ -43,7 +44,14 @@ import type {
 	WordTheme,
 	WordThemeOption
 } from '../_types/global.js';
-import { LOOSE_THEMES, WORD_DATA, WORD_LANGUAGES, WORD_THEMES } from '../word/data/index.js';
+import {
+	LOOSE_THEMES,
+	WORD_DATA,
+	WORD_LANGUAGES,
+	WORD_THEMES,
+	resolveTheme,
+	resolveWordLanguage
+} from '../word/data/index.js';
 import type { WordFrame, WordGender, WordLanguageData, WordPool } from '../word/data/types.js';
 import {
 	agree,
@@ -468,24 +476,24 @@ function generateOne(language: WordLanguage, settings: Settings): Built {
  * one-entry set, and an empty set asks the same thing `'none'` does, since
  * neither leaves any slot allowed beside the noun.
  */
+const WORD_SLOTS: readonly WordSlot[] = ['adjective', 'action', 'noun', 'part'];
+
 function resolveSlots(slots: WordSlotOption | undefined): Settings['slots'] {
-	if (slots === undefined) {
-		return 'all';
+	if (slots === undefined || slots === 'all' || slots === 'none') {
+		return slots ?? 'all';
 	}
 
-	if (slots === 'all' || slots === 'none') {
-		return slots;
-	}
+	const wanted = resolveMany(slots, WORD_SLOTS, []);
 
-	const wanted = typeof slots === 'string' ? [slots] : slots;
-
+	// An empty set asks the same thing `'none'` does, and so does a set of slots
+	// this package does not know: neither leaves any slot allowed beside the noun.
 	return wanted.length ? wanted : 'none';
 }
 
 /** Resolve the caller's options into the settings a single nickname is built from. */
 function resolveSettings(options: RandNicknameOptions): Settings {
 	return {
-		theme: options.theme ?? 'all',
+		theme: resolveTheme(options.theme),
 		slots: resolveSlots(options.slots),
 		invent: resolveRealism(options.realism),
 		loose: (options.realism ?? 'real') !== 'real',
@@ -499,7 +507,7 @@ function resolveSettings(options: RandNicknameOptions): Settings {
 
 export function generateNicknameDetails(options: RandNicknameOptions = {}): NicknameDetail[] {
 	const settings = resolveSettings(options);
-	const language = options.language ?? 'all';
+	const language = resolveWordLanguage(options.language);
 	// Settled once rather than per draw: neither the shapes a language has nor the
 	// script it writes changes between one nickname and the next.
 	const able = languagesFor(settings);
