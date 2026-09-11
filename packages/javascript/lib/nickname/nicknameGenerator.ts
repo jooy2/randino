@@ -237,9 +237,12 @@ function poolOf(data: WordLanguageData, slot: WordSlot, nouns: WordPool): WordPo
 		case 'action':
 			return data.actions;
 		case 'part':
-			// Only a frame of the language's own can ask for this, and one that does
-			// is only written where the pool is.
-			return data.parts!;
+			// Only a frame of the language's own can ask for this, and one that does is
+			// only written where the pool is — but `slotBounds` already answers the
+			// same question with `?? []`, and one of the two defending itself is one
+			// place for the two to disagree. An empty pool invents a word, which is
+			// what every other empty draw does.
+			return data.parts ?? [];
 		default:
 			return nouns;
 	}

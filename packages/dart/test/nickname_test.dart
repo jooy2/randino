@@ -329,6 +329,21 @@ void main() {
       }
     });
 
+    test('a modifier is an adjective or an action, and not both', () {
+      // A word in both pools is drawn twice as often as one in either, because
+      // `modifiersOf` with no kind is the two of them joined; and `kind` stops
+      // saying which pool a modifier came from. Spanish, Italian and German each
+      // held a participle twice — a participle is what the word is by form, so it
+      // stays in `actions`, and every adjective line already carried a plain
+      // adjective for the same idea.
+      for (final language in wordLanguages) {
+        final data = wordData[language]!;
+        final both = data.adjectives.where(data.actions.contains).toList();
+
+        expect(both, isEmpty, reason: '${language.name}: ${both.join(', ')}');
+      }
+    });
+
     test('a noun with no singular takes a plural modifier', () {
       // `ножницы` and `Jeans` have no singular for a singular modifier to
       // agree with, so they are tagged `p` — the language's default plural —

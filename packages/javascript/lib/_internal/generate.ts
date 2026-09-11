@@ -143,7 +143,11 @@ export function lengthBounds(
 	const low = clamp(min ?? naturalMin, RAND_LENGTH_MIN, ceiling);
 	const high = clamp(max ?? naturalMax, RAND_LENGTH_MIN, ceiling);
 
-	return [low, Math.max(low, high)];
+	// A range the wrong way round is a caller contradicting themselves, and the
+	// bound that survives is `maxLength` — the one they are usually holding to,
+	// a field limit or a column width, where `minLength` only shapes how a result
+	// reads. `[30, 5]` used to read as `[30, 30]`, which is the other way about.
+	return [Math.min(low, high), high];
 }
 
 /** The language one draw uses: the requested one, or any of them for `'all'`. */

@@ -524,24 +524,24 @@ export const DE: WordLanguageData = {
 	joiner: ' ',
 	capitalize: false,
 	adjectives: words(`
-		blau grün rot schwarz weiß gelb golden silbern hell glänzend groß klein lang
-		kurz breit schmal niedrig schnell langsam stark schwach hart weich warm kalt
-		lauwarm trocken feucht sauber neu alt jung schön hässlich süß bitter salzig scharf sauer
-		sanft rau leicht schwer rund spitz tief fern nah reich arm selten ruhig laut tapfer weise
-		fröhlich traurig frei ewig durchsichtig einsam strahlend wild heiter still uralt modern
-		endlos hohl seidig neblig wolkig regnerisch sonnig schneeig windig rostig neugierig
-		schelmisch edel bescheiden freundlich flink stachelig ruhelos kräftig verworren
-		lebhaft zart grau blass innig eisig glühend düster leuchtend erhaben schlicht zierlich
-		drollig schlau kühn faul wach glatt dicht knapp
-		treu geduldig wachsam geschickt standhaft mild offen verschlossen stur schroff zottig
-		pummelig massiv luftig dampfend würzig honigsüß gefleckt
-		gestreift abgenutzt poliert nagelneu gereift dick dünn flach spitzig krumm gerade schlank
-		gedrungen gedämpft schrill klangvoll dumpf melodisch heiser bebend flüsternd lau schwül
-		bedeckt klar bereift sternenklar mondhell moosig rankend grünend blühend
-		duftend smaragden korallen elfenbeinern kristallen bronzen zinnern bleiern
-		achatfarben purpurn zinnoberrot ockerfarben indigoblau türkis lavendelfarben malvenfarben
-		rabenschwarz entlegen winzig prächtig karg kunstvoll grob gebrechlich kraftvoll geräumig
-		abschüssig
+ blau grün rot schwarz weiß gelb golden silbern hell glänzend groß klein lang
+ kurz breit schmal niedrig schnell langsam stark schwach hart weich warm kalt
+ lauwarm trocken feucht sauber neu alt jung schön hässlich süß bitter salzig scharf sauer
+ sanft rau leicht schwer rund spitz tief fern nah reich arm selten ruhig laut tapfer weise
+ fröhlich traurig frei ewig durchsichtig einsam strahlend wild heiter still uralt modern
+ endlos hohl seidig neblig wolkig regnerisch sonnig schneeig windig rostig neugierig
+ schelmisch edel bescheiden freundlich flink stachelig ruhelos kräftig verworren
+ lebhaft zart grau blass innig eisig glühend düster leuchtend erhaben schlicht zierlich
+ drollig schlau kühn faul wach glatt dicht knapp
+ treu geduldig wachsam geschickt standhaft mild offen verschlossen stur schroff zottig
+ pummelig massiv luftig dampfend würzig honigsüß gefleckt
+ gestreift abgenutzt poliert nagelneu gereift dick dünn flach spitzig krumm gerade schlank
+ gedrungen gedämpft schrill klangvoll dumpf melodisch heiser bebend lau schwül
+ bedeckt klar bereift sternenklar mondhell moosig rankend grünend
+ duftend smaragden korallen elfenbeinern kristallen bronzen zinnern bleiern
+ achatfarben purpurn zinnoberrot ockerfarben indigoblau türkis lavendelfarben malvenfarben
+ rabenschwarz entlegen winzig prächtig karg kunstvoll grob gebrechlich kraftvoll geräumig
+ abschüssig
 	`),
 	actions: words(`
 		schlafend rennend fliegend schwimmend singend tanzend lachend weinend gehend stehend

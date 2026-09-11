@@ -279,6 +279,20 @@ def test_a_word_belongs_to_exactly_one_theme() -> None:
                 owner[word] = theme
 
 
+def test_a_modifier_is_an_adjective_or_an_action_and_not_both() -> None:
+    # A word in both pools is drawn twice as often as one in either, because
+    # `modifiers_of` with no kind is the two of them joined; and `kind` stops saying
+    # which pool a modifier came from. Spanish, Italian and German each held a
+    # participle twice — a participle is what the word is by form, so it stays in
+    # `actions`, and every adjective line already carried a plain adjective for the
+    # same idea.
+    for language in WORD_LANGUAGES:
+        data = WORD_DATA[language]
+        both = [word for word in data.adjectives if word in data.actions]
+
+        assert not both, f"{language}: {', '.join(both)} is in both pools"
+
+
 def test_a_noun_with_no_singular_takes_a_plural_modifier() -> None:
     # `ножницы` and `Jeans` have no singular for a singular modifier to agree
     # with, so they are tagged `p` — the language's default plural — and `fp`

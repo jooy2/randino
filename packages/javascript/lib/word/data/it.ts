@@ -522,24 +522,24 @@ export const IT: WordLanguageData = {
 	joiner: ' ',
 	capitalize: false,
 	adjectives: words(`
-		azzurro verde rosso nero bianco giallo dorato argenteo scuro chiaro brillante grande
-		piccolo lungo corto largo stretto alto basso rapido lento forte debole duro morbido caldo
-		freddo tiepido secco umido pulito nuovo vecchio giovane bello brutto dolce amaro salato
-		piccante aspro soffice ruvido leggero pesante rotondo acuto profondo lontano vicino ricco
-		povero raro tranquillo rumoroso coraggioso saggio allegro triste libero eterno trasparente
-		misterioso solitario radioso selvaggio sereno silenzioso antico moderno infinito cavo
-		setoso nebbioso nuvoloso piovoso soleggiato nevoso ventoso arrugginito curioso birichino
-		nobile umile gentile feroce agile spinoso irrequieto robusto vivido tenue grigio pallido
-		intenso gelido ardente cupo luminoso maestoso semplice elegante buffo astuto audace pigro
-		sveglio affilato liscio denso scarso
-		leale paziente vigile abile fermo mite franco riservato ostinato schietto tagliente peloso
-		lucido rilucente paffuto massiccio lieve gelato fumante aromatico mielato maculato striato
-		consumato lucidato nuovissimo stagionato spesso sottile piatto aguzzo storto dritto
-		slanciato tozzo smorzato stridulo sonoro grave melodioso roco vibrante sussurrante
-		temperato afoso coperto sgombro brinato stellato lunare muschioso attorcigliato
-		verdeggiante fiorito profumato smeraldino corallino eburneo ossidiano cristallino bronzeo
-		stagnato plumbeo cremisi vermiglio ocra indaco turchese lavanda malva avorio
-		corvino remoto minuscolo grandioso austero raffinato rozzo fragile vigoroso ampio scosceso
+ azzurro verde rosso nero bianco giallo dorato argenteo scuro chiaro brillante grande
+ piccolo lungo corto largo stretto alto basso rapido lento forte debole duro morbido caldo
+ freddo tiepido secco umido pulito nuovo vecchio giovane bello brutto dolce amaro salato
+ piccante aspro soffice ruvido leggero pesante rotondo acuto profondo lontano vicino ricco
+ povero raro tranquillo rumoroso coraggioso saggio allegro triste libero eterno trasparente
+ misterioso solitario radioso selvaggio sereno silenzioso antico moderno infinito cavo
+ setoso nebbioso nuvoloso piovoso soleggiato nevoso ventoso arrugginito curioso birichino
+ nobile umile gentile feroce agile spinoso irrequieto robusto vivido tenue grigio pallido
+ intenso gelido ardente cupo luminoso maestoso semplice elegante buffo astuto audace pigro
+ sveglio affilato liscio denso scarso
+ leale paziente vigile abile fermo mite franco riservato ostinato schietto tagliente peloso
+ lucido rilucente paffuto massiccio lieve fumante aromatico mielato maculato striato
+ consumato nuovissimo stagionato spesso sottile piatto aguzzo storto dritto
+ slanciato tozzo smorzato stridulo sonoro grave melodioso roco vibrante sussurrante
+ temperato afoso coperto sgombro brinato stellato lunare muschioso attorcigliato
+ verdeggiante profumato smeraldino corallino eburneo ossidiano cristallino bronzeo
+ stagnato plumbeo cremisi vermiglio ocra indaco turchese lavanda malva avorio
+ corvino remoto minuscolo grandioso austero raffinato rozzo fragile vigoroso ampio scosceso
 	`),
 	actions: words(`
 		dormito perduto trovato nascosto stancato bagnato bruciato gelato sciolto rotto aperto

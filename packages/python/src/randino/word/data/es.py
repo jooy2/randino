@@ -572,28 +572,28 @@ ES = WordLanguageData(
     joiner=" ",
     capitalize=False,
     adjectives=words("""
-        azul verde rojo negro blanco amarillo dorado plateado oscuro claro brillante
-        grande pequeño largo corto ancho estrecho alto bajo rápido lento fuerte débil
-        duro blando caliente frío tibio seco húmedo limpio nuevo viejo joven hermoso feo
-        dulce amargo salado picante agrio suave áspero ligero pesado redondo agudo
-        profundo lejano cercano rico pobre raro tranquilo ruidoso valiente sabio alegre
-        triste libre eterno transparente misterioso solitario radiante salvaje sereno
-        silencioso antiguo moderno infinito hueco sedoso brumoso nublado lluvioso
-        soleado nevado ventoso oxidado curioso travieso noble humilde gentil feroz ágil
-        espinoso inquieto robusto enredado vívido tenue gris pálido intenso cálido
-        helado ardiente sombrío luminoso majestuoso sencillo elegante gracioso astuto
-        audaz perezoso alerta afilado romo liso rugoso denso escaso
-        leal paciente vigilante hábil firme apacible franco reservado terco
-        llano cortante peludo lustroso reluciente rechoncho macizo liviano gélido
-        humeante aromático meloso moteado rayado gastado pulido flamante
-        añejo grueso delgado plano puntiagudo torcido recto esbelto achaparrado apagado
-        estridente sonoro grave melodioso ronco vibrante susurrante templado
-        bochornoso encapotado despejado escarchado estrellado
-        musgoso rojizo perfumado esmeralda coralino
-        marfileño obsidiano cristalino argénteo broncíneo estañado plomizo carmesí
-        bermejo ocre añil turquesa lavanda malva marfil azabache remoto minúsculo
-        grandioso austero primoroso tosco frágil vigoroso amplio escarpado
-    """),
+ azul verde rojo negro blanco amarillo dorado plateado oscuro claro brillante
+ grande pequeño largo corto ancho estrecho alto bajo rápido lento fuerte débil
+ duro blando caliente frío tibio seco húmedo limpio nuevo viejo joven hermoso feo
+ dulce amargo salado picante agrio suave áspero ligero pesado redondo agudo
+ profundo lejano cercano rico pobre raro tranquilo ruidoso valiente sabio alegre
+ triste libre eterno transparente misterioso solitario radiante salvaje sereno
+ silencioso antiguo moderno infinito hueco sedoso brumoso nublado lluvioso
+ soleado nevado ventoso oxidado curioso travieso noble humilde gentil feroz ágil
+ espinoso inquieto robusto enredado vívido tenue gris pálido intenso cálido
+ helado ardiente sombrío luminoso majestuoso sencillo elegante gracioso astuto
+ audaz perezoso alerta afilado romo liso rugoso denso escaso
+ leal paciente vigilante hábil firme apacible franco reservado terco
+ llano cortante peludo lustroso reluciente rechoncho macizo liviano gélido
+ humeante aromático meloso moteado rayado gastado flamante
+ añejo grueso delgado plano puntiagudo torcido recto esbelto achaparrado
+ estridente sonoro grave melodioso ronco vibrante susurrante templado
+ bochornoso encapotado despejado escarchado estrellado
+ musgoso rojizo perfumado esmeralda coralino
+ marfileño obsidiano cristalino argénteo broncíneo estañado plomizo carmesí
+ bermejo ocre añil turquesa lavanda malva marfil azabache remoto minúsculo
+ grandioso austero primoroso tosco frágil vigoroso amplio escarpado
+ """),
     actions=words("""
         dormido despierto perdido hallado escondido cansado mojado quemado congelado
         derretido roto abierto cerrado atado colgado caído sentado acostado olvidado

@@ -1,6 +1,7 @@
 import { drawLanguage, resolveRealism } from '../_internal/generate.js';
+import { capitalizeFirst } from '../_internal/utils.js';
 import { detectLanguage } from '../_internal/script.js';
-import type { RandModifierOptions } from '../_types/global.js';
+import type { RandModifierOptions, WordLanguage, WordLanguageOption } from '../_types/global.js';
 import { WORD_DATA, WORD_LANGUAGES } from '../word/data/index.js';
 import {
 	agree,
@@ -12,11 +13,47 @@ import {
 } from '../word/wordGenerator.js';
 import { firstArgument } from './attach.js';
 
+// The Latin-script languages that carry a gender per noun, and so can answer
+// whether a word is theirs in one lookup.
+const INFLECTING: readonly WordLanguage[] = ['es', 'it', 'de'];
+
+/**
+ * The language a value is written in, for a caller who named none.
+ *
+ * The script answers it wherever the script says which: Hangul is Korean, kana
+ * Japanese, han Chinese, Cyrillic Russian, and Latin with Vietnamese marks on it
+ * Vietnamese. What is left is the Latin alphabet, which English, Spanish, Italian
+ * and German share — so the three of those that carry a gender per noun are asked
+ * whether the word is one of theirs, which is one lookup each. English is what
+ * nobody claims.
+ *
+ * A word none of them holds and no script places is English, which is the most a
+ * single word can be asked to say: `gato` is Spanish because Spanish has it, and
+ * an invented Latin word is nobody's.
+ */
+function languageOf(value: string): WordLanguageOption {
+	const byScript = detectLanguage(value);
+
+	if (byScript !== 'en') {
+		return byScript;
+	}
+
+	for (const code of INFLECTING) {
+		const nouns = WORD_DATA[code].nounGender;
+
+		if (nouns?.[value] || nouns?.[capitalizeFirst(value)]) {
+			return code;
+		}
+	}
+
+	return 'en';
+}
+
 /** Draw one modifier, the separator to use, and which side of the value it goes. */
 function draw(value: string | undefined, options: RandModifierOptions): [string, string, boolean] {
 	// The language of the word being decorated, so that `'고양이'` is not handed
 	// an English modifier. Only consulted when the caller left `language` out.
-	const requested = options.language ?? (value ? detectLanguage(value) : 'all');
+	const requested = options.language ?? (value ? languageOf(value) : 'all');
 	const language = drawLanguage(requested, WORD_LANGUAGES);
 	const data = WORD_DATA[language];
 	const pool = modifiersOf(data, options.kind ?? 'all');
