@@ -11,6 +11,8 @@
 //   that can still reach it, and only then padded with extra middle names.
 // - Every name is produced in both scripts, native and romanized.
 
+import 'dart:math';
+
 import 'package:randino/src/internal/generate.dart';
 import 'package:randino/src/internal/utils.dart';
 import 'package:randino/src/name/data/index.dart';
@@ -671,6 +673,10 @@ List<NameDetail> generateNameDetails({
   bool includeMiddleName = false,
   String? startsWith,
   bool unique = false,
+
+  /// Where the randomness comes from: `Random.secure()` for a value nobody may
+  /// predict, `Random(42)` for one that has to come out the same every run.
+  Random? random,
 }) {
   final settings = _Settings(
     gender: gender,
@@ -690,11 +696,14 @@ List<NameDetail> generateNameDetails({
     return <NameDetail>[];
   }
 
-  return collect<NameDetail>(
-    count: count,
-    unique: unique,
-    startsWith: settings.prefix,
-    draw: () => _generateOne(pick(languages), settings),
-    keyOf: (detail) => detail.native,
+  return withRandom(
+    random,
+    () => collect<NameDetail>(
+      count: count,
+      unique: unique,
+      startsWith: settings.prefix,
+      draw: () => _generateOne(pick(languages), settings),
+      keyOf: (detail) => detail.native,
+    ),
   );
 }

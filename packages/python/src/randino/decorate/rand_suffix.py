@@ -1,5 +1,6 @@
 """Append a random token to a string, or to every string in a list."""
 
+from collections.abc import Callable
 from typing import overload
 
 from randino.decorate._attach import attach
@@ -13,6 +14,7 @@ def rand_suffix(
     length: int = ...,
     separator: str = ...,
     charset: str = ...,
+    random: Callable[[], float] | None = ...,
 ) -> str: ...
 
 
@@ -23,6 +25,7 @@ def rand_suffix(
     length: int = ...,
     separator: str = ...,
     charset: str = ...,
+    random: Callable[[], float] | None = ...,
 ) -> str: ...
 
 
@@ -33,6 +36,7 @@ def rand_suffix(
     length: int = ...,
     separator: str = ...,
     charset: str = ...,
+    random: Callable[[], float] | None = ...,
 ) -> list[str]: ...
 
 
@@ -42,6 +46,7 @@ def rand_suffix(
     length: int = AFFIX_LENGTH_DEFAULT,
     separator: str = AFFIX_SEPARATOR_DEFAULT,
     charset: str = "",
+    random: Callable[[], float] | None = None,
 ) -> str | list[str]:
     """Append a random token, so that two people asking at the same moment differ.
 
@@ -62,6 +67,10 @@ def rand_suffix(
             token is the whole answer and `separator` is not used.
         length: Characters in the token. Clamped to `1..32`.
         separator: Placed between the value and the token.
+        random: Where the randomness comes from: a callable returning a number in
+            `[0, 1)`, the way `random.random` does. `SystemRandom().random` for a value
+            nobody may predict, `Random(42).random` for one that has to come out the
+            same every run.
         charset: Characters the token is drawn from. Defaults to alphanumerics
             without `0O1lI`, the pairs that are easy to misread.
 
@@ -76,4 +85,6 @@ def rand_suffix(
         >>> rand_suffix(rand_nickname(language="ko", count=2))
         ['오래된곰_AVcCV', '영원한도마뱀_RUKAP']
     """
-    return attach(value, length, separator, charset, lambda item, token, sep: item + sep + token)
+    return attach(
+        value, length, separator, charset, lambda item, token, sep: item + sep + token, random
+    )

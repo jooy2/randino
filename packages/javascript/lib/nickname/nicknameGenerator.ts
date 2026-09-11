@@ -30,10 +30,11 @@ import {
 	resolveLength,
 	resolveMany,
 	resolvePrefix,
+	resolveRandom,
 	resolveRealism,
 	resolveVocabulary
 } from '../_internal/generate.js';
-import { pick } from '../_internal/utils.js';
+import { pick, random, withRandom } from '../_internal/utils.js';
 import type {
 	NicknameDetail,
 	RandNicknameOptions,
@@ -216,7 +217,7 @@ function frameRange(frame: WordFrame, bounds: Bounds, joiner: number): readonly 
 
 function pickFrame(frames: readonly WordFrame[]): WordFrame {
 	const total = frames.reduce((sum, frame) => sum + frame.weight, 0);
-	let roll = Math.random() * total;
+	let roll = random() * total;
 
 	for (const frame of frames) {
 		roll -= frame.weight;
@@ -522,14 +523,16 @@ export function generateNicknameDetails(options: RandNicknameOptions = {}): Nick
 		return [];
 	}
 
-	return collect(
-		options,
-		() => {
-			const code = pick(languages);
-			const { words, slots, nickname, theme } = generateOne(code, settings);
+	return withRandom(resolveRandom(options.random), () =>
+		collect(
+			options,
+			() => {
+				const code = pick(languages);
+				const { words, slots, nickname, theme } = generateOne(code, settings);
 
-			return { nickname, words, slots, language: code, theme };
-		},
-		(detail) => detail.nickname
+				return { nickname, words, slots, language: code, theme };
+			},
+			(detail) => detail.nickname
+		)
 	);
 }

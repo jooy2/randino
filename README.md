@@ -18,6 +18,7 @@ Every option, every language and every example, with **JavaScript**, **Dart** or
 - **Sentences** are whole statements in the language's own grammar, from `randSentence`. A verb states what can do it and what it can be done to, so the words of one sentence belong together: 여우가 사과를 먹는다, The brave lion runs quietly.
 - **Decorators** attach something to a string you already have rather than generating one: a random token with `randSuffix` and `randPrefix`, a word with `randModifier`.
 - One options set per generator: language, length, count, a `realism` setting that goes from real words to fully invented ones, and a `vocabulary` setting that keeps to the everyday words.
+- **Every generator and decorator takes a `random`** — where the draws come from. A secure source for a value nobody may predict, a seeded one for a fixture that has to come out the same every run.
 - **No runtime dependencies**, in any of the packages.
 
 ## Packages

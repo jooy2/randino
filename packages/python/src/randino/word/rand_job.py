@@ -1,5 +1,6 @@
 """The trades and roles people hold."""
 
+from collections.abc import Callable
 from typing import Literal, overload
 
 from randino._types import (
@@ -23,6 +24,7 @@ def rand_job(
     max_length: int | None = ...,
     starts_with: str = ...,
     unique: bool = ...,
+    random: Callable[[], float] | None = ...,
     output: Literal["value"] = ...,
 ) -> list[str]: ...
 
@@ -38,6 +40,7 @@ def rand_job(
     max_length: int | None = ...,
     starts_with: str = ...,
     unique: bool = ...,
+    random: Callable[[], float] | None = ...,
     output: Literal["detail"],
 ) -> list[WordDetail]: ...
 
@@ -52,6 +55,7 @@ def rand_job(
     max_length: int | None = None,
     starts_with: str = "",
     unique: bool = False,
+    random: Callable[[], float] | None = None,
     output: str = "value",
 ) -> list[str] | list[WordDetail]:
     """The trades and roles people hold.
@@ -81,6 +85,7 @@ def rand_job(
             max_length=max_length,
             starts_with=starts_with,
             unique=unique,
+            random=random,
             output="detail",
         )
 
@@ -94,4 +99,5 @@ def rand_job(
         max_length=max_length,
         starts_with=starts_with,
         unique=unique,
+        random=random,
     )

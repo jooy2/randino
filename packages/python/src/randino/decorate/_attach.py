@@ -3,7 +3,7 @@
 from collections.abc import Callable
 
 from randino._internal.generate import resolve_whole
-from randino._internal.utils import rand_token
+from randino._internal.utils import rand_token, with_random
 from randino.decorate.data import AFFIX_CHARSET, AFFIX_LENGTH_DEFAULT, AFFIX_LENGTH_MAX
 
 
@@ -13,6 +13,7 @@ def attach(
     separator: str,
     charset: str,
     join: Callable[[str, str, str], str],
+    random: Callable[[], float] | None = None,
 ) -> str | list[str]:
     """Attach a freshly drawn token to one string, or to every string in a list.
 
@@ -27,6 +28,7 @@ def attach(
         separator: Placed between the value and the token.
         charset: Characters the token is drawn from; empty means the default.
         join: Given `(value, token, separator)`, returns the finished string.
+        random: Where the randomness comes from, or None for the package's own.
 
     Returns:
         A string when `value` is a string or None, a list when it is a list.
@@ -40,13 +42,14 @@ def attach(
     def token() -> str:
         return rand_token(size, alphabet)
 
-    if value is None:
-        return token()
-
     def one(item: str) -> str:
         return join(item, token(), separator)
 
-    if isinstance(value, str):
-        return one(value)
+    with with_random(random):
+        if value is None:
+            return token()
 
-    return [one(item) for item in value]
+        if isinstance(value, str):
+            return one(value)
+
+        return [one(item) for item in value]

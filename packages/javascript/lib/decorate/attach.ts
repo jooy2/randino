@@ -1,8 +1,8 @@
 // Shared by `randSuffix` and `randPrefix`. Internal — the two of them differ by
 // one line, which is the side the token lands on.
 
-import { resolveWhole } from '../_internal/generate.js';
-import { randToken } from '../_internal/utils.js';
+import { resolveRandom, resolveWhole } from '../_internal/generate.js';
+import { randToken, withRandom } from '../_internal/utils.js';
 import type { RandAffixOptions } from '../_types/global.js';
 import {
 	AFFIX_CHARSET,
@@ -51,11 +51,13 @@ export function attach(
 		typeof settings.separator === 'string' ? settings.separator : AFFIX_SEPARATOR_DEFAULT;
 	const token = () => randToken(length, charset);
 
-	if (target === undefined) {
-		return token();
-	}
+	return withRandom(resolveRandom(settings.random), () => {
+		if (target === undefined) {
+			return token();
+		}
 
-	const one = (item: string) => join(item, token(), separator);
+		const one = (item: string) => join(item, token(), separator);
 
-	return Array.isArray(target) ? target.map(one) : one(target);
+		return Array.isArray(target) ? target.map(one) : one(target);
+	});
 }

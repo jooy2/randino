@@ -14,9 +14,8 @@ Internal — `rand_name` is the public entry point, in both of its output forms.
 """
 
 import math
-import random
 import re
-from collections.abc import Collection
+from collections.abc import Callable, Collection
 from dataclasses import dataclass, field
 from typing import Literal, NamedTuple
 
@@ -36,6 +35,8 @@ from randino._internal.utils import (
     pick,
     pick_weighted,
     rand_int,
+    random,
+    with_random,
 )
 from randino._types import (
     NameDetail,
@@ -349,7 +350,7 @@ def pick_given_length(
         total = sum(weight for _, weight in options)
 
         if total > 0:
-            roll = random.random() * total
+            roll = random() * total
 
             for length, weight in options:
                 roll -= weight
@@ -630,9 +631,7 @@ def generate_one(language: NameLanguage, settings: Settings) -> NameDetail:
     """Build one complete name in one language."""
     data = NAME_DATA[language]
     gender: NameGender = (
-        ("male" if random.random() < 0.5 else "female")
-        if settings.gender == "all"
-        else settings.gender
+        ("male" if random() < 0.5 else "female") if settings.gender == "all" else settings.gender
     )
     low, high = bounds_for(language, settings)
     build = generate_cjk if data.joiner == "" else generate_spaced
@@ -693,6 +692,7 @@ def generate_name_details(
     include_middle_name: bool = False,
     starts_with: str = "",
     unique: bool = False,
+    random: Callable[[], float] | None = None,
 ) -> list[NameDetail]:
     """Generate `count` names, applied to every option the caller passed."""
     settings = Settings(
@@ -712,10 +712,11 @@ def generate_name_details(
     if not languages:
         return []
 
-    return collect(
-        count=count,
-        unique=unique,
-        starts_with=settings.prefix,
-        draw=lambda: generate_one(pick(languages), settings),
-        key_of=lambda detail: detail.native,
-    )
+    with with_random(random):
+        return collect(
+            count=count,
+            unique=unique,
+            starts_with=settings.prefix,
+            draw=lambda: generate_one(pick(languages), settings),
+            key_of=lambda detail: detail.native,
+        )

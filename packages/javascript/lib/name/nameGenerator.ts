@@ -18,9 +18,19 @@ import {
 	resolveLength,
 	resolveOption,
 	resolvePrefix,
+	resolveRandom,
 	resolveRealism
 } from '../_internal/generate.js';
-import { capitalizeFirst, chance, clamp, pick, pickWeighted, randInt } from '../_internal/utils.js';
+import {
+	capitalizeFirst,
+	chance,
+	clamp,
+	pick,
+	pickWeighted,
+	randInt,
+	random,
+	withRandom
+} from '../_internal/utils.js';
 import type { NameDetail, NameGender, NameLanguage, RandNameOptions } from '../_types/global.js';
 import { NAME_DATA, NAME_LANGUAGES, resolveNameLanguage } from './data/index.js';
 import type { NameLanguageData, NamePool, NameToken, SyllableSet } from './data/types.js';
@@ -351,7 +361,7 @@ function pickGivenLength(
 		const total = options.reduce((sum, [, weight]) => sum + weight, 0);
 
 		if (total > 0) {
-			let roll = Math.random() * total;
+			let roll = random() * total;
 
 			for (const [length, weight] of options) {
 				roll -= weight;
@@ -634,7 +644,7 @@ function boundsFor(language: NameLanguage, settings: Settings): [number, number]
 function generateOne(language: NameLanguage, settings: Settings): NameDetail {
 	const data = NAME_DATA[language];
 	const gender: NameGender =
-		settings.gender === 'all' ? (Math.random() < 0.5 ? 'male' : 'female') : settings.gender;
+		settings.gender === 'all' ? (random() < 0.5 ? 'male' : 'female') : settings.gender;
 	const isMale = gender === 'male';
 	const [min, max] = boundsFor(language, settings);
 	const entry =
@@ -685,9 +695,11 @@ export function generateNameDetails(options: RandNameOptions = {}): NameDetail[]
 		return [];
 	}
 
-	return collect(
-		options,
-		() => generateOne(pick(languages), settings),
-		(detail) => detail.native
+	return withRandom(resolveRandom(options.random), () =>
+		collect(
+			options,
+			() => generateOne(pick(languages), settings),
+			(detail) => detail.native
+		)
 	);
 }

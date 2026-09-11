@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:randino/src/nickname/nickname_generator.dart';
 import 'package:randino/src/types.dart';
 
@@ -43,6 +45,10 @@ List<String> randNickname({
   String? wordSeparator,
   String? startsWith,
   bool unique = false,
+
+  /// Where the randomness comes from: `Random.secure()` for a value nobody may
+  /// predict, `Random(42)` for one that has to come out the same every run.
+  Random? random,
 }) =>
     generateNicknameDetails(
       language: language,
@@ -56,4 +62,5 @@ List<String> randNickname({
       wordSeparator: wordSeparator,
       startsWith: startsWith,
       unique: unique,
+      random: random,
     ).map((detail) => detail.nickname).toList();

@@ -1,5 +1,5 @@
-import { drawLanguage, resolveRealism } from '../_internal/generate.js';
-import { capitalizeFirst } from '../_internal/utils.js';
+import { drawLanguage, resolveRandom, resolveRealism } from '../_internal/generate.js';
+import { capitalizeFirst, withRandom } from '../_internal/utils.js';
 import { detectLanguage } from '../_internal/script.js';
 import type { RandModifierOptions, WordLanguage, WordLanguageOption } from '../_types/global.js';
 import { WORD_DATA, WORD_LANGUAGES } from '../word/data/index.js';
@@ -111,16 +111,18 @@ export function randModifier(
 ): string | string[] {
 	const { target, settings } = firstArgument<RandModifierOptions>(value, options, {});
 
-	if (target === undefined) {
-		return draw(undefined, settings)[0];
-	}
+	return withRandom(resolveRandom(settings.random), () => {
+		if (target === undefined) {
+			return draw(undefined, settings)[0];
+		}
 
-	const one = (item: string) => {
-		const [word, separator, follows] = draw(item, settings);
+		const one = (item: string) => {
+			const [word, separator, follows] = draw(item, settings);
 
-		// Vietnamese puts the modifier after the noun, and says so in its frames.
-		return follows ? item + separator + word : word + separator + item;
-	};
+			// Vietnamese puts the modifier after the noun, and says so in its frames.
+			return follows ? item + separator + word : word + separator + item;
+		};
 
-	return Array.isArray(target) ? target.map(one) : one(target);
+		return Array.isArray(target) ? target.map(one) : one(target);
+	});
 }

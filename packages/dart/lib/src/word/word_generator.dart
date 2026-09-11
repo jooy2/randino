@@ -7,6 +7,8 @@
 // together, which is why the drawing lives here and the composing lives in
 // `nickname/nickname_generator.dart`.
 
+import 'dart:math';
+
 import 'package:randino/src/internal/generate.dart';
 import 'package:randino/src/internal/utils.dart';
 import 'package:randino/src/types.dart';
@@ -501,6 +503,10 @@ List<WordDetail> generateWordDetails({
   int? maxLength,
   String? startsWith,
   bool unique = false,
+
+  /// Where the randomness comes from: `Random.secure()` for a value nobody may
+  /// predict, `Random(42)` for one that has to come out the same every run.
+  Random? random,
 }) {
   final invent = resolveRealism(realism);
   final prefix = resolvePrefix(startsWith);
@@ -513,13 +519,23 @@ List<WordDetail> generateWordDetails({
     return <WordDetail>[];
   }
 
-  return collect<WordDetail>(
-    count: count,
-    unique: unique,
-    startsWith: prefix,
-    draw:
-        () =>
-            _generateOne(pick(languages), theme, invent, vocabulary, minLength, maxLength, prefix),
-    keyOf: (detail) => detail.word,
+  return withRandom(
+    random,
+    () => collect<WordDetail>(
+      count: count,
+      unique: unique,
+      startsWith: prefix,
+      draw:
+          () => _generateOne(
+            pick(languages),
+            theme,
+            invent,
+            vocabulary,
+            minLength,
+            maxLength,
+            prefix,
+          ),
+      keyOf: (detail) => detail.word,
+    ),
   );
 }

@@ -242,6 +242,80 @@ rand_name(count=5)  # 9개 언어 중 하나씩, 이름 다섯 개
 
 :::
 
+## 난수원 고르기 {#choosing-the-source}
+
+모든 생성 함수와 데코레이터가 `random` 옵션을 받고, 한 번의 호출이 하는 모든 추첨이 이 난수원을 거칩니다. 생성기가 다른 생성기를 부르며 하는 추첨도 마찬가지라서, `randSentence`가 쓰는 사람 이름도 문장과 같은 난수원에서 나옵니다. 생략하면 각 언어의 일반 난수 생성기를 씁니다. `Math.random`, `dart:math`의 `Random`, Python의 `random`입니다.
+
+샘플 데이터에는 이 기본값으로 충분하지만, 두 가지 경우에는 맞지 않습니다.
+
+**아무도 예측하면 안 되는 값.** 위 생성기들은 모두 암호학적으로 안전하지 않습니다. 작은 내부 상태를 굴리는 방식이라 출력 몇 개로 상태가 복원됩니다. 추측 불가능해야 하는 토큰에는 보안 난수원을 넘기십시오.
+
+::: lang js
+
+```javascript
+const secure = () => crypto.getRandomValues(new Uint32Array(1))[0] / 2 ** 32;
+
+randSuffix('MistyOwl', { random: secure }); // 'MistyOwl_k3Rm9'
+```
+
+:::
+
+::: lang dart
+
+```dart
+import 'dart:math';
+
+randSuffix(value: 'MistyOwl', random: Random.secure()); // 'MistyOwl_k3Rm9'
+```
+
+:::
+
+::: lang py
+
+```python
+from random import SystemRandom
+
+rand_suffix("MistyOwl", random=SystemRandom().random)  # 'MistyOwl_k3Rm9'
+```
+
+:::
+
+**매번 같아야 하는 고정 데이터.** 시드를 준 난수원을 넘기면 호출 전체가 재현됩니다. 스냅샷 테스트나 데모용 데이터베이스에 쓰기 좋습니다. 시드와 옵션이 같으면 결과도 같습니다.
+
+::: lang js
+
+```javascript
+// 시드를 받는 생성기는 표준 라이브러리에 없으니 직접 준비합니다.
+const seeded = (seed) => () => /* … */;
+
+randName({ language: 'en', count: 3, random: seeded(42) });
+// ['Easton Bryant', 'Pearl Fenwick', 'Callum Bradley'] — 언제나 같습니다
+```
+
+:::
+
+::: lang dart
+
+```dart
+randName(language: NameLanguage.en, count: 3, random: Random(42));
+// ['Quinn Palmer', 'Bryson Compton', 'Hannah Evans'] — 언제나 같습니다
+```
+
+:::
+
+::: lang py
+
+```python
+from random import Random
+
+rand_name(language="en", count=3, random=Random(42).random)
+# ['Simon Bancroft', 'Liam Norton', 'Jordan Sutton'] — 언제나 같습니다
+```
+
+:::
+
+시드를 준 결과는 같은 버전 안에서만 재현됩니다. 단어 풀은 계속 늘어나고, 단어 하나가 추가되면 그 뒤의 모든 추첨이 밀립니다. 고정 데이터가 업그레이드를 넘어 살아남아야 한다면 버전을 고정하십시오.
+
 ## 다음으로
 
 - [**지원 언어**](./languages) — 9개 언어 코드가 무엇을 다루는지, 그리고 언어마다 무엇이 다른지.

@@ -6,13 +6,14 @@
 // whole of `randWord`; a nickname is what you get when several of these are put
 // together, which is why the drawing lives here and the composing lives there.
 
-import { chance, clamp, pick, randInt } from '../_internal/utils.js';
+import { chance, clamp, pick, randInt, withRandom } from '../_internal/utils.js';
 import {
 	collect,
 	languagesWriting,
 	lengthBounds,
 	resolveLength,
 	resolvePrefix,
+	resolveRandom,
 	resolveRealism,
 	resolveVocabulary
 } from '../_internal/generate.js';
@@ -559,10 +560,12 @@ export function generateWordDetails(options: RandWordOptions = {}): WordDetail[]
 		return [];
 	}
 
-	return collect(
-		options,
-		() => generateOne(pick(languages), settings),
-		(detail) => detail.word
+	return withRandom(resolveRandom(options.random), () =>
+		collect(
+			options,
+			() => generateOne(pick(languages), settings),
+			(detail) => detail.word
+		)
 	);
 }
 

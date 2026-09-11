@@ -24,6 +24,7 @@ randModifier(randAnimal({ language: 'en', count: 2 }));
 | `realism` | `RandRealism` | `'real'` | `real` draws a modifier the language uses, `invented` builds one that only reads like it |
 | `kind` | `ModifierKind \| 'all'` | `'all'` | `adjective` says what the value is like, `action` what it is doing |
 | `separator` | `string` | _language_ | Placed between the modifier and the value |
+| `random` | `() => number` | — | Where the randomness comes from — see [Choosing the source](../guide/getting-started#choosing-the-source) |
 
 Returns a `string` for a `string`, and a `string[]` for a `string[]`.
 
@@ -49,6 +50,7 @@ randModifierAll(randAnimal(language: WordLanguage.en, count: 2));
 | `realism` | `RandRealism` | `RandRealism.real` | `real` draws a real modifier, `invented` builds one |
 | `kind` | `ModifierKind?` | `null` | `adjective` says what the value is like, `action` what it is doing |
 | `separator` | `String?` | _language_ | Placed between the modifier and the value |
+| `random` | `Random?` | `null` | Where the randomness comes from — see [Choosing the source](../guide/getting-started#choosing-the-source) |
 
 Returns a `String`. **`randModifierAll` is the list form**, the way `randSuffixAll` is for `randSuffix`.
 
@@ -74,6 +76,7 @@ rand_modifier(rand_animal(language="en", count=2))
 | `realism` | `RandRealism` | `"real"` | `real` draws a real modifier, `invented` builds one |
 | `kind` | `ModifierKind \| Literal["all"]` | `"all"` | `adjective` says what the value is like, `action` what it is doing |
 | `separator` | `str \| None` | _language_ | Placed between the modifier and the value |
+| `random` | `Callable[[], float] \| None` | `None` | Where the randomness comes from — see [Choosing the source](../guide/getting-started#choosing-the-source) |
 
 Returns a `str` for a `str`, and a `list[str]` for a `list[str]`, carried by `@overload`.
 

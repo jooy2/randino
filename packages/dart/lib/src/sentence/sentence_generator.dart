@@ -20,6 +20,8 @@
 //   not — no tag on any noun, because `themeClass` already knows what a theme
 //   names.
 
+import 'dart:math';
+
 import 'package:randino/src/constants.dart';
 import 'package:randino/src/internal/generate.dart';
 import 'package:randino/src/internal/script.dart';
@@ -5131,6 +5133,10 @@ List<SentenceDetail> generateSentenceDetails({
   SentenceTense? tense,
   SentenceStory? story,
   RandVocabulary vocabulary = RandVocabulary.common,
+
+  /// Where the randomness comes from: `Random.secure()` for a value nobody may
+  /// predict, `Random(42)` for one that has to come out the same every run.
+  Random? random,
 }) {
   final settings = _Settings(
     theme: theme,
@@ -5168,39 +5174,42 @@ List<SentenceDetail> generateSentenceDetails({
     return <SentenceDetail>[];
   }
 
-  return collect<SentenceDetail>(
-    count: count,
-    unique: unique,
-    startsWith: settings.prefix,
-    draw: () {
-      // Whether the result writes a person's name is settled inside
-      // [_generateResult], which is where the language's own name lengths are in
-      // hand: a range only a noun phrase can reach is a range no name can answer.
-      // Deciding it here left [_nameFits] unreachable, and a `minLength` of 54
-      // Korean characters wrote a name in half of its results where the reference
-      // implementation wrote none.
-      final WordLanguage code = pick(languages);
-      final data = sentenceData[code]!;
-      final result = _generateResult(code, settings);
-      final built = result.built;
+  return withRandom(
+    random,
+    () => collect<SentenceDetail>(
+      count: count,
+      unique: unique,
+      startsWith: settings.prefix,
+      draw: () {
+        // Whether the result writes a person's name is settled inside
+        // [_generateResult], which is where the language's own name lengths are in
+        // hand: a range only a noun phrase can reach is a range no name can answer.
+        // Deciding it here left [_nameFits] unreachable, and a `minLength` of 54
+        // Korean characters wrote a name in half of its results where the reference
+        // implementation wrote none.
+        final WordLanguage code = pick(languages);
+        final data = sentenceData[code]!;
+        final result = _generateResult(code, settings);
+        final built = result.built;
 
-      return SentenceDetail(
-        sentence: built.map((one) => one.sentence).join(data.space),
-        sentences: List<String>.unmodifiable(built.map((one) => one.sentence)),
-        phrases: List<String>.unmodifiable(built.expand((one) => one.phrases)),
-        // Unmodifiable, and a copy: the frames are the language's own, so a
-        // caller reading the detail must not be able to reach into them.
-        slots: List<SentenceSlot>.unmodifiable(built.expand((one) => one.slots)),
-        names: List<String>.unmodifiable(built.expand((one) => one.names)),
-        types: List<SentenceType>.unmodifiable(built.map((one) => one.type)),
-        tense: result.tense,
-        story: result.story,
-        language: code,
-        // What the result is about: its hero in a story, and otherwise what its
-        // first sentence was about, which the ones after it stay inside.
-        theme: result.theme,
-      );
-    },
-    keyOf: (detail) => detail.sentence,
+        return SentenceDetail(
+          sentence: built.map((one) => one.sentence).join(data.space),
+          sentences: List<String>.unmodifiable(built.map((one) => one.sentence)),
+          phrases: List<String>.unmodifiable(built.expand((one) => one.phrases)),
+          // Unmodifiable, and a copy: the frames are the language's own, so a
+          // caller reading the detail must not be able to reach into them.
+          slots: List<SentenceSlot>.unmodifiable(built.expand((one) => one.slots)),
+          names: List<String>.unmodifiable(built.expand((one) => one.names)),
+          types: List<SentenceType>.unmodifiable(built.map((one) => one.type)),
+          tense: result.tense,
+          story: result.story,
+          language: code,
+          // What the result is about: its hero in a story, and otherwise what its
+          // first sentence was about, which the ones after it stay inside.
+          theme: result.theme,
+        );
+      },
+      keyOf: (detail) => detail.sentence,
+    ),
   );
 }

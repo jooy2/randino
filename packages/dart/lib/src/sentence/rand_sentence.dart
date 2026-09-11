@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:randino/src/sentence/sentence_generator.dart';
 import 'package:randino/src/types.dart';
 
@@ -105,6 +107,10 @@ List<String> randSentence({
   SentenceStyle? style,
   SentenceTense? tense,
   SentenceStory? story,
+
+  /// Where the randomness comes from: `Random.secure()` for a value nobody may
+  /// predict, `Random(42)` for one that has to come out the same every run.
+  Random? random,
 }) =>
     generateSentenceDetails(
       language: language,
@@ -126,4 +132,5 @@ List<String> randSentence({
       style: style,
       tense: tense,
       story: story,
+      random: random,
     ).map((detail) => detail.sentence).toList();

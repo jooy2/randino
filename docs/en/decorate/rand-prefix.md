@@ -20,6 +20,7 @@ randPrefix(randNickname({ language: 'en', count: 2 }));
 | `length` | `number` | `5` | Characters in the token. Clamped to `1` … `32` |
 | `separator` | `string` | `'_'` | Placed between the token and the value |
 | `charset` | `string` | _built-in_ | Characters the token is drawn from |
+| `random` | `() => number` | — | Where the randomness comes from — see [Choosing the source](../guide/getting-started#choosing-the-source) |
 
 Returns a `string` for a `string`, and a `string[]` for a `string[]`.
 
@@ -37,12 +38,13 @@ randPrefixAll(randNickname(language: WordLanguage.en, count: 2));
 // ['AVcCV_MistyOwl', 'RUKAP_RustyBoot']
 ```
 
-| Parameter   | Type      | Default | Description                                    |
-| ----------- | --------- | ------- | ---------------------------------------------- |
-| `value`     | `String?` | `null`  | What to prepend to. Omit it for the bare token |
-| `length`    | `int`     | `5`     | Characters in the token. Clamped to `1` … `32` |
-| `separator` | `String`  | `'_'`   | Placed between the token and the value         |
-| `charset`   | `String?` | `null`  | Characters the token is drawn from             |
+| Parameter | Type | Default | Description |
+| --- | --- | --- | --- |
+| `value` | `String?` | `null` | What to prepend to. Omit it for the bare token |
+| `length` | `int` | `5` | Characters in the token. Clamped to `1` … `32` |
+| `separator` | `String` | `'_'` | Placed between the token and the value |
+| `charset` | `String?` | `null` | Characters the token is drawn from |
+| `random` | `Random?` | `null` | Where the randomness comes from — see [Choosing the source](../guide/getting-started#choosing-the-source) |
 
 Returns a `String`. **`randPrefixAll` is the list form**, for the same reason `randSuffixAll` is.
 
@@ -66,6 +68,7 @@ rand_prefix(rand_nickname(language="en", count=2))
 | `length` | `int` | `5` | Characters in the token. Clamped to `1` … `32` |
 | `separator` | `str` | `"_"` | Placed between the token and the value |
 | `charset` | `str` | `""` | Characters the token is drawn from; empty means the default |
+| `random` | `Callable[[], float] \| None` | `None` | Where the randomness comes from — see [Choosing the source](../guide/getting-started#choosing-the-source) |
 
 Returns a `str` for a `str`, and a `list[str]` for a `list[str]`.
 

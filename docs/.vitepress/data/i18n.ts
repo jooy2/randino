@@ -87,6 +87,10 @@ const strings = {
 		ko: '같은 단어를 두 번 돌려주지 않습니다. 풀이 바닥나면 요청보다 적게 돌아옵니다.',
 		en: 'Never return the same word twice. Returns fewer than asked once a pool runs out.'
 	},
+	optionRandom: {
+		ko: '무작위성을 어디서 가져올지. 기본값은 각 언어의 일반 난수 생성기입니다.',
+		en: "Where the randomness comes from. Defaults to the platform's ordinary generator."
+	},
 	optionOutput: {
 		ko: '문자열, 또는 단어마다 WordDetail 하나.',
 		en: 'Strings, or one WordDetail per word.'

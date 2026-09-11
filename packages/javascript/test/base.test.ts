@@ -153,4 +153,69 @@ describe('base test', () => {
 		// that runs `NaN` times wrote nothing at all.
 		assert.strictEqual(randino.randSuffix('x', { length: NaN }).length, 'x_'.length + 5);
 	});
+
+	it('`random` is where every draw of a call comes from', () => {
+		// One source, threaded through everything the call reaches — which for
+		// `randSentence` is the word pools, the story planner and the name
+		// generator. Two calls with the same seed have to agree on all of it.
+		const seeded = (seed: number) => {
+			let state = seed >>> 0;
+
+			return () => {
+				state = (state + 0x6d2b79f5) >>> 0;
+
+				let next = Math.imul(state ^ (state >>> 15), state | 1);
+
+				next ^= next + Math.imul(next ^ (next >>> 7), next | 61);
+
+				return ((next ^ (next >>> 14)) >>> 0) / 4294967296;
+			};
+		};
+
+		const twice = <T>(draw: () => T) => [draw(), draw()];
+		const agrees = <T>(draw: () => T) => {
+			const [first, second] = twice(draw);
+
+			assert.deepEqual(first, second);
+
+			return first;
+		};
+
+		agrees(() => randino.randName({ language: 'en', count: 5, random: seeded(42) }));
+		agrees(() => randino.randWord({ language: 'ko', count: 5, random: seeded(42) }));
+		agrees(() => randino.randAnimal({ language: 'en', count: 5, random: seeded(42) }));
+		agrees(() => randino.randNickname({ language: 'en', count: 5, random: seeded(42) }));
+		agrees(() =>
+			randino.randSentence({ language: 'ko', count: 3, sentences: 3, random: seeded(42) })
+		);
+		agrees(() => randino.randSuffix('MistyOwl', { random: seeded(42) }));
+		agrees(() => randino.randPrefix('MistyOwl', { random: seeded(42) }));
+		agrees(() => randino.randModifier('사자', { random: seeded(42) }));
+
+		// Two different seeds are two different answers, so the source is actually
+		// what the draws are coming from.
+		assert.notDeepEqual(
+			randino.randName({ language: 'en', count: 5, random: seeded(1) }),
+			randino.randName({ language: 'en', count: 5, random: seeded(2) })
+		);
+
+		// And the package's own source is put back afterwards, including when the
+		// caller's throws.
+		const before = randino.randName({ count: 5 });
+
+		assert.throws(() =>
+			randino.randName({
+				random: () => {
+					throw new Error('boom');
+				}
+			})
+		);
+		assert.notDeepEqual(before, randino.randName({ count: 5 }));
+
+		// A source that hands back something that is not a number in `[0, 1)` reads
+		// as `0` rather than as an index off the end of a pool.
+		for (const source of [() => NaN, () => 1, () => -1, () => 'x' as never]) {
+			assert.strictEqual(randino.randName({ language: 'en', random: source }).length, 1);
+		}
+	});
 });

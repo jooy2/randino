@@ -26,8 +26,7 @@ attaching a token to a string was never a thing about nicknames.
 """
 
 import math
-import random
-from collections.abc import Sequence
+from collections.abc import Callable, Sequence
 from dataclasses import dataclass
 from typing import Literal, NamedTuple
 
@@ -41,7 +40,7 @@ from randino._internal.generate import (
     resolve_realism,
     resolve_vocabulary,
 )
-from randino._internal.utils import pick
+from randino._internal.utils import pick, random, with_random
 from randino._types import (
     NicknameDetail,
     RandRealism,
@@ -237,7 +236,7 @@ def frame_range(frame: WordFrame, bounds: Bounds, joiner: int) -> tuple[int, int
 
 def pick_frame(frames: Sequence[WordFrame]) -> WordFrame:
     """Draw one shape in proportion to its weight."""
-    roll = random.random() * sum(frame.weight for frame in frames)
+    roll = random() * sum(frame.weight for frame in frames)
 
     for frame in frames:
         roll -= frame.weight
@@ -490,6 +489,7 @@ def generate_nickname_details(
     word_separator: str | None = None,
     starts_with: str = "",
     unique: bool = False,
+    random: Callable[[], float] | None = None,
 ) -> list[NicknameDetail]:
     """Generate `count` nicknames, applied to every option the caller passed."""
     settings = Settings(
@@ -526,10 +526,11 @@ def generate_nickname_details(
             theme=built_theme,
         )
 
-    return collect(
-        count=count,
-        unique=unique,
-        starts_with=settings.prefix,
-        draw=draw,
-        key_of=lambda detail: detail.nickname,
-    )
+    with with_random(random):
+        return collect(
+            count=count,
+            unique=unique,
+            starts_with=settings.prefix,
+            draw=draw,
+            key_of=lambda detail: detail.nickname,
+        )

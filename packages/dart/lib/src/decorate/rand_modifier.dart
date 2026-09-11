@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:randino/src/internal/generate.dart';
 import 'package:randino/src/internal/script.dart';
 import 'package:randino/src/internal/utils.dart';
@@ -59,11 +61,15 @@ String randModifier({
   RandRealism realism = RandRealism.real,
   ModifierKind? kind,
   String? separator,
-}) {
+
+  /// Where the randomness comes from: `Random.secure()` for a word nobody may
+  /// predict, `Random(42)` for one that has to come out the same every run.
+  Random? random,
+}) => withRandom(random, () {
   final (word, joiner, follows) = drawModifier(value, language, realism, kind, separator);
 
   if (value == null) return word;
 
   // Vietnamese puts the modifier after the noun, and says so in its frames.
   return follows ? '$value$joiner$word' : '$word$joiner$value';
-}
+});

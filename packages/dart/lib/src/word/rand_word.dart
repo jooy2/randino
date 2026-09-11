@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:randino/src/types.dart';
 import 'package:randino/src/word/word_generator.dart';
 
@@ -26,6 +28,10 @@ List<String> randWord({
   int? maxLength,
   String? startsWith,
   bool unique = false,
+
+  /// Where the randomness comes from: `Random.secure()` for a value nobody may
+  /// predict, `Random(42)` for one that has to come out the same every run.
+  Random? random,
 }) => [
   for (final detail in generateWordDetails(
     language: language,
@@ -37,6 +43,7 @@ List<String> randWord({
     maxLength: maxLength,
     startsWith: startsWith,
     unique: unique,
+    random: random,
   ))
     detail.word,
 ];

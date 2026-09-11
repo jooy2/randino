@@ -81,6 +81,15 @@ export function resolveMany<T extends string>(
 }
 
 /**
+ * The caller's source of randomness, or `undefined` for the package's own. A
+ * value that is not a function reads as absent, the way every other option the
+ * types rule out does.
+ */
+export function resolveRandom(value: unknown): (() => number) | undefined {
+	return typeof value === 'function' ? (value as () => number) : undefined;
+}
+
+/**
  * `startsWith` narrowed to the single character every generator matches on. One
  * character rather than a string: it is applied to the first *word* a result is
  * built from, and a two-character prefix would rule out most pools entirely.

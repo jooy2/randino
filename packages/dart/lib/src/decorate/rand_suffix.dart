@@ -1,5 +1,8 @@
+import 'dart:math';
+
 import 'package:randino/src/decorate/attach.dart';
 import 'package:randino/src/decorate/data/index.dart';
+import 'package:randino/src/internal/utils.dart';
 
 /// Appends a random token to [value], so that two people asking for the same
 /// nickname at the same moment are very unlikely to walk away with the same one.
@@ -31,7 +34,14 @@ String randSuffix({
   int length = affixLengthDefault,
   String separator = affixSeparatorDefault,
   String? charset,
-}) =>
-    value == null
-        ? affixToken(length, charset)
-        : attachOne(value, length, separator, charset, appendToken);
+
+  /// Where the randomness comes from: `Random.secure()` for a token nobody may
+  /// predict, `Random(42)` for one that has to come out the same every run.
+  Random? random,
+}) => withRandom(
+  random,
+  () =>
+      value == null
+          ? affixToken(length, charset)
+          : attachOne(value, length, separator, charset, appendToken),
+);

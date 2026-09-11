@@ -63,6 +63,7 @@ rand_sentence()
 | <Lang js="startsWith" dart="startsWith" py="starts_with" code /> | <Lang js="string" dart="String?" py="str" code /> | <Lang js="—" dart="null" py="&quot;&quot;" code /> | 이 글자로 시작하는 문장만 남깁니다. 그 글자를 쓰는 문자 체계의 언어에서만 뽑습니다. 관사를 쓰는 언어에서는 그 글자가 관사의 첫 글자입니다. [아래](#a-first-character)를 보세요. |
 | `unique` | <Lang js="boolean" dart="bool" py="bool" code /> | <Lang js="false" dart="false" py="False" code /> | 같은 문장을 두 번 돌려주지 않습니다. `count`보다 적게 돌아올 수 있습니다. |
 | `output` | <Lang js="RandOutput" py="RandOutput" code /> | <Lang js="'value'" py="&quot;value&quot;" code /> | 문자열, 또는 문장마다 `SentenceDetail` 하나. Dart에는 이 옵션이 없습니다. [상세 출력](#the-detail-output) 참고. |
+| `random` | <Lang js="() => number" dart="Random?" py="Callable[[], float] &#124; None" code /> | <Lang js="—" dart="null" py="None" code /> | 무작위성을 어디서 가져올지. [난수원 고르기](../guide/getting-started#choosing-the-source)를 보세요. 기본값은 각 언어의 일반 난수 생성기입니다. |
 
 두 길이 옵션은 다른 생성기가 쓰는 상한이 아니라 **문장 하나당** <Lang js="RAND_SENTENCE_LENGTH_MAX" dart="randSentenceLengthMax" py="RAND_SENTENCE_LENGTH_MAX" code />으로 제한됩니다. 이름과 단어와 닉네임은 길어야 세 단어지만 문장은 여러 단어이고, 열 문장짜리 결과에는 그 열 배까지 허용됩니다.
 

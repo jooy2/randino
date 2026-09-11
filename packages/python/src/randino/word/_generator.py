@@ -7,7 +7,7 @@ is why the drawing lives here and the composing lives in `nickname/_generator.py
 """
 
 import math
-from collections.abc import Sequence
+from collections.abc import Callable, Sequence
 from typing import Literal, NamedTuple
 
 from randino._internal.generate import (
@@ -18,7 +18,14 @@ from randino._internal.generate import (
     resolve_realism,
     resolve_vocabulary,
 )
-from randino._internal.utils import capitalize_first, chance, clamp, pick, rand_int
+from randino._internal.utils import (
+    capitalize_first,
+    chance,
+    clamp,
+    pick,
+    rand_int,
+    with_random,
+)
 from randino._types import (
     ModifierKind,
     RandRealism,
@@ -520,6 +527,7 @@ def generate_word_details(
     max_length: int | None = None,
     starts_with: str = "",
     unique: bool = False,
+    random: Callable[[], float] | None = None,
 ) -> list[WordDetail]:
     """Generate `count` words, applied to every option the caller passed."""
     settings = Settings(
@@ -538,10 +546,11 @@ def generate_word_details(
     if not languages:
         return []
 
-    return collect(
-        count=count,
-        unique=unique,
-        starts_with=settings.prefix,
-        draw=lambda: generate_one(pick(languages), settings),
-        key_of=lambda detail: detail.word,
-    )
+    with with_random(random):
+        return collect(
+            count=count,
+            unique=unique,
+            starts_with=settings.prefix,
+            draw=lambda: generate_one(pick(languages), settings),
+            key_of=lambda detail: detail.word,
+        )

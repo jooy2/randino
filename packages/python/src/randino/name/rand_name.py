@@ -1,5 +1,6 @@
 """Generating person names, as strings or as details."""
 
+from collections.abc import Callable
 from typing import Literal, overload
 
 from randino._types import (
@@ -27,6 +28,7 @@ def rand_name(
     script: NameScript = ...,
     starts_with: str = ...,
     unique: bool = ...,
+    random: Callable[[], float] | None = ...,
     output: Literal["value"] = ...,
 ) -> list[str]: ...
 
@@ -45,6 +47,7 @@ def rand_name(
     script: NameScript = ...,
     starts_with: str = ...,
     unique: bool = ...,
+    random: Callable[[], float] | None = ...,
     output: Literal["detail"],
 ) -> list[NameDetail]: ...
 
@@ -62,6 +65,7 @@ def rand_name(
     script: NameScript = "native",
     starts_with: str = "",
     unique: bool = False,
+    random: Callable[[], float] | None = None,
     output: RandOutput = "value",
 ) -> list[str] | list[NameDetail]:
     """Generate natural-looking person names.
@@ -88,6 +92,11 @@ def rand_name(
         unique: Never return the same name twice. May return fewer than `count`
             names when the pool runs out of combinations.
         output: `"value"` for strings, `"detail"` for a `NameDetail` per name.
+        random: Where the randomness comes from: a callable returning a number in
+            `[0, 1)`, the way `random.random` does. `SystemRandom().random` for a value
+            nobody may predict, `Random(42).random` for one that has to come out the
+            same every run. Used for every draw the call makes, including the ones a
+            generator makes through another.
 
     Returns:
         A `list[str]`, or a `list[NameDetail]` when `output="detail"` — the
@@ -116,6 +125,7 @@ def rand_name(
         include_middle_name=include_middle_name,
         starts_with=starts_with,
         unique=unique,
+        random=random,
     )
 
     if output == "detail":

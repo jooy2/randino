@@ -12,12 +12,11 @@ so that nobody eats what nobody picked up, and a "so" is written only where the 
 gave the sentence a reason.
 """
 
-import random
 from collections.abc import Callable, Sequence
 from dataclasses import dataclass, replace
 from typing import Any, Literal, cast
 
-from randino._internal.utils import chance, pick, pick_weighted, rand_int
+from randino._internal.utils import chance, pick, pick_weighted, rand_int, shuffle
 from randino._types import SentenceStory, SentenceType, WordTheme
 from randino.sentence.data import (
     AGENT_CLASSES,
@@ -772,8 +771,8 @@ def plan(
 
             filler.append(insert)
 
-        random.shuffle(own)
-        random.shuffle(filler)
+        shuffle(own)
+        shuffle(filler)
 
         for attempt in [*own, *filler]:
             candidate = attempt()
@@ -807,7 +806,7 @@ def plan(
         if _is_action(walked[i].step) and _is_action(walked[i + 1].step)
     ]
 
-    random.shuffle(pairs)
+    shuffle(pairs)
 
     for at in pairs:
         if len(joined) >= joins:

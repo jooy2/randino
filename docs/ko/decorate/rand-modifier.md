@@ -24,6 +24,7 @@ randModifier(randAnimal({ language: 'en', count: 2 }));
 | `realism` | `RandRealism` | `'real'` | `real`은 언어가 쓰는 수식어를 뽑고, `invented`는 그 언어처럼 읽히기만 하는 수식어를 만들어냅니다 |
 | `kind` | `ModifierKind \| 'all'` | `'all'` | `adjective`는 어떤지를, `action`은 무엇을 하는지를 말합니다 |
 | `separator` | `string` | _언어_ | 수식어와 값 사이에 들어감 |
+| `random` | `() => number` | — | 무작위성을 어디서 가져올지. [난수원 고르기](../guide/getting-started#choosing-the-source)를 보세요 |
 
 `string`에는 `string`을, `string[]`에는 `string[]`을 반환합니다.
 
@@ -49,6 +50,7 @@ randModifierAll(randAnimal(language: WordLanguage.en, count: 2));
 | `realism` | `RandRealism` | `RandRealism.real` | `real`은 실제 수식어, `invented`는 만들어낸 수식어 |
 | `kind` | `ModifierKind?` | `null` | `adjective`는 어떤지를, `action`은 무엇을 하는지를 말합니다 |
 | `separator` | `String?` | _언어_ | 수식어와 값 사이에 들어감 |
+| `random` | `Random?` | `null` | 무작위성을 어디서 가져올지. [난수원 고르기](../guide/getting-started#choosing-the-source)를 보세요 |
 
 `String`을 반환합니다. **리스트 형태는 `randModifierAll`입니다.** `randSuffix`에 대한 `randSuffixAll`과 같습니다.
 
@@ -74,6 +76,7 @@ rand_modifier(rand_animal(language="en", count=2))
 | `realism` | `RandRealism` | `"real"` | `real`은 실제 수식어, `invented`는 만들어낸 수식어 |
 | `kind` | `ModifierKind \| Literal["all"]` | `"all"` | `adjective`는 어떤지를, `action`은 무엇을 하는지를 말합니다 |
 | `separator` | `str \| None` | _언어_ | 수식어와 값 사이에 들어감 |
+| `random` | `Callable[[], float] \| None` | `None` | 무작위성을 어디서 가져올지. [난수원 고르기](../guide/getting-started#choosing-the-source)를 보세요 |
 
 `str`에는 `str`을, `list[str]`에는 `list[str]`을 반환하며 `@overload`가 이를 전달합니다.
 

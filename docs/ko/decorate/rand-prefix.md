@@ -20,6 +20,7 @@ randPrefix(randNickname({ language: 'en', count: 2 }));
 | `length` | `number` | `5` | 토큰의 글자 수. `1` … `32`로 제한 |
 | `separator` | `string` | `'_'` | 토큰과 값 사이에 들어감 |
 | `charset` | `string` | _내장_ | 토큰을 뽑아 쓸 문자들 |
+| `random` | `() => number` | — | 무작위성을 어디서 가져올지. [난수원 고르기](../guide/getting-started#choosing-the-source)를 보세요 |
 
 `string`에는 `string`을, `string[]`에는 `string[]`을 반환합니다.
 
@@ -37,12 +38,13 @@ randPrefixAll(randNickname(language: WordLanguage.en, count: 2));
 // ['AVcCV_MistyOwl', 'RUKAP_RustyBoot']
 ```
 
-| 파라미터    | 타입      | 기본값 | 설명                              |
-| ----------- | --------- | ------ | --------------------------------- |
-| `value`     | `String?` | `null` | 앞에 붙일 대상. 생략하면 토큰만   |
-| `length`    | `int`     | `5`    | 토큰의 글자 수. `1` … `32`로 제한 |
-| `separator` | `String`  | `'_'`  | 토큰과 값 사이에 들어감           |
-| `charset`   | `String?` | `null` | 토큰을 뽑아 쓸 문자들             |
+| 파라미터 | 타입 | 기본값 | 설명 |
+| --- | --- | --- | --- |
+| `value` | `String?` | `null` | 앞에 붙일 대상. 생략하면 토큰만 |
+| `length` | `int` | `5` | 토큰의 글자 수. `1` … `32`로 제한 |
+| `separator` | `String` | `'_'` | 토큰과 값 사이에 들어감 |
+| `charset` | `String?` | `null` | 토큰을 뽑아 쓸 문자들 |
+| `random` | `Random?` | `null` | 무작위성을 어디서 가져올지. [난수원 고르기](../guide/getting-started#choosing-the-source)를 보세요 |
 
 `String`을 반환합니다. **리스트 형태는 `randPrefixAll`이며**, `randSuffixAll`이 존재하는 이유와 같습니다.
 
@@ -66,6 +68,7 @@ rand_prefix(rand_nickname(language="en", count=2))
 | `length` | `int` | `5` | 토큰의 글자 수. `1` … `32`로 제한 |
 | `separator` | `str` | `"_"` | 토큰과 값 사이에 들어감 |
 | `charset` | `str` | `""` | 토큰을 뽑아 쓸 문자들. 비어 있으면 기본값 |
+| `random` | `Callable[[], float] \| None` | `None` | 무작위성을 어디서 가져올지. [난수원 고르기](../guide/getting-started#choosing-the-source)를 보세요 |
 
 `str`에는 `str`을, `list[str]`에는 `list[str]`을 반환합니다.
 

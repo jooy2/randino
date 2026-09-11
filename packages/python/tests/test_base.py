@@ -5,6 +5,7 @@ import pathlib
 import re
 import sys
 from collections.abc import Callable
+from random import Random
 from typing import Any
 
 import randino
@@ -224,3 +225,35 @@ def test_an_option_the_types_rule_out_falls_back_rather_than_raising() -> None:
     assert len(loose.rand_name(count=float("nan"))) == 1
     # A token of no length is not a token.
     assert len(loose.rand_suffix("x", length=float("nan"))) == len("x_") + 5
+
+
+def test_random_is_where_every_draw_of_a_call_comes_from() -> None:
+    """One source, threaded through everything the call reaches.
+
+    For `rand_sentence` that is the word pools, the story planner and the name
+    generator. Two calls with the same seed have to agree on all of it.
+    """
+
+    def twice(draw: Callable[[], object]) -> None:
+        assert draw() == draw()
+
+    twice(lambda: randino.rand_name(language="en", count=5, random=Random(42).random))
+    twice(lambda: randino.rand_word(language="ko", count=5, random=Random(42).random))
+    twice(lambda: randino.rand_animal(language="en", count=5, random=Random(42).random))
+    twice(lambda: randino.rand_nickname(language="en", count=5, random=Random(42).random))
+    twice(
+        lambda: randino.rand_sentence(language="ko", count=3, sentences=3, random=Random(42).random)
+    )
+    twice(lambda: randino.rand_suffix("MistyOwl", random=Random(42).random))
+    twice(lambda: randino.rand_prefix("MistyOwl", random=Random(42).random))
+    twice(lambda: randino.rand_modifier("사자", random=Random(42).random))
+    twice(lambda: randino.rand_modifier(["사자", "여우"], random=Random(42).random))
+
+    # Two different seeds are two different answers, so the source is actually what
+    # the draws are coming from.
+    assert randino.rand_name(language="en", count=5, random=Random(1).random) != randino.rand_name(
+        language="en", count=5, random=Random(2).random
+    )
+
+    # And the package's own source is put back afterwards.
+    assert randino.rand_name(count=5) != randino.rand_name(count=5)

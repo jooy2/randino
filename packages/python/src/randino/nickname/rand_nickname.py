@@ -1,5 +1,6 @@
 """Generating nicknames, as strings or as details."""
 
+from collections.abc import Callable
 from typing import Literal, overload
 
 from randino._types import (
@@ -28,6 +29,7 @@ def rand_nickname(
     word_separator: str | None = ...,
     starts_with: str = ...,
     unique: bool = ...,
+    random: Callable[[], float] | None = ...,
     output: Literal["value"] = ...,
 ) -> list[str]: ...
 
@@ -46,6 +48,7 @@ def rand_nickname(
     word_separator: str | None = ...,
     starts_with: str = ...,
     unique: bool = ...,
+    random: Callable[[], float] | None = ...,
     output: Literal["detail"],
 ) -> list[NicknameDetail]: ...
 
@@ -63,6 +66,7 @@ def rand_nickname(
     word_separator: str | None = None,
     starts_with: str = "",
     unique: bool = False,
+    random: Callable[[], float] | None = None,
     output: RandOutput = "value",
 ) -> list[str] | list[NicknameDetail]:
     """Generate nicknames — the kind of handle someone would pick for a game or a website.
@@ -98,6 +102,11 @@ def rand_nickname(
         output: `"value"` for strings, `"detail"` for a `NicknameDetail` per
             nickname — the words in order, what each of them does in the shape, the
             language and the theme.
+        random: Where the randomness comes from: a callable returning a number in
+            `[0, 1)`, the way `random.random` does. `SystemRandom().random` for a value
+            nobody may predict, `Random(42).random` for one that has to come out the
+            same every run. Used for every draw the call makes, including the ones a
+            generator makes through another.
 
     Returns:
         A `list[str]`, or a `list[NicknameDetail]` when `output="detail"` — the
@@ -129,6 +138,7 @@ def rand_nickname(
         word_separator=word_separator,
         starts_with=starts_with,
         unique=unique,
+        random=random,
     )
 
     if output == "detail":

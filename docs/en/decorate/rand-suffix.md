@@ -20,6 +20,7 @@ randSuffix(randNickname({ language: 'en', count: 2 }));
 | `length` | `number` | `5` | Characters in the token. Clamped to `1` … `32` |
 | `separator` | `string` | `'_'` | Placed between the value and the token. An empty string joins them directly |
 | `charset` | `string` | _built-in_ | Characters the token is drawn from |
+| `random` | `() => number` | — | Where the randomness comes from — see [Choosing the source](../guide/getting-started#choosing-the-source) |
 
 Returns a `string` for a `string`, and a `string[]` for a `string[]`.
 
@@ -37,12 +38,13 @@ randSuffixAll(randNickname(language: WordLanguage.en, count: 2));
 // ['RoundSeason_RVBnC', 'RowdyDusk_dwtu5']
 ```
 
-| Parameter   | Type      | Default | Description                                    |
-| ----------- | --------- | ------- | ---------------------------------------------- |
-| `value`     | `String?` | `null`  | What to append to. Omit it for the bare token  |
-| `length`    | `int`     | `5`     | Characters in the token. Clamped to `1` … `32` |
-| `separator` | `String`  | `'_'`   | Placed between the value and the token         |
-| `charset`   | `String?` | `null`  | Characters the token is drawn from             |
+| Parameter | Type | Default | Description |
+| --- | --- | --- | --- |
+| `value` | `String?` | `null` | What to append to. Omit it for the bare token |
+| `length` | `int` | `5` | Characters in the token. Clamped to `1` … `32` |
+| `separator` | `String` | `'_'` | Placed between the value and the token |
+| `charset` | `String?` | `null` | Characters the token is drawn from |
+| `random` | `Random?` | `null` | Where the randomness comes from — see [Choosing the source](../guide/getting-started#choosing-the-source) |
 
 Returns a `String`. Every parameter is named, `value` included: Dart cannot combine an optional positional parameter with named ones, and making the value optional was worth more than the shorthand. **`randSuffixAll` is the list form**, taking a `List<String>` and returning one, with the same named parameters. Dart has neither overloads nor union types, so the two shapes are two functions rather than one taking either.
 
@@ -66,6 +68,7 @@ rand_suffix(rand_nickname(language="en", count=2))
 | `length` | `int` | `5` | Characters in the token. Clamped to `1` … `32` |
 | `separator` | `str` | `"_"` | Placed between the value and the token |
 | `charset` | `str` | `""` | Characters the token is drawn from; empty means the default |
+| `random` | `Callable[[], float] \| None` | `None` | Where the randomness comes from — see [Choosing the source](../guide/getting-started#choosing-the-source) |
 
 Returns a `str` for a `str`, and a `list[str]` for a `list[str]`, carried by `@overload` so a type checker knows which one it got.
 
@@ -176,7 +179,7 @@ It comes from the platform's ordinary random number generator — `Math.random`,
 - **A token can be guessed.** These generators run a small amount of state forward, and that state can be recovered from a handful of outputs. Anybody who sees a few tokens can work out the ones that come next.
 - **Two tokens can collide.** The default is five characters out of an alphabet of 57, which is 601,692,057 tokens. By the birthday bound a collision becomes likely somewhere around thirty thousand of them, and one turned up in a run of fifty thousand. A longer `length` pushes that out — eight characters is 3.7 × 10¹⁴ — but it never reaches zero.
 
-So a suffix is right for telling two nicknames apart, and wrong for anything that has to be unguessable: a session token, an invite code, a password reset link, an object key somebody must not be able to enumerate. Use the platform's own secure generator for those — `crypto.getRandomValues`, `Random.secure()`, `secrets` — and use a database constraint rather than a token when a value has to be unique with certainty.
+So a suffix is right for telling two nicknames apart, and wrong for anything that has to be unguessable: a session token, an invite code, a password reset link, an object key somebody must not be able to enumerate. For those, hand the decorator a secure source through [`random`](../guide/getting-started#choosing-the-source) — `crypto.getRandomValues`, `Random.secure()`, `SystemRandom` — and use a database constraint rather than a token when a value has to be unique with certainty.
 
 ## A separate function rather than an option {#why-this-is-not-a-nickname-option}
 

@@ -1,5 +1,7 @@
 import 'dart:io';
 
+import 'dart:math';
+
 import 'package:randino/randino.dart';
 import 'package:test/test.dart';
 
@@ -181,6 +183,42 @@ void main() {
       expect(nameLanguages.toSet(), NameLanguage.values.toSet());
       expect(wordLanguages.toSet(), WordLanguage.values.toSet());
       expect(wordThemes.toSet(), WordTheme.values.toSet());
+    });
+
+    test('`random` is where every draw of a call comes from', () {
+      // One source, threaded through everything the call reaches — which for
+      // `randSentence` is the word pools, the story planner and the name
+      // generator. Two calls with the same seed have to agree on all of it.
+      void twice(String Function() draw) => expect(draw(), draw());
+
+      twice(() => randName(language: NameLanguage.en, count: 5, random: Random(42)).join());
+      twice(() => randWord(language: WordLanguage.ko, count: 5, random: Random(42)).join());
+      twice(() => randAnimal(language: WordLanguage.en, count: 5, random: Random(42)).join());
+      twice(() => randNickname(language: WordLanguage.en, count: 5, random: Random(42)).join());
+      twice(
+        () =>
+            randSentence(
+              language: WordLanguage.ko,
+              count: 3,
+              sentences: 3,
+              random: Random(42),
+            ).join(),
+      );
+      twice(() => randSuffix(value: 'MistyOwl', random: Random(42)));
+      twice(() => randPrefix(value: 'MistyOwl', random: Random(42)));
+      twice(() => randModifier(value: '사자', random: Random(42)));
+      twice(() => randSuffixAll(const ['a', 'b'], random: Random(42)).join());
+      twice(() => randModifierAll(const ['사자', '여우'], random: Random(42)).join());
+
+      // Two different seeds are two different answers, so the source is actually
+      // what the draws are coming from.
+      expect(
+        randName(language: NameLanguage.en, count: 5, random: Random(1)),
+        isNot(randName(language: NameLanguage.en, count: 5, random: Random(2))),
+      );
+
+      // And the package's own source is put back afterwards.
+      expect(randName(count: 5), isNot(randName(count: 5)));
     });
 
     test('LengthRange compares by value', () {

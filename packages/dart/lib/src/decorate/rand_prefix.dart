@@ -1,5 +1,8 @@
+import 'dart:math';
+
 import 'package:randino/src/decorate/attach.dart';
 import 'package:randino/src/decorate/data/index.dart';
+import 'package:randino/src/internal/utils.dart';
 
 /// Prepends a random token to [value]. The mirror of [randSuffix], for the
 /// places where the distinguishing part belongs in front — a shard, a tenant, a
@@ -20,7 +23,14 @@ String randPrefix({
   int length = affixLengthDefault,
   String separator = affixSeparatorDefault,
   String? charset,
-}) =>
-    value == null
-        ? affixToken(length, charset)
-        : attachOne(value, length, separator, charset, prependToken);
+
+  /// Where the randomness comes from: `Random.secure()` for a token nobody may
+  /// predict, `Random(42)` for one that has to come out the same every run.
+  Random? random,
+}) => withRandom(
+  random,
+  () =>
+      value == null
+          ? affixToken(length, charset)
+          : attachOne(value, length, separator, charset, prependToken),
+);

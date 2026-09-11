@@ -111,6 +111,7 @@ test/
 - **Internal modules are not exported** from any `index.ts`. Prefix-free names are fine; the `index.ts` files are the API boundary.
 - **Every public function takes a single optional options object** and has a JSDoc block with an `@example`. All options have defaults — `randName()` with no arguments must work.
 - **Prettier owns formatting** (tabs, single quotes, no trailing commas). Run `npm run format`; `npm run build` runs it first.
+- **Every draw goes through one source, and `random` is how a caller replaces it.** `_internal/utils` holds an ambient source and `withRandom` swaps it for the length of a call; `Math.random` is named in exactly one place. Ambient rather than threaded through every signature, because the alternative is carrying a parameter through some fifty call sites of `pick` — and the library is synchronous from the entry point down, so nothing can interleave. **A new draw calls `pick` / `randInt` / `chance` / `random`, never `Math.random`**, or a caller's source quietly stops being the source: `List.shuffle` and `random.shuffle` are how both ports leaked one.
 - **Zero runtime dependencies.** This is a hard constraint, not a preference. It is why Hangul romanization is implemented in `lib/name/romanize.ts` instead of pulling in `es-hangul`.
 - **No module may do anything at import time.** `package.json` declares `sideEffects: false`, which is what lets a bundler drop the pools a caller never reaches — importing only `randSuffix` is 0.4 KB gzipped rather than the 448 KB the whole library is. The declaration is a promise about every file in `lib/`: constants and function declarations, and nothing that runs. A single top-level statement with an effect makes it a lie, and the failure is silent — the bundler drops code the caller needed.
 
@@ -432,7 +433,7 @@ The return value is random, so tests assert the **properties every result must h
 - `count` is exact, including the clamped edges (`0`, negatives, above `RAND_COUNT_MAX`).
 - Anything genuinely deterministic is asserted by value: `nameLengthRange`, the romanizer's known outputs.
 
-Do not assert an exact generated name, and do not use a fixed seed — there is none. When a property test is flaky, the option is either under-specified or the assertion is wrong; **run the suite 20+ times before calling it stable**, because a 1-in-1000 case will show up in CI otherwise.
+Do not assert an exact generated name. A seed is available now (`random`), and it is still the wrong thing to pin output with: the pools grow, and a word added to one of them moves every draw after it, so a seeded assertion fails on the next dataset commit rather than on a real regression. Seed a test to prove that seeding works, and assert properties everywhere else. When a property test is flaky, the option is either under-specified or the assertion is wrong; **run the suite 20+ times before calling it stable**, because a 1-in-1000 case will show up in CI otherwise.
 
 Gender is the one option with no directly observable effect in most languages. It is verified through Russian, whose middle name and surname inflect for it (`…ович` / `…овна`, `Иванов` / `Иванова`).
 

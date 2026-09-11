@@ -1,5 +1,6 @@
 """Prepend a random token to a string, or to every string in a list."""
 
+from collections.abc import Callable
 from typing import overload
 
 from randino.decorate._attach import attach
@@ -13,6 +14,7 @@ def rand_prefix(
     length: int = ...,
     separator: str = ...,
     charset: str = ...,
+    random: Callable[[], float] | None = ...,
 ) -> str: ...
 
 
@@ -23,6 +25,7 @@ def rand_prefix(
     length: int = ...,
     separator: str = ...,
     charset: str = ...,
+    random: Callable[[], float] | None = ...,
 ) -> str: ...
 
 
@@ -33,6 +36,7 @@ def rand_prefix(
     length: int = ...,
     separator: str = ...,
     charset: str = ...,
+    random: Callable[[], float] | None = ...,
 ) -> list[str]: ...
 
 
@@ -42,6 +46,7 @@ def rand_prefix(
     length: int = AFFIX_LENGTH_DEFAULT,
     separator: str = AFFIX_SEPARATOR_DEFAULT,
     charset: str = "",
+    random: Callable[[], float] | None = None,
 ) -> str | list[str]:
     """Prepend a random token, for the places the distinguishing part goes in front.
 
@@ -56,6 +61,10 @@ def rand_prefix(
             token is the whole answer and `separator` is not used.
         length: Characters in the token. Clamped to `1..32`.
         separator: Placed between the token and the value.
+        random: Where the randomness comes from: a callable returning a number in
+            `[0, 1)`, the way `random.random` does. `SystemRandom().random` for a value
+            nobody may predict, `Random(42).random` for one that has to come out the
+            same every run.
         charset: Characters the token is drawn from. Defaults to alphanumerics
             without `0O1lI`, the pairs that are easy to misread.
 
@@ -70,4 +79,6 @@ def rand_prefix(
         >>> rand_prefix("order", length=4, separator="-")
         'k3Rm-order'
     """
-    return attach(value, length, separator, charset, lambda item, token, sep: token + sep + item)
+    return attach(
+        value, length, separator, charset, lambda item, token, sep: token + sep + item, random
+    )

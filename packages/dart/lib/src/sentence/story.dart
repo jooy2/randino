@@ -757,8 +757,8 @@ Plan? plan(
       });
     }
 
-    own.shuffle();
-    filler.shuffle();
+    own.shuffle(randomSource);
+    filler.shuffle(randomSource);
 
     for (final attempt in <List<StoryStep> Function()>[...own, ...filler]) {
       final candidate = attempt();
@@ -791,7 +791,7 @@ Plan? plan(
   final pairs = <int>[
     for (var i = 0; i + 1 < walked!.length; i += 1)
       if (_isAction(walked![i].step) && _isAction(walked![i + 1].step)) i,
-  ]..shuffle();
+  ]..shuffle(randomSource);
 
   for (final at in pairs) {
     if (joined.length >= joins) break;

@@ -1,9 +1,11 @@
 """Put a random modifier in front of a string, or of every string in a list."""
 
+from collections.abc import Callable
 from typing import Literal, overload
 
 from randino._internal.generate import draw_language, resolve_realism
 from randino._internal.script import detect_language
+from randino._internal.utils import with_random
 from randino._types import ModifierKind, RandRealism, WordLanguageOption
 from randino.word._generator import (
     agree,
@@ -48,6 +50,7 @@ def rand_modifier(
     realism: RandRealism = ...,
     kind: ModifierKind | Literal["all"] = ...,
     separator: str | None = ...,
+    random: Callable[[], float] | None = ...,
 ) -> str: ...
 
 
@@ -59,6 +62,7 @@ def rand_modifier(
     realism: RandRealism = ...,
     kind: ModifierKind | Literal["all"] = ...,
     separator: str | None = ...,
+    random: Callable[[], float] | None = ...,
 ) -> str: ...
 
 
@@ -70,6 +74,7 @@ def rand_modifier(
     realism: RandRealism = ...,
     kind: ModifierKind | Literal["all"] = ...,
     separator: str | None = ...,
+    random: Callable[[], float] | None = ...,
 ) -> list[str]: ...
 
 
@@ -80,6 +85,7 @@ def rand_modifier(
     realism: RandRealism = "real",
     kind: ModifierKind | Literal["all"] = "all",
     separator: str | None = None,
+    random: Callable[[], float] | None = None,
 ) -> str | list[str]:
     """Put a random modifier in front of a string: `"사자"` becomes `"멋진사자"`.
 
@@ -101,6 +107,10 @@ def rand_modifier(
             what it is doing (`웃는`, `Laughing`). `"all"` draws from both.
         separator: Placed between the modifier and the value. Defaults to the way
             the language itself joins words, which is to run them together.
+        random: Where the randomness comes from: a callable returning a number in
+            `[0, 1)`, the way `random.random` does. `SystemRandom().random` for a value
+            nobody may predict, `Random(42).random` for one that has to come out the
+            same every run.
 
     Returns:
         A string when `value` is a string or omitted, a list when it is a list.
@@ -117,8 +127,6 @@ def rand_modifier(
         >>> rand_modifier(rand_animal(language="ko", count=2))
         ['오래된곰', '영원한도마뱀']
     """
-    if value is None:
-        return _draw(None, language, realism, kind)[0]
 
     def one(item: str) -> str:
         word, joiner, follows = _draw(item, language, realism, kind)
@@ -127,7 +135,11 @@ def rand_modifier(
         # Vietnamese puts the modifier after the noun, and says so in its frames.
         return item + gap + word if follows else word + gap + item
 
-    if isinstance(value, str):
-        return one(value)
+    with with_random(random):
+        if value is None:
+            return _draw(None, language, realism, kind)[0]
 
-    return [one(item) for item in value]
+        if isinstance(value, str):
+            return one(value)
+
+        return [one(item) for item in value]

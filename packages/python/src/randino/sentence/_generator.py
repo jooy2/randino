@@ -19,7 +19,6 @@ alone, which is why `여우가 사과를 먹는다` comes out and `여우가 철
 not — no tag on any noun, because `THEME_CLASS` already knows what a theme names.
 """
 
-import random
 import sys
 from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass, field, replace
@@ -40,7 +39,14 @@ from randino._internal.generate import (
     resolve_whole,
 )
 from randino._internal.script import ends_with_consonant, ends_with_liquid
-from randino._internal.utils import chance, pick, pick_weighted
+from randino._internal.utils import (
+    chance,
+    pick,
+    pick_weighted,
+    rand_int,
+    random,
+    with_random,
+)
 from randino._types import (
     RandRealism,
     RandVocabulary,
@@ -234,12 +240,12 @@ def _date_text(data: SentenceLanguageData) -> str:
     if calendar is None:
         return ""
 
-    month = random.randint(1, 12)
+    month = rand_int(1, 12)
     # The month goes in last, because a month's name has letters in it that the other
     # two stand for: `März` would lose its `M` to the month number.
     written = calendar.date.replace(
-        "Y", str(random.randint(calendar.years[0], calendar.years[1])), 1
-    ).replace("D", str(random.randint(1, 28)), 1)
+        "Y", str(rand_int(calendar.years[0], calendar.years[1])), 1
+    ).replace("D", str(rand_int(1, 28)), 1)
 
     if calendar.months is None:
         return written.replace("M", str(month), 1)
@@ -261,8 +267,8 @@ def _clock_text(data: SentenceLanguageData) -> str:
     if calendar is None:
         return ""
 
-    return calendar.clock.replace("h", str(random.randint(0, 23)), 1).replace(
-        "mm", f"{random.randint(0, 59):02d}", 1
+    return calendar.clock.replace("h", str(rand_int(0, 23)), 1).replace(
+        "mm", f"{rand_int(0, 59):02d}", 1
     )
 
 
@@ -309,7 +315,7 @@ def _count_text(data: SentenceLanguageData, theme: WordTheme) -> str:
         return ""
 
     counter = numeral.counters.get(THEME_CLASS[theme])
-    number = _grouped(random.randint(numeral.count[0], numeral.count[1]), numeral.group)
+    number = _grouped(rand_int(numeral.count[0], numeral.count[1]), numeral.group)
 
     return number if counter is None else number + numeral.gap + counter
 
@@ -1638,7 +1644,7 @@ def _pick_frame(
         return frame.weight * (1 if boost is None else boost(frame))
 
     total = sum(weight_of(frame) for frame in frames)
-    roll = random.random() * total
+    roll = random() * total
 
     for frame in frames:
         roll -= weight_of(frame)
@@ -5132,6 +5138,7 @@ def generate_sentence_details(
     max_length: int | None = None,
     starts_with: str = "",
     unique: bool = False,
+    random: Callable[[], float] | None = None,
     sentences: int = 1,
     include_name: bool | None = None,
     type: SentenceTypeOption | None = None,
@@ -5155,6 +5162,11 @@ def generate_sentence_details(
         max_length: Maximum length in characters.
         starts_with: Keep only sentences whose first character is this one.
         unique: Never return the same sentence twice.
+        random: Where the randomness comes from: a callable returning a number in
+            `[0, 1)`, the way `random.random` does. `SystemRandom().random` for a value
+            nobody may predict, `Random(42).random` for one that has to come out the
+            same every run. Used for every draw the call makes, including the ones a
+            generator makes through another.
         sentences: How many sentences one result holds.
         include_name: Whether a phrase about a person is written as a name.
         type: What the sentences are doing.
@@ -5240,10 +5252,11 @@ def generate_sentence_details(
             theme=result.theme,
         )
 
-    return collect(
-        count=count,
-        unique=unique,
-        starts_with=settings.prefix,
-        draw=draw,
-        key_of=lambda detail: detail.sentence,
-    )
+    with with_random(random):
+        return collect(
+            count=count,
+            unique=unique,
+            starts_with=settings.prefix,
+            draw=draw,
+            key_of=lambda detail: detail.sentence,
+        )

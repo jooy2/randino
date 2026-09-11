@@ -19,6 +19,7 @@ Every option and every example, with **Dart** picked in the sidebar. This README
 - **Decorators** attach something to a string you already have: `randSuffix`, `randPrefix` and `randModifier`.
 - Every parameter is named and optional, and a **null enum means "every one of them"**, so `randName()` on its own works.
 - **Pure Dart, no dependencies.** It imports nothing but `dart:math`, so it runs on the VM, on the web and inside Flutter on every platform.
+- **Every generator and decorator takes a `random`.** `Random.secure()` for a value nobody may predict, `Random(42)` for one that has to come out the same every run.
 
 This is the Dart package. The [npm package](https://www.npmjs.com/package/randino) and the [PyPI package](https://pypi.org/project/randino/) are the other two, and all three generate from the same datasets under the same rules. They version independently, so the numbers on pub.dev, npm and PyPI will not always agree.
 

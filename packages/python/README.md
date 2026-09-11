@@ -19,6 +19,7 @@ Every option and every example, with **Python** picked in the sidebar. This READ
 - **Decorators** attach something to a string you already have: `rand_suffix`, `rand_prefix` and `rand_modifier`.
 - Every argument is keyword-only and optional, so `rand_name()` on its own works.
 - **Pure Python, no dependencies.** It imports nothing outside the standard library, and ships a `py.typed` marker so mypy and Pyright read the annotations.
+- **Every generator and decorator takes a `random`.** `SystemRandom().random` for a value nobody may predict, `Random(42).random` for one that has to come out the same every run.
 
 This is the Python package. The [npm package](https://www.npmjs.com/package/randino) and the [pub.dev package](https://pub.dev/packages/randino) are the other two, and all three generate from the same datasets under the same rules. They version independently, so the numbers on PyPI, npm and pub.dev will not always agree.
 

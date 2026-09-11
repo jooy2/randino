@@ -242,6 +242,80 @@ Names are `snake_case`: `includeMiddleName` is `include_middle_name`, `minLength
 
 :::
 
+## Choosing the source {#choosing-the-source}
+
+Every generator and every decorator takes a `random` option, and every draw the call makes goes through it — including the draws one generator makes through another, so the name `randSentence` writes comes from the same source the sentence did. Left out, it is the platform's ordinary generator: `Math.random`, `dart:math`'s `Random`, Python's `random`.
+
+That default is fine for sample data and wrong for two things.
+
+**A value nobody may predict.** None of those generators is cryptographically secure — each runs a small amount of state forward, and that state can be recovered from a handful of outputs. Pass a secure source for a token that has to be unguessable.
+
+::: lang js
+
+```javascript
+const secure = () => crypto.getRandomValues(new Uint32Array(1))[0] / 2 ** 32;
+
+randSuffix('MistyOwl', { random: secure }); // 'MistyOwl_k3Rm9'
+```
+
+:::
+
+::: lang dart
+
+```dart
+import 'dart:math';
+
+randSuffix(value: 'MistyOwl', random: Random.secure()); // 'MistyOwl_k3Rm9'
+```
+
+:::
+
+::: lang py
+
+```python
+from random import SystemRandom
+
+rand_suffix("MistyOwl", random=SystemRandom().random)  # 'MistyOwl_k3Rm9'
+```
+
+:::
+
+**A fixture that has to come out the same every run.** A seeded source makes the whole call reproducible, which is what a snapshot test or a demo database wants. The same seed and the same options give the same results.
+
+::: lang js
+
+```javascript
+// Any seeded generator will do; there is none in the standard library.
+const seeded = (seed) => () => /* … */;
+
+randName({ language: 'en', count: 3, random: seeded(42) });
+// ['Easton Bryant', 'Pearl Fenwick', 'Callum Bradley'] — every time
+```
+
+:::
+
+::: lang dart
+
+```dart
+randName(language: NameLanguage.en, count: 3, random: Random(42));
+// ['Quinn Palmer', 'Bryson Compton', 'Hannah Evans'] — every time
+```
+
+:::
+
+::: lang py
+
+```python
+from random import Random
+
+rand_name(language="en", count=3, random=Random(42).random)
+# ['Simon Bancroft', 'Liam Norton', 'Jordan Sutton'] — every time
+```
+
+:::
+
+A seeded result is reproducible for one version of the package and not across versions: the pools grow, and a word added to one of them moves every draw after it. Pin the version if a fixture has to survive an upgrade.
+
 ## Where to go next
 
 - [**Supported languages**](./languages) — what the nine codes cover, and where they differ from one another.

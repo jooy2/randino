@@ -107,6 +107,12 @@ export const WORD_OPTIONS: readonly WordOptionRow[] = [
 		about: 'optionUnique'
 	},
 	{
+		name: 'random',
+		type: { js: '() => number', dart: 'Random?', py: 'Callable[[], float] | None' },
+		fallback: { js: '—', dart: 'null', py: 'None' },
+		about: 'optionRandom'
+	},
+	{
 		// Dart has no `output` at all — the detail form is its own function there —
 		// so the row is dropped for it rather than shown with two empty cells.
 		// `randWordDetails` is named in the `::: lang dart` block on every page.

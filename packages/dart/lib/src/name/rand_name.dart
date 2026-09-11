@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:randino/src/name/name_generator.dart';
 import 'package:randino/src/types.dart';
 
@@ -34,6 +36,10 @@ List<String> randName({
   NameScript script = NameScript.native,
   String? startsWith,
   bool unique = false,
+
+  /// Where the randomness comes from: `Random.secure()` for a value nobody may
+  /// predict, `Random(42)` for one that has to come out the same every run.
+  Random? random,
 }) =>
     generateNameDetails(
       language: language,
@@ -46,4 +52,5 @@ List<String> randName({
       includeMiddleName: includeMiddleName,
       startsWith: startsWith,
       unique: unique,
+      random: random,
     ).map((detail) => script == NameScript.roman ? detail.roman : detail.native).toList();

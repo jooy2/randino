@@ -29,12 +29,13 @@ import {
 	resolveOption,
 	resolveOptional,
 	resolvePrefix,
+	resolveRandom,
 	resolveRealism,
 	resolveVocabulary,
 	resolveWhole
 } from '../_internal/generate.js';
 import { endsWithConsonant, endsWithLiquid } from '../_internal/script.js';
-import { chance, pick, pickWeighted, randInt } from '../_internal/utils.js';
+import { chance, pick, pickWeighted, randInt, random, withRandom } from '../_internal/utils.js';
 import { RAND_SENTENCE_COUNT_MAX, RAND_SENTENCE_LENGTH_MAX } from '../constants.js';
 import type {
 	NameGender,
@@ -1412,7 +1413,7 @@ function pickFrame(
 ): SentenceFrame {
 	const weightOf = (frame: SentenceFrame) => frame.weight * (boost ? boost(frame) : 1);
 	const total = frames.reduce((sum, frame) => sum + weightOf(frame), 0);
-	let roll = Math.random() * total;
+	let roll = random() * total;
 
 	for (const frame of frames) {
 		roll -= weightOf(frame);
@@ -5061,28 +5062,30 @@ export function generateSentenceDetails(options: RandSentenceOptions = {}): Sent
 		return [];
 	}
 
-	return collect(
-		options,
-		() => {
-			const code = pick(languages);
-			const data = SENTENCE_DATA[code];
-			const { built, tense, story, theme } = generateResult(code, settings);
+	return withRandom(resolveRandom(options.random), () =>
+		collect(
+			options,
+			() => {
+				const code = pick(languages);
+				const data = SENTENCE_DATA[code];
+				const { built, tense, story, theme } = generateResult(code, settings);
 
-			return {
-				sentence: built.map((one) => one.sentence).join(data.space),
-				sentences: built.map((one) => one.sentence),
-				phrases: built.flatMap((one) => one.phrases),
-				slots: built.flatMap((one) => one.slots),
-				names: built.flatMap((one) => one.names),
-				types: built.map((one) => one.type),
-				tense,
-				story,
-				language: code,
-				// What the result is about: its hero in a story, and otherwise what its
-				// first sentence was about, which the ones after it stay inside.
-				theme
-			};
-		},
-		(detail) => detail.sentence
+				return {
+					sentence: built.map((one) => one.sentence).join(data.space),
+					sentences: built.map((one) => one.sentence),
+					phrases: built.flatMap((one) => one.phrases),
+					slots: built.flatMap((one) => one.slots),
+					names: built.flatMap((one) => one.names),
+					types: built.map((one) => one.type),
+					tense,
+					story,
+					language: code,
+					// What the result is about: its hero in a story, and otherwise what its
+					// first sentence was about, which the ones after it stay inside.
+					theme
+				};
+			},
+			(detail) => detail.sentence
+		)
 	);
 }

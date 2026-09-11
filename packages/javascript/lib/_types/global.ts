@@ -90,6 +90,26 @@ export interface RandCommonOptions {
 	unique?: boolean;
 	/** Strings, or one detail object per result. Default `'value'`. */
 	output?: RandOutput;
+	/**
+	 * Where the randomness comes from: a function returning a number in `[0, 1)`,
+	 * the way `Math.random` does. That is the default, and it is neither
+	 * cryptographically secure nor reproducible — pass one of your own when you
+	 * need either.
+	 *
+	 * ```javascript
+	 * // Unguessable, for a value somebody must not be able to predict.
+	 * const secure = () => crypto.getRandomValues(new Uint32Array(1))[0] / 2 ** 32;
+	 *
+	 * randSuffix('MistyOwl', { random: secure });
+	 *
+	 * // Or reproducible, for a fixture that has to come out the same every run.
+	 * randName({ language: 'en', count: 3, random: seeded(42) });
+	 * ```
+	 *
+	 * It is used for every draw the call makes, including the ones a generator
+	 * makes through another — the name `randSentence` writes comes from here too.
+	 */
+	random?: () => number;
 }
 
 export interface RandNameOptions extends RandCommonOptions {
@@ -268,6 +288,26 @@ export interface RandAffixOptions {
 	separator?: string;
 	/** Characters the token is drawn from. Defaults to alphanumerics without `0O1lI`. */
 	charset?: string;
+	/**
+	 * Where the randomness comes from: a function returning a number in `[0, 1)`,
+	 * the way `Math.random` does. That is the default, and it is neither
+	 * cryptographically secure nor reproducible — pass one of your own when you
+	 * need either.
+	 *
+	 * ```javascript
+	 * // Unguessable, for a value somebody must not be able to predict.
+	 * const secure = () => crypto.getRandomValues(new Uint32Array(1))[0] / 2 ** 32;
+	 *
+	 * randSuffix('MistyOwl', { random: secure });
+	 *
+	 * // Or reproducible, for a fixture that has to come out the same every run.
+	 * randName({ language: 'en', count: 3, random: seeded(42) });
+	 * ```
+	 *
+	 * It is used for every draw the call makes, including the ones a generator
+	 * makes through another — the name `randSentence` writes comes from here too.
+	 */
+	random?: () => number;
 }
 
 /** What `randModifier` puts in front of a value. */
@@ -293,6 +333,12 @@ export interface RandModifierOptions {
 	 * itself joins words, which is to run them together (`멋진사자`, `MistyOwl`).
 	 */
 	separator?: string;
+	/**
+	 * Where the randomness comes from: a function returning a number in `[0, 1)`,
+	 * the way `Math.random` does. The same option every generator takes — see
+	 * `RandCommonOptions`.
+	 */
+	random?: () => number;
 }
 
 /** A generated nickname with the pieces it was built from. */

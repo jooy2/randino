@@ -20,6 +20,7 @@ randSuffix(randNickname({ language: 'en', count: 2 }));
 | `length` | `number` | `5` | 토큰의 글자 수. `1` … `32`로 제한 |
 | `separator` | `string` | `'_'` | 값과 토큰 사이에 들어감. 빈 문자열이면 바로 이어 붙음 |
 | `charset` | `string` | _내장_ | 토큰을 뽑아 쓸 문자들 |
+| `random` | `() => number` | — | 무작위성을 어디서 가져올지. [난수원 고르기](../guide/getting-started#choosing-the-source)를 보세요 |
 
 `string`에는 `string`을, `string[]`에는 `string[]`을 반환합니다.
 
@@ -37,12 +38,13 @@ randSuffixAll(randNickname(language: WordLanguage.en, count: 2));
 // ['RoundSeason_RVBnC', 'RowdyDusk_dwtu5']
 ```
 
-| 파라미터    | 타입      | 기본값 | 설명                              |
-| ----------- | --------- | ------ | --------------------------------- |
-| `value`     | `String?` | `null` | 뒤에 붙일 대상. 생략하면 토큰만   |
-| `length`    | `int`     | `5`    | 토큰의 글자 수. `1` … `32`로 제한 |
-| `separator` | `String`  | `'_'`  | 값과 토큰 사이에 들어감           |
-| `charset`   | `String?` | `null` | 토큰을 뽑아 쓸 문자들             |
+| 파라미터 | 타입 | 기본값 | 설명 |
+| --- | --- | --- | --- |
+| `value` | `String?` | `null` | 뒤에 붙일 대상. 생략하면 토큰만 |
+| `length` | `int` | `5` | 토큰의 글자 수. `1` … `32`로 제한 |
+| `separator` | `String` | `'_'` | 값과 토큰 사이에 들어감 |
+| `charset` | `String?` | `null` | 토큰을 뽑아 쓸 문자들 |
+| `random` | `Random?` | `null` | 무작위성을 어디서 가져올지. [난수원 고르기](../guide/getting-started#choosing-the-source)를 보세요 |
 
 `String`을 반환합니다. `value`를 포함해 모든 파라미터가 이름 있는 파라미터입니다. Dart는 선택적 위치 파라미터와 이름 있는 파라미터를 함께 쓸 수 없고, 값을 선택 사항으로 만드는 쪽이 짧은 호출보다 가치가 있었습니다. **리스트 형태는 `randSuffixAll`입니다.** `List<String>`을 받아 `List<String>`을 돌려주며, 이름 있는 파라미터는 동일합니다. Dart에는 오버로드도 유니온 타입도 없기 때문에, 하나가 두 형태를 받는 대신 두 함수로 나뉘어 있습니다.
 
@@ -66,6 +68,7 @@ rand_suffix(rand_nickname(language="en", count=2))
 | `length` | `int` | `5` | 토큰의 글자 수. `1` … `32`로 제한 |
 | `separator` | `str` | `"_"` | 값과 토큰 사이에 들어감 |
 | `charset` | `str` | `""` | 토큰을 뽑아 쓸 문자들. 비어 있으면 기본값 |
+| `random` | `Callable[[], float] \| None` | `None` | 무작위성을 어디서 가져올지. [난수원 고르기](../guide/getting-started#choosing-the-source)를 보세요 |
 
 `str`에는 `str`을, `list[str]`에는 `list[str]`을 반환합니다. `@overload`가 이 대응을 그대로 전달하므로 타입 검사기도 어느 쪽인지 압니다.
 
@@ -176,7 +179,7 @@ rand_suffix("MistyOwl", charset="".join(c for c in AFFIX_CHARSET if not c.isuppe
 - **토큰은 추측할 수 있습니다.** 이런 생성기는 작은 내부 상태를 굴리는데, 그 상태는 출력 몇 개만으로 복원됩니다. 토큰 몇 개를 본 사람은 다음에 나올 토큰을 계산해 낼 수 있습니다.
 - **토큰은 겹칠 수 있습니다.** 기본값은 57자 알파벳에서 고른 다섯 글자, 즉 601,692,057가지입니다. 생일 문제로 3만 개 언저리부터 충돌이 잦아지고, 5만 개를 뽑은 실제 실행에서 한 번 겹쳤습니다. `length`를 늘리면 그 지점이 멀어지지만(여덟 글자는 3.7 × 10¹⁴가지) 0이 되지는 않습니다.
 
-그래서 접미 토큰은 닉네임 둘을 구분하는 데는 맞고, 추측 불가능해야 하는 값에는 맞지 않습니다. 세션 토큰, 초대 코드, 비밀번호 재설정 링크, 남이 훑어서는 안 되는 객체 키가 그렇습니다. 그런 값에는 플랫폼의 보안 난수 생성기(`crypto.getRandomValues`, `Random.secure()`, `secrets`)를 쓰고, 반드시 유일해야 하는 값에는 토큰이 아니라 데이터베이스 제약을 쓰십시오.
+그래서 접미 토큰은 닉네임 둘을 구분하는 데는 맞고, 추측 불가능해야 하는 값에는 맞지 않습니다. 세션 토큰, 초대 코드, 비밀번호 재설정 링크, 남이 훑어서는 안 되는 객체 키가 그렇습니다. 그런 값에는 [`random`](../guide/getting-started#choosing-the-source) 옵션으로 보안 난수원(`crypto.getRandomValues`, `Random.secure()`, `SystemRandom`)을 넘기고, 반드시 유일해야 하는 값에는 토큰이 아니라 데이터베이스 제약을 쓰십시오.
 
 ## 닉네임 옵션이 아닌 이유 {#why-this-is-not-a-nickname-option}
 

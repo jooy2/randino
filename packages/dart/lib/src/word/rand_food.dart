@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:randino/src/types.dart';
 import 'package:randino/src/word/rand_word.dart';
 
@@ -20,6 +22,10 @@ List<String> randFood({
   int? maxLength,
   String? startsWith,
   bool unique = false,
+
+  /// Where the randomness comes from: `Random.secure()` for a value nobody may
+  /// predict, `Random(42)` for one that has to come out the same every run.
+  Random? random,
 }) => randWord(
   language: language,
   theme: WordTheme.food,
@@ -30,4 +36,5 @@ List<String> randFood({
   maxLength: maxLength,
   startsWith: startsWith,
   unique: unique,
+  random: random,
 );

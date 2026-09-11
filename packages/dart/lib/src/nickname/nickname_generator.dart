@@ -24,6 +24,8 @@
 // What used to be the fifth entry here, `uniqueSuffix`, is `randSuffix` now:
 // attaching a token to a string was never a thing about nicknames.
 
+import 'dart:math';
+
 import 'package:randino/src/internal/generate.dart';
 import 'package:randino/src/internal/utils.dart';
 import 'package:randino/src/types.dart';
@@ -469,6 +471,10 @@ List<NicknameDetail> generateNicknameDetails({
   String? wordSeparator,
   String? startsWith,
   bool unique = false,
+
+  /// Where the randomness comes from: `Random.secure()` for a value nobody may
+  /// predict, `Random(42)` for one that has to come out the same every run.
+  Random? random,
 }) {
   final settings = _Settings(
     theme: theme,
@@ -493,24 +499,27 @@ List<NicknameDetail> generateNicknameDetails({
     return <NicknameDetail>[];
   }
 
-  return collect<NicknameDetail>(
-    count: count,
-    unique: unique,
-    startsWith: settings.prefix,
-    draw: () {
-      final WordLanguage code = pick(languages);
-      final built = _generateOne(code, settings);
+  return withRandom(
+    random,
+    () => collect<NicknameDetail>(
+      count: count,
+      unique: unique,
+      startsWith: settings.prefix,
+      draw: () {
+        final WordLanguage code = pick(languages);
+        final built = _generateOne(code, settings);
 
-      return NicknameDetail(
-        nickname: built.nickname,
-        words: List<String>.unmodifiable(built.words),
-        // Unmodifiable, and a copy: the frames are the language's own, so a
-        // caller reading the detail must not be able to reach into them.
-        slots: List<WordSlot>.unmodifiable(built.slots),
-        language: code,
-        theme: built.theme,
-      );
-    },
-    keyOf: (detail) => detail.nickname,
+        return NicknameDetail(
+          nickname: built.nickname,
+          words: List<String>.unmodifiable(built.words),
+          // Unmodifiable, and a copy: the frames are the language's own, so a
+          // caller reading the detail must not be able to reach into them.
+          slots: List<WordSlot>.unmodifiable(built.slots),
+          language: code,
+          theme: built.theme,
+        );
+      },
+      keyOf: (detail) => detail.nickname,
+    ),
   );
 }
