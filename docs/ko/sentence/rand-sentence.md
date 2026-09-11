@@ -60,7 +60,7 @@ rand_sentence()
 | `vocabulary` | `RandVocabulary` | <Lang js="`'common'`" dart="`RandVocabulary.common`" py="`\"common\"`" /> | 명사가 얼마나 흔해야 하는지 정합니다. 주어, 목적어, 장소, 이야기의 물건이 모두 해당하며 `basic`, `common`, `full` 중 하나입니다. 문장은 읽히는 것이므로 따로 정하지 않으면 사람들이 쓰는 단어로 씁니다. [흔한 단어](../word/rand-word#vocabulary)를 보세요. |
 | <Lang js="minLength" dart="minLength" py="min_length" code /> | <Lang js="number" dart="int?" py="int &#124; None" code /> | _언어_ | 문장 부호를 포함한 최소 글자 수. |
 | <Lang js="maxLength" dart="maxLength" py="max_length" code /> | <Lang js="number" dart="int?" py="int &#124; None" code /> | _언어_ | 최대 글자 수. |
-| <Lang js="startsWith" dart="startsWith" py="starts_with" code /> | <Lang js="string" dart="String?" py="str" code /> | <Lang js="—" dart="null" py="&quot;&quot;" code /> | 이 글자로 시작하는 문장만 남깁니다. 관사를 쓰는 언어에서는 그 글자가 관사의 첫 글자입니다. |
+| <Lang js="startsWith" dart="startsWith" py="starts_with" code /> | <Lang js="string" dart="String?" py="str" code /> | <Lang js="—" dart="null" py="&quot;&quot;" code /> | 이 글자로 시작하는 문장만 남깁니다. 그 글자를 쓰는 문자 체계의 언어에서만 뽑습니다. 관사를 쓰는 언어에서는 그 글자가 관사의 첫 글자입니다. [아래](#a-first-character)를 보세요. |
 | `unique` | <Lang js="boolean" dart="bool" py="bool" code /> | <Lang js="false" dart="false" py="False" code /> | 같은 문장을 두 번 돌려주지 않습니다. `count`보다 적게 돌아올 수 있습니다. |
 | `output` | <Lang js="RandOutput" py="RandOutput" code /> | <Lang js="'value'" py="&quot;value&quot;" code /> | 문자열, 또는 문장마다 `SentenceDetail` 하나. Dart에는 이 옵션이 없습니다. [상세 출력](#the-detail-output) 참고. |
 
@@ -1239,6 +1239,31 @@ rand_sentence(language="ko", output="detail", count=1)
 `phrases`에는 구만 들어 있습니다. 구를 표시하는 조사나 전치사는 `sentence`에만 있으므로, `그리핀이 …`는 `그리핀`으로 보고되고 구를 다시 이어 붙여도 원래 문장이 되지 않습니다. 완성된 문자열은 `sentence`에서, 문장을 이루는 요소는 `phrases`에서 읽으면 됩니다.
 
 모든 문장에는 `subject`가 정확히 하나, 서술어가 정확히 하나 있습니다. 그 서술어는 `verb`이거나 `state`이며, 둘 다인 경우는 없습니다.
+
+## 첫 글자 {#a-first-character}
+
+`startsWith`는 지정한 글자로 시작하는 문장만 남깁니다. 이 조건이 충족되는 방식은 언어에 따라 둘로 나뉩니다.
+
+관사를 쓰지 않고 명사구가 먼저 오는 언어(한국어, 일본어, 중국어)는 **유도**됩니다. 그 글자로 시작하는 단어 중에서 명사를 뽑으므로 거의 모든 시도가 조건을 만족합니다.
+
+```javascript
+randSentence({ language: 'ko', startsWith: '사', count: 3 });
+// ['사자가 달린다.', '사슴이 물을 마신다.', '사과가 익는다.']
+```
+
+관사나 전치사, 부사구가 앞에 오는 언어(영어, 스페인어, 이탈리아어, 독일어, 러시아어)는 그렇게 유도할 수 없습니다. 문장의 첫 단어가 명사가 아니기 때문입니다. 이 언어들은 **걸러집니다**. 평소대로 문장을 뽑은 뒤 그 글자로 시작하지 않는 것을 버립니다. 흔한 첫 글자는 금방 채워지지만, 드문 글자는 요청한 개수보다 적게 돌아오거나 하나도 돌아오지 않을 수 있습니다.
+
+```javascript
+randSentence({ language: 'es', startsWith: 'e', count: 3 }); // `el`, `en` 덕분에 금방 3개
+randSentence({ language: 'es', startsWith: 'z', count: 3 }); // []
+```
+
+그 언어가 아예 쓰지 않는 문자를 넘기면 두 문자 체계가 섞인 문장 대신 빈 배열이 돌아옵니다. 모든 언어를 대상으로 하면 그 글자를 쓸 수 있는 언어로 좁혀지므로, `startsWith: 'ж'`는 러시아어를 뽑습니다.
+
+```javascript
+randSentence({ language: 'ko', startsWith: 'Q' }); // []
+randSentence({ startsWith: 'ж', count: 2 }); // 러시아어 문장 2개
+```
 
 ## 주어의 테마 {#a-theme-for-the-subject}
 

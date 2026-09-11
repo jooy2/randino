@@ -60,7 +60,7 @@ Every option is optional, and the defaults are what the empty call above uses.
 | `vocabulary` | `RandVocabulary` | <Lang js="`'common'`" dart="`RandVocabulary.common`" py="`\"common\"`" /> | How common the nouns have to be — the subject, the object, the place, the thing a story is about: `basic`, `common` or `full`. A sentence is read, so it keeps to the words people use unless asked otherwise. See [Common words](../word/rand-word#vocabulary). |
 | <Lang js="minLength" dart="minLength" py="min_length" code /> | <Lang js="number" dart="int?" py="int &#124; None" code /> | _language_ | Minimum length in characters, punctuation included. |
 | <Lang js="maxLength" dart="maxLength" py="max_length" code /> | <Lang js="number" dart="int?" py="int &#124; None" code /> | _language_ | Maximum length in characters. |
-| <Lang js="startsWith" dart="startsWith" py="starts_with" code /> | <Lang js="string" dart="String?" py="str" code /> | <Lang js="—" dart="null" py="&quot;&quot;" code /> | Keep only sentences whose first character is this one. In a language that writes articles, that character is the article's. |
+| <Lang js="startsWith" dart="startsWith" py="starts_with" code /> | <Lang js="string" dart="String?" py="str" code /> | <Lang js="—" dart="null" py="&quot;&quot;" code /> | Keep only sentences whose first character is this one, and only from a language that writes that character's script. In a language that writes articles, that character is the article's — see [below](#a-first-character). |
 | `unique` | <Lang js="boolean" dart="bool" py="bool" code /> | <Lang js="false" dart="false" py="False" code /> | Never return the same sentence twice. May return fewer than `count`. |
 | `output` | <Lang js="RandOutput" py="RandOutput" code /> | <Lang js="'value'" py="&quot;value&quot;" code /> | Strings, or a `SentenceDetail` per sentence. Dart has no such parameter — see [the detail output](#the-detail-output). |
 
@@ -1266,6 +1266,31 @@ rand_sentence(language="ko", output="detail", count=1)
 `phrases` holds the phrases and nothing else. The particle or preposition that marks one lives in `sentence` alone, so `그리핀이 …` reports `그리핀` and joining the phrases back together does not reproduce the sentence. Read `sentence` for the finished string, and `phrases` for what it was built from.
 
 Every sentence has exactly one `subject` and exactly one predicate, and that predicate is either a `verb` or a `state`, never both.
+
+## A first character {#a-first-character}
+
+`startsWith` keeps the sentences that begin with the character you asked for, and it is met two different ways depending on the language.
+
+A language that writes no article and puts a noun phrase first — Korean, Japanese, Chinese — is **steered**: the noun is drawn from the words that begin with the character, so nearly every draw lands.
+
+```javascript
+randSentence({ language: 'ko', startsWith: '사', count: 3 });
+// ['사자가 달린다.', '사슴이 물을 마신다.', '사과가 익는다.']
+```
+
+A language that writes an article, a preposition or an adverbial in front — English, Spanish, Italian, German, Russian — cannot be steered that way, because the first word of the sentence is not the noun. Those are **filtered**: sentences are drawn as usual and the ones that do not begin with the character are thrown away. A common opening letter comes back quickly; a rare one may come back with fewer results than you asked for, or with none.
+
+```javascript
+randSentence({ language: 'es', startsWith: 'e', count: 3 }); // three, quickly — `el`, `en`
+randSentence({ language: 'es', startsWith: 'z', count: 3 }); // []
+```
+
+A character the language does not write at all is answered with no results rather than with two scripts in one string. Asking every language narrows to the ones that can, so `startsWith: 'ж'` draws Russian.
+
+```javascript
+randSentence({ language: 'ko', startsWith: 'Q' }); // []
+randSentence({ startsWith: 'ж', count: 2 }); // two Russian sentences
+```
 
 ## A theme for the subject
 

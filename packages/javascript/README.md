@@ -30,6 +30,8 @@ npm install randino
 
 Requires **Node.js 22 or newer**, or any browser. The package ships ESM with type declarations and pulls nothing in behind it.
 
+`sideEffects: false` is declared, so a bundler drops the pools nothing reaches — and the pools are nearly all of it. Minified and gzipped, `randSuffix` alone is 0.5 KB, `randName` 23 KB, `randWord` and `randNickname` 265 KB, and `randSentence` 449 KB. In a browser bundle that is worth knowing: the word pools are one object per language, so one theme costs what twenty-nine do.
+
 ## Person names
 
 ```javascript

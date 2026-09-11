@@ -54,6 +54,24 @@ pip install randino
 
 :::
 
+::: lang js
+
+### What it weighs in a browser bundle {#bundle-size}
+
+The package declares `sideEffects: false`, so a bundler drops the pools nothing reaches — and the pools are nearly all of it. What one import costs, minified and gzipped:
+
+| Import                                                | gzipped |
+| ----------------------------------------------------- | ------- |
+| `randSuffix`, `randPrefix`                            | 0.5 KB  |
+| `randName`                                            | 23 KB   |
+| `randWord`, `randAnimal` and the rest, `randModifier` | 265 KB  |
+| `randNickname`                                        | 267 KB  |
+| `randSentence`                                        | 449 KB  |
+
+The word pools are one object per language, so one theme costs what twenty-nine do, and `randSentence` adds the grammar on top. That is the trade a synchronous API with no dependencies makes: nothing is fetched, so everything a function can reach ships with it. On a server it is nothing; in a browser bundle, reach for `randName` or the decorators if that is all you need, and load `randSentence` from a chunk of its own.
+
+:::
+
 ## Your first name
 
 ::: lang js
