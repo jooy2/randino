@@ -1,6 +1,6 @@
 # randPrefix
 
-Prepends a random token to a string, or to every string in an array. It mirrors [`randSuffix`](./rand-suffix), for the places where the distinguishing part belongs in front: a shard, a tenant, a key that sorts by nothing in particular.
+Prepends a random token to a string, or to every string in an array. It mirrors [`randSuffix`](./rand-suffix), for the places where the distinguishing part belongs in front: a shard, a tenant, a key that sorts by nothing in particular. The token is the same one, and so is [what it is not for](./rand-suffix#not-for-security).
 
 ::: lang js
 

@@ -13,7 +13,8 @@ export function randPrefix(options?: RandAffixOptions): string;
 /**
  * Prepends a random token to a string. The mirror of `randSuffix`, for the
  * places where the distinguishing part belongs in front — a shard, a tenant, a
- * sortable-by-nothing key.
+ * sortable-by-nothing key. It is the same token, so it is not for anything that
+ * has to be unguessable either; see `randSuffix`.
  *
  * @example
  * randPrefix('멋진사자'); // 'nVtRC_멋진사자'

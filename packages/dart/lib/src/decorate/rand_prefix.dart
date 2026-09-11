@@ -3,7 +3,8 @@ import 'package:randino/src/decorate/data/index.dart';
 
 /// Prepends a random token to [value]. The mirror of [randSuffix], for the
 /// places where the distinguishing part belongs in front — a shard, a tenant, a
-/// key that is sortable by nothing.
+/// key that is sortable by nothing. It is the same token, so it is not for
+/// anything that has to be unguessable either; see [randSuffix].
 ///
 /// With [value] left out you get the bare token, which is the same thing
 /// [randSuffix] hands back with no value: which side it would have landed on is

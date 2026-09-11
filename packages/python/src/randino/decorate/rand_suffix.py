@@ -49,6 +49,14 @@ def rand_suffix(
     what a generator's output is usually passed here for. With no value at all
     you get the bare token — what a decorator attaches is worth having on its own.
 
+    **Not for anything that has to be unguessable.** The token comes from `random`,
+    which is not a cryptographically secure source: its state can be recovered from
+    a handful of outputs, so the tokens that follow can be worked out. Nor is it
+    collision-free — five characters of the default charset is 601,692,057 tokens,
+    and a collision becomes likely somewhere around thirty thousand of them. Use
+    `secrets` for a session token, an invite code or a key nobody may enumerate, and
+    a database constraint where a value has to be unique with certainty.
+
     Args:
         value: The string, or the list of strings, to append to. Omitted, the
             token is the whole answer and `separator` is not used.

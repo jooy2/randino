@@ -48,6 +48,8 @@ def rand_prefix(
     The mirror of `rand_suffix` — a shard, a tenant, a key that is sortable by
     nothing. With no value at all you get the bare token, which is the same thing
     `rand_suffix` hands back: which side it would have landed on is not decided yet.
+    It is the same token, so it is not for anything that has to be unguessable
+    either; see `rand_suffix`.
 
     Args:
         value: The string, or the list of strings, to prepend to. Omitted, the

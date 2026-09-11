@@ -11,7 +11,16 @@ import { attach } from './attach.js';
 export function randSuffix(options?: RandAffixOptions): string;
 /**
  * Appends a random token to a string, so that two people asking for the same
- * nickname at the same moment do not walk away with the same one.
+ * nickname at the same moment are very unlikely to walk away with the same one.
+ *
+ * **Not for anything that has to be unguessable.** The token comes from
+ * `Math.random`, which is not a cryptographically secure source: its state can
+ * be recovered from a handful of outputs, so the tokens that follow can be
+ * worked out. Nor is it collision-free — five characters of the default charset
+ * is 601,692,057 tokens, and a collision becomes likely somewhere around thirty
+ * thousand of them. Use `crypto.getRandomValues` for a session token, an invite
+ * code or a key nobody may enumerate, and a database constraint where a value
+ * has to be unique with certainty.
  *
  * @example
  * randSuffix('멋진사자'); // '멋진사자_nVtRC'
