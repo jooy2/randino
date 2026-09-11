@@ -148,7 +148,7 @@ rand_suffix(rand_nickname(language="en", count=2))
 npm install randino
 ```
 
-Node.js 18 이상 또는 아무 브라우저에서 동작합니다. 타입 선언이 포함된 ESM이고, 뒤따라 설치되는 패키지가 없습니다.
+Node.js 22 이상 또는 아무 브라우저에서 동작합니다. 타입 선언이 포함된 ESM이고, 뒤따라 설치되는 패키지가 없습니다.
 
 :::
 

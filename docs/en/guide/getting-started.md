@@ -30,7 +30,7 @@ The Python package is published to PyPI as [`randino`](https://pypi.org/project/
 npm install randino
 ```
 
-**Node.js 18 or newer**, or any browser. That is the whole install, and there is nothing to configure.
+**Node.js 22 or newer**, or any browser. That is the whole install, and there is nothing to configure.
 
 :::
 

@@ -12,6 +12,10 @@ defaults:
   run:
     working-directory: docs
 
+# Nothing here writes anything back.
+permissions:
+  contents: read
+
 jobs:
   run-build-docs:
     runs-on: ubuntu-latest

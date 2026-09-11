@@ -14,6 +14,10 @@ defaults:
   run:
     working-directory: packages/javascript
 
+# Nothing here writes anything back.
+permissions:
+  contents: read
+
 jobs:
   run-test-javascript:
     runs-on: ${{ matrix.os }}
@@ -21,6 +25,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
+        # The floor `package.json` declares, whatever is current, and one in
+        # between. A library that only ever runs on the newest runtime is a
+        # library whose `engines` field is a guess — which is what it was: the
+        # floor read 18 and nothing had ever run there.
         node_version: ['22', '24', '25']
         os: [ubuntu-latest, windows-latest, macos-latest]
 

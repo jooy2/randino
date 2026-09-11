@@ -31,6 +31,11 @@ concurrency:
   group: publish-documentation
   cancel-in-progress: false
 
+# The deploy goes through `secrets.ACCESS_TOKEN`, so the workflow's own token needs
+# nothing but the checkout.
+permissions:
+  contents: read
+
 jobs:
   publish-documentation:
     runs-on: ubuntu-latest
@@ -69,9 +74,13 @@ jobs:
         run: |
           echo "fqdn=$(node -p "new URL(require('../packages/javascript/package.json').homepage).hostname")" >> "$GITHUB_OUTPUT"
 
+      # Pinned to the commit `v4` resolved to, rather than to the tag. This step is
+      # the one that holds a token with write access to this repository, and a tag
+      # is a name its owner can move — pinning it is what makes an update to the
+      # action something that has to be committed here.
       # @see https://github.com/crazy-max/ghaction-github-pages
       - name: Deploy to GitHub Pages
-        uses: crazy-max/ghaction-github-pages@v4
+        uses: crazy-max/ghaction-github-pages@df5cc2bfa78282ded844b354faee141f06b41865 # v4.2.0
         with:
           target_branch: gh-pages
           build_dir: docs-dist

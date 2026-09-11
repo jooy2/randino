@@ -28,7 +28,7 @@ This is the JavaScript package. The [Dart package](https://pub.dev/packages/rand
 npm install randino
 ```
 
-Requires **Node.js 18 or newer**, or any browser. The package ships ESM with type declarations and pulls nothing in behind it.
+Requires **Node.js 22 or newer**, or any browser. The package ships ESM with type declarations and pulls nothing in behind it.
 
 ## Person names
 

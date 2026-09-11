@@ -139,7 +139,7 @@ Run from `packages/javascript`; there is no workspace root that forwards them.
 | `npm run lint`   | ESLint (`lint:fix` to fix)                                          |
 | `npm run format` | Prettier, in place                                                  |
 
-The tests are TypeScript but import from `../dist`, so they are run through `tsx` and **they need a build** — that is what `npm run test` does first. Node >= 18.
+The tests are TypeScript but import from `../dist`, so they are run through `tsx` and **they need a build** — that is what `npm run test` does first. Node >= 22, which is the floor `package.json` declares and the lowest the workflow runs.
 
 Only `dist/` and the top-level `README.md` / `LICENSE` are published; `.npmignore` keeps `lib/`, `test/`, the config files and the remaining markdown out of the package.
 

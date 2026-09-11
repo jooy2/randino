@@ -16,6 +16,10 @@ on:
       - .github/workflows/run-check-data.yml
   workflow_dispatch:
 
+# Nothing here writes anything back.
+permissions:
+  contents: read
+
 jobs:
   run-check-data:
     runs-on: ubuntu-latest

@@ -24,7 +24,7 @@ Every option, every language and every example, with **JavaScript**, **Dart** or
 
 | Package                                      | Registry                                                 | Requires                          | Quick start                             |
 | -------------------------------------------- | -------------------------------------------------------- | --------------------------------- | --------------------------------------- |
-| [`packages/javascript`](packages/javascript) | [npm: `randino`](https://www.npmjs.com/package/randino)   | Node.js 18 or later, or a browser | [README](packages/javascript/README.md) |
+| [`packages/javascript`](packages/javascript) | [npm: `randino`](https://www.npmjs.com/package/randino)   | Node.js 22 or later, or a browser | [README](packages/javascript/README.md) |
 | [`packages/dart`](packages/dart)             | [pub.dev: `randino`](https://pub.dev/packages/randino)    | Dart 3.7 or newer (Flutter 3.29)  | [README](packages/dart/README.md)       |
 | [`packages/python`](packages/python)         | [PyPI: `randino`](https://pypi.org/project/randino/)      | Python 3.10 or newer              | [README](packages/python/README.md)     |
 

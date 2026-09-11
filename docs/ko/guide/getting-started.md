@@ -30,7 +30,7 @@ Python 패키지는 PyPI에 [`randino`](https://pypi.org/project/randino/)로 �
 npm install randino
 ```
 
-**Node.js 18 이상** 또는 아무 브라우저면 됩니다. 설치는 이게 전부이고, 따로 설정할 것이 없습니다.
+**Node.js 22 이상** 또는 아무 브라우저면 됩니다. 설치는 이게 전부이고, 따로 설정할 것이 없습니다.
 
 :::
 

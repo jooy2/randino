@@ -148,7 +148,7 @@ You can also ask what a result was built from. <Lang js="output: 'detail'" dart=
 npm install randino
 ```
 
-Node.js 18 or newer, or any browser. It is ESM with type declarations, and nothing is pulled in behind it.
+Node.js 22 or newer, or any browser. It is ESM with type declarations, and nothing is pulled in behind it.
 
 :::
 
