@@ -1199,23 +1199,36 @@ function timePools(data: SentenceLanguageData): readonly WordPool[] {
 	].filter((pool) => pool.length > 0);
 }
 
-/** The longest and shortest article the language can open a phrase with. */
+const articleCache = new WeakMap<SentenceLanguageData, readonly [number, number]>();
+
+/**
+ * The longest and shortest article the language can open a phrase with. Held on
+ * to, because it is a property of the language and `partRange` asks for it once
+ * per noun phrase of every shape it measures — which was three percent of a
+ * paragraph spent walking the same dozen articles.
+ */
 function articleSpan(data: SentenceLanguageData): readonly [number, number] {
-	if (!data.articles) {
-		return [0, 0];
+	const cached = articleCache.get(data);
+
+	if (cached) {
+		return cached;
 	}
 
 	let min = Infinity;
 	let max = 0;
 
-	for (const rules of Object.values(data.articles)) {
+	for (const rules of Object.values(data.articles ?? {})) {
 		for (const [, article] of rules ?? []) {
 			min = Math.min(min, article.length);
 			max = Math.max(max, article.length);
 		}
 	}
 
-	return [min === Infinity ? 0 : min, max];
+	const span: readonly [number, number] = data.articles ? [min === Infinity ? 0 : min, max] : [0, 0];
+
+	articleCache.set(data, span);
+
+	return span;
 }
 
 /** What one part adds to the sentence, at its shortest and at its longest. */
@@ -1280,11 +1293,40 @@ function partRange(
 }
 
 /** Shortest and longest sentence a shape can produce. */
+/**
+ * What a shape can be, by the shape and the bounds it was measured against. Both
+ * are held rather than rebuilt: the language's own `slotBounds` is one object
+ * reused for every call, and the narrowed ones a named result uses are built once
+ * per result — so a `WeakMap` of a `WeakMap` keys on identity and never grows.
+ *
+ * Worth holding because this is the hottest thing a paragraph does. Every shape
+ * of the language is measured to pick a kind, again to pick a shape, again per
+ * attempt, and again for every sentence; it and `partRange` together were a fifth
+ * of the time a paragraph took.
+ */
+const frameRangeCache = new WeakMap<
+	SentenceFrame,
+	WeakMap<Record<string, readonly [number, number]>, readonly [number, number]>
+>();
+
 function frameRange(
 	frame: SentenceFrame,
 	data: SentenceLanguageData,
 	bounds: Record<string, readonly [number, number]>
 ): readonly [number, number] {
+	let byBounds = frameRangeCache.get(frame);
+
+	if (!byBounds) {
+		byBounds = new WeakMap();
+		frameRangeCache.set(frame, byBounds);
+	}
+
+	const cached = byBounds.get(bounds);
+
+	if (cached) {
+		return cached;
+	}
+
 	// Measured against the longest mark the language writes, so a shape is never
 	// chosen for a range only the shortest one could have reached.
 	const marks = Math.max(...Object.values(data.terminators).map((mark) => mark.length));
@@ -1300,7 +1342,11 @@ function frameRange(
 		max += gap + high;
 	}
 
-	return [min, max];
+	const range: readonly [number, number] = [min, max];
+
+	byBounds.set(bounds, range);
+
+	return range;
 }
 
 /** The shortest and longest sentence a set of shapes can produce. */
@@ -1512,11 +1558,48 @@ function placeHeadFor(data: SentenceLanguageData, noun: string): string | null {
 	return null;
 }
 
+const NO_TRAITS: readonly NounTrait[] = [];
+
+/**
+ * Every noun the language gives a trait to, as one lookup. Built once per
+ * language rather than walked per question: `acceptsNoun` asks this of every
+ * group it considers, and rebuilding the entry list and filtering every pool each
+ * time was six percent of what a paragraph took.
+ */
+const traitCache = new WeakMap<SentenceLanguageData, Map<string, readonly NounTrait[]>>();
+
+function traitsIndexOf(data: SentenceLanguageData): Map<string, readonly NounTrait[]> {
+	const cached = traitCache.get(data);
+
+	if (cached) {
+		return cached;
+	}
+
+	const index = new Map<string, NounTrait[]>();
+
+	for (const [trait, pool] of Object.entries(data.traits ?? {}) as [
+		NounTrait,
+		WordPool | undefined
+	][]) {
+		for (const noun of pool ?? []) {
+			const carried = index.get(noun);
+
+			if (carried) {
+				carried.push(trait);
+			} else {
+				index.set(noun, [trait]);
+			}
+		}
+	}
+
+	traitCache.set(data, index);
+
+	return index;
+}
+
 /** The traits a noun carries: what its language says it can do. */
 function traitsOf(data: SentenceLanguageData, noun: string): readonly NounTrait[] {
-	return (Object.entries(data.traits ?? {}) as [NounTrait, WordPool | undefined][])
-		.filter(([, pool]) => pool?.includes(noun))
-		.map(([trait]) => trait);
+	return traitsIndexOf(data).get(noun) ?? NO_TRAITS;
 }
 
 /**
@@ -2200,7 +2283,10 @@ function generateOne(language: WordLanguage, settings: Settings, draw: Draw): Bu
 
 		return high >= min && low <= max && buildable(frame);
 	});
-	const loose = frames.filter(buildable);
+	// Only asked for when nothing fits. `buildable` walks every verb group of the
+	// language against the shape, and computing this every time cost a quarter of
+	// what a Korean paragraph took to answer a question it usually never asks.
+	const loose = fitting.length ? [] : frames.filter(buildable);
 	const usable = fitting.length ? fitting : loose.length ? loose : frames;
 	let best: Built | null = null;
 	let bestDistance = Infinity;
@@ -3611,13 +3697,32 @@ function markWeight(mark: SentenceMark, flow: Flow): number {
  * named sentence cannot fill. Both the result's budget and the per-sentence
  * choice of shape read this rather than `slotBounds` directly.
  */
+const roomCache = new Map<string, Record<string, readonly [number, number]>>();
+
 function roomFor(
 	language: WordLanguage,
 	includeName: boolean | null
 ): Record<string, readonly [number, number]> {
 	const bounds = slotBounds(language);
 
-	return includeName ? { ...bounds, subject: nameSpan(language) } : bounds;
+	if (!includeName) {
+		return bounds;
+	}
+
+	// Held rather than rebuilt, and not only to save the spread: `frameRange` keys
+	// what it remembers on the bounds object it was handed, so a fresh one per
+	// sentence would be a fresh cache per sentence.
+	const cached = roomCache.get(language);
+
+	if (cached) {
+		return cached;
+	}
+
+	const narrowed = { ...bounds, subject: nameSpan(language) };
+
+	roomCache.set(language, narrowed);
+
+	return narrowed;
 }
 
 function nameFits(

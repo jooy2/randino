@@ -247,14 +247,33 @@ WordPool levelledNouns(WordLanguageData data, WordTheme theme, RandVocabulary vo
 }
 
 /// Theme a word belongs to, across every theme of the language.
-WordTheme? themeOf(WordLanguageData data, String word) {
+WordTheme? themeOf(WordLanguageData data, String word) => _themeIndexOf(data)[word];
+
+/// Which theme holds each noun of the language, as one lookup.
+///
+/// Built once per language rather than walked per question. The themes are
+/// disjoint, so a word has at most one — and an invented word has to be looked up
+/// against every one of them, because it can spell a real word by accident, which
+/// is twenty-nine pools and some three and a half thousand comparisons for a word
+/// that is usually in none of them.
+final Expando<Map<String, WordTheme>> _themeCache = Expando<Map<String, WordTheme>>('themeOf');
+
+Map<String, WordTheme> _themeIndexOf(WordLanguageData data) {
+  final cached = _themeCache[data];
+
+  if (cached != null) return cached;
+
+  final index = <String, WordTheme>{};
+
   for (final theme in wordThemes) {
-    if (data.nouns[theme]!.contains(word)) {
-      return theme;
+    for (final word in data.nouns[theme]!) {
+      index.putIfAbsent(word, () => theme);
     }
   }
 
-  return null;
+  _themeCache[data] = index;
+
+  return index;
 }
 
 /// A pool word of a length between [min] and [max], starting with [prefix] when

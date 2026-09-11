@@ -270,13 +270,45 @@ def levelled_nouns(
     return usable
 
 
+# Keyed on `id()`, which is safe here and nowhere else: every `WordLanguageData` is
+# part of `WORD_DATA`, a module constant that lives as long as the process, so no id is
+# ever recycled under the cache.
+_THEME_CACHE: dict[int, dict[str, WordTheme]] = {}
+
+
+def _theme_index_of(data: WordLanguageData) -> dict[str, WordTheme]:
+    """Which theme holds each noun of the language, as one lookup.
+
+    Built once per language rather than walked per question. The themes are disjoint, so
+    a word has at most one — and an invented word has to be looked up against every one
+    of them, because it can spell a real word by accident, which is twenty-nine pools and
+    some three and a half thousand comparisons for a word that is usually in none of them.
+
+    Args:
+        data: The language's word data.
+
+    Returns:
+        The theme that holds each noun, by the noun.
+    """
+    cached = _THEME_CACHE.get(id(data))
+
+    if cached is not None:
+        return cached
+
+    index: dict[str, WordTheme] = {}
+
+    for theme in WORD_THEMES:
+        for word in data.nouns[theme]:
+            index.setdefault(word, theme)
+
+    _THEME_CACHE[id(data)] = index
+
+    return index
+
+
 def theme_of(data: WordLanguageData, word: str) -> WordTheme | None:
     """Theme a word belongs to, across every theme of the language."""
-    for theme in WORD_THEMES:
-        if word in data.nouns[theme]:
-            return theme
-
-    return None
+    return _theme_index_of(data).get(word)
 
 
 def pick_word(pool: WordPool, low: int, high: int, prefix: str) -> str | None:

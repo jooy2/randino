@@ -15,7 +15,7 @@ gave the sentence a reason.
 import random
 from collections.abc import Callable, Sequence
 from dataclasses import dataclass, replace
-from typing import Literal
+from typing import Any, Literal, cast
 
 from randino._internal.utils import chance, pick, pick_weighted, rand_int
 from randino._types import SentenceStory, SentenceType, WordTheme
@@ -520,13 +520,50 @@ def _repeatable(step: StoryStep) -> bool:
     )
 
 
+# What each of the three questions below already answered, per language.
+#
+# All three are decided by the language's own verbs and the story's own steps, so none
+# of them changes between one telling and the next — and every telling asks them again,
+# `item_themes_for` once per theme of the item's classes. Walking a story's required
+# steps twenty-nine times over was a quarter of what a paragraph took.
+#
+# A telling is random and this is not: `_settle` picks which condition a state step
+# says, but whether the step can be settled at all is the language's business, and that
+# is the only half `tellable` reads.
+#
+# Keyed on `id(data)`, which is safe here and nowhere else: every `SentenceLanguageData`
+# is part of `SENTENCE_DATA`, a module constant that lives as long as the process.
+_ANSWER_CACHE: dict[int, dict[str, Any]] = {}
+
+
+def _remembered(data: SentenceLanguageData, key: str, answer: Callable[[], Any]) -> Any:
+    """The answer to `key` for this language, worked out once."""
+    by_key = _ANSWER_CACHE.setdefault(id(data), {})
+
+    if key in by_key:
+        return by_key[key]
+
+    value = answer()
+    by_key[key] = value
+
+    return value
+
+
 def tellable(
     data: SentenceLanguageData, story: Story, hero: NounClass, item: WordTheme | None
 ) -> bool:
     """Whether the language can tell this story about this hero at all."""
-    return (
-        _walk(data, story, [step for step in story.steps if step.required], hero, item, None)
-        is not None
+    return bool(
+        _remembered(
+            data,
+            f"tellable:{story.name}:{hero}:{item or '-'}",
+            lambda: (
+                _walk(
+                    data, story, [step for step in story.steps if step.required], hero, item, None
+                )
+                is not None
+            ),
+        )
     )
 
 
@@ -536,16 +573,20 @@ def item_themes_for(data: SentenceLanguageData, story: Story, hero: NounClass) -
     Every theme of the classes the story names that the language can tell the whole
     story with.
     """
-    if story.item is None:
-        return []
 
-    return [
-        theme
-        for theme in THEME_CLASS
-        if THEME_CLASS[theme] in story.item
-        and (story.item_themes is None or theme in story.item_themes)
-        and tellable(data, story, hero, theme)
-    ]
+    def themes() -> list[WordTheme]:
+        if story.item is None:
+            return []
+
+        return [
+            theme
+            for theme in THEME_CLASS
+            if THEME_CLASS[theme] in story.item
+            and (story.item_themes is None or theme in story.item_themes)
+            and tellable(data, story, hero, theme)
+        ]
+
+    return cast("list[WordTheme]", _remembered(data, f"item:{story.name}:{hero}", themes))
 
 
 def prop_themes_for(data: SentenceLanguageData, story: Story, hero: NounClass) -> list[WordTheme]:
@@ -554,21 +595,25 @@ def prop_themes_for(data: SentenceLanguageData, story: Story, hero: NounClass) -
     Every theme of the classes the story names that some verb of every prop step takes.
     Empty for a story with no prop, and for a language that cannot write one of its steps.
     """
-    steps = [step for step in story.steps if step.object == "prop"]
 
-    if story.prop is None or not steps:
-        return []
+    def themes() -> list[WordTheme]:
+        steps = [step for step in story.steps if step.object == "prop"]
 
-    return [
-        theme
-        for theme in THEME_CLASS
-        if THEME_CLASS[theme] in story.prop
-        and (story.prop_themes is None or theme in story.prop_themes)
-        and all(
-            any(groups_of(data, field, hero, theme, True) for field in step.fields)
-            for step in steps
-        )
-    ]
+        if story.prop is None or not steps:
+            return []
+
+        return [
+            theme
+            for theme in THEME_CLASS
+            if THEME_CLASS[theme] in story.prop
+            and (story.prop_themes is None or theme in story.prop_themes)
+            and all(
+                any(groups_of(data, field, hero, theme, True) for field in step.fields)
+                for step in steps
+            )
+        ]
+
+    return cast("list[WordTheme]", _remembered(data, f"prop:{story.name}:{hero}", themes))
 
 
 def hero_classes_for(

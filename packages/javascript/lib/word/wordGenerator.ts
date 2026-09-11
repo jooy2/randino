@@ -237,15 +237,42 @@ export function levelledNouns(
 	return usable;
 }
 
-/** Theme a word belongs to, across every theme of the language. */
-export function themeOf(data: WordLanguageData, word: string): WordTheme | null {
+/**
+ * Which theme holds each noun of the language, as one lookup.
+ *
+ * Built once per language rather than walked per question. The themes are
+ * disjoint, so a word has at most one — and an invented word has to be looked up
+ * against every one of them, because it can spell a real word by accident, which
+ * is twenty-nine pools and some three and a half thousand comparisons for a word
+ * that is usually in none of them.
+ */
+const themeCache = new WeakMap<WordLanguageData, Map<string, WordTheme>>();
+
+function themeIndexOf(data: WordLanguageData): Map<string, WordTheme> {
+	const cached = themeCache.get(data);
+
+	if (cached) {
+		return cached;
+	}
+
+	const index = new Map<string, WordTheme>();
+
 	for (const theme of WORD_THEMES) {
-		if (data.nouns[theme].includes(word)) {
-			return theme;
+		for (const word of data.nouns[theme]) {
+			if (!index.has(word)) {
+				index.set(word, theme);
+			}
 		}
 	}
 
-	return null;
+	themeCache.set(data, index);
+
+	return index;
+}
+
+/** Theme a word belongs to, across every theme of the language. */
+export function themeOf(data: WordLanguageData, word: string): WordTheme | null {
+	return themeIndexOf(data).get(word) ?? null;
 }
 
 /**

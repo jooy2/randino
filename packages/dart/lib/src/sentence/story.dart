@@ -531,40 +531,76 @@ bool _repeatable(StoryStep step) =>
     step.destination == null &&
     (step.kind != StepKind.act || step.fields.every(_repeatableFields.contains));
 
+/// What each of the three questions below already answered, per language.
+///
+/// All three are decided by the language's own verbs and the story's own steps,
+/// so none of them changes between one telling and the next — and every telling
+/// asks them again, [itemThemesFor] once per theme of the item's classes.
+/// Walking a story's required steps twenty-nine times over was a quarter of what
+/// a paragraph took.
+///
+/// A telling is random and this is not: `_settle` picks which condition a state
+/// step says, but whether the step can be settled at all is the language's
+/// business, and that is the only half [tellable] reads.
+final Expando<Map<String, Object>> _answerCache = Expando<Map<String, Object>>('storyAnswers');
+
+T _remembered<T extends Object>(SentenceLanguageData data, String key, T Function() answer) {
+  final byKey = _answerCache[data] ??= <String, Object>{};
+  final cached = byKey[key];
+
+  if (cached != null) return cached as T;
+
+  final value = answer();
+
+  byKey[key] = value;
+
+  return value;
+}
+
 /// Whether the language can tell this story about this hero at all.
 bool tellable(SentenceLanguageData data, Story story, NounClass hero, WordTheme? item) =>
-    _walk(
+    _remembered(
       data,
-      story,
-      story.steps.where((step) => step.required).toList(growable: false),
-      hero,
-      item,
-      // A prop is never in a required step, so none is needed to tell the story.
-      null,
-    ) !=
-    null;
+      'tellable:${story.name.name}:${hero.name}:${item?.name ?? '-'}',
+      () =>
+          _walk(
+            data,
+            story,
+            story.steps.where((step) => step.required).toList(growable: false),
+            hero,
+            item,
+            // A prop is never in a required step, so none is needed to tell it.
+            null,
+          ) !=
+          null,
+    );
 
 /// The themes the story's item may come from, for this hero: every theme of the
 /// classes the story names that the language can tell the whole story with.
-List<WordTheme> itemThemesFor(SentenceLanguageData data, Story story, NounClass hero) {
-  final item = story.item;
+List<WordTheme> itemThemesFor(SentenceLanguageData data, Story story, NounClass hero) =>
+    _remembered(data, 'item:${story.name.name}:${hero.name}', () {
+      final item = story.item;
 
-  if (item == null) return const <WordTheme>[];
+      if (item == null) return const <WordTheme>[];
 
-  return themeClass.keys
-      .where(
-        (theme) =>
-            item.contains(themeClass[theme]) &&
-            (story.itemThemes == null || story.itemThemes!.contains(theme)) &&
-            tellable(data, story, hero, theme),
-      )
-      .toList(growable: false);
-}
+      return themeClass.keys
+          .where(
+            (theme) =>
+                item.contains(themeClass[theme]) &&
+                (story.itemThemes == null || story.itemThemes!.contains(theme)) &&
+                tellable(data, story, hero, theme),
+          )
+          .toList(growable: false);
+    });
 
 /// The themes the story's prop may come from, for this hero: every theme of the
 /// classes the story names that some verb of every prop step takes. Empty for a
 /// story with no prop, and for a language that cannot write one of its steps.
-List<WordTheme> propThemesFor(SentenceLanguageData data, Story story, NounClass hero) {
+List<WordTheme> propThemesFor(
+  SentenceLanguageData data,
+  Story story,
+  NounClass hero,
+) => _remembered(data, 'prop:${story.name.name}:${hero.name}', () {
   final prop = story.prop;
   final steps = story.steps.where((step) => step.object == StoryRole.prop).toList(growable: false);
 
@@ -581,7 +617,7 @@ List<WordTheme> propThemesFor(SentenceLanguageData data, Story story, NounClass 
             ),
       )
       .toList(growable: false);
-}
+});
 
 /// The classes of [heroes] this story can be told about in this language.
 List<NounClass> heroClassesFor(SentenceLanguageData data, Story story, List<NounClass> heroes) =>

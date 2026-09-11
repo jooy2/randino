@@ -1416,14 +1416,39 @@ def _slot_bounds(language: WordLanguage) -> dict[str, tuple[int, int]]:
     return bounds
 
 
+# The caches below key on `id()`, which is safe here and nowhere else: every
+# `SentenceLanguageData` and every `SentenceFrame` is part of `SENTENCE_DATA`, a module
+# constant that lives as long as the process, so no id is ever recycled under a cache.
+_ARTICLE_CACHE: dict[int, tuple[int, int]] = {}
+
+
 def _article_span(data: SentenceLanguageData) -> tuple[int, int]:
-    """The longest and shortest article the language can open a phrase with."""
+    """The longest and shortest article the language can open a phrase with.
+
+    Held on to, because it is a property of the language and `_part_range` asks for it
+    once per noun phrase of every shape it measures — which was three percent of a
+    paragraph spent walking the same dozen articles.
+
+    Args:
+        data: The language's sentence data.
+
+    Returns:
+        The shortest and longest article it writes, and `(0, 0)` where it writes none.
+    """
+    cached = _ARTICLE_CACHE.get(id(data))
+
+    if cached is not None:
+        return cached
+
     if data.articles is None:
-        return (0, 0)
+        span = (0, 0)
+    else:
+        lengths = [len(article) for rules in data.articles.values() for _, article in rules]
+        span = (min(lengths, default=0), max(lengths, default=0))
 
-    lengths = [len(article) for rules in data.articles.values() for _, article in rules]
+    _ARTICLE_CACHE[id(data)] = span
 
-    return (min(lengths, default=0), max(lengths, default=0))
+    return span
 
 
 def _tail_min(part: SentencePart) -> int:
@@ -1490,12 +1515,40 @@ def _part_range(
     )
 
 
+_FRAME_RANGE_CACHE: dict[tuple[int, int], tuple[int, int]] = {}
+
+
 def _frame_range(
     frame: SentenceFrame,
     data: SentenceLanguageData,
     bounds: dict[str, tuple[int, int]],
 ) -> tuple[int, int]:
-    """Shortest and longest sentence a shape can produce."""
+    """Shortest and longest sentence a shape can produce.
+
+    Held by the shape and the bounds it was measured against. Both live as long as the
+    process: the frames are the language's own data, the language's `_slot_bounds` is
+    one dict reused for every call, and the narrowed one a named result uses is built
+    once per language — so keying on identity never grows.
+
+    Worth holding because this is the hottest thing a paragraph does. Every shape of the
+    language is measured to pick a kind, again to pick a shape, again per attempt, and
+    again for every sentence; it and `_part_range` together were a fifth of the time a
+    paragraph took.
+
+    Args:
+        frame: The shape to measure.
+        data: The language's sentence data.
+        bounds: What each kind of slot can contribute.
+
+    Returns:
+        The shortest and longest sentence the shape can produce.
+    """
+    key = (id(frame), id(bounds))
+    remembered = _FRAME_RANGE_CACHE.get(key)
+
+    if remembered is not None:
+        return remembered
+
     # Measured against the longest mark the language writes, so a shape is never chosen
     # for a range only the shortest one could have reached.
     marks = max(len(mark) for mark in data.terminators.values())
@@ -1509,6 +1562,8 @@ def _frame_range(
 
         low += gap + part_low
         high += gap + part_high
+
+    _FRAME_RANGE_CACHE[key] = (low, high)
 
     return (low, high)
 
@@ -1843,9 +1898,43 @@ def _place_head_for(data: SentenceLanguageData, noun: str) -> str | None:
     return None
 
 
+_TRAIT_CACHE: dict[int, dict[str, tuple[NounTrait, ...]]] = {}
+_NO_TRAITS: tuple[NounTrait, ...] = ()
+
+
+def _traits_index_of(data: SentenceLanguageData) -> dict[str, tuple[NounTrait, ...]]:
+    """Every noun the language gives a trait to, as one lookup.
+
+    Built once per language rather than walked per question: `_accepts_noun` asks this of
+    every group it considers, and searching every pool each time was six percent of what
+    a paragraph took.
+
+    Args:
+        data: The language's sentence data.
+
+    Returns:
+        The traits each noun carries, by the noun.
+    """
+    cached = _TRAIT_CACHE.get(id(data))
+
+    if cached is not None:
+        return cached
+
+    building: dict[str, list[NounTrait]] = {}
+
+    for trait, pool in (data.traits or {}).items():
+        for noun in pool:
+            building.setdefault(noun, []).append(trait)
+
+    index = {noun: tuple(traits) for noun, traits in building.items()}
+    _TRAIT_CACHE[id(data)] = index
+
+    return index
+
+
 def _traits_of(data: SentenceLanguageData, noun: str) -> tuple[NounTrait, ...]:
     """The traits a noun carries: what its language says it can do."""
-    return tuple(trait for trait, pool in (data.traits or {}).items() if noun in pool)
+    return _traits_index_of(data).get(noun, _NO_TRAITS)
 
 
 def _accepts_noun(data: SentenceLanguageData, group: VerbGroup | StateGroup, noun: str) -> bool:
@@ -3434,6 +3523,9 @@ def _connectives_of(
     )
 
 
+_ROOM_CACHE: dict[WordLanguage, dict[str, tuple[int, int]]] = {}
+
+
 def _room_for(language: WordLanguage, include_name: bool | None) -> dict[str, tuple[int, int]]:
     """The slot bounds this result is measured against.
 
@@ -3452,7 +3544,19 @@ def _room_for(language: WordLanguage, include_name: bool | None) -> dict[str, tu
     """
     bounds = _slot_bounds(language)
 
-    return {**bounds, "subject": _name_span(language)} if include_name else bounds
+    if not include_name:
+        return bounds
+
+    # Held rather than rebuilt, and not only to save the copy: `_frame_range` keys what
+    # it remembers on the bounds dict it was handed, so a fresh one per sentence would
+    # be a fresh cache per sentence.
+    narrowed = _ROOM_CACHE.get(language)
+
+    if narrowed is None:
+        narrowed = {**bounds, "subject": _name_span(language)}
+        _ROOM_CACHE[language] = narrowed
+
+    return narrowed
 
 
 def _name_fits(
@@ -4878,7 +4982,10 @@ def _generate_one(language: WordLanguage, settings: Settings, draw: Draw) -> Bui
         and _frame_range(frame, data, bounds)[0] <= high
         and buildable(frame)
     ]
-    loose = [frame for frame in frames if buildable(frame)]
+    # Only asked for when nothing fits. `buildable` walks every verb group of the
+    # language against the shape, and computing it every time cost a quarter of what a
+    # Korean paragraph took to answer a question it usually never asks.
+    loose = [] if fitting else [frame for frame in frames if buildable(frame)]
     usable = fitting or loose or frames
     best: Built | None = None
     best_distance = None

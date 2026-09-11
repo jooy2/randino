@@ -472,6 +472,40 @@ function walkFrom(
 	return settled;
 }
 
+/**
+ * What each of the three questions below already answered, per language.
+ *
+ * All three are decided by the language's own verbs and the story's own steps,
+ * so none of them changes between one telling and the next — and every telling
+ * asks them again, `itemThemesFor` once per theme of the item's classes. Walking
+ * a story's required steps twenty-nine times over was a quarter of what a
+ * paragraph took.
+ *
+ * A telling is random and this is not: `settle` picks which condition a state
+ * step says, but whether the step can be settled at all is the language's
+ * business, and that is the only half `tellable` reads.
+ */
+const answerCache = new WeakMap<SentenceLanguageData, Map<string, unknown>>();
+
+function remembered<T>(data: SentenceLanguageData, key: string, answer: () => T): T {
+	let byKey = answerCache.get(data);
+
+	if (!byKey) {
+		byKey = new Map();
+		answerCache.set(data, byKey);
+	}
+
+	if (byKey.has(key)) {
+		return byKey.get(key) as T;
+	}
+
+	const value = answer();
+
+	byKey.set(key, value);
+
+	return value;
+}
+
 /** Whether the language can tell this story about this hero at all. */
 export function tellable(
 	data: SentenceLanguageData,
@@ -479,16 +513,19 @@ export function tellable(
 	hero: NounClass,
 	item: WordTheme | null
 ): boolean {
-	// A prop is never in a required step, so none is needed to tell the story.
-	return (
-		walk(
-			data,
-			story,
-			story.steps.filter((step) => step.required),
-			hero,
-			item,
-			null
-		) !== null
+	return remembered(
+		data,
+		`tellable:${story.name}:${hero}:${item ?? '-'}`,
+		() =>
+			// A prop is never in a required step, so none is needed to tell the story.
+			walk(
+				data,
+				story,
+				story.steps.filter((step) => step.required),
+				hero,
+				item,
+				null
+			) !== null
 	);
 }
 
@@ -534,13 +571,15 @@ export function itemThemesFor(
 	story: Story,
 	hero: NounClass
 ): readonly WordTheme[] {
-	const themes = (Object.keys(THEME_CLASS) as WordTheme[]).filter(
-		(theme) =>
-			(story.item ?? []).includes(THEME_CLASS[theme]) &&
-			(!story.itemThemes || story.itemThemes.includes(theme))
-	);
+	return remembered(data, `item:${story.name}:${hero}`, () => {
+		const themes = (Object.keys(THEME_CLASS) as WordTheme[]).filter(
+			(theme) =>
+				(story.item ?? []).includes(THEME_CLASS[theme]) &&
+				(!story.itemThemes || story.itemThemes.includes(theme))
+		);
 
-	return themes.filter((theme) => tellable(data, story, hero, theme));
+		return themes.filter((theme) => tellable(data, story, hero, theme));
+	});
 }
 
 /**
@@ -554,20 +593,22 @@ export function propThemesFor(
 	story: Story,
 	hero: NounClass
 ): readonly WordTheme[] {
-	const steps = story.steps.filter((step) => step.object === 'prop');
+	return remembered(data, `prop:${story.name}:${hero}`, () => {
+		const steps = story.steps.filter((step) => step.object === 'prop');
 
-	if (!story.prop || !steps.length) {
-		return [];
-	}
+		if (!story.prop || !steps.length) {
+			return [];
+		}
 
-	return (Object.keys(THEME_CLASS) as WordTheme[]).filter(
-		(theme) =>
-			story.prop!.includes(THEME_CLASS[theme]) &&
-			(!story.propThemes || story.propThemes.includes(theme)) &&
-			steps.every((step) =>
-				fieldsOf(step).some((field) => groupsOf(data, field, hero, theme, true).length > 0)
-			)
-	);
+		return (Object.keys(THEME_CLASS) as WordTheme[]).filter(
+			(theme) =>
+				story.prop!.includes(THEME_CLASS[theme]) &&
+				(!story.propThemes || story.propThemes.includes(theme)) &&
+				steps.every((step) =>
+					fieldsOf(step).some((field) => groupsOf(data, field, hero, theme, true).length > 0)
+				)
+		);
+	});
 }
 
 // The fields a step may be told twice in one story. Going, arriving, rising,

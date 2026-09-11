@@ -1385,23 +1385,35 @@ Map<SentenceSlot, LengthRange> _slotBounds(WordLanguage language) {
   return bounds;
 }
 
+final Expando<LengthRange> _articleCache = Expando<LengthRange>('articleSpan');
+
 /// The longest and shortest article the language can open a phrase with.
+///
+/// Held on to, because it is a property of the language and [_partRange] asks
+/// for it once per noun phrase of every shape it measures — which was three
+/// percent of a paragraph spent walking the same dozen articles.
 LengthRange _articleSpan(SentenceLanguageData data) {
+  final cached = _articleCache[data];
+
+  if (cached != null) return cached;
+
   final articles = data.articles;
-
-  if (articles == null) return const LengthRange(0, 0);
-
   var min = 1 << 30;
   var max = 0;
 
-  for (final rules in articles.values) {
+  for (final rules in (articles ?? const <WordGender, List<List<String>>>{}).values) {
     for (final rule in rules) {
       if (rule[1].length < min) min = rule[1].length;
       if (rule[1].length > max) max = rule[1].length;
     }
   }
 
-  return LengthRange(min == 1 << 30 ? 0 : min, max);
+  final span =
+      articles == null ? const LengthRange(0, 0) : LengthRange(min == 1 << 30 ? 0 : min, max);
+
+  _articleCache[data] = span;
+
+  return span;
 }
 
 int _tailMin(SentencePart part) {
@@ -1464,6 +1476,19 @@ LengthRange _partRange(
   );
 }
 
+/// What a shape can be, by the shape and the bounds it was measured against.
+///
+/// Both are held rather than rebuilt: the language's own [_slotBounds] is one
+/// map reused for every call, and the narrowed one a named result uses is built
+/// once per language — so keying on identity never grows.
+///
+/// Worth holding because this is the hottest thing a paragraph does. Every shape
+/// of the language is measured to pick a kind, again to pick a shape, again per
+/// attempt, and again for every sentence; it and [_partRange] together were a
+/// fifth of the time a paragraph took.
+final Expando<Map<Map<SentenceSlot, LengthRange>, LengthRange>> _frameRangeCache =
+    Expando<Map<Map<SentenceSlot, LengthRange>, LengthRange>>('frameRange');
+
 /// Shortest and longest sentence a shape can produce.
 LengthRange _frameRange(
   SentenceFrame frame,
@@ -1471,6 +1496,12 @@ LengthRange _frameRange(
   Map<SentenceSlot, LengthRange> bounds,
   LengthRange modifier,
 ) {
+  final byBounds =
+      _frameRangeCache[frame] ??= Map<Map<SentenceSlot, LengthRange>, LengthRange>.identity();
+  final cached = byBounds[bounds];
+
+  if (cached != null) return cached;
+
   // Measured against the longest mark the language writes, so a shape is never
   // chosen for a range only the shortest one could have reached.
   var marks = 0;
@@ -1491,7 +1522,11 @@ LengthRange _frameRange(
     max += gap + range.max;
   }
 
-  return LengthRange(min, max);
+  final range = LengthRange(min, max);
+
+  byBounds[bounds] = range;
+
+  return range;
 }
 
 /// Every sentence length the language can produce.
@@ -1666,10 +1701,37 @@ String? _placeHeadFor(SentenceLanguageData data, String noun) {
   return null;
 }
 
-List<NounTrait> _traitsOf(SentenceLanguageData data, String noun) => <NounTrait>[
-  for (final entry in (data.traits ?? const <NounTrait, WordPool>{}).entries)
-    if (entry.value.contains(noun)) entry.key,
-];
+const List<NounTrait> _noTraits = <NounTrait>[];
+
+/// Every noun the language gives a trait to, as one lookup.
+///
+/// Built once per language rather than walked per question: [_acceptsNoun] asks
+/// this of every group it considers, and rebuilding the entry list and searching
+/// every pool each time was six percent of what a paragraph took.
+final Expando<Map<String, List<NounTrait>>> _traitCache = Expando<Map<String, List<NounTrait>>>(
+  'traits',
+);
+
+Map<String, List<NounTrait>> _traitsIndexOf(SentenceLanguageData data) {
+  final cached = _traitCache[data];
+
+  if (cached != null) return cached;
+
+  final index = <String, List<NounTrait>>{};
+
+  for (final entry in (data.traits ?? const <NounTrait, WordPool>{}).entries) {
+    for (final noun in entry.value) {
+      (index[noun] ??= <NounTrait>[]).add(entry.key);
+    }
+  }
+
+  _traitCache[data] = index;
+
+  return index;
+}
+
+List<NounTrait> _traitsOf(SentenceLanguageData data, String noun) =>
+    _traitsIndexOf(data)[noun] ?? _noTraits;
 
 /// Whether a verb group takes this noun as its subject, by what the noun can do.
 ///
@@ -3237,7 +3299,13 @@ _Built _generateOne(WordLanguage language, _Settings settings, _Draw draw) {
         return own.max >= range.min && own.min <= range.max && buildable(frame);
       })
       .toList(growable: false);
-  final loose = frames.where(buildable).toList(growable: false);
+  // Only asked for when nothing fits. `buildable` walks every verb group of the
+  // language against the shape, and computing it every time cost a quarter of
+  // what a Korean paragraph took to answer a question it usually never asks.
+  final loose =
+      fitting.isNotEmpty
+          ? const <SentenceFrame>[]
+          : frames.where(buildable).toList(growable: false);
   final usable = fitting.isNotEmpty ? fitting : (loose.isNotEmpty ? loose : frames);
   _Built? best;
   var bestDistance = 1 << 30;
@@ -3729,12 +3797,21 @@ LengthRange _modifierSpan(WordLanguage language) {
   return _modifierBounds[language]!;
 }
 
+final Map<WordLanguage, Map<SentenceSlot, LengthRange>> _roomCache =
+    <WordLanguage, Map<SentenceSlot, LengthRange>>{};
+
 Map<SentenceSlot, LengthRange> _roomFor(WordLanguage language, bool? includeName) {
   final bounds = _slotBounds(language);
 
-  return (includeName ?? false)
-      ? <SentenceSlot, LengthRange>{...bounds, SentenceSlot.subject: _nameSpan(language)}
-      : bounds;
+  if (!(includeName ?? false)) return bounds;
+
+  // Held rather than rebuilt, and not only to save the copy: [_frameRange] keys
+  // what it remembers on the bounds map it was handed, so a fresh one per
+  // sentence would be a fresh cache per sentence.
+  return _roomCache[language] ??= <SentenceSlot, LengthRange>{
+    ...bounds,
+    SentenceSlot.subject: _nameSpan(language),
+  };
 }
 
 /// Whether a result that writes a name can still land in the range the caller
