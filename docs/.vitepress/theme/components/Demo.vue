@@ -1,5 +1,5 @@
 <script setup>
-import { computed, onMounted, reactive, ref, watch } from 'vue';
+import { computed, nextTick, onMounted, reactive, ref, watch } from 'vue';
 import { useData } from 'vitepress';
 import {
 	NAME_LANGUAGES,
@@ -57,8 +57,42 @@ const LANGUAGE_NAMES = {
 
 const COUNT_MAX = 50;
 
+/**
+ * The four generators, as a real tab list.
+ *
+ * `role="tablist"` was on the row and nothing else of the pattern was: no panel
+ * for the tabs to control, and four buttons all in the tab order rather than one
+ * with the arrow keys moving between them. A screen reader was told "tab 1 of 4"
+ * about a control that pointed at nothing.
+ */
+const TABS = ['name', 'nickname', 'word', 'sentence'];
+
+const TAB_LABELS = {
+	name: 'demoNames',
+	nickname: 'demoNicknames',
+	word: 'demoWords',
+	sentence: 'demoSentences'
+};
+
 const tab = ref('name');
+const tablist = ref(null);
 const details = ref(false);
+
+/** Arrow keys move between the tabs, which is what makes the row one control. */
+function onTabKey(event) {
+	const at = TABS.indexOf(tab.value);
+	const step = { ArrowRight: 1, ArrowLeft: -1, Home: -at, End: TABS.length - 1 - at }[event.key];
+
+	if (step === undefined) {
+		return;
+	}
+
+	event.preventDefault();
+	tab.value = TABS[(at + step + TABS.length) % TABS.length];
+	// The focus follows the selection: the tab that is selected is the only one in
+	// the tab order, so leaving the focus behind would strand it outside.
+	nextTick(() => tablist.value?.querySelector('[aria-selected="true"]')?.focus());
+}
 
 /** A decorator, applied to whatever the generator returned. */
 const decorate = reactive({ kind: 'none', length: 5, separator: '_' });
@@ -455,46 +489,30 @@ async function copy() {
 
 <template>
 	<div class="randino-demo">
-		<div class="randino-demo-tabs" role="tablist">
+		<div ref="tablist" class="randino-demo-tabs" role="tablist" @keydown="onTabKey">
 			<button
+				v-for="item in TABS"
+				:id="`randino-demo-tab-${item}`"
+				:key="item"
 				type="button"
 				role="tab"
-				:aria-selected="tab === 'name'"
 				class="randino-demo-tab"
-				@click="tab = 'name'"
+				:aria-selected="tab === item"
+				:aria-controls="`randino-demo-panel-${item}`"
+				:tabindex="tab === item ? 0 : -1"
+				@click="tab = item"
 			>
-				{{ t(locale, 'demoNames') }}
-			</button>
-			<button
-				type="button"
-				role="tab"
-				:aria-selected="tab === 'nickname'"
-				class="randino-demo-tab"
-				@click="tab = 'nickname'"
-			>
-				{{ t(locale, 'demoNicknames') }}
-			</button>
-			<button
-				type="button"
-				role="tab"
-				:aria-selected="tab === 'word'"
-				class="randino-demo-tab"
-				@click="tab = 'word'"
-			>
-				{{ t(locale, 'demoWords') }}
-			</button>
-			<button
-				type="button"
-				role="tab"
-				:aria-selected="tab === 'sentence'"
-				class="randino-demo-tab"
-				@click="tab = 'sentence'"
-			>
-				{{ t(locale, 'demoSentences') }}
+				{{ t(locale, TAB_LABELS[item]) }}
 			</button>
 		</div>
 
-		<div class="randino-demo-body">
+		<div
+			:id="`randino-demo-panel-${tab}`"
+			class="randino-demo-body"
+			role="tabpanel"
+			:aria-labelledby="`randino-demo-tab-${tab}`"
+			tabindex="0"
+		>
 			<div v-if="tab === 'name'" class="randino-demo-fields">
 				<label class="randino-demo-field">
 					<span><code>language</code></span>
@@ -874,7 +892,7 @@ async function copy() {
 				</button>
 			</div>
 
-			<ul v-if="rows.length" class="randino-demo-output">
+			<ul v-if="rows.length" class="randino-demo-output" aria-live="polite" aria-atomic="false">
 				<li v-for="(row, index) in rows" :key="index">
 					<span class="randino-demo-value">{{ row.text }}</span>
 					<span v-if="row.meta" class="randino-demo-meta">

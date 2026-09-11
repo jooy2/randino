@@ -104,9 +104,13 @@ function onMenuKey(event) {
 			closeMenu(true);
 			break;
 		case 'Tab':
-			// Not `preventDefault` — the focus is meant to leave, the menu is not
-			// meant to be left behind open.
-			closeMenu();
+			// The focus is meant to leave and the menu is not meant to be left behind
+			// open — but the menu is `v-if`'d, so letting the browser move on from an
+			// option that is about to stop existing drops the focus on the document.
+			// Closing first and putting it back on the button is what leaves Tab
+			// somewhere to go from.
+			event.preventDefault();
+			closeMenu(true);
 			break;
 	}
 }
@@ -136,6 +140,7 @@ watch(
 			type="button"
 			class="randino-lang-button"
 			aria-haspopup="listbox"
+			aria-controls="randino-lang-list"
 			:aria-expanded="open"
 			aria-labelledby="randino-lang-label randino-lang-current"
 			@click="open ? closeMenu() : openMenu()"
@@ -169,7 +174,12 @@ watch(
 			<!-- The hint is a sibling of the list rather than a child of it: a
 			     `listbox` whose children are not all `option`s is a listbox screen
 			     readers have to guess at. -->
-			<div class="randino-lang-list" role="listbox" :aria-label="t(locale, 'languageSelect')">
+			<div
+				id="randino-lang-list"
+				class="randino-lang-list"
+				role="listbox"
+				:aria-label="t(locale, 'languageSelect')"
+			>
 				<button
 					v-for="item in CODE_LANGUAGES"
 					:key="item.id"
