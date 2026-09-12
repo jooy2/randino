@@ -2,6 +2,8 @@
 
 ## vNext (2026--)
 
+## 1.2.0 (2026-09-12)
+
 - **Every generator and every decorator takes a `random`.** A function returning a number in `[0, 1)`, the way `Math.random` does — which is still the default, and is neither cryptographically secure nor reproducible. Pass `crypto.getRandomValues` for a token nobody may predict, or a seeded generator for a fixture that has to come out the same every run. One source answers every draw a call makes, including the ones a generator makes through another, so the name `randSentence` writes comes from the same place the sentence did.
 - **Four smaller things.** `randModifier` reads a Spanish, Italian or German noun as its own language instead of as English — the Latin alphabet says nothing, so the three that carry a gender per noun are asked whether the word is theirs, and `gato` comes back `gato saboreado` rather than `Solargato`. `nameSupportsRoman` is read off the pools rather than off the language code, so a Latin-script language added tomorrow with no marks in its names answers correctly. A length range the wrong way round keeps `maxLength` rather than `minLength`, which is the bound a caller is holding to — `{ minLength: 30, maxLength: 5 }` used to read as `[30, 30]`. And a word that was in both the adjective and the action pool is in one of them: Spanish, Italian and German each held a participle twice, which drew it twice as often as its neighbours and left `kind` unable to say which pool it came from.
 - **The JavaScript package requires Node 22.** `engines` read `>=18` and nothing had ever run there: the workflow tests 22, 24 and 25, and `npm run test` itself needs `node --import`, which is Node 20.6 and later. A floor nobody runs is a guess, and this one is now the lowest version CI actually uses.
