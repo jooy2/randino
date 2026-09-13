@@ -221,6 +221,38 @@ def test_rand_modifier_follows_the_script_of_the_value_when_no_language_is_given
         assert belongs(rand_modifier("고양이", language="en"), "en")
 
 
+def test_rand_modifier_reads_a_latin_or_cyrillic_value_as_the_language_that_has_the_word() -> None:
+    # The Latin alphabet says nothing about which of four languages a word is in, so the
+    # three that carry a gender per noun are asked whether it is theirs, and Cyrillic is
+    # Russian. `gato` used to come back `Solargato`.
+    words: list[tuple[str, WordLanguage]] = [
+        ("gato", "es"),
+        ("gatto", "it"),
+        ("Katze", "de"),
+        ("katze", "de"),
+        ("кот", "ru"),
+        ("Owl", "en"),
+    ]
+
+    for word, language in words:
+        data = WORD_DATA[language]
+        modifiers = set(modifiers_of(data)) | {
+            agree(data, each, form)
+            for form in (data.agreement or {})
+            for each in modifiers_of(data)
+        }
+        follows = modifier_follows(data)
+
+        for _ in range(20):
+            decorated = rand_modifier(word)
+            attached = (
+                decorated[len(word) :] if follows else decorated[: len(decorated) - len(word)]
+            )
+
+            assert decorated.startswith(word) if follows else decorated.endswith(word), decorated
+            assert attached.strip() in modifiers, f"{word}: {decorated} is not {language}"
+
+
 def test_rand_modifier_takes_a_separator_a_realism_and_a_list() -> None:
     for _ in range(SAMPLE):
         assert re.fullmatch(r"[A-Za-z]+ Owl", rand_modifier("Owl", language="en", separator=" "))

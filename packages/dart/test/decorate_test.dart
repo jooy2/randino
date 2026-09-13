@@ -222,6 +222,45 @@ void main() {
       expect(both.any(wordData[WordLanguage.ko]!.actions.contains), isTrue);
     });
 
+    test('randModifier reads a Latin or Cyrillic value as the language that has the word', () {
+      // The Latin alphabet says nothing about which of four languages a word is
+      // in, so the three that carry a gender per noun are asked whether it is
+      // theirs, and Cyrillic is Russian. `gato` used to come back `Solargato`.
+      final words = <(String, WordLanguage)>[
+        ('gato', WordLanguage.es),
+        ('gatto', WordLanguage.it),
+        ('Katze', WordLanguage.de),
+        ('katze', WordLanguage.de),
+        ('кот', WordLanguage.ru),
+        ('Owl', WordLanguage.en),
+      ];
+
+      for (final (word, language) in words) {
+        final data = wordData[language]!;
+        final modifiers = <String>{
+          ...modifiersOf(data),
+          for (final form in data.agreement?.keys ?? const <WordGender>[])
+            for (final each in modifiersOf(data)) agree(data, each, form),
+        };
+        final follows = modifierFollows(data);
+
+        for (var i = 0; i < 20; i += 1) {
+          final decorated = randModifier(value: word);
+          final attached =
+              follows
+                  ? decorated.substring(word.length)
+                  : decorated.substring(0, decorated.length - word.length);
+
+          expect(decorated, follows ? startsWith(word) : endsWith(word), reason: decorated);
+          expect(
+            modifiers,
+            contains(attached.trim()),
+            reason: '$word: $decorated is not ${language.name}',
+          );
+        }
+      }
+    });
+
     test('randModifier follows the script of the value when no language is given', () {
       bool belongs(String word, WordLanguage language) =>
           modifiersOf(wordData[language]!).any(word.startsWith);

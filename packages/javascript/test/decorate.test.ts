@@ -247,6 +247,38 @@ describe('Decorate', () => {
 		}
 	});
 
+	it('randModifier reads a Latin or Cyrillic value as the language that has the word', () => {
+		// The Latin alphabet says nothing about which of four languages a word is in,
+		// so the three that carry a gender per noun are asked whether it is theirs, and
+		// Cyrillic is Russian. `gato` used to come back `Solargato`.
+		for (const [word, language] of [
+			['gato', 'es'],
+			['gatto', 'it'],
+			['Katze', 'de'],
+			['katze', 'de'],
+			['кот', 'ru'],
+			['Owl', 'en']
+		] as [string, WordLanguage][]) {
+			const data = WORD_DATA[language];
+			const forms = Object.keys(data.agreement ?? {}) as WordGender[];
+			const modifiers = new Set([
+				...modifiersOf(language),
+				...forms.flatMap((form) => modifiersOf(language).map((each) => agree(data, each, form)))
+			]);
+			const follows = modifierFollows(data);
+
+			for (let i = 0; i < 20; i += 1) {
+				const decorated = randModifier(word);
+				const attached = follows
+					? decorated.slice(word.length)
+					: decorated.slice(0, decorated.length - word.length);
+
+				assert.ok(follows ? decorated.startsWith(word) : decorated.endsWith(word), decorated);
+				assert.ok(modifiers.has(attached.trim()), `${word}: ${decorated} is not ${language}`);
+			}
+		}
+	});
+
 	it('randModifier takes a separator, a realism and a list', () => {
 		for (let i = 0; i < SAMPLE; i += 1) {
 			assert.match(randModifier('Owl', { language: 'en', separator: ' ' }), /^[A-Za-z]+ Owl$/);

@@ -7,6 +7,44 @@ import 'package:randino/src/types.dart';
 import 'package:randino/src/word/data/index.dart';
 import 'package:randino/src/word/word_generator.dart';
 
+// The Latin-script languages that carry a gender per noun, and so can answer
+// whether a word is theirs in one lookup.
+const List<WordLanguage> _inflecting = <WordLanguage>[
+  WordLanguage.es,
+  WordLanguage.it,
+  WordLanguage.de,
+];
+
+/// The language a value is written in, for a caller who named none.
+///
+/// The script answers it wherever the script says which: Hangul is Korean, kana
+/// Japanese, han Chinese, Cyrillic Russian, and Latin with Vietnamese marks on it
+/// Vietnamese. What is left is the Latin alphabet, which English, Spanish,
+/// Italian and German share — so the three of those that carry a gender per noun
+/// are asked whether the word is one of theirs, which is one lookup each.
+/// English is what nobody claims.
+///
+/// A word none of them holds and no script places is English, which is the most
+/// a single word can be asked to say: `gato` is Spanish because Spanish has it,
+/// and an invented Latin word is nobody's.
+WordLanguage _languageOf(String value) {
+  final byScript = detectLanguage(value);
+
+  if (byScript != WordLanguage.en) {
+    return byScript;
+  }
+
+  for (final code in _inflecting) {
+    final nouns = wordData[code]!.nounGender;
+
+    if (nouns != null && (nouns.containsKey(value) || nouns.containsKey(capitalizeFirst(value)))) {
+      return code;
+    }
+  }
+
+  return WordLanguage.en;
+}
+
 /// Draws one modifier, and reports the separator its language joins with.
 ///
 /// Internal — shared by [randModifier] and `randModifierAll`.
@@ -20,7 +58,7 @@ import 'package:randino/src/word/word_generator.dart';
   // The language of the word being decorated, so that '고양이' is not handed an
   // English modifier. Only consulted when the caller left the language out.
   final WordLanguage code =
-      language ?? (value == null ? pick(wordLanguages) : detectLanguage(value));
+      language ?? (value == null || value.isEmpty ? pick(wordLanguages) : _languageOf(value));
   final data = wordData[code]!;
   final pool = modifiersOf(data, kind);
   final bounds = poolBounds(pool);

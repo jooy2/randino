@@ -5,8 +5,8 @@ from typing import Literal, overload
 
 from randino._internal.generate import draw_language, resolve_realism
 from randino._internal.script import detect_language
-from randino._internal.utils import with_random
-from randino._types import ModifierKind, RandRealism, WordLanguageOption
+from randino._internal.utils import capitalize_first, with_random
+from randino._types import ModifierKind, RandRealism, WordLanguage, WordLanguageOption
 from randino.word._generator import (
     agree,
     draw_word,
@@ -16,6 +16,37 @@ from randino.word._generator import (
     pool_bounds,
 )
 from randino.word.data import WORD_DATA, WORD_LANGUAGES
+
+# The Latin-script languages that carry a gender per noun, and so can answer whether a
+# word is theirs in one lookup.
+_INFLECTING: tuple[WordLanguage, ...] = ("es", "it", "de")
+
+
+def _language_of(value: str) -> WordLanguage:
+    """The language a value is written in, for a caller who named none.
+
+    The script answers it wherever the script says which: Hangul is Korean, kana
+    Japanese, han Chinese, Cyrillic Russian, and Latin with Vietnamese marks on it
+    Vietnamese. What is left is the Latin alphabet, which English, Spanish, Italian and
+    German share — so the three of those that carry a gender per noun are asked whether
+    the word is one of theirs, which is one lookup each. English is what nobody claims.
+
+    A word none of them holds and no script places is English, which is the most a
+    single word can be asked to say: `gato` is Spanish because Spanish has it, and an
+    invented Latin word is nobody's.
+    """
+    by_script = detect_language(value)
+
+    if by_script != "en":
+        return by_script
+
+    for code in _INFLECTING:
+        nouns = WORD_DATA[code].noun_gender
+
+        if nouns and (value in nouns or capitalize_first(value) in nouns):
+            return code
+
+    return "en"
 
 
 def _draw(
@@ -27,7 +58,7 @@ def _draw(
     """One modifier, the separator its language joins with, and which side it goes."""
     # The language of the word being decorated, so that `"고양이"` is not handed an
     # English modifier. Only consulted when the caller left `language` out.
-    requested = language or (detect_language(value) if value is not None else "all")
+    requested = language or (_language_of(value) if value else "all")
     code = draw_language(requested, WORD_LANGUAGES)
     data = WORD_DATA[code]
     pool = modifiers_of(data, kind)
