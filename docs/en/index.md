@@ -129,12 +129,13 @@ Every option is optional, so the shortest call returns one name in one of the ni
 | A username that cannot collide | <Lang js="randSuffix(randNickname())" dart="randSuffix(value: randNickname().first)" py="rand_suffix(rand_nickname())" code /> |
 | Placeholder paragraphs | <Lang js="randSentence({ sentences: 3 })" dart="randSentence(sentences: 3)" py="rand_sentence(sentences=3)" code /> |
 | Coupon codes and unique tokens | <Lang js="randSuffix()" dart="randSuffix()" py="rand_suffix()" code /> |
+| A city and region for a sample profile | <Lang js="randLocation({ language: 'en', level: 'city' })" dart="randLocation(language: LocationLanguage.en, level: LocationLevel.city)" py="rand_location(language=&quot;en&quot;, level=&quot;city&quot;)" code /> |
 | A set of words on one theme | <Lang js="randAnimal({ count: 10 })" dart="randAnimal(count: 10)" py="rand_animal(count=10)" code /> |
 | A field with a length limit | <Lang js="randNickname({ maxLength: 12 })" dart="randNickname(maxLength: 12)" py="rand_nickname(max_length=12)" code /> |
 
 ## One set of options, every generator {#one-set-of-options}
 
-How many, how long, which first character, and whether to deduplicate are the same options under the same names on all four generators. What you learn on `randName` works on `randNickname`, `randWord` and `randSentence`.
+How many, how long, which first character, and whether to deduplicate are the same options under the same names on every generator. What you learn on `randName` works on `randNickname`, `randWord`, `randSentence` and `randLocation`.
 
 <Lang js="count" dart="count" py="count" code /> is how many you get back, <Lang js="minLength" dart="minLength" py="min_length" code /> and <Lang js="maxLength" dart="maxLength" py="max_length" code /> bound the characters, <Lang js="startsWith" dart="startsWith" py="starts_with" code /> fixes the first one, `unique` rules out duplicates inside one call, and `realism` decides between real words and invented ones that only read like the language.
 

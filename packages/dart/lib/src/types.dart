@@ -658,3 +658,81 @@ class NicknameDetail {
   @override
   String toString() => 'NicknameDetail($nickname, $words, ${language.name}, ${theme?.name})';
 }
+
+/// A language the location generators can write in.
+///
+/// Each one writes the places of its own country — [ko] the divisions of South
+/// Korea, [en] the states and places of the United States — and a language whose
+/// country publishes no dataset that can be shipped without conditions is not
+/// one of them. Wherever one of these is optional, `null` means every language.
+enum LocationLanguage {
+  /// English, which writes the places of the United States.
+  en,
+
+  /// Korean, which writes the places of South Korea.
+  ko,
+}
+
+/// How far down a location goes, largest first.
+///
+/// Not every country has every level: the United States stops at [city]. Nothing
+/// goes below [district], and no location ever names a street or a building, so
+/// a result cannot point at anybody's address.
+enum LocationLevel {
+  /// The country itself: `대한민국`, `United States`.
+  country,
+
+  /// Its first-level division — a Korean 시·도, a US state.
+  region,
+
+  /// The division a city, county or district is — a Korean 시·군·구, a US city,
+  /// town, village or census designated place.
+  city,
+
+  /// The division inside a city — a Korean 읍·면·동.
+  district,
+}
+
+/// A generated location with every level it was built from.
+class LocationDetail {
+  /// Creates a detail record. Returned by the generator; there is rarely a
+  /// reason to build one by hand outside a test.
+  const LocationDetail({
+    required this.location,
+    required this.language,
+    required this.level,
+    required this.country,
+    required this.region,
+    required this.city,
+    required this.district,
+  });
+
+  /// What the value form returns: one division's name, or the whole location
+  /// written out.
+  final String location;
+
+  /// The language, and so the country, this location was drawn from.
+  final LocationLanguage language;
+
+  /// The deepest level the result names.
+  final LocationLevel level;
+
+  /// The country, the way [language] writes its own.
+  final String country;
+
+  /// The first-level division, or `null` for a result that does not reach it.
+  final String? region;
+
+  /// The city, or `null` for a level the result does not reach, or one its
+  /// country does not have there.
+  final String? city;
+
+  /// The district, or `null` for a level the result does not reach, or one its
+  /// country does not have there.
+  final String? district;
+
+  @override
+  String toString() =>
+      'LocationDetail($location, ${language.name}, ${level.name}, '
+      '$country, $region, $city, $district)';
+}

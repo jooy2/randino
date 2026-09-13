@@ -19,14 +19,15 @@
  * decides nothing but its URL.
  *
  * **Generators** is the one that goes a level deeper, into **General** — the
- * four that generate a kind of text — and **Words**, the twenty-nine themed forms
- * of `randWord`. Thirty-three entries in one list would bury the four, and the
- * twenty-nine are `randWord` with its argument decided rather than twenty-nine
- * separate ideas, so they sit beside the four rather than among them.
+ * five that generate a kind of text — and two groups of the same function with
+ * one argument decided: **Words**, the twenty-nine themed forms of `randWord`, and
+ * **Locations**, the four level forms of `randLocation`. Thirty-eight entries in
+ * one list would bury the five, so the forms sit beside them rather than among
+ * them.
  *
- * Words is also the one group the navbar's API dropdown leaves out, which it
- * says itself with `sidebarOnly`: twenty-nine names for one function is a wall in
- * a menu, and the dropdown already points at the function they all are.
+ * Words and Locations are the groups the navbar's API dropdown leaves out, which
+ * they say themselves with `sidebarOnly`: the dropdown already points at the
+ * function each of them is.
  *
  * **Behaviour** holds the prose explaining how a generator's options behave,
  * where there is enough of it to be its own page — `randName`, `randNickname`
@@ -93,7 +94,19 @@ export const SIDEBAR: SidebarGroup[] = [
 							{ path: 'name/rand-name', en: 'randName', ko: 'randName' },
 							{ path: 'nickname/rand-nickname', en: 'randNickname', ko: 'randNickname' },
 							{ path: 'word/rand-word', en: 'randWord', ko: 'randWord' },
-							{ path: 'sentence/rand-sentence', en: 'randSentence', ko: 'randSentence' }
+							{ path: 'sentence/rand-sentence', en: 'randSentence', ko: 'randSentence' },
+							{ path: 'location/rand-location', en: 'randLocation', ko: 'randLocation' }
+						]
+					},
+					{
+						en: 'Locations',
+						ko: '위치',
+						sidebarOnly: true,
+						items: [
+							{ path: 'location/rand-country', en: 'randCountry', ko: 'randCountry' },
+							{ path: 'location/rand-region', en: 'randRegion', ko: 'randRegion' },
+							{ path: 'location/rand-city', en: 'randCity', ko: 'randCity' },
+							{ path: 'location/rand-district', en: 'randDistrict', ko: 'randDistrict' }
 						]
 					},
 					{
@@ -251,7 +264,7 @@ function groupById(entries: (SidebarPage | SidebarGroup)[], id: string): Sidebar
  * A group's pages used to be `items.filter(isPage)`, which stopped being the
  * whole answer the moment **Generators** held its three in a **General**
  * subgroup rather than directly. Recursing is what keeps the dropdown showing
- * the same functions the sidebar section does; `sidebarOnly` is how the one
+ * the same functions the sidebar section does; `sidebarOnly` is how a
  * subgroup that would flood it says so.
  */
 function pagesOf(group: SidebarGroup): SidebarPage[] {

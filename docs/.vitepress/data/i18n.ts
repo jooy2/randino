@@ -95,6 +95,41 @@ const strings = {
 		ko: '문자열, 또는 단어마다 WordDetail 하나.',
 		en: 'Strings, or one WordDetail per word.'
 	},
+	/* `LocationOptions.vue` — the table `randLocation` and its four level functions
+	   share. The column headings and `optionRandom` are the ones above. */
+	optionNoBound: { ko: '제한 없음', en: 'no bound' },
+	optionLocationLanguage: {
+		ko: '어느 언어로, 곧 어느 나라의 위치를 쓸지. 생략하면 결과마다 하나씩 골라 섞습니다.',
+		en: 'Which language, and so which country, the places are from. Left out, it picks one per result and mixes them.'
+	},
+	optionLevel: {
+		ko: '어느 단계까지 쓸지. 그 단계가 없는 나라는 가진 단계 중 가장 낮은 곳에서 멈춥니다.',
+		en: 'How far down the location goes. A country without that level stops at the deepest one it has.'
+	},
+	optionLocationCount: {
+		ko: '돌려줄 결과 개수. 0 … 10000으로 제한됩니다.',
+		en: 'How many results to return. Clamped to 0 … 10000.'
+	},
+	optionLocationMinLength: {
+		ko: '최소 글자 수. 결과 문자열 전체의 길이입니다.',
+		en: 'Minimum length in characters, of the whole string returned.'
+	},
+	optionLocationMaxLength: {
+		ko: '최대 글자 수. 맞는 곳이 없으면 가장 가까운 길이의 위치로 답합니다.',
+		en: 'Maximum length in characters. A range nothing fits is answered with the closest length there is.'
+	},
+	optionLocationStartsWith: {
+		ko: '이 글자로 시작하는 결과만 남깁니다.',
+		en: 'Keep only results whose first character is this one.'
+	},
+	optionLocationUnique: {
+		ko: '같은 결과를 두 번 돌려주지 않습니다. 목록이 바닥나면 요청보다 적게 돌아옵니다.',
+		en: 'Never return the same result twice. Returns fewer than asked once the list runs out.'
+	},
+	optionLocationOutput: {
+		ko: '문자열, 또는 결과마다 LocationDetail 하나.',
+		en: 'Strings, or one LocationDetail per result.'
+	},
 	/* The demo page. Its controls are labelled with the option names themselves,
 	   so these are only the parts that are not identifiers. */
 	demoNames: { ko: '사람 이름', en: 'Person names' },

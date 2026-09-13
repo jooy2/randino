@@ -10,12 +10,13 @@ Every option and every example, with **JavaScript** picked in the sidebar. This 
 
 ---
 
-**randino** generates random person names, nicknames, words and sentences in the language you ask for.
+**randino** generates random person names, nicknames, words, sentences and real locations in the language you ask for.
 
 - **Person names** read like names people carry: Emma Clover, Jack Reeves, each with its English pronunciation. 9 languages.
 - **Nicknames** are handles for a game or a website: MistyOwl, CraneVoyage, RustyBoot. Built from everyday words across twenty-nine themes, and never from person names.
 - **Words** are those themes on their own: `randWord`, plus `randAnimal`, `randFood` and twenty-seven more.
 - **Sentences** are whole statements in the language's own grammar, from `randSentence`. The verb decides what can stand beside it, so the words of one sentence belong together.
+- **Locations** are real places down to a neighbourhood or a city, from `randLocation`: Korean and US divisions, as each country publishes them.
 - **Decorators** attach something to a string you already have: `randSuffix`, `randPrefix` and `randModifier`.
 - One options object per generator, every option optional: `randName()` on its own works.
 - **No runtime dependencies.** ESM, typed, and it runs in Node and in the browser alike.
@@ -197,6 +198,39 @@ sentenceLengthRange('en'); // [12, 92]
 `include` puts words you name into every sentence. A word the pools hold goes in the phrase it belongs to, and a word from anywhere else is used as a noun.
 
 `type` is what the sentence does: a statement, a question, an exclamation, a line that trails off, or one somebody says or thinks. `style` is the speech level, which Korean writes four of. `sentences` puts up to ten of them in one string, about one subject. `includeName` puts a generated person's name where a person can stand. Left out, the three of them are drawn per result.
+
+## Locations
+
+Real places, written out from the country down the way the language writes one. Every division is one the country itself publishes, inside the one written beside it, and nothing goes below a Korean 읍·면·동 or a US city, so a result is never somebody's address. Korean and English only: a country is in when its list comes with no conditions a user of this package would inherit.
+
+```javascript
+import { randCity, randDistrict, randLocation, randRegion } from 'randino';
+
+randLocation({ language: 'ko', count: 2 });
+// ['대한민국 경기도 양평군 단월면', '대한민국 충청북도 청주시 서원구 미평동']
+randLocation({ language: 'en', level: 'city' });
+// ['Gig Harbor, Washington, United States']
+
+randRegion({ language: 'en', count: 3 }); // ['Idaho', 'Georgia', 'Vermont']
+randCity({ language: 'ko', count: 3 }); // ['함안군', '영덕군', '여수시']
+randDistrict({ count: 3 }); // ['가현동', '겸면', '행주외동']
+
+randLocation({ language: 'ko', output: 'detail' });
+// [{ location: '대한민국 전남광주통합특별시 서구 양동', language: 'ko', level: 'district',
+//    country: '대한민국', region: '전남광주통합특별시', city: '서구', district: '양동' }]
+```
+
+| Option                    | Type                    | Default      |
+| ------------------------- | ----------------------- | ------------ |
+| `language`                | `'all' \| 'ko' \| 'en'` | `'all'`      |
+| `level`                   | `LocationLevel`         | `'district'` |
+| `count`                   | `number`                | `1`          |
+| `minLength` / `maxLength` | `number`                | —            |
+| `startsWith`              | `string`                | —            |
+| `unique`                  | `boolean`               | `false`      |
+| `output`                  | `'value' \| 'detail'`   | `'value'`    |
+
+`level` is how far down the location goes: `country`, `region`, `city` or `district`. A country without that level stops at the deepest one it has, so an English location ends at its city. `randCountry`, `randRegion`, `randCity` and `randDistrict` take the same options minus `level`, and hand back that one division's name.
 
 ## Decorators
 

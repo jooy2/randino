@@ -4,14 +4,15 @@ Guidance for AI agents (and humans) working in this repository. Written in Engli
 
 ## What randino is
 
-**randino** is a zero-dependency library that generates random **person names**, **nicknames** and **everyday words**, per language. It ships for more than one programming language — TypeScript, Dart and Python — and every one of them generates from the same datasets under the same rules. Separate concerns, deliberately:
+**randino** is a zero-dependency library that generates random **person names**, **nicknames**, **everyday words**, **sentences** and **locations**, per language. It ships for more than one programming language — TypeScript, Dart and Python — and every one of them generates from the same datasets under the same rules. Separate concerns, deliberately:
 
 - **Names** should read like names a person actually carries (`김민준`, `Emma Clover`). Sample data for forms, seeds, mockups.
 - **Nicknames** are the handles someone would pick for a game or a website (`멋진사자`, `MistyOwl`). They are built from everyday words and **never from person names** — that rule is the whole point of keeping the two apart.
 - **Words** are those everyday words on their own (`여우`, `Lantern`), one theme at a time. `randWord` takes the theme as an option, and the twenty-nine `randAnimal` / `randFood` / … functions are the same generator with the theme already chosen.
 - **Sentences** are whole statements in the language's own grammar (`여우가 사과를 먹는다.`, `The brave lion runs quietly.`). They draw the same nouns a nickname does, and what they add is everything a sentence needs beside them — a verb in the form a statement ends on, the particles, the articles and the shapes.
+- **Locations** are real places, written out from the country down (`대한민국 경기도 수원시 장안구 파장동`, `Pasadena, California, United States`). Nothing about them is invented: every division is one the country publishes, inside the one written beside it, and nothing goes below a Korean 읍·면·동 or a US city — no street, no building, no number. `randLocation` takes the level as an option, and `randCountry` / `randRegion` / `randCity` / `randDistrict` hand back one level's name alone. **Two languages, not nine**, and on purpose — see the location bullets below.
 
-All four are implemented. Keep the generators apart — a shared "generator" abstraction is not wanted — but the options they all take, and the loop that draws until it has `count` results, live in `_internal/generate` and are shared. So are the word pools: `word/data` is the one dataset, and `nickname` consumes it.
+All five are implemented. Keep the generators apart — a shared "generator" abstraction is not wanted — but the options they all take, and the loop that draws until it has `count` results, live in `_internal/generate` and are shared. So are the word pools: `word/data` is the one dataset, and `nickname` consumes it.
 
 Beside them sits **decorate**, which generates nothing on its own: it attaches something to a string you already have. `randSuffix` and `randPrefix` attach a random token (`멋진사자` → `멋진사자_nVtRC`); `randModifier` attaches a word out of the pools (`사자` → `멋진사자`). All three used to be nickname options — `uniqueSuffix*` and `includeModifier` — and all three moved out for the same reason: decorating a string was never a thing about nicknames. **Every decorator works with no value at all**, handing back the token or the word it would have attached, because what it attaches is worth having on its own.
 
@@ -19,7 +20,7 @@ That is the third group, and the three of them are why the split is not generato
 
 The name generator is a port of the logic behind vutools' [Random Person Name Generator](https://www.vutools.com/tools/text/random-person-name-generator) (`client/src/app/[locale]/tools/text/random-person-name-generator` in the `www-vutools-com` repo), with the same options. Two deliberate differences: the web page's `es-hangul` dependency is replaced by an internal romanizer (see below), and length bounds are resolved per language so `language: 'all'` does not stretch a Korean name to fill a Spanish name's range.
 
-The nickname, word and sentence generators have no upstream — they are this repo's own. Their options mirror the name generator's where they mean the same thing: those live on `RandCommonOptions` (`count`, `realism`, `minLength` / `maxLength`, `startsWith`, `unique`, `output`), and each generator adds only what is its own. `randWord` adds `language` and `theme`; `randNickname` adds those plus `wordSeparator`; `randSentence` adds `shape`, `slots`, `include`, `sentences`, `type`, `quote`, `style` and `includeName`.
+The nickname, word, sentence and location generators have no upstream — they are this repo's own. Their options mirror the name generator's where they mean the same thing: those live on `RandCommonOptions` (`count`, `realism`, `minLength` / `maxLength`, `startsWith`, `unique`, `output`), and each generator adds only what is its own. `randWord` adds `language` and `theme`; `randNickname` adds those plus `wordSeparator`; `randSentence` adds `shape`, `slots`, `include`, `sentences`, `type`, `quote`, `style` and `includeName`; `randLocation` adds `language` and `level`, and takes no `realism`, because there is nothing to invent.
 
 **A new generator should add options, not repeat them.** If it counts, filters by a starting character or deduplicates, it calls `collect` in `_internal/generate` and gets all of that for free.
 
@@ -45,7 +46,7 @@ lib/
   constants.ts              # RAND_COUNT_MAX and the length bounds, shared by all
   _internal/
     utils.ts                # shared random/string helpers, never exported
-    parse.ts                # words() / tokens() / romanMap() dataset helpers
+    parse.ts                # words() / tokens() / romanMap() / outline() dataset helpers
     generate.ts             # the common options, and the draw loop (`collect`)
     script.ts               # which language a string is written in, by its script
   decorate/
@@ -94,9 +95,19 @@ lib/
       index.ts              # SENTENCE_DATA, THEME_CLASS, STORIES, FIELD_RULES
       types.ts              # internal dataset types (verbs, states, frames)
       en.ts ko.ts ja.ts …   # one file per language, nine of them
+  location/
+    index.ts
+    randLocation.ts         # public: string[], or LocationDetail[] likewise
+    randCountry.ts …        # public: one per level — country, region, city, district
+    locationGenerator.ts    # internal: the pools per level, the narrowing, the draw
+    data/
+      index.ts              # LOCATION_DATA, LOCATION_LANGUAGES, LOCATION_LEVELS
+      types.ts              # internal dataset types
+      en.ts ko.ts           # GENERATED by tools/location — never edited by hand
 test/
   base.test.ts              # the package's export surface
   decorate.test.ts          # one *.test.ts per category
+  location.test.ts
   name.test.ts
   nickname.test.ts
   sentence.test.ts
@@ -171,9 +182,12 @@ lib/
     nickname/               # mirrors lib/nickname
     sentence/               # mirrors lib/sentence, plus `randSentenceDetails`
       data/                 # one file per language, ported verbatim
+    location/               # mirrors lib/location, plus a `…Details` twin per function
+      data/                 # en.dart ko.dart GENERATED by tools/location
 test/
   base_test.dart            # the barrel's export surface, read out of the source
   decorate_test.dart
+  location_test.dart
   name_test.dart
   nickname_test.dart
   sentence_test.dart
@@ -208,7 +222,7 @@ example/
 Dart has neither overloads nor union types, so a function cannot hand back one type for one argument and another type for another. That costs two things, and both are the same limitation:
 
 - `randSuffix` takes a `String` and `randSuffixAll` takes a `List<String>`, where npm and PyPI have one function taking either. The same goes for `randModifier` / `randModifierAll`. And because Dart cannot make a positional parameter optional alongside named ones, the decorators' `value` is **named**: `randSuffix(value: 'a')`, so that `randSuffix()` can mean the bare token.
-- `randNameDetails`, `randNicknameDetails`, `randWordDetails` and `randSentenceDetails` still exist here. In the other two packages they are `output: 'detail'` on the generator itself; in Dart, `randName` returns `List<String>` and that is the end of it.
+- `randNameDetails`, `randNicknameDetails`, `randWordDetails`, `randSentenceDetails` and the five location `…Details` functions still exist here. In the other two packages they are `output: 'detail'` on the generator itself; in Dart, `randName` returns `List<String>` and that is the end of it.
 - `randSentence`'s `include` is a `List<String>` where the other two take a string or a list, for the same reason.
 - The **twenty-nine themed word functions have no detail form.** Thirty-two functions for one option would be the wrong trade, so `randAnimal` returns `List<String>` and a caller who wants the detail passes `WordTheme.animal` to `randWordDetails`. That asymmetry is documented on every one of them.
 
@@ -244,10 +258,13 @@ src/randino/
   nickname/                 # mirrors lib/nickname
   sentence/                 # mirrors lib/sentence
     data/                   # one file per language, ported verbatim
+  location/                 # mirrors lib/location
+    data/                   # en.py ko.py GENERATED by tools/location
   py.typed                  # PEP 561 — without it every annotation is ignored
 tests/
   test_base.py              # the barrel's export surface, and the no-dependency rule
   test_decorate.py
+  test_location.py
   test_name.py
   test_nickname.py
   test_sentence.py
@@ -326,7 +343,7 @@ Every variant is in the document and CSS hides all but one, which is what buys t
 
 `name/`, `nickname/`, `word/` and `decorate/` are four folders because those are four things in the source, and the sidebar deliberately does not repeat that split. A reader looking for `randNickname` is looking for a function, not for the corner of the library it belongs to, so the groups are what a function **is**:
 
-- **API**, which nests three groups by what a function *does with a string*: **Generators** make one out of nothing, **Decorators** attach something to one you already have (`randSuffix`, `randPrefix`, `randModifier`), and **Utilities** answer a question about a language (`nameLengthRange`, `wordLengthRange`, the two `nameSupports…`). Generators nests once more, into **General** — `randName`, `randNickname`, `randWord`, one per kind of text — and **Words**, the twenty-nine themed forms of the last of them. Thirty-three in one list would bury the three, and the twenty-nine are one function with an argument decided rather than twenty-nine ideas.
+- **API**, which nests three groups by what a function *does with a string*: **Generators** make one out of nothing, **Decorators** attach something to one you already have (`randSuffix`, `randPrefix`, `randModifier`), and **Utilities** answer a question about a language (`nameLengthRange`, `wordLengthRange`, the two `nameSupports…`). Generators nests once more, into **General** — `randName`, `randNickname`, `randWord`, `randSentence`, `randLocation`, one per kind of text — and two groups of one function with an argument decided: **Words**, the twenty-nine themed forms of `randWord`, and **Locations**, the four level forms of `randLocation`.
 - **Behaviour** — the prose explaining how a generator's options behave, where there is enough of it to be its own page. `randName` and `randNickname` have one each; `randWord` does not, because it draws one word and its API page says everything there is to say. Its own group rather than more entries under Guide, because it grows alongside Generators and Guide does not.
 
 `data/sidebar.ts` nests as deep as it is written: a `SidebarGroup`'s `items` are pages, or more groups, and `sidebarFor` recurses. **Three levels is the working limit** — API > Generators > Words is the deepest there is. The third level earns itself by splitting one group that had grown past reading, not by being a finer category: twenty-nine entries under Generators is a list nobody scans, and `randAnimal` is `randWord` with an argument decided, so `General` and `Words` is the split the functions themselves suggest. Anything that is merely *related* to a page still goes beside it, not under it.
@@ -335,9 +352,9 @@ Every variant is in the document and CSS hides all but one, which is what buys t
 
 There is **no exception for a family of functions**. `randAnimal` … `randFurniture` are twenty-nine names for `randWord` with its `theme` decided, and they have twenty-nine pages: a reader looking for `randAnimal` should find `randAnimal`, not a section of somebody else's page. What that would cost — the same option table written out thirty times, in two locales, with three packages' types in every cell — is paid by `WordOptions.vue` instead, which draws the table once and takes a `theme` prop for the one page that accepts the option rather than answering it. **A page repeated across pages is a component, not a reason to merge the pages.**
 
-Those twenty-nine are the **Words** group nested inside Generators, beside the **General** three — in one list with them they would bury them. Words is also the one group the navbar's API dropdown leaves out, and the group says so itself with `sidebarOnly`: `navGroupsFor` gathers a group's pages through its subgroups, and skips the ones marked. The Markdown that is left on each page is what actually differs: what the theme is, and three code samples of it.
+Those twenty-nine are the **Words** group nested inside Generators, beside **General** — in one list with it they would bury it. `LocationOptions.vue` does the same for `randLocation` and its four level pages, with a `level` prop. Words and Locations are the groups the navbar's API dropdown leaves out, and each says so itself with `sidebarOnly`: `navGroupsFor` gathers a group's pages through its subgroups, and skips the ones marked. The Markdown that is left on each page is what actually differs: what the theme is, and three code samples of it.
 
-The navbar is the same lists — its API dropdown is Generators, Decorators and Utilities as three labelled sections, built out of `data/sidebar.ts` by `navGroupsFor`, so the menu and the sections it points into cannot drift. Generators there is the three of **General**, because the only other thing in it is `sidebarOnly`. Its **Packages** dropdown is `PackageLinks.vue`, which is where npm, pub.dev and PyPI went when they stopped being three of the four icons in the navbar's right-hand corner; the registry URLs are still derived from the three manifests in `config.ts`, and GitHub is the one social link left. Its marks are `RegistryMark.vue` and not `LangMark.vue` — npm is not JavaScript and PyPI is not Python, and only pub.dev, which brands itself with the Dart logo, has the same drawing in both files.
+The navbar is the same lists — its API dropdown is Generators, Decorators and Utilities as three labelled sections, built out of `data/sidebar.ts` by `navGroupsFor`, so the menu and the sections it points into cannot drift. Generators there is **General**, because everything else in it is `sidebarOnly`. Its **Packages** dropdown is `PackageLinks.vue`, which is where npm, pub.dev and PyPI went when they stopped being three of the four icons in the navbar's right-hand corner; the registry URLs are still derived from the three manifests in `config.ts`, and GitHub is the one social link left. Its marks are `RegistryMark.vue` and not `LangMark.vue` — npm is not JavaScript and PyPI is not Python, and only pub.dev, which brands itself with the Dart logo, has the same drawing in both files.
 
 ### The demo runs the real library
 
@@ -403,15 +420,24 @@ tools/
     index.mjs             # writes the Dart and Python sentence datasets, then formats them
     sentence-data.ts      # the emitter: reads `SENTENCE_DATA`, writes each port's syntax
     README.md             # what it writes, what it leaves alone
+  location/
+    index.mjs             # writes all three packages' location datasets out of the publishers' files
+    README.md             # which files, their checksums, and what is kept of them
 ```
 
-The parity check runs from `.github/workflows/run-check-data.yml`, the one workflow that installs all three toolchains at once. The emitter runs by hand.
+The parity check runs from `.github/workflows/run-check-data.yml`, the one workflow that installs all three toolchains at once. The emitter and the location writer run by hand.
 
 ### `tools/emit` — the sentence datasets are written once
 
 `node tools/emit/index.mjs` reads `SENTENCE_DATA` out of the JavaScript package and writes `packages/dart/lib/src/sentence/data/<code>.dart` and `packages/python/src/randino/sentence/data/<code>.py` for every language, then runs `dart format` and `ruff format` over them. **Edit a sentence dataset in `packages/javascript` and regenerate**, rather than editing the three copies; the emitted files say at the top that they are generated, and a comment worth keeping goes in the JavaScript source.
 
 It covers the sentence datasets alone. The word and name datasets, the `index` files, `THEME_CLASS`, the stories and the field rules are still written by hand in all three, and `tools/parity` is what checks them. A generated file that fails to compile is a bug in `sentence-data.ts`, not something to patch in the file.
+
+### `tools/location` — the locations come from the publisher, not from JavaScript
+
+`node tools/location/index.mjs <sources>` reads the files each country publishes and writes `lib/location/data/<code>.ts`, `lib/src/location/data/<code>.dart` and `src/randino/location/data/<code>.py` at once, then formats all three. **This is the one dataset the JavaScript package is not the source of**: thousands of real divisions can only be trusted as the publisher wrote them, so the publisher's file is the source and every package is a copy of it. The source files are not committed; `tools/location/README.md` names each one, where it comes from, and the checksum of the copy the repository was written from.
+
+The run stops rather than writes when a file changes shape — new columns, an unknown LSAD, a 시 that holds neither 읍·면·동 nor 일반구 — because each of those is a decision about what a real place is called. A generated file that is wrong is a bug in `index.mjs`, not something to patch in the file.
 
 ### `tools/parity` — the packages hold the same data
 
@@ -421,7 +447,7 @@ It covers the sentence datasets alone. The word and name datasets, the `index` f
 
 **The dumps normalize what only differs because the languages differ, and nothing else.** A pool entry is `{ n, r }` everywhere; field names are the JavaScript ones; an optional field is present and null rather than absent; `syn` carries its `kind` tag even in the two packages that tell the shapes apart by type. That normalization lives in the three dumps — one per package, each responsible for its own language's spelling — so the comparison itself has nothing to know about any of them. Adding a field to a dataset means adding it to all three dumps, and the check reports a field only one dump writes as a difference, which is the intended failure.
 
-**Do not widen it into a general "the ports agree" check.** It covers the word, sentence and name datasets, the stories and the field rules beside them, the surname romanization map, and the bounds in `constants` and `decorate/data` — the last of which is still written by hand in each package. The nickname shapes are in it now that they are `WordLanguageData.frames`: they were left out while they were a table private to each generator, and being data is what put them in. The sentence datasets are the same story on a larger scale, `THEME_CLASS` included, because a theme moving from one class to another changes what every verb of every language will accept.
+**Do not widen it into a general "the ports agree" check.** It covers the word, sentence, name and location datasets, the stories and the field rules beside them, the surname romanization map, and the bounds in `constants` and `decorate/data` — the last of which is still written by hand in each package. The nickname shapes are in it now that they are `WordLanguageData.frames`: they were left out while they were a table private to each generator, and being data is what put them in. The sentence datasets are the same story on a larger scale, `THEME_CLASS` included, because a theme moving from one class to another changes what every verb of every language will accept.
 
 ## Testing a random generator
 
@@ -536,6 +562,28 @@ Sentences:
 - **Two beats may be one sentence.** `SentenceJoin` is per language — `{ form: 'linking' }` for Korean's `-고` and Japanese's `-て`, `{ word }` for `and`, `y`, `и`, `，然后` — and German declares none. The plan marks a `first` and a `second` beat, the second is drawn with its subject dropped, and `joinClauses` writes the seam. A join is estimated against the shortest the two shapes could be and is given up when it overshoots, so a narrow range writes two sentences and a wide one writes one.
 - **A story is told again when it misses the range.** The sentences are drawn one after another against a budget shared out between them and re-shared after each, and a run of short sentences leaves the last one a gap no shape can fill: three Korean sentences at forty to sixty characters fell short once in a hundred and twenty. `STORY_ATTEMPTS` tells the whole story again with a fresh `Flow` and keeps the closest telling.
 - **A caller who named `type` gets those kinds; a story otherwise writes statements.** `Settings.typed` is `options.type !== undefined`, `'all'` included, and a story told on its own terms is prose — `STORY_KIND_WEIGHT` lets a step that allows an exclamation or a trailing end get one now and then, and nothing else.
+
+Locations:
+
+- **A country is in only when its list is free of conditions.** No attribution a user of the package would have to carry, no uncertain terms, and no disputed territory — the conditions on a dataset pass to everybody who installs the package, and a list that settles a border settles it for them too. That is why `LOCATION_LANGUAGES` is `['en', 'ko']`: Japan, Spain, Italy and Germany publish complete lists under terms that require the source to be named, and none of the rest met all three. **Do not add a country whose data needs a NOTICE file**; the library's promise is MIT and nothing else. `docs/*/guide/languages.md` keeps the checklist.
+- **A language writes its own country, and nothing else.** `randCountry` is not a list of the world's countries — that list is a list of which territories count, which is not a question a random-data library answers — so it hands back the language's own country, and `language: 'all'` is how more than one comes back.
+- **The levels are four names for what a division is, not four depths.** `region` is the first-level division, `city` the one a region is made of (a Korean 시·군·구, a US place), `district` the one inside a city (a Korean 읍·면·동). `LocationLanguageData.levels` says which of them a country's outline holds, so the United States stops at `city`. A country with a level between two of these would need a fifth name, and the test is what an address in that country writes, not what its statistics office tabulates: US counties are left out because an address never names one.
+- **A branch may skip a level, and that is data, not a special case.** 세종특별자치시 has no 시·군·구, so its outline puts 읍·면·동 straight after the region, and `OutlineEntry.below` says so. `randCity` never returns it; `randLocation({ level: 'city' })` stops at the region for it rather than leaving it out, because a location at that level has to be able to land anywhere in the country.
+- **Every draw is even over the level the result stops at.** A Korean location is one of some five thousand 읍·면·동, whatever the population behind it. Weighting by population would need a population table per division, which is a second dataset with its own terms.
+- **`startsWith` and the length range narrow the pool; they do not steer a draw.** The candidates are filtered and one is picked, and a range nothing fits falls back to the closest length — an overshoot half a character worse, as everywhere else. The last narrowing is remembered per pool, because a US pool is thirty-two thousand names and a loop of single draws would filter it on every call.
+- **`RAND_LOCATION_LENGTH_MAX` is its own ceiling.** A location written out is every level at once — the longest today is sixty-nine characters — so `RAND_LENGTH_MAX` would cut it.
+- **Parsed on first use, never at import.** The outline is a string until a draw needs it, and each pool is built the first time it is drawn from. Importing the package costs nothing for locations nobody asks for.
+- **The generated files are never edited.** A name that is wrong is wrong in the publisher's file or in `tools/location/index.mjs`, and a fix anywhere else is overwritten by the next run.
+
+## Adding a location language
+
+1. Find the country's own published list of divisions, down to the level the privacy rule allows (a Korean 읍·면·동 is the floor for every country: a named area, never a street or a building). Read its terms. If anything in them asks for attribution, restricts use, or is unstated, stop: the country is not added. If the list takes a side on a disputed territory, stop.
+2. Decide the levels by what an address in that country writes, and map them onto `region`, `city` and `district`. Write down anything in the file that is not how an address writes it — a run-together name, a placeholder division, a legal suffix — because each needs a rule in the reader, not a hand edit.
+3. Add a reader to `tools/location/index.mjs` and an entry to `COUNTRIES`: the country's own name in the language, `order`, `joiner`, `levels`. Make the reader fail on anything unexpected rather than guess.
+4. Add the file to the tables in `tools/location/README.md` with its terms and checksum, and run the tool.
+5. Add the code to `LocationLanguage` in all three packages, to `LOCATION_LANGUAGES` / `locationLanguages` and the data maps, and to the script and dataset checks in each package's location suite.
+6. Add the row to the checklist in `docs/*/guide/languages.md`, the table on `docs/*/location/rand-location.md`, and the root `README.md`.
+7. Run every suite and `node tools/parity/index.mjs`.
 
 ## Adding a sentence language
 

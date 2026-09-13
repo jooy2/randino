@@ -129,12 +129,13 @@ rand_suffix(rand_nickname(language="en", count=2))
 | 겹치지 않는 아이디 | <Lang js="randSuffix(randNickname())" dart="randSuffix(value: randNickname().first)" py="rand_suffix(rand_nickname())" code /> |
 | 자리를 채울 문단 | <Lang js="randSentence({ sentences: 3 })" dart="randSentence(sentences: 3)" py="rand_sentence(sentences=3)" code /> |
 | 쿠폰 코드와 고유 토큰 | <Lang js="randSuffix()" dart="randSuffix()" py="rand_suffix()" code /> |
+| 예시 프로필의 시·군·구 | <Lang js="randLocation({ language: 'ko', level: 'city' })" dart="randLocation(language: LocationLanguage.ko, level: LocationLevel.city)" py="rand_location(language=&quot;ko&quot;, level=&quot;city&quot;)" code /> |
 | 테마별 단어 세트 | <Lang js="randAnimal({ count: 10 })" dart="randAnimal(count: 10)" py="rand_animal(count=10)" code /> |
 | 길이가 정해진 입력칸 | <Lang js="randNickname({ maxLength: 12 })" dart="randNickname(maxLength: 12)" py="rand_nickname(max_length=12)" code /> |
 
 ## 어느 함수에서나 같은 옵션 {#one-set-of-options}
 
-개수와 길이, 시작 글자, 중복 제거는 네 생성 함수가 모두 같은 이름으로 받습니다. `randName`에서 익힌 옵션이 `randNickname`과 `randWord`와 `randSentence`에서 그대로 통합니다.
+개수와 길이, 시작 글자, 중복 제거는 모든 생성 함수가 같은 이름으로 받습니다. `randName`에서 익힌 옵션이 `randNickname`, `randWord`, `randSentence`, `randLocation`에서 그대로 통합니다.
 
 <Lang js="count" dart="count" py="count" code />는 몇 개를 받을지, <Lang js="minLength" dart="minLength" py="min_length" code />와 <Lang js="maxLength" dart="maxLength" py="max_length" code />는 글자 수, <Lang js="startsWith" dart="startsWith" py="starts_with" code />는 첫 글자, `unique`는 한 번의 호출 안에서 중복을 없앨지, `realism`은 실제 단어를 뽑을지 그 언어처럼 읽히는 단어를 지어낼지 정합니다.
 

@@ -24,6 +24,12 @@ def test_the_package_exports_exactly_its_public_api() -> None:
         "AFFIX_LENGTH_DEFAULT",
         "AFFIX_LENGTH_MAX",
         "AFFIX_SEPARATOR_DEFAULT",
+        "LOCATION_LANGUAGES",
+        "LOCATION_LEVELS",
+        "LocationDetail",
+        "LocationLanguage",
+        "LocationLanguageOption",
+        "LocationLevel",
         "ModifierKind",
         "NAME_LANGUAGES",
         "NameDetail",
@@ -36,6 +42,7 @@ def test_the_package_exports_exactly_its_public_api() -> None:
         "RAND_COUNT_MAX",
         "RAND_LENGTH_MAX",
         "RAND_LENGTH_MIN",
+        "RAND_LOCATION_LENGTH_MAX",
         "RAND_SENTENCE_COUNT_MAX",
         "RAND_SENTENCE_LENGTH_MAX",
         "RandRealism",
@@ -66,9 +73,12 @@ def test_the_package_exports_exactly_its_public_api() -> None:
         "nickname_length_range",
         "rand_animal",
         "rand_body",
+        "rand_city",
         "rand_clothing",
         "rand_color",
         "rand_concept",
+        "rand_country",
+        "rand_district",
         "rand_drink",
         "rand_emotion",
         "rand_finance",
@@ -76,6 +86,7 @@ def test_the_package_exports_exactly_its_public_api() -> None:
         "rand_furniture",
         "rand_gem",
         "rand_job",
+        "rand_location",
         "rand_modifier",
         "rand_music",
         "rand_myth",
@@ -88,6 +99,7 @@ def test_the_package_exports_exactly_its_public_api() -> None:
         "rand_plant",
         "rand_prefix",
         "rand_product",
+        "rand_region",
         "rand_sentence",
         "rand_sound",
         "rand_space",
@@ -152,6 +164,14 @@ def test_the_functions_are_callable_and_the_constants_are_what_they_claim() -> N
     assert randino.AFFIX_LENGTH_MAX == 32
     assert randino.AFFIX_SEPARATOR_DEFAULT == "_"
     assert re.fullmatch(r"[0-9A-Za-z]+", randino.AFFIX_CHARSET)
+
+    # A location written out is every level of it at once, so it has a length ceiling of
+    # its own, and one generator per level below it.
+    assert isinstance(randino.rand_location(language="ko")[0], str)
+    assert len(randino.rand_location(output="detail")[0].country) > 0
+    assert randino.rand_city(language="en", output="detail")[0].level == "city"
+    assert randino.RAND_LOCATION_LENGTH_MAX == 100
+    assert randino.LOCATION_LEVELS == ("country", "region", "city", "district")
 
 
 def test_the_package_imports_nothing_outside_the_standard_library() -> None:
@@ -218,6 +238,10 @@ def test_an_option_the_types_rule_out_falls_back_rather_than_raising() -> None:
         lambda: loose.nickname_length_range("xx"),
         lambda: loose.sentence_length_range("xx"),
         lambda: loose.name_supports_middle_name("xx"),
+        lambda: loose.rand_location(language="xx"),
+        lambda: loose.rand_location(level="street"),
+        lambda: loose.rand_location(min_length=float("nan")),
+        lambda: loose.rand_city(language="ja"),
     ]
 
     for ask in asks:
@@ -262,6 +286,8 @@ def test_random_is_where_every_draw_of_a_call_comes_from() -> None:
     twice(lambda: randino.rand_prefix("MistyOwl", random=Random(42).random))
     twice(lambda: randino.rand_modifier("사자", random=Random(42).random))
     twice(lambda: randino.rand_modifier(["사자", "여우"], random=Random(42).random))
+    twice(lambda: randino.rand_location(count=5, random=Random(42).random))
+    twice(lambda: randino.rand_city(language="en", max_length=8, count=5, random=Random(42).random))
 
     # Two different seeds are two different answers, so the source is actually what
     # the draws are coming from.

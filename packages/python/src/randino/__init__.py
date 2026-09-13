@@ -1,10 +1,11 @@
-"""randino — random names, nicknames, words and sentences, per language, no dependencies.
+"""randino — random names, nicknames, words, sentences and locations, per language, no dependencies.
 
 Separate concerns, deliberately. `rand_name` produces names a person could actually
 carry (`김민준`, `Emma Clover`); `rand_nickname` produces the handle someone would pick
 for a game or a website (`멋진사자`, `MistyOwl`), built from everyday words and never
-from person names; `rand_word` hands those words over on their own; and `rand_sentence`
-writes a whole statement in the language's own grammar.
+from person names; `rand_word` hands those words over on their own; `rand_sentence`
+writes a whole statement in the language's own grammar; and `rand_location` writes a real
+place, from the country down to a Korean 읍·면·동 or a US city.
 
 Example:
     >>> from randino import rand_name, rand_nickname, rand_sentence
@@ -17,6 +18,10 @@ Example:
 """
 
 from randino._types import (
+    LocationDetail,
+    LocationLanguage,
+    LocationLanguageOption,
+    LocationLevel,
     ModifierKind,
     NameDetail,
     NameGender,
@@ -50,6 +55,7 @@ from randino.constants import (
     RAND_COUNT_MAX,
     RAND_LENGTH_MAX,
     RAND_LENGTH_MIN,
+    RAND_LOCATION_LENGTH_MAX,
     RAND_SENTENCE_COUNT_MAX,
     RAND_SENTENCE_LENGTH_MAX,
 )
@@ -61,6 +67,15 @@ from randino.decorate import (
     rand_modifier,
     rand_prefix,
     rand_suffix,
+)
+from randino.location import (
+    LOCATION_LANGUAGES,
+    LOCATION_LEVELS,
+    rand_city,
+    rand_country,
+    rand_district,
+    rand_location,
+    rand_region,
 )
 from randino.name import (
     NAME_LANGUAGES,
@@ -112,14 +127,21 @@ __all__ = [
     "AFFIX_LENGTH_DEFAULT",
     "AFFIX_LENGTH_MAX",
     "AFFIX_SEPARATOR_DEFAULT",
+    "LOCATION_LANGUAGES",
+    "LOCATION_LEVELS",
     "NAME_LANGUAGES",
     "RAND_COUNT_MAX",
     "RAND_LENGTH_MAX",
     "RAND_LENGTH_MIN",
+    "RAND_LOCATION_LENGTH_MAX",
     "RAND_SENTENCE_COUNT_MAX",
     "RAND_SENTENCE_LENGTH_MAX",
     "WORD_LANGUAGES",
     "WORD_THEMES",
+    "LocationDetail",
+    "LocationLanguage",
+    "LocationLanguageOption",
+    "LocationLevel",
     "ModifierKind",
     "NameDetail",
     "NameGender",
@@ -154,9 +176,12 @@ __all__ = [
     "nickname_length_range",
     "rand_animal",
     "rand_body",
+    "rand_city",
     "rand_clothing",
     "rand_color",
     "rand_concept",
+    "rand_country",
+    "rand_district",
     "rand_drink",
     "rand_emotion",
     "rand_finance",
@@ -164,6 +189,7 @@ __all__ = [
     "rand_furniture",
     "rand_gem",
     "rand_job",
+    "rand_location",
     "rand_modifier",
     "rand_music",
     "rand_myth",
@@ -176,6 +202,7 @@ __all__ = [
     "rand_plant",
     "rand_prefix",
     "rand_product",
+    "rand_region",
     "rand_sentence",
     "rand_sound",
     "rand_space",

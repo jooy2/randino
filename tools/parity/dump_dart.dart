@@ -10,6 +10,9 @@ import 'dart:convert';
 
 import 'package:randino/src/constants.dart';
 import 'package:randino/src/decorate/data/index.dart';
+import 'package:randino/src/internal/parse.dart';
+import 'package:randino/src/location/data/index.dart';
+import 'package:randino/src/location/data/types.dart';
 import 'package:randino/src/name/data/index.dart';
 import 'package:randino/src/name/data/ko.dart';
 import 'package:randino/src/name/data/types.dart';
@@ -454,10 +457,44 @@ void main() {
         'randLengthMin': randLengthMin,
         'randLengthMax': randLengthMax,
         'randSentenceLengthMax': randSentenceLengthMax,
+        'randLocationLengthMax': randLocationLengthMax,
         'affixLengthDefault': affixLengthDefault,
         'affixLengthMax': affixLengthMax,
         'affixSeparatorDefault': affixSeparatorDefault,
         'affixCharset': affixCharset,
+      },
+      // The outline is compared as each package parses it rather than as the text
+      // it is written in, so a parser that reads `_` or a skipped level differently
+      // shows up here even though the three strings are the same generated text.
+      'location': <String, Object?>{
+        'languages': <String>[
+          for (final language in locationLanguages) language.name,
+        ],
+        'levels': <String>[for (final level in locationLevels) level.name],
+        'data': <String, Object?>{
+          for (final entry in locationData.entries)
+            entry.key.name: <String, Object?>{
+              'country': entry.value.country,
+              'order': entry.value.order == LocationOrder.largestFirst
+                  ? 'largest-first'
+                  : 'smallest-first',
+              'joiner': entry.value.joiner,
+              'levels': <String>[
+                for (final level in entry.value.levels) level.name,
+              ],
+              'entries': <Object?>[
+                for (final each in outline(
+                  entry.value.outline,
+                  entry.value.levels.length,
+                ))
+                  <String, Object?>{
+                    'path': <String?>[...each.path],
+                    'depth': each.depth,
+                    'below': each.below,
+                  },
+              ],
+            },
+        },
       },
       'word': <String, Object?>{
         'languages': <String>[

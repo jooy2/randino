@@ -35,3 +35,12 @@ export const RAND_SENTENCE_LENGTH_MAX = 200;
  * land inside the result's own length range.
  */
 export const RAND_SENTENCE_COUNT_MAX = 10;
+
+/**
+ * Upper bound for `minLength` / `maxLength` on the location generators, in
+ * characters. Its own number rather than `RAND_LENGTH_MAX`, because a location
+ * written out is every level of it at once: the longest today is sixty-nine
+ * characters (`The University of Virginia's College at Wise, Virginia, United
+ * States`), and a single US place name already runs to forty-four.
+ */
+export const RAND_LOCATION_LENGTH_MAX = 100;

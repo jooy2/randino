@@ -13,6 +13,7 @@ import {
 	RAND_COUNT_MAX,
 	RAND_LENGTH_MAX,
 	RAND_LENGTH_MIN,
+	RAND_LOCATION_LENGTH_MAX,
 	RAND_SENTENCE_LENGTH_MAX
 } from 'randino';
 ```
@@ -22,6 +23,7 @@ import {
 | `RAND_LENGTH_MIN`          | `number` | `1`     |
 | `RAND_LENGTH_MAX`          | `number` | `40`    |
 | `RAND_SENTENCE_LENGTH_MAX` | `number` | `200`   |
+| `RAND_LOCATION_LENGTH_MAX` | `number` | `100`   |
 | `RAND_COUNT_MAX`           | `number` | `10000` |
 
 :::
@@ -37,6 +39,7 @@ import 'package:randino/randino.dart';
 | `randLengthMin`         | `int` | `1`     |
 | `randLengthMax`         | `int` | `40`    |
 | `randSentenceLengthMax` | `int` | `200`   |
+| `randLocationLengthMax` | `int` | `100`   |
 | `randCountMax`          | `int` | `10000` |
 
 :::
@@ -48,6 +51,7 @@ from randino import (
     RAND_COUNT_MAX,
     RAND_LENGTH_MAX,
     RAND_LENGTH_MIN,
+    RAND_LOCATION_LENGTH_MAX,
     RAND_SENTENCE_LENGTH_MAX,
 )
 ```
@@ -57,11 +61,12 @@ from randino import (
 | `RAND_LENGTH_MIN`          | `int` | `1`     |
 | `RAND_LENGTH_MAX`          | `int` | `40`    |
 | `RAND_SENTENCE_LENGTH_MAX` | `int` | `200`   |
+| `RAND_LOCATION_LENGTH_MAX` | `int` | `100`   |
 | `RAND_COUNT_MAX`           | `int` | `10000` |
 
 :::
 
-길이 옵션은 생성 결과의 글자 수를 기준으로 `1 … 40`으로 제한됩니다. `randSentence`만은 상한이 `200`입니다. 이름과 단어와 닉네임은 길어야 세 단어지만 문장은 여러 단어이기 때문입니다. `count`는 `0 … 10000`으로 제한되는데, 상한이 있는 이유는 `unique`를 켠 채로 개수를 제한하지 않으면 이미 바닥난 후보에서 계속 다시 뽑느라 오래 걸릴 수 있기 때문입니다.
+길이 옵션은 생성 결과의 글자 수를 기준으로 `1 … 40`으로 제한됩니다. `randSentence`만은 상한이 `200`이고, 위치 생성 함수는 `100`입니다. 이름과 단어와 닉네임은 길어야 세 단어지만, 문장은 여러 단어이고 위치는 모든 단계를 한 번에 이어 쓰기 때문입니다. `count`는 `0 … 10000`으로 제한되는데, 상한이 있는 이유는 `unique`를 켠 채로 개수를 제한하지 않으면 이미 바닥난 후보에서 계속 다시 뽑느라 오래 걸릴 수 있기 때문입니다.
 
 ## 이름
 
@@ -139,6 +144,47 @@ from randino import WORD_LANGUAGES, WORD_THEMES
 | ---------------- | ------------------------ | ------------------------- |
 | `WORD_LANGUAGES` | `tuple[WordLanguage, …]` | 지원하는 모든 닉네임 언어 |
 | `WORD_THEMES`    | `tuple[WordTheme, …]`    | 29개 테마 전체            |
+
+:::
+
+## 위치 {#locations}
+
+::: lang js
+
+```javascript
+import { LOCATION_LANGUAGES, LOCATION_LEVELS } from 'randino';
+```
+
+| 이름                 | 타입                 | 값                                          |
+| -------------------- | -------------------- | ------------------------------------------- |
+| `LOCATION_LANGUAGES` | `LocationLanguage[]` | `['en', 'ko']`                              |
+| `LOCATION_LEVELS`    | `LocationLevel[]`    | `['country', 'region', 'city', 'district']` |
+
+:::
+
+::: lang dart
+
+```dart
+import 'package:randino/randino.dart';
+```
+
+| 이름                | 타입                     | 값                        |
+| ------------------- | ------------------------ | ------------------------- |
+| `locationLanguages` | `List<LocationLanguage>` | 위치를 지원하는 모든 언어 |
+| `locationLevels`    | `List<LocationLevel>`    | 모든 단계, 큰 단위부터    |
+
+:::
+
+::: lang py
+
+```python
+from randino import LOCATION_LANGUAGES, LOCATION_LEVELS
+```
+
+| 이름 | 타입 | 값 |
+| --- | --- | --- |
+| `LOCATION_LANGUAGES` | `tuple[LocationLanguage, …]` | `('en', 'ko')` |
+| `LOCATION_LEVELS` | `tuple[LocationLevel, …]` | `('country', 'region', 'city', 'district')` |
 
 :::
 
@@ -264,6 +310,11 @@ import type {
 	WordLanguageOption,
 	WordTheme,
 	WordThemeOption,
+	LocationDetail,
+	LocationLanguage,
+	LocationLanguageOption,
+	LocationLevel,
+	RandLocationOptions,
 	RandNameOptions,
 	RandNicknameOptions,
 	RandOutput
@@ -286,9 +337,10 @@ import 'package:randino/randino.dart';
 // enum
 NameLanguage, NameGender, NameScript
 WordLanguage, WordTheme
+LocationLanguage, LocationLevel
 
 // 값
-LengthRange, NameDetail, NicknameDetail
+LengthRange, NameDetail, NicknameDetail, LocationDetail
 ```
 
 `…Option` 타입도 없고 `all` 멤버도 없습니다. **null인 enum이 "전부"를 뜻하므로**, 쓰지 않은 파라미터가 이미 섞인 결과를 의미합니다. 그래서 헬퍼들도 더 좁은 타입이 아니라 생성기와 같은 타입을 받습니다.
@@ -312,6 +364,10 @@ from randino import (
     WordLanguageOption,
     WordTheme,
     WordThemeOption,
+    LocationDetail,
+    LocationLanguage,
+    LocationLanguageOption,
+    LocationLevel,
     RandOutput,
 )
 

@@ -1,12 +1,14 @@
-/// randino generates random person names, nicknames, words and sentences in the
-/// language you ask for.
+/// randino generates random person names, nicknames, words, sentences and
+/// locations in the language you ask for.
 ///
-/// Four generators, kept apart on purpose. **Person names** read like names
+/// Five generators, kept apart on purpose. **Person names** read like names
 /// people actually carry (김민준, Emma Clover) and come with their English
 /// pronunciation. **Nicknames** are the handles someone would pick for a game or
 /// a website (멋진사자, MistyOwl); they are built from everyday words and never
-/// from person names. **Words** are those everyday words on their own, and
-/// **sentences** are whole statements written in the language's own grammar.
+/// from person names. **Words** are those everyday words on their own,
+/// **sentences** are whole statements written in the language's own grammar, and
+/// **locations** are real places, from the country down to a Korean 읍·면·동 or a
+/// US city.
 ///
 /// ```dart
 /// import 'package:randino/randino.dart';
@@ -22,7 +24,13 @@
 library;
 
 export 'src/constants.dart'
-    show randCountMax, randLengthMax, randLengthMin, randSentenceCountMax, randSentenceLengthMax;
+    show
+        randCountMax,
+        randLengthMax,
+        randLengthMin,
+        randLocationLengthMax,
+        randSentenceCountMax,
+        randSentenceLengthMax;
 export 'src/decorate/data/index.dart'
     show affixCharset, affixLengthDefault, affixLengthMax, affixSeparatorDefault;
 export 'src/decorate/rand_modifier.dart' show randModifier;
@@ -31,6 +39,17 @@ export 'src/decorate/rand_prefix.dart' show randPrefix;
 export 'src/decorate/rand_prefix_all.dart' show randPrefixAll;
 export 'src/decorate/rand_suffix.dart' show randSuffix;
 export 'src/decorate/rand_suffix_all.dart' show randSuffixAll;
+export 'src/location/data/index.dart' show locationLanguages, locationLevels;
+export 'src/location/rand_city.dart' show randCity;
+export 'src/location/rand_city_details.dart' show randCityDetails;
+export 'src/location/rand_country.dart' show randCountry;
+export 'src/location/rand_country_details.dart' show randCountryDetails;
+export 'src/location/rand_district.dart' show randDistrict;
+export 'src/location/rand_district_details.dart' show randDistrictDetails;
+export 'src/location/rand_location.dart' show randLocation;
+export 'src/location/rand_location_details.dart' show randLocationDetails;
+export 'src/location/rand_region.dart' show randRegion;
+export 'src/location/rand_region_details.dart' show randRegionDetails;
 export 'src/name/data/index.dart' show nameLanguages;
 export 'src/name/name_length_range.dart' show nameLengthRange;
 export 'src/name/name_supports_middle_name.dart' show nameSupportsMiddleName;
@@ -46,6 +65,9 @@ export 'src/sentence/sentence_length_range.dart' show sentenceLengthRange;
 export 'src/types.dart'
     show
         LengthRange,
+        LocationDetail,
+        LocationLanguage,
+        LocationLevel,
         ModifierKind,
         NameDetail,
         NameGender,

@@ -9,11 +9,12 @@ import json
 from collections.abc import Mapping, Sequence
 from typing import Any
 
-from randino._internal.parse import NameToken
+from randino._internal.parse import NameToken, outline
 from randino.constants import (
     RAND_COUNT_MAX,
     RAND_LENGTH_MAX,
     RAND_LENGTH_MIN,
+    RAND_LOCATION_LENGTH_MAX,
     RAND_SENTENCE_LENGTH_MAX,
 )
 from randino.decorate.data import (
@@ -22,6 +23,7 @@ from randino.decorate.data import (
     AFFIX_LENGTH_MAX,
     AFFIX_SEPARATOR_DEFAULT,
 )
+from randino.location.data import LOCATION_DATA, LOCATION_LANGUAGES, LOCATION_LEVELS
 from randino.name.data import NAME_DATA, NAME_LANGUAGES
 from randino.name.data.ko import KO_SURNAME_ROMAN
 from randino.sentence.data import (
@@ -376,6 +378,20 @@ sentence = {
     for code, data in SENTENCE_DATA.items()
 }
 
+location = {
+    code: {
+        "country": data.country,
+        "order": data.order,
+        "joiner": data.joiner,
+        "levels": list(data.levels),
+        "entries": [
+            {"path": list(entry.path), "depth": entry.depth, "below": entry.below}
+            for entry in outline(data.outline, len(data.levels))
+        ],
+    }
+    for code, data in LOCATION_DATA.items()
+}
+
 print(
     json.dumps(
         {
@@ -384,10 +400,19 @@ print(
                 "randLengthMin": RAND_LENGTH_MIN,
                 "randLengthMax": RAND_LENGTH_MAX,
                 "randSentenceLengthMax": RAND_SENTENCE_LENGTH_MAX,
+                "randLocationLengthMax": RAND_LOCATION_LENGTH_MAX,
                 "affixLengthDefault": AFFIX_LENGTH_DEFAULT,
                 "affixLengthMax": AFFIX_LENGTH_MAX,
                 "affixSeparatorDefault": AFFIX_SEPARATOR_DEFAULT,
                 "affixCharset": AFFIX_CHARSET,
+            },
+            # The outline is compared as each package parses it rather than as the text it
+            # is written in, so a parser that reads `_` or a skipped level differently
+            # shows up here even though the three strings are the same generated text.
+            "location": {
+                "languages": list(LOCATION_LANGUAGES),
+                "levels": list(LOCATION_LEVELS),
+                "data": location,
             },
             "word": {
                 "languages": list(WORD_LANGUAGES),

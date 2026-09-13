@@ -39,6 +39,9 @@ void main() {
         exportedNames().toList()..sort(),
         <String>[
           'LengthRange',
+          'LocationDetail',
+          'LocationLanguage',
+          'LocationLevel',
           'ModifierKind',
           'NameDetail',
           'NameGender',
@@ -63,6 +66,8 @@ void main() {
           'affixLengthDefault',
           'affixLengthMax',
           'affixSeparatorDefault',
+          'locationLanguages',
+          'locationLevels',
           'nameLanguages',
           'nameLengthRange',
           'nameSupportsMiddleName',
@@ -73,10 +78,16 @@ void main() {
           'wordThemes',
           'randAnimal',
           'randBody',
+          'randCity',
+          'randCityDetails',
           'randClothing',
           'randColor',
           'randConcept',
           'randCountMax',
+          'randCountry',
+          'randCountryDetails',
+          'randDistrict',
+          'randDistrictDetails',
           'randDrink',
           'randEmotion',
           'randFinance',
@@ -86,6 +97,9 @@ void main() {
           'randJob',
           'randLengthMax',
           'randLengthMin',
+          'randLocation',
+          'randLocationDetails',
+          'randLocationLengthMax',
           'randSentenceCountMax',
           'randSentenceLengthMax',
           'randModifier',
@@ -104,6 +118,8 @@ void main() {
           'randPrefix',
           'randPrefixAll',
           'randProduct',
+          'randRegion',
+          'randRegionDetails',
           'randSentence',
           'randSound',
           'randSentenceDetails',
@@ -159,6 +175,26 @@ void main() {
       expect(randSentenceLengthMax, 200);
       expect(randSentenceCountMax, 10);
       expect(randAnimal(language: WordLanguage.ko), hasLength(1));
+
+      // A location written out is every level of it at once, so it has a length
+      // ceiling of its own, and one generator per level below it.
+      expect(randLocation(language: LocationLanguage.ko), hasLength(1));
+      expect(randLocationDetails()[0].country, isNotEmpty);
+      expect(randCountry(), hasLength(1));
+      expect(randCountryDetails()[0], isA<LocationDetail>());
+      expect(randRegion(), hasLength(1));
+      expect(randRegionDetails()[0], isA<LocationDetail>());
+      expect(randCity(), hasLength(1));
+      expect(randCityDetails(language: LocationLanguage.en)[0].level, LocationLevel.city);
+      expect(randDistrict(), hasLength(1));
+      expect(randDistrictDetails()[0], isA<LocationDetail>());
+      expect(randLocationLengthMax, 100);
+      expect(locationLevels, <LocationLevel>[
+        LocationLevel.country,
+        LocationLevel.region,
+        LocationLevel.city,
+        LocationLevel.district,
+      ]);
     });
 
     test('the bounds are the same numbers the JavaScript package uses', () {
@@ -185,6 +221,8 @@ void main() {
       expect(nameLanguages.toSet(), NameLanguage.values.toSet());
       expect(wordLanguages.toSet(), WordLanguage.values.toSet());
       expect(wordThemes.toSet(), WordTheme.values.toSet());
+      expect(locationLanguages.toSet(), LocationLanguage.values.toSet());
+      expect(locationLevels.toSet(), LocationLevel.values.toSet());
     });
 
     test('a length range the wrong way round keeps maxLength', () {
@@ -226,6 +264,16 @@ void main() {
       twice(() => randSuffix(value: 'MistyOwl', random: Random(42)));
       twice(() => randPrefix(value: 'MistyOwl', random: Random(42)));
       twice(() => randModifier(value: '사자', random: Random(42)));
+      twice(() => randLocation(count: 5, random: Random(42)).join());
+      twice(
+        () =>
+            randCity(
+              language: LocationLanguage.en,
+              maxLength: 8,
+              count: 5,
+              random: Random(42),
+            ).join(),
+      );
       twice(() => randSuffixAll(const ['a', 'b'], random: Random(42)).join());
       twice(() => randModifierAll(const ['사자', '여우'], random: Random(42)).join());
 

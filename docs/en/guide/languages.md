@@ -1,35 +1,36 @@
 # Supported languages
 
-randino generates in nine languages, each with its own pools, its own name order and its own romanization. Every generator takes a language, and mixes all of the ones it supports when you leave it out.
+randino generates in nine languages, each with its own pools, its own name order and its own romanization. Every generator takes a language, and mixes all of the ones it supports when you leave it out. Locations are the exception to nine: they are [two languages so far](#locations).
 
-| Code | Language   | Native     | Person names | Words and nicknames | Sentences |
-| ---- | ---------- | ---------- | :----------: | :-----------------: | :-------: |
-| `en` | English    | English    |      ✅      |         ✅          |    ✅     |
-| `ko` | Korean     | 한국어     |      ✅      |         ✅          |    ✅     |
-| `ja` | Japanese   | 日本語     |      ✅      |         ✅          |    ✅     |
-| `zh` | Chinese    | 中文       |      ✅      |         ✅          |    ✅     |
-| `it` | Italian    | Italiano   |      ✅      |         ✅          |    ✅     |
-| `de` | German     | Deutsch    |      ✅      |         ✅          |    ✅     |
-| `ru` | Russian    | Русский    |      ✅      |         ✅          |    ✅     |
-| `es` | Spanish    | Español    |      ✅      |         ✅          |    ✅     |
-| `vi` | Vietnamese | Tiếng Việt |      ✅      |         ✅          |    ✅     |
+| Code | Language   | Native     | Person names | Words and nicknames | Sentences | Locations |
+| ---- | ---------- | ---------- | :----------: | :-----------------: | :-------: | :-------: |
+| `en` | English    | English    |      ✅      |         ✅          |    ✅     |    ✅     |
+| `ko` | Korean     | 한국어     |      ✅      |         ✅          |    ✅     |    ✅     |
+| `ja` | Japanese   | 日本語     |      ✅      |         ✅          |    ✅     |     —     |
+| `zh` | Chinese    | 中文       |      ✅      |         ✅          |    ✅     |     —     |
+| `it` | Italian    | Italiano   |      ✅      |         ✅          |    ✅     |     —     |
+| `de` | German     | Deutsch    |      ✅      |         ✅          |    ✅     |     —     |
+| `ru` | Russian    | Русский    |      ✅      |         ✅          |    ✅     |     —     |
+| `es` | Spanish    | Español    |      ✅      |         ✅          |    ✅     |     —     |
+| `vi` | Vietnamese | Tiếng Việt |      ✅      |         ✅          |    ✅     |     —     |
 
 ::: lang js
 
-The codes are string literals, and they are also available at runtime as `NAME_LANGUAGES` and `WORD_LANGUAGES`.
+The codes are string literals, and they are also available at runtime as `NAME_LANGUAGES`, `WORD_LANGUAGES` and `LOCATION_LANGUAGES`.
 
 ```javascript
-import { NAME_LANGUAGES, WORD_LANGUAGES } from 'randino';
+import { LOCATION_LANGUAGES, NAME_LANGUAGES, WORD_LANGUAGES } from 'randino';
 
 NAME_LANGUAGES; // ['en', 'ko', 'ja', 'zh', 'it', 'de', 'ru', 'es', 'vi']
 WORD_LANGUAGES; // ['en', 'ko', 'ja', 'zh', 'vi', 'es', 'it', 'de', 'ru']
+LOCATION_LANGUAGES; // ['en', 'ko']
 ```
 
 :::
 
 ::: lang dart
 
-The codes are the members of two enums, and the lists are also available as `nameLanguages` and `wordLanguages`.
+The codes are the members of three enums, and the lists are also available as `nameLanguages`, `wordLanguages` and `locationLanguages`.
 
 ```dart
 import 'package:randino/randino.dart';
@@ -37,19 +38,21 @@ import 'package:randino/randino.dart';
 NameLanguage.ko.name; // 'ko'
 nameLanguages; // every NameLanguage, in presentation order
 wordLanguages; // every WordLanguage, in presentation order
+locationLanguages; // [LocationLanguage.en, LocationLanguage.ko]
 ```
 
 :::
 
 ::: lang py
 
-The codes are `Literal` types, so a checker rejects a code that does not exist, and the tuples are also available at runtime as `NAME_LANGUAGES` and `WORD_LANGUAGES`.
+The codes are `Literal` types, so a checker rejects a code that does not exist, and the tuples are also available at runtime as `NAME_LANGUAGES`, `WORD_LANGUAGES` and `LOCATION_LANGUAGES`.
 
 ```python
-from randino import NAME_LANGUAGES, WORD_LANGUAGES
+from randino import LOCATION_LANGUAGES, NAME_LANGUAGES, WORD_LANGUAGES
 
 NAME_LANGUAGES  # ('en', 'ko', 'ja', 'zh', 'it', 'de', 'ru', 'es', 'vi')
 WORD_LANGUAGES  # ('en', 'ko', 'ja', 'zh', 'vi', 'es', 'it', 'de', 'ru')
+LOCATION_LANGUAGES  # ('en', 'ko')
 ```
 
 :::
@@ -122,3 +125,25 @@ Every language writes sentences too, and each declares the shapes its own gramma
 | `ru` | Russian | no object, no place | Спутанный юпитер едва светлеет. |
 
 German and Russian are narrower for the same reason. Both would put an object in the accusative and a place in another case again, and each case changes the noun's own ending or the article in front of it, so they do not declare the shapes that need one. Asking for one falls back to the closest they have. [Sentences](../sentence/) covers this in full.
+
+## Locations {#locations}
+
+A location is real or it is nothing, so a language has locations only when its country publishes the list of its divisions. That is not enough on its own: the list also has to come free of conditions, because every condition on the data would pass to everyone who installs this package.
+
+- **No attribution to carry.** A dataset under CC BY or a government licence that requires the source to be named would make every app built on randino name it too.
+- **No uncertain copyright.** A list with no stated terms, or one its publisher calls internal, stays out.
+- **No disputed territory.** A list that settles a border question one way stays out, whichever way it settles it.
+
+| Code | Country | Locations | Why |
+| --- | --- | :-: | --- |
+| `ko` | 대한민국 | ✅ | 국토교통부 publishes its legal divisions with no conditions on use |
+| `en` | United States | ✅ | Census Bureau files are a U.S. Government work, with no copyright |
+| `ja` | 日本 | — | The official code list requires the source to be named |
+| `es` | España | — | INE data is CC BY 4.0, which requires the source to be named |
+| `it` | Italia | — | ISTAT data is CC BY 4.0, which requires the source to be named |
+| `de` | Deutschland | — | Destatis permits reuse only with the source named |
+| `zh` | 中国 | — | No published list meets all three conditions |
+| `vi` | Việt Nam | — | No published list meets all three conditions |
+| `ru` | Россия | — | No published list meets all three conditions |
+
+[`randLocation`](../location/rand-location) covers what each supported country's locations hold.

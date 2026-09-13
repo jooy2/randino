@@ -428,3 +428,58 @@ class NicknameDetail:
     `None` when that word is not one the generator knows, which happens when it
     was invented.
     """
+
+
+LocationLanguage = Literal["en", "ko"]
+"""A language the location generators can write in.
+
+Each one writes the places of its own country — `ko` the divisions of South Korea, `en`
+the states and places of the United States — and a language whose country publishes no
+dataset that can be shipped without conditions is not one of them.
+"""
+
+LocationLanguageOption = Literal[LocationLanguage, "all"]
+""""all" mixes every language the location generators support."""
+
+LocationLevel = Literal["country", "region", "city", "district"]
+"""How far down a location goes, largest first.
+
+- `country`: the country itself (`대한민국`, `United States`).
+- `region`: its first-level division — a Korean 시·도, a US state.
+- `city`: the division a city, county or district is — a Korean 시·군·구, a US city,
+  town, village or census designated place.
+- `district`: the division inside a city — a Korean 읍·면·동.
+
+Not every country has every level: the United States stops at `city`. Nothing goes below
+`district`, and no location ever names a street or a building, so a result cannot point
+at anybody's address.
+"""
+
+
+@dataclass(frozen=True, slots=True)
+class LocationDetail:
+    """A generated location with every level it was built from."""
+
+    location: str
+    """What the value form returns: one division's name, or the whole location written out."""
+
+    language: LocationLanguage
+    """The language, and so the country, this location was drawn from."""
+
+    level: LocationLevel
+    """The deepest level the result names."""
+
+    country: str
+    """The country, the way the language writes its own."""
+
+    region: str | None
+    """The first-level division.
+
+    `None` for a level the result does not reach, or one its country does not have there.
+    """
+
+    city: str | None
+    """The division inside the region, or `None` the way `region` is."""
+
+    district: str | None
+    """The division inside the city, or `None` the way `region` is."""

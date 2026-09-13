@@ -20,7 +20,7 @@
 import { existsSync, readFileSync } from 'node:fs';
 import { writeFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
-import { inlineLang, wordOptionsTable } from './data/markdown';
+import { inlineLang, locationOptionsTable, wordOptionsTable } from './data/markdown';
 import { SIDEBAR, type SidebarGroup, type SidebarPage } from './data/sidebar';
 
 export interface LlmsOptions {
@@ -90,6 +90,9 @@ function flatten(markdown: string): string {
 			.replace(/^<WordOptions(\s+theme)?\s*\/>$/gm, (_, theme?: string) =>
 				wordOptionsTable(Boolean(theme))
 			)
+			.replace(/^<LocationOptions(\s+level)?\s*\/>$/gm, (_, level?: string) =>
+				locationOptionsTable(Boolean(level))
+			)
 			// Whatever the removals left behind.
 			.replace(/\n{3,}/g, '\n\n')
 			.trim()
@@ -97,13 +100,14 @@ function flatten(markdown: string): string {
 }
 
 const PREAMBLE = [
-	'randino generates random text for sample data, in four kinds and nine languages.',
+	'randino generates random text for sample data, in five kinds and nine languages.',
 	'**Person names** read like names a person actually carries (김민준, Emma Clover).',
 	'**Nicknames** are the handles someone would pick for a game or a website (멋진사자, MistyOwl),',
 	'built from everyday words and never from person names. **Words** are those everyday words on',
 	"their own, across twenty-nine themes. **Sentences** are whole statements in the language's own",
-	'grammar (여우가 사과를 먹는다), and **decorators** attach a token or a modifier to a string you',
-	'already have.',
+	'grammar (여우가 사과를 먹는다). **Locations** are real places written out down to a Korean 읍·면·동',
+	'or a US city, in the two languages whose countries publish that list free of conditions, and',
+	'**decorators** attach a token or a modifier to a string you already have.',
 	'',
 	'The same library ships as three packages (`randino` on npm, on pub.dev and on PyPI), generating',
 	'the same output from the same datasets. **Everything below is the JavaScript package**, which is',

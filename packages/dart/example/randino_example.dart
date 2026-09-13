@@ -11,6 +11,7 @@ void main() {
   _words();
   _nicknames();
   _sentences();
+  _locations();
   _decorators();
   _questionsAboutALanguage();
 }
@@ -110,6 +111,13 @@ void _sentences() {
 
   print('${detail.sentence} <- ${detail.phrases} (${detail.theme?.name})');
   // 검은 고양이가 숲에서 잠잔다. <- [검은 고양이, 숲, 잠잔다] (animal)
+}
+
+/// Locations: a real place, from the country down, and never an address.
+void _locations() {
+  print('-- locations --------------------------------------------------');
+
+  print(randLocation(language: LocationLanguage.ko)); // [대한민국 경기도 수원시 장안구 파장동]
 }
 
 void _decorators() {

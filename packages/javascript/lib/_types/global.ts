@@ -735,3 +735,59 @@ export interface SentenceDetail {
 	 */
 	theme: WordTheme | null;
 }
+
+/**
+ * A language the location generators can write in. Each one writes the places of
+ * its own country — `ko` the divisions of South Korea, `en` the states and places
+ * of the United States — and a language whose country publishes no dataset that
+ * can be shipped without conditions is not one of them.
+ */
+export type LocationLanguage = 'en' | 'ko';
+
+/** `'all'` mixes every language the location generators support. */
+export type LocationLanguageOption = LocationLanguage | 'all';
+
+/**
+ * How far down a location goes, largest first:
+ * - `country`: the country itself (`대한민국`, `United States`).
+ * - `region`: its first-level division — a Korean 시·도, a US state.
+ * - `city`: the division a city, county or district is — a Korean 시·군·구, a US
+ *   city, town, village or census designated place.
+ * - `district`: the division inside a city — a Korean 읍·면·동.
+ *
+ * Not every country has every level: the United States stops at `city`. Nothing
+ * goes below `district`, and no location ever names a street or a building, so a
+ * result cannot point at anybody's address.
+ */
+export type LocationLevel = 'country' | 'region' | 'city' | 'district';
+
+/**
+ * What the location generators take. `realism` is not among them: a location is
+ * a real place or it is not a location, so there is nothing to invent.
+ */
+export interface RandLocationUnitOptions extends Omit<RandCommonOptions, 'realism'> {
+	/** Language, and so country, of the places. `'all'` mixes every one. Default `'all'`. */
+	language?: LocationLanguageOption;
+}
+
+export interface RandLocationOptions extends RandLocationUnitOptions {
+	/**
+	 * How far down the location goes. A country without that level stops at the
+	 * deepest one it has. Default `'district'`, which is as far as any goes.
+	 */
+	level?: LocationLevel;
+}
+
+/** A generated location with every level it was built from. */
+export interface LocationDetail {
+	/** What the value form returns: one division's name, or the whole location written out. */
+	location: string;
+	language: LocationLanguage;
+	/** The deepest level the result names. */
+	level: LocationLevel;
+	country: string;
+	/** `null` for a level the result does not reach, or one its country does not have there. */
+	region: string | null;
+	city: string | null;
+	district: string | null;
+}

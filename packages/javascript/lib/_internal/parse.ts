@@ -108,3 +108,77 @@ export function conjugate(
 
 	return { words: attach(endings.statement), forms };
 }
+
+/** One division an outline names, and where it sits. */
+export interface OutlineEntry {
+	/**
+	 * The division's name and the name of every division it sits inside, largest
+	 * first, one per level down to its own. `null` for a level its branch skips.
+	 */
+	readonly path: readonly (string | null)[];
+	/** The level the division itself is, as an index into the dataset's levels. */
+	readonly depth: number;
+	/** The shallowest level among the divisions directly inside it, or `null` for none. */
+	readonly below: number | null;
+}
+
+/**
+ * Split an outline of divisions, `levels` deep. A line `# name` opens a division
+ * at the first level and `## name` one at the second; a line with no marker is a
+ * pool of divisions at the last level, inside the division opened last. `_`
+ * stands for a space, the way it does in `words`.
+ *
+ * A pool straight after a `#` line skips the levels between: 세종특별자치시 has no
+ * 시·군·구, so its 읍·면·동 follow its own line.
+ */
+export function outline(source: string, levels: number): OutlineEntry[] {
+	type Open = { path: (string | null)[]; depth: number; below: number | null };
+
+	const entries: Open[] = [];
+	// The division opened last at each level, down to the deepest one still open.
+	const open: Open[] = [];
+
+	const add = (name: string, depth: number, parent: Open | undefined) => {
+		const path = parent ? [...parent.path] : [];
+
+		while (path.length < depth) {
+			path.push(null);
+		}
+
+		path.push(name.replace(/_/g, ' '));
+
+		const entry: Open = { path, depth, below: null };
+
+		if (parent) {
+			parent.below = parent.below === null ? depth : Math.min(parent.below, depth);
+		}
+
+		entries.push(entry);
+
+		return entry;
+	};
+
+	for (const line of source.split('\n')) {
+		const text = line.trim();
+
+		if (!text) {
+			continue;
+		}
+
+		const marker = /^(#+) (\S+)$/.exec(text);
+
+		if (marker) {
+			const depth = marker[1].length - 1;
+
+			open.length = depth;
+			open.push(add(marker[2], depth, open[depth - 1]));
+			continue;
+		}
+
+		for (const name of text.split(/\s+/)) {
+			add(name, levels - 1, open[open.length - 1]);
+		}
+	}
+
+	return entries;
+}

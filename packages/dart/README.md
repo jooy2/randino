@@ -10,12 +10,13 @@ Every option and every example, with **Dart** picked in the sidebar. This README
 
 ---
 
-**randino** generates random person names, nicknames, words and sentences in the language you ask for.
+**randino** generates random person names, nicknames, words, sentences and real locations in the language you ask for.
 
 - **Person names** read like names people carry: Emma Clover, Jack Reeves, each with its English pronunciation. 9 languages.
 - **Nicknames** are handles for a game or a website: MistyOwl, CraneVoyage, RustyBoot. Built from everyday words across twenty-nine themes, and never from person names.
 - **Words** are those twenty-nine themes on their own: `randWord`, plus `randAnimal`, `randFood` and twenty-seven more.
 - **Sentences** are whole statements in the language's own grammar, from `randSentence`. The verb decides what can stand beside it, so the words of one sentence belong together.
+- **Locations** are real places down to a neighbourhood or a city, from `randLocation`: Korean and US divisions, as each country publishes them.
 - **Decorators** attach something to a string you already have: `randSuffix`, `randPrefix` and `randModifier`.
 - Every parameter is named and optional, and a **null enum means "every one of them"**, so `randName()` on its own works.
 - **Pure Dart, no dependencies.** It imports nothing but `dart:math`, so it runs on the VM, on the web and inside Flutter on every platform.
@@ -179,6 +180,35 @@ sentenceLengthRange(WordLanguage.en); // LengthRange(12, 92)
 
 `type` is what the sentence does: a statement, a question, an exclamation, a line that trails off, or one somebody says or thinks. `style` is the speech level, which Korean writes four of. `sentences` puts up to ten of them in one string, about one subject. `includeName` puts a generated person's name where a person can stand. Left out, the three of them are drawn per result.
 
+## Locations
+
+Real places, written out from the country down the way the language writes one. Every division is one the country itself publishes, inside the one written beside it, and nothing goes below a Korean 읍·면·동 or a US city, so a result is never somebody's address. Korean and English only: a country is in when its list comes with no conditions a user of this package would inherit.
+
+```dart
+randLocation(language: LocationLanguage.ko, count: 2);
+// [대한민국 경기도 양평군 단월면, 대한민국 충청북도 청주시 서원구 미평동]
+randLocation(language: LocationLanguage.en, level: LocationLevel.city);
+// [Gig Harbor, Washington, United States]
+
+randRegion(language: LocationLanguage.en, count: 3); // [Idaho, Georgia, Vermont]
+randCity(language: LocationLanguage.ko, count: 3); // [함안군, 영덕군, 여수시]
+randDistrict(count: 3); // [가현동, 겸면, 행주외동]
+
+randCityDetails(language: LocationLanguage.ko).first;
+// LocationDetail(중랑구, ko, city, 대한민국, 서울특별시, 중랑구, null)
+```
+
+| Parameter                 | Type                | Default                  |
+| ------------------------- | ------------------- | ------------------------ |
+| `language`                | `LocationLanguage?` | `null` — every one       |
+| `level`                   | `LocationLevel`     | `LocationLevel.district` |
+| `count`                   | `int`               | `1`                      |
+| `minLength` / `maxLength` | `int?`              | `null`                   |
+| `startsWith`              | `String?`           | `null`                   |
+| `unique`                  | `bool`              | `false`                  |
+
+`level` is how far down the location goes: `country`, `region`, `city` or `district`. A country without that level stops at the deepest one it has, so an English location ends at its city. `randCountry`, `randRegion`, `randCity` and `randDistrict` take the same parameters minus `level`, and hand back that one division's name; each has a `…Details` twin, as `randLocation` has `randLocationDetails`.
+
 ## Decorators
 
 `randSuffix`, `randPrefix` and `randModifier` attach something to a string you already have, rather than generating one. They take anything, not just this library's output, which is why none of them is a parameter on a generator. Each of them also works with no value at all, handing back the thing it would have attached.
@@ -234,7 +264,7 @@ nicknameLengthRange(language: WordLanguage.ko); // LengthRange(1, 13)
 sentenceLengthRange(WordLanguage.ko); // LengthRange(5, 43)
 ```
 
-`nameLanguages`, `wordLanguages` and `wordThemes` list what the generators accept; `randCountMax`, `randLengthMin` / `Max`, `randSentenceLengthMax`, `affixLengthDefault` / `Max`, `affixSeparatorDefault` and `affixCharset` are the bounds and defaults every parameter is clamped to.
+`nameLanguages`, `wordLanguages`, `wordThemes`, `locationLanguages` and `locationLevels` list what the generators accept; `randCountMax`, `randLengthMin` / `Max`, `randSentenceLengthMax`, `randLocationLengthMax`, `affixLengthDefault` / `Max`, `affixSeparatorDefault` and `affixCharset` are the bounds and defaults every parameter is clamped to.
 
 ## Differences from the npm package
 
@@ -247,7 +277,7 @@ The two generate the same output from the same data, and only the surface is Dar
 | `language: 'all'` (the default)    | `language` left out, or `null`                 |
 | `[number, number]`                 | `LengthRange`, which compares by value         |
 | `NameDetail` / `NicknameDetail` interfaces | The same two names, as classes         |
-| `output: 'detail'`                 | `randNameDetails` / `randNicknameDetails` / `randWordDetails` / `randSentenceDetails` |
+| `output: 'detail'`                 | `randNameDetails` / `randNicknameDetails` / `randWordDetails` / `randSentenceDetails` / `randLocationDetails` … |
 | `randModifier('Owl')`             | `randModifier(value: 'Owl')` — every parameter is named |
 | `randSuffix(['a', 'b'])`           | `randSuffixAll(['a', 'b'])`                    |
 | `include: 'lion'` or `['lion']`    | `include: ['lion']` — a list either way        |

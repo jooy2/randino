@@ -1,35 +1,36 @@
 # 지원 언어
 
-randino는 9개 언어로 텍스트를 생성합니다. 언어마다 단어 풀과 이름 순서, 로마자 표기 규칙이 따로 있습니다. 모든 생성기는 언어를 받으며, 지정하지 않으면 지원하는 모든 언어를 섞습니다.
+randino는 9개 언어로 텍스트를 생성합니다. 언어마다 단어 풀과 이름 순서, 로마자 표기 규칙이 따로 있습니다. 모든 생성기는 언어를 받으며, 지정하지 않으면 지원하는 모든 언어를 섞습니다. 위치만은 예외여서 [아직 두 언어](#locations)만 지원합니다.
 
-| 코드 | 언어       | 표기       | 사람 이름 | 단어와 닉네임 | 문장 |
-| ---- | ---------- | ---------- | :-------: | :-----------: | :--: |
-| `en` | 영어       | English    |    ✅     |      ✅       |  ✅  |
-| `ko` | 한국어     | 한국어     |    ✅     |      ✅       |  ✅  |
-| `ja` | 일본어     | 日本語     |    ✅     |      ✅       |  ✅  |
-| `zh` | 중국어     | 中文       |    ✅     |      ✅       |  ✅  |
-| `it` | 이탈리아어 | Italiano   |    ✅     |      ✅       |  ✅  |
-| `de` | 독일어     | Deutsch    |    ✅     |      ✅       |  ✅  |
-| `ru` | 러시아어   | Русский    |    ✅     |      ✅       |  ✅  |
-| `es` | 스페인어   | Español    |    ✅     |      ✅       |  ✅  |
-| `vi` | 베트남어   | Tiếng Việt |    ✅     |      ✅       |  ✅  |
+| 코드 | 언어       | 표기       | 사람 이름 | 단어와 닉네임 | 문장 | 위치 |
+| ---- | ---------- | ---------- | :-------: | :-----------: | :--: | :--: |
+| `en` | 영어       | English    |    ✅     |      ✅       |  ✅  |  ✅  |
+| `ko` | 한국어     | 한국어     |    ✅     |      ✅       |  ✅  |  ✅  |
+| `ja` | 일본어     | 日本語     |    ✅     |      ✅       |  ✅  |  —   |
+| `zh` | 중국어     | 中文       |    ✅     |      ✅       |  ✅  |  —   |
+| `it` | 이탈리아어 | Italiano   |    ✅     |      ✅       |  ✅  |  —   |
+| `de` | 독일어     | Deutsch    |    ✅     |      ✅       |  ✅  |  —   |
+| `ru` | 러시아어   | Русский    |    ✅     |      ✅       |  ✅  |  —   |
+| `es` | 스페인어   | Español    |    ✅     |      ✅       |  ✅  |  —   |
+| `vi` | 베트남어   | Tiếng Việt |    ✅     |      ✅       |  ✅  |  —   |
 
 ::: lang js
 
-코드는 문자열 리터럴이며, 런타임에는 `NAME_LANGUAGES`와 `WORD_LANGUAGES`로도 확인할 수 있습니다.
+코드는 문자열 리터럴이며, 런타임에는 `NAME_LANGUAGES`, `WORD_LANGUAGES`, `LOCATION_LANGUAGES`로도 확인할 수 있습니다.
 
 ```javascript
-import { NAME_LANGUAGES, WORD_LANGUAGES } from 'randino';
+import { LOCATION_LANGUAGES, NAME_LANGUAGES, WORD_LANGUAGES } from 'randino';
 
 NAME_LANGUAGES; // ['en', 'ko', 'ja', 'zh', 'it', 'de', 'ru', 'es', 'vi']
 WORD_LANGUAGES; // ['en', 'ko', 'ja', 'zh', 'vi', 'es', 'it', 'de', 'ru']
+LOCATION_LANGUAGES; // ['en', 'ko']
 ```
 
 :::
 
 ::: lang dart
 
-코드는 두 enum의 멤버이며, 목록은 `nameLanguages`와 `wordLanguages`로도 확인할 수 있습니다.
+코드는 세 enum의 멤버이며, 목록은 `nameLanguages`, `wordLanguages`, `locationLanguages`로도 확인할 수 있습니다.
 
 ```dart
 import 'package:randino/randino.dart';
@@ -37,19 +38,21 @@ import 'package:randino/randino.dart';
 NameLanguage.ko.name; // 'ko'
 nameLanguages; // 표시 순서대로 나열된 모든 NameLanguage
 wordLanguages; // 모든 WordLanguage, 표시 순서대로
+locationLanguages; // [LocationLanguage.en, LocationLanguage.ko]
 ```
 
 :::
 
 ::: lang py
 
-코드는 `Literal` 타입이므로 존재하지 않는 코드는 타입 검사기가 거부하며, 목록은 런타임에도 `NAME_LANGUAGES`와 `WORD_LANGUAGES`로 확인할 수 있습니다.
+코드는 `Literal` 타입이므로 존재하지 않는 코드는 타입 검사기가 거부하며, 목록은 런타임에도 `NAME_LANGUAGES`, `WORD_LANGUAGES`, `LOCATION_LANGUAGES`로 확인할 수 있습니다.
 
 ```python
-from randino import NAME_LANGUAGES, WORD_LANGUAGES
+from randino import LOCATION_LANGUAGES, NAME_LANGUAGES, WORD_LANGUAGES
 
 NAME_LANGUAGES  # ('en', 'ko', 'ja', 'zh', 'it', 'de', 'ru', 'es', 'vi')
 WORD_LANGUAGES  # ('en', 'ko', 'ja', 'zh', 'vi', 'es', 'it', 'de', 'ru')
+LOCATION_LANGUAGES  # ('en', 'ko')
 ```
 
 :::
@@ -122,3 +125,25 @@ WORD_LANGUAGES  # ('en', 'ko', 'ja', 'zh', 'vi', 'es', 'it', 'de', 'ru')
 | `ru` | 러시아어   | 목적어와 장소 없음       | Спутанный юпитер едва светлеет.             |
 
 독일어와 러시아어가 좁은 이유는 같습니다. 둘 다 목적어는 대격에, 장소는 또 다른 격에 두어야 하는데, 격이 바뀌면 명사의 어미나 앞의 관사가 바뀌므로 그런 형태는 선언하지 않습니다. 그런 요청이 오면 그 언어가 가진 형태 중 가장 가까운 것으로 답합니다. 자세한 내용은 [문장](../sentence/)에 있습니다.
+
+## 위치 {#locations}
+
+위치는 실제 장소여야 하므로, 나라가 행정구역 목록을 공개해야만 그 언어에서 위치를 쓸 수 있습니다. 공개만으로는 부족하고 조건 없이 공개돼야 합니다. 데이터에 붙은 조건은 이 패키지를 설치하는 모든 사람에게 그대로 넘어가기 때문입니다.
+
+- **출처 표기 의무가 없어야 합니다.** CC BY나 출처 표기를 요구하는 정부 라이선스의 데이터를 넣으면, randino로 만든 앱마다 그 출처를 적어야 합니다.
+- **저작권이 분명해야 합니다.** 이용 조건이 적혀 있지 않거나 공개 기관이 내부 자료로 보는 목록은 넣지 않습니다.
+- **분쟁 지역이 없어야 합니다.** 국경 문제를 어느 한쪽으로 정해 버리는 목록은 어느 쪽이든 넣지 않습니다.
+
+| 코드 | 나라          | 위치 | 이유                                                          |
+| ---- | ------------- | :--: | ------------------------------------------------------------- |
+| `ko` | 대한민국      |  ✅  | 국토교통부가 법정동을 이용 조건 없이 공개합니다               |
+| `en` | United States |  ✅  | Census Bureau 파일은 저작권이 없는 미국 연방정부 저작물입니다 |
+| `ja` | 日本          |  —   | 공식 코드 목록이 출처 표기를 요구합니다                       |
+| `es` | España        |  —   | INE 데이터는 출처 표기가 필요한 CC BY 4.0입니다               |
+| `it` | Italia        |  —   | ISTAT 데이터는 출처 표기가 필요한 CC BY 4.0입니다             |
+| `de` | Deutschland   |  —   | Destatis는 출처를 밝히는 경우에만 재사용을 허락합니다         |
+| `zh` | 中国          |  —   | 세 조건을 모두 만족하는 공개 목록이 없습니다                  |
+| `vi` | Việt Nam      |  —   | 세 조건을 모두 만족하는 공개 목록이 없습니다                  |
+| `ru` | Россия        |  —   | 세 조건을 모두 만족하는 공개 목록이 없습니다                  |
+
+지원하는 나라의 위치에 무엇이 들어 있는지는 [`randLocation`](../location/rand-location)에 정리해 두었습니다.

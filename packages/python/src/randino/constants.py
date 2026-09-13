@@ -38,3 +38,12 @@ RAND_SENTENCE_COUNT_MAX = 10
 Ten is already a paragraph, and every one of them still has to land inside the result's
 own length range.
 """
+
+RAND_LOCATION_LENGTH_MAX = 100
+"""Upper bound for `min_length` / `max_length` on the location generators, in characters.
+
+Its own number rather than `RAND_LENGTH_MAX`, because a location written out is every
+level of it at once: the longest today is sixty-nine characters (`The University of
+Virginia's College at Wise, Virginia, United States`), and a single US place name already
+runs to forty-four.
+"""

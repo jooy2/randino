@@ -5,6 +5,7 @@ instead of one list entry per line, which keeps a 120-name pool to a handful of
 lines.
 """
 
+import re
 from collections.abc import Mapping
 from typing import TYPE_CHECKING, NamedTuple, cast
 
@@ -114,4 +115,99 @@ def conjugate(stems: str, endings: Mapping[str, str]) -> "PredicateTense":
             for form, ending in endings.items()
             if form != "statement"
         },
+    )
+
+
+class OutlineEntry(NamedTuple):
+    """One division an outline names, and where it sits."""
+
+    path: tuple[str | None, ...]
+    """The division's name and the name of every division it sits inside.
+
+    Largest first, one per level down to its own. None for a level its branch skips.
+    """
+
+    depth: int
+    """The level the division itself is, as an index into the dataset's levels."""
+
+    below: int | None
+    """The shallowest level among the divisions directly inside it, or None for none."""
+
+
+_MARKER = re.compile(r"(#+) (\S+)")
+"""A line that opens a division: one `#` per level down, then the division's name."""
+
+
+def outline(source: str, levels: int) -> tuple[OutlineEntry, ...]:
+    """Split an outline of divisions, `levels` deep.
+
+    A line `# name` opens a division at the first level and `## name` one at the second;
+    a line with no marker is a pool of divisions at the last level, inside the division
+    opened last. `_` stands for a space, the way it does in `words`.
+
+    A pool straight after a `#` line skips the levels between: 세종특별자치시 has no
+    시·군·구, so its 읍·면·동 follow its own line.
+
+    Args:
+        source: The outline, one division or one pool of them per line.
+        levels: How many levels the outline holds.
+
+    Returns:
+        Every division the outline names, in the order it names them.
+    """
+    # Built as three parallel lists and frozen at the end, because a division learns
+    # what is `below` it only once the lines inside it have been read.
+    paths: list[tuple[str | None, ...]] = []
+    depths: list[int] = []
+    belows: list[int | None] = []
+    # The division opened last at each level, as an index into the lists above, down to
+    # the deepest one still open. None where a marker skipped a level.
+    opened: list[int | None] = []
+
+    def add(name: str, depth: int, parent: int | None) -> int:
+        path: list[str | None] = [] if parent is None else list(paths[parent])
+
+        while len(path) < depth:
+            path.append(None)
+
+        path.append(name.replace("_", " "))
+
+        if parent is not None:
+            below = belows[parent]
+            belows[parent] = depth if below is None else min(below, depth)
+
+        paths.append(tuple(path))
+        depths.append(depth)
+        belows.append(None)
+
+        return len(paths) - 1
+
+    for line in source.split("\n"):
+        text = line.strip()
+
+        if not text:
+            continue
+
+        marker = _MARKER.fullmatch(text)
+
+        if marker:
+            depth = len(marker.group(1)) - 1
+
+            del opened[depth:]
+
+            while len(opened) < depth:
+                opened.append(None)
+
+            parent = opened[depth - 1] if depth > 0 else None
+            opened.append(add(marker.group(2), depth, parent))
+            continue
+
+        parent = opened[-1] if opened else None
+
+        for name in text.split():
+            add(name, levels - 1, parent)
+
+    return tuple(
+        OutlineEntry(path, depth, below)
+        for path, depth, below in zip(paths, depths, belows, strict=True)
     )

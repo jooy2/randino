@@ -4,6 +4,7 @@ import Lang from './components/Lang.vue';
 import Demo from './components/Demo.vue';
 import LangStart from './components/LangStart.vue';
 import WordOptions from './components/WordOptions.vue';
+import LocationOptions from './components/LocationOptions.vue';
 import PackageLinks from './components/PackageLinks.vue';
 import { syncCodeLanguage } from '../data/language';
 import './styles/lang.css';
@@ -34,6 +35,9 @@ export default {
 
 		// One table, twenty-six pages: `randWord` and each of its themed forms.
 		app.component('WordOptions', WordOptions);
+
+		// One table, five pages: `randLocation` and each of its level functions.
+		app.component('LocationOptions', LocationOptions);
 
 		// Reads the stored choice into the reactive copy the components use, and
 		// writes it back onto `<html>`. No-op during SSR.

@@ -37,3 +37,12 @@ const int randSentenceLengthMax = 200;
 /// Ten is already a paragraph, and every one of them still has to land inside the
 /// result's own length range.
 const int randSentenceCountMax = 10;
+
+/// Upper bound for `minLength` / `maxLength` on the location generators, in
+/// characters.
+///
+/// Its own number rather than [randLengthMax], because a location written out is
+/// every level of it at once: the longest today is sixty-nine characters (`The
+/// University of Virginia's College at Wise, Virginia, United States`), and a
+/// single US place name already runs to forty-four.
+const int randLocationLengthMax = 100;

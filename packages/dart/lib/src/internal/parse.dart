@@ -99,3 +99,95 @@ PredicateTense conjugate(
     },
   );
 }
+
+/// One division an outline names, and where it sits.
+class OutlineEntry {
+  /// Creates an entry. Built by [outline]; there is no other reason to make one.
+  const OutlineEntry({required this.path, required this.depth, required this.below});
+
+  /// The division's name and the name of every division it sits inside, largest
+  /// first, one per level down to its own. `null` for a level its branch skips.
+  final List<String?> path;
+
+  /// The level the division itself is, as an index into the dataset's levels.
+  final int depth;
+
+  /// The shallowest level among the divisions directly inside it, or `null` for
+  /// none.
+  final int? below;
+}
+
+/// An entry while its outline is still being read: the divisions inside it are
+/// what settle [below], and they come after it.
+class _OpenEntry {
+  _OpenEntry(this.path, this.depth);
+
+  final List<String?> path;
+  final int depth;
+  int? below;
+}
+
+final RegExp _marker = RegExp(r'^(#+) (\S+)$');
+
+/// Split an outline of divisions, [levels] deep.
+///
+/// A line `# name` opens a division at the first level and `## name` one at the
+/// second; a line with no marker is a pool of divisions at the last level, inside
+/// the division opened last. `_` stands for a space, the way it does in [words].
+///
+/// A pool straight after a `#` line skips the levels between: 세종특별자치시 has
+/// no 시·군·구, so its 읍·면·동 follow its own line.
+List<OutlineEntry> outline(String source, int levels) {
+  final entries = <_OpenEntry>[];
+  // The division opened last at each level, down to the deepest one still open.
+  // A marker that skips a level leaves a hole, the way the npm package's does.
+  final open = <_OpenEntry?>[];
+
+  _OpenEntry add(String name, int depth, _OpenEntry? parent) {
+    final path = <String?>[...?parent?.path];
+
+    while (path.length < depth) {
+      path.add(null);
+    }
+
+    path.add(name.replaceAll('_', ' '));
+
+    final entry = _OpenEntry(List<String?>.unmodifiable(path), depth);
+
+    if (parent != null) {
+      final below = parent.below;
+
+      parent.below = below == null || depth < below ? depth : below;
+    }
+
+    entries.add(entry);
+
+    return entry;
+  }
+
+  for (final line in source.split('\n')) {
+    final text = line.trim();
+
+    if (text.isEmpty) {
+      continue;
+    }
+
+    final marker = _marker.firstMatch(text);
+
+    if (marker != null) {
+      final depth = marker.group(1)!.length - 1;
+
+      open.length = depth;
+      open.add(add(marker.group(2)!, depth, depth > 0 ? open[depth - 1] : null));
+      continue;
+    }
+
+    for (final name in text.split(_whitespace)) {
+      add(name, levels - 1, open.isEmpty ? null : open.last);
+    }
+  }
+
+  return List<OutlineEntry>.unmodifiable(
+    entries.map((entry) => OutlineEntry(path: entry.path, depth: entry.depth, below: entry.below)),
+  );
+}

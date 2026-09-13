@@ -1,5 +1,12 @@
-import { t } from './i18n';
-import { isPhrase, isVariants, wordOptionRows, type OptionCell } from './wordOptions';
+import { t, type StringKey } from './i18n';
+import { locationOptionRows } from './locationOptions';
+import {
+	isPhrase,
+	isVariants,
+	wordOptionRows,
+	type OptionCell,
+	type OptionVariants
+} from './wordOptions';
 
 /**
  * The one transform two very different readers both need.
@@ -39,6 +46,22 @@ export function inlineLang(markdown: string): string {
  * everything else in that file is.
  */
 export function wordOptionsTable(theme: boolean): string {
+	return optionsTable(wordOptionRows(theme));
+}
+
+/** `<LocationOptions />` → the option table it draws, the same way `<WordOptions />` is. */
+export function locationOptionsTable(level: boolean): string {
+	return optionsTable(locationOptionRows(level));
+}
+
+function optionsTable(
+	source: readonly {
+		name: OptionCell;
+		type: OptionVariants;
+		fallback: OptionCell;
+		about: StringKey;
+	}[]
+): string {
 	const cell = (value: OptionCell): string => {
 		if (isPhrase(value)) {
 			return `_${t('en', value.i18n)}_`;
@@ -49,7 +72,7 @@ export function wordOptionsTable(theme: boolean): string {
 		return text ? `\`${text}\`` : '—';
 	};
 
-	const rows = wordOptionRows(theme)
+	const rows = source
 		// A row no JavaScript spelling exists for is a row the npm package has not
 		// got, which is the half this file keeps.
 		.filter((row) => row.type.js)

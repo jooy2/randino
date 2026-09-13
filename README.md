@@ -10,12 +10,13 @@ Every option, every language and every example, with **JavaScript**, **Dart** or
 
 ---
 
-**randino** generates random text in the language you ask for: person names, nicknames, everyday words and whole sentences. One function per kind of text, one set of options, and a dataset per language.
+**randino** generates random text in the language you ask for: person names, nicknames, everyday words, whole sentences and real locations. One function per kind of text, one set of options, and a dataset per language.
 
 - **Person names** read like names people carry: Emma Clover, Jack Reeves, each with its English pronunciation. 9 languages.
 - **Nicknames** are handles for a game or a website: MistyOwl, CraneVoyage, RustyBoot. Built from everyday words across twenty-nine themes and never from person names, they run to over forty million combinations in Korean and in English before a random suffix is added.
 - **Words** are those twenty-nine themes on their own: `randWord`, and a function per theme, from `randAnimal` and `randFood` to `randGem`.
 - **Sentences** are whole statements in the language's own grammar, from `randSentence`. A verb states what can do it and what it can be done to, so the words of one sentence belong together: 여우가 사과를 먹는다, The brave lion runs quietly.
+- **Locations** are real places written out from the country down, from `randLocation`: 대한민국 경기도 수원시 장안구 파장동, Pasadena, California, United States. Every division is one the country publishes, nothing goes below a neighbourhood or a city, and only countries that publish that list free of conditions are in — Korea and the United States so far.
 - **Decorators** attach something to a string you already have rather than generating one: a random token with `randSuffix` and `randPrefix`, a word with `randModifier`.
 - One options set per generator: language, length, count, a `realism` setting that goes from real words to fully invented ones, and a `vocabulary` setting that keeps to the everyday words.
 - **Every generator and decorator takes a `random`** — where the draws come from. A secure source for a value nobody may predict, a seeded one for a fixture that has to come out the same every run.
@@ -107,21 +108,23 @@ Pure Python. It imports nothing outside the standard library and ships a `py.typ
 
 ## Supported languages
 
-Every generator takes a language, or mixes every language it supports when you leave it out. All nine are covered everywhere, including the word pools: where a modifier goes and how it agrees with its noun are part of each language's own data.
+Every generator takes a language, or mixes every language it supports when you leave it out. All nine are covered by every generator but one, including the word pools: where a modifier goes and how it agrees with its noun are part of each language's own data.
 
-| Code | Language   | Native     | Person names | Words and nicknames | Sentences |
-| ---- | ---------- | ---------- | :----------: | :-----------------: | :-------: |
-| `en` | English    | English    |      ✅      |         ✅          |    ✅     |
-| `ko` | Korean     | 한국어     |      ✅      |         ✅          |    ✅     |
-| `ja` | Japanese   | 日本語     |      ✅      |         ✅          |    ✅     |
-| `zh` | Chinese    | 中文       |      ✅      |         ✅          |    ✅     |
-| `it` | Italian    | Italiano   |      ✅      |         ✅          |    ✅     |
-| `de` | German     | Deutsch    |      ✅      |         ✅          |    ✅     |
-| `ru` | Russian    | Русский    |      ✅      |         ✅          |    ✅     |
-| `es` | Spanish    | Español    |      ✅      |         ✅          |    ✅     |
-| `vi` | Vietnamese | Tiếng Việt |      ✅      |         ✅          |    ✅     |
+| Code | Language   | Native     | Person names | Words and nicknames | Sentences | Locations |
+| ---- | ---------- | ---------- | :----------: | :-----------------: | :-------: | :-------: |
+| `en` | English    | English    |      ✅      |         ✅          |    ✅     |    ✅     |
+| `ko` | Korean     | 한국어     |      ✅      |         ✅          |    ✅     |    ✅     |
+| `ja` | Japanese   | 日本語     |      ✅      |         ✅          |    ✅     |     —     |
+| `zh` | Chinese    | 中文       |      ✅      |         ✅          |    ✅     |     —     |
+| `it` | Italian    | Italiano   |      ✅      |         ✅          |    ✅     |     —     |
+| `de` | German     | Deutsch    |      ✅      |         ✅          |    ✅     |     —     |
+| `ru` | Russian    | Русский    |      ✅      |         ✅          |    ✅     |     —     |
+| `es` | Spanish    | Español    |      ✅      |         ✅          |    ✅     |     —     |
+| `vi` | Vietnamese | Tiếng Việt |      ✅      |         ✅          |    ✅     |     —     |
 
 A sentence is the one place where a language can be narrower than the others. Each declares the shapes its own grammar carries, so German writes no object and Russian no place, because both would put the noun in a case its own ending has to change for.
+
+Locations are the generator that is not in all nine. A language has them only when its country publishes its divisions with no attribution to carry, no uncertain terms and no disputed territory, and the [checklist](https://randino.cdget.com/guide/languages#locations) says which do.
 
 ## What it generates
 
@@ -131,6 +134,7 @@ A sentence is the one place where a language can be narrower than the others. Ea
 | Nicknames      | `randNickname`               | `rand_nickname`              | MistyOwl, CraneVoyage |
 | Words          | `randWord`, `randAnimal`, …  | `rand_word`, `rand_animal`, … | Lantern, Otter |
 | Sentences      | `randSentence`               | `rand_sentence`              | The brave lion runs quietly. |
+| Locations      | `randLocation`, `randCity`, … | `rand_location`, `rand_city`, … | 대한민국 서울특별시 종로구 청운동 |
 | Decorators     | `randSuffix`, `randPrefix`, `randModifier` | `rand_suffix`, `rand_prefix`, `rand_modifier` | MistyOwl_nVtRC, MistyOwl |
 
 Each generator returns strings by default, or one detail object per result with <code>output: 'detail'</code>: both scripts of a name, or the words a nickname was built from. The Dart package spells that as a second function (`randNameDetails`), because Dart has no way to make one function's return type depend on an argument.
@@ -145,6 +149,7 @@ packages/
   dart/         The pub.dev package — Dart source in lib/, tests in test/
   python/       The PyPI package — Python source in src/, tests in tests/
 docs/           The documentation site (VitePress), English and Korean
+tools/          Repository tooling: the parity check, the dataset emitter, the location writer
 ```
 
 Each package owns its own `README.md` and `CHANGELOG.md`, because npm, pub.dev and PyPI all read those from the package root. This file is the only one that describes all of them at once.

@@ -1,5 +1,6 @@
 export * from './decorate/index.js';
 export * from './constants.js';
+export * from './location/index.js';
 export * from './name/index.js';
 export * from './nickname/index.js';
 export * from './sentence/index.js';

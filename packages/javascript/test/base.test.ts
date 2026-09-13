@@ -13,10 +13,13 @@ describe('base test', () => {
 			'AFFIX_LENGTH_DEFAULT',
 			'AFFIX_LENGTH_MAX',
 			'AFFIX_SEPARATOR_DEFAULT',
+			'LOCATION_LANGUAGES',
+			'LOCATION_LEVELS',
 			'NAME_LANGUAGES',
 			'RAND_COUNT_MAX',
 			'RAND_LENGTH_MAX',
 			'RAND_LENGTH_MIN',
+			'RAND_LOCATION_LENGTH_MAX',
 			'RAND_SENTENCE_COUNT_MAX',
 			'RAND_SENTENCE_LENGTH_MAX',
 			'WORD_LANGUAGES',
@@ -27,9 +30,12 @@ describe('base test', () => {
 			'nicknameLengthRange',
 			'randAnimal',
 			'randBody',
+			'randCity',
 			'randClothing',
 			'randColor',
 			'randConcept',
+			'randCountry',
+			'randDistrict',
 			'randDrink',
 			'randEmotion',
 			'randFinance',
@@ -37,6 +43,7 @@ describe('base test', () => {
 			'randFurniture',
 			'randGem',
 			'randJob',
+			'randLocation',
 			'randModifier',
 			'randMusic',
 			'randMyth',
@@ -49,6 +56,7 @@ describe('base test', () => {
 			'randPlant',
 			'randPrefix',
 			'randProduct',
+			'randRegion',
 			'randSentence',
 			'randSound',
 			'randSpace',
@@ -111,6 +119,14 @@ describe('base test', () => {
 		assert.strictEqual(randino.AFFIX_LENGTH_MAX, 32);
 		assert.strictEqual(randino.AFFIX_SEPARATOR_DEFAULT, '_');
 		assert.match(randino.AFFIX_CHARSET, /^[0-9A-Za-z]+$/);
+
+		// A location written out is every level of it at once, so it has a length
+		// ceiling of its own, and one generator per level below it.
+		assert.strictEqual(typeof randino.randLocation({ language: 'ko' })[0], 'string');
+		assert.strictEqual(randino.randLocation({ output: 'detail' })[0].country.length > 0, true);
+		assert.strictEqual(randino.randCity({ language: 'en', output: 'detail' })[0].level, 'city');
+		assert.strictEqual(randino.RAND_LOCATION_LENGTH_MAX, 100);
+		assert.deepStrictEqual(randino.LOCATION_LEVELS, ['country', 'region', 'city', 'district']);
 	});
 
 	it('an option the types rule out falls back rather than throwing', () => {
@@ -140,7 +156,11 @@ describe('base test', () => {
 			() => randino.wordLengthRange('xx' as never),
 			() => randino.nicknameLengthRange('xx' as never),
 			() => randino.sentenceLengthRange('xx' as never),
-			() => randino.nameSupportsMiddleName('xx' as never)
+			() => randino.nameSupportsMiddleName('xx' as never),
+			() => randino.randLocation({ language: 'xx' as never }),
+			() => randino.randLocation({ level: 'street' as never }),
+			() => randino.randLocation({ minLength: NaN }),
+			() => randino.randCity({ language: 'ja' as never })
 		];
 
 		for (const ask of asks) {
@@ -210,6 +230,8 @@ describe('base test', () => {
 		agrees(() => randino.randSuffix('MistyOwl', { random: seeded(42) }));
 		agrees(() => randino.randPrefix('MistyOwl', { random: seeded(42) }));
 		agrees(() => randino.randModifier('사자', { random: seeded(42) }));
+		agrees(() => randino.randLocation({ count: 5, random: seeded(42) }));
+		agrees(() => randino.randCity({ language: 'en', maxLength: 8, count: 5, random: seeded(42) }));
 
 		// Two different seeds are two different answers, so the source is actually
 		// what the draws are coming from.

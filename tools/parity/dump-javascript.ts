@@ -5,14 +5,21 @@ import {
 	RAND_COUNT_MAX,
 	RAND_LENGTH_MAX,
 	RAND_LENGTH_MIN,
+	RAND_LOCATION_LENGTH_MAX,
 	RAND_SENTENCE_LENGTH_MAX
 } from '../../packages/javascript/lib/constants.js';
+import { outline } from '../../packages/javascript/lib/_internal/parse.js';
 import {
 	AFFIX_CHARSET,
 	AFFIX_LENGTH_DEFAULT,
 	AFFIX_LENGTH_MAX,
 	AFFIX_SEPARATOR_DEFAULT
 } from '../../packages/javascript/lib/decorate/data/index.js';
+import {
+	LOCATION_DATA,
+	LOCATION_LANGUAGES,
+	LOCATION_LEVELS
+} from '../../packages/javascript/lib/location/data/index.js';
 import { NAME_DATA, NAME_LANGUAGES } from '../../packages/javascript/lib/name/data/index.js';
 import {
 	AGENT_CLASSES,
@@ -119,10 +126,34 @@ console.log(
 			randLengthMin: RAND_LENGTH_MIN,
 			randLengthMax: RAND_LENGTH_MAX,
 			randSentenceLengthMax: RAND_SENTENCE_LENGTH_MAX,
+			randLocationLengthMax: RAND_LOCATION_LENGTH_MAX,
 			affixLengthDefault: AFFIX_LENGTH_DEFAULT,
 			affixLengthMax: AFFIX_LENGTH_MAX,
 			affixSeparatorDefault: AFFIX_SEPARATOR_DEFAULT,
 			affixCharset: AFFIX_CHARSET
+		},
+		// The outline is compared as each package parses it rather than as the text
+		// it is written in, so a parser that reads `_` or a skipped level differently
+		// shows up here even though the three strings are the same generated text.
+		location: {
+			languages: [...LOCATION_LANGUAGES],
+			levels: [...LOCATION_LEVELS],
+			data: Object.fromEntries(
+				Object.entries(LOCATION_DATA).map(([code, data]) => [
+					code,
+					{
+						country: data.country,
+						order: data.order,
+						joiner: data.joiner,
+						levels: [...data.levels],
+						entries: outline(data.outline, data.levels.length).map((entry) => ({
+							path: [...entry.path],
+							depth: entry.depth,
+							below: entry.below
+						}))
+					}
+				])
+			)
 		},
 		word: {
 			languages: [...WORD_LANGUAGES],
