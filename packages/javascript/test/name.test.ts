@@ -15,7 +15,7 @@ import type { NameDetail, NameLanguage, RandNameOptions, RandRealism } from '../
 // is random, but romanization is a pure function with known answers, and the
 // pools are what the tests below hold the generator to.
 import { NAME_DATA } from '../dist/name/data/index.js';
-import { romanizeHangul } from '../dist/name/romanize.js';
+import { fold, romanizeHangul } from '../dist/name/romanize.js';
 
 // Output is random by definition, so the tests assert the properties every name
 // must have — script, structure, length, requested prefix — over a sample large
@@ -116,6 +116,38 @@ describe('Name', () => {
 
 		assert.strictEqual(nameSupportsRoman('en'), false);
 		assert.strictEqual(nameSupportsRoman('ko'), true);
+	});
+
+	it('nameSupportsRoman is read off the pools, not off the language code', () => {
+		// It used to be `language !== 'en'`, which is only right while English is the
+		// one language whose names carry no mark. A language that folds romanizes to
+		// something else exactly when one of its names folds to something else.
+		for (const language of NAME_LANGUAGES) {
+			const data = NAME_DATA[language];
+			const names = [
+				data.last,
+				data.male,
+				data.female,
+				data.middleMale,
+				data.middleFemale,
+				data.givenMale,
+				data.givenFemale
+			].flatMap((pool) => (pool ?? []).map((item) => (typeof item === 'string' ? item : item.n)));
+			const differs = data.roman !== 'fold' || names.some((name) => fold(name) !== name);
+
+			assert.strictEqual(nameSupportsRoman(language), differs, language);
+
+			if (!differs) {
+				for (const detail of nameDetails({ language, count: SAMPLE })) {
+					assert.strictEqual(detail.roman, detail.native, `${language}: ${detail.native}`);
+				}
+			}
+		}
+
+		// `García` and `Müller` are why the two answer yes, and some language always does.
+		assert.strictEqual(nameSupportsRoman('es'), true);
+		assert.strictEqual(nameSupportsRoman('de'), true);
+		assert.strictEqual(nameSupportsRoman(), true);
 	});
 
 	it('Korean surnames use their conventional romanization', () => {

@@ -27,7 +27,7 @@ from randino._internal.parse import NameToken
 # Internal, so they get their own checks: everything else about a generated name is
 # random, but romanization is a pure function with known answers, and the pools are
 # what the tests below hold the generator to.
-from randino.name._romanize import romanize_hangul
+from randino.name._romanize import fold, romanize_hangul
 from randino.name.data import NAME_DATA
 from randino.name.data._types import NamePool
 
@@ -135,6 +135,36 @@ def test_script_roman_leaves_english_names_as_they_are() -> None:
 
     assert name_supports_roman("en") is False
     assert name_supports_roman("ko") is True
+
+
+def test_name_supports_roman_is_read_off_the_pools_not_off_the_language_code() -> None:
+    # It used to be `language != "en"`, which is only right while English is the one
+    # language whose names carry no mark. A language that folds romanizes to something
+    # else exactly when one of its names folds to something else.
+    for language in NAME_LANGUAGES:
+        data = NAME_DATA[language]
+        pools = (
+            data.last,
+            data.male,
+            data.female,
+            data.middle_male,
+            data.middle_female,
+            data.given_male,
+            data.given_female,
+        )
+        names = [item if isinstance(item, str) else item.n for pool in pools for item in pool or ()]
+        differs = data.roman != "fold" or any(fold(name) != name for name in names)
+
+        assert name_supports_roman(language) is differs, language
+
+        if not differs:
+            for detail in rand_name(output="detail", language=language, count=SAMPLE):
+                assert detail.roman == detail.native, f"{language}: {detail.native}"
+
+    # `García` and `Müller` are why the two answer yes, and some language always does.
+    assert name_supports_roman("es") is True
+    assert name_supports_roman("de") is True
+    assert name_supports_roman() is True
 
 
 def test_korean_surnames_use_their_conventional_romanization() -> None:

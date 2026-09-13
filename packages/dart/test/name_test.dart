@@ -98,6 +98,40 @@ void main() {
       expect(nameSupportsRoman(NameLanguage.ko), isTrue);
     });
 
+    test('nameSupportsRoman is read off the pools, not off the language code', () {
+      // It used to be `language != NameLanguage.en`, which is only right while
+      // English is the one language whose names carry no mark. A language that
+      // folds romanizes to something else exactly when one of its names folds to
+      // something else.
+      for (final language in nameLanguages) {
+        final data = nameData[language]!;
+        final names = <NamePool?>[
+          data.last,
+          data.male,
+          data.female,
+          data.middleMale,
+          data.middleFemale,
+          data.givenMale,
+          data.givenFemale,
+        ].expand((pool) => pool ?? const <NameEntry>[]).map((entry) => entry.n);
+        final differs = data.roman != RomanMode.fold || names.any((name) => fold(name) != name);
+
+        expect(nameSupportsRoman(language), differs, reason: language.name);
+
+        if (!differs) {
+          for (final detail in randNameDetails(language: language, count: sample)) {
+            expect(detail.roman, detail.native, reason: '${language.name}: ${detail.native}');
+          }
+        }
+      }
+
+      // `García` and `Müller` are why the two answer yes, and some language always
+      // does.
+      expect(nameSupportsRoman(NameLanguage.es), isTrue);
+      expect(nameSupportsRoman(NameLanguage.de), isTrue);
+      expect(nameSupportsRoman(), isTrue);
+    });
+
     test('Korean surnames use their conventional romanization', () {
       for (final detail in randNameDetails(
         language: NameLanguage.ko,
