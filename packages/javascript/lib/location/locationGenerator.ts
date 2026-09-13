@@ -63,6 +63,9 @@ type Pool = Texts & {
 	data: LocationLanguageData;
 	language: LocationLanguage;
 	form: LocationForm;
+	// Whether a location written out opens on its country. A single division's
+	// name has no country to leave out.
+	withCountry: boolean;
 	// `null` for the country, which the outline does not hold.
 	entries: readonly (OutlineEntry | null)[];
 };
@@ -151,7 +154,9 @@ function detailOf(pool: Pool, entry: OutlineEntry | null): LocationDetail {
 		named[level] = entry.path[depth] ?? null;
 	});
 
-	const parts = [data.country, ...entry.path].filter((part): part is string => part !== null);
+	const parts = [pool.withCountry ? data.country : null, ...entry.path].filter(
+		(part): part is string => part !== null
+	);
 	const name = entry.path[entry.depth] as string;
 
 	return {
@@ -166,10 +171,16 @@ function detailOf(pool: Pool, entry: OutlineEntry | null): LocationDetail {
 	};
 }
 
-// One pool per language, form and level, each built the first time it is drawn from.
+// One pool per language, form, level and whether it opens on the country, each
+// built the first time it is drawn from.
 const poolCache = new WeakMap<LocationLanguageData, Map<string, Pool>>();
 
-function poolOf(language: LocationLanguage, form: LocationForm, level: LocationLevel): Pool {
+function poolOf(
+	language: LocationLanguage,
+	form: LocationForm,
+	level: LocationLevel,
+	withCountry: boolean
+): Pool {
 	const data = LOCATION_DATA[language];
 	let byKind = poolCache.get(data);
 
@@ -178,7 +189,7 @@ function poolOf(language: LocationLanguage, form: LocationForm, level: LocationL
 		poolCache.set(data, byKind);
 	}
 
-	const key = `${form}:${level}`;
+	const key = `${form}:${level}:${withCountry}`;
 	const cached = byKind.get(key);
 
 	if (cached) {
@@ -186,7 +197,16 @@ function poolOf(language: LocationLanguage, form: LocationForm, level: LocationL
 	}
 
 	const entries = entriesAt(data, form, level);
-	const pool: Pool = { data, language, form, entries, texts: [], shortest: 0, longest: 0 };
+	const pool: Pool = {
+		data,
+		language,
+		form,
+		withCountry,
+		entries,
+		texts: [],
+		shortest: 0,
+		longest: 0
+	};
 	const texts = entries.map((entry) => detailOf(pool, entry).location);
 
 	pool.texts = texts;
@@ -294,8 +314,12 @@ function narrowAfresh(
 export function generateLocationDetails(
 	form: LocationForm,
 	level: LocationLevel,
-	options: RandLocationUnitOptions = {}
+	options: RandLocationUnitOptions = {},
+	includeCountry = true
 ): LocationDetail[] {
+	// A location at the country level is the country: leaving it out would leave
+	// nothing, so the option only reaches the levels below it.
+	const withCountry = form === 'unit' || level === 'country' || includeCountry;
 	const language = resolveLocationLanguage(options.language);
 	const prefix = resolvePrefix(options.startsWith);
 	const minLength = resolveLength(options.minLength);
@@ -306,7 +330,7 @@ export function generateLocationDetails(
 	// every language for a 읍·면·동 draws Korean rather than spending half the
 	// draws on English, which has none.
 	const candidates = languagesWriting(language, LOCATION_LANGUAGES, prefix).flatMap((code) => {
-		const pool = poolOf(code, form, level);
+		const pool = poolOf(code, form, level, withCountry);
 		const indexes = pool.entries.length ? narrow(pool, prefix, minLength, maxLength) : [];
 
 		return indexes === null || indexes.length ? [{ pool, indexes }] : [];
@@ -334,9 +358,10 @@ export function generateLocationDetails(
 export function drawLocation(
 	form: LocationForm,
 	level: LocationLevel,
-	options: RandLocationUnitOptions & { output?: 'value' | 'detail' }
+	options: RandLocationUnitOptions & { output?: 'value' | 'detail' },
+	includeCountry = true
 ): string[] | LocationDetail[] {
-	const details = generateLocationDetails(form, level, options);
+	const details = generateLocationDetails(form, level, options, includeCountry);
 
 	return options.output === 'detail' ? details : details.map((detail) => detail.location);
 }

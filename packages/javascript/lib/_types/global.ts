@@ -795,6 +795,14 @@ export interface RandLocationOptions extends RandLocationUnitOptions {
 	 * deepest one it has. Default `'district'`, which is as far as any goes.
 	 */
 	level?: LocationLevel;
+	/**
+	 * Open the location on its country. Default `true`. A caller who fixed
+	 * `language` already knows the country, and `false` writes `경기도 수원시 장안구`
+	 * rather than `대한민국 경기도 수원시 장안구`; the detail still reports `country`.
+	 * The length options and `startsWith` read the string without it. A location
+	 * at `level: 'country'` is the country, and writes it either way.
+	 */
+	includeCountry?: boolean;
 }
 
 /** A generated location with every level it was built from. */

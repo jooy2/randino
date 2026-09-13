@@ -52,11 +52,15 @@ abstract class _Texts {
 
 /// The divisions one kind of draw may land on.
 class _Pool extends _Texts {
-  _Pool(this.data, this.language, this.form, this.entries);
+  _Pool(this.data, this.language, this.form, this.withCountry, this.entries);
 
   final LocationLanguageData data;
   final LocationLanguage language;
   final LocationForm form;
+
+  // Whether a location written out opens on its country. A single division's
+  // name has no country to leave out.
+  final bool withCountry;
 
   // `null` for the country, which the outline does not hold.
   final List<OutlineEntry?> entries;
@@ -139,7 +143,7 @@ LocationDetail _detailOf(_Pool pool, OutlineEntry? entry) {
   if (pool.form == LocationForm.unit) {
     location = entry.path[entry.depth]!;
   } else {
-    final parts = <String>[data.country, ...entry.path.nonNulls];
+    final parts = <String>[if (pool.withCountry) data.country, ...entry.path.nonNulls];
 
     location = (data.order == LocationOrder.largestFirst ? parts : parts.reversed).join(
       data.joiner,
@@ -157,21 +161,21 @@ LocationDetail _detailOf(_Pool pool, OutlineEntry? entry) {
   );
 }
 
-// One pool per language, form and level, each built the first time it is drawn
-// from.
+// One pool per language, form, level and whether it opens on the country, each
+// built the first time it is drawn from.
 final Expando<Map<String, _Pool>> _poolCache = Expando<Map<String, _Pool>>('locationPools');
 
-_Pool _poolOf(LocationLanguage language, LocationForm form, LocationLevel level) {
+_Pool _poolOf(LocationLanguage language, LocationForm form, LocationLevel level, bool withCountry) {
   final data = locationData[language]!;
   final byKind = _poolCache[data] ??= <String, _Pool>{};
-  final key = '${form.name}:${level.name}';
+  final key = '${form.name}:${level.name}:$withCountry';
   final cached = byKind[key];
 
   if (cached != null) {
     return cached;
   }
 
-  final pool = _Pool(data, language, form, _entriesAt(data, form, level));
+  final pool = _Pool(data, language, form, withCountry, _entriesAt(data, form, level));
   final texts = List<String>.unmodifiable(
     pool.entries.map((entry) => _detailOf(pool, entry).location),
   );
@@ -298,12 +302,16 @@ List<LocationDetail> generateLocationDetails({
   int? maxLength,
   String? startsWith,
   bool unique = false,
+  bool includeCountry = true,
 
   /// Where the randomness comes from: `Random.secure()` for a value nobody may
   /// predict, `Random(42)` for one that has to come out the same every run.
   Random? random,
 }) {
   final prefix = resolvePrefix(startsWith);
+  // A location at the country level is the country: leaving it out would leave
+  // nothing, so the option only reaches the levels below it.
+  final withCountry = form == LocationForm.unit || level == LocationLevel.country || includeCountry;
 
   // A language that cannot write the requested first character, and one with
   // nothing at the requested level, are out before a draw is made — so asking
@@ -312,7 +320,7 @@ List<LocationDetail> generateLocationDetails({
   final candidates = <_Candidate<_Pool>>[];
 
   for (final code in languagesWriting(language, locationLanguages, prefix)) {
-    final pool = _poolOf(code, form, level);
+    final pool = _poolOf(code, form, level, withCountry);
     final indexes =
         pool.entries.isEmpty ? const <int>[] : _narrow(pool, prefix, minLength, maxLength);
 

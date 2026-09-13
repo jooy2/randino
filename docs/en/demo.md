@@ -18,6 +18,7 @@ Everything below runs in your browser. The controls are the options `randName`, 
 - Type two words into `include` — `brave lion` in English, `사자 조용히` in Korean. Both land in every sentence, and `brave` becomes a modifier or a predicate depending on what the rest of the shape has room for.
 - Set `shape` to `simple` and then to `complex`. The sentence gains a phrase rather than a longer word, which is the same thing `minLength` does one character at a time.
 - On the locations tab, turn on the details and press Generate a few times. Every district sits inside the city beside it and every city inside its region, because each is one the country publishes rather than a name put together.
+- Leave `randLocation` picked, set `language` to `ko` and turn off `includeCountry`. The country stops opening every line, and `startsWith` on `서` now draws from 서울특별시 rather than matching nothing.
 - Pick `randDistrict` and set `language` to `en`. Nothing comes back: a US location stops at the city, and only Korean has a level below it. Leave `language` on `all` and the same call draws Korean alone.
 - Pick `randRegion`, set `language` to `ko`, `count` to `20` and turn on `unique`. Sixteen come back, which is every 시·도 there is.
 - Pick `randCountry` and set `language` to `ja`, then turn on the details. Every country and territory ISO 3166-1 codes has a name in all nine languages, so this is the one location function that is not held to Korean and English.

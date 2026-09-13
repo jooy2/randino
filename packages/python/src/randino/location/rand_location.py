@@ -18,6 +18,7 @@ def rand_location(
     max_length: int | None = ...,
     starts_with: str = ...,
     unique: bool = ...,
+    include_country: bool = ...,
     random: Callable[[], float] | None = ...,
     output: Literal["value"] = ...,
 ) -> list[str]: ...
@@ -33,6 +34,7 @@ def rand_location(
     max_length: int | None = ...,
     starts_with: str = ...,
     unique: bool = ...,
+    include_country: bool = ...,
     random: Callable[[], float] | None = ...,
     output: Literal["detail"],
 ) -> list[LocationDetail]: ...
@@ -47,6 +49,7 @@ def rand_location(
     max_length: int | None = None,
     starts_with: str = "",
     unique: bool = False,
+    include_country: bool = True,
     random: Callable[[], float] | None = None,
     output: str = "value",
 ) -> list[str] | list[LocationDetail]:
@@ -71,6 +74,10 @@ def rand_location(
         starts_with: Keep only locations whose first character is this one.
         unique: Never return the same location twice. May return fewer than `count` once
             the divisions run out.
+        include_country: Open the location on its country. A caller who fixed `language`
+            already knows it, and `False` writes `경기도 수원시 장안구` rather than
+            `대한민국 경기도 수원시 장안구`; the detail still reports the country. A location at
+            `level="country"` is the country, and writes it either way.
         random: Where the randomness comes from: a callable returning a number in
             `[0, 1)`, the way `random.random` does. `SystemRandom().random` for a value
             nobody may predict, `Random(42).random` for one that has to come out the
@@ -89,6 +96,8 @@ def rand_location(
         ['Pasadena, California, United States']
         >>> rand_location(language="ko", level="city", count=2)
         ['대한민국 경상남도 창원시 진해구', '대한민국 충청북도 단양군']
+        >>> rand_location(language="ko", include_country=False)
+        ['경기도 양평군 단월면']
         >>> rand_location(language="ko", output="detail")
         [LocationDetail(location='대한민국 서울특별시 종로구 청운동', language='ko', level='district', country='대한민국', region='서울특별시', city='종로구', district='청운동')]
     """
@@ -103,4 +112,5 @@ def rand_location(
         unique=unique,
         random=random,
         output=output,
+        include_country=include_country,
     )

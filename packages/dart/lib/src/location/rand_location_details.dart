@@ -22,6 +22,12 @@ List<LocationDetail> randLocationDetails({
   String? startsWith,
   bool unique = false,
 
+  /// Open the location on its country. A caller who fixed [language] already
+  /// knows it, and `false` writes `경기도 수원시 장안구` rather than
+  /// `대한민국 경기도 수원시 장안구`; the detail still reports the country. A
+  /// location at [LocationLevel.country] is the country, and writes it either way.
+  bool includeCountry = true,
+
   /// Where the randomness comes from: `Random.secure()` for a value nobody may
   /// predict, `Random(42)` for one that has to come out the same every run.
   Random? random,
@@ -34,5 +40,6 @@ List<LocationDetail> randLocationDetails({
   maxLength: maxLength,
   startsWith: startsWith,
   unique: unique,
+  includeCountry: includeCountry,
   random: random,
 );

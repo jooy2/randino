@@ -224,13 +224,14 @@ randLocation({ language: 'ko', output: 'detail' });
 | ------------------------- | ----------------------- | ------------ |
 | `language`                | `'all' \| 'ko' \| 'en'` | `'all'`      |
 | `level`                   | `LocationLevel`         | `'district'` |
+| `includeCountry`          | `boolean`               | `true`       |
 | `count`                   | `number`                | `1`          |
 | `minLength` / `maxLength` | `number`                | —            |
 | `startsWith`              | `string`                | —            |
 | `unique`                  | `boolean`               | `false`      |
 | `output`                  | `'value' \| 'detail'`   | `'value'`    |
 
-`level` is how far down the location goes: `country`, `region`, `city` or `district`. A country without that level stops at the deepest one it has, so an English location ends at its city. `randRegion`, `randCity` and `randDistrict` take the same options minus `level`, and hand back that one division's name.
+`level` is how far down the location goes: `country`, `region`, `city` or `district`. A country without that level stops at the deepest one it has, so an English location ends at its city. `includeCountry: false` leaves the country out of the string, which is what a fixed `language` usually wants. `randRegion`, `randCity` and `randDistrict` take the same options minus `level`, and hand back that one division's name.
 
 `randCountry` names any of the 249 ISO 3166-1 countries and territories, in any of the nine languages rather than only the two with divisions:
 

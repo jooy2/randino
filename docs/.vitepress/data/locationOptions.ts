@@ -46,6 +46,13 @@ export const LOCATION_OPTIONS: readonly LocationOptionRow[] = [
 		levelOnly: true
 	},
 	{
+		name: { js: 'includeCountry', dart: 'includeCountry', py: 'include_country' },
+		type: { js: 'boolean', dart: 'bool', py: 'bool' },
+		fallback: { js: 'true', dart: 'true', py: 'True' },
+		about: 'optionIncludeCountry',
+		levelOnly: true
+	},
+	{
 		name: 'count',
 		type: { js: 'number', dart: 'int', py: 'int' },
 		fallback: '1',

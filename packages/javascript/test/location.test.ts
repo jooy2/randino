@@ -176,6 +176,55 @@ describe('Location', () => {
 		]);
 	});
 
+	it('includeCountry: false writes a location without its country, and the detail keeps it', () => {
+		for (const language of LOCATION_LANGUAGES) {
+			const data = LOCATION_DATA[language];
+
+			for (const detail of randLocation({
+				language,
+				includeCountry: false,
+				count: SAMPLE,
+				output: 'detail'
+			})) {
+				const parts = [detail.region, detail.city, detail.district].filter(
+					(part): part is string => part !== null
+				);
+
+				assert.strictEqual(
+					detail.location,
+					(data.order === 'largest-first' ? parts : parts.reverse()).join(data.joiner)
+				);
+				assert.strictEqual(detail.country, data.country);
+				assert.ok(!detail.location.includes(data.country), detail.location);
+			}
+		}
+
+		// A location at the country level is the country, so it is written either way.
+		assert.deepStrictEqual(
+			randLocation({ language: 'en', level: 'country', includeCountry: false }),
+			['United States']
+		);
+
+		// `startsWith` and the length options read the string that is written.
+		for (const location of randLocation({
+			language: 'ko',
+			includeCountry: false,
+			startsWith: '서',
+			count: SAMPLE
+		})) {
+			assert.match(location, /^서울특별시 /);
+		}
+
+		for (const location of randLocation({
+			language: 'ko',
+			includeCountry: false,
+			maxLength: 10,
+			count: SAMPLE
+		})) {
+			assert.ok(location.length <= 10, location);
+		}
+	});
+
 	it('a region with no city is still a location at the city level', () => {
 		// Every city-level location of that exact length, which is few enough for the
 		// draws `unique` allows to reach all of them.

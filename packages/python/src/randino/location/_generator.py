@@ -85,6 +85,12 @@ class _Pool(_Texts):
     form: LocationForm
     """Whether a draw is one division's name or the whole location."""
 
+    with_country: bool
+    """Whether a location written out opens on its country.
+
+    A single division's name has no country to leave out.
+    """
+
     entries: tuple[OutlineEntry | None, ...]
     """The divisions, with None for the country, which the outline does not hold."""
 
@@ -104,8 +110,9 @@ class _Candidate(NamedTuple):
 # the language, whose dataset is a module constant that lives as long as the process.
 _ENTRY_CACHE: dict[LocationLanguage, tuple[OutlineEntry, ...]] = {}
 
-# One pool per language, form and level, each built the first time it is drawn from.
-_POOL_CACHE: dict[tuple[LocationLanguage, LocationForm, LocationLevel], _Pool] = {}
+# One pool per language, form, level and whether it opens on the country, each built the
+# first time it is drawn from.
+_POOL_CACHE: dict[tuple[LocationLanguage, LocationForm, LocationLevel, bool], _Pool] = {}
 
 
 def _entries_of(language: LocationLanguage) -> tuple[OutlineEntry, ...]:
@@ -189,7 +196,11 @@ def _detail_of(pool: _Pool, entry: OutlineEntry | None) -> LocationDetail:
     for depth, level in enumerate(data.levels):
         named[level] = entry.path[depth] if depth < len(entry.path) else None
 
-    parts = [part for part in (data.country, *entry.path) if part is not None]
+    parts = [
+        part
+        for part in (data.country if pool.with_country else None, *entry.path)
+        if part is not None
+    ]
     name = entry.path[entry.depth] or ""
 
     if pool.form == "unit":
@@ -208,9 +219,11 @@ def _detail_of(pool: _Pool, entry: OutlineEntry | None) -> LocationDetail:
     )
 
 
-def _pool_of(language: LocationLanguage, form: LocationForm, level: LocationLevel) -> _Pool:
+def _pool_of(
+    language: LocationLanguage, form: LocationForm, level: LocationLevel, with_country: bool
+) -> _Pool:
     """The pool for one language, form and level, built the first time it is drawn from."""
-    key = (language, form, level)
+    key = (language, form, level, with_country)
     cached = _POOL_CACHE.get(key)
 
     if cached is not None:
@@ -222,6 +235,7 @@ def _pool_of(language: LocationLanguage, form: LocationForm, level: LocationLeve
         data=data,
         language=language,
         form=form,
+        with_country=with_country,
         entries=entries,
         texts=(),
         shortest=0,
@@ -328,10 +342,14 @@ def generate_location_details(
     max_length: int | None = None,
     starts_with: str = "",
     unique: bool = False,
+    include_country: bool = True,
     random: Callable[[], float] | None = None,
 ) -> list[LocationDetail]:
     """Generate `count` locations at one level, in one form, applied to every option."""
     prefix = resolve_prefix(starts_with)
+    # A location at the country level is the country: leaving it out would leave nothing,
+    # so the option only reaches the levels below it.
+    with_country = form == "unit" or level == "country" or include_country
     low = resolve_length(min_length)
     high = resolve_length(max_length)
 
@@ -342,7 +360,7 @@ def generate_location_details(
     candidates: list[_Candidate] = []
 
     for code in languages_writing(resolve_location_language(language), LOCATION_LANGUAGES, prefix):
-        pool = _pool_of(code, form, level)
+        pool = _pool_of(code, form, level, with_country)
         indexes = _narrow(pool, prefix, low, high) if pool.entries else ()
 
         if indexes is None or indexes:
@@ -379,6 +397,7 @@ def draw_location(
     unique: bool,
     random: Callable[[], float] | None,
     output: str,
+    include_country: bool = True,
 ) -> list[str] | list[LocationDetail]:
     """What every location generator does: a draw at one level, in one form.
 
@@ -393,6 +412,7 @@ def draw_location(
         unique: The caller's `unique`.
         random: The caller's `random`.
         output: `"detail"` for the details, anything else for the strings.
+        include_country: Whether a location written out opens on its country.
 
     Returns:
         The details, or what each of them writes out.
@@ -406,6 +426,7 @@ def draw_location(
         max_length=max_length,
         starts_with=starts_with,
         unique=unique,
+        include_country=include_country,
         random=random,
     )
 

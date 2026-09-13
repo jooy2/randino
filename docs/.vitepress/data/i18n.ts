@@ -114,6 +114,10 @@ const strings = {
 		ko: '어느 단계까지 쓸지. 그 단계가 없는 나라는 가진 단계 중 가장 낮은 곳에서 멈춥니다.',
 		en: 'How far down the location goes. A country without that level stops at the deepest one it has.'
 	},
+	optionIncludeCountry: {
+		ko: '위치 맨 앞에 나라 이름을 쓸지. 언어를 정했다면 끄는 편이 깔끔하며, 상세 출력의 country는 그대로 남습니다.',
+		en: 'Open the location on its country. Turn it off once the language is fixed; the detail still reports the country.'
+	},
 	optionLocationCount: {
 		ko: '돌려줄 결과 개수. 0 … 10000으로 제한됩니다.',
 		en: 'How many results to return. Clamped to 0 … 10000.'

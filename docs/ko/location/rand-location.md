@@ -43,7 +43,7 @@ rand_location()
 
 <LocationOptions level />
 
-`level`을 뺀 같은 표가 아래 네 단계 함수에도 들어 있습니다. `realism`은 없습니다. 위치는 실제 장소이거나 위치가 아니거나 둘 중 하나라서, 지어낼 것이 없습니다.
+`level`과 `includeCountry`를 뺀 같은 표가 아래 네 단계 함수에도 들어 있습니다. `realism`은 없습니다. 위치는 실제 장소이거나 위치가 아니거나 둘 중 하나라서, 지어낼 것이 없습니다.
 
 Dart에는 `output`이 없습니다. 거기서는 [상세 출력](#the-detail-output)이 `randLocationDetails`입니다.
 
@@ -126,11 +126,47 @@ rand_location(language="ko", level="city", count=2)
 
 멈추는 단계의 구역은 모두 같은 확률로 뽑힙니다. 한국 위치라면 인구와 상관없이 약 5천 개 읍·면·동 가운데 하나를 고르게 고릅니다.
 
+## 나라 이름 빼기 {#include-country}
+
+위치는 나라 이름으로 시작합니다. `language`를 섞을 때는 의미가 있지만, 언어를 정하면 매번 같은 이름일 뿐입니다. <Lang js="includeCountry: false" dart="includeCountry: false" py="include_country=False" code />를 주면 문자열에서 나라 이름을 뺍니다. 상세 출력의 `country`는 그대로 남습니다.
+
+::: lang js
+
+```javascript
+randLocation({ language: 'ko', includeCountry: false, count: 2 });
+// ['경기도 양평군 단월면', '충청남도 공주시 월송동']
+
+randLocation({ language: 'en', includeCountry: false, count: 2 });
+// ['Diamond Springs, California', 'Gig Harbor, Washington']
+```
+
+:::
+
+::: lang dart
+
+```dart
+randLocation(language: LocationLanguage.ko, includeCountry: false, count: 2);
+// [경기도 양평군 단월면, 충청남도 공주시 월송동]
+```
+
+:::
+
+::: lang py
+
+```python
+rand_location(language="ko", include_country=False, count=2)
+# ['경기도 양평군 단월면', '충청남도 공주시 월송동']
+```
+
+:::
+
+`level: 'country'`인 위치는 나라 이름 자체이므로, 이 옵션과 상관없이 나라 이름을 씁니다.
+
 ## 길이와 첫 글자 {#length}
 
 <Lang js="minLength" dart="minLength" py="min_length" code />와 <Lang js="maxLength" dart="maxLength" py="max_length" code />는 나라 이름과 구분자까지 포함한 문자열 전체의 길이를 재며, 최대 <Lang js="RAND_LOCATION_LENGTH_MAX" dart="randLocationLengthMax" py="RAND_LOCATION_LENGTH_MAX" code />(100)까지입니다. 맞는 위치가 없으면 빈 결과 대신 가장 가까운 길이의 위치로 답합니다.
 
-<Lang js="startsWith" dart="startsWith" py="starts_with" code />는 문자열의 첫 글자와 비교합니다. 한국어 위치는 늘 나라 이름의 `대`로 시작하니, 이 옵션은 네 단계 함수에서 더 쓸모가 있습니다.
+<Lang js="startsWith" dart="startsWith" py="starts_with" code />는 문자열의 첫 글자와 비교합니다. 한국어 위치는 나라 이름의 `대`로 시작하지만, <Lang js="includeCountry: false" dart="includeCountry: false" py="include_country=False" code />로 나라 이름을 빼면 `startsWith: '서'`로 서울특별시에서만 뽑을 수 있습니다. 길이 옵션도 나라 이름이 있든 없든 실제로 쓰인 문자열을 잽니다.
 
 ::: lang js
 

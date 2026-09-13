@@ -43,7 +43,7 @@ Every option is optional, and the defaults are what the empty call above uses.
 
 <LocationOptions level />
 
-The same table, minus `level`, is on each of the four level functions below. There is no `realism`: a location is a real place or it is not a location, so there is nothing to invent.
+The same table, minus `level` and `includeCountry`, is on each of the four level functions below. There is no `realism`: a location is a real place or it is not a location, so there is nothing to invent.
 
 Dart has no `output`; [the detail output](#the-detail-output) is `randLocationDetails` there.
 
@@ -126,11 +126,47 @@ A branch that has no division at a level stops above it. 세종특별자치시 h
 
 Every division is drawn as often as any other at the level the location stops at, so a Korean location is one of some five thousand 읍·면·동 picked evenly, whatever the population behind it.
 
+## Without the country {#include-country}
+
+A location opens on its country, which says something when `language` is left to mix and nothing once it is fixed. <Lang js="includeCountry: false" dart="includeCountry: false" py="include_country=False" code /> leaves it out of the string; the detail still reports `country`.
+
+::: lang js
+
+```javascript
+randLocation({ language: 'ko', includeCountry: false, count: 2 });
+// ['경기도 양평군 단월면', '충청남도 공주시 월송동']
+
+randLocation({ language: 'en', includeCountry: false, count: 2 });
+// ['Diamond Springs, California', 'Gig Harbor, Washington']
+```
+
+:::
+
+::: lang dart
+
+```dart
+randLocation(language: LocationLanguage.ko, includeCountry: false, count: 2);
+// [경기도 양평군 단월면, 충청남도 공주시 월송동]
+```
+
+:::
+
+::: lang py
+
+```python
+rand_location(language="ko", include_country=False, count=2)
+# ['경기도 양평군 단월면', '충청남도 공주시 월송동']
+```
+
+:::
+
+A location at `level: 'country'` is the country and nothing else, so it is written either way.
+
 ## Length and first character {#length}
 
 <Lang js="minLength" dart="minLength" py="min_length" code /> and <Lang js="maxLength" dart="maxLength" py="max_length" code /> measure the whole string, country and separators included, up to <Lang js="RAND_LOCATION_LENGTH_MAX" dart="randLocationLengthMax" py="RAND_LOCATION_LENGTH_MAX" code /> (100). A range nothing fits is answered with the locations closest to it rather than with none.
 
-<Lang js="startsWith" dart="startsWith" py="starts_with" code /> matches the first character of the string, which for Korean is always the `대` of the country; it is more use on the four level functions.
+<Lang js="startsWith" dart="startsWith" py="starts_with" code /> matches the first character of the string, which for Korean is the `대` of the country unless the country is left out: with <Lang js="includeCountry: false" dart="includeCountry: false" py="include_country=False" code />, `startsWith: '서'` draws from 서울특별시. The length options measure the string as it is written, with or without the country.
 
 ::: lang js
 

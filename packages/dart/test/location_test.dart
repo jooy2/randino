@@ -187,6 +187,59 @@ void main() {
       },
     );
 
+    test(
+      'includeCountry: false writes a location without its country, and the detail keeps it',
+      () {
+        for (final language in locationLanguages) {
+          final data = locationData[language]!;
+
+          for (final detail in randLocationDetails(
+            language: language,
+            includeCountry: false,
+            count: sample,
+          )) {
+            final parts = <String?>[detail.region, detail.city, detail.district].nonNulls.toList();
+
+            expect(
+              detail.location,
+              (data.order == LocationOrder.largestFirst ? parts : parts.reversed).join(data.joiner),
+            );
+            expect(detail.country, data.country);
+            expect(detail.location.contains(data.country), isFalse, reason: detail.location);
+          }
+        }
+
+        // A location at the country level is the country, so it is written either way.
+        expect(
+          randLocation(
+            language: LocationLanguage.en,
+            level: LocationLevel.country,
+            includeCountry: false,
+          ),
+          <String>['United States'],
+        );
+
+        // `startsWith` and the length options read the string that is written.
+        for (final location in randLocation(
+          language: LocationLanguage.ko,
+          includeCountry: false,
+          startsWith: '서',
+          count: sample,
+        )) {
+          expect(location, startsWith('서울특별시 '));
+        }
+
+        for (final location in randLocation(
+          language: LocationLanguage.ko,
+          includeCountry: false,
+          maxLength: 10,
+          count: sample,
+        )) {
+          expect(location.length, lessThanOrEqualTo(10), reason: location);
+        }
+      },
+    );
+
     test('a region with no city is still a location at the city level', () {
       // Every city-level location of that exact length, which is few enough for the
       // draws `unique` allows to reach all of them.

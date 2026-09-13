@@ -193,6 +193,36 @@ def test_level_says_how_far_down_and_stops_at_the_deepest_one_its_country_has() 
     ]
 
 
+def test_include_country_false_writes_a_location_without_its_country() -> None:
+    for language in LOCATION_LANGUAGES:
+        data = LOCATION_DATA[language]
+
+        for detail in rand_location(
+            language=language, include_country=False, count=SAMPLE, output="detail"
+        ):
+            parts = [part for part in (detail.region, detail.city, detail.district) if part]
+
+            assert detail.location == data.joiner.join(
+                parts if data.order == "largest-first" else parts[::-1]
+            )
+            assert detail.country == data.country
+            assert data.country not in detail.location, detail.location
+
+    # A location at the country level is the country, so it is written either way.
+    assert rand_location(language="en", level="country", include_country=False) == ["United States"]
+
+    # `starts_with` and the length arguments read the string that is written.
+    for location in rand_location(
+        language="ko", include_country=False, starts_with="서", count=SAMPLE
+    ):
+        assert location.startswith("서울특별시 ")
+
+    for location in rand_location(
+        language="ko", include_country=False, max_length=10, count=SAMPLE
+    ):
+        assert len(location) <= 10, location
+
+
 def test_a_region_with_no_city_is_still_a_location_at_the_city_level() -> None:
     # Every city-level location of that exact length, which is few enough for the draws
     # `unique` allows to reach all of them.
