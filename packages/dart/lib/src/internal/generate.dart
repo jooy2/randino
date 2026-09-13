@@ -48,7 +48,11 @@ LengthRange lengthBounds(
   final low = clampInt(min ?? naturalMin, randLengthMin, ceiling);
   final high = clampInt(max ?? naturalMax, randLengthMin, ceiling);
 
-  return LengthRange(low, high < low ? low : high);
+  // A range the wrong way round is a caller contradicting themselves, and the
+  // bound that survives is `maxLength` — the one they are usually holding to, a
+  // field limit or a column width, where `minLength` only shapes how a result
+  // reads. `(30, 5)` used to read as `(30, 30)`, which is the other way about.
+  return LengthRange(high < low ? high : low, high);
 }
 
 /// The languages a draw may come from once `startsWith` has had its say: the

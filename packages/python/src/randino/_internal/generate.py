@@ -172,7 +172,11 @@ def length_bounds(
     resolved_low = clamp(natural_low if low is None else low, RAND_LENGTH_MIN, ceiling)
     resolved_high = clamp(natural_high if high is None else high, RAND_LENGTH_MIN, ceiling)
 
-    return resolved_low, max(resolved_low, resolved_high)
+    # A range the wrong way round is a caller contradicting themselves, and the bound
+    # that survives is `max_length` — the one they are usually holding to, a field
+    # limit or a column width, where `min_length` only shapes how a result reads.
+    # `(30, 5)` used to read as `(30, 30)`, which is the other way about.
+    return min(resolved_low, resolved_high), resolved_high
 
 
 def draw_language(option: str, languages: Sequence[L]) -> L:

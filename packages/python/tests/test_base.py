@@ -10,6 +10,9 @@ from typing import Any
 
 import randino
 
+# Internal, but every generator's length options go through it.
+from randino._internal.generate import length_bounds
+
 SOURCE = pathlib.Path(randino.__file__).parent
 
 
@@ -225,6 +228,17 @@ def test_an_option_the_types_rule_out_falls_back_rather_than_raising() -> None:
     assert len(loose.rand_name(count=float("nan"))) == 1
     # A token of no length is not a token.
     assert len(loose.rand_suffix("x", length=float("nan"))) == len("x_") + 5
+
+
+def test_a_length_range_the_wrong_way_round_keeps_max_length() -> None:
+    # `max_length` is the bound a caller is holding to — a field limit, a column width —
+    # where `min_length` only shapes how a result reads. `(30, 5)` used to read as
+    # `(30, 30)`.
+    assert length_bounds(30, 5, 3, 10) == (5, 5)
+    assert length_bounds(5, 30, 3, 10) == (5, 30)
+
+    for word in randino.rand_word(language="en", min_length=30, max_length=5, count=60):
+        assert len(word) <= 5, word
 
 
 def test_random_is_where_every_draw_of_a_call_comes_from() -> None:

@@ -1,6 +1,8 @@
 import assert from 'assert';
 import { describe, it } from 'node:test';
 import * as randino from '../dist/index.js';
+// Internal, but every generator's length options go through it.
+import { lengthBounds } from '../dist/_internal/generate.js';
 
 describe('base test', () => {
 	it('all check success', async () => {
@@ -152,6 +154,23 @@ describe('base test', () => {
 		// A token of no length is not a token. `NaN` clamped to `NaN`, and a loop
 		// that runs `NaN` times wrote nothing at all.
 		assert.strictEqual(randino.randSuffix('x', { length: NaN }).length, 'x_'.length + 5);
+	});
+
+	it('a length range the wrong way round keeps maxLength', () => {
+		// `maxLength` is the bound a caller is holding to — a field limit, a column
+		// width — where `minLength` only shapes how a result reads. `[30, 5]` used to
+		// read as `[30, 30]`.
+		assert.deepStrictEqual(lengthBounds(30, 5, 3, 10), [5, 5]);
+		assert.deepStrictEqual(lengthBounds(5, 30, 3, 10), [5, 30]);
+
+		for (const word of randino.randWord({
+			language: 'en',
+			minLength: 30,
+			maxLength: 5,
+			count: 60
+		})) {
+			assert.ok(word.length <= 5, word);
+		}
 	});
 
 	it('`random` is where every draw of a call comes from', () => {

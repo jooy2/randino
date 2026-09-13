@@ -3,6 +3,8 @@ import 'dart:io';
 import 'dart:math';
 
 import 'package:randino/randino.dart';
+// Internal, but every generator's length options go through it.
+import 'package:randino/src/internal/generate.dart';
 import 'package:test/test.dart';
 
 /// Every name `lib/randino.dart` exports, read out of its `show` clauses.
@@ -183,6 +185,23 @@ void main() {
       expect(nameLanguages.toSet(), NameLanguage.values.toSet());
       expect(wordLanguages.toSet(), WordLanguage.values.toSet());
       expect(wordThemes.toSet(), WordTheme.values.toSet());
+    });
+
+    test('a length range the wrong way round keeps maxLength', () {
+      // `maxLength` is the bound a caller is holding to — a field limit, a column
+      // width — where `minLength` only shapes how a result reads. `(30, 5)` used
+      // to read as `(30, 30)`.
+      expect(lengthBounds(30, 5, 3, 10), const LengthRange(5, 5));
+      expect(lengthBounds(5, 30, 3, 10), const LengthRange(5, 30));
+
+      for (final word in randWord(
+        language: WordLanguage.en,
+        minLength: 30,
+        maxLength: 5,
+        count: 60,
+      )) {
+        expect(word.length, lessThanOrEqualTo(5), reason: word);
+      }
     });
 
     test('`random` is where every draw of a call comes from', () {
