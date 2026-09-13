@@ -102,6 +102,14 @@ const strings = {
 		ko: '어느 언어로, 곧 어느 나라의 위치를 쓸지. 생략하면 결과마다 하나씩 골라 섞습니다.',
 		en: 'Which language, and so which country, the places are from. Left out, it picks one per result and mixes them.'
 	},
+	optionCountryLanguage: {
+		ko: '국가 이름을 쓸 언어. 9개 언어 모두 됩니다. 생략하면 결과마다 하나씩 골라 섞습니다.',
+		en: 'Language the country names are written in, any of the nine. Left out, it picks one per result and mixes them.'
+	},
+	optionCountryOutput: {
+		ko: '문자열, 또는 결과마다 CountryDetail 하나.',
+		en: 'Strings, or one CountryDetail per result.'
+	},
 	optionLevel: {
 		ko: '어느 단계까지 쓸지. 그 단계가 없는 나라는 가진 단계 중 가장 낮은 곳에서 멈춥니다.',
 		en: 'How far down the location goes. A country without that level stops at the deepest one it has.'

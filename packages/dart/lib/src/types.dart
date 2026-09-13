@@ -736,3 +736,22 @@ class LocationDetail {
       'LocationDetail($location, ${language.name}, ${level.name}, '
       '$country, $region, $city, $district)';
 }
+
+/// A generated country with the code it is known by.
+class CountryDetail {
+  /// Creates a detail record. Returned by the generator; there is rarely a
+  /// reason to build one by hand outside a test.
+  const CountryDetail({required this.country, required this.code, required this.language});
+
+  /// The country's name, as [language] writes it.
+  final String country;
+
+  /// Its ISO 3166-1 alpha-2 code, which is the same whatever the language.
+  final String code;
+
+  /// The language the name was written in.
+  final WordLanguage language;
+
+  @override
+  String toString() => 'CountryDetail($country, $code, ${language.name})';
+}

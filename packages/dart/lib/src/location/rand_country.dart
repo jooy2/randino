@@ -3,17 +3,22 @@ import 'dart:math';
 import 'package:randino/src/location/location_generator.dart';
 import 'package:randino/src/types.dart';
 
-/// The country a language's locations are in, the way the language writes it.
+/// Generate country names: every ISO 3166-1 country and territory, 249 of them,
+/// named the way the language names it.
 ///
-/// There is one per language — a null [language] is how more than one comes
-/// back — and it is the top of every location `randLocation` writes.
+/// Every word language has a name for every one, so this takes a
+/// [WordLanguage], where the other location generators write only the languages
+/// whose countries publish their divisions. A null [language] mixes all nine.
+///
+/// Each is drawn as often as any other. The names are Wikidata's, and the list
+/// is ISO's: a territory is in because ISO 3166-1 gives it a code of its own.
 ///
 /// ```dart
-/// randCountry(language: LocationLanguage.ko); // [대한민국]
-/// randCountry(count: 3); // [United States, 대한민국, 대한민국]
+/// randCountry(language: WordLanguage.ko, count: 3); // [아르헨티나, 방글라데시, 세인트키츠 네비스]
+/// randCountry(language: WordLanguage.en, count: 2); // [Gibraltar, Burkina Faso]
 /// ```
 List<String> randCountry({
-  LocationLanguage? language,
+  WordLanguage? language,
   int count = 1,
   int? minLength,
   int? maxLength,
@@ -24,9 +29,7 @@ List<String> randCountry({
   /// predict, `Random(42)` for one that has to come out the same every run.
   Random? random,
 }) => [
-  for (final detail in generateLocationDetails(
-    form: LocationForm.unit,
-    level: LocationLevel.country,
+  for (final detail in generateCountryDetails(
     language: language,
     count: count,
     minLength: minLength,
@@ -35,5 +38,5 @@ List<String> randCountry({
     unique: unique,
     random: random,
   ))
-    detail.location,
+    detail.country,
 ];

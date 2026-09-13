@@ -207,7 +207,7 @@ randCityDetails(language: LocationLanguage.ko).first;
 | `startsWith`              | `String?`           | `null`                   |
 | `unique`                  | `bool`              | `false`                  |
 
-`level` is how far down the location goes: `country`, `region`, `city` or `district`. A country without that level stops at the deepest one it has, so an English location ends at its city. `randCountry`, `randRegion`, `randCity` and `randDistrict` take the same parameters minus `level`, and hand back that one division's name; each has a `…Details` twin, as `randLocation` has `randLocationDetails`.
+`level` is how far down the location goes: `country`, `region`, `city` or `district`. A country without that level stops at the deepest one it has, so an English location ends at its city. `randRegion`, `randCity` and `randDistrict` take the same parameters minus `level`, and hand back that one division's name; each has a `…Details` twin, as `randLocation` has `randLocationDetails`. `randCountry` is the exception: it takes a `WordLanguage?` and names any of the 249 ISO 3166-1 countries and territories in any of the nine languages, and `randCountryDetails` adds each one's code as a `CountryDetail`.
 
 ## Decorators
 

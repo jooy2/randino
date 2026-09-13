@@ -90,8 +90,10 @@ function flatten(markdown: string): string {
 			.replace(/^<WordOptions(\s+theme)?\s*\/>$/gm, (_, theme?: string) =>
 				wordOptionsTable(Boolean(theme))
 			)
-			.replace(/^<LocationOptions(\s+level)?\s*\/>$/gm, (_, level?: string) =>
-				locationOptionsTable(Boolean(level))
+			.replace(
+				/^<LocationOptions(\s+level)?(\s+country)?\s*\/>$/gm,
+				(_, level?: string, country?: string) =>
+					locationOptionsTable(Boolean(level), Boolean(country))
 			)
 			// Whatever the removals left behind.
 			.replace(/\n{3,}/g, '\n\n')
@@ -106,8 +108,9 @@ const PREAMBLE = [
 	'built from everyday words and never from person names. **Words** are those everyday words on',
 	"their own, across twenty-nine themes. **Sentences** are whole statements in the language's own",
 	'grammar (여우가 사과를 먹는다). **Locations** are real places written out down to a Korean 읍·면·동',
-	'or a US city, in the two languages whose countries publish that list free of conditions, and',
-	'**decorators** attach a token or a modifier to a string you already have.',
+	'or a US city, in the two languages whose countries publish that list free of conditions, beside',
+	"every country's name in all nine, and **decorators** attach a token or a modifier to a string",
+	'you already have.',
 	'',
 	'The same library ships as three packages (`randino` on npm, on pub.dev and on PyPI), generating',
 	'the same output from the same datasets. **Everything below is the JavaScript package**, which is',

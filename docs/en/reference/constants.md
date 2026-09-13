@@ -310,10 +310,12 @@ import type {
 	WordLanguageOption,
 	WordTheme,
 	WordThemeOption,
+	CountryDetail,
 	LocationDetail,
 	LocationLanguage,
 	LocationLanguageOption,
 	LocationLevel,
+	RandCountryOptions,
 	RandLocationOptions,
 	RandNameOptions,
 	RandNicknameOptions,
@@ -340,7 +342,7 @@ WordLanguage, WordTheme
 LocationLanguage, LocationLevel
 
 // Values
-LengthRange, NameDetail, NicknameDetail, LocationDetail
+LengthRange, NameDetail, NicknameDetail, LocationDetail, CountryDetail
 ```
 
 There is no `…Option` type and no `all` member: **a null enum is what means "every one of them"**, so the parameter you do not write is already the mixed draw. That also means the helpers take the same type the generators do, rather than a narrower one.
@@ -364,6 +366,7 @@ from randino import (
     WordLanguageOption,
     WordTheme,
     WordThemeOption,
+    CountryDetail,
     LocationDetail,
     LocationLanguage,
     LocationLanguageOption,

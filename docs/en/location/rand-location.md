@@ -86,7 +86,7 @@ rand_location(language="ko", count=3)
 
 :::
 
-The other seven languages the package writes have no locations. A country qualifies when it publishes its divisions free of conditions — no attribution a user of this package would have to carry, and no disputed territory in the list — and so far only these two do. [Supported languages](../guide/languages#locations) keeps the checklist.
+The other seven languages the package writes have no locations below the country, though [`randCountry`](./rand-country) names every country in all nine. A country qualifies when it publishes its divisions free of conditions — no attribution a user of this package would have to carry, and no disputed territory in the list — and so far only these two do. [Supported languages](../guide/languages#locations) keeps the checklist.
 
 ## How far down {#level}
 
@@ -164,7 +164,7 @@ rand_location(language="ko", max_length=14, count=3)
 
 ## One function per level {#levels}
 
-Each level below the country has a function of its own, which hands back that one division's name rather than the whole location.
+Each level has a function of its own, which hands back one name rather than the whole location. [`randCountry`](./rand-country) is the one that reaches past the language's own country: it names any of the world's 249 countries and territories, in any word language.
 
 [`randCountry`](./rand-country) · [`randRegion`](./rand-region) · [`randCity`](./rand-city) · [`randDistrict`](./rand-district)
 
@@ -210,6 +210,8 @@ rand_location(language="ko", output="detail")
 | ---- | ------------------------------------------------------------------------- | ---------- |
 | `ko` | 국토교통부, 전국 법정동 (공공데이터포털 15063424), 이용허락범위 제한 없음 | 2026-07-29 |
 | `en` | U.S. Census Bureau, 2026 Gazetteer places, a U.S. Government work         | 2026       |
+
+The country a location opens on is the name [`randCountry`](./rand-country) gives it, from the same table: ISO 3166-1 as the tz database lists it (public domain), named by Wikidata (CC0).
 
 A Korean district is the legal 동 an address is written with, not the administrative 동 a community centre serves, and a 시 with 일반구 is written with its 구 (`수원시 장안구`). A US city is every incorporated place and census designated place in the fifty states and the District of Columbia, named without its legal description (`Pasadena`, not `Pasadena city`). Puerto Rico and the Island Areas are not among the states.
 

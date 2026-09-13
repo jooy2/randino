@@ -23,6 +23,14 @@ export interface LocationOptionRow {
 	levelOnly?: boolean;
 }
 
+/** `randCountry` takes any word language: every country has a name in all nine. */
+const COUNTRY_LANGUAGE: LocationOptionRow = {
+	name: 'language',
+	type: { js: 'WordLanguageOption', dart: 'WordLanguage?', py: 'WordLanguageOption' },
+	fallback: { js: "'all'", dart: 'null', py: '"all"' },
+	about: 'optionCountryLanguage'
+};
+
 export const LOCATION_OPTIONS: readonly LocationOptionRow[] = [
 	{
 		name: 'language',
@@ -83,7 +91,20 @@ export const LOCATION_OPTIONS: readonly LocationOptionRow[] = [
 	}
 ];
 
-/** The rows a page shows: every one, minus `level` where the function answers it. */
-export function locationOptionRows(level: boolean): readonly LocationOptionRow[] {
-	return level ? LOCATION_OPTIONS : LOCATION_OPTIONS.filter((row) => !row.levelOnly);
+/**
+ * The rows a page shows: every one, minus `level` where the function answers it,
+ * and with `randCountry`'s wider `language` on its page.
+ */
+export function locationOptionRows(level: boolean, country = false): readonly LocationOptionRow[] {
+	const rows = level ? LOCATION_OPTIONS : LOCATION_OPTIONS.filter((row) => !row.levelOnly);
+
+	return country
+		? rows.map((row) =>
+				row.about === 'optionLocationLanguage'
+					? COUNTRY_LANGUAGE
+					: row.about === 'optionLocationOutput'
+						? { ...row, about: 'optionCountryOutput' }
+						: row
+			)
+		: rows;
 }

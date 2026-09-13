@@ -3,16 +3,23 @@ import { describe, it } from 'node:test';
 import {
 	LOCATION_LANGUAGES,
 	RAND_COUNT_MAX,
+	WORD_LANGUAGES,
 	randCity,
 	randCountry,
 	randDistrict,
 	randLocation,
 	randRegion
 } from '../dist/index.js';
-import type { LocationDetail, LocationLanguage, LocationLevel } from '../dist/index.js';
+import type {
+	LocationDetail,
+	LocationLanguage,
+	LocationLevel,
+	WordLanguage
+} from '../dist/index.js';
 // The datasets are internal, but a location is only real if it is one of theirs —
 // these are what tie the output back to the outline each language ships.
 import { outline } from '../dist/_internal/parse.js';
+import { COUNTRIES } from '../dist/location/data/countries.js';
 import { LOCATION_DATA } from '../dist/location/data/index.js';
 
 const SAMPLE = 60;
@@ -24,6 +31,32 @@ const NAME: Record<LocationLanguage, RegExp> = {
 	ko: /^[가-힣0-9]+(?: [가-힣0-9]+)?$/,
 	en: /^[\p{Script=Latin}0-9 .,'()/-]+$/u
 };
+
+// The script a country's name opens on, per word language.
+const OPENS: Record<WordLanguage, RegExp> = {
+	en: /^\p{Script=Latin}/u,
+	ko: /^[가-힣]/,
+	ja: /^[぀-ヿ一-鿿]/,
+	zh: /^[一-鿿]/,
+	vi: /^\p{Script=Latin}/u,
+	es: /^\p{Script=Latin}/u,
+	it: /^\p{Script=Latin}/u,
+	de: /^\p{Script=Latin}/u,
+	ru: /^\p{Script=Cyrillic}/u
+};
+
+/** The country table as rows of `[code, name, name, …]`. */
+const COUNTRY_ROWS = COUNTRIES.table
+	.trim()
+	.split('\n')
+	.map((line: string) => line.trim().split('|'));
+
+/** Every country's name in one language, by its code. */
+function countriesIn(language: WordLanguage): Map<string, string> {
+	const column = COUNTRIES.languages.indexOf(language) + 1;
+
+	return new Map(COUNTRY_ROWS.map((row: string[]) => [row[0], row[column]]));
+}
 
 const DEPTH: Record<LocationLevel, number> = { country: 0, region: 1, city: 2, district: 3 };
 
@@ -168,19 +201,54 @@ describe('Location', () => {
 				assert.ok(PLACES[detail.language].has(keyOf(detail as Place)), detail.location);
 			}
 		}
+	});
 
-		assert.deepStrictEqual(randCountry({ language: 'ko' }), ['대한민국']);
-		assert.deepStrictEqual(randCountry({ language: 'en', output: 'detail' }), [
-			{
-				location: 'United States',
-				language: 'en',
-				level: 'country',
-				country: 'United States',
-				region: null,
-				city: null,
-				district: null
+	it('randCountry names every ISO 3166-1 country, in every word language', () => {
+		assert.strictEqual(COUNTRY_ROWS.length, 249);
+		assert.strictEqual(new Set(COUNTRY_ROWS.map((row: string[]) => row[0])).size, 249);
+		assert.deepStrictEqual([...COUNTRIES.languages].sort(), [...WORD_LANGUAGES].sort());
+
+		for (const row of COUNTRY_ROWS) {
+			assert.match(row[0], /^[A-Z]{2}$/);
+			assert.strictEqual(row.length, COUNTRIES.languages.length + 1, row[0]);
+		}
+
+		for (const language of WORD_LANGUAGES) {
+			const named = countriesIn(language);
+
+			for (const detail of randCountry({ language, count: SAMPLE, output: 'detail' })) {
+				assert.strictEqual(detail.language, language);
+				assert.strictEqual(named.get(detail.code), detail.country, `${language}: ${detail.code}`);
+				assert.match(detail.country, OPENS[language], detail.country);
 			}
-		]);
+
+			// Unique by name, and two countries a language names alike would be one.
+			assert.strictEqual(
+				randCountry({ language, unique: true, count: 300 }).length,
+				new Set(named.values()).size
+			);
+		}
+	});
+
+	it('randCountry mixes every word language, not only the ones with divisions', () => {
+		const languages = new Set(randCountry({ count: 300, output: 'detail' }).map((d) => d.language));
+
+		assert.deepStrictEqual([...languages].sort(), [...WORD_LANGUAGES].sort());
+		assert.deepStrictEqual(
+			randCountry({ language: 'de', startsWith: 'Ö', count: 3, unique: true }),
+			['Österreich']
+		);
+
+		for (const name of randCountry({ language: 'ru', maxLength: 5, count: SAMPLE })) {
+			assert.ok(name.length <= 5, name);
+		}
+	});
+
+	it('a location opens on the name the country table gives its country', () => {
+		// `randLocation` and `randCountry` read one table, so they cannot spell a country two ways.
+		assert.strictEqual(LOCATION_DATA.ko.country, countriesIn('ko').get('KR'));
+		assert.strictEqual(LOCATION_DATA.en.country, countriesIn('en').get('US'));
+		assert.deepStrictEqual(randLocation({ language: 'ko', level: 'country' }), ['대한민국']);
 	});
 
 	it('a level the country does not have is answered with nothing, and `all` skips that country', () => {
@@ -258,7 +326,6 @@ describe('Location', () => {
 
 		assert.strictEqual(new Set(regions).size, regions.length);
 		assert.strictEqual(regions.length, 51);
-		assert.strictEqual(randCountry({ unique: true, count: 5 }).length, 2);
 	});
 
 	it('the Korean dataset stops above the 리, and writes a city district after its city', () => {

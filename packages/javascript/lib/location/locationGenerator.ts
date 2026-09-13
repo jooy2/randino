@@ -18,11 +18,16 @@ import type { OutlineEntry } from '../_internal/parse.js';
 import { pick, randInt, withRandom } from '../_internal/utils.js';
 import { RAND_LOCATION_LENGTH_MAX } from '../constants.js';
 import type {
+	CountryDetail,
 	LocationDetail,
 	LocationLanguage,
 	LocationLevel,
-	RandLocationUnitOptions
+	RandCountryOptions,
+	RandLocationUnitOptions,
+	WordLanguage
 } from '../_types/global.js';
+import { WORD_LANGUAGES, resolveWordLanguage } from '../word/data/index.js';
+import { COUNTRIES } from './data/countries.js';
 import {
 	LOCATION_DATA,
 	LOCATION_LANGUAGES,
@@ -39,23 +44,27 @@ import type { LocationLanguageData } from './data/types.js';
 export type LocationForm = 'unit' | 'path';
 
 /**
- * The divisions one kind of draw may land on, with what each is written as. The
- * text is worked out once, because every length and `startsWith` filter reads it
- * and a US list is thirty-two thousand of them.
+ * What a draw may land on, written out. The text is worked out once, because
+ * every length and `startsWith` filter reads it and a US list is thirty-two
+ * thousand of them.
  */
-type Pool = {
+type Texts = {
+	texts: readonly string[];
+	shortest: number;
+	longest: number;
+	// The last narrowing asked of this list, which is the one a loop of single
+	// draws asks again: filtering thirty-two thousand names costs a millisecond,
+	// and a caller drawing one at a time would pay it every call.
+	narrowed?: { key: string; indexes: readonly number[] };
+};
+
+/** The divisions one kind of draw may land on. */
+type Pool = Texts & {
 	data: LocationLanguageData;
 	language: LocationLanguage;
 	form: LocationForm;
 	// `null` for the country, which the outline does not hold.
 	entries: readonly (OutlineEntry | null)[];
-	texts: readonly string[];
-	shortest: number;
-	longest: number;
-	// The last narrowing asked of this pool, which is the one a loop of single
-	// draws asks again: filtering thirty-two thousand names costs a millisecond,
-	// and a caller drawing one at a time would pay it every call.
-	narrowed?: { key: string; indexes: readonly number[] };
 };
 
 // Parsed once per dataset, on the first draw that needs it rather than at import:
@@ -179,6 +188,16 @@ function poolOf(language: LocationLanguage, form: LocationForm, level: LocationL
 	const entries = entriesAt(data, form, level);
 	const pool: Pool = { data, language, form, entries, texts: [], shortest: 0, longest: 0 };
 	const texts = entries.map((entry) => detailOf(pool, entry).location);
+
+	pool.texts = texts;
+	[pool.shortest, pool.longest] = spanOf(texts);
+	byKind.set(key, pool);
+
+	return pool;
+}
+
+/** Shortest and longest of a list of texts, `[0, 0]` for none. */
+function spanOf(texts: readonly string[]): [number, number] {
 	let shortest = Infinity;
 	let longest = 0;
 
@@ -189,12 +208,7 @@ function poolOf(language: LocationLanguage, form: LocationForm, level: LocationL
 		longest = Math.max(longest, text.length);
 	}
 
-	pool.texts = texts;
-	pool.shortest = texts.length ? shortest : 0;
-	pool.longest = longest;
-	byKind.set(key, pool);
-
-	return pool;
+	return texts.length ? [shortest, longest] : [0, 0];
 }
 
 /**
@@ -207,7 +221,7 @@ function poolOf(language: LocationLanguage, form: LocationForm, level: LocationL
  * `maxLength` is the bound a caller is usually holding to.
  */
 function narrow(
-	pool: Pool,
+	pool: Texts,
 	prefix: string,
 	minLength: number | undefined,
 	maxLength: number | undefined
@@ -230,7 +244,7 @@ function narrow(
 }
 
 function narrowAfresh(
-	pool: Pool,
+	pool: Texts,
 	prefix: string,
 	minLength: number | undefined,
 	maxLength: number | undefined
@@ -325,4 +339,75 @@ export function drawLocation(
 	const details = generateLocationDetails(form, level, options);
 
 	return options.output === 'detail' ? details : details.map((detail) => detail.location);
+}
+
+/* --- Countries ------------------------------------------------------------ */
+
+/** Every country's name in one language, with the code each one is known by. */
+type CountryPool = Texts & { language: WordLanguage; codes: readonly string[] };
+
+// Split out of the table the first time a language is drawn from, never at import.
+const countryCache = new Map<WordLanguage, CountryPool>();
+
+function countryPoolOf(language: WordLanguage): CountryPool {
+	const cached = countryCache.get(language);
+
+	if (cached) {
+		return cached;
+	}
+
+	const column = COUNTRIES.languages.indexOf(language) + 1;
+	const codes: string[] = [];
+	const texts: string[] = [];
+
+	for (const line of COUNTRIES.table.split('\n')) {
+		const cells = line.trim().split('|');
+
+		if (cells.length > column) {
+			codes.push(cells[0]);
+			texts.push(cells[column]);
+		}
+	}
+
+	const [shortest, longest] = spanOf(texts);
+	const pool: CountryPool = { language, codes, texts, shortest, longest };
+
+	countryCache.set(language, pool);
+
+	return pool;
+}
+
+/**
+ * Countries in any word language: the ISO 3166-1 list, each named the way the
+ * language names it. Unlike the divisions, which only some languages have, every
+ * country has a name in all nine — so this reads `language` as a word language.
+ */
+export function generateCountryDetails(options: RandCountryOptions = {}): CountryDetail[] {
+	const language = resolveWordLanguage(options.language);
+	const prefix = resolvePrefix(options.startsWith);
+	const minLength = resolveLength(options.minLength);
+	const maxLength = resolveLength(options.maxLength);
+	const candidates = languagesWriting(language, WORD_LANGUAGES, prefix).flatMap((code) => {
+		const pool = countryPoolOf(code);
+		const indexes = narrow(pool, prefix, minLength, maxLength);
+
+		return indexes === null || indexes.length ? [{ pool, indexes }] : [];
+	});
+
+	if (!candidates.length) {
+		return [];
+	}
+
+	return withRandom(resolveRandom(options.random), () =>
+		collect(
+			options,
+			() => {
+				const { pool, indexes } = pick(candidates);
+				const index = indexes ? pick(indexes) : randInt(0, pool.codes.length - 1);
+
+				return { country: pool.texts[index], code: pool.codes[index], language: pool.language };
+			},
+			(detail) => detail.country
+		)
+	);
 }

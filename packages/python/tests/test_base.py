@@ -24,6 +24,7 @@ def test_the_package_exports_exactly_its_public_api() -> None:
         "AFFIX_LENGTH_DEFAULT",
         "AFFIX_LENGTH_MAX",
         "AFFIX_SEPARATOR_DEFAULT",
+        "CountryDetail",
         "LOCATION_LANGUAGES",
         "LOCATION_LEVELS",
         "LocationDetail",
@@ -242,6 +243,7 @@ def test_an_option_the_types_rule_out_falls_back_rather_than_raising() -> None:
         lambda: loose.rand_location(level="street"),
         lambda: loose.rand_location(min_length=float("nan")),
         lambda: loose.rand_city(language="ja"),
+        lambda: loose.rand_country(language="xx", min_length=float("nan")),
     ]
 
     for ask in asks:

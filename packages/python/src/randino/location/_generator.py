@@ -19,7 +19,15 @@ from randino._internal.generate import (
 )
 from randino._internal.parse import OutlineEntry, outline
 from randino._internal.utils import pick, rand_int, with_random
-from randino._types import LocationDetail, LocationLanguage, LocationLanguageOption, LocationLevel
+from randino._types import (
+    CountryDetail,
+    LocationDetail,
+    LocationLanguage,
+    LocationLanguageOption,
+    LocationLevel,
+    WordLanguage,
+    WordLanguageOption,
+)
 from randino.constants import RAND_LOCATION_LENGTH_MAX
 from randino.location.data import (
     LOCATION_DATA,
@@ -28,6 +36,8 @@ from randino.location.data import (
     resolve_location_language,
 )
 from randino.location.data._types import LocationLanguageData
+from randino.location.data.countries import COUNTRIES
+from randino.word.data import WORD_LANGUAGES, resolve_word_language
 
 LocationForm = Literal["unit", "path"]
 """What one draw hands back.
@@ -37,13 +47,34 @@ the language writes a location (`rand_location`).
 """
 
 
-@dataclass(slots=True)
-class _Pool:
-    """The divisions one kind of draw may land on, with what each is written as.
+@dataclass(slots=True, kw_only=True)
+class _Texts:
+    """What a draw may land on, written out.
 
     The text is worked out once, because every length and `starts_with` filter reads it
     and a US list is thirty-two thousand of them.
     """
+
+    texts: tuple[str, ...]
+    """What each entry is written as, at the same index."""
+
+    shortest: int
+    """The length of the shortest text, or `0` for an empty list."""
+
+    longest: int
+    """The length of the longest text."""
+
+    narrowed: tuple[tuple[str, int | None, int | None], tuple[int, ...]] | None = None
+    """The last narrowing asked of this list, and its answer.
+
+    That is the one a loop of single draws asks again: filtering thirty-two thousand
+    names is not free, and a caller drawing one at a time would pay it every call.
+    """
+
+
+@dataclass(slots=True)
+class _Pool(_Texts):
+    """The divisions one kind of draw may land on."""
 
     data: LocationLanguageData
     """The dataset the divisions come from."""
@@ -56,22 +87,6 @@ class _Pool:
 
     entries: tuple[OutlineEntry | None, ...]
     """The divisions, with None for the country, which the outline does not hold."""
-
-    texts: tuple[str, ...]
-    """What each entry is written as, at the same index."""
-
-    shortest: int
-    """The length of the shortest text, or `0` for an empty pool."""
-
-    longest: int
-    """The length of the longest text."""
-
-    narrowed: tuple[tuple[str, int | None, int | None], tuple[int, ...]] | None = None
-    """The last narrowing asked of this pool, and its answer.
-
-    That is the one a loop of single draws asks again: filtering thirty-two thousand
-    names is not free, and a caller drawing one at a time would pay it every call.
-    """
 
 
 class _Candidate(NamedTuple):
@@ -213,18 +228,23 @@ def _pool_of(language: LocationLanguage, form: LocationForm, level: LocationLeve
         longest=0,
     )
     texts = tuple(_detail_of(pool, entry).location for entry in entries)
-    lengths = [len(text) for text in texts]
 
     pool.texts = texts
-    pool.shortest = min(lengths, default=0)
-    pool.longest = max(lengths, default=0)
+    pool.shortest, pool.longest = _span_of(texts)
     _POOL_CACHE[key] = pool
 
     return pool
 
 
+def _span_of(texts: tuple[str, ...]) -> tuple[int, int]:
+    """Shortest and longest of a list of texts, `(0, 0)` for none."""
+    lengths = [len(text) for text in texts]
+
+    return min(lengths, default=0), max(lengths, default=0)
+
+
 def _narrow(
-    pool: _Pool, prefix: str, min_length: int | None, max_length: int | None
+    pool: _Texts, prefix: str, min_length: int | None, max_length: int | None
 ) -> tuple[int, ...] | None:
     """The indexes of a pool one call may draw from once the options have had their say.
 
@@ -258,7 +278,7 @@ def _narrow(
 
 
 def _narrow_afresh(
-    pool: _Pool, prefix: str, min_length: int | None, max_length: int | None
+    pool: _Texts, prefix: str, min_length: int | None, max_length: int | None
 ) -> tuple[int, ...]:
     """What `_narrow` answers when the pool has not been asked the same thing just before."""
     lower = prefix.lower()
@@ -390,3 +410,112 @@ def draw_location(
     )
 
     return details if output == "detail" else [detail.location for detail in details]
+
+
+# --- Countries --------------------------------------------------------------
+
+
+@dataclass(slots=True)
+class _CountryPool(_Texts):
+    """Every country's name in one language, with the code each one is known by."""
+
+    language: WordLanguage
+    """The language the names are written in."""
+
+    codes: tuple[str, ...]
+    """Each country's ISO 3166-1 code, at the same index as its name."""
+
+
+class _CountryCandidate(NamedTuple):
+    """A country pool one call may draw from, and the indexes of it that call may land on."""
+
+    pool: _CountryPool
+    """The pool itself."""
+
+    indexes: tuple[int, ...] | None
+    """The indexes left once the options had their say, or None for all of them."""
+
+
+# Split out of the table the first time a language is drawn from, never at import.
+_COUNTRY_CACHE: dict[WordLanguage, _CountryPool] = {}
+
+
+def _country_pool_of(language: WordLanguage) -> _CountryPool:
+    """Every country's name in one language, split out of the table on first use."""
+    cached = _COUNTRY_CACHE.get(language)
+
+    if cached is not None:
+        return cached
+
+    column = COUNTRIES.languages.index(language) + 1
+    codes: list[str] = []
+    texts: list[str] = []
+
+    for line in COUNTRIES.table.split("\n"):
+        cells = line.strip().split("|")
+
+        if len(cells) > column:
+            codes.append(cells[0])
+            texts.append(cells[column])
+
+    shortest, longest = _span_of(tuple(texts))
+    pool = _CountryPool(
+        language=language,
+        codes=tuple(codes),
+        texts=tuple(texts),
+        shortest=shortest,
+        longest=longest,
+    )
+
+    _COUNTRY_CACHE[language] = pool
+
+    return pool
+
+
+def generate_country_details(
+    *,
+    language: WordLanguageOption = "all",
+    count: int = 1,
+    min_length: int | None = None,
+    max_length: int | None = None,
+    starts_with: str = "",
+    unique: bool = False,
+    random: Callable[[], float] | None = None,
+) -> list[CountryDetail]:
+    """Generate `count` countries in any word language, applied to every option.
+
+    The ISO 3166-1 list, each named the way the language names it. Unlike the divisions,
+    which only some languages have, every country has a name in all nine — so this reads
+    `language` as a word language.
+    """
+    prefix = resolve_prefix(starts_with)
+    low = resolve_length(min_length)
+    high = resolve_length(max_length)
+    candidates: list[_CountryCandidate] = []
+
+    for code in languages_writing(resolve_word_language(language), WORD_LANGUAGES, prefix):
+        pool = _country_pool_of(code)
+        indexes = _narrow(pool, prefix, low, high)
+
+        if indexes is None or indexes:
+            candidates.append(_CountryCandidate(pool, indexes))
+
+    if not candidates:
+        return []
+
+    def draw() -> CountryDetail:
+        pool, indexes = pick(candidates)
+        index = pick(indexes) if indexes is not None else rand_int(0, len(pool.codes) - 1)
+
+        return CountryDetail(
+            country=pool.texts[index], code=pool.codes[index], language=pool.language
+        )
+
+    with with_random(random):
+        return collect(
+            count=count,
+            unique=unique,
+            starts_with=prefix,
+            draw=draw,
+            key_of=lambda detail: detail.country,
+        )

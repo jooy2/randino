@@ -10,6 +10,8 @@ writes them out of the file the country publishes, into all three packages at on
 from dataclasses import dataclass
 from typing import Literal
 
+from randino._types import WordLanguage
+
 OutlineLevel = Literal["region", "city", "district"]
 """A level an outline holds: every one but the country, which the dataset names itself."""
 
@@ -36,3 +38,18 @@ class LocationLanguageData:
 
     outline: str
     """The divisions themselves, as `outline` in `_internal/parse` reads them."""
+
+
+@dataclass(frozen=True, slots=True)
+class CountryTable:
+    """Every country, named in every word language.
+
+    One line per ISO 3166-1 code, `code|name|name|…`, with the names in the order
+    `languages` lists them.
+    """
+
+    languages: tuple[WordLanguage, ...]
+    """The word languages, in the order the names follow the code on every line."""
+
+    table: str
+    """The countries themselves, one line each."""

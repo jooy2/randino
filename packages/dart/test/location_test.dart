@@ -2,6 +2,7 @@ import 'package:randino/randino.dart';
 // The datasets are internal, but a location is only real if it is one of theirs —
 // these are what tie the output back to the outline each language ships.
 import 'package:randino/src/internal/parse.dart';
+import 'package:randino/src/location/data/countries.dart';
 import 'package:randino/src/location/data/index.dart';
 import 'package:randino/src/location/data/types.dart';
 import 'package:test/test.dart';
@@ -15,6 +16,31 @@ final Map<LocationLanguage, RegExp> nameScript = <LocationLanguage, RegExp>{
   LocationLanguage.ko: RegExp(r'^[가-힣0-9]+(?: [가-힣0-9]+)?$'),
   LocationLanguage.en: RegExp(r"^[\p{Script=Latin}0-9 .,'()/-]+$", unicode: true),
 };
+
+// The script a country's name opens on, per word language.
+final Map<WordLanguage, RegExp> opens = <WordLanguage, RegExp>{
+  WordLanguage.en: RegExp(r'^\p{Script=Latin}', unicode: true),
+  WordLanguage.ko: RegExp(r'^[가-힣]'),
+  WordLanguage.ja: RegExp(r'^[぀-ヿ一-鿿]'),
+  WordLanguage.zh: RegExp(r'^[一-鿿]'),
+  WordLanguage.vi: RegExp(r'^\p{Script=Latin}', unicode: true),
+  WordLanguage.es: RegExp(r'^\p{Script=Latin}', unicode: true),
+  WordLanguage.it: RegExp(r'^\p{Script=Latin}', unicode: true),
+  WordLanguage.de: RegExp(r'^\p{Script=Latin}', unicode: true),
+  WordLanguage.ru: RegExp(r'^\p{Script=Cyrillic}', unicode: true),
+};
+
+/// The country table as rows of `[code, name, name, …]`.
+final List<List<String>> countryRows = <List<String>>[
+  for (final line in countries.table.trim().split('\n')) line.trim().split('|'),
+];
+
+/// Every country's name in one language, by its code.
+Map<String, String> countriesIn(WordLanguage language) {
+  final column = countries.languages.indexOf(language) + 1;
+
+  return <String, String>{for (final row in countryRows) row[0]: row[column]};
+}
 
 const Map<LocationLevel, int> depthOf = <LocationLevel, int>{
   LocationLevel.country: 0,
@@ -195,19 +221,57 @@ void main() {
           );
         }
       }
+    });
 
-      expect(randCountry(language: LocationLanguage.ko), <String>['대한민국']);
+    test('randCountry names every ISO 3166-1 country, in every word language', () {
+      expect(countryRows, hasLength(249));
+      expect(countryRows.map((row) => row[0]).toSet(), hasLength(249));
+      expect(countries.languages, unorderedEquals(wordLanguages));
 
-      final countries = randCountryDetails(language: LocationLanguage.en);
+      for (final row in countryRows) {
+        expect(row[0], matches(RegExp(r'^[A-Z]{2}$')));
+        expect(row, hasLength(countries.languages.length + 1), reason: row[0]);
+      }
 
-      expect(countries, hasLength(1));
-      expect(countries.first.location, 'United States');
-      expect(countries.first.language, LocationLanguage.en);
-      expect(countries.first.level, LocationLevel.country);
-      expect(countries.first.country, 'United States');
-      expect(countries.first.region, isNull);
-      expect(countries.first.city, isNull);
-      expect(countries.first.district, isNull);
+      for (final language in wordLanguages) {
+        final named = countriesIn(language);
+
+        for (final detail in randCountryDetails(language: language, count: sample)) {
+          expect(detail.language, language);
+          expect(named[detail.code], detail.country, reason: '${language.name}: ${detail.code}');
+          expect(detail.country, matches(opens[language]!), reason: detail.country);
+        }
+
+        // Unique by name, and two countries a language names alike would be one.
+        expect(
+          randCountry(language: language, unique: true, count: 300),
+          hasLength(named.values.toSet().length),
+        );
+      }
+    });
+
+    test('randCountry mixes every word language, not only the ones with divisions', () {
+      final languages = randCountryDetails(count: 300).map((detail) => detail.language).toSet();
+
+      expect(languages, wordLanguages.toSet());
+      expect(
+        randCountry(language: WordLanguage.de, startsWith: 'Ö', count: 3, unique: true),
+        <String>['Österreich'],
+      );
+
+      for (final name in randCountry(language: WordLanguage.ru, maxLength: 5, count: sample)) {
+        expect(name.length, lessThanOrEqualTo(5), reason: name);
+      }
+    });
+
+    test('a location opens on the name the country table gives its country', () {
+      // `randLocation` and `randCountry` read one table, so they cannot spell a
+      // country two ways.
+      expect(locationData[LocationLanguage.ko]!.country, countriesIn(WordLanguage.ko)['KR']);
+      expect(locationData[LocationLanguage.en]!.country, countriesIn(WordLanguage.en)['US']);
+      expect(randLocation(language: LocationLanguage.ko, level: LocationLevel.country), <String>[
+        '대한민국',
+      ]);
     });
 
     test(
@@ -306,7 +370,6 @@ void main() {
 
       expect(regions.toSet(), hasLength(regions.length));
       expect(regions, hasLength(51));
-      expect(randCountry(unique: true, count: 5), hasLength(2));
     });
 
     test('the Korean dataset stops above the 리, and writes a city district after its city', () {

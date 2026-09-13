@@ -770,6 +770,25 @@ export interface RandLocationUnitOptions extends Omit<RandCommonOptions, 'realis
 	language?: LocationLanguageOption;
 }
 
+/**
+ * What `randCountry` takes. Its `language` is any word language rather than a
+ * location language: every country has a name in all nine, where only some of
+ * them have divisions to draw.
+ */
+export interface RandCountryOptions extends Omit<RandCommonOptions, 'realism'> {
+	/** Language the country names are written in. `'all'` mixes every one. Default `'all'`. */
+	language?: WordLanguageOption;
+}
+
+/** A generated country with the code it is known by. */
+export interface CountryDetail {
+	/** The country's name, as the language writes it. */
+	country: string;
+	/** Its ISO 3166-1 alpha-2 code, which is the same whatever the language. */
+	code: string;
+	language: WordLanguage;
+}
+
 export interface RandLocationOptions extends RandLocationUnitOptions {
 	/**
 	 * How far down the location goes. A country without that level stops at the

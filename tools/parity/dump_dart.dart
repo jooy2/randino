@@ -11,6 +11,7 @@ import 'dart:convert';
 import 'package:randino/src/constants.dart';
 import 'package:randino/src/decorate/data/index.dart';
 import 'package:randino/src/internal/parse.dart';
+import 'package:randino/src/location/data/countries.dart';
 import 'package:randino/src/location/data/index.dart';
 import 'package:randino/src/location/data/types.dart';
 import 'package:randino/src/name/data/index.dart';
@@ -471,6 +472,17 @@ void main() {
           for (final language in locationLanguages) language.name,
         ],
         'levels': <String>[for (final level in locationLevels) level.name],
+        // One row per country, `[code, name, name, …]`, split the way the package
+        // splits it.
+        'countries': <String, Object?>{
+          'languages': <String>[
+            for (final language in countries.languages) language.name,
+          ],
+          'rows': <List<String>>[
+            for (final line in countries.table.split('\n'))
+              if (line.trim().isNotEmpty) line.trim().split('|'),
+          ],
+        },
         'data': <String, Object?>{
           for (final entry in locationData.entries)
             entry.key.name: <String, Object?>{

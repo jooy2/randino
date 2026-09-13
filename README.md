@@ -16,7 +16,7 @@ Every option, every language and every example, with **JavaScript**, **Dart** or
 - **Nicknames** are handles for a game or a website: MistyOwl, CraneVoyage, RustyBoot. Built from everyday words across twenty-nine themes and never from person names, they run to over forty million combinations in Korean and in English before a random suffix is added.
 - **Words** are those twenty-nine themes on their own: `randWord`, and a function per theme, from `randAnimal` and `randFood` to `randGem`.
 - **Sentences** are whole statements in the language's own grammar, from `randSentence`. A verb states what can do it and what it can be done to, so the words of one sentence belong together: 여우가 사과를 먹는다, The brave lion runs quietly.
-- **Locations** are real places written out from the country down, from `randLocation`: 대한민국 경기도 수원시 장안구 파장동, Pasadena, California, United States. Every division is one the country publishes, nothing goes below a neighbourhood or a city, and only countries that publish that list free of conditions are in — Korea and the United States so far.
+- **Locations** are real places written out from the country down, from `randLocation`: 대한민국 경기도 수원시 장안구 파장동, Pasadena, California, United States. Every division is one the country publishes, nothing goes below a neighbourhood or a city, and only countries that publish that list free of conditions are in — Korea and the United States so far. `randCountry` names every country, all 249 of ISO 3166-1, in all nine languages.
 - **Decorators** attach something to a string you already have rather than generating one: a random token with `randSuffix` and `randPrefix`, a word with `randModifier`.
 - One options set per generator: language, length, count, a `realism` setting that goes from real words to fully invented ones, and a `vocabulary` setting that keeps to the everyday words.
 - **Every generator and decorator takes a `random`** — where the draws come from. A secure source for a value nobody may predict, a seeded one for a fixture that has to come out the same every run.
@@ -124,7 +124,7 @@ Every generator takes a language, or mixes every language it supports when you l
 
 A sentence is the one place where a language can be narrower than the others. Each declares the shapes its own grammar carries, so German writes no object and Russian no place, because both would put the noun in a case its own ending has to change for.
 
-Locations are the generator that is not in all nine. A language has them only when its country publishes its divisions with no attribution to carry, no uncertain terms and no disputed territory, and the [checklist](https://randino.cdget.com/guide/languages#locations) says which do.
+Locations are the generator that is not in all nine. A language has them only when its country publishes its divisions with no attribution to carry, no uncertain terms and no disputed territory, and the [checklist](https://randino.cdget.com/guide/languages#locations) says which do. Country names are the exception: `randCountry` has every country in every language.
 
 ## What it generates
 

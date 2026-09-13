@@ -231,13 +231,192 @@ function readUnitedStates() {
 	}));
 }
 
+// --- Countries --------------------------------------------------------------
+
+// The languages a country is named in, in the order each line of the table lists
+// them: every word language, because a country's name is a word every one of them
+// has.
+const COUNTRY_LANGUAGES = ['en', 'ko', 'ja', 'zh', 'vi', 'es', 'it', 'de', 'ru'];
+
+// Where Wikidata writes a language's label. Chinese is the simplified script the
+// rest of the package writes, with the plain `zh` label as the last resort.
+const LABEL_KEYS = {
+	en: ['en'],
+	ko: ['ko'],
+	ja: ['ja'],
+	zh: ['zh-hans', 'zh-cn', 'zh'],
+	vi: ['vi'],
+	es: ['es'],
+	it: ['it'],
+	de: ['de'],
+	ru: ['ru']
+};
+
+// A code Wikidata puts on more than one item, and the item that is the country.
+// Any other code on two items stops the run: which one is meant is a decision.
+const COUNTRY_ITEMS = {
+	AQ: 'Q51', // Antarctica, not the Antarctic Treaty area
+	CY: 'Q229', // the country, not the island
+	NL: 'Q55' // the Netherlands, not the Kingdom of the Netherlands
+};
+
+// Languages that write a place with no name of its own in them the way English
+// writes it, which is what `Jersey` is in Vietnamese, Spanish, Italian and German.
+// A missing name in any other language stops the run.
+const ENGLISH_FALLBACK = new Set(['vi', 'es', 'it', 'de']);
+
+/**
+ * Every country: the ISO 3166-1 alpha-2 codes the tz database lists (public
+ * domain), named in every word language by Wikidata's labels (CC0). The list is
+ * the tz table's so that membership follows ISO rather than whatever Wikidata
+ * tags with a code — Wikidata also codes the reserved `AC`, `EZ`, `UN` and `XK`.
+ */
+function readCountries() {
+	const codes = source('iso3166.tab')
+		.split(/\r?\n/)
+		.filter((line) => line && !line.startsWith('#'))
+		.map((line) => line.split('\t')[0]);
+
+	check(
+		codes.length === 249 && codes.every((code) => /^[A-Z]{2}$/.test(code)),
+		`iso3166.tab lists ${codes.length} codes`
+	);
+
+	const result = JSON.parse(source('countries.json'));
+	const items = new Map();
+	const labels = new Map();
+
+	for (const row of result.results.bindings) {
+		const code = row.code.value;
+		const item = row.item.value.split('/').pop();
+
+		if (!codes.includes(code)) continue;
+
+		if (!items.has(code)) items.set(code, new Set());
+		items.get(code).add(item);
+
+		if (!labels.has(item)) labels.set(item, {});
+		labels.get(item)[row.label['xml:lang']] = row.label.value;
+	}
+
+	const fallbacks = [];
+	const rows = [...codes].sort().map((code) => {
+		const found = [...(items.get(code) ?? [])];
+		const item = found.length > 1 ? COUNTRY_ITEMS[code] : found[0];
+
+		check(
+			item && found.includes(item),
+			`${code} is ${found.length ? `on ${found.join(', ')}` : 'on no Wikidata item'}`
+		);
+
+		const label = labels.get(item) ?? {};
+		const names = {};
+
+		for (const language of COUNTRY_LANGUAGES) {
+			const key = LABEL_KEYS[language].find((each) => label[each]);
+
+			if (key) {
+				// A label is written the way the name reads mid-sentence, so a handful
+				// start in lower case (`isola di Man`, `châu Nam Cực`). A name handed
+				// back on its own starts with a capital.
+				names[language] = label[key].charAt(0).toUpperCase() + label[key].slice(1);
+			} else {
+				check(ENGLISH_FALLBACK.has(language) && label.en, `${code} (${item}) has no ${language} name`);
+				names[language] = label.en;
+				fallbacks.push(`${code}:${language}`);
+			}
+		}
+
+		return { code, names };
+	});
+
+	if (fallbacks.length) {
+		console.log('countries named the English way, having no label of their own:', fallbacks.join(' '));
+	}
+
+	return rows;
+}
+
+/** One cell of the country table, which must break neither the line nor a string literal. */
+function cell(text) {
+	check(
+		text && text.trim() === text && !/[|\t\n`$\\"]|'''/.test(text),
+		`a country name the table cannot carry: ${JSON.stringify(text)}`
+	);
+
+	return text;
+}
+
+const COUNTRIES_FROM =
+	'ISO 3166-1 codes from the tz database `iso3166.tab` (public domain); names from Wikidata labels (CC0), queried 2026-09-13';
+
+function writeCountries(rows) {
+	const table = rows.map((row) =>
+		[row.code, ...COUNTRY_LANGUAGES.map((language) => cell(row.names[language]))].join('|')
+	);
+	const header = [`// ${GENERATED}`, `// regenerate instead. Source: ${COUNTRIES_FROM}.`, ''];
+
+	writeFileSync(
+		here('packages/javascript/lib/location/data/countries.ts'),
+		[
+			...header,
+			"import type { CountryTable } from './types.js';",
+			'',
+			'export const COUNTRIES: CountryTable = {',
+			`\tlanguages: [${COUNTRY_LANGUAGES.map((language) => `'${language}'`).join(', ')}],`,
+			'\ttable: `',
+			...table.map((line) => `\t\t${line}`),
+			'\t`',
+			'};',
+			''
+		].join('\n')
+	);
+	writeFileSync(
+		here('packages/dart/lib/src/location/data/countries.dart'),
+		[
+			...header,
+			"import 'package:randino/src/location/data/types.dart';",
+			"import 'package:randino/src/types.dart';",
+			'',
+			'/// Every country, named in every word language.',
+			'final CountryTable countries = CountryTable(',
+			`  languages: <WordLanguage>[${COUNTRY_LANGUAGES.map((language) => `WordLanguage.${language}`).join(', ')}],`,
+			"  table: r'''",
+			...table.map((line) => `    ${line}`),
+			"  ''',",
+			');',
+			''
+		].join('\n')
+	);
+	writeFileSync(
+		here('packages/python/src/randino/location/data/countries.py'),
+		[
+			'"""Every country, named in every word language.',
+			'',
+			`${GENERATED} regenerate instead.`,
+			`Source: ${COUNTRIES_FROM}.`,
+			'"""',
+			'',
+			'from randino.location.data._types import CountryTable',
+			'',
+			'COUNTRIES = CountryTable(',
+			`    languages=(${COUNTRY_LANGUAGES.map((language) => `"${language}"`).join(', ')}),`,
+			'    table="""',
+			...table.map((line) => `        ${line}`),
+			'    """,',
+			')',
+			''
+		].join('\n')
+	);
+}
+
 // --- Writing ----------------------------------------------------------------
 
 const COUNTRIES = [
 	{
 		code: 'ko',
 		constant: 'KO',
-		country: '대한민국',
+		iso: 'KR',
 		order: 'largest-first',
 		joiner: ' ',
 		levels: ['region', 'city', 'district'],
@@ -247,7 +426,7 @@ const COUNTRIES = [
 	{
 		code: 'en',
 		constant: 'EN',
-		country: 'United States',
+		iso: 'US',
 		order: 'smallest-first',
 		joiner: ', ',
 		levels: ['region', 'city'],
@@ -405,7 +584,16 @@ for (const directory of [
 	mkdirSync(here(directory), { recursive: true });
 }
 
+const countries = readCountries();
+
+writeCountries(countries);
+console.log('countries', { codes: countries.length });
+
 for (const country of COUNTRIES) {
+	// The country a location is written with is the name the country table gives
+	// it, so `randLocation` and `randCountry` can never spell it two ways.
+	country.country = countries.find((row) => row.code === country.iso).names[country.code];
+
 	const tree = country.read();
 
 	writeJavaScript(country, tree);

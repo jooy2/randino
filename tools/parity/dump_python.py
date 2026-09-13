@@ -24,6 +24,7 @@ from randino.decorate.data import (
     AFFIX_SEPARATOR_DEFAULT,
 )
 from randino.location.data import LOCATION_DATA, LOCATION_LANGUAGES, LOCATION_LEVELS
+from randino.location.data.countries import COUNTRIES
 from randino.name.data import NAME_DATA, NAME_LANGUAGES
 from randino.name.data.ko import KO_SURNAME_ROMAN
 from randino.sentence.data import (
@@ -412,6 +413,16 @@ print(
             "location": {
                 "languages": list(LOCATION_LANGUAGES),
                 "levels": list(LOCATION_LEVELS),
+                # One row per country, `[code, name, name, …]`, split the way the package
+                # splits it.
+                "countries": {
+                    "languages": list(COUNTRIES.languages),
+                    "rows": [
+                        line.strip().split("|")
+                        for line in COUNTRIES.table.split("\n")
+                        if line.strip()
+                    ],
+                },
                 "data": location,
             },
             "word": {

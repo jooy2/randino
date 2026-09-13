@@ -2,14 +2,17 @@
 
 import re
 import unicodedata
+from collections.abc import Callable
 from typing import Any, NamedTuple
 
 from randino import (
     LOCATION_LANGUAGES,
     RAND_COUNT_MAX,
+    WORD_LANGUAGES,
     LocationDetail,
     LocationLanguage,
     LocationLevel,
+    WordLanguage,
     rand_city,
     rand_country,
     rand_district,
@@ -21,6 +24,8 @@ from randino import (
 # are what tie the output back to the outline each language ships.
 from randino._internal.parse import outline
 from randino.location.data import LOCATION_DATA
+from randino.location.data.countries import COUNTRIES
+from tests.test_name import script
 
 SAMPLE = 60
 
@@ -43,6 +48,33 @@ def is_name(language: LocationLanguage, name: str) -> bool:
     return bool(name) and all(
         char in ENGLISH_MARKS or unicodedata.name(char, "").startswith("LATIN ") for char in name
     )
+
+
+# The script a country's name opens on, per word language. Python's `re` has no
+# `\p{Script=…}`, so the alphabetic ones are judged by the character's Unicode name.
+OPENS: dict[WordLanguage, Callable[[str], bool]] = {
+    "en": script("LATIN"),
+    "ko": lambda char: re.fullmatch(r"[가-힣]", char) is not None,
+    "ja": lambda char: re.fullmatch(r"[぀-ヿ一-鿿]", char) is not None,
+    "zh": lambda char: re.fullmatch(r"[一-鿿]", char) is not None,
+    "vi": script("LATIN"),
+    "es": script("LATIN"),
+    "it": script("LATIN"),
+    "de": script("LATIN"),
+    "ru": script("CYRILLIC"),
+}
+
+COUNTRY_ROWS: list[list[str]] = [
+    line.strip().split("|") for line in COUNTRIES.table.strip().split("\n")
+]
+"""The country table as rows of `[code, name, name, …]`."""
+
+
+def countries_in(language: WordLanguage) -> dict[str, str]:
+    """Every country's name in one language, by its code."""
+    column = COUNTRIES.languages.index(language) + 1
+
+    return {row[0]: row[column] for row in COUNTRY_ROWS}
 
 
 DEPTH: dict[LocationLevel, int] = {"country": 0, "region": 1, "city": 2, "district": 3}
@@ -185,18 +217,46 @@ def test_each_level_has_a_generator_of_its_own_handing_back_that_level_alone() -
             assert detail.location == getattr(detail, level)
             assert key_of(detail) in PLACES[detail.language], detail.location
 
-    assert rand_country(language="ko") == ["대한민국"]
-    assert rand_country(language="en", output="detail") == [
-        LocationDetail(
-            location="United States",
-            language="en",
-            level="country",
-            country="United States",
-            region=None,
-            city=None,
-            district=None,
+
+def test_rand_country_names_every_iso_3166_1_country_in_every_word_language() -> None:
+    assert len(COUNTRY_ROWS) == 249
+    assert len({row[0] for row in COUNTRY_ROWS}) == 249
+    assert sorted(COUNTRIES.languages) == sorted(WORD_LANGUAGES)
+
+    for row in COUNTRY_ROWS:
+        assert re.fullmatch(r"[A-Z]{2}", row[0])
+        assert len(row) == len(COUNTRIES.languages) + 1, row[0]
+
+    for language in WORD_LANGUAGES:
+        named = countries_in(language)
+
+        for detail in rand_country(language=language, count=SAMPLE, output="detail"):
+            assert detail.language == language
+            assert named.get(detail.code) == detail.country, f"{language}: {detail.code}"
+            assert OPENS[language](detail.country[0]), detail.country
+
+        # Unique by name, and two countries a language names alike would be one.
+        assert len(rand_country(language=language, unique=True, count=300)) == len(
+            set(named.values())
         )
-    ]
+
+
+def test_rand_country_mixes_every_word_language_not_only_the_ones_with_divisions() -> None:
+    languages = {detail.language for detail in rand_country(count=300, output="detail")}
+
+    assert sorted(languages) == sorted(WORD_LANGUAGES)
+    assert rand_country(language="de", starts_with="Ö", count=3, unique=True) == ["Österreich"]
+
+    for name in rand_country(language="ru", max_length=5, count=SAMPLE):
+        assert len(name) <= 5, name
+
+
+def test_a_location_opens_on_the_name_the_country_table_gives_its_country() -> None:
+    # `rand_location` and `rand_country` read one table, so they cannot spell a country two
+    # ways.
+    assert LOCATION_DATA["ko"].country == countries_in("ko").get("KR")
+    assert LOCATION_DATA["en"].country == countries_in("en").get("US")
+    assert rand_location(language="ko", level="country") == ["대한민국"]
 
 
 def test_a_level_the_country_does_not_have_is_nothing_and_all_skips_that_country() -> None:
@@ -266,7 +326,6 @@ def test_unique_never_repeats_a_result_and_stops_when_the_pool_runs_out() -> Non
 
     assert len(set(regions)) == len(regions)
     assert len(regions) == 51
-    assert len(rand_country(unique=True, count=5)) == 2
 
 
 def test_the_korean_dataset_stops_above_the_ri_and_writes_a_district_after_its_city() -> None:

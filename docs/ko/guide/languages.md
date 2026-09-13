@@ -146,4 +146,6 @@ LOCATION_LANGUAGES  # ('en', 'ko')
 | `vi` | Việt Nam      |  —   | 세 조건을 모두 만족하는 공개 목록이 없습니다                  |
 | `ru` | Россия        |  —   | 세 조건을 모두 만족하는 공개 목록이 없습니다                  |
 
+이 체크리스트는 행정구역 이야기입니다. 국가 이름은 다릅니다. [`randCountry`](../location/rand-country)는 ISO 3166-1의 국가와 지역 249곳을 9개 언어 모두로 씁니다. 이름은 조건 없이 쓸 수 있는 CC0인 Wikidata 레이블입니다.
+
 지원하는 나라의 위치에 무엇이 들어 있는지는 [`randLocation`](../location/rand-location)에 정리해 두었습니다.

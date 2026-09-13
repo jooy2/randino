@@ -186,6 +186,22 @@ const place = reactive({
 /** `randLocation` and the four that hand back one level of it, by the name picked. */
 const LOCATION_FUNCTIONS = { randLocation, randCountry, randRegion, randCity, randDistrict };
 
+/**
+ * The languages the picked function writes. `randCountry` names every country in
+ * every word language; the rest write only the languages with divisions.
+ */
+const placeLanguages = computed(() =>
+	place.fn === 'randCountry' ? WORD_LANGUAGES : LOCATION_LANGUAGES
+);
+
+// A language the newly picked function does not write falls back to all of them,
+// rather than asking it for a language it would quietly replace.
+watch(placeLanguages, (languages) => {
+	if (place.language !== 'all' && !languages.includes(place.language)) {
+		place.language = 'all';
+	}
+});
+
 const SENTENCE_SLOTS = [
 	'object',
 	'place',
@@ -389,7 +405,15 @@ function generate() {
 	} else if (tab.value === 'location') {
 		const draw = LOCATION_FUNCTIONS[place.fn];
 
-		if (details.value) {
+		if (details.value && place.fn === 'randCountry') {
+			const drawn = draw({ ...config, output: 'detail' });
+
+			items = drawn.map((detail) => detail.country);
+			meta = drawn.map((detail) => [
+				['code', detail.code],
+				['language', detail.language]
+			]);
+		} else if (details.value) {
 			const drawn = draw({ ...config, output: 'detail' });
 
 			items = drawn.map((detail) => detail.location);
@@ -674,7 +698,7 @@ async function copy() {
 					<span><code>language</code></span>
 					<select v-model="place.language">
 						<option value="all">all</option>
-						<option v-for="code_ in LOCATION_LANGUAGES" :key="code_" :value="code_">
+						<option v-for="code_ in placeLanguages" :key="code_" :value="code_">
 							{{ code_ }} — {{ LANGUAGE_NAMES[code_] }}
 						</option>
 					</select>

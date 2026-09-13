@@ -16,7 +16,7 @@ Every option and every example, with **JavaScript** picked in the sidebar. This 
 - **Nicknames** are handles for a game or a website: MistyOwl, CraneVoyage, RustyBoot. Built from everyday words across twenty-nine themes, and never from person names.
 - **Words** are those themes on their own: `randWord`, plus `randAnimal`, `randFood` and twenty-seven more.
 - **Sentences** are whole statements in the language's own grammar, from `randSentence`. The verb decides what can stand beside it, so the words of one sentence belong together.
-- **Locations** are real places down to a neighbourhood or a city, from `randLocation`: Korean and US divisions, as each country publishes them.
+- **Locations** are real places down to a neighbourhood or a city, from `randLocation`: Korean and US divisions, as each country publishes them, and every country's name in all nine languages from `randCountry`.
 - **Decorators** attach something to a string you already have: `randSuffix`, `randPrefix` and `randModifier`.
 - One options object per generator, every option optional: `randName()` on its own works.
 - **No runtime dependencies.** ESM, typed, and it runs in Node and in the browser alike.
@@ -230,7 +230,17 @@ randLocation({ language: 'ko', output: 'detail' });
 | `unique`                  | `boolean`               | `false`      |
 | `output`                  | `'value' \| 'detail'`   | `'value'`    |
 
-`level` is how far down the location goes: `country`, `region`, `city` or `district`. A country without that level stops at the deepest one it has, so an English location ends at its city. `randCountry`, `randRegion`, `randCity` and `randDistrict` take the same options minus `level`, and hand back that one division's name.
+`level` is how far down the location goes: `country`, `region`, `city` or `district`. A country without that level stops at the deepest one it has, so an English location ends at its city. `randRegion`, `randCity` and `randDistrict` take the same options minus `level`, and hand back that one division's name.
+
+`randCountry` names any of the 249 ISO 3166-1 countries and territories, in any of the nine languages rather than only the two with divisions:
+
+```javascript
+import { randCountry } from 'randino';
+
+randCountry({ language: 'ko', count: 3 }); // ['아르헨티나', '방글라데시', '세인트키츠 네비스']
+randCountry({ language: 'ja', output: 'detail' });
+// [{ country: 'サウジアラビア', code: 'SA', language: 'ja' }]
+```
 
 ## Decorators
 

@@ -18,6 +18,7 @@ Example:
 """
 
 from randino._types import (
+    CountryDetail,
     LocationDetail,
     LocationLanguage,
     LocationLanguageOption,
@@ -138,6 +139,7 @@ __all__ = [
     "RAND_SENTENCE_LENGTH_MAX",
     "WORD_LANGUAGES",
     "WORD_THEMES",
+    "CountryDetail",
     "LocationDetail",
     "LocationLanguage",
     "LocationLanguageOption",

@@ -221,7 +221,7 @@ rand_city(language="ko", output="detail")
 | `unique`                    | `bool`                   | `False`      |
 | `output`                    | `"value" \| "detail"`    | `"value"`    |
 
-`level` is how far down the location goes: `"country"`, `"region"`, `"city"` or `"district"`. A country without that level stops at the deepest one it has, so an English location ends at its city. `rand_country`, `rand_region`, `rand_city` and `rand_district` take the same arguments minus `level`, and hand back that one division's name.
+`level` is how far down the location goes: `"country"`, `"region"`, `"city"` or `"district"`. A country without that level stops at the deepest one it has, so an English location ends at its city. `rand_region`, `rand_city` and `rand_district` take the same arguments minus `level`, and hand back that one division's name. `rand_country` is the exception: its `language` is any `WordLanguage`, and it names any of the 249 ISO 3166-1 countries and territories in any of the nine languages, with each one's code in a `CountryDetail` when `output="detail"`.
 
 ## Decorators
 

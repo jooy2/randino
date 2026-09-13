@@ -5,7 +5,7 @@
 // `tools/location` writes them out of the file the country publishes, into all
 // three packages at once.
 
-import type { LocationLevel } from '../../_types/global.js';
+import type { LocationLevel, WordLanguage } from '../../_types/global.js';
 
 /** A level an outline holds: every one but the country, which the dataset names itself. */
 export type OutlineLevel = Exclude<LocationLevel, 'country'>;
@@ -25,4 +25,13 @@ export interface LocationLanguageData {
 	levels: readonly OutlineLevel[];
 	/** The divisions themselves, as `outline` in `_internal/parse` reads them. */
 	outline: string;
+}
+
+/**
+ * Every country, named in every word language: one line per ISO 3166-1 code,
+ * `code|name|name|…`, with the names in the order `languages` lists them.
+ */
+export interface CountryTable {
+	languages: readonly WordLanguage[];
+	table: string;
 }

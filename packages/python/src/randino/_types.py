@@ -483,3 +483,17 @@ class LocationDetail:
 
     district: str | None
     """The division inside the city, or `None` the way `region` is."""
+
+
+@dataclass(frozen=True, slots=True)
+class CountryDetail:
+    """A generated country with the code it is known by."""
+
+    country: str
+    """The country's name, as the language writes it."""
+
+    code: str
+    """Its ISO 3166-1 alpha-2 code, which is the same whatever the language."""
+
+    language: WordLanguage
+    """The language the name is written in."""

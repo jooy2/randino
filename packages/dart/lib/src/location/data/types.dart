@@ -45,3 +45,16 @@ class LocationLanguageData {
   /// The divisions themselves, as `outline` in `internal/parse.dart` reads them.
   final String outline;
 }
+
+/// Every country, named in every word language: one line per ISO 3166-1 code,
+/// `code|name|name|…`, with the names in the order [languages] lists them.
+class CountryTable {
+  /// Creates the table.
+  const CountryTable({required this.languages, required this.table});
+
+  /// The languages the names are in, in the order each line holds them.
+  final List<WordLanguage> languages;
+
+  /// One line per country: its code, then its name in each of [languages].
+  final String table;
+}

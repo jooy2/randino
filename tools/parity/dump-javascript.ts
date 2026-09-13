@@ -15,6 +15,7 @@ import {
 	AFFIX_LENGTH_MAX,
 	AFFIX_SEPARATOR_DEFAULT
 } from '../../packages/javascript/lib/decorate/data/index.js';
+import { COUNTRIES } from '../../packages/javascript/lib/location/data/countries.js';
 import {
 	LOCATION_DATA,
 	LOCATION_LANGUAGES,
@@ -138,6 +139,15 @@ console.log(
 		location: {
 			languages: [...LOCATION_LANGUAGES],
 			levels: [...LOCATION_LEVELS],
+			// One row per country, `[code, name, name, …]`, split the way the package splits it.
+			countries: {
+				languages: [...COUNTRIES.languages],
+				rows: COUNTRIES.table
+					.split('\n')
+					.map((line) => line.trim())
+					.filter(Boolean)
+					.map((line) => line.split('|'))
+			},
 			data: Object.fromEntries(
 				Object.entries(LOCATION_DATA).map(([code, data]) => [
 					code,

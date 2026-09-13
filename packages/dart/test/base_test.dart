@@ -38,6 +38,7 @@ void main() {
       expect(
         exportedNames().toList()..sort(),
         <String>[
+          'CountryDetail',
           'LengthRange',
           'LocationDetail',
           'LocationLanguage',
@@ -181,7 +182,7 @@ void main() {
       expect(randLocation(language: LocationLanguage.ko), hasLength(1));
       expect(randLocationDetails()[0].country, isNotEmpty);
       expect(randCountry(), hasLength(1));
-      expect(randCountryDetails()[0], isA<LocationDetail>());
+      expect(randCountryDetails()[0], isA<CountryDetail>());
       expect(randRegion(), hasLength(1));
       expect(randRegionDetails()[0], isA<LocationDetail>());
       expect(randCity(), hasLength(1));

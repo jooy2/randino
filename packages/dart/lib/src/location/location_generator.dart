@@ -11,9 +11,11 @@ import 'package:randino/src/constants.dart';
 import 'package:randino/src/internal/generate.dart';
 import 'package:randino/src/internal/parse.dart';
 import 'package:randino/src/internal/utils.dart';
+import 'package:randino/src/location/data/countries.dart';
 import 'package:randino/src/location/data/index.dart';
 import 'package:randino/src/location/data/types.dart';
 import 'package:randino/src/types.dart';
+import 'package:randino/src/word/data/index.dart';
 
 /// What one draw hands back.
 enum LocationForm {
@@ -25,7 +27,7 @@ enum LocationForm {
   path,
 }
 
-/// The last narrowing asked of a pool, and what it came to.
+/// The last narrowing asked of a list, and what it came to.
 class _Narrowed {
   const _Narrowed(this.key, this.indexes);
 
@@ -33,11 +35,23 @@ class _Narrowed {
   final List<int> indexes;
 }
 
-/// The divisions one kind of draw may land on, with what each is written as.
+/// What a draw may land on, written out.
 ///
 /// The text is worked out once, because every length and `startsWith` filter
 /// reads it and a US list is thirty-two thousand of them.
-class _Pool {
+abstract class _Texts {
+  List<String> texts = const <String>[];
+  int shortest = 0;
+  int longest = 0;
+
+  // The last narrowing asked of this list, which is the one a loop of single
+  // draws asks again: filtering thirty-two thousand names is not free, and a
+  // caller drawing one at a time would pay it every call.
+  _Narrowed? narrowed;
+}
+
+/// The divisions one kind of draw may land on.
+class _Pool extends _Texts {
   _Pool(this.data, this.language, this.form, this.entries);
 
   final LocationLanguageData data;
@@ -46,15 +60,6 @@ class _Pool {
 
   // `null` for the country, which the outline does not hold.
   final List<OutlineEntry?> entries;
-
-  List<String> texts = const <String>[];
-  int shortest = 0;
-  int longest = 0;
-
-  // The last narrowing asked of this pool, which is the one a loop of single
-  // draws asks again: filtering thirty-two thousand names is not free, and a
-  // caller drawing one at a time would pay it every call.
-  _Narrowed? narrowed;
 }
 
 // Parsed once per dataset, on the first draw that needs it rather than at import:
@@ -170,6 +175,19 @@ _Pool _poolOf(LocationLanguage language, LocationForm form, LocationLevel level)
   final texts = List<String>.unmodifiable(
     pool.entries.map((entry) => _detailOf(pool, entry).location),
   );
+  final (shortest, longest) = _spanOf(texts);
+
+  pool
+    ..texts = texts
+    ..shortest = shortest
+    ..longest = longest;
+  byKind[key] = pool;
+
+  return pool;
+}
+
+/// Shortest and longest of a list of texts, `(0, 0)` for none.
+(int, int) _spanOf(List<String> texts) {
   var shortest = 1 << 30;
   var longest = 0;
 
@@ -178,13 +196,7 @@ _Pool _poolOf(LocationLanguage language, LocationForm form, LocationLevel level)
     if (text.length > longest) longest = text.length;
   }
 
-  pool
-    ..texts = texts
-    ..shortest = texts.isEmpty ? 0 : shortest
-    ..longest = longest;
-  byKind[key] = pool;
-
-  return pool;
+  return texts.isEmpty ? (0, 0) : (shortest, longest);
 }
 
 /// The indexes of a pool one call may draw from once `startsWith` and the length
@@ -194,7 +206,7 @@ _Pool _poolOf(LocationLanguage language, LocationForm form, LocationLevel level)
 /// rather than with none, the way every other generator answers one — and an
 /// overshoot counts half a character worse than an undershoot, because
 /// `maxLength` is the bound a caller is usually holding to.
-List<int>? _narrow(_Pool pool, String prefix, int? minLength, int? maxLength) {
+List<int>? _narrow(_Texts pool, String prefix, int? minLength, int? maxLength) {
   if (prefix.isEmpty && minLength == null && maxLength == null) {
     return null;
   }
@@ -213,7 +225,7 @@ List<int>? _narrow(_Pool pool, String prefix, int? minLength, int? maxLength) {
   return indexes;
 }
 
-List<int> _narrowAfresh(_Pool pool, String prefix, int? minLength, int? maxLength) {
+List<int> _narrowAfresh(_Texts pool, String prefix, int? minLength, int? maxLength) {
   final lower = prefix.toLowerCase();
   final matching = <int>[];
 
@@ -265,10 +277,10 @@ List<int> _narrowAfresh(_Pool pool, String prefix, int? minLength, int? maxLengt
 }
 
 /// A language's pool, and the indexes of it a call may draw from.
-class _Candidate {
+class _Candidate<P extends _Texts> {
   const _Candidate(this.pool, this.indexes);
 
-  final _Pool pool;
+  final P pool;
 
   // `null` for every entry of the pool.
   final List<int>? indexes;
@@ -297,7 +309,7 @@ List<LocationDetail> generateLocationDetails({
   // nothing at the requested level, are out before a draw is made — so asking
   // every language for a 읍·면·동 draws Korean rather than spending half the
   // draws on English, which has none.
-  final candidates = <_Candidate>[];
+  final candidates = <_Candidate<_Pool>>[];
 
   for (final code in languagesWriting(language, locationLanguages, prefix)) {
     final pool = _poolOf(code, form, level);
@@ -328,6 +340,109 @@ List<LocationDetail> generateLocationDetails({
         return _detailOf(pool, pool.entries[index]);
       },
       keyOf: (detail) => detail.location,
+    ),
+  );
+}
+
+/* --- Countries ------------------------------------------------------------ */
+
+/// Every country's name in one language, with the code each one is known by.
+class _CountryPool extends _Texts {
+  _CountryPool(this.language, this.codes);
+
+  final WordLanguage language;
+  final List<String> codes;
+}
+
+// Split out of the table the first time a language is drawn from, never at
+// import.
+final Map<WordLanguage, _CountryPool> _countryCache = <WordLanguage, _CountryPool>{};
+
+_CountryPool _countryPoolOf(WordLanguage language) {
+  final cached = _countryCache[language];
+
+  if (cached != null) {
+    return cached;
+  }
+
+  final column = countries.languages.indexOf(language) + 1;
+  final codes = <String>[];
+  final texts = <String>[];
+
+  for (final line in countries.table.split('\n')) {
+    final cells = line.trim().split('|');
+
+    if (cells.length > column) {
+      codes.add(cells[0]);
+      texts.add(cells[column]);
+    }
+  }
+
+  final (shortest, longest) = _spanOf(texts);
+  final pool = _CountryPool(language, List<String>.unmodifiable(codes));
+
+  pool
+    ..texts = List<String>.unmodifiable(texts)
+    ..shortest = shortest
+    ..longest = longest;
+  _countryCache[language] = pool;
+
+  return pool;
+}
+
+/// Countries in any word language: the ISO 3166-1 list, each named the way the
+/// language names it.
+///
+/// Unlike the divisions, which only some languages have, every country has a
+/// name in all nine — so this reads [language] as a word language, and a null
+/// one means every word language.
+List<CountryDetail> generateCountryDetails({
+  WordLanguage? language,
+  int count = 1,
+  int? minLength,
+  int? maxLength,
+  String? startsWith,
+  bool unique = false,
+
+  /// Where the randomness comes from: `Random.secure()` for a value nobody may
+  /// predict, `Random(42)` for one that has to come out the same every run.
+  Random? random,
+}) {
+  final prefix = resolvePrefix(startsWith);
+  final candidates = <_Candidate<_CountryPool>>[];
+
+  for (final code in languagesWriting(language, wordLanguages, prefix)) {
+    final pool = _countryPoolOf(code);
+    final indexes = _narrow(pool, prefix, minLength, maxLength);
+
+    if (indexes == null || indexes.isNotEmpty) {
+      candidates.add(_Candidate(pool, indexes));
+    }
+  }
+
+  if (candidates.isEmpty) {
+    return <CountryDetail>[];
+  }
+
+  return withRandom(
+    random,
+    () => collect<CountryDetail>(
+      count: count,
+      unique: unique,
+      startsWith: prefix,
+      draw: () {
+        final candidate = pick(candidates);
+        final pool = candidate.pool;
+        final indexes = candidate.indexes;
+        final index = indexes != null ? pick(indexes) : randInt(0, pool.codes.length - 1);
+
+        return CountryDetail(
+          country: pool.texts[index],
+          code: pool.codes[index],
+          language: pool.language,
+        );
+      },
+      keyOf: (detail) => detail.country,
     ),
   );
 }

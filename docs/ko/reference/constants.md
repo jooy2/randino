@@ -310,10 +310,12 @@ import type {
 	WordLanguageOption,
 	WordTheme,
 	WordThemeOption,
+	CountryDetail,
 	LocationDetail,
 	LocationLanguage,
 	LocationLanguageOption,
 	LocationLevel,
+	RandCountryOptions,
 	RandLocationOptions,
 	RandNameOptions,
 	RandNicknameOptions,
@@ -340,7 +342,7 @@ WordLanguage, WordTheme
 LocationLanguage, LocationLevel
 
 // 값
-LengthRange, NameDetail, NicknameDetail, LocationDetail
+LengthRange, NameDetail, NicknameDetail, LocationDetail, CountryDetail
 ```
 
 `…Option` 타입도 없고 `all` 멤버도 없습니다. **null인 enum이 "전부"를 뜻하므로**, 쓰지 않은 파라미터가 이미 섞인 결과를 의미합니다. 그래서 헬퍼들도 더 좁은 타입이 아니라 생성기와 같은 타입을 받습니다.
@@ -364,6 +366,7 @@ from randino import (
     WordLanguageOption,
     WordTheme,
     WordThemeOption,
+    CountryDetail,
     LocationDetail,
     LocationLanguage,
     LocationLanguageOption,

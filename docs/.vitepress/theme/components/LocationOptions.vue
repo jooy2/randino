@@ -13,12 +13,14 @@ import { isPhrase, isVariants } from '../../data/wordOptions';
  */
 const props = defineProps({
 	/** Include the `level` row. Only `randLocation` takes one; the rest answer it. */
-	level: { type: Boolean, default: false }
+	level: { type: Boolean, default: false },
+	/** `randCountry`'s page, whose `language` is any word language. */
+	country: { type: Boolean, default: false }
 });
 
 const { lang } = useData();
 const locale = computed(() => localeOf(lang.value));
-const rows = computed(() => locationOptionRows(props.level));
+const rows = computed(() => locationOptionRows(props.level, props.country));
 </script>
 
 <template>

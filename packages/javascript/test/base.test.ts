@@ -160,7 +160,8 @@ describe('base test', () => {
 			() => randino.randLocation({ language: 'xx' as never }),
 			() => randino.randLocation({ level: 'street' as never }),
 			() => randino.randLocation({ minLength: NaN }),
-			() => randino.randCity({ language: 'ja' as never })
+			() => randino.randCity({ language: 'ja' as never }),
+			() => randino.randCountry({ language: 'xx' as never, minLength: NaN })
 		];
 
 		for (const ask of asks) {

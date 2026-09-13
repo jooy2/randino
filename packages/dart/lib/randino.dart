@@ -64,6 +64,7 @@ export 'src/sentence/rand_sentence_details.dart' show randSentenceDetails;
 export 'src/sentence/sentence_length_range.dart' show sentenceLengthRange;
 export 'src/types.dart'
     show
+        CountryDetail,
         LengthRange,
         LocationDetail,
         LocationLanguage,

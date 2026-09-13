@@ -146,4 +146,6 @@ A location is real or it is nothing, so a language has locations only when its c
 | `vi` | Việt Nam | — | No published list meets all three conditions |
 | `ru` | Россия | — | No published list meets all three conditions |
 
+The checklist is about divisions. Country names are not: [`randCountry`](../location/rand-country) names all 249 ISO 3166-1 countries and territories in every one of the nine languages, from Wikidata's labels, which are CC0 and ask for nothing.
+
 [`randLocation`](../location/rand-location) covers what each supported country's locations hold.

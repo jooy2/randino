@@ -50,8 +50,8 @@ export function wordOptionsTable(theme: boolean): string {
 }
 
 /** `<LocationOptions />` → the option table it draws, the same way `<WordOptions />` is. */
-export function locationOptionsTable(level: boolean): string {
-	return optionsTable(locationOptionRows(level));
+export function locationOptionsTable(level: boolean, country = false): string {
+	return optionsTable(locationOptionRows(level, country));
 }
 
 function optionsTable(
