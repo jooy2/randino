@@ -20,16 +20,20 @@
 	overflow: hidden;
 }
 
-/* --- the two generators -------------------------------------------------- */
+/* --- the generators ------------------------------------------------------ */
 
+/* Five tabs are wider than a phone, so the row scrolls rather than wrapping. */
 .randino-demo-tabs {
 	display: flex;
 	gap: 4px;
 	padding: 8px 8px 0;
 	border-bottom: 1px solid var(--vp-c-divider);
+	overflow-x: auto;
 }
 
 .randino-demo-tab {
+	flex: none;
+	white-space: nowrap;
 	padding: 8px 14px;
 	border-radius: 8px 8px 0 0;
 	color: var(--vp-c-text-2);

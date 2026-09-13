@@ -1,6 +1,6 @@
 # 데모
 
-아래의 모든 것은 브라우저에서 직접 실행됩니다. 컨트롤은 `randName`, `randNickname`, `randWord`, `randSentence`가 실제로 받는 옵션이고, 결과 아래의 코드 블록은 지금 설정이 만들어 내는 호출이며, 보이는 값은 Generate를 누를 때마다 새로 뽑힙니다.
+아래의 모든 것은 브라우저에서 직접 실행됩니다. 컨트롤은 `randName`, `randNickname`, `randWord`, `randSentence`, `randLocation`이 실제로 받는 옵션이고, 결과 아래의 코드 블록은 지금 설정이 만들어 내는 호출이며, 보이는 값은 Generate를 누를 때마다 새로 뽑힙니다.
 
 <Demo />
 
@@ -17,6 +17,10 @@
 - 문장 탭에서 `language`를 `de`와 `ru`로 바꾸고 상세 정보를 켜 보세요. 두 언어에는 `object`도 `place`도 없습니다. 둘 다 명사 자체의 어미가 바뀌는 격을 요구하므로, 그 형태는 두 언어가 선언한 목록에 아예 없습니다.
 - `include`에 두 단어를 넣어 보세요. 한국어라면 `사자 조용히`, 영어라면 `brave lion`입니다. 모든 문장에 두 단어가 들어가며, `brave`는 남은 자리에 따라 수식어가 되기도 하고 서술어가 되기도 합니다.
 - `shape`를 `simple`에서 `complex`로 바꿔 보세요. 단어가 길어지는 대신 구가 하나 늘어납니다. `minLength`가 글자 단위로 하는 일을 구 단위로 하는 셈입니다.
+- 위치 탭에서 상세 정보를 켜고 Generate를 몇 번 눌러 보세요. 읍·면·동은 옆에 적힌 시·군·구 안에, 시·군·구는 그 시·도 안에 실제로 있습니다. 이름을 조합한 것이 아니라 나라가 공개한 구역이기 때문입니다.
+- `randDistrict`를 고르고 `language`를 `en`으로 바꿔 보세요. 아무것도 나오지 않습니다. 미국 위치는 도시에서 멈추고, 그 아래 단계는 한국어에만 있습니다. `language`를 `all`로 두면 같은 호출이 한국어로만 뽑습니다.
+- `randRegion`을 고르고 `language`를 `ko`, `count`를 `20`으로 두고 `unique`를 켜 보세요. 16개가 나오는데, 이것이 시·도 전부입니다.
+- `randCity`에서 `language`를 `ko`, `startsWith`를 `수`로 두어 보세요. 시에 딸린 일반구는 주소에 쓰듯 `수원시 장안구`처럼 시와 함께 나옵니다.
 
 ## 이 페이지의 범위 {#what-this-page-is-not}
 
@@ -27,5 +31,5 @@
 ## 다음으로 볼 것 {#where-to-go-next}
 
 - [시작하기](./guide/getting-started) — 세 패키지 중 쓰는 것으로 설치하기.
-- [`randName`](./name/rand-name), [`randNickname`](./nickname/rand-nickname), [`randWord`](./word/rand-word), [`randSentence`](./sentence/rand-sentence) — 위 패널에 있는 모든 옵션의 설명.
+- [`randName`](./name/rand-name), [`randNickname`](./nickname/rand-nickname), [`randWord`](./word/rand-word), [`randSentence`](./sentence/rand-sentence), [`randLocation`](./location/rand-location) — 위 패널에 있는 모든 옵션의 설명.
 - [지원 언어](./guide/languages) — 언어마다 할 수 있는 것과 할 수 없는 것.

@@ -1,6 +1,6 @@
 # Demo
 
-Everything below runs in your browser. The controls are the options `randName`, `randNickname`, `randWord` and `randSentence` actually take, the code block under the output is the call your settings amount to, and what you see is drawn fresh every time you press Generate.
+Everything below runs in your browser. The controls are the options `randName`, `randNickname`, `randWord`, `randSentence` and `randLocation` actually take, the code block under the output is the call your settings amount to, and what you see is drawn fresh every time you press Generate.
 
 <Demo />
 
@@ -17,6 +17,10 @@ Everything below runs in your browser. The controls are the options `randName`, 
 - On the sentence tab, set `language` to `de` and then to `ru`, and turn on the details. Neither language offers an `object` or a `place`: both would put the noun in a case its own ending has to change for, so those shapes are not among the ones they declare.
 - Type two words into `include` — `brave lion` in English, `사자 조용히` in Korean. Both land in every sentence, and `brave` becomes a modifier or a predicate depending on what the rest of the shape has room for.
 - Set `shape` to `simple` and then to `complex`. The sentence gains a phrase rather than a longer word, which is the same thing `minLength` does one character at a time.
+- On the locations tab, turn on the details and press Generate a few times. Every district sits inside the city beside it and every city inside its region, because each is one the country publishes rather than a name put together.
+- Pick `randDistrict` and set `language` to `en`. Nothing comes back: a US location stops at the city, and only Korean has a level below it. Leave `language` on `all` and the same call draws Korean alone.
+- Pick `randRegion`, set `language` to `ko`, `count` to `20` and turn on `unique`. Sixteen come back, which is every 시·도 there is.
+- Pick `randCity` with `language` on `ko` and `startsWith` on `수`. A 구 that is one of a city's districts is written with its city, `수원시 장안구`, the way an address writes it.
 
 ## The scope of this page {#what-this-page-is-not}
 
@@ -27,5 +31,5 @@ The output is also **not seeded**. There is no way to ask randino for the same b
 ## Where to go next
 
 - [Getting started](./guide/getting-started) — installing it, for whichever of the three packages you use.
-- [`randName`](./name/rand-name), [`randNickname`](./nickname/rand-nickname), [`randWord`](./word/rand-word) and [`randSentence`](./sentence/rand-sentence) — every option in the panel above, written out.
+- [`randName`](./name/rand-name), [`randNickname`](./nickname/rand-nickname), [`randWord`](./word/rand-word), [`randSentence`](./sentence/rand-sentence) and [`randLocation`](./location/rand-location) — every option in the panel above, written out.
 - [Supported languages](./guide/languages) — what each language can and cannot do.

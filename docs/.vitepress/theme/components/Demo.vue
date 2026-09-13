@@ -2,6 +2,8 @@
 import { computed, nextTick, onMounted, reactive, ref, watch } from 'vue';
 import { useData } from 'vitepress';
 import {
+	LOCATION_LANGUAGES,
+	LOCATION_LEVELS,
 	NAME_LANGUAGES,
 	RAND_SENTENCE_COUNT_MAX,
 	WORD_LANGUAGES,
@@ -9,10 +11,15 @@ import {
 	nameLengthRange,
 	nameSupportsMiddleName,
 	nicknameLengthRange,
+	randCity,
+	randCountry,
+	randDistrict,
+	randLocation,
 	randModifier,
 	randName,
 	randNickname,
 	randPrefix,
+	randRegion,
 	randSentence,
 	randSuffix,
 	randWord,
@@ -58,20 +65,21 @@ const LANGUAGE_NAMES = {
 const COUNT_MAX = 50;
 
 /**
- * The four generators, as a real tab list.
+ * The five generators, as a real tab list.
  *
  * `role="tablist"` was on the row and nothing else of the pattern was: no panel
  * for the tabs to control, and four buttons all in the tab order rather than one
  * with the arrow keys moving between them. A screen reader was told "tab 1 of 4"
  * about a control that pointed at nothing.
  */
-const TABS = ['name', 'nickname', 'word', 'sentence'];
+const TABS = ['name', 'nickname', 'word', 'sentence', 'location'];
 
 const TAB_LABELS = {
 	name: 'demoNames',
 	nickname: 'demoNicknames',
 	word: 'demoWords',
-	sentence: 'demoSentences'
+	sentence: 'demoSentences',
+	location: 'demoLocations'
 };
 
 const tab = ref('name');
@@ -160,6 +168,24 @@ const sentence = reactive({
 	unique: false
 });
 
+/**
+ * The location tab. `place` rather than `location`, which would shadow the
+ * browser's own `location` everywhere in this component.
+ */
+const place = reactive({
+	fn: 'randLocation',
+	language: 'all',
+	level: 'district',
+	count: 8,
+	minLength: '',
+	maxLength: '',
+	startsWith: '',
+	unique: false
+});
+
+/** `randLocation` and the four that hand back one level of it, by the name picked. */
+const LOCATION_FUNCTIONS = { randLocation, randCountry, randRegion, randCity, randDistrict };
+
 const SENTENCE_SLOTS = [
 	'object',
 	'place',
@@ -202,6 +228,19 @@ const options = computed(() => {
 		if (num(name.maxLength) !== undefined) out.maxLength = num(name.maxLength);
 		if (name.startsWith) out.startsWith = name.startsWith;
 		if (name.unique) out.unique = true;
+
+		return out;
+	}
+
+	if (tab.value === 'location') {
+		if (place.language !== 'all') out.language = place.language;
+		// Only `randLocation` takes a level; the other four answer it.
+		if (place.fn === 'randLocation' && place.level !== 'district') out.level = place.level;
+		if (place.count !== 1) out.count = Number(place.count);
+		if (num(place.minLength) !== undefined) out.minLength = num(place.minLength);
+		if (num(place.maxLength) !== undefined) out.maxLength = num(place.maxLength);
+		if (place.startsWith) out.startsWith = place.startsWith;
+		if (place.unique) out.unique = true;
 
 		return out;
 	}
@@ -316,11 +355,14 @@ const supportsMiddleName = computed(() => nameSupportsMiddleName(name.language))
 const DECORATORS = { suffix: randSuffix, prefix: randPrefix, modifier: randModifier };
 
 /**
- * Whether a decorator runs at all. It is offered on every tab but this one: a
- * decorator attaches a token or a word to a name, and a whole sentence is not a
- * string anybody attaches anything to.
+ * Whether the tab offers a decorator at all. A decorator attaches a token or a
+ * word to a name, and neither a whole sentence nor a real place is a string
+ * anybody attaches anything to.
  */
-const decorating = computed(() => tab.value !== 'sentence' && decorate.kind !== 'none');
+const decoratable = computed(() => tab.value !== 'sentence' && tab.value !== 'location');
+
+/** Whether a decorator runs. */
+const decorating = computed(() => decoratable.value && decorate.kind !== 'none');
 
 const rows = ref([]);
 const asked = ref(0);
@@ -343,6 +385,24 @@ function generate() {
 			]);
 		} else {
 			items = randName(config);
+		}
+	} else if (tab.value === 'location') {
+		const draw = LOCATION_FUNCTIONS[place.fn];
+
+		if (details.value) {
+			const drawn = draw({ ...config, output: 'detail' });
+
+			items = drawn.map((detail) => detail.location);
+			meta = drawn.map((detail) => [
+				['level', detail.level],
+				['country', detail.country],
+				['region', String(detail.region)],
+				['city', String(detail.city)],
+				['district', String(detail.district)],
+				['language', detail.language]
+			]);
+		} else {
+			items = draw(config);
 		}
 	} else if (tab.value === 'sentence') {
 		if (details.value) {
@@ -396,9 +456,23 @@ function generate() {
 // Not in `setup`: see the note at the top about SSR.
 onMounted(generate);
 
-// Switching tab or turning details on is a different question, so it is asked
-// straight away rather than leaving the previous answer on screen.
-watch([tab, details], generate);
+// Switching tab, turning details on or picking another location function is a
+// different question, so it is asked straight away rather than leaving the
+// previous answer on screen.
+watch([tab, details, () => place.fn], generate);
+
+/**
+ * Whether an empty location result is the level missing rather than a filter
+ * that matched nothing: US locations stop at the city, so `randDistrict` has
+ * nothing to hand back in English whatever the options say.
+ */
+const levelMissing = computed(
+	() =>
+		tab.value === 'location' &&
+		!place.startsWith &&
+		num(place.minLength) === undefined &&
+		num(place.maxLength) === undefined
+);
 
 /* ---------------------------------------------------------------------------
  * The call, written out
@@ -446,7 +520,7 @@ const DETAIL_FIELDS = {
 };
 
 const code = computed(() => {
-	const generator = GENERATORS[tab.value];
+	const generator = tab.value === 'location' ? place.fn : GENERATORS[tab.value];
 	const call = `${generator}(${objectLiteral(generatorOptions.value)})`;
 
 	if (!decorating.value) {
@@ -582,6 +656,59 @@ async function copy() {
 
 				<label class="randino-demo-check">
 					<input v-model="name.unique" type="checkbox" />
+					<code>unique</code>
+				</label>
+			</div>
+
+			<div v-else-if="tab === 'location'" class="randino-demo-fields">
+				<label class="randino-demo-field">
+					<span>{{ t(locale, 'demoFunction') }}</span>
+					<select v-model="place.fn">
+						<option v-for="item in Object.keys(LOCATION_FUNCTIONS)" :key="item" :value="item">
+							{{ item }}
+						</option>
+					</select>
+				</label>
+
+				<label class="randino-demo-field">
+					<span><code>language</code></span>
+					<select v-model="place.language">
+						<option value="all">all</option>
+						<option v-for="code_ in LOCATION_LANGUAGES" :key="code_" :value="code_">
+							{{ code_ }} — {{ LANGUAGE_NAMES[code_] }}
+						</option>
+					</select>
+				</label>
+
+				<label class="randino-demo-field" :class="{ 'is-off': place.fn !== 'randLocation' }">
+					<span><code>level</code></span>
+					<select v-model="place.level" :disabled="place.fn !== 'randLocation'">
+						<option v-for="item in LOCATION_LEVELS" :key="item" :value="item">{{ item }}</option>
+					</select>
+				</label>
+
+				<label class="randino-demo-field">
+					<span><code>count</code></span>
+					<input v-model.number="place.count" type="number" min="1" :max="COUNT_MAX" />
+				</label>
+
+				<label class="randino-demo-field">
+					<span><code>minLength</code></span>
+					<input v-model="place.minLength" type="number" min="1" placeholder="—" />
+				</label>
+
+				<label class="randino-demo-field">
+					<span><code>maxLength</code></span>
+					<input v-model="place.maxLength" type="number" min="1" placeholder="—" />
+				</label>
+
+				<label class="randino-demo-field">
+					<span><code>startsWith</code></span>
+					<input v-model="place.startsWith" type="text" maxlength="1" placeholder="—" />
+				</label>
+
+				<label class="randino-demo-check">
+					<input v-model="place.unique" type="checkbox" />
 					<code>unique</code>
 				</label>
 			</div>
@@ -837,7 +964,7 @@ async function copy() {
 			</div>
 
 			<div class="randino-demo-fields randino-demo-affix">
-				<label v-if="tab !== 'sentence'" class="randino-demo-field">
+				<label v-if="decoratable" class="randino-demo-field">
 					<span>{{ t(locale, 'demoDecorate') }}</span>
 					<select v-model="decorate.kind">
 						<option value="none">{{ t(locale, 'demoDecorateNone') }}</option>
@@ -848,7 +975,7 @@ async function copy() {
 				</label>
 
 				<label
-					v-if="tab !== 'sentence'"
+					v-if="decoratable"
 					class="randino-demo-field"
 					:class="{ 'is-off': decorate.kind === 'none' || decorate.kind === 'modifier' }"
 				>
@@ -863,7 +990,7 @@ async function copy() {
 				</label>
 
 				<label
-					v-if="tab !== 'sentence'"
+					v-if="decoratable"
 					class="randino-demo-field"
 					:class="{ 'is-off': decorate.kind === 'none' }"
 				>
@@ -904,7 +1031,9 @@ async function copy() {
 				</li>
 			</ul>
 
-			<p v-else class="randino-demo-note">{{ t(locale, 'demoEmpty') }}</p>
+			<p v-else class="randino-demo-note">
+				{{ t(locale, levelMissing ? 'demoNoLevel' : 'demoEmpty') }}
+			</p>
 
 			<p v-if="rows.length && rows.length < asked" class="randino-demo-note">
 				{{ t(locale, 'demoShort') }}

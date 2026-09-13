@@ -136,6 +136,8 @@ const strings = {
 	demoNicknames: { ko: '닉네임', en: 'Nicknames' },
 	demoWords: { ko: '단어', en: 'Words' },
 	demoSentences: { ko: '문장', en: 'Sentences' },
+	demoLocations: { ko: '위치', en: 'Locations' },
+	demoFunction: { ko: '함수', en: 'Function' },
 	demoIncludeHint: {
 		ko: '반드시 넣을 단어 (공백으로 구분)',
 		en: 'words to include, separated by spaces'
@@ -150,6 +152,10 @@ const strings = {
 	demoEmpty: {
 		ko: '조건에 맞는 결과가 없습니다. 길이 범위나 startsWith를 넓혀 보세요.',
 		en: 'Nothing came back. Widen the length range, or the startsWith filter.'
+	},
+	demoNoLevel: {
+		ko: '고른 언어에는 이 단계가 없습니다. 미국 위치는 도시에서 멈추고, 읍·면·동은 한국어에만 있습니다.',
+		en: 'The language picked has no such level. US locations stop at the city, and only Korean has districts.'
 	},
 	demoShort: {
 		ko: '요청한 개수보다 적게 나왔습니다. unique를 켜면 조합이 바닥났을 때 그렇게 됩니다.',
