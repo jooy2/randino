@@ -2,6 +2,8 @@
 
 ## vNext (2026--)
 
+- **Two people in one story share no name, across sentences as well.** 1.2.0 drew a person's name against the names of the sentence it was written in, so a sentence that dropped its subject — `연우가 별장으로 내려간다. 드디어 연우를 조우하고 인사한다.` — could still meet somebody with the hero's own name, and so could the second clause of a joined sentence. The names the result has already written are now what a new name is drawn against.
+
 ## 1.2.0 (2026-09-12)
 
 - **Every generator and every decorator takes a `random`.** A function returning a number in `[0, 1)`, the way `Math.random` does — which is still the default, and is neither cryptographically secure nor reproducible. Pass `crypto.getRandomValues` for a token nobody may predict, or a seeded generator for a fixture that has to come out the same every run. One source answers every draw a call makes, including the ones a generator makes through another, so the name `randSentence` writes comes from the same place the sentence did.

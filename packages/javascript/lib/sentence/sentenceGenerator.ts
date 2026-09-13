@@ -465,6 +465,13 @@ type Draw = {
 	 * pinned nouns of a story are not the only ones a telling draws twice.
 	 */
 	described: ReadonlySet<string>;
+	/**
+	 * The person names the result has already written. A name drawn for somebody
+	 * new is one nobody in the result carries: the hero of a `visit` meets somebody
+	 * in a sentence that drops its own subject, so the sentence alone does not know
+	 * whose name is taken.
+	 */
+	names: ReadonlySet<string>;
 	follow: Follow | null;
 	/** The tense every sentence of the result is in. */
 	tense: SentenceTense;
@@ -2806,12 +2813,10 @@ function compose(
 			if (proper[i]) {
 				phrase = proper[i] as string;
 			} else {
-				const drawn = freshName(
-					language,
-					settings,
-					prefixable && i === 0 ? settings.prefix : '',
-					names
-				);
+				const drawn = freshName(language, settings, prefixable && i === 0 ? settings.prefix : '', [
+					...draw.names,
+					...names
+				]);
 
 				phrase = drawn.text;
 				names.push(drawn.text);
@@ -3817,6 +3822,7 @@ function generateResult(language: WordLanguage, settings: Settings): Result {
 		flow: freshFlow(),
 		spent: new Set(),
 		described: new Set(),
+		names: new Set(),
 		voice,
 		tense
 	});
@@ -3854,7 +3860,7 @@ function generateResult(language: WordLanguage, settings: Settings): Result {
 	}
 
 	const paragraph = telling();
-	const { flow, spent, described } = paragraph;
+	const { flow, spent, described, names } = paragraph;
 
 	for (let i = 0; i < settings.sentences; i += 1) {
 		const budget = budgets[i];
@@ -3871,6 +3877,7 @@ function generateResult(language: WordLanguage, settings: Settings): Result {
 			style: styleFor(type, settings.style, voice),
 			avoid: spent,
 			described,
+			names,
 			follow,
 			tense,
 			beat: null,
@@ -3895,6 +3902,10 @@ function generateResult(language: WordLanguage, settings: Settings): Result {
 
 		for (const noun of one.described) {
 			described.add(noun);
+		}
+
+		for (const name of one.names) {
+			names.add(name);
 		}
 
 		flow.run = type === flow.last ? flow.run + 1 : 1;
@@ -3966,6 +3977,7 @@ type Telling = {
 	flow: Flow;
 	spent: Set<string>;
 	described: Set<string>;
+	names: Set<string>;
 	voice: SentenceStyle;
 	tense: SentenceTense;
 };
@@ -4188,6 +4200,7 @@ function tellStory(telling: Telling): Result | null {
 		flow,
 		spent,
 		described,
+		names,
 		voice,
 		tense
 	} = telling;
@@ -4664,6 +4677,7 @@ function tellStory(telling: Telling): Result | null {
 					: styleFor(type, settings.style, voice),
 			avoid: spent,
 			described,
+			names,
 			follow,
 			// A line says now what is true, and reports in the past what was just
 			// done; a remark, a question and what is noticed are about now.
@@ -4790,6 +4804,10 @@ function tellStory(telling: Telling): Result | null {
 
 		for (const noun of one.described) {
 			described.add(noun);
+		}
+
+		for (const name of one.names) {
+			names.add(name);
 		}
 
 		placed =

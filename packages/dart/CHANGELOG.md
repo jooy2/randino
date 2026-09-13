@@ -2,6 +2,8 @@
 
 ## vNext (2026--)
 
+- **Two people in one story share no name, across sentences as well.** 1.2.0 drew a person's name against the names of the sentence it was written in, so a sentence that dropped its subject — `연우가 별장으로 내려간다. 드디어 연우를 조우하고 인사한다.` — could still meet somebody with the hero's own name, and so could the second clause of a joined sentence. The names the result has already written are now what a new name is drawn against.
+
 ## 1.2.0 (2026-09-12)
 
 - **Every generator and every decorator takes a `random`.** A `dart:math` `Random` — `Random.secure()` for a value nobody may predict, `Random(42)` for one that has to come out the same every run; the package's own unseeded `Random` by default. One source answers every draw a call makes, including the ones a generator makes through another, so the name `randSentence` writes comes from the same place the sentence did. The story planner reached `List.shuffle` without it, which is fixed: a shuffle is a draw like any other.

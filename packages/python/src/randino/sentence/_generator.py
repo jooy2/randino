@@ -671,6 +671,14 @@ class Draw:
     draws twice.
     """
 
+    names: frozenset[str]
+    """The person names the result has already written.
+
+    A name drawn for somebody new is one nobody in the result carries: the hero of a
+    `visit` meets somebody in a sentence that drops its own subject, so the sentence
+    alone does not know whose name is taken.
+    """
+
     follow: "Follow | None"
     tense: SentenceTense
     """The tense every sentence of the result is in."""
@@ -3035,7 +3043,7 @@ def _compose(
                     language,
                     settings,
                     settings.prefix if prefixable and index == 0 else "",
-                    names,
+                    [*draw.names, *names],
                 )
                 names.append(phrase)
 
@@ -3761,6 +3769,7 @@ class Telling:
     flow: Flow
     spent: set[str]
     described: set[str]
+    names: set[str]
     voice: SentenceStyle
     tense: SentenceTense
 
@@ -3844,6 +3853,7 @@ def _generate_result(language: WordLanguage, settings: Settings) -> Result:
             Flow(),
             set(),
             set(),
+            set(),
             voice,
             tense,
         )
@@ -3879,6 +3889,7 @@ def _generate_result(language: WordLanguage, settings: Settings) -> Result:
     flow = paragraph.flow
     spent = paragraph.spent
     described = paragraph.described
+    names = paragraph.names
 
     built: list[Built] = []
     topic: Topic | None = None
@@ -3898,6 +3909,7 @@ def _generate_result(language: WordLanguage, settings: Settings) -> Result:
             _style_for(type_, settings.style, voice),
             frozenset(spent),
             frozenset(described),
+            frozenset(names),
             follow,
             tense,
             None,
@@ -3917,6 +3929,7 @@ def _generate_result(language: WordLanguage, settings: Settings) -> Result:
         scene = one.scene
         spent.update(one.used)
         described.update(one.described)
+        names.update(one.names)
         flow.run = flow.run + 1 if type_ == flow.last else 1
         flow.last = type_
         flow.mark = mark
@@ -4584,6 +4597,7 @@ def _tell_story(telling: Telling) -> Result | None:
             style,
             frozenset(telling.spent),
             frozenset(telling.described),
+            frozenset(telling.names),
             follow,
             # A line says now what is true, and reports in the past what was just done;
             # a remark, a question and what is noticed are about now.
@@ -4698,6 +4712,7 @@ def _tell_story(telling: Telling) -> Result | None:
 
         telling.spent.update(one.used)
         telling.described.update(one.described)
+        telling.names.update(one.names)
         placed = (
             scene
             or "place" in one.scene

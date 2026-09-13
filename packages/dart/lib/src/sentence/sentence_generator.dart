@@ -524,6 +524,7 @@ class _Draw {
     required this.style,
     required this.avoid,
     required this.described,
+    required this.names,
     required this.follow,
     required this.tense,
     required this.beat,
@@ -566,6 +567,13 @@ class _Draw {
   /// baskets rather than one, and the pinned nouns of a story are not the only
   /// ones a telling draws twice.
   final Set<String> described;
+
+  /// The person names the result has already written.
+  ///
+  /// A name drawn for somebody new is one nobody in the result carries: the hero
+  /// of a `visit` meets somebody in a sentence that drops its own subject, so the
+  /// sentence alone does not know whose name is taken.
+  final Set<String> names;
   final _Follow? follow;
 
   /// The tense every sentence of the result is in.
@@ -615,6 +623,7 @@ class _Draw {
     style: style,
     avoid: avoid,
     described: described,
+    names: names,
     follow: keepFollow ? (follow ?? this.follow) : follow,
     tense: tense,
     beat: beat,
@@ -2743,7 +2752,7 @@ _Built _compose(
           language,
           settings,
           prefixable && i == 0 ? settings.prefix : '',
-          names,
+          <String>[...draw.names, ...names],
         );
 
         phrase = drawnName.text;
@@ -3871,6 +3880,7 @@ class _Telling {
     required this.flow,
     required this.spent,
     required this.described,
+    required this.names,
     required this.voice,
     required this.tense,
   });
@@ -3885,6 +3895,7 @@ class _Telling {
   final _Flow flow;
   final Set<String> spent;
   final Set<String> described;
+  final Set<String> names;
   final SentenceStyle voice;
   final SentenceTense tense;
 }
@@ -3977,6 +3988,7 @@ _Result _generateResult(WordLanguage language, _Settings settings) {
     flow: _Flow(),
     spent: <String>{},
     described: <String>{},
+    names: <String>{},
     voice: voice,
     tense: tense,
   );
@@ -4012,6 +4024,7 @@ _Result _generateResult(WordLanguage language, _Settings settings) {
   final flow = paragraph.flow;
   final spent = paragraph.spent;
   final described = paragraph.described;
+  final names = paragraph.names;
 
   final built = <_Built>[];
   _Topic? topic;
@@ -4044,6 +4057,7 @@ _Result _generateResult(WordLanguage language, _Settings settings) {
       style: _styleFor(type, settled.style, voice),
       avoid: spent,
       described: described,
+      names: names,
       follow: follow,
       tense: tense,
       beat: null,
@@ -4058,6 +4072,7 @@ _Result _generateResult(WordLanguage language, _Settings settings) {
     scene = one.scene;
     spent.addAll(one.used);
     described.addAll(one.described);
+    names.addAll(one.names);
     flow.run = type == flow.last ? flow.run + 1 : 1;
     flow.last = type;
     flow.mark = mark;
@@ -4797,6 +4812,7 @@ _Result? _tellStory(_Telling telling) {
       style: style,
       avoid: telling.spent,
       described: telling.described,
+      names: telling.names,
       follow: follow,
       // A line says now what is true, and reports in the past what was just
       // done; a remark, a question and what is noticed are about now.
@@ -4957,6 +4973,7 @@ _Result? _tellStory(_Telling telling) {
 
     telling.spent.addAll(one.used);
     telling.described.addAll(one.described);
+    telling.names.addAll(one.names);
     placed =
         scene ||
         one.scene.containsKey(SentenceSlot.place) ||
