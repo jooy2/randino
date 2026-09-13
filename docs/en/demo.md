@@ -27,7 +27,7 @@ Everything below runs in your browser. The controls are the options `randName`, 
 
 This page is a demonstration rather than a generator to call from a browser at scale. The library itself has no network calls and no dependencies, so the same code runs on a server, in a build script or in a test fixture exactly as it runs here.
 
-The output is also **not seeded**. There is no way to ask randino for the same batch twice; if you need reproducibility, keep the strings rather than the settings that produced them.
+The page draws **without a seed**, so pressing Generate twice gives two different batches. Your own calls do not have to: every generator takes a `random`, and a seeded one hands back the same batch on every run. [Choosing the source](./guide/getting-started#choosing-the-source) shows how.
 
 ## Where to go next
 
