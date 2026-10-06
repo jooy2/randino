@@ -149,6 +149,9 @@ const strings = {
 	demoWords: { ko: '단어', en: 'Words' },
 	demoSentences: { ko: '문장', en: 'Sentences' },
 	demoLocations: { ko: '위치', en: 'Locations' },
+	demoAges: { ko: '나이', en: 'Ages' },
+	demoGenders: { ko: '성별', en: 'Genders' },
+	demoOrganizations: { ko: '회사·기관', en: 'Organizations' },
 	demoFunction: { ko: '함수', en: 'Function' },
 	demoIncludeHint: {
 		ko: '반드시 넣을 단어 (공백으로 구분)',

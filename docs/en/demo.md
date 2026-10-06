@@ -1,6 +1,6 @@
 # Demo
 
-Everything below runs in your browser. The controls are the options `randName`, `randNickname`, `randWord`, `randSentence` and `randLocation` actually take, the code block under the output is the call your settings amount to, and what you see is drawn fresh every time you press Generate.
+Everything below runs in your browser. The controls are the options `randName`, `randNickname`, `randWord`, `randSentence`, `randLocation`, `randAge`, `randGender` and `randOrganization` actually take, the code block under the output is the call your settings amount to, and what you see is drawn fresh every time you press Generate.
 
 <Demo />
 
@@ -23,6 +23,14 @@ Everything below runs in your browser. The controls are the options `randName`, 
 - Pick `randRegion`, set `language` to `ko`, `count` to `20` and turn on `unique`. Sixteen come back, which is every 시·도 there is.
 - Pick `randCountry` and set `language` to `ja`, then turn on the details. Every country and territory ISO 3166-1 codes has a name in all nine languages, so this is the one location function that is not held to Korean and English.
 - Pick `randCity` with `language` on `ko` and `startsWith` on `수`. A 구 that is one of a city's districts is written with its city, `수원시 장안구`, the way an address writes it.
+- On the ages tab, press Generate a few times, then set `distribution` to `uniform`. The first draws mostly people from their twenties to their fifties; the second is as likely to hand back a ninety-year-old as a nine-year-old.
+- Set `group` to `senior` and `maxAge` to `40`. No age is both, so the range wins and the ages come from 0 to 40 rather than nothing at all.
+- On the genders tab, turn on `includeUnknown` and `includeNonbinary` and set `count` to `50`. Unknown comes up four or five times; non-binary once or not at all, since it is about one draw in a hundred.
+- Set `language` to `de` with `includeNonbinary` on. German writes `Divers`, the third option its own forms carry.
+- On the organizations tab, set `type` to `company` and switch `language` between `es` and `de`. Spanish puts the business in front of the name and German behind it: the order is the language's template, not the generator's.
+- Leave `type` on `all` and pick an `industry`. Only companies come back, because an industry is a company's.
+- Set `language` to `ko` and `minLength` to `12`. A Korean organization is usually shorter, so the long kinds are chosen, a company with its legal form or a 종합사회복지관, rather than a short name stretched.
+- Turn on the details, set `language` to `ko` and `startsWith` to `해`. The name starts with it even where `주식회사` is written in front.
 
 ## The scope of this page {#what-this-page-is-not}
 
@@ -33,5 +41,5 @@ The page draws **without a seed**, so pressing Generate twice gives two differen
 ## Where to go next
 
 - [Getting started](./guide/getting-started) — installing it, for whichever of the three packages you use.
-- [`randName`](./name/rand-name), [`randNickname`](./nickname/rand-nickname), [`randWord`](./word/rand-word), [`randSentence`](./sentence/rand-sentence) and [`randLocation`](./location/rand-location) — every option in the panel above, written out.
+- [`randName`](./name/rand-name), [`randNickname`](./nickname/rand-nickname), [`randWord`](./word/rand-word), [`randSentence`](./sentence/rand-sentence), [`randLocation`](./location/rand-location), [`randAge`](./age/rand-age), [`randGender`](./gender/rand-gender) and [`randOrganization`](./organization/rand-organization) — every option in the panel above, written out.
 - [Supported languages](./guide/languages) — what each language can and cannot do.

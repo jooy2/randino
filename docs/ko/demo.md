@@ -1,6 +1,6 @@
 # 데모
 
-아래의 모든 것은 브라우저에서 직접 실행됩니다. 컨트롤은 `randName`, `randNickname`, `randWord`, `randSentence`, `randLocation`이 실제로 받는 옵션이고, 결과 아래의 코드 블록은 지금 설정이 만들어 내는 호출이며, 보이는 값은 Generate를 누를 때마다 새로 뽑힙니다.
+아래의 모든 것은 브라우저에서 직접 실행됩니다. 컨트롤은 `randName`, `randNickname`, `randWord`, `randSentence`, `randLocation`, `randAge`, `randGender`, `randOrganization`이 실제로 받는 옵션이고, 결과 아래의 코드 블록은 지금 설정이 만들어 내는 호출이며, 보이는 값은 Generate를 누를 때마다 새로 뽑힙니다.
 
 <Demo />
 
@@ -23,6 +23,14 @@
 - `randRegion`을 고르고 `language`를 `ko`, `count`를 `20`으로 두고 `unique`를 켜 보세요. 16개가 나오는데, 이것이 시·도 전부입니다.
 - `randCountry`를 고르고 `language`를 `ja`로 둔 뒤 상세 정보를 켜 보세요. ISO 3166-1이 코드를 준 국가와 지역은 9개 언어 모두에 이름이 있어서, 위치 함수 중 이것만 한국어와 영어에 묶이지 않습니다.
 - `randCity`에서 `language`를 `ko`, `startsWith`를 `수`로 두어 보세요. 시에 딸린 일반구는 주소에 쓰듯 `수원시 장안구`처럼 시와 함께 나옵니다.
+- 나이 탭에서 Generate를 몇 번 누른 뒤 `distribution`을 `uniform`으로 바꿔 보세요. 처음에는 20대에서 50대가 대부분이고, 바꾼 뒤에는 아흔 살이 아홉 살만큼 자주 나옵니다.
+- `group`을 `senior`로, `maxAge`를 `40`으로 두어 보세요. 둘을 모두 만족하는 나이가 없으므로 범위를 따라, 빈 결과 대신 0세에서 40세 사이가 나옵니다.
+- 성별 탭에서 `includeUnknown`과 `includeNonbinary`를 켜고 `count`를 `50`으로 두어 보세요. 미상은 네다섯 번 나오고, 논바이너리는 100번에 한 번꼴이라 한 번 나오거나 아예 나오지 않습니다.
+- `includeNonbinary`를 켠 채 `language`를 `de`로 바꿔 보세요. 독일어는 자국 양식에 있는 세 번째 선택지인 `Divers`를 씁니다.
+- 회사·기관 탭에서 `type`을 `company`로 두고 `language`를 `es`와 `de`로 번갈아 바꿔 보세요. 스페인어는 업종을 이름 앞에, 독일어는 뒤에 둡니다. 어순은 생성기가 아니라 그 언어의 템플릿이 정합니다.
+- `type`을 `all`로 둔 채 `industry`를 골라 보세요. 업종은 회사에만 있으므로 회사만 나옵니다.
+- `language`를 `ko`, `minLength`를 `12`로 두어 보세요. 한국어 조직 이름은 대개 그보다 짧아서, 짧은 이름을 늘이지 않고 법인 형태가 붙은 회사나 종합사회복지관처럼 긴 종류를 고릅니다.
+- 상세 정보를 켜고 `language`를 `ko`, `startsWith`를 `해`로 두어 보세요. 앞에 `주식회사`가 붙어도 이름은 그 글자로 시작합니다.
 
 ## 이 페이지의 범위 {#what-this-page-is-not}
 
@@ -33,5 +41,5 @@
 ## 다음으로 볼 것 {#where-to-go-next}
 
 - [시작하기](./guide/getting-started) — 세 패키지 중 쓰는 것으로 설치하기.
-- [`randName`](./name/rand-name), [`randNickname`](./nickname/rand-nickname), [`randWord`](./word/rand-word), [`randSentence`](./sentence/rand-sentence), [`randLocation`](./location/rand-location) — 위 패널에 있는 모든 옵션의 설명.
+- [`randName`](./name/rand-name), [`randNickname`](./nickname/rand-nickname), [`randWord`](./word/rand-word), [`randSentence`](./sentence/rand-sentence), [`randLocation`](./location/rand-location), [`randAge`](./age/rand-age), [`randGender`](./gender/rand-gender), [`randOrganization`](./organization/rand-organization) — 위 패널에 있는 모든 옵션의 설명.
 - [지원 언어](./guide/languages) — 언어마다 할 수 있는 것과 할 수 없는 것.

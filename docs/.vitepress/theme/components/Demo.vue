@@ -2,22 +2,29 @@
 import { computed, nextTick, onMounted, reactive, ref, watch } from 'vue';
 import { useData } from 'vitepress';
 import {
+	AGE_GROUPS,
 	LOCATION_LANGUAGES,
 	LOCATION_LEVELS,
 	NAME_LANGUAGES,
+	ORGANIZATION_INDUSTRIES,
+	ORGANIZATION_TYPES,
+	RAND_AGE_MAX,
 	RAND_SENTENCE_COUNT_MAX,
 	WORD_LANGUAGES,
 	WORD_THEMES,
 	nameLengthRange,
 	nameSupportsMiddleName,
 	nicknameLengthRange,
+	randAge,
 	randCity,
 	randCountry,
 	randDistrict,
+	randGender,
 	randLocation,
 	randModifier,
 	randName,
 	randNickname,
+	randOrganization,
 	randPrefix,
 	randRegion,
 	randSentence,
@@ -65,21 +72,24 @@ const LANGUAGE_NAMES = {
 const COUNT_MAX = 50;
 
 /**
- * The five generators, as a real tab list.
+ * The generators, as a real tab list.
  *
  * `role="tablist"` was on the row and nothing else of the pattern was: no panel
  * for the tabs to control, and four buttons all in the tab order rather than one
  * with the arrow keys moving between them. A screen reader was told "tab 1 of 4"
  * about a control that pointed at nothing.
  */
-const TABS = ['name', 'nickname', 'word', 'sentence', 'location'];
+const TABS = ['name', 'nickname', 'word', 'sentence', 'location', 'age', 'gender', 'organization'];
 
 const TAB_LABELS = {
 	name: 'demoNames',
 	nickname: 'demoNicknames',
 	word: 'demoWords',
 	sentence: 'demoSentences',
-	location: 'demoLocations'
+	location: 'demoLocations',
+	age: 'demoAges',
+	gender: 'demoGenders',
+	organization: 'demoOrganizations'
 };
 
 const tab = ref('name');
@@ -184,6 +194,43 @@ const place = reactive({
 	unique: false
 });
 
+const age = reactive({
+	minAge: '',
+	maxAge: '',
+	group: 'all',
+	distribution: 'population',
+	count: 8,
+	unique: false
+});
+
+const gender = reactive({
+	language: 'en',
+	includeUnknown: false,
+	includeNonbinary: false,
+	count: 8,
+	unique: false
+});
+
+const organization = reactive({
+	language: 'en',
+	type: 'all',
+	industry: 'all',
+	includeLegalForm: '',
+	count: 8,
+	realism: 'real',
+	minLength: '',
+	maxLength: '',
+	startsWith: '',
+	unique: false
+});
+
+/**
+ * Whether a company can come out. An industry and a legal form are a company's,
+ * so their selects only mean something then — and with `type` on `all`, an
+ * industry asks for companies outright.
+ */
+const companyPossible = computed(() => ['all', 'company'].includes(organization.type));
+
 /** `randLocation` and the four that hand back one level of it, by the name picked. */
 const LOCATION_FUNCTIONS = { randLocation, randCountry, randRegion, randCity, randDistrict };
 
@@ -245,6 +292,46 @@ const options = computed(() => {
 		if (num(name.maxLength) !== undefined) out.maxLength = num(name.maxLength);
 		if (name.startsWith) out.startsWith = name.startsWith;
 		if (name.unique) out.unique = true;
+
+		return out;
+	}
+
+	if (tab.value === 'age') {
+		if (num(age.minAge) !== undefined) out.minAge = num(age.minAge);
+		if (num(age.maxAge) !== undefined) out.maxAge = num(age.maxAge);
+		if (age.group !== 'all') out.group = age.group;
+		if (age.distribution !== 'population') out.distribution = age.distribution;
+		if (age.count !== 1) out.count = Number(age.count);
+		if (age.unique) out.unique = true;
+
+		return out;
+	}
+
+	if (tab.value === 'gender') {
+		if (gender.language !== 'all') out.language = gender.language;
+		if (gender.includeUnknown) out.includeUnknown = true;
+		if (gender.includeNonbinary) out.includeNonbinary = true;
+		if (gender.count !== 1) out.count = Number(gender.count);
+		if (gender.unique) out.unique = true;
+
+		return out;
+	}
+
+	if (tab.value === 'organization') {
+		if (organization.language !== 'all') out.language = organization.language;
+		if (organization.type !== 'all') out.type = organization.type;
+		if (companyPossible.value && organization.industry !== 'all') {
+			out.industry = organization.industry;
+		}
+		if (companyPossible.value && organization.includeLegalForm) {
+			out.includeLegalForm = organization.includeLegalForm === 'on';
+		}
+		if (organization.count !== 1) out.count = Number(organization.count);
+		if (organization.realism !== 'real') out.realism = organization.realism;
+		if (num(organization.minLength) !== undefined) out.minLength = num(organization.minLength);
+		if (num(organization.maxLength) !== undefined) out.maxLength = num(organization.maxLength);
+		if (organization.startsWith) out.startsWith = organization.startsWith;
+		if (organization.unique) out.unique = true;
 
 		return out;
 	}
@@ -374,10 +461,10 @@ const DECORATORS = { suffix: randSuffix, prefix: randPrefix, modifier: randModif
 
 /**
  * Whether the tab offers a decorator at all. A decorator attaches a token or a
- * word to a name, and neither a whole sentence nor a real place is a string
- * anybody attaches anything to.
+ * word to a name or a handle, and a sentence, a real place, an age, a gender
+ * and an organization are not strings anybody attaches one to.
  */
-const decoratable = computed(() => tab.value !== 'sentence' && tab.value !== 'location');
+const decoratable = computed(() => ['name', 'nickname', 'word'].includes(tab.value));
 
 /** Whether a decorator runs. */
 const decorating = computed(() => decoratable.value && decorate.kind !== 'none');
@@ -403,6 +490,42 @@ function generate() {
 			]);
 		} else {
 			items = randName(config);
+		}
+	} else if (tab.value === 'age') {
+		if (details.value) {
+			const drawn = randAge({ ...config, output: 'detail' });
+
+			items = drawn.map((detail) => String(detail.age));
+			meta = drawn.map((detail) => [['group', detail.group]]);
+		} else {
+			items = randAge(config).map(String);
+		}
+	} else if (tab.value === 'gender') {
+		if (details.value) {
+			const drawn = randGender({ ...config, output: 'detail' });
+
+			items = drawn.map((detail) => detail.gender);
+			meta = drawn.map((detail) => [
+				['code', detail.code],
+				['language', detail.language]
+			]);
+		} else {
+			items = randGender(config);
+		}
+	} else if (tab.value === 'organization') {
+		if (details.value) {
+			const drawn = randOrganization({ ...config, output: 'detail' });
+
+			items = drawn.map((detail) => detail.organization);
+			meta = drawn.map((detail) => [
+				['name', detail.name],
+				['legalForm', String(detail.legalForm)],
+				['type', detail.type],
+				['industry', String(detail.industry)],
+				['language', detail.language]
+			]);
+		} else {
+			items = randOrganization(config);
 		}
 	} else if (tab.value === 'location') {
 		const draw = LOCATION_FUNCTIONS[place.fn];
@@ -529,7 +652,10 @@ const GENERATORS = {
 	name: 'randName',
 	nickname: 'randNickname',
 	word: 'randWord',
-	sentence: 'randSentence'
+	sentence: 'randSentence',
+	age: 'randAge',
+	gender: 'randGender',
+	organization: 'randOrganization'
 };
 
 const DECORATOR_NAMES = {
@@ -682,6 +808,151 @@ async function copy() {
 
 				<label class="randino-demo-check">
 					<input v-model="name.unique" type="checkbox" />
+					<code>unique</code>
+				</label>
+			</div>
+
+			<div v-else-if="tab === 'age'" class="randino-demo-fields">
+				<label class="randino-demo-field">
+					<span><code>minAge</code></span>
+					<input v-model="age.minAge" type="number" min="0" :max="RAND_AGE_MAX" placeholder="0" />
+				</label>
+
+				<label class="randino-demo-field">
+					<span><code>maxAge</code></span>
+					<input v-model="age.maxAge" type="number" min="0" :max="RAND_AGE_MAX" placeholder="100" />
+				</label>
+
+				<label class="randino-demo-field">
+					<span><code>group</code></span>
+					<select v-model="age.group">
+						<option value="all">all</option>
+						<option v-for="item in AGE_GROUPS" :key="item" :value="item">{{ item }}</option>
+					</select>
+				</label>
+
+				<label class="randino-demo-field">
+					<span><code>distribution</code></span>
+					<select v-model="age.distribution">
+						<option value="population">population</option>
+						<option value="uniform">uniform</option>
+					</select>
+				</label>
+
+				<label class="randino-demo-field">
+					<span><code>count</code></span>
+					<input v-model.number="age.count" type="number" min="1" :max="COUNT_MAX" />
+				</label>
+
+				<label class="randino-demo-check">
+					<input v-model="age.unique" type="checkbox" />
+					<code>unique</code>
+				</label>
+			</div>
+
+			<div v-else-if="tab === 'gender'" class="randino-demo-fields">
+				<label class="randino-demo-field">
+					<span><code>language</code></span>
+					<select v-model="gender.language">
+						<option value="all">all</option>
+						<option v-for="code_ in WORD_LANGUAGES" :key="code_" :value="code_">
+							{{ code_ }} — {{ LANGUAGE_NAMES[code_] }}
+						</option>
+					</select>
+				</label>
+
+				<label class="randino-demo-field">
+					<span><code>count</code></span>
+					<input v-model.number="gender.count" type="number" min="1" :max="COUNT_MAX" />
+				</label>
+
+				<label class="randino-demo-check">
+					<input v-model="gender.includeUnknown" type="checkbox" />
+					<code>includeUnknown</code>
+				</label>
+
+				<label class="randino-demo-check">
+					<input v-model="gender.includeNonbinary" type="checkbox" />
+					<code>includeNonbinary</code>
+				</label>
+
+				<label class="randino-demo-check">
+					<input v-model="gender.unique" type="checkbox" />
+					<code>unique</code>
+				</label>
+			</div>
+
+			<div v-else-if="tab === 'organization'" class="randino-demo-fields">
+				<label class="randino-demo-field">
+					<span><code>language</code></span>
+					<select v-model="organization.language">
+						<option value="all">all</option>
+						<option v-for="code_ in WORD_LANGUAGES" :key="code_" :value="code_">
+							{{ code_ }} — {{ LANGUAGE_NAMES[code_] }}
+						</option>
+					</select>
+				</label>
+
+				<label class="randino-demo-field">
+					<span><code>type</code></span>
+					<select v-model="organization.type">
+						<option value="all">all</option>
+						<option v-for="item in ORGANIZATION_TYPES" :key="item" :value="item">
+							{{ item }}
+						</option>
+					</select>
+				</label>
+
+				<label class="randino-demo-field" :class="{ 'is-off': !companyPossible }">
+					<span><code>industry</code></span>
+					<select v-model="organization.industry" :disabled="!companyPossible">
+						<option value="all">all</option>
+						<option v-for="item in ORGANIZATION_INDUSTRIES" :key="item" :value="item">
+							{{ item }}
+						</option>
+					</select>
+				</label>
+
+				<label class="randino-demo-field" :class="{ 'is-off': !companyPossible }">
+					<span><code>includeLegalForm</code></span>
+					<select v-model="organization.includeLegalForm" :disabled="!companyPossible">
+						<option value="">random</option>
+						<option value="on">on</option>
+						<option value="off">off</option>
+					</select>
+				</label>
+
+				<label class="randino-demo-field">
+					<span><code>count</code></span>
+					<input v-model.number="organization.count" type="number" min="1" :max="COUNT_MAX" />
+				</label>
+
+				<label class="randino-demo-field">
+					<span><code>realism</code></span>
+					<select v-model="organization.realism">
+						<option value="real">real</option>
+						<option value="mixed">mixed</option>
+						<option value="invented">invented</option>
+					</select>
+				</label>
+
+				<label class="randino-demo-field">
+					<span><code>minLength</code></span>
+					<input v-model="organization.minLength" type="number" min="1" placeholder="—" />
+				</label>
+
+				<label class="randino-demo-field">
+					<span><code>maxLength</code></span>
+					<input v-model="organization.maxLength" type="number" min="1" placeholder="—" />
+				</label>
+
+				<label class="randino-demo-field">
+					<span><code>startsWith</code></span>
+					<input v-model="organization.startsWith" type="text" maxlength="1" placeholder="—" />
+				</label>
+
+				<label class="randino-demo-check">
+					<input v-model="organization.unique" type="checkbox" />
 					<code>unique</code>
 				</label>
 			</div>

@@ -22,13 +22,17 @@
 
 /* --- the generators ------------------------------------------------------ */
 
-/* Five tabs are wider than a phone, so the row scrolls rather than wrapping. */
+/*
+ * Eight tabs are wider than the content column even on a desktop, so the row
+ * wraps rather than scrolls: a tab scrolled out of view is a generator the
+ * reader never finds out the page has.
+ */
 .randino-demo-tabs {
 	display: flex;
+	flex-wrap: wrap;
 	gap: 4px;
 	padding: 8px 8px 0;
 	border-bottom: 1px solid var(--vp-c-divider);
-	overflow-x: auto;
 }
 
 .randino-demo-tab {
