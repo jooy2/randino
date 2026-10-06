@@ -15,18 +15,20 @@ import {
 	RAND_LENGTH_MAX,
 	RAND_LENGTH_MIN,
 	RAND_LOCATION_LENGTH_MAX,
+	RAND_ORGANIZATION_LENGTH_MAX,
 	RAND_SENTENCE_LENGTH_MAX
 } from 'randino';
 ```
 
-| Name                       | Type     | Value   |
-| -------------------------- | -------- | ------- |
-| `RAND_LENGTH_MIN`          | `number` | `1`     |
-| `RAND_LENGTH_MAX`          | `number` | `40`    |
-| `RAND_SENTENCE_LENGTH_MAX` | `number` | `200`   |
-| `RAND_LOCATION_LENGTH_MAX` | `number` | `100`   |
-| `RAND_AGE_MAX`             | `number` | `120`   |
-| `RAND_COUNT_MAX`           | `number` | `10000` |
+| Name                           | Type     | Value   |
+| ------------------------------ | -------- | ------- |
+| `RAND_LENGTH_MIN`              | `number` | `1`     |
+| `RAND_LENGTH_MAX`              | `number` | `40`    |
+| `RAND_SENTENCE_LENGTH_MAX`     | `number` | `200`   |
+| `RAND_LOCATION_LENGTH_MAX`     | `number` | `100`   |
+| `RAND_ORGANIZATION_LENGTH_MAX` | `number` | `60`    |
+| `RAND_AGE_MAX`                 | `number` | `120`   |
+| `RAND_COUNT_MAX`               | `number` | `10000` |
 
 :::
 
@@ -36,14 +38,15 @@ import {
 import 'package:randino/randino.dart';
 ```
 
-| Name                    | Type  | Value   |
-| ----------------------- | ----- | ------- |
-| `randLengthMin`         | `int` | `1`     |
-| `randLengthMax`         | `int` | `40`    |
-| `randSentenceLengthMax` | `int` | `200`   |
-| `randLocationLengthMax` | `int` | `100`   |
-| `randAgeMax`            | `int` | `120`   |
-| `randCountMax`          | `int` | `10000` |
+| Name                        | Type  | Value   |
+| --------------------------- | ----- | ------- |
+| `randLengthMin`             | `int` | `1`     |
+| `randLengthMax`             | `int` | `40`    |
+| `randSentenceLengthMax`     | `int` | `200`   |
+| `randLocationLengthMax`     | `int` | `100`   |
+| `randOrganizationLengthMax` | `int` | `60`    |
+| `randAgeMax`                | `int` | `120`   |
+| `randCountMax`              | `int` | `10000` |
 
 :::
 
@@ -56,22 +59,24 @@ from randino import (
     RAND_LENGTH_MAX,
     RAND_LENGTH_MIN,
     RAND_LOCATION_LENGTH_MAX,
+    RAND_ORGANIZATION_LENGTH_MAX,
     RAND_SENTENCE_LENGTH_MAX,
 )
 ```
 
-| Name                       | Type  | Value   |
-| -------------------------- | ----- | ------- |
-| `RAND_LENGTH_MIN`          | `int` | `1`     |
-| `RAND_LENGTH_MAX`          | `int` | `40`    |
-| `RAND_SENTENCE_LENGTH_MAX` | `int` | `200`   |
-| `RAND_LOCATION_LENGTH_MAX` | `int` | `100`   |
-| `RAND_AGE_MAX`             | `int` | `120`   |
-| `RAND_COUNT_MAX`           | `int` | `10000` |
+| Name                           | Type  | Value   |
+| ------------------------------ | ----- | ------- |
+| `RAND_LENGTH_MIN`              | `int` | `1`     |
+| `RAND_LENGTH_MAX`              | `int` | `40`    |
+| `RAND_SENTENCE_LENGTH_MAX`     | `int` | `200`   |
+| `RAND_LOCATION_LENGTH_MAX`     | `int` | `100`   |
+| `RAND_ORGANIZATION_LENGTH_MAX` | `int` | `60`    |
+| `RAND_AGE_MAX`                 | `int` | `120`   |
+| `RAND_COUNT_MAX`               | `int` | `10000` |
 
 :::
 
-The length options are clamped into `1 … 40`, counted in characters of what the generator returns, except on `randSentence`, whose ceiling is `200`, and on the location generators, whose ceiling is `100`. A sentence is many words where a name, a word and a nickname are at most three, and a location is every level of it written out at once. `randAge` takes no length, and clamps its ages into `0 … 120` instead. `count` is clamped into `0 … 10000`, because an unbounded count with `unique` on can spend a long time re-drawing from an exhausted pool.
+The length options are clamped into `1 … 40`, counted in characters of what the generator returns, except on `randSentence`, whose ceiling is `200`, on the location generators, whose ceiling is `100`, and on `randOrganization`, whose ceiling is `60`. A sentence is many words where a name, a word and a nickname are at most three, a location is every level of it written out at once, and an organization is a name, a word for its business and a legal form. `randAge` takes no length, and clamps its ages into `0 … 120` instead. `count` is clamped into `0 … 10000`, because an unbounded count with `unique` on can spend a long time re-drawing from an exhausted pool.
 
 ## Names
 
@@ -233,6 +238,47 @@ from randino import AGE_GROUPS
 
 The ages each group covers are on the [`randAge`](../age/rand-age#groups) page.
 
+## Organizations
+
+::: lang js
+
+```javascript
+import { ORGANIZATION_INDUSTRIES, ORGANIZATION_TYPES } from 'randino';
+```
+
+| Name | Type | Value |
+| --- | --- | --- |
+| `ORGANIZATION_TYPES` | `OrganizationType[]` | `['company', 'nonprofit', 'school', 'government', 'public']` |
+| `ORGANIZATION_INDUSTRIES` | `OrganizationIndustry[]` | All ten industries |
+
+:::
+
+::: lang dart
+
+```dart
+import 'package:randino/randino.dart';
+```
+
+| Name                     | Type                         | Value                        |
+| ------------------------ | ---------------------------- | ---------------------------- |
+| `organizationTypes`      | `List<OrganizationType>`     | Every kind, a business first |
+| `organizationIndustries` | `List<OrganizationIndustry>` | All ten industries           |
+
+:::
+
+::: lang py
+
+```python
+from randino import ORGANIZATION_INDUSTRIES, ORGANIZATION_TYPES
+```
+
+| Name | Type | Value |
+| --- | --- | --- |
+| `ORGANIZATION_TYPES` | `tuple[OrganizationType, …]` | `('company', 'nonprofit', 'school', 'government', 'public')` |
+| `ORGANIZATION_INDUSTRIES` | `tuple[OrganizationIndustry, …]` | All ten industries |
+
+:::
+
 ## Affixes
 
 ::: lang js
@@ -357,6 +403,11 @@ import type {
 	NameLanguageOption,
 	NameScript,
 	NicknameDetail,
+	OrganizationDetail,
+	OrganizationIndustry,
+	OrganizationIndustryOption,
+	OrganizationType,
+	OrganizationTypeOption,
 	WordLanguage,
 	WordLanguageOption,
 	WordTheme,
@@ -372,6 +423,7 @@ import type {
 	RandLocationOptions,
 	RandNameOptions,
 	RandNicknameOptions,
+	RandOrganizationOptions,
 	RandOutput
 } from 'randino';
 
@@ -392,11 +444,13 @@ import 'package:randino/randino.dart';
 // Enums
 AgeGroup, AgeDistribution, GenderCode
 NameLanguage, NameGender, NameScript
+OrganizationType, OrganizationIndustry
 WordLanguage, WordTheme
 LocationLanguage, LocationLevel
 
 // Values
-LengthRange, AgeDetail, GenderDetail, NameDetail, NicknameDetail, LocationDetail, CountryDetail
+LengthRange, AgeDetail, GenderDetail, NameDetail, NicknameDetail, LocationDetail, CountryDetail,
+OrganizationDetail
 ```
 
 There is no `…Option` type and no `all` member: **a null enum is what means "every one of them"**, so the parameter you do not write is already the mixed draw. That also means the helpers take the same type the generators do, rather than a narrower one.
@@ -422,6 +476,11 @@ from randino import (
     NameLanguageOption,
     NameScript,
     NicknameDetail,
+    OrganizationDetail,
+    OrganizationIndustry,
+    OrganizationIndustryOption,
+    OrganizationType,
+    OrganizationTypeOption,
     WordLanguage,
     WordLanguageOption,
     WordTheme,

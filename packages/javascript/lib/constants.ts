@@ -51,3 +51,12 @@ export const RAND_LOCATION_LENGTH_MAX = 100;
  * a sample has no use for a record.
  */
 export const RAND_AGE_MAX = 120;
+
+/**
+ * Upper bound for `minLength` / `maxLength` on `randOrganization`, in
+ * characters. Its own number rather than `RAND_LENGTH_MAX`, because an
+ * organization is a name, a word for its business and a legal form at once, and
+ * the longest of them run past forty: `Công ty TNHH MTV Giải pháp Công nghệ
+ * Thịnh Vượng`, `Polideportivo Municipal de Encinar del Valle`.
+ */
+export const RAND_ORGANIZATION_LENGTH_MAX = 60;

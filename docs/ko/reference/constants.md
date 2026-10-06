@@ -15,18 +15,20 @@ import {
 	RAND_LENGTH_MAX,
 	RAND_LENGTH_MIN,
 	RAND_LOCATION_LENGTH_MAX,
+	RAND_ORGANIZATION_LENGTH_MAX,
 	RAND_SENTENCE_LENGTH_MAX
 } from 'randino';
 ```
 
-| 이름                       | 타입     | 값      |
-| -------------------------- | -------- | ------- |
-| `RAND_LENGTH_MIN`          | `number` | `1`     |
-| `RAND_LENGTH_MAX`          | `number` | `40`    |
-| `RAND_SENTENCE_LENGTH_MAX` | `number` | `200`   |
-| `RAND_LOCATION_LENGTH_MAX` | `number` | `100`   |
-| `RAND_AGE_MAX`             | `number` | `120`   |
-| `RAND_COUNT_MAX`           | `number` | `10000` |
+| 이름                           | 타입     | 값      |
+| ------------------------------ | -------- | ------- |
+| `RAND_LENGTH_MIN`              | `number` | `1`     |
+| `RAND_LENGTH_MAX`              | `number` | `40`    |
+| `RAND_SENTENCE_LENGTH_MAX`     | `number` | `200`   |
+| `RAND_LOCATION_LENGTH_MAX`     | `number` | `100`   |
+| `RAND_ORGANIZATION_LENGTH_MAX` | `number` | `60`    |
+| `RAND_AGE_MAX`                 | `number` | `120`   |
+| `RAND_COUNT_MAX`               | `number` | `10000` |
 
 :::
 
@@ -36,14 +38,15 @@ import {
 import 'package:randino/randino.dart';
 ```
 
-| 이름                    | 타입  | 값      |
-| ----------------------- | ----- | ------- |
-| `randLengthMin`         | `int` | `1`     |
-| `randLengthMax`         | `int` | `40`    |
-| `randSentenceLengthMax` | `int` | `200`   |
-| `randLocationLengthMax` | `int` | `100`   |
-| `randAgeMax`            | `int` | `120`   |
-| `randCountMax`          | `int` | `10000` |
+| 이름                        | 타입  | 값      |
+| --------------------------- | ----- | ------- |
+| `randLengthMin`             | `int` | `1`     |
+| `randLengthMax`             | `int` | `40`    |
+| `randSentenceLengthMax`     | `int` | `200`   |
+| `randLocationLengthMax`     | `int` | `100`   |
+| `randOrganizationLengthMax` | `int` | `60`    |
+| `randAgeMax`                | `int` | `120`   |
+| `randCountMax`              | `int` | `10000` |
 
 :::
 
@@ -56,22 +59,24 @@ from randino import (
     RAND_LENGTH_MAX,
     RAND_LENGTH_MIN,
     RAND_LOCATION_LENGTH_MAX,
+    RAND_ORGANIZATION_LENGTH_MAX,
     RAND_SENTENCE_LENGTH_MAX,
 )
 ```
 
-| 이름                       | 타입  | 값      |
-| -------------------------- | ----- | ------- |
-| `RAND_LENGTH_MIN`          | `int` | `1`     |
-| `RAND_LENGTH_MAX`          | `int` | `40`    |
-| `RAND_SENTENCE_LENGTH_MAX` | `int` | `200`   |
-| `RAND_LOCATION_LENGTH_MAX` | `int` | `100`   |
-| `RAND_AGE_MAX`             | `int` | `120`   |
-| `RAND_COUNT_MAX`           | `int` | `10000` |
+| 이름                           | 타입  | 값      |
+| ------------------------------ | ----- | ------- |
+| `RAND_LENGTH_MIN`              | `int` | `1`     |
+| `RAND_LENGTH_MAX`              | `int` | `40`    |
+| `RAND_SENTENCE_LENGTH_MAX`     | `int` | `200`   |
+| `RAND_LOCATION_LENGTH_MAX`     | `int` | `100`   |
+| `RAND_ORGANIZATION_LENGTH_MAX` | `int` | `60`    |
+| `RAND_AGE_MAX`                 | `int` | `120`   |
+| `RAND_COUNT_MAX`               | `int` | `10000` |
 
 :::
 
-길이 옵션은 생성 결과의 글자 수를 기준으로 `1 … 40`으로 제한됩니다. `randSentence`만은 상한이 `200`이고, 위치 생성 함수는 `100`입니다. 이름과 단어와 닉네임은 길어야 세 단어지만, 문장은 여러 단어이고 위치는 모든 단계를 한 번에 이어 쓰기 때문입니다. `randAge`는 길이 대신 나이를 `0 … 120`으로 제한합니다. `count`는 `0 … 10000`으로 제한되는데, 상한이 있는 이유는 `unique`를 켠 채로 개수를 제한하지 않으면 이미 바닥난 후보에서 계속 다시 뽑느라 오래 걸릴 수 있기 때문입니다.
+길이 옵션은 생성 결과의 글자 수를 기준으로 `1 … 40`으로 제한됩니다. `randSentence`만은 상한이 `200`이고, 위치 생성 함수는 `100`, `randOrganization`은 `60`입니다. 이름과 단어와 닉네임은 길어야 세 단어지만, 문장은 여러 단어이고 위치는 모든 단계를 한 번에 이어 쓰며, 조직은 이름과 업종 낱말과 법인 형태를 함께 쓰기 때문입니다. `randAge`는 길이 대신 나이를 `0 … 120`으로 제한합니다. `count`는 `0 … 10000`으로 제한되는데, 상한이 있는 이유는 `unique`를 켠 채로 개수를 제한하지 않으면 이미 바닥난 후보에서 계속 다시 뽑느라 오래 걸릴 수 있기 때문입니다.
 
 ## 이름
 
@@ -233,6 +238,47 @@ from randino import AGE_GROUPS
 
 각 연령대가 어느 나이를 다루는지는 [`randAge`](../age/rand-age#groups) 문서에 있습니다.
 
+## 조직 {#organizations}
+
+::: lang js
+
+```javascript
+import { ORGANIZATION_INDUSTRIES, ORGANIZATION_TYPES } from 'randino';
+```
+
+| 이름 | 타입 | 값 |
+| --- | --- | --- |
+| `ORGANIZATION_TYPES` | `OrganizationType[]` | `['company', 'nonprofit', 'school', 'government', 'public']` |
+| `ORGANIZATION_INDUSTRIES` | `OrganizationIndustry[]` | 열 가지 업종 전부 |
+
+:::
+
+::: lang dart
+
+```dart
+import 'package:randino/randino.dart';
+```
+
+| 이름                     | 타입                         | 값                  |
+| ------------------------ | ---------------------------- | ------------------- |
+| `organizationTypes`      | `List<OrganizationType>`     | 모든 종류, 회사부터 |
+| `organizationIndustries` | `List<OrganizationIndustry>` | 열 가지 업종 전부   |
+
+:::
+
+::: lang py
+
+```python
+from randino import ORGANIZATION_INDUSTRIES, ORGANIZATION_TYPES
+```
+
+| 이름 | 타입 | 값 |
+| --- | --- | --- |
+| `ORGANIZATION_TYPES` | `tuple[OrganizationType, …]` | `('company', 'nonprofit', 'school', 'government', 'public')` |
+| `ORGANIZATION_INDUSTRIES` | `tuple[OrganizationIndustry, …]` | 열 가지 업종 전부 |
+
+:::
+
 ## 접미사와 접두사 {#affixes}
 
 ::: lang js
@@ -357,6 +403,11 @@ import type {
 	NameLanguageOption,
 	NameScript,
 	NicknameDetail,
+	OrganizationDetail,
+	OrganizationIndustry,
+	OrganizationIndustryOption,
+	OrganizationType,
+	OrganizationTypeOption,
 	WordLanguage,
 	WordLanguageOption,
 	WordTheme,
@@ -372,6 +423,7 @@ import type {
 	RandLocationOptions,
 	RandNameOptions,
 	RandNicknameOptions,
+	RandOrganizationOptions,
 	RandOutput
 } from 'randino';
 
@@ -392,11 +444,13 @@ import 'package:randino/randino.dart';
 // enum
 AgeGroup, AgeDistribution, GenderCode
 NameLanguage, NameGender, NameScript
+OrganizationType, OrganizationIndustry
 WordLanguage, WordTheme
 LocationLanguage, LocationLevel
 
 // 값
-LengthRange, AgeDetail, GenderDetail, NameDetail, NicknameDetail, LocationDetail, CountryDetail
+LengthRange, AgeDetail, GenderDetail, NameDetail, NicknameDetail, LocationDetail, CountryDetail,
+OrganizationDetail
 ```
 
 `…Option` 타입도 없고 `all` 멤버도 없습니다. **null인 enum이 "전부"를 뜻하므로**, 쓰지 않은 파라미터가 이미 섞인 결과를 의미합니다. 그래서 헬퍼들도 더 좁은 타입이 아니라 생성기와 같은 타입을 받습니다.
@@ -422,6 +476,11 @@ from randino import (
     NameLanguageOption,
     NameScript,
     NicknameDetail,
+    OrganizationDetail,
+    OrganizationIndustry,
+    OrganizationIndustryOption,
+    OrganizationType,
+    OrganizationTypeOption,
     WordLanguage,
     WordLanguageOption,
     WordTheme,

@@ -4,7 +4,7 @@ Guidance for AI agents (and humans) working in this repository. Written in Engli
 
 ## What randino is
 
-**randino** is a zero-dependency library that generates random **person names**, **nicknames**, **everyday words**, **sentences**, **locations**, **ages** and **genders**, per language. It ships for more than one programming language — TypeScript, Dart and Python — and every one of them generates from the same datasets under the same rules. Separate concerns, deliberately:
+**randino** is a zero-dependency library that generates random **person names**, **nicknames**, **everyday words**, **sentences**, **locations**, **ages**, **genders** and **organizations**, per language. It ships for more than one programming language — TypeScript, Dart and Python — and every one of them generates from the same datasets under the same rules. Separate concerns, deliberately:
 
 - **Names** should read like names a person actually carries (`김민준`, `Emma Clover`). Sample data for forms, seeds, mockups.
 - **Nicknames** are the handles someone would pick for a game or a website (`멋진사자`, `MistyOwl`). They are built from everyday words and **never from person names** — that rule is the whole point of keeping the two apart.
@@ -13,6 +13,7 @@ Guidance for AI agents (and humans) working in this repository. Written in Engli
 - **Locations** are real places, written out from the country down (`대한민국 경기도 수원시 장안구 파장동`, `Pasadena, California, United States`). Nothing about them is invented: every division is one the country publishes, inside the one written beside it, and nothing goes below a Korean 읍·면·동 or a US city — no street, no building, no number. `randLocation` takes the level as an option, and `randCountry` / `randRegion` / `randCity` / `randDistrict` hand back one level's name alone. **Two languages, not nine**, and on purpose — see the location bullets below. `randCountry` is the exception: it names every ISO 3166-1 country in all nine.
 - **Ages** are whole numbers of years for a sample person (`34`), drawn along a curve shaped like a population rather than evenly, so a sample is mostly adults. An age has no language, so `randAge` is the one generator that takes none, and `minAge` / `maxAge` and `group` are its own options in place of the length ones.
 - **Genders** are the label a form in the language writes for one (`여성`, `Female`, `Divers`). Male and female split evenly, and the two others — `unknown` and `nonbinary` — come up only when the caller switches them on, and rarely when they do.
+- **Organizations** are companies, schools, offices and associations that do not exist (`(주)새솔테크`, `Westbrook High School`, `Гимназия № 135`), each written the way its language writes that kind. Nothing about them is real, and that is the requirement rather than a limitation: the stems are chosen to be nobody's brand, and **no organization is ever built from a person name** — a surname with a legal form behind it is exactly how famous companies are named.
 
 All of them are implemented. Keep the generators apart — a shared "generator" abstraction is not wanted — but the options they all take, and the loop that draws until it has `count` results, live in `_internal/generate` and are shared. So are the word pools: `word/data` is the one dataset, and `nickname` consumes it.
 
@@ -56,6 +57,14 @@ lib/
     randAge.ts              # public: number[], or AgeDetail[] on `output: 'detail'`
     ageGenerator.ts         # internal: the candidates per call, the weighted draw
     data/index.ts           # AGE_GROUPS, the band of each group, the curve
+  organization/
+    index.ts
+    randOrganization.ts     # public: string[], or OrganizationDetail[] on `output: 'detail'`
+    organizationGenerator.ts # internal: the plan per call, the shapes, the gap filling
+    data/
+      index.ts              # ORGANIZATION_DATA, the kinds, the industries, the odds
+      types.ts              # internal dataset types (templates, synthesis)
+      en.ts ko.ts ja.ts …   # one file per language, nine of them
   gender/
     index.ts
     randGender.ts           # public: string[], or GenderDetail[] on `output: 'detail'`
@@ -122,6 +131,7 @@ test/
   age.test.ts               # one *.test.ts per category
   decorate.test.ts
   gender.test.ts
+  organization.test.ts
   location.test.ts
   name.test.ts
   nickname.test.ts
@@ -187,6 +197,8 @@ lib/
     age/                    # mirrors lib/age, plus `randAgeDetails`
     decorate/               # mirrors lib/decorate, plus the `…All` list forms
     gender/                 # mirrors lib/gender, plus `randGenderDetails`
+    organization/           # mirrors lib/organization, plus `randOrganizationDetails`
+      data/                 # one file per language, ported verbatim
     name/                   # mirrors lib/name in the JavaScript package
       data/                 # one file per language, ported verbatim
       romanize.dart
@@ -206,6 +218,7 @@ test/
   age_test.dart
   decorate_test.dart
   gender_test.dart
+  organization_test.dart
   location_test.dart
   name_test.dart
   nickname_test.dart
@@ -267,6 +280,8 @@ src/randino/
   age/                      # mirrors lib/age
   decorate/                 # mirrors lib/decorate; `@overload` carries the shape
   gender/                   # mirrors lib/gender
+  organization/             # mirrors lib/organization
+    data/                   # one file per language, ported verbatim
   name/                     # mirrors lib/name in the JavaScript package
     data/                   # one file per language, ported verbatim
     _romanize.py
@@ -287,6 +302,7 @@ tests/
   test_age.py
   test_decorate.py
   test_gender.py
+  test_organization.py
   test_location.py
   test_name.py
   test_nickname.py
@@ -470,7 +486,7 @@ The run stops rather than writes when a file changes shape — new columns, an u
 
 **The dumps normalize what only differs because the languages differ, and nothing else.** A pool entry is `{ n, r }` everywhere; field names are the JavaScript ones; an optional field is present and null rather than absent; `syn` carries its `kind` tag even in the two packages that tell the shapes apart by type. That normalization lives in the three dumps — one per package, each responsible for its own language's spelling — so the comparison itself has nothing to know about any of them. Adding a field to a dataset means adding it to all three dumps, and the check reports a field only one dump writes as a difference, which is the intended failure.
 
-**Do not widen it into a general "the ports agree" check.** It covers the word, sentence, name and location datasets, the age bands and curve, the gender labels and weights, the stories and the field rules beside them, the surname romanization map, and the bounds in `constants` and `decorate/data` — the last of which is still written by hand in each package. The nickname shapes are in it now that they are `WordLanguageData.frames`: they were left out while they were a table private to each generator, and being data is what put them in. The sentence datasets are the same story on a larger scale, `THEME_CLASS` included, because a theme moving from one class to another changes what every verb of every language will accept.
+**Do not widen it into a general "the ports agree" check.** It covers the word, sentence, name and location datasets, the age bands and curve, the gender labels and weights, the organization datasets and their odds, the stories and the field rules beside them, the surname romanization map, and the bounds in `constants` and `decorate/data` — the last of which is still written by hand in each package. The nickname shapes are in it now that they are `WordLanguageData.frames`: they were left out while they were a table private to each generator, and being data is what put them in. The sentence datasets are the same story on a larger scale, `THEME_CLASS` included, because a theme moving from one class to another changes what every verb of every language will accept.
 
 ## Testing a random generator
 
@@ -611,6 +627,16 @@ Genders:
 - **The weights are out of a hundred with everything switched on, and a switched-off code drops out.** 45 / 45 / 9 / 1, so the two always-on codes split evenly by themselves and the rest keep their proportions — `unknown` alone is about one in eleven, `nonbinary` alone about one in ninety. Nothing is renormalised by hand; `pickWeighted` over the codes that are left does it.
 - **`male` and `female` are `NameGender`'s two codes.** That is the point of `code` on the detail: a drawn gender can choose the pool a name comes from. Keep them the same strings.
 
+Organizations:
+
+- **A name is a template with its gaps filled, and the template is the language's.** `OrganizationLanguageData.templates` writes each kind in the language's own order with `{stem}`, `{industry}`, `{place}` and `{number}` gaps — `{industry} {stem}` in Spanish and Vietnamese, `{stem} {industry}` in German, `{place}{stem}{industry}` in Chinese, `Школа № {number}` in Russian. **A new shape is a template, never a branch in the generator**, the same rule the nickname frames follow. Every company template carries an `{industry}`; the company that is its stem alone (`Larkspur, Inc.`) is a shape the generator adds itself, only when no industry was asked for, and it always takes a legal form.
+- **The stems are curated against brands, in both directions.** A stem is in only when neither it nor it with any of the language's business words behind it is a well-known company's name — `한빛` is out because `한빛소프트` is real, `Juniper` because `Juniper Networks` is. The invented-stem syllables are narrowed the same way, so that two drawn at random do not spell one (`한`+`솔`, `辉`+`瑞`), and each file says what it left out and why. A word added to a stem pool, a business-word pool or a syllable pool has to be checked against every other pool it can be joined to. A generic name matching some small real business somewhere is accepted and documented; a famous one is a bug.
+- **No person names.** Not the name pools, and not a surname list of the organization data's own: `Ferrari S.p.A.`, `村田製作所` and `A. Lange & Söhne` are what a surname template writes. This is the nickname rule for the same reason.
+- **A length range is met by planning, not by re-drawing.** `planFor` works out once per call which shapes, in which legal forms, can land inside the range, and drops the kinds that have none while another kind has one; `fill` then gives each gap the room the gaps behind it leave. Re-drawing whole names missed nearly everything Korean, Japanese and Chinese were asked for above twelve characters — a long name there is a particular template, not a lucky draw. What is left to miss is an invented stem, and `FIT_ATTEMPTS` covers it.
+- **`startsWith` reads the name, the length options read the organization.** A legal form written in front (`주식회사 새솔`, `ООО «Вега»`) is not where the name starts, so `startsWith` is checked against `name` and kept away from `collect`, while the length bounds a column or a field limit cares about are the whole string's. A first character no stem starts with is answered with an invented stem, the way `randWord` answers one, so `startsWith` only comes back empty for a character the language does not write.
+- **An industry is a company's.** Naming one with `type` left out asks for companies; with kinds named, it narrows the companies among them. The industry reported is the one whose word the name carries, and `null` for a generic word, a bare stem or any other kind. The business words are disjoint within a language, and the suites assert it, so the word always says which industry it is.
+- **The odds are data.** The kind weights (40 / 15 / 20 / 10 / 15), the bare-stem, generic-word and legal-form chances live in `organization/data/index.ts` and are compared by `tools/parity`.
+
 ## Adding a location language
 
 1. Find the country's own published list of divisions, down to the level the privacy rule allows (a Korean 읍·면·동 is the floor for every country: a named area, never a street or a building). Read its terms. If anything in them asks for attribution, restricts use, or is unstated, stop: the country is not added. If the list takes a side on a disputed territory, stop.
@@ -668,8 +694,9 @@ To add one that clears the bar:
 7. No person names, and no word that is only a name — for `en` this is enforced against the person-name pools, which is why `job` has no `Knight`, `Baker` or `Hunter` and `plant` no `Rose` or `Ivy`. Add the language to the README tables and to `SCRIPT` in `test/word.test.ts` **and** `test/nickname.test.ts`; the existing per-language tests then cover it.
 8. A language that inflects tags its nouns and lists its endings: write `nouns` as a `theme -> \`gato:m luna:f\`` map through `taggedNouns`, and give `agreement` the rules per form, `p` (and `fp` where the plural inflects for gender) included if any noun has no singular. Put the noun **first** in the frames where the grammar allows it; where it cannot (`blauer Wal`), `buildWords` draws the noun ahead of its turn instead.
 9. Port all of it to `packages/dart` and `packages/python`, the same way a name language is ported.
-10. Add the row to the tables in `docs/*/guide/languages.md` and to the root `README.md`.
-11. Run `node tools/parity/index.mjs` from the repository root — twenty-nine pools in three packages are exactly where one word goes missing unnoticed.
+10. Add the language's row to `GENDER_LABELS` and its `organization/data/<code>` file — stems checked against brands, the business words for every industry, a template for every kind and its legal forms — in all three packages. `randGender` and `randOrganization` cover every word language, and both suites assert it.
+11. Add the row to the tables in `docs/*/guide/languages.md` and to the root `README.md`.
+12. Run `node tools/parity/index.mjs` from the repository root — twenty-nine pools in three packages are exactly where one word goes missing unnoticed.
 
 ### The compound rule: one entry per thing
 

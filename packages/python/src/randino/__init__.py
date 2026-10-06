@@ -6,8 +6,9 @@ for a game or a website (`멋진사자`, `MistyOwl`), built from everyday words 
 from person names; `rand_word` hands those words over on their own; `rand_sentence`
 writes a whole statement in the language's own grammar; `rand_location` writes a real
 place, from the country down to a Korean 읍·면·동 or a US city; `rand_age` draws an age
-along a curve shaped like a population; and `rand_gender` writes the label a form in the
-language uses for a gender.
+along a curve shaped like a population; `rand_gender` writes the label a form in the
+language uses for a gender; and `rand_organization` names a company, a school or an office
+that does not exist.
 
 Example:
     >>> from randino import rand_name, rand_nickname, rand_sentence
@@ -39,6 +40,11 @@ from randino._types import (
     NameLanguageOption,
     NameScript,
     NicknameDetail,
+    OrganizationDetail,
+    OrganizationIndustry,
+    OrganizationIndustryOption,
+    OrganizationType,
+    OrganizationTypeOption,
     RandRealism,
     RandVocabulary,
     SentenceDetail,
@@ -67,6 +73,7 @@ from randino.constants import (
     RAND_LENGTH_MAX,
     RAND_LENGTH_MIN,
     RAND_LOCATION_LENGTH_MAX,
+    RAND_ORGANIZATION_LENGTH_MAX,
     RAND_SENTENCE_COUNT_MAX,
     RAND_SENTENCE_LENGTH_MAX,
 )
@@ -97,6 +104,7 @@ from randino.name import (
     rand_name,
 )
 from randino.nickname import nickname_length_range, rand_nickname
+from randino.organization import ORGANIZATION_INDUSTRIES, ORGANIZATION_TYPES, rand_organization
 from randino.sentence import rand_sentence, sentence_length_range
 from randino.word import (
     WORD_LANGUAGES,
@@ -143,11 +151,14 @@ __all__ = [
     "LOCATION_LANGUAGES",
     "LOCATION_LEVELS",
     "NAME_LANGUAGES",
+    "ORGANIZATION_INDUSTRIES",
+    "ORGANIZATION_TYPES",
     "RAND_AGE_MAX",
     "RAND_COUNT_MAX",
     "RAND_LENGTH_MAX",
     "RAND_LENGTH_MIN",
     "RAND_LOCATION_LENGTH_MAX",
+    "RAND_ORGANIZATION_LENGTH_MAX",
     "RAND_SENTENCE_COUNT_MAX",
     "RAND_SENTENCE_LENGTH_MAX",
     "WORD_LANGUAGES",
@@ -171,6 +182,11 @@ __all__ = [
     "NameLanguageOption",
     "NameScript",
     "NicknameDetail",
+    "OrganizationDetail",
+    "OrganizationIndustry",
+    "OrganizationIndustryOption",
+    "OrganizationType",
+    "OrganizationTypeOption",
     "RandRealism",
     "RandVocabulary",
     "SentenceDetail",
@@ -220,6 +236,7 @@ __all__ = [
     "rand_nature",
     "rand_nickname",
     "rand_object",
+    "rand_organization",
     "rand_person",
     "rand_place",
     "rand_plant",

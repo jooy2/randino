@@ -13,6 +13,7 @@ void main() {
   _sentences();
   _locations();
   _people();
+  _organizations();
   _decorators();
   _questionsAboutALanguage();
 }
@@ -132,6 +133,21 @@ void _people() {
   print(randGender(language: WordLanguage.ko, count: 3)); // [여성, 남성, 여성]
   print(randGenderDetails(language: WordLanguage.de, includeNonbinary: true).first);
   // GenderDetail(Weiblich, female, de)
+}
+
+/// Organizations that do not exist, written the way the language writes each kind.
+void _organizations() {
+  print('-- organizations ----------------------------------------------');
+
+  print(randOrganization(language: WordLanguage.ko, count: 3)); // [(주)가람에너지, 윤슬교육지원청, 새솔홀딩스]
+  print(
+    randOrganization(
+      language: WordLanguage.en,
+      industry: OrganizationIndustry.logistics,
+      includeLegalForm: true,
+    ),
+  );
+  // [Greenbriar Logistics Corp.]
 }
 
 void _decorators() {

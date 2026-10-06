@@ -19,6 +19,8 @@ import 'package:randino/src/location/data/types.dart';
 import 'package:randino/src/name/data/index.dart';
 import 'package:randino/src/name/data/ko.dart';
 import 'package:randino/src/name/data/types.dart';
+import 'package:randino/src/organization/data/index.dart';
+import 'package:randino/src/organization/data/types.dart';
 import 'package:randino/src/sentence/data/index.dart';
 import 'package:randino/src/sentence/data/types.dart';
 import 'package:randino/src/word/data/index.dart';
@@ -111,6 +113,38 @@ Map<String, Object?> synOf(SyllableSet syn) => <String, Object?>{
   'coda': syn.coda,
   'minSyllables': syn.minSyllables,
   'maxSyllables': syn.maxSyllables,
+};
+
+/// One language's organization dataset, the synthesis tagged with its kind.
+Map<String, Object?> organizationOf(OrganizationLanguageData data) => <String, Object?>{
+  'stems': data.stems,
+  'syn': switch (data.syn) {
+    OrganizationPoolSynthesis syn => <String, Object?>{
+      'kind': 'pool',
+      'pool': syn.pool,
+      'joiner': syn.joiner,
+      'minSyllables': syn.minSyllables,
+      'maxSyllables': syn.maxSyllables,
+    },
+    OrganizationSyllableSynthesis syn => <String, Object?>{
+      'kind': 'syllable',
+      'onset': syn.onset,
+      'vowel': syn.vowel,
+      'coda': syn.coda,
+      'minSyllables': syn.minSyllables,
+      'maxSyllables': syn.maxSyllables,
+    },
+  },
+  'places': data.places,
+  'numbers': data.numbers == null ? null : <int>[data.numbers!.$1, data.numbers!.$2],
+  'industries': <String, Object?>{
+    for (final industry in organizationIndustries) industry.name: data.industries[industry],
+  },
+  'generic': data.generic,
+  'templates': <String, Object?>{
+    for (final type in organizationTypes) type.name: data.templates[type],
+  },
+  'legalForms': data.legalForms,
 };
 
 void main() {
@@ -462,6 +496,7 @@ void main() {
         'randSentenceLengthMax': randSentenceLengthMax,
         'randLocationLengthMax': randLocationLengthMax,
         'randAgeMax': randAgeMax,
+        'randOrganizationLengthMax': randOrganizationLengthMax,
         'affixLengthDefault': affixLengthDefault,
         'affixLengthMax': affixLengthMax,
         'affixSeparatorDefault': affixSeparatorDefault,
@@ -474,6 +509,19 @@ void main() {
         },
         'curve': <Object?>[for (final (age, weight) in ageCurve) <num>[age, weight]],
         'maxDefault': ageMaxDefault,
+      },
+      'organization': <String, Object?>{
+        'types': <String>[for (final type in organizationTypes) type.name],
+        'industries': <String>[for (final industry in organizationIndustries) industry.name],
+        'typeWeights': <String, Object?>{
+          for (final entry in organizationTypeWeights.entries) entry.key.name: entry.value,
+        },
+        'bareChance': organizationBareChance,
+        'genericChance': organizationGenericChance,
+        'legalFormChance': organizationLegalFormChance,
+        'data': <String, Object?>{
+          for (final entry in organizationData.entries) entry.key.name: organizationOf(entry.value),
+        },
       },
       'gender': <String, Object?>{
         'codes': <String>[for (final code in genderCodes) code.name],

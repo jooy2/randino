@@ -10,7 +10,7 @@ Every option and every example, with **Dart** picked in the sidebar. This README
 
 ---
 
-**randino** generates random person names, nicknames, words, sentences, real locations, ages and genders in the language you ask for.
+**randino** generates random person names, nicknames, words, sentences, real locations, ages, genders and organizations in the language you ask for.
 
 - **Person names** read like names people carry: Emma Clover, Jack Reeves, each with its English pronunciation. 9 languages.
 - **Nicknames** are handles for a game or a website: MistyOwl, CraneVoyage, RustyBoot. Built from everyday words across twenty-nine themes, and never from person names.
@@ -19,6 +19,7 @@ Every option and every example, with **Dart** picked in the sidebar. This README
 - **Locations** are real places down to a neighbourhood or a city, from `randLocation`: Korean and US divisions, as each country publishes them.
 - **Ages** are whole numbers drawn along a curve shaped like a population, from `randAge`, so a sample of people is mostly adults.
 - **Genders** are the labels a form in the language writes, from `randGender`: 여성, Female, Weiblich. An unstated gender and a third gender are there when you ask for them.
+- **Organizations** are companies, schools, offices and associations that do not exist, from `randOrganization`: (주)새솔테크, Westbrook High School, Stadtwerke Bergtal.
 - **Decorators** attach something to a string you already have: `randSuffix`, `randPrefix` and `randModifier`.
 - Every parameter is named and optional, and a **null enum means "every one of them"**, so `randName()` on its own works.
 - **Pure Dart, no dependencies.** It imports nothing but `dart:math`, so it runs on the VM, on the web and inside Flutter on every platform.
@@ -257,6 +258,39 @@ randGenderDetails(language: WordLanguage.ko).first; // GenderDetail(여성, fema
 
 A `GenderDetail`'s `code` is a `GenderCode` whatever the language, and its `male` and `female` are the two `NameGender` holds.
 
+## Organizations
+
+Companies, schools, government offices, public institutions and associations that do not exist, each written the way its language writes that kind of organization. A company may carry its legal form (`Inc.`, `(주)`, `GmbH`, `ООО`), and the stems are chosen to be nobody's brand.
+
+```dart
+randOrganization(language: WordLanguage.ko, count: 3); // [(주)가람에너지, 윤슬교육지원청, 새솔홀딩스]
+randOrganization(language: WordLanguage.en, industry: OrganizationIndustry.logistics);
+// [Greenbriar Logistics Corp.]
+randOrganization(
+  language: WordLanguage.de,
+  type: {OrganizationType.school, OrganizationType.public},
+  count: 2,
+);
+// [Gymnasium Eschenhain, Stadtbibliothek Tannenhof]
+
+randOrganizationDetails(language: WordLanguage.ko, type: {OrganizationType.company}).first;
+// OrganizationDetail((주)새솔테크, 새솔테크, (주), company, tech, ko)
+```
+
+| Parameter                 | Type                     | Default             |
+| ------------------------- | ------------------------ | ------------------- |
+| `language`                | `WordLanguage?`          | `null` — every one  |
+| `type`                    | `Set<OrganizationType>?` | `null` — every kind |
+| `industry`                | `OrganizationIndustry?`  | `null` — every one  |
+| `includeLegalForm`        | `bool?`                  | `null` — drawn      |
+| `count`                   | `int`                    | `1`                 |
+| `realism`                 | `RandRealism`            | `RandRealism.real`  |
+| `minLength` / `maxLength` | `int?`                   | `null`              |
+| `startsWith`              | `String?`                | `null`              |
+| `unique`                  | `bool`                   | `false`             |
+
+A null `type` draws a kind per result, companies most often. An `industry` is written into a company's name as a word for its business, and naming one with `type` left null asks for companies. `RandRealism.invented` builds the stem from the language's own sounds, for a name nobody has.
+
 ## Decorators
 
 `randSuffix`, `randPrefix` and `randModifier` attach something to a string you already have, rather than generating one. They take anything, not just this library's output, which is why none of them is a parameter on a generator. Each of them also works with no value at all, handing back the thing it would have attached.
@@ -312,7 +346,7 @@ nicknameLengthRange(language: WordLanguage.ko); // LengthRange(1, 13)
 sentenceLengthRange(WordLanguage.ko); // LengthRange(5, 43)
 ```
 
-`nameLanguages`, `wordLanguages`, `wordThemes`, `locationLanguages`, `locationLevels` and `ageGroups` list what the generators accept; `randCountMax`, `randLengthMin` / `Max`, `randSentenceLengthMax`, `randLocationLengthMax`, `randAgeMax`, `affixLengthDefault` / `Max`, `affixSeparatorDefault` and `affixCharset` are the bounds and defaults every parameter is clamped to.
+`nameLanguages`, `wordLanguages`, `wordThemes`, `locationLanguages`, `locationLevels`, `ageGroups`, `organizationTypes` and `organizationIndustries` list what the generators accept; `randCountMax`, `randLengthMin` / `Max`, `randSentenceLengthMax`, `randLocationLengthMax`, `randAgeMax`, `randOrganizationLengthMax`, `affixLengthDefault` / `Max`, `affixSeparatorDefault` and `affixCharset` are the bounds and defaults every parameter is clamped to.
 
 ## Differences from the npm package
 

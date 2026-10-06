@@ -1,5 +1,5 @@
 /// randino generates random person names, nicknames, words, sentences,
-/// locations, ages and genders in the language you ask for.
+/// locations, ages, genders and organizations in the language you ask for.
 ///
 /// The generators are kept apart on purpose. **Person names** read like names
 /// people actually carry (김민준, Emma Clover) and come with their English
@@ -9,7 +9,8 @@
 /// **sentences** are whole statements written in the language's own grammar, and
 /// **locations** are real places, from the country down to a Korean 읍·면·동 or a
 /// US city. **Ages** are whole numbers drawn along a curve shaped like a
-/// population, and **genders** are the labels a form in the language writes.
+/// population, **genders** are the labels a form in the language writes, and
+/// **organizations** are companies, schools and offices that do not exist.
 ///
 /// ```dart
 /// import 'package:randino/randino.dart';
@@ -34,6 +35,7 @@ export 'src/constants.dart'
         randLengthMax,
         randLengthMin,
         randLocationLengthMax,
+        randOrganizationLengthMax,
         randSentenceCountMax,
         randSentenceLengthMax;
 export 'src/decorate/data/index.dart'
@@ -66,6 +68,9 @@ export 'src/name/rand_name_details.dart' show randNameDetails;
 export 'src/nickname/nickname_length_range.dart' show nicknameLengthRange;
 export 'src/nickname/rand_nickname.dart' show randNickname;
 export 'src/nickname/rand_nickname_details.dart' show randNicknameDetails;
+export 'src/organization/data/index.dart' show organizationIndustries, organizationTypes;
+export 'src/organization/rand_organization.dart' show randOrganization;
+export 'src/organization/rand_organization_details.dart' show randOrganizationDetails;
 export 'src/sentence/rand_sentence.dart' show randSentence;
 export 'src/sentence/rand_sentence_details.dart' show randSentenceDetails;
 export 'src/sentence/sentence_length_range.dart' show sentenceLengthRange;
@@ -87,6 +92,9 @@ export 'src/types.dart'
         NameLanguage,
         NameScript,
         NicknameDetail,
+        OrganizationDetail,
+        OrganizationIndustry,
+        OrganizationType,
         RandRealism,
         RandVocabulary,
         SentenceDetail,

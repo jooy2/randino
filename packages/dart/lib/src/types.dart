@@ -831,3 +831,96 @@ class GenderDetail {
   @override
   String toString() => 'GenderDetail($gender, ${code.name}, ${language.name})';
 }
+
+/// What kind of organization a name is for.
+enum OrganizationType {
+  /// A business: `Westbrook Logistics, Inc.`, `(주)새솔테크`.
+  company,
+
+  /// An association, a foundation or a club: `새솔장학재단`,
+  /// `Heimatverein Bergtal e.V.`.
+  nonprofit,
+
+  /// From a kindergarten to a university: `가람초등학교`, `Westbrook High School`.
+  school,
+
+  /// An office of the state or a town: `해솔구청`, `Ayuntamiento de Valdecastro`.
+  government,
+
+  /// An institution run for the public that is not an office — a library, a
+  /// hospital, a transit authority: `새솔시립도서관`, `Stadtwerke Lindenhof`.
+  public,
+}
+
+/// What a company does, which is the word its name carries for it.
+enum OrganizationIndustry {
+  /// `Technologies`, `테크`.
+  tech,
+
+  /// `Manufacturing`, `정밀`.
+  manufacturing,
+
+  /// `Foods`, `식품`.
+  food,
+
+  /// `Trading`, `유통`.
+  retail,
+
+  /// `Capital`, `투자`.
+  finance,
+
+  /// `Construction`, `건설`.
+  construction,
+
+  /// `Freight`, `물류`.
+  logistics,
+
+  /// `Media`, `미디어`.
+  media,
+
+  /// `Pharmaceuticals`, `제약`.
+  health,
+
+  /// `Energy`, `에너지`.
+  energy,
+}
+
+/// A generated organization with the pieces it was built from.
+class OrganizationDetail {
+  /// Creates a detail record. Returned by the generator; there is rarely a
+  /// reason to build one by hand outside a test.
+  const OrganizationDetail({
+    required this.organization,
+    required this.name,
+    required this.legalForm,
+    required this.type,
+    required this.industry,
+    required this.language,
+  });
+
+  /// What the value form returns: the whole name, legal form and all.
+  final String organization;
+
+  /// The name without its legal form: `새솔테크` for `(주)새솔테크`.
+  final String name;
+
+  /// The legal form, as the language writes it (`(주)`, `Inc.`, `ООО`), or
+  /// `null` for none.
+  final String? legalForm;
+
+  /// The kind of organization.
+  final OrganizationType type;
+
+  /// The industry the name says the company is in, or `null` when it says none
+  /// — a word like `Group`, a company named by its stem alone, or any other
+  /// kind of organization.
+  final OrganizationIndustry? industry;
+
+  /// The language the organization is written in.
+  final WordLanguage language;
+
+  @override
+  String toString() =>
+      'OrganizationDetail($organization, $name, $legalForm, ${type.name}, '
+      '${industry?.name}, ${language.name})';
+}

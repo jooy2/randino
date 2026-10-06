@@ -17,6 +17,7 @@ from randino.constants import (
     RAND_LENGTH_MAX,
     RAND_LENGTH_MIN,
     RAND_LOCATION_LENGTH_MAX,
+    RAND_ORGANIZATION_LENGTH_MAX,
     RAND_SENTENCE_LENGTH_MAX,
 )
 from randino.decorate.data import (
@@ -30,6 +31,16 @@ from randino.location.data import LOCATION_DATA, LOCATION_LANGUAGES, LOCATION_LE
 from randino.location.data.countries import COUNTRIES
 from randino.name.data import NAME_DATA, NAME_LANGUAGES
 from randino.name.data.ko import KO_SURNAME_ROMAN
+from randino.organization.data import (
+    ORGANIZATION_BARE_CHANCE,
+    ORGANIZATION_DATA,
+    ORGANIZATION_GENERIC_CHANCE,
+    ORGANIZATION_INDUSTRIES,
+    ORGANIZATION_LEGAL_FORM_CHANCE,
+    ORGANIZATION_TYPE_WEIGHTS,
+    ORGANIZATION_TYPES,
+)
+from randino.organization.data._types import OrganizationLanguageData, PoolOrganizationSynthesis
 from randino.sentence.data import (
     AGENT_CLASSES,
     FIELD_RULES,
@@ -396,6 +407,37 @@ location = {
     for code, data in LOCATION_DATA.items()
 }
 
+def organization_of(data: OrganizationLanguageData) -> dict[str, object]:
+    """One language's organization dataset, the synthesis tagged with its kind."""
+    syn = data.syn
+
+    return {
+        "stems": list(data.stems),
+        "syn": {
+            "kind": "pool",
+            "pool": list(syn.pool),
+            "joiner": syn.joiner,
+            "minSyllables": syn.min_syllables,
+            "maxSyllables": syn.max_syllables,
+        }
+        if isinstance(syn, PoolOrganizationSynthesis)
+        else {
+            "kind": "syllable",
+            "onset": list(syn.onset),
+            "vowel": list(syn.vowel),
+            "coda": list(syn.coda),
+            "minSyllables": syn.min_syllables,
+            "maxSyllables": syn.max_syllables,
+        },
+        "places": None if data.places is None else list(data.places),
+        "numbers": None if data.numbers is None else list(data.numbers),
+        "industries": {each: list(data.industries[each]) for each in ORGANIZATION_INDUSTRIES},
+        "generic": list(data.generic),
+        "templates": {kind: list(data.templates[kind]) for kind in ORGANIZATION_TYPES},
+        "legalForms": list(data.legal_forms),
+    }
+
+
 print(
     json.dumps(
         {
@@ -406,6 +448,7 @@ print(
                 "randSentenceLengthMax": RAND_SENTENCE_LENGTH_MAX,
                 "randLocationLengthMax": RAND_LOCATION_LENGTH_MAX,
                 "randAgeMax": RAND_AGE_MAX,
+                "randOrganizationLengthMax": RAND_ORGANIZATION_LENGTH_MAX,
                 "affixLengthDefault": AFFIX_LENGTH_DEFAULT,
                 "affixLengthMax": AFFIX_LENGTH_MAX,
                 "affixSeparatorDefault": AFFIX_SEPARATOR_DEFAULT,
@@ -416,6 +459,15 @@ print(
                 "bands": {group: list(AGE_BANDS[group]) for group in AGE_GROUPS},
                 "curve": [[age, weight] for age, weight in AGE_CURVE],
                 "maxDefault": AGE_MAX_DEFAULT,
+            },
+            "organization": {
+                "types": list(ORGANIZATION_TYPES),
+                "industries": list(ORGANIZATION_INDUSTRIES),
+                "typeWeights": dict(ORGANIZATION_TYPE_WEIGHTS),
+                "bareChance": ORGANIZATION_BARE_CHANCE,
+                "genericChance": ORGANIZATION_GENERIC_CHANCE,
+                "legalFormChance": ORGANIZATION_LEGAL_FORM_CHANCE,
+                "data": {code: organization_of(data) for code, data in ORGANIZATION_DATA.items()},
             },
             "gender": {
                 "codes": list(GENDER_CODES),

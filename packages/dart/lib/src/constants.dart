@@ -52,3 +52,12 @@ const int randLocationLengthMax = 100;
 /// The age curve runs out here: the oldest anybody has been verified to live is
 /// a little past it, and a sample has no use for a record.
 const int randAgeMax = 120;
+
+/// Upper bound for `minLength` / `maxLength` on `randOrganization`, in
+/// characters.
+///
+/// Its own number rather than [randLengthMax], because an organization is a
+/// name, a word for its business and a legal form at once, and the longest of
+/// them run past forty: `Công ty TNHH MTV Giải pháp Công nghệ Thịnh Vượng`,
+/// `Polideportivo Municipal de Encinar del Valle`.
+const int randOrganizationLengthMax = 60;

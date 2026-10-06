@@ -17,11 +17,14 @@ describe('base test', () => {
 			'LOCATION_LANGUAGES',
 			'LOCATION_LEVELS',
 			'NAME_LANGUAGES',
+			'ORGANIZATION_INDUSTRIES',
+			'ORGANIZATION_TYPES',
 			'RAND_AGE_MAX',
 			'RAND_COUNT_MAX',
 			'RAND_LENGTH_MAX',
 			'RAND_LENGTH_MIN',
 			'RAND_LOCATION_LENGTH_MAX',
+			'RAND_ORGANIZATION_LENGTH_MAX',
 			'RAND_SENTENCE_COUNT_MAX',
 			'RAND_SENTENCE_LENGTH_MAX',
 			'WORD_LANGUAGES',
@@ -55,6 +58,7 @@ describe('base test', () => {
 			'randNature',
 			'randNickname',
 			'randObject',
+			'randOrganization',
 			'randPerson',
 			'randPlace',
 			'randPlant',
@@ -141,6 +145,20 @@ describe('base test', () => {
 
 		assert.strictEqual(typeof randino.randGender()[0], 'string');
 		assert.strictEqual(randino.randGender({ language: 'en', output: 'detail' })[0].language, 'en');
+
+		// An organization can be a name, a word for its business and a legal form at
+		// once, so it has a length ceiling of its own.
+		assert.strictEqual(typeof randino.randOrganization()[0], 'string');
+		assert.strictEqual(randino.randOrganization({ output: 'detail' })[0].name.length > 0, true);
+		assert.strictEqual(randino.RAND_ORGANIZATION_LENGTH_MAX, 60);
+		assert.deepStrictEqual(randino.ORGANIZATION_TYPES, [
+			'company',
+			'nonprofit',
+			'school',
+			'government',
+			'public'
+		]);
+		assert.strictEqual(randino.ORGANIZATION_INDUSTRIES.length, 10);
 	});
 
 	it('an option the types rule out falls back rather than throwing', () => {
@@ -181,7 +199,10 @@ describe('base test', () => {
 			() => randino.randAge({ distribution: 'normal' as never }),
 			() => randino.randAge({ minAge: NaN, maxAge: 'x' as never }),
 			() => randino.randGender({ language: 'xx' as never, count: NaN }),
-			() => randino.randGender({ includeUnknown: 'yes' as never })
+			() => randino.randGender({ includeUnknown: 'yes' as never }),
+			() => randino.randOrganization({ language: 'xx' as never, type: 'shop' as never }),
+			() => randino.randOrganization({ type: [null] as never, industry: 'mining' as never }),
+			() => randino.randOrganization({ includeLegalForm: 'yes' as never, minLength: NaN })
 		];
 
 		for (const ask of asks) {
@@ -257,6 +278,8 @@ describe('base test', () => {
 		agrees(() => randino.randCity({ language: 'en', maxLength: 8, count: 5, random: seeded(42) }));
 		agrees(() => randino.randAge({ count: 5, random: seeded(42) }));
 		agrees(() => randino.randGender({ count: 5, includeUnknown: true, random: seeded(42) }));
+		agrees(() => randino.randOrganization({ count: 5, random: seeded(42) }));
+		agrees(() => randino.randOrganization({ count: 5, maxLength: 20, random: seeded(42) }));
 
 		// Two different seeds are two different answers, so the source is actually
 		// what the draws are coming from.

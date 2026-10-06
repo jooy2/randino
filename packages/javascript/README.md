@@ -10,7 +10,7 @@ Every option and every example, with **JavaScript** picked in the sidebar. This 
 
 ---
 
-**randino** generates random person names, nicknames, words, sentences, real locations, ages and genders in the language you ask for.
+**randino** generates random person names, nicknames, words, sentences, real locations, ages, genders and organizations in the language you ask for.
 
 - **Person names** read like names people carry: Emma Clover, Jack Reeves, each with its English pronunciation. 9 languages.
 - **Nicknames** are handles for a game or a website: MistyOwl, CraneVoyage, RustyBoot. Built from everyday words across twenty-nine themes, and never from person names.
@@ -19,6 +19,7 @@ Every option and every example, with **JavaScript** picked in the sidebar. This 
 - **Locations** are real places down to a neighbourhood or a city, from `randLocation`: Korean and US divisions, as each country publishes them, and every country's name in all nine languages from `randCountry`.
 - **Ages** are whole numbers drawn along a curve shaped like a population, from `randAge`, so a sample of people is mostly adults.
 - **Genders** are the labels a form in the language writes, from `randGender`: 여성, Female, Weiblich. An unstated gender and a third gender are there when you ask for them.
+- **Organizations** are companies, schools, offices and associations that do not exist, from `randOrganization`: (주)새솔테크, Westbrook High School, Stadtwerke Bergtal.
 - **Decorators** attach something to a string you already have: `randSuffix`, `randPrefix` and `randModifier`.
 - One options object per generator, every option optional: `randName()` on its own works.
 - **No runtime dependencies.** ESM, typed, and it runs in Node and in the browser alike.
@@ -297,6 +298,38 @@ randGender({ language: 'ko', output: 'detail' });
 
 The detail's `code` is `male`, `female`, `nonbinary` or `unknown` whatever the language, and the first two are the codes `randName`'s `gender` takes.
 
+## Organizations
+
+Companies, schools, government offices, public institutions and associations that do not exist, each written the way its language writes that kind of organization. A company may carry its legal form (`Inc.`, `(주)`, `GmbH`, `ООО`), and the stems are chosen to be nobody's brand.
+
+```javascript
+import { randOrganization } from 'randino';
+
+randOrganization({ language: 'ko', count: 3 }); // ['(주)가람에너지', '윤슬교육지원청', '새솔홀딩스']
+randOrganization({ language: 'en', industry: 'logistics' }); // ['Greenbriar Logistics Corp.']
+randOrganization({ language: 'de', type: ['school', 'public'], count: 2 });
+// ['Gymnasium Eschenhain', 'Stadtbibliothek Tannenhof']
+
+randOrganization({ language: 'ko', type: 'company', output: 'detail' });
+// [{ organization: '(주)새솔테크', name: '새솔테크', legalForm: '(주)',
+//    type: 'company', industry: 'tech', language: 'ko' }]
+```
+
+| Option                    | Type                         | Default   |
+| ------------------------- | ---------------------------- | --------- |
+| `language`                | `WordLanguageOption`         | `'all'`   |
+| `type`                    | `OrganizationTypeOption`     | `'all'`   |
+| `industry`                | `OrganizationIndustryOption` | `'all'`   |
+| `includeLegalForm`        | `boolean`                    | _drawn_   |
+| `count`                   | `number`                     | `1`       |
+| `realism`                 | `RandRealism`                | `'real'`  |
+| `minLength` / `maxLength` | `number`                     | —         |
+| `startsWith`              | `string`                     | —         |
+| `unique`                  | `boolean`                    | `false`   |
+| `output`                  | `'value' \| 'detail'`        | `'value'` |
+
+`type` is `company`, `nonprofit`, `school`, `government` or `public`, or an array of them; left out, companies come up most often. `industry` is one of ten, written into a company's name as a word for its business, and naming one with `type` left out asks for companies. `realism: 'invented'` builds the stem from the language's own sounds, for a name nobody has.
+
 ## Decorators
 
 `randSuffix`, `randPrefix` and `randModifier` attach something to a string you already have, rather than generating one. They take anything, not just this library's output, which is why none of them is an option on a generator. Each of them also works with no value at all, handing back the thing it would have attached.
@@ -367,7 +400,7 @@ sentenceLengthRange('ko'); // [5, 43]
 wordLengthRange('ko'); // [1, 4]
 ```
 
-`NAME_LANGUAGES`, `WORD_LANGUAGES`, `WORD_THEMES` and `AGE_GROUPS` list what the generators accept; `RAND_COUNT_MAX`, `RAND_LENGTH_MIN` / `_MAX`, `RAND_SENTENCE_LENGTH_MAX`, `RAND_AGE_MAX`, `AFFIX_LENGTH_DEFAULT` / `_MAX`, `AFFIX_SEPARATOR_DEFAULT` and `AFFIX_CHARSET` are the bounds and defaults every option is clamped to.
+`NAME_LANGUAGES`, `WORD_LANGUAGES`, `WORD_THEMES`, `AGE_GROUPS`, `ORGANIZATION_TYPES` and `ORGANIZATION_INDUSTRIES` list what the generators accept; `RAND_COUNT_MAX`, `RAND_LENGTH_MIN` / `_MAX`, `RAND_SENTENCE_LENGTH_MAX`, `RAND_AGE_MAX`, `RAND_ORGANIZATION_LENGTH_MAX`, `AFFIX_LENGTH_DEFAULT` / `_MAX`, `AFFIX_SEPARATOR_DEFAULT` and `AFFIX_CHARSET` are the bounds and defaults every option is clamped to.
 
 ## Development
 

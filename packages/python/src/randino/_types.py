@@ -556,3 +556,61 @@ class GenderDetail:
 
     language: WordLanguage
     """The language the label is written in."""
+
+
+OrganizationType = Literal["company", "nonprofit", "school", "government", "public"]
+"""What kind of organization a name is for.
+
+- `company`: a business (`Westbrook Logistics, Inc.`, `(주)새솔테크`).
+- `nonprofit`: an association, a foundation or a club (`새솔장학재단`).
+- `school`: from a kindergarten to a university (`가람초등학교`).
+- `government`: an office of the state or a town (`해솔구청`).
+- `public`: an institution run for the public that is not an office — a library, a
+  hospital, a transit authority (`새솔시립도서관`, `Stadtwerke Lindenhof`).
+"""
+
+OrganizationTypeOption = OrganizationType | Sequence[OrganizationType] | Literal["all"]
+"""Which kinds a result may be.
+
+A sequence is a set to draw from, decided per result, and `"all"` is every one of them.
+"""
+
+OrganizationIndustry = Literal[
+    "tech",
+    "manufacturing",
+    "food",
+    "retail",
+    "finance",
+    "construction",
+    "logistics",
+    "media",
+    "health",
+    "energy",
+]
+"""What a company does, which is the word its name carries for it."""
+
+OrganizationIndustryOption = Literal[OrganizationIndustry, "all"]
+""""all" draws an industry per company, or a word that names none."""
+
+
+@dataclass(frozen=True, slots=True)
+class OrganizationDetail:
+    """A generated organization with the pieces it was built from."""
+
+    organization: str
+    """What the value form returns: the whole name, legal form and all."""
+
+    name: str
+    """The name without its legal form: `새솔테크` for `(주)새솔테크`."""
+
+    legal_form: str | None
+    """The legal form, as the language writes it (`(주)`, `Inc.`, `ООО`), or None."""
+
+    type: OrganizationType
+    """The kind of organization."""
+
+    industry: OrganizationIndustry | None
+    """The industry the name says the company is in, or None when it says none."""
+
+    language: WordLanguage
+    """The language the organization is written in."""

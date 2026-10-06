@@ -54,6 +54,9 @@ void main() {
           'NameLanguage',
           'NameScript',
           'NicknameDetail',
+          'OrganizationDetail',
+          'OrganizationIndustry',
+          'OrganizationType',
           'RandRealism',
           'RandVocabulary',
           'SentenceDetail',
@@ -79,6 +82,8 @@ void main() {
           'nameLengthRange',
           'nameSupportsMiddleName',
           'nameSupportsRoman',
+          'organizationIndustries',
+          'organizationTypes',
           'wordLanguages',
           'nicknameLengthRange',
           'sentenceLengthRange',
@@ -124,6 +129,9 @@ void main() {
           'randNickname',
           'randNicknameDetails',
           'randObject',
+          'randOrganization',
+          'randOrganizationDetails',
+          'randOrganizationLengthMax',
           'randPerson',
           'randPlace',
           'randPlant',
@@ -217,6 +225,20 @@ void main() {
 
       expect(randGender(), hasLength(1));
       expect(randGenderDetails(language: WordLanguage.en)[0].language, WordLanguage.en);
+
+      // An organization can be a name, a word for its business and a legal form
+      // at once, so it has a length ceiling of its own.
+      expect(randOrganization(), hasLength(1));
+      expect(randOrganizationDetails()[0].name, isNotEmpty);
+      expect(randOrganizationLengthMax, 60);
+      expect(organizationTypes, <OrganizationType>[
+        OrganizationType.company,
+        OrganizationType.nonprofit,
+        OrganizationType.school,
+        OrganizationType.government,
+        OrganizationType.public,
+      ]);
+      expect(organizationIndustries, hasLength(10));
     });
 
     test('the bounds are the same numbers the JavaScript package uses', () {
@@ -246,6 +268,8 @@ void main() {
       expect(locationLanguages.toSet(), LocationLanguage.values.toSet());
       expect(locationLevels.toSet(), LocationLevel.values.toSet());
       expect(ageGroups.toSet(), AgeGroup.values.toSet());
+      expect(organizationTypes.toSet(), OrganizationType.values.toSet());
+      expect(organizationIndustries.toSet(), OrganizationIndustry.values.toSet());
     });
 
     test('a length range the wrong way round keeps maxLength', () {
@@ -299,6 +323,8 @@ void main() {
       );
       twice(() => randAge(count: 5, random: Random(42)).join(','));
       twice(() => randGender(count: 5, includeUnknown: true, random: Random(42)).join());
+      twice(() => randOrganization(count: 5, random: Random(42)).join('|'));
+      twice(() => randOrganization(count: 5, maxLength: 20, random: Random(42)).join('|'));
       twice(() => randSuffixAll(const ['a', 'b'], random: Random(42)).join());
       twice(() => randModifierAll(const ['사자', '여우'], random: Random(42)).join());
 

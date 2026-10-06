@@ -54,3 +54,12 @@ RAND_AGE_MAX = 120
 The age curve runs out here: the oldest anybody has been verified to live is a little
 past it, and a sample has no use for a record.
 """
+
+RAND_ORGANIZATION_LENGTH_MAX = 60
+"""Upper bound for `min_length` / `max_length` on `rand_organization`, in characters.
+
+Its own number rather than `RAND_LENGTH_MAX`, because an organization is a name, a word
+for its business and a legal form at once, and the longest of them run past forty:
+`Công ty TNHH MTV Giải pháp Công nghệ Thịnh Vượng`, `Polideportivo Municipal de Encinar
+del Valle`.
+"""

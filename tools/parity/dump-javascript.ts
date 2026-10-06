@@ -13,6 +13,7 @@ import {
 	RAND_LENGTH_MAX,
 	RAND_LENGTH_MIN,
 	RAND_LOCATION_LENGTH_MAX,
+	RAND_ORGANIZATION_LENGTH_MAX,
 	RAND_SENTENCE_LENGTH_MAX
 } from '../../packages/javascript/lib/constants.js';
 import { outline } from '../../packages/javascript/lib/_internal/parse.js';
@@ -34,6 +35,15 @@ import {
 	LOCATION_LEVELS
 } from '../../packages/javascript/lib/location/data/index.js';
 import { NAME_DATA, NAME_LANGUAGES } from '../../packages/javascript/lib/name/data/index.js';
+import {
+	ORGANIZATION_BARE_CHANCE,
+	ORGANIZATION_DATA,
+	ORGANIZATION_GENERIC_CHANCE,
+	ORGANIZATION_INDUSTRIES,
+	ORGANIZATION_LEGAL_FORM_CHANCE,
+	ORGANIZATION_TYPE_WEIGHTS,
+	ORGANIZATION_TYPES
+} from '../../packages/javascript/lib/organization/data/index.js';
 import {
 	AGENT_CLASSES,
 	FIELD_RULES,
@@ -141,6 +151,7 @@ console.log(
 			randSentenceLengthMax: RAND_SENTENCE_LENGTH_MAX,
 			randLocationLengthMax: RAND_LOCATION_LENGTH_MAX,
 			randAgeMax: RAND_AGE_MAX,
+			randOrganizationLengthMax: RAND_ORGANIZATION_LENGTH_MAX,
 			affixLengthDefault: AFFIX_LENGTH_DEFAULT,
 			affixLengthMax: AFFIX_LENGTH_MAX,
 			affixSeparatorDefault: AFFIX_SEPARATOR_DEFAULT,
@@ -153,6 +164,51 @@ console.log(
 			bands: Object.fromEntries(AGE_GROUPS.map((group) => [group, [...AGE_BANDS[group]]])),
 			curve: AGE_CURVE.map(([age, weight]) => [age, weight]),
 			maxDefault: AGE_MAX_DEFAULT
+		},
+		// A synthesis carries its `kind` tag, and a language without places or numbers
+		// writes them as null, the way every other optional field is written.
+		organization: {
+			types: [...ORGANIZATION_TYPES],
+			industries: [...ORGANIZATION_INDUSTRIES],
+			typeWeights: { ...ORGANIZATION_TYPE_WEIGHTS },
+			bareChance: ORGANIZATION_BARE_CHANCE,
+			genericChance: ORGANIZATION_GENERIC_CHANCE,
+			legalFormChance: ORGANIZATION_LEGAL_FORM_CHANCE,
+			data: Object.fromEntries(
+				Object.entries(ORGANIZATION_DATA).map(([code, data]) => [
+					code,
+					{
+						stems: [...data.stems],
+						syn:
+							data.syn.kind === 'pool'
+								? {
+										kind: 'pool',
+										pool: [...data.syn.pool],
+										joiner: data.syn.joiner,
+										minSyllables: data.syn.minSyllables,
+										maxSyllables: data.syn.maxSyllables
+									}
+								: {
+										kind: 'syllable',
+										onset: [...data.syn.onset],
+										vowel: [...data.syn.vowel],
+										coda: [...data.syn.coda],
+										minSyllables: data.syn.minSyllables,
+										maxSyllables: data.syn.maxSyllables
+									},
+						places: list(data.places),
+						numbers: data.numbers ? [...data.numbers] : null,
+						industries: Object.fromEntries(
+							ORGANIZATION_INDUSTRIES.map((each) => [each, [...data.industries[each]]])
+						),
+						generic: [...data.generic],
+						templates: Object.fromEntries(
+							ORGANIZATION_TYPES.map((type) => [type, [...data.templates[type]]])
+						),
+						legalForms: [...data.legalForms]
+					}
+				])
+			)
 		},
 		gender: {
 			codes: [...GENDER_CODES],

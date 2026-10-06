@@ -918,3 +918,79 @@ export interface GenderDetail {
 	code: GenderCode;
 	language: WordLanguage;
 }
+
+/**
+ * What kind of organization a name is for:
+ * - `company`: a business (`Westbrook Logistics, Inc.`, `(주)새솔테크`).
+ * - `nonprofit`: an association, a foundation or a club (`새솔장학재단`,
+ *   `Heimatverein Bergtal e.V.`).
+ * - `school`: from a kindergarten to a university (`가람초등학교`, `Westbrook High School`).
+ * - `government`: an office of the state or a town (`해솔구청`, `Ayuntamiento de Valdecastro`).
+ * - `public`: an institution run for the public that is not an office — a
+ *   library, a hospital, a transit authority (`새솔시립도서관`, `Stadtwerke Lindenhof`).
+ */
+export type OrganizationType = 'company' | 'nonprofit' | 'school' | 'government' | 'public';
+
+/**
+ * Which kinds a result may be. An array is a set to draw from, decided per
+ * result, and `'all'` is every one of them.
+ */
+export type OrganizationTypeOption = OrganizationType | readonly OrganizationType[] | 'all';
+
+/**
+ * What a company does, which is the word its name carries for it: `tech` writes
+ * `Technologies` or `테크`, `logistics` writes `Freight` or `물류`.
+ */
+export type OrganizationIndustry =
+	| 'tech'
+	| 'manufacturing'
+	| 'food'
+	| 'retail'
+	| 'finance'
+	| 'construction'
+	| 'logistics'
+	| 'media'
+	| 'health'
+	| 'energy';
+
+/** `'all'` draws an industry per company, or a word that names none. */
+export type OrganizationIndustryOption = OrganizationIndustry | 'all';
+
+export interface RandOrganizationOptions extends RandCommonOptions {
+	/** Language of the organizations. `'all'` mixes every language. Default `'all'`. */
+	language?: WordLanguageOption;
+	/**
+	 * Which kinds of organization. Default `'all'`, which draws a kind per result,
+	 * companies most often.
+	 */
+	type?: OrganizationTypeOption;
+	/**
+	 * What the companies do. Default `'all'`. An industry is a company's, so naming
+	 * one with `type` left out asks for companies; with `type` naming other kinds
+	 * too, it narrows the companies among them and leaves the rest alone.
+	 */
+	industry?: OrganizationIndustryOption;
+	/**
+	 * Write a company's legal form — `Inc.`, `(주)`, `GmbH`, `ООО`. Left out, it is
+	 * decided per company. Only a company carries one: the other kinds never do.
+	 */
+	includeLegalForm?: boolean;
+}
+
+/** A generated organization with the pieces it was built from. */
+export interface OrganizationDetail {
+	/** What the value form returns: the whole name, legal form and all. */
+	organization: string;
+	/** The name without its legal form: `새솔테크` for `(주)새솔테크`. */
+	name: string;
+	/** The legal form, as the language writes it (`(주)`, `Inc.`, `ООО`), or `null` for none. */
+	legalForm: string | null;
+	type: OrganizationType;
+	/**
+	 * The industry the name says the company is in, or `null` when it says none —
+	 * a word like `Group`, a company named by its stem alone, or any other kind of
+	 * organization.
+	 */
+	industry: OrganizationIndustry | null;
+	language: WordLanguage;
+}

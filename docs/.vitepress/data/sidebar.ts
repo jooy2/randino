@@ -97,7 +97,12 @@ export const SIDEBAR: SidebarGroup[] = [
 							{ path: 'sentence/rand-sentence', en: 'randSentence', ko: 'randSentence' },
 							{ path: 'location/rand-location', en: 'randLocation', ko: 'randLocation' },
 							{ path: 'age/rand-age', en: 'randAge', ko: 'randAge' },
-							{ path: 'gender/rand-gender', en: 'randGender', ko: 'randGender' }
+							{ path: 'gender/rand-gender', en: 'randGender', ko: 'randGender' },
+							{
+								path: 'organization/rand-organization',
+								en: 'randOrganization',
+								ko: 'randOrganization'
+							}
 						]
 					},
 					{

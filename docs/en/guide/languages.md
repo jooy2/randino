@@ -2,17 +2,17 @@
 
 randino generates in nine languages, each with its own pools, its own name order and its own romanization. Every generator takes a language, and mixes all of the ones it supports when you leave it out — except [`randAge`](../age/rand-age), because an age has none. Locations are the exception to nine: they are [two languages so far](#locations).
 
-| Code | Language   | Native     | Person names | Words and nicknames | Sentences | Locations |
-| ---- | ---------- | ---------- | :----------: | :-----------------: | :-------: | :-------: |
-| `en` | English    | English    |      ✅      |         ✅          |    ✅     |    ✅     |
-| `ko` | Korean     | 한국어     |      ✅      |         ✅          |    ✅     |    ✅     |
-| `ja` | Japanese   | 日本語     |      ✅      |         ✅          |    ✅     |     —     |
-| `zh` | Chinese    | 中文       |      ✅      |         ✅          |    ✅     |     —     |
-| `it` | Italian    | Italiano   |      ✅      |         ✅          |    ✅     |     —     |
-| `de` | German     | Deutsch    |      ✅      |         ✅          |    ✅     |     —     |
-| `ru` | Russian    | Русский    |      ✅      |         ✅          |    ✅     |     —     |
-| `es` | Spanish    | Español    |      ✅      |         ✅          |    ✅     |     —     |
-| `vi` | Vietnamese | Tiếng Việt |      ✅      |         ✅          |    ✅     |     —     |
+| Code | Language | Native | Person names | Words and nicknames | Sentences | Organizations | Locations |
+| --- | --- | --- | :-: | :-: | :-: | :-: | :-: |
+| `en` | English | English | ✅ | ✅ | ✅ | ✅ | ✅ |
+| `ko` | Korean | 한국어 | ✅ | ✅ | ✅ | ✅ | ✅ |
+| `ja` | Japanese | 日本語 | ✅ | ✅ | ✅ | ✅ | — |
+| `zh` | Chinese | 中文 | ✅ | ✅ | ✅ | ✅ | — |
+| `it` | Italian | Italiano | ✅ | ✅ | ✅ | ✅ | — |
+| `de` | German | Deutsch | ✅ | ✅ | ✅ | ✅ | — |
+| `ru` | Russian | Русский | ✅ | ✅ | ✅ | ✅ | — |
+| `es` | Spanish | Español | ✅ | ✅ | ✅ | ✅ | — |
+| `vi` | Vietnamese | Tiếng Việt | ✅ | ✅ | ✅ | ✅ | — |
 
 ::: lang js
 
