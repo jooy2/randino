@@ -10,7 +10,7 @@ Every option and every example, with **Dart** picked in the sidebar. This README
 
 ---
 
-**randino** generates random person names, nicknames, words, sentences, real locations and ages in the language you ask for.
+**randino** generates random person names, nicknames, words, sentences, real locations, ages and genders in the language you ask for.
 
 - **Person names** read like names people carry: Emma Clover, Jack Reeves, each with its English pronunciation. 9 languages.
 - **Nicknames** are handles for a game or a website: MistyOwl, CraneVoyage, RustyBoot. Built from everyday words across twenty-nine themes, and never from person names.
@@ -18,6 +18,7 @@ Every option and every example, with **Dart** picked in the sidebar. This README
 - **Sentences** are whole statements in the language's own grammar, from `randSentence`. The verb decides what can stand beside it, so the words of one sentence belong together.
 - **Locations** are real places down to a neighbourhood or a city, from `randLocation`: Korean and US divisions, as each country publishes them.
 - **Ages** are whole numbers drawn along a curve shaped like a population, from `randAge`, so a sample of people is mostly adults.
+- **Genders** are the labels a form in the language writes, from `randGender`: 여성, Female, Weiblich. An unstated gender and a third gender are there when you ask for them.
 - **Decorators** attach something to a string you already have: `randSuffix`, `randPrefix` and `randModifier`.
 - Every parameter is named and optional, and a **null enum means "every one of them"**, so `randName()` on its own works.
 - **Pure Dart, no dependencies.** It imports nothing but `dart:math`, so it runs on the VM, on the web and inside Flutter on every platform.
@@ -233,6 +234,28 @@ randAgeDetails().first; // AgeDetail(16, teen)
 | `unique`            | `bool`            | `false`                      |
 
 `group` is `child` (0 to 12), `teen` (13 to 19), `adult` (20 to 64) or `senior` (65 and up), and narrows the range rather than replacing it. An age has no language, so `randAge` takes none.
+
+## Genders
+
+Genders for sample people, written the way a form in the language labels them. Male and female split evenly; `includeUnknown` adds a gender nobody stated, about one draw in eleven, and `includeNonbinary` a third gender, about one in a hundred.
+
+```dart
+randGender(language: WordLanguage.ko, count: 3); // [여성, 남성, 여성]
+randGender(language: WordLanguage.en, includeUnknown: true, count: 3); // [Male, Unknown, Female]
+randGender(language: WordLanguage.de, includeNonbinary: true); // [Divers]
+
+randGenderDetails(language: WordLanguage.ko).first; // GenderDetail(여성, female, ko)
+```
+
+| Parameter          | Type            | Default            |
+| ------------------ | --------------- | ------------------ |
+| `language`         | `WordLanguage?` | `null` — every one |
+| `includeUnknown`   | `bool`          | `false`            |
+| `includeNonbinary` | `bool`          | `false`            |
+| `count`            | `int`           | `1`                |
+| `unique`           | `bool`          | `false`            |
+
+A `GenderDetail`'s `code` is a `GenderCode` whatever the language, and its `male` and `female` are the two `NameGender` holds.
 
 ## Decorators
 

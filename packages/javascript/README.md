@@ -10,7 +10,7 @@ Every option and every example, with **JavaScript** picked in the sidebar. This 
 
 ---
 
-**randino** generates random person names, nicknames, words, sentences, real locations and ages in the language you ask for.
+**randino** generates random person names, nicknames, words, sentences, real locations, ages and genders in the language you ask for.
 
 - **Person names** read like names people carry: Emma Clover, Jack Reeves, each with its English pronunciation. 9 languages.
 - **Nicknames** are handles for a game or a website: MistyOwl, CraneVoyage, RustyBoot. Built from everyday words across twenty-nine themes, and never from person names.
@@ -18,6 +18,7 @@ Every option and every example, with **JavaScript** picked in the sidebar. This 
 - **Sentences** are whole statements in the language's own grammar, from `randSentence`. The verb decides what can stand beside it, so the words of one sentence belong together.
 - **Locations** are real places down to a neighbourhood or a city, from `randLocation`: Korean and US divisions, as each country publishes them, and every country's name in all nine languages from `randCountry`.
 - **Ages** are whole numbers drawn along a curve shaped like a population, from `randAge`, so a sample of people is mostly adults.
+- **Genders** are the labels a form in the language writes, from `randGender`: 여성, Female, Weiblich. An unstated gender and a third gender are there when you ask for them.
 - **Decorators** attach something to a string you already have: `randSuffix`, `randPrefix` and `randModifier`.
 - One options object per generator, every option optional: `randName()` on its own works.
 - **No runtime dependencies.** ESM, typed, and it runs in Node and in the browser alike.
@@ -269,6 +270,32 @@ randAge({ output: 'detail' }); // [{ age: 16, group: 'teen' }]
 | `output`            | `'value' \| 'detail'`       | `'value'`      |
 
 `group` is `child` (0 to 12), `teen` (13 to 19), `adult` (20 to 64) or `senior` (65 and up), or an array of them, and narrows the range rather than replacing it. An age has no language, so `randAge` takes none.
+
+## Genders
+
+Genders for sample people, written the way a form in the language labels them. Male and female split evenly; `includeUnknown` adds a gender nobody stated, about one draw in eleven, and `includeNonbinary` a third gender, about one in a hundred.
+
+```javascript
+import { randGender } from 'randino';
+
+randGender({ language: 'ko', count: 3 }); // ['여성', '남성', '여성']
+randGender({ language: 'en', includeUnknown: true, count: 3 }); // ['Male', 'Unknown', 'Female']
+randGender({ language: 'de', includeNonbinary: true }); // ['Divers']
+
+randGender({ language: 'ko', output: 'detail' });
+// [{ gender: '여성', code: 'female', language: 'ko' }]
+```
+
+| Option             | Type                  | Default   |
+| ------------------ | --------------------- | --------- |
+| `language`         | `WordLanguageOption`  | `'all'`   |
+| `includeUnknown`   | `boolean`             | `false`   |
+| `includeNonbinary` | `boolean`             | `false`   |
+| `count`            | `number`              | `1`       |
+| `unique`           | `boolean`             | `false`   |
+| `output`           | `'value' \| 'detail'` | `'value'` |
+
+The detail's `code` is `male`, `female`, `nonbinary` or `unknown` whatever the language, and the first two are the codes `randName`'s `gender` takes.
 
 ## Decorators
 

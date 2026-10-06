@@ -212,4 +212,5 @@ rand_age(output="detail")
 
 ## 함께 보기 {#see-also}
 
+- [`randGender`](../gender/rand-gender) — 나이와 함께 쓸 성별.
 - [`randName`](../name/rand-name) — 나이와 함께 쓸 이름.

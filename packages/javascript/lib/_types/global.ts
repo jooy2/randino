@@ -879,3 +879,42 @@ export interface AgeDetail {
 	age: number;
 	group: AgeGroup;
 }
+
+/**
+ * A gender as a code, the same in every language:
+ * - `male` and `female`, the same two codes `NameGender` uses.
+ * - `nonbinary`: the third option a form offers beside them.
+ * - `unknown`: not stated — what a record holds when nobody gave an answer.
+ */
+export type GenderCode = 'male' | 'female' | 'nonbinary' | 'unknown';
+
+/**
+ * What `randGender` takes. A gender is one of four labels, so it has no length,
+ * no first character to ask for and nothing to invent.
+ */
+export interface RandGenderOptions extends Pick<
+	RandCommonOptions,
+	'count' | 'unique' | 'output' | 'random'
+> {
+	/** Language the labels are written in. `'all'` mixes every language. Default `'all'`. */
+	language?: WordLanguageOption;
+	/**
+	 * Answer `unknown` now and then, about one draw in eleven — a record whose
+	 * gender was never stated. Default `false`.
+	 */
+	includeUnknown?: boolean;
+	/**
+	 * Answer `nonbinary` now and then, about one draw in a hundred — rarely, the
+	 * way it comes up in a population. Default `false`.
+	 */
+	includeNonbinary?: boolean;
+}
+
+/** A generated gender in its language, with the code behind it. */
+export interface GenderDetail {
+	/** The label a form in the language writes: `여성`, `Female`, `Weiblich`. */
+	gender: string;
+	/** The same gender as a code, which is the same whatever the language. */
+	code: GenderCode;
+	language: WordLanguage;
+}

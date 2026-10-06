@@ -10,7 +10,7 @@ Every option, every language and every example, with **JavaScript**, **Dart** or
 
 ---
 
-**randino** generates random text in the language you ask for: person names, nicknames, everyday words, whole sentences and real locations, and the ages to go with them. One function per kind of value, one set of options, and a dataset per language.
+**randino** generates random text in the language you ask for: person names, nicknames, everyday words, whole sentences and real locations, and the ages and genders to go with them. One function per kind of value, one set of options, and a dataset per language.
 
 - **Person names** read like names people carry: Emma Clover, Jack Reeves, each with its English pronunciation. 9 languages.
 - **Nicknames** are handles for a game or a website: MistyOwl, CraneVoyage, RustyBoot. Built from everyday words across twenty-nine themes and never from person names, they run to over forty million combinations in Korean and in English before a random suffix is added.
@@ -18,6 +18,7 @@ Every option, every language and every example, with **JavaScript**, **Dart** or
 - **Sentences** are whole statements in the language's own grammar, from `randSentence`. A verb states what can do it and what it can be done to, so the words of one sentence belong together: 여우가 사과를 먹는다, The brave lion runs quietly.
 - **Locations** are real places written out from the country down, from `randLocation`: 대한민국 경기도 수원시 장안구 파장동, Pasadena, California, United States. Every division is one the country publishes, nothing goes below a neighbourhood or a city, and only countries that publish that list free of conditions are in — Korea and the United States so far. `randCountry` names every country, all 249 of ISO 3166-1, in all nine languages.
 - **Ages** are whole numbers from `randAge`, drawn along a curve shaped like a population rather than evenly, so a sample of people is mostly adults and thins out past seventy.
+- **Genders** are the labels a form in the language writes, from `randGender`: 여성, Female, Weiblich. Male and female split evenly, and an unstated gender and a third gender are there when you ask for them.
 - **Decorators** attach something to a string you already have rather than generating one: a random token with `randSuffix` and `randPrefix`, a word with `randModifier`.
 - One options set per generator: language, length, count, a `realism` setting that goes from real words to fully invented ones, and a `vocabulary` setting that keeps to the everyday words.
 - **Every generator and decorator takes a `random`** — where the draws come from. A secure source for a value nobody may predict, a seeded one for a fixture that has to come out the same every run.
@@ -137,6 +138,7 @@ Locations are the generator that is not in all nine. A language has them only wh
 | Sentences      | `randSentence`               | `rand_sentence`              | The brave lion runs quietly. |
 | Locations      | `randLocation`, `randCity`, … | `rand_location`, `rand_city`, … | 대한민국 서울특별시 종로구 청운동 |
 | Ages           | `randAge`                    | `rand_age`                   | 34, 8, 71 |
+| Genders        | `randGender`                 | `rand_gender`                | 여성, Female, Weiblich |
 | Decorators     | `randSuffix`, `randPrefix`, `randModifier` | `rand_suffix`, `rand_prefix`, `rand_modifier` | MistyOwl_nVtRC, MistyOwl |
 
 Each generator returns strings by default, or one detail object per result with <code>output: 'detail'</code>: both scripts of a name, or the words a nickname was built from. The Dart package spells that as a second function (`randNameDetails`), because Dart has no way to make one function's return type depend on an argument.

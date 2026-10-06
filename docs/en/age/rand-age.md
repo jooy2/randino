@@ -212,4 +212,5 @@ rand_age(output="detail")
 
 ## See also
 
+- [`randGender`](../gender/rand-gender) — a gender to go with the age.
 - [`randName`](../name/rand-name) — a name to go with the age.

@@ -10,7 +10,7 @@ Every option and every example, with **Python** picked in the sidebar. This READ
 
 ---
 
-**randino** generates random person names, nicknames, words, sentences, real locations and ages in the language you ask for.
+**randino** generates random person names, nicknames, words, sentences, real locations, ages and genders in the language you ask for.
 
 - **Person names** read like names people carry: Emma Clover, Jack Reeves, each with its English pronunciation. 9 languages.
 - **Nicknames** are handles for a game or a website: MistyOwl, CraneVoyage, RustyBoot. Built from everyday words across twenty-nine themes, and never from person names.
@@ -18,6 +18,7 @@ Every option and every example, with **Python** picked in the sidebar. This READ
 - **Sentences** are whole statements in the language's own grammar, from `rand_sentence`. The verb decides what can stand beside it, so the words of one sentence belong together.
 - **Locations** are real places down to a neighbourhood or a city, from `rand_location`: Korean and US divisions, as each country publishes them.
 - **Ages** are whole numbers drawn along a curve shaped like a population, from `rand_age`, so a sample of people is mostly adults.
+- **Genders** are the labels a form in the language writes, from `rand_gender`: 여성, Female, Weiblich. An unstated gender and a third gender are there when you ask for them.
 - **Decorators** attach something to a string you already have: `rand_suffix`, `rand_prefix` and `rand_modifier`.
 - Every argument is keyword-only and optional, so `rand_name()` on its own works.
 - **Pure Python, no dependencies.** It imports nothing outside the standard library, and ships a `py.typed` marker so mypy and Pyright read the annotations.
@@ -250,6 +251,32 @@ rand_age(output="detail")  # [AgeDetail(age=16, group='teen')]
 | `output`              | `"value" \| "detail"`       | `"value"`      |
 
 `group` is `"child"` (0 to 12), `"teen"` (13 to 19), `"adult"` (20 to 64) or `"senior"` (65 and up), or a sequence of them, and narrows the range rather than replacing it. An age has no language, so `rand_age` takes none.
+
+## Genders
+
+Genders for sample people, written the way a form in the language labels them. Male and female split evenly; `include_unknown` adds a gender nobody stated, about one draw in eleven, and `include_nonbinary` a third gender, about one in a hundred.
+
+```python
+from randino import rand_gender
+
+rand_gender(language="ko", count=3)  # ['여성', '남성', '여성']
+rand_gender(language="en", include_unknown=True, count=3)  # ['Male', 'Unknown', 'Female']
+rand_gender(language="de", include_nonbinary=True)  # ['Divers']
+
+rand_gender(language="ko", output="detail")
+# [GenderDetail(gender='여성', code='female', language='ko')]
+```
+
+| Argument            | Type                  | Default   |
+| ------------------- | --------------------- | --------- |
+| `language`          | `WordLanguageOption`  | `"all"`   |
+| `include_unknown`   | `bool`                | `False`   |
+| `include_nonbinary` | `bool`                | `False`   |
+| `count`             | `int`                 | `1`       |
+| `unique`            | `bool`                | `False`   |
+| `output`            | `"value" \| "detail"` | `"value"` |
+
+The detail's `code` is `"male"`, `"female"`, `"nonbinary"` or `"unknown"` whatever the language, and the first two are the codes `rand_name`'s `gender` takes.
 
 ## Decorators
 

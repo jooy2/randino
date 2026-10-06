@@ -533,3 +533,26 @@ class AgeDetail:
 
     group: AgeGroup
     """The part of a life the age falls in."""
+
+
+GenderCode = Literal["male", "female", "nonbinary", "unknown"]
+"""A gender as a code, the same in every language.
+
+- `male` and `female`: the same two codes `NameGender` uses.
+- `nonbinary`: the third option a form offers beside them.
+- `unknown`: not stated — what a record holds when nobody gave an answer.
+"""
+
+
+@dataclass(frozen=True, slots=True)
+class GenderDetail:
+    """A generated gender in its language, with the code behind it."""
+
+    gender: str
+    """The label a form in the language writes: `여성`, `Female`, `Weiblich`."""
+
+    code: GenderCode
+    """The same gender as a code, which is the same whatever the language."""
+
+    language: WordLanguage
+    """The language the label is written in."""

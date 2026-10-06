@@ -4,7 +4,7 @@ Guidance for AI agents (and humans) working in this repository. Written in Engli
 
 ## What randino is
 
-**randino** is a zero-dependency library that generates random **person names**, **nicknames**, **everyday words**, **sentences**, **locations** and **ages**, per language. It ships for more than one programming language — TypeScript, Dart and Python — and every one of them generates from the same datasets under the same rules. Separate concerns, deliberately:
+**randino** is a zero-dependency library that generates random **person names**, **nicknames**, **everyday words**, **sentences**, **locations**, **ages** and **genders**, per language. It ships for more than one programming language — TypeScript, Dart and Python — and every one of them generates from the same datasets under the same rules. Separate concerns, deliberately:
 
 - **Names** should read like names a person actually carries (`김민준`, `Emma Clover`). Sample data for forms, seeds, mockups.
 - **Nicknames** are the handles someone would pick for a game or a website (`멋진사자`, `MistyOwl`). They are built from everyday words and **never from person names** — that rule is the whole point of keeping the two apart.
@@ -12,6 +12,7 @@ Guidance for AI agents (and humans) working in this repository. Written in Engli
 - **Sentences** are whole statements in the language's own grammar (`여우가 사과를 먹는다.`, `The brave lion runs quietly.`). They draw the same nouns a nickname does, and what they add is everything a sentence needs beside them — a verb in the form a statement ends on, the particles, the articles and the shapes.
 - **Locations** are real places, written out from the country down (`대한민국 경기도 수원시 장안구 파장동`, `Pasadena, California, United States`). Nothing about them is invented: every division is one the country publishes, inside the one written beside it, and nothing goes below a Korean 읍·면·동 or a US city — no street, no building, no number. `randLocation` takes the level as an option, and `randCountry` / `randRegion` / `randCity` / `randDistrict` hand back one level's name alone. **Two languages, not nine**, and on purpose — see the location bullets below. `randCountry` is the exception: it names every ISO 3166-1 country in all nine.
 - **Ages** are whole numbers of years for a sample person (`34`), drawn along a curve shaped like a population rather than evenly, so a sample is mostly adults. An age has no language, so `randAge` is the one generator that takes none, and `minAge` / `maxAge` and `group` are its own options in place of the length ones.
+- **Genders** are the label a form in the language writes for one (`여성`, `Female`, `Divers`). Male and female split evenly, and the two others — `unknown` and `nonbinary` — come up only when the caller switches them on, and rarely when they do.
 
 All of them are implemented. Keep the generators apart — a shared "generator" abstraction is not wanted — but the options they all take, and the loop that draws until it has `count` results, live in `_internal/generate` and are shared. So are the word pools: `word/data` is the one dataset, and `nickname` consumes it.
 
@@ -55,6 +56,11 @@ lib/
     randAge.ts              # public: number[], or AgeDetail[] on `output: 'detail'`
     ageGenerator.ts         # internal: the candidates per call, the weighted draw
     data/index.ts           # AGE_GROUPS, the band of each group, the curve
+  gender/
+    index.ts
+    randGender.ts           # public: string[], or GenderDetail[] on `output: 'detail'`
+    genderGenerator.ts      # internal: the codes a call allows, the weighted draw
+    data/index.ts           # GENDER_CODES, GENDER_WEIGHTS, GENDER_LABELS per language
   decorate/
     index.ts                # the category's public surface
     randSuffix.ts           # public: nothing, a string, or an array -> the same, token attached
@@ -115,6 +121,7 @@ test/
   base.test.ts              # the package's export surface
   age.test.ts               # one *.test.ts per category
   decorate.test.ts
+  gender.test.ts
   location.test.ts
   name.test.ts
   nickname.test.ts
@@ -179,6 +186,7 @@ lib/
       parse.dart            # words() / pairs() / weightMap() / romanMap()
     age/                    # mirrors lib/age, plus `randAgeDetails`
     decorate/               # mirrors lib/decorate, plus the `…All` list forms
+    gender/                 # mirrors lib/gender, plus `randGenderDetails`
     name/                   # mirrors lib/name in the JavaScript package
       data/                 # one file per language, ported verbatim
       romanize.dart
@@ -197,6 +205,7 @@ test/
   base_test.dart            # the barrel's export surface, read out of the source
   age_test.dart
   decorate_test.dart
+  gender_test.dart
   location_test.dart
   name_test.dart
   nickname_test.dart
@@ -257,6 +266,7 @@ src/randino/
     parse.py                # words() / tokens() / weights() / roman_map()
   age/                      # mirrors lib/age
   decorate/                 # mirrors lib/decorate; `@overload` carries the shape
+  gender/                   # mirrors lib/gender
   name/                     # mirrors lib/name in the JavaScript package
     data/                   # one file per language, ported verbatim
     _romanize.py
@@ -276,6 +286,7 @@ tests/
   test_base.py              # the barrel's export surface, and the no-dependency rule
   test_age.py
   test_decorate.py
+  test_gender.py
   test_location.py
   test_name.py
   test_nickname.py
@@ -459,7 +470,7 @@ The run stops rather than writes when a file changes shape — new columns, an u
 
 **The dumps normalize what only differs because the languages differ, and nothing else.** A pool entry is `{ n, r }` everywhere; field names are the JavaScript ones; an optional field is present and null rather than absent; `syn` carries its `kind` tag even in the two packages that tell the shapes apart by type. That normalization lives in the three dumps — one per package, each responsible for its own language's spelling — so the comparison itself has nothing to know about any of them. Adding a field to a dataset means adding it to all three dumps, and the check reports a field only one dump writes as a difference, which is the intended failure.
 
-**Do not widen it into a general "the ports agree" check.** It covers the word, sentence, name and location datasets, the age bands and curve, the stories and the field rules beside them, the surname romanization map, and the bounds in `constants` and `decorate/data` — the last of which is still written by hand in each package. The nickname shapes are in it now that they are `WordLanguageData.frames`: they were left out while they were a table private to each generator, and being data is what put them in. The sentence datasets are the same story on a larger scale, `THEME_CLASS` included, because a theme moving from one class to another changes what every verb of every language will accept.
+**Do not widen it into a general "the ports agree" check.** It covers the word, sentence, name and location datasets, the age bands and curve, the gender labels and weights, the stories and the field rules beside them, the surname romanization map, and the bounds in `constants` and `decorate/data` — the last of which is still written by hand in each package. The nickname shapes are in it now that they are `WordLanguageData.frames`: they were left out while they were a table private to each generator, and being data is what put them in. The sentence datasets are the same story on a larger scale, `THEME_CLASS` included, because a theme moving from one class to another changes what every verb of every language will accept.
 
 ## Testing a random generator
 
@@ -593,6 +604,12 @@ Ages:
 - **A group narrows the range, and the range wins.** `group` is filtered inside `minAge`..`maxAge`, and a group with no age there is ignored rather than answered with nothing, because the range is a number the caller wrote and the group only a name for one. The bands are data (`AGE_BANDS`) and meet without a gap from 0 to `RAND_AGE_MAX`.
 - **`maxAge` left out is 100, unless `minAge` is past it.** A centenarian is about one draw in twenty thousand, so the default stops there; `minAge: 105` alone moves it to `RAND_AGE_MAX` rather than reading as a range the wrong way round. An explicit range the wrong way round keeps `maxAge`, the way `lengthBounds` keeps `maxLength`.
 - **The candidates are worked out once per call.** At most 121 ages, each with its weight, and every draw is a `pickWeighted` over them. The last age of the curve has weight zero and is still drawn when it is the only age in range, which is `pickWeighted`'s even fallback doing its job.
+
+Genders:
+
+- **A label is what a form writes, not the noun for a person.** `남성` rather than `남자`, `Männlich` rather than `Mann`, and the adjective that agrees with the field's own noun where the language has one (`Masculino` for `sexo`, `Мужской` for `пол`). German writes `Divers` for the third option because that is the option its forms carry. A new word language needs a row in `GENDER_LABELS` in all three packages, and the suites assert every language labels every code with four different strings.
+- **The weights are out of a hundred with everything switched on, and a switched-off code drops out.** 45 / 45 / 9 / 1, so the two always-on codes split evenly by themselves and the rest keep their proportions — `unknown` alone is about one in eleven, `nonbinary` alone about one in ninety. Nothing is renormalised by hand; `pickWeighted` over the codes that are left does it.
+- **`male` and `female` are `NameGender`'s two codes.** That is the point of `code` on the detail: a drawn gender can choose the pool a name comes from. Keep them the same strings.
 
 ## Adding a location language
 

@@ -348,6 +348,8 @@ import type {
 	AgeDistribution,
 	AgeGroup,
 	AgeGroupOption,
+	GenderCode,
+	GenderDetail,
 	NameDetail,
 	NameGender,
 	NameGenderOption,
@@ -366,6 +368,7 @@ import type {
 	LocationLevel,
 	RandAgeOptions,
 	RandCountryOptions,
+	RandGenderOptions,
 	RandLocationOptions,
 	RandNameOptions,
 	RandNicknameOptions,
@@ -387,13 +390,13 @@ Every public type is exported alongside the functions:
 import 'package:randino/randino.dart';
 
 // Enums
-AgeGroup, AgeDistribution
+AgeGroup, AgeDistribution, GenderCode
 NameLanguage, NameGender, NameScript
 WordLanguage, WordTheme
 LocationLanguage, LocationLevel
 
 // Values
-LengthRange, AgeDetail, NameDetail, NicknameDetail, LocationDetail, CountryDetail
+LengthRange, AgeDetail, GenderDetail, NameDetail, NicknameDetail, LocationDetail, CountryDetail
 ```
 
 There is no `…Option` type and no `all` member: **a null enum is what means "every one of them"**, so the parameter you do not write is already the mixed draw. That also means the helpers take the same type the generators do, rather than a narrower one.
@@ -410,6 +413,8 @@ from randino import (
     AgeDistribution,
     AgeGroup,
     AgeGroupOption,
+    GenderCode,
+    GenderDetail,
     NameDetail,
     NameGender,
     NameGenderOption,

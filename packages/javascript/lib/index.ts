@@ -1,6 +1,7 @@
 export * from './age/index.js';
 export * from './decorate/index.js';
 export * from './constants.js';
+export * from './gender/index.js';
 export * from './location/index.js';
 export * from './name/index.js';
 export * from './nickname/index.js';

@@ -1,12 +1,13 @@
-"""randino — random names, nicknames, words, sentences, locations and ages, no dependencies.
+"""randino — names, nicknames, words, sentences, locations, ages and genders, no dependencies.
 
 Separate concerns, deliberately. `rand_name` produces names a person could actually
 carry (`김민준`, `Emma Clover`); `rand_nickname` produces the handle someone would pick
 for a game or a website (`멋진사자`, `MistyOwl`), built from everyday words and never
 from person names; `rand_word` hands those words over on their own; `rand_sentence`
 writes a whole statement in the language's own grammar; `rand_location` writes a real
-place, from the country down to a Korean 읍·면·동 or a US city; and `rand_age` draws an
-age along a curve shaped like a population.
+place, from the country down to a Korean 읍·면·동 or a US city; `rand_age` draws an age
+along a curve shaped like a population; and `rand_gender` writes the label a form in the
+language uses for a gender.
 
 Example:
     >>> from randino import rand_name, rand_nickname, rand_sentence
@@ -24,6 +25,8 @@ from randino._types import (
     AgeGroup,
     AgeGroupOption,
     CountryDetail,
+    GenderCode,
+    GenderDetail,
     LocationDetail,
     LocationLanguage,
     LocationLanguageOption,
@@ -76,6 +79,7 @@ from randino.decorate import (
     rand_prefix,
     rand_suffix,
 )
+from randino.gender import rand_gender
 from randino.location import (
     LOCATION_LANGUAGES,
     LOCATION_LEVELS,
@@ -153,6 +157,8 @@ __all__ = [
     "AgeGroup",
     "AgeGroupOption",
     "CountryDetail",
+    "GenderCode",
+    "GenderDetail",
     "LocationDetail",
     "LocationLanguage",
     "LocationLanguageOption",
@@ -204,6 +210,7 @@ __all__ = [
     "rand_food",
     "rand_furniture",
     "rand_gem",
+    "rand_gender",
     "rand_job",
     "rand_location",
     "rand_modifier",

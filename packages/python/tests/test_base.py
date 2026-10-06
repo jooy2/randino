@@ -30,6 +30,8 @@ def test_the_package_exports_exactly_its_public_api() -> None:
         "AgeGroup",
         "AgeGroupOption",
         "CountryDetail",
+        "GenderCode",
+        "GenderDetail",
         "LOCATION_LANGUAGES",
         "LOCATION_LEVELS",
         "LocationDetail",
@@ -93,6 +95,7 @@ def test_the_package_exports_exactly_its_public_api() -> None:
         "rand_food",
         "rand_furniture",
         "rand_gem",
+        "rand_gender",
         "rand_job",
         "rand_location",
         "rand_modifier",
@@ -187,6 +190,9 @@ def test_the_functions_are_callable_and_the_constants_are_what_they_claim() -> N
     assert randino.RAND_AGE_MAX == 120
     assert randino.AGE_GROUPS == ("child", "teen", "adult", "senior")
 
+    assert isinstance(randino.rand_gender()[0], str)
+    assert randino.rand_gender(language="en", output="detail")[0].language == "en"
+
 
 def test_the_package_imports_nothing_outside_the_standard_library() -> None:
     # Zero runtime dependencies is a hard constraint, not a preference — it is why
@@ -261,6 +267,8 @@ def test_an_option_the_types_rule_out_falls_back_rather_than_raising() -> None:
         lambda: loose.rand_age(group=[None]),
         lambda: loose.rand_age(distribution="normal"),
         lambda: loose.rand_age(min_age=float("nan"), max_age="x"),
+        lambda: loose.rand_gender(language="xx", count=float("nan")),
+        lambda: loose.rand_gender(include_unknown="yes"),
     ]
 
     for ask in asks:
@@ -310,6 +318,7 @@ def test_random_is_where_every_draw_of_a_call_comes_from() -> None:
     twice(lambda: randino.rand_location(count=5, random=Random(42).random))
     twice(lambda: randino.rand_city(language="en", max_length=8, count=5, random=Random(42).random))
     twice(lambda: randino.rand_age(count=5, random=Random(42).random))
+    twice(lambda: randino.rand_gender(count=5, include_unknown=True, random=Random(42).random))
 
     # Two different seeds are two different answers, so the source is actually what
     # the draws are coming from.

@@ -797,3 +797,37 @@ class AgeDetail {
   @override
   String toString() => 'AgeDetail($age, ${group.name})';
 }
+
+/// A gender as a code, the same in every language.
+enum GenderCode {
+  /// The same code `NameGender.male` is.
+  male,
+
+  /// The same code `NameGender.female` is.
+  female,
+
+  /// The third option a form offers beside the two.
+  nonbinary,
+
+  /// Not stated — what a record holds when nobody gave an answer.
+  unknown,
+}
+
+/// A generated gender in its language, with the code behind it.
+class GenderDetail {
+  /// Creates a detail record. Returned by the generator; there is rarely a
+  /// reason to build one by hand outside a test.
+  const GenderDetail({required this.gender, required this.code, required this.language});
+
+  /// The label a form in [language] writes: `여성`, `Female`, `Weiblich`.
+  final String gender;
+
+  /// The same gender as a code, which is the same whatever the language.
+  final GenderCode code;
+
+  /// The language the label is written in.
+  final WordLanguage language;
+
+  @override
+  String toString() => 'GenderDetail($gender, ${code.name}, ${language.name})';
+}

@@ -42,6 +42,8 @@ void main() {
           'AgeDistribution',
           'AgeGroup',
           'CountryDetail',
+          'GenderCode',
+          'GenderDetail',
           'LengthRange',
           'LocationDetail',
           'LocationLanguage',
@@ -101,6 +103,8 @@ void main() {
           'randFinance',
           'randFood',
           'randFurniture',
+          'randGender',
+          'randGenderDetails',
           'randGem',
           'randJob',
           'randLengthMax',
@@ -210,6 +214,9 @@ void main() {
       expect(randAgeDetails()[0], isA<AgeDetail>());
       expect(randAgeMax, 120);
       expect(ageGroups, <AgeGroup>[AgeGroup.child, AgeGroup.teen, AgeGroup.adult, AgeGroup.senior]);
+
+      expect(randGender(), hasLength(1));
+      expect(randGenderDetails(language: WordLanguage.en)[0].language, WordLanguage.en);
     });
 
     test('the bounds are the same numbers the JavaScript package uses', () {
@@ -291,6 +298,7 @@ void main() {
             ).join(),
       );
       twice(() => randAge(count: 5, random: Random(42)).join(','));
+      twice(() => randGender(count: 5, includeUnknown: true, random: Random(42)).join());
       twice(() => randSuffixAll(const ['a', 'b'], random: Random(42)).join());
       twice(() => randModifierAll(const ['사자', '여우'], random: Random(42)).join());
 

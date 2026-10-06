@@ -46,7 +46,7 @@ always reported as the other package's.
 
 The word datasets, the sentence datasets, the name datasets, the surname
 romanization map, the age groups with their bands and the curve ages are drawn
-along, and the bounds every generator shares (`constants` and `decorate/data`).
+along, the gender labels and how often each gender comes up, and the bounds every generator shares (`constants` and `decorate/data`).
 That is everything written once per package as data.
 
 That includes the nickname shapes. They are `WordLanguageData.frames`, one set

@@ -45,6 +45,7 @@ describe('base test', () => {
 			'randFood',
 			'randFurniture',
 			'randGem',
+			'randGender',
 			'randJob',
 			'randLocation',
 			'randModifier',
@@ -137,6 +138,9 @@ describe('base test', () => {
 		assert.strictEqual(typeof randino.randAge({ output: 'detail' })[0].group, 'string');
 		assert.strictEqual(randino.RAND_AGE_MAX, 120);
 		assert.deepStrictEqual(randino.AGE_GROUPS, ['child', 'teen', 'adult', 'senior']);
+
+		assert.strictEqual(typeof randino.randGender()[0], 'string');
+		assert.strictEqual(randino.randGender({ language: 'en', output: 'detail' })[0].language, 'en');
 	});
 
 	it('an option the types rule out falls back rather than throwing', () => {
@@ -175,7 +179,9 @@ describe('base test', () => {
 			() => randino.randAge({ group: 'elder' as never }),
 			() => randino.randAge({ group: [null] as never }),
 			() => randino.randAge({ distribution: 'normal' as never }),
-			() => randino.randAge({ minAge: NaN, maxAge: 'x' as never })
+			() => randino.randAge({ minAge: NaN, maxAge: 'x' as never }),
+			() => randino.randGender({ language: 'xx' as never, count: NaN }),
+			() => randino.randGender({ includeUnknown: 'yes' as never })
 		];
 
 		for (const ask of asks) {
@@ -250,6 +256,7 @@ describe('base test', () => {
 		agrees(() => randino.randLocation({ count: 5, random: seeded(42) }));
 		agrees(() => randino.randCity({ language: 'en', maxLength: 8, count: 5, random: seeded(42) }));
 		agrees(() => randino.randAge({ count: 5, random: seeded(42) }));
+		agrees(() => randino.randGender({ count: 5, includeUnknown: true, random: seeded(42) }));
 
 		// Two different seeds are two different answers, so the source is actually
 		// what the draws are coming from.

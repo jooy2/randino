@@ -25,6 +25,7 @@ from randino.decorate.data import (
     AFFIX_LENGTH_MAX,
     AFFIX_SEPARATOR_DEFAULT,
 )
+from randino.gender.data import GENDER_CODES, GENDER_LABELS, GENDER_WEIGHTS
 from randino.location.data import LOCATION_DATA, LOCATION_LANGUAGES, LOCATION_LEVELS
 from randino.location.data.countries import COUNTRIES
 from randino.name.data import NAME_DATA, NAME_LANGUAGES
@@ -415,6 +416,11 @@ print(
                 "bands": {group: list(AGE_BANDS[group]) for group in AGE_GROUPS},
                 "curve": [[age, weight] for age, weight in AGE_CURVE],
                 "maxDefault": AGE_MAX_DEFAULT,
+            },
+            "gender": {
+                "codes": list(GENDER_CODES),
+                "weights": dict(GENDER_WEIGHTS),
+                "labels": {language: dict(labels) for language, labels in GENDER_LABELS.items()},
             },
             # The outline is compared as each package parses it rather than as the text it
             # is written in, so a parser that reads `_` or a skipped level differently

@@ -12,7 +12,7 @@ void main() {
   _nicknames();
   _sentences();
   _locations();
-  _ages();
+  _people();
   _decorators();
   _questionsAboutALanguage();
 }
@@ -121,13 +121,17 @@ void _locations() {
   print(randLocation(language: LocationLanguage.ko)); // [대한민국 경기도 수원시 장안구 파장동]
 }
 
-/// Ages for sample people, drawn along a curve shaped like a population.
-void _ages() {
-  print('-- ages -------------------------------------------------------');
+/// Ages and genders for sample people: an age along a curve shaped like a
+/// population, a gender the way a form in the language labels it.
+void _people() {
+  print('-- ages and genders -------------------------------------------');
 
   print(randAge(count: 5)); // [27, 8, 41, 63, 30]
   print(randAge(group: {AgeGroup.senior}, count: 3)); // [71, 66, 80]
   print(randAgeDetails().first); // AgeDetail(16, teen)
+  print(randGender(language: WordLanguage.ko, count: 3)); // [여성, 남성, 여성]
+  print(randGenderDetails(language: WordLanguage.de, includeNonbinary: true).first);
+  // GenderDetail(Weiblich, female, de)
 }
 
 void _decorators() {

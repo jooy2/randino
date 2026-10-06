@@ -22,6 +22,11 @@ import {
 	AFFIX_LENGTH_MAX,
 	AFFIX_SEPARATOR_DEFAULT
 } from '../../packages/javascript/lib/decorate/data/index.js';
+import {
+	GENDER_CODES,
+	GENDER_LABELS,
+	GENDER_WEIGHTS
+} from '../../packages/javascript/lib/gender/data/index.js';
 import { COUNTRIES } from '../../packages/javascript/lib/location/data/countries.js';
 import {
 	LOCATION_DATA,
@@ -148,6 +153,11 @@ console.log(
 			bands: Object.fromEntries(AGE_GROUPS.map((group) => [group, [...AGE_BANDS[group]]])),
 			curve: AGE_CURVE.map(([age, weight]) => [age, weight]),
 			maxDefault: AGE_MAX_DEFAULT
+		},
+		gender: {
+			codes: [...GENDER_CODES],
+			weights: { ...GENDER_WEIGHTS },
+			labels: GENDER_LABELS
 		},
 		// The outline is compared as each package parses it rather than as the text
 		// it is written in, so a parser that reads `_` or a skipped level differently

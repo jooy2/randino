@@ -348,6 +348,8 @@ import type {
 	AgeDistribution,
 	AgeGroup,
 	AgeGroupOption,
+	GenderCode,
+	GenderDetail,
 	NameDetail,
 	NameGender,
 	NameGenderOption,
@@ -366,6 +368,7 @@ import type {
 	LocationLevel,
 	RandAgeOptions,
 	RandCountryOptions,
+	RandGenderOptions,
 	RandLocationOptions,
 	RandNameOptions,
 	RandNicknameOptions,
@@ -387,13 +390,13 @@ const options: RandNameOptions = { language: 'ko', count: 3 };
 import 'package:randino/randino.dart';
 
 // enum
-AgeGroup, AgeDistribution
+AgeGroup, AgeDistribution, GenderCode
 NameLanguage, NameGender, NameScript
 WordLanguage, WordTheme
 LocationLanguage, LocationLevel
 
 // 값
-LengthRange, AgeDetail, NameDetail, NicknameDetail, LocationDetail, CountryDetail
+LengthRange, AgeDetail, GenderDetail, NameDetail, NicknameDetail, LocationDetail, CountryDetail
 ```
 
 `…Option` 타입도 없고 `all` 멤버도 없습니다. **null인 enum이 "전부"를 뜻하므로**, 쓰지 않은 파라미터가 이미 섞인 결과를 의미합니다. 그래서 헬퍼들도 더 좁은 타입이 아니라 생성기와 같은 타입을 받습니다.
@@ -410,6 +413,8 @@ from randino import (
     AgeDistribution,
     AgeGroup,
     AgeGroupOption,
+    GenderCode,
+    GenderDetail,
     NameDetail,
     NameGender,
     NameGenderOption,
