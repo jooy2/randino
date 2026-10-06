@@ -1,11 +1,12 @@
-"""randino — random names, nicknames, words, sentences and locations, per language, no dependencies.
+"""randino — random names, nicknames, words, sentences, locations and ages, no dependencies.
 
 Separate concerns, deliberately. `rand_name` produces names a person could actually
 carry (`김민준`, `Emma Clover`); `rand_nickname` produces the handle someone would pick
 for a game or a website (`멋진사자`, `MistyOwl`), built from everyday words and never
 from person names; `rand_word` hands those words over on their own; `rand_sentence`
-writes a whole statement in the language's own grammar; and `rand_location` writes a real
-place, from the country down to a Korean 읍·면·동 or a US city.
+writes a whole statement in the language's own grammar; `rand_location` writes a real
+place, from the country down to a Korean 읍·면·동 or a US city; and `rand_age` draws an
+age along a curve shaped like a population.
 
 Example:
     >>> from randino import rand_name, rand_nickname, rand_sentence
@@ -18,6 +19,10 @@ Example:
 """
 
 from randino._types import (
+    AgeDetail,
+    AgeDistribution,
+    AgeGroup,
+    AgeGroupOption,
     CountryDetail,
     LocationDetail,
     LocationLanguage,
@@ -52,7 +57,9 @@ from randino._types import (
     WordTheme,
     WordThemeOption,
 )
+from randino.age import AGE_GROUPS, rand_age
 from randino.constants import (
+    RAND_AGE_MAX,
     RAND_COUNT_MAX,
     RAND_LENGTH_MAX,
     RAND_LENGTH_MIN,
@@ -128,9 +135,11 @@ __all__ = [
     "AFFIX_LENGTH_DEFAULT",
     "AFFIX_LENGTH_MAX",
     "AFFIX_SEPARATOR_DEFAULT",
+    "AGE_GROUPS",
     "LOCATION_LANGUAGES",
     "LOCATION_LEVELS",
     "NAME_LANGUAGES",
+    "RAND_AGE_MAX",
     "RAND_COUNT_MAX",
     "RAND_LENGTH_MAX",
     "RAND_LENGTH_MIN",
@@ -139,6 +148,10 @@ __all__ = [
     "RAND_SENTENCE_LENGTH_MAX",
     "WORD_LANGUAGES",
     "WORD_THEMES",
+    "AgeDetail",
+    "AgeDistribution",
+    "AgeGroup",
+    "AgeGroupOption",
     "CountryDetail",
     "LocationDetail",
     "LocationLanguage",
@@ -176,6 +189,7 @@ __all__ = [
     "name_supports_middle_name",
     "name_supports_roman",
     "nickname_length_range",
+    "rand_age",
     "rand_animal",
     "rand_body",
     "rand_city",

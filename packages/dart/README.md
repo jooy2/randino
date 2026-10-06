@@ -10,13 +10,14 @@ Every option and every example, with **Dart** picked in the sidebar. This README
 
 ---
 
-**randino** generates random person names, nicknames, words, sentences and real locations in the language you ask for.
+**randino** generates random person names, nicknames, words, sentences, real locations and ages in the language you ask for.
 
 - **Person names** read like names people carry: Emma Clover, Jack Reeves, each with its English pronunciation. 9 languages.
 - **Nicknames** are handles for a game or a website: MistyOwl, CraneVoyage, RustyBoot. Built from everyday words across twenty-nine themes, and never from person names.
 - **Words** are those twenty-nine themes on their own: `randWord`, plus `randAnimal`, `randFood` and twenty-seven more.
 - **Sentences** are whole statements in the language's own grammar, from `randSentence`. The verb decides what can stand beside it, so the words of one sentence belong together.
 - **Locations** are real places down to a neighbourhood or a city, from `randLocation`: Korean and US divisions, as each country publishes them.
+- **Ages** are whole numbers drawn along a curve shaped like a population, from `randAge`, so a sample of people is mostly adults.
 - **Decorators** attach something to a string you already have: `randSuffix`, `randPrefix` and `randModifier`.
 - Every parameter is named and optional, and a **null enum means "every one of them"**, so `randName()` on its own works.
 - **Pure Dart, no dependencies.** It imports nothing but `dart:math`, so it runs on the VM, on the web and inside Flutter on every platform.
@@ -210,6 +211,29 @@ randCityDetails(language: LocationLanguage.ko).first;
 
 `level` is how far down the location goes: `country`, `region`, `city` or `district`. A country without that level stops at the deepest one it has, so an English location ends at its city. `includeCountry: false` leaves the country out of the string, which is what a fixed `language` usually wants. `randRegion`, `randCity` and `randDistrict` take the same parameters minus `level`, and hand back that one division's name; each has a `…Details` twin, as `randLocation` has `randLocationDetails`. `randCountry` is the exception: it takes a `WordLanguage?` and names any of the 249 ISO 3166-1 countries and territories in any of the nine languages, and `randCountryDetails` adds each one's code as a `CountryDetail`.
 
+## Ages
+
+Ages for sample people, in whole years. The draw follows a curve shaped like a population rather than an even spread: it peaks from 25 to 35, sits lower for children and falls away past seventy, so a third of the ages are in their twenties and thirties and about 2% are past eighty.
+
+```dart
+randAge(count: 5); // [27, 8, 41, 63, 30]
+randAge(minAge: 18, maxAge: 39, count: 3); // [22, 35, 31]
+randAge(group: {AgeGroup.teen, AgeGroup.senior}, count: 3); // [15, 71, 66]
+randAge(distribution: AgeDistribution.uniform, count: 3); // [91, 4, 57]
+
+randAgeDetails().first; // AgeDetail(16, teen)
+```
+
+| Parameter           | Type              | Default                      |
+| ------------------- | ----------------- | ---------------------------- |
+| `minAge` / `maxAge` | `int?`            | `0` / `100`                  |
+| `group`             | `Set<AgeGroup>?`  | `null` — every group         |
+| `distribution`      | `AgeDistribution` | `AgeDistribution.population` |
+| `count`             | `int`             | `1`                          |
+| `unique`            | `bool`            | `false`                      |
+
+`group` is `child` (0 to 12), `teen` (13 to 19), `adult` (20 to 64) or `senior` (65 and up), and narrows the range rather than replacing it. An age has no language, so `randAge` takes none.
+
 ## Decorators
 
 `randSuffix`, `randPrefix` and `randModifier` attach something to a string you already have, rather than generating one. They take anything, not just this library's output, which is why none of them is a parameter on a generator. Each of them also works with no value at all, handing back the thing it would have attached.
@@ -265,7 +289,7 @@ nicknameLengthRange(language: WordLanguage.ko); // LengthRange(1, 13)
 sentenceLengthRange(WordLanguage.ko); // LengthRange(5, 43)
 ```
 
-`nameLanguages`, `wordLanguages`, `wordThemes`, `locationLanguages` and `locationLevels` list what the generators accept; `randCountMax`, `randLengthMin` / `Max`, `randSentenceLengthMax`, `randLocationLengthMax`, `affixLengthDefault` / `Max`, `affixSeparatorDefault` and `affixCharset` are the bounds and defaults every parameter is clamped to.
+`nameLanguages`, `wordLanguages`, `wordThemes`, `locationLanguages`, `locationLevels` and `ageGroups` list what the generators accept; `randCountMax`, `randLengthMin` / `Max`, `randSentenceLengthMax`, `randLocationLengthMax`, `randAgeMax`, `affixLengthDefault` / `Max`, `affixSeparatorDefault` and `affixCharset` are the bounds and defaults every parameter is clamped to.
 
 ## Differences from the npm package
 

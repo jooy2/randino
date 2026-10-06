@@ -24,6 +24,11 @@ def test_the_package_exports_exactly_its_public_api() -> None:
         "AFFIX_LENGTH_DEFAULT",
         "AFFIX_LENGTH_MAX",
         "AFFIX_SEPARATOR_DEFAULT",
+        "AGE_GROUPS",
+        "AgeDetail",
+        "AgeDistribution",
+        "AgeGroup",
+        "AgeGroupOption",
         "CountryDetail",
         "LOCATION_LANGUAGES",
         "LOCATION_LEVELS",
@@ -40,6 +45,7 @@ def test_the_package_exports_exactly_its_public_api() -> None:
         "NameLanguageOption",
         "NameScript",
         "NicknameDetail",
+        "RAND_AGE_MAX",
         "RAND_COUNT_MAX",
         "RAND_LENGTH_MAX",
         "RAND_LENGTH_MIN",
@@ -72,6 +78,7 @@ def test_the_package_exports_exactly_its_public_api() -> None:
         "name_supports_middle_name",
         "name_supports_roman",
         "nickname_length_range",
+        "rand_age",
         "rand_animal",
         "rand_body",
         "rand_city",
@@ -174,6 +181,12 @@ def test_the_functions_are_callable_and_the_constants_are_what_they_claim() -> N
     assert randino.RAND_LOCATION_LENGTH_MAX == 100
     assert randino.LOCATION_LEVELS == ("country", "region", "city", "district")
 
+    # An age is a number rather than a string, and its groups are what `group` accepts.
+    assert isinstance(randino.rand_age()[0], int)
+    assert randino.rand_age(output="detail")[0].group in randino.AGE_GROUPS
+    assert randino.RAND_AGE_MAX == 120
+    assert randino.AGE_GROUPS == ("child", "teen", "adult", "senior")
+
 
 def test_the_package_imports_nothing_outside_the_standard_library() -> None:
     # Zero runtime dependencies is a hard constraint, not a preference — it is why
@@ -244,6 +257,10 @@ def test_an_option_the_types_rule_out_falls_back_rather_than_raising() -> None:
         lambda: loose.rand_location(min_length=float("nan")),
         lambda: loose.rand_city(language="ja"),
         lambda: loose.rand_country(language="xx", min_length=float("nan")),
+        lambda: loose.rand_age(group="elder"),
+        lambda: loose.rand_age(group=[None]),
+        lambda: loose.rand_age(distribution="normal"),
+        lambda: loose.rand_age(min_age=float("nan"), max_age="x"),
     ]
 
     for ask in asks:
@@ -252,6 +269,8 @@ def test_an_option_the_types_rule_out_falls_back_rather_than_raising() -> None:
     # And the fallback is the option's own default, not silence: `count=nan` asked for
     # one name and used to hand back none.
     assert len(loose.rand_name(count=float("nan"))) == 1
+    # An age range that is not a number is the default range, not an empty one.
+    assert loose.rand_age(min_age=float("nan"), max_age=float("nan"))[0] <= 100
     # A token of no length is not a token.
     assert len(loose.rand_suffix("x", length=float("nan"))) == len("x_") + 5
 
@@ -290,6 +309,7 @@ def test_random_is_where_every_draw_of_a_call_comes_from() -> None:
     twice(lambda: randino.rand_modifier(["사자", "여우"], random=Random(42).random))
     twice(lambda: randino.rand_location(count=5, random=Random(42).random))
     twice(lambda: randino.rand_city(language="en", max_length=8, count=5, random=Random(42).random))
+    twice(lambda: randino.rand_age(count=5, random=Random(42).random))
 
     # Two different seeds are two different answers, so the source is actually what
     # the draws are coming from.

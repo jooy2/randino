@@ -1,6 +1,6 @@
 # Supported languages
 
-randino generates in nine languages, each with its own pools, its own name order and its own romanization. Every generator takes a language, and mixes all of the ones it supports when you leave it out. Locations are the exception to nine: they are [two languages so far](#locations).
+randino generates in nine languages, each with its own pools, its own name order and its own romanization. Every generator takes a language, and mixes all of the ones it supports when you leave it out — except [`randAge`](../age/rand-age), because an age has none. Locations are the exception to nine: they are [two languages so far](#locations).
 
 | Code | Language   | Native     | Person names | Words and nicknames | Sentences | Locations |
 | ---- | ---------- | ---------- | :----------: | :-----------------: | :-------: | :-------: |

@@ -46,3 +46,9 @@ const int randSentenceCountMax = 10;
 /// University of Virginia's College at Wise, Virginia, United States`), and a
 /// single US place name already runs to forty-four.
 const int randLocationLengthMax = 100;
+
+/// Upper bound for `minAge` / `maxAge` on `randAge`, in years.
+///
+/// The age curve runs out here: the oldest anybody has been verified to live is
+/// a little past it, and a sample has no use for a record.
+const int randAgeMax = 120;

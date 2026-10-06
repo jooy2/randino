@@ -38,6 +38,9 @@ void main() {
       expect(
         exportedNames().toList()..sort(),
         <String>[
+          'AgeDetail',
+          'AgeDistribution',
+          'AgeGroup',
           'CountryDetail',
           'LengthRange',
           'LocationDetail',
@@ -67,6 +70,7 @@ void main() {
           'affixLengthDefault',
           'affixLengthMax',
           'affixSeparatorDefault',
+          'ageGroups',
           'locationLanguages',
           'locationLevels',
           'nameLanguages',
@@ -77,6 +81,9 @@ void main() {
           'nicknameLengthRange',
           'sentenceLengthRange',
           'wordThemes',
+          'randAge',
+          'randAgeDetails',
+          'randAgeMax',
           'randAnimal',
           'randBody',
           'randCity',
@@ -196,6 +203,13 @@ void main() {
         LocationLevel.city,
         LocationLevel.district,
       ]);
+
+      // An age is a number rather than a string, and its groups are what `group`
+      // accepts.
+      expect(randAge(), hasLength(1));
+      expect(randAgeDetails()[0], isA<AgeDetail>());
+      expect(randAgeMax, 120);
+      expect(ageGroups, <AgeGroup>[AgeGroup.child, AgeGroup.teen, AgeGroup.adult, AgeGroup.senior]);
     });
 
     test('the bounds are the same numbers the JavaScript package uses', () {
@@ -224,6 +238,7 @@ void main() {
       expect(wordThemes.toSet(), WordTheme.values.toSet());
       expect(locationLanguages.toSet(), LocationLanguage.values.toSet());
       expect(locationLevels.toSet(), LocationLevel.values.toSet());
+      expect(ageGroups.toSet(), AgeGroup.values.toSet());
     });
 
     test('a length range the wrong way round keeps maxLength', () {
@@ -275,6 +290,7 @@ void main() {
               random: Random(42),
             ).join(),
       );
+      twice(() => randAge(count: 5, random: Random(42)).join(','));
       twice(() => randSuffixAll(const ['a', 'b'], random: Random(42)).join());
       twice(() => randModifierAll(const ['사자', '여우'], random: Random(42)).join());
 

@@ -818,3 +818,64 @@ export interface LocationDetail {
 	city: string | null;
 	district: string | null;
 }
+
+/**
+ * Which part of a life an age falls in:
+ * - `child`: 0 to 12.
+ * - `teen`: 13 to 19, the ages that end in "-teen".
+ * - `adult`: 20 to 64.
+ * - `senior`: 65 and over, the age most pension and statistics systems count
+ *   old age from.
+ */
+export type AgeGroup = 'child' | 'teen' | 'adult' | 'senior';
+
+/**
+ * Which groups an age may fall in. An array is a set to draw from, so
+ * `['adult', 'senior']` is any age from 20 up, and `'all'` is every one of them.
+ */
+export type AgeGroupOption = AgeGroup | readonly AgeGroup[] | 'all';
+
+/**
+ * How likely each age is:
+ * - `population`: along a curve shaped like a population, so a draw lands on a
+ *   young adult far more often than on a child or somebody past seventy. The
+ *   default.
+ * - `uniform`: every age in the range as often as any other.
+ */
+export type AgeDistribution = 'population' | 'uniform';
+
+/**
+ * What `randAge` takes. An age is a number, so it has no language, no length and
+ * no first character, and none of the options that ask about those.
+ */
+export interface RandAgeOptions extends Pick<
+	RandCommonOptions,
+	'count' | 'unique' | 'output' | 'random'
+> {
+	/** The youngest age to return, in whole years. Default `0`, minimum `0`. */
+	minAge?: number;
+	/**
+	 * The oldest age to return, in whole years. Default `100`, or `RAND_AGE_MAX`
+	 * when `minAge` is above 100; maximum `RAND_AGE_MAX`. A range the wrong way
+	 * round keeps `maxAge`.
+	 */
+	maxAge?: number;
+	/**
+	 * Which part of a life the ages come from. Default `'all'`.
+	 *
+	 * It narrows the range rather than replacing it, so `group: 'adult'` with
+	 * `maxAge: 30` is 20 to 30. A group with no age inside the range is not one
+	 * the range can answer, and the range wins: the ages come from `minAge` to
+	 * `maxAge` as though no group had been named.
+	 */
+	group?: AgeGroupOption;
+	/** How likely each age is. Default `'population'`. */
+	distribution?: AgeDistribution;
+}
+
+/** A generated age with the part of a life it falls in. */
+export interface AgeDetail {
+	/** The age, in whole years. */
+	age: number;
+	group: AgeGroup;
+}

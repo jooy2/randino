@@ -10,6 +10,7 @@ Every generator counts, clamps and deduplicates the same way, so the bounds are 
 
 ```javascript
 import {
+	RAND_AGE_MAX,
 	RAND_COUNT_MAX,
 	RAND_LENGTH_MAX,
 	RAND_LENGTH_MIN,
@@ -24,6 +25,7 @@ import {
 | `RAND_LENGTH_MAX`          | `number` | `40`    |
 | `RAND_SENTENCE_LENGTH_MAX` | `number` | `200`   |
 | `RAND_LOCATION_LENGTH_MAX` | `number` | `100`   |
+| `RAND_AGE_MAX`             | `number` | `120`   |
 | `RAND_COUNT_MAX`           | `number` | `10000` |
 
 :::
@@ -40,6 +42,7 @@ import 'package:randino/randino.dart';
 | `randLengthMax`         | `int` | `40`    |
 | `randSentenceLengthMax` | `int` | `200`   |
 | `randLocationLengthMax` | `int` | `100`   |
+| `randAgeMax`            | `int` | `120`   |
 | `randCountMax`          | `int` | `10000` |
 
 :::
@@ -48,6 +51,7 @@ import 'package:randino/randino.dart';
 
 ```python
 from randino import (
+    RAND_AGE_MAX,
     RAND_COUNT_MAX,
     RAND_LENGTH_MAX,
     RAND_LENGTH_MIN,
@@ -62,11 +66,12 @@ from randino import (
 | `RAND_LENGTH_MAX`          | `int` | `40`    |
 | `RAND_SENTENCE_LENGTH_MAX` | `int` | `200`   |
 | `RAND_LOCATION_LENGTH_MAX` | `int` | `100`   |
+| `RAND_AGE_MAX`             | `int` | `120`   |
 | `RAND_COUNT_MAX`           | `int` | `10000` |
 
 :::
 
-The length options are clamped into `1 … 40`, counted in characters of what the generator returns, except on `randSentence`, whose ceiling is `200`, and on the location generators, whose ceiling is `100`. A sentence is many words where a name, a word and a nickname are at most three, and a location is every level of it written out at once. `count` is clamped into `0 … 10000`, because an unbounded count with `unique` on can spend a long time re-drawing from an exhausted pool.
+The length options are clamped into `1 … 40`, counted in characters of what the generator returns, except on `randSentence`, whose ceiling is `200`, and on the location generators, whose ceiling is `100`. A sentence is many words where a name, a word and a nickname are at most three, and a location is every level of it written out at once. `randAge` takes no length, and clamps its ages into `0 … 120` instead. `count` is clamped into `0 … 10000`, because an unbounded count with `unique` on can spend a long time re-drawing from an exhausted pool.
 
 ## Names
 
@@ -188,6 +193,46 @@ from randino import LOCATION_LANGUAGES, LOCATION_LEVELS
 
 :::
 
+## Ages
+
+::: lang js
+
+```javascript
+import { AGE_GROUPS } from 'randino';
+```
+
+| Name         | Type         | Value                                  |
+| ------------ | ------------ | -------------------------------------- |
+| `AGE_GROUPS` | `AgeGroup[]` | `['child', 'teen', 'adult', 'senior']` |
+
+:::
+
+::: lang dart
+
+```dart
+import 'package:randino/randino.dart';
+```
+
+| Name        | Type             | Value                       |
+| ----------- | ---------------- | --------------------------- |
+| `ageGroups` | `List<AgeGroup>` | Every group, youngest first |
+
+:::
+
+::: lang py
+
+```python
+from randino import AGE_GROUPS
+```
+
+| Name         | Type                 | Value                                  |
+| ------------ | -------------------- | -------------------------------------- |
+| `AGE_GROUPS` | `tuple[AgeGroup, …]` | `('child', 'teen', 'adult', 'senior')` |
+
+:::
+
+The ages each group covers are on the [`randAge`](../age/rand-age#groups) page.
+
 ## Affixes
 
 ::: lang js
@@ -299,6 +344,10 @@ Every public type is exported alongside the functions, so an options object can 
 
 ```typescript
 import type {
+	AgeDetail,
+	AgeDistribution,
+	AgeGroup,
+	AgeGroupOption,
 	NameDetail,
 	NameGender,
 	NameGenderOption,
@@ -315,6 +364,7 @@ import type {
 	LocationLanguage,
 	LocationLanguageOption,
 	LocationLevel,
+	RandAgeOptions,
 	RandCountryOptions,
 	RandLocationOptions,
 	RandNameOptions,
@@ -337,12 +387,13 @@ Every public type is exported alongside the functions:
 import 'package:randino/randino.dart';
 
 // Enums
+AgeGroup, AgeDistribution
 NameLanguage, NameGender, NameScript
 WordLanguage, WordTheme
 LocationLanguage, LocationLevel
 
 // Values
-LengthRange, NameDetail, NicknameDetail, LocationDetail, CountryDetail
+LengthRange, AgeDetail, NameDetail, NicknameDetail, LocationDetail, CountryDetail
 ```
 
 There is no `…Option` type and no `all` member: **a null enum is what means "every one of them"**, so the parameter you do not write is already the mixed draw. That also means the helpers take the same type the generators do, rather than a narrower one.
@@ -355,6 +406,10 @@ Every public type is importable alongside the functions, and the package ships a
 
 ```python
 from randino import (
+    AgeDetail,
+    AgeDistribution,
+    AgeGroup,
+    AgeGroupOption,
     NameDetail,
     NameGender,
     NameGenderOption,

@@ -47,3 +47,10 @@ level of it at once: the longest today is sixty-nine characters (`The University
 Virginia's College at Wise, Virginia, United States`), and a single US place name already
 runs to forty-four.
 """
+
+RAND_AGE_MAX = 120
+"""Upper bound for `min_age` / `max_age` on `rand_age`, in years.
+
+The age curve runs out here: the oldest anybody has been verified to live is a little
+past it, and a sample has no use for a record.
+"""

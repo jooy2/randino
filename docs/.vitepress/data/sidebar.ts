@@ -13,16 +13,16 @@
  * because the two generators are two things, but a reader looking for the
  * function they are about to call does not care which folder it lives in. The
  * split here is by what a function *is*, one level down inside **API**:
- * **Generators** hand back names, nicknames, words and sentences out of nothing,
+ * **Generators** hand back names, words, sentences and the rest out of nothing,
  * **Decorators** attach something to a string you already have, and
  * **Utilities** answer a question about a language. The folder a page sits in
  * decides nothing but its URL.
  *
- * **Generators** is the one that goes a level deeper, into **General** — the
- * five that generate a kind of text — and two groups of the same function with
- * one argument decided: **Words**, the twenty-nine themed forms of `randWord`, and
+ * **Generators** is the one that goes a level deeper, into **General** — one
+ * function per kind of value — and two groups of the same function with one
+ * argument decided: **Words**, the twenty-nine themed forms of `randWord`, and
  * **Locations**, the four level forms of `randLocation`. Thirty-eight entries in
- * one list would bury the five, so the forms sit beside them rather than among
+ * one list would bury the rest, so the forms sit beside them rather than among
  * them.
  *
  * Words and Locations are the groups the navbar's API dropdown leaves out, which
@@ -95,7 +95,8 @@ export const SIDEBAR: SidebarGroup[] = [
 							{ path: 'nickname/rand-nickname', en: 'randNickname', ko: 'randNickname' },
 							{ path: 'word/rand-word', en: 'randWord', ko: 'randWord' },
 							{ path: 'sentence/rand-sentence', en: 'randSentence', ko: 'randSentence' },
-							{ path: 'location/rand-location', en: 'randLocation', ko: 'randLocation' }
+							{ path: 'location/rand-location', en: 'randLocation', ko: 'randLocation' },
+							{ path: 'age/rand-age', en: 'randAge', ko: 'randAge' }
 						]
 					},
 					{

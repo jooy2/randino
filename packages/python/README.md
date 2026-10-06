@@ -10,13 +10,14 @@ Every option and every example, with **Python** picked in the sidebar. This READ
 
 ---
 
-**randino** generates random person names, nicknames, words, sentences and real locations in the language you ask for.
+**randino** generates random person names, nicknames, words, sentences, real locations and ages in the language you ask for.
 
 - **Person names** read like names people carry: Emma Clover, Jack Reeves, each with its English pronunciation. 9 languages.
 - **Nicknames** are handles for a game or a website: MistyOwl, CraneVoyage, RustyBoot. Built from everyday words across twenty-nine themes, and never from person names.
 - **Words** are those twenty-nine themes on their own: `rand_word`, plus `rand_animal`, `rand_food` and twenty-seven more.
 - **Sentences** are whole statements in the language's own grammar, from `rand_sentence`. The verb decides what can stand beside it, so the words of one sentence belong together.
 - **Locations** are real places down to a neighbourhood or a city, from `rand_location`: Korean and US divisions, as each country publishes them.
+- **Ages** are whole numbers drawn along a curve shaped like a population, from `rand_age`, so a sample of people is mostly adults.
 - **Decorators** attach something to a string you already have: `rand_suffix`, `rand_prefix` and `rand_modifier`.
 - Every argument is keyword-only and optional, so `rand_name()` on its own works.
 - **Pure Python, no dependencies.** It imports nothing outside the standard library, and ships a `py.typed` marker so mypy and Pyright read the annotations.
@@ -224,6 +225,32 @@ rand_city(language="ko", output="detail")
 
 `level` is how far down the location goes: `"country"`, `"region"`, `"city"` or `"district"`. A country without that level stops at the deepest one it has, so an English location ends at its city. `include_country=False` leaves the country out of the string, which is what a fixed `language` usually wants. `rand_region`, `rand_city` and `rand_district` take the same arguments minus `level`, and hand back that one division's name. `rand_country` is the exception: its `language` is any `WordLanguage`, and it names any of the 249 ISO 3166-1 countries and territories in any of the nine languages, with each one's code in a `CountryDetail` when `output="detail"`.
 
+## Ages
+
+Ages for sample people, in whole years. The draw follows a curve shaped like a population rather than an even spread: it peaks from 25 to 35, sits lower for children and falls away past seventy, so a third of the ages are in their twenties and thirties and about 2% are past eighty.
+
+```python
+from randino import rand_age
+
+rand_age(count=5)  # [27, 8, 41, 63, 30]
+rand_age(min_age=18, max_age=39, count=3)  # [22, 35, 31]
+rand_age(group=("teen", "senior"), count=3)  # [15, 71, 66]
+rand_age(distribution="uniform", count=3)  # [91, 4, 57]
+
+rand_age(output="detail")  # [AgeDetail(age=16, group='teen')]
+```
+
+| Argument              | Type                        | Default        |
+| --------------------- | --------------------------- | -------------- |
+| `min_age` / `max_age` | `int \| None`               | `0` / `100`    |
+| `group`               | `AgeGroupOption`            | `"all"`        |
+| `distribution`        | `"population" \| "uniform"` | `"population"` |
+| `count`               | `int`                       | `1`            |
+| `unique`              | `bool`                      | `False`        |
+| `output`              | `"value" \| "detail"`       | `"value"`      |
+
+`group` is `"child"` (0 to 12), `"teen"` (13 to 19), `"adult"` (20 to 64) or `"senior"` (65 and up), or a sequence of them, and narrows the range rather than replacing it. An age has no language, so `rand_age` takes none.
+
 ## Decorators
 
 `rand_suffix`, `rand_prefix` and `rand_modifier` attach something to a string you already have, rather than generating one. They take anything, not just this library's output, which is why none of them is an argument on a generator. Each of them also works with no value at all, handing back the thing it would have attached.
@@ -285,7 +312,7 @@ nickname_length_range("ko")  # (1, 13)
 sentence_length_range("ko")  # (5, 43)
 ```
 
-`NAME_LANGUAGES`, `WORD_LANGUAGES`, `WORD_THEMES`, `LOCATION_LANGUAGES` and `LOCATION_LEVELS` list what the generators accept; `RAND_COUNT_MAX`, `RAND_LENGTH_MIN` / `MAX`, `RAND_LOCATION_LENGTH_MAX`, `AFFIX_LENGTH_DEFAULT` / `MAX`, `AFFIX_SEPARATOR_DEFAULT` and `AFFIX_CHARSET` are the bounds and defaults every argument is clamped to.
+`NAME_LANGUAGES`, `WORD_LANGUAGES`, `WORD_THEMES`, `LOCATION_LANGUAGES`, `LOCATION_LEVELS` and `AGE_GROUPS` list what the generators accept; `RAND_COUNT_MAX`, `RAND_LENGTH_MIN` / `MAX`, `RAND_LOCATION_LENGTH_MAX`, `RAND_AGE_MAX`, `AFFIX_LENGTH_DEFAULT` / `MAX`, `AFFIX_SEPARATOR_DEFAULT` and `AFFIX_CHARSET` are the bounds and defaults every argument is clamped to.
 
 ## Differences from the npm package
 

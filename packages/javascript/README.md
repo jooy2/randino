@@ -10,13 +10,14 @@ Every option and every example, with **JavaScript** picked in the sidebar. This 
 
 ---
 
-**randino** generates random person names, nicknames, words, sentences and real locations in the language you ask for.
+**randino** generates random person names, nicknames, words, sentences, real locations and ages in the language you ask for.
 
 - **Person names** read like names people carry: Emma Clover, Jack Reeves, each with its English pronunciation. 9 languages.
 - **Nicknames** are handles for a game or a website: MistyOwl, CraneVoyage, RustyBoot. Built from everyday words across twenty-nine themes, and never from person names.
 - **Words** are those themes on their own: `randWord`, plus `randAnimal`, `randFood` and twenty-seven more.
 - **Sentences** are whole statements in the language's own grammar, from `randSentence`. The verb decides what can stand beside it, so the words of one sentence belong together.
 - **Locations** are real places down to a neighbourhood or a city, from `randLocation`: Korean and US divisions, as each country publishes them, and every country's name in all nine languages from `randCountry`.
+- **Ages** are whole numbers drawn along a curve shaped like a population, from `randAge`, so a sample of people is mostly adults.
 - **Decorators** attach something to a string you already have: `randSuffix`, `randPrefix` and `randModifier`.
 - One options object per generator, every option optional: `randName()` on its own works.
 - **No runtime dependencies.** ESM, typed, and it runs in Node and in the browser alike.
@@ -243,6 +244,32 @@ randCountry({ language: 'ja', output: 'detail' });
 // [{ country: 'サウジアラビア', code: 'SA', language: 'ja' }]
 ```
 
+## Ages
+
+Ages for sample people, in whole years. The draw follows a curve shaped like a population rather than an even spread: it peaks from 25 to 35, sits lower for children and falls away past seventy, so a third of the ages are in their twenties and thirties and about 2% are past eighty.
+
+```javascript
+import { randAge } from 'randino';
+
+randAge({ count: 5 }); // [27, 8, 41, 63, 30]
+randAge({ minAge: 18, maxAge: 39, count: 3 }); // [22, 35, 31]
+randAge({ group: ['teen', 'senior'], count: 3 }); // [15, 71, 66]
+randAge({ distribution: 'uniform', count: 3 }); // [91, 4, 57]
+
+randAge({ output: 'detail' }); // [{ age: 16, group: 'teen' }]
+```
+
+| Option              | Type                        | Default        |
+| ------------------- | --------------------------- | -------------- |
+| `minAge` / `maxAge` | `number`                    | `0` / `100`    |
+| `group`             | `AgeGroupOption`            | `'all'`        |
+| `distribution`      | `'population' \| 'uniform'` | `'population'` |
+| `count`             | `number`                    | `1`            |
+| `unique`            | `boolean`                   | `false`        |
+| `output`            | `'value' \| 'detail'`       | `'value'`      |
+
+`group` is `child` (0 to 12), `teen` (13 to 19), `adult` (20 to 64) or `senior` (65 and up), or an array of them, and narrows the range rather than replacing it. An age has no language, so `randAge` takes none.
+
 ## Decorators
 
 `randSuffix`, `randPrefix` and `randModifier` attach something to a string you already have, rather than generating one. They take anything, not just this library's output, which is why none of them is an option on a generator. Each of them also works with no value at all, handing back the thing it would have attached.
@@ -313,7 +340,7 @@ sentenceLengthRange('ko'); // [5, 43]
 wordLengthRange('ko'); // [1, 4]
 ```
 
-`NAME_LANGUAGES`, `WORD_LANGUAGES` and `WORD_THEMES` list what the generators accept; `RAND_COUNT_MAX`, `RAND_LENGTH_MIN` / `_MAX`, `RAND_SENTENCE_LENGTH_MAX`, `AFFIX_LENGTH_DEFAULT` / `_MAX`, `AFFIX_SEPARATOR_DEFAULT` and `AFFIX_CHARSET` are the bounds and defaults every option is clamped to.
+`NAME_LANGUAGES`, `WORD_LANGUAGES`, `WORD_THEMES` and `AGE_GROUPS` list what the generators accept; `RAND_COUNT_MAX`, `RAND_LENGTH_MIN` / `_MAX`, `RAND_SENTENCE_LENGTH_MAX`, `RAND_AGE_MAX`, `AFFIX_LENGTH_DEFAULT` / `_MAX`, `AFFIX_SEPARATOR_DEFAULT` and `AFFIX_CHARSET` are the bounds and defaults every option is clamped to.
 
 ## Development
 

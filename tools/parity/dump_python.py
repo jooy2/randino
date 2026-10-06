@@ -10,7 +10,9 @@ from collections.abc import Mapping, Sequence
 from typing import Any
 
 from randino._internal.parse import NameToken, outline
+from randino.age.data import AGE_BANDS, AGE_CURVE, AGE_GROUPS, AGE_MAX_DEFAULT
 from randino.constants import (
+    RAND_AGE_MAX,
     RAND_COUNT_MAX,
     RAND_LENGTH_MAX,
     RAND_LENGTH_MIN,
@@ -402,10 +404,17 @@ print(
                 "randLengthMax": RAND_LENGTH_MAX,
                 "randSentenceLengthMax": RAND_SENTENCE_LENGTH_MAX,
                 "randLocationLengthMax": RAND_LOCATION_LENGTH_MAX,
+                "randAgeMax": RAND_AGE_MAX,
                 "affixLengthDefault": AFFIX_LENGTH_DEFAULT,
                 "affixLengthMax": AFFIX_LENGTH_MAX,
                 "affixSeparatorDefault": AFFIX_SEPARATOR_DEFAULT,
                 "affixCharset": AFFIX_CHARSET,
+            },
+            "age": {
+                "groups": list(AGE_GROUPS),
+                "bands": {group: list(AGE_BANDS[group]) for group in AGE_GROUPS},
+                "curve": [[age, weight] for age, weight in AGE_CURVE],
+                "maxDefault": AGE_MAX_DEFAULT,
             },
             # The outline is compared as each package parses it rather than as the text it
             # is written in, so a parser that reads `_` or a skipped level differently

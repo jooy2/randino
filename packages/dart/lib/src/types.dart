@@ -755,3 +755,45 @@ class CountryDetail {
   @override
   String toString() => 'CountryDetail($country, $code, ${language.name})';
 }
+
+/// Which part of a life an age falls in.
+enum AgeGroup {
+  /// 0 to 12.
+  child,
+
+  /// 13 to 19, the ages that end in "-teen".
+  teen,
+
+  /// 20 to 64.
+  adult,
+
+  /// 65 and over, the age most pension and statistics systems count old age
+  /// from.
+  senior,
+}
+
+/// How likely each age is.
+enum AgeDistribution {
+  /// Along a curve shaped like a population, so a draw lands on a young adult
+  /// far more often than on a child or somebody past seventy. The default.
+  population,
+
+  /// Every age in the range as often as any other.
+  uniform,
+}
+
+/// A generated age with the part of a life it falls in.
+class AgeDetail {
+  /// Creates a detail record. Returned by the generator; there is rarely a
+  /// reason to build one by hand outside a test.
+  const AgeDetail({required this.age, required this.group});
+
+  /// The age, in whole years.
+  final int age;
+
+  /// The part of a life [age] falls in.
+  final AgeGroup group;
+
+  @override
+  String toString() => 'AgeDetail($age, ${group.name})';
+}

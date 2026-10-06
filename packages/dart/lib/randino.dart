@@ -1,14 +1,15 @@
-/// randino generates random person names, nicknames, words, sentences and
-/// locations in the language you ask for.
+/// randino generates random person names, nicknames, words, sentences,
+/// locations and ages in the language you ask for.
 ///
-/// Five generators, kept apart on purpose. **Person names** read like names
+/// The generators are kept apart on purpose. **Person names** read like names
 /// people actually carry (김민준, Emma Clover) and come with their English
 /// pronunciation. **Nicknames** are the handles someone would pick for a game or
 /// a website (멋진사자, MistyOwl); they are built from everyday words and never
 /// from person names. **Words** are those everyday words on their own,
 /// **sentences** are whole statements written in the language's own grammar, and
 /// **locations** are real places, from the country down to a Korean 읍·면·동 or a
-/// US city.
+/// US city. **Ages** are whole numbers drawn along a curve shaped like a
+/// population.
 ///
 /// ```dart
 /// import 'package:randino/randino.dart';
@@ -23,8 +24,12 @@
 /// nine supported languages.
 library;
 
+export 'src/age/data/index.dart' show ageGroups;
+export 'src/age/rand_age.dart' show randAge;
+export 'src/age/rand_age_details.dart' show randAgeDetails;
 export 'src/constants.dart'
     show
+        randAgeMax,
         randCountMax,
         randLengthMax,
         randLengthMin,
@@ -64,6 +69,9 @@ export 'src/sentence/rand_sentence_details.dart' show randSentenceDetails;
 export 'src/sentence/sentence_length_range.dart' show sentenceLengthRange;
 export 'src/types.dart'
     show
+        AgeDetail,
+        AgeDistribution,
+        AgeGroup,
         CountryDetail,
         LengthRange,
         LocationDetail,

@@ -2,6 +2,13 @@
 // `index.mjs` compares. See `tools/parity/README.md` for what canonical means.
 
 import {
+	AGE_BANDS,
+	AGE_CURVE,
+	AGE_GROUPS,
+	AGE_MAX_DEFAULT
+} from '../../packages/javascript/lib/age/data/index.js';
+import {
+	RAND_AGE_MAX,
 	RAND_COUNT_MAX,
 	RAND_LENGTH_MAX,
 	RAND_LENGTH_MIN,
@@ -128,10 +135,19 @@ console.log(
 			randLengthMax: RAND_LENGTH_MAX,
 			randSentenceLengthMax: RAND_SENTENCE_LENGTH_MAX,
 			randLocationLengthMax: RAND_LOCATION_LENGTH_MAX,
+			randAgeMax: RAND_AGE_MAX,
 			affixLengthDefault: AFFIX_LENGTH_DEFAULT,
 			affixLengthMax: AFFIX_LENGTH_MAX,
 			affixSeparatorDefault: AFFIX_SEPARATOR_DEFAULT,
 			affixCharset: AFFIX_CHARSET
+		},
+		// Each band and each point of the curve is a pair, written as a two-entry list
+		// in all three — a tuple in Python and a record in Dart.
+		age: {
+			groups: [...AGE_GROUPS],
+			bands: Object.fromEntries(AGE_GROUPS.map((group) => [group, [...AGE_BANDS[group]]])),
+			curve: AGE_CURVE.map(([age, weight]) => [age, weight]),
+			maxDefault: AGE_MAX_DEFAULT
 		},
 		// The outline is compared as each package parses it rather than as the text
 		// it is written in, so a parser that reads `_` or a skipped level differently

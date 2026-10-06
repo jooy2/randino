@@ -8,6 +8,7 @@
 
 import 'dart:convert';
 
+import 'package:randino/src/age/data/index.dart';
 import 'package:randino/src/constants.dart';
 import 'package:randino/src/decorate/data/index.dart';
 import 'package:randino/src/internal/parse.dart';
@@ -459,10 +460,19 @@ void main() {
         'randLengthMax': randLengthMax,
         'randSentenceLengthMax': randSentenceLengthMax,
         'randLocationLengthMax': randLocationLengthMax,
+        'randAgeMax': randAgeMax,
         'affixLengthDefault': affixLengthDefault,
         'affixLengthMax': affixLengthMax,
         'affixSeparatorDefault': affixSeparatorDefault,
         'affixCharset': affixCharset,
+      },
+      'age': <String, Object?>{
+        'groups': <String>[for (final group in ageGroups) group.name],
+        'bands': <String, Object?>{
+          for (final group in ageGroups) group.name: <int>[ageBands[group]!.$1, ageBands[group]!.$2],
+        },
+        'curve': <Object?>[for (final (age, weight) in ageCurve) <num>[age, weight]],
+        'maxDefault': ageMaxDefault,
       },
       // The outline is compared as each package parses it rather than as the text
       // it is written in, so a parser that reads `_` or a skipped level differently

@@ -1,3 +1,4 @@
+export * from './age/index.js';
 export * from './decorate/index.js';
 export * from './constants.js';
 export * from './location/index.js';

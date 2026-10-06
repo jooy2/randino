@@ -497,3 +497,39 @@ class CountryDetail:
 
     language: WordLanguage
     """The language the name is written in."""
+
+
+AgeGroup = Literal["child", "teen", "adult", "senior"]
+"""Which part of a life an age falls in.
+
+- `child`: 0 to 12.
+- `teen`: 13 to 19, the ages that end in "-teen".
+- `adult`: 20 to 64.
+- `senior`: 65 and over, the age most pension and statistics systems count old age from.
+"""
+
+AgeGroupOption = AgeGroup | Sequence[AgeGroup] | Literal["all"]
+"""Which groups an age may fall in.
+
+A sequence is a set to draw from, so `("adult", "senior")` is any age from 20 up, and
+`"all"` is every one of them.
+"""
+
+AgeDistribution = Literal["population", "uniform"]
+"""How likely each age is.
+
+- `population`: along a curve shaped like a population, so a draw lands on a young adult
+  far more often than on a child or somebody past seventy. The default.
+- `uniform`: every age in the range as often as any other.
+"""
+
+
+@dataclass(frozen=True, slots=True)
+class AgeDetail:
+    """A generated age with the part of a life it falls in."""
+
+    age: int
+    """The age, in whole years."""
+
+    group: AgeGroup
+    """The part of a life the age falls in."""

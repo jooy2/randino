@@ -44,3 +44,10 @@ export const RAND_SENTENCE_COUNT_MAX = 10;
  * States`), and a single US place name already runs to forty-four.
  */
 export const RAND_LOCATION_LENGTH_MAX = 100;
+
+/**
+ * Upper bound for `minAge` / `maxAge` on `randAge`, in years. The age curve runs
+ * out here: the oldest anybody has been verified to live is a little past it, and
+ * a sample has no use for a record.
+ */
+export const RAND_AGE_MAX = 120;

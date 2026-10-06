@@ -10,6 +10,7 @@
 
 ```javascript
 import {
+	RAND_AGE_MAX,
 	RAND_COUNT_MAX,
 	RAND_LENGTH_MAX,
 	RAND_LENGTH_MIN,
@@ -24,6 +25,7 @@ import {
 | `RAND_LENGTH_MAX`          | `number` | `40`    |
 | `RAND_SENTENCE_LENGTH_MAX` | `number` | `200`   |
 | `RAND_LOCATION_LENGTH_MAX` | `number` | `100`   |
+| `RAND_AGE_MAX`             | `number` | `120`   |
 | `RAND_COUNT_MAX`           | `number` | `10000` |
 
 :::
@@ -40,6 +42,7 @@ import 'package:randino/randino.dart';
 | `randLengthMax`         | `int` | `40`    |
 | `randSentenceLengthMax` | `int` | `200`   |
 | `randLocationLengthMax` | `int` | `100`   |
+| `randAgeMax`            | `int` | `120`   |
 | `randCountMax`          | `int` | `10000` |
 
 :::
@@ -48,6 +51,7 @@ import 'package:randino/randino.dart';
 
 ```python
 from randino import (
+    RAND_AGE_MAX,
     RAND_COUNT_MAX,
     RAND_LENGTH_MAX,
     RAND_LENGTH_MIN,
@@ -62,11 +66,12 @@ from randino import (
 | `RAND_LENGTH_MAX`          | `int` | `40`    |
 | `RAND_SENTENCE_LENGTH_MAX` | `int` | `200`   |
 | `RAND_LOCATION_LENGTH_MAX` | `int` | `100`   |
+| `RAND_AGE_MAX`             | `int` | `120`   |
 | `RAND_COUNT_MAX`           | `int` | `10000` |
 
 :::
 
-길이 옵션은 생성 결과의 글자 수를 기준으로 `1 … 40`으로 제한됩니다. `randSentence`만은 상한이 `200`이고, 위치 생성 함수는 `100`입니다. 이름과 단어와 닉네임은 길어야 세 단어지만, 문장은 여러 단어이고 위치는 모든 단계를 한 번에 이어 쓰기 때문입니다. `count`는 `0 … 10000`으로 제한되는데, 상한이 있는 이유는 `unique`를 켠 채로 개수를 제한하지 않으면 이미 바닥난 후보에서 계속 다시 뽑느라 오래 걸릴 수 있기 때문입니다.
+길이 옵션은 생성 결과의 글자 수를 기준으로 `1 … 40`으로 제한됩니다. `randSentence`만은 상한이 `200`이고, 위치 생성 함수는 `100`입니다. 이름과 단어와 닉네임은 길어야 세 단어지만, 문장은 여러 단어이고 위치는 모든 단계를 한 번에 이어 쓰기 때문입니다. `randAge`는 길이 대신 나이를 `0 … 120`으로 제한합니다. `count`는 `0 … 10000`으로 제한되는데, 상한이 있는 이유는 `unique`를 켠 채로 개수를 제한하지 않으면 이미 바닥난 후보에서 계속 다시 뽑느라 오래 걸릴 수 있기 때문입니다.
 
 ## 이름
 
@@ -188,6 +193,46 @@ from randino import LOCATION_LANGUAGES, LOCATION_LEVELS
 
 :::
 
+## 나이 {#ages}
+
+::: lang js
+
+```javascript
+import { AGE_GROUPS } from 'randino';
+```
+
+| 이름         | 타입         | 값                                     |
+| ------------ | ------------ | -------------------------------------- |
+| `AGE_GROUPS` | `AgeGroup[]` | `['child', 'teen', 'adult', 'senior']` |
+
+:::
+
+::: lang dart
+
+```dart
+import 'package:randino/randino.dart';
+```
+
+| 이름        | 타입             | 값                       |
+| ----------- | ---------------- | ------------------------ |
+| `ageGroups` | `List<AgeGroup>` | 모든 연령대, 어린 쪽부터 |
+
+:::
+
+::: lang py
+
+```python
+from randino import AGE_GROUPS
+```
+
+| 이름         | 타입                 | 값                                     |
+| ------------ | -------------------- | -------------------------------------- |
+| `AGE_GROUPS` | `tuple[AgeGroup, …]` | `('child', 'teen', 'adult', 'senior')` |
+
+:::
+
+각 연령대가 어느 나이를 다루는지는 [`randAge`](../age/rand-age#groups) 문서에 있습니다.
+
 ## 접미사와 접두사 {#affixes}
 
 ::: lang js
@@ -299,6 +344,10 @@ rand_suffix("MistyOwl", charset="".join(c for c in AFFIX_CHARSET if not c.isuppe
 
 ```typescript
 import type {
+	AgeDetail,
+	AgeDistribution,
+	AgeGroup,
+	AgeGroupOption,
 	NameDetail,
 	NameGender,
 	NameGenderOption,
@@ -315,6 +364,7 @@ import type {
 	LocationLanguage,
 	LocationLanguageOption,
 	LocationLevel,
+	RandAgeOptions,
 	RandCountryOptions,
 	RandLocationOptions,
 	RandNameOptions,
@@ -337,12 +387,13 @@ const options: RandNameOptions = { language: 'ko', count: 3 };
 import 'package:randino/randino.dart';
 
 // enum
+AgeGroup, AgeDistribution
 NameLanguage, NameGender, NameScript
 WordLanguage, WordTheme
 LocationLanguage, LocationLevel
 
 // 값
-LengthRange, NameDetail, NicknameDetail, LocationDetail, CountryDetail
+LengthRange, AgeDetail, NameDetail, NicknameDetail, LocationDetail, CountryDetail
 ```
 
 `…Option` 타입도 없고 `all` 멤버도 없습니다. **null인 enum이 "전부"를 뜻하므로**, 쓰지 않은 파라미터가 이미 섞인 결과를 의미합니다. 그래서 헬퍼들도 더 좁은 타입이 아니라 생성기와 같은 타입을 받습니다.
@@ -355,6 +406,10 @@ LengthRange, NameDetail, NicknameDetail, LocationDetail, CountryDetail
 
 ```python
 from randino import (
+    AgeDetail,
+    AgeDistribution,
+    AgeGroup,
+    AgeGroupOption,
     NameDetail,
     NameGender,
     NameGenderOption,

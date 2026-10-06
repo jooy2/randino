@@ -45,8 +45,9 @@ always reported as the other package's.
 ## What it covers
 
 The word datasets, the sentence datasets, the name datasets, the surname
-romanization map, and the bounds every generator shares (`constants` and
-`decorate/data`). That is everything written once per package as data.
+romanization map, the age groups with their bands and the curve ages are drawn
+along, and the bounds every generator shares (`constants` and `decorate/data`).
+That is everything written once per package as data.
 
 That includes the nickname shapes. They are `WordLanguageData.frames`, one set
 per language with the particle each gap needs, so the slots, the particles and

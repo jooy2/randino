@@ -13,9 +13,11 @@ describe('base test', () => {
 			'AFFIX_LENGTH_DEFAULT',
 			'AFFIX_LENGTH_MAX',
 			'AFFIX_SEPARATOR_DEFAULT',
+			'AGE_GROUPS',
 			'LOCATION_LANGUAGES',
 			'LOCATION_LEVELS',
 			'NAME_LANGUAGES',
+			'RAND_AGE_MAX',
 			'RAND_COUNT_MAX',
 			'RAND_LENGTH_MAX',
 			'RAND_LENGTH_MIN',
@@ -28,6 +30,7 @@ describe('base test', () => {
 			'nameSupportsMiddleName',
 			'nameSupportsRoman',
 			'nicknameLengthRange',
+			'randAge',
 			'randAnimal',
 			'randBody',
 			'randCity',
@@ -127,6 +130,13 @@ describe('base test', () => {
 		assert.strictEqual(randino.randCity({ language: 'en', output: 'detail' })[0].level, 'city');
 		assert.strictEqual(randino.RAND_LOCATION_LENGTH_MAX, 100);
 		assert.deepStrictEqual(randino.LOCATION_LEVELS, ['country', 'region', 'city', 'district']);
+
+		// An age is a number rather than a string, and its groups are what `group`
+		// accepts.
+		assert.strictEqual(typeof randino.randAge()[0], 'number');
+		assert.strictEqual(typeof randino.randAge({ output: 'detail' })[0].group, 'string');
+		assert.strictEqual(randino.RAND_AGE_MAX, 120);
+		assert.deepStrictEqual(randino.AGE_GROUPS, ['child', 'teen', 'adult', 'senior']);
 	});
 
 	it('an option the types rule out falls back rather than throwing', () => {
@@ -161,7 +171,11 @@ describe('base test', () => {
 			() => randino.randLocation({ level: 'street' as never }),
 			() => randino.randLocation({ minLength: NaN }),
 			() => randino.randCity({ language: 'ja' as never }),
-			() => randino.randCountry({ language: 'xx' as never, minLength: NaN })
+			() => randino.randCountry({ language: 'xx' as never, minLength: NaN }),
+			() => randino.randAge({ group: 'elder' as never }),
+			() => randino.randAge({ group: [null] as never }),
+			() => randino.randAge({ distribution: 'normal' as never }),
+			() => randino.randAge({ minAge: NaN, maxAge: 'x' as never })
 		];
 
 		for (const ask of asks) {
@@ -172,6 +186,8 @@ describe('base test', () => {
 		// asked for one name and used to hand back none.
 		assert.strictEqual(randino.randName({ count: NaN }).length, 1);
 		assert.strictEqual(randino.randSentence({ sentences: NaN })[0].split('. ').length, 1);
+		// An age range that is not a number is the default range, not an empty one.
+		assert.ok(randino.randAge({ minAge: NaN, maxAge: NaN })[0] <= 100);
 		// A token of no length is not a token. `NaN` clamped to `NaN`, and a loop
 		// that runs `NaN` times wrote nothing at all.
 		assert.strictEqual(randino.randSuffix('x', { length: NaN }).length, 'x_'.length + 5);
@@ -233,6 +249,7 @@ describe('base test', () => {
 		agrees(() => randino.randModifier('사자', { random: seeded(42) }));
 		agrees(() => randino.randLocation({ count: 5, random: seeded(42) }));
 		agrees(() => randino.randCity({ language: 'en', maxLength: 8, count: 5, random: seeded(42) }));
+		agrees(() => randino.randAge({ count: 5, random: seeded(42) }));
 
 		// Two different seeds are two different answers, so the source is actually
 		// what the draws are coming from.
