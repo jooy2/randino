@@ -1,0 +1,180 @@
+name: release
+
+# A GitHub release for each package tag. The packages version independently, so
+# each is tagged on its own — `javascript-v1.3.0`, `dart-v1.3.0` or
+# `python-v1.3.0` — by hand, on the commit that cut that version, once it is on
+# `main`. npm, pub.dev and PyPI are still published by hand (see `CLAUDE.md`).
+# This covers what sits between the tag and the registry: a check that the tag
+# names the version the manifest holds, the package built the way its registry
+# receives it, and the release page written from that version's changelog.
+#
+# The tests are not run again. The tag goes on a `main` commit that CI has
+# already tested, and every other workflow filters its pushes by branch, so a
+# tag push starts this one alone.
+on:
+  push:
+    tags:
+      - 'javascript-v*'
+      - 'dart-v*'
+      - 'python-v*'
+
+permissions:
+  contents: write
+
+# Two pushes of the same tag are the same release; the second one waits.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  javascript:
+    if: startsWith(github.ref_name, 'javascript-v')
+    runs-on: ubuntu-latest
+    name: GitHub release of the JavaScript package
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: packages/javascript
+
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: packages/javascript/package-lock.json
+
+      # The tag is typed by hand; one pushed onto the wrong commit would
+      # otherwise attach a tarball that says a different version.
+      - name: Check the tag names the version in package.json
+        id: version
+        run: |
+          version=$(node -p "require('./package.json').version")
+          if [ "$GITHUB_REF_NAME" != "javascript-v$version" ]; then
+            echo "::error::The tag is $GITHUB_REF_NAME and package.json says $version. Tag the commit that cut javascript-v$version."
+            exit 1
+          fi
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+
+      # Before the build, so a changelog that still says `vNext` fails in
+      # seconds.
+      - name: Write the release notes from CHANGELOG.md
+        run: node ../../.github/scripts/release-notes.mjs "$GITHUB_REF_NAME" > "$RUNNER_TEMP/notes.md"
+
+      - run: npm ci
+
+      # The package has no `prepare` script, so `npm pack` packs whatever
+      # `dist/` holds; build it first, the way a release is built by hand. The
+      # tarball goes outside the checkout and is exactly what `npm publish`
+      # uploads.
+      - name: Build and pack
+        run: |
+          npm run build
+          mkdir -p "$RUNNER_TEMP/assets"
+          npm pack --pack-destination "$RUNNER_TEMP/assets"
+
+      - name: Publish the GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          TITLE: JavaScript ${{ steps.version.outputs.version }}
+          VERSION: ${{ steps.version.outputs.version }}
+        run: bash ../../.github/scripts/publish-release.sh "$RUNNER_TEMP/notes.md" "$RUNNER_TEMP/assets"
+
+  dart:
+    if: startsWith(github.ref_name, 'dart-v')
+    runs-on: ubuntu-latest
+    name: GitHub release of the Dart package
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: packages/dart
+
+    steps:
+      - uses: actions/checkout@v5
+      # For the notes script; the package itself needs no Node.
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+
+      - name: Check the tag names the version in pubspec.yaml
+        id: version
+        run: |
+          version=$(sed -n 's/^version:[[:space:]]*//p' pubspec.yaml)
+          if [ "$GITHUB_REF_NAME" != "dart-v$version" ]; then
+            echo "::error::The tag is $GITHUB_REF_NAME and pubspec.yaml says $version. Tag the commit that cut dart-v$version."
+            exit 1
+          fi
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+
+      - name: Write the release notes from CHANGELOG.md
+        run: node ../../.github/scripts/release-notes.mjs "$GITHUB_REF_NAME" > "$RUNNER_TEMP/notes.md"
+
+      - uses: dart-lang/setup-dart@v1
+        with:
+          sdk: stable
+      - run: dart pub get
+
+      # pub.dev takes source, and pub has no command that writes the archive it
+      # uploads to a file, so this release carries no asset of its own beyond
+      # the source archives GitHub attaches to every release. What stands in
+      # for building is pub.dev's own check of what `dart pub publish` would
+      # upload. A warning fails it; a hint does not.
+      - name: Validate the package for pub.dev
+        run: dart pub publish --dry-run
+
+      - name: Publish the GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          TITLE: Dart ${{ steps.version.outputs.version }}
+          VERSION: ${{ steps.version.outputs.version }}
+        run: bash ../../.github/scripts/publish-release.sh "$RUNNER_TEMP/notes.md"
+
+  python:
+    if: startsWith(github.ref_name, 'python-v')
+    runs-on: ubuntu-latest
+    name: GitHub release of the Python package
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: packages/python
+
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.14'
+      # For the notes script; the package itself needs no Node.
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+
+      - name: Check the tag names the version in pyproject.toml
+        id: version
+        run: |
+          version=$(python -c "import tomllib; print(tomllib.load(open('pyproject.toml', 'rb'))['project']['version'])")
+          if [ "$GITHUB_REF_NAME" != "python-v$version" ]; then
+            echo "::error::The tag is $GITHUB_REF_NAME and pyproject.toml says $version. Tag the commit that cut python-v$version."
+            exit 1
+          fi
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+
+      - name: Write the release notes from CHANGELOG.md
+        run: node ../../.github/scripts/release-notes.mjs "$GITHUB_REF_NAME" > "$RUNNER_TEMP/notes.md"
+
+      # The wheel and the source distribution, built outside the checkout, and
+      # their metadata read the way PyPI reads it.
+      - name: Build and check
+        run: |
+          pip install build twine
+          python -m build --outdir "$RUNNER_TEMP/assets"
+          twine check --strict "$RUNNER_TEMP/assets"/*
+
+      - name: Publish the GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          TITLE: Python ${{ steps.version.outputs.version }}
+          VERSION: ${{ steps.version.outputs.version }}
+        run: bash ../../.github/scripts/publish-release.sh "$RUNNER_TEMP/notes.md" "$RUNNER_TEMP/assets"

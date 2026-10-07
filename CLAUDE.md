@@ -736,21 +736,23 @@ A theme is a slice of everyday vocabulary that a modifier can sit in front of. A
 
 `tag: message`, Udacity Git style tags: `feat`, `fix`, `docs`, `style`, `refactor`, `test`, `chore`, plus informal `package` (deps/config) and `typo`. Write in English, wrap identifiers and paths in backticks, one logical change per commit. Example: `feat: add \`randNickname\` method`.
 
-A release is its own commit, `bump version to \`x.y.z\``, and touches the package's manifest, its lockfiles and its `CHANGELOG.md` — one bullet per user-visible change, newest version on top, dated. Nothing else belongs in it. The packages version independently, so a release commit touches one package.
+A release is its own commit, `[javascript] bump version to \`x.y.z\``, and touches the package's manifest, its lockfiles and its `CHANGELOG.md` — one bullet per user-visible change, newest version on top, dated. The entries collect under `## vNext (yyyy--)` as they land, and the release commit puts `## x.y.z (yyyy-mm-dd)` under that heading, which stays behind, empty, for the next one. Nothing else belongs in it. The packages version independently, so a release commit touches one package.
 
 ## Releasing
 
-**Publishing is manual, from a maintainer's machine.** No workflow publishes any of the three; CI only tests and deploys the documentation site. Every registry rejects a re-upload of a version that already exists, so the version number is the one thing that cannot be taken back.
+**Publishing is manual, from a maintainer's machine.** No workflow uploads to npm, pub.dev or PyPI; CI tests, deploys the documentation site, and writes a GitHub release for each tag. Every registry rejects a re-upload of a version that already exists, so the version number is the one thing that cannot be taken back.
+
+**Each release commit is tagged `<package>-v<x.y.z>`** — `javascript-v1.3.0`, `dart-v1.3.0`, `python-v1.3.0` — on `main`, after CI has passed on it. A bare `v1.3.0` would not say which package it is, and the packages do not share a version. Pushing the tag starts `.github/workflows/release.yml`, which fails unless the tag names the version in the manifest, then writes the GitHub release from that version's section of the package's `CHANGELOG.md` (`.github/scripts/release-notes.mjs`) and attaches what the registry receives: the `npm pack` tarball, or the wheel and the source distribution. Pub has no command that writes its archive to a file, so a Dart release carries none and runs `dart pub publish --dry-run` in its place. Pushing the same tag again brings an existing release up to date rather than failing.
 
 Before uploading anything, from the package's own directory:
 
-| Package      | Check it                                            | Then                          |
-| ------------ | --------------------------------------------------- | ----------------------------- |
-| `javascript` | `npm run lint && npm run test && npm run build`      | `npm publish`                 |
-| `dart`       | `dart analyze --fatal-infos && dart test` | `dart pub publish`  |
-| `python`     | `ruff check . && mypy && pytest`                     | `uv build && uv publish`      |
+| Package      | Check it                                        | Then                                    |
+| ------------ | ----------------------------------------------- | --------------------------------------- |
+| `javascript` | `npm run lint && npm run test && npm run build` | `npm publish`                           |
+| `dart`       | `dart analyze --fatal-infos && dart test`       | `dart pub publish`                      |
+| `python`     | `ruff check . && mypy && pytest`                | `rm -rf dist && uv build && uv publish` |
 
-Both `dart pub publish` and `uv publish` have a rehearsal worth using — `--dry-run` for the former, and TestPyPI (`uv publish --publish-url https://test.pypi.org/legacy/`) for the latter, which is the only way to see a first upload land without spending the real version. `twine check dist/*` reads the built metadata the way PyPI will.
+`uv build` adds to `dist/` without emptying it, and `uv publish` uploads everything in it, so the previous version's files go first. Both `dart pub publish` and `uv publish` have a rehearsal worth using — `--dry-run` for the former, and TestPyPI (`uv publish --publish-url https://test.pypi.org/legacy/`) for the latter, which is the only way to see a first upload land without spending the real version. `twine check dist/*` reads the built metadata the way PyPI will.
 
 The credentials are the maintainer's own and belong in the tooling's own config, never in the repository.
 
