@@ -437,7 +437,7 @@ The repository's own `README.md` links the file by a relative path, which is wha
 
 ### Deployment
 
-`.github/workflows/publish-documentation.yml` builds the site and pushes `docs-dist/` to the `gh-pages` branch on every push to `main` that touches `docs/`, any package's manifest, or any package's `CHANGELOG.md`. Nothing else in `packages/` reaches the site, so nothing else triggers it. It is the only workflow that deploys, and it repeats `run-build-docs`' three checks — typecheck, format, build — because a commit landing on `main` directly never saw them.
+`.github/workflows/publish-documentation.yml` builds the site and pushes `docs-dist/` to the `gh-pages` branch on every push to `main` that touches `docs/`, any package's manifest, or any package's `CHANGELOG.md`. Nothing else in `packages/` reaches the site, so nothing else triggers it. It is the only workflow that deploys the site, and it repeats `run-build-docs`' three checks — typecheck, format, build — because a commit landing on `main` directly never saw them.
 
 Two things it does not hard-code. The custom domain is read out of the npm package's `homepage`, the same field `config.ts` derives the canonical links and the sitemap from, so the `CNAME` it writes cannot drift from the URL the pages claim. And `run-build-docs` is pull-request-only, so one commit never builds the site twice.
 
@@ -740,19 +740,18 @@ A release is its own commit, `[javascript] bump version to \`x.y.z\``, and touch
 
 ## Releasing
 
-**Publishing is manual, from a maintainer's machine.** No workflow uploads to npm, pub.dev or PyPI; CI tests, deploys the documentation site, and writes a GitHub release for each tag. Every registry rejects a re-upload of a version that already exists, so the version number is the one thing that cannot be taken back.
+**Publishing is a tag push.** Each release commit is tagged `<package>-v<x.y.z>` — `javascript-v1.3.0`, `dart-v1.3.0`, `python-v1.3.0` — on `main`, after CI has passed on it. A bare `v1.3.0` would not say which package it is, and the packages do not share a version. Pushing the tag starts `.github/workflows/release.yml`, which runs two jobs for the package. The first fails unless the tag names the version in the manifest, writes the release notes from that version's section of the package's `CHANGELOG.md` (`.github/scripts/release-notes.mjs`), and builds the package. The second publishes it to its registry and writes the GitHub release with what the registry received attached: the tarball, the archive pub.dev serves, or the wheel and the source distribution.
 
-**Each release commit is tagged `<package>-v<x.y.z>`** — `javascript-v1.3.0`, `dart-v1.3.0`, `python-v1.3.0` — on `main`, after CI has passed on it. A bare `v1.3.0` would not say which package it is, and the packages do not share a version. Pushing the tag starts `.github/workflows/release.yml`, which fails unless the tag names the version in the manifest, then writes the GitHub release from that version's section of the package's `CHANGELOG.md` (`.github/scripts/release-notes.mjs`) and attaches what the registry receives: the `npm pack` tarball, or the wheel and the source distribution. Pub has no command that writes its archive to a file, so a Dart release carries none and runs `dart pub publish --dry-run` in its place. Pushing the same tag again brings an existing release up to date rather than failing.
+**No registry token is stored anywhere.** npm, pub.dev and PyPI each list `release.yml` in this repository, running in the `release` environment, as a trusted publisher, and accept the short-lived token GitHub signs for it. pub.dev also holds the tag pattern `dart-v{{version}}`, and publishes only from a tag push. Renaming the workflow file or the environment breaks publishing until all three settings are changed to match. Only the publishing job has `id-token: write`; the job that installs dependencies and builds holds no credential.
 
-Before uploading anything, from the package's own directory:
+Every registry rejects a re-upload of a version that already exists, so the version number is the one thing that cannot be taken back, and pushing the tag is what spends it. A publish the registry already holds is skipped, so a run that failed after publishing is re-run, not re-tagged.
 
-| Package      | Check it                                        | Then                                    |
+Before tagging, from the package's own directory:
+
+| Package      | Check it                                        | By hand, if the workflow cannot         |
 | ------------ | ----------------------------------------------- | --------------------------------------- |
 | `javascript` | `npm run lint && npm run test && npm run build` | `npm publish`                           |
 | `dart`       | `dart analyze --fatal-infos && dart test`       | `dart pub publish`                      |
 | `python`     | `ruff check . && mypy && pytest`                | `rm -rf dist && uv build && uv publish` |
 
-`uv build` adds to `dist/` without emptying it, and `uv publish` uploads everything in it, so the previous version's files go first. Both `dart pub publish` and `uv publish` have a rehearsal worth using — `--dry-run` for the former, and TestPyPI (`uv publish --publish-url https://test.pypi.org/legacy/`) for the latter, which is the only way to see a first upload land without spending the real version. `twine check dist/*` reads the built metadata the way PyPI will.
-
-The credentials are the maintainer's own and belong in the tooling's own config, never in the repository.
-
+The commands in the last column use the maintainer's own credentials, which belong in the tooling's own config, never in the repository. `uv build` adds to `dist/` without emptying it, and `uv publish` uploads everything in it, so the previous version's files go first. A version published by hand still gets its release from the tag, because the workflow skips the publish it finds already done.

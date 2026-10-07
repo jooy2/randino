@@ -1,12 +1,25 @@
 name: release
 
-# A GitHub release for each package tag. The packages version independently, so
-# each is tagged on its own — `javascript-v1.3.0`, `dart-v1.3.0` or
-# `python-v1.3.0` — by hand, on the commit that cut that version, once it is on
-# `main`. npm, pub.dev and PyPI are still published by hand (see `CLAUDE.md`).
-# This covers what sits between the tag and the registry: a check that the tag
-# names the version the manifest holds, the package built the way its registry
-# receives it, and the release page written from that version's changelog.
+# Publishes a package and writes its GitHub release, from one pushed tag. The
+# packages version independently, so each is tagged on its own —
+# `javascript-v1.3.0`, `dart-v1.3.0` or `python-v1.3.0` — by hand, on the
+# commit that cut that version, once CI has passed on `main`.
+#
+# Each package runs in two jobs. The first checks that the tag names the version
+# the manifest holds, writes the release notes from that version's changelog
+# section, and builds the package the way its registry receives it. It holds no
+# credential, so nothing it installs can publish. The second publishes, through
+# trusted publishing: npm, pub.dev and PyPI each accept a short-lived token that
+# GitHub signs for this workflow, so no registry token is stored anywhere. Then
+# it writes the GitHub release, with the files the registry received attached.
+#
+# The second job runs in the `release` environment, which is the name every
+# registry's trusted publisher is configured with. Required reviewers on that
+# environment turn every publish into one that waits for an approval.
+#
+# A publish that is already on the registry is skipped rather than failed, so a
+# re-run after a later step failed finishes the release instead of stopping at
+# the version that already went out.
 #
 # The tests are not run again. The tag goes on a `main` commit that CI has
 # already tested, and every other workflow filters its pushes by branch, so a
@@ -18,8 +31,8 @@ on:
       - 'dart-v*'
       - 'python-v*'
 
-permissions:
-  contents: write
+# Each job asks for what it needs.
+permissions: {}
 
 # Two pushes of the same tag are the same release; the second one waits.
 concurrency:
@@ -30,8 +43,12 @@ jobs:
   javascript:
     if: startsWith(github.ref_name, 'javascript-v')
     runs-on: ubuntu-latest
-    name: GitHub release of the JavaScript package
+    name: Build the JavaScript package
     timeout-minutes: 15
+    permissions:
+      contents: read
+    outputs:
+      version: ${{ steps.version.outputs.version }}
     defaults:
       run:
         working-directory: packages/javascript
@@ -45,7 +62,7 @@ jobs:
           cache-dependency-path: packages/javascript/package-lock.json
 
       # The tag is typed by hand; one pushed onto the wrong commit would
-      # otherwise attach a tarball that says a different version.
+      # otherwise publish a version the commit does not hold.
       - name: Check the tag names the version in package.json
         id: version
         run: |
@@ -59,33 +76,78 @@ jobs:
       # Before the build, so a changelog that still says `vNext` fails in
       # seconds.
       - name: Write the release notes from CHANGELOG.md
-        run: node ../../.github/scripts/release-notes.mjs "$GITHUB_REF_NAME" > "$RUNNER_TEMP/notes.md"
+        run: |
+          mkdir -p "$RUNNER_TEMP/release/assets"
+          node ../../.github/scripts/release-notes.mjs "$GITHUB_REF_NAME" > "$RUNNER_TEMP/release/notes.md"
 
       - run: npm ci
 
       # The package has no `prepare` script, so `npm pack` packs whatever
-      # `dist/` holds; build it first, the way a release is built by hand. The
-      # tarball goes outside the checkout and is exactly what `npm publish`
-      # uploads.
+      # `dist/` holds; build it first. The tarball is what the next job
+      # publishes, byte for byte.
       - name: Build and pack
         run: |
           npm run build
-          mkdir -p "$RUNNER_TEMP/assets"
-          npm pack --pack-destination "$RUNNER_TEMP/assets"
+          npm pack --pack-destination "$RUNNER_TEMP/release/assets"
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: release
+          path: ${{ runner.temp }}/release
+          if-no-files-found: error
+
+  javascript-publish:
+    needs: javascript
+    runs-on: ubuntu-latest
+    name: Publish the JavaScript package
+    timeout-minutes: 15
+    environment: release
+    permissions:
+      contents: write
+      id-token: write
+
+    steps:
+      - uses: actions/checkout@v5
+      # No `registry-url`: it writes an `.npmrc` that points npm at a token,
+      # and npm then never tries trusted publishing. Node 24 carries an npm new
+      # enough for it (11.5.1 or later).
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+      - uses: actions/download-artifact@v8
+        with:
+          name: release
+          path: ${{ runner.temp }}/release
+
+      # Provenance is attached by npm itself on a trusted publish.
+      - name: Publish to npm
+        env:
+          VERSION: ${{ needs.javascript.outputs.version }}
+        run: |
+          name=$(node -p "require('./packages/javascript/package.json').name")
+          if npm view "$name@$VERSION" version > /dev/null 2>&1; then
+            echo "$name $VERSION is already on npm; not publishing it again."
+          else
+            npm publish "$RUNNER_TEMP"/release/assets/*.tgz
+          fi
 
       - name: Publish the GitHub release
         env:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
-          TITLE: JavaScript ${{ steps.version.outputs.version }}
-          VERSION: ${{ steps.version.outputs.version }}
-        run: bash ../../.github/scripts/publish-release.sh "$RUNNER_TEMP/notes.md" "$RUNNER_TEMP/assets"
+          TITLE: JavaScript ${{ needs.javascript.outputs.version }}
+          VERSION: ${{ needs.javascript.outputs.version }}
+        run: bash .github/scripts/publish-release.sh "$RUNNER_TEMP/release/notes.md" "$RUNNER_TEMP/release/assets"
 
   dart:
     if: startsWith(github.ref_name, 'dart-v')
     runs-on: ubuntu-latest
-    name: GitHub release of the Dart package
+    name: Check the Dart package
     timeout-minutes: 15
+    permissions:
+      contents: read
+    outputs:
+      version: ${{ steps.version.outputs.version }}
     defaults:
       run:
         working-directory: packages/dart
@@ -108,34 +170,103 @@ jobs:
           echo "version=$version" >> "$GITHUB_OUTPUT"
 
       - name: Write the release notes from CHANGELOG.md
-        run: node ../../.github/scripts/release-notes.mjs "$GITHUB_REF_NAME" > "$RUNNER_TEMP/notes.md"
+        run: |
+          mkdir -p "$RUNNER_TEMP/release"
+          node ../../.github/scripts/release-notes.mjs "$GITHUB_REF_NAME" > "$RUNNER_TEMP/release/notes.md"
 
       - uses: dart-lang/setup-dart@v1
         with:
           sdk: stable
       - run: dart pub get
 
-      # pub.dev takes source, and pub has no command that writes the archive it
-      # uploads to a file, so this release carries no asset of its own beyond
-      # the source archives GitHub attaches to every release. What stands in
-      # for building is pub.dev's own check of what `dart pub publish` would
-      # upload. A warning fails it; a hint does not.
+      # pub.dev's own checks on what `dart pub publish` would upload. A warning
+      # fails it; a hint does not.
       - name: Validate the package for pub.dev
         run: dart pub publish --dry-run
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: release
+          path: ${{ runner.temp }}/release
+          if-no-files-found: error
+
+  dart-publish:
+    needs: dart
+    runs-on: ubuntu-latest
+    name: Publish the Dart package
+    timeout-minutes: 20
+    environment: release
+    permissions:
+      contents: write
+      id-token: write
+    defaults:
+      run:
+        working-directory: packages/dart
+
+    steps:
+      - uses: actions/checkout@v5
+      # With `id-token: write`, this step also signs in to pub.dev for the
+      # publish below.
+      - uses: dart-lang/setup-dart@v1
+        with:
+          sdk: stable
+      - uses: actions/download-artifact@v8
+        with:
+          name: release
+          path: ${{ runner.temp }}/release
+      - run: dart pub get
+
+      - name: Publish to pub.dev
+        env:
+          VERSION: ${{ needs.dart.outputs.version }}
+        run: |
+          name=$(sed -n 's/^name:[[:space:]]*//p' pubspec.yaml)
+          if curl -sf "https://pub.dev/api/packages/$name/versions/$VERSION" > /dev/null; then
+            echo "$name $VERSION is already on pub.dev; not publishing it again."
+          else
+            dart pub publish --force
+          fi
+
+      # Pub uploads source and has no command that writes its archive to a
+      # file, so the archive attached is the one pub.dev serves, checked
+      # against the checksum pub.dev reports for it. A new version can take a
+      # few minutes to be listed.
+      - name: Download the archive pub.dev serves
+        env:
+          VERSION: ${{ needs.dart.outputs.version }}
+        run: |
+          name=$(sed -n 's/^name:[[:space:]]*//p' pubspec.yaml)
+          info=""
+          for attempt in $(seq 1 40); do
+            info=$(curl -sf "https://pub.dev/api/packages/$name/versions/$VERSION") && break
+            sleep 15
+          done
+          if [ -z "$info" ]; then
+            echo "::error::pub.dev did not list $name $VERSION within ten minutes. Re-run this job once it does."
+            exit 1
+          fi
+          archive="$RUNNER_TEMP/release/assets/$name-$VERSION.tar.gz"
+          mkdir -p "$(dirname "$archive")"
+          curl -sfL -o "$archive" "$(jq -r .archive_url <<< "$info")"
+          echo "$(jq -r .archive_sha256 <<< "$info")  $archive" | sha256sum -c -
 
       - name: Publish the GitHub release
         env:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
-          TITLE: Dart ${{ steps.version.outputs.version }}
-          VERSION: ${{ steps.version.outputs.version }}
-        run: bash ../../.github/scripts/publish-release.sh "$RUNNER_TEMP/notes.md"
+          TITLE: Dart ${{ needs.dart.outputs.version }}
+          VERSION: ${{ needs.dart.outputs.version }}
+        run: bash ../../.github/scripts/publish-release.sh "$RUNNER_TEMP/release/notes.md" "$RUNNER_TEMP/release/assets"
 
   python:
     if: startsWith(github.ref_name, 'python-v')
     runs-on: ubuntu-latest
-    name: GitHub release of the Python package
+    name: Build the Python package
     timeout-minutes: 15
+    permissions:
+      contents: read
+    outputs:
+      version: ${{ steps.version.outputs.version }}
     defaults:
       run:
         working-directory: packages/python
@@ -161,20 +292,52 @@ jobs:
           echo "version=$version" >> "$GITHUB_OUTPUT"
 
       - name: Write the release notes from CHANGELOG.md
-        run: node ../../.github/scripts/release-notes.mjs "$GITHUB_REF_NAME" > "$RUNNER_TEMP/notes.md"
+        run: |
+          mkdir -p "$RUNNER_TEMP/release/assets"
+          node ../../.github/scripts/release-notes.mjs "$GITHUB_REF_NAME" > "$RUNNER_TEMP/release/notes.md"
 
-      # The wheel and the source distribution, built outside the checkout, and
-      # their metadata read the way PyPI reads it.
+      # The wheel and the source distribution, and their metadata read the way
+      # PyPI reads it.
       - name: Build and check
         run: |
           pip install build twine
-          python -m build --outdir "$RUNNER_TEMP/assets"
-          twine check --strict "$RUNNER_TEMP/assets"/*
+          python -m build --outdir "$RUNNER_TEMP/release/assets"
+          twine check --strict "$RUNNER_TEMP"/release/assets/*
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: release
+          path: ${{ runner.temp }}/release
+          if-no-files-found: error
+
+  python-publish:
+    needs: python
+    runs-on: ubuntu-latest
+    name: Publish the Python package
+    timeout-minutes: 15
+    environment: release
+    permissions:
+      contents: write
+      id-token: write
+
+    steps:
+      - uses: actions/checkout@v5
+      # No floating major tag is published for this action, so it is pinned.
+      - uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
+      - uses: actions/download-artifact@v8
+        with:
+          name: release
+          path: ${{ runner.temp }}/release
+
+      # `--check-url` skips a file PyPI already holds with the same content,
+      # so a re-run uploads only what is missing.
+      - name: Publish to PyPI
+        run: uv publish --trusted-publishing always --check-url https://pypi.org/simple/ "$RUNNER_TEMP"/release/assets/*
 
       - name: Publish the GitHub release
         env:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
-          TITLE: Python ${{ steps.version.outputs.version }}
-          VERSION: ${{ steps.version.outputs.version }}
-        run: bash ../../.github/scripts/publish-release.sh "$RUNNER_TEMP/notes.md" "$RUNNER_TEMP/assets"
+          TITLE: Python ${{ needs.python.outputs.version }}
+          VERSION: ${{ needs.python.outputs.version }}
+        run: bash .github/scripts/publish-release.sh "$RUNNER_TEMP/release/notes.md" "$RUNNER_TEMP/release/assets"
