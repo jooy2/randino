@@ -2,6 +2,8 @@
 
 ## vNext (2026--)
 
+- The description pub.dev shows names every kind of value the package generates. It named only person names and nicknames, and its list of languages added up to ten where there are nine.
+
 ## 1.3.0 (2026-10-07)
 
 - **`randOrganization` generates organizations that do not exist**, with a `randOrganizationDetails` twin: companies, schools, government offices, public institutions and associations, in all nine languages, each written the way its language writes that kind (`(주)새솔테크`, `Construcciones Valdecastro, S.L.`, `Гимназия № 135`, `Heimatverein Bergtal e.V.`). `type` is a set of `OrganizationType`s, with companies the most common when it is null; `industry` writes one of ten businesses into a company's name; `includeLegalForm` decides whether a company carries `Inc.`, `(주)`, `GmbH` or `ООО`, and null leaves it to a coin flip. The stems are chosen to be nobody's brand, and `RandRealism.invented` builds them from the language's sounds instead. `organizationTypes`, `organizationIndustries` and `randOrganizationLengthMax` are exported beside it.

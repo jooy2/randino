@@ -2,6 +2,8 @@
 
 ## vNext (2026--)
 
+- The description npm shows names every kind of value the package generates. It stopped at sentences, and left out locations, ages, genders and organizations; the keywords now name those four as well.
+
 ## 1.3.0 (2026-10-07)
 
 - **`randOrganization` generates organizations that do not exist**: companies, schools, government offices, public institutions and associations, in all nine languages, each written the way its language writes that kind (`(주)새솔테크`, `Construcciones Valdecastro, S.L.`, `Гимназия № 135`, `Heimatverein Bergtal e.V.`). `type` picks the kinds, one or several, with companies the most common when it is left out; `industry` writes one of ten businesses into a company's name; `includeLegalForm` decides whether a company carries `Inc.`, `(주)`, `GmbH` or `ООО`, and left out it is a coin flip. The stems are chosen to be nobody's brand, and `realism: 'invented'` builds them from the language's sounds instead. The length options describe the whole organization and are met by choosing a shape that can land in the range. `output: 'detail'` reports the name without its legal form, the form, the kind and the industry. `ORGANIZATION_TYPES`, `ORGANIZATION_INDUSTRIES` and `RAND_ORGANIZATION_LENGTH_MAX` are exported beside it.

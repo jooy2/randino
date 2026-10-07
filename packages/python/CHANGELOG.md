@@ -2,6 +2,8 @@
 
 ## vNext (2026--)
 
+- The description and keywords PyPI shows name every kind of value the package generates. The description named only person names and nicknames, and its list of languages added up to ten where there are nine; the keywords are the npm package's now.
+
 ## 1.3.0 (2026-10-07)
 
 - **`rand_organization` generates organizations that do not exist**: companies, schools, government offices, public institutions and associations, in all nine languages, each written the way its language writes that kind (`(주)새솔테크`, `Construcciones Valdecastro, S.L.`, `Гимназия № 135`, `Heimatverein Bergtal e.V.`). `type` picks the kinds, one or several, with companies the most common when it is left out; `industry` writes one of ten businesses into a company's name; `include_legal_form` decides whether a company carries `Inc.`, `(주)`, `GmbH` or `ООО`, and left out it is a coin flip. The stems are chosen to be nobody's brand, and `realism="invented"` builds them from the language's sounds instead. `output="detail"` reports the name without its legal form (`legal_form`), the kind and the industry. `ORGANIZATION_TYPES`, `ORGANIZATION_INDUSTRIES` and `RAND_ORGANIZATION_LENGTH_MAX` are exported beside it.
