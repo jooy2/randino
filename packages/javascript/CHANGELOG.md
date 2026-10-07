@@ -2,6 +2,8 @@
 
 ## vNext (2026--)
 
+## 1.3.1 (2026-10-07)
+
 - The description npm shows names every kind of value the package generates. It stopped at sentences, and left out locations, ages, genders and organizations; the keywords now name those four as well.
 
 ## 1.3.0 (2026-10-07)
