@@ -119,7 +119,10 @@ jobs:
           name: release
           path: ${{ runner.temp }}/release
 
-      # Provenance is attached by npm itself on a trusted publish.
+      # Provenance is attached by npm itself on a trusted publish. The trusted
+      # publisher on npmjs.com has to allow `npm publish` under Allowed
+      # actions; a new one allows only `npm stage publish` and refuses this
+      # with a 403.
       - name: Publish to npm
         env:
           VERSION: ${{ needs.javascript.outputs.version }}
