@@ -2,6 +2,8 @@
 
 ## vNext (2026--)
 
+## 1.3.1 (2026-10-07)
+
 - The description pub.dev shows names every kind of value the package generates. It named only person names and nicknames, and its list of languages added up to ten where there are nine.
 
 ## 1.3.0 (2026-10-07)
