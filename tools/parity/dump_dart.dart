@@ -17,6 +17,7 @@ import 'package:randino/src/date/data/index.dart';
 import 'package:randino/src/decorate/data/index.dart';
 import 'package:randino/src/device/data/index.dart';
 import 'package:randino/src/disk/data/index.dart';
+import 'package:randino/src/file/data/index.dart';
 import 'package:randino/src/gender/data/index.dart';
 import 'package:randino/src/gpu/data/index.dart';
 import 'package:randino/src/internal/parse.dart';
@@ -632,6 +633,14 @@ void main() {
             'company': entry.company,
             'full': entry.full,
           },
+      },
+      // One entry per extension, keyed by the extension without its dot.
+      'file': <String, Object?>{
+        'categories': <String>[for (final category in fileCategories) category.name],
+        'extensions': <String, Object?>{
+          for (final entry in fileExtensions)
+            entry.name: <String, Object?>{'category': entry.category.name, 'weight': entry.weight},
+        },
       },
       'version': <String, Object?>{
         'formats': <String>[for (final format in versionFormats) format.name],

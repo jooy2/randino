@@ -1025,3 +1025,45 @@ class AppStoreDetail:
 
     platform: SystemPlatform
     """The kind of machine the store sells apps for."""
+
+
+FileCategory = Literal[
+    "document",
+    "spreadsheet",
+    "presentation",
+    "image",
+    "audio",
+    "video",
+    "archive",
+    "code",
+    "data",
+    "executable",
+    "font",
+    "ebook",
+    "disk",
+    "model",
+]
+"""What a file holds, as its extension says.
+
+`document` (`.pdf`), `spreadsheet` (`.xlsx`), `presentation` (`.pptx`), `image` (`.png`),
+`audio` (`.mp3`), `video` (`.mp4`), `archive` (`.zip`), `code` (`.js`), `data` (`.json`),
+`executable` (`.exe`), `font` (`.ttf`), `ebook` (`.epub`), `disk` for a disk image
+(`.iso`), or `model` for a 3D model (`.stl`).
+"""
+
+FileCategoryOption = FileCategory | Sequence[FileCategory] | Literal["all"]
+"""One category, a sequence of them to draw from, or `"all"` of them."""
+
+
+@dataclass(frozen=True, slots=True)
+class FileExtensionDetail:
+    """A generated file extension, with what kind of file it is."""
+
+    extension: str
+    """The extension as the value form returns it: `.png`."""
+
+    name: str
+    """The extension without its dot: `png`."""
+
+    category: FileCategory
+    """What kind of file it is."""

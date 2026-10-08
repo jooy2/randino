@@ -50,6 +50,10 @@ def test_the_package_exports_exactly_its_public_api() -> None:
         "DiskTypeDetail",
         "DiskUnit",
         "DiskUnitOption",
+        "FILE_CATEGORIES",
+        "FileCategory",
+        "FileCategoryOption",
+        "FileExtensionDetail",
         "GenderCode",
         "GenderDetail",
         "GpuDetail",
@@ -147,6 +151,7 @@ def test_the_package_exports_exactly_its_public_api() -> None:
         "rand_district",
         "rand_drink",
         "rand_emotion",
+        "rand_file_extension",
         "rand_finance",
         "rand_food",
         "rand_furniture",
@@ -296,6 +301,7 @@ def test_the_functions_are_callable_and_the_constants_are_what_they_claim() -> N
     assert re.fullmatch(r"\d+\.\d+\.\d+", randino.rand_version()[0])
     assert randino.VERSION_FORMATS == ("semver", "calver", "number")
     assert isinstance(randino.rand_app_store()[0], str)
+    assert re.fullmatch(r"\.[a-z0-9]+", randino.rand_file_extension()[0])
 
 
 def test_the_package_imports_nothing_outside_the_standard_library() -> None:
@@ -391,6 +397,7 @@ def test_an_option_the_types_rule_out_falls_back_rather_than_raising() -> None:
         lambda: loose.rand_architecture(include_rare="yes", count="x"),
         lambda: loose.rand_resolution(platform="tv", separator=None),
         lambda: loose.rand_app_store(platform="console", include_company="no"),
+        lambda: loose.rand_file_extension(category="nope", include_dot="no"),
         lambda: loose.rand_version(format="nope", prefix=3, min_year="x", max_year=float("nan")),
         lambda: loose.rand_gender(language="xx", count=float("nan")),
         lambda: loose.rand_gender(include_unknown="yes"),
@@ -467,6 +474,7 @@ def test_random_is_where_every_draw_of_a_call_comes_from() -> None:
     twice(lambda: randino.rand_resolution(count=5, random=Random(42).random))
     twice(lambda: randino.rand_version(format="all", count=5, random=Random(42).random))
     twice(lambda: randino.rand_app_store(count=5, random=Random(42).random))
+    twice(lambda: randino.rand_file_extension(count=5, random=Random(42).random))
 
     # Two different seeds are two different answers, so the source is actually what
     # the draws are coming from.

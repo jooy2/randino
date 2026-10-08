@@ -53,6 +53,8 @@ void main() {
           'DiskType',
           'DiskTypeDetail',
           'DiskUnit',
+          'FileCategory',
+          'FileExtensionDetail',
           'GenderCode',
           'GenderDetail',
           'GpuDetail',
@@ -103,6 +105,7 @@ void main() {
           'deviceTypes',
           'diskTypes',
           'diskUnits',
+          'fileCategories',
           'locationLanguages',
           'locationLevels',
           'nameLanguages',
@@ -152,6 +155,8 @@ void main() {
           'randDistrictDetails',
           'randDrink',
           'randEmotion',
+          'randFileExtension',
+          'randFileExtensionDetails',
           'randFinance',
           'randFood',
           'randFurniture',
@@ -342,6 +347,9 @@ void main() {
       expect(randVersionDetails()[0], isA<VersionDetail>());
       expect(randAppStore(), hasLength(1));
       expect(randAppStoreDetails()[0], isA<AppStoreDetail>());
+      expect(randFileExtension().single, matches(RegExp(r'^\.[a-z0-9]+$')));
+      expect(randFileExtensionDetails()[0], isA<FileExtensionDetail>());
+      expect(fileCategories, FileCategory.values);
       expect(versionFormats, VersionFormat.values);
     });
 
@@ -446,6 +454,7 @@ void main() {
       twice(() => randResolution(count: 5, random: Random(42)).join());
       twice(() => randVersion(format: null, count: 5, random: Random(42)).join());
       twice(() => randAppStore(count: 5, random: Random(42)).join());
+      twice(() => randFileExtension(count: 5, random: Random(42)).join());
       twice(() => randOrganization(count: 5, random: Random(42)).join('|'));
       twice(() => randOrganization(count: 5, maxLength: 20, random: Random(42)).join('|'));
       twice(() => randSuffixAll(const ['a', 'b'], random: Random(42)).join());

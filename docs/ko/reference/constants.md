@@ -332,6 +332,7 @@ import {
 	DISK_TYPES,
 	DISK_UNITS,
 	RAM_UNITS,
+	FILE_CATEGORIES,
 	SYSTEM_PLATFORMS,
 	VERSION_FORMATS
 } from 'randino';
@@ -346,6 +347,7 @@ import {
 | `DISK_UNITS`       | `DiskUnit[]`       | `['MB', 'GB', 'TB']`                                |
 | `ARCHITECTURES`    | `Architecture[]`   | `['x86_64', 'arm64', 'x86', 'armv7', 'riscv64', …]` |
 | `VERSION_FORMATS`  | `VersionFormat[]`  | `['semver', 'calver', 'number']`                    |
+| `FILE_CATEGORIES`  | `FileCategory[]`   | `['document', 'spreadsheet', …, 'model']`           |
 
 :::
 
@@ -355,15 +357,16 @@ import {
 import 'package:randino/randino.dart';
 ```
 
-| 이름              | 타입                   | 값                                     |
-| ----------------- | ---------------------- | -------------------------------------- |
-| `systemPlatforms` | `List<SystemPlatform>` | `desktop`, `mobile` 순                 |
-| `deviceTypes`     | `List<DeviceType>`     | `phone`, `tablet`, `laptop` 순         |
-| `ramUnits`        | `List<RamUnit>`        | `mb`, `gb` 순                          |
-| `diskTypes`       | `List<DiskType>`       | `hdd`, `ssd`, `sshd`, `emmc`, `ufs` 순 |
-| `diskUnits`       | `List<DiskUnit>`       | `mb`, `gb`, `tb` 순                    |
-| `architectures`   | `List<String>`         | 흔한 넷, 드문 여섯 순                  |
-| `versionFormats`  | `List<VersionFormat>`  | `semver`, `calver`, `number` 순        |
+| 이름              | 타입                   | 값                                              |
+| ----------------- | ---------------------- | ----------------------------------------------- |
+| `systemPlatforms` | `List<SystemPlatform>` | `desktop`, `mobile` 순                          |
+| `deviceTypes`     | `List<DeviceType>`     | `phone`, `tablet`, `laptop` 순                  |
+| `ramUnits`        | `List<RamUnit>`        | `mb`, `gb` 순                                   |
+| `diskTypes`       | `List<DiskType>`       | `hdd`, `ssd`, `sshd`, `emmc`, `ufs` 순          |
+| `diskUnits`       | `List<DiskUnit>`       | `mb`, `gb`, `tb` 순                             |
+| `architectures`   | `List<String>`         | 흔한 넷, 드문 여섯 순                           |
+| `versionFormats`  | `List<VersionFormat>`  | `semver`, `calver`, `number` 순                 |
+| `fileCategories`  | `List<FileCategory>`   | `document`, `spreadsheet`, … `model`, 모두 14개 |
 
 :::
 
@@ -376,6 +379,7 @@ from randino import (
     DISK_TYPES,
     DISK_UNITS,
     RAM_UNITS,
+    FILE_CATEGORIES,
     SYSTEM_PLATFORMS,
     VERSION_FORMATS,
 )
@@ -390,6 +394,7 @@ from randino import (
 | `DISK_UNITS` | `tuple[DiskUnit, …]` | `('MB', 'GB', 'TB')` |
 | `ARCHITECTURES` | `tuple[Architecture, …]` | `('x86_64', 'arm64', 'x86', 'armv7', 'riscv64', …)` |
 | `VERSION_FORMATS` | `tuple[VersionFormat, …]` | `('semver', 'calver', 'number')` |
+| `FILE_CATEGORIES` | `tuple[FileCategory, …]` | `('document', 'spreadsheet', …, 'model')` |
 
 :::
 
@@ -601,6 +606,9 @@ import type {
 	DiskTypeDetail,
 	DiskUnit,
 	DiskUnitOption,
+	FileCategory,
+	FileCategoryOption,
+	FileExtensionDetail,
 	LocationDetail,
 	LocationLanguage,
 	LocationLanguageOption,
@@ -614,6 +622,7 @@ import type {
 	RandDeviceOptions,
 	RandDiskSizeOptions,
 	RandDiskTypeOptions,
+	RandFileExtensionOptions,
 	RandGenderOptions,
 	RandGpuOptions,
 	RandLocationOptions,
@@ -643,7 +652,7 @@ const options: RandNameOptions = { language: 'ko', count: 3 };
 import 'package:randino/randino.dart';
 
 // enum
-AgeGroup, AgeDistribution, DateUnit, DeviceType, DiskType, DiskUnit, GenderCode
+AgeGroup, AgeDistribution, DateUnit, DeviceType, DiskType, DiskUnit, FileCategory, GenderCode
 NameLanguage, NameGender, NameScript
 OrganizationType, OrganizationIndustry
 PhoneCountry, PhoneType
@@ -652,7 +661,7 @@ WordLanguage, WordTheme
 LocationLanguage, LocationLevel
 
 // 값
-LengthRange, AgeDetail, AppStoreDetail, ArchitectureDetail, CpuDetail, DateDetail, DeviceDetail, DiskSizeDetail, DiskTypeDetail, GenderDetail, GpuDetail, NameDetail, NicknameDetail, LocationDetail, CountryDetail,
+LengthRange, AgeDetail, AppStoreDetail, ArchitectureDetail, CpuDetail, DateDetail, DeviceDetail, DiskSizeDetail, DiskTypeDetail, FileExtensionDetail, GenderDetail, GpuDetail, NameDetail, NicknameDetail, LocationDetail, CountryDetail,
 OrganizationDetail, OsDetail, PhoneDetail, RamDetail, ResolutionDetail, VersionDetail
 ```
 
@@ -720,6 +729,9 @@ from randino import (
     DiskTypeDetail,
     DiskUnit,
     DiskUnitOption,
+    FileCategory,
+    FileCategoryOption,
+    FileExtensionDetail,
     LocationDetail,
     LocationLanguage,
     LocationLanguageOption,

@@ -7,6 +7,7 @@ export * from './disk/index.js';
 export * from './constants.js';
 export * from './cpu/index.js';
 export * from './date/index.js';
+export * from './file/index.js';
 export * from './gender/index.js';
 export * from './gpu/index.js';
 export * from './location/index.js';

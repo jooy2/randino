@@ -43,6 +43,9 @@ from randino._types import (
     DiskTypeDetail,
     DiskUnit,
     DiskUnitOption,
+    FileCategory,
+    FileCategoryOption,
+    FileExtensionDetail,
     GenderCode,
     GenderDetail,
     GpuDetail,
@@ -126,6 +129,7 @@ from randino.decorate import (
 )
 from randino.device import DEVICE_TYPES, rand_device
 from randino.disk import DISK_TYPES, DISK_UNITS, rand_disk_size, rand_disk_type
+from randino.file import FILE_CATEGORIES, rand_file_extension
 from randino.gender import rand_gender
 from randino.gpu import rand_gpu
 from randino.location import (
@@ -199,6 +203,7 @@ __all__ = [
     "DEVICE_TYPES",
     "DISK_TYPES",
     "DISK_UNITS",
+    "FILE_CATEGORIES",
     "LOCATION_LANGUAGES",
     "LOCATION_LEVELS",
     "NAME_LANGUAGES",
@@ -239,6 +244,9 @@ __all__ = [
     "DiskTypeDetail",
     "DiskUnit",
     "DiskUnitOption",
+    "FileCategory",
+    "FileCategoryOption",
+    "FileExtensionDetail",
     "GenderCode",
     "GenderDetail",
     "GpuDetail",
@@ -316,6 +324,7 @@ __all__ = [
     "rand_district",
     "rand_drink",
     "rand_emotion",
+    "rand_file_extension",
     "rand_finance",
     "rand_food",
     "rand_furniture",

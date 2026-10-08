@@ -19,6 +19,7 @@ describe('base test', () => {
 			'DEVICE_TYPES',
 			'DISK_TYPES',
 			'DISK_UNITS',
+			'FILE_CATEGORIES',
 			'LOCATION_LANGUAGES',
 			'LOCATION_LEVELS',
 			'NAME_LANGUAGES',
@@ -61,6 +62,7 @@ describe('base test', () => {
 			'randDistrict',
 			'randDrink',
 			'randEmotion',
+			'randFileExtension',
 			'randFinance',
 			'randFood',
 			'randFurniture',
@@ -222,6 +224,7 @@ describe('base test', () => {
 		assert.match(randino.randResolution()[0], /^\d+x\d+$/);
 		assert.match(randino.randVersion()[0], /^\d+\.\d+\.\d+$/);
 		assert.strictEqual(typeof randino.randAppStore()[0], 'string');
+		assert.match(randino.randFileExtension()[0], /^\.[a-z0-9]+$/);
 	});
 
 	it('an option the types rule out falls back rather than throwing', () => {
@@ -378,6 +381,7 @@ describe('base test', () => {
 		agrees(() => randino.randResolution({ count: 5, random: seeded(42) }));
 		agrees(() => randino.randVersion({ count: 5, format: 'all', random: seeded(42) }));
 		agrees(() => randino.randAppStore({ count: 5, random: seeded(42) }));
+		agrees(() => randino.randFileExtension({ count: 5, random: seeded(42) }));
 
 		// Two different seeds are two different answers, so the source is actually
 		// what the draws are coming from.

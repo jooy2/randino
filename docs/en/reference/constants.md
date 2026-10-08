@@ -332,6 +332,7 @@ import {
 	DISK_TYPES,
 	DISK_UNITS,
 	RAM_UNITS,
+	FILE_CATEGORIES,
 	SYSTEM_PLATFORMS,
 	VERSION_FORMATS
 } from 'randino';
@@ -346,6 +347,7 @@ import {
 | `DISK_UNITS`       | `DiskUnit[]`       | `['MB', 'GB', 'TB']`                                |
 | `ARCHITECTURES`    | `Architecture[]`   | `['x86_64', 'arm64', 'x86', 'armv7', 'riscv64', …]` |
 | `VERSION_FORMATS`  | `VersionFormat[]`  | `['semver', 'calver', 'number']`                    |
+| `FILE_CATEGORIES`  | `FileCategory[]`   | `['document', 'spreadsheet', …, 'model']`           |
 
 :::
 
@@ -355,15 +357,16 @@ import {
 import 'package:randino/randino.dart';
 ```
 
-| Name              | Type                   | Value                                         |
-| ----------------- | ---------------------- | --------------------------------------------- |
-| `systemPlatforms` | `List<SystemPlatform>` | `desktop`, then `mobile`                      |
-| `deviceTypes`     | `List<DeviceType>`     | `phone`, `tablet`, then `laptop`              |
-| `ramUnits`        | `List<RamUnit>`        | `mb`, then `gb`                               |
-| `diskTypes`       | `List<DiskType>`       | `hdd`, `ssd`, `sshd`, `emmc`, then `ufs`      |
-| `diskUnits`       | `List<DiskUnit>`       | `mb`, `gb`, then `tb`                         |
-| `architectures`   | `List<String>`         | The four common ones first, then the rare six |
-| `versionFormats`  | `List<VersionFormat>`  | `semver`, `calver`, then `number`             |
+| Name | Type | Value |
+| --- | --- | --- |
+| `systemPlatforms` | `List<SystemPlatform>` | `desktop`, then `mobile` |
+| `deviceTypes` | `List<DeviceType>` | `phone`, `tablet`, then `laptop` |
+| `ramUnits` | `List<RamUnit>` | `mb`, then `gb` |
+| `diskTypes` | `List<DiskType>` | `hdd`, `ssd`, `sshd`, `emmc`, then `ufs` |
+| `diskUnits` | `List<DiskUnit>` | `mb`, `gb`, then `tb` |
+| `architectures` | `List<String>` | The four common ones first, then the rare six |
+| `versionFormats` | `List<VersionFormat>` | `semver`, `calver`, then `number` |
+| `fileCategories` | `List<FileCategory>` | `document`, `spreadsheet`, … `model`, fourteen in all |
 
 :::
 
@@ -376,6 +379,7 @@ from randino import (
     DISK_TYPES,
     DISK_UNITS,
     RAM_UNITS,
+    FILE_CATEGORIES,
     SYSTEM_PLATFORMS,
     VERSION_FORMATS,
 )
@@ -390,6 +394,7 @@ from randino import (
 | `DISK_UNITS` | `tuple[DiskUnit, …]` | `('MB', 'GB', 'TB')` |
 | `ARCHITECTURES` | `tuple[Architecture, …]` | `('x86_64', 'arm64', 'x86', 'armv7', 'riscv64', …)` |
 | `VERSION_FORMATS` | `tuple[VersionFormat, …]` | `('semver', 'calver', 'number')` |
+| `FILE_CATEGORIES` | `tuple[FileCategory, …]` | `('document', 'spreadsheet', …, 'model')` |
 
 :::
 
@@ -601,6 +606,9 @@ import type {
 	DiskTypeDetail,
 	DiskUnit,
 	DiskUnitOption,
+	FileCategory,
+	FileCategoryOption,
+	FileExtensionDetail,
 	LocationDetail,
 	LocationLanguage,
 	LocationLanguageOption,
@@ -614,6 +622,7 @@ import type {
 	RandDeviceOptions,
 	RandDiskSizeOptions,
 	RandDiskTypeOptions,
+	RandFileExtensionOptions,
 	RandGenderOptions,
 	RandGpuOptions,
 	RandLocationOptions,
@@ -643,7 +652,7 @@ Every public type is exported alongside the functions:
 import 'package:randino/randino.dart';
 
 // Enums
-AgeGroup, AgeDistribution, DateUnit, DeviceType, DiskType, DiskUnit, GenderCode
+AgeGroup, AgeDistribution, DateUnit, DeviceType, DiskType, DiskUnit, FileCategory, GenderCode
 NameLanguage, NameGender, NameScript
 OrganizationType, OrganizationIndustry
 PhoneCountry, PhoneType
@@ -652,7 +661,7 @@ WordLanguage, WordTheme
 LocationLanguage, LocationLevel
 
 // Values
-LengthRange, AgeDetail, AppStoreDetail, ArchitectureDetail, CpuDetail, DateDetail, DeviceDetail, DiskSizeDetail, DiskTypeDetail, GenderDetail, GpuDetail, NameDetail, NicknameDetail, LocationDetail, CountryDetail,
+LengthRange, AgeDetail, AppStoreDetail, ArchitectureDetail, CpuDetail, DateDetail, DeviceDetail, DiskSizeDetail, DiskTypeDetail, FileExtensionDetail, GenderDetail, GpuDetail, NameDetail, NicknameDetail, LocationDetail, CountryDetail,
 OrganizationDetail, OsDetail, PhoneDetail, RamDetail, ResolutionDetail, VersionDetail
 ```
 
@@ -720,6 +729,9 @@ from randino import (
     DiskTypeDetail,
     DiskUnit,
     DiskUnitOption,
+    FileCategory,
+    FileCategoryOption,
+    FileExtensionDetail,
     LocationDetail,
     LocationLanguage,
     LocationLanguageOption,

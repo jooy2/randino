@@ -41,6 +41,7 @@ from randino.decorate.data import (
 )
 from randino.device.data import DEVICE_TYPES, DEVICES
 from randino.disk.data import DISK_SCALE, DISK_TYPE_LABELS, DISK_TYPE_WEIGHTS, DISK_TYPES
+from randino.file.data import FILE_CATEGORIES, FILE_EXTENSIONS
 from randino.gender.data import GENDER_CODES, GENDER_LABELS, GENDER_WEIGHTS
 from randino.gpu.data import GPUS
 from randino.location.data import LOCATION_DATA, LOCATION_LANGUAGES, LOCATION_LEVELS
@@ -590,6 +591,14 @@ print(
                     "full": entry.full,
                 }
                 for entry in APP_STORES
+            },
+            # One entry per extension, keyed by the extension without its dot.
+            "file": {
+                "categories": list(FILE_CATEGORIES),
+                "extensions": {
+                    entry.name: {"category": entry.category, "weight": entry.weight}
+                    for entry in FILE_EXTENSIONS
+                },
             },
             "version": {
                 "formats": list(VERSION_FORMATS),

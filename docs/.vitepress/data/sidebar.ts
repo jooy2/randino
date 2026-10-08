@@ -128,7 +128,8 @@ export const SIDEBAR: SidebarGroup[] = [
 							},
 							{ path: 'resolution/rand-resolution', en: 'randResolution', ko: 'randResolution' },
 							{ path: 'version/rand-version', en: 'randVersion', ko: 'randVersion' },
-							{ path: 'appstore/rand-app-store', en: 'randAppStore', ko: 'randAppStore' }
+							{ path: 'appstore/rand-app-store', en: 'randAppStore', ko: 'randAppStore' },
+							{ path: 'file/rand-file-extension', en: 'randFileExtension', ko: 'randFileExtension' }
 						]
 					},
 					{

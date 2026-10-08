@@ -38,6 +38,7 @@ import {
 	AFFIX_LENGTH_MAX,
 	AFFIX_SEPARATOR_DEFAULT
 } from '../../packages/javascript/lib/decorate/data/index.js';
+import { FILE_CATEGORIES, FILE_EXTENSIONS } from '../../packages/javascript/lib/file/data/index.js';
 import { CPUS } from '../../packages/javascript/lib/cpu/data/index.js';
 import { DEVICES, DEVICE_TYPES } from '../../packages/javascript/lib/device/data/index.js';
 import {
@@ -343,6 +344,16 @@ console.log(
 				{ weight: entry.weight, company: entry.company, full: entry.full }
 			])
 		),
+		// One entry per extension, keyed by the extension without its dot.
+		file: {
+			categories: [...FILE_CATEGORIES],
+			extensions: Object.fromEntries(
+				FILE_EXTENSIONS.map((entry) => [
+					entry.name,
+					{ category: entry.category, weight: entry.weight }
+				])
+			)
+		},
 		version: {
 			formats: [...VERSION_FORMATS],
 			parts: VERSION_PARTS,

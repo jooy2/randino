@@ -1523,3 +1523,67 @@ class AppStoreDetail {
   @override
   String toString() => 'AppStoreDetail($store, ${platform.name})';
 }
+
+/// What a file holds, as its extension says.
+enum FileCategory {
+  /// A document: `.pdf`, `.docx`, `.txt`.
+  document,
+
+  /// A spreadsheet: `.xlsx`, `.csv`.
+  spreadsheet,
+
+  /// A presentation: `.pptx`, `.key`.
+  presentation,
+
+  /// An image: `.png`, `.jpg`, `.svg`.
+  image,
+
+  /// Audio: `.mp3`, `.wav`, `.flac`.
+  audio,
+
+  /// Video: `.mp4`, `.mov`, `.mkv`.
+  video,
+
+  /// An archive: `.zip`, `.7z`, `.tar`.
+  archive,
+
+  /// Source code: `.js`, `.py`, `.html`.
+  code,
+
+  /// Data and configuration: `.json`, `.yaml`, `.sql`.
+  data,
+
+  /// A program or an installer: `.exe`, `.apk`, `.dmg`.
+  executable,
+
+  /// A font: `.ttf`, `.woff2`.
+  font,
+
+  /// An e-book: `.epub`, `.mobi`.
+  ebook,
+
+  /// A disk image: `.iso`, `.vmdk`.
+  disk,
+
+  /// A 3D model: `.stl`, `.glb`.
+  model,
+}
+
+/// A generated file extension, with what kind of file it is.
+class FileExtensionDetail {
+  /// Creates a detail record. Returned by the generator; there is rarely a
+  /// reason to build one by hand outside a test.
+  const FileExtensionDetail({required this.extension, required this.name, required this.category});
+
+  /// The extension as `randFileExtension` returns it: `.png`.
+  final String extension;
+
+  /// The extension without its dot: `png`.
+  final String name;
+
+  /// What kind of file it is.
+  final FileCategory category;
+
+  @override
+  String toString() => 'FileExtensionDetail($extension, ${category.name})';
+}

@@ -1673,3 +1673,49 @@ export interface AppStoreDetail {
 	company: string;
 	platform: SystemPlatform;
 }
+
+/**
+ * What a file holds, as its extension says: `document` (`.pdf`), `spreadsheet`
+ * (`.xlsx`), `presentation` (`.pptx`), `image` (`.png`), `audio` (`.mp3`),
+ * `video` (`.mp4`), `archive` (`.zip`), `code` (`.js`), `data` (`.json`),
+ * `executable` (`.exe`), `font` (`.ttf`), `ebook` (`.epub`), `disk` for a disk
+ * image (`.iso`), or `model` for a 3D model (`.stl`).
+ */
+export type FileCategory =
+	| 'document'
+	| 'spreadsheet'
+	| 'presentation'
+	| 'image'
+	| 'audio'
+	| 'video'
+	| 'archive'
+	| 'code'
+	| 'data'
+	| 'executable'
+	| 'font'
+	| 'ebook'
+	| 'disk'
+	| 'model';
+
+/** One category, several, or `'all'` of them. */
+export type FileCategoryOption = FileCategory | readonly FileCategory[] | 'all';
+
+/** What `randFileExtension` takes. An extension is written the same in every language. */
+export interface RandFileExtensionOptions extends Pick<
+	RandCommonOptions,
+	'count' | 'unique' | 'output' | 'random'
+> {
+	/** Which kinds of file. Default `'all'`. */
+	category?: FileCategoryOption;
+	/** Write the dot in front: `.png` rather than `png`. Default `true`. */
+	includeDot?: boolean;
+}
+
+/** A generated file extension, with what kind of file it is. */
+export interface FileExtensionDetail {
+	/** The extension as the value form returns it: `.png`. */
+	extension: string;
+	/** The extension without its dot: `png`. */
+	name: string;
+	category: FileCategory;
+}
