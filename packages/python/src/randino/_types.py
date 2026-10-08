@@ -668,6 +668,12 @@ class DateDetail:
     millisecond: int
     """`0` to `999`."""
 
+    weekday: int
+    """The day of the week, `1` for Monday to `7` for Sunday, the way ISO 8601 counts it."""
+
+    language: WordLanguage
+    """The language the names in `date` are written in."""
+
 
 PhoneCountry = Literal["US", "KR", "JP", "CN", "VN", "ES", "IT", "DE", "RU"]
 """A country `rand_phone` writes numbers for, by its ISO 3166-1 alpha-2 code.

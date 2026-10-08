@@ -5,34 +5,46 @@
 // out differently on two machines from the same seed, and an hour that a
 // daylight-saving change skips would be a date no clock ever showed.
 
-import { collect, resolveOptional, resolveRandom } from '../_internal/generate.js';
-import { clamp, randInt, withRandom } from '../_internal/utils.js';
-import type { DateDetail, DateUnit, RandDateOptions } from '../_types/global.js';
+import { collect, resolveOption, resolveOptional, resolveRandom } from '../_internal/generate.js';
+import { clamp, pick, randInt, withRandom } from '../_internal/utils.js';
+import type {
+	DateDetail,
+	DateUnit,
+	RandDateOptions,
+	WordLanguage,
+	WordLanguageOption
+} from '../_types/global.js';
+import { WORD_LANGUAGES } from '../word/data/index.js';
 import {
 	DATE_CEILING,
 	DATE_FLOOR,
 	DATE_FORMAT_DEFAULT,
 	DATE_MAX_DEFAULT,
 	DATE_MIN_DEFAULT,
+	DATE_NAMES,
 	DATE_UNITS
 } from './data/index.js';
+import type { DateNames } from './data/index.js';
 
 const DAY = 86400000;
 
 /** The first and the last millisecond a bound stands for. */
 type Span = { start: number; end: number };
 
-/** The parts of a date, which is a detail without the two fields worked out from them. */
-type Parts = Omit<DateDetail, 'date' | 'timestamp'>;
+/** The parts of a date, which is a detail without the fields worked out from them. */
+type Parts = Omit<DateDetail, 'date' | 'timestamp' | 'weekday' | 'language'>;
+
+/** The parts a format writes from, the day of the week among them. */
+type Written = Parts & { weekday: number };
 
 // `2024`, `2024-03`, `2024-03-15`, `2024-03-15T14:07`, `2024-03-15 14:07:32.481`,
 // with an offset after the time: `Z`, `+09:00`, `+0900` or `+09`.
 const ISO_DATE =
 	/^(\d{4})(?:-(\d{2})(?:-(\d{2})(?:[Tt ](\d{2}):(\d{2})(?::(\d{2})(?:\.(\d+))?)?([Zz]|[+-]\d{2}(?::?\d{2})?)?)?)?)?$/;
 
-// Longest first, so `YYYY` is never read as two `YY`. Text in brackets is written
-// as it is, and so is anything that is not a token.
-const TOKENS = /\[([^\]]*)]|YYYY|YY|SSS|MM?|DD?|HH?|hh?|mm?|ss?|A|a/g;
+// Longest first, so `YYYY` is never read as two `YY` nor `MMMM` as two `MM`. Text
+// in brackets is written as it is, and so is anything that is not a token.
+const TOKENS = /\[([^\]]*)]|YYYY|YY|MMMM|MMM|MM?|DD?|dddd|ddd|HH?|hh?|mm?|ss?|SSS|A|a/g;
 
 function isLeap(year: number): boolean {
 	return (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0;
@@ -173,13 +185,17 @@ function pad(value: number, width: number): string {
 	return String(value).padStart(width, '0');
 }
 
-/** What one token of a format writes for a date. */
-function write(token: string, parts: Parts): string {
+/** What one token of a format writes for a date, in the names of one language. */
+function write(token: string, parts: Written, names: DateNames): string {
 	switch (token) {
 		case 'YYYY':
 			return pad(parts.year, 4);
 		case 'YY':
 			return pad(parts.year % 100, 2);
+		case 'MMMM':
+			return names.months[parts.month - 1];
+		case 'MMM':
+			return names.monthsShort[parts.month - 1];
 		case 'MM':
 			return pad(parts.month, 2);
 		case 'M':
@@ -188,6 +204,10 @@ function write(token: string, parts: Parts): string {
 			return pad(parts.day, 2);
 		case 'D':
 			return String(parts.day);
+		case 'dddd':
+			return names.weekdays[parts.weekday - 1];
+		case 'ddd':
+			return names.weekdaysShort[parts.weekday - 1];
 		case 'HH':
 			return pad(parts.hour, 2);
 		case 'H':
@@ -207,22 +227,24 @@ function write(token: string, parts: Parts): string {
 		case 'SSS':
 			return pad(parts.millisecond, 3);
 		case 'A':
-			return parts.hour < 12 ? 'AM' : 'PM';
+			return names.meridiem[parts.hour < 12 ? 0 : 1];
 		default:
-			return parts.hour < 12 ? 'am' : 'pm';
+			return names.meridiemLower[parts.hour < 12 ? 0 : 1];
 	}
 }
 
-/** A date written out by a format. */
-export function formatDate(parts: Parts, format: string): string {
+/** A date written out by a format, in the names of `language`. */
+export function formatDate(parts: Written, format: string, language: WordLanguage): string {
+	const names = DATE_NAMES[language];
+
 	return format.replace(
 		TOKENS,
-		(token: string, literal?: string) => literal ?? write(token, parts)
+		(token: string, literal?: string) => literal ?? write(token, parts, names)
 	);
 }
 
 /** Every part of the date `timestamp` falls on, in UTC. */
-function partsOf(timestamp: number): Parts {
+function partsOf(timestamp: number): Written {
 	const date = new Date(timestamp);
 
 	return {
@@ -232,13 +254,24 @@ function partsOf(timestamp: number): Parts {
 		hour: date.getUTCHours(),
 		minute: date.getUTCMinutes(),
 		second: date.getUTCSeconds(),
-		millisecond: date.getUTCMilliseconds()
+		millisecond: date.getUTCMilliseconds(),
+		// `getUTCDay` counts from Sunday; ISO 8601 counts from Monday.
+		weekday: ((date.getUTCDay() + 6) % 7) + 1
 	};
 }
 
 /** The caller's `format`, or ISO 8601 for one that writes nothing at all. */
 function resolveFormat(format: unknown): string {
 	return typeof format === 'string' && format ? format : DATE_FORMAT_DEFAULT;
+}
+
+/**
+ * The caller's `language`, or English for one the package does not know. Not
+ * `'all'` by default the way the other generators have it: a format is written in
+ * one language, and nine languages' month names in one format is no format.
+ */
+function resolveDateLanguage(language: unknown): WordLanguageOption {
+	return resolveOption<WordLanguageOption>(language, [...WORD_LANGUAGES, 'all'], 'en');
 }
 
 /** The caller's `unit`, or `null` for the whole date. */
@@ -250,6 +283,7 @@ export function generateDateDetails(options: RandDateOptions = {}): DateDetail[]
 	const [min, max] = dateRange(options);
 	const format = resolveFormat(options.format);
 	const unit = resolveDateUnit(options.unit);
+	const language = resolveDateLanguage(options.language);
 
 	return withRandom(resolveRandom(options.random), () =>
 		collect(
@@ -259,8 +293,14 @@ export function generateDateDetails(options: RandDateOptions = {}): DateDetail[]
 			() => {
 				const timestamp = randInt(min, max);
 				const parts = partsOf(timestamp);
+				const drawn: WordLanguage = language === 'all' ? pick(WORD_LANGUAGES) : language;
 
-				return { date: formatDate(parts, format), timestamp, ...parts };
+				return {
+					date: formatDate(parts, format, drawn),
+					timestamp,
+					...parts,
+					language: drawn
+				};
 			},
 			// Deduplicated by what the caller is handed: two dates in one minute are
 			// one result when `unit` asks for the minute.

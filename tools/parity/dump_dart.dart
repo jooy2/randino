@@ -536,6 +536,17 @@ void main() {
         'minDefault': dateMinDefault,
         'maxDefault': dateMaxDefault,
         'formatDefault': dateFormatDefault,
+        'names': <String, Object?>{
+          for (final entry in dateNames.entries)
+            entry.key.name: <String, Object?>{
+              'months': entry.value.months,
+              'monthsShort': entry.value.monthsShort,
+              'weekdays': entry.value.weekdays,
+              'weekdaysShort': entry.value.weekdaysShort,
+              'meridiem': entry.value.meridiem,
+              'meridiemLower': entry.value.meridiemLower,
+            },
+        },
       },
       'organization': <String, Object?>{
         'types': <String>[for (final type in organizationTypes) type.name],

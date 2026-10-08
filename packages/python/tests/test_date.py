@@ -3,10 +3,24 @@
 import re
 from datetime import date, datetime, timedelta, timezone
 
-from randino import DATE_UNITS, RAND_COUNT_MAX, DateDetail, DateInput, rand_date
+from randino import (
+    DATE_UNITS,
+    RAND_COUNT_MAX,
+    WORD_LANGUAGES,
+    DateDetail,
+    DateInput,
+    WordLanguageOption,
+    rand_date,
+)
 
 # Internal, but they are what a range is checked against.
-from randino.date.data import DATE_CEILING, DATE_FLOOR, DATE_MAX_DEFAULT, DATE_MIN_DEFAULT
+from randino.date.data import (
+    DATE_CEILING,
+    DATE_FLOOR,
+    DATE_MAX_DEFAULT,
+    DATE_MIN_DEFAULT,
+    DATE_NAMES,
+)
 
 SAMPLE = 60
 LARGE = 6000
@@ -34,6 +48,7 @@ def agrees(detail: DateDetail) -> bool:
         moment.minute,
         moment.second,
         moment.microsecond // 1000,
+        moment.isoweekday(),
     ) == (
         detail.year,
         detail.month,
@@ -42,6 +57,7 @@ def agrees(detail: DateDetail) -> bool:
         detail.minute,
         detail.second,
         detail.millisecond,
+        detail.weekday,
     )
 
 
@@ -212,6 +228,67 @@ def test_format_writes_every_token_and_text_in_brackets_as_it_is() -> None:
 
     # A format that writes nothing is no format at all.
     assert re.match(ISO, rand_date(format="")[0])
+
+
+def test_the_names_are_written_in_the_language_asked_for_english_by_default() -> None:
+    # 2024-03-15 was a Friday, in the afternoon.
+    at = "2024-03-15T19:05"
+
+    def names(language: WordLanguageOption = "en") -> str:
+        return rand_date(
+            min_date=at, max_date=at, format="dddd|ddd|MMMM|MMM|A|a", language=language
+        )[0]
+
+    assert names() == "Friday|Fri|March|Mar|PM|pm"
+    assert names("ko") == "금요일|금|3월|3월|오후|오후"
+    assert names("ru") == "пятница|пт|марта|мар.|PM|pm"
+
+    for language in WORD_LANGUAGES:
+        table = DATE_NAMES[language]
+
+        assert names(language) == "|".join(
+            (
+                table.weekdays[4],
+                table.weekdays_short[4],
+                table.months[2],
+                table.months_short[2],
+                table.meridiem[1],
+                table.meridiem_lower[1],
+            )
+        ), language
+
+
+def test_every_language_names_twelve_months_seven_days_and_two_halves_none_twice() -> None:
+    assert set(DATE_NAMES) == set(WORD_LANGUAGES)
+
+    for language in WORD_LANGUAGES:
+        table = DATE_NAMES[language]
+
+        for names, length in (
+            (table.months, 12),
+            (table.months_short, 12),
+            (table.weekdays, 7),
+            (table.weekdays_short, 7),
+            (table.meridiem, 2),
+            (table.meridiem_lower, 2),
+        ):
+            assert len(names) == length, language
+            assert len(set(names)) == length, f"{language} names a part twice"
+
+
+def test_all_picks_a_language_per_date_and_the_detail_says_which() -> None:
+    details = rand_date(language="all", format="MMMM dddd", count=300, output="detail")
+
+    assert {detail.language for detail in details} == set(WORD_LANGUAGES)
+
+    for detail in details:
+        table = DATE_NAMES[detail.language]
+
+        assert (
+            detail.date == f"{table.months[detail.month - 1]} {table.weekdays[detail.weekday - 1]}"
+        )
+
+    assert all(detail.language == "en" for detail in rand_date(count=20, output="detail"))
 
 
 def test_unit_returns_that_part_of_each_date_as_a_number() -> None:

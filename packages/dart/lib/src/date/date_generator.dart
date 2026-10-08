@@ -11,10 +11,13 @@ import 'package:randino/src/date/data/index.dart';
 import 'package:randino/src/internal/generate.dart';
 import 'package:randino/src/internal/utils.dart';
 import 'package:randino/src/types.dart';
+import 'package:randino/src/word/data/index.dart';
 
 // Longest first, so `YYYY` is never read as two `YY`. Text in brackets is
 // written as it is, and so is anything that is not a token.
-final RegExp _tokens = RegExp(r'\[([^\]]*)]|YYYY|YY|SSS|MM?|DD?|HH?|hh?|mm?|ss?|A|a');
+final RegExp _tokens = RegExp(
+  r'\[([^\]]*)]|YYYY|YY|MMMM|MMM|MM?|DD?|dddd|ddd|HH?|hh?|mm?|ss?|SSS|A|a',
+);
 
 /// The first and the last millisecond a call may land on.
 ///
@@ -36,14 +39,18 @@ final RegExp _tokens = RegExp(r'\[([^\]]*)]|YYYY|YY|SSS|MM?|DD?|HH?|hh?|mm?|ss?|
 
 String _pad(int value, int width) => '$value'.padLeft(width, '0');
 
-/// What one token of a format writes for [date].
-String _write(String token, DateTime date) => switch (token) {
+/// What one token of a format writes for [date], in [names].
+String _write(String token, DateTime date, DateNames names) => switch (token) {
   'YYYY' => _pad(date.year, 4),
   'YY' => _pad(date.year % 100, 2),
+  'MMMM' => names.months[date.month - 1],
+  'MMM' => names.monthsShort[date.month - 1],
   'MM' => _pad(date.month, 2),
   'M' => '${date.month}',
   'DD' => _pad(date.day, 2),
   'D' => '${date.day}',
+  'dddd' => names.weekdays[date.weekday - 1],
+  'ddd' => names.weekdaysShort[date.weekday - 1],
   'HH' => _pad(date.hour, 2),
   'H' => '${date.hour}',
   'hh' => _pad(date.hour % 12 == 0 ? 12 : date.hour % 12, 2),
@@ -53,13 +60,19 @@ String _write(String token, DateTime date) => switch (token) {
   'ss' => _pad(date.second, 2),
   's' => '${date.second}',
   'SSS' => _pad(date.millisecond, 3),
-  'A' => date.hour < 12 ? 'AM' : 'PM',
-  _ => date.hour < 12 ? 'am' : 'pm',
+  'A' => names.meridiem[date.hour < 12 ? 0 : 1],
+  _ => names.meridiemLower[date.hour < 12 ? 0 : 1],
 };
 
-/// [date] written out by [format].
-String formatDate(DateTime date, String format) =>
-    format.replaceAllMapped(_tokens, (match) => match.group(1) ?? _write(match.group(0)!, date));
+/// [date] written out by [format], in the names of [language].
+String formatDate(DateTime date, String format, WordLanguage language) {
+  final names = dateNames[language]!;
+
+  return format.replaceAllMapped(
+    _tokens,
+    (match) => match.group(1) ?? _write(match.group(0)!, date, names),
+  );
+}
 
 /// A whole number from [min] to [max], both included.
 ///
@@ -78,6 +91,7 @@ List<DateDetail> generateDateDetails({
   DateTime? maxDate,
   DateUnit? unit,
   String format = dateFormatDefault,
+  WordLanguage? language = WordLanguage.en,
   bool unique = false,
   Random? random,
 }) {
@@ -94,9 +108,10 @@ List<DateDetail> generateDateDetails({
       draw: () {
         final timestamp = _drawBetween(min, max);
         final date = DateTime.fromMillisecondsSinceEpoch(timestamp, isUtc: true);
+        final WordLanguage drawn = language ?? pick(wordLanguages);
 
         return DateDetail(
-          date: formatDate(date, written),
+          date: formatDate(date, written, drawn),
           timestamp: timestamp,
           year: date.year,
           month: date.month,
@@ -105,6 +120,8 @@ List<DateDetail> generateDateDetails({
           minute: date.minute,
           second: date.second,
           millisecond: date.millisecond,
+          weekday: date.weekday,
+          language: drawn,
         );
       },
       // Deduplicated by what the caller is handed: two dates in one minute are

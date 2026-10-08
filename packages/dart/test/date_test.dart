@@ -19,7 +19,8 @@ bool agrees(DateDetail detail) {
       date.hour == detail.hour &&
       date.minute == detail.minute &&
       date.second == detail.second &&
-      date.millisecond == detail.millisecond;
+      date.millisecond == detail.millisecond &&
+      date.weekday == detail.weekday;
 }
 
 bool inRange(List<DateDetail> dates, DateTime from, DateTime to) => dates.every(
@@ -158,6 +159,76 @@ void main() {
       expect(write(DateTime.utc(2024, 3, 5), 'h A'), '12 AM');
       // A format that writes nothing is no format at all.
       expect(randDate(format: '').single, matches(iso));
+    });
+
+    test('the names are written in the language asked for, English by default', () {
+      // 2024-03-15 was a Friday, in the afternoon.
+      final at = DateTime.utc(2024, 3, 15, 19, 5);
+      String names([WordLanguage? language = WordLanguage.en]) =>
+          randDate(
+            minDate: at,
+            maxDate: at,
+            format: 'dddd|ddd|MMMM|MMM|A|a',
+            language: language,
+          ).single;
+
+      expect(names(), 'Friday|Fri|March|Mar|PM|pm');
+      expect(names(WordLanguage.ko), '금요일|금|3월|3월|오후|오후');
+      expect(names(WordLanguage.ru), 'пятница|пт|марта|мар.|PM|pm');
+
+      for (final language in wordLanguages) {
+        final table = dateNames[language]!;
+
+        expect(
+          names(language),
+          <String>[
+            table.weekdays[4],
+            table.weekdaysShort[4],
+            table.months[2],
+            table.monthsShort[2],
+            table.meridiem[1],
+            table.meridiemLower[1],
+          ].join('|'),
+          reason: language.name,
+        );
+      }
+    });
+
+    test('every language names twelve months, seven days and two halves, none twice', () {
+      expect(dateNames.keys.toSet(), WordLanguage.values.toSet());
+
+      for (final language in wordLanguages) {
+        final table = dateNames[language]!;
+
+        for (final (list, length) in <(List<String>, int)>[
+          (table.months, 12),
+          (table.monthsShort, 12),
+          (table.weekdays, 7),
+          (table.weekdaysShort, 7),
+          (table.meridiem, 2),
+          (table.meridiemLower, 2),
+        ]) {
+          expect(list, hasLength(length), reason: language.name);
+          expect(list.toSet(), hasLength(length), reason: '${language.name} names a part twice');
+        }
+      }
+    });
+
+    test('a null language picks one per date, and the detail says which', () {
+      final details = randDateDetails(language: null, format: 'MMMM dddd', count: 300);
+
+      expect(details.map((detail) => detail.language).toSet(), wordLanguages.toSet());
+
+      for (final detail in details) {
+        final table = dateNames[detail.language]!;
+
+        expect(
+          detail.date,
+          '${table.months[detail.month - 1]} ${table.weekdays[detail.weekday - 1]}',
+        );
+      }
+
+      expect(randDateDetails(count: 20).every((d) => d.language == WordLanguage.en), isTrue);
     });
 
     test('randDateUnit returns that part of each date, as a number', () {

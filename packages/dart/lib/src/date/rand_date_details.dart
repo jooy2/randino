@@ -17,6 +17,7 @@ List<DateDetail> randDateDetails({
   DateTime? minDate,
   DateTime? maxDate,
   String format = dateFormatDefault,
+  WordLanguage? language = WordLanguage.en,
   bool unique = false,
 
   /// Where the randomness comes from: `Random.secure()` for a value nobody may
@@ -27,6 +28,7 @@ List<DateDetail> randDateDetails({
   minDate: minDate,
   maxDate: maxDate,
   format: format,
+  language: language,
   unique: unique,
   random: random,
 );

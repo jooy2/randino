@@ -11,17 +11,20 @@ from collections.abc import Callable
 from dataclasses import dataclass
 from datetime import date, datetime, timedelta, timezone
 
-from randino._internal.generate import collect, resolve_optional
-from randino._internal.utils import clamp, rand_int, with_random
-from randino._types import DateDetail, DateInput, DateUnit
+from randino._internal.generate import collect, resolve_option, resolve_optional
+from randino._internal.utils import clamp, pick, rand_int, with_random
+from randino._types import DateDetail, DateInput, DateUnit, WordLanguage, WordLanguageOption
 from randino.date.data import (
     DATE_CEILING,
     DATE_FLOOR,
     DATE_FORMAT_DEFAULT,
     DATE_MAX_DEFAULT,
     DATE_MIN_DEFAULT,
+    DATE_NAMES,
     DATE_UNITS,
+    DateNames,
 )
+from randino.word.data import WORD_LANGUAGES
 
 _EPOCH = datetime(1970, 1, 1, tzinfo=timezone.utc)
 _MILLISECOND = timedelta(milliseconds=1)
@@ -36,8 +39,8 @@ _ISO_DATE = re.compile(
 With an offset after the time: `Z`, `+09:00`, `+0900` or `+09`.
 """
 
-_TOKENS = re.compile(r"\[([^\]]*)]|YYYY|YY|SSS|MM?|DD?|HH?|hh?|mm?|ss?|A|a")
-"""Longest first, so `YYYY` is never read as two `YY`.
+_TOKENS = re.compile(r"\[([^\]]*)]|YYYY|YY|MMMM|MMM|MM?|DD?|dddd|ddd|HH?|hh?|mm?|ss?|SSS|A|a")
+"""Longest first, so `YYYY` is never read as two `YY` nor `MMMM` as two `MM`.
 
 Text in brackets is written as it is, and so is anything that is not a token.
 """
@@ -182,12 +185,17 @@ def date_range(min_date: object, max_date: object) -> tuple[int, int]:
     return min(clamp(start, DATE_FLOOR, DATE_CEILING), top), top
 
 
-def _write(token: str, moment: datetime) -> str:
-    """What one token of a format writes for `moment`."""
+def _write(token: str, moment: datetime, names: DateNames) -> str:
+    """What one token of a format writes for `moment`, in the names of one language."""
     twelve = moment.hour % 12 or 12
+    half = 0 if moment.hour < 12 else 1
     written = {
         "YYYY": f"{moment.year:04d}",
         "YY": f"{moment.year % 100:02d}",
+        "MMMM": names.months[moment.month - 1],
+        "MMM": names.months_short[moment.month - 1],
+        "dddd": names.weekdays[moment.isoweekday() - 1],
+        "ddd": names.weekdays_short[moment.isoweekday() - 1],
         "MM": f"{moment.month:02d}",
         "M": str(moment.month),
         "DD": f"{moment.day:02d}",
@@ -201,20 +209,33 @@ def _write(token: str, moment: datetime) -> str:
         "ss": f"{moment.second:02d}",
         "s": str(moment.second),
         "SSS": f"{moment.microsecond // 1000:03d}",
-        "A": "AM" if moment.hour < 12 else "PM",
+        "A": names.meridiem[half],
     }
 
-    return written.get(token, "am" if moment.hour < 12 else "pm")
+    return written.get(token, names.meridiem_lower[half])
 
 
-def format_date(moment: datetime, format: str) -> str:
-    """`moment` written out by `format`."""
+def format_date(moment: datetime, format: str, language: WordLanguage) -> str:
+    """`moment` written out by `format`, in the names of `language`."""
+    names = DATE_NAMES[language]
+
     return _TOKENS.sub(
         lambda match: (
-            match.group(1) if match.group(1) is not None else _write(match.group(0), moment)
+            match.group(1) if match.group(1) is not None else _write(match.group(0), moment, names)
         ),
         format,
     )
+
+
+def _resolve_date_language(language: object) -> WordLanguageOption:
+    """The caller's `language`, or English for one the package does not know.
+
+    Not `"all"` by default the way the other generators have it: a format is written in
+    one language, and nine languages' month names in one format is no format.
+    """
+    known: tuple[WordLanguageOption, ...] = (*WORD_LANGUAGES, "all")
+
+    return resolve_option(language, known, "en")
 
 
 def resolve_date_unit(unit: object) -> DateUnit | None:
@@ -236,6 +257,7 @@ def generate_date_details(
     max_date: DateInput | None = None,
     unit: DateUnit | None = None,
     format: str = DATE_FORMAT_DEFAULT,
+    language: WordLanguageOption = "en",
     unique: bool = False,
     random: Callable[[], float] | None = None,
 ) -> list[DateDetail]:
@@ -244,13 +266,15 @@ def generate_date_details(
     # A format that writes nothing is no format at all.
     written = format if isinstance(format, str) and format else DATE_FORMAT_DEFAULT
     part = resolve_date_unit(unit)
+    chosen = _resolve_date_language(language)
 
     def draw() -> DateDetail:
         timestamp = rand_int(low, high)
         moment = _EPOCH + timedelta(milliseconds=timestamp)
+        drawn: WordLanguage = pick(WORD_LANGUAGES) if chosen == "all" else chosen
 
         return DateDetail(
-            date=format_date(moment, written),
+            date=format_date(moment, written, drawn),
             timestamp=timestamp,
             year=moment.year,
             month=moment.month,
@@ -259,6 +283,8 @@ def generate_date_details(
             minute=moment.minute,
             second=moment.second,
             millisecond=moment.microsecond // 1000,
+            weekday=moment.isoweekday(),
+            language=drawn,
         )
 
     def key_of(detail: DateDetail) -> str:

@@ -2,7 +2,7 @@
 
 Generates dates and returns `count` of them, each drawn evenly from a range and written out in UTC. The default range is the years 1900 to 2099, and the default [format](#formats) is ISO 8601. With [`unit`](#units) it returns one part of each date as a number instead, from the year down to the millisecond, and with [`output: 'detail'`](#the-detail-output) it returns every part at once.
 
-A date is written by a format rather than in a language, so `randDate` takes no `language`.
+The numbers in a date need no language. The month and weekday names a [format](#formats) can ask for do, so [`language`](#names) says which one writes them, English unless you name another.
 
 ::: lang js
 
@@ -46,6 +46,7 @@ Every option is optional, and the defaults are what the empty call above uses.
 | <Lang js="minDate" dart="minDate" py="min_date" code /> | <Lang js="DateInput" dart="DateTime?" py="DateInput &#124; None" code /> | `1900-01-01` | The earliest date to return. See [the range](#the-range). |
 | <Lang js="maxDate" dart="maxDate" py="max_date" code /> | <Lang js="DateInput" dart="DateTime?" py="DateInput &#124; None" code /> | `2099-12-31` | The latest date to return, up to the last millisecond of that day. See [the range](#the-range). |
 | `format` | <Lang js="string" dart="String" py="str" code /> | `YYYY-MM-DDTHH:mm:ss.SSSZ` | How each date is written. See [formats](#formats). |
+| `language` | <Lang js="WordLanguageOption" dart="WordLanguage?" py="WordLanguageOption" code /> | <Lang js="'en'" dart="WordLanguage.en" py="&quot;en&quot;" code /> | The language month names, weekday names and `AM` / `PM` are written in. See [names](#names). |
 | `unit` | <Lang js="DateUnit" py="DateUnit &#124; None" code /> | <Lang js="—" py="None" code /> | Return one part of each date as a number. Dart spells this as a function of its own — see [units](#units). |
 | `count` | <Lang js="number" dart="int" py="int" code /> | `1` | How many dates to return. Clamped to `0` … `10000`. |
 | `unique` | <Lang js="boolean" dart="bool" py="bool" code /> | <Lang js="false" dart="false" py="False" code /> | Never return the same result twice: the same written date, or the same part when <Lang js="unit" dart="randDateUnit" py="unit" code /> names one. Returns fewer than `count` once the range runs out. |
@@ -127,25 +128,29 @@ Every range is held inside the years 1 to 9999, which is what a year of four dig
 
 `format` writes each date. The tokens below are replaced by a part of the date, text inside `[` and `]` is written as it is, and everything else is written as it is too.
 
-| Token  | Writes                        | Example |
-| ------ | ----------------------------- | ------- |
-| `YYYY` | The year, four digits         | `2024`  |
-| `YY`   | The year, two digits          | `24`    |
-| `MM`   | The month, two digits         | `03`    |
-| `M`    | The month                     | `3`     |
-| `DD`   | The day, two digits           | `05`    |
-| `D`    | The day                       | `5`     |
-| `HH`   | The hour, 00 to 23            | `19`    |
-| `H`    | The hour, 0 to 23             | `19`    |
-| `hh`   | The hour, 01 to 12            | `07`    |
-| `h`    | The hour, 1 to 12             | `7`     |
-| `mm`   | The minute, two digits        | `08`    |
-| `m`    | The minute                    | `8`     |
-| `ss`   | The second, two digits        | `09`    |
-| `s`    | The second                    | `9`     |
-| `SSS`  | The millisecond, three digits | `045`   |
-| `A`    | `AM` or `PM`                  | `PM`    |
-| `a`    | `am` or `pm`                  | `pm`    |
+| Token  | Writes                        | Example   |
+| ------ | ----------------------------- | --------- |
+| `YYYY` | The year, four digits         | `2024`    |
+| `YY`   | The year, two digits          | `24`      |
+| `MMMM` | The month's name              | `March`   |
+| `MMM`  | The month's short name        | `Mar`     |
+| `MM`   | The month, two digits         | `03`      |
+| `M`    | The month                     | `3`       |
+| `DD`   | The day, two digits           | `05`      |
+| `D`    | The day                       | `5`       |
+| `dddd` | The day of the week's name    | `Tuesday` |
+| `ddd`  | Its short name                | `Tue`     |
+| `HH`   | The hour, 00 to 23            | `19`      |
+| `H`    | The hour, 0 to 23             | `19`      |
+| `hh`   | The hour, 01 to 12            | `07`      |
+| `h`    | The hour, 1 to 12             | `7`       |
+| `mm`   | The minute, two digits        | `08`      |
+| `m`    | The minute                    | `8`       |
+| `ss`   | The second, two digits        | `09`      |
+| `s`    | The second                    | `9`       |
+| `SSS`  | The millisecond, three digits | `045`     |
+| `A`    | Before or after noon          | `PM`      |
+| `a`    | The same, in lower case       | `pm`      |
 
 The default, `YYYY-MM-DDTHH:mm:ss.SSSZ`, is ISO 8601 in UTC: neither `T` nor `Z` is a token, so both are written as they are.
 
@@ -183,6 +188,60 @@ rand_date(format="[Week of] YYYY-MM-DD")  # ['Week of 2012-05-19']
 :::
 
 A letter that is a token is replaced wherever it stands, so `Day` outside brackets comes out as `5amy`: both `D` and `a` are tokens. Put any word in brackets. A format that writes nothing at all, `''`, is read as the default.
+
+## Names in nine languages {#names}
+
+`MMMM`, `MMM`, `dddd`, `ddd`, `A` and `a` write words rather than numbers, and `language` says which language writes them. It is one of the nine the word pools cover, and English when left out: a format is written in one language, so the names keep to one rather than mixing nine into it. <Lang js="'all'" dart="A null language" py="&quot;all&quot;" code /> picks one per date, which is what the detail's `language` reports.
+
+| Language | `MMMM`  | `MMM` | `dddd`  | `ddd` | `A`   |
+| -------- | ------- | ----- | ------- | ----- | ----- |
+| `en`     | March   | Mar   | Friday  | Fri   | PM    |
+| `ko`     | 3월     | 3월   | 금요일  | 금    | 오후  |
+| `ja`     | 3月     | 3月   | 金曜日  | 金    | 午後  |
+| `zh`     | 三月    | 3月   | 星期五  | 周五  | 下午  |
+| `vi`     | tháng 3 | thg 3 | Thứ Sáu | T6    | CH    |
+| `es`     | marzo   | mar   | viernes | vie   | p. m. |
+| `it`     | marzo   | mar   | venerdì | ven   | PM    |
+| `de`     | März    | März  | Freitag | Fr.   | PM    |
+| `ru`     | марта   | мар.  | пятница | пт    | PM    |
+
+Each name is the form the language writes inside a date. Spanish and Italian months are in lower case, Russian months are in the genitive (`14 августа`, not `август`), and a Vietnamese month is `tháng 3`. The languages that keep to a 24-hour clock in writing still have `AM` and `PM` for a format that asks for them.
+
+::: lang js
+
+```javascript
+randDate({ format: 'dddd, MMMM D, YYYY' }); // ['Saturday, May 19, 2012']
+randDate({ format: 'YYYY년 M월 D일 dddd A h:mm', language: 'ko' }); // ['2031년 3월 4일 화요일 오후 7:40']
+randDate({ format: 'YYYY年M月D日(ddd)', language: 'ja' }); // ['1993年8月14日(土)']
+randDate({ format: 'D MMMM YYYY', language: 'ru' }); // ['14 августа 1993']
+randDate({ format: 'dddd, D. MMMM YYYY', language: 'de' }); // ['Samstag, 14. August 1993']
+```
+
+:::
+
+::: lang dart
+
+```dart
+randDate(format: 'dddd, MMMM D, YYYY'); // [Saturday, May 19, 2012]
+randDate(format: 'YYYY년 M월 D일 dddd A h:mm', language: WordLanguage.ko); // [2031년 3월 4일 화요일 오후 7:40]
+randDate(format: 'YYYY年M月D日(ddd)', language: WordLanguage.ja); // [1993年8月14日(土)]
+randDate(format: 'D MMMM YYYY', language: WordLanguage.ru); // [14 августа 1993]
+randDate(format: 'dddd, D. MMMM YYYY', language: WordLanguage.de); // [Samstag, 14. August 1993]
+```
+
+:::
+
+::: lang py
+
+```python
+rand_date(format="dddd, MMMM D, YYYY")  # ['Saturday, May 19, 2012']
+rand_date(format="YYYY년 M월 D일 dddd A h:mm", language="ko")  # ['2031년 3월 4일 화요일 오후 7:40']
+rand_date(format="YYYY年M月D日(ddd)", language="ja")  # ['1993年8月14日(土)']
+rand_date(format="D MMMM YYYY", language="ru")  # ['14 августа 1993']
+rand_date(format="dddd, D. MMMM YYYY", language="de")  # ['Samstag, 14. August 1993']
+```
+
+:::
 
 ## Units {#units}
 
@@ -251,7 +310,9 @@ randDate({ output: 'detail' });
 //   hour: 8,
 //   minute: 14,
 //   second: 51,
-//   millisecond: 302
+//   millisecond: 302,
+//   weekday: 7,
+//   language: 'en'
 // }]
 ```
 
@@ -267,6 +328,7 @@ final detail = randDateDetails().first;
 detail.date; // 1987-06-21T08:14:51.302Z
 detail.timestamp; // 551261691302
 detail[DateUnit.hour]; // 8
+detail.weekday; // 7
 ```
 
 Dart has neither overloads nor union types, so the detail form is its own function. It takes the same parameters as `randDate`, and `detail[unit]` reads one part by its `DateUnit`.
@@ -278,7 +340,8 @@ Dart has neither overloads nor union types, so the detail form is its own functi
 ```python
 rand_date(output="detail")
 # [DateDetail(date='1987-06-21T08:14:51.302Z', timestamp=551261691302, year=1987,
-#             month=6, day=21, hour=8, minute=14, second=51, millisecond=302)]
+#             month=6, day=21, hour=8, minute=14, second=51, millisecond=302,
+#             weekday=7, language='en')]
 ```
 
 `unit` does not change the detail: it is the whole date either way.
@@ -291,6 +354,8 @@ rand_date(output="detail")
 | `timestamp` | <Lang js="number" dart="int" py="int" code /> | Milliseconds since `1970-01-01T00:00:00.000Z`, negative before it. |
 | `year`, `month`, `day` | <Lang js="number" dart="int" py="int" code /> | The calendar date, with `month` from 1 to 12. |
 | `hour`, `minute`, `second`, `millisecond` | <Lang js="number" dart="int" py="int" code /> | The time of day. |
+| `weekday` | <Lang js="number" dart="int" py="int" code /> | The day of the week, `1` for Monday to `7` for Sunday, the way ISO 8601 counts it. |
+| `language` | `WordLanguage` | The language the names in `date` are written in. |
 
 <Lang js="new Date(detail.timestamp)" dart="DateTime.fromMillisecondsSinceEpoch(detail.timestamp, isUtc: true)" py="datetime.fromtimestamp(detail.timestamp / 1000, timezone.utc)" code /> turns the detail back into the platform's own date.
 

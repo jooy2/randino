@@ -2,7 +2,7 @@
 
 날짜를 만들어 `count`개만큼 돌려줍니다. 각 날짜는 범위 안에서 고르게 뽑고 UTC로 씁니다. 기본 범위는 1900년부터 2099년까지이고, 기본 [형식](#formats)은 ISO 8601입니다. [`unit`](#units)을 주면 날짜를 쓰는 대신 연도부터 밀리초까지 중 한 단위를 숫자로 돌려주고, [`output: 'detail'`](#the-detail-output)을 주면 모든 단위를 한꺼번에 돌려줍니다.
 
-날짜는 언어가 아니라 형식으로 쓰므로 `randDate`는 `language`를 받지 않습니다.
+날짜의 숫자에는 언어가 없습니다. [형식](#formats)이 쓸 수 있는 월과 요일의 이름에는 언어가 있으므로, [`language`](#names)로 어느 언어로 쓸지 정합니다. 따로 정하지 않으면 영어입니다.
 
 ::: lang js
 
@@ -46,6 +46,7 @@ rand_date()
 | <Lang js="minDate" dart="minDate" py="min_date" code /> | <Lang js="DateInput" dart="DateTime?" py="DateInput &#124; None" code /> | `1900-01-01` | 돌려줄 가장 이른 날짜. [범위](#the-range)를 보세요. |
 | <Lang js="maxDate" dart="maxDate" py="max_date" code /> | <Lang js="DateInput" dart="DateTime?" py="DateInput &#124; None" code /> | `2099-12-31` | 돌려줄 가장 늦은 날짜. 그날의 마지막 밀리초까지 포함합니다. [범위](#the-range)를 보세요. |
 | `format` | <Lang js="string" dart="String" py="str" code /> | `YYYY-MM-DDTHH:mm:ss.SSSZ` | 날짜를 쓰는 방식. [형식](#formats)을 보세요. |
+| `language` | <Lang js="WordLanguageOption" dart="WordLanguage?" py="WordLanguageOption" code /> | <Lang js="'en'" dart="WordLanguage.en" py="&quot;en&quot;" code /> | 월 이름, 요일 이름, 오전·오후를 쓸 언어. [이름](#names)을 보세요. |
 | `unit` | <Lang js="DateUnit" py="DateUnit &#124; None" code /> | <Lang js="—" py="None" code /> | 날짜마다 한 단위를 숫자로 돌려줍니다. Dart에서는 별도 함수입니다. [단위](#units)를 보세요. |
 | `count` | <Lang js="number" dart="int" py="int" code /> | `1` | 돌려줄 날짜 개수. `0` … `10000`으로 제한됩니다. |
 | `unique` | <Lang js="boolean" dart="bool" py="bool" code /> | <Lang js="false" dart="false" py="False" code /> | 같은 결과를 두 번 돌려주지 않습니다. 쓴 날짜가 같으면 같은 결과이고, <Lang js="unit" dart="randDateUnit" py="unit" code />으로 단위를 고르면 그 단위의 값이 같을 때 같은 결과입니다. 범위가 바닥나면 `count`보다 적게 돌아옵니다. |
@@ -127,25 +128,29 @@ rand_date(min_date="2024-03-15T09:00", max_date="2024-03-15T17:59", format="HH:m
 
 `format`은 날짜를 쓰는 방식입니다. 아래 토큰은 날짜의 한 부분으로 바뀌고, `[`와 `]` 사이의 글자는 그대로 쓰며, 나머지 글자도 그대로 씁니다.
 
-| 토큰   | 쓰는 값         | 예     |
-| ------ | --------------- | ------ |
-| `YYYY` | 연도, 네 자리   | `2024` |
-| `YY`   | 연도, 두 자리   | `24`   |
-| `MM`   | 월, 두 자리     | `03`   |
-| `M`    | 월              | `3`    |
-| `DD`   | 일, 두 자리     | `05`   |
-| `D`    | 일              | `5`    |
-| `HH`   | 시, 00~23       | `19`   |
-| `H`    | 시, 0~23        | `19`   |
-| `hh`   | 시, 01~12       | `07`   |
-| `h`    | 시, 1~12        | `7`    |
-| `mm`   | 분, 두 자리     | `08`   |
-| `m`    | 분              | `8`    |
-| `ss`   | 초, 두 자리     | `09`   |
-| `s`    | 초              | `9`    |
-| `SSS`  | 밀리초, 세 자리 | `045`  |
-| `A`    | `AM` 또는 `PM`  | `PM`   |
-| `a`    | `am` 또는 `pm`  | `pm`   |
+| 토큰   | 쓰는 값         | 예        |
+| ------ | --------------- | --------- |
+| `YYYY` | 연도, 네 자리   | `2024`    |
+| `YY`   | 연도, 두 자리   | `24`      |
+| `MMMM` | 월 이름         | `March`   |
+| `MMM`  | 짧은 월 이름    | `Mar`     |
+| `MM`   | 월, 두 자리     | `03`      |
+| `M`    | 월              | `3`       |
+| `DD`   | 일, 두 자리     | `05`      |
+| `D`    | 일              | `5`       |
+| `dddd` | 요일 이름       | `Tuesday` |
+| `ddd`  | 짧은 요일 이름  | `Tue`     |
+| `HH`   | 시, 00~23       | `19`      |
+| `H`    | 시, 0~23        | `19`      |
+| `hh`   | 시, 01~12       | `07`      |
+| `h`    | 시, 1~12        | `7`       |
+| `mm`   | 분, 두 자리     | `08`      |
+| `m`    | 분              | `8`       |
+| `ss`   | 초, 두 자리     | `09`      |
+| `s`    | 초              | `9`       |
+| `SSS`  | 밀리초, 세 자리 | `045`     |
+| `A`    | 오전 또는 오후  | `PM`      |
+| `a`    | 같은 것, 소문자 | `pm`      |
 
 기본값 `YYYY-MM-DDTHH:mm:ss.SSSZ`는 UTC로 쓴 ISO 8601입니다. `T`와 `Z`는 토큰이 아니어서 그대로 쓰입니다.
 
@@ -183,6 +188,60 @@ rand_date(format="[Week of] YYYY-MM-DD")  # ['Week of 2012-05-19']
 :::
 
 토큰인 글자는 어디에 있든 바뀝니다. 대괄호 밖의 `Day`는 `D`와 `a`가 모두 토큰이라 `5amy`가 됩니다. 영어 단어는 대괄호로 감싸세요. 한글은 토큰이 아니므로 그대로 써도 됩니다. 아무것도 쓰지 않는 형식 `''`는 기본값으로 읽습니다.
+
+## 9개 언어의 이름 {#names}
+
+`MMMM`, `MMM`, `dddd`, `ddd`, `A`, `a`는 숫자가 아니라 낱말을 쓰고, 어느 언어의 낱말인지는 `language`가 정합니다. 단어 풀이 다루는 9개 언어 중 하나이고, 생략하면 영어입니다. 형식은 한 언어로 쓰는 것이므로, 이름도 9개 언어를 섞지 않고 한 언어를 따릅니다. <Lang js="'all'" dart="null" py="&quot;all&quot;" code />을 주면 날짜마다 언어를 하나씩 고르고, 상세 출력의 `language`가 어느 언어였는지 알려 줍니다.
+
+| 언어 | `MMMM`  | `MMM` | `dddd`  | `ddd` | `A`   |
+| ---- | ------- | ----- | ------- | ----- | ----- |
+| `en` | March   | Mar   | Friday  | Fri   | PM    |
+| `ko` | 3월     | 3월   | 금요일  | 금    | 오후  |
+| `ja` | 3月     | 3月   | 金曜日  | 金    | 午後  |
+| `zh` | 三月    | 3月   | 星期五  | 周五  | 下午  |
+| `vi` | tháng 3 | thg 3 | Thứ Sáu | T6    | CH    |
+| `es` | marzo   | mar   | viernes | vie   | p. m. |
+| `it` | marzo   | mar   | venerdì | ven   | PM    |
+| `de` | März    | März  | Freitag | Fr.   | PM    |
+| `ru` | марта   | мар.  | пятница | пт    | PM    |
+
+각 이름은 그 언어가 날짜 안에서 쓰는 형태입니다. 스페인어와 이탈리아어의 월은 소문자로 쓰고, 러시아어의 월은 생격으로 씁니다(`август`가 아니라 `14 августа`). 베트남어의 월은 `tháng 3`입니다. 글에서 24시간제를 쓰는 언어도 형식이 요구하면 `AM`과 `PM`을 씁니다.
+
+::: lang js
+
+```javascript
+randDate({ format: 'dddd, MMMM D, YYYY' }); // ['Saturday, May 19, 2012']
+randDate({ format: 'YYYY년 M월 D일 dddd A h:mm', language: 'ko' }); // ['2031년 3월 4일 화요일 오후 7:40']
+randDate({ format: 'YYYY年M月D日(ddd)', language: 'ja' }); // ['1993年8月14日(土)']
+randDate({ format: 'D MMMM YYYY', language: 'ru' }); // ['14 августа 1993']
+randDate({ format: 'dddd, D. MMMM YYYY', language: 'de' }); // ['Samstag, 14. August 1993']
+```
+
+:::
+
+::: lang dart
+
+```dart
+randDate(format: 'dddd, MMMM D, YYYY'); // [Saturday, May 19, 2012]
+randDate(format: 'YYYY년 M월 D일 dddd A h:mm', language: WordLanguage.ko); // [2031년 3월 4일 화요일 오후 7:40]
+randDate(format: 'YYYY年M月D日(ddd)', language: WordLanguage.ja); // [1993年8月14日(土)]
+randDate(format: 'D MMMM YYYY', language: WordLanguage.ru); // [14 августа 1993]
+randDate(format: 'dddd, D. MMMM YYYY', language: WordLanguage.de); // [Samstag, 14. August 1993]
+```
+
+:::
+
+::: lang py
+
+```python
+rand_date(format="dddd, MMMM D, YYYY")  # ['Saturday, May 19, 2012']
+rand_date(format="YYYY년 M월 D일 dddd A h:mm", language="ko")  # ['2031년 3월 4일 화요일 오후 7:40']
+rand_date(format="YYYY年M月D日(ddd)", language="ja")  # ['1993年8月14日(土)']
+rand_date(format="D MMMM YYYY", language="ru")  # ['14 августа 1993']
+rand_date(format="dddd, D. MMMM YYYY", language="de")  # ['Samstag, 14. August 1993']
+```
+
+:::
 
 ## 단위 {#units}
 
@@ -251,7 +310,9 @@ randDate({ output: 'detail' });
 //   hour: 8,
 //   minute: 14,
 //   second: 51,
-//   millisecond: 302
+//   millisecond: 302,
+//   weekday: 7,
+//   language: 'en'
 // }]
 ```
 
@@ -267,6 +328,7 @@ final detail = randDateDetails().first;
 detail.date; // 1987-06-21T08:14:51.302Z
 detail.timestamp; // 551261691302
 detail[DateUnit.hour]; // 8
+detail.weekday; // 7
 ```
 
 Dart에는 오버로드도 유니언 타입도 없어서, 상세 출력은 별도 함수입니다. `randDate`와 같은 매개변수를 받고, `detail[unit]`으로 `DateUnit`에 해당하는 단위 하나를 읽습니다.
@@ -278,7 +340,8 @@ Dart에는 오버로드도 유니언 타입도 없어서, 상세 출력은 별�
 ```python
 rand_date(output="detail")
 # [DateDetail(date='1987-06-21T08:14:51.302Z', timestamp=551261691302, year=1987,
-#             month=6, day=21, hour=8, minute=14, second=51, millisecond=302)]
+#             month=6, day=21, hour=8, minute=14, second=51, millisecond=302,
+#             weekday=7, language='en')]
 ```
 
 `unit`은 상세 출력을 바꾸지 않습니다. 어느 쪽이든 날짜 전체가 돌아옵니다.
@@ -291,6 +354,8 @@ rand_date(output="detail")
 | `timestamp` | <Lang js="number" dart="int" py="int" code /> | `1970-01-01T00:00:00.000Z` 이후의 밀리초. 그 이전은 음수입니다. |
 | `year`, `month`, `day` | <Lang js="number" dart="int" py="int" code /> | 달력의 날짜. `month`는 1~12입니다. |
 | `hour`, `minute`, `second`, `millisecond` | <Lang js="number" dart="int" py="int" code /> | 하루의 시각. |
+| `weekday` | <Lang js="number" dart="int" py="int" code /> | 요일. ISO 8601처럼 월요일 `1`부터 일요일 `7`까지 셉니다. |
+| `language` | `WordLanguage` | `date`의 이름을 쓴 언어. |
 
 <Lang js="new Date(detail.timestamp)" dart="DateTime.fromMillisecondsSinceEpoch(detail.timestamp, isUtc: true)" py="datetime.fromtimestamp(detail.timestamp / 1000, timezone.utc)" code />로 각 언어의 날짜 타입으로 되돌릴 수 있습니다.
 

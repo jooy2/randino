@@ -966,6 +966,8 @@ class DateDetail {
     required this.minute,
     required this.second,
     required this.millisecond,
+    required this.weekday,
+    required this.language,
   });
 
   /// The date as `format` writes it — what `randDate` returns.
@@ -994,6 +996,13 @@ class DateDetail {
 
   /// `0` to `999`.
   final int millisecond;
+
+  /// The day of the week, `1` for Monday to `7` for Sunday, the way ISO 8601
+  /// and `DateTime.weekday` count it.
+  final int weekday;
+
+  /// The language the names in [date] are written in.
+  final WordLanguage language;
 
   /// The part [unit] names.
   int operator [](DateUnit unit) => switch (unit) {

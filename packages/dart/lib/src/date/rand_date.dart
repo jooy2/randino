@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:randino/src/date/data/index.dart';
 import 'package:randino/src/date/date_generator.dart';
+import 'package:randino/src/types.dart';
 
 /// Generate dates, drawn evenly from a range and written out in UTC.
 ///
@@ -11,10 +12,13 @@ import 'package:randino/src/date/date_generator.dart';
 /// round keeps [maxDate]. A `DateTime` is the instant it holds, so
 /// `DateTime.utc(2024, 12, 31)` as [maxDate] stops at that midnight.
 ///
-/// [format] writes the date: `YYYY`, `YY`, `M`, `MM`, `D`, `DD`, `H`, `HH`,
-/// `h`, `hh`, `m`, `mm`, `s`, `ss`, `SSS`, `A` and `a` are replaced, text
-/// inside `[` `]` is written as it is, and so is everything else. It defaults
-/// to ISO 8601.
+/// [format] writes the date: `YYYY`, `YY`, `MMMM`, `MMM`, `MM`, `M`, `DD`,
+/// `D`, `dddd`, `ddd`, `HH`, `H`, `hh`, `h`, `mm`, `m`, `ss`, `s`, `SSS`, `A`
+/// and `a` are replaced, text inside `[` `]` is written as it is, and so is
+/// everything else. It defaults to ISO 8601. `MMMM`, `MMM`, `dddd` and `ddd`
+/// write the month and the day of the week by name, and `A` and `a` the half
+/// of the day, in [language]: English by default, because a format is written
+/// in one language, and a null [language] picks one per date.
 ///
 /// ```dart
 /// randDate(); // [1987-06-21T08:14:51.302Z]
@@ -26,6 +30,7 @@ List<String> randDate({
   DateTime? minDate,
   DateTime? maxDate,
   String format = dateFormatDefault,
+  WordLanguage? language = WordLanguage.en,
   bool unique = false,
 
   /// Where the randomness comes from: `Random.secure()` for a value nobody may
@@ -37,6 +42,7 @@ List<String> randDate({
     minDate: minDate,
     maxDate: maxDate,
     format: format,
+    language: language,
     unique: unique,
     random: random,
   ))

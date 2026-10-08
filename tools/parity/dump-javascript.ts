@@ -22,6 +22,7 @@ import {
 	DATE_FORMAT_DEFAULT,
 	DATE_MAX_DEFAULT,
 	DATE_MIN_DEFAULT,
+	DATE_NAMES,
 	DATE_UNITS
 } from '../../packages/javascript/lib/date/data/index.js';
 import { outline } from '../../packages/javascript/lib/_internal/parse.js';
@@ -200,7 +201,20 @@ console.log(
 			ceiling: DATE_CEILING,
 			minDefault: DATE_MIN_DEFAULT,
 			maxDefault: DATE_MAX_DEFAULT,
-			formatDefault: DATE_FORMAT_DEFAULT
+			formatDefault: DATE_FORMAT_DEFAULT,
+			names: Object.fromEntries(
+				Object.entries(DATE_NAMES).map(([code, names]) => [
+					code,
+					{
+						months: [...names.months],
+						monthsShort: [...names.monthsShort],
+						weekdays: [...names.weekdays],
+						weekdaysShort: [...names.weekdaysShort],
+						meridiem: [...names.meridiem],
+						meridiemLower: [...names.meridiemLower]
+					}
+				])
+			)
 		},
 		// A synthesis carries its `kind` tag, and a language without places or numbers
 		// writes them as null, the way every other optional field is written.

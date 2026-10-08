@@ -224,6 +224,7 @@ describe('base test', () => {
 			() => randino.randAge({ distribution: 'normal' as never }),
 			() => randino.randAge({ minAge: NaN, maxAge: 'x' as never }),
 			() => randino.randDate({ unit: 'week' as never, format: 123 as never }),
+			() => randino.randDate({ language: 'xx' as never, format: 'MMMM dddd A' }),
 			() => randino.randDate({ minDate: {} as never, maxDate: [] as never, count: NaN }),
 			() => randino.randPhone({ country: 'XX' as never, type: 'pager' as never }),
 			() => randino.randPhone({ country: 123 as never, separator: 7 as never, count: NaN }),

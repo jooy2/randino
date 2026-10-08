@@ -1,13 +1,14 @@
 import assert from 'assert';
 import { describe, it } from 'node:test';
-import { DATE_UNITS, RAND_COUNT_MAX, randDate } from '../dist/index.js';
+import { DATE_UNITS, RAND_COUNT_MAX, WORD_LANGUAGES, randDate } from '../dist/index.js';
 import type { DateDetail } from '../dist/index.js';
 // Internal, but they are what a range is checked against.
 import {
 	DATE_CEILING,
 	DATE_FLOOR,
 	DATE_MAX_DEFAULT,
-	DATE_MIN_DEFAULT
+	DATE_MIN_DEFAULT,
+	DATE_NAMES
 } from '../dist/date/data/index.js';
 
 const SAMPLE = 60;
@@ -26,7 +27,8 @@ function agrees(detail: DateDetail): boolean {
 		date.getUTCHours() === detail.hour &&
 		date.getUTCMinutes() === detail.minute &&
 		date.getUTCSeconds() === detail.second &&
-		date.getUTCMilliseconds() === detail.millisecond
+		date.getUTCMilliseconds() === detail.millisecond &&
+		((date.getUTCDay() + 6) % 7) + 1 === detail.weekday
 	);
 }
 
@@ -239,6 +241,99 @@ describe('Date', () => {
 		);
 		// A format that writes nothing is no format at all.
 		assert.match(randDate({ format: '' })[0], ISO);
+	});
+
+	it('the names are written in the language asked for, English by default', () => {
+		// 2024-03-15 was a Friday, in the afternoon.
+		const at = '2024-03-15T19:05';
+		const write = (language?: string) =>
+			randDate({
+				minDate: at,
+				maxDate: at,
+				format: 'dddd|ddd|MMMM|MMM|A|a',
+				language: language as never
+			})[0];
+
+		assert.strictEqual(write(), 'Friday|Fri|March|Mar|PM|pm');
+
+		for (const language of WORD_LANGUAGES) {
+			const names = DATE_NAMES[language];
+
+			assert.strictEqual(
+				write(language),
+				[
+					names.weekdays[4],
+					names.weekdaysShort[4],
+					names.months[2],
+					names.monthsShort[2],
+					names.meridiem[1],
+					names.meridiemLower[1]
+				].join('|'),
+				language
+			);
+		}
+
+		assert.strictEqual(write('ko'), '금요일|금|3월|3월|오후|오후');
+		assert.strictEqual(write('ru'), 'пятница|пт|марта|мар.|PM|pm');
+	});
+
+	it('every month and every day of the week is written', () => {
+		for (const language of WORD_LANGUAGES) {
+			const months = new Set(
+				randDate({ language, format: 'MMMM', count: 600, minDate: '2024', maxDate: '2024' })
+			);
+			const days = new Set(randDate({ language, format: 'dddd', count: 300 }));
+
+			assert.strictEqual(months.size, 12, language);
+			assert.strictEqual(days.size, 7, language);
+		}
+	});
+
+	it('every language names twelve months, seven days and two halves, none of them twice', () => {
+		assert.deepStrictEqual(Object.keys(DATE_NAMES).sort(), [...WORD_LANGUAGES].sort());
+
+		for (const language of WORD_LANGUAGES) {
+			const names = DATE_NAMES[language];
+
+			for (const [list, length] of [
+				[names.months, 12],
+				[names.monthsShort, 12],
+				[names.weekdays, 7],
+				[names.weekdaysShort, 7],
+				[names.meridiem, 2],
+				[names.meridiemLower, 2]
+			] as const) {
+				assert.strictEqual(list.length, length, language);
+				assert.strictEqual(new Set(list).size, length, `${language} names a part twice`);
+			}
+		}
+	});
+
+	it("'all' picks a language per date, and the detail says which", () => {
+		const details = randDate({
+			language: 'all',
+			format: 'MMMM dddd',
+			count: 300,
+			output: 'detail'
+		});
+
+		assert.strictEqual(
+			new Set(details.map((detail) => detail.language)).size,
+			WORD_LANGUAGES.length
+		);
+
+		for (const detail of details) {
+			const names = DATE_NAMES[detail.language];
+
+			assert.strictEqual(
+				detail.date,
+				`${names.months[detail.month - 1]} ${names.weekdays[detail.weekday - 1]}`
+			);
+		}
+
+		assert.ok(
+			randDate({ count: 20, output: 'detail' }).every((detail) => detail.language === 'en')
+		);
 	});
 
 	it('unit returns that part of each date, as a number', () => {

@@ -26,6 +26,7 @@ from randino.date.data import (
     DATE_FORMAT_DEFAULT,
     DATE_MAX_DEFAULT,
     DATE_MIN_DEFAULT,
+    DATE_NAMES,
     DATE_UNITS,
 )
 from randino.decorate.data import (
@@ -495,6 +496,17 @@ print(
                 "minDefault": DATE_MIN_DEFAULT,
                 "maxDefault": DATE_MAX_DEFAULT,
                 "formatDefault": DATE_FORMAT_DEFAULT,
+                "names": {
+                    code: {
+                        "months": list(names.months),
+                        "monthsShort": list(names.months_short),
+                        "weekdays": list(names.weekdays),
+                        "weekdaysShort": list(names.weekdays_short),
+                        "meridiem": list(names.meridiem),
+                        "meridiemLower": list(names.meridiem_lower),
+                    }
+                    for code, names in DATE_NAMES.items()
+                },
             },
             "organization": {
                 "types": list(ORGANIZATION_TYPES),

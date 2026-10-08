@@ -310,6 +310,7 @@ def test_an_option_the_types_rule_out_falls_back_rather_than_raising() -> None:
         lambda: loose.rand_age(distribution="normal"),
         lambda: loose.rand_age(min_age=float("nan"), max_age="x"),
         lambda: loose.rand_date(unit="week", format=123),
+        lambda: loose.rand_date(language="xx", format="MMMM dddd A"),
         lambda: loose.rand_date(min_date={}, max_date=[], count=float("nan")),
         lambda: loose.rand_phone(country="XX", type="pager"),
         lambda: loose.rand_phone(country=123, separator=7, count=float("nan")),

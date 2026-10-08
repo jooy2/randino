@@ -354,12 +354,13 @@ randDate({ output: 'detail' });
 | --------------------- | -------------------------- | -------------------------- |
 | `minDate` / `maxDate` | `string \| Date \| number` | `'1900'` / `'2099'`        |
 | `format`              | `string`                   | `YYYY-MM-DDTHH:mm:ss.SSSZ` |
+| `language`            | `WordLanguageOption`       | `'en'`                     |
 | `unit`                | `DateUnit`                 | —                          |
 | `count`               | `number`                   | `1`                        |
 | `unique`              | `boolean`                  | `false`                    |
 | `output`              | `'value' \| 'detail'`      | `'value'`                  |
 
-`format` replaces `YYYY`, `YY`, `M`, `MM`, `D`, `DD`, `H`, `HH`, `h`, `hh`, `m`, `mm`, `s`, `ss`, `SSS`, `A` and `a`, and writes text inside `[` `]` as it is. `unit` is `year`, `month`, `day`, `hour`, `minute`, `second` or `millisecond`, read off a date drawn from the range, so a minute is `0` to `59` and a year keeps inside the range. A date has no language, so `randDate` takes none.
+`format` replaces `YYYY`, `YY`, `MMMM`, `MMM`, `MM`, `M`, `DD`, `D`, `dddd`, `ddd`, `HH`, `H`, `hh`, `h`, `mm`, `m`, `ss`, `s`, `SSS`, `A` and `a`, and writes text inside `[` `]` as it is. `MMMM`, `MMM`, `dddd`, `ddd`, `A` and `a` write words, in `language`: English unless another of the nine is named. `unit` is `year`, `month`, `day`, `hour`, `minute`, `second` or `millisecond`, read off a date drawn from the range, so a minute is `0` to `59` and a year keeps inside the range.
 
 ## Phone numbers
 

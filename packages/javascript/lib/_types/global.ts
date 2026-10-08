@@ -1040,12 +1040,20 @@ export interface RandDateOptions extends Pick<
 	 */
 	unit?: DateUnit;
 	/**
-	 * How the date is written, in UTC. `YYYY`, `YY`, `M`, `MM`, `D`, `DD`, `H`,
-	 * `HH`, `h`, `hh`, `m`, `mm`, `s`, `ss`, `SSS`, `A` and `a` are replaced, text
-	 * inside `[` `]` is written as it is, and so is everything else. Default
-	 * `'YYYY-MM-DDTHH:mm:ss.SSSZ'`, which is ISO 8601: `2024-03-15T14:07:32.481Z`.
+	 * How the date is written, in UTC. `YYYY`, `YY`, `MMMM`, `MMM`, `MM`, `M`,
+	 * `DD`, `D`, `dddd`, `ddd`, `HH`, `H`, `hh`, `h`, `mm`, `m`, `ss`, `s`, `SSS`,
+	 * `A` and `a` are replaced, text inside `[` `]` is written as it is, and so is
+	 * everything else. Default `'YYYY-MM-DDTHH:mm:ss.SSSZ'`, which is ISO 8601:
+	 * `2024-03-15T14:07:32.481Z`.
 	 */
 	format?: string;
+	/**
+	 * The language `MMMM`, `MMM`, `dddd`, `ddd`, `A` and `a` write their words in:
+	 * `March` or `3월`, `Friday` or `金曜日`, `PM` or `오후`. Default `'en'`. A format
+	 * is written in one language, so the names keep to one rather than mixing
+	 * nine into it; `'all'` picks a language per date.
+	 */
+	language?: WordLanguageOption;
 }
 
 /** A generated date with every part it was built from. All of them are UTC. */
@@ -1067,6 +1075,10 @@ export interface DateDetail {
 	second: number;
 	/** `0` to `999`. */
 	millisecond: number;
+	/** The day of the week, `1` for Monday to `7` for Sunday, the way ISO 8601 counts it. */
+	weekday: number;
+	/** The language the names in `date` are written in. */
+	language: WordLanguage;
 }
 
 /**

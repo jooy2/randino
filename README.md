@@ -20,7 +20,7 @@ Every option, every language and every example, with **JavaScript**, **Dart** or
 - **Ages** are whole numbers from `randAge`, drawn along a curve shaped like a population rather than evenly, so a sample of people is mostly adults and thins out past seventy.
 - **Genders** are the labels a form in the language writes, from `randGender`: 여성, Female, Weiblich. Male and female split evenly, and an unstated gender and a third gender are there when you ask for them.
 - **Organizations** are companies, schools, offices and associations that do not exist, from `randOrganization`: (주)새솔테크, Westbrook High School, Stadtwerke Bergtal. A company may carry its legal form, and the stems are chosen to be nobody's brand.
-- **Dates** are drawn evenly from a range and written out in UTC by a format of your own, from `randDate`: 2024-03-15T14:07:32.481Z, 2024년 3월 15일. `unit` hands back one part on its own, from the year down to the millisecond.
+- **Dates** are drawn evenly from a range and written out in UTC by a format of your own, from `randDate`: 2024-03-15T14:07:32.481Z, 2024년 3월 15일 금요일, 15 марта 2024. Month and weekday names come in all nine languages. `unit` hands back one part on its own, from the year down to the millisecond.
 - **Phone numbers** are written the way their country writes them, from `randPhone`: 010-4821-3967, (415) 726-0193, 8 (912) 345-67-89, in nine countries, with the country code and E.164 a parameter away. A number opens on a block the country really gives out, so it can by chance be somebody's: it is sample data, never a number to call or text. `fictional` keeps to the numbers the United States and Germany set aside for films and books, which nobody is given.
 - **Decorators** attach something to a string you already have rather than generating one: a random token with `randSuffix` and `randPrefix`, a word with `randModifier`.
 - One options set per generator: language, length, count, a `realism` setting that goes from real words to fully invented ones, and a `vocabulary` setting that keeps to the everyday words.
@@ -113,7 +113,7 @@ Pure Python. It imports nothing outside the standard library and ships a `py.typ
 
 ## Supported languages
 
-Every generator but `randAge`, `randDate` and `randPhone` takes a language, or mixes every language it supports when you leave it out; an age has none, a date is written by a format, and a phone number takes the country each language is spoken in first. All nine are covered by every generator but one, including the word pools: where a modifier goes and how it agrees with its noun are part of each language's own data.
+Every generator but `randAge`, `randDate` and `randPhone` takes a language, or mixes every language it supports when you leave it out; an age has none, a date's language only writes its month and weekday names and is English unless you name another, and a phone number takes the country each language is spoken in first. All nine are covered by every generator but one, including the word pools: where a modifier goes and how it agrees with its noun are part of each language's own data.
 
 | Code | Language   | Native     | Person names | Words and nicknames | Sentences | Organizations | Locations |
 | ---- | ---------- | ---------- | :----------: | :-----------------: | :-------: | :-----------: | :-------: |

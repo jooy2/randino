@@ -3,7 +3,7 @@
 from collections.abc import Callable
 from typing import Literal, overload
 
-from randino._types import DateDetail, DateInput, DateUnit
+from randino._types import DateDetail, DateInput, DateUnit, WordLanguageOption
 from randino.date._generator import generate_date_details, resolve_date_unit, unit_of
 from randino.date.data import DATE_FORMAT_DEFAULT
 
@@ -16,6 +16,7 @@ def rand_date(
     max_date: DateInput | None = ...,
     unit: None = ...,
     format: str = ...,
+    language: WordLanguageOption = ...,
     unique: bool = ...,
     random: Callable[[], float] | None = ...,
     output: Literal["value"] = ...,
@@ -30,6 +31,7 @@ def rand_date(
     max_date: DateInput | None = ...,
     unit: DateUnit,
     format: str = ...,
+    language: WordLanguageOption = ...,
     unique: bool = ...,
     random: Callable[[], float] | None = ...,
     output: Literal["value"] = ...,
@@ -44,6 +46,7 @@ def rand_date(
     max_date: DateInput | None = ...,
     unit: DateUnit | None = ...,
     format: str = ...,
+    language: WordLanguageOption = ...,
     unique: bool = ...,
     random: Callable[[], float] | None = ...,
     output: Literal["detail"],
@@ -57,6 +60,7 @@ def rand_date(
     max_date: DateInput | None = None,
     unit: DateUnit | None = None,
     format: str = DATE_FORMAT_DEFAULT,
+    language: WordLanguageOption = "en",
     unique: bool = False,
     random: Callable[[], float] | None = None,
     output: str = "value",
@@ -74,9 +78,14 @@ def rand_date(
             evening of that day. A range the wrong way round keeps `max_date`.
         unit: Return one part of each date, as an `int`, instead of the date written
             out. The part is read off a drawn date, so it keeps to the range.
-        format: How the date is written. `YYYY`, `YY`, `M`, `MM`, `D`, `DD`, `H`, `HH`,
-            `h`, `hh`, `m`, `mm`, `s`, `ss`, `SSS`, `A` and `a` are replaced, text inside
-            `[` `]` is written as it is, and so is everything else. Defaults to ISO 8601.
+        format: How the date is written. `YYYY`, `YY`, `MMMM`, `MMM`, `MM`, `M`, `DD`,
+            `D`, `dddd`, `ddd`, `HH`, `H`, `hh`, `h`, `mm`, `m`, `ss`, `s`, `SSS`, `A` and
+            `a` are replaced, text inside `[` `]` is written as it is, and so is everything
+            else. Defaults to ISO 8601.
+        language: The language `MMMM`, `MMM`, `dddd`, `ddd`, `A` and `a` write their
+            words in: `March` or `3월`, `Friday` or `金曜日`, `PM` or `오후`. Defaults to
+            `"en"`, because a format is written in one language; `"all"` picks one per
+            date.
         unique: Never return the same result twice — the same date, or the same part
             when `unit` names one. Returns fewer than `count` once the range runs out.
         random: Where the randomness comes from: a callable returning a number in
@@ -105,6 +114,7 @@ def rand_date(
         max_date=max_date,
         unit=unit,
         format=format,
+        language=language,
         unique=unique,
         random=random,
     )

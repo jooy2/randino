@@ -312,14 +312,15 @@ randDateUnit(DateUnit.minute, count: 5); // [37, 4, 52, 19, 0]
 randDateDetails().first.year; // 1987
 ```
 
-| Parameter             | Type        | Default                      |
-| --------------------- | ----------- | ---------------------------- |
-| `minDate` / `maxDate` | `DateTime?` | `null` — 1900 / 2099         |
-| `format`              | `String`    | `'YYYY-MM-DDTHH:mm:ss.SSSZ'` |
-| `count`               | `int`       | `1`                          |
-| `unique`              | `bool`      | `false`                      |
+| Parameter             | Type            | Default                      |
+| --------------------- | --------------- | ---------------------------- |
+| `minDate` / `maxDate` | `DateTime?`     | `null` — 1900 / 2099         |
+| `format`              | `String`        | `'YYYY-MM-DDTHH:mm:ss.SSSZ'` |
+| `language`            | `WordLanguage?` | `WordLanguage.en`            |
+| `count`               | `int`           | `1`                          |
+| `unique`              | `bool`          | `false`                      |
 
-`format` replaces `YYYY`, `YY`, `M`, `MM`, `D`, `DD`, `H`, `HH`, `h`, `hh`, `m`, `mm`, `s`, `ss`, `SSS`, `A` and `a`, and writes text inside `[` `]` as it is. `randDateUnit` takes a `DateUnit` in place of `format` and returns that part of each date as an `int`, read off a date drawn from the range, so a minute is `0` to `59` and a year keeps inside the range.
+`format` replaces `YYYY`, `YY`, `MMMM`, `MMM`, `MM`, `M`, `DD`, `D`, `dddd`, `ddd`, `HH`, `H`, `hh`, `h`, `mm`, `m`, `ss`, `s`, `SSS`, `A` and `a`, and writes text inside `[` `]` as it is. `MMMM`, `MMM`, `dddd`, `ddd`, `A` and `a` write words, in `language`: English unless another of the nine is named. `randDateUnit` takes a `DateUnit` in place of `format` and returns that part of each date as an `int`, read off a date drawn from the range, so a minute is `0` to `59` and a year keeps inside the range.
 
 ## Phone numbers
 

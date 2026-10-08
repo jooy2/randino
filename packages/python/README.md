@@ -335,12 +335,13 @@ rand_date(output="detail")
 | ----------------------- | ----------------------------------- | ---------------------------- |
 | `min_date` / `max_date` | `str \| datetime \| date \| None` | `None` — 1900 / 2099         |
 | `format`                | `str`                               | `"YYYY-MM-DDTHH:mm:ss.SSSZ"` |
+| `language`              | `WordLanguageOption`                | `"en"`                       |
 | `unit`                  | `DateUnit \| None`                  | `None`                       |
 | `count`                 | `int`                               | `1`                          |
 | `unique`                | `bool`                              | `False`                      |
 | `output`                | `"value" \| "detail"`               | `"value"`                    |
 
-`format` replaces `YYYY`, `YY`, `M`, `MM`, `D`, `DD`, `H`, `HH`, `h`, `hh`, `m`, `mm`, `s`, `ss`, `SSS`, `A` and `a`, and writes text inside `[` `]` as it is — the same tokens the npm package takes, rather than `strftime`'s. `unit` is `"year"`, `"month"`, `"day"`, `"hour"`, `"minute"`, `"second"` or `"millisecond"`, read off a date drawn from the range, and returns an `int` per date.
+`format` replaces `YYYY`, `YY`, `MMMM`, `MMM`, `MM`, `M`, `DD`, `D`, `dddd`, `ddd`, `HH`, `H`, `hh`, `h`, `mm`, `m`, `ss`, `s`, `SSS`, `A` and `a`, and writes text inside `[` `]` as it is — the same tokens the npm package takes, rather than `strftime`'s. `MMMM`, `MMM`, `dddd`, `ddd`, `A` and `a` write words, in `language`: English unless another of the nine is named. `unit` is `"year"`, `"month"`, `"day"`, `"hour"`, `"minute"`, `"second"` or `"millisecond"`, read off a date drawn from the range, and returns an `int` per date.
 
 ## Phone numbers
 
