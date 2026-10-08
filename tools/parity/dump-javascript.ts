@@ -5,8 +5,8 @@ import {
 	AGE_BANDS,
 	AGE_CURVE,
 	AGE_GROUPS,
-	AGE_MAX_DEFAULT,
-} from "../../packages/javascript/lib/age/data/index.js";
+	AGE_MAX_DEFAULT
+} from '../../packages/javascript/lib/age/data/index.js';
 import {
 	RAND_AGE_MAX,
 	RAND_COUNT_MAX,
@@ -15,8 +15,8 @@ import {
 	RAND_LOCATION_LENGTH_MAX,
 	RAND_ORGANIZATION_LENGTH_MAX,
 	RAND_SENTENCE_LENGTH_MAX,
-	SYSTEM_PLATFORMS,
-} from "../../packages/javascript/lib/constants.js";
+	SYSTEM_PLATFORMS
+} from '../../packages/javascript/lib/constants.js';
 import {
 	DATE_CEILING,
 	DATE_FLOOR,
@@ -24,33 +24,33 @@ import {
 	DATE_MAX_DEFAULT,
 	DATE_MIN_DEFAULT,
 	DATE_NAMES,
-	DATE_UNITS,
-} from "../../packages/javascript/lib/date/data/index.js";
-import { outline } from "../../packages/javascript/lib/_internal/parse.js";
+	DATE_UNITS
+} from '../../packages/javascript/lib/date/data/index.js';
+import { outline } from '../../packages/javascript/lib/_internal/parse.js';
 import {
 	AFFIX_CHARSET,
 	AFFIX_LENGTH_DEFAULT,
 	AFFIX_LENGTH_MAX,
-	AFFIX_SEPARATOR_DEFAULT,
-} from "../../packages/javascript/lib/decorate/data/index.js";
-import { DEVICES, DEVICE_TYPES } from "../../packages/javascript/lib/device/data/index.js";
+	AFFIX_SEPARATOR_DEFAULT
+} from '../../packages/javascript/lib/decorate/data/index.js';
+import { DEVICES, DEVICE_TYPES } from '../../packages/javascript/lib/device/data/index.js';
 import {
 	DISK_TYPES,
 	DISK_TYPE_LABELS,
-	DISK_TYPE_WEIGHTS,
-} from "../../packages/javascript/lib/disk/data/index.js";
+	DISK_TYPE_WEIGHTS
+} from '../../packages/javascript/lib/disk/data/index.js';
 import {
 	GENDER_CODES,
 	GENDER_LABELS,
-	GENDER_WEIGHTS,
-} from "../../packages/javascript/lib/gender/data/index.js";
-import { COUNTRIES } from "../../packages/javascript/lib/location/data/countries.js";
+	GENDER_WEIGHTS
+} from '../../packages/javascript/lib/gender/data/index.js';
+import { COUNTRIES } from '../../packages/javascript/lib/location/data/countries.js';
 import {
 	LOCATION_DATA,
 	LOCATION_LANGUAGES,
-	LOCATION_LEVELS,
-} from "../../packages/javascript/lib/location/data/index.js";
-import { NAME_DATA, NAME_LANGUAGES } from "../../packages/javascript/lib/name/data/index.js";
+	LOCATION_LEVELS
+} from '../../packages/javascript/lib/location/data/index.js';
+import { NAME_DATA, NAME_LANGUAGES } from '../../packages/javascript/lib/name/data/index.js';
 import {
 	ORGANIZATION_BARE_CHANCE,
 	ORGANIZATION_DATA,
@@ -58,15 +58,15 @@ import {
 	ORGANIZATION_INDUSTRIES,
 	ORGANIZATION_LEGAL_FORM_CHANCE,
 	ORGANIZATION_TYPE_WEIGHTS,
-	ORGANIZATION_TYPES,
-} from "../../packages/javascript/lib/organization/data/index.js";
-import { OS_FAMILIES, OS_RELEASES } from "../../packages/javascript/lib/os/data/index.js";
-import { RAM_SCALE } from "../../packages/javascript/lib/ram/data/index.js";
+	ORGANIZATION_TYPES
+} from '../../packages/javascript/lib/organization/data/index.js';
+import { OS_FAMILIES, OS_RELEASES } from '../../packages/javascript/lib/os/data/index.js';
+import { RAM_SCALE } from '../../packages/javascript/lib/ram/data/index.js';
 import {
 	PHONE_COUNTRIES,
 	PHONE_DATA,
-	PHONE_TYPES,
-} from "../../packages/javascript/lib/phone/data/index.js";
+	PHONE_TYPES
+} from '../../packages/javascript/lib/phone/data/index.js';
 import {
 	AGENT_CLASSES,
 	FIELD_RULES,
@@ -74,22 +74,22 @@ import {
 	OPPOSITES,
 	SENTENCE_DATA,
 	STORIES,
-	THEME_CLASS,
-} from "../../packages/javascript/lib/sentence/data/index.js";
-import type { PhoneShape } from "../../packages/javascript/lib/phone/data/index.js";
-import type { StoryStep } from "../../packages/javascript/lib/sentence/data/index.js";
+	THEME_CLASS
+} from '../../packages/javascript/lib/sentence/data/index.js';
+import type { PhoneShape } from '../../packages/javascript/lib/phone/data/index.js';
+import type { StoryStep } from '../../packages/javascript/lib/sentence/data/index.js';
 import type {
 	ModifierGroup,
 	PredicateTense,
-	SentenceSpeech,
-} from "../../packages/javascript/lib/sentence/data/types.js";
-import { KO_SURNAME_ROMAN } from "../../packages/javascript/lib/name/data/ko.js";
+	SentenceSpeech
+} from '../../packages/javascript/lib/sentence/data/types.js';
+import { KO_SURNAME_ROMAN } from '../../packages/javascript/lib/name/data/ko.js';
 import {
 	LOOSE_THEMES,
 	WORD_DATA,
 	WORD_LANGUAGES,
-	WORD_THEMES,
-} from "../../packages/javascript/lib/word/data/index.js";
+	WORD_THEMES
+} from '../../packages/javascript/lib/word/data/index.js';
 
 type Entry = string | { n: string; r: string };
 
@@ -100,26 +100,26 @@ const phonePlans = (plans: Readonly<Record<string, readonly PhoneShape[]>>) =>
 			type,
 			plans[type].map((shape) => ({
 				prefixes: [...shape.prefixes],
-				lead: shape.lead ?? "",
+				lead: shape.lead ?? '',
 				groups: [...shape.groups],
 				avoid: [...(shape.avoid ?? [])],
-				trunk: shape.trunk ?? null,
-			})),
-		]),
+				trunk: shape.trunk ?? null
+			}))
+		])
 	);
 
 const pool = (source: readonly Entry[] | undefined) =>
 	source === undefined
 		? null
 		: source.map((entry) =>
-				typeof entry === "string" ? { n: entry, r: null } : { n: entry.n, r: entry.r },
+				typeof entry === 'string' ? { n: entry, r: null } : { n: entry.n, r: entry.r }
 			);
 
 const list = (source: readonly string[] | undefined) => (source === undefined ? null : [...source]);
 
 /** A first or second person in the canonical shape, with an empty map for no heads. */
 const speech = (person: SentenceSpeech | undefined) =>
-	person ? { subject: person.subject, head: person.head ?? "", heads: person.heads ?? {} } : null;
+	person ? { subject: person.subject, head: person.head ?? '', heads: person.heads ?? {} } : null;
 
 // Optional in one package and defaulted in another; written as a map of lists
 // either way, so the shapes compare.
@@ -141,19 +141,19 @@ const groups = (source: readonly ModifierGroup[]) =>
 		subject: [...group.subject],
 		themes: list(group.themes),
 		fields: list(group.fields),
-		words: list(group.words),
+		words: list(group.words)
 	}));
 
 const rules = (
-	source: Readonly<Record<string, readonly (readonly string[])[] | undefined>> | undefined,
+	source: Readonly<Record<string, readonly (readonly string[])[] | undefined>> | undefined
 ) =>
 	source === undefined
 		? null
 		: Object.fromEntries(
 				Object.entries(source).map(([gender, list]) => [
 					gender,
-					(list ?? []).map((rule) => [...rule]),
-				]),
+					(list ?? []).map((rule) => [...rule])
+				])
 			);
 
 // A story step. `field` is one or several in this package and always a list in the
@@ -163,22 +163,22 @@ const step = (source: StoryStep) => ({
 	fields:
 		source.field === undefined
 			? []
-			: typeof source.field === "string"
+			: typeof source.field === 'string'
 				? [source.field]
 				: [...source.field],
-	condition: source.condition ?? "",
-	object: source.object ?? "",
+	condition: source.condition ?? '',
+	object: source.object ?? '',
 	place: source.place ?? false,
-	destination: source.destination ?? "",
+	destination: source.destination ?? '',
 	needs: [...(source.needs ?? [])],
 	required: source.required ?? false,
-	link: source.link ?? "",
+	link: source.link ?? '',
 	kinds: [...(source.kinds ?? [])],
 	// Who an `other` step is about: the item, or the classes listed — one field
 	// here and two in the ports, written as two everywhere.
-	actor: source.actor === "item" ? "item" : "",
+	actor: source.actor === 'item' ? 'item' : '',
 	actorClasses: Array.isArray(source.actor) ? [...source.actor] : [],
-	actorThemes: list(source.actorThemes),
+	actorThemes: list(source.actorThemes)
 });
 
 console.log(
@@ -195,7 +195,7 @@ console.log(
 			affixLengthMax: AFFIX_LENGTH_MAX,
 			affixSeparatorDefault: AFFIX_SEPARATOR_DEFAULT,
 			affixCharset: AFFIX_CHARSET,
-			systemPlatforms: [...SYSTEM_PLATFORMS],
+			systemPlatforms: [...SYSTEM_PLATFORMS]
 		},
 		// Each band and each point of the curve is a pair, written as a two-entry list
 		// in all three — a tuple in Python and a record in Dart.
@@ -203,7 +203,7 @@ console.log(
 			groups: [...AGE_GROUPS],
 			bands: Object.fromEntries(AGE_GROUPS.map((group) => [group, [...AGE_BANDS[group]]])),
 			curve: AGE_CURVE.map(([age, weight]) => [age, weight]),
-			maxDefault: AGE_MAX_DEFAULT,
+			maxDefault: AGE_MAX_DEFAULT
 		},
 		date: {
 			units: [...DATE_UNITS],
@@ -221,10 +221,10 @@ console.log(
 						weekdays: [...names.weekdays],
 						weekdaysShort: [...names.weekdaysShort],
 						meridiem: [...names.meridiem],
-						meridiemLower: [...names.meridiemLower],
-					},
-				]),
-			),
+						meridiemLower: [...names.meridiemLower]
+					}
+				])
+			)
 		},
 		// A synthesis carries its `kind` tag, and a language without places or numbers
 		// writes them as null, the way every other optional field is written.
@@ -241,35 +241,35 @@ console.log(
 					{
 						stems: [...data.stems],
 						syn:
-							data.syn.kind === "pool"
+							data.syn.kind === 'pool'
 								? {
-										kind: "pool",
+										kind: 'pool',
 										pool: [...data.syn.pool],
 										joiner: data.syn.joiner,
 										minSyllables: data.syn.minSyllables,
-										maxSyllables: data.syn.maxSyllables,
+										maxSyllables: data.syn.maxSyllables
 									}
 								: {
-										kind: "syllable",
+										kind: 'syllable',
 										onset: [...data.syn.onset],
 										vowel: [...data.syn.vowel],
 										coda: [...data.syn.coda],
 										minSyllables: data.syn.minSyllables,
-										maxSyllables: data.syn.maxSyllables,
+										maxSyllables: data.syn.maxSyllables
 									},
 						places: list(data.places),
 						numbers: data.numbers ? [...data.numbers] : null,
 						industries: Object.fromEntries(
-							ORGANIZATION_INDUSTRIES.map((each) => [each, [...data.industries[each]]]),
+							ORGANIZATION_INDUSTRIES.map((each) => [each, [...data.industries[each]]])
 						),
 						generic: [...data.generic],
 						templates: Object.fromEntries(
-							ORGANIZATION_TYPES.map((type) => [type, [...data.templates[type]]]),
+							ORGANIZATION_TYPES.map((type) => [type, [...data.templates[type]]])
 						),
-						legalForms: [...data.legalForms],
-					},
-				]),
-			),
+						legalForms: [...data.legalForms]
+					}
+				])
+			)
 		},
 		// A shape's optional fields are written out, so a lead, an avoid list or a
 		// trunk one package leaves unset and another sets shows up as a difference.
@@ -288,16 +288,16 @@ console.log(
 							national: data.national,
 							international: data.international,
 							plans: phonePlans(data.plans),
-							fiction: data.fiction ? phonePlans(data.fiction) : null,
-						},
+							fiction: data.fiction ? phonePlans(data.fiction) : null
+						}
 					];
-				}),
-			),
+				})
+			)
 		},
 		gender: {
 			codes: [...GENDER_CODES],
 			weights: { ...GENDER_WEIGHTS },
-			labels: GENDER_LABELS,
+			labels: GENDER_LABELS
 		},
 		// One entry per device, keyed by its maker and model, so a device one package
 		// holds and another does not is reported as itself.
@@ -306,14 +306,14 @@ console.log(
 			devices: Object.fromEntries(
 				DEVICES.map((entry) => [
 					`${entry.vendor} ${entry.model}`,
-					{ type: entry.type, year: entry.year },
-				]),
-			),
+					{ type: entry.type, year: entry.year }
+				])
+			)
 		},
 		disk: {
 			types: [...DISK_TYPES],
 			labels: DISK_TYPE_LABELS,
-			weights: DISK_TYPE_WEIGHTS,
+			weights: DISK_TYPE_WEIGHTS
 		},
 		// The scale and the pool as written: every size with its weight, in the unit
 		// the pool is kept in.
@@ -323,7 +323,7 @@ console.log(
 			base: RAM_SCALE.base,
 			reference: RAM_SCALE.reference,
 			bytes: RAM_SCALE.bytes,
-			pool: RAM_SCALE.pool.map(([size, weight]) => [size, weight]),
+			pool: RAM_SCALE.pool.map(([size, weight]) => [size, weight])
 		},
 		// One entry per release, keyed by its line and version, so a release one
 		// package holds and another does not is reported as itself. A build is
@@ -338,10 +338,10 @@ console.log(
 						template: release.template,
 						name: release.name,
 						editions: [...release.editions],
-						builds: release.builds.map((build) => `${build.year} ${build.text}`),
-					},
-				]),
-			),
+						builds: release.builds.map((build) => `${build.year} ${build.text}`)
+					}
+				])
+			)
 		},
 		// The outline is compared as each package parses it rather than as the text
 		// it is written in, so a parser that reads `_` or a skipped level differently
@@ -353,10 +353,10 @@ console.log(
 			countries: {
 				languages: [...COUNTRIES.languages],
 				rows: COUNTRIES.table
-					.split("\n")
+					.split('\n')
 					.map((line) => line.trim())
 					.filter(Boolean)
-					.map((line) => line.split("|")),
+					.map((line) => line.split('|'))
 			},
 			data: Object.fromEntries(
 				Object.entries(LOCATION_DATA).map(([code, data]) => [
@@ -369,11 +369,11 @@ console.log(
 						entries: outline(data.outline, data.levels.length).map((entry) => ({
 							path: [...entry.path],
 							depth: entry.depth,
-							below: entry.below,
-						})),
-					},
-				]),
-			),
+							below: entry.below
+						}))
+					}
+				])
+			)
 		},
 		word: {
 			languages: [...WORD_LANGUAGES],
@@ -394,8 +394,8 @@ console.log(
 							? Object.fromEntries(
 									Object.entries(data.agreement).map(([gender, rules]) => [
 										gender,
-										(rules ?? []).map((rule) => [...rule]),
-									]),
+										(rules ?? []).map((rule) => [...rule])
+									])
 								)
 							: null,
 						frames: data.frames.map((frame) => ({
@@ -403,31 +403,31 @@ console.log(
 							// Optional in one package and defaulted in another; written as a
 							// list either way so the shapes compare.
 							glue: [...(frame.glue ?? [])],
-							weight: frame.weight,
+							weight: frame.weight
 						})),
 						nouns: Object.fromEntries(
-							Object.entries(data.nouns).map(([theme, words]) => [theme, list(words)]),
+							Object.entries(data.nouns).map(([theme, words]) => [theme, list(words)])
 						),
 						levels: { basic: list(data.levels.basic), rare: list(data.levels.rare) },
 						syn:
-							data.syn.kind === "syllable"
+							data.syn.kind === 'syllable'
 								? {
-										kind: "syllable",
+										kind: 'syllable',
 										onset: list(data.syn.onset),
 										vowel: list(data.syn.vowel),
 										coda: list(data.syn.coda),
 										minSyllables: data.syn.minSyllables,
-										maxSyllables: data.syn.maxSyllables,
+										maxSyllables: data.syn.maxSyllables
 									}
 								: {
-										kind: "pool",
+										kind: 'pool',
 										pool: list(data.syn.pool),
 										minSyllables: data.syn.minSyllables,
-										maxSyllables: data.syn.maxSyllables,
-									},
-					},
-				]),
-			),
+										maxSyllables: data.syn.maxSyllables
+									}
+					}
+				])
+			)
 		},
 		sentence: {
 			themeClass: map(THEME_CLASS),
@@ -439,9 +439,9 @@ console.log(
 						needs: [...(rule.needs ?? [])],
 						gives: [...(rule.gives ?? [])],
 						takes: [...(rule.takes ?? [])],
-						after: [...(rule.after ?? [])],
-					},
-				]),
+						after: [...(rule.after ?? [])]
+					}
+				])
 			),
 			opposites: map(OPPOSITES),
 			stories: STORIES.map((story) => ({
@@ -455,7 +455,7 @@ console.log(
 				lines: story.lines ?? 0,
 				start: [...story.start],
 				steps: story.steps.map(step),
-				weight: story.weight,
+				weight: story.weight
 			})),
 			interludes: INTERLUDES.map(step),
 			data: Object.fromEntries(
@@ -469,16 +469,16 @@ console.log(
 						// map either way so the shapes compare.
 						openers: map(data.openers ?? {}),
 						quotes: Object.fromEntries(
-							Object.entries(data.quotes).map(([kind, pair]) => [kind, [...pair]]),
+							Object.entries(data.quotes).map(([kind, pair]) => [kind, [...pair]])
 						),
 						// Optional in one package and defaulted in another; written the same
 						// way here either way, so the shapes compare.
 						predicateAgrees: data.predicateAgrees ?? false,
 						pastAgreement: rules(data.pastAgreement),
 						pastMark: data.pastMark
-							? { head: data.pastMark.head ?? "", tail: data.pastMark.tail ?? "" }
+							? { head: data.pastMark.head ?? '', tail: data.pastMark.tail ?? '' }
 							: null,
-						join: data.join ? { form: data.join.form ?? "", word: data.join.word ?? "" } : null,
+						join: data.join ? { form: data.join.form ?? '', word: data.join.word ?? '' } : null,
 						articles: rules(data.articles),
 						verbs: data.verbs.map((group) => ({
 							subject: [...group.subject],
@@ -490,21 +490,21 @@ console.log(
 							objectThemes: list(group.objectThemes),
 							objectTraits: list(group.objectTraits),
 							objectWithout: list(group.objectWithout),
-							requires: group.requires ?? "",
-							condition: group.condition ?? "",
+							requires: group.requires ?? '',
+							condition: group.condition ?? '',
 							words: list(group.words),
 							forms: forms(group.forms),
-							past: tense(group.past),
+							past: tense(group.past)
 						})),
 						states: data.states.map((group) => ({
 							subject: [...group.subject],
 							subjectThemes: list(group.subjectThemes),
-							condition: group.condition ?? "",
-							head: group.head ?? "",
-							pastHead: group.pastHead ?? "",
+							condition: group.condition ?? '',
+							head: group.head ?? '',
+							pastHead: group.pastHead ?? '',
 							words: list(group.words),
 							forms: forms(group.forms),
-							past: tense(group.past),
+							past: tense(group.past)
 						})),
 						modifiers: groups(data.modifiers),
 						manners: groups(data.manners),
@@ -513,7 +513,7 @@ console.log(
 							any: list(data.times.any),
 							past: list(data.times.past),
 							present: list(data.times.present),
-							habitual: list(data.times.habitual),
+							habitual: list(data.times.habitual)
 						},
 						homes: list(data.homes),
 						replies: data.replies
@@ -521,23 +521,23 @@ console.log(
 									Object.entries(data.replies).map(([level, pools]) => [
 										level,
 										Object.fromEntries(
-											Object.entries(pools ?? {}).map(([cue, pool]) => [cue, list(pool)]),
-										),
-									]),
+											Object.entries(pools ?? {}).map(([cue, pool]) => [cue, list(pool)])
+										)
+									])
 								)
 							: null,
 						degrees: list(data.degrees),
 						connectives: Object.fromEntries(
-							Object.entries(data.connectives).map(([kind, pool]) => [kind, list(pool)]),
+							Object.entries(data.connectives).map(([kind, pool]) => [kind, list(pool)])
 						),
 						traits: data.traits
 							? Object.fromEntries(
-									Object.entries(data.traits).map(([trait, pool]) => [trait, list(pool)]),
+									Object.entries(data.traits).map(([trait, pool]) => [trait, list(pool)])
 								)
 							: null,
 						interjections: list(data.interjections),
 						pronouns: Object.fromEntries(
-							Object.entries(data.pronouns).map(([gender, pool]) => [gender, list(pool)]),
+							Object.entries(data.pronouns).map(([gender, pool]) => [gender, list(pool)])
 						),
 						// Optional in one package and defaulted in another; written as a list
 						// either way so the shapes compare.
@@ -547,22 +547,22 @@ console.log(
 									words: Object.fromEntries(
 										Object.entries(data.objectPronouns.words).map(([gender, pool]) => [
 											gender,
-											list(pool),
-										]),
+											list(pool)
+										])
 									),
-									clitic: data.objectPronouns.clitic ?? false,
+									clitic: data.objectPronouns.clitic ?? false
 								}
 							: null,
 						speech: speech(data.speech),
 						listener: speech(data.listener),
 						homecomings: data.homecomings
 							? Object.fromEntries(
-									Object.entries(data.homecomings).map(([level, pool]) => [level, list(pool)]),
+									Object.entries(data.homecomings).map(([level, pool]) => [level, list(pool)])
 								)
 							: null,
 						placeHeads: data.placeHeads
 							? Object.fromEntries(
-									Object.entries(data.placeHeads).map(([head, pool]) => [head, list(pool)]),
+									Object.entries(data.placeHeads).map(([head, pool]) => [head, list(pool)])
 								)
 							: null,
 						numeral: data.numeral
@@ -573,7 +573,7 @@ console.log(
 									currency: data.numeral.currency,
 									amounts: [...data.numeral.amounts],
 									group: data.numeral.group,
-									gap: data.numeral.gap,
+									gap: data.numeral.gap
 								}
 							: null,
 						calendar: data.calendar
@@ -586,30 +586,30 @@ console.log(
 										subject: [...data.calendar.copula.subject],
 										words: list(data.calendar.copula.words),
 										forms: forms(data.calendar.copula.forms),
-										past: tense(data.calendar.copula.past),
-									},
+										past: tense(data.calendar.copula.past)
+									}
 								}
 							: null,
 						frames: data.frames.map((frame) => ({
 							parts: frame.parts.map((part) => ({
 								slot: part.slot,
-								head: part.head ?? "",
-								pastHead: part.pastHead ?? "",
-								tail: part.tail ?? "",
-								tailAlt: part.tailAlt ?? "",
-								tailLiquid: part.tailLiquid ?? "",
+								head: part.head ?? '',
+								pastHead: part.pastHead ?? '',
+								tail: part.tail ?? '',
+								tailAlt: part.tailAlt ?? '',
+								tailLiquid: part.tailLiquid ?? '',
 								modifiable: part.modifiable ?? false,
 								bare: part.bare ?? false,
-								copula: part.copula ?? "",
+								copula: part.copula ?? ''
 							})),
 							weight: frame.weight,
-							mood: frame.mood ?? "statement",
-							tag: frame.tag ?? "",
-							fields: list(frame.fields),
-						})),
-					},
-				]),
-			),
+							mood: frame.mood ?? 'statement',
+							tag: frame.tag ?? '',
+							fields: list(frame.fields)
+						}))
+					}
+				])
+			)
 		},
 		name: {
 			languages: [...NAME_LANGUAGES],
@@ -625,7 +625,7 @@ console.log(
 						lengthSpec: {
 							given: [...data.lengthSpec.given],
 							last: [...data.lengthSpec.last],
-							middle: [...data.lengthSpec.middle],
+							middle: [...data.lengthSpec.middle]
 						},
 						last: pool(data.last),
 						lastWeights: map(data.lastWeights),
@@ -646,12 +646,12 @@ console.log(
 									vowel: list(data.syn.vowel),
 									coda: list(data.syn.coda),
 									minSyllables: data.syn.minSyllables,
-									maxSyllables: data.syn.maxSyllables,
+									maxSyllables: data.syn.maxSyllables
 								}
-							: null,
-					},
-				]),
-			),
-		},
-	}),
+							: null
+					}
+				])
+			)
+		}
+	})
 );
