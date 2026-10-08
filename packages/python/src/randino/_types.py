@@ -820,3 +820,32 @@ class RamDetail:
 
     bytes: int
     """The same size in bytes, counted in powers of two: `17179869184`."""
+
+
+DiskType = Literal["hdd", "ssd", "sshd", "emmc", "ufs"]
+"""What kind of storage a machine has, as a code.
+
+- `hdd`: a hard disk drive, spinning platters.
+- `ssd`: a solid-state drive, flash memory behind SATA or NVMe.
+- `sshd`: a solid-state hybrid drive, a hard disk with a flash cache.
+- `emmc`: embedded MultiMediaCard flash, soldered to the board — older phones, cheap
+  tablets and laptops.
+- `ufs`: Universal Flash Storage, what a phone or a tablet stores to now.
+"""
+
+
+@dataclass(frozen=True, slots=True)
+class DiskTypeDetail:
+    """A generated kind of storage, with its code and its name written out."""
+
+    disk_type: str
+    """The label as the value form returns it: `SSD`, `eMMC`."""
+
+    code: DiskType
+    """The same kind as a code."""
+
+    name: str
+    """The label written out: `Solid State Drive`, `Universal Flash Storage`."""
+
+    platform: SystemPlatform
+    """The kind of machine it was drawn for."""

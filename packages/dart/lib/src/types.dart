@@ -1232,3 +1232,49 @@ class RamDetail {
   @override
   String toString() => 'RamDetail($ram, $bytes)';
 }
+
+/// What kind of storage a machine has.
+enum DiskType {
+  /// A hard disk drive, spinning platters.
+  hdd,
+
+  /// A solid-state drive, flash memory behind SATA or NVMe.
+  ssd,
+
+  /// A solid-state hybrid drive, a hard disk with a flash cache.
+  sshd,
+
+  /// Embedded MultiMediaCard flash, soldered to the board — older phones, cheap
+  /// tablets and laptops.
+  emmc,
+
+  /// Universal Flash Storage, what a phone or a tablet stores to now.
+  ufs,
+}
+
+/// A generated kind of storage, with its code and its name written out.
+class DiskTypeDetail {
+  /// Creates a detail record. Returned by the generator; there is rarely a
+  /// reason to build one by hand outside a test.
+  const DiskTypeDetail({
+    required this.diskType,
+    required this.code,
+    required this.name,
+    required this.platform,
+  });
+
+  /// The label as `randDiskType` returns it: `SSD`, `eMMC`.
+  final String diskType;
+
+  /// The same kind as a code.
+  final DiskType code;
+
+  /// The label written out: `Solid State Drive`, `Universal Flash Storage`.
+  final String name;
+
+  /// The kind of machine it was drawn for.
+  final SystemPlatform platform;
+
+  @override
+  String toString() => 'DiskTypeDetail($diskType, ${platform.name})';
+}

@@ -46,6 +46,8 @@ void main() {
           'DateUnit',
           'DeviceDetail',
           'DeviceType',
+          'DiskType',
+          'DiskTypeDetail',
           'GenderCode',
           'GenderDetail',
           'LengthRange',
@@ -89,6 +91,7 @@ void main() {
           'ageGroups',
           'dateUnits',
           'deviceTypes',
+          'diskTypes',
           'locationLanguages',
           'locationLevels',
           'nameLanguages',
@@ -123,6 +126,8 @@ void main() {
           'randDateUnit',
           'randDevice',
           'randDeviceDetails',
+          'randDiskType',
+          'randDiskTypeDetails',
           'randDistrict',
           'randDistrictDetails',
           'randDrink',
@@ -293,6 +298,9 @@ void main() {
       expect(randRam().single, matches(RegExp(r'^\d+ (MB|GB)$')));
       expect(randRamDetails()[0], isA<RamDetail>());
       expect(ramUnits, RamUnit.values);
+      expect(randDiskType(), hasLength(1));
+      expect(randDiskTypeDetails()[0], isA<DiskTypeDetail>());
+      expect(diskTypes, DiskType.values);
     });
 
     test('the bounds are the same numbers the JavaScript package uses', () {
@@ -388,6 +396,7 @@ void main() {
       twice(() => randOs(count: 5, includeBuild: true, random: Random(42)).join());
       twice(() => randDevice(count: 5, random: Random(42)).join());
       twice(() => randRam(count: 5, random: Random(42)).join());
+      twice(() => randDiskType(count: 5, random: Random(42)).join());
       twice(() => randOrganization(count: 5, random: Random(42)).join('|'));
       twice(() => randOrganization(count: 5, maxLength: 20, random: Random(42)).join('|'));
       twice(() => randSuffixAll(const ['a', 'b'], random: Random(42)).join());

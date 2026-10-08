@@ -1338,3 +1338,40 @@ export interface RamDetail {
 	/** The same size in bytes, counted in powers of two: `17179869184`. */
 	bytes: number;
 }
+
+/**
+ * What kind of storage a machine has, as a code:
+ * - `hdd`: a hard disk drive, spinning platters.
+ * - `ssd`: a solid-state drive, flash memory behind SATA or NVMe.
+ * - `sshd`: a solid-state hybrid drive, a hard disk with a flash cache.
+ * - `emmc`: embedded MultiMediaCard flash, soldered to the board — older phones,
+ *   cheap tablets and laptops.
+ * - `ufs`: Universal Flash Storage, what a phone or a tablet stores to now.
+ */
+export type DiskType = 'hdd' | 'ssd' | 'sshd' | 'emmc' | 'ufs';
+
+/**
+ * What `randDiskType` takes. A kind of storage is one of five labels, so it has
+ * no language, no length and nothing to invent.
+ */
+export interface RandDiskTypeOptions extends Pick<
+	RandCommonOptions,
+	'count' | 'unique' | 'output' | 'random'
+> {
+	/**
+	 * The storage of desktops and laptops, of phones and tablets, or of both.
+	 * Default `'all'`.
+	 */
+	platform?: SystemPlatformOption;
+}
+
+/** A generated kind of storage, with its code and its name written out. */
+export interface DiskTypeDetail {
+	/** The label as the value form returns it: `SSD`, `eMMC`. */
+	diskType: string;
+	code: DiskType;
+	/** The label written out: `Solid State Drive`, `Universal Flash Storage`. */
+	name: string;
+	/** The kind of machine it was drawn for. */
+	platform: SystemPlatform;
+}

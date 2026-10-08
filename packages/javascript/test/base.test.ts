@@ -16,6 +16,7 @@ describe('base test', () => {
 			'AGE_GROUPS',
 			'DATE_UNITS',
 			'DEVICE_TYPES',
+			'DISK_TYPES',
 			'LOCATION_LANGUAGES',
 			'LOCATION_LEVELS',
 			'NAME_LANGUAGES',
@@ -49,6 +50,7 @@ describe('base test', () => {
 			'randCountry',
 			'randDate',
 			'randDevice',
+			'randDiskType',
 			'randDistrict',
 			'randDrink',
 			'randEmotion',
@@ -200,6 +202,8 @@ describe('base test', () => {
 		assert.deepStrictEqual(randino.DEVICE_TYPES, ['phone', 'tablet', 'laptop']);
 		assert.match(randino.randRam()[0], /^\d+ (MB|GB)$/);
 		assert.deepStrictEqual(randino.RAM_UNITS, ['MB', 'GB']);
+		assert.strictEqual(typeof randino.randDiskType()[0], 'string');
+		assert.deepStrictEqual(randino.DISK_TYPES, ['hdd', 'ssd', 'sshd', 'emmc', 'ufs']);
 	});
 
 	it('an option the types rule out falls back rather than throwing', () => {
@@ -256,7 +260,8 @@ describe('base test', () => {
 			() => randino.randDevice({ type: 'watch' as never, minYear: 'x' as never }),
 			() => randino.randDevice({ type: [null] as never, includeVendor: 'no' as never }),
 			() => randino.randRam({ unit: 'KB' as never, minSize: NaN, maxSize: 'x' as never }),
-			() => randino.randRam({ includeUnit: 'no' as never, count: NaN })
+			() => randino.randRam({ includeUnit: 'no' as never, count: NaN }),
+			() => randino.randDiskType({ platform: 'server' as never, count: 'x' as never })
 		];
 
 		for (const ask of asks) {
@@ -344,6 +349,7 @@ describe('base test', () => {
 		agrees(() => randino.randOs({ count: 5, includeBuild: true, random: seeded(42) }));
 		agrees(() => randino.randDevice({ count: 5, random: seeded(42) }));
 		agrees(() => randino.randRam({ count: 5, random: seeded(42) }));
+		agrees(() => randino.randDiskType({ count: 5, random: seeded(42) }));
 
 		// Two different seeds are two different answers, so the source is actually
 		// what the draws are coming from.

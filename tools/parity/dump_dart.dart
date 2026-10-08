@@ -13,6 +13,7 @@ import 'package:randino/src/constants.dart';
 import 'package:randino/src/date/data/index.dart';
 import 'package:randino/src/decorate/data/index.dart';
 import 'package:randino/src/device/data/index.dart';
+import 'package:randino/src/disk/data/index.dart';
 import 'package:randino/src/gender/data/index.dart';
 import 'package:randino/src/internal/parse.dart';
 import 'package:randino/src/location/data/countries.dart';
@@ -627,6 +628,23 @@ void main() {
             '${entry.vendor} ${entry.model}': <String, Object?>{
               'type': entry.type.name,
               'year': entry.year,
+            },
+        },
+      },
+      'disk': <String, Object?>{
+        'types': <String>[for (final type in diskTypes) type.name],
+        'labels': <String, Object?>{
+          for (final entry in diskTypeLabels.entries)
+            entry.key.name: <String, Object?>{
+              'label': entry.value.label,
+              'name': entry.value.name,
+            },
+        },
+        'weights': <String, Object?>{
+          for (final platform in diskTypeWeights.entries)
+            platform.key.name: <String, Object?>{
+              for (final entry in platform.value.entries)
+                entry.key.name: entry.value,
             },
         },
       },

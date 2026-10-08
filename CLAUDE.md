@@ -15,7 +15,7 @@ Guidance for AI agents (and humans) working in this repository. Written in Engli
 - **Genders** are the label a form in the language writes for one (`여성`, `Female`, `Divers`). Male and female split evenly, and the two others — `unknown` and `nonbinary` — come up only when the caller switches them on, and rarely when they do.
 - **Dates** are instants drawn evenly from a range and written out in UTC (`2024-03-15T14:07:32.481Z`, `2024년 3월 15일`), by a format of the caller's own. `unit` hands back one part of a date as a number instead — `minute` is `0` to `59` — read off a drawn date so it keeps to the range. Its `language` writes only the month and weekday names and the half of the day, and defaults to `'en'` rather than `'all'`: a format is written in one language. `minDate` / `maxDate`, `format`, `unit` and `utcOffset` are its own options.
 - **Phone numbers** are written the way their country writes them (`010-4821-3967`, `(415) 726-0193`, `8 (912) 345-67-89`), for the country each word language is spoken in first. Each opens on a block the country's numbering plan really gives out and ends on random digits, so **a drawn number can by chance be somebody's** — the docs and the doc comments say so, and say never to call or text one. `randPhone` takes `country` in place of `language`, and `type`, `includeCountryCode`, `separator` and `fictional` are its own options.
-- **System values** describe a sample machine with real products, the one place the library does not invent: an operating system from `randOs` (`Windows 11 Pro 23H2 (Build 22631)`, `macOS Sonoma 14.5`, `Android 14 (API 34)`) a phone, tablet or laptop from `randDevice` (`Apple iPhone 15 Pro`, `Lenovo ThinkPad X1 Carbon Gen 11`), and the memory one is sold with from `randRam` (`16 GB`). Nothing is made up — every value is a release that came out, written by the name it was released under — so none of them takes a `language`, and they share `platform` (`desktop` or `mobile`) and, where a value has a release year, `minYear` / `maxYear`. The names are the products' own and belong to their owners; the docs say so on every page that lists them.
+- **System values** describe a sample machine with real products, the one place the library does not invent: an operating system from `randOs` (`Windows 11 Pro 23H2 (Build 22631)`, `macOS Sonoma 14.5`, `Android 14 (API 34)`) a phone, tablet or laptop from `randDevice` (`Apple iPhone 15 Pro`, `Lenovo ThinkPad X1 Carbon Gen 11`), the memory one is sold with from `randRam` (`16 GB`), and the kind of storage it has from `randDiskType` (`SSD`). Nothing is made up — every value is a release that came out, written by the name it was released under — so none of them takes a `language`, and they share `platform` (`desktop` or `mobile`) and, where a value has a release year, `minYear` / `maxYear`. The names are the products' own and belong to their owners; the docs say so on every page that lists them.
 - **Organizations** are companies, schools, offices and associations that do not exist (`(주)새솔테크`, `Westbrook High School`, `Гимназия № 135`), each written the way its language writes that kind. Nothing about them is real, and that is the requirement rather than a limitation: the stems are chosen to be nobody's brand, and **no organization is ever built from a person name** — a surname with a legal form behind it is exactly how famous companies are named.
 
 All of them are implemented. Keep the generators apart — a shared "generator" abstraction is not wanted — but the options they all take, and the loop that draws until it has `count` results, live in `_internal/generate` and are shared. So are the word pools: `word/data` is the one dataset, and `nickname` consumes it.
@@ -84,6 +84,11 @@ lib/
     randDevice.ts           # public: string[], or DeviceDetail[] on `output: 'detail'`
     deviceGenerator.ts      # internal: the candidates per call, the maker written once
     data/index.ts           # DEVICE_TYPES, DEVICES: every model, one row each
+  disk/
+    index.ts
+    randDiskType.ts         # public: string[], or DiskTypeDetail[] on `output: 'detail'`
+    diskTypeGenerator.ts    # internal: the platform first, then the kind it uses
+    data/index.ts           # DISK_TYPES, the labels, the weights per platform
   decorate/
     index.ts                # the category's public surface
     randSuffix.ts           # public: nothing, a string, or an array -> the same, token attached
@@ -161,6 +166,7 @@ test/
   date.test.ts
   decorate.test.ts
   device.test.ts
+  disk.test.ts
   gender.test.ts
   organization.test.ts
   location.test.ts
@@ -232,6 +238,7 @@ lib/
     date/                   # mirrors lib/date, plus `randDateUnit` and `randDateDetails`
     decorate/               # mirrors lib/decorate, plus the `…All` list forms
     device/                 # mirrors lib/device, plus `randDeviceDetails`
+    disk/                   # mirrors lib/disk, plus `randDiskTypeDetails`
     gender/                 # mirrors lib/gender, plus `randGenderDetails`
     organization/           # mirrors lib/organization, plus `randOrganizationDetails`
       data/                 # one file per language, ported verbatim
@@ -258,6 +265,7 @@ test/
   date_test.dart
   decorate_test.dart
   device_test.dart
+  disk_test.dart
   gender_test.dart
   organization_test.dart
   location_test.dart
@@ -326,6 +334,7 @@ src/randino/
   date/                     # mirrors lib/date
   decorate/                 # mirrors lib/decorate; `@overload` carries the shape
   device/                   # mirrors lib/device
+  disk/                     # mirrors lib/disk
   gender/                   # mirrors lib/gender
   organization/             # mirrors lib/organization
     data/                   # one file per language, ported verbatim
@@ -353,6 +362,7 @@ tests/
   test_date.py
   test_decorate.py
   test_device.py
+  test_disk.py
   test_gender.py
   test_organization.py
   test_location.py
@@ -541,7 +551,7 @@ The run stops rather than writes when a file changes shape — new columns, an u
 
 **The dumps normalize what only differs because the languages differ, and nothing else.** A pool entry is `{ n, r }` everywhere; field names are the JavaScript ones; an optional field is present and null rather than absent; `syn` carries its `kind` tag even in the two packages that tell the shapes apart by type. That normalization lives in the three dumps — one per package, each responsible for its own language's spelling — so the comparison itself has nothing to know about any of them. Adding a field to a dataset means adding it to all three dumps, and the check reports a field only one dump writes as a difference, which is the intended failure.
 
-**Do not widen it into a general "the ports agree" check.** It covers the word, sentence, name and location datasets, the age bands and curve, the date units and default range, the phone plans and templates, the operating system catalog and the weight of each line, the device catalog, the memory sizes and their weights, the gender labels and weights, the organization datasets and their odds, the stories and the field rules beside them, the surname romanization map, and the bounds in `constants` and `decorate/data` — the last of which is still written by hand in each package. The nickname shapes are in it now that they are `WordLanguageData.frames`: they were left out while they were a table private to each generator, and being data is what put them in. The sentence datasets are the same story on a larger scale, `THEME_CLASS` included, because a theme moving from one class to another changes what every verb of every language will accept.
+**Do not widen it into a general "the ports agree" check.** It covers the word, sentence, name and location datasets, the age bands and curve, the date units and default range, the phone plans and templates, the operating system catalog and the weight of each line, the device catalog, the memory sizes and their weights, the disk types and their weights per platform, the gender labels and weights, the organization datasets and their odds, the stories and the field rules beside them, the surname romanization map, and the bounds in `constants` and `decorate/data` — the last of which is still written by hand in each package. The nickname shapes are in it now that they are `WordLanguageData.frames`: they were left out while they were a table private to each generator, and being data is what put them in. The sentence datasets are the same story on a larger scale, `THEME_CLASS` included, because a theme moving from one class to another changes what every verb of every language will accept.
 
 ## Testing a random generator
 

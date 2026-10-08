@@ -1,6 +1,7 @@
 export * from './age/index.js';
 export * from './decorate/index.js';
 export * from './device/index.js';
+export * from './disk/index.js';
 export * from './constants.js';
 export * from './date/index.js';
 export * from './gender/index.js';

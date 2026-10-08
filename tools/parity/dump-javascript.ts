@@ -35,6 +35,11 @@ import {
 } from "../../packages/javascript/lib/decorate/data/index.js";
 import { DEVICES, DEVICE_TYPES } from "../../packages/javascript/lib/device/data/index.js";
 import {
+	DISK_TYPES,
+	DISK_TYPE_LABELS,
+	DISK_TYPE_WEIGHTS,
+} from "../../packages/javascript/lib/disk/data/index.js";
+import {
 	GENDER_CODES,
 	GENDER_LABELS,
 	GENDER_WEIGHTS,
@@ -304,6 +309,11 @@ console.log(
 					{ type: entry.type, year: entry.year },
 				]),
 			),
+		},
+		disk: {
+			types: [...DISK_TYPES],
+			labels: DISK_TYPE_LABELS,
+			weights: DISK_TYPE_WEIGHTS,
 		},
 		// The scale and the pool as written: every size with its weight, in the unit
 		// the pool is kept in.

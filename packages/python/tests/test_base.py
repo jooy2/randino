@@ -32,12 +32,15 @@ def test_the_package_exports_exactly_its_public_api() -> None:
         "CountryDetail",
         "DATE_UNITS",
         "DEVICE_TYPES",
+        "DISK_TYPES",
         "DateDetail",
         "DateInput",
         "DateUnit",
         "DeviceDetail",
         "DeviceType",
         "DeviceTypeOption",
+        "DiskType",
+        "DiskTypeDetail",
         "GenderCode",
         "GenderDetail",
         "LOCATION_LANGUAGES",
@@ -121,6 +124,7 @@ def test_the_package_exports_exactly_its_public_api() -> None:
         "rand_country",
         "rand_date",
         "rand_device",
+        "rand_disk_type",
         "rand_district",
         "rand_drink",
         "rand_emotion",
@@ -259,6 +263,8 @@ def test_the_functions_are_callable_and_the_constants_are_what_they_claim() -> N
     assert randino.DEVICE_TYPES == ("phone", "tablet", "laptop")
     assert re.fullmatch(r"\d+ (MB|GB)", randino.rand_ram()[0])
     assert randino.RAM_UNITS == ("MB", "GB")
+    assert isinstance(randino.rand_disk_type()[0], str)
+    assert randino.DISK_TYPES == ("hdd", "ssd", "sshd", "emmc", "ufs")
 
 
 def test_the_package_imports_nothing_outside_the_standard_library() -> None:
@@ -347,6 +353,7 @@ def test_an_option_the_types_rule_out_falls_back_rather_than_raising() -> None:
         lambda: loose.rand_device(type=[None], include_vendor="no"),
         lambda: loose.rand_ram(unit="KB", min_size=float("nan"), max_size="x"),
         lambda: loose.rand_ram(include_unit="no", count=float("nan")),
+        lambda: loose.rand_disk_type(platform="server", count="x"),
         lambda: loose.rand_gender(language="xx", count=float("nan")),
         lambda: loose.rand_gender(include_unknown="yes"),
         lambda: loose.rand_organization(language="xx", type="shop"),
@@ -414,6 +421,7 @@ def test_random_is_where_every_draw_of_a_call_comes_from() -> None:
     twice(lambda: randino.rand_os(count=5, include_build=True, random=Random(42).random))
     twice(lambda: randino.rand_device(count=5, random=Random(42).random))
     twice(lambda: randino.rand_ram(count=5, random=Random(42).random))
+    twice(lambda: randino.rand_disk_type(count=5, random=Random(42).random))
 
     # Two different seeds are two different answers, so the source is actually what
     # the draws are coming from.

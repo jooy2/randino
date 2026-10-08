@@ -34,6 +34,8 @@ from randino._types import (
     DeviceDetail,
     DeviceType,
     DeviceTypeOption,
+    DiskType,
+    DiskTypeDetail,
     GenderCode,
     GenderDetail,
     LocationDetail,
@@ -108,6 +110,7 @@ from randino.decorate import (
     rand_suffix,
 )
 from randino.device import DEVICE_TYPES, rand_device
+from randino.disk import DISK_TYPES, rand_disk_type
 from randino.gender import rand_gender
 from randino.location import (
     LOCATION_LANGUAGES,
@@ -175,6 +178,7 @@ __all__ = [
     "AGE_GROUPS",
     "DATE_UNITS",
     "DEVICE_TYPES",
+    "DISK_TYPES",
     "LOCATION_LANGUAGES",
     "LOCATION_LEVELS",
     "NAME_LANGUAGES",
@@ -205,6 +209,8 @@ __all__ = [
     "DeviceDetail",
     "DeviceType",
     "DeviceTypeOption",
+    "DiskType",
+    "DiskTypeDetail",
     "GenderCode",
     "GenderDetail",
     "LocationDetail",
@@ -269,6 +275,7 @@ __all__ = [
     "rand_country",
     "rand_date",
     "rand_device",
+    "rand_disk_type",
     "rand_district",
     "rand_drink",
     "rand_emotion",
