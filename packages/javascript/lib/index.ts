@@ -1,4 +1,5 @@
 export * from './age/index.js';
+export * from './architecture/index.js';
 export * from './decorate/index.js';
 export * from './device/index.js';
 export * from './disk/index.js';

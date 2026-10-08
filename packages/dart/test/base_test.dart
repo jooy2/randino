@@ -41,6 +41,7 @@ void main() {
           'AgeDetail',
           'AgeDistribution',
           'AgeGroup',
+          'ArchitectureDetail',
           'CountryDetail',
           'CpuDetail',
           'DateDetail',
@@ -93,6 +94,7 @@ void main() {
           'affixLengthMax',
           'affixSeparatorDefault',
           'ageGroups',
+          'architectures',
           'dateUnits',
           'deviceTypes',
           'diskTypes',
@@ -117,6 +119,8 @@ void main() {
           'randAgeDetails',
           'randAgeMax',
           'randAnimal',
+          'randArchitecture',
+          'randArchitectureDetails',
           'randBody',
           'randCity',
           'randCityDetails',
@@ -319,6 +323,8 @@ void main() {
       expect(randCpuDetails()[0], isA<CpuDetail>());
       expect(randGpu(), hasLength(1));
       expect(randGpuDetails()[0], isA<GpuDetail>());
+      expect(architectures, contains(randArchitecture().single));
+      expect(randArchitectureDetails()[0], isA<ArchitectureDetail>());
     });
 
     test('the bounds are the same numbers the JavaScript package uses', () {
@@ -418,6 +424,7 @@ void main() {
       twice(() => randDiskSize(count: 5, random: Random(42)).join());
       twice(() => randCpu(count: 5, random: Random(42)).join());
       twice(() => randGpu(count: 5, random: Random(42)).join());
+      twice(() => randArchitecture(count: 5, includeRare: true, random: Random(42)).join());
       twice(() => randOrganization(count: 5, random: Random(42)).join('|'));
       twice(() => randOrganization(count: 5, maxLength: 20, random: Random(42)).join('|'));
       twice(() => randSuffixAll(const ['a', 'b'], random: Random(42)).join());

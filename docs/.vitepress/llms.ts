@@ -116,7 +116,7 @@ const PREAMBLE = [
 	'**phone numbers** are written the way their country writes them and can by chance be real',
 	'ones, **system values** describe a sample machine with real operating systems, devices,',
 	'processors and graphics (Windows 11, Apple iPhone 15 Pro, Intel Core i7-13700K, NVIDIA GeForce',
-	'RTX 4090) and the memory and storage',
+	'RTX 4090), the architecture they run (x86_64) and the memory and storage',
 	'they are sold with (16 GB, 1 TB SSD),',
 	'and **decorators** attach a token or a modifier to a string you already have.',
 	'',

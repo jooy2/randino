@@ -9,6 +9,7 @@
 import 'dart:convert';
 
 import 'package:randino/src/age/data/index.dart';
+import 'package:randino/src/architecture/data/index.dart';
 import 'package:randino/src/constants.dart';
 import 'package:randino/src/cpu/data/index.dart';
 import 'package:randino/src/date/data/index.dart';
@@ -596,6 +597,19 @@ void main() {
           for (final language in genderLabels.entries)
             language.key.name: <String, Object?>{
               for (final label in language.value.entries) label.key.name: label.value,
+            },
+        },
+      },
+      'architecture': <String, Object?>{
+        'architectures': architectures,
+        'data': <String, Object?>{
+          for (final entry in architectureData.entries)
+            entry.key: <String, Object?>{
+              'family': entry.value.family,
+              'bits': entry.value.bits,
+              'weight': entry.value.weight,
+              'rare': entry.value.rare,
+              'aliases': entry.value.aliases,
             },
         },
       },

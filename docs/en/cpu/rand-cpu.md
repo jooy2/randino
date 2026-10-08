@@ -187,4 +187,5 @@ rand_cpu(output="detail")
 
 - [`randDevice`](../device/rand-device) — a phone, a tablet or a laptop the processor could be in.
 - [`randGpu`](../gpu/rand-gpu) — the graphics beside it.
+- [`randArchitecture`](../architecture/rand-architecture) — the architecture it runs.
 - [`randRam`](../ram/rand-ram) — the memory beside it.

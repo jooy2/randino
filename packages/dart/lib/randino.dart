@@ -28,6 +28,9 @@ library;
 export 'src/age/data/index.dart' show ageGroups;
 export 'src/age/rand_age.dart' show randAge;
 export 'src/age/rand_age_details.dart' show randAgeDetails;
+export 'src/architecture/data/index.dart' show architectures;
+export 'src/architecture/rand_architecture.dart' show randArchitecture;
+export 'src/architecture/rand_architecture_details.dart' show randArchitectureDetails;
 export 'src/constants.dart'
     show
         randAgeMax,
@@ -104,6 +107,7 @@ export 'src/types.dart'
         AgeDetail,
         AgeDistribution,
         AgeGroup,
+        ArchitectureDetail,
         CountryDetail,
         CpuDetail,
         DateDetail,

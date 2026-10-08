@@ -1513,3 +1513,50 @@ export interface GpuDetail {
 	/** The year the first cards or machines with it went on sale. */
 	year: number;
 }
+
+/**
+ * A processor architecture, by the name a download page most often lists it under.
+ * The first four are what nearly every machine runs; the rest come up only with
+ * `includeRare`.
+ */
+export type Architecture =
+	| 'x86_64'
+	| 'arm64'
+	| 'x86'
+	| 'armv7'
+	| 'riscv64'
+	| 'ppc64le'
+	| 's390x'
+	| 'mips64'
+	| 'loongarch64'
+	| 'sparc64';
+
+/**
+ * What `randArchitecture` takes. An architecture is one of ten names, so it has
+ * no language, no length and nothing to invent.
+ */
+export interface RandArchitectureOptions extends Pick<
+	RandCommonOptions,
+	'count' | 'unique' | 'output' | 'random'
+> {
+	/**
+	 * Draw the architectures few machines run now and then as well: RISC-V,
+	 * POWER, IBM Z, MIPS, LoongArch and SPARC, about one draw in twenty
+	 * together. Default `false`, which keeps to x86 and Arm.
+	 */
+	includeRare?: boolean;
+}
+
+/** A generated architecture with what it is known by elsewhere. */
+export interface ArchitectureDetail {
+	/** The architecture as the value form returns it: `x86_64`. */
+	architecture: Architecture;
+	/** The other names it goes by: `amd64` in Debian and Go, `x64` in Windows and Node. */
+	aliases: string[];
+	/** `32` or `64`. */
+	bits: number;
+	/** The line it belongs to: `x86`, `arm`, `riscv`, `power`, `s390`, `mips`, `loongarch`, `sparc`. */
+	family: string;
+	/** Whether it is one of the architectures `includeRare` adds. */
+	rare: boolean;
+}

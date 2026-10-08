@@ -14,6 +14,7 @@ describe('base test', () => {
 			'AFFIX_LENGTH_MAX',
 			'AFFIX_SEPARATOR_DEFAULT',
 			'AGE_GROUPS',
+			'ARCHITECTURES',
 			'DATE_UNITS',
 			'DEVICE_TYPES',
 			'DISK_TYPES',
@@ -43,6 +44,7 @@ describe('base test', () => {
 			'nicknameLengthRange',
 			'randAge',
 			'randAnimal',
+			'randArchitecture',
 			'randBody',
 			'randCity',
 			'randClothing',
@@ -212,6 +214,7 @@ describe('base test', () => {
 		assert.deepStrictEqual(randino.DISK_UNITS, ['MB', 'GB', 'TB']);
 		assert.strictEqual(typeof randino.randCpu()[0], 'string');
 		assert.strictEqual(typeof randino.randGpu()[0], 'string');
+		assert.ok(randino.ARCHITECTURES.includes(randino.randArchitecture()[0] as never));
 	});
 
 	it('an option the types rule out falls back rather than throwing', () => {
@@ -364,6 +367,7 @@ describe('base test', () => {
 		agrees(() => randino.randDiskSize({ count: 5, random: seeded(42) }));
 		agrees(() => randino.randCpu({ count: 5, random: seeded(42) }));
 		agrees(() => randino.randGpu({ count: 5, random: seeded(42) }));
+		agrees(() => randino.randArchitecture({ count: 5, includeRare: true, random: seeded(42) }));
 
 		// Two different seeds are two different answers, so the source is actually
 		// what the draws are coming from.

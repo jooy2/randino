@@ -27,6 +27,8 @@ from randino._types import (
     AgeDistribution,
     AgeGroup,
     AgeGroupOption,
+    Architecture,
+    ArchitectureDetail,
     CountryDetail,
     CpuDetail,
     DateDetail,
@@ -93,6 +95,7 @@ from randino._types import (
     WordThemeOption,
 )
 from randino.age import AGE_GROUPS, rand_age
+from randino.architecture import ARCHITECTURES, rand_architecture
 from randino.constants import (
     RAND_AGE_MAX,
     RAND_COUNT_MAX,
@@ -183,6 +186,7 @@ __all__ = [
     "AFFIX_LENGTH_MAX",
     "AFFIX_SEPARATOR_DEFAULT",
     "AGE_GROUPS",
+    "ARCHITECTURES",
     "DATE_UNITS",
     "DEVICE_TYPES",
     "DISK_TYPES",
@@ -210,6 +214,8 @@ __all__ = [
     "AgeDistribution",
     "AgeGroup",
     "AgeGroupOption",
+    "Architecture",
+    "ArchitectureDetail",
     "CountryDetail",
     "CpuDetail",
     "DateDetail",
@@ -280,6 +286,7 @@ __all__ = [
     "nickname_length_range",
     "rand_age",
     "rand_animal",
+    "rand_architecture",
     "rand_body",
     "rand_city",
     "rand_clothing",

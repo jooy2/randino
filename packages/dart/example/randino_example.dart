@@ -183,6 +183,7 @@ void _system() {
   print(randDeviceDetails().first); // DeviceDetail(Google Pixel 8, phone, 2023)
   print(randCpu(platform: SystemPlatform.mobile)); // [Qualcomm Snapdragon 8 Gen 3]
   print(randGpu(platform: SystemPlatform.desktop)); // [NVIDIA GeForce RTX 3060]
+  print(randArchitecture(includeRare: true, count: 3)); // [arm64, riscv64, x86_64]
   print(randRam(count: 3)); // [8 GB, 16 GB, 4 GB]
   print(randDiskType(platform: SystemPlatform.desktop)); // [SSD]
   print(randDiskSize(count: 2)); // [1 TB, 256 GB]

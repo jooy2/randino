@@ -1386,3 +1386,36 @@ class GpuDetail {
   @override
   String toString() => 'GpuDetail($gpu, ${platform.name}, $year)';
 }
+
+/// A generated processor architecture with what it is known by elsewhere.
+class ArchitectureDetail {
+  /// Creates a detail record. Returned by the generator; there is rarely a
+  /// reason to build one by hand outside a test.
+  const ArchitectureDetail({
+    required this.architecture,
+    required this.aliases,
+    required this.bits,
+    required this.family,
+    required this.rare,
+  });
+
+  /// The architecture as `randArchitecture` returns it: `x86_64`.
+  final String architecture;
+
+  /// The other names it goes by: `amd64` in Debian and Go, `x64` in Windows
+  /// and Node.
+  final List<String> aliases;
+
+  /// `32` or `64`.
+  final int bits;
+
+  /// The line it belongs to: `x86`, `arm`, `riscv`, `power`, `s390`, `mips`,
+  /// `loongarch`, `sparc`.
+  final String family;
+
+  /// Whether it is one of the architectures `includeRare` adds.
+  final bool rare;
+
+  @override
+  String toString() => 'ArchitectureDetail($architecture, $bits)';
+}

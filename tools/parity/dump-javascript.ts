@@ -8,6 +8,10 @@ import {
 	AGE_MAX_DEFAULT
 } from '../../packages/javascript/lib/age/data/index.js';
 import {
+	ARCHITECTURES,
+	ARCHITECTURE_DATA
+} from '../../packages/javascript/lib/architecture/data/index.js';
+import {
 	RAND_AGE_MAX,
 	RAND_COUNT_MAX,
 	RAND_LENGTH_MAX,
@@ -301,6 +305,10 @@ console.log(
 			codes: [...GENDER_CODES],
 			weights: { ...GENDER_WEIGHTS },
 			labels: GENDER_LABELS
+		},
+		architecture: {
+			architectures: [...ARCHITECTURES],
+			data: ARCHITECTURE_DATA
 		},
 		// One entry per processor, keyed by its maker and model, the way the devices are.
 		cpu: Object.fromEntries(

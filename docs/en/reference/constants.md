@@ -326,16 +326,24 @@ How each country writes its numbers is on the [`randPhone`](../phone/rand-phone#
 ::: lang js
 
 ```javascript
-import { DEVICE_TYPES, DISK_TYPES, DISK_UNITS, RAM_UNITS, SYSTEM_PLATFORMS } from 'randino';
+import {
+	ARCHITECTURES,
+	DEVICE_TYPES,
+	DISK_TYPES,
+	DISK_UNITS,
+	RAM_UNITS,
+	SYSTEM_PLATFORMS
+} from 'randino';
 ```
 
-| Name               | Type               | Value                                   |
-| ------------------ | ------------------ | --------------------------------------- |
-| `SYSTEM_PLATFORMS` | `SystemPlatform[]` | `['desktop', 'mobile']`                 |
-| `DEVICE_TYPES`     | `DeviceType[]`     | `['phone', 'tablet', 'laptop']`         |
-| `RAM_UNITS`        | `RamUnit[]`        | `['MB', 'GB']`                          |
-| `DISK_TYPES`       | `DiskType[]`       | `['hdd', 'ssd', 'sshd', 'emmc', 'ufs']` |
-| `DISK_UNITS`       | `DiskUnit[]`       | `['MB', 'GB', 'TB']`                    |
+| Name               | Type               | Value                                               |
+| ------------------ | ------------------ | --------------------------------------------------- |
+| `SYSTEM_PLATFORMS` | `SystemPlatform[]` | `['desktop', 'mobile']`                             |
+| `DEVICE_TYPES`     | `DeviceType[]`     | `['phone', 'tablet', 'laptop']`                     |
+| `RAM_UNITS`        | `RamUnit[]`        | `['MB', 'GB']`                                      |
+| `DISK_TYPES`       | `DiskType[]`       | `['hdd', 'ssd', 'sshd', 'emmc', 'ufs']`             |
+| `DISK_UNITS`       | `DiskUnit[]`       | `['MB', 'GB', 'TB']`                                |
+| `ARCHITECTURES`    | `Architecture[]`   | `['x86_64', 'arm64', 'x86', 'armv7', 'riscv64', …]` |
 
 :::
 
@@ -345,29 +353,38 @@ import { DEVICE_TYPES, DISK_TYPES, DISK_UNITS, RAM_UNITS, SYSTEM_PLATFORMS } fro
 import 'package:randino/randino.dart';
 ```
 
-| Name              | Type                   | Value                                    |
-| ----------------- | ---------------------- | ---------------------------------------- |
-| `systemPlatforms` | `List<SystemPlatform>` | `desktop`, then `mobile`                 |
-| `deviceTypes`     | `List<DeviceType>`     | `phone`, `tablet`, then `laptop`         |
-| `ramUnits`        | `List<RamUnit>`        | `mb`, then `gb`                          |
-| `diskTypes`       | `List<DiskType>`       | `hdd`, `ssd`, `sshd`, `emmc`, then `ufs` |
-| `diskUnits`       | `List<DiskUnit>`       | `mb`, `gb`, then `tb`                    |
+| Name              | Type                   | Value                                         |
+| ----------------- | ---------------------- | --------------------------------------------- |
+| `systemPlatforms` | `List<SystemPlatform>` | `desktop`, then `mobile`                      |
+| `deviceTypes`     | `List<DeviceType>`     | `phone`, `tablet`, then `laptop`              |
+| `ramUnits`        | `List<RamUnit>`        | `mb`, then `gb`                               |
+| `diskTypes`       | `List<DiskType>`       | `hdd`, `ssd`, `sshd`, `emmc`, then `ufs`      |
+| `diskUnits`       | `List<DiskUnit>`       | `mb`, `gb`, then `tb`                         |
+| `architectures`   | `List<String>`         | The four common ones first, then the rare six |
 
 :::
 
 ::: lang py
 
 ```python
-from randino import DEVICE_TYPES, DISK_TYPES, DISK_UNITS, RAM_UNITS, SYSTEM_PLATFORMS
+from randino import (
+    ARCHITECTURES,
+    DEVICE_TYPES,
+    DISK_TYPES,
+    DISK_UNITS,
+    RAM_UNITS,
+    SYSTEM_PLATFORMS,
+)
 ```
 
-| Name               | Type                       | Value                                   |
-| ------------------ | -------------------------- | --------------------------------------- |
-| `SYSTEM_PLATFORMS` | `tuple[SystemPlatform, …]` | `('desktop', 'mobile')`                 |
-| `DEVICE_TYPES`     | `tuple[DeviceType, …]`     | `('phone', 'tablet', 'laptop')`         |
-| `RAM_UNITS`        | `tuple[RamUnit, …]`        | `('MB', 'GB')`                          |
-| `DISK_TYPES`       | `tuple[DiskType, …]`       | `('hdd', 'ssd', 'sshd', 'emmc', 'ufs')` |
-| `DISK_UNITS`       | `tuple[DiskUnit, …]`       | `('MB', 'GB', 'TB')`                    |
+| Name | Type | Value |
+| --- | --- | --- |
+| `SYSTEM_PLATFORMS` | `tuple[SystemPlatform, …]` | `('desktop', 'mobile')` |
+| `DEVICE_TYPES` | `tuple[DeviceType, …]` | `('phone', 'tablet', 'laptop')` |
+| `RAM_UNITS` | `tuple[RamUnit, …]` | `('MB', 'GB')` |
+| `DISK_TYPES` | `tuple[DiskType, …]` | `('hdd', 'ssd', 'sshd', 'emmc', 'ufs')` |
+| `DISK_UNITS` | `tuple[DiskUnit, …]` | `('MB', 'GB', 'TB')` |
+| `ARCHITECTURES` | `tuple[Architecture, …]` | `('x86_64', 'arm64', 'x86', 'armv7', 'riscv64', …)` |
 
 :::
 
@@ -529,6 +546,8 @@ import type {
 	AgeDistribution,
 	AgeGroup,
 	AgeGroupOption,
+	Architecture,
+	ArchitectureDetail,
 	GenderCode,
 	GenderDetail,
 	GpuDetail,
@@ -577,6 +596,7 @@ import type {
 	LocationLanguageOption,
 	LocationLevel,
 	RandAgeOptions,
+	RandArchitectureOptions,
 	RandCountryOptions,
 	RandCpuOptions,
 	RandDateOptions,
@@ -619,7 +639,7 @@ WordLanguage, WordTheme
 LocationLanguage, LocationLevel
 
 // Values
-LengthRange, AgeDetail, CpuDetail, DateDetail, DeviceDetail, DiskSizeDetail, DiskTypeDetail, GenderDetail, GpuDetail, NameDetail, NicknameDetail, LocationDetail, CountryDetail,
+LengthRange, AgeDetail, ArchitectureDetail, CpuDetail, DateDetail, DeviceDetail, DiskSizeDetail, DiskTypeDetail, GenderDetail, GpuDetail, NameDetail, NicknameDetail, LocationDetail, CountryDetail,
 OrganizationDetail, OsDetail, PhoneDetail, RamDetail
 ```
 
@@ -637,6 +657,8 @@ from randino import (
     AgeDistribution,
     AgeGroup,
     AgeGroupOption,
+    Architecture,
+    ArchitectureDetail,
     GenderCode,
     GenderDetail,
     GpuDetail,

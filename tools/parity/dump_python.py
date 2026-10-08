@@ -11,6 +11,7 @@ from typing import Any
 
 from randino._internal.parse import NameToken, outline
 from randino.age.data import AGE_BANDS, AGE_CURVE, AGE_GROUPS, AGE_MAX_DEFAULT
+from randino.architecture.data import ARCHITECTURE_DATA, ARCHITECTURES
 from randino.constants import (
     RAND_AGE_MAX,
     RAND_COUNT_MAX,
@@ -546,6 +547,19 @@ print(
                 "codes": list(GENDER_CODES),
                 "weights": dict(GENDER_WEIGHTS),
                 "labels": {language: dict(labels) for language, labels in GENDER_LABELS.items()},
+            },
+            "architecture": {
+                "architectures": list(ARCHITECTURES),
+                "data": {
+                    code: {
+                        "family": data.family,
+                        "bits": data.bits,
+                        "weight": data.weight,
+                        "rare": data.rare,
+                        "aliases": list(data.aliases),
+                    }
+                    for code, data in ARCHITECTURE_DATA.items()
+                },
             },
             # One entry per processor, keyed by its maker and model, the way the devices are.
             "cpu": {

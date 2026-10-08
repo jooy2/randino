@@ -326,16 +326,24 @@ from randino import PHONE_COUNTRIES, PHONE_TYPES
 ::: lang js
 
 ```javascript
-import { DEVICE_TYPES, DISK_TYPES, DISK_UNITS, RAM_UNITS, SYSTEM_PLATFORMS } from 'randino';
+import {
+	ARCHITECTURES,
+	DEVICE_TYPES,
+	DISK_TYPES,
+	DISK_UNITS,
+	RAM_UNITS,
+	SYSTEM_PLATFORMS
+} from 'randino';
 ```
 
-| 이름               | 타입               | 값                                      |
-| ------------------ | ------------------ | --------------------------------------- |
-| `SYSTEM_PLATFORMS` | `SystemPlatform[]` | `['desktop', 'mobile']`                 |
-| `DEVICE_TYPES`     | `DeviceType[]`     | `['phone', 'tablet', 'laptop']`         |
-| `RAM_UNITS`        | `RamUnit[]`        | `['MB', 'GB']`                          |
-| `DISK_TYPES`       | `DiskType[]`       | `['hdd', 'ssd', 'sshd', 'emmc', 'ufs']` |
-| `DISK_UNITS`       | `DiskUnit[]`       | `['MB', 'GB', 'TB']`                    |
+| 이름               | 타입               | 값                                                  |
+| ------------------ | ------------------ | --------------------------------------------------- |
+| `SYSTEM_PLATFORMS` | `SystemPlatform[]` | `['desktop', 'mobile']`                             |
+| `DEVICE_TYPES`     | `DeviceType[]`     | `['phone', 'tablet', 'laptop']`                     |
+| `RAM_UNITS`        | `RamUnit[]`        | `['MB', 'GB']`                                      |
+| `DISK_TYPES`       | `DiskType[]`       | `['hdd', 'ssd', 'sshd', 'emmc', 'ufs']`             |
+| `DISK_UNITS`       | `DiskUnit[]`       | `['MB', 'GB', 'TB']`                                |
+| `ARCHITECTURES`    | `Architecture[]`   | `['x86_64', 'arm64', 'x86', 'armv7', 'riscv64', …]` |
 
 :::
 
@@ -352,22 +360,31 @@ import 'package:randino/randino.dart';
 | `ramUnits`        | `List<RamUnit>`        | `mb`, `gb` 순                          |
 | `diskTypes`       | `List<DiskType>`       | `hdd`, `ssd`, `sshd`, `emmc`, `ufs` 순 |
 | `diskUnits`       | `List<DiskUnit>`       | `mb`, `gb`, `tb` 순                    |
+| `architectures`   | `List<String>`         | 흔한 넷, 드문 여섯 순                  |
 
 :::
 
 ::: lang py
 
 ```python
-from randino import DEVICE_TYPES, DISK_TYPES, DISK_UNITS, RAM_UNITS, SYSTEM_PLATFORMS
+from randino import (
+    ARCHITECTURES,
+    DEVICE_TYPES,
+    DISK_TYPES,
+    DISK_UNITS,
+    RAM_UNITS,
+    SYSTEM_PLATFORMS,
+)
 ```
 
-| 이름               | 타입                       | 값                                      |
-| ------------------ | -------------------------- | --------------------------------------- |
-| `SYSTEM_PLATFORMS` | `tuple[SystemPlatform, …]` | `('desktop', 'mobile')`                 |
-| `DEVICE_TYPES`     | `tuple[DeviceType, …]`     | `('phone', 'tablet', 'laptop')`         |
-| `RAM_UNITS`        | `tuple[RamUnit, …]`        | `('MB', 'GB')`                          |
-| `DISK_TYPES`       | `tuple[DiskType, …]`       | `('hdd', 'ssd', 'sshd', 'emmc', 'ufs')` |
-| `DISK_UNITS`       | `tuple[DiskUnit, …]`       | `('MB', 'GB', 'TB')`                    |
+| 이름 | 타입 | 값 |
+| --- | --- | --- |
+| `SYSTEM_PLATFORMS` | `tuple[SystemPlatform, …]` | `('desktop', 'mobile')` |
+| `DEVICE_TYPES` | `tuple[DeviceType, …]` | `('phone', 'tablet', 'laptop')` |
+| `RAM_UNITS` | `tuple[RamUnit, …]` | `('MB', 'GB')` |
+| `DISK_TYPES` | `tuple[DiskType, …]` | `('hdd', 'ssd', 'sshd', 'emmc', 'ufs')` |
+| `DISK_UNITS` | `tuple[DiskUnit, …]` | `('MB', 'GB', 'TB')` |
+| `ARCHITECTURES` | `tuple[Architecture, …]` | `('x86_64', 'arm64', 'x86', 'armv7', 'riscv64', …)` |
 
 :::
 
@@ -529,6 +546,8 @@ import type {
 	AgeDistribution,
 	AgeGroup,
 	AgeGroupOption,
+	Architecture,
+	ArchitectureDetail,
 	GenderCode,
 	GenderDetail,
 	GpuDetail,
@@ -577,6 +596,7 @@ import type {
 	LocationLanguageOption,
 	LocationLevel,
 	RandAgeOptions,
+	RandArchitectureOptions,
 	RandCountryOptions,
 	RandCpuOptions,
 	RandDateOptions,
@@ -619,7 +639,7 @@ WordLanguage, WordTheme
 LocationLanguage, LocationLevel
 
 // 값
-LengthRange, AgeDetail, CpuDetail, DateDetail, DeviceDetail, DiskSizeDetail, DiskTypeDetail, GenderDetail, GpuDetail, NameDetail, NicknameDetail, LocationDetail, CountryDetail,
+LengthRange, AgeDetail, ArchitectureDetail, CpuDetail, DateDetail, DeviceDetail, DiskSizeDetail, DiskTypeDetail, GenderDetail, GpuDetail, NameDetail, NicknameDetail, LocationDetail, CountryDetail,
 OrganizationDetail, OsDetail, PhoneDetail, RamDetail
 ```
 
@@ -637,6 +657,8 @@ from randino import (
     AgeDistribution,
     AgeGroup,
     AgeGroupOption,
+    Architecture,
+    ArchitectureDetail,
     GenderCode,
     GenderDetail,
     GpuDetail,

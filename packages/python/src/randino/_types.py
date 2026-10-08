@@ -917,3 +917,42 @@ class GpuDetail:
 
     year: int
     """The year the first cards or machines with it went on sale."""
+
+
+Architecture = Literal[
+    "x86_64",
+    "arm64",
+    "x86",
+    "armv7",
+    "riscv64",
+    "ppc64le",
+    "s390x",
+    "mips64",
+    "loongarch64",
+    "sparc64",
+]
+"""A processor architecture, by the name a download page most often lists it under.
+
+The first four are what nearly every machine runs; the rest come up only with
+`include_rare`.
+"""
+
+
+@dataclass(frozen=True, slots=True)
+class ArchitectureDetail:
+    """A generated processor architecture with what it is known by elsewhere."""
+
+    architecture: Architecture
+    """The architecture as the value form returns it: `x86_64`."""
+
+    aliases: tuple[str, ...]
+    """The other names it goes by: `amd64` in Debian and Go, `x64` in Windows and Node."""
+
+    bits: int
+    """`32` or `64`."""
+
+    family: str
+    """The line it belongs to: `x86`, `arm`, `riscv`, `power`, `s390`, `mips`, `loongarch`, `sparc`."""
+
+    rare: bool
+    """Whether it is one of the architectures `include_rare` adds."""
