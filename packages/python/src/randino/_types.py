@@ -849,3 +849,31 @@ class DiskTypeDetail:
 
     platform: SystemPlatform
     """The kind of machine it was drawn for."""
+
+
+DiskUnit = Literal["MB", "GB", "TB"]
+"""A unit storage is written in.
+
+A drive is sold in powers of ten, so a terabyte here is 1000 gigabytes — the way the box
+and the spec sheet count it.
+"""
+
+DiskUnitOption = Literal[DiskUnit, "auto"]
+""""auto" writes each size in the largest unit it is a whole number of: `2 TB`, but `512 GB`."""
+
+
+@dataclass(frozen=True, slots=True)
+class DiskSizeDetail:
+    """A generated drive capacity, in the unit it was written in and in bytes."""
+
+    size: str
+    """The size as the value form returns it: `1 TB`."""
+
+    value: int
+    """The number written: `1`."""
+
+    unit: DiskUnit
+    """The unit the size is written in."""
+
+    bytes: int
+    """The same size in bytes, counted in powers of ten: `1000000000000`."""

@@ -35,6 +35,7 @@ import {
 } from '../../packages/javascript/lib/decorate/data/index.js';
 import { DEVICES, DEVICE_TYPES } from '../../packages/javascript/lib/device/data/index.js';
 import {
+	DISK_SCALE,
 	DISK_TYPES,
 	DISK_TYPE_LABELS,
 	DISK_TYPE_WEIGHTS
@@ -313,7 +314,15 @@ console.log(
 		disk: {
 			types: [...DISK_TYPES],
 			labels: DISK_TYPE_LABELS,
-			weights: DISK_TYPE_WEIGHTS
+			weights: DISK_TYPE_WEIGHTS,
+			scale: {
+				units: [...DISK_SCALE.units],
+				step: DISK_SCALE.step,
+				base: DISK_SCALE.base,
+				reference: DISK_SCALE.reference,
+				bytes: DISK_SCALE.bytes,
+				pool: DISK_SCALE.pool.map(([size, weight]) => [size, weight])
+			}
 		},
 		// The scale and the pool as written: every size with its weight, in the unit
 		// the pool is kept in.

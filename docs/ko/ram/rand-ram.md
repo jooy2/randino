@@ -186,5 +186,5 @@ rand_ram(output="detail")
 ## 함께 보기 {#see-also}
 
 - [`randDevice`](../device/rand-device) — 이 메모리가 들어갈 휴대폰, 태블릿, 노트북.
-- [`randDiskType`](../disk/rand-disk-type) — 함께 들어가는 저장 장치.
+- [`randDiskType`](../disk/rand-disk-type)과 [`randDiskSize`](../disk/rand-disk-size) — 함께 들어가는 저장 장치.
 - [`randOs`](../os/rand-os) — 그 기기에서 돌아가는 운영체제.

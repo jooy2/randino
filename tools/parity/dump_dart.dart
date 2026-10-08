@@ -621,6 +621,14 @@ void main() {
               for (final entry in platform.value.entries) entry.key.name: entry.value,
             },
         },
+        'scale': <String, Object?>{
+          'units': <String>[for (final unit in diskScale.units) unit.label],
+          'step': diskScale.step,
+          'base': diskScale.base.label,
+          'reference': diskScale.reference.label,
+          'bytes': diskScale.bytes,
+          'pool': <Object?>[for (final (size, weight) in diskScale.pool) <num>[size, weight]],
+        },
       },
       // The scale and the pool as written: every size with its weight, in the
       // unit the pool is kept in.

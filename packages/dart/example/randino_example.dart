@@ -183,6 +183,7 @@ void _system() {
   print(randDeviceDetails().first); // DeviceDetail(Google Pixel 8, phone, 2023)
   print(randRam(count: 3)); // [8 GB, 16 GB, 4 GB]
   print(randDiskType(platform: SystemPlatform.desktop)); // [SSD]
+  print(randDiskSize(count: 2)); // [1 TB, 256 GB]
 }
 
 void _decorators() {

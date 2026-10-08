@@ -54,7 +54,9 @@ export 'src/decorate/rand_suffix_all.dart' show randSuffixAll;
 export 'src/device/data/index.dart' show deviceTypes;
 export 'src/device/rand_device.dart' show randDevice;
 export 'src/device/rand_device_details.dart' show randDeviceDetails;
-export 'src/disk/data/index.dart' show diskTypes;
+export 'src/disk/data/index.dart' show diskTypes, diskUnits;
+export 'src/disk/rand_disk_size.dart' show randDiskSize;
+export 'src/disk/rand_disk_size_details.dart' show randDiskSizeDetails;
 export 'src/disk/rand_disk_type.dart' show randDiskType;
 export 'src/disk/rand_disk_type_details.dart' show randDiskTypeDetails;
 export 'src/gender/rand_gender.dart' show randGender;
@@ -103,8 +105,10 @@ export 'src/types.dart'
         DateUnit,
         DeviceDetail,
         DeviceType,
+        DiskSizeDetail,
         DiskType,
         DiskTypeDetail,
+        DiskUnit,
         GenderCode,
         GenderDetail,
         LengthRange,

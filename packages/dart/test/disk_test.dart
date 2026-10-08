@@ -3,10 +3,13 @@ import 'dart:math';
 import 'package:randino/randino.dart';
 // Internal, but they are what a result is checked against.
 import 'package:randino/src/disk/data/index.dart';
+import 'package:randino/src/internal/capacity.dart';
 import 'package:test/test.dart';
 
 const int sample = 60;
 const int large = 4000;
+const int gigabyte = 1000 * 1000 * 1000;
+final List<int> sizes = [for (final (size, _) in diskScale.pool) size];
 
 double share(List<DiskTypeDetail> details, DiskType code) =>
     details.where((detail) => detail.code == code).length / details.length;
@@ -83,6 +86,129 @@ void main() {
           'eMMC',
         });
         expect(randDiskType(unique: true, count: 10), hasLength(diskTypes.length));
+      });
+    });
+    group('randDiskSize', () {
+      test('returns one size by default', () {
+        expect(randDiskSize().single, matches(RegExp(r'^\d+ (GB|TB)$')));
+      });
+
+      test('returns exactly `count` sizes', () {
+        for (final count in <int>[0, 1, 7, 25]) {
+          expect(randDiskSize(count: count), hasLength(count));
+        }
+
+        expect(randDiskSize(count: -3), isEmpty);
+        expect(randDiskSize(count: randCountMax + 5), hasLength(randCountMax));
+      });
+
+      test('the pool is every size once, smallest first', () {
+        for (var i = 0; i < diskScale.pool.length; i += 1) {
+          final (size, weight) = diskScale.pool[i];
+
+          expect(size, greaterThan(0));
+          expect(weight, greaterThan(0));
+
+          if (i > 0) {
+            expect(size, greaterThan(diskScale.pool[i - 1].$1), reason: '$size is out of order');
+          }
+        }
+      });
+
+      test(
+        'a size is counted in powers of ten, and written in the largest unit it is whole in',
+        () {
+          expect(fitUnit(diskScale, 1000), DiskUnit.tb);
+          expect(fitUnit(diskScale, 512), DiskUnit.gb);
+          expect(inUnit(diskScale, 1000, DiskUnit.tb), 1);
+          expect(inUnit(diskScale, 500, DiskUnit.tb), 0.5);
+          expect(inUnit(diskScale, 512, DiskUnit.mb), 512000);
+
+          for (final detail in randDiskSizeDetails(count: large)) {
+            expect(detail.unit, fitUnit(diskScale, detail.bytes ~/ gigabyte), reason: detail.size);
+          }
+        },
+      );
+
+      test('every size is one the pool holds, and the detail is what was written', () {
+        for (final unit in <DiskUnit?>[null, ...diskUnits]) {
+          for (final detail in randDiskSizeDetails(unit: unit, count: sample * 5)) {
+            final size = detail.bytes ~/ gigabyte;
+
+            expect(sizes, contains(size));
+            expect(detail.size, '${detail.value} ${detail.unit.label}');
+            expect(detail.value, inUnit(diskScale, size, detail.unit));
+          }
+        }
+      });
+
+      test('a named unit keeps to the sizes whole in it, and never writes a decimal point', () {
+        final terabytes = randDiskSizeDetails(unit: DiskUnit.tb, count: large);
+
+        expect(terabytes.every((detail) => detail.unit == DiskUnit.tb), isTrue);
+        expect(terabytes.any((detail) => detail.bytes == 500 * gigabyte), isFalse);
+        expect(
+          randDiskSize(unit: DiskUnit.gb, count: sample * 3).every(RegExp(r'^\d+ GB$').hasMatch),
+          isTrue,
+        );
+
+        for (final size in randDiskSize(count: large)) {
+          expect(size, isNot(contains('.')));
+        }
+      });
+
+      test('includeUnit: false writes the number alone, in gigabytes throughout', () {
+        for (final size in randDiskSize(includeUnit: false, count: sample * 5)) {
+          expect(size, matches(RegExp(r'^\d+$')));
+          expect(sizes, contains(int.parse(size)));
+        }
+      });
+
+      test('minSize and maxSize are read in the unit, or in gigabytes for a null one', () {
+        for (final detail in randDiskSizeDetails(minSize: 500, maxSize: 2000, count: sample * 3)) {
+          expect(detail.bytes ~/ gigabyte, inInclusiveRange(500, 2000), reason: detail.size);
+        }
+
+        for (final detail in randDiskSizeDetails(
+          unit: DiskUnit.tb,
+          minSize: 8,
+          count: sample * 3,
+        )) {
+          expect(detail.value, greaterThanOrEqualTo(8), reason: detail.size);
+        }
+
+        expect(randDiskSize(minSize: 1000, maxSize: 1000, count: sample).toSet(), {'1 TB'});
+      });
+
+      test(
+        'a range no real size is inside answers with nothing, and one the wrong way round keeps maxSize',
+        () {
+          expect(randDiskSize(minSize: 600, maxSize: 900, count: 5), isEmpty);
+          expect(randDiskSize(minSize: 100000, count: 5), isEmpty);
+          expect(randDiskSize(minSize: 4000, maxSize: 256, count: sample).toSet(), {'256 GB'});
+        },
+      );
+
+      test('256 GB, 512 GB and 1 TB are the most common, and the largest drives rare', () {
+        final drives = randDiskSize(count: large);
+        double share(String size) => drives.where((each) => each == size).length / drives.length;
+
+        expect(share('256 GB') + share('512 GB') + share('1 TB'), greaterThan(0.35));
+        expect(share('1 TB'), greaterThan(share('8 TB')));
+        expect(share('24 TB'), lessThan(0.01));
+      });
+
+      test('the value form is the size of each detail', () {
+        expect(randDiskSize(count: sample, random: Random(7)), <String>[
+          for (final detail in randDiskSizeDetails(count: sample, random: Random(7))) detail.size,
+        ]);
+      });
+
+      test('unique never repeats a size, and stops when the sizes run out', () {
+        final drives = randDiskSize(minSize: 256, maxSize: 2000, unique: true, count: 100);
+
+        expect(drives.toSet(), hasLength(drives.length));
+        expect(drives.toSet(), {'256 GB', '480 GB', '500 GB', '512 GB', '1 TB', '2 TB'});
       });
     });
   });

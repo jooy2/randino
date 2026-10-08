@@ -10,7 +10,7 @@ Every option and every example, with **Python** picked in the sidebar. This READ
 
 ---
 
-**randino** generates random person names, nicknames, words, sentences, real locations, ages, genders, organizations, dates and phone numbers in the language you ask for, and real operating systems, devices, memory sizes and kinds of storage for a sample machine.
+**randino** generates random person names, nicknames, words, sentences, real locations, ages, genders, organizations, dates and phone numbers in the language you ask for, and real operating systems, devices, memory and storage for a sample machine.
 
 - **Person names** read like names people carry: Emma Clover, Jack Reeves, each with its English pronunciation. 9 languages.
 - **Nicknames** are handles for a game or a website: MistyOwl, CraneVoyage, RustyBoot. Built from everyday words across twenty-nine themes, and never from person names.
@@ -22,7 +22,7 @@ Every option and every example, with **Python** picked in the sidebar. This READ
 - **Organizations** are companies, schools, offices and associations that do not exist, from `rand_organization`: (주)새솔테크, Westbrook High School, Stadtwerke Bergtal.
 - **Dates** are drawn evenly from a range and written out in UTC by a format of your own, from `rand_date`, or one part at a time.
 - **Phone numbers** are written the way their country writes them, from `rand_phone`, in nine countries. They open on blocks the country really gives out, so one can by chance be real: sample data, never a number to call.
-- **System values** describe a sample machine with real products: an operating system from `rand_os`, written the way its release is known, `Windows 11 Pro 23H2 (Build 22631)`, a phone, tablet or laptop from `rand_device`, `Apple iPhone 15 Pro`, its memory from `rand_ram`, `16 GB`, and its storage from `rand_disk_type`, `SSD`.
+- **System values** describe a sample machine with real products: an operating system from `rand_os`, written the way its release is known, `Windows 11 Pro 23H2 (Build 22631)`, a phone, tablet or laptop from `rand_device`, `Apple iPhone 15 Pro`, its memory from `rand_ram`, `16 GB`, and its storage from `rand_disk_type` and `rand_disk_size`, `SSD`, `1 TB`.
 - **Decorators** attach something to a string you already have: `rand_suffix`, `rand_prefix` and `rand_modifier`.
 - Every argument is keyword-only and optional, so `rand_name()` on its own works.
 - **Pure Python, no dependencies.** It imports nothing outside the standard library, and ships a `py.typed` marker so mypy and Pyright read the annotations.
@@ -486,6 +486,20 @@ rand_disk_type(output="detail")
 | `unique`   | `bool`                 | `False`   |
 | `output`   | `"value" \| "detail"`  | `"value"` |
 
+`rand_disk_size` writes how much it holds, the way `rand_ram` writes memory: a size a drive is sold with, drawn by how common it is, in a unit it is whole in. A terabyte is 1000 gigabytes, the way the box counts.
+
+```python
+from randino import rand_disk_size
+
+rand_disk_size(count=3)  # ['1 TB', '256 GB', '2 TB']
+rand_disk_size(unit="GB")  # ['1000 GB']
+rand_disk_size(unit="TB", min_size=8)  # ['12 TB']
+
+rand_disk_size(output="detail")  # [DiskSizeDetail(size='1 TB', value=1, unit='TB', bytes=1000000000000)]
+```
+
+It takes `rand_ram`'s arguments, with `unit` a `DiskUnitOption`: `"MB"`, `"GB"`, `"TB"` or `"auto"`.
+
 ## Decorators
 
 `rand_suffix`, `rand_prefix` and `rand_modifier` attach something to a string you already have, rather than generating one. They take anything, not just this library's output, which is why none of them is an argument on a generator. Each of them also works with no value at all, handing back the thing it would have attached.
@@ -547,7 +561,7 @@ nickname_length_range("ko")  # (1, 13)
 sentence_length_range("ko")  # (5, 43)
 ```
 
-`NAME_LANGUAGES`, `WORD_LANGUAGES`, `WORD_THEMES`, `LOCATION_LANGUAGES`, `LOCATION_LEVELS`, `AGE_GROUPS`, `ORGANIZATION_TYPES`, `ORGANIZATION_INDUSTRIES`, `DATE_UNITS`, `PHONE_COUNTRIES`, `PHONE_TYPES`, `SYSTEM_PLATFORMS`, `DEVICE_TYPES`, `RAM_UNITS` and `DISK_TYPES` list what the generators accept; `RAND_COUNT_MAX`, `RAND_LENGTH_MIN` / `MAX`, `RAND_LOCATION_LENGTH_MAX`, `RAND_AGE_MAX`, `RAND_ORGANIZATION_LENGTH_MAX`, `AFFIX_LENGTH_DEFAULT` / `MAX`, `AFFIX_SEPARATOR_DEFAULT` and `AFFIX_CHARSET` are the bounds and defaults every argument is clamped to.
+`NAME_LANGUAGES`, `WORD_LANGUAGES`, `WORD_THEMES`, `LOCATION_LANGUAGES`, `LOCATION_LEVELS`, `AGE_GROUPS`, `ORGANIZATION_TYPES`, `ORGANIZATION_INDUSTRIES`, `DATE_UNITS`, `PHONE_COUNTRIES`, `PHONE_TYPES`, `SYSTEM_PLATFORMS`, `DEVICE_TYPES`, `RAM_UNITS`, `DISK_TYPES` and `DISK_UNITS` list what the generators accept; `RAND_COUNT_MAX`, `RAND_LENGTH_MIN` / `MAX`, `RAND_LOCATION_LENGTH_MAX`, `RAND_AGE_MAX`, `RAND_ORGANIZATION_LENGTH_MAX`, `AFFIX_LENGTH_DEFAULT` / `MAX`, `AFFIX_SEPARATOR_DEFAULT` and `AFFIX_CHARSET` are the bounds and defaults every argument is clamped to.
 
 ## Differences from the npm package
 

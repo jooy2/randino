@@ -1278,3 +1278,49 @@ class DiskTypeDetail {
   @override
   String toString() => 'DiskTypeDetail($diskType, ${platform.name})';
 }
+
+/// A unit storage is written in. A drive is sold in powers of ten, so a
+/// terabyte here is 1000 gigabytes — the way the box and the spec sheet count
+/// it.
+enum DiskUnit {
+  /// Megabytes.
+  mb('MB'),
+
+  /// Gigabytes, 1000 megabytes each.
+  gb('GB'),
+
+  /// Terabytes, 1000 gigabytes each.
+  tb('TB');
+
+  const DiskUnit(this.label);
+
+  /// The unit as it is written after a size: `GB`, `TB`.
+  final String label;
+}
+
+/// A generated drive capacity, in the unit it was written in and in bytes.
+class DiskSizeDetail {
+  /// Creates a detail record. Returned by the generator; there is rarely a
+  /// reason to build one by hand outside a test.
+  const DiskSizeDetail({
+    required this.size,
+    required this.value,
+    required this.unit,
+    required this.bytes,
+  });
+
+  /// The size as `randDiskSize` returns it: `1 TB`.
+  final String size;
+
+  /// The number written: `1`.
+  final int value;
+
+  /// The unit the size is written in.
+  final DiskUnit unit;
+
+  /// The same size in bytes, counted in powers of ten: `1000000000000`.
+  final int bytes;
+
+  @override
+  String toString() => 'DiskSizeDetail($size, $bytes)';
+}

@@ -326,7 +326,7 @@ from randino import PHONE_COUNTRIES, PHONE_TYPES
 ::: lang js
 
 ```javascript
-import { DEVICE_TYPES, DISK_TYPES, RAM_UNITS, SYSTEM_PLATFORMS } from 'randino';
+import { DEVICE_TYPES, DISK_TYPES, DISK_UNITS, RAM_UNITS, SYSTEM_PLATFORMS } from 'randino';
 ```
 
 | 이름               | 타입               | 값                                      |
@@ -335,6 +335,7 @@ import { DEVICE_TYPES, DISK_TYPES, RAM_UNITS, SYSTEM_PLATFORMS } from 'randino';
 | `DEVICE_TYPES`     | `DeviceType[]`     | `['phone', 'tablet', 'laptop']`         |
 | `RAM_UNITS`        | `RamUnit[]`        | `['MB', 'GB']`                          |
 | `DISK_TYPES`       | `DiskType[]`       | `['hdd', 'ssd', 'sshd', 'emmc', 'ufs']` |
+| `DISK_UNITS`       | `DiskUnit[]`       | `['MB', 'GB', 'TB']`                    |
 
 :::
 
@@ -350,13 +351,14 @@ import 'package:randino/randino.dart';
 | `deviceTypes`     | `List<DeviceType>`     | `phone`, `tablet`, `laptop` 순         |
 | `ramUnits`        | `List<RamUnit>`        | `mb`, `gb` 순                          |
 | `diskTypes`       | `List<DiskType>`       | `hdd`, `ssd`, `sshd`, `emmc`, `ufs` 순 |
+| `diskUnits`       | `List<DiskUnit>`       | `mb`, `gb`, `tb` 순                    |
 
 :::
 
 ::: lang py
 
 ```python
-from randino import DEVICE_TYPES, DISK_TYPES, RAM_UNITS, SYSTEM_PLATFORMS
+from randino import DEVICE_TYPES, DISK_TYPES, DISK_UNITS, RAM_UNITS, SYSTEM_PLATFORMS
 ```
 
 | 이름               | 타입                       | 값                                      |
@@ -365,6 +367,7 @@ from randino import DEVICE_TYPES, DISK_TYPES, RAM_UNITS, SYSTEM_PLATFORMS
 | `DEVICE_TYPES`     | `tuple[DeviceType, …]`     | `('phone', 'tablet', 'laptop')`         |
 | `RAM_UNITS`        | `tuple[RamUnit, …]`        | `('MB', 'GB')`                          |
 | `DISK_TYPES`       | `tuple[DiskType, …]`       | `('hdd', 'ssd', 'sshd', 'emmc', 'ufs')` |
+| `DISK_UNITS`       | `tuple[DiskUnit, …]`       | `('MB', 'GB', 'TB')`                    |
 
 :::
 
@@ -562,8 +565,11 @@ import type {
 	DeviceDetail,
 	DeviceType,
 	DeviceTypeOption,
+	DiskSizeDetail,
 	DiskType,
 	DiskTypeDetail,
+	DiskUnit,
+	DiskUnitOption,
 	LocationDetail,
 	LocationLanguage,
 	LocationLanguageOption,
@@ -572,6 +578,7 @@ import type {
 	RandCountryOptions,
 	RandDateOptions,
 	RandDeviceOptions,
+	RandDiskSizeOptions,
 	RandDiskTypeOptions,
 	RandGenderOptions,
 	RandLocationOptions,
@@ -599,7 +606,7 @@ const options: RandNameOptions = { language: 'ko', count: 3 };
 import 'package:randino/randino.dart';
 
 // enum
-AgeGroup, AgeDistribution, DateUnit, DeviceType, DiskType, GenderCode
+AgeGroup, AgeDistribution, DateUnit, DeviceType, DiskType, DiskUnit, GenderCode
 NameLanguage, NameGender, NameScript
 OrganizationType, OrganizationIndustry
 PhoneCountry, PhoneType
@@ -608,7 +615,7 @@ WordLanguage, WordTheme
 LocationLanguage, LocationLevel
 
 // 값
-LengthRange, AgeDetail, DateDetail, DeviceDetail, DiskTypeDetail, GenderDetail, NameDetail, NicknameDetail, LocationDetail, CountryDetail,
+LengthRange, AgeDetail, DateDetail, DeviceDetail, DiskSizeDetail, DiskTypeDetail, GenderDetail, NameDetail, NicknameDetail, LocationDetail, CountryDetail,
 OrganizationDetail, OsDetail, PhoneDetail, RamDetail
 ```
 
@@ -662,8 +669,11 @@ from randino import (
     DeviceDetail,
     DeviceType,
     DeviceTypeOption,
+    DiskSizeDetail,
     DiskType,
     DiskTypeDetail,
+    DiskUnit,
+    DiskUnitOption,
     LocationDetail,
     LocationLanguage,
     LocationLanguageOption,

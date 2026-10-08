@@ -115,7 +115,7 @@ const PREAMBLE = [
 	'**dates** are drawn from a range and written out by a format, or one part at a time,',
 	'**phone numbers** are written the way their country writes them and can by chance be real',
 	'ones, **system values** describe a sample machine with real operating systems and devices',
-	'(Windows 11, Apple iPhone 15 Pro) and the memory and storage they are sold with (16 GB, SSD),',
+	'(Windows 11, Apple iPhone 15 Pro) and the memory and storage they are sold with (16 GB, 1 TB SSD),',
 	'and **decorators** attach a token or a modifier to a string you already have.',
 	'',
 	'The same library ships as three packages (`randino` on npm, on pub.dev and on PyPI), generating',

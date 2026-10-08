@@ -186,5 +186,5 @@ rand_ram(output="detail")
 ## See also
 
 - [`randDevice`](../device/rand-device) — a phone, a tablet or a laptop to put the memory in.
-- [`randDiskType`](../disk/rand-disk-type) — the storage beside it.
+- [`randDiskType`](../disk/rand-disk-type) and [`randDiskSize`](../disk/rand-disk-size) — the storage beside it.
 - [`randOs`](../os/rand-os) — the operating system it runs.

@@ -117,7 +117,8 @@ export const SIDEBAR: SidebarGroup[] = [
 							{ path: 'os/rand-os', en: 'randOs', ko: 'randOs' },
 							{ path: 'device/rand-device', en: 'randDevice', ko: 'randDevice' },
 							{ path: 'ram/rand-ram', en: 'randRam', ko: 'randRam' },
-							{ path: 'disk/rand-disk-type', en: 'randDiskType', ko: 'randDiskType' }
+							{ path: 'disk/rand-disk-type', en: 'randDiskType', ko: 'randDiskType' },
+							{ path: 'disk/rand-disk-size', en: 'randDiskSize', ko: 'randDiskSize' }
 						]
 					},
 					{

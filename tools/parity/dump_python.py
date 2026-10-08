@@ -37,7 +37,7 @@ from randino.decorate.data import (
     AFFIX_SEPARATOR_DEFAULT,
 )
 from randino.device.data import DEVICE_TYPES, DEVICES
-from randino.disk.data import DISK_TYPE_LABELS, DISK_TYPE_WEIGHTS, DISK_TYPES
+from randino.disk.data import DISK_SCALE, DISK_TYPE_LABELS, DISK_TYPE_WEIGHTS, DISK_TYPES
 from randino.gender.data import GENDER_CODES, GENDER_LABELS, GENDER_WEIGHTS
 from randino.location.data import LOCATION_DATA, LOCATION_LANGUAGES, LOCATION_LEVELS
 from randino.location.data.countries import COUNTRIES
@@ -564,6 +564,14 @@ print(
                     for code, (label, name) in DISK_TYPE_LABELS.items()
                 },
                 "weights": {platform: dict(row) for platform, row in DISK_TYPE_WEIGHTS.items()},
+                "scale": {
+                    "units": list(DISK_SCALE.units),
+                    "step": DISK_SCALE.step,
+                    "base": DISK_SCALE.base,
+                    "reference": DISK_SCALE.reference,
+                    "bytes": DISK_SCALE.bytes,
+                    "pool": [[size, weight] for size, weight in DISK_SCALE.pool],
+                },
             },
             # The scale and the pool as written: every size with its weight, in the unit the
             # pool is kept in.

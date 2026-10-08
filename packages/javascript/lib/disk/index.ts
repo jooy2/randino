@@ -1,2 +1,3 @@
-export { DISK_TYPES } from './data/index.js';
+export { DISK_TYPES, DISK_UNITS } from './data/index.js';
+export { randDiskSize } from './randDiskSize.js';
 export { randDiskType } from './randDiskType.js';
