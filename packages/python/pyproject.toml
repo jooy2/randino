@@ -5,7 +5,7 @@ build-backend = "hatchling.build"
 [project]
 name = "randino"
 version = "1.3.1"
-description = "Generates random person names, nicknames, words, sentences, real locations, ages, genders and fictional organizations in nine languages. No dependencies, pure Python."
+description = "Generates random person names, nicknames, words, sentences, real locations, ages, genders, fictional organizations, dates and phone numbers in nine languages. No dependencies, pure Python."
 readme = "README.md"
 license = "MIT"
 license-files = ["LICENSE"]
@@ -24,6 +24,8 @@ keywords = [
     "age",
     "gender",
     "organization",
+    "date",
+    "phone",
     "name-generator",
     "nickname-generator",
     "word-generator",
