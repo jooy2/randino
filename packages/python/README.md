@@ -448,6 +448,7 @@ from randino import rand_cpu
 rand_cpu(count=2)  # ['Intel Core i7-13700K', 'Apple A17 Pro']
 rand_cpu(platform="desktop", max_year=2012)  # ['AMD Phenom II X4 940']
 rand_cpu(platform="mobile", include_vendor=False)  # ['Snapdragon 8 Gen 3']
+rand_cpu(vendor=("AMD", "Apple"))  # ['AMD Ryzen 5 5600X']
 
 rand_cpu(output="detail")
 # [CpuDetail(cpu='Apple M3 Pro', vendor='Apple', model='M3 Pro', platform='desktop', year=2023)]
@@ -458,6 +459,7 @@ rand_cpu(output="detail")
 | `platform`       | `SystemPlatformOption` | `"all"`   |
 | `min_year`       | `int \| None`          | `None`    |
 | `max_year`       | `int \| None`          | `None`    |
+| `vendor`         | `CpuVendorOption`      | `"all"`   |
 | `include_vendor` | `bool`                 | `True`    |
 | `count`          | `int`                  | `1`       |
 | `unique`         | `bool`                 | `False`   |
@@ -477,7 +479,7 @@ rand_gpu(output="detail")
 # [GpuDetail(gpu='Intel Arc A770', vendor='Intel', model='Arc A770', platform='desktop', year=2022)]
 ```
 
-It takes `rand_cpu`'s arguments: `platform`, `min_year`, `max_year` and `include_vendor`.
+It takes `rand_cpu`'s arguments: `platform`, `min_year`, `max_year`, `vendor` and `include_vendor`.
 
 ### Architectures
 

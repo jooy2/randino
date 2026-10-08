@@ -16,11 +16,18 @@ import 'package:randino/src/types.dart';
 /// randCpu(platform: SystemPlatform.mobile, count: 2); // [Qualcomm Snapdragon 8 Gen 3, Apple A17 Pro]
 /// randCpu(platform: SystemPlatform.desktop, maxYear: 2012); // [AMD Phenom II X4 940]
 /// randCpu(includeVendor: false); // [Ryzen 7 7800X3D]
+/// randCpu(vendor: {'AMD', 'Apple'}, count: 2); // [AMD Ryzen 5 5600X, Apple M2]
 /// ```
 List<String> randCpu({
   SystemPlatform? platform,
   int? minYear,
   int? maxYear,
+
+  /// Which makers, by the name each sells under: `{'Intel'}`. A null or
+  /// empty set, or one naming no maker the catalog holds, draws every maker; a
+  /// maker with no part on the platform or in the years asked for is answered
+  /// with nothing.
+  Set<String>? vendor,
 
   /// Write the maker in front of the processor: `Intel Core i7-13700K` rather
   /// than `Core i7-13700K`.
@@ -36,6 +43,7 @@ List<String> randCpu({
     platform: platform,
     minYear: minYear,
     maxYear: maxYear,
+    vendor: vendor,
     includeVendor: includeVendor,
     count: count,
     unique: unique,

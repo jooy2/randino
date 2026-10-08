@@ -879,6 +879,21 @@ class DiskSizeDetail:
     """The same size in bytes, counted in powers of ten: `1000000000000`."""
 
 
+CpuVendor = Literal[
+    "Intel", "AMD", "Apple", "Qualcomm", "Samsung", "MediaTek", "Google", "HiSilicon"
+]
+"""Who makes a processor, by the name it is sold under."""
+
+CpuVendorOption = CpuVendor | Sequence[CpuVendor] | Literal["all"]
+"""One maker, a sequence of them to draw from, or `"all"` of them."""
+
+GpuVendor = Literal["NVIDIA", "ATI", "AMD", "Intel", "Qualcomm", "Arm", "Samsung"]
+"""Who sells a graphics processor under its own name; `ATI` is the Radeons of before 2011."""
+
+GpuVendorOption = GpuVendor | Sequence[GpuVendor] | Literal["all"]
+"""One maker, a sequence of them to draw from, or `"all"` of them."""
+
+
 @dataclass(frozen=True, slots=True)
 class CpuDetail:
     """A generated processor with the pieces it was written from."""
@@ -886,7 +901,7 @@ class CpuDetail:
     cpu: str
     """The processor as the value form returns it: `AMD Ryzen 7 7800X3D`."""
 
-    vendor: str
+    vendor: CpuVendor
     """Who makes it: `AMD`."""
 
     model: str
@@ -906,7 +921,7 @@ class GpuDetail:
     gpu: str
     """The graphics processor as the value form returns it: `NVIDIA GeForce RTX 4090`."""
 
-    vendor: str
+    vendor: GpuVendor
     """Who sells it under their name: `NVIDIA`."""
 
     model: str

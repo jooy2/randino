@@ -3,7 +3,18 @@
 from dataclasses import dataclass
 
 from randino._internal.table import rows
-from randino._types import SystemPlatform
+from randino._types import GpuVendor, SystemPlatform
+
+GPU_VENDORS: tuple[GpuVendor, ...] = (
+    "NVIDIA",
+    "ATI",
+    "AMD",
+    "Intel",
+    "Qualcomm",
+    "Arm",
+    "Samsung",
+)
+"""Every maker the catalog holds a part of, in the order the catalog lists them."""
 
 
 @dataclass(frozen=True, slots=True)
@@ -16,7 +27,7 @@ class GpuEntry:
     year: int
     """The year the first cards or machines with it went on sale."""
 
-    vendor: str
+    vendor: GpuVendor
     """Who sells it under their name: `NVIDIA`, `AMD`, `Intel`, `Qualcomm`, `Arm`."""
 
     model: str

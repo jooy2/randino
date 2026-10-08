@@ -3,7 +3,7 @@
 from collections.abc import Callable
 from typing import Literal, overload
 
-from randino._types import CpuDetail, SystemPlatformOption
+from randino._types import CpuDetail, CpuVendorOption, SystemPlatformOption
 from randino.cpu._generator import generate_cpu_details
 
 
@@ -13,6 +13,7 @@ def rand_cpu(
     platform: SystemPlatformOption = ...,
     min_year: int | None = ...,
     max_year: int | None = ...,
+    vendor: CpuVendorOption = ...,
     include_vendor: bool = ...,
     count: int = ...,
     unique: bool = ...,
@@ -27,6 +28,7 @@ def rand_cpu(
     platform: SystemPlatformOption = ...,
     min_year: int | None = ...,
     max_year: int | None = ...,
+    vendor: CpuVendorOption = ...,
     include_vendor: bool = ...,
     count: int = ...,
     unique: bool = ...,
@@ -40,6 +42,7 @@ def rand_cpu(
     platform: SystemPlatformOption = "all",
     min_year: int | None = None,
     max_year: int | None = None,
+    vendor: CpuVendorOption = "all",
     include_vendor: bool = True,
     count: int = 1,
     unique: bool = False,
@@ -56,6 +59,9 @@ def rand_cpu(
         min_year: The earliest year the first machines with it went on sale.
         max_year: The latest year the first machines with it went on sale — `2015` is
             what was out by the end of 2015. A range the wrong way round keeps `max_year`.
+        vendor: Which makers, by the name each sells under: `"Intel"`, or a sequence of
+            them. A maker with no part on the platform or in the years asked for is
+            answered with nothing.
         include_vendor: Write the maker in front of the processor: `Intel Core i7-13700K`
             rather than `Core i7-13700K`.
         count: How many processors to return. Held inside `0`..`RAND_COUNT_MAX`.
@@ -85,6 +91,7 @@ def rand_cpu(
         platform=platform,
         min_year=min_year,
         max_year=max_year,
+        vendor=vendor,
         include_vendor=include_vendor,
         count=count,
         unique=unique,

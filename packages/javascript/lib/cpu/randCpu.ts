@@ -14,6 +14,7 @@ import { generateCpuDetails } from './cpuGenerator.js';
  * randCpu({ platform: 'mobile', count: 2 }); // ['Qualcomm Snapdragon 8 Gen 3', 'Apple A17 Pro']
  * randCpu({ platform: 'desktop', maxYear: 2012 }); // ['AMD Phenom II X4 940']
  * randCpu({ includeVendor: false }); // ['Ryzen 7 7800X3D']
+ * randCpu({ vendor: ['AMD', 'Apple'], count: 2 }); // ['AMD Ryzen 5 5600X', 'Apple M2']
  */
 export function randCpu(options?: RandCpuOptions & { output?: 'value' }): string[];
 /**

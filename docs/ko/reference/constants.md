@@ -328,11 +328,13 @@ from randino import PHONE_COUNTRIES, PHONE_TYPES
 ```javascript
 import {
 	ARCHITECTURES,
+	CPU_VENDORS,
 	DEVICE_TYPES,
 	DISK_TYPES,
 	DISK_UNITS,
 	RAM_UNITS,
 	FILE_CATEGORIES,
+	GPU_VENDORS,
 	MIME_TOP_LEVELS,
 	SYSTEM_PLATFORMS,
 	VERSION_FORMATS
@@ -350,6 +352,8 @@ import {
 | `VERSION_FORMATS` | `VersionFormat[]` | `['semver', 'calver', 'number']` |
 | `FILE_CATEGORIES` | `FileCategory[]` | `['document', 'spreadsheet', …, 'model']` |
 | `MIME_TOP_LEVELS` | `MimeTopLevel[]` | `['application', 'audio', 'font', 'image', 'model', 'text', 'video']` |
+| `CPU_VENDORS` | `CpuVendor[]` | `['Intel', 'AMD', 'Apple', 'Qualcomm', …]` |
+| `GPU_VENDORS` | `GpuVendor[]` | `['NVIDIA', 'ATI', 'AMD', 'Intel', …]` |
 
 :::
 
@@ -370,6 +374,8 @@ import 'package:randino/randino.dart';
 | `versionFormats`  | `List<VersionFormat>`  | `semver`, `calver`, `number` 순                 |
 | `fileCategories`  | `List<FileCategory>`   | `document`, `spreadsheet`, … `model`, 모두 14개 |
 | `mimeTopLevels`   | `List<MimeTopLevel>`   | `application`, `audio`, … `video`, 모두 7개     |
+| `cpuVendors`      | `List<String>`         | `Intel`, `AMD`, … `HiSilicon`, 모두 8개         |
+| `gpuVendors`      | `List<String>`         | `NVIDIA`, `ATI`, … `Samsung`, 모두 7개          |
 
 :::
 
@@ -378,11 +384,13 @@ import 'package:randino/randino.dart';
 ```python
 from randino import (
     ARCHITECTURES,
+    CPU_VENDORS,
     DEVICE_TYPES,
     DISK_TYPES,
     DISK_UNITS,
     RAM_UNITS,
     FILE_CATEGORIES,
+    GPU_VENDORS,
     MIME_TOP_LEVELS,
     SYSTEM_PLATFORMS,
     VERSION_FORMATS,
@@ -400,6 +408,8 @@ from randino import (
 | `VERSION_FORMATS` | `tuple[VersionFormat, …]` | `('semver', 'calver', 'number')` |
 | `FILE_CATEGORIES` | `tuple[FileCategory, …]` | `('document', 'spreadsheet', …, 'model')` |
 | `MIME_TOP_LEVELS` | `tuple[MimeTopLevel, …]` | `('application', 'audio', 'font', 'image', 'model', 'text', 'video')` |
+| `CPU_VENDORS` | `tuple[CpuVendor, …]` | `('Intel', 'AMD', 'Apple', 'Qualcomm', …)` |
+| `GPU_VENDORS` | `tuple[GpuVendor, …]` | `('NVIDIA', 'ATI', 'AMD', 'Intel', …)` |
 
 :::
 
@@ -567,6 +577,8 @@ import type {
 	GenderCode,
 	GenderDetail,
 	GpuDetail,
+	GpuVendor,
+	GpuVendorOption,
 	NameDetail,
 	NameGender,
 	NameGenderOption,
@@ -600,6 +612,8 @@ import type {
 	WordThemeOption,
 	CountryDetail,
 	CpuDetail,
+	CpuVendor,
+	CpuVendorOption,
 	DateDetail,
 	DateInput,
 	DateUnit,
@@ -694,6 +708,8 @@ from randino import (
     GenderCode,
     GenderDetail,
     GpuDetail,
+    GpuVendor,
+    GpuVendorOption,
     NameDetail,
     NameGender,
     NameGenderOption,
@@ -727,6 +743,8 @@ from randino import (
     WordThemeOption,
     CountryDetail,
     CpuDetail,
+    CpuVendor,
+    CpuVendorOption,
     DateDetail,
     DateInput,
     DateUnit,

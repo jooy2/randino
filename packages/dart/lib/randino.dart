@@ -44,6 +44,7 @@ export 'src/constants.dart'
         randSentenceCountMax,
         randSentenceLengthMax,
         systemPlatforms;
+export 'src/cpu/data/index.dart' show cpuVendors;
 export 'src/cpu/rand_cpu.dart' show randCpu;
 export 'src/cpu/rand_cpu_details.dart' show randCpuDetails;
 export 'src/date/data/index.dart' show dateUnits;
@@ -73,6 +74,7 @@ export 'src/file/rand_mime_type.dart' show randMimeType;
 export 'src/file/rand_mime_type_details.dart' show randMimeTypeDetails;
 export 'src/gender/rand_gender.dart' show randGender;
 export 'src/gender/rand_gender_details.dart' show randGenderDetails;
+export 'src/gpu/data/index.dart' show gpuVendors;
 export 'src/gpu/rand_gpu.dart' show randGpu;
 export 'src/gpu/rand_gpu_details.dart' show randGpuDetails;
 export 'src/location/data/index.dart' show locationLanguages, locationLevels;

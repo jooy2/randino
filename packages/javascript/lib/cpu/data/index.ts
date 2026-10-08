@@ -1,5 +1,17 @@
 import { rows } from '../../_internal/parse.js';
-import type { SystemPlatform } from '../../_types/global.js';
+import type { CpuVendor, SystemPlatform } from '../../_types/global.js';
+
+/** Every maker the catalog holds a part of, in the order the catalog lists them. */
+export const CPU_VENDORS: readonly CpuVendor[] = [
+	'Intel',
+	'AMD',
+	'Apple',
+	'Qualcomm',
+	'Samsung',
+	'MediaTek',
+	'Google',
+	'HiSilicon'
+];
 
 /** One processor the catalog holds. */
 export interface CpuEntry {
@@ -7,7 +19,7 @@ export interface CpuEntry {
 	/** The year the first machines with it went on sale. */
 	year: number;
 	/** Who makes it: `Intel`, `AMD`, `Apple`, `Qualcomm`. */
-	vendor: string;
+	vendor: CpuVendor;
 	/** The processor's own name, as its maker writes it: `Core i7-13700K`, `Snapdragon 8 Gen 3`. */
 	model: string;
 }
@@ -285,6 +297,6 @@ export const CPUS: readonly CpuEntry[] = rows(`
 `).map(([platform, year, vendor, model]) => ({
 	platform: platform as SystemPlatform,
 	year: Number(year),
-	vendor,
+	vendor: vendor as CpuVendor,
 	model
 }));

@@ -123,5 +123,38 @@ void main() {
       expect(found.toSet(), hasLength(found.length));
       expect(found.toSet(), expected);
     });
+
+    test('vendor keeps to the makers named, and lists every maker the catalog holds', () {
+      expect({for (final entry in cpus) entry.vendor}, cpuVendors.toSet());
+
+      for (final vendor in cpuVendors) {
+        expect(
+          randCpuDetails(
+            vendor: {vendor},
+            count: sample,
+          ).every((detail) => detail.vendor == vendor),
+          isTrue,
+          reason: vendor,
+        );
+      }
+
+      expect(
+        randCpuDetails(
+          vendor: {'Intel', 'Apple'},
+          count: sample,
+        ).every((detail) => detail.vendor == 'Intel' || detail.vendor == 'Apple'),
+        isTrue,
+      );
+      expect(
+        randCpuDetails(vendor: {'Nope'}, count: sample).any((detail) => detail.vendor != 'Intel'),
+        isTrue,
+        reason: 'an unknown maker reads as all of them',
+      );
+    });
+
+    test('a maker with no part on the platform asked for is answered with nothing', () {
+      expect(randCpu(vendor: {'MediaTek'}, platform: SystemPlatform.desktop, count: 5), isEmpty);
+      expect(randCpu(vendor: {'Intel'}, platform: SystemPlatform.mobile, count: 5), isEmpty);
+    });
   });
 }

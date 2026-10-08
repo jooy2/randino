@@ -1432,6 +1432,13 @@ export interface DiskSizeDetail {
 	bytes: number;
 }
 
+/** Who makes a processor, by the name it is sold under. */
+export type CpuVendor =
+	'Intel' | 'AMD' | 'Apple' | 'Qualcomm' | 'Samsung' | 'MediaTek' | 'Google' | 'HiSilicon';
+
+/** One maker, several, or `'all'` of them. */
+export type CpuVendorOption = CpuVendor | readonly CpuVendor[] | 'all';
+
 /**
  * What `randCpu` takes. A processor is a real part with a real name, so it has
  * no language, no length and nothing to invent.
@@ -1454,6 +1461,12 @@ export interface RandCpuOptions extends Pick<
 	 */
 	maxYear?: number;
 	/**
+	 * Which makers, by the name each sells under: `'Intel'`, `['AMD', 'Apple']`.
+	 * A maker with no part on the platform or in the years asked for is answered
+	 * with nothing. Default `'all'`.
+	 */
+	vendor?: CpuVendorOption;
+	/**
 	 * Write the maker in front of the processor: `Intel Core i7-13700K` rather
 	 * than `Core i7-13700K`. Default `true`.
 	 */
@@ -1465,13 +1478,22 @@ export interface CpuDetail {
 	/** The processor as the value form returns it: `AMD Ryzen 7 7800X3D`. */
 	cpu: string;
 	/** Who makes it: `AMD`. */
-	vendor: string;
+	vendor: CpuVendor;
 	/** The processor's own name: `Ryzen 7 7800X3D`. */
 	model: string;
 	platform: SystemPlatform;
 	/** The year the first machines with it went on sale. */
 	year: number;
 }
+
+/**
+ * Who sells a graphics processor under its own name. `ATI` is the Radeons of
+ * before the end of 2010, sold under that name.
+ */
+export type GpuVendor = 'NVIDIA' | 'ATI' | 'AMD' | 'Intel' | 'Qualcomm' | 'Arm' | 'Samsung';
+
+/** One maker, several, or `'all'` of them. */
+export type GpuVendorOption = GpuVendor | readonly GpuVendor[] | 'all';
 
 /**
  * What `randGpu` takes. A graphics processor is a real part with a real name, so
@@ -1495,6 +1517,12 @@ export interface RandGpuOptions extends Pick<
 	 */
 	maxYear?: number;
 	/**
+	 * Which makers, by the name each sells under: `'NVIDIA'`, `['AMD', 'ATI']`.
+	 * A maker with no part on the platform or in the years asked for is answered
+	 * with nothing. Default `'all'`.
+	 */
+	vendor?: GpuVendorOption;
+	/**
 	 * Write the maker in front of the graphics processor: `NVIDIA GeForce RTX
 	 * 4090` rather than `GeForce RTX 4090`. Default `true`.
 	 */
@@ -1506,7 +1534,7 @@ export interface GpuDetail {
 	/** The graphics processor as the value form returns it: `NVIDIA GeForce RTX 4090`. */
 	gpu: string;
 	/** Who sells it under their name: `NVIDIA`. */
-	vendor: string;
+	vendor: GpuVendor;
 	/** The graphics processor's own name: `GeForce RTX 4090`. */
 	model: string;
 	platform: SystemPlatform;

@@ -1,6 +1,6 @@
 import assert from 'assert';
 import { describe, it } from 'node:test';
-import { RAND_COUNT_MAX, SYSTEM_PLATFORMS, randGpu } from '../dist/index.js';
+import { GPU_VENDORS, RAND_COUNT_MAX, SYSTEM_PLATFORMS, randGpu } from '../dist/index.js';
 // Internal, but they are what a result is checked against.
 import { GPUS } from '../dist/gpu/data/index.js';
 import { writeGpu } from '../dist/gpu/gpuGenerator.js';
@@ -133,5 +133,36 @@ describe('Gpu', () => {
 
 		assert.strictEqual(new Set(gpus).size, gpus.length);
 		assert.deepStrictEqual([...gpus].sort(), expected.map((entry) => writeGpu(entry, true)).sort());
+	});
+
+	it('vendor keeps to the makers named, and lists every maker the catalog holds', () => {
+		assert.deepStrictEqual(
+			[...new Set(GPUS.map((entry) => entry.vendor))].sort(),
+			[...GPU_VENDORS].sort()
+		);
+
+		for (const vendor of GPU_VENDORS) {
+			assert.ok(
+				randGpu({ vendor, count: SAMPLE, output: 'detail' }).every(
+					(detail) => detail.vendor === vendor
+				),
+				vendor
+			);
+		}
+
+		const two = randGpu({ vendor: ['NVIDIA', 'Arm'], count: SAMPLE, output: 'detail' });
+
+		assert.ok(two.every((detail) => detail.vendor === 'NVIDIA' || detail.vendor === 'Arm'));
+		assert.ok(
+			randGpu({ vendor: 'Nope' as never, count: SAMPLE, output: 'detail' }).some(
+				(detail) => detail.vendor !== 'NVIDIA'
+			),
+			'an unknown maker reads as all of them'
+		);
+	});
+
+	it('a maker with no part on the platform asked for is answered with nothing', () => {
+		assert.deepStrictEqual(randGpu({ vendor: 'Arm', platform: 'desktop', count: 5 }), []);
+		assert.deepStrictEqual(randGpu({ vendor: 'NVIDIA', platform: 'mobile', count: 5 }), []);
 	});
 });

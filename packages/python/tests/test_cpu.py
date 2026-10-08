@@ -2,7 +2,7 @@
 
 from random import Random
 
-from randino import RAND_COUNT_MAX, SYSTEM_PLATFORMS, rand_cpu
+from randino import CPU_VENDORS, RAND_COUNT_MAX, SYSTEM_PLATFORMS, rand_cpu
 
 # Internal, but they are what a result is checked against.
 from randino.cpu._generator import write_cpu
@@ -105,3 +105,21 @@ def test_unique_never_repeats_a_processor_and_stops_when_the_processors_run_out(
 
     assert len(set(found)) == len(found)
     assert set(found) == expected
+
+
+def test_vendor_keeps_to_the_makers_named_and_lists_every_maker_the_catalog_holds() -> None:
+    assert {entry.vendor for entry in CPUS} == set(CPU_VENDORS)
+
+    for vendor in CPU_VENDORS:
+        details = rand_cpu(vendor=vendor, count=SAMPLE, output="detail")
+
+        assert all(detail.vendor == vendor for detail in details), vendor
+
+    two = rand_cpu(vendor=("Intel", "Apple"), count=SAMPLE, output="detail")
+
+    assert all(detail.vendor in ("Intel", "Apple") for detail in two)
+
+
+def test_a_maker_with_no_part_on_the_platform_asked_for_is_answered_with_nothing() -> None:
+    assert rand_cpu(vendor="MediaTek", platform="desktop", count=5) == []
+    assert rand_cpu(vendor="Intel", platform="mobile", count=5) == []

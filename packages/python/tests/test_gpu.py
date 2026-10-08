@@ -2,7 +2,7 @@
 
 from random import Random
 
-from randino import RAND_COUNT_MAX, SYSTEM_PLATFORMS, rand_gpu
+from randino import GPU_VENDORS, RAND_COUNT_MAX, SYSTEM_PLATFORMS, rand_gpu
 
 # Internal, but they are what a result is checked against.
 from randino.gpu._generator import write_gpu
@@ -105,3 +105,21 @@ def test_unique_never_repeats_a_graphics_processor_and_stops_when_they_run_out()
 
     assert len(set(found)) == len(found)
     assert set(found) == expected
+
+
+def test_vendor_keeps_to_the_makers_named_and_lists_every_maker_the_catalog_holds() -> None:
+    assert {entry.vendor for entry in GPUS} == set(GPU_VENDORS)
+
+    for vendor in GPU_VENDORS:
+        details = rand_gpu(vendor=vendor, count=SAMPLE, output="detail")
+
+        assert all(detail.vendor == vendor for detail in details), vendor
+
+    two = rand_gpu(vendor=("NVIDIA", "Arm"), count=SAMPLE, output="detail")
+
+    assert all(detail.vendor in ("NVIDIA", "Arm") for detail in two)
+
+
+def test_a_maker_with_no_part_on_the_platform_asked_for_is_answered_with_nothing() -> None:
+    assert rand_gpu(vendor="Arm", platform="desktop", count=5) == []
+    assert rand_gpu(vendor="NVIDIA", platform="mobile", count=5) == []

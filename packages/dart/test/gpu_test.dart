@@ -123,5 +123,38 @@ void main() {
       expect(found.toSet(), hasLength(found.length));
       expect(found.toSet(), expected);
     });
+
+    test('vendor keeps to the makers named, and lists every maker the catalog holds', () {
+      expect({for (final entry in gpus) entry.vendor}, gpuVendors.toSet());
+
+      for (final vendor in gpuVendors) {
+        expect(
+          randGpuDetails(
+            vendor: {vendor},
+            count: sample,
+          ).every((detail) => detail.vendor == vendor),
+          isTrue,
+          reason: vendor,
+        );
+      }
+
+      expect(
+        randGpuDetails(
+          vendor: {'NVIDIA', 'Arm'},
+          count: sample,
+        ).every((detail) => detail.vendor == 'NVIDIA' || detail.vendor == 'Arm'),
+        isTrue,
+      );
+      expect(
+        randGpuDetails(vendor: {'Nope'}, count: sample).any((detail) => detail.vendor != 'NVIDIA'),
+        isTrue,
+        reason: 'an unknown maker reads as all of them',
+      );
+    });
+
+    test('a maker with no part on the platform asked for is answered with nothing', () {
+      expect(randGpu(vendor: {'Arm'}, platform: SystemPlatform.desktop, count: 5), isEmpty);
+      expect(randGpu(vendor: {'NVIDIA'}, platform: SystemPlatform.mobile, count: 5), isEmpty);
+    });
   });
 }

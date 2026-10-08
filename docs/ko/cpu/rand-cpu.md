@@ -46,6 +46,7 @@ rand_cpu()
 | `platform` | <Lang js="SystemPlatformOption" dart="SystemPlatform?" py="SystemPlatformOption" code /> | <Lang js="'all'" dart="null" py="&quot;all&quot;" code /> | `desktop`은 데스크톱과 노트북 프로세서, `mobile`은 휴대폰과 태블릿 칩입니다. <Lang js="'all'" dart="null" py="&quot;all&quot;" code />이면 둘 다에서 뽑습니다. |
 | <Lang js="minYear" dart="minYear" py="min_year" code /> | <Lang js="number" dart="int?" py="int &#124; None" code /> | <Lang js="—" dart="null" py="None" code /> | 프로세서가 나온 가장 이른 해. [연도](#years)를 보세요. |
 | <Lang js="maxYear" dart="maxYear" py="max_year" code /> | <Lang js="number" dart="int?" py="int &#124; None" code /> | <Lang js="—" dart="null" py="None" code /> | 프로세서가 나온 가장 늦은 해. [연도](#years)를 보세요. |
+| `vendor` | <Lang js="CpuVendorOption" dart="Set&lt;String&gt;?" py="CpuVendorOption" code /> | <Lang js="'all'" dart="null" py="&quot;all&quot;" code /> | 제조사. 파는 이름 그대로 하나, 여러 개, 또는 전부를 줄 수 있습니다. [제조사](#vendors)를 보세요. |
 | <Lang js="includeVendor" dart="includeVendor" py="include_vendor" code /> | <Lang js="boolean" dart="bool" py="bool" code /> | <Lang js="true" dart="true" py="True" code /> | 프로세서 앞에 제조사를 씁니다. `Core i7-13700K` 대신 `Intel Core i7-13700K`로 씁니다. |
 | `count` | <Lang js="number" dart="int" py="int" code /> | `1` | 돌려줄 프로세서 개수. `0` … `10000`으로 제한됩니다. |
 | `unique` | <Lang js="boolean" dart="bool" py="bool" code /> | <Lang js="false" dart="false" py="False" code /> | 같은 결과를 두 번 돌려주지 않습니다. 카탈로그가 바닥나면 `count`보다 적게 돌아옵니다. |
@@ -102,6 +103,42 @@ rand_cpu(include_vendor=False, count=2)  # ['Ryzen 7 7800X3D', 'Snapdragon 865']
 제품군마다 판매된 변형을 모두 넣지 않고, 사양표에 가장 자주 나오는 모델을 골라 담았습니다. 데스크톱은 배수 제한이 풀린 모델, 노트북은 주력 모델, 휴대폰 칩은 플래그십과 보급형입니다. 노트북 프로세서는 노트북이 데스크톱 운영체제를 쓰는 것과 같은 이유로 `desktop`에 넣었습니다.
 
 이름은 각 제품의 것이고, 그 권리는 소유자에게 있습니다. randino는 이들 중 어느 곳과도 관계가 없습니다.
+
+## 제조사 {#vendors}
+
+`vendor`는 [뽑는 범위](#catalog)에 적힌 이름 그대로 고른 제조사만 남깁니다. `Intel`, `AMD`, `Apple`, `Qualcomm`, `Samsung`, `MediaTek`, `Google`, `HiSilicon`이며, <Lang js="CPU_VENDORS" dart="cpuVendors" py="CPU_VENDORS" code />도 이 순서입니다. 카탈로그에 없는 이름은 무시하고, 그런 이름만 주면 모든 제조사에서 뽑습니다. `platform`, 연도와 함께 범위를 좁히므로 그 안에 부품이 없는 제조사는 빈 결과를 돌려줍니다. 예를 들어 MediaTek의 데스크톱 프로세서는 들어 있지 않습니다.
+
+::: lang js
+
+```javascript
+randCpu({ vendor: 'AMD', count: 2 }); // ['AMD Ryzen 7 7800X3D', 'AMD Ryzen 5 3600']
+randCpu({ vendor: ['Apple', 'Qualcomm'], platform: 'desktop' }); // ['Apple M3 Pro']
+randCpu({ vendor: 'MediaTek', platform: 'desktop' }); // []
+```
+
+:::
+
+::: lang dart
+
+```dart
+randCpu(vendor: {'AMD'}, count: 2); // [AMD Ryzen 7 7800X3D, AMD Ryzen 5 3600]
+randCpu(vendor: {'Apple', 'Qualcomm'}, platform: SystemPlatform.desktop); // [Apple M3 Pro]
+randCpu(vendor: {'MediaTek'}, platform: SystemPlatform.desktop); // []
+```
+
+제조사는 이름이므로 열거형이 아니라 문자열로 받으며, 정확히 같은 이름만 맞습니다.
+
+:::
+
+::: lang py
+
+```python
+rand_cpu(vendor="AMD", count=2)  # ['AMD Ryzen 7 7800X3D', 'AMD Ryzen 5 3600']
+rand_cpu(vendor=("Apple", "Qualcomm"), platform="desktop")  # ['Apple M3 Pro']
+rand_cpu(vendor="MediaTek", platform="desktop")  # []
+```
+
+:::
 
 ## 연도 {#years}
 

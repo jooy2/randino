@@ -3,10 +3,16 @@
 // Nothing is invented and nothing is weighted. Every option narrows the parts a
 // draw may land on, and every part left is as likely as the next.
 
-import { collect, resolvePlatforms, resolveRandom, resolveYears } from '../_internal/generate.js';
+import {
+	collect,
+	resolveMany,
+	resolvePlatforms,
+	resolveRandom,
+	resolveYears
+} from '../_internal/generate.js';
 import { pick, withRandom } from '../_internal/utils.js';
 import type { CpuDetail, RandCpuOptions } from '../_types/global.js';
-import { CPUS } from './data/index.js';
+import { CPUS, CPU_VENDORS } from './data/index.js';
 import type { CpuEntry } from './data/index.js';
 
 /** `entry` with its maker in front, or alone. */
@@ -18,10 +24,15 @@ export function generateCpuDetails(options: RandCpuOptions = {}): CpuDetail[] {
 	const platforms = resolvePlatforms(options.platform);
 	const [minYear, maxYear] = resolveYears(options.minYear, options.maxYear);
 	const includeVendor = options.includeVendor !== false;
+	const vendors = resolveMany(options.vendor, CPU_VENDORS, CPU_VENDORS);
 	// Worked out once per call rather than per draw: a call of ten thousand would
 	// otherwise filter the catalog ten thousand times.
 	const candidates = CPUS.filter(
-		(entry) => platforms.includes(entry.platform) && entry.year >= minYear && entry.year <= maxYear
+		(entry) =>
+			platforms.includes(entry.platform) &&
+			vendors.includes(entry.vendor) &&
+			entry.year >= minYear &&
+			entry.year <= maxYear
 	);
 
 	return withRandom(resolveRandom(options.random), () =>

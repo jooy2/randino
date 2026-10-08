@@ -1,5 +1,16 @@
 import { rows } from '../../_internal/parse.js';
-import type { SystemPlatform } from '../../_types/global.js';
+import type { GpuVendor, SystemPlatform } from '../../_types/global.js';
+
+/** Every maker the catalog holds a part of, in the order the catalog lists them. */
+export const GPU_VENDORS: readonly GpuVendor[] = [
+	'NVIDIA',
+	'ATI',
+	'AMD',
+	'Intel',
+	'Qualcomm',
+	'Arm',
+	'Samsung'
+];
 
 /** One graphics processor the catalog holds. */
 export interface GpuEntry {
@@ -7,7 +18,7 @@ export interface GpuEntry {
 	/** The year the first cards or machines with it went on sale. */
 	year: number;
 	/** Who sells it under their name: `NVIDIA`, `AMD`, `Intel`, `Qualcomm`, `Arm`. */
-	vendor: string;
+	vendor: GpuVendor;
 	/** The graphics processor's own name, as its maker writes it: `GeForce RTX 4090`. */
 	model: string;
 }
@@ -212,6 +223,6 @@ export const GPUS: readonly GpuEntry[] = rows(`
 `).map(([platform, year, vendor, model]) => ({
 	platform: platform as SystemPlatform,
 	year: Number(year),
-	vendor,
+	vendor: vendor as GpuVendor,
 	model
 }));

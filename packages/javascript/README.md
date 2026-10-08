@@ -466,6 +466,7 @@ import { randCpu } from 'randino';
 randCpu({ count: 2 }); // ['Intel Core i7-13700K', 'Apple A17 Pro']
 randCpu({ platform: 'desktop', maxYear: 2012 }); // ['AMD Phenom II X4 940']
 randCpu({ platform: 'mobile', includeVendor: false }); // ['Snapdragon 8 Gen 3']
+randCpu({ vendor: ['AMD', 'Apple'] }); // ['AMD Ryzen 5 5600X']
 
 randCpu({ output: 'detail' });
 // [{ cpu: 'Apple M3 Pro', vendor: 'Apple', model: 'M3 Pro', platform: 'desktop', year: 2023 }]
@@ -476,6 +477,7 @@ randCpu({ output: 'detail' });
 | `platform`      | `SystemPlatformOption` | `'all'`   |
 | `minYear`       | `number`               | —         |
 | `maxYear`       | `number`               | —         |
+| `vendor`        | `CpuVendorOption`      | `'all'`   |
 | `includeVendor` | `boolean`              | `true`    |
 | `count`         | `number`               | `1`       |
 | `unique`        | `boolean`              | `false`   |
@@ -495,7 +497,7 @@ randGpu({ output: 'detail' });
 // [{ gpu: 'Intel Arc A770', vendor: 'Intel', model: 'Arc A770', platform: 'desktop', year: 2022 }]
 ```
 
-It takes `randCpu`'s options: `platform`, `minYear`, `maxYear` and `includeVendor`.
+It takes `randCpu`'s options: `platform`, `minYear`, `maxYear`, `vendor` and `includeVendor`.
 
 ### Architectures
 
@@ -751,7 +753,7 @@ sentenceLengthRange('ko'); // [5, 43]
 wordLengthRange('ko'); // [1, 4]
 ```
 
-`NAME_LANGUAGES`, `WORD_LANGUAGES`, `WORD_THEMES`, `AGE_GROUPS`, `ORGANIZATION_TYPES`, `ORGANIZATION_INDUSTRIES`, `DATE_UNITS`, `PHONE_COUNTRIES`, `PHONE_TYPES`, `SYSTEM_PLATFORMS`, `DEVICE_TYPES`, `RAM_UNITS`, `DISK_TYPES`, `DISK_UNITS`, `ARCHITECTURES`, `VERSION_FORMATS`, `FILE_CATEGORIES` and `MIME_TOP_LEVELS` list what the generators accept; `RAND_COUNT_MAX`, `RAND_LENGTH_MIN` / `_MAX`, `RAND_SENTENCE_LENGTH_MAX`, `RAND_AGE_MAX`, `RAND_ORGANIZATION_LENGTH_MAX`, `AFFIX_LENGTH_DEFAULT` / `_MAX`, `AFFIX_SEPARATOR_DEFAULT` and `AFFIX_CHARSET` are the bounds and defaults every option is clamped to.
+`NAME_LANGUAGES`, `WORD_LANGUAGES`, `WORD_THEMES`, `AGE_GROUPS`, `ORGANIZATION_TYPES`, `ORGANIZATION_INDUSTRIES`, `DATE_UNITS`, `PHONE_COUNTRIES`, `PHONE_TYPES`, `SYSTEM_PLATFORMS`, `DEVICE_TYPES`, `RAM_UNITS`, `DISK_TYPES`, `DISK_UNITS`, `ARCHITECTURES`, `VERSION_FORMATS`, `FILE_CATEGORIES`, `MIME_TOP_LEVELS`, `CPU_VENDORS` and `GPU_VENDORS` list what the generators accept; `RAND_COUNT_MAX`, `RAND_LENGTH_MIN` / `_MAX`, `RAND_SENTENCE_LENGTH_MAX`, `RAND_AGE_MAX`, `RAND_ORGANIZATION_LENGTH_MAX`, `AFFIX_LENGTH_DEFAULT` / `_MAX`, `AFFIX_SEPARATOR_DEFAULT` and `AFFIX_CHARSET` are the bounds and defaults every option is clamped to.
 
 ## Development
 

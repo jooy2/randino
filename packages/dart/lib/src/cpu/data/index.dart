@@ -1,6 +1,19 @@
 import 'package:randino/src/internal/parse.dart';
 import 'package:randino/src/types.dart';
 
+/// Every maker the catalog holds a part of, in the order the catalog lists
+/// them.
+const List<String> cpuVendors = <String>[
+  'Intel',
+  'AMD',
+  'Apple',
+  'Qualcomm',
+  'Samsung',
+  'MediaTek',
+  'Google',
+  'HiSilicon',
+];
+
 /// One processor the catalog holds. Internal.
 class CpuEntry {
   /// Creates an entry.

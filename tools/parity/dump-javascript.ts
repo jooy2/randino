@@ -43,7 +43,7 @@ import {
 	FILE_EXTENSIONS,
 	MIME_TOP_LEVELS
 } from '../../packages/javascript/lib/file/data/index.js';
-import { CPUS } from '../../packages/javascript/lib/cpu/data/index.js';
+import { CPUS, CPU_VENDORS } from '../../packages/javascript/lib/cpu/data/index.js';
 import { DEVICES, DEVICE_TYPES } from '../../packages/javascript/lib/device/data/index.js';
 import {
 	DISK_SCALE,
@@ -51,7 +51,7 @@ import {
 	DISK_TYPE_LABELS,
 	DISK_TYPE_WEIGHTS
 } from '../../packages/javascript/lib/disk/data/index.js';
-import { GPUS } from '../../packages/javascript/lib/gpu/data/index.js';
+import { GPUS, GPU_VENDORS } from '../../packages/javascript/lib/gpu/data/index.js';
 import {
 	GENDER_CODES,
 	GENDER_LABELS,
@@ -372,6 +372,8 @@ console.log(
 				ceiling: VERSION_YEAR_CEILING
 			}
 		},
+		// Every maker `vendor` accepts, in the order each catalog lists them.
+		vendors: { cpu: [...CPU_VENDORS], gpu: [...GPU_VENDORS] },
 		// One entry per processor, keyed by its maker and model, the way the devices are.
 		cpu: Object.fromEntries(
 			CPUS.map((entry) => [

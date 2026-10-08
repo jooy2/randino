@@ -46,6 +46,7 @@ Every option is optional, and the defaults are what the empty call above uses.
 | `platform` | <Lang js="SystemPlatformOption" dart="SystemPlatform?" py="SystemPlatformOption" code /> | <Lang js="'all'" dart="null" py="&quot;all&quot;" code /> | `desktop` for desktop and laptop processors, `mobile` for the chips of phones and tablets. <Lang js="'all'" dart="null" py="&quot;all&quot;" code /> draws from both. |
 | <Lang js="minYear" dart="minYear" py="min_year" code /> | <Lang js="number" dart="int?" py="int &#124; None" code /> | <Lang js="—" dart="null" py="None" code /> | The earliest year a processor may have come out in. See [years](#years). |
 | <Lang js="maxYear" dart="maxYear" py="max_year" code /> | <Lang js="number" dart="int?" py="int &#124; None" code /> | <Lang js="—" dart="null" py="None" code /> | The latest year a processor may have come out in. See [years](#years). |
+| `vendor` | <Lang js="CpuVendorOption" dart="Set&lt;String&gt;?" py="CpuVendorOption" code /> | <Lang js="'all'" dart="null" py="&quot;all&quot;" code /> | Which makers, by the name each sells under: one, several, or every one of them. See [makers](#vendors). |
 | <Lang js="includeVendor" dart="includeVendor" py="include_vendor" code /> | <Lang js="boolean" dart="bool" py="bool" code /> | <Lang js="true" dart="true" py="True" code /> | Write the maker in front of the processor: `Intel Core i7-13700K` rather than `Core i7-13700K`. |
 | `count` | <Lang js="number" dart="int" py="int" code /> | `1` | How many processors to return. Clamped to `0` … `10000`. |
 | `unique` | <Lang js="boolean" dart="bool" py="bool" code /> | <Lang js="false" dart="false" py="False" code /> | Never return the same processor twice. Returns fewer than `count` once the catalog runs out. |
@@ -102,6 +103,42 @@ rand_cpu(include_vendor=False, count=2)  # ['Ryzen 7 7800X3D', 'Snapdragon 865']
 Each line is represented by the models a spec sheet most often names — the unlocked desktop part, the mainstream laptop part, the flagship and the mid-range chip of a phone line — rather than by every variant its maker sold. A laptop processor counts as `desktop`, the way a laptop runs a desktop operating system.
 
 The names are the products' own, and they belong to their owners. randino is not affiliated with any of them.
+
+## Makers {#vendors}
+
+`vendor` keeps to the makers named, written as the [catalog](#catalog) writes them: `Intel`, `AMD`, `Apple`, `Qualcomm`, `Samsung`, `MediaTek`, `Google` and `HiSilicon`, the order <Lang js="CPU_VENDORS" dart="cpuVendors" py="CPU_VENDORS" code /> lists them in. A name the catalog does not hold is ignored, and a list of nothing but such names draws every maker. It narrows alongside `platform` and the years, so a maker with no part there is answered with nothing: MediaTek makes no desktop processor here.
+
+::: lang js
+
+```javascript
+randCpu({ vendor: 'AMD', count: 2 }); // ['AMD Ryzen 7 7800X3D', 'AMD Ryzen 5 3600']
+randCpu({ vendor: ['Apple', 'Qualcomm'], platform: 'desktop' }); // ['Apple M3 Pro']
+randCpu({ vendor: 'MediaTek', platform: 'desktop' }); // []
+```
+
+:::
+
+::: lang dart
+
+```dart
+randCpu(vendor: {'AMD'}, count: 2); // [AMD Ryzen 7 7800X3D, AMD Ryzen 5 3600]
+randCpu(vendor: {'Apple', 'Qualcomm'}, platform: SystemPlatform.desktop); // [Apple M3 Pro]
+randCpu(vendor: {'MediaTek'}, platform: SystemPlatform.desktop); // []
+```
+
+The makers are strings rather than an enum, because they are names: `{'AMD'}`, matched exactly.
+
+:::
+
+::: lang py
+
+```python
+rand_cpu(vendor="AMD", count=2)  # ['AMD Ryzen 7 7800X3D', 'AMD Ryzen 5 3600']
+rand_cpu(vendor=("Apple", "Qualcomm"), platform="desktop")  # ['Apple M3 Pro']
+rand_cpu(vendor="MediaTek", platform="desktop")  # []
+```
+
+:::
 
 ## Years {#years}
 

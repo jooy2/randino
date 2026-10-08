@@ -14,6 +14,7 @@ import { generateGpuDetails } from './gpuGenerator.js';
  * randGpu({ platform: 'mobile', count: 2 }); // ['Qualcomm Adreno 740', 'Arm Mali-G78']
  * randGpu({ platform: 'desktop', maxYear: 2010 }); // ['ATI Radeon HD 4870']
  * randGpu({ includeVendor: false }); // ['Radeon RX 7900 XTX']
+ * randGpu({ vendor: 'NVIDIA', count: 2 }); // ['NVIDIA GeForce RTX 4070', 'NVIDIA GeForce GTX 1650']
  */
 export function randGpu(options?: RandGpuOptions & { output?: 'value' }): string[];
 /**

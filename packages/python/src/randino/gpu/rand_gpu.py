@@ -3,7 +3,7 @@
 from collections.abc import Callable
 from typing import Literal, overload
 
-from randino._types import GpuDetail, SystemPlatformOption
+from randino._types import GpuDetail, GpuVendorOption, SystemPlatformOption
 from randino.gpu._generator import generate_gpu_details
 
 
@@ -13,6 +13,7 @@ def rand_gpu(
     platform: SystemPlatformOption = ...,
     min_year: int | None = ...,
     max_year: int | None = ...,
+    vendor: GpuVendorOption = ...,
     include_vendor: bool = ...,
     count: int = ...,
     unique: bool = ...,
@@ -27,6 +28,7 @@ def rand_gpu(
     platform: SystemPlatformOption = ...,
     min_year: int | None = ...,
     max_year: int | None = ...,
+    vendor: GpuVendorOption = ...,
     include_vendor: bool = ...,
     count: int = ...,
     unique: bool = ...,
@@ -40,6 +42,7 @@ def rand_gpu(
     platform: SystemPlatformOption = "all",
     min_year: int | None = None,
     max_year: int | None = None,
+    vendor: GpuVendorOption = "all",
     include_vendor: bool = True,
     count: int = 1,
     unique: bool = False,
@@ -58,6 +61,9 @@ def rand_gpu(
         max_year: The latest year the first cards or machines with it went on sale —
             `2015` is what was out by the end of 2015. A range the wrong way round keeps
             `max_year`.
+        vendor: Which makers, by the name each sells under: `"NVIDIA"`, or a sequence of
+            them. A maker with no part on the platform or in the years asked for is
+            answered with nothing.
         include_vendor: Write the maker in front of the graphics processor: `NVIDIA
             GeForce RTX 4090` rather than `GeForce RTX 4090`.
         count: How many graphics processors to return. Held inside `0`..`RAND_COUNT_MAX`.
@@ -87,6 +93,7 @@ def rand_gpu(
         platform=platform,
         min_year=min_year,
         max_year=max_year,
+        vendor=vendor,
         include_vendor=include_vendor,
         count=count,
         unique=unique,

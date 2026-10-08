@@ -412,6 +412,7 @@ Real processors, by the names their makers gave them: Intel, AMD, Apple and Qual
 randCpu(count: 2); // [Intel Core i7-13700K, Apple A17 Pro]
 randCpu(platform: SystemPlatform.desktop, maxYear: 2012); // [AMD Phenom II X4 940]
 randCpu(platform: SystemPlatform.mobile, includeVendor: false); // [Snapdragon 8 Gen 3]
+randCpu(vendor: {'AMD', 'Apple'}); // [AMD Ryzen 5 5600X]
 
 randCpuDetails().first; // CpuDetail(Apple M3 Pro, desktop, 2023)
 ```
@@ -421,6 +422,7 @@ randCpuDetails().first; // CpuDetail(Apple M3 Pro, desktop, 2023)
 | `platform`      | `SystemPlatform?` | `null` — both |
 | `minYear`       | `int?`            | `null` — none |
 | `maxYear`       | `int?`            | `null` — none |
+| `vendor`        | `Set<String>?`    | `null` — all  |
 | `includeVendor` | `bool`            | `true`        |
 | `count`         | `int`             | `1`           |
 | `unique`        | `bool`            | `false`       |
@@ -436,7 +438,7 @@ randGpu(platform: SystemPlatform.desktop, maxYear: 2010); // [ATI Radeon HD 4870
 randGpuDetails().first; // GpuDetail(Intel Arc A770, desktop, 2022)
 ```
 
-It takes `randCpu`'s parameters: `platform`, `minYear`, `maxYear` and `includeVendor`.
+It takes `randCpu`'s parameters: `platform`, `minYear`, `maxYear`, `vendor` and `includeVendor`.
 
 ### Architectures
 

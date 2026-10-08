@@ -20,6 +20,7 @@ List<GpuDetail> generateGpuDetails({
   SystemPlatform? platform,
   int? minYear,
   int? maxYear,
+  Set<String>? vendor,
   bool includeVendor = true,
   int count = 1,
   bool unique = false,
@@ -27,11 +28,22 @@ List<GpuDetail> generateGpuDetails({
 }) {
   final platforms = resolvePlatforms(platform);
   final (low, high) = resolveYears(minYear, maxYear);
+  // Unknown names are dropped, and a set left with none of them reads as every
+  // maker, the way the npm package's `resolveMany` reads one.
+  final named = {
+    for (final each in gpuVendors)
+      if (vendor?.contains(each) ?? false) each,
+  };
+  final vendors = named.isEmpty ? gpuVendors.toSet() : named;
   // Worked out once per call rather than per draw: a call of ten thousand would
   // otherwise filter the catalog ten thousand times.
   final candidates = <GpuEntry>[
     for (final entry in gpus)
-      if (platforms.contains(entry.platform) && entry.year >= low && entry.year <= high) entry,
+      if (platforms.contains(entry.platform) &&
+          vendors.contains(entry.vendor) &&
+          entry.year >= low &&
+          entry.year <= high)
+        entry,
   ];
 
   return withRandom(

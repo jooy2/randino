@@ -32,6 +32,8 @@ from randino._types import (
     ArchitectureDetail,
     CountryDetail,
     CpuDetail,
+    CpuVendor,
+    CpuVendorOption,
     DateDetail,
     DateInput,
     DateUnit,
@@ -49,6 +51,8 @@ from randino._types import (
     GenderCode,
     GenderDetail,
     GpuDetail,
+    GpuVendor,
+    GpuVendorOption,
     LocationDetail,
     LocationLanguage,
     LocationLanguageOption,
@@ -119,7 +123,7 @@ from randino.constants import (
     RAND_SENTENCE_LENGTH_MAX,
     SYSTEM_PLATFORMS,
 )
-from randino.cpu import rand_cpu
+from randino.cpu import CPU_VENDORS, rand_cpu
 from randino.date import DATE_UNITS, rand_date
 from randino.decorate import (
     AFFIX_CHARSET,
@@ -134,7 +138,7 @@ from randino.device import DEVICE_TYPES, rand_device
 from randino.disk import DISK_TYPES, DISK_UNITS, rand_disk_size, rand_disk_type
 from randino.file import FILE_CATEGORIES, MIME_TOP_LEVELS, rand_file_extension, rand_mime_type
 from randino.gender import rand_gender
-from randino.gpu import rand_gpu
+from randino.gpu import GPU_VENDORS, rand_gpu
 from randino.location import (
     LOCATION_LANGUAGES,
     LOCATION_LEVELS,
@@ -202,11 +206,13 @@ __all__ = [
     "AFFIX_SEPARATOR_DEFAULT",
     "AGE_GROUPS",
     "ARCHITECTURES",
+    "CPU_VENDORS",
     "DATE_UNITS",
     "DEVICE_TYPES",
     "DISK_TYPES",
     "DISK_UNITS",
     "FILE_CATEGORIES",
+    "GPU_VENDORS",
     "LOCATION_LANGUAGES",
     "LOCATION_LEVELS",
     "MIME_TOP_LEVELS",
@@ -237,6 +243,8 @@ __all__ = [
     "ArchitectureDetail",
     "CountryDetail",
     "CpuDetail",
+    "CpuVendor",
+    "CpuVendorOption",
     "DateDetail",
     "DateInput",
     "DateUnit",
@@ -254,6 +262,8 @@ __all__ = [
     "GenderCode",
     "GenderDetail",
     "GpuDetail",
+    "GpuVendor",
+    "GpuVendorOption",
     "LocationDetail",
     "LocationLanguage",
     "LocationLanguageOption",

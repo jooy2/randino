@@ -23,7 +23,7 @@ from randino.constants import (
     RAND_SENTENCE_LENGTH_MAX,
     SYSTEM_PLATFORMS,
 )
-from randino.cpu.data import CPUS
+from randino.cpu.data import CPU_VENDORS, CPUS
 from randino.date.data import (
     DATE_CEILING,
     DATE_FLOOR,
@@ -43,7 +43,7 @@ from randino.device.data import DEVICE_TYPES, DEVICES
 from randino.disk.data import DISK_SCALE, DISK_TYPE_LABELS, DISK_TYPE_WEIGHTS, DISK_TYPES
 from randino.file.data import FILE_CATEGORIES, FILE_EXTENSIONS, MIME_TOP_LEVELS
 from randino.gender.data import GENDER_CODES, GENDER_LABELS, GENDER_WEIGHTS
-from randino.gpu.data import GPUS
+from randino.gpu.data import GPU_VENDORS, GPUS
 from randino.location.data import LOCATION_DATA, LOCATION_LANGUAGES, LOCATION_LEVELS
 from randino.location.data.countries import COUNTRIES
 from randino.name.data import NAME_DATA, NAME_LANGUAGES
@@ -618,6 +618,8 @@ print(
                     "ceiling": VERSION_YEAR_CEILING,
                 },
             },
+            # Every maker `vendor` accepts, in the order each catalog lists them.
+            "vendors": {"cpu": list(CPU_VENDORS), "gpu": list(GPU_VENDORS)},
             # One entry per processor, keyed by its maker and model, the way the devices are.
             "cpu": {
                 f"{entry.vendor} {entry.model}": {"platform": entry.platform, "year": entry.year}

@@ -1,6 +1,6 @@
 import assert from 'assert';
 import { describe, it } from 'node:test';
-import { RAND_COUNT_MAX, SYSTEM_PLATFORMS, randCpu } from '../dist/index.js';
+import { CPU_VENDORS, RAND_COUNT_MAX, SYSTEM_PLATFORMS, randCpu } from '../dist/index.js';
 // Internal, but they are what a result is checked against.
 import { CPUS } from '../dist/cpu/data/index.js';
 import { writeCpu } from '../dist/cpu/cpuGenerator.js';
@@ -133,5 +133,36 @@ describe('Cpu', () => {
 
 		assert.strictEqual(new Set(cpus).size, cpus.length);
 		assert.deepStrictEqual([...cpus].sort(), expected.map((entry) => writeCpu(entry, true)).sort());
+	});
+
+	it('vendor keeps to the makers named, and lists every maker the catalog holds', () => {
+		assert.deepStrictEqual(
+			[...new Set(CPUS.map((entry) => entry.vendor))].sort(),
+			[...CPU_VENDORS].sort()
+		);
+
+		for (const vendor of CPU_VENDORS) {
+			assert.ok(
+				randCpu({ vendor, count: SAMPLE, output: 'detail' }).every(
+					(detail) => detail.vendor === vendor
+				),
+				vendor
+			);
+		}
+
+		const two = randCpu({ vendor: ['Intel', 'Apple'], count: SAMPLE, output: 'detail' });
+
+		assert.ok(two.every((detail) => detail.vendor === 'Intel' || detail.vendor === 'Apple'));
+		assert.ok(
+			randCpu({ vendor: 'Nope' as never, count: SAMPLE, output: 'detail' }).some(
+				(detail) => detail.vendor !== 'Intel'
+			),
+			'an unknown maker reads as all of them'
+		);
+	});
+
+	it('a maker with no part on the platform asked for is answered with nothing', () => {
+		assert.deepStrictEqual(randCpu({ vendor: 'MediaTek', platform: 'desktop', count: 5 }), []);
+		assert.deepStrictEqual(randCpu({ vendor: 'Intel', platform: 'mobile', count: 5 }), []);
 	});
 });

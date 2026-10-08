@@ -46,6 +46,7 @@ rand_gpu()
 | `platform` | <Lang js="SystemPlatformOption" dart="SystemPlatform?" py="SystemPlatformOption" code /> | <Lang js="'all'" dart="null" py="&quot;all&quot;" code /> | `desktop`은 데스크톱 그래픽 카드, 노트북 GPU, PC 프로세서 내장 그래픽이고, `mobile`은 휴대폰과 태블릿의 GPU입니다. <Lang js="'all'" dart="null" py="&quot;all&quot;" code />이면 둘 다에서 뽑습니다. |
 | <Lang js="minYear" dart="minYear" py="min_year" code /> | <Lang js="number" dart="int?" py="int &#124; None" code /> | <Lang js="—" dart="null" py="None" code /> | 그래픽 프로세서가 나온 가장 이른 해. [연도](#years)를 보세요. |
 | <Lang js="maxYear" dart="maxYear" py="max_year" code /> | <Lang js="number" dart="int?" py="int &#124; None" code /> | <Lang js="—" dart="null" py="None" code /> | 그래픽 프로세서가 나온 가장 늦은 해. [연도](#years)를 보세요. |
+| `vendor` | <Lang js="GpuVendorOption" dart="Set&lt;String&gt;?" py="GpuVendorOption" code /> | <Lang js="'all'" dart="null" py="&quot;all&quot;" code /> | 제조사. 파는 이름 그대로 하나, 여러 개, 또는 전부를 줄 수 있습니다. [제조사](#vendors)를 보세요. |
 | <Lang js="includeVendor" dart="includeVendor" py="include_vendor" code /> | <Lang js="boolean" dart="bool" py="bool" code /> | <Lang js="true" dart="true" py="True" code /> | 앞에 제조사를 씁니다. `GeForce RTX 4090` 대신 `NVIDIA GeForce RTX 4090`으로 씁니다. |
 | `count` | <Lang js="number" dart="int" py="int" code /> | `1` | 돌려줄 그래픽 프로세서 개수. `0` … `10000`으로 제한됩니다. |
 | `unique` | <Lang js="boolean" dart="bool" py="bool" code /> | <Lang js="false" dart="false" py="False" code /> | 같은 결과를 두 번 돌려주지 않습니다. 카탈로그가 바닥나면 `count`보다 적게 돌아옵니다. |
@@ -99,6 +100,42 @@ rand_gpu(include_vendor=False, count=2)  # ['Radeon RX 7900 XTX', 'GeForce RTX 4
 2010년 말 이전의 Radeon은 당시 팔리던 이름대로 ATI로 씁니다. AMD는 HD 6000 시리즈부터 ATI라는 이름을 쓰지 않았습니다. 노트북 GPU는 NVIDIA가 쓰는 대로 `Laptop GPU`까지 붙여서, 번호가 같은 데스크톱 카드와 헷갈리지 않게 합니다. 애플 GPU는 뺐습니다. 따로 붙은 이름이 없고, Mac은 칩 이름을 보여 주는데 그 이름은 [`randCpu`](../cpu/rand-cpu)가 이미 씁니다.
 
 이름은 각 제품의 것이고, 그 권리는 소유자에게 있습니다. randino는 이들 중 어느 곳과도 관계가 없습니다.
+
+## 제조사 {#vendors}
+
+`vendor`는 [뽑는 범위](#catalog)에 적힌 이름 그대로 고른 제조사만 남깁니다. `NVIDIA`, `ATI`, `AMD`, `Intel`, `Qualcomm`, `Arm`, `Samsung`이며, <Lang js="GPU_VENDORS" dart="gpuVendors" py="GPU_VENDORS" code />도 이 순서입니다. 카탈로그에 없는 이름은 무시하고, 그런 이름만 주면 모든 제조사에서 뽑습니다. `platform`, 연도와 함께 범위를 좁히므로 그 안에 부품이 없는 제조사는 빈 결과를 돌려줍니다. 예를 들어 NVIDIA의 휴대폰 GPU는 들어 있지 않습니다.
+
+::: lang js
+
+```javascript
+randGpu({ vendor: 'NVIDIA', count: 2 }); // ['NVIDIA GeForce RTX 4070', 'NVIDIA GeForce GTX 1650']
+randGpu({ vendor: ['AMD', 'ATI'], maxYear: 2010 }); // ['ATI Radeon HD 4870']
+randGpu({ vendor: 'NVIDIA', platform: 'mobile' }); // []
+```
+
+:::
+
+::: lang dart
+
+```dart
+randGpu(vendor: {'NVIDIA'}, count: 2); // [NVIDIA GeForce RTX 4070, NVIDIA GeForce GTX 1650]
+randGpu(vendor: {'AMD', 'ATI'}, maxYear: 2010); // [ATI Radeon HD 4870]
+randGpu(vendor: {'NVIDIA'}, platform: SystemPlatform.mobile); // []
+```
+
+제조사는 이름이므로 열거형이 아니라 문자열로 받으며, 정확히 같은 이름만 맞습니다.
+
+:::
+
+::: lang py
+
+```python
+rand_gpu(vendor="NVIDIA", count=2)  # ['NVIDIA GeForce RTX 4070', 'NVIDIA GeForce GTX 1650']
+rand_gpu(vendor=("AMD", "ATI"), max_year=2010)  # ['ATI Radeon HD 4870']
+rand_gpu(vendor="NVIDIA", platform="mobile")  # []
+```
+
+:::
 
 ## 연도 {#years}
 

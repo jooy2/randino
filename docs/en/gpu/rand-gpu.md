@@ -46,6 +46,7 @@ Every option is optional, and the defaults are what the empty call above uses.
 | `platform` | <Lang js="SystemPlatformOption" dart="SystemPlatform?" py="SystemPlatformOption" code /> | <Lang js="'all'" dart="null" py="&quot;all&quot;" code /> | `desktop` for desktop cards, laptop GPUs and the graphics built into a PC processor, `mobile` for the GPUs of phones and tablets. <Lang js="'all'" dart="null" py="&quot;all&quot;" code /> draws from both. |
 | <Lang js="minYear" dart="minYear" py="min_year" code /> | <Lang js="number" dart="int?" py="int &#124; None" code /> | <Lang js="—" dart="null" py="None" code /> | The earliest year a graphics processor may have come out in. See [years](#years). |
 | <Lang js="maxYear" dart="maxYear" py="max_year" code /> | <Lang js="number" dart="int?" py="int &#124; None" code /> | <Lang js="—" dart="null" py="None" code /> | The latest year a graphics processor may have come out in. See [years](#years). |
+| `vendor` | <Lang js="GpuVendorOption" dart="Set&lt;String&gt;?" py="GpuVendorOption" code /> | <Lang js="'all'" dart="null" py="&quot;all&quot;" code /> | Which makers, by the name each sells under: one, several, or every one of them. See [makers](#vendors). |
 | <Lang js="includeVendor" dart="includeVendor" py="include_vendor" code /> | <Lang js="boolean" dart="bool" py="bool" code /> | <Lang js="true" dart="true" py="True" code /> | Write the maker in front: `NVIDIA GeForce RTX 4090` rather than `GeForce RTX 4090`. |
 | `count` | <Lang js="number" dart="int" py="int" code /> | `1` | How many graphics processors to return. Clamped to `0` … `10000`. |
 | `unique` | <Lang js="boolean" dart="bool" py="bool" code /> | <Lang js="false" dart="false" py="False" code /> | Never return the same graphics processor twice. Returns fewer than `count` once the catalog runs out. |
@@ -99,6 +100,42 @@ rand_gpu(include_vendor=False, count=2)  # ['Radeon RX 7900 XTX', 'GeForce RTX 4
 A Radeon from before the end of 2010 is written as ATI, because that is the name it was sold under; AMD retired the ATI name with the HD 6000 series. A laptop GPU is written the way NVIDIA writes it, `Laptop GPU` and all, so it is never mistaken for the desktop card of the same number. Apple's GPUs are left out: they carry no name of their own, and a Mac reports its chip's, which [`randCpu`](../cpu/rand-cpu) already writes.
 
 The names are the products' own, and they belong to their owners. randino is not affiliated with any of them.
+
+## Makers {#vendors}
+
+`vendor` keeps to the makers named, written as the [catalog](#catalog) writes them: `NVIDIA`, `ATI`, `AMD`, `Intel`, `Qualcomm`, `Arm` and `Samsung`, the order <Lang js="GPU_VENDORS" dart="gpuVendors" py="GPU_VENDORS" code /> lists them in. A name the catalog does not hold is ignored, and a list of nothing but such names draws every maker. It narrows alongside `platform` and the years, so a maker with no part there is answered with nothing: NVIDIA has no phone GPU here.
+
+::: lang js
+
+```javascript
+randGpu({ vendor: 'NVIDIA', count: 2 }); // ['NVIDIA GeForce RTX 4070', 'NVIDIA GeForce GTX 1650']
+randGpu({ vendor: ['AMD', 'ATI'], maxYear: 2010 }); // ['ATI Radeon HD 4870']
+randGpu({ vendor: 'NVIDIA', platform: 'mobile' }); // []
+```
+
+:::
+
+::: lang dart
+
+```dart
+randGpu(vendor: {'NVIDIA'}, count: 2); // [NVIDIA GeForce RTX 4070, NVIDIA GeForce GTX 1650]
+randGpu(vendor: {'AMD', 'ATI'}, maxYear: 2010); // [ATI Radeon HD 4870]
+randGpu(vendor: {'NVIDIA'}, platform: SystemPlatform.mobile); // []
+```
+
+The makers are strings rather than an enum, because they are names: `{'NVIDIA'}`, matched exactly.
+
+:::
+
+::: lang py
+
+```python
+rand_gpu(vendor="NVIDIA", count=2)  # ['NVIDIA GeForce RTX 4070', 'NVIDIA GeForce GTX 1650']
+rand_gpu(vendor=("AMD", "ATI"), max_year=2010)  # ['ATI Radeon HD 4870']
+rand_gpu(vendor="NVIDIA", platform="mobile")  # []
+```
+
+:::
 
 ## Years {#years}
 
