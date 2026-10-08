@@ -21,6 +21,7 @@ from randino.constants import (
     RAND_SENTENCE_LENGTH_MAX,
     SYSTEM_PLATFORMS,
 )
+from randino.cpu.data import CPUS
 from randino.date.data import (
     DATE_CEILING,
     DATE_FLOOR,
@@ -544,6 +545,11 @@ print(
                 "codes": list(GENDER_CODES),
                 "weights": dict(GENDER_WEIGHTS),
                 "labels": {language: dict(labels) for language, labels in GENDER_LABELS.items()},
+            },
+            # One entry per processor, keyed by its maker and model, the way the devices are.
+            "cpu": {
+                f"{entry.vendor} {entry.model}": {"platform": entry.platform, "year": entry.year}
+                for entry in CPUS
             },
             # One entry per device, keyed by its maker and model, so a device one package
             # holds and another does not is reported as itself.

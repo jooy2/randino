@@ -10,6 +10,7 @@ import 'dart:convert';
 
 import 'package:randino/src/age/data/index.dart';
 import 'package:randino/src/constants.dart';
+import 'package:randino/src/cpu/data/index.dart';
 import 'package:randino/src/date/data/index.dart';
 import 'package:randino/src/decorate/data/index.dart';
 import 'package:randino/src/device/data/index.dart';
@@ -596,6 +597,15 @@ void main() {
               for (final label in language.value.entries) label.key.name: label.value,
             },
         },
+      },
+      // One entry per processor, keyed by its maker and model, the way the
+      // devices are.
+      'cpu': <String, Object?>{
+        for (final entry in cpus)
+          '${entry.vendor} ${entry.model}': <String, Object?>{
+            'platform': entry.platform.name,
+            'year': entry.year,
+          },
       },
       // One entry per device, keyed by its maker and model, so a device one
       // package holds and another does not is reported as itself.

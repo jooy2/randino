@@ -10,7 +10,7 @@ Every option and every example, with **Python** picked in the sidebar. This READ
 
 ---
 
-**randino** generates random person names, nicknames, words, sentences, real locations, ages, genders, organizations, dates and phone numbers in the language you ask for, and real operating systems, devices, memory and storage for a sample machine.
+**randino** generates random person names, nicknames, words, sentences, real locations, ages, genders, organizations, dates and phone numbers in the language you ask for, and real operating systems, devices, processors, memory and storage for a sample machine.
 
 - **Person names** read like names people carry: Emma Clover, Jack Reeves, each with its English pronunciation. 9 languages.
 - **Nicknames** are handles for a game or a website: MistyOwl, CraneVoyage, RustyBoot. Built from everyday words across twenty-nine themes, and never from person names.
@@ -22,7 +22,7 @@ Every option and every example, with **Python** picked in the sidebar. This READ
 - **Organizations** are companies, schools, offices and associations that do not exist, from `rand_organization`: (주)새솔테크, Westbrook High School, Stadtwerke Bergtal.
 - **Dates** are drawn evenly from a range and written out in UTC by a format of your own, from `rand_date`, or one part at a time.
 - **Phone numbers** are written the way their country writes them, from `rand_phone`, in nine countries. They open on blocks the country really gives out, so one can by chance be real: sample data, never a number to call.
-- **System values** describe a sample machine with real products: an operating system from `rand_os`, written the way its release is known, `Windows 11 Pro 23H2 (Build 22631)`, a phone, tablet or laptop from `rand_device`, `Apple iPhone 15 Pro`, its memory from `rand_ram`, `16 GB`, and its storage from `rand_disk_type` and `rand_disk_size`, `SSD`, `1 TB`.
+- **System values** describe a sample machine with real products: an operating system from `rand_os`, written the way its release is known, `Windows 11 Pro 23H2 (Build 22631)`, a phone, tablet or laptop from `rand_device`, `Apple iPhone 15 Pro`, its processor from `rand_cpu`, `Intel Core i7-13700K`, its memory from `rand_ram`, `16 GB`, and its storage from `rand_disk_type` and `rand_disk_size`, `SSD`, `1 TB`.
 - **Decorators** attach something to a string you already have: `rand_suffix`, `rand_prefix` and `rand_modifier`.
 - Every argument is keyword-only and optional, so `rand_name()` on its own works.
 - **Pure Python, no dependencies.** It imports nothing outside the standard library, and ships a `py.typed` marker so mypy and Pyright read the annotations.
@@ -438,6 +438,31 @@ rand_device(output="detail")
 
 `type` is `"phone"`, `"tablet"` or `"laptop"`, or a sequence of them. A model is written the way its maker writes it, generation and all, and one whose name already opens on its maker's (`Xiaomi 14`) is never written with the maker twice.
 
+### Processors
+
+Real processors, by the names their makers gave them: Intel, AMD, Apple and Qualcomm parts for desktops and laptops, and the chips of phones and tablets from Apple, Qualcomm, Samsung, MediaTek, Google and HiSilicon, from the Pentium 4 to the parts out by the end of 2025.
+
+```python
+from randino import rand_cpu
+
+rand_cpu(count=2)  # ['Intel Core i7-13700K', 'Apple A17 Pro']
+rand_cpu(platform="desktop", max_year=2012)  # ['AMD Phenom II X4 940']
+rand_cpu(platform="mobile", include_vendor=False)  # ['Snapdragon 8 Gen 3']
+
+rand_cpu(output="detail")
+# [CpuDetail(cpu='Apple M3 Pro', vendor='Apple', model='M3 Pro', platform='desktop', year=2023)]
+```
+
+| Argument         | Type                   | Default   |
+| ---------------- | ---------------------- | --------- |
+| `platform`       | `SystemPlatformOption` | `"all"`   |
+| `min_year`       | `int \| None`          | `None`    |
+| `max_year`       | `int \| None`          | `None`    |
+| `include_vendor` | `bool`                 | `True`    |
+| `count`          | `int`                  | `1`       |
+| `unique`         | `bool`                 | `False`   |
+| `output`         | `"value" \| "detail"`  | `"value"` |
+
 ### Memory
 
 Amounts of memory a machine is really sold with, from 512 MB to a terabyte, drawn by how common each one is: 8 and 16 GB are most of a sample. A size is only written in a unit it is a whole number of, so nothing carries a decimal point; a gigabyte is 1024 megabytes, the way an operating system counts.
@@ -495,7 +520,9 @@ rand_disk_size(count=3)  # ['1 TB', '256 GB', '2 TB']
 rand_disk_size(unit="GB")  # ['1000 GB']
 rand_disk_size(unit="TB", min_size=8)  # ['12 TB']
 
-rand_disk_size(output="detail")  # [DiskSizeDetail(size='1 TB', value=1, unit='TB', bytes=1000000000000)]
+rand_disk_size(
+    output="detail"
+)  # [DiskSizeDetail(size='1 TB', value=1, unit='TB', bytes=1000000000000)]
 ```
 
 It takes `rand_ram`'s arguments, with `unit` a `DiskUnitOption`: `"MB"`, `"GB"`, `"TB"` or `"auto"`.

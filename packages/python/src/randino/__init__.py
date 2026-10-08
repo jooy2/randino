@@ -28,6 +28,7 @@ from randino._types import (
     AgeGroup,
     AgeGroupOption,
     CountryDetail,
+    CpuDetail,
     DateDetail,
     DateInput,
     DateUnit,
@@ -102,6 +103,7 @@ from randino.constants import (
     RAND_SENTENCE_LENGTH_MAX,
     SYSTEM_PLATFORMS,
 )
+from randino.cpu import rand_cpu
 from randino.date import DATE_UNITS, rand_date
 from randino.decorate import (
     AFFIX_CHARSET,
@@ -207,6 +209,7 @@ __all__ = [
     "AgeGroup",
     "AgeGroupOption",
     "CountryDetail",
+    "CpuDetail",
     "DateDetail",
     "DateInput",
     "DateUnit",
@@ -280,6 +283,7 @@ __all__ = [
     "rand_color",
     "rand_concept",
     "rand_country",
+    "rand_cpu",
     "rand_date",
     "rand_device",
     "rand_disk_size",

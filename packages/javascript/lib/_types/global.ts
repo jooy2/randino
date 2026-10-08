@@ -1431,3 +1431,44 @@ export interface DiskSizeDetail {
 	/** The same size in bytes, counted in powers of ten: `1000000000000`. */
 	bytes: number;
 }
+
+/**
+ * What `randCpu` takes. A processor is a real part with a real name, so it has
+ * no language, no length and nothing to invent.
+ */
+export interface RandCpuOptions extends Pick<
+	RandCommonOptions,
+	'count' | 'unique' | 'output' | 'random'
+> {
+	/**
+	 * Desktop and laptop processors, the systems-on-chip of phones and tablets, or
+	 * both. Default `'all'`.
+	 */
+	platform?: SystemPlatformOption;
+	/** The earliest year the first machines with it went on sale. Default none. */
+	minYear?: number;
+	/**
+	 * The latest year the first machines with it went on sale — `2015` is what was
+	 * out by the end of 2015. A range the wrong way round keeps `maxYear`. Default
+	 * none.
+	 */
+	maxYear?: number;
+	/**
+	 * Write the maker in front of the processor: `Intel Core i7-13700K` rather
+	 * than `Core i7-13700K`. Default `true`.
+	 */
+	includeVendor?: boolean;
+}
+
+/** A generated processor with the pieces it was written from. */
+export interface CpuDetail {
+	/** The processor as the value form returns it: `AMD Ryzen 7 7800X3D`. */
+	cpu: string;
+	/** Who makes it: `AMD`. */
+	vendor: string;
+	/** The processor's own name: `Ryzen 7 7800X3D`. */
+	model: string;
+	platform: SystemPlatform;
+	/** The year the first machines with it went on sale. */
+	year: number;
+}

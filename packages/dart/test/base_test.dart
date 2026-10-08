@@ -42,6 +42,7 @@ void main() {
           'AgeDistribution',
           'AgeGroup',
           'CountryDetail',
+          'CpuDetail',
           'DateDetail',
           'DateUnit',
           'DeviceDetail',
@@ -124,6 +125,8 @@ void main() {
           'randCountMax',
           'randCountry',
           'randCountryDetails',
+          'randCpu',
+          'randCpuDetails',
           'randDate',
           'randDateDetails',
           'randDateUnit',
@@ -309,6 +312,8 @@ void main() {
       expect(randDiskSize().single, matches(RegExp(r'^\d+ (GB|TB)$')));
       expect(randDiskSizeDetails()[0], isA<DiskSizeDetail>());
       expect(diskUnits, DiskUnit.values);
+      expect(randCpu(), hasLength(1));
+      expect(randCpuDetails()[0], isA<CpuDetail>());
     });
 
     test('the bounds are the same numbers the JavaScript package uses', () {
@@ -406,6 +411,7 @@ void main() {
       twice(() => randRam(count: 5, random: Random(42)).join());
       twice(() => randDiskType(count: 5, random: Random(42)).join());
       twice(() => randDiskSize(count: 5, random: Random(42)).join());
+      twice(() => randCpu(count: 5, random: Random(42)).join());
       twice(() => randOrganization(count: 5, random: Random(42)).join('|'));
       twice(() => randOrganization(count: 5, maxLength: 20, random: Random(42)).join('|'));
       twice(() => randSuffixAll(const ['a', 'b'], random: Random(42)).join());

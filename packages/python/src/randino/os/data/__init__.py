@@ -3,7 +3,7 @@
 from dataclasses import dataclass
 from typing import Literal, NamedTuple
 
-from randino._internal.parse import items, rows
+from randino._internal.table import items, rows
 from randino._types import SystemPlatform
 
 OsFamily = Literal["windows", "macos", "ubuntu", "fedora", "debian", "android", "ios", "ipados"]

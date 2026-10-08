@@ -559,6 +559,7 @@ import type {
 	WordTheme,
 	WordThemeOption,
 	CountryDetail,
+	CpuDetail,
 	DateDetail,
 	DateInput,
 	DateUnit,
@@ -576,6 +577,7 @@ import type {
 	LocationLevel,
 	RandAgeOptions,
 	RandCountryOptions,
+	RandCpuOptions,
 	RandDateOptions,
 	RandDeviceOptions,
 	RandDiskSizeOptions,
@@ -615,7 +617,7 @@ WordLanguage, WordTheme
 LocationLanguage, LocationLevel
 
 // 값
-LengthRange, AgeDetail, DateDetail, DeviceDetail, DiskSizeDetail, DiskTypeDetail, GenderDetail, NameDetail, NicknameDetail, LocationDetail, CountryDetail,
+LengthRange, AgeDetail, CpuDetail, DateDetail, DeviceDetail, DiskSizeDetail, DiskTypeDetail, GenderDetail, NameDetail, NicknameDetail, LocationDetail, CountryDetail,
 OrganizationDetail, OsDetail, PhoneDetail, RamDetail
 ```
 
@@ -663,6 +665,7 @@ from randino import (
     WordTheme,
     WordThemeOption,
     CountryDetail,
+    CpuDetail,
     DateDetail,
     DateInput,
     DateUnit,

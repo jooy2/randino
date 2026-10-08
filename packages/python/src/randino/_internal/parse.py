@@ -211,23 +211,3 @@ def outline(source: str, levels: int) -> tuple[OutlineEntry, ...]:
         OutlineEntry(path, depth, below)
         for path, depth, below in zip(paths, depths, belows, strict=True)
     )
-
-
-def rows(source: str) -> tuple[tuple[str, ...], ...]:
-    """Split a table written one row per line with `|` between the cells.
-
-    For the catalogs of real products whose names carry spaces of their own: `Core
-    i7-13700K`, `Galaxy S24 Ultra`, `23H2 (Build 22631)`. Every cell is trimmed, blank
-    lines are skipped, and an empty cell stays an empty string so a row keeps its
-    columns where they are.
-    """
-    return tuple(
-        tuple(cell.strip() for cell in line.strip().split("|"))
-        for line in source.split("\n")
-        if line.strip()
-    )
-
-
-def items(cell: str) -> tuple[str, ...]:
-    """Split a cell holding a list, `a, b, c`, into its entries. An empty cell is none."""
-    return tuple(entry.strip() for entry in cell.split(",") if entry.strip())

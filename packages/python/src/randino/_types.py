@@ -877,3 +877,23 @@ class DiskSizeDetail:
 
     bytes: int
     """The same size in bytes, counted in powers of ten: `1000000000000`."""
+
+
+@dataclass(frozen=True, slots=True)
+class CpuDetail:
+    """A generated processor with the pieces it was written from."""
+
+    cpu: str
+    """The processor as the value form returns it: `AMD Ryzen 7 7800X3D`."""
+
+    vendor: str
+    """Who makes it: `AMD`."""
+
+    model: str
+    """The processor's own name: `Ryzen 7 7800X3D`."""
+
+    platform: SystemPlatform
+    """The kind of machine it is built into."""
+
+    year: int
+    """The year the first machines with it went on sale."""

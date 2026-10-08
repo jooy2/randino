@@ -39,6 +39,8 @@ export 'src/constants.dart'
         randSentenceCountMax,
         randSentenceLengthMax,
         systemPlatforms;
+export 'src/cpu/rand_cpu.dart' show randCpu;
+export 'src/cpu/rand_cpu_details.dart' show randCpuDetails;
 export 'src/date/data/index.dart' show dateUnits;
 export 'src/date/rand_date.dart' show randDate;
 export 'src/date/rand_date_details.dart' show randDateDetails;
@@ -101,6 +103,7 @@ export 'src/types.dart'
         AgeDistribution,
         AgeGroup,
         CountryDetail,
+        CpuDetail,
         DateDetail,
         DateUnit,
         DeviceDetail,

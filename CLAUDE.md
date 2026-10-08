@@ -15,7 +15,7 @@ Guidance for AI agents (and humans) working in this repository. Written in Engli
 - **Genders** are the label a form in the language writes for one (`여성`, `Female`, `Divers`). Male and female split evenly, and the two others — `unknown` and `nonbinary` — come up only when the caller switches them on, and rarely when they do.
 - **Dates** are instants drawn evenly from a range and written out in UTC (`2024-03-15T14:07:32.481Z`, `2024년 3월 15일`), by a format of the caller's own. `unit` hands back one part of a date as a number instead — `minute` is `0` to `59` — read off a drawn date so it keeps to the range. Its `language` writes only the month and weekday names and the half of the day, and defaults to `'en'` rather than `'all'`: a format is written in one language. `minDate` / `maxDate`, `format`, `unit` and `utcOffset` are its own options.
 - **Phone numbers** are written the way their country writes them (`010-4821-3967`, `(415) 726-0193`, `8 (912) 345-67-89`), for the country each word language is spoken in first. Each opens on a block the country's numbering plan really gives out and ends on random digits, so **a drawn number can by chance be somebody's** — the docs and the doc comments say so, and say never to call or text one. `randPhone` takes `country` in place of `language`, and `type`, `includeCountryCode`, `separator` and `fictional` are its own options.
-- **System values** describe a sample machine with real products, the one place the library does not invent: an operating system from `randOs` (`Windows 11 Pro 23H2 (Build 22631)`, `macOS Sonoma 14.5`, `Android 14 (API 34)`) a phone, tablet or laptop from `randDevice` (`Apple iPhone 15 Pro`, `Lenovo ThinkPad X1 Carbon Gen 11`), the memory one is sold with from `randRam` (`16 GB`), and the kind and size of its storage from `randDiskType` and `randDiskSize` (`SSD`, `1 TB`). Nothing is made up — every value is a release that came out, written by the name it was released under — so none of them takes a `language`, and they share `platform` (`desktop` or `mobile`) and, where a value has a release year, `minYear` / `maxYear`. The names are the products' own and belong to their owners; the docs say so on every page that lists them.
+- **System values** describe a sample machine with real products, the one place the library does not invent: an operating system from `randOs` (`Windows 11 Pro 23H2 (Build 22631)`, `macOS Sonoma 14.5`, `Android 14 (API 34)`) a phone, tablet or laptop from `randDevice` (`Apple iPhone 15 Pro`, `Lenovo ThinkPad X1 Carbon Gen 11`), its processor from `randCpu` (`Intel Core i7-13700K`), the memory one is sold with from `randRam` (`16 GB`), and the kind and size of its storage from `randDiskType` and `randDiskSize` (`SSD`, `1 TB`). Nothing is made up — every value is a release that came out, written by the name it was released under — so none of them takes a `language`, and they share `platform` (`desktop` or `mobile`) and, where a value has a release year, `minYear` / `maxYear`. The names are the products' own and belong to their owners; the docs say so on every page that lists them.
 - **Organizations** are companies, schools, offices and associations that do not exist (`(주)새솔테크`, `Westbrook High School`, `Гимназия № 135`), each written the way its language writes that kind. Nothing about them is real, and that is the requirement rather than a limitation: the stems are chosen to be nobody's brand, and **no organization is ever built from a person name** — a surname with a legal form behind it is exactly how famous companies are named.
 
 All of them are implemented. Keep the generators apart — a shared "generator" abstraction is not wanted — but the options they all take, and the loop that draws until it has `count` results, live in `_internal/generate` and are shared. So are the word pools: `word/data` is the one dataset, and `nickname` consumes it.
@@ -69,6 +69,11 @@ lib/
       index.ts              # ORGANIZATION_DATA, the kinds, the industries, the odds
       types.ts              # internal dataset types (templates, synthesis)
       en.ts ko.ts ja.ts …   # one file per language, nine of them
+  cpu/
+    index.ts
+    randCpu.ts              # public: string[], or CpuDetail[] on `output: 'detail'`
+    cpuGenerator.ts         # internal: the candidates per call, the maker in front or not
+    data/index.ts           # CPUS: every processor, one row each
   date/
     index.ts
     randDate.ts             # public: string[], number[] on `unit`, or DateDetail[] on `output: 'detail'`
@@ -165,6 +170,7 @@ lib/
 test/
   base.test.ts              # the package's export surface
   age.test.ts               # one *.test.ts per category
+  cpu.test.ts
   date.test.ts
   decorate.test.ts
   device.test.ts
@@ -237,6 +243,7 @@ lib/
       utils.dart            # pick / randInt / chance / clamp, never exported
       parse.dart            # words() / pairs() / weightMap() / romanMap()
     age/                    # mirrors lib/age, plus `randAgeDetails`
+    cpu/                    # mirrors lib/cpu, plus `randCpuDetails`
     date/                   # mirrors lib/date, plus `randDateUnit` and `randDateDetails`
     decorate/               # mirrors lib/decorate, plus the `…All` list forms
     device/                 # mirrors lib/device, plus `randDeviceDetails`
@@ -264,6 +271,7 @@ lib/
 test/
   base_test.dart            # the barrel's export surface, read out of the source
   age_test.dart
+  cpu_test.dart
   date_test.dart
   decorate_test.dart
   device_test.dart
@@ -332,7 +340,9 @@ src/randino/
   _internal/
     utils.py                # pick / rand_int / chance / clamp, never exported
     parse.py                # words() / tokens() / weights() / roman_map()
+    table.py                # rows() / items(), apart from parse: see the system bullets
   age/                      # mirrors lib/age
+  cpu/                      # mirrors lib/cpu
   date/                     # mirrors lib/date
   decorate/                 # mirrors lib/decorate; `@overload` carries the shape
   device/                   # mirrors lib/device
@@ -361,6 +371,7 @@ src/randino/
 tests/
   test_base.py              # the barrel's export surface, and the no-dependency rule
   test_age.py
+  test_cpu.py
   test_date.py
   test_decorate.py
   test_device.py
@@ -553,7 +564,7 @@ The run stops rather than writes when a file changes shape — new columns, an u
 
 **The dumps normalize what only differs because the languages differ, and nothing else.** A pool entry is `{ n, r }` everywhere; field names are the JavaScript ones; an optional field is present and null rather than absent; `syn` carries its `kind` tag even in the two packages that tell the shapes apart by type. That normalization lives in the three dumps — one per package, each responsible for its own language's spelling — so the comparison itself has nothing to know about any of them. Adding a field to a dataset means adding it to all three dumps, and the check reports a field only one dump writes as a difference, which is the intended failure.
 
-**Do not widen it into a general "the ports agree" check.** It covers the word, sentence, name and location datasets, the age bands and curve, the date units and default range, the phone plans and templates, the operating system catalog and the weight of each line, the device catalog, the memory sizes and their weights, the disk types and their weights per platform, the disk sizes and their weights, the gender labels and weights, the organization datasets and their odds, the stories and the field rules beside them, the surname romanization map, and the bounds in `constants` and `decorate/data` — the last of which is still written by hand in each package. The nickname shapes are in it now that they are `WordLanguageData.frames`: they were left out while they were a table private to each generator, and being data is what put them in. The sentence datasets are the same story on a larger scale, `THEME_CLASS` included, because a theme moving from one class to another changes what every verb of every language will accept.
+**Do not widen it into a general "the ports agree" check.** It covers the word, sentence, name and location datasets, the age bands and curve, the date units and default range, the phone plans and templates, the operating system catalog and the weight of each line, the device and processor catalogs, the memory sizes and their weights, the disk types and their weights per platform, the disk sizes and their weights, the gender labels and weights, the organization datasets and their odds, the stories and the field rules beside them, the surname romanization map, and the bounds in `constants` and `decorate/data` — the last of which is still written by hand in each package. The nickname shapes are in it now that they are `WordLanguageData.frames`: they were left out while they were a table private to each generator, and being data is what put them in. The sentence datasets are the same story on a larger scale, `THEME_CLASS` included, because a theme moving from one class to another changes what every verb of every language will accept.
 
 ## Testing a random generator
 
@@ -732,9 +743,10 @@ System values:
 - **A release is written by its template.** `OsRelease.template` holds the words around the version (`macOS Sonoma {v}`, `Android {v} KitKat{b}`, `Ubuntu{e} {v} LTS`), `{e}` is the edition and `{b}` the build, each with its space. A template with no `{b}` writes its build in the version's place, which is how `macOS Sonoma 14` becomes `macOS Sonoma 14.5` rather than `14 14.5`. A new way of writing a release is a template, never a branch.
 - **A line is drawn first, a release second.** `OS_FAMILIES` weights the lines of each platform, hand-written in the order they are common in, because the lines ship at different paces: macOS, iOS and Android release every year where Windows has eleven releases in thirty years, and an even draw over releases made Windows a tenth of every desktop. Inside a line every release is as likely as the next. The suites assert the order of the shares, not the numbers.
 - **The year that counts is the year of what is written.** Without `includeBuild` it is the release's, with it the build's, so Windows 10 is outside `minYear: 2020` until its 2020 and later updates are what the result names. A year range nothing came out in returns nothing rather than a release from outside it, the way `fictional` answers a country with no fiction numbers.
-- **A device is drawn evenly, and its maker is written once.** Nothing weights one model over another; `type` and the years narrow the catalog and every model left is as likely as the next. `writeDevice` puts the maker in front unless the model already opens on the maker's name (`Xiaomi 14`, `OnePlus 12`, `Nothing Phone (2)`), so a model like that is written whole in its row, maker included. A desktop PC is not a device here: it has no model name of its own.
+- **In Python the table helpers live in `_internal/table`, not in `parse`.** `parse` imports the word package's pool types, and `randino` imports `cpu` before `word`, so a catalog reading `parse` imported the two half-finished — the reason `date/data` carries its own copy of `words`. The npm and pub.dev packages keep `rows()` in `parse`, where nothing imports in that order.
+- **A device or a processor is drawn evenly, and its maker is written once.** Nothing weights one model over another; `type` and the years narrow the catalog and every model left is as likely as the next. `writeDevice` puts the maker in front unless the model already opens on the maker's name (`Xiaomi 14`, `OnePlus 12`, `Nothing Phone (2)`), so a model like that is written whole in its row, maker included. A desktop PC is not a device here: it has no model name of its own.
 - **A size is real, and it is whole in the unit it is written in.** `_internal/capacity` holds what memory and storage share: a pool of the sizes machines are sold with, weighted by hand in the order they are common in, and the units they are counted in — memory in powers of two, as an operating system reports it, and storage in powers of ten, as a drive is sold. `'auto'` writes each size in the largest unit it is whole in, and a named unit leaves out the sizes that are not whole in it rather than rounding 512 MB to `1 GB` or `0.5 GB`. Bounds are read in the unit, or in gigabytes for `'auto'`, and a range no real size is inside returns nothing. A size written without its unit is in one unit throughout, because a bare `512` and a bare `16` cannot be told apart.
-- **The OS catalog runs to October 2026 and the device catalog to the end of 2025**, and a release after that is a row in all three packages. What was checked rather than remembered — the 2026 releases — was confirmed against the publishers' and the press's announcements before it went in.
+- **The OS catalog runs to October 2026 and the device and processor catalogs to the end of 2025**, and a release after that is a row in all three packages. What was checked rather than remembered — the 2026 releases — was confirmed against the publishers' and the press's announcements before it went in.
 
 ## Adding a location language
 

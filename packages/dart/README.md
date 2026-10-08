@@ -10,7 +10,7 @@ Every option and every example, with **Dart** picked in the sidebar. This README
 
 ---
 
-**randino** generates random person names, nicknames, words, sentences, real locations, ages, genders, organizations, dates and phone numbers in the language you ask for, and real operating systems, devices, memory and storage for a sample machine.
+**randino** generates random person names, nicknames, words, sentences, real locations, ages, genders, organizations, dates and phone numbers in the language you ask for, and real operating systems, devices, processors, memory and storage for a sample machine.
 
 - **Person names** read like names people carry: Emma Clover, Jack Reeves, each with its English pronunciation. 9 languages.
 - **Nicknames** are handles for a game or a website: MistyOwl, CraneVoyage, RustyBoot. Built from everyday words across twenty-nine themes, and never from person names.
@@ -22,7 +22,7 @@ Every option and every example, with **Dart** picked in the sidebar. This README
 - **Organizations** are companies, schools, offices and associations that do not exist, from `randOrganization`: (주)새솔테크, Westbrook High School, Stadtwerke Bergtal.
 - **Dates** are drawn evenly from a range and written out in UTC by a format of your own, from `randDate`, or one part at a time from `randDateUnit`.
 - **Phone numbers** are written the way their country writes them, from `randPhone`, in nine countries. They open on blocks the country really gives out, so one can by chance be real: sample data, never a number to call.
-- **System values** describe a sample machine with real products: an operating system from `randOs`, written the way its release is known, `Windows 11 Pro 23H2 (Build 22631)`, a phone, tablet or laptop from `randDevice`, `Apple iPhone 15 Pro`, its memory from `randRam`, `16 GB`, and its storage from `randDiskType` and `randDiskSize`, `SSD`, `1 TB`.
+- **System values** describe a sample machine with real products: an operating system from `randOs`, written the way its release is known, `Windows 11 Pro 23H2 (Build 22631)`, a phone, tablet or laptop from `randDevice`, `Apple iPhone 15 Pro`, its processor from `randCpu`, `Intel Core i7-13700K`, its memory from `randRam`, `16 GB`, and its storage from `randDiskType` and `randDiskSize`, `SSD`, `1 TB`.
 - **Decorators** attach something to a string you already have: `randSuffix`, `randPrefix` and `randModifier`.
 - Every parameter is named and optional, and a **null enum means "every one of them"**, so `randName()` on its own works.
 - **Pure Dart, no dependencies.** It imports nothing but `dart:math`, so it runs on the VM, on the web and inside Flutter on every platform.
@@ -404,6 +404,27 @@ randDeviceDetails().first; // DeviceDetail(Google Pixel 8, phone, 2023)
 
 A model is written the way its maker writes it, generation and all, and one whose name already opens on its maker's (`Xiaomi 14`) is never written with the maker twice.
 
+### Processors
+
+Real processors, by the names their makers gave them: Intel, AMD, Apple and Qualcomm parts for desktops and laptops, and the chips of phones and tablets from Apple, Qualcomm, Samsung, MediaTek, Google and HiSilicon, from the Pentium 4 to the parts out by the end of 2025.
+
+```dart
+randCpu(count: 2); // [Intel Core i7-13700K, Apple A17 Pro]
+randCpu(platform: SystemPlatform.desktop, maxYear: 2012); // [AMD Phenom II X4 940]
+randCpu(platform: SystemPlatform.mobile, includeVendor: false); // [Snapdragon 8 Gen 3]
+
+randCpuDetails().first; // CpuDetail(Apple M3 Pro, desktop, 2023)
+```
+
+| Parameter       | Type              | Default       |
+| --------------- | ----------------- | ------------- |
+| `platform`      | `SystemPlatform?` | `null` — both |
+| `minYear`       | `int?`            | `null` — none |
+| `maxYear`       | `int?`            | `null` — none |
+| `includeVendor` | `bool`            | `true`        |
+| `count`         | `int`             | `1`           |
+| `unique`        | `bool`            | `false`       |
+
 ### Memory
 
 Amounts of memory a machine is really sold with, from 512 MB to a terabyte, drawn by how common each one is: 8 and 16 GB are most of a sample. A size is only written in a unit it is a whole number of, so nothing carries a decimal point; a gigabyte is 1024 megabytes, the way an operating system counts.
@@ -525,7 +546,7 @@ The two generate the same output from the same data, and only the surface is Dar
 | `language: 'all'` (the default)    | `language` left out, or `null`                 |
 | `[number, number]`                 | `LengthRange`, which compares by value         |
 | `NameDetail` / `NicknameDetail` interfaces | The same two names, as classes         |
-| `output: 'detail'`                 | `randNameDetails` / `randNicknameDetails` / `randWordDetails` / `randSentenceDetails` / `randLocationDetails` / `randOsDetails` / `randDeviceDetails` / `randRamDetails` / `randDiskTypeDetails` / `randDiskSizeDetails` … |
+| `output: 'detail'`                 | `randNameDetails` / `randNicknameDetails` / `randWordDetails` / `randSentenceDetails` / `randLocationDetails` / `randOsDetails` / `randDeviceDetails` / `randCpuDetails` / `randRamDetails` / `randDiskTypeDetails` / `randDiskSizeDetails` … |
 | `randDate({ unit: 'minute' })`     | `randDateUnit(DateUnit.minute)`                |
 | `randModifier('Owl')`             | `randModifier(value: 'Owl')` — every parameter is named |
 | `randSuffix(['a', 'b'])`           | `randSuffixAll(['a', 'b'])`                    |

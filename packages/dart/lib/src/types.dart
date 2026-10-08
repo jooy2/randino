@@ -1324,3 +1324,34 @@ class DiskSizeDetail {
   @override
   String toString() => 'DiskSizeDetail($size, $bytes)';
 }
+
+/// A generated processor with the pieces it was written from.
+class CpuDetail {
+  /// Creates a detail record. Returned by the generator; there is rarely a
+  /// reason to build one by hand outside a test.
+  const CpuDetail({
+    required this.cpu,
+    required this.vendor,
+    required this.model,
+    required this.platform,
+    required this.year,
+  });
+
+  /// The processor as `randCpu` returns it: `AMD Ryzen 7 7800X3D`.
+  final String cpu;
+
+  /// Who makes it: `AMD`.
+  final String vendor;
+
+  /// The processor's own name: `Ryzen 7 7800X3D`.
+  final String model;
+
+  /// The kind of machine it is built into.
+  final SystemPlatform platform;
+
+  /// The year the first machines with it went on sale.
+  final int year;
+
+  @override
+  String toString() => 'CpuDetail($cpu, ${platform.name}, $year)';
+}

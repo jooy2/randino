@@ -49,6 +49,7 @@ describe('base test', () => {
 			'randColor',
 			'randConcept',
 			'randCountry',
+			'randCpu',
 			'randDate',
 			'randDevice',
 			'randDiskSize',
@@ -208,6 +209,7 @@ describe('base test', () => {
 		assert.deepStrictEqual(randino.DISK_TYPES, ['hdd', 'ssd', 'sshd', 'emmc', 'ufs']);
 		assert.match(randino.randDiskSize()[0], /^\d+ (GB|TB)$/);
 		assert.deepStrictEqual(randino.DISK_UNITS, ['MB', 'GB', 'TB']);
+		assert.strictEqual(typeof randino.randCpu()[0], 'string');
 	});
 
 	it('an option the types rule out falls back rather than throwing', () => {
@@ -266,7 +268,9 @@ describe('base test', () => {
 			() => randino.randRam({ unit: 'KB' as never, minSize: NaN, maxSize: 'x' as never }),
 			() => randino.randRam({ includeUnit: 'no' as never, count: NaN }),
 			() => randino.randDiskType({ platform: 'server' as never, count: 'x' as never }),
-			() => randino.randDiskSize({ unit: 'PB' as never, minSize: NaN, includeUnit: 0 as never })
+			() => randino.randDiskSize({ unit: 'PB' as never, minSize: NaN, includeUnit: 0 as never }),
+			() =>
+				randino.randCpu({ platform: 'server' as never, maxYear: NaN, includeVendor: 'no' as never })
 		];
 
 		for (const ask of asks) {
@@ -356,6 +360,7 @@ describe('base test', () => {
 		agrees(() => randino.randRam({ count: 5, random: seeded(42) }));
 		agrees(() => randino.randDiskType({ count: 5, random: seeded(42) }));
 		agrees(() => randino.randDiskSize({ count: 5, random: seeded(42) }));
+		agrees(() => randino.randCpu({ count: 5, random: seeded(42) }));
 
 		// Two different seeds are two different answers, so the source is actually
 		// what the draws are coming from.

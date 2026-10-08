@@ -2,7 +2,7 @@
 
 from dataclasses import dataclass
 
-from randino._internal.parse import rows
+from randino._internal.table import rows
 from randino._types import DeviceType
 
 DEVICE_TYPES: tuple[DeviceType, ...] = ("phone", "tablet", "laptop")
