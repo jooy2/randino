@@ -1718,4 +1718,36 @@ export interface FileExtensionDetail {
 	/** The extension without its dot: `png`. */
 	name: string;
 	category: FileCategory;
+	/** The MIME type a file with it is served as: `image/png`. */
+	mimeType: string;
+}
+
+/**
+ * The top-level media type a MIME type comes under: the part in front of the
+ * slash, `image` in `image/png`.
+ */
+export type MimeTopLevel = 'application' | 'audio' | 'font' | 'image' | 'model' | 'text' | 'video';
+
+/** One top-level type, several, or `'all'` of them. */
+export type MimeTopLevelOption = MimeTopLevel | readonly MimeTopLevel[] | 'all';
+
+/** What `randMimeType` takes. */
+export interface RandMimeTypeOptions extends Pick<
+	RandCommonOptions,
+	'count' | 'unique' | 'output' | 'random'
+> {
+	/** Which top-level types, the part in front of the slash. Default `'all'`. */
+	type?: MimeTopLevelOption;
+}
+
+/** A generated MIME type, split into its parts, with the extensions it is saved with. */
+export interface MimeTypeDetail {
+	/** The MIME type as the value form returns it: `image/png`. */
+	mimeType: string;
+	/** The part in front of the slash: `image`. */
+	type: MimeTopLevel;
+	/** The part behind it: `png`. */
+	subtype: string;
+	/** The extensions a file of it is saved with, without their dots: `['jpg', 'jpeg']`. */
+	extensions: string[];
 }

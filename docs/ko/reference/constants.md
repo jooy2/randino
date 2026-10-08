@@ -333,21 +333,23 @@ import {
 	DISK_UNITS,
 	RAM_UNITS,
 	FILE_CATEGORIES,
+	MIME_TOP_LEVELS,
 	SYSTEM_PLATFORMS,
 	VERSION_FORMATS
 } from 'randino';
 ```
 
-| 이름               | 타입               | 값                                                  |
-| ------------------ | ------------------ | --------------------------------------------------- |
-| `SYSTEM_PLATFORMS` | `SystemPlatform[]` | `['desktop', 'mobile']`                             |
-| `DEVICE_TYPES`     | `DeviceType[]`     | `['phone', 'tablet', 'laptop']`                     |
-| `RAM_UNITS`        | `RamUnit[]`        | `['MB', 'GB']`                                      |
-| `DISK_TYPES`       | `DiskType[]`       | `['hdd', 'ssd', 'sshd', 'emmc', 'ufs']`             |
-| `DISK_UNITS`       | `DiskUnit[]`       | `['MB', 'GB', 'TB']`                                |
-| `ARCHITECTURES`    | `Architecture[]`   | `['x86_64', 'arm64', 'x86', 'armv7', 'riscv64', …]` |
-| `VERSION_FORMATS`  | `VersionFormat[]`  | `['semver', 'calver', 'number']`                    |
-| `FILE_CATEGORIES`  | `FileCategory[]`   | `['document', 'spreadsheet', …, 'model']`           |
+| 이름 | 타입 | 값 |
+| --- | --- | --- |
+| `SYSTEM_PLATFORMS` | `SystemPlatform[]` | `['desktop', 'mobile']` |
+| `DEVICE_TYPES` | `DeviceType[]` | `['phone', 'tablet', 'laptop']` |
+| `RAM_UNITS` | `RamUnit[]` | `['MB', 'GB']` |
+| `DISK_TYPES` | `DiskType[]` | `['hdd', 'ssd', 'sshd', 'emmc', 'ufs']` |
+| `DISK_UNITS` | `DiskUnit[]` | `['MB', 'GB', 'TB']` |
+| `ARCHITECTURES` | `Architecture[]` | `['x86_64', 'arm64', 'x86', 'armv7', 'riscv64', …]` |
+| `VERSION_FORMATS` | `VersionFormat[]` | `['semver', 'calver', 'number']` |
+| `FILE_CATEGORIES` | `FileCategory[]` | `['document', 'spreadsheet', …, 'model']` |
+| `MIME_TOP_LEVELS` | `MimeTopLevel[]` | `['application', 'audio', 'font', 'image', 'model', 'text', 'video']` |
 
 :::
 
@@ -367,6 +369,7 @@ import 'package:randino/randino.dart';
 | `architectures`   | `List<String>`         | 흔한 넷, 드문 여섯 순                           |
 | `versionFormats`  | `List<VersionFormat>`  | `semver`, `calver`, `number` 순                 |
 | `fileCategories`  | `List<FileCategory>`   | `document`, `spreadsheet`, … `model`, 모두 14개 |
+| `mimeTopLevels`   | `List<MimeTopLevel>`   | `application`, `audio`, … `video`, 모두 7개     |
 
 :::
 
@@ -380,6 +383,7 @@ from randino import (
     DISK_UNITS,
     RAM_UNITS,
     FILE_CATEGORIES,
+    MIME_TOP_LEVELS,
     SYSTEM_PLATFORMS,
     VERSION_FORMATS,
 )
@@ -395,6 +399,7 @@ from randino import (
 | `ARCHITECTURES` | `tuple[Architecture, …]` | `('x86_64', 'arm64', 'x86', 'armv7', 'riscv64', …)` |
 | `VERSION_FORMATS` | `tuple[VersionFormat, …]` | `('semver', 'calver', 'number')` |
 | `FILE_CATEGORIES` | `tuple[FileCategory, …]` | `('document', 'spreadsheet', …, 'model')` |
+| `MIME_TOP_LEVELS` | `tuple[MimeTopLevel, …]` | `('application', 'audio', 'font', 'image', 'model', 'text', 'video')` |
 
 :::
 
@@ -613,6 +618,9 @@ import type {
 	LocationLanguage,
 	LocationLanguageOption,
 	LocationLevel,
+	MimeTopLevel,
+	MimeTopLevelOption,
+	MimeTypeDetail,
 	RandAgeOptions,
 	RandAppStoreOptions,
 	RandArchitectureOptions,
@@ -626,6 +634,7 @@ import type {
 	RandGenderOptions,
 	RandGpuOptions,
 	RandLocationOptions,
+	RandMimeTypeOptions,
 	RandNameOptions,
 	RandNicknameOptions,
 	RandOrganizationOptions,
@@ -658,10 +667,10 @@ OrganizationType, OrganizationIndustry
 PhoneCountry, PhoneType
 RamUnit, SystemPlatform, VersionFormat
 WordLanguage, WordTheme
-LocationLanguage, LocationLevel
+LocationLanguage, LocationLevel, MimeTopLevel
 
 // 값
-LengthRange, AgeDetail, AppStoreDetail, ArchitectureDetail, CpuDetail, DateDetail, DeviceDetail, DiskSizeDetail, DiskTypeDetail, FileExtensionDetail, GenderDetail, GpuDetail, NameDetail, NicknameDetail, LocationDetail, CountryDetail,
+LengthRange, AgeDetail, AppStoreDetail, ArchitectureDetail, CpuDetail, DateDetail, DeviceDetail, DiskSizeDetail, DiskTypeDetail, FileExtensionDetail, GenderDetail, MimeTypeDetail, GpuDetail, NameDetail, NicknameDetail, LocationDetail, CountryDetail,
 OrganizationDetail, OsDetail, PhoneDetail, RamDetail, ResolutionDetail, VersionDetail
 ```
 
@@ -736,6 +745,9 @@ from randino import (
     LocationLanguage,
     LocationLanguageOption,
     LocationLevel,
+    MimeTopLevel,
+    MimeTopLevelOption,
+    MimeTypeDetail,
     RandOutput,
 )
 

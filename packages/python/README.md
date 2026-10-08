@@ -10,7 +10,7 @@ Every option and every example, with **Python** picked in the sidebar. This READ
 
 ---
 
-**randino** generates random person names, nicknames, words, sentences, real locations, ages, genders, organizations, dates and phone numbers in the language you ask for, and real operating systems, devices, processors, graphics, architectures, memory, storage and screen resolutions for a sample machine, software version numbers, app stores and file extensions.
+**randino** generates random person names, nicknames, words, sentences, real locations, ages, genders, organizations, dates and phone numbers in the language you ask for, and real operating systems, devices, processors, graphics, architectures, memory, storage and screen resolutions for a sample machine, software version numbers, app stores, file extensions and MIME types.
 
 - **Person names** read like names people carry: Emma Clover, Jack Reeves, each with its English pronunciation. 9 languages.
 - **Nicknames** are handles for a game or a website: MistyOwl, CraneVoyage, RustyBoot. Built from everyday words across twenty-nine themes, and never from person names.
@@ -22,7 +22,7 @@ Every option and every example, with **Python** picked in the sidebar. This READ
 - **Organizations** are companies, schools, offices and associations that do not exist, from `rand_organization`: (주)새솔테크, Westbrook High School, Stadtwerke Bergtal.
 - **Dates** are drawn evenly from a range and written out in UTC by a format of your own, from `rand_date`, or one part at a time.
 - **Phone numbers** are written the way their country writes them, from `rand_phone`, in nine countries. They open on blocks the country really gives out, so one can by chance be real: sample data, never a number to call.
-- **System values** describe a sample machine with real products: an operating system from `rand_os`, written the way its release is known, `Windows 11 Pro 23H2 (Build 22631)`, a phone, tablet or laptop from `rand_device`, `Apple iPhone 15 Pro`, its processor and graphics from `rand_cpu` and `rand_gpu`, `Intel Core i7-13700K`, `NVIDIA GeForce RTX 4090`, the architecture from `rand_architecture`, `x86_64`, its memory from `rand_ram`, `16 GB`, its storage from `rand_disk_type` and `rand_disk_size`, `SSD`, `1 TB`, its screen from `rand_resolution`, `1920x1080`, a version number from `rand_version`, `2.14.3`, an app store from `rand_app_store`, `Google Play Store`, and a file extension from `rand_file_extension`, `.pdf`.
+- **System values** describe a sample machine with real products: an operating system from `rand_os`, written the way its release is known, `Windows 11 Pro 23H2 (Build 22631)`, a phone, tablet or laptop from `rand_device`, `Apple iPhone 15 Pro`, its processor and graphics from `rand_cpu` and `rand_gpu`, `Intel Core i7-13700K`, `NVIDIA GeForce RTX 4090`, the architecture from `rand_architecture`, `x86_64`, its memory from `rand_ram`, `16 GB`, its storage from `rand_disk_type` and `rand_disk_size`, `SSD`, `1 TB`, its screen from `rand_resolution`, `1920x1080`, a version number from `rand_version`, `2.14.3`, an app store from `rand_app_store`, `Google Play Store`, a file extension from `rand_file_extension`, `.pdf`, and a MIME type from `rand_mime_type`, `application/pdf`.
 - **Decorators** attach something to a string you already have: `rand_suffix`, `rand_prefix` and `rand_modifier`.
 - Every argument is keyword-only and optional, so `rand_name()` on its own works.
 - **Pure Python, no dependencies.** It imports nothing outside the standard library, and ships a `py.typed` marker so mypy and Pyright read the annotations.
@@ -621,7 +621,19 @@ rand_file_extension(category="image", count=2)  # ['.jpg', '.webp']
 rand_file_extension(category=("code", "data"), include_dot=False)  # ['json']
 
 rand_file_extension(output="detail")
-# [FileExtensionDetail(extension='.png', name='png', category='image')]
+# [FileExtensionDetail(extension='.png', name='png', category='image', mime_type='image/png')]
+```
+
+`rand_mime_type` draws the MIME types those extensions are served as, once each, by the part in front of the slash:
+
+```python
+from randino import rand_mime_type
+
+rand_mime_type(count=2)  # ['application/pdf', 'image/png']
+rand_mime_type(type=("audio", "video"))  # ['video/mp4']
+
+rand_mime_type(output="detail")
+# [MimeTypeDetail(mime_type='image/jpeg', type='image', subtype='jpeg', extensions=('jpg', 'jpeg'))]
 ```
 
 It takes `category`, `include_dot`, `count`, `unique`, `random` and `output`.

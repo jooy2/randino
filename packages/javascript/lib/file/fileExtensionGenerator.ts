@@ -20,7 +20,12 @@ export function generateFileExtensionDetails(
 			() => {
 				const entry = pickWeighted(candidates, (each) => each.weight);
 
-				return { extension: dot + entry.name, name: entry.name, category: entry.category };
+				return {
+					extension: dot + entry.name,
+					name: entry.name,
+					category: entry.category,
+					mimeType: entry.mimeType
+				};
 			},
 			(detail) => detail.extension
 		)

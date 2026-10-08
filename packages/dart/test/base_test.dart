@@ -62,6 +62,8 @@ void main() {
           'LocationDetail',
           'LocationLanguage',
           'LocationLevel',
+          'MimeTopLevel',
+          'MimeTypeDetail',
           'ModifierKind',
           'NameDetail',
           'NameGender',
@@ -106,6 +108,7 @@ void main() {
           'diskTypes',
           'diskUnits',
           'fileCategories',
+          'mimeTopLevels',
           'locationLanguages',
           'locationLevels',
           'nameLanguages',
@@ -169,6 +172,8 @@ void main() {
           'randLengthMax',
           'randLengthMin',
           'randLocation',
+          'randMimeType',
+          'randMimeTypeDetails',
           'randLocationDetails',
           'randLocationLengthMax',
           'randSentenceCountMax',
@@ -350,6 +355,9 @@ void main() {
       expect(randFileExtension().single, matches(RegExp(r'^\.[a-z0-9]+$')));
       expect(randFileExtensionDetails()[0], isA<FileExtensionDetail>());
       expect(fileCategories, FileCategory.values);
+      expect(randMimeType().single, contains('/'));
+      expect(randMimeTypeDetails()[0], isA<MimeTypeDetail>());
+      expect(mimeTopLevels, MimeTopLevel.values);
       expect(versionFormats, VersionFormat.values);
     });
 
@@ -455,6 +463,7 @@ void main() {
       twice(() => randVersion(format: null, count: 5, random: Random(42)).join());
       twice(() => randAppStore(count: 5, random: Random(42)).join());
       twice(() => randFileExtension(count: 5, random: Random(42)).join());
+      twice(() => randMimeType(count: 5, random: Random(42)).join());
       twice(() => randOrganization(count: 5, random: Random(42)).join('|'));
       twice(() => randOrganization(count: 5, maxLength: 20, random: Random(42)).join('|'));
       twice(() => randSuffixAll(const ['a', 'b'], random: Random(42)).join());

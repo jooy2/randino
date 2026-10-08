@@ -53,6 +53,9 @@ from randino._types import (
     LocationLanguage,
     LocationLanguageOption,
     LocationLevel,
+    MimeTopLevel,
+    MimeTopLevelOption,
+    MimeTypeDetail,
     ModifierKind,
     NameDetail,
     NameGender,
@@ -129,7 +132,7 @@ from randino.decorate import (
 )
 from randino.device import DEVICE_TYPES, rand_device
 from randino.disk import DISK_TYPES, DISK_UNITS, rand_disk_size, rand_disk_type
-from randino.file import FILE_CATEGORIES, rand_file_extension
+from randino.file import FILE_CATEGORIES, MIME_TOP_LEVELS, rand_file_extension, rand_mime_type
 from randino.gender import rand_gender
 from randino.gpu import rand_gpu
 from randino.location import (
@@ -206,6 +209,7 @@ __all__ = [
     "FILE_CATEGORIES",
     "LOCATION_LANGUAGES",
     "LOCATION_LEVELS",
+    "MIME_TOP_LEVELS",
     "NAME_LANGUAGES",
     "ORGANIZATION_INDUSTRIES",
     "ORGANIZATION_TYPES",
@@ -254,6 +258,9 @@ __all__ = [
     "LocationLanguage",
     "LocationLanguageOption",
     "LocationLevel",
+    "MimeTopLevel",
+    "MimeTopLevelOption",
+    "MimeTypeDetail",
     "ModifierKind",
     "NameDetail",
     "NameGender",
@@ -333,6 +340,7 @@ __all__ = [
     "rand_gpu",
     "rand_job",
     "rand_location",
+    "rand_mime_type",
     "rand_modifier",
     "rand_music",
     "rand_myth",

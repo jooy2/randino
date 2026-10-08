@@ -33,6 +33,10 @@ describe('File extension', () => {
 			assert.match(entry.name, /^[a-z0-9]+$/);
 			assert.ok(FILE_CATEGORIES.includes(entry.category), entry.name);
 			assert.ok(entry.weight >= 1 && entry.weight <= 5, entry.name);
+			assert.match(
+				entry.mimeType,
+				/^(application|audio|font|image|model|text|video)\/[a-z0-9.+-]+$/
+			);
 		}
 
 		for (const category of FILE_CATEGORIES) {
@@ -49,8 +53,21 @@ describe('File extension', () => {
 
 			assert.ok(entry, detail.extension);
 			assert.strictEqual(detail.category, entry.category);
+			assert.strictEqual(detail.mimeType, entry.mimeType);
 			assert.strictEqual(detail.extension, `.${detail.name}`);
 		}
+	});
+
+	it('an extension carries the MIME type its format is served as', () => {
+		const mime = (name: string) => FILE_EXTENSIONS.find((entry) => entry.name === name)?.mimeType;
+
+		assert.strictEqual(mime('pdf'), 'application/pdf');
+		assert.strictEqual(mime('png'), 'image/png');
+		assert.strictEqual(mime('jpg'), mime('jpeg'));
+		assert.strictEqual(mime('mp4'), 'video/mp4');
+		assert.strictEqual(mime('js'), 'text/javascript');
+		assert.strictEqual(mime('ts'), 'text/plain', 'TypeScript is not an MPEG stream');
+		assert.strictEqual(mime('woff2'), 'font/woff2');
 	});
 
 	it('includeDot: false leaves the dot out', () => {

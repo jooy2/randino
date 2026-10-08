@@ -37,6 +37,7 @@ List<FileExtensionDetail> generateFileExtensionDetails({
           extension: '$dot${entry.name}',
           name: entry.name,
           category: entry.category,
+          mimeType: entry.mimeType,
         );
       },
       keyOf: (detail) => detail.extension,

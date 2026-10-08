@@ -119,7 +119,7 @@ const PREAMBLE = [
 	'RTX 4090), the architecture they run (x86_64), the memory and storage they are sold with',
 	'(16 GB, 1 TB SSD), the size of their screen (1920x1080) and the version numbers of their',
 	'software (2.14.3, 2024.3.1), the store it came from (Google Play Store) and the extensions',
-	'of its files (.pdf),',
+	'of its files and the MIME types they are served as (.pdf, application/pdf),',
 	'and **decorators** attach a token or a modifier to a string you already have.',
 	'',
 	'The same library ships as three packages (`randino` on npm, on pub.dev and on PyPI), generating',

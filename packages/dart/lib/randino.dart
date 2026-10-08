@@ -66,9 +66,11 @@ export 'src/disk/rand_disk_size.dart' show randDiskSize;
 export 'src/disk/rand_disk_size_details.dart' show randDiskSizeDetails;
 export 'src/disk/rand_disk_type.dart' show randDiskType;
 export 'src/disk/rand_disk_type_details.dart' show randDiskTypeDetails;
-export 'src/file/data/index.dart' show fileCategories;
+export 'src/file/data/index.dart' show fileCategories, mimeTopLevels;
 export 'src/file/rand_file_extension.dart' show randFileExtension;
 export 'src/file/rand_file_extension_details.dart' show randFileExtensionDetails;
+export 'src/file/rand_mime_type.dart' show randMimeType;
+export 'src/file/rand_mime_type_details.dart' show randMimeTypeDetails;
 export 'src/gender/rand_gender.dart' show randGender;
 export 'src/gender/rand_gender_details.dart' show randGenderDetails;
 export 'src/gpu/rand_gpu.dart' show randGpu;
@@ -135,6 +137,8 @@ export 'src/types.dart'
         LocationDetail,
         LocationLanguage,
         LocationLevel,
+        MimeTopLevel,
+        MimeTypeDetail,
         ModifierKind,
         NameDetail,
         NameGender,

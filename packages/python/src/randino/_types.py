@@ -1067,3 +1067,30 @@ class FileExtensionDetail:
 
     category: FileCategory
     """What kind of file it is."""
+
+    mime_type: str
+    """The MIME type a file with it is served as: `image/png`."""
+
+
+MimeTopLevel = Literal["application", "audio", "font", "image", "model", "text", "video"]
+"""The top-level media type a MIME type comes under: `image` in `image/png`."""
+
+MimeTopLevelOption = MimeTopLevel | Sequence[MimeTopLevel] | Literal["all"]
+"""One top-level type, a sequence of them to draw from, or `"all"` of them."""
+
+
+@dataclass(frozen=True, slots=True)
+class MimeTypeDetail:
+    """A generated MIME type, split into its parts, with the extensions it is saved with."""
+
+    mime_type: str
+    """The MIME type as the value form returns it: `image/png`."""
+
+    type: MimeTopLevel
+    """The part in front of the slash: `image`."""
+
+    subtype: str
+    """The part behind it: `png`."""
+
+    extensions: tuple[str, ...]
+    """The extensions a file of it is saved with, without their dots: `('jpg', 'jpeg')`."""

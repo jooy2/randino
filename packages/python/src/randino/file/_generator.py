@@ -27,7 +27,10 @@ def generate_file_extension_details(
         entry = pick_weighted(candidates, lambda each: each.weight)
 
         return FileExtensionDetail(
-            extension=dot + entry.name, name=entry.name, category=entry.category
+            extension=dot + entry.name,
+            name=entry.name,
+            category=entry.category,
+            mime_type=entry.mime_type,
         )
 
     with with_random(random):

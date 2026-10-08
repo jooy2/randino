@@ -93,7 +93,7 @@ Each extension has a weight from `5` for the ones nearly everybody meets to `1` 
 | `document` | Documents | `.pdf`, `.docx`, `.txt` | `.doc`, `.rtf`, `.odt`, `.md` | `.tex`, `.pages`, `.wpd` |
 | `spreadsheet` | Spreadsheets | `.xlsx`, `.csv` | `.xls`, `.ods` | `.numbers`, `.tsv` |
 | `presentation` | Presentations | `.pptx` | — | `.ppt`, `.odp`, `.key` |
-| `image` | Images | `.jpg`, `.png`, `.gif`, `.svg`, `.webp`, `.jpeg` | `.heic`, `.bmp`, `.tiff`, `.ico` | `.psd`, `.avif`, `.tif`, `.ai`, `.eps`, `.raw` |
+| `image` | Images | `.jpg`, `.png`, `.gif`, `.svg`, `.webp`, `.jpeg` | `.heic`, `.bmp`, `.tiff`, `.ico` | `.psd`, `.avif`, `.tif`, `.ai`, `.eps`, `.dng` |
 | `audio` | Audio | `.mp3` | `.wav`, `.m4a`, `.aac`, `.flac`, `.ogg` | `.wma`, `.aiff`, `.opus`, `.mid` |
 | `video` | Video | `.mp4` | `.mov`, `.avi`, `.mkv`, `.webm` | `.wmv`, `.flv`, `.m4v`, `.3gp`, `.mpeg` |
 | `archive` | Archives | `.zip` | `.rar`, `.7z`, `.gz`, `.tar` | `.bz2`, `.xz`, `.tgz`, `.zst` |
@@ -109,13 +109,13 @@ The weights are written by hand in the order the extensions are common in, not m
 
 ## The detail output {#the-detail-output}
 
-The detail carries the extension without its dot and the kind of file it is.
+The detail carries the extension without its dot, the kind of file it is and the MIME type it is served as.
 
 ::: lang js
 
 ```javascript
 randFileExtension({ output: 'detail' });
-// [{ extension: '.png', name: 'png', category: 'image' }]
+// [{ extension: '.png', name: 'png', category: 'image', mimeType: 'image/png' }]
 ```
 
 :::
@@ -134,7 +134,7 @@ Dart has neither overloads nor union types, so the detail form is its own functi
 
 ```python
 rand_file_extension(output="detail")
-# [FileExtensionDetail(extension='.png', name='png', category='image')]
+# [FileExtensionDetail(extension='.png', name='png', category='image', mime_type='image/png')]
 ```
 
 :::
@@ -144,8 +144,10 @@ rand_file_extension(output="detail")
 | `extension` | <Lang js="string" dart="String" py="str" code /> | The extension, as the value form returns it. |
 | `name` | <Lang js="string" dart="String" py="str" code /> | The extension without its dot: `png`. |
 | `category` | `FileCategory` | The kind of file it is: `image`. |
+| <Lang js="mimeType" dart="mimeType" py="mime_type" code /> | <Lang js="string" dart="String" py="str" code /> | The MIME type a file with it is served as: `image/png`. See [`randMimeType`](./rand-mime-type#source) for where the types come from. |
 
 ## See also
 
 - [`randWord`](../word/rand-word) — a word to name the file with.
+- [`randMimeType`](./rand-mime-type) — the MIME types these extensions are served as.
 - [`randAppStore`](../appstore/rand-app-store) — a store to get a program from.

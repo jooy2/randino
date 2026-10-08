@@ -1573,7 +1573,12 @@ enum FileCategory {
 class FileExtensionDetail {
   /// Creates a detail record. Returned by the generator; there is rarely a
   /// reason to build one by hand outside a test.
-  const FileExtensionDetail({required this.extension, required this.name, required this.category});
+  const FileExtensionDetail({
+    required this.extension,
+    required this.name,
+    required this.category,
+    required this.mimeType,
+  });
 
   /// The extension as `randFileExtension` returns it: `.png`.
   final String extension;
@@ -1584,6 +1589,62 @@ class FileExtensionDetail {
   /// What kind of file it is.
   final FileCategory category;
 
+  /// The MIME type a file with it is served as: `image/png`.
+  final String mimeType;
+
   @override
   String toString() => 'FileExtensionDetail($extension, ${category.name})';
+}
+
+/// The top-level media type a MIME type comes under: the part in front of the
+/// slash, `image` in `image/png`.
+enum MimeTopLevel {
+  /// `application/…`: documents, archives, programs and data.
+  application,
+
+  /// `audio/…`.
+  audio,
+
+  /// `font/…`.
+  font,
+
+  /// `image/…`.
+  image,
+
+  /// `model/…`: 3D models.
+  model,
+
+  /// `text/…`.
+  text,
+
+  /// `video/…`.
+  video,
+}
+
+/// A generated MIME type, split into its parts, with the extensions it is
+/// saved with.
+class MimeTypeDetail {
+  /// Creates a detail record. Returned by the generator; there is rarely a
+  /// reason to build one by hand outside a test.
+  const MimeTypeDetail({
+    required this.mimeType,
+    required this.type,
+    required this.subtype,
+    required this.extensions,
+  });
+
+  /// The MIME type as `randMimeType` returns it: `image/png`.
+  final String mimeType;
+
+  /// The part in front of the slash.
+  final MimeTopLevel type;
+
+  /// The part behind it: `png`.
+  final String subtype;
+
+  /// The extensions a file of it is saved with, without their dots.
+  final List<String> extensions;
+
+  @override
+  String toString() => 'MimeTypeDetail($mimeType)';
 }

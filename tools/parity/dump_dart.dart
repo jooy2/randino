@@ -637,9 +637,14 @@ void main() {
       // One entry per extension, keyed by the extension without its dot.
       'file': <String, Object?>{
         'categories': <String>[for (final category in fileCategories) category.name],
+        'mimeTopLevels': <String>[for (final top in mimeTopLevels) top.name],
         'extensions': <String, Object?>{
           for (final entry in fileExtensions)
-            entry.name: <String, Object?>{'category': entry.category.name, 'weight': entry.weight},
+            entry.name: <String, Object?>{
+              'category': entry.category.name,
+              'weight': entry.weight,
+              'mimeType': entry.mimeType,
+            },
         },
       },
       'version': <String, Object?>{

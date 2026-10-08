@@ -191,6 +191,7 @@ void _system() {
   print(randVersion(format: null, prefix: 'v', count: 3)); // [v1.4.0, v24.04, v42]
   print(randAppStore(platform: SystemPlatform.mobile)); // [Google Play Store]
   print(randFileExtension(count: 3)); // [.pdf, .png, .mp4]
+  print(randMimeType(type: {MimeTopLevel.image})); // [image/png]
 }
 
 void _decorators() {

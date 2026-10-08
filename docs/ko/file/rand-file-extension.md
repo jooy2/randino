@@ -93,7 +93,7 @@ rand_file_extension(category=("code", "data"), include_dot=False, count=3)  # ['
 | `document` | 문서 | `.pdf`, `.docx`, `.txt` | `.doc`, `.rtf`, `.odt`, `.md` | `.tex`, `.pages`, `.wpd` |
 | `spreadsheet` | 스프레드시트 | `.xlsx`, `.csv` | `.xls`, `.ods` | `.numbers`, `.tsv` |
 | `presentation` | 프레젠테이션 | `.pptx` | — | `.ppt`, `.odp`, `.key` |
-| `image` | 이미지 | `.jpg`, `.png`, `.gif`, `.svg`, `.webp`, `.jpeg` | `.heic`, `.bmp`, `.tiff`, `.ico` | `.psd`, `.avif`, `.tif`, `.ai`, `.eps`, `.raw` |
+| `image` | 이미지 | `.jpg`, `.png`, `.gif`, `.svg`, `.webp`, `.jpeg` | `.heic`, `.bmp`, `.tiff`, `.ico` | `.psd`, `.avif`, `.tif`, `.ai`, `.eps`, `.dng` |
 | `audio` | 오디오 | `.mp3` | `.wav`, `.m4a`, `.aac`, `.flac`, `.ogg` | `.wma`, `.aiff`, `.opus`, `.mid` |
 | `video` | 동영상 | `.mp4` | `.mov`, `.avi`, `.mkv`, `.webm` | `.wmv`, `.flv`, `.m4v`, `.3gp`, `.mpeg` |
 | `archive` | 압축 파일 | `.zip` | `.rar`, `.7z`, `.gz`, `.tar` | `.bz2`, `.xz`, `.tgz`, `.zst` |
@@ -109,13 +109,13 @@ rand_file_extension(category=("code", "data"), include_dot=False, count=3)  # ['
 
 ## 상세 출력 {#the-detail-output}
 
-상세 출력에는 점을 뺀 확장자와 파일의 종류가 들어 있습니다.
+상세 출력에는 점을 뺀 확장자, 파일의 종류, 전송될 때의 MIME 타입이 들어 있습니다.
 
 ::: lang js
 
 ```javascript
 randFileExtension({ output: 'detail' });
-// [{ extension: '.png', name: 'png', category: 'image' }]
+// [{ extension: '.png', name: 'png', category: 'image', mimeType: 'image/png' }]
 ```
 
 :::
@@ -134,18 +134,20 @@ Dart에는 오버로드도 유니언 타입도 없어서, 상세 출력은 별�
 
 ```python
 rand_file_extension(output="detail")
-# [FileExtensionDetail(extension='.png', name='png', category='image')]
+# [FileExtensionDetail(extension='.png', name='png', category='image', mime_type='image/png')]
 ```
 
 :::
 
-| 필드        | 타입                                             | 설명                       |
-| ----------- | ------------------------------------------------ | -------------------------- |
+| 필드 | 타입 | 설명 |
+| --- | --- | --- |
 | `extension` | <Lang js="string" dart="String" py="str" code /> | 값 출력이 돌려주는 문자열. |
-| `name`      | <Lang js="string" dart="String" py="str" code /> | 점을 뺀 확장자: `png`.     |
-| `category`  | `FileCategory`                                   | 파일의 종류: `image`.      |
+| `name` | <Lang js="string" dart="String" py="str" code /> | 점을 뺀 확장자: `png`. |
+| `category` | `FileCategory` | 파일의 종류: `image`. |
+| <Lang js="mimeType" dart="mimeType" py="mime_type" code /> | <Lang js="string" dart="String" py="str" code /> | 그 확장자의 파일이 전송될 때의 MIME 타입: `image/png`. 타입을 어디서 가져왔는지는 [`randMimeType`](./rand-mime-type#source)을 보세요. |
 
 ## 함께 보기 {#see-also}
 
 - [`randWord`](../word/rand-word) — 파일 이름으로 쓸 단어.
+- [`randMimeType`](./rand-mime-type) — 이 확장자들의 MIME 타입.
 - [`randAppStore`](../appstore/rand-app-store) — 프로그램을 받을 스토어.
