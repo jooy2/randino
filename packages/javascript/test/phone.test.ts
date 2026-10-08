@@ -224,6 +224,42 @@ describe('Phone', () => {
 		assert.strictEqual(phones.length, 500);
 	});
 
+	it('fictional keeps to the numbers a country sets aside for fiction', () => {
+		const reserved: Record<string, RegExp> = {
+			US: /^\(\d{3}\) 555-01\d{2}$/,
+			// The Bundesnetzagentur's drama numbers, and the two mobile blocks.
+			DE: /^(030 23125\d{3}|040 66969\d{3}|069 90009\d{3}|089 99998\d{3}|0221 4710\d{3}|0171 39200\d{2}|0176 040690\d{2})$/
+		};
+
+		for (const country of ['US', 'DE'] as const) {
+			for (const type of PHONE_TYPES) {
+				for (const detail of sample(country, type, { fictional: true })) {
+					assert.match(detail.phone, reserved[country], `${country} ${type}`);
+				}
+			}
+		}
+
+		// `all` narrows to the two countries that reserve any.
+		const countries = new Set(
+			randPhone({ fictional: true, count: SAMPLE, output: 'detail' }).map(
+				(detail) => detail.country
+			)
+		);
+
+		assert.deepStrictEqual([...countries].sort(), ['DE', 'US']);
+
+		// A country that reserves none answers with nothing rather than with real numbers.
+		for (const country of PHONE_COUNTRIES.filter((code) => !PHONE_DATA[code].fiction)) {
+			assert.deepStrictEqual(randPhone({ country, fictional: true, count: 5 }), []);
+		}
+
+		// The forms are the same forms: E.164 still follows the calling code.
+		for (const detail of sample('US', 'mobile', { fictional: true, includeCountryCode: true })) {
+			assert.match(detail.phone, /^\+1 \d{3}-555-01\d{2}$/);
+			assert.match(detail.e164, /^\+1\d{3}55501\d{2}$/);
+		}
+	});
+
 	it('every shape is one the templates can write', () => {
 		assert.deepStrictEqual(Object.keys(PHONE_DATA).sort(), [...PHONE_COUNTRIES].sort());
 
@@ -236,7 +272,7 @@ describe('Phone', () => {
 			for (const type of PHONE_TYPES) {
 				assert.ok(data.plans[type].length > 0, `${country} has no ${type} plan`);
 
-				for (const shape of data.plans[type]) {
+				for (const shape of [...data.plans[type], ...(data.fiction?.[type] ?? [])]) {
 					// The first group is the prefix, and each pattern is one group more.
 					assert.strictEqual(marks(data.national), shape.groups.length + 1, country);
 					assert.strictEqual(marks(data.international), shape.groups.length + 1, country);

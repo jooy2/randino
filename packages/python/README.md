@@ -365,11 +365,12 @@ rand_phone(country="JP", output="detail")
 | `type`                 | `PhoneTypeOption`     | `"mobile"` |
 | `include_country_code` | `bool`                | `False`    |
 | `separator`            | `str \| None`         | `None`     |
+| `fictional`            | `bool`                | `False`    |
 | `count`                | `int`                 | `1`        |
 | `unique`               | `bool`                | `False`    |
 | `output`               | `"value" \| "detail"` | `"value"`  |
 
-`country` is an ISO 3166-1 alpha-2 code, read regardless of case. `include_country_code` drops the trunk prefix the country dials at home, and `separator` replaces the country's own punctuation: `""` writes the digits alone, which with the country code is E.164.
+`country` is an ISO 3166-1 alpha-2 code, read regardless of case. `include_country_code` drops the trunk prefix the country dials at home, and `separator` replaces the country's own punctuation: `""` writes the digits alone, which with the country code is E.164. `fictional` keeps to the numbers a country sets aside for films and books, which nobody is given: `555-0100` to `555-0199` in the United States and the drama numbers in Germany; the other seven countries reserve none and return nothing.
 
 ## Decorators
 

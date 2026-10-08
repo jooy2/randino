@@ -1117,6 +1117,15 @@ export interface RandPhoneOptions extends Pick<
 	 * `010-2345-6789`, `(212) 846-0147`, `8 (912) 345-67-89`.
 	 */
 	separator?: string;
+	/**
+	 * Keep to the numbers a country sets aside for films, books and examples,
+	 * which are never given to a subscriber: `555-0100` to `555-0199` in the
+	 * United States, the drama numbers of the Bundesnetzagentur in Germany. The
+	 * other seven countries reserve none, so a call naming one of them returns no
+	 * numbers at all rather than real ones, and `'all'` narrows to the two that
+	 * do. Default `false`.
+	 */
+	fictional?: boolean;
 }
 
 /** A generated phone number with the pieces it was built from. */

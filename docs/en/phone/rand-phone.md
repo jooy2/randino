@@ -4,7 +4,7 @@ Generates phone numbers and returns `count` of them, written the way their count
 
 ::: warning A drawn number can be somebody's
 
-A number opens on a block that is really in use and ends on random digits, so it can be in service and belong to a real person or business. That is a coincidence of the draw and nothing more: randino knows no subscriber, holds no list of real numbers and checks none. Use the numbers as sample data, in a form, a fixture or a mockup, and **never to call, text or message anybody**, to sign anybody up for anything, or for anything else that could reach or harm whoever a number happens to belong to. See [using the numbers](#using-the-numbers).
+A number opens on a block that is really in use and ends on random digits, so it can be in service and belong to a real person or business. That is a coincidence of the draw and nothing more: randino knows no subscriber, holds no list of real numbers and checks none. Use the numbers as sample data, in a form, a fixture or a mockup, and **never to call, text or message anybody**, to sign anybody up for anything, or for anything else that could reach or harm whoever a number happens to belong to. Where a screen or a page has to show a number somebody might dial, ask for a [fictional one](#fictional-numbers), and see [using the numbers](#using-the-numbers).
 
 :::
 
@@ -53,6 +53,7 @@ Every option is optional, and the defaults are what `randPhone()` with nothing p
 | `type` | <Lang js="PhoneTypeOption" dart="PhoneType?" py="PhoneTypeOption" code /> | <Lang js="'mobile'" dart="PhoneType.mobile" py="&quot;mobile&quot;" code /> | `mobile`, `landline`, or <Lang js="'all'" dart="null" py="&quot;all&quot;" code /> for either, decided per number. |
 | <Lang js="includeCountryCode" dart="includeCountryCode" py="include_country_code" code /> | <Lang js="boolean" dart="bool" py="bool" code /> | <Lang js="false" dart="false" py="False" code /> | Write the number the way it is dialled from abroad. See [formats](#formats). |
 | `separator` | <Lang js="string" dart="String?" py="str &#124; None" code /> | <Lang js="—" dart="null" py="None" code /> | What goes between the groups of digits, in place of the country's own punctuation. See [formats](#formats). |
+| `fictional` | <Lang js="boolean" dart="bool" py="bool" code /> | <Lang js="false" dart="false" py="False" code /> | Keep to the numbers a country sets aside for fiction, which nobody is given. See [fictional numbers](#fictional-numbers). |
 | `count` | <Lang js="number" dart="int" py="int" code /> | `1` | How many numbers to return. Clamped to `0` … `10000`. |
 | `unique` | <Lang js="boolean" dart="bool" py="bool" code /> | <Lang js="false" dart="false" py="False" code /> | Never return the same number twice. |
 | `output` | <Lang js="RandOutput" py="RandOutput" code /> | <Lang js="'value'" py="&quot;value&quot;" code /> | Strings, or a `PhoneDetail` per number. Dart has no such parameter — see [the detail output](#the-detail-output). |
@@ -177,6 +178,52 @@ rand_phone(country="US", separator="-")  # ['415-726-0193']
 
 The trunk prefix keeps the place its country gives it when a separator replaces the punctuation: on the first group in Korea (`010-…`), and a group of its own in Russia (`8-912-…`).
 
+## Fictional numbers {#fictional-numbers}
+
+`fictional` keeps to the numbers a country sets aside for films, television and books. Nobody is ever given one, so a reader who dials a number off a screen or a page reaches nobody. Two of the nine countries reserve any:
+
+| Country | Mobile | Landline | Set aside by |
+| --- | --- | --- | --- |
+| `US` | `(415) 555-0100` to `555-0199` | the same | NANPA, in every area code |
+| `DE` | `0171 3920000` to `3920099`, `0176 04069000` to `04069099` | a thousand numbers each in Berlin (`030 23125…`), Hamburg (`040 66969…`), Frankfurt (`069 90009…`), Munich (`089 99998…`) and Cologne (`0221 4710…`) | the Bundesnetzagentur, as its drama numbers |
+
+The other seven reserve none, so naming one of them with `fictional` returns no numbers at all rather than real ones, and leaving `country` out draws from the United States and Germany alone. The forms are the same forms: <Lang js="includeCountryCode" dart="includeCountryCode" py="include_country_code" code /> and `separator` write a fictional number the way they write any other.
+
+::: lang js
+
+```javascript
+randPhone({ country: 'US', fictional: true, count: 2 }); // ['(415) 555-0147', '(917) 555-0182']
+randPhone({ country: 'DE', type: 'landline', fictional: true }); // ['030 23125418']
+randPhone({ fictional: true, count: 2 }); // ['0176 04069031', '(212) 555-0109']
+randPhone({ country: 'KR', fictional: true }); // []
+```
+
+:::
+
+::: lang dart
+
+```dart
+randPhone(country: PhoneCountry.us, fictional: true, count: 2); // [(415) 555-0147, (917) 555-0182]
+randPhone(country: PhoneCountry.de, type: PhoneType.landline, fictional: true); // [030 23125418]
+randPhone(fictional: true, count: 2); // [0176 04069031, (212) 555-0109]
+randPhone(country: PhoneCountry.kr, fictional: true); // []
+```
+
+:::
+
+::: lang py
+
+```python
+rand_phone(country="US", fictional=True, count=2)  # ['(415) 555-0147', '(917) 555-0182']
+rand_phone(country="DE", type="landline", fictional=True)  # ['030 23125418']
+rand_phone(fictional=True, count=2)  # ['0176 04069031', '(212) 555-0109']
+rand_phone(country="KR", fictional=True)  # []
+```
+
+:::
+
+Korea's film council sets aside a handful of numbers too, but it publishes them with their last four digits hidden, so there is nothing whole to draw from.
+
 ## The detail output {#the-detail-output}
 
 ::: lang js
@@ -230,6 +277,7 @@ rand_phone(country="JP", output="detail")
 randino draws a number from the shape of a country's numbering plan and random digits. It does not look numbers up, does not know who holds them, and cannot tell a number in service from one that is not, so **any resemblance to a real number is a coincidence of the draw**. A number that turns out to be real is still only a sample value.
 
 - Use the numbers where nothing is sent to them: a sign-up form under test, a seeded database, a screenshot, a mockup.
+- Where a number will be seen by people who might dial it — a screenshot, a demo, a printed page — use [`fictional`](#fictional-numbers), which keeps to the US and German numbers nobody is given.
 - When a test sends a text message or places a call, send it to a number you own, or to the test numbers your SMS or telephony provider sets aside, never to one drawn here.
 - Do not use the numbers to reach, harass, spam, defraud or impersonate anybody, to get past a verification step, or for any other malicious purpose. Whoever a drawn number belongs to never agreed to be part of your data.
 

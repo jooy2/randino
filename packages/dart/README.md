@@ -341,10 +341,11 @@ randPhoneDetails(country: PhoneCountry.jp).first;
 | `type`               | `PhoneType?`    | `PhoneType.mobile`         |
 | `includeCountryCode` | `bool`          | `false`                    |
 | `separator`          | `String?`       | `null` — the country's own |
+| `fictional`          | `bool`          | `false`                    |
 | `count`              | `int`           | `1`                        |
 | `unique`             | `bool`          | `false`                    |
 
-A null `type` draws a mobile number or a landline per result. `includeCountryCode` drops the trunk prefix the country dials at home, and `separator` replaces the country's own punctuation: `''` writes the digits alone, which with the country code is E.164.
+A null `type` draws a mobile number or a landline per result. `includeCountryCode` drops the trunk prefix the country dials at home, and `separator` replaces the country's own punctuation: `''` writes the digits alone, which with the country code is E.164. `fictional` keeps to the numbers a country sets aside for films and books, which nobody is given: `555-0100` to `555-0199` in the United States and the drama numbers in Germany; the other seven countries reserve none and return nothing.
 
 ## Decorators
 

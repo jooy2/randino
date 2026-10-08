@@ -4,7 +4,7 @@
 
 ::: warning 뽑은 번호가 누군가의 번호일 수 있습니다
 
-번호는 실제로 쓰이는 대역으로 시작하고 무작위 숫자로 끝나므로, 개통된 번호이고 실제 개인이나 업체의 번호일 수 있습니다. 이는 무작위 추첨에서 생긴 우연일 뿐입니다. randino는 어떤 가입자도 알지 못하고, 실제 번호 목록을 갖고 있지 않으며, 번호를 확인하지도 않습니다. 번호는 입력 폼, 테스트 데이터, 화면 시안 같은 샘플 데이터로만 쓰고, **어떤 번호로도 전화하거나 문자·메시지를 보내지 마세요**. 누군가를 어떤 서비스에 가입시키는 일, 그 밖에 번호의 주인에게 닿거나 피해를 줄 수 있는 어떤 용도로도 쓰면 안 됩니다. [번호를 쓸 때](#using-the-numbers)를 보세요.
+번호는 실제로 쓰이는 대역으로 시작하고 무작위 숫자로 끝나므로, 개통된 번호이고 실제 개인이나 업체의 번호일 수 있습니다. 이는 무작위 추첨에서 생긴 우연일 뿐입니다. randino는 어떤 가입자도 알지 못하고, 실제 번호 목록을 갖고 있지 않으며, 번호를 확인하지도 않습니다. 번호는 입력 폼, 테스트 데이터, 화면 시안 같은 샘플 데이터로만 쓰고, **어떤 번호로도 전화하거나 문자·메시지를 보내지 마세요**. 누군가를 어떤 서비스에 가입시키는 일, 그 밖에 번호의 주인에게 닿거나 피해를 줄 수 있는 어떤 용도로도 쓰면 안 됩니다. 누군가 보고 전화를 걸 수 있는 화면이나 지면에 번호를 보여야 한다면 [가상 번호](#fictional-numbers)를 쓰고, [번호를 쓸 때](#using-the-numbers)를 보세요.
 
 :::
 
@@ -53,6 +53,7 @@ rand_phone(country="KR")
 | `type` | <Lang js="PhoneTypeOption" dart="PhoneType?" py="PhoneTypeOption" code /> | <Lang js="'mobile'" dart="PhoneType.mobile" py="&quot;mobile&quot;" code /> | `mobile`(휴대전화), `landline`(유선전화), 또는 번호마다 둘 중 하나를 고르는 <Lang js="'all'" dart="null" py="&quot;all&quot;" code />. |
 | <Lang js="includeCountryCode" dart="includeCountryCode" py="include_country_code" code /> | <Lang js="boolean" dart="bool" py="bool" code /> | <Lang js="false" dart="false" py="False" code /> | 해외에서 걸 때의 형식으로 씁니다. [형식](#formats)을 보세요. |
 | `separator` | <Lang js="string" dart="String?" py="str &#124; None" code /> | <Lang js="—" dart="null" py="None" code /> | 그 나라의 구두점 대신 숫자 묶음 사이에 넣을 문자열. [형식](#formats)을 보세요. |
+| `fictional` | <Lang js="boolean" dart="bool" py="bool" code /> | <Lang js="false" dart="false" py="False" code /> | 나라가 창작물용으로 따로 떼어 둔, 누구에게도 배정되지 않는 번호만 씁니다. [가상 번호](#fictional-numbers)를 보세요. |
 | `count` | <Lang js="number" dart="int" py="int" code /> | `1` | 돌려줄 번호 개수. `0` … `10000`으로 제한됩니다. |
 | `unique` | <Lang js="boolean" dart="bool" py="bool" code /> | <Lang js="false" dart="false" py="False" code /> | 같은 번호를 두 번 돌려주지 않습니다. |
 | `output` | <Lang js="RandOutput" py="RandOutput" code /> | <Lang js="'value'" py="&quot;value&quot;" code /> | 문자열, 또는 번호마다 `PhoneDetail` 하나. Dart에는 이 매개변수가 없습니다. [상세 출력](#the-detail-output)을 보세요. |
@@ -177,6 +178,52 @@ rand_phone(country="US", separator="-")  # ['415-726-0193']
 
 구분자로 구두점을 바꿔도 국내 식별번호는 그 나라가 두는 자리에 그대로 있습니다. 한국은 첫 묶음에 붙고(`010-…`), 러시아는 따로 한 묶음이 됩니다(`8-912-…`).
 
+## 가상 번호 {#fictional-numbers}
+
+`fictional`을 켜면 나라가 영화, 방송, 책에 쓰라고 따로 떼어 둔 번호만 씁니다. 이 번호는 누구에게도 배정되지 않으므로, 화면이나 지면에서 번호를 보고 전화를 걸어도 아무에게도 닿지 않습니다. 아홉 나라 가운데 이런 번호를 정해 둔 나라는 둘입니다.
+
+| 나라 | 휴대전화 | 유선전화 | 정한 곳 |
+| --- | --- | --- | --- |
+| `US` | `(415) 555-0100`~`555-0199` | 같음 | NANPA, 모든 지역 번호에서 |
+| `DE` | `0171 3920000`~~`3920099`, `0176 04069000`~~`04069099` | 베를린(`030 23125…`), 함부르크(`040 66969…`), 프랑크푸르트(`069 90009…`), 뮌헨(`089 99998…`), 쾰른(`0221 4710…`)에서 각각 1,000개 | 연방네트워크청(Bundesnetzagentur)의 드라마 번호 |
+
+나머지 일곱 나라는 이런 번호가 없으므로, 그 나라를 지정하고 `fictional`을 켜면 실제 번호 대신 빈 결과를 돌려줍니다. `country`를 생략하면 미국과 독일에서만 뽑습니다. 형식은 그대로 적용되어, <Lang js="includeCountryCode" dart="includeCountryCode" py="include_country_code" code />와 `separator`는 가상 번호도 다른 번호와 같은 방식으로 씁니다.
+
+::: lang js
+
+```javascript
+randPhone({ country: 'US', fictional: true, count: 2 }); // ['(415) 555-0147', '(917) 555-0182']
+randPhone({ country: 'DE', type: 'landline', fictional: true }); // ['030 23125418']
+randPhone({ fictional: true, count: 2 }); // ['0176 04069031', '(212) 555-0109']
+randPhone({ country: 'KR', fictional: true }); // []
+```
+
+:::
+
+::: lang dart
+
+```dart
+randPhone(country: PhoneCountry.us, fictional: true, count: 2); // [(415) 555-0147, (917) 555-0182]
+randPhone(country: PhoneCountry.de, type: PhoneType.landline, fictional: true); // [030 23125418]
+randPhone(fictional: true, count: 2); // [0176 04069031, (212) 555-0109]
+randPhone(country: PhoneCountry.kr, fictional: true); // []
+```
+
+:::
+
+::: lang py
+
+```python
+rand_phone(country="US", fictional=True, count=2)  # ['(415) 555-0147', '(917) 555-0182']
+rand_phone(country="DE", type="landline", fictional=True)  # ['030 23125418']
+rand_phone(fictional=True, count=2)  # ['0176 04069031', '(212) 555-0109']
+rand_phone(country="KR", fictional=True)  # []
+```
+
+:::
+
+한국도 영화진흥위원회가 영화용 번호 몇 개를 정해 두었지만 끝 네 자리를 가린 채로만 공개하므로, 온전한 번호를 뽑을 수 없습니다.
+
 ## 상세 출력 {#the-detail-output}
 
 ::: lang js
@@ -230,6 +277,7 @@ rand_phone(country="JP", output="detail")
 randino는 나라별 번호 계획의 모양과 무작위 숫자로 번호를 뽑습니다. 번호를 조회하지 않고, 누가 그 번호를 쓰는지 알지 못하며, 개통된 번호와 그렇지 않은 번호를 구별하지도 못합니다. 그러므로 **실제 번호와 같은 번호가 나온다면 그것은 무작위 추첨에서 생긴 우연**입니다. 실제 번호로 밝혀진 번호도 샘플 값일 뿐입니다.
 
 - 번호로 아무것도 보내지 않는 곳에서만 쓰세요. 테스트 중인 가입 폼, 시드 데이터베이스, 스크린숏, 화면 시안이 그런 곳입니다.
+- 스크린숏, 데모, 인쇄물처럼 누군가 보고 전화를 걸 수 있는 곳에 번호가 나간다면 [`fictional`](#fictional-numbers)을 쓰세요. 누구에게도 배정되지 않는 미국과 독일의 번호만 나옵니다.
 - 테스트에서 문자를 보내거나 전화를 건다면, 직접 가진 번호나 문자·전화 서비스 업체가 테스트용으로 정해 둔 번호로 보내세요. 여기서 뽑은 번호로는 보내지 마세요.
 - 누군가에게 연락하거나, 괴롭히거나, 스팸을 보내거나, 사기를 치거나, 다른 사람을 사칭하거나, 본인 인증을 우회하는 일처럼 악의적인 목적으로 번호를 쓰지 마세요. 뽑힌 번호의 주인은 여러분의 데이터에 들어가는 데 동의한 적이 없습니다.
 

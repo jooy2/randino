@@ -66,6 +66,7 @@ import {
 	STORIES,
 	THEME_CLASS
 } from '../../packages/javascript/lib/sentence/data/index.js';
+import type { PhoneShape } from '../../packages/javascript/lib/phone/data/index.js';
 import type { StoryStep } from '../../packages/javascript/lib/sentence/data/index.js';
 import type {
 	ModifierGroup,
@@ -81,6 +82,21 @@ import {
 } from '../../packages/javascript/lib/word/data/index.js';
 
 type Entry = string | { n: string; r: string };
+
+// A phone plan per type, every optional field of a shape written out.
+const phonePlans = (plans: Readonly<Record<string, readonly PhoneShape[]>>) =>
+	Object.fromEntries(
+		PHONE_TYPES.map((type) => [
+			type,
+			plans[type].map((shape) => ({
+				prefixes: [...shape.prefixes],
+				lead: shape.lead ?? '',
+				groups: [...shape.groups],
+				avoid: [...(shape.avoid ?? [])],
+				trunk: shape.trunk ?? null
+			}))
+		])
+	);
 
 const pool = (source: readonly Entry[] | undefined) =>
 	source === undefined
@@ -247,18 +263,8 @@ console.log(
 							trunk: data.trunk,
 							national: data.national,
 							international: data.international,
-							plans: Object.fromEntries(
-								PHONE_TYPES.map((type) => [
-									type,
-									data.plans[type].map((shape) => ({
-										prefixes: [...shape.prefixes],
-										lead: shape.lead ?? '',
-										groups: [...shape.groups],
-										avoid: [...(shape.avoid ?? [])],
-										trunk: shape.trunk ?? null
-									}))
-								])
-							)
+							plans: phonePlans(data.plans),
+							fiction: data.fiction ? phonePlans(data.fiction) : null
 						}
 					];
 				})

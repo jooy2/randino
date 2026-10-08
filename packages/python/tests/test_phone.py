@@ -202,6 +202,34 @@ def test_unique_never_repeats_a_number() -> None:
     assert len(set(phones)) == 500
 
 
+def test_fictional_keeps_to_the_numbers_a_country_sets_aside_for_fiction() -> None:
+    reserved: dict[PhoneCountry, str] = {
+        "US": r"\(\d{3}\) 555-01\d{2}",
+        # The Bundesnetzagentur's drama numbers, and the two mobile blocks.
+        "DE": (
+            r"030 23125\d{3}|040 66969\d{3}|069 90009\d{3}|089 99998\d{3}|0221 4710\d{3}"
+            r"|0171 39200\d{2}|0176 040690\d{2}"
+        ),
+    }
+
+    for country, pattern in reserved.items():
+        for type in PHONE_TYPES:
+            for detail in draw(country, type, fictional=True):
+                assert re.fullmatch(pattern, detail.phone), (country, type, detail.phone)
+
+    # "all" narrows to the two countries that reserve any.
+    countries = {
+        detail.country for detail in rand_phone(fictional=True, count=SAMPLE, output="detail")
+    }
+
+    assert countries == {"US", "DE"}
+
+    # A country that reserves none answers with nothing rather than with real numbers.
+    for country in PHONE_COUNTRIES:
+        if PHONE_DATA[country].fiction is None:
+            assert rand_phone(country=country, fictional=True, count=5) == []
+
+
 def test_every_shape_is_one_the_templates_can_write() -> None:
     assert set(PHONE_DATA) == set(PHONE_COUNTRIES)
 
@@ -213,7 +241,7 @@ def test_every_shape_is_one_the_templates_can_write() -> None:
         for type in PHONE_TYPES:
             assert data.plans[type], f"{country} has no {type} plan"
 
-            for shape in data.plans[type]:
+            for shape in (*data.plans[type], *(data.fiction or {}).get(type, ())):
                 # The first group is the prefix, and each pattern is one group more.
                 assert data.national.count("#") == len(shape.groups) + 1
                 assert data.international.count("#") == len(shape.groups) + 1

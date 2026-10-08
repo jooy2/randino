@@ -127,13 +127,24 @@ def generate_phone_details(
     count: int = 1,
     include_country_code: bool = False,
     separator: str | None = None,
+    fictional: bool = False,
     unique: bool = False,
     random: Callable[[], float] | None = None,
 ) -> list[PhoneDetail]:
     """Generate `count` phone numbers, applied to every option."""
     chosen = resolve_phone_country(country)
     kind = _resolve_phone_type(type)
-    countries: tuple[PhoneCountry, ...] = PHONE_COUNTRIES if chosen == "all" else (chosen,)
+    fiction = fictional is True
+    # A country that reserves no numbers for fiction can only answer with real ones, so
+    # asking it for fiction is asking for nothing.
+    countries: tuple[PhoneCountry, ...] = tuple(
+        code
+        for code in (PHONE_COUNTRIES if chosen == "all" else (chosen,))
+        if not fiction or PHONE_DATA[code].fiction is not None
+    )
+
+    if not countries:
+        return []
     international = include_country_code is True
     written = separator if isinstance(separator, str) else None
 
@@ -144,7 +155,8 @@ def generate_phone_details(
         # Every opening the plan can write is as likely as any other, so a shape listing
         # sixteen area codes comes up sixteen times as often as one listing one, and
         # Spain's `6xx` ten times as often as its `71x`.
-        shape = pick_weighted(data.plans[drawn], _openings)
+        plans = data.fiction if fiction and data.fiction is not None else data.plans
+        shape = pick_weighted(plans[drawn], _openings)
         groups = [
             pick(shape.prefixes) + _fill(shape.lead),
             *(_draw_group(pattern, shape.avoid) for pattern in shape.groups),

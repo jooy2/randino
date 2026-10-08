@@ -50,6 +50,7 @@ from randino.organization.data import (
 )
 from randino.organization.data._types import OrganizationLanguageData, PoolOrganizationSynthesis
 from randino.phone.data import PHONE_COUNTRIES, PHONE_DATA, PHONE_TYPES
+from randino.phone.data._types import PhoneShape
 from randino.sentence.data import (
     AGENT_CLASSES,
     FIELD_RULES,
@@ -63,6 +64,23 @@ from randino.sentence.data import (
 from randino.sentence.data._types import ModifierGroup, PredicateTense, SentenceSpeech
 from randino.word.data import LOOSE_THEMES, WORD_DATA, WORD_LANGUAGES, WORD_THEMES
 from randino.word.data._types import SyllableSynthesis, WordAgreement
+
+
+def phone_plans(plans: Mapping[str, Sequence[PhoneShape]]) -> dict[str, Any]:
+    """A phone plan per type, every optional field of a shape written out."""
+    return {
+        kind: [
+            {
+                "prefixes": list(shape.prefixes),
+                "lead": shape.lead,
+                "groups": list(shape.groups),
+                "avoid": list(shape.avoid),
+                "trunk": shape.trunk,
+            }
+            for shape in plans[kind]
+        ]
+        for kind in PHONE_TYPES
+    }
 
 
 def pool(source: Sequence[Any] | None) -> list[dict[str, str | None]] | None:
@@ -498,19 +516,8 @@ print(
                         "trunk": data.trunk,
                         "national": data.national,
                         "international": data.international,
-                        "plans": {
-                            kind: [
-                                {
-                                    "prefixes": list(shape.prefixes),
-                                    "lead": shape.lead,
-                                    "groups": list(shape.groups),
-                                    "avoid": list(shape.avoid),
-                                    "trunk": shape.trunk,
-                                }
-                                for shape in data.plans[kind]
-                            ]
-                            for kind in PHONE_TYPES
-                        },
+                        "plans": phone_plans(data.plans),
+                        "fiction": None if data.fiction is None else phone_plans(data.fiction),
                     }
                     for code, data in PHONE_DATA.items()
                 },

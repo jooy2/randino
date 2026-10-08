@@ -109,10 +109,18 @@ List<PhoneDetail> generatePhoneDetails({
   int count = 1,
   bool includeCountryCode = false,
   String? separator,
+  bool fictional = false,
   bool unique = false,
   Random? random,
 }) {
-  final countries = country == null ? phoneCountries : <PhoneCountry>[country];
+  // A country that reserves no numbers for fiction can only answer with real
+  // ones, so asking it for fiction is asking for nothing.
+  final countries = <PhoneCountry>[
+    for (final code in country == null ? phoneCountries : <PhoneCountry>[country])
+      if (!fictional || phoneData[code]!.fiction != null) code,
+  ];
+
+  if (countries.isEmpty) return <PhoneDetail>[];
 
   return withRandom(
     random,
@@ -127,7 +135,8 @@ List<PhoneDetail> generatePhoneDetails({
         // Every opening the plan can write is as likely as any other, so a shape
         // listing sixteen area codes comes up sixteen times as often as one listing
         // one, and Spain's `6xx` ten times as often as its `71x`.
-        final shape = pickWeighted(data.plans[kind]!, _openings);
+        final plans = fictional ? data.fiction ?? data.plans : data.plans;
+        final shape = pickWeighted(plans[kind]!, _openings);
         final groups = <String>[
           pick(shape.prefixes) + _fill(shape.lead),
           for (final pattern in shape.groups) _drawGroup(pattern, shape.avoid),

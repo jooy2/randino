@@ -15,6 +15,7 @@ def rand_phone(
     count: int = ...,
     include_country_code: bool = ...,
     separator: str | None = ...,
+    fictional: bool = ...,
     unique: bool = ...,
     random: Callable[[], float] | None = ...,
     output: Literal["value"] = ...,
@@ -29,6 +30,7 @@ def rand_phone(
     count: int = ...,
     include_country_code: bool = ...,
     separator: str | None = ...,
+    fictional: bool = ...,
     unique: bool = ...,
     random: Callable[[], float] | None = ...,
     output: Literal["detail"],
@@ -42,6 +44,7 @@ def rand_phone(
     count: int = 1,
     include_country_code: bool = False,
     separator: str | None = None,
+    fictional: bool = False,
     unique: bool = False,
     random: Callable[[], float] | None = None,
     output: str = "value",
@@ -51,7 +54,9 @@ def rand_phone(
     Each number opens on a block the country's numbering plan gives out — a mobile block,
     or the area code of a real city — and the digits after it are random. That is what
     makes it look like a real number, and it is also why it can be one: a drawn number
-    may belong to somebody. Use the numbers as sample data, and never call or text one.
+    may belong to somebody. Use the numbers as sample data, and never call or text one —
+    or pass `fictional`, for the numbers the United States and Germany keep out of service
+    for films and books.
 
     Args:
         country: Which country's numbers, by ISO 3166-1 alpha-2 code, read regardless of
@@ -64,6 +69,11 @@ def rand_phone(
         separator: What goes between the groups of digits, in place of the country's own
             way of writing them. `""` writes the digits alone, which with
             `include_country_code` is E.164. None keeps each country's own.
+        fictional: Keep to the numbers a country sets aside for fiction, which no
+            subscriber is ever given: `555-0100` to `555-0199` in the United States, the
+            Bundesnetzagentur's drama numbers in Germany. The other seven countries reserve
+            none, so naming one of them returns an empty list rather than real numbers, and
+            `"all"` narrows to the two that do.
         unique: Never return the same number twice.
         random: Where the randomness comes from: a callable returning a number in
             `[0, 1)`, the way `random.random` does. `SystemRandom().random` for a value
@@ -90,6 +100,7 @@ def rand_phone(
         count=count,
         include_country_code=include_country_code,
         separator=separator,
+        fictional=fictional,
         unique=unique,
         random=random,
     )

@@ -1,6 +1,7 @@
 import 'package:randino/randino.dart';
 // Internal, but it is what every number is checked against.
 import 'package:randino/src/phone/data/index.dart';
+import 'package:randino/src/phone/data/types.dart';
 import 'package:test/test.dart';
 
 const int sample = 60;
@@ -224,6 +225,41 @@ void main() {
       expect(phones.toSet(), hasLength(500));
     });
 
+    test('fictional keeps to the numbers a country sets aside for fiction', () {
+      final reserved = <PhoneCountry, RegExp>{
+        PhoneCountry.us: RegExp(r'^\(\d{3}\) 555-01\d{2}$'),
+        // The Bundesnetzagentur's drama numbers, and the two mobile blocks.
+        PhoneCountry.de: RegExp(
+          r'^(030 23125\d{3}|040 66969\d{3}|069 90009\d{3}|089 99998\d{3}|0221 4710\d{3}'
+          r'|0171 39200\d{2}|0176 040690\d{2})$',
+        ),
+      };
+
+      for (final MapEntry(key: country, value: pattern) in reserved.entries) {
+        for (final type in phoneTypes) {
+          for (final detail in randPhoneDetails(
+            country: country,
+            type: type,
+            fictional: true,
+            count: sample,
+          )) {
+            expect(detail.phone, matches(pattern), reason: '${country.code} ${type.name}');
+          }
+        }
+      }
+
+      // A null country narrows to the two that reserve any.
+      expect(
+        randPhoneDetails(fictional: true, count: sample).map((detail) => detail.country).toSet(),
+        <PhoneCountry>{PhoneCountry.us, PhoneCountry.de},
+      );
+
+      // A country that reserves none answers with nothing rather than real numbers.
+      for (final country in phoneCountries.where((code) => phoneData[code]!.fiction == null)) {
+        expect(randPhone(country: country, fictional: true, count: 5), isEmpty);
+      }
+    });
+
     test('every shape is one the templates can write', () {
       expect(phoneData.keys.toSet(), PhoneCountry.values.toSet());
 
@@ -236,7 +272,7 @@ void main() {
         for (final type in phoneTypes) {
           expect(data.plans[type], isNotEmpty);
 
-          for (final shape in data.plans[type]!) {
+          for (final shape in <PhoneShape>[...data.plans[type]!, ...?data.fiction?[type]]) {
             // The first group is the prefix, and each pattern is one group more.
             expect(marks(data.national), shape.groups.length + 1);
             expect(marks(data.international), shape.groups.length + 1);

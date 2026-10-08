@@ -110,6 +110,8 @@ final PhoneShape _usShape = PhoneShape(
   avoid: words('211 311 411 511 611 711 811 911 555'),
 );
 
+final PhoneShape _usFiction = PhoneShape(prefixes: _usAreas, groups: const <String>['555', '01xx']);
+
 /// How each country numbers its phones and how it writes them, at the level of
 /// its numbering plan: which prefixes are mobile, which are a city, how many
 /// digits follow. Internal.
@@ -126,6 +128,12 @@ final Map<PhoneCountry, PhoneCountryData> phoneData = <PhoneCountry, PhoneCountr
     plans: <PhoneType, List<PhoneShape>>{
       PhoneType.mobile: <PhoneShape>[_usShape],
       PhoneType.landline: <PhoneShape>[_usShape],
+    },
+    // NANPA keeps `555-0100` to `555-0199` out of service in every area code,
+    // for films and television, and writes them the same for both types.
+    fiction: <PhoneType, List<PhoneShape>>{
+      PhoneType.mobile: <PhoneShape>[_usFiction],
+      PhoneType.landline: <PhoneShape>[_usFiction],
     },
   ),
   PhoneCountry.kr: PhoneCountryData(
@@ -239,6 +247,22 @@ final Map<PhoneCountry, PhoneCountryData> phoneData = <PhoneCountry, PhoneCountr
         PhoneShape(prefixes: _deAreasShort, groups: const <String>['Nxxxxxxx']),
         PhoneShape(prefixes: _deAreas, groups: const <String>['Nxxxxxx']),
         PhoneShape(prefixes: _deAreas, groups: const <String>['Nxxxxxxx']),
+      ],
+    },
+    // The Bundesnetzagentur's drama numbers: a thousand lines in each of five
+    // cities, and a hundred numbers each that Telekom and Telefónica keep out of
+    // service. Its gazette notice 148/2021 lists them.
+    fiction: const <PhoneType, List<PhoneShape>>{
+      PhoneType.mobile: <PhoneShape>[
+        PhoneShape(prefixes: <String>['171'], groups: <String>['39200xx']),
+        PhoneShape(prefixes: <String>['176'], groups: <String>['040690xx']),
+      ],
+      PhoneType.landline: <PhoneShape>[
+        PhoneShape(prefixes: <String>['30'], groups: <String>['23125xxx']),
+        PhoneShape(prefixes: <String>['40'], groups: <String>['66969xxx']),
+        PhoneShape(prefixes: <String>['69'], groups: <String>['90009xxx']),
+        PhoneShape(prefixes: <String>['89'], groups: <String>['99998xxx']),
+        PhoneShape(prefixes: <String>['221'], groups: <String>['4710xxx']),
       ],
     },
   ),

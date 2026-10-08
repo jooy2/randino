@@ -52,3 +52,10 @@ class PhoneCountryData:
 
     plans: dict[PhoneType, tuple[PhoneShape, ...]]
     """The shapes each type of number is drawn from."""
+
+    fiction: dict[PhoneType, tuple[PhoneShape, ...]] | None = None
+    """The numbers the country sets aside for fiction, which no subscriber is ever given.
+
+    Written in the same templates, and None where a country reserves none, which is most
+    of them.
+    """

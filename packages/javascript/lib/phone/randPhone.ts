@@ -8,7 +8,8 @@ import { generatePhoneDetails } from './phoneGenerator.js';
  * mobile block, or the area code of a real city — and the digits after it are
  * random. That is what makes it look like a real number, and it is also why it
  * can be one: a drawn number may belong to somebody. Use the numbers as sample
- * data, and never call or text one.
+ * data, and never call or text one — or pass `fictional`, for the numbers the
+ * United States and Germany keep out of service for films and books.
  *
  * Mobile numbers by default. `includeCountryCode` writes the international
  * form, and `separator` replaces the country's own punctuation.
@@ -18,6 +19,7 @@ import { generatePhoneDetails } from './phoneGenerator.js';
  * randPhone({ country: 'US', count: 2 }); // ['(415) 726-0193', '(917) 384-5520']
  * randPhone({ country: 'KR', includeCountryCode: true }); // ['+82 10-4821-3967']
  * randPhone({ country: 'KR', includeCountryCode: true, separator: '' }); // ['+821048213967']
+ * randPhone({ country: 'US', fictional: true }); // ['(415) 555-0147']
  */
 export function randPhone(options?: RandPhoneOptions & { output?: 'value' }): string[];
 /**

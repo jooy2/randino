@@ -126,9 +126,18 @@ function resolvePhoneType(type: unknown): PhoneTypeOption {
 export function generatePhoneDetails(options: RandPhoneOptions = {}): PhoneDetail[] {
 	const country = resolvePhoneCountry(options.country);
 	const type = resolvePhoneType(options.type);
-	const countries = country === 'all' ? PHONE_COUNTRIES : [country];
+	const fictional = options.fictional === true;
+	// A country that reserves no numbers for fiction can only answer with real
+	// ones, so asking it for fiction is asking for nothing.
+	const countries = (country === 'all' ? PHONE_COUNTRIES : [country]).filter(
+		(code) => !fictional || PHONE_DATA[code].fiction
+	);
 	const includeCountryCode = options.includeCountryCode === true;
 	const separator = typeof options.separator === 'string' ? options.separator : null;
+
+	if (!countries.length) {
+		return [];
+	}
 
 	return withRandom(resolveRandom(options.random), () =>
 		collect(
@@ -142,7 +151,8 @@ export function generatePhoneDetails(options: RandPhoneOptions = {}): PhoneDetai
 				// Every opening the plan can write is as likely as any other, so a shape
 				// listing sixteen area codes comes up sixteen times as often as one listing one,
 				// and Spain's `6xx` ten times as often as its `71x`.
-				const shape: PhoneShape = pickWeighted(data.plans[kind], openings);
+				const plans = fictional && data.fiction ? data.fiction : data.plans;
+				const shape: PhoneShape = pickWeighted(plans[kind], openings);
 				const groups = [
 					pick(shape.prefixes) + fill(shape.lead ?? ''),
 					...shape.groups.map((pattern) => drawGroup(pattern, shape.avoid))

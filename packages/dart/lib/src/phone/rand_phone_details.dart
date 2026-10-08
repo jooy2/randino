@@ -18,6 +18,7 @@ List<PhoneDetail> randPhoneDetails({
   int count = 1,
   bool includeCountryCode = false,
   String? separator,
+  bool fictional = false,
   bool unique = false,
 
   /// Where the randomness comes from: `Random.secure()` for a value nobody may
@@ -29,6 +30,7 @@ List<PhoneDetail> randPhoneDetails({
   count: count,
   includeCountryCode: includeCountryCode,
   separator: separator,
+  fictional: fictional,
   unique: unique,
   random: random,
 );

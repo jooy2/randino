@@ -111,6 +111,8 @@ _US_SHAPE = PhoneShape(
     avoid=words("211 311 411 511 611 711 811 911 555"),
 )
 
+_US_FICTION = PhoneShape(prefixes=_US_AREAS, groups=("555", "01xx"))
+
 PHONE_DATA: dict[PhoneCountry, PhoneCountryData] = {
     "US": PhoneCountryData(
         calling_code="1",
@@ -118,6 +120,9 @@ PHONE_DATA: dict[PhoneCountry, PhoneCountryData] = {
         national="(#) #-#",
         international="#-#-#",
         plans={"mobile": (_US_SHAPE,), "landline": (_US_SHAPE,)},
+        # NANPA keeps `555-0100` to `555-0199` out of service in every area code, for
+        # films and television, and writes them the same for both types.
+        fiction={"mobile": (_US_FICTION,), "landline": (_US_FICTION,)},
     ),
     "KR": PhoneCountryData(
         calling_code="82",
@@ -216,6 +221,22 @@ PHONE_DATA: dict[PhoneCountry, PhoneCountryData] = {
                 PhoneShape(prefixes=_DE_AREAS_SHORT, groups=("Nxxxxxxx",)),
                 PhoneShape(prefixes=_DE_AREAS, groups=("Nxxxxxx",)),
                 PhoneShape(prefixes=_DE_AREAS, groups=("Nxxxxxxx",)),
+            ),
+        },
+        # The Bundesnetzagentur's drama numbers: a thousand lines in each of five cities,
+        # and a hundred numbers each that Telekom and Telefónica keep out of service. Its
+        # gazette notice 148/2021 lists them.
+        fiction={
+            "mobile": (
+                PhoneShape(prefixes=("171",), groups=("39200xx",)),
+                PhoneShape(prefixes=("176",), groups=("040690xx",)),
+            ),
+            "landline": (
+                PhoneShape(prefixes=("30",), groups=("23125xxx",)),
+                PhoneShape(prefixes=("40",), groups=("66969xxx",)),
+                PhoneShape(prefixes=("69",), groups=("90009xxx",)),
+                PhoneShape(prefixes=("89",), groups=("99998xxx",)),
+                PhoneShape(prefixes=("221",), groups=("4710xxx",)),
             ),
         },
     ),

@@ -54,6 +54,12 @@ export interface PhoneCountryData {
 	/** How it writes one for the world, after `+` and the calling code and a space. */
 	international: string;
 	plans: Record<PhoneType, readonly PhoneShape[]>;
+	/**
+	 * The numbers the country sets aside for fiction, which no subscriber is ever
+	 * given, written in the same templates. Left out where a country reserves
+	 * none, which is most of them.
+	 */
+	fiction?: Record<PhoneType, readonly PhoneShape[]>;
 }
 
 // US geographic area codes, all of them long-standing ones of the fifty states
@@ -79,6 +85,8 @@ const US_SHAPE: PhoneShape = {
 	groups: ['Nxx', 'xxxx'],
 	avoid: words('211 311 411 511 611 711 811 911 555')
 };
+
+const US_FICTION: PhoneShape = { prefixes: US_AREAS, groups: ['555', '01xx'] };
 
 // Korea's two-digit area codes, which with Seoul's `2` are all seventeen it has.
 // An exchange is three digits or four, and both are in use.
@@ -167,7 +175,10 @@ export const PHONE_DATA: Record<PhoneCountry, PhoneCountryData> = {
 		trunk: '',
 		national: '(#) #-#',
 		international: '#-#-#',
-		plans: { mobile: [US_SHAPE], landline: [US_SHAPE] }
+		plans: { mobile: [US_SHAPE], landline: [US_SHAPE] },
+		// NANPA keeps `555-0100` to `555-0199` out of service in every area code,
+		// for films and television, and writes them the same for both types.
+		fiction: { mobile: [US_FICTION], landline: [US_FICTION] }
 	},
 	KR: {
 		callingCode: '82',
@@ -266,6 +277,22 @@ export const PHONE_DATA: Record<PhoneCountry, PhoneCountryData> = {
 				{ prefixes: DE_AREAS_SHORT, groups: ['Nxxxxxxx'] },
 				{ prefixes: DE_AREAS, groups: ['Nxxxxxx'] },
 				{ prefixes: DE_AREAS, groups: ['Nxxxxxxx'] }
+			]
+		},
+		// The Bundesnetzagentur's drama numbers: a thousand lines in each of five
+		// cities, and a hundred numbers each that Telekom and Telefónica keep out of
+		// service. Its gazette notice 148/2021 lists them.
+		fiction: {
+			mobile: [
+				{ prefixes: ['171'], groups: ['39200xx'] },
+				{ prefixes: ['176'], groups: ['040690xx'] }
+			],
+			landline: [
+				{ prefixes: ['30'], groups: ['23125xxx'] },
+				{ prefixes: ['40'], groups: ['66969xxx'] },
+				{ prefixes: ['69'], groups: ['90009xxx'] },
+				{ prefixes: ['89'], groups: ['99998xxx'] },
+				{ prefixes: ['221'], groups: ['4710xxx'] }
 			]
 		}
 	},

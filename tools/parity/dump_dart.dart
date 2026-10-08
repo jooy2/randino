@@ -23,10 +23,27 @@ import 'package:randino/src/name/data/types.dart';
 import 'package:randino/src/organization/data/index.dart';
 import 'package:randino/src/organization/data/types.dart';
 import 'package:randino/src/phone/data/index.dart';
+import 'package:randino/src/phone/data/types.dart';
 import 'package:randino/src/sentence/data/index.dart';
 import 'package:randino/src/sentence/data/types.dart';
+import 'package:randino/src/types.dart';
 import 'package:randino/src/word/data/index.dart';
 import 'package:randino/src/word/data/types.dart';
+
+/// A phone plan per type, every optional field of a shape written out.
+Map<String, Object?> phonePlans(Map<PhoneType, List<PhoneShape>> plans) => <String, Object?>{
+  for (final type in phoneTypes)
+    type.name: <Object?>[
+      for (final shape in plans[type]!)
+        <String, Object?>{
+          'prefixes': shape.prefixes,
+          'lead': shape.lead,
+          'groups': shape.groups,
+          'avoid': shape.avoid,
+          'trunk': shape.trunk,
+        },
+    ],
+};
 
 /// Flattens a name pool: a plain entry carries no reading, a token does.
 List<Map<String, String?>>? pool(NamePool? source) => source
@@ -545,19 +562,10 @@ void main() {
               'trunk': phoneData[country]!.trunk,
               'national': phoneData[country]!.national,
               'international': phoneData[country]!.international,
-              'plans': <String, Object?>{
-                for (final type in phoneTypes)
-                  type.name: <Object?>[
-                    for (final shape in phoneData[country]!.plans[type]!)
-                      <String, Object?>{
-                        'prefixes': shape.prefixes,
-                        'lead': shape.lead,
-                        'groups': shape.groups,
-                        'avoid': shape.avoid,
-                        'trunk': shape.trunk,
-                      },
-                  ],
-              },
+              'plans': phonePlans(phoneData[country]!.plans),
+              'fiction': phoneData[country]!.fiction == null
+                  ? null
+                  : phonePlans(phoneData[country]!.fiction!),
             },
         },
       },

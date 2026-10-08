@@ -46,6 +46,7 @@ class PhoneCountryData {
     required this.national,
     required this.international,
     required this.plans,
+    this.fiction,
   });
 
   /// The country calling code, without the `+`.
@@ -65,4 +66,9 @@ class PhoneCountryData {
 
   /// The shapes each type of number is drawn from.
   final Map<PhoneType, List<PhoneShape>> plans;
+
+  /// The numbers the country sets aside for fiction, which no subscriber is
+  /// ever given, written in the same templates. Null where a country reserves
+  /// none, which is most of them.
+  final Map<PhoneType, List<PhoneShape>>? fiction;
 }
