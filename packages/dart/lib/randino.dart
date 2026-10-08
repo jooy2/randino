@@ -154,10 +154,15 @@ export 'src/types.dart'
         SentenceStyle,
         SentenceTense,
         SystemPlatform,
+        VersionDetail,
+        VersionFormat,
         WordDetail,
         WordLanguage,
         WordSlot,
         WordTheme;
+export 'src/version/data/index.dart' show versionFormats;
+export 'src/version/rand_version.dart' show randVersion;
+export 'src/version/rand_version_details.dart' show randVersionDetails;
 export 'src/word/data/index.dart' show wordLanguages, wordThemes;
 export 'src/word/rand_animal.dart' show randAnimal;
 export 'src/word/rand_body.dart' show randBody;

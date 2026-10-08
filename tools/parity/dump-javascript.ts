@@ -74,6 +74,17 @@ import {
 	RESOLUTION_SEPARATOR_DEFAULT
 } from '../../packages/javascript/lib/resolution/data/index.js';
 import {
+	CALVER_SCHEMES,
+	VERSION_FORMATS,
+	VERSION_PARTS,
+	VERSION_PRERELEASES,
+	VERSION_PRERELEASE_CHANCE,
+	VERSION_YEAR_CEILING,
+	VERSION_YEAR_FLOOR,
+	VERSION_YEAR_MAX_DEFAULT,
+	VERSION_YEAR_MIN_DEFAULT
+} from '../../packages/javascript/lib/version/data/index.js';
+import {
 	PHONE_COUNTRIES,
 	PHONE_DATA,
 	PHONE_TYPES
@@ -323,6 +334,19 @@ console.log(
 					entry.weight
 				])
 			)
+		},
+		version: {
+			formats: [...VERSION_FORMATS],
+			parts: VERSION_PARTS,
+			prereleases: VERSION_PRERELEASES,
+			prereleaseChance: VERSION_PRERELEASE_CHANCE,
+			calverSchemes: Object.fromEntries(CALVER_SCHEMES.map((each) => [each.scheme, each.weight])),
+			years: {
+				minDefault: VERSION_YEAR_MIN_DEFAULT,
+				maxDefault: VERSION_YEAR_MAX_DEFAULT,
+				floor: VERSION_YEAR_FLOOR,
+				ceiling: VERSION_YEAR_CEILING
+			}
 		},
 		// One entry per processor, keyed by its maker and model, the way the devices are.
 		cpu: Object.fromEntries(

@@ -35,6 +35,7 @@ import 'package:randino/src/resolution/data/index.dart';
 import 'package:randino/src/sentence/data/index.dart';
 import 'package:randino/src/sentence/data/types.dart';
 import 'package:randino/src/types.dart';
+import 'package:randino/src/version/data/index.dart';
 import 'package:randino/src/word/data/index.dart';
 import 'package:randino/src/word/data/types.dart';
 
@@ -620,6 +621,23 @@ void main() {
         'sizes': <String, Object?>{
           for (final entry in resolutions)
             '${entry.platform.name} ${entry.width}x${entry.height}': entry.weight,
+        },
+      },
+      'version': <String, Object?>{
+        'formats': <String>[for (final format in versionFormats) format.name],
+        'parts': <String, Object?>{
+          for (final entry in versionParts.entries) entry.key: <int>[entry.value.$1, entry.value.$2],
+        },
+        'prereleases': versionPrereleases,
+        'prereleaseChance': versionPrereleaseChance,
+        'calverSchemes': <String, Object?>{
+          for (final each in calverSchemes) each.scheme: each.weight,
+        },
+        'years': <String, Object?>{
+          'minDefault': versionYearMinDefault,
+          'maxDefault': versionYearMaxDefault,
+          'floor': versionYearFloor,
+          'ceiling': versionYearCeiling,
         },
       },
       // One entry per processor, keyed by its maker and model, the way the

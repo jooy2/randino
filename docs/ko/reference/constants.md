@@ -332,7 +332,8 @@ import {
 	DISK_TYPES,
 	DISK_UNITS,
 	RAM_UNITS,
-	SYSTEM_PLATFORMS
+	SYSTEM_PLATFORMS,
+	VERSION_FORMATS
 } from 'randino';
 ```
 
@@ -344,6 +345,7 @@ import {
 | `DISK_TYPES`       | `DiskType[]`       | `['hdd', 'ssd', 'sshd', 'emmc', 'ufs']`             |
 | `DISK_UNITS`       | `DiskUnit[]`       | `['MB', 'GB', 'TB']`                                |
 | `ARCHITECTURES`    | `Architecture[]`   | `['x86_64', 'arm64', 'x86', 'armv7', 'riscv64', …]` |
+| `VERSION_FORMATS`  | `VersionFormat[]`  | `['semver', 'calver', 'number']`                    |
 
 :::
 
@@ -361,6 +363,7 @@ import 'package:randino/randino.dart';
 | `diskTypes`       | `List<DiskType>`       | `hdd`, `ssd`, `sshd`, `emmc`, `ufs` 순 |
 | `diskUnits`       | `List<DiskUnit>`       | `mb`, `gb`, `tb` 순                    |
 | `architectures`   | `List<String>`         | 흔한 넷, 드문 여섯 순                  |
+| `versionFormats`  | `List<VersionFormat>`  | `semver`, `calver`, `number` 순        |
 
 :::
 
@@ -374,6 +377,7 @@ from randino import (
     DISK_UNITS,
     RAM_UNITS,
     SYSTEM_PLATFORMS,
+    VERSION_FORMATS,
 )
 ```
 
@@ -385,6 +389,7 @@ from randino import (
 | `DISK_TYPES` | `tuple[DiskType, …]` | `('hdd', 'ssd', 'sshd', 'emmc', 'ufs')` |
 | `DISK_UNITS` | `tuple[DiskUnit, …]` | `('MB', 'GB', 'TB')` |
 | `ARCHITECTURES` | `tuple[Architecture, …]` | `('x86_64', 'arm64', 'x86', 'armv7', 'riscv64', …)` |
+| `VERSION_FORMATS` | `tuple[VersionFormat, …]` | `('semver', 'calver', 'number')` |
 
 :::
 
@@ -572,8 +577,12 @@ import type {
 	RamDetail,
 	RamUnit,
 	RamUnitOption,
+	ResolutionDetail,
 	SystemPlatform,
 	SystemPlatformOption,
+	VersionDetail,
+	VersionFormat,
+	VersionFormatOption,
 	WordLanguage,
 	WordLanguageOption,
 	WordTheme,
@@ -612,6 +621,8 @@ import type {
 	RandOsOptions,
 	RandPhoneOptions,
 	RandRamOptions,
+	RandResolutionOptions,
+	RandVersionOptions,
 	RandOutput
 } from 'randino';
 
@@ -634,13 +645,13 @@ AgeGroup, AgeDistribution, DateUnit, DeviceType, DiskType, DiskUnit, GenderCode
 NameLanguage, NameGender, NameScript
 OrganizationType, OrganizationIndustry
 PhoneCountry, PhoneType
-RamUnit, SystemPlatform
+RamUnit, SystemPlatform, VersionFormat
 WordLanguage, WordTheme
 LocationLanguage, LocationLevel
 
 // 값
 LengthRange, AgeDetail, ArchitectureDetail, CpuDetail, DateDetail, DeviceDetail, DiskSizeDetail, DiskTypeDetail, GenderDetail, GpuDetail, NameDetail, NicknameDetail, LocationDetail, CountryDetail,
-OrganizationDetail, OsDetail, PhoneDetail, RamDetail
+OrganizationDetail, OsDetail, PhoneDetail, RamDetail, ResolutionDetail, VersionDetail
 ```
 
 `…Option` 타입도 없고 `all` 멤버도 없습니다. **null인 enum이 "전부"를 뜻하므로**, 쓰지 않은 파라미터가 이미 섞인 결과를 의미합니다. 그래서 헬퍼들도 더 좁은 타입이 아니라 생성기와 같은 타입을 받습니다.
@@ -683,8 +694,12 @@ from randino import (
     RamDetail,
     RamUnit,
     RamUnitOption,
+    ResolutionDetail,
     SystemPlatform,
     SystemPlatformOption,
+    VersionDetail,
+    VersionFormat,
+    VersionFormatOption,
     WordLanguage,
     WordLanguageOption,
     WordTheme,

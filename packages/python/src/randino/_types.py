@@ -973,3 +973,38 @@ class ResolutionDetail:
 
     platform: SystemPlatform
     """The kind of machine the screen belongs to."""
+
+
+VersionFormat = Literal["semver", "calver", "number"]
+"""How a software version is numbered.
+
+- `semver`: semantic versioning, `2.14.3`, with a pre-release such as `-beta.2` when asked.
+- `calver`: calendar versioning, counted from a year, `2024.3.1`, `24.04`, `2024.03.15`.
+- `number`: a version that is one number, the way a browser's is, `42`.
+"""
+
+VersionFormatOption = VersionFormat | Sequence[VersionFormat] | Literal["all"]
+"""One format, a sequence of them to draw from, or `"all"` of them."""
+
+
+@dataclass(frozen=True, slots=True)
+class VersionDetail:
+    """A generated software version, with the numbers it is made of."""
+
+    version: str
+    """The version as the value form returns it, prefix included: `v2.14.3`."""
+
+    format: VersionFormat
+    """How it is numbered."""
+
+    scheme: str
+    """How it is numbered, in CalVer's notation: `MAJOR.MINOR.PATCH`, `MAJOR`, `YY.0M`."""
+
+    parts: tuple[int, ...]
+    """The numbers in the order they are written: `(2, 14, 3)`, `(24, 4)`."""
+
+    prerelease: str | None
+    """The pre-release, without its hyphen: `beta.2`. `None` when there is none."""
+
+    year: int | None
+    """The year a calendar version is counted from, in full. `None` for the others."""

@@ -15,7 +15,7 @@ Guidance for AI agents (and humans) working in this repository. Written in Engli
 - **Genders** are the label a form in the language writes for one (`여성`, `Female`, `Divers`). Male and female split evenly, and the two others — `unknown` and `nonbinary` — come up only when the caller switches them on, and rarely when they do.
 - **Dates** are instants drawn evenly from a range and written out in UTC (`2024-03-15T14:07:32.481Z`, `2024년 3월 15일`), by a format of the caller's own. `unit` hands back one part of a date as a number instead — `minute` is `0` to `59` — read off a drawn date so it keeps to the range. Its `language` writes only the month and weekday names and the half of the day, and defaults to `'en'` rather than `'all'`: a format is written in one language. `minDate` / `maxDate`, `format`, `unit` and `utcOffset` are its own options.
 - **Phone numbers** are written the way their country writes them (`010-4821-3967`, `(415) 726-0193`, `8 (912) 345-67-89`), for the country each word language is spoken in first. Each opens on a block the country's numbering plan really gives out and ends on random digits, so **a drawn number can by chance be somebody's** — the docs and the doc comments say so, and say never to call or text one. `randPhone` takes `country` in place of `language`, and `type`, `includeCountryCode`, `separator` and `fictional` are its own options.
-- **System values** describe a sample machine with real products, the one place the library does not invent: an operating system from `randOs` (`Windows 11 Pro 23H2 (Build 22631)`, `macOS Sonoma 14.5`, `Android 14 (API 34)`) a phone, tablet or laptop from `randDevice` (`Apple iPhone 15 Pro`, `Lenovo ThinkPad X1 Carbon Gen 11`), its processor and graphics from `randCpu` and `randGpu` (`Intel Core i7-13700K`, `NVIDIA GeForce RTX 4090`), the architecture it runs from `randArchitecture` (`x86_64`), the memory one is sold with from `randRam` (`16 GB`), the kind and size of its storage from `randDiskType` and `randDiskSize` (`SSD`, `1 TB`), and the size of its screen from `randResolution` (`1920x1080`). Nothing is made up — every value is a release that came out, written by the name it was released under — so none of them takes a `language`, and they share `platform` (`desktop` or `mobile`) and, where a value has a release year, `minYear` / `maxYear`. The names are the products' own and belong to their owners; the docs say so on every page that lists them.
+- **System values** describe a sample machine with real products, the one place the library does not invent: an operating system from `randOs` (`Windows 11 Pro 23H2 (Build 22631)`, `macOS Sonoma 14.5`, `Android 14 (API 34)`) a phone, tablet or laptop from `randDevice` (`Apple iPhone 15 Pro`, `Lenovo ThinkPad X1 Carbon Gen 11`), its processor and graphics from `randCpu` and `randGpu` (`Intel Core i7-13700K`, `NVIDIA GeForce RTX 4090`), the architecture it runs from `randArchitecture` (`x86_64`), the memory one is sold with from `randRam` (`16 GB`), the kind and size of its storage from `randDiskType` and `randDiskSize` (`SSD`, `1 TB`), the size of its screen from `randResolution` (`1920x1080`), and the version numbers of its software from `randVersion` (`2.14.3`, `2024.3.1`). Apart from a version number, which no catalog could list and which is drawn instead, nothing is made up — every value is a release that came out, written by the name it was released under — so none of them takes a `language`, and they share `platform` (`desktop` or `mobile`) and, where a value has a release year, `minYear` / `maxYear`. The names are the products' own and belong to their owners; the docs say so on every page that lists them.
 - **Organizations** are companies, schools, offices and associations that do not exist (`(주)새솔테크`, `Westbrook High School`, `Гимназия № 135`), each written the way its language writes that kind. Nothing about them is real, and that is the requirement rather than a limitation: the stems are chosen to be nobody's brand, and **no organization is ever built from a person name** — a surname with a legal form behind it is exactly how famous companies are named.
 
 All of them are implemented. Keep the generators apart — a shared "generator" abstraction is not wanted — but the options they all take, and the loop that draws until it has `count` results, live in `_internal/generate` and are shared. So are the word pools: `word/data` is the one dataset, and `nickname` consumes it.
@@ -162,6 +162,11 @@ lib/
     randResolution.ts       # public: string[], or ResolutionDetail[] on `output: 'detail'`
     resolutionGenerator.ts  # internal: one pool per platform, the weighted draw
     data/index.ts           # RESOLUTIONS, every size with its weight per platform
+  version/
+    index.ts
+    randVersion.ts          # public: string[], or VersionDetail[] on `output: 'detail'`
+    versionGenerator.ts     # internal: the three formats, the small-number draw, the calendar schemes
+    data/index.ts           # VERSION_FORMATS, the part ranges, the pre-releases, CALVER_SCHEMES
   sentence/
     index.ts
     randSentence.ts         # public: string[], or SentenceDetail[] likewise
@@ -202,6 +207,7 @@ test/
   ram.test.ts
   resolution.test.ts
   sentence.test.ts
+  version.test.ts
   word.test.ts
 ```
 
@@ -287,6 +293,7 @@ lib/
     resolution/             # mirrors lib/resolution, plus `randResolutionDetails`
     sentence/               # mirrors lib/sentence, plus `randSentenceDetails`
       data/                 # one file per language, ported verbatim
+    version/                # mirrors lib/version, plus `randVersionDetails`
     location/               # mirrors lib/location, plus a `…Details` twin per function
       data/                 # en.dart ko.dart GENERATED by tools/location
 test/
@@ -309,6 +316,7 @@ test/
   ram_test.dart
   resolution_test.dart
   sentence_test.dart
+  version_test.dart
   word_test.dart
 example/
   randino_example.dart      # what pub.dev renders on the package's Example tab
@@ -390,6 +398,7 @@ src/randino/
   phone/                    # mirrors lib/phone
   ram/                      # mirrors lib/ram
   resolution/               # mirrors lib/resolution
+  version/                  # mirrors lib/version
   sentence/                 # mirrors lib/sentence
     data/                   # one file per language, ported verbatim
   location/                 # mirrors lib/location
@@ -415,6 +424,7 @@ tests/
   test_ram.py
   test_resolution.py
   test_sentence.py
+  test_version.py
   test_word.py
 ```
 
@@ -594,7 +604,7 @@ The run stops rather than writes when a file changes shape — new columns, an u
 
 **The dumps normalize what only differs because the languages differ, and nothing else.** A pool entry is `{ n, r }` everywhere; field names are the JavaScript ones; an optional field is present and null rather than absent; `syn` carries its `kind` tag even in the two packages that tell the shapes apart by type. That normalization lives in the three dumps — one per package, each responsible for its own language's spelling — so the comparison itself has nothing to know about any of them. Adding a field to a dataset means adding it to all three dumps, and the check reports a field only one dump writes as a difference, which is the intended failure.
 
-**Do not widen it into a general "the ports agree" check.** It covers the word, sentence, name and location datasets, the age bands and curve, the date units and default range, the phone plans and templates, the operating system catalog and the weight of each line, the device, processor and graphics catalogs, the architectures with their weights and aliases, the memory sizes and their weights, the disk types and their weights per platform, the disk sizes and their weights, the screen resolutions and their weights per platform, the gender labels and weights, the organization datasets and their odds, the stories and the field rules beside them, the surname romanization map, and the bounds in `constants` and `decorate/data` — the last of which is still written by hand in each package. The nickname shapes are in it now that they are `WordLanguageData.frames`: they were left out while they were a table private to each generator, and being data is what put them in. The sentence datasets are the same story on a larger scale, `THEME_CLASS` included, because a theme moving from one class to another changes what every verb of every language will accept.
+**Do not widen it into a general "the ports agree" check.** It covers the word, sentence, name and location datasets, the age bands and curve, the date units and default range, the phone plans and templates, the operating system catalog and the weight of each line, the device, processor and graphics catalogs, the architectures with their weights and aliases, the memory sizes and their weights, the disk types and their weights per platform, the disk sizes and their weights, the screen resolutions and their weights per platform, the version formats and the ranges their parts are drawn from, the gender labels and weights, the organization datasets and their odds, the stories and the field rules beside them, the surname romanization map, and the bounds in `constants` and `decorate/data` — the last of which is still written by hand in each package. The nickname shapes are in it now that they are `WordLanguageData.frames`: they were left out while they were a table private to each generator, and being data is what put them in. The sentence datasets are the same story on a larger scale, `THEME_CLASS` included, because a theme moving from one class to another changes what every verb of every language will accept.
 
 ## Testing a random generator
 
@@ -779,6 +789,7 @@ System values:
 - **A device or a part is drawn evenly, and its maker is written once.** Nothing weights one model over another; `type` and the years narrow the catalog and every model left is as likely as the next. `writeDevice` puts the maker in front unless the model already opens on the maker's name (`Xiaomi 14`, `OnePlus 12`, `Nothing Phone (2)`), so a model like that is written whole in its row, maker included. A desktop PC is not a device here: it has no model name of its own.
 - **A size is real, and it is whole in the unit it is written in.** `_internal/capacity` holds what memory and storage share: a pool of the sizes machines are sold with, weighted by hand in the order they are common in, and the units they are counted in — memory in powers of two, as an operating system reports it, and storage in powers of ten, as a drive is sold. `'auto'` writes each size in the largest unit it is whole in, and a named unit leaves out the sizes that are not whole in it rather than rounding 512 MB to `1 GB` or `0.5 GB`. Bounds are read in the unit, or in gigabytes for `'auto'`, and a range no real size is inside returns nothing. A size written without its unit is in one unit throughout, because a bare `512` and a bare `16` cannot be told apart.
 - **A resolution is the size a browser reports, not the panel's pixels.** A scaled display lays things out at its panel divided by the scale, so a 1920x1080 laptop at 125% is `1536x864` and a 14-inch MacBook Pro `1512x982`, and a phone or a tablet is written portrait, its width first. The platform is drawn before the size, so `'all'` is half of each whatever the table lists, and each platform's weights add up to a hundred — the suites assert it, and that 1920x1080 leads the desktops.
+- **A version is the one system value that is drawn, not picked.** No catalog lists the world's version numbers, so `randVersion` builds one: each part comes out of a range in `VERSION_PARTS` with a number weighted one over its distance from the bottom, which makes `0.x` and `x.y.0` common the way a registry has them. `format` defaults to `'semver'` rather than `'all'`, the way a date's `language` defaults to `'en'`: a column of versions is one scheme. A calendar version's year is kept inside 2000 to 2099 because CalVer's short year is the year less 2000, its default range 2010 to 2026 is fixed rather than counted from today, and a bound left out moves out of the way of the one that was written.
 - **The OS catalog runs to October 2026 and the device, processor and graphics catalogs to the end of 2025**, and a release after that is a row in all three packages. What was checked rather than remembered — the 2026 releases — was confirmed against the publishers' and the press's announcements before it went in.
 
 ## Adding a location language

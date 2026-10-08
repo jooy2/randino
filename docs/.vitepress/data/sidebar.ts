@@ -126,7 +126,8 @@ export const SIDEBAR: SidebarGroup[] = [
 								en: 'randArchitecture',
 								ko: 'randArchitecture'
 							},
-							{ path: 'resolution/rand-resolution', en: 'randResolution', ko: 'randResolution' }
+							{ path: 'resolution/rand-resolution', en: 'randResolution', ko: 'randResolution' },
+							{ path: 'version/rand-version', en: 'randVersion', ko: 'randVersion' }
 						]
 					},
 					{

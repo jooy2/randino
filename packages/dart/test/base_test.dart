@@ -86,6 +86,8 @@ void main() {
           'SentenceStyle',
           'SentenceTense',
           'SystemPlatform',
+          'VersionDetail',
+          'VersionFormat',
           'WordDetail',
           'WordLanguage',
           'WordSlot',
@@ -115,6 +117,7 @@ void main() {
           'nicknameLengthRange',
           'sentenceLengthRange',
           'systemPlatforms',
+          'versionFormats',
           'wordThemes',
           'randAge',
           'randAgeDetails',
@@ -203,6 +206,8 @@ void main() {
           'randTool',
           'randToy',
           'randVehicle',
+          'randVersion',
+          'randVersionDetails',
           'randWeather',
           'randWord',
           'randWordDetails',
@@ -330,6 +335,9 @@ void main() {
       expect(randArchitectureDetails()[0], isA<ArchitectureDetail>());
       expect(randResolution().single, matches(RegExp(r'^\d+x\d+$')));
       expect(randResolutionDetails()[0], isA<ResolutionDetail>());
+      expect(randVersion().single, matches(RegExp(r'^\d+\.\d+\.\d+$')));
+      expect(randVersionDetails()[0], isA<VersionDetail>());
+      expect(versionFormats, VersionFormat.values);
     });
 
     test('the bounds are the same numbers the JavaScript package uses', () {
@@ -431,6 +439,7 @@ void main() {
       twice(() => randGpu(count: 5, random: Random(42)).join());
       twice(() => randArchitecture(count: 5, includeRare: true, random: Random(42)).join());
       twice(() => randResolution(count: 5, random: Random(42)).join());
+      twice(() => randVersion(format: null, count: 5, random: Random(42)).join());
       twice(() => randOrganization(count: 5, random: Random(42)).join('|'));
       twice(() => randOrganization(count: 5, maxLength: 20, random: Random(42)).join('|'));
       twice(() => randSuffixAll(const ['a', 'b'], random: Random(42)).join());

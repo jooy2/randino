@@ -10,7 +10,7 @@ Every option and every example, with **JavaScript** picked in the sidebar. This 
 
 ---
 
-**randino** generates random person names, nicknames, words, sentences, real locations, ages, genders, organizations, dates and phone numbers in the language you ask for, and real operating systems, devices, processors, graphics, architectures, memory, storage and screen resolutions for a sample machine.
+**randino** generates random person names, nicknames, words, sentences, real locations, ages, genders, organizations, dates and phone numbers in the language you ask for, and real operating systems, devices, processors, graphics, architectures, memory, storage and screen resolutions for a sample machine, and software version numbers.
 
 - **Person names** read like names people carry: Emma Clover, Jack Reeves, each with its English pronunciation. 9 languages.
 - **Nicknames** are handles for a game or a website: MistyOwl, CraneVoyage, RustyBoot. Built from everyday words across twenty-nine themes, and never from person names.
@@ -22,7 +22,7 @@ Every option and every example, with **JavaScript** picked in the sidebar. This 
 - **Organizations** are companies, schools, offices and associations that do not exist, from `randOrganization`: (주)새솔테크, Westbrook High School, Stadtwerke Bergtal.
 - **Dates** are drawn evenly from a range and written out in UTC by a format of your own, from `randDate`, or one part at a time.
 - **Phone numbers** are written the way their country writes them, from `randPhone`, in nine countries. They open on blocks the country really gives out, so one can by chance be real: sample data, never a number to call.
-- **System values** describe a sample machine with real products: an operating system from `randOs`, written the way its release is known, `Windows 11 Pro 23H2 (Build 22631)`, a phone, tablet or laptop from `randDevice`, `Apple iPhone 15 Pro`, its processor and graphics from `randCpu` and `randGpu`, `Intel Core i7-13700K`, `NVIDIA GeForce RTX 4090`, the architecture from `randArchitecture`, `x86_64`, its memory from `randRam`, `16 GB`, its storage from `randDiskType` and `randDiskSize`, `SSD`, `1 TB`, and its screen from `randResolution`, `1920x1080`.
+- **System values** describe a sample machine with real products: an operating system from `randOs`, written the way its release is known, `Windows 11 Pro 23H2 (Build 22631)`, a phone, tablet or laptop from `randDevice`, `Apple iPhone 15 Pro`, its processor and graphics from `randCpu` and `randGpu`, `Intel Core i7-13700K`, `NVIDIA GeForce RTX 4090`, the architecture from `randArchitecture`, `x86_64`, its memory from `randRam`, `16 GB`, its storage from `randDiskType` and `randDiskSize`, `SSD`, `1 TB`, its screen from `randResolution`, `1920x1080`, and a version number from `randVersion`, `2.14.3`.
 - **Decorators** attach something to a string you already have: `randSuffix`, `randPrefix` and `randModifier`.
 - One options object per generator, every option optional: `randName()` on its own works.
 - **No runtime dependencies.** ESM, typed, and it runs in Node and in the browser alike.
@@ -596,6 +596,33 @@ randResolution({ output: 'detail' });
 | `unique`    | `boolean`              | `false`   |
 | `output`    | `'value' \| 'detail'`  | `'value'` |
 
+### Versions
+
+Software version numbers, in one of three formats: `semver` (`2.14.3`), `calver`, counted from a year (`2024.3.1`, `24.04`, `2024.03.15`), or `number`, a version that is one number (`42`). Every part is drawn with the small numbers most often, so `0.x` and `x.y.0` come up the way they do in a registry.
+
+```javascript
+import { randVersion } from 'randino';
+
+randVersion({ count: 3 }); // ['2.14.3', '0.4.0', '1.0.2']
+randVersion({ format: 'calver', minYear: 2022 }); // ['2024.3.1']
+randVersion({ format: 'all', prefix: 'v', count: 3 }); // ['v1.4.0', 'v24.04', 'v42']
+randVersion({ includePrerelease: true, count: 2 }); // ['3.0.0-rc.1', '0.12.2']
+
+randVersion({ output: 'detail' });
+// [{ version: '2.14.3', format: 'semver', scheme: 'MAJOR.MINOR.PATCH', parts: [2, 14, 3], prerelease: null, year: null }]
+```
+
+| Option              | Type                  | Default    |
+| ------------------- | --------------------- | ---------- |
+| `format`            | `VersionFormatOption` | `'semver'` |
+| `prefix`            | `string`              | `''`       |
+| `includePrerelease` | `boolean`             | `false`    |
+| `minYear`           | `number`              | `2010`     |
+| `maxYear`           | `number`              | `2026`     |
+| `count`             | `number`              | `1`        |
+| `unique`            | `boolean`             | `false`    |
+| `output`            | `'value' \| 'detail'` | `'value'`  |
+
 ## Decorators
 
 `randSuffix`, `randPrefix` and `randModifier` attach something to a string you already have, rather than generating one. They take anything, not just this library's output, which is why none of them is an option on a generator. Each of them also works with no value at all, handing back the thing it would have attached.
@@ -666,7 +693,7 @@ sentenceLengthRange('ko'); // [5, 43]
 wordLengthRange('ko'); // [1, 4]
 ```
 
-`NAME_LANGUAGES`, `WORD_LANGUAGES`, `WORD_THEMES`, `AGE_GROUPS`, `ORGANIZATION_TYPES`, `ORGANIZATION_INDUSTRIES`, `DATE_UNITS`, `PHONE_COUNTRIES`, `PHONE_TYPES`, `SYSTEM_PLATFORMS`, `DEVICE_TYPES`, `RAM_UNITS`, `DISK_TYPES`, `DISK_UNITS` and `ARCHITECTURES` list what the generators accept; `RAND_COUNT_MAX`, `RAND_LENGTH_MIN` / `_MAX`, `RAND_SENTENCE_LENGTH_MAX`, `RAND_AGE_MAX`, `RAND_ORGANIZATION_LENGTH_MAX`, `AFFIX_LENGTH_DEFAULT` / `_MAX`, `AFFIX_SEPARATOR_DEFAULT` and `AFFIX_CHARSET` are the bounds and defaults every option is clamped to.
+`NAME_LANGUAGES`, `WORD_LANGUAGES`, `WORD_THEMES`, `AGE_GROUPS`, `ORGANIZATION_TYPES`, `ORGANIZATION_INDUSTRIES`, `DATE_UNITS`, `PHONE_COUNTRIES`, `PHONE_TYPES`, `SYSTEM_PLATFORMS`, `DEVICE_TYPES`, `RAM_UNITS`, `DISK_TYPES`, `DISK_UNITS`, `ARCHITECTURES` and `VERSION_FORMATS` list what the generators accept; `RAND_COUNT_MAX`, `RAND_LENGTH_MIN` / `_MAX`, `RAND_SENTENCE_LENGTH_MAX`, `RAND_AGE_MAX`, `RAND_ORGANIZATION_LENGTH_MAX`, `AFFIX_LENGTH_DEFAULT` / `_MAX`, `AFFIX_SEPARATOR_DEFAULT` and `AFFIX_CHARSET` are the bounds and defaults every option is clamped to.
 
 ## Development
 

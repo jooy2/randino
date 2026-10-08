@@ -332,7 +332,8 @@ import {
 	DISK_TYPES,
 	DISK_UNITS,
 	RAM_UNITS,
-	SYSTEM_PLATFORMS
+	SYSTEM_PLATFORMS,
+	VERSION_FORMATS
 } from 'randino';
 ```
 
@@ -344,6 +345,7 @@ import {
 | `DISK_TYPES`       | `DiskType[]`       | `['hdd', 'ssd', 'sshd', 'emmc', 'ufs']`             |
 | `DISK_UNITS`       | `DiskUnit[]`       | `['MB', 'GB', 'TB']`                                |
 | `ARCHITECTURES`    | `Architecture[]`   | `['x86_64', 'arm64', 'x86', 'armv7', 'riscv64', …]` |
+| `VERSION_FORMATS`  | `VersionFormat[]`  | `['semver', 'calver', 'number']`                    |
 
 :::
 
@@ -361,6 +363,7 @@ import 'package:randino/randino.dart';
 | `diskTypes`       | `List<DiskType>`       | `hdd`, `ssd`, `sshd`, `emmc`, then `ufs`      |
 | `diskUnits`       | `List<DiskUnit>`       | `mb`, `gb`, then `tb`                         |
 | `architectures`   | `List<String>`         | The four common ones first, then the rare six |
+| `versionFormats`  | `List<VersionFormat>`  | `semver`, `calver`, then `number`             |
 
 :::
 
@@ -374,6 +377,7 @@ from randino import (
     DISK_UNITS,
     RAM_UNITS,
     SYSTEM_PLATFORMS,
+    VERSION_FORMATS,
 )
 ```
 
@@ -385,6 +389,7 @@ from randino import (
 | `DISK_TYPES` | `tuple[DiskType, …]` | `('hdd', 'ssd', 'sshd', 'emmc', 'ufs')` |
 | `DISK_UNITS` | `tuple[DiskUnit, …]` | `('MB', 'GB', 'TB')` |
 | `ARCHITECTURES` | `tuple[Architecture, …]` | `('x86_64', 'arm64', 'x86', 'armv7', 'riscv64', …)` |
+| `VERSION_FORMATS` | `tuple[VersionFormat, …]` | `('semver', 'calver', 'number')` |
 
 :::
 
@@ -572,8 +577,12 @@ import type {
 	RamDetail,
 	RamUnit,
 	RamUnitOption,
+	ResolutionDetail,
 	SystemPlatform,
 	SystemPlatformOption,
+	VersionDetail,
+	VersionFormat,
+	VersionFormatOption,
 	WordLanguage,
 	WordLanguageOption,
 	WordTheme,
@@ -612,6 +621,8 @@ import type {
 	RandOsOptions,
 	RandPhoneOptions,
 	RandRamOptions,
+	RandResolutionOptions,
+	RandVersionOptions,
 	RandOutput
 } from 'randino';
 
@@ -634,13 +645,13 @@ AgeGroup, AgeDistribution, DateUnit, DeviceType, DiskType, DiskUnit, GenderCode
 NameLanguage, NameGender, NameScript
 OrganizationType, OrganizationIndustry
 PhoneCountry, PhoneType
-RamUnit, SystemPlatform
+RamUnit, SystemPlatform, VersionFormat
 WordLanguage, WordTheme
 LocationLanguage, LocationLevel
 
 // Values
 LengthRange, AgeDetail, ArchitectureDetail, CpuDetail, DateDetail, DeviceDetail, DiskSizeDetail, DiskTypeDetail, GenderDetail, GpuDetail, NameDetail, NicknameDetail, LocationDetail, CountryDetail,
-OrganizationDetail, OsDetail, PhoneDetail, RamDetail
+OrganizationDetail, OsDetail, PhoneDetail, RamDetail, ResolutionDetail, VersionDetail
 ```
 
 There is no `…Option` type and no `all` member: **a null enum is what means "every one of them"**, so the parameter you do not write is already the mixed draw. That also means the helpers take the same type the generators do, rather than a narrower one.
@@ -683,8 +694,12 @@ from randino import (
     RamDetail,
     RamUnit,
     RamUnitOption,
+    ResolutionDetail,
     SystemPlatform,
     SystemPlatformOption,
+    VersionDetail,
+    VersionFormat,
+    VersionFormatOption,
     WordLanguage,
     WordLanguageOption,
     WordTheme,

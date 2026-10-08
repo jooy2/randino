@@ -87,6 +87,9 @@ from randino._types import (
     SentenceTypeOption,
     SystemPlatform,
     SystemPlatformOption,
+    VersionDetail,
+    VersionFormat,
+    VersionFormatOption,
     WordDetail,
     WordLanguage,
     WordLanguageOption,
@@ -146,6 +149,7 @@ from randino.phone import PHONE_COUNTRIES, PHONE_TYPES, rand_phone
 from randino.ram import RAM_UNITS, rand_ram
 from randino.resolution import rand_resolution
 from randino.sentence import rand_sentence, sentence_length_range
+from randino.version import VERSION_FORMATS, rand_version
 from randino.word import (
     WORD_LANGUAGES,
     WORD_THEMES,
@@ -210,6 +214,7 @@ __all__ = [
     "RAND_SENTENCE_COUNT_MAX",
     "RAND_SENTENCE_LENGTH_MAX",
     "SYSTEM_PLATFORMS",
+    "VERSION_FORMATS",
     "WORD_LANGUAGES",
     "WORD_THEMES",
     "AgeDetail",
@@ -276,6 +281,9 @@ __all__ = [
     "SentenceTypeOption",
     "SystemPlatform",
     "SystemPlatformOption",
+    "VersionDetail",
+    "VersionFormat",
+    "VersionFormatOption",
     "WordDetail",
     "WordLanguage",
     "WordLanguageOption",
@@ -340,6 +348,7 @@ __all__ = [
     "rand_tool",
     "rand_toy",
     "rand_vehicle",
+    "rand_version",
     "rand_weather",
     "rand_word",
     "sentence_length_range",

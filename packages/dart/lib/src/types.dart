@@ -1446,3 +1446,53 @@ class ResolutionDetail {
   @override
   String toString() => 'ResolutionDetail($resolution, ${platform.name})';
 }
+
+/// How a software version is numbered.
+enum VersionFormat {
+  /// Semantic versioning: `2.14.3`, with a pre-release such as `-beta.2` when
+  /// one is asked for.
+  semver,
+
+  /// Calendar versioning, counted from a year: `2024.3.1`, `24.04`, `2024.03.15`.
+  calver,
+
+  /// A version that is one number, the way a browser's is: `42`.
+  number,
+}
+
+/// A generated software version, with the numbers it is made of.
+class VersionDetail {
+  /// Creates a detail record. Returned by the generator; there is rarely a
+  /// reason to build one by hand outside a test.
+  const VersionDetail({
+    required this.version,
+    required this.format,
+    required this.scheme,
+    required this.parts,
+    required this.prerelease,
+    required this.year,
+  });
+
+  /// The version as `randVersion` returns it, prefix included: `v2.14.3`.
+  final String version;
+
+  /// How it is numbered.
+  final VersionFormat format;
+
+  /// How it is numbered, in CalVer's notation: `MAJOR.MINOR.PATCH` for a
+  /// semantic version, `MAJOR` for a single number, `YYYY.MM.MICRO` or `YY.0M`
+  /// for a calendar one.
+  final String scheme;
+
+  /// The numbers in the order they are written: `[2, 14, 3]`, `[24, 4]`.
+  final List<int> parts;
+
+  /// The pre-release, without its hyphen: `beta.2`. Null when there is none.
+  final String? prerelease;
+
+  /// The year a calendar version is counted from, in full. Null for the others.
+  final int? year;
+
+  @override
+  String toString() => 'VersionDetail($version, ${format.name})';
+}

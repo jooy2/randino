@@ -1588,3 +1588,62 @@ export interface ResolutionDetail {
 	height: number;
 	platform: SystemPlatform;
 }
+
+/**
+ * How a software version is numbered: `semver` (`2.14.3`), `calver` for one
+ * counted from the calendar (`2024.3.1`, `24.04`), or `number` for a version that
+ * is one number (`42`).
+ */
+export type VersionFormat = 'semver' | 'calver' | 'number';
+
+/** One format, several, or `'all'` of them. */
+export type VersionFormatOption = VersionFormat | readonly VersionFormat[] | 'all';
+
+/** What `randVersion` takes. A version has no language and no length. */
+export interface RandVersionOptions extends Pick<
+	RandCommonOptions,
+	'count' | 'unique' | 'output' | 'random'
+> {
+	/**
+	 * How the version is numbered. Several formats are drawn evenly, one per
+	 * result. Default `'semver'`: a column of versions is one scheme, so `'all'`
+	 * is an ask rather than the default.
+	 */
+	format?: VersionFormatOption;
+	/** Written in front of every version: `'v'` writes `v2.14.3`. Default `''`. */
+	prefix?: string;
+	/**
+	 * Give a semantic version a pre-release now and then: `2.0.0-beta.2`. About one
+	 * in four carries one. Default `false`.
+	 */
+	includePrerelease?: boolean;
+	/**
+	 * The earliest year a calendar version may be counted from. Kept inside 2000 to
+	 * 2099. Default `2010`.
+	 */
+	minYear?: number;
+	/**
+	 * The latest year a calendar version may be counted from. A range the wrong way
+	 * round keeps `maxYear`. Default `2026`, or `minYear` when that is later.
+	 */
+	maxYear?: number;
+}
+
+/** A generated software version, with the numbers it is made of. */
+export interface VersionDetail {
+	/** The version as the value form returns it, prefix included: `v2.14.3`. */
+	version: string;
+	format: VersionFormat;
+	/**
+	 * How it is numbered, in CalVer's notation: `MAJOR.MINOR.PATCH` for a semantic
+	 * version, `MAJOR` for a single number, `YYYY.MM.MICRO` or `YY.0M` for a
+	 * calendar one.
+	 */
+	scheme: string;
+	/** The numbers in the order they are written: `[2, 14, 3]`, `[24, 4]`. */
+	parts: number[];
+	/** The pre-release, without its hyphen: `beta.2`. `null` when there is none. */
+	prerelease: string | null;
+	/** The year a calendar version is counted from, in full. `null` for the others. */
+	year: number | null;
+}

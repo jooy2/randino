@@ -17,5 +17,6 @@ export * from './phone/index.js';
 export * from './ram/index.js';
 export * from './resolution/index.js';
 export * from './sentence/index.js';
+export * from './version/index.js';
 export * from './word/index.js';
 export type * from './_types/global.js';
