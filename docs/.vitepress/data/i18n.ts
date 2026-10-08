@@ -155,8 +155,12 @@ const strings = {
 	demoDates: { ko: '날짜', en: 'Dates' },
 	demoPhones: { ko: '전화번호', en: 'Phone numbers' },
 	demoPhoneNote: {
-		ko: '뽑은 번호는 우연히 실제 누군가의 번호일 수 있습니다. 샘플 데이터로만 쓰고, 전화하거나 문자를 보내지 마세요.',
-		en: "A drawn number can by chance be somebody's. Use it as sample data, and never call or text it."
+		ko: '뽑은 번호는 우연히 실제 누군가의 번호일 수 있습니다. 샘플 데이터로만 쓰고, 전화하거나 문자를 보내지 마세요. 화면에 보여 줄 번호라면 fictional을 켜세요.',
+		en: "A drawn number can by chance be somebody's. Use it as sample data, and never call or text it — or turn on fictional for a number that is safe to show."
+	},
+	demoNoFiction: {
+		ko: '고른 나라는 창작물용 번호를 따로 정해 두지 않았습니다. fictional은 미국과 독일에서만 번호를 돌려줍니다.',
+		en: 'The country picked sets aside no numbers for fiction. fictional returns numbers for the United States and Germany only.'
 	},
 	demoFunction: { ko: '함수', en: 'Function' },
 	demoIncludeHint: {

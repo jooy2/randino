@@ -246,6 +246,8 @@ const date = reactive({
 	minDate: '',
 	maxDate: '',
 	format: '',
+	language: 'en',
+	utcOffset: '',
 	unit: '',
 	count: 8,
 	unique: false
@@ -271,6 +273,7 @@ const phone = reactive({
 	type: 'mobile',
 	includeCountryCode: false,
 	separator: OWN_SEPARATOR,
+	fictional: false,
 	count: 8,
 	unique: false
 });
@@ -362,6 +365,8 @@ const options = computed(() => {
 		if (date.minDate.trim()) out.minDate = date.minDate.trim();
 		if (date.maxDate.trim()) out.maxDate = date.maxDate.trim();
 		if (date.format) out.format = date.format;
+		if (date.language !== 'en') out.language = date.language;
+		if (date.utcOffset.trim()) out.utcOffset = date.utcOffset.trim();
 		if (date.unit) out.unit = date.unit;
 		if (date.count !== 1) out.count = Number(date.count);
 		if (date.unique) out.unique = true;
@@ -374,6 +379,7 @@ const options = computed(() => {
 		if (phone.type !== 'mobile') out.type = phone.type;
 		if (phone.includeCountryCode) out.includeCountryCode = true;
 		if (phone.separator !== OWN_SEPARATOR) out.separator = phone.separator;
+		if (phone.fictional) out.fictional = true;
 		if (phone.count !== 1) out.count = Number(phone.count);
 		if (phone.unique) out.unique = true;
 
@@ -583,7 +589,9 @@ function generate() {
 			items = drawn.map((detail) => (date.unit ? String(detail[date.unit]) : detail.date));
 			meta = drawn.map((detail) => [
 				['date', detail.date],
-				['timestamp', String(detail.timestamp)]
+				['timestamp', String(detail.timestamp)],
+				['weekday', String(detail.weekday)],
+				['language', detail.language]
 			]);
 		} else {
 			items = randDate(config).map(String);
@@ -724,6 +732,12 @@ const levelMissing = computed(
 		num(place.minLength) === undefined &&
 		num(place.maxLength) === undefined
 );
+
+/**
+ * Whether an empty phone result is `fictional` asking a country that reserves no
+ * numbers for fiction — the only way a phone call comes back empty.
+ */
+const noFiction = computed(() => tab.value === 'phone' && phone.fictional);
 
 /* ---------------------------------------------------------------------------
  * The call, written out
@@ -971,6 +985,21 @@ async function copy() {
 				</label>
 
 				<label class="randino-demo-field">
+					<span><code>language</code></span>
+					<select v-model="date.language">
+						<option value="all">all</option>
+						<option v-for="code_ in WORD_LANGUAGES" :key="code_" :value="code_">
+							{{ code_ }} — {{ LANGUAGE_NAMES[code_] }}
+						</option>
+					</select>
+				</label>
+
+				<label class="randino-demo-field">
+					<span><code>utcOffset</code></span>
+					<input v-model="date.utcOffset" type="text" placeholder="Z" />
+				</label>
+
+				<label class="randino-demo-field">
 					<span><code>unit</code></span>
 					<select v-model="date.unit">
 						<option value="">—</option>
@@ -1024,6 +1053,11 @@ async function copy() {
 				<label class="randino-demo-check">
 					<input v-model="phone.includeCountryCode" type="checkbox" />
 					<code>includeCountryCode</code>
+				</label>
+
+				<label class="randino-demo-check">
+					<input v-model="phone.fictional" type="checkbox" />
+					<code>fictional</code>
 				</label>
 
 				<label class="randino-demo-check">
@@ -1520,7 +1554,7 @@ async function copy() {
 			</ul>
 
 			<p v-else class="randino-demo-note">
-				{{ t(locale, levelMissing ? 'demoNoLevel' : 'demoEmpty') }}
+				{{ t(locale, noFiction ? 'demoNoFiction' : levelMissing ? 'demoNoLevel' : 'demoEmpty') }}
 			</p>
 
 			<p v-if="rows.length && rows.length < asked" class="randino-demo-note">

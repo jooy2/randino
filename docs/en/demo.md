@@ -36,6 +36,9 @@ Everything below runs in your browser. The controls are the options `randName`, 
 - Type `YYYY년 M월 D일 A h:mm` into `format`, then `[Day] D` and `Day D`. Text outside brackets is read for tokens, so the last one comes out as something like `5amy 5`: both `D` and `a` are tokens.
 - On the phone tab, switch `country` between `KR`, `US` and `RU`. Each writes its numbers its own way: dashes, a bracketed area code, the trunk `8` in front.
 - Turn on `includeCountryCode` and set `separator` to `''`. That is E.164, the form an SMS gateway expects — and the detail carries it whatever the other options say. A number like this can by chance be real, so it is for a form under test, not for sending anything to.
+- Turn on `fictional` with `country` on `all`. Only US and German numbers come back, `555-01xx` and the Bundesnetzagentur's drama numbers, because those are the two countries that set numbers aside for films and books; pick `KR` and nothing comes back at all, rather than a real number.
+- Back on the dates tab, type `dddd, D MMMM YYYY` into `format` and switch `language` to `de`, `ru` and `ko`. The names change and the digits stay; Russian writes its month in the genitive, the way a date needs it.
+- Set `utcOffset` to `+09:00` and leave `format` empty. The dates end on `+09:00` rather than `Z`, and setting `minDate` and `maxDate` to the same day keeps every date on that day in Seoul.
 
 ## The scope of this page {#what-this-page-is-not}
 
