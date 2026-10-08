@@ -40,6 +40,7 @@ from randino.decorate.data import (
 from randino.device.data import DEVICE_TYPES, DEVICES
 from randino.disk.data import DISK_SCALE, DISK_TYPE_LABELS, DISK_TYPE_WEIGHTS, DISK_TYPES
 from randino.gender.data import GENDER_CODES, GENDER_LABELS, GENDER_WEIGHTS
+from randino.gpu.data import GPUS
 from randino.location.data import LOCATION_DATA, LOCATION_LANGUAGES, LOCATION_LEVELS
 from randino.location.data.countries import COUNTRIES
 from randino.name.data import NAME_DATA, NAME_LANGUAGES
@@ -550,6 +551,11 @@ print(
             "cpu": {
                 f"{entry.vendor} {entry.model}": {"platform": entry.platform, "year": entry.year}
                 for entry in CPUS
+            },
+            # One entry per graphics processor, keyed the same way.
+            "gpu": {
+                f"{entry.vendor} {entry.model}": {"platform": entry.platform, "year": entry.year}
+                for entry in GPUS
             },
             # One entry per device, keyed by its maker and model, so a device one package
             # holds and another does not is reported as itself.

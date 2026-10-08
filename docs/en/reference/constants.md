@@ -531,6 +531,7 @@ import type {
 	AgeGroupOption,
 	GenderCode,
 	GenderDetail,
+	GpuDetail,
 	NameDetail,
 	NameGender,
 	NameGenderOption,
@@ -583,6 +584,7 @@ import type {
 	RandDiskSizeOptions,
 	RandDiskTypeOptions,
 	RandGenderOptions,
+	RandGpuOptions,
 	RandLocationOptions,
 	RandNameOptions,
 	RandNicknameOptions,
@@ -617,7 +619,7 @@ WordLanguage, WordTheme
 LocationLanguage, LocationLevel
 
 // Values
-LengthRange, AgeDetail, CpuDetail, DateDetail, DeviceDetail, DiskSizeDetail, DiskTypeDetail, GenderDetail, NameDetail, NicknameDetail, LocationDetail, CountryDetail,
+LengthRange, AgeDetail, CpuDetail, DateDetail, DeviceDetail, DiskSizeDetail, DiskTypeDetail, GenderDetail, GpuDetail, NameDetail, NicknameDetail, LocationDetail, CountryDetail,
 OrganizationDetail, OsDetail, PhoneDetail, RamDetail
 ```
 
@@ -637,6 +639,7 @@ from randino import (
     AgeGroupOption,
     GenderCode,
     GenderDetail,
+    GpuDetail,
     NameDetail,
     NameGender,
     NameGenderOption,

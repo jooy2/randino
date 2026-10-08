@@ -62,6 +62,7 @@ describe('base test', () => {
 			'randFurniture',
 			'randGem',
 			'randGender',
+			'randGpu',
 			'randJob',
 			'randLocation',
 			'randModifier',
@@ -210,6 +211,7 @@ describe('base test', () => {
 		assert.match(randino.randDiskSize()[0], /^\d+ (GB|TB)$/);
 		assert.deepStrictEqual(randino.DISK_UNITS, ['MB', 'GB', 'TB']);
 		assert.strictEqual(typeof randino.randCpu()[0], 'string');
+		assert.strictEqual(typeof randino.randGpu()[0], 'string');
 	});
 
 	it('an option the types rule out falls back rather than throwing', () => {
@@ -361,6 +363,7 @@ describe('base test', () => {
 		agrees(() => randino.randDiskType({ count: 5, random: seeded(42) }));
 		agrees(() => randino.randDiskSize({ count: 5, random: seeded(42) }));
 		agrees(() => randino.randCpu({ count: 5, random: seeded(42) }));
+		agrees(() => randino.randGpu({ count: 5, random: seeded(42) }));
 
 		// Two different seeds are two different answers, so the source is actually
 		// what the draws are coming from.

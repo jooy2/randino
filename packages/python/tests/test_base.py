@@ -48,6 +48,7 @@ def test_the_package_exports_exactly_its_public_api() -> None:
         "DiskUnitOption",
         "GenderCode",
         "GenderDetail",
+        "GpuDetail",
         "LOCATION_LANGUAGES",
         "LOCATION_LEVELS",
         "LocationDetail",
@@ -140,6 +141,7 @@ def test_the_package_exports_exactly_its_public_api() -> None:
         "rand_furniture",
         "rand_gem",
         "rand_gender",
+        "rand_gpu",
         "rand_job",
         "rand_location",
         "rand_modifier",
@@ -275,6 +277,7 @@ def test_the_functions_are_callable_and_the_constants_are_what_they_claim() -> N
     assert re.fullmatch(r"\d+ (GB|TB)", randino.rand_disk_size()[0])
     assert randino.DISK_UNITS == ("MB", "GB", "TB")
     assert isinstance(randino.rand_cpu()[0], str)
+    assert isinstance(randino.rand_gpu()[0], str)
 
 
 def test_the_package_imports_nothing_outside_the_standard_library() -> None:
@@ -366,6 +369,7 @@ def test_an_option_the_types_rule_out_falls_back_rather_than_raising() -> None:
         lambda: loose.rand_disk_type(platform="server", count="x"),
         lambda: loose.rand_disk_size(unit="PB", min_size=float("nan"), include_unit=0),
         lambda: loose.rand_cpu(platform="server", max_year=float("nan"), include_vendor="no"),
+        lambda: loose.rand_gpu(platform="console", min_year="x", count=float("nan")),
         lambda: loose.rand_gender(language="xx", count=float("nan")),
         lambda: loose.rand_gender(include_unknown="yes"),
         lambda: loose.rand_organization(language="xx", type="shop"),
@@ -436,6 +440,7 @@ def test_random_is_where_every_draw_of_a_call_comes_from() -> None:
     twice(lambda: randino.rand_disk_type(count=5, random=Random(42).random))
     twice(lambda: randino.rand_disk_size(count=5, random=Random(42).random))
     twice(lambda: randino.rand_cpu(count=5, random=Random(42).random))
+    twice(lambda: randino.rand_gpu(count=5, random=Random(42).random))
 
     # Two different seeds are two different answers, so the source is actually what
     # the draws are coming from.

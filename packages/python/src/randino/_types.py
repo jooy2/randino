@@ -897,3 +897,23 @@ class CpuDetail:
 
     year: int
     """The year the first machines with it went on sale."""
+
+
+@dataclass(frozen=True, slots=True)
+class GpuDetail:
+    """A generated graphics processor with the pieces it was written from."""
+
+    gpu: str
+    """The graphics processor as the value form returns it: `NVIDIA GeForce RTX 4090`."""
+
+    vendor: str
+    """Who sells it under their name: `NVIDIA`."""
+
+    model: str
+    """The graphics processor's own name: `GeForce RTX 4090`."""
+
+    platform: SystemPlatform
+    """The kind of machine it is built into."""
+
+    year: int
+    """The year the first cards or machines with it went on sale."""

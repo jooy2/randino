@@ -63,6 +63,8 @@ export 'src/disk/rand_disk_type.dart' show randDiskType;
 export 'src/disk/rand_disk_type_details.dart' show randDiskTypeDetails;
 export 'src/gender/rand_gender.dart' show randGender;
 export 'src/gender/rand_gender_details.dart' show randGenderDetails;
+export 'src/gpu/rand_gpu.dart' show randGpu;
+export 'src/gpu/rand_gpu_details.dart' show randGpuDetails;
 export 'src/location/data/index.dart' show locationLanguages, locationLevels;
 export 'src/location/rand_city.dart' show randCity;
 export 'src/location/rand_city_details.dart' show randCityDetails;
@@ -114,6 +116,7 @@ export 'src/types.dart'
         DiskUnit,
         GenderCode,
         GenderDetail,
+        GpuDetail,
         LengthRange,
         LocationDetail,
         LocationLanguage,

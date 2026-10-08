@@ -186,4 +186,5 @@ rand_cpu(output="detail")
 ## 함께 보기 {#see-also}
 
 - [`randDevice`](../device/rand-device) — 이 프로세서가 들어갈 만한 휴대폰, 태블릿, 노트북.
+- [`randGpu`](../gpu/rand-gpu) — 함께 들어가는 그래픽.
 - [`randRam`](../ram/rand-ram) — 함께 들어가는 메모리.

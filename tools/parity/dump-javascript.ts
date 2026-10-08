@@ -41,6 +41,7 @@ import {
 	DISK_TYPE_LABELS,
 	DISK_TYPE_WEIGHTS
 } from '../../packages/javascript/lib/disk/data/index.js';
+import { GPUS } from '../../packages/javascript/lib/gpu/data/index.js';
 import {
 	GENDER_CODES,
 	GENDER_LABELS,
@@ -304,6 +305,13 @@ console.log(
 		// One entry per processor, keyed by its maker and model, the way the devices are.
 		cpu: Object.fromEntries(
 			CPUS.map((entry) => [
+				`${entry.vendor} ${entry.model}`,
+				{ platform: entry.platform, year: entry.year }
+			])
+		),
+		// One entry per graphics processor, keyed the same way.
+		gpu: Object.fromEntries(
+			GPUS.map((entry) => [
 				`${entry.vendor} ${entry.model}`,
 				{ platform: entry.platform, year: entry.year }
 			])

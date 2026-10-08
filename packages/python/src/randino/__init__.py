@@ -42,6 +42,7 @@ from randino._types import (
     DiskUnitOption,
     GenderCode,
     GenderDetail,
+    GpuDetail,
     LocationDetail,
     LocationLanguage,
     LocationLanguageOption,
@@ -117,6 +118,7 @@ from randino.decorate import (
 from randino.device import DEVICE_TYPES, rand_device
 from randino.disk import DISK_TYPES, DISK_UNITS, rand_disk_size, rand_disk_type
 from randino.gender import rand_gender
+from randino.gpu import rand_gpu
 from randino.location import (
     LOCATION_LANGUAGES,
     LOCATION_LEVELS,
@@ -223,6 +225,7 @@ __all__ = [
     "DiskUnitOption",
     "GenderCode",
     "GenderDetail",
+    "GpuDetail",
     "LocationDetail",
     "LocationLanguage",
     "LocationLanguageOption",
@@ -296,6 +299,7 @@ __all__ = [
     "rand_furniture",
     "rand_gem",
     "rand_gender",
+    "rand_gpu",
     "rand_job",
     "rand_location",
     "rand_modifier",

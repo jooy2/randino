@@ -1355,3 +1355,34 @@ class CpuDetail {
   @override
   String toString() => 'CpuDetail($cpu, ${platform.name}, $year)';
 }
+
+/// A generated graphics processor with the pieces it was written from.
+class GpuDetail {
+  /// Creates a detail record. Returned by the generator; there is rarely a
+  /// reason to build one by hand outside a test.
+  const GpuDetail({
+    required this.gpu,
+    required this.vendor,
+    required this.model,
+    required this.platform,
+    required this.year,
+  });
+
+  /// The graphics processor as `randGpu` returns it: `NVIDIA GeForce RTX 4090`.
+  final String gpu;
+
+  /// Who sells it under their name: `NVIDIA`.
+  final String vendor;
+
+  /// The graphics processor's own name: `GeForce RTX 4090`.
+  final String model;
+
+  /// The kind of machine it is built into.
+  final SystemPlatform platform;
+
+  /// The year the first cards or machines with it went on sale.
+  final int year;
+
+  @override
+  String toString() => 'GpuDetail($gpu, ${platform.name}, $year)';
+}

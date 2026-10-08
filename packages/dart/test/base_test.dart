@@ -53,6 +53,7 @@ void main() {
           'DiskUnit',
           'GenderCode',
           'GenderDetail',
+          'GpuDetail',
           'LengthRange',
           'LocationDetail',
           'LocationLanguage',
@@ -145,6 +146,8 @@ void main() {
           'randFurniture',
           'randGender',
           'randGenderDetails',
+          'randGpu',
+          'randGpuDetails',
           'randGem',
           'randJob',
           'randLengthMax',
@@ -314,6 +317,8 @@ void main() {
       expect(diskUnits, DiskUnit.values);
       expect(randCpu(), hasLength(1));
       expect(randCpuDetails()[0], isA<CpuDetail>());
+      expect(randGpu(), hasLength(1));
+      expect(randGpuDetails()[0], isA<GpuDetail>());
     });
 
     test('the bounds are the same numbers the JavaScript package uses', () {
@@ -412,6 +417,7 @@ void main() {
       twice(() => randDiskType(count: 5, random: Random(42)).join());
       twice(() => randDiskSize(count: 5, random: Random(42)).join());
       twice(() => randCpu(count: 5, random: Random(42)).join());
+      twice(() => randGpu(count: 5, random: Random(42)).join());
       twice(() => randOrganization(count: 5, random: Random(42)).join('|'));
       twice(() => randOrganization(count: 5, maxLength: 20, random: Random(42)).join('|'));
       twice(() => randSuffixAll(const ['a', 'b'], random: Random(42)).join());

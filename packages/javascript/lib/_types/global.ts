@@ -1472,3 +1472,44 @@ export interface CpuDetail {
 	/** The year the first machines with it went on sale. */
 	year: number;
 }
+
+/**
+ * What `randGpu` takes. A graphics processor is a real part with a real name, so
+ * it has no language, no length and nothing to invent.
+ */
+export interface RandGpuOptions extends Pick<
+	RandCommonOptions,
+	'count' | 'unique' | 'output' | 'random'
+> {
+	/**
+	 * Desktop cards, laptop GPUs and the graphics built into a PC processor, the
+	 * GPUs inside the chips of phones and tablets, or both. Default `'all'`.
+	 */
+	platform?: SystemPlatformOption;
+	/** The earliest year the first cards or machines with it went on sale. Default none. */
+	minYear?: number;
+	/**
+	 * The latest year the first cards or machines with it went on sale — `2015` is
+	 * what was out by the end of 2015. A range the wrong way round keeps
+	 * `maxYear`. Default none.
+	 */
+	maxYear?: number;
+	/**
+	 * Write the maker in front of the graphics processor: `NVIDIA GeForce RTX
+	 * 4090` rather than `GeForce RTX 4090`. Default `true`.
+	 */
+	includeVendor?: boolean;
+}
+
+/** A generated graphics processor with the pieces it was written from. */
+export interface GpuDetail {
+	/** The graphics processor as the value form returns it: `NVIDIA GeForce RTX 4090`. */
+	gpu: string;
+	/** Who sells it under their name: `NVIDIA`. */
+	vendor: string;
+	/** The graphics processor's own name: `GeForce RTX 4090`. */
+	model: string;
+	platform: SystemPlatform;
+	/** The year the first cards or machines with it went on sale. */
+	year: number;
+}

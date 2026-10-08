@@ -16,6 +16,7 @@ import 'package:randino/src/decorate/data/index.dart';
 import 'package:randino/src/device/data/index.dart';
 import 'package:randino/src/disk/data/index.dart';
 import 'package:randino/src/gender/data/index.dart';
+import 'package:randino/src/gpu/data/index.dart';
 import 'package:randino/src/internal/parse.dart';
 import 'package:randino/src/location/data/countries.dart';
 import 'package:randino/src/location/data/index.dart';
@@ -602,6 +603,14 @@ void main() {
       // devices are.
       'cpu': <String, Object?>{
         for (final entry in cpus)
+          '${entry.vendor} ${entry.model}': <String, Object?>{
+            'platform': entry.platform.name,
+            'year': entry.year,
+          },
+      },
+      // One entry per graphics processor, keyed the same way.
+      'gpu': <String, Object?>{
+        for (final entry in gpus)
           '${entry.vendor} ${entry.model}': <String, Object?>{
             'platform': entry.platform.name,
             'year': entry.year,

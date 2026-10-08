@@ -6,6 +6,7 @@ export * from './constants.js';
 export * from './cpu/index.js';
 export * from './date/index.js';
 export * from './gender/index.js';
+export * from './gpu/index.js';
 export * from './location/index.js';
 export * from './name/index.js';
 export * from './nickname/index.js';
