@@ -1,6 +1,6 @@
 # randDate
 
-날짜를 만들어 `count`개만큼 돌려줍니다. 각 날짜는 범위 안에서 고르게 뽑고 UTC로 씁니다. 기본 범위는 1900년부터 2099년까지이고, 기본 [형식](#formats)은 ISO 8601입니다. [`unit`](#units)을 주면 날짜를 쓰는 대신 연도부터 밀리초까지 중 한 단위를 숫자로 돌려주고, [`output: 'detail'`](#the-detail-output)을 주면 모든 단위를 한꺼번에 돌려줍니다.
+날짜를 만들어 `count`개만큼 돌려줍니다. 각 날짜는 범위 안에서 고르게 뽑고, UTC나 지정한 [오프셋](#time-zones)으로 씁니다. 기본 범위는 1900년부터 2099년까지이고, 기본 [형식](#formats)은 ISO 8601입니다. [`unit`](#units)을 주면 날짜를 쓰는 대신 연도부터 밀리초까지 중 한 단위를 숫자로 돌려주고, [`output: 'detail'`](#the-detail-output)을 주면 모든 단위를 한꺼번에 돌려줍니다.
 
 날짜의 숫자에는 언어가 없습니다. [형식](#formats)이 쓸 수 있는 월과 요일의 이름에는 언어가 있으므로, [`language`](#names)로 어느 언어로 쓸지 정합니다. 따로 정하지 않으면 영어입니다.
 
@@ -46,6 +46,7 @@ rand_date()
 | <Lang js="minDate" dart="minDate" py="min_date" code /> | <Lang js="DateInput" dart="DateTime?" py="DateInput &#124; None" code /> | `1900-01-01` | 돌려줄 가장 이른 날짜. [범위](#the-range)를 보세요. |
 | <Lang js="maxDate" dart="maxDate" py="max_date" code /> | <Lang js="DateInput" dart="DateTime?" py="DateInput &#124; None" code /> | `2099-12-31` | 돌려줄 가장 늦은 날짜. 그날의 마지막 밀리초까지 포함합니다. [범위](#the-range)를 보세요. |
 | `format` | <Lang js="string" dart="String" py="str" code /> | `YYYY-MM-DDTHH:mm:ss.SSSZ` | 날짜를 쓰는 방식. [형식](#formats)을 보세요. |
+| <Lang js="utcOffset" dart="utcOffset" py="utc_offset" code /> | <Lang js="string &#124; number" dart="Duration?" py="str &#124; timedelta &#124; None" code /> | UTC | 날짜를 쓸 UTC 기준 오프셋. [UTC 오프셋](#time-zones)을 보세요. |
 | `language` | <Lang js="WordLanguageOption" dart="WordLanguage?" py="WordLanguageOption" code /> | <Lang js="'en'" dart="WordLanguage.en" py="&quot;en&quot;" code /> | 월 이름, 요일 이름, 오전·오후를 쓸 언어. [이름](#names)을 보세요. |
 | `unit` | <Lang js="DateUnit" py="DateUnit &#124; None" code /> | <Lang js="—" py="None" code /> | 날짜마다 한 단위를 숫자로 돌려줍니다. Dart에서는 별도 함수입니다. [단위](#units)를 보세요. |
 | `count` | <Lang js="number" dart="int" py="int" code /> | `1` | 돌려줄 날짜 개수. `0` … `10000`으로 제한됩니다. |
@@ -72,7 +73,7 @@ randDate({ minDate: '2024-03-15T09:00', maxDate: '2024-03-15T17:59', format: 'HH
 // ['13:27']
 ```
 
-문자열은 오프셋이 붙어 있지 않으면 UTC입니다. `'2024-03-15T09:00+09:00'`은 서울의 오전 9시이고, UTC로는 0시입니다. `Date`와 숫자는 그것이 담은 순간 하나이고 앞뒤로 구간이 없으므로, `maxDate: new Date()`는 호출한 그 순간에서 멈춥니다. `new Date(2024, 0, 1)`은 실행하는 컴퓨터의 시간대로 본 자정이라 컴퓨터마다 다른 순간이 됩니다. 달력의 날짜를 뜻한다면 `'2024-01-01'`로 쓰세요.
+문자열은 [`utcOffset`](#time-zones)으로 읽고, 따로 정하지 않으면 UTC입니다. 자체 오프셋이 붙은 문자열은 그 오프셋으로 읽습니다. `'2024-03-15T09:00+09:00'`은 서울의 오전 9시이고, UTC로는 0시입니다. `Date`와 숫자는 그것이 담은 순간 하나이고 앞뒤로 구간이 없으므로, `maxDate: new Date()`는 호출한 그 순간에서 멈춥니다. `new Date(2024, 0, 1)`은 실행하는 컴퓨터의 시간대로 본 자정이라 컴퓨터마다 다른 순간이 됩니다. 달력의 날짜를 뜻한다면 `'2024-01-01'`로 쓰세요.
 
 날짜가 아닌 문자열(`'2024-02-30'`, `'tomorrow'`)과 유효하지 않은 `Date`는 경계를 생략한 것으로 읽습니다.
 
@@ -101,7 +102,7 @@ randDate(minDate: DateTime.utc(2024, 3, 15, 9), maxDate: DateTime.utc(2024, 3, 1
 
 ::: lang py
 
-경계는 문자열, `datetime`, `date`입니다. 문자열은 연도만 쓴 것부터 밀리초까지 쓴 것까지의 ISO 8601이고, 한 순간이 아니라 **구간을 가리킵니다**. `"2024"`는 그해 전체이고 `"2024-03-15"`는 그날 하루 전체입니다. 범위는 <Lang js="minDate" dart="minDate" py="min_date" code /> 구간의 첫 밀리초에서 시작해 <Lang js="maxDate" dart="maxDate" py="max_date" code /> 구간의 마지막 밀리초에서 끝납니다. 그래서 `max_date="2024-12-31"`은 그날 0시에서 멈추지 않고 그날 밤까지 이어집니다. `date`도 UTC로 본 그날 하루 전체입니다.
+경계는 문자열, `datetime`, `date`입니다. 문자열은 연도만 쓴 것부터 밀리초까지 쓴 것까지의 ISO 8601이고, 한 순간이 아니라 **구간을 가리킵니다**. `"2024"`는 그해 전체이고 `"2024-03-15"`는 그날 하루 전체입니다. 범위는 <Lang js="minDate" dart="minDate" py="min_date" code /> 구간의 첫 밀리초에서 시작해 <Lang js="maxDate" dart="maxDate" py="max_date" code /> 구간의 마지막 밀리초에서 끝납니다. 그래서 `max_date="2024-12-31"`은 그날 0시에서 멈추지 않고 그날 밤까지 이어집니다. `date`도 문자열처럼 [`utc_offset`](#time-zones)으로 본 그날 하루 전체입니다.
 
 ```python
 rand_date(min_date="2024-01-01", max_date="2024-12-31", format="YYYY-MM-DD", count=3)
@@ -114,7 +115,7 @@ rand_date(min_date="2024-03-15T09:00", max_date="2024-03-15T17:59", format="HH:m
 # ['13:27']
 ```
 
-문자열은 오프셋이 붙어 있지 않으면 UTC입니다. `"2024-03-15T09:00+09:00"`은 서울의 오전 9시이고, UTC로는 0시입니다. `datetime`은 그것이 담은 순간입니다. 시간대가 있는 값은 그 시간대로, 시간대가 없는 값은 `datetime.timestamp`처럼 실행하는 컴퓨터의 시간대로 읽으므로, `max_date=datetime.now()`는 호출한 그 순간에서 멈춥니다.
+문자열은 [`utc_offset`](#time-zones)으로 읽고, 따로 정하지 않으면 UTC입니다. 자체 오프셋이 붙은 문자열은 그 오프셋으로 읽습니다. `"2024-03-15T09:00+09:00"`은 서울의 오전 9시이고, UTC로는 0시입니다. `datetime`은 그것이 담은 순간입니다. 시간대가 있는 값은 그 시간대로, 시간대가 없는 값은 `datetime.timestamp`처럼 실행하는 컴퓨터의 시간대로 읽으므로, `max_date=datetime.now()`는 호출한 그 순간에서 멈춥니다.
 
 날짜가 아닌 문자열(`"2024-02-30"`, `"tomorrow"`)은 경계를 생략한 것으로 읽습니다.
 
@@ -128,31 +129,33 @@ rand_date(min_date="2024-03-15T09:00", max_date="2024-03-15T17:59", format="HH:m
 
 `format`은 날짜를 쓰는 방식입니다. 아래 토큰은 날짜의 한 부분으로 바뀌고, `[`와 `]` 사이의 글자는 그대로 쓰며, 나머지 글자도 그대로 씁니다.
 
-| 토큰   | 쓰는 값         | 예        |
-| ------ | --------------- | --------- |
-| `YYYY` | 연도, 네 자리   | `2024`    |
-| `YY`   | 연도, 두 자리   | `24`      |
-| `MMMM` | 월 이름         | `March`   |
-| `MMM`  | 짧은 월 이름    | `Mar`     |
-| `MM`   | 월, 두 자리     | `03`      |
-| `M`    | 월              | `3`       |
-| `DD`   | 일, 두 자리     | `05`      |
-| `D`    | 일              | `5`       |
-| `dddd` | 요일 이름       | `Tuesday` |
-| `ddd`  | 짧은 요일 이름  | `Tue`     |
-| `HH`   | 시, 00~23       | `19`      |
-| `H`    | 시, 0~23        | `19`      |
-| `hh`   | 시, 01~12       | `07`      |
-| `h`    | 시, 1~12        | `7`       |
-| `mm`   | 분, 두 자리     | `08`      |
-| `m`    | 분              | `8`       |
-| `ss`   | 초, 두 자리     | `09`      |
-| `s`    | 초              | `9`       |
-| `SSS`  | 밀리초, 세 자리 | `045`     |
-| `A`    | 오전 또는 오후  | `PM`      |
-| `a`    | 같은 것, 소문자 | `pm`      |
+| 토큰   | 쓰는 값           | 예        |
+| ------ | ----------------- | --------- |
+| `YYYY` | 연도, 네 자리     | `2024`    |
+| `YY`   | 연도, 두 자리     | `24`      |
+| `MMMM` | 월 이름           | `March`   |
+| `MMM`  | 짧은 월 이름      | `Mar`     |
+| `MM`   | 월, 두 자리       | `03`      |
+| `M`    | 월                | `3`       |
+| `DD`   | 일, 두 자리       | `05`      |
+| `D`    | 일                | `5`       |
+| `dddd` | 요일 이름         | `Tuesday` |
+| `ddd`  | 짧은 요일 이름    | `Tue`     |
+| `HH`   | 시, 00~23         | `19`      |
+| `H`    | 시, 0~23          | `19`      |
+| `hh`   | 시, 01~12         | `07`      |
+| `h`    | 시, 1~12          | `7`       |
+| `mm`   | 분, 두 자리       | `08`      |
+| `m`    | 분                | `8`       |
+| `ss`   | 초, 두 자리       | `09`      |
+| `s`    | 초                | `9`       |
+| `SSS`  | 밀리초, 세 자리   | `045`     |
+| `A`    | 오전 또는 오후    | `PM`      |
+| `a`    | 같은 것, 소문자   | `pm`      |
+| `Z`    | 오프셋, UTC는 `Z` | `+09:00`  |
+| `ZZ`   | 콜론 없는 오프셋  | `+0900`   |
 
-기본값 `YYYY-MM-DDTHH:mm:ss.SSSZ`는 UTC로 쓴 ISO 8601입니다. `T`와 `Z`는 토큰이 아니어서 그대로 쓰입니다.
+기본값 `YYYY-MM-DDTHH:mm:ss.SSSZ`는 ISO 8601입니다. `T`는 토큰이 아니어서 그대로 쓰이고, `Z`는 ISO 8601처럼 UTC에서는 `Z`를, 그 밖에서는 오프셋을 씁니다.
 
 ::: lang js
 
@@ -359,9 +362,52 @@ rand_date(output="detail")
 
 <Lang js="new Date(detail.timestamp)" dart="DateTime.fromMillisecondsSinceEpoch(detail.timestamp, isUtc: true)" py="datetime.fromtimestamp(detail.timestamp / 1000, timezone.utc)" code />로 각 언어의 날짜 타입으로 되돌릴 수 있습니다.
 
-## 시간대 {#time-zones}
+## UTC 오프셋 {#time-zones}
 
-모든 날짜는 UTC로 뽑고 UTC로 쓰며, 상세 출력의 모든 단위도 UTC 기준입니다. 실행하는 컴퓨터의 시간대로 뽑으면 같은 시드로도 컴퓨터마다 다른 날짜가 나오고, 서머타임 전환으로 건너뛰는 시각처럼 어느 시계에도 나타난 적 없는 날짜가 나올 수 있습니다. 다른 시간대로 보여 주려면 타임스탬프를 각 언어의 날짜 타입에 넘겨 그쪽에서 형식을 맞추세요.
+<Lang js="utcOffset" dart="utcOffset" py="utc_offset" code />로 오프셋을 정하지 않으면 날짜는 UTC로 씁니다. 오프셋을 정하면 날짜의 모든 부분, 즉 일, 시, 요일, 모든 `unit`을 그 시계로 읽고, 형식의 `Z`가 그 오프셋을 씁니다. 그래서 기본 형식은 `Z` 자리에 `+09:00`을 씁니다. 상세 출력의 `timestamp`는 어느 쪽이든 같은 순간입니다.
+
+::: lang js
+
+```javascript
+randDate({ utcOffset: '+09:00' }); // ['1987-06-21T17:14:51.302+09:00']
+randDate({ utcOffset: 540, format: 'YYYY-MM-DD HH:mm' }); // ['2031-03-05 04:40']
+randDate({ utcOffset: '-05:00', minDate: '2024-03-15', maxDate: '2024-03-15', format: 'HH:mm Z' });
+// ['21:17 -05:00']
+```
+
+`utcOffset`은 `'+09:00'`, `'+0900'`, `'+09'`, `'Z'` 같은 문자열이나, UTC에서 동쪽으로 몇 분인지를 나타내는 숫자입니다.
+
+:::
+
+::: lang dart
+
+```dart
+randDate(utcOffset: Duration(hours: 9)); // [1987-06-21T17:14:51.302+09:00]
+randDate(utcOffset: Duration(hours: 9), format: 'YYYY-MM-DD HH:mm'); // [2031-03-05 04:40]
+randDate(utcOffset: Duration(hours: -5), minDate: DateTime.utc(2024, 3, 15, 5), maxDate: DateTime.utc(2024, 3, 16, 4, 59), format: 'HH:mm Z');
+// [21:17 -05:00]
+```
+
+`utcOffset`은 `Duration`이고, 분 단위로 자릅니다. `DateTime` 경계는 어느 쪽이든 순간이므로, Dart에서 오프셋이 바꾸는 것은 기본 범위와 날짜의 부분이고, 직접 쓴 경계는 정확히 그 순간을 가리킵니다.
+
+:::
+
+::: lang py
+
+```python
+rand_date(utc_offset="+09:00")  # ['1987-06-21T17:14:51.302+09:00']
+rand_date(utc_offset=timedelta(hours=9), format="YYYY-MM-DD HH:mm")  # ['2031-03-05 04:40']
+rand_date(utc_offset="-05:00", min_date="2024-03-15", max_date="2024-03-15", format="HH:mm Z")
+# ['21:17 -05:00']
+```
+
+`utc_offset`은 `"+09:00"`, `"+0900"`, `"+09"`, `"Z"` 같은 문자열이나 `timedelta`이고, 분 단위로 자릅니다.
+
+:::
+
+범위도 오프셋을 따라 움직입니다. 범위의 양 끝이 달력의 날짜이기 때문입니다. 생략하면 날짜를 쓰는 시계로 1900년부터 2099년까지이고, `+14:00`에서도 `-12:00`에서도 1년부터 9999년을 벗어난 연도는 쓰지 않습니다.
+
+시간대 이름이 아니라 오프셋을 받습니다. 시간대는 날짜에 따라, 세계 여러 곳에서는 1년에 두 번 오프셋이 바뀌는데, Dart에는 그 규칙을 읽을 표가 없습니다. 세 패키지가 똑같이 지킬 수 있는 것은 고정된 오프셋뿐입니다. 하루 이상의 오프셋은 어느 시계도 쓰지 않는 값이라 UTC로 읽습니다. 시간대 고유의 규칙이 필요하면 상세 출력의 `timestamp`를 각 언어의 날짜 타입에 넘겨 그쪽에서 형식을 맞추세요.
 
 ## 함께 보기 {#see-also}
 

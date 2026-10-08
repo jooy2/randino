@@ -351,6 +351,9 @@ void main() {
       twice(() => randAge(count: 5, random: Random(42)).join(','));
       twice(() => randDate(count: 5, random: Random(42)).join());
       twice(() => randDateUnit(DateUnit.minute, count: 5, random: Random(42)).join(','));
+      twice(
+        () => randDate(count: 5, utcOffset: const Duration(hours: 9), random: Random(42)).join(),
+      );
       twice(() => randPhone(count: 5, random: Random(42)).join());
       twice(() => randPhone(count: 5, fictional: true, random: Random(42)).join());
       twice(() => randGender(count: 5, includeUnknown: true, random: Random(42)).join());

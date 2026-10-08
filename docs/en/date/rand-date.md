@@ -1,6 +1,6 @@
 # randDate
 
-Generates dates and returns `count` of them, each drawn evenly from a range and written out in UTC. The default range is the years 1900 to 2099, and the default [format](#formats) is ISO 8601. With [`unit`](#units) it returns one part of each date as a number instead, from the year down to the millisecond, and with [`output: 'detail'`](#the-detail-output) it returns every part at once.
+Generates dates and returns `count` of them, each drawn evenly from a range and written out in UTC or at the [offset](#time-zones) you name. The default range is the years 1900 to 2099, and the default [format](#formats) is ISO 8601. With [`unit`](#units) it returns one part of each date as a number instead, from the year down to the millisecond, and with [`output: 'detail'`](#the-detail-output) it returns every part at once.
 
 The numbers in a date need no language. The month and weekday names a [format](#formats) can ask for do, so [`language`](#names) says which one writes them, English unless you name another.
 
@@ -46,6 +46,7 @@ Every option is optional, and the defaults are what the empty call above uses.
 | <Lang js="minDate" dart="minDate" py="min_date" code /> | <Lang js="DateInput" dart="DateTime?" py="DateInput &#124; None" code /> | `1900-01-01` | The earliest date to return. See [the range](#the-range). |
 | <Lang js="maxDate" dart="maxDate" py="max_date" code /> | <Lang js="DateInput" dart="DateTime?" py="DateInput &#124; None" code /> | `2099-12-31` | The latest date to return, up to the last millisecond of that day. See [the range](#the-range). |
 | `format` | <Lang js="string" dart="String" py="str" code /> | `YYYY-MM-DDTHH:mm:ss.SSSZ` | How each date is written. See [formats](#formats). |
+| <Lang js="utcOffset" dart="utcOffset" py="utc_offset" code /> | <Lang js="string &#124; number" dart="Duration?" py="str &#124; timedelta &#124; None" code /> | UTC | The offset from UTC the dates are written at. See [UTC offsets](#time-zones). |
 | `language` | <Lang js="WordLanguageOption" dart="WordLanguage?" py="WordLanguageOption" code /> | <Lang js="'en'" dart="WordLanguage.en" py="&quot;en&quot;" code /> | The language month names, weekday names and `AM` / `PM` are written in. See [names](#names). |
 | `unit` | <Lang js="DateUnit" py="DateUnit &#124; None" code /> | <Lang js="—" py="None" code /> | Return one part of each date as a number. Dart spells this as a function of its own — see [units](#units). |
 | `count` | <Lang js="number" dart="int" py="int" code /> | `1` | How many dates to return. Clamped to `0` … `10000`. |
@@ -72,7 +73,7 @@ randDate({ minDate: '2024-03-15T09:00', maxDate: '2024-03-15T17:59', format: 'HH
 // ['13:27']
 ```
 
-A string is UTC unless it carries an offset: `'2024-03-15T09:00+09:00'` is nine in the morning in Seoul, which is midnight in UTC. A `Date` and a number are the instant they hold, with no span around it, so `maxDate: new Date()` stops at the moment of the call. `new Date(2024, 0, 1)` is midnight in the machine's own time zone, which is a different instant on every machine; write `'2024-01-01'` for the calendar day.
+A string is read at [`utcOffset`](#time-zones), UTC unless you name one, and one that carries an offset of its own is read at that: `'2024-03-15T09:00+09:00'` is nine in the morning in Seoul, which is midnight in UTC. A `Date` and a number are the instant they hold, with no span around it, so `maxDate: new Date()` stops at the moment of the call. `new Date(2024, 0, 1)` is midnight in the machine's own time zone, which is a different instant on every machine; write `'2024-01-01'` for the calendar day.
 
 A string that is not a date — `'2024-02-30'`, `'tomorrow'` — and an invalid `Date` are read as though the bound were left out.
 
@@ -101,7 +102,7 @@ randDate(minDate: DateTime.utc(2024, 3, 15, 9), maxDate: DateTime.utc(2024, 3, 1
 
 ::: lang py
 
-A bound is a string, a `datetime` or a `date`. A string is ISO 8601, from a year on its own down to the millisecond, and it **names a span** rather than an instant: `"2024"` is the whole year and `"2024-03-15"` the whole day. The range starts at the first millisecond of <Lang js="minDate" dart="minDate" py="min_date" code /> and ends at the last millisecond of <Lang js="maxDate" dart="maxDate" py="max_date" code />, so `max_date="2024-12-31"` reaches the evening of New Year's Eve rather than stopping at its first minute. A `date` is the same whole day in UTC.
+A bound is a string, a `datetime` or a `date`. A string is ISO 8601, from a year on its own down to the millisecond, and it **names a span** rather than an instant: `"2024"` is the whole year and `"2024-03-15"` the whole day. The range starts at the first millisecond of <Lang js="minDate" dart="minDate" py="min_date" code /> and ends at the last millisecond of <Lang js="maxDate" dart="maxDate" py="max_date" code />, so `max_date="2024-12-31"` reaches the evening of New Year's Eve rather than stopping at its first minute. A `date` is the same whole day, at [`utc_offset`](#time-zones) as a string is.
 
 ```python
 rand_date(min_date="2024-01-01", max_date="2024-12-31", format="YYYY-MM-DD", count=3)
@@ -114,7 +115,7 @@ rand_date(min_date="2024-03-15T09:00", max_date="2024-03-15T17:59", format="HH:m
 # ['13:27']
 ```
 
-A string is UTC unless it carries an offset: `"2024-03-15T09:00+09:00"` is nine in the morning in Seoul, which is midnight in UTC. A `datetime` is the instant it holds: an aware one in its own zone, and a naive one in the machine's, the way `datetime.timestamp` reads it, so `max_date=datetime.now()` stops at the moment of the call.
+A string is read at [`utc_offset`](#time-zones), UTC unless you name one, and one that carries an offset of its own is read at that: `"2024-03-15T09:00+09:00"` is nine in the morning in Seoul, which is midnight in UTC. A `datetime` is the instant it holds: an aware one in its own zone, and a naive one in the machine's, the way `datetime.timestamp` reads it, so `max_date=datetime.now()` stops at the moment of the call.
 
 A string that is not a date — `"2024-02-30"`, `"tomorrow"` — is read as though the bound were left out.
 
@@ -151,8 +152,10 @@ Every range is held inside the years 1 to 9999, which is what a year of four dig
 | `SSS`  | The millisecond, three digits | `045`     |
 | `A`    | Before or after noon          | `PM`      |
 | `a`    | The same, in lower case       | `pm`      |
+| `Z`    | The offset, `Z` at UTC        | `+09:00`  |
+| `ZZ`   | The offset, without the colon | `+0900`   |
 
-The default, `YYYY-MM-DDTHH:mm:ss.SSSZ`, is ISO 8601 in UTC: neither `T` nor `Z` is a token, so both are written as they are.
+The default, `YYYY-MM-DDTHH:mm:ss.SSSZ`, is ISO 8601: `T` is not a token, so it is written as it is, and `Z` writes `Z` at UTC, the way ISO 8601 does, and the offset anywhere else.
 
 ::: lang js
 
@@ -359,9 +362,52 @@ rand_date(output="detail")
 
 <Lang js="new Date(detail.timestamp)" dart="DateTime.fromMillisecondsSinceEpoch(detail.timestamp, isUtc: true)" py="datetime.fromtimestamp(detail.timestamp / 1000, timezone.utc)" code /> turns the detail back into the platform's own date.
 
-## Time zones
+## UTC offsets {#time-zones}
 
-Every date is drawn and written in UTC, and every part of the detail is a UTC part. A date drawn in the machine's own zone would come out differently on two machines from the same seed, and an hour skipped by a daylight-saving change would be a date no clock ever showed. To show a date in a zone of your own, pass its timestamp to the platform's own date type and format it there.
+Dates are written in UTC unless <Lang js="utcOffset" dart="utcOffset" py="utc_offset" code /> names an offset. With one, every part of a date is read on that clock — the day, the hour, the day of the week, every `unit` — and `Z` in the format writes it, so the default format writes `+09:00` where it would write `Z`. The `timestamp` in the detail is the same instant either way.
+
+::: lang js
+
+```javascript
+randDate({ utcOffset: '+09:00' }); // ['1987-06-21T17:14:51.302+09:00']
+randDate({ utcOffset: 540, format: 'YYYY-MM-DD HH:mm' }); // ['2031-03-05 04:40']
+randDate({ utcOffset: '-05:00', minDate: '2024-03-15', maxDate: '2024-03-15', format: 'HH:mm Z' });
+// ['21:17 -05:00']
+```
+
+`utcOffset` is a string, `'+09:00'`, `'+0900'`, `'+09'` or `'Z'`, or a number of minutes east of UTC.
+
+:::
+
+::: lang dart
+
+```dart
+randDate(utcOffset: Duration(hours: 9)); // [1987-06-21T17:14:51.302+09:00]
+randDate(utcOffset: Duration(hours: 9), format: 'YYYY-MM-DD HH:mm'); // [2031-03-05 04:40]
+randDate(utcOffset: Duration(hours: -5), minDate: DateTime.utc(2024, 3, 15, 5), maxDate: DateTime.utc(2024, 3, 16, 4, 59), format: 'HH:mm Z');
+// [21:17 -05:00]
+```
+
+`utcOffset` is a `Duration`, cut to whole minutes. A `DateTime` bound is an instant either way, so in Dart the offset moves the default range and the parts, and the bounds you write say exactly where they are.
+
+:::
+
+::: lang py
+
+```python
+rand_date(utc_offset="+09:00")  # ['1987-06-21T17:14:51.302+09:00']
+rand_date(utc_offset=timedelta(hours=9), format="YYYY-MM-DD HH:mm")  # ['2031-03-05 04:40']
+rand_date(utc_offset="-05:00", min_date="2024-03-15", max_date="2024-03-15", format="HH:mm Z")
+# ['21:17 -05:00']
+```
+
+`utc_offset` is a string, `"+09:00"`, `"+0900"`, `"+09"` or `"Z"`, or a `timedelta`, cut to whole minutes.
+
+:::
+
+The range moves with the offset, because both its ends are dates on a calendar. Left out, it is 1900 to 2099 on the clock the dates are written in, and no date is ever written with a year outside 1 to 9999, at `+14:00` or at `-12:00`.
+
+It takes an offset and not a time zone's name. A zone changes its offset with the date, twice a year in much of the world, and Dart has no table of the rules to read it from; an offset the three packages agree on is the one thing all of them can promise. An offset of a day or more is not one a clock is set to, and reads as UTC. For a zone's own rules, take the `timestamp` from the detail to the platform's date type and format it there.
 
 ## See also
 

@@ -336,6 +336,112 @@ describe('Date', () => {
 		);
 	});
 
+	it('utcOffset writes every part at the offset, and Z writes the offset', () => {
+		const dates = randDate({
+			utcOffset: '+09:00',
+			minDate: '2024-03-15',
+			maxDate: '2024-03-15',
+			count: SAMPLE,
+			output: 'detail'
+		});
+
+		// A string bound with no offset of its own is read at the call's: the whole of
+		// the 15th in Seoul, which starts at three in the afternoon of the 14th in UTC.
+		assert.ok(inRange(dates, '2024-03-14T15:00:00.000Z', '2024-03-15T14:59:59.999Z'));
+
+		for (const detail of dates) {
+			assert.match(detail.date, /^2024-03-15T\d{2}:\d{2}:\d{2}\.\d{3}\+09:00$/);
+			assert.strictEqual(detail.day, 15);
+			// The detail's parts are the ones written, and its timestamp the instant.
+			assert.strictEqual(new Date(detail.date).getTime(), detail.timestamp);
+		}
+
+		// Minutes east of UTC are the same offset as the string.
+		const seeded = (seed: number) => () => ((seed = (seed * 16807) % 2147483647) - 1) / 2147483646;
+
+		assert.deepStrictEqual(
+			randDate({ utcOffset: 540, count: 5, random: seeded(7) }),
+			randDate({ utcOffset: '+09:00', count: 5, random: seeded(7) })
+		);
+	});
+
+	it('a bound with an offset of its own, a Date and a number keep their instant', () => {
+		const at = '2024-03-15T20:00:00.000Z';
+
+		for (const bound of [at, new Date(at), Date.parse(at)]) {
+			assert.deepStrictEqual(
+				randDate({
+					utcOffset: '-05:30',
+					minDate: bound,
+					maxDate: bound,
+					format: 'YYYY-MM-DD HH:mm Z ZZ'
+				}),
+				['2024-03-15 14:30 -05:30 -0530']
+			);
+		}
+
+		// UTC is written `Z` by `Z`, which keeps the default format ISO 8601.
+		assert.deepStrictEqual(randDate({ minDate: at, maxDate: at, format: 'Z ZZ' }), ['Z +0000']);
+	});
+
+	it("the day, the hour and the weekday are the offset clock's", () => {
+		// Eight in the evening of Friday in UTC is five in the morning of Saturday in Seoul.
+		const at = '2024-03-15T20:00:00.000Z';
+		const [detail] = randDate({
+			utcOffset: '+09:00',
+			minDate: at,
+			maxDate: at,
+			format: 'dddd HH',
+			output: 'detail'
+		});
+
+		assert.strictEqual(detail.date, 'Saturday 05');
+		assert.deepStrictEqual([detail.day, detail.hour, detail.weekday], [16, 5, 6]);
+
+		for (const hour of randDate({
+			utcOffset: '+09:00',
+			minDate: '2024-03-15T09:00',
+			maxDate: '2024-03-15T17:59',
+			unit: 'hour',
+			count: SAMPLE
+		})) {
+			assert.ok(hour >= 9 && hour <= 17, String(hour));
+		}
+	});
+
+	it('the default range and the limits are on the offset clock', () => {
+		for (const utcOffset of ['+14:00', '-12:00']) {
+			for (const detail of randDate({ utcOffset, count: SAMPLE, output: 'detail' })) {
+				assert.ok(detail.year >= 1900 && detail.year <= 2099, `${utcOffset} ${detail.date}`);
+			}
+		}
+
+		// No year past the four digits, at either end and either side of UTC.
+		for (const detail of randDate({
+			utcOffset: '+14:00',
+			minDate: '9999',
+			count: SAMPLE,
+			output: 'detail'
+		})) {
+			assert.strictEqual(detail.year, 9999);
+		}
+
+		for (const detail of randDate({
+			utcOffset: '-12:00',
+			maxDate: '0001',
+			count: SAMPLE,
+			output: 'detail'
+		})) {
+			assert.strictEqual(detail.year, 1);
+		}
+	});
+
+	it('an offset no clock is set to is UTC', () => {
+		for (const utcOffset of ['+25:00', '+09:60', 'Seoul', 1440, -1440, NaN, {}]) {
+			assert.match(randDate({ utcOffset: utcOffset as never })[0], ISO, String(utcOffset));
+		}
+	});
+
 	it('unit returns that part of each date, as a number', () => {
 		const spans: Record<string, [number, number]> = {
 			year: [1900, 2099],

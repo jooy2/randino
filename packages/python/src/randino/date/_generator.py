@@ -1,8 +1,9 @@
 """The date generator: an instant drawn evenly from a range, then written out.
 
-Everything here is UTC. A date drawn in the machine's own time zone would come out
-differently on two machines from the same seed, and an hour that a daylight-saving change
-skips would be a date no clock ever showed.
+Everything here is UTC unless the caller names an offset. A date drawn in the machine's
+own time zone would come out differently on two machines from the same seed, and an hour
+that a daylight-saving change skips would be a date no clock ever showed; a fixed offset
+has neither problem.
 """
 
 import calendar
@@ -39,7 +40,7 @@ _ISO_DATE = re.compile(
 With an offset after the time: `Z`, `+09:00`, `+0900` or `+09`.
 """
 
-_TOKENS = re.compile(r"\[([^\]]*)]|YYYY|YY|MMMM|MMM|MM?|DD?|dddd|ddd|HH?|hh?|mm?|ss?|SSS|A|a")
+_TOKENS = re.compile(r"\[([^\]]*)]|YYYY|YY|MMMM|MMM|MM?|DD?|dddd|ddd|HH?|hh?|mm?|ss?|SSS|A|a|ZZ|Z")
 """Longest first, so `YYYY` is never read as two `YY` nor `MMMM` as two `MM`.
 
 Text in brackets is written as it is, and so is anything that is not a token.
@@ -59,27 +60,55 @@ def _timestamp_of(moment: datetime) -> int:
     return (moment - _EPOCH) // _MILLISECOND
 
 
-def _offset_of(text: str | None) -> int | None:
+_OFFSET = re.compile(r"^(?:[Zz]|([+-])(\d{2})(?::?(\d{2}))?)$")
+"""`Z`, `+09:00`, `+0900` or `+09`."""
+
+_OFFSET_LIMIT = 24 * 60
+"""Minutes an offset stays under: a clock is set at most fourteen hours from UTC."""
+
+
+def _offset_of(text: str) -> int | None:
     """An offset as milliseconds east of UTC, or None for one no clock shows."""
-    if not text or text in ("Z", "z"):
-        return 0
+    match = _OFFSET.match(text)
 
-    digits = text[1:].replace(":", "")
-    hours = int(digits[:2])
-    minutes = int(digits[2:] or "0")
-
-    if hours > 23 or minutes > 59:
+    if not match:
         return None
 
-    return (-1 if text[0] == "-" else 1) * (hours * 60 + minutes) * 60000
+    sign, hours, minutes = match.groups()
+
+    if not sign:
+        return 0
+
+    if int(hours) > 23 or int(minutes or 0) > 59:
+        return None
+
+    return (-1 if sign == "-" else 1) * (int(hours) * 60 + int(minutes or 0)) * 60000
 
 
-def _parse_date(text: str) -> _Span | None:
+def resolve_offset(utc_offset: object) -> int:
+    """`utc_offset` as milliseconds east of UTC, whole minutes only.
+
+    A string is read the way a date string's own offset is, and a `timedelta` is cut to
+    whole minutes. Anything that is not an offset a clock could be set to is UTC.
+    """
+    if isinstance(utc_offset, str):
+        return _offset_of(utc_offset.strip()) or 0
+
+    if isinstance(utc_offset, timedelta):
+        minutes = int(utc_offset.total_seconds() / 60)
+
+        return minutes * 60000 if abs(minutes) < _OFFSET_LIMIT else 0
+
+    return 0
+
+
+def _parse_date(text: str, shift: int) -> _Span | None:
     """A string as the span it names.
 
     `"2024"` is the whole year and `"2024-03-15"` the whole day, so `max_date="2024-03-15"`
     reaches the evening of the 15th rather than stopping at its first millisecond. A string
-    that is not a date — `"2024-02-30"`, `"24:00"` — names nothing.
+    with no offset of its own is read at `shift`, the call's `utc_offset`. A string that is
+    not a date — `"2024-02-30"`, `"24:00"` — names nothing.
     """
     match = _ISO_DATE.match(text.strip())
 
@@ -97,10 +126,10 @@ def _parse_date(text: str) -> _Span | None:
     )
     # A fraction finer than a millisecond is cut to one, never rounded up into the next.
     millisecond = int(fraction[:3].ljust(3, "0")) if fraction else 0
-    shift = _offset_of(offset)
+    own = shift if offset is None else _offset_of(offset)
 
     if (
-        shift is None
+        own is None
         or parts[0] < 1
         or not 1 <= parts[1] <= 12
         or not 1 <= parts[2] <= calendar.monthrange(parts[0], parts[1])[1]
@@ -110,7 +139,7 @@ def _parse_date(text: str) -> _Span | None:
     ):
         return None
 
-    start = _timestamp_of(datetime(*parts, millisecond * 1000, tzinfo=timezone.utc)) - shift
+    start = _timestamp_of(datetime(*parts, millisecond * 1000, tzinfo=timezone.utc)) - own
 
     if fraction:
         span = 1
@@ -128,10 +157,13 @@ def _parse_date(text: str) -> _Span | None:
     return _Span(start, start + span - 1)
 
 
-def _span_of(value: object) -> _Span | None:
-    """A bound as the span it stands for, or None for anything that is not a date."""
+def _span_of(value: object, shift: int) -> _Span | None:
+    """A bound as the span it stands for, or None for anything that is not a date.
+
+    A string and a `date` with no offset of their own are read at `shift`.
+    """
     if isinstance(value, str):
-        return _parse_date(value)
+        return _parse_date(value, shift)
 
     if isinstance(value, datetime):
         if value.tzinfo is None:
@@ -148,45 +180,65 @@ def _span_of(value: object) -> _Span | None:
         return _Span(instant, instant)
 
     if isinstance(value, date):
-        start = _timestamp_of(datetime(value.year, value.month, value.day, tzinfo=timezone.utc))
+        start = (
+            _timestamp_of(datetime(value.year, value.month, value.day, tzinfo=timezone.utc)) - shift
+        )
 
         return _Span(start, start + _DAY - 1)
 
     return None
 
 
-def date_range(min_date: object, max_date: object) -> tuple[int, int]:
-    """The first and the last millisecond a call may land on.
+def date_range(min_date: object, max_date: object, shift: int = 0) -> tuple[int, int]:
+    """The first and the last millisecond a call may land on, for dates read at `shift`.
 
     A bound left out never contradicts the one that was written: past the default at
-    either end, it moves to the end of what a date may be.
+    either end, it moves to the end of what a date may be. The defaults and the limits
+    are dates on a calendar, so they move with the offset: the range left out is 1900 to
+    2099 on the clock the dates are written in, and no date is written with a year
+    outside 1 to 9999.
     """
-    low = _span_of(min_date)
-    high = _span_of(max_date)
+    floor = DATE_FLOOR - shift
+    ceiling = DATE_CEILING - shift
+    min_default = DATE_MIN_DEFAULT - shift
+    max_default = DATE_MAX_DEFAULT - shift
+    low = _span_of(min_date, shift)
+    high = _span_of(max_date, shift)
 
     if low is not None:
         start = low.start
-    elif high is not None and high.end < DATE_MIN_DEFAULT:
-        start = DATE_FLOOR
+    elif high is not None and high.end < min_default:
+        start = floor
     else:
-        start = DATE_MIN_DEFAULT
+        start = min_default
 
     if high is not None:
         end = high.end
-    elif low is not None and low.start > DATE_MAX_DEFAULT:
-        end = DATE_CEILING
+    elif low is not None and low.start > max_default:
+        end = ceiling
     else:
-        end = DATE_MAX_DEFAULT
+        end = max_default
 
-    top = clamp(end, DATE_FLOOR, DATE_CEILING)
+    top = clamp(end, floor, ceiling)
 
     # A range the wrong way round keeps `max_date`, the same way a length range keeps
     # `max_length`: it is the bound a caller is usually holding to.
-    return min(clamp(start, DATE_FLOOR, DATE_CEILING), top), top
+    return min(clamp(start, floor, ceiling), top), top
 
 
-def _write(token: str, moment: datetime, names: DateNames) -> str:
-    """What one token of a format writes for `moment`, in the names of one language."""
+def _zone(minutes: int, colon: bool) -> str:
+    """An offset in minutes as ISO 8601 writes it: `+09:00`, or `+0900` without the colon."""
+    hours, rest = divmod(abs(minutes), 60)
+
+    return f"{'-' if minutes < 0 else '+'}{hours:02d}{':' if colon else ''}{rest:02d}"
+
+
+def _write(token: str, moment: datetime, names: DateNames, offset: int) -> str:
+    """What one token of a format writes for `moment`, in the names of one language.
+
+    `offset` is the minutes east of UTC the date was read at. UTC is `Z` to `Z`, which is
+    what keeps the default format the string JavaScript's `toISOString` writes.
+    """
     twelve = moment.hour % 12 or 12
     half = 0 if moment.hour < 12 else 1
     written = {
@@ -210,18 +262,22 @@ def _write(token: str, moment: datetime, names: DateNames) -> str:
         "s": str(moment.second),
         "SSS": f"{moment.microsecond // 1000:03d}",
         "A": names.meridiem[half],
+        "Z": _zone(offset, colon=True) if offset else "Z",
+        "ZZ": _zone(offset, colon=False),
     }
 
     return written.get(token, names.meridiem_lower[half])
 
 
-def format_date(moment: datetime, format: str, language: WordLanguage) -> str:
-    """`moment` written out by `format`, in the names of `language`."""
+def format_date(moment: datetime, format: str, language: WordLanguage, offset: int = 0) -> str:
+    """`moment` written out by `format`, in the names of `language`, at `offset` minutes."""
     names = DATE_NAMES[language]
 
     return _TOKENS.sub(
         lambda match: (
-            match.group(1) if match.group(1) is not None else _write(match.group(0), moment, names)
+            match.group(1)
+            if match.group(1) is not None
+            else _write(match.group(0), moment, names, offset)
         ),
         format,
     )
@@ -258,11 +314,13 @@ def generate_date_details(
     unit: DateUnit | None = None,
     format: str = DATE_FORMAT_DEFAULT,
     language: WordLanguageOption = "en",
+    utc_offset: str | timedelta | None = None,
     unique: bool = False,
     random: Callable[[], float] | None = None,
 ) -> list[DateDetail]:
     """Generate `count` dates, applied to every option."""
-    low, high = date_range(min_date, max_date)
+    shift = resolve_offset(utc_offset)
+    low, high = date_range(min_date, max_date, shift)
     # A format that writes nothing is no format at all.
     written = format if isinstance(format, str) and format else DATE_FORMAT_DEFAULT
     part = resolve_date_unit(unit)
@@ -270,11 +328,13 @@ def generate_date_details(
 
     def draw() -> DateDetail:
         timestamp = rand_int(low, high)
-        moment = _EPOCH + timedelta(milliseconds=timestamp)
+        # The parts read at the offset: a `datetime` that is UTC in name, holding the clock
+        # the date is written on.
+        moment = _EPOCH + timedelta(milliseconds=timestamp + shift)
         drawn: WordLanguage = pick(WORD_LANGUAGES) if chosen == "all" else chosen
 
         return DateDetail(
-            date=format_date(moment, written, drawn),
+            date=format_date(moment, written, drawn, shift // 60000),
             timestamp=timestamp,
             year=moment.year,
             month=moment.month,

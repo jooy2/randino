@@ -311,6 +311,7 @@ def test_an_option_the_types_rule_out_falls_back_rather_than_raising() -> None:
         lambda: loose.rand_age(min_age=float("nan"), max_age="x"),
         lambda: loose.rand_date(unit="week", format=123),
         lambda: loose.rand_date(language="xx", format="MMMM dddd A"),
+        lambda: loose.rand_date(utc_offset=[], format="Z ZZ"),
         lambda: loose.rand_date(min_date={}, max_date=[], count=float("nan")),
         lambda: loose.rand_phone(country="XX", type="pager"),
         lambda: loose.rand_phone(country=123, separator=7, count=float("nan")),
@@ -373,6 +374,7 @@ def test_random_is_where_every_draw_of_a_call_comes_from() -> None:
     twice(lambda: randino.rand_age(count=5, random=Random(42).random))
     twice(lambda: randino.rand_date(count=5, random=Random(42).random))
     twice(lambda: randino.rand_date(unit="minute", count=5, random=Random(42).random))
+    twice(lambda: randino.rand_date(utc_offset="+09:00", count=5, random=Random(42).random))
     twice(lambda: randino.rand_phone(count=5, random=Random(42).random))
     twice(lambda: randino.rand_phone(count=5, fictional=True, random=Random(42).random))
     twice(lambda: randino.rand_gender(count=5, include_unknown=True, random=Random(42).random))

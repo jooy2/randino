@@ -355,12 +355,13 @@ randDate({ output: 'detail' });
 | `minDate` / `maxDate` | `string \| Date \| number` | `'1900'` / `'2099'`        |
 | `format`              | `string`                   | `YYYY-MM-DDTHH:mm:ss.SSSZ` |
 | `language`            | `WordLanguageOption`       | `'en'`                     |
+| `utcOffset`           | `string \| number`         | UTC                        |
 | `unit`                | `DateUnit`                 | —                          |
 | `count`               | `number`                   | `1`                        |
 | `unique`              | `boolean`                  | `false`                    |
 | `output`              | `'value' \| 'detail'`      | `'value'`                  |
 
-`format` replaces `YYYY`, `YY`, `MMMM`, `MMM`, `MM`, `M`, `DD`, `D`, `dddd`, `ddd`, `HH`, `H`, `hh`, `h`, `mm`, `m`, `ss`, `s`, `SSS`, `A` and `a`, and writes text inside `[` `]` as it is. `MMMM`, `MMM`, `dddd`, `ddd`, `A` and `a` write words, in `language`: English unless another of the nine is named. `unit` is `year`, `month`, `day`, `hour`, `minute`, `second` or `millisecond`, read off a date drawn from the range, so a minute is `0` to `59` and a year keeps inside the range.
+`format` replaces `YYYY`, `YY`, `MMMM`, `MMM`, `MM`, `M`, `DD`, `D`, `dddd`, `ddd`, `HH`, `H`, `hh`, `h`, `mm`, `m`, `ss`, `s`, `SSS`, `A`, `a`, `Z` and `ZZ`, and writes text inside `[` `]` as it is. `MMMM`, `MMM`, `dddd`, `ddd`, `A` and `a` write words, in `language`: English unless another of the nine is named. `utcOffset` writes the dates at a fixed offset, `'+09:00'` or `540` minutes, and `Z` writes it. `unit` is `year`, `month`, `day`, `hour`, `minute`, `second` or `millisecond`, read off a date drawn from the range, so a minute is `0` to `59` and a year keeps inside the range.
 
 ## Phone numbers
 

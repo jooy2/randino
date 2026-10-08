@@ -8,6 +8,8 @@ import 'package:randino/src/types.dart';
 /// The part is read off a date drawn from the range, so `DateUnit.minute` is
 /// `0` to `59` and `DateUnit.year` keeps inside [minDate] and [maxDate].
 /// [unique] never repeats the part: an hour has sixty minutes, and no more.
+/// [utcOffset] reads the part at a fixed offset from UTC, so the hour is the
+/// hour on that clock.
 ///
 /// Dart has neither overloads nor union types, so a part on its own is a
 /// function of its own rather than the `unit` option the npm and PyPI packages
@@ -22,6 +24,7 @@ List<int> randDateUnit(
   int count = 1,
   DateTime? minDate,
   DateTime? maxDate,
+  Duration? utcOffset,
   bool unique = false,
 
   /// Where the randomness comes from: `Random.secure()` for a value nobody may
@@ -33,6 +36,7 @@ List<int> randDateUnit(
     minDate: minDate,
     maxDate: maxDate,
     unit: unit,
+    utcOffset: utcOffset,
     unique: unique,
     random: random,
   ))

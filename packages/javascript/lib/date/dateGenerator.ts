@@ -44,7 +44,14 @@ const ISO_DATE =
 
 // Longest first, so `YYYY` is never read as two `YY` nor `MMMM` as two `MM`. Text
 // in brackets is written as it is, and so is anything that is not a token.
-const TOKENS = /\[([^\]]*)]|YYYY|YY|MMMM|MMM|MM?|DD?|dddd|ddd|HH?|hh?|mm?|ss?|SSS|A|a/g;
+const TOKENS = /\[([^\]]*)]|YYYY|YY|MMMM|MMM|MM?|DD?|dddd|ddd|HH?|hh?|mm?|ss?|SSS|A|a|ZZ|Z/g;
+
+// The widest offset a clock is set to is fourteen hours; anything up to a day
+// short of it is still an offset, and a day or more is not one.
+const OFFSET_LIMIT = 24 * 60;
+
+// `Z`, `+09:00`, `+0900` or `+09`.
+const OFFSET = /^(?:[Zz]|([+-])(\d{2})(?::?(\d{2}))?)$/;
 
 function isLeap(year: number): boolean {
 	return (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0;
@@ -68,29 +75,34 @@ function timestampOf(parts: Parts): number {
 }
 
 /** An offset as milliseconds east of UTC, or `undefined` for one no clock shows. */
-function offsetOf(text: string | undefined): number | undefined {
-	if (!text || text === 'Z' || text === 'z') {
-		return 0;
-	}
+function offsetOf(text: string): number | undefined {
+	const match = OFFSET.exec(text);
 
-	const digits = text.slice(1).replace(':', '');
-	const hours = Number(digits.slice(0, 2));
-	const minutes = Number(digits.slice(2) || '0');
-
-	if (hours > 23 || minutes > 59) {
+	if (!match) {
 		return undefined;
 	}
 
-	return (text[0] === '-' ? -1 : 1) * (hours * 60 + minutes) * 60000;
+	const [, sign, hours, minutes] = match;
+
+	if (!sign) {
+		return 0;
+	}
+
+	if (Number(hours) > 23 || Number(minutes ?? 0) > 59) {
+		return undefined;
+	}
+
+	return (sign === '-' ? -1 : 1) * (Number(hours) * 60 + Number(minutes ?? 0)) * 60000;
 }
 
 /**
  * A string as the span it names: `'2024'` is the whole year and `'2024-03-15'`
  * the whole day, so `maxDate: '2024-03-15'` reaches the evening of the 15th
- * rather than stopping at its first millisecond. A string that is not a date —
+ * rather than stopping at its first millisecond. A string with no offset of its
+ * own is read at `shift`, the call's `utcOffset`. A string that is not a date —
  * `'2024-02-30'`, `'24:00'` — names nothing.
  */
-function parseDate(text: string): Span | undefined {
+function parseDate(text: string, shift: number): Span | undefined {
 	const match = ISO_DATE.exec(text.trim());
 
 	if (!match) {
@@ -109,10 +121,10 @@ function parseDate(text: string): Span | undefined {
 		// the next.
 		millisecond: fraction ? Number(fraction.slice(0, 3).padEnd(3, '0')) : 0
 	};
-	const shift = offsetOf(offset);
+	const own = offset === undefined ? shift : offsetOf(offset);
 
 	if (
-		shift === undefined ||
+		own === undefined ||
 		parts.year < 1 ||
 		parts.month < 1 ||
 		parts.month > 12 ||
@@ -125,7 +137,7 @@ function parseDate(text: string): Span | undefined {
 		return undefined;
 	}
 
-	const start = timestampOf(parts) - shift;
+	const start = timestampOf(parts) - own;
 	const span = fraction
 		? 1
 		: second
@@ -146,9 +158,9 @@ function parseDate(text: string): Span | undefined {
  * date. A `Date` and a number are one instant each, and an invalid `Date` is
  * nothing, the way a `NaN` is.
  */
-function spanOf(value: unknown): Span | undefined {
+function spanOf(value: unknown, shift: number): Span | undefined {
 	if (typeof value === 'string') {
-		return parseDate(value);
+		return parseDate(value, shift);
 	}
 
 	const time = value instanceof Date ? value.getTime() : typeof value === 'number' ? value : NaN;
@@ -162,31 +174,62 @@ function spanOf(value: unknown): Span | undefined {
 	return { start: instant, end: instant };
 }
 
-/** The first and the last millisecond a call may land on. */
-export function dateRange(options: RandDateOptions): [number, number] {
-	const low = spanOf(options.minDate);
-	const high = spanOf(options.maxDate);
+/**
+ * `utcOffset` as milliseconds east of UTC: a string the way a date string's own
+ * offset is read, or a number of minutes. Anything that is not an offset a clock
+ * could be set to is UTC.
+ */
+export function resolveOffset(utcOffset: unknown): number {
+	if (typeof utcOffset === 'string') {
+		return offsetOf(utcOffset.trim()) ?? 0;
+	}
+
+	const minutes = typeof utcOffset === 'number' ? Math.trunc(utcOffset) : NaN;
+
+	return Number.isFinite(minutes) && Math.abs(minutes) < OFFSET_LIMIT ? minutes * 60000 : 0;
+}
+
+/**
+ * The first and the last millisecond a call may land on, for dates read at
+ * `shift`. The defaults and the limits are dates on a calendar, so they move with
+ * the offset: the range left out is 1900 to 2099 on the clock the dates are
+ * written in, and no date is written with a year outside 1 to 9999.
+ */
+export function dateRange(options: RandDateOptions, shift: number): [number, number] {
+	const floor = DATE_FLOOR - shift;
+	const ceiling = DATE_CEILING - shift;
+	const minDefault = DATE_MIN_DEFAULT - shift;
+	const maxDefault = DATE_MAX_DEFAULT - shift;
+	const low = spanOf(options.minDate, shift);
+	const high = spanOf(options.maxDate, shift);
 	// A bound left out never contradicts the one that was written: past the
 	// default at either end, it moves to the end of what a date may be.
-	const min = low ? low.start : high && high.end < DATE_MIN_DEFAULT ? DATE_FLOOR : DATE_MIN_DEFAULT;
-	const max = high
-		? high.end
-		: low && low.start > DATE_MAX_DEFAULT
-			? DATE_CEILING
-			: DATE_MAX_DEFAULT;
-	const top = clamp(max, DATE_FLOOR, DATE_CEILING);
+	const min = low ? low.start : high && high.end < minDefault ? floor : minDefault;
+	const max = high ? high.end : low && low.start > maxDefault ? ceiling : maxDefault;
+	const top = clamp(max, floor, ceiling);
 
 	// A range the wrong way round keeps `maxDate`, the same way a length range
 	// keeps `maxLength`: it is the bound a caller is usually holding to.
-	return [Math.min(clamp(min, DATE_FLOOR, DATE_CEILING), top), top];
+	return [Math.min(clamp(min, floor, ceiling), top), top];
+}
+
+/** An offset in minutes as ISO 8601 writes it: `+09:00`, or `+0900` without the colon. */
+function zone(minutes: number, colon: boolean): string {
+	const sign = minutes < 0 ? '-' : '+';
+	const size = Math.abs(minutes);
+
+	return `${sign}${pad(Math.floor(size / 60), 2)}${colon ? ':' : ''}${pad(size % 60, 2)}`;
 }
 
 function pad(value: number, width: number): string {
 	return String(value).padStart(width, '0');
 }
 
-/** What one token of a format writes for a date, in the names of one language. */
-function write(token: string, parts: Written, names: DateNames): string {
+/**
+ * What one token of a format writes for a date, in the names of one language, for
+ * a date read at `offset` minutes east of UTC.
+ */
+function write(token: string, parts: Written, names: DateNames, offset: number): string {
 	switch (token) {
 		case 'YYYY':
 			return pad(parts.year, 4);
@@ -226,6 +269,12 @@ function write(token: string, parts: Written, names: DateNames): string {
 			return String(parts.second);
 		case 'SSS':
 			return pad(parts.millisecond, 3);
+		case 'Z':
+			// UTC is `Z` in ISO 8601, which is what keeps the default format the
+			// string `toISOString` writes.
+			return offset ? zone(offset, true) : 'Z';
+		case 'ZZ':
+			return zone(offset, false);
 		case 'A':
 			return names.meridiem[parts.hour < 12 ? 0 : 1];
 		default:
@@ -233,19 +282,24 @@ function write(token: string, parts: Written, names: DateNames): string {
 	}
 }
 
-/** A date written out by a format, in the names of `language`. */
-export function formatDate(parts: Written, format: string, language: WordLanguage): string {
+/** A date written out by a format, in the names of `language`, at `offset` minutes east of UTC. */
+export function formatDate(
+	parts: Written,
+	format: string,
+	language: WordLanguage,
+	offset: number
+): string {
 	const names = DATE_NAMES[language];
 
 	return format.replace(
 		TOKENS,
-		(token: string, literal?: string) => literal ?? write(token, parts, names)
+		(token: string, literal?: string) => literal ?? write(token, parts, names, offset)
 	);
 }
 
-/** Every part of the date `timestamp` falls on, in UTC. */
-function partsOf(timestamp: number): Written {
-	const date = new Date(timestamp);
+/** Every part of the date `timestamp` falls on, read at `shift` milliseconds east of UTC. */
+function partsOf(timestamp: number, shift: number): Written {
+	const date = new Date(timestamp + shift);
 
 	return {
 		year: date.getUTCFullYear(),
@@ -280,7 +334,8 @@ export function resolveDateUnit(unit: unknown): DateUnit | null {
 }
 
 export function generateDateDetails(options: RandDateOptions = {}): DateDetail[] {
-	const [min, max] = dateRange(options);
+	const shift = resolveOffset(options.utcOffset);
+	const [min, max] = dateRange(options, shift);
 	const format = resolveFormat(options.format);
 	const unit = resolveDateUnit(options.unit);
 	const language = resolveDateLanguage(options.language);
@@ -292,11 +347,11 @@ export function generateDateDetails(options: RandDateOptions = {}): DateDetail[]
 			{ count: options.count, unique: options.unique },
 			() => {
 				const timestamp = randInt(min, max);
-				const parts = partsOf(timestamp);
+				const parts = partsOf(timestamp, shift);
 				const drawn: WordLanguage = language === 'all' ? pick(WORD_LANGUAGES) : language;
 
 				return {
-					date: formatDate(parts, format, drawn),
+					date: formatDate(parts, format, drawn, shift / 60000),
 					timestamp,
 					...parts,
 					language: drawn

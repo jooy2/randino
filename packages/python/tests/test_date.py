@@ -2,6 +2,8 @@
 
 import re
 from datetime import date, datetime, timedelta, timezone
+from random import Random
+from typing import Any
 
 from randino import (
     DATE_UNITS,
@@ -289,6 +291,97 @@ def test_all_picks_a_language_per_date_and_the_detail_says_which() -> None:
         )
 
     assert all(detail.language == "en" for detail in rand_date(count=20, output="detail"))
+
+
+def test_utc_offset_writes_every_part_at_the_offset_and_z_writes_it() -> None:
+    dates = rand_date(
+        utc_offset="+09:00",
+        min_date="2024-03-15",
+        max_date="2024-03-15",
+        count=SAMPLE,
+        output="detail",
+    )
+
+    # A string bound with no offset of its own is read at the call's: the whole of the 15th
+    # in Seoul, which starts at three in the afternoon of the 14th in UTC.
+    assert in_range(dates, "2024-03-14T15:00:00.000Z", "2024-03-15T14:59:59.999Z")
+
+    for detail in dates:
+        assert re.fullmatch(r"2024-03-15T\d{2}:\d{2}:\d{2}\.\d{3}\+09:00", detail.date)
+        assert detail.day == 15
+
+    # A `timedelta` is the same offset as the string.
+    assert rand_date(utc_offset=timedelta(hours=9), count=5, random=Random(7).random) == (
+        rand_date(utc_offset="+09:00", count=5, random=Random(7).random)
+    )
+    # A `date` is its whole day at the offset, the way its string is.
+    day = rand_date(
+        utc_offset="+09:00", min_date=date(2024, 3, 15), max_date=date(2024, 3, 15), count=SAMPLE
+    )
+
+    assert all(written.startswith("2024-03-15T") for written in day)
+
+
+def test_a_bound_with_an_offset_of_its_own_and_a_datetime_keep_their_instant() -> None:
+    at = "2024-03-15T20:00:00.000Z"
+    aware = datetime(2024, 3, 15, 20, tzinfo=timezone.utc)
+
+    for bound in (at, aware):
+        assert rand_date(
+            utc_offset="-05:30", min_date=bound, max_date=bound, format="YYYY-MM-DD HH:mm Z ZZ"
+        ) == ["2024-03-15 14:30 -05:30 -0530"]
+
+    # UTC is written `Z` by `Z`, which keeps the default format ISO 8601.
+    assert rand_date(min_date=at, max_date=at, format="Z ZZ") == ["Z +0000"]
+
+
+def test_the_day_the_hour_and_the_weekday_are_the_offset_clocks() -> None:
+    # Eight in the evening of Friday in UTC is five in the morning of Saturday in Seoul.
+    at = "2024-03-15T20:00:00.000Z"
+    detail = rand_date(
+        utc_offset="+09:00", min_date=at, max_date=at, format="dddd HH", output="detail"
+    )[0]
+
+    assert detail.date == "Saturday 05"
+    assert (detail.day, detail.hour, detail.weekday) == (16, 5, 6)
+
+    hours = rand_date(
+        utc_offset="+09:00",
+        min_date="2024-03-15T09:00",
+        max_date="2024-03-15T17:59",
+        unit="hour",
+        count=SAMPLE,
+    )
+
+    assert all(9 <= hour <= 17 for hour in hours)
+
+
+def test_the_default_range_and_the_limits_are_on_the_offset_clock() -> None:
+    for offset in ("+14:00", "-12:00"):
+        for detail in rand_date(utc_offset=offset, count=SAMPLE, output="detail"):
+            assert 1900 <= detail.year <= 2099, (offset, detail.date)
+
+    late = rand_date(utc_offset="+14:00", min_date="9999", count=SAMPLE, output="detail")
+    early = rand_date(utc_offset="-12:00", max_date="0001", count=SAMPLE, output="detail")
+
+    assert all(detail.year == 9999 for detail in late)
+    assert all(detail.year == 1 for detail in early)
+
+
+def test_an_offset_no_clock_is_set_to_is_utc() -> None:
+    loose: Any = rand_date
+    offsets: list[object] = [
+        "+25:00",
+        "+09:60",
+        "Seoul",
+        timedelta(days=1),
+        timedelta(days=-1),
+        540,
+        [],
+    ]
+
+    for offset in offsets:
+        assert re.match(ISO, loose(utc_offset=offset)[0]), offset
 
 
 def test_unit_returns_that_part_of_each_date_as_a_number() -> None:

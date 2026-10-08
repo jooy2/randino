@@ -231,6 +231,83 @@ void main() {
       expect(randDateDetails(count: 20).every((d) => d.language == WordLanguage.en), isTrue);
     });
 
+    test('utcOffset writes every part at the offset, and Z writes the offset', () {
+      const seoul = Duration(hours: 9);
+      // The default range is 1900 to 2099 on the clock the dates are written in.
+      final dates = randDateDetails(utcOffset: seoul, count: sample);
+
+      for (final detail in dates) {
+        expect(
+          detail.date,
+          matches(RegExp(r'^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}\+09:00$')),
+        );
+        expect(detail.year, inInclusiveRange(1900, 2099));
+        // The written date is the same instant as the timestamp.
+        expect(DateTime.parse(detail.date).millisecondsSinceEpoch, detail.timestamp);
+      }
+
+      final at = DateTime.utc(2024, 3, 15, 20);
+
+      expect(
+        randDate(
+          utcOffset: const Duration(hours: -5, minutes: -30),
+          minDate: at,
+          maxDate: at,
+          format: 'YYYY-MM-DD HH:mm Z ZZ',
+        ),
+        <String>['2024-03-15 14:30 -05:30 -0530'],
+      );
+      // UTC is written `Z` by `Z`, which keeps the default format ISO 8601.
+      expect(randDate(minDate: at, maxDate: at, format: 'Z ZZ'), <String>['Z +0000']);
+    });
+
+    test('the day, the hour and the weekday are the offset clock\'s', () {
+      // Eight in the evening of Friday in UTC is five in the morning of Saturday
+      // in Seoul.
+      final at = DateTime.utc(2024, 3, 15, 20);
+      final detail =
+          randDateDetails(
+            utcOffset: const Duration(hours: 9),
+            minDate: at,
+            maxDate: at,
+            format: 'dddd HH',
+          ).single;
+
+      expect(detail.date, 'Saturday 05');
+      expect(<int>[detail.day, detail.hour, detail.weekday], <int>[16, 5, 6]);
+
+      for (final hour in randDateUnit(
+        DateUnit.hour,
+        utcOffset: const Duration(hours: 9),
+        minDate: DateTime.utc(2024, 3, 15),
+        maxDate: DateTime.utc(2024, 3, 15, 8, 59),
+        count: sample,
+      )) {
+        expect(hour, inInclusiveRange(9, 17));
+      }
+    });
+
+    test('no date is written with a year past four digits, either side of UTC', () {
+      for (final detail in randDateDetails(
+        utcOffset: const Duration(hours: 14),
+        minDate: DateTime.utc(9999),
+        count: sample,
+      )) {
+        expect(detail.year, 9999);
+      }
+
+      for (final detail in randDateDetails(
+        utcOffset: const Duration(hours: -12),
+        maxDate: DateTime.utc(1, 1, 2),
+        count: sample,
+      )) {
+        expect(detail.year, 1);
+      }
+
+      // A day or more is no offset, and reads as UTC.
+      expect(randDate(utcOffset: const Duration(days: 1)).single, matches(iso));
+    });
+
     test('randDateUnit returns that part of each date, as a number', () {
       const spans = <DateUnit, (int, int)>{
         DateUnit.year: (1900, 2099),

@@ -1040,13 +1040,22 @@ export interface RandDateOptions extends Pick<
 	 */
 	unit?: DateUnit;
 	/**
-	 * How the date is written, in UTC. `YYYY`, `YY`, `MMMM`, `MMM`, `MM`, `M`,
-	 * `DD`, `D`, `dddd`, `ddd`, `HH`, `H`, `hh`, `h`, `mm`, `m`, `ss`, `s`, `SSS`,
-	 * `A` and `a` are replaced, text inside `[` `]` is written as it is, and so is
-	 * everything else. Default `'YYYY-MM-DDTHH:mm:ss.SSSZ'`, which is ISO 8601:
-	 * `2024-03-15T14:07:32.481Z`.
+	 * How the date is written, at `utcOffset`. `YYYY`, `YY`, `MMMM`, `MMM`, `MM`,
+	 * `M`, `DD`, `D`, `dddd`, `ddd`, `HH`, `H`, `hh`, `h`, `mm`, `m`, `ss`, `s`,
+	 * `SSS`, `A`, `a`, `Z` and `ZZ` are replaced, text inside `[` `]` is written as
+	 * it is, and so is everything else. Default `'YYYY-MM-DDTHH:mm:ss.SSSZ'`,
+	 * which is ISO 8601: `2024-03-15T14:07:32.481Z`, or `…+09:00` at an offset.
 	 */
 	format?: string;
+	/**
+	 * The offset from UTC the dates are written at: `'+09:00'`, `'-05:30'`, `'Z'`,
+	 * or a number of minutes east of UTC (`540`). Every part of a date is read at
+	 * it, a string bound with no offset of its own is read at it, and `Z` in a
+	 * format writes it. Default UTC. An offset rather than a zone's name: a zone
+	 * changes its offset with the date, and the Dart package has no table of the
+	 * rules to read one from.
+	 */
+	utcOffset?: string | number;
 	/**
 	 * The language `MMMM`, `MMM`, `dddd`, `ddd`, `A` and `a` write their words in:
 	 * `March` or `3월`, `Friday` or `金曜日`, `PM` or `오후`. Default `'en'`. A format
