@@ -10,7 +10,7 @@ Every option and every example, with **Dart** picked in the sidebar. This README
 
 ---
 
-**randino** generates random person names, nicknames, words, sentences, real locations, ages, genders, organizations, dates and phone numbers in the language you ask for, and real operating systems, devices, processors, graphics, architectures, memory and storage for a sample machine.
+**randino** generates random person names, nicknames, words, sentences, real locations, ages, genders, organizations, dates and phone numbers in the language you ask for, and real operating systems, devices, processors, graphics, architectures, memory, storage and screen resolutions for a sample machine.
 
 - **Person names** read like names people carry: Emma Clover, Jack Reeves, each with its English pronunciation. 9 languages.
 - **Nicknames** are handles for a game or a website: MistyOwl, CraneVoyage, RustyBoot. Built from everyday words across twenty-nine themes, and never from person names.
@@ -22,7 +22,7 @@ Every option and every example, with **Dart** picked in the sidebar. This README
 - **Organizations** are companies, schools, offices and associations that do not exist, from `randOrganization`: (주)새솔테크, Westbrook High School, Stadtwerke Bergtal.
 - **Dates** are drawn evenly from a range and written out in UTC by a format of your own, from `randDate`, or one part at a time from `randDateUnit`.
 - **Phone numbers** are written the way their country writes them, from `randPhone`, in nine countries. They open on blocks the country really gives out, so one can by chance be real: sample data, never a number to call.
-- **System values** describe a sample machine with real products: an operating system from `randOs`, written the way its release is known, `Windows 11 Pro 23H2 (Build 22631)`, a phone, tablet or laptop from `randDevice`, `Apple iPhone 15 Pro`, its processor and graphics from `randCpu` and `randGpu`, `Intel Core i7-13700K`, `NVIDIA GeForce RTX 4090`, the architecture from `randArchitecture`, `x86_64`, its memory from `randRam`, `16 GB`, and its storage from `randDiskType` and `randDiskSize`, `SSD`, `1 TB`.
+- **System values** describe a sample machine with real products: an operating system from `randOs`, written the way its release is known, `Windows 11 Pro 23H2 (Build 22631)`, a phone, tablet or laptop from `randDevice`, `Apple iPhone 15 Pro`, its processor and graphics from `randCpu` and `randGpu`, `Intel Core i7-13700K`, `NVIDIA GeForce RTX 4090`, the architecture from `randArchitecture`, `x86_64`, its memory from `randRam`, `16 GB`, its storage from `randDiskType` and `randDiskSize`, `SSD`, `1 TB`, and its screen from `randResolution`, `1920x1080`.
 - **Decorators** attach something to a string you already have: `randSuffix`, `randPrefix` and `randModifier`.
 - Every parameter is named and optional, and a **null enum means "every one of them"**, so `randName()` on its own works.
 - **Pure Dart, no dependencies.** It imports nothing but `dart:math`, so it runs on the VM, on the web and inside Flutter on every platform.
@@ -504,6 +504,20 @@ randDiskSizeDetails().first; // DiskSizeDetail(1 TB, 1000000000000)
 
 It takes `randRam`'s parameters, with `unit` a `DiskUnit?`.
 
+### Resolutions
+
+Screen resolutions, the way a browser reports them, with the common ones most often: 1920x1080 is about a quarter of the desktops, and a phone is written portrait, its width first. A scaled display is the size the system lays things out at, so a 1920x1080 laptop at 125% is `1536x864`.
+
+```dart
+randResolution(platform: SystemPlatform.desktop, count: 3); // [1920x1080, 2560x1440, 1366x768]
+randResolution(platform: SystemPlatform.mobile); // [390x844]
+randResolution(separator: '×'); // [1920×1080]
+
+randResolutionDetails().first; // ResolutionDetail(1920x1080, desktop)
+```
+
+It takes `platform`, `separator`, `count`, `unique` and `random`.
+
 ## Decorators
 
 `randSuffix`, `randPrefix` and `randModifier` attach something to a string you already have, rather than generating one. They take anything, not just this library's output, which is why none of them is a parameter on a generator. Each of them also works with no value at all, handing back the thing it would have attached.
@@ -572,7 +586,7 @@ The two generate the same output from the same data, and only the surface is Dar
 | `language: 'all'` (the default)    | `language` left out, or `null`                 |
 | `[number, number]`                 | `LengthRange`, which compares by value         |
 | `NameDetail` / `NicknameDetail` interfaces | The same two names, as classes         |
-| `output: 'detail'`                 | `randNameDetails` / `randNicknameDetails` / `randWordDetails` / `randSentenceDetails` / `randLocationDetails` / `randOsDetails` / `randDeviceDetails` / `randCpuDetails` / `randGpuDetails` / `randArchitectureDetails` / `randRamDetails` / `randDiskTypeDetails` / `randDiskSizeDetails` … |
+| `output: 'detail'`                 | `randNameDetails` / `randNicknameDetails` / `randWordDetails` / `randSentenceDetails` / `randLocationDetails` / `randOsDetails` / `randDeviceDetails` / `randCpuDetails` / `randGpuDetails` / `randArchitectureDetails` / `randRamDetails` / `randDiskTypeDetails` / `randDiskSizeDetails` / `randResolutionDetails` … |
 | `randDate({ unit: 'minute' })`     | `randDateUnit(DateUnit.minute)`                |
 | `randModifier('Owl')`             | `randModifier(value: 'Owl')` — every parameter is named |
 | `randSuffix(['a', 'b'])`           | `randSuffixAll(['a', 'b'])`                    |

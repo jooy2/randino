@@ -60,6 +60,7 @@ from randino.os.data import OS_FAMILIES, OS_RELEASES
 from randino.phone.data import PHONE_COUNTRIES, PHONE_DATA, PHONE_TYPES
 from randino.phone.data._types import PhoneShape
 from randino.ram.data import RAM_SCALE
+from randino.resolution.data import RESOLUTION_SEPARATOR_DEFAULT, RESOLUTIONS
 from randino.sentence.data import (
     AGENT_CLASSES,
     FIELD_RULES,
@@ -559,6 +560,14 @@ print(
                         "aliases": list(data.aliases),
                     }
                     for code, data in ARCHITECTURE_DATA.items()
+                },
+            },
+            # One entry per screen size, keyed by its platform and the size itself.
+            "resolution": {
+                "separator": RESOLUTION_SEPARATOR_DEFAULT,
+                "sizes": {
+                    f"{entry.platform} {entry.width}x{entry.height}": entry.weight
+                    for entry in RESOLUTIONS
                 },
             },
             # One entry per processor, keyed by its maker and model, the way the devices are.

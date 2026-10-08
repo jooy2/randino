@@ -187,6 +187,7 @@ void _system() {
   print(randRam(count: 3)); // [8 GB, 16 GB, 4 GB]
   print(randDiskType(platform: SystemPlatform.desktop)); // [SSD]
   print(randDiskSize(count: 2)); // [1 TB, 256 GB]
+  print(randResolution(platform: SystemPlatform.mobile)); // [390x844]
 }
 
 void _decorators() {

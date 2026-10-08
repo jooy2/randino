@@ -31,6 +31,7 @@ import 'package:randino/src/os/data/index.dart';
 import 'package:randino/src/phone/data/index.dart';
 import 'package:randino/src/phone/data/types.dart';
 import 'package:randino/src/ram/data/index.dart';
+import 'package:randino/src/resolution/data/index.dart';
 import 'package:randino/src/sentence/data/index.dart';
 import 'package:randino/src/sentence/data/types.dart';
 import 'package:randino/src/types.dart';
@@ -611,6 +612,14 @@ void main() {
               'rare': entry.value.rare,
               'aliases': entry.value.aliases,
             },
+        },
+      },
+      // One entry per screen size, keyed by its platform and the size itself.
+      'resolution': <String, Object?>{
+        'separator': resolutionSeparatorDefault,
+        'sizes': <String, Object?>{
+          for (final entry in resolutions)
+            '${entry.platform.name} ${entry.width}x${entry.height}': entry.weight,
         },
       },
       // One entry per processor, keyed by its maker and model, the way the

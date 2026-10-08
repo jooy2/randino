@@ -10,7 +10,7 @@ Every option and every example, with **JavaScript** picked in the sidebar. This 
 
 ---
 
-**randino** generates random person names, nicknames, words, sentences, real locations, ages, genders, organizations, dates and phone numbers in the language you ask for, and real operating systems, devices, processors, graphics, architectures, memory and storage for a sample machine.
+**randino** generates random person names, nicknames, words, sentences, real locations, ages, genders, organizations, dates and phone numbers in the language you ask for, and real operating systems, devices, processors, graphics, architectures, memory, storage and screen resolutions for a sample machine.
 
 - **Person names** read like names people carry: Emma Clover, Jack Reeves, each with its English pronunciation. 9 languages.
 - **Nicknames** are handles for a game or a website: MistyOwl, CraneVoyage, RustyBoot. Built from everyday words across twenty-nine themes, and never from person names.
@@ -22,7 +22,7 @@ Every option and every example, with **JavaScript** picked in the sidebar. This 
 - **Organizations** are companies, schools, offices and associations that do not exist, from `randOrganization`: (주)새솔테크, Westbrook High School, Stadtwerke Bergtal.
 - **Dates** are drawn evenly from a range and written out in UTC by a format of your own, from `randDate`, or one part at a time.
 - **Phone numbers** are written the way their country writes them, from `randPhone`, in nine countries. They open on blocks the country really gives out, so one can by chance be real: sample data, never a number to call.
-- **System values** describe a sample machine with real products: an operating system from `randOs`, written the way its release is known, `Windows 11 Pro 23H2 (Build 22631)`, a phone, tablet or laptop from `randDevice`, `Apple iPhone 15 Pro`, its processor and graphics from `randCpu` and `randGpu`, `Intel Core i7-13700K`, `NVIDIA GeForce RTX 4090`, the architecture from `randArchitecture`, `x86_64`, its memory from `randRam`, `16 GB`, and its storage from `randDiskType` and `randDiskSize`, `SSD`, `1 TB`.
+- **System values** describe a sample machine with real products: an operating system from `randOs`, written the way its release is known, `Windows 11 Pro 23H2 (Build 22631)`, a phone, tablet or laptop from `randDevice`, `Apple iPhone 15 Pro`, its processor and graphics from `randCpu` and `randGpu`, `Intel Core i7-13700K`, `NVIDIA GeForce RTX 4090`, the architecture from `randArchitecture`, `x86_64`, its memory from `randRam`, `16 GB`, its storage from `randDiskType` and `randDiskSize`, `SSD`, `1 TB`, and its screen from `randResolution`, `1920x1080`.
 - **Decorators** attach something to a string you already have: `randSuffix`, `randPrefix` and `randModifier`.
 - One options object per generator, every option optional: `randName()` on its own works.
 - **No runtime dependencies.** ESM, typed, and it runs in Node and in the browser alike.
@@ -572,6 +572,29 @@ randDiskSize({ output: 'detail' }); // [{ size: '1 TB', value: 1, unit: 'TB', by
 ```
 
 It takes `randRam`'s options, with `unit` a `DiskUnitOption`: `'MB'`, `'GB'`, `'TB'` or `'auto'`.
+
+### Resolutions
+
+Screen resolutions, the way a browser reports them, with the common ones most often: 1920x1080 is about a quarter of the desktops, and a phone is written portrait, its width first. A scaled display is the size the system lays things out at, so a 1920x1080 laptop at 125% is `1536x864`.
+
+```javascript
+import { randResolution } from 'randino';
+
+randResolution({ platform: 'desktop', count: 3 }); // ['1920x1080', '2560x1440', '1366x768']
+randResolution({ platform: 'mobile' }); // ['390x844']
+randResolution({ separator: '×' }); // ['1920×1080']
+
+randResolution({ output: 'detail' });
+// [{ resolution: '1920x1080', width: 1920, height: 1080, platform: 'desktop' }]
+```
+
+| Option      | Type                   | Default   |
+| ----------- | ---------------------- | --------- |
+| `platform`  | `SystemPlatformOption` | `'all'`   |
+| `separator` | `string`               | `'x'`     |
+| `count`     | `number`               | `1`       |
+| `unique`    | `boolean`              | `false`   |
+| `output`    | `'value' \| 'detail'`  | `'value'` |
 
 ## Decorators
 

@@ -1419,3 +1419,30 @@ class ArchitectureDetail {
   @override
   String toString() => 'ArchitectureDetail($architecture, $bits)';
 }
+
+/// A generated screen resolution, as two numbers and as written.
+class ResolutionDetail {
+  /// Creates a detail record. Returned by the generator; there is rarely a
+  /// reason to build one by hand outside a test.
+  const ResolutionDetail({
+    required this.resolution,
+    required this.width,
+    required this.height,
+    required this.platform,
+  });
+
+  /// The resolution as `randResolution` returns it: `1920x1080`.
+  final String resolution;
+
+  /// The width, in the pixels a browser reports.
+  final int width;
+
+  /// The height, in the pixels a browser reports.
+  final int height;
+
+  /// The kind of machine the screen belongs to.
+  final SystemPlatform platform;
+
+  @override
+  String toString() => 'ResolutionDetail($resolution, ${platform.name})';
+}

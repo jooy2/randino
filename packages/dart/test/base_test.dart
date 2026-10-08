@@ -76,6 +76,7 @@ void main() {
           'RamUnit',
           'RandRealism',
           'RandVocabulary',
+          'ResolutionDetail',
           'SentenceDetail',
           'SentenceQuote',
           'SentenceShape',
@@ -188,6 +189,8 @@ void main() {
           'randRamDetails',
           'randRegion',
           'randRegionDetails',
+          'randResolution',
+          'randResolutionDetails',
           'randSentence',
           'randSound',
           'randSentenceDetails',
@@ -325,6 +328,8 @@ void main() {
       expect(randGpuDetails()[0], isA<GpuDetail>());
       expect(architectures, contains(randArchitecture().single));
       expect(randArchitectureDetails()[0], isA<ArchitectureDetail>());
+      expect(randResolution().single, matches(RegExp(r'^\d+x\d+$')));
+      expect(randResolutionDetails()[0], isA<ResolutionDetail>());
     });
 
     test('the bounds are the same numbers the JavaScript package uses', () {
@@ -425,6 +430,7 @@ void main() {
       twice(() => randCpu(count: 5, random: Random(42)).join());
       twice(() => randGpu(count: 5, random: Random(42)).join());
       twice(() => randArchitecture(count: 5, includeRare: true, random: Random(42)).join());
+      twice(() => randResolution(count: 5, random: Random(42)).join());
       twice(() => randOrganization(count: 5, random: Random(42)).join('|'));
       twice(() => randOrganization(count: 5, maxLength: 20, random: Random(42)).join('|'));
       twice(() => randSuffixAll(const ['a', 'b'], random: Random(42)).join());

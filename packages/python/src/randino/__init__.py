@@ -73,6 +73,7 @@ from randino._types import (
     RamUnitOption,
     RandRealism,
     RandVocabulary,
+    ResolutionDetail,
     SentenceDetail,
     SentenceQuote,
     SentenceShape,
@@ -143,6 +144,7 @@ from randino.organization import ORGANIZATION_INDUSTRIES, ORGANIZATION_TYPES, ra
 from randino.os import rand_os
 from randino.phone import PHONE_COUNTRIES, PHONE_TYPES, rand_phone
 from randino.ram import RAM_UNITS, rand_ram
+from randino.resolution import rand_resolution
 from randino.sentence import rand_sentence, sentence_length_range
 from randino.word import (
     WORD_LANGUAGES,
@@ -260,6 +262,7 @@ __all__ = [
     "RamUnitOption",
     "RandRealism",
     "RandVocabulary",
+    "ResolutionDetail",
     "SentenceDetail",
     "SentenceQuote",
     "SentenceShape",
@@ -326,6 +329,7 @@ __all__ = [
     "rand_product",
     "rand_ram",
     "rand_region",
+    "rand_resolution",
     "rand_sentence",
     "rand_sound",
     "rand_space",

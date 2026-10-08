@@ -99,6 +99,8 @@ export 'src/phone/rand_phone_details.dart' show randPhoneDetails;
 export 'src/ram/data/index.dart' show ramUnits;
 export 'src/ram/rand_ram.dart' show randRam;
 export 'src/ram/rand_ram_details.dart' show randRamDetails;
+export 'src/resolution/rand_resolution.dart' show randResolution;
+export 'src/resolution/rand_resolution_details.dart' show randResolutionDetails;
 export 'src/sentence/rand_sentence.dart' show randSentence;
 export 'src/sentence/rand_sentence_details.dart' show randSentenceDetails;
 export 'src/sentence/sentence_length_range.dart' show sentenceLengthRange;
@@ -142,6 +144,7 @@ export 'src/types.dart'
         RamUnit,
         RandRealism,
         RandVocabulary,
+        ResolutionDetail,
         SentenceDetail,
         SentenceShape,
         SentenceQuote,

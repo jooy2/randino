@@ -224,3 +224,4 @@ rand_device(output="detail")
 - [`randOs`](../os/rand-os) — an operating system to run on it, from the same years.
 - [`randCpu`](../cpu/rand-cpu) — the processor inside it.
 - [`randRam`](../ram/rand-ram) — the memory it comes with.
+- [`randResolution`](../resolution/rand-resolution) — the size of its screen.

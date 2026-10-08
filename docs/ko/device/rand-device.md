@@ -224,3 +224,4 @@ rand_device(output="detail")
 - [`randOs`](../os/rand-os) — 같은 연도에 나와 있던, 그 기기에서 돌릴 운영체제.
 - [`randCpu`](../cpu/rand-cpu) — 그 기기에 들어 있는 프로세서.
 - [`randRam`](../ram/rand-ram) — 그 기기에 들어 있는 메모리.
+- [`randResolution`](../resolution/rand-resolution) — 그 기기의 화면 크기.

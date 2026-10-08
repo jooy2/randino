@@ -70,6 +70,10 @@ import {
 import { OS_FAMILIES, OS_RELEASES } from '../../packages/javascript/lib/os/data/index.js';
 import { RAM_SCALE } from '../../packages/javascript/lib/ram/data/index.js';
 import {
+	RESOLUTIONS,
+	RESOLUTION_SEPARATOR_DEFAULT
+} from '../../packages/javascript/lib/resolution/data/index.js';
+import {
 	PHONE_COUNTRIES,
 	PHONE_DATA,
 	PHONE_TYPES
@@ -309,6 +313,16 @@ console.log(
 		architecture: {
 			architectures: [...ARCHITECTURES],
 			data: ARCHITECTURE_DATA
+		},
+		// One entry per screen size, keyed by its platform and the size itself.
+		resolution: {
+			separator: RESOLUTION_SEPARATOR_DEFAULT,
+			sizes: Object.fromEntries(
+				RESOLUTIONS.map((entry) => [
+					`${entry.platform} ${entry.width}x${entry.height}`,
+					entry.weight
+				])
+			)
 		},
 		// One entry per processor, keyed by its maker and model, the way the devices are.
 		cpu: Object.fromEntries(

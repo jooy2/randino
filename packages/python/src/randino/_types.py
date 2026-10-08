@@ -956,3 +956,20 @@ class ArchitectureDetail:
 
     rare: bool
     """Whether it is one of the architectures `include_rare` adds."""
+
+
+@dataclass(frozen=True, slots=True)
+class ResolutionDetail:
+    """A generated screen resolution, as two numbers and as written."""
+
+    resolution: str
+    """The resolution as the value form returns it: `1920x1080`."""
+
+    width: int
+    """The width, in the pixels a browser reports."""
+
+    height: int
+    """The height, in the pixels a browser reports."""
+
+    platform: SystemPlatform
+    """The kind of machine the screen belongs to."""

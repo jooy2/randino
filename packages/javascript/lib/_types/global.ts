@@ -1560,3 +1560,31 @@ export interface ArchitectureDetail {
 	/** Whether it is one of the architectures `includeRare` adds. */
 	rare: boolean;
 }
+
+/**
+ * What `randResolution` takes. A resolution is two numbers, so it has no
+ * language, no length and nothing to invent.
+ */
+export interface RandResolutionOptions extends Pick<
+	RandCommonOptions,
+	'count' | 'unique' | 'output' | 'random'
+> {
+	/** The screens of desktops and laptops, of phones and tablets, or both. Default `'all'`. */
+	platform?: SystemPlatformOption;
+	/**
+	 * What goes between the width and the height: `'×'` writes `1920×1080`, `' x '`
+	 * writes `1920 x 1080`. Default `'x'`.
+	 */
+	separator?: string;
+}
+
+/** A generated screen resolution, as two numbers and as written. */
+export interface ResolutionDetail {
+	/** The resolution as the value form returns it: `1920x1080`. */
+	resolution: string;
+	/** The width, in the pixels a browser reports. */
+	width: number;
+	/** The height, in the pixels a browser reports. */
+	height: number;
+	platform: SystemPlatform;
+}

@@ -84,6 +84,7 @@ describe('base test', () => {
 			'randProduct',
 			'randRam',
 			'randRegion',
+			'randResolution',
 			'randSentence',
 			'randSound',
 			'randSpace',
@@ -215,6 +216,7 @@ describe('base test', () => {
 		assert.strictEqual(typeof randino.randCpu()[0], 'string');
 		assert.strictEqual(typeof randino.randGpu()[0], 'string');
 		assert.ok(randino.ARCHITECTURES.includes(randino.randArchitecture()[0] as never));
+		assert.match(randino.randResolution()[0], /^\d+x\d+$/);
 	});
 
 	it('an option the types rule out falls back rather than throwing', () => {
@@ -368,6 +370,7 @@ describe('base test', () => {
 		agrees(() => randino.randCpu({ count: 5, random: seeded(42) }));
 		agrees(() => randino.randGpu({ count: 5, random: seeded(42) }));
 		agrees(() => randino.randArchitecture({ count: 5, includeRare: true, random: seeded(42) }));
+		agrees(() => randino.randResolution({ count: 5, random: seeded(42) }));
 
 		// Two different seeds are two different answers, so the source is actually
 		// what the draws are coming from.
