@@ -4,7 +4,7 @@ Guidance for AI agents (and humans) working in this repository. Written in Engli
 
 ## What randino is
 
-**randino** is a zero-dependency library that generates random **person names**, **nicknames**, **everyday words**, **sentences**, **locations**, **ages**, **genders**, **organizations** and **dates**, per language. It ships for more than one programming language — TypeScript, Dart and Python — and every one of them generates from the same datasets under the same rules. Separate concerns, deliberately:
+**randino** is a zero-dependency library that generates random **person names**, **nicknames**, **everyday words**, **sentences**, **locations**, **ages**, **genders**, **organizations**, **dates** and **phone numbers**, per language. It ships for more than one programming language — TypeScript, Dart and Python — and every one of them generates from the same datasets under the same rules. Separate concerns, deliberately:
 
 - **Names** should read like names a person actually carries (`김민준`, `Emma Clover`). Sample data for forms, seeds, mockups.
 - **Nicknames** are the handles someone would pick for a game or a website (`멋진사자`, `MistyOwl`). They are built from everyday words and **never from person names** — that rule is the whole point of keeping the two apart.
@@ -14,6 +14,7 @@ Guidance for AI agents (and humans) working in this repository. Written in Engli
 - **Ages** are whole numbers of years for a sample person (`34`), drawn along a curve shaped like a population rather than evenly, so a sample is mostly adults. An age has no language, so `randAge` is the one generator that takes none, and `minAge` / `maxAge` and `group` are its own options in place of the length ones.
 - **Genders** are the label a form in the language writes for one (`여성`, `Female`, `Divers`). Male and female split evenly, and the two others — `unknown` and `nonbinary` — come up only when the caller switches them on, and rarely when they do.
 - **Dates** are instants drawn evenly from a range and written out in UTC (`2024-03-15T14:07:32.481Z`, `2024년 3월 15일`), by a format of the caller's own. `unit` hands back one part of a date as a number instead — `minute` is `0` to `59` — read off a drawn date so it keeps to the range. A date is written by a format rather than in a language, so `randDate` takes no `language`, and `minDate` / `maxDate`, `format` and `unit` are its own options.
+- **Phone numbers** are written the way their country writes them (`010-4821-3967`, `(415) 726-0193`, `8 (912) 345-67-89`), for the country each word language is spoken in first. Each opens on a block the country's numbering plan really gives out and ends on random digits, so **a drawn number can by chance be somebody's** — the docs and the doc comments say so, and say never to call or text one. `randPhone` takes `country` in place of `language`, and `type`, `includeCountryCode` and `separator` are its own options.
 - **Organizations** are companies, schools, offices and associations that do not exist (`(주)새솔테크`, `Westbrook High School`, `Гимназия № 135`), each written the way its language writes that kind. Nothing about them is real, and that is the requirement rather than a limitation: the stems are chosen to be nobody's brand, and **no organization is ever built from a person name** — a surname with a legal form behind it is exactly how famous companies are named.
 
 All of them are implemented. Keep the generators apart — a shared "generator" abstraction is not wanted — but the options they all take, and the loop that draws until it has `count` results, live in `_internal/generate` and are shared. So are the word pools: `word/data` is the one dataset, and `nickname` consumes it.
@@ -112,6 +113,11 @@ lib/
     randNickname.ts         # public: string[], or NicknameDetail[] likewise
     nicknameLengthRange.ts  # public helper
     nicknameGenerator.ts    # internal: shapes, length fitting; draws through word/
+  phone/
+    index.ts
+    randPhone.ts            # public: string[], or PhoneDetail[] on `output: 'detail'`
+    phoneGenerator.ts       # internal: the shape per draw, the groups, the three ways to write them
+    data/index.ts           # PHONE_COUNTRIES, PHONE_TYPES, every country's plan and templates
   sentence/
     index.ts
     randSentence.ts         # public: string[], or SentenceDetail[] likewise
@@ -142,6 +148,7 @@ test/
   location.test.ts
   name.test.ts
   nickname.test.ts
+  phone.test.ts
   sentence.test.ts
   word.test.ts
 ```
@@ -217,6 +224,7 @@ lib/
       word_generator.dart
       rand_word.dart rand_animal.dart …
     nickname/               # mirrors lib/nickname
+    phone/                  # mirrors lib/phone, plus `randPhoneDetails`
     sentence/               # mirrors lib/sentence, plus `randSentenceDetails`
       data/                 # one file per language, ported verbatim
     location/               # mirrors lib/location, plus a `…Details` twin per function
@@ -231,6 +239,7 @@ test/
   location_test.dart
   name_test.dart
   nickname_test.dart
+  phone_test.dart
   sentence_test.dart
   word_test.dart
 example/
@@ -303,6 +312,7 @@ src/randino/
     _generator.py
     rand_word.py rand_animal.py …
   nickname/                 # mirrors lib/nickname
+  phone/                    # mirrors lib/phone
   sentence/                 # mirrors lib/sentence
     data/                   # one file per language, ported verbatim
   location/                 # mirrors lib/location
@@ -318,6 +328,7 @@ tests/
   test_location.py
   test_name.py
   test_nickname.py
+  test_phone.py
   test_sentence.py
   test_word.py
 ```
@@ -498,7 +509,7 @@ The run stops rather than writes when a file changes shape — new columns, an u
 
 **The dumps normalize what only differs because the languages differ, and nothing else.** A pool entry is `{ n, r }` everywhere; field names are the JavaScript ones; an optional field is present and null rather than absent; `syn` carries its `kind` tag even in the two packages that tell the shapes apart by type. That normalization lives in the three dumps — one per package, each responsible for its own language's spelling — so the comparison itself has nothing to know about any of them. Adding a field to a dataset means adding it to all three dumps, and the check reports a field only one dump writes as a difference, which is the intended failure.
 
-**Do not widen it into a general "the ports agree" check.** It covers the word, sentence, name and location datasets, the age bands and curve, the date units and default range, the gender labels and weights, the organization datasets and their odds, the stories and the field rules beside them, the surname romanization map, and the bounds in `constants` and `decorate/data` — the last of which is still written by hand in each package. The nickname shapes are in it now that they are `WordLanguageData.frames`: they were left out while they were a table private to each generator, and being data is what put them in. The sentence datasets are the same story on a larger scale, `THEME_CLASS` included, because a theme moving from one class to another changes what every verb of every language will accept.
+**Do not widen it into a general "the ports agree" check.** It covers the word, sentence, name and location datasets, the age bands and curve, the date units and default range, the phone plans and templates, the gender labels and weights, the organization datasets and their odds, the stories and the field rules beside them, the surname romanization map, and the bounds in `constants` and `decorate/data` — the last of which is still written by hand in each package. The nickname shapes are in it now that they are `WordLanguageData.frames`: they were left out while they were a table private to each generator, and being data is what put them in. The sentence datasets are the same story on a larger scale, `THEME_CLASS` included, because a theme moving from one class to another changes what every verb of every language will accept.
 
 ## Testing a random generator
 
@@ -643,6 +654,15 @@ Dates:
 - **The tokens are the npm ecosystem's, in all three packages.** `YYYY`, `MM`, `DD`, `HH`, `mm`, `ss`, `SSS`, `A` and the rest, with `[` `]` for literal text; Python takes the same tokens rather than `strftime`'s, because a format string is data a caller may share between the packages. Only numbers and `AM` / `PM` are written: a month or a weekday name is a word in a language, and a token for one would need a language option and a table per language.
 - **Dart draws through `randDouble`, not `randInt`.** `Random.nextInt` takes no bound past 2^32, and two centuries are six trillion milliseconds.
 
+Phone numbers:
+
+- **A number may be real, and the docs say so where a reader will see it.** It opens on a block the country really gives out, so it can be in service, and nothing in the library can know whether it is. The `randPhone` page opens with a warning, ends with a section on using the numbers, and the doc comment on every `randPhone` says the same: sample data, never a number to call or text, and any resemblance a coincidence of the draw. A change that makes the numbers more real — a finer block, an exchange list — keeps all of that true; a fictional range a country reserves (`555-01xx`) is what would make them less so.
+- **The plan is data at the level of the blocks, and nothing finer.** `PHONE_DATA` lists, per country, the mobile blocks and the area codes of real cities, how many digits follow, and the two templates the country writes a number with. A list is written from the country's numbering plan as it is publicly documented, and narrowed rather than widened where a block's use was in doubt: China's data-card blocks, Germany's pagers, Russia's satellite and data codes and the two it lends to Abkhazia and South Ossetia are left out, and the US area codes are long-standing ones of the fifty states and DC. **Do not copy libphonenumber's metadata** to widen it: it is Apache 2.0, and its terms would travel with every package, which the library's MIT-only promise rules out.
+- **A number is its groups, and the three forms are three ways of writing them.** `#` in a template is the next group and `T` the trunk prefix; `T#` attaches the trunk to the first group (`010`) and anything between keeps them apart (`8 (912)`), which is also where a custom `separator` puts it. `includeCountryCode` writes the international template and drops the trunk; Italy has no trunk and keeps a landline's `0` because the `0` is part of its prefixes. E.164 is always the groups run together after `+` and the calling code.
+- **Every opening is as likely as any other.** A shape is drawn by how many first groups it can write — its prefixes times what its `lead` can add — so Spain's `6xx` is ten times as likely as its `71x`, and a shape listing sixteen area codes sixteen times as likely as one listing one. Weighting by the prefix count alone made 80% of Spanish mobiles start on a `7`.
+- **`avoid` is drawn again, not filtered after.** A US exchange that comes out `N11` or `555` is redrawn up to `AVOID_ATTEMPTS` times; nine values in eight hundred never get close.
+- **One country per word language, and the suites hold it.** `PHONE_COUNTRIES` is as long as `WORD_LANGUAGES`, in the same order; a word language added without its country fails the base tests.
+
 Genders:
 
 - **A label is what a form writes, not the noun for a person.** `남성` rather than `남자`, `Männlich` rather than `Mann`, and the adjective that agrees with the field's own noun where the language has one (`Masculino` for `sexo`, `Мужской` for `пол`). German writes `Divers` for the third option because that is the option its forms carry. A new word language needs a row in `GENDER_LABELS` in all three packages, and the suites assert every language labels every code with four different strings.
@@ -716,9 +736,10 @@ To add one that clears the bar:
 7. No person names, and no word that is only a name — for `en` this is enforced against the person-name pools, which is why `job` has no `Knight`, `Baker` or `Hunter` and `plant` no `Rose` or `Ivy`. Add the language to the README tables and to `SCRIPT` in `test/word.test.ts` **and** `test/nickname.test.ts`; the existing per-language tests then cover it.
 8. A language that inflects tags its nouns and lists its endings: write `nouns` as a `theme -> \`gato:m luna:f\`` map through `taggedNouns`, and give `agreement` the rules per form, `p` (and `fp` where the plural inflects for gender) included if any noun has no singular. Put the noun **first** in the frames where the grammar allows it; where it cannot (`blauer Wal`), `buildWords` draws the noun ahead of its turn instead.
 9. Port all of it to `packages/dart` and `packages/python`, the same way a name language is ported.
-10. Add the language's row to `GENDER_LABELS` and its `organization/data/<code>` file — stems checked against brands, the business words for every industry, a template for every kind and its legal forms — in all three packages. `randGender` and `randOrganization` cover every word language, and both suites assert it.
-11. Add the row to the tables in `docs/*/guide/languages.md` and to the root `README.md`.
-12. Run `node tools/parity/index.mjs` from the repository root — twenty-nine pools in three packages are exactly where one word goes missing unnoticed.
+10. Add the country the language is spoken in first to `PhoneCountry` and `PHONE_DATA`, with its mobile blocks, a dozen real area codes and its two templates, in all three packages. The base suites assert one phone country per word language.
+11. Add the language's row to `GENDER_LABELS` and its `organization/data/<code>` file — stems checked against brands, the business words for every industry, a template for every kind and its legal forms — in all three packages. `randGender` and `randOrganization` cover every word language, and both suites assert it.
+12. Add the row to the tables in `docs/*/guide/languages.md` and to the root `README.md`.
+13. Run `node tools/parity/index.mjs` from the repository root — twenty-nine pools in three packages are exactly where one word goes missing unnoticed.
 
 ### The compound rule: one entry per thing
 

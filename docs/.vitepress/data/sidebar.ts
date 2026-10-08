@@ -103,7 +103,8 @@ export const SIDEBAR: SidebarGroup[] = [
 								en: 'randOrganization',
 								ko: 'randOrganization'
 							},
-							{ path: 'date/rand-date', en: 'randDate', ko: 'randDate' }
+							{ path: 'date/rand-date', en: 'randDate', ko: 'randDate' },
+							{ path: 'phone/rand-phone', en: 'randPhone', ko: 'randPhone' }
 						]
 					},
 					{

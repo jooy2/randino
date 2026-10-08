@@ -58,6 +58,13 @@ def test_the_package_exports_exactly_its_public_api() -> None:
         "OrganizationIndustryOption",
         "OrganizationType",
         "OrganizationTypeOption",
+        "PHONE_COUNTRIES",
+        "PHONE_TYPES",
+        "PhoneCountry",
+        "PhoneCountryOption",
+        "PhoneDetail",
+        "PhoneType",
+        "PhoneTypeOption",
         "RAND_AGE_MAX",
         "RAND_COUNT_MAX",
         "RAND_LENGTH_MAX",
@@ -120,6 +127,7 @@ def test_the_package_exports_exactly_its_public_api() -> None:
         "rand_object",
         "rand_organization",
         "rand_person",
+        "rand_phone",
         "rand_place",
         "rand_plant",
         "rand_prefix",
@@ -221,6 +229,12 @@ def test_the_functions_are_callable_and_the_constants_are_what_they_claim() -> N
     assert randino.ORGANIZATION_TYPES == ("company", "nonprofit", "school", "government", "public")
     assert len(randino.ORGANIZATION_INDUSTRIES) == 10
 
+    # A phone number is written by its country, one country per word language.
+    assert isinstance(randino.rand_phone()[0], str)
+    assert randino.rand_phone(output="detail")[0].e164.startswith("+")
+    assert len(randino.PHONE_COUNTRIES) == len(randino.WORD_LANGUAGES)
+    assert randino.PHONE_TYPES == ("mobile", "landline")
+
 
 def test_the_package_imports_nothing_outside_the_standard_library() -> None:
     # Zero runtime dependencies is a hard constraint, not a preference — it is why
@@ -297,6 +311,8 @@ def test_an_option_the_types_rule_out_falls_back_rather_than_raising() -> None:
         lambda: loose.rand_age(min_age=float("nan"), max_age="x"),
         lambda: loose.rand_date(unit="week", format=123),
         lambda: loose.rand_date(min_date={}, max_date=[], count=float("nan")),
+        lambda: loose.rand_phone(country="XX", type="pager"),
+        lambda: loose.rand_phone(country=123, separator=7, count=float("nan")),
         lambda: loose.rand_gender(language="xx", count=float("nan")),
         lambda: loose.rand_gender(include_unknown="yes"),
         lambda: loose.rand_organization(language="xx", type="shop"),
@@ -355,6 +371,7 @@ def test_random_is_where_every_draw_of_a_call_comes_from() -> None:
     twice(lambda: randino.rand_age(count=5, random=Random(42).random))
     twice(lambda: randino.rand_date(count=5, random=Random(42).random))
     twice(lambda: randino.rand_date(unit="minute", count=5, random=Random(42).random))
+    twice(lambda: randino.rand_phone(count=5, random=Random(42).random))
     twice(lambda: randino.rand_gender(count=5, include_unknown=True, random=Random(42).random))
     twice(lambda: randino.rand_organization(count=5, random=Random(42).random))
     twice(lambda: randino.rand_organization(count=5, max_length=20, random=Random(42).random))

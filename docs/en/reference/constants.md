@@ -278,6 +278,49 @@ from randino import DATE_UNITS
 
 What each unit returns is on the [`randDate`](../date/rand-date#units) page.
 
+## Phone numbers
+
+::: lang js
+
+```javascript
+import { PHONE_COUNTRIES, PHONE_TYPES } from 'randino';
+```
+
+| Name              | Type             | Value                                                    |
+| ----------------- | ---------------- | -------------------------------------------------------- |
+| `PHONE_COUNTRIES` | `PhoneCountry[]` | `['US', 'KR', 'JP', 'CN', 'VN', 'ES', 'IT', 'DE', 'RU']` |
+| `PHONE_TYPES`     | `PhoneType[]`    | `['mobile', 'landline']`                                 |
+
+:::
+
+::: lang dart
+
+```dart
+import 'package:randino/randino.dart';
+```
+
+| Name             | Type                 | Value                                          |
+| ---------------- | -------------------- | ---------------------------------------------- |
+| `phoneCountries` | `List<PhoneCountry>` | Every country, in the order of `wordLanguages` |
+| `phoneTypes`     | `List<PhoneType>`    | `mobile`, then `landline`                      |
+
+:::
+
+::: lang py
+
+```python
+from randino import PHONE_COUNTRIES, PHONE_TYPES
+```
+
+| Name | Type | Value |
+| --- | --- | --- |
+| `PHONE_COUNTRIES` | `tuple[PhoneCountry, …]` | `('US', 'KR', 'JP', 'CN', 'VN', 'ES', 'IT', 'DE', 'RU')` |
+| `PHONE_TYPES` | `tuple[PhoneType, …]` | `('mobile', 'landline')` |
+
+:::
+
+How each country writes its numbers is on the [`randPhone`](../phone/rand-phone#countries) page.
+
 ## Organizations
 
 ::: lang js
@@ -448,6 +491,11 @@ import type {
 	OrganizationIndustryOption,
 	OrganizationType,
 	OrganizationTypeOption,
+	PhoneCountry,
+	PhoneCountryOption,
+	PhoneDetail,
+	PhoneType,
+	PhoneTypeOption,
 	WordLanguage,
 	WordLanguageOption,
 	WordTheme,
@@ -468,6 +516,7 @@ import type {
 	RandNameOptions,
 	RandNicknameOptions,
 	RandOrganizationOptions,
+	RandPhoneOptions,
 	RandOutput
 } from 'randino';
 
@@ -489,12 +538,13 @@ import 'package:randino/randino.dart';
 AgeGroup, AgeDistribution, DateUnit, GenderCode
 NameLanguage, NameGender, NameScript
 OrganizationType, OrganizationIndustry
+PhoneCountry, PhoneType
 WordLanguage, WordTheme
 LocationLanguage, LocationLevel
 
 // Values
 LengthRange, AgeDetail, DateDetail, GenderDetail, NameDetail, NicknameDetail, LocationDetail, CountryDetail,
-OrganizationDetail
+OrganizationDetail, PhoneDetail
 ```
 
 There is no `…Option` type and no `all` member: **a null enum is what means "every one of them"**, so the parameter you do not write is already the mixed draw. That also means the helpers take the same type the generators do, rather than a narrower one.
@@ -525,6 +575,11 @@ from randino import (
     OrganizationIndustryOption,
     OrganizationType,
     OrganizationTypeOption,
+    PhoneCountry,
+    PhoneCountryOption,
+    PhoneDetail,
+    PhoneType,
+    PhoneTypeOption,
     WordLanguage,
     WordLanguageOption,
     WordTheme,

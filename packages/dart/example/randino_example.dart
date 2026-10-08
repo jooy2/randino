@@ -15,6 +15,7 @@ void main() {
   _people();
   _organizations();
   _dates();
+  _phones();
   _decorators();
   _questionsAboutALanguage();
 }
@@ -158,6 +159,16 @@ void _dates() {
   print(randDate()); // [1987-06-21T08:14:51.302Z]
   print(randDate(minDate: DateTime.utc(2024), format: 'YYYY년 M월 D일')); // [2031년 3월 4일]
   print(randDateUnit(DateUnit.minute, count: 5)); // [37, 4, 52, 19, 0]
+}
+
+/// Phone numbers written the way their country writes them. A drawn number can
+/// by chance be somebody's, so it is sample data and never a number to call.
+void _phones() {
+  print('-- phone numbers ----------------------------------------------');
+
+  print(randPhone(country: PhoneCountry.kr)); // [010-4821-3967]
+  print(randPhone(country: PhoneCountry.us, includeCountryCode: true)); // [+1 415-726-0193]
+  print(randPhoneDetails(country: PhoneCountry.jp).first.e164); // +819037182046
 }
 
 void _decorators() {

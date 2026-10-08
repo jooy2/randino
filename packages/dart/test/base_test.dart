@@ -59,6 +59,9 @@ void main() {
           'OrganizationDetail',
           'OrganizationIndustry',
           'OrganizationType',
+          'PhoneCountry',
+          'PhoneDetail',
+          'PhoneType',
           'RandRealism',
           'RandVocabulary',
           'SentenceDetail',
@@ -87,6 +90,8 @@ void main() {
           'nameSupportsRoman',
           'organizationIndustries',
           'organizationTypes',
+          'phoneCountries',
+          'phoneTypes',
           'wordLanguages',
           'nicknameLengthRange',
           'sentenceLengthRange',
@@ -139,6 +144,8 @@ void main() {
           'randOrganizationDetails',
           'randOrganizationLengthMax',
           'randPerson',
+          'randPhone',
+          'randPhoneDetails',
           'randPlace',
           'randPlant',
           'randPrefix',
@@ -252,6 +259,13 @@ void main() {
         OrganizationType.public,
       ]);
       expect(organizationIndustries, hasLength(10));
+
+      // A phone number is written by its country, one country per word
+      // language.
+      expect(randPhone(), hasLength(1));
+      expect(randPhoneDetails()[0].e164, startsWith('+'));
+      expect(phoneCountries, hasLength(wordLanguages.length));
+      expect(phoneTypes, <PhoneType>[PhoneType.mobile, PhoneType.landline]);
     });
 
     test('the bounds are the same numbers the JavaScript package uses', () {
@@ -337,6 +351,7 @@ void main() {
       twice(() => randAge(count: 5, random: Random(42)).join(','));
       twice(() => randDate(count: 5, random: Random(42)).join());
       twice(() => randDateUnit(DateUnit.minute, count: 5, random: Random(42)).join(','));
+      twice(() => randPhone(count: 5, random: Random(42)).join());
       twice(() => randGender(count: 5, includeUnknown: true, random: Random(42)).join());
       twice(() => randOrganization(count: 5, random: Random(42)).join('|'));
       twice(() => randOrganization(count: 5, maxLength: 20, random: Random(42)).join('|'));

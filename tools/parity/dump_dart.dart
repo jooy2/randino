@@ -22,6 +22,7 @@ import 'package:randino/src/name/data/ko.dart';
 import 'package:randino/src/name/data/types.dart';
 import 'package:randino/src/organization/data/index.dart';
 import 'package:randino/src/organization/data/types.dart';
+import 'package:randino/src/phone/data/index.dart';
 import 'package:randino/src/sentence/data/index.dart';
 import 'package:randino/src/sentence/data/types.dart';
 import 'package:randino/src/word/data/index.dart';
@@ -530,6 +531,34 @@ void main() {
         'legalFormChance': organizationLegalFormChance,
         'data': <String, Object?>{
           for (final entry in organizationData.entries) entry.key.name: organizationOf(entry.value),
+        },
+      },
+      // A shape's optional fields are written out, so a lead, an avoid list or a
+      // trunk one package leaves unset and another sets shows up as a difference.
+      'phone': <String, Object?>{
+        'countries': <String>[for (final country in phoneCountries) country.code],
+        'types': <String>[for (final type in phoneTypes) type.name],
+        'data': <String, Object?>{
+          for (final country in phoneCountries)
+            country.code: <String, Object?>{
+              'callingCode': phoneData[country]!.callingCode,
+              'trunk': phoneData[country]!.trunk,
+              'national': phoneData[country]!.national,
+              'international': phoneData[country]!.international,
+              'plans': <String, Object?>{
+                for (final type in phoneTypes)
+                  type.name: <Object?>[
+                    for (final shape in phoneData[country]!.plans[type]!)
+                      <String, Object?>{
+                        'prefixes': shape.prefixes,
+                        'lead': shape.lead,
+                        'groups': shape.groups,
+                        'avoid': shape.avoid,
+                        'trunk': shape.trunk,
+                      },
+                  ],
+              },
+            },
         },
       },
       'gender': <String, Object?>{

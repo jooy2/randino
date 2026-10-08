@@ -667,3 +667,47 @@ class DateDetail:
 
     millisecond: int
     """`0` to `999`."""
+
+
+PhoneCountry = Literal["US", "KR", "JP", "CN", "VN", "ES", "IT", "DE", "RU"]
+"""A country `rand_phone` writes numbers for, by its ISO 3166-1 alpha-2 code.
+
+One for each language the word pools cover: the United States for English, Korea for
+Korean, and so on.
+"""
+
+PhoneCountryOption = Literal[PhoneCountry, "all"]
+""""all" mixes every country."""
+
+PhoneType = Literal["mobile", "landline"]
+"""What a number is for.
+
+- `mobile`: a mobile phone, from the blocks the country gives its operators.
+- `landline`: a fixed line, behind the area code of a real city.
+
+The United States writes both the same way, so there the two are drawn from the same
+area codes.
+"""
+
+PhoneTypeOption = Literal[PhoneType, "all"]
+""""all" draws a mobile number or a landline per result."""
+
+
+@dataclass(frozen=True, slots=True)
+class PhoneDetail:
+    """A generated phone number with the pieces it was built from."""
+
+    phone: str
+    """What the value form returns, written the way the arguments asked for."""
+
+    e164: str
+    """The same number in E.164, the one form every system accepts: `+821023456789`."""
+
+    country: PhoneCountry
+    """The country the number is for."""
+
+    calling_code: str
+    """The country calling code, without the `+`: `"82"`."""
+
+    type: PhoneType
+    """What the number is for."""

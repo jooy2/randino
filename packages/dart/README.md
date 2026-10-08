@@ -10,7 +10,7 @@ Every option and every example, with **Dart** picked in the sidebar. This README
 
 ---
 
-**randino** generates random person names, nicknames, words, sentences, real locations, ages, genders, organizations and dates in the language you ask for.
+**randino** generates random person names, nicknames, words, sentences, real locations, ages, genders, organizations, dates and phone numbers in the language you ask for.
 
 - **Person names** read like names people carry: Emma Clover, Jack Reeves, each with its English pronunciation. 9 languages.
 - **Nicknames** are handles for a game or a website: MistyOwl, CraneVoyage, RustyBoot. Built from everyday words across twenty-nine themes, and never from person names.
@@ -21,6 +21,7 @@ Every option and every example, with **Dart** picked in the sidebar. This README
 - **Genders** are the labels a form in the language writes, from `randGender`: 여성, Female, Weiblich. An unstated gender and a third gender are there when you ask for them.
 - **Organizations** are companies, schools, offices and associations that do not exist, from `randOrganization`: (주)새솔테크, Westbrook High School, Stadtwerke Bergtal.
 - **Dates** are drawn evenly from a range and written out in UTC by a format of your own, from `randDate`, or one part at a time from `randDateUnit`.
+- **Phone numbers** are written the way their country writes them, from `randPhone`, in nine countries. They open on blocks the country really gives out, so one can by chance be real: sample data, never a number to call.
 - **Decorators** attach something to a string you already have: `randSuffix`, `randPrefix` and `randModifier`.
 - Every parameter is named and optional, and a **null enum means "every one of them"**, so `randName()` on its own works.
 - **Pure Dart, no dependencies.** It imports nothing but `dart:math`, so it runs on the VM, on the web and inside Flutter on every platform.
@@ -320,6 +321,31 @@ randDateDetails().first.year; // 1987
 
 `format` replaces `YYYY`, `YY`, `M`, `MM`, `D`, `DD`, `H`, `HH`, `h`, `hh`, `m`, `mm`, `s`, `ss`, `SSS`, `A` and `a`, and writes text inside `[` `]` as it is. `randDateUnit` takes a `DateUnit` in place of `format` and returns that part of each date as an `int`, read off a date drawn from the range, so a minute is `0` to `59` and a year keeps inside the range.
 
+## Phone numbers
+
+Phone numbers written the way their country writes them, for the United States, Korea, Japan, China, Vietnam, Spain, Italy, Germany and Russia. Each opens on a mobile block or a city's area code that the country really gives out, and the digits after it are random — so a number can by chance belong to somebody. Use them as sample data, and never call or text one.
+
+```dart
+randPhone(country: PhoneCountry.kr, count: 2); // [010-4821-3967, 010-7302-1958]
+randPhone(country: PhoneCountry.us, type: PhoneType.landline); // [(212) 846-0147]
+randPhone(country: PhoneCountry.kr, includeCountryCode: true); // [+82 10-4821-3967]
+randPhone(country: PhoneCountry.kr, includeCountryCode: true, separator: ''); // [+821048213967]
+
+randPhoneDetails(country: PhoneCountry.jp).first;
+// PhoneDetail(090-3718-2046, +819037182046, JP, mobile)
+```
+
+| Parameter            | Type            | Default                    |
+| -------------------- | --------------- | -------------------------- |
+| `country`            | `PhoneCountry?` | `null` — every one         |
+| `type`               | `PhoneType?`    | `PhoneType.mobile`         |
+| `includeCountryCode` | `bool`          | `false`                    |
+| `separator`          | `String?`       | `null` — the country's own |
+| `count`              | `int`           | `1`                        |
+| `unique`             | `bool`          | `false`                    |
+
+A null `type` draws a mobile number or a landline per result. `includeCountryCode` drops the trunk prefix the country dials at home, and `separator` replaces the country's own punctuation: `''` writes the digits alone, which with the country code is E.164.
+
 ## Decorators
 
 `randSuffix`, `randPrefix` and `randModifier` attach something to a string you already have, rather than generating one. They take anything, not just this library's output, which is why none of them is a parameter on a generator. Each of them also works with no value at all, handing back the thing it would have attached.
@@ -375,7 +401,7 @@ nicknameLengthRange(language: WordLanguage.ko); // LengthRange(1, 13)
 sentenceLengthRange(WordLanguage.ko); // LengthRange(5, 43)
 ```
 
-`nameLanguages`, `wordLanguages`, `wordThemes`, `locationLanguages`, `locationLevels`, `ageGroups`, `organizationTypes`, `organizationIndustries` and `dateUnits` list what the generators accept; `randCountMax`, `randLengthMin` / `Max`, `randSentenceLengthMax`, `randLocationLengthMax`, `randAgeMax`, `randOrganizationLengthMax`, `affixLengthDefault` / `Max`, `affixSeparatorDefault` and `affixCharset` are the bounds and defaults every parameter is clamped to.
+`nameLanguages`, `wordLanguages`, `wordThemes`, `locationLanguages`, `locationLevels`, `ageGroups`, `organizationTypes`, `organizationIndustries`, `dateUnits`, `phoneCountries` and `phoneTypes` list what the generators accept; `randCountMax`, `randLengthMin` / `Max`, `randSentenceLengthMax`, `randLocationLengthMax`, `randAgeMax`, `randOrganizationLengthMax`, `affixLengthDefault` / `Max`, `affixSeparatorDefault` and `affixCharset` are the bounds and defaults every parameter is clamped to.
 
 ## Differences from the npm package
 

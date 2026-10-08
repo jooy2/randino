@@ -1068,3 +1068,65 @@ export interface DateDetail {
 	/** `0` to `999`. */
 	millisecond: number;
 }
+
+/**
+ * A country `randPhone` writes numbers for, by its ISO 3166-1 alpha-2 code: one
+ * for each language the word pools cover — the United States for English, Korea
+ * for Korean, and so on.
+ */
+export type PhoneCountry = 'US' | 'KR' | 'JP' | 'CN' | 'VN' | 'ES' | 'IT' | 'DE' | 'RU';
+
+/** `'all'` mixes every country. */
+export type PhoneCountryOption = PhoneCountry | 'all';
+
+/**
+ * What a number is for:
+ * - `mobile`: a mobile phone, from the blocks the country gives its operators.
+ * - `landline`: a fixed line, behind the area code of a real city.
+ *
+ * The United States and its neighbours write both the same way, so there the two
+ * are drawn from the same area codes.
+ */
+export type PhoneType = 'mobile' | 'landline';
+
+/** `'all'` draws a mobile number or a landline per result. */
+export type PhoneTypeOption = PhoneType | 'all';
+
+/**
+ * What `randPhone` takes. A number is written by its country rather than in a
+ * language, so it has no `language`, no length and nothing to invent.
+ */
+export interface RandPhoneOptions extends Pick<
+	RandCommonOptions,
+	'count' | 'unique' | 'output' | 'random'
+> {
+	/** Which country's numbers. `'all'` mixes every one. Default `'all'`. */
+	country?: PhoneCountryOption;
+	/** Mobile numbers, landlines, or either. Default `'mobile'`. */
+	type?: PhoneTypeOption;
+	/**
+	 * Write the number the way it is dialled from abroad: `+82 10-2345-6789` rather
+	 * than `010-2345-6789`. The trunk prefix the country dials at home is dropped.
+	 * Default `false`.
+	 */
+	includeCountryCode?: boolean;
+	/**
+	 * What goes between the groups of digits, in place of the country's own way of
+	 * writing them. `''` writes the digits alone, which with `includeCountryCode`
+	 * is E.164: `+821023456789`. Left out, each country writes its own:
+	 * `010-2345-6789`, `(212) 846-0147`, `8 (912) 345-67-89`.
+	 */
+	separator?: string;
+}
+
+/** A generated phone number with the pieces it was built from. */
+export interface PhoneDetail {
+	/** What the value form returns, written the way the options asked for. */
+	phone: string;
+	/** The same number in E.164, the one form every system accepts: `+821023456789`. */
+	e164: string;
+	country: PhoneCountry;
+	/** The country calling code, without the `+`: `'82'`. */
+	callingCode: string;
+	type: PhoneType;
+}

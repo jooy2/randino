@@ -49,6 +49,7 @@ from randino.organization.data import (
     ORGANIZATION_TYPES,
 )
 from randino.organization.data._types import OrganizationLanguageData, PoolOrganizationSynthesis
+from randino.phone.data import PHONE_COUNTRIES, PHONE_DATA, PHONE_TYPES
 from randino.sentence.data import (
     AGENT_CLASSES,
     FIELD_RULES,
@@ -415,6 +416,7 @@ location = {
     for code, data in LOCATION_DATA.items()
 }
 
+
 def organization_of(data: OrganizationLanguageData) -> dict[str, object]:
     """One language's organization dataset, the synthesis tagged with its kind."""
     syn = data.syn
@@ -484,6 +486,34 @@ print(
                 "genericChance": ORGANIZATION_GENERIC_CHANCE,
                 "legalFormChance": ORGANIZATION_LEGAL_FORM_CHANCE,
                 "data": {code: organization_of(data) for code, data in ORGANIZATION_DATA.items()},
+            },
+            # A shape's optional fields are written out, so a lead, an avoid list or a trunk
+            # one package leaves unset and another sets shows up as a difference.
+            "phone": {
+                "countries": list(PHONE_COUNTRIES),
+                "types": list(PHONE_TYPES),
+                "data": {
+                    code: {
+                        "callingCode": data.calling_code,
+                        "trunk": data.trunk,
+                        "national": data.national,
+                        "international": data.international,
+                        "plans": {
+                            kind: [
+                                {
+                                    "prefixes": list(shape.prefixes),
+                                    "lead": shape.lead,
+                                    "groups": list(shape.groups),
+                                    "avoid": list(shape.avoid),
+                                    "trunk": shape.trunk,
+                                }
+                                for shape in data.plans[kind]
+                            ]
+                            for kind in PHONE_TYPES
+                        },
+                    }
+                    for code, data in PHONE_DATA.items()
+                },
             },
             "gender": {
                 "codes": list(GENDER_CODES),

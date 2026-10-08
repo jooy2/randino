@@ -20,6 +20,8 @@ describe('base test', () => {
 			'NAME_LANGUAGES',
 			'ORGANIZATION_INDUSTRIES',
 			'ORGANIZATION_TYPES',
+			'PHONE_COUNTRIES',
+			'PHONE_TYPES',
 			'RAND_AGE_MAX',
 			'RAND_COUNT_MAX',
 			'RAND_LENGTH_MAX',
@@ -62,6 +64,7 @@ describe('base test', () => {
 			'randObject',
 			'randOrganization',
 			'randPerson',
+			'randPhone',
 			'randPlace',
 			'randPlant',
 			'randPrefix',
@@ -175,6 +178,12 @@ describe('base test', () => {
 			'public'
 		]);
 		assert.strictEqual(randino.ORGANIZATION_INDUSTRIES.length, 10);
+
+		// A phone number is written by its country, one country per word language.
+		assert.strictEqual(typeof randino.randPhone()[0], 'string');
+		assert.match(randino.randPhone({ output: 'detail' })[0].e164, /^\+\d+$/);
+		assert.strictEqual(randino.PHONE_COUNTRIES.length, randino.WORD_LANGUAGES.length);
+		assert.deepStrictEqual(randino.PHONE_TYPES, ['mobile', 'landline']);
 	});
 
 	it('an option the types rule out falls back rather than throwing', () => {
@@ -216,6 +225,8 @@ describe('base test', () => {
 			() => randino.randAge({ minAge: NaN, maxAge: 'x' as never }),
 			() => randino.randDate({ unit: 'week' as never, format: 123 as never }),
 			() => randino.randDate({ minDate: {} as never, maxDate: [] as never, count: NaN }),
+			() => randino.randPhone({ country: 'XX' as never, type: 'pager' as never }),
+			() => randino.randPhone({ country: 123 as never, separator: 7 as never, count: NaN }),
 			() => randino.randGender({ language: 'xx' as never, count: NaN }),
 			() => randino.randGender({ includeUnknown: 'yes' as never }),
 			() => randino.randOrganization({ language: 'xx' as never, type: 'shop' as never }),
@@ -299,6 +310,7 @@ describe('base test', () => {
 		agrees(() => randino.randAge({ count: 5, random: seeded(42) }));
 		agrees(() => randino.randDate({ count: 5, random: seeded(42) }));
 		agrees(() => randino.randDate({ unit: 'minute', count: 5, random: seeded(42) }));
+		agrees(() => randino.randPhone({ count: 5, random: seeded(42) }));
 		agrees(() => randino.randGender({ count: 5, includeUnknown: true, random: seeded(42) }));
 		agrees(() => randino.randOrganization({ count: 5, random: seeded(42) }));
 		agrees(() => randino.randOrganization({ count: 5, maxLength: 20, random: seeded(42) }));

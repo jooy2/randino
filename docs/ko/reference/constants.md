@@ -278,6 +278,49 @@ from randino import DATE_UNITS
 
 각 단위가 어떤 값을 돌려주는지는 [`randDate`](../date/rand-date#units) 문서에 있습니다.
 
+## 전화번호 {#phone-numbers}
+
+::: lang js
+
+```javascript
+import { PHONE_COUNTRIES, PHONE_TYPES } from 'randino';
+```
+
+| 이름              | 타입             | 값                                                       |
+| ----------------- | ---------------- | -------------------------------------------------------- |
+| `PHONE_COUNTRIES` | `PhoneCountry[]` | `['US', 'KR', 'JP', 'CN', 'VN', 'ES', 'IT', 'DE', 'RU']` |
+| `PHONE_TYPES`     | `PhoneType[]`    | `['mobile', 'landline']`                                 |
+
+:::
+
+::: lang dart
+
+```dart
+import 'package:randino/randino.dart';
+```
+
+| 이름             | 타입                 | 값                                     |
+| ---------------- | -------------------- | -------------------------------------- |
+| `phoneCountries` | `List<PhoneCountry>` | 모든 나라, `wordLanguages`와 같은 순서 |
+| `phoneTypes`     | `List<PhoneType>`    | `mobile`, `landline` 순                |
+
+:::
+
+::: lang py
+
+```python
+from randino import PHONE_COUNTRIES, PHONE_TYPES
+```
+
+| 이름 | 타입 | 값 |
+| --- | --- | --- |
+| `PHONE_COUNTRIES` | `tuple[PhoneCountry, …]` | `('US', 'KR', 'JP', 'CN', 'VN', 'ES', 'IT', 'DE', 'RU')` |
+| `PHONE_TYPES` | `tuple[PhoneType, …]` | `('mobile', 'landline')` |
+
+:::
+
+나라마다 번호를 어떻게 쓰는지는 [`randPhone`](../phone/rand-phone#countries) 문서에 있습니다.
+
 ## 조직 {#organizations}
 
 ::: lang js
@@ -448,6 +491,11 @@ import type {
 	OrganizationIndustryOption,
 	OrganizationType,
 	OrganizationTypeOption,
+	PhoneCountry,
+	PhoneCountryOption,
+	PhoneDetail,
+	PhoneType,
+	PhoneTypeOption,
 	WordLanguage,
 	WordLanguageOption,
 	WordTheme,
@@ -468,6 +516,7 @@ import type {
 	RandNameOptions,
 	RandNicknameOptions,
 	RandOrganizationOptions,
+	RandPhoneOptions,
 	RandOutput
 } from 'randino';
 
@@ -489,12 +538,13 @@ import 'package:randino/randino.dart';
 AgeGroup, AgeDistribution, DateUnit, GenderCode
 NameLanguage, NameGender, NameScript
 OrganizationType, OrganizationIndustry
+PhoneCountry, PhoneType
 WordLanguage, WordTheme
 LocationLanguage, LocationLevel
 
 // 값
 LengthRange, AgeDetail, DateDetail, GenderDetail, NameDetail, NicknameDetail, LocationDetail, CountryDetail,
-OrganizationDetail
+OrganizationDetail, PhoneDetail
 ```
 
 `…Option` 타입도 없고 `all` 멤버도 없습니다. **null인 enum이 "전부"를 뜻하므로**, 쓰지 않은 파라미터가 이미 섞인 결과를 의미합니다. 그래서 헬퍼들도 더 좁은 타입이 아니라 생성기와 같은 타입을 받습니다.
@@ -525,6 +575,11 @@ from randino import (
     OrganizationIndustryOption,
     OrganizationType,
     OrganizationTypeOption,
+    PhoneCountry,
+    PhoneCountryOption,
+    PhoneDetail,
+    PhoneType,
+    PhoneTypeOption,
     WordLanguage,
     WordLanguageOption,
     WordTheme,

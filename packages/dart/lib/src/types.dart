@@ -1009,3 +1009,80 @@ class DateDetail {
   @override
   String toString() => 'DateDetail($date, $timestamp)';
 }
+
+/// A country `randPhone` writes numbers for: one for each language the word
+/// pools cover — the United States for English, Korea for Korean, and so on.
+enum PhoneCountry {
+  /// The United States, `+1`.
+  us,
+
+  /// South Korea, `+82`.
+  kr,
+
+  /// Japan, `+81`.
+  jp,
+
+  /// China, `+86`.
+  cn,
+
+  /// Vietnam, `+84`.
+  vn,
+
+  /// Spain, `+34`.
+  es,
+
+  /// Italy, `+39`.
+  it,
+
+  /// Germany, `+49`.
+  de,
+
+  /// Russia, `+7`.
+  ru;
+
+  /// The ISO 3166-1 alpha-2 code: `KR` for [kr].
+  String get code => name.toUpperCase();
+}
+
+/// What a number is for.
+enum PhoneType {
+  /// A mobile phone, from the blocks the country gives its operators.
+  mobile,
+
+  /// A fixed line, behind the area code of a real city. The United States
+  /// writes both the same way, so there the two are drawn from the same area
+  /// codes.
+  landline,
+}
+
+/// A generated phone number with the pieces it was built from.
+class PhoneDetail {
+  /// Creates a detail record. Returned by the generator; there is rarely a
+  /// reason to build one by hand outside a test.
+  const PhoneDetail({
+    required this.phone,
+    required this.e164,
+    required this.country,
+    required this.callingCode,
+    required this.type,
+  });
+
+  /// What `randPhone` returns, written the way the parameters asked for.
+  final String phone;
+
+  /// The same number in E.164, the one form every system accepts:
+  /// `+821023456789`.
+  final String e164;
+
+  /// The country the number is for.
+  final PhoneCountry country;
+
+  /// The country calling code, without the `+`: `'82'`.
+  final String callingCode;
+
+  /// What the number is for.
+  final PhoneType type;
+
+  @override
+  String toString() => 'PhoneDetail($phone, $e164, ${country.code}, ${type.name})';
+}

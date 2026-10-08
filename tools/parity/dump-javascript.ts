@@ -53,6 +53,11 @@ import {
 	ORGANIZATION_TYPES
 } from '../../packages/javascript/lib/organization/data/index.js';
 import {
+	PHONE_COUNTRIES,
+	PHONE_DATA,
+	PHONE_TYPES
+} from '../../packages/javascript/lib/phone/data/index.js';
+import {
 	AGENT_CLASSES,
 	FIELD_RULES,
 	INTERLUDES,
@@ -224,6 +229,39 @@ console.log(
 						legalForms: [...data.legalForms]
 					}
 				])
+			)
+		},
+		// A shape's optional fields are written out, so a lead, an avoid list or a
+		// trunk one package leaves unset and another sets shows up as a difference.
+		phone: {
+			countries: [...PHONE_COUNTRIES],
+			types: [...PHONE_TYPES],
+			data: Object.fromEntries(
+				PHONE_COUNTRIES.map((code) => {
+					const data = PHONE_DATA[code];
+
+					return [
+						code,
+						{
+							callingCode: data.callingCode,
+							trunk: data.trunk,
+							national: data.national,
+							international: data.international,
+							plans: Object.fromEntries(
+								PHONE_TYPES.map((type) => [
+									type,
+									data.plans[type].map((shape) => ({
+										prefixes: [...shape.prefixes],
+										lead: shape.lead ?? '',
+										groups: [...shape.groups],
+										avoid: [...(shape.avoid ?? [])],
+										trunk: shape.trunk ?? null
+									}))
+								])
+							)
+						}
+					];
+				})
 			)
 		},
 		gender: {

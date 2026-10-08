@@ -75,6 +75,9 @@ export 'src/nickname/rand_nickname_details.dart' show randNicknameDetails;
 export 'src/organization/data/index.dart' show organizationIndustries, organizationTypes;
 export 'src/organization/rand_organization.dart' show randOrganization;
 export 'src/organization/rand_organization_details.dart' show randOrganizationDetails;
+export 'src/phone/data/index.dart' show phoneCountries, phoneTypes;
+export 'src/phone/rand_phone.dart' show randPhone;
+export 'src/phone/rand_phone_details.dart' show randPhoneDetails;
 export 'src/sentence/rand_sentence.dart' show randSentence;
 export 'src/sentence/rand_sentence_details.dart' show randSentenceDetails;
 export 'src/sentence/sentence_length_range.dart' show sentenceLengthRange;
@@ -101,6 +104,9 @@ export 'src/types.dart'
         OrganizationDetail,
         OrganizationIndustry,
         OrganizationType,
+        PhoneCountry,
+        PhoneDetail,
+        PhoneType,
         RandRealism,
         RandVocabulary,
         SentenceDetail,

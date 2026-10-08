@@ -1,4 +1,4 @@
-"""randino — names, nicknames, words, sentences, locations, ages, genders and dates.
+"""randino — names, nicknames, words, sentences, places, ages, dates and phone numbers.
 
 Separate concerns, deliberately. `rand_name` produces names a person could actually
 carry (`김민준`, `Emma Clover`); `rand_nickname` produces the handle someone would pick
@@ -8,8 +8,9 @@ writes a whole statement in the language's own grammar; `rand_location` writes a
 place, from the country down to a Korean 읍·면·동 or a US city; `rand_age` draws an age
 along a curve shaped like a population; `rand_gender` writes the label a form in the
 language uses for a gender; `rand_organization` names a company, a school or an office
-that does not exist; and `rand_date` draws a date from a range and writes it out by a
-format, or hands back one part of it.
+that does not exist; `rand_date` draws a date from a range and writes it out by a format,
+or hands back one part of it; and `rand_phone` writes a phone number the way its country
+does.
 
 Example:
     >>> from randino import rand_name, rand_nickname, rand_sentence
@@ -49,6 +50,11 @@ from randino._types import (
     OrganizationIndustryOption,
     OrganizationType,
     OrganizationTypeOption,
+    PhoneCountry,
+    PhoneCountryOption,
+    PhoneDetail,
+    PhoneType,
+    PhoneTypeOption,
     RandRealism,
     RandVocabulary,
     SentenceDetail,
@@ -110,6 +116,7 @@ from randino.name import (
 )
 from randino.nickname import nickname_length_range, rand_nickname
 from randino.organization import ORGANIZATION_INDUSTRIES, ORGANIZATION_TYPES, rand_organization
+from randino.phone import PHONE_COUNTRIES, PHONE_TYPES, rand_phone
 from randino.sentence import rand_sentence, sentence_length_range
 from randino.word import (
     WORD_LANGUAGES,
@@ -159,6 +166,8 @@ __all__ = [
     "NAME_LANGUAGES",
     "ORGANIZATION_INDUSTRIES",
     "ORGANIZATION_TYPES",
+    "PHONE_COUNTRIES",
+    "PHONE_TYPES",
     "RAND_AGE_MAX",
     "RAND_COUNT_MAX",
     "RAND_LENGTH_MAX",
@@ -196,6 +205,11 @@ __all__ = [
     "OrganizationIndustryOption",
     "OrganizationType",
     "OrganizationTypeOption",
+    "PhoneCountry",
+    "PhoneCountryOption",
+    "PhoneDetail",
+    "PhoneType",
+    "PhoneTypeOption",
     "RandRealism",
     "RandVocabulary",
     "SentenceDetail",
@@ -248,6 +262,7 @@ __all__ = [
     "rand_object",
     "rand_organization",
     "rand_person",
+    "rand_phone",
     "rand_place",
     "rand_plant",
     "rand_prefix",

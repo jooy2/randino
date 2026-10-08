@@ -7,6 +7,7 @@ export * from './location/index.js';
 export * from './name/index.js';
 export * from './nickname/index.js';
 export * from './organization/index.js';
+export * from './phone/index.js';
 export * from './sentence/index.js';
 export * from './word/index.js';
 export type * from './_types/global.js';
