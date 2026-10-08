@@ -1095,3 +1095,53 @@ class PhoneDetail {
   @override
   String toString() => 'PhoneDetail($phone, $e164, ${country.code}, ${type.name})';
 }
+
+/// Which kind of machine a system value belongs to.
+enum SystemPlatform {
+  /// A PC, a laptop included — what runs Windows, macOS or Linux.
+  desktop,
+
+  /// A phone or a tablet — what runs Android, iOS or iPadOS.
+  mobile,
+}
+
+/// A generated operating system with the pieces it was written from.
+class OsDetail {
+  /// Creates a detail record. Returned by the generator; there is rarely a
+  /// reason to build one by hand outside a test.
+  const OsDetail({
+    required this.os,
+    required this.name,
+    required this.version,
+    required this.build,
+    required this.edition,
+    required this.platform,
+    required this.year,
+  });
+
+  /// The system as `randOs` returns it: `Windows 11 Pro 23H2 (Build 22631)`.
+  final String os;
+
+  /// The name without a version: `Windows`, `macOS`, `Mac OS X`, `Ubuntu`.
+  final String name;
+
+  /// The release's version: `11`, `14`, `22.04`, `XP`. Null with
+  /// `includeVersion: false`.
+  final String? version;
+
+  /// The build or point release written, as it is written: `23H2 (Build
+  /// 22631)`, `14.5`.
+  final String? build;
+
+  /// The edition written: `Pro`, `Server`.
+  final String? edition;
+
+  /// The kind of machine the system runs on.
+  final SystemPlatform platform;
+
+  /// The year the release came out, or the build when one is written.
+  final int year;
+
+  @override
+  String toString() => 'OsDetail($os, ${platform.name}, $year)';
+}

@@ -10,7 +10,7 @@ Every option and every example, with **JavaScript** picked in the sidebar. This 
 
 ---
 
-**randino** generates random person names, nicknames, words, sentences, real locations, ages, genders, organizations, dates and phone numbers in the language you ask for.
+**randino** generates random person names, nicknames, words, sentences, real locations, ages, genders, organizations, dates and phone numbers in the language you ask for, and real operating systems for a sample machine.
 
 - **Person names** read like names people carry: Emma Clover, Jack Reeves, each with its English pronunciation. 9 languages.
 - **Nicknames** are handles for a game or a website: MistyOwl, CraneVoyage, RustyBoot. Built from everyday words across twenty-nine themes, and never from person names.
@@ -22,6 +22,7 @@ Every option and every example, with **JavaScript** picked in the sidebar. This 
 - **Organizations** are companies, schools, offices and associations that do not exist, from `randOrganization`: (주)새솔테크, Westbrook High School, Stadtwerke Bergtal.
 - **Dates** are drawn evenly from a range and written out in UTC by a format of your own, from `randDate`, or one part at a time.
 - **Phone numbers** are written the way their country writes them, from `randPhone`, in nine countries. They open on blocks the country really gives out, so one can by chance be real: sample data, never a number to call.
+- **System values** describe a sample machine with real products: an operating system from `randOs`, written the way its release is known, `Windows 11 Pro 23H2 (Build 22631)`.
 - **Decorators** attach something to a string you already have: `randSuffix`, `randPrefix` and `randModifier`.
 - One options object per generator, every option optional: `randName()` on its own works.
 - **No runtime dependencies.** ESM, typed, and it runs in Node and in the browser alike.
@@ -392,6 +393,41 @@ randPhone({ country: 'JP', output: 'detail' });
 
 `country` is an ISO 3166-1 alpha-2 code, read regardless of case. `includeCountryCode` drops the trunk prefix the country dials at home, and `separator` replaces the country's own punctuation: `''` writes the digits alone, which with the country code is E.164. `fictional` keeps to the numbers a country sets aside for films and books, which nobody is given: `555-0100` to `555-0199` in the United States and the drama numbers in Germany; the other seven countries reserve none and return nothing.
 
+## System
+
+Values that describe a sample machine. They are real products rather than invented ones, written by the names they were released under, so none of them takes a `language`.
+
+### Operating systems
+
+Windows, macOS, Ubuntu, Debian and Fedora on the desktop, Android, iOS and iPadOS on mobile, every release from the first to the ones out by October 2026, written the way each release is known.
+
+```javascript
+import { randOs } from 'randino';
+
+randOs({ count: 3 }); // ['Windows 10', 'macOS Sonoma 14', 'Android 9 Pie']
+randOs({ platform: 'mobile' }); // ['iOS 17']
+randOs({ includeBuild: true, includeEdition: true }); // ['Windows 11 Pro 23H2 (Build 22631)']
+randOs({ platform: 'desktop', maxYear: 2010 }); // ['Mac OS X Snow Leopard 10.6']
+
+randOs({ includeBuild: true, output: 'detail' });
+// [{ os: 'Android 14 (API 34)', name: 'Android', version: '14', build: '(API 34)',
+//    edition: null, platform: 'mobile', year: 2023 }]
+```
+
+| Option           | Type                   | Default   |
+| ---------------- | ---------------------- | --------- |
+| `platform`       | `SystemPlatformOption` | `'all'`   |
+| `minYear`        | `number`               | —         |
+| `maxYear`        | `number`               | —         |
+| `includeVersion` | `boolean`              | `true`    |
+| `includeBuild`   | `boolean`              | `false`   |
+| `includeEdition` | `boolean`              | `false`   |
+| `count`          | `number`               | `1`       |
+| `unique`         | `boolean`              | `false`   |
+| `output`         | `'value' \| 'detail'`  | `'value'` |
+
+A draw picks the line first — Windows is about two desktops in three, Android about three phones in five — and a release inside it second. `minYear` and `maxYear` read the year a release came out, or with `includeBuild` the year of the build written, and a range nothing came out in returns nothing.
+
 ## Decorators
 
 `randSuffix`, `randPrefix` and `randModifier` attach something to a string you already have, rather than generating one. They take anything, not just this library's output, which is why none of them is an option on a generator. Each of them also works with no value at all, handing back the thing it would have attached.
@@ -462,7 +498,7 @@ sentenceLengthRange('ko'); // [5, 43]
 wordLengthRange('ko'); // [1, 4]
 ```
 
-`NAME_LANGUAGES`, `WORD_LANGUAGES`, `WORD_THEMES`, `AGE_GROUPS`, `ORGANIZATION_TYPES`, `ORGANIZATION_INDUSTRIES`, `DATE_UNITS`, `PHONE_COUNTRIES` and `PHONE_TYPES` list what the generators accept; `RAND_COUNT_MAX`, `RAND_LENGTH_MIN` / `_MAX`, `RAND_SENTENCE_LENGTH_MAX`, `RAND_AGE_MAX`, `RAND_ORGANIZATION_LENGTH_MAX`, `AFFIX_LENGTH_DEFAULT` / `_MAX`, `AFFIX_SEPARATOR_DEFAULT` and `AFFIX_CHARSET` are the bounds and defaults every option is clamped to.
+`NAME_LANGUAGES`, `WORD_LANGUAGES`, `WORD_THEMES`, `AGE_GROUPS`, `ORGANIZATION_TYPES`, `ORGANIZATION_INDUSTRIES`, `DATE_UNITS`, `PHONE_COUNTRIES`, `PHONE_TYPES` and `SYSTEM_PLATFORMS` list what the generators accept; `RAND_COUNT_MAX`, `RAND_LENGTH_MIN` / `_MAX`, `RAND_SENTENCE_LENGTH_MAX`, `RAND_AGE_MAX`, `RAND_ORGANIZATION_LENGTH_MAX`, `AFFIX_LENGTH_DEFAULT` / `_MAX`, `AFFIX_SEPARATOR_DEFAULT` and `AFFIX_CHARSET` are the bounds and defaults every option is clamped to.
 
 ## Development
 

@@ -321,6 +321,46 @@ from randino import PHONE_COUNTRIES, PHONE_TYPES
 
 나라마다 번호를 어떻게 쓰는지는 [`randPhone`](../phone/rand-phone#countries) 문서에 있습니다.
 
+## 시스템 {#system}
+
+::: lang js
+
+```javascript
+import { SYSTEM_PLATFORMS } from 'randino';
+```
+
+| 이름               | 타입               | 값                      |
+| ------------------ | ------------------ | ----------------------- |
+| `SYSTEM_PLATFORMS` | `SystemPlatform[]` | `['desktop', 'mobile']` |
+
+:::
+
+::: lang dart
+
+```dart
+import 'package:randino/randino.dart';
+```
+
+| 이름              | 타입                   | 값                     |
+| ----------------- | ---------------------- | ---------------------- |
+| `systemPlatforms` | `List<SystemPlatform>` | `desktop`, `mobile` 순 |
+
+:::
+
+::: lang py
+
+```python
+from randino import SYSTEM_PLATFORMS
+```
+
+| 이름               | 타입                       | 값                      |
+| ------------------ | -------------------------- | ----------------------- |
+| `SYSTEM_PLATFORMS` | `tuple[SystemPlatform, …]` | `('desktop', 'mobile')` |
+
+:::
+
+플랫폼마다 어떤 기기를 가리키는지는 [`randOs`](../os/rand-os#catalog) 문서에 있습니다.
+
 ## 조직 {#organizations}
 
 ::: lang js
@@ -491,11 +531,14 @@ import type {
 	OrganizationIndustryOption,
 	OrganizationType,
 	OrganizationTypeOption,
+	OsDetail,
 	PhoneCountry,
 	PhoneCountryOption,
 	PhoneDetail,
 	PhoneType,
 	PhoneTypeOption,
+	SystemPlatform,
+	SystemPlatformOption,
 	WordLanguage,
 	WordLanguageOption,
 	WordTheme,
@@ -516,6 +559,7 @@ import type {
 	RandNameOptions,
 	RandNicknameOptions,
 	RandOrganizationOptions,
+	RandOsOptions,
 	RandPhoneOptions,
 	RandOutput
 } from 'randino';
@@ -539,12 +583,13 @@ AgeGroup, AgeDistribution, DateUnit, GenderCode
 NameLanguage, NameGender, NameScript
 OrganizationType, OrganizationIndustry
 PhoneCountry, PhoneType
+SystemPlatform
 WordLanguage, WordTheme
 LocationLanguage, LocationLevel
 
 // 값
 LengthRange, AgeDetail, DateDetail, GenderDetail, NameDetail, NicknameDetail, LocationDetail, CountryDetail,
-OrganizationDetail, PhoneDetail
+OrganizationDetail, OsDetail, PhoneDetail
 ```
 
 `…Option` 타입도 없고 `all` 멤버도 없습니다. **null인 enum이 "전부"를 뜻하므로**, 쓰지 않은 파라미터가 이미 섞인 결과를 의미합니다. 그래서 헬퍼들도 더 좁은 타입이 아니라 생성기와 같은 타입을 받습니다.
@@ -575,11 +620,14 @@ from randino import (
     OrganizationIndustryOption,
     OrganizationType,
     OrganizationTypeOption,
+    OsDetail,
     PhoneCountry,
     PhoneCountryOption,
     PhoneDetail,
     PhoneType,
     PhoneTypeOption,
+    SystemPlatform,
+    SystemPlatformOption,
     WordLanguage,
     WordLanguageOption,
     WordTheme,

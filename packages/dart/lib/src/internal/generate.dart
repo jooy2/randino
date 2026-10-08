@@ -55,6 +55,27 @@ LengthRange lengthBounds(
   return LengthRange(high < low ? high : low, high);
 }
 
+/// The platforms a call may draw from: the one named, or both for a null one.
+List<SystemPlatform> resolvePlatforms(SystemPlatform? platform) =>
+    platform == null ? systemPlatforms : <SystemPlatform>[platform];
+
+// The latest year a catalog bound is read up to. A year of four digits is as far
+// as anything here is dated, and nothing in a catalog comes close to either end.
+const int _yearMax = 9999;
+
+/// `minYear` and `maxYear` as the years a catalog draw may come from, both ends
+/// included.
+///
+/// A bound left out is no bound, and a range the wrong way round keeps
+/// `maxYear`, the way a length range keeps `maxLength`: it is the one a caller
+/// usually means — "as of 2015" — where `minYear` only trims the old end.
+(int, int) resolveYears(int? minYear, int? maxYear) {
+  final high = clampInt(maxYear ?? _yearMax, 0, _yearMax);
+  final low = clampInt(minYear ?? 0, 0, _yearMax);
+
+  return (low < high ? low : high, high);
+}
+
 /// The languages a draw may come from once `startsWith` has had its say: the
 /// requested one, or every one of them for a null [option], minus the ones that
 /// do not write the requested character's script.

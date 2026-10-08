@@ -6,6 +6,8 @@ produces differs; how many of them you may ask for, and how long you may ask
 them to be, does not.
 """
 
+from randino._types import SystemPlatform
+
 RAND_COUNT_MAX = 10000
 """Upper bound for `count` on every generator.
 
@@ -62,4 +64,10 @@ Its own number rather than `RAND_LENGTH_MAX`, because an organization is a name,
 for its business and a legal form at once, and the longest of them run past forty:
 `Công ty TNHH MTV Giải pháp Công nghệ Thịnh Vượng`, `Polideportivo Municipal de Encinar
 del Valle`.
+"""
+
+SYSTEM_PLATFORMS: tuple[SystemPlatform, ...] = ("desktop", "mobile")
+"""The two kinds of machine a system generator tells apart, which its `platform` names.
+
+`desktop` is a PC, a laptop included, and `mobile` a phone or a tablet.
 """

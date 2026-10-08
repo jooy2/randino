@@ -82,6 +82,10 @@ const packageLinks = [
  * looking for a function, not for the corner of the library it belongs to.
  * `navGroupsFor` is what keeps the menu and those sections in step.
  *
+ * **System** sits inside Generators in the sidebar and is a section of its own
+ * here, so the functions that describe a sample machine are found together
+ * rather than among the kinds of text.
+ *
  * The sidebar's **Words** group, nested inside Generators beside **General**,
  * is the one left out — and it says so itself, with `sidebarOnly` on the group
  * rather than an omission here. Fourteen names for `randWord` with its argument
@@ -93,7 +97,7 @@ const navFor = (lang: string, labels: { demo: string; guide: string; packages: s
 	{ text: labels.demo, link: `${localeBase(lang, defaultLocale)}demo` },
 	{
 		text: 'API',
-		items: navGroupsFor(['generators', 'decorators', 'utilities'], lang, defaultLocale)
+		items: navGroupsFor(['generators', 'system', 'decorators', 'utilities'], lang, defaultLocale)
 	},
 	{
 		text: labels.packages,

@@ -4,7 +4,7 @@ Guidance for AI agents (and humans) working in this repository. Written in Engli
 
 ## What randino is
 
-**randino** is a zero-dependency library that generates random **person names**, **nicknames**, **everyday words**, **sentences**, **locations**, **ages**, **genders**, **organizations**, **dates** and **phone numbers**, per language. It ships for more than one programming language — TypeScript, Dart and Python — and every one of them generates from the same datasets under the same rules. Separate concerns, deliberately:
+**randino** is a zero-dependency library that generates random **person names**, **nicknames**, **everyday words**, **sentences**, **locations**, **ages**, **genders**, **organizations**, **dates** and **phone numbers**, per language, and the **system values** a sample machine is described by. It ships for more than one programming language — TypeScript, Dart and Python — and every one of them generates from the same datasets under the same rules. Separate concerns, deliberately:
 
 - **Names** should read like names a person actually carries (`김민준`, `Emma Clover`). Sample data for forms, seeds, mockups.
 - **Nicknames** are the handles someone would pick for a game or a website (`멋진사자`, `MistyOwl`). They are built from everyday words and **never from person names** — that rule is the whole point of keeping the two apart.
@@ -15,6 +15,7 @@ Guidance for AI agents (and humans) working in this repository. Written in Engli
 - **Genders** are the label a form in the language writes for one (`여성`, `Female`, `Divers`). Male and female split evenly, and the two others — `unknown` and `nonbinary` — come up only when the caller switches them on, and rarely when they do.
 - **Dates** are instants drawn evenly from a range and written out in UTC (`2024-03-15T14:07:32.481Z`, `2024년 3월 15일`), by a format of the caller's own. `unit` hands back one part of a date as a number instead — `minute` is `0` to `59` — read off a drawn date so it keeps to the range. Its `language` writes only the month and weekday names and the half of the day, and defaults to `'en'` rather than `'all'`: a format is written in one language. `minDate` / `maxDate`, `format`, `unit` and `utcOffset` are its own options.
 - **Phone numbers** are written the way their country writes them (`010-4821-3967`, `(415) 726-0193`, `8 (912) 345-67-89`), for the country each word language is spoken in first. Each opens on a block the country's numbering plan really gives out and ends on random digits, so **a drawn number can by chance be somebody's** — the docs and the doc comments say so, and say never to call or text one. `randPhone` takes `country` in place of `language`, and `type`, `includeCountryCode`, `separator` and `fictional` are its own options.
+- **System values** describe a sample machine with real products, the one place the library does not invent: an operating system from `randOs` (`Windows 11 Pro 23H2 (Build 22631)`, `macOS Sonoma 14.5`, `Android 14 (API 34)`). Nothing is made up — every value is a release that came out, written by the name it was released under — so none of them takes a `language`, and they share `platform` (`desktop` or `mobile`) and, where a value has a release year, `minYear` / `maxYear`. The names are the products' own and belong to their owners; the docs say so on every page that lists them.
 - **Organizations** are companies, schools, offices and associations that do not exist (`(주)새솔테크`, `Westbrook High School`, `Гимназия № 135`), each written the way its language writes that kind. Nothing about them is real, and that is the requirement rather than a limitation: the stems are chosen to be nobody's brand, and **no organization is ever built from a person name** — a surname with a legal form behind it is exactly how famous companies are named.
 
 All of them are implemented. Keep the generators apart — a shared "generator" abstraction is not wanted — but the options they all take, and the loop that draws until it has `count` results, live in `_internal/generate` and are shared. So are the word pools: `word/data` is the one dataset, and `nickname` consumes it.
@@ -51,7 +52,7 @@ lib/
   constants.ts              # RAND_COUNT_MAX and the length bounds, shared by all
   _internal/
     utils.ts                # shared random/string helpers, never exported
-    parse.ts                # words() / tokens() / romanMap() / outline() dataset helpers
+    parse.ts                # words() / tokens() / romanMap() / outline() / rows() dataset helpers
     generate.ts             # the common options, and the draw loop (`collect`)
     script.ts               # which language a string is written in, by its script
   age/
@@ -113,6 +114,11 @@ lib/
     randNickname.ts         # public: string[], or NicknameDetail[] likewise
     nicknameLengthRange.ts  # public helper
     nicknameGenerator.ts    # internal: shapes, length fitting; draws through word/
+  os/
+    index.ts
+    randOs.ts               # public: string[], or OsDetail[] on `output: 'detail'`
+    osGenerator.ts          # internal: the candidates per call, the line, release and build drawn
+    data/index.ts           # OS_FAMILIES, OS_RELEASES: every release, one row each
   phone/
     index.ts
     randPhone.ts            # public: string[], or PhoneDetail[] on `output: 'detail'`
@@ -148,6 +154,7 @@ test/
   location.test.ts
   name.test.ts
   nickname.test.ts
+  os.test.ts
   phone.test.ts
   sentence.test.ts
   word.test.ts
@@ -224,6 +231,7 @@ lib/
       word_generator.dart
       rand_word.dart rand_animal.dart …
     nickname/               # mirrors lib/nickname
+    os/                     # mirrors lib/os, plus `randOsDetails`
     phone/                  # mirrors lib/phone, plus `randPhoneDetails`
     sentence/               # mirrors lib/sentence, plus `randSentenceDetails`
       data/                 # one file per language, ported verbatim
@@ -239,6 +247,7 @@ test/
   location_test.dart
   name_test.dart
   nickname_test.dart
+  os_test.dart
   phone_test.dart
   sentence_test.dart
   word_test.dart
@@ -312,6 +321,7 @@ src/randino/
     _generator.py
     rand_word.py rand_animal.py …
   nickname/                 # mirrors lib/nickname
+  os/                       # mirrors lib/os
   phone/                    # mirrors lib/phone
   sentence/                 # mirrors lib/sentence
     data/                   # one file per language, ported verbatim
@@ -328,6 +338,7 @@ tests/
   test_location.py
   test_name.py
   test_nickname.py
+  test_os.py
   test_phone.py
   test_sentence.py
   test_word.py
@@ -405,7 +416,7 @@ Every variant is in the document and CSS hides all but one, which is what buys t
 
 `name/`, `nickname/`, `word/` and `decorate/` are four folders because those are four things in the source, and the sidebar deliberately does not repeat that split. A reader looking for `randNickname` is looking for a function, not for the corner of the library it belongs to, so the groups are what a function **is**:
 
-- **API**, which nests three groups by what a function *does with a string*: **Generators** make one out of nothing, **Decorators** attach something to one you already have (`randSuffix`, `randPrefix`, `randModifier`), and **Utilities** answer a question about a language (`nameLengthRange`, `wordLengthRange`, the two `nameSupports…`). Generators nests once more, into **General** — `randName`, `randNickname`, `randWord`, `randSentence`, `randLocation`, one per kind of text — and two groups of one function with an argument decided: **Words**, the twenty-nine themed forms of `randWord`, and **Locations**, the four level forms of `randLocation`.
+- **API**, which nests three groups by what a function *does with a string*: **Generators** make one out of nothing, **Decorators** attach something to one you already have (`randSuffix`, `randPrefix`, `randModifier`), and **Utilities** answer a question about a language (`nameLengthRange`, `wordLengthRange`, the two `nameSupports…`). Generators nests once more, into **General** — `randName`, `randNickname`, `randWord`, `randSentence`, `randLocation`, one per kind of text — **System**, the values a sample machine is described by, and two groups of one function with an argument decided: **Words**, the twenty-nine themed forms of `randWord`, and **Locations**, the four level forms of `randLocation`.
 - **Behaviour** — the prose explaining how a generator's options behave, where there is enough of it to be its own page. `randName` and `randNickname` have one each; `randWord` does not, because it draws one word and its API page says everything there is to say. Its own group rather than more entries under Guide, because it grows alongside Generators and Guide does not.
 
 `data/sidebar.ts` nests as deep as it is written: a `SidebarGroup`'s `items` are pages, or more groups, and `sidebarFor` recurses. **Three levels is the working limit** — API > Generators > Words is the deepest there is. The third level earns itself by splitting one group that had grown past reading, not by being a finer category: twenty-nine entries under Generators is a list nobody scans, and `randAnimal` is `randWord` with an argument decided, so `General` and `Words` is the split the functions themselves suggest. Anything that is merely *related* to a page still goes beside it, not under it.
@@ -416,7 +427,7 @@ There is **no exception for a family of functions**. `randAnimal` … `randFurni
 
 Those twenty-nine are the **Words** group nested inside Generators, beside **General** — in one list with it they would bury it. `LocationOptions.vue` does the same for `randLocation` and its four level pages, with a `level` prop. Words and Locations are the groups the navbar's API dropdown leaves out, and each says so itself with `sidebarOnly`: `navGroupsFor` gathers a group's pages through its subgroups, and skips the ones marked. The Markdown that is left on each page is what actually differs: what the theme is, and three code samples of it.
 
-The navbar is the same lists — its API dropdown is Generators, Decorators and Utilities as three labelled sections, built out of `data/sidebar.ts` by `navGroupsFor`, so the menu and the sections it points into cannot drift. Generators there is **General**, because everything else in it is `sidebarOnly`. Its **Packages** dropdown is `PackageLinks.vue`, which is where npm, pub.dev and PyPI went when they stopped being three of the four icons in the navbar's right-hand corner; the registry URLs are still derived from the three manifests in `config.ts`, and GitHub is the one social link left. Its marks are `RegistryMark.vue` and not `LangMark.vue` — npm is not JavaScript and PyPI is not Python, and only pub.dev, which brands itself with the Dart logo, has the same drawing in both files.
+The navbar is the same lists — its API dropdown is Generators, System, Decorators and Utilities as four labelled sections, built out of `data/sidebar.ts` by `navGroupsFor`, so the menu and the sections it points into cannot drift. Generators there is **General**, because everything else in it is `sidebarOnly` or, like **System**, carries an `id` of its own and is a section of the dropdown in its own right; `pagesOf` leaves a subgroup with an `id` to that section. Its **Packages** dropdown is `PackageLinks.vue`, which is where npm, pub.dev and PyPI went when they stopped being three of the four icons in the navbar's right-hand corner; the registry URLs are still derived from the three manifests in `config.ts`, and GitHub is the one social link left. Its marks are `RegistryMark.vue` and not `LangMark.vue` — npm is not JavaScript and PyPI is not Python, and only pub.dev, which brands itself with the Dart logo, has the same drawing in both files.
 
 ### The demo runs the real library
 
@@ -509,7 +520,7 @@ The run stops rather than writes when a file changes shape — new columns, an u
 
 **The dumps normalize what only differs because the languages differ, and nothing else.** A pool entry is `{ n, r }` everywhere; field names are the JavaScript ones; an optional field is present and null rather than absent; `syn` carries its `kind` tag even in the two packages that tell the shapes apart by type. That normalization lives in the three dumps — one per package, each responsible for its own language's spelling — so the comparison itself has nothing to know about any of them. Adding a field to a dataset means adding it to all three dumps, and the check reports a field only one dump writes as a difference, which is the intended failure.
 
-**Do not widen it into a general "the ports agree" check.** It covers the word, sentence, name and location datasets, the age bands and curve, the date units and default range, the phone plans and templates, the gender labels and weights, the organization datasets and their odds, the stories and the field rules beside them, the surname romanization map, and the bounds in `constants` and `decorate/data` — the last of which is still written by hand in each package. The nickname shapes are in it now that they are `WordLanguageData.frames`: they were left out while they were a table private to each generator, and being data is what put them in. The sentence datasets are the same story on a larger scale, `THEME_CLASS` included, because a theme moving from one class to another changes what every verb of every language will accept.
+**Do not widen it into a general "the ports agree" check.** It covers the word, sentence, name and location datasets, the age bands and curve, the date units and default range, the phone plans and templates, the operating system catalog and the weight of each line, the gender labels and weights, the organization datasets and their odds, the stories and the field rules beside them, the surname romanization map, and the bounds in `constants` and `decorate/data` — the last of which is still written by hand in each package. The nickname shapes are in it now that they are `WordLanguageData.frames`: they were left out while they were a table private to each generator, and being data is what put them in. The sentence datasets are the same story on a larger scale, `THEME_CLASS` included, because a theme moving from one class to another changes what every verb of every language will accept.
 
 ## Testing a random generator
 
@@ -680,6 +691,15 @@ Organizations:
 - **`startsWith` reads the name, the length options read the organization.** A legal form written in front (`주식회사 새솔`, `ООО «Вега»`) is not where the name starts, so `startsWith` is checked against `name` and kept away from `collect`, while the length bounds a column or a field limit cares about are the whole string's. A first character no stem starts with is answered with an invented stem, the way `randWord` answers one, so `startsWith` only comes back empty for a character the language does not write.
 - **An industry is a company's.** Naming one with `type` left out asks for companies; with kinds named, it narrows the companies among them. The industry reported is the one whose word the name carries, and `null` for a generic word, a bare stem or any other kind. The business words are disjoint within a language, and the suites assert it, so the word always says which industry it is.
 - **The odds are data.** The kind weights (40 / 15 / 20 / 10 / 15), the bare-stem, generic-word and legal-form chances live in `organization/data/index.ts` and are compared by `tools/parity`.
+
+System values:
+
+- **Nothing is invented, so the catalog is the whole of it.** Every value is a release that came out, written whole as data, and the generator only picks. A release that is wrong is wrong in its row, never in the generator.
+- **A catalog is a table, and the same text in all three packages.** `rows()` in `_internal/parse` splits one row per line on `|`, and the table is written once in the JavaScript package and copied into the Dart and Python data files verbatim, so a diff between the three is a diff of one string. `tools/parity` compares what each package parses out of it.
+- **A release is written by its template.** `OsRelease.template` holds the words around the version (`macOS Sonoma {v}`, `Android {v} KitKat{b}`, `Ubuntu{e} {v} LTS`), `{e}` is the edition and `{b}` the build, each with its space. A template with no `{b}` writes its build in the version's place, which is how `macOS Sonoma 14` becomes `macOS Sonoma 14.5` rather than `14 14.5`. A new way of writing a release is a template, never a branch.
+- **A line is drawn first, a release second.** `OS_FAMILIES` weights the lines of each platform, hand-written in the order they are common in, because the lines ship at different paces: macOS, iOS and Android release every year where Windows has eleven releases in thirty years, and an even draw over releases made Windows a tenth of every desktop. Inside a line every release is as likely as the next. The suites assert the order of the shares, not the numbers.
+- **The year that counts is the year of what is written.** Without `includeBuild` it is the release's, with it the build's, so Windows 10 is outside `minYear: 2020` until its 2020 and later updates are what the result names. A year range nothing came out in returns nothing rather than a release from outside it, the way `fictional` answers a country with no fiction numbers.
+- **The catalog runs to October 2026**, and a release after that is a row in all three packages. What was checked rather than remembered — the 2026 releases — was confirmed against the publishers' and the press's announcements before it went in.
 
 ## Adding a location language
 

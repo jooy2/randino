@@ -19,6 +19,7 @@ from randino.constants import (
     RAND_LOCATION_LENGTH_MAX,
     RAND_ORGANIZATION_LENGTH_MAX,
     RAND_SENTENCE_LENGTH_MAX,
+    SYSTEM_PLATFORMS,
 )
 from randino.date.data import (
     DATE_CEILING,
@@ -39,6 +40,7 @@ from randino.gender.data import GENDER_CODES, GENDER_LABELS, GENDER_WEIGHTS
 from randino.location.data import LOCATION_DATA, LOCATION_LANGUAGES, LOCATION_LEVELS
 from randino.location.data.countries import COUNTRIES
 from randino.name.data import NAME_DATA, NAME_LANGUAGES
+from randino.os.data import OS_FAMILIES, OS_RELEASES
 from randino.name.data.ko import KO_SURNAME_ROMAN
 from randino.organization.data import (
     ORGANIZATION_BARE_CHANCE,
@@ -49,7 +51,10 @@ from randino.organization.data import (
     ORGANIZATION_TYPE_WEIGHTS,
     ORGANIZATION_TYPES,
 )
-from randino.organization.data._types import OrganizationLanguageData, PoolOrganizationSynthesis
+from randino.organization.data._types import (
+    OrganizationLanguageData,
+    PoolOrganizationSynthesis,
+)
 from randino.phone.data import PHONE_COUNTRIES, PHONE_DATA, PHONE_TYPES
 from randino.phone.data._types import PhoneShape
 from randino.sentence.data import (
@@ -89,7 +94,9 @@ def pool(source: Sequence[Any] | None) -> list[dict[str, str | None]] | None:
     if source is None:
         return None
     return [
-        {"n": entry.n, "r": entry.r} if isinstance(entry, NameToken) else {"n": entry, "r": None}
+        {"n": entry.n, "r": entry.r}
+        if isinstance(entry, NameToken)
+        else {"n": entry, "r": None}
         for entry in source
     ]
 
@@ -164,7 +171,9 @@ def step(source: StoryStep) -> dict[str, object]:
 
 def mapped(source: Mapping[Any, Any] | None) -> dict[str, Any] | None:
     """Flatten a lookup, keyed by string so a syllable count compares as one."""
-    return None if source is None else {str(key): value for key, value in source.items()}
+    return (
+        None if source is None else {str(key): value for key, value in source.items()}
+    )
 
 
 word = {
@@ -183,7 +192,9 @@ word = {
         "agreement": (
             None
             if data.agreement is None
-            else {g: [list(rule) for rule in rules] for g, rules in data.agreement.items()}
+            else {
+                g: [list(rule) for rule in rules] for g, rules in data.agreement.items()
+            }
         ),
         # Optional in one package and defaulted in another; written as a list
         # either way so the shapes compare.
@@ -196,7 +207,10 @@ word = {
             for frame in data.frames
         ],
         "nouns": {theme: listed(words) for theme, words in data.nouns.items()},
-        "levels": {"basic": listed(data.levels.basic), "rare": listed(data.levels.rare)},
+        "levels": {
+            "basic": listed(data.levels.basic),
+            "rare": listed(data.levels.rare),
+        },
         # The npm package tags the two shapes with `kind`; here they are two
         # classes, so the tag is written back out for the comparison.
         "syn": {
@@ -346,7 +360,8 @@ sentence = {
             if data.object_pronouns is None
             else {
                 "words": {
-                    gender: listed(pool) for gender, pool in data.object_pronouns.words.items()
+                    gender: listed(pool)
+                    for gender, pool in data.object_pronouns.words.items()
                 },
                 "clitic": data.object_pronouns.clitic,
             }
@@ -381,14 +396,19 @@ sentence = {
             if data.calendar is None
             else {
                 "date": data.calendar.date,
-                "months": (None if data.calendar.months is None else listed(data.calendar.months)),
+                "months": (
+                    None
+                    if data.calendar.months is None
+                    else listed(data.calendar.months)
+                ),
                 "clock": data.calendar.clock,
                 "years": list(data.calendar.years),
                 "copula": {
                     "subject": list(data.calendar.copula.subject),
                     "words": listed(data.calendar.copula.words),
                     "forms": {
-                        form: listed(pool) for form, pool in data.calendar.copula.forms.items()
+                        form: listed(pool)
+                        for form, pool in data.calendar.copula.forms.items()
                     },
                     "past": tense(data.calendar.copula.past),
                 },
@@ -460,7 +480,9 @@ def organization_of(data: OrganizationLanguageData) -> dict[str, object]:
         },
         "places": None if data.places is None else list(data.places),
         "numbers": None if data.numbers is None else list(data.numbers),
-        "industries": {each: list(data.industries[each]) for each in ORGANIZATION_INDUSTRIES},
+        "industries": {
+            each: list(data.industries[each]) for each in ORGANIZATION_INDUSTRIES
+        },
         "generic": list(data.generic),
         "templates": {kind: list(data.templates[kind]) for kind in ORGANIZATION_TYPES},
         "legalForms": list(data.legal_forms),
@@ -482,6 +504,7 @@ print(
                 "affixLengthMax": AFFIX_LENGTH_MAX,
                 "affixSeparatorDefault": AFFIX_SEPARATOR_DEFAULT,
                 "affixCharset": AFFIX_CHARSET,
+                "systemPlatforms": list(SYSTEM_PLATFORMS),
             },
             "age": {
                 "groups": list(AGE_GROUPS),
@@ -515,7 +538,10 @@ print(
                 "bareChance": ORGANIZATION_BARE_CHANCE,
                 "genericChance": ORGANIZATION_GENERIC_CHANCE,
                 "legalFormChance": ORGANIZATION_LEGAL_FORM_CHANCE,
-                "data": {code: organization_of(data) for code, data in ORGANIZATION_DATA.items()},
+                "data": {
+                    code: organization_of(data)
+                    for code, data in ORGANIZATION_DATA.items()
+                },
             },
             # A shape's optional fields are written out, so a lead, an avoid list or a trunk
             # one package leaves unset and another sets shows up as a difference.
@@ -529,7 +555,9 @@ print(
                         "national": data.national,
                         "international": data.international,
                         "plans": phone_plans(data.plans),
-                        "fiction": None if data.fiction is None else phone_plans(data.fiction),
+                        "fiction": None
+                        if data.fiction is None
+                        else phone_plans(data.fiction),
                     }
                     for code, data in PHONE_DATA.items()
                 },
@@ -537,7 +565,30 @@ print(
             "gender": {
                 "codes": list(GENDER_CODES),
                 "weights": dict(GENDER_WEIGHTS),
-                "labels": {language: dict(labels) for language, labels in GENDER_LABELS.items()},
+                "labels": {
+                    language: dict(labels) for language, labels in GENDER_LABELS.items()
+                },
+            },
+            # One entry per release, keyed by its line and version, so a release one package
+            # holds and another does not is reported as itself. A build is `year text`, the
+            # way the table groups them.
+            "os": {
+                "families": {
+                    family: {"platform": data.platform, "weight": data.weight}
+                    for family, data in OS_FAMILIES.items()
+                },
+                "releases": {
+                    f"{release.family} {release.version}": {
+                        "year": release.year,
+                        "template": release.template,
+                        "name": release.name,
+                        "editions": list(release.editions),
+                        "builds": [
+                            f"{build.year} {build.text}" for build in release.builds
+                        ],
+                    }
+                    for release in OS_RELEASES
+                },
             },
             # The outline is compared as each package parses it rather than as the text it
             # is written in, so a parser that reads `_` or a skipped level differently

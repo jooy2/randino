@@ -6,6 +6,8 @@
 /// you may ask them to be, does not.
 library;
 
+import 'package:randino/src/types.dart';
+
 /// Upper bound for `count` on every generator.
 ///
 /// Generation is cheap, but an unbounded count with `unique: true` can spend a
@@ -61,3 +63,11 @@ const int randAgeMax = 120;
 /// them run past forty: `Công ty TNHH MTV Giải pháp Công nghệ Thịnh Vượng`,
 /// `Polideportivo Municipal de Encinar del Valle`.
 const int randOrganizationLengthMax = 60;
+
+/// The two kinds of machine a system generator tells apart, which is what its
+/// `platform` parameter names: [SystemPlatform.desktop] is a PC, a laptop
+/// included, and [SystemPlatform.mobile] a phone or a tablet.
+const List<SystemPlatform> systemPlatforms = <SystemPlatform>[
+  SystemPlatform.desktop,
+  SystemPlatform.mobile,
+];

@@ -58,6 +58,7 @@ def test_the_package_exports_exactly_its_public_api() -> None:
         "OrganizationIndustryOption",
         "OrganizationType",
         "OrganizationTypeOption",
+        "OsDetail",
         "PHONE_COUNTRIES",
         "PHONE_TYPES",
         "PhoneCountry",
@@ -75,6 +76,7 @@ def test_the_package_exports_exactly_its_public_api() -> None:
         "RAND_SENTENCE_LENGTH_MAX",
         "RandRealism",
         "RandVocabulary",
+        "SYSTEM_PLATFORMS",
         "SentenceDetail",
         "SentenceQuote",
         "SentenceShape",
@@ -86,6 +88,8 @@ def test_the_package_exports_exactly_its_public_api() -> None:
         "SentenceTense",
         "SentenceType",
         "SentenceTypeOption",
+        "SystemPlatform",
+        "SystemPlatformOption",
         "WORD_LANGUAGES",
         "WORD_THEMES",
         "WordDetail",
@@ -126,6 +130,7 @@ def test_the_package_exports_exactly_its_public_api() -> None:
         "rand_nickname",
         "rand_object",
         "rand_organization",
+        "rand_os",
         "rand_person",
         "rand_phone",
         "rand_place",
@@ -235,6 +240,12 @@ def test_the_functions_are_callable_and_the_constants_are_what_they_claim() -> N
     assert len(randino.PHONE_COUNTRIES) == len(randino.WORD_LANGUAGES)
     assert randino.PHONE_TYPES == ("mobile", "landline")
 
+    # A system value belongs to a kind of machine, and an operating system is a real
+    # release.
+    assert randino.SYSTEM_PLATFORMS == ("desktop", "mobile")
+    assert isinstance(randino.rand_os()[0], str)
+    assert isinstance(randino.rand_os(output="detail")[0].year, int)
+
 
 def test_the_package_imports_nothing_outside_the_standard_library() -> None:
     # Zero runtime dependencies is a hard constraint, not a preference — it is why
@@ -316,6 +327,8 @@ def test_an_option_the_types_rule_out_falls_back_rather_than_raising() -> None:
         lambda: loose.rand_phone(country="XX", type="pager"),
         lambda: loose.rand_phone(country=123, separator=7, count=float("nan")),
         lambda: loose.rand_phone(fictional="yes"),
+        lambda: loose.rand_os(platform="tv", min_year=float("nan"), max_year="x"),
+        lambda: loose.rand_os(include_build="yes", include_version=0),
         lambda: loose.rand_gender(language="xx", count=float("nan")),
         lambda: loose.rand_gender(include_unknown="yes"),
         lambda: loose.rand_organization(language="xx", type="shop"),
@@ -380,6 +393,7 @@ def test_random_is_where_every_draw_of_a_call_comes_from() -> None:
     twice(lambda: randino.rand_gender(count=5, include_unknown=True, random=Random(42).random))
     twice(lambda: randino.rand_organization(count=5, random=Random(42).random))
     twice(lambda: randino.rand_organization(count=5, max_length=20, random=Random(42).random))
+    twice(lambda: randino.rand_os(count=5, include_build=True, random=Random(42).random))
 
     # Two different seeds are two different answers, so the source is actually what
     # the draws are coming from.

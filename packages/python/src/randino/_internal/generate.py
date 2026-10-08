@@ -12,8 +12,13 @@ from typing import TypeVar
 
 from randino._internal.script import writes_script
 from randino._internal.utils import clamp, pick
-from randino._types import RandRealism, RandVocabulary
-from randino.constants import RAND_COUNT_MAX, RAND_LENGTH_MAX, RAND_LENGTH_MIN
+from randino._types import RandRealism, RandVocabulary, SystemPlatform
+from randino.constants import (
+    RAND_COUNT_MAX,
+    RAND_LENGTH_MAX,
+    RAND_LENGTH_MIN,
+    SYSTEM_PLATFORMS,
+)
 
 T = TypeVar("T")
 L = TypeVar("L", bound=str)
@@ -177,6 +182,38 @@ def length_bounds(
     # limit or a column width, where `min_length` only shapes how a result reads.
     # `(30, 5)` used to read as `(30, 30)`, which is the other way about.
     return min(resolved_low, resolved_high), resolved_high
+
+
+def resolve_platforms(platform: object) -> tuple[SystemPlatform, ...]:
+    """The platforms a call may draw from: the one named, or both for `"all"` and the rest."""
+    return (platform,) if platform in SYSTEM_PLATFORMS else SYSTEM_PLATFORMS
+
+
+_YEAR_MAX = 9999
+"""The latest year a catalog bound is read up to.
+
+A year of four digits is as far as anything here is dated, and nothing in a catalog
+comes close to either end.
+"""
+
+
+def resolve_years(min_year: object, max_year: object) -> tuple[int, int]:
+    """`min_year` and `max_year` as the years a catalog draw may come from, both included.
+
+    A bound left out is no bound, and a range the wrong way round keeps `max_year`, the
+    way a length range keeps `max_length`: it is the one a caller usually means — "as of
+    2015" — where `min_year` only trims the old end.
+
+    Args:
+        min_year: The earliest year, or None for no bound.
+        max_year: The latest year, or None for no bound.
+
+    Returns:
+        The two years, the first never after the second.
+    """
+    high = resolve_whole(max_year, _YEAR_MAX, 0, _YEAR_MAX)
+
+    return min(resolve_whole(min_year, 0, 0, _YEAR_MAX), high), high
 
 
 def draw_language(option: str, languages: Sequence[L]) -> L:

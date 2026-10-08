@@ -182,3 +182,26 @@ export function outline(source: string, levels: number): OutlineEntry[] {
 
 	return entries;
 }
+
+/**
+ * Split a table written one row per line with `|` between the cells, for the
+ * catalogs of real products whose names carry spaces of their own: `Core
+ * i7-13700K`, `Galaxy S24 Ultra`, `23H2 (Build 22631)`. Every cell is trimmed,
+ * blank lines are skipped, and an empty cell stays an empty string so a row
+ * keeps its columns where they are.
+ */
+export function rows(source: string): string[][] {
+	return source
+		.split('\n')
+		.map((line) => line.trim())
+		.filter((line) => line.length > 0)
+		.map((line) => line.split('|').map((cell) => cell.trim()));
+}
+
+/** Split a cell holding a list, `a, b, c`, into its entries. An empty cell is no entries. */
+export function items(cell: string): string[] {
+	return cell
+		.split(',')
+		.map((entry) => entry.trim())
+		.filter((entry) => entry.length > 0);
+}

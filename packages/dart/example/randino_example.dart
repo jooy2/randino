@@ -16,6 +16,7 @@ void main() {
   _organizations();
   _dates();
   _phones();
+  _system();
   _decorators();
   _questionsAboutALanguage();
 }
@@ -169,6 +170,15 @@ void _phones() {
   print(randPhone(country: PhoneCountry.kr)); // [010-4821-3967]
   print(randPhone(country: PhoneCountry.us, includeCountryCode: true)); // [+1 415-726-0193]
   print(randPhoneDetails(country: PhoneCountry.jp).first.e164); // +819037182046
+}
+
+/// A sample machine, described with real products rather than invented ones.
+void _system() {
+  print('-- system -----------------------------------------------------');
+
+  print(randOs(count: 3)); // [Windows 10, macOS Sonoma 14, Android 9 Pie]
+  print(randOs(includeBuild: true, includeEdition: true)); // [Windows 11 Pro 23H2 (Build 22631)]
+  print(randOs(platform: SystemPlatform.desktop, maxYear: 2010)); // [Mac OS X Snow Leopard 10.6]
 }
 
 void _decorators() {

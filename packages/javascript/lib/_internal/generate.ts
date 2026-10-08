@@ -6,8 +6,18 @@
 // the same `unique` bookkeeping and the same attempt budget. Written once here,
 // a new generator gets all of it by calling `collect`.
 
-import { RAND_COUNT_MAX, RAND_LENGTH_MAX, RAND_LENGTH_MIN } from '../constants.js';
-import type { RandCommonOptions, RandRealism, RandVocabulary } from '../_types/global.js';
+import {
+	RAND_COUNT_MAX,
+	RAND_LENGTH_MAX,
+	RAND_LENGTH_MIN,
+	SYSTEM_PLATFORMS
+} from '../constants.js';
+import type {
+	RandCommonOptions,
+	RandRealism,
+	RandVocabulary,
+	SystemPlatform
+} from '../_types/global.js';
 import { writesScript } from './script.js';
 import { clamp, pick } from './utils.js';
 
@@ -157,6 +167,32 @@ export function lengthBounds(
 	// a field limit or a column width, where `minLength` only shapes how a result
 	// reads. `[30, 5]` used to read as `[30, 30]`, which is the other way about.
 	return [Math.min(low, high), high];
+}
+
+/**
+ * The platforms a call may draw from: the one named, or both for `'all'` and for
+ * anything this package does not know.
+ */
+export function resolvePlatforms(platform: unknown): readonly SystemPlatform[] {
+	return SYSTEM_PLATFORMS.includes(platform as SystemPlatform)
+		? [platform as SystemPlatform]
+		: SYSTEM_PLATFORMS;
+}
+
+// The latest year a catalog bound is read up to. A year of four digits is as far
+// as anything here is dated, and nothing in a catalog comes close to either end.
+const YEAR_MAX = 9999;
+
+/**
+ * `minYear` and `maxYear` as the years a catalog draw may come from, both ends
+ * included. A bound left out is no bound, and a range the wrong way round keeps
+ * `maxYear`, the way a length range keeps `maxLength`: it is the one a caller
+ * usually means — "as of 2015" — where `minYear` only trims the old end.
+ */
+export function resolveYears(minYear: unknown, maxYear: unknown): [number, number] {
+	const high = resolveWhole(maxYear, YEAR_MAX, 0, YEAR_MAX);
+
+	return [Math.min(resolveWhole(minYear, 0, 0, YEAR_MAX), high), high];
 }
 
 /** The language one draw uses: the requested one, or any of them for `'all'`. */

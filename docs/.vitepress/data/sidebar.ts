@@ -19,7 +19,8 @@
  * decides nothing but its URL.
  *
  * **Generators** is the one that goes a level deeper, into **General** — one
- * function per kind of value — and two groups of the same function with one
+ * function per kind of value — **System**, the values a sample machine is
+ * described by, and two groups of the same function with one
  * argument decided: **Words**, the twenty-nine themed forms of `randWord`, and
  * **Locations**, the four level forms of `randLocation`. Thirty-eight entries in
  * one list would bury the rest, so the forms sit beside them rather than among
@@ -27,7 +28,8 @@
  *
  * Words and Locations are the groups the navbar's API dropdown leaves out, which
  * they say themselves with `sidebarOnly`: the dropdown already points at the
- * function each of them is.
+ * function each of them is. System is in the dropdown as a section of its own,
+ * which it says with an `id`, the way the three top groups of API do.
  *
  * **Behaviour** holds the prose explaining how a generator's options behave,
  * where there is enough of it to be its own page — `randName`, `randNickname`
@@ -106,6 +108,12 @@ export const SIDEBAR: SidebarGroup[] = [
 							{ path: 'date/rand-date', en: 'randDate', ko: 'randDate' },
 							{ path: 'phone/rand-phone', en: 'randPhone', ko: 'randPhone' }
 						]
+					},
+					{
+						id: 'system',
+						en: 'System',
+						ko: '시스템',
+						items: [{ path: 'os/rand-os', en: 'randOs', ko: 'randOs' }]
 					},
 					{
 						en: 'Locations',
@@ -282,7 +290,9 @@ function pagesOf(group: SidebarGroup): SidebarPage[] {
 			return [entry];
 		}
 
-		return entry.sidebarOnly ? [] : pagesOf(entry);
+		// A subgroup with an `id` is a section of the dropdown in its own right, so
+		// the group around it leaves its pages to that section.
+		return entry.sidebarOnly || entry.id ? [] : pagesOf(entry);
 	});
 }
 

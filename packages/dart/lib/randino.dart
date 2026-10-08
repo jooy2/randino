@@ -37,7 +37,8 @@ export 'src/constants.dart'
         randLocationLengthMax,
         randOrganizationLengthMax,
         randSentenceCountMax,
-        randSentenceLengthMax;
+        randSentenceLengthMax,
+        systemPlatforms;
 export 'src/date/data/index.dart' show dateUnits;
 export 'src/date/rand_date.dart' show randDate;
 export 'src/date/rand_date_details.dart' show randDateDetails;
@@ -75,6 +76,8 @@ export 'src/nickname/rand_nickname_details.dart' show randNicknameDetails;
 export 'src/organization/data/index.dart' show organizationIndustries, organizationTypes;
 export 'src/organization/rand_organization.dart' show randOrganization;
 export 'src/organization/rand_organization_details.dart' show randOrganizationDetails;
+export 'src/os/rand_os.dart' show randOs;
+export 'src/os/rand_os_details.dart' show randOsDetails;
 export 'src/phone/data/index.dart' show phoneCountries, phoneTypes;
 export 'src/phone/rand_phone.dart' show randPhone;
 export 'src/phone/rand_phone_details.dart' show randPhoneDetails;
@@ -104,6 +107,7 @@ export 'src/types.dart'
         OrganizationDetail,
         OrganizationIndustry,
         OrganizationType,
+        OsDetail,
         PhoneCountry,
         PhoneDetail,
         PhoneType,
@@ -117,6 +121,7 @@ export 'src/types.dart'
         SentenceStory,
         SentenceStyle,
         SentenceTense,
+        SystemPlatform,
         WordDetail,
         WordLanguage,
         WordSlot,

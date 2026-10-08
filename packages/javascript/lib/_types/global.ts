@@ -1160,3 +1160,71 @@ export interface PhoneDetail {
 	callingCode: string;
 	type: PhoneType;
 }
+
+/**
+ * Which kind of machine a system value belongs to:
+ * - `desktop`: a PC, a laptop included — what runs Windows, macOS or Linux.
+ * - `mobile`: a phone or a tablet — what runs Android, iOS or iPadOS.
+ */
+export type SystemPlatform = 'desktop' | 'mobile';
+
+/** `'all'` draws from both. */
+export type SystemPlatformOption = SystemPlatform | 'all';
+
+/**
+ * What `randOs` takes. An operating system is a real release with a real name,
+ * so it has no language, no length and nothing to invent.
+ */
+export interface RandOsOptions extends Pick<
+	RandCommonOptions,
+	'count' | 'unique' | 'output' | 'random'
+> {
+	/** Desktop systems, mobile ones, or both. Default `'all'`. */
+	platform?: SystemPlatformOption;
+	/**
+	 * The earliest year a release may have come out in. With `includeBuild`, the
+	 * year the build or point release came out in. Default none.
+	 */
+	minYear?: number;
+	/**
+	 * The latest year a release may have come out in — `2015` is what was out by
+	 * the end of 2015. With `includeBuild`, the year the build or point release
+	 * came out in. A range the wrong way round keeps `maxYear`. Default none.
+	 */
+	maxYear?: number;
+	/**
+	 * Write the version after the name: `Windows 11` rather than `Windows`. Left
+	 * off, the build and the edition go with it, because neither means anything
+	 * without the version they belong to. Default `true`.
+	 */
+	includeVersion?: boolean;
+	/**
+	 * Write the build or the point release where the release has them: `Windows 11
+	 * 23H2 (Build 22631)`, `macOS Sonoma 14.5`, `Android 14 (API 34)`. A release
+	 * with none is written at its version. Default `false`.
+	 */
+	includeBuild?: boolean;
+	/**
+	 * Write an edition where the release has them: `Windows 11 Pro`, `Ubuntu
+	 * Server 24.04 LTS`, `Fedora Workstation 40`. A release with none — macOS,
+	 * Android, iOS — is written without one. Default `false`.
+	 */
+	includeEdition?: boolean;
+}
+
+/** A generated operating system with the pieces it was written from. */
+export interface OsDetail {
+	/** The system as the value form returns it: `Windows 11 Pro 23H2 (Build 22631)`. */
+	os: string;
+	/** The name without a version: `Windows`, `macOS`, `Mac OS X`, `Ubuntu`. */
+	name: string;
+	/** The release's version: `11`, `14`, `22.04`, `XP`. `null` with `includeVersion: false`. */
+	version: string | null;
+	/** The build or point release written, as it is written: `23H2 (Build 22631)`, `14.5`. */
+	build: string | null;
+	/** The edition written: `Pro`, `Server`. */
+	edition: string | null;
+	platform: SystemPlatform;
+	/** The year the release came out, or the build when one is written. */
+	year: number;
+}

@@ -1,3 +1,5 @@
+import type { SystemPlatform } from './_types/global.js';
+
 // Bounds every generator shares. They used to be `NAME_*` and `NICKNAME_*`, one
 // pair each, which meant a third generator had to invent a third pair holding
 // the same numbers. What a generator produces differs; how many of them you may
@@ -60,3 +62,10 @@ export const RAND_AGE_MAX = 120;
  * Thịnh Vượng`, `Polideportivo Municipal de Encinar del Valle`.
  */
 export const RAND_ORGANIZATION_LENGTH_MAX = 60;
+
+/**
+ * The two kinds of machine a system generator tells apart, which is what its
+ * `platform` option names: `desktop` is a PC, a laptop included, and `mobile` a
+ * phone or a tablet.
+ */
+export const SYSTEM_PLATFORMS: readonly SystemPlatform[] = ['desktop', 'mobile'];

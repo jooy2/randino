@@ -717,3 +717,40 @@ class PhoneDetail:
 
     type: PhoneType
     """What the number is for."""
+
+
+SystemPlatform = Literal["desktop", "mobile"]
+"""Which kind of machine a system value belongs to.
+
+- `desktop`: a PC, a laptop included — what runs Windows, macOS or Linux.
+- `mobile`: a phone or a tablet — what runs Android, iOS or iPadOS.
+"""
+
+SystemPlatformOption = Literal[SystemPlatform, "all"]
+""""all" draws from both."""
+
+
+@dataclass(frozen=True, slots=True)
+class OsDetail:
+    """A generated operating system with the pieces it was written from."""
+
+    os: str
+    """The system as the value form returns it: `Windows 11 Pro 23H2 (Build 22631)`."""
+
+    name: str
+    """The name without a version: `Windows`, `macOS`, `Mac OS X`, `Ubuntu`."""
+
+    version: str | None
+    """The release's version: `11`, `14`, `22.04`, `XP`. None with `include_version=False`."""
+
+    build: str | None
+    """The build or point release written, as it is written: `23H2 (Build 22631)`, `14.5`."""
+
+    edition: str | None
+    """The edition written: `Pro`, `Server`."""
+
+    platform: SystemPlatform
+    """The kind of machine the system runs on."""
+
+    year: int
+    """The year the release came out, or the build when one is written."""

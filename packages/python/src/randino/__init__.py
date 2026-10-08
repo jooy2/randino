@@ -50,6 +50,7 @@ from randino._types import (
     OrganizationIndustryOption,
     OrganizationType,
     OrganizationTypeOption,
+    OsDetail,
     PhoneCountry,
     PhoneCountryOption,
     PhoneDetail,
@@ -68,6 +69,8 @@ from randino._types import (
     SentenceTense,
     SentenceType,
     SentenceTypeOption,
+    SystemPlatform,
+    SystemPlatformOption,
     WordDetail,
     WordLanguage,
     WordLanguageOption,
@@ -86,6 +89,7 @@ from randino.constants import (
     RAND_ORGANIZATION_LENGTH_MAX,
     RAND_SENTENCE_COUNT_MAX,
     RAND_SENTENCE_LENGTH_MAX,
+    SYSTEM_PLATFORMS,
 )
 from randino.date import DATE_UNITS, rand_date
 from randino.decorate import (
@@ -116,6 +120,7 @@ from randino.name import (
 )
 from randino.nickname import nickname_length_range, rand_nickname
 from randino.organization import ORGANIZATION_INDUSTRIES, ORGANIZATION_TYPES, rand_organization
+from randino.os import rand_os
 from randino.phone import PHONE_COUNTRIES, PHONE_TYPES, rand_phone
 from randino.sentence import rand_sentence, sentence_length_range
 from randino.word import (
@@ -176,6 +181,7 @@ __all__ = [
     "RAND_ORGANIZATION_LENGTH_MAX",
     "RAND_SENTENCE_COUNT_MAX",
     "RAND_SENTENCE_LENGTH_MAX",
+    "SYSTEM_PLATFORMS",
     "WORD_LANGUAGES",
     "WORD_THEMES",
     "AgeDetail",
@@ -205,6 +211,7 @@ __all__ = [
     "OrganizationIndustryOption",
     "OrganizationType",
     "OrganizationTypeOption",
+    "OsDetail",
     "PhoneCountry",
     "PhoneCountryOption",
     "PhoneDetail",
@@ -223,6 +230,8 @@ __all__ = [
     "SentenceTense",
     "SentenceType",
     "SentenceTypeOption",
+    "SystemPlatform",
+    "SystemPlatformOption",
     "WordDetail",
     "WordLanguage",
     "WordLanguageOption",
@@ -261,6 +270,7 @@ __all__ = [
     "rand_nickname",
     "rand_object",
     "rand_organization",
+    "rand_os",
     "rand_person",
     "rand_phone",
     "rand_place",

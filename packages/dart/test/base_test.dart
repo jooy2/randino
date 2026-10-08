@@ -59,6 +59,7 @@ void main() {
           'OrganizationDetail',
           'OrganizationIndustry',
           'OrganizationType',
+          'OsDetail',
           'PhoneCountry',
           'PhoneDetail',
           'PhoneType',
@@ -72,6 +73,7 @@ void main() {
           'SentenceStory',
           'SentenceStyle',
           'SentenceTense',
+          'SystemPlatform',
           'WordDetail',
           'WordLanguage',
           'WordSlot',
@@ -95,6 +97,7 @@ void main() {
           'wordLanguages',
           'nicknameLengthRange',
           'sentenceLengthRange',
+          'systemPlatforms',
           'wordThemes',
           'randAge',
           'randAgeDetails',
@@ -143,6 +146,8 @@ void main() {
           'randOrganization',
           'randOrganizationDetails',
           'randOrganizationLengthMax',
+          'randOs',
+          'randOsDetails',
           'randPerson',
           'randPhone',
           'randPhoneDetails',
@@ -266,6 +271,12 @@ void main() {
       expect(randPhoneDetails()[0].e164, startsWith('+'));
       expect(phoneCountries, hasLength(wordLanguages.length));
       expect(phoneTypes, <PhoneType>[PhoneType.mobile, PhoneType.landline]);
+
+      // A system value belongs to a kind of machine, and an operating system is
+      // a real release.
+      expect(systemPlatforms, <SystemPlatform>[SystemPlatform.desktop, SystemPlatform.mobile]);
+      expect(randOs(), hasLength(1));
+      expect(randOsDetails()[0], isA<OsDetail>());
     });
 
     test('the bounds are the same numbers the JavaScript package uses', () {
@@ -297,6 +308,7 @@ void main() {
       expect(ageGroups.toSet(), AgeGroup.values.toSet());
       expect(organizationTypes.toSet(), OrganizationType.values.toSet());
       expect(organizationIndustries.toSet(), OrganizationIndustry.values.toSet());
+      expect(systemPlatforms.toSet(), SystemPlatform.values.toSet());
     });
 
     test('a length range the wrong way round keeps maxLength', () {
@@ -357,6 +369,7 @@ void main() {
       twice(() => randPhone(count: 5, random: Random(42)).join());
       twice(() => randPhone(count: 5, fictional: true, random: Random(42)).join());
       twice(() => randGender(count: 5, includeUnknown: true, random: Random(42)).join());
+      twice(() => randOs(count: 5, includeBuild: true, random: Random(42)).join());
       twice(() => randOrganization(count: 5, random: Random(42)).join('|'));
       twice(() => randOrganization(count: 5, maxLength: 20, random: Random(42)).join('|'));
       twice(() => randSuffixAll(const ['a', 'b'], random: Random(42)).join());

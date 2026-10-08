@@ -191,3 +191,23 @@ List<OutlineEntry> outline(String source, int levels) {
     entries.map((entry) => OutlineEntry(path: entry.path, depth: entry.depth, below: entry.below)),
   );
 }
+
+/// Split a table written one row per line with `|` between the cells, for the
+/// catalogs of real products whose names carry spaces of their own: `Core
+/// i7-13700K`, `Galaxy S24 Ultra`, `23H2 (Build 22631)`.
+///
+/// Every cell is trimmed, blank lines are skipped, and an empty cell stays an
+/// empty string so a row keeps its columns where they are.
+List<List<String>> rows(String source) => List<List<String>>.unmodifiable(
+  source
+      .split('\n')
+      .map((line) => line.trim())
+      .where((line) => line.isNotEmpty)
+      .map((line) => List<String>.unmodifiable(line.split('|').map((cell) => cell.trim()))),
+);
+
+/// Split a cell holding a list, `a, b, c`, into its entries. An empty cell is no
+/// entries.
+List<String> items(String cell) => List<String>.unmodifiable(
+  cell.split(',').map((entry) => entry.trim()).where((entry) => entry.isNotEmpty),
+);

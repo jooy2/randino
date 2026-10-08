@@ -30,6 +30,7 @@ describe('base test', () => {
 			'RAND_ORGANIZATION_LENGTH_MAX',
 			'RAND_SENTENCE_COUNT_MAX',
 			'RAND_SENTENCE_LENGTH_MAX',
+			'SYSTEM_PLATFORMS',
 			'WORD_LANGUAGES',
 			'WORD_THEMES',
 			'nameLengthRange',
@@ -63,6 +64,7 @@ describe('base test', () => {
 			'randNickname',
 			'randObject',
 			'randOrganization',
+			'randOs',
 			'randPerson',
 			'randPhone',
 			'randPlace',
@@ -184,6 +186,12 @@ describe('base test', () => {
 		assert.match(randino.randPhone({ output: 'detail' })[0].e164, /^\+\d+$/);
 		assert.strictEqual(randino.PHONE_COUNTRIES.length, randino.WORD_LANGUAGES.length);
 		assert.deepStrictEqual(randino.PHONE_TYPES, ['mobile', 'landline']);
+
+		// A system value belongs to a kind of machine, and an operating system is a
+		// real release.
+		assert.deepStrictEqual(randino.SYSTEM_PLATFORMS, ['desktop', 'mobile']);
+		assert.strictEqual(typeof randino.randOs()[0], 'string');
+		assert.strictEqual(typeof randino.randOs({ output: 'detail' })[0].year, 'number');
 	});
 
 	it('an option the types rule out falls back rather than throwing', () => {
@@ -234,7 +242,9 @@ describe('base test', () => {
 			() => randino.randGender({ includeUnknown: 'yes' as never }),
 			() => randino.randOrganization({ language: 'xx' as never, type: 'shop' as never }),
 			() => randino.randOrganization({ type: [null] as never, industry: 'mining' as never }),
-			() => randino.randOrganization({ includeLegalForm: 'yes' as never, minLength: NaN })
+			() => randino.randOrganization({ includeLegalForm: 'yes' as never, minLength: NaN }),
+			() => randino.randOs({ platform: 'tv' as never, minYear: NaN, maxYear: 'x' as never }),
+			() => randino.randOs({ includeBuild: 'yes' as never, includeVersion: 0 as never })
 		];
 
 		for (const ask of asks) {
@@ -319,6 +329,7 @@ describe('base test', () => {
 		agrees(() => randino.randGender({ count: 5, includeUnknown: true, random: seeded(42) }));
 		agrees(() => randino.randOrganization({ count: 5, random: seeded(42) }));
 		agrees(() => randino.randOrganization({ count: 5, maxLength: 20, random: seeded(42) }));
+		agrees(() => randino.randOs({ count: 5, includeBuild: true, random: seeded(42) }));
 
 		// Two different seeds are two different answers, so the source is actually
 		// what the draws are coming from.

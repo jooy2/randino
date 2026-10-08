@@ -18,6 +18,7 @@ import 'package:randino/src/location/data/countries.dart';
 import 'package:randino/src/location/data/index.dart';
 import 'package:randino/src/location/data/types.dart';
 import 'package:randino/src/name/data/index.dart';
+import 'package:randino/src/os/data/index.dart';
 import 'package:randino/src/name/data/ko.dart';
 import 'package:randino/src/name/data/types.dart';
 import 'package:randino/src/organization/data/index.dart';
@@ -31,19 +32,20 @@ import 'package:randino/src/word/data/index.dart';
 import 'package:randino/src/word/data/types.dart';
 
 /// A phone plan per type, every optional field of a shape written out.
-Map<String, Object?> phonePlans(Map<PhoneType, List<PhoneShape>> plans) => <String, Object?>{
-  for (final type in phoneTypes)
-    type.name: <Object?>[
-      for (final shape in plans[type]!)
-        <String, Object?>{
-          'prefixes': shape.prefixes,
-          'lead': shape.lead,
-          'groups': shape.groups,
-          'avoid': shape.avoid,
-          'trunk': shape.trunk,
-        },
-    ],
-};
+Map<String, Object?> phonePlans(Map<PhoneType, List<PhoneShape>> plans) =>
+    <String, Object?>{
+      for (final type in phoneTypes)
+        type.name: <Object?>[
+          for (final shape in plans[type]!)
+            <String, Object?>{
+              'prefixes': shape.prefixes,
+              'lead': shape.lead,
+              'groups': shape.groups,
+              'avoid': shape.avoid,
+              'trunk': shape.trunk,
+            },
+        ],
+    };
 
 /// Flattens a name pool: a plain entry carries no reading, a token does.
 List<Map<String, String?>>? pool(NamePool? source) => source
@@ -111,7 +113,9 @@ Map<String, Object?> step(StoryStep source) => <String, Object?>{
   'link': source.link?.name ?? '',
   'kinds': <String>[for (final kind in source.kinds) kind.name],
   'actor': source.actor?.name ?? '',
-  'actorClasses': <String>[for (final noun in source.actorClasses ?? const <NounClass>[]) noun.name],
+  'actorClasses': <String>[
+    for (final noun in source.actorClasses ?? const <NounClass>[]) noun.name,
+  ],
   'actorThemes': source.actorThemes == null
       ? null
       : <String>[for (final theme in source.actorThemes!) theme.name],
@@ -135,36 +139,40 @@ Map<String, Object?> synOf(SyllableSet syn) => <String, Object?>{
 };
 
 /// One language's organization dataset, the synthesis tagged with its kind.
-Map<String, Object?> organizationOf(OrganizationLanguageData data) => <String, Object?>{
-  'stems': data.stems,
-  'syn': switch (data.syn) {
-    OrganizationPoolSynthesis syn => <String, Object?>{
-      'kind': 'pool',
-      'pool': syn.pool,
-      'joiner': syn.joiner,
-      'minSyllables': syn.minSyllables,
-      'maxSyllables': syn.maxSyllables,
-    },
-    OrganizationSyllableSynthesis syn => <String, Object?>{
-      'kind': 'syllable',
-      'onset': syn.onset,
-      'vowel': syn.vowel,
-      'coda': syn.coda,
-      'minSyllables': syn.minSyllables,
-      'maxSyllables': syn.maxSyllables,
-    },
-  },
-  'places': data.places,
-  'numbers': data.numbers == null ? null : <int>[data.numbers!.$1, data.numbers!.$2],
-  'industries': <String, Object?>{
-    for (final industry in organizationIndustries) industry.name: data.industries[industry],
-  },
-  'generic': data.generic,
-  'templates': <String, Object?>{
-    for (final type in organizationTypes) type.name: data.templates[type],
-  },
-  'legalForms': data.legalForms,
-};
+Map<String, Object?> organizationOf(OrganizationLanguageData data) =>
+    <String, Object?>{
+      'stems': data.stems,
+      'syn': switch (data.syn) {
+        OrganizationPoolSynthesis syn => <String, Object?>{
+          'kind': 'pool',
+          'pool': syn.pool,
+          'joiner': syn.joiner,
+          'minSyllables': syn.minSyllables,
+          'maxSyllables': syn.maxSyllables,
+        },
+        OrganizationSyllableSynthesis syn => <String, Object?>{
+          'kind': 'syllable',
+          'onset': syn.onset,
+          'vowel': syn.vowel,
+          'coda': syn.coda,
+          'minSyllables': syn.minSyllables,
+          'maxSyllables': syn.maxSyllables,
+        },
+      },
+      'places': data.places,
+      'numbers': data.numbers == null
+          ? null
+          : <int>[data.numbers!.$1, data.numbers!.$2],
+      'industries': <String, Object?>{
+        for (final industry in organizationIndustries)
+          industry.name: data.industries[industry],
+      },
+      'generic': data.generic,
+      'templates': <String, Object?>{
+        for (final type in organizationTypes) type.name: data.templates[type],
+      },
+      'legalForms': data.legalForms,
+    };
 
 void main() {
   final word = <String, Object?>{
@@ -352,7 +360,8 @@ void main() {
             : <String, Object?>{
                 for (final level in entry.value.replies!.entries)
                   level.key.name: <String, Object?>{
-                    for (final cue in level.value.entries) cue.key.name: listed(cue.value),
+                    for (final cue in level.value.entries)
+                      cue.key.name: listed(cue.value),
                   },
               },
         'degrees': listed(entry.value.degrees),
@@ -396,7 +405,8 @@ void main() {
         'placeHeads': entry.value.placeHeads == null
             ? null
             : <String, Object?>{
-                for (final h in entry.value.placeHeads!.entries) h.key: listed(h.value),
+                for (final h in entry.value.placeHeads!.entries)
+                  h.key: listed(h.value),
               },
         'numeral': entry.value.numeral == null
             ? null
@@ -520,13 +530,19 @@ void main() {
         'affixLengthMax': affixLengthMax,
         'affixSeparatorDefault': affixSeparatorDefault,
         'affixCharset': affixCharset,
+        'systemPlatforms': <String>[
+          for (final platform in systemPlatforms) platform.name,
+        ],
       },
       'age': <String, Object?>{
         'groups': <String>[for (final group in ageGroups) group.name],
         'bands': <String, Object?>{
-          for (final group in ageGroups) group.name: <int>[ageBands[group]!.$1, ageBands[group]!.$2],
+          for (final group in ageGroups)
+            group.name: <int>[ageBands[group]!.$1, ageBands[group]!.$2],
         },
-        'curve': <Object?>[for (final (age, weight) in ageCurve) <num>[age, weight]],
+        'curve': <Object?>[
+          for (final (age, weight) in ageCurve) <num>[age, weight],
+        ],
         'maxDefault': ageMaxDefault,
       },
       'date': <String, Object?>{
@@ -550,21 +566,27 @@ void main() {
       },
       'organization': <String, Object?>{
         'types': <String>[for (final type in organizationTypes) type.name],
-        'industries': <String>[for (final industry in organizationIndustries) industry.name],
+        'industries': <String>[
+          for (final industry in organizationIndustries) industry.name,
+        ],
         'typeWeights': <String, Object?>{
-          for (final entry in organizationTypeWeights.entries) entry.key.name: entry.value,
+          for (final entry in organizationTypeWeights.entries)
+            entry.key.name: entry.value,
         },
         'bareChance': organizationBareChance,
         'genericChance': organizationGenericChance,
         'legalFormChance': organizationLegalFormChance,
         'data': <String, Object?>{
-          for (final entry in organizationData.entries) entry.key.name: organizationOf(entry.value),
+          for (final entry in organizationData.entries)
+            entry.key.name: organizationOf(entry.value),
         },
       },
       // A shape's optional fields are written out, so a lead, an avoid list or a
       // trunk one package leaves unset and another sets shows up as a difference.
       'phone': <String, Object?>{
-        'countries': <String>[for (final country in phoneCountries) country.code],
+        'countries': <String>[
+          for (final country in phoneCountries) country.code,
+        ],
         'types': <String>[for (final type in phoneTypes) type.name],
         'data': <String, Object?>{
           for (final country in phoneCountries)
@@ -583,12 +605,39 @@ void main() {
       'gender': <String, Object?>{
         'codes': <String>[for (final code in genderCodes) code.name],
         'weights': <String, Object?>{
-          for (final entry in genderWeights.entries) entry.key.name: entry.value,
+          for (final entry in genderWeights.entries)
+            entry.key.name: entry.value,
         },
         'labels': <String, Object?>{
           for (final language in genderLabels.entries)
             language.key.name: <String, Object?>{
-              for (final label in language.value.entries) label.key.name: label.value,
+              for (final label in language.value.entries)
+                label.key.name: label.value,
+            },
+        },
+      },
+      // One entry per release, keyed by its line and version, so a release one
+      // package holds and another does not is reported as itself. A build is
+      // `year text`, the way the table groups them.
+      'os': <String, Object?>{
+        'families': <String, Object?>{
+          for (final entry in osFamilies.entries)
+            entry.key.name: <String, Object?>{
+              'platform': entry.value.platform.name,
+              'weight': entry.value.weight,
+            },
+        },
+        'releases': <String, Object?>{
+          for (final release in osReleases)
+            '${release.family.name} ${release.version}': <String, Object?>{
+              'year': release.year,
+              'template': release.template,
+              'name': release.name,
+              'editions': release.editions,
+              'builds': <String>[
+                for (final build in release.builds)
+                  '${build.year} ${build.text}',
+              ],
             },
         },
       },

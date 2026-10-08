@@ -10,7 +10,7 @@ Every option and every example, with **Python** picked in the sidebar. This READ
 
 ---
 
-**randino** generates random person names, nicknames, words, sentences, real locations, ages, genders, organizations, dates and phone numbers in the language you ask for.
+**randino** generates random person names, nicknames, words, sentences, real locations, ages, genders, organizations, dates and phone numbers in the language you ask for, and real operating systems for a sample machine.
 
 - **Person names** read like names people carry: Emma Clover, Jack Reeves, each with its English pronunciation. 9 languages.
 - **Nicknames** are handles for a game or a website: MistyOwl, CraneVoyage, RustyBoot. Built from everyday words across twenty-nine themes, and never from person names.
@@ -22,6 +22,7 @@ Every option and every example, with **Python** picked in the sidebar. This READ
 - **Organizations** are companies, schools, offices and associations that do not exist, from `rand_organization`: (주)새솔테크, Westbrook High School, Stadtwerke Bergtal.
 - **Dates** are drawn evenly from a range and written out in UTC by a format of your own, from `rand_date`, or one part at a time.
 - **Phone numbers** are written the way their country writes them, from `rand_phone`, in nine countries. They open on blocks the country really gives out, so one can by chance be real: sample data, never a number to call.
+- **System values** describe a sample machine with real products: an operating system from `rand_os`, written the way its release is known, `Windows 11 Pro 23H2 (Build 22631)`.
 - **Decorators** attach something to a string you already have: `rand_suffix`, `rand_prefix` and `rand_modifier`.
 - Every argument is keyword-only and optional, so `rand_name()` on its own works.
 - **Pure Python, no dependencies.** It imports nothing outside the standard library, and ships a `py.typed` marker so mypy and Pyright read the annotations.
@@ -374,6 +375,41 @@ rand_phone(country="JP", output="detail")
 
 `country` is an ISO 3166-1 alpha-2 code, read regardless of case. `include_country_code` drops the trunk prefix the country dials at home, and `separator` replaces the country's own punctuation: `""` writes the digits alone, which with the country code is E.164. `fictional` keeps to the numbers a country sets aside for films and books, which nobody is given: `555-0100` to `555-0199` in the United States and the drama numbers in Germany; the other seven countries reserve none and return nothing.
 
+## System
+
+Values that describe a sample machine. They are real products rather than invented ones, written by the names they were released under, so none of them takes a `language`.
+
+### Operating systems
+
+Windows, macOS, Ubuntu, Debian and Fedora on the desktop, Android, iOS and iPadOS on mobile, every release from the first to the ones out by October 2026, written the way each release is known.
+
+```python
+from randino import rand_os
+
+rand_os(count=3)  # ['Windows 10', 'macOS Sonoma 14', 'Android 9 Pie']
+rand_os(platform="mobile")  # ['iOS 17']
+rand_os(include_build=True, include_edition=True)  # ['Windows 11 Pro 23H2 (Build 22631)']
+rand_os(platform="desktop", max_year=2010)  # ['Mac OS X Snow Leopard 10.6']
+
+rand_os(include_build=True, output="detail")
+# [OsDetail(os='Android 14 (API 34)', name='Android', version='14', build='(API 34)',
+#           edition=None, platform='mobile', year=2023)]
+```
+
+| Argument          | Type                   | Default   |
+| ----------------- | ---------------------- | --------- |
+| `platform`        | `SystemPlatformOption` | `"all"`   |
+| `min_year`        | `int \| None`          | `None`    |
+| `max_year`        | `int \| None`          | `None`    |
+| `include_version` | `bool`                 | `True`    |
+| `include_build`   | `bool`                 | `False`   |
+| `include_edition` | `bool`                 | `False`   |
+| `count`           | `int`                  | `1`       |
+| `unique`          | `bool`                 | `False`   |
+| `output`          | `"value" \| "detail"`  | `"value"` |
+
+A draw picks the line first — Windows is about two desktops in three, Android about three phones in five — and a release inside it second. `min_year` and `max_year` read the year a release came out, or with `include_build` the year of the build written, and a range nothing came out in returns nothing.
+
 ## Decorators
 
 `rand_suffix`, `rand_prefix` and `rand_modifier` attach something to a string you already have, rather than generating one. They take anything, not just this library's output, which is why none of them is an argument on a generator. Each of them also works with no value at all, handing back the thing it would have attached.
@@ -435,7 +471,7 @@ nickname_length_range("ko")  # (1, 13)
 sentence_length_range("ko")  # (5, 43)
 ```
 
-`NAME_LANGUAGES`, `WORD_LANGUAGES`, `WORD_THEMES`, `LOCATION_LANGUAGES`, `LOCATION_LEVELS`, `AGE_GROUPS`, `ORGANIZATION_TYPES`, `ORGANIZATION_INDUSTRIES`, `DATE_UNITS`, `PHONE_COUNTRIES` and `PHONE_TYPES` list what the generators accept; `RAND_COUNT_MAX`, `RAND_LENGTH_MIN` / `MAX`, `RAND_LOCATION_LENGTH_MAX`, `RAND_AGE_MAX`, `RAND_ORGANIZATION_LENGTH_MAX`, `AFFIX_LENGTH_DEFAULT` / `MAX`, `AFFIX_SEPARATOR_DEFAULT` and `AFFIX_CHARSET` are the bounds and defaults every argument is clamped to.
+`NAME_LANGUAGES`, `WORD_LANGUAGES`, `WORD_THEMES`, `LOCATION_LANGUAGES`, `LOCATION_LEVELS`, `AGE_GROUPS`, `ORGANIZATION_TYPES`, `ORGANIZATION_INDUSTRIES`, `DATE_UNITS`, `PHONE_COUNTRIES`, `PHONE_TYPES` and `SYSTEM_PLATFORMS` list what the generators accept; `RAND_COUNT_MAX`, `RAND_LENGTH_MIN` / `MAX`, `RAND_LOCATION_LENGTH_MAX`, `RAND_AGE_MAX`, `RAND_ORGANIZATION_LENGTH_MAX`, `AFFIX_LENGTH_DEFAULT` / `MAX`, `AFFIX_SEPARATOR_DEFAULT` and `AFFIX_CHARSET` are the bounds and defaults every argument is clamped to.
 
 ## Differences from the npm package
 

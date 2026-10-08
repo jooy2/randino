@@ -47,7 +47,7 @@ always reported as the other package's.
 The word datasets, the sentence datasets, the name datasets, the surname
 romanization map, the age groups with their bands and the curve ages are drawn
 along, the date units with the default range and the default format, the phone plans with
-the templates each country writes a number in, the gender labels and how often each gender comes up, the organization
+the templates each country writes a number in, the operating system catalog with the weight of each line, the gender labels and how often each gender comes up, the organization
 datasets with the odds each kind and shape is drawn by, and the bounds every generator shares (`constants` and `decorate/data`).
 That is everything written once per package as data.
 
