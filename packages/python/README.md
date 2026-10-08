@@ -10,7 +10,7 @@ Every option and every example, with **Python** picked in the sidebar. This READ
 
 ---
 
-**randino** generates random person names, nicknames, words, sentences, real locations, ages, genders and organizations in the language you ask for.
+**randino** generates random person names, nicknames, words, sentences, real locations, ages, genders, organizations and dates in the language you ask for.
 
 - **Person names** read like names people carry: Emma Clover, Jack Reeves, each with its English pronunciation. 9 languages.
 - **Nicknames** are handles for a game or a website: MistyOwl, CraneVoyage, RustyBoot. Built from everyday words across twenty-nine themes, and never from person names.
@@ -20,6 +20,7 @@ Every option and every example, with **Python** picked in the sidebar. This READ
 - **Ages** are whole numbers drawn along a curve shaped like a population, from `rand_age`, so a sample of people is mostly adults.
 - **Genders** are the labels a form in the language writes, from `rand_gender`: 여성, Female, Weiblich. An unstated gender and a third gender are there when you ask for them.
 - **Organizations** are companies, schools, offices and associations that do not exist, from `rand_organization`: (주)새솔테크, Westbrook High School, Stadtwerke Bergtal.
+- **Dates** are drawn evenly from a range and written out in UTC by a format of your own, from `rand_date`, or one part at a time.
 - **Decorators** attach something to a string you already have: `rand_suffix`, `rand_prefix` and `rand_modifier`.
 - Every argument is keyword-only and optional, so `rand_name()` on its own works.
 - **Pure Python, no dependencies.** It imports nothing outside the standard library, and ships a `py.typed` marker so mypy and Pyright read the annotations.
@@ -311,6 +312,35 @@ rand_organization(language="ko", type="company", output="detail")
 
 `type` is `"company"`, `"nonprofit"`, `"school"`, `"government"` or `"public"`, or a sequence of them; left out, companies come up most often. `industry` is one of ten, written into a company's name as a word for its business, and naming one with `type` left out asks for companies. `realism="invented"` builds the stem from the language's own sounds, for a name nobody has.
 
+## Dates
+
+Dates drawn evenly from a range and written out in UTC. The range defaults to the years 1900 to 2099 and the format to ISO 8601. A string bound names a span, so `max_date="2024-12-31"` reaches the last millisecond of that day.
+
+```python
+from randino import rand_date
+
+rand_date()  # ['1987-06-21T08:14:51.302Z']
+rand_date(min_date="2024-01-01", max_date="2024-12-31", format="YYYY-MM-DD", count=3)
+# ['2024-07-09', '2024-02-27', '2024-11-30']
+rand_date(format="YYYY년 M월 D일 HH:mm")  # ['2031년 3월 4일 19:40']
+
+rand_date(unit="minute", count=5)  # [37, 4, 52, 19, 0]
+rand_date(output="detail")
+# [DateDetail(date='1987-06-21T08:14:51.302Z', timestamp=551261691302, year=1987,
+#             month=6, day=21, hour=8, minute=14, second=51, millisecond=302)]
+```
+
+| Argument                | Type                                | Default                      |
+| ----------------------- | ----------------------------------- | ---------------------------- |
+| `min_date` / `max_date` | `str \| datetime \| date \| None` | `None` — 1900 / 2099         |
+| `format`                | `str`                               | `"YYYY-MM-DDTHH:mm:ss.SSSZ"` |
+| `unit`                  | `DateUnit \| None`                  | `None`                       |
+| `count`                 | `int`                               | `1`                          |
+| `unique`                | `bool`                              | `False`                      |
+| `output`                | `"value" \| "detail"`               | `"value"`                    |
+
+`format` replaces `YYYY`, `YY`, `M`, `MM`, `D`, `DD`, `H`, `HH`, `h`, `hh`, `m`, `mm`, `s`, `ss`, `SSS`, `A` and `a`, and writes text inside `[` `]` as it is — the same tokens the npm package takes, rather than `strftime`'s. `unit` is `"year"`, `"month"`, `"day"`, `"hour"`, `"minute"`, `"second"` or `"millisecond"`, read off a date drawn from the range, and returns an `int` per date.
+
 ## Decorators
 
 `rand_suffix`, `rand_prefix` and `rand_modifier` attach something to a string you already have, rather than generating one. They take anything, not just this library's output, which is why none of them is an argument on a generator. Each of them also works with no value at all, handing back the thing it would have attached.
@@ -372,7 +402,7 @@ nickname_length_range("ko")  # (1, 13)
 sentence_length_range("ko")  # (5, 43)
 ```
 
-`NAME_LANGUAGES`, `WORD_LANGUAGES`, `WORD_THEMES`, `LOCATION_LANGUAGES`, `LOCATION_LEVELS`, `AGE_GROUPS`, `ORGANIZATION_TYPES` and `ORGANIZATION_INDUSTRIES` list what the generators accept; `RAND_COUNT_MAX`, `RAND_LENGTH_MIN` / `MAX`, `RAND_LOCATION_LENGTH_MAX`, `RAND_AGE_MAX`, `RAND_ORGANIZATION_LENGTH_MAX`, `AFFIX_LENGTH_DEFAULT` / `MAX`, `AFFIX_SEPARATOR_DEFAULT` and `AFFIX_CHARSET` are the bounds and defaults every argument is clamped to.
+`NAME_LANGUAGES`, `WORD_LANGUAGES`, `WORD_THEMES`, `LOCATION_LANGUAGES`, `LOCATION_LEVELS`, `AGE_GROUPS`, `ORGANIZATION_TYPES`, `ORGANIZATION_INDUSTRIES` and `DATE_UNITS` list what the generators accept; `RAND_COUNT_MAX`, `RAND_LENGTH_MIN` / `MAX`, `RAND_LOCATION_LENGTH_MAX`, `RAND_AGE_MAX`, `RAND_ORGANIZATION_LENGTH_MAX`, `AFFIX_LENGTH_DEFAULT` / `MAX`, `AFFIX_SEPARATOR_DEFAULT` and `AFFIX_CHARSET` are the bounds and defaults every argument is clamped to.
 
 ## Differences from the npm package
 

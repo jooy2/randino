@@ -10,7 +10,7 @@ Every option and every example, with **Dart** picked in the sidebar. This README
 
 ---
 
-**randino** generates random person names, nicknames, words, sentences, real locations, ages, genders and organizations in the language you ask for.
+**randino** generates random person names, nicknames, words, sentences, real locations, ages, genders, organizations and dates in the language you ask for.
 
 - **Person names** read like names people carry: Emma Clover, Jack Reeves, each with its English pronunciation. 9 languages.
 - **Nicknames** are handles for a game or a website: MistyOwl, CraneVoyage, RustyBoot. Built from everyday words across twenty-nine themes, and never from person names.
@@ -20,6 +20,7 @@ Every option and every example, with **Dart** picked in the sidebar. This README
 - **Ages** are whole numbers drawn along a curve shaped like a population, from `randAge`, so a sample of people is mostly adults.
 - **Genders** are the labels a form in the language writes, from `randGender`: 여성, Female, Weiblich. An unstated gender and a third gender are there when you ask for them.
 - **Organizations** are companies, schools, offices and associations that do not exist, from `randOrganization`: (주)새솔테크, Westbrook High School, Stadtwerke Bergtal.
+- **Dates** are drawn evenly from a range and written out in UTC by a format of your own, from `randDate`, or one part at a time from `randDateUnit`.
 - **Decorators** attach something to a string you already have: `randSuffix`, `randPrefix` and `randModifier`.
 - Every parameter is named and optional, and a **null enum means "every one of them"**, so `randName()` on its own works.
 - **Pure Dart, no dependencies.** It imports nothing but `dart:math`, so it runs on the VM, on the web and inside Flutter on every platform.
@@ -291,6 +292,34 @@ randOrganizationDetails(language: WordLanguage.ko, type: {OrganizationType.compa
 
 A null `type` draws a kind per result, companies most often. An `industry` is written into a company's name as a word for its business, and naming one with `type` left null asks for companies. `RandRealism.invented` builds the stem from the language's own sounds, for a name nobody has.
 
+## Dates
+
+Dates drawn evenly from a range and written out in UTC. The range defaults to the years 1900 to 2099 and the format to ISO 8601. A `DateTime` bound is the instant it holds, local or UTC.
+
+```dart
+randDate(); // [1987-06-21T08:14:51.302Z]
+randDate(
+  minDate: DateTime.utc(2024),
+  maxDate: DateTime.utc(2024, 12, 31, 23, 59, 59, 999),
+  format: 'YYYY-MM-DD',
+  count: 3,
+);
+// [2024-07-09, 2024-02-27, 2024-11-30]
+randDate(format: 'YYYY년 M월 D일 HH:mm'); // [2031년 3월 4일 19:40]
+
+randDateUnit(DateUnit.minute, count: 5); // [37, 4, 52, 19, 0]
+randDateDetails().first.year; // 1987
+```
+
+| Parameter             | Type        | Default                      |
+| --------------------- | ----------- | ---------------------------- |
+| `minDate` / `maxDate` | `DateTime?` | `null` — 1900 / 2099         |
+| `format`              | `String`    | `'YYYY-MM-DDTHH:mm:ss.SSSZ'` |
+| `count`               | `int`       | `1`                          |
+| `unique`              | `bool`      | `false`                      |
+
+`format` replaces `YYYY`, `YY`, `M`, `MM`, `D`, `DD`, `H`, `HH`, `h`, `hh`, `m`, `mm`, `s`, `ss`, `SSS`, `A` and `a`, and writes text inside `[` `]` as it is. `randDateUnit` takes a `DateUnit` in place of `format` and returns that part of each date as an `int`, read off a date drawn from the range, so a minute is `0` to `59` and a year keeps inside the range.
+
 ## Decorators
 
 `randSuffix`, `randPrefix` and `randModifier` attach something to a string you already have, rather than generating one. They take anything, not just this library's output, which is why none of them is a parameter on a generator. Each of them also works with no value at all, handing back the thing it would have attached.
@@ -346,7 +375,7 @@ nicknameLengthRange(language: WordLanguage.ko); // LengthRange(1, 13)
 sentenceLengthRange(WordLanguage.ko); // LengthRange(5, 43)
 ```
 
-`nameLanguages`, `wordLanguages`, `wordThemes`, `locationLanguages`, `locationLevels`, `ageGroups`, `organizationTypes` and `organizationIndustries` list what the generators accept; `randCountMax`, `randLengthMin` / `Max`, `randSentenceLengthMax`, `randLocationLengthMax`, `randAgeMax`, `randOrganizationLengthMax`, `affixLengthDefault` / `Max`, `affixSeparatorDefault` and `affixCharset` are the bounds and defaults every parameter is clamped to.
+`nameLanguages`, `wordLanguages`, `wordThemes`, `locationLanguages`, `locationLevels`, `ageGroups`, `organizationTypes`, `organizationIndustries` and `dateUnits` list what the generators accept; `randCountMax`, `randLengthMin` / `Max`, `randSentenceLengthMax`, `randLocationLengthMax`, `randAgeMax`, `randOrganizationLengthMax`, `affixLengthDefault` / `Max`, `affixSeparatorDefault` and `affixCharset` are the bounds and defaults every parameter is clamped to.
 
 ## Differences from the npm package
 
@@ -360,6 +389,7 @@ The two generate the same output from the same data, and only the surface is Dar
 | `[number, number]`                 | `LengthRange`, which compares by value         |
 | `NameDetail` / `NicknameDetail` interfaces | The same two names, as classes         |
 | `output: 'detail'`                 | `randNameDetails` / `randNicknameDetails` / `randWordDetails` / `randSentenceDetails` / `randLocationDetails` … |
+| `randDate({ unit: 'minute' })`     | `randDateUnit(DateUnit.minute)`                |
 | `randModifier('Owl')`             | `randModifier(value: 'Owl')` — every parameter is named |
 | `randSuffix(['a', 'b'])`           | `randSuffixAll(['a', 'b'])`                    |
 | `include: 'lion'` or `['lion']`    | `include: ['lion']` — a list either way        |

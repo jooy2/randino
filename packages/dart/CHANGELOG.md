@@ -2,6 +2,8 @@
 
 ## vNext (2026--)
 
+- **`randDate` generates dates**, with `randDateUnit` and `randDateDetails` beside it, drawn evenly from a range and written out in UTC. `minDate` and `maxDate` take a `DateTime`, which is the instant it holds. The range defaults to the years 1900 to 2099, a bound left out moves out of the way of the one that was written, and every range is held inside the years 1 to 9999. `format` writes the date with `YYYY`, `MM`, `DD`, `HH`, `mm`, `ss`, `SSS` and the rest of the tokens, ISO 8601 by default. `randDateUnit` returns one part of each date as an `int` instead: `randDateUnit(DateUnit.minute)` is `0` to `59`. `randDateDetails` reports the timestamp and every part, and `dateUnits` is exported beside them.
+
 ## 1.3.1 (2026-10-07)
 
 - The description pub.dev shows names every kind of value the package generates. It named only person names and nicknames, and its list of languages added up to ten where there are nine.

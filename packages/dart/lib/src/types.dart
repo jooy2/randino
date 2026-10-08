@@ -924,3 +924,88 @@ class OrganizationDetail {
       'OrganizationDetail($organization, $name, $legalForm, ${type.name}, '
       '${industry?.name}, ${language.name})';
 }
+
+/// One part of a date, largest first.
+///
+/// `randDateUnit` hands back the part it is given, as a number: `minute` is `0`
+/// to `59`, `month` is `1` to `12`.
+enum DateUnit {
+  /// `1` to `9999`, inside the range.
+  year,
+
+  /// `1` to `12`.
+  month,
+
+  /// `1` to `31`.
+  day,
+
+  /// `0` to `23`.
+  hour,
+
+  /// `0` to `59`.
+  minute,
+
+  /// `0` to `59`.
+  second,
+
+  /// `0` to `999`.
+  millisecond,
+}
+
+/// A generated date with every part it was built from. All of them are UTC.
+class DateDetail {
+  /// Creates a detail record. Returned by the generator; there is rarely a
+  /// reason to build one by hand outside a test.
+  const DateDetail({
+    required this.date,
+    required this.timestamp,
+    required this.year,
+    required this.month,
+    required this.day,
+    required this.hour,
+    required this.minute,
+    required this.second,
+    required this.millisecond,
+  });
+
+  /// The date as `format` writes it — what `randDate` returns.
+  final String date;
+
+  /// Milliseconds since `1970-01-01T00:00:00.000Z`, negative before it.
+  final int timestamp;
+
+  /// The year.
+  final int year;
+
+  /// `1` to `12`.
+  final int month;
+
+  /// `1` to `31`.
+  final int day;
+
+  /// `0` to `23`.
+  final int hour;
+
+  /// `0` to `59`.
+  final int minute;
+
+  /// `0` to `59`.
+  final int second;
+
+  /// `0` to `999`.
+  final int millisecond;
+
+  /// The part [unit] names.
+  int operator [](DateUnit unit) => switch (unit) {
+    DateUnit.year => year,
+    DateUnit.month => month,
+    DateUnit.day => day,
+    DateUnit.hour => hour,
+    DateUnit.minute => minute,
+    DateUnit.second => second,
+    DateUnit.millisecond => millisecond,
+  };
+
+  @override
+  String toString() => 'DateDetail($date, $timestamp)';
+}

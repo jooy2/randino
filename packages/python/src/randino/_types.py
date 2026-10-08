@@ -4,6 +4,7 @@ The options themselves are keyword arguments rather than a type: `randName({ …
 in the npm package is `rand_name(…)` here.
 """
 
+import datetime as dt
 from collections.abc import Sequence
 from dataclasses import dataclass
 from typing import Literal
@@ -614,3 +615,55 @@ class OrganizationDetail:
 
     language: WordLanguage
     """The language the organization is written in."""
+
+
+DateUnit = Literal["year", "month", "day", "hour", "minute", "second", "millisecond"]
+"""One part of a date, largest first.
+
+Named as `unit`, it is the one part `rand_date` hands back, as a number: `minute` is `0`
+to `59`, `month` is `1` to `12`.
+"""
+
+DateInput = str | dt.datetime | dt.date
+"""One end of the range a date is drawn from.
+
+- A string in ISO 8601 form, from `"2024"` down to `"2024-03-15T14:07:32.481+09:00"`. It
+  is UTC unless it carries an offset, and it names a span rather than an instant:
+  `"2024-03"` is all of March, so as `max_date` it reaches the last millisecond of the
+  month.
+- A `datetime`, which is the instant it holds. An aware one is read in its own zone, and
+  a naive one in the machine's, the way `datetime.timestamp` reads it.
+- A `date`, which is the whole of that day in UTC, the way `"2024-03-15"` is.
+"""
+
+
+@dataclass(frozen=True, slots=True)
+class DateDetail:
+    """A generated date with every part it was built from. All of them are UTC."""
+
+    date: str
+    """The date as `format` writes it — what the value form returns when no `unit` is named."""
+
+    timestamp: int
+    """Milliseconds since `1970-01-01T00:00:00.000Z`, negative before it."""
+
+    year: int
+    """The year."""
+
+    month: int
+    """`1` to `12`."""
+
+    day: int
+    """`1` to `31`."""
+
+    hour: int
+    """`0` to `23`."""
+
+    minute: int
+    """`0` to `59`."""
+
+    second: int
+    """`0` to `59`."""
+
+    millisecond: int
+    """`0` to `999`."""

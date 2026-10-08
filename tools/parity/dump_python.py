@@ -20,6 +20,14 @@ from randino.constants import (
     RAND_ORGANIZATION_LENGTH_MAX,
     RAND_SENTENCE_LENGTH_MAX,
 )
+from randino.date.data import (
+    DATE_CEILING,
+    DATE_FLOOR,
+    DATE_FORMAT_DEFAULT,
+    DATE_MAX_DEFAULT,
+    DATE_MIN_DEFAULT,
+    DATE_UNITS,
+)
 from randino.decorate.data import (
     AFFIX_CHARSET,
     AFFIX_LENGTH_DEFAULT,
@@ -459,6 +467,14 @@ print(
                 "bands": {group: list(AGE_BANDS[group]) for group in AGE_GROUPS},
                 "curve": [[age, weight] for age, weight in AGE_CURVE],
                 "maxDefault": AGE_MAX_DEFAULT,
+            },
+            "date": {
+                "units": list(DATE_UNITS),
+                "floor": DATE_FLOOR,
+                "ceiling": DATE_CEILING,
+                "minDefault": DATE_MIN_DEFAULT,
+                "maxDefault": DATE_MAX_DEFAULT,
+                "formatDefault": DATE_FORMAT_DEFAULT,
             },
             "organization": {
                 "types": list(ORGANIZATION_TYPES),

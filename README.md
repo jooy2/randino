@@ -10,7 +10,7 @@ Every option, every language and every example, with **JavaScript**, **Dart** or
 
 ---
 
-**randino** generates random text in the language you ask for: person names, nicknames, everyday words, whole sentences and real locations, the ages and genders to go with them, and organizations that do not exist. One function per kind of value, one set of options, and a dataset per language.
+**randino** generates random text in the language you ask for: person names, nicknames, everyday words, whole sentences and real locations, the ages, genders and dates to go with them, and organizations that do not exist. One function per kind of value, one set of options, and a dataset per language.
 
 - **Person names** read like names people carry: Emma Clover, Jack Reeves, each with its English pronunciation. 9 languages.
 - **Nicknames** are handles for a game or a website: MistyOwl, CraneVoyage, RustyBoot. Built from everyday words across twenty-nine themes and never from person names, they run to over forty million combinations in Korean and in English before a random suffix is added.
@@ -20,6 +20,7 @@ Every option, every language and every example, with **JavaScript**, **Dart** or
 - **Ages** are whole numbers from `randAge`, drawn along a curve shaped like a population rather than evenly, so a sample of people is mostly adults and thins out past seventy.
 - **Genders** are the labels a form in the language writes, from `randGender`: 여성, Female, Weiblich. Male and female split evenly, and an unstated gender and a third gender are there when you ask for them.
 - **Organizations** are companies, schools, offices and associations that do not exist, from `randOrganization`: (주)새솔테크, Westbrook High School, Stadtwerke Bergtal. A company may carry its legal form, and the stems are chosen to be nobody's brand.
+- **Dates** are drawn evenly from a range and written out in UTC by a format of your own, from `randDate`: 2024-03-15T14:07:32.481Z, 2024년 3월 15일. `unit` hands back one part on its own, from the year down to the millisecond.
 - **Decorators** attach something to a string you already have rather than generating one: a random token with `randSuffix` and `randPrefix`, a word with `randModifier`.
 - One options set per generator: language, length, count, a `realism` setting that goes from real words to fully invented ones, and a `vocabulary` setting that keeps to the everyday words.
 - **Every generator and decorator takes a `random`** — where the draws come from. A secure source for a value nobody may predict, a seeded one for a fixture that has to come out the same every run.
@@ -111,7 +112,7 @@ Pure Python. It imports nothing outside the standard library and ships a `py.typ
 
 ## Supported languages
 
-Every generator but `randAge` takes a language, or mixes every language it supports when you leave it out; an age has none. All nine are covered by every generator but one, including the word pools: where a modifier goes and how it agrees with its noun are part of each language's own data.
+Every generator but `randAge` and `randDate` takes a language, or mixes every language it supports when you leave it out; an age has none, and a date is written by a format. All nine are covered by every generator but one, including the word pools: where a modifier goes and how it agrees with its noun are part of each language's own data.
 
 | Code | Language   | Native     | Person names | Words and nicknames | Sentences | Organizations | Locations |
 | ---- | ---------- | ---------- | :----------: | :-----------------: | :-------: | :-----------: | :-------: |
@@ -141,6 +142,7 @@ Locations are the generator that is not in all nine. A language has them only wh
 | Ages           | `randAge`                    | `rand_age`                   | 34, 8, 71 |
 | Genders        | `randGender`                 | `rand_gender`                | 여성, Female, Weiblich |
 | Organizations  | `randOrganization`           | `rand_organization`          | (주)새솔테크, Westbrook High School |
+| Dates          | `randDate`                   | `rand_date`                  | 2024-03-15T14:07:32.481Z, 37 |
 | Decorators     | `randSuffix`, `randPrefix`, `randModifier` | `rand_suffix`, `rand_prefix`, `rand_modifier` | MistyOwl_nVtRC, MistyOwl |
 
 Each generator returns strings by default, or one detail object per result with <code>output: 'detail'</code>: both scripts of a name, or the words a nickname was built from. The Dart package spells that as a second function (`randNameDetails`), because Dart has no way to make one function's return type depend on an argument.

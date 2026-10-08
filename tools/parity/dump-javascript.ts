@@ -16,6 +16,14 @@ import {
 	RAND_ORGANIZATION_LENGTH_MAX,
 	RAND_SENTENCE_LENGTH_MAX
 } from '../../packages/javascript/lib/constants.js';
+import {
+	DATE_CEILING,
+	DATE_FLOOR,
+	DATE_FORMAT_DEFAULT,
+	DATE_MAX_DEFAULT,
+	DATE_MIN_DEFAULT,
+	DATE_UNITS
+} from '../../packages/javascript/lib/date/data/index.js';
 import { outline } from '../../packages/javascript/lib/_internal/parse.js';
 import {
 	AFFIX_CHARSET,
@@ -164,6 +172,14 @@ console.log(
 			bands: Object.fromEntries(AGE_GROUPS.map((group) => [group, [...AGE_BANDS[group]]])),
 			curve: AGE_CURVE.map(([age, weight]) => [age, weight]),
 			maxDefault: AGE_MAX_DEFAULT
+		},
+		date: {
+			units: [...DATE_UNITS],
+			floor: DATE_FLOOR,
+			ceiling: DATE_CEILING,
+			minDefault: DATE_MIN_DEFAULT,
+			maxDefault: DATE_MAX_DEFAULT,
+			formatDefault: DATE_FORMAT_DEFAULT
 		},
 		// A synthesis carries its `kind` tag, and a language without places or numbers
 		// writes them as null, the way every other optional field is written.

@@ -42,6 +42,8 @@ void main() {
           'AgeDistribution',
           'AgeGroup',
           'CountryDetail',
+          'DateDetail',
+          'DateUnit',
           'GenderCode',
           'GenderDetail',
           'LengthRange',
@@ -76,6 +78,7 @@ void main() {
           'affixLengthMax',
           'affixSeparatorDefault',
           'ageGroups',
+          'dateUnits',
           'locationLanguages',
           'locationLevels',
           'nameLanguages',
@@ -101,6 +104,9 @@ void main() {
           'randCountMax',
           'randCountry',
           'randCountryDetails',
+          'randDate',
+          'randDateDetails',
+          'randDateUnit',
           'randDistrict',
           'randDistrictDetails',
           'randDrink',
@@ -223,6 +229,13 @@ void main() {
       expect(randAgeMax, 120);
       expect(ageGroups, <AgeGroup>[AgeGroup.child, AgeGroup.teen, AgeGroup.adult, AgeGroup.senior]);
 
+      // A date is a string written by `format`, and one part of it is a number,
+      // which in Dart is a function of its own.
+      expect(randDate(), hasLength(1));
+      expect(randDateUnit(DateUnit.minute).single, isA<int>());
+      expect(randDateDetails()[0], isA<DateDetail>());
+      expect(dateUnits, DateUnit.values);
+
       expect(randGender(), hasLength(1));
       expect(randGenderDetails(language: WordLanguage.en)[0].language, WordLanguage.en);
 
@@ -322,6 +335,8 @@ void main() {
             ).join(),
       );
       twice(() => randAge(count: 5, random: Random(42)).join(','));
+      twice(() => randDate(count: 5, random: Random(42)).join());
+      twice(() => randDateUnit(DateUnit.minute, count: 5, random: Random(42)).join(','));
       twice(() => randGender(count: 5, includeUnknown: true, random: Random(42)).join());
       twice(() => randOrganization(count: 5, random: Random(42)).join('|'));
       twice(() => randOrganization(count: 5, maxLength: 20, random: Random(42)).join('|'));

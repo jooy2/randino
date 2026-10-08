@@ -14,6 +14,7 @@ void main() {
   _locations();
   _people();
   _organizations();
+  _dates();
   _decorators();
   _questionsAboutALanguage();
 }
@@ -148,6 +149,15 @@ void _organizations() {
     ),
   );
   // [Greenbriar Logistics Corp.]
+}
+
+/// Dates drawn evenly from a range, written out in UTC or one part at a time.
+void _dates() {
+  print('-- dates ------------------------------------------------------');
+
+  print(randDate()); // [1987-06-21T08:14:51.302Z]
+  print(randDate(minDate: DateTime.utc(2024), format: 'YYYY년 M월 D일')); // [2031년 3월 4일]
+  print(randDateUnit(DateUnit.minute, count: 5)); // [37, 4, 52, 19, 0]
 }
 
 void _decorators() {

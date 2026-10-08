@@ -1,4 +1,4 @@
-"""randino — names, nicknames, words, sentences, locations, ages and genders, no dependencies.
+"""randino — names, nicknames, words, sentences, locations, ages, genders and dates.
 
 Separate concerns, deliberately. `rand_name` produces names a person could actually
 carry (`김민준`, `Emma Clover`); `rand_nickname` produces the handle someone would pick
@@ -7,8 +7,9 @@ from person names; `rand_word` hands those words over on their own; `rand_senten
 writes a whole statement in the language's own grammar; `rand_location` writes a real
 place, from the country down to a Korean 읍·면·동 or a US city; `rand_age` draws an age
 along a curve shaped like a population; `rand_gender` writes the label a form in the
-language uses for a gender; and `rand_organization` names a company, a school or an office
-that does not exist.
+language uses for a gender; `rand_organization` names a company, a school or an office
+that does not exist; and `rand_date` draws a date from a range and writes it out by a
+format, or hands back one part of it.
 
 Example:
     >>> from randino import rand_name, rand_nickname, rand_sentence
@@ -26,6 +27,9 @@ from randino._types import (
     AgeGroup,
     AgeGroupOption,
     CountryDetail,
+    DateDetail,
+    DateInput,
+    DateUnit,
     GenderCode,
     GenderDetail,
     LocationDetail,
@@ -77,6 +81,7 @@ from randino.constants import (
     RAND_SENTENCE_COUNT_MAX,
     RAND_SENTENCE_LENGTH_MAX,
 )
+from randino.date import DATE_UNITS, rand_date
 from randino.decorate import (
     AFFIX_CHARSET,
     AFFIX_LENGTH_DEFAULT,
@@ -148,6 +153,7 @@ __all__ = [
     "AFFIX_LENGTH_MAX",
     "AFFIX_SEPARATOR_DEFAULT",
     "AGE_GROUPS",
+    "DATE_UNITS",
     "LOCATION_LANGUAGES",
     "LOCATION_LEVELS",
     "NAME_LANGUAGES",
@@ -168,6 +174,9 @@ __all__ = [
     "AgeGroup",
     "AgeGroupOption",
     "CountryDetail",
+    "DateDetail",
+    "DateInput",
+    "DateUnit",
     "GenderCode",
     "GenderDetail",
     "LocationDetail",
@@ -219,6 +228,7 @@ __all__ = [
     "rand_color",
     "rand_concept",
     "rand_country",
+    "rand_date",
     "rand_district",
     "rand_drink",
     "rand_emotion",

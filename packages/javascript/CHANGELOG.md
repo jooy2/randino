@@ -2,6 +2,8 @@
 
 ## vNext (2026--)
 
+- **`randDate` generates dates**, drawn evenly from a range and written out in UTC. `minDate` and `maxDate` take an ISO 8601 string, a `Date` or a timestamp in milliseconds. A string names a span, so `maxDate: '2024-12-31'` reaches the last millisecond of that day, and one that carries an offset is read in it. The range defaults to the years 1900 to 2099, a bound left out moves out of the way of the one that was written, and every range is held inside the years 1 to 9999. `format` writes the date with `YYYY`, `MM`, `DD`, `HH`, `mm`, `ss`, `SSS` and the rest of the tokens, ISO 8601 by default, and `unit` returns one part of each date as a number instead: `unit: 'minute'` is `0` to `59`. `output: 'detail'` reports the timestamp and every part. `DATE_UNITS` is exported beside it.
+
 ## 1.3.1 (2026-10-07)
 
 - The description npm shows names every kind of value the package generates. It stopped at sentences, and left out locations, ages, genders and organizations; the keywords now name those four as well.

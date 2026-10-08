@@ -14,6 +14,7 @@ describe('base test', () => {
 			'AFFIX_LENGTH_MAX',
 			'AFFIX_SEPARATOR_DEFAULT',
 			'AGE_GROUPS',
+			'DATE_UNITS',
 			'LOCATION_LANGUAGES',
 			'LOCATION_LEVELS',
 			'NAME_LANGUAGES',
@@ -41,6 +42,7 @@ describe('base test', () => {
 			'randColor',
 			'randConcept',
 			'randCountry',
+			'randDate',
 			'randDistrict',
 			'randDrink',
 			'randEmotion',
@@ -143,6 +145,20 @@ describe('base test', () => {
 		assert.strictEqual(randino.RAND_AGE_MAX, 120);
 		assert.deepStrictEqual(randino.AGE_GROUPS, ['child', 'teen', 'adult', 'senior']);
 
+		// A date is a string written by `format`, and one part of it is a number.
+		assert.strictEqual(typeof randino.randDate()[0], 'string');
+		assert.strictEqual(typeof randino.randDate({ unit: 'minute' })[0], 'number');
+		assert.strictEqual(typeof randino.randDate({ output: 'detail' })[0].timestamp, 'number');
+		assert.deepStrictEqual(randino.DATE_UNITS, [
+			'year',
+			'month',
+			'day',
+			'hour',
+			'minute',
+			'second',
+			'millisecond'
+		]);
+
 		assert.strictEqual(typeof randino.randGender()[0], 'string');
 		assert.strictEqual(randino.randGender({ language: 'en', output: 'detail' })[0].language, 'en');
 
@@ -198,6 +214,8 @@ describe('base test', () => {
 			() => randino.randAge({ group: [null] as never }),
 			() => randino.randAge({ distribution: 'normal' as never }),
 			() => randino.randAge({ minAge: NaN, maxAge: 'x' as never }),
+			() => randino.randDate({ unit: 'week' as never, format: 123 as never }),
+			() => randino.randDate({ minDate: {} as never, maxDate: [] as never, count: NaN }),
 			() => randino.randGender({ language: 'xx' as never, count: NaN }),
 			() => randino.randGender({ includeUnknown: 'yes' as never }),
 			() => randino.randOrganization({ language: 'xx' as never, type: 'shop' as never }),
@@ -215,6 +233,8 @@ describe('base test', () => {
 		assert.strictEqual(randino.randSentence({ sentences: NaN })[0].split('. ').length, 1);
 		// An age range that is not a number is the default range, not an empty one.
 		assert.ok(randino.randAge({ minAge: NaN, maxAge: NaN })[0] <= 100);
+		// A unit that is not one is the whole date, written the default way.
+		assert.match(randino.randDate({ unit: 'week' as never })[0] as never, /^\d{4}-/);
 		// A token of no length is not a token. `NaN` clamped to `NaN`, and a loop
 		// that runs `NaN` times wrote nothing at all.
 		assert.strictEqual(randino.randSuffix('x', { length: NaN }).length, 'x_'.length + 5);
@@ -277,6 +297,8 @@ describe('base test', () => {
 		agrees(() => randino.randLocation({ count: 5, random: seeded(42) }));
 		agrees(() => randino.randCity({ language: 'en', maxLength: 8, count: 5, random: seeded(42) }));
 		agrees(() => randino.randAge({ count: 5, random: seeded(42) }));
+		agrees(() => randino.randDate({ count: 5, random: seeded(42) }));
+		agrees(() => randino.randDate({ unit: 'minute', count: 5, random: seeded(42) }));
 		agrees(() => randino.randGender({ count: 5, includeUnknown: true, random: seeded(42) }));
 		agrees(() => randino.randOrganization({ count: 5, random: seeded(42) }));
 		agrees(() => randino.randOrganization({ count: 5, maxLength: 20, random: seeded(42) }));

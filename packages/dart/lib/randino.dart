@@ -38,6 +38,10 @@ export 'src/constants.dart'
         randOrganizationLengthMax,
         randSentenceCountMax,
         randSentenceLengthMax;
+export 'src/date/data/index.dart' show dateUnits;
+export 'src/date/rand_date.dart' show randDate;
+export 'src/date/rand_date_details.dart' show randDateDetails;
+export 'src/date/rand_date_unit.dart' show randDateUnit;
 export 'src/decorate/data/index.dart'
     show affixCharset, affixLengthDefault, affixLengthMax, affixSeparatorDefault;
 export 'src/decorate/rand_modifier.dart' show randModifier;
@@ -80,6 +84,8 @@ export 'src/types.dart'
         AgeDistribution,
         AgeGroup,
         CountryDetail,
+        DateDetail,
+        DateUnit,
         GenderCode,
         GenderDetail,
         LengthRange,

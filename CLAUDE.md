@@ -4,7 +4,7 @@ Guidance for AI agents (and humans) working in this repository. Written in Engli
 
 ## What randino is
 
-**randino** is a zero-dependency library that generates random **person names**, **nicknames**, **everyday words**, **sentences**, **locations**, **ages**, **genders** and **organizations**, per language. It ships for more than one programming language — TypeScript, Dart and Python — and every one of them generates from the same datasets under the same rules. Separate concerns, deliberately:
+**randino** is a zero-dependency library that generates random **person names**, **nicknames**, **everyday words**, **sentences**, **locations**, **ages**, **genders**, **organizations** and **dates**, per language. It ships for more than one programming language — TypeScript, Dart and Python — and every one of them generates from the same datasets under the same rules. Separate concerns, deliberately:
 
 - **Names** should read like names a person actually carries (`김민준`, `Emma Clover`). Sample data for forms, seeds, mockups.
 - **Nicknames** are the handles someone would pick for a game or a website (`멋진사자`, `MistyOwl`). They are built from everyday words and **never from person names** — that rule is the whole point of keeping the two apart.
@@ -13,6 +13,7 @@ Guidance for AI agents (and humans) working in this repository. Written in Engli
 - **Locations** are real places, written out from the country down (`대한민국 경기도 수원시 장안구 파장동`, `Pasadena, California, United States`). Nothing about them is invented: every division is one the country publishes, inside the one written beside it, and nothing goes below a Korean 읍·면·동 or a US city — no street, no building, no number. `randLocation` takes the level as an option, and `randCountry` / `randRegion` / `randCity` / `randDistrict` hand back one level's name alone. **Two languages, not nine**, and on purpose — see the location bullets below. `randCountry` is the exception: it names every ISO 3166-1 country in all nine.
 - **Ages** are whole numbers of years for a sample person (`34`), drawn along a curve shaped like a population rather than evenly, so a sample is mostly adults. An age has no language, so `randAge` is the one generator that takes none, and `minAge` / `maxAge` and `group` are its own options in place of the length ones.
 - **Genders** are the label a form in the language writes for one (`여성`, `Female`, `Divers`). Male and female split evenly, and the two others — `unknown` and `nonbinary` — come up only when the caller switches them on, and rarely when they do.
+- **Dates** are instants drawn evenly from a range and written out in UTC (`2024-03-15T14:07:32.481Z`, `2024년 3월 15일`), by a format of the caller's own. `unit` hands back one part of a date as a number instead — `minute` is `0` to `59` — read off a drawn date so it keeps to the range. A date is written by a format rather than in a language, so `randDate` takes no `language`, and `minDate` / `maxDate`, `format` and `unit` are its own options.
 - **Organizations** are companies, schools, offices and associations that do not exist (`(주)새솔테크`, `Westbrook High School`, `Гимназия № 135`), each written the way its language writes that kind. Nothing about them is real, and that is the requirement rather than a limitation: the stems are chosen to be nobody's brand, and **no organization is ever built from a person name** — a surname with a legal form behind it is exactly how famous companies are named.
 
 All of them are implemented. Keep the generators apart — a shared "generator" abstraction is not wanted — but the options they all take, and the loop that draws until it has `count` results, live in `_internal/generate` and are shared. So are the word pools: `word/data` is the one dataset, and `nickname` consumes it.
@@ -65,6 +66,11 @@ lib/
       index.ts              # ORGANIZATION_DATA, the kinds, the industries, the odds
       types.ts              # internal dataset types (templates, synthesis)
       en.ts ko.ts ja.ts …   # one file per language, nine of them
+  date/
+    index.ts
+    randDate.ts             # public: string[], number[] on `unit`, or DateDetail[] on `output: 'detail'`
+    dateGenerator.ts        # internal: the range, the ISO 8601 reader, the format writer
+    data/index.ts           # DATE_UNITS, the default range, the floor and ceiling, the default format
   gender/
     index.ts
     randGender.ts           # public: string[], or GenderDetail[] on `output: 'detail'`
@@ -129,6 +135,7 @@ lib/
 test/
   base.test.ts              # the package's export surface
   age.test.ts               # one *.test.ts per category
+  date.test.ts
   decorate.test.ts
   gender.test.ts
   organization.test.ts
@@ -195,6 +202,7 @@ lib/
       utils.dart            # pick / randInt / chance / clamp, never exported
       parse.dart            # words() / pairs() / weightMap() / romanMap()
     age/                    # mirrors lib/age, plus `randAgeDetails`
+    date/                   # mirrors lib/date, plus `randDateUnit` and `randDateDetails`
     decorate/               # mirrors lib/decorate, plus the `…All` list forms
     gender/                 # mirrors lib/gender, plus `randGenderDetails`
     organization/           # mirrors lib/organization, plus `randOrganizationDetails`
@@ -216,6 +224,7 @@ lib/
 test/
   base_test.dart            # the barrel's export surface, read out of the source
   age_test.dart
+  date_test.dart
   decorate_test.dart
   gender_test.dart
   organization_test.dart
@@ -256,6 +265,7 @@ Dart has neither overloads nor union types, so a function cannot hand back one t
 - `randSuffix` takes a `String` and `randSuffixAll` takes a `List<String>`, where npm and PyPI have one function taking either. The same goes for `randModifier` / `randModifierAll`. And because Dart cannot make a positional parameter optional alongside named ones, the decorators' `value` is **named**: `randSuffix(value: 'a')`, so that `randSuffix()` can mean the bare token.
 - `randNameDetails`, `randNicknameDetails`, `randWordDetails`, `randSentenceDetails` and the five location `…Details` functions still exist here. In the other two packages they are `output: 'detail'` on the generator itself; in Dart, `randName` returns `List<String>` and that is the end of it.
 - `randSentence`'s `include` is a `List<String>` where the other two take a string or a list, for the same reason.
+- `randDate`'s `unit` is `randDateUnit`, because it turns the strings into numbers. It takes the unit positionally — `randDateUnit(DateUnit.minute)` — the way `randModifierAll` takes its list, and every other parameter is named. `minDate` / `maxDate` are `DateTime?` alone, where the other two also take an ISO 8601 string: a `String` beside a `DateTime` is the `Object` parameter this section rules out.
 - The **twenty-nine themed word functions have no detail form.** Thirty-two functions for one option would be the wrong trade, so `randAnimal` returns `List<String>` and a caller who wants the detail passes `WordTheme.animal` to `randWordDetails`. That asymmetry is documented on every one of them.
 
 Do not try to fake either with `Object` or a generic: `T extends Object` would type-check `randSuffix(3)` and fail at run time, which is worse than a second name. **A new option that changes a return type lands as a second Dart function**, and the `::: lang` blocks on the docs page are where the two shapes are shown side by side.
@@ -278,6 +288,7 @@ src/randino/
     utils.py                # pick / rand_int / chance / clamp, never exported
     parse.py                # words() / tokens() / weights() / roman_map()
   age/                      # mirrors lib/age
+  date/                     # mirrors lib/date
   decorate/                 # mirrors lib/decorate; `@overload` carries the shape
   gender/                   # mirrors lib/gender
   organization/             # mirrors lib/organization
@@ -300,6 +311,7 @@ src/randino/
 tests/
   test_base.py              # the barrel's export surface, and the no-dependency rule
   test_age.py
+  test_date.py
   test_decorate.py
   test_gender.py
   test_organization.py
@@ -486,7 +498,7 @@ The run stops rather than writes when a file changes shape — new columns, an u
 
 **The dumps normalize what only differs because the languages differ, and nothing else.** A pool entry is `{ n, r }` everywhere; field names are the JavaScript ones; an optional field is present and null rather than absent; `syn` carries its `kind` tag even in the two packages that tell the shapes apart by type. That normalization lives in the three dumps — one per package, each responsible for its own language's spelling — so the comparison itself has nothing to know about any of them. Adding a field to a dataset means adding it to all three dumps, and the check reports a field only one dump writes as a difference, which is the intended failure.
 
-**Do not widen it into a general "the ports agree" check.** It covers the word, sentence, name and location datasets, the age bands and curve, the gender labels and weights, the organization datasets and their odds, the stories and the field rules beside them, the surname romanization map, and the bounds in `constants` and `decorate/data` — the last of which is still written by hand in each package. The nickname shapes are in it now that they are `WordLanguageData.frames`: they were left out while they were a table private to each generator, and being data is what put them in. The sentence datasets are the same story on a larger scale, `THEME_CLASS` included, because a theme moving from one class to another changes what every verb of every language will accept.
+**Do not widen it into a general "the ports agree" check.** It covers the word, sentence, name and location datasets, the age bands and curve, the date units and default range, the gender labels and weights, the organization datasets and their odds, the stories and the field rules beside them, the surname romanization map, and the bounds in `constants` and `decorate/data` — the last of which is still written by hand in each package. The nickname shapes are in it now that they are `WordLanguageData.frames`: they were left out while they were a table private to each generator, and being data is what put them in. The sentence datasets are the same story on a larger scale, `THEME_CLASS` included, because a theme moving from one class to another changes what every verb of every language will accept.
 
 ## Testing a random generator
 
@@ -620,6 +632,16 @@ Ages:
 - **A group narrows the range, and the range wins.** `group` is filtered inside `minAge`..`maxAge`, and a group with no age there is ignored rather than answered with nothing, because the range is a number the caller wrote and the group only a name for one. The bands are data (`AGE_BANDS`) and meet without a gap from 0 to `RAND_AGE_MAX`.
 - **`maxAge` left out is 100, unless `minAge` is past it.** A centenarian is about one draw in twenty thousand, so the default stops there; `minAge: 105` alone moves it to `RAND_AGE_MAX` rather than reading as a range the wrong way round. An explicit range the wrong way round keeps `maxAge`, the way `lengthBounds` keeps `maxLength`.
 - **The candidates are worked out once per call.** At most 121 ages, each with its weight, and every draw is a `pickWeighted` over them. The last age of the curve has weight zero and is still drawn when it is the only age in range, which is `pickWeighted`'s even fallback doing its job.
+
+Dates:
+
+- **UTC, from the draw to the format.** A date drawn in the machine's own zone comes out differently on two machines from the same seed, and an hour a daylight-saving change skips is a date no clock ever showed. A caller who wants a zone takes the timestamp to the platform's own date type.
+- **A string bound names a span; a `Date`, a `DateTime`, a `datetime` and a number are an instant.** `'2024'` is the whole year and `'2024-03-15'` the whole day, so `minDate` takes the first millisecond of its span and `maxDate` the last: `maxDate: '2024-12-31'` reaching only midnight is the bug this rule is there to prevent. The strings are read by the package's own reader (`parseDate`, `_parse_date`) rather than by the platform — `new Date('2024-03-15T09:00')` is local time in JavaScript and `datetime.fromisoformat` does not take a `Z` in Python 3.10 — so the two that take a string agree on what it means. A string that is not a date falls back to the default, the way every option the types rule out does.
+- **A native object is the instant it stands for, the way its own language reads it.** A local JavaScript `Date`, a local Dart `DateTime` and a naive Python `datetime` are all the machine's own time, which is what makes `maxDate: new Date()` / `DateTime.now()` / `datetime.now()` mean now. A Python `date` is the whole day in UTC, the way a date string is.
+- **The default range is fixed, 1900 to 2099, and never counted from today.** A seeded `random` has to hand back the same dates on every run. A bound left out moves out of the way of the one that was written — `DATE_FLOOR` below, `DATE_CEILING` above — the way `maxAge` does, and the whole range is held inside the years 1 to 9999 because Python can hold no more and a year of four digits is what every format writes.
+- **A unit is read off a drawn date, never drawn on its own.** That is what keeps `unit: 'hour'` inside a range of 09:00 to 17:59, and it is why `day` is 31 less often than 1 and `month` comes up in proportion to its days. `unique` keys on the unit, so sixty minutes is all there is.
+- **The tokens are the npm ecosystem's, in all three packages.** `YYYY`, `MM`, `DD`, `HH`, `mm`, `ss`, `SSS`, `A` and the rest, with `[` `]` for literal text; Python takes the same tokens rather than `strftime`'s, because a format string is data a caller may share between the packages. Only numbers and `AM` / `PM` are written: a month or a weekday name is a word in a language, and a token for one would need a language option and a table per language.
+- **Dart draws through `randDouble`, not `randInt`.** `Random.nextInt` takes no bound past 2^32, and two centuries are six trillion milliseconds.
 
 Genders:
 

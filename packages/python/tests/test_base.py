@@ -30,6 +30,10 @@ def test_the_package_exports_exactly_its_public_api() -> None:
         "AgeGroup",
         "AgeGroupOption",
         "CountryDetail",
+        "DATE_UNITS",
+        "DateDetail",
+        "DateInput",
+        "DateUnit",
         "GenderCode",
         "GenderDetail",
         "LOCATION_LANGUAGES",
@@ -96,6 +100,7 @@ def test_the_package_exports_exactly_its_public_api() -> None:
         "rand_color",
         "rand_concept",
         "rand_country",
+        "rand_date",
         "rand_district",
         "rand_drink",
         "rand_emotion",
@@ -199,6 +204,12 @@ def test_the_functions_are_callable_and_the_constants_are_what_they_claim() -> N
     assert randino.RAND_AGE_MAX == 120
     assert randino.AGE_GROUPS == ("child", "teen", "adult", "senior")
 
+    # A date is a string written by `format`, and one part of it is a number.
+    assert isinstance(randino.rand_date()[0], str)
+    assert isinstance(randino.rand_date(unit="minute")[0], int)
+    assert isinstance(randino.rand_date(output="detail")[0].timestamp, int)
+    assert randino.DATE_UNITS == ("year", "month", "day", "hour", "minute", "second", "millisecond")
+
     assert isinstance(randino.rand_gender()[0], str)
     assert randino.rand_gender(language="en", output="detail")[0].language == "en"
 
@@ -284,6 +295,8 @@ def test_an_option_the_types_rule_out_falls_back_rather_than_raising() -> None:
         lambda: loose.rand_age(group=[None]),
         lambda: loose.rand_age(distribution="normal"),
         lambda: loose.rand_age(min_age=float("nan"), max_age="x"),
+        lambda: loose.rand_date(unit="week", format=123),
+        lambda: loose.rand_date(min_date={}, max_date=[], count=float("nan")),
         lambda: loose.rand_gender(language="xx", count=float("nan")),
         lambda: loose.rand_gender(include_unknown="yes"),
         lambda: loose.rand_organization(language="xx", type="shop"),
@@ -299,6 +312,8 @@ def test_an_option_the_types_rule_out_falls_back_rather_than_raising() -> None:
     assert len(loose.rand_name(count=float("nan"))) == 1
     # An age range that is not a number is the default range, not an empty one.
     assert loose.rand_age(min_age=float("nan"), max_age=float("nan"))[0] <= 100
+    # A unit that is not one is the whole date, written the default way.
+    assert re.match(r"\d{4}-", loose.rand_date(unit="week")[0])
     # A token of no length is not a token.
     assert len(loose.rand_suffix("x", length=float("nan"))) == len("x_") + 5
 
@@ -338,6 +353,8 @@ def test_random_is_where_every_draw_of_a_call_comes_from() -> None:
     twice(lambda: randino.rand_location(count=5, random=Random(42).random))
     twice(lambda: randino.rand_city(language="en", max_length=8, count=5, random=Random(42).random))
     twice(lambda: randino.rand_age(count=5, random=Random(42).random))
+    twice(lambda: randino.rand_date(count=5, random=Random(42).random))
+    twice(lambda: randino.rand_date(unit="minute", count=5, random=Random(42).random))
     twice(lambda: randino.rand_gender(count=5, include_unknown=True, random=Random(42).random))
     twice(lambda: randino.rand_organization(count=5, random=Random(42).random))
     twice(lambda: randino.rand_organization(count=5, max_length=20, random=Random(42).random))

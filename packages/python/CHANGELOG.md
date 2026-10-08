@@ -2,6 +2,8 @@
 
 ## vNext (2026--)
 
+- **`rand_date` generates dates**, drawn evenly from a range and written out in UTC. `min_date` and `max_date` take an ISO 8601 string, a `datetime` or a `date`. A string names a span, so `max_date="2024-12-31"` reaches the last millisecond of that day, and one that carries an offset is read in it. The range defaults to the years 1900 to 2099, a bound left out moves out of the way of the one that was written, and every range is held inside the years 1 to 9999. `format` writes the date with `YYYY`, `MM`, `DD`, `HH`, `mm`, `ss`, `SSS` and the rest of the tokens, ISO 8601 by default, and `unit` returns one part of each date as an `int` instead: `unit="minute"` is `0` to `59`. `output="detail"` reports the timestamp and every part. `DATE_UNITS` is exported beside it.
+
 ## 1.3.1 (2026-10-07)
 
 - The description and keywords PyPI shows name every kind of value the package generates. The description named only person names and nicknames, and its list of languages added up to ten where there are nine; the keywords are the npm package's now.

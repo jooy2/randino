@@ -994,3 +994,77 @@ export interface OrganizationDetail {
 	industry: OrganizationIndustry | null;
 	language: WordLanguage;
 }
+
+/**
+ * One part of a date, largest first. Named as `unit`, it is the one part
+ * `randDate` hands back, as a number: `minute` is `0` to `59`, `month` is `1` to
+ * `12`.
+ */
+export type DateUnit = 'year' | 'month' | 'day' | 'hour' | 'minute' | 'second' | 'millisecond';
+
+/**
+ * One end of the range a date is drawn from:
+ * - a string in ISO 8601 form, from `'2024'` down to
+ *   `'2024-03-15T14:07:32.481+09:00'`. It is UTC unless it carries an offset, and
+ *   it names a span rather than an instant: `'2024-03'` is all of March, so as
+ *   `maxDate` it reaches the last millisecond of the month.
+ * - a `Date`, which is the instant it holds.
+ * - a number, the milliseconds since `1970-01-01T00:00:00.000Z`.
+ */
+export type DateInput = string | Date | number;
+
+/**
+ * What `randDate` takes. A date is written by `format` rather than in a
+ * language, and the range bounds it in place of a length, so none of the options
+ * that ask about those are here.
+ */
+export interface RandDateOptions extends Pick<
+	RandCommonOptions,
+	'count' | 'unique' | 'output' | 'random'
+> {
+	/**
+	 * The earliest date to return. Default `'1900-01-01'`, or the first day of the
+	 * year 1 when `maxDate` is earlier than that. Held inside the years 1 to 9999.
+	 */
+	minDate?: DateInput;
+	/**
+	 * The latest date to return. Default the end of `'2099-12-31'`, or the end of
+	 * the year 9999 when `minDate` is later than that. A range the wrong way round
+	 * keeps `maxDate`.
+	 */
+	maxDate?: DateInput;
+	/**
+	 * Return one part of each date, as a number, instead of the date written out.
+	 * The part is read off a drawn date, so it keeps to the range: `'day'` is `31`
+	 * less often than `1`, the way a calendar has it.
+	 */
+	unit?: DateUnit;
+	/**
+	 * How the date is written, in UTC. `YYYY`, `YY`, `M`, `MM`, `D`, `DD`, `H`,
+	 * `HH`, `h`, `hh`, `m`, `mm`, `s`, `ss`, `SSS`, `A` and `a` are replaced, text
+	 * inside `[` `]` is written as it is, and so is everything else. Default
+	 * `'YYYY-MM-DDTHH:mm:ss.SSSZ'`, which is ISO 8601: `2024-03-15T14:07:32.481Z`.
+	 */
+	format?: string;
+}
+
+/** A generated date with every part it was built from. All of them are UTC. */
+export interface DateDetail {
+	/** The date as `format` writes it — what the value form returns when no `unit` is named. */
+	date: string;
+	/** Milliseconds since `1970-01-01T00:00:00.000Z`, negative before it. */
+	timestamp: number;
+	year: number;
+	/** `1` to `12`. */
+	month: number;
+	/** `1` to `31`. */
+	day: number;
+	/** `0` to `23`. */
+	hour: number;
+	/** `0` to `59`. */
+	minute: number;
+	/** `0` to `59`. */
+	second: number;
+	/** `0` to `999`. */
+	millisecond: number;
+}

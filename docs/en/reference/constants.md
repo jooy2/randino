@@ -76,7 +76,7 @@ from randino import (
 
 :::
 
-The length options are clamped into `1 … 40`, counted in characters of what the generator returns, except on `randSentence`, whose ceiling is `200`, on the location generators, whose ceiling is `100`, and on `randOrganization`, whose ceiling is `60`. A sentence is many words where a name, a word and a nickname are at most three, a location is every level of it written out at once, and an organization is a name, a word for its business and a legal form. `randAge` takes no length, and clamps its ages into `0 … 120` instead. `count` is clamped into `0 … 10000`, because an unbounded count with `unique` on can spend a long time re-drawing from an exhausted pool.
+The length options are clamped into `1 … 40`, counted in characters of what the generator returns, except on `randSentence`, whose ceiling is `200`, on the location generators, whose ceiling is `100`, and on `randOrganization`, whose ceiling is `60`. A sentence is many words where a name, a word and a nickname are at most three, a location is every level of it written out at once, and an organization is a name, a word for its business and a legal form. `randAge` takes no length and clamps its ages into `0 … 120` instead, and `randDate` clamps its range into the years 1 to 9999. `count` is clamped into `0 … 10000`, because an unbounded count with `unique` on can spend a long time re-drawing from an exhausted pool.
 
 ## Names
 
@@ -237,6 +237,46 @@ from randino import AGE_GROUPS
 :::
 
 The ages each group covers are on the [`randAge`](../age/rand-age#groups) page.
+
+## Dates
+
+::: lang js
+
+```javascript
+import { DATE_UNITS } from 'randino';
+```
+
+| Name | Type | Value |
+| --- | --- | --- |
+| `DATE_UNITS` | `DateUnit[]` | `['year', 'month', 'day', 'hour', 'minute', 'second', 'millisecond']` |
+
+:::
+
+::: lang dart
+
+```dart
+import 'package:randino/randino.dart';
+```
+
+| Name        | Type             | Value                     |
+| ----------- | ---------------- | ------------------------- |
+| `dateUnits` | `List<DateUnit>` | Every unit, largest first |
+
+:::
+
+::: lang py
+
+```python
+from randino import DATE_UNITS
+```
+
+| Name | Type | Value |
+| --- | --- | --- |
+| `DATE_UNITS` | `tuple[DateUnit, …]` | `('year', 'month', 'day', 'hour', 'minute', 'second', 'millisecond')` |
+
+:::
+
+What each unit returns is on the [`randDate`](../date/rand-date#units) page.
 
 ## Organizations
 
@@ -413,12 +453,16 @@ import type {
 	WordTheme,
 	WordThemeOption,
 	CountryDetail,
+	DateDetail,
+	DateInput,
+	DateUnit,
 	LocationDetail,
 	LocationLanguage,
 	LocationLanguageOption,
 	LocationLevel,
 	RandAgeOptions,
 	RandCountryOptions,
+	RandDateOptions,
 	RandGenderOptions,
 	RandLocationOptions,
 	RandNameOptions,
@@ -442,14 +486,14 @@ Every public type is exported alongside the functions:
 import 'package:randino/randino.dart';
 
 // Enums
-AgeGroup, AgeDistribution, GenderCode
+AgeGroup, AgeDistribution, DateUnit, GenderCode
 NameLanguage, NameGender, NameScript
 OrganizationType, OrganizationIndustry
 WordLanguage, WordTheme
 LocationLanguage, LocationLevel
 
 // Values
-LengthRange, AgeDetail, GenderDetail, NameDetail, NicknameDetail, LocationDetail, CountryDetail,
+LengthRange, AgeDetail, DateDetail, GenderDetail, NameDetail, NicknameDetail, LocationDetail, CountryDetail,
 OrganizationDetail
 ```
 
@@ -486,6 +530,9 @@ from randino import (
     WordTheme,
     WordThemeOption,
     CountryDetail,
+    DateDetail,
+    DateInput,
+    DateUnit,
     LocationDetail,
     LocationLanguage,
     LocationLanguageOption,

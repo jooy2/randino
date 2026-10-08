@@ -10,6 +10,7 @@ import 'dart:convert';
 
 import 'package:randino/src/age/data/index.dart';
 import 'package:randino/src/constants.dart';
+import 'package:randino/src/date/data/index.dart';
 import 'package:randino/src/decorate/data/index.dart';
 import 'package:randino/src/gender/data/index.dart';
 import 'package:randino/src/internal/parse.dart';
@@ -509,6 +510,14 @@ void main() {
         },
         'curve': <Object?>[for (final (age, weight) in ageCurve) <num>[age, weight]],
         'maxDefault': ageMaxDefault,
+      },
+      'date': <String, Object?>{
+        'units': <String>[for (final unit in dateUnits) unit.name],
+        'floor': dateFloor,
+        'ceiling': dateCeiling,
+        'minDefault': dateMinDefault,
+        'maxDefault': dateMaxDefault,
+        'formatDefault': dateFormatDefault,
       },
       'organization': <String, Object?>{
         'types': <String>[for (final type in organizationTypes) type.name],

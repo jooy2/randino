@@ -10,7 +10,7 @@ Every option and every example, with **JavaScript** picked in the sidebar. This 
 
 ---
 
-**randino** generates random person names, nicknames, words, sentences, real locations, ages, genders and organizations in the language you ask for.
+**randino** generates random person names, nicknames, words, sentences, real locations, ages, genders, organizations and dates in the language you ask for.
 
 - **Person names** read like names people carry: Emma Clover, Jack Reeves, each with its English pronunciation. 9 languages.
 - **Nicknames** are handles for a game or a website: MistyOwl, CraneVoyage, RustyBoot. Built from everyday words across twenty-nine themes, and never from person names.
@@ -20,6 +20,7 @@ Every option and every example, with **JavaScript** picked in the sidebar. This 
 - **Ages** are whole numbers drawn along a curve shaped like a population, from `randAge`, so a sample of people is mostly adults.
 - **Genders** are the labels a form in the language writes, from `randGender`: 여성, Female, Weiblich. An unstated gender and a third gender are there when you ask for them.
 - **Organizations** are companies, schools, offices and associations that do not exist, from `randOrganization`: (주)새솔테크, Westbrook High School, Stadtwerke Bergtal.
+- **Dates** are drawn evenly from a range and written out in UTC by a format of your own, from `randDate`, or one part at a time.
 - **Decorators** attach something to a string you already have: `randSuffix`, `randPrefix` and `randModifier`.
 - One options object per generator, every option optional: `randName()` on its own works.
 - **No runtime dependencies.** ESM, typed, and it runs in Node and in the browser alike.
@@ -330,6 +331,35 @@ randOrganization({ language: 'ko', type: 'company', output: 'detail' });
 
 `type` is `company`, `nonprofit`, `school`, `government` or `public`, or an array of them; left out, companies come up most often. `industry` is one of ten, written into a company's name as a word for its business, and naming one with `type` left out asks for companies. `realism: 'invented'` builds the stem from the language's own sounds, for a name nobody has.
 
+## Dates
+
+Dates drawn evenly from a range and written out in UTC. The range defaults to the years 1900 to 2099 and the format to ISO 8601. A string bound names a span, so `maxDate: '2024-12-31'` reaches the last millisecond of that day.
+
+```javascript
+import { randDate } from 'randino';
+
+randDate(); // ['1987-06-21T08:14:51.302Z']
+randDate({ minDate: '2024-01-01', maxDate: '2024-12-31', format: 'YYYY-MM-DD', count: 3 });
+// ['2024-07-09', '2024-02-27', '2024-11-30']
+randDate({ format: 'YYYY년 M월 D일 HH:mm' }); // ['2031년 3월 4일 19:40']
+
+randDate({ unit: 'minute', count: 5 }); // [37, 4, 52, 19, 0]
+randDate({ output: 'detail' });
+// [{ date: '1987-06-21T08:14:51.302Z', timestamp: 551261691302, year: 1987, month: 6,
+//    day: 21, hour: 8, minute: 14, second: 51, millisecond: 302 }]
+```
+
+| Option                | Type                       | Default                    |
+| --------------------- | -------------------------- | -------------------------- |
+| `minDate` / `maxDate` | `string \| Date \| number` | `'1900'` / `'2099'`        |
+| `format`              | `string`                   | `YYYY-MM-DDTHH:mm:ss.SSSZ` |
+| `unit`                | `DateUnit`                 | —                          |
+| `count`               | `number`                   | `1`                        |
+| `unique`              | `boolean`                  | `false`                    |
+| `output`              | `'value' \| 'detail'`      | `'value'`                  |
+
+`format` replaces `YYYY`, `YY`, `M`, `MM`, `D`, `DD`, `H`, `HH`, `h`, `hh`, `m`, `mm`, `s`, `ss`, `SSS`, `A` and `a`, and writes text inside `[` `]` as it is. `unit` is `year`, `month`, `day`, `hour`, `minute`, `second` or `millisecond`, read off a date drawn from the range, so a minute is `0` to `59` and a year keeps inside the range. A date has no language, so `randDate` takes none.
+
 ## Decorators
 
 `randSuffix`, `randPrefix` and `randModifier` attach something to a string you already have, rather than generating one. They take anything, not just this library's output, which is why none of them is an option on a generator. Each of them also works with no value at all, handing back the thing it would have attached.
@@ -400,7 +430,7 @@ sentenceLengthRange('ko'); // [5, 43]
 wordLengthRange('ko'); // [1, 4]
 ```
 
-`NAME_LANGUAGES`, `WORD_LANGUAGES`, `WORD_THEMES`, `AGE_GROUPS`, `ORGANIZATION_TYPES` and `ORGANIZATION_INDUSTRIES` list what the generators accept; `RAND_COUNT_MAX`, `RAND_LENGTH_MIN` / `_MAX`, `RAND_SENTENCE_LENGTH_MAX`, `RAND_AGE_MAX`, `RAND_ORGANIZATION_LENGTH_MAX`, `AFFIX_LENGTH_DEFAULT` / `_MAX`, `AFFIX_SEPARATOR_DEFAULT` and `AFFIX_CHARSET` are the bounds and defaults every option is clamped to.
+`NAME_LANGUAGES`, `WORD_LANGUAGES`, `WORD_THEMES`, `AGE_GROUPS`, `ORGANIZATION_TYPES`, `ORGANIZATION_INDUSTRIES` and `DATE_UNITS` list what the generators accept; `RAND_COUNT_MAX`, `RAND_LENGTH_MIN` / `_MAX`, `RAND_SENTENCE_LENGTH_MAX`, `RAND_AGE_MAX`, `RAND_ORGANIZATION_LENGTH_MAX`, `AFFIX_LENGTH_DEFAULT` / `_MAX`, `AFFIX_SEPARATOR_DEFAULT` and `AFFIX_CHARSET` are the bounds and defaults every option is clamped to.
 
 ## Development
 
