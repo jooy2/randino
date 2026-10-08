@@ -1,6 +1,6 @@
 # Demo
 
-Everything below runs in your browser. The controls are the options `randName`, `randNickname`, `randWord`, `randSentence`, `randLocation`, `randAge`, `randGender` and `randOrganization` actually take, the code block under the output is the call your settings amount to, and what you see is drawn fresh every time you press Generate.
+Everything below runs in your browser. The controls are the options `randName`, `randNickname`, `randWord`, `randSentence`, `randLocation`, `randAge`, `randGender`, `randOrganization`, `randDate` and `randPhone` actually take, the code block under the output is the call your settings amount to, and what you see is drawn fresh every time you press Generate.
 
 <Demo />
 
@@ -31,6 +31,11 @@ Everything below runs in your browser. The controls are the options `randName`, 
 - Leave `type` on `all` and pick an `industry`. Only companies come back, because an industry is a company's.
 - Set `language` to `ko` and `minLength` to `12`. A Korean organization is usually shorter, so the long kinds are chosen, a company with its legal form or a 종합사회복지관, rather than a short name stretched.
 - Turn on the details, set `language` to `ko` and `startsWith` to `해`. The name starts with it even where `주식회사` is written in front.
+- On the dates tab, set `minDate` and `maxDate` both to `2024-02`. Every date lands in February 2024 and its last day is the 29th, because a string bound names the whole month rather than its first millisecond.
+- Set `unit` to `month`, `count` to `20` and turn on `unique`. Twelve come back, however often you press Generate, since a year has no more.
+- Type `YYYY년 M월 D일 A h:mm` into `format`, then `[Day] D` and `Day D`. Text outside brackets is read for tokens, so the last one comes out as something like `5amy 5`: both `D` and `a` are tokens.
+- On the phone tab, switch `country` between `KR`, `US` and `RU`. Each writes its numbers its own way: dashes, a bracketed area code, the trunk `8` in front.
+- Turn on `includeCountryCode` and set `separator` to `''`. That is E.164, the form an SMS gateway expects — and the detail carries it whatever the other options say. A number like this can by chance be real, so it is for a form under test, not for sending anything to.
 
 ## The scope of this page {#what-this-page-is-not}
 
@@ -41,5 +46,5 @@ The page draws **without a seed**, so pressing Generate twice gives two differen
 ## Where to go next
 
 - [Getting started](./guide/getting-started) — installing it, for whichever of the three packages you use.
-- [`randName`](./name/rand-name), [`randNickname`](./nickname/rand-nickname), [`randWord`](./word/rand-word), [`randSentence`](./sentence/rand-sentence), [`randLocation`](./location/rand-location), [`randAge`](./age/rand-age), [`randGender`](./gender/rand-gender) and [`randOrganization`](./organization/rand-organization) — every option in the panel above, written out.
+- [`randName`](./name/rand-name), [`randNickname`](./nickname/rand-nickname), [`randWord`](./word/rand-word), [`randSentence`](./sentence/rand-sentence), [`randLocation`](./location/rand-location), [`randAge`](./age/rand-age), [`randGender`](./gender/rand-gender), [`randOrganization`](./organization/rand-organization), [`randDate`](./date/rand-date) and [`randPhone`](./phone/rand-phone) — every option in the panel above, written out.
 - [Supported languages](./guide/languages) — what each language can and cannot do.

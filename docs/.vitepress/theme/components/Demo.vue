@@ -3,11 +3,14 @@ import { computed, nextTick, onMounted, reactive, ref, watch } from 'vue';
 import { useData } from 'vitepress';
 import {
 	AGE_GROUPS,
+	DATE_UNITS,
 	LOCATION_LANGUAGES,
 	LOCATION_LEVELS,
 	NAME_LANGUAGES,
 	ORGANIZATION_INDUSTRIES,
 	ORGANIZATION_TYPES,
+	PHONE_COUNTRIES,
+	PHONE_TYPES,
 	RAND_AGE_MAX,
 	RAND_SENTENCE_COUNT_MAX,
 	WORD_LANGUAGES,
@@ -18,6 +21,7 @@ import {
 	randAge,
 	randCity,
 	randCountry,
+	randDate,
 	randDistrict,
 	randGender,
 	randLocation,
@@ -25,6 +29,7 @@ import {
 	randName,
 	randNickname,
 	randOrganization,
+	randPhone,
 	randPrefix,
 	randRegion,
 	randSentence,
@@ -79,7 +84,18 @@ const COUNT_MAX = 50;
  * with the arrow keys moving between them. A screen reader was told "tab 1 of 4"
  * about a control that pointed at nothing.
  */
-const TABS = ['name', 'nickname', 'word', 'sentence', 'location', 'age', 'gender', 'organization'];
+const TABS = [
+	'name',
+	'nickname',
+	'word',
+	'sentence',
+	'location',
+	'age',
+	'gender',
+	'organization',
+	'date',
+	'phone'
+];
 
 const TAB_LABELS = {
 	name: 'demoNames',
@@ -89,7 +105,9 @@ const TAB_LABELS = {
 	location: 'demoLocations',
 	age: 'demoAges',
 	gender: 'demoGenders',
-	organization: 'demoOrganizations'
+	organization: 'demoOrganizations',
+	date: 'demoDates',
+	phone: 'demoPhones'
 };
 
 const tab = ref('name');
@@ -224,6 +242,39 @@ const organization = reactive({
 	unique: false
 });
 
+const date = reactive({
+	minDate: '',
+	maxDate: '',
+	format: '',
+	unit: '',
+	count: 8,
+	unique: false
+});
+
+/**
+ * What `separator` is left at when the reader has not picked one: the country's
+ * own punctuation, which is the option left out rather than any string. `''` is
+ * a separator of its own — the digits alone — so it cannot stand for "none".
+ */
+const OWN_SEPARATOR = 'own';
+
+/** The separators the select offers, each with how it reads in a call. */
+const PHONE_SEPARATORS = [
+	{ value: '', label: "''" },
+	{ value: '-', label: "'-'" },
+	{ value: ' ', label: "' '" },
+	{ value: '.', label: "'.'" }
+];
+
+const phone = reactive({
+	country: 'all',
+	type: 'mobile',
+	includeCountryCode: false,
+	separator: OWN_SEPARATOR,
+	count: 8,
+	unique: false
+});
+
 /**
  * Whether a company can come out. An industry and a legal form are a company's,
  * so their selects only mean something then — and with `type` on `all`, an
@@ -303,6 +354,28 @@ const options = computed(() => {
 		if (age.distribution !== 'population') out.distribution = age.distribution;
 		if (age.count !== 1) out.count = Number(age.count);
 		if (age.unique) out.unique = true;
+
+		return out;
+	}
+
+	if (tab.value === 'date') {
+		if (date.minDate.trim()) out.minDate = date.minDate.trim();
+		if (date.maxDate.trim()) out.maxDate = date.maxDate.trim();
+		if (date.format) out.format = date.format;
+		if (date.unit) out.unit = date.unit;
+		if (date.count !== 1) out.count = Number(date.count);
+		if (date.unique) out.unique = true;
+
+		return out;
+	}
+
+	if (tab.value === 'phone') {
+		if (phone.country !== 'all') out.country = phone.country;
+		if (phone.type !== 'mobile') out.type = phone.type;
+		if (phone.includeCountryCode) out.includeCountryCode = true;
+		if (phone.separator !== OWN_SEPARATOR) out.separator = phone.separator;
+		if (phone.count !== 1) out.count = Number(phone.count);
+		if (phone.unique) out.unique = true;
 
 		return out;
 	}
@@ -461,8 +534,9 @@ const DECORATORS = { suffix: randSuffix, prefix: randPrefix, modifier: randModif
 
 /**
  * Whether the tab offers a decorator at all. A decorator attaches a token or a
- * word to a name or a handle, and a sentence, a real place, an age, a gender
- * and an organization are not strings anybody attaches one to.
+ * word to a name or a handle, and a sentence, a real place, an age, a gender,
+ * an organization, a date and a phone number are not strings anybody attaches
+ * one to.
  */
 const decoratable = computed(() => ['name', 'nickname', 'word'].includes(tab.value));
 
@@ -499,6 +573,34 @@ function generate() {
 			meta = drawn.map((detail) => [['group', detail.group]]);
 		} else {
 			items = randAge(config).map(String);
+		}
+	} else if (tab.value === 'date') {
+		if (details.value) {
+			const drawn = randDate({ ...config, output: 'detail' });
+
+			// The detail is the whole date whatever `unit` asked for, so the line shows
+			// the part the value form would have, and the date beside it.
+			items = drawn.map((detail) => (date.unit ? String(detail[date.unit]) : detail.date));
+			meta = drawn.map((detail) => [
+				['date', detail.date],
+				['timestamp', String(detail.timestamp)]
+			]);
+		} else {
+			items = randDate(config).map(String);
+		}
+	} else if (tab.value === 'phone') {
+		if (details.value) {
+			const drawn = randPhone({ ...config, output: 'detail' });
+
+			items = drawn.map((detail) => detail.phone);
+			meta = drawn.map((detail) => [
+				['e164', detail.e164],
+				['country', detail.country],
+				['callingCode', detail.callingCode],
+				['type', detail.type]
+			]);
+		} else {
+			items = randPhone(config);
 		}
 	} else if (tab.value === 'gender') {
 		if (details.value) {
@@ -655,7 +757,9 @@ const GENERATORS = {
 	sentence: 'randSentence',
 	age: 'randAge',
 	gender: 'randGender',
-	organization: 'randOrganization'
+	organization: 'randOrganization',
+	date: 'randDate',
+	phone: 'randPhone'
 };
 
 const DECORATOR_NAMES = {
@@ -846,6 +950,84 @@ async function copy() {
 
 				<label class="randino-demo-check">
 					<input v-model="age.unique" type="checkbox" />
+					<code>unique</code>
+				</label>
+			</div>
+
+			<div v-else-if="tab === 'date'" class="randino-demo-fields">
+				<label class="randino-demo-field">
+					<span><code>minDate</code></span>
+					<input v-model="date.minDate" type="text" placeholder="1900-01-01" />
+				</label>
+
+				<label class="randino-demo-field">
+					<span><code>maxDate</code></span>
+					<input v-model="date.maxDate" type="text" placeholder="2099-12-31" />
+				</label>
+
+				<label class="randino-demo-field">
+					<span><code>format</code></span>
+					<input v-model="date.format" type="text" placeholder="YYYY-MM-DDTHH:mm:ss.SSSZ" />
+				</label>
+
+				<label class="randino-demo-field">
+					<span><code>unit</code></span>
+					<select v-model="date.unit">
+						<option value="">—</option>
+						<option v-for="item in DATE_UNITS" :key="item" :value="item">{{ item }}</option>
+					</select>
+				</label>
+
+				<label class="randino-demo-field">
+					<span><code>count</code></span>
+					<input v-model.number="date.count" type="number" min="1" :max="COUNT_MAX" />
+				</label>
+
+				<label class="randino-demo-check">
+					<input v-model="date.unique" type="checkbox" />
+					<code>unique</code>
+				</label>
+			</div>
+
+			<div v-else-if="tab === 'phone'" class="randino-demo-fields">
+				<label class="randino-demo-field">
+					<span><code>country</code></span>
+					<select v-model="phone.country">
+						<option value="all">all</option>
+						<option v-for="item in PHONE_COUNTRIES" :key="item" :value="item">{{ item }}</option>
+					</select>
+				</label>
+
+				<label class="randino-demo-field">
+					<span><code>type</code></span>
+					<select v-model="phone.type">
+						<option v-for="item in PHONE_TYPES" :key="item" :value="item">{{ item }}</option>
+						<option value="all">all</option>
+					</select>
+				</label>
+
+				<label class="randino-demo-field">
+					<span><code>separator</code></span>
+					<select v-model="phone.separator">
+						<option :value="OWN_SEPARATOR">—</option>
+						<option v-for="item in PHONE_SEPARATORS" :key="item.label" :value="item.value">
+							{{ item.label }}
+						</option>
+					</select>
+				</label>
+
+				<label class="randino-demo-field">
+					<span><code>count</code></span>
+					<input v-model.number="phone.count" type="number" min="1" :max="COUNT_MAX" />
+				</label>
+
+				<label class="randino-demo-check">
+					<input v-model="phone.includeCountryCode" type="checkbox" />
+					<code>includeCountryCode</code>
+				</label>
+
+				<label class="randino-demo-check">
+					<input v-model="phone.unique" type="checkbox" />
 					<code>unique</code>
 				</label>
 			</div>
@@ -1344,6 +1526,8 @@ async function copy() {
 			<p v-if="rows.length && rows.length < asked" class="randino-demo-note">
 				{{ t(locale, 'demoShort') }}
 			</p>
+
+			<p v-if="tab === 'phone'" class="randino-demo-note">{{ t(locale, 'demoPhoneNote') }}</p>
 
 			<details class="randino-demo-code">
 				<summary>{{ t(locale, 'demoCall') }}</summary>
