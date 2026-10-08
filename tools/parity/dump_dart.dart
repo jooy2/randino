@@ -12,6 +12,7 @@ import 'package:randino/src/age/data/index.dart';
 import 'package:randino/src/constants.dart';
 import 'package:randino/src/date/data/index.dart';
 import 'package:randino/src/decorate/data/index.dart';
+import 'package:randino/src/device/data/index.dart';
 import 'package:randino/src/gender/data/index.dart';
 import 'package:randino/src/internal/parse.dart';
 import 'package:randino/src/location/data/countries.dart';
@@ -613,6 +614,18 @@ void main() {
             language.key.name: <String, Object?>{
               for (final label in language.value.entries)
                 label.key.name: label.value,
+            },
+        },
+      },
+      // One entry per device, keyed by its maker and model, so a device one
+      // package holds and another does not is reported as itself.
+      'device': <String, Object?>{
+        'types': <String>[for (final type in deviceTypes) type.name],
+        'devices': <String, Object?>{
+          for (final entry in devices)
+            '${entry.vendor} ${entry.model}': <String, Object?>{
+              'type': entry.type.name,
+              'year': entry.year,
             },
         },
       },

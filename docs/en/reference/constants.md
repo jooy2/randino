@@ -326,12 +326,13 @@ How each country writes its numbers is on the [`randPhone`](../phone/rand-phone#
 ::: lang js
 
 ```javascript
-import { SYSTEM_PLATFORMS } from 'randino';
+import { DEVICE_TYPES, SYSTEM_PLATFORMS } from 'randino';
 ```
 
-| Name               | Type               | Value                   |
-| ------------------ | ------------------ | ----------------------- |
-| `SYSTEM_PLATFORMS` | `SystemPlatform[]` | `['desktop', 'mobile']` |
+| Name               | Type               | Value                           |
+| ------------------ | ------------------ | ------------------------------- |
+| `SYSTEM_PLATFORMS` | `SystemPlatform[]` | `['desktop', 'mobile']`         |
+| `DEVICE_TYPES`     | `DeviceType[]`     | `['phone', 'tablet', 'laptop']` |
 
 :::
 
@@ -341,25 +342,27 @@ import { SYSTEM_PLATFORMS } from 'randino';
 import 'package:randino/randino.dart';
 ```
 
-| Name              | Type                   | Value                    |
-| ----------------- | ---------------------- | ------------------------ |
-| `systemPlatforms` | `List<SystemPlatform>` | `desktop`, then `mobile` |
+| Name              | Type                   | Value                            |
+| ----------------- | ---------------------- | -------------------------------- |
+| `systemPlatforms` | `List<SystemPlatform>` | `desktop`, then `mobile`         |
+| `deviceTypes`     | `List<DeviceType>`     | `phone`, `tablet`, then `laptop` |
 
 :::
 
 ::: lang py
 
 ```python
-from randino import SYSTEM_PLATFORMS
+from randino import DEVICE_TYPES, SYSTEM_PLATFORMS
 ```
 
-| Name               | Type                       | Value                   |
-| ------------------ | -------------------------- | ----------------------- |
-| `SYSTEM_PLATFORMS` | `tuple[SystemPlatform, …]` | `('desktop', 'mobile')` |
+| Name               | Type                       | Value                           |
+| ------------------ | -------------------------- | ------------------------------- |
+| `SYSTEM_PLATFORMS` | `tuple[SystemPlatform, …]` | `('desktop', 'mobile')`         |
+| `DEVICE_TYPES`     | `tuple[DeviceType, …]`     | `('phone', 'tablet', 'laptop')` |
 
 :::
 
-Which kind of machine each platform covers is on the [`randOs`](../os/rand-os#catalog) page.
+Which kind of machine each platform covers is on the [`randOs`](../os/rand-os#catalog) page, and what each device type holds on the [`randDevice`](../device/rand-device#catalog) page.
 
 ## Organizations
 
@@ -547,6 +550,9 @@ import type {
 	DateDetail,
 	DateInput,
 	DateUnit,
+	DeviceDetail,
+	DeviceType,
+	DeviceTypeOption,
 	LocationDetail,
 	LocationLanguage,
 	LocationLanguageOption,
@@ -554,6 +560,7 @@ import type {
 	RandAgeOptions,
 	RandCountryOptions,
 	RandDateOptions,
+	RandDeviceOptions,
 	RandGenderOptions,
 	RandLocationOptions,
 	RandNameOptions,
@@ -579,7 +586,7 @@ Every public type is exported alongside the functions:
 import 'package:randino/randino.dart';
 
 // Enums
-AgeGroup, AgeDistribution, DateUnit, GenderCode
+AgeGroup, AgeDistribution, DateUnit, DeviceType, GenderCode
 NameLanguage, NameGender, NameScript
 OrganizationType, OrganizationIndustry
 PhoneCountry, PhoneType
@@ -588,7 +595,7 @@ WordLanguage, WordTheme
 LocationLanguage, LocationLevel
 
 // Values
-LengthRange, AgeDetail, DateDetail, GenderDetail, NameDetail, NicknameDetail, LocationDetail, CountryDetail,
+LengthRange, AgeDetail, DateDetail, DeviceDetail, GenderDetail, NameDetail, NicknameDetail, LocationDetail, CountryDetail,
 OrganizationDetail, OsDetail, PhoneDetail
 ```
 
@@ -636,6 +643,9 @@ from randino import (
     DateDetail,
     DateInput,
     DateUnit,
+    DeviceDetail,
+    DeviceType,
+    DeviceTypeOption,
     LocationDetail,
     LocationLanguage,
     LocationLanguageOption,

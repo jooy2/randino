@@ -10,7 +10,7 @@ Every option and every example, with **JavaScript** picked in the sidebar. This 
 
 ---
 
-**randino** generates random person names, nicknames, words, sentences, real locations, ages, genders, organizations, dates and phone numbers in the language you ask for, and real operating systems for a sample machine.
+**randino** generates random person names, nicknames, words, sentences, real locations, ages, genders, organizations, dates and phone numbers in the language you ask for, and real operating systems and devices for a sample machine.
 
 - **Person names** read like names people carry: Emma Clover, Jack Reeves, each with its English pronunciation. 9 languages.
 - **Nicknames** are handles for a game or a website: MistyOwl, CraneVoyage, RustyBoot. Built from everyday words across twenty-nine themes, and never from person names.
@@ -22,7 +22,7 @@ Every option and every example, with **JavaScript** picked in the sidebar. This 
 - **Organizations** are companies, schools, offices and associations that do not exist, from `randOrganization`: (주)새솔테크, Westbrook High School, Stadtwerke Bergtal.
 - **Dates** are drawn evenly from a range and written out in UTC by a format of your own, from `randDate`, or one part at a time.
 - **Phone numbers** are written the way their country writes them, from `randPhone`, in nine countries. They open on blocks the country really gives out, so one can by chance be real: sample data, never a number to call.
-- **System values** describe a sample machine with real products: an operating system from `randOs`, written the way its release is known, `Windows 11 Pro 23H2 (Build 22631)`.
+- **System values** describe a sample machine with real products: an operating system from `randOs`, written the way its release is known, `Windows 11 Pro 23H2 (Build 22631)`, and a phone, tablet or laptop from `randDevice`, `Apple iPhone 15 Pro`.
 - **Decorators** attach something to a string you already have: `randSuffix`, `randPrefix` and `randModifier`.
 - One options object per generator, every option optional: `randName()` on its own works.
 - **No runtime dependencies.** ESM, typed, and it runs in Node and in the browser alike.
@@ -428,6 +428,34 @@ randOs({ includeBuild: true, output: 'detail' });
 
 A draw picks the line first — Windows is about two desktops in three, Android about three phones in five — and a release inside it second. `minYear` and `maxYear` read the year a release came out, or with `includeBuild` the year of the build written, and a range nothing came out in returns nothing.
 
+### Devices
+
+Real phones, tablets and laptops, by the names their makers gave them, from the first iPhone to the devices released by the end of 2025. A desktop PC is left out: it is built from parts and has no model name of its own.
+
+```javascript
+import { randDevice } from 'randino';
+
+randDevice({ count: 2 }); // ['Samsung Galaxy S24 Ultra', 'Apple iPad (10th generation)']
+randDevice({ type: 'laptop' }); // ['Lenovo ThinkPad X1 Carbon Gen 11']
+randDevice({ type: ['phone', 'tablet'], maxYear: 2012 }); // ['Apple iPhone 4']
+randDevice({ type: 'phone', includeVendor: false }); // ['Pixel 8 Pro']
+
+randDevice({ output: 'detail' });
+// [{ device: 'Google Pixel 8', vendor: 'Google', model: 'Pixel 8', type: 'phone', year: 2023 }]
+```
+
+| Option          | Type                  | Default   |
+| --------------- | --------------------- | --------- |
+| `type`          | `DeviceTypeOption`    | `'all'`   |
+| `minYear`       | `number`              | —         |
+| `maxYear`       | `number`              | —         |
+| `includeVendor` | `boolean`             | `true`    |
+| `count`         | `number`              | `1`       |
+| `unique`        | `boolean`             | `false`   |
+| `output`        | `'value' \| 'detail'` | `'value'` |
+
+`type` is `phone`, `tablet` or `laptop`, or an array of them. A model is written the way its maker writes it, generation and all, and one whose name already opens on its maker's (`Xiaomi 14`) is never written with the maker twice.
+
 ## Decorators
 
 `randSuffix`, `randPrefix` and `randModifier` attach something to a string you already have, rather than generating one. They take anything, not just this library's output, which is why none of them is an option on a generator. Each of them also works with no value at all, handing back the thing it would have attached.
@@ -498,7 +526,7 @@ sentenceLengthRange('ko'); // [5, 43]
 wordLengthRange('ko'); // [1, 4]
 ```
 
-`NAME_LANGUAGES`, `WORD_LANGUAGES`, `WORD_THEMES`, `AGE_GROUPS`, `ORGANIZATION_TYPES`, `ORGANIZATION_INDUSTRIES`, `DATE_UNITS`, `PHONE_COUNTRIES`, `PHONE_TYPES` and `SYSTEM_PLATFORMS` list what the generators accept; `RAND_COUNT_MAX`, `RAND_LENGTH_MIN` / `_MAX`, `RAND_SENTENCE_LENGTH_MAX`, `RAND_AGE_MAX`, `RAND_ORGANIZATION_LENGTH_MAX`, `AFFIX_LENGTH_DEFAULT` / `_MAX`, `AFFIX_SEPARATOR_DEFAULT` and `AFFIX_CHARSET` are the bounds and defaults every option is clamped to.
+`NAME_LANGUAGES`, `WORD_LANGUAGES`, `WORD_THEMES`, `AGE_GROUPS`, `ORGANIZATION_TYPES`, `ORGANIZATION_INDUSTRIES`, `DATE_UNITS`, `PHONE_COUNTRIES`, `PHONE_TYPES`, `SYSTEM_PLATFORMS` and `DEVICE_TYPES` list what the generators accept; `RAND_COUNT_MAX`, `RAND_LENGTH_MIN` / `_MAX`, `RAND_SENTENCE_LENGTH_MAX`, `RAND_AGE_MAX`, `RAND_ORGANIZATION_LENGTH_MAX`, `AFFIX_LENGTH_DEFAULT` / `_MAX`, `AFFIX_SEPARATOR_DEFAULT` and `AFFIX_CHARSET` are the bounds and defaults every option is clamped to.
 
 ## Development
 

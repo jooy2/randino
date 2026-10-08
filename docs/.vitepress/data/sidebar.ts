@@ -113,7 +113,10 @@ export const SIDEBAR: SidebarGroup[] = [
 						id: 'system',
 						en: 'System',
 						ko: '시스템',
-						items: [{ path: 'os/rand-os', en: 'randOs', ko: 'randOs' }]
+						items: [
+							{ path: 'os/rand-os', en: 'randOs', ko: 'randOs' },
+							{ path: 'device/rand-device', en: 'randDevice', ko: 'randDevice' }
+						]
 					},
 					{
 						en: 'Locations',

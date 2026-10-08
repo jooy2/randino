@@ -326,12 +326,13 @@ from randino import PHONE_COUNTRIES, PHONE_TYPES
 ::: lang js
 
 ```javascript
-import { SYSTEM_PLATFORMS } from 'randino';
+import { DEVICE_TYPES, SYSTEM_PLATFORMS } from 'randino';
 ```
 
-| 이름               | 타입               | 값                      |
-| ------------------ | ------------------ | ----------------------- |
-| `SYSTEM_PLATFORMS` | `SystemPlatform[]` | `['desktop', 'mobile']` |
+| 이름               | 타입               | 값                              |
+| ------------------ | ------------------ | ------------------------------- |
+| `SYSTEM_PLATFORMS` | `SystemPlatform[]` | `['desktop', 'mobile']`         |
+| `DEVICE_TYPES`     | `DeviceType[]`     | `['phone', 'tablet', 'laptop']` |
 
 :::
 
@@ -341,25 +342,27 @@ import { SYSTEM_PLATFORMS } from 'randino';
 import 'package:randino/randino.dart';
 ```
 
-| 이름              | 타입                   | 값                     |
-| ----------------- | ---------------------- | ---------------------- |
-| `systemPlatforms` | `List<SystemPlatform>` | `desktop`, `mobile` 순 |
+| 이름              | 타입                   | 값                             |
+| ----------------- | ---------------------- | ------------------------------ |
+| `systemPlatforms` | `List<SystemPlatform>` | `desktop`, `mobile` 순         |
+| `deviceTypes`     | `List<DeviceType>`     | `phone`, `tablet`, `laptop` 순 |
 
 :::
 
 ::: lang py
 
 ```python
-from randino import SYSTEM_PLATFORMS
+from randino import DEVICE_TYPES, SYSTEM_PLATFORMS
 ```
 
-| 이름               | 타입                       | 값                      |
-| ------------------ | -------------------------- | ----------------------- |
-| `SYSTEM_PLATFORMS` | `tuple[SystemPlatform, …]` | `('desktop', 'mobile')` |
+| 이름               | 타입                       | 값                              |
+| ------------------ | -------------------------- | ------------------------------- |
+| `SYSTEM_PLATFORMS` | `tuple[SystemPlatform, …]` | `('desktop', 'mobile')`         |
+| `DEVICE_TYPES`     | `tuple[DeviceType, …]`     | `('phone', 'tablet', 'laptop')` |
 
 :::
 
-플랫폼마다 어떤 기기를 가리키는지는 [`randOs`](../os/rand-os#catalog) 문서에 있습니다.
+플랫폼마다 어떤 기기를 가리키는지는 [`randOs`](../os/rand-os#catalog) 문서에, 기기 종류마다 무엇이 들어 있는지는 [`randDevice`](../device/rand-device#catalog) 문서에 있습니다.
 
 ## 조직 {#organizations}
 
@@ -547,6 +550,9 @@ import type {
 	DateDetail,
 	DateInput,
 	DateUnit,
+	DeviceDetail,
+	DeviceType,
+	DeviceTypeOption,
 	LocationDetail,
 	LocationLanguage,
 	LocationLanguageOption,
@@ -554,6 +560,7 @@ import type {
 	RandAgeOptions,
 	RandCountryOptions,
 	RandDateOptions,
+	RandDeviceOptions,
 	RandGenderOptions,
 	RandLocationOptions,
 	RandNameOptions,
@@ -579,7 +586,7 @@ const options: RandNameOptions = { language: 'ko', count: 3 };
 import 'package:randino/randino.dart';
 
 // enum
-AgeGroup, AgeDistribution, DateUnit, GenderCode
+AgeGroup, AgeDistribution, DateUnit, DeviceType, GenderCode
 NameLanguage, NameGender, NameScript
 OrganizationType, OrganizationIndustry
 PhoneCountry, PhoneType
@@ -588,7 +595,7 @@ WordLanguage, WordTheme
 LocationLanguage, LocationLevel
 
 // 값
-LengthRange, AgeDetail, DateDetail, GenderDetail, NameDetail, NicknameDetail, LocationDetail, CountryDetail,
+LengthRange, AgeDetail, DateDetail, DeviceDetail, GenderDetail, NameDetail, NicknameDetail, LocationDetail, CountryDetail,
 OrganizationDetail, OsDetail, PhoneDetail
 ```
 
@@ -636,6 +643,9 @@ from randino import (
     DateDetail,
     DateInput,
     DateUnit,
+    DeviceDetail,
+    DeviceType,
+    DeviceTypeOption,
     LocationDetail,
     LocationLanguage,
     LocationLanguageOption,

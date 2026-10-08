@@ -1228,3 +1228,57 @@ export interface OsDetail {
 	/** The year the release came out, or the build when one is written. */
 	year: number;
 }
+
+/**
+ * What kind of device a model is:
+ * - `phone`: a smartphone, and the handful of phones before them that carried a
+ *   model name a sample is likely to want (`BlackBerry Bold 9000`).
+ * - `tablet`: a tablet, a detachable two-in-one such as the Surface Pro included.
+ * - `laptop`: a laptop. A desktop PC is left out on purpose: it is mostly built
+ *   from parts and has no model name of its own.
+ */
+export type DeviceType = 'phone' | 'tablet' | 'laptop';
+
+/**
+ * Which kinds of device to draw. An array is a set to draw from, so `['phone',
+ * 'tablet']` is any mobile device, and `'all'` is every one of them.
+ */
+export type DeviceTypeOption = DeviceType | readonly DeviceType[] | 'all';
+
+/**
+ * What `randDevice` takes. A device is a real model with a real name, so it has
+ * no language, no length and nothing to invent.
+ */
+export interface RandDeviceOptions extends Pick<
+	RandCommonOptions,
+	'count' | 'unique' | 'output' | 'random'
+> {
+	/** Which kinds of device. Default `'all'`. */
+	type?: DeviceTypeOption;
+	/** The earliest year a device may have been released in. Default none. */
+	minYear?: number;
+	/**
+	 * The latest year a device may have been released in — `2015` is what was out
+	 * by the end of 2015. A range the wrong way round keeps `maxYear`. Default none.
+	 */
+	maxYear?: number;
+	/**
+	 * Write the maker in front of the model: `Apple iPhone 15` rather than `iPhone
+	 * 15`. A model whose name already opens on its maker's (`Xiaomi 14`, `OnePlus
+	 * 12`) is written the same either way. Default `true`.
+	 */
+	includeVendor?: boolean;
+}
+
+/** A generated device with the pieces it was written from. */
+export interface DeviceDetail {
+	/** The device as the value form returns it: `Samsung Galaxy S24 Ultra`. */
+	device: string;
+	/** Who makes it: `Samsung`. */
+	vendor: string;
+	/** The model's own name: `Galaxy S24 Ultra`. */
+	model: string;
+	type: DeviceType;
+	/** The year the device was released. */
+	year: number;
+}

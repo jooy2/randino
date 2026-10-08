@@ -31,9 +31,13 @@ def test_the_package_exports_exactly_its_public_api() -> None:
         "AgeGroupOption",
         "CountryDetail",
         "DATE_UNITS",
+        "DEVICE_TYPES",
         "DateDetail",
         "DateInput",
         "DateUnit",
+        "DeviceDetail",
+        "DeviceType",
+        "DeviceTypeOption",
         "GenderCode",
         "GenderDetail",
         "LOCATION_LANGUAGES",
@@ -112,6 +116,7 @@ def test_the_package_exports_exactly_its_public_api() -> None:
         "rand_concept",
         "rand_country",
         "rand_date",
+        "rand_device",
         "rand_district",
         "rand_drink",
         "rand_emotion",
@@ -245,6 +250,8 @@ def test_the_functions_are_callable_and_the_constants_are_what_they_claim() -> N
     assert randino.SYSTEM_PLATFORMS == ("desktop", "mobile")
     assert isinstance(randino.rand_os()[0], str)
     assert isinstance(randino.rand_os(output="detail")[0].year, int)
+    assert isinstance(randino.rand_device()[0], str)
+    assert randino.DEVICE_TYPES == ("phone", "tablet", "laptop")
 
 
 def test_the_package_imports_nothing_outside_the_standard_library() -> None:
@@ -329,6 +336,8 @@ def test_an_option_the_types_rule_out_falls_back_rather_than_raising() -> None:
         lambda: loose.rand_phone(fictional="yes"),
         lambda: loose.rand_os(platform="tv", min_year=float("nan"), max_year="x"),
         lambda: loose.rand_os(include_build="yes", include_version=0),
+        lambda: loose.rand_device(type="watch", min_year="x"),
+        lambda: loose.rand_device(type=[None], include_vendor="no"),
         lambda: loose.rand_gender(language="xx", count=float("nan")),
         lambda: loose.rand_gender(include_unknown="yes"),
         lambda: loose.rand_organization(language="xx", type="shop"),
@@ -394,6 +403,7 @@ def test_random_is_where_every_draw_of_a_call_comes_from() -> None:
     twice(lambda: randino.rand_organization(count=5, random=Random(42).random))
     twice(lambda: randino.rand_organization(count=5, max_length=20, random=Random(42).random))
     twice(lambda: randino.rand_os(count=5, include_build=True, random=Random(42).random))
+    twice(lambda: randino.rand_device(count=5, random=Random(42).random))
 
     # Two different seeds are two different answers, so the source is actually what
     # the draws are coming from.

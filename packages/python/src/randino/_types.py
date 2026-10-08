@@ -754,3 +754,41 @@ class OsDetail:
 
     year: int
     """The year the release came out, or the build when one is written."""
+
+
+DeviceType = Literal["phone", "tablet", "laptop"]
+"""What kind of device a model is.
+
+- `phone`: a smartphone, and the handful of phones before them that carried a model name
+  a sample is likely to want.
+- `tablet`: a tablet, a detachable two-in-one such as the Surface Pro included.
+- `laptop`: a laptop. A desktop PC is left out on purpose: it is mostly built from parts
+  and has no model name of its own.
+"""
+
+DeviceTypeOption = DeviceType | Sequence[DeviceType] | Literal["all"]
+"""Which kinds of device to draw.
+
+A sequence is a set to draw from, so `("phone", "tablet")` is any mobile device, and
+`"all"` is every one of them.
+"""
+
+
+@dataclass(frozen=True, slots=True)
+class DeviceDetail:
+    """A generated device with the pieces it was written from."""
+
+    device: str
+    """The device as the value form returns it: `Samsung Galaxy S24 Ultra`."""
+
+    vendor: str
+    """Who makes it: `Samsung`."""
+
+    model: str
+    """The model's own name: `Galaxy S24 Ultra`."""
+
+    type: DeviceType
+    """What kind of device it is."""
+
+    year: int
+    """The year the device was released."""

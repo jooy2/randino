@@ -10,7 +10,7 @@ Every option and every example, with **Python** picked in the sidebar. This READ
 
 ---
 
-**randino** generates random person names, nicknames, words, sentences, real locations, ages, genders, organizations, dates and phone numbers in the language you ask for, and real operating systems for a sample machine.
+**randino** generates random person names, nicknames, words, sentences, real locations, ages, genders, organizations, dates and phone numbers in the language you ask for, and real operating systems and devices for a sample machine.
 
 - **Person names** read like names people carry: Emma Clover, Jack Reeves, each with its English pronunciation. 9 languages.
 - **Nicknames** are handles for a game or a website: MistyOwl, CraneVoyage, RustyBoot. Built from everyday words across twenty-nine themes, and never from person names.
@@ -22,7 +22,7 @@ Every option and every example, with **Python** picked in the sidebar. This READ
 - **Organizations** are companies, schools, offices and associations that do not exist, from `rand_organization`: (주)새솔테크, Westbrook High School, Stadtwerke Bergtal.
 - **Dates** are drawn evenly from a range and written out in UTC by a format of your own, from `rand_date`, or one part at a time.
 - **Phone numbers** are written the way their country writes them, from `rand_phone`, in nine countries. They open on blocks the country really gives out, so one can by chance be real: sample data, never a number to call.
-- **System values** describe a sample machine with real products: an operating system from `rand_os`, written the way its release is known, `Windows 11 Pro 23H2 (Build 22631)`.
+- **System values** describe a sample machine with real products: an operating system from `rand_os`, written the way its release is known, `Windows 11 Pro 23H2 (Build 22631)`, and a phone, tablet or laptop from `rand_device`, `Apple iPhone 15 Pro`.
 - **Decorators** attach something to a string you already have: `rand_suffix`, `rand_prefix` and `rand_modifier`.
 - Every argument is keyword-only and optional, so `rand_name()` on its own works.
 - **Pure Python, no dependencies.** It imports nothing outside the standard library, and ships a `py.typed` marker so mypy and Pyright read the annotations.
@@ -410,6 +410,34 @@ rand_os(include_build=True, output="detail")
 
 A draw picks the line first — Windows is about two desktops in three, Android about three phones in five — and a release inside it second. `min_year` and `max_year` read the year a release came out, or with `include_build` the year of the build written, and a range nothing came out in returns nothing.
 
+### Devices
+
+Real phones, tablets and laptops, by the names their makers gave them, from the first iPhone to the devices released by the end of 2025. A desktop PC is left out: it is built from parts and has no model name of its own.
+
+```python
+from randino import rand_device
+
+rand_device(count=2)  # ['Samsung Galaxy S24 Ultra', 'Apple iPad (10th generation)']
+rand_device(type="laptop")  # ['Lenovo ThinkPad X1 Carbon Gen 11']
+rand_device(type=("phone", "tablet"), max_year=2012)  # ['Apple iPhone 4']
+rand_device(type="phone", include_vendor=False)  # ['Pixel 8 Pro']
+
+rand_device(output="detail")
+# [DeviceDetail(device='Google Pixel 8', vendor='Google', model='Pixel 8', type='phone', year=2023)]
+```
+
+| Argument         | Type                  | Default   |
+| ---------------- | --------------------- | --------- |
+| `type`           | `DeviceTypeOption`    | `"all"`   |
+| `min_year`       | `int \| None`         | `None`    |
+| `max_year`       | `int \| None`         | `None`    |
+| `include_vendor` | `bool`                | `True`    |
+| `count`          | `int`                 | `1`       |
+| `unique`         | `bool`                | `False`   |
+| `output`         | `"value" \| "detail"` | `"value"` |
+
+`type` is `"phone"`, `"tablet"` or `"laptop"`, or a sequence of them. A model is written the way its maker writes it, generation and all, and one whose name already opens on its maker's (`Xiaomi 14`) is never written with the maker twice.
+
 ## Decorators
 
 `rand_suffix`, `rand_prefix` and `rand_modifier` attach something to a string you already have, rather than generating one. They take anything, not just this library's output, which is why none of them is an argument on a generator. Each of them also works with no value at all, handing back the thing it would have attached.
@@ -471,7 +499,7 @@ nickname_length_range("ko")  # (1, 13)
 sentence_length_range("ko")  # (5, 43)
 ```
 
-`NAME_LANGUAGES`, `WORD_LANGUAGES`, `WORD_THEMES`, `LOCATION_LANGUAGES`, `LOCATION_LEVELS`, `AGE_GROUPS`, `ORGANIZATION_TYPES`, `ORGANIZATION_INDUSTRIES`, `DATE_UNITS`, `PHONE_COUNTRIES`, `PHONE_TYPES` and `SYSTEM_PLATFORMS` list what the generators accept; `RAND_COUNT_MAX`, `RAND_LENGTH_MIN` / `MAX`, `RAND_LOCATION_LENGTH_MAX`, `RAND_AGE_MAX`, `RAND_ORGANIZATION_LENGTH_MAX`, `AFFIX_LENGTH_DEFAULT` / `MAX`, `AFFIX_SEPARATOR_DEFAULT` and `AFFIX_CHARSET` are the bounds and defaults every argument is clamped to.
+`NAME_LANGUAGES`, `WORD_LANGUAGES`, `WORD_THEMES`, `LOCATION_LANGUAGES`, `LOCATION_LEVELS`, `AGE_GROUPS`, `ORGANIZATION_TYPES`, `ORGANIZATION_INDUSTRIES`, `DATE_UNITS`, `PHONE_COUNTRIES`, `PHONE_TYPES`, `SYSTEM_PLATFORMS` and `DEVICE_TYPES` list what the generators accept; `RAND_COUNT_MAX`, `RAND_LENGTH_MIN` / `MAX`, `RAND_LOCATION_LENGTH_MAX`, `RAND_AGE_MAX`, `RAND_ORGANIZATION_LENGTH_MAX`, `AFFIX_LENGTH_DEFAULT` / `MAX`, `AFFIX_SEPARATOR_DEFAULT` and `AFFIX_CHARSET` are the bounds and defaults every argument is clamped to.
 
 ## Differences from the npm package
 

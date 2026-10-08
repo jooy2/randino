@@ -51,6 +51,9 @@ export 'src/decorate/rand_prefix.dart' show randPrefix;
 export 'src/decorate/rand_prefix_all.dart' show randPrefixAll;
 export 'src/decorate/rand_suffix.dart' show randSuffix;
 export 'src/decorate/rand_suffix_all.dart' show randSuffixAll;
+export 'src/device/data/index.dart' show deviceTypes;
+export 'src/device/rand_device.dart' show randDevice;
+export 'src/device/rand_device_details.dart' show randDeviceDetails;
 export 'src/gender/rand_gender.dart' show randGender;
 export 'src/gender/rand_gender_details.dart' show randGenderDetails;
 export 'src/location/data/index.dart' show locationLanguages, locationLevels;
@@ -92,6 +95,8 @@ export 'src/types.dart'
         CountryDetail,
         DateDetail,
         DateUnit,
+        DeviceDetail,
+        DeviceType,
         GenderCode,
         GenderDetail,
         LengthRange,

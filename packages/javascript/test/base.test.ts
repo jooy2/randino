@@ -15,6 +15,7 @@ describe('base test', () => {
 			'AFFIX_SEPARATOR_DEFAULT',
 			'AGE_GROUPS',
 			'DATE_UNITS',
+			'DEVICE_TYPES',
 			'LOCATION_LANGUAGES',
 			'LOCATION_LEVELS',
 			'NAME_LANGUAGES',
@@ -46,6 +47,7 @@ describe('base test', () => {
 			'randConcept',
 			'randCountry',
 			'randDate',
+			'randDevice',
 			'randDistrict',
 			'randDrink',
 			'randEmotion',
@@ -192,6 +194,8 @@ describe('base test', () => {
 		assert.deepStrictEqual(randino.SYSTEM_PLATFORMS, ['desktop', 'mobile']);
 		assert.strictEqual(typeof randino.randOs()[0], 'string');
 		assert.strictEqual(typeof randino.randOs({ output: 'detail' })[0].year, 'number');
+		assert.strictEqual(typeof randino.randDevice()[0], 'string');
+		assert.deepStrictEqual(randino.DEVICE_TYPES, ['phone', 'tablet', 'laptop']);
 	});
 
 	it('an option the types rule out falls back rather than throwing', () => {
@@ -244,7 +248,9 @@ describe('base test', () => {
 			() => randino.randOrganization({ type: [null] as never, industry: 'mining' as never }),
 			() => randino.randOrganization({ includeLegalForm: 'yes' as never, minLength: NaN }),
 			() => randino.randOs({ platform: 'tv' as never, minYear: NaN, maxYear: 'x' as never }),
-			() => randino.randOs({ includeBuild: 'yes' as never, includeVersion: 0 as never })
+			() => randino.randOs({ includeBuild: 'yes' as never, includeVersion: 0 as never }),
+			() => randino.randDevice({ type: 'watch' as never, minYear: 'x' as never }),
+			() => randino.randDevice({ type: [null] as never, includeVendor: 'no' as never })
 		];
 
 		for (const ask of asks) {
@@ -330,6 +336,7 @@ describe('base test', () => {
 		agrees(() => randino.randOrganization({ count: 5, random: seeded(42) }));
 		agrees(() => randino.randOrganization({ count: 5, maxLength: 20, random: seeded(42) }));
 		agrees(() => randino.randOs({ count: 5, includeBuild: true, random: seeded(42) }));
+		agrees(() => randino.randDevice({ count: 5, random: seeded(42) }));
 
 		// Two different seeds are two different answers, so the source is actually
 		// what the draws are coming from.

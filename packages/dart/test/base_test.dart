@@ -44,6 +44,8 @@ void main() {
           'CountryDetail',
           'DateDetail',
           'DateUnit',
+          'DeviceDetail',
+          'DeviceType',
           'GenderCode',
           'GenderDetail',
           'LengthRange',
@@ -84,6 +86,7 @@ void main() {
           'affixSeparatorDefault',
           'ageGroups',
           'dateUnits',
+          'deviceTypes',
           'locationLanguages',
           'locationLevels',
           'nameLanguages',
@@ -115,6 +118,8 @@ void main() {
           'randDate',
           'randDateDetails',
           'randDateUnit',
+          'randDevice',
+          'randDeviceDetails',
           'randDistrict',
           'randDistrictDetails',
           'randDrink',
@@ -277,6 +282,9 @@ void main() {
       expect(systemPlatforms, <SystemPlatform>[SystemPlatform.desktop, SystemPlatform.mobile]);
       expect(randOs(), hasLength(1));
       expect(randOsDetails()[0], isA<OsDetail>());
+      expect(randDevice(), hasLength(1));
+      expect(randDeviceDetails()[0], isA<DeviceDetail>());
+      expect(deviceTypes, DeviceType.values);
     });
 
     test('the bounds are the same numbers the JavaScript package uses', () {
@@ -370,6 +378,7 @@ void main() {
       twice(() => randPhone(count: 5, fictional: true, random: Random(42)).join());
       twice(() => randGender(count: 5, includeUnknown: true, random: Random(42)).join());
       twice(() => randOs(count: 5, includeBuild: true, random: Random(42)).join());
+      twice(() => randDevice(count: 5, random: Random(42)).join());
       twice(() => randOrganization(count: 5, random: Random(42)).join('|'));
       twice(() => randOrganization(count: 5, maxLength: 20, random: Random(42)).join('|'));
       twice(() => randSuffixAll(const ['a', 'b'], random: Random(42)).join());

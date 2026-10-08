@@ -33,6 +33,7 @@ import {
 	AFFIX_LENGTH_MAX,
 	AFFIX_SEPARATOR_DEFAULT,
 } from "../../packages/javascript/lib/decorate/data/index.js";
+import { DEVICES, DEVICE_TYPES } from "../../packages/javascript/lib/device/data/index.js";
 import {
 	GENDER_CODES,
 	GENDER_LABELS,
@@ -291,6 +292,17 @@ console.log(
 			codes: [...GENDER_CODES],
 			weights: { ...GENDER_WEIGHTS },
 			labels: GENDER_LABELS,
+		},
+		// One entry per device, keyed by its maker and model, so a device one package
+		// holds and another does not is reported as itself.
+		device: {
+			types: [...DEVICE_TYPES],
+			devices: Object.fromEntries(
+				DEVICES.map((entry) => [
+					`${entry.vendor} ${entry.model}`,
+					{ type: entry.type, year: entry.year },
+				]),
+			),
 		},
 		// One entry per release, keyed by its line and version, so a release one
 		// package holds and another does not is reported as itself. A build is

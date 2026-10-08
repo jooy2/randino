@@ -1145,3 +1145,48 @@ class OsDetail {
   @override
   String toString() => 'OsDetail($os, ${platform.name}, $year)';
 }
+
+/// What kind of device a model is.
+enum DeviceType {
+  /// A smartphone, and the handful of phones before them that carried a model
+  /// name a sample is likely to want.
+  phone,
+
+  /// A tablet, a detachable two-in-one such as the Surface Pro included.
+  tablet,
+
+  /// A laptop. A desktop PC is left out on purpose: it is mostly built from
+  /// parts and has no model name of its own.
+  laptop,
+}
+
+/// A generated device with the pieces it was written from.
+class DeviceDetail {
+  /// Creates a detail record. Returned by the generator; there is rarely a
+  /// reason to build one by hand outside a test.
+  const DeviceDetail({
+    required this.device,
+    required this.vendor,
+    required this.model,
+    required this.type,
+    required this.year,
+  });
+
+  /// The device as `randDevice` returns it: `Samsung Galaxy S24 Ultra`.
+  final String device;
+
+  /// Who makes it: `Samsung`.
+  final String vendor;
+
+  /// The model's own name: `Galaxy S24 Ultra`.
+  final String model;
+
+  /// What kind of device it is.
+  final DeviceType type;
+
+  /// The year the device was released.
+  final int year;
+
+  @override
+  String toString() => 'DeviceDetail($device, ${type.name}, $year)';
+}

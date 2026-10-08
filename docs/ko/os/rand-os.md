@@ -256,4 +256,5 @@ rand_os(include_build=True, output="detail")
 
 ## 함께 보기 {#see-also}
 
+- [`randDevice`](../device/rand-device) — 같은 연도에 나온 휴대폰, 태블릿, 노트북.
 - [`randDate`](../date/rand-date) — 그 운영체제가 쓰이던 해 안의 날짜.

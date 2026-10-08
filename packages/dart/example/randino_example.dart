@@ -179,6 +179,8 @@ void _system() {
   print(randOs(count: 3)); // [Windows 10, macOS Sonoma 14, Android 9 Pie]
   print(randOs(includeBuild: true, includeEdition: true)); // [Windows 11 Pro 23H2 (Build 22631)]
   print(randOs(platform: SystemPlatform.desktop, maxYear: 2010)); // [Mac OS X Snow Leopard 10.6]
+  print(randDevice(type: {DeviceType.laptop})); // [Lenovo ThinkPad X1 Carbon Gen 11]
+  print(randDeviceDetails().first); // DeviceDetail(Google Pixel 8, phone, 2023)
 }
 
 void _decorators() {

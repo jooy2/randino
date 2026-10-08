@@ -36,6 +36,7 @@ from randino.decorate.data import (
     AFFIX_LENGTH_MAX,
     AFFIX_SEPARATOR_DEFAULT,
 )
+from randino.device.data import DEVICE_TYPES, DEVICES
 from randino.gender.data import GENDER_CODES, GENDER_LABELS, GENDER_WEIGHTS
 from randino.location.data import LOCATION_DATA, LOCATION_LANGUAGES, LOCATION_LEVELS
 from randino.location.data.countries import COUNTRIES
@@ -567,6 +568,18 @@ print(
                 "weights": dict(GENDER_WEIGHTS),
                 "labels": {
                     language: dict(labels) for language, labels in GENDER_LABELS.items()
+                },
+            },
+            # One entry per device, keyed by its maker and model, so a device one package
+            # holds and another does not is reported as itself.
+            "device": {
+                "types": list(DEVICE_TYPES),
+                "devices": {
+                    f"{entry.vendor} {entry.model}": {
+                        "type": entry.type,
+                        "year": entry.year,
+                    }
+                    for entry in DEVICES
                 },
             },
             # One entry per release, keyed by its line and version, so a release one package

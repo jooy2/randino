@@ -256,4 +256,5 @@ rand_os(include_build=True, output="detail")
 
 ## See also
 
+- [`randDevice`](../device/rand-device) — a phone, a tablet or a laptop from the same years.
 - [`randDate`](../date/rand-date) — a date inside the years the system was current.

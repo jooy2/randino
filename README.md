@@ -10,7 +10,7 @@ Every option, every language and every example, with **JavaScript**, **Dart** or
 
 ---
 
-**randino** generates random text in the language you ask for: person names, nicknames, everyday words, whole sentences and real locations, the ages, genders, dates and phone numbers to go with them, organizations that do not exist, and the real operating system of a sample machine. One function per kind of value, one set of options, and a dataset per language.
+**randino** generates random text in the language you ask for: person names, nicknames, everyday words, whole sentences and real locations, the ages, genders, dates and phone numbers to go with them, organizations that do not exist, and the real operating system and device of a sample machine. One function per kind of value, one set of options, and a dataset per language.
 
 - **Person names** read like names people carry: Emma Clover, Jack Reeves, each with its English pronunciation. 9 languages.
 - **Nicknames** are handles for a game or a website: MistyOwl, CraneVoyage, RustyBoot. Built from everyday words across twenty-nine themes and never from person names, they run to over forty million combinations in Korean and in English before a random suffix is added.
@@ -22,7 +22,7 @@ Every option, every language and every example, with **JavaScript**, **Dart** or
 - **Organizations** are companies, schools, offices and associations that do not exist, from `randOrganization`: (주)새솔테크, Westbrook High School, Stadtwerke Bergtal. A company may carry its legal form, and the stems are chosen to be nobody's brand.
 - **Dates** are drawn evenly from a range and written out in UTC by a format of your own, from `randDate`: 2024-03-15T14:07:32.481Z, 2024년 3월 15일 금요일, 15 марта 2024. Month and weekday names come in all nine languages. `unit` hands back one part on its own, from the year down to the millisecond.
 - **Phone numbers** are written the way their country writes them, from `randPhone`: 010-4821-3967, (415) 726-0193, 8 (912) 345-67-89, in nine countries, with the country code and E.164 a parameter away. A number opens on a block the country really gives out, so it can by chance be somebody's: it is sample data, never a number to call or text. `fictional` keeps to the numbers the United States and Germany set aside for films and books, which nobody is given.
-- **System values** describe a sample machine with real products rather than invented ones. `randOs` writes an operating system the way its release is known — Windows 11 Pro 23H2 (Build 22631), macOS Sonoma 14.5, Android 14 (API 34) — from Windows 95 to the releases of October 2026, and `minYear` and `maxYear` keep to what was out in a given year.
+- **System values** describe a sample machine with real products rather than invented ones. `randOs` writes an operating system the way its release is known — Windows 11 Pro 23H2 (Build 22631), macOS Sonoma 14.5, Android 14 (API 34) — from Windows 95 to the releases of October 2026, and `randDevice` a real phone, tablet or laptop by its maker's name — Apple iPhone 15 Pro, Samsung Galaxy Tab S9, Lenovo ThinkPad X1 Carbon Gen 11. `minYear` and `maxYear` keep either to what was out in a given year.
 - **Decorators** attach something to a string you already have rather than generating one: a random token with `randSuffix` and `randPrefix`, a word with `randModifier`.
 - One options set per generator: language, length, count, a `realism` setting that goes from real words to fully invented ones, and a `vocabulary` setting that keeps to the everyday words.
 - **Every generator and decorator takes a `random`** — where the draws come from. A secure source for a value nobody may predict, a seeded one for a fixture that has to come out the same every run.
@@ -114,7 +114,7 @@ Pure Python. It imports nothing outside the standard library and ships a `py.typ
 
 ## Supported languages
 
-Every generator but `randAge`, `randDate`, `randPhone` and the system generators takes a language, or mixes every language it supports when you leave it out; an age has none, a date's language only writes its month and weekday names and is English unless you name another, a phone number takes the country each language is spoken in first, and an operating system is written by the name it was released under. All nine are covered by every generator but one, including the word pools: where a modifier goes and how it agrees with its noun are part of each language's own data.
+Every generator but `randAge`, `randDate`, `randPhone` and the system generators takes a language, or mixes every language it supports when you leave it out; an age has none, a date's language only writes its month and weekday names and is English unless you name another, a phone number takes the country each language is spoken in first, and an operating system or a device is written by the name it was released under. All nine are covered by every generator but one, including the word pools: where a modifier goes and how it agrees with its noun are part of each language's own data.
 
 | Code | Language   | Native     | Person names | Words and nicknames | Sentences | Organizations | Locations |
 | ---- | ---------- | ---------- | :----------: | :-----------------: | :-------: | :-----------: | :-------: |
@@ -147,6 +147,7 @@ Locations are the generator that is not in all nine. A language has them only wh
 | Dates          | `randDate`                   | `rand_date`                  | 2024-03-15T14:07:32.481Z, 37 |
 | Phone numbers  | `randPhone`                  | `rand_phone`                 | 010-4821-3967, (415) 726-0193 |
 | Operating systems | `randOs`                  | `rand_os`                    | Windows 11, macOS Sonoma 14.5 |
+| Devices        | `randDevice`                 | `rand_device`                | Apple iPhone 15 Pro, Dell XPS 13 9310 |
 | Decorators     | `randSuffix`, `randPrefix`, `randModifier` | `rand_suffix`, `rand_prefix`, `rand_modifier` | MistyOwl_nVtRC, MistyOwl |
 
 Each generator returns strings by default, or one detail object per result with <code>output: 'detail'</code>: both scripts of a name, or the words a nickname was built from. The Dart package spells that as a second function (`randNameDetails`), because Dart has no way to make one function's return type depend on an argument.

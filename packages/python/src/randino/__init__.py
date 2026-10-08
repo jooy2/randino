@@ -31,6 +31,9 @@ from randino._types import (
     DateDetail,
     DateInput,
     DateUnit,
+    DeviceDetail,
+    DeviceType,
+    DeviceTypeOption,
     GenderCode,
     GenderDetail,
     LocationDetail,
@@ -101,6 +104,7 @@ from randino.decorate import (
     rand_prefix,
     rand_suffix,
 )
+from randino.device import DEVICE_TYPES, rand_device
 from randino.gender import rand_gender
 from randino.location import (
     LOCATION_LANGUAGES,
@@ -166,6 +170,7 @@ __all__ = [
     "AFFIX_SEPARATOR_DEFAULT",
     "AGE_GROUPS",
     "DATE_UNITS",
+    "DEVICE_TYPES",
     "LOCATION_LANGUAGES",
     "LOCATION_LEVELS",
     "NAME_LANGUAGES",
@@ -192,6 +197,9 @@ __all__ = [
     "DateDetail",
     "DateInput",
     "DateUnit",
+    "DeviceDetail",
+    "DeviceType",
+    "DeviceTypeOption",
     "GenderCode",
     "GenderDetail",
     "LocationDetail",
@@ -252,6 +260,7 @@ __all__ = [
     "rand_concept",
     "rand_country",
     "rand_date",
+    "rand_device",
     "rand_district",
     "rand_drink",
     "rand_emotion",
