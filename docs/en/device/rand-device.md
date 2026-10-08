@@ -222,3 +222,4 @@ rand_device(output="detail")
 ## See also
 
 - [`randOs`](../os/rand-os) — an operating system to run on it, from the same years.
+- [`randRam`](../ram/rand-ram) — the memory it comes with.

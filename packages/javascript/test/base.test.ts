@@ -23,6 +23,7 @@ describe('base test', () => {
 			'ORGANIZATION_TYPES',
 			'PHONE_COUNTRIES',
 			'PHONE_TYPES',
+			'RAM_UNITS',
 			'RAND_AGE_MAX',
 			'RAND_COUNT_MAX',
 			'RAND_LENGTH_MAX',
@@ -73,6 +74,7 @@ describe('base test', () => {
 			'randPlant',
 			'randPrefix',
 			'randProduct',
+			'randRam',
 			'randRegion',
 			'randSentence',
 			'randSound',
@@ -196,6 +198,8 @@ describe('base test', () => {
 		assert.strictEqual(typeof randino.randOs({ output: 'detail' })[0].year, 'number');
 		assert.strictEqual(typeof randino.randDevice()[0], 'string');
 		assert.deepStrictEqual(randino.DEVICE_TYPES, ['phone', 'tablet', 'laptop']);
+		assert.match(randino.randRam()[0], /^\d+ (MB|GB)$/);
+		assert.deepStrictEqual(randino.RAM_UNITS, ['MB', 'GB']);
 	});
 
 	it('an option the types rule out falls back rather than throwing', () => {
@@ -250,7 +254,9 @@ describe('base test', () => {
 			() => randino.randOs({ platform: 'tv' as never, minYear: NaN, maxYear: 'x' as never }),
 			() => randino.randOs({ includeBuild: 'yes' as never, includeVersion: 0 as never }),
 			() => randino.randDevice({ type: 'watch' as never, minYear: 'x' as never }),
-			() => randino.randDevice({ type: [null] as never, includeVendor: 'no' as never })
+			() => randino.randDevice({ type: [null] as never, includeVendor: 'no' as never }),
+			() => randino.randRam({ unit: 'KB' as never, minSize: NaN, maxSize: 'x' as never }),
+			() => randino.randRam({ includeUnit: 'no' as never, count: NaN })
 		];
 
 		for (const ask of asks) {
@@ -337,6 +343,7 @@ describe('base test', () => {
 		agrees(() => randino.randOrganization({ count: 5, maxLength: 20, random: seeded(42) }));
 		agrees(() => randino.randOs({ count: 5, includeBuild: true, random: seeded(42) }));
 		agrees(() => randino.randDevice({ count: 5, random: seeded(42) }));
+		agrees(() => randino.randRam({ count: 5, random: seeded(42) }));
 
 		// Two different seeds are two different answers, so the source is actually
 		// what the draws are coming from.

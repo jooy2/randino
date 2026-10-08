@@ -41,7 +41,6 @@ from randino.gender.data import GENDER_CODES, GENDER_LABELS, GENDER_WEIGHTS
 from randino.location.data import LOCATION_DATA, LOCATION_LANGUAGES, LOCATION_LEVELS
 from randino.location.data.countries import COUNTRIES
 from randino.name.data import NAME_DATA, NAME_LANGUAGES
-from randino.os.data import OS_FAMILIES, OS_RELEASES
 from randino.name.data.ko import KO_SURNAME_ROMAN
 from randino.organization.data import (
     ORGANIZATION_BARE_CHANCE,
@@ -56,8 +55,10 @@ from randino.organization.data._types import (
     OrganizationLanguageData,
     PoolOrganizationSynthesis,
 )
+from randino.os.data import OS_FAMILIES, OS_RELEASES
 from randino.phone.data import PHONE_COUNTRIES, PHONE_DATA, PHONE_TYPES
 from randino.phone.data._types import PhoneShape
+from randino.ram.data import RAM_SCALE
 from randino.sentence.data import (
     AGENT_CLASSES,
     FIELD_RULES,
@@ -581,6 +582,16 @@ print(
                     }
                     for entry in DEVICES
                 },
+            },
+            # The scale and the pool as written: every size with its weight, in the unit the
+            # pool is kept in.
+            "ram": {
+                "units": list(RAM_SCALE.units),
+                "step": RAM_SCALE.step,
+                "base": RAM_SCALE.base,
+                "reference": RAM_SCALE.reference,
+                "bytes": RAM_SCALE.bytes,
+                "pool": [[size, weight] for size, weight in RAM_SCALE.pool],
             },
             # One entry per release, keyed by its line and version, so a release one package
             # holds and another does not is reported as itself. A build is `year text`, the

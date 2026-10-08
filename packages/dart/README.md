@@ -10,7 +10,7 @@ Every option and every example, with **Dart** picked in the sidebar. This README
 
 ---
 
-**randino** generates random person names, nicknames, words, sentences, real locations, ages, genders, organizations, dates and phone numbers in the language you ask for, and real operating systems and devices for a sample machine.
+**randino** generates random person names, nicknames, words, sentences, real locations, ages, genders, organizations, dates and phone numbers in the language you ask for, and real operating systems, devices and memory sizes for a sample machine.
 
 - **Person names** read like names people carry: Emma Clover, Jack Reeves, each with its English pronunciation. 9 languages.
 - **Nicknames** are handles for a game or a website: MistyOwl, CraneVoyage, RustyBoot. Built from everyday words across twenty-nine themes, and never from person names.
@@ -22,7 +22,7 @@ Every option and every example, with **Dart** picked in the sidebar. This README
 - **Organizations** are companies, schools, offices and associations that do not exist, from `randOrganization`: (주)새솔테크, Westbrook High School, Stadtwerke Bergtal.
 - **Dates** are drawn evenly from a range and written out in UTC by a format of your own, from `randDate`, or one part at a time from `randDateUnit`.
 - **Phone numbers** are written the way their country writes them, from `randPhone`, in nine countries. They open on blocks the country really gives out, so one can by chance be real: sample data, never a number to call.
-- **System values** describe a sample machine with real products: an operating system from `randOs`, written the way its release is known, `Windows 11 Pro 23H2 (Build 22631)`, and a phone, tablet or laptop from `randDevice`, `Apple iPhone 15 Pro`.
+- **System values** describe a sample machine with real products: an operating system from `randOs`, written the way its release is known, `Windows 11 Pro 23H2 (Build 22631)`, a phone, tablet or laptop from `randDevice`, `Apple iPhone 15 Pro`, and its memory from `randRam`, `16 GB`.
 - **Decorators** attach something to a string you already have: `randSuffix`, `randPrefix` and `randModifier`.
 - Every parameter is named and optional, and a **null enum means "every one of them"**, so `randName()` on its own works.
 - **Pure Dart, no dependencies.** It imports nothing but `dart:math`, so it runs on the VM, on the web and inside Flutter on every platform.
@@ -404,6 +404,30 @@ randDeviceDetails().first; // DeviceDetail(Google Pixel 8, phone, 2023)
 
 A model is written the way its maker writes it, generation and all, and one whose name already opens on its maker's (`Xiaomi 14`) is never written with the maker twice.
 
+### Memory
+
+Amounts of memory a machine is really sold with, from 512 MB to a terabyte, drawn by how common each one is: 8 and 16 GB are most of a sample. A size is only written in a unit it is a whole number of, so nothing carries a decimal point; a gigabyte is 1024 megabytes, the way an operating system counts.
+
+```dart
+randRam(count: 3); // [8 GB, 16 GB, 4 GB]
+randRam(unit: RamUnit.mb); // [8192 MB]
+randRam(minSize: 16, maxSize: 64); // [32 GB]
+randRam(includeUnit: false); // [16]
+
+randRamDetails().first; // RamDetail(16 GB, 17179869184)
+```
+
+| Parameter     | Type       | Default       |
+| ------------- | ---------- | ------------- |
+| `unit`        | `RamUnit?` | `null` — fits |
+| `includeUnit` | `bool`     | `true`        |
+| `minSize`     | `int?`     | `null` — none |
+| `maxSize`     | `int?`     | `null` — none |
+| `count`       | `int`      | `1`           |
+| `unique`      | `bool`     | `false`       |
+
+A null `unit` writes each size in the largest unit it is whole in; `RamUnit.gb` or `RamUnit.mb` keeps to the sizes whole in that unit. `minSize` and `maxSize` are in `unit`, or in gigabytes for a null one, and a range no real size is inside returns nothing.
+
 ## Decorators
 
 `randSuffix`, `randPrefix` and `randModifier` attach something to a string you already have, rather than generating one. They take anything, not just this library's output, which is why none of them is a parameter on a generator. Each of them also works with no value at all, handing back the thing it would have attached.
@@ -459,7 +483,7 @@ nicknameLengthRange(language: WordLanguage.ko); // LengthRange(1, 13)
 sentenceLengthRange(WordLanguage.ko); // LengthRange(5, 43)
 ```
 
-`nameLanguages`, `wordLanguages`, `wordThemes`, `locationLanguages`, `locationLevels`, `ageGroups`, `organizationTypes`, `organizationIndustries`, `dateUnits`, `phoneCountries`, `phoneTypes`, `systemPlatforms` and `deviceTypes` list what the generators accept; `randCountMax`, `randLengthMin` / `Max`, `randSentenceLengthMax`, `randLocationLengthMax`, `randAgeMax`, `randOrganizationLengthMax`, `affixLengthDefault` / `Max`, `affixSeparatorDefault` and `affixCharset` are the bounds and defaults every parameter is clamped to.
+`nameLanguages`, `wordLanguages`, `wordThemes`, `locationLanguages`, `locationLevels`, `ageGroups`, `organizationTypes`, `organizationIndustries`, `dateUnits`, `phoneCountries`, `phoneTypes`, `systemPlatforms`, `deviceTypes` and `ramUnits` list what the generators accept; `randCountMax`, `randLengthMin` / `Max`, `randSentenceLengthMax`, `randLocationLengthMax`, `randAgeMax`, `randOrganizationLengthMax`, `affixLengthDefault` / `Max`, `affixSeparatorDefault` and `affixCharset` are the bounds and defaults every parameter is clamped to.
 
 ## Differences from the npm package
 
@@ -472,7 +496,7 @@ The two generate the same output from the same data, and only the surface is Dar
 | `language: 'all'` (the default)    | `language` left out, or `null`                 |
 | `[number, number]`                 | `LengthRange`, which compares by value         |
 | `NameDetail` / `NicknameDetail` interfaces | The same two names, as classes         |
-| `output: 'detail'`                 | `randNameDetails` / `randNicknameDetails` / `randWordDetails` / `randSentenceDetails` / `randLocationDetails` / `randOsDetails` / `randDeviceDetails` … |
+| `output: 'detail'`                 | `randNameDetails` / `randNicknameDetails` / `randWordDetails` / `randSentenceDetails` / `randLocationDetails` / `randOsDetails` / `randDeviceDetails` / `randRamDetails` … |
 | `randDate({ unit: 'minute' })`     | `randDateUnit(DateUnit.minute)`                |
 | `randModifier('Owl')`             | `randModifier(value: 'Owl')` — every parameter is named |
 | `randSuffix(['a', 'b'])`           | `randSuffixAll(['a', 'b'])`                    |

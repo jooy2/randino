@@ -1190,3 +1190,45 @@ class DeviceDetail {
   @override
   String toString() => 'DeviceDetail($device, ${type.name}, $year)';
 }
+
+/// A unit memory is written in. Memory counts in powers of two, so a gigabyte
+/// here is 1024 megabytes — the way an operating system reports it.
+enum RamUnit {
+  /// Megabytes.
+  mb('MB'),
+
+  /// Gigabytes, 1024 megabytes each.
+  gb('GB');
+
+  const RamUnit(this.label);
+
+  /// The unit as it is written after a size: `MB`, `GB`.
+  final String label;
+}
+
+/// A generated amount of memory, in the unit it was written in and in bytes.
+class RamDetail {
+  /// Creates a detail record. Returned by the generator; there is rarely a
+  /// reason to build one by hand outside a test.
+  const RamDetail({
+    required this.ram,
+    required this.value,
+    required this.unit,
+    required this.bytes,
+  });
+
+  /// The size as `randRam` returns it: `16 GB`.
+  final String ram;
+
+  /// The number written: `16`.
+  final int value;
+
+  /// The unit the size is written in.
+  final RamUnit unit;
+
+  /// The same size in bytes, counted in powers of two: `17179869184`.
+  final int bytes;
+
+  @override
+  String toString() => 'RamDetail($ram, $bytes)';
+}

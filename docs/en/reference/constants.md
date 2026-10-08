@@ -326,13 +326,14 @@ How each country writes its numbers is on the [`randPhone`](../phone/rand-phone#
 ::: lang js
 
 ```javascript
-import { DEVICE_TYPES, SYSTEM_PLATFORMS } from 'randino';
+import { DEVICE_TYPES, RAM_UNITS, SYSTEM_PLATFORMS } from 'randino';
 ```
 
 | Name               | Type               | Value                           |
 | ------------------ | ------------------ | ------------------------------- |
 | `SYSTEM_PLATFORMS` | `SystemPlatform[]` | `['desktop', 'mobile']`         |
 | `DEVICE_TYPES`     | `DeviceType[]`     | `['phone', 'tablet', 'laptop']` |
+| `RAM_UNITS`        | `RamUnit[]`        | `['MB', 'GB']`                  |
 
 :::
 
@@ -346,19 +347,21 @@ import 'package:randino/randino.dart';
 | ----------------- | ---------------------- | -------------------------------- |
 | `systemPlatforms` | `List<SystemPlatform>` | `desktop`, then `mobile`         |
 | `deviceTypes`     | `List<DeviceType>`     | `phone`, `tablet`, then `laptop` |
+| `ramUnits`        | `List<RamUnit>`        | `mb`, then `gb`                  |
 
 :::
 
 ::: lang py
 
 ```python
-from randino import DEVICE_TYPES, SYSTEM_PLATFORMS
+from randino import DEVICE_TYPES, RAM_UNITS, SYSTEM_PLATFORMS
 ```
 
 | Name               | Type                       | Value                           |
 | ------------------ | -------------------------- | ------------------------------- |
 | `SYSTEM_PLATFORMS` | `tuple[SystemPlatform, …]` | `('desktop', 'mobile')`         |
 | `DEVICE_TYPES`     | `tuple[DeviceType, …]`     | `('phone', 'tablet', 'laptop')` |
+| `RAM_UNITS`        | `tuple[RamUnit, …]`        | `('MB', 'GB')`                  |
 
 :::
 
@@ -540,6 +543,9 @@ import type {
 	PhoneDetail,
 	PhoneType,
 	PhoneTypeOption,
+	RamDetail,
+	RamUnit,
+	RamUnitOption,
 	SystemPlatform,
 	SystemPlatformOption,
 	WordLanguage,
@@ -568,6 +574,7 @@ import type {
 	RandOrganizationOptions,
 	RandOsOptions,
 	RandPhoneOptions,
+	RandRamOptions,
 	RandOutput
 } from 'randino';
 
@@ -590,13 +597,13 @@ AgeGroup, AgeDistribution, DateUnit, DeviceType, GenderCode
 NameLanguage, NameGender, NameScript
 OrganizationType, OrganizationIndustry
 PhoneCountry, PhoneType
-SystemPlatform
+RamUnit, SystemPlatform
 WordLanguage, WordTheme
 LocationLanguage, LocationLevel
 
 // Values
 LengthRange, AgeDetail, DateDetail, DeviceDetail, GenderDetail, NameDetail, NicknameDetail, LocationDetail, CountryDetail,
-OrganizationDetail, OsDetail, PhoneDetail
+OrganizationDetail, OsDetail, PhoneDetail, RamDetail
 ```
 
 There is no `…Option` type and no `all` member: **a null enum is what means "every one of them"**, so the parameter you do not write is already the mixed draw. That also means the helpers take the same type the generators do, rather than a narrower one.
@@ -633,6 +640,9 @@ from randino import (
     PhoneDetail,
     PhoneType,
     PhoneTypeOption,
+    RamDetail,
+    RamUnit,
+    RamUnitOption,
     SystemPlatform,
     SystemPlatformOption,
     WordLanguage,

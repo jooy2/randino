@@ -181,6 +181,7 @@ void _system() {
   print(randOs(platform: SystemPlatform.desktop, maxYear: 2010)); // [Mac OS X Snow Leopard 10.6]
   print(randDevice(type: {DeviceType.laptop})); // [Lenovo ThinkPad X1 Carbon Gen 11]
   print(randDeviceDetails().first); // DeviceDetail(Google Pixel 8, phone, 2023)
+  print(randRam(count: 3)); // [8 GB, 16 GB, 4 GB]
 }
 
 void _decorators() {

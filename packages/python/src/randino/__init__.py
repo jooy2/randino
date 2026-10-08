@@ -59,6 +59,9 @@ from randino._types import (
     PhoneDetail,
     PhoneType,
     PhoneTypeOption,
+    RamDetail,
+    RamUnit,
+    RamUnitOption,
     RandRealism,
     RandVocabulary,
     SentenceDetail,
@@ -126,6 +129,7 @@ from randino.nickname import nickname_length_range, rand_nickname
 from randino.organization import ORGANIZATION_INDUSTRIES, ORGANIZATION_TYPES, rand_organization
 from randino.os import rand_os
 from randino.phone import PHONE_COUNTRIES, PHONE_TYPES, rand_phone
+from randino.ram import RAM_UNITS, rand_ram
 from randino.sentence import rand_sentence, sentence_length_range
 from randino.word import (
     WORD_LANGUAGES,
@@ -178,6 +182,7 @@ __all__ = [
     "ORGANIZATION_TYPES",
     "PHONE_COUNTRIES",
     "PHONE_TYPES",
+    "RAM_UNITS",
     "RAND_AGE_MAX",
     "RAND_COUNT_MAX",
     "RAND_LENGTH_MAX",
@@ -225,6 +230,9 @@ __all__ = [
     "PhoneDetail",
     "PhoneType",
     "PhoneTypeOption",
+    "RamDetail",
+    "RamUnit",
+    "RamUnitOption",
     "RandRealism",
     "RandVocabulary",
     "SentenceDetail",
@@ -286,6 +294,7 @@ __all__ = [
     "rand_plant",
     "rand_prefix",
     "rand_product",
+    "rand_ram",
     "rand_region",
     "rand_sentence",
     "rand_sound",

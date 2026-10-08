@@ -792,3 +792,31 @@ class DeviceDetail:
 
     year: int
     """The year the device was released."""
+
+
+RamUnit = Literal["MB", "GB"]
+"""A unit memory is written in.
+
+Memory counts in powers of two, so a gigabyte here is 1024 megabytes — the way an
+operating system reports it.
+"""
+
+RamUnitOption = Literal[RamUnit, "auto"]
+""""auto" writes each size in the largest unit it is a whole number of: `16 GB`, but `512 MB`."""
+
+
+@dataclass(frozen=True, slots=True)
+class RamDetail:
+    """A generated amount of memory, in the unit it was written in and in bytes."""
+
+    ram: str
+    """The size as the value form returns it: `16 GB`."""
+
+    value: int
+    """The number written: `16`."""
+
+    unit: RamUnit
+    """The unit the size is written in."""
+
+    bytes: int
+    """The same size in bytes, counted in powers of two: `17179869184`."""

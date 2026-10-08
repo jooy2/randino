@@ -65,6 +65,8 @@ void main() {
           'PhoneCountry',
           'PhoneDetail',
           'PhoneType',
+          'RamDetail',
+          'RamUnit',
           'RandRealism',
           'RandVocabulary',
           'SentenceDetail',
@@ -97,6 +99,7 @@ void main() {
           'organizationTypes',
           'phoneCountries',
           'phoneTypes',
+          'ramUnits',
           'wordLanguages',
           'nicknameLengthRange',
           'sentenceLengthRange',
@@ -161,6 +164,8 @@ void main() {
           'randPrefix',
           'randPrefixAll',
           'randProduct',
+          'randRam',
+          'randRamDetails',
           'randRegion',
           'randRegionDetails',
           'randSentence',
@@ -285,6 +290,9 @@ void main() {
       expect(randDevice(), hasLength(1));
       expect(randDeviceDetails()[0], isA<DeviceDetail>());
       expect(deviceTypes, DeviceType.values);
+      expect(randRam().single, matches(RegExp(r'^\d+ (MB|GB)$')));
+      expect(randRamDetails()[0], isA<RamDetail>());
+      expect(ramUnits, RamUnit.values);
     });
 
     test('the bounds are the same numbers the JavaScript package uses', () {
@@ -379,6 +387,7 @@ void main() {
       twice(() => randGender(count: 5, includeUnknown: true, random: Random(42)).join());
       twice(() => randOs(count: 5, includeBuild: true, random: Random(42)).join());
       twice(() => randDevice(count: 5, random: Random(42)).join());
+      twice(() => randRam(count: 5, random: Random(42)).join());
       twice(() => randOrganization(count: 5, random: Random(42)).join('|'));
       twice(() => randOrganization(count: 5, maxLength: 20, random: Random(42)).join('|'));
       twice(() => randSuffixAll(const ['a', 'b'], random: Random(42)).join());

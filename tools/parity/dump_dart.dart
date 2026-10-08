@@ -25,6 +25,7 @@ import 'package:randino/src/name/data/types.dart';
 import 'package:randino/src/organization/data/index.dart';
 import 'package:randino/src/organization/data/types.dart';
 import 'package:randino/src/phone/data/index.dart';
+import 'package:randino/src/ram/data/index.dart';
 import 'package:randino/src/phone/data/types.dart';
 import 'package:randino/src/sentence/data/index.dart';
 import 'package:randino/src/sentence/data/types.dart';
@@ -628,6 +629,18 @@ void main() {
               'year': entry.year,
             },
         },
+      },
+      // The scale and the pool as written: every size with its weight, in the
+      // unit the pool is kept in.
+      'ram': <String, Object?>{
+        'units': <String>[for (final unit in ramScale.units) unit.label],
+        'step': ramScale.step,
+        'base': ramScale.base.label,
+        'reference': ramScale.reference.label,
+        'bytes': ramScale.bytes,
+        'pool': <Object?>[
+          for (final (size, weight) in ramScale.pool) <num>[size, weight],
+        ],
       },
       // One entry per release, keyed by its line and version, so a release one
       // package holds and another does not is reported as itself. A build is

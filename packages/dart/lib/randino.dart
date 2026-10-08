@@ -84,6 +84,9 @@ export 'src/os/rand_os_details.dart' show randOsDetails;
 export 'src/phone/data/index.dart' show phoneCountries, phoneTypes;
 export 'src/phone/rand_phone.dart' show randPhone;
 export 'src/phone/rand_phone_details.dart' show randPhoneDetails;
+export 'src/ram/data/index.dart' show ramUnits;
+export 'src/ram/rand_ram.dart' show randRam;
+export 'src/ram/rand_ram_details.dart' show randRamDetails;
 export 'src/sentence/rand_sentence.dart' show randSentence;
 export 'src/sentence/rand_sentence_details.dart' show randSentenceDetails;
 export 'src/sentence/sentence_length_range.dart' show sentenceLengthRange;
@@ -116,6 +119,8 @@ export 'src/types.dart'
         PhoneCountry,
         PhoneDetail,
         PhoneType,
+        RamDetail,
+        RamUnit,
         RandRealism,
         RandVocabulary,
         SentenceDetail,

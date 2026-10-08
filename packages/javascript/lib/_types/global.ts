@@ -1282,3 +1282,59 @@ export interface DeviceDetail {
 	/** The year the device was released. */
 	year: number;
 }
+
+/**
+ * A unit memory is written in. Memory counts in powers of two, so a gigabyte
+ * here is 1024 megabytes — the way an operating system reports it.
+ */
+export type RamUnit = 'MB' | 'GB';
+
+/**
+ * `'auto'` writes each size in the largest unit it is a whole number of:
+ * `16 GB`, but `512 MB`.
+ */
+export type RamUnitOption = RamUnit | 'auto';
+
+/**
+ * What `randRam` takes. Memory is a size, so it has no language, no length and
+ * no first character to ask for.
+ */
+export interface RandRamOptions extends Pick<
+	RandCommonOptions,
+	'count' | 'unique' | 'output' | 'random'
+> {
+	/**
+	 * The unit the sizes are written in. A named unit keeps to the sizes that are a
+	 * whole number of it, so `'GB'` never writes the 512 MB a phone once had as
+	 * `0.5 GB`. Default `'auto'`.
+	 */
+	unit?: RamUnitOption;
+	/**
+	 * Write the unit after the number: `16 GB` rather than `16`. Left off with
+	 * `unit: 'auto'`, every size is written in gigabytes, because a bare `512` and
+	 * a bare `16` would otherwise be in two different units. Default `true`.
+	 */
+	includeUnit?: boolean;
+	/**
+	 * The smallest size to return, in `unit` — in gigabytes when `unit` is
+	 * `'auto'`. Default none.
+	 */
+	minSize?: number;
+	/**
+	 * The largest size to return, in `unit` — in gigabytes when `unit` is
+	 * `'auto'`. A range the wrong way round keeps `maxSize`, and a range no real
+	 * size is inside returns nothing. Default none.
+	 */
+	maxSize?: number;
+}
+
+/** A generated amount of memory, in the unit it was written in and in bytes. */
+export interface RamDetail {
+	/** The size as the value form returns it: `16 GB`. */
+	ram: string;
+	/** The number written: `16`. */
+	value: number;
+	unit: RamUnit;
+	/** The same size in bytes, counted in powers of two: `17179869184`. */
+	bytes: number;
+}

@@ -326,13 +326,14 @@ from randino import PHONE_COUNTRIES, PHONE_TYPES
 ::: lang js
 
 ```javascript
-import { DEVICE_TYPES, SYSTEM_PLATFORMS } from 'randino';
+import { DEVICE_TYPES, RAM_UNITS, SYSTEM_PLATFORMS } from 'randino';
 ```
 
 | 이름               | 타입               | 값                              |
 | ------------------ | ------------------ | ------------------------------- |
 | `SYSTEM_PLATFORMS` | `SystemPlatform[]` | `['desktop', 'mobile']`         |
 | `DEVICE_TYPES`     | `DeviceType[]`     | `['phone', 'tablet', 'laptop']` |
+| `RAM_UNITS`        | `RamUnit[]`        | `['MB', 'GB']`                  |
 
 :::
 
@@ -346,19 +347,21 @@ import 'package:randino/randino.dart';
 | ----------------- | ---------------------- | ------------------------------ |
 | `systemPlatforms` | `List<SystemPlatform>` | `desktop`, `mobile` 순         |
 | `deviceTypes`     | `List<DeviceType>`     | `phone`, `tablet`, `laptop` 순 |
+| `ramUnits`        | `List<RamUnit>`        | `mb`, `gb` 순                  |
 
 :::
 
 ::: lang py
 
 ```python
-from randino import DEVICE_TYPES, SYSTEM_PLATFORMS
+from randino import DEVICE_TYPES, RAM_UNITS, SYSTEM_PLATFORMS
 ```
 
 | 이름               | 타입                       | 값                              |
 | ------------------ | -------------------------- | ------------------------------- |
 | `SYSTEM_PLATFORMS` | `tuple[SystemPlatform, …]` | `('desktop', 'mobile')`         |
 | `DEVICE_TYPES`     | `tuple[DeviceType, …]`     | `('phone', 'tablet', 'laptop')` |
+| `RAM_UNITS`        | `tuple[RamUnit, …]`        | `('MB', 'GB')`                  |
 
 :::
 
@@ -540,6 +543,9 @@ import type {
 	PhoneDetail,
 	PhoneType,
 	PhoneTypeOption,
+	RamDetail,
+	RamUnit,
+	RamUnitOption,
 	SystemPlatform,
 	SystemPlatformOption,
 	WordLanguage,
@@ -568,6 +574,7 @@ import type {
 	RandOrganizationOptions,
 	RandOsOptions,
 	RandPhoneOptions,
+	RandRamOptions,
 	RandOutput
 } from 'randino';
 
@@ -590,13 +597,13 @@ AgeGroup, AgeDistribution, DateUnit, DeviceType, GenderCode
 NameLanguage, NameGender, NameScript
 OrganizationType, OrganizationIndustry
 PhoneCountry, PhoneType
-SystemPlatform
+RamUnit, SystemPlatform
 WordLanguage, WordTheme
 LocationLanguage, LocationLevel
 
 // 값
 LengthRange, AgeDetail, DateDetail, DeviceDetail, GenderDetail, NameDetail, NicknameDetail, LocationDetail, CountryDetail,
-OrganizationDetail, OsDetail, PhoneDetail
+OrganizationDetail, OsDetail, PhoneDetail, RamDetail
 ```
 
 `…Option` 타입도 없고 `all` 멤버도 없습니다. **null인 enum이 "전부"를 뜻하므로**, 쓰지 않은 파라미터가 이미 섞인 결과를 의미합니다. 그래서 헬퍼들도 더 좁은 타입이 아니라 생성기와 같은 타입을 받습니다.
@@ -633,6 +640,9 @@ from randino import (
     PhoneDetail,
     PhoneType,
     PhoneTypeOption,
+    RamDetail,
+    RamUnit,
+    RamUnitOption,
     SystemPlatform,
     SystemPlatformOption,
     WordLanguage,

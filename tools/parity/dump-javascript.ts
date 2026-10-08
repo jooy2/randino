@@ -56,6 +56,7 @@ import {
 	ORGANIZATION_TYPES,
 } from "../../packages/javascript/lib/organization/data/index.js";
 import { OS_FAMILIES, OS_RELEASES } from "../../packages/javascript/lib/os/data/index.js";
+import { RAM_SCALE } from "../../packages/javascript/lib/ram/data/index.js";
 import {
 	PHONE_COUNTRIES,
 	PHONE_DATA,
@@ -303,6 +304,16 @@ console.log(
 					{ type: entry.type, year: entry.year },
 				]),
 			),
+		},
+		// The scale and the pool as written: every size with its weight, in the unit
+		// the pool is kept in.
+		ram: {
+			units: [...RAM_SCALE.units],
+			step: RAM_SCALE.step,
+			base: RAM_SCALE.base,
+			reference: RAM_SCALE.reference,
+			bytes: RAM_SCALE.bytes,
+			pool: RAM_SCALE.pool.map(([size, weight]) => [size, weight]),
 		},
 		// One entry per release, keyed by its line and version, so a release one
 		// package holds and another does not is reported as itself. A build is

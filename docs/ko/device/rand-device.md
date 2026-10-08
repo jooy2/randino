@@ -222,3 +222,4 @@ rand_device(output="detail")
 ## 함께 보기 {#see-also}
 
 - [`randOs`](../os/rand-os) — 같은 연도에 나와 있던, 그 기기에서 돌릴 운영체제.
+- [`randRam`](../ram/rand-ram) — 그 기기에 들어 있는 메모리.

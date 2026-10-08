@@ -10,7 +10,7 @@ Every option and every example, with **JavaScript** picked in the sidebar. This 
 
 ---
 
-**randino** generates random person names, nicknames, words, sentences, real locations, ages, genders, organizations, dates and phone numbers in the language you ask for, and real operating systems and devices for a sample machine.
+**randino** generates random person names, nicknames, words, sentences, real locations, ages, genders, organizations, dates and phone numbers in the language you ask for, and real operating systems, devices and memory sizes for a sample machine.
 
 - **Person names** read like names people carry: Emma Clover, Jack Reeves, each with its English pronunciation. 9 languages.
 - **Nicknames** are handles for a game or a website: MistyOwl, CraneVoyage, RustyBoot. Built from everyday words across twenty-nine themes, and never from person names.
@@ -22,7 +22,7 @@ Every option and every example, with **JavaScript** picked in the sidebar. This 
 - **Organizations** are companies, schools, offices and associations that do not exist, from `randOrganization`: (주)새솔테크, Westbrook High School, Stadtwerke Bergtal.
 - **Dates** are drawn evenly from a range and written out in UTC by a format of your own, from `randDate`, or one part at a time.
 - **Phone numbers** are written the way their country writes them, from `randPhone`, in nine countries. They open on blocks the country really gives out, so one can by chance be real: sample data, never a number to call.
-- **System values** describe a sample machine with real products: an operating system from `randOs`, written the way its release is known, `Windows 11 Pro 23H2 (Build 22631)`, and a phone, tablet or laptop from `randDevice`, `Apple iPhone 15 Pro`.
+- **System values** describe a sample machine with real products: an operating system from `randOs`, written the way its release is known, `Windows 11 Pro 23H2 (Build 22631)`, a phone, tablet or laptop from `randDevice`, `Apple iPhone 15 Pro`, and its memory from `randRam`, `16 GB`.
 - **Decorators** attach something to a string you already have: `randSuffix`, `randPrefix` and `randModifier`.
 - One options object per generator, every option optional: `randName()` on its own works.
 - **No runtime dependencies.** ESM, typed, and it runs in Node and in the browser alike.
@@ -456,6 +456,33 @@ randDevice({ output: 'detail' });
 
 `type` is `phone`, `tablet` or `laptop`, or an array of them. A model is written the way its maker writes it, generation and all, and one whose name already opens on its maker's (`Xiaomi 14`) is never written with the maker twice.
 
+### Memory
+
+Amounts of memory a machine is really sold with, from 512 MB to a terabyte, drawn by how common each one is: 8 and 16 GB are most of a sample. A size is only written in a unit it is a whole number of, so nothing carries a decimal point; a gigabyte is 1024 megabytes, the way an operating system counts.
+
+```javascript
+import { randRam } from 'randino';
+
+randRam({ count: 3 }); // ['8 GB', '16 GB', '4 GB']
+randRam({ unit: 'MB' }); // ['8192 MB']
+randRam({ minSize: 16, maxSize: 64 }); // ['32 GB']
+randRam({ includeUnit: false }); // ['16']
+
+randRam({ output: 'detail' }); // [{ ram: '16 GB', value: 16, unit: 'GB', bytes: 17179869184 }]
+```
+
+| Option        | Type                  | Default   |
+| ------------- | --------------------- | --------- |
+| `unit`        | `RamUnitOption`       | `'auto'`  |
+| `includeUnit` | `boolean`             | `true`    |
+| `minSize`     | `number`              | —         |
+| `maxSize`     | `number`              | —         |
+| `count`       | `number`              | `1`       |
+| `unique`      | `boolean`             | `false`   |
+| `output`      | `'value' \| 'detail'` | `'value'` |
+
+`unit: 'auto'` writes each size in the largest unit it is whole in; `'GB'` or `'MB'` keeps to the sizes whole in that unit. `minSize` and `maxSize` are in `unit`, or in gigabytes for `'auto'`, and a range no real size is inside returns nothing.
+
 ## Decorators
 
 `randSuffix`, `randPrefix` and `randModifier` attach something to a string you already have, rather than generating one. They take anything, not just this library's output, which is why none of them is an option on a generator. Each of them also works with no value at all, handing back the thing it would have attached.
@@ -526,7 +553,7 @@ sentenceLengthRange('ko'); // [5, 43]
 wordLengthRange('ko'); // [1, 4]
 ```
 
-`NAME_LANGUAGES`, `WORD_LANGUAGES`, `WORD_THEMES`, `AGE_GROUPS`, `ORGANIZATION_TYPES`, `ORGANIZATION_INDUSTRIES`, `DATE_UNITS`, `PHONE_COUNTRIES`, `PHONE_TYPES`, `SYSTEM_PLATFORMS` and `DEVICE_TYPES` list what the generators accept; `RAND_COUNT_MAX`, `RAND_LENGTH_MIN` / `_MAX`, `RAND_SENTENCE_LENGTH_MAX`, `RAND_AGE_MAX`, `RAND_ORGANIZATION_LENGTH_MAX`, `AFFIX_LENGTH_DEFAULT` / `_MAX`, `AFFIX_SEPARATOR_DEFAULT` and `AFFIX_CHARSET` are the bounds and defaults every option is clamped to.
+`NAME_LANGUAGES`, `WORD_LANGUAGES`, `WORD_THEMES`, `AGE_GROUPS`, `ORGANIZATION_TYPES`, `ORGANIZATION_INDUSTRIES`, `DATE_UNITS`, `PHONE_COUNTRIES`, `PHONE_TYPES`, `SYSTEM_PLATFORMS`, `DEVICE_TYPES` and `RAM_UNITS` list what the generators accept; `RAND_COUNT_MAX`, `RAND_LENGTH_MIN` / `_MAX`, `RAND_SENTENCE_LENGTH_MAX`, `RAND_AGE_MAX`, `RAND_ORGANIZATION_LENGTH_MAX`, `AFFIX_LENGTH_DEFAULT` / `_MAX`, `AFFIX_SEPARATOR_DEFAULT` and `AFFIX_CHARSET` are the bounds and defaults every option is clamped to.
 
 ## Development
 
