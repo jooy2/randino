@@ -27,6 +27,7 @@ from randino._types import (
     AgeDistribution,
     AgeGroup,
     AgeGroupOption,
+    AppStoreDetail,
     Architecture,
     ArchitectureDetail,
     CountryDetail,
@@ -99,6 +100,7 @@ from randino._types import (
     WordThemeOption,
 )
 from randino.age import AGE_GROUPS, rand_age
+from randino.appstore import rand_app_store
 from randino.architecture import ARCHITECTURES, rand_architecture
 from randino.constants import (
     RAND_AGE_MAX,
@@ -221,6 +223,7 @@ __all__ = [
     "AgeDistribution",
     "AgeGroup",
     "AgeGroupOption",
+    "AppStoreDetail",
     "Architecture",
     "ArchitectureDetail",
     "CountryDetail",
@@ -297,6 +300,7 @@ __all__ = [
     "nickname_length_range",
     "rand_age",
     "rand_animal",
+    "rand_app_store",
     "rand_architecture",
     "rand_body",
     "rand_city",

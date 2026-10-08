@@ -41,6 +41,7 @@ void main() {
           'AgeDetail',
           'AgeDistribution',
           'AgeGroup',
+          'AppStoreDetail',
           'ArchitectureDetail',
           'CountryDetail',
           'CpuDetail',
@@ -123,6 +124,8 @@ void main() {
           'randAgeDetails',
           'randAgeMax',
           'randAnimal',
+          'randAppStore',
+          'randAppStoreDetails',
           'randArchitecture',
           'randArchitectureDetails',
           'randBody',
@@ -337,6 +340,8 @@ void main() {
       expect(randResolutionDetails()[0], isA<ResolutionDetail>());
       expect(randVersion().single, matches(RegExp(r'^\d+\.\d+\.\d+$')));
       expect(randVersionDetails()[0], isA<VersionDetail>());
+      expect(randAppStore(), hasLength(1));
+      expect(randAppStoreDetails()[0], isA<AppStoreDetail>());
       expect(versionFormats, VersionFormat.values);
     });
 
@@ -440,6 +445,7 @@ void main() {
       twice(() => randArchitecture(count: 5, includeRare: true, random: Random(42)).join());
       twice(() => randResolution(count: 5, random: Random(42)).join());
       twice(() => randVersion(format: null, count: 5, random: Random(42)).join());
+      twice(() => randAppStore(count: 5, random: Random(42)).join());
       twice(() => randOrganization(count: 5, random: Random(42)).join('|'));
       twice(() => randOrganization(count: 5, maxLength: 20, random: Random(42)).join('|'));
       twice(() => randSuffixAll(const ['a', 'b'], random: Random(42)).join());

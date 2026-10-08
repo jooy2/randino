@@ -10,7 +10,7 @@ Every option and every example, with **JavaScript** picked in the sidebar. This 
 
 ---
 
-**randino** generates random person names, nicknames, words, sentences, real locations, ages, genders, organizations, dates and phone numbers in the language you ask for, and real operating systems, devices, processors, graphics, architectures, memory, storage and screen resolutions for a sample machine, and software version numbers.
+**randino** generates random person names, nicknames, words, sentences, real locations, ages, genders, organizations, dates and phone numbers in the language you ask for, and real operating systems, devices, processors, graphics, architectures, memory, storage and screen resolutions for a sample machine, software version numbers and app stores.
 
 - **Person names** read like names people carry: Emma Clover, Jack Reeves, each with its English pronunciation. 9 languages.
 - **Nicknames** are handles for a game or a website: MistyOwl, CraneVoyage, RustyBoot. Built from everyday words across twenty-nine themes, and never from person names.
@@ -22,7 +22,7 @@ Every option and every example, with **JavaScript** picked in the sidebar. This 
 - **Organizations** are companies, schools, offices and associations that do not exist, from `randOrganization`: (주)새솔테크, Westbrook High School, Stadtwerke Bergtal.
 - **Dates** are drawn evenly from a range and written out in UTC by a format of your own, from `randDate`, or one part at a time.
 - **Phone numbers** are written the way their country writes them, from `randPhone`, in nine countries. They open on blocks the country really gives out, so one can by chance be real: sample data, never a number to call.
-- **System values** describe a sample machine with real products: an operating system from `randOs`, written the way its release is known, `Windows 11 Pro 23H2 (Build 22631)`, a phone, tablet or laptop from `randDevice`, `Apple iPhone 15 Pro`, its processor and graphics from `randCpu` and `randGpu`, `Intel Core i7-13700K`, `NVIDIA GeForce RTX 4090`, the architecture from `randArchitecture`, `x86_64`, its memory from `randRam`, `16 GB`, its storage from `randDiskType` and `randDiskSize`, `SSD`, `1 TB`, its screen from `randResolution`, `1920x1080`, and a version number from `randVersion`, `2.14.3`.
+- **System values** describe a sample machine with real products: an operating system from `randOs`, written the way its release is known, `Windows 11 Pro 23H2 (Build 22631)`, a phone, tablet or laptop from `randDevice`, `Apple iPhone 15 Pro`, its processor and graphics from `randCpu` and `randGpu`, `Intel Core i7-13700K`, `NVIDIA GeForce RTX 4090`, the architecture from `randArchitecture`, `x86_64`, its memory from `randRam`, `16 GB`, its storage from `randDiskType` and `randDiskSize`, `SSD`, `1 TB`, its screen from `randResolution`, `1920x1080`, a version number from `randVersion`, `2.14.3`, and an app store from `randAppStore`, `Google Play Store`.
 - **Decorators** attach something to a string you already have: `randSuffix`, `randPrefix` and `randModifier`.
 - One options object per generator, every option optional: `randName()` on its own works.
 - **No runtime dependencies.** ESM, typed, and it runs in Node and in the browser alike.
@@ -622,6 +622,29 @@ randVersion({ output: 'detail' });
 | `count`             | `number`              | `1`        |
 | `unique`            | `boolean`             | `false`    |
 | `output`            | `'value' \| 'detail'` | `'value'`  |
+
+### App stores
+
+Real app stores, by the name each is known by, its company in front where the store is called by one: `Google Play Store`, `Apple App Store`, `Samsung Galaxy Store`, `Steam`. Google Play and Apple's App Store are most of the phones, and the Microsoft Store, Steam and the Mac App Store most of the desktops. Google Play is never a desktop's.
+
+```javascript
+import { randAppStore } from 'randino';
+
+randAppStore({ platform: 'mobile', count: 3 }); // ['Google Play Store', 'Apple App Store', 'Huawei AppGallery']
+randAppStore({ platform: 'desktop', count: 2 }); // ['Steam', 'Microsoft Store']
+randAppStore({ includeCompany: false }); // ['Galaxy Store']
+
+randAppStore({ output: 'detail' });
+// [{ store: 'Apple App Store', name: 'App Store', company: 'Apple', platform: 'mobile' }]
+```
+
+| Option           | Type                   | Default   |
+| ---------------- | ---------------------- | --------- |
+| `platform`       | `SystemPlatformOption` | `'all'`   |
+| `includeCompany` | `boolean`              | `true`    |
+| `count`          | `number`               | `1`       |
+| `unique`         | `boolean`              | `false`   |
+| `output`         | `'value' \| 'detail'`  | `'value'` |
 
 ## Decorators
 

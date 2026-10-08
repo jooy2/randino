@@ -189,6 +189,7 @@ void _system() {
   print(randDiskSize(count: 2)); // [1 TB, 256 GB]
   print(randResolution(platform: SystemPlatform.mobile)); // [390x844]
   print(randVersion(format: null, prefix: 'v', count: 3)); // [v1.4.0, v24.04, v42]
+  print(randAppStore(platform: SystemPlatform.mobile)); // [Google Play Store]
 }
 
 void _decorators() {

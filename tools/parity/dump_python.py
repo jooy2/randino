@@ -11,6 +11,7 @@ from typing import Any
 
 from randino._internal.parse import NameToken, outline
 from randino.age.data import AGE_BANDS, AGE_CURVE, AGE_GROUPS, AGE_MAX_DEFAULT
+from randino.appstore.data import APP_STORES
 from randino.architecture.data import ARCHITECTURE_DATA, ARCHITECTURES
 from randino.constants import (
     RAND_AGE_MAX,
@@ -580,6 +581,15 @@ print(
                     f"{entry.platform} {entry.width}x{entry.height}": entry.weight
                     for entry in RESOLUTIONS
                 },
+            },
+            # One entry per store, keyed by its platform and its own name.
+            "appStore": {
+                f"{entry.platform} {entry.name}": {
+                    "weight": entry.weight,
+                    "company": entry.company,
+                    "full": entry.full,
+                }
+                for entry in APP_STORES
             },
             "version": {
                 "formats": list(VERSION_FORMATS),

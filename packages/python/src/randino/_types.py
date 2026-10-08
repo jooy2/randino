@@ -1008,3 +1008,20 @@ class VersionDetail:
 
     year: int | None
     """The year a calendar version is counted from, in full. `None` for the others."""
+
+
+@dataclass(frozen=True, slots=True)
+class AppStoreDetail:
+    """A generated app store, with the company that runs it."""
+
+    store: str
+    """The store as the value form returns it: `Apple App Store`."""
+
+    name: str
+    """The store's own name, without the company: `App Store`."""
+
+    company: str
+    """The company that runs it: `Apple`."""
+
+    platform: SystemPlatform
+    """The kind of machine the store sells apps for."""

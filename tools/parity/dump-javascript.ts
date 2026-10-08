@@ -7,6 +7,7 @@ import {
 	AGE_GROUPS,
 	AGE_MAX_DEFAULT
 } from '../../packages/javascript/lib/age/data/index.js';
+import { APP_STORES } from '../../packages/javascript/lib/appstore/data/index.js';
 import {
 	ARCHITECTURES,
 	ARCHITECTURE_DATA
@@ -335,6 +336,13 @@ console.log(
 				])
 			)
 		},
+		// One entry per store, keyed by its platform and its own name.
+		appStore: Object.fromEntries(
+			APP_STORES.map((entry) => [
+				`${entry.platform} ${entry.name}`,
+				{ weight: entry.weight, company: entry.company, full: entry.full }
+			])
+		),
 		version: {
 			formats: [...VERSION_FORMATS],
 			parts: VERSION_PARTS,

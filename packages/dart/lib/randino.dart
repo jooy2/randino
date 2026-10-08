@@ -28,6 +28,8 @@ library;
 export 'src/age/data/index.dart' show ageGroups;
 export 'src/age/rand_age.dart' show randAge;
 export 'src/age/rand_age_details.dart' show randAgeDetails;
+export 'src/appstore/rand_app_store.dart' show randAppStore;
+export 'src/appstore/rand_app_store_details.dart' show randAppStoreDetails;
 export 'src/architecture/data/index.dart' show architectures;
 export 'src/architecture/rand_architecture.dart' show randArchitecture;
 export 'src/architecture/rand_architecture_details.dart' show randArchitectureDetails;
@@ -109,6 +111,7 @@ export 'src/types.dart'
         AgeDetail,
         AgeDistribution,
         AgeGroup,
+        AppStoreDetail,
         ArchitectureDetail,
         CountryDetail,
         CpuDetail,

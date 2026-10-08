@@ -551,6 +551,7 @@ import type {
 	AgeDistribution,
 	AgeGroup,
 	AgeGroupOption,
+	AppStoreDetail,
 	Architecture,
 	ArchitectureDetail,
 	GenderCode,
@@ -605,6 +606,7 @@ import type {
 	LocationLanguageOption,
 	LocationLevel,
 	RandAgeOptions,
+	RandAppStoreOptions,
 	RandArchitectureOptions,
 	RandCountryOptions,
 	RandCpuOptions,
@@ -650,7 +652,7 @@ WordLanguage, WordTheme
 LocationLanguage, LocationLevel
 
 // 값
-LengthRange, AgeDetail, ArchitectureDetail, CpuDetail, DateDetail, DeviceDetail, DiskSizeDetail, DiskTypeDetail, GenderDetail, GpuDetail, NameDetail, NicknameDetail, LocationDetail, CountryDetail,
+LengthRange, AgeDetail, AppStoreDetail, ArchitectureDetail, CpuDetail, DateDetail, DeviceDetail, DiskSizeDetail, DiskTypeDetail, GenderDetail, GpuDetail, NameDetail, NicknameDetail, LocationDetail, CountryDetail,
 OrganizationDetail, OsDetail, PhoneDetail, RamDetail, ResolutionDetail, VersionDetail
 ```
 
@@ -668,6 +670,7 @@ from randino import (
     AgeDistribution,
     AgeGroup,
     AgeGroupOption,
+    AppStoreDetail,
     Architecture,
     ArchitectureDetail,
     GenderCode,

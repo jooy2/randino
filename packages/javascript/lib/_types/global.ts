@@ -1647,3 +1647,29 @@ export interface VersionDetail {
 	/** The year a calendar version is counted from, in full. `null` for the others. */
 	year: number | null;
 }
+
+/** What `randAppStore` takes. A store is called by its own name in every language. */
+export interface RandAppStoreOptions extends Pick<
+	RandCommonOptions,
+	'count' | 'unique' | 'output' | 'random'
+> {
+	/** The stores of desktops and laptops, of phones and tablets, or both. Default `'all'`. */
+	platform?: SystemPlatformOption;
+	/**
+	 * Write the name with its company where the store is known by one: `Apple App
+	 * Store` rather than `App Store`. A store whose name carries no company is
+	 * written the same either way. Default `true`.
+	 */
+	includeCompany?: boolean;
+}
+
+/** A generated app store, with the company that runs it. */
+export interface AppStoreDetail {
+	/** The store as the value form returns it: `Apple App Store`. */
+	store: string;
+	/** The store's own name, without the company: `App Store`. */
+	name: string;
+	/** The company that runs it: `Apple`. */
+	company: string;
+	platform: SystemPlatform;
+}

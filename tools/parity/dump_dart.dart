@@ -9,6 +9,7 @@
 import 'dart:convert';
 
 import 'package:randino/src/age/data/index.dart';
+import 'package:randino/src/appstore/data/index.dart';
 import 'package:randino/src/architecture/data/index.dart';
 import 'package:randino/src/constants.dart';
 import 'package:randino/src/cpu/data/index.dart';
@@ -622,6 +623,15 @@ void main() {
           for (final entry in resolutions)
             '${entry.platform.name} ${entry.width}x${entry.height}': entry.weight,
         },
+      },
+      // One entry per store, keyed by its platform and its own name.
+      'appStore': <String, Object?>{
+        for (final entry in appStores)
+          '${entry.platform.name} ${entry.name}': <String, Object?>{
+            'weight': entry.weight,
+            'company': entry.company,
+            'full': entry.full,
+          },
       },
       'version': <String, Object?>{
         'formats': <String>[for (final format in versionFormats) format.name],

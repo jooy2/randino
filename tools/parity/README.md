@@ -47,7 +47,7 @@ always reported as the other package's.
 The word datasets, the sentence datasets, the name datasets, the surname
 romanization map, the age groups with their bands and the curve ages are drawn
 along, the date units with the default range and the default format, the phone plans with
-the templates each country writes a number in, the operating system catalog with the weight of each line, the device, processor and graphics catalogs, the architectures with their weights and aliases, the memory sizes with their weights, the disk types with their weights per platform, the disk sizes with their weights, the screen resolutions with their weights per platform, the version formats with the ranges their parts are drawn from, the gender labels and how often each gender comes up, the organization
+the templates each country writes a number in, the operating system catalog with the weight of each line, the device, processor and graphics catalogs, the architectures with their weights and aliases, the memory sizes with their weights, the disk types with their weights per platform, the disk sizes with their weights, the screen resolutions with their weights per platform, the version formats with the ranges their parts are drawn from, the app stores with their weights per platform, the gender labels and how often each gender comes up, the organization
 datasets with the odds each kind and shape is drawn by, and the bounds every generator shares (`constants` and `decorate/data`).
 That is everything written once per package as data.
 

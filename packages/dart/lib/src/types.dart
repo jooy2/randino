@@ -1496,3 +1496,30 @@ class VersionDetail {
   @override
   String toString() => 'VersionDetail($version, ${format.name})';
 }
+
+/// A generated app store, with the company that runs it.
+class AppStoreDetail {
+  /// Creates a detail record. Returned by the generator; there is rarely a
+  /// reason to build one by hand outside a test.
+  const AppStoreDetail({
+    required this.store,
+    required this.name,
+    required this.company,
+    required this.platform,
+  });
+
+  /// The store as `randAppStore` returns it: `Apple App Store`.
+  final String store;
+
+  /// The store's own name, without the company: `App Store`.
+  final String name;
+
+  /// The company that runs it: `Apple`.
+  final String company;
+
+  /// The kind of machine the store sells apps for.
+  final SystemPlatform platform;
+
+  @override
+  String toString() => 'AppStoreDetail($store, ${platform.name})';
+}
