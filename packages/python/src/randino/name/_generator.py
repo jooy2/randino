@@ -227,17 +227,33 @@ def synth_entry(data: NameLanguageData, prefix: str = "") -> Entry:
     return Entry(native, romanize(data.roman, native, "given"))
 
 
-def lead_entry(data: NameLanguageData, pool: NamePool, part: NamePart, prefix: str) -> Entry:
+def lead_entry(
+    data: NameLanguageData,
+    pool: NamePool,
+    part: NamePart,
+    prefix: str,
+    whole: NamePool | None = None,
+) -> Entry:
     """Pick the part that leads the full name when a starting character was asked for.
 
     Prefers a real name that already starts with it; otherwise invents one
     (Latin/Cyrillic) or uses the character verbatim (CJK, where any syllable is a
     usable name part — so 앙 + 지수 -> 앙지수).
+
+    `pool` may be `whole` narrowed to the lengths a range leaves room for, and hold
+    nothing on the character where `whole` does. A real name a little off the length is
+    what a draw that invents nothing has to settle for: the closest of the attempts is
+    kept, and `Zachary` beats `Zeahos`.
     """
     matches = starting_with(pool, prefix)
 
     if matches:
         return pick_entry(matches, data, part)
+
+    any_length = starting_with(whole, prefix) if whole is not None and whole is not pool else ()
+
+    if any_length:
+        return pick_entry(any_length, data, part)
 
     if data.syn is not None:
         return synth_entry(data, prefix)
@@ -504,7 +520,7 @@ def draw_parts(
             (last_span[0] + middle_span[0], last_span[1] + middle_span[1]),
         )
         given = (
-            lead_entry(data, pool, "given", given_prefix)
+            lead_entry(data, pool, "given", given_prefix, given_pool)
             if given_prefix
             else pick_entry(pool, data, "given")
         )
@@ -518,7 +534,7 @@ def draw_parts(
         if data.syn is not None and chance(invent):
             surname = synth_entry(data, surname_prefix)
         elif surname_prefix:
-            surname = lead_entry(data, pool, "surname", surname_prefix)
+            surname = lead_entry(data, pool, "surname", surname_prefix, data.last)
         else:
             native = native_of(pick_pooled(pool, data, "surname"))
 

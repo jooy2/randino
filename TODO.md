@@ -44,7 +44,6 @@ A fix to a generator added under `vNext` needs no changelog entry of its own, si
 
 ### A. No decision needed
 
-- **A24. `realism: 'real'` invents a name under `startsWith` and a tight `maxLength`.** The aimed draw narrows the pool by length and falls back to synthesis when no entry of that length starts with the character, though a real one exists (`Zeahos Cox` beside `Zachary King`). Fall back to the prefix matches of the whole pool first.
 - **A25. Invented Russian surnames are never feminized.** `feminizeRu` runs only on pooled surnames, so `realism: 'invented', gender: 'female'` writes `Чачев`.
 - **A26. `randModifier` reads a lowercase German noun as masculine.** `languageOf` tries the capitalized form and finds `Katze`, but `genderOf` looks up `katze` and writes `flinker katze`.
 - **A27. An astral `charset` breaks `randSuffix` and `randPrefix`.** JS and Dart index UTF-16 code units, so `charset: '🎲🎯🎮'` writes lone surrogates. Python is right.

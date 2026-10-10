@@ -214,12 +214,23 @@ function leadEntry(
 	data: NameLanguageData,
 	pool: NamePool,
 	part: 'surname' | 'given',
-	prefix: string
+	prefix: string,
+	whole: NamePool = pool
 ): Entry {
 	const matches = startingWith(pool, prefix);
 
 	if (matches.length) {
 		return pickEntry(matches, data, part);
+	}
+
+	// `pool` may be `whole` narrowed to the lengths a range leaves room for, and
+	// hold nothing on the character where `whole` does. A real name a little off
+	// the length is what a draw that invents nothing has to settle for: the
+	// closest of the attempts is kept, and `Zachary` beats `Zeahos`.
+	const anyLength = whole === pool ? matches : startingWith(whole, prefix);
+
+	if (anyLength.length) {
+		return pickEntry(anyLength, data, part);
 	}
 
 	if (data.syn) {
@@ -511,7 +522,7 @@ function drawParts(
 		]);
 
 		given = givenPrefix
-			? leadEntry(data, pool, 'given', givenPrefix)
+			? leadEntry(data, pool, 'given', givenPrefix, givenPool)
 			: pickEntry(pool, data, 'given');
 	}
 
@@ -524,7 +535,7 @@ function drawParts(
 		if (data.syn && chance(invent)) {
 			surname = synthEntry(data, surnamePrefix || undefined);
 		} else if (surnamePrefix) {
-			surname = leadEntry(data, pool, 'surname', surnamePrefix);
+			surname = leadEntry(data, pool, 'surname', surnamePrefix, data.last);
 		} else {
 			let native = nativeOf(pickPooled(pool, data, 'surname'));
 

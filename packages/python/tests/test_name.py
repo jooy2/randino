@@ -415,6 +415,21 @@ def test_starts_with_leads_every_name_with_the_requested_character() -> None:
         assert name.startswith("B"), name
 
 
+def test_a_starts_with_and_a_tight_range_still_draw_a_real_name_where_one_exists() -> None:
+    # The pool narrowed to the lengths the range leaves room for may hold no name on
+    # the character while the whole pool does, and the draw invented one (`Zeahos Cox`)
+    # beside `Zachary King`.
+    male = NAME_DATA["en"].male or ()
+    female = NAME_DATA["en"].female or ()
+    pools = {"male": {native(item) for item in male}, "female": {native(item) for item in female}}
+
+    for prefix in ("Z", "X", "Q"):
+        for detail in rand_name(
+            language="en", starts_with=prefix, max_length=9, count=SAMPLE, output="detail"
+        ):
+            assert detail.native.split(" ")[0] in pools[detail.gender], detail.native
+
+
 def test_a_starts_with_the_language_does_not_write_is_answered_with_nothing() -> None:
     # A character from another script is one the language can never begin a name
     # with. Glueing it on anyway produced `Q대겸` — a Latin letter and a Korean given

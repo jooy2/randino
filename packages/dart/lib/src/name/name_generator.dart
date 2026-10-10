@@ -214,11 +214,28 @@ _Entry _synthEntry(NameLanguageData data, String prefix) {
 /// character. Prefers a real name that already starts with it; otherwise invents
 /// one (Latin/Cyrillic) or uses the character verbatim (CJK, where any syllable
 /// is a usable name part — so 앙 + 지수 -> 앙지수).
-_Entry _leadEntry(NameLanguageData data, NamePool pool, NamePart part, String prefix) {
+_Entry _leadEntry(
+  NameLanguageData data,
+  NamePool pool,
+  NamePart part,
+  String prefix, [
+  NamePool? whole,
+]) {
   final matches = _startingWith(pool, prefix);
 
   if (matches.isNotEmpty) {
     return _pickEntry(matches, data, part);
+  }
+
+  // [pool] may be [whole] narrowed to the lengths a range leaves room for, and
+  // hold nothing on the character where [whole] does. A real name a little off
+  // the length is what a draw that invents nothing has to settle for: the
+  // closest of the attempts is kept, and `Zachary` beats `Zeahos`.
+  final anyLength =
+      whole == null || identical(whole, pool) ? matches : _startingWith(whole, prefix);
+
+  if (anyLength.isNotEmpty) {
+    return _pickEntry(anyLength, data, part);
   }
 
   if (data.syn != null) {
@@ -493,7 +510,7 @@ _Parts _drawParts(NameLanguageData data, _Settings settings, bool isMale, [Lengt
 
     given =
         givenPrefix.isNotEmpty
-            ? _leadEntry(data, pool, NamePart.given, givenPrefix)
+            ? _leadEntry(data, pool, NamePart.given, givenPrefix, givenPool)
             : _pickEntry(pool, data, NamePart.given);
   }
 
@@ -506,7 +523,7 @@ _Parts _drawParts(NameLanguageData data, _Settings settings, bool isMale, [Lengt
     if (data.syn != null && chance(invent)) {
       surname = _synthEntry(data, surnamePrefix);
     } else if (surnamePrefix.isNotEmpty) {
-      surname = _leadEntry(data, pool, NamePart.surname, surnamePrefix);
+      surname = _leadEntry(data, pool, NamePart.surname, surnamePrefix, data.last);
     } else {
       var native = _pickPooled(pool, data, NamePart.surname).n;
 

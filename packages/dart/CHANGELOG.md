@@ -2,6 +2,7 @@
 
 ## vNext (2026--)
 
+- `randName` with `startsWith` and a tight `maxLength` draws a real name wherever one starts with the character. When no name of the right length did, it invented one at `realism: RandRealism.real` too (`Zeahos Cox` beside `Zachary King`).
 - `randName` with `unique` and `script: NameScript.roman` never returns the same string twice. It compared the native names, and two of them can romanize alike: about one Vietnamese name in ten came back twice.
 - A `startsWith` that is no letter, or a fullwidth one, is answered with nothing in every language. A fullwidth `Ａ` was read as Latin and led an English word as `Ａiskell`.
 - `randAge` with `unique` stops as soon as every age in range has been drawn. It kept drawing repeats until its attempt budget ran out, which took seconds at a large `count`.

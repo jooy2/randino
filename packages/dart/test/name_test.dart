@@ -502,6 +502,32 @@ void main() {
       }
     });
 
+    test('a startsWith and a tight range still draw a real name where one exists', () {
+      // The pool narrowed to the lengths the range leaves room for may hold no
+      // name on the character while the whole pool does, and the draw invented
+      // one (`Zeahos Cox`) beside `Zachary King`.
+      final data = nameData[NameLanguage.en]!;
+      final pools = {
+        NameGender.male: {for (final entry in data.male!) entry.n},
+        NameGender.female: {for (final entry in data.female!) entry.n},
+      };
+
+      for (final prefix in ['Z', 'X', 'Q']) {
+        for (final detail in randNameDetails(
+          language: NameLanguage.en,
+          startsWith: prefix,
+          maxLength: 9,
+          count: sample,
+        )) {
+          expect(
+            pools[detail.gender],
+            contains(detail.native.split(' ').first),
+            reason: detail.native,
+          );
+        }
+      }
+    });
+
     test('a startsWith the language does not write is answered with nothing', () {
       // A character from another script is one the language can never begin a
       // name with. Glueing it on anyway produced `Q대겸` — a Latin letter and a

@@ -2,6 +2,7 @@
 
 ## vNext (2026--)
 
+- `randName` with `startsWith` and a tight `maxLength` draws a real name wherever one starts with the character. When no name of the right length did, it invented one at `realism: 'real'` too (`Zeahos Cox` beside `Zachary King`).
 - `randName` with `unique` and `script: 'roman'` never returns the same string twice. It compared the native names, and two of them can romanize alike: about one Vietnamese name in ten came back twice.
 - A `startsWith` that is no letter, or a fullwidth one, is answered with nothing in every language. A fullwidth `Ａ` was read as Latin and led an English word as `Ａiskell`.
 - `randSentence` is 12 KB smaller, gzipped. The Japanese verbs are written once in their dictionary form, and their polite, past and linking forms are worked out from it rather than spelt out four more times.
