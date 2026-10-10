@@ -1156,7 +1156,7 @@ It is a bare given name rather than a full one or a noun phrase: no article, no 
 
 A name is shorter than a noun phrase, so a result that writes one cannot reach the top of what the language writes: `Yvonne` stands where `die schlanke Wolke` would have. It never falls under the bottom of it either. The shapes are chosen against the name at the high end and against the language's own nouns at the low end, so what <Lang js="sentenceLengthRange" dart="sentenceLengthRange" py="sentence_length_range" code /> reports holds whoever the subject turns out to be.
 
-A name only stands where a person could. Turning the option on narrows the subject to the themes that name people, so that the sentence has somewhere to put one. A `theme` you named yourself still wins, and then no name is written at all:
+A name only stands where a person could. Turning the option on narrows the subject to the themes that name people, so that the sentence has somewhere to put one. A `theme` you named yourself still wins, and so does a `story` no person can be the hero of (`sketch`, `passage`); then no name is written at all:
 
 ::: lang js
 

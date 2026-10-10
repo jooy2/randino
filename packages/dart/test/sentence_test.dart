@@ -3618,6 +3618,31 @@ void main() {
       }
     });
 
+    test('a story the caller named is told, whatever is decided about names', () {
+      // A name narrows the hero to people, and `sketch` and `passage` have none:
+      // a name drawn for the result told another story about half the time, and
+      // one asked for told another every time.
+      for (final story in [SentenceStory.sketch, SentenceStory.passage]) {
+        for (final includeName in <bool?>[null, true]) {
+          for (final language in [WordLanguage.en, WordLanguage.ko]) {
+            final told = randSentenceDetails(
+              language: language,
+              story: story,
+              includeName: includeName,
+              sentences: 4,
+              count: 40,
+            );
+
+            expect(
+              told.every((detail) => detail.story == story),
+              isTrue,
+              reason: '$language $story',
+            );
+          }
+        }
+      }
+    });
+
     test('a story moves its day forward, and never back', () {
       for (final language in wordLanguages) {
         final day = sentenceData[language]!.times.day;

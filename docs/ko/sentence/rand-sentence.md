@@ -1129,7 +1129,7 @@ rand_sentence(language="es", include_name=True, count=3)
 
 이름은 명사구보다 짧습니다. `die schlanke Wolke`가 설 자리에 `Yvonne`이 서므로, 이름을 쓴 결과는 그 언어가 쓰는 가장 긴 문장에 닿지 못합니다. 대신 가장 짧은 문장보다 짧아지지도 않습니다. 문형은 위쪽 끝에서는 이름을, 아래쪽 끝에서는 그 언어의 명사를 기준으로 고르므로, <Lang js="sentenceLengthRange" dart="sentenceLengthRange" py="sentence_length_range" code />가 알려 주는 범위는 주어가 무엇이 되든 지켜집니다.
 
-이름은 사람이 설 수 있는 자리에만 섭니다. 이 옵션을 켜면 주어가 사람을 가리키는 테마로 좁혀지므로 문장에 이름을 둘 자리가 생깁니다. 직접 지정한 `theme`이 우선이며, 그때는 이름이 쓰이지 않습니다.
+이름은 사람이 설 수 있는 자리에만 섭니다. 이 옵션을 켜면 주어가 사람을 가리키는 테마로 좁혀지므로 문장에 이름을 둘 자리가 생깁니다. 직접 지정한 `theme`이 우선이고, 사람이 주인공이 될 수 없는 `story`(`sketch`, `passage`)도 우선입니다. 그때는 이름이 쓰이지 않습니다.
 
 ::: lang js
 

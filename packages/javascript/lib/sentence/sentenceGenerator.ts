@@ -78,7 +78,7 @@ import {
 import { drawName } from '../name/nameGenerator.js';
 import { nameLengthRange } from '../name/nameLengthRange.js';
 import { SENTENCE_DATA, STORIES, THEME_CLASS } from './data/index.js';
-import type { StoryStep } from './data/index.js';
+import type { Story, StoryStep } from './data/index.js';
 import type {
 	Condition,
 	ConnectiveKind,
@@ -3763,6 +3763,14 @@ function roomFor(
  * answers a range too narrow for the parts it was told to carry; drawn, it is
  * one more thing to decide against the room.
  */
+/** Whether the story the caller named is one no person can be the hero of. */
+function personless(data: SentenceLanguageData, settings: Settings): boolean {
+	const story: Story | undefined =
+		settings.sentences > 1 ? STORIES.find(({ name }) => name === settings.story) : undefined;
+
+	return story !== undefined && !heroClassesFor(data, story, ['person']).length;
+}
+
 function nameFits(
 	data: SentenceLanguageData,
 	frames: readonly SentenceFrame[],
@@ -3813,8 +3821,12 @@ function generateResult(language: WordLanguage, settings: Settings): Result {
 	// A result either has a person in it or does not; deciding that per sentence
 	// would put a name in one line of a paragraph and not the next. Settled here
 	// because it takes the language's own name lengths to know whether a name can
-	// answer the range that was asked for.
-	const named = settings.includeName ?? (nameFits(data, frames, settings, language) && chance(50));
+	// answer the range that was asked for. A story the caller named wins, the way a
+	// theme does: a name narrows the hero to people, `sketch` and `passage` have
+	// none, and the story asked for was told about half the time.
+	const named =
+		!personless(data, settings) &&
+		(settings.includeName ?? (nameFits(data, frames, settings, language) && chance(50)));
 	const settled = settings.includeName === named ? settings : { ...settings, includeName: named };
 	// And the budget is measured against what a named result actually writes: one
 	// word where a noun phrase would have written an article, a modifier and a noun.

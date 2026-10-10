@@ -3081,6 +3081,28 @@ def test_vocabulary_decides_how_common_the_nouns_are() -> None:
         check("common", unrare)
 
 
+def test_a_story_the_caller_named_is_told_whatever_is_decided_about_names() -> None:
+    # A name narrows the hero to people, and `sketch` and `passage` have none: a name
+    # drawn for the result told another story about half the time, and one asked for told
+    # another every time.
+    stories: list[SentenceStory] = ["sketch", "passage"]
+    languages: list[WordLanguage] = ["en", "ko"]
+
+    for story in stories:
+        for include_name in (None, True):
+            for language in languages:
+                told = rand_sentence(
+                    language=language,
+                    story=story,
+                    include_name=include_name,
+                    sentences=4,
+                    count=40,
+                    output="detail",
+                )
+
+                assert all(detail.story == story for detail in told), f"{language} {story}"
+
+
 def test_a_story_moves_its_day_forward_and_never_back() -> None:
     for language in WORD_LANGUAGES:
         day = SENTENCE_DATA[language].times.day

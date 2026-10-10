@@ -3610,6 +3610,16 @@ def _room_for(language: WordLanguage, include_name: bool | None) -> dict[str, tu
     return narrowed
 
 
+def _personless(data: SentenceLanguageData, settings: Settings) -> bool:
+    """Whether the story the caller named is one no person can be the hero of."""
+    if settings.sentences <= 1:
+        return False
+
+    story = next((each for each in STORIES if each.name == settings.story), None)
+
+    return story is not None and not hero_classes_for(data, story, ("person",))
+
+
 def _name_fits(
     data: SentenceLanguageData,
     frames: list[SentenceFrame],
@@ -3845,8 +3855,10 @@ def _generate_result(language: WordLanguage, settings: Settings) -> Result:
         for frame in _frames_for(data, settings, _mood_for(cast("SentenceMark", mark)))
     ]
     # A result either has a person in it or does not; deciding that per sentence would
-    # put a name in one line of a paragraph and not the next.
-    named = (
+    # put a name in one line of a paragraph and not the next. A story the caller named
+    # wins, the way a theme does: a name narrows the hero to people, `sketch` and
+    # `passage` have none, and the story asked for was told about half the time.
+    named = not _personless(data, settings) and (
         settings.include_name
         if settings.include_name is not None
         else (_name_fits(data, frames, settings, language) and chance(50))

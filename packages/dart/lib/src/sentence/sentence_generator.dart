@@ -3845,6 +3845,15 @@ Map<SentenceSlot, LengthRange> _roomFor(WordLanguage language, bool? includeName
 /// outright the generator writes one anyway, the same way it answers a range too
 /// narrow for the parts it was told to carry; drawn, it is one more thing to
 /// decide against the room.
+/// Whether the story the caller named is one no person can be the hero of.
+bool _personless(SentenceLanguageData data, _Settings settings) {
+  if (settings.sentences <= 1) return false;
+
+  final story = stories.where((each) => each.name == settings.story).firstOrNull;
+
+  return story != null && heroClassesFor(data, story, const [NounClass.person]).isEmpty;
+}
+
 bool _nameFits(
   SentenceLanguageData data,
   List<SentenceFrame> frames,
@@ -3972,10 +3981,14 @@ _Result _generateResult(WordLanguage language, _Settings settings) {
         ..._framesFor(data, settings, _moodFor(mark)),
   ];
   // A result either has a person in it or does not; deciding that per sentence
-  // would put a name in one line of a paragraph and not the next.
+  // would put a name in one line of a paragraph and not the next. A story the
+  // caller named wins, the way a theme does: a name narrows the hero to people,
+  // `sketch` and `passage` have none, and the story asked for was told about half
+  // the time.
   final named =
-      settings.includeName ??
-      (_nameFits(data, frames, modifierBounds, settings, language) && chance(50));
+      !_personless(data, settings) &&
+      (settings.includeName ??
+          (_nameFits(data, frames, modifierBounds, settings, language) && chance(50)));
   final settled = settings.includeName == named ? settings : settings.naming(named);
   // And the budget is measured against what a named result actually writes: one
   // word where a noun phrase would have written an article, a modifier and a noun.

@@ -44,7 +44,6 @@ A fix to a generator added under `vNext` needs no changelog entry of its own, si
 
 ### A. No decision needed
 
-- **A34. The drawn `includeName` overrides an explicit `story`.** A drawn name narrows the hero to people, and `sketch` and `passage` have no person hero, so `story: 'sketch'` is told half the time. Draw a name only when the story asked for can have a person hero.
 - **A35. `startsWith` invents nouns at `realism: 'real'` in steered languages.** The subject's theme is chosen before the prefix is considered, and `drawWord`'s `missed` is ignored: `ko '여'` invents 87 of 400 subjects, `zh '大'` 168. Choose among the themes that have a word with the prefix.
 - **A36. German quoted lines put the verb first.** A spoken line drops its `time` part after the shape was chosen, and German's verb-second shapes then open on the verb (`„Ist eine Vorstadt sonnig.“`, 102 of 1,037). Leave shapes with a time part out for a spoken line instead.
 - **A37. German writes `streckte sich er`.** A pronoun subject after a reflexive verb goes before `sich`. 295 of 10,000 story sentences.

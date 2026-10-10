@@ -3314,6 +3314,31 @@ describe('Sentence', () => {
 		}
 	});
 
+	it('a story the caller named is told, whatever is decided about names', () => {
+		// A name narrows the hero to people, and `sketch` and `passage` have none: a
+		// name drawn for the result told another story about half the time, and one
+		// asked for told another every time.
+		for (const story of ['sketch', 'passage'] as const) {
+			for (const includeName of [undefined, true]) {
+				for (const language of ['en', 'ko'] as const) {
+					const told = randSentence({
+						language,
+						story,
+						includeName,
+						sentences: 4,
+						count: 40,
+						output: 'detail'
+					});
+
+					assert.ok(
+						told.every((detail) => detail.story === story),
+						`${language} ${story}`
+					);
+				}
+			}
+		}
+	});
+
 	it('a story moves its day forward, and never back', () => {
 		for (const language of WORD_LANGUAGES) {
 			const day = SENTENCE_DATA[language].times.day;

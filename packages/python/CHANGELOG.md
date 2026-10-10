@@ -2,6 +2,7 @@
 
 ## vNext (2026--)
 
+- `rand_sentence` tells the `story` it was asked for whatever is decided about names. A name narrows the hero to people, and `sketch` and `passage` have none, so a name drawn for the result told another story about half the time; a story with no person in it now wins over `include_name` the way a `theme` does.
 - `rand_sentence` keeps a modifier `include` asked for when it writes a name. A name takes no modifier, and the name drawn for a result in two was written over the subject the modifier was meant for: `include="brave"` lost `brave` in about a third of the results.
 - `Lemonade` is an English drink rather than a food: `rand_drink` draws it, `rand_food` no longer does, and a sentence drinks it rather than eating it.
 - A `realism` `rand_nickname` does not know is `"real"` in every respect: it invented nothing, but still let the colour, finance and tech themes into `theme="all"`.
