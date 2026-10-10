@@ -2,6 +2,7 @@
 
 ## vNext (2026--)
 
+- `randSentence` is 12 KB smaller, gzipped. The Japanese verbs are written once in their dictionary form, and their polite, past and linking forms are worked out from it rather than spelt out four more times.
 - `nameLengthRange`, `nameSupportsMiddleName` and `nameSupportsRoman` bundle in about half a kilobyte each, gzipped; they carried every name pool, 18 KB, because what they read sat in the same objects as the names.
 - `randModifier` reads a `language` it does not know as one left out, so the value's own script decides; it threw. A value such as `constructor` or `toString` is no longer taken for a Spanish noun because the gender lookup inherited it from `Object.prototype`.
 - A `null` option is read as left out, the way the Dart and Python packages read one. `count: null` returned nothing, `maxAge: null` an age of zero and `maxLength: null` the shortest names there are, and every generator threw on a `null` options object, `randName(null)` included.

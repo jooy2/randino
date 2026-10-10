@@ -44,7 +44,6 @@ A fix to a generator added under `vNext` needs no changelog entry of its own, si
 
 ### A. No decision needed
 
-- **A15. The Japanese sentence data spells out five forms of every verb.** 805 of 847 verbs follow from the dictionary form, and the rest from rules for `〜ていく` and `〜てくる`. Writing the dictionary form and the verb class, the way `koVerbs` does for Korean, saves about 12 KB gzipped on `randSentence`. The parsed data must come out identical; `tools/emit` rewrites the ports.
 - **A16. A constant drags in its catalog.** `CPU_VENDORS`, `GPU_VENDORS`, `DEVICE_TYPES`, `FILE_CATEGORIES`, `MIME_TOP_LEVELS`, `PHONE_COUNTRIES` and `DATE_UNITS` sit beside a top-level `rows(...)` or `words(...)` call a bundler cannot drop, so importing the constant alone costs 1.1 to 2.7 KB. Move the constants to modules of their own.
 - **A17. The home hero image is 193 KB.** A WebP of `docs/public/512x512.png` is 26 KB. Keep the PNG for `og:image`.
 - **A18. Dead code and stray comments.** `nameFits` has an unused `bounds` parameter; `sentenceGenerator.ts` has doc blocks attached to the wrong function near lines 1254, 1315, 3606 and 3698 and duplicated comments near 322 and 3780; `docs/.vitepress/data/sidebar.ts` has an orphaned block above `pagesOf`.
@@ -107,7 +106,7 @@ A fix to a generator added under `vNext` needs no changelog entry of its own, si
 
 ### Found while working
 
-Nothing yet.
+- **A72. Japanese verbs that already carry an object take a second one.** A verb written with its own `を` (`値をつける`) sits in a group that takes an object, so a sentence writes `電話を値をつけます`. Move those verbs to a group without an object, or give the frame the particle the verb needs (`電話に値をつける`), in the JavaScript data; `tools/emit` carries it to the ports.
 
 ## Further ideas, not yet agreed
 
