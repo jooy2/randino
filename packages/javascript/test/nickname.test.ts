@@ -257,6 +257,12 @@ describe('Nickname', () => {
 			assert.ok(!LOOSE_THEMES.includes(detail.theme!), `${detail.nickname}: ${detail.theme}`);
 		}
 
+		// A level the package does not know is the default here too, as it already
+		// was for what gets invented.
+		for (const detail of nicknameDetails({ realism: 'bogus' as never, count: 400 })) {
+			assert.ok(!LOOSE_THEMES.includes(detail.theme!), `${detail.nickname}: ${detail.theme}`);
+		}
+
 		const loosened = new Set(
 			nicknameDetails({ realism: 'mixed', count: 400 }).map((detail) => detail.theme)
 		);

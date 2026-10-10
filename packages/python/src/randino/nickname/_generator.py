@@ -512,7 +512,9 @@ def generate_nickname_details(
         theme=resolve_theme(theme),
         slots=resolve_slots(slots),
         invent=resolve_realism(realism),
-        loose=realism != "real",
+        # Read off the resolved level, so a `realism` the package does not know is
+        # `"real"` here too, as it already was for what gets invented.
+        loose=resolve_realism(realism) > 0,
         vocabulary=resolve_vocabulary(vocabulary),
         min_length=resolve_length(min_length),
         max_length=resolve_length(max_length),

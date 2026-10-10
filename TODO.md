@@ -44,7 +44,6 @@ A fix to a generator added under `vNext` needs no changelog entry of its own, si
 
 ### A. No decision needed
 
-- **A31. `randNickname` reads `realism` before resolving it.** `realism: 'bogus'` invents nothing yet opens the loose themes. Derive `loose` from the resolved chance.
 - **A32. `Lemonade` is in the English `food` pool.** It belongs in `drink`, in all three packages.
 - **A33. A required modifier is dropped when the subject is a name.** `includeName` is drawn per result, and a named subject takes no modifier, so `include: 'brave'` is missing from 112 of 300 results. Do not write a name over a part the plan put a requirement on.
 - **A34. The drawn `includeName` overrides an explicit `story`.** A drawn name narrows the hero to people, and `sketch` and `passage` have no person hero, so `story: 'sketch'` is told half the time. Draw a name only when the story asked for can have a person hero.

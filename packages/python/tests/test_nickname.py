@@ -8,7 +8,7 @@ person-name pools.
 
 import re
 from collections.abc import Sequence
-from typing import get_args
+from typing import Any, get_args
 
 from randino import (
     RAND_COUNT_MAX,
@@ -228,6 +228,12 @@ def test_realism_decides_which_themes_all_spans() -> None:
     # A modifier in front of a colour or a loan reads as a joke, so those themes wait
     # for the caller to loosen `realism` — or to name one.
     for detail in rand_nickname(output="detail", count=400):
+        assert detail.theme not in LOOSE_THEMES, f"{detail.nickname}: {detail.theme}"
+
+    # A level the package does not know is the default here too, as it already was for
+    # what gets invented.
+    loose: Any = rand_nickname
+    for detail in loose(output="detail", realism="bogus", count=400):
         assert detail.theme not in LOOSE_THEMES, f"{detail.nickname}: {detail.theme}"
 
     loosened = {

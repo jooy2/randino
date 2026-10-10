@@ -517,7 +517,9 @@ function resolveSettings(options: RandNicknameOptions): Settings {
 		theme: resolveTheme(options.theme),
 		slots: resolveSlots(options.slots),
 		invent: resolveRealism(options.realism),
-		loose: (options.realism ?? 'real') !== 'real',
+		// Read off the resolved level, so a `realism` the package does not know is
+		// `'real'` here too, as it already was for what gets invented.
+		loose: resolveRealism(options.realism) > 0,
 		vocabulary: resolveVocabulary(options.vocabulary),
 		minLength: resolveLength(options.minLength),
 		maxLength: resolveLength(options.maxLength),
