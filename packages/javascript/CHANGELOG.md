@@ -2,6 +2,7 @@
 
 ## vNext (2026--)
 
+- `randSuffix` and `randPrefix` draw whole characters from a `charset` that holds emoji or any other character outside the Basic Multilingual Plane. They drew UTF-16 code units, which split `🎲` into two halves that are no character.
 - `randModifier` gives a German noun written in lower case the gender the noun has: `katze` takes a feminine modifier, as `Katze` does. It was read by its ending and came back `flinker katze`.
 - An invented Russian surname takes the feminine form beside a woman's name, the way a real one does. `realism: 'invented'` and `'mixed'` wrote `Чачев` beside a woman's given name.
 - `randName` with `startsWith` and a tight `maxLength` draws a real name wherever one starts with the character. When no name of the right length did, it invented one at `realism: 'real'` too (`Zeahos Cox` beside `Zachary King`).

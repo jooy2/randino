@@ -85,11 +85,15 @@ String capitalizeFirst(String value) =>
     value.isEmpty ? value : value[0].toUpperCase() + value.substring(1);
 
 /// Random string of [length] characters drawn from [charset].
+///
+/// Characters, not UTF-16 code units: indexing the string itself split `🎲`
+/// into two halves that are no character at all.
 String randToken(int length, String charset) {
+  final characters = charset.runes.toList(growable: false);
   final buffer = StringBuffer();
 
   for (var i = 0; i < length; i += 1) {
-    buffer.write(charset[_source.nextInt(charset.length)]);
+    buffer.writeCharCode(characters[_source.nextInt(characters.length)]);
   }
 
   return buffer.toString();

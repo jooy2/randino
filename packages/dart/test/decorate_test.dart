@@ -76,6 +76,11 @@ void main() {
           randSuffix(value: 'Owl', separator: '', length: 1),
           matches(RegExp(r'^Owl[0-9A-Za-z]$')),
         );
+        // A charset is characters, not UTF-16 code units: each die is whole.
+        expect(
+          randSuffix(charset: '🎲🎯🎮', length: 4),
+          matches(RegExp(r'^[🎲🎯🎮]{4}$', unicode: true)),
+        );
       }
     });
 

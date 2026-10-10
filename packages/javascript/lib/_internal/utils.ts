@@ -104,12 +104,17 @@ export function capitalizeFirst(value: string): string {
 	return value ? value.charAt(0).toUpperCase() + value.slice(1) : value;
 }
 
-/** Random string of `length` characters drawn from `charset`. */
+/**
+ * Random string of `length` characters drawn from `charset`. Characters, not
+ * UTF-16 code units: indexing the string itself split `🎲` into two halves that
+ * are no character at all.
+ */
 export function randToken(length: number, charset: string): string {
+	const characters = Array.from(charset);
 	let out = '';
 
 	for (let i = 0; i < length; i += 1) {
-		out += charset.charAt(Math.floor(random() * charset.length));
+		out += characters[Math.floor(random() * characters.length)];
 	}
 
 	return out;

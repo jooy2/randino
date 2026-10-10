@@ -83,6 +83,8 @@ describe('Decorate', () => {
 			assert.match(randSuffix('사자', { length: 4, charset: '0123456789' }), /^사자_[0-9]{4}$/);
 			// An empty separator is a choice, not a missing value.
 			assert.match(randSuffix('Owl', { separator: '', length: 1 }), /^Owl[0-9A-Za-z]$/);
+			// A charset is characters, not UTF-16 code units: each die is whole.
+			assert.match(randSuffix({ charset: '🎲🎯🎮', length: 4 }), /^[🎲🎯🎮]{4}$/u);
 		}
 	});
 

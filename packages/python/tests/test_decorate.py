@@ -77,6 +77,8 @@ def test_length_separator_and_charset_are_all_configurable() -> None:
         assert re.fullmatch(r"사자_[0-9]{4}", rand_suffix("사자", length=4, charset="0123456789"))
         # An empty separator is a choice, not a missing value.
         assert re.fullmatch(r"Owl[0-9A-Za-z]", rand_suffix("Owl", separator="", length=1))
+        # A charset is characters: each die is whole.
+        assert re.fullmatch(r"[🎲🎯🎮]{4}", rand_suffix(charset="🎲🎯🎮", length=4))
 
 
 def test_length_is_clamped_to_at_least_one_character_and_at_most_the_maximum() -> None:
