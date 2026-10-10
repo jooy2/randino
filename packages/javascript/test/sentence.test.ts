@@ -1151,6 +1151,36 @@ describe('Sentence', () => {
 		);
 	});
 
+	it('a subject led by `startsWith` is a real noun where the pools have one', () => {
+		// The theme used to be chosen before the word, so a theme with nothing on the
+		// character invented one at `realism: 'real'` — `여젤은 시들합니다` — while
+		// another theme had `여우`.
+		for (const [language, prefix] of [
+			['ko', '여'],
+			['ko', '사'],
+			['zh', '大']
+		] as [WordLanguage, string][]) {
+			const nouns = Object.values(WORD_DATA[language].nouns).flat();
+
+			for (const detail of randSentence({
+				language,
+				startsWith: prefix,
+				includeName: false,
+				count: SAMPLE,
+				output: 'detail'
+			})) {
+				if (detail.slots[0] === 'subject') {
+					const phrase = detail.phrases[0];
+
+					assert.ok(
+						nouns.some((noun) => phrase.endsWith(noun)),
+						`${language}: ${detail.sentence}`
+					);
+				}
+			}
+		}
+	});
+
 	it('sentences start with `startsWith`', () => {
 		for (const [language, prefix] of [
 			['ko', '사'],

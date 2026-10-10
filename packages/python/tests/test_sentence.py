@@ -863,6 +863,30 @@ def test_sentences_respect_the_length_range() -> None:
             )
 
 
+def test_a_subject_led_by_starts_with_is_a_real_noun_where_the_pools_have_one() -> None:
+    # The theme used to be chosen before the word, so a theme with nothing on the
+    # character invented one at `realism="real"` — `여젤은 시들합니다` — while another
+    # theme had `여우`.
+    cases: list[tuple[WordLanguage, str]] = [("ko", "여"), ("ko", "사"), ("zh", "大")]
+
+    for language, prefix in cases:
+        nouns = [noun for pool in WORD_DATA[language].nouns.values() for noun in pool]
+
+        for detail in rand_sentence(
+            language=language,
+            starts_with=prefix,
+            include_name=False,
+            count=SAMPLE,
+            output="detail",
+        ):
+            if detail.slots[0] == "subject":
+                phrase = detail.phrases[0]
+
+                assert any(phrase.endswith(noun) for noun in nouns), (
+                    f"{language}: {detail.sentence}"
+                )
+
+
 def test_sentences_start_with_starts_with() -> None:
     cases: list[tuple[WordLanguage, str]] = [("ko", "사"), ("ja", "空"), ("zh", "雨")]
 

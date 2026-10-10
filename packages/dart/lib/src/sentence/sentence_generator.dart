@@ -262,6 +262,7 @@ class _Settings {
     required this.prefix,
     required this.include,
     required this.classified,
+    required this.leading,
     required this.sentences,
     required this.realism,
     required this.includeName,
@@ -295,6 +296,11 @@ class _Settings {
   /// first time a language is asked. One map per call, shared by every result of
   /// it.
   final Map<WordLanguage, List<_Requirement>> classified;
+
+  /// Whether a subject pool holds a word on [prefix], filled in by
+  /// [_holdsPrefix]. One map per call, like [classified]; keyed by the pool,
+  /// which is held per group and theme for the life of the program.
+  final Map<WordPool, bool> leading;
 
   /// How many sentences one result holds, clamped.
   final int sentences;
@@ -342,6 +348,7 @@ class _Settings {
     prefix: prefix,
     include: include,
     classified: classified,
+    leading: leading,
     sentences: sentences,
     realism: realism,
     includeName: named,
@@ -1787,6 +1794,16 @@ bool _acceptsNoun(SentenceLanguageData data, Object group, String noun) {
 }
 
 /// The nouns of a theme a group's subject may be drawn from.
+/// Whether [pool] holds a word on the character `startsWith` asked for.
+///
+/// Kept per call in [settings]: a sentence asks it of every group and theme it
+/// considers, and the pools are held per group and theme already.
+bool _holdsPrefix(_Settings settings, WordPool pool) => settings.leading.putIfAbsent(pool, () {
+  final lower = settings.prefix.toLowerCase();
+
+  return pool.any((word) => word.toLowerCase().startsWith(lower));
+});
+
 WordPool _subjectPoolFor(
   WordLanguage language,
   SentenceLanguageData data,
@@ -2403,48 +2420,9 @@ _Built _compose(
             beat,
             _subjectNounOf(frame, plan, follow),
           );
-  final StateGroup? stateGroup = headed ? pick(states.isNotEmpty ? states : data.states) : null;
-  final VerbGroup? verbGroup =
-      headed
-          ? null
-          : pick(
-            verbs.isNotEmpty
-                ? verbs
-                : data.verbs
-                    .where(
-                      (group) =>
-                          (group.object != null) == _takesObject(frame) &&
-                          (group.requires == null ||
-                              frame.parts.any((part) => part.slot == group.requires)) &&
-                          (!frame.parts.any((part) => part.slot == SentenceSlot.destination) ||
-                              group.requires == SentenceSlot.destination),
-                    )
-                    .toList(growable: false),
-          );
-  // The same predicates, in the form this type of sentence ends on, in the tense
-  // the result is in — or in the form that links a first clause to the one after
-  // it. Index-aligned with the plain words, which is what lets a required word be
-  // translated rather than written out in the wrong form.
-  final base = stateGroup?.words ?? verbGroup!.words;
-  final predicates = _formOf(
-    stateGroup,
-    verbGroup,
-    draw.mark,
-    draw.style,
-    draw.tense,
-    draw.link == JoinSide.first ? data.join : null,
-  );
-  final Object group = stateGroup ?? verbGroup!;
-  final subjectThemes = _subjectThemesOf(language, data, group, themes, settings.vocabulary);
   // Which part is the subject is the shape's business, not the slot's: a counted
   // shape has no `subject` part and its quantity is the subject.
   final subjectSlot = _subjectSlotOf(frame);
-  final subjectRequired = _requiredAt(frame, plan, subjectSlot);
-  // A theme the caller named is honoured even when no verb group of the language
-  // has anything to say about it. Written out: `??` would otherwise infer `pick`'s
-  // type argument from the nullable left-hand side, and hand back a `WordTheme?`.
-  final WordTheme subjectTheme =
-      subjectRequired?.theme ?? pick<WordTheme>(subjectThemes.isNotEmpty ? subjectThemes : themes);
   // A sentence carrying on about the topic stands a pronoun where its subject
   // would go, and the languages that drop their subject stand nothing there at
   // all — in which case the phrase is not in the shape to carry an article, a
@@ -2484,6 +2462,95 @@ _Built _compose(
       at.add(i);
     }
   }
+
+  // A sentence opening on its subject with nothing in front of it leads with the
+  // subject's first character, so the predicate and then the subject's theme are
+  // chosen among the ones that have a word on the character `startsWith` asked
+  // for. Chosen first and filled in after, a theme with nothing on it invented a
+  // word even at `realism: RandRealism.real` — `여젤은 시들합니다` — while
+  // another had `여우`.
+  final leading =
+      follow == null &&
+              data.articles == null &&
+              shape.isNotEmpty &&
+              shape.first.slot == subjectSlot &&
+              shape.first.head == null &&
+              _requiredAt(frame, plan, subjectSlot) == null
+          ? settings.prefix
+          : '';
+  bool leads(Object group) => _subjectThemesOf(
+    language,
+    data,
+    group,
+    themes,
+    settings.vocabulary,
+  ).any(
+    (theme) =>
+        _holdsPrefix(settings, _subjectPoolFor(language, data, group, theme, settings.vocabulary)),
+  );
+  List<T> leadingOf<T extends Object>(List<T> groups) {
+    if (leading.isEmpty) return groups;
+
+    final held = groups.where(leads).toList(growable: false);
+
+    return held.isNotEmpty ? held : groups;
+  }
+
+  final StateGroup? stateGroup =
+      headed ? pick(leadingOf(states.isNotEmpty ? states : data.states)) : null;
+  final VerbGroup? verbGroup =
+      headed
+          ? null
+          : pick(
+            leadingOf(
+              verbs.isNotEmpty
+                  ? verbs
+                  : data.verbs
+                      .where(
+                        (group) =>
+                            (group.object != null) == _takesObject(frame) &&
+                            (group.requires == null ||
+                                frame.parts.any((part) => part.slot == group.requires)) &&
+                            (!frame.parts.any((part) => part.slot == SentenceSlot.destination) ||
+                                group.requires == SentenceSlot.destination),
+                      )
+                      .toList(growable: false),
+            ),
+          );
+  // The same predicates, in the form this type of sentence ends on, in the tense
+  // the result is in — or in the form that links a first clause to the one after
+  // it. Index-aligned with the plain words, which is what lets a required word be
+  // translated rather than written out in the wrong form.
+  final base = stateGroup?.words ?? verbGroup!.words;
+  final predicates = _formOf(
+    stateGroup,
+    verbGroup,
+    draw.mark,
+    draw.style,
+    draw.tense,
+    draw.link == JoinSide.first ? data.join : null,
+  );
+  final Object group = stateGroup ?? verbGroup!;
+  final subjectThemes = _subjectThemesOf(language, data, group, themes, settings.vocabulary);
+  final subjectRequired = _requiredAt(frame, plan, subjectSlot);
+  // A theme the caller named is honoured even when no verb group of the language
+  // has anything to say about it. Written out: `??` would otherwise infer `pick`'s
+  // type argument from the nullable left-hand side, and hand back a `WordTheme?`.
+  final offeredThemes = subjectThemes.isNotEmpty ? subjectThemes : themes;
+  final leadingThemes =
+      leading.isEmpty
+          ? const <WordTheme>[]
+          : offeredThemes
+              .where(
+                (theme) => _holdsPrefix(
+                  settings,
+                  _subjectPoolFor(language, data, group, theme, settings.vocabulary),
+                ),
+              )
+              .toList(growable: false);
+  final WordTheme subjectTheme =
+      subjectRequired?.theme ??
+      pick<WordTheme>(leadingThemes.isNotEmpty ? leadingThemes : offeredThemes);
 
   // Only a shape that opens on a noun phrase with nothing in front of it can
   // honour `startsWith`; anywhere else the sentence opens on an article, a
@@ -5195,6 +5262,7 @@ List<SentenceDetail> generateSentenceDetails({
     prefix: resolvePrefix(startsWith),
     include: include.map((word) => word.trim()).where((word) => word.isNotEmpty).toList(),
     classified: <WordLanguage, List<_Requirement>>{},
+    leading: Map<WordPool, bool>.identity(),
     sentences: clampInt(sentences, 1, randSentenceCountMax),
     realism: realism,
     includeName: includeName,

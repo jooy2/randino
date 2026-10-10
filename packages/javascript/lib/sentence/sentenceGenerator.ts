@@ -320,6 +320,9 @@ type Settings = {
 	// `include` as each language reads it, filled in by `requirementsOf` the first
 	// time a language is asked. One map per call, shared by every result of it.
 	classified: Map<WordLanguage, readonly Requirement[]>;
+	// Whether a subject pool holds a word on `prefix`, filled in by `holdsPrefix`.
+	// One map per call, like `classified`.
+	leading: Map<WordPool, boolean>;
 	// How many sentences one result holds, clamped.
 	sentences: number;
 	// Whether a sentence about a person writes a name, or null when the caller left
@@ -1678,6 +1681,24 @@ function acceptsNoun(
 	return !group.subjectWithout?.some((trait) => traits.includes(trait));
 }
 
+/**
+ * Whether a pool holds a word on the character `startsWith` asked for. Kept per
+ * call in `settings`, keyed by the pool: a sentence asks it of every group and
+ * theme it considers, and the pools are held per group and theme already.
+ */
+function holdsPrefix(settings: Settings, pool: WordPool): boolean {
+	let holds = settings.leading.get(pool);
+
+	if (holds === undefined) {
+		const lower = settings.prefix.toLowerCase();
+
+		holds = pool.some((word) => word.toLowerCase().startsWith(lower));
+		settings.leading.set(pool, holds);
+	}
+
+	return holds;
+}
+
 /** The nouns of a theme a group's subject may be drawn from. */
 function subjectPoolFor(
 	language: WordLanguage,
@@ -2526,30 +2547,11 @@ function compose(
 						draw.beat,
 						subjectNounOf(frame, plan, follow)
 					) as (StateGroup | VerbGroup)[]);
-	const group = pick(groups.length ? groups : headedFallback(data, frame, headed));
-	// The same predicates, in the form this type of sentence ends on, in the tense
-	// the result is in — or in the form that links a first clause to the one after
-	// it. Index-aligned with `group.words`, which is what lets a required word be
-	// translated rather than written out in the wrong form.
-	const predicates = formOf(
-		group,
-		draw.mark,
-		draw.style,
-		draw.tense,
-		draw.link === 'first' ? data.join : undefined
-	);
-	const subjectThemes = subjectThemesOf(group, themes, language, data, settings.vocabulary);
 	// Which part is the subject is the shape's business, not the slot's: a counted
 	// shape has no `subject` part and its quantity is the subject. Looking for a
 	// `subject` part regardless is how a word required into a counted subject lost
 	// its theme, and `사과` came out as `사과 9명` — nine people's worth of apple.
 	const subjectSlot = subjectSlotOf(frame);
-	const subjectRequired = requiredAt(frame, plan, subjectSlot);
-	// A theme the caller named is honoured even when no verb group of the language
-	// has anything to say about it, the same way a shape it cannot make falls back
-	// rather than being answered with something else entirely.
-	const subjectTheme =
-		subjectRequired?.theme ?? pick(subjectThemes.length ? subjectThemes : themes);
 	// A sentence carrying on about the topic stands a pronoun where its subject
 	// would go, and the languages that drop their subject stand nothing there at
 	// all — in which case the phrase is not in the shape to carry an article, a
@@ -2593,7 +2595,53 @@ function compose(
 			shape.push({ part, at });
 		}
 	});
+	// A sentence opening on its subject with nothing in front of it leads with the
+	// subject's first character, so the predicate and then the subject's theme are
+	// chosen among the ones that have a word on the character `startsWith` asked
+	// for. Chosen first and filled in after, a theme with nothing on it invented a
+	// word even at `realism: 'real'` — `여젤은 시들합니다` — while another had `여우`.
+	const leading =
+		!follow &&
+		!data.articles &&
+		shape[0]?.part.slot === subjectSlot &&
+		!shape[0].part.head &&
+		!requiredAt(frame, plan, subjectSlot)
+			? settings.prefix
+			: '';
+	const offered = groups.length ? groups : headedFallback(data, frame, headed);
+	const leadingGroups = leading
+		? offered.filter((each) =>
+				subjectThemesOf(each, themes, language, data, settings.vocabulary).some((theme) =>
+					holdsPrefix(settings, subjectPoolFor(language, data, each, theme, settings.vocabulary))
+				)
+			)
+		: [];
+	const group = pick(leadingGroups.length ? leadingGroups : offered);
+	// The same predicates, in the form this type of sentence ends on, in the tense
+	// the result is in — or in the form that links a first clause to the one after
+	// it. Index-aligned with `group.words`, which is what lets a required word be
+	// translated rather than written out in the wrong form.
+	const predicates = formOf(
+		group,
+		draw.mark,
+		draw.style,
+		draw.tense,
+		draw.link === 'first' ? data.join : undefined
+	);
+	const subjectThemes = subjectThemesOf(group, themes, language, data, settings.vocabulary);
+	const subjectRequired = requiredAt(frame, plan, subjectSlot);
 
+	// A theme the caller named is honoured even when no verb group of the language
+	// has anything to say about it, the same way a shape it cannot make falls back
+	// rather than being answered with something else entirely.
+	const offeredThemes = subjectThemes.length ? subjectThemes : themes;
+	const leadingThemes = leading
+		? offeredThemes.filter((theme) =>
+				holdsPrefix(settings, subjectPoolFor(language, data, group, theme, settings.vocabulary))
+			)
+		: [];
+	const subjectTheme =
+		subjectRequired?.theme ?? pick(leadingThemes.length ? leadingThemes : offeredThemes);
 	// Every phrase's theme is settled before any of them is drawn, because a length
 	// budget is only as good as the pools it was measured against. Left to the loop,
 	// each phrase was given the room the language's longest noun would need and
@@ -5085,6 +5133,7 @@ function resolveSettings(options: RandSentenceOptions): Settings {
 		prefix: resolvePrefix(options.startsWith),
 		include: resolveInclude(options.include),
 		classified: new Map(),
+		leading: new Map(),
 		sentences: resolveWhole(options.sentences, 1, 1, RAND_SENTENCE_COUNT_MAX),
 		// A sentence is read, so it keeps to the words people use unless asked
 		// otherwise; a word asked for on its own is a word.

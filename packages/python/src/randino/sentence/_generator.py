@@ -423,6 +423,13 @@ class Settings:
     time a language is asked. One dict per call, shared by every result of it.
     """
 
+    leading: dict[int, bool] = field(default_factory=dict)
+    """Whether a subject pool holds a word on `prefix`, by the pool's identity.
+
+    Filled in by `_holds_prefix`; one dict per call, like `classified`. The pools are
+    held per group and theme for the life of the process, so an identity is never reused.
+    """
+
 
 QUOTED_TYPES: tuple[SentenceType, ...] = ("dialogue", "thought")
 """The kinds that are a line somebody says or thinks rather than prose about it."""
@@ -2011,6 +2018,22 @@ def _accepts_noun(data: SentenceLanguageData, group: VerbGroup | StateGroup, nou
     return group.subject_without is None or not any(t in traits for t in group.subject_without)
 
 
+def _holds_prefix(settings: Settings, pool: WordPool) -> bool:
+    """Whether a pool holds a word on the character `starts_with` asked for.
+
+    Kept per call in `settings`: a sentence asks it of every group and theme it
+    considers, and the pools are held per group and theme already.
+    """
+    holds = settings.leading.get(id(pool))
+
+    if holds is None:
+        lower = settings.prefix.lower()
+        holds = any(word.lower().startswith(lower) for word in pool)
+        settings.leading[id(pool)] = holds
+
+    return holds
+
+
 def _subject_pool_for(
     language: WordLanguage,
     data: SentenceLanguageData,
@@ -2697,64 +2720,9 @@ def _compose(
     # A shape whose predicate has nothing to say about the requested subject only
     # gets this far when no shape of the language did, so the fallback is the same
     # best effort every other narrowing here makes.
-    state_group: StateGroup | None = None
-    verb_group: VerbGroup | None = None
-
-    if headed:
-        states = (
-            [data.calendar.copula]
-            if copular and data.calendar is not None
-            else _state_groups_for(language, data, settings.vocabulary, themes, frame, plan, beat)
-            or list(data.states)
-        )
-        state_group = pick(states)
-        chosen: VerbGroup | StateGroup = state_group
-        base = state_group.words
-    else:
-        verbs = _verb_groups_for(
-            language,
-            data,
-            settings.vocabulary,
-            frame,
-            themes,
-            plan,
-            beat,
-            _subject_noun_of(frame, plan, follow),
-        ) or [
-            group
-            for group in data.verbs
-            if (group.object is not None) == wants_object
-            and (group.requires is None or any(part.slot == group.requires for part in frame.parts))
-            and (not wants_destination or group.requires == "destination")
-        ]
-        verb_group = pick(verbs)
-        chosen = verb_group
-        base = verb_group.words
-
-    # The same predicates, in the form this type of sentence ends on, in the tense the
-    # result is in — or in the form that links a first clause to the one after it.
-    # Index-aligned with the plain words, which is what lets a required word be
-    # translated rather than written out in the wrong form.
-    predicates = _form_of(
-        state_group,
-        verb_group,
-        draw.mark,
-        draw.style,
-        draw.tense,
-        data.join if draw.link == "first" else None,
-    )
-    subject_themes = _subject_themes_of(language, data, chosen, themes, settings.vocabulary)
     # Which part is the subject is the shape's business, not the slot's: a counted
     # shape has no `subject` part and its quantity is the subject.
     subject_slot = _subject_slot_of(frame)
-    subject_required = _required_at(frame, plan, subject_slot)
-    # A theme the caller named is honoured even when no verb group of the language
-    # has anything to say about it.
-    subject_theme = (
-        subject_required.theme
-        if subject_required is not None and subject_required.theme is not None
-        else pick(subject_themes or themes)
-    )
     # A sentence carrying on about the topic stands a pronoun where its subject would
     # go, and the languages that drop their subject stand nothing there at all — in
     # which case the phrase is not in the shape to carry an article, a modifier or a
@@ -2796,6 +2764,97 @@ def _compose(
         if part.slot != "subject" or pronoun is None or pronoun:
             shape.append(part)
             at.append(index)
+
+    # A sentence opening on its subject with nothing in front of it leads with the
+    # subject's first character, so the predicate and then the subject's theme are chosen
+    # among the ones that have a word on the character `starts_with` asked for. Chosen
+    # first and filled in after, a theme with nothing on it invented a word even at
+    # `realism="real"` — `여젤은 시들합니다` — while another had `여우`.
+    leading = (
+        settings.prefix
+        if follow is None
+        and data.articles is None
+        and shape
+        and shape[0].slot == subject_slot
+        and not shape[0].head
+        and _required_at(frame, plan, subject_slot) is None
+        else ""
+    )
+
+    def leads(group: VerbGroup | StateGroup) -> bool:
+        return any(
+            _holds_prefix(
+                settings, _subject_pool_for(language, data, group, theme, settings.vocabulary)
+            )
+            for theme in _subject_themes_of(language, data, group, themes, settings.vocabulary)
+        )
+
+    state_group: StateGroup | None = None
+    verb_group: VerbGroup | None = None
+
+    if headed:
+        states = (
+            [data.calendar.copula]
+            if copular and data.calendar is not None
+            else _state_groups_for(language, data, settings.vocabulary, themes, frame, plan, beat)
+            or list(data.states)
+        )
+        state_group = pick(
+            [group for group in states if leads(group)] or states if leading else states
+        )
+        chosen: VerbGroup | StateGroup = state_group
+        base = state_group.words
+    else:
+        verbs = _verb_groups_for(
+            language,
+            data,
+            settings.vocabulary,
+            frame,
+            themes,
+            plan,
+            beat,
+            _subject_noun_of(frame, plan, follow),
+        ) or [
+            group
+            for group in data.verbs
+            if (group.object is not None) == wants_object
+            and (group.requires is None or any(part.slot == group.requires for part in frame.parts))
+            and (not wants_destination or group.requires == "destination")
+        ]
+        verb_group = pick([group for group in verbs if leads(group)] or verbs if leading else verbs)
+        chosen = verb_group
+        base = verb_group.words
+
+    # The same predicates, in the form this type of sentence ends on, in the tense the
+    # result is in — or in the form that links a first clause to the one after it.
+    # Index-aligned with the plain words, which is what lets a required word be
+    # translated rather than written out in the wrong form.
+    predicates = _form_of(
+        state_group,
+        verb_group,
+        draw.mark,
+        draw.style,
+        draw.tense,
+        data.join if draw.link == "first" else None,
+    )
+    subject_themes = _subject_themes_of(language, data, chosen, themes, settings.vocabulary)
+    subject_required = _required_at(frame, plan, subject_slot)
+    # A theme the caller named is honoured even when no verb group of the language
+    # has anything to say about it.
+    offered_themes = subject_themes or themes
+    leading_themes = [
+        theme
+        for theme in offered_themes
+        if leading
+        and _holds_prefix(
+            settings, _subject_pool_for(language, data, chosen, theme, settings.vocabulary)
+        )
+    ]
+    subject_theme = (
+        subject_required.theme
+        if subject_required is not None and subject_required.theme is not None
+        else pick(leading_themes or offered_themes)
+    )
 
     # Only a shape that opens on a noun phrase with nothing in front of it can honour
     # `starts_with`; anywhere else the sentence opens on an article, a preposition or an
