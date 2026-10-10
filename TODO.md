@@ -44,7 +44,6 @@ A fix to a generator added under `vNext` needs no changelog entry of its own, si
 
 ### A. No decision needed
 
-- **A51. Korean copy.** `ko/demo.md` names the button "Generate" where the UI says "생성"; the home tagline is the one sentence in 해요체 and says "별명"; getting-started says "데코레이터" where everything else says "장식 함수".
 - **A52. The `randSentence` docs.** `includeName` is described as off by default in the pages, the JSDoc and both ports' doc comments, where it is drawn per result; the speech paragraph is stale; the `startsWith` section leaves out `ru` and `vi`; "exactly one subject and one predicate" is false; several example sentences are ones the rules now forbid. Regenerate the examples from a build.
 - **A53. Name and word examples.** A 27-character name for a 20-to-25 range, `Naoyato`, a Russian name family-first, `거문고` for `maxLength: 2`, eight themed examples from another theme (`randNature`'s `Sunset`), and four themed functions missing from the `randWord` page.
 - **A54. The decorator docs.** The nickname page says `randSuffix` makes collisions impossible; the default separator is described as nothing where five languages use a space; the Python `language` row of `randNickname` has the wrong default; 57^8 is 1.1 × 10¹⁴, not 3.7 × 10¹⁴; German has six gender rules, not four; six Korean anchors differ from the English ones.
