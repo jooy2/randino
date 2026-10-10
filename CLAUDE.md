@@ -473,6 +473,7 @@ Set up with `uv venv && uv pip install -e ".[dev]"`, or the `pip` equivalent.
 - **Everything public carries a docstring**, including inside `_internal`. Ruff's `D` rules are on, Google convention.
 - **`ruff format` owns formatting** — 4 spaces, double quotes, 100 columns. Double quotes rather than the repo's single because that is what the Python ecosystem's formatters emit; each package follows its own language's convention, which is the same reason Dart uses single.
 - **No dependencies.** `test_base.py` walks every module's imports and asserts each one is either stdlib or `randino`, because that promise is the one nothing else fails on.
+- **The ambient source is a `ContextVar`, not a module global.** A JavaScript call cannot be interrupted, but a Python thread can be, and two threads that each passed their own `random` swapped one global back and forth: a caller who asked for `SystemRandom` was handed draws from somebody else's seed, and one caller's source stayed in place after both had finished. `test_base.py` runs two threads against each other to keep it that way.
 
 ### Where the port is closer to JavaScript than Dart is
 

@@ -3,19 +3,21 @@
 import random as _random
 from collections.abc import Callable, Iterator, MutableSequence, Sequence
 from contextlib import contextmanager
+from contextvars import ContextVar
 from typing import TypeVar
 
 T = TypeVar("T")
 
-_source: Callable[[], float] = _random.random
-"""Where every draw in this package comes from.
+_source: ContextVar[Callable[[], float] | None] = ContextVar("randino_source", default=None)
+"""Where every draw in this package comes from, or None for the `random` module's own.
 
 A source is ambient rather than threaded through every signature, because every
 function here would have to carry it and hand it on: `rand_sentence` alone reaches
 `pick` from some fifty places, through the word generator, the name generator and the
-story planner. The library is synchronous from the entry point down — there is no
-`await` anywhere in it — so nothing can interleave between `with_random` setting this
-and putting it back.
+story planner. It is a context variable rather than a module global because a thread is
+not a call: two threads that each pass their own `random` would otherwise swap the one
+global back and forth, leave one caller's source in place after both had finished, and
+hand a caller who asked for `SystemRandom` a draw from somebody else's seed.
 """
 
 
@@ -30,8 +32,10 @@ def random() -> float:
     Returns:
         A number in `[0, 1)`.
     """
+    source = _source.get()
+
     try:
-        value = float(_source())
+        value = float(source() if source is not None else _random.random())
     except (TypeError, ValueError):
         return 0.0
 
@@ -53,19 +57,16 @@ def with_random(source: Callable[[], float] | None) -> Iterator[None]:
     Yields:
         Nothing; the block runs with the source in place.
     """
-    global _source
-
     if source is None:
         yield
         return
 
-    previous = _source
-    _source = source
+    token = _source.set(source)
 
     try:
         yield
     finally:
-        _source = previous
+        _source.reset(token)
 
 
 def shuffle(items: MutableSequence[T]) -> None:

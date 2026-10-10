@@ -4,6 +4,7 @@ import ast
 import pathlib
 import re
 import sys
+import threading
 from collections.abc import Callable
 from random import Random
 from typing import Any
@@ -500,3 +501,46 @@ def test_random_is_where_every_draw_of_a_call_comes_from() -> None:
 
     # And the package's own source is put back afterwards.
     assert randino.rand_name(count=5) != randino.rand_name(count=5)
+
+
+def test_each_thread_draws_from_its_own_source() -> None:
+    """A source passed in one thread never reaches a call running in another.
+
+    The switch interval is lowered and the threads start together, so they interleave
+    inside their calls, which is where a source held in a module global was swapped
+    under the other one.
+    """
+    interval = sys.getswitchinterval()
+    tokens: list[str] = []
+    together = threading.Barrier(2)
+
+    def highest() -> None:
+        together.wait()
+
+        for _ in range(2000):
+            tokens.append(randino.rand_suffix(length=8, random=lambda: 0.999999))
+
+    def lowest() -> None:
+        together.wait()
+
+        for _ in range(200):
+            randino.rand_name(language="en", count=3, random=lambda: 0.0)
+
+    sys.setswitchinterval(1e-6)
+
+    try:
+        threads = [threading.Thread(target=highest), threading.Thread(target=lowest)]
+
+        for thread in threads:
+            thread.start()
+
+        for thread in threads:
+            thread.join()
+    finally:
+        sys.setswitchinterval(interval)
+
+    last = randino.AFFIX_CHARSET[-1]
+    assert len(tokens) == 2000
+    assert all(token == last * 8 for token in tokens)
+    # And neither source is left behind once both threads are done.
+    assert len({randino.rand_suffix(length=8) for _ in range(20)}) > 1
