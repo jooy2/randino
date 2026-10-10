@@ -485,6 +485,12 @@ const options = computed(() => {
 const generatorOptions = computed(() => {
 	const out = { ...options.value };
 
+	// The input's `max` is a hint the browser does not enforce on a typed value, and
+	// ten thousand sentences of ten would hold the page for seconds.
+	if (out.count !== undefined) {
+		out.count = Math.min(Math.max(Number(out.count) || 1, 1), COUNT_MAX);
+	}
+
 	if (details.value) {
 		if (tab.value === 'name') {
 			delete out.script;
@@ -842,7 +848,7 @@ async function copy() {
 				role="tab"
 				class="randino-demo-tab"
 				:aria-selected="tab === item"
-				:aria-controls="`randino-demo-panel-${item}`"
+				:aria-controls="tab === item ? `randino-demo-panel-${item}` : undefined"
 				:tabindex="tab === item ? 0 : -1"
 				@click="tab = item"
 			>
@@ -1541,7 +1547,13 @@ async function copy() {
 				</button>
 			</div>
 
-			<ul v-if="rows.length" class="randino-demo-output" aria-live="polite" aria-atomic="false">
+			<!-- The count is what is announced, rather than every result again on each
+			     press: a list of paragraphs read out in full is a minute of speech. -->
+			<p class="randino-demo-status" aria-live="polite">
+				{{ rows.length ? t(locale, 'demoCount').replace('{count}', String(rows.length)) : '' }}
+			</p>
+
+			<ul v-if="rows.length" class="randino-demo-output">
 				<li v-for="(row, index) in rows" :key="index">
 					<span class="randino-demo-value">{{ row.text }}</span>
 					<span v-if="row.meta" class="randino-demo-meta">

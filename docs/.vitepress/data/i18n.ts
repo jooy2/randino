@@ -184,7 +184,11 @@ const strings = {
 	},
 	demoShort: {
 		ko: '요청한 개수보다 적게 나왔습니다. unique를 켜면 조합이 바닥났을 때 그렇게 됩니다.',
-		en: 'Fewer than asked for — that is what `unique` does once the pools run out.'
+		en: 'Fewer than asked for — that is what unique does once the pools run out.'
+	},
+	demoCount: {
+		ko: '결과 {count}개',
+		en: '{count} results'
 	},
 	demoLive: {
 		ko: '이 페이지는 npm에 배포된 버전이 아니라 이 저장소의 JavaScript 패키지를 그대로 실행합니다.',

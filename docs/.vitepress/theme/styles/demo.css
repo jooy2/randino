@@ -126,6 +126,15 @@
 	border-color: var(--vp-c-brand-1);
 }
 
+/* VitePress takes the outline off a focused input; a keyboard user still needs to
+   see which of the controls they are on. */
+.randino-demo-field select:focus-visible,
+.randino-demo-field input:focus-visible,
+.randino-demo-check input:focus-visible {
+	outline: 2px solid var(--vp-c-brand-1);
+	outline-offset: 2px;
+}
+
 .randino-demo-field input[type='range'] {
 	width: 100%;
 	height: 32px;
@@ -282,4 +291,15 @@
 	font-size: 12.5px;
 	line-height: 1.6;
 	overflow-x: auto;
+}
+
+/* Read by a screen reader and seen by nobody: the count the output announces. */
+.randino-demo-status {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	margin: -1px;
+	overflow: hidden;
+	clip-path: inset(50%);
+	white-space: nowrap;
 }
