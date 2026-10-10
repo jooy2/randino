@@ -1905,8 +1905,8 @@ EN = SentenceLanguageData(
         """),
         "liquid": words("""
             porridge stew chowder curry bisque consomme goulash congee pho ramen udon soba pudding
-            custard yogurt honey syrup lemonade salsa chutney relish marmalade hummus guacamole soup
-            broth sauce
+            custard yogurt honey syrup salsa chutney relish marmalade hummus guacamole soup broth
+            sauce
         """),
         "raw": words("""
             potato carrot cabbage spinach broccoli pumpkin garlic mushroom steak fillet drumstick

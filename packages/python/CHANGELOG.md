@@ -2,6 +2,7 @@
 
 ## vNext (2026--)
 
+- `Lemonade` is an English drink rather than a food: `rand_drink` draws it, `rand_food` no longer does, and a sentence drinks it rather than eating it.
 - A `realism` `rand_nickname` does not know is `"real"` in every respect: it invented nothing, but still let the colour, finance and tech themes into `theme="all"`.
 - With `language="all"`, `rand_nickname` and `rand_sentence` keep to the languages that write the `starts_with` character before narrowing by shape or by required word. `rand_nickname(slots="part", starts_with="б")` returned nothing, though Russian answers it with its closest shape.
 - A `word_separator` that is not a string reads as left out, the language's own joiner. `rand_nickname(word_separator=5)` and `nickname_length_range("en", 5)` raised `TypeError`.

@@ -1889,7 +1889,7 @@ final SentenceLanguageData en = SentenceLanguageData(
     '''),
     NounTrait.liquid: words(r'''
       porridge stew chowder curry bisque consomme goulash congee pho ramen udon soba pudding custard
-      yogurt honey syrup lemonade salsa chutney relish marmalade hummus guacamole soup broth sauce
+      yogurt honey syrup salsa chutney relish marmalade hummus guacamole soup broth sauce
     '''),
     NounTrait.raw: words(r'''
       potato carrot cabbage spinach broccoli pumpkin garlic mushroom steak fillet drumstick brisket

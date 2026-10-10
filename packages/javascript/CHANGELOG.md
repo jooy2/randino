@@ -2,6 +2,7 @@
 
 ## vNext (2026--)
 
+- `Lemonade` is an English drink rather than a food: `randDrink` draws it, `randFood` no longer does, and a sentence drinks it rather than eating it.
 - A `realism` `randNickname` does not know is `'real'` in every respect: it invented nothing, but still let the colour, finance and tech themes into `theme: 'all'`.
 - With `language: 'all'`, `randNickname` and `randSentence` keep to the languages that write the `startsWith` character before narrowing by shape or by required word. `randNickname({ slots: 'part', startsWith: 'б' })` returned nothing, though Russian answers it with its closest shape.
 - A `wordSeparator` that is not a string reads as left out, the language's own joiner. `randNickname({ wordSeparator: 5 })` threw, and `nicknameLengthRange('en', 5)` returned `[NaN, NaN]`.

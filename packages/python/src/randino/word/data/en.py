@@ -264,7 +264,7 @@ EN = WordLanguageData(
             Barbecue Taco Burrito Sushi Tempura Kimchi Tofu Potato Carrot Cabbage
             Lettuce Spinach Broccoli Pumpkin Cucumber Garlic Mushroom Apple Strawberry
             Grape Watermelon Peach Lemon Banana Mango Pineapple Blueberry Chocolate
-            Candy Honey Syrup Lemonade Popcorn Baguette Brioche Muffin Scone Crumpet
+            Candy Honey Syrup Popcorn Baguette Brioche Muffin Scone Crumpet
             Crepe Cornbread Frittata Quiche Paella Gnocchi Ravioli Linguine Fettuccine
             Ramen Udon Soba Pho Congee Bisque Consomme Goulash Casserole Meatloaf
             Pastrami Prosciutto Salami Terrine Cutlet Schnitzel Kebab Skewer Roast
@@ -488,7 +488,7 @@ EN = WordLanguageData(
             Barleywater Ricewater Sodawater Sparkling
             Cola Mojito Margarita Martini Daiquiri Negroni Cognac Grappa Schnapps Mezcal Soju
             Prosecco Merlot Riesling Chianti Rootbeer Boba Kvass Cortado Affogato Decaf Rooibos
-            Slushie Limeade Spritzer Mimosa Julep Moonshine Liquor Ayran
+            Slushie Limeade Lemonade Spritzer Mimosa Julep Moonshine Liquor Ayran
         """),
         "toy": words("""
             Balloon Kite Marbles Dice Card Puzzle Blocks Toy Game Doll Teddybear Ball Yoyo Frisbee
