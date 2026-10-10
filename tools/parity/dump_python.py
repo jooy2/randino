@@ -467,6 +467,7 @@ def organization_of(data: OrganizationLanguageData) -> dict[str, object]:
         "syn": {
             "kind": "pool",
             "pool": list(syn.pool),
+            "avoid": list(syn.avoid),
             "joiner": syn.joiner,
             "minSyllables": syn.min_syllables,
             "maxSyllables": syn.max_syllables,

@@ -16,6 +16,7 @@ final OrganizationLanguageData ja = OrganizationLanguageData(
       青 葉 明 栄 翔 清 瑞 雅 晴 澄 碧 翠 陽 月 雲 嵐 泉 峰 川 森 恵 昌
       誠 豊 松 若 白 錦 紫 朝 夕 暁 凪 楓 葵 桜
     '''),
+    avoid: words(r'光栄 和光 森永 明星'),
     joiner: '',
     minSyllables: 2,
     maxSyllables: 2,

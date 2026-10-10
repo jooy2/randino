@@ -35,6 +35,13 @@ class PoolOrganizationSynthesis:
     pool: OrganizationPool
     """The syllables to draw from."""
 
+    avoid: OrganizationPool
+    """The companies two syllables of the pool could spell.
+
+    The pool leaves out a syllable of each, and a caller's `starts_with` can put it back
+    in front, so a stem that spells one is drawn again.
+    """
+
     joiner: str
     """What goes between two of them: nothing for 솔람 and 瑞峰, a space for Lộc Phát."""
 

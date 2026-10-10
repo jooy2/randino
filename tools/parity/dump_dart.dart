@@ -152,6 +152,7 @@ Map<String, Object?> organizationOf(OrganizationLanguageData data) => <String, O
     OrganizationPoolSynthesis syn => <String, Object?>{
       'kind': 'pool',
       'pool': syn.pool,
+      'avoid': syn.avoid,
       'joiner': syn.joiner,
       'minSyllables': syn.minSyllables,
       'maxSyllables': syn.maxSyllables,

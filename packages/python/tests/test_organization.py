@@ -10,6 +10,7 @@ from randino import (
     RAND_ORGANIZATION_LENGTH_MAX,
     WORD_LANGUAGES,
     OrganizationDetail,
+    RandRealism,
     WordLanguage,
     rand_organization,
 )
@@ -324,6 +325,26 @@ def test_language_all_mixes_every_language() -> None:
     languages = {detail.language for detail in rand_organization(count=SAMPLE * 5, output="detail")}
 
     assert len(languages) == len(WORD_LANGUAGES)
+
+
+def test_an_invented_stem_never_spells_a_company_the_pool_was_trimmed_against() -> None:
+    # The pools leave out a syllable of each company two of their syllables could spell,
+    # and a `starts_with` on that syllable put it back in front: `동` gave `동아지방법원`,
+    # `辉` gave `辉瑞能源股份有限公司`.
+    realisms: list[RandRealism] = ["real", "invented"]
+
+    for language in WORD_LANGUAGES:
+        syn = ORGANIZATION_DATA[language].syn
+
+        if not isinstance(syn, PoolOrganizationSynthesis):
+            continue
+
+        for brand in syn.avoid:
+            for realism in realisms:
+                for name in rand_organization(
+                    language=language, starts_with=brand[0], realism=realism, count=40
+                ):
+                    assert not any(each in name for each in syn.avoid), f"{language}: {name}"
 
 
 def test_unique_never_repeats_an_organization() -> None:

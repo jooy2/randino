@@ -117,6 +117,9 @@ final Map<List<String>, (int, int)> _spanCache = Map<List<String>, (int, int)>.i
   }
 }
 
+// How many times a stem that spells a company is drawn again before it is kept.
+const int _avoidAttempts = 8;
+
 /// A stem nobody chose, spelled the way the language spells one, of a syllable
 /// count that can land between [low] and [high] where one can.
 String inventStem(OrganizationSynthesis syn, String prefix, [num low = 0, num high = 1 << 30]) {
@@ -129,20 +132,32 @@ String inventStem(OrganizationSynthesis syn, String prefix, [num low = 0, num hi
   switch (syn) {
     case OrganizationPoolSynthesis():
       final firsts = _matching(syn.pool, prefix);
-      final parts = <String>[firsts.isNotEmpty ? pick(firsts) : prefix];
+      final first = firsts.isNotEmpty ? pick(firsts) : prefix;
+      var stem = first;
 
-      while (parts.length < count) {
-        var next = pick(syn.pool);
+      // A stem that spells a company the pool was trimmed against is drawn again
+      // from its second syllable on. The first may be the caller's own character,
+      // which is how `startsWith: '동'` put `동` back in front of `아`.
+      for (var attempt = 0; attempt < _avoidAttempts; attempt += 1) {
+        final parts = <String>[first];
 
-        // The same syllable twice in a row reads as a stutter (솔솔, 瑞瑞).
-        for (var tries = 0; tries < 3 && next == parts.last; tries += 1) {
-          next = pick(syn.pool);
+        while (parts.length < count) {
+          var next = pick(syn.pool);
+
+          // The same syllable twice in a row reads as a stutter (솔솔, 瑞瑞).
+          for (var tries = 0; tries < 3 && next == parts.last; tries += 1) {
+            next = pick(syn.pool);
+          }
+
+          parts.add(next);
         }
 
-        parts.add(next);
+        stem = parts.join(syn.joiner);
+
+        if (!syn.avoid.any(stem.contains)) break;
       }
 
-      return parts.join(syn.joiner);
+      return stem;
     case OrganizationSyllableSynthesis():
       final word = StringBuffer();
 

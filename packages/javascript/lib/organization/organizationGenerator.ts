@@ -170,6 +170,9 @@ function syllableSpan(syn: OrganizationSynthesis, count: number): Span {
 	return [count * (onset[0] + vowel[0]) + coda[0], count * (onset[1] + vowel[1]) + coda[1]];
 }
 
+// How many times a stem that spells a company is drawn again before it is kept.
+const AVOID_ATTEMPTS = 8;
+
 /**
  * A stem nobody chose, spelled the way the language spells one, of a syllable
  * count that can land between `low` and `high` where one can. A requested first
@@ -196,20 +199,34 @@ export function inventStem(
 
 	if (syn.kind === 'pool') {
 		const firsts = matching(syn.pool, prefix);
-		const parts = [firsts.length ? pick(firsts) : prefix];
+		const first = firsts.length ? pick(firsts) : prefix;
+		let stem = first;
 
-		while (parts.length < count) {
-			let next = pick(syn.pool);
+		// A stem that spells a company the pool was trimmed against is drawn again
+		// from its second syllable on. The first may be the caller's own character,
+		// which is how `startsWith: '동'` put `동` back in front of `아`.
+		for (let attempt = 0; attempt < AVOID_ATTEMPTS; attempt += 1) {
+			const parts = [first];
 
-			// The same syllable twice in a row reads as a stutter (솔솔, 瑞瑞).
-			for (let tries = 0; tries < 3 && next === parts[parts.length - 1]; tries += 1) {
-				next = pick(syn.pool);
+			while (parts.length < count) {
+				let next = pick(syn.pool);
+
+				// The same syllable twice in a row reads as a stutter (솔솔, 瑞瑞).
+				for (let tries = 0; tries < 3 && next === parts[parts.length - 1]; tries += 1) {
+					next = pick(syn.pool);
+				}
+
+				parts.push(next);
 			}
 
-			parts.push(next);
+			stem = parts.join(syn.joiner);
+
+			if (!syn.avoid.some((brand) => stem.includes(brand))) {
+				break;
+			}
 		}
 
-		return parts.join(syn.joiner);
+		return stem;
 	}
 
 	let word = '';

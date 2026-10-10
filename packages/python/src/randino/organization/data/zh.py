@@ -17,6 +17,7 @@ ZH = OrganizationLanguageData(
             明 鑫 成 新 元 峰 远 航 升 鼎 盛 瑞 祥 帆 清 源 博 泰 佳 德 润 鸿
             翠 晖 辰 盈 锦 腾 晨 曦 卓 弘 启 晟 昌 澜 涛 景 睿 琪 璟 煜 舟
         """),
+        avoid=words("海信 恒瑞 永辉 正泰 宏达 泰禾 嘉德 锦程 辉瑞 瑞达"),
         joiner="",
         min_syllables=2,
         max_syllables=2,

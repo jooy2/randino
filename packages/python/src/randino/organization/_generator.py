@@ -168,6 +168,10 @@ def _syllable_span(syn: OrganizationSynthesis, count: int) -> tuple[int, int]:
     )
 
 
+_AVOID_ATTEMPTS = 8
+"""How many times a stem that spells a company is drawn again before it is kept."""
+
+
 def invent_stem(
     syn: OrganizationSynthesis, prefix: str, low: float = 0, high: float = math.inf
 ) -> str:
@@ -185,21 +189,33 @@ def invent_stem(
 
     if isinstance(syn, PoolOrganizationSynthesis):
         firsts = _matching(syn.pool, prefix)
-        parts = [pick(firsts) if firsts else prefix]
+        first = pick(firsts) if firsts else prefix
+        stem = first
 
-        while len(parts) < count:
-            following = pick(syn.pool)
+        # A stem that spells a company the pool was trimmed against is drawn again from
+        # its second syllable on. The first may be the caller's own character, which is
+        # how `starts_with="동"` put `동` back in front of `아`.
+        for _ in range(_AVOID_ATTEMPTS):
+            parts = [first]
 
-            # The same syllable twice in a row reads as a stutter (솔솔, 瑞瑞).
-            for _ in range(3):
-                if following != parts[-1]:
-                    break
-
+            while len(parts) < count:
                 following = pick(syn.pool)
 
-            parts.append(following)
+                # The same syllable twice in a row reads as a stutter (솔솔, 瑞瑞).
+                for _ in range(3):
+                    if following != parts[-1]:
+                        break
 
-        return syn.joiner.join(parts)
+                    following = pick(syn.pool)
+
+                parts.append(following)
+
+            stem = syn.joiner.join(parts)
+
+            if not any(brand in stem for brand in syn.avoid):
+                break
+
+        return stem
 
     word = ""
 

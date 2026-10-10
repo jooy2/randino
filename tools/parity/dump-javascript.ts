@@ -273,6 +273,7 @@ console.log(
 								? {
 										kind: 'pool',
 										pool: [...data.syn.pool],
+										avoid: [...data.syn.avoid],
 										joiner: data.syn.joiner,
 										minSyllables: data.syn.minSyllables,
 										maxSyllables: data.syn.maxSyllables

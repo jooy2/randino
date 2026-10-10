@@ -25,6 +25,12 @@ export type OrganizationSynthesis =
 	| {
 			kind: 'pool';
 			pool: OrganizationPool;
+			/**
+			 * The companies two syllables of the pool could spell. The pool leaves out
+			 * a syllable of each, and a caller's `startsWith` can put it back in front,
+			 * so a stem that spells one is drawn again.
+			 */
+			avoid: OrganizationPool;
 			joiner: string;
 			minSyllables: number;
 			maxSyllables: number;

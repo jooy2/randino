@@ -16,6 +16,7 @@ final OrganizationLanguageData ko = OrganizationLanguageData(
       가 다 마 바 사 아 자 하 온 솔 빛 결 람 윤 은 별 해 늘 새 슬 담 든
       루 린 봄 울 초 휘 연 채 율 겸 누 여 예 유 지
     '''),
+    avoid: words(r'한솔 하나 대한 동아 라온 서울 유진'),
     joiner: '',
     minSyllables: 2,
     maxSyllables: 2,

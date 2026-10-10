@@ -23,6 +23,7 @@ export const VI: OrganizationLanguageData = {
 			Vĩnh Thái Hồng Phúc Ngọc Toàn Thắng Ánh Dương Nam Đông Châu Thuận Tiến Đức Vạn
 			Quý Cường Khang Lan
 		`),
+		avoid: words('Bảo_Việt An_Bình Hưng_Thịnh Nam_Long'),
 		joiner: ' ',
 		minSyllables: 2,
 		maxSyllables: 2

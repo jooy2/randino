@@ -44,6 +44,7 @@ class OrganizationPoolSynthesis extends OrganizationSynthesis {
   /// Creates a syllable-pool template.
   const OrganizationPoolSynthesis({
     required this.pool,
+    required this.avoid,
     required this.joiner,
     required super.minSyllables,
     required super.maxSyllables,
@@ -51,6 +52,11 @@ class OrganizationPoolSynthesis extends OrganizationSynthesis {
 
   /// The syllables to draw from.
   final List<String> pool;
+
+  /// The companies two syllables of the pool could spell. The pool leaves out a
+  /// syllable of each, and a caller's `startsWith` can put it back in front, so
+  /// a stem that spells one is drawn again.
+  final List<String> avoid;
 
   /// What goes between two of them.
   final String joiner;

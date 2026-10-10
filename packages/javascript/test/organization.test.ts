@@ -413,6 +413,32 @@ describe('Organization', () => {
 		assert.strictEqual(languages.size, WORD_LANGUAGES.length);
 	});
 
+	it('an invented stem never spells a company the pool was trimmed against', () => {
+		// The pools leave out a syllable of each company two of their syllables
+		// could spell, and a `startsWith` on that syllable put it back in front:
+		// `동` gave `동아지방법원`, `辉` gave `辉瑞能源股份有限公司`.
+		for (const [language, data] of Object.entries(ORGANIZATION_DATA)) {
+			if (data.syn.kind !== 'pool') {
+				continue;
+			}
+
+			const { avoid } = data.syn;
+
+			for (const brand of avoid) {
+				for (const realism of ['real', 'invented'] as const) {
+					for (const name of randOrganization({
+						language: language as WordLanguage,
+						startsWith: brand[0],
+						realism,
+						count: 40
+					})) {
+						assert.ok(!avoid.some((each) => name.includes(each)), `${language}: ${name}`);
+					}
+				}
+			}
+		}
+	});
+
 	it('unique never repeats an organization', () => {
 		const organizations = randOrganization({ language: 'en', unique: true, count: 300 });
 
