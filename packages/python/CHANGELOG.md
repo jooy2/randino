@@ -2,6 +2,7 @@
 
 ## vNext (2026--)
 
+- A `min_length` past the top of a language's natural range moves a `max_length` left out out of the way, the way `max_age` moves for `min_age`: `rand_name(language="en", min_length=30)` writes names of thirty characters or so rather than twenty-one, and the range keeps its natural width above the minimum.
 - An invented Japanese word goes on in the kana its first character is written in: a hiragana `starts_with` such as `か` gives `かろび`, where it gave `かロビ`, half in one kana and half in the other.
 - A Japanese sentence with an object takes a verb that takes `を`. Verbs that carry an object of their own or take `に` or `と` sat among the ones that take an object, and wrote `電話を値をつけます` and `店員を会いました`; `挨拶する` moved to the verbs of talking, where it takes none.
 - `rand_organization` no longer writes a famous company when `starts_with` is the syllable kept out of its invented stems to prevent that. The caller's character went back in front of the syllable the pool was trimmed against, and `동` gave `동아…`, `辉` gave `辉瑞…`; a stem that spells one of those companies is now drawn again.

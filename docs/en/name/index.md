@@ -95,6 +95,8 @@ For space-separated languages the range is satisfied by re-drawing from the pool
 
 Leave both out and each language falls back to its own range, which is what <Lang js="nameLengthRange" dart="nameLengthRange" py="name_length_range" code /> reports. That fallback is resolved per language, so mixing languages does not stretch a Korean name to fill a Spanish name's range.
 
+Give a <Lang js="minLength" dart="minLength" py="min_length" code /> past the top of that range and leave <Lang js="maxLength" dart="maxLength" py="max_length" code /> out, and the maximum moves out of the way, the way `maxAge` does for an age: the range keeps its natural width above the minimum. `minLength: 30` writes English names of thirty characters or so, with a second given name where one is needed, and a Korean name asked to be six characters long is six or seven, with an invented given name.
+
 ### `startsWith` applies to the whole name
 
 That means the surname for family-first languages, and the given name otherwise, or whenever the surname is switched off. A character that no real name starts with still returns names rather than nothing: Latin and Cyrillic scripts invent one (`Q` → `Qivu Railooth`), and CJK scripts use the character as a name part of its own (`앙` + `지수` → `앙지수`).

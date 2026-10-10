@@ -637,12 +637,27 @@ def bounds_for(language: NameLanguage, settings: Settings) -> tuple[int, int]:
 
     What the caller asked for, falling back to the language's own natural range for
     whichever bound was left out.
+
+    A `max_length` left out moves out of the way of a `min_length` past the natural
+    top, the way `max_age` does: a name can carry another given name, and a CJK given
+    name can run longer than a real one, so `min_length=30` alone is a name of thirty
+    characters or so rather than one of twenty-one. It keeps the natural range's width
+    above the minimum rather than reaching for `RAND_LENGTH_MAX`, because a Korean name
+    asked to be six characters long is six or seven, not a forty-character invention.
+    The other generators keep the natural top: their pools are what they can write, and
+    a range past them is answered with the longest there is.
     """
     natural_min, natural_max = name_length_range(
         language, settings.include_surname, settings.include_middle_name
     )
+    min_length = settings.min_length
+    max_length = (
+        min_length + natural_max - natural_min
+        if settings.max_length is None and min_length is not None and min_length > natural_max
+        else settings.max_length
+    )
 
-    return length_bounds(settings.min_length, settings.max_length, natural_min, natural_max)
+    return length_bounds(min_length, max_length, natural_min, natural_max)
 
 
 def generate_one(language: NameLanguage, settings: Settings) -> NameDetail:

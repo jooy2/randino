@@ -95,6 +95,8 @@ rand_name(language="en", realism="invented", count=3)
 
 둘 다 생략하면 각 언어의 고유한 범위를 사용하며, 그 값은 <Lang js="nameLengthRange" dart="nameLengthRange" py="name_length_range" code />가 알려 줍니다. 이 기본값은 **언어별로** 결정되므로, 여러 언어를 섞어도 한국어 이름이 스페인어 이름의 길이에 맞춰 늘어나지 않습니다.
 
+그 범위의 상한보다 큰 <Lang js="minLength" dart="minLength" py="min_length" code />를 주고 <Lang js="maxLength" dart="maxLength" py="max_length" code />를 생략하면, 나이의 `maxAge`처럼 상한이 비켜 줍니다. 범위는 고유한 폭을 유지한 채 최솟값 위로 옮겨 갑니다. `minLength: 30`이면 필요한 곳에 두 번째 이름을 넣어 서른 자 안팎의 영어 이름을 쓰고, 여섯 자로 요청한 한국어 이름은 지어낸 이름으로 여섯이나 일곱 자가 됩니다.
+
 ### `startsWith`는 이름 전체의 첫 글자에 적용됩니다
 
 성이 먼저 오는 언어에서는 성에, 그 외에는 이름에 적용됩니다. 성을 끄면 언제나 이름에 적용됩니다. 실제 이름 중에 그 글자로 시작하는 것이 없어도 빈 결과가 아니라 이름을 돌려줍니다. 라틴 문자와 키릴 문자는 이름을 만들어내고(`Q` → `Qivu Railooth`), 한중일 문자는 그 글자 자체를 이름의 한 요소로 씁니다(`앙` + `지수` → `앙지수`).

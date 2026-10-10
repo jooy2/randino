@@ -632,13 +632,29 @@ _Entry _generateSpaced(
 
 /// Length range for one language: what the caller asked for, falling back to the
 /// language's own natural range for whichever bound was left out.
+///
+/// A `maxLength` left out moves out of the way of a `minLength` past the
+/// natural top, the way `maxAge` does: a name can carry another given name, and
+/// a CJK given name can run longer than a real one, so `minLength: 30` alone is
+/// a name of thirty characters or so rather than one of twenty-one. It keeps the
+/// natural range's width above the minimum rather than reaching for
+/// [randLengthMax], because a Korean name asked to be six characters long is six
+/// or seven, not a forty-character invention. The other generators keep the
+/// natural top: their pools are what they can write, and a range past them is
+/// answered with the longest there is.
 LengthRange _lengthBounds(NameLanguage language, _Settings settings) {
   final natural = nameLengthRange(
     language: language,
     includeSurname: settings.includeSurname,
     includeMiddleName: settings.includeMiddleName,
   );
-  return lengthBounds(settings.minLength, settings.maxLength, natural.min, natural.max);
+  final minLength = settings.minLength;
+  final maxLength =
+      settings.maxLength == null && minLength != null && minLength > natural.max
+          ? minLength + natural.max - natural.min
+          : settings.maxLength;
+
+  return lengthBounds(minLength, maxLength, natural.min, natural.max);
 }
 
 NameDetail _generateOne(NameLanguage language, _Settings settings) {

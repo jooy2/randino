@@ -645,6 +645,16 @@ function generateSpaced(
 /**
  * Length range for one language: what the caller asked for, falling back to the
  * language's own natural range for whichever bound was left out.
+ *
+ * A `maxLength` left out moves out of the way of a `minLength` past the natural
+ * top, the way `maxAge` does: a name can carry another given name, and a CJK
+ * given name can run longer than a real one, so `minLength: 30` alone is a name
+ * of thirty characters or so rather than one of twenty-one. It keeps the natural
+ * range's width above the minimum rather than reaching for `RAND_LENGTH_MAX`,
+ * because a Korean name asked to be six characters long is six or seven, not a
+ * forty-character invention. The other generators keep the natural top: their
+ * pools are what they can write, and a range past them is answered with the
+ * longest there is.
  */
 function boundsFor(language: NameLanguage, settings: Settings): [number, number] {
 	const [naturalMin, naturalMax] = nameLengthRange(
@@ -652,8 +662,13 @@ function boundsFor(language: NameLanguage, settings: Settings): [number, number]
 		settings.includeSurname,
 		settings.includeMiddleName
 	);
+	const { minLength } = settings;
+	const maxLength =
+		settings.maxLength === undefined && minLength !== undefined && minLength > naturalMax
+			? minLength + naturalMax - naturalMin
+			: settings.maxLength;
 
-	return lengthBounds(settings.minLength, settings.maxLength, naturalMin, naturalMax);
+	return lengthBounds(minLength, maxLength, naturalMin, naturalMax);
 }
 
 function generateOne(language: NameLanguage, settings: Settings): NameDetail {

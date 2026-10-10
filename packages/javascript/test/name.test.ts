@@ -267,6 +267,26 @@ describe('Name', () => {
 		}
 	});
 
+	it('a minLength past the natural top moves the maxLength left out', () => {
+		// The way `maxAge` moves out of the way of `minAge`. `minLength: 30` alone was
+		// answered with names of twenty-one characters, the natural top; it keeps the
+		// natural width above the minimum, so a Korean name of six stays six or seven.
+		const asks: [NameLanguage, number, number][] = [
+			['en', 30, 30 + 21 - 7],
+			['ko', 6, 7],
+			['ru', 30, 40]
+		];
+
+		for (const [language, minLength, top] of asks) {
+			for (const name of randName({ language, minLength, count: SAMPLE })) {
+				assert.ok(
+					name.length >= minLength && name.length <= top,
+					`${language} ${minLength}: ${name} (${name.length})`
+				);
+			}
+		}
+	});
+
 	it('the default range is what the pools can actually produce', () => {
 		// `lengthSpec` is the one hand-written number in a language's dataset, and a
 		// wrong one is silent: too narrow and the generator re-draws real names

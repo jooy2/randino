@@ -265,6 +265,21 @@ def test_names_stay_inside_the_requested_length_range() -> None:
             assert low <= len(name) <= high, f"{language} {low}-{high}: {name} ({len(name)})"
 
 
+def test_a_min_length_past_the_natural_top_moves_the_max_length_left_out() -> None:
+    # The way `max_age` moves out of the way of `min_age`. `min_length=30` alone was
+    # answered with names of twenty-one characters, the natural top; it keeps the natural
+    # width above the minimum, so a Korean name of six stays six or seven.
+    asks: list[tuple[NameLanguage, int, int]] = [
+        ("en", 30, 30 + 21 - 7),
+        ("ko", 6, 7),
+        ("ru", 30, 40),
+    ]
+
+    for language, min_length, top in asks:
+        for name in rand_name(language=language, min_length=min_length, count=SAMPLE):
+            assert min_length <= len(name) <= top, f"{language} {min_length}: {name} ({len(name)})"
+
+
 def test_the_default_range_is_what_the_pools_can_actually_produce() -> None:
     # `length_spec` is the one hand-written number in a language's dataset, and a
     # wrong one is silent: too narrow and the generator re-draws real names away, too
