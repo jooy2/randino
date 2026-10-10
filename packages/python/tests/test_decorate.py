@@ -18,7 +18,7 @@ from randino import (
 
 # The decorating pools are internal, but what `rand_modifier` attaches has to come out
 # of them, and they are the same pools the nickname generator uses.
-from randino.word._generator import agree, modifier_follows, modifiers_of
+from randino.word._generator import agree, modifier_follows, modifier_glue, modifiers_of
 from randino.word.data import WORD_DATA
 
 SAMPLE = 60
@@ -126,15 +126,38 @@ def test_rand_modifier_attaches_on_the_side_the_language_uses() -> None:
         # Vietnamese and Spanish write `mèo xanh` and `gato azul`, so the modifier
         # lands behind the value. The frames are what say so.
         follows = modifier_follows(WORD_DATA[language])
+        # Chinese writes `的` after an action, the way its frames do.
+        glue = modifier_glue(data, "action")
 
         for word in rand_word(language=language, count=SAMPLE):
             decorated = rand_modifier(word, language=language)
             attached = (
                 decorated[len(word) :] if follows else decorated[: len(decorated) - len(word)]
+            ).strip()
+            bare = (
+                attached[: -len(glue)]
+                if glue and attached.endswith(glue) and attached[: -len(glue)] in data.actions
+                else attached
             )
 
             assert decorated.startswith(word) if follows else decorated.endswith(word), decorated
-            assert attached.strip() in modifiers, f"{decorated} carries no {language} modifier"
+            assert bare in modifiers, f"{decorated} carries no {language} modifier"
+
+
+def test_rand_modifier_writes_the_particle_the_frames_write_between_a_modifier_and_its_noun() -> (
+    None
+):
+    # `拥抱狮子` reads as a verb and its object; the nickname frames write `奔跑的狮子`, and
+    # so does the decorator now. An adjective takes nothing, and neither does the modifier
+    # on its own, which has nothing to attach to.
+    for _ in range(SAMPLE):
+        assert re.fullmatch(r".+的狮子", rand_modifier("狮子", language="zh", kind="action"))
+        assert "的" not in rand_modifier("狮子", language="zh", kind="adjective")
+        assert not rand_modifier(language="zh", kind="action").endswith("的")
+        # The particle attaches to the modifier, and the separator goes after it.
+        assert re.fullmatch(
+            r".+的 狮子", rand_modifier("狮子", language="zh", kind="action", separator=" ")
+        )
 
 
 def test_rand_modifier_on_its_own_is_the_modifier() -> None:

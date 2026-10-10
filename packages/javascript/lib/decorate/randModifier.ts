@@ -13,6 +13,7 @@ import {
 	drawWord,
 	genderOf,
 	modifierFollows,
+	modifierGlue,
 	modifiersOf,
 	poolBounds
 } from '../word/wordGenerator.js';
@@ -54,8 +55,14 @@ function languageOf(value: string): WordLanguageOption {
 	return 'en';
 }
 
-/** Draw one modifier, the separator to use, and which side of the value it goes. */
-function draw(value: string | undefined, options: RandModifierOptions): [string, string, boolean] {
+/**
+ * Draw one modifier, the separator to use, which side of the value it goes, and
+ * the particle between them.
+ */
+function draw(
+	value: string | undefined,
+	options: RandModifierOptions
+): [string, string, boolean, string] {
 	// The language of the word being decorated, so that `'고양이'` is not handed
 	// an English modifier. Only consulted when the caller left `language` out, or
 	// named one this package does not know.
@@ -72,8 +79,19 @@ function draw(value: string | undefined, options: RandModifierOptions): [string,
 	// read by its ending, the way the language itself reads an unfamiliar word, and
 	// a language that does not inflect has nothing to look up either way.
 	const gender = value === undefined ? undefined : genderOf(data, value);
+	// Chinese writes `的` after an action and nothing after an adjective, so a kind
+	// left to chance is read off the word drawn. An invented word is neither, and
+	// takes what an adjective takes.
+	const adjectiveGlue = modifierGlue(data, 'adjective');
+	const actionGlue = modifierGlue(data, 'action');
+	const glue =
+		adjectiveGlue === actionGlue
+			? adjectiveGlue
+			: options.kind === 'action' || (options.kind !== 'adjective' && data.actions.includes(word))
+				? actionGlue
+				: adjectiveGlue;
 
-	return [agree(data, word, gender), options.separator ?? data.joiner, modifierFollows(data)];
+	return [agree(data, word, gender), options.separator ?? data.joiner, modifierFollows(data), glue];
 }
 
 /**
@@ -124,10 +142,12 @@ export function randModifier(
 		}
 
 		const one = (item: string) => {
-			const [word, separator, follows] = draw(item, settings);
+			const [word, separator, follows, glue] = draw(item, settings);
 
 			// Vietnamese puts the modifier after the noun, and says so in its frames.
-			return follows ? item + separator + word : word + separator + item;
+			// A particle attaches to the word in front of it, so a separator goes after
+			// it: `沉睡的 狮子`, never `沉睡 的狮子`.
+			return follows ? item + glue + separator + word : word + glue + separator + item;
 		};
 
 		return Array.isArray(target) ? target.map(one) : one(target);

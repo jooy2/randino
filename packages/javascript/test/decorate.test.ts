@@ -16,7 +16,7 @@ import type { WordLanguage } from '../dist/index.js';
 // The decorating pools are internal, but what `randModifier` attaches has to
 // come out of them, and they are the same pools the nickname generator uses.
 import { WORD_DATA } from '../dist/word/data/index.js';
-import { agree, modifierFollows } from '../dist/word/wordGenerator.js';
+import { agree, modifierFollows, modifierGlue } from '../dist/word/wordGenerator.js';
 import type { WordGender } from '../dist/word/data/types.js';
 
 const SAMPLE = 60;
@@ -152,16 +152,40 @@ describe('Decorate', () => {
 			// Vietnamese and Spanish write `mèo xanh` and `gato azul`, so the modifier
 			// lands behind the value. The frames are what say so.
 			const follows = modifierFollows(WORD_DATA[language]);
+			// Chinese writes `的` after an action, the way its frames do.
+			const glue = modifierGlue(data, 'action');
 
 			for (const word of randWord({ language, count: SAMPLE })) {
 				const decorated = randModifier(word, { language });
-				const attached = follows
-					? decorated.slice(word.length)
-					: decorated.slice(0, decorated.length - word.length);
+				const attached = (
+					follows
+						? decorated.slice(word.length)
+						: decorated.slice(0, decorated.length - word.length)
+				).trim();
+				const bare =
+					glue && attached.endsWith(glue) && data.actions.includes(attached.slice(0, -glue.length))
+						? attached.slice(0, -glue.length)
+						: attached;
 
 				assert.ok(follows ? decorated.startsWith(word) : decorated.endsWith(word), decorated);
-				assert.ok(modifiers.has(attached.trim()), `${decorated} carries no ${language} modifier`);
+				assert.ok(modifiers.has(bare), `${decorated} carries no ${language} modifier`);
 			}
+		}
+	});
+
+	it('randModifier writes the particle the frames write between a modifier and its noun', () => {
+		// `拥抱狮子` reads as a verb and its object; the nickname frames write
+		// `奔跑的狮子`, and so does the decorator now. An adjective takes nothing, and
+		// neither does the modifier on its own, which has nothing to attach to.
+		for (let i = 0; i < SAMPLE; i += 1) {
+			assert.match(randModifier('狮子', { language: 'zh', kind: 'action' }), /^.+的狮子$/);
+			assert.doesNotMatch(randModifier('狮子', { language: 'zh', kind: 'adjective' }), /的/);
+			assert.doesNotMatch(randModifier({ language: 'zh', kind: 'action' }), /的$/);
+			// The particle attaches to the modifier, and the separator goes after it.
+			assert.match(
+				randModifier('狮子', { language: 'zh', kind: 'action', separator: ' ' }),
+				/^.+的 狮子$/
+			);
 		}
 	});
 

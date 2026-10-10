@@ -166,6 +166,8 @@ The five languages whose modifiers do not change shape, `ko`, `en`, `ja`, `zh` a
 
 A modifier either says what the value is like or what it is doing, and they are two pools rather than one. `kind` picks between them, and left out, both are in play.
 
+The two sit in different grammar, and the decorator writes what the language's nicknames write between them and the value. That matters in Chinese, which puts `的` after an action and nothing after an adjective: `奔跑的狮子` and `快乐狮子`, where `奔跑狮子` would read as a verb and its object. A modifier on its own has nothing to attach the particle to, and comes back bare.
+
 ::: lang js
 
 ```javascript

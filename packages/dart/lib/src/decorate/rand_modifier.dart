@@ -45,10 +45,11 @@ WordLanguage _languageOf(String value) {
   return WordLanguage.en;
 }
 
-/// Draws one modifier, and reports the separator its language joins with.
+/// Draws one modifier, and reports the separator its language joins with, which
+/// side of the value it goes, and the particle between them.
 ///
 /// Internal — shared by [randModifier] and `randModifierAll`.
-(String, String, bool) drawModifier(
+(String, String, bool, String) drawModifier(
   String? value,
   WordLanguage? language,
   RandRealism realism,
@@ -68,8 +69,20 @@ WordLanguage _languageOf(String value) {
   // read by its ending, the way the language itself reads an unfamiliar word, and
   // a language that does not inflect has nothing to look up either way.
   final gender = value == null ? null : genderOf(data, value);
+  // Chinese writes `的` after an action and nothing after an adjective, so a
+  // kind left to chance is read off the word drawn. An invented word is neither,
+  // and takes what an adjective takes.
+  final adjectiveGlue = modifierGlue(data, WordSlot.adjective);
+  final actionGlue = modifierGlue(data, WordSlot.action);
+  final glue =
+      adjectiveGlue == actionGlue
+          ? adjectiveGlue
+          : kind == ModifierKind.action ||
+              (kind != ModifierKind.adjective && data.actions.contains(drawn.word))
+          ? actionGlue
+          : adjectiveGlue;
 
-  return (agree(data, drawn.word, gender), separator ?? data.joiner, modifierFollows(data));
+  return (agree(data, drawn.word, gender), separator ?? data.joiner, modifierFollows(data), glue);
 }
 
 /// Puts a random modifier in front of [value]: `'사자'` becomes `'멋진사자'`.
@@ -104,10 +117,12 @@ String randModifier({
   /// predict, `Random(42)` for one that has to come out the same every run.
   Random? random,
 }) => withRandom(random, () {
-  final (word, joiner, follows) = drawModifier(value, language, realism, kind, separator);
+  final (word, joiner, follows, glue) = drawModifier(value, language, realism, kind, separator);
 
   if (value == null) return word;
 
-  // Vietnamese puts the modifier after the noun, and says so in its frames.
-  return follows ? '$value$joiner$word' : '$word$joiner$value';
+  // Vietnamese puts the modifier after the noun, and says so in its frames. A
+  // particle attaches to the word in front of it, so a separator goes after it:
+  // `沉睡的 狮子`, never `沉睡 的狮子`.
+  return follows ? '$value$glue$joiner$word' : '$word$glue$joiner$value';
 });

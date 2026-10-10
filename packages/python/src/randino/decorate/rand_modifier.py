@@ -12,6 +12,7 @@ from randino.word._generator import (
     draw_word,
     gender_of,
     modifier_follows,
+    modifier_glue,
     modifiers_of,
     pool_bounds,
 )
@@ -54,8 +55,8 @@ def _draw(
     language: WordLanguageOption | None,
     realism: RandRealism,
     kind: ModifierKind | Literal["all"],
-) -> tuple[str, str, bool]:
-    """One modifier, the separator its language joins with, and which side it goes."""
+) -> tuple[str, str, bool, str]:
+    """One modifier, the separator its language joins with, its side, and its particle."""
     # The language of the word being decorated, so that `"고양이"` is not handed an
     # English modifier. Only consulted when the caller left `language` out, or named one
     # this package does not know.
@@ -71,8 +72,20 @@ def _draw(
     # read by its ending, the way the language itself reads an unfamiliar word, and
     # a language that does not inflect has nothing to look up either way.
     gender = None if value is None else gender_of(data, value)
+    # Chinese writes `的` after an action and nothing after an adjective, so a kind left
+    # to chance is read off the word drawn. An invented word is neither, and takes what
+    # an adjective takes.
+    adjective_glue = modifier_glue(data, "adjective")
+    action_glue = modifier_glue(data, "action")
 
-    return agree(data, word, gender), data.joiner, modifier_follows(data)
+    if adjective_glue == action_glue:
+        glue = adjective_glue
+    elif kind == "action" or (kind != "adjective" and word in data.actions):
+        glue = action_glue
+    else:
+        glue = adjective_glue
+
+    return agree(data, word, gender), data.joiner, modifier_follows(data), glue
 
 
 @overload
@@ -163,11 +176,13 @@ def rand_modifier(
     """
 
     def one(item: str) -> str:
-        word, joiner, follows = _draw(item, language, realism, kind)
+        word, joiner, follows, glue = _draw(item, language, realism, kind)
         gap = joiner if separator is None else separator
 
-        # Vietnamese puts the modifier after the noun, and says so in its frames.
-        return item + gap + word if follows else word + gap + item
+        # Vietnamese puts the modifier after the noun, and says so in its frames. A
+        # particle attaches to the word in front of it, so a separator goes after it:
+        # `沉睡的 狮子`, never `沉睡 的狮子`.
+        return item + glue + gap + word if follows else word + glue + gap + item
 
     with with_random(random):
         if value is None:

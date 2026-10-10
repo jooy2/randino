@@ -74,6 +74,27 @@ export function modifierFollows(data: WordLanguageData): boolean {
 }
 
 /**
+ * The particle the language's frames write between a modifier of `slot` and its
+ * noun: Chinese `的` after an action (`奔跑的狮子`), where `奔跑狮子` reads as a
+ * verb and its object, and nothing anywhere else. Read out of the frames, the
+ * way `modifierFollows` is, so the frames stay the one place a particle is
+ * written.
+ */
+export function modifierGlue(data: WordLanguageData, slot: ModifierKind): string {
+	for (const frame of data.frames) {
+		for (let i = 0; i + 1 < frame.slots.length; i += 1) {
+			const pair = [frame.slots[i], frame.slots[i + 1]];
+
+			if (pair.includes(slot) && pair.includes('noun')) {
+				return frame.glue?.[i] ?? '';
+			}
+		}
+	}
+
+	return '';
+}
+
+/**
  * A modifier reshaped to agree with a noun of `gender`. The first rule whose
  * ending matches wins; a word none of them match is already right, which is how
  * Spanish `azul` stays `azul` beside both `gato` and `luna`.

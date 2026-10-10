@@ -104,6 +104,23 @@ def modifier_follows(data: WordLanguageData) -> bool:
     return False
 
 
+def modifier_glue(data: WordLanguageData, slot: ModifierKind) -> str:
+    """The particle the language's frames write between a modifier of `slot` and its noun.
+
+    Chinese writes `的` after an action (`奔跑的狮子`), where `奔跑狮子` reads as a verb
+    and its object, and nothing goes anywhere else. Read out of the frames, the way
+    `modifier_follows` is, so the frames stay the one place a particle is written.
+    """
+    for frame in data.frames:
+        for index in range(len(frame.slots) - 1):
+            pair = (frame.slots[index], frame.slots[index + 1])
+
+            if slot in pair and "noun" in pair:
+                return frame.glue_at(index + 1)
+
+    return ""
+
+
 def _piece_span(pool: Sequence[str]) -> tuple[int, int]:
     """Shortest and longest entry of a pool, counting an empty entry as the zero it is.
 

@@ -65,6 +65,23 @@ bool modifierFollows(WordLanguageData data) {
   return false;
 }
 
+/// The particle the language's frames write between a modifier of [slot] and
+/// its noun: Chinese `的` after an action (`奔跑的狮子`), where `奔跑狮子` reads
+/// as a verb and its object, and nothing anywhere else. Read out of the frames,
+/// the way [modifierFollows] is, so the frames stay the one place a particle is
+/// written.
+String modifierGlue(WordLanguageData data, WordSlot slot) {
+  for (final frame in data.frames) {
+    for (var i = 0; i + 1 < frame.slots.length; i += 1) {
+      final pair = [frame.slots[i], frame.slots[i + 1]];
+
+      if (pair.contains(slot) && pair.contains(WordSlot.noun)) return frame.glueAt(i + 1);
+    }
+  }
+
+  return '';
+}
+
 /// Shortest and longest entry of [pool], counting an empty entry as the zero it
 /// is. [poolBounds] answers the same question for a pool of words, where an empty
 /// result would mean nothing; a coda pool holds the empty string on purpose.

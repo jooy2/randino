@@ -130,21 +130,56 @@ void main() {
         // Vietnamese and Spanish write `mèo xanh` and `gato azul`, so the modifier
         // lands behind the value. The frames are what say so.
         final follows = modifierFollows(wordData[language]!);
+        // Chinese writes `的` after an action, the way its frames do.
+        final glue = modifierGlue(data, WordSlot.action);
 
         for (final word in randWord(language: language, count: sample)) {
           final decorated = randModifier(value: word, language: language);
           final attached =
-              follows
-                  ? decorated.substring(word.length)
-                  : decorated.substring(0, decorated.length - word.length);
+              (follows
+                      ? decorated.substring(word.length)
+                      : decorated.substring(0, decorated.length - word.length))
+                  .trim();
+          final bare =
+              glue.isNotEmpty &&
+                      attached.endsWith(glue) &&
+                      data.actions.contains(attached.substring(0, attached.length - glue.length))
+                  ? attached.substring(0, attached.length - glue.length)
+                  : attached;
 
           expect(decorated, follows ? startsWith(word) : endsWith(word), reason: decorated);
-          expect(
-            modifiers,
-            contains(attached.trim()),
-            reason: '$decorated carries no $language modifier',
-          );
+          expect(modifiers, contains(bare), reason: '$decorated carries no $language modifier');
         }
+      }
+    });
+
+    test('randModifier writes the particle the frames write between a modifier and its noun', () {
+      // `拥抱狮子` reads as a verb and its object; the nickname frames write
+      // `奔跑的狮子`, and so does the decorator now. An adjective takes nothing,
+      // and neither does the modifier on its own, which has nothing to attach to.
+      for (var i = 0; i < sample; i += 1) {
+        expect(
+          randModifier(value: '狮子', language: WordLanguage.zh, kind: ModifierKind.action),
+          matches(RegExp(r'^.+的狮子$')),
+        );
+        expect(
+          randModifier(value: '狮子', language: WordLanguage.zh, kind: ModifierKind.adjective),
+          isNot(contains('的')),
+        );
+        expect(
+          randModifier(language: WordLanguage.zh, kind: ModifierKind.action),
+          isNot(endsWith('的')),
+        );
+        // The particle attaches to the modifier, and the separator goes after it.
+        expect(
+          randModifier(
+            value: '狮子',
+            language: WordLanguage.zh,
+            kind: ModifierKind.action,
+            separator: ' ',
+          ),
+          matches(RegExp(r'^.+的 狮子$')),
+        );
       }
     });
 
