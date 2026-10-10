@@ -1,7 +1,7 @@
+import { defineAsyncComponent } from 'vue';
 import DefaultTheme from 'vitepress/theme';
 import Layout from './components/Layout.vue';
 import Lang from './components/Lang.vue';
-import Demo from './components/Demo.vue';
 import LangStart from './components/LangStart.vue';
 import WordOptions from './components/WordOptions.vue';
 import LocationOptions from './components/LocationOptions.vue';
@@ -26,8 +26,13 @@ export default {
 		app.component('PackageLinks', PackageLinks);
 
 		// Used straight from `demo.md`, the same way `Lang` is used from every
-		// reference page.
-		app.component('Demo', Demo);
+		// reference page. Loaded only where it is used: the demo runs the whole
+		// library, and imported here it put every pool in the chunk each page of the
+		// site loads, whether or not the page had a demo on it.
+		app.component(
+			'Demo',
+			defineAsyncComponent(() => import('./components/Demo.vue'))
+		);
 
 		// The home page's package picker, which writes the same choice the
 		// sidebar's switch does.

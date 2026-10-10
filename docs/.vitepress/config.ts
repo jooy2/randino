@@ -345,8 +345,14 @@ const randinoSource: Plugin = {
 			return null;
 		}
 
+		// `moduleSideEffects: false` is the package's own `sideEffects: false`, which
+		// a path resolved here would otherwise lose: without it every catalog the
+		// demo never reaches is kept in its chunk.
 		return importer.split('?')[0].startsWith(packageSrc)
-			? resolve(dirname(importer.split('?')[0]), source.replace(/\.js$/, '.ts'))
+			? {
+					id: resolve(dirname(importer.split('?')[0]), source.replace(/\.js$/, '.ts')),
+					moduleSideEffects: false
+				}
 			: null;
 	}
 };

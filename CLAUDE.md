@@ -545,6 +545,8 @@ The navbar is the same lists — its API dropdown is Generators, System, Decorat
 
 **Depending on `randino` from npm would be the wrong shape.** The site documents this repository, so a page describing an option added since the last release would demo a build without it. The cost is that `.github/workflows/publish-documentation.yml` has to redeploy when `packages/javascript/lib/**` changes, which is in its path filter.
 
+`Demo` is registered as an async component, so the library is a chunk of its own that `/demo` alone loads; registered the plain way, every pool was in the theme chunk every page of the site preloads. The plugin returns `moduleSideEffects: false` for the files it resolves, which is the package's own `sideEffects: false` carried across, so the catalogs the demo never reaches stay out of that chunk too.
+
 `Demo.vue` generates nothing during SSR. A page of random text pre-rendered at build time and re-rendered on hydration is a guaranteed mismatch rather than a likely one, so the first batch is drawn in `onMounted`.
 
 ### `llms.txt` is generated, not written
