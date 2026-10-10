@@ -35,13 +35,18 @@ The **JavaScript package is the source of truth**: a behaviour change starts the
 
 ### Changing a pool
 
-The datasets are the case where that is easiest to get wrong. Each package holds its own copy of the pools in its own language's syntax, and no package's suite can see past its own copy, so a word added to `packages/javascript` and forgotten in the other two breaks no test. The pools have to be edited in all three, and this is what checks you did:
+The datasets are the case where that is easiest to get wrong. Each package holds its own copy of the pools in its own language's syntax, and no package's suite can see past its own copy, so a word added to `packages/javascript` and forgotten in the other two breaks no test. Most pools have to be edited in all three, and this is what checks you did:
 
 ```
 node tools/parity/index.mjs
 ```
 
 Run it from the repository root whenever you touch a pool. It reads the datasets out of all three packages the way each package loads them and fails on any difference, naming the field and the entries that differ. CI runs it too.
+
+Two kinds of data are written by a tool rather than by hand, and an edit to their Dart or Python copy is overwritten the next time the tool runs:
+
+- The sentence datasets. Edit them in `packages/javascript/lib/sentence/data` and run `node tools/emit/index.mjs`, which writes the other two.
+- The location datasets. They are written by `tools/location` out of the files each country publishes; `tools/location/README.md` says which files and how to run it.
 
 Each package keeps its own `README.md` and `CHANGELOG.md`, because npm, pub.dev and PyPI read those from the package root. The repository's `README.md` is the only one that describes all of them at once.
 
@@ -55,7 +60,7 @@ Here's the process for contributing to the project:
 2. Install the package (if the package manager exists)
 3. Setting up lint or code formatter in the IDE (if your project includes a linter) and installing the relevant plugins. Some projects may use specific commands to check rules and perform formatting after module installation and before committing.
 4. Write the code that needs to be fixed
-5. Update the documentation (if it exists) or create a new one. If your project supports multilingual documentation, update the documentation for all languages. You can fill in the content in your own language and not translate it.
+5. Update the documentation. Every page of the site exists in English and in Korean, and the build fails when one locale has a page the other does not. If you cannot write one of the two, write the other and say so in the pull request.
 6. Add or modify tests as needed (if test code exists). You should also verify that existing tests pass.
 
 ### Write a commit message
@@ -64,11 +69,11 @@ While we don't have strict restrictions on commit messages, we recommend that yo
 
 - Write in English.
 - Use the ` symbol to name functions, variables, or folders and files.
-- Use a format like `xxx: message (fixes #1)`. The content in parentheses is optional.
+- Use a format like `[scope] tag: message (fixes #1)`. The scope is `[javascript]`, `[dart]` or `[python]` for a change to one package and `[common]` for one that reaches all of them, a change to the docs site alone takes none, and the content in parentheses is optional.
 - The message includes a summary of what was modified.
 - It's a good idea to separate multiple modifications into their own commit messages.
 
-It is recommended that you include a tag at the beginning of the commit message. Between the tag and the message, use `: ` between the tag and the message.
+Start the message with a tag, and put `: ` between the tag and the message.
 
 tags conform to the ["Udacity Git Commit Message Style Guide"](https://udacity.github.io/git-styleguide). However, you are welcome to use tags not listed here for additional situations.
 
