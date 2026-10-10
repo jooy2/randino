@@ -507,6 +507,29 @@ def test_random_is_where_every_draw_of_a_call_comes_from() -> None:
     assert randino.rand_name(count=5) != randino.rand_name(count=5)
 
 
+def test_a_source_that_raises_is_heard_and_one_that_cannot_be_called_is_ignored() -> None:
+    loose: Any = randino
+
+    def broken() -> float:
+        raise ValueError("the caller's own")
+
+    try:
+        randino.rand_name(random=broken)
+    except ValueError as error:
+        assert str(error) == "the caller's own"
+    else:
+        raise AssertionError("the source's error was swallowed")
+
+    # Not callable: `Random(42)` itself rather than its `.random`. Every draw of the call
+    # used to come out the same.
+    assert len(set(loose.rand_word(language="en", count=20, random=Random(42)))) > 1
+    assert len(set(loose.rand_word(language="en", count=20, random=42))) > 1
+    # A string that spells a number is not one, and reads as 0 the way NaN does.
+    assert loose.rand_word(language="en", count=3, random=lambda: "0.7") == loose.rand_word(
+        language="en", count=3, random=lambda: float("nan")
+    )
+
+
 def test_each_thread_draws_from_its_own_source() -> None:
     """A source passed in one thread never reaches a call running in another.
 

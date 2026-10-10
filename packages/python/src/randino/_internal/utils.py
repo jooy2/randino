@@ -27,19 +27,21 @@ def random() -> float:
     A source that hands back something else — `nan`, a number out of range, the wrong
     type — reads as `0` rather than as an index off the end of a pool. The same
     reasoning the option resolvers use: a caller who got it wrong should not be answered
-    from somewhere that says nothing about what they got wrong.
+    from somewhere that says nothing about what they got wrong. A source that raises is
+    the caller's own error, and reaches them as it was raised.
 
     Returns:
         A number in `[0, 1)`.
     """
     source = _source.get()
+    value = source() if source is not None else _random.random()
 
-    try:
-        value = float(source() if source is not None else _random.random())
-    except (TypeError, ValueError):
-        return 0.0
+    # Only a number is a draw: a string that spells one is not, the way it is not in
+    # JavaScript, and a `bool` is an `int` here and no number either.
+    if isinstance(value, int | float) and not isinstance(value, bool) and 0.0 <= value < 1.0:
+        return float(value)
 
-    return value if 0.0 <= value < 1.0 else 0.0
+    return 0.0
 
 
 @contextmanager
@@ -52,12 +54,15 @@ def with_random(source: Callable[[], float] | None) -> Iterator[None]:
     `rand_name`, and the name is meant to come from the same source the sentence did.
 
     Args:
-        source: What to draw from, or None to leave the source alone.
+        source: What to draw from, or None to leave the source alone. Anything that
+            cannot be called reads as None, the way it does in JavaScript: a
+            `random.Random(42)` passed where its `.random` was meant used to make every
+            draw of the call the same.
 
     Yields:
         Nothing; the block runs with the source in place.
     """
-    if source is None:
+    if source is None or not callable(source):
         yield
         return
 

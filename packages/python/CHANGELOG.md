@@ -2,6 +2,7 @@
 
 ## vNext (2026--)
 
+- An error raised by the `random` a caller passed reaches the caller; it was swallowed, and every draw after it read as `0`. A `random` that cannot be called, such as `random.Random(42)` itself rather than its `.random`, is ignored the way JavaScript ignores one, where it made every draw of the call the same. A source returning a string that spells a number reads as `0`, as it does in JavaScript.
 - `rand_modifier` reads a `language` it does not know as one left out, so the value's own script decides; it raised `KeyError`.
 - A `random` passed in one thread no longer reaches a call running in another. The source was held in a module global, so two threads that each passed their own could hand a caller who asked for `SystemRandom().random` draws from the other caller's seed, and leave one source in place after both had finished.
 - `rand_age` with `unique` stops as soon as every age in range has been drawn. It kept drawing repeats until its attempt budget ran out, which took seconds at a large `count`.
