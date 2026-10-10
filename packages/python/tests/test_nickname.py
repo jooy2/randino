@@ -522,6 +522,13 @@ def test_slots_picks_the_languages_that_can_answer_it() -> None:
     assert 0 < len(able) < len(WORD_LANGUAGES)
     assert used == able
 
+    # The first character narrows first. A shape only some languages have used to leave
+    # none that write `б`, though Russian answers with its closest shape.
+    russian = rand_nickname(slots="part", starts_with="б", count=SAMPLE, output="detail")
+
+    assert len(russian) == SAMPLE
+    assert all(detail.language == "ru" for detail in russian)
+
 
 def test_output_detail_reports_what_each_word_does() -> None:
     for language in WORD_LANGUAGES:

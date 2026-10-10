@@ -141,26 +141,33 @@ def frames_for(data: WordLanguageData, settings: Settings) -> tuple[WordFrame, .
     return matching or tuple(data.frames)
 
 
-def languages_for(settings: Settings) -> tuple[WordLanguage, ...]:
+def languages_for(
+    settings: Settings, candidates: tuple[WordLanguage, ...]
+) -> tuple[WordLanguage, ...]:
     """The languages one draw may come from.
 
     `language="all"` prefers the ones whose shapes answer the request, so asking every
     language for a trailing noun does not spend most of its draws on the four that have
     no such shape. When none of them can, every language is back in play and each
     answers with its closest.
+
+    `candidates` are the languages that write the requested first character, and the
+    narrowing happens inside them: narrowed first, `slots="part"` kept the languages
+    with that shape and `starts_with="б"` then dropped every one of them, though Russian
+    could answer with its closest shape.
     """
     wanted = settings.slots
 
     if wanted == "all":
-        return WORD_LANGUAGES
+        return candidates
 
     able = tuple(
         code
-        for code in WORD_LANGUAGES
+        for code in candidates
         if any(matches_slots(frame, wanted) for frame in WORD_DATA[code].frames)
     )
 
-    return able or WORD_LANGUAGES
+    return able or candidates
 
 
 _WORD_SLOTS: tuple[WordSlot, ...] = ("adjective", "action", "noun", "part")
@@ -514,11 +521,13 @@ def generate_nickname_details(
     )
 
     # Settled once rather than per draw: neither the shapes a language has nor the
-    # script it writes changes between one nickname and the next.
-    able = languages_for(settings)
-    # And a requested first character the language does not write is one it can never
-    # lead a nickname with, so those languages are out before a draw is made.
-    languages = languages_writing(resolve_word_language(language), able, settings.prefix)
+    # script it writes changes between one nickname and the next. A requested first
+    # character the language does not write is one it can never lead a nickname with,
+    # so those languages are out first, and the shapes narrow what is left.
+    languages = languages_for(
+        settings,
+        tuple(languages_writing(resolve_word_language(language), WORD_LANGUAGES, settings.prefix)),
+    )
 
     if not languages:
         return []

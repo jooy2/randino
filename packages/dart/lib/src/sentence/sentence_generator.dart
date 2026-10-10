@@ -945,8 +945,8 @@ bool _carries(SentenceLanguageData data, _Settings settings) {
 /// A null language prefers the ones whose shapes answer the request, and — when
 /// words were required — the ones whose pools actually hold them. When none of
 /// them can, every language is back in play and each answers with its closest.
-List<WordLanguage> _languagesFor(_Settings settings) {
-  final able = wordLanguages
+List<WordLanguage> _languagesFor(_Settings settings, List<WordLanguage> candidates) {
+  final able = candidates
       .where(
         (code) =>
             _carries(sentenceData[code]!, settings) &&
@@ -956,11 +956,11 @@ List<WordLanguage> _languagesFor(_Settings settings) {
 
   if (able.isNotEmpty) return able;
 
-  final shaped = wordLanguages
+  final shaped = candidates
       .where((code) => _carries(sentenceData[code]!, settings))
       .toList(growable: false);
 
-  return shaped.isNotEmpty ? shaped : wordLanguages;
+  return shaped.isNotEmpty ? shaped : candidates;
 }
 
 /* --- Required words -------------------------------------------------------- */
@@ -5198,11 +5198,13 @@ List<SentenceDetail> generateSentenceDetails({
   // Settled once rather than per draw. Neither the shapes a language has nor the
   // words it holds changes between one result and the next, and `_classify` walks
   // every pool of every language to answer `include` — which is nine walks per
-  // result when this sits inside the loop.
-  final able = _languagesFor(settings);
-  // And a requested first character the language does not write is one it can
-  // never lead a sentence with, so those languages are out before a draw is made.
-  final languages = languagesWriting(language, able, settings.prefix);
+  // result when this sits inside the loop. A requested first character the
+  // language does not write is one it can never lead a sentence with, so those
+  // languages are out first, and the shapes and words narrow what is left.
+  final languages = _languagesFor(
+    settings,
+    languagesWriting(language, wordLanguages, settings.prefix),
+  );
 
   if (languages.isEmpty) {
     return <SentenceDetail>[];

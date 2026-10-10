@@ -681,6 +681,14 @@ void main() {
       expect(able, isNotEmpty);
       expect(able.length, lessThan(wordLanguages.length));
       expect(used, unorderedEquals(able));
+
+      // The first character narrows first. A shape only some languages have used
+      // to leave none that write `б`, though Russian answers with its closest
+      // shape.
+      final russian = randNicknameDetails(slots: {WordSlot.part}, startsWith: 'б', count: sample);
+
+      expect(russian, hasLength(sample));
+      expect(russian.every((detail) => detail.language == WordLanguage.ru), isTrue);
     });
 
     test('randNicknameDetails reports what each word does', () {

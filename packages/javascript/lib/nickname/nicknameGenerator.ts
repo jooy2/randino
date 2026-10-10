@@ -148,15 +148,23 @@ function carries(data: WordLanguageData, settings: Settings): boolean {
  * shapes answer the request, so asking every language for a trailing noun does
  * not spend most of its draws on the four that have no such shape. When none of
  * them can, every language is back in play and each answers with its closest.
+ *
+ * `candidates` are the languages that write the requested first character, and
+ * the narrowing happens inside them: narrowed first, `slots: 'part'` kept the
+ * languages with that shape and `startsWith: 'б'` then dropped every one of them,
+ * though Russian could answer with its closest shape.
  */
-function languagesFor(settings: Settings): readonly WordLanguage[] {
+function languagesFor(
+	settings: Settings,
+	candidates: readonly WordLanguage[]
+): readonly WordLanguage[] {
 	if (settings.slots === 'all') {
-		return WORD_LANGUAGES;
+		return candidates;
 	}
 
-	const able = WORD_LANGUAGES.filter((code) => carries(WORD_DATA[code], settings));
+	const able = candidates.filter((code) => carries(WORD_DATA[code], settings));
 
-	return able.length ? able : WORD_LANGUAGES;
+	return able.length ? able : candidates;
 }
 
 /**
@@ -522,11 +530,13 @@ export function generateNicknameDetails(options: RandNicknameOptions = {}): Nick
 	const settings = resolveSettings(options);
 	const language = resolveWordLanguage(options.language);
 	// Settled once rather than per draw: neither the shapes a language has nor the
-	// script it writes changes between one nickname and the next.
-	const able = languagesFor(settings);
-	// And a requested first character the language does not write is one it can
-	// never lead a nickname with, so those languages are out before a draw is made.
-	const languages = languagesWriting(language, able, settings.prefix);
+	// script it writes changes between one nickname and the next. A requested first
+	// character the language does not write is one it can never lead a nickname
+	// with, so those languages are out first, and the shapes narrow what is left.
+	const languages = languagesFor(
+		settings,
+		languagesWriting(language, WORD_LANGUAGES, settings.prefix)
+	);
 
 	if (!languages.length) {
 		return [];

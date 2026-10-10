@@ -789,9 +789,16 @@ function carries(data: SentenceLanguageData, settings: Settings): boolean {
  * shapes answer the request, and — when words were required — the ones whose
  * pools actually hold them. When none of them can, every language is back in
  * play and each answers with its closest.
+ *
+ * `candidates` are the languages that write the requested first character, and
+ * the narrowing happens inside them, so a shape only English has does not rule
+ * out a first character only Russian writes.
  */
-function languagesFor(settings: Settings): readonly WordLanguage[] {
-	const able = WORD_LANGUAGES.filter(
+function languagesFor(
+	settings: Settings,
+	candidates: readonly WordLanguage[]
+): readonly WordLanguage[] {
+	const able = candidates.filter(
 		(code) =>
 			carries(SENTENCE_DATA[code], settings) &&
 			requirementsOf(settings, code).every((requirement) => requirement.known)
@@ -801,9 +808,9 @@ function languagesFor(settings: Settings): readonly WordLanguage[] {
 		return able;
 	}
 
-	const shaped = WORD_LANGUAGES.filter((code) => carries(SENTENCE_DATA[code], settings));
+	const shaped = candidates.filter((code) => carries(SENTENCE_DATA[code], settings));
 
-	return shaped.length ? shaped : WORD_LANGUAGES;
+	return shaped.length ? shaped : candidates;
 }
 
 /* --- Required words -------------------------------------------------------- */
@@ -5085,11 +5092,13 @@ export function generateSentenceDetails(options: RandSentenceOptions = {}): Sent
 	// Settled once rather than per draw. Neither the shapes a language has nor the
 	// words it holds changes between one result and the next, and `classify` walks
 	// every pool of every language to answer `include` — which is nine walks per
-	// result when this sits inside the loop.
-	const able = languagesFor(settings);
-	// And a requested first character the language does not write is one it can
-	// never lead a sentence with, so those languages are out before a draw is made.
-	const languages = languagesWriting(language, able, settings.prefix);
+	// result when this sits inside the loop. A requested first character the
+	// language does not write is one it can never lead a sentence with, so those
+	// languages are out first, and the shapes and words narrow what is left.
+	const languages = languagesFor(
+		settings,
+		languagesWriting(language, WORD_LANGUAGES, settings.prefix)
+	);
 
 	if (!languages.length) {
 		return [];

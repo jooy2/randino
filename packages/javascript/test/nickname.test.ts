@@ -592,6 +592,13 @@ describe('Nickname', () => {
 
 		assert.ok(able.length > 0 && able.length < WORD_LANGUAGES.length);
 		assert.deepStrictEqual([...used].sort(), [...able].sort());
+
+		// The first character narrows first. A shape only some languages have used to
+		// leave none that write `б`, though Russian answers with its closest shape.
+		const russian = nicknameDetails({ slots: 'part', startsWith: 'б', count: SAMPLE });
+
+		assert.strictEqual(russian.length, SAMPLE);
+		assert.ok(russian.every((detail) => detail.language === 'ru'));
 	});
 
 	it("output: 'detail' reports what each word does", () => {

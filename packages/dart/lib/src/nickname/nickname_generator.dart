@@ -125,16 +125,16 @@ List<WordFrame> _framesFor(WordLanguageData data, _Settings settings) {
 /// every language for a trailing noun does not spend most of its draws on the
 /// four that have no such shape. When none of them can, every language is back
 /// in play and each answers with its closest.
-List<WordLanguage> _languagesFor(_Settings settings) {
+List<WordLanguage> _languagesFor(_Settings settings, List<WordLanguage> candidates) {
   final wanted = settings.slots;
 
-  if (wanted == null) return wordLanguages;
+  if (wanted == null) return candidates;
 
-  final able = wordLanguages
+  final able = candidates
       .where((code) => wordData[code]!.frames.any((frame) => _matchesSlots(frame, wanted)))
       .toList(growable: false);
 
-  return able.isNotEmpty ? able : wordLanguages;
+  return able.isNotEmpty ? able : candidates;
 }
 
 /// What goes between the words: the caller's separator, or the language's own
@@ -489,11 +489,13 @@ List<NicknameDetail> generateNicknameDetails({
   );
 
   // Settled once rather than per draw: neither the shapes a language has nor the
-  // script it writes changes between one nickname and the next.
-  final able = _languagesFor(settings);
-  // And a requested first character the language does not write is one it can
-  // never lead a nickname with, so those languages are out before a draw is made.
-  final languages = languagesWriting(language, able, settings.prefix);
+  // script it writes changes between one nickname and the next. A requested first
+  // character the language does not write is one it can never lead a nickname
+  // with, so those languages are out first, and the shapes narrow what is left.
+  final languages = _languagesFor(
+    settings,
+    languagesWriting(language, wordLanguages, settings.prefix),
+  );
 
   if (languages.isEmpty) {
     return <NicknameDetail>[];

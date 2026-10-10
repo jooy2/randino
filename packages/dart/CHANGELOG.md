@@ -2,6 +2,7 @@
 
 ## vNext (2026--)
 
+- With no `language`, `randNickname` and `randSentence` keep to the languages that write the `startsWith` character before narrowing by shape or by required word. `randNickname(slots: {WordSlot.part}, startsWith: 'б')` returned nothing, though Russian answers it with its closest shape.
 - `randSuffix` and `randPrefix` draw whole characters from a `charset` that holds emoji or any other character outside the Basic Multilingual Plane. They drew UTF-16 code units, which split `🎲` into two halves that are no character.
 - `randModifier` gives a German noun written in lower case the gender the noun has: `katze` takes a feminine modifier, as `Katze` does. It was read by its ending and came back `flinker katze`.
 - An invented Russian surname takes the feminine form beside a woman's name, the way a real one does. `RandRealism.invented` and `RandRealism.mixed` wrote `Чачев` beside a woman's given name.

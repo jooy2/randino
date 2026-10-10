@@ -2,6 +2,7 @@
 
 ## vNext (2026--)
 
+- With `language="all"`, `rand_nickname` and `rand_sentence` keep to the languages that write the `starts_with` character before narrowing by shape or by required word. `rand_nickname(slots="part", starts_with="б")` returned nothing, though Russian answers it with its closest shape.
 - A `word_separator` that is not a string reads as left out, the language's own joiner. `rand_nickname(word_separator=5)` and `nickname_length_range("en", 5)` raised `TypeError`.
 - `rand_modifier` gives a German noun written in lower case the gender the noun has: `katze` takes a feminine modifier, as `Katze` does. It was read by its ending and came back `flinker katze`.
 - An invented Russian surname takes the feminine form beside a woman's name, the way a real one does. `realism="invented"` and `"mixed"` wrote `Чачев` beside a woman's given name.

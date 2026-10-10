@@ -44,7 +44,6 @@ A fix to a generator added under `vNext` needs no changelog entry of its own, si
 
 ### A. No decision needed
 
-- **A30. With `language: 'all'`, `slots` narrows the languages before `startsWith` does.** `randNickname({ slots: 'part', startsWith: 'б' })` is `[]`, while naming `ru` works. Filter by script first.
 - **A31. `randNickname` reads `realism` before resolving it.** `realism: 'bogus'` invents nothing yet opens the loose themes. Derive `loose` from the resolved chance.
 - **A32. `Lemonade` is in the English `food` pool.** It belongs in `drink`, in all three packages.
 - **A33. A required modifier is dropped when the subject is a name.** `includeName` is drawn per result, and a named subject takes no modifier, so `include: 'brave'` is missing from 112 of 300 results. Do not write a name over a part the plan put a requirement on.

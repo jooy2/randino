@@ -997,16 +997,22 @@ def _carries(data: SentenceLanguageData, settings: Settings) -> bool:
     )
 
 
-def _languages_for(settings: Settings) -> tuple[WordLanguage, ...]:
+def _languages_for(
+    settings: Settings, candidates: tuple[WordLanguage, ...]
+) -> tuple[WordLanguage, ...]:
     """The languages one draw may come from.
 
     `"all"` prefers the ones whose shapes answer the request, and — when words were
     required — the ones whose pools actually hold them. When none of them can, every
     language is back in play and each answers with its closest.
+
+    `candidates` are the languages that write the requested first character, and the
+    narrowing happens inside them, so a shape only English has does not rule out a
+    first character only Russian writes.
     """
     able = tuple(
         code
-        for code in WORD_LANGUAGES
+        for code in candidates
         if _carries(SENTENCE_DATA[code], settings)
         and all(requirement.known for requirement in _requirements_of(settings, code))
     )
@@ -1014,9 +1020,9 @@ def _languages_for(settings: Settings) -> tuple[WordLanguage, ...]:
     if able:
         return able
 
-    shaped = tuple(code for code in WORD_LANGUAGES if _carries(SENTENCE_DATA[code], settings))
+    shaped = tuple(code for code in candidates if _carries(SENTENCE_DATA[code], settings))
 
-    return shaped or WORD_LANGUAGES
+    return shaped or candidates
 
 
 # --- Required words ---------------------------------------------------------
@@ -5251,11 +5257,13 @@ def generate_sentence_details(
     # Settled once rather than per draw. Neither the shapes a language has nor the
     # words it holds changes between one result and the next, and `_classify` walks
     # every pool of every language to answer `include` — which is nine walks per
-    # result when this sits inside the loop.
-    able = _languages_for(settings)
-    # And a requested first character the language does not write is one it can never
-    # lead a sentence with, so those languages are out before a draw is made.
-    languages = languages_writing(resolve_word_language(language), able, settings.prefix)
+    # result when this sits inside the loop. A requested first character the language
+    # does not write is one it can never lead a sentence with, so those languages are
+    # out first, and the shapes and words narrow what is left.
+    languages = _languages_for(
+        settings,
+        tuple(languages_writing(resolve_word_language(language), WORD_LANGUAGES, settings.prefix)),
+    )
 
     if not languages:
         return []

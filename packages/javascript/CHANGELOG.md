@@ -2,6 +2,7 @@
 
 ## vNext (2026--)
 
+- With `language: 'all'`, `randNickname` and `randSentence` keep to the languages that write the `startsWith` character before narrowing by shape or by required word. `randNickname({ slots: 'part', startsWith: 'б' })` returned nothing, though Russian answers it with its closest shape.
 - A `wordSeparator` that is not a string reads as left out, the language's own joiner. `randNickname({ wordSeparator: 5 })` threw, and `nicknameLengthRange('en', 5)` returned `[NaN, NaN]`.
 - `randSuffix`, `randPrefix` and `randModifier` keep the options passed beside a value of `undefined` or `null`, the way a caller forwarding an optional value writes it. `randSuffix(undefined, { length: 12 })` wrote the default five-character token.
 - `randSuffix` and `randPrefix` draw whole characters from a `charset` that holds emoji or any other character outside the Basic Multilingual Plane. They drew UTF-16 code units, which split `🎲` into two halves that are no character.
