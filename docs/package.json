@@ -9,8 +9,9 @@
 	"scripts": {
 		"changelog": "node scripts/copy-changelog.mjs",
 		"check:anchors": "node scripts/check-anchors.mjs",
+		"check:site": "node scripts/check-site.mjs",
 		"dev": "npm run changelog && vitepress dev",
-		"build": "npm run changelog && vitepress build && npm run check:anchors",
+		"build": "npm run changelog && vitepress build && npm run check:anchors && npm run check:site",
 		"serve": "npm run build && vitepress serve",
 		"format": "prettier . --check",
 		"format:fix": "prettier . --write",

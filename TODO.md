@@ -44,7 +44,6 @@ A fix to a generator added under `vNext` needs no changelog entry of its own, si
 
 ### A. No decision needed
 
-- **A46. A site check script.** Fail the docs build on a component tag left in `llms*.txt`, a page missing from `SIDEBAR`, and an upper-case export missing from `reference/constants.md`.
 - **A47. Stale bundle sizes.** `CLAUDE.md` calls 448 KB the whole library (it is about 613 KB; 448 KB is `randSentence`) and cites a 33 KB figure that is not there; `rand-sentence.md` still says 122.5 and 144.5 KB. Keep the numbers in the getting-started table only, and add `randLocation` (160 KB), `randCountry` (18 KB) and `randOrganization` (14 KB) to it.
 - **A48. Stale statements in `CLAUDE.md`.** The deploy triggers contradict each other (lines 545 and 583); "four folders" is 22; General has 10 functions, not five; the Behaviour pages leave out sentence; the Dart and Python trees miss `generate`, `script`, `capacity` and `constants`; the commit section leaves out the `[common]` prefix; the selectors hard-coding the packages are in four places, not one.
 - **A49. `CONTRIBUTING.md` is out of date.** It does not say the sentence and location datasets are generated, it contradicts itself on the language of the docs, and its line about the tag separator is garbled.

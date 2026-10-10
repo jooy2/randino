@@ -508,13 +508,14 @@ docs/
   scripts/
     copy-changelog.mjs      # every package's CHANGELOG.md -> docs/<locale>/changelog.md
     check-anchors.mjs       # every `#fragment` link resolves (see below)
+    check-site.mjs          # no markup left in llms*.txt, every page in the menu, every constant documented
   public/                   # the logo, one file per size (see below)
 ```
 
 | Command                 | What it does                                        |
 | ----------------------- | --------------------------------------------------- |
 | `npm run dev`           | The dev server                                      |
-| `npm run build`         | changelog → VitePress → anchor check, into `docs-dist/` |
+| `npm run build`         | changelog → VitePress → anchor and site checks, into `docs-dist/` |
 | `npm run typecheck`     | `tsc` over `.vitepress`                             |
 | `npm run format`        | Prettier, read-only — what CI runs                  |
 | `npm run format:fix`    | Prettier, in place                                  |
