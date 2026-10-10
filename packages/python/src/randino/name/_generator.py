@@ -310,7 +310,7 @@ def compose_given(data: NameLanguageData, is_male: bool, length: int, prefix: st
     native = "".join(native_of(part) for part in parts)
 
     if data.roman == "hangul":
-        return Entry(native, capitalize_first(romanize_hangul(native)))
+        return Entry(native, capitalize_first(romanize_hangul(native, name=True)))
 
     # Kanji and hanzi carry their own reading, but a syllable the caller passed to
     # `starts_with` has none — fall back to the character itself rather than

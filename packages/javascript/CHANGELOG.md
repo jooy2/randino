@@ -2,6 +2,7 @@
 
 ## vNext (2026--)
 
+- A Korean name is romanized by the Revised Romanization's rule for personal names, which writes no sound change inside a name: `석민` is `Seokmin` and `복남` `Boknam`, where they came out `Seongmin` and `Bongnam`.
 - `randName` keeps a Korean, Japanese or Chinese surname under a `maxLength` too tight for it, the way it keeps every other part asked for, and prefers a surname short enough to leave room for a given name: `maxLength: 1` wrote a bare given name (`솔`), and Japanese wrote one at a maximum of two, where `森` and `林` leave room.
 - A `minLength` past the top of a language's natural range moves a `maxLength` left out out of the way, the way `maxAge` moves for `minAge`: `randName({ language: 'en', minLength: 30 })` writes names of thirty characters or so rather than twenty-one, and the range keeps its natural width above the minimum.
 - An invented Japanese word goes on in the kana its first character is written in: a hiragana `startsWith` such as `か` gives `かろび`, where it gave `かロビ`, half in one kana and half in the other.

@@ -228,7 +228,11 @@ function decompose(char: string): Syllable | null {
  * Romanize one final consonant against the syllable that follows it. Returns the
  * sound the current syllable ends on plus an onset override for the next one.
  */
-function romanizeCoda(coda: number, next: Syllable | null): readonly [string, string | null] {
+function romanizeCoda(
+	coda: number,
+	next: Syllable | null,
+	name: boolean
+): readonly [string, string | null] {
 	if (coda === 0) {
 		return ['', null];
 	}
@@ -243,6 +247,14 @@ function romanizeCoda(coda: number, next: Syllable | null): readonly [string, st
 	if (onset === ONSET_EMPTY) {
 		const [keep, moved] = LIAISON[coda];
 		return [keep, moved];
+	}
+
+	// A personal name writes no sound change between its syllables: `복남` is
+	// `Boknam` and `빛나` `Bitna`, by the romanization's own rule for names. A
+	// doubled ㄹ is still `ll`, which is how the romanization spells it rather than
+	// a change in the sound.
+	if (name) {
+		return CODA_L.has(coda) && onset === ONSET_R ? ['l', 'l'] : [CODA[coda], null];
 	}
 
 	// ㅎ in the final aspirates the next consonant (놓다 -> nota).
@@ -277,8 +289,12 @@ function romanizeCoda(coda: number, next: Syllable | null): readonly [string, st
 /**
  * Romanize Hangul text with the Revised Romanization of Korean. Characters that
  * are not composed Hangul syllables are passed through untouched.
+ *
+ * `name` follows the romanization's rule for personal names, which writes no
+ * sound change inside a name: `석민` is `seokmin` as a name and `seongmin` as
+ * anything else.
  */
-export function romanizeHangul(text: string): string {
+export function romanizeHangul(text: string, name = false): string {
 	const chars = [...text];
 	const syllables = chars.map(decompose);
 	let out = '';
@@ -293,7 +309,7 @@ export function romanizeHangul(text: string): string {
 			continue;
 		}
 
-		const [coda, nextOnset] = romanizeCoda(current.coda, syllables[i + 1] ?? null);
+		const [coda, nextOnset] = romanizeCoda(current.coda, syllables[i + 1] ?? null, name);
 
 		out += (override ?? ONSET[current.onset]) + NUCLEUS[current.nucleus] + coda;
 		override = nextOnset;
@@ -313,8 +329,8 @@ export function romanize(mode: RomanMode, value: string, part: 'surname' | 'give
 			return translit(value);
 		case 'hangul':
 			return part === 'surname'
-				? (KO_SURNAME_ROMAN[value] ?? capitalizeFirst(romanizeHangul(value)))
-				: capitalizeFirst(romanizeHangul(value));
+				? (KO_SURNAME_ROMAN[value] ?? capitalizeFirst(romanizeHangul(value, true)))
+				: capitalizeFirst(romanizeHangul(value, true));
 		case 'token':
 		default:
 			return value;

@@ -815,6 +815,37 @@ void main() {
       for (final (hangul, expected) in cases) {
         expect(romanizeHangul(hangul), expected, reason: hangul);
       }
+
+      // A personal name writes no sound change inside it, by the romanization's
+      // own rule for names (한복남 Han Boknam, 홍빛나 Hong Bitna). A final
+      // consonant still moves in front of a vowel, and ㄹㄹ is still `ll`.
+      const names = <(String, String)>[
+        ('복남', 'boknam'),
+        ('빛나', 'bitna'),
+        ('석민', 'seokmin'),
+        ('성록', 'seongrok'),
+        ('진리', 'jinri'),
+        ('슬나', 'seulna'),
+        ('별리', 'byeolli'),
+        ('은우', 'eunu'),
+        ('민준', 'minjun'),
+      ];
+
+      for (final (hangul, expected) in names) {
+        expect(romanizeHangul(hangul, name: true), expected, reason: hangul);
+      }
+    });
+
+    test('a Korean given name is romanized without the sound changes inside it', () {
+      for (final detail in randNameDetails(
+        language: NameLanguage.ko,
+        includeSurname: false,
+        count: sample * 5,
+      )) {
+        final roman = romanizeHangul(detail.native, name: true);
+
+        expect(detail.roman, roman[0].toUpperCase() + roman.substring(1), reason: detail.native);
+      }
     });
 
     test('the fold table covers every Latin-script pool', () {

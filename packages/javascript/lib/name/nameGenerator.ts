@@ -303,7 +303,7 @@ function composeGiven(
 	const n = parts.map(nativeOf).join('');
 
 	if (data.roman === 'hangul') {
-		return { n, r: capitalizeFirst(romanizeHangul(n)) };
+		return { n, r: capitalizeFirst(romanizeHangul(n, true)) };
 	}
 
 	// Kanji and hanzi carry their own reading, but a syllable the caller passed to

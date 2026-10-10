@@ -81,7 +81,7 @@ Romanization is the **English pronunciation of the native form**, not a translat
 
 - **Latin scripts** drop their diacritics: `Pérez` → `Perez`, `Müller` → `Muller`, `Đỗ` → `Do`.
 - **Cyrillic** is transliterated character by character: `Семёнов` → `Semyonov`.
-- **Korean** follows the Revised Romanization of Korean, including the sound changes between syllables — `석민` is `Seongmin` and not `Seokmin` — with the conventional spelling for surnames, so `김` is `Kim` rather than `Gim`.
+- **Korean** follows the Revised Romanization of Korean and its rule for personal names, which writes no sound change inside a name: `석민` is `Seokmin` and `복남` is `Boknam`, not `Seongmin` and `Bongnam`. A final consonant still moves in front of a vowel (`은우` is `Eunu`), and surnames take their conventional spelling, so `김` is `Kim` rather than `Gim`.
 - **Japanese and Chinese** carry the reading on each character, so `佐藤` is `Sato` and `王` is `Wang`.
 
 English is the one language where romanizing changes nothing, because the names are already in the Latin alphabet.

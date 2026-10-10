@@ -625,3 +625,30 @@ def test_romanize_hangul_follows_the_revised_romanization_of_korean() -> None:
 
     for hangul, expected in cases:
         assert romanize_hangul(hangul) == expected, hangul
+
+    # A personal name writes no sound change inside it, by the romanization's own rule
+    # for names (한복남 Han Boknam, 홍빛나 Hong Bitna). A final consonant still moves in
+    # front of a vowel, and ㄹㄹ is still `ll`.
+    names = [
+        ("복남", "boknam"),
+        ("빛나", "bitna"),
+        ("석민", "seokmin"),
+        ("성록", "seongrok"),
+        ("진리", "jinri"),
+        ("슬나", "seulna"),
+        ("별리", "byeolli"),
+        ("은우", "eunu"),
+        ("민준", "minjun"),
+    ]
+
+    for hangul, expected in names:
+        assert romanize_hangul(hangul, name=True) == expected, hangul
+
+
+def test_a_korean_given_name_is_romanized_without_the_sound_changes_inside_it() -> None:
+    for detail in rand_name(
+        language="ko", include_surname=False, count=SAMPLE * 5, output="detail"
+    ):
+        roman = romanize_hangul(detail.native, name=True)
+
+        assert detail.roman == roman[0].upper() + roman[1:], detail.native

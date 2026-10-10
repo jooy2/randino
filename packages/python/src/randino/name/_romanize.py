@@ -240,11 +240,13 @@ def decompose(char: str) -> Syllable | None:
     return Syllable(onset=offset // 588, nucleus=(offset % 588) // 28, coda=offset % 28)
 
 
-def romanize_coda(coda: int, following: Syllable | None) -> tuple[str, str | None]:
+def romanize_coda(
+    coda: int, following: Syllable | None, name: bool = False
+) -> tuple[str, str | None]:
     """Romanize one final consonant against the syllable that follows it.
 
     Returns the sound the current syllable ends on plus an onset override for the
-    next one.
+    next one. `name` writes no sound change, the way a personal name is romanized.
     """
     if coda == 0:
         return "", None
@@ -257,6 +259,13 @@ def romanize_coda(coda: int, following: Syllable | None) -> tuple[str, str | Non
     # A vowel-initial syllable pulls the final consonant across.
     if onset == ONSET_EMPTY:
         return LIAISON[coda]
+
+    # A personal name writes no sound change between its syllables: `복남` is `Boknam`
+    # and `빛나` `Bitna`, by the romanization's own rule for names. A doubled ㄹ is
+    # still `ll`, which is how the romanization spells it rather than a change in the
+    # sound.
+    if name:
+        return ("l", "l") if coda in CODA_L and onset == ONSET_R else (CODA[coda], None)
 
     # ㅎ in the final aspirates the next consonant (놓다 -> nota).
     if coda in CODA_H and onset in ASPIRATED:
@@ -292,10 +301,12 @@ def romanize_coda(coda: int, following: Syllable | None) -> tuple[str, str | Non
     return CODA[coda], None
 
 
-def romanize_hangul(text: str) -> str:
+def romanize_hangul(text: str, name: bool = False) -> str:
     """Romanize Hangul with the Revised Romanization of Korean.
 
     Characters that are not composed Hangul syllables are passed through untouched.
+    `name` follows the romanization's rule for personal names, which writes no sound
+    change inside a name: `석민` is `seokmin` as a name and `seongmin` as anything else.
     """
     syllables = [decompose(char) for char in text]
     out = ""
@@ -310,7 +321,7 @@ def romanize_hangul(text: str) -> str:
             continue
 
         following = syllables[index + 1] if index + 1 < len(syllables) else None
-        coda, next_onset = romanize_coda(current.coda, following)
+        coda, next_onset = romanize_coda(current.coda, following, name)
 
         out += ONSET[current.onset] if override is None else override
         out += NUCLEUS[current.nucleus] + coda
@@ -329,6 +340,6 @@ def romanize(mode: RomanMode, value: str, part: Literal["surname", "given"]) -> 
         if part == "surname" and value in KO_SURNAME_ROMAN:
             return KO_SURNAME_ROMAN[value]
 
-        return capitalize_first(romanize_hangul(value))
+        return capitalize_first(romanize_hangul(value, name=True))
 
     return value

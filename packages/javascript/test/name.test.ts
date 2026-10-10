@@ -697,5 +697,37 @@ describe('Name', () => {
 		for (const [hangul, roman] of cases) {
 			assert.strictEqual(romanizeHangul(hangul), roman, hangul);
 		}
+
+		// A personal name writes no sound change inside it, by the romanization's
+		// own rule for names (한복남 Han Boknam, 홍빛나 Hong Bitna). A final
+		// consonant still moves in front of a vowel, and ㄹㄹ is still `ll`.
+		const names: [string, string][] = [
+			['복남', 'boknam'],
+			['빛나', 'bitna'],
+			['석민', 'seokmin'],
+			['성록', 'seongrok'],
+			['진리', 'jinri'],
+			['슬나', 'seulna'],
+			['별리', 'byeolli'],
+			['은우', 'eunu'],
+			['민준', 'minjun']
+		];
+
+		for (const [hangul, roman] of names) {
+			assert.strictEqual(romanizeHangul(hangul, true), roman, hangul);
+		}
+	});
+
+	it('a Korean given name is romanized without the sound changes inside it', () => {
+		for (const detail of randName({
+			language: 'ko',
+			includeSurname: false,
+			count: SAMPLE * 5,
+			output: 'detail'
+		})) {
+			const roman = romanizeHangul(detail.native, true);
+
+			assert.strictEqual(detail.roman, roman[0].toUpperCase() + roman.slice(1), detail.native);
+		}
 	});
 });

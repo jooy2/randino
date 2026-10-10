@@ -237,7 +237,7 @@ _Syllable? _decompose(int code) {
 
 /// Romanize one final consonant against the syllable that follows it. Returns
 /// the sound the current syllable ends on plus an onset override for the next.
-(String, String?) _romanizeCoda(int coda, _Syllable? next) {
+(String, String?) _romanizeCoda(int coda, _Syllable? next, bool name) {
   if (coda == 0) {
     return ('', null);
   }
@@ -253,6 +253,14 @@ _Syllable? _decompose(int code) {
     final moved = _liaison[coda];
 
     return (moved[0], moved[1]);
+  }
+
+  // A personal name writes no sound change between its syllables: `복남` is
+  // `Boknam` and `빛나` `Bitna`, by the romanization's own rule for names. A
+  // doubled ㄹ is still `ll`, which is how the romanization spells it rather
+  // than a change in the sound.
+  if (name) {
+    return _codaL.contains(coda) && onset == _onsetR ? ('l', 'l') : (_coda[coda], null);
   }
 
   // ㅎ in the final aspirates the next consonant (놓다 -> nota).
@@ -286,7 +294,11 @@ _Syllable? _decompose(int code) {
 
 /// Romanize Hangul text with the Revised Romanization of Korean. Characters
 /// that are not composed Hangul syllables are passed through untouched.
-String romanizeHangul(String text) {
+///
+/// [name] follows the romanization's rule for personal names, which writes no
+/// sound change inside a name: `석민` is `seokmin` as a name and `seongmin` as
+/// anything else.
+String romanizeHangul(String text, {bool name = false}) {
   final codes = text.runes.toList(growable: false);
   final syllables = codes.map(_decompose).toList(growable: false);
   final buffer = StringBuffer();
@@ -304,6 +316,7 @@ String romanizeHangul(String text) {
     final (coda, nextOnset) = _romanizeCoda(
       current.coda,
       i + 1 < syllables.length ? syllables[i + 1] : null,
+      name,
     );
 
     buffer.write((override ?? _onset[current.onset]) + _nucleus[current.nucleus] + coda);
@@ -334,8 +347,8 @@ String romanize(RomanMode mode, String value, NamePart part) {
       return translit(value);
     case RomanMode.hangul:
       return part == NamePart.surname
-          ? (koSurnameRoman[value] ?? capitalizeFirst(romanizeHangul(value)))
-          : capitalizeFirst(romanizeHangul(value));
+          ? (koSurnameRoman[value] ?? capitalizeFirst(romanizeHangul(value, name: true)))
+          : capitalizeFirst(romanizeHangul(value, name: true));
     case RomanMode.token:
       return value;
   }

@@ -287,7 +287,7 @@ _Entry _composeGiven(NameLanguageData data, bool isMale, int length, String pref
   final n = parts.map((part) => part.n).join();
 
   if (data.roman == RomanMode.hangul) {
-    return _Entry(n, capitalizeFirst(romanizeHangul(n)));
+    return _Entry(n, capitalizeFirst(romanizeHangul(n, name: true)));
   }
 
   // Kanji and hanzi carry their own reading, but a syllable the caller passed to
