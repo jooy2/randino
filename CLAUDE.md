@@ -285,10 +285,9 @@ A port of the JavaScript package, not a second design. Same datasets, same rules
 lib/
   randino.dart              # the barrel — its `show` clauses ARE the public API
   src/
-    types.dart              # ALL public types (enums, LengthRange, the two details)
-    internal/
-      utils.dart            # pick / randInt / chance / clamp, never exported
-      parse.dart            # words() / pairs() / weightMap() / romanMap()
+    types.dart              # ALL public types (enums, LengthRange, every detail)
+    constants.dart          # the shared bounds, as `lib/constants.ts` has them
+    internal/               # mirrors lib/_internal: utils, parse, generate, script, capacity
     age/                    # mirrors lib/age, plus `randAgeDetails`
     appstore/               # mirrors lib/appstore, plus `randAppStoreDetails`
     architecture/           # mirrors lib/architecture, plus `randArchitectureDetails`
@@ -396,10 +395,9 @@ A port of the JavaScript package, not a second design. Same datasets, same rules
 ```
 src/randino/
   __init__.py               # the barrel — its `__all__` IS the public API
-  _types.py                 # ALL public types (Literals, the two details)
-  _internal/
-    utils.py                # pick / rand_int / chance / clamp, never exported
-    parse.py                # words() / tokens() / weights() / roman_map()
+  _types.py                 # ALL public types (Literals, every detail)
+  constants.py              # the shared bounds, as `lib/constants.ts` has them
+  _internal/                # mirrors lib/_internal: utils, parse, generate, script, capacity
     table.py                # rows() / items(), apart from parse: see the system bullets
   age/                      # mirrors lib/age
   appstore/                 # mirrors lib/appstore
@@ -475,7 +473,7 @@ Set up with `uv venv && uv pip install -e ".[dev]"`, or the `pip` equivalent.
 
 - **Keyword-only arguments, not an options object.** `rand_name(language="ko", count=3)`; the `*` in every generator's signature is deliberate, because `rand_name("ja", "female", 5)` is both unreadable and a parameter order frozen into the API. The three `name_*` / `nickname_length_range` helpers are the exception — they take their arguments positionally as well, the way the JavaScript ones do, because they are short enough to read either way.
 - **`Literal`, not enums.** `language="ko"` is the same string the npm package takes, and `"all"` survives the crossing intact — which is why Python needs none of Dart's "a null enum means every one of them", and why no argument here has to distinguish "omitted" from "every one of them".
-- **`tuple[int, int]` replaces `[number, number]`**, and the two details are frozen dataclasses with `slots=True`.
+- **`tuple[int, int]` replaces `[number, number]`**, and every detail is a frozen dataclass with `slots=True`.
 - **File names are `snake_case`, one public function per file**, named after the function. `__init__.py` re-exports them and `__all__` is the contract.
 - **Imports are absolute** (`from randino.name.data import NAME_DATA`), even inside the package, so a moved file breaks loudly rather than silently.
 - **Everything public carries a docstring**, including inside `_internal`. Ruff's `D` rules are on, Google convention.
@@ -500,10 +498,16 @@ docs/
       language.ts           # the reader's choice, as one value the site shares
       sidebar.ts            # the menu, written out — two locale columns, one structure
       i18n.ts               # the few strings the site's own components render
+      markdown.ts           # `<Lang>` and the option tables flattened to text, for llms and <meta>
+      wordOptions.ts        # the rows `WordOptions.vue` draws and `llms-full.txt` writes
+      locationOptions.ts    # the same for `LocationOptions.vue`
     llms.ts                 # `llms.txt` and `llms-full.txt`, written at build time
     theme/                  # the language switch, the packages menu, the demo, the CSS
       components/
+        Demo.vue            # `/demo`, which runs the library in the reader's browser
         WordOptions.vue     # the option table `randWord` and its twenty-nine share
+        LocationOptions.vue # the option table `randLocation` and its four levels share
+        Lang.vue …          # the `<Lang>` switch, the package marks and menus, the layout
   en/  ko/                  # the pages, mirrored
   scripts/
     copy-changelog.mjs      # every package's CHANGELOG.md -> docs/<locale>/changelog.md
@@ -527,16 +531,16 @@ A page says the same thing about `randName` whichever package a reader installs;
 - **`::: lang js` … `:::`** wraps a block only one package sees. `::: lang js dart` is a block two of them want.
 - **`<Lang js="…" dart="…" py="…" code />`** is the inline form, for a phrase in the middle of a sentence that does not differ. It is what keeps an option table from being written three times, and what carries `min_length` next to `minLength`.
 
-Every variant is in the document and CSS hides all but one, which is what buys the no-flash switch, a hydration-safe render and a search index that carries all of them. Adding a package is an entry in `data/languages.ts`, a branch in `LangMark.vue` for its logo, a line in the one hard-coded selector group in `theme/styles/lang.css`, a row in `packageLinks` in `config.ts` plus a branch in `RegistryMark.vue` for the registry it is published to, and the blocks on whatever pages have something to say about it.
+Every variant is in the document and CSS hides all but one, which is what buys the no-flash switch, a hydration-safe render and a search index that carries all of them. Adding a package is an entry in `data/languages.ts`, a branch in `LangMark.vue` for its logo, a line in each of the two hard-coded selector groups in `theme/styles/lang.css` (the page's blocks, and the home page's picker), an entry in `PACKAGES` in `scripts/copy-changelog.mjs` and a key in `OptionVariants` in `data/wordOptions.ts`, a row in `packageLinks` in `config.ts` plus a branch in `RegistryMark.vue` for the registry it is published to, and the blocks on whatever pages have something to say about it.
 
 **Function and option names in headings, the sidebar and anchors stay in the JavaScript spelling**, and only the body carries all three. That is not laziness: VitePress builds its outline from the rendered heading and its sidebar from `config.ts`, so a per-package heading would either read as all three names run together or flash the wrong one before hydration — and a cross-page `#anchor` has to resolve for every reader, not just the one who picked JavaScript. The mapping is mechanical (`minLength` → `min_length`) and Getting started states it once.
 
 ### The menu is not the folders
 
-`name/`, `nickname/`, `word/` and `decorate/` are four folders because those are four things in the source, and the sidebar deliberately does not repeat that split. A reader looking for `randNickname` is looking for a function, not for the corner of the library it belongs to, so the groups are what a function **is**:
+The source is a folder per category, and the sidebar deliberately does not repeat that split. A reader looking for `randNickname` is looking for a function, not for the corner of the library it belongs to, so the groups are what a function **is**:
 
-- **API**, which nests three groups by what a function *does with a string*: **Generators** make one out of nothing, **Decorators** attach something to one you already have (`randSuffix`, `randPrefix`, `randModifier`), and **Utilities** answer a question about a language (`nameLengthRange`, `wordLengthRange`, the two `nameSupports…`). Generators nests once more, into **General** — `randName`, `randNickname`, `randWord`, `randSentence`, `randLocation`, one per kind of text — **System**, the values a sample machine is described by, and two groups of one function with an argument decided: **Words**, the twenty-nine themed forms of `randWord`, and **Locations**, the four level forms of `randLocation`.
-- **Behaviour** — the prose explaining how a generator's options behave, where there is enough of it to be its own page. `randName` and `randNickname` have one each; `randWord` does not, because it draws one word and its API page says everything there is to say. Its own group rather than more entries under Guide, because it grows alongside Generators and Guide does not.
+- **API**, which nests three groups by what a function *does with a string*: **Generators** make one out of nothing, **Decorators** attach something to one you already have (`randSuffix`, `randPrefix`, `randModifier`), and **Utilities** answer a question about a language (`nameLengthRange`, `wordLengthRange`, the two `nameSupports…`). Generators nests once more, into **General** — `randName`, `randNickname`, `randWord`, `randSentence`, `randLocation`, `randAge`, `randGender`, `randOrganization`, `randDate` and `randPhone`, one per kind of value — **System**, the values a sample machine is described by, and two groups of one function with an argument decided: **Words**, the twenty-nine themed forms of `randWord`, and **Locations**, the four level forms of `randLocation`.
+- **Behaviour** — the prose explaining how a generator's options behave, where there is enough of it to be its own page. `randName`, `randNickname` and `randSentence` have one each; `randWord` does not, because it draws one word and its API page says everything there is to say. Its own group rather than more entries under Guide, because it grows alongside Generators and Guide does not.
 
 `data/sidebar.ts` nests as deep as it is written: a `SidebarGroup`'s `items` are pages, or more groups, and `sidebarFor` recurses. **Three levels is the working limit** — API > Generators > Words is the deepest there is. The third level earns itself by splitting one group that had grown past reading, not by being a finer category: twenty-nine entries under Generators is a list nobody scans, and `randAnimal` is `randWord` with an argument decided, so `General` and `Words` is the split the functions themselves suggest. Anything that is merely *related* to a page still goes beside it, not under it.
 
@@ -593,7 +597,7 @@ The repository's own `README.md` links the file by a relative path, which is wha
 
 ### Deployment
 
-`.github/workflows/publish-documentation.yml` builds the site and pushes `docs-dist/` to the `gh-pages` branch on every push to `main` that touches `docs/`, any package's manifest, or any package's `CHANGELOG.md`. Nothing else in `packages/` reaches the site, so nothing else triggers it. It is the only workflow that deploys the site, and it repeats `run-build-docs`' three checks — typecheck, format, build — because a commit landing on `main` directly never saw them.
+`.github/workflows/publish-documentation.yml` builds the site and pushes `docs-dist/` to the `gh-pages` branch on every push to `main` that touches `docs/`, `packages/javascript/lib/**` (the demo bundles it from source), any package's manifest, or any package's `CHANGELOG.md`. Nothing else in `packages/` reaches the site, so nothing else triggers it. It is the only workflow that deploys the site, and it repeats `run-build-docs`' three checks — typecheck, format, build — because a commit landing on `main` directly never saw them.
 
 Two things it does not hard-code. The custom domain is read out of the npm package's `homepage`, the same field `config.ts` derives the canonical links and the sitemap from, so the `CNAME` it writes cannot drift from the URL the pages claim. And `run-build-docs` is pull-request-only, so one commit never builds the site twice.
 
@@ -932,7 +936,7 @@ A theme is a slice of everyday vocabulary that a modifier can sit in front of. A
 
 ## Commit conventions
 
-`tag: message`, Udacity Git style tags: `feat`, `fix`, `docs`, `style`, `refactor`, `test`, `chore`, plus informal `package` (deps/config) and `typo`. Write in English, wrap identifiers and paths in backticks, one logical change per commit. Example: `feat: add \`randNickname\` method`.
+`[scope] tag: message`, where the scope is `[javascript]`, `[dart]` or `[python]` for a change to one package and `[common]` for one that reaches all of them, and a change to the docs site alone takes none. Udacity Git style tags: `feat`, `fix`, `docs`, `style`, `refactor`, `test`, `chore`, plus informal `package` (deps/config) and `typo`. Write in English, wrap identifiers and paths in backticks, one logical change per commit. Example: `feat: add \`randNickname\` method`.
 
 A release is its own commit, `[javascript] bump version to \`x.y.z\``, and touches the package's manifest, its lockfiles and its `CHANGELOG.md` — one bullet per user-visible change, newest version on top, dated. The entries collect under `## vNext (yyyy--)` as they land, and the release commit puts `## x.y.z (yyyy-mm-dd)` under that heading, which stays behind, empty, for the next one. Nothing else belongs in it. The packages version independently, so a release commit touches one package.
 

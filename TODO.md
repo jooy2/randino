@@ -44,7 +44,6 @@ A fix to a generator added under `vNext` needs no changelog entry of its own, si
 
 ### A. No decision needed
 
-- **A48. Stale statements in `CLAUDE.md`.** The deploy triggers contradict each other (lines 545 and 583); "four folders" is 22; General has 10 functions, not five; the Behaviour pages leave out sentence; the Dart and Python trees miss `generate`, `script`, `capacity` and `constants`; the commit section leaves out the `[common]` prefix; the selectors hard-coding the packages are in four places, not one.
 - **A49. `CONTRIBUTING.md` is out of date.** It does not say the sentence and location datasets are generated, it contradicts itself on the language of the docs, and its line about the tag separator is garbled.
 - **A51. Korean copy.** `ko/demo.md` names the button "Generate" where the UI says "생성"; the home tagline is the one sentence in 해요체 and says "별명"; getting-started says "데코레이터" where everything else says "장식 함수".
 - **A52. The `randSentence` docs.** `includeName` is described as off by default in the pages, the JSDoc and both ports' doc comments, where it is drawn per result; the speech paragraph is stale; the `startsWith` section leaves out `ru` and `vi`; "exactly one subject and one predicate" is false; several example sentences are ones the rules now forbid. Regenerate the examples from a build.
