@@ -8,7 +8,7 @@ groups allow.
 from collections.abc import Callable
 from itertools import pairwise
 
-from randino._internal.generate import collect, resolve_whole
+from randino._internal.generate import collect, resolve_count, resolve_whole
 from randino._internal.utils import pick_weighted, with_random
 from randino._types import AgeDetail, AgeDistribution, AgeGroup, AgeGroupOption
 from randino.age.data import (
@@ -81,15 +81,25 @@ def generate_age_details(
 ) -> list[AgeDetail]:
     """Generate `count` ages, applied to every option."""
     candidates = _candidates(min_age, max_age, group, distribution)
+    # A unique call takes each age out once it is drawn, which deals the same odds as
+    # drawing again on a repeat and stops when the ages run out, rather than spending the
+    # whole attempt budget on repeats. An age the curve gives no weight is left out of it,
+    # since a repeat would never have reached that age either.
+    weighted = [candidate for candidate in candidates if candidate[1] > 0]
+    left = (weighted or list(candidates)) if unique else candidates
+    wanted = min(resolve_count(count), len(left)) if unique else count
 
     def draw() -> AgeDetail:
-        age, _ = pick_weighted(candidates, lambda candidate: candidate[1])
+        drawn = pick_weighted(left, lambda candidate: candidate[1])
 
-        return AgeDetail(age=age, group=group_of(age))
+        if unique:
+            left.remove(drawn)
+
+        return AgeDetail(age=drawn[0], group=group_of(drawn[0]))
 
     with with_random(random):
         return collect(
-            count=count,
+            count=wanted,
             unique=unique,
             starts_with="",
             draw=draw,

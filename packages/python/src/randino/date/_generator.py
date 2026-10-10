@@ -317,8 +317,13 @@ def generate_date_details(
     utc_offset: str | timedelta | None = None,
     unique: bool = False,
     random: Callable[[], float] | None = None,
+    write: bool = True,
 ) -> list[DateDetail]:
-    """Generate `count` dates, applied to every option."""
+    """Generate `count` dates, applied to every option.
+
+    `write` is False when the caller is handed a `unit` and nothing else, which leaves
+    `date` empty: formatting a date nobody reads was most of the time a call spent.
+    """
     shift = resolve_offset(utc_offset)
     low, high = date_range(min_date, max_date, shift)
     # A format that writes nothing is no format at all.
@@ -334,7 +339,7 @@ def generate_date_details(
         drawn: WordLanguage = pick(WORD_LANGUAGES) if chosen == "all" else chosen
 
         return DateDetail(
-            date=format_date(moment, written, drawn, shift // 60000),
+            date=format_date(moment, written, drawn, shift // 60000) if write else "",
             timestamp=timestamp,
             year=moment.year,
             month=moment.month,

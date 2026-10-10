@@ -128,6 +128,7 @@ def rand_date(
         utc_offset=utc_offset,
         unique=unique,
         random=random,
+        write=output == "detail" or resolve_date_unit(unit) is None,
     )
 
     if output == "detail":

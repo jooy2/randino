@@ -2,6 +2,7 @@
 
 ## vNext (2026--)
 
+- `randAge` with `unique` stops as soon as every age in range has been drawn. It kept drawing repeats until its attempt budget ran out, which took seconds at a large `count`.
 - The first draw from `randLocation`, `randRegion`, `randCity` or `randDistrict` is about three times faster and holds less than half the memory. Every division used to be written out when a pool was first drawn from, whether or not `startsWith` or a length asked for it.
 - `randSentence` with `include` is several times faster. The required words were looked up in every pool of the language again for each result, and now are once per call.
 - `randWord`, `randNickname`, `randModifier` and `randSentence` draw Korean, Japanese and Chinese words about five times faster. Every word drawn used to read through its whole pool to find out whether the language writes capitals.

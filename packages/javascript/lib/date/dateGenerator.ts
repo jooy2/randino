@@ -333,7 +333,12 @@ export function resolveDateUnit(unit: unknown): DateUnit | null {
 	return resolveOptional(unit, DATE_UNITS);
 }
 
-export function generateDateDetails(options: RandDateOptions = {}): DateDetail[] {
+/**
+ * `write` is false when the caller is handed a `unit` and nothing else, which
+ * leaves `date` empty: formatting a date nobody reads was most of the time a
+ * call of minutes spent.
+ */
+export function generateDateDetails(options: RandDateOptions = {}, write = true): DateDetail[] {
 	const shift = resolveOffset(options.utcOffset);
 	const [min, max] = dateRange(options, shift);
 	const format = resolveFormat(options.format);
@@ -351,7 +356,7 @@ export function generateDateDetails(options: RandDateOptions = {}): DateDetail[]
 				const drawn: WordLanguage = language === 'all' ? pick(WORD_LANGUAGES) : language;
 
 				return {
-					date: formatDate(parts, format, drawn, shift / 60000),
+					date: write ? formatDate(parts, format, drawn, shift / 60000) : '',
 					timestamp,
 					...parts,
 					language: drawn

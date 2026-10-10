@@ -44,7 +44,6 @@ A fix to a generator added under `vNext` needs no changelog entry of its own, si
 
 ### A. No decision needed
 
-- **A4. Ages and date units draw past what is left.** `unique` ages keep drawing after the 101 candidates are used (5.5 s in Python at count 10,000); remove each drawn candidate instead. `randDate` with `unit` formats a date string it never returns, 90% of Python's time; skip the format.
 - **A5. `randVersion` sums its harmonic weights twice per draw.** `smallNumber` loops over the span twice for every number; cache the total per span.
 - **A6. The Python random source is a process global.** `with_random` swaps `_source` and puts it back, so two threads that interleave can leave one caller's constant source in place, or hand a `SystemRandom` caller a draw from another request's seeded source. Hold it in a `contextvars.ContextVar`. `_internal/utils.py`.
 - **A7. A `randDate` format of many `[` takes quadratic time.** `\[([^\]]*)]` scans to the end at every unclosed `[`: 20,000 of them take 0.58 s in JS, 1.2 s in Python and 4 s in Dart, and the format is read again on every draw. Tokenize the format once per call with a linear scan.

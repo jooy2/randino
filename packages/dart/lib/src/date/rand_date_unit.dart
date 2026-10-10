@@ -39,6 +39,7 @@ List<int> randDateUnit(
     utcOffset: utcOffset,
     unique: unique,
     random: random,
+    write: false,
   ))
     detail[unit],
 ];

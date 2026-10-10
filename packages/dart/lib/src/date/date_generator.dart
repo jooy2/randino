@@ -120,6 +120,10 @@ int _drawBetween(int min, int max) {
 }
 
 /// What `randDate`, `randDateUnit` and `randDateDetails` all do.
+///
+/// [write] is false when the caller is handed a unit and nothing else, which
+/// leaves `date` empty: formatting a date nobody reads was most of the time a
+/// call spent.
 List<DateDetail> generateDateDetails({
   int count = 1,
   DateTime? minDate,
@@ -130,6 +134,7 @@ List<DateDetail> generateDateDetails({
   Duration? utcOffset,
   bool unique = false,
   Random? random,
+  bool write = true,
 }) {
   final shift = resolveOffset(utcOffset);
   final (min, max) = dateRange(minDate, maxDate, shift);
@@ -150,7 +155,7 @@ List<DateDetail> generateDateDetails({
         final WordLanguage drawn = language ?? pick(wordLanguages);
 
         return DateDetail(
-          date: formatDate(date, written, drawn, offset: shift ~/ 60000),
+          date: write ? formatDate(date, written, drawn, offset: shift ~/ 60000) : '',
           timestamp: timestamp,
           year: date.year,
           month: date.month,

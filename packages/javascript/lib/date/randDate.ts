@@ -42,13 +42,12 @@ export function randDate(
  */
 export function randDate(options: RandDateOptions & { output: 'detail' }): DateDetail[];
 export function randDate(options: RandDateOptions = {}): string[] | number[] | DateDetail[] {
-	const details = generateDateDetails(options);
+	const unit = resolveDateUnit(options.unit);
+	const details = generateDateDetails(options, options.output === 'detail' || unit === null);
 
 	if (options.output === 'detail') {
 		return details;
 	}
-
-	const unit = resolveDateUnit(options.unit);
 
 	return unit ? details.map((detail) => detail[unit]) : details.map((detail) => detail.date);
 }
