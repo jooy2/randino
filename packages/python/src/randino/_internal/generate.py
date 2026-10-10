@@ -37,11 +37,12 @@ def _whole(value: object) -> int | None:
         value: Whatever the caller passed.
 
     Returns:
-        The floor of the number, or None when it is not a finite one.
+        The floor of the number, or None when it is not a finite one. An integer too
+        large for a float is not one either, the way JavaScript reads it as `Infinity`.
     """
     try:
         number = float(value)  # type: ignore[arg-type]
-    except (TypeError, ValueError):
+    except (TypeError, ValueError, OverflowError):
         return None
 
     return math.floor(number) if math.isfinite(number) else None

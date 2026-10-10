@@ -422,6 +422,12 @@ def test_an_option_the_types_rule_out_falls_back_rather_than_raising() -> None:
         lambda: loose.rand_organization(include_legal_form="yes", min_length=float("nan")),
         lambda: loose.rand_modifier("cat", language="xx"),
         lambda: loose.rand_modifier(language="xx"),
+        # Too large for a float, which JavaScript reads as `Infinity`.
+        lambda: loose.rand_name(count=10**400),
+        lambda: loose.rand_age(min_age=10**400),
+        lambda: loose.rand_os(max_year=10**400),
+        lambda: loose.rand_ram(min_size=10**400),
+        lambda: loose.rand_version(format="calver", min_year=10**400),
     ]
 
     for ask in asks:
@@ -434,6 +440,7 @@ def test_an_option_the_types_rule_out_falls_back_rather_than_raising() -> None:
     assert loose.rand_age(min_age=float("nan"), max_age=float("nan"))[0] <= 100
     # A unit that is not one is the whole date, written the default way.
     assert re.match(r"\d{4}-", loose.rand_date(unit="week")[0])
+    assert len(loose.rand_name(count=10**400)) == 1
     # A token of no length is not a token.
     assert len(loose.rand_suffix("x", length=float("nan"))) == len("x_") + 5
     # A language the package does not know leaves the value's own script to decide.

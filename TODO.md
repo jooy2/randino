@@ -44,7 +44,6 @@ A fix to a generator added under `vNext` needs no changelog entry of its own, si
 
 ### A. No decision needed
 
-- **A11. Python raises `OverflowError` on a huge integer.** `count=10**400` or `min_year=10**400` raise where every other wrong value falls back. Catch it in `_whole`.
 - **A12. The release jobs use actions by tag.** The jobs holding `id-token: write` in `.github/workflows/release.yml` use `actions/checkout@v5`, `actions/setup-node@v6`, `actions/download-artifact@v8` and `dart-lang/setup-dart@v1`. Pin them to commit SHAs, the rule the docs workflow already states.
 - **A13. Every docs page downloads the whole library.** `Demo.vue` is registered globally in `docs/.vitepress/theme/index.js`, so the theme chunk is 645 KB gzipped. `defineAsyncComponent` brings it to 25 KB and loads the library on `/demo` only; returning `{ id, moduleSideEffects: false }` from the `randinoSource` plugin in `config.ts` saves 13 KB more on the demo.
 - **A14. The name helpers bundle every name pool.** `nameLengthRange`, `nameSupportsMiddleName` and `nameSupportsRoman` read `lengthSpec`, `hasMiddle` and `roman`, and are 18 to 19 KB each because those sit in the same objects as the pools. Move them into a small table of their own.
