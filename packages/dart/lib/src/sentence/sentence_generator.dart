@@ -2469,6 +2469,13 @@ _Built _compose(
   // for. Chosen first and filled in after, a theme with nothing on it invented a
   // word even at `realism: RandRealism.real` — `여젤은 시들합니다` — while
   // another had `여우`.
+  // A pronoun written after its verb goes in front of anything the verb carries
+  // after it: German writes `streckte er sich`, and `sich` comes whole with the
+  // verb, which wrote `streckte sich er`. So a sentence like that steers away
+  // from a predicate written in more than one word, where it has another.
+  final subjectAt = shape.indexWhere((part) => part.slot == subjectSlot);
+  final verbAt = shape.indexWhere((part) => part.slot == SentenceSlot.verb);
+  final inverted = (pronoun ?? '').isNotEmpty && verbAt >= 0 && subjectAt > verbAt;
   final leading =
       follow == null &&
               data.articles == null &&
@@ -2941,7 +2948,9 @@ _Built _compose(
         gender,
         low,
         high,
-        draw.avoid,
+        part.slot == SentenceSlot.verb && inverted
+            ? {...draw.avoid, ...base.where((word) => word.contains(' '))}
+            : draw.avoid,
         draw.tense,
         draw.dayAt,
         // The first sentence of a result may set its scene in any time it likes;

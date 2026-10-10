@@ -2588,6 +2588,19 @@ void main() {
       }
     });
 
+    test('a German pronoun is never written after `sich`', () {
+      // `sich` comes whole with its verb, so a pronoun after the verb was written
+      // after it too: `Am Mittag streckte sich er.` German writes `streckte er
+      // sich`.
+      for (final paragraph in randSentence(
+        language: WordLanguage.de,
+        sentences: 6,
+        count: sample * 3,
+      )) {
+        expect(paragraph, isNot(contains(RegExp(r'\bsich (er|sie|es)\b'))), reason: paragraph);
+      }
+    });
+
     test('a question form pool is the same length as the words it restates', () {
       // Index-aligned is the whole contract: a verb keeps its meaning across the
       // forms, and a word the caller required is translated by its position.

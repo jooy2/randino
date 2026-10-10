@@ -2114,6 +2114,13 @@ def test_a_question_is_a_shape_not_a_mark_bolted_onto_a_statement() -> None:
             assert not any(lower.startswith(verb + " ") for verb in verbs), f"de: {line}"
 
 
+def test_a_german_pronoun_is_never_written_after_sich() -> None:
+    # `sich` comes whole with its verb, so a pronoun after the verb was written after it
+    # too: `Am Mittag streckte sich er.` German writes `streckte er sich`.
+    for paragraph in rand_sentence(language="de", sentences=6, count=SAMPLE * 3):
+        assert not re.search(r"\bsich (er|sie|es)\b", paragraph), paragraph
+
+
 def test_a_question_form_pool_is_the_same_length_as_the_words_it_restates() -> None:
     # Index-aligned is the whole contract: a verb keeps its meaning across the forms,
     # and a word the caller required is translated by its position.

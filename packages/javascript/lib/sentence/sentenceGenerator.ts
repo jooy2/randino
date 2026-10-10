@@ -2604,6 +2604,13 @@ function compose(
 	// chosen among the ones that have a word on the character `startsWith` asked
 	// for. Chosen first and filled in after, a theme with nothing on it invented a
 	// word even at `realism: 'real'` — `여젤은 시들합니다` — while another had `여우`.
+	// A pronoun written after its verb goes in front of anything the verb carries
+	// after it: German writes `streckte er sich`, and `sich` comes whole with the
+	// verb, which wrote `streckte sich er`. So a sentence like that steers away
+	// from a predicate written in more than one word, where it has another.
+	const subjectAt = shape.findIndex(({ part }) => part.slot === subjectSlot);
+	const inverted =
+		Boolean(pronoun) && subjectAt > shape.findIndex(({ part }) => part.slot === 'verb');
 	const leading =
 		!follow &&
 		!data.articles &&
@@ -3002,7 +3009,7 @@ function compose(
 				gender,
 				low,
 				high,
-				draw.avoid,
+				part.slot === 'verb' && inverted ? avoidingPhrasal(draw.avoid, group.words) : draw.avoid,
 				draw.tense,
 				draw.dayAt,
 				// The first sentence of a result may set its scene in any time it likes;
@@ -3160,6 +3167,11 @@ function agreeBy(rules: WordAgreement, word: string, gender: WordGender | undefi
  * — for a time — which phase of the day it named, as an index into `times.day`.
  */
 type Predicate = { text: string; base: string; dayAt: number };
+
+/** `avoid`, and every predicate of `words` written in more than one word. */
+function avoidingPhrasal(avoid: ReadonlySet<string>, words: WordPool): ReadonlySet<string> {
+	return new Set([...avoid, ...words.filter((word) => word.includes(' '))]);
+}
 
 /**
  * The word a phrase that is not a noun phrase writes: the predicate, or an adverb.

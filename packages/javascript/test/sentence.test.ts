@@ -2346,6 +2346,14 @@ describe('Sentence', () => {
 		}
 	});
 
+	it('a German pronoun is never written after `sich`', () => {
+		// `sich` comes whole with its verb, so a pronoun after the verb was written
+		// after it too: `Am Mittag streckte sich er.` German writes `streckte er sich`.
+		for (const paragraph of randSentence({ language: 'de', sentences: 6, count: SAMPLE * 3 })) {
+			assert.doesNotMatch(paragraph, /\bsich (er|sie|es)\b/, paragraph);
+		}
+	});
+
 	it('a question form pool is the same length as the words it restates', () => {
 		// Index-aligned is the whole contract: a verb keeps its meaning across the
 		// forms, and a word the caller required is translated by its position.

@@ -2770,6 +2770,16 @@ def _compose(
     # among the ones that have a word on the character `starts_with` asked for. Chosen
     # first and filled in after, a theme with nothing on it invented a word even at
     # `realism="real"` — `여젤은 시들합니다` — while another had `여우`.
+    # A pronoun written after its verb goes in front of anything the verb carries after
+    # it: German writes `streckte er sich`, and `sich` comes whole with the verb, which
+    # wrote `streckte sich er`. So a sentence like that steers away from a predicate
+    # written in more than one word, where it has another.
+    slots_written = [part.slot for part in shape]
+    inverted = bool(pronoun) and (
+        subject_slot in slots_written
+        and "verb" in slots_written
+        and slots_written.index(subject_slot) > slots_written.index("verb")
+    )
     leading = (
         settings.prefix
         if follow is None
@@ -3229,7 +3239,11 @@ def _compose(
                 gender,
                 part_low,
                 part_high,
-                draw.avoid,
+                (
+                    draw.avoid | {word for word in base if " " in word}
+                    if part.slot == "verb" and inverted
+                    else draw.avoid
+                ),
                 draw.tense,
                 draw.day_at,
                 # The first sentence of a result may set its scene in any time it

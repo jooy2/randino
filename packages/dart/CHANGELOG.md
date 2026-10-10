@@ -2,6 +2,7 @@
 
 ## vNext (2026--)
 
+- A German sentence whose pronoun subject follows the verb takes a verb written in one word, where `sich` would have stood in front of the pronoun: `Am Mittag streckte sich er.` German writes the pronoun first.
 - A German line somebody says keeps its verb second. A quoted line names no time, and a shape that opened on its time part opened on the verb once the time was left out (`„Ist eine Vorstadt sonnig.“`), which is a question's order; such a line now takes a shape without a time part.
 - `randSentence` opens on a real noun for a `startsWith` wherever the language has one on the character. The subject's theme was chosen before the word, so a theme with nothing on it invented a noun even at `RandRealism.real` (`여젤은 시들합니다`), about one Korean sentence in five.
 - `randSentence` tells the `story` it was asked for whatever is decided about names. A name narrows the hero to people, and `sketch` and `passage` have none, so a name drawn for the result told another story about half the time; a story with no person in it now wins over `includeName` the way a `theme` does.
