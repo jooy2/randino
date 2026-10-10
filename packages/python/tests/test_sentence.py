@@ -2451,6 +2451,17 @@ def test_no_plain_japanese_predicate_closes_the_way_a_polite_one_does() -> None:
         assert not polite.search(word), f"ja: '{word}' is a plain form that closes politely"
 
 
+def test_no_japanese_verb_that_takes_an_object_carries_an_object_of_its_own() -> None:
+    """The object frame writes `を`, so a verb that already holds one cannot take one."""
+    # A verb that takes `に` or `と` instead writes `電話を値をつけます` just the same.
+    for group in SENTENCE_DATA["ja"].verbs:
+        if not group.object:
+            continue
+
+        for word in group.words:
+            assert "を" not in word, f"ja: '{word}' takes an object and has one already"
+
+
 def test_a_predicate_comes_out_of_the_pool_its_level_and_mood_land_on() -> None:
     languages: tuple[WordLanguage, ...] = ("ko", "ja")
     types: tuple[SentenceMark, ...] = ("statement", "question", "exclamation")

@@ -255,7 +255,7 @@ export const JA: SentenceLanguageData = {
 			field: 'talk',
 			subject: ['creature', 'person'],
 			...tensed(
-				`話す おしゃべりする 語り合う しゃべる 会話する 雑談する ささやく つぶやき合う 語る 話し込む 立ち話する 声をかける:i 言葉を交わす 談笑する`
+				`話す おしゃべりする 語り合う しゃべる 会話する 雑談する ささやく つぶやき合う 語る 話し込む 立ち話する 声をかける:i 言葉を交わす 談笑する 挨拶する`
 			)
 		},
 		{
@@ -270,7 +270,7 @@ export const JA: SentenceLanguageData = {
 			subject: ['person', 'creature'],
 			object: ['idea', 'event', 'place'],
 			...tensed(
-				`覚える:i 忘れる:i 想像する 数える:i 思い出す 懐かしむ 考える:i 思い描く 夢に見る:i 思いを巡らす 気にかける:i 心配する 信じる:i 期待する 理解する 悟る 恋しがる 懐かしがる 思い返す 反芻する 案じる:i 恋い焦がれる:i 想う`
+				`覚える:i 忘れる:i 想像する 数える:i 思い出す 懐かしむ 考える:i 思い描く 夢に見る:i 気にかける:i 心配する 信じる:i 期待する 理解する 悟る 恋しがる 懐かしがる 思い返す 反芻する 案じる:i 想う`
 			)
 		},
 		{
@@ -317,7 +317,7 @@ export const JA: SentenceLanguageData = {
 			subject: ['creature', 'person'],
 			object: ['thing', 'plant', 'edible'],
 			...tensed(
-				`隠す しまう 守る 埋める:i 取っておく しまい込む 保管する 蓄える:i 貯める:i 片付ける:i 押し込む 詰め込む 覆う 包む 収める:i 大事にする 見守る 隠しておく 置いておく 仕舞っておく 埋めておく 蓋をする`
+				`隠す しまう 守る 埋める:i 取っておく しまい込む 保管する 蓄える:i 貯める:i 片付ける:i 押し込む 詰め込む 覆う 包む 収める:i 大事にする 見守る 隠しておく 置いておく 仕舞っておく 埋めておく`
 			)
 		},
 		{
@@ -332,10 +332,10 @@ export const JA: SentenceLanguageData = {
 			field: 'meet',
 			subject: ['creature', 'person'],
 			object: ['person'],
-			// Verbs that take を: 会う takes に, and the object frame writes を.
-			...tensed(
-				`訪ねる:i 見かける:i 迎える:i 出会う 出くわす 会う 挨拶する 迎え入れる:i 歓迎する 見つける:i 待ち合わせる:i 抱きしめる:i 手を振る 声をかける:i 顔を合わせる:i`
-			)
+			// Verbs that take を, because the object frame writes を: 会う, 出会う,
+			// 出くわす, 挨拶する, 手を振る and 声をかける take に, and 待ち合わせる and
+			// 顔を合わせる take と, so none of them is here.
+			...tensed(`訪ねる:i 見かける:i 迎える:i 迎え入れる:i 歓迎する 見つける:i 抱きしめる:i`)
 		},
 		{
 			field: 'make',
@@ -350,7 +350,7 @@ export const JA: SentenceLanguageData = {
 			subject: ['person'],
 			object: ['thing', 'vehicle'],
 			...tensed(
-				`直す 磨く 手入れする 整える:i 片付ける:i 修理する 修繕する 掃除する 拭く 洗う 手を入れる:i 調整する 締める:i 油を差す 点検する 整備する 世話する 大切にする 洗い流す 乾かす 拭き取る 磨き直す 修理し直す`
+				`直す 磨く 手入れする 整える:i 片付ける:i 修理する 修繕する 掃除する 拭く 洗う 調整する 締める:i 点検する 整備する 世話する 大切にする 洗い流す 乾かす 拭き取る 磨き直す 修理し直す`
 			)
 		},
 		{
@@ -358,7 +358,7 @@ export const JA: SentenceLanguageData = {
 			subject: ['person'],
 			object: ['thing', 'vehicle'],
 			...tensed(
-				`売る 手渡す 譲る 並べる:i 売り払う 売りさばく 売り渡す 差し出す 引き渡す 手放す 売り出す 譲り渡す 取引する 値をつける:i 陳列する 並べて売る 卸す`
+				`売る 手渡す 譲る 並べる:i 売り払う 売りさばく 売り渡す 差し出す 引き渡す 手放す 売り出す 譲り渡す 取引する 陳列する 並べて売る 卸す`
 			)
 		},
 		{
@@ -375,7 +375,7 @@ export const JA: SentenceLanguageData = {
 			object: ['edible'],
 			objectThemes: ['food'],
 			...tensed(
-				`焼く 温める:i 煮る:i 料理する 切る 盛る 炒める:i 煮込む 蒸す 揚げる:i 茹でる:i 刻む 混ぜる:i 味付けする 調理する 炊く 温め直す 盛り付ける:i 味見する かき混ぜる:i ひっくり返す 注ぐ 皮をむく 刻んで入れる:i 仕込む 用意する`
+				`焼く 温める:i 煮る:i 料理する 切る 盛る 炒める:i 煮込む 蒸す 揚げる:i 茹でる:i 刻む 混ぜる:i 味付けする 調理する 炊く 温め直す 盛り付ける:i 味見する かき混ぜる:i ひっくり返す 注ぐ 刻んで入れる:i 仕込む 用意する`
 			)
 		},
 		{

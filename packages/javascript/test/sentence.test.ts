@@ -2762,6 +2762,20 @@ describe('Sentence', () => {
 		}
 	});
 
+	it('no Japanese verb that takes an object carries an object of its own', () => {
+		// The object frame writes `を`, so a verb that already holds one, or takes
+		// `に` or `と` instead, writes a sentence no speaker would: `電話を値をつけます`.
+		for (const group of SENTENCE_DATA.ja.verbs) {
+			if (!group.object?.length) {
+				continue;
+			}
+
+			for (const word of group.words) {
+				assert.doesNotMatch(word, /を/, `ja: '${word}' takes an object and has one already`);
+			}
+		}
+	});
+
 	it('a predicate comes out of the pool its level and its mood land on', () => {
 		for (const language of ['ko', 'ja'] as WordLanguage[]) {
 			const data = SENTENCE_DATA[language];

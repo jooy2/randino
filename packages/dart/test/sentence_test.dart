@@ -2965,6 +2965,24 @@ void main() {
       }
     });
 
+    test('no Japanese verb that takes an object carries an object of its own', () {
+      // The object frame writes `を`, so a verb that already holds one, or takes
+      // `に` or `と` instead, writes a sentence no speaker would: `電話を値をつけます`.
+      for (final group in sentenceData[WordLanguage.ja]!.verbs) {
+        if (group.object == null || group.object!.isEmpty) {
+          continue;
+        }
+
+        for (final word in group.words) {
+          expect(
+            word,
+            isNot(contains('を')),
+            reason: "ja: '$word' takes an object and has one already",
+          );
+        }
+      }
+    });
+
     test('a predicate comes out of the pool its level and its mood land on', () {
       for (final language in <WordLanguage>[WordLanguage.ko, WordLanguage.ja]) {
         final data = sentenceData[language]!;

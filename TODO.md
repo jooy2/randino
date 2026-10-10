@@ -66,7 +66,6 @@ A fix to a generator added under `vNext` needs no changelog entry of its own, si
 
 ### Found while working
 
-- **A72. Japanese verbs that already carry an object take a second one.** A verb written with its own `を` (`値をつける`) sits in a group that takes an object, so a sentence writes `電話を値をつけます`. Move those verbs to a group without an object, or give the frame the particle the verb needs (`電話に値をつける`), in the JavaScript data; `tools/emit` carries it to the ports.
 - **A74. A steered `startsWith` can still invent the subject at `realism: 'real'`.** `randSentence({ language: 'ja', startsWith: 'か' })` writes an invented subject in about one result in five (`かヌゾがトンネルに到着します`), half hiragana and half katakana. The frame is chosen before `compose` steers, so a shape whose groups hold no subject on the character — a copular one, or one whose verbs take few classes — falls through to `drawWord`, which synthesizes a word on the prefix in the template's own script. Prefer the frames that can lead with the character in `generateOne`, and keep an invented word on a prefix in the prefix's script.
 
 ## Further ideas, not yet agreed

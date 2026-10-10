@@ -2,6 +2,7 @@
 
 ## vNext (2026--)
 
+- A Japanese sentence with an object takes a verb that takes `を`. Verbs that carry an object of their own or take `に` or `と` sat among the ones that take an object, and wrote `電話を値をつけます` and `店員を会いました`; `挨拶する` moved to the verbs of talking, where it takes none.
 - `rand_organization` no longer writes a famous company when `starts_with` is the syllable kept out of its invented stems to prevent that. The caller's character went back in front of the syllable the pool was trimmed against, and `동` gave `동아…`, `辉` gave `辉瑞…`; a stem that spells one of those companies is now drawn again.
 - `rand_sentence` puts every word of `include` in a result of several sentences, in the first sentence that can carry it. The words reached the first sentence alone, and a story whose first sentence had no room for one dropped it: `조용히` was missing from most three-sentence Korean results.
 - A German sentence whose pronoun subject follows the verb takes a verb written in one word, where `sich` would have stood in front of the pronoun: `Am Mittag streckte sich er.` German writes the pronoun first.
