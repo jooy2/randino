@@ -515,6 +515,52 @@ describe('Name', () => {
 		}
 	});
 
+	it('a romanized name reads its startsWith, or is left out', () => {
+		// A character no name in the pools starts with becomes a name part of its
+		// own, and a kanji nobody listed has no reading: `鬱 Haruto` was two scripts
+		// in one string. A kana is read out, and a character with no reading leaves
+		// the language out of a romanized result.
+		for (const [language, character] of [
+			['ja', 'か'],
+			['ja', 'カ']
+		] as const) {
+			for (const name of randName({
+				language,
+				startsWith: character,
+				script: 'roman',
+				count: SAMPLE
+			})) {
+				assert.match(name, /^Ka [A-Za-z]+$/, name);
+			}
+		}
+
+		assert.deepEqual(
+			randName({ language: 'ja', startsWith: '鬱', script: 'roman', count: SAMPLE }),
+			[]
+		);
+		assert.deepEqual(
+			randName({ language: 'zh', startsWith: '鬱', script: 'roman', count: SAMPLE }),
+			[]
+		);
+		assert.deepEqual(randName({ startsWith: '鬱', script: 'roman', count: SAMPLE }), []);
+
+		// A character the pools hold a reading for is read as they read it, and the
+		// native script is untouched.
+		for (const name of randName({
+			language: 'ja',
+			startsWith: '佐',
+			script: 'roman',
+			count: SAMPLE
+		})) {
+			assert.match(name, /^[A-Za-z]+ [A-Za-z]+$/, name);
+		}
+
+		assert.strictEqual(
+			randName({ language: 'ja', startsWith: '鬱', count: SAMPLE }).length,
+			SAMPLE
+		);
+	});
+
 	it('a startsWith the language does not write is answered with nothing', () => {
 		// A character from another script is one the language can never begin a
 		// name with. Glueing it on anyway produced `Q대겸` — a Latin letter and a

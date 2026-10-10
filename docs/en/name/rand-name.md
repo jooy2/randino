@@ -312,7 +312,7 @@ rand_name(language="en", count=3, starts_with="k")
 
 :::
 
-A character no real name starts with still returns names rather than nothing: Latin and Cyrillic scripts invent one (`Q` → `Qivu Railooth`), and CJK scripts use the character as a name part of its own.
+A character no real name starts with still returns names rather than nothing: Latin and Cyrillic scripts invent one (`Q` → `Qivu Railooth`), and CJK scripts use the character as a name part of its own. Romanized, a kana is read out (`か` → `Ka Yuto`), and a kanji or hanzi no name in the pools begins with has no reading, so <Lang js="script: 'roman'" dart="script: NameScript.roman" py="script=&quot;roman&quot;" code /> answers it with nothing rather than with `鬱 Haruto`, a name in two scripts. The detail form still carries the character in its `roman`, beside the native name it was asked for.
 
 ### Length
 

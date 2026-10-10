@@ -46,7 +46,7 @@ from randino._types import (
     NameLanguageOption,
     RandRealism,
 )
-from randino.name._romanize import romanize, romanize_hangul
+from randino.name._romanize import kana_reading, romanize, romanize_hangul, romanize_kana
 from randino.name.data import NAME_DATA, NAME_LANGUAGES, resolve_name_language
 from randino.name.data._types import NameLanguageData, NamePool, SyllableSet
 from randino.name.name_length_range import name_length_range
@@ -315,7 +315,7 @@ def compose_given(data: NameLanguageData, is_male: bool, length: int, prefix: st
     # Kanji and hanzi carry their own reading, but a syllable the caller passed to
     # `starts_with` has none — fall back to the character itself rather than
     # dropping it from the romanization.
-    roman = "".join(part if isinstance(part, str) else part.r for part in parts)
+    roman = "".join(romanize_kana(part) if isinstance(part, str) else part.r for part in parts)
 
     return Entry(native, capitalize_first(roman))
 
@@ -771,12 +771,47 @@ def generate_name_details(
     if not languages:
         return []
 
+    # A romanized name cannot carry a character it has no reading for: `鬱 Haruto` is two
+    # scripts in one string. So a language that would lead with one is out before the
+    # draw, and a name that comes out with one anyway — an invented given name can begin
+    # on the bare character — is never kept.
+    readable = [code for code in languages if _reads_prefix(code, settings)] if roman else languages
+
+    if not readable:
+        return []
+
     with with_random(random):
         return collect(
             count=count,
             unique=unique,
             starts_with=settings.prefix,
-            draw=lambda: generate_one(pick(languages), settings),
-            key_of=lambda detail: detail.native,
+            draw=lambda: generate_one(pick(readable), settings),
+            key_of=lambda detail: "" if roman and _UNREAD.search(detail.roman) else detail.native,
             unique_of=lambda detail: detail.roman if roman else detail.native,
         )
+
+
+_UNREAD = re.compile(r"[\u3040-\u30ff\u3400-\u9fff\uf900-\ufaff]")
+"""A character a romanization left as it was: kana, or a Han character."""
+
+
+def _reads_prefix(language: NameLanguage, settings: Settings) -> bool:
+    """Whether a language can write the name a `starts_with` leads with in Latin letters.
+
+    Always, unless its names carry their reading in the pools and the character is
+    neither a kana nor the start of a name or syllable the pool leading the name holds.
+    `か` reads `ka`, and `佐` is the start of `佐藤:Sato`.
+    """
+    data = NAME_DATA[language]
+    prefix = settings.prefix
+
+    if not prefix or data.roman != "token" or kana_reading(prefix) is not None:
+        return True
+
+    leading = (
+        [data.last]
+        if surname_leads(data, settings.include_surname)
+        else [data.given_male, data.given_female, data.first_male, data.first_female]
+    )
+
+    return any(pool is not None and starting_with(pool, prefix) for pool in leading)

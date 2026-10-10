@@ -342,4 +342,41 @@ def romanize(mode: RomanMode, value: str, part: Literal["surname", "given"]) -> 
 
         return capitalize_first(romanize_hangul(value, name=True))
 
-    return value
+    return capitalize_first(romanize_kana(value))
+
+
+# The Hepburn reading of every kana that can stand on its own, hiragana first; a
+# katakana reads the same as the hiragana 0x60 code points below it. A small kana and
+# the long-vowel mark cannot begin a word, so they have none.
+_KANA = """
+    あ:a い:i う:u え:e お:o か:ka き:ki く:ku け:ke こ:ko さ:sa し:shi す:su せ:se
+    そ:so た:ta ち:chi つ:tsu て:te と:to な:na に:ni ぬ:nu ね:ne の:no は:ha ひ:hi
+    ふ:fu へ:he ほ:ho ま:ma み:mi む:mu め:me も:mo や:ya ゆ:yu よ:yo ら:ra り:ri
+    る:ru れ:re ろ:ro わ:wa ゐ:i ゑ:e を:o ん:n が:ga ぎ:gi ぐ:gu げ:ge ご:go ざ:za
+    じ:ji ず:zu ぜ:ze ぞ:zo だ:da ぢ:ji づ:zu で:de ど:do ば:ba び:bi ぶ:bu べ:be
+    ぼ:bo ぱ:pa ぴ:pi ぷ:pu ぺ:pe ぽ:po ゔ:vu
+"""
+_KATAKANA_SHIFT = 0x60
+_kana_readings: dict[str, str] = {}
+
+
+def kana_reading(character: str) -> str | None:
+    """The Hepburn reading of one kana, or None for anything else."""
+    if not _kana_readings:
+        for entry in _KANA.split():
+            kana, reading = entry.split(":")
+            _kana_readings[kana] = reading
+            _kana_readings[chr(ord(kana) + _KATAKANA_SHIFT)] = reading
+
+    return _kana_readings.get(character)
+
+
+def romanize_kana(text: str) -> str:
+    """`text` with every kana it holds read out, and every other character left as it is.
+
+    A name part carries its own reading, so this only meets a character a caller passed
+    to `starts_with` that no name in the pools begins with: `か` reads `ka`, and a kanji
+    nobody listed stays itself, which `rand_name` then leaves out of a romanized result
+    rather than writing it in two scripts.
+    """
+    return "".join(kana_reading(character) or character for character in text)

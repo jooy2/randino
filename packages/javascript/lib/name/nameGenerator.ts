@@ -35,7 +35,7 @@ import type { NameDetail, NameGender, NameLanguage, RandNameOptions } from '../_
 import { NAME_DATA, NAME_LANGUAGES, resolveNameLanguage } from './data/index.js';
 import type { NameLanguageData, NamePool, NameToken, SyllableSet } from './data/types.js';
 import { nameLengthRange } from './nameLengthRange.js';
-import { romanize, romanizeHangul } from './romanize.js';
+import { kanaReading, romanize, romanizeHangul, romanizeKana } from './romanize.js';
 
 // One name part, or a whole name, in both scripts.
 type Entry = { n: string; r: string };
@@ -307,9 +307,9 @@ function composeGiven(
 	}
 
 	// Kanji and hanzi carry their own reading, but a syllable the caller passed to
-	// `startsWith` has none — fall back to the character itself rather than
-	// dropping it from the romanization.
-	const r = parts.map((part) => (typeof part === 'string' ? part : part.r)).join('');
+	// `startsWith` has none. A kana is read out; anything else stays itself, and a
+	// romanized result leaves the name out rather than write it in two scripts.
+	const r = parts.map((part) => (typeof part === 'string' ? romanizeKana(part) : part.r)).join('');
 
 	return { n, r: capitalizeFirst(r) };
 }
@@ -756,12 +756,47 @@ export function generateNameDetails(options: RandNameOptions = {}, roman = false
 		return [];
 	}
 
+	// A romanized name cannot carry a character it has no reading for: `鬱 Haruto`
+	// is two scripts in one string. So a language that would lead with one is out
+	// before the draw, and a name that comes out with one anyway — an invented
+	// given name can begin on the bare character — is never kept.
+	const readable = roman ? languages.filter((code) => readsPrefix(code, settings)) : languages;
+
+	if (!readable.length) {
+		return [];
+	}
+
 	return withRandom(resolveRandom(options.random), () =>
 		collect(
 			options,
-			() => generateOne(pick(languages), settings),
-			(detail) => detail.native,
+			() => generateOne(pick(readable), settings),
+			(detail) => (roman && UNREAD.test(detail.roman) ? '' : detail.native),
 			(detail) => (roman ? detail.roman : detail.native)
 		)
+	);
+}
+
+// A character a romanization left as it was.
+const UNREAD = /[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}]/u;
+
+/**
+ * Whether a language can write the name a `startsWith` leads with in Latin
+ * letters: always, unless its names carry their reading in the pools and the
+ * character is neither a kana nor the start of a name or syllable the pool
+ * leading the name holds. `か` reads `ka`, and `佐` is the start of `佐藤:Sato`.
+ */
+function readsPrefix(language: NameLanguage, settings: Settings): boolean {
+	const data = NAME_DATA[language];
+
+	if (!settings.prefix || data.roman !== 'token' || kanaReading(settings.prefix) !== null) {
+		return true;
+	}
+
+	const leading = surnameLeads(data, settings.includeSurname)
+		? [data.last]
+		: [data.givenMale, data.givenFemale, data.firstMale, data.firstFemale];
+
+	return leading.some(
+		(pool) => pool !== undefined && startingWith(pool, settings.prefix).length > 0
 	);
 }

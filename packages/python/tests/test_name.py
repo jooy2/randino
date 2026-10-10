@@ -427,6 +427,26 @@ def test_omitted_length_bounds_fall_back_to_the_language_default() -> None:
             assert low <= len(name) <= high, f"{language}: {name}"
 
 
+def test_a_romanized_name_reads_its_starts_with_or_is_left_out() -> None:
+    # A character no name in the pools starts with becomes a name part of its own, and
+    # a kanji nobody listed has no reading: `鬱 Haruto` was two scripts in one string. A
+    # kana is read out, and a character with no reading leaves the language out of a
+    # romanized result.
+    for character in ("か", "カ"):
+        for name in rand_name(language="ja", starts_with=character, script="roman", count=SAMPLE):
+            assert re.fullmatch(r"Ka [A-Za-z]+", name), name
+
+    for language in ("ja", "zh", "all"):
+        assert rand_name(language=language, starts_with="鬱", script="roman", count=SAMPLE) == []
+
+    # A character the pools hold a reading for is read as they read it, and the native
+    # script is untouched.
+    for name in rand_name(language="ja", starts_with="佐", script="roman", count=SAMPLE):
+        assert re.fullmatch(r"[A-Za-z]+ [A-Za-z]+", name), name
+
+    assert len(rand_name(language="ja", starts_with="鬱", count=SAMPLE)) == SAMPLE
+
+
 def test_starts_with_leads_every_name_with_the_requested_character() -> None:
     for name in rand_name(language="en", count=SAMPLE, starts_with="k"):
         assert name[0] in "Kk", name

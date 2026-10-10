@@ -527,6 +527,47 @@ void main() {
       }
     });
 
+    test('a romanized name reads its startsWith, or is left out', () {
+      // A character no name in the pools starts with becomes a name part of its
+      // own, and a kanji nobody listed has no reading: `鬱 Haruto` was two
+      // scripts in one string. A kana is read out, and a character with no
+      // reading leaves the language out of a romanized result.
+      for (final character in ['か', 'カ']) {
+        for (final name in randName(
+          language: NameLanguage.ja,
+          startsWith: character,
+          script: NameScript.roman,
+          count: sample,
+        )) {
+          expect(name, matches(RegExp(r'^Ka [A-Za-z]+$')), reason: name);
+        }
+      }
+
+      for (final language in <NameLanguage?>[NameLanguage.ja, NameLanguage.zh, null]) {
+        expect(
+          randName(language: language, startsWith: '鬱', script: NameScript.roman, count: sample),
+          isEmpty,
+          reason: '$language',
+        );
+      }
+
+      // A character the pools hold a reading for is read as they read it, and
+      // the native script is untouched.
+      for (final name in randName(
+        language: NameLanguage.ja,
+        startsWith: '佐',
+        script: NameScript.roman,
+        count: sample,
+      )) {
+        expect(name, matches(RegExp(r'^[A-Za-z]+ [A-Za-z]+$')), reason: name);
+      }
+
+      expect(
+        randName(language: NameLanguage.ja, startsWith: '鬱', count: sample),
+        hasLength(sample),
+      );
+    });
+
     test('startsWith leads every name with the requested character', () {
       for (final name in randName(language: NameLanguage.en, count: sample, startsWith: 'k')) {
         expect(name, matches(RegExp('^[Kk]')), reason: name);

@@ -291,9 +291,9 @@ _Entry _composeGiven(NameLanguageData data, bool isMale, int length, String pref
   }
 
   // Kanji and hanzi carry their own reading, but a syllable the caller passed to
-  // `startsWith` has none — fall back to the character itself rather than
-  // dropping it from the romanization.
-  final r = parts.map((part) => part.r ?? part.n).join();
+  // `startsWith` has none. A kana is read out; anything else stays itself, and a
+  // romanized result leaves the name out rather than write it in two scripts.
+  final r = parts.map((part) => part.r ?? romanizeKana(part.n)).join();
 
   return _Entry(n, capitalizeFirst(r));
 }
@@ -753,15 +753,54 @@ List<NameDetail> generateNameDetails({
     return <NameDetail>[];
   }
 
+  // A romanized name cannot carry a character it has no reading for: `鬱 Haruto`
+  // is two scripts in one string. So a language that would lead with one is out
+  // before the draw, and a name that comes out with one anyway — an invented
+  // given name can begin on the bare character — is never kept.
+  final readable =
+      roman
+          ? languages.where((code) => _readsPrefix(code, settings)).toList(growable: false)
+          : languages;
+
+  if (readable.isEmpty) {
+    return <NameDetail>[];
+  }
+
   return withRandom(
     random,
     () => collect<NameDetail>(
       count: count,
       unique: unique,
       startsWith: settings.prefix,
-      draw: () => _generateOne(pick(languages), settings),
-      keyOf: (detail) => detail.native,
+      draw: () => _generateOne(pick(readable), settings),
+      keyOf: (detail) => roman && _unread.hasMatch(detail.roman) ? '' : detail.native,
       uniqueOf: (detail) => roman ? detail.roman : detail.native,
     ),
   );
+}
+
+// A character a romanization left as it was.
+final RegExp _unread = RegExp(
+  r'[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}]',
+  unicode: true,
+);
+
+/// Whether a language can write the name a `startsWith` leads with in Latin
+/// letters: always, unless its names carry their reading in the pools and the
+/// character is neither a kana nor the start of a name or syllable the pool
+/// leading the name holds. `か` reads `ka`, and `佐` is the start of `佐藤:Sato`.
+bool _readsPrefix(NameLanguage language, _Settings settings) {
+  final data = nameData[language]!;
+  final prefix = settings.prefix;
+
+  if (prefix.isEmpty || data.roman != RomanMode.token || kanaReading(prefix) != null) {
+    return true;
+  }
+
+  final leading =
+      _surnameLeads(data, settings.includeSurname)
+          ? <NamePool?>[data.last]
+          : <NamePool?>[data.givenMale, data.givenFemale, data.firstMale, data.firstFemale];
+
+  return leading.any((pool) => pool != null && _startingWith(pool, prefix).isNotEmpty);
 }

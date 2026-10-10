@@ -333,6 +333,50 @@ export function romanize(mode: RomanMode, value: string, part: 'surname' | 'give
 				: capitalizeFirst(romanizeHangul(value, true));
 		case 'token':
 		default:
-			return value;
+			return capitalizeFirst(romanizeKana(value));
 	}
+}
+
+// --- Kana -------------------------------------------------------------------
+
+// The Hepburn reading of every kana that can stand on its own, hiragana first;
+// a katakana reads the same as the hiragana 0x60 code points below it. A small
+// kana and the long-vowel mark cannot begin a word, so they have none. Kept as
+// text and split on first use, so importing the romanizer runs nothing.
+const KANA = `
+	あ:a い:i う:u え:e お:o か:ka き:ki く:ku け:ke こ:ko さ:sa し:shi す:su せ:se
+	そ:so た:ta ち:chi つ:tsu て:te と:to な:na に:ni ぬ:nu ね:ne の:no は:ha ひ:hi
+	ふ:fu へ:he ほ:ho ま:ma み:mi む:mu め:me も:mo や:ya ゆ:yu よ:yo ら:ra り:ri
+	る:ru れ:re ろ:ro わ:wa ゐ:i ゑ:e を:o ん:n が:ga ぎ:gi ぐ:gu げ:ge ご:go ざ:za
+	じ:ji ず:zu ぜ:ze ぞ:zo だ:da ぢ:ji づ:zu で:de ど:do ば:ba び:bi ぶ:bu べ:be
+	ぼ:bo ぱ:pa ぴ:pi ぷ:pu ぺ:pe ぽ:po ゔ:vu
+`;
+const KATAKANA_SHIFT = 0x60;
+let kanaReadings: Map<string, string> | null = null;
+
+/** The Hepburn reading of one kana, or `null` for anything else. */
+export function kanaReading(character: string): string | null {
+	if (!kanaReadings) {
+		kanaReadings = new Map();
+
+		for (const entry of KANA.split(/\s+/).filter(Boolean)) {
+			const [kana, reading] = entry.split(':');
+
+			kanaReadings.set(kana, reading);
+			kanaReadings.set(String.fromCodePoint(kana.codePointAt(0)! + KATAKANA_SHIFT), reading);
+		}
+	}
+
+	return kanaReadings.get(character) ?? null;
+}
+
+/**
+ * `text` with every kana it holds read out, and every other character left as
+ * it is. A name part carries its own reading, so this only meets a character a
+ * caller passed to `startsWith` that no name in the pools begins with: `か`
+ * reads `ka`, and a kanji nobody listed stays itself, which `randName` then
+ * leaves out of a romanized result rather than writing it in two scripts.
+ */
+export function romanizeKana(text: string): string {
+	return Array.from(text, (character) => kanaReading(character) ?? character).join('');
 }

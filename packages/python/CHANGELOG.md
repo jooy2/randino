@@ -2,6 +2,7 @@
 
 ## vNext (2026--)
 
+- `rand_name` with `script="roman"` reads a kana `starts_with` out (`か` gives `Ka Yuto`), and answers a Japanese or Chinese character it has no reading for with nothing, narrowing `language="all"` to the languages that can read it. It wrote the character itself into the romanized name: `鬱 Haruto`.
 - A Chinese action modifier is attached with the `的` its nicknames write: `奔跑的狮子`, where `奔跑狮子` read as a verb and its object. An adjective takes nothing, and a modifier on its own comes back bare.
 - A Korean name is romanized by the Revised Romanization's rule for personal names, which writes no sound change inside a name: `석민` is `Seokmin` and `복남` `Boknam`, where they came out `Seongmin` and `Bongnam`.
 - `rand_name` keeps a Korean, Japanese or Chinese surname under a `max_length` too tight for it, the way it keeps every other part asked for, and prefers a surname short enough to leave room for a given name: `max_length=1` wrote a bare given name (`솔`), and Japanese wrote one at a maximum of two, where `森` and `林` leave room.
