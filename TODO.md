@@ -44,7 +44,6 @@ A fix to a generator added under `vNext` needs no changelog entry of its own, si
 
 ### A. No decision needed
 
-- **A12. The release jobs use actions by tag.** The jobs holding `id-token: write` in `.github/workflows/release.yml` use `actions/checkout@v5`, `actions/setup-node@v6`, `actions/download-artifact@v8` and `dart-lang/setup-dart@v1`. Pin them to commit SHAs, the rule the docs workflow already states.
 - **A13. Every docs page downloads the whole library.** `Demo.vue` is registered globally in `docs/.vitepress/theme/index.js`, so the theme chunk is 645 KB gzipped. `defineAsyncComponent` brings it to 25 KB and loads the library on `/demo` only; returning `{ id, moduleSideEffects: false }` from the `randinoSource` plugin in `config.ts` saves 13 KB more on the demo.
 - **A14. The name helpers bundle every name pool.** `nameLengthRange`, `nameSupportsMiddleName` and `nameSupportsRoman` read `lengthSpec`, `hasMiddle` and `roman`, and are 18 to 19 KB each because those sit in the same objects as the pools. Move them into a small table of their own.
 - **A15. The Japanese sentence data spells out five forms of every verb.** 805 of 847 verbs follow from the dictionary form, and the rest from rules for `〜ていく` and `〜てくる`. Writing the dictionary form and the verb class, the way `koVerbs` does for Korean, saves about 12 KB gzipped on `randSentence`. The parsed data must come out identical; `tools/emit` rewrites the ports.

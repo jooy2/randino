@@ -106,15 +106,18 @@ jobs:
       contents: write
       id-token: write
 
+    # Every action in a publishing job is pinned to the commit its tag resolved to,
+    # rather than to the tag: these jobs can sign in to a registry, and a tag is a
+    # name its owner can move. An update to one has to be committed here.
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
       # No `registry-url`: it writes an `.npmrc` that points npm at a token,
       # and npm then never tries trusted publishing. Node 24 carries an npm new
       # enough for it (11.5.1 or later).
-      - uses: actions/setup-node@v6
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
         with:
           node-version: '24'
-      - uses: actions/download-artifact@v8
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           name: release
           path: ${{ runner.temp }}/release
@@ -206,14 +209,17 @@ jobs:
       run:
         working-directory: packages/dart
 
+    # Every action in a publishing job is pinned to the commit its tag resolved to,
+    # rather than to the tag: these jobs can sign in to a registry, and a tag is a
+    # name its owner can move. An update to one has to be committed here.
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
       # With `id-token: write`, this step also signs in to pub.dev for the
       # publish below.
-      - uses: dart-lang/setup-dart@v1
+      - uses: dart-lang/setup-dart@6afc89df92d6eb3834022f73cd65adc8cdfcb92d # v1.8.1
         with:
           sdk: stable
-      - uses: actions/download-artifact@v8
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           name: release
           path: ${{ runner.temp }}/release
@@ -323,11 +329,13 @@ jobs:
       contents: write
       id-token: write
 
+    # Every action in a publishing job is pinned to the commit its tag resolved to,
+    # rather than to the tag: these jobs can sign in to a registry, and a tag is a
+    # name its owner can move. An update to one has to be committed here.
     steps:
-      - uses: actions/checkout@v5
-      # No floating major tag is published for this action, so it is pinned.
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
       - uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
-      - uses: actions/download-artifact@v8
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           name: release
           path: ${{ runner.temp }}/release
