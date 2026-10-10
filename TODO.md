@@ -44,7 +44,6 @@ A fix to a generator added under `vNext` needs no changelog entry of its own, si
 
 ### A. No decision needed
 
-- **A40. `.azw3` has the type of `.azw`.** The type IANA registered for KF8 is `application/vnd.amazon.mobi8-ebook`, which is what the comment and the docs promise.
 - **A41. `llms-full.txt` carries 21 raw `<Lang>` tags.** `inlineLang` in `docs/.vitepress/data/markdown.ts` stops at the first `>`, which `js="() => number"` contains.
 - **A42. The demo's accessibility.** Its inputs have no visible focus, the whole result list is `aria-live`, nine tabs point `aria-controls` at panels that do not exist, `demoShort` shows literal backticks, and `count` is not clamped.
 - **A43. Make the cross-cutting tests table-driven.** Drive the base suites from the export list: no arguments, `count` as `0`, `-1`, `NaN`, `null`, past the maximum, seeded determinism, adversarial sources, unknown and prototype-key strings for every string option. Add a Python two-thread test and a time bound on an exhausted `unique`.

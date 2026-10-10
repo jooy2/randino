@@ -185,7 +185,7 @@ font | 1 | woff | font/woff
 font | 1 | eot | application/vnd.ms-fontobject
 ebook | 2 | epub | application/epub+zip
 ebook | 1 | mobi | application/x-mobipocket-ebook
-ebook | 1 | azw3 | application/vnd.amazon.ebook
+ebook | 1 | azw3 | application/vnd.amazon.mobi8-ebook
 disk | 2 | iso | application/x-iso9660-image
 disk | 1 | img | application/octet-stream
 disk | 1 | vhd | application/x-virtualbox-vhd
