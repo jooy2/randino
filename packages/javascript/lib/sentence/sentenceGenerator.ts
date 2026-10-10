@@ -322,7 +322,6 @@ type Settings = {
 	classified: Map<WordLanguage, readonly Requirement[]>;
 	// How many sentences one result holds, clamped.
 	sentences: number;
-	// Whether a phrase about a person is written as a name.
 	// Whether a sentence about a person writes a name, or null when the caller left
 	// it to the generator, in which case it is decided once per result.
 	includeName: boolean | null;
@@ -1271,7 +1270,6 @@ function articleSpan(data: SentenceLanguageData): readonly [number, number] {
 	return span;
 }
 
-/** What one part adds to the sentence, at its shortest and at its longest. */
 /**
  * How much room the copula takes on the phrase it is written onto, at its
  * shortest and its longest. Every form of it, because the level and the mood are
@@ -1301,6 +1299,7 @@ function copulaSpan(part: SentencePart, data: SentenceLanguageData): readonly [n
 	return [low + gap, high + gap];
 }
 
+/** What one part adds to the sentence, at its shortest and at its longest. */
 function partRange(
 	part: SentencePart,
 	data: SentenceLanguageData,
@@ -1332,7 +1331,6 @@ function partRange(
 	];
 }
 
-/** Shortest and longest sentence a shape can produce. */
 /**
  * What a shape can be, by the shape and the bounds it was measured against. Both
  * are held rather than rebuilt: the language's own `slotBounds` is one object
@@ -1349,6 +1347,7 @@ const frameRangeCache = new WeakMap<
 	WeakMap<Record<string, readonly [number, number]>, readonly [number, number]>
 >();
 
+/** Shortest and longest sentence a shape can produce. */
 function frameRange(
 	frame: SentenceFrame,
 	data: SentenceLanguageData,
@@ -3243,15 +3242,6 @@ function timeFor(
 }
 
 /**
- * The predicates of a group, in the form this sentence ends on.
- *
- * Each level falls back along its own chain to the plain statement the `words`
- * already are, so a group declares only what its language actually writes.
- * Japanese declares `polite` alone and it serves the formal level and the
- * question too, because the `か` that asks is the frame's tag rather than part
- * of the verb.
- */
-/**
  * Which form a level writes for each mood, best first, falling through to the
  * plain statement the group's `words` already are.
  *
@@ -3301,6 +3291,15 @@ function endings(pool: WordPool): WordPool {
 	return pool.flatMap((entry) => (entry.includes('|') ? entry.split('|') : [entry]));
 }
 
+/**
+ * The predicates of a group, in the form this sentence ends on.
+ *
+ * Each level falls back along its own chain to the plain statement the `words`
+ * already are, so a group declares only what its language actually writes.
+ * Japanese declares `polite` alone and it serves the formal level and the
+ * question too, because the `か` that asks is the frame's tag rather than part
+ * of the verb.
+ */
 function formOf(
 	group: StateGroup | VerbGroup,
 	mark: SentenceMark,
@@ -3362,13 +3361,13 @@ function headedFallback(
 	);
 }
 
-/** The theme a phrase other than the subject draws from. */
 // Where a subject can go, and where a story happens. `place` alone, and not the
 // two other themes of its class: a hero can walk to the market and not to Pluto,
 // and a sky is not somewhere a fox goes. A `place` part on its own still spans
 // the class, because a fox can sleep under a sky.
 const DESTINATION_THEMES: readonly WordTheme[] = ['place'];
 
+/** The theme a phrase other than the subject draws from. */
 function themeForPart(
 	slot: SentenceSlot,
 	group: VerbGroup | StateGroup,
@@ -3624,13 +3623,6 @@ function connectivesOf(
 }
 
 /**
- * Every sentence of one result, in order.
- *
- * The range is shared out before the first of them is drawn, and the topic is
- * taken from that first sentence — so what follows is about the same thing rather
- * than another draw that happened to land beside it.
- */
-/**
  * The kind this sentence is, and the kind whose mark it closes on, chosen
  * against the room it has.
  *
@@ -3716,17 +3708,6 @@ function markWeight(mark: SentenceMark, flow: Flow): number {
 }
 
 /**
- * Whether a result that writes a name can still land in the range the caller
- * asked for.
- *
- * A name is one word and no article — `Yvonne` where a noun phrase would write
- * `die schlanke Wolke` — so a named sentence is the shorter of the two by a wide
- * margin, and a range only the longer one can reach is a range a name cannot be
- * in. Asked for a name outright the generator writes one anyway, the same way it
- * answers a range too narrow for the parts it was told to carry; drawn, it is
- * one more thing to decide against the room.
- */
-/**
  * The slot bounds this result is measured against: the language's own, with the
  * subject narrowed to a name when the result writes one.
  *
@@ -3763,10 +3744,20 @@ function roomFor(
 	return narrowed;
 }
 
+/**
+ * Whether a result that writes a name can still land in the range the caller
+ * asked for.
+ *
+ * A name is one word and no article — `Yvonne` where a noun phrase would write
+ * `die schlanke Wolke` — so a named sentence is the shorter of the two by a wide
+ * margin, and a range only the longer one can reach is a range a name cannot be
+ * in. Asked for a name outright the generator writes one anyway, the same way it
+ * answers a range too narrow for the parts it was told to carry; drawn, it is
+ * one more thing to decide against the room.
+ */
 function nameFits(
 	data: SentenceLanguageData,
 	frames: readonly SentenceFrame[],
-	bounds: Record<string, readonly [number, number]>,
 	settings: Settings,
 	language: WordLanguage
 ): boolean {
@@ -3794,11 +3785,15 @@ type Result = {
 	theme: WordTheme | null;
 };
 
+/**
+ * Every sentence of one result, in order.
+ *
+ * The range is shared out before the first of them is drawn, and the topic is
+ * taken from that first sentence — so what follows is about the same thing rather
+ * than another draw that happened to land beside it.
+ */
 function generateResult(language: WordLanguage, settings: Settings): Result {
 	const data = SENTENCE_DATA[language];
-	const bounds = slotBounds(language);
-	// Every shape any of the requested types could take, because the budget is
-	// shared out before the first type is even drawn.
 	// Every shape any of the requested kinds could take, because the budget is
 	// shared out before the first of them is even drawn — and a quoted line can be
 	// any kind at all, so its shapes are all of them.
@@ -3811,8 +3806,7 @@ function generateResult(language: WordLanguage, settings: Settings): Result {
 	// would put a name in one line of a paragraph and not the next. Settled here
 	// because it takes the language's own name lengths to know whether a name can
 	// answer the range that was asked for.
-	const named =
-		settings.includeName ?? (nameFits(data, frames, bounds, settings, language) && chance(50));
+	const named = settings.includeName ?? (nameFits(data, frames, settings, language) && chance(50));
 	const settled = settings.includeName === named ? settings : { ...settings, includeName: named };
 	// And the budget is measured against what a named result actually writes: one
 	// word where a noun phrase would have written an article, a modifier and a noun.

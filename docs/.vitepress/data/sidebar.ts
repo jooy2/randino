@@ -290,13 +290,6 @@ function groupById(entries: (SidebarPage | SidebarGroup)[], id: string): Sidebar
 }
 
 /**
- * Some of the groups again, as the sections of one navbar dropdown.
- *
- * The navbar's API menu and the sidebar's two function groups are the same
- * lists, so they are the same lists — a menu that quietly stops matching the
- * section it points into is the kind of thing only the reader notices.
- */
-/**
  * Every page a group holds, however deep — minus the subgroups that asked to
  * stay out of the menu.
  *
@@ -318,6 +311,13 @@ function pagesOf(group: SidebarGroup): SidebarPage[] {
 	});
 }
 
+/**
+ * Some of the groups again, as the sections of one navbar dropdown.
+ *
+ * The navbar's API menu and the sidebar's two function groups are the same
+ * lists, so they are the same lists — a menu that quietly stops matching the
+ * section it points into is the kind of thing only the reader notices.
+ */
 export function navGroupsFor(ids: string[], lang: string, defaultLocale: string) {
 	const base = localeBase(lang, defaultLocale);
 

@@ -1459,7 +1459,6 @@ int _tailMax(SentencePart part) {
   return tail > alt ? tail : alt;
 }
 
-/// What one part adds to the sentence, at its shortest and at its longest.
 /// How much room the copula takes on the phrase it is written onto.
 ///
 /// Every form of it, because the level and the mood are settled after the shape
@@ -1475,6 +1474,7 @@ LengthRange _copulaSpan(SentencePart part, SentenceLanguageData data) {
   return LengthRange(own.min + gap, own.max + gap);
 }
 
+/// What one part adds to the sentence, at its shortest and at its longest.
 LengthRange _partRange(
   SentencePart part,
   SentenceLanguageData data,
@@ -2297,13 +2297,13 @@ int _modifyChanceFor(int distance, bool tooLong, bool storied) {
   return tooLong ? 0 : 100;
 }
 
-/// The theme a phrase other than the subject draws from.
 /// Where a subject can go, and where a story happens. `place` alone, and not
 /// the two other themes of its class: a hero can walk to the market and not to
 /// Pluto, and a sky is not somewhere a fox goes. A `place` part on its own
 /// still spans the class, because a fox can sleep under a sky.
 const List<WordTheme> _destinationThemes = <WordTheme>[WordTheme.place];
 
+/// The theme a phrase other than the subject draws from.
 WordTheme _themeForPart(
   WordLanguage language,
   SentenceLanguageData data,
@@ -3697,11 +3697,6 @@ WordPool _connectivesOf(
   ];
 }
 
-/// Every sentence of one result, in order.
-///
-/// The range is shared out before the first of them is drawn, and the topic is
-/// taken from that first sentence — so what follows is about the same thing
-/// rather than another draw that happened to land beside it.
 /// The kind this sentence is, and the kind whose mark it closes on, chosen
 /// against the room it has.
 ///
@@ -3956,6 +3951,11 @@ bool _timeSpent(List<_Built> built, int count) {
       named >= (share < 1 ? 1 : share);
 }
 
+/// Every sentence of one result, in order.
+///
+/// The range is shared out before the first of them is drawn, and the topic is
+/// taken from that first sentence — so what follows is about the same thing
+/// rather than another draw that happened to land beside it.
 _Result _generateResult(WordLanguage language, _Settings settings) {
   final data = sentenceData[language]!;
   final modifierBounds = _modifierSpan(language);
