@@ -309,7 +309,12 @@ describe('base test', () => {
 		// And the fallback is the option's own default, not silence: `count: NaN`
 		// asked for one name and used to hand back none.
 		assert.strictEqual(randino.randName({ count: NaN }).length, 1);
-		assert.strictEqual(randino.randSentence({ sentences: NaN })[0].split('. ').length, 1);
+		// Counted by the detail rather than by splitting on `. `, which a German date
+		// writes inside one sentence: `Am 3. Mai 2030 wendet sich Edith.`
+		assert.strictEqual(
+			randino.randSentence({ sentences: NaN, output: 'detail' })[0].sentences.length,
+			1
+		);
 		// An age range that is not a number is the default range, not an empty one.
 		assert.ok(randino.randAge({ minAge: NaN, maxAge: NaN })[0] <= 100);
 		// A unit that is not one is the whole date, written the default way.
