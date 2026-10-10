@@ -44,7 +44,6 @@ A fix to a generator added under `vNext` needs no changelog entry of its own, si
 
 ### A. No decision needed
 
-- **A1. CJK word draws scan the whole pool for case.** `drawWord` calls `poolCapitalizes(pool)` on every draw, and a pool with no letter case (ko, ja, zh) is walked to the end: 10,000 `randWord` are 18 ms in `en` and 120 ms in `ko`. Ask the pool only when the word was invented. `lib/word/wordGenerator.ts` and both ports.
 - **A2. `randSentence` classifies `include` on every draw.** `classify` walks every pool of the language per required word, for every first sentence, opener retry and story retelling: 100 words at count 1000 go from 0.3 s to 8.3 s. Classify once per call.
 - **A3. Location pools do work nobody asked for.** `poolOf` writes every pool's texts eagerly (about 10 ms and 2 MB each), `narrowAfresh` lowercases the whole pool on every new `startsWith`, and the US `city` and `district` path pools are the same entries cached twice. Build the texts on first narrowing, keep the lowercased copy, key path pools by the depth they stop at.
 - **A4. Ages and date units draw past what is left.** `unique` ages keep drawing after the 101 candidates are used (5.5 s in Python at count 10,000); remove each drawn candidate instead. `randDate` with `unit` formats a date string it never returns, 90% of Python's time; skip the format.

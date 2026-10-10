@@ -462,8 +462,13 @@ export function drawWord(
 	return {
 		// An invented word is written the way the pool it stands in for is written,
 		// which is how a German one comes out `Biefreum` rather than `biefreum`
-		// beside the `Klugheit` and `Bettdecke` of the pools.
-		word: data.capitalize || poolCapitalizes(pool) ? capitalizeFirst(chosen) : chosen,
+		// beside the `Klugheit` and `Bettdecke` of the pools. A drawn word is
+		// already written that way, so only an invented one asks the pool, which
+		// is walked to the end in a script with no case.
+		word:
+			data.capitalize || (word === null && poolCapitalizes(pool))
+				? capitalizeFirst(chosen)
+				: chosen,
 		missed: !made && !word
 	};
 }

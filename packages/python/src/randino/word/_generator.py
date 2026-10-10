@@ -442,8 +442,9 @@ def draw_word(
 
     # An invented word is written the way the pool it stands in for is written, which is
     # how a German one comes out `Biefreum` rather than `biefreum` beside the `Klugheit`
-    # and `Bettdecke` of the pools.
-    capitalized = data.capitalize or pool_capitalizes(pool)
+    # and `Bettdecke` of the pools. A drawn word is already written that way, so only an
+    # invented one asks the pool, which is walked to the end in a script with no case.
+    capitalized = data.capitalize or (word is None and pool_capitalizes(pool))
 
     return Drawn(
         capitalize_first(chosen) if capitalized else chosen,
