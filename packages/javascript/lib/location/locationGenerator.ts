@@ -52,6 +52,9 @@ type Texts = {
 	texts: readonly string[];
 	shortest: number;
 	longest: number;
+	// The texts in lower case, for `startsWith`, made the first time a prefix is
+	// asked of the list rather than once per prefix.
+	lower?: readonly string[];
 	// The last narrowing asked of this list, which is the one a loop of single
 	// draws asks again: filtering thirty-two thousand names costs a millisecond,
 	// and a caller drawing one at a time would pay it every call.
@@ -59,7 +62,7 @@ type Texts = {
 };
 
 /** The divisions one kind of draw may land on. */
-type Pool = Texts & {
+type Pool = {
 	data: LocationLanguageData;
 	language: LocationLanguage;
 	form: LocationForm;
@@ -68,6 +71,9 @@ type Pool = Texts & {
 	withCountry: boolean;
 	// `null` for the country, which the outline does not hold.
 	entries: readonly (OutlineEntry | null)[];
+	// Every entry written out, made the first time `startsWith` or a length asks
+	// for it. A draw with neither writes the one entry it lands on and no other.
+	written?: Texts;
 };
 
 // Parsed once per dataset, on the first draw that needs it rather than at import:
@@ -116,6 +122,23 @@ function entriesAt(
 		return entries.filter((entry) => rankOf(data, entry.depth) === wanted);
 	}
 
+	const limit = limitOf(data, level);
+
+	return entries.filter(
+		(entry) =>
+			entry.depth === limit ||
+			(entry.depth < limit && (entry.below === null || entry.below > limit))
+	);
+}
+
+/**
+ * The deepest outline depth a location written out at `level` reaches: the
+ * deepest level the country has at or above the one asked for. Two levels the
+ * country has no division between reach the same depth, which is how the US
+ * `city` and `district` share one pool.
+ */
+function limitOf(data: LocationLanguageData, level: LocationLevel): number {
+	const wanted = LOCATION_LEVELS.indexOf(level);
 	let limit = -1;
 
 	data.levels.forEach((_, depth) => {
@@ -124,11 +147,7 @@ function entriesAt(
 		}
 	});
 
-	return entries.filter(
-		(entry) =>
-			entry.depth === limit ||
-			(entry.depth < limit && (entry.below === null || entry.below > limit))
-	);
+	return limit;
 }
 
 /** One result, built fresh per draw so a caller can never reach the pool's own arrays. */
@@ -172,7 +191,9 @@ function detailOf(pool: Pool, entry: OutlineEntry | null): LocationDetail {
 }
 
 // One pool per language, form, level and whether it opens on the country, each
-// built the first time it is drawn from.
+// built the first time it is drawn from. A location written out is keyed by the
+// depth it stops at rather than by the level, so two levels that write the same
+// list share it.
 const poolCache = new WeakMap<LocationLanguageData, Map<string, Pool>>();
 
 function poolOf(
@@ -189,31 +210,37 @@ function poolOf(
 		poolCache.set(data, byKind);
 	}
 
-	const key = `${form}:${level}:${withCountry}`;
+	const reach = form === 'path' && level !== 'country' ? limitOf(data, level) : level;
+	const key = `${form}:${reach}:${withCountry}`;
 	const cached = byKind.get(key);
 
 	if (cached) {
 		return cached;
 	}
 
-	const entries = entriesAt(data, form, level);
 	const pool: Pool = {
 		data,
 		language,
 		form,
 		withCountry,
-		entries,
-		texts: [],
-		shortest: 0,
-		longest: 0
+		entries: entriesAt(data, form, level)
 	};
-	const texts = entries.map((entry) => detailOf(pool, entry).location);
 
-	pool.texts = texts;
-	[pool.shortest, pool.longest] = spanOf(texts);
 	byKind.set(key, pool);
 
 	return pool;
+}
+
+/** Every entry of a pool written out, the first time something has to read them. */
+function textsOf(pool: Pool): Texts {
+	if (!pool.written) {
+		const texts = pool.entries.map((entry) => detailOf(pool, entry).location);
+		const [shortest, longest] = spanOf(texts);
+
+		pool.written = { texts, shortest, longest };
+	}
+
+	return pool.written;
 }
 
 /** Shortest and longest of a list of texts, `[0, 0]` for none. */
@@ -272,11 +299,16 @@ function narrowAfresh(
 	const lower = prefix.toLowerCase();
 	const matching: number[] = [];
 
-	pool.texts.forEach((text, index) => {
-		if (!lower || text.toLowerCase().startsWith(lower)) {
-			matching.push(index);
-		}
-	});
+	if (lower) {
+		pool.lower ??= pool.texts.map((text) => text.toLowerCase());
+		pool.lower.forEach((text, index) => {
+			if (text.startsWith(lower)) {
+				matching.push(index);
+			}
+		});
+	} else {
+		pool.texts.forEach((_, index) => matching.push(index));
+	}
 
 	if (minLength === undefined && maxLength === undefined) {
 		return matching;
@@ -331,7 +363,11 @@ export function generateLocationDetails(
 	// draws on English, which has none.
 	const candidates = languagesWriting(language, LOCATION_LANGUAGES, prefix).flatMap((code) => {
 		const pool = poolOf(code, form, level, withCountry);
-		const indexes = pool.entries.length ? narrow(pool, prefix, minLength, maxLength) : [];
+		const indexes = !pool.entries.length
+			? []
+			: prefix || minLength !== undefined || maxLength !== undefined
+				? narrow(textsOf(pool), prefix, minLength, maxLength)
+				: null;
 
 		return indexes === null || indexes.length ? [{ pool, indexes }] : [];
 	});

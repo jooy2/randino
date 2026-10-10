@@ -64,6 +64,12 @@ class _Texts:
     longest: int
     """The length of the longest text."""
 
+    lower: tuple[str, ...] | None = None
+    """The texts in lower case, for `starts_with`.
+
+    Made the first time a prefix is asked of the list rather than once per prefix.
+    """
+
     narrowed: tuple[tuple[str, int | None, int | None], tuple[int, ...]] | None = None
     """The last narrowing asked of this list, and its answer.
 
@@ -73,7 +79,7 @@ class _Texts:
 
 
 @dataclass(slots=True)
-class _Pool(_Texts):
+class _Pool:
     """The divisions one kind of draw may land on."""
 
     data: LocationLanguageData
@@ -94,6 +100,12 @@ class _Pool(_Texts):
     entries: tuple[OutlineEntry | None, ...]
     """The divisions, with None for the country, which the outline does not hold."""
 
+    written: _Texts | None = None
+    """Every entry written out, made the first time `starts_with` or a length asks for it.
+
+    A draw with neither writes the one entry it lands on and no other.
+    """
+
 
 class _Candidate(NamedTuple):
     """A pool one call may draw from, and the indexes of it that call may land on."""
@@ -111,8 +123,9 @@ class _Candidate(NamedTuple):
 _ENTRY_CACHE: dict[LocationLanguage, tuple[OutlineEntry, ...]] = {}
 
 # One pool per language, form, level and whether it opens on the country, each built the
-# first time it is drawn from.
-_POOL_CACHE: dict[tuple[LocationLanguage, LocationForm, LocationLevel, bool], _Pool] = {}
+# first time it is drawn from. A location written out is keyed by the depth it stops at
+# rather than by the level, so two levels that write the same list share it.
+_POOL_CACHE: dict[tuple[LocationLanguage, LocationForm, LocationLevel | int, bool], _Pool] = {}
 
 
 def _entries_of(language: LocationLanguage) -> tuple[OutlineEntry, ...]:
@@ -162,11 +175,7 @@ def _entries_at(
     if form == "unit":
         return tuple(entry for entry in entries if _rank_of(data, entry.depth) == wanted)
 
-    limit = -1
-
-    for depth in range(len(data.levels)):
-        if _rank_of(data, depth) <= wanted:
-            limit = depth
+    limit = _limit_of(data, level)
 
     return tuple(
         entry
@@ -174,6 +183,23 @@ def _entries_at(
         if entry.depth == limit
         or (entry.depth < limit and (entry.below is None or entry.below > limit))
     )
+
+
+def _limit_of(data: LocationLanguageData, level: LocationLevel) -> int:
+    """The deepest outline depth a location written out at `level` reaches.
+
+    That is the deepest level the country has at or above the one asked for. Two levels
+    the country has no division between reach the same depth, which is how the US `city`
+    and `district` share one pool.
+    """
+    wanted = LOCATION_LEVELS.index(level)
+    limit = -1
+
+    for depth in range(len(data.levels)):
+        if _rank_of(data, depth) <= wanted:
+            limit = depth
+
+    return limit
 
 
 def _detail_of(pool: _Pool, entry: OutlineEntry | None) -> LocationDetail:
@@ -223,31 +249,34 @@ def _pool_of(
     language: LocationLanguage, form: LocationForm, level: LocationLevel, with_country: bool
 ) -> _Pool:
     """The pool for one language, form and level, built the first time it is drawn from."""
-    key = (language, form, level, with_country)
+    data = LOCATION_DATA[language]
+    reach = _limit_of(data, level) if form == "path" and level != "country" else level
+    key = (language, form, reach, with_country)
     cached = _POOL_CACHE.get(key)
 
     if cached is not None:
         return cached
 
-    data = LOCATION_DATA[language]
-    entries = _entries_at(language, form, level)
     pool = _Pool(
         data=data,
         language=language,
         form=form,
         with_country=with_country,
-        entries=entries,
-        texts=(),
-        shortest=0,
-        longest=0,
+        entries=_entries_at(language, form, level),
     )
-    texts = tuple(_detail_of(pool, entry).location for entry in entries)
-
-    pool.texts = texts
-    pool.shortest, pool.longest = _span_of(texts)
     _POOL_CACHE[key] = pool
 
     return pool
+
+
+def _texts_of(pool: _Pool) -> _Texts:
+    """Every entry of a pool written out, the first time something has to read them."""
+    if pool.written is None:
+        texts = tuple(_detail_of(pool, entry).location for entry in pool.entries)
+        shortest, longest = _span_of(texts)
+        pool.written = _Texts(texts=texts, shortest=shortest, longest=longest)
+
+    return pool.written
 
 
 def _span_of(texts: tuple[str, ...]) -> tuple[int, int]:
@@ -296,11 +325,14 @@ def _narrow_afresh(
 ) -> tuple[int, ...]:
     """What `_narrow` answers when the pool has not been asked the same thing just before."""
     lower = prefix.lower()
-    matching = [
-        index
-        for index, text in enumerate(pool.texts)
-        if not lower or text.lower().startswith(lower)
-    ]
+
+    if lower:
+        if pool.lower is None:
+            pool.lower = tuple(text.lower() for text in pool.texts)
+
+        matching = [index for index, text in enumerate(pool.lower) if text.startswith(lower)]
+    else:
+        matching = list(range(len(pool.texts)))
 
     if min_length is None and max_length is None:
         return tuple(matching)
@@ -361,7 +393,12 @@ def generate_location_details(
 
     for code in languages_writing(resolve_location_language(language), LOCATION_LANGUAGES, prefix):
         pool = _pool_of(code, form, level, with_country)
-        indexes = _narrow(pool, prefix, low, high) if pool.entries else ()
+        if not pool.entries:
+            indexes: tuple[int, ...] | None = ()
+        elif prefix or low is not None or high is not None:
+            indexes = _narrow(_texts_of(pool), prefix, low, high)
+        else:
+            indexes = None
 
         if indexes is None or indexes:
             candidates.append(_Candidate(pool, indexes))

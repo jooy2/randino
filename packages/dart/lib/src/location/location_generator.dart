@@ -39,10 +39,14 @@ class _Narrowed {
 ///
 /// The text is worked out once, because every length and `startsWith` filter
 /// reads it and a US list is thirty-two thousand of them.
-abstract class _Texts {
+class _Texts {
   List<String> texts = const <String>[];
   int shortest = 0;
   int longest = 0;
+
+  // The texts in lower case, for `startsWith`, made the first time a prefix is
+  // asked of the list rather than once per prefix.
+  List<String>? lower;
 
   // The last narrowing asked of this list, which is the one a loop of single
   // draws asks again: filtering thirty-two thousand names is not free, and a
@@ -51,7 +55,7 @@ abstract class _Texts {
 }
 
 /// The divisions one kind of draw may land on.
-class _Pool extends _Texts {
+class _Pool {
   _Pool(this.data, this.language, this.form, this.withCountry, this.entries);
 
   final LocationLanguageData data;
@@ -64,6 +68,10 @@ class _Pool extends _Texts {
 
   // `null` for the country, which the outline does not hold.
   final List<OutlineEntry?> entries;
+
+  // Every entry written out, made the first time `startsWith` or a length asks
+  // for it. A draw with neither writes the one entry it lands on and no other.
+  _Texts? written;
 }
 
 // Parsed once per dataset, on the first draw that needs it rather than at import:
@@ -98,13 +106,7 @@ List<OutlineEntry?> _entriesAt(LocationLanguageData data, LocationForm form, Loc
     return entries.where((entry) => _rankOf(data, entry.depth) == wanted).toList(growable: false);
   }
 
-  var limit = -1;
-
-  for (var depth = 0; depth < data.levels.length; depth += 1) {
-    if (_rankOf(data, depth) <= wanted) {
-      limit = depth;
-    }
-  }
+  final limit = _limitOf(data, level);
 
   return entries
       .where((entry) {
@@ -113,6 +115,24 @@ List<OutlineEntry?> _entriesAt(LocationLanguageData data, LocationForm form, Loc
         return entry.depth == limit || (entry.depth < limit && (below == null || below > limit));
       })
       .toList(growable: false);
+}
+
+/// The deepest outline depth a location written out at [level] reaches.
+///
+/// That is the deepest level the country has at or above the one asked for. Two
+/// levels the country has no division between reach the same depth, which is
+/// how the US `city` and `district` share one pool.
+int _limitOf(LocationLanguageData data, LocationLevel level) {
+  final wanted = locationLevels.indexOf(level);
+  var limit = -1;
+
+  for (var depth = 0; depth < data.levels.length; depth += 1) {
+    if (_rankOf(data, depth) <= wanted) {
+      limit = depth;
+    }
+  }
+
+  return limit;
 }
 
 /// One result, built fresh per draw so a caller can never reach the pool's own
@@ -162,32 +182,41 @@ LocationDetail _detailOf(_Pool pool, OutlineEntry? entry) {
 }
 
 // One pool per language, form, level and whether it opens on the country, each
-// built the first time it is drawn from.
+// built the first time it is drawn from. A location written out is keyed by the
+// depth it stops at rather than by the level, so two levels that write the same
+// list share it.
 final Expando<Map<String, _Pool>> _poolCache = Expando<Map<String, _Pool>>('locationPools');
 
 _Pool _poolOf(LocationLanguage language, LocationForm form, LocationLevel level, bool withCountry) {
   final data = locationData[language]!;
   final byKind = _poolCache[data] ??= <String, _Pool>{};
-  final key = '${form.name}:${level.name}:$withCountry';
-  final cached = byKind[key];
+  final reach =
+      form == LocationForm.path && level != LocationLevel.country
+          ? '${_limitOf(data, level)}'
+          : level.name;
+  final key = '${form.name}:$reach:$withCountry';
 
-  if (cached != null) {
-    return cached;
+  return byKind[key] ??= _Pool(data, language, form, withCountry, _entriesAt(data, form, level));
+}
+
+/// Every entry of a pool written out, the first time something has to read them.
+_Texts _textsOf(_Pool pool) {
+  final written = pool.written;
+
+  if (written != null) {
+    return written;
   }
 
-  final pool = _Pool(data, language, form, withCountry, _entriesAt(data, form, level));
   final texts = List<String>.unmodifiable(
     pool.entries.map((entry) => _detailOf(pool, entry).location),
   );
   final (shortest, longest) = _spanOf(texts);
 
-  pool
-    ..texts = texts
-    ..shortest = shortest
-    ..longest = longest;
-  byKind[key] = pool;
-
-  return pool;
+  return pool.written =
+      _Texts()
+        ..texts = texts
+        ..shortest = shortest
+        ..longest = longest;
 }
 
 /// Shortest and longest of a list of texts, `(0, 0)` for none.
@@ -233,9 +262,16 @@ List<int> _narrowAfresh(_Texts pool, String prefix, int? minLength, int? maxLeng
   final lower = prefix.toLowerCase();
   final matching = <int>[];
 
-  for (var index = 0; index < pool.texts.length; index += 1) {
-    if (lower.isEmpty || pool.texts[index].toLowerCase().startsWith(lower)) {
-      matching.add(index);
+  if (lower.isEmpty) {
+    matching.addAll(Iterable<int>.generate(pool.texts.length));
+  } else {
+    final texts =
+        pool.lower ??= List<String>.unmodifiable(pool.texts.map((text) => text.toLowerCase()));
+
+    for (var index = 0; index < texts.length; index += 1) {
+      if (texts[index].startsWith(lower)) {
+        matching.add(index);
+      }
     }
   }
 
@@ -281,7 +317,7 @@ List<int> _narrowAfresh(_Texts pool, String prefix, int? minLength, int? maxLeng
 }
 
 /// A language's pool, and the indexes of it a call may draw from.
-class _Candidate<P extends _Texts> {
+class _Candidate<P extends Object> {
   const _Candidate(this.pool, this.indexes);
 
   final P pool;
@@ -321,8 +357,13 @@ List<LocationDetail> generateLocationDetails({
 
   for (final code in languagesWriting(language, locationLanguages, prefix)) {
     final pool = _poolOf(code, form, level, withCountry);
+    final asked = prefix.isNotEmpty || minLength != null || maxLength != null;
     final indexes =
-        pool.entries.isEmpty ? const <int>[] : _narrow(pool, prefix, minLength, maxLength);
+        pool.entries.isEmpty
+            ? const <int>[]
+            : asked
+            ? _narrow(_textsOf(pool), prefix, minLength, maxLength)
+            : null;
 
     if (indexes == null || indexes.isNotEmpty) {
       candidates.add(_Candidate(pool, indexes));

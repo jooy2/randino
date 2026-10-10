@@ -2,6 +2,7 @@
 
 ## vNext (2026--)
 
+- The first draw from `rand_location`, `rand_region`, `rand_city` or `rand_district` is about three times faster and holds less than half the memory. Every division used to be written out when a pool was first drawn from, whether or not `starts_with` or a length asked for it.
 - `rand_sentence` with `include` is several times faster. The required words were looked up in every pool of the language again for each result, and now are once per call.
 - `rand_word`, `rand_nickname`, `rand_modifier` and `rand_sentence` draw Korean, Japanese and Chinese words about five times faster. Every word drawn used to read through its whole pool to find out whether the language writes capitals.
 - **`rand_cpu` and `rand_gpu` take `vendor`**, which keeps to the makers named: `rand_cpu(vendor="AMD")`, `rand_gpu(vendor=("AMD", "ATI"))`. A name neither catalog holds is ignored, and a maker with no part on the platform or in the years asked for is answered with nothing. The details' `vendor` is now typed `CpuVendor` and `GpuVendor`, and `CpuVendor`, `CpuVendorOption`, `GpuVendor`, `GpuVendorOption`, `CPU_VENDORS` and `GPU_VENDORS` are exported beside them.
