@@ -25,6 +25,7 @@
 
 import {
 	collect,
+	languagesFitting,
 	languagesWriting,
 	lengthBounds,
 	resolveLength,
@@ -535,9 +536,11 @@ export function generateNicknameDetails(options: RandNicknameOptions = {}): Nick
 	// script it writes changes between one nickname and the next. A requested first
 	// character the language does not write is one it can never lead a nickname
 	// with, so those languages are out first, and the shapes narrow what is left.
-	const languages = languagesFor(
-		settings,
-		languagesWriting(language, WORD_LANGUAGES, settings.prefix)
+	const languages = languagesFitting(
+		languagesFor(settings, languagesWriting(language, WORD_LANGUAGES, settings.prefix)),
+		settings.minLength,
+		settings.maxLength,
+		(code) => naturalRange(code, settings.separator)
 	);
 
 	if (!languages.length) {

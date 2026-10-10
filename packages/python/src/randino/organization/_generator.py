@@ -408,6 +408,8 @@ class _Plan:
     data: OrganizationLanguageData
     shapes: dict[OrganizationType, tuple[_Shape, ...]]
     types: tuple[OrganizationType, ...]
+    fits: bool
+    """Whether some shape of the language can land inside the length range."""
 
 
 def _plan_for(language: WordLanguage, settings: _Settings) -> _Plan:
@@ -447,7 +449,7 @@ def _plan_for(language: WordLanguage, settings: _Settings) -> _Plan:
 
     types = tuple(kind for kind in settings.types if shapes[kind])
 
-    return _Plan(language, data, shapes, tuple(fitting) or types)
+    return _Plan(language, data, shapes, tuple(fitting) or types, bool(fitting))
 
 
 def _choose_shape(shapes: Sequence[_Shape]) -> _Shape:
@@ -650,7 +652,7 @@ def generate_organization_details(
     )
     # A language that does not write the requested character, and one with no shape of
     # the requested kinds that can lead with it, are out before a draw.
-    plans = [
+    able = [
         plan
         for plan in (
             _plan_for(code, settings)
@@ -660,6 +662,10 @@ def generate_organization_details(
         )
         if plan.types
     ]
+    # And a language with no shape inside the length range, while another has one: asked
+    # for eight characters, every language answered, and the ones whose names run longer
+    # answered with their shortest.
+    plans = [plan for plan in able if plan.fits] or able
 
     if not plans:
         return []

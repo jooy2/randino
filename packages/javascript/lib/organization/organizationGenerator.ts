@@ -443,6 +443,8 @@ type Plan = {
 	data: OrganizationLanguageData;
 	shapes: Partial<Record<OrganizationType, readonly Shape[]>>;
 	types: readonly OrganizationType[];
+	/** Whether some shape of the language can land inside the length range. */
+	fits: boolean;
 };
 
 function planFor(language: WordLanguage, settings: Settings): Plan {
@@ -486,7 +488,8 @@ function planFor(language: WordLanguage, settings: Settings): Plan {
 		language,
 		data,
 		shapes,
-		types: fitting.length ? fitting : types
+		types: fitting.length ? fitting : types,
+		fits: fitting.length > 0
 	};
 }
 
@@ -726,9 +729,14 @@ export function generateOrganizationDetails(
 	};
 	// A language that does not write the requested character, and one with no
 	// shape of the requested kinds that can lead with it, are out before a draw.
-	const plans = languagesWriting(language, WORD_LANGUAGES, settings.prefix)
+	const able = languagesWriting(language, WORD_LANGUAGES, settings.prefix)
 		.map((code) => planFor(code, settings))
 		.filter((plan) => plan.types.length > 0);
+	// And a language with no shape inside the length range, while another has one:
+	// asked for eight characters, every language answered, and the ones whose
+	// names run longer answered with their shortest.
+	const fitted = able.filter((plan) => plan.fits);
+	const plans = fitted.length ? fitted : able;
 
 	if (!plans.length) {
 		return [];

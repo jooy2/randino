@@ -249,6 +249,38 @@ export function languagesWriting<T extends string>(
 }
 
 /**
+ * The languages among `languages` whose own range of lengths meets the range the
+ * caller asked for, or every one of them when none does.
+ *
+ * With every language in play, a range only some of them can reach was answered
+ * by the rest with the closest result they had: `randWord({ maxLength: 1 })`
+ * kept to one character a quarter of the time, because only the CJK languages
+ * write a word that short. A language that cannot meet the range is left out,
+ * the way `languagesWriting` leaves out one that cannot write `startsWith`; when
+ * none can, every language is kept and each answers with its closest.
+ */
+export function languagesFitting<T extends string>(
+	languages: readonly T[],
+	minLength: number | undefined,
+	maxLength: number | undefined,
+	rangeOf: (code: T) => readonly [number, number]
+): readonly T[] {
+	if (languages.length < 2 || (minLength === undefined && maxLength === undefined)) {
+		return languages;
+	}
+
+	const low = minLength ?? 0;
+	const high = maxLength ?? Infinity;
+	const fitting = languages.filter((code) => {
+		const [min, max] = rangeOf(code);
+
+		return max >= low && min <= high;
+	});
+
+	return fitting.length ? fitting : languages;
+}
+
+/**
  * Draw until there are `count` results, discarding what the caller's filters
  * reject. `keyOf` is the string a result is filtered and deduplicated by — the
  * name, the nickname, the word. `uniqueOf` deduplicates by another string where

@@ -21,6 +21,7 @@ from typing import Literal, NamedTuple
 
 from randino._internal.generate import (
     collect,
+    languages_fitting,
     languages_writing,
     length_bounds,
     resolve_length,
@@ -766,7 +767,15 @@ def generate_name_details(
 
     # A requested first character the language does not write is one it can never
     # lead a name with, so the languages that cannot are out before a draw is made.
-    languages = languages_writing(resolve_name_language(language), NAME_LANGUAGES, settings.prefix)
+    # And one whose names cannot land inside the length range, while another's can.
+    languages = languages_fitting(
+        languages_writing(resolve_name_language(language), NAME_LANGUAGES, settings.prefix),
+        settings.min_length,
+        settings.max_length,
+        lambda code: name_length_range(
+            code, settings.include_surname, settings.include_middle_name
+        ),
+    )
 
     if not languages:
         return []

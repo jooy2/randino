@@ -5425,9 +5425,21 @@ List<SentenceDetail> generateSentenceDetails({
   // result when this sits inside the loop. A requested first character the
   // language does not write is one it can never lead a sentence with, so those
   // languages are out first, and the shapes and words narrow what is left.
-  final languages = _languagesFor(
-    settings,
-    languagesWriting(language, wordLanguages, settings.prefix),
+  // A result of several sentences is held to the range as a whole, so a
+  // language's own range is its one sentence's times as many, with the spaces.
+  final languages = languagesFitting(
+    _languagesFor(settings, languagesWriting(language, wordLanguages, settings.prefix)),
+    settings.minLength,
+    settings.maxLength,
+    (code) {
+      final range = naturalRange(code);
+      final gap = sentenceData[code]!.space.length * (settings.sentences - 1);
+
+      return LengthRange(
+        range.min * settings.sentences + gap,
+        range.max * settings.sentences + gap,
+      );
+    },
   );
 
   if (languages.isEmpty) {

@@ -27,6 +27,7 @@ from typing import cast
 
 from randino._internal.generate import (
     collect,
+    languages_fitting,
     languages_writing,
     length_bounds,
     resolve_length,
@@ -1646,6 +1647,18 @@ def _natural_span(
         high = max(high, frame_high)
 
     return (low or 1, high)
+
+
+def _result_range(language: WordLanguage, sentences: int) -> tuple[int, int]:
+    """A language's own range for a result of `sentences` sentences.
+
+    A result of several sentences is held to the range as a whole, so it is one
+    sentence's range times as many, with the spaces between them.
+    """
+    low, high = natural_range(language)
+    gap = len(SENTENCE_DATA[language].space) * (sentences - 1)
+
+    return low * sentences + gap, high * sentences + gap
 
 
 def natural_range(language: WordLanguage) -> tuple[int, int]:
@@ -5491,9 +5504,16 @@ def generate_sentence_details(
     # result when this sits inside the loop. A requested first character the language
     # does not write is one it can never lead a sentence with, so those languages are
     # out first, and the shapes and words narrow what is left.
-    languages = _languages_for(
-        settings,
-        tuple(languages_writing(resolve_word_language(language), WORD_LANGUAGES, settings.prefix)),
+    languages = languages_fitting(
+        _languages_for(
+            settings,
+            tuple(
+                languages_writing(resolve_word_language(language), WORD_LANGUAGES, settings.prefix)
+            ),
+        ),
+        settings.min_length,
+        settings.max_length,
+        lambda code: _result_range(code, settings.sentences),
     )
 
     if not languages:

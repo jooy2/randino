@@ -251,6 +251,8 @@ Names are `snake_case`: `includeMiddleName` is `include_middle_name`, `minLength
 
 :::
 
+With every language in play, the length options narrow the languages before a draw is made. A language that has nothing inside <Lang js="minLength" dart="minLength" py="min_length" code /> and <Lang js="maxLength" dart="maxLength" py="max_length" code /> is left out while another has something there, so asking every language for a word of one character draws from the languages that write one, and a location of at most fifteen characters comes from the country whose places are that short. When no language can meet the range, every one of them stays in, and each answers with the closest result it has.
+
 ## Choosing the source {#choosing-the-source}
 
 Every generator and every decorator takes a `random` option, and every draw the call makes goes through it — including the draws one generator makes through another, so the name `randSentence` writes comes from the same source the sentence did. Left out, it is the platform's ordinary generator: `Math.random`, `dart:math`'s `Random`, Python's `random`.

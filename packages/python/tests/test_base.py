@@ -675,3 +675,20 @@ def test_each_thread_draws_from_its_own_source() -> None:
     assert all(token == last * 8 for token in tokens)
     # And neither source is left behind once both threads are done.
     assert len({randino.rand_suffix(length=8) for _ in range(20)}) > 1
+
+
+def test_every_language_that_cannot_meet_a_length_range_is_left_out_of_a_mixed_draw() -> None:
+    # With every language in play, a range only some of them reach was answered by the
+    # rest with their closest: a location of at most fifteen characters was an American
+    # one longer than that about half the time.
+    assert all(len(each) <= 15 for each in randino.rand_location(max_length=15, count=60))
+    assert all(len(each) <= 4 for each in randino.rand_country(max_length=4, count=60))
+    assert all(len(each) <= 8 for each in randino.rand_organization(max_length=8, count=60))
+    assert all(len(each) <= 3 for each in randino.rand_name(max_length=3, count=60))
+
+    for detail in randino.rand_word(max_length=1, count=60, output="detail"):
+        assert randino.word_length_range(detail.language)[0] <= 1, detail.language
+
+    # A range no language can meet keeps every one of them, each answering with its
+    # closest.
+    assert len(randino.rand_word(min_length=40, count=60)) == 60

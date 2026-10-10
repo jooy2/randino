@@ -711,5 +711,35 @@ void main() {
       expect(const LengthRange(1, 4), isNot(const LengthRange(1, 5)));
       expect(const LengthRange(1, 4).hashCode, const LengthRange(1, 4).hashCode);
     });
+    test('every language that cannot meet a length range is left out of a mixed draw', () {
+      // With every language in play, a range only some of them reach was answered
+      // by the rest with their closest: a location of at most fifteen characters
+      // was an American one longer than that about half the time.
+      bool within(String value, int max) => value.runes.length <= max;
+
+      for (final location in randLocation(maxLength: 15, count: 60)) {
+        expect(within(location, 15), isTrue, reason: location);
+      }
+
+      for (final country in randCountry(maxLength: 4, count: 60)) {
+        expect(within(country, 4), isTrue, reason: country);
+      }
+
+      for (final organization in randOrganization(maxLength: 8, count: 60)) {
+        expect(within(organization, 8), isTrue, reason: organization);
+      }
+
+      for (final name in randName(maxLength: 3, count: 60)) {
+        expect(within(name, 3), isTrue, reason: name);
+      }
+
+      for (final detail in randWordDetails(maxLength: 1, count: 60)) {
+        expect(wordLengthRange(language: detail.language).min, lessThanOrEqualTo(1));
+      }
+
+      // A range no language can meet keeps every one of them, each answering
+      // with its closest.
+      expect(randWord(minLength: 40, count: 60), hasLength(60));
+    });
   });
 }

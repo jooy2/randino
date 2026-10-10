@@ -343,6 +343,35 @@ function narrowAfresh(
 	return closest;
 }
 
+/**
+ * Whether what `narrow` kept of a pool lands inside the length range, rather
+ * than being the closest it had. With every language in play, a language whose
+ * places are all longer than the range is left out while another has one that
+ * fits: `randLocation({ maxLength: 15 })` wrote an American place more than half
+ * the time, all of them longer than fifteen.
+ */
+function inRange(
+	pool: Texts,
+	indexes: readonly number[] | null,
+	minLength: number | undefined,
+	maxLength: number | undefined
+): boolean {
+	if (minLength === undefined && maxLength === undefined) {
+		return true;
+	}
+
+	const [min, max] = lengthBounds(
+		minLength,
+		maxLength,
+		pool.shortest,
+		pool.longest,
+		RAND_LOCATION_LENGTH_MAX
+	);
+	const length = pool.texts[indexes?.[0] ?? 0]?.length ?? 0;
+
+	return length >= min && length <= max;
+}
+
 export function generateLocationDetails(
 	form: LocationForm,
 	level: LocationLevel,
@@ -371,8 +400,12 @@ export function generateLocationDetails(
 
 		return indexes === null || indexes.length ? [{ pool, indexes }] : [];
 	});
+	const fitting = candidates.filter(({ pool, indexes }) =>
+		inRange(textsOf(pool), indexes, minLength, maxLength)
+	);
+	const drawn = fitting.length ? fitting : candidates;
 
-	if (!candidates.length) {
+	if (!drawn.length) {
 		return [];
 	}
 
@@ -380,7 +413,7 @@ export function generateLocationDetails(
 		collect(
 			options,
 			() => {
-				const { pool, indexes } = pick(candidates);
+				const { pool, indexes } = pick(drawn);
 				const index = indexes ? pick(indexes) : randInt(0, pool.entries.length - 1);
 
 				return detailOf(pool, pool.entries[index]);
@@ -454,8 +487,12 @@ export function generateCountryDetails(options: RandCountryOptions = {}): Countr
 
 		return indexes === null || indexes.length ? [{ pool, indexes }] : [];
 	});
+	const fitting = candidates.filter(({ pool, indexes }) =>
+		inRange(pool, indexes, minLength, maxLength)
+	);
+	const drawn = fitting.length ? fitting : candidates;
 
-	if (!candidates.length) {
+	if (!drawn.length) {
 		return [];
 	}
 
@@ -463,7 +500,7 @@ export function generateCountryDetails(options: RandCountryOptions = {}): Countr
 		collect(
 			options,
 			() => {
-				const { pool, indexes } = pick(candidates);
+				const { pool, indexes } = pick(drawn);
 				const index = indexes ? pick(indexes) : randInt(0, pool.codes.length - 1);
 
 				return { country: pool.texts[index], code: pool.codes[index], language: pool.language };

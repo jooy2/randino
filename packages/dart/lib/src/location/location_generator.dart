@@ -317,6 +317,27 @@ List<int> _narrowAfresh(_Texts pool, String prefix, int? minLength, int? maxLeng
 }
 
 /// A language's pool, and the indexes of it a call may draw from.
+/// Whether what [_narrow] kept of a pool lands inside the length range, rather
+/// than being the closest it had. With every language in play, a language whose
+/// places are all longer than the range is left out while another has one that
+/// fits: `randLocation(maxLength: 15)` wrote an American place more than half
+/// the time, all of them longer than fifteen.
+bool _inRange(_Texts pool, List<int>? indexes, int? minLength, int? maxLength) {
+  if (minLength == null && maxLength == null) return true;
+
+  final bounds = lengthBounds(
+    minLength,
+    maxLength,
+    pool.shortest,
+    pool.longest,
+    ceiling: randLocationLengthMax,
+  );
+  final index = indexes == null || indexes.isEmpty ? 0 : indexes.first;
+  final length = pool.texts.isEmpty ? 0 : pool.texts[index].length;
+
+  return length >= bounds.min && length <= bounds.max;
+}
+
 class _Candidate<P extends Object> {
   const _Candidate(this.pool, this.indexes);
 
@@ -370,7 +391,14 @@ List<LocationDetail> generateLocationDetails({
     }
   }
 
-  if (candidates.isEmpty) {
+  final fitting = candidates
+      .where(
+        (candidate) => _inRange(_textsOf(candidate.pool), candidate.indexes, minLength, maxLength),
+      )
+      .toList(growable: false);
+  final drawn = fitting.isNotEmpty ? fitting : candidates;
+
+  if (drawn.isEmpty) {
     return <LocationDetail>[];
   }
 
@@ -381,7 +409,7 @@ List<LocationDetail> generateLocationDetails({
       unique: unique,
       startsWith: prefix,
       draw: () {
-        final candidate = pick(candidates);
+        final candidate = pick(drawn);
         final pool = candidate.pool;
         final indexes = candidate.indexes;
         final index = indexes != null ? pick(indexes) : randInt(0, pool.entries.length - 1);
@@ -469,7 +497,12 @@ List<CountryDetail> generateCountryDetails({
     }
   }
 
-  if (candidates.isEmpty) {
+  final fitting = candidates
+      .where((candidate) => _inRange(candidate.pool, candidate.indexes, minLength, maxLength))
+      .toList(growable: false);
+  final drawn = fitting.isNotEmpty ? fitting : candidates;
+
+  if (drawn.isEmpty) {
     return <CountryDetail>[];
   }
 
@@ -480,7 +513,7 @@ List<CountryDetail> generateCountryDetails({
       unique: unique,
       startsWith: prefix,
       draw: () {
-        final candidate = pick(candidates);
+        final candidate = pick(drawn);
         final pool = candidate.pool;
         final indexes = candidate.indexes;
         final index = indexes != null ? pick(indexes) : randInt(0, pool.codes.length - 1);

@@ -492,9 +492,11 @@ List<NicknameDetail> generateNicknameDetails({
   // script it writes changes between one nickname and the next. A requested first
   // character the language does not write is one it can never lead a nickname
   // with, so those languages are out first, and the shapes narrow what is left.
-  final languages = _languagesFor(
-    settings,
-    languagesWriting(language, wordLanguages, settings.prefix),
+  final languages = languagesFitting(
+    _languagesFor(settings, languagesWriting(language, wordLanguages, settings.prefix)),
+    settings.minLength,
+    settings.maxLength,
+    (code) => naturalRange(code, settings.separator),
   );
 
   if (languages.isEmpty) {

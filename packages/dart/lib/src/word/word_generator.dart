@@ -536,7 +536,13 @@ List<WordDetail> generateWordDetails({
 
   // A requested first character the language does not write is one it can never
   // lead a word with, so the languages that cannot are out before a draw is made.
-  final languages = languagesWriting(language, wordLanguages, prefix);
+  // And one with no word inside the length range, while another has one.
+  final languages = languagesFitting(
+    languagesWriting(language, wordLanguages, prefix),
+    minLength,
+    maxLength,
+    (code) => naturalRange(code, theme),
+  );
 
   if (languages.isEmpty) {
     return <WordDetail>[];

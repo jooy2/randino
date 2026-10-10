@@ -107,6 +107,28 @@ class _Pool:
     """
 
 
+def _in_range(
+    pool: _Texts, indexes: tuple[int, ...] | None, min_length: int | None, max_length: int | None
+) -> bool:
+    """Whether what `_narrow` kept of a pool lands inside the length range.
+
+    Rather than being the closest it had. With every language in play, a language whose
+    places are all longer than the range is left out while another has one that fits:
+    `rand_location(max_length=15)` wrote an American place more than half the time, all
+    of them longer than fifteen.
+    """
+    if min_length is None and max_length is None:
+        return True
+
+    low, high = length_bounds(
+        min_length, max_length, pool.shortest, pool.longest, RAND_LOCATION_LENGTH_MAX
+    )
+    index = indexes[0] if indexes else 0
+    length = len(pool.texts[index]) if pool.texts else 0
+
+    return low <= length <= high
+
+
 class _Candidate(NamedTuple):
     """A pool one call may draw from, and the indexes of it that call may land on."""
 
@@ -403,11 +425,18 @@ def generate_location_details(
         if indexes is None or indexes:
             candidates.append(_Candidate(pool, indexes))
 
-    if not candidates:
+    fitting = [
+        candidate
+        for candidate in candidates
+        if _in_range(_texts_of(candidate.pool), candidate.indexes, low, high)
+    ]
+    drawn = fitting or candidates
+
+    if not drawn:
         return []
 
     def draw() -> LocationDetail:
-        pool, indexes = pick(candidates)
+        pool, indexes = pick(drawn)
         index = pick(indexes) if indexes is not None else rand_int(0, len(pool.entries) - 1)
 
         return _detail_of(pool, pool.entries[index])
@@ -558,11 +587,18 @@ def generate_country_details(
         if indexes is None or indexes:
             candidates.append(_CountryCandidate(pool, indexes))
 
-    if not candidates:
+    fitting = [
+        candidate
+        for candidate in candidates
+        if _in_range(candidate.pool, candidate.indexes, low, high)
+    ]
+    drawn = fitting or candidates
+
+    if not drawn:
         return []
 
     def draw() -> CountryDetail:
-        pool, indexes = pick(candidates)
+        pool, indexes = pick(drawn)
         index = pick(indexes) if indexes is not None else rand_int(0, len(pool.codes) - 1)
 
         return CountryDetail(

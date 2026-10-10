@@ -98,6 +98,36 @@ List<T> languagesWriting<T extends Enum>(T? option, List<T> languages, String pr
       : wanted.where((code) => writesScript(code.name, prefix)).toList(growable: false);
 }
 
+/// The languages among [languages] whose own range of lengths meets the range
+/// the caller asked for, or every one of them when none does.
+///
+/// With every language in play, a range only some of them can reach was
+/// answered by the rest with the closest result they had: `randWord(maxLength:
+/// 1)` kept to one character a quarter of the time, because only the CJK
+/// languages write a word that short. A language that cannot meet the range is
+/// left out, the way [languagesWriting] leaves out one that cannot write
+/// `startsWith`; when none can, every language is kept and each answers with
+/// its closest.
+List<T> languagesFitting<T>(
+  List<T> languages,
+  int? minLength,
+  int? maxLength,
+  LengthRange Function(T code) rangeOf,
+) {
+  if (languages.length < 2 || (minLength == null && maxLength == null)) return languages;
+
+  final low = minLength ?? 0;
+  final fitting = languages
+      .where((code) {
+        final range = rangeOf(code);
+
+        return range.max >= low && (maxLength == null || range.min <= maxLength);
+      })
+      .toList(growable: false);
+
+  return fitting.isNotEmpty ? fitting : languages;
+}
+
 /// Draw until there are [count] results, discarding what the filters reject.
 ///
 /// [keyOf] is the string a result is filtered and deduplicated by — the name,

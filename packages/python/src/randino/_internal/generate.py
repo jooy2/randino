@@ -235,6 +235,44 @@ def draw_language(option: str, languages: Sequence[L]) -> L:
     return pick(languages) if option == "all" else option  # type: ignore[return-value]
 
 
+def languages_fitting(
+    languages: Sequence[L],
+    min_length: int | None,
+    max_length: int | None,
+    range_of: Callable[[L], tuple[int, int]],
+) -> tuple[L, ...]:
+    """The languages whose own range of lengths meets the range the caller asked for.
+
+    Every one of them when none does. With every language in play, a range only some of
+    them can reach was answered by the rest with the closest result they had:
+    `rand_word(max_length=1)` kept to one character a quarter of the time, because only
+    the CJK languages write a word that short. A language that cannot meet the range is
+    left out, the way `languages_writing` leaves out one that cannot write
+    `starts_with`; when none can, every language is kept and each answers with its
+    closest.
+
+    Args:
+        languages: The languages still in play.
+        min_length: The caller's minimum, or None.
+        max_length: The caller's maximum, or None.
+        range_of: A language's own shortest and longest result.
+
+    Returns:
+        The languages that can meet the range, or all of them when none can.
+    """
+    if len(languages) < 2 or (min_length is None and max_length is None):
+        return tuple(languages)
+
+    low = 0 if min_length is None else min_length
+    fitting = tuple(
+        code
+        for code in languages
+        if range_of(code)[1] >= low and (max_length is None or range_of(code)[0] <= max_length)
+    )
+
+    return fitting or tuple(languages)
+
+
 def languages_writing(option: str, languages: Sequence[L], prefix: str) -> tuple[L, ...]:
     """The languages a draw may come from once `starts_with` has had its say.
 

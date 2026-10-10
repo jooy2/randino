@@ -22,6 +22,7 @@
 
 import {
 	collect,
+	languagesFitting,
 	languagesWriting,
 	lengthBounds,
 	resolveLength,
@@ -5299,9 +5300,18 @@ export function generateSentenceDetails(options: RandSentenceOptions = {}): Sent
 	// result when this sits inside the loop. A requested first character the
 	// language does not write is one it can never lead a sentence with, so those
 	// languages are out first, and the shapes and words narrow what is left.
-	const languages = languagesFor(
-		settings,
-		languagesWriting(language, WORD_LANGUAGES, settings.prefix)
+	// A result of several sentences is held to the range as a whole, so a
+	// language's own range is its one sentence's times as many, with the spaces.
+	const languages = languagesFitting(
+		languagesFor(settings, languagesWriting(language, WORD_LANGUAGES, settings.prefix)),
+		settings.minLength,
+		settings.maxLength,
+		(code) => {
+			const [low, high] = naturalRange(code);
+			const gap = SENTENCE_DATA[code].space.length * (settings.sentences - 1);
+
+			return [low * settings.sentences + gap, high * settings.sentences + gap];
+		}
 	);
 
 	if (!languages.length) {

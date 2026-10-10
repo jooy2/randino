@@ -9,6 +9,7 @@
 import { chance, clamp, pick, randInt, withRandom } from '../_internal/utils.js';
 import {
 	collect,
+	languagesFitting,
 	languagesWriting,
 	lengthBounds,
 	resolveLength,
@@ -584,7 +585,13 @@ export function generateWordDetails(options: RandWordOptions = {}): WordDetail[]
 
 	// A requested first character the language does not write is one it can never
 	// lead a word with, so the languages that cannot are out before a draw is made.
-	const languages = languagesWriting(language, WORD_LANGUAGES, settings.prefix);
+	// And one with no word inside the length range, while another has one.
+	const languages = languagesFitting(
+		languagesWriting(language, WORD_LANGUAGES, settings.prefix),
+		settings.minLength,
+		settings.maxLength,
+		(code) => naturalRange(code, settings.theme)
+	);
 
 	if (!languages.length) {
 		return [];

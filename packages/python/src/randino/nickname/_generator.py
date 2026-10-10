@@ -32,6 +32,7 @@ from typing import Literal, NamedTuple
 
 from randino._internal.generate import (
     collect,
+    languages_fitting,
     languages_writing,
     length_bounds,
     resolve_length,
@@ -526,9 +527,16 @@ def generate_nickname_details(
     # script it writes changes between one nickname and the next. A requested first
     # character the language does not write is one it can never lead a nickname with,
     # so those languages are out first, and the shapes narrow what is left.
-    languages = languages_for(
-        settings,
-        tuple(languages_writing(resolve_word_language(language), WORD_LANGUAGES, settings.prefix)),
+    languages = languages_fitting(
+        languages_for(
+            settings,
+            tuple(
+                languages_writing(resolve_word_language(language), WORD_LANGUAGES, settings.prefix)
+            ),
+        ),
+        settings.min_length,
+        settings.max_length,
+        lambda code: natural_range(code, settings.separator),
     )
 
     if not languages:

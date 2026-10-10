@@ -539,4 +539,35 @@ describe('base test', () => {
 			assert.strictEqual(randino.randName({ language: 'en', random: source }).length, 1);
 		}
 	});
+
+	it('every language that cannot meet a length range is left out of a mixed draw', () => {
+		// With every language in play, a range only some of them reach was answered
+		// by the rest with their closest: a location of at most fifteen characters
+		// was an American one longer than that about half the time.
+		const within = (value: string, max: number) => [...value].length <= max;
+
+		for (const location of randino.randLocation({ maxLength: 15, count: 60 })) {
+			assert.ok(within(location, 15), location);
+		}
+
+		for (const country of randino.randCountry({ maxLength: 4, count: 60 })) {
+			assert.ok(within(country, 4), country);
+		}
+
+		for (const organization of randino.randOrganization({ maxLength: 8, count: 60 })) {
+			assert.ok(within(organization, 8), organization);
+		}
+
+		for (const name of randino.randName({ maxLength: 3, count: 60 })) {
+			assert.ok(within(name, 3), name);
+		}
+
+		for (const detail of randino.randWord({ maxLength: 1, count: 60, output: 'detail' })) {
+			assert.ok(randino.wordLengthRange(detail.language)[0] <= 1, detail.language);
+		}
+
+		// A range no language can meet keeps every one of them, each answering with
+		// its closest.
+		assert.strictEqual(randino.randWord({ minLength: 40, count: 60 }).length, 60);
+	});
 });

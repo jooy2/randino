@@ -356,12 +356,15 @@ List<String?> _formsThatFit(_Shape shape, OrganizationLanguageData data, _Settin
 
 /// What one language can answer a call with, worked out once per call.
 class _Plan {
-  const _Plan(this.language, this.data, this.shapes, this.types);
+  const _Plan(this.language, this.data, this.shapes, this.types, {required this.fits});
 
   final WordLanguage language;
   final OrganizationLanguageData data;
   final Map<OrganizationType, List<_Shape>> shapes;
   final List<OrganizationType> types;
+
+  /// Whether some shape of the language can land inside the length range.
+  final bool fits;
 }
 
 _Plan _planFor(WordLanguage language, _Settings settings) {
@@ -404,7 +407,13 @@ _Plan _planFor(WordLanguage language, _Settings settings) {
 
   final types = settings.types.where((type) => shapes[type]!.isNotEmpty).toList();
 
-  return _Plan(language, data, shapes, fitting.isNotEmpty ? fitting : types);
+  return _Plan(
+    language,
+    data,
+    shapes,
+    fitting.isNotEmpty ? fitting : types,
+    fits: fitting.isNotEmpty,
+  );
 }
 
 /// A stem alone a fifth of the time when it is in play, a template otherwise.
@@ -638,11 +647,16 @@ List<OrganizationDetail> generateOrganizationDetails({
   );
   // A language that does not write the requested character, and one with no
   // shape of the requested kinds that can lead with it, are out before a draw.
-  final plans =
+  final able =
       [
         for (final code in languagesWriting(language, wordLanguages, settings.prefix))
           _planFor(code, settings),
       ].where((plan) => plan.types.isNotEmpty).toList();
+  // And a language with no shape inside the length range, while another has
+  // one: asked for eight characters, every language answered, and the ones whose
+  // names run longer answered with their shortest.
+  final fitted = able.where((plan) => plan.fits).toList(growable: false);
+  final plans = fitted.isNotEmpty ? fitted : able;
 
   if (plans.isEmpty) {
     return <OrganizationDetail>[];

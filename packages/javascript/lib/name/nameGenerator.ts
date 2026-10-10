@@ -13,6 +13,7 @@
 
 import {
 	collect,
+	languagesFitting,
 	languagesWriting,
 	lengthBounds,
 	resolveLength,
@@ -750,7 +751,13 @@ export function generateNameDetails(options: RandNameOptions = {}, roman = false
 	const settings = resolveSettings(options);
 	// A requested first character the language does not write is one it can never
 	// lead a name with, so the languages that cannot are out before a draw is made.
-	const languages = languagesWriting(language, NAME_LANGUAGES, settings.prefix);
+	// And one whose names cannot land inside the length range, while another's can.
+	const languages = languagesFitting(
+		languagesWriting(language, NAME_LANGUAGES, settings.prefix),
+		settings.minLength,
+		settings.maxLength,
+		(code) => nameLengthRange(code, settings.includeSurname, settings.includeMiddleName)
+	);
 
 	if (!languages.length) {
 		return [];

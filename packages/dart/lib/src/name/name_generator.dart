@@ -747,7 +747,18 @@ List<NameDetail> generateNameDetails({
 
   // A requested first character the language does not write is one it can never
   // lead a name with, so the languages that cannot are out before a draw is made.
-  final languages = languagesWriting(language, nameLanguages, settings.prefix);
+  // And one whose names cannot land inside the length range, while another's
+  // can.
+  final languages = languagesFitting(
+    languagesWriting(language, nameLanguages, settings.prefix),
+    settings.minLength,
+    settings.maxLength,
+    (code) => nameLengthRange(
+      language: code,
+      includeSurname: settings.includeSurname,
+      includeMiddleName: settings.includeMiddleName,
+    ),
+  );
 
   if (languages.isEmpty) {
     return <NameDetail>[];

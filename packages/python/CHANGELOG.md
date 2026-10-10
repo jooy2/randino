@@ -2,6 +2,7 @@
 
 ## vNext (2026--)
 
+- With `language="all"`, a length range narrows the languages before a draw: one whose results cannot land inside it is left out while another's can, and every language stays when none can. `rand_location(max_length=15)` kept to fifteen characters about half the time, `rand_organization(max_length=8)` and `rand_word(max_length=1)` less often than that; the first two now always do, and the word does where a theme has one that short.
 - `rand_name` with `script="roman"` reads a kana `starts_with` out (`か` gives `Ka Yuto`), and answers a Japanese or Chinese character it has no reading for with nothing, narrowing `language="all"` to the languages that can read it. It wrote the character itself into the romanized name: `鬱 Haruto`.
 - A Chinese action modifier is attached with the `的` its nicknames write: `奔跑的狮子`, where `奔跑狮子` read as a verb and its object. An adjective takes nothing, and a modifier on its own comes back bare.
 - A Korean name is romanized by the Revised Romanization's rule for personal names, which writes no sound change inside a name: `석민` is `Seokmin` and `복남` `Boknam`, where they came out `Seongmin` and `Bongnam`.

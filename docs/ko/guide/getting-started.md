@@ -251,6 +251,8 @@ rand_name(count=5)  # 9개 언어 중 하나씩, 이름 다섯 개
 
 :::
 
+모든 언어를 대상으로 할 때 길이 옵션은 뽑기 전에 언어부터 좁힙니다. <Lang js="minLength" dart="minLength" py="min_length" code />와 <Lang js="maxLength" dart="maxLength" py="max_length" code /> 범위 안에 낼 것이 없는 언어는, 다른 언어가 그 범위를 맞출 수 있으면 빠집니다. 그래서 한 글자 단어를 요청하면 한 글자 단어를 쓰는 언어에서만 뽑고, 열다섯 자 이하의 지역은 그만큼 짧은 지명을 가진 나라에서 나옵니다. 범위를 맞출 수 있는 언어가 하나도 없으면 모든 언어가 남고, 각 언어가 가장 가까운 결과로 답합니다.
+
 ## 난수원 고르기 {#choosing-the-source}
 
 모든 생성 함수와 장식 함수가 `random` 옵션을 받고, 한 번의 호출이 하는 모든 추첨이 이 난수원을 거칩니다. 생성기가 다른 생성기를 부르며 하는 추첨도 마찬가지라서, `randSentence`가 쓰는 사람 이름도 문장과 같은 난수원에서 나옵니다. 생략하면 각 언어의 일반 난수 생성기를 씁니다. `Math.random`, `dart:math`의 `Random`, Python의 `random`입니다.
