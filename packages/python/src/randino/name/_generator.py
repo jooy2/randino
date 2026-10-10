@@ -261,6 +261,29 @@ def lead_entry(
     return Entry(prefix, romanize(data.roman, prefix, part))
 
 
+# The surnames short enough to leave a character for a given name, per pool and
+# maximum. The pools are module constants and a maximum is at most `RAND_LENGTH_MAX`,
+# so this never grows past a few dozen entries a pool.
+_roomy_cache: dict[tuple[int, int], NamePool] = {}
+
+
+def _roomy_surnames(pool: NamePool, max_length: int) -> NamePool:
+    """The surnames of `pool` that leave room for a given name under `max_length`.
+
+    The whole pool when none does: then the surname is kept and the name runs past the
+    maximum, because the structure the caller asked for wins.
+    """
+    key = (id(pool), max_length)
+    roomy = _roomy_cache.get(key)
+
+    if roomy is None:
+        short = tuple(item for item in pool if len(native_of(item)) < max_length)
+        roomy = short if short and len(short) < len(pool) else pool
+        _roomy_cache[key] = roomy
+
+    return roomy
+
+
 # --- CJK given names --------------------------------------------------------
 
 
@@ -417,23 +440,21 @@ def generate_cjk(
     surname: Entry | None = None
 
     if settings.include_surname:
+        # A surname that leaves no room for a given name under the maximum is left for
+        # one that does: `남궁` under a maximum of two, `池田` under one of two.
+        pool = _roomy_surnames(data.last, max_length)
         surname = (
-            lead_entry(data, data.last, "surname", prefix)
+            lead_entry(data, pool, "surname", prefix, data.last)
             if leads_with_surname
-            else pick_entry(data.last, data, "surname")
+            else pick_entry(pool, data, "surname")
         )
 
     surname_length = len(surname.n) if surname else 0
     low = max(1, min_length - surname_length)
-    high = max_length - surname_length
-
-    if high < low and surname:
-        # A multi-character surname alone overflows the range — drop it.
-        surname = None
-        low = max(1, min_length)
-        high = max(low, max_length)
-
-    high = max(low, high)
+    # The structure the caller asked for wins over the length. A surname that still
+    # leaves no room is kept, and the given name is the shortest the language writes:
+    # `rand_name(max_length=1)` is `김솔`, never a bare `솔`.
+    high = max(low, max_length - surname_length)
 
     given_prefix = "" if leads_with_surname else prefix
 

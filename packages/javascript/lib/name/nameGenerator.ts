@@ -240,6 +240,36 @@ function leadEntry(
 	return { n: prefix, r: romanize(data.roman, prefix, part) };
 }
 
+// The surnames short enough to leave a character for a given name, per pool and
+// maximum. The pools are module constants and a maximum is at most
+// `RAND_LENGTH_MAX`, so this never grows past a few dozen entries a pool.
+const roomyCache = new WeakMap<NamePool, Map<number, NamePool>>();
+
+/**
+ * The surnames of `pool` that leave room for a given name under `maxLength`, or
+ * the whole pool when none does: then the surname is kept and the name runs
+ * past the maximum, because the structure the caller asked for wins.
+ */
+function roomySurnames(pool: NamePool, maxLength: number): NamePool {
+	let byMax = roomyCache.get(pool);
+
+	if (!byMax) {
+		byMax = new Map();
+		roomyCache.set(pool, byMax);
+	}
+
+	let roomy = byMax.get(maxLength);
+
+	if (!roomy) {
+		const short = pool.filter((item) => nativeOf(item).length < maxLength);
+
+		roomy = short.length && short.length < pool.length ? short : pool;
+		byMax.set(maxLength, roomy);
+	}
+
+	return roomy;
+}
+
 // --- CJK given names --------------------------------------------------------
 
 /** Compose an invented CJK given name of exactly `length` syllables. */
@@ -422,24 +452,21 @@ function generateCjk(
 	let surname: Entry | null = null;
 
 	if (settings.includeSurname) {
+		// A surname that leaves no room for a given name under the maximum is left
+		// for one that does: `남궁` under a maximum of two, `池田` under one of two.
+		const pool = roomySurnames(data.last, maxLength);
+
 		surname = leadsWithSurname
-			? leadEntry(data, data.last, 'surname', prefix)
-			: pickEntry(data.last, data, 'surname');
+			? leadEntry(data, pool, 'surname', prefix, data.last)
+			: pickEntry(pool, data, 'surname');
 	}
 
-	let surnameLength = surname ? surname.n.length : 0;
-	let min = Math.max(1, minLength - surnameLength);
-	let max = maxLength - surnameLength;
-
-	if (max < min && surname) {
-		// A multi-character surname alone overflows the range — drop it.
-		surname = null;
-		surnameLength = 0;
-		min = Math.max(1, minLength);
-		max = Math.max(min, maxLength);
-	}
-
-	max = Math.max(min, max);
+	const surnameLength = surname ? surname.n.length : 0;
+	const min = Math.max(1, minLength - surnameLength);
+	// The structure the caller asked for wins over the length. A surname that still
+	// leaves no room is kept, and the given name is the shortest the language
+	// writes: `randName({ maxLength: 1 })` is `김솔`, never a bare `솔`.
+	const max = Math.max(min, maxLength - surnameLength);
 
 	const givenPrefix = leadsWithSurname ? '' : prefix;
 	const drawGiven = (): Entry => {

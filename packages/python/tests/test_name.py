@@ -265,6 +265,20 @@ def test_names_stay_inside_the_requested_length_range() -> None:
             assert low <= len(name) <= high, f"{language} {low}-{high}: {name} ({len(name)})"
 
 
+def test_a_cjk_name_keeps_its_surname_under_a_maximum_too_tight_for_it() -> None:
+    # The structure the caller asked for wins over the length, in these three as in the
+    # rest: `max_length=1` was answered with a bare given name, `솔`. A surname that
+    # leaves room is preferred, so `池田` gives way to `森` at two.
+    asks: list[tuple[NameLanguage, int]] = [("ko", 1), ("zh", 1), ("ja", 2)]
+
+    for language, max_length in asks:
+        for detail in rand_name(
+            language=language, max_length=max_length, count=SAMPLE, output="detail"
+        ):
+            assert " " in detail.roman, f"{language}: {detail.native}"
+            assert len(detail.native) == max(2, max_length), detail.native
+
+
 def test_a_min_length_past_the_natural_top_moves_the_max_length_left_out() -> None:
     # The way `max_age` moves out of the way of `min_age`. `min_length=30` alone was
     # answered with names of twenty-one characters, the natural top; it keeps the natural

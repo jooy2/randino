@@ -2,6 +2,7 @@
 
 ## vNext (2026--)
 
+- `rand_name` keeps a Korean, Japanese or Chinese surname under a `max_length` too tight for it, the way it keeps every other part asked for, and prefers a surname short enough to leave room for a given name: `max_length=1` wrote a bare given name (`솔`), and Japanese wrote one at a maximum of two, where `森` and `林` leave room.
 - A `min_length` past the top of a language's natural range moves a `max_length` left out out of the way, the way `max_age` moves for `min_age`: `rand_name(language="en", min_length=30)` writes names of thirty characters or so rather than twenty-one, and the range keeps its natural width above the minimum.
 - An invented Japanese word goes on in the kana its first character is written in: a hiragana `starts_with` such as `か` gives `かろび`, where it gave `かロビ`, half in one kana and half in the other.
 - A Japanese sentence with an object takes a verb that takes `を`. Verbs that carry an object of their own or take `に` or `と` sat among the ones that take an object, and wrote `電話を値をつけます` and `店員を会いました`; `挨拶する` moved to the verbs of talking, where it takes none.

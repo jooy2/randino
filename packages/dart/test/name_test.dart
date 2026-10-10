@@ -311,6 +311,28 @@ void main() {
       }
     });
 
+    test('a CJK name keeps its surname under a maximum too tight for it', () {
+      // The structure the caller asked for wins over the length, in these three
+      // as in the rest: `maxLength: 1` was answered with a bare given name, `솔`.
+      // A surname that leaves room is preferred, so `池田` gives way to `森` at two.
+      const asks = <(NameLanguage, int)>[
+        (NameLanguage.ko, 1),
+        (NameLanguage.zh, 1),
+        (NameLanguage.ja, 2),
+      ];
+
+      for (final (language, maxLength) in asks) {
+        for (final detail in randNameDetails(
+          language: language,
+          maxLength: maxLength,
+          count: sample,
+        )) {
+          expect(detail.roman, contains(' '), reason: '${language.name}: ${detail.native}');
+          expect(detail.native.length, maxLength < 2 ? 2 : maxLength, reason: detail.native);
+        }
+      }
+    });
+
     test('a minLength past the natural top moves the maxLength left out', () {
       // The way `maxAge` moves out of the way of `minAge`. `minLength: 30` alone
       // was answered with names of twenty-one characters, the natural top; it
