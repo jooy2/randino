@@ -16,6 +16,7 @@ import {
 	RAND_LENGTH_MIN,
 	RAND_LOCATION_LENGTH_MAX,
 	RAND_ORGANIZATION_LENGTH_MAX,
+	RAND_SENTENCE_COUNT_MAX,
 	RAND_SENTENCE_LENGTH_MAX
 } from 'randino';
 ```
@@ -29,6 +30,7 @@ import {
 | `RAND_ORGANIZATION_LENGTH_MAX` | `number` | `60`    |
 | `RAND_AGE_MAX`                 | `number` | `120`   |
 | `RAND_COUNT_MAX`               | `number` | `10000` |
+| `RAND_SENTENCE_COUNT_MAX`      | `number` | `10`    |
 
 :::
 
@@ -47,6 +49,7 @@ import 'package:randino/randino.dart';
 | `randOrganizationLengthMax` | `int` | `60`    |
 | `randAgeMax`                | `int` | `120`   |
 | `randCountMax`              | `int` | `10000` |
+| `randSentenceCountMax`      | `int` | `10`    |
 
 :::
 
@@ -60,6 +63,7 @@ from randino import (
     RAND_LENGTH_MIN,
     RAND_LOCATION_LENGTH_MAX,
     RAND_ORGANIZATION_LENGTH_MAX,
+    RAND_SENTENCE_COUNT_MAX,
     RAND_SENTENCE_LENGTH_MAX,
 )
 ```
@@ -73,10 +77,11 @@ from randino import (
 | `RAND_ORGANIZATION_LENGTH_MAX` | `int` | `60`    |
 | `RAND_AGE_MAX`                 | `int` | `120`   |
 | `RAND_COUNT_MAX`               | `int` | `10000` |
+| `RAND_SENTENCE_COUNT_MAX`      | `int` | `10`    |
 
 :::
 
-The length options are clamped into `1 … 40`, counted in characters of what the generator returns, except on `randSentence`, whose ceiling is `200`, on the location generators, whose ceiling is `100`, and on `randOrganization`, whose ceiling is `60`. A sentence is many words where a name, a word and a nickname are at most three, a location is every level of it written out at once, and an organization is a name, a word for its business and a legal form. `randAge` takes no length and clamps its ages into `0 … 120` instead, and `randDate` clamps its range into the years 1 to 9999. `count` is clamped into `0 … 10000`, because an unbounded count with `unique` on can spend a long time re-drawing from an exhausted pool.
+The length options are clamped into `1 … 40`, counted in characters of what the generator returns, except on `randSentence`, whose ceiling is `200`, on the location generators, whose ceiling is `100`, and on `randOrganization`, whose ceiling is `60`. A sentence is many words where a name, a word and a nickname are at most three, a location is every level of it written out at once, and an organization is a name, a word for its business and a legal form. `randAge` takes no length and clamps its ages into `0 … 120` instead, and `randDate` clamps its range into the years 1 to 9999. `count` is clamped into `0 … 10000`, because an unbounded count with `unique` on can spend a long time re-drawing from an exhausted pool. `randSentence` takes `sentences` too, clamped into `1 … 10`: that many sentences make one result, each of them held to the per-sentence ceiling.
 
 ## Names
 
