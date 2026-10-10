@@ -24,6 +24,13 @@ _Drawn = tuple[str, str, tuple[int, ...], str | None, int | None]
 """What one draw writes: the version, its scheme, its parts, its pre-release and its year."""
 
 
+_TOTALS: dict[tuple[int, int], float] = {}
+"""The sum of a span's weights, worked out the first time the span is drawn from.
+
+The spans are the parts in `VERSION_PARTS`, so there are seven of them.
+"""
+
+
 def small_number(span: tuple[int, int]) -> int:
     """A number from `span`, weighted by one over its distance from the bottom plus one.
 
@@ -31,7 +38,12 @@ def small_number(span: tuple[int, int]) -> int:
     far up.
     """
     low, high = span
-    total = sum(1 / (n - low + 1) for n in range(low, high + 1))
+    total = _TOTALS.get(span)
+
+    if total is None:
+        total = sum(1 / (n - low + 1) for n in range(low, high + 1))
+        _TOTALS[span] = total
+
     roll = random() * total
 
     for n in range(low, high + 1):

@@ -18,19 +18,36 @@ import {
 
 const PRERELEASES = Object.keys(VERSION_PRERELEASES);
 
+// The sum of a range's weights, worked out the first time the range is drawn
+// from. The ranges are the parts in `VERSION_PARTS`, so there are seven of them.
+const totals = new WeakMap<readonly [number, number], number>();
+
+function totalOf(range: readonly [number, number]): number {
+	let total = totals.get(range);
+
+	if (total === undefined) {
+		const [low, high] = range;
+
+		total = 0;
+
+		for (let n = low; n <= high; n++) {
+			total += 1 / (n - low + 1);
+		}
+
+		totals.set(range, total);
+	}
+
+	return total;
+}
+
 /**
  * A number from `[low, high]`, each one weighted by one over its distance from
  * `low` plus one: the bottom is most likely, and a number is about twice as
  * likely as the one twice as far up.
  */
-export function smallNumber([low, high]: readonly [number, number]): number {
-	let total = 0;
-
-	for (let n = low; n <= high; n++) {
-		total += 1 / (n - low + 1);
-	}
-
-	let roll = random() * total;
+export function smallNumber(range: readonly [number, number]): number {
+	const [low, high] = range;
+	let roll = random() * totalOf(range);
 
 	for (let n = low; n <= high; n++) {
 		roll -= 1 / (n - low + 1);

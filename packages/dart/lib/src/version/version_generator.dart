@@ -8,10 +8,11 @@ import 'package:randino/src/internal/utils.dart';
 import 'package:randino/src/types.dart';
 import 'package:randino/src/version/data/index.dart';
 
-/// A number from [range], each one weighted by one over its distance from the
-/// bottom plus one: the bottom is most likely, and a number is about twice as
-/// likely as the one twice as far up.
-int smallNumber((int, int) range) {
+// The sum of a range's weights, worked out the first time the range is drawn
+// from. The ranges are the parts in `versionParts`, so there are seven of them.
+final Map<(int, int), double> _totals = <(int, int), double>{};
+
+double _totalOf((int, int) range) => _totals.putIfAbsent(range, () {
   final (low, high) = range;
   var total = 0.0;
 
@@ -19,7 +20,15 @@ int smallNumber((int, int) range) {
     total += 1 / (n - low + 1);
   }
 
-  var roll = randDouble() * total;
+  return total;
+});
+
+/// A number from [range], each one weighted by one over its distance from the
+/// bottom plus one: the bottom is most likely, and a number is about twice as
+/// likely as the one twice as far up.
+int smallNumber((int, int) range) {
+  final (low, high) = range;
+  var roll = randDouble() * _totalOf(range);
 
   for (var n = low; n <= high; n++) {
     roll -= 1 / (n - low + 1);
