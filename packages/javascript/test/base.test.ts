@@ -4,6 +4,21 @@ import * as randino from '../dist/index.js';
 // Internal, but every generator's length options go through it.
 import { lengthBounds } from '../dist/_internal/generate.js';
 
+/** A small seeded source, so a test can ask for the same draws twice. */
+function seeded(seed: number): () => number {
+	let state = seed >>> 0;
+
+	return () => {
+		state = (state + 0x6d2b79f5) >>> 0;
+
+		let next = Math.imul(state ^ (state >>> 15), state | 1);
+
+		next ^= next + Math.imul(next ^ (next >>> 7), next | 61);
+
+		return ((next ^ (next >>> 14)) >>> 0) / 4294967296;
+	};
+}
+
 describe('base test', () => {
 	it('all check success', async () => {
 		// The package entry point is the API contract: everything documented in the
@@ -362,6 +377,77 @@ describe('base test', () => {
 		}
 	});
 
+	it('every generator answers the same odd input the same way', () => {
+		// Driven by the export list rather than written out, so a generator added
+		// later is covered without anybody remembering to list it. The cases above
+		// pin what an option falls back to; these pin that nothing throws, and that
+		// the count and the source are honoured, for every one of them.
+		const decorators = new Set(['randSuffix', 'randPrefix', 'randModifier']);
+		const generators = Object.entries(randino).filter(
+			([name, value]) =>
+				typeof value === 'function' && /^rand[A-Z]/.test(name) && !decorators.has(name)
+		) as [string, (options?: unknown) => unknown[]][];
+		const options = [
+			'language',
+			'theme',
+			'type',
+			'platform',
+			'unit',
+			'format',
+			'story',
+			'style',
+			'level',
+			'group',
+			'gender',
+			'script',
+			'kind',
+			'country',
+			'vendor',
+			'category',
+			'realism',
+			'vocabulary',
+			'shape',
+			'slots',
+			'distribution',
+			'tense',
+			'quote',
+			'industry',
+			'separator',
+			'wordSeparator',
+			'startsWith',
+			'include'
+		];
+		const strange: unknown[] = ['xx', '__proto__', 'constructor', 'toString', 123, [null], {}];
+		const sources = [() => 0, () => 0.9999999, () => 1, () => -1, () => NaN, () => 'x'];
+
+		assert.ok(generators.length >= 56, String(generators.length));
+
+		for (const [name, generate] of generators) {
+			assert.strictEqual(generate().length, 1, name);
+			assert.strictEqual(generate({ count: 0 }).length, 0, name);
+			assert.strictEqual(generate({ count: -1 }).length, 0, name);
+			assert.strictEqual(generate({ count: NaN }).length, 1, name);
+			assert.strictEqual(generate({ count: null }).length, 1, name);
+
+			const again = () => generate({ count: 3, random: seeded(7) });
+
+			assert.deepStrictEqual(again(), again(), name);
+
+			for (const source of sources) {
+				assert.ok(Array.isArray(generate({ count: 2, random: source })), name);
+			}
+
+			for (const option of options) {
+				for (const value of strange) {
+					assert.doesNotThrow(
+						() => generate({ [option]: value }),
+						`${name} ${option}: ${String(value)}`
+					);
+				}
+			}
+		}
+	});
+
 	it('a length range the wrong way round keeps maxLength', () => {
 		// `maxLength` is the bound a caller is holding to — a field limit, a column
 		// width — where `minLength` only shapes how a result reads. `[30, 5]` used to
@@ -383,20 +469,6 @@ describe('base test', () => {
 		// One source, threaded through everything the call reaches — which for
 		// `randSentence` is the word pools, the story planner and the name
 		// generator. Two calls with the same seed have to agree on all of it.
-		const seeded = (seed: number) => {
-			let state = seed >>> 0;
-
-			return () => {
-				state = (state + 0x6d2b79f5) >>> 0;
-
-				let next = Math.imul(state ^ (state >>> 15), state | 1);
-
-				next ^= next + Math.imul(next ^ (next >>> 7), next | 61);
-
-				return ((next ^ (next >>> 14)) >>> 0) / 4294967296;
-			};
-		};
-
 		const twice = <T>(draw: () => T) => [draw(), draw()];
 		const agrees = <T>(draw: () => T) => {
 			const [first, second] = twice(draw);

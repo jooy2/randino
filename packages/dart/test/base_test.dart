@@ -482,6 +482,230 @@ void main() {
       expect(randName(count: 5), isNot(randName(count: 5)));
     });
 
+    test('every generator honours its count and its source', () {
+      // Every list-returning generator of the barrel, written out because Dart has
+      // no reflection to read them off the export list; the export test above is
+      // what fails when one is added and left out of here.
+      final generators = <String, List<Object?> Function({required int count, Random? random})>{
+        'randAge': ({required int count, Random? random}) => randAge(count: count, random: random),
+        'randAgeDetails':
+            ({required int count, Random? random}) => randAgeDetails(count: count, random: random),
+        'randAnimal':
+            ({required int count, Random? random}) => randAnimal(count: count, random: random),
+        'randAppStore':
+            ({required int count, Random? random}) => randAppStore(count: count, random: random),
+        'randAppStoreDetails':
+            ({required int count, Random? random}) =>
+                randAppStoreDetails(count: count, random: random),
+        'randArchitecture':
+            ({required int count, Random? random}) =>
+                randArchitecture(count: count, random: random),
+        'randArchitectureDetails':
+            ({required int count, Random? random}) =>
+                randArchitectureDetails(count: count, random: random),
+        'randBody':
+            ({required int count, Random? random}) => randBody(count: count, random: random),
+        'randCity':
+            ({required int count, Random? random}) => randCity(count: count, random: random),
+        'randCityDetails':
+            ({required int count, Random? random}) => randCityDetails(count: count, random: random),
+        'randClothing':
+            ({required int count, Random? random}) => randClothing(count: count, random: random),
+        'randColor':
+            ({required int count, Random? random}) => randColor(count: count, random: random),
+        'randConcept':
+            ({required int count, Random? random}) => randConcept(count: count, random: random),
+        'randCountry':
+            ({required int count, Random? random}) => randCountry(count: count, random: random),
+        'randCountryDetails':
+            ({required int count, Random? random}) =>
+                randCountryDetails(count: count, random: random),
+        'randCpu': ({required int count, Random? random}) => randCpu(count: count, random: random),
+        'randCpuDetails':
+            ({required int count, Random? random}) => randCpuDetails(count: count, random: random),
+        'randDate':
+            ({required int count, Random? random}) => randDate(count: count, random: random),
+        'randDateDetails':
+            ({required int count, Random? random}) => randDateDetails(count: count, random: random),
+        'randDevice':
+            ({required int count, Random? random}) => randDevice(count: count, random: random),
+        'randDeviceDetails':
+            ({required int count, Random? random}) =>
+                randDeviceDetails(count: count, random: random),
+        'randDiskSize':
+            ({required int count, Random? random}) => randDiskSize(count: count, random: random),
+        'randDiskSizeDetails':
+            ({required int count, Random? random}) =>
+                randDiskSizeDetails(count: count, random: random),
+        'randDiskType':
+            ({required int count, Random? random}) => randDiskType(count: count, random: random),
+        'randDiskTypeDetails':
+            ({required int count, Random? random}) =>
+                randDiskTypeDetails(count: count, random: random),
+        'randDistrict':
+            ({required int count, Random? random}) => randDistrict(count: count, random: random),
+        'randDistrictDetails':
+            ({required int count, Random? random}) =>
+                randDistrictDetails(count: count, random: random),
+        'randDrink':
+            ({required int count, Random? random}) => randDrink(count: count, random: random),
+        'randEmotion':
+            ({required int count, Random? random}) => randEmotion(count: count, random: random),
+        'randFileExtension':
+            ({required int count, Random? random}) =>
+                randFileExtension(count: count, random: random),
+        'randFileExtensionDetails':
+            ({required int count, Random? random}) =>
+                randFileExtensionDetails(count: count, random: random),
+        'randFinance':
+            ({required int count, Random? random}) => randFinance(count: count, random: random),
+        'randFood':
+            ({required int count, Random? random}) => randFood(count: count, random: random),
+        'randFurniture':
+            ({required int count, Random? random}) => randFurniture(count: count, random: random),
+        'randGem': ({required int count, Random? random}) => randGem(count: count, random: random),
+        'randGender':
+            ({required int count, Random? random}) => randGender(count: count, random: random),
+        'randGenderDetails':
+            ({required int count, Random? random}) =>
+                randGenderDetails(count: count, random: random),
+        'randGpu': ({required int count, Random? random}) => randGpu(count: count, random: random),
+        'randGpuDetails':
+            ({required int count, Random? random}) => randGpuDetails(count: count, random: random),
+        'randJob': ({required int count, Random? random}) => randJob(count: count, random: random),
+        'randLocation':
+            ({required int count, Random? random}) => randLocation(count: count, random: random),
+        'randLocationDetails':
+            ({required int count, Random? random}) =>
+                randLocationDetails(count: count, random: random),
+        'randMimeType':
+            ({required int count, Random? random}) => randMimeType(count: count, random: random),
+        'randMimeTypeDetails':
+            ({required int count, Random? random}) =>
+                randMimeTypeDetails(count: count, random: random),
+        'randMusic':
+            ({required int count, Random? random}) => randMusic(count: count, random: random),
+        'randMyth':
+            ({required int count, Random? random}) => randMyth(count: count, random: random),
+        'randName':
+            ({required int count, Random? random}) => randName(count: count, random: random),
+        'randNameDetails':
+            ({required int count, Random? random}) => randNameDetails(count: count, random: random),
+        'randNature':
+            ({required int count, Random? random}) => randNature(count: count, random: random),
+        'randNickname':
+            ({required int count, Random? random}) => randNickname(count: count, random: random),
+        'randNicknameDetails':
+            ({required int count, Random? random}) =>
+                randNicknameDetails(count: count, random: random),
+        'randObject':
+            ({required int count, Random? random}) => randObject(count: count, random: random),
+        'randOrganization':
+            ({required int count, Random? random}) =>
+                randOrganization(count: count, random: random),
+        'randOrganizationDetails':
+            ({required int count, Random? random}) =>
+                randOrganizationDetails(count: count, random: random),
+        'randOs': ({required int count, Random? random}) => randOs(count: count, random: random),
+        'randOsDetails':
+            ({required int count, Random? random}) => randOsDetails(count: count, random: random),
+        'randPerson':
+            ({required int count, Random? random}) => randPerson(count: count, random: random),
+        'randPhone':
+            ({required int count, Random? random}) => randPhone(count: count, random: random),
+        'randPhoneDetails':
+            ({required int count, Random? random}) =>
+                randPhoneDetails(count: count, random: random),
+        'randPlace':
+            ({required int count, Random? random}) => randPlace(count: count, random: random),
+        'randPlant':
+            ({required int count, Random? random}) => randPlant(count: count, random: random),
+        'randProduct':
+            ({required int count, Random? random}) => randProduct(count: count, random: random),
+        'randRam': ({required int count, Random? random}) => randRam(count: count, random: random),
+        'randRamDetails':
+            ({required int count, Random? random}) => randRamDetails(count: count, random: random),
+        'randRegion':
+            ({required int count, Random? random}) => randRegion(count: count, random: random),
+        'randRegionDetails':
+            ({required int count, Random? random}) =>
+                randRegionDetails(count: count, random: random),
+        'randResolution':
+            ({required int count, Random? random}) => randResolution(count: count, random: random),
+        'randResolutionDetails':
+            ({required int count, Random? random}) =>
+                randResolutionDetails(count: count, random: random),
+        'randSentence':
+            ({required int count, Random? random}) => randSentence(count: count, random: random),
+        'randSentenceDetails':
+            ({required int count, Random? random}) =>
+                randSentenceDetails(count: count, random: random),
+        'randSound':
+            ({required int count, Random? random}) => randSound(count: count, random: random),
+        'randSpace':
+            ({required int count, Random? random}) => randSpace(count: count, random: random),
+        'randSport':
+            ({required int count, Random? random}) => randSport(count: count, random: random),
+        'randTech':
+            ({required int count, Random? random}) => randTech(count: count, random: random),
+        'randTime':
+            ({required int count, Random? random}) => randTime(count: count, random: random),
+        'randTool':
+            ({required int count, Random? random}) => randTool(count: count, random: random),
+        'randToy': ({required int count, Random? random}) => randToy(count: count, random: random),
+        'randVehicle':
+            ({required int count, Random? random}) => randVehicle(count: count, random: random),
+        'randVersion':
+            ({required int count, Random? random}) => randVersion(count: count, random: random),
+        'randVersionDetails':
+            ({required int count, Random? random}) =>
+                randVersionDetails(count: count, random: random),
+        'randWeather':
+            ({required int count, Random? random}) => randWeather(count: count, random: random),
+        'randWord':
+            ({required int count, Random? random}) => randWord(count: count, random: random),
+        'randWordDetails':
+            ({required int count, Random? random}) => randWordDetails(count: count, random: random),
+        'randDateUnit':
+            ({required int count, Random? random}) =>
+                randDateUnit(DateUnit.minute, count: count, random: random),
+      };
+
+      expect(
+        generators.keys.toSet(),
+        exportedNames()
+            .where((name) => RegExp(r'^rand[A-Z]').hasMatch(name))
+            .toSet()
+            .difference(const {
+              'randSuffix',
+              'randPrefix',
+              'randModifier',
+              'randSuffixAll',
+              'randPrefixAll',
+              'randModifierAll',
+              'randAgeMax',
+              'randCountMax',
+              'randLengthMax',
+              'randLengthMin',
+              'randLocationLengthMax',
+              'randOrganizationLengthMax',
+              'randSentenceCountMax',
+              'randSentenceLengthMax',
+            }),
+      );
+
+      for (final MapEntry(key: name, value: generate) in generators.entries) {
+        expect(generate(count: 0), isEmpty, reason: name);
+        expect(generate(count: -1), isEmpty, reason: name);
+        expect(generate(count: 1), hasLength(1), reason: name);
+        expect(
+          generate(count: 3, random: Random(7)).toString(),
+          generate(count: 3, random: Random(7)).toString(),
+          reason: name,
+        );
+      }
+    });
+
     test('LengthRange compares by value', () {
       expect(const LengthRange(1, 4), const LengthRange(1, 4));
       expect(const LengthRange(1, 4), isNot(const LengthRange(1, 5)));

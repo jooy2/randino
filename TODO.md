@@ -44,7 +44,6 @@ A fix to a generator added under `vNext` needs no changelog entry of its own, si
 
 ### A. No decision needed
 
-- **A43. Make the cross-cutting tests table-driven.** Drive the base suites from the export list: no arguments, `count` as `0`, `-1`, `NaN`, `null`, past the maximum, seeded determinism, adversarial sources, unknown and prototype-key strings for every string option. Add a Python two-thread test and a time bound on an exhausted `unique`.
 - **A44. The sentence suites pin the options that hide bugs.** The helpers fix `includeName: false`, `type: 'statement'` and `tense: 'present'`. Cover `include` with the default `includeName` and over several sentences, a named `story` by default, `startsWith` at `realism: 'real'`, German verb-second order and reflexives, and the middle of a multi-sentence length range.
 - **A46. A site check script.** Fail the docs build on a component tag left in `llms*.txt`, a page missing from `SIDEBAR`, and an upper-case export missing from `reference/constants.md`.
 - **A47. Stale bundle sizes.** `CLAUDE.md` calls 448 KB the whole library (it is about 613 KB; 448 KB is `randSentence`) and cites a 33 KB figure that is not there; `rand-sentence.md` still says 122.5 and 144.5 KB. Keep the numbers in the getting-started table only, and add `randLocation` (160 KB), `randCountry` (18 KB) and `randOrganization` (14 KB) to it.
@@ -59,7 +58,7 @@ A fix to a generator added under `vNext` needs no changelog entry of its own, si
 
 ### B. Needs a decision
 
-- **B56. `collect` keeps drawing after nothing new can come.** It spends `count * 50 + 500` draws however long they take: `randWord({ language: 'vi', startsWith: 'ư', unique: true, count: 10000 })` is 70 s, and minutes in Python. A stall cutoff ends it, at the cost of rarely returning one result fewer; hoisting the per-draw pool filtering out of the generators needs no decision and can go with it.
+- **B56. `collect` keeps drawing after nothing new can come.** It spends `count * 50 + 500` draws however long they take: `randWord({ language: 'vi', startsWith: 'ư', unique: true, count: 10000 })` is 70 s, and minutes in Python. A stall cutoff ends it, at the cost of rarely returning one result fewer; hoisting the per-draw pool filtering out of the generators needs no decision and can go with it. A test bounding how long an exhausted `unique` takes goes with it, since it fails until the cutoff is in.
 - **B57. `minLength` given alone is capped by the default maximum.** `randName({ language: 'en', minLength: 30 })` writes 20 to 21 characters. Moving the omitted bound out of the way, as `randAge` does, changes output.
 - **B58. `language: 'all'` and a length range only some languages can meet.** The others answer with their closest entry: `randLocation({ maxLength: 15 })` lands 48%, `randOrganization` 32%, `randWord({ maxLength: 1 })` 28%. Keeping only the languages that fit changes the mix, and should be one rule for every generator.
 - **B59. CJK names drop the surname under a tight `maxLength`.** `randName({ language: 'ko', maxLength: 1 })` writes `솔`, where the docs say a surname is never dropped. Change the behaviour or the docs.

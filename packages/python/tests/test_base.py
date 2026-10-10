@@ -1,6 +1,7 @@
 """The package's export surface, and the promise that it depends on nothing."""
 
 import ast
+import inspect
 import pathlib
 import re
 import sys
@@ -459,6 +460,88 @@ def test_an_option_the_types_rule_out_falls_back_rather_than_raising() -> None:
     assert loose.nickname_length_range("en", 5) == loose.nickname_length_range("en")
     # A language the package does not know leaves the value's own script to decide.
     assert all(" " not in loose.rand_modifier("고양이", language="xx") for _ in range(20))
+
+
+def test_every_generator_answers_the_same_odd_input_the_same_way() -> None:
+    """Driven by `__all__` rather than written out.
+
+    A generator added later is covered without anybody remembering to list it. The cases
+    above pin what an option falls back to; these pin that nothing raises, and that the
+    count and the source are honoured, for every one of them. Each generator is handed
+    only the options its signature takes, since an unknown keyword is a `TypeError` in
+    Python whatever the library does.
+    """
+    decorators = {"rand_suffix", "rand_prefix", "rand_modifier"}
+    generators = [
+        (name, getattr(randino, name))
+        for name in randino.__all__
+        if name.startswith("rand_") and name not in decorators
+    ]
+    options = (
+        "language",
+        "theme",
+        "type",
+        "platform",
+        "unit",
+        "format",
+        "story",
+        "style",
+        "level",
+        "group",
+        "gender",
+        "script",
+        "kind",
+        "country",
+        "vendor",
+        "category",
+        "realism",
+        "vocabulary",
+        "shape",
+        "slots",
+        "distribution",
+        "tense",
+        "quote",
+        "industry",
+        "separator",
+        "word_separator",
+        "starts_with",
+        "include",
+    )
+    strange: list[object] = ["xx", "__proto__", "constructor", 123, [None], {}, None]
+    sources: list[Callable[[], object]] = [
+        lambda: 0,
+        lambda: 0.9999999,
+        lambda: 1,
+        lambda: -1,
+        lambda: float("nan"),
+        lambda: "x",
+    ]
+
+    assert len(generators) >= 56, len(generators)
+
+    for name, generate in generators:
+        takes = set(inspect.signature(generate).parameters)
+
+        assert len(generate()) == 1, name
+        assert generate(count=0) == [], name
+        assert generate(count=-1) == [], name
+        assert len(generate(count=float("nan"))) == 1, name
+        assert len(generate(count=None)) == 1, name
+
+        def again(draw: Callable[..., list[object]] = generate) -> list[object]:
+            return draw(count=3, random=Random(7).random)
+
+        assert again() == again(), name
+
+        for source in sources:
+            assert isinstance(generate(count=2, random=source), list), name
+
+        for option in options:
+            if option not in takes:
+                continue
+
+            for value in strange:
+                generate(**{option: value})
 
 
 def test_a_length_range_the_wrong_way_round_keeps_max_length() -> None:
