@@ -6,7 +6,7 @@
 // and a 500 GB drive is never `0.5 TB`. Asking for a unit leaves out the sizes
 // that are not whole in it rather than rounding them into a size nobody sells.
 
-import { resolveLength } from './generate.js';
+import { finite } from './generate.js';
 
 /** How one kind of size is measured: its units, and the pool it draws from. */
 export interface CapacityScale<U extends string> {
@@ -69,8 +69,10 @@ export function capacityCandidates<U extends string>(
 	maxSize: unknown
 ): CapacityCandidate<U>[] {
 	const bound = unit === 'auto' ? scale.reference : unit;
-	const high = resolveLength(maxSize as number);
-	const asked = resolveLength(minSize as number);
+	// As written, not floored: `minSize: 1.5` in terabytes is no terabyte, and
+	// `maxSize: 0.5` in gigabytes is 512 MB.
+	const high = finite(maxSize);
+	const asked = finite(minSize);
 	// A range the wrong way round keeps `maxSize`, the way a length range keeps
 	// `maxLength`: it is the bound a caller is usually holding to.
 	const low = asked !== undefined && high !== undefined ? Math.min(asked, high) : asked;

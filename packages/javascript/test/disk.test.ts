@@ -239,6 +239,14 @@ describe('Disk', () => {
 			);
 		});
 
+		it('a bound need not be whole, and is not rounded', () => {
+			// Floored, 1.5 TB read as 1 TB and let a 1 TB drive in under it.
+			assert.deepStrictEqual(
+				[...new Set(randDiskSize({ unit: 'TB', minSize: 1.5, maxSize: 2.5, count: SAMPLE }))],
+				['2 TB']
+			);
+		});
+
 		it('256 GB, 512 GB and 1 TB are the most common, and the largest drives rare', () => {
 			const drives = randDiskSize({ count: LARGE });
 			const share = (size: string) => drives.filter((each) => each === size).length / drives.length;

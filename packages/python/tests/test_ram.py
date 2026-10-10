@@ -95,6 +95,12 @@ def test_a_range_no_real_size_is_inside_answers_with_nothing() -> None:
     assert rand_ram(min_size=5000, count=5) == []
 
 
+def test_a_bound_need_not_be_whole_and_is_not_rounded() -> None:
+    # Half a gigabyte is 512 MB, which is in range; floored, it was 0 GB.
+    assert set(rand_ram(max_size=0.5, count=SAMPLE)) == {"512 MB"}
+    assert rand_ram(min_size=0.6, max_size=0.9, count=5) == []
+
+
 def test_a_range_the_wrong_way_round_keeps_max_size() -> None:
     assert set(rand_ram(min_size=64, max_size=8, count=SAMPLE)) == {"8 GB"}
 

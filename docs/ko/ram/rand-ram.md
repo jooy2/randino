@@ -45,8 +45,8 @@ rand_ram()
 | --- | --- | --- | --- |
 | `unit` | <Lang js="RamUnitOption" dart="RamUnit?" py="RamUnitOption" code /> | <Lang js="'auto'" dart="null" py="&quot;auto&quot;" code /> | `MB`나 `GB`, 또는 용량마다 정수로 떨어지는 가장 큰 단위를 고르는 <Lang js="'auto'" dart="null" py="&quot;auto&quot;" code />. [단위](#units)를 보세요. |
 | <Lang js="includeUnit" dart="includeUnit" py="include_unit" code /> | <Lang js="boolean" dart="bool" py="bool" code /> | <Lang js="true" dart="true" py="True" code /> | 숫자 뒤에 단위를 씁니다. |
-| <Lang js="minSize" dart="minSize" py="min_size" code /> | <Lang js="number" dart="int?" py="int &#124; None" code /> | <Lang js="—" dart="null" py="None" code /> | 돌려줄 가장 작은 용량. [범위](#bounds)를 보세요. |
-| <Lang js="maxSize" dart="maxSize" py="max_size" code /> | <Lang js="number" dart="int?" py="int &#124; None" code /> | <Lang js="—" dart="null" py="None" code /> | 돌려줄 가장 큰 용량. [범위](#bounds)를 보세요. |
+| <Lang js="minSize" dart="minSize" py="min_size" code /> | <Lang js="number" dart="num?" py="float &#124; None" code /> | <Lang js="—" dart="null" py="None" code /> | 돌려줄 가장 작은 용량. [범위](#bounds)를 보세요. |
+| <Lang js="maxSize" dart="maxSize" py="max_size" code /> | <Lang js="number" dart="num?" py="float &#124; None" code /> | <Lang js="—" dart="null" py="None" code /> | 돌려줄 가장 큰 용량. [범위](#bounds)를 보세요. |
 | `count` | <Lang js="number" dart="int" py="int" code /> | `1` | 돌려줄 용량 개수. `0` … `10000`으로 제한됩니다. |
 | `unique` | <Lang js="boolean" dart="bool" py="bool" code /> | <Lang js="false" dart="false" py="False" code /> | 같은 결과를 두 번 돌려주지 않습니다. 용량이 바닥나면 `count`보다 적게 돌아옵니다. |
 | `output` | <Lang js="RandOutput" py="RandOutput" code /> | <Lang js="'value'" py="&quot;value&quot;" code /> | 문자열, 또는 용량마다 `RamDetail` 하나. Dart에는 이 매개변수가 없습니다. [상세 출력](#the-detail-output)을 보세요. |
@@ -110,7 +110,7 @@ rand_ram(include_unit=False, count=3)  # ['16', '8', '32']
 
 ## 범위 {#bounds}
 
-<Lang js="minSize" dart="minSize" py="min_size" code />와 <Lang js="maxSize" dart="maxSize" py="max_size" code />는 그 사이의 용량만 고르고, 양 끝도 범위에 들어갑니다. 정한 단위로 읽고, 단위를 정하지 않았으면 GB로 읽습니다. 그래서 <Lang js="minSize: 16" dart="minSize: 16" py="min_size=16" code />는 16 GB 이상이고, <Lang js="unit: 'MB', maxSize: 4096" dart="unit: RamUnit.mb, maxSize: 4096" py="unit=&quot;MB&quot;, max_size=4096" code />는 4096 MB 이하입니다.
+<Lang js="minSize" dart="minSize" py="min_size" code />와 <Lang js="maxSize" dart="maxSize" py="max_size" code />는 그 사이의 용량만 고르고, 양 끝도 범위에 들어갑니다. 정한 단위로 읽고, 단위를 정하지 않았으면 GB로 읽습니다. 그래서 <Lang js="minSize: 16" dart="minSize: 16" py="min_size=16" code />는 16 GB 이상이고, <Lang js="unit: 'MB', maxSize: 4096" dart="unit: RamUnit.mb, maxSize: 4096" py="unit=&quot;MB&quot;, max_size=4096" code />는 4096 MB 이하입니다. 경계가 정수일 필요는 없어서, <Lang js="maxSize: 0.5" dart="maxSize: 0.5" py="max_size=0.5" code />는 512 MB 이하입니다.
 
 범위 안에 실제 용량이 없으면 아무도 팔지 않는 크기를 만들어 내지 않고 빈 결과를 돌려줍니다. 범위의 앞뒤가 바뀌면 <Lang js="maxSize" dart="maxSize" py="max_size" code />를 남깁니다. 호출하는 쪽이 대개 지키려는 한계가 그 값이기 때문입니다.
 

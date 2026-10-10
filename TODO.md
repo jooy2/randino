@@ -44,7 +44,6 @@ A fix to a generator added under `vNext` needs no changelog entry of its own, si
 
 ### A. No decision needed
 
-- **A19. Fractional capacity bounds are floored.** `randDiskSize({ unit: 'TB', minSize: 1.5, maxSize: 2.5 })` returns `1 TB`, and `randRam({ maxSize: 0.5 })` returns nothing although 512 MB is 0.5 GB. Compare against the bound as written. `_internal/capacity` in JS and Python.
 - **A20. The `startsWith` script check differs between packages.** JS takes a fullwidth `Ａ` as Latin (`Ａiskell`), Python takes `×` and `÷` as Latin. Require a letter as well, and make Python's ranges match `Script=Latin` and `Script=Cyrillic`.
 - **A21. Python `rand_word` skips `resolve_length`.** `min_length=nan` returns only the longest words, `min_length=[]` raises, and `realism=['real']` raises `TypeError: unhashable` in every generator that takes `realism`.
 - **A22. Python reads non-ASCII digits in date strings.** `\d` matches `２０２４` and Arabic-Indic digits, which JS rejects. Use `re.ASCII`.

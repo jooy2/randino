@@ -9,7 +9,7 @@ out the sizes that are not whole in it rather than rounding them into a size nob
 from dataclasses import dataclass
 from typing import Generic, TypeVar
 
-from randino._internal.generate import resolve_length
+from randino._internal.generate import finite
 
 U = TypeVar("U", bound=str)
 
@@ -98,8 +98,10 @@ def capacity_candidates(
     """
     named: U | None = unit if unit in scale.units else None
     bound = named if named is not None else scale.reference
-    high = resolve_length(max_size)  # type: ignore[arg-type]
-    asked = resolve_length(min_size)  # type: ignore[arg-type]
+    # As written, not floored: `min_size=1.5` in terabytes is no terabyte, and
+    # `max_size=0.5` in gigabytes is 512 MB.
+    high = finite(max_size)
+    asked = finite(min_size)
     # A range the wrong way round keeps `max_size`, the way a length range keeps
     # `max_length`: it is the bound a caller is usually holding to.
     low = min(asked, high) if asked is not None and high is not None else asked

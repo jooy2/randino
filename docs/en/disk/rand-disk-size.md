@@ -45,8 +45,8 @@ Every option is optional, and the defaults are what the empty call above uses.
 | --- | --- | --- | --- |
 | `unit` | <Lang js="DiskUnitOption" dart="DiskUnit?" py="DiskUnitOption" code /> | <Lang js="'auto'" dart="null" py="&quot;auto&quot;" code /> | `MB`, `GB` or `TB`, or <Lang js="'auto'" dart="null" py="&quot;auto&quot;" code /> for the largest unit each size is a whole number of. See [units](#units). |
 | <Lang js="includeUnit" dart="includeUnit" py="include_unit" code /> | <Lang js="boolean" dart="bool" py="bool" code /> | <Lang js="true" dart="true" py="True" code /> | Write the unit after the number. |
-| <Lang js="minSize" dart="minSize" py="min_size" code /> | <Lang js="number" dart="int?" py="int &#124; None" code /> | <Lang js="—" dart="null" py="None" code /> | The smallest size to return. See [bounds](#bounds). |
-| <Lang js="maxSize" dart="maxSize" py="max_size" code /> | <Lang js="number" dart="int?" py="int &#124; None" code /> | <Lang js="—" dart="null" py="None" code /> | The largest size to return. See [bounds](#bounds). |
+| <Lang js="minSize" dart="minSize" py="min_size" code /> | <Lang js="number" dart="num?" py="float &#124; None" code /> | <Lang js="—" dart="null" py="None" code /> | The smallest size to return. See [bounds](#bounds). |
+| <Lang js="maxSize" dart="maxSize" py="max_size" code /> | <Lang js="number" dart="num?" py="float &#124; None" code /> | <Lang js="—" dart="null" py="None" code /> | The largest size to return. See [bounds](#bounds). |
 | `count` | <Lang js="number" dart="int" py="int" code /> | `1` | How many sizes to return. Clamped to `0` … `10000`. |
 | `unique` | <Lang js="boolean" dart="bool" py="bool" code /> | <Lang js="false" dart="false" py="False" code /> | Never return the same size twice. Returns fewer than `count` once the sizes run out. |
 | `output` | <Lang js="RandOutput" py="RandOutput" code /> | <Lang js="'value'" py="&quot;value&quot;" code /> | Strings, or a `DiskSizeDetail` per size. Dart has no such parameter — see [the detail output](#the-detail-output). |
@@ -112,7 +112,7 @@ rand_disk_size(include_unit=False, count=3)  # ['512', '2000', '256']
 
 ## Bounds {#bounds}
 
-<Lang js="minSize" dart="minSize" py="min_size" code /> and <Lang js="maxSize" dart="maxSize" py="max_size" code /> keep to the sizes between them, both ends included. They are read in the unit you name, and in gigabytes when the unit is left to fit, so <Lang js="minSize: 1000" dart="minSize: 1000" py="min_size=1000" code /> is 1 TB and up while <Lang js="unit: 'TB', minSize: 8" dart="unit: DiskUnit.tb, minSize: 8" py="unit=&quot;TB&quot;, min_size=8" code /> is 8 TB and up.
+<Lang js="minSize" dart="minSize" py="min_size" code /> and <Lang js="maxSize" dart="maxSize" py="max_size" code /> keep to the sizes between them, both ends included. They are read in the unit you name, and in gigabytes when the unit is left to fit, so <Lang js="minSize: 1000" dart="minSize: 1000" py="min_size=1000" code /> is 1 TB and up while <Lang js="unit: 'TB', minSize: 8" dart="unit: DiskUnit.tb, minSize: 8" py="unit=&quot;TB&quot;, min_size=8" code /> is 8 TB and up. A bound need not be whole: <Lang js="unit: 'TB', minSize: 1.5" dart="unit: DiskUnit.tb, minSize: 1.5" py="unit=&quot;TB&quot;, min_size=1.5" code /> is 2 TB and up.
 
 A range no real size is inside is answered with nothing rather than with a size nobody sells, and a range the wrong way round keeps <Lang js="maxSize" dart="maxSize" py="max_size" code />.
 

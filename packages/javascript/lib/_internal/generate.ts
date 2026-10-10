@@ -31,6 +31,17 @@ import { clamp, pick } from './utils.js';
  * threw from somewhere that says nothing about which option was wrong.
  */
 function whole(value: unknown): number | undefined {
+	const number = finite(value);
+
+	return number === undefined ? undefined : Math.floor(number);
+}
+
+/**
+ * A finite number, or `undefined` for anything that is not one — `whole` without
+ * the floor, for a bound that may fall between two whole numbers: half a
+ * gigabyte is 512 MB.
+ */
+export function finite(value: unknown): number | undefined {
 	// Only a number, or a string that spells one, is a number here. `Number` reads
 	// `null`, `''` and `[]` as `0`, which made `count: null` an empty result and
 	// `maxAge: null` an age of zero, where the other two packages read a null as
@@ -40,12 +51,7 @@ function whole(value: unknown): number | undefined {
 		typeof value === 'bigint' ||
 		typeof value === 'boolean' ||
 		(typeof value === 'string' && value.trim() !== '');
-
-	if (!numeric) {
-		return undefined;
-	}
-
-	const number = Math.floor(Number(value));
+	const number = numeric ? Number(value) : NaN;
 
 	return Number.isFinite(number) ? number : undefined;
 }

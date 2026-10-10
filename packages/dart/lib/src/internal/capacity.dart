@@ -90,13 +90,17 @@ U fitUnit<U extends Enum>(CapacityScale<U> scale, int size) {
 List<CapacityCandidate<U>> capacityCandidates<U extends Enum>(
   CapacityScale<U> scale,
   U? unit,
-  int? minSize,
-  int? maxSize,
+  num? minSize,
+  num? maxSize,
 ) {
   final bound = unit ?? scale.reference;
+  // As written, not rounded: `minSize: 1.5` in terabytes is no terabyte, and
+  // `maxSize: 0.5` in gigabytes is 512 MB. A bound that is not finite is none.
+  final high = maxSize != null && maxSize.isFinite ? maxSize : null;
+  final asked = minSize != null && minSize.isFinite ? minSize : null;
   // A range the wrong way round keeps `maxSize`, the way a length range keeps
   // `maxLength`: it is the bound a caller is usually holding to.
-  final low = minSize != null && maxSize != null && minSize > maxSize ? maxSize : minSize;
+  final low = asked != null && high != null && asked > high ? high : asked;
   final candidates = <CapacityCandidate<U>>[];
 
   for (final (size, weight) in scale.pool) {
@@ -106,7 +110,7 @@ List<CapacityCandidate<U>> capacityCandidates<U extends Enum>(
 
     if (!_whole(value)) continue;
     if (low != null && measured < low) continue;
-    if (maxSize != null && measured > maxSize) continue;
+    if (high != null && measured > high) continue;
 
     candidates.add(CapacityCandidate<U>(size, weight, written, value.toInt()));
   }

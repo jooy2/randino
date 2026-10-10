@@ -175,6 +175,11 @@ def test_a_disk_range_with_no_real_size_answers_with_nothing() -> None:
     assert set(rand_disk_size(min_size=4000, max_size=256, count=SAMPLE)) == {"256 GB"}
 
 
+def test_a_disk_bound_need_not_be_whole_and_is_not_rounded() -> None:
+    # Floored, 1.5 TB read as 1 TB and let a 1 TB drive in under it.
+    assert set(rand_disk_size(unit="TB", min_size=1.5, max_size=2.5, count=SAMPLE)) == {"2 TB"}
+
+
 def test_256_gb_512_gb_and_1_tb_are_the_most_common() -> None:
     drives = rand_disk_size(count=LARGE)
 

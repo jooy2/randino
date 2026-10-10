@@ -189,6 +189,12 @@ void main() {
         },
       );
 
+      test('a bound need not be whole, and is not rounded', () {
+        expect(randDiskSize(unit: DiskUnit.tb, minSize: 1.5, maxSize: 2.5, count: sample).toSet(), {
+          '2 TB',
+        });
+      });
+
       test('256 GB, 512 GB and 1 TB are the most common, and the largest drives rare', () {
         final drives = randDiskSize(count: large);
         double share(String size) => drives.where((each) => each == size).length / drives.length;

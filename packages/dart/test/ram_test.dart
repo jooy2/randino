@@ -112,6 +112,12 @@ void main() {
       expect(randRam(minSize: 5000, count: 5), isEmpty);
     });
 
+    test('a bound need not be whole, and is not rounded', () {
+      // Half a gigabyte is 512 MB, which is in range.
+      expect(randRam(maxSize: 0.5, count: sample).toSet(), {'512 MB'});
+      expect(randRam(minSize: 0.6, maxSize: 0.9, count: 5), isEmpty);
+    });
+
     test('a range the wrong way round keeps maxSize', () {
       expect(randRam(minSize: 64, maxSize: 8, count: sample).toSet(), {'8 GB'});
     });

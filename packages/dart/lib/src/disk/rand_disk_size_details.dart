@@ -14,8 +14,8 @@ import 'package:randino/src/types.dart';
 List<DiskSizeDetail> randDiskSizeDetails({
   DiskUnit? unit,
   bool includeUnit = true,
-  int? minSize,
-  int? maxSize,
+  num? minSize,
+  num? maxSize,
   int count = 1,
   bool unique = false,
 

@@ -25,8 +25,8 @@ List<String> randRam({
   /// is written in gigabytes, because a bare `512` and a bare `16` would
   /// otherwise be in two different units.
   bool includeUnit = true,
-  int? minSize,
-  int? maxSize,
+  num? minSize,
+  num? maxSize,
   int count = 1,
   bool unique = false,
 

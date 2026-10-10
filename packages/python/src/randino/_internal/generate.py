@@ -40,12 +40,24 @@ def _whole(value: object) -> int | None:
         The floor of the number, or None when it is not a finite one. An integer too
         large for a float is not one either, the way JavaScript reads it as `Infinity`.
     """
+    number = finite(value)
+
+    return None if number is None else math.floor(number)
+
+
+def finite(value: object) -> float | None:
+    """A finite number, or None for anything that is not one.
+
+    `_whole` without the floor, for a bound that may fall between two whole numbers: half
+    a gigabyte is 512 MB. An integer too large for a float is not a finite number, the
+    way JavaScript reads it as `Infinity`.
+    """
     try:
         number = float(value)  # type: ignore[arg-type]
     except (TypeError, ValueError, OverflowError):
         return None
 
-    return math.floor(number) if math.isfinite(number) else None
+    return number if math.isfinite(number) else None
 
 
 def resolve_whole(value: object, fallback: int, low: int, high: int) -> int:

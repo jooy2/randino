@@ -127,6 +127,12 @@ describe('Ram', () => {
 		assert.deepStrictEqual(randRam({ minSize: 5000, count: 5 }), []);
 	});
 
+	it('a bound need not be whole, and is not rounded', () => {
+		// Half a gigabyte is 512 MB, which is in range; floored, it was 0 GB.
+		assert.deepStrictEqual([...new Set(randRam({ maxSize: 0.5, count: SAMPLE }))], ['512 MB']);
+		assert.deepStrictEqual(randRam({ minSize: 0.6, maxSize: 0.9, count: 5 }), []);
+	});
+
 	it('a range the wrong way round keeps maxSize', () => {
 		assert.deepStrictEqual(
 			[...new Set(randRam({ minSize: 64, maxSize: 8, count: SAMPLE }))],
