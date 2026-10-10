@@ -448,4 +448,15 @@ describe('Word', () => {
 		assert.strictEqual(new Set(limited).size, limited.length);
 		assert.ok(limited.length < 400, `expected the pool to run out: ${limited.length}`);
 	});
+
+	it('an exhausted unique stops soon after its pool runs out', () => {
+		// The 270 Vietnamese words on `ư` were found and then drawn again for a
+		// hundred thousand draws, which took over a minute in Python and fifteen
+		// seconds here. A run of draws that adds nothing ends it now.
+		const started = performance.now();
+		const words = randWord({ language: 'vi', startsWith: 'ư', unique: true, count: 2000 });
+
+		assert.ok(words.length < 2000, `expected the pool to run out: ${words.length}`);
+		assert.ok(performance.now() - started < 3000, `took ${performance.now() - started} ms`);
+	});
 });

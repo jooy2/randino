@@ -301,6 +301,15 @@ def languages_writing(option: str, languages: Sequence[L], prefix: str) -> tuple
     return tuple(code for code in wanted if writes_script(code, prefix))
 
 
+_COLLECT_STALL = 2000
+"""How many draws in a row may add nothing before `collect` stops.
+
+Only a call of more than thirty results ever reaches it, since a smaller one runs out of
+attempts first; a result one draw in a hundred finds is missed this way about twice in a
+billion.
+"""
+
+
 def collect(
     *,
     count: int,
@@ -334,9 +343,16 @@ def collect(
     # `unique` request whose pool has run out of combinations.
     max_attempts = wanted * 50 + 500
     attempts = 0
+    missed = 0
 
-    while len(results) < wanted and attempts < max_attempts:
+    # A run of draws that adds nothing is a pool with nothing new left in it, and the
+    # budget above was spent all the same: `rand_word(language="vi", starts_with="ư",
+    # unique=True, count=2000)` found its 270 words and went on for a hundred thousand
+    # draws. A result still to be found is missed only when it fails to come up
+    # `_COLLECT_STALL` draws in a row.
+    while len(results) < wanted and attempts < max_attempts and missed < _COLLECT_STALL:
         attempts += 1
+        missed += 1
 
         item = draw()
         key = key_of(item)
@@ -355,5 +371,6 @@ def collect(
             seen.add(once)
 
         results.append(item)
+        missed = 0
 
     return results

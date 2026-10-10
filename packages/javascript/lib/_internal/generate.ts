@@ -280,6 +280,12 @@ export function languagesFitting<T extends string>(
 	return fitting.length ? fitting : languages;
 }
 
+// How many draws in a row may add nothing before `collect` stops. Only a call of
+// more than thirty results ever reaches it, since a smaller one runs out of
+// attempts first; a result one draw in a hundred finds is missed this way about
+// twice in a billion.
+const COLLECT_STALL = 2000;
+
 /**
  * Draw until there are `count` results, discarding what the caller's filters
  * reject. `keyOf` is the string a result is filtered and deduplicated by — the
@@ -303,9 +309,16 @@ export function collect<T>(
 	// `unique` request whose pool has run out of combinations.
 	const maxAttempts = count * 50 + 500;
 	let attempts = 0;
+	let missed = 0;
 
-	while (results.length < count && attempts < maxAttempts) {
+	// A run of draws that adds nothing is a pool with nothing new left in it, and the
+	// budget above was spent all the same: `randWord({ language: 'vi', startsWith:
+	// 'ư', unique: true, count: 2000 })` found its 270 words and went on for a
+	// hundred thousand draws. A result still to be found is missed only when it
+	// fails to come up `COLLECT_STALL` draws in a row.
+	while (results.length < count && attempts < maxAttempts && missed < COLLECT_STALL) {
 		attempts += 1;
+		missed += 1;
 
 		const item = draw();
 		const key = keyOf(item);
@@ -322,6 +335,7 @@ export function collect<T>(
 		}
 
 		results.push(item);
+		missed = 0;
 	}
 
 	return results;

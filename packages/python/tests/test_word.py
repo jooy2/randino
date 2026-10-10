@@ -1,6 +1,7 @@
 """The word generators: `rand_word` and the twenty-nine themed ones."""
 
 import re
+import time
 from typing import cast, get_args
 
 from randino import (
@@ -401,3 +402,13 @@ def test_unique_never_repeats_a_word() -> None:
 
     assert len(set(limited)) == len(limited)
     assert len(limited) < 400
+
+
+def test_an_exhausted_unique_stops_soon_after_its_pool_runs_out() -> None:
+    # The 270 Vietnamese words on `ư` were found and then drawn again for a hundred
+    # thousand draws, which took over a minute. A run of draws that adds nothing ends it.
+    started = time.perf_counter()
+    words = rand_word(language="vi", starts_with="ư", unique=True, count=2000)
+
+    assert len(words) < 2000
+    assert time.perf_counter() - started < 15, f"took {time.perf_counter() - started:.1f} s"

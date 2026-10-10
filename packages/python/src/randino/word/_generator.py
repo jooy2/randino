@@ -350,15 +350,44 @@ def theme_of(data: WordLanguageData, word: str) -> WordTheme | None:
     return _theme_index_of(data).get(word)
 
 
+_prefixed: dict[int, tuple[WordPool, str, WordPool]] = {}
+"""What a pool holds on one first character, kept per pool for the last character asked.
+
+A call asks every draw the same one, and a draw can walk a dozen themes: filtering each
+pool again for each of them was most of what a `starts_with` cost. One entry a pool,
+keyed on the pool's identity and holding the pool so the identity stays its own. A pool
+put together for one call is held too, so the table is emptied once it reaches
+`_PREFIXED_MAX` rather than growing with every call.
+"""
+
+_PREFIXED_MAX = 512
+
+
+def _starting_with(pool: WordPool, prefix: str) -> WordPool:
+    """The words of `pool` that begin with `prefix`, ignoring case."""
+    held = _prefixed.get(id(pool))
+
+    if held is not None and held[0] is pool and held[1] == prefix:
+        return held[2]
+
+    lower = prefix.lower()
+    words = tuple(word for word in pool if word.lower().startswith(lower))
+
+    if len(_prefixed) >= _PREFIXED_MAX:
+        _prefixed.clear()
+
+    _prefixed[id(pool)] = (pool, prefix, words)
+
+    return words
+
+
 def pick_word(pool: WordPool, low: int, high: int, prefix: str) -> str | None:
     """A pool word between `low` and `high` characters, starting with `prefix`.
 
     Falls back to a looser fit rather than nothing, and returns None only when no
     word starts with the requested character.
     """
-    candidates = (
-        tuple(word for word in pool if word.lower().startswith(prefix.lower())) if prefix else pool
-    )
+    candidates = _starting_with(pool, prefix) if prefix else pool
 
     if not candidates:
         return None

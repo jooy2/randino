@@ -128,6 +128,12 @@ List<T> languagesFitting<T>(
   return fitting.isNotEmpty ? fitting : languages;
 }
 
+// How many draws in a row may add nothing before `collect` stops. Only a call
+// of more than thirty results ever reaches it, since a smaller one runs out of
+// attempts first; a result one draw in a hundred finds is missed this way about
+// twice in a billion.
+const int _collectStall = 2000;
+
 /// Draw until there are [count] results, discarding what the filters reject.
 ///
 /// [keyOf] is the string a result is filtered and deduplicated by — the name,
@@ -153,9 +159,16 @@ List<T> collect<T>({
   // `unique` request whose pool has run out of combinations.
   final maxAttempts = wanted * 50 + 500;
   var attempts = 0;
+  var missed = 0;
 
-  while (results.length < wanted && attempts < maxAttempts) {
+  // A run of draws that adds nothing is a pool with nothing new left in it, and
+  // the budget above was spent all the same: `randWord(language:
+  // WordLanguage.vi, startsWith: 'ư', unique: true, count: 2000)` found its 270
+  // words and went on for a hundred thousand draws. A result still to be found
+  // is missed only when it fails to come up [_collectStall] draws in a row.
+  while (results.length < wanted && attempts < maxAttempts && missed < _collectStall) {
     attempts += 1;
+    missed += 1;
 
     final item = draw();
     final key = keyOf(item);
@@ -172,6 +185,7 @@ List<T> collect<T>({
     }
 
     results.add(item);
+    missed = 0;
   }
 
   return results;

@@ -472,5 +472,15 @@ void main() {
       expect(limited.toSet(), hasLength(limited.length));
       expect(limited.length, lessThan(400));
     });
+
+    test('an exhausted unique stops soon after its pool runs out', () {
+      // The 270 Vietnamese words on `ư` were found and then drawn again for a
+      // hundred thousand draws. A run of draws that adds nothing ends it now.
+      final watch = Stopwatch()..start();
+      final words = randWord(language: WordLanguage.vi, startsWith: 'ư', unique: true, count: 2000);
+
+      expect(words.length, lessThan(2000));
+      expect(watch.elapsedMilliseconds, lessThan(5000));
+    });
   });
 }

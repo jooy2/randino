@@ -298,18 +298,33 @@ Map<String, WordTheme> _themeIndexOf(WordLanguageData data) {
   return index;
 }
 
+// What a pool holds on one first character, kept per pool for the last
+// character asked. A call asks every draw the same one, and a draw can walk a
+// dozen themes: filtering each pool again for each of them was most of what a
+// `startsWith` cost. One entry a pool, keyed on the pool itself, so this never
+// grows.
+final Expando<(String, WordPool)> _prefixed = Expando();
+
+WordPool _startingWith(WordPool pool, String prefix) {
+  final held = _prefixed[pool];
+
+  if (held != null && held.$1 == prefix) return held.$2;
+
+  final lower = prefix.toLowerCase();
+  final words = pool.where((word) => word.toLowerCase().startsWith(lower)).toList(growable: false);
+
+  _prefixed[pool] = (prefix, words);
+
+  return words;
+}
+
 /// A pool word of a length between [min] and [max], starting with [prefix] when
 /// one was asked for.
 ///
 /// Falls back to a looser fit rather than nothing, and returns null only when no
 /// word starts with the requested character.
 String? pickWord(WordPool pool, int min, int max, String prefix) {
-  final candidates =
-      prefix.isEmpty
-          ? pool
-          : pool
-              .where((word) => word.toLowerCase().startsWith(prefix.toLowerCase()))
-              .toList(growable: false);
+  final candidates = prefix.isEmpty ? pool : _startingWith(pool, prefix);
 
   if (candidates.isEmpty) {
     return null;

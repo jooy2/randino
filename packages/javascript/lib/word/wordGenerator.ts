@@ -307,15 +307,34 @@ export function themeOf(data: WordLanguageData, word: string): WordTheme | null 
 	return themeIndexOf(data).get(word) ?? null;
 }
 
+// What a pool holds on one first character, kept per pool for the last character
+// asked. A call asks every draw the same one, and a draw can walk a dozen themes:
+// filtering each pool again for each of them was most of what a `startsWith` cost.
+// One entry a pool, keyed on the pool itself, so this never grows.
+const prefixed = new WeakMap<WordPool, { prefix: string; words: WordPool }>();
+
+function startingWith(pool: WordPool, prefix: string): WordPool {
+	const held = prefixed.get(pool);
+
+	if (held?.prefix === prefix) {
+		return held.words;
+	}
+
+	const lower = prefix.toLowerCase();
+	const words = pool.filter((word) => word.toLowerCase().startsWith(lower));
+
+	prefixed.set(pool, { prefix, words });
+
+	return words;
+}
+
 /**
  * A pool word of a length between `min` and `max`, starting with `prefix` when
  * one was asked for. Falls back to a looser fit rather than nothing, and returns
  * null only when no word starts with the requested character.
  */
 export function pickWord(pool: WordPool, min: number, max: number, prefix: string): string | null {
-	const candidates = prefix
-		? pool.filter((word) => word.toLowerCase().startsWith(prefix.toLowerCase()))
-		: pool;
+	const candidates = prefix ? startingWith(pool, prefix) : pool;
 
 	if (!candidates.length) {
 		return null;
