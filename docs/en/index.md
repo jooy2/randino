@@ -17,7 +17,7 @@ hero:
       text: Demo
       link: /demo
   image:
-    src: /512x512.png
+    src: /512x512.webp
     alt: randino
 
 features:

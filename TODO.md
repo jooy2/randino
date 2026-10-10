@@ -44,7 +44,6 @@ A fix to a generator added under `vNext` needs no changelog entry of its own, si
 
 ### A. No decision needed
 
-- **A17. The home hero image is 193 KB.** A WebP of `docs/public/512x512.png` is 26 KB. Keep the PNG for `og:image`.
 - **A18. Dead code and stray comments.** `nameFits` has an unused `bounds` parameter; `sentenceGenerator.ts` has doc blocks attached to the wrong function near lines 1254, 1315, 3606 and 3698 and duplicated comments near 322 and 3780; `docs/.vitepress/data/sidebar.ts` has an orphaned block above `pagesOf`.
 - **A19. Fractional capacity bounds are floored.** `randDiskSize({ unit: 'TB', minSize: 1.5, maxSize: 2.5 })` returns `1 TB`, and `randRam({ maxSize: 0.5 })` returns nothing although 512 MB is 0.5 GB. Compare against the bound as written. `_internal/capacity` in JS and Python.
 - **A20. The `startsWith` script check differs between packages.** JS takes a fullwidth `Ａ` as Latin (`Ａiskell`), Python takes `×` and `÷` as Latin. Require a letter as well, and make Python's ranges match `Script=Latin` and `Script=Cyrillic`.

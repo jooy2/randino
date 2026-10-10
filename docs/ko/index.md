@@ -17,7 +17,7 @@ hero:
       text: 데모
       link: /ko/demo
   image:
-    src: /512x512.png
+    src: /512x512.webp
     alt: randino
 
 features:
