@@ -10,6 +10,7 @@
 import 'dart:math';
 
 import 'package:randino/src/internal/generate.dart';
+import 'package:randino/src/internal/script.dart';
 import 'package:randino/src/internal/utils.dart';
 import 'package:randino/src/types.dart';
 import 'package:randino/src/word/data/index.dart';
@@ -328,11 +329,12 @@ String synthWord(WordSynthesis syn, int min, int max, String prefix) {
     var last = prefix.isEmpty ? '' : prefix.substring(prefix.length - 1);
 
     for (var i = prefix.length; i < count; i += 1) {
-      // Avoid immediately repeating a character (狼狼).
-      var next = pick(syn.pool);
+      // Avoid immediately repeating a character (狼狼), and go on in the kana the
+      // requested first character is written in.
+      var next = kanaLike(pick(syn.pool), prefix);
 
       for (var tries = 0; tries < 3 && next == last; tries += 1) {
-        next = pick(syn.pool);
+        next = kanaLike(pick(syn.pool), prefix);
       }
 
       buffer.write(next);

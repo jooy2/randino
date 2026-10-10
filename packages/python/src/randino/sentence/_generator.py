@@ -2697,6 +2697,65 @@ def _predicate_for(
     return agreed(drawn), plainly(pool.index(drawn)), -1
 
 
+def _leads(
+    language: WordLanguage,
+    data: SentenceLanguageData,
+    settings: Settings,
+    group: VerbGroup | StateGroup,
+    themes: Sequence[WordTheme],
+) -> bool:
+    """Whether `group` takes a subject on the character `starts_with` asked for."""
+    return any(
+        _holds_prefix(
+            settings, _subject_pool_for(language, data, group, theme, settings.vocabulary)
+        )
+        for theme in _subject_themes_of(language, data, group, themes, settings.vocabulary)
+    )
+
+
+def _invents_lead(
+    language: WordLanguage,
+    data: SentenceLanguageData,
+    settings: Settings,
+    frame: SentenceFrame,
+    plan: Plan,
+    themes: Sequence[WordTheme],
+    draw: Draw,
+) -> bool:
+    """Whether a shape that opens on its subject would have to invent one.
+
+    That is when none of its predicates takes a subject on the character `starts_with`
+    asked for.
+    """
+    first = frame.parts[0]
+    subject_slot = _subject_slot_of(frame)
+
+    if first.slot != subject_slot or first.head or _required_at(frame, plan, subject_slot):
+        return False
+
+    groups: Sequence[VerbGroup | StateGroup]
+
+    if not any(part.slot in ("state", "verb") for part in frame.parts):
+        groups = [data.calendar.copula] if data.calendar is not None else []
+    elif any(part.slot == "state" for part in frame.parts):
+        groups = _state_groups_for(
+            language, data, settings.vocabulary, themes, frame, plan, draw.beat
+        )
+    else:
+        groups = _verb_groups_for(
+            language,
+            data,
+            settings.vocabulary,
+            frame,
+            themes,
+            plan,
+            draw.beat,
+            _subject_noun_of(frame, plan, draw.follow),
+        )
+
+    return not any(_leads(language, data, settings, group, themes) for group in groups)
+
+
 def _compose(
     language: WordLanguage,
     data: SentenceLanguageData,
@@ -2804,12 +2863,7 @@ def _compose(
     )
 
     def leads(group: VerbGroup | StateGroup) -> bool:
-        return any(
-            _holds_prefix(
-                settings, _subject_pool_for(language, data, group, theme, settings.vocabulary)
-            )
-            for theme in _subject_themes_of(language, data, group, themes, settings.vocabulary)
-        )
+        return _leads(language, data, settings, group, themes)
 
     state_group: StateGroup | None = None
     verb_group: VerbGroup | None = None
@@ -5185,6 +5239,26 @@ def _generate_one(language: WordLanguage, settings: Settings, draw: Draw) -> Bui
     # Korean paragraph took to answer a question it usually never asks.
     loose = [] if fitting else [frame for frame in frames if buildable(frame)]
     usable = fitting or loose or frames
+    # `_compose` leads with a subject on the `starts_with` character where the shape
+    # opens on its subject, and a shape whose predicates take no subject on it has to
+    # invent one: `かヌゾが…` at `realism="real"`, while another shape had a real word.
+    # Such a shape is drawn again when the language has a real word on the character at
+    # all, and kept when it has none, because then an invented word is the only answer.
+    # Asked of the shape drawn rather than of them all: walking every verb group
+    # against every shape doubled what a call took.
+    themes = tuple(requested) or WORD_THEMES
+    steered = (
+        settings.prefix != ""
+        and follow is None
+        and draw.speech is None
+        and not draw.spoken
+        and data.articles is None
+        and any(
+            _holds_prefix(settings, _nouns_of(language, theme, settings.vocabulary))
+            for theme in themes
+        )
+    )
+    inventing: dict[int, bool] = {}
     best: Built | None = None
     best_distance = None
     best_too_long = False
@@ -5213,6 +5287,22 @@ def _generate_one(language: WordLanguage, settings: Settings, draw: Draw) -> Bui
     for attempt in range(FIT_ATTEMPTS):
         at = attempt
         frame = _pick_frame(usable, lambda candidate: weigh(candidate, at))  # noqa: B023
+
+        if steered:
+            left = usable
+
+            while len(left) > 1:
+                if id(frame) not in inventing:
+                    inventing[id(frame)] = _invents_lead(
+                        language, data, settings, frame, plans[id(frame)][0], themes, draw
+                    )
+
+                if not inventing[id(frame)]:
+                    break
+
+                drawn = frame
+                left = [each for each in left if each is not drawn]
+                frame = _pick_frame(left, lambda candidate: weigh(candidate, at))  # noqa: B023
         built = _compose(
             language,
             data,

@@ -134,3 +134,38 @@ export function endsWithLiquid(text: string): boolean {
 		(code - HANGUL_BASE) % HANGUL_FINALS === HANGUL_LIQUID
 	);
 }
+
+// Hiragana and katakana sit 0x60 code points apart, kana for kana, from `ぁ` /
+// `ァ` to `ゖ` / `ヶ`.
+const HIRAGANA_FIRST = 0x3041;
+const HIRAGANA_LAST = 0x3096;
+const KATAKANA_FIRST = 0x30a1;
+const KATAKANA_LAST = 0x30f6;
+const KANA_SHIFT = 0x60;
+
+/**
+ * `text` written in the kana `like` ends on: hiragana after a hiragana `like`,
+ * katakana after a katakana one, and unchanged after anything else. Japanese
+ * spells a word in one of the two, so an invented word that opens on the `か` a
+ * caller asked for goes on in hiragana rather than in the katakana its syllables
+ * are written in: `かよ`, never `かヨ`.
+ */
+export function kanaLike(text: string, like: string): string {
+	const code = like ? like.codePointAt(like.length - 1)! : 0;
+	const [from, to, shift] =
+		code >= HIRAGANA_FIRST && code <= HIRAGANA_LAST
+			? [KATAKANA_FIRST, KATAKANA_LAST, -KANA_SHIFT]
+			: code >= KATAKANA_FIRST && code <= KATAKANA_LAST
+				? [HIRAGANA_FIRST, HIRAGANA_LAST, KANA_SHIFT]
+				: [0, -1, 0];
+
+	if (!shift) {
+		return text;
+	}
+
+	return Array.from(text, (character) => {
+		const point = character.codePointAt(0)!;
+
+		return point >= from && point <= to ? String.fromCodePoint(point + shift) : character;
+	}).join('');
+}

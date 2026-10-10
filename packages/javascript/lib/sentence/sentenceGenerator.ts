@@ -2258,6 +2258,62 @@ function subjectThemesFor(settings: Settings, follow: Follow | null): readonly W
 	return inClass.length ? inClass : themes;
 }
 
+/**
+ * What heads a shape: a `state` part, a `verb` part, or neither, which makes it a
+ * copular one that equates its subject to the date or the clock it carries and
+ * takes the language's copula for a predicate.
+ */
+function headOf(frame: SentenceFrame): 'state' | 'verb' | 'copula' {
+	return frame.parts.some((part) => part.slot === 'state')
+		? 'state'
+		: frame.parts.some((part) => part.slot === 'verb')
+			? 'verb'
+			: 'copula';
+}
+
+/** The predicate groups a shape can be written with, about the subjects in `themes`. */
+function predicateGroupsFor(
+	language: WordLanguage,
+	data: SentenceLanguageData,
+	settings: Settings,
+	frame: SentenceFrame,
+	plan: Plan,
+	themes: readonly WordTheme[],
+	draw: Draw
+): readonly (StateGroup | VerbGroup)[] {
+	const headed = headOf(frame);
+
+	return headed === 'copula'
+		? [data.calendar!.copula]
+		: headed === 'state'
+			? stateGroupsFor(language, data, settings.vocabulary, themes, frame, plan, draw.beat)
+			: verbGroupsFor(
+					language,
+					data,
+					settings.vocabulary,
+					frame,
+					themes,
+					plan,
+					draw.beat,
+					subjectNounOf(frame, plan, draw.follow)
+				);
+}
+
+/** The groups among `groups` that take a subject on the character `startsWith` asked for. */
+function leadingGroupsOf(
+	language: WordLanguage,
+	data: SentenceLanguageData,
+	settings: Settings,
+	groups: readonly (StateGroup | VerbGroup)[],
+	themes: readonly WordTheme[]
+): (StateGroup | VerbGroup)[] {
+	return groups.filter((each) =>
+		subjectThemesOf(each, themes, language, data, settings.vocabulary).some((theme) =>
+			holdsPrefix(settings, subjectPoolFor(language, data, each, theme, settings.vocabulary))
+		)
+	);
+}
+
 function generateOne(language: WordLanguage, settings: Settings, draw: Draw): Built {
 	const follow = draw.follow;
 	const budget = draw.budget;
@@ -2370,6 +2426,40 @@ function generateOne(language: WordLanguage, settings: Settings, draw: Draw): Bu
 	// what a Korean paragraph took to answer a question it usually never asks.
 	const loose = fitting.length ? [] : frames.filter(buildable);
 	const usable = fitting.length ? fitting : loose.length ? loose : frames;
+	// `compose` leads with a subject on the `startsWith` character where the shape
+	// opens on its subject, and a shape whose predicates take no subject on it has
+	// to invent one: `かヌゾが…` at `realism: 'real'`, while another shape had a
+	// real word. Such a shape is drawn again when the language has a real word on
+	// the character at all, and kept when it has none, because then an invented
+	// word is the only answer. Asked of the shape drawn rather than of them all:
+	// walking every verb group against every shape doubled what a call took.
+	const themes = requested.length ? requested : WORD_THEMES;
+	const steered =
+		settings.prefix !== '' &&
+		!follow &&
+		!draw.speech &&
+		!draw.spoken &&
+		!data.articles &&
+		themes.some((theme) => holdsPrefix(settings, nounsOf(language, theme, settings.vocabulary)));
+	const inventsLead = (frame: SentenceFrame): boolean => {
+		const first = frame.parts[0];
+		const subjectSlot = subjectSlotOf(frame);
+		const plan = plans.get(frame)!.plan;
+
+		return (
+			first.slot === subjectSlot &&
+			!first.head &&
+			!requiredAt(frame, plan, subjectSlot) &&
+			!leadingGroupsOf(
+				language,
+				data,
+				settings,
+				predicateGroupsFor(language, data, settings, frame, plan, themes, draw),
+				themes
+			).length
+		);
+	};
+	const inventing = new Map<SentenceFrame, boolean>();
 	let best: Built | null = null;
 	let bestDistance = Infinity;
 	let bestTooLong = false;
@@ -2380,7 +2470,7 @@ function generateOne(language: WordLanguage, settings: Settings, draw: Draw): Bu
 		// filtered: a shape that missed by two characters can still make it on the
 		// next draw, and dropping it left a language whose short shape was the only
 		// one in range settling for whatever it had.
-		const frame = pickFrame(usable, (candidate) => {
+		const weigh = (candidate: SentenceFrame): number => {
 			const fit =
 				attempt > 0 && bestDistance > 0
 					? (() => {
@@ -2400,7 +2490,29 @@ function generateOne(language: WordLanguage, settings: Settings, draw: Draw): Bu
 			const fuller = draw.beat && candidate.parts.length >= 3 ? 2 : 1;
 
 			return fit * preferred * fuller;
-		});
+		};
+		let frame = pickFrame(usable, weigh);
+
+		if (steered) {
+			let left = usable;
+
+			while (left.length > 1) {
+				let invents = inventing.get(frame);
+
+				if (invents === undefined) {
+					invents = inventsLead(frame);
+					inventing.set(frame, invents);
+				}
+
+				if (!invents) {
+					break;
+				}
+
+				left = left.filter((each) => each !== frame);
+				frame = pickFrame(left, weigh);
+			}
+		}
+
 		const modifyChance = modifyChanceFor(
 			attempt === 0 ? 0 : bestDistance,
 			bestTooLong,
@@ -2534,34 +2646,11 @@ function compose(
 ): Built {
 	const follow = draw.follow;
 	const themes = requested.length ? requested : WORD_THEMES;
-	// A shape with a `state` part is headed by one and a shape with a `verb` part by
-	// that; a shape with neither is a copular one, which equates its subject to the
-	// date or the clock it carries and takes the language's copula for a predicate.
-	const headed = frame.parts.some((part) => part.slot === 'state')
-		? 'state'
-		: frame.parts.some((part) => part.slot === 'verb')
-			? 'verb'
-			: 'copula';
+	const headed = headOf(frame);
 	// A shape whose predicate has nothing to say about the requested subject only
 	// gets this far when no shape of the language did, so the fallback is the same
 	// best effort every other narrowing here makes.
-	const groups =
-		headed === 'copula'
-			? [data.calendar!.copula as StateGroup | VerbGroup]
-			: headed === 'state'
-				? (stateGroupsFor(language, data, settings.vocabulary, themes, frame, plan, draw.beat) as (
-						StateGroup | VerbGroup
-					)[])
-				: (verbGroupsFor(
-						language,
-						data,
-						settings.vocabulary,
-						frame,
-						themes,
-						plan,
-						draw.beat,
-						subjectNounOf(frame, plan, follow)
-					) as (StateGroup | VerbGroup)[]);
+	const groups = predicateGroupsFor(language, data, settings, frame, plan, themes, draw);
 	// Which part is the subject is the shape's business, not the slot's: a counted
 	// shape has no `subject` part and its quantity is the subject. Looking for a
 	// `subject` part regardless is how a word required into a counted subject lost
@@ -2631,13 +2720,7 @@ function compose(
 			? settings.prefix
 			: '';
 	const offered = groups.length ? groups : headedFallback(data, frame, headed);
-	const leadingGroups = leading
-		? offered.filter((each) =>
-				subjectThemesOf(each, themes, language, data, settings.vocabulary).some((theme) =>
-					holdsPrefix(settings, subjectPoolFor(language, data, each, theme, settings.vocabulary))
-				)
-			)
-		: [];
+	const leadingGroups = leading ? leadingGroupsOf(language, data, settings, offered, themes) : [];
 	const group = pick(leadingGroups.length ? leadingGroups : offered);
 	// The same predicates, in the form this type of sentence ends on, in the tense
 	// the result is in — or in the form that links a first clause to the one after

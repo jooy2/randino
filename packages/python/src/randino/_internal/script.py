@@ -169,3 +169,42 @@ def ends_with_liquid(text: str) -> bool:
         _HANGUL_BASE <= code <= _HANGUL_LAST
         and (code - _HANGUL_BASE) % _HANGUL_FINALS == _HANGUL_LIQUID
     )
+
+
+# Hiragana and katakana sit 0x60 code points apart, kana for kana, from `ぁ` / `ァ` to
+# `ゖ` / `ヶ`.
+_HIRAGANA_FIRST = 0x3041
+_HIRAGANA_LAST = 0x3096
+_KATAKANA_FIRST = 0x30A1
+_KATAKANA_LAST = 0x30F6
+_KANA_SHIFT = 0x60
+
+
+def kana_like(text: str, like: str) -> str:
+    """`text` written in the kana `like` ends on.
+
+    Hiragana after a hiragana `like`, katakana after a katakana one, and unchanged
+    after anything else. Japanese spells a word in one of the two, so an invented word
+    that opens on the `か` a caller asked for goes on in hiragana rather than in the
+    katakana its syllables are written in: `かよ`, never `かヨ`.
+
+    Args:
+        text: The text to write.
+        like: The text whose last character decides the kana.
+
+    Returns:
+        `text`, its kana shifted to the kind `like` ends on.
+    """
+    code = ord(like[-1]) if like else 0
+
+    if _HIRAGANA_FIRST <= code <= _HIRAGANA_LAST:
+        first, last, shift = _KATAKANA_FIRST, _KATAKANA_LAST, -_KANA_SHIFT
+    elif _KATAKANA_FIRST <= code <= _KATAKANA_LAST:
+        first, last, shift = _HIRAGANA_FIRST, _HIRAGANA_LAST, _KANA_SHIFT
+    else:
+        return text
+
+    return "".join(
+        chr(ord(character) + shift) if first <= ord(character) <= last else character
+        for character in text
+    )

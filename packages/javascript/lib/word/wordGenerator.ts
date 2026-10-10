@@ -17,6 +17,7 @@ import {
 	resolveRealism,
 	resolveVocabulary
 } from '../_internal/generate.js';
+import { kanaLike } from '../_internal/script.js';
 import { capitalizeFirst } from '../_internal/utils.js';
 import type {
 	ModifierKind,
@@ -325,11 +326,12 @@ export function synthWord(syn: WordSynthesis, min: number, max: number, prefix: 
 		let out = prefix;
 
 		for (let i = out.length; i < count; i += 1) {
-			// Avoid immediately repeating a character (狼狼).
-			let next = pick(syn.pool);
+			// Avoid immediately repeating a character (狼狼), and go on in the kana the
+			// requested first character is written in.
+			let next = kanaLike(pick(syn.pool), prefix);
 
 			for (let tries = 0; tries < 3 && next === out.slice(-1); tries += 1) {
-				next = pick(syn.pool);
+				next = kanaLike(pick(syn.pool), prefix);
 			}
 
 			out += next;

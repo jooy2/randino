@@ -2385,6 +2385,60 @@ String _agreeBy(WordAgreement rules, String word, WordGender? gender) {
 /// reserved their shortest — which is how a narrow range drops a modifier rather
 /// than overshooting a word, and how the subject's gender is in hand before the
 /// adjective that has to agree with it.
+/// Whether [group] takes a subject on the character `startsWith` asked for.
+bool _leads(
+  WordLanguage language,
+  SentenceLanguageData data,
+  _Settings settings,
+  Object group,
+  List<WordTheme> themes,
+) => _subjectThemesOf(language, data, group, themes, settings.vocabulary).any(
+  (theme) =>
+      _holdsPrefix(settings, _subjectPoolFor(language, data, group, theme, settings.vocabulary)),
+);
+
+/// Whether a shape that opens on its subject would have to invent one on the
+/// character `startsWith` asked for, because none of its predicates takes a
+/// subject on it.
+bool _inventsLead(
+  WordLanguage language,
+  SentenceLanguageData data,
+  _Settings settings,
+  SentenceFrame frame,
+  _Plan plan,
+  List<WordTheme> themes,
+  _Draw draw,
+) {
+  final first = frame.parts.first;
+  final subjectSlot = _subjectSlotOf(frame);
+
+  if (first.slot != subjectSlot ||
+      first.head != null ||
+      _requiredAt(frame, plan, subjectSlot) != null) {
+    return false;
+  }
+
+  final copular =
+      !frame.parts.any((part) => part.slot == SentenceSlot.state || part.slot == SentenceSlot.verb);
+  final List<Object> groups =
+      copular
+          ? <Object>[data.calendar!.copula]
+          : frame.parts.any((part) => part.slot == SentenceSlot.state)
+          ? _stateGroupsFor(language, data, settings.vocabulary, themes, frame, plan, draw.beat)
+          : _verbGroupsFor(
+            language,
+            data,
+            settings.vocabulary,
+            frame,
+            themes,
+            plan,
+            draw.beat,
+            _subjectNounOf(frame, plan, draw.follow),
+          );
+
+  return !groups.any((group) => _leads(language, data, settings, group, themes));
+}
+
 _Built _compose(
   WordLanguage language,
   SentenceLanguageData data,
@@ -2497,20 +2551,12 @@ _Built _compose(
               _requiredAt(frame, plan, subjectSlot) == null
           ? settings.prefix
           : '';
-  bool leads(Object group) => _subjectThemesOf(
-    language,
-    data,
-    group,
-    themes,
-    settings.vocabulary,
-  ).any(
-    (theme) =>
-        _holdsPrefix(settings, _subjectPoolFor(language, data, group, theme, settings.vocabulary)),
-  );
   List<T> leadingOf<T extends Object>(List<T> groups) {
     if (leading.isEmpty) return groups;
 
-    final held = groups.where(leads).toList(growable: false);
+    final held = groups
+        .where((group) => _leads(language, data, settings, group, themes))
+        .toList(growable: false);
 
     return held.isNotEmpty ? held : groups;
   }
@@ -3437,6 +3483,22 @@ _Built _generateOne(WordLanguage language, _Settings settings, _Draw draw) {
           ? const <SentenceFrame>[]
           : frames.where(buildable).toList(growable: false);
   final usable = fitting.isNotEmpty ? fitting : (loose.isNotEmpty ? loose : frames);
+  // `_compose` leads with a subject on the `startsWith` character where the
+  // shape opens on its subject, and a shape whose predicates take no subject on
+  // it has to invent one: `かヌゾが…` at `RandRealism.real`, while another shape
+  // had a real word. Such a shape is drawn again when the language has a real
+  // word on the character at all, and kept when it has none, because then an
+  // invented word is the only answer. Asked of the shape drawn rather than of
+  // them all: walking every verb group against every shape doubled a call.
+  final themes = requested.isNotEmpty ? requested : wordThemes;
+  final steered =
+      settings.prefix.isNotEmpty &&
+      follow == null &&
+      draw.speech == null &&
+      !draw.spoken &&
+      data.articles == null &&
+      themes.any((theme) => _holdsPrefix(settings, _nounsOf(language, theme, settings.vocabulary)));
+  final inventing = <SentenceFrame, bool>{};
   _Built? best;
   var bestDistance = 1 << 30;
   var bestTooLong = false;
@@ -3447,7 +3509,7 @@ _Built _generateOne(WordLanguage language, _Settings settings, _Draw draw) {
     // better for carrying what the story would rather it carried — the place it
     // is all happening in — and for saying a little more than the bare subject
     // and verb.
-    final frame = _pickFrame(usable, (candidate) {
+    int weigh(SentenceFrame candidate) {
       var weight = 1;
 
       if (attempt > 0 && bestDistance > 0) {
@@ -3467,7 +3529,33 @@ _Built _generateOne(WordLanguage language, _Settings settings, _Draw draw) {
       }
 
       return weight;
-    });
+    }
+
+    var frame = _pickFrame(usable, weigh);
+
+    if (steered) {
+      var left = usable;
+
+      while (left.length > 1 &&
+          inventing.putIfAbsent(
+            frame,
+            () => _inventsLead(
+              language,
+              data,
+              settings,
+              frame,
+              placements[frame]!.plan,
+              themes,
+              draw,
+            ),
+          )) {
+        final drawn = frame;
+
+        left = left.where((each) => each != drawn).toList(growable: false);
+        frame = _pickFrame(left, weigh);
+      }
+    }
+
     final built = _compose(
       language,
       data,

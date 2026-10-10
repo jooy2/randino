@@ -128,3 +128,37 @@ bool endsWithLiquid(String text) {
       code <= _hangulLast &&
       (code - _hangulBase) % _hangulFinals == _hangulLiquid;
 }
+
+// Hiragana and katakana sit 0x60 code points apart, kana for kana, from `ぁ` /
+// `ァ` to `ゖ` / `ヶ`.
+const int _hiraganaFirst = 0x3041;
+const int _hiraganaLast = 0x3096;
+const int _katakanaFirst = 0x30a1;
+const int _katakanaLast = 0x30f6;
+const int _kanaShift = 0x60;
+
+/// [text] written in the kana [like] ends on: hiragana after a hiragana [like],
+/// katakana after a katakana one, and unchanged after anything else. Japanese
+/// spells a word in one of the two, so an invented word that opens on the `か`
+/// a caller asked for goes on in hiragana rather than in the katakana its
+/// syllables are written in: `かよ`, never `かヨ`.
+String kanaLike(String text, String like) {
+  if (like.isEmpty) return text;
+
+  final code = like.runes.last;
+  final int from;
+  final int to;
+  final int shift;
+
+  if (code >= _hiraganaFirst && code <= _hiraganaLast) {
+    (from, to, shift) = (_katakanaFirst, _katakanaLast, -_kanaShift);
+  } else if (code >= _katakanaFirst && code <= _katakanaLast) {
+    (from, to, shift) = (_hiraganaFirst, _hiraganaLast, _kanaShift);
+  } else {
+    return text;
+  }
+
+  return String.fromCharCodes(
+    text.runes.map((point) => point >= from && point <= to ? point + shift : point),
+  );
+}

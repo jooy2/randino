@@ -240,6 +240,25 @@ void main() {
       )) {
         expect(word, matches(RegExp(r'^Z[A-Za-z]+$')), reason: word);
       }
+
+      // And it goes on in the kana its first character is written in: the
+      // syllables are katakana, and `かヨ` was half one and half the other.
+      const kana = <(String, String)>[
+        ('か', r'^か[\u3041-\u309f]+$'),
+        ('ゑ', r'^ゑ[\u3041-\u309f]+$'),
+        ('カ', r'^カ[\u30a1-\u30ff]+$'),
+      ];
+
+      for (final (prefix, pattern) in kana) {
+        for (final word in randWord(
+          language: WordLanguage.ja,
+          realism: RandRealism.invented,
+          count: 20,
+          startsWith: prefix,
+        )) {
+          expect(word, matches(RegExp(pattern, unicode: true)), reason: word);
+        }
+      }
     });
 
     test('a startsWith the language does not write is answered with nothing', () {

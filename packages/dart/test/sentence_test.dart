@@ -1200,11 +1200,14 @@ void main() {
     test('a subject led by `startsWith` is a real noun where the pools have one', () {
       // The theme used to be chosen before the word, so a theme with nothing on
       // the character invented one at `realism: RandRealism.real` — `여젤은
-      // 시들합니다` — while another theme had `여우`.
+      // 시들합니다` — while another theme had `여우`. And a shape whose verbs take
+      // no subject on the character invented one too, while another shape had a
+      // real word: `かヌゾ` opened about one Japanese sentence in five on `か`.
       const cases = <(WordLanguage, String)>[
         (WordLanguage.ko, '여'),
         (WordLanguage.ko, '사'),
         (WordLanguage.zh, '大'),
+        (WordLanguage.ja, 'か'),
       ];
 
       for (final (language, prefix) in cases) {

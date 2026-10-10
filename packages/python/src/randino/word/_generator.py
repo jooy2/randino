@@ -19,6 +19,7 @@ from randino._internal.generate import (
     resolve_realism,
     resolve_vocabulary,
 )
+from randino._internal.script import kana_like
 from randino._internal.utils import (
     capitalize_first,
     chance,
@@ -369,13 +370,14 @@ def synth_word(syn: WordSynthesis, low: int, high: int, prefix: str) -> str:
         out = prefix
 
         for _ in range(len(out), count):
-            # Avoid immediately repeating a character (狼狼).
-            following = pick(syn.pool)
+            # Avoid immediately repeating a character (狼狼), and go on in the kana the
+            # requested first character is written in.
+            following = kana_like(pick(syn.pool), prefix)
 
             for _tries in range(3):
                 if following != out[-1:]:
                     break
-                following = pick(syn.pool)
+                following = kana_like(pick(syn.pool), prefix)
 
             out += following
 

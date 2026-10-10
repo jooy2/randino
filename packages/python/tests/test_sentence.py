@@ -876,8 +876,10 @@ def test_sentences_respect_the_length_range() -> None:
 def test_a_subject_led_by_starts_with_is_a_real_noun_where_the_pools_have_one() -> None:
     # The theme used to be chosen before the word, so a theme with nothing on the
     # character invented one at `realism="real"` — `여젤은 시들합니다` — while another
-    # theme had `여우`.
-    cases: list[tuple[WordLanguage, str]] = [("ko", "여"), ("ko", "사"), ("zh", "大")]
+    # theme had `여우`. And a shape whose verbs take no subject on the character
+    # invented one too, while another shape had a real word: `かヌゾ` opened about one
+    # Japanese sentence in five on `か`.
+    cases: list[tuple[WordLanguage, str]] = [("ko", "여"), ("ko", "사"), ("zh", "大"), ("ja", "か")]
 
     for language, prefix in cases:
         nouns = [noun for pool in WORD_DATA[language].nouns.values() for noun in pool]

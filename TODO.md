@@ -66,7 +66,6 @@ A fix to a generator added under `vNext` needs no changelog entry of its own, si
 
 ### Found while working
 
-- **A74. A steered `startsWith` can still invent the subject at `realism: 'real'`.** `randSentence({ language: 'ja', startsWith: 'か' })` writes an invented subject in about one result in five (`かヌゾがトンネルに到着します`), half hiragana and half katakana. The frame is chosen before `compose` steers, so a shape whose groups hold no subject on the character — a copular one, or one whose verbs take few classes — falls through to `drawWord`, which synthesizes a word on the prefix in the template's own script. Prefer the frames that can lead with the character in `generateOne`, and keep an invented word on a prefix in the prefix's script.
 
 ## Further ideas, not yet agreed
 

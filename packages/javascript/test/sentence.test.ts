@@ -1171,11 +1171,14 @@ describe('Sentence', () => {
 	it('a subject led by `startsWith` is a real noun where the pools have one', () => {
 		// The theme used to be chosen before the word, so a theme with nothing on the
 		// character invented one at `realism: 'real'` — `여젤은 시들합니다` — while
-		// another theme had `여우`.
+		// another theme had `여우`. And a shape whose verbs take no subject on the
+		// character invented one too, while another shape had a real word: `かヌゾ`
+		// opened about one Japanese sentence in five on `か`.
 		for (const [language, prefix] of [
 			['ko', '여'],
 			['ko', '사'],
-			['zh', '大']
+			['zh', '大'],
+			['ja', 'か']
 		] as [WordLanguage, string][]) {
 			const nouns = Object.values(WORD_DATA[language].nouns).flat();
 

@@ -249,6 +249,23 @@ describe('Word', () => {
 		for (const word of randWord({ language: 'en', theme: 'gem', count: 20, startsWith: 'Z' })) {
 			assert.match(word, /^Z[A-Za-z]+$/, word);
 		}
+
+		// And it goes on in the kana its first character is written in: the syllables
+		// are katakana, and `かヨ` was half one and half the other.
+		for (const [prefix, kana] of [
+			['か', /^か[\u3041-\u309f]+$/],
+			['ゑ', /^ゑ[\u3041-\u309f]+$/],
+			['カ', /^カ[\u30a1-\u30ff]+$/]
+		] as [string, RegExp][]) {
+			for (const word of randWord({
+				language: 'ja',
+				realism: 'invented',
+				count: 20,
+				startsWith: prefix
+			})) {
+				assert.match(word, kana, word);
+			}
+		}
 	});
 
 	it('a startsWith the language does not write is answered with nothing', () => {

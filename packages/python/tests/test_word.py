@@ -229,6 +229,18 @@ def test_starts_with_leads_every_word_with_the_requested_character() -> None:
     for word in rand_word(language="en", theme="gem", count=20, starts_with="Z"):
         assert re.fullmatch(r"Z[A-Za-z]+", word), word
 
+    # And it goes on in the kana its first character is written in: the syllables are
+    # katakana, and `かヨ` was half one and half the other.
+    kana = [
+        ("か", r"か[\u3041-\u309f]+"),
+        ("ゑ", r"ゑ[\u3041-\u309f]+"),
+        ("カ", r"カ[\u30a1-\u30ff]+"),
+    ]
+
+    for prefix, pattern in kana:
+        for word in rand_word(language="ja", realism="invented", count=20, starts_with=prefix):
+            assert re.fullmatch(pattern, word), word
+
 
 def test_a_starts_with_the_language_does_not_write_is_answered_with_nothing() -> None:
     # A character from another script is one the language can never begin a word
