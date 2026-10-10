@@ -22,17 +22,33 @@ import {
  * ports of it.
  */
 
-/** `<Lang js="minLength" py="min_length" code />` → `` `minLength` ``. */
+/**
+ * `<Lang js="minLength" py="min_length" code />` → `` `minLength` ``.
+ *
+ * The attributes are matched whole, quoted value and all, an escaped quote
+ * included (`py="\"real\""`). A value may hold a `>` — `js="() => number"` —
+ * and matching up to the first `>` left that tag in the text, on every page that
+ * documents `random`.
+ */
 export function inlineLang(markdown: string): string {
-	return markdown.replace(/<Lang\s+([^>]*?)\/>/g, (_, attrs: string) => {
-		const js = attrs.match(/\bjs="([^"]*)"/)?.[1];
+	return markdown.replace(
+		/<Lang((?:\s+[\w-]+(?:="(?:[^"\\]|\\.)*")?)*)\s*\/>/g,
+		(_, attrs: string) => {
+			const values = new Map<string, string>();
 
-		if (js === undefined) {
-			return '';
+			for (const [, name, value] of attrs.matchAll(/([\w-]+)(?:="((?:[^"\\]|\\.)*)")?/g)) {
+				values.set(name, value ?? '');
+			}
+
+			const js = values.get('js');
+
+			if (js === undefined) {
+				return '';
+			}
+
+			return values.has('code') ? `\`${js}\`` : js;
 		}
-
-		return /\bcode\b/.test(attrs) ? `\`${js}\`` : js;
-	});
+	);
 }
 
 /**
