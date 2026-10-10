@@ -102,7 +102,8 @@ def rand_sentence(
     """Generate whole sentences, written the way the language writes them.
 
     A subject and something said about it. The words are the same everyday vocabulary
-    `rand_word` draws from, and person names are never used. A verb states what can do
+    `rand_word` draws from, and a person in one is sometimes written by a name
+    (`include_name`). A verb states what can do
     it and what it can be done to, so the words of one sentence belong together:
     `여우가 사과를 먹는다` comes out, and the same shape never puts an idea where the
     apple is.
@@ -145,10 +146,10 @@ def rand_sentence(
             keeps the tense, the level and the register it opened in.
         include_name: Whether a sentence about a person writes a generated name where
             that person would go — `Emma runs quietly.`, `민준이 조용히 달린다.`
-            Turning it on narrows the subject to the themes that name people; a `theme`
-            you named yourself still wins. The name is a bare given name, and it
-            carries its own gender, so what agrees with a subject agrees with it. Off
-            by default because it is the one option that reaches the person-name pools.
+            None decides it per result, about one in two. True narrows the subject to the
+            themes that name people; a `theme` you named yourself still wins, and so does
+            a `story` no person can be the hero of. The name is a bare given name, and it
+            carries its own gender, so what agrees with a subject agrees with it.
         type: What the sentences are doing — saying something, asking it, exclaiming it,
             quoting somebody, or trailing off. A sequence or `"all"` decides per
             sentence, and that decision is weighted rather than even, because prose is:

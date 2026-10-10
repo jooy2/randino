@@ -4,7 +4,8 @@ import { generateSentenceDetails } from './sentenceGenerator.js';
 /**
  * Generate whole sentences — a subject and something said about it, written the
  * way the language writes it. The words are the same everyday vocabulary
- * `randWord` draws from, and person names are never used.
+ * `randWord` draws from, and a person in one is sometimes written by a name
+ * (`includeName`).
  *
  * A verb states what can do it and what it can be done to, so the words of one
  * sentence belong together: `여우가 사과를 먹는다` comes out, and the same shape

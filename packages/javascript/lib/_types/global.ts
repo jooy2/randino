@@ -640,18 +640,19 @@ export interface RandSentenceOptions extends RandCommonOptions {
 	story?: SentenceStory;
 	/**
 	 * Whether a sentence about a person writes a generated name where that person
-	 * would go — `Emma runs quietly.`, `민준이 조용히 달린다.` Default `false`.
+	 * would go — `Emma runs quietly.`, `민준이 조용히 달린다.` Left out, it is decided
+	 * per result, about one in two.
 	 *
-	 * Turning it on narrows the subject to the themes that name people, so that the
+	 * `true` narrows the subject to the themes that name people, so that the
 	 * sentence has somewhere to put one; a `theme` you named yourself is still
-	 * honoured, and a sentence about a lion stays about a lion. The name is a bare
-	 * given name — no article and no modifier — and it carries its own gender, so
-	 * what agrees with a subject agrees with it.
+	 * honoured, and a sentence about a lion stays about a lion, as is a `story` no
+	 * person can be the hero of. The name is a bare given name — no article and no
+	 * modifier — and it carries its own gender, so what agrees with a subject agrees
+	 * with it. `false` writes no name.
 	 *
-	 * Off by default because it is the one option that reaches the person-name
-	 * pools: a caller who never asks for a name never pays for them. It does not
-	 * weaken the rule that a nickname is never built from a person name — this is a
-	 * sentence, and you asked.
+	 * It is the one option that reaches the person-name pools, so they are in any
+	 * bundle that reaches `randSentence`. It does not weaken the rule that a
+	 * nickname is never built from a person name — this is a sentence.
 	 */
 	includeName?: boolean;
 	/**
@@ -713,8 +714,8 @@ export interface SentenceDetail {
 	/** What each phrase does in the sentence, at the same index as `phrases`. */
 	slots: SentenceSlot[];
 	/**
-	 * The person names the result was written with, in order, and empty unless
-	 * `includeName` asked for them. Every one of them is also a phrase.
+	 * The person names the result was written with, in order, and empty when it
+	 * wrote none. Every one of them is also a phrase.
 	 */
 	names: string[];
 	/** What each sentence is doing, at the same index as `sentences`. */

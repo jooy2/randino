@@ -57,7 +57,7 @@ sentence_length_range()  # (4, 147) — 모든 언어를 한꺼번에
 
 ```javascript
 randSentence({ language: 'en', minLength: 14, maxLength: 26, count: 3 });
-// ['The brave wine gathers.', 'The oni lifts the icy tea.', 'The toe aches in the lake.']
+// ['The old obsidian is rare.', 'Roger slumps in the grove.', 'Geraldine scours.']
 ```
 
 :::
@@ -66,7 +66,7 @@ randSentence({ language: 'en', minLength: 14, maxLength: 26, count: 3 });
 
 ```dart
 randSentence(language: WordLanguage.en, minLength: 14, maxLength: 26, count: 3);
-// [The brave wine gathers., The oni lifts the icy tea., The toe aches in the lake.]
+// [The old obsidian is rare., Roger slumps in the grove., Geraldine scours.]
 ```
 
 :::
@@ -75,7 +75,7 @@ randSentence(language: WordLanguage.en, minLength: 14, maxLength: 26, count: 3);
 
 ```python
 rand_sentence(language="en", min_length=14, max_length=26, count=3)
-# ['The brave wine gathers.', 'The oni lifts the icy tea.', 'The toe aches in the lake.']
+# ['The old obsidian is rare.', 'Roger slumps in the grove.', 'Geraldine scours.']
 ```
 
 :::

@@ -37,13 +37,13 @@ It is not a promise that every sentence means something. A lion can bake a puddi
 
 Every language writes out the shapes its own grammar allows, in its own word order, with the particle or preposition each phrase needs. Korean closes on its verb, English puts it second, and Chinese frames the action before it:
 
-| Language | A sentence                                          |
-| -------- | --------------------------------------------------- |
-| Korean   | `검은 고양이가 숲에서 잠잔다.`                      |
-| Japanese | `ハンバーガーが暗礁で冷める。`                      |
-| Chinese  | `巨乌贼又品尝朱红椰汁。`                            |
-| English  | `The angler cleans the towel in the ivory balcony.` |
-| German   | `Im Frühling blüht eine Chrysantheme noch.`         |
+| Language | A sentence                                   |
+| -------- | -------------------------------------------- |
+| Korean   | `검은 고양이가 숲에서 잠잔다.`               |
+| Japanese | `ハンバーガーが暗礁で冷める。`               |
+| Chinese  | `巨乌贼又品尝朱红椰汁。`                     |
+| English  | `On a foggy day, Albert snores in the dune.` |
+| German   | `Im Frühling blüht eine Chrysantheme noch.`  |
 
 Two consequences follow.
 

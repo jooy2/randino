@@ -373,7 +373,7 @@ class SentenceDetail:
     names: tuple[str, ...]
     """The person names the result was written with, in order.
 
-    Empty unless `include_name` asked for them. Every one of them is also a phrase.
+    Empty when it wrote none. Every one of them is also a phrase.
     """
 
     types: tuple[SentenceType, ...]

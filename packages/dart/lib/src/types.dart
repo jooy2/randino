@@ -594,8 +594,7 @@ class SentenceDetail {
 
   /// The person names the result was written with, in order.
   ///
-  /// Empty unless `includeName` asked for them. Every one of them is also a
-  /// phrase.
+  /// Empty when it wrote none. Every one of them is also a phrase.
   final List<String> names;
 
   /// What each sentence is doing, at the same index as [sentences].

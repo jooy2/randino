@@ -6,8 +6,8 @@ import 'package:randino/src/types.dart';
 /// Generate whole sentences — a subject and something said about it, written the
 /// way the language writes it.
 ///
-/// The words are the same everyday vocabulary `randWord` draws from, and person
-/// names are never used. A verb states what can do it and what it can be done
+/// The words are the same everyday vocabulary `randWord` draws from, and a
+/// person in one is sometimes written by a name ([includeName]). A verb states what can do it and what it can be done
 /// to, so the words of one sentence belong together: `여우가 사과를 먹는다`
 /// comes out, and the same shape never puts an idea where the apple is.
 ///
@@ -32,8 +32,10 @@ import 'package:randino/src/types.dart';
 /// `minLength` and `maxLength` describe the whole string whatever this is.
 ///
 /// [includeName] writes a generated person's name where a sentence has room for
-/// one — `Emma runs quietly.`, `민준이 조용히 달린다.` It narrows the subject to
-/// the themes that name people; a [theme] you named yourself still wins. The
+/// one — `Emma runs quietly.`, `민준이 조용히 달린다.` Left null, it is decided
+/// per result, about one in two. `true` narrows the subject to the themes that
+/// name people; a [theme] you named yourself still wins, and so does a [story]
+/// no person can be the hero of. The
 /// name is a bare given name, and it carries its own gender, so what agrees with
 /// a subject agrees with it.
 ///

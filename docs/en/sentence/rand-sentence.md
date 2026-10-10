@@ -8,7 +8,7 @@ Generates whole sentences and returns `count` of them as strings. Each one is a 
 import { randSentence } from 'randino';
 
 randSentence();
-// ['The satin ranger dances in the plush harborside.']
+// ['Frank stubbornly tastes the soju in the silent crypt.']
 ```
 
 :::
@@ -19,7 +19,7 @@ randSentence();
 import 'package:randino/randino.dart';
 
 randSentence();
-// ['The satin ranger dances in the plush harborside.']
+// ['Frank stubbornly tastes the soju in the silent crypt.']
 ```
 
 :::
@@ -30,12 +30,12 @@ randSentence();
 from randino import rand_sentence
 
 rand_sentence()
-# ['The satin ranger dances in the plush harborside.']
+# ['Frank stubbornly tastes the soju in the silent crypt.']
 ```
 
 :::
 
-The words are the same everyday vocabulary [`randWord`](../word/rand-word) draws from, and **person names are never used**. What a sentence adds to them is the grammar: see [Sentences](./) for how the shapes and the verbs decide what can stand where.
+The words are the same everyday vocabulary [`randWord`](../word/rand-word) draws from, and a person in a sentence is sometimes written by a name (see [`includeName`](#a-persons-name)). What a sentence adds to them is the grammar: see [Sentences](./) for how the shapes and the verbs decide what can stand where.
 
 ## Options
 
@@ -489,10 +489,10 @@ Russian declares no calendar, so asking for one falls back the way any unanswera
 
 ```javascript
 randSentence({ language: 'en', include: 'lion', count: 3 });
-// ['The genial lion finds the grumpy vest.', 'The noble lion is new.', 'The narrow lion crawls in the ancient pulsar.']
+// ['The quick lion kept back the worn projector.', 'The lion welcomes the prisoner.', 'The gruff lion sprints.']
 
 randSentence({ language: 'en', include: ['brave', 'lion', 'quietly'], count: 3 });
-// ['The brave lion walks quietly.', 'The brave lion dozes quietly.', 'The brave lion swims quietly.']
+// ['The brave lion gulps quietly.', 'The brave lion rouses quietly.', 'The brave lion hurried off quietly.']
 
 randSentence({ language: 'ko', include: ['사자', '조용히'], count: 2 });
 // ['눈꽃 사자가 조용히 뻔뻔한 토스터를 옮긴다.', '사자가 조용히 다가온다.']
@@ -504,14 +504,14 @@ randSentence({ language: 'ko', include: ['사자', '조용히'], count: 2 });
 
 ```dart
 randSentence(language: WordLanguage.en, include: <String>['lion'], count: 3);
-// [The genial lion finds the grumpy vest., The noble lion is new.]
+// [The quick lion kept back the worn projector., The lion welcomes the prisoner.]
 
 randSentence(
   language: WordLanguage.en,
   include: <String>['brave', 'lion', 'quietly'],
   count: 3,
 );
-// [The brave lion walks quietly., The brave lion dozes quietly.]
+// [The brave lion gulps quietly., The brave lion rouses quietly.]
 
 randSentence(language: WordLanguage.ko, include: <String>['사자', '조용히'], count: 2);
 // [눈꽃 사자가 조용히 뻔뻔한 토스터를 옮긴다., 사자가 조용히 다가온다.]
@@ -523,10 +523,10 @@ randSentence(language: WordLanguage.ko, include: <String>['사자', '조용히']
 
 ```python
 rand_sentence(language="en", include="lion", count=3)
-# ['The genial lion finds the grumpy vest.', 'The noble lion is new.']
+# ['The quick lion kept back the worn projector.', 'The lion welcomes the prisoner.']
 
 rand_sentence(language="en", include=["brave", "lion", "quietly"], count=3)
-# ['The brave lion walks quietly.', 'The brave lion dozes quietly.']
+# ['The brave lion gulps quietly.', 'The brave lion rouses quietly.']
 
 rand_sentence(language="ko", include=["사자", "조용히"], count=2)
 # ['눈꽃 사자가 조용히 뻔뻔한 토스터를 옮긴다.', '사자가 조용히 다가온다.']
@@ -1043,7 +1043,7 @@ The day only moves forward. A story that opened `at dawn` goes on `in the mornin
 
 Two neighbouring steps are sometimes one sentence, with the second clause written without its subject: `사원에서 멈춰서고 천천히 집에 들어섰다`, `The broker heads back to the cottage and leans warily`, `記念館へ下りる。のんびり家に帰り着いてさらりともたれる。` A language declares how it joins two clauses — Korean's `-고` on the first verb, English's `and`, Japanese's `-て` — and German declares nothing, so it never joins. The joins come off the length budget like everything else, so a narrow range writes two short sentences where a wide one writes one long one.
 
-A person sometimes speaks. A state sentence about a person — hungry, tired, glad — is now and then a line they say or think rather than a sentence the story narrates: `“배고파.”`, `‘I am tired.’`, `「くたくたです！」`. It is quoted, in the first person, at a level a person speaks at whatever the story's own, never the first sentence and never more than twice in one result, and only in the languages that can write a first person without changing the predicate: Korean, Japanese, Chinese, Vietnamese and English. An animal is narrated, and so is everybody in Spanish, Italian, German and Russian. A caller who named `type` gets those kinds instead.
+Only a person speaks: a story about an animal, a thing or a place is narrated all the way through. A line is never the first sentence, and one telling has at most two of them, answers included — four in a scene of speech, and up to five in `chat`, which is a conversation. Nobody speaks twice in a row, except that in a scene the hero may go on after being answered. A caller who named `type` gets those kinds and no voices at all.
 
 A person is not a kind of thing. A paragraph about Emma is about Emma: it names her again or stands a pronoun where she was, and never draws somebody else of the same kind. That last one would be a paragraph that quietly becomes about Sophie.
 
@@ -1257,7 +1257,7 @@ rand_sentence(language="ko", output="detail", count=1)
 | `sentences` | <Lang js="string[]" dart="List&lt;String&gt;" py="tuple[str, ...]" code /> | One entry per sentence. A single entry unless `sentences` asked for more. |
 | `phrases` | <Lang js="string[]" dart="List&lt;String&gt;" py="tuple[str, ...]" code /> | The phrases it is made of, in order — without the particles. One flat list across every sentence. |
 | `slots` | <Lang js="SentenceSlot[]" dart="List&lt;SentenceSlot&gt;" py="tuple[SentenceSlot, ...]" code /> | What each phrase does, at the same index as `phrases`. |
-| `names` | <Lang js="string[]" dart="List&lt;String&gt;" py="tuple[str, ...]" code /> | The person names the result was written with, in order. Empty unless `includeName` asked for them. |
+| `names` | <Lang js="string[]" dart="List&lt;String&gt;" py="tuple[str, ...]" code /> | The person names the result was written with, in order. Empty when it wrote none. |
 | `types` | <Lang js="SentenceType[]" dart="List&lt;SentenceType&gt;" py="tuple[SentenceType, ...]" code /> | What each sentence is doing, at the same index as `sentences`. |
 | `tense` | `SentenceTense` | When it happened. One tense for the whole result. |
 | `story` | <Lang js="SentenceStory &#124; null" dart="SentenceStory?" py="SentenceStory &#124; None" code /> | The story a result of several sentences told. Null for a result of one. |
@@ -1266,20 +1266,20 @@ rand_sentence(language="ko", output="detail", count=1)
 
 `phrases` holds the phrases and nothing else. The particle or preposition that marks one lives in `sentence` alone, so `그리핀이 …` reports `그리핀` and joining the phrases back together does not reproduce the sentence. Read `sentence` for the finished string, and `phrases` for what it was built from.
 
-Every sentence has exactly one `subject` and exactly one predicate, and that predicate is either a `verb` or a `state`, never both.
+A sentence has one predicate: a `verb` or a `state`, never both, or — in a shape that equates its subject with a day or a time — a `date` or a `clock` with the copula written onto it. Its subject is a `subject` phrase, or a counted `quantity` where the amount is what does the thing (`사과 12개가 익는다`). A sentence of a paragraph may carry no subject phrase at all, where the language leaves out a subject it has already named, and an answer one person gives another is written whole and reports no phrase.
 
 ## A first character {#a-first-character}
 
 `startsWith` keeps the sentences that begin with the character you asked for, and it is met two different ways depending on the language.
 
-A language that writes no article and puts a noun phrase first — Korean, Japanese, Chinese — is **steered**: the noun is drawn from the words that begin with the character, so nearly every draw lands.
+A language that writes no article — Korean, Japanese, Chinese, Vietnamese, Russian — is **steered** whenever the sentence opens on its subject: the verb is chosen among those that take a subject beginning with the character, and the subject is drawn from those words, so nearly every draw lands. A sentence that opens on anything else — a time, a connective, an interjection, a quotation mark — is drawn as usual and kept only if it happens to begin with the character.
 
 ```javascript
 randSentence({ language: 'ko', startsWith: '사', count: 3 });
 // ['사자가 달린다.', '사슴이 물을 마신다.', '사과가 익는다.']
 ```
 
-A language that writes an article, a preposition or an adverbial in front — English, Spanish, Italian, German, Russian — cannot be steered that way, because the first word of the sentence is not the noun. Those are **filtered**: sentences are drawn as usual and the ones that do not begin with the character are thrown away. A common opening letter comes back quickly; a rare one may come back with fewer results than you asked for, or with none.
+A language that writes an article in front of its noun — English, Spanish, Italian, German — cannot be steered that way, because the first word of the sentence is the article, not the noun. Those are **filtered**: sentences are drawn as usual and the ones that do not begin with the character are thrown away. A common opening letter comes back quickly; a rare one may come back with fewer results than you asked for, or with none.
 
 ```javascript
 randSentence({ language: 'es', startsWith: 'e', count: 3 }); // three, quickly — `el`, `en`
@@ -1301,7 +1301,7 @@ randSentence({ startsWith: 'ж', count: 2 }); // two Russian sentences
 
 ```javascript
 randSentence({ language: 'en', theme: 'animal', count: 3 });
-// ['The hippo sleeps in the starburst.', 'The sparrow approaches in the lightyear.', 'The puppy swallows the calm springwater briefly.']
+// ['The kitten laughed for a while.', 'The speckled squirrel ran to the windmill.', 'The bobcat is fidgety.']
 ```
 
 :::
@@ -1310,7 +1310,7 @@ randSentence({ language: 'en', theme: 'animal', count: 3 });
 
 ```dart
 randSentence(language: WordLanguage.en, theme: WordTheme.animal, count: 3);
-// [The hippo sleeps in the starburst., The sparrow approaches in the lightyear.]
+// [The kitten laughed for a while., The speckled squirrel ran to the windmill.]
 ```
 
 :::
@@ -1319,7 +1319,7 @@ randSentence(language: WordLanguage.en, theme: WordTheme.animal, count: 3);
 
 ```python
 rand_sentence(language="en", theme="animal", count=3)
-# ['The hippo sleeps in the starburst.', 'The sparrow approaches in the lightyear.']
+# ['The kitten laughed for a while.', 'The speckled squirrel ran to the windmill.']
 ```
 
 :::

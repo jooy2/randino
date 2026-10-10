@@ -8,7 +8,7 @@
 import { randSentence } from 'randino';
 
 randSentence();
-// ['The satin ranger dances in the plush harborside.']
+// ['Frank stubbornly tastes the soju in the silent crypt.']
 ```
 
 :::
@@ -19,7 +19,7 @@ randSentence();
 import 'package:randino/randino.dart';
 
 randSentence();
-// ['The satin ranger dances in the plush harborside.']
+// ['Frank stubbornly tastes the soju in the silent crypt.']
 ```
 
 :::
@@ -30,12 +30,12 @@ randSentence();
 from randino import rand_sentence
 
 rand_sentence()
-# ['The satin ranger dances in the plush harborside.']
+# ['Frank stubbornly tastes the soju in the silent crypt.']
 ```
 
 :::
 
-단어는 [`randWord`](../word/rand-word)가 뽑는 것과 같은 일상 어휘이며, **사람 이름은 쓰지 않습니다.** 문장이 거기에 더하는 것은 문법입니다. 형태와 동사가 무엇을 어디에 세울지 정하는 방식은 [문장](./)에서 설명합니다.
+단어는 [`randWord`](../word/rand-word)가 뽑는 것과 같은 일상 어휘이며, 사람이 나오는 문장에는 이름이 쓰이기도 합니다([`includeName`](#a-persons-name) 참고). 문장이 거기에 더하는 것은 문법입니다. 형태와 동사가 무엇을 어디에 세울지 정하는 방식은 [문장](./)에서 설명합니다.
 
 ## 옵션 {#options}
 
@@ -489,10 +489,10 @@ rand_sentence(language="de", slots="date", count=2)
 
 ```javascript
 randSentence({ language: 'en', include: 'lion', count: 3 });
-// ['The genial lion finds the grumpy vest.', 'The noble lion is new.', 'The narrow lion crawls in the ancient pulsar.']
+// ['The quick lion kept back the worn projector.', 'The lion welcomes the prisoner.', 'The gruff lion sprints.']
 
 randSentence({ language: 'en', include: ['brave', 'lion', 'quietly'], count: 3 });
-// ['The brave lion walks quietly.', 'The brave lion dozes quietly.', 'The brave lion swims quietly.']
+// ['The brave lion gulps quietly.', 'The brave lion rouses quietly.', 'The brave lion hurried off quietly.']
 
 randSentence({ language: 'ko', include: ['사자', '조용히'], count: 2 });
 // ['눈꽃 사자가 조용히 뻔뻔한 토스터를 옮긴다.', '사자가 조용히 다가온다.']
@@ -504,14 +504,14 @@ randSentence({ language: 'ko', include: ['사자', '조용히'], count: 2 });
 
 ```dart
 randSentence(language: WordLanguage.en, include: <String>['lion'], count: 3);
-// [The genial lion finds the grumpy vest., The noble lion is new.]
+// [The quick lion kept back the worn projector., The lion welcomes the prisoner.]
 
 randSentence(
   language: WordLanguage.en,
   include: <String>['brave', 'lion', 'quietly'],
   count: 3,
 );
-// [The brave lion walks quietly., The brave lion dozes quietly.]
+// [The brave lion gulps quietly., The brave lion rouses quietly.]
 
 randSentence(language: WordLanguage.ko, include: <String>['사자', '조용히'], count: 2);
 // [눈꽃 사자가 조용히 뻔뻔한 토스터를 옮긴다., 사자가 조용히 다가온다.]
@@ -523,10 +523,10 @@ randSentence(language: WordLanguage.ko, include: <String>['사자', '조용히']
 
 ```python
 rand_sentence(language="en", include="lion", count=3)
-# ['The genial lion finds the grumpy vest.', 'The noble lion is new.']
+# ['The quick lion kept back the worn projector.', 'The lion welcomes the prisoner.']
 
 rand_sentence(language="en", include=["brave", "lion", "quietly"], count=3)
-# ['The brave lion walks quietly.', 'The brave lion dozes quietly.']
+# ['The brave lion gulps quietly.', 'The brave lion rouses quietly.']
 
 rand_sentence(language="ko", include=["사자", "조용히"], count=2)
 # ['눈꽃 사자가 조용히 뻔뻔한 토스터를 옮긴다.', '사자가 조용히 다가온다.']
@@ -1016,7 +1016,7 @@ rand_sentence(language="en", sentences=4, story="meal", include_name=True)
 
 이웃한 두 단계는 때로 한 문장이 됩니다. 뒤 절은 주어 없이 씁니다. `사원에서 멈춰서고 천천히 집에 들어섰다`, `The broker heads back to the cottage and leans warily`, `記念館へ下りる。のんびり家に帰り着いてさらりともたれる。`처럼 됩니다. 두 절을 어떻게 잇는지는 언어가 선언합니다. 한국어는 앞 동사의 `-고`, 영어는 `and`, 일본어는 `-て`이고, 독일어는 선언하지 않아 절을 잇지 않습니다. 이음새도 다른 요소와 같이 길이 범위에서 값을 치르므로, 좁은 범위에서는 짧은 두 문장이 되고 넓은 범위에서는 긴 한 문장이 됩니다.
 
-사람은 이따금 말을 합니다. 사람이 배고프다거나 피곤하다거나 기쁘다는 상태문은 때때로 서술 대신 그 사람이 말하거나 생각하는 대사가 됩니다. `“배고파.”`, `‘I am tired.’`, `「くたくたです！」`처럼 따옴표 안에 1인칭으로, 이야기의 말투와 상관없이 사람이 말하는 높임으로 씁니다. 첫 문장은 대사가 되지 않고 한 결과에 두 번을 넘지 않으며, 술어를 바꾸지 않고 1인칭을 쓸 수 있는 한국어, 일본어, 중국어, 베트남어, 영어에서만 나옵니다. 동물은 서술만 하고, 스페인어와 이탈리아어와 독일어와 러시아어에서는 모두가 서술만 합니다. `type`을 지정하면 대사 대신 지정한 종류가 나옵니다.
+말을 하는 것은 사람뿐입니다. 동물이나 물건이나 장소가 주인공인 이야기는 처음부터 끝까지 서술만 합니다. 첫 문장은 대사가 되지 않고, 대사는 대답까지 합쳐 한 번 들려줄 때 두 번까지 나옵니다. 대화 장면이면 네 번까지, 대화 자체인 `chat`은 다섯 번까지입니다. 같은 사람이 두 번 연달아 말하지는 않지만, 대화 장면에서는 대답을 들은 주인공이 이어서 말할 수 있습니다. `type`을 지정하면 그 종류만 나오고 대사는 나오지 않습니다.
 
 주어가 사람 이름일 때는 다릅니다. 민준으로 시작한 문단은 이름을 다시 부르거나 그 자리에 대명사를 세울 뿐, 같은 부류의 다른 사람을 뽑지 않습니다. 그랬다가는 문단이 도중에 다른 사람 이야기가 되기 때문입니다.
 
@@ -1230,7 +1230,7 @@ rand_sentence(language="ko", output="detail", count=1)
 | `sentences` | <Lang js="string[]" dart="List&lt;String&gt;" py="tuple[str, ...]" code /> | 문장마다 하나씩. `sentences`로 더 요청하지 않았다면 항목 하나입니다. |
 | `phrases` | <Lang js="string[]" dart="List&lt;String&gt;" py="tuple[str, ...]" code /> | 문장을 이루는 구를 순서대로. 조사는 빠져 있습니다. 모든 문장을 통틀어 한 줄로 이어집니다. |
 | `slots` | <Lang js="SentenceSlot[]" dart="List&lt;SentenceSlot&gt;" py="tuple[SentenceSlot, ...]" code /> | 각 구가 하는 일. `phrases`와 같은 인덱스입니다. |
-| `names` | <Lang js="string[]" dart="List&lt;String&gt;" py="tuple[str, ...]" code /> | 결과에 쓰인 사람 이름을 순서대로. `includeName`으로 요청하지 않았다면 비어 있습니다. |
+| `names` | <Lang js="string[]" dart="List&lt;String&gt;" py="tuple[str, ...]" code /> | 결과에 쓰인 사람 이름을 순서대로. 이름을 쓰지 않았다면 비어 있습니다. |
 | `types` | <Lang js="SentenceType[]" dart="List&lt;SentenceType&gt;" py="tuple[SentenceType, ...]" code /> | 각 문장이 무엇을 하는지. `sentences`와 같은 자리입니다. |
 | `tense` | `SentenceTense` | 언제 일어난 일인지. 결과 전체가 한 시제입니다. |
 | `story` | <Lang js="SentenceStory &#124; null" dart="SentenceStory?" py="SentenceStory &#124; None" code /> | 여러 문장짜리 결과가 따른 이야기. 문장 하나짜리 결과에서는 null입니다. |
@@ -1239,20 +1239,20 @@ rand_sentence(language="ko", output="detail", count=1)
 
 `phrases`에는 구만 들어 있습니다. 구를 표시하는 조사나 전치사는 `sentence`에만 있으므로, `그리핀이 …`는 `그리핀`으로 보고되고 구를 다시 이어 붙여도 원래 문장이 되지 않습니다. 완성된 문자열은 `sentence`에서, 문장을 이루는 요소는 `phrases`에서 읽으면 됩니다.
 
-모든 문장에는 `subject`가 정확히 하나, 서술어가 정확히 하나 있습니다. 그 서술어는 `verb`이거나 `state`이며, 둘 다인 경우는 없습니다.
+문장의 서술어는 하나입니다. `verb`이거나 `state`이며 둘 다인 경우는 없고, 주어를 날짜나 시각과 같다고 하는 형태에서는 계사가 붙은 `date`나 `clock`이 서술어입니다. 주어는 `subject` 구이거나, 수량이 곧 주어인 문장에서는 수를 센 `quantity`입니다(`사과 12개가 익는다`). 문단 안의 문장은 이미 말한 주어를 생략하는 언어라면 주어 구가 아예 없을 수 있고, 한 사람이 다른 사람에게 하는 대답은 통째로 쓰므로 구를 하나도 보고하지 않습니다.
 
 ## 첫 글자 {#a-first-character}
 
 `startsWith`는 지정한 글자로 시작하는 문장만 남깁니다. 이 조건이 충족되는 방식은 언어에 따라 둘로 나뉩니다.
 
-관사를 쓰지 않고 명사구가 먼저 오는 언어(한국어, 일본어, 중국어)는 **유도**됩니다. 그 글자로 시작하는 단어 중에서 명사를 뽑으므로 거의 모든 시도가 조건을 만족합니다.
+관사를 쓰지 않는 언어(한국어, 일본어, 중국어, 베트남어, 러시아어)는 문장이 주어로 시작할 때 **유도**됩니다. 그 글자로 시작하는 주어를 받을 수 있는 동사를 고르고 그 단어 중에서 주어를 뽑으므로, 거의 모든 시도가 조건을 만족합니다. 시간 표현이나 접속어, 감탄사, 따옴표처럼 다른 것으로 시작하는 문장은 평소대로 뽑은 뒤 그 글자로 시작할 때만 남깁니다.
 
 ```javascript
 randSentence({ language: 'ko', startsWith: '사', count: 3 });
 // ['사자가 달린다.', '사슴이 물을 마신다.', '사과가 익는다.']
 ```
 
-관사나 전치사, 부사구가 앞에 오는 언어(영어, 스페인어, 이탈리아어, 독일어, 러시아어)는 그렇게 유도할 수 없습니다. 문장의 첫 단어가 명사가 아니기 때문입니다. 이 언어들은 **걸러집니다**. 평소대로 문장을 뽑은 뒤 그 글자로 시작하지 않는 것을 버립니다. 흔한 첫 글자는 금방 채워지지만, 드문 글자는 요청한 개수보다 적게 돌아오거나 하나도 돌아오지 않을 수 있습니다.
+명사 앞에 관사를 쓰는 언어(영어, 스페인어, 이탈리아어, 독일어)는 그렇게 유도할 수 없습니다. 문장의 첫 단어가 명사가 아니라 관사이기 때문입니다. 이 언어들은 **걸러집니다**. 평소대로 문장을 뽑은 뒤 그 글자로 시작하지 않는 것을 버립니다. 흔한 첫 글자는 금방 채워지지만, 드문 글자는 요청한 개수보다 적게 돌아오거나 하나도 돌아오지 않을 수 있습니다.
 
 ```javascript
 randSentence({ language: 'es', startsWith: 'e', count: 3 }); // `el`, `en` 덕분에 금방 3개
@@ -1274,7 +1274,7 @@ randSentence({ startsWith: 'ж', count: 2 }); // 러시아어 문장 2개
 
 ```javascript
 randSentence({ language: 'en', theme: 'animal', count: 3 });
-// ['The hippo sleeps in the starburst.', 'The sparrow approaches in the lightyear.', 'The puppy swallows the calm springwater briefly.']
+// ['The kitten laughed for a while.', 'The speckled squirrel ran to the windmill.', 'The bobcat is fidgety.']
 ```
 
 :::
@@ -1283,7 +1283,7 @@ randSentence({ language: 'en', theme: 'animal', count: 3 });
 
 ```dart
 randSentence(language: WordLanguage.en, theme: WordTheme.animal, count: 3);
-// [The hippo sleeps in the starburst., The sparrow approaches in the lightyear.]
+// [The kitten laughed for a while., The speckled squirrel ran to the windmill.]
 ```
 
 :::
@@ -1292,7 +1292,7 @@ randSentence(language: WordLanguage.en, theme: WordTheme.animal, count: 3);
 
 ```python
 rand_sentence(language="en", theme="animal", count=3)
-# ['The hippo sleeps in the starburst.', 'The sparrow approaches in the lightyear.']
+# ['The kitten laughed for a while.', 'The speckled squirrel ran to the windmill.']
 ```
 
 :::
