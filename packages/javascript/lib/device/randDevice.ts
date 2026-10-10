@@ -28,6 +28,8 @@ export function randDevice(options?: RandDeviceOptions & { output?: 'value' }): 
  */
 export function randDevice(options: RandDeviceOptions & { output: 'detail' }): DeviceDetail[];
 export function randDevice(options: RandDeviceOptions = {}): string[] | DeviceDetail[] {
+	options ??= {};
+
 	const details = generateDeviceDetails(options);
 
 	return options.output === 'detail' ? details : details.map((detail) => detail.device);

@@ -21,5 +21,7 @@ export function randVehicle(options?: RandThemedWordOptions & { output?: 'value'
  */
 export function randVehicle(options: RandThemedWordOptions & { output: 'detail' }): WordDetail[];
 export function randVehicle(options: RandThemedWordOptions = {}): string[] | WordDetail[] {
+	options ??= {};
+
 	return themedWord('vehicle', options);
 }

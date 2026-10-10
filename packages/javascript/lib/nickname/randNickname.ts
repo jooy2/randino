@@ -40,6 +40,8 @@ export function randNickname(options?: RandNicknameOptions & { output?: 'value' 
  */
 export function randNickname(options: RandNicknameOptions & { output: 'detail' }): NicknameDetail[];
 export function randNickname(options: RandNicknameOptions = {}): string[] | NicknameDetail[] {
+	options ??= {};
+
 	const details = generateNicknameDetails(options);
 
 	return options.output === 'detail' ? details : details.map((detail) => detail.nickname);

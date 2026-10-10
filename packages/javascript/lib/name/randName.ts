@@ -28,6 +28,8 @@ export function randName(options?: RandNameOptions & { output?: 'value' }): stri
  */
 export function randName(options: RandNameOptions & { output: 'detail' }): NameDetail[];
 export function randName(options: RandNameOptions = {}): string[] | NameDetail[] {
+	options ??= {};
+
 	const details = generateNameDetails(options);
 
 	if (options.output === 'detail') {

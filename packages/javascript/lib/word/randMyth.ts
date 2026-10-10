@@ -21,5 +21,7 @@ export function randMyth(options?: RandThemedWordOptions & { output?: 'value' })
  */
 export function randMyth(options: RandThemedWordOptions & { output: 'detail' }): WordDetail[];
 export function randMyth(options: RandThemedWordOptions = {}): string[] | WordDetail[] {
+	options ??= {};
+
 	return themedWord('myth', options);
 }

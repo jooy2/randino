@@ -21,5 +21,7 @@ export function randSpace(options?: RandThemedWordOptions & { output?: 'value' }
  */
 export function randSpace(options: RandThemedWordOptions & { output: 'detail' }): WordDetail[];
 export function randSpace(options: RandThemedWordOptions = {}): string[] | WordDetail[] {
+	options ??= {};
+
 	return themedWord('space', options);
 }

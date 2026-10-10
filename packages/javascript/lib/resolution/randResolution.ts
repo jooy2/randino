@@ -29,6 +29,8 @@ export function randResolution(
 	options: RandResolutionOptions & { output: 'detail' }
 ): ResolutionDetail[];
 export function randResolution(options: RandResolutionOptions = {}): string[] | ResolutionDetail[] {
+	options ??= {};
+
 	const details = generateResolutionDetails(options);
 
 	return options.output === 'detail' ? details : details.map((detail) => detail.resolution);

@@ -21,5 +21,7 @@ export function randPlace(options?: RandThemedWordOptions & { output?: 'value' }
  */
 export function randPlace(options: RandThemedWordOptions & { output: 'detail' }): WordDetail[];
 export function randPlace(options: RandThemedWordOptions = {}): string[] | WordDetail[] {
+	options ??= {};
+
 	return themedWord('place', options);
 }

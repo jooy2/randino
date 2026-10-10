@@ -21,5 +21,7 @@ export function randPlant(options?: RandThemedWordOptions & { output?: 'value' }
  */
 export function randPlant(options: RandThemedWordOptions & { output: 'detail' }): WordDetail[];
 export function randPlant(options: RandThemedWordOptions = {}): string[] | WordDetail[] {
+	options ??= {};
+
 	return themedWord('plant', options);
 }

@@ -24,5 +24,7 @@ export function randCity(options?: RandLocationUnitOptions & { output?: 'value' 
  */
 export function randCity(options: RandLocationUnitOptions & { output: 'detail' }): LocationDetail[];
 export function randCity(options: RandLocationUnitOptions = {}): string[] | LocationDetail[] {
+	options ??= {};
+
 	return drawLocation('unit', 'city', options);
 }

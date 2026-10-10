@@ -21,5 +21,7 @@ export function randPerson(options?: RandThemedWordOptions & { output?: 'value' 
  */
 export function randPerson(options: RandThemedWordOptions & { output: 'detail' }): WordDetail[];
 export function randPerson(options: RandThemedWordOptions = {}): string[] | WordDetail[] {
+	options ??= {};
+
 	return themedWord('person', options);
 }

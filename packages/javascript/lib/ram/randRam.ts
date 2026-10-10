@@ -26,6 +26,8 @@ export function randRam(options?: RandRamOptions & { output?: 'value' }): string
  */
 export function randRam(options: RandRamOptions & { output: 'detail' }): RamDetail[];
 export function randRam(options: RandRamOptions = {}): string[] | RamDetail[] {
+	options ??= {};
+
 	const details = generateRamDetails(options);
 
 	return options.output === 'detail' ? details : details.map((detail) => detail.ram);

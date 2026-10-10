@@ -41,6 +41,8 @@ export function randSentence(options?: RandSentenceOptions & { output?: 'value' 
  */
 export function randSentence(options: RandSentenceOptions & { output: 'detail' }): SentenceDetail[];
 export function randSentence(options: RandSentenceOptions = {}): string[] | SentenceDetail[] {
+	options ??= {};
+
 	const details = generateSentenceDetails(options);
 
 	return options.output === 'detail' ? details : details.map((detail) => detail.sentence);

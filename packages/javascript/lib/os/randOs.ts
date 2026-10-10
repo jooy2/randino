@@ -29,6 +29,8 @@ export function randOs(options?: RandOsOptions & { output?: 'value' }): string[]
  */
 export function randOs(options: RandOsOptions & { output: 'detail' }): OsDetail[];
 export function randOs(options: RandOsOptions = {}): string[] | OsDetail[] {
+	options ??= {};
+
 	const details = generateOsDetails(options);
 
 	return options.output === 'detail' ? details : details.map((detail) => detail.os);

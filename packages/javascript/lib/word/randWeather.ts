@@ -21,5 +21,7 @@ export function randWeather(options?: RandThemedWordOptions & { output?: 'value'
  */
 export function randWeather(options: RandThemedWordOptions & { output: 'detail' }): WordDetail[];
 export function randWeather(options: RandThemedWordOptions = {}): string[] | WordDetail[] {
+	options ??= {};
+
 	return themedWord('weather', options);
 }

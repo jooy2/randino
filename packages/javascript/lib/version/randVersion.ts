@@ -27,6 +27,8 @@ export function randVersion(options?: RandVersionOptions & { output?: 'value' })
  */
 export function randVersion(options: RandVersionOptions & { output: 'detail' }): VersionDetail[];
 export function randVersion(options: RandVersionOptions = {}): string[] | VersionDetail[] {
+	options ??= {};
+
 	const details = generateVersionDetails(options);
 
 	return options.output === 'detail' ? details : details.map((detail) => detail.version);

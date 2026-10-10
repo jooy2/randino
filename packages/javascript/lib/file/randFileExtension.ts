@@ -32,6 +32,8 @@ export function randFileExtension(
 export function randFileExtension(
 	options: RandFileExtensionOptions = {}
 ): string[] | FileExtensionDetail[] {
+	options ??= {};
+
 	const details = generateFileExtensionDetails(options);
 
 	return options.output === 'detail' ? details : details.map((detail) => detail.extension);

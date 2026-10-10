@@ -21,5 +21,7 @@ export function randFinance(options?: RandThemedWordOptions & { output?: 'value'
  */
 export function randFinance(options: RandThemedWordOptions & { output: 'detail' }): WordDetail[];
 export function randFinance(options: RandThemedWordOptions = {}): string[] | WordDetail[] {
+	options ??= {};
+
 	return themedWord('finance', options);
 }

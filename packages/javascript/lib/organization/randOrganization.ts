@@ -39,6 +39,8 @@ export function randOrganization(
 export function randOrganization(
 	options: RandOrganizationOptions = {}
 ): string[] | OrganizationDetail[] {
+	options ??= {};
+
 	const details = generateOrganizationDetails(options);
 
 	return options.output === 'detail' ? details : details.map((detail) => detail.organization);

@@ -27,6 +27,8 @@ export function randDiskSize(options?: RandDiskSizeOptions & { output?: 'value' 
  */
 export function randDiskSize(options: RandDiskSizeOptions & { output: 'detail' }): DiskSizeDetail[];
 export function randDiskSize(options: RandDiskSizeOptions = {}): string[] | DiskSizeDetail[] {
+	options ??= {};
+
 	const details = generateDiskSizeDetails(options);
 
 	return options.output === 'detail' ? details : details.map((detail) => detail.size);

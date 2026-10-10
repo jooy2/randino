@@ -21,5 +21,7 @@ export function randToy(options?: RandThemedWordOptions & { output?: 'value' }):
  */
 export function randToy(options: RandThemedWordOptions & { output: 'detail' }): WordDetail[];
 export function randToy(options: RandThemedWordOptions = {}): string[] | WordDetail[] {
+	options ??= {};
+
 	return themedWord('toy', options);
 }

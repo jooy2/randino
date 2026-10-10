@@ -27,6 +27,8 @@ export function randGender(options?: RandGenderOptions & { output?: 'value' }): 
  */
 export function randGender(options: RandGenderOptions & { output: 'detail' }): GenderDetail[];
 export function randGender(options: RandGenderOptions = {}): string[] | GenderDetail[] {
+	options ??= {};
+
 	const details = generateGenderDetails(options);
 
 	return options.output === 'detail' ? details : details.map((detail) => detail.gender);

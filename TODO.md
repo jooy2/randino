@@ -44,7 +44,6 @@ A fix to a generator added under `vNext` needs no changelog entry of its own, si
 
 ### A. No decision needed
 
-- **A8. JS reads `null` as `0`.** `whole` turns `null`, `''` and `[]` into `0`, so `count: null` is `[]`, `maxAge: null` is `0`, `maxYear: null` is `[]` and `maxDate: null` is the epoch, and `randName(null)` throws. Python and Dart read `null` as left out. Read `null` as left out in `whole`, `resolveLength` and the date reader, and default a `null` options object.
 - **A9. Caller strings are looked up on plain objects.** `randModifier` never resolves `language` (`'xx'` and `'__proto__'` throw, Python raises `KeyError`), and `randModifier('constructor')` reads `Object.prototype` as a Spanish noun. `resolveRealism` looks up the same way. Resolve the language, and look up with `Object.hasOwn`.
 - **A10. Python's `random` swallows the caller's errors.** `random()` calls the source inside `try`, so a source that raises, or a value that is not callable (`random.Random(42)`), silently becomes `0` and every draw repeats. Call the source outside the `try` and check only what it returns; a non-callable reads as left out, as in JS.
 - **A11. Python raises `OverflowError` on a huge integer.** `count=10**400` or `min_year=10**400` raise where every other wrong value falls back. Catch it in `_whole`.

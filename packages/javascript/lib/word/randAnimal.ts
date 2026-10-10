@@ -21,5 +21,7 @@ export function randAnimal(options?: RandThemedWordOptions & { output?: 'value' 
  */
 export function randAnimal(options: RandThemedWordOptions & { output: 'detail' }): WordDetail[];
 export function randAnimal(options: RandThemedWordOptions = {}): string[] | WordDetail[] {
+	options ??= {};
+
 	return themedWord('animal', options);
 }

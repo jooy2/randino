@@ -27,6 +27,8 @@ export function randWord(options?: RandWordOptions & { output?: 'value' }): stri
  */
 export function randWord(options: RandWordOptions & { output: 'detail' }): WordDetail[];
 export function randWord(options: RandWordOptions = {}): string[] | WordDetail[] {
+	options ??= {};
+
 	const details = generateWordDetails(options);
 
 	return options.output === 'detail' ? details : details.map((detail) => detail.word);

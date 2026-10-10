@@ -21,5 +21,7 @@ export function randMusic(options?: RandThemedWordOptions & { output?: 'value' }
  */
 export function randMusic(options: RandThemedWordOptions & { output: 'detail' }): WordDetail[];
 export function randMusic(options: RandThemedWordOptions = {}): string[] | WordDetail[] {
+	options ??= {};
+
 	return themedWord('music', options);
 }

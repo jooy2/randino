@@ -21,5 +21,7 @@ export function randEmotion(options?: RandThemedWordOptions & { output?: 'value'
  */
 export function randEmotion(options: RandThemedWordOptions & { output: 'detail' }): WordDetail[];
 export function randEmotion(options: RandThemedWordOptions = {}): string[] | WordDetail[] {
+	options ??= {};
+
 	return themedWord('emotion', options);
 }

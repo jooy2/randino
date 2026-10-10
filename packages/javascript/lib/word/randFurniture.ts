@@ -21,5 +21,7 @@ export function randFurniture(options?: RandThemedWordOptions & { output?: 'valu
  */
 export function randFurniture(options: RandThemedWordOptions & { output: 'detail' }): WordDetail[];
 export function randFurniture(options: RandThemedWordOptions = {}): string[] | WordDetail[] {
+	options ??= {};
+
 	return themedWord('furniture', options);
 }

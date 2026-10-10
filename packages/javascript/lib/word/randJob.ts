@@ -21,5 +21,7 @@ export function randJob(options?: RandThemedWordOptions & { output?: 'value' }):
  */
 export function randJob(options: RandThemedWordOptions & { output: 'detail' }): WordDetail[];
 export function randJob(options: RandThemedWordOptions = {}): string[] | WordDetail[] {
+	options ??= {};
+
 	return themedWord('job', options);
 }

@@ -24,6 +24,8 @@ export function randDiskType(options?: RandDiskTypeOptions & { output?: 'value' 
  */
 export function randDiskType(options: RandDiskTypeOptions & { output: 'detail' }): DiskTypeDetail[];
 export function randDiskType(options: RandDiskTypeOptions = {}): string[] | DiskTypeDetail[] {
+	options ??= {};
+
 	const details = generateDiskTypeDetails(options);
 
 	return options.output === 'detail' ? details : details.map((detail) => detail.diskType);

@@ -21,5 +21,7 @@ export function randFood(options?: RandThemedWordOptions & { output?: 'value' })
  */
 export function randFood(options: RandThemedWordOptions & { output: 'detail' }): WordDetail[];
 export function randFood(options: RandThemedWordOptions = {}): string[] | WordDetail[] {
+	options ??= {};
+
 	return themedWord('food', options);
 }

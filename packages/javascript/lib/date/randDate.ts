@@ -42,6 +42,8 @@ export function randDate(
  */
 export function randDate(options: RandDateOptions & { output: 'detail' }): DateDetail[];
 export function randDate(options: RandDateOptions = {}): string[] | number[] | DateDetail[] {
+	options ??= {};
+
 	const unit = resolveDateUnit(options.unit);
 	const details = generateDateDetails(options, options.output === 'detail' || unit === null);
 

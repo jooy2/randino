@@ -30,5 +30,7 @@ export function randLocation(options?: RandLocationOptions & { output?: 'value' 
  */
 export function randLocation(options: RandLocationOptions & { output: 'detail' }): LocationDetail[];
 export function randLocation(options: RandLocationOptions = {}): string[] | LocationDetail[] {
+	options ??= {};
+
 	return drawLocation('path', resolveLevel(options.level), options, options.includeCountry ?? true);
 }

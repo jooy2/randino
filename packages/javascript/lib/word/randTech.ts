@@ -21,5 +21,7 @@ export function randTech(options?: RandThemedWordOptions & { output?: 'value' })
  */
 export function randTech(options: RandThemedWordOptions & { output: 'detail' }): WordDetail[];
 export function randTech(options: RandThemedWordOptions = {}): string[] | WordDetail[] {
+	options ??= {};
+
 	return themedWord('tech', options);
 }

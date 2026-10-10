@@ -25,5 +25,7 @@ export function randDistrict(
 	options: RandLocationUnitOptions & { output: 'detail' }
 ): LocationDetail[];
 export function randDistrict(options: RandLocationUnitOptions = {}): string[] | LocationDetail[] {
+	options ??= {};
+
 	return drawLocation('unit', 'district', options);
 }

@@ -30,6 +30,8 @@ export function randGpu(options?: RandGpuOptions & { output?: 'value' }): string
  */
 export function randGpu(options: RandGpuOptions & { output: 'detail' }): GpuDetail[];
 export function randGpu(options: RandGpuOptions = {}): string[] | GpuDetail[] {
+	options ??= {};
+
 	const details = generateGpuDetails(options);
 
 	return options.output === 'detail' ? details : details.map((detail) => detail.gpu);

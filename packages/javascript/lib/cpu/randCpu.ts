@@ -28,6 +28,8 @@ export function randCpu(options?: RandCpuOptions & { output?: 'value' }): string
  */
 export function randCpu(options: RandCpuOptions & { output: 'detail' }): CpuDetail[];
 export function randCpu(options: RandCpuOptions = {}): string[] | CpuDetail[] {
+	options ??= {};
+
 	const details = generateCpuDetails(options);
 
 	return options.output === 'detail' ? details : details.map((detail) => detail.cpu);

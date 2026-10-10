@@ -21,5 +21,7 @@ export function randNature(options?: RandThemedWordOptions & { output?: 'value' 
  */
 export function randNature(options: RandThemedWordOptions & { output: 'detail' }): WordDetail[];
 export function randNature(options: RandThemedWordOptions = {}): string[] | WordDetail[] {
+	options ??= {};
+
 	return themedWord('nature', options);
 }

@@ -32,6 +32,8 @@ export function randPhone(options?: RandPhoneOptions & { output?: 'value' }): st
  */
 export function randPhone(options: RandPhoneOptions & { output: 'detail' }): PhoneDetail[];
 export function randPhone(options: RandPhoneOptions = {}): string[] | PhoneDetail[] {
+	options ??= {};
+
 	const details = generatePhoneDetails(options);
 
 	return options.output === 'detail' ? details : details.map((detail) => detail.phone);

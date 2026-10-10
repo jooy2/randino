@@ -310,6 +310,31 @@ describe('base test', () => {
 		assert.strictEqual(randino.randSuffix('x', { length: NaN }).length, 'x_'.length + 5);
 	});
 
+	it('a null is an option left out, and a null options object is none', () => {
+		// The other two packages read a null as left out. `Number(null)` is `0`, so
+		// JavaScript used to read every one of these as zero.
+		assert.strictEqual(randino.randName({ count: null as never }).length, 1);
+		assert.strictEqual(randino.randName({ count: '' as never }).length, 1);
+		assert.strictEqual(randino.randName({ count: [] as never }).length, 1);
+		assert.ok(randino.randName({ language: 'en', maxLength: null as never })[0].length > 3);
+		assert.ok(randino.randAge({ maxAge: null as never, count: 50 }).some((age) => age > 0));
+		assert.strictEqual(randino.randOs({ maxYear: null as never }).length, 1);
+		assert.strictEqual(randino.randRam({ maxSize: null as never }).length, 1);
+		// A count spelled as a string is still a count.
+		assert.strictEqual(randino.randName({ count: '3' as never }).length, 3);
+
+		for (const [name, generate] of Object.entries(randino)) {
+			if (typeof generate !== 'function' || !/^rand[A-Z]/.test(name)) {
+				continue;
+			}
+
+			// The decorators take a value first, and read a null one as none.
+			const result = (generate as (options: unknown) => unknown)(null);
+
+			assert.ok(typeof result === 'string' || (Array.isArray(result) && result.length === 1), name);
+		}
+	});
+
 	it('a length range the wrong way round keeps maxLength', () => {
 		// `maxLength` is the bound a caller is holding to — a field limit, a column
 		// width — where `minLength` only shapes how a result reads. `[30, 5]` used to

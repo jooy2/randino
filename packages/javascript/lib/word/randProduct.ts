@@ -21,5 +21,7 @@ export function randProduct(options?: RandThemedWordOptions & { output?: 'value'
  */
 export function randProduct(options: RandThemedWordOptions & { output: 'detail' }): WordDetail[];
 export function randProduct(options: RandThemedWordOptions = {}): string[] | WordDetail[] {
+	options ??= {};
+
 	return themedWord('product', options);
 }

@@ -27,6 +27,8 @@ export function randAppStore(options?: RandAppStoreOptions & { output?: 'value' 
  */
 export function randAppStore(options: RandAppStoreOptions & { output: 'detail' }): AppStoreDetail[];
 export function randAppStore(options: RandAppStoreOptions = {}): string[] | AppStoreDetail[] {
+	options ??= {};
+
 	const details = generateAppStoreDetails(options);
 
 	return options.output === 'detail' ? details : details.map((detail) => detail.store);

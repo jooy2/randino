@@ -21,5 +21,7 @@ export function randSport(options?: RandThemedWordOptions & { output?: 'value' }
  */
 export function randSport(options: RandThemedWordOptions & { output: 'detail' }): WordDetail[];
 export function randSport(options: RandThemedWordOptions = {}): string[] | WordDetail[] {
+	options ??= {};
+
 	return themedWord('sport', options);
 }

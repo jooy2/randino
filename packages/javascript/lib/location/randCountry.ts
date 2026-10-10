@@ -24,6 +24,8 @@ export function randCountry(options?: RandCountryOptions & { output?: 'value' })
  */
 export function randCountry(options: RandCountryOptions & { output: 'detail' }): CountryDetail[];
 export function randCountry(options: RandCountryOptions = {}): string[] | CountryDetail[] {
+	options ??= {};
+
 	const details = generateCountryDetails(options);
 
 	return options.output === 'detail' ? details : details.map((detail) => detail.country);

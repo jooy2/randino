@@ -27,6 +27,8 @@ export function randMimeType(options?: RandMimeTypeOptions & { output?: 'value' 
  */
 export function randMimeType(options: RandMimeTypeOptions & { output: 'detail' }): MimeTypeDetail[];
 export function randMimeType(options: RandMimeTypeOptions = {}): string[] | MimeTypeDetail[] {
+	options ??= {};
+
 	const details = generateMimeTypeDetails(options);
 
 	return options.output === 'detail' ? details : details.map((detail) => detail.mimeType);

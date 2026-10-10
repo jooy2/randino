@@ -21,5 +21,7 @@ export function randGem(options?: RandThemedWordOptions & { output?: 'value' }):
  */
 export function randGem(options: RandThemedWordOptions & { output: 'detail' }): WordDetail[];
 export function randGem(options: RandThemedWordOptions = {}): string[] | WordDetail[] {
+	options ??= {};
+
 	return themedWord('gem', options);
 }

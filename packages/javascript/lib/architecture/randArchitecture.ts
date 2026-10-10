@@ -33,6 +33,8 @@ export function randArchitecture(
 export function randArchitecture(
 	options: RandArchitectureOptions = {}
 ): string[] | ArchitectureDetail[] {
+	options ??= {};
+
 	const details = generateArchitectureDetails(options);
 
 	return options.output === 'detail' ? details : details.map((detail) => detail.architecture);

@@ -21,5 +21,7 @@ export function randColor(options?: RandThemedWordOptions & { output?: 'value' }
  */
 export function randColor(options: RandThemedWordOptions & { output: 'detail' }): WordDetail[];
 export function randColor(options: RandThemedWordOptions = {}): string[] | WordDetail[] {
+	options ??= {};
+
 	return themedWord('color', options);
 }

@@ -22,5 +22,7 @@ export function randRegion(
 	options: RandLocationUnitOptions & { output: 'detail' }
 ): LocationDetail[];
 export function randRegion(options: RandLocationUnitOptions = {}): string[] | LocationDetail[] {
+	options ??= {};
+
 	return drawLocation('unit', 'region', options);
 }

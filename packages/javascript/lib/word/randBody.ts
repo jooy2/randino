@@ -21,5 +21,7 @@ export function randBody(options?: RandThemedWordOptions & { output?: 'value' })
  */
 export function randBody(options: RandThemedWordOptions & { output: 'detail' }): WordDetail[];
 export function randBody(options: RandThemedWordOptions = {}): string[] | WordDetail[] {
+	options ??= {};
+
 	return themedWord('body', options);
 }

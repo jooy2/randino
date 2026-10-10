@@ -21,5 +21,7 @@ export function randTime(options?: RandThemedWordOptions & { output?: 'value' })
  */
 export function randTime(options: RandThemedWordOptions & { output: 'detail' }): WordDetail[];
 export function randTime(options: RandThemedWordOptions = {}): string[] | WordDetail[] {
+	options ??= {};
+
 	return themedWord('time', options);
 }

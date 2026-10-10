@@ -25,6 +25,8 @@ export function randAge(options?: RandAgeOptions & { output?: 'value' }): number
  */
 export function randAge(options: RandAgeOptions & { output: 'detail' }): AgeDetail[];
 export function randAge(options: RandAgeOptions = {}): number[] | AgeDetail[] {
+	options ??= {};
+
 	const details = generateAgeDetails(options);
 
 	return options.output === 'detail' ? details : details.map((detail) => detail.age);
