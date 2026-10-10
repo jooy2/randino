@@ -658,6 +658,19 @@ void main() {
       final names = randName(language: NameLanguage.ko, count: 400, unique: true);
 
       expect(names.toSet().length, names.length);
+
+      // What is compared is what is handed back: `王伟` and `王玮` are two names
+      // and one `Wang Wei`, and a roman `unique` returned both.
+      for (final language in [NameLanguage.zh, NameLanguage.vi]) {
+        final roman = randName(
+          language: language,
+          script: NameScript.roman,
+          count: 1500,
+          unique: true,
+        );
+
+        expect(roman.toSet().length, roman.length, reason: language.name);
+      }
       // Korean given names are a closed pool, so a request this large runs out of
       // combinations and returns fewer names instead of looping forever. Keep the
       // count comfortably above the pool, or growing the pool turns this into a

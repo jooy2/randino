@@ -677,6 +677,10 @@ List<NameDetail> generateNameDetails({
   /// Where the randomness comes from: `Random.secure()` for a value nobody may
   /// predict, `Random(42)` for one that has to come out the same every run.
   Random? random,
+
+  /// Whether the caller is handed the romanized names, which is what [unique]
+  /// has to compare: `王伟` and `王玮` are two names and one `Wang Wei`.
+  bool roman = false,
 }) {
   final settings = _Settings(
     gender: gender,
@@ -704,6 +708,7 @@ List<NameDetail> generateNameDetails({
       startsWith: settings.prefix,
       draw: () => _generateOne(pick(languages), settings),
       keyOf: (detail) => detail.native,
+      uniqueOf: (detail) => roman ? detail.roman : detail.native,
     ),
   );
 }

@@ -270,6 +270,7 @@ def collect(
     starts_with: str,
     draw: Callable[[], T],
     key_of: Callable[[T], str],
+    unique_of: Callable[[T], str] | None = None,
 ) -> list[T]:
     """Draw until there are `count` results, discarding what the filters reject.
 
@@ -279,6 +280,9 @@ def collect(
         starts_with: The single character every result has to begin with.
         draw: Produces one candidate result.
         key_of: The string a result is filtered and deduplicated by.
+        unique_of: Another string to deduplicate by, where the one handed back is not
+            the one `starts_with` reads: a romanized name is returned in Latin letters
+            and matched against the native first character.
 
     Returns:
         Up to `count` results — fewer only when `unique` exhausts the pools.
@@ -305,10 +309,12 @@ def collect(
             continue
 
         if unique:
-            if key in seen:
+            once = key if unique_of is None else unique_of(item)
+
+            if once in seen:
                 continue
 
-            seen.add(key)
+            seen.add(once)
 
         results.append(item)
 

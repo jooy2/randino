@@ -126,6 +126,7 @@ def rand_name(
         starts_with=starts_with,
         unique=unique,
         random=random,
+        roman=output != "detail" and script == "roman",
     )
 
     if output == "detail":

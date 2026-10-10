@@ -517,6 +517,13 @@ def test_unique_never_repeats_a_name() -> None:
     names = rand_name(language="ko", count=400, unique=True)
 
     assert len(set(names)) == len(names)
+
+    # What is compared is what is handed back: `王伟` and `王玮` are two names and one
+    # `Wang Wei`, and a roman `unique` returned both.
+    for language in ("zh", "vi"):
+        roman = rand_name(language=language, script="roman", count=1500, unique=True)
+
+        assert len(set(roman)) == len(roman), language
     # Korean given names are a closed pool, so a request this large runs out of
     # combinations and returns fewer names instead of looping forever. Keep the count
     # comfortably above the pool, or growing the pool turns this into a failure that

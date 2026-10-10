@@ -2,6 +2,7 @@
 
 ## vNext (2026--)
 
+- `randName` with `unique` and `script: NameScript.roman` never returns the same string twice. It compared the native names, and two of them can romanize alike: about one Vietnamese name in ten came back twice.
 - A `startsWith` that is no letter, or a fullwidth one, is answered with nothing in every language. A fullwidth `Ａ` was read as Latin and led an English word as `Ａiskell`.
 - `randAge` with `unique` stops as soon as every age in range has been drawn. It kept drawing repeats until its attempt budget ran out, which took seconds at a large `count`.
 - The first draw from `randLocation`, `randRegion`, `randCity` or `randDistrict` is about three times faster and holds less than half the memory. Every division used to be written out when a pool was first drawn from, whether or not `startsWith` or a length asked for it.

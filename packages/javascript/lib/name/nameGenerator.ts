@@ -684,7 +684,11 @@ export function drawName(language: NameLanguage, options: RandNameOptions = {}):
 	return generateOne(language, resolveSettings(options));
 }
 
-export function generateNameDetails(options: RandNameOptions = {}): NameDetail[] {
+/**
+ * `roman` is true when the caller is handed the romanized names, which is what
+ * `unique` has to compare: `王伟` and `王玮` are two names and one `Wang Wei`.
+ */
+export function generateNameDetails(options: RandNameOptions = {}, roman = false): NameDetail[] {
 	const language = resolveNameLanguage(options.language);
 	const settings = resolveSettings(options);
 	// A requested first character the language does not write is one it can never
@@ -699,7 +703,8 @@ export function generateNameDetails(options: RandNameOptions = {}): NameDetail[]
 		collect(
 			options,
 			() => generateOne(pick(languages), settings),
-			(detail) => detail.native
+			(detail) => detail.native,
+			(detail) => (roman ? detail.roman : detail.native)
 		)
 	);
 }

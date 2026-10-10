@@ -108,6 +108,11 @@ List<T> collect<T>({
   required String startsWith,
   required T Function() draw,
   required String Function(T item) keyOf,
+
+  /// Another string to deduplicate by, where the one handed back is not the one
+  /// [startsWith] reads: a romanized name is returned in Latin letters and
+  /// matched against the native first character.
+  String Function(T item)? uniqueOf,
 }) {
   final wanted = resolveCount(count);
   final prefix = startsWith.toLowerCase();
@@ -129,9 +134,11 @@ List<T> collect<T>({
     if (prefix.isNotEmpty && !key.toLowerCase().startsWith(prefix)) continue;
 
     if (unique) {
-      if (seen.contains(key)) continue;
+      final once = uniqueOf == null ? key : uniqueOf(item);
 
-      seen.add(key);
+      if (seen.contains(once)) continue;
+
+      seen.add(once);
     }
 
     results.add(item);

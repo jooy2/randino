@@ -693,8 +693,13 @@ def generate_name_details(
     starts_with: str = "",
     unique: bool = False,
     random: Callable[[], float] | None = None,
+    roman: bool = False,
 ) -> list[NameDetail]:
-    """Generate `count` names, applied to every option the caller passed."""
+    """Generate `count` names, applied to every option the caller passed.
+
+    `roman` is True when the caller is handed the romanized names, which is what `unique`
+    has to compare: `王伟` and `王玮` are two names and one `Wang Wei`.
+    """
     settings = Settings(
         gender=gender,
         include_surname=include_surname,
@@ -719,4 +724,5 @@ def generate_name_details(
             starts_with=settings.prefix,
             draw=lambda: generate_one(pick(languages), settings),
             key_of=lambda detail: detail.native,
+            unique_of=lambda detail: detail.roman if roman else detail.native,
         )

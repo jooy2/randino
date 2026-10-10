@@ -251,12 +251,15 @@ export function languagesWriting<T extends string>(
 /**
  * Draw until there are `count` results, discarding what the caller's filters
  * reject. `keyOf` is the string a result is filtered and deduplicated by — the
- * name, the nickname, the word.
+ * name, the nickname, the word. `uniqueOf` deduplicates by another string where
+ * the one handed back is not the one `startsWith` reads: a romanized name is
+ * returned in Latin letters and matched against the native first character.
  */
 export function collect<T>(
 	options: RandCommonOptions,
 	draw: () => T,
-	keyOf: (item: T) => string
+	keyOf: (item: T) => string,
+	uniqueOf: (item: T) => string = keyOf
 ): T[] {
 	const count = resolveCount(options.count);
 	const prefix = resolvePrefix(options.startsWith).toLowerCase();
@@ -279,9 +282,11 @@ export function collect<T>(
 		if (prefix && !key.toLowerCase().startsWith(prefix)) continue;
 
 		if (unique) {
-			if (seen.has(key)) continue;
+			const once = uniqueOf(item);
 
-			seen.add(key);
+			if (seen.has(once)) continue;
+
+			seen.add(once);
 		}
 
 		results.push(item);

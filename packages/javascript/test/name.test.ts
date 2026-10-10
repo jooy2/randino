@@ -567,6 +567,14 @@ describe('Name', () => {
 		const names = randName({ language: 'ko', count: 400, unique: true });
 
 		assert.strictEqual(new Set(names).size, names.length);
+
+		// What is compared is what is handed back: `王伟` and `王玮` are two names and
+		// one `Wang Wei`, and a roman `unique` returned both.
+		for (const language of ['zh', 'vi'] as const) {
+			const roman = randName({ language, script: 'roman', count: 1500, unique: true });
+
+			assert.strictEqual(new Set(roman).size, roman.length, language);
+		}
 		// Korean given names are a closed pool, so a request this large runs out of
 		// combinations and returns fewer names instead of looping forever. Keep the
 		// count comfortably above the pool, or growing the pool turns this into a

@@ -53,4 +53,5 @@ List<String> randName({
       startsWith: startsWith,
       unique: unique,
       random: random,
+      roman: script == NameScript.roman,
     ).map((detail) => script == NameScript.roman ? detail.roman : detail.native).toList();

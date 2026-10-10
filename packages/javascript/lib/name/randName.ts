@@ -30,13 +30,12 @@ export function randName(options: RandNameOptions & { output: 'detail' }): NameD
 export function randName(options: RandNameOptions = {}): string[] | NameDetail[] {
 	options ??= {};
 
-	const details = generateNameDetails(options);
+	const script = options.script ?? 'native';
+	const details = generateNameDetails(options, options.output !== 'detail' && script === 'roman');
 
 	if (options.output === 'detail') {
 		return details;
 	}
-
-	const script = options.script ?? 'native';
 
 	return details.map((detail) => (script === 'roman' ? detail.roman : detail.native));
 }

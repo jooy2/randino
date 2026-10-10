@@ -44,7 +44,6 @@ A fix to a generator added under `vNext` needs no changelog entry of its own, si
 
 ### A. No decision needed
 
-- **A23. `unique` with `script: 'roman'` returns duplicates.** The key is the native name, and two native names can romanize alike: 291 of 3,000 unique `vi` roman names repeat. Key on the string returned.
 - **A24. `realism: 'real'` invents a name under `startsWith` and a tight `maxLength`.** The aimed draw narrows the pool by length and falls back to synthesis when no entry of that length starts with the character, though a real one exists (`Zeahos Cox` beside `Zachary King`). Fall back to the prefix matches of the whole pool first.
 - **A25. Invented Russian surnames are never feminized.** `feminizeRu` runs only on pooled surnames, so `realism: 'invented', gender: 'female'` writes `Чачев`.
 - **A26. `randModifier` reads a lowercase German noun as masculine.** `languageOf` tries the capitalized form and finds `Katze`, but `genderOf` looks up `katze` and writes `flinker katze`.
