@@ -269,8 +269,9 @@ export interface RandNicknameOptions extends RandCommonOptions {
 	/**
 	 * Placed between the words a nickname is built from (`'멋진 사자'`,
 	 * `'misty-owl'`), and counted toward `minLength` / `maxLength`. Defaults to the
-	 * way the language itself joins them, which is to run them together
-	 * (`멋진사자`, `MistyOwl`).
+	 * way the language itself joins them: run together in Korean, Japanese,
+	 * Chinese and English (`멋진사자`, `MistyOwl`), a space in the other five
+	 * (`gato azul`).
 	 */
 	wordSeparator?: string;
 }
@@ -330,7 +331,8 @@ export interface RandModifierOptions {
 	kind?: ModifierKind | 'all';
 	/**
 	 * Placed between the modifier and the value. Defaults to the way the language
-	 * itself joins words, which is to run them together (`멋진사자`, `MistyOwl`).
+	 * itself joins words: run together in Korean, Japanese, Chinese and English
+	 * (`멋진사자`, `MistyOwl`), a space in the other five (`gato azul`).
 	 */
 	separator?: string;
 	/**

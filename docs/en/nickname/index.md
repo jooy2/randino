@@ -91,7 +91,7 @@ The default range is wide on purpose. It spans every shape, and the shape weight
 
 ### `wordSeparator` replaces the language's own joiner
 
-Left out, each language joins its words the way it writes them: Korean, Japanese and Chinese run them together, and English reads as CamelCase. Pass one and every shape uses it, the two-word ones and the three-word ones alike.
+Left out, each language joins its words the way it writes them: Korean, Japanese and Chinese run them together, English reads as CamelCase, and Vietnamese, Spanish, Italian, German and Russian put a space between them. Pass one and every shape uses it, the two-word ones and the three-word ones alike.
 
 ::: lang js
 
@@ -223,4 +223,4 @@ rand_nickname(theme="finance", count=2)  # ['QuietLedger', 'RisingYield']
 
 ### `unique`, and the suffix beside it {#unique-and-why-a-suffix-is-usually-the-better-answer}
 
-Korean and English have over forty million word combinations each, so duplicates are rare either way. `unique` rules them out inside one call and returns fewer nicknames once the pools run out; [`randSuffix`](../decorate/rand-suffix) makes collisions impossible across calls, across processes and across users, which is the guarantee a sign-up form actually needs.
+Korean and English have over forty million word combinations each, so duplicates are rare either way. `unique` rules them out inside one call and returns fewer nicknames once the pools run out; [`randSuffix`](../decorate/rand-suffix) makes a collision across calls, processes and users unlikely, though never impossible, since a token is drawn rather than counted. Where a handle has to be unique, a database constraint is what guarantees it, and the suffix keeps that constraint from being hit often.

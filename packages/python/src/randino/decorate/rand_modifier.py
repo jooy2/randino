@@ -139,7 +139,8 @@ def rand_modifier(
         kind: whether the modifier says what the value is like (`멋진`, `Misty`) or
             what it is doing (`웃는`, `Laughing`). `"all"` draws from both.
         separator: Placed between the modifier and the value. Defaults to the way
-            the language itself joins words, which is to run them together.
+            the language itself joins words: run together in Korean, Japanese,
+            Chinese and English, a space in the other five.
         random: Where the randomness comes from: a callable returning a number in
             `[0, 1)`, the way `random.random` does. `SystemRandom().random` for a value
             nobody may predict, `Random(42).random` for one that has to come out the

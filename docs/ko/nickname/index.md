@@ -91,7 +91,7 @@ rand_nickname(language="en", count=4, min_length=4, max_length=9)
 
 ### `wordSeparator`는 언어 고유의 연결 방식을 대체합니다
 
-생략하면 각 언어가 단어를 표기하는 방식대로 이어 붙입니다. 한국어, 일본어, 중국어는 붙여 쓰고 영어는 CamelCase로 읽힙니다. 값을 넘기면 두 단어짜리든 세 단어짜리든 모든 형태가 그 구분자를 씁니다.
+생략하면 각 언어가 단어를 표기하는 방식대로 이어 붙입니다. 한국어, 일본어, 중국어는 붙여 쓰고, 영어는 CamelCase로 읽히며, 베트남어, 스페인어, 이탈리아어, 독일어, 러시아어는 공백을 넣습니다. 값을 넘기면 두 단어짜리든 세 단어짜리든 모든 형태가 그 구분자를 씁니다.
 
 ::: lang js
 
@@ -221,6 +221,6 @@ rand_nickname(theme="finance", count=2)  # ['QuietLedger', 'RisingYield']
 
 :::
 
-### `unique`와 접미사 {#unique-and-why-a-suffix-is-usually-better}
+### `unique`와 접미사 {#unique-and-why-a-suffix-is-usually-the-better-answer}
 
-한국어와 영어는 각각 단어 조합이 4천만 가지가 넘으므로 중복은 어느 쪽이든 드뭅니다. `unique`는 한 번의 호출 안에서 중복을 없애고, 조합이 바닥나면 더 적은 개수를 돌려줍니다. 호출과 프로세스와 사용자를 가로질러 충돌을 막아야 한다면 [`randSuffix`](../decorate/rand-suffix)를 쓰세요. 가입 폼에 필요한 보장은 이쪽입니다.
+한국어와 영어는 각각 단어 조합이 4천만 가지가 넘으므로 중복은 어느 쪽이든 드뭅니다. `unique`는 한 번의 호출 안에서 중복을 없애고, 조합이 바닥나면 더 적은 개수를 돌려줍니다. [`randSuffix`](../decorate/rand-suffix)는 호출과 프로세스와 사용자를 가로질러 충돌을 드물게 만들지만, 토큰을 세지 않고 뽑기 때문에 없애지는 못합니다. 핸들이 반드시 유일해야 한다면 데이터베이스 제약으로 보장하고, 접미 토큰은 그 제약에 걸리는 일을 줄여 줍니다.

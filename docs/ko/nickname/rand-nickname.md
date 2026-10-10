@@ -41,7 +41,7 @@ rand_nickname()
 
 | 옵션 | 타입 | 기본값 | 설명 |
 | --- | --- | --- | --- |
-| `language` | <Lang js="WordLanguageOption" dart="WordLanguage?" py="WordLanguageOption &#124; None" code /> | <Lang js="'all'" dart="null" py="None" code /> | 생성할 닉네임의 언어. <Lang js="'all'" dart="null" py="&quot;all&quot;" code />이면 지원하는 모든 언어를 섞어서 닉네임마다 하나씩 고릅니다. |
+| `language` | <Lang js="WordLanguageOption" dart="WordLanguage?" py="WordLanguageOption" code /> | <Lang js="'all'" dart="null" py="&quot;all&quot;" code /> | 생성할 닉네임의 언어. <Lang js="'all'" dart="null" py="&quot;all&quot;" code />이면 지원하는 모든 언어를 섞어서 닉네임마다 하나씩 고릅니다. |
 | `theme` | <Lang js="WordThemeOption" dart="WordTheme?" py="WordThemeOption" code /> | <Lang js="'all'" dart="null" py="&quot;all&quot;" code /> | 닉네임의 주제. [테마](../word/themes)를 참고하세요. |
 | `slots` | <Lang js="WordSlotOption" dart="Set&lt;WordSlot&gt;?" py="WordSlotOption" code /> | <Lang js="'all'" dart="null" py="&quot;all&quot;" code /> | 명사 옆에 무엇을 두는 형태를 받을지. [형태 고르기](#picking-the-shape)를 참고하세요. |
 | `count` | <Lang js="number" dart="int" py="int" code /> | `1` | 반환할 닉네임의 개수. `0` … `10000` 범위로 제한됩니다. |
@@ -49,7 +49,7 @@ rand_nickname()
 | `vocabulary` | `RandVocabulary` | <Lang js="`'full'`" dart="`RandVocabulary.full`" py="`\"full\"`" /> | 기준이 되는 명사가 얼마나 흔해야 하는지 정합니다. `basic`, `common`, `full` 중 하나입니다. [흔한 단어](../word/rand-word#vocabulary)를 보세요. |
 | <Lang js="minLength" dart="minLength" py="min_length" code /> | <Lang js="number" dart="int?" py="int &#124; None" code /> | _언어별_ | 최소 글자 수. |
 | <Lang js="maxLength" dart="maxLength" py="max_length" code /> | <Lang js="number" dart="int?" py="int &#124; None" code /> | _언어별_ | 최대 글자 수. |
-| <Lang js="wordSeparator" dart="wordSeparator" py="word_separator" code /> | <Lang js="string" dart="String?" py="str &#124; None" code /> | _언어별_ | 단어 사이에 넣습니다. 길이 범위에 포함됩니다. 기본값은 붙여 쓰는 것입니다. |
+| <Lang js="wordSeparator" dart="wordSeparator" py="word_separator" code /> | <Lang js="string" dart="String?" py="str &#124; None" code /> | _언어별_ | 단어 사이에 넣습니다. 길이 범위에 포함됩니다. 기본값은 언어마다 달라서 한국어, 일본어, 중국어, 영어는 붙여 쓰고 나머지는 공백을 넣습니다. |
 | <Lang js="startsWith" dart="startsWith" py="starts_with" code /> | <Lang js="string" dart="String?" py="str" code /> | <Lang js="—" dart="null" py="&quot;&quot;" code /> | 첫 글자가 이 글자인 닉네임만 반환합니다. |
 | `unique` | <Lang js="boolean" dart="bool" py="bool" code /> | <Lang js="false" dart="false" py="False" code /> | 같은 닉네임을 두 번 반환하지 않습니다. 조합이 바닥나면 `count`보다 적게 반환할 수 있습니다. |
 | `output` | <Lang js="RandOutput" py="RandOutput" code /> | <Lang js="'value'" py="&quot;value&quot;" code /> | 문자열, 또는 닉네임마다 하나의 `NicknameDetail`. Dart에는 이 파라미터가 없습니다. [상세 출력](#the-detail-output)을 참고하세요. |

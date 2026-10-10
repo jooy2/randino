@@ -620,7 +620,7 @@ ES = WordLanguageData(
     # one. Only the endings listed change; `azul` and `grande` match no rule and
     # are already right beside either gender.
     # A word outside the pools is read by its ending, which is what Spanish itself
-    # does: `-a`, `-ión`, `-dad`, `-tad` and `-umbre` are feminine, the rest
+    # does: `-a`, `-ión`, `-dad`, `-tad`, `-umbre` and `-triz` are feminine, the rest
     # masculine. An invented word has no true gender, and this is what keeps the
     # article and the adjective beside it agreeing with each other.
     gender_rules=(

@@ -74,7 +74,7 @@ rand_prefix(rand_nickname(language="en", count=2))
 
 :::
 
-## 나머지는 전부 `randSuffix`와 같습니다 {#everything-else-is-rand-suffix}
+## 나머지는 전부 `randSuffix`와 같습니다 {#everything-else-is-randsuffix}
 
 토큰과 기본값, 값 제한, 값마다 새 토큰을 뽑는 규칙까지 모두 같습니다. 값이 선택 사항인 것도 같아서, `randPrefix()`는 `randSuffix()`와 똑같이 토큰만 돌려줍니다. 두 함수는 구현을 공유하고 토큰이 어느 쪽에 붙는지만 다릅니다. [`randSuffix`](./rand-suffix)의 문자 집합 설명이 여기에도 그대로 적용됩니다.
 

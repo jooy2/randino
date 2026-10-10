@@ -120,7 +120,7 @@ rand_modifier("고양이", language="en")  # 'Misty고양이'
 
 ## 수식어는 값에 맞춰 모양을 바꿉니다 {#the-modifier-agrees-with-the-value}
 
-수식어가 명사 옆에서 모양을 바꾸는 언어라면 `randModifier`는 값을 그 언어의 단어 풀에서 찾습니다. 풀에 있는 단어에는 성이 붙어 있으므로 수식어가 거기에 맞는 형태로 나옵니다. 풀에 없는 단어는 어미로 판단합니다. 스페인어는 `-a`, `-ión`, `-dad`를 여성으로 읽고, 러시아어는 `-а`와 `-о`를, 독일어는 어미로 알 수 있는 네 가지를 그렇게 읽습니다. 그래서 지어낸 단어에도 성에 맞는 수식어가 붙습니다.
+수식어가 명사 옆에서 모양을 바꾸는 언어라면 `randModifier`는 값을 그 언어의 단어 풀에서 찾습니다. 풀에 있는 단어에는 성이 붙어 있으므로 수식어가 거기에 맞는 형태로 나옵니다. 풀에 없는 단어는 어미로 판단합니다. 스페인어는 `-a`, `-ión`, `-dad`, `-tad`, `-umbre`, `-triz`를 여성으로 읽습니다. 러시아어는 `-а`와 `-я`를 여성으로, `-о`, `-е`, `-ё`를 중성으로 읽고, 독일어는 어미로 알 수 있는 여섯 가지 가운데 `-ung`, `-heit`, `-keit`, `-schaft`를 여성으로, `-chen`과 `-lein`을 중성으로 읽습니다. 나머지는 남성으로 보므로 지어낸 단어에도 성에 맞는 수식어가 붙습니다.
 
 단수형이 아예 없는 명사(`ножницы`, `gafas`, `Jeans`)도 같은 이유로 복수 태그를 답니다. 그래서 그 옆의 수식어도 복수형입니다.
 
@@ -239,7 +239,7 @@ rand_modifier(["Owl", "Owl", "Owl"])
 
 ## 구분자와 만들어낸 수식어 {#the-separator-and-invented-modifiers}
 
-`separator`의 기본값은 그 언어가 단어를 잇는 방식, 즉 붙여 쓰는 것입니다. `realism`은 모든 생성 함수가 가진 그 옵션입니다. `real`은 언어가 실제로 쓰는 수식어를 뽑고, `invented`는 그 언어처럼 읽히기만 하는 수식어를 만들어냅니다.
+`separator`의 기본값은 그 언어가 단어를 잇는 방식입니다. 한국어, 일본어, 중국어, 영어는 붙여 쓰고 베트남어, 스페인어, 이탈리아어, 독일어, 러시아어는 공백을 넣습니다(`gato azul`). `realism`은 모든 생성 함수가 가진 그 옵션입니다. `real`은 언어가 실제로 쓰는 수식어를 뽑고, `invented`는 그 언어처럼 읽히기만 하는 수식어를 만들어냅니다.
 
 ::: lang js
 
@@ -268,7 +268,7 @@ rand_modifier(language="en", realism="invented")  # 'Snikith'
 
 :::
 
-## 수식어와 명사는 닉네임이 쓰는 그 단어 풀입니다 {#the-same-pools-a-nickname-uses}
+## 수식어와 명사는 닉네임이 쓰는 그 단어 풀입니다 {#the-modifier-and-the-noun-are-the-same-pools-a-nickname-uses}
 
 단어 앞에 수식어를 붙이는 것은 `randNickname`이 대부분의 경우에 하는 일과 같습니다. <Lang js="randModifier(randAnimal())" dart="randModifier(value: randAnimal().first)" py="rand_modifier(rand_animal())" code />와 `randNickname({ theme: 'animal' })`은 같은 곳에서 단어를 꺼냅니다. 닉네임 생성기가 여기에 더하는 것은 형태와 길이 맞추기입니다. 뒤에 붙는 단어, 결과 전체가 들어가야 하는 범위, 그리고 두 단어가 경계에서 같은 글자를 반복할 때의 재추첨입니다.
 

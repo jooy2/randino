@@ -177,7 +177,7 @@ rand_suffix("MistyOwl", charset="".join(c for c in AFFIX_CHARSET if not c.isuppe
 It comes from the platform's ordinary random number generator — `Math.random`, `dart:math`'s `Random`, Python's `random` — and none of those is a cryptographically secure source. Two things follow, and both matter more than they look:
 
 - **A token can be guessed.** These generators run a small amount of state forward, and that state can be recovered from a handful of outputs. Anybody who sees a few tokens can work out the ones that come next.
-- **Two tokens can collide.** The default is five characters out of an alphabet of 57, which is 601,692,057 tokens. By the birthday bound a collision becomes likely somewhere around thirty thousand of them, and one turned up in a run of fifty thousand. A longer `length` pushes that out — eight characters is 3.7 × 10¹⁴ — but it never reaches zero.
+- **Two tokens can collide.** The default is five characters out of an alphabet of 57, which is 601,692,057 tokens. By the birthday bound a collision becomes likely somewhere around thirty thousand of them, and one turned up in a run of fifty thousand. A longer `length` pushes that out — eight characters is 1.1 × 10¹⁴ — but it never reaches zero.
 
 So a suffix is right for telling two nicknames apart, and wrong for anything that has to be unguessable: a session token, an invite code, a password reset link, an object key somebody must not be able to enumerate. For those, hand the decorator a secure source through [`random`](../guide/getting-started#choosing-the-source) — `crypto.getRandomValues`, `Random.secure()`, `SystemRandom` — and use a database constraint rather than a token when a value has to be unique with certainty.
 

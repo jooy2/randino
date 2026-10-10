@@ -84,8 +84,8 @@ WordLanguage _languageOf(String value) {
 /// is in play. [realism] decides whether the modifier is one the language
 /// actually uses or one invented to read like it, and [kind] whether it says
 /// what the value is like or what it is doing — left out, both are in play.
-/// [separator] defaults to the way the language joins words, which is to run
-/// them together.
+/// [separator] defaults to the way the language joins words: run together in
+/// Korean, Japanese, Chinese and English, a space in the other five.
 ///
 /// ```dart
 /// randModifier(); // '멋진'

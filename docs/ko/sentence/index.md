@@ -2,7 +2,7 @@
 
 [`randSentence`](./rand-sentence)는 주어와 서술어를 갖춘 완결된 문장을 만듭니다. 이 페이지는 생성기가 무엇을 어디에 세울지 정하는 방식을 설명합니다. 옵션 하나하나는 [레퍼런스 페이지](./rand-sentence)에 있습니다.
 
-## 동사가 정하는 단어 조합 {#the-words-belong-together}
+## 동사가 정하는 단어 조합 {#the-words-of-one-sentence-belong-together}
 
 한 문장의 단어를 묶어 주는 것은 동사입니다. 모든 동사는 어떤 종류의 명사가 그 행위를 할 수 있는지, 타동사라면 무엇에 할 수 있는지를 밝혀 두고, 명사는 거기서만 뽑습니다.
 
@@ -59,7 +59,7 @@
 
 `shape`는 같은 일을 더 큰 단위로 합니다. 글자 수가 아니라 구의 개수를 정하며, 짧은 문장과 긴 문장이라고 할 때 보통 뜻하는 쪽이 이것입니다.
 
-## `realism`의 적용 범위 {#what-realism-changes}
+## `realism`의 적용 범위 {#what-realism-changes-and-what-it-does-not}
 
 `realism`은 단어가 어디서 오는지만 정합니다. `'invented'`는 명사와 수식어를 그 언어의 소리로 지어내고, 그 주위의 문법은 그대로 둡니다. 조사도 관사도 일치도 형태도 모두 그 언어의 것입니다.
 
@@ -75,7 +75,7 @@
 
 이야기의 종류는 [`randSentence`](./rand-sentence#more-than-one-sentence)에 있고, 같은 페이지의 `tense`가 이야기를 어느 시제로 쓸지 정합니다.
 
-## 닉네임과의 차이 {#where-a-sentence-differs}
+## 닉네임과의 차이 {#where-a-sentence-differs-from-a-nickname}
 
 [`randNickname`](../nickname/rand-nickname)은 단어를 나란히 놓기만 하고, 문장은 그중 하나에 대해 무언가를 말합니다. 차이는 세 가지입니다.
 

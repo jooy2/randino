@@ -615,7 +615,7 @@ final WordLanguageData de = WordLanguageData(
   nounGender: _nouns.gender,
   // German declines the modifier in front of the noun, and the base form is the
   // bare stem: `blau` becomes `blauer Wal`, `blaue Katze`, `blaues Haus`.
-  // German gender is not predictable from the ending, and these four suffixes are
+  // German gender is not predictable from the ending, and these six suffixes are
   // the exception — every noun in `-ung`, `-heit`, `-keit` or `-schaft` is
   // feminine, and one in `-chen` or `-lein` neuter. A made-up word matching none
   // of them is masculine, which is a guess; what it buys is an article and an

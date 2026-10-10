@@ -65,7 +65,7 @@ name_length_range("en", include_middle_name=True)  # (11, 32)
 
 :::
 
-## 켜져 있는 요소만 셉니다 {#counts-only-what-is-switched-on}
+## 켜져 있는 요소만 셉니다 {#it-counts-only-the-parts-that-are-switched-on}
 
 성을 빼면 그만큼 범위가 내려갈 뿐, 이름이 길어져 빈자리를 채우지는 않습니다. 그리고 없는 중간 이름을 요청해도 범위가 넓어지지 않습니다.
 

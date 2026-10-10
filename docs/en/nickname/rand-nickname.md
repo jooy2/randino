@@ -41,7 +41,7 @@ Every option is optional, and the defaults are what the empty call above uses.
 
 | Option | Type | Default | Description |
 | --- | --- | --- | --- |
-| `language` | <Lang js="WordLanguageOption" dart="WordLanguage?" py="WordLanguageOption &#124; None" code /> | <Lang js="'all'" dart="null" py="None" code /> | Language of the generated nicknames. <Lang js="'all'" dart="null" py="&quot;all&quot;" code /> mixes every supported language, picking one per nickname. |
+| `language` | <Lang js="WordLanguageOption" dart="WordLanguage?" py="WordLanguageOption" code /> | <Lang js="'all'" dart="null" py="&quot;all&quot;" code /> | Language of the generated nicknames. <Lang js="'all'" dart="null" py="&quot;all&quot;" code /> mixes every supported language, picking one per nickname. |
 | `theme` | <Lang js="WordThemeOption" dart="WordTheme?" py="WordThemeOption" code /> | <Lang js="'all'" dart="null" py="&quot;all&quot;" code /> | What the nickname is about. See [Themes](../word/themes). |
 | `slots` | <Lang js="WordSlotOption" dart="Set&lt;WordSlot&gt;?" py="WordSlotOption" code /> | <Lang js="'all'" dart="null" py="&quot;all&quot;" code /> | Which shapes to accept, by what they put beside the noun. See [Picking the shape](#picking-the-shape). |
 | `count` | <Lang js="number" dart="int" py="int" code /> | `1` | How many nicknames to return. Clamped to `0` … `10000`. |
@@ -49,7 +49,7 @@ Every option is optional, and the defaults are what the empty call above uses.
 | `vocabulary` | `RandVocabulary` | <Lang js="`'full'`" dart="`RandVocabulary.full`" py="`\"full\"`" /> | How common the noun the nickname is built around has to be: `basic`, `common` or `full`. See [Common words](../word/rand-word#vocabulary). |
 | <Lang js="minLength" dart="minLength" py="min_length" code /> | <Lang js="number" dart="int?" py="int &#124; None" code /> | _language_ | Minimum length in characters. |
 | <Lang js="maxLength" dart="maxLength" py="max_length" code /> | <Lang js="number" dart="int?" py="int &#124; None" code /> | _language_ | Maximum length in characters. |
-| <Lang js="wordSeparator" dart="wordSeparator" py="word_separator" code /> | <Lang js="string" dart="String?" py="str &#124; None" code /> | _language_ | Placed between the words. Counts toward the length range. Defaults to running them together. |
+| <Lang js="wordSeparator" dart="wordSeparator" py="word_separator" code /> | <Lang js="string" dart="String?" py="str &#124; None" code /> | _language_ | Placed between the words. Counts toward the length range. Defaults to the language's own: nothing in Korean, Japanese, Chinese and English, a space in the rest. |
 | <Lang js="startsWith" dart="startsWith" py="starts_with" code /> | <Lang js="string" dart="String?" py="str" code /> | <Lang js="—" dart="null" py="&quot;&quot;" code /> | Keep only nicknames whose first character is this one. |
 | `unique` | <Lang js="boolean" dart="bool" py="bool" code /> | <Lang js="false" dart="false" py="False" code /> | Never return the same nickname twice. May return fewer than `count` once the pools run out of combinations. |
 | `output` | <Lang js="RandOutput" py="RandOutput" code /> | <Lang js="'value'" py="&quot;value&quot;" code /> | Strings, or a `NicknameDetail` per nickname. Dart has no such parameter — see [the detail output](#the-detail-output). |

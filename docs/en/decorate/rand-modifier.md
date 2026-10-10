@@ -120,7 +120,7 @@ With no value there is no script to read, so every language is in play unless yo
 
 ## The modifier agrees with the value
 
-In a language whose modifiers change shape beside the noun, `randModifier` looks the value up in that language's pools. A word it finds carries a gender, so the modifier comes back in the form that goes with it. A word from no pool is read by its ending instead, the way the language itself reads an unfamiliar one. Spanish takes `-a`, `-ión` and `-dad` as feminine, Russian `-а` and `-о`, and German the four suffixes that are predictable, so a made-up word gets a modifier that agrees with it too.
+In a language whose modifiers change shape beside the noun, `randModifier` looks the value up in that language's pools. A word it finds carries a gender, so the modifier comes back in the form that goes with it. A word from no pool is read by its ending instead, the way the language itself reads an unfamiliar one. Spanish takes `-a`, `-ión`, `-dad`, `-tad`, `-umbre` and `-triz` as feminine; Russian takes `-а` and `-я` as feminine and `-о`, `-е` and `-ё` as neuter; German reads the six suffixes that are predictable, `-ung`, `-heit`, `-keit` and `-schaft` as feminine and `-chen` and `-lein` as neuter. Anything else is masculine, so a made-up word gets a modifier that agrees with it too.
 
 A noun with no singular at all, such as `ножницы`, `gafas` or `Jeans`, is tagged plural for the same reason, so the modifier beside it is plural too.
 
@@ -239,7 +239,7 @@ rand_modifier(["Owl", "Owl", "Owl"])
 
 ## The separator, and invented modifiers
 
-`separator` defaults to the way the language itself joins words, which is to run them together. `realism` is the same option every generator has: `real` draws a modifier the language actually uses, `invented` builds one that only reads like it.
+`separator` defaults to the way the language itself joins words: run together in Korean, Japanese, Chinese and English, a space in Vietnamese, Spanish, Italian, German and Russian (`gato azul`). `realism` is the same option every generator has: `real` draws a modifier the language actually uses, `invented` builds one that only reads like it.
 
 ::: lang js
 

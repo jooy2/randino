@@ -94,8 +94,9 @@ def rand_nickname(
         max_length: Maximum length in characters.
         word_separator: Placed between the words a nickname is built from
             (`"멋진 사자"`, `"misty-owl"`), and counted toward `min_length` /
-            `max_length`. Defaults to the way the language itself joins them, which
-            is to run them together (`멋진사자`, `MistyOwl`).
+            `max_length`. Defaults to the way the language itself joins them: run
+            together in Korean, Japanese, Chinese and English (`멋진사자`,
+            `MistyOwl`), a space in the other five (`gato azul`).
         starts_with: Keep only nicknames whose first character is this one.
         unique: Never return the same nickname twice. May return fewer than `count`
             nicknames once the pools run out of combinations.

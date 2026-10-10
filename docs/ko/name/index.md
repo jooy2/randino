@@ -87,7 +87,7 @@ rand_name(language="en", realism="invented", count=3)
 
 나머지 여섯 언어는 성씨 분포의 꼬리가 길어서 균등하게 뽑아도 실제와 자릿수가 맞습니다. 그래서 빈도표를 두지 않았습니다.
 
-### 길이는 고유 표기를 기준으로 셉니다 {#length}
+### 길이는 고유 표기를 기준으로 셉니다 {#length-is-counted-in-the-native-form}
 
 <Lang js="minLength" dart="minLength" py="min_length" code />와 <Lang js="maxLength" dart="maxLength" py="max_length" code />는 **요소 사이의 공백을 포함한 고유 표기의 글자 수**를 셉니다. 요청한 구조가 항상 우선합니다. 요청한 요소를 담기에 범위가 너무 좁으면, 요청한 성이나 중간 이름을 빼는 대신 생성기가 만들 수 있는 가장 가까운 이름을 돌려줍니다.
 
