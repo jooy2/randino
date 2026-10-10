@@ -8,7 +8,7 @@ Each theme is also a generator of its own. `randWord` takes the theme as an opti
 | --- | --- | --- | --- | --- |
 | `animal` | [`randAnimal`](./rand-animal) | animals | 사자, 고양이 | Lion, Cat |
 | `object` | [`randObject`](./rand-object) | things within reach | 물병, 우산 | Bottle, Umbrella |
-| `nature` | [`randNature`](./rand-nature) | nature and its phenomena | 하늘, 노을 | Sky, Dawn |
+| `nature` | [`randNature`](./rand-nature) | nature and its phenomena | 하늘, 파도 | Sky, River |
 | `plant` | [`randPlant`](./rand-plant) | plants, and their parts | 민들레, 솔방울 | Dandelion, Acorn |
 | `gem` | [`randGem`](./rand-gem) | stones, metals and gems | 흑요석, 청동 | Obsidian, Bronze |
 | `concept` | [`randConcept`](./rand-concept) | terms, and ideas from the humanities | 철학, 자유 | Philosophy, Truth |
@@ -32,7 +32,7 @@ Each theme is also a generator of its own. `randWord` takes the theme as an opti
 | `tool` | [`randTool`](./rand-tool) | what a hand works with | 대패, 곡괭이 | Chisel, Trowel |
 | `drink` | [`randDrink`](./rand-drink) | something to drink | 식혜, 보리차 | Cider, Cordial |
 | `toy` | [`randToy`](./rand-toy) | toys and games | 팽이, 연 | Kite, Yoyo |
-| `sound` | [`randSound`](./rand-sound) | sounds, voices and onomatopoeia | 속삭임, 함성 | Whisper, Chime |
+| `sound` | [`randSound`](./rand-sound) | sounds, voices and onomatopoeia | 속삭임, 함성 | Whisper, Hum |
 | `person` | [`randPerson`](./rand-person) | people by age, kinship and character | 꼬마, 이웃 | Toddler, Neighbor |
 | `furniture` | [`randFurniture`](./rand-furniture) | furniture and furnishings | 흔들의자, 요람 | Hammock, Cradle |
 
@@ -48,7 +48,7 @@ WORD_THEMES;
 //  'drink', 'toy', 'sound', 'person', 'furniture']
 
 randWord({ theme: 'food', language: 'en', count: 3 });
-// ['Dumpling', 'Cocoa', 'Pancake']
+// ['Dumpling', 'Pretzel', 'Pancake']
 
 randFood({ language: 'en', count: 3 }); // the same thing
 ```
@@ -63,7 +63,7 @@ import 'package:randino/randino.dart';
 wordThemes; // every WordTheme, in presentation order
 
 randWord(theme: WordTheme.food, language: WordLanguage.en, count: 3);
-// [Dumpling, Cocoa, Pancake]
+// [Dumpling, Pretzel, Pancake]
 
 randFood(language: WordLanguage.en, count: 3); // the same thing
 ```
@@ -82,7 +82,7 @@ WORD_THEMES
 #  'drink', 'toy', 'sound', 'person', 'furniture')
 
 rand_word(theme="food", language="en", count=3)
-# ['Dumpling', 'Cocoa', 'Pancake']
+# ['Dumpling', 'Pretzel', 'Pancake']
 
 rand_food(language="en", count=3)  # the same thing
 ```

@@ -70,7 +70,7 @@ def rand_product(
         >>> rand_product(language="ko", count=3)
         ['노트북', '키보드', '이어폰']
         >>> rand_product(language="en", count=3)
-        ['Laptop', 'Keyboard', 'Earphone']
+        ['Laptop', 'Keyboard', 'Headphone']
     """
     theme: WordThemeOption = "product"
 

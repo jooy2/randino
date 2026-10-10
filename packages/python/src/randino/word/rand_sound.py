@@ -89,7 +89,7 @@ def rand_sound(
         >>> rand_sound(language="ko", count=3)
         ['속삭임', '함성', '바스락']
         >>> rand_sound(language="en", count=3)
-        ['Whisper', 'Chime', 'Rustle']
+        ['Whisper', 'Hum', 'Rustle']
     """
     theme: WordThemeOption = "sound"
 

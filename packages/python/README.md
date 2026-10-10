@@ -123,7 +123,7 @@ rand_word(language="en", theme="animal", count=3)
 # ['Otter', 'Falcon', 'Lynx']
 
 rand_animal(language="en", count=2)  # ['Turtle', 'Crane']
-rand_food(language="en", count=2)  # ['Dumpling', 'Cocoa']
+rand_food(language="en", count=2)  # ['Dumpling', 'Pretzel']
 
 rand_word(language="en", theme="plant", output="detail")
 # [WordDetail(word='Cedar', language='en', theme='plant')]

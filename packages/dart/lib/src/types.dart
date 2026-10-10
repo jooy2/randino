@@ -52,7 +52,7 @@ enum NameGender {
 
 /// How a name is written out.
 enum NameScript {
-  /// The language's own script: 김민준, 佐藤陽斗, Иванов Иван.
+  /// The language's own script: 김민준, 佐藤陽斗, Иван Семёнов.
   native,
 
   /// The English pronunciation of the native form: Kim Minjun.

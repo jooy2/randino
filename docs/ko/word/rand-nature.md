@@ -9,7 +9,7 @@
 ```javascript
 import { randNature } from 'randino';
 
-randNature({ language: 'en', count: 3 }); // ['Sky', 'Sunset', 'Breeze']
+randNature({ language: 'en', count: 3 }); // ['Sky', 'River', 'Meadow']
 randNature({ language: 'en', output: 'detail' });
 // [{ word: 'Sky', language: 'en', theme: 'nature' }]
 ```
@@ -21,7 +21,7 @@ randNature({ language: 'en', output: 'detail' });
 ```dart
 import 'package:randino/randino.dart';
 
-randNature(language: WordLanguage.en, count: 3); // [Sky, Sunset, Breeze]
+randNature(language: WordLanguage.en, count: 3); // [Sky, River, Meadow]
 ```
 
 `List<String>`을 돌려줍니다. 상세 출력이 필요하면 `randWordDetails`에 `WordTheme.nature`를 넘기세요. Dart에는 오버로드가 없어서, 이것만을 위해 함수를 스물아홉 개 더 두는 것은 과합니다.
@@ -33,7 +33,7 @@ randNature(language: WordLanguage.en, count: 3); // [Sky, Sunset, Breeze]
 ```python
 from randino import rand_nature
 
-rand_nature(language="en", count=3)  # ['Sky', 'Sunset', 'Breeze']
+rand_nature(language="en", count=3)  # ['Sky', 'River', 'Meadow']
 rand_nature(language="en", output="detail")
 # [WordDetail(word='Sky', language='en', theme='nature')]
 ```

@@ -9,7 +9,7 @@ import { themedWord } from './wordGenerator.js';
  *
  * @example
  * randProduct({ language: 'ko', count: 3 }); // ['노트북', '키보드', '이어폰']
- * randProduct({ language: 'en', count: 3 }); // ['Laptop', 'Keyboard', 'Earphone']
+ * randProduct({ language: 'en', count: 3 }); // ['Laptop', 'Keyboard', 'Headphone']
  */
 export function randProduct(options?: RandThemedWordOptions & { output?: 'value' }): string[];
 /**

@@ -89,7 +89,7 @@ def rand_color(
         >>> rand_color(language="ko", count=3)
         ['주홍', '연두', '쪽빛']
         >>> rand_color(language="en", count=3)
-        ['Crimson', 'Teal', 'Ochre']
+        ['Crimson', 'Teal', 'Ocher']
     """
     theme: WordThemeOption = "color"
 

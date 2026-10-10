@@ -11,7 +11,7 @@ import 'package:randino/src/word/rand_word.dart';
 ///
 /// ```dart
 /// randTool(language: WordLanguage.ko, count: 3); // [대패, 곡괭이, 집게]
-/// randTool(language: WordLanguage.en, count: 3); // [Chisel, Mallet, Trowel]
+/// randTool(language: WordLanguage.en, count: 3); // [Chisel, Hammer, Trowel]
 /// ```
 List<String> randTool({
   WordLanguage? language,

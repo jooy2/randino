@@ -8,7 +8,7 @@
 | --- | --- | --- | --- | --- |
 | `animal` | [`randAnimal`](./rand-animal) | 동물 | 사자, 고양이 | Lion, Cat |
 | `object` | [`randObject`](./rand-object) | 손 닿는 사물 | 물병, 우산 | Bottle, Umbrella |
-| `nature` | [`randNature`](./rand-nature) | 자연과 자연 현상 | 하늘, 노을 | Sky, Dawn |
+| `nature` | [`randNature`](./rand-nature) | 자연과 자연 현상 | 하늘, 파도 | Sky, River |
 | `plant` | [`randPlant`](./rand-plant) | 식물과 그 부분 | 민들레, 솔방울 | Dandelion, Acorn |
 | `gem` | [`randGem`](./rand-gem) | 돌, 금속, 보석 | 흑요석, 청동 | Obsidian, Bronze |
 | `concept` | [`randConcept`](./rand-concept) | 학문 용어와 인문·사회의 개념 | 철학, 자유 | Philosophy, Truth |
@@ -32,7 +32,7 @@
 | `tool` | [`randTool`](./rand-tool) | 손으로 다루는 연장 | 대패, 곡괭이 | Chisel, Trowel |
 | `drink` | [`randDrink`](./rand-drink) | 마실 것 | 식혜, 보리차 | Cider, Cordial |
 | `toy` | [`randToy`](./rand-toy) | 장난감과 놀이 | 팽이, 연 | Kite, Yoyo |
-| `sound` | [`randSound`](./rand-sound) | 소리, 목소리, 의성어 | 속삭임, 함성 | Whisper, Chime |
+| `sound` | [`randSound`](./rand-sound) | 소리, 목소리, 의성어 | 속삭임, 함성 | Whisper, Hum |
 | `person` | [`randPerson`](./rand-person) | 나이, 관계, 성격으로 부르는 사람 | 꼬마, 이웃 | Toddler, Neighbor |
 | `furniture` | [`randFurniture`](./rand-furniture) | 가구와 살림살이 | 흔들의자, 요람 | Hammock, Cradle |
 
@@ -48,7 +48,7 @@ WORD_THEMES;
 //  'drink', 'toy', 'sound', 'person', 'furniture']
 
 randWord({ theme: 'food', language: 'en', count: 3 });
-// ['Dumpling', 'Cocoa', 'Pancake']
+// ['Dumpling', 'Pretzel', 'Pancake']
 
 randFood({ language: 'en', count: 3 }); // 같은 결과
 ```
@@ -63,7 +63,7 @@ import 'package:randino/randino.dart';
 wordThemes; // 표시 순서대로 나열된 모든 WordTheme
 
 randWord(theme: WordTheme.food, language: WordLanguage.en, count: 3);
-// [Dumpling, Cocoa, Pancake]
+// [Dumpling, Pretzel, Pancake]
 
 randFood(language: WordLanguage.en, count: 3); // 같은 결과
 ```
@@ -82,7 +82,7 @@ WORD_THEMES
 #  'drink', 'toy', 'sound', 'person', 'furniture')
 
 rand_word(theme="food", language="en", count=3)
-# ['Dumpling', 'Cocoa', 'Pancake']
+# ['Dumpling', 'Pretzel', 'Pancake']
 
 rand_food(language="en", count=3)  # 같은 결과
 ```

@@ -118,7 +118,7 @@ randWord(language: WordLanguage.en, theme: WordTheme.animal, count: 3);
 // [Otter, Falcon, Lynx]
 
 randAnimal(language: WordLanguage.en, count: 2); // [Turtle, Crane]
-randFood(language: WordLanguage.en, count: 2); // [Dumpling, Cocoa]
+randFood(language: WordLanguage.en, count: 2); // [Dumpling, Pretzel]
 
 randWordDetails(language: WordLanguage.en, theme: WordTheme.plant).first;
 // WordDetail(Cedar, en, plant)

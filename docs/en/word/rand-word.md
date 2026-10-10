@@ -51,7 +51,7 @@ Dart has no `output`; [the detail output](#the-detail-output) is `randWordDetail
 
 A theme is an option and a function both. Each of the twenty-nine is `randWord` with the theme already chosen, and each has a page of its own. The words each theme holds are on [Themes](./themes).
 
-[`randAnimal`](./rand-animal) · [`randObject`](./rand-object) · [`randNature`](./rand-nature) · [`randPlant`](./rand-plant) · [`randGem`](./rand-gem) · [`randConcept`](./rand-concept) · [`randMyth`](./rand-myth) · [`randJob`](./rand-job) · [`randMusic`](./rand-music) · [`randPlace`](./rand-place) · [`randFood`](./rand-food) · [`randSport`](./rand-sport) · [`randVehicle`](./rand-vehicle) · [`randProduct`](./rand-product) · [`randColor`](./rand-color) · [`randFinance`](./rand-finance) · [`randTech`](./rand-tech) · [`randWeather`](./rand-weather) · [`randSpace`](./rand-space) · [`randTime`](./rand-time) · [`randEmotion`](./rand-emotion) · [`randBody`](./rand-body) · [`randClothing`](./rand-clothing) · [`randTool`](./rand-tool) · [`randDrink`](./rand-drink)
+[`randAnimal`](./rand-animal) · [`randObject`](./rand-object) · [`randNature`](./rand-nature) · [`randPlant`](./rand-plant) · [`randGem`](./rand-gem) · [`randConcept`](./rand-concept) · [`randMyth`](./rand-myth) · [`randJob`](./rand-job) · [`randMusic`](./rand-music) · [`randPlace`](./rand-place) · [`randFood`](./rand-food) · [`randSport`](./rand-sport) · [`randVehicle`](./rand-vehicle) · [`randProduct`](./rand-product) · [`randColor`](./rand-color) · [`randFinance`](./rand-finance) · [`randTech`](./rand-tech) · [`randWeather`](./rand-weather) · [`randSpace`](./rand-space) · [`randTime`](./rand-time) · [`randEmotion`](./rand-emotion) · [`randBody`](./rand-body) · [`randClothing`](./rand-clothing) · [`randTool`](./rand-tool) · [`randDrink`](./rand-drink) · [`randToy`](./rand-toy) · [`randSound`](./rand-sound) · [`randPerson`](./rand-person) · [`randFurniture`](./rand-furniture)
 
 ::: lang js
 
@@ -59,7 +59,7 @@ A theme is an option and a function both. Each of the twenty-nine is `randWord` 
 import { randAnimal, randFood, randGem } from 'randino';
 
 randAnimal({ language: 'en', count: 3 }); // ['Otter', 'Falcon', 'Lynx']
-randFood({ language: 'en', count: 2 }); // ['Dumpling', 'Cocoa']
+randFood({ language: 'en', count: 2 }); // ['Dumpling', 'Pretzel']
 randGem({ language: 'en', count: 2, unique: true }); // ['Obsidian', 'Bronze']
 ```
 
@@ -71,7 +71,7 @@ randGem({ language: 'en', count: 2, unique: true }); // ['Obsidian', 'Bronze']
 import 'package:randino/randino.dart';
 
 randAnimal(language: WordLanguage.en, count: 3); // [Otter, Falcon, Lynx]
-randFood(language: WordLanguage.en, count: 2); // [Dumpling, Cocoa]
+randFood(language: WordLanguage.en, count: 2); // [Dumpling, Pretzel]
 randGem(language: WordLanguage.en, count: 2, unique: true); // [Obsidian, Bronze]
 ```
 
@@ -85,7 +85,7 @@ The themed functions return `List<String>` only. For the detail form, pass the t
 from randino import rand_animal, rand_food, rand_gem
 
 rand_animal(language="en", count=3)  # ['Otter', 'Falcon', 'Lynx']
-rand_food(language="en", count=2)  # ['Dumpling', 'Cocoa']
+rand_food(language="en", count=2)  # ['Dumpling', 'Pretzel']
 rand_gem(language="en", count=2, unique=True)  # ['Obsidian', 'Bronze']
 ```
 

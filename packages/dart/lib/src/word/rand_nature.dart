@@ -10,8 +10,8 @@ import 'package:randino/src/word/rand_word.dart';
 /// no overloads, and twenty-four more functions for it would be twenty-four too many.
 ///
 /// ```dart
-/// randNature(language: WordLanguage.ko, count: 3); // [하늘, 노을, 바람]
-/// randNature(language: WordLanguage.en, count: 3); // [Sky, Sunset, Breeze]
+/// randNature(language: WordLanguage.ko, count: 3); // [하늘, 파도, 숲]
+/// randNature(language: WordLanguage.en, count: 3); // [Sky, River, Meadow]
 /// ```
 List<String> randNature({
   WordLanguage? language,

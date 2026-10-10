@@ -68,9 +68,9 @@ def rand_nature(
 
     Example:
         >>> rand_nature(language="ko", count=3)
-        ['하늘', '노을', '바람']
+        ['하늘', '파도', '숲']
         >>> rand_nature(language="en", count=3)
-        ['Sky', 'Sunset', 'Breeze']
+        ['Sky', 'River', 'Meadow']
     """
     theme: WordThemeOption = "nature"
 

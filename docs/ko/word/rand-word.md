@@ -51,7 +51,7 @@ Dart에는 `output`이 없습니다. 거기서는 [상세 출력](#the-detail-ou
 
 테마는 옵션이면서 함수이기도 합니다. 29개 각각이 테마를 미리 정해 둔 `randWord`이고, 문서 페이지도 하나씩 있습니다. 각 테마가 담고 있는 단어는 [테마](./themes)에 있습니다.
 
-[`randAnimal`](./rand-animal) · [`randObject`](./rand-object) · [`randNature`](./rand-nature) · [`randPlant`](./rand-plant) · [`randGem`](./rand-gem) · [`randConcept`](./rand-concept) · [`randMyth`](./rand-myth) · [`randJob`](./rand-job) · [`randMusic`](./rand-music) · [`randPlace`](./rand-place) · [`randFood`](./rand-food) · [`randSport`](./rand-sport) · [`randVehicle`](./rand-vehicle) · [`randProduct`](./rand-product) · [`randColor`](./rand-color) · [`randFinance`](./rand-finance) · [`randTech`](./rand-tech) · [`randWeather`](./rand-weather) · [`randSpace`](./rand-space) · [`randTime`](./rand-time) · [`randEmotion`](./rand-emotion) · [`randBody`](./rand-body) · [`randClothing`](./rand-clothing) · [`randTool`](./rand-tool) · [`randDrink`](./rand-drink)
+[`randAnimal`](./rand-animal) · [`randObject`](./rand-object) · [`randNature`](./rand-nature) · [`randPlant`](./rand-plant) · [`randGem`](./rand-gem) · [`randConcept`](./rand-concept) · [`randMyth`](./rand-myth) · [`randJob`](./rand-job) · [`randMusic`](./rand-music) · [`randPlace`](./rand-place) · [`randFood`](./rand-food) · [`randSport`](./rand-sport) · [`randVehicle`](./rand-vehicle) · [`randProduct`](./rand-product) · [`randColor`](./rand-color) · [`randFinance`](./rand-finance) · [`randTech`](./rand-tech) · [`randWeather`](./rand-weather) · [`randSpace`](./rand-space) · [`randTime`](./rand-time) · [`randEmotion`](./rand-emotion) · [`randBody`](./rand-body) · [`randClothing`](./rand-clothing) · [`randTool`](./rand-tool) · [`randDrink`](./rand-drink) · [`randToy`](./rand-toy) · [`randSound`](./rand-sound) · [`randPerson`](./rand-person) · [`randFurniture`](./rand-furniture)
 
 ::: lang js
 
@@ -59,7 +59,7 @@ Dart에는 `output`이 없습니다. 거기서는 [상세 출력](#the-detail-ou
 import { randAnimal, randFood, randGem } from 'randino';
 
 randAnimal({ language: 'en', count: 3 }); // ['Otter', 'Falcon', 'Lynx']
-randFood({ language: 'en', count: 2 }); // ['Dumpling', 'Cocoa']
+randFood({ language: 'en', count: 2 }); // ['Dumpling', 'Pretzel']
 randGem({ language: 'en', count: 2, unique: true }); // ['Obsidian', 'Bronze']
 ```
 
@@ -71,7 +71,7 @@ randGem({ language: 'en', count: 2, unique: true }); // ['Obsidian', 'Bronze']
 import 'package:randino/randino.dart';
 
 randAnimal(language: WordLanguage.en, count: 3); // [Otter, Falcon, Lynx]
-randFood(language: WordLanguage.en, count: 2); // [Dumpling, Cocoa]
+randFood(language: WordLanguage.en, count: 2); // [Dumpling, Pretzel]
 randGem(language: WordLanguage.en, count: 2, unique: true); // [Obsidian, Bronze]
 ```
 
@@ -85,7 +85,7 @@ randGem(language: WordLanguage.en, count: 2, unique: true); // [Obsidian, Bronze
 from randino import rand_animal, rand_food, rand_gem
 
 rand_animal(language="en", count=3)  # ['Otter', 'Falcon', 'Lynx']
-rand_food(language="en", count=2)  # ['Dumpling', 'Cocoa']
+rand_food(language="en", count=2)  # ['Dumpling', 'Pretzel']
 rand_gem(language="en", count=2, unique=True)  # ['Obsidian', 'Bronze']
 ```
 

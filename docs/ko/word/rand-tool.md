@@ -9,7 +9,7 @@
 ```javascript
 import { randTool } from 'randino';
 
-randTool({ language: 'en', count: 3 }); // ['Chisel', 'Mallet', 'Trowel']
+randTool({ language: 'en', count: 3 }); // ['Chisel', 'Hammer', 'Trowel']
 randTool({ language: 'en', output: 'detail' });
 // [{ word: 'Chisel', language: 'en', theme: 'tool' }]
 ```
@@ -21,7 +21,7 @@ randTool({ language: 'en', output: 'detail' });
 ```dart
 import 'package:randino/randino.dart';
 
-randTool(language: WordLanguage.en, count: 3); // [Chisel, Mallet, Trowel]
+randTool(language: WordLanguage.en, count: 3); // [Chisel, Hammer, Trowel]
 ```
 
 `List<String>`을 돌려줍니다. 상세 출력이 필요하면 `randWordDetails`에 `WordTheme.tool`을 넘기세요. Dart에는 오버로드가 없어서, 이것만을 위해 함수를 스물아홉 개 더 두는 것은 과합니다.
@@ -33,7 +33,7 @@ randTool(language: WordLanguage.en, count: 3); // [Chisel, Mallet, Trowel]
 ```python
 from randino import rand_tool
 
-rand_tool(language="en", count=3)  # ['Chisel', 'Mallet', 'Trowel']
+rand_tool(language="en", count=3)  # ['Chisel', 'Hammer', 'Trowel']
 rand_tool(language="en", output="detail")
 # [WordDetail(word='Chisel', language='en', theme='tool')]
 ```

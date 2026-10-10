@@ -12,7 +12,7 @@ import { generateWordDetails } from './wordGenerator.js';
  * @example
  * randWord({ language: 'ko', theme: 'animal', count: 3 }); // ['여우', '고래', '수달']
  * randWord({ language: 'en', count: 2 }); // ['Lantern', 'Meadow']
- * randWord({ language: 'ko', maxLength: 2, count: 3 }); // ['별', '노을', '거문고']
+ * randWord({ language: 'ko', maxLength: 2, count: 3 }); // ['별', '노을', '달']
  */
 export function randWord(options?: RandWordOptions & { output?: 'value' }): string[];
 /**

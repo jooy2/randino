@@ -8,8 +8,8 @@ import { themedWord } from './wordGenerator.js';
  * option is the same.
  *
  * @example
- * randNature({ language: 'ko', count: 3 }); // ['하늘', '노을', '바람']
- * randNature({ language: 'en', count: 3 }); // ['Sky', 'Sunset', 'Breeze']
+ * randNature({ language: 'ko', count: 3 }); // ['하늘', '파도', '숲']
+ * randNature({ language: 'en', count: 3 }); // ['Sky', 'River', 'Meadow']
  */
 export function randNature(options?: RandThemedWordOptions & { output?: 'value' }): string[];
 /**

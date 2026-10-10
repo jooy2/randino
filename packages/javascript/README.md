@@ -57,7 +57,7 @@ randName({ language: 'en', gender: 'female', includeMiddleName: true });
 // ['Grace Amelia Bennett']
 
 randName({ language: 'ja', count: 2, script: 'roman' });
-// ['Yamazaki Aina', 'Kato Kaeno']
+// ['Murakami Hinata', 'Miura Eriko']
 
 randName({ language: 'ko', output: 'detail' });
 // [{ native: '여미주', roman: 'Yeo Miju', language: 'ko', gender: 'female' }]
@@ -128,7 +128,7 @@ randWord({ language: 'en', theme: 'animal', count: 3 });
 // ['Otter', 'Falcon', 'Lynx']
 
 randAnimal({ language: 'en', count: 2 }); // ['Turtle', 'Crane']
-randFood({ language: 'en', count: 2 }); // ['Dumpling', 'Cocoa']
+randFood({ language: 'en', count: 2 }); // ['Dumpling', 'Pretzel']
 
 randWord({ language: 'en', theme: 'plant', output: 'detail' });
 // [{ word: 'Cedar', language: 'en', theme: 'plant' }]

@@ -9,7 +9,7 @@ import { themedWord } from './wordGenerator.js';
  *
  * @example
  * randTool({ language: 'ko', count: 3 }); // ['대패', '곡괭이', '집게']
- * randTool({ language: 'en', count: 3 }); // ['Chisel', 'Mallet', 'Trowel']
+ * randTool({ language: 'en', count: 3 }); // ['Chisel', 'Hammer', 'Trowel']
  */
 export function randTool(options?: RandThemedWordOptions & { output?: 'value' }): string[];
 /**

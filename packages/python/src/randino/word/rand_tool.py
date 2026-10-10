@@ -89,7 +89,7 @@ def rand_tool(
         >>> rand_tool(language="ko", count=3)
         ['대패', '곡괭이', '집게']
         >>> rand_tool(language="en", count=3)
-        ['Chisel', 'Mallet', 'Trowel']
+        ['Chisel', 'Hammer', 'Trowel']
     """
     theme: WordThemeOption = "tool"
 

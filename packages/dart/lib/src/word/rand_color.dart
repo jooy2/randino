@@ -11,7 +11,7 @@ import 'package:randino/src/word/rand_word.dart';
 ///
 /// ```dart
 /// randColor(language: WordLanguage.ko, count: 3); // [주홍, 연두, 쪽빛]
-/// randColor(language: WordLanguage.en, count: 3); // [Crimson, Teal, Ochre]
+/// randColor(language: WordLanguage.en, count: 3); // [Crimson, Teal, Ocher]
 /// ```
 List<String> randColor({
   WordLanguage? language,

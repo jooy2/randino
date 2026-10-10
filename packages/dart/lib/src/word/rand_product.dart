@@ -11,7 +11,7 @@ import 'package:randino/src/word/rand_word.dart';
 ///
 /// ```dart
 /// randProduct(language: WordLanguage.ko, count: 3); // [노트북, 키보드, 이어폰]
-/// randProduct(language: WordLanguage.en, count: 3); // [Laptop, Keyboard, Earphone]
+/// randProduct(language: WordLanguage.en, count: 3); // [Laptop, Keyboard, Headphone]
 /// ```
 List<String> randProduct({
   WordLanguage? language,

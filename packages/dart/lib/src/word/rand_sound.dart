@@ -11,7 +11,7 @@ import 'package:randino/src/word/rand_word.dart';
 ///
 /// ```dart
 /// randSound(language: WordLanguage.ko, count: 3); // [속삭임, 함성, 바스락]
-/// randSound(language: WordLanguage.en, count: 3); // [Whisper, Chime, Rustle]
+/// randSound(language: WordLanguage.en, count: 3); // [Whisper, Hum, Rustle]
 /// ```
 List<String> randSound({
   WordLanguage? language,

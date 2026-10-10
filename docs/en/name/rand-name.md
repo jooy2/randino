@@ -252,7 +252,7 @@ randName({ language: 'ko', count: 3, script: 'roman' });
 // ['Kim Minjun', 'Won Donghyeok', 'Jo Jinu']
 
 randName({ language: 'ja', count: 3, script: 'roman' });
-// ['Yamazaki Aina', 'Kato Kaeno', 'Yoshida Naoyato']
+// ['Murakami Hinata', 'Miura Eriko', 'Watanabe Shintaro']
 ```
 
 :::
@@ -264,7 +264,7 @@ randName(language: NameLanguage.ko, count: 3, script: NameScript.roman);
 // ['Kim Minjun', 'Won Donghyeok', 'Jo Jinu']
 
 randName(language: NameLanguage.ja, count: 3, script: NameScript.roman);
-// ['Yamazaki Aina', 'Kato Kaeno', 'Yoshida Naoyato']
+// ['Murakami Hinata', 'Miura Eriko', 'Watanabe Shintaro']
 ```
 
 :::
@@ -276,7 +276,7 @@ rand_name(language="ko", count=3, script="roman")
 # ['Kim Minjun', 'Won Donghyeok', 'Jo Jinu']
 
 rand_name(language="ja", count=3, script="roman")
-# ['Yamazaki Aina', 'Kato Kaeno', 'Yoshida Naoyato']
+# ['Murakami Hinata', 'Miura Eriko', 'Watanabe Shintaro']
 ```
 
 :::
@@ -320,7 +320,7 @@ A character no real name starts with still returns names rather than nothing: La
 
 ```javascript
 randName({ language: 'en', count: 2, minLength: 20, maxLength: 25 });
-// ['Josephine Adelaide Sinclair', 'Christina Genevieve Whitaker']
+// ['Evangeline Haverford', 'Stephanie Cunningham']
 ```
 
 :::
@@ -329,7 +329,7 @@ randName({ language: 'en', count: 2, minLength: 20, maxLength: 25 });
 
 ```dart
 randName(language: NameLanguage.en, count: 2, minLength: 20, maxLength: 25);
-// ['Josephine Adelaide Sinclair', 'Christina Genevieve Whitaker']
+// ['Evangeline Haverford', 'Stephanie Cunningham']
 ```
 
 :::
@@ -338,7 +338,7 @@ randName(language: NameLanguage.en, count: 2, minLength: 20, maxLength: 25);
 
 ```python
 rand_name(language="en", count=2, min_length=20, max_length=25)
-# ['Josephine Adelaide Sinclair', 'Christina Genevieve Whitaker']
+# ['Evangeline Haverford', 'Stephanie Cunningham']
 ```
 
 :::
@@ -354,7 +354,7 @@ for (const { native, roman } of randName({ language: 'ja', count: 3, output: 'de
 	console.log(`${native} (${roman})`);
 }
 // 山崎愛菜 (Yamazaki Aina)
-// 加藤楓乃 (Kato Kaeno)
+// 松田美智子 (Matsuda Michiko)
 // 吉田直人 (Yoshida Naoto)
 ```
 
@@ -367,7 +367,7 @@ for (final detail in randNameDetails(language: NameLanguage.ja, count: 3)) {
   print('${detail.native} (${detail.roman})');
 }
 // 山崎愛菜 (Yamazaki Aina)
-// 加藤楓乃 (Kato Kaeno)
+// 松田美智子 (Matsuda Michiko)
 // 吉田直人 (Yoshida Naoto)
 ```
 
@@ -379,7 +379,7 @@ for (final detail in randNameDetails(language: NameLanguage.ja, count: 3)) {
 for detail in rand_name(language="ja", count=3, output="detail"):
     print(f"{detail.native} ({detail.roman})")
 # 山崎愛菜 (Yamazaki Aina)
-# 加藤楓乃 (Kato Kaeno)
+# 松田美智子 (Matsuda Michiko)
 # 吉田直人 (Yoshida Naoto)
 ```
 
@@ -394,7 +394,7 @@ randName({ count: 3, output: 'detail' });
 // [
 //   { native: '조동민', roman: 'Jo Dongmin', language: 'ko', gender: 'male' },
 //   { native: 'Anna Mariani', roman: 'Anna Mariani', language: 'it', gender: 'female' },
-//   { native: 'Иванов Иван', roman: 'Ivanov Ivan', language: 'ru', gender: 'male' }
+//   { native: 'Семён Дементьев', roman: 'Semyon Dementev', language: 'ru', gender: 'male' }
 // ]
 ```
 
@@ -407,7 +407,7 @@ randNameDetails(count: 3);
 // [
 //   NameDetail(조동민, Jo Dongmin, ko, male),
 //   NameDetail(Anna Mariani, Anna Mariani, it, female),
-//   NameDetail(Иванов Иван, Ivanov Ivan, ru, male),
+//   NameDetail(Семён Дементьев, Semyon Dementev, ru, male),
 // ]
 ```
 
@@ -420,7 +420,7 @@ rand_name(count=3, output="detail")
 # [
 #     NameDetail(native='조동민', roman='Jo Dongmin', language='ko', gender='male'),
 #     NameDetail(native='Anna Mariani', roman='Anna Mariani', language='it', gender='female'),
-#     NameDetail(native='Иванов Иван', roman='Ivanov Ivan', language='ru', gender='male'),
+#     NameDetail(native='Семён Дементьев', roman='Semyon Dementev', language='ru', gender='male'),
 # ]
 ```
 

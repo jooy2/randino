@@ -9,7 +9,7 @@ Sounds and voices, and the words a language has for them.
 ```javascript
 import { randSound } from 'randino';
 
-randSound({ language: 'en', count: 3 }); // ['Whisper', 'Chime', 'Rustle']
+randSound({ language: 'en', count: 3 }); // ['Whisper', 'Hum', 'Rustle']
 randSound({ language: 'en', output: 'detail' });
 // [{ word: 'Whisper', language: 'en', theme: 'sound' }]
 ```
@@ -21,7 +21,7 @@ randSound({ language: 'en', output: 'detail' });
 ```dart
 import 'package:randino/randino.dart';
 
-randSound(language: WordLanguage.en, count: 3); // [Whisper, Chime, Rustle]
+randSound(language: WordLanguage.en, count: 3); // [Whisper, Hum, Rustle]
 ```
 
 Returns `List<String>`. For the detail form, pass `WordTheme.sound` to `randWordDetails`. Dart has no overloads, and a detail twin for each of the twenty-nine themes would be twenty-nine functions too many.
@@ -33,7 +33,7 @@ Returns `List<String>`. For the detail form, pass `WordTheme.sound` to `randWord
 ```python
 from randino import rand_sound
 
-rand_sound(language="en", count=3)  # ['Whisper', 'Chime', 'Rustle']
+rand_sound(language="en", count=3)  # ['Whisper', 'Hum', 'Rustle']
 rand_sound(language="en", output="detail")
 # [WordDetail(word='Whisper', language='en', theme='sound')]
 ```

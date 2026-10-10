@@ -24,7 +24,7 @@ NameGenderOption = Literal[NameGender, "all"]
 NameScript = Literal["native", "roman"]
 """How a name is written out.
 
-- `native`: the language's own script (김민준, 佐藤陽斗, Иванов Иван).
+- `native`: the language's own script (김민준, 佐藤陽斗, Иван Семёнов).
 - `roman`: the English pronunciation of the native form (Kim Minjun).
 """
 

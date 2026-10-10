@@ -9,7 +9,7 @@
 ```javascript
 import { randSound } from 'randino';
 
-randSound({ language: 'en', count: 3 }); // ['Whisper', 'Chime', 'Rustle']
+randSound({ language: 'en', count: 3 }); // ['Whisper', 'Hum', 'Rustle']
 randSound({ language: 'en', output: 'detail' });
 // [{ word: 'Whisper', language: 'en', theme: 'sound' }]
 ```
@@ -21,7 +21,7 @@ randSound({ language: 'en', output: 'detail' });
 ```dart
 import 'package:randino/randino.dart';
 
-randSound(language: WordLanguage.en, count: 3); // [Whisper, Chime, Rustle]
+randSound(language: WordLanguage.en, count: 3); // [Whisper, Hum, Rustle]
 ```
 
 `List<String>`을 돌려줍니다. 상세 출력이 필요하면 `randWordDetails`에 `WordTheme.sound`를 넘기세요. Dart에는 오버로드가 없어서, 이것만을 위해 함수를 스물아홉 개 더 두는 것은 과합니다.
@@ -33,7 +33,7 @@ randSound(language: WordLanguage.en, count: 3); // [Whisper, Chime, Rustle]
 ```python
 from randino import rand_sound
 
-rand_sound(language="en", count=3)  # ['Whisper', 'Chime', 'Rustle']
+rand_sound(language="en", count=3)  # ['Whisper', 'Hum', 'Rustle']
 rand_sound(language="en", output="detail")
 # [WordDetail(word='Whisper', language='en', theme='sound')]
 ```

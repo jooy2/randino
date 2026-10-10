@@ -9,7 +9,7 @@ import { themedWord } from './wordGenerator.js';
  *
  * @example
  * randSound({ language: 'ko', count: 3 }); // ['속삭임', '함성', '바스락']
- * randSound({ language: 'en', count: 3 }); // ['Whisper', 'Chime', 'Rustle']
+ * randSound({ language: 'en', count: 3 }); // ['Whisper', 'Hum', 'Rustle']
  */
 export function randSound(options?: RandThemedWordOptions & { output?: 'value' }): string[];
 /**

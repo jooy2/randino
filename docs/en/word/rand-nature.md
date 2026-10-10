@@ -9,7 +9,7 @@ Nature and its phenomena: sky, weather, water and land.
 ```javascript
 import { randNature } from 'randino';
 
-randNature({ language: 'en', count: 3 }); // ['Sky', 'Sunset', 'Breeze']
+randNature({ language: 'en', count: 3 }); // ['Sky', 'River', 'Meadow']
 randNature({ language: 'en', output: 'detail' });
 // [{ word: 'Sky', language: 'en', theme: 'nature' }]
 ```
@@ -21,7 +21,7 @@ randNature({ language: 'en', output: 'detail' });
 ```dart
 import 'package:randino/randino.dart';
 
-randNature(language: WordLanguage.en, count: 3); // [Sky, Sunset, Breeze]
+randNature(language: WordLanguage.en, count: 3); // [Sky, River, Meadow]
 ```
 
 Returns `List<String>`. For the detail form, pass `WordTheme.nature` to `randWordDetails`. Dart has no overloads, and a detail twin for each of the twenty-nine themes would be twenty-nine functions too many.
@@ -33,7 +33,7 @@ Returns `List<String>`. For the detail form, pass `WordTheme.nature` to `randWor
 ```python
 from randino import rand_nature
 
-rand_nature(language="en", count=3)  # ['Sky', 'Sunset', 'Breeze']
+rand_nature(language="en", count=3)  # ['Sky', 'River', 'Meadow']
 rand_nature(language="en", output="detail")
 # [WordDetail(word='Sky', language='en', theme='nature')]
 ```

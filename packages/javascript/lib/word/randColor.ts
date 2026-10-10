@@ -9,7 +9,7 @@ import { themedWord } from './wordGenerator.js';
  *
  * @example
  * randColor({ language: 'ko', count: 3 }); // ['주홍', '연두', '쪽빛']
- * randColor({ language: 'en', count: 3 }); // ['Crimson', 'Teal', 'Ochre']
+ * randColor({ language: 'en', count: 3 }); // ['Crimson', 'Teal', 'Ocher']
  */
 export function randColor(options?: RandThemedWordOptions & { output?: 'value' }): string[];
 /**
