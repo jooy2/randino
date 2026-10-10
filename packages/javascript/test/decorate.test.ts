@@ -88,6 +88,19 @@ describe('Decorate', () => {
 		}
 	});
 
+	it('a value passed as undefined or null leaves the options beside it in force', () => {
+		// A caller forwarding an optional value writes it this way, and the options
+		// were dropped: the token came back five characters of the default charset.
+		for (const value of [undefined, null]) {
+			assert.match(
+				randSuffix(value as never, { length: 12, charset: '0123456789' }),
+				/^[0-9]{12}$/
+			);
+			assert.match(randPrefix(value as never, { length: 3, charset: 'xy' }), /^[xy]{3}$/);
+			assert.match(randModifier(value as never, { language: 'ko' }), /^[가-힣]+$/);
+		}
+	});
+
 	it('length is clamped to at least one character and at most the maximum', () => {
 		assert.strictEqual(randSuffix('a', { length: 0, separator: '' }).length, 2);
 		assert.strictEqual(randSuffix('a', { length: -5, separator: '' }).length, 2);

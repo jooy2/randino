@@ -2,6 +2,7 @@
 
 ## vNext (2026--)
 
+- `randSuffix`, `randPrefix` and `randModifier` keep the options passed beside a value of `undefined` or `null`, the way a caller forwarding an optional value writes it. `randSuffix(undefined, { length: 12 })` wrote the default five-character token.
 - `randSuffix` and `randPrefix` draw whole characters from a `charset` that holds emoji or any other character outside the Basic Multilingual Plane. They drew UTF-16 code units, which split `🎲` into two halves that are no character.
 - `randModifier` gives a German noun written in lower case the gender the noun has: `katze` takes a feminine modifier, as `Katze` does. It was read by its ending and came back `flinker katze`.
 - An invented Russian surname takes the feminine form beside a woman's name, the way a real one does. `realism: 'invented'` and `'mixed'` wrote `Чачев` beside a woman's given name.

@@ -22,10 +22,14 @@ export function firstArgument<T>(
 	fallback: T
 ): { target: string | string[] | undefined; settings: T } {
 	const isValue = typeof value === 'string' || Array.isArray(value);
+	// `randSuffix(undefined, { length: 12 })` is a value left out with its options
+	// beside it, the way a caller forwarding an optional value writes it; only an
+	// object in the first place is the options themselves.
+	const settings = isValue || value === undefined || value === null ? options : (value as T);
 
 	return {
 		target: isValue ? (value as string | string[]) : undefined,
-		settings: (isValue ? options : (value as T | undefined)) ?? fallback
+		settings: settings ?? fallback
 	};
 }
 
