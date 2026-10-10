@@ -11,6 +11,7 @@ import re
 from collections.abc import Callable
 from dataclasses import dataclass
 from datetime import date, datetime, timedelta, timezone
+from typing import NamedTuple
 
 from randino._internal.generate import collect, resolve_option, resolve_optional
 from randino._internal.utils import clamp, pick, rand_int, with_random
@@ -40,11 +41,42 @@ _ISO_DATE = re.compile(
 With an offset after the time: `Z`, `+09:00`, `+0900` or `+09`.
 """
 
-_TOKENS = re.compile(r"\[([^\]]*)]|YYYY|YY|MMMM|MMM|MM?|DD?|dddd|ddd|HH?|hh?|mm?|ss?|SSS|A|a|ZZ|Z")
-"""Longest first, so `YYYY` is never read as two `YY` nor `MMMM` as two `MM`.
+_TOKENS = (
+    "YYYY",
+    "YY",
+    "MMMM",
+    "MMM",
+    "MM",
+    "M",
+    "DD",
+    "D",
+    "dddd",
+    "ddd",
+    "HH",
+    "H",
+    "hh",
+    "h",
+    "mm",
+    "m",
+    "ss",
+    "s",
+    "SSS",
+    "A",
+    "a",
+    "ZZ",
+    "Z",
+)
+"""Longest first, so `YYYY` is never read as two `YY` nor `MMMM` as two `MM`."""
 
-Text in brackets is written as it is, and so is anything that is not a token.
-"""
+
+class _Piece(NamedTuple):
+    """One piece of a read format: text written as it is, or a token filled in."""
+
+    text: str
+    """The text, or `""` for a token."""
+
+    token: str | None
+    """The token, or None for text."""
 
 
 @dataclass(frozen=True, slots=True)
@@ -269,17 +301,61 @@ def _write(token: str, moment: datetime, names: DateNames, offset: int) -> str:
     return written.get(token, names.meridiem_lower[half])
 
 
-def format_date(moment: datetime, format: str, language: WordLanguage, offset: int = 0) -> str:
-    """`moment` written out by `format`, in the names of `language`, at `offset` minutes."""
+def read_format(format: str) -> tuple[_Piece, ...]:
+    """`format` read once, left to right.
+
+    Text in brackets is written as it is, and so is anything that is not a token, a `[`
+    with no `]` after it included. A scan rather than a regular expression: matching a
+    bracket pair at every `[` runs to the end of the format whenever no `]` follows, so a
+    format of many `[` took time growing with the square of its length — and it was read
+    again for every date drawn.
+    """
+    pieces: list[_Piece] = []
+    text: list[str] = []
+    # Whether a `]` is still ahead. Once none is, every `[` left is plain text.
+    closing = True
+    at = 0
+
+    def flush() -> None:
+        if text:
+            pieces.append(_Piece("".join(text), None))
+            text.clear()
+
+    while at < len(format):
+        if closing and format[at] == "[":
+            end = format.find("]", at + 1)
+
+            if end >= 0:
+                text.append(format[at + 1 : end])
+                at = end + 1
+                continue
+
+            closing = False
+
+        token = next((each for each in _TOKENS if format.startswith(each, at)), None)
+
+        if token is not None:
+            flush()
+            pieces.append(_Piece("", token))
+            at += len(token)
+        else:
+            text.append(format[at])
+            at += 1
+
+    flush()
+
+    return tuple(pieces)
+
+
+def format_date(
+    moment: datetime, pieces: tuple[_Piece, ...], language: WordLanguage, offset: int = 0
+) -> str:
+    """`moment` written out by a read format, in the names of `language`, at `offset` minutes."""
     names = DATE_NAMES[language]
 
-    return _TOKENS.sub(
-        lambda match: (
-            match.group(1)
-            if match.group(1) is not None
-            else _write(match.group(0), moment, names, offset)
-        ),
-        format,
+    return "".join(
+        piece.text if piece.token is None else _write(piece.token, moment, names, offset)
+        for piece in pieces
     )
 
 
@@ -327,7 +403,7 @@ def generate_date_details(
     shift = resolve_offset(utc_offset)
     low, high = date_range(min_date, max_date, shift)
     # A format that writes nothing is no format at all.
-    written = format if isinstance(format, str) and format else DATE_FORMAT_DEFAULT
+    written = read_format(format if isinstance(format, str) and format else DATE_FORMAT_DEFAULT)
     part = resolve_date_unit(unit)
     chosen = _resolve_date_language(language)
 

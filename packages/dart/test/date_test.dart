@@ -161,6 +161,26 @@ void main() {
       expect(randDate(format: '').single, matches(iso));
     });
 
+    test('a bracket with no closing one is text, and so is everything inside a pair', () {
+      final at = DateTime.utc(2024, 3, 5, 7, 8, 9, 45);
+
+      expect(write(at, '[YYYY'), '[2024');
+      expect(write(at, '[]YYYY'), '2024');
+      expect(write(at, '[a[b]YYYY'), 'a[b2024');
+      expect(write(at, 'YYYY]'), '2024]');
+      expect(write(at, '[[YYYY]] D'), '[YYYY] 5');
+    });
+
+    test('a format of many unclosed brackets is read in linear time', () {
+      final watch = Stopwatch()..start();
+      final dates = randDate(format: '[' * 50000, count: 20);
+
+      expect(dates.first, '[' * 50000);
+      // Quadratic, this took seconds; read once and in one pass, it is
+      // milliseconds.
+      expect(watch.elapsedMilliseconds, lessThan(1000));
+    });
+
     test('the names are written in the language asked for, English by default', () {
       // 2024-03-15 was a Friday, in the afternoon.
       final at = DateTime.utc(2024, 3, 15, 19, 5);

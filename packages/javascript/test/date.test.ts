@@ -243,6 +243,26 @@ describe('Date', () => {
 		assert.match(randDate({ format: '' })[0], ISO);
 	});
 
+	it('a bracket with no closing one is text, and so is everything inside a pair', () => {
+		const at = '2024-03-05T07:08:09.045Z';
+		const write = (format: string) => randDate({ minDate: at, maxDate: at, format })[0];
+
+		assert.strictEqual(write('[YYYY'), '[2024');
+		assert.strictEqual(write('[]YYYY'), '2024');
+		assert.strictEqual(write('[a[b]YYYY'), 'a[b2024');
+		assert.strictEqual(write('YYYY]'), '2024]');
+		assert.strictEqual(write('[[YYYY]] D'), '[YYYY] 5');
+	});
+
+	it('a format of many unclosed brackets is read in linear time', () => {
+		const started = performance.now();
+		const [date] = randDate({ format: '['.repeat(50000), count: 20 });
+
+		assert.strictEqual(date, '['.repeat(50000));
+		// Quadratic, this took seconds; read once and in one pass, it is milliseconds.
+		assert.ok(performance.now() - started < 1000);
+	});
+
 	it('the names are written in the language asked for, English by default', () => {
 		// 2024-03-15 was a Friday, in the afternoon.
 		const at = '2024-03-15T19:05';

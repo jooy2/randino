@@ -15,10 +15,46 @@ import 'package:randino/src/types.dart';
 import 'package:randino/src/word/data/index.dart';
 
 // Longest first, so `YYYY` is never read as two `YY` nor `MMMM` as two `MM`.
-// Text in brackets is written as it is, and so is anything that is not a token.
-final RegExp _tokens = RegExp(
-  r'\[([^\]]*)]|YYYY|YY|MMMM|MMM|MM?|DD?|dddd|ddd|HH?|hh?|mm?|ss?|SSS|A|a|ZZ|Z',
-);
+const List<String> _tokens = <String>[
+  'YYYY',
+  'YY',
+  'MMMM',
+  'MMM',
+  'MM',
+  'M',
+  'DD',
+  'D',
+  'dddd',
+  'ddd',
+  'HH',
+  'H',
+  'hh',
+  'h',
+  'mm',
+  'm',
+  'ss',
+  's',
+  'SSS',
+  'A',
+  'a',
+  'ZZ',
+  'Z',
+];
+
+/// One piece of a read format: text written as it is, or a token filled in.
+class FormatPiece {
+  /// Text the format writes as it is.
+  const FormatPiece.text(String this.text) : token = null;
+
+  /// A token the format fills in from the date.
+  const FormatPiece.token(String this.token) : text = null;
+
+  /// The text, or null for a token.
+  final String? text;
+
+  /// The token, or null for text.
+  final String? token;
+}
 
 // The widest offset a clock is set to is fourteen hours; anything up to a day
 // short of it is still an offset, and a day or more is not one.
@@ -98,15 +134,68 @@ String _write(String token, DateTime date, DateNames names, int offset) => switc
   _ => names.meridiemLower[date.hour < 12 ? 0 : 1],
 };
 
-/// [date] written out by [format], in the names of [language], for a date
+/// [format] read once, left to right.
+///
+/// Text in brackets is written as it is, and so is anything that is not a
+/// token, a `[` with no `]` after it included. A scan rather than a regular
+/// expression: matching a bracket pair at every `[` runs to the end of the
+/// format whenever no `]` follows, so a format of many `[` took time growing with
+/// the square of its length — and it was read again for every date drawn.
+List<FormatPiece> readFormat(String format) {
+  final pieces = <FormatPiece>[];
+  final text = StringBuffer();
+  // Whether a `]` is still ahead. Once none is, every `[` left is plain text.
+  var closing = true;
+  var at = 0;
+
+  void flush() {
+    if (text.isNotEmpty) {
+      pieces.add(FormatPiece.text(text.toString()));
+      text.clear();
+    }
+  }
+
+  while (at < format.length) {
+    if (closing && format[at] == '[') {
+      final end = format.indexOf(']', at + 1);
+
+      if (end >= 0) {
+        text.write(format.substring(at + 1, end));
+        at = end + 1;
+        continue;
+      }
+
+      closing = false;
+    }
+
+    final token = _tokens.where((each) => format.startsWith(each, at)).firstOrNull;
+
+    if (token != null) {
+      flush();
+      pieces.add(FormatPiece.token(token));
+      at += token.length;
+    } else {
+      text.write(format[at]);
+      at += 1;
+    }
+  }
+
+  flush();
+
+  return pieces;
+}
+
+/// [date] written out by a read format, in the names of [language], for a date
 /// read at [offset] minutes east of UTC.
-String formatDate(DateTime date, String format, WordLanguage language, {int offset = 0}) {
+String formatDate(
+  DateTime date,
+  List<FormatPiece> pieces,
+  WordLanguage language, {
+  int offset = 0,
+}) {
   final names = dateNames[language]!;
 
-  return format.replaceAllMapped(
-    _tokens,
-    (match) => match.group(1) ?? _write(match.group(0)!, date, names, offset),
-  );
+  return pieces.map((piece) => piece.text ?? _write(piece.token!, date, names, offset)).join();
 }
 
 /// A whole number from [min] to [max], both included.
@@ -139,7 +228,7 @@ List<DateDetail> generateDateDetails({
   final shift = resolveOffset(utcOffset);
   final (min, max) = dateRange(minDate, maxDate, shift);
   // A format that writes nothing is no format at all.
-  final written = format.isEmpty ? dateFormatDefault : format;
+  final written = readFormat(format.isEmpty ? dateFormatDefault : format);
 
   return withRandom(
     random,

@@ -42,9 +42,35 @@ type Written = Parts & { weekday: number };
 const ISO_DATE =
 	/^(\d{4})(?:-(\d{2})(?:-(\d{2})(?:[Tt ](\d{2}):(\d{2})(?::(\d{2})(?:\.(\d+))?)?([Zz]|[+-]\d{2}(?::?\d{2})?)?)?)?)?$/;
 
-// Longest first, so `YYYY` is never read as two `YY` nor `MMMM` as two `MM`. Text
-// in brackets is written as it is, and so is anything that is not a token.
-const TOKENS = /\[([^\]]*)]|YYYY|YY|MMMM|MMM|MM?|DD?|dddd|ddd|HH?|hh?|mm?|ss?|SSS|A|a|ZZ|Z/g;
+// Longest first, so `YYYY` is never read as two `YY` nor `MMMM` as two `MM`.
+const TOKENS = [
+	'YYYY',
+	'YY',
+	'MMMM',
+	'MMM',
+	'MM',
+	'M',
+	'DD',
+	'D',
+	'dddd',
+	'ddd',
+	'HH',
+	'H',
+	'hh',
+	'h',
+	'mm',
+	'm',
+	'ss',
+	's',
+	'SSS',
+	'A',
+	'a',
+	'ZZ',
+	'Z'
+];
+
+/** A format read into the text it writes as it is and the tokens it fills in. */
+type Piece = { text: string } | { token: string };
 
 // The widest offset a clock is set to is fourteen hours; anything up to a day
 // short of it is still an offset, and a day or more is not one.
@@ -282,19 +308,70 @@ function write(token: string, parts: Written, names: DateNames, offset: number):
 	}
 }
 
-/** A date written out by a format, in the names of `language`, at `offset` minutes east of UTC. */
+/**
+ * A format read once, left to right. Text in brackets is written as it is, and so
+ * is anything that is not a token, a `[` with no `]` after it included.
+ *
+ * A scan rather than a regular expression: matching a bracket pair at every `[`
+ * runs to the end of the format whenever no `]` follows, so a format of many `[`
+ * took time growing with the square of its length — and it was read again for
+ * every date drawn.
+ */
+export function readFormat(format: string): Piece[] {
+	const pieces: Piece[] = [];
+	let text = '';
+	// Whether a `]` is still ahead. Once none is, every `[` left is plain text.
+	let closing = true;
+	let at = 0;
+
+	while (at < format.length) {
+		if (closing && format[at] === '[') {
+			const end = format.indexOf(']', at + 1);
+
+			if (end >= 0) {
+				text += format.slice(at + 1, end);
+				at = end + 1;
+				continue;
+			}
+
+			closing = false;
+		}
+
+		const token = TOKENS.find((each) => format.startsWith(each, at));
+
+		if (token) {
+			if (text) {
+				pieces.push({ text });
+				text = '';
+			}
+
+			pieces.push({ token });
+			at += token.length;
+		} else {
+			text += format[at];
+			at += 1;
+		}
+	}
+
+	if (text) {
+		pieces.push({ text });
+	}
+
+	return pieces;
+}
+
+/** A date written out by a read format, in the names of `language`, at `offset` minutes east of UTC. */
 export function formatDate(
 	parts: Written,
-	format: string,
+	pieces: readonly Piece[],
 	language: WordLanguage,
 	offset: number
 ): string {
 	const names = DATE_NAMES[language];
 
-	return format.replace(
-		TOKENS,
-		(token: string, literal?: string) => literal ?? write(token, parts, names, offset)
-	);
+	return pieces
+		.map((piece) => ('text' in piece ? piece.text : write(piece.token, parts, names, offset)))
+		.join('');
 }
 
 /** Every part of the date `timestamp` falls on, read at `shift` milliseconds east of UTC. */
@@ -341,7 +418,7 @@ export function resolveDateUnit(unit: unknown): DateUnit | null {
 export function generateDateDetails(options: RandDateOptions = {}, write = true): DateDetail[] {
 	const shift = resolveOffset(options.utcOffset);
 	const [min, max] = dateRange(options, shift);
-	const format = resolveFormat(options.format);
+	const format = readFormat(resolveFormat(options.format));
 	const unit = resolveDateUnit(options.unit);
 	const language = resolveDateLanguage(options.language);
 

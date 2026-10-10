@@ -1,6 +1,7 @@
 """Dates: drawn evenly from a range, written out by a format or one part at a time."""
 
 import re
+import time
 from datetime import date, datetime, timedelta, timezone
 from random import Random
 from typing import Any
@@ -230,6 +231,25 @@ def test_format_writes_every_token_and_text_in_brackets_as_it_is() -> None:
 
     # A format that writes nothing is no format at all.
     assert re.match(ISO, rand_date(format="")[0])
+
+
+def test_a_bracket_with_no_closing_one_is_text_and_so_is_everything_inside_a_pair() -> None:
+    at = "2024-03-05T07:08:09.045Z"
+
+    assert write(at, "[YYYY") == "[2024"
+    assert write(at, "[]YYYY") == "2024"
+    assert write(at, "[a[b]YYYY") == "a[b2024"
+    assert write(at, "YYYY]") == "2024]"
+    assert write(at, "[[YYYY]] D") == "[YYYY] 5"
+
+
+def test_a_format_of_many_unclosed_brackets_is_read_in_linear_time() -> None:
+    started = time.perf_counter()
+    date = rand_date(format="[" * 50000, count=20)[0]
+
+    assert date == "[" * 50000
+    # Quadratic, this took seconds; read once and in one pass, it is milliseconds.
+    assert time.perf_counter() - started < 1
 
 
 def test_the_names_are_written_in_the_language_asked_for_english_by_default() -> None:
