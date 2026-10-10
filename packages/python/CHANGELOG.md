@@ -2,6 +2,7 @@
 
 ## vNext (2026--)
 
+- An invented Russian surname takes the feminine form beside a woman's name, the way a real one does. `realism="invented"` and `"mixed"` wrote `Чачев` beside a woman's given name.
 - `rand_name` with `starts_with` and a tight `max_length` draws a real name wherever one starts with the character. When no name of the right length did, it invented one at `realism="real"` too (`Zeahos Cox` beside `Zachary King`).
 - `rand_name` with `unique` and `script="roman"` never returns the same string twice. It compared the native names, and two of them can romanize alike: about one Vietnamese name in ten came back twice.
 - `rand_word` and the themed word functions read a `min_length` or `max_length` that is not a number as left out; `nan` returned only the longest words and a list raised `TypeError`. A `realism` that is a list or a dict falls back to `"real"` in every generator, where it raised `TypeError: unhashable`.

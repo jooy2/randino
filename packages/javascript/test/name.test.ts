@@ -230,6 +230,12 @@ describe('Name', () => {
 			assert.match(surname, /а$/, name);
 		}
 
+		// An invented surname agrees too: `Чачев` beside a woman's given name was a
+		// man's surname.
+		for (const name of randName({ ...options, gender: 'female', realism: 'invented' })) {
+			assert.doesNotMatch(name.split(' ').at(-1)!, /(ов|ев|ёв|ин|ын|ский|ой)$/, name);
+		}
+
 		const genders = new Set(nameDetails({ ...options, count: 200 }).map((d) => d.gender));
 		assert.deepStrictEqual([...genders].sort(), ['female', 'male']);
 

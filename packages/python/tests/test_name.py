@@ -230,6 +230,11 @@ def test_gender_picks_the_pools_the_name_is_drawn_from() -> None:
         assert middle.endswith("на"), name
         assert surname.endswith("а"), name
 
+    # An invented surname agrees too: `Чачев` beside a woman's given name was a man's
+    # surname.
+    for name in rand_name(gender="female", realism="invented", **options):  # type: ignore[call-overload]
+        assert not re.search(r"(ов|ев|ёв|ин|ын|ский|ой)$", name.split(" ")[-1]), name
+
     genders = {
         detail.gender
         for detail in rand_name(

@@ -537,11 +537,15 @@ function drawParts(
 		} else if (surnamePrefix) {
 			surname = leadEntry(data, pool, 'surname', surnamePrefix, data.last);
 		} else {
-			let native = nativeOf(pickPooled(pool, data, 'surname'));
+			const native = nativeOf(pickPooled(pool, data, 'surname'));
 
-			if (data.roman === 'translit' && !isMale) {
-				native = feminizeRu(native);
-			}
+			surname = { n: native, r: romanize(data.roman, native, 'surname') };
+		}
+
+		// A Russian surname agrees with the name in front of it, invented or not:
+		// `Чачев` beside a woman's given name is a man's surname.
+		if (data.roman === 'translit' && !isMale) {
+			const native = feminizeRu(surname.n);
 
 			surname = { n: native, r: romanize(data.roman, native, 'surname') };
 		}

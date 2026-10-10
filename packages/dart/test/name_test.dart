@@ -244,6 +244,23 @@ void main() {
         expect(parts[2], endsWith('а'), reason: name);
       }
 
+      // An invented surname agrees too: `Чачев` beside a woman's given name was
+      // a man's surname.
+      for (final name in randName(
+        language: NameLanguage.ru,
+        minLength: 1,
+        maxLength: 40,
+        count: sample,
+        gender: NameGender.female,
+        realism: RandRealism.invented,
+      )) {
+        expect(
+          name.split(' ').last,
+          isNot(matches(RegExp(r'(ов|ев|ёв|ин|ын|ский|ой)$'))),
+          reason: name,
+        );
+      }
+
       final genders =
           randNameDetails(
             language: NameLanguage.ru,

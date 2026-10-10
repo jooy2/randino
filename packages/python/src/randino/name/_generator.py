@@ -537,10 +537,12 @@ def draw_parts(
             surname = lead_entry(data, pool, "surname", surname_prefix, data.last)
         else:
             native = native_of(pick_pooled(pool, data, "surname"))
+            surname = Entry(native, romanize(data.roman, native, "surname"))
 
-            if data.roman == "translit" and not is_male:
-                native = feminize_ru(native)
-
+        # A Russian surname agrees with the name in front of it, invented or not:
+        # `Чачев` beside a woman's given name is a man's surname.
+        if data.roman == "translit" and not is_male:
+            native = feminize_ru(surname.n)
             surname = Entry(native, romanize(data.roman, native, "surname"))
 
     middles: list[Entry] = []

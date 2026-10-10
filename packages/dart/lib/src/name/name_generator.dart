@@ -525,11 +525,15 @@ _Parts _drawParts(NameLanguageData data, _Settings settings, bool isMale, [Lengt
     } else if (surnamePrefix.isNotEmpty) {
       surname = _leadEntry(data, pool, NamePart.surname, surnamePrefix, data.last);
     } else {
-      var native = _pickPooled(pool, data, NamePart.surname).n;
+      final native = _pickPooled(pool, data, NamePart.surname).n;
 
-      if (data.roman == RomanMode.translit && !isMale) {
-        native = _feminizeRu(native);
-      }
+      surname = _Entry(native, romanize(data.roman, native, NamePart.surname));
+    }
+
+    // A Russian surname agrees with the name in front of it, invented or not:
+    // `Чачев` beside a woman's given name is a man's surname.
+    if (data.roman == RomanMode.translit && !isMale) {
+      final native = _feminizeRu(surname.n);
 
       surname = _Entry(native, romanize(data.roman, native, NamePart.surname));
     }
