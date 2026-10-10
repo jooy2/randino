@@ -289,6 +289,23 @@ void main() {
       }
     });
 
+    test('randModifier gives a noun written in lower case the gender of the noun', () {
+      // `katze` is the feminine `Katze`, and was read by its ending as masculine:
+      // `flinker katze`.
+      final data = wordData[WordLanguage.de]!;
+      final feminine = {for (final each in modifiersOf(data)) agree(data, each, WordGender.f)};
+
+      for (var i = 0; i < sample; i += 1) {
+        final decorated = randModifier(value: 'katze', separator: ' ');
+
+        expect(
+          feminine,
+          contains(decorated.substring(0, decorated.length - ' katze'.length)),
+          reason: decorated,
+        );
+      }
+    });
+
     test('randModifier takes a separator, a realism and a list', () {
       for (var i = 0; i < sample; i += 1) {
         expect(

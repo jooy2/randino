@@ -180,7 +180,9 @@ export function themesOf(theme: WordThemeOption): readonly WordTheme[] {
  * adjective that agree with each other.
  */
 export function genderOf(data: WordLanguageData, word: string): WordGender | undefined {
-	const known = data.nounGender?.[word];
+	// A noun written in lower case is still the noun: `katze` is the `Katze` German
+	// capitalizes, and is no more masculine for being written small.
+	const known = data.nounGender?.[word] ?? data.nounGender?.[capitalizeFirst(word)];
 
 	if (known) {
 		return known;

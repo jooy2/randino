@@ -177,7 +177,9 @@ List<WordTheme> themesOf(WordTheme? theme) => theme == null ? wordThemes : <Word
 /// A made-up word has no true gender. What this buys is an article and an
 /// adjective that agree with each other.
 WordGender? genderOf(WordLanguageData data, String word) {
-  final known = data.nounGender?[word];
+  // A noun written in lower case is still the noun: `katze` is the `Katze`
+  // German capitalizes, and is no more masculine for being written small.
+  final known = data.nounGender?[word] ?? data.nounGender?[capitalizeFirst(word)];
 
   if (known != null) return known;
 

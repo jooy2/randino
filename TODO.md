@@ -44,7 +44,6 @@ A fix to a generator added under `vNext` needs no changelog entry of its own, si
 
 ### A. No decision needed
 
-- **A26. `randModifier` reads a lowercase German noun as masculine.** `languageOf` tries the capitalized form and finds `Katze`, but `genderOf` looks up `katze` and writes `flinker katze`.
 - **A27. An astral `charset` breaks `randSuffix` and `randPrefix`.** JS and Dart index UTF-16 code units, so `charset: '🎲🎯🎮'` writes lone surrogates. Python is right.
 - **A28. An explicit `undefined` value makes a decorator ignore its options.** `randSuffix(undefined, { length: 12 })` writes five characters. JS only.
 - **A29. A non-string `wordSeparator` breaks the nickname generator.** `randNickname({ wordSeparator: 5 })` throws and `nicknameLengthRange('en', 5)` is `[NaN, NaN]`; Python raises `TypeError`. Read it as left out.

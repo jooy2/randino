@@ -2,6 +2,7 @@
 
 ## vNext (2026--)
 
+- `randModifier` gives a German noun written in lower case the gender the noun has: `katze` takes a feminine modifier, as `Katze` does. It was read by its ending and came back `flinker katze`.
 - An invented Russian surname takes the feminine form beside a woman's name, the way a real one does. `realism: 'invented'` and `'mixed'` wrote `Чачев` beside a woman's given name.
 - `randName` with `startsWith` and a tight `maxLength` draws a real name wherever one starts with the character. When no name of the right length did, it invented one at `realism: 'real'` too (`Zeahos Cox` beside `Zachary King`).
 - `randName` with `unique` and `script: 'roman'` never returns the same string twice. It compared the native names, and two of them can romanize alike: about one Vietnamese name in ten came back twice.

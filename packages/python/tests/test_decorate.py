@@ -253,6 +253,18 @@ def test_rand_modifier_reads_a_latin_or_cyrillic_value_as_the_language_that_has_
             assert attached.strip() in modifiers, f"{word}: {decorated} is not {language}"
 
 
+def test_rand_modifier_gives_a_noun_written_in_lower_case_the_gender_of_the_noun() -> None:
+    # `katze` is the feminine `Katze`, and was read by its ending as masculine:
+    # `flinker katze`.
+    data = WORD_DATA["de"]
+    feminine = {agree(data, each, "f") for each in modifiers_of(data)}
+
+    for _ in range(SAMPLE):
+        decorated = rand_modifier("katze", separator=" ")
+
+        assert decorated[: -len(" katze")] in feminine, decorated
+
+
 def test_rand_modifier_takes_a_separator_a_realism_and_a_list() -> None:
     for _ in range(SAMPLE):
         assert re.fullmatch(r"[A-Za-z]+ Owl", rand_modifier("Owl", language="en", separator=" "))

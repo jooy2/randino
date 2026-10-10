@@ -208,7 +208,13 @@ def gender_of(data: WordLanguageData, word: str) -> WordGender | None:
     Returns:
         Its gender, or None for a language that does not ask.
     """
-    known = None if data.noun_gender is None else data.noun_gender.get(word)
+    # A noun written in lower case is still the noun: `katze` is the `Katze` German
+    # capitalizes, and is no more masculine for being written small.
+    known = (
+        None
+        if data.noun_gender is None
+        else data.noun_gender.get(word, data.noun_gender.get(capitalize_first(word)))
+    )
 
     if known is not None:
         return known

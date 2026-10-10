@@ -279,6 +279,19 @@ describe('Decorate', () => {
 		}
 	});
 
+	it('randModifier gives a noun written in lower case the gender of the noun', () => {
+		// `katze` is the feminine `Katze`, and was read by its ending as masculine:
+		// `flinker katze`.
+		const data = WORD_DATA.de;
+		const feminine = new Set(modifiersOf('de').map((each) => agree(data, each, 'f')));
+
+		for (let i = 0; i < SAMPLE; i += 1) {
+			const decorated = randModifier('katze', { separator: ' ' });
+
+			assert.ok(feminine.has(decorated.slice(0, -' katze'.length)), decorated);
+		}
+	});
+
 	it('randModifier takes a separator, a realism and a list', () => {
 		for (let i = 0; i < SAMPLE; i += 1) {
 			assert.match(randModifier('Owl', { language: 'en', separator: ' ' }), /^[A-Za-z]+ Owl$/);
