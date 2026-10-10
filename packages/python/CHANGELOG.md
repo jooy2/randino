@@ -2,6 +2,7 @@
 
 ## vNext (2026--)
 
+- `rand_sentence` keeps a modifier `include` asked for when it writes a name. A name takes no modifier, and the name drawn for a result in two was written over the subject the modifier was meant for: `include="brave"` lost `brave` in about a third of the results.
 - `Lemonade` is an English drink rather than a food: `rand_drink` draws it, `rand_food` no longer does, and a sentence drinks it rather than eating it.
 - A `realism` `rand_nickname` does not know is `"real"` in every respect: it invented nothing, but still let the colour, finance and tech themes into `theme="all"`.
 - With `language="all"`, `rand_nickname` and `rand_sentence` keep to the languages that write the `starts_with` character before narrowing by shape or by required word. `rand_nickname(slots="part", starts_with="б")` returned nothing, though Russian answers it with its closest shape.

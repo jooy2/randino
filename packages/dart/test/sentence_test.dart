@@ -902,6 +902,24 @@ void main() {
       }
     });
 
+    test('a required modifier stays when the result writes a name', () {
+      // A name takes no modifier, and a drawn `includeName` wrote one over the
+      // subject the modifier was planned on: `include: ['brave']` lost `brave` in
+      // a third of the results.
+      for (final includeName in <bool?>[null, true]) {
+        for (final (language, word) in [(WordLanguage.en, 'brave'), (WordLanguage.ko, '멋진')]) {
+          for (final sentence in randSentence(
+            language: language,
+            include: [word],
+            includeName: includeName,
+            count: 60,
+          )) {
+            expect(sentence.toLowerCase(), contains(word), reason: '$language: $word');
+          }
+        }
+      }
+    });
+
     test('`include` puts every word it was given into every sentence', () {
       const cases = <(WordLanguage, List<String>)>[
         (WordLanguage.ko, <String>['사자']),

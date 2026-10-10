@@ -44,7 +44,6 @@ A fix to a generator added under `vNext` needs no changelog entry of its own, si
 
 ### A. No decision needed
 
-- **A33. A required modifier is dropped when the subject is a name.** `includeName` is drawn per result, and a named subject takes no modifier, so `include: 'brave'` is missing from 112 of 300 results. Do not write a name over a part the plan put a requirement on.
 - **A34. The drawn `includeName` overrides an explicit `story`.** A drawn name narrows the hero to people, and `sketch` and `passage` have no person hero, so `story: 'sketch'` is told half the time. Draw a name only when the story asked for can have a person hero.
 - **A35. `startsWith` invents nouns at `realism: 'real'` in steered languages.** The subject's theme is chosen before the prefix is considered, and `drawWord`'s `missed` is ignored: `ko '여'` invents 87 of 400 subjects, `zh '大'` 168. Choose among the themes that have a word with the prefix.
 - **A36. German quoted lines put the verb first.** A spoken line drops its `time` part after the shape was chosen, and German's verb-second shapes then open on the verb (`„Ist eine Vorstadt sonnig.“`, 102 of 1,037). Leave shapes with a time part out for a spoken line instead.

@@ -2863,8 +2863,9 @@ def _compose(
             and follow.topic.named
         ):
             proper.append(follow.topic.noun)
-        elif plan.phrase.get(at[index]) is not None:
-            # A word the caller required holds its place against all of this.
+        elif plan.phrase.get(at[index]) is not None or plan.modifier.get(at[index]) is not None:
+            # A word the caller required holds its place against all of this, and so does
+            # a modifier it required of the phrase: a name takes none.
             proper.append(None)
         elif part.slot == "quantity":
             # A person is one person: `서호 3명` counts somebody's name.

@@ -648,6 +648,19 @@ def test_slots_decides_what_the_sentence_carries_beside_its_subject() -> None:
         assert len(detail.phrases) <= 2, detail.sentence
 
 
+def test_a_required_modifier_stays_when_the_result_writes_a_name() -> None:
+    # A name takes no modifier, and a drawn `include_name` wrote one over the subject the
+    # modifier was planned on: `include="brave"` lost `brave` in a third of the results.
+    cases: list[tuple[WordLanguage, str]] = [("en", "brave"), ("ko", "멋진")]
+
+    for include_name in (None, True):
+        for language, word in cases:
+            for sentence in rand_sentence(
+                language=language, include=word, include_name=include_name, count=60
+            ):
+                assert word in sentence.lower(), f"{language}: {word} missing from {sentence}"
+
+
 def test_include_puts_every_word_it_was_given_into_every_sentence() -> None:
     cases: list[tuple[WordLanguage, list[str]]] = [
         ("ko", ["사자"]),

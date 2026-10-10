@@ -2551,8 +2551,9 @@ _Built _compose(
           return follow.topic.noun;
         }
 
-        // A word the caller required holds its place against all of this.
-        if (plan.phrase.containsKey(at[i])) return null;
+        // A word the caller required holds its place against all of this, and so
+        // does a modifier it required of the phrase: a name takes none.
+        if (plan.phrase.containsKey(at[i]) || plan.modifier.containsKey(at[i])) return null;
 
         // A person is one person. `서호 3명` counts somebody's name, which is not
         // a thing a sentence says.

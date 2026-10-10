@@ -2627,8 +2627,9 @@ function compose(
 
 		// A word the caller required holds its place against all of this. `include`
 		// says the sentence has to contain it, and a name written over it would be a
-		// sentence that does not.
-		if (plan.phrase.has(at)) {
+		// sentence that does not. So does a modifier it required of the phrase: a
+		// name takes none, and `include: 'brave'` came back without `brave`.
+		if (plan.phrase.has(at) || plan.modifier.has(at)) {
 			return null;
 		}
 

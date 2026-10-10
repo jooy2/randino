@@ -923,6 +923,25 @@ describe('Sentence', () => {
 		}
 	});
 
+	it('a required modifier stays when the result writes a name', () => {
+		// A name takes no modifier, and a drawn `includeName` wrote one over the
+		// subject the modifier was planned on: `include: 'brave'` lost `brave` in a
+		// third of the results.
+		for (const includeName of [undefined, true]) {
+			for (const [language, word] of [
+				['en', 'brave'],
+				['ko', '멋진']
+			] as const) {
+				for (const sentence of randSentence({ language, include: word, includeName, count: 60 })) {
+					assert.ok(
+						sentence.toLowerCase().includes(word),
+						`${language}: '${word}' missing from '${sentence}'`
+					);
+				}
+			}
+		}
+	});
+
 	it('`include` puts every word it was given into every sentence', () => {
 		const cases: [WordLanguage, string | string[]][] = [
 			['ko', '사자'],
