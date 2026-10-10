@@ -34,7 +34,10 @@ _DAY = 86400000
 
 _ISO_DATE = re.compile(
     r"^(\d{4})(?:-(\d{2})(?:-(\d{2})(?:[Tt ](\d{2}):(\d{2})(?::(\d{2})(?:\.(\d+))?)?"
-    r"([Zz]|[+-]\d{2}(?::?\d{2})?)?)?)?)?$"
+    r"([Zz]|[+-]\d{2}(?::?\d{2})?)?)?)?)?$",
+    # `\d` is any digit Unicode knows without it, and `int` reads them all: `２０２４`
+    # was the year 2024 here and no date in JavaScript.
+    re.ASCII,
 )
 """`2024`, `2024-03`, `2024-03-15`, `2024-03-15T14:07`, `2024-03-15 14:07:32.481`.
 
@@ -92,7 +95,7 @@ def _timestamp_of(moment: datetime) -> int:
     return (moment - _EPOCH) // _MILLISECOND
 
 
-_OFFSET = re.compile(r"^(?:[Zz]|([+-])(\d{2})(?::?(\d{2}))?)$")
+_OFFSET = re.compile(r"^(?:[Zz]|([+-])(\d{2})(?::?(\d{2}))?)$", re.ASCII)
 """`Z`, `+09:00`, `+0900` or `+09`."""
 
 _OFFSET_LIMIT = 24 * 60

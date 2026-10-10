@@ -152,6 +152,9 @@ describe('Date', () => {
 			'2024-03-15T24:00',
 			'tomorrow',
 			'',
+			// Digits of another script spell no date, in this package or in Python.
+			'２０２４',
+			'٢٠٢٤-٠٣',
 			new Date(NaN),
 			NaN
 		]) {

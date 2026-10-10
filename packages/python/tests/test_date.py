@@ -183,7 +183,8 @@ def test_a_datetime_is_the_instant_it_holds_and_a_date_is_its_day() -> None:
 
 
 def test_a_bound_that_is_not_a_date_is_the_default() -> None:
-    for bad in ("2024-02-30", "2024-13", "2024-03-15T24:00", "tomorrow", ""):
+    # Digits of another script spell no date: `int` reads them, and JavaScript does not.
+    for bad in ("2024-02-30", "2024-13", "2024-03-15T24:00", "tomorrow", "", "２０２４", "٢٠٢٤-٠٣"):
         dates = rand_date(min_date=bad, max_date=bad, count=SAMPLE, output="detail")
 
         assert in_range(dates, "1900-01-01T00:00:00.000Z", "2099-12-31T23:59:59.999Z"), bad
