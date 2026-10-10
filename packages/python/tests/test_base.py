@@ -420,6 +420,8 @@ def test_an_option_the_types_rule_out_falls_back_rather_than_raising() -> None:
         lambda: loose.rand_organization(language="xx", type="shop"),
         lambda: loose.rand_organization(type=[None], industry="mining"),
         lambda: loose.rand_organization(include_legal_form="yes", min_length=float("nan")),
+        lambda: loose.rand_modifier("cat", language="xx"),
+        lambda: loose.rand_modifier(language="xx"),
     ]
 
     for ask in asks:
@@ -434,6 +436,8 @@ def test_an_option_the_types_rule_out_falls_back_rather_than_raising() -> None:
     assert re.match(r"\d{4}-", loose.rand_date(unit="week")[0])
     # A token of no length is not a token.
     assert len(loose.rand_suffix("x", length=float("nan"))) == len("x_") + 5
+    # A language the package does not know leaves the value's own script to decide.
+    assert all(" " not in loose.rand_modifier("고양이", language="xx") for _ in range(20))
 
 
 def test_a_length_range_the_wrong_way_round_keeps_max_length() -> None:

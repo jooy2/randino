@@ -25,7 +25,9 @@ export function taggedNouns<T extends string>(
 	source: Record<T, string>
 ): { pools: Record<T, WordPool>; gender: Record<string, WordGender> } {
 	const pools = {} as Record<T, WordPool>;
-	const gender: Record<string, WordGender> = {};
+	// No prototype, so a caller's `'constructor'` or `'toString'` is a word the
+	// lookup does not hold rather than a function it inherited.
+	const gender: Record<string, WordGender> = Object.create(null);
 
 	for (const theme of Object.keys(source) as T[]) {
 		pools[theme] = words(source[theme]).map((entry) => {

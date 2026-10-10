@@ -1,8 +1,13 @@
-import { drawLanguage, resolveRandom, resolveRealism } from '../_internal/generate.js';
+import {
+	drawLanguage,
+	resolveOptional,
+	resolveRandom,
+	resolveRealism
+} from '../_internal/generate.js';
 import { capitalizeFirst, withRandom } from '../_internal/utils.js';
 import { detectLanguage } from '../_internal/script.js';
 import type { RandModifierOptions, WordLanguage, WordLanguageOption } from '../_types/global.js';
-import { WORD_DATA, WORD_LANGUAGES } from '../word/data/index.js';
+import { WORD_DATA, WORD_LANGUAGE_OPTIONS, WORD_LANGUAGES } from '../word/data/index.js';
 import {
 	agree,
 	drawWord,
@@ -52,8 +57,10 @@ function languageOf(value: string): WordLanguageOption {
 /** Draw one modifier, the separator to use, and which side of the value it goes. */
 function draw(value: string | undefined, options: RandModifierOptions): [string, string, boolean] {
 	// The language of the word being decorated, so that `'고양이'` is not handed
-	// an English modifier. Only consulted when the caller left `language` out.
-	const requested = options.language ?? (value ? languageOf(value) : 'all');
+	// an English modifier. Only consulted when the caller left `language` out, or
+	// named one this package does not know.
+	const named = resolveOptional(options.language, WORD_LANGUAGE_OPTIONS);
+	const requested = named ?? (value ? languageOf(value) : 'all');
 	const language = drawLanguage(requested, WORD_LANGUAGES);
 	const data = WORD_DATA[language];
 	const pool = modifiersOf(data, options.kind ?? 'all');

@@ -290,7 +290,14 @@ describe('base test', () => {
 			() => randino.randDiskType({ platform: 'server' as never, count: 'x' as never }),
 			() => randino.randDiskSize({ unit: 'PB' as never, minSize: NaN, includeUnit: 0 as never }),
 			() =>
-				randino.randCpu({ platform: 'server' as never, maxYear: NaN, includeVendor: 'no' as never })
+				randino.randCpu({
+					platform: 'server' as never,
+					maxYear: NaN,
+					includeVendor: 'no' as never
+				}),
+			() => randino.randModifier('cat', { language: 'xx' as never }),
+			() => randino.randModifier('cat', { language: '__proto__' as never }),
+			() => randino.randModifier({ language: 'toString' as never })
 		];
 
 		for (const ask of asks) {
@@ -308,6 +315,14 @@ describe('base test', () => {
 		// A token of no length is not a token. `NaN` clamped to `NaN`, and a loop
 		// that runs `NaN` times wrote nothing at all.
 		assert.strictEqual(randino.randSuffix('x', { length: NaN }).length, 'x_'.length + 5);
+		// A language the package does not know leaves the value's own script to decide.
+		for (let i = 0; i < 20; i += 1) {
+			assert.doesNotMatch(randino.randModifier('고양이', { language: 'xx' as never }), / /);
+		}
+		// A word the lookup inherits from `Object.prototype` is no Spanish noun: an
+		// English modifier goes in front of it, where a Spanish one would follow.
+		assert.match(randino.randModifier('constructor', { separator: ' ' }), / constructor$/);
+		assert.match(randino.randModifier('toString', { separator: ' ' }), / toString$/);
 	});
 
 	it('a null is an option left out, and a null options object is none', () => {

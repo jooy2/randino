@@ -2,6 +2,7 @@
 
 ## vNext (2026--)
 
+- `rand_modifier` reads a `language` it does not know as one left out, so the value's own script decides; it raised `KeyError`.
 - A `random` passed in one thread no longer reaches a call running in another. The source was held in a module global, so two threads that each passed their own could hand a caller who asked for `SystemRandom().random` draws from the other caller's seed, and leave one source in place after both had finished.
 - `rand_age` with `unique` stops as soon as every age in range has been drawn. It kept drawing repeats until its attempt budget ran out, which took seconds at a large `count`.
 - The first draw from `rand_location`, `rand_region`, `rand_city` or `rand_district` is about three times faster and holds less than half the memory. Every division used to be written out when a pool was first drawn from, whether or not `starts_with` or a length asked for it.

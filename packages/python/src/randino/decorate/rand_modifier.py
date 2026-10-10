@@ -3,7 +3,7 @@
 from collections.abc import Callable
 from typing import Literal, overload
 
-from randino._internal.generate import draw_language, resolve_realism
+from randino._internal.generate import draw_language, resolve_optional, resolve_realism
 from randino._internal.script import detect_language
 from randino._internal.utils import capitalize_first, with_random
 from randino._types import ModifierKind, RandRealism, WordLanguage, WordLanguageOption
@@ -57,8 +57,10 @@ def _draw(
 ) -> tuple[str, str, bool]:
     """One modifier, the separator its language joins with, and which side it goes."""
     # The language of the word being decorated, so that `"고양이"` is not handed an
-    # English modifier. Only consulted when the caller left `language` out.
-    requested = language or (_language_of(value) if value else "all")
+    # English modifier. Only consulted when the caller left `language` out, or named one
+    # this package does not know.
+    named = resolve_optional(language, (*WORD_LANGUAGES, "all"))
+    requested = named or (_language_of(value) if value else "all")
     code = draw_language(requested, WORD_LANGUAGES)
     data = WORD_DATA[code]
     pool = modifiers_of(data, kind)

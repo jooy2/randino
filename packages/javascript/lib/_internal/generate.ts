@@ -135,7 +135,9 @@ const INVENT_CHANCE: Record<RandRealism, number> = {
  * still pass falls back to the default rather than throwing.
  */
 export function resolveRealism(realism?: RandRealism): number {
-	return INVENT_CHANCE[realism as RandRealism] ?? INVENT_CHANCE.real;
+	return typeof realism === 'string' && Object.hasOwn(INVENT_CHANCE, realism)
+		? INVENT_CHANCE[realism]
+		: INVENT_CHANCE.real;
 }
 
 const VOCABULARIES: readonly RandVocabulary[] = ['basic', 'common', 'full'];

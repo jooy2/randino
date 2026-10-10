@@ -44,7 +44,6 @@ A fix to a generator added under `vNext` needs no changelog entry of its own, si
 
 ### A. No decision needed
 
-- **A9. Caller strings are looked up on plain objects.** `randModifier` never resolves `language` (`'xx'` and `'__proto__'` throw, Python raises `KeyError`), and `randModifier('constructor')` reads `Object.prototype` as a Spanish noun. `resolveRealism` looks up the same way. Resolve the language, and look up with `Object.hasOwn`.
 - **A10. Python's `random` swallows the caller's errors.** `random()` calls the source inside `try`, so a source that raises, or a value that is not callable (`random.Random(42)`), silently becomes `0` and every draw repeats. Call the source outside the `try` and check only what it returns; a non-callable reads as left out, as in JS.
 - **A11. Python raises `OverflowError` on a huge integer.** `count=10**400` or `min_year=10**400` raise where every other wrong value falls back. Catch it in `_whole`.
 - **A12. The release jobs use actions by tag.** The jobs holding `id-token: write` in `.github/workflows/release.yml` use `actions/checkout@v5`, `actions/setup-node@v6`, `actions/download-artifact@v8` and `dart-lang/setup-dart@v1`. Pin them to commit SHAs, the rule the docs workflow already states.
