@@ -376,6 +376,15 @@ function boundsFor(
  * reports. Kept here so it is derived from the same frames and pools the
  * generator actually draws from.
  */
+/**
+ * The caller's `wordSeparator`, or `undefined` for the language's own joiner when
+ * it is not a string. Its length is part of every nickname's, and a number has
+ * none: `wordSeparator: 5` made every bound `NaN` and the generator threw.
+ */
+export function resolveSeparator(separator: unknown): string | undefined {
+	return typeof separator === 'string' ? separator : undefined;
+}
+
 export function naturalRange(
 	language: WordLanguage,
 	separator?: string
@@ -505,7 +514,7 @@ function resolveSettings(options: RandNicknameOptions): Settings {
 		minLength: resolveLength(options.minLength),
 		maxLength: resolveLength(options.maxLength),
 		prefix: resolvePrefix(options.startsWith),
-		separator: options.wordSeparator
+		separator: resolveSeparator(options.wordSeparator)
 	};
 }
 

@@ -2,7 +2,7 @@ import { clamp } from '../_internal/utils.js';
 import { RAND_LENGTH_MAX, RAND_LENGTH_MIN } from '../constants.js';
 import type { WordLanguageOption } from '../_types/global.js';
 import { WORD_LANGUAGES, resolveWordLanguage } from '../word/data/index.js';
-import { naturalRange } from './nicknameGenerator.js';
+import { naturalRange, resolveSeparator } from './nicknameGenerator.js';
 
 /**
  * Every nickname length the language can produce, in characters, which is what
@@ -27,7 +27,7 @@ export function nicknameLengthRange(
 	let max = 0;
 
 	for (const code of languages) {
-		const [low, high] = naturalRange(code, wordSeparator);
+		const [low, high] = naturalRange(code, resolveSeparator(wordSeparator));
 
 		min = Math.min(min, low);
 		max = Math.max(max, high);

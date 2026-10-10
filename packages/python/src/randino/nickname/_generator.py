@@ -393,6 +393,15 @@ def bounds_for(
     return length_bounds(settings.min_length, settings.max_length, natural_min, natural_max)
 
 
+def resolve_separator(separator: object) -> str | None:
+    """The caller's `word_separator`, or None for the language's own joiner.
+
+    Its length is part of every nickname's, and a number has none: `word_separator=5`
+    raised `TypeError` from a length nothing named.
+    """
+    return separator if isinstance(separator, str) else None
+
+
 def natural_range(language: WordLanguage, separator: str | None = None) -> tuple[int, int]:
     """Every length a language can produce, across all of its themes.
 
@@ -501,7 +510,7 @@ def generate_nickname_details(
         min_length=resolve_length(min_length),
         max_length=resolve_length(max_length),
         prefix=resolve_prefix(starts_with),
-        separator=word_separator,
+        separator=resolve_separator(word_separator),
     )
 
     # Settled once rather than per draw: neither the shapes a language has nor the

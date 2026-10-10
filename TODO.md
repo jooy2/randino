@@ -44,7 +44,6 @@ A fix to a generator added under `vNext` needs no changelog entry of its own, si
 
 ### A. No decision needed
 
-- **A29. A non-string `wordSeparator` breaks the nickname generator.** `randNickname({ wordSeparator: 5 })` throws and `nicknameLengthRange('en', 5)` is `[NaN, NaN]`; Python raises `TypeError`. Read it as left out.
 - **A30. With `language: 'all'`, `slots` narrows the languages before `startsWith` does.** `randNickname({ slots: 'part', startsWith: 'б' })` is `[]`, while naming `ru` works. Filter by script first.
 - **A31. `randNickname` reads `realism` before resolving it.** `realism: 'bogus'` invents nothing yet opens the loose themes. Derive `loose` from the resolved chance.
 - **A32. `Lemonade` is in the English `food` pool.** It belongs in `drink`, in all three packages.

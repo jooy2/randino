@@ -297,7 +297,9 @@ describe('base test', () => {
 				}),
 			() => randino.randModifier('cat', { language: 'xx' as never }),
 			() => randino.randModifier('cat', { language: '__proto__' as never }),
-			() => randino.randModifier({ language: 'toString' as never })
+			() => randino.randModifier({ language: 'toString' as never }),
+			() => randino.randNickname({ wordSeparator: 5 as never }),
+			() => randino.nicknameLengthRange('en', [] as never)
 		];
 
 		for (const ask of asks) {
@@ -315,6 +317,11 @@ describe('base test', () => {
 		// A token of no length is not a token. `NaN` clamped to `NaN`, and a loop
 		// that runs `NaN` times wrote nothing at all.
 		assert.strictEqual(randino.randSuffix('x', { length: NaN }).length, 'x_'.length + 5);
+		// A separator that is not a string is the language's own joiner.
+		assert.deepStrictEqual(
+			randino.nicknameLengthRange('en', 5 as never),
+			randino.nicknameLengthRange('en')
+		);
 		// A language the package does not know leaves the value's own script to decide.
 		for (let i = 0; i < 20; i += 1) {
 			assert.doesNotMatch(randino.randModifier('고양이', { language: 'xx' as never }), / /);

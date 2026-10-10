@@ -2,6 +2,7 @@
 
 ## vNext (2026--)
 
+- A `word_separator` that is not a string reads as left out, the language's own joiner. `rand_nickname(word_separator=5)` and `nickname_length_range("en", 5)` raised `TypeError`.
 - `rand_modifier` gives a German noun written in lower case the gender the noun has: `katze` takes a feminine modifier, as `Katze` does. It was read by its ending and came back `flinker katze`.
 - An invented Russian surname takes the feminine form beside a woman's name, the way a real one does. `realism="invented"` and `"mixed"` wrote `Чачев` beside a woman's given name.
 - `rand_name` with `starts_with` and a tight `max_length` draws a real name wherever one starts with the character. When no name of the right length did, it invented one at `realism="real"` too (`Zeahos Cox` beside `Zachary King`).

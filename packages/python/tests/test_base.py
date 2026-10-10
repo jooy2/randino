@@ -423,6 +423,8 @@ def test_an_option_the_types_rule_out_falls_back_rather_than_raising() -> None:
         lambda: loose.rand_modifier("cat", language="xx"),
         lambda: loose.rand_modifier(language="xx"),
         lambda: loose.rand_word(min_length=[], max_length={}),
+        lambda: loose.rand_nickname(word_separator=5),
+        lambda: loose.nickname_length_range("en", []),
         lambda: loose.rand_name(realism=["real"]),
         lambda: loose.rand_nickname(realism={}),
         # Too large for a float, which JavaScript reads as `Infinity`.
@@ -453,6 +455,8 @@ def test_an_option_the_types_rule_out_falls_back_rather_than_raising() -> None:
     )
     # A token of no length is not a token.
     assert len(loose.rand_suffix("x", length=float("nan"))) == len("x_") + 5
+    # A separator that is not a string is the language's own joiner.
+    assert loose.nickname_length_range("en", 5) == loose.nickname_length_range("en")
     # A language the package does not know leaves the value's own script to decide.
     assert all(" " not in loose.rand_modifier("고양이", language="xx") for _ in range(20))
 
