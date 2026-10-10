@@ -151,10 +151,11 @@ void main() {
         ).every((detail) => detail.format != VersionFormat.semver),
         isTrue,
       );
-      expect(
-        randVersionDetails(format: {}, count: sample).map((detail) => detail.format).toSet(),
-        hasLength(greaterThan(1)),
-      );
+      // An empty set is the format left out, the way the other two packages read
+      // an empty list; a null one is every format.
+      expect(randVersionDetails(format: {}, count: sample).map((detail) => detail.format).toSet(), {
+        VersionFormat.semver,
+      });
     });
 
     test('includePrerelease gives about one semantic version in four a pre-release', () {

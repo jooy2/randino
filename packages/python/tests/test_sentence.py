@@ -2075,6 +2075,12 @@ def test_type_decides_what_the_sentence_is_doing_and_what_it_closes_on() -> None
 
     assert len(seen) == len(every)
 
+    # An empty sequence names the kinds too, every one of them, in all three packages: a
+    # story told with it asks things, where one told with none never does.
+    empty = rand_sentence(language="en", type=[], sentences=4, count=60, output="detail")
+
+    assert any("question" in detail.types for detail in empty)
+
 
 def test_a_question_is_a_shape_not_a_mark_bolted_onto_a_statement() -> None:
     # The languages whose grammar moves for a question say so in their own frames, and

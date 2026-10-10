@@ -89,7 +89,7 @@ randVersion(format: {VersionFormat.semver, VersionFormat.number}, count: 3); // 
 randVersion(format: null, count: 3); // [2.0.1, 2023.11.2, 15]
 ```
 
-null이나 빈 집합을 주면 모든 형식에서 뽑습니다.
+null을 주면 모든 형식에서 뽑고, 빈 집합을 주면 다른 두 패키지가 빈 목록을 읽는 것처럼 `semver`를 씁니다.
 
 :::
 

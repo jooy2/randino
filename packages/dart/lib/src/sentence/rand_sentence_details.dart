@@ -27,8 +27,8 @@ import 'package:randino/src/types.dart';
 /// a subject agrees with it.
 ///
 /// [type] says what the sentences are doing — saying something, asking it,
-/// exclaiming it, quoting somebody, or trailing off. A null set, or one holding
-/// more than one kind, decides per sentence, and that decision is weighted rather
+/// exclaiming it, quoting somebody, or trailing off. A null set, an empty one,
+/// or one holding more than one kind decides per sentence, and that decision is weighted rather
 /// than even, because prose is: a statement is far and away the most likely, a
 /// line somebody says comes next, and a question or an exclamation is the rarest
 /// of them. A language answers with what it has: five of the nine write a

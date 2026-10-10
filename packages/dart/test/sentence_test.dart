@@ -2453,6 +2453,18 @@ void main() {
       };
 
       expect(seen, hasLength(SentenceType.values.length));
+
+      // An empty set names the kinds too, every one of them, in all three
+      // packages: a story told with it asks things, where one told with none
+      // never does.
+      final empty = randSentenceDetails(
+        language: WordLanguage.en,
+        type: {},
+        sentences: 4,
+        count: 60,
+      );
+
+      expect(empty.any((detail) => detail.types.contains(SentenceType.question)), isTrue);
     });
 
     test('a quoted line is a sentence in the language`s own marks', () {

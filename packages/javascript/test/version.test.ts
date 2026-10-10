@@ -156,6 +156,12 @@ describe('Version', () => {
 		const two = randVersion({ format: ['calver', 'number'], count: SAMPLE, output: 'detail' });
 
 		assert.ok(two.every((detail) => detail.format !== 'semver'));
+		// An empty list is the format left out, in all three packages.
+		assert.ok(
+			randVersion({ format: [], count: SAMPLE, output: 'detail' }).every(
+				(detail) => detail.format === 'semver'
+			)
+		);
 		assert.ok(
 			randVersion({ format: 'nope' as never, count: SAMPLE, output: 'detail' }).every(
 				(detail) => detail.format === 'semver'

@@ -6,7 +6,7 @@ import 'package:randino/src/version/version_generator.dart';
 /// Generate software version numbers: `2.14.3`, `2024.3.1`, `42`.
 ///
 /// [format] picks how they are numbered, and several are drawn evenly, one per
-/// result; a null or empty one draws every format. Every part is drawn with the
+/// result; a null one draws every format, and an empty one `semver`. Every part is drawn with the
 /// small numbers most often, so `0.x` and `x.y.0` come up the way they do in a
 /// registry.
 ///

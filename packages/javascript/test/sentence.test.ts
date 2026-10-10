@@ -2282,6 +2282,12 @@ describe('Sentence', () => {
 		);
 
 		assert.strictEqual(seen.size, EVERY.length);
+
+		// An empty list names the kinds too, every one of them, in all three packages:
+		// a story told with it asks things, where one told with none never does.
+		const empty = sentenceDetails({ language: 'en', type: [], sentences: 4, count: 60 });
+
+		assert.ok(empty.some((detail) => detail.types.includes('question')));
 	});
 
 	it('a question is a shape, not a mark bolted onto a statement', () => {

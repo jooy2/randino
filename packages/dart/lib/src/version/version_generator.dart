@@ -151,9 +151,14 @@ List<VersionDetail> generateVersionDetails({
   bool unique = false,
   Random? random,
 }) {
+  // A null set is every format, the way a null enum is everywhere in this
+  // package, and an empty one is the format left out: the npm and PyPI packages
+  // read an empty list as `semver`.
   final formats =
-      format == null || format.isEmpty
+      format == null
           ? versionFormats
+          : format.isEmpty
+          ? const [VersionFormat.semver]
           : [
             for (final each in versionFormats)
               if (format.contains(each)) each,

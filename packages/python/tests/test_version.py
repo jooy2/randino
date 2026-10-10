@@ -120,6 +120,11 @@ def test_several_formats_or_all_of_them_are_drawn_evenly() -> None:
     two = rand_version(format=("calver", "number"), count=SAMPLE, output="detail")
 
     assert all(detail.format != "semver" for detail in two)
+    # An empty sequence is the format left out, in all three packages.
+    assert all(
+        detail.format == "semver"
+        for detail in rand_version(format=[], count=SAMPLE, output="detail")
+    )
 
 
 def test_include_prerelease_gives_about_one_semantic_version_in_four_a_prerelease() -> None:

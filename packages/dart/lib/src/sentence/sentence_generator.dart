@@ -5413,8 +5413,9 @@ List<SentenceDetail> generateSentenceDetails({
     tense: tense,
     story: story,
     // A caller who named the kinds — every one of them included — gets them; a
-    // story writes statements otherwise.
-    typed: type != null && type.isNotEmpty,
+    // story writes statements otherwise. An empty set is a set that was named,
+    // the way the npm and PyPI packages read an empty list: every kind.
+    typed: type != null,
     vocabulary: vocabulary,
   );
 

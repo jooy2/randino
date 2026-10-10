@@ -89,7 +89,7 @@ randVersion(format: {VersionFormat.semver, VersionFormat.number}, count: 3); // 
 randVersion(format: null, count: 3); // [2.0.1, 2023.11.2, 15]
 ```
 
-A null or empty set draws every format.
+A null set draws every format, and an empty one `semver`, the way the other two packages read an empty list.
 
 :::
 

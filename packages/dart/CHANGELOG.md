@@ -2,6 +2,7 @@
 
 ## vNext (2026--)
 
+- `randSentence(type: {})` names every kind, the way an empty list does in the npm and PyPI packages, so a story told with it asks and exclaims as well as tells. It read as no `type` at all, and a story wrote statements.
 - An invented Japanese word goes on in the kana its first character is written in: a hiragana `startsWith` such as `か` gives `かろび`, where it gave `かロビ`, half in one kana and half in the other.
 - A Japanese sentence with an object takes a verb that takes `を`. Verbs that carry an object of their own or take `に` or `と` sat among the ones that take an object, and wrote `電話を値をつけます` and `店員を会いました`; `挨拶する` moved to the verbs of talking, where it takes none.
 - `randOrganization` no longer writes a famous company when `startsWith` is the syllable kept out of its invented stems to prevent that. The caller's character went back in front of the syllable the pool was trimmed against, and `동` gave `동아…`, `辉` gave `辉瑞…`; a stem that spells one of those companies is now drawn again.
