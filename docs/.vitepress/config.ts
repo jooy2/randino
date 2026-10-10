@@ -88,7 +88,7 @@ const packageLinks = [
  *
  * The sidebar's **Words** group, nested inside Generators beside **General**,
  * is the one left out — and it says so itself, with `sidebarOnly` on the group
- * rather than an omission here. Fourteen names for `randWord` with its argument
+ * rather than an omission here. Twenty-nine names for `randWord` with its argument
  * decided would double the menu and say nothing `randWord` does not; the
  * sidebar lists them, and the dropdown points at the function they all are.
  */
@@ -322,9 +322,9 @@ function transformHead({ pageData, siteData, title, description }: TransformCont
 /* ---------------------------------------------------------------------------
  * The demo page runs the real library
  *
- * `/demo` calls `randName` and `randNickname` in the reader's browser, and it
- * calls **this repository's** copy of them rather than a published one. Two
- * lines make that work, and both are here rather than in the component:
+ * `/demo` calls the generators in the reader's browser, and it calls **this
+ * repository's** copy of them rather than a published one. Two lines make that
+ * work, and both are here rather than in the component:
  *
  * - The alias points the bare specifier `randino` at the package's TypeScript
  *   entry point. Depending on `randino` from npm instead would pin the demo to

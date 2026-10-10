@@ -215,7 +215,7 @@ rand_cpu(output="detail")
 | 필드 | 타입 | 설명 |
 | --- | --- | --- |
 | `cpu` | <Lang js="string" dart="String" py="str" code /> | 값 출력이 돌려주는 문자열. |
-| `vendor` | <Lang js="string" dart="String" py="str" code /> | 제조사: `Intel`, `AMD`, `Apple`. |
+| `vendor` | <Lang js="CpuVendor" dart="String" py="CpuVendor" code /> | 제조사: `Intel`, `AMD`, `Apple`. |
 | `model` | <Lang js="string" dart="String" py="str" code /> | 프로세서 이름: `Ryzen 7 7800X3D`. |
 | `platform` | `SystemPlatform` | `desktop` 또는 `mobile`. |
 | `year` | <Lang js="number" dart="int" py="int" code /> | 그 프로세서를 단 기기가 처음 팔리기 시작한 해. |

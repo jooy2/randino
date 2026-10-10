@@ -209,7 +209,7 @@ rand_gpu(output="detail")
 | Field | Type | Description |
 | --- | --- | --- |
 | `gpu` | <Lang js="string" dart="String" py="str" code /> | The graphics processor, as the value form returns it. |
-| `vendor` | <Lang js="string" dart="String" py="str" code /> | Who sells it under their name: `NVIDIA`, `AMD`, `Arm`. |
+| `vendor` | <Lang js="GpuVendor" dart="String" py="GpuVendor" code /> | Who sells it under their name: `NVIDIA`, `AMD`, `Arm`. |
 | `model` | <Lang js="string" dart="String" py="str" code /> | The graphics processor's own name: `GeForce RTX 4090`. |
 | `platform` | `SystemPlatform` | `desktop` or `mobile`. |
 | `year` | <Lang js="number" dart="int" py="int" code /> | The year the first cards or machines with it went on sale. |

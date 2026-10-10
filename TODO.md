@@ -44,7 +44,6 @@ A fix to a generator added under `vNext` needs no changelog entry of its own, si
 
 ### A. No decision needed
 
-- **A55. Smaller doc fixes.** The CPU and GPU detail tables type `vendor` as `string`; `randFileExtension`'s JSDoc example leaves out `mimeType`; `randPhone`'s detail overload and Dart's `randPhoneDetails` leave out the warning that a number may be real; the organization page says one in four where it is one in five; the Korean `maxLength: 14` location example cannot be met; the phone page counts Korea's regions differently from the location data; the site code's comments carry stale counts.
 
 ### B. Needs a decision
 

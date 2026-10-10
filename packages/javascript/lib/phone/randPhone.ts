@@ -26,6 +26,10 @@ export function randPhone(options?: RandPhoneOptions & { output?: 'value' }): st
  * Generate phone numbers along with their country, their type and their E.164
  * form.
  *
+ * A drawn number may belong to somebody, the same as with the plain form: use it
+ * as sample data, never call or text one, and pass `fictional` for numbers kept
+ * out of service.
+ *
  * @example
  * randPhone({ country: 'JP', output: 'detail' });
  * // [{ phone: '090-3718-2046', e164: '+819037182046', country: 'JP', callingCode: '81', type: 'mobile' }]

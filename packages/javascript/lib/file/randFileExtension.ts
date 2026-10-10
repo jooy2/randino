@@ -24,7 +24,7 @@ export function randFileExtension(
  *
  * @example
  * randFileExtension({ output: 'detail' });
- * // [{ extension: '.png', name: 'png', category: 'image' }]
+ * // [{ extension: '.png', name: 'png', category: 'image', mimeType: 'image/png' }]
  */
 export function randFileExtension(
 	options: RandFileExtensionOptions & { output: 'detail' }

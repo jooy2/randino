@@ -147,7 +147,7 @@ rand_organization(language="en", industry="logistics", count=3)
 
 :::
 
-With no industry asked for, a company draws one of the ten, except that one in four carries a word that says nothing about its business (`Holdings`, `그룹`, `集团`) and one in five is its name and a legal form and nothing else (`Larkspur, Inc.`). Neither of those reports an industry.
+With no industry asked for, a company draws one of the ten, except that one in five carries a word that says nothing about its business (`Holdings`, `그룹`, `集团`) and one in five is its name and a legal form and nothing else (`Larkspur, Inc.`). Neither of those reports an industry.
 
 ## Legal forms {#legal-forms}
 

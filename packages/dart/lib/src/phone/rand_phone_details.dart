@@ -5,6 +5,10 @@ import 'package:randino/src/types.dart';
 
 /// [randPhone], along with each number's country, type and E.164 form.
 ///
+/// A drawn number may belong to somebody, the same as with [randPhone]: use it
+/// as sample data, never call or text one, and pass [fictional] for numbers
+/// kept out of service.
+///
 /// Dart has neither overloads nor union types, so the detail form is its own
 /// function rather than the `output` option the npm and PyPI packages take.
 ///

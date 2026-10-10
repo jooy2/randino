@@ -209,7 +209,7 @@ rand_gpu(output="detail")
 | 필드 | 타입 | 설명 |
 | --- | --- | --- |
 | `gpu` | <Lang js="string" dart="String" py="str" code /> | 값 출력이 돌려주는 문자열. |
-| `vendor` | <Lang js="string" dart="String" py="str" code /> | 자기 이름으로 파는 회사: `NVIDIA`, `AMD`, `Arm`. |
+| `vendor` | <Lang js="GpuVendor" dart="String" py="GpuVendor" code /> | 자기 이름으로 파는 회사: `NVIDIA`, `AMD`, `Arm`. |
 | `model` | <Lang js="string" dart="String" py="str" code /> | 그래픽 프로세서 이름: `GeForce RTX 4090`. |
 | `platform` | `SystemPlatform` | `desktop` 또는 `mobile`. |
 | `year` | <Lang js="number" dart="int" py="int" code /> | 그것을 단 그래픽 카드나 기기가 처음 팔리기 시작한 해. |

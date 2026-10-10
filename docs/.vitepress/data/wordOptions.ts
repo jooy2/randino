@@ -1,7 +1,7 @@
 /**
  * The options `randWord` and its twenty-nine themed forms take, as data.
  *
- * Twenty-six pages document the same table, in two locales, with three packages'
+ * Thirty pages document the same table, in two locales, with three packages'
  * types in every cell — so it is written once here and drawn from two places:
  * `theme/components/WordOptions.vue` for the site, and `wordOptionsTable` in
  * `markdown.ts` for `llms-full.txt`, which has no CSS to hide a variant with

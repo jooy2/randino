@@ -23,7 +23,7 @@
 /* --- the generators ------------------------------------------------------ */
 
 /*
- * Eight tabs are wider than the content column even on a desktop, so the row
+ * Ten tabs are wider than the content column even on a desktop, so the row
  * wraps rather than scrolls: a tab scrolled out of view is a generator the
  * reader never finds out the page has.
  */

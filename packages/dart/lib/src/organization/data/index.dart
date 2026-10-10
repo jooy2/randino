@@ -50,7 +50,8 @@ const Map<OrganizationType, int> organizationTypeWeights = <OrganizationType, in
 const int organizationBareChance = 20;
 
 /// How often a company with no industry asked for carries a word that names
-/// none, as a percentage. Internal.
+/// none, as a percentage of the companies that are not a bare stem — a fifth
+/// of all of them. Internal.
 const int organizationGenericChance = 25;
 
 /// How often a company carries its legal form when the caller left it to

@@ -171,7 +171,7 @@ A location at `level: 'country'` is the country and nothing else, so it is writt
 ::: lang js
 
 ```javascript
-randLocation({ language: 'ko', maxLength: 14, count: 3 });
+randLocation({ language: 'ko', maxLength: 15, count: 3 });
 // ['대한민국 경기도 광주시 역동', '대한민국 경기도 시흥시 포동', '대한민국 경기도 광주시 삼동']
 
 randLocation({ language: 'en', startsWith: 'S', count: 2 });
@@ -183,7 +183,7 @@ randLocation({ language: 'en', startsWith: 'S', count: 2 });
 ::: lang dart
 
 ```dart
-randLocation(language: LocationLanguage.ko, maxLength: 14, count: 3);
+randLocation(language: LocationLanguage.ko, maxLength: 15, count: 3);
 // [대한민국 경기도 광주시 역동, 대한민국 경기도 시흥시 포동, 대한민국 경기도 광주시 삼동]
 ```
 
@@ -192,7 +192,7 @@ randLocation(language: LocationLanguage.ko, maxLength: 14, count: 3);
 ::: lang py
 
 ```python
-rand_location(language="ko", max_length=14, count=3)
+rand_location(language="ko", max_length=15, count=3)
 # ['대한민국 경기도 광주시 역동', '대한민국 경기도 시흥시 포동', '대한민국 경기도 광주시 삼동']
 ```
 

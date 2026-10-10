@@ -127,7 +127,7 @@ The code is read regardless of case, so `"kr"` is `"KR"`.
 | `DE` | Germany | `+49` | `0151 23456789`, `0171 2345678` | `030 23456789`, `0221 2345678` |
 | `RU` | Russia | `+7` | `8 (912) 345-67-89` | `8 (495) 323-45-67` |
 
-A mobile number opens on a block the country gives its operators, and a landline on the area code of a real city: Seoul and the sixteen provinces and cities of Korea, Tokyo and Osaka, Beijing and Shenzhen, Rome and Milan. The lists are the country's numbering plan at the level of the blocks it gives out, and nothing finer, since a plan does not say which numbers inside a block are in service. In the United States the area codes are long-standing ones of the fifty states and DC, never Canada's or the Caribbean's, and the exchange is never a service code like `411` nor `555`.
+A mobile number opens on a block the country gives its operators, and a landline on the area code of a real city: Seoul's `02` and the sixteen other area codes of Korea, Tokyo and Osaka, Beijing and Shenzhen, Rome and Milan. The lists are the country's numbering plan at the level of the blocks it gives out, and nothing finer, since a plan does not say which numbers inside a block are in service. In the United States the area codes are long-standing ones of the fifty states and DC, never Canada's or the Caribbean's, and the exchange is never a service code like `411` nor `555`.
 
 ## Formats {#formats}
 

@@ -215,7 +215,7 @@ rand_cpu(output="detail")
 | Field | Type | Description |
 | --- | --- | --- |
 | `cpu` | <Lang js="string" dart="String" py="str" code /> | The processor, as the value form returns it. |
-| `vendor` | <Lang js="string" dart="String" py="str" code /> | Who makes it: `Intel`, `AMD`, `Apple`. |
+| `vendor` | <Lang js="CpuVendor" dart="String" py="CpuVendor" code /> | Who makes it: `Intel`, `AMD`, `Apple`. |
 | `model` | <Lang js="string" dart="String" py="str" code /> | The processor's own name: `Ryzen 7 7800X3D`. |
 | `platform` | `SystemPlatform` | `desktop` or `mobile`. |
 | `year` | <Lang js="number" dart="int" py="int" code /> | The year the first machines with it went on sale. |

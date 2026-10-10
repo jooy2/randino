@@ -62,7 +62,8 @@ export const ORGANIZATION_BARE_CHANCE = 20;
 
 /**
  * How often a company with no industry asked for carries a word that names none
- * (`Group`, `홀딩스`, `集团`) rather than one that does, as a percentage.
+ * (`Group`, `홀딩스`, `集团`) rather than one that does, as a percentage of the
+ * companies that are not a bare stem — a fifth of all of them.
  */
 export const ORGANIZATION_GENERIC_CHANCE = 25;
 

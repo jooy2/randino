@@ -519,7 +519,8 @@ type Descriptor = { word: string; industry: OrganizationIndustry | null };
 
 /**
  * The word that says what a company does, and the industry it says. With none
- * asked for, a quarter of companies carry a word that names no industry
+ * asked for, a quarter of the companies that carry such a word — a fifth of all
+ * of them, since a fifth are a bare stem — carry one that names no industry
  * (`Group`, `홀딩스`) and the rest one industry's word, so the industries come up
  * alike rather than in proportion to how many words each one has.
  */

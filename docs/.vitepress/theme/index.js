@@ -38,7 +38,7 @@ export default {
 		// sidebar's switch does.
 		app.component('LangStart', LangStart);
 
-		// One table, twenty-six pages: `randWord` and each of its themed forms.
+		// One table, thirty pages: `randWord` and each of its themed forms.
 		app.component('WordOptions', WordOptions);
 
 		// One table, five pages: `randLocation` and each of its level functions.

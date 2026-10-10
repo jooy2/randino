@@ -54,7 +54,7 @@ ORGANIZATION_BARE_CHANCE = 20
 """How often a company with no industry asked for is its stem and a legal form alone."""
 
 ORGANIZATION_GENERIC_CHANCE = 25
-"""How often a company with no industry asked for carries a word that names none."""
+"""How often a company that is not a bare stem carries a word that names no industry."""
 
 ORGANIZATION_LEGAL_FORM_CHANCE = 50
 """How often a company carries its legal form when the caller left it to chance."""
