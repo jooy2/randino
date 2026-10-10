@@ -2,6 +2,7 @@
 
 ## vNext (2026--)
 
+- `randSentence` with `include` is several times faster. The required words were looked up in every pool of the language again for each result, and now are once per call.
 - `randWord`, `randNickname`, `randModifier` and `randSentence` draw Korean, Japanese and Chinese words about five times faster. Every word drawn used to read through its whole pool to find out whether the language writes capitals.
 - **`randCpu` and `randGpu` take `vendor`**, which keeps to the makers named: `randCpu({ vendor: 'AMD' })`, `randGpu({ vendor: ['AMD', 'ATI'] })`. A name neither catalog holds is ignored, and a maker with no part on the platform or in the years asked for is answered with nothing. The details' `vendor` is now typed `CpuVendor` and `GpuVendor`, and `CPU_VENDORS` and `GPU_VENDORS` are exported beside them.
 - **`randMimeType` generates MIME types** files are really served as: `application/pdf`, `image/png`, `video/mp4`. Each of `randFileExtension`'s extensions now carries the MIME type it is served as, taken from mime-db 1.54.0 with the type IANA registered where there are several, and `.raw`, which names no one format, is `.dng`. The types are those, once each, as common as their commonest extension; `type` keeps to the part in front of the slash, and `output: 'detail'` splits a type into its two parts and lists its extensions. `randFileExtension`'s detail gains `mimeType`. `MIME_TOP_LEVELS` is exported beside it.

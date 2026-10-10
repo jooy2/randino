@@ -261,6 +261,7 @@ class _Settings {
     required this.maxLength,
     required this.prefix,
     required this.include,
+    required this.classified,
     required this.sentences,
     required this.realism,
     required this.includeName,
@@ -289,6 +290,11 @@ class _Settings {
   final int? maxLength;
   final String prefix;
   final List<String> include;
+
+  /// [include] as each language reads it, filled in by [_requirementsOf] the
+  /// first time a language is asked. One map per call, shared by every result of
+  /// it.
+  final Map<WordLanguage, List<_Requirement>> classified;
 
   /// How many sentences one result holds, clamped.
   final int sentences;
@@ -335,6 +341,7 @@ class _Settings {
     maxLength: maxLength,
     prefix: prefix,
     include: include,
+    classified: classified,
     sentences: sentences,
     realism: realism,
     includeName: named,
@@ -943,7 +950,7 @@ List<WordLanguage> _languagesFor(_Settings settings) {
       .where(
         (code) =>
             _carries(sentenceData[code]!, settings) &&
-            settings.include.every((word) => _classify(code, word).known),
+            _requirementsOf(settings, code).every((requirement) => requirement.known),
       )
       .toList(growable: false);
 
@@ -1030,6 +1037,17 @@ String? _entryOf(WordPool pool, String word) {
 
   return null;
 }
+
+/// The caller's required words as [language] reads them.
+///
+/// Classified once per call and kept in [settings]: [_classify] walks every
+/// pool of the language, and a result asks again for every first sentence,
+/// every opener retried and every story told again.
+List<_Requirement> _requirementsOf(_Settings settings, WordLanguage language) =>
+    settings.classified.putIfAbsent(
+      language,
+      () => settings.include.map((word) => _classify(language, word)).toList(growable: false),
+    );
 
 /// What a required word is, judged by every pool it appears in.
 _Requirement _classify(WordLanguage language, String word) {
@@ -3190,9 +3208,7 @@ _Built _generateOne(WordLanguage language, _Settings settings, _Draw draw) {
   // The words a caller required go in the first sentence — once in the result
   // rather than once in every sentence of it.
   final requirements =
-      follow != null
-          ? const <_Requirement>[]
-          : settings.include.map((word) => _classify(language, word)).toList(growable: false);
+      follow != null ? const <_Requirement>[] : _requirementsOf(settings, language);
   // What the result has already put on the page and this sentence keeps: its
   // subject when the topic is being named again, and every noun of its scene.
   final pinned = <SentenceSlot, _Requirement>{...(follow?.scene ?? draw.beat?.pinned ?? const {})};
@@ -5164,6 +5180,7 @@ List<SentenceDetail> generateSentenceDetails({
     maxLength: maxLength,
     prefix: resolvePrefix(startsWith),
     include: include.map((word) => word.trim()).where((word) => word.isNotEmpty).toList(),
+    classified: <WordLanguage, List<_Requirement>>{},
     sentences: clampInt(sentences, 1, randSentenceCountMax),
     realism: realism,
     includeName: includeName,

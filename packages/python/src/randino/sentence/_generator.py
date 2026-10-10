@@ -418,6 +418,10 @@ class Settings:
 
     min_length: int | None = None
     max_length: int | None = None
+    classified: "dict[WordLanguage, tuple[Requirement, ...]]" = field(default_factory=dict)
+    """`include` as each language reads it, filled in by `_requirements_of` the first
+    time a language is asked. One dict per call, shared by every result of it.
+    """
 
 
 QUOTED_TYPES: tuple[SentenceType, ...] = ("dialogue", "thought")
@@ -1004,7 +1008,7 @@ def _languages_for(settings: Settings) -> tuple[WordLanguage, ...]:
         code
         for code in WORD_LANGUAGES
         if _carries(SENTENCE_DATA[code], settings)
-        and all(_classify(code, word).known for word in settings.include)
+        and all(requirement.known for requirement in _requirements_of(settings, code))
     )
 
     if able:
@@ -1150,6 +1154,22 @@ def _classify(language: WordLanguage, word: str) -> Requirement:
         return Requirement(word, ("subject",), known=False)
 
     return Requirement(written, tuple(slots), theme=theme)
+
+
+def _requirements_of(settings: Settings, language: WordLanguage) -> tuple[Requirement, ...]:
+    """The caller's required words as `language` reads them.
+
+    Classified once per call and kept in `settings`: `_classify` walks every pool of the
+    language, and a result asks again for every first sentence, every opener retried and
+    every story told again.
+    """
+    found = settings.classified.get(language)
+
+    if found is None:
+        found = tuple(_classify(language, word) for word in settings.include)
+        settings.classified[language] = found
+
+    return found
 
 
 def _plan_for(
@@ -4899,7 +4919,7 @@ def _generate_one(language: WordLanguage, settings: Settings, draw: Draw) -> Bui
     )
     # The words a caller required go in the first sentence — once in the result rather
     # than once in every sentence of it.
-    requirements = [] if follow is not None else [_classify(language, w) for w in settings.include]
+    requirements = () if follow is not None else _requirements_of(settings, language)
     # What the result has already put on the page and this sentence keeps: its subject
     # when the topic is being named again, and every noun of its scene.
     pinned: dict[SentenceSlot, Requirement] = (

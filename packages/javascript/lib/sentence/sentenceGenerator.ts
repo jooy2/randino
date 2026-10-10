@@ -317,6 +317,9 @@ type Settings = {
 	maxLength?: number;
 	prefix: string;
 	include: readonly string[];
+	// `include` as each language reads it, filled in by `requirementsOf` the first
+	// time a language is asked. One map per call, shared by every result of it.
+	classified: Map<WordLanguage, readonly Requirement[]>;
 	// How many sentences one result holds, clamped.
 	sentences: number;
 	// Whether a phrase about a person is written as a name.
@@ -792,7 +795,7 @@ function languagesFor(settings: Settings): readonly WordLanguage[] {
 	const able = WORD_LANGUAGES.filter(
 		(code) =>
 			carries(SENTENCE_DATA[code], settings) &&
-			settings.include.every((word) => classify(code, word).known)
+			requirementsOf(settings, code).every((requirement) => requirement.known)
 	);
 
 	if (able.length) {
@@ -934,6 +937,23 @@ function classify(language: WordLanguage, word: string): Requirement {
 	return slots.length
 		? { word: written, slots, theme, known: true }
 		: { word, slots: ['subject'], known: false };
+}
+
+/**
+ * The caller's required words as `language` reads them. Classified once per call
+ * and kept in `settings`: `classify` walks every pool of the language, and a
+ * result asks again for every first sentence, every opener retried and every
+ * story told again.
+ */
+function requirementsOf(settings: Settings, language: WordLanguage): readonly Requirement[] {
+	let found = settings.classified.get(language);
+
+	if (!found) {
+		found = settings.include.map((word) => classify(language, word));
+		settings.classified.set(language, found);
+	}
+
+	return found;
 }
 
 /**
@@ -2211,7 +2231,7 @@ function generateOne(language: WordLanguage, settings: Settings, draw: Draw): Bu
 	const requested = draw.beat?.subject ?? subjectThemesFor(settings, follow);
 	// The words a caller required go in the first sentence — once in the result
 	// rather than once in every sentence of it.
-	const requirements = follow ? [] : settings.include.map((word) => classify(language, word));
+	const requirements = follow ? [] : requirementsOf(settings, language);
 	// What the result has already put on the page and this sentence keeps: its
 	// subject when the topic is being named again, and every noun of its scene.
 	const pinned = new Map<SentenceSlot, Requirement>(follow?.scene ?? draw.beat?.pinned ?? []);
@@ -5050,6 +5070,7 @@ function resolveSettings(options: RandSentenceOptions): Settings {
 		maxLength: resolveLength(options.maxLength),
 		prefix: resolvePrefix(options.startsWith),
 		include: resolveInclude(options.include),
+		classified: new Map(),
 		sentences: resolveWhole(options.sentences, 1, 1, RAND_SENTENCE_COUNT_MAX),
 		// A sentence is read, so it keeps to the words people use unless asked
 		// otherwise; a word asked for on its own is a word.
