@@ -60,13 +60,22 @@ pip install randino
 
 The package declares `sideEffects: false`, so a bundler drops the pools nothing reaches — and the pools are nearly all of it. What one import costs, minified and gzipped:
 
-| Import                                                | gzipped |
-| ----------------------------------------------------- | ------- |
-| `randSuffix`, `randPrefix`                            | 0.5 KB  |
-| `randName`                                            | 23 KB   |
-| `randWord`, `randAnimal` and the rest, `randModifier` | 265 KB  |
-| `randNickname`                                        | 267 KB  |
-| `randSentence`                                        | 449 KB  |
+| Import                                                        | gzipped  |
+| ------------------------------------------------------------- | -------- |
+| `randSuffix`, `randPrefix`, the `nameLengthRange` helpers     | 0.5 KB   |
+| `randAge`, `randGender`, `randArchitecture`, `randRam`        | 1–1.5 KB |
+| `randOs`, `randDevice`, `randCpu` and the other system values | 1–5 KB   |
+| `randDate`, `randPhone`                                       | 3–4 KB   |
+| `randOrganization`                                            | 14 KB    |
+| `randCountry`                                                 | 18 KB    |
+| `randName`                                                    | 24 KB    |
+| `randLocation`, `randRegion`, `randCity`, `randDistrict`      | 160 KB   |
+| `randWord`, `randAnimal` and the rest, `randModifier`         | 260 KB   |
+| `randNickname`                                                | 262 KB   |
+| `randSentence`                                                | 426 KB   |
+| Everything                                                    | 640 KB   |
+
+Measured by bundling the one import with esbuild, minified, and gzipping the result.
 
 The word pools are one object per language, so one theme costs what twenty-nine do, and `randSentence` adds the grammar on top. That is the trade a synchronous API with no dependencies makes: nothing is fetched, so everything a function can reach ships with it. On a server it is nothing; in a browser bundle, reach for `randName` or the decorators if that is all you need, and load `randSentence` from a chunk of its own.
 

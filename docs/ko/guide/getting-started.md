@@ -60,13 +60,22 @@ pip install randino
 
 이 패키지는 `sideEffects: false`를 선언하므로, 번들러가 아무도 쓰지 않는 단어 풀을 덜어냅니다. 그리고 이 라이브러리는 거의 전부가 단어 풀입니다. 함수 하나를 가져올 때의 용량은 다음과 같습니다(minify + gzip 기준).
 
-| 가져오는 함수                              | gzip   |
-| ------------------------------------------ | ------ |
-| `randSuffix`, `randPrefix`                 | 0.5 KB |
-| `randName`                                 | 23 KB  |
-| `randWord`와 테마별 함수들, `randModifier` | 265 KB |
-| `randNickname`                             | 267 KB |
-| `randSentence`                             | 449 KB |
+| 가져오는 함수                                              | gzip     |
+| ---------------------------------------------------------- | -------- |
+| `randSuffix`, `randPrefix`, `nameLengthRange` 등 이름 헬퍼 | 0.5 KB   |
+| `randAge`, `randGender`, `randArchitecture`, `randRam`     | 1–1.5 KB |
+| `randOs`, `randDevice`, `randCpu` 등 다른 시스템 값 함수   | 1–5 KB   |
+| `randDate`, `randPhone`                                    | 3–4 KB   |
+| `randOrganization`                                         | 14 KB    |
+| `randCountry`                                              | 18 KB    |
+| `randName`                                                 | 24 KB    |
+| `randLocation`, `randRegion`, `randCity`, `randDistrict`   | 160 KB   |
+| `randWord`와 테마별 함수들, `randModifier`                 | 260 KB   |
+| `randNickname`                                             | 262 KB   |
+| `randSentence`                                             | 426 KB   |
+| 전체                                                       | 640 KB   |
+
+가져올 함수 하나만 esbuild로 번들하고 minify한 뒤 gzip으로 잰 값입니다.
 
 단어 풀은 언어마다 객체 하나이므로 테마 하나만 써도 29개 전부와 같은 용량이 들고, `randSentence`는 그 위에 문법 데이터가 더해집니다. 의존성 없는 동기 API가 치르는 대가입니다. 아무것도 내려받지 않는 대신, 함수가 닿을 수 있는 모든 것이 함께 실립니다. 서버에서는 신경 쓸 일이 아니지만, 브라우저 번들이라면 `randName`이나 데코레이터만으로 충분한지 먼저 보고, `randSentence`는 별도 청크로 불러오는 편이 낫습니다.
 
