@@ -1,16 +1,7 @@
 import { words } from '../../_internal/parse.js';
-import type { DateUnit, WordLanguage } from '../../_types/global.js';
+import type { WordLanguage } from '../../_types/global.js';
 
-// The parts of a date, largest first.
-export const DATE_UNITS: readonly DateUnit[] = [
-	'year',
-	'month',
-	'day',
-	'hour',
-	'minute',
-	'second',
-	'millisecond'
-];
+export { DATE_UNITS } from './constants.js';
 
 /**
  * The earliest and the latest instant a date may be, as milliseconds since the

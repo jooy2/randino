@@ -1,16 +1,7 @@
 import { rows } from '../../_internal/parse.js';
 import type { GpuVendor, SystemPlatform } from '../../_types/global.js';
 
-/** Every maker the catalog holds a part of, in the order the catalog lists them. */
-export const GPU_VENDORS: readonly GpuVendor[] = [
-	'NVIDIA',
-	'ATI',
-	'AMD',
-	'Intel',
-	'Qualcomm',
-	'Arm',
-	'Samsung'
-];
+export { GPU_VENDORS } from './constants.js';
 
 /** One graphics processor the catalog holds. */
 export interface GpuEntry {

@@ -1,7 +1,7 @@
 import { rows } from '../../_internal/parse.js';
 import type { DeviceType } from '../../_types/global.js';
 
-export const DEVICE_TYPES: readonly DeviceType[] = ['phone', 'tablet', 'laptop'];
+export { DEVICE_TYPES } from './constants.js';
 
 /** One device the catalog holds. */
 export interface DeviceEntry {

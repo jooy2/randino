@@ -1,33 +1,7 @@
 import { rows } from '../../_internal/parse.js';
 import type { FileCategory, MimeTopLevel } from '../../_types/global.js';
 
-export const FILE_CATEGORIES: readonly FileCategory[] = [
-	'document',
-	'spreadsheet',
-	'presentation',
-	'image',
-	'audio',
-	'video',
-	'archive',
-	'code',
-	'data',
-	'executable',
-	'font',
-	'ebook',
-	'disk',
-	'model'
-];
-
-/** The top-level media types the catalog's MIME types come under. */
-export const MIME_TOP_LEVELS: readonly MimeTopLevel[] = [
-	'application',
-	'audio',
-	'font',
-	'image',
-	'model',
-	'text',
-	'video'
-];
+export { FILE_CATEGORIES, MIME_TOP_LEVELS } from './constants.js';
 
 /** One extension the catalog holds, and how often it comes up. */
 export interface FileExtensionEntry {

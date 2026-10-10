@@ -1,17 +1,7 @@
 import { rows } from '../../_internal/parse.js';
 import type { CpuVendor, SystemPlatform } from '../../_types/global.js';
 
-/** Every maker the catalog holds a part of, in the order the catalog lists them. */
-export const CPU_VENDORS: readonly CpuVendor[] = [
-	'Intel',
-	'AMD',
-	'Apple',
-	'Qualcomm',
-	'Samsung',
-	'MediaTek',
-	'Google',
-	'HiSilicon'
-];
+export { CPU_VENDORS } from './constants.js';
 
 /** One processor the catalog holds. */
 export interface CpuEntry {

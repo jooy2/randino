@@ -1,2 +1,2 @@
-export { DEVICE_TYPES } from './data/index.js';
+export { DEVICE_TYPES } from './data/constants.js';
 export { randDevice } from './randDevice.js';

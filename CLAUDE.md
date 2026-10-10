@@ -84,23 +84,27 @@ lib/
     randCpu.ts              # public: string[], or CpuDetail[] on `output: 'detail'`
     cpuGenerator.ts         # internal: the candidates per call, the maker in front or not
     data/index.ts           # CPUS: every processor, one row each
+    data/constants.ts       # CPU_VENDORS, apart from the catalog
   date/
     index.ts
     randDate.ts             # public: string[], number[] on `unit`, or DateDetail[] on `output: 'detail'`
     dateGenerator.ts        # internal: the range, the ISO 8601 reader, the format writer
-    data/index.ts           # DATE_UNITS, the default range, the floor and ceiling, the default format
+    data/index.ts           # the default range, the floor and ceiling, the default format, the names
+    data/constants.ts       # DATE_UNITS
   file/
     index.ts
     randFileExtension.ts    # public: string[], or FileExtensionDetail[] on `output: 'detail'`
     randMimeType.ts         # public: string[], or MimeTypeDetail[] on `output: 'detail'`
     fileExtensionGenerator.ts # internal: the candidates per call, the weighted draw
     mimeTypeGenerator.ts    # internal: the same draw over the MIME types the extensions carry
-    data/index.ts           # FILE_CATEGORIES, MIME_TOP_LEVELS, FILE_EXTENSIONS with each one's MIME type
+    data/index.ts           # FILE_EXTENSIONS, each with its MIME type
+    data/constants.ts       # FILE_CATEGORIES, MIME_TOP_LEVELS
   gpu/
     index.ts
     randGpu.ts              # public: string[], or GpuDetail[] on `output: 'detail'`
     gpuGenerator.ts         # internal: randCpu's draw over the graphics catalog
     data/index.ts           # GPUS: every graphics processor, one row each
+    data/constants.ts       # GPU_VENDORS
   gender/
     index.ts
     randGender.ts           # public: string[], or GenderDetail[] on `output: 'detail'`
@@ -110,7 +114,8 @@ lib/
     index.ts
     randDevice.ts           # public: string[], or DeviceDetail[] on `output: 'detail'`
     deviceGenerator.ts      # internal: the candidates per call, the maker written once
-    data/index.ts           # DEVICE_TYPES, DEVICES: every model, one row each
+    data/index.ts           # DEVICES: every model, one row each
+    data/constants.ts       # DEVICE_TYPES
   disk/
     index.ts
     randDiskType.ts         # public: string[], or DiskTypeDetail[] on `output: 'detail'`
@@ -164,7 +169,8 @@ lib/
     index.ts
     randPhone.ts            # public: string[], or PhoneDetail[] on `output: 'detail'`
     phoneGenerator.ts       # internal: the shape per draw, the groups, the three ways to write them
-    data/index.ts           # PHONE_COUNTRIES, PHONE_TYPES, every country's plan and templates
+    data/index.ts           # every country's plan and templates
+    data/constants.ts       # PHONE_COUNTRIES, PHONE_TYPES
   ram/
     index.ts
     randRam.ts              # public: string[], or RamDetail[] on `output: 'detail'`
@@ -238,6 +244,7 @@ test/
 - **Every draw goes through one source, and `random` is how a caller replaces it.** `_internal/utils` holds an ambient source and `withRandom` swaps it for the length of a call; `Math.random` is named in exactly one place. Ambient rather than threaded through every signature, because the alternative is carrying a parameter through some fifty call sites of `pick` — and the library is synchronous from the entry point down, so nothing can interleave. **A new draw calls `pick` / `randInt` / `chance` / `random`, never `Math.random`**, or a caller's source quietly stops being the source: `List.shuffle` and `random.shuffle` are how both ports leaked one.
 - **Zero runtime dependencies.** This is a hard constraint, not a preference. It is why Hangul romanization is implemented in `lib/name/romanize.ts` instead of pulling in `es-hangul`.
 - **No module may do anything at import time.** `package.json` declares `sideEffects: false`, which is what lets a bundler drop the pools a caller never reaches — importing only `randSuffix` is 0.4 KB gzipped rather than the 448 KB the whole library is. The declaration is a promise about every file in `lib/`: constants and function declarations, and nothing that runs. A single top-level statement with an effect makes it a lie, and the failure is silent — the bundler drops code the caller needed.
+- **A public constant does not share a module with a catalog.** A catalog is built by a call at the top of its module (`rows(...)`, `words(...)`), which a bundler cannot prove pure and so keeps whenever anything of that module is imported. `CPU_VENDORS` beside `CPUS` cost an importer 1.7 KB for a list of twelve names; a category's public constants go in its `data/constants.ts`, which `data/index.ts` re-exports for the generators.
 
 #### Datasets
 
