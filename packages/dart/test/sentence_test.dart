@@ -2569,6 +2569,23 @@ void main() {
 
         expect(verbs.any((verb) => lower.startsWith('$verb ')), isTrue, reason: 'de: $sentence');
       }
+
+      // And a line that says something keeps its verb second. A shape opening on a
+      // time part opened on its verb once a quoted line had left the time out:
+      // `„Ist eine Vorstadt sonnig.“` is a question's order.
+      for (final detail in randSentenceDetails(
+        language: WordLanguage.de,
+        sentences: 6,
+        count: sample,
+      )) {
+        for (final line in detail.sentences) {
+          if (!RegExp('^[„‚]').hasMatch(line) || RegExp(r'\?[“‘]$').hasMatch(line)) continue;
+
+          final lower = line.substring(1).toLowerCase();
+
+          expect(verbs.any((verb) => lower.startsWith('$verb ')), isFalse, reason: 'de: $line');
+        }
+      }
     });
 
     test('a question form pool is the same length as the words it restates', () {

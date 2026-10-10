@@ -2284,8 +2284,12 @@ function generateOne(language: WordLanguage, settings: Settings, draw: Draw): Bu
 	// 한낮에` says it twice.
 	const spent = follow !== null && draw.dayAt >= data.times.day.length - 1;
 	const dated = draw.dated || (data.connectives.temporal ?? []).includes(draw.opener);
+	// A line somebody says names no time either, and a shape with a time part is
+	// left out for one rather than written without it: German puts its verb second,
+	// and a shape that opened on the time opened on the verb once the time was gone
+	// (`„Ist eine Vorstadt sonnig.“`), which is a question's order.
 	const timeless =
-		spent || dated
+		spent || dated || draw.spoken
 			? allowed.filter((frame) => !frame.parts.some((part) => part.slot === 'time'))
 			: allowed;
 	// A sentence that drops its subject and carries nothing else is one word —

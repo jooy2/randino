@@ -3302,8 +3302,12 @@ _Built _generateOne(WordLanguage language, _Settings settings, _Draw draw) {
   final dated =
       draw.dated ||
       (data.connectives[ConnectiveKind.temporal] ?? const <String>[]).contains(draw.opener);
+  // A line somebody says names no time either, and a shape with a time part is
+  // left out for one rather than written without it: German puts its verb
+  // second, and a shape that opened on the time opened on the verb once the time
+  // was gone (`„Ist eine Vorstadt sonnig.“`), which is a question's order.
   final timeless =
-      spent || dated
+      spent || dated || draw.spoken
           ? allowed
               .where((frame) => !frame.parts.any((part) => part.slot == SentenceSlot.time))
               .toList(growable: false)

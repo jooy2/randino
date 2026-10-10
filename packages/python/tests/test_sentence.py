@@ -2101,6 +2101,18 @@ def test_a_question_is_a_shape_not_a_mark_bolted_onto_a_statement() -> None:
 
         assert any(lower.startswith(verb + " ") for verb in verbs), f"de: {sentence}"
 
+    # And a line that says something keeps its verb second. A shape opening on a time
+    # part opened on its verb once a quoted line had left the time out: `„Ist eine
+    # Vorstadt sonnig.“` is a question's order.
+    for detail in rand_sentence(language="de", sentences=6, count=SAMPLE, output="detail"):
+        for line in detail.sentences:
+            if not re.match(r"^[„‚]", line) or re.search(r"\?[“‘]$", line):
+                continue
+
+            lower = line[1:].lower()
+
+            assert not any(lower.startswith(verb + " ") for verb in verbs), f"de: {line}"
+
 
 def test_a_question_form_pool_is_the_same_length_as_the_words_it_restates() -> None:
     # Index-aligned is the whole contract: a verb keeps its meaning across the forms,

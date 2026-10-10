@@ -2321,6 +2321,29 @@ describe('Sentence', () => {
 				`de: ${sentence}`
 			);
 		}
+
+		// And a line that says something keeps its verb second. A shape opening on a
+		// time part opened on its verb once a quoted line had left the time out:
+		// `„Ist eine Vorstadt sonnig.“` is a question's order.
+		for (const detail of randSentence({
+			language: 'de',
+			sentences: 6,
+			count: SAMPLE,
+			output: 'detail'
+		})) {
+			for (const sentence of detail.sentences) {
+				if (!/^[„‚]/.test(sentence) || /\?[“‘]$/.test(sentence)) {
+					continue;
+				}
+
+				const lower = sentence.slice(1).toLowerCase();
+
+				assert.ok(
+					![...verbs, 'ist', 'war'].some((verb) => lower.startsWith(verb + ' ')),
+					`de: ${sentence}`
+				);
+			}
+		}
 	});
 
 	it('a question form pool is the same length as the words it restates', () => {

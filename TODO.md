@@ -44,7 +44,6 @@ A fix to a generator added under `vNext` needs no changelog entry of its own, si
 
 ### A. No decision needed
 
-- **A36. German quoted lines put the verb first.** A spoken line drops its `time` part after the shape was chosen, and German's verb-second shapes then open on the verb (`„Ist eine Vorstadt sonnig.“`, 102 of 1,037). Leave shapes with a time part out for a spoken line instead.
 - **A37. German writes `streckte sich er`.** A pronoun subject after a reflexive verb goes before `sich`. 295 of 10,000 story sentences.
 - **A38. `include` is lost in a result of several sentences.** Requirements reach only the first sentence, and a story whose first beat cannot carry the word drops it: `ko include: '조용히'` over three sentences misses 257 of 400. Carry an unplaced requirement to the first beat that can take it.
 - **A39. An invented organization stem can spell a famous brand under `startsWith`.** The syllable pools leave out `동`, `한`, `辉`, `恒`, `光` and others so two syllables cannot spell `동아` or `辉瑞`, but `inventStem` puts a caller's prefix back as the first syllable. Make the brands each data file lists into data, and redraw while a stem contains one.

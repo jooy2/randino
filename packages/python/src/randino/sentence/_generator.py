@@ -5028,7 +5028,10 @@ def _generate_one(language: WordLanguage, settings: Settings, draw: Draw) -> Bui
     dated = draw.dated or draw.opener in data.connectives.get("temporal", ())
     timeless = (
         [frame for frame in allowed if not any(part.slot == "time" for part in frame.parts)]
-        if spent or dated
+        # A line somebody says names no time either, and a shape with a time part is left
+        # out for one rather than written without it: German puts its verb second, and a
+        # shape that opened on the time opened on the verb once the time was gone.
+        if spent or dated or draw.spoken
         else allowed
     )
     # A sentence that drops its subject and carries nothing else is one word — `놀아요.`,
