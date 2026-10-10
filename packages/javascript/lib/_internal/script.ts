@@ -8,8 +8,14 @@ import type { WordLanguage } from '../_types/global.js';
 const HANGUL = /[가-힣]/;
 const KANA = /[぀-ヿ]/;
 const HAN = /[一-鿿]/;
-const CYRILLIC = /\p{Script=Cyrillic}/u;
-const LATIN = /\p{Script=Latin}/u;
+// Written as ranges rather than `\p{Script=…}`, the same ranges in all three
+// packages: Python's `re` has no script classes, and `\p{Script=Latin}` takes in
+// the fullwidth `Ａ`, which no pool writes and which led an English word as
+// `Ａiskell`.
+const CYRILLIC = /[\u0400-\u052F]/;
+const LATIN = /[A-Za-z\u00C0-\u024F\u1E00-\u1EFF]/;
+// A letter of any script. The Latin ranges hold `×` and `÷`, which are not.
+const LETTER = /^\p{L}/u;
 // Vietnamese shares the Latin alphabet with English, and is told apart by the
 // letters and tone marks English never uses. A Vietnamese word carrying none of
 // them reads as English, which is the most a single word can be asked to say.
@@ -66,7 +72,11 @@ const SCRIPTS: Record<string, readonly RegExp[]> = {
 export function writesScript(language: string, text: string): boolean {
 	const scripts = SCRIPTS[language];
 
-	return !text || !scripts ? true : scripts.some((script) => script.test(text));
+	if (!text || !scripts) {
+		return true;
+	}
+
+	return LETTER.test(text) && scripts.some((script) => script.test(text));
 }
 
 // Hangul syllables are composed as (initial * 21 + vowel) * 28 + final, so the
@@ -101,7 +111,7 @@ export function endsWithConsonant(text: string): boolean {
 		return (code - HANGUL_BASE) % HANGUL_FINALS !== 0;
 	}
 
-	return /\p{Letter}/u.test(last) && !VOWELS.test(last.toLowerCase());
+	return LETTER.test(last) && !VOWELS.test(last.toLowerCase());
 }
 
 // The final consonant `ㄹ` is the eighth of the twenty-seven a syllable can close

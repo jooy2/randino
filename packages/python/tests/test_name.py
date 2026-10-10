@@ -431,6 +431,11 @@ def test_a_starts_with_the_language_does_not_write_is_answered_with_nothing() ->
     for language, character in asks:
         assert rand_name(language=language, count=SAMPLE, starts_with=character) == []
 
+    # No language writes a fullwidth letter, and none leads a name with a sign. `×` and
+    # `÷` sit inside the Latin-1 block, and Python read them as Latin.
+    for character in ("Ａ", "ｚ", "×", "÷", "1", "_"):
+        assert rand_name(count=SAMPLE, starts_with=character) == [], character
+
     # And `"all"` narrows to the languages that can answer rather than spending most
     # of its draws on the ones that cannot.
     for detail in rand_name(output="detail", count=SAMPLE, starts_with="ж"):

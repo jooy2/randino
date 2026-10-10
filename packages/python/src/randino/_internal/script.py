@@ -12,7 +12,9 @@ from randino._types import WordLanguage
 HANGUL = re.compile(r"[가-힣]")
 KANA = re.compile(r"[぀-ヿ]")
 HAN = re.compile(r"[一-鿿]")
-CYRILLIC = re.compile(r"[\u0400-\u04ff\u0500-\u052f]")
+# The same ranges as the other two packages, which write them out rather than use a
+# script class: `re` has none, and the JavaScript one took in the fullwidth `Ａ`.
+CYRILLIC = re.compile(r"[\u0400-\u052f]")
 LATIN = re.compile(r"[A-Za-z\u00c0-\u024f\u1e00-\u1eff]")
 # Vietnamese shares the Latin alphabet with English, and is told apart by the
 # letters and tone marks English never uses. A Vietnamese word carrying none of
@@ -92,7 +94,8 @@ def writes_script(language: str, text: str) -> bool:
     if not text or scripts is None:
         return True
 
-    return any(script.search(text) for script in scripts)
+    # A letter of any script. The Latin ranges hold `×` and `÷`, which are not.
+    return text[0].isalpha() and any(script.search(text) for script in scripts)
 
 
 # Hangul syllables are composed as (initial * 21 + vowel) * 28 + final, so the

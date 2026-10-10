@@ -2,6 +2,7 @@
 
 ## vNext (2026--)
 
+- A `starts_with` that is no letter is answered with nothing in every language. `×` and `÷` sit inside the Latin-1 block and were read as Latin, leading an English word as `×aefeerk`.
 - An integer too large for a float, such as `count=10**400`, falls back the way any other number the options cannot use does; it raised `OverflowError`.
 - An error raised by the `random` a caller passed reaches the caller; it was swallowed, and every draw after it read as `0`. A `random` that cannot be called, such as `random.Random(42)` itself rather than its `.random`, is ignored the way JavaScript ignores one, where it made every draw of the call the same. A source returning a string that spells a number reads as `0`, as it does in JavaScript.
 - `rand_modifier` reads a `language` it does not know as one left out, so the value's own script decides; it raised `KeyError`.

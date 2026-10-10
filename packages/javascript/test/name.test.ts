@@ -467,6 +467,13 @@ describe('Name', () => {
 			assert.deepEqual(randName({ language, count: SAMPLE, startsWith: character }), []);
 		}
 
+		// No language writes a fullwidth letter, and none leads a name with a sign.
+		// `×` and `÷` sit inside the Latin-1 block, and `Ａ` used to read as Latin
+		// in JavaScript and Dart alone, which wrote `Ａoupiepas Lewis`.
+		for (const character of ['Ａ', 'ｚ', '×', '÷', '1', '_']) {
+			assert.deepEqual(randName({ count: SAMPLE, startsWith: character }), [], character);
+		}
+
 		// And `'all'` narrows to the languages that can answer rather than spending
 		// most of its draws on the ones that cannot.
 		for (const detail of nameDetails({ count: SAMPLE, startsWith: 'ж' })) {

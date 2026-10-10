@@ -523,6 +523,13 @@ void main() {
         );
       }
 
+      // No language writes a fullwidth letter, and none leads a name with a
+      // sign. `×` and `÷` sit inside the Latin-1 block, and `Ａ` used to read as
+      // Latin here and in JavaScript.
+      for (final character in ['Ａ', 'ｚ', '×', '÷', '1', '_']) {
+        expect(randName(count: sample, startsWith: character), isEmpty, reason: character);
+      }
+
       // And every language narrows to the ones that can answer rather than
       // spending most of its draws on the ones that cannot.
       for (final detail in randNameDetails(count: sample, startsWith: 'ж')) {

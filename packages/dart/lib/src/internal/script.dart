@@ -8,8 +8,12 @@ import 'package:randino/src/types.dart';
 final RegExp _hangul = RegExp('[가-힣]');
 final RegExp _kana = RegExp('[぀-ヿ]');
 final RegExp _han = RegExp('[一-鿿]');
-final RegExp _cyrillic = RegExp(r'\p{Script=Cyrillic}', unicode: true);
-final RegExp _latin = RegExp(r'\p{Script=Latin}', unicode: true);
+// Written as ranges rather than `\p{Script=…}`, the same ranges in all three
+// packages: Python's `re` has no script classes, and `\p{Script=Latin}` takes in
+// the fullwidth `Ａ`, which no pool writes and which led an English word as
+// `Ａiskell`.
+final RegExp _cyrillic = RegExp('[\u0400-\u052F]');
+final RegExp _latin = RegExp('[A-Za-z\u00C0-\u024F\u1E00-\u1EFF]');
 // Vietnamese shares the Latin alphabet with English, and is told apart by the
 // letters and tone marks English never uses. A Vietnamese word carrying none of
 // them reads as English, which is the most a single word can be asked to say.
@@ -68,7 +72,8 @@ bool writesScript(String language, String text) {
     return true;
   }
 
-  return scripts.any((script) => script.hasMatch(text));
+  // A letter of any script. The Latin ranges hold `×` and `÷`, which are not.
+  return _letter.hasMatch(text.substring(0, 1)) && scripts.any((script) => script.hasMatch(text));
 }
 
 // Hangul syllables are composed as (initial * 21 + vowel) * 28 + final, so the
