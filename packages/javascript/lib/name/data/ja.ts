@@ -1,12 +1,9 @@
 import { tokens } from '../../_internal/parse.js';
+import { NAME_SPECS } from './specs.js';
 import type { NameLanguageData } from './types.js';
 
 export const JA: NameLanguageData = {
-	order: 'family-first',
-	joiner: '',
-	hasMiddle: false,
-	roman: 'token',
-	lengthSpec: { given: [2, 3], last: [1, 3], middle: [0, 0] },
+	...NAME_SPECS.ja,
 	givenLenWeights: { 2: 70, 3: 30 },
 	last: tokens(`
 		佐藤:Sato 鈴木:Suzuki 高橋:Takahashi 田中:Tanaka 渡辺:Watanabe 伊藤:Ito

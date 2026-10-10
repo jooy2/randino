@@ -1,13 +1,10 @@
 import { words } from '../../_internal/parse.js';
 import { ITALIAN_SYLLABLES } from './syllables.js';
+import { NAME_SPECS } from './specs.js';
 import type { NameLanguageData } from './types.js';
 
 export const IT: NameLanguageData = {
-	order: 'given-first',
-	joiner: ' ',
-	hasMiddle: true,
-	roman: 'fold',
-	lengthSpec: { given: [3, 10], last: [4, 10], middle: [3, 10] },
+	...NAME_SPECS.it,
 	last: words(`
 		Rossi Russo Ferrari Esposito Bianchi Romano Colombo Ricci Marino Greco Bruno
 		Gallo Conti De_Luca Costa Giordano Mancini Rizzo Lombardi Moretti Barbieri

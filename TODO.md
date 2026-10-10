@@ -44,7 +44,6 @@ A fix to a generator added under `vNext` needs no changelog entry of its own, si
 
 ### A. No decision needed
 
-- **A14. The name helpers bundle every name pool.** `nameLengthRange`, `nameSupportsMiddleName` and `nameSupportsRoman` read `lengthSpec`, `hasMiddle` and `roman`, and are 18 to 19 KB each because those sit in the same objects as the pools. Move them into a small table of their own.
 - **A15. The Japanese sentence data spells out five forms of every verb.** 805 of 847 verbs follow from the dictionary form, and the rest from rules for `〜ていく` and `〜てくる`. Writing the dictionary form and the verb class, the way `koVerbs` does for Korean, saves about 12 KB gzipped on `randSentence`. The parsed data must come out identical; `tools/emit` rewrites the ports.
 - **A16. A constant drags in its catalog.** `CPU_VENDORS`, `GPU_VENDORS`, `DEVICE_TYPES`, `FILE_CATEGORIES`, `MIME_TOP_LEVELS`, `PHONE_COUNTRIES` and `DATE_UNITS` sit beside a top-level `rows(...)` or `words(...)` call a bundler cannot drop, so importing the constant alone costs 1.1 to 2.7 KB. Move the constants to modules of their own.
 - **A17. The home hero image is 193 KB.** A WebP of `docs/public/512x512.png` is 26 KB. Keep the PNG for `og:image`.

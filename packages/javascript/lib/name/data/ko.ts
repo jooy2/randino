@@ -1,4 +1,5 @@
 import { romanMap, weights, words } from '../../_internal/parse.js';
+import { NAME_SPECS } from './specs.js';
 import type { NameLanguageData } from './types.js';
 
 // Conventional romanization of the surnames below. Anything missing (including a
@@ -15,11 +16,7 @@ export const KO_SURNAME_ROMAN: Record<string, string> = romanMap(`
 `);
 
 export const KO: NameLanguageData = {
-	order: 'family-first',
-	joiner: '',
-	hasMiddle: false,
-	roman: 'hangul',
-	lengthSpec: { given: [1, 2], last: [1, 1], middle: [0, 0] },
+	...NAME_SPECS.ko,
 	// Weighted to reality: two-syllable given names dominate, one- and
 	// three-syllable ones are the exception.
 	givenLenWeights: { 1: 4, 2: 92, 3: 4 },

@@ -2,6 +2,7 @@
 
 ## vNext (2026--)
 
+- `nameLengthRange`, `nameSupportsMiddleName` and `nameSupportsRoman` bundle in about half a kilobyte each, gzipped; they carried every name pool, 18 KB, because what they read sat in the same objects as the names.
 - `randModifier` reads a `language` it does not know as one left out, so the value's own script decides; it threw. A value such as `constructor` or `toString` is no longer taken for a Spanish noun because the gender lookup inherited it from `Object.prototype`.
 - A `null` option is read as left out, the way the Dart and Python packages read one. `count: null` returned nothing, `maxAge: null` an age of zero and `maxLength: null` the shortest names there are, and every generator threw on a `null` options object, `randName(null)` included.
 - `randAge` with `unique` stops as soon as every age in range has been drawn. It kept drawing repeats until its attempt budget ran out, which took seconds at a large `count`.

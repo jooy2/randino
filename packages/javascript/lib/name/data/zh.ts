@@ -1,12 +1,9 @@
 import { tokens, weights } from '../../_internal/parse.js';
+import { NAME_SPECS } from './specs.js';
 import type { NameLanguageData } from './types.js';
 
 export const ZH: NameLanguageData = {
-	order: 'family-first',
-	joiner: '',
-	hasMiddle: false,
-	roman: 'token',
-	lengthSpec: { given: [1, 2], last: [1, 1], middle: [0, 0] },
+	...NAME_SPECS.zh,
 	givenLenWeights: { 1: 45, 2: 55 },
 	// Share of the population carrying each surname, in tenths of a percent. The
 	// pool is the top fifty and every entry is listed, because none of them is a

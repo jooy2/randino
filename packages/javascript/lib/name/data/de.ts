@@ -1,13 +1,10 @@
 import { words } from '../../_internal/parse.js';
 import { GERMAN_SYLLABLES } from './syllables.js';
+import { NAME_SPECS } from './specs.js';
 import type { NameLanguageData } from './types.js';
 
 export const DE: NameLanguageData = {
-	order: 'given-first',
-	joiner: ' ',
-	hasMiddle: true,
-	roman: 'fold',
-	lengthSpec: { given: [3, 10], last: [4, 10], middle: [3, 10] },
+	...NAME_SPECS.de,
 	last: words(`
 		Müller Schmidt Schneider Fischer Weber Meyer Wagner Becker Schulz Hoffmann
 		Schäfer Koch Bauer Richter Klein Wolf Schröder Neumann Schwarz Zimmermann Braun

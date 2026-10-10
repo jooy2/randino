@@ -1,13 +1,10 @@
 import { weights, words } from '../../_internal/parse.js';
 import { VIETNAMESE_SYLLABLES } from './syllables.js';
+import { NAME_SPECS } from './specs.js';
 import type { NameLanguageData } from './types.js';
 
 export const VI: NameLanguageData = {
-	order: 'family-first',
-	joiner: ' ',
-	hasMiddle: true,
-	roman: 'fold',
-	lengthSpec: { given: [1, 6], last: [2, 6], middle: [2, 6] },
+	...NAME_SPECS.vi,
 	// Share of the population carrying each surname, in tenths of a percent. No
 	// language in the set is more lopsided: two Vietnamese names in five are a
 	// Nguyễn, so drawing the thirty surnames evenly is the most visible skew there

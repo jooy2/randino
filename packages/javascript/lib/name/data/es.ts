@@ -1,13 +1,10 @@
 import { words } from '../../_internal/parse.js';
 import { SPANISH_SYLLABLES } from './syllables.js';
+import { NAME_SPECS } from './specs.js';
 import type { NameLanguageData } from './types.js';
 
 export const ES: NameLanguageData = {
-	order: 'given-first',
-	joiner: ' ',
-	hasMiddle: true,
-	roman: 'fold',
-	lengthSpec: { given: [3, 10], last: [3, 9], middle: [3, 10] },
+	...NAME_SPECS.es,
 	last: words(`
 		García Rodríguez González Fernández López Martínez Sánchez Pérez Gómez Martín
 		Jiménez Ruiz Hernández Díaz Moreno Álvarez Romero Alonso Gutiérrez Navarro

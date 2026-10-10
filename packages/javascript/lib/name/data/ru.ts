@@ -1,13 +1,10 @@
 import { words } from '../../_internal/parse.js';
 import { RUSSIAN_SYLLABLES } from './syllables.js';
+import { NAME_SPECS } from './specs.js';
 import type { NameLanguageData } from './types.js';
 
 export const RU: NameLanguageData = {
-	order: 'given-first',
-	joiner: ' ',
-	hasMiddle: true,
-	roman: 'translit',
-	lengthSpec: { given: [3, 11], last: [4, 11], middle: [5, 14] },
+	...NAME_SPECS.ru,
 	// Every surname here is the masculine form; `feminizeRu` derives the feminine
 	// one, so a new entry has to end in -ов / -ев / -ёв / -ин / -ын / -ский / -ой.
 	last: words(`

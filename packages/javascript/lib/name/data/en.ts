@@ -1,13 +1,10 @@
 import { words } from '../../_internal/parse.js';
 import { WESTERN_SYLLABLES } from './syllables.js';
+import { NAME_SPECS } from './specs.js';
 import type { NameLanguageData } from './types.js';
 
 export const EN: NameLanguageData = {
-	order: 'given-first',
-	joiner: ' ',
-	hasMiddle: true,
-	roman: 'fold',
-	lengthSpec: { given: [3, 10], last: [3, 10], middle: [3, 10] },
+	...NAME_SPECS.en,
 	last: words(`
 		Smith Johnson Williams Brown Jones Miller Davis Wilson Anderson Taylor Thomas
 		Moore Jackson Martin Lee Clark Lewis Walker Hall Allen Young King Wright Scott

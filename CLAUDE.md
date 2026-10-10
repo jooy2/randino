@@ -135,7 +135,8 @@ lib/
     nameGenerator.ts        # internal: the generator itself
     romanize.ts             # internal: native form -> English pronunciation
     data/
-      index.ts              # NAME_DATA, NAME_LANGUAGES, bounds
+      index.ts              # NAME_DATA, bounds
+      specs.ts              # NAME_LANGUAGES, NAME_SPECS: everything but the pools, for the helpers
       types.ts              # internal dataset types
       syllables.ts          # syllable templates for invented names
       en.ts ko.ts ja.ts …   # one file per language
@@ -849,8 +850,8 @@ Every word language has sentence data too, so this is only for a language being 
 ## Adding a name language
 
 1. Add the code to `NameLanguage` in `lib/_types/global.ts`.
-2. Add `lib/name/data/<code>.ts` with a `NameLanguageData` object: name order, joiner (`''` for CJK, `' '` otherwise), `hasMiddle`, `roman` mode, `lengthSpec`, and the pools. CJK languages use `givenMale` / `givenFemale` plus `first*` / `rest*` syllables; other scripts use `male` / `female` / `last` plus a `syn` template. Add `lastWeights` only when the language's surnames are steeply distributed — an even draw is already close to reality for the long-tailed ones (see the surname bullet below).
-3. Register it in `NAME_DATA` and `NAME_LANGUAGES` in `lib/name/data/index.ts`.
+2. Add the language's entry to `NAME_SPECS` in `lib/name/data/specs.ts` — name order, joiner (`''` for CJK, `' '` otherwise), `hasMiddle`, `roman` mode, `lengthSpec`, and `romanizes` — and `lib/name/data/<code>.ts`, a `NameLanguageData` object that spreads that entry and adds the pools. The entry is kept apart so that `nameLengthRange` and the two `nameSupports…` helpers bundle without any pool. CJK languages use `givenMale` / `givenFemale` plus `first*` / `rest*` syllables; other scripts use `male` / `female` / `last` plus a `syn` template. Add `lastWeights` only when the language's surnames are steeply distributed — an even draw is already close to reality for the long-tailed ones (see the surname bullet below).
+3. Register it in `NAME_LANGUAGES` in `lib/name/data/specs.ts` and in `NAME_DATA` in `lib/name/data/index.ts`.
 4. If it needs a new romanization mode, add it to `RomanMode` and handle it in `lib/name/romanize.ts`.
 5. `lengthSpec` must be **measured, not estimated** — it is the default length range, and a wrong value is silent. Too narrow and the generator re-draws real names away; too wide and it aims at lengths nothing can spell. The `given` span is the given-name pool's, narrowed to the lengths `givenLenWeights` actually asks for where the language has a table; `last` and `middle` are their pools', and Russian's `last` adds the character feminization can put on it. The joiner is **not** in these numbers — `nameLengthRange` adds one per part it switches on. `test/name.test.ts` checks all of it against the pools.
 6. Add the language to the README table and to the script regexes in `test/name.test.ts`; the existing per-language tests then cover it.

@@ -1,5 +1,5 @@
 import type { NameLanguageOption } from '../_types/global.js';
-import { NAME_DATA, resolveNameLanguage } from './data/index.js';
+import { NAME_SPECS, resolveNameLanguage } from './data/specs.js';
 
 /**
  * Whether the language uses a middle name. `includeMiddleName` is ignored for
@@ -12,5 +12,5 @@ import { NAME_DATA, resolveNameLanguage } from './data/index.js';
 export function nameSupportsMiddleName(language: NameLanguageOption = 'all'): boolean {
 	const wanted = resolveNameLanguage(language);
 
-	return wanted === 'all' ? true : NAME_DATA[wanted].hasMiddle;
+	return wanted === 'all' ? true : NAME_SPECS[wanted].hasMiddle;
 }

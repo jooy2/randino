@@ -37,13 +37,19 @@ export type NameLengthSpec = {
 	middle: readonly [number, number];
 };
 
-export type NameLanguageData = {
+/** What a language's names are like, apart from the names themselves. */
+export type NameSpec = {
 	order: 'given-first' | 'family-first';
 	// Joins native parts: '' for CJK (김민준), ' ' for space-separated scripts.
 	joiner: string;
 	hasMiddle: boolean;
 	roman: RomanMode;
 	lengthSpec: NameLengthSpec;
+	// Whether any name of the language romanizes to something other than itself.
+	romanizes: boolean;
+};
+
+export type NameLanguageData = NameSpec & {
 	last: NamePool;
 	// How likely each surname is relative to the others, for languages whose
 	// surnames are steeply distributed (Korean, Chinese, Vietnamese). Written in
