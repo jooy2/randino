@@ -44,7 +44,6 @@ A fix to a generator added under `vNext` needs no changelog entry of its own, si
 
 ### A. No decision needed
 
-- **A21. Python `rand_word` skips `resolve_length`.** `min_length=nan` returns only the longest words, `min_length=[]` raises, and `realism=['real']` raises `TypeError: unhashable` in every generator that takes `realism`.
 - **A22. Python reads non-ASCII digits in date strings.** `\d` matches `２０２４` and Arabic-Indic digits, which JS rejects. Use `re.ASCII`.
 - **A23. `unique` with `script: 'roman'` returns duplicates.** The key is the native name, and two native names can romanize alike: 291 of 3,000 unique `vi` roman names repeat. Key on the string returned.
 - **A24. `realism: 'real'` invents a name under `startsWith` and a tight `maxLength`.** The aimed draw narrows the pool by length and falls back to synthesis when no entry of that length starts with the character, though a real one exists (`Zeahos Cox` beside `Zachary King`). Fall back to the prefix matches of the whole pool first.

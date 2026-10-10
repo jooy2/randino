@@ -14,6 +14,7 @@ from randino._internal.generate import (
     collect,
     languages_writing,
     length_bounds,
+    resolve_length,
     resolve_prefix,
     resolve_realism,
     resolve_vocabulary,
@@ -535,8 +536,8 @@ def generate_word_details(
         theme=resolve_theme(theme),
         invent=resolve_realism(realism),
         vocabulary=resolve_vocabulary(vocabulary),
-        min_length=min_length,
-        max_length=max_length,
+        min_length=resolve_length(min_length),
+        max_length=resolve_length(max_length),
         prefix=resolve_prefix(starts_with),
     )
 

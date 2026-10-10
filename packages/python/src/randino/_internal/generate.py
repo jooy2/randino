@@ -153,7 +153,8 @@ def resolve_realism(realism: RandRealism) -> int:
     That is what every generator actually asks of it. A level the type rules out but an
     unchecked caller can still pass falls back to the default rather than raising.
     """
-    return _INVENT_CHANCE.get(realism, 0)
+    # A list or a dict is no level, and cannot be looked up in one either.
+    return _INVENT_CHANCE.get(realism, 0) if isinstance(realism, str) else 0
 
 
 _VOCABULARIES: tuple[RandVocabulary, ...] = ("basic", "common", "full")
