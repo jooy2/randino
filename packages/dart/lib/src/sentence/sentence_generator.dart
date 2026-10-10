@@ -548,9 +548,15 @@ class _Draw {
     this.object,
     this.speech,
     this.spoken = false,
+    this.owed = const <_Requirement>[],
   });
 
   final LengthRange budget;
+
+  /// The words the caller required that the result has not written yet. All of
+  /// them for its first sentence; a sentence that could not carry one hands it
+  /// on.
+  final List<_Requirement> owed;
 
   /// What the caller asked for, and what the detail reports.
   final SentenceType type;
@@ -647,6 +653,7 @@ class _Draw {
     object: object,
     speech: speech,
     spoken: spoken,
+    owed: owed,
   );
 }
 
@@ -2059,8 +2066,13 @@ class _Built {
     this.scene,
     this.field,
     this.dayAt,
-    this.object,
-  );
+    this.object, {
+    this.placed = const <_Requirement>[],
+  });
+
+  /// The words the caller required that this sentence wrote, which the
+  /// sentences after it no longer owe.
+  final List<_Requirement> placed;
 
   final String sentence;
   final List<String> phrases;
@@ -2747,6 +2759,8 @@ _Built _compose(
   // phrases of one sentence describe one noun no more than two sentences do.
   final settled = <String>{...draw.described};
   final describedNouns = <String>[];
+  // The caller's required words this sentence writes.
+  final placed = <_Requirement>[];
   final drawn = <SentenceSlot, _Phrase>{};
   _Phrase? subject;
   var named = false;
@@ -2911,6 +2925,9 @@ _Built _compose(
         describedNouns.add(built.noun);
       }
 
+      if (required != null) placed.add(required);
+      if (owed != null && built.modified) placed.add(owed);
+
       // A place takes the preposition it takes — `on the balcony`, `at the
       // market`, `under the sky` — where the language says so, and the frame's
       // own otherwise. The budget was measured against the frame's, so the
@@ -2938,13 +2955,17 @@ _Built _compose(
         drawn[part.slot] = built;
       }
     } else {
+      final predicateRequired = plan.phrase[at[i]];
+
+      if (predicateRequired != null) placed.add(predicateRequired);
+
       final predicate = _predicateFor(
         part.slot,
         lexicon,
         data,
         base,
         predicates,
-        plan.phrase[at[i]],
+        predicateRequired,
         gender,
         low,
         high,
@@ -3055,6 +3076,7 @@ _Built _compose(
         : reference != null
         ? (noun: reference.noun, named: false)
         : null,
+    placed: placed,
   );
 }
 
@@ -3282,10 +3304,10 @@ _Built _generateOne(WordLanguage language, _Settings settings, _Draw draw) {
   final modifierBounds = _modifierBounds[language]!;
   final allowed = _framesFor(data, settings, _moodFor(draw.mark), draw.beat);
   final requested = draw.beat?.subject ?? _subjectThemesFor(settings, follow);
-  // The words a caller required go in the first sentence — once in the result
-  // rather than once in every sentence of it.
-  final requirements =
-      follow != null ? const <_Requirement>[] : _requirementsOf(settings, language);
+  // The words a caller required go in the first sentence that can carry them —
+  // once in the result rather than once in every sentence of it. A story that
+  // opens on a state has nowhere to put `조용히`, and its next sentence does.
+  final requirements = draw.owed;
   // What the result has already put on the page and this sentence keeps: its
   // subject when the topic is being named again, and every noun of its scene.
   final pinned = <SentenceSlot, _Requirement>{...(follow?.scene ?? draw.beat?.pinned ?? const {})};
@@ -3982,9 +4004,14 @@ class _Telling {
     required this.spent,
     required this.described,
     required this.names,
+    required this.owed,
     required this.voice,
     required this.tense,
   });
+
+  /// The words the caller required that no sentence has written yet, handed on
+  /// until one can carry them and cut down in place as they are written.
+  final List<_Requirement> owed;
 
   final WordLanguage language;
   final SentenceLanguageData data;
@@ -4099,6 +4126,7 @@ _Result _generateResult(WordLanguage language, _Settings settings) {
     spent: <String>{},
     described: <String>{},
     names: <String>{},
+    owed: _requirementsOf(settled, language).toList(),
     voice: voice,
     tense: tense,
   );
@@ -4175,11 +4203,13 @@ _Result _generateResult(WordLanguage language, _Settings settings) {
       dayAt: dayAt,
       object: object,
       dated: _timeSpent(built, settings.sentences),
+      owed: List<_Requirement>.unmodifiable(paragraph.owed),
     );
     final (one, opened) = _drawOne(paragraph, draw);
 
     built.add(one);
     scene = one.scene;
+    paragraph.owed.removeWhere((each) => one.placed.any((written) => identical(written, each)));
     spent.addAll(one.used);
     described.addAll(one.described);
     names.addAll(one.names);
@@ -4958,6 +4988,14 @@ _Result? _tellStory(_Telling telling) {
               ? listener
               : null,
       spoken: spoken,
+      // A second clause owes what the first left unwritten.
+      owed: [
+        for (final each in telling.owed)
+          if (!(beat.join == JoinSide.second &&
+              previous != null &&
+              previous.placed.any((written) => identical(written, each))))
+            each,
+      ],
     );
     var (one, opened) = _drawOne(telling, draw);
 
@@ -5081,6 +5119,7 @@ _Result? _tellStory(_Telling telling) {
       }
     }
 
+    telling.owed.removeWhere((each) => one.placed.any((written) => identical(written, each)));
     telling.spent.addAll(one.used);
     telling.described.addAll(one.described);
     telling.names.addAll(one.names);
@@ -5234,6 +5273,7 @@ _Built _joinClauses(SentenceLanguageData data, _Built first, _Built second) {
     second.field,
     first.dayAt > second.dayAt ? first.dayAt : second.dayAt,
     second.object ?? first.object,
+    placed: <_Requirement>[...first.placed, ...second.placed],
   );
 }
 

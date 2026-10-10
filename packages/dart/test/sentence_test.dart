@@ -920,6 +920,26 @@ void main() {
       }
     });
 
+    test('`include` puts every word in a result of several sentences, once it can', () {
+      // The words used to reach the first sentence alone, and a story whose first
+      // beat had no room for one dropped it: `조용히` was missing from most
+      // results.
+      for (final (language, word) in [
+        (WordLanguage.ko, '조용히'),
+        (WordLanguage.ko, '사자'),
+        (WordLanguage.en, 'quietly'),
+      ]) {
+        for (final result in randSentence(
+          language: language,
+          include: [word],
+          sentences: 3,
+          count: sample,
+        )) {
+          expect(result.toLowerCase(), contains(word), reason: '$language: $word');
+        }
+      }
+    });
+
     test('`include` puts every word it was given into every sentence', () {
       const cases = <(WordLanguage, List<String>)>[
         (WordLanguage.ko, <String>['사자']),

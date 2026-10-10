@@ -44,7 +44,6 @@ A fix to a generator added under `vNext` needs no changelog entry of its own, si
 
 ### A. No decision needed
 
-- **A38. `include` is lost in a result of several sentences.** Requirements reach only the first sentence, and a story whose first beat cannot carry the word drops it: `ko include: '조용히'` over three sentences misses 257 of 400. Carry an unplaced requirement to the first beat that can take it.
 - **A39. An invented organization stem can spell a famous brand under `startsWith`.** The syllable pools leave out `동`, `한`, `辉`, `恒`, `光` and others so two syllables cannot spell `동아` or `辉瑞`, but `inventStem` puts a caller's prefix back as the first syllable. Make the brands each data file lists into data, and redraw while a stem contains one.
 - **A40. `.azw3` has the type of `.azw`.** The type IANA registered for KF8 is `application/vnd.amazon.mobi8-ebook`, which is what the comment and the docs promise.
 - **A41. `llms-full.txt` carries 21 raw `<Lang>` tags.** `inlineLang` in `docs/.vitepress/data/markdown.ts` stops at the first `>`, which `js="() => number"` contains.

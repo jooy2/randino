@@ -1099,7 +1099,7 @@ rand_sentence(language="ko", sentences=3, min_length=40, max_length=55)
 
 :::
 
-`include` goes in the first sentence, which puts each word in the result once rather than once per sentence. `sentences` is clamped to <Lang js="RAND_SENTENCE_COUNT_MAX" dart="randSentenceCountMax" py="RAND_SENTENCE_COUNT_MAX" code />, which is ten.
+Each word of `include` goes in the first sentence that can carry it, which puts it in the result once rather than once per sentence: a story that opens on how somebody feels has no room for `quietly`, and its next sentence does. `sentences` is clamped to <Lang js="RAND_SENTENCE_COUNT_MAX" dart="randSentenceCountMax" py="RAND_SENTENCE_COUNT_MAX" code />, which is ten.
 
 ## A person's name {#a-persons-name}
 

@@ -579,8 +579,8 @@ export interface RandSentenceOptions extends RandCommonOptions {
 	 *
 	 * A sentence has room for as many of them as it has phrases, so asking for
 	 * more words than the longest shape can carry places what fits and drops the
-	 * rest. With `sentences` above 1 the words go in the first of them, which is
-	 * what puts each of them in the result once rather than once per sentence.
+	 * rest. With `sentences` above 1 each word goes in the first sentence that can
+	 * carry it, which puts it in the result once rather than once per sentence.
 	 */
 	include?: string | readonly string[];
 	/**

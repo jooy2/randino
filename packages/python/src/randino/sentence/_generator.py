@@ -736,6 +736,12 @@ class Draw:
     line drawn on its own terms is not one of these.
     """
 
+    owed: tuple["Requirement", ...] = ()
+    """The words the caller required that the result has not written yet.
+
+    All of them for its first sentence; a sentence that could not carry one hands it on.
+    """
+
 
 @dataclass(frozen=True, slots=True)
 class BeatDraw:
@@ -2207,6 +2213,12 @@ class Built:
     Or stood a pronoun for it — or left it out, which is a pronoun that writes nothing.
     """
 
+    placed: tuple[Requirement, ...] = ()
+    """The words the caller required that this sentence wrote.
+
+    The sentences after it no longer owe them.
+    """
+
 
 @dataclass(frozen=True, slots=True)
 class ObjectMention:
@@ -3042,6 +3054,8 @@ def _compose(
     # one sentence describe one noun no more than two sentences do.
     settled = set(draw.described)
     described_nouns: list[str] = []
+    # The caller's required words this sentence writes.
+    placed_words: list[Requirement] = []
     drawn: dict[SentenceSlot, Phrase] = {}
     subject: Phrase | None = None
     named = False
@@ -3209,6 +3223,12 @@ def _compose(
                 settled.add(built.noun)
                 described_nouns.append(built.noun)
 
+            if required is not None:
+                placed_words.append(required)
+
+            if owed is not None and built.modified:
+                placed_words.append(owed)
+
             # A place takes the preposition it takes — `on the balcony`, `at the market`,
             # `under the sky` — where the language says so, and the frame's own otherwise.
             # The budget was measured against the frame's, so the difference is paid here.
@@ -3229,13 +3249,18 @@ def _compose(
             if part.slot in ("place", "object", "destination"):
                 drawn[part.slot] = built
         else:
+            predicate_required = plan.phrase.get(at[index])
+
+            if predicate_required is not None:
+                placed_words.append(predicate_required)
+
             phrase, plain_form, named_day = _predicate_for(
                 part.slot,
                 lexicon,
                 data,
                 base,
                 predicates,
-                plan.phrase.get(at[index]),
+                predicate_required,
                 gender,
                 part_low,
                 part_high,
@@ -3352,6 +3377,7 @@ def _compose(
         ObjectMention(drawn["object"].noun, True)
         if "object" in drawn
         else (ObjectMention(reference.noun, False) if reference is not None else None),
+        tuple(placed_words),
     )
 
 
@@ -3880,6 +3906,12 @@ class Telling:
     spent: set[str]
     described: set[str]
     names: set[str]
+    owed: list[Requirement]
+    """The words the caller required that no sentence has written yet.
+
+    Handed on until one can carry them, and cut down in place as they are written.
+    """
+
     voice: SentenceStyle
     tense: SentenceTense
 
@@ -3966,6 +3998,7 @@ def _generate_result(language: WordLanguage, settings: Settings) -> Result:
             set(),
             set(),
             set(),
+            list(_requirements_of(settled, language)),
             voice,
             tense,
         )
@@ -4034,11 +4067,15 @@ def _generate_result(language: WordLanguage, settings: Settings) -> Result:
             and last.object.noun == item.word
             else None,
             dated=_time_spent(built, settings.sentences),
+            owed=tuple(paragraph.owed),
         )
         one, opened = _draw_one(paragraph, draw)
 
         built.append(one)
         scene = one.scene
+        paragraph.owed[:] = [
+            each for each in paragraph.owed if all(each is not p for p in one.placed)
+        ]
         spent.update(one.used)
         described.update(one.described)
         names.update(one.names)
@@ -4738,6 +4775,16 @@ def _tell_story(telling: Telling) -> Result | None:
             dated=dated,
             speech=data.speech if line else listener if asked else None,
             spoken=spoken,
+            # A second clause owes what the first left unwritten.
+            owed=tuple(
+                each
+                for each in telling.owed
+                if not (
+                    beat.join == "second"
+                    and previous is not None
+                    and any(each is placed_word for placed_word in previous.placed)
+                )
+            ),
         )
         one, opened = _draw_one(telling, draw)
 
@@ -4822,6 +4869,7 @@ def _tell_story(telling: Telling) -> Result | None:
             if met is not None:
                 roles.item = Requirement(met, ("object",), known=False, bare=True, settled=True)
 
+        telling.owed[:] = [each for each in telling.owed if all(each is not p for p in one.placed)]
         telling.spent.update(one.used)
         telling.described.update(one.described)
         telling.names.update(one.names)
@@ -4961,6 +5009,7 @@ def _join_clauses(data: SentenceLanguageData, first: Built, second: Built) -> Bu
         second.field,
         max(first.day_at, second.day_at),
         second.object if second.object is not None else first.object,
+        (*first.placed, *second.placed),
     )
 
 
@@ -5011,7 +5060,10 @@ def _generate_one(language: WordLanguage, settings: Settings, draw: Draw) -> Bui
     )
     # The words a caller required go in the first sentence — once in the result rather
     # than once in every sentence of it.
-    requirements = () if follow is not None else _requirements_of(settings, language)
+    # The words a caller required go in the first sentence that can carry them — once in
+    # the result rather than once in every sentence of it. A story that opens on a state
+    # has nowhere to put `조용히`, and its next sentence does.
+    requirements = draw.owed
     # What the result has already put on the page and this sentence keeps: its subject
     # when the topic is being named again, and every noun of its scene.
     pinned: dict[SentenceSlot, Requirement] = (

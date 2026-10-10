@@ -1072,7 +1072,7 @@ rand_sentence(language="ko", sentences=3, min_length=40, max_length=55)
 
 :::
 
-`include`에 적은 단어는 첫 문장에 들어갑니다. 문장마다 한 번씩이 아니라 결과마다 한 번씩 넣기 위해서입니다. `sentences`는 <Lang js="RAND_SENTENCE_COUNT_MAX" dart="randSentenceCountMax" py="RAND_SENTENCE_COUNT_MAX" code />인 10으로 제한됩니다.
+`include`에 적은 단어는 그 단어를 실을 수 있는 첫 문장에 들어갑니다. 문장마다 한 번씩이 아니라 결과마다 한 번씩 넣기 위해서입니다. 기분으로 시작하는 이야기의 첫 문장에는 `조용히`가 들어갈 자리가 없으므로, 그다음 문장에 들어갑니다. `sentences`는 <Lang js="RAND_SENTENCE_COUNT_MAX" dart="randSentenceCountMax" py="RAND_SENTENCE_COUNT_MAX" code />인 10으로 제한됩니다.
 
 ## 사람 이름 {#a-persons-name}
 

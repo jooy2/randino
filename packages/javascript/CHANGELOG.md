@@ -2,6 +2,7 @@
 
 ## vNext (2026--)
 
+- `randSentence` puts every word of `include` in a result of several sentences, in the first sentence that can carry it. The words reached the first sentence alone, and a story whose first sentence had no room for one dropped it: `조용히` was missing from most three-sentence Korean results.
 - A German sentence whose pronoun subject follows the verb takes a verb written in one word, where `sich` would have stood in front of the pronoun: `Am Mittag streckte sich er.` German writes the pronoun first.
 - A German line somebody says keeps its verb second. A quoted line names no time, and a shape that opened on its time part opened on the verb once the time was left out (`„Ist eine Vorstadt sonnig.“`), which is a question's order; such a line now takes a shape without a time part.
 - `randSentence` opens on a real noun for a `startsWith` wherever the language has one on the character. The subject's theme was chosen before the word, so a theme with nothing on it invented a noun even at `realism: 'real'` (`여젤은 시들합니다`), about one Korean sentence in five.

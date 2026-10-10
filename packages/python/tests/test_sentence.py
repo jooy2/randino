@@ -661,6 +661,16 @@ def test_a_required_modifier_stays_when_the_result_writes_a_name() -> None:
                 assert word in sentence.lower(), f"{language}: {word} missing from {sentence}"
 
 
+def test_include_puts_every_word_in_a_result_of_several_sentences_once_it_can() -> None:
+    # The words used to reach the first sentence alone, and a story whose first beat had
+    # no room for one dropped it: `조용히` was missing from most results.
+    cases: list[tuple[WordLanguage, str]] = [("ko", "조용히"), ("ko", "사자"), ("en", "quietly")]
+
+    for language, word in cases:
+        for result in rand_sentence(language=language, include=word, sentences=3, count=SAMPLE):
+            assert word in result.lower(), f"{language}: {word} missing from {result}"
+
+
 def test_include_puts_every_word_it_was_given_into_every_sentence() -> None:
     cases: list[tuple[WordLanguage, list[str]]] = [
         ("ko", ["사자"]),

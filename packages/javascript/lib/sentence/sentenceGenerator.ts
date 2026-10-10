@@ -478,6 +478,11 @@ type Draw = {
 	 */
 	names: ReadonlySet<string>;
 	follow: Follow | null;
+	/**
+	 * The words the caller required that the result has not written yet. All of
+	 * them for its first sentence; a sentence that could not carry one hands it on.
+	 */
+	owed: readonly Requirement[];
 	/** The tense every sentence of the result is in. */
 	tense: SentenceTense;
 	/**
@@ -1975,6 +1980,11 @@ type Built = {
 	type: SentenceType;
 	/** The field its verb came from, for a story to know what it did. */
 	field: VerbField | null;
+	/**
+	 * The words the caller required that this sentence wrote, which the sentences
+	 * after it no longer owe.
+	 */
+	placed: Requirement[];
 	/** The phase of the day it named, as an index into `times.day`, or `-1`. */
 	dayAt: number;
 	/**
@@ -2256,9 +2266,10 @@ function generateOne(language: WordLanguage, settings: Settings, draw: Draw): Bu
 	const bounds = roomFor(language, settings.includeName);
 	const allowed = framesFor(data, settings, moodFor(draw.mark), draw.beat);
 	const requested = draw.beat?.subject ?? subjectThemesFor(settings, follow);
-	// The words a caller required go in the first sentence — once in the result
-	// rather than once in every sentence of it.
-	const requirements = follow ? [] : requirementsOf(settings, language);
+	// The words a caller required go in the first sentence that can carry them —
+	// once in the result rather than once in every sentence of it. A story that
+	// opens on a state has nowhere to put `조용히`, and its next sentence does.
+	const requirements = draw.owed;
 	// What the result has already put on the page and this sentence keeps: its
 	// subject when the topic is being named again, and every noun of its scene.
 	const pinned = new Map<SentenceSlot, Requirement>(follow?.scene ?? draw.beat?.pinned ?? []);
@@ -2805,6 +2816,8 @@ function compose(
 	// phrases of one sentence describe one noun no more than two sentences do.
 	const settled = new Set(draw.described);
 	const described: string[] = [];
+	// The caller's required words this sentence writes.
+	const placed: Requirement[] = [];
 	// The noun phrases this sentence drew for the slots a later one keeps.
 	const drawn = new Map<SentenceSlot, Phrase>();
 	let subject: Phrase | undefined;
@@ -2973,6 +2986,14 @@ function compose(
 				described.push(built.noun);
 			}
 
+			if (required) {
+				placed.push(required);
+			}
+
+			if (owed && built.modified) {
+				placed.push(owed);
+			}
+
 			// A place takes the preposition it takes — `on the balcony`, `at the
 			// market`, `under the sky` — where the language says so, and the frame's
 			// own otherwise. The budget was measured against the frame's, so the
@@ -2999,13 +3020,19 @@ function compose(
 				drawn.set(part.slot, built);
 			}
 		} else {
+			const required = plan.phrase.get(at);
+
+			if (required) {
+				placed.push(required);
+			}
+
 			const drawn = predicateFor(
 				part.slot,
 				wordData,
 				data,
 				group.words,
 				predicates,
-				plan.phrase.get(at),
+				required,
 				gender,
 				low,
 				high,
@@ -3125,6 +3152,7 @@ function compose(
 		names,
 		used: spent,
 		described,
+		placed,
 		type: draw.type,
 		scene,
 		theme: named ? null : (subject?.theme ?? null),
@@ -3921,6 +3949,7 @@ function generateResult(language: WordLanguage, settings: Settings): Result {
 		spent: new Set(),
 		described: new Set(),
 		names: new Set(),
+		owed: requirementsOf(settled, language),
 		voice,
 		tense
 	});
@@ -3977,6 +4006,7 @@ function generateResult(language: WordLanguage, settings: Settings): Result {
 			described,
 			names,
 			follow,
+			owed: paragraph.owed,
 			tense,
 			beat: null,
 			link: null,
@@ -3993,6 +4023,7 @@ function generateResult(language: WordLanguage, settings: Settings): Result {
 
 		built.push(one);
 		scene = one.scene;
+		paragraph.owed = paragraph.owed.filter((requirement) => !one.placed.includes(requirement));
 
 		for (const word of one.used) {
 			spent.add(word);
@@ -4076,6 +4107,9 @@ type Telling = {
 	spent: Set<string>;
 	described: Set<string>;
 	names: Set<string>;
+	// The words the caller required that no sentence has written yet, handed on
+	// until one can carry them.
+	owed: readonly Requirement[];
 	voice: SentenceStyle;
 	tense: SentenceTense;
 };
@@ -4545,6 +4579,7 @@ function tellStory(telling: Telling): Result | null {
 				names: [],
 				used: [],
 				described: [],
+				placed: [],
 				scene: new Map(),
 				type: 'dialogue',
 				field: null,
@@ -4777,6 +4812,11 @@ function tellStory(telling: Telling): Result | null {
 			described,
 			names,
 			follow,
+			// A second clause owes what the first left unwritten.
+			owed:
+				beat.join === 'second' && previous
+					? telling.owed.filter((requirement) => !previous.placed.includes(requirement))
+					: telling.owed,
 			// A line says now what is true, and reports in the past what was just
 			// done; a remark, a question and what is noticed are about now.
 			tense: line
@@ -4895,6 +4935,8 @@ function tellStory(telling: Telling): Result | null {
 				roles.item = { word: met, slots: ['object'], known: false, bare: true, settled: true };
 			}
 		}
+
+		telling.owed = telling.owed.filter((requirement) => !one.placed.includes(requirement));
 
 		for (const word of one.used) {
 			spent.add(word);
@@ -5049,6 +5091,7 @@ function joinClauses(data: SentenceLanguageData, first: Built, second: Built): B
 		names: [...first.names, ...second.names],
 		used: [...first.used, ...second.used],
 		described: [...first.described, ...second.described],
+		placed: [...first.placed, ...second.placed],
 		scene: new Map([...first.scene, ...second.scene]),
 		object: second.object ?? first.object,
 		type: second.type,
