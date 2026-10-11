@@ -384,7 +384,7 @@ A draw picks the line first — Windows is about two desktops in three, Android 
 
 ### Devices
 
-Real phones, tablets and laptops, by the names their makers gave them, from the first iPhone to the devices released by the end of 2025. A desktop PC is left out: it is built from parts and has no model name of its own.
+Real phones, tablets and laptops, by the names their makers gave them, from the first iPhone to the devices on sale by October 2026. A desktop PC is left out: it is built from parts and has no model name of its own.
 
 ```dart
 randDevice(count: 2); // [Samsung Galaxy S24 Ultra, Apple iPad (10th generation)]
@@ -410,7 +410,7 @@ A model is written the way its maker writes it, generation and all, and one whos
 
 ### Processors
 
-Real processors, by the names their makers gave them: Intel, AMD, Apple and Qualcomm parts for desktops and laptops, and the chips of phones and tablets from Apple, Qualcomm, Samsung, MediaTek, Google and HiSilicon, from the Pentium 4 to the parts out by the end of 2025.
+Real processors, by the names their makers gave them: Intel, AMD, Apple and Qualcomm parts for desktops and laptops, and the chips of phones and tablets from Apple, Qualcomm, Samsung, MediaTek, Google and HiSilicon, from the Pentium 4 to the parts on sale by October 2026.
 
 ```dart
 randCpu(count: 2); // [Intel Core i7-13700K, Apple A17 Pro]
@@ -433,7 +433,7 @@ randCpuDetails().first; // CpuDetail(Apple M3 Pro, desktop, 2023)
 
 ### Graphics
 
-Real graphics processors, by the names their makers gave them: NVIDIA, AMD and Intel cards, laptop GPUs and integrated graphics for desktops and laptops, and the GPUs of phones and tablets from Qualcomm, Arm and Samsung, from the GeForce 8800 GTX to the parts out by the end of 2025. A Radeon from before the end of 2010 is written as ATI sold it.
+Real graphics processors, by the names their makers gave them: NVIDIA, AMD and Intel cards, laptop GPUs and integrated graphics for desktops and laptops, and the GPUs of phones and tablets from Qualcomm, Arm and Samsung, from the GeForce 8800 GTX to the parts on sale by October 2026. A Radeon from before the end of 2010 is written as ATI sold it.
 
 ```dart
 randGpu(count: 2); // [NVIDIA GeForce RTX 3060, Qualcomm Adreno 740]

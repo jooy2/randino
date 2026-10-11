@@ -93,13 +93,13 @@ rand_device(type=("phone", "tablet"), count=3)
 
 ## 뽑는 범위 {#catalog}
 
-2007년의 첫 iPhone부터 2025년 말까지 나온 기기까지 모델 459개가 들어 있습니다. `type`과 연도로 범위를 좁힌 뒤에는 남은 모델이 모두 같은 확률로 나옵니다.
+2007년의 첫 iPhone부터 2026년 10월까지 판매가 시작된 기기까지 모델 537개가 들어 있습니다. `type`과 연도로 범위를 좁힌 뒤에는 남은 모델이 모두 같은 확률로 나옵니다.
 
 | 종류 | 모델 수 | 연도 | 제조사 |
 | --- | --: | --- | --- |
-| `phone` | 260 | 2007 – 2025 | Apple, Samsung, Google, Xiaomi, OnePlus, Sony, LG, Huawei, Motorola, Nothing, Nokia, HTC, BlackBerry |
-| `tablet` | 99 | 2010 – 2025 | Apple, Samsung, Microsoft, Google, Amazon, Lenovo, Xiaomi, Huawei |
-| `laptop` | 100 | 2008 – 2025 | Apple, Microsoft, Dell, Lenovo, HP, ASUS, Samsung, Razer, Google, LG |
+| `phone` | 292 | 2007 – 2026 | Apple, Samsung, Google, Xiaomi, OnePlus, Sony, LG, Huawei, Motorola, Nothing, Nokia, HTC, BlackBerry |
+| `tablet` | 109 | 2010 – 2026 | Apple, Samsung, Microsoft, Google, Amazon, Lenovo, Xiaomi, Huawei |
+| `laptop` | 136 | 2008 – 2026 | Apple, Microsoft, Dell, Lenovo, HP, ASUS, Samsung, Razer, Google, LG |
 
 모델 이름은 제조사가 쓰는 표기를 따릅니다. 애플의 iPad와 Mac은 애플이 붙인 식별 이름을 세대까지 그대로 쓰고(`iPad (10th generation)`, `iPad Pro 13-inch (M4)`, `MacBook Air (M2, 2022)`), ThinkPad는 `Gen`을, EliteBook은 `G`를 붙입니다. 여러 해 같은 이름을 쓰는 노트북은 구분하는 연도를 붙입니다(`ROG Zephyrus G14 (2023)`, `Blade 15 (2020)`). Surface Pro 같은 분리형 2-in-1은 태블릿으로, Surface Laptop은 노트북으로 분류합니다.
 

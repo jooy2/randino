@@ -85,20 +85,20 @@ rand_cpu(include_vendor=False, count=2)  # ['Ryzen 7 7800X3D', 'Snapdragon 865']
 
 ## 뽑는 범위 {#catalog}
 
-2000년의 Pentium 4부터 2025년 말까지 나온 부품까지 프로세서 248개가 들어 있습니다. `platform`과 연도로 범위를 좁힌 뒤에는 남은 프로세서가 모두 같은 확률로 나옵니다.
+2000년의 Pentium 4부터 2026년 10월까지 판매가 시작된 부품까지 프로세서 298개가 들어 있습니다. `platform`과 연도로 범위를 좁힌 뒤에는 남은 프로세서가 모두 같은 확률로 나옵니다.
 
 | 플랫폼 | 제조사 | 개수 | 연도 | 제품군 |
 | --- | --- | --: | --- | --- |
-| `desktop` | Intel | 82 | 2000 – 2025 | Pentium, Core 2, Core i3~i9, Core Ultra, Celeron, Atom |
-| `desktop` | AMD | 53 | 2003 – 2025 | Athlon 64, Phenom II, FX, A 시리즈, Ryzen, Ryzen Threadripper, Ryzen AI |
-| `desktop` | Apple | 16 | 2020 – 2025 | M1~M5와 각각의 Pro, Max, Ultra |
-| `desktop` | Qualcomm | 4 | 2022 – 2025 | Snapdragon 8cx, Snapdragon X |
-| `mobile` | Apple | 25 | 2010 – 2025 | A4~A19 Pro, iPad용 X·Z 칩 포함 |
-| `mobile` | Qualcomm | 32 | 2013 – 2025 | Snapdragon 600~8 Elite Gen 5 |
-| `mobile` | Samsung | 12 | 2016 – 2025 | Exynos |
-| `mobile` | MediaTek | 13 | 2018 – 2025 | Helio, Dimensity |
-| `mobile` | Google | 5 | 2021 – 2025 | Tensor~Tensor G5 |
-| `mobile` | HiSilicon | 6 | 2017 – 2024 | Kirin |
+| `desktop` | Intel | 94 | 2000 – 2026 | Pentium, Core 2, Core i3~i9, Core Ultra, Core 7, Celeron, Atom |
+| `desktop` | AMD | 63 | 2003 – 2026 | Athlon 64, Phenom II, FX, A 시리즈, Ryzen, Ryzen Threadripper, Ryzen AI |
+| `desktop` | Apple | 20 | 2020 – 2026 | M1~M6와 각각의 Pro, Max, Ultra |
+| `desktop` | Qualcomm | 7 | 2022 – 2026 | Snapdragon 8cx, Snapdragon X, X2 |
+| `mobile` | Apple | 26 | 2010 – 2026 | A4~A20 Pro, iPad용 X·Z 칩 포함 |
+| `mobile` | Qualcomm | 39 | 2013 – 2026 | Snapdragon 600~8 Elite Extreme Gen 6 |
+| `mobile` | Samsung | 15 | 2016 – 2026 | Exynos |
+| `mobile` | MediaTek | 19 | 2018 – 2026 | Helio, Dimensity |
+| `mobile` | Google | 6 | 2021 – 2026 | Tensor~Tensor G6 |
+| `mobile` | HiSilicon | 9 | 2017 – 2026 | Kirin |
 
 제품군마다 판매된 변형을 모두 넣지 않고, 사양표에 가장 자주 나오는 모델을 골라 담았습니다. 데스크톱은 배수 제한이 풀린 모델, 노트북은 주력 모델, 휴대폰 칩은 플래그십과 보급형입니다. 노트북 프로세서는 노트북이 데스크톱 운영체제를 쓰는 것과 같은 이유로 `desktop`에 넣었습니다.
 

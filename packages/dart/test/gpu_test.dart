@@ -30,7 +30,7 @@ void main() {
         final key = '${entry.vendor} ${entry.model}';
 
         expect(seen.add(key), isTrue, reason: '$key is listed twice');
-        expect(entry.year, inInclusiveRange(2006, 2025), reason: key);
+        expect(entry.year, inInclusiveRange(2006, 2026), reason: key);
         expect(entry.model.startsWith(entry.vendor), isFalse, reason: key);
       }
 
@@ -111,7 +111,7 @@ void main() {
     test('unique never repeats a graphics processor, and stops when they run out', () {
       final expected = {
         for (final entry in gpus)
-          if (entry.platform == SystemPlatform.mobile && entry.year == 2025) writeGpu(entry, true),
+          if (entry.platform == SystemPlatform.mobile && entry.year >= 2025) writeGpu(entry, true),
       };
       final found = randGpu(
         platform: SystemPlatform.mobile,

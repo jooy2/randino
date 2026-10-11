@@ -46,7 +46,10 @@ class GpuEntry {
 /// because that is the name it carried. Apple's GPUs carry no name of their own
 /// — a Mac reports its chip's, which `randCpu` already writes — so they are
 /// left out. The year is the year the first cards or machines with it went on
-/// sale, and the catalog runs to the graphics processors out by the end of 2025.
+/// sale. The catalog runs to the graphics processors on sale by October 2026,
+/// and what came out in 2026, with the 2023 to 2025 parts added beside it, was
+/// checked against its maker's own announcement or product page before it went
+/// in.
 final List<GpuEntry> gpus = List<GpuEntry>.unmodifiable(
   rows(r'''
   desktop | 2006 | NVIDIA | GeForce 8800 GTX
@@ -108,6 +111,8 @@ final List<GpuEntry> gpus = List<GpuEntry>.unmodifiable(
   desktop | 2023 | NVIDIA | GeForce RTX 4050 Laptop GPU
   desktop | 2023 | NVIDIA | GeForce RTX 4060 Laptop GPU
   desktop | 2023 | NVIDIA | GeForce RTX 4070 Laptop GPU
+  desktop | 2023 | NVIDIA | GeForce RTX 4080 Laptop GPU
+  desktop | 2023 | NVIDIA | GeForce RTX 4090 Laptop GPU
   desktop | 2024 | NVIDIA | GeForce RTX 4070 SUPER
   desktop | 2024 | NVIDIA | GeForce RTX 4070 Ti SUPER
   desktop | 2024 | NVIDIA | GeForce RTX 4080 SUPER
@@ -120,6 +125,10 @@ final List<GpuEntry> gpus = List<GpuEntry>.unmodifiable(
   desktop | 2025 | NVIDIA | GeForce RTX 5050
   desktop | 2025 | NVIDIA | GeForce RTX 5060 Laptop GPU
   desktop | 2025 | NVIDIA | GeForce RTX 5070 Laptop GPU
+  desktop | 2025 | NVIDIA | GeForce RTX 5070 Ti Laptop GPU
+  desktop | 2025 | NVIDIA | GeForce RTX 5080 Laptop GPU
+  desktop | 2025 | NVIDIA | GeForce RTX 5090 Laptop GPU
+  desktop | 2025 | NVIDIA | GeForce RTX 5050 Laptop GPU
 
   desktop | 2008 | ATI | Radeon HD 4850
   desktop | 2008 | ATI | Radeon HD 4870
@@ -163,10 +172,14 @@ final List<GpuEntry> gpus = List<GpuEntry>.unmodifiable(
   desktop | 2023 | AMD | Radeon 780M
   desktop | 2024 | AMD | Radeon RX 7600 XT
   desktop | 2024 | AMD | Radeon 890M
+  desktop | 2024 | AMD | Radeon 880M
   desktop | 2025 | AMD | Radeon RX 9070 XT
   desktop | 2025 | AMD | Radeon RX 9070
   desktop | 2025 | AMD | Radeon RX 9060 XT
   desktop | 2025 | AMD | Radeon 8060S
+  desktop | 2025 | AMD | Radeon RX 9070 GRE
+  desktop | 2025 | AMD | Radeon 860M
+  desktop | 2026 | AMD | Radeon RX 9050
 
   desktop | 2011 | Intel | HD Graphics 3000
   desktop | 2012 | Intel | HD Graphics 4000
@@ -187,8 +200,15 @@ final List<GpuEntry> gpus = List<GpuEntry>.unmodifiable(
   desktop | 2023 | Intel | Arc Graphics
   desktop | 2024 | Intel | Arc 140V
   desktop | 2024 | Intel | Arc B580
+  desktop | 2024 | Intel | Arc 130V
   desktop | 2025 | Intel | Arc B570
   desktop | 2025 | Intel | Arc 140T
+  desktop | 2026 | Intel | Arc B390
+
+  desktop | 2024 | Qualcomm | Adreno X1-85
+  desktop | 2024 | Qualcomm | Adreno X1-45
+  desktop | 2026 | Qualcomm | Adreno X2-90
+  desktop | 2026 | Qualcomm | Adreno X2-45
 
   mobile | 2013 | Qualcomm | Adreno 330
   mobile | 2014 | Qualcomm | Adreno 420
@@ -229,10 +249,16 @@ final List<GpuEntry> gpus = List<GpuEntry>.unmodifiable(
   mobile | 2023 | Arm | Mali-G715
   mobile | 2023 | Arm | Immortalis-G720
   mobile | 2024 | Arm | Immortalis-G925
+  mobile | 2025 | Arm | Mali G1-Ultra
+  mobile | 2026 | Arm | Mali G2-Ultra NX
 
   mobile | 2022 | Samsung | Xclipse 920
   mobile | 2024 | Samsung | Xclipse 940
+  mobile | 2024 | Samsung | Xclipse 530
   mobile | 2025 | Samsung | Xclipse 950
+  mobile | 2025 | Samsung | Xclipse 540
+  mobile | 2026 | Samsung | Xclipse 550
+  mobile | 2026 | Samsung | Xclipse 960
 ''').map(
     (row) => GpuEntry(
       platform: SystemPlatform.values.byName(row[0]),

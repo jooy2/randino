@@ -109,6 +109,9 @@ phone | 2025 | Apple | iPhone 17
 phone | 2025 | Apple | iPhone Air
 phone | 2025 | Apple | iPhone 17 Pro
 phone | 2025 | Apple | iPhone 17 Pro Max
+phone | 2026 | Apple | iPhone 17e
+phone | 2026 | Apple | iPhone 18 Pro
+phone | 2026 | Apple | iPhone 18 Pro Max
 
 phone | 2010 | Samsung | Galaxy S
 phone | 2011 | Samsung | Galaxy S II
@@ -182,6 +185,15 @@ phone | 2025 | Samsung | Galaxy S25 Edge
 phone | 2025 | Samsung | Galaxy Z Fold7
 phone | 2025 | Samsung | Galaxy Z Flip7
 phone | 2025 | Samsung | Galaxy A56 5G
+phone | 2025 | Samsung | Galaxy S25 FE
+phone | 2026 | Samsung | Galaxy S26
+phone | 2026 | Samsung | Galaxy S26+
+phone | 2026 | Samsung | Galaxy S26 Ultra
+phone | 2026 | Samsung | Galaxy S26 FE
+phone | 2026 | Samsung | Galaxy Z Fold8
+phone | 2026 | Samsung | Galaxy Z Fold8 Ultra
+phone | 2026 | Samsung | Galaxy Z Flip8
+phone | 2026 | Samsung | Galaxy A57 5G
 
 phone | 2016 | Google | Pixel
 phone | 2016 | Google | Pixel XL
@@ -216,6 +228,11 @@ phone | 2025 | Google | Pixel 10
 phone | 2025 | Google | Pixel 10 Pro
 phone | 2025 | Google | Pixel 10 Pro XL
 phone | 2025 | Google | Pixel 10 Pro Fold
+phone | 2026 | Google | Pixel 10a
+phone | 2026 | Google | Pixel 11
+phone | 2026 | Google | Pixel 11 Pro
+phone | 2026 | Google | Pixel 11 Pro XL
+phone | 2026 | Google | Pixel 11 Pro Fold
 
 phone | 2019 | Xiaomi | Mi 9
 phone | 2019 | Xiaomi | Redmi Note 8
@@ -236,6 +253,12 @@ phone | 2024 | Xiaomi | Xiaomi 14 Ultra
 phone | 2024 | Xiaomi | Xiaomi 14T Pro
 phone | 2024 | Xiaomi | Xiaomi 15
 phone | 2025 | Xiaomi | Xiaomi 15 Ultra
+phone | 2025 | Xiaomi | Xiaomi 15T Pro
+phone | 2025 | Xiaomi | Xiaomi 17
+phone | 2025 | Xiaomi | Xiaomi 17 Pro
+phone | 2025 | Xiaomi | Xiaomi 17 Ultra
+phone | 2026 | Xiaomi | Xiaomi 17T Pro
+phone | 2026 | Xiaomi | Xiaomi 18 Pro
 
 phone | 2014 | OnePlus | OnePlus One
 phone | 2015 | OnePlus | OnePlus 2
@@ -259,6 +282,7 @@ phone | 2022 | OnePlus | OnePlus 10T
 phone | 2023 | OnePlus | OnePlus 11
 phone | 2023 | OnePlus | OnePlus 12
 phone | 2024 | OnePlus | OnePlus 13
+phone | 2025 | OnePlus | OnePlus 15
 
 phone | 2013 | Sony | Xperia Z
 phone | 2013 | Sony | Xperia Z1
@@ -281,6 +305,7 @@ phone | 2023 | Sony | Xperia 1 V
 phone | 2023 | Sony | Xperia 5 V
 phone | 2024 | Sony | Xperia 1 VI
 phone | 2025 | Sony | Xperia 1 VII
+phone | 2026 | Sony | Xperia 1 VIII
 
 phone | 2015 | LG | G4
 phone | 2016 | LG | G5
@@ -309,6 +334,11 @@ phone | 2022 | Huawei | Mate 50 Pro
 phone | 2023 | Huawei | P60 Pro
 phone | 2023 | Huawei | Mate 60 Pro
 phone | 2024 | Huawei | Pura 70 Pro
+phone | 2024 | Huawei | Mate 70 Pro
+phone | 2025 | Huawei | Pura 80 Pro
+phone | 2025 | Huawei | Mate 80 Pro
+phone | 2026 | Huawei | Pura 90 Pro
+phone | 2026 | Huawei | Mate 90 Pro
 
 phone | 2009 | Motorola | Droid
 phone | 2013 | Motorola | Moto X
@@ -316,6 +346,8 @@ phone | 2013 | Motorola | Moto G
 phone | 2019 | Motorola | Moto G7
 phone | 2023 | Motorola | Razr 40 Ultra
 phone | 2024 | Motorola | Razr 50 Ultra
+phone | 2025 | Motorola | Razr 60 Ultra
+phone | 2026 | Motorola | Razr 70 Ultra
 
 phone | 2022 | Nothing | Nothing Phone (1)
 phone | 2023 | Nothing | Nothing Phone (2)
@@ -372,6 +404,8 @@ tablet | 2025 | Apple | iPad Air 11-inch (M3)
 tablet | 2025 | Apple | iPad Air 13-inch (M3)
 tablet | 2025 | Apple | iPad Pro 11-inch (M5)
 tablet | 2025 | Apple | iPad Pro 13-inch (M5)
+tablet | 2026 | Apple | iPad Air 11-inch (M4)
+tablet | 2026 | Apple | iPad Air 13-inch (M4)
 
 tablet | 2011 | Samsung | Galaxy Tab 10.1
 tablet | 2014 | Samsung | Galaxy Tab S
@@ -396,6 +430,8 @@ tablet | 2024 | Samsung | Galaxy Tab S10 Ultra
 tablet | 2025 | Samsung | Galaxy Tab S10 FE
 tablet | 2025 | Samsung | Galaxy Tab S11
 tablet | 2025 | Samsung | Galaxy Tab S11 Ultra
+tablet | 2026 | Samsung | Galaxy Tab S12+
+tablet | 2026 | Samsung | Galaxy Tab S12 Ultra
 
 tablet | 2012 | Microsoft | Surface RT
 tablet | 2013 | Microsoft | Surface Pro
@@ -417,6 +453,7 @@ tablet | 2023 | Microsoft | Surface Go 4
 tablet | 2024 | Microsoft | Surface Pro 10
 tablet | 2024 | Microsoft | Surface Pro (11th Edition)
 tablet | 2025 | Microsoft | Surface Pro 12-inch
+tablet | 2026 | Microsoft | Surface Pro (12th Edition)
 
 tablet | 2012 | Google | Nexus 7 (2012)
 tablet | 2013 | Google | Nexus 7 (2013)
@@ -430,6 +467,11 @@ tablet | 2021 | Lenovo | Tab P11
 tablet | 2021 | Lenovo | Tab P12 Pro
 tablet | 2021 | Xiaomi | Xiaomi Pad 5
 tablet | 2023 | Xiaomi | Xiaomi Pad 6
+tablet | 2024 | Xiaomi | Xiaomi Pad 7
+tablet | 2024 | Xiaomi | Xiaomi Pad 7 Pro
+tablet | 2025 | Xiaomi | Xiaomi Pad 8
+tablet | 2025 | Xiaomi | Xiaomi Pad 8 Pro
+tablet | 2026 | Xiaomi | Xiaomi Pad 9 Pro
 tablet | 2019 | Huawei | MatePad Pro
 
 laptop | 2008 | Apple | MacBook Air (Original)
@@ -462,6 +504,11 @@ laptop | 2024 | Apple | MacBook Pro (16-inch, 2024)
 laptop | 2025 | Apple | MacBook Air (13-inch, M4, 2025)
 laptop | 2025 | Apple | MacBook Air (15-inch, M4, 2025)
 laptop | 2025 | Apple | MacBook Pro (14-inch, M5)
+laptop | 2026 | Apple | MacBook Air (13-inch, M5)
+laptop | 2026 | Apple | MacBook Air (15-inch, M5)
+laptop | 2026 | Apple | MacBook Pro (14-inch, M5 Pro or M5 Max)
+laptop | 2026 | Apple | MacBook Pro (16-inch, M5 Pro or M5 Max)
+laptop | 2026 | Apple | MacBook Neo
 
 laptop | 2018 | Dell | XPS 13 9370
 laptop | 2018 | Dell | XPS 15 9570
@@ -477,6 +524,14 @@ laptop | 2022 | Dell | XPS 15 9520
 laptop | 2023 | Dell | XPS 15 9530
 laptop | 2024 | Dell | XPS 13 9340
 laptop | 2024 | Dell | XPS 13 9350
+laptop | 2024 | Dell | XPS 14 9440
+laptop | 2024 | Dell | XPS 16 9640
+laptop | 2024 | Dell | XPS 13 9345
+laptop | 2025 | Dell | Dell 14 Premium DA14250
+laptop | 2025 | Dell | Dell 16 Premium DA16250
+laptop | 2026 | Dell | XPS 14 DA14260
+laptop | 2026 | Dell | XPS 16 DA16260
+laptop | 2026 | Dell | XPS 13 DX13260
 
 laptop | 2018 | Lenovo | ThinkPad T480
 laptop | 2018 | Lenovo | ThinkPad X1 Carbon Gen 6
@@ -492,6 +547,10 @@ laptop | 2023 | Lenovo | ThinkPad T14 Gen 4
 laptop | 2023 | Lenovo | ThinkPad X1 Carbon Gen 11
 laptop | 2024 | Lenovo | ThinkPad T14 Gen 5
 laptop | 2024 | Lenovo | ThinkPad X1 Carbon Gen 12
+laptop | 2024 | Lenovo | ThinkPad X1 Carbon Gen 13 Aura Edition
+laptop | 2025 | Lenovo | ThinkPad T14 Gen 6
+laptop | 2026 | Lenovo | ThinkPad X1 Carbon Gen 14 Aura Edition
+laptop | 2026 | Lenovo | ThinkPad T14 Gen 7
 
 laptop | 2018 | HP | EliteBook 840 G5
 laptop | 2019 | HP | EliteBook 840 G6
@@ -501,6 +560,8 @@ laptop | 2021 | HP | Spectre x360 14
 laptop | 2022 | HP | EliteBook 840 G9
 laptop | 2023 | HP | EliteBook 840 G10
 laptop | 2024 | HP | EliteBook 840 G11
+laptop | 2025 | HP | EliteBook 8 G1i 14
+laptop | 2026 | HP | EliteBook 8 G2i 14
 
 laptop | 2015 | Microsoft | Surface Book
 laptop | 2017 | Microsoft | Surface Laptop
@@ -518,37 +579,55 @@ laptop | 2023 | Microsoft | Surface Laptop Studio 2
 laptop | 2024 | Microsoft | Surface Laptop 6
 laptop | 2024 | Microsoft | Surface Laptop (7th Edition)
 laptop | 2025 | Microsoft | Surface Laptop 13-inch
+laptop | 2026 | Microsoft | Surface Laptop (8th Edition)
 
 laptop | 2020 | ASUS | ROG Zephyrus G14 (2020)
 laptop | 2021 | ASUS | ROG Zephyrus G14 (2021)
 laptop | 2022 | ASUS | ROG Zephyrus G14 (2022)
 laptop | 2023 | ASUS | ROG Zephyrus G14 (2023)
 laptop | 2024 | ASUS | ROG Zephyrus G14 (2024)
+laptop | 2024 | ASUS | ROG Zephyrus G16 (2024)
+laptop | 2025 | ASUS | ROG Zephyrus G14 (2025)
+laptop | 2025 | ASUS | ROG Zephyrus G16 (2025)
+laptop | 2026 | ASUS | ROG Zephyrus G14 (2026)
+laptop | 2026 | ASUS | ROG Zephyrus G16 (2026)
 
 laptop | 2021 | Samsung | Galaxy Book Pro
 laptop | 2022 | Samsung | Galaxy Book2 Pro
 laptop | 2023 | Samsung | Galaxy Book3 Pro
-laptop | 2023 | Samsung | Galaxy Book4 Pro
+laptop | 2024 | Samsung | Galaxy Book4 Pro
 laptop | 2025 | Samsung | Galaxy Book5 Pro
+laptop | 2026 | Samsung | Galaxy Book6 Pro
 
 laptop | 2018 | Razer | Blade 15 (2018)
 laptop | 2020 | Razer | Blade 15 (2020)
 laptop | 2021 | Razer | Blade 14 (2021)
 laptop | 2023 | Razer | Blade 16 (2023)
 laptop | 2023 | Razer | Blade 18 (2023)
+laptop | 2024 | Razer | Blade 14 (2024)
+laptop | 2024 | Razer | Blade 16 (2024)
+laptop | 2024 | Razer | Blade 18 (2024)
+laptop | 2025 | Razer | Blade 14 (2025)
+laptop | 2025 | Razer | Blade 16 (2025)
+laptop | 2025 | Razer | Blade 18 (2025)
+laptop | 2026 | Razer | Blade 16 (2026)
+laptop | 2026 | Razer | Blade 18 (2026)
 
 laptop | 2017 | Google | Pixelbook
 laptop | 2019 | Google | Pixelbook Go
-laptop | 2024 | LG | gram Pro 16
+laptop | 2024 | LG | gram Pro 16 (2024)
+laptop | 2025 | LG | gram Pro 16 (2025)
+laptop | 2026 | LG | gram Pro 16 (2026)
 """)
 )
 """Every device the catalog holds, one per row: `type | year | vendor | model`.
 
 Phones, tablets and laptops — the devices that carry a model name of their own, which a
 desktop PC built from parts does not. A model is written the way its maker writes it,
-generation and all: Apple's own identifiers for its iPads and Macs, the `Gen` of a
-ThinkPad and the `G` of an EliteBook, and the year a laptop line is told apart by. The
-year is the year the device was first released, which for a phone launched in one market a
-few weeks before the rest is that first market's. The catalog runs to the devices released
-by the end of 2025.
+generation and all: Apple's own identifiers for its iPads and Macs, the `Gen` of a ThinkPad
+and the `G` of an EliteBook, and the year a laptop line is told apart by. The year is the
+year the device was first released, which for a phone launched in one market a few weeks
+before the rest is that first market's. The catalog runs to the devices on sale by October
+2026, and what came out in 2026, with the 2024 and 2025 devices added beside it, was checked
+against its maker's own announcement or product page before it went in.
 """

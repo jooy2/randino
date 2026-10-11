@@ -33,7 +33,7 @@ describe('Gpu', () => {
 			assert.ok(!seen.has(key), `${key} is listed twice`);
 			seen.add(key);
 			assert.ok(SYSTEM_PLATFORMS.includes(entry.platform), key);
-			assert.ok(entry.year >= 2006 && entry.year <= 2025, key);
+			assert.ok(entry.year >= 2006 && entry.year <= 2026, key);
 			assert.ok(entry.vendor.length > 0 && entry.model.length > 0, key);
 			// The maker is written in front of the model, never inside it.
 			assert.ok(!entry.model.startsWith(entry.vendor), key);
@@ -128,7 +128,7 @@ describe('Gpu', () => {
 	});
 
 	it('unique never repeats a graphics processor, and stops when they run out', () => {
-		const expected = GPUS.filter((entry) => entry.platform === 'mobile' && entry.year === 2025);
+		const expected = GPUS.filter((entry) => entry.platform === 'mobile' && entry.year >= 2025);
 		const gpus = randGpu({ platform: 'mobile', minYear: 2025, unique: true, count: 100 });
 
 		assert.strictEqual(new Set(gpus).size, gpus.length);

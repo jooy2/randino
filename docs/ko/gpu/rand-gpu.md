@@ -85,17 +85,18 @@ rand_gpu(include_vendor=False, count=2)  # ['Radeon RX 7900 XTX', 'GeForce RTX 4
 
 ## 뽑는 범위 {#catalog}
 
-2006년의 GeForce 8800 GTX부터 2025년 말까지 나온 부품까지 그래픽 프로세서 179개가 들어 있습니다. `platform`과 연도로 범위를 좁힌 뒤에는 남은 부품이 모두 같은 확률로 나옵니다.
+2006년의 GeForce 8800 GTX부터 2026년 10월까지 판매가 시작된 부품까지 그래픽 프로세서 201개가 들어 있습니다. `platform`과 연도로 범위를 좁힌 뒤에는 남은 부품이 모두 같은 확률로 나옵니다.
 
 | 플랫폼 | 제조사 | 개수 | 연도 | 제품군 |
 | --- | --- | --: | --- | --- |
-| `desktop` | NVIDIA | 71 | 2006 – 2025 | GeForce 8·9, GeForce GTX, GeForce RTX, GeForce MX, 노트북용 Laptop GPU |
+| `desktop` | NVIDIA | 77 | 2006 – 2025 | GeForce 8·9, GeForce GTX, GeForce RTX, GeForce MX, 노트북용 Laptop GPU |
 | `desktop` | ATI | 4 | 2008 – 2009 | Radeon HD 4000·5000 |
-| `desktop` | AMD | 42 | 2010 – 2025 | Radeon HD, R9, RX, RX Vega, Ryzen 내장 Radeon 그래픽 |
-| `desktop` | Intel | 21 | 2011 – 2025 | HD, UHD, Iris, Arc |
+| `desktop` | AMD | 46 | 2010 – 2026 | Radeon HD, R9, RX, RX Vega, Ryzen 내장 Radeon 그래픽 |
+| `desktop` | Intel | 23 | 2011 – 2026 | HD, UHD, Iris, Arc |
+| `desktop` | Qualcomm | 4 | 2024 – 2026 | Snapdragon X·X2 내장 Adreno X1·X2 |
 | `mobile` | Qualcomm | 25 | 2013 – 2025 | Adreno |
-| `mobile` | Arm | 13 | 2016 – 2024 | Mali, Immortalis |
-| `mobile` | Samsung | 3 | 2022 – 2025 | Xclipse |
+| `mobile` | Arm | 15 | 2016 – 2026 | Mali, Immortalis |
+| `mobile` | Samsung | 7 | 2022 – 2026 | Xclipse |
 
 2010년 말 이전의 Radeon은 당시 팔리던 이름대로 ATI로 씁니다. AMD는 HD 6000 시리즈부터 ATI라는 이름을 쓰지 않았습니다. 노트북 GPU는 NVIDIA가 쓰는 대로 `Laptop GPU`까지 붙여서, 번호가 같은 데스크톱 카드와 헷갈리지 않게 합니다. 애플 GPU는 뺐습니다. 따로 붙은 이름이 없고, Mac은 칩 이름을 보여 주는데 그 이름은 [`randCpu`](../cpu/rand-cpu)가 이미 씁니다.
 

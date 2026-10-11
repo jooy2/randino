@@ -36,7 +36,7 @@ def test_every_device_in_the_catalog_is_well_formed() -> None:
         assert key not in seen, f"{key} is listed twice"
         seen.add(key)
         assert entry.type in DEVICE_TYPES, key
-        assert 2007 <= entry.year <= 2025, key
+        assert 2007 <= entry.year <= 2026, key
         assert entry.vendor and entry.model, key
         assert entry.model == entry.model.strip(), key
 
@@ -121,7 +121,7 @@ def test_unique_never_repeats_a_device_and_stops_when_the_devices_run_out() -> N
     expected = {
         write_device(entry, True)
         for entry in DEVICES
-        if entry.type == "laptop" and entry.year == 2025
+        if entry.type == "laptop" and entry.year >= 2025
     }
     found = rand_device(type="laptop", min_year=2025, unique=True, count=100)
 

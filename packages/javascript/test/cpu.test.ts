@@ -33,7 +33,7 @@ describe('Cpu', () => {
 			assert.ok(!seen.has(key), `${key} is listed twice`);
 			seen.add(key);
 			assert.ok(SYSTEM_PLATFORMS.includes(entry.platform), key);
-			assert.ok(entry.year >= 2000 && entry.year <= 2025, key);
+			assert.ok(entry.year >= 2000 && entry.year <= 2026, key);
 			assert.ok(entry.vendor.length > 0 && entry.model.length > 0, key);
 			// The maker is written in front of the model, never inside it.
 			assert.ok(!entry.model.startsWith(entry.vendor), key);
@@ -128,7 +128,7 @@ describe('Cpu', () => {
 	});
 
 	it('unique never repeats a processor, and stops when the processors run out', () => {
-		const expected = CPUS.filter((entry) => entry.platform === 'mobile' && entry.year === 2025);
+		const expected = CPUS.filter((entry) => entry.platform === 'mobile' && entry.year >= 2025);
 		const cpus = randCpu({ platform: 'mobile', minYear: 2025, unique: true, count: 100 });
 
 		assert.strictEqual(new Set(cpus).size, cpus.length);

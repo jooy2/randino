@@ -33,7 +33,7 @@ describe('Device', () => {
 			assert.ok(!seen.has(key), `${key} is listed twice`);
 			seen.add(key);
 			assert.ok(DEVICE_TYPES.includes(entry.type), key);
-			assert.ok(entry.year >= 2007 && entry.year <= 2025, key);
+			assert.ok(entry.year >= 2007 && entry.year <= 2026, key);
 			assert.ok(entry.vendor.length > 0 && entry.model.length > 0, key);
 			// A cell is trimmed, so a name never carries a stray space at either end.
 			assert.strictEqual(entry.model, entry.model.trim(), key);
@@ -161,7 +161,7 @@ describe('Device', () => {
 	});
 
 	it('unique never repeats a device, and stops when the devices run out', () => {
-		const expected = DEVICES.filter((entry) => entry.type === 'laptop' && entry.year === 2025);
+		const expected = DEVICES.filter((entry) => entry.type === 'laptop' && entry.year >= 2025);
 		const devices = randDevice({ type: 'laptop', minYear: 2025, unique: true, count: 100 });
 
 		assert.strictEqual(new Set(devices).size, devices.length);

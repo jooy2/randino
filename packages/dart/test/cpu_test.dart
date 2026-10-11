@@ -30,7 +30,7 @@ void main() {
         final key = '${entry.vendor} ${entry.model}';
 
         expect(seen.add(key), isTrue, reason: '$key is listed twice');
-        expect(entry.year, inInclusiveRange(2000, 2025), reason: key);
+        expect(entry.year, inInclusiveRange(2000, 2026), reason: key);
         expect(entry.model.startsWith(entry.vendor), isFalse, reason: key);
       }
 
@@ -111,7 +111,7 @@ void main() {
     test('unique never repeats a processor, and stops when the processors run out', () {
       final expected = {
         for (final entry in cpus)
-          if (entry.platform == SystemPlatform.mobile && entry.year == 2025) writeCpu(entry, true),
+          if (entry.platform == SystemPlatform.mobile && entry.year >= 2025) writeCpu(entry, true),
       };
       final found = randCpu(
         platform: SystemPlatform.mobile,

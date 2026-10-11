@@ -93,13 +93,13 @@ rand_device(type=("phone", "tablet"), count=3)
 
 ## What it draws from {#catalog}
 
-459 models from the first iPhone in 2007 to the devices released by the end of 2025, every one of them as likely as the next once `type` and the years have narrowed them:
+537 models from the first iPhone in 2007 to the devices on sale by October 2026, every one of them as likely as the next once `type` and the years have narrowed them:
 
 | Type | Models | Years | Makers |
 | --- | --: | --- | --- |
-| `phone` | 260 | 2007 – 2025 | Apple, Samsung, Google, Xiaomi, OnePlus, Sony, LG, Huawei, Motorola, Nothing, Nokia, HTC, BlackBerry |
-| `tablet` | 99 | 2010 – 2025 | Apple, Samsung, Microsoft, Google, Amazon, Lenovo, Xiaomi, Huawei |
-| `laptop` | 100 | 2008 – 2025 | Apple, Microsoft, Dell, Lenovo, HP, ASUS, Samsung, Razer, Google, LG |
+| `phone` | 292 | 2007 – 2026 | Apple, Samsung, Google, Xiaomi, OnePlus, Sony, LG, Huawei, Motorola, Nothing, Nokia, HTC, BlackBerry |
+| `tablet` | 109 | 2010 – 2026 | Apple, Samsung, Microsoft, Google, Amazon, Lenovo, Xiaomi, Huawei |
+| `laptop` | 136 | 2008 – 2026 | Apple, Microsoft, Dell, Lenovo, HP, ASUS, Samsung, Razer, Google, LG |
 
 A model is written the way its maker writes it. Apple's iPads and Macs carry the identifier Apple gives them, generation and all — `iPad (10th generation)`, `iPad Pro 13-inch (M4)`, `MacBook Air (M2, 2022)` — a ThinkPad its `Gen`, an EliteBook its `G`, and a laptop line that keeps one name across years the year it is told apart by: `ROG Zephyrus G14 (2023)`, `Blade 15 (2020)`. A detachable two-in-one such as the Surface Pro is a tablet, and the Surface Laptop a laptop.
 

@@ -138,7 +138,7 @@ windows | 2009 | 7 | Windows {v}{e}{b} | Windows | Starter, Home Basic, Home Pre
 windows | 2012 | 8 | Windows {v}{e}{b} | Windows | Pro, Enterprise | 2012: (Build 9200)
 windows | 2013 | 8.1 | Windows {v}{e}{b} | Windows | Pro, Enterprise | 2013: (Build 9600)
 windows | 2015 | 10 | Windows {v}{e}{b} | Windows | Home, Pro, Education, Enterprise | 2015: 1507 (Build 10240), 1511 (Build 10586); 2016: 1607 (Build 14393); 2017: 1703 (Build 15063), 1709 (Build 16299); 2018: 1803 (Build 17134), 1809 (Build 17763); 2019: 1903 (Build 18362), 1909 (Build 18363); 2020: 2004 (Build 19041), 20H2 (Build 19042); 2021: 21H1 (Build 19043), 21H2 (Build 19044); 2022: 22H2 (Build 19045)
-windows | 2021 | 11 | Windows {v}{e}{b} | Windows | Home, Pro, Education, Enterprise | 2021: 21H2 (Build 22000); 2022: 22H2 (Build 22621); 2023: 23H2 (Build 22631); 2024: 24H2 (Build 26100); 2025: 25H2 (Build 26200); 2026: 26H2 (Build 26300)
+windows | 2021 | 11 | Windows {v}{e}{b} | Windows | Home, Pro, Education, Enterprise | 2021: 21H2 (Build 22000); 2022: 22H2 (Build 22621); 2023: 23H2 (Build 22631); 2024: 24H2 (Build 26100); 2025: 25H2 (Build 26200); 2026: 26H1 (Build 28000), 26H2 (Build 26300)
 
 macos | 2001 | 10.0 | Mac OS X {v} | Mac OS X | | 2001: 10.0, 10.0.1, 10.0.2, 10.0.3, 10.0.4
 macos | 2001 | 10.1 | Mac OS X {v} | Mac OS X | | 2001: 10.1, 10.1.1, 10.1.2; 2002: 10.1.3, 10.1.4, 10.1.5
@@ -159,8 +159,8 @@ macos | 2019 | 10.15 | macOS Catalina {v} | macOS | | 2019: 10.15, 10.15.1, 10.1
 macos | 2020 | 11 | macOS Big Sur {v} | macOS | | 2020: 11.0.1, 11.1; 2021: 11.2, 11.3, 11.4, 11.5, 11.6; 2022: 11.7
 macos | 2021 | 12 | macOS Monterey {v} | macOS | | 2021: 12.0.1, 12.1; 2022: 12.2, 12.3, 12.4, 12.5, 12.6; 2023: 12.7
 macos | 2022 | 13 | macOS Ventura {v} | macOS | | 2022: 13.0, 13.1; 2023: 13.2, 13.3, 13.4, 13.5, 13.6; 2024: 13.7
-macos | 2023 | 14 | macOS Sonoma {v} | macOS | | 2023: 14.0, 14.1, 14.2; 2024: 14.3, 14.4, 14.5, 14.6, 14.7
-macos | 2024 | 15 | macOS Sequoia {v} | macOS | | 2024: 15.0, 15.1, 15.2; 2025: 15.3, 15.4, 15.5, 15.6, 15.7
+macos | 2023 | 14 | macOS Sonoma {v} | macOS | | 2023: 14.0, 14.1, 14.2; 2024: 14.3, 14.4, 14.5, 14.6, 14.7; 2025: 14.8
+macos | 2024 | 15 | macOS Sequoia {v} | macOS | | 2024: 15.0, 15.1, 15.2; 2025: 15.3, 15.4, 15.5, 15.6, 15.7; 2026: 15.8
 macos | 2025 | 26 | macOS Tahoe {v} | macOS | | 2025: 26.0, 26.1, 26.2; 2026: 26.3, 26.4, 26.5, 26.6, 26.7
 macos | 2026 | 27 | macOS Golden Gate {v} | macOS | | 2026: 27.0
 
@@ -203,11 +203,11 @@ ubuntu | 2022 | 22.04 | Ubuntu{e} {v} LTS | Ubuntu | Desktop, Server | 2022: 22.
 ubuntu | 2022 | 22.10 | Ubuntu{e} {v} | Ubuntu | Desktop, Server |
 ubuntu | 2023 | 23.04 | Ubuntu{e} {v} | Ubuntu | Desktop, Server |
 ubuntu | 2023 | 23.10 | Ubuntu{e} {v} | Ubuntu | Desktop, Server |
-ubuntu | 2024 | 24.04 | Ubuntu{e} {v} LTS | Ubuntu | Desktop, Server | 2024: 24.04, 24.04.1; 2025: 24.04.2, 24.04.3; 2026: 24.04.4
+ubuntu | 2024 | 24.04 | Ubuntu{e} {v} LTS | Ubuntu | Desktop, Server | 2024: 24.04, 24.04.1; 2025: 24.04.2, 24.04.3; 2026: 24.04.4, 24.04.5
 ubuntu | 2024 | 24.10 | Ubuntu{e} {v} | Ubuntu | Desktop, Server |
 ubuntu | 2025 | 25.04 | Ubuntu{e} {v} | Ubuntu | Desktop, Server |
 ubuntu | 2025 | 25.10 | Ubuntu{e} {v} | Ubuntu | Desktop, Server |
-ubuntu | 2026 | 26.04 | Ubuntu{e} {v} LTS | Ubuntu | Desktop, Server | 2026: 26.04
+ubuntu | 2026 | 26.04 | Ubuntu{e} {v} LTS | Ubuntu | Desktop, Server | 2026: 26.04, 26.04.1
 
 debian | 1996 | 1.1 | Debian {v} | Debian | |
 debian | 1996 | 1.2 | Debian {v} | Debian | |
@@ -328,7 +328,7 @@ ios | 2021 | 15 | iOS {v} | iOS | | 2021: 15.0, 15.1, 15.2; 2022: 15.3, 15.4, 15
 ios | 2022 | 16 | iOS {v} | iOS | | 2022: 16.0, 16.1, 16.2; 2023: 16.3, 16.4, 16.5, 16.6, 16.7
 ios | 2023 | 17 | iOS {v} | iOS | | 2023: 17.0, 17.1, 17.2; 2024: 17.3, 17.4, 17.5, 17.6, 17.7
 ios | 2024 | 18 | iOS {v} | iOS | | 2024: 18.0, 18.1, 18.2; 2025: 18.3, 18.4, 18.5, 18.6, 18.7
-ios | 2025 | 26 | iOS {v} | iOS | | 2025: 26.0, 26.1, 26.2; 2026: 26.3, 26.4, 26.5, 26.6
+ios | 2025 | 26 | iOS {v} | iOS | | 2025: 26.0, 26.1, 26.2; 2026: 26.3, 26.4, 26.5, 26.6, 26.7
 ios | 2026 | 27 | iOS {v} | iOS | | 2026: 27.0
 
 ipados | 2019 | 13 | iPadOS {v} | iPadOS | | 2019: 13.1, 13.2, 13.3; 2020: 13.4, 13.5, 13.6, 13.7
@@ -337,7 +337,7 @@ ipados | 2021 | 15 | iPadOS {v} | iPadOS | | 2021: 15.0, 15.1, 15.2; 2022: 15.3,
 ipados | 2022 | 16 | iPadOS {v} | iPadOS | | 2022: 16.1, 16.2; 2023: 16.3, 16.4, 16.5, 16.6, 16.7
 ipados | 2023 | 17 | iPadOS {v} | iPadOS | | 2023: 17.0, 17.1, 17.2; 2024: 17.3, 17.4, 17.5, 17.6, 17.7
 ipados | 2024 | 18 | iPadOS {v} | iPadOS | | 2024: 18.0, 18.1, 18.2; 2025: 18.3, 18.4, 18.5, 18.6, 18.7
-ipados | 2025 | 26 | iPadOS {v} | iPadOS | | 2025: 26.0, 26.1, 26.2; 2026: 26.3, 26.4, 26.5, 26.6
+ipados | 2025 | 26 | iPadOS {v} | iPadOS | | 2025: 26.0, 26.1, 26.2; 2026: 26.3, 26.4, 26.5, 26.6, 26.7
 ipados | 2026 | 27 | iPadOS {v} | iPadOS | | 2026: 27.0
 """)
 )

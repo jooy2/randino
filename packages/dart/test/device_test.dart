@@ -30,7 +30,7 @@ void main() {
         final key = '${entry.vendor} ${entry.model}';
 
         expect(seen.add(key), isTrue, reason: '$key is listed twice');
-        expect(entry.year, inInclusiveRange(2007, 2025), reason: key);
+        expect(entry.year, inInclusiveRange(2007, 2026), reason: key);
         expect(entry.vendor, isNotEmpty, reason: key);
         expect(entry.model, entry.model.trim(), reason: key);
       }
@@ -136,7 +136,7 @@ void main() {
     test('unique never repeats a device, and stops when the devices run out', () {
       final expected = {
         for (final entry in devices)
-          if (entry.type == DeviceType.laptop && entry.year == 2025) writeDevice(entry, true),
+          if (entry.type == DeviceType.laptop && entry.year >= 2025) writeDevice(entry, true),
       };
       final found = randDevice(type: {DeviceType.laptop}, minYear: 2025, unique: true, count: 100);
 

@@ -35,7 +35,7 @@ def test_every_graphics_processor_in_the_catalog_is_well_formed() -> None:
         assert key not in seen, f"{key} is listed twice"
         seen.add(key)
         assert entry.platform in SYSTEM_PLATFORMS, key
-        assert 2006 <= entry.year <= 2025, key
+        assert 2006 <= entry.year <= 2026, key
         assert not entry.model.startswith(entry.vendor), key
 
     for platform in SYSTEM_PLATFORMS:
@@ -99,7 +99,7 @@ def test_unique_never_repeats_a_graphics_processor_and_stops_when_they_run_out()
     expected = {
         write_gpu(entry, True)
         for entry in GPUS
-        if entry.platform == "mobile" and entry.year == 2025
+        if entry.platform == "mobile" and entry.year >= 2025
     }
     found = rand_gpu(platform="mobile", min_year=2025, unique=True, count=100)
 

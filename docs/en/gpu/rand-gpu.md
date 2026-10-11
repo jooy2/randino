@@ -85,17 +85,18 @@ rand_gpu(include_vendor=False, count=2)  # ['Radeon RX 7900 XTX', 'GeForce RTX 4
 
 ## What it draws from {#catalog}
 
-179 graphics processors from the GeForce 8800 GTX in 2006 to the parts out by the end of 2025, every one of them as likely as the next once `platform` and the years have narrowed them:
+201 graphics processors from the GeForce 8800 GTX in 2006 to the parts on sale by October 2026, every one of them as likely as the next once `platform` and the years have narrowed them:
 
 | Platform | Maker | Parts | Years | Lines |
 | --- | --- | --: | --- | --- |
-| `desktop` | NVIDIA | 71 | 2006 – 2025 | GeForce 8 and 9, GeForce GTX, GeForce RTX, GeForce MX, the Laptop GPUs |
+| `desktop` | NVIDIA | 77 | 2006 – 2025 | GeForce 8 and 9, GeForce GTX, GeForce RTX, GeForce MX, the Laptop GPUs |
 | `desktop` | ATI | 4 | 2008 – 2009 | Radeon HD 4000 and 5000 |
-| `desktop` | AMD | 42 | 2010 – 2025 | Radeon HD, R9, RX, RX Vega, and the Radeon graphics built into Ryzen |
-| `desktop` | Intel | 21 | 2011 – 2025 | HD, UHD, Iris and Arc |
+| `desktop` | AMD | 46 | 2010 – 2026 | Radeon HD, R9, RX, RX Vega, and the Radeon graphics built into Ryzen |
+| `desktop` | Intel | 23 | 2011 – 2026 | HD, UHD, Iris and Arc |
+| `desktop` | Qualcomm | 4 | 2024 – 2026 | Adreno X1 and X2, the graphics of Snapdragon X and X2 |
 | `mobile` | Qualcomm | 25 | 2013 – 2025 | Adreno |
-| `mobile` | Arm | 13 | 2016 – 2024 | Mali and Immortalis |
-| `mobile` | Samsung | 3 | 2022 – 2025 | Xclipse |
+| `mobile` | Arm | 15 | 2016 – 2026 | Mali and Immortalis |
+| `mobile` | Samsung | 7 | 2022 – 2026 | Xclipse |
 
 A Radeon from before the end of 2010 is written as ATI, because that is the name it was sold under; AMD retired the ATI name with the HD 6000 series. A laptop GPU is written the way NVIDIA writes it, `Laptop GPU` and all, so it is never mistaken for the desktop card of the same number. Apple's GPUs are left out: they carry no name of their own, and a Mac reports its chip's, which [`randCpu`](../cpu/rand-cpu) already writes.
 

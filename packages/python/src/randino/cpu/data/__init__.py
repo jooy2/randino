@@ -111,15 +111,27 @@ desktop | 2023 | Intel | Core i7-14700K
 desktop | 2023 | Intel | Core i5-14600K
 desktop | 2023 | Intel | Core Ultra 7 155H
 desktop | 2023 | Intel | Core Ultra 5 125U
+desktop | 2023 | Intel | Core i7-1355U
 desktop | 2024 | Intel | Core i5-14400
 desktop | 2024 | Intel | Core Ultra 7 258V
 desktop | 2024 | Intel | Core Ultra 5 226V
 desktop | 2024 | Intel | Core Ultra 9 285K
 desktop | 2024 | Intel | Core Ultra 7 265K
 desktop | 2024 | Intel | Core Ultra 5 245K
+desktop | 2024 | Intel | Core i9-14900HX
+desktop | 2024 | Intel | Core i7-14700HX
 desktop | 2025 | Intel | Core Ultra 9 285H
 desktop | 2025 | Intel | Core Ultra 9 275HX
 desktop | 2025 | Intel | Core Ultra 5 225
+desktop | 2025 | Intel | Core Ultra 7 255H
+desktop | 2026 | Intel | Core Ultra X9 388H
+desktop | 2026 | Intel | Core Ultra X7 358H
+desktop | 2026 | Intel | Core Ultra 7 365
+desktop | 2026 | Intel | Core Ultra 5 325
+desktop | 2026 | Intel | Core Ultra 9 290HX Plus
+desktop | 2026 | Intel | Core Ultra 7 270K Plus
+desktop | 2026 | Intel | Core Ultra 5 250K Plus
+desktop | 2026 | Intel | Core 7 350
 
 desktop | 2003 | AMD | Athlon 64 3200+
 desktop | 2005 | AMD | Athlon 64 X2 4200+
@@ -165,15 +177,25 @@ desktop | 2023 | AMD | Ryzen 7 7800X3D
 desktop | 2023 | AMD | Ryzen 9 7940HS
 desktop | 2023 | AMD | Ryzen 7 7840U
 desktop | 2023 | AMD | Ryzen 5 7530U
+desktop | 2023 | AMD | Ryzen 9 7945HX
 desktop | 2024 | AMD | Ryzen 9 9950X
 desktop | 2024 | AMD | Ryzen 7 9700X
 desktop | 2024 | AMD | Ryzen 5 9600X
 desktop | 2024 | AMD | Ryzen 7 9800X3D
 desktop | 2024 | AMD | Ryzen AI 9 HX 370
 desktop | 2024 | AMD | Ryzen AI 9 365
+desktop | 2024 | AMD | Ryzen 7 8845HS
+desktop | 2024 | AMD | Ryzen 7 8700G
+desktop | 2024 | AMD | Ryzen 9 9900X
 desktop | 2025 | AMD | Ryzen 9 9950X3D
 desktop | 2025 | AMD | Ryzen AI Max+ 395
 desktop | 2025 | AMD | Ryzen AI 7 350
+desktop | 2025 | AMD | Ryzen 9 9900X3D
+desktop | 2025 | AMD | Ryzen 9 9955HX3D
+desktop | 2026 | AMD | Ryzen 7 9850X3D
+desktop | 2026 | AMD | Ryzen AI 9 HX 470
+desktop | 2026 | AMD | Ryzen AI 7 450
+desktop | 2026 | AMD | Ryzen 9 9950X3D2 Dual Edition
 
 desktop | 2020 | Apple | M1
 desktop | 2021 | Apple | M1 Pro
@@ -191,11 +213,18 @@ desktop | 2024 | Apple | M4 Pro
 desktop | 2024 | Apple | M4 Max
 desktop | 2025 | Apple | M3 Ultra
 desktop | 2025 | Apple | M5
+desktop | 2026 | Apple | M5 Pro
+desktop | 2026 | Apple | M5 Max
+desktop | 2026 | Apple | M5 Ultra
+desktop | 2026 | Apple | M6
 
 desktop | 2022 | Qualcomm | Snapdragon 8cx Gen 3
 desktop | 2024 | Qualcomm | Snapdragon X Elite
 desktop | 2024 | Qualcomm | Snapdragon X Plus
 desktop | 2025 | Qualcomm | Snapdragon X
+desktop | 2026 | Qualcomm | Snapdragon X2 Elite Extreme
+desktop | 2026 | Qualcomm | Snapdragon X2 Elite
+desktop | 2026 | Qualcomm | Snapdragon X2 Plus
 
 mobile | 2010 | Apple | A4
 mobile | 2011 | Apple | A5
@@ -222,6 +251,7 @@ mobile | 2024 | Apple | A18
 mobile | 2024 | Apple | A18 Pro
 mobile | 2025 | Apple | A19
 mobile | 2025 | Apple | A19 Pro
+mobile | 2026 | Apple | A20 Pro
 
 mobile | 2013 | Qualcomm | Snapdragon 600
 mobile | 2013 | Qualcomm | Snapdragon 800
@@ -254,7 +284,14 @@ mobile | 2023 | Qualcomm | Snapdragon 7+ Gen 2
 mobile | 2023 | Qualcomm | Snapdragon 7s Gen 2
 mobile | 2023 | Qualcomm | Snapdragon 8 Gen 3
 mobile | 2024 | Qualcomm | Snapdragon 8 Elite
+mobile | 2024 | Qualcomm | Snapdragon 8s Gen 3
+mobile | 2024 | Qualcomm | Snapdragon 7+ Gen 3
+mobile | 2024 | Qualcomm | Snapdragon 7s Gen 3
 mobile | 2025 | Qualcomm | Snapdragon 8 Elite Gen 5
+mobile | 2025 | Qualcomm | Snapdragon 8s Gen 4
+mobile | 2025 | Qualcomm | Snapdragon 7 Gen 4
+mobile | 2026 | Qualcomm | Snapdragon 8 Elite Gen 6
+mobile | 2026 | Qualcomm | Snapdragon 8 Elite Extreme Gen 6
 
 mobile | 2016 | Samsung | Exynos 8890
 mobile | 2017 | Samsung | Exynos 8895
@@ -266,8 +303,11 @@ mobile | 2022 | Samsung | Exynos 2200
 mobile | 2023 | Samsung | Exynos 1380
 mobile | 2024 | Samsung | Exynos 1480
 mobile | 2024 | Samsung | Exynos 2400
+mobile | 2024 | Samsung | Exynos 2400e
 mobile | 2025 | Samsung | Exynos 1580
 mobile | 2025 | Samsung | Exynos 2500
+mobile | 2026 | Samsung | Exynos 1680
+mobile | 2026 | Samsung | Exynos 2600
 
 mobile | 2018 | MediaTek | Helio P60
 mobile | 2019 | MediaTek | Helio G90T
@@ -280,14 +320,21 @@ mobile | 2022 | MediaTek | Dimensity 9000
 mobile | 2022 | MediaTek | Dimensity 9200
 mobile | 2023 | MediaTek | Dimensity 7050
 mobile | 2023 | MediaTek | Dimensity 9300
+mobile | 2023 | MediaTek | Dimensity 8300
 mobile | 2024 | MediaTek | Dimensity 9400
+mobile | 2024 | MediaTek | Dimensity 6300
+mobile | 2024 | MediaTek | Dimensity 7300
 mobile | 2025 | MediaTek | Dimensity 9500
+mobile | 2025 | MediaTek | Dimensity 8400
+mobile | 2026 | MediaTek | Dimensity 8500
+mobile | 2026 | MediaTek | Dimensity 9600 Pro
 
 mobile | 2021 | Google | Tensor
 mobile | 2022 | Google | Tensor G2
 mobile | 2023 | Google | Tensor G3
 mobile | 2024 | Google | Tensor G4
 mobile | 2025 | Google | Tensor G5
+mobile | 2026 | Google | Tensor G6
 
 mobile | 2017 | HiSilicon | Kirin 970
 mobile | 2018 | HiSilicon | Kirin 980
@@ -295,13 +342,18 @@ mobile | 2019 | HiSilicon | Kirin 990
 mobile | 2020 | HiSilicon | Kirin 9000
 mobile | 2023 | HiSilicon | Kirin 9000S
 mobile | 2024 | HiSilicon | Kirin 9010
+mobile | 2025 | HiSilicon | Kirin 9030
+mobile | 2025 | HiSilicon | Kirin 9030 Pro
+mobile | 2026 | HiSilicon | Kirin 9030S
 """)
 )
 """Every processor the catalog holds, one per row: `platform | year | vendor | model`.
 
-Desktop and laptop processors under `desktop`, and the systems-on-chip of phones and
-tablets under `mobile`. Each line is represented by the models a spec sheet most often
-names rather than every variant its maker sold. The year is the year the first machines
-with it went on sale, which for a phone chip announced in one December and shipped in the
-next is the year it shipped. The catalog runs to the processors out by the end of 2025.
+Desktop and laptop processors under `desktop`, and the systems-on-chip of phones and tablets
+under `mobile`. Each line is represented by the models a spec sheet most often names rather
+than every variant its maker sold. The year is the year the first machines with it went on
+sale, which for a phone chip announced in one December and shipped in the next is the year
+it shipped. The catalog runs to the processors on sale by October 2026, and what came out in
+2026, with the 2023 to 2025 parts added beside it, was checked against its maker's own
+announcement or product page before it went in.
 """

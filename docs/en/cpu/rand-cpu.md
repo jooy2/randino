@@ -85,20 +85,20 @@ rand_cpu(include_vendor=False, count=2)  # ['Ryzen 7 7800X3D', 'Snapdragon 865']
 
 ## What it draws from {#catalog}
 
-248 processors from the Pentium 4 in 2000 to the parts out by the end of 2025, every one of them as likely as the next once `platform` and the years have narrowed them:
+298 processors from the Pentium 4 in 2000 to the parts on sale by October 2026, every one of them as likely as the next once `platform` and the years have narrowed them:
 
 | Platform | Maker | Parts | Years | Lines |
 | --- | --- | --: | --- | --- |
-| `desktop` | Intel | 82 | 2000 – 2025 | Pentium, Core 2, Core i3 to i9, Core Ultra, Celeron, Atom |
-| `desktop` | AMD | 53 | 2003 – 2025 | Athlon 64, Phenom II, FX, A-Series, Ryzen, Ryzen Threadripper, Ryzen AI |
-| `desktop` | Apple | 16 | 2020 – 2025 | M1 to M5, with their Pro, Max and Ultra |
-| `desktop` | Qualcomm | 4 | 2022 – 2025 | Snapdragon 8cx and Snapdragon X |
-| `mobile` | Apple | 25 | 2010 – 2025 | A4 to A19 Pro, the X and Z chips of the iPad included |
-| `mobile` | Qualcomm | 32 | 2013 – 2025 | Snapdragon 600 to 8 Elite Gen 5 |
-| `mobile` | Samsung | 12 | 2016 – 2025 | Exynos |
-| `mobile` | MediaTek | 13 | 2018 – 2025 | Helio and Dimensity |
-| `mobile` | Google | 5 | 2021 – 2025 | Tensor to Tensor G5 |
-| `mobile` | HiSilicon | 6 | 2017 – 2024 | Kirin |
+| `desktop` | Intel | 94 | 2000 – 2026 | Pentium, Core 2, Core i3 to i9, Core Ultra, Core 7, Celeron, Atom |
+| `desktop` | AMD | 63 | 2003 – 2026 | Athlon 64, Phenom II, FX, A-Series, Ryzen, Ryzen Threadripper, Ryzen AI |
+| `desktop` | Apple | 20 | 2020 – 2026 | M1 to M6, with their Pro, Max and Ultra |
+| `desktop` | Qualcomm | 7 | 2022 – 2026 | Snapdragon 8cx, Snapdragon X and X2 |
+| `mobile` | Apple | 26 | 2010 – 2026 | A4 to A20 Pro, the X and Z chips of the iPad included |
+| `mobile` | Qualcomm | 39 | 2013 – 2026 | Snapdragon 600 to 8 Elite Extreme Gen 6 |
+| `mobile` | Samsung | 15 | 2016 – 2026 | Exynos |
+| `mobile` | MediaTek | 19 | 2018 – 2026 | Helio and Dimensity |
+| `mobile` | Google | 6 | 2021 – 2026 | Tensor to Tensor G6 |
+| `mobile` | HiSilicon | 9 | 2017 – 2026 | Kirin |
 
 Each line is represented by the models a spec sheet most often names — the unlocked desktop part, the mainstream laptop part, the flagship and the mid-range chip of a phone line — rather than by every variant its maker sold. A laptop processor counts as `desktop`, the way a laptop runs a desktop operating system.
 
