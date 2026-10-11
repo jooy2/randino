@@ -255,6 +255,45 @@
 	font-size: 11px;
 }
 
+/* The system tab: one machine a line, the device on top and its values in a
+   grid under it, as many columns as the width has room for. */
+.vp-doc .randino-demo-output.is-machines {
+	grid-template-columns: 1fr;
+}
+
+.vp-doc .randino-demo-specs {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+	gap: 6px 14px;
+	margin: 8px 0 0;
+}
+
+.vp-doc .randino-demo-specs > div {
+	min-width: 0;
+}
+
+.vp-doc .randino-demo-specs dt {
+	margin: 0;
+	color: var(--vp-c-text-3);
+	font-size: 11px;
+	line-height: 1.5;
+}
+
+.vp-doc .randino-demo-specs dt code {
+	padding: 0;
+	background: none;
+	color: inherit;
+	font-size: inherit;
+}
+
+.vp-doc .randino-demo-specs dd {
+	margin: 0;
+	color: var(--vp-c-text-2);
+	font-size: 13px;
+	line-height: 1.5;
+	word-break: break-word;
+}
+
 .vp-doc .randino-demo-note {
 	margin: 12px 0 0;
 	color: var(--vp-c-text-3);

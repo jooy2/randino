@@ -1,6 +1,6 @@
 # Demo
 
-Everything below runs in your browser. The controls are the options `randName`, `randNickname`, `randWord`, `randSentence`, `randLocation`, `randAge`, `randGender`, `randOrganization`, `randDate` and `randPhone` actually take, the code block under the output is the call your settings amount to, and what you see is drawn fresh every time you press Generate.
+Everything below runs in your browser. The controls are the options `randName`, `randNickname`, `randWord`, `randSentence`, `randLocation`, `randAge`, `randGender`, `randOrganization`, `randDate` and `randPhone` actually take, and the system values tab puts a sample machine together from the system generators, one a line. The code block under the output is the call your settings amount to, and what you see is drawn fresh every time you press Generate.
 
 <Demo />
 
@@ -39,6 +39,9 @@ Everything below runs in your browser. The controls are the options `randName`, 
 - Turn on `fictional` with `country` on `all`. Only US and German numbers come back, `555-01xx` and the Bundesnetzagentur's drama numbers, because those are the two countries that set numbers aside for films and books; pick `KR` and nothing comes back at all, rather than a real number.
 - Back on the dates tab, type `dddd, D MMMM YYYY` into `format` and switch `language` to `de`, `ru` and `ko`. The names change and the digits stay; Russian writes its month in the genitive, the way a date needs it.
 - Set `utcOffset` to `+09:00` and leave `format` empty. The dates end on `+09:00` rather than `Z`, and setting `minDate` and `maxDate` to the same day keeps every date on that day in Seoul.
+- On the system values tab, set `platform` to `mobile`. Every line is a phone or a tablet with a phone's chip, Arm, LPDDR memory and UFS or eMMC storage; set it to `desktop` and the same columns turn into a laptop's. Left on `all`, each line picks one platform and keeps to it.
+- Watch an Apple line. The device is drawn first and its maker decides the rest through `family` and `vendor`: an iPhone runs iOS on an Apple chip and buys from the App Store, a Mac before the M1 has an Intel processor and `x86_64`, and the system is the one out the year the device was. Open the call behind it to see the options each value was drawn with.
+- Press Generate a few times and watch the storage column. The size is drawn for the kind of storage beside it, so an eMMC line stops at 128 GB and only a hard disk goes past 8 TB.
 
 ## The scope of this page {#what-this-page-is-not}
 
@@ -50,4 +53,5 @@ The page draws **without a seed**, so pressing Generate twice gives two differen
 
 - [Getting started](./guide/getting-started) — installing it, for whichever of the three packages you use.
 - [`randName`](./name/rand-name), [`randNickname`](./nickname/rand-nickname), [`randWord`](./word/rand-word), [`randSentence`](./sentence/rand-sentence), [`randLocation`](./location/rand-location), [`randAge`](./age/rand-age), [`randGender`](./gender/rand-gender), [`randOrganization`](./organization/rand-organization), [`randDate`](./date/rand-date) and [`randPhone`](./phone/rand-phone) — every option in the panel above, written out.
+- [`randOs`](./os/rand-os), [`randDevice`](./device/rand-device), [`randCpu`](./cpu/rand-cpu), [`randGpu`](./gpu/rand-gpu), [`randArchitecture`](./architecture/rand-architecture), [`randRam`](./ram/rand-ram), [`randDiskSize`](./disk/rand-disk-size) and the other system generators — what the system values tab keeps at its defaults.
 - [Supported languages](./guide/languages) — what each language can and cannot do.

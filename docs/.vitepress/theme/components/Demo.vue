@@ -4,6 +4,7 @@ import { useData } from 'vitepress';
 import {
 	AGE_GROUPS,
 	DATE_UNITS,
+	DEVICE_VENDORS,
 	LOCATION_LANGUAGES,
 	LOCATION_LEVELS,
 	NAME_LANGUAGES,
@@ -14,26 +15,39 @@ import {
 	RAND_AGE_MAX,
 	RAND_SENTENCE_COUNT_MAX,
 	WORD_LANGUAGES,
+	SYSTEM_PLATFORMS,
 	WORD_THEMES,
 	nameLengthRange,
 	nameSupportsMiddleName,
 	nicknameLengthRange,
 	randAge,
+	randAppStore,
+	randArchitecture,
 	randCity,
 	randCountry,
+	randCpu,
 	randDate,
+	randDevice,
+	randDiskSize,
+	randDiskType,
 	randDistrict,
+	randFileExtension,
 	randGender,
+	randGpu,
 	randLocation,
 	randModifier,
 	randName,
 	randNickname,
 	randOrganization,
+	randOs,
 	randPhone,
 	randPrefix,
+	randRam,
 	randRegion,
+	randResolution,
 	randSentence,
 	randSuffix,
+	randVersion,
 	randWord,
 	sentenceLengthRange,
 	wordLengthRange
@@ -94,7 +108,8 @@ const TABS = [
 	'gender',
 	'organization',
 	'date',
-	'phone'
+	'phone',
+	'system'
 ];
 
 const TAB_LABELS = {
@@ -107,7 +122,8 @@ const TAB_LABELS = {
 	gender: 'demoGenders',
 	organization: 'demoOrganizations',
 	date: 'demoDates',
-	phone: 'demoPhones'
+	phone: 'demoPhones',
+	system: 'demoSystem'
 };
 
 const tab = ref('name');
@@ -279,6 +295,241 @@ const phone = reactive({
 });
 
 /**
+ * The system tab: a sample machine a line. Every value is drawn for the one
+ * platform the line was given, and then for the device drawn first: its maker
+ * decides the line of systems and who made the processor, the processor decides
+ * the graphics and the architecture, and the system the app store. The platform
+ * is the tab's only control.
+ */
+const system = reactive({ platform: 'all' });
+
+/** How many machines a press draws. One a line, so the list stays readable. */
+const MACHINES = 6;
+
+/**
+ * The kinds of device a platform's machines are drawn from. A desktop's is a
+ * laptop: a desktop PC is built from parts and has no model name of its own.
+ */
+const DEVICE_TYPES_OF = { desktop: 'laptop', mobile: ['phone', 'tablet'] };
+
+/**
+ * The makers whose devices run a system the OS catalog holds. Nokia's phones ran
+ * Symbian or Windows Phone and BlackBerry's its own, a Surface tablet runs
+ * Windows, which is a desktop's, and Google's Pixelbooks run ChromeOS.
+ */
+const MAKERS_OF = {
+	desktop: DEVICE_VENDORS.filter((vendor) => vendor !== 'Google'),
+	mobile: DEVICE_VENDORS.filter((vendor) => !['Nokia', 'BlackBerry', 'Microsoft'].includes(vendor))
+};
+
+/** The line of systems a device runs, by its maker, its kind and its year. */
+function familyOf(device) {
+	if (device.vendor === 'Apple') {
+		if (device.type === 'laptop') return 'macos';
+
+		// An iPad ran iOS until iPadOS was split from it in 2019.
+		return device.type === 'tablet' && device.year >= 2019 ? 'ipados' : 'ios';
+	}
+
+	if (device.type !== 'laptop') return 'android';
+
+	// A Surface runs Windows; a ThinkPad or an XPS is sold with Linux as well.
+	return device.vendor === 'Microsoft' ? 'windows' : ['windows', 'ubuntu', 'fedora', 'debian'];
+}
+
+/** Who made the processor a device is built on, by its maker, its kind and its year. */
+function chipMakersOf(device) {
+	if (device.vendor === 'Apple') {
+		// Apple's own chip in every phone and tablet, and in the Macs from the M1
+		// of late 2020; Intel's in the Macs before them.
+		const own = device.type !== 'laptop' || device.year >= 2021 || /\bM\d/.test(device.model);
+
+		return own ? ['Apple'] : ['Intel'];
+	}
+
+	if (device.type === 'laptop') return ['Intel', 'AMD', 'Qualcomm'];
+	if (device.vendor === 'Samsung') return ['Samsung', 'Qualcomm'];
+	if (device.vendor === 'Google') return device.year >= 2021 ? ['Google'] : ['Qualcomm'];
+	if (device.vendor === 'Huawei') return ['HiSilicon'];
+
+	return ['Qualcomm', 'MediaTek'];
+}
+
+/**
+ * Who made the graphics beside each maker's processor. Apple is not here: its
+ * graphics carry no name of their own, and a Mac or an iPhone reports its chip's.
+ */
+const GPU_MAKERS_OF = {
+	Intel: ['Intel', 'NVIDIA'],
+	AMD: ['AMD', 'ATI', 'NVIDIA'],
+	Qualcomm: ['Qualcomm'],
+	Samsung: ['Samsung', 'Arm'],
+	MediaTek: ['Arm'],
+	Google: ['Arm'],
+	HiSilicon: ['Arm']
+};
+
+/**
+ * The companies whose app stores sell to each line of systems: only Apple's on
+ * an iPhone, and on Android every store but another maker's own.
+ */
+const STORE_COMPANIES = {
+	ios: { only: ['Apple'] },
+	ipados: { only: ['Apple'] },
+	macos: { not: ['Microsoft', 'Canonical'] },
+	windows: { not: ['Apple', 'Canonical', 'MacPaw'] },
+	android: { not: ['Apple', 'Samsung', 'Huawei', 'Xiaomi'] },
+	ubuntu: { only: ['Canonical', 'Valve'] },
+	fedora: { only: ['Valve'] },
+	debian: { only: ['Valve'] }
+};
+
+/** The stores a machine's system takes, as a test and as the code block writes it. */
+function storeFilter(family, vendor) {
+	const { only, not } = STORE_COMPANIES[family];
+
+	if (only) {
+		return {
+			keep: (store) => only.includes(store.company),
+			code: `(store) => ${literal(only)}.includes(store.company)`
+		};
+	}
+
+	// A maker's own store is on its own phones.
+	const others = not.filter((company) => company !== vendor);
+
+	return {
+		keep: (store) => !others.includes(store.company),
+		code: `(store) => !${literal(others)}.includes(store.company)`
+	};
+}
+
+/** The generators the system tab calls, by name, so a call can be written out as made. */
+const SYSTEM_GENERATORS = {
+	randAppStore,
+	randArchitecture,
+	randCpu,
+	randDevice,
+	randDiskSize,
+	randDiskType,
+	randFileExtension,
+	randGpu,
+	randOs,
+	randRam,
+	randResolution,
+	randVersion
+};
+
+/** One machine, every value drawn for `platform` and for the device drawn first. */
+function drawMachine(platform) {
+	// Each call the machine was drawn by, `[name, generator, options, then]`, for
+	// the code block to write out the first machine's.
+	const calls = [];
+
+	// The first of `attempts` that gives anything — kept to what `keep` allows,
+	// where a generator has no option for it — so a device older than every
+	// processor of its maker still gets one. Only the call that answered is kept.
+	const draw = (name, generator, attempts, keep, code) => {
+		for (const options of attempts) {
+			const out = SYSTEM_GENERATORS[generator](options);
+			const found = keep ? out.find(keep) : out[0];
+
+			if (found !== undefined) {
+				calls.push([name, generator, options, keep ? `.filter(${code})` : '']);
+
+				return found;
+			}
+		}
+
+		return undefined;
+	};
+
+	const device = draw('device', 'randDevice', [
+		{ type: DEVICE_TYPES_OF[platform], vendor: MAKERS_OF[platform], output: 'detail' }
+	]);
+	const year = device.year;
+	const years = { minYear: year, maxYear: year };
+	const family = familyOf(device);
+	// The system it came with: a release, or a build of one, out the year it was.
+	const os = draw('os', 'randOs', [
+		{ family, ...years, includeBuild: true, output: 'detail' },
+		{ family, output: 'detail' }
+	]);
+	const chipMakers = chipMakersOf(device);
+	const cpu = draw('cpu', 'randCpu', [
+		{ platform, vendor: chipMakers, minYear: year - 1, maxYear: year, output: 'detail' },
+		{ platform, vendor: chipMakers, output: 'detail' }
+	]);
+	const gpuMakers = GPU_MAKERS_OF[cpu.vendor];
+	const gpu = gpuMakers
+		? draw('gpu', 'randGpu', [
+				{ platform, vendor: gpuMakers, minYear: year - 1, maxYear: year },
+				{ platform, vendor: gpuMakers }
+			])
+		: cpu.cpu;
+	const line = ['Intel', 'AMD'].includes(cpu.vendor) ? 'x86' : 'arm';
+	const architecture = draw(
+		'architecture',
+		'randArchitecture',
+		[{ platform, unique: true, count: 10, output: 'detail' }],
+		(each) => each.family === line,
+		`(each) => each.family === '${line}'`
+	);
+	// A chip soldered to its memory takes a phone's kind of it, so an M-series
+	// Mac or a Snapdragon laptop has LPDDR rather than DDR modules.
+	const lowPower = platform === 'mobile' || ['Apple', 'Qualcomm'].includes(cpu.vendor);
+	const ramOptions = { platform, includeType: true, output: 'detail' };
+	const ram = lowPower
+		? draw(
+				'ram',
+				'randRam',
+				[
+					{ ...ramOptions, ...years, count: 20 },
+					{ ...ramOptions, count: 20 }
+				],
+				(each) => each.type.startsWith('LPDDR'),
+				"(each) => each.type.startsWith('LPDDR')"
+			)
+		: draw('ram', 'randRam', [{ ...ramOptions, ...years }, ramOptions]);
+	// The size is drawn for the kind of storage just drawn, so an eMMC phone is
+	// never handed a hard disk's 8 TB.
+	const disk = draw('disk', 'randDiskType', [{ platform, output: 'detail' }]);
+	const storage = draw('storage', 'randDiskSize', [{ type: disk.code, platform }]);
+	const resolution = draw('resolution', 'randResolution', [{ platform }]);
+	const version = draw('version', 'randVersion', [{}]);
+	const stores = storeFilter(os.family, device.vendor);
+	const appStore = draw(
+		'appStore',
+		'randAppStore',
+		[{ platform, unique: true, count: 20, output: 'detail' }],
+		stores.keep,
+		stores.code
+	);
+	// The extension's own MIME type rather than a second draw, so the two agree.
+	const file = draw('file', 'randFileExtension', [{ output: 'detail' }]);
+
+	return {
+		text: device.device,
+		platform,
+		calls,
+		apple: !gpuMakers,
+		specs: [
+			['os', os.os],
+			['cpu', cpu.cpu],
+			['gpu', gpu],
+			['architecture', architecture.architecture],
+			['ram', ram.ram],
+			['storage', `${storage} ${disk.diskType}`],
+			['resolution', resolution],
+			['version', version],
+			['appStore', appStore.store],
+			['extension', file.extension],
+			['mimeType', file.mimeType]
+		]
+	};
+}
+
+/**
  * Whether a company can come out. An industry and a legal form are a company's,
  * so their selects only mean something then — and with `type` on `all`, an
  * industry asks for companies outright.
@@ -370,6 +621,12 @@ const options = computed(() => {
 		if (date.unit) out.unit = date.unit;
 		if (date.count !== 1) out.count = Number(date.count);
 		if (date.unique) out.unique = true;
+
+		return out;
+	}
+
+	if (tab.value === 'system') {
+		if (system.platform !== 'all') out.platform = system.platform;
 
 		return out;
 	}
@@ -563,6 +820,21 @@ function generate() {
 	let items;
 	let meta = null;
 
+	if (tab.value === 'system') {
+		// A platform a line when none is picked, so `all` is half desktops and half
+		// phones the way each generator's own `'all'` is.
+		rows.value = Array.from({ length: MACHINES }, () =>
+			drawMachine(
+				system.platform === 'all'
+					? SYSTEM_PLATFORMS[Math.floor(Math.random() * SYSTEM_PLATFORMS.length)]
+					: system.platform
+			)
+		);
+		asked.value = MACHINES;
+
+		return;
+	}
+
 	if (tab.value === 'name') {
 		if (details.value) {
 			const drawn = randName({ ...config, output: 'detail' });
@@ -724,7 +996,7 @@ onMounted(generate);
 // Switching tab, turning details on or picking another location function is a
 // different question, so it is asked straight away rather than leaving the
 // previous answer on screen.
-watch([tab, details, () => place.fn], generate);
+watch([tab, details, () => place.fn, () => system.platform], generate);
 
 /**
  * Whether an empty location result is the level missing rather than a filter
@@ -795,7 +1067,44 @@ const DETAIL_FIELDS = {
 	sentence: 'sentence'
 };
 
+/**
+ * The calls the first machine above was drawn by, with the options each one was
+ * given, so the code block is what the page did rather than a sketch of it.
+ */
+function systemCode() {
+	const machine = rows.value[0];
+
+	if (!machine?.calls) {
+		return '';
+	}
+
+	const names = [...new Set(machine.calls.map(([, generator]) => generator))].sort();
+	const lines = machine.calls.map(([name, generator, options, then]) => {
+		return `const [${name}] = ${generator}(${objectLiteral(options)})${then};`;
+	});
+	const gpu = machine.apple
+		? [
+				"// Apple's graphics carry no name of their own: the gpu column is the chip's.",
+				'const gpu = cpu.cpu;'
+			]
+		: [];
+	const at = lines.findIndex((each) => each.startsWith('const [architecture]'));
+
+	lines.splice(at, 0, ...gpu);
+
+	return [
+		`import { ${names.join(', ')} } from 'randino';`,
+		'',
+		`// The first machine above, drawn for '${machine.platform}'.`,
+		...lines
+	].join('\n');
+}
+
 const code = computed(() => {
+	if (tab.value === 'system') {
+		return systemCode();
+	}
+
 	const generator = tab.value === 'location' ? place.fn : GENERATORS[tab.value];
 	const call = `${generator}(${objectLiteral(generatorOptions.value)})`;
 
@@ -826,9 +1135,17 @@ const code = computed(() => {
 
 const copied = ref(false);
 
+/**
+ * A line as it is copied. A machine is its values separated by tabs, so a paste
+ * into a spreadsheet lands one value a column.
+ */
+function copiedLine(row) {
+	return row.specs ? [row.text, ...row.specs.map(([, value]) => value)].join('\t') : row.text;
+}
+
 async function copy() {
 	try {
-		await navigator.clipboard.writeText(rows.value.map((row) => row.text).join('\n'));
+		await navigator.clipboard.writeText(rows.value.map(copiedLine).join('\n'));
 		copied.value = true;
 		setTimeout(() => (copied.value = false), 1200);
 	} catch {
@@ -1021,6 +1338,16 @@ async function copy() {
 				<label class="randino-demo-check">
 					<input v-model="date.unique" type="checkbox" />
 					<code>unique</code>
+				</label>
+			</div>
+
+			<div v-else-if="tab === 'system'" class="randino-demo-fields">
+				<label class="randino-demo-field">
+					<span><code>platform</code></span>
+					<select v-model="system.platform">
+						<option value="all">all</option>
+						<option v-for="item in SYSTEM_PLATFORMS" :key="item" :value="item">{{ item }}</option>
+					</select>
 				</label>
 			</div>
 
@@ -1491,7 +1818,7 @@ async function copy() {
 				</label>
 			</div>
 
-			<div class="randino-demo-fields randino-demo-affix">
+			<div v-if="tab !== 'system'" class="randino-demo-fields randino-demo-affix">
 				<label v-if="decoratable" class="randino-demo-field">
 					<span>{{ t(locale, 'demoDecorate') }}</span>
 					<select v-model="decorate.kind">
@@ -1553,10 +1880,22 @@ async function copy() {
 				{{ rows.length ? t(locale, 'demoCount').replace('{count}', String(rows.length)) : '' }}
 			</p>
 
-			<ul v-if="rows.length" class="randino-demo-output">
+			<ul
+				v-if="rows.length"
+				class="randino-demo-output"
+				:class="{ 'is-machines': tab === 'system' }"
+			>
 				<li v-for="(row, index) in rows" :key="index">
 					<span class="randino-demo-value">{{ row.text }}</span>
-					<span v-if="row.meta" class="randino-demo-meta">
+					<dl v-if="row.specs" class="randino-demo-specs">
+						<div v-for="[key, value] in row.specs" :key="key">
+							<dt
+								><code>{{ key }}</code></dt
+							>
+							<dd>{{ value }}</dd>
+						</div>
+					</dl>
+					<span v-else-if="row.meta" class="randino-demo-meta">
 						<span v-for="[key, value] in row.meta" :key="key">
 							<code>{{ key }}</code>
 							{{ value }}

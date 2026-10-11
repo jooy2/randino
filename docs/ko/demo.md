@@ -1,6 +1,6 @@
 # 데모
 
-아래의 모든 것은 브라우저에서 직접 실행됩니다. 컨트롤은 `randName`, `randNickname`, `randWord`, `randSentence`, `randLocation`, `randAge`, `randGender`, `randOrganization`, `randDate`, `randPhone`이 실제로 받는 옵션이고, 결과 아래의 코드 블록은 지금 설정이 만들어 내는 호출이며, 보이는 값은 **생성** 버튼을 누를 때마다 새로 뽑힙니다.
+아래의 모든 것은 브라우저에서 직접 실행됩니다. 컨트롤은 `randName`, `randNickname`, `randWord`, `randSentence`, `randLocation`, `randAge`, `randGender`, `randOrganization`, `randDate`, `randPhone`이 실제로 받는 옵션이고, 시스템 값 탭은 시스템 값 생성 함수들로 예시 기기를 한 줄에 한 대씩 만듭니다. 결과 아래의 코드 블록은 지금 설정이 만들어 내는 호출이며, 보이는 값은 **생성** 버튼을 누를 때마다 새로 뽑힙니다.
 
 <Demo />
 
@@ -39,6 +39,9 @@
 - `country`를 `all`로 두고 `fictional`을 켜 보세요. 미국의 `555-01xx`와 독일 연방네트워크청의 드라마 번호만 나옵니다. 영화와 책에 쓰라고 번호를 따로 떼어 둔 나라가 그 둘뿐이기 때문입니다. `KR`을 고르면 실제 번호 대신 아무것도 나오지 않습니다.
 - 날짜 탭으로 돌아가 `format`에 `dddd, D MMMM YYYY`를 넣고 `language`를 `de`, `ru`, `ko`로 바꿔 보세요. 이름만 바뀌고 숫자는 그대로입니다. 러시아어는 날짜에 맞게 월을 생격으로 씁니다.
 - `utcOffset`을 `+09:00`으로 두고 `format`은 비워 두세요. 날짜가 `Z` 대신 `+09:00`으로 끝나고, `minDate`와 `maxDate`를 같은 날로 두면 모든 날짜가 서울 기준으로 그날 안에 들어갑니다.
+- 시스템 값 탭에서 `platform`을 `mobile`로 바꿔 보세요. 모든 줄이 휴대폰이나 태블릿이 되고, 휴대폰용 칩, Arm, LPDDR 메모리, UFS나 eMMC 저장 장치가 함께 나옵니다. `desktop`으로 바꾸면 같은 열이 노트북의 값으로 바뀝니다. `all`로 두면 줄마다 플랫폼을 하나 골라 끝까지 그 플랫폼의 값만 씁니다.
+- Apple 기기가 나온 줄을 보세요. 기기를 먼저 뽑고, 그 제조사에 맞춰 `family`와 `vendor`로 나머지를 정합니다. iPhone은 Apple 칩에서 iOS를 돌리고 App Store를 쓰며, M1 이전 Mac은 Intel 프로세서와 `x86_64`입니다. 운영체제는 그 기기가 나온 해의 릴리스입니다. 결과 아래의 호출을 열면 값마다 어떤 옵션으로 뽑았는지 보입니다.
+- **생성**을 몇 번 누르며 저장 장치 열을 보세요. 용량은 옆에 적힌 저장 장치 종류에 맞춰 뽑으므로, eMMC는 128 GB에서 끝나고 8 TB를 넘는 것은 하드 디스크뿐입니다.
 
 ## 이 페이지의 범위 {#what-this-page-is-not}
 
@@ -50,4 +53,5 @@
 
 - [시작하기](./guide/getting-started) — 세 패키지 중 쓰는 것으로 설치하기.
 - [`randName`](./name/rand-name), [`randNickname`](./nickname/rand-nickname), [`randWord`](./word/rand-word), [`randSentence`](./sentence/rand-sentence), [`randLocation`](./location/rand-location), [`randAge`](./age/rand-age), [`randGender`](./gender/rand-gender), [`randOrganization`](./organization/rand-organization), [`randDate`](./date/rand-date), [`randPhone`](./phone/rand-phone) — 위 패널에 있는 모든 옵션의 설명.
+- [`randOs`](./os/rand-os), [`randDevice`](./device/rand-device), [`randCpu`](./cpu/rand-cpu), [`randGpu`](./gpu/rand-gpu), [`randArchitecture`](./architecture/rand-architecture), [`randRam`](./ram/rand-ram), [`randDiskSize`](./disk/rand-disk-size)와 그 밖의 시스템 값 생성 함수 — 시스템 값 탭이 기본값으로 두는 옵션의 설명.
 - [지원 언어](./guide/languages) — 언어마다 할 수 있는 것과 할 수 없는 것.
