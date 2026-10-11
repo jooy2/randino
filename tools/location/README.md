@@ -1,6 +1,6 @@
 # Writing the location datasets
 
-`node tools/location/index.mjs <sources directory>` writes the location datasets of all three packages out of the files each country publishes, then runs `prettier`, `dart format` and `ruff format` over what it wrote.
+`node tools/location/index.mjs <sources directory>` writes the location datasets of all three packages out of the files each country publishes, then runs `prettier`, `dart format` and `ruff format` over what it wrote. For the npm package it also writes `lib/location/data/regions.ts`, the first level of every outline on its own, so that `randRegion` bundles without the outline; the ports read their outlines for it.
 
 Every other dataset starts in the JavaScript package and is ported from there. These cannot: they are thousands of real divisions, and the only copy worth trusting is the publisher's. So the publisher's file is the source, and the three packages are written from it at once, which is also why `tools/parity` never finds them apart.
 

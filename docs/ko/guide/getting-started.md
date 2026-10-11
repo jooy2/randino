@@ -64,12 +64,13 @@ pip install randino
 | ---------------------------------------------------------- | -------- |
 | `randSuffix`, `randPrefix`, `nameLengthRange` 등 이름 헬퍼 | 0.5 KB   |
 | `randAge`, `randGender`, `randArchitecture`, `randRam`     | 1–1.5 KB |
+| `randRegion`                                               | 2 KB     |
 | `randOs`, `randDevice`, `randCpu` 등 다른 시스템 값 함수   | 1–5 KB   |
 | `randDate`, `randPhone`                                    | 3–4 KB   |
 | `randOrganization`                                         | 14 KB    |
 | `randCountry`                                              | 18 KB    |
 | `randName`                                                 | 24 KB    |
-| `randLocation`, `randRegion`, `randCity`, `randDistrict`   | 160 KB   |
+| `randLocation`, `randCity`, `randDistrict`                 | 160 KB   |
 | `randWord`와 테마별 함수들, `randModifier`                 | 260 KB   |
 | `randNickname`                                             | 262 KB   |
 | `randSentence`                                             | 426 KB   |

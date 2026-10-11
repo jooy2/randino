@@ -576,6 +576,36 @@ function writePython(country, tree) {
 	writeFileSync(here(`packages/python/src/randino/location/data/${country.code}.py`), body.join('\n'));
 }
 
+/**
+ * The first-level divisions of every outline, written apart from it for the npm
+ * package alone: `randRegion` draws from a few dozen names, and reading them out
+ * of the outline put the whole of it in every bundle that imported the function.
+ * The ports read the outline, since nothing there is bundled.
+ */
+function writeRegions(written) {
+	const quote = (text) => `'${text.replace(/\\/g, '\\\\').replace(/'/g, "\\'")}'`;
+	const body = [
+		`// ${GENERATED}`,
+		'// regenerate instead. The first-level divisions of every outline, apart from it so',
+		'// that `randRegion` reaches none of the outline.',
+		'',
+		"import type { LocationLanguage } from '../../_types/global.js';",
+		'',
+		'export const LOCATION_REGIONS: Record<',
+		'\tLocationLanguage,',
+		'\t{ country: string; regions: readonly string[] }',
+		'> = {',
+		...written.map(
+			({ code, country, tree }) =>
+				`\t${code}: { country: ${quote(country)}, regions: [${tree.map((region) => quote(region.name)).join(', ')}] },`
+		),
+		'};',
+		''
+	];
+
+	writeFileSync(here('packages/javascript/lib/location/data/regions.ts'), body.join('\n'));
+}
+
 for (const directory of [
 	'packages/javascript/lib/location/data',
 	'packages/dart/lib/src/location/data',
@@ -585,6 +615,7 @@ for (const directory of [
 }
 
 const countries = readCountries();
+const written = [];
 
 writeCountries(countries);
 console.log('countries', { codes: countries.length });
@@ -599,8 +630,11 @@ for (const country of COUNTRIES) {
 	writeJavaScript(country, tree);
 	writeDart(country, tree);
 	writePython(country, tree);
+	written.push({ code: country.code, country: country.country, tree });
 	console.log(country.code, count(tree));
 }
+
+writeRegions(written);
 
 function ruffBin() {
 	for (const candidate of ['packages/python/.venv/bin/ruff', 'packages/python/.venv/Scripts/ruff.exe']) {

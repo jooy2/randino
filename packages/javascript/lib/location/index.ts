@@ -1,4 +1,4 @@
-export { LOCATION_LANGUAGES, LOCATION_LEVELS } from './data/index.js';
+export { LOCATION_LANGUAGES, LOCATION_LEVELS } from './data/constants.js';
 export { randCity } from './randCity.js';
 export { randCountry } from './randCountry.js';
 export { randDistrict } from './randDistrict.js';

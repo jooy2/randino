@@ -1,5 +1,5 @@
 import type { LocationDetail, RandLocationUnitOptions } from '../_types/global.js';
-import { drawLocation } from './locationGenerator.js';
+import { generateRegionDetails } from './regionGenerator.js';
 
 /**
  * Generate a country's first-level divisions: a Korean 시·도, a US state or the
@@ -24,5 +24,7 @@ export function randRegion(
 export function randRegion(options: RandLocationUnitOptions = {}): string[] | LocationDetail[] {
 	options ??= {};
 
-	return drawLocation('unit', 'region', options);
+	const details = generateRegionDetails(options);
+
+	return options.output === 'detail' ? details : details.map((detail) => detail.location);
 }

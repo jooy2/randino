@@ -21,6 +21,7 @@ import type {
 import { outline } from '../dist/_internal/parse.js';
 import { COUNTRIES } from '../dist/location/data/countries.js';
 import { LOCATION_DATA } from '../dist/location/data/index.js';
+import { LOCATION_REGIONS } from '../dist/location/data/regions.js';
 
 const SAMPLE = 60;
 
@@ -102,6 +103,21 @@ function written(detail: LocationDetail): string {
 }
 
 describe('Location', () => {
+	it("the regions file holds the outline's first-level divisions, in order", () => {
+		// `randRegion` reads the regions apart from the outline, so that a bundle
+		// importing it carries none of the outline. Both are written by
+		// `tools/location`, and this is what keeps them from telling two stories.
+		for (const language of LOCATION_LANGUAGES) {
+			const data = LOCATION_DATA[language];
+			const fromOutline = outline(data.outline, data.levels.length)
+				.filter((entry) => entry.depth === 0)
+				.map((entry) => entry.path[0]);
+
+			assert.deepStrictEqual([...LOCATION_REGIONS[language].regions], fromOutline, language);
+			assert.strictEqual(LOCATION_REGIONS[language].country, LOCATION_DATA[language].country);
+		}
+	});
+
 	it('randLocation returns one location by default', () => {
 		const locations = randLocation();
 

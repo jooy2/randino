@@ -64,12 +64,13 @@ The package declares `sideEffects: false`, so a bundler drops the pools nothing 
 | ------------------------------------------------------------- | -------- |
 | `randSuffix`, `randPrefix`, the `nameLengthRange` helpers     | 0.5 KB   |
 | `randAge`, `randGender`, `randArchitecture`, `randRam`        | 1–1.5 KB |
+| `randRegion`                                                  | 2 KB     |
 | `randOs`, `randDevice`, `randCpu` and the other system values | 1–5 KB   |
 | `randDate`, `randPhone`                                       | 3–4 KB   |
 | `randOrganization`                                            | 14 KB    |
 | `randCountry`                                                 | 18 KB    |
 | `randName`                                                    | 24 KB    |
-| `randLocation`, `randRegion`, `randCity`, `randDistrict`      | 160 KB   |
+| `randLocation`, `randCity`, `randDistrict`                    | 160 KB   |
 | `randWord`, `randAnimal` and the rest, `randModifier`         | 260 KB   |
 | `randNickname`                                                | 262 KB   |
 | `randSentence`                                                | 426 KB   |

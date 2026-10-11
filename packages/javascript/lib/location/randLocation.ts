@@ -1,5 +1,5 @@
 import type { LocationDetail, RandLocationOptions } from '../_types/global.js';
-import { resolveLevel } from './data/index.js';
+import { resolveLevel } from './data/constants.js';
 import { drawLocation } from './locationGenerator.js';
 
 /**
