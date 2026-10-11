@@ -58,14 +58,16 @@ def rand_phone(
     or pass `fictional`, for the numbers the United States and Germany keep out of service
     for films and books.
 
+    The examples write the last four digits as `#`; a call returns every digit.
+
     Args:
         country: Which country's numbers, by ISO 3166-1 alpha-2 code, read regardless of
             case, or `"all"` to mix every one.
         type: `"mobile"`, `"landline"`, or `"all"` for either, decided per number.
         count: How many numbers to return. Held inside `0`..`RAND_COUNT_MAX`.
         include_country_code: Write the number the way it is dialled from abroad,
-            `+82 10-2345-6789` rather than `010-2345-6789`. The trunk prefix the country
-            dials at home is dropped.
+            `+82 10-2345-####` rather than `010-2345-####`, the last four digits hidden
+            here. The trunk prefix the country dials at home is dropped.
         separator: What goes between the groups of digits, in place of the country's own
             way of writing them. `""` writes the digits alone, which with
             `include_country_code` is E.164. None keeps each country's own.
@@ -88,11 +90,11 @@ def rand_phone(
 
     Example:
         >>> rand_phone(country="KR")
-        ['010-4821-3967']
+        ['010-4821-####']
         >>> rand_phone(country="US", count=2)
-        ['(415) 726-0193', '(917) 384-5520']
+        ['(415) 726-####', '(917) 384-####']
         >>> rand_phone(country="KR", include_country_code=True, separator="")
-        ['+821048213967']
+        ['+82104821####']
     """
     details = generate_phone_details(
         country=country,

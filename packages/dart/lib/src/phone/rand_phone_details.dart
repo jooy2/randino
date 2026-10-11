@@ -12,9 +12,11 @@ import 'package:randino/src/types.dart';
 /// Dart has neither overloads nor union types, so the detail form is its own
 /// function rather than the `output` option the npm and PyPI packages take.
 ///
+/// The examples write the last four digits as `#`; a call returns every digit.
+///
 /// ```dart
 /// randPhoneDetails(country: PhoneCountry.jp).first;
-/// // PhoneDetail(090-3718-2046, +819037182046, JP, mobile)
+/// // PhoneDetail(090-3718-####, +81903718####, JP, mobile)
 /// ```
 List<PhoneDetail> randPhoneDetails({
   PhoneCountry? country,

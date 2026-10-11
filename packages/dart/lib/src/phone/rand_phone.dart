@@ -24,11 +24,13 @@ import 'package:randino/src/types.dart';
 /// punctuation: `''` writes the digits alone, which with [includeCountryCode]
 /// is E.164.
 ///
+/// The examples write the last four digits as `#`; a call returns every digit.
+///
 /// ```dart
-/// randPhone(country: PhoneCountry.kr); // [010-4821-3967]
-/// randPhone(country: PhoneCountry.us, count: 2); // [(415) 726-0193, (917) 384-5520]
-/// randPhone(country: PhoneCountry.kr, includeCountryCode: true); // [+82 10-4821-3967]
-/// randPhone(country: PhoneCountry.kr, includeCountryCode: true, separator: ''); // [+821048213967]
+/// randPhone(country: PhoneCountry.kr); // [010-4821-####]
+/// randPhone(country: PhoneCountry.us, count: 2); // [(415) 726-####, (917) 384-####]
+/// randPhone(country: PhoneCountry.kr, includeCountryCode: true); // [+82 10-4821-####]
+/// randPhone(country: PhoneCountry.kr, includeCountryCode: true, separator: ''); // [+82104821####]
 /// randPhone(country: PhoneCountry.us, fictional: true); // [(415) 555-0147]
 /// ```
 List<String> randPhone({

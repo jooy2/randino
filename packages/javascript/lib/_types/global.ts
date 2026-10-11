@@ -1143,16 +1143,18 @@ export interface RandPhoneOptions extends Pick<
 	/** Mobile numbers, landlines, or either. Default `'mobile'`. */
 	type?: PhoneTypeOption;
 	/**
-	 * Write the number the way it is dialled from abroad: `+82 10-2345-6789` rather
-	 * than `010-2345-6789`. The trunk prefix the country dials at home is dropped.
+	 * Write the number the way it is dialled from abroad: `+82 10-2345-####` rather
+	 * than `010-2345-####`, the last four digits hidden here. The trunk prefix the
+	 * country dials at home is dropped.
 	 * Default `false`.
 	 */
 	includeCountryCode?: boolean;
 	/**
 	 * What goes between the groups of digits, in place of the country's own way of
 	 * writing them. `''` writes the digits alone, which with `includeCountryCode`
-	 * is E.164: `+821023456789`. Left out, each country writes its own:
-	 * `010-2345-6789`, `(212) 846-0147`, `8 (912) 345-67-89`.
+	 * is E.164: `+82102345####`. Left out, each country writes its own:
+	 * `010-2345-####`, `(212) 846-####`, `8 (912) 345-##-##`, the last four digits
+	 * hidden here.
 	 */
 	separator?: string;
 	/**
@@ -1170,7 +1172,10 @@ export interface RandPhoneOptions extends Pick<
 export interface PhoneDetail {
 	/** What the value form returns, written the way the options asked for. */
 	phone: string;
-	/** The same number in E.164, the one form every system accepts: `+821023456789`. */
+	/**
+	 * The same number in E.164, the one form every system accepts:
+	 * `+82102345####`, the last four digits hidden here.
+	 */
 	e164: string;
 	country: PhoneCountry;
 	/** The country calling code, without the `+`: `'82'`. */

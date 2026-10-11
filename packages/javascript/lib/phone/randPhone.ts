@@ -14,11 +14,13 @@ import { generatePhoneDetails } from './phoneGenerator.js';
  * Mobile numbers by default. `includeCountryCode` writes the international
  * form, and `separator` replaces the country's own punctuation.
  *
+ * The examples write the last four digits as `#`; a call returns every digit.
+ *
  * @example
- * randPhone({ country: 'KR' }); // ['010-4821-3967']
- * randPhone({ country: 'US', count: 2 }); // ['(415) 726-0193', '(917) 384-5520']
- * randPhone({ country: 'KR', includeCountryCode: true }); // ['+82 10-4821-3967']
- * randPhone({ country: 'KR', includeCountryCode: true, separator: '' }); // ['+821048213967']
+ * randPhone({ country: 'KR' }); // ['010-4821-####']
+ * randPhone({ country: 'US', count: 2 }); // ['(415) 726-####', '(917) 384-####']
+ * randPhone({ country: 'KR', includeCountryCode: true }); // ['+82 10-4821-####']
+ * randPhone({ country: 'KR', includeCountryCode: true, separator: '' }); // ['+82104821####']
  * randPhone({ country: 'US', fictional: true }); // ['(415) 555-0147']
  */
 export function randPhone(options?: RandPhoneOptions & { output?: 'value' }): string[];
@@ -30,9 +32,11 @@ export function randPhone(options?: RandPhoneOptions & { output?: 'value' }): st
  * as sample data, never call or text one, and pass `fictional` for numbers kept
  * out of service.
  *
+ * The examples write the last four digits as `#`; a call returns every digit.
+ *
  * @example
  * randPhone({ country: 'JP', output: 'detail' });
- * // [{ phone: '090-3718-2046', e164: '+819037182046', country: 'JP', callingCode: '81', type: 'mobile' }]
+ * // [{ phone: '090-3718-####', e164: '+81903718####', country: 'JP', callingCode: '81', type: 'mobile' }]
  */
 export function randPhone(options: RandPhoneOptions & { output: 'detail' }): PhoneDetail[];
 export function randPhone(options: RandPhoneOptions = {}): string[] | PhoneDetail[] {

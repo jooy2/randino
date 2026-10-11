@@ -1082,7 +1082,7 @@ class PhoneDetail {
   final String phone;
 
   /// The same number in E.164, the one form every system accepts:
-  /// `+821023456789`.
+  /// `+82102345####`, the last four digits hidden here.
   final String e164;
 
   /// The country the number is for.

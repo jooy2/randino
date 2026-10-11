@@ -164,12 +164,13 @@ void _dates() {
 
 /// Phone numbers written the way their country writes them. A drawn number can
 /// by chance be somebody's, so it is sample data and never a number to call.
+/// The comments write the last four digits as `#`; the calls print every digit.
 void _phones() {
   print('-- phone numbers ----------------------------------------------');
 
-  print(randPhone(country: PhoneCountry.kr)); // [010-4821-3967]
-  print(randPhone(country: PhoneCountry.us, includeCountryCode: true)); // [+1 415-726-0193]
-  print(randPhoneDetails(country: PhoneCountry.jp).first.e164); // +819037182046
+  print(randPhone(country: PhoneCountry.kr)); // [010-4821-####]
+  print(randPhone(country: PhoneCountry.us, includeCountryCode: true)); // [+1 415-726-####]
+  print(randPhoneDetails(country: PhoneCountry.jp).first.e164); // +81903718####
 }
 
 /// A sample machine, described with real products rather than invented ones.

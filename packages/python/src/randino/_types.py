@@ -709,7 +709,10 @@ class PhoneDetail:
     """What the value form returns, written the way the arguments asked for."""
 
     e164: str
-    """The same number in E.164, the one form every system accepts: `+821023456789`."""
+    """The same number in E.164, the one form every system accepts: `+82102345####`.
+
+    The last four digits are hidden here; the field holds every digit.
+    """
 
     country: PhoneCountry
     """The country the number is for."""

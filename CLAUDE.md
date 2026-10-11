@@ -592,7 +592,7 @@ They are **English and JavaScript**: llms.txt has no notion of locales, and the 
 
 **A new generator whose values can match something real gets a line on that page**, in both locales: under `#coincidence` when a value can be somebody's, under `#trademarks` when it names a real product. The page is a promise about every generator, and one that is missing from it is the one a reader will ask about.
 
-**No page shows a whole drawn phone number.** An example opens on a block that is really in use, so a whole one can be somebody's, and a published page keeps it there for good. The phone page, the READMEs and the changelogs write the last four digits as `#` (`010-4821-####`, `8 (912) 345-##-##`) and say so beside the examples, and the demo hides them the same way on its phone tab. A fictional number, `555-01xx` or a German drama number, is nobody's and is written whole.
+**No page shows a whole drawn phone number.** An example opens on a block that is really in use, so a whole one can be somebody's, and a published page keeps it there for good. The phone page, the READMEs, the changelogs and the doc comments in all three packages write the last four digits as `#` (`010-4821-####`, `8 (912) 345-##-##`) and say so beside the examples, and the demo hides them the same way on its phone tab. A fictional number, `555-01xx` or a German drama number, is nobody's and is written whole.
 
 ### The logo
 
