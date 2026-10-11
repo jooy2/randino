@@ -176,7 +176,7 @@ randSentence({ language: 'ko', output: 'detail' });
 //   theme: 'animal'
 // }]
 
-sentenceLengthRange('en'); // [12, 92]
+sentenceLengthRange('en'); // [11, 117]
 ```
 
 | Option                    | Type                                            | Default    |
@@ -749,7 +749,7 @@ nameLengthRange('en', true, true); // [11, 32]
 nameSupportsMiddleName('ko'); // false
 nameSupportsRoman('en'); // false
 nicknameLengthRange('ko'); // [1, 13]
-sentenceLengthRange('ko'); // [5, 43]
+sentenceLengthRange('ko'); // [5, 53]
 wordLengthRange('ko'); // [1, 4]
 ```
 

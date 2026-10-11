@@ -3118,6 +3118,57 @@ describe('Sentence', () => {
 		assert.strictEqual(allMax, Math.max(...WORD_LANGUAGES.map((l) => sentenceLengthRange(l)[1])));
 	});
 
+	it('the top of sentenceLengthRange is one a sentence comes close to', () => {
+		// The top was every slot's longest word added up, and the longest noun is
+		// seldom one the longest verb takes: Spanish claimed 147 characters and wrote
+		// 120 at most, Japanese 63 and wrote 52. It is worked out per predicate now,
+		// and aimed at the top fifteen percent of its range every language writes
+		// something inside it.
+		for (const language of WORD_LANGUAGES) {
+			const [, max] = sentenceLengthRange(language);
+			const floor = Math.floor(max * 0.85);
+			const drawn = randSentence({ language, minLength: floor, maxLength: max, count: 200 });
+
+			assert.ok(
+				drawn.some((sentence) => sentence.length >= floor),
+				`${language}: nothing reached ${floor} of ${max}`
+			);
+		}
+	});
+
+	it('a result of three sentences lands in the middle of its range', () => {
+		// Asked for the middle of what three sentences can be, give or take a tenth,
+		// a story fell short most of the time: its steps write short sentences, and
+		// the top it aimed at could not be reached. Every language now lands at least
+		// one time in three, and most of them nearly always.
+		let landed = 0;
+		let drawn = 0;
+
+		for (const language of WORD_LANGUAGES) {
+			const [low, high] = sentenceLengthRange(language);
+			const gaps = 2 * SENTENCE_DATA[language].space.length;
+			const [min, max] = [low * 3 + gaps, high * 3 + gaps];
+			const middle = Math.round((min + max) / 2);
+			const spread = Math.round((max - min) / 10);
+			const results = randSentence({
+				language,
+				sentences: 3,
+				minLength: middle - spread,
+				maxLength: middle + spread,
+				count: SAMPLE
+			});
+			const inside = results.filter(
+				(each) => each.length >= middle - spread && each.length <= middle + spread
+			).length;
+
+			assert.ok(inside * 3 >= results.length, `${language}: ${inside} of ${results.length}`);
+			landed += inside;
+			drawn += results.length;
+		}
+
+		assert.ok(landed >= drawn * 0.75, `${landed} of ${drawn}`);
+	});
+
 	it('`tense` decides when it happened, and a result keeps one tense', () => {
 		for (const language of WORD_LANGUAGES) {
 			const data = SENTENCE_DATA[language];

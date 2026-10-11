@@ -7,10 +7,10 @@
 ```javascript
 import { sentenceLengthRange } from 'randino';
 
-sentenceLengthRange('ko'); // [5, 55]
-sentenceLengthRange('en'); // [11, 118]
-sentenceLengthRange('zh'); // [4, 33]
-sentenceLengthRange(); // [4, 147] — 모든 언어를 한꺼번에
+sentenceLengthRange('ko'); // [5, 53]
+sentenceLengthRange('en'); // [11, 117]
+sentenceLengthRange('zh'); // [4, 31]
+sentenceLengthRange(); // [4, 128] — 모든 언어를 한꺼번에
 ```
 
 :::
@@ -20,10 +20,10 @@ sentenceLengthRange(); // [4, 147] — 모든 언어를 한꺼번에
 ```dart
 import 'package:randino/randino.dart';
 
-sentenceLengthRange(WordLanguage.ko); // LengthRange(5, 55)
-sentenceLengthRange(WordLanguage.en); // LengthRange(11, 118)
-sentenceLengthRange(WordLanguage.zh); // LengthRange(4, 33)
-sentenceLengthRange(); // LengthRange(4, 147) — 모든 언어를 한꺼번에
+sentenceLengthRange(WordLanguage.ko); // LengthRange(5, 53)
+sentenceLengthRange(WordLanguage.en); // LengthRange(11, 117)
+sentenceLengthRange(WordLanguage.zh); // LengthRange(4, 31)
+sentenceLengthRange(); // LengthRange(4, 128) — 모든 언어를 한꺼번에
 ```
 
 :::
@@ -33,10 +33,10 @@ sentenceLengthRange(); // LengthRange(4, 147) — 모든 언어를 한꺼번에
 ```python
 from randino import sentence_length_range
 
-sentence_length_range("ko")  # (5, 55)
-sentence_length_range("en")  # (11, 118)
-sentence_length_range("zh")  # (4, 33)
-sentence_length_range()  # (4, 147) — 모든 언어를 한꺼번에
+sentence_length_range("ko")  # (5, 53)
+sentence_length_range("en")  # (11, 117)
+sentence_length_range("zh")  # (4, 31)
+sentence_length_range()  # (4, 128) — 모든 언어를 한꺼번에
 ```
 
 :::
@@ -49,7 +49,7 @@ sentence_length_range()  # (4, 147) — 모든 언어를 한꺼번에
 
 ## 기본 범위 {#why-the-range-is-so-wide}
 
-범위가 넓은 것은 양 끝이 극단이기 때문입니다. 아래쪽 끝은 가장 짧은 형태에 가장 짧은 단어를 넣은 것이고, 위쪽 끝은 가장 긴 형태의 모든 구에 수식어를 붙인 것입니다. 그 사이 어디에 떨어지든 그 언어가 쓸 수 있는 문장이며, 어느 것이 나올지는 범위가 아니라 형태의 가중치가 정합니다.
+범위가 넓은 것은 양 끝이 극단이기 때문입니다. 아래쪽 끝은 가장 짧은 형태에 가장 짧은 단어를 넣은 것이고, 위쪽 끝은 가장 긴 형태의 모든 구에 수식어를 붙인 것입니다. 위쪽 끝은 서술어마다 따로 잽니다. 각 구는 그 자리에 서술어가 받는 가장 긴 명사만큼 길다고 보므로, 모든 자리의 가장 긴 단어를 더한 값이 아니라 실제 문장이 가까이 다가가는 값입니다. 그 사이 어디에 떨어지든 그 언어가 쓸 수 있는 문장이며, 어느 것이 나올지는 범위가 아니라 형태의 가중치가 정합니다.
 
 그래서 범위를 좁히는 것이 쓸모 있습니다. 짧은 범위를 주면 들어가지 못하는 형태가 빠집니다.
 

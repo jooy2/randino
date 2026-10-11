@@ -2804,6 +2804,49 @@ def test_the_detail_form_reports_what_the_sentence_was_built_from() -> None:
         assert detail.theme is None or detail.theme in WORD_THEMES
 
 
+def test_the_top_of_sentence_length_range_is_one_a_sentence_comes_close_to() -> None:
+    # The top was every slot's longest word added up, and the longest noun is seldom one
+    # the longest verb takes: Spanish claimed 147 characters and wrote 120 at most,
+    # Japanese 63 and wrote 52. It is worked out per predicate now, and aimed at the top
+    # fifteen percent of its range every language writes something inside it.
+    for language in WORD_LANGUAGES:
+        top = sentence_length_range(language)[1]
+        floor = int(top * 0.85)
+        drawn = rand_sentence(language=language, min_length=floor, max_length=top, count=200)
+
+        assert any(len(sentence) >= floor for sentence in drawn), f"{language}: {floor} of {top}"
+
+
+def test_a_result_of_three_sentences_lands_in_the_middle_of_its_range() -> None:
+    # Asked for the middle of what three sentences can be, give or take a tenth, a story
+    # fell short most of the time: its steps write short sentences, and the top it aimed
+    # at could not be reached. Every language now lands at least one time in three, and
+    # most of them nearly always.
+    landed = 0
+    drawn = 0
+
+    for language in WORD_LANGUAGES:
+        low, high = sentence_length_range(language)
+        gaps = 2 * len(SENTENCE_DATA[language].space)
+        least, most = low * 3 + gaps, high * 3 + gaps
+        middle = round((least + most) / 2)
+        spread = round((most - least) / 10)
+        results = rand_sentence(
+            language=language,
+            sentences=3,
+            min_length=middle - spread,
+            max_length=middle + spread,
+            count=SAMPLE,
+        )
+        inside = sum(1 for each in results if middle - spread <= len(each) <= middle + spread)
+
+        assert inside * 3 >= len(results), f"{language}: {inside} of {len(results)}"
+        landed += inside
+        drawn += len(results)
+
+    assert landed >= drawn * 0.75, f"{landed} of {drawn}"
+
+
 def test_sentence_length_range_reports_what_the_language_can_produce() -> None:
     for language in WORD_LANGUAGES:
         low, high = sentence_length_range(language)

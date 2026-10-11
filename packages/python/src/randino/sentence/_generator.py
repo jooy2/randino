@@ -126,6 +126,16 @@ FIT_ATTEMPTS = 14
 
 STORY_ATTEMPTS = 3
 
+_LAST_ATTEMPTS = 8
+"""How many times the last sentence of a story is drawn against what is left of the range.
+
+A sentence is one shape's draw, where a telling is the whole story again, so this is the
+cheaper way to land.
+"""
+
+_SHARE_ATTEMPTS = 3
+"""And how many times any other sentence of a story is, against its own share."""
+
 NAME_ATTEMPTS = 6
 """How many times a name is drawn again when it is one the result already carries.
 
@@ -1627,9 +1637,139 @@ def _frame_range(
         low += gap + part_low
         high += gap + part_high
 
+    # Against the language's own words, the top is worked out predicate by predicate
+    # rather than slot by slot: see `_frame_top`.
+    language = _language_of_data(data)
+
+    if bounds is _slot_bounds(language):
+        high = max(low, min(high, _frame_top(language, frame, data)))
+
     _FRAME_RANGE_CACHE[key] = (low, high)
 
     return (low, high)
+
+
+_DATA_LANGUAGES: dict[int, WordLanguage] = {}
+
+
+def _language_of_data(data: SentenceLanguageData) -> WordLanguage:
+    """The language a sentence dataset belongs to."""
+    if not _DATA_LANGUAGES:
+        _DATA_LANGUAGES.update({id(each): code for code, each in SENTENCE_DATA.items()})
+
+    return _DATA_LANGUAGES[id(data)]
+
+
+def _frame_top(language: WordLanguage, frame: SentenceFrame, data: SentenceLanguageData) -> int:
+    """The longest a shape can be with the language's own words, predicate by predicate.
+
+    Adding up the longest word of every slot claimed lengths no sentence reaches, because
+    the longest noun is seldom one the longest verb takes, or one a place can be: Spanish
+    was said to write 147 characters and wrote 118, Japanese 63 and wrote 52. So each slot
+    is measured against what the predicate lets into it — the subjects and objects of its
+    themes, the places a place can be, the modifiers each theme takes — and the shape is
+    the longest of its predicates. Still a top rather than a promise, since it does not
+    ask whether the longest subject and the longest object go together.
+    """
+    bounds = _slot_bounds(language)
+    marks = max(len(mark) for mark in data.terminators.values())
+    tag = len(frame.tag) + len(data.space) if frame.tag else 0
+    by_state = any(part.slot == "state" for part in frame.parts)
+    copular = not by_state and not any(part.slot == "verb" for part in frame.parts)
+    destination = any(part.slot == "destination" for part in frame.parts)
+    groups: Sequence[VerbGroup | StateGroup]
+
+    if copular:
+        groups = [data.calendar.copula] if data.calendar is not None else []
+    elif by_state:
+        groups = data.states
+    else:
+        groups = [
+            group
+            for group in data.verbs
+            if (group.object is not None) == _takes_object(frame)
+            and (group.requires is None or any(part.slot == group.requires for part in frame.parts))
+            and (not destination or group.requires == "destination")
+        ]
+
+    subject_slot = _subject_slot_of(frame)
+    places = _themes_for_classes(WORD_THEMES, ("place",))
+    top = 0
+
+    for group in groups:
+        predicate = max(
+            _longest_of(pool) for pool in _predicate_pools(group.words, group.forms, group.past)
+        )
+        total = marks + tag
+
+        for index, part in enumerate(frame.parts):
+
+            def phrase(
+                themes: Sequence[WordTheme],
+                pool_of: Callable[[WordTheme], WordPool],
+                part: SentencePart = part,
+            ) -> int:
+                # A noun phrase, as long as the longest noun of `themes` with the longest
+                # modifier its theme takes.
+                longest = 0
+
+                for theme in themes:
+                    noun = _longest_of(pool_of(theme))
+
+                    if noun:
+                        narrowed = {
+                            **bounds,
+                            part.slot: (1, noun),
+                            "modifier": (1, _modifier_top(language, theme)),
+                        }
+                        longest = max(longest, _part_range(part, data, narrowed)[1])
+
+                return longest or _part_range(part, data, bounds)[1]
+
+            if part.slot == "subject" and subject_slot == "subject":
+                high = phrase(
+                    _subject_themes_of(language, data, group, WORD_THEMES, "full"),
+                    lambda theme: _subject_pool_for(language, data, group, theme, "full"),  # noqa: B023
+                )
+            elif part.slot == "object" and isinstance(group, VerbGroup):
+                high = phrase(
+                    _object_themes_of(language, data, group, None, "full"),
+                    lambda theme: _object_pool_for(language, data, group, theme, "full"),  # noqa: B023
+                )
+            elif part.slot in ("place", "destination"):
+                high = phrase(
+                    places if part.slot == "place" else DESTINATION_THEMES,
+                    lambda theme: _place_pool_for(language, data, theme, "full"),
+                )
+            elif part.slot in ("verb", "state"):
+                high = _part_range(part, data, {**bounds, part.slot: (1, predicate)})[1]
+            else:
+                high = _part_range(part, data, bounds)[1]
+
+            total += (0 if index == 0 else len(data.space)) + high
+
+        top = max(top, total)
+
+    return top or 1 << 30
+
+
+def _longest_of(pool: WordPool) -> int:
+    """The longest entry of a pool, or 0 for an empty one."""
+    return pool_bounds(pool)[1] if pool else 0
+
+
+def _modifier_top(language: WordLanguage, theme: WordTheme) -> int:
+    """The longest modifier a noun of `theme` takes, in any singular form it agrees in.
+
+    A sentence writes no noun that has no singular, so a plural ending is never written.
+    """
+    agreement = WORD_DATA[language].agreement
+    genders: list[WordGender | None] = [
+        None,
+        *(gender for gender in (agreement or {}) if gender not in ("p", "fp")),
+    ]
+
+    return max(_longest_of(_modifiers_for(language, theme, gender)) for gender in genders)
 
 
 def _natural_span(
@@ -4070,6 +4210,74 @@ def _generate_result(language: WordLanguage, settings: Settings) -> Result:
             tense,
         )
 
+    def tell_paragraph() -> Result:
+        """The result as a paragraph about one topic, which is what a story falls back to."""
+        paragraph = telling()
+        flow = paragraph.flow
+        spent = paragraph.spent
+        described = paragraph.described
+        names = paragraph.names
+
+        built: list[Built] = []
+        topic: Topic | None = None
+        scene: Mapping[SentenceSlot, Requirement] = {}
+
+        for budget in budgets:
+            type_, mark = _kind_for(data, settled, room, budget, flow)
+            follow = None if topic is None else _follow_for(data, topic, scene, flow.repeated)
+            item = scene.get("object")
+            last = built[-1] if built else None
+            draw = Draw(
+                budget,
+                type_,
+                mark,
+                _quote_for(data, type_, settings.quote),
+                _opener_for(data, mark, follow, budget[1], shortest, flow),
+                _style_for(type_, settings.style, voice),
+                frozenset(spent),
+                frozenset(described),
+                frozenset(names),
+                follow,
+                tense,
+                None,
+                None,
+                max((one.day_at for one in built), default=-1),
+                object=_object_reference_for(language, data, item.word, False, last.object.named)
+                if item is not None
+                and last is not None
+                and last.object is not None
+                and last.object.noun == item.word
+                else None,
+                dated=_time_spent(built, settings.sentences),
+                owed=tuple(paragraph.owed),
+            )
+            one, opened = _draw_one(paragraph, draw)
+
+            built.append(one)
+            scene = one.scene
+            paragraph.owed[:] = [
+                each for each in paragraph.owed if all(each is not p for p in one.placed)
+            ]
+            spent.update(one.used)
+            described.update(one.described)
+            names.update(one.names)
+            flow.run = flow.run + 1 if type_ == flow.last else 1
+            flow.last = type_
+            flow.mark = mark
+            flow.opened = bool(opened)
+            flow.repeated = follow is None or follow.reference == "repeat"
+
+            if opened:
+                flow.openers.add(opened)
+
+            if flow.lead is None:
+                flow.lead = type_
+
+            if topic is None:
+                topic = _topic_of(one)
+
+        return Result(built, tense, None, built[0].theme)
+
     # More than one sentence is a story, when the language can tell one about the
     # subject asked for. It always can — every class has a story — so the paragraph
     # below is what a result falls back to rather than what it usually is. A story that
@@ -4094,74 +4302,25 @@ def _generate_result(language: WordLanguage, settings: Settings) -> Result:
             if miss == 0:
                 break
 
-        if closest is not None:
+        # A story whose every telling missed the range is set beside the paragraph a result
+        # falls back to, and the closer of the two is kept: a story's steps write short
+        # sentences — a hero who is hungry, a hero who sits down — and asked for the
+        # middle of what three Korean sentences can be, the story fell short two times in
+        # three. A story the caller named is told whatever its length, the way it wins
+        # over a name.
+        if closest is not None and (missed == 0 or settings.story is not None):
             return closest
 
-    paragraph = telling()
-    flow = paragraph.flow
-    spent = paragraph.spent
-    described = paragraph.described
-    names = paragraph.names
+        if closest is not None:
+            fallback = tell_paragraph()
 
-    built: list[Built] = []
-    topic: Topic | None = None
-    scene: Mapping[SentenceSlot, Requirement] = {}
+            return (
+                fallback
+                if _distance_from(_length_of(data, fallback.built), whole) < missed
+                else closest
+            )
 
-    for budget in budgets:
-        type_, mark = _kind_for(data, settled, room, budget, flow)
-        follow = None if topic is None else _follow_for(data, topic, scene, flow.repeated)
-        item = scene.get("object")
-        last = built[-1] if built else None
-        draw = Draw(
-            budget,
-            type_,
-            mark,
-            _quote_for(data, type_, settings.quote),
-            _opener_for(data, mark, follow, budget[1], shortest, flow),
-            _style_for(type_, settings.style, voice),
-            frozenset(spent),
-            frozenset(described),
-            frozenset(names),
-            follow,
-            tense,
-            None,
-            None,
-            max((one.day_at for one in built), default=-1),
-            object=_object_reference_for(language, data, item.word, False, last.object.named)
-            if item is not None
-            and last is not None
-            and last.object is not None
-            and last.object.noun == item.word
-            else None,
-            dated=_time_spent(built, settings.sentences),
-            owed=tuple(paragraph.owed),
-        )
-        one, opened = _draw_one(paragraph, draw)
-
-        built.append(one)
-        scene = one.scene
-        paragraph.owed[:] = [
-            each for each in paragraph.owed if all(each is not p for p in one.placed)
-        ]
-        spent.update(one.used)
-        described.update(one.described)
-        names.update(one.names)
-        flow.run = flow.run + 1 if type_ == flow.last else 1
-        flow.last = type_
-        flow.mark = mark
-        flow.opened = bool(opened)
-        flow.repeated = follow is None or follow.reference == "repeat"
-
-        if opened:
-            flow.openers.add(opened)
-
-        if flow.lead is None:
-            flow.lead = type_
-
-        if topic is None:
-            topic = _topic_of(one)
-
-    return Result(built, tense, None, built[0].theme)
+    return tell_paragraph()
 
 
 # --- Telling a story --------------------------------------------------------
@@ -4334,6 +4493,22 @@ class Told:
     mark: SentenceMark
     opened: str
     follow: Follow | None
+
+
+@dataclass
+class _StoryState:
+    """What telling one sentence of a story changes, held to be put back."""
+
+    owed: list[Requirement]
+    spent: set[str]
+    described: set[str]
+    names: set[str]
+    roles: Roles
+    line: SentenceStyle | None
+    topic: Topic | None
+    day_at: int
+    placed: bool
+    hero_last: bool
 
 
 def _tell_story(telling: Telling) -> Result | None:
@@ -4954,6 +5129,67 @@ def _tell_story(telling: Telling) -> Result | None:
 
         return Told(one, type_, mark, opened, follow)
 
+    def snapshot() -> _StoryState:
+        """Everything telling a sentence changes, to be put back before it is told again."""
+        return _StoryState(
+            owed=list(telling.owed),
+            spent=set(telling.spent),
+            described=set(telling.described),
+            names=set(telling.names),
+            roles=replace(roles),
+            line=telling.flow.line,
+            topic=topic,
+            day_at=day_at,
+            placed=placed,
+            hero_last=hero_last,
+        )
+
+    def restore(state: _StoryState) -> None:
+        """Put the story back the way `snapshot` found it."""
+        nonlocal topic, day_at, placed, hero_last
+        telling.owed[:] = state.owed
+
+        for held, kept in (
+            (telling.spent, state.spent),
+            (telling.described, state.described),
+            (telling.names, state.names),
+        ):
+            held.clear()
+            held.update(kept)
+
+        roles.item, roles.prop = state.roles.item, state.roles.prop
+        roles.place, roles.home = state.roles.place, state.roles.home
+        telling.flow.line = state.line
+        topic, day_at, placed, hero_last = state.topic, state.day_at, state.placed, state.hero_last
+
+    def tell_fitted(beat: Beat, budget: tuple[int, int], attempts: int) -> Told:
+        """One sentence, drawn again while it misses its share of the range.
+
+        A sentence that falls short hands what it did not use to the ones after it, and a
+        run of them a few characters short each left the last a gap no shape of its step
+        could fill. The closest draw is kept, and the story is put back the way it was
+        before each try. The last sentence gets more tries, because what it has left is
+        the whole of what the result can still do.
+        """
+        before = snapshot()
+        best = tell(beat, budget, None)
+        missed = _distance_from(len(best.one.sentence), budget)
+        attempt = 1
+
+        while attempt < attempts and missed > 0:
+            attempt += 1
+            kept = snapshot()
+            restore(before)
+            retry = tell(beat, budget, None)
+            miss = _distance_from(len(retry.one.sentence), budget)
+
+            if miss < missed:
+                best, missed = retry, miss
+            else:
+                restore(kept)
+
+        return best
+
     # The range is shared out again after every sentence, over the ones still to come: a
     # sentence that fell short hands what it did not use to the next one.
     total_min = sum(budget[0] for budget in telling.budgets) + len(data.space) * (
@@ -5020,7 +5256,9 @@ def _tell_story(telling: Telling) -> Result | None:
             ):
                 told = tell(unjoined(beat), budget, None)
         else:
-            told = tell(beat, budget, None)
+            told = tell_fitted(
+                beat, budget, _LAST_ATTEMPTS if i == len(beats) - 1 else _SHARE_ATTEMPTS
+            )
 
         built.append(told.one)
         last = told.one

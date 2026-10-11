@@ -7,10 +7,10 @@ Every sentence length the language can produce, in characters. That is what [`ra
 ```javascript
 import { sentenceLengthRange } from 'randino';
 
-sentenceLengthRange('ko'); // [5, 55]
-sentenceLengthRange('en'); // [11, 118]
-sentenceLengthRange('zh'); // [4, 33]
-sentenceLengthRange(); // [4, 147] — every language at once
+sentenceLengthRange('ko'); // [5, 53]
+sentenceLengthRange('en'); // [11, 117]
+sentenceLengthRange('zh'); // [4, 31]
+sentenceLengthRange(); // [4, 128] — every language at once
 ```
 
 :::
@@ -20,10 +20,10 @@ sentenceLengthRange(); // [4, 147] — every language at once
 ```dart
 import 'package:randino/randino.dart';
 
-sentenceLengthRange(WordLanguage.ko); // LengthRange(5, 55)
-sentenceLengthRange(WordLanguage.en); // LengthRange(11, 118)
-sentenceLengthRange(WordLanguage.zh); // LengthRange(4, 33)
-sentenceLengthRange(); // LengthRange(4, 147) — every language at once
+sentenceLengthRange(WordLanguage.ko); // LengthRange(5, 53)
+sentenceLengthRange(WordLanguage.en); // LengthRange(11, 117)
+sentenceLengthRange(WordLanguage.zh); // LengthRange(4, 31)
+sentenceLengthRange(); // LengthRange(4, 128) — every language at once
 ```
 
 :::
@@ -33,10 +33,10 @@ sentenceLengthRange(); // LengthRange(4, 147) — every language at once
 ```python
 from randino import sentence_length_range
 
-sentence_length_range("ko")  # (5, 55)
-sentence_length_range("en")  # (11, 118)
-sentence_length_range("zh")  # (4, 33)
-sentence_length_range()  # (4, 147) — every language at once
+sentence_length_range("ko")  # (5, 53)
+sentence_length_range("en")  # (11, 117)
+sentence_length_range("zh")  # (4, 31)
+sentence_length_range()  # (4, 128) — every language at once
 ```
 
 :::
@@ -49,7 +49,7 @@ Returns <Lang js="[min, max]" dart="a LengthRange" py="(min, max)" code />, both
 
 ## The default range {#why-the-range-is-so-wide}
 
-The range is wide because its ends are extremes. The lower end is the shortest shape with the shortest words in it, and the upper end the longest shape with a modifier on every phrase. A sentence that lands anywhere between the two is a sentence the language can write, and the frame weights rather than the ends decide which one you get.
+The range is wide because its ends are extremes. The lower end is the shortest shape with the shortest words in it, and the upper end the longest shape with a modifier on every phrase, measured predicate by predicate: each phrase is as long as the longest noun the predicate takes there, so the top is one a sentence comes close to rather than every slot's longest word added up. A sentence that lands anywhere between the two is a sentence the language can write, and the frame weights rather than the ends decide which one you get.
 
 That is also what makes narrowing it useful. Ask for a short range and the shapes that cannot fit drop out:
 

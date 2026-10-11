@@ -118,6 +118,14 @@ const FIT_ATTEMPTS = 14;
 // hundred and twenty. Telling the whole story again is what closes that.
 const STORY_ATTEMPTS = 3;
 
+// How many times the last sentence of a story is drawn against what is left of
+// the range before the closest is kept. A sentence is one shape's draw, where a
+// telling is the whole story again, so this is the cheaper way to land.
+const LAST_ATTEMPTS = 8;
+
+// And how many times any other sentence of a story is, against its own share.
+const SHARE_ATTEMPTS = 3;
+
 // How many times a name is drawn again when it is one the result already
 // carries. Two people in one story sharing a name reads as a mistake.
 const NAME_ATTEMPTS = 6;
@@ -1397,11 +1405,141 @@ function frameRange(
 		max += gap + high;
 	}
 
-	const range: readonly [number, number] = [min, max];
+	// Against the language's own words, the top is worked out predicate by
+	// predicate rather than slot by slot: see `frameTop`.
+	const language = languageOfData(data);
+	const top = bounds === slotBounds(language) ? frameTop(language, frame, data) : max;
+	const range: readonly [number, number] = [min, Math.max(min, Math.min(max, top))];
 
 	byBounds.set(bounds, range);
 
 	return range;
+}
+
+let dataLanguages: Map<SentenceLanguageData, WordLanguage> | null = null;
+
+/** The language a sentence dataset belongs to. */
+function languageOfData(data: SentenceLanguageData): WordLanguage {
+	dataLanguages ??= new Map(
+		(Object.entries(SENTENCE_DATA) as [WordLanguage, SentenceLanguageData][]).map(
+			([code, each]) => [each, code]
+		)
+	);
+
+	return dataLanguages.get(data)!;
+}
+
+/**
+ * The longest a shape can be with the language's own words, worked out for each
+ * predicate it can take. Adding up the longest word of every slot claimed lengths
+ * no sentence reaches, because the longest noun is seldom one the longest verb
+ * takes, or one a place can be: Spanish was said to write 147 characters and wrote
+ * 118, Japanese 63 and wrote 52. So each slot is measured against what the
+ * predicate lets into it — the subjects and objects of its themes, the places
+ * a place can be, the modifiers each theme takes — and the shape is the longest
+ * of its predicates. Still a top rather than a promise, since it does not ask
+ * whether the longest subject and the longest object go together.
+ */
+function frameTop(
+	language: WordLanguage,
+	frame: SentenceFrame,
+	data: SentenceLanguageData
+): number {
+	const bounds = slotBounds(language);
+	const marks = Math.max(...Object.values(data.terminators).map((mark) => mark.length));
+	const tag = frame.tag ? frame.tag.length + data.space.length : 0;
+	const headed = headOf(frame);
+	const destination = frame.parts.some((part) => part.slot === 'destination');
+	const groups: readonly (VerbGroup | StateGroup)[] =
+		headed === 'copula'
+			? [data.calendar!.copula]
+			: headed === 'state'
+				? data.states
+				: data.verbs.filter(
+						(group) =>
+							(group.object !== undefined) === takesObject(frame) &&
+							(!group.requires || frame.parts.some((part) => part.slot === group.requires)) &&
+							(!destination || group.requires === 'destination')
+					);
+	const subjectSlot = subjectSlotOf(frame);
+	const places = themesForClasses(WORD_THEMES, ['place']);
+	let top = 0;
+
+	for (const group of groups) {
+		const predicate = Math.max(...predicatePools(group).map((pool) => longestOf(pool)));
+		let total = marks + tag;
+
+		frame.parts.forEach((part, i) => {
+			// A noun phrase, as long as the longest noun of `themes` with the longest
+			// modifier its theme takes.
+			const phrase = (themes: readonly WordTheme[], poolOf: (theme: WordTheme) => WordPool) => {
+				let longest = 0;
+
+				for (const theme of themes) {
+					const noun = longestOf(poolOf(theme));
+
+					if (noun) {
+						const narrowed: Record<string, readonly [number, number]> = {
+							...bounds,
+							[part.slot]: [1, noun],
+							modifier: [1, modifierTop(language, theme)]
+						};
+
+						longest = Math.max(longest, partRange(part, data, narrowed)[1]);
+					}
+				}
+
+				return longest || partRange(part, data, bounds)[1];
+			};
+			const vocabulary: RandVocabulary = 'full';
+			const high =
+				part.slot === 'subject' && subjectSlot === 'subject'
+					? phrase(subjectThemesOf(group, WORD_THEMES, language, data, vocabulary), (theme) =>
+							subjectPoolFor(language, data, group, theme, vocabulary)
+						)
+					: part.slot === 'object' && 'field' in group
+						? phrase(objectThemesOf(group, null, language, data, vocabulary), (theme) =>
+								objectPoolFor(language, data, group, theme, vocabulary)
+							)
+						: part.slot === 'place' || part.slot === 'destination'
+							? phrase(part.slot === 'place' ? places : DESTINATION_THEMES, (theme) =>
+									placePoolFor(language, data, theme, vocabulary)
+								)
+							: part.slot === 'verb' || part.slot === 'state'
+								? partRange(part, data, { ...bounds, [part.slot]: [1, predicate] })[1]
+								: partRange(part, data, bounds)[1];
+
+			total += (i === 0 ? 0 : data.space.length) + high;
+		});
+
+		top = Math.max(top, total);
+	}
+
+	return top || Infinity;
+}
+
+/** The longest entry of a pool, or `0` for an empty one. */
+function longestOf(pool: WordPool): number {
+	return pool.length ? poolBounds(pool)[1] : 0;
+}
+
+/**
+ * The longest modifier a noun of `theme` takes, in any singular form it agrees
+ * in: a sentence writes no noun that has no singular, so a plural ending is never
+ * written.
+ */
+function modifierTop(language: WordLanguage, theme: WordTheme): number {
+	const agreement = WORD_DATA[language].agreement;
+	const genders: (WordGender | undefined)[] = agreement
+		? [
+				undefined,
+				...(Object.keys(agreement) as WordGender[]).filter(
+					(gender) => gender !== 'p' && gender !== 'fp'
+				)
+			]
+		: [undefined];
+
+	return Math.max(...genders.map((gender) => longestOf(modifiersFor(language, theme, gender))));
 }
 
 /** The shortest and longest sentence a set of shapes can produce. */
@@ -4065,79 +4203,96 @@ function generateResult(language: WordLanguage, settings: Settings): Result {
 			}
 		}
 
-		if (closest) {
+		// A story whose every telling missed the range is set beside the paragraph a
+		// result falls back to, and the closer of the two is kept: a story's steps
+		// write short sentences — a hero who is hungry, a hero who sits down — and
+		// asked for the middle of what three Korean sentences can be, the story fell
+		// short two times in three. A story the caller named is told whatever its
+		// length, the way it wins over a name.
+		if (closest && (missed === 0 || settings.story !== null)) {
 			return closest;
 		}
-	}
 
-	const paragraph = telling();
-	const { flow, spent, described, names } = paragraph;
+		if (closest) {
+			const fallback = tellParagraph();
 
-	for (let i = 0; i < settings.sentences; i += 1) {
-		const budget = budgets[i];
-		const [type, mark] = kindFor(data, settled, room, budget, flow);
-		const follow = topic ? followFor(data, topic, scene, flow.repeated) : null;
-		const item = scene.get('object');
-		const last = built.length ? built[built.length - 1] : null;
-		const draw: Draw = {
-			budget,
-			type,
-			mark,
-			quote: quoteFor(data, type, settings.quote),
-			opener: openerFor(data, mark, follow, budget[1], shortest, flow),
-			style: styleFor(type, settings.style, voice),
-			avoid: spent,
-			described,
-			names,
-			follow,
-			owed: paragraph.owed,
-			tense,
-			beat: null,
-			link: null,
-			dayAt: built.reduce((latest, one) => Math.max(latest, one.dayAt), -1),
-			dated: timeSpent(built, settings.sentences),
-			object:
-				item && last?.object?.noun === item.word
-					? objectReferenceFor(language, data, item.word, false, last.object.named)
-					: null,
-			speech: null,
-			spoken: false
-		};
-		const [one, opened] = drawOne(paragraph, draw);
-
-		built.push(one);
-		scene = one.scene;
-		paragraph.owed = paragraph.owed.filter((requirement) => !one.placed.includes(requirement));
-
-		for (const word of one.used) {
-			spent.add(word);
-		}
-
-		for (const noun of one.described) {
-			described.add(noun);
-		}
-
-		for (const name of one.names) {
-			names.add(name);
-		}
-
-		flow.run = type === flow.last ? flow.run + 1 : 1;
-		flow.last = type;
-		flow.mark = mark;
-		flow.opened = Boolean(opened);
-		flow.lead ??= type;
-		flow.repeated = follow ? follow.reference === 'repeat' : true;
-
-		if (opened) {
-			flow.openers.add(opened);
-		}
-
-		if (!topic) {
-			topic = topicOf(one);
+			return distanceFrom(lengthOf(data, fallback.built), [min, max]) < missed ? fallback : closest;
 		}
 	}
 
-	return { built, tense, story: null, theme: built[0].theme };
+	return tellParagraph();
+
+	/** The result as a paragraph about one topic, which is what a story falls back to. */
+	function tellParagraph(): Result {
+		const paragraph = telling();
+		const { flow, spent, described, names } = paragraph;
+
+		for (let i = 0; i < settings.sentences; i += 1) {
+			const budget = budgets[i];
+			const [type, mark] = kindFor(data, settled, room, budget, flow);
+			const follow = topic ? followFor(data, topic, scene, flow.repeated) : null;
+			const item = scene.get('object');
+			const last = built.length ? built[built.length - 1] : null;
+			const draw: Draw = {
+				budget,
+				type,
+				mark,
+				quote: quoteFor(data, type, settings.quote),
+				opener: openerFor(data, mark, follow, budget[1], shortest, flow),
+				style: styleFor(type, settings.style, voice),
+				avoid: spent,
+				described,
+				names,
+				follow,
+				owed: paragraph.owed,
+				tense,
+				beat: null,
+				link: null,
+				dayAt: built.reduce((latest, one) => Math.max(latest, one.dayAt), -1),
+				dated: timeSpent(built, settings.sentences),
+				object:
+					item && last?.object?.noun === item.word
+						? objectReferenceFor(language, data, item.word, false, last.object.named)
+						: null,
+				speech: null,
+				spoken: false
+			};
+			const [one, opened] = drawOne(paragraph, draw);
+
+			built.push(one);
+			scene = one.scene;
+			paragraph.owed = paragraph.owed.filter((requirement) => !one.placed.includes(requirement));
+
+			for (const word of one.used) {
+				spent.add(word);
+			}
+
+			for (const noun of one.described) {
+				described.add(noun);
+			}
+
+			for (const name of one.names) {
+				names.add(name);
+			}
+
+			flow.run = type === flow.last ? flow.run + 1 : 1;
+			flow.last = type;
+			flow.mark = mark;
+			flow.opened = Boolean(opened);
+			flow.lead ??= type;
+			flow.repeated = follow ? follow.reference === 'repeat' : true;
+
+			if (opened) {
+				flow.openers.add(opened);
+			}
+
+			if (!topic) {
+				topic = topicOf(one);
+			}
+		}
+
+		return { built, tense, story: null, theme: built[0].theme };
+	}
 }
 
 // How many of a result's sentences may say when, as a share of its count: one in
@@ -5050,6 +5205,79 @@ function tellStory(telling: Telling): Result | null {
 		return [one, type, mark, opened, follow];
 	};
 
+	/** Everything telling a sentence changes, to be put back before it is told again. */
+	const snapshot = () => ({
+		owed: telling.owed,
+		spent: new Set(spent),
+		described: new Set(described),
+		names: new Set(names),
+		roles: { ...roles },
+		line: flow.line,
+		topic,
+		dayAt,
+		placed,
+		heroLast
+	});
+	const restore = (state: ReturnType<typeof snapshot>): void => {
+		telling.owed = state.owed;
+
+		for (const [set, held] of [
+			[spent, state.spent],
+			[described, state.described],
+			[names, state.names]
+		] as const) {
+			set.clear();
+			held.forEach((each) => set.add(each));
+		}
+
+		for (const key of Object.keys(roles) as (keyof Roles)[]) {
+			delete roles[key];
+		}
+
+		Object.assign(roles, state.roles);
+		flow.line = state.line;
+		topic = state.topic;
+		dayAt = state.dayAt;
+		placed = state.placed;
+		heroLast = state.heroLast;
+	};
+	/**
+	 * One sentence, drawn again while it misses its share of the range. A sentence
+	 * that falls short hands what it did not use to the ones after it, and a run of
+	 * them a few characters short each left the last a gap no shape of its step
+	 * could fill: five Korean sentences missed the middle of a range a third of the
+	 * time, every one of them short. The closest draw is kept, and the story is put
+	 * back the way it was before each try. The last sentence gets more tries,
+	 * because what it has left is the whole of what the result can still do.
+	 */
+	const tellFitted = (
+		beat: Beat,
+		budget: readonly [number, number],
+		attempts: number
+	): [Built, SentenceType, SentenceMark, string, Follow | null] => {
+		const before = snapshot();
+		let best = tell(beat, budget, null);
+		let missed = distanceFrom(best[0].sentence.length, budget);
+
+		for (let attempt = 1; attempt < attempts && missed > 0; attempt += 1) {
+			const kept = snapshot();
+
+			restore(before);
+
+			const retry = tell(beat, budget, null);
+			const miss = distanceFrom(retry[0].sentence.length, budget);
+
+			if (miss < missed) {
+				best = retry;
+				missed = miss;
+			} else {
+				restore(kept);
+			}
+		}
+
+		return best;
+	};
+
 	// The range is shared out again after every sentence, over the ones still to
 	// come: a sentence that fell short hands what it did not use to the next one,
 	// so the result lands inside its range even when one of its sentences could
@@ -5127,7 +5355,11 @@ function tellStory(telling: Telling): Result | null {
 				[one, type, mark, opened, follow] = tell({ ...beat, join: null }, budget, null);
 			}
 		} else {
-			[one, type, mark, opened, follow] = tell(beat, budget, null);
+			[one, type, mark, opened, follow] = tellFitted(
+				beat,
+				budget,
+				i === beats.length - 1 ? LAST_ATTEMPTS : SHARE_ATTEMPTS
+			);
 		}
 
 		built.push(one);

@@ -47,7 +47,6 @@ A fix to a generator added under `vNext` needs no changelog entry of its own, si
 
 ### B. Decided, being worked through
 
-- **B63. The top of `sentenceLengthRange` cannot be reached, and multi-sentence results miss the middle of a range.** `ko` reaches 47 of a claimed 55; three sentences miss a mid range 57 to 94% of the time. Re-measuring changes the numbers returned; a fallback changes the output. A test on the middle of a multi-sentence range goes with it, since it fails until one of the two is done. Decided: re-measure the top, and redraw the last sentence of a result against what is left of the range.
 - **B65. Split the word data for bundling.** `randAnimal` alone is 260 KB, and `randModifier` uses about 87 KB of the 260 KB it pulls. Splitting modifiers and grammar from the nouns by theme touches three packages and `tools/parity`; an invented word is looked up in every theme, which limits what a themed function saves. Decided: split the modifiers and frames from the nouns, in the JavaScript package only.
 - **B66. Encode or split the location data.** Front-coding the US outline is 134 KB to 114 KB gzipped, and emitting region names apart would keep `randRegion` off the outline. Both change the generated files. Decided: emit the region names apart; no front-coding.
 - **B68. The site description.** The `<meta>` description, the home hero and the `llms.txt` preamble describe only names, nicknames, words and sentences. Decided: rewrite the description for everything the library generates, in both locales.

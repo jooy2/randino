@@ -1070,7 +1070,7 @@ Each language handles the pronoun its own way. English writes `it`; Korean, Japa
 
 A name is the exception, because it is the one subject that does carry a gender. `Philip counts the prime. He forgets it in the supernova.` is English standing `he` where `the locksmith` could only ever be named again. A language that writes no gendered pronoun is unaffected: Korean drops the subject rather than saying `그것` about somebody.
 
-The length range describes the whole string, whatever the sentence count. It is shared out across the sentences before any of them is drawn, and the last one takes the rounding.
+The length range describes the whole string, whatever the sentence count. It is shared out across the sentences before any of them is drawn, the last one takes the rounding, and a sentence that misses its share is drawn again before the rest are. A story's steps write short sentences, so a story whose every telling still misses the range is set beside a paragraph about one topic, and the closer of the two is kept: asked for the middle of what three sentences can be, about half the results are paragraphs rather than stories. A `story` you named is told whatever its length.
 
 ::: lang js
 

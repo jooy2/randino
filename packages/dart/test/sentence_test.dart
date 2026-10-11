@@ -3413,6 +3413,69 @@ void main() {
       }
     });
 
+    test('the top of sentenceLengthRange is one a sentence comes close to', () {
+      // The top was every slot's longest word added up, and the longest noun is
+      // seldom one the longest verb takes: Spanish claimed 147 characters and
+      // wrote 120 at most, Japanese 63 and wrote 52. It is worked out per
+      // predicate now, and aimed at the top fifteen percent of its range every
+      // language writes something inside it.
+      for (final language in wordLanguages) {
+        final max = sentenceLengthRange(language).max;
+        final floor = (max * 0.85).floor();
+        final drawn = randSentence(
+          language: language,
+          minLength: floor,
+          maxLength: max,
+          count: 200,
+        );
+
+        expect(
+          drawn.any((sentence) => sentence.length >= floor),
+          isTrue,
+          reason: '${language.name}: nothing reached $floor of $max',
+        );
+      }
+    });
+
+    test('a result of three sentences lands in the middle of its range', () {
+      // Asked for the middle of what three sentences can be, give or take a
+      // tenth, a story fell short most of the time: its steps write short
+      // sentences, and the top it aimed at could not be reached. Every language
+      // now lands at least one time in three, and most of them nearly always.
+      var landed = 0;
+      var drawn = 0;
+
+      for (final language in wordLanguages) {
+        final range = sentenceLengthRange(language);
+        final gaps = 2 * sentenceData[language]!.space.length;
+        final min = range.min * 3 + gaps;
+        final max = range.max * 3 + gaps;
+        final middle = ((min + max) / 2).round();
+        final spread = ((max - min) / 10).round();
+        final results = randSentence(
+          language: language,
+          sentences: 3,
+          minLength: middle - spread,
+          maxLength: middle + spread,
+          count: sample,
+        );
+        final inside =
+            results
+                .where((each) => each.length >= middle - spread && each.length <= middle + spread)
+                .length;
+
+        expect(
+          inside * 3,
+          greaterThanOrEqualTo(results.length),
+          reason: '${language.name}: $inside',
+        );
+        landed += inside;
+        drawn += results.length;
+      }
+
+      expect(landed, greaterThanOrEqualTo(drawn * 0.75));
+    });
+
     test('sentenceLengthRange reports what the language can produce', () {
       for (final language in wordLanguages) {
         final range = sentenceLengthRange(language);

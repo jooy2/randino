@@ -167,7 +167,7 @@ rand_sentence(language="ko", output="detail")
 #                 phrases=('검은 고양이', '숲', '잠잔다'),
 #                 slots=('subject', 'place', 'verb'), language='ko', theme='animal')]
 
-sentence_length_range("en")  # (12, 92)
+sentence_length_range("en")  # (11, 117)
 ```
 
 | Argument                    | Type                                | Default   |
@@ -698,7 +698,7 @@ name_length_range("en", include_middle_name=True)  # (11, 32)
 name_supports_middle_name("ko")  # False
 name_supports_roman("en")  # False
 nickname_length_range("ko")  # (1, 13)
-sentence_length_range("ko")  # (5, 43)
+sentence_length_range("ko")  # (5, 53)
 ```
 
 `NAME_LANGUAGES`, `WORD_LANGUAGES`, `WORD_THEMES`, `LOCATION_LANGUAGES`, `LOCATION_LEVELS`, `AGE_GROUPS`, `ORGANIZATION_TYPES`, `ORGANIZATION_INDUSTRIES`, `DATE_UNITS`, `PHONE_COUNTRIES`, `PHONE_TYPES`, `SYSTEM_PLATFORMS`, `DEVICE_TYPES`, `RAM_UNITS`, `DISK_TYPES`, `DISK_UNITS` and `ARCHITECTURES` list what the generators accept; `RAND_COUNT_MAX`, `RAND_LENGTH_MIN` / `MAX`, `RAND_LOCATION_LENGTH_MAX`, `RAND_AGE_MAX`, `RAND_ORGANIZATION_LENGTH_MAX`, `AFFIX_LENGTH_DEFAULT` / `MAX`, `AFFIX_SEPARATOR_DEFAULT` and `AFFIX_CHARSET` are the bounds and defaults every argument is clamped to.

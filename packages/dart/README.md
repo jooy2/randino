@@ -158,7 +158,7 @@ randSentence(language: WordLanguage.en, include: <String>['brave', 'lion']);
 randSentenceDetails(language: WordLanguage.ko).first;
 // SentenceDetail(검은 고양이가 숲에서 잠잔다., [검은 고양이, 숲, 잠잔다], ko, animal)
 
-sentenceLengthRange(WordLanguage.en); // LengthRange(12, 92)
+sentenceLengthRange(WordLanguage.en); // LengthRange(11, 117)
 ```
 
 | Parameter                 | Type                  | Default            |
@@ -624,7 +624,7 @@ nameLengthRange(language: NameLanguage.en, includeMiddleName: true); // LengthRa
 nameSupportsMiddleName(NameLanguage.ko); // false
 nameSupportsRoman(NameLanguage.en); // false
 nicknameLengthRange(language: WordLanguage.ko); // LengthRange(1, 13)
-sentenceLengthRange(WordLanguage.ko); // LengthRange(5, 43)
+sentenceLengthRange(WordLanguage.ko); // LengthRange(5, 53)
 ```
 
 `nameLanguages`, `wordLanguages`, `wordThemes`, `locationLanguages`, `locationLevels`, `ageGroups`, `organizationTypes`, `organizationIndustries`, `dateUnits`, `phoneCountries`, `phoneTypes`, `systemPlatforms`, `deviceTypes`, `ramUnits`, `diskTypes`, `diskUnits` and `architectures` list what the generators accept; `randCountMax`, `randLengthMin` / `Max`, `randSentenceLengthMax`, `randLocationLengthMax`, `randAgeMax`, `randOrganizationLengthMax`, `affixLengthDefault` / `Max`, `affixSeparatorDefault` and `affixCharset` are the bounds and defaults every parameter is clamped to.
