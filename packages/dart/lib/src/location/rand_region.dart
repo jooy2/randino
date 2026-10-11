@@ -12,6 +12,7 @@ import 'package:randino/src/types.dart';
 /// ```dart
 /// randRegion(language: LocationLanguage.ko, count: 3); // [경기도, 부산광역시, 제주특별자치도]
 /// randRegion(language: LocationLanguage.en, count: 2); // [Ohio, New Mexico]
+/// randRegion(language: LocationLanguage.ko, short: true, count: 3); // [경기, 부산, 충북]
 /// ```
 List<String> randRegion({
   LocationLanguage? language,
@@ -20,6 +21,10 @@ List<String> randRegion({
   int? maxLength,
   String? startsWith,
   bool unique = false,
+
+  /// Write the region by its short name, without the kind it is: `서울특별시` as `서울` and `충청북도` as `충북`.
+  /// The rule is [randLocation]'s `short`.
+  bool short = false,
 
   /// Where the randomness comes from: `Random.secure()` for a value nobody may
   /// predict, `Random(42)` for one that has to come out the same every run.
@@ -34,6 +39,7 @@ List<String> randRegion({
     maxLength: maxLength,
     startsWith: startsWith,
     unique: unique,
+    short: short,
     random: random,
   ))
     detail.location,

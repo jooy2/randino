@@ -16,6 +16,7 @@ def rand_city(
     max_length: int | None = ...,
     starts_with: str = ...,
     unique: bool = ...,
+    short: bool = ...,
     random: Callable[[], float] | None = ...,
     output: Literal["value"] = ...,
 ) -> list[str]: ...
@@ -30,6 +31,7 @@ def rand_city(
     max_length: int | None = ...,
     starts_with: str = ...,
     unique: bool = ...,
+    short: bool = ...,
     random: Callable[[], float] | None = ...,
     output: Literal["detail"],
 ) -> list[LocationDetail]: ...
@@ -43,6 +45,7 @@ def rand_city(
     max_length: int | None = None,
     starts_with: str = "",
     unique: bool = False,
+    short: bool = False,
     random: Callable[[], float] | None = None,
     output: str = "value",
 ) -> list[str] | list[LocationDetail]:
@@ -63,6 +66,8 @@ def rand_city(
         ['강남구', '수원시 장안구', '양평군']
         >>> rand_city(language="en", count=2)
         ['Pasadena', 'Burlington']
+        >>> rand_city(language="ko", short=True, count=3)
+        ['강남', '수원 장안', '중구']
         >>> rand_city(language="ko", output="detail")
         [LocationDetail(location='강남구', language='ko', level='city', country='대한민국', region='서울특별시', city='강남구', district=None)]
     """
@@ -77,4 +82,5 @@ def rand_city(
         unique=unique,
         random=random,
         output=output,
+        short=short,
     )

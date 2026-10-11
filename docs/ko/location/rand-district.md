@@ -66,6 +66,32 @@ rand_district(language="en")  # []
 
 :::
 
+<Lang js="short: true" dart="short: true" py="short=True" code />를 주면 [`randLocation`](./rand-location#short)처럼 종류를 떼고 씁니다. `가현동`은 `가현`, `행주외동`은 `행주외`가 되고, 한 글자만 남는 `겸면`은 그대로입니다. 상세 출력의 `district`는 공표된 이름 그대로입니다.
+
+::: lang js
+
+```javascript
+randDistrict({ language: 'ko', short: true, count: 3 }); // ['가현', '겸면', '행주외']
+```
+
+:::
+
+::: lang dart
+
+```dart
+randDistrict(language: LocationLanguage.ko, short: true, count: 3); // [가현, 겸면, 행주외]
+```
+
+:::
+
+::: lang py
+
+```python
+rand_district(language="ko", short=True, count=3)  # ['가현', '겸면', '행주외']
+```
+
+:::
+
 ## 옵션 {#options}
 
 <LocationOptions />

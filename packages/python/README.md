@@ -212,6 +212,10 @@ rand_region(language="en", count=3)  # ['Idaho', 'Georgia', 'Vermont']
 rand_city(language="ko", count=3)  # ['함안군', '영덕군', '여수시']
 rand_district(count=3)  # ['가현동', '겸면', '행주외동']
 
+rand_location(language="ko", include_country=False, short=True)
+# ['경기 양평 단월']
+rand_region(language="ko", short=True, count=3)  # ['세종', '울산', '충북']
+
 rand_city(language="ko", output="detail")
 # [LocationDetail(location='중랑구', language='ko', level='city', country='대한민국',
 #                 region='서울특별시', city='중랑구', district=None)]
@@ -222,13 +226,14 @@ rand_city(language="ko", output="detail")
 | `language`                  | `LocationLanguageOption` | `"all"`      |
 | `level`                     | `LocationLevel`          | `"district"` |
 | `include_country`           | `bool`                   | `True`       |
+| `short`                     | `bool`                   | `False`      |
 | `count`                     | `int`                    | `1`          |
 | `min_length` / `max_length` | `int \| None`            | `None`       |
 | `starts_with`               | `str`                    | `""`         |
 | `unique`                    | `bool`                   | `False`      |
 | `output`                    | `"value" \| "detail"`    | `"value"`    |
 
-`level` is how far down the location goes: `"country"`, `"region"`, `"city"` or `"district"`. A country without that level stops at the deepest one it has, so an English location ends at its city. `include_country=False` leaves the country out of the string, which is what a fixed `language` usually wants. `rand_region`, `rand_city` and `rand_district` take the same arguments minus `level`, and hand back that one division's name. `rand_country` is the exception: its `language` is any `WordLanguage`, and it names any of the 249 ISO 3166-1 countries and territories in any of the nine languages, with each one's code in a `CountryDetail` when `output="detail"`.
+`level` is how far down the location goes: `"country"`, `"region"`, `"city"` or `"district"`. A country without that level stops at the deepest one it has, so an English location ends at its city. `include_country=False` leaves the country out of the string, which is what a fixed `language` usually wants. `short=True` writes each division without its kind, the way it is said: `서울특별시` is `서울`, `충청북도` is `충북` and `관악구` is `관악`, while a name left one character long keeps its kind (`중구`) and English names stay as they are. `rand_region`, `rand_city` and `rand_district` take the same arguments minus `level`, and hand back that one division's name. `rand_country` is the exception: its `language` is any `WordLanguage`, and it names any of the 249 ISO 3166-1 countries and territories in any of the nine languages, with each one's code in a `CountryDetail` when `output="detail"`.
 
 ## Ages
 

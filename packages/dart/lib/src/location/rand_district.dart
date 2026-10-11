@@ -13,6 +13,7 @@ import 'package:randino/src/types.dart';
 ///
 /// ```dart
 /// randDistrict(language: LocationLanguage.ko, count: 3); // [역삼동, 조치원읍, 한림읍]
+/// randDistrict(language: LocationLanguage.ko, short: true, count: 3); // [역삼, 조치원, 목동]
 /// ```
 List<String> randDistrict({
   LocationLanguage? language,
@@ -21,6 +22,10 @@ List<String> randDistrict({
   int? maxLength,
   String? startsWith,
   bool unique = false,
+
+  /// Write the district by its short name, without the kind it is: `봉천동` as `봉천` and `조치원읍` as `조치원`, while `목동` stays `목동`.
+  /// The rule is [randLocation]'s `short`.
+  bool short = false,
 
   /// Where the randomness comes from: `Random.secure()` for a value nobody may
   /// predict, `Random(42)` for one that has to come out the same every run.
@@ -35,6 +40,7 @@ List<String> randDistrict({
     maxLength: maxLength,
     startsWith: startsWith,
     unique: unique,
+    short: short,
     random: random,
   ))
     detail.location,

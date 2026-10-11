@@ -118,6 +118,10 @@ const strings = {
 		ko: '위치 맨 앞에 나라 이름을 쓸지. 언어를 정했다면 끄는 편이 깔끔하며, 상세 출력의 country는 그대로 남습니다.',
 		en: 'Open the location on its country. Turn it off once the language is fixed; the detail still reports the country.'
 	},
+	optionShort: {
+		ko: '행정구역을 종류를 뗀 줄인 이름으로 씁니다. 서울특별시는 서울, 관악구는 관악이 되고, 한 글자만 남는 이름은 그대로 둡니다.',
+		en: 'Write each division by its short name, without its kind: 서울특별시 as 서울, 관악구 as 관악. A name left one character long keeps its kind.'
+	},
 	optionLocationCount: {
 		ko: '돌려줄 결과 개수. 0 … 10000으로 제한됩니다.',
 		en: 'How many results to return. Clamped to 0 … 10000.'

@@ -35,6 +35,7 @@ import {
 	resolveLocationLanguage
 } from './data/index.js';
 import type { LocationLanguageData } from './data/types.js';
+import { shortName } from './shorten.js';
 
 /**
  * What one draw hands back: a single division's name (`randCity`), or every
@@ -51,6 +52,8 @@ type Pool = {
 	// Whether a location written out opens on its country. A single division's
 	// name has no country to leave out.
 	withCountry: boolean;
+	// Whether each division is written by its short name: 서울 for 서울특별시.
+	short: boolean;
 	// `null` for the country, which the outline does not hold.
 	entries: readonly (OutlineEntry | null)[];
 	// Every entry written out, made the first time `startsWith` or a length asks
@@ -155,10 +158,17 @@ function detailOf(pool: Pool, entry: OutlineEntry | null): LocationDetail {
 		named[level] = entry.path[depth] ?? null;
 	});
 
-	const parts = [pool.withCountry ? data.country : null, ...entry.path].filter(
+	// The names the result is written with. The detail's levels keep the ones the
+	// country publishes, so a short name can always be traced to its division.
+	const written = pool.short
+		? entry.path.map((part, depth) =>
+				part === null ? null : shortName(pool.language, data.levels[depth], part)
+			)
+		: entry.path;
+	const parts = [pool.withCountry ? data.country : null, ...written].filter(
 		(part): part is string => part !== null
 	);
-	const name = entry.path[entry.depth] as string;
+	const name = written[entry.depth] as string;
 
 	return {
 		location:
@@ -172,17 +182,18 @@ function detailOf(pool: Pool, entry: OutlineEntry | null): LocationDetail {
 	};
 }
 
-// One pool per language, form, level and whether it opens on the country, each
-// built the first time it is drawn from. A location written out is keyed by the
-// depth it stops at rather than by the level, so two levels that write the same
-// list share it.
+// One pool per language, form, level, whether it opens on the country and
+// whether it writes short names, each built the first time it is drawn from. A
+// location written out is keyed by the depth it stops at rather than by the
+// level, so two levels that write the same list share it.
 const poolCache = new WeakMap<LocationLanguageData, Map<string, Pool>>();
 
 function poolOf(
 	language: LocationLanguage,
 	form: LocationForm,
 	level: LocationLevel,
-	withCountry: boolean
+	withCountry: boolean,
+	short: boolean
 ): Pool {
 	const data = LOCATION_DATA[language];
 	let byKind = poolCache.get(data);
@@ -193,7 +204,7 @@ function poolOf(
 	}
 
 	const reach = form === 'path' && level !== 'country' ? limitOf(data, level) : level;
-	const key = `${form}:${reach}:${withCountry}`;
+	const key = `${form}:${reach}:${withCountry}:${short}`;
 	const cached = byKind.get(key);
 
 	if (cached) {
@@ -205,6 +216,7 @@ function poolOf(
 		language,
 		form,
 		withCountry,
+		short,
 		entries: entriesAt(data, form, level)
 	};
 
@@ -249,6 +261,7 @@ export function generateLocationDetails(
 	// A location at the country level is the country: leaving it out would leave
 	// nothing, so the option only reaches the levels below it.
 	const withCountry = form === 'unit' || level === 'country' || includeCountry;
+	const short = options.short === true;
 	const language = resolveLocationLanguage(options.language);
 	const prefix = resolvePrefix(options.startsWith);
 	const minLength = resolveLength(options.minLength);
@@ -259,7 +272,7 @@ export function generateLocationDetails(
 	// every language for a 읍·면·동 draws Korean rather than spending half the
 	// draws on English, which has none.
 	const candidates = languagesWriting(language, LOCATION_LANGUAGES, prefix).flatMap((code) => {
-		const pool = poolOf(code, form, level, withCountry);
+		const pool = poolOf(code, form, level, withCountry, short);
 		const indexes = !pool.entries.length
 			? []
 			: prefix || minLength !== undefined || maxLength !== undefined

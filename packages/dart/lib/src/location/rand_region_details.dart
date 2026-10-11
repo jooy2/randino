@@ -20,6 +20,10 @@ List<LocationDetail> randRegionDetails({
   String? startsWith,
   bool unique = false,
 
+  /// Write the region by its short name, without the kind it is: `서울특별시` as `서울` and `충청북도` as `충북`.
+  /// The rule is [randLocation]'s `short`.
+  bool short = false,
+
   /// Where the randomness comes from: `Random.secure()` for a value nobody may
   /// predict, `Random(42)` for one that has to come out the same every run.
   Random? random,
@@ -32,5 +36,6 @@ List<LocationDetail> randRegionDetails({
   maxLength: maxLength,
   startsWith: startsWith,
   unique: unique,
+  short: short,
   random: random,
 );

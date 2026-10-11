@@ -16,6 +16,7 @@ def rand_district(
     max_length: int | None = ...,
     starts_with: str = ...,
     unique: bool = ...,
+    short: bool = ...,
     random: Callable[[], float] | None = ...,
     output: Literal["value"] = ...,
 ) -> list[str]: ...
@@ -30,6 +31,7 @@ def rand_district(
     max_length: int | None = ...,
     starts_with: str = ...,
     unique: bool = ...,
+    short: bool = ...,
     random: Callable[[], float] | None = ...,
     output: Literal["detail"],
 ) -> list[LocationDetail]: ...
@@ -43,6 +45,7 @@ def rand_district(
     max_length: int | None = None,
     starts_with: str = "",
     unique: bool = False,
+    short: bool = False,
     random: Callable[[], float] | None = None,
     output: str = "value",
 ) -> list[str] | list[LocationDetail]:
@@ -61,6 +64,8 @@ def rand_district(
     Example:
         >>> rand_district(language="ko", count=3)
         ['역삼동', '조치원읍', '한림읍']
+        >>> rand_district(language="ko", short=True, count=3)
+        ['역삼', '조치원', '목동']
         >>> rand_district(language="ko", output="detail")
         [LocationDetail(location='역삼동', language='ko', level='district', country='대한민국', region='서울특별시', city='강남구', district='역삼동')]
     """
@@ -75,4 +80,5 @@ def rand_district(
         unique=unique,
         random=random,
         output=output,
+        short=short,
     )

@@ -90,6 +90,44 @@ final Map<LocationLanguage, Map<String, Place>> places = <LocationLanguage, Map<
     language: <String, Place>{for (final place in listed[language]!) placeKey(place): place},
 };
 
+// Every Korean region by the short name `short` writes it with.
+const Map<String, String> regionShort = <String, String>{
+  '서울특별시': '서울',
+  '부산광역시': '부산',
+  '대구광역시': '대구',
+  '인천광역시': '인천',
+  '대전광역시': '대전',
+  '울산광역시': '울산',
+  '세종특별자치시': '세종',
+  '전남광주통합특별시': '전남광주',
+  '경기도': '경기',
+  '강원특별자치도': '강원',
+  '충청북도': '충북',
+  '충청남도': '충남',
+  '전북특별자치도': '전북',
+  '경상북도': '경북',
+  '경상남도': '경남',
+  '제주특별자치도': '제주',
+};
+
+// The kinds `short` leaves off a Korean 시·군·구 and 읍·면·동.
+final Map<LocationLevel, RegExp> kinds = <LocationLevel, RegExp>{
+  LocationLevel.city: RegExp(r'[시군구]$'),
+  LocationLevel.district: RegExp(r'[동읍면]$'),
+};
+
+/// A Korean city or district name less its kind, unless that leaves one
+/// character.
+String shortOf(LocationLevel level, String name) => name
+    .split(' ')
+    .map(
+      (word) =>
+          kinds[level]!.hasMatch(word) && word.length > 2
+              ? word.substring(0, word.length - 1)
+              : word,
+    )
+    .join(' ');
+
 /// What a detail writes out, rebuilt from its own levels.
 String written(LocationDetail detail) {
   final data = locationData[detail.language]!;
@@ -423,6 +461,143 @@ void main() {
 
       expect(regions.toSet(), hasLength(regions.length));
       expect(regions, hasLength(51));
+    });
+
+    test(
+      'short writes a Korean region by its short name, and a province told apart by its half by the half',
+      () {
+        final details = randRegionDetails(
+          language: LocationLanguage.ko,
+          short: true,
+          unique: true,
+          count: 16,
+        );
+
+        expect(details, hasLength(16));
+
+        for (final detail in details) {
+          // The detail keeps the name the country publishes.
+          expect(detail.location, regionShort[detail.region], reason: detail.region);
+        }
+      },
+    );
+
+    test(
+      'short leaves the kind off a Korean city and district, unless one character would be left',
+      () {
+        final generators =
+            <(LocationLevel, List<LocationDetail>, String? Function(LocationDetail))>[
+              (
+                LocationLevel.city,
+                randCityDetails(language: LocationLanguage.ko, short: true, count: sample),
+                (d) => d.city,
+              ),
+              (
+                LocationLevel.district,
+                randDistrictDetails(language: LocationLanguage.ko, short: true, count: sample),
+                (d) => d.district,
+              ),
+            ];
+
+        for (final (level, details, named) in generators) {
+          for (final detail in details) {
+            expect(detail.location, shortOf(level, named(detail)!), reason: named(detail));
+            expect(
+              places[LocationLanguage.ko]!.containsKey(detailKey(detail)),
+              isTrue,
+              reason: named(detail),
+            );
+          }
+        }
+
+        // A city's district is written with its city, both short.
+        final su = randCity(
+          language: LocationLanguage.ko,
+          short: true,
+          startsWith: '수',
+          unique: true,
+          count: 20,
+        );
+
+        expect(su, contains('수원 장안'));
+
+        // `중구` would be `중`, so it stays `중구`.
+        final middle = randCity(
+          language: LocationLanguage.ko,
+          short: true,
+          startsWith: '중',
+          maxLength: 2,
+          unique: true,
+          count: 10,
+        );
+
+        expect(middle, contains('중구'));
+        expect(middle, isNot(contains('중')));
+      },
+    );
+
+    test(
+      'short writes a whole location with the short names, and keeps the published ones in the detail',
+      () {
+        for (final detail in randLocationDetails(
+          language: LocationLanguage.ko,
+          short: true,
+          count: sample,
+        )) {
+          final parts =
+              <String?>[
+                detail.country,
+                regionShort[detail.region],
+                detail.city == null ? null : shortOf(LocationLevel.city, detail.city!),
+                detail.district == null ? null : shortOf(LocationLevel.district, detail.district!),
+              ].nonNulls;
+
+          expect(detail.location, parts.join(' '));
+          expect(
+            places[LocationLanguage.ko]!.containsKey(detailKey(detail)),
+            isTrue,
+            reason: detail.location,
+          );
+        }
+
+        // `startsWith` and the length options read the short name.
+        for (final location in randLocation(
+          language: LocationLanguage.ko,
+          short: true,
+          includeCountry: false,
+          startsWith: '충',
+          count: sample,
+        )) {
+          expect(location, matches(RegExp(r'^충[북남] ')));
+        }
+
+        for (final region in randRegion(
+          language: LocationLanguage.ko,
+          short: true,
+          maxLength: 2,
+          count: sample,
+        )) {
+          expect(region, hasLength(2));
+        }
+      },
+    );
+
+    test('short writes English names as they are', () {
+      for (final detail in randLocationDetails(
+        language: LocationLanguage.en,
+        short: true,
+        count: sample,
+      )) {
+        expect(detail.location, written(detail));
+      }
+
+      for (final detail in randRegionDetails(
+        language: LocationLanguage.en,
+        short: true,
+        count: sample,
+      )) {
+        expect(detail.location, detail.region);
+      }
     });
 
     test('the Korean dataset stops above the 리, and writes a city district after its city', () {

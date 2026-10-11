@@ -23,6 +23,7 @@ import 'package:randino/src/gpu/data/index.dart';
 import 'package:randino/src/internal/parse.dart';
 import 'package:randino/src/location/data/countries.dart';
 import 'package:randino/src/location/data/index.dart';
+import 'package:randino/src/location/data/short.dart';
 import 'package:randino/src/location/data/types.dart';
 import 'package:randino/src/name/data/index.dart';
 import 'package:randino/src/name/data/ko.dart';
@@ -801,6 +802,20 @@ void main() {
             for (final line in countries.table.split('\n'))
               if (line.trim().isNotEmpty) line.trim().split('|'),
           ],
+        },
+        // Each language's short-name rule, null for one whose names carry no
+        // kind.
+        'short': <String, Object?>{
+          for (final entry in locationShort.entries)
+            entry.key.name: entry.value == null
+                ? null
+                : <String, Object?>{
+                    'kinds': <String, Object?>{
+                      for (final kind in entry.value!.kinds.entries) kind.key.name: kind.value,
+                    },
+                    'stem': entry.value!.stem,
+                    'halves': entry.value!.halves,
+                  },
         },
         'data': <String, Object?>{
           for (final entry in locationData.entries)

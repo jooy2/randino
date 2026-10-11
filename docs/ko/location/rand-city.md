@@ -71,6 +71,32 @@ rand_city(language="ko", starts_with="수", count=3)  # ['수영구', '수성구
 
 :::
 
+<Lang js="short: true" dart="short: true" py="short=True" code />를 주면 [`randLocation`](./rand-location#short)처럼 종류를 떼고 씁니다. `함안군`은 `함안`, `수원시 장안구`는 `수원 장안`이 되고, 한 글자만 남는 `중구`는 그대로입니다. 상세 출력의 `city`는 공표된 이름 그대로입니다.
+
+::: lang js
+
+```javascript
+randCity({ language: 'ko', short: true, count: 3 }); // ['함안', '영덕', '여수']
+```
+
+:::
+
+::: lang dart
+
+```dart
+randCity(language: LocationLanguage.ko, short: true, count: 3); // [함안, 영덕, 여수]
+```
+
+:::
+
+::: lang py
+
+```python
+rand_city(language="ko", short=True, count=3)  # ['함안', '영덕', '여수']
+```
+
+:::
+
 ## 옵션 {#options}
 
 <LocationOptions />

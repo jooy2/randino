@@ -20,6 +20,10 @@ List<LocationDetail> randCityDetails({
   String? startsWith,
   bool unique = false,
 
+  /// Write the city by its short name, without the kind it is: `관악구` as `관악` and `수원시 장안구` as `수원 장안`, while `중구` stays `중구`.
+  /// The rule is [randLocation]'s `short`.
+  bool short = false,
+
   /// Where the randomness comes from: `Random.secure()` for a value nobody may
   /// predict, `Random(42)` for one that has to come out the same every run.
   Random? random,
@@ -32,5 +36,6 @@ List<LocationDetail> randCityDetails({
   maxLength: maxLength,
   startsWith: startsWith,
   unique: unique,
+  short: short,
   random: random,
 );

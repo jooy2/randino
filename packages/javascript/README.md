@@ -221,6 +221,10 @@ randRegion({ language: 'en', count: 3 }); // ['Idaho', 'Georgia', 'Vermont']
 randCity({ language: 'ko', count: 3 }); // ['함안군', '영덕군', '여수시']
 randDistrict({ count: 3 }); // ['가현동', '겸면', '행주외동']
 
+randLocation({ language: 'ko', includeCountry: false, short: true });
+// ['경기 양평 단월']
+randRegion({ language: 'ko', short: true, count: 3 }); // ['세종', '울산', '충북']
+
 randLocation({ language: 'ko', output: 'detail' });
 // [{ location: '대한민국 전남광주통합특별시 서구 양동', language: 'ko', level: 'district',
 //    country: '대한민국', region: '전남광주통합특별시', city: '서구', district: '양동' }]
@@ -231,13 +235,14 @@ randLocation({ language: 'ko', output: 'detail' });
 | `language`                | `'all' \| 'ko' \| 'en'` | `'all'`      |
 | `level`                   | `LocationLevel`         | `'district'` |
 | `includeCountry`          | `boolean`               | `true`       |
+| `short`                   | `boolean`               | `false`      |
 | `count`                   | `number`                | `1`          |
 | `minLength` / `maxLength` | `number`                | —            |
 | `startsWith`              | `string`                | —            |
 | `unique`                  | `boolean`               | `false`      |
 | `output`                  | `'value' \| 'detail'`   | `'value'`    |
 
-`level` is how far down the location goes: `country`, `region`, `city` or `district`. A country without that level stops at the deepest one it has, so an English location ends at its city. `includeCountry: false` leaves the country out of the string, which is what a fixed `language` usually wants. `randRegion`, `randCity` and `randDistrict` take the same options minus `level`, and hand back that one division's name.
+`level` is how far down the location goes: `country`, `region`, `city` or `district`. A country without that level stops at the deepest one it has, so an English location ends at its city. `includeCountry: false` leaves the country out of the string, which is what a fixed `language` usually wants. `short: true` writes each division without its kind, the way it is said: `서울특별시` is `서울`, `충청북도` is `충북` and `관악구` is `관악`, while a name left one character long keeps its kind (`중구`) and English names stay as they are. `randRegion`, `randCity` and `randDistrict` take the same options minus `level`, and hand back that one division's name.
 
 `randCountry` names any of the 249 ISO 3166-1 countries and territories, in any of the nine languages rather than only the two with divisions:
 

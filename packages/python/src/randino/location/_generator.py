@@ -29,6 +29,7 @@ from randino._types import (
     WordLanguageOption,
 )
 from randino.constants import RAND_LOCATION_LENGTH_MAX
+from randino.location._shorten import short_name
 from randino.location.data import (
     LOCATION_DATA,
     LOCATION_LANGUAGES,
@@ -97,6 +98,9 @@ class _Pool:
     A single division's name has no country to leave out.
     """
 
+    short: bool
+    """Whether each division is written by its short name: 서울 for 서울특별시."""
+
     entries: tuple[OutlineEntry | None, ...]
     """The divisions, with None for the country, which the outline does not hold."""
 
@@ -144,10 +148,13 @@ class _Candidate(NamedTuple):
 # the language, whose dataset is a module constant that lives as long as the process.
 _ENTRY_CACHE: dict[LocationLanguage, tuple[OutlineEntry, ...]] = {}
 
-# One pool per language, form, level and whether it opens on the country, each built the
-# first time it is drawn from. A location written out is keyed by the depth it stops at
-# rather than by the level, so two levels that write the same list share it.
-_POOL_CACHE: dict[tuple[LocationLanguage, LocationForm, LocationLevel | int, bool], _Pool] = {}
+# One pool per language, form, level, whether it opens on the country and whether it
+# writes short names, each built the first time it is drawn from. A location written out
+# is keyed by the depth it stops at rather than by the level, so two levels that write the
+# same list share it.
+_POOL_CACHE: dict[
+    tuple[LocationLanguage, LocationForm, LocationLevel | int, bool, bool], _Pool
+] = {}
 
 
 def _entries_of(language: LocationLanguage) -> tuple[OutlineEntry, ...]:
@@ -244,12 +251,20 @@ def _detail_of(pool: _Pool, entry: OutlineEntry | None) -> LocationDetail:
     for depth, level in enumerate(data.levels):
         named[level] = entry.path[depth] if depth < len(entry.path) else None
 
+    # The names the result is written with. The detail's levels keep the ones the country
+    # publishes, so a short name can always be traced to its division.
+    written = (
+        tuple(
+            None if part is None else short_name(pool.language, data.levels[depth], part)
+            for depth, part in enumerate(entry.path)
+        )
+        if pool.short
+        else entry.path
+    )
     parts = [
-        part
-        for part in (data.country if pool.with_country else None, *entry.path)
-        if part is not None
+        part for part in (data.country if pool.with_country else None, *written) if part is not None
     ]
-    name = entry.path[entry.depth] or ""
+    name = written[entry.depth] or ""
 
     if pool.form == "unit":
         location = name
@@ -268,12 +283,16 @@ def _detail_of(pool: _Pool, entry: OutlineEntry | None) -> LocationDetail:
 
 
 def _pool_of(
-    language: LocationLanguage, form: LocationForm, level: LocationLevel, with_country: bool
+    language: LocationLanguage,
+    form: LocationForm,
+    level: LocationLevel,
+    with_country: bool,
+    short: bool,
 ) -> _Pool:
     """The pool for one language, form and level, built the first time it is drawn from."""
     data = LOCATION_DATA[language]
     reach = _limit_of(data, level) if form == "path" and level != "country" else level
-    key = (language, form, reach, with_country)
+    key = (language, form, reach, with_country, short)
     cached = _POOL_CACHE.get(key)
 
     if cached is not None:
@@ -284,6 +303,7 @@ def _pool_of(
         language=language,
         form=form,
         with_country=with_country,
+        short=short,
         entries=_entries_at(language, form, level),
     )
     _POOL_CACHE[key] = pool
@@ -397,6 +417,7 @@ def generate_location_details(
     starts_with: str = "",
     unique: bool = False,
     include_country: bool = True,
+    short: bool = False,
     random: Callable[[], float] | None = None,
 ) -> list[LocationDetail]:
     """Generate `count` locations at one level, in one form, applied to every option."""
@@ -404,6 +425,8 @@ def generate_location_details(
     # A location at the country level is the country: leaving it out would leave nothing,
     # so the option only reaches the levels below it.
     with_country = form == "unit" or level == "country" or include_country
+    # `is True` rather than truthiness, the way the npm package reads it.
+    with_short = short is True
     low = resolve_length(min_length)
     high = resolve_length(max_length)
 
@@ -414,7 +437,7 @@ def generate_location_details(
     candidates: list[_Candidate] = []
 
     for code in languages_writing(resolve_location_language(language), LOCATION_LANGUAGES, prefix):
-        pool = _pool_of(code, form, level, with_country)
+        pool = _pool_of(code, form, level, with_country, with_short)
         if not pool.entries:
             indexes: tuple[int, ...] | None = ()
         elif prefix or low is not None or high is not None:
@@ -464,6 +487,7 @@ def draw_location(
     random: Callable[[], float] | None,
     output: str,
     include_country: bool = True,
+    short: bool = False,
 ) -> list[str] | list[LocationDetail]:
     """What every location generator does: a draw at one level, in one form.
 
@@ -479,6 +503,7 @@ def draw_location(
         random: The caller's `random`.
         output: `"detail"` for the details, anything else for the strings.
         include_country: Whether a location written out opens on its country.
+        short: The caller's `short`.
 
     Returns:
         The details, or what each of them writes out.
@@ -493,6 +518,7 @@ def draw_location(
         starts_with=starts_with,
         unique=unique,
         include_country=include_country,
+        short=short,
         random=random,
     )
 

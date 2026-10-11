@@ -19,6 +19,8 @@ import 'package:randino/src/types.dart';
 /// randLocation(language: LocationLanguage.ko, level: LocationLevel.city, count: 2);
 /// // [대한민국 경상남도 창원시 진해구, 대한민국 충청북도 단양군]
 /// randLocation(language: LocationLanguage.ko, includeCountry: false); // [경기도 양평군 단월면]
+/// randLocation(language: LocationLanguage.ko, includeCountry: false, short: true);
+/// // [경기 수원 장안 파장]
 /// ```
 List<String> randLocation({
   LocationLanguage? language,
@@ -35,6 +37,16 @@ List<String> randLocation({
   /// location at [LocationLevel.country] is the country, and writes it either way.
   bool includeCountry = true,
 
+  /// Write each division by its short name, without the kind it is:
+  /// `서울특별시` is `서울`, `관악구` is `관악` and `봉천동` is `봉천`, and a
+  /// province told apart by its half goes by the half, `충청북도` as `충북`. A
+  /// name the kind would leave one character long keeps it (`중구`, `목동`),
+  /// and a `가` or a `로` is part of the name. English names carry no kind, so
+  /// they are written as they are. [minLength], [maxLength] and [startsWith]
+  /// read the short name; a detail's `region`, `city` and `district` stay the
+  /// names the country publishes.
+  bool short = false,
+
   /// Where the randomness comes from: `Random.secure()` for a value nobody may
   /// predict, `Random(42)` for one that has to come out the same every run.
   Random? random,
@@ -49,6 +61,7 @@ List<String> randLocation({
     startsWith: startsWith,
     unique: unique,
     includeCountry: includeCountry,
+    short: short,
     random: random,
   ))
     detail.location,

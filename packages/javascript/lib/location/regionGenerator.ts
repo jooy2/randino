@@ -21,20 +21,26 @@ import { LOCATION_LANGUAGES, resolveLocationLanguage } from './data/constants.js
 import { LOCATION_REGIONS } from './data/regions.js';
 import { inRange, narrow } from './narrow.js';
 import type { Texts } from './narrow.js';
+import { shortName } from './shorten.js';
 
-// Each language's regions as a list `narrow` can read, made the first time the
-// language is drawn from.
-const pools = new Map<LocationLanguage, Texts>();
+// Each language's regions as a list `narrow` can read, written the way the call
+// asks and made the first time the language is drawn from that way. `names` are
+// the regions as the country publishes them, which the detail reports.
+type RegionPool = Texts & { names: readonly string[] };
 
-function poolOf(language: LocationLanguage): Texts {
-	let pool = pools.get(language);
+const pools = new Map<string, RegionPool>();
+
+function poolOf(language: LocationLanguage, short: boolean): RegionPool {
+	const key = `${language}:${short}`;
+	let pool = pools.get(key);
 
 	if (!pool) {
-		const texts = LOCATION_REGIONS[language].regions;
+		const names = LOCATION_REGIONS[language].regions;
+		const texts = short ? names.map((name) => shortName(language, 'region', name)) : names;
 		const lengths = texts.map((text) => text.length);
 
-		pool = { texts, shortest: Math.min(...lengths), longest: Math.max(...lengths) };
-		pools.set(language, pool);
+		pool = { names, texts, shortest: Math.min(...lengths), longest: Math.max(...lengths) };
+		pools.set(key, pool);
 	}
 
 	return pool;
@@ -46,8 +52,9 @@ export function generateRegionDetails(options: RandLocationUnitOptions = {}): Lo
 	const prefix = resolvePrefix(options.startsWith);
 	const minLength = resolveLength(options.minLength);
 	const maxLength = resolveLength(options.maxLength);
+	const short = options.short === true;
 	const candidates = languagesWriting(language, LOCATION_LANGUAGES, prefix).flatMap((code) => {
-		const pool = poolOf(code);
+		const pool = poolOf(code, short);
 		const indexes = narrow(pool, prefix, minLength, maxLength);
 
 		return indexes === null || indexes.length ? [{ code, pool, indexes }] : [];
@@ -66,14 +73,14 @@ export function generateRegionDetails(options: RandLocationUnitOptions = {}): Lo
 			options,
 			() => {
 				const { code, pool, indexes } = pick(drawn);
-				const name = pool.texts[indexes ? pick(indexes) : randInt(0, pool.texts.length - 1)];
+				const index = indexes ? pick(indexes) : randInt(0, pool.texts.length - 1);
 
 				return {
-					location: name,
+					location: pool.texts[index],
 					language: code,
 					level: 'region',
 					country: LOCATION_REGIONS[code].country,
-					region: name,
+					region: pool.names[index],
 					city: null,
 					district: null
 				};

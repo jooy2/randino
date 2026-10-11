@@ -720,6 +720,9 @@ class LocationDetail {
   final String country;
 
   /// The first-level division, or `null` for a result that does not reach it.
+  ///
+  /// Each level is the name the country publishes, even where `short` wrote
+  /// [location] with a shorter one.
   final String? region;
 
   /// The city, or `null` for a level the result does not reach, or one its

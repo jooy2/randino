@@ -16,6 +16,7 @@ def rand_region(
     max_length: int | None = ...,
     starts_with: str = ...,
     unique: bool = ...,
+    short: bool = ...,
     random: Callable[[], float] | None = ...,
     output: Literal["value"] = ...,
 ) -> list[str]: ...
@@ -30,6 +31,7 @@ def rand_region(
     max_length: int | None = ...,
     starts_with: str = ...,
     unique: bool = ...,
+    short: bool = ...,
     random: Callable[[], float] | None = ...,
     output: Literal["detail"],
 ) -> list[LocationDetail]: ...
@@ -43,6 +45,7 @@ def rand_region(
     max_length: int | None = None,
     starts_with: str = "",
     unique: bool = False,
+    short: bool = False,
     random: Callable[[], float] | None = None,
     output: str = "value",
 ) -> list[str] | list[LocationDetail]:
@@ -59,6 +62,8 @@ def rand_region(
         ['경기도', '부산광역시', '제주특별자치도']
         >>> rand_region(language="en", count=2)
         ['Ohio', 'New Mexico']
+        >>> rand_region(language="ko", short=True, count=3)
+        ['경기', '부산', '충북']
         >>> rand_region(language="en", output="detail")
         [LocationDetail(location='Ohio', language='en', level='region', country='United States', region='Ohio', city=None, district=None)]
     """
@@ -73,4 +78,5 @@ def rand_region(
         unique=unique,
         random=random,
         output=output,
+        short=short,
     )

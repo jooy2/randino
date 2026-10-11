@@ -52,6 +52,7 @@ from randino.gender.data import GENDER_CODES, GENDER_LABELS, GENDER_WEIGHTS
 from randino.gpu.data import GPU_VENDORS, GPUS
 from randino.location.data import LOCATION_DATA, LOCATION_LANGUAGES, LOCATION_LEVELS
 from randino.location.data.countries import COUNTRIES
+from randino.location.data.short import LOCATION_SHORT
 from randino.name.data import NAME_DATA, NAME_LANGUAGES
 from randino.name.data.ko import KO_SURNAME_ROMAN
 from randino.organization.data import (
@@ -737,6 +738,17 @@ print(
                         for line in COUNTRIES.table.split("\n")
                         if line.strip()
                     ],
+                },
+                # Each language's short-name rule, None for one whose names carry no kind.
+                "short": {
+                    code: None
+                    if rule is None
+                    else {
+                        "kinds": {level: list(kinds) for level, kinds in rule.kinds.items()},
+                        "stem": rule.stem,
+                        "halves": list(rule.halves),
+                    }
+                    for code, rule in LOCATION_SHORT.items()
                 },
                 "data": location,
             },

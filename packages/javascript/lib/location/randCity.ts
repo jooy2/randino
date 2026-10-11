@@ -12,6 +12,7 @@ import { drawLocation } from './locationGenerator.js';
  * @example
  * randCity({ language: 'ko', count: 3 }); // ['강남구', '수원시 장안구', '양평군']
  * randCity({ language: 'en', count: 2 }); // ['Pasadena', 'Burlington']
+ * randCity({ language: 'ko', short: true, count: 3 }); // ['강남', '수원 장안', '중구']
  */
 export function randCity(options?: RandLocationUnitOptions & { output?: 'value' }): string[];
 /**

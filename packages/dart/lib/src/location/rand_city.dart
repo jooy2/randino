@@ -14,6 +14,7 @@ import 'package:randino/src/types.dart';
 /// ```dart
 /// randCity(language: LocationLanguage.ko, count: 3); // [강남구, 수원시 장안구, 양평군]
 /// randCity(language: LocationLanguage.en, count: 2); // [Pasadena, Burlington]
+/// randCity(language: LocationLanguage.ko, short: true, count: 3); // [강남, 수원 장안, 중구]
 /// ```
 List<String> randCity({
   LocationLanguage? language,
@@ -22,6 +23,10 @@ List<String> randCity({
   int? maxLength,
   String? startsWith,
   bool unique = false,
+
+  /// Write the city by its short name, without the kind it is: `관악구` as `관악` and `수원시 장안구` as `수원 장안`, while `중구` stays `중구`.
+  /// The rule is [randLocation]'s `short`.
+  bool short = false,
 
   /// Where the randomness comes from: `Random.secure()` for a value nobody may
   /// predict, `Random(42)` for one that has to come out the same every run.
@@ -36,6 +41,7 @@ List<String> randCity({
     maxLength: maxLength,
     startsWith: startsWith,
     unique: unique,
+    short: short,
     random: random,
   ))
     detail.location,

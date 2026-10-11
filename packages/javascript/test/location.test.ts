@@ -92,6 +92,37 @@ const PLACES: Record<LocationLanguage, Map<string, Place>> = {
 	en: new Map(LISTED.en.map((place) => [keyOf(place), place]))
 };
 
+// Every Korean region by the short name `short` writes it with.
+const REGION_SHORT: Record<string, string> = {
+	서울특별시: '서울',
+	부산광역시: '부산',
+	대구광역시: '대구',
+	인천광역시: '인천',
+	대전광역시: '대전',
+	울산광역시: '울산',
+	세종특별자치시: '세종',
+	전남광주통합특별시: '전남광주',
+	경기도: '경기',
+	강원특별자치도: '강원',
+	충청북도: '충북',
+	충청남도: '충남',
+	전북특별자치도: '전북',
+	경상북도: '경북',
+	경상남도: '경남',
+	제주특별자치도: '제주'
+};
+
+// The kinds `short` leaves off a Korean 시·군·구 and 읍·면·동.
+const KINDS: Record<'city' | 'district', RegExp> = { city: /[시군구]$/, district: /[동읍면]$/ };
+
+/** A Korean city or district name less its kind, unless that leaves one character. */
+function shortOf(level: 'city' | 'district', name: string): string {
+	return name
+		.split(' ')
+		.map((word) => (KINDS[level].test(word) && word.length > 2 ? word.slice(0, -1) : word))
+		.join(' ');
+}
+
 /** What a detail writes out, rebuilt from its own levels. */
 function written(detail: LocationDetail): string {
 	const data = LOCATION_DATA[detail.language];
@@ -391,6 +422,111 @@ describe('Location', () => {
 
 		assert.strictEqual(new Set(regions).size, regions.length);
 		assert.strictEqual(regions.length, 51);
+	});
+
+	it('short writes a Korean region by its short name, and a province told apart by its half by the half', () => {
+		const details = randRegion({
+			language: 'ko',
+			short: true,
+			unique: true,
+			count: 16,
+			output: 'detail'
+		});
+
+		assert.strictEqual(details.length, 16);
+
+		for (const detail of details) {
+			// The detail keeps the name the country publishes.
+			assert.strictEqual(detail.location, REGION_SHORT[detail.region!], detail.region!);
+		}
+	});
+
+	it('short leaves the kind off a Korean city and district, unless one character would be left', () => {
+		for (const level of ['city', 'district'] as const) {
+			const generate = level === 'city' ? randCity : randDistrict;
+
+			for (const detail of generate({
+				language: 'ko',
+				short: true,
+				count: SAMPLE,
+				output: 'detail'
+			})) {
+				assert.strictEqual(detail.location, shortOf(level, detail[level]!), detail[level]!);
+				assert.ok(PLACES.ko.has(keyOf(detail as Place)), detail[level]!);
+			}
+		}
+
+		// A city's district is written with its city, both short.
+		const su = randCity({ language: 'ko', short: true, startsWith: '수', unique: true, count: 20 });
+
+		assert.ok(su.includes('수원 장안'), su.join());
+
+		// `중구` would be `중`, so it stays `중구`.
+		const middle = randCity({
+			language: 'ko',
+			short: true,
+			startsWith: '중',
+			maxLength: 2,
+			unique: true,
+			count: 10
+		});
+
+		assert.ok(middle.includes('중구'), middle.join());
+		assert.ok(!middle.includes('중'), middle.join());
+	});
+
+	it('short writes a whole location with the short names, and keeps the published ones in the detail', () => {
+		for (const detail of randLocation({
+			language: 'ko',
+			short: true,
+			count: SAMPLE,
+			output: 'detail'
+		})) {
+			const parts = [
+				detail.country,
+				REGION_SHORT[detail.region!],
+				detail.city === null ? null : shortOf('city', detail.city),
+				detail.district === null ? null : shortOf('district', detail.district)
+			].filter((part): part is string => part !== null);
+
+			assert.strictEqual(detail.location, parts.join(' '));
+			assert.ok(PLACES.ko.has(keyOf(detail as Place)), detail.location);
+		}
+
+		// `startsWith` and the length options read the short name.
+		for (const location of randLocation({
+			language: 'ko',
+			short: true,
+			includeCountry: false,
+			startsWith: '충',
+			count: SAMPLE
+		})) {
+			assert.match(location, /^충[북남] /);
+		}
+
+		for (const region of randRegion({ language: 'ko', short: true, maxLength: 2, count: SAMPLE })) {
+			assert.strictEqual(region.length, 2, region);
+		}
+	});
+
+	it('short writes English names as they are', () => {
+		for (const detail of randLocation({
+			language: 'en',
+			short: true,
+			count: SAMPLE,
+			output: 'detail'
+		})) {
+			assert.strictEqual(detail.location, written(detail));
+		}
+
+		for (const detail of randRegion({
+			language: 'en',
+			short: true,
+			count: SAMPLE,
+			output: 'detail'
+		})) {
+			assert.strictEqual(detail.location, detail.region);
+		}
 	});
 
 	it('the Korean dataset stops above the 리, and writes a city district after its city', () => {

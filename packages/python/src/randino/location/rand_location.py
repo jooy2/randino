@@ -19,6 +19,7 @@ def rand_location(
     starts_with: str = ...,
     unique: bool = ...,
     include_country: bool = ...,
+    short: bool = ...,
     random: Callable[[], float] | None = ...,
     output: Literal["value"] = ...,
 ) -> list[str]: ...
@@ -35,6 +36,7 @@ def rand_location(
     starts_with: str = ...,
     unique: bool = ...,
     include_country: bool = ...,
+    short: bool = ...,
     random: Callable[[], float] | None = ...,
     output: Literal["detail"],
 ) -> list[LocationDetail]: ...
@@ -50,6 +52,7 @@ def rand_location(
     starts_with: str = "",
     unique: bool = False,
     include_country: bool = True,
+    short: bool = False,
     random: Callable[[], float] | None = None,
     output: str = "value",
 ) -> list[str] | list[LocationDetail]:
@@ -78,6 +81,13 @@ def rand_location(
             already knows it, and `False` writes `경기도 수원시 장안구` rather than
             `대한민국 경기도 수원시 장안구`; the detail still reports the country. A location at
             `level="country"` is the country, and writes it either way.
+        short: Write each division by its short name, without the kind it is: `서울특별시`
+            is `서울`, `관악구` is `관악` and `봉천동` is `봉천`, and a province told apart by
+            its half goes by the half, `충청북도` as `충북`. A name the kind would leave one
+            character long keeps it (`중구`, `목동`), and a `가` or a `로` is part of the
+            name. English names carry no kind, so they are written as they are. The length
+            arguments and `starts_with` read the short name; the detail's `region`, `city`
+            and `district` stay the names the country publishes.
         random: Where the randomness comes from: a callable returning a number in
             `[0, 1)`, the way `random.random` does. `SystemRandom().random` for a value
             nobody may predict, `Random(42).random` for one that has to come out the
@@ -98,6 +108,8 @@ def rand_location(
         ['대한민국 경상남도 창원시 진해구', '대한민국 충청북도 단양군']
         >>> rand_location(language="ko", include_country=False)
         ['경기도 양평군 단월면']
+        >>> rand_location(language="ko", include_country=False, short=True)
+        ['경기 수원 장안 파장']
         >>> rand_location(language="ko", output="detail")
         [LocationDetail(location='대한민국 서울특별시 종로구 청운동', language='ko', level='district', country='대한민국', region='서울특별시', city='종로구', district='청운동')]
     """
@@ -112,5 +124,6 @@ def rand_location(
         unique=unique,
         random=random,
         output=output,
+        short=short,
         include_country=include_country,
     )

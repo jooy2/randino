@@ -14,6 +14,7 @@ import 'package:randino/src/internal/utils.dart';
 import 'package:randino/src/location/data/countries.dart';
 import 'package:randino/src/location/data/index.dart';
 import 'package:randino/src/location/data/types.dart';
+import 'package:randino/src/location/shorten.dart';
 import 'package:randino/src/types.dart';
 import 'package:randino/src/word/data/index.dart';
 
@@ -56,7 +57,7 @@ class _Texts {
 
 /// The divisions one kind of draw may land on.
 class _Pool {
-  _Pool(this.data, this.language, this.form, this.withCountry, this.entries);
+  _Pool(this.data, this.language, this.form, this.withCountry, this.short, this.entries);
 
   final LocationLanguageData data;
   final LocationLanguage language;
@@ -65,6 +66,9 @@ class _Pool {
   // Whether a location written out opens on its country. A single division's
   // name has no country to leave out.
   final bool withCountry;
+
+  // Whether each division is written by its short name: 서울 for 서울특별시.
+  final bool short;
 
   // `null` for the country, which the outline does not hold.
   final List<OutlineEntry?> entries;
@@ -158,12 +162,23 @@ LocationDetail _detailOf(_Pool pool, OutlineEntry? entry) {
     named[data.levels[depth]] = depth < entry.path.length ? entry.path[depth] : null;
   }
 
+  // The names the result is written with. The detail's levels keep the ones the
+  // country publishes, so a short name can always be traced to its division.
+  final written =
+      pool.short
+          ? <String?>[
+            for (var depth = 0; depth < entry.path.length; depth += 1)
+              entry.path[depth] == null
+                  ? null
+                  : shortName(pool.language, data.levels[depth], entry.path[depth]!),
+          ]
+          : entry.path;
   final String location;
 
   if (pool.form == LocationForm.unit) {
-    location = entry.path[entry.depth]!;
+    location = written[entry.depth]!;
   } else {
-    final parts = <String>[if (pool.withCountry) data.country, ...entry.path.nonNulls];
+    final parts = <String>[if (pool.withCountry) data.country, ...written.nonNulls];
 
     location = (data.order == LocationOrder.largestFirst ? parts : parts.reversed).join(
       data.joiner,
@@ -181,22 +196,35 @@ LocationDetail _detailOf(_Pool pool, OutlineEntry? entry) {
   );
 }
 
-// One pool per language, form, level and whether it opens on the country, each
-// built the first time it is drawn from. A location written out is keyed by the
-// depth it stops at rather than by the level, so two levels that write the same
-// list share it.
+// One pool per language, form, level, whether it opens on the country and
+// whether it writes short names, each built the first time it is drawn from. A
+// location written out is keyed by the depth it stops at rather than by the
+// level, so two levels that write the same list share it.
 final Expando<Map<String, _Pool>> _poolCache = Expando<Map<String, _Pool>>('locationPools');
 
-_Pool _poolOf(LocationLanguage language, LocationForm form, LocationLevel level, bool withCountry) {
+_Pool _poolOf(
+  LocationLanguage language,
+  LocationForm form,
+  LocationLevel level,
+  bool withCountry,
+  bool short,
+) {
   final data = locationData[language]!;
   final byKind = _poolCache[data] ??= <String, _Pool>{};
   final reach =
       form == LocationForm.path && level != LocationLevel.country
           ? '${_limitOf(data, level)}'
           : level.name;
-  final key = '${form.name}:$reach:$withCountry';
+  final key = '${form.name}:$reach:$withCountry:$short';
 
-  return byKind[key] ??= _Pool(data, language, form, withCountry, _entriesAt(data, form, level));
+  return byKind[key] ??= _Pool(
+    data,
+    language,
+    form,
+    withCountry,
+    short,
+    _entriesAt(data, form, level),
+  );
 }
 
 /// Every entry of a pool written out, the first time something has to read them.
@@ -360,6 +388,7 @@ List<LocationDetail> generateLocationDetails({
   String? startsWith,
   bool unique = false,
   bool includeCountry = true,
+  bool short = false,
 
   /// Where the randomness comes from: `Random.secure()` for a value nobody may
   /// predict, `Random(42)` for one that has to come out the same every run.
@@ -377,7 +406,7 @@ List<LocationDetail> generateLocationDetails({
   final candidates = <_Candidate<_Pool>>[];
 
   for (final code in languagesWriting(language, locationLanguages, prefix)) {
-    final pool = _poolOf(code, form, level, withCountry);
+    final pool = _poolOf(code, form, level, withCountry, short);
     final asked = prefix.isNotEmpty || minLength != null || maxLength != null;
     final indexes =
         pool.entries.isEmpty

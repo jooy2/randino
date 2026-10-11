@@ -66,6 +66,32 @@ rand_district(language="en")  # []
 
 :::
 
+<Lang js="short: true" dart="short: true" py="short=True" code /> writes each one without its kind, the way [`randLocation`](./rand-location#short) does: `가현동` is `가현` and `행주외동` is `행주외`, while `겸면`, which would be left one character long, stays `겸면`. The detail's `district` stays the published name.
+
+::: lang js
+
+```javascript
+randDistrict({ language: 'ko', short: true, count: 3 }); // ['가현', '겸면', '행주외']
+```
+
+:::
+
+::: lang dart
+
+```dart
+randDistrict(language: LocationLanguage.ko, short: true, count: 3); // [가현, 겸면, 행주외]
+```
+
+:::
+
+::: lang py
+
+```python
+rand_district(language="ko", short=True, count=3)  # ['가현', '겸면', '행주외']
+```
+
+:::
+
 ## Options
 
 <LocationOptions />

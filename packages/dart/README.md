@@ -200,6 +200,10 @@ randRegion(language: LocationLanguage.en, count: 3); // [Idaho, Georgia, Vermont
 randCity(language: LocationLanguage.ko, count: 3); // [함안군, 영덕군, 여수시]
 randDistrict(count: 3); // [가현동, 겸면, 행주외동]
 
+randLocation(language: LocationLanguage.ko, includeCountry: false, short: true);
+// [경기 양평 단월]
+randRegion(language: LocationLanguage.ko, short: true, count: 3); // [세종, 울산, 충북]
+
 randCityDetails(language: LocationLanguage.ko).first;
 // LocationDetail(중랑구, ko, city, 대한민국, 서울특별시, 중랑구, null)
 ```
@@ -209,12 +213,13 @@ randCityDetails(language: LocationLanguage.ko).first;
 | `language`                | `LocationLanguage?` | `null` — every one       |
 | `level`                   | `LocationLevel`     | `LocationLevel.district` |
 | `includeCountry`          | `bool`              | `true`                   |
+| `short`                   | `bool`              | `false`                  |
 | `count`                   | `int`               | `1`                      |
 | `minLength` / `maxLength` | `int?`              | `null`                   |
 | `startsWith`              | `String?`           | `null`                   |
 | `unique`                  | `bool`              | `false`                  |
 
-`level` is how far down the location goes: `country`, `region`, `city` or `district`. A country without that level stops at the deepest one it has, so an English location ends at its city. `includeCountry: false` leaves the country out of the string, which is what a fixed `language` usually wants. `randRegion`, `randCity` and `randDistrict` take the same parameters minus `level`, and hand back that one division's name; each has a `…Details` twin, as `randLocation` has `randLocationDetails`. `randCountry` is the exception: it takes a `WordLanguage?` and names any of the 249 ISO 3166-1 countries and territories in any of the nine languages, and `randCountryDetails` adds each one's code as a `CountryDetail`.
+`level` is how far down the location goes: `country`, `region`, `city` or `district`. A country without that level stops at the deepest one it has, so an English location ends at its city. `includeCountry: false` leaves the country out of the string, which is what a fixed `language` usually wants. `short: true` writes each division without its kind, the way it is said: `서울특별시` is `서울`, `충청북도` is `충북` and `관악구` is `관악`, while a name left one character long keeps its kind (`중구`) and English names stay as they are. `randRegion`, `randCity` and `randDistrict` take the same parameters minus `level`, and hand back that one division's name; each has a `…Details` twin, as `randLocation` has `randLocationDetails`. `randCountry` is the exception: it takes a `WordLanguage?` and names any of the 249 ISO 3166-1 countries and territories in any of the nine languages, and `randCountryDetails` adds each one's code as a `CountryDetail`.
 
 ## Ages
 

@@ -44,6 +44,32 @@ rand_region(language="en", count=3)  # ['Idaho', 'Georgia', 'Vermont']
 
 한국은 16개, 미국은 51개라서 <Lang js="unique: true" dart="unique: true" py="unique=True" code />에 더 큰 `count`를 주면 전부 한 번씩 돌려주고 멈춥니다.
 
+<Lang js="short: true" dart="short: true" py="short=True" code />를 주면 [`randLocation`](./rand-location#short)처럼 줄인 이름으로 씁니다. `세종특별자치시`는 `세종`, `충청북도`는 `충북`입니다. 상세 출력의 `region`은 공표된 이름 그대로입니다.
+
+::: lang js
+
+```javascript
+randRegion({ language: 'ko', short: true, count: 3 }); // ['세종', '울산', '강원']
+```
+
+:::
+
+::: lang dart
+
+```dart
+randRegion(language: LocationLanguage.ko, short: true, count: 3); // [세종, 울산, 강원]
+```
+
+:::
+
+::: lang py
+
+```python
+rand_region(language="ko", short=True, count=3)  # ['세종', '울산', '강원']
+```
+
+:::
+
 ## 옵션 {#options}
 
 <LocationOptions />

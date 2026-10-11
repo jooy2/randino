@@ -477,6 +477,8 @@ class LocationDetail:
     """The first-level division.
 
     `None` for a level the result does not reach, or one its country does not have there.
+    Each level is the name the country publishes, even where `short` wrote `location` with
+    a shorter one.
     """
 
     city: str | None

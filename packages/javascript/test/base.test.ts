@@ -286,6 +286,7 @@ describe('base test', () => {
 			() => randino.randLocation({ level: 'street' as never }),
 			() => randino.randLocation({ minLength: NaN }),
 			() => randino.randCity({ language: 'ja' as never }),
+			() => randino.randRegion({ short: 'yes' as never }),
 			() => randino.randCountry({ language: 'xx' as never, minLength: NaN }),
 			() => randino.randAge({ group: 'elder' as never }),
 			() => randino.randAge({ group: [null] as never }),

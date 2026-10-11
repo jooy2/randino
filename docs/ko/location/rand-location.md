@@ -43,7 +43,7 @@ rand_location()
 
 <LocationOptions level />
 
-`level`과 `includeCountry`를 뺀 같은 표가 아래 네 단계 함수에도 들어 있습니다. `realism`은 없습니다. 위치는 실제 장소이거나 위치가 아니거나 둘 중 하나라서, 지어낼 것이 없습니다.
+`level`과 `includeCountry`를 뺀 같은 표가 아래 네 단계 함수에도 들어 있고, [`randCountry`](./rand-country)에는 `short`도 없습니다. 나라 이름에는 뗄 종류가 없기 때문입니다. `realism`은 없습니다. 위치는 실제 장소이거나 위치가 아니거나 둘 중 하나라서, 지어낼 것이 없습니다.
 
 Dart에는 `output`이 없습니다. 거기서는 [상세 출력](#the-detail-output)이 `randLocationDetails`입니다.
 
@@ -161,6 +161,44 @@ rand_location(language="ko", include_country=False, count=2)
 :::
 
 `level: 'country'`인 위치는 나라 이름 자체이므로, 이 옵션과 상관없이 나라 이름을 씁니다.
+
+## 줄인 이름 {#short}
+
+<Lang js="short: true" dart="short: true" py="short=True" code />를 주면 행정구역을 등록된 이름이 아니라 부르는 이름으로, 종류를 떼고 씁니다. `서울특별시`는 `서울`, `관악구`는 `관악`, `봉천동`은 `봉천`입니다. 남·북으로 나뉜 도는 첫 글자와 남·북만 남겨 `충청북도`가 `충북`, `경상남도`가 `경남`이 됩니다. `전남광주통합특별시`는 `전남광주`이며, 법률상 약칭인 `광주특별시`가 아니라 종류만 뗀 이름입니다.
+
+::: lang js
+
+```javascript
+randLocation({ language: 'ko', short: true, count: 2 });
+// ['대한민국 경기 양평 단월', '대한민국 충남 공주 월송']
+
+randLocation({ language: 'ko', level: 'city', includeCountry: false, short: true, count: 3 });
+// ['서울 관악', '충북 청주 서원', '부산 중구']
+```
+
+:::
+
+::: lang dart
+
+```dart
+randLocation(language: LocationLanguage.ko, short: true, count: 2);
+// [대한민국 경기 양평 단월, 대한민국 충남 공주 월송]
+```
+
+:::
+
+::: lang py
+
+```python
+rand_location(language="ko", short=True, count=2)
+# ['대한민국 경기 양평 단월', '대한민국 충남 공주 월송']
+```
+
+:::
+
+종류를 떼면 한 글자만 남는 이름은 그대로 둡니다. `중구`, `목동`, `서면`이 그렇습니다. `가`와 `로`는 이름의 일부라서 `종로1가`, `세종로`도 그대로입니다. 시에 딸린 일반구는 시와 함께 줄여서 `수원시 장안구`가 `수원 장안`이 됩니다. 영어 이름에는 뗄 종류가 없어서 그대로 씁니다.
+
+`startsWith`와 길이 옵션은 줄인 문자열을 기준으로 합니다. 상세 출력의 `region`, `city`, `district`는 나라가 공표한 이름 그대로라서, 줄인 이름이 어느 구역인지 언제든 알 수 있습니다.
 
 ## 길이와 첫 글자 {#length}
 

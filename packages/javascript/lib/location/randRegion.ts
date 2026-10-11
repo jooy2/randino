@@ -8,6 +8,7 @@ import { generateRegionDetails } from './regionGenerator.js';
  * @example
  * randRegion({ language: 'ko', count: 3 }); // ['경기도', '부산광역시', '제주특별자치도']
  * randRegion({ language: 'en', count: 2 }); // ['Ohio', 'New Mexico']
+ * randRegion({ language: 'ko', short: true, count: 3 }); // ['경기', '부산', '충북']
  */
 export function randRegion(options?: RandLocationUnitOptions & { output?: 'value' }): string[];
 /**

@@ -11,6 +11,7 @@ import { drawLocation } from './locationGenerator.js';
  *
  * @example
  * randDistrict({ language: 'ko', count: 3 }); // ['역삼동', '조치원읍', '한림읍']
+ * randDistrict({ language: 'ko', short: true, count: 3 }); // ['역삼', '조치원', '목동']
  */
 export function randDistrict(options?: RandLocationUnitOptions & { output?: 'value' }): string[];
 /**

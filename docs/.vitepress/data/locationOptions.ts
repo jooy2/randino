@@ -21,6 +21,8 @@ export interface LocationOptionRow {
 	langs?: string;
 	/** Only `randLocation` takes this one; the four level functions answer it. */
 	levelOnly?: boolean;
+	/** `randCountry` does not take this one: a country's name has no kind to leave off. */
+	divisionsOnly?: boolean;
 }
 
 /** `randCountry` takes any word language: every country has a name in all nine. */
@@ -51,6 +53,13 @@ export const LOCATION_OPTIONS: readonly LocationOptionRow[] = [
 		fallback: { js: 'true', dart: 'true', py: 'True' },
 		about: 'optionIncludeCountry',
 		levelOnly: true
+	},
+	{
+		name: 'short',
+		type: { js: 'boolean', dart: 'bool', py: 'bool' },
+		fallback: { js: 'false', dart: 'false', py: 'False' },
+		about: 'optionShort',
+		divisionsOnly: true
 	},
 	{
 		name: 'count',
@@ -100,18 +109,20 @@ export const LOCATION_OPTIONS: readonly LocationOptionRow[] = [
 
 /**
  * The rows a page shows: every one, minus `level` where the function answers it,
- * and with `randCountry`'s wider `language` on its page.
+ * and with `randCountry`'s wider `language`, and without `short`, on its page.
  */
 export function locationOptionRows(level: boolean, country = false): readonly LocationOptionRow[] {
 	const rows = level ? LOCATION_OPTIONS : LOCATION_OPTIONS.filter((row) => !row.levelOnly);
 
 	return country
-		? rows.map((row) =>
-				row.about === 'optionLocationLanguage'
-					? COUNTRY_LANGUAGE
-					: row.about === 'optionLocationOutput'
-						? { ...row, about: 'optionCountryOutput' }
-						: row
-			)
+		? rows
+				.filter((row) => !row.divisionsOnly)
+				.map((row) =>
+					row.about === 'optionLocationLanguage'
+						? COUNTRY_LANGUAGE
+						: row.about === 'optionLocationOutput'
+							? { ...row, about: 'optionCountryOutput' }
+							: row
+				)
 		: rows;
 }

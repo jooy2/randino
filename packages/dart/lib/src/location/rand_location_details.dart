@@ -28,6 +28,16 @@ List<LocationDetail> randLocationDetails({
   /// location at [LocationLevel.country] is the country, and writes it either way.
   bool includeCountry = true,
 
+  /// Write each division by its short name, without the kind it is:
+  /// `서울특별시` is `서울`, `관악구` is `관악` and `봉천동` is `봉천`, and a
+  /// province told apart by its half goes by the half, `충청북도` as `충북`. A
+  /// name the kind would leave one character long keeps it (`중구`, `목동`),
+  /// and a `가` or a `로` is part of the name. English names carry no kind, so
+  /// they are written as they are. [minLength], [maxLength] and [startsWith]
+  /// read the short name; a detail's `region`, `city` and `district` stay the
+  /// names the country publishes.
+  bool short = false,
+
   /// Where the randomness comes from: `Random.secure()` for a value nobody may
   /// predict, `Random(42)` for one that has to come out the same every run.
   Random? random,
@@ -41,5 +51,6 @@ List<LocationDetail> randLocationDetails({
   startsWith: startsWith,
   unique: unique,
   includeCountry: includeCountry,
+  short: short,
   random: random,
 );

@@ -16,6 +16,7 @@ import { drawLocation } from './locationGenerator.js';
  * randLocation({ language: 'ko', level: 'city', count: 2 });
  * // ['대한민국 경상남도 창원시 진해구', '대한민국 충청북도 단양군']
  * randLocation({ language: 'ko', includeCountry: false }); // ['경기도 양평군 단월면']
+ * randLocation({ language: 'ko', includeCountry: false, short: true }); // ['경기 수원 장안 파장']
  */
 export function randLocation(options?: RandLocationOptions & { output?: 'value' }): string[];
 /**

@@ -44,6 +44,32 @@ rand_region(language="en", count=3)  # ['Idaho', 'Georgia', 'Vermont']
 
 Korea has sixteen of them and the United States fifty-one, so <Lang js="unique: true" dart="unique: true" py="unique=True" code /> with a larger `count` returns every one and stops there.
 
+<Lang js="short: true" dart="short: true" py="short=True" code /> writes each one by its short name, the way [`randLocation`](./rand-location#short) does: `세종특별자치시` is `세종` and `충청북도` is `충북`. The detail's `region` stays the published name.
+
+::: lang js
+
+```javascript
+randRegion({ language: 'ko', short: true, count: 3 }); // ['세종', '울산', '강원']
+```
+
+:::
+
+::: lang dart
+
+```dart
+randRegion(language: LocationLanguage.ko, short: true, count: 3); // [세종, 울산, 강원]
+```
+
+:::
+
+::: lang py
+
+```python
+rand_region(language="ko", short=True, count=3)  # ['세종', '울산', '강원']
+```
+
+:::
+
 ## Options
 
 <LocationOptions />

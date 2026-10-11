@@ -771,6 +771,16 @@ export type LocationLevel = 'country' | 'region' | 'city' | 'district';
 export interface RandLocationUnitOptions extends Omit<RandCommonOptions, 'realism'> {
 	/** Language, and so country, of the places. `'all'` mixes every one. Default `'all'`. */
 	language?: LocationLanguageOption;
+	/**
+	 * Write each division by its short name, without the kind it is: `서울특별시`
+	 * is `서울`, `관악구` is `관악` and `봉천동` is `봉천`, and a province told apart
+	 * by its half goes by the half, `충청북도` as `충북`. A name the kind would leave
+	 * one character long keeps it (`중구`, `목동`), and a `가` or a `로` is part of
+	 * the name. English names carry no kind, so they are written as they are. The
+	 * length options and `startsWith` read the short name; the detail's `region`,
+	 * `city` and `district` stay the names the country publishes. Default `false`.
+	 */
+	short?: boolean;
 }
 
 /**
@@ -816,7 +826,11 @@ export interface LocationDetail {
 	/** The deepest level the result names. */
 	level: LocationLevel;
 	country: string;
-	/** `null` for a level the result does not reach, or one its country does not have there. */
+	/**
+	 * `null` for a level the result does not reach, or one its country does not
+	 * have there. Each is the name the country publishes, even where `short`
+	 * wrote `location` with a shorter one.
+	 */
 	region: string | null;
 	city: string | null;
 	district: string | null;

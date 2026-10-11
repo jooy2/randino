@@ -43,7 +43,7 @@ Every option is optional, and the defaults are what the empty call above uses.
 
 <LocationOptions level />
 
-The same table, minus `level` and `includeCountry`, is on each of the four level functions below. There is no `realism`: a location is a real place or it is not a location, so there is nothing to invent.
+The same table, minus `level` and `includeCountry`, is on each of the four level functions below, and [`randCountry`](./rand-country)'s has no `short` either, since a country's name carries no kind. There is no `realism`: a location is a real place or it is not a location, so there is nothing to invent.
 
 Dart has no `output`; [the detail output](#the-detail-output) is `randLocationDetails` there.
 
@@ -161,6 +161,44 @@ rand_location(language="ko", include_country=False, count=2)
 :::
 
 A location at `level: 'country'` is the country and nothing else, so it is written either way.
+
+## Short names {#short}
+
+<Lang js="short: true" dart="short: true" py="short=True" code /> writes each division by the name it is called by rather than the one it is registered under, without the kind it is: `서울특별시` is `서울`, `관악구` is `관악` and `봉천동` is `봉천`. A province told apart by its half goes by the half, so `충청북도` is `충북` and `경상남도` is `경남`. `전남광주통합특별시` is `전남광주`, the name with its kind left off rather than the legal short form `광주특별시`.
+
+::: lang js
+
+```javascript
+randLocation({ language: 'ko', short: true, count: 2 });
+// ['대한민국 경기 양평 단월', '대한민국 충남 공주 월송']
+
+randLocation({ language: 'ko', level: 'city', includeCountry: false, short: true, count: 3 });
+// ['서울 관악', '충북 청주 서원', '부산 중구']
+```
+
+:::
+
+::: lang dart
+
+```dart
+randLocation(language: LocationLanguage.ko, short: true, count: 2);
+// [대한민국 경기 양평 단월, 대한민국 충남 공주 월송]
+```
+
+:::
+
+::: lang py
+
+```python
+rand_location(language="ko", short=True, count=2)
+# ['대한민국 경기 양평 단월', '대한민국 충남 공주 월송']
+```
+
+:::
+
+A name the kind would leave one character long keeps it, so `중구`, `목동` and `서면` stay as they are, and a `가` or a `로` is part of the name (`종로1가`, `세종로`). A city's district keeps its city, both short: `수원시 장안구` is `수원 장안`. English names carry no kind to leave out, and are written as they are.
+
+`startsWith` and the length options read the short string. The detail's `region`, `city` and `district` stay the names the country publishes, so a short name can always be traced to its division.
 
 ## Length and first character {#length}
 

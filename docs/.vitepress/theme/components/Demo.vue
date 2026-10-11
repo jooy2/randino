@@ -221,6 +221,7 @@ const place = reactive({
 	language: 'all',
 	level: 'district',
 	includeCountry: true,
+	short: false,
 	count: 8,
 	minLength: '',
 	maxLength: '',
@@ -677,6 +678,8 @@ const options = computed(() => {
 		// Only `randLocation` takes a level; the other four answer it.
 		if (place.fn === 'randLocation' && place.level !== 'district') out.level = place.level;
 		if (place.fn === 'randLocation' && !place.includeCountry) out.includeCountry = false;
+		// A country's name has no kind to leave off, so `randCountry` takes no `short`.
+		if (place.fn !== 'randCountry' && place.short) out.short = true;
 		if (place.count !== 1) out.count = Number(place.count);
 		if (num(place.minLength) !== undefined) out.minLength = num(place.minLength);
 		if (num(place.maxLength) !== undefined) out.maxLength = num(place.maxLength);
@@ -1560,6 +1563,11 @@ async function copy() {
 						:disabled="place.fn !== 'randLocation'"
 					/>
 					<code>includeCountry</code>
+				</label>
+
+				<label class="randino-demo-check" :class="{ 'is-off': place.fn === 'randCountry' }">
+					<input v-model="place.short" type="checkbox" :disabled="place.fn === 'randCountry'" />
+					<code>short</code>
 				</label>
 
 				<label class="randino-demo-check">

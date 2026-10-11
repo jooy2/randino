@@ -64,6 +64,7 @@ import {
 	GENDER_WEIGHTS
 } from '../../packages/javascript/lib/gender/data/index.js';
 import { COUNTRIES } from '../../packages/javascript/lib/location/data/countries.js';
+import { LOCATION_SHORT } from '../../packages/javascript/lib/location/data/short.js';
 import {
 	LOCATION_DATA,
 	LOCATION_LANGUAGES,
@@ -495,6 +496,21 @@ console.log(
 					.filter(Boolean)
 					.map((line) => line.split('|'))
 			},
+			// Each language's short-name rule, null for one whose names carry no kind.
+			short: Object.fromEntries(
+				Object.entries(LOCATION_SHORT).map(([code, rule]) => [
+					code,
+					rule && {
+						kinds: {
+							region: [...rule.kinds.region],
+							city: [...rule.kinds.city],
+							district: [...rule.kinds.district]
+						},
+						stem: rule.stem,
+						halves: [...rule.halves]
+					}
+				])
+			),
 			data: Object.fromEntries(
 				Object.entries(LOCATION_DATA).map(([code, data]) => [
 					code,

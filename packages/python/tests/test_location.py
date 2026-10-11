@@ -118,6 +118,38 @@ PLACES: dict[LocationLanguage, dict[str, Place]] = {
 }
 
 
+REGION_SHORT: dict[str, str] = {
+    "서울특별시": "서울",
+    "부산광역시": "부산",
+    "대구광역시": "대구",
+    "인천광역시": "인천",
+    "대전광역시": "대전",
+    "울산광역시": "울산",
+    "세종특별자치시": "세종",
+    "전남광주통합특별시": "전남광주",
+    "경기도": "경기",
+    "강원특별자치도": "강원",
+    "충청북도": "충북",
+    "충청남도": "충남",
+    "전북특별자치도": "전북",
+    "경상북도": "경북",
+    "경상남도": "경남",
+    "제주특별자치도": "제주",
+}
+"""Every Korean region by the short name `short` writes it with."""
+
+KINDS: dict[str, str] = {"city": "시군구", "district": "동읍면"}
+"""The kinds `short` leaves off a Korean 시·군·구 and 읍·면·동."""
+
+
+def short_of(level: str, name: str) -> str:
+    """A Korean city or district name less its kind, unless that leaves one character."""
+    return " ".join(
+        word[:-1] if word[-1] in KINDS[level] and len(word) > 2 else word
+        for word in name.split(" ")
+    )
+
+
 def written(detail: LocationDetail) -> str:
     """What a detail writes out, rebuilt from its own levels."""
     data = LOCATION_DATA[detail.language]
@@ -356,6 +388,74 @@ def test_unique_never_repeats_a_result_and_stops_when_the_pool_runs_out() -> Non
 
     assert len(set(regions)) == len(regions)
     assert len(regions) == 51
+
+
+def test_short_writes_a_korean_region_by_its_short_name_and_a_half_by_the_half() -> None:
+    details = rand_region(language="ko", short=True, unique=True, count=16, output="detail")
+
+    assert len(details) == 16
+
+    for detail in details:
+        # The detail keeps the name the country publishes.
+        assert detail.region is not None
+        assert detail.location == REGION_SHORT[detail.region], detail.region
+
+
+def test_short_leaves_the_kind_off_a_city_and_district_unless_one_character_is_left() -> None:
+    for level, generate in (("city", rand_city), ("district", rand_district)):
+        for detail in generate(language="ko", short=True, count=SAMPLE, output="detail"):
+            name = getattr(detail, level)
+
+            assert detail.location == short_of(level, name), name
+            assert key_of(detail) in PLACES["ko"], name
+
+    # A city's district is written with its city, both short.
+    su = rand_city(language="ko", short=True, starts_with="수", unique=True, count=20)
+
+    assert "수원 장안" in su, su
+
+    # `중구` would be `중`, so it stays `중구`.
+    middle = rand_city(
+        language="ko", short=True, starts_with="중", max_length=2, unique=True, count=10
+    )
+
+    assert "중구" in middle, middle
+    assert "중" not in middle, middle
+
+
+def test_short_writes_a_whole_location_and_keeps_the_published_names_in_the_detail() -> None:
+    for detail in rand_location(language="ko", short=True, count=SAMPLE, output="detail"):
+        assert detail.region is not None
+        parts = [
+            part
+            for part in (
+                detail.country,
+                REGION_SHORT[detail.region],
+                None if detail.city is None else short_of("city", detail.city),
+                None if detail.district is None else short_of("district", detail.district),
+            )
+            if part is not None
+        ]
+
+        assert detail.location == " ".join(parts)
+        assert key_of(detail) in PLACES["ko"], detail.location
+
+    # `starts_with` and the length arguments read the short name.
+    for location in rand_location(
+        language="ko", short=True, include_country=False, starts_with="충", count=SAMPLE
+    ):
+        assert re.match(r"충[북남] ", location), location
+
+    for region in rand_region(language="ko", short=True, max_length=2, count=SAMPLE):
+        assert len(region) == 2, region
+
+
+def test_short_writes_english_names_as_they_are() -> None:
+    for detail in rand_location(language="en", short=True, count=SAMPLE, output="detail"):
+        assert detail.location == written(detail)
+
+    for detail in rand_region(language="en", short=True, count=SAMPLE, output="detail"):
+        assert detail.location == detail.region
 
 
 def test_the_korean_dataset_stops_above_the_ri_and_writes_a_district_after_its_city() -> None:
