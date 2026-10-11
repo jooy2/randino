@@ -205,6 +205,8 @@ Every organization is put together from parts, so none of them is a real one. Th
 
 A generic name can still match a small real business or a school somewhere, the way `Riverside High School` is the name of hundreds of schools. If that matters, `realism: 'invented'` builds the stem from the language's own sounds instead — `Caiwi, Inc.`, `솔람테크` — so the name reads like the language without being any of its words. A first character no stem in the list starts with is answered with an invented stem that does, whatever `realism` is.
 
+Any match with a real organization is a coincidence. See the [disclaimer](../guide/disclaimer#coincidence).
+
 ## Length {#length}
 
 <Lang js="minLength" dart="minLength" py="min_length" code /> and <Lang js="maxLength" dart="maxLength" py="max_length" code /> describe the whole organization, legal form and all, and have no bound until you set one. The shapes that cannot land inside the range are set aside before one is chosen, so asking a Korean organization for twelve characters or more writes a longer kind (`주식회사 은빛그린에너지`) rather than stretching a short one. A range nothing reaches is answered with the closest organization there is. The ceiling is `60`, because the longest names run past forty characters (`Công ty TNHH MTV Giải pháp Công nghệ Thịnh Vượng`).

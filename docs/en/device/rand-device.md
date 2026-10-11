@@ -105,7 +105,7 @@ A model is written the way its maker writes it. Apple's iPads and Macs carry the
 
 The year is the year the device was first released. A phone launched in one market a few weeks before the rest is dated by that first market, so a Xiaomi or OnePlus flagship launched in China in December is that December's year.
 
-The names are the products' own, and they belong to their owners. randino is not affiliated with any of them.
+The names are the products' own, and they belong to their owners. randino is not affiliated with any of them. See the [disclaimer](../guide/disclaimer#trademarks).
 
 ## Makers and models {#vendor}
 

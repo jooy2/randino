@@ -100,7 +100,7 @@ rand_gpu(include_vendor=False, count=2)  # ['Radeon RX 7900 XTX', 'GeForce RTX 4
 
 A Radeon from before the end of 2010 is written as ATI, because that is the name it was sold under; AMD retired the ATI name with the HD 6000 series. A laptop GPU is written the way NVIDIA writes it, `Laptop GPU` and all, so it is never mistaken for the desktop card of the same number. Apple's GPUs are left out: they carry no name of their own, and a Mac reports its chip's, which [`randCpu`](../cpu/rand-cpu) already writes.
 
-The names are the products' own, and they belong to their owners. randino is not affiliated with any of them.
+The names are the products' own, and they belong to their owners. randino is not affiliated with any of them. See the [disclaimer](../guide/disclaimer#trademarks).
 
 ## Makers {#vendors}
 

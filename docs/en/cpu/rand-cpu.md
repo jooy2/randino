@@ -102,7 +102,7 @@ rand_cpu(include_vendor=False, count=2)  # ['Ryzen 7 7800X3D', 'Snapdragon 865']
 
 Each line is represented by the models a spec sheet most often names — the unlocked desktop part, the mainstream laptop part, the flagship and the mid-range chip of a phone line — rather than by every variant its maker sold. A laptop processor counts as `desktop`, the way a laptop runs a desktop operating system.
 
-The names are the products' own, and they belong to their owners. randino is not affiliated with any of them.
+The names are the products' own, and they belong to their owners. randino is not affiliated with any of them. See the [disclaimer](../guide/disclaimer#trademarks).
 
 ## Makers {#vendors}
 

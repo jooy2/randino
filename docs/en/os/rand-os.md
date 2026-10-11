@@ -104,7 +104,7 @@ A draw picks the line first, by the share in the table, and a release inside it 
 
 Each release is written the way it is known, which is not the same pattern for every line: the macOS releases carry the name Apple gave them before the number (`macOS Sonoma 14`), the Android releases up to 9 the dessert after it (`Android 4.4 KitKat`), and an Ubuntu long-term release its `LTS`.
 
-The names are the products' own, and they belong to their owners. randino is not affiliated with any of them.
+The names are the products' own, and they belong to their owners. randino is not affiliated with any of them. See the [disclaimer](../guide/disclaimer#trademarks).
 
 ## Lines {#lines}
 

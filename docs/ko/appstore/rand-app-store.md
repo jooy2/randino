@@ -112,7 +112,7 @@ rand_app_store(include_company=False, count=2)  # ['App Store', 'Galaxy Store']
 | `Ubisoft Connect`  | `Ubisoft Connect`  | Ubisoft         |   3% |
 | `Setapp`           | `Setapp`           | MacPaw          |   3% |
 
-Google Play는 데스크톱 운영체제에 들어 있지 않으므로 첫 번째 표에만 있습니다. 이름은 각 스토어의 것이고, 그 권리는 소유자에게 있습니다. randino는 이들 중 어느 곳과도 관계가 없습니다.
+Google Play는 데스크톱 운영체제에 들어 있지 않으므로 첫 번째 표에만 있습니다. 이름은 각 스토어의 것이고, 그 권리는 소유자에게 있습니다. randino는 이들 중 어느 곳과도 관계가 없습니다. 자세한 내용은 [면책 조항](../guide/disclaimer#trademarks)을 참고하세요.
 
 ## 상세 출력 {#the-detail-output}
 

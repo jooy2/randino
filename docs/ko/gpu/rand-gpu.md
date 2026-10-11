@@ -100,7 +100,7 @@ rand_gpu(include_vendor=False, count=2)  # ['Radeon RX 7900 XTX', 'GeForce RTX 4
 
 2010년 말 이전의 Radeon은 당시 팔리던 이름대로 ATI로 씁니다. AMD는 HD 6000 시리즈부터 ATI라는 이름을 쓰지 않았습니다. 노트북 GPU는 NVIDIA가 쓰는 대로 `Laptop GPU`까지 붙여서, 번호가 같은 데스크톱 카드와 헷갈리지 않게 합니다. 애플 GPU는 뺐습니다. 따로 붙은 이름이 없고, Mac은 칩 이름을 보여 주는데 그 이름은 [`randCpu`](../cpu/rand-cpu)가 이미 씁니다.
 
-이름은 각 제품의 것이고, 그 권리는 소유자에게 있습니다. randino는 이들 중 어느 곳과도 관계가 없습니다.
+이름은 각 제품의 것이고, 그 권리는 소유자에게 있습니다. randino는 이들 중 어느 곳과도 관계가 없습니다. 자세한 내용은 [면책 조항](../guide/disclaimer#trademarks)을 참고하세요.
 
 ## 제조사 {#vendors}
 

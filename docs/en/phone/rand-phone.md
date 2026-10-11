@@ -281,6 +281,8 @@ randino draws a number from the shape of a country's numbering plan and random d
 - When a test sends a text message or places a call, send it to a number you own, or to the test numbers your SMS or telephony provider sets aside, never to one drawn here.
 - Do not use the numbers to reach, harass, spam, defraud or impersonate anybody, to get past a verification step, or for any other malicious purpose. Whoever a drawn number belongs to never agreed to be part of your data.
 
+The [disclaimer](../guide/disclaimer#coincidence) says what holds for every generator, phone numbers included.
+
 ## See also
 
 - [`randName`](../name/rand-name) — a name to go with the number.

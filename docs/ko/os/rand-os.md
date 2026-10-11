@@ -104,7 +104,7 @@ rand_os(include_version=False, count=3)  # ['Windows', 'Android', 'macOS']
 
 릴리스는 알려진 이름 그대로 쓰므로 계열마다 쓰는 형식이 다릅니다. macOS 릴리스는 번호 앞에 애플이 붙인 이름을 쓰고(`macOS Sonoma 14`), Android 9까지는 번호 뒤에 디저트 이름을 쓰며(`Android 4.4 KitKat`), Ubuntu의 장기 지원 릴리스에는 `LTS`가 붙습니다.
 
-이름은 각 제품의 것이고, 그 권리는 소유자에게 있습니다. randino는 이들 중 어느 곳과도 관계가 없습니다.
+이름은 각 제품의 것이고, 그 권리는 소유자에게 있습니다. randino는 이들 중 어느 곳과도 관계가 없습니다. 자세한 내용은 [면책 조항](../guide/disclaimer#trademarks)을 참고하세요.
 
 ## 계열 {#lines}
 

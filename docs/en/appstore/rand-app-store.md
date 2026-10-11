@@ -112,7 +112,7 @@ On a desktop or a laptop, the system stores and the stores games are bought from
 | `Ubisoft Connect`  | `Ubisoft Connect`  | Ubisoft         |    3% |
 | `Setapp`           | `Setapp`           | MacPaw          |    3% |
 
-Google Play is in the first table alone: no desktop system ships it. The names are the stores' own, and they belong to their owners. randino is not affiliated with any of them.
+Google Play is in the first table alone: no desktop system ships it. The names are the stores' own, and they belong to their owners. randino is not affiliated with any of them. See the [disclaimer](../guide/disclaimer#trademarks).
 
 ## The detail output {#the-detail-output}
 

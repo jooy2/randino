@@ -205,6 +205,8 @@ rand_organization(language="ja", type="company", include_legal_form=True, count=
 
 그래도 흔한 이름은 어딘가의 작은 가게나 학교 이름과 겹칠 수 있습니다. `Riverside High School`이 수백 곳의 학교 이름인 것과 같습니다. 이것이 문제라면 `realism: 'invented'`를 주세요. 고유 이름을 그 언어의 소리로 지어내므로(`Caiwi, Inc.`, `솔람테크`), 그 언어처럼 읽히지만 어떤 낱말도 아닌 이름이 됩니다. 목록에 그 글자로 시작하는 이름이 없는 <Lang js="startsWith" dart="startsWith" py="starts_with" code />는 `realism`과 관계없이 그 글자로 시작하도록 지어낸 이름으로 답합니다.
 
+실제 조직과 겹치는 이름은 우연입니다. 자세한 내용은 [면책 조항](../guide/disclaimer#coincidence)을 참고하세요.
+
 ## 길이 {#length}
 
 <Lang js="minLength" dart="minLength" py="min_length" code />와 <Lang js="maxLength" dart="maxLength" py="max_length" code />는 법인 형태까지 포함한 전체 길이이며, 직접 주기 전에는 제한이 없습니다. 범위 안에 들어올 수 없는 모양은 고르기 전에 빼므로, 한국어 조직에 12자 이상을 요구하면 짧은 이름을 늘이지 않고 긴 종류를 씁니다(`주식회사 은빛그린에너지`). 어떤 조직도 닿지 않는 범위에는 가장 가까운 조직으로 답합니다. 가장 긴 이름이 40자를 넘기 때문에(`Công ty TNHH MTV Giải pháp Công nghệ Thịnh Vượng`) 상한은 `60`입니다.

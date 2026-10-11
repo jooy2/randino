@@ -586,6 +586,12 @@ They are **English and JavaScript**: llms.txt has no notion of locales, and the 
 
 **Every page has to exist in both locales.** `data/sidebar.ts` is one structure with an `en` and a `ko` label per entry, and VitePress fails the build on a dead link — so a page added to one locale and not the other does not get committed by accident.
 
+### The disclaimer is one page
+
+`guide/disclaimer` is where the site says what the values are, what they are for, and that a match with a real person, organization, number or product is a coincidence nobody answers for. The repository's `README.md` and each package's carry a short version of it that links there. A page that warns about real values — a phone number that can be in service, a product name that is a trademark, an organization that can match a real one — keeps its own warning and links to the section of the disclaimer it belongs to.
+
+**A new generator whose values can match something real gets a line on that page**, in both locales: under `#coincidence` when a value can be somebody's, under `#trademarks` when it names a real product. The page is a promise about every generator, and one that is missing from it is the one a reader will ask about.
+
 ### The logo
 
 The artwork lives at `assets/logo-master.png` — outside `docs/public/`, so VitePress does not serve it. `docs/public/` holds what is served, one size per job, all generated from that master:
