@@ -6,7 +6,7 @@
 // whole of `randWord`; a nickname is what you get when several of these are put
 // together, which is why the drawing lives here and the composing lives there.
 
-import { chance, clamp, pick, randInt, withRandom } from '../_internal/utils.js';
+import { chance, clamp, pick, pickWeighted, randInt, withRandom } from '../_internal/utils.js';
 import {
 	collect,
 	languagesFitting,
@@ -30,6 +30,7 @@ import type {
 	WordThemeOption
 } from '../_types/global.js';
 import {
+	LEVEL_WEIGHTS,
 	WORD_DATA,
 	WORD_LANGUAGES,
 	WORD_THEMES,
@@ -284,6 +285,60 @@ export function levelledNouns(
  * is every pool of the language and some thousands of comparisons for a word
  * that is usually in none of them.
  */
+const tierCache = new WeakMap<WordLanguageData, Map<WordTheme, readonly WordPool[]>>();
+
+/** A theme's pool split into its three levels: basic, common and rare. */
+function levelTiers(data: WordLanguageData, theme: WordTheme): readonly WordPool[] {
+	let byTheme = tierCache.get(data);
+
+	if (!byTheme) {
+		byTheme = new Map();
+		tierCache.set(data, byTheme);
+	}
+
+	const cached = byTheme.get(theme);
+
+	if (cached) {
+		return cached;
+	}
+
+	const basic = new Set(data.levels.basic);
+	const rare = new Set(data.levels.rare);
+	const pool = data.nouns[theme];
+	const tiers = [
+		pool.filter((word) => basic.has(word)),
+		pool.filter((word) => !basic.has(word) && !rare.has(word)),
+		pool.filter((word) => rare.has(word))
+	];
+
+	byTheme.set(theme, tiers);
+
+	return tiers;
+}
+
+/**
+ * The pool one word is drawn from: the theme's own at the vocabulary asked for,
+ * or, where `LEVEL_WEIGHTS` weighs the theme and every level is open, one of its
+ * levels, picked by its weight times its size. A level with no word in it is
+ * never picked, because its share is nothing.
+ */
+export function weightedNouns(
+	data: WordLanguageData,
+	theme: WordTheme,
+	vocabulary: RandVocabulary
+): WordPool {
+	const weights = LEVEL_WEIGHTS[theme];
+
+	if (!weights || vocabulary !== 'full') {
+		return levelledNouns(data, theme, vocabulary);
+	}
+
+	const tiers = levelTiers(data, theme);
+	const each = [weights.basic, weights.common, weights.rare];
+
+	return pickWeighted(tiers, (tier) => each[tiers.indexOf(tier)] * tier.length);
+}
+
 const themeCache = new WeakMap<WordLanguageData, Map<string, WordTheme>>();
 
 function themeIndexOf(data: WordLanguageData): Map<string, WordTheme> {
@@ -504,7 +559,11 @@ export function drawWord(
 	invent: number,
 	min: number,
 	max: number,
-	prefix: string
+	prefix: string,
+	// The pool an invented word is written like, when the one it is drawn from is
+	// only part of it: one level of a weighted theme may be all capitals where the
+	// theme as a whole is not.
+	casing: WordPool = pool
 ): Drawn {
 	const made = chance(invent);
 	const word = made ? null : pickWord(pool, min, max, prefix);
@@ -517,7 +576,7 @@ export function drawWord(
 		// already written that way, so only an invented one asks the pool, which
 		// is walked to the end in a script with no case.
 		word:
-			data.capitalize || (word === null && poolCapitalizes(pool))
+			data.capitalize || (word === null && poolCapitalizes(casing))
 				? capitalizeFirst(chosen)
 				: chosen,
 		missed: !made && !word
@@ -570,7 +629,16 @@ function generateOne(language: WordLanguage, settings: Settings): WordDetail {
 		const pool = levelledNouns(data, theme, settings.vocabulary);
 		const [low, high] = poolBounds(pool);
 		const [min, max] = lengthBounds(settings.minLength, settings.maxLength, low, high);
-		const { word, missed } = drawWord(data, pool, settings.invent, min, max, settings.prefix);
+		// The level the theme's weights pick, and the whole pool when that level has
+		// no word the range and the first character allow.
+		const weighted = weightedNouns(data, theme, settings.vocabulary);
+		let drawn = drawWord(data, weighted, settings.invent, min, max, settings.prefix, pool);
+
+		if (drawn.missed && weighted !== pool) {
+			drawn = drawWord(data, pool, settings.invent, min, max, settings.prefix);
+		}
+
+		const { word, missed } = drawn;
 		const detail: WordDetail = {
 			word,
 			language,

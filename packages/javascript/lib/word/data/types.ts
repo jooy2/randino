@@ -90,6 +90,17 @@ export type WordLevels = {
 	rare: WordPool;
 };
 
+/**
+ * What each level of a theme weighs in a draw, against the other two: `basic`,
+ * the words in neither list (`common`), and `rare`. A level is picked by its
+ * weight times its size, so a weight of 1 everywhere is the even draw.
+ */
+export type WordLevelWeights = {
+	basic: number;
+	common: number;
+	rare: number;
+};
+
 export type WordLanguageData = {
 	// Joins words that are put together. '' everywhere so far — Korean and CJK
 	// words run together, and alphabetic ones read as CamelCase (BraveLion).

@@ -7,7 +7,7 @@ from randino._types import (
     WordTheme,
     WordThemeOption,
 )
-from randino.word.data._types import WordLanguageData
+from randino.word.data._types import WordLanguageData, WordLevelWeights
 from randino.word.data.de import DE
 from randino.word.data.en import EN
 from randino.word.data.es import ES
@@ -78,6 +78,18 @@ of and still have something anybody would type — `멋진대출`, `BraveInvoice
 So `rand_nickname` leaves them out of `theme="all"` at `realism="real"` and puts them
 back at `"mixed"` and `"invented"`. A theme the caller named is always honoured: asking
 for `finance` and getting something else would be the argument not working.
+"""
+
+LEVEL_WEIGHTS: dict[WordTheme, WordLevelWeights] = {
+    "planet": WordLevelWeights(basic=12, common=3, rare=1),
+}
+"""Themes whose everyday words an even draw would bury, and what each level weighs instead.
+
+`planet` holds the eight planets and Pluto beside some ninety names only an astronomer
+knows, and drawn evenly it named an exoplanet four times in five; weighted, the nine come
+up about half the time in English and the rest keep the other half. Read by `rand_word`
+and its themed forms alone: a sentence keeps to the common words already, and a nickname
+is welcome to be named after Dimidium.
 """
 
 WORD_DATA: dict[WordLanguage, WordLanguageData] = {

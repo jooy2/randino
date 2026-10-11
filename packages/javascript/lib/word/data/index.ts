@@ -11,7 +11,7 @@ import { ES } from './es.js';
 import { IT } from './it.js';
 import { JA } from './ja.js';
 import { KO } from './ko.js';
-import type { WordLanguageData } from './types.js';
+import type { WordLanguageData, WordLevelWeights } from './types.js';
 import { RU } from './ru.js';
 import { VI } from './vi.js';
 import { ZH } from './zh.js';
@@ -87,6 +87,19 @@ export const WORD_THEMES: readonly WordTheme[] = [
  * not working.
  */
 export const LOOSE_THEMES: readonly WordTheme[] = ['color', 'finance', 'tech'];
+
+/**
+ * Themes whose everyday words an even draw would bury, and what each level
+ * weighs instead. `planet` holds the eight planets and Pluto beside some ninety
+ * names only an astronomer knows, and drawn evenly it named an exoplanet four
+ * times in five; weighted, the nine come up about half the time in English and
+ * the rest keep the other half. Read by `randWord` and its themed forms alone: a
+ * sentence keeps to the common words already, and a nickname is welcome to be
+ * named after Dimidium.
+ */
+export const LEVEL_WEIGHTS: Partial<Record<WordTheme, WordLevelWeights>> = {
+	planet: { basic: 12, common: 3, rare: 1 }
+};
 
 export const WORD_DATA: Record<WordLanguage, WordLanguageData> = {
 	en: EN,

@@ -268,6 +268,45 @@ WordPool levelledNouns(WordLanguageData data, WordTheme theme, RandVocabulary vo
   return usable;
 }
 
+final Expando<Map<WordTheme, List<WordPool>>> _tierCache = Expando<Map<WordTheme, List<WordPool>>>(
+  'levelTiers',
+);
+
+/// A theme's pool split into its three levels: basic, common and rare.
+List<WordPool> _levelTiers(WordLanguageData data, WordTheme theme) {
+  final byTheme = _tierCache[data] ??= <WordTheme, List<WordPool>>{};
+
+  return byTheme.putIfAbsent(theme, () {
+    final basic = data.levels.basic.toSet();
+    final rare = data.levels.rare.toSet();
+    final pool = data.nouns[theme]!;
+
+    return <WordPool>[
+      pool.where(basic.contains).toList(growable: false),
+      pool.where((word) => !basic.contains(word) && !rare.contains(word)).toList(growable: false),
+      pool.where(rare.contains).toList(growable: false),
+    ];
+  });
+}
+
+/// The pool one word is drawn from: the theme's own at the vocabulary asked
+/// for, or, where [levelWeights] weighs the theme and every level is open, one
+/// of its levels, picked by its weight times its size.
+///
+/// A level with no word in it is never picked, because its share is nothing.
+WordPool weightedNouns(WordLanguageData data, WordTheme theme, RandVocabulary vocabulary) {
+  final weights = levelWeights[theme];
+
+  if (weights == null || vocabulary != RandVocabulary.full) {
+    return levelledNouns(data, theme, vocabulary);
+  }
+
+  final tiers = _levelTiers(data, theme);
+  final each = <num>[weights.basic, weights.common, weights.rare];
+
+  return pickWeighted(tiers, (tier) => each[tiers.indexOf(tier)] * tier.length);
+}
+
 /// Theme a word belongs to, across every theme of the language.
 WordTheme? themeOf(WordLanguageData data, String word) => _themeIndexOf(data)[word];
 
@@ -444,7 +483,19 @@ class Drawn {
 }
 
 /// Draw one word from [pool], or invent one [invent] percent of the time.
-Drawn drawWord(WordLanguageData data, WordPool pool, int invent, int min, int max, String prefix) {
+///
+/// [casing] is the pool an invented word is written like, when [pool] is only
+/// part of it: one level of a weighted theme may be all capitals where the theme
+/// as a whole is not.
+Drawn drawWord(
+  WordLanguageData data,
+  WordPool pool,
+  int invent,
+  int min,
+  int max,
+  String prefix, {
+  WordPool? casing,
+}) {
   final made = chance(invent);
   final word = made ? null : pickWord(pool, min, max, prefix);
   final chosen = word ?? synthWord(data.syn, min, max, prefix);
@@ -454,7 +505,7 @@ Drawn drawWord(WordLanguageData data, WordPool pool, int invent, int min, int ma
   // the `Klugheit` and `Bettdecke` of the pools. A drawn word is already written
   // that way, so only an invented one asks the pool, which is walked to the end in
   // a script with no case.
-  final capitalized = data.capitalize || (word == null && poolCapitalizes(pool));
+  final capitalized = data.capitalize || (word == null && poolCapitalizes(casing ?? pool));
 
   return Drawn(capitalized ? capitalizeFirst(chosen) : chosen, !made && word == null);
 }
@@ -498,7 +549,14 @@ WordDetail _generateOne(
     final pool = levelledNouns(data, drawnTheme, vocabulary);
     final natural = poolBounds(pool);
     final range = lengthBounds(minLength, maxLength, natural.min, natural.max);
-    final drawn = drawWord(data, pool, invent, range.min, range.max, prefix);
+    // The level the theme's weights pick, and the whole pool when that level has
+    // no word the range and the first character allow.
+    final weighted = weightedNouns(data, drawnTheme, vocabulary);
+    var drawn = drawWord(data, weighted, invent, range.min, range.max, prefix, casing: pool);
+
+    if (drawn.missed && !identical(weighted, pool)) {
+      drawn = drawWord(data, pool, invent, range.min, range.max, prefix);
+    }
     final detail = WordDetail(
       word: drawn.word,
       language: language,

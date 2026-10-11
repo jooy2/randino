@@ -2,6 +2,8 @@
 
 Planets by name: the eight, the dwarf planets, the best-known named minor planets and the exoplanets the IAU has named. Never a catalogue designation such as `Kepler-452b`, and never a name the IAU took from a person.
 
+The eight planets and Pluto are a handful of names beside dozens only an astronomer knows, so they are drawn more often than their count alone would make them: about half the draws in English, more in the languages that write fewer exoplanets. `vocabulary: 'basic'` keeps to them alone.
+
 [`randWord`](./rand-word) with `theme` fixed to <Lang js="'planet'" dart="WordTheme.planet" py="&quot;planet&quot;" code />; every other option is the same one, and means the same thing.
 
 ::: lang js

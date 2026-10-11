@@ -99,7 +99,7 @@ from randino.version.data import (
     VERSION_YEAR_MAX_DEFAULT,
     VERSION_YEAR_MIN_DEFAULT,
 )
-from randino.word.data import LOOSE_THEMES, WORD_DATA, WORD_LANGUAGES, WORD_THEMES
+from randino.word.data import LEVEL_WEIGHTS, LOOSE_THEMES, WORD_DATA, WORD_LANGUAGES, WORD_THEMES
 from randino.word.data._types import SyllableSynthesis, WordAgreement
 
 
@@ -778,6 +778,10 @@ print(
                 "languages": list(WORD_LANGUAGES),
                 "themes": list(WORD_THEMES),
                 "looseThemes": list(LOOSE_THEMES),
+                "levelWeights": {
+                    theme: {"basic": w.basic, "common": w.common, "rare": w.rare}
+                    for theme, w in LEVEL_WEIGHTS.items()
+                },
                 "data": word,
             },
             "sentence": {

@@ -26,6 +26,7 @@ from randino._internal.utils import (
     chance,
     clamp,
     pick,
+    pick_weighted,
     rand_int,
     with_random,
 )
@@ -40,6 +41,7 @@ from randino._types import (
     WordThemeOption,
 )
 from randino.word.data import (
+    LEVEL_WEIGHTS,
     WORD_DATA,
     WORD_LANGUAGES,
     WORD_THEMES,
@@ -278,6 +280,50 @@ def pool_capitalizes(pool: WordPool) -> bool:
 _LEVEL_CACHE: dict[tuple[int, WordTheme, RandVocabulary], WordPool] = {}
 
 
+_TIER_CACHE: dict[tuple[int, WordTheme], tuple[WordPool, WordPool, WordPool]] = {}
+
+
+def _level_tiers(data: WordLanguageData, theme: WordTheme) -> tuple[WordPool, WordPool, WordPool]:
+    """A theme's pool split into its three levels: basic, common and rare."""
+    key = (id(data), theme)
+    cached = _TIER_CACHE.get(key)
+
+    if cached is not None:
+        return cached
+
+    basic = set(data.levels.basic)
+    rare = set(data.levels.rare)
+    pool = data.nouns[theme]
+    tiers = (
+        tuple(word for word in pool if word in basic),
+        tuple(word for word in pool if word not in basic and word not in rare),
+        tuple(word for word in pool if word in rare),
+    )
+    _TIER_CACHE[key] = tiers
+
+    return tiers
+
+
+def weighted_nouns(
+    data: WordLanguageData, theme: WordTheme, vocabulary: RandVocabulary
+) -> WordPool:
+    """The pool one word is drawn from.
+
+    The theme's own at the vocabulary asked for, or, where `LEVEL_WEIGHTS` weighs the theme
+    and every level is open, one of its levels, picked by its weight times its size. A
+    level with no word in it is never picked, because its share is nothing.
+    """
+    weights = LEVEL_WEIGHTS.get(theme)
+
+    if weights is None or vocabulary != "full":
+        return levelled_nouns(data, theme, vocabulary)
+
+    tiers = _level_tiers(data, theme)
+    each = (weights.basic, weights.common, weights.rare)
+
+    return pick_weighted(tiers, lambda tier: each[tiers.index(tier)] * len(tier))
+
+
 def levelled_nouns(
     data: WordLanguageData, theme: WordTheme, vocabulary: RandVocabulary
 ) -> WordPool:
@@ -490,8 +536,13 @@ def draw_word(
     low: int,
     high: int,
     prefix: str,
+    casing: WordPool | None = None,
 ) -> Drawn:
-    """Draw one word from `pool`, or invent one `invent` percent of the time."""
+    """Draw one word from `pool`, or invent one `invent` percent of the time.
+
+    `casing` is the pool an invented word is written like, when `pool` is only part of it:
+    one level of a weighted theme may be all capitals where the theme as a whole is not.
+    """
     made = chance(invent)
     word = None if made else pick_word(pool, low, high, prefix)
     chosen = word if word is not None else synth_word(data.syn, low, high, prefix)
@@ -500,7 +551,9 @@ def draw_word(
     # how a German one comes out `Biefreum` rather than `biefreum` beside the `Klugheit`
     # and `Bettdecke` of the pools. A drawn word is already written that way, so only an
     # invented one asks the pool, which is walked to the end in a script with no case.
-    capitalized = data.capitalize or (word is None and pool_capitalizes(pool))
+    capitalized = data.capitalize or (
+        word is None and pool_capitalizes(pool if casing is None else casing)
+    )
 
     return Drawn(
         capitalize_first(chosen) if capitalized else chosen,
@@ -546,7 +599,15 @@ def generate_one(language: WordLanguage, settings: Settings) -> WordDetail:
         low, high = length_bounds(
             settings.min_length, settings.max_length, natural_low, natural_high
         )
-        word, missed = draw_word(data, pool, settings.invent, low, high, settings.prefix)
+        # The level the theme's weights pick, and the whole pool when that level has no
+        # word the range and the first character allow.
+        weighted = weighted_nouns(data, theme, settings.vocabulary)
+        word, missed = draw_word(
+            data, weighted, settings.invent, low, high, settings.prefix, casing=pool
+        )
+
+        if missed and weighted is not pool:
+            word, missed = draw_word(data, pool, settings.invent, low, high, settings.prefix)
         detail = WordDetail(
             word=word,
             language=language,

@@ -140,6 +140,24 @@ class WordLevels {
   final WordPool rare;
 }
 
+/// What each level of a theme weighs in a draw, against the other two.
+///
+/// A level is picked by its weight times its size, so a weight of 1
+/// everywhere is the even draw.
+class WordLevelWeights {
+  /// Creates the three weights.
+  const WordLevelWeights({required this.basic, required this.common, required this.rare});
+
+  /// The everyday words.
+  final num basic;
+
+  /// The words in neither list.
+  final num common;
+
+  /// The specialist's and the dictionary's words.
+  final num rare;
+}
+
 /// Everything the generators know about one word language.
 class WordLanguageData {
   /// Creates a language dataset.

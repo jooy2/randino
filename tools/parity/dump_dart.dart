@@ -869,6 +869,14 @@ void main() {
         ],
         'themes': <String>[for (final theme in wordThemes) theme.name],
         'looseThemes': <String>[for (final theme in looseThemes) theme.name],
+        'levelWeights': <String, Object?>{
+          for (final entry in levelWeights.entries)
+            entry.key.name: <String, Object?>{
+              'basic': entry.value.basic,
+              'common': entry.value.common,
+              'rare': entry.value.rare,
+            },
+        },
         'data': word,
       },
       'sentence': <String, Object?>{

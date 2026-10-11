@@ -186,6 +186,27 @@ describe('Word', () => {
 		assert.deepStrictEqual([...themes].sort(), [...WORD_THEMES].sort());
 	});
 
+	it('a weighted theme draws its everyday words more often than their count alone would', () => {
+		// `planet` holds the eight planets and Pluto beside some ninety names only an
+		// astronomer knows, and an even draw named an exoplanet four times in five.
+		for (const language of WORD_LANGUAGES) {
+			const basic = new Set(WORD_DATA[language].levels.basic);
+			const pool = WORD_DATA[language].nouns.planet;
+			const even = pool.filter((word) => basic.has(word)).length / pool.length;
+			const drawn = randPlanet({ language, count: 600 });
+			const share = drawn.filter((word) => basic.has(word)).length / drawn.length;
+
+			assert.ok(
+				share > even * 1.5,
+				`${language}: ${share.toFixed(2)} of the draws were everyday, against ${even.toFixed(2)} of the pool`
+			);
+			assert.ok(
+				drawn.some((word) => !basic.has(word)),
+				`${language}: no rarer planet came up`
+			);
+		}
+	});
+
 	it('there is one generator per theme, and it is that theme', () => {
 		// A theme added to `WORD_THEMES` without a generator beside it is the
 		// failure this catches — the table above would be missing a key.

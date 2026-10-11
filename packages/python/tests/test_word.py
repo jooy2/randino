@@ -154,6 +154,22 @@ def test_the_mixed_language_uses_every_language_it_knows() -> None:
     assert len(used) == len(WORD_LANGUAGES)
 
 
+def test_a_weighted_theme_draws_its_everyday_words_more_often_than_their_count_would() -> None:
+    # `planet` holds the eight planets and Pluto beside some ninety names only an astronomer
+    # knows, and an even draw named an exoplanet four times in five.
+    for language in WORD_LANGUAGES:
+        basic = set(WORD_DATA[language].levels.basic)
+        pool = WORD_DATA[language].nouns["planet"]
+        even = sum(1 for word in pool if word in basic) / len(pool)
+        drawn = rand_planet(language=language, count=600)
+        share = sum(1 for word in drawn if word in basic) / len(drawn)
+
+        assert share > even * 1.5, (
+            f"{language}: {share:.2f} of the draws were everyday, against {even:.2f} of the pool"
+        )
+        assert any(word not in basic for word in drawn), f"{language}: no rarer planet came up"
+
+
 def test_a_drawn_word_comes_out_of_the_pools_with_the_theme_that_holds_it() -> None:
     for language in WORD_LANGUAGES:
         pool = set(pool_of(language))

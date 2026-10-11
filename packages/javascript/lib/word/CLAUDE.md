@@ -49,6 +49,10 @@ The rule is applied strictly, and the young, the size, the sex, the stage and th
 
 This applies to every language, and the failure looks different in each. Korean and Japanese suffix a classifier (`꽃`, `類`, `具`, `体`); Chinese suffixes `系` or `馆`; Vietnamese puts a state in front of a noun (`lá khô`, `nước ấm`); English keeps a British and an American spelling of one word; Russian keeps a diminutive beside its base. `tools/parity` cannot see any of it — the packages agree with each other perfectly while all three hold the same redundant entry. What finds it is comparing a pool **against itself**: within one theme, look for a word that contains another.
 
+## Weighting a theme's levels
+
+A draw is even over the pool, which is right for nearly every theme and wrong for one whose everyday words are a handful beside dozens a specialist knows. `LEVEL_WEIGHTS` in `lib/word/data/index.ts` names those themes and what each level weighs; `weightedNouns` picks a level by its weight times its size, then a word inside it, and falls back to the whole pool when the level has no word the range or `startsWith` allows. `planet` is the one listed — the eight planets and Pluto beside some ninety exoplanets — and an even draw named an exoplanet four times in five. Only `randWord` and its themed forms read it: a sentence keeps to the common words already. An invented word is still written the way the whole theme is, which is what `drawWord`'s `casing` is for — a level of all capitals in a theme that is not would otherwise capitalise it. Weights are data, so `tools/parity` compares them.
+
 ## Adding a word theme
 
 A theme is a slice of everyday vocabulary that a modifier can sit in front of. Adding one touches every language at once, because `nouns` is a `Record<WordTheme, WordPool>` — the TypeScript type will not let a language skip it, and the ports assert it instead. **It also adds a public function**, because every theme has one.

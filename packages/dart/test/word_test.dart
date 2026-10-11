@@ -144,6 +144,29 @@ void main() {
       expect(used, hasLength(wordLanguages.length));
     });
 
+    test('a weighted theme draws its everyday words more often than their count alone would', () {
+      // `planet` holds the eight planets and Pluto beside some ninety names only an
+      // astronomer knows, and an even draw named an exoplanet four times in five.
+      for (final language in wordLanguages) {
+        final basic = wordData[language]!.levels.basic.toSet();
+        final pool = wordData[language]!.nouns[WordTheme.planet]!;
+        final even = pool.where(basic.contains).length / pool.length;
+        final drawn = randPlanet(language: language, count: 600);
+        final share = drawn.where(basic.contains).length / drawn.length;
+
+        expect(
+          share,
+          greaterThan(even * 1.5),
+          reason: '$language: $share of the draws were everyday, against $even of the pool',
+        );
+        expect(
+          drawn.any((word) => !basic.contains(word)),
+          isTrue,
+          reason: '$language: no rarer planet came up',
+        );
+      }
+    });
+
     test('a drawn word comes out of the pools, and reports the theme that holds it', () {
       for (final language in wordLanguages) {
         final pool = poolOf(language).toSet();

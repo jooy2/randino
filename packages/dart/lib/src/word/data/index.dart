@@ -83,6 +83,19 @@ final List<WordTheme> wordThemes = List<WordTheme>.unmodifiable(<WordTheme>[
 /// the parameter not working.
 const List<WordTheme> looseThemes = <WordTheme>[WordTheme.color, WordTheme.finance, WordTheme.tech];
 
+/// Themes whose everyday words an even draw would bury, and what each level
+/// weighs instead.
+///
+/// `planet` holds the eight planets and Pluto beside some ninety names only an
+/// astronomer knows, and drawn evenly it named an exoplanet four times in five;
+/// weighted, the nine come up about half the time in English and the rest keep
+/// the other half. Read by `randWord` and its themed forms alone: a sentence
+/// keeps to the common words already, and a nickname is welcome to be named
+/// after Dimidium.
+const Map<WordTheme, WordLevelWeights> levelWeights = <WordTheme, WordLevelWeights>{
+  WordTheme.planet: WordLevelWeights(basic: 12, common: 3, rare: 1),
+};
+
 /// The dataset behind each language. Internal.
 final Map<WordLanguage, WordLanguageData> wordData =
     Map<WordLanguage, WordLanguageData>.unmodifiable(<WordLanguage, WordLanguageData>{

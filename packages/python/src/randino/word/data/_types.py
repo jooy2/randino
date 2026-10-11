@@ -128,6 +128,24 @@ class WordLevels:
 
 
 @dataclass(frozen=True, slots=True)
+class WordLevelWeights:
+    """What each level of a theme weighs in a draw, against the other two.
+
+    A level is picked by its weight times its size, so a weight of 1 everywhere is the
+    even draw.
+    """
+
+    basic: float
+    """The everyday words."""
+
+    common: float
+    """The words in neither list."""
+
+    rare: float
+    """The specialist's and the dictionary's words."""
+
+
+@dataclass(frozen=True, slots=True)
 class WordLanguageData:
     """Everything the generators know about one word language."""
 

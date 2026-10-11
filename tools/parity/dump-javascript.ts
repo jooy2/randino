@@ -132,6 +132,7 @@ import type {
 } from '../../packages/javascript/lib/sentence/data/types.js';
 import { KO_SURNAME_ROMAN } from '../../packages/javascript/lib/name/data/ko.js';
 import {
+	LEVEL_WEIGHTS,
 	LOOSE_THEMES,
 	WORD_DATA,
 	WORD_LANGUAGES,
@@ -538,6 +539,12 @@ console.log(
 			languages: [...WORD_LANGUAGES],
 			themes: [...WORD_THEMES],
 			looseThemes: [...LOOSE_THEMES],
+			levelWeights: Object.fromEntries(
+				Object.entries(LEVEL_WEIGHTS).map(([theme, weights]) => [
+					theme,
+					{ basic: weights!.basic, common: weights!.common, rare: weights!.rare }
+				])
+			),
 			data: Object.fromEntries(
 				Object.entries(WORD_DATA).map(([code, data]) => [
 					code,
