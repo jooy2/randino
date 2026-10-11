@@ -69,9 +69,6 @@ bool acceptsObjectNoun(SentenceLanguageData data, VerbGroup group, String noun) 
 
 bool acceptsNoun(SentenceLanguageData data, VerbGroup group, String noun) {
   final traits = traitsOf(data, noun);
-
-  if (traits.contains(NounTrait.lifeless)) return false;
-
   final wanted = group.subjectTraits;
   final barred = group.subjectWithout;
 
@@ -1900,17 +1897,15 @@ void main() {
       }
     });
 
-    test('a lifeless word never does anything, and a spell is no longer one', () {
-      // `lifeless` marks a word of a creature theme that is no creature. `myth` held
-      // spells and amulets beside dragons and elves and needed it; since the
-      // creatures moved to `monster`, `myth` is an idea, and a curse that fades is
-      // a sentence like any other. A word a language does list still never acts.
+    test('a spell from `myth` is a subject like any other', () {
+      // `myth` held spells and amulets beside dragons and elves, and a spell that
+      // chooses a gouge is what the class alone allowed. The creatures are
+      // `monster` now and `myth` is an idea, so a curse that fades is a sentence of
+      // its own.
       expect(themeClass[WordTheme.myth], NounClass.idea);
       expect(themeClass[WordTheme.monster], NounClass.creature);
 
       for (final language in wordLanguages) {
-        final data = sentenceData[language]!;
-        final lifeless = (data.traits?[NounTrait.lifeless] ?? const <String>[]).toSet();
         final pronouns = pronounsOf(language);
         final myth =
             wordData[language]!.nouns[WordTheme.myth]!.map((word) => plain(language, word)).toSet();
@@ -1929,15 +1924,7 @@ void main() {
 
             if (detail.slots[i] != SentenceSlot.subject || pronouns.contains(phrase)) continue;
 
-            final found = nounsIn(language, phrase);
-
-            expect(
-              found.isEmpty || found.any((noun) => !lifeless.contains(noun)),
-              isTrue,
-              reason: "$language: '$phrase' is lifeless (${detail.sentence})",
-            );
-
-            spells += found.where(myth.contains).length;
+            spells += nounsIn(language, phrase).where(myth.contains).length;
           }
         }
 
@@ -4386,9 +4373,6 @@ void main() {
 
             for (final word in lexicon.nouns[theme]!) {
               final noun = plain(language, word);
-
-              // A lifeless noun takes no verb, by design.
-              if (traitsOf(data, noun).contains(NounTrait.lifeless)) continue;
 
               expect(
                 inField.any((group) => acceptsNoun(data, group, noun)),

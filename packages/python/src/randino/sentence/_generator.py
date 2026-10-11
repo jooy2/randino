@@ -2157,19 +2157,14 @@ def _accepts_noun(data: SentenceLanguageData, group: VerbGroup | StateGroup, nou
     """Whether a group takes this noun as its subject, by what the noun can do.
 
     A group that asks for no trait takes any noun; one that asks for one takes only a noun
-    that carries it; one that rules some out takes any noun that carries none of them. A
-    lifeless noun neither does anything nor is anything a creature is: a spell casts no
-    spell, and an amulet is never hungry.
+    that carries it; one that rules some out takes any noun that carries none of them.
     """
-    traits = _traits_of(data, noun)
-
-    if "lifeless" in traits:
-        return False
-
     if not isinstance(group, VerbGroup) or (
         group.subject_traits is None and group.subject_without is None
     ):
         return True
+
+    traits = _traits_of(data, noun)
 
     if group.subject_traits is not None and not any(t in traits for t in group.subject_traits):
         return False
@@ -2206,9 +2201,8 @@ def _subject_pool_for(
         group.subject_traits is not None or group.subject_without is not None
     )
 
-    # A state group narrows nothing of its own, but a lifeless noun is no subject of one
-    # either.
-    if not narrowed and (data.traits is None or data.traits.get("lifeless") is None):
+    # A state group narrows nothing of its own.
+    if not narrowed:
         return pool
 
     key = (id(group), theme, vocabulary)

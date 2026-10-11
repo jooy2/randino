@@ -1806,17 +1806,11 @@ function acceptsNoun(
 	group: VerbGroup | StateGroup,
 	noun: string
 ): boolean {
-	const traits = traitsOf(data, noun);
-
-	// A lifeless noun neither does anything nor is anything a creature is: a spell
-	// casts no spell, and an amulet is never hungry.
-	if (traits.includes('lifeless')) {
-		return false;
-	}
-
 	if (!('field' in group) || (!group.subjectTraits && !group.subjectWithout)) {
 		return true;
 	}
+
+	const traits = traitsOf(data, noun);
 
 	if (group.subjectTraits && !group.subjectTraits.some((trait) => traits.includes(trait))) {
 		return false;
@@ -1854,9 +1848,8 @@ function subjectPoolFor(
 	const pool = nounsOf(language, theme, vocabulary);
 	const narrowed = 'field' in group && (group.subjectTraits || group.subjectWithout);
 
-	// A state group narrows nothing of its own, but a lifeless noun is no subject
-	// of one either.
-	if (!narrowed && !data.traits?.lifeless) {
+	// A state group narrows nothing of its own.
+	if (!narrowed) {
 		return pool;
 	}
 

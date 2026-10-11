@@ -160,18 +160,13 @@ class PredicateTense:
     """The other forms, index-aligned with `words`."""
 
 
-NounTrait = Literal[
-    "flier", "swimmer", "crawler", "lifeless", "liquid", "raw", "placeless", "proper"
-]
+NounTrait = Literal["flier", "swimmer", "crawler", "liquid", "raw", "placeless", "proper"]
 """What a noun can do that its theme does not say.
 
 A fish and a sparrow are both `animal`, and only one of them flies; a snake and a lion are
 both `animal`, and only one of them runs. A language lists the nouns that carry each trait
 under `SentenceLanguageData.traits`, and a verb group asks for one with `subject_traits` or
-rules one out with `subject_without`. `"lifeless"` is the odd one: a word of a creature
-theme that is no creature — a spell, a rune, an amulet — which takes no verb and no state
-at all, because it neither does anything nor is anything a creature is. `"liquid"` and
-`"raw"` are what a verb asks of its object: `sips` takes a liquid and `chews` takes none,
+rules one out with `subject_without`. `"liquid"` and `"raw"` are what a verb asks of its object: `sips` takes a liquid and `chews` takes none,
 `roasts` takes something raw. `"placeless"` is what a place part asks of its noun: a word
 of the `place` class that is no place — a wave, a comet, a lightyear — which a sentence never
 happens in and nobody goes to. `"proper"` is how the noun is written rather than what it can

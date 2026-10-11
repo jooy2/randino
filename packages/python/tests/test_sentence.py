@@ -204,9 +204,6 @@ def accepts_noun(data: SentenceLanguageData, group: VerbGroup, noun: str) -> boo
     """Whether a verb group takes this noun as its subject, by what the noun can do."""
     traits = traits_of(data, noun)
 
-    if "lifeless" in traits:
-        return False
-
     if group.subject_traits is not None and not any(t in traits for t in group.subject_traits):
         return False
 
@@ -1647,17 +1644,14 @@ def test_a_sentence_happens_somewhere() -> None:
                     )
 
 
-def test_a_lifeless_word_never_does_anything_and_a_spell_is_no_longer_one() -> None:
-    # `lifeless` marks a word of a creature theme that is no creature. `myth` held spells
-    # and amulets beside dragons and elves and needed it; since the creatures moved to
-    # `monster`, `myth` is an idea, and a curse that fades is a sentence like any other.
-    # A word a language does list still never acts.
+def test_a_spell_from_myth_is_a_subject_like_any_other() -> None:
+    # `myth` held spells and amulets beside dragons and elves, and a spell that chooses a
+    # gouge is what the class alone allowed. The creatures are `monster` now and `myth` is
+    # an idea, so a curse that fades is a sentence of its own.
     assert THEME_CLASS["myth"] == "idea"
     assert THEME_CLASS["monster"] == "creature"
 
     for language in WORD_LANGUAGES:
-        data = SENTENCE_DATA[language]
-        lifeless = set((data.traits or {}).get("lifeless") or ())
         pronouns = pronouns_of(language)
         myth = {plain(language, word) for word in WORD_DATA[language].nouns["myth"]}
         spells = 0
@@ -1675,13 +1669,7 @@ def test_a_lifeless_word_never_does_anything_and_a_spell_is_no_longer_one() -> N
                 if slot != "subject" or phrase in pronouns:
                     continue
 
-                found = nouns_in(language, phrase)
-
-                assert not found or any(noun not in lifeless for noun in found), (
-                    f"{language}: '{phrase}' is lifeless ({detail.sentence})"
-                )
-
-                spells += sum(1 for noun in found if noun in myth)
+                spells += sum(1 for noun in nouns_in(language, phrase) if noun in myth)
 
         assert spells > 0, f"{language}: no sentence about a myth had one for its subject"
 
@@ -2968,10 +2956,6 @@ def test_every_noun_the_pools_hold_has_a_verb_in_every_field_its_class_has() -> 
 
                 for word in lexicon.nouns[theme]:
                     noun = plain(language, word)
-
-                    # A lifeless noun takes no verb, by design.
-                    if "lifeless" in traits_of(data, noun):
-                        continue
 
                     assert any(accepts_noun(data, group, noun) for group in in_field), (
                         f"{language}: no {field} verb takes '{noun}'"

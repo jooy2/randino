@@ -452,10 +452,6 @@ function acceptsObjectNoun(data: SentenceLanguageData, group: VerbGroup, noun: s
 function acceptsNoun(data: SentenceLanguageData, group: VerbGroup, noun: string): boolean {
 	const traits = traitsOf(data, noun);
 
-	if (traits.includes('lifeless')) {
-		return false;
-	}
-
 	if (group.subjectTraits && !group.subjectTraits.some((trait) => traits.includes(trait))) {
 		return false;
 	}
@@ -1782,17 +1778,14 @@ describe('Sentence', () => {
 		}
 	});
 
-	it('a lifeless word never does anything, and a spell is no longer one', () => {
-		// `lifeless` marks a word of a creature theme that is no creature. `myth` held
-		// spells and amulets beside dragons and elves and needed it; since the
-		// creatures moved to `monster`, `myth` is an idea, and a curse that fades is
-		// a sentence like any other. A word a language does list still never acts.
+	it('a spell from `myth` is a subject like any other', () => {
+		// `myth` held spells and amulets beside dragons and elves, and a spell that
+		// chooses a gouge is what the class alone allowed. The creatures are `monster`
+		// now and `myth` is an idea, so a curse that fades is a sentence of its own.
 		assert.strictEqual(THEME_CLASS.myth, 'idea');
 		assert.strictEqual(THEME_CLASS.monster, 'creature');
 
 		for (const language of WORD_LANGUAGES) {
-			const data = SENTENCE_DATA[language];
-			const lifeless = new Set(data.traits?.lifeless ?? []);
 			const pronouns = pronounsOf(language);
 			const myth = new Set(WORD_DATA[language].nouns.myth.map((word) => plain(language, word)));
 			let spells = 0;
@@ -1803,14 +1796,7 @@ describe('Sentence', () => {
 						return;
 					}
 
-					const found = [...nounsIn(language, phrase)];
-
-					assert.ok(
-						found.length === 0 || found.some((noun) => !lifeless.has(noun)),
-						`${language}: '${phrase}' is lifeless (${detail.sentence})`
-					);
-
-					spells += found.filter((noun) => myth.has(noun)).length;
+					spells += [...nounsIn(language, phrase)].filter((noun) => myth.has(noun)).length;
 				});
 			}
 
@@ -3967,11 +3953,6 @@ describe('Sentence', () => {
 
 					for (const word of wordData.nouns[theme]) {
 						const noun = plain(language, word);
-
-						// A lifeless noun takes no verb, by design.
-						if (traitsOf(data, noun).includes('lifeless')) {
-							continue;
-						}
 
 						assert.ok(
 							inField.some((group) => acceptsNoun(data, group, noun)),
