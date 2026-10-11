@@ -2,13 +2,13 @@
 layout: home
 
 title: randino
-titleTemplate: A random text generator for sample data
-description: Made-up person names, nicknames, words and whole sentences in nine languages. Use them for sample data, for suggesting a name at sign-up, or anywhere you need a set of words of your own. Shipped for JavaScript, Dart and Python, with no runtime dependencies.
+titleTemplate: Random sample data in nine languages
+description: Made-up person names, nicknames, words, sentences and organizations, real places, ages, genders, dates and phone numbers in nine languages, and the operating system, hardware and files of a sample machine. Use them to seed a database, fill a mockup or suggest a name at sign-up. Shipped for JavaScript, Dart and Python, with no runtime dependencies.
 
 hero:
   name: randino
-  text: A random text generator for sample data
-  tagline: Made-up names, handles, words and whole sentences, generated for you. Use them to fill sample data, to suggest a name at sign-up, or anywhere you need a set of words of your own.
+  text: Random sample data in nine languages
+  tagline: Names, handles, words and whole sentences, places, dates and phone numbers, and the specs of a sample machine, generated for you. Use them to fill sample data, to suggest a name at sign-up, or anywhere you need a set of values of your own.
   actions:
     - theme: brand
       text: Get started
@@ -37,6 +37,14 @@ features:
     details: The verb only brings in words that go with it, so the sentence means something. Each language writes its own particles, articles and word order.
     link: /sentence/
     linkText: Sentences
+  - title: Everything else a record needs
+    details: Real places down to a Korean 읍·면·동 or a US city, ages along the curve of a population, gender labels as a form writes them, companies and schools that do not exist, dates in any format, and phone numbers the way each country writes them.
+    link: /demo
+    linkText: Try them in the demo
+  - title: The specs of a sample machine
+    details: An operating system, a device, its processor, graphics, memory, storage and screen, and the files on it, all real products under the names they were released by.
+    link: /os/rand-os
+    linkText: randOs
   - title: Three packages, one library
     details: The same datasets and the same rules for JavaScript, Dart and Python. One page documents all of them, so pick your language in the sidebar.
     link: /guide/getting-started

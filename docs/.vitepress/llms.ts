@@ -102,7 +102,7 @@ function flatten(markdown: string): string {
 }
 
 const PREAMBLE = [
-	'randino generates random text for sample data, in nine languages.',
+	'randino generates random sample data, in nine languages.',
 	'**Person names** read like names a person actually carries (김민준, Emma Clover).',
 	'**Nicknames** are the handles someone would pick for a game or a website (멋진사자, MistyOwl),',
 	'built from everyday words and never from person names. **Words** are those everyday words on',

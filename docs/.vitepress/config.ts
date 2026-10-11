@@ -107,7 +107,7 @@ const navFor = (lang: string, labels: { demo: string; guide: string; packages: s
 
 /** The site's own sentence. Read twice: once by a crawler, once by `llms.txt`. */
 const siteDescription =
-	'A random text generator for sample data. Made-up person names, nicknames, words and whole sentences in nine languages, shipped for JavaScript, Dart and Python with no runtime dependencies.';
+	'Random sample data in nine languages: made-up person names, nicknames, words, sentences and organizations, real places, ages, genders, dates and phone numbers, and the operating system, hardware and files of a sample machine. Shipped for JavaScript, Dart and Python with no runtime dependencies.';
 
 const vitePressI18nConfig: VitePressI18nOptions = {
 	locales: supportLocales,
@@ -115,7 +115,7 @@ const vitePressI18nConfig: VitePressI18nOptions = {
 	searchProvider: 'local',
 	description: {
 		en: siteDescription,
-		ko: '샘플 데이터를 위한 무작위 텍스트 생성 라이브러리입니다. 가상의 사람 이름과 닉네임, 단어와 문장을 9개 언어로 만들며, JavaScript, Dart, Python 패키지로 제공되고 런타임 의존성이 없습니다.'
+		ko: '9개 언어로 만드는 무작위 샘플 데이터입니다. 가상의 사람 이름과 닉네임, 단어, 문장, 조직과 실제 지역, 나이, 성별, 날짜, 전화번호, 예시 기기의 운영체제와 하드웨어와 파일 형식을 만들며, JavaScript, Dart, Python 패키지로 제공되고 런타임 의존성이 없습니다.'
 	},
 	themeConfig: {
 		en: {
