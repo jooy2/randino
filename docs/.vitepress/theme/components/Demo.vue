@@ -815,6 +815,29 @@ const decoratable = computed(() => ['name', 'nickname', 'word'].includes(tab.val
 /** Whether a decorator runs. */
 const decorating = computed(() => decoratable.value && decorate.kind !== 'none');
 
+/**
+ * A drawn phone number as the demo shows it, with its last four digits written as
+ * `#`. A number opens on a block that is really in use, so a whole one can be
+ * somebody's, and this page is public. A fictional number is nobody's and is shown
+ * whole. The library returns every digit; hiding them is the page's choice.
+ */
+function shownNumber(number) {
+	if (phone.fictional) {
+		return number;
+	}
+
+	const chars = [...number];
+
+	for (let index = chars.length - 1, left = 4; index >= 0 && left > 0; index--) {
+		if (chars[index] >= '0' && chars[index] <= '9') {
+			chars[index] = '#';
+			left--;
+		}
+	}
+
+	return chars.join('');
+}
+
 const rows = ref([]);
 const asked = ref(0);
 
@@ -881,15 +904,15 @@ function generate() {
 		if (details.value) {
 			const drawn = randPhone({ ...config, output: 'detail' });
 
-			items = drawn.map((detail) => detail.phone);
+			items = drawn.map((detail) => shownNumber(detail.phone));
 			meta = drawn.map((detail) => [
-				['e164', detail.e164],
+				['e164', shownNumber(detail.e164)],
 				['country', detail.country],
 				['callingCode', detail.callingCode],
 				['type', detail.type]
 			]);
 		} else {
-			items = randPhone(config);
+			items = randPhone(config).map(shownNumber);
 		}
 	} else if (tab.value === 'gender') {
 		if (details.value) {

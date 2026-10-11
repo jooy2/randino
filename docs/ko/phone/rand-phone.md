@@ -1,12 +1,14 @@
 # randPhone
 
-전화번호를 만들어 `count`개만큼 돌려줍니다. 번호는 그 나라가 쓰는 방식으로 씁니다. 한국은 `010-4821-3967`, 미국은 `(415) 726-0193`, 러시아는 `8 (912) 345-67-89`입니다. 모든 번호는 그 나라의 번호 계획이 실제로 배정하는 대역으로 시작하므로 진짜 번호처럼 읽히고, 그 뒤의 숫자는 무작위입니다. [`includeCountryCode`](#formats)는 국제 형식으로 쓰고, [`separator`](#formats)는 그 나라의 구두점을 바꾸며, [`output: 'detail'`](#the-detail-output)은 E.164 형식을 함께 돌려줍니다.
+전화번호를 만들어 `count`개만큼 돌려줍니다. 번호는 그 나라가 쓰는 방식으로 씁니다. 한국은 `010-4821-####`, 미국은 `(415) 726-####`, 러시아는 `8 (912) 345-##-##`입니다. 모든 번호는 그 나라의 번호 계획이 실제로 배정하는 대역으로 시작하므로 진짜 번호처럼 읽히고, 그 뒤의 숫자는 무작위입니다. [`includeCountryCode`](#formats)는 국제 형식으로 쓰고, [`separator`](#formats)는 그 나라의 구두점을 바꾸며, [`output: 'detail'`](#the-detail-output)은 E.164 형식을 함께 돌려줍니다.
 
 ::: warning 뽑은 번호가 누군가의 번호일 수 있습니다
 
 번호는 실제로 쓰이는 대역으로 시작하고 무작위 숫자로 끝나므로, 개통된 번호이고 실제 개인이나 업체의 번호일 수 있습니다. 이는 무작위 추첨에서 생긴 우연일 뿐입니다. randino는 어떤 가입자도 알지 못하고, 실제 번호 목록을 갖고 있지 않으며, 번호를 확인하지도 않습니다. 번호는 입력 폼, 테스트 데이터, 화면 시안 같은 샘플 데이터로만 쓰고, **어떤 번호로도 전화하거나 문자·메시지를 보내지 마세요**. 누군가를 어떤 서비스에 가입시키는 일, 그 밖에 번호의 주인에게 닿거나 피해를 줄 수 있는 어떤 용도로도 쓰면 안 됩니다. 누군가 보고 전화를 걸 수 있는 화면이나 지면에 번호를 보여야 한다면 [가상 번호](#fictional-numbers)를 쓰고, [번호를 쓸 때](#using-the-numbers)를 보세요.
 
 :::
+
+이 페이지의 예시는 번호마다 끝 네 자리를 `#`으로 가렸습니다. 누군가 걸 수 있는 번호를 예시로 남기지 않으려는 것이며, 라이브러리는 모든 숫자를 돌려줍니다. [가상 번호](#fictional-numbers)는 누구에게도 배정되지 않으므로 그대로 적었습니다.
 
 전화번호는 언어가 아니라 나라가 정하는 방식으로 쓰므로, `randPhone`은 `language` 대신 `country`를 받습니다.
 
@@ -16,7 +18,7 @@
 import { randPhone } from 'randino';
 
 randPhone({ country: 'KR' });
-// ['010-4821-3967']
+// ['010-4821-####']
 ```
 
 :::
@@ -27,7 +29,7 @@ randPhone({ country: 'KR' });
 import 'package:randino/randino.dart';
 
 randPhone(country: PhoneCountry.kr);
-// [010-4821-3967]
+// [010-4821-####]
 ```
 
 :::
@@ -38,7 +40,7 @@ randPhone(country: PhoneCountry.kr);
 from randino import rand_phone
 
 rand_phone(country="KR")
-# ['010-4821-3967']
+# ['010-4821-####']
 ```
 
 :::
@@ -64,9 +66,9 @@ rand_phone(country="KR")
 ::: lang js
 
 ```javascript
-randPhone({ country: 'US', count: 3 }); // ['(415) 726-0193', '(917) 384-5520', '(312) 940-2271']
-randPhone({ country: 'JP', type: 'landline', count: 2 }); // ['03-5412-7788', '045-321-6540']
-randPhone({ type: 'all', count: 3 }); // ['0151 23456789', '0755 2345 6789', '612 34 56 78']
+randPhone({ country: 'US', count: 3 }); // ['(415) 726-####', '(917) 384-####', '(312) 940-####']
+randPhone({ country: 'JP', type: 'landline', count: 2 }); // ['03-5412-####', '045-321-####']
+randPhone({ type: 'all', count: 3 }); // ['0151 2345####', '0755 2345 ####', '612 34 ## ##']
 ```
 
 :::
@@ -74,9 +76,9 @@ randPhone({ type: 'all', count: 3 }); // ['0151 23456789', '0755 2345 6789', '61
 ::: lang dart
 
 ```dart
-randPhone(country: PhoneCountry.us, count: 3); // [(415) 726-0193, (917) 384-5520, (312) 940-2271]
-randPhone(country: PhoneCountry.jp, type: PhoneType.landline, count: 2); // [03-5412-7788, 045-321-6540]
-randPhone(type: null, count: 3); // [0151 23456789, 0755 2345 6789, 612 34 56 78]
+randPhone(country: PhoneCountry.us, count: 3); // [(415) 726-####, (917) 384-####, (312) 940-####]
+randPhone(country: PhoneCountry.jp, type: PhoneType.landline, count: 2); // [03-5412-####, 045-321-####]
+randPhone(type: null, count: 3); // [0151 2345####, 0755 2345 ####, 612 34 ## ##]
 ```
 
 패키지의 다른 곳에서 null 열거값이 "모두"를 뜻하듯, `type`이 null이면 두 종류 중 하나를 뽑습니다. 매개변수의 기본값은 `PhoneType.mobile`입니다.
@@ -86,9 +88,9 @@ randPhone(type: null, count: 3); // [0151 23456789, 0755 2345 6789, 612 34 56 78
 ::: lang py
 
 ```python
-rand_phone(country="US", count=3)  # ['(415) 726-0193', '(917) 384-5520', '(312) 940-2271']
-rand_phone(country="JP", type="landline", count=2)  # ['03-5412-7788', '045-321-6540']
-rand_phone(type="all", count=3)  # ['0151 23456789', '0755 2345 6789', '612 34 56 78']
+rand_phone(country="US", count=3)  # ['(415) 726-####', '(917) 384-####', '(312) 940-####']
+rand_phone(country="JP", type="landline", count=2)  # ['03-5412-####', '045-321-####']
+rand_phone(type="all", count=3)  # ['0151 2345####', '0755 2345 ####', '612 34 ## ##']
 ```
 
 :::
@@ -117,15 +119,15 @@ rand_phone(type="all", count=3)  # ['0151 23456789', '0755 2345 6789', '612 34 5
 
 | 코드 | 나라 | 국가 번호 | 휴대전화 | 유선전화 |
 | --- | --- | --- | --- | --- |
-| `US` | 미국 | `+1` | `(415) 726-0193` | `(212) 846-0147` |
-| `KR` | 대한민국 | `+82` | `010-4821-3967` | `02-3456-7890`, `031-234-5678` |
-| `JP` | 일본 | `+81` | `090-3718-2046` | `03-5412-7788`, `045-321-6540` |
-| `CN` | 중국 | `+86` | `138 2873 1496` | `010 6512 3456`, `0755 2345 6789` |
-| `VN` | 베트남 | `+84` | `091 234 5678` | `024 3826 1234`, `0236 382 1234` |
-| `ES` | 스페인 | `+34` | `612 34 56 78` | `912 34 56 78` |
-| `IT` | 이탈리아 | `+39` | `347 123 4567` | `06 4123 5678`, `011 523 4567` |
-| `DE` | 독일 | `+49` | `0151 23456789`, `0171 2345678` | `030 23456789`, `0221 2345678` |
-| `RU` | 러시아 | `+7` | `8 (912) 345-67-89` | `8 (495) 323-45-67` |
+| `US` | 미국 | `+1` | `(415) 726-####` | `(212) 846-####` |
+| `KR` | 대한민국 | `+82` | `010-4821-####` | `02-3456-####`, `031-234-####` |
+| `JP` | 일본 | `+81` | `090-3718-####` | `03-5412-####`, `045-321-####` |
+| `CN` | 중국 | `+86` | `138 2873 ####` | `010 6512 ####`, `0755 2345 ####` |
+| `VN` | 베트남 | `+84` | `091 234 ####` | `024 3826 ####`, `0236 382 ####` |
+| `ES` | 스페인 | `+34` | `612 34 ## ##` | `912 34 ## ##` |
+| `IT` | 이탈리아 | `+39` | `347 123 ####` | `06 4123 ####`, `011 523 ####` |
+| `DE` | 독일 | `+49` | `0151 2345####`, `0171 234####` | `030 2345####`, `0221 234####` |
+| `RU` | 러시아 | `+7` | `8 (912) 345-##-##` | `8 (495) 323-##-##` |
 
 휴대전화 번호는 그 나라가 통신사에 배정하는 대역으로 시작하고, 유선전화 번호는 실제 도시의 지역 번호로 시작합니다. 한국은 서울의 `02`와 나머지 지역 번호 16개, 일본은 도쿄와 오사카, 중국은 베이징과 선전, 이탈리아는 로마와 밀라노 같은 식입니다. 이 목록은 그 나라의 번호 계획을 대역 단위까지만 옮긴 것입니다. 번호 계획은 대역 안의 어느 번호가 개통됐는지 알려 주지 않기 때문입니다. 미국의 지역 번호는 50개 주와 워싱턴 D.C.에서 오래 써 온 것만 담았고, 캐나다나 카리브해 지역의 번호는 넣지 않았습니다. 국번은 `411` 같은 서비스 번호나 `555`가 되지 않습니다.
 
@@ -137,19 +139,19 @@ rand_phone(type="all", count=3)  # ['0151 23456789', '0755 2345 6789', '612 34 5
 
 | 옵션 | 한국 | 미국 | 러시아 |
 | --- | --- | --- | --- |
-| 둘 다 없음 | `010-4821-3967` | `(415) 726-0193` | `8 (912) 345-67-89` |
-| <Lang js="includeCountryCode" dart="includeCountryCode" py="include_country_code" code /> | `+82 10-4821-3967` | `+1 415-726-0193` | `+7 912 345-67-89` |
-| `separator: ''` | `01048213967` | `4157260193` | `89123456789` |
-| 둘 다, `''`로 | `+821048213967` | `+14157260193` | `+79123456789` |
-| `separator: '.'` | `010.4821.3967` | `415.726.0193` | `8.912.345.67.89` |
+| 둘 다 없음 | `010-4821-####` | `(415) 726-####` | `8 (912) 345-##-##` |
+| <Lang js="includeCountryCode" dart="includeCountryCode" py="include_country_code" code /> | `+82 10-4821-####` | `+1 415-726-####` | `+7 912 345-##-##` |
+| `separator: ''` | `0104821####` | `415726####` | `8912345####` |
+| 둘 다, `''`로 | `+82104821####` | `+1415726####` | `+7912345####` |
+| `separator: '.'` | `010.4821.####` | `415.726.####` | `8.912.345.##.##` |
 
 ::: lang js
 
 ```javascript
-randPhone({ country: 'KR', includeCountryCode: true }); // ['+82 10-4821-3967']
-randPhone({ country: 'KR', separator: '' }); // ['01048213967']
-randPhone({ country: 'KR', includeCountryCode: true, separator: '' }); // ['+821048213967']
-randPhone({ country: 'US', separator: '-' }); // ['415-726-0193']
+randPhone({ country: 'KR', includeCountryCode: true }); // ['+82 10-4821-####']
+randPhone({ country: 'KR', separator: '' }); // ['0104821####']
+randPhone({ country: 'KR', includeCountryCode: true, separator: '' }); // ['+82104821####']
+randPhone({ country: 'US', separator: '-' }); // ['415-726-####']
 ```
 
 :::
@@ -157,10 +159,10 @@ randPhone({ country: 'US', separator: '-' }); // ['415-726-0193']
 ::: lang dart
 
 ```dart
-randPhone(country: PhoneCountry.kr, includeCountryCode: true); // [+82 10-4821-3967]
-randPhone(country: PhoneCountry.kr, separator: ''); // [01048213967]
-randPhone(country: PhoneCountry.kr, includeCountryCode: true, separator: ''); // [+821048213967]
-randPhone(country: PhoneCountry.us, separator: '-'); // [415-726-0193]
+randPhone(country: PhoneCountry.kr, includeCountryCode: true); // [+82 10-4821-####]
+randPhone(country: PhoneCountry.kr, separator: ''); // [0104821####]
+randPhone(country: PhoneCountry.kr, includeCountryCode: true, separator: ''); // [+82104821####]
+randPhone(country: PhoneCountry.us, separator: '-'); // [415-726-####]
 ```
 
 :::
@@ -168,10 +170,10 @@ randPhone(country: PhoneCountry.us, separator: '-'); // [415-726-0193]
 ::: lang py
 
 ```python
-rand_phone(country="KR", include_country_code=True)  # ['+82 10-4821-3967']
-rand_phone(country="KR", separator="")  # ['01048213967']
-rand_phone(country="KR", include_country_code=True, separator="")  # ['+821048213967']
-rand_phone(country="US", separator="-")  # ['415-726-0193']
+rand_phone(country="KR", include_country_code=True)  # ['+82 10-4821-####']
+rand_phone(country="KR", separator="")  # ['0104821####']
+rand_phone(country="KR", include_country_code=True, separator="")  # ['+82104821####']
+rand_phone(country="US", separator="-")  # ['415-726-####']
 ```
 
 :::
@@ -231,8 +233,8 @@ rand_phone(country="KR", fictional=True)  # []
 ```javascript
 randPhone({ country: 'JP', output: 'detail' });
 // [{
-//   phone: '090-3718-2046',
-//   e164: '+819037182046',
+//   phone: '090-3718-####',
+//   e164: '+81903718####',
 //   country: 'JP',
 //   callingCode: '81',
 //   type: 'mobile'
@@ -245,7 +247,7 @@ randPhone({ country: 'JP', output: 'detail' });
 
 ```dart
 randPhoneDetails(country: PhoneCountry.jp).first;
-// PhoneDetail(090-3718-2046, +819037182046, JP, mobile)
+// PhoneDetail(090-3718-####, +81903718####, JP, mobile)
 ```
 
 Dart에는 오버로드도 유니언 타입도 없어서, 상세 출력은 별도 함수입니다. `randPhone`과 같은 매개변수를 받습니다.
@@ -256,7 +258,7 @@ Dart에는 오버로드도 유니언 타입도 없어서, 상세 출력은 별�
 
 ```python
 rand_phone(country="JP", output="detail")
-# [PhoneDetail(phone='090-3718-2046', e164='+819037182046', country='JP',
+# [PhoneDetail(phone='090-3718-####', e164='+81903718####', country='JP',
 #              calling_code='81', type='mobile')]
 ```
 
@@ -265,7 +267,7 @@ rand_phone(country="JP", output="detail")
 | 필드 | 타입 | 설명 |
 | --- | --- | --- |
 | `phone` | <Lang js="string" dart="String" py="str" code /> | 옵션이 정한 방식대로 쓴 번호. |
-| `e164` | <Lang js="string" dart="String" py="str" code /> | 옵션과 관계없이 E.164로 쓴 같은 번호. `+819037182046`처럼 씁니다. |
+| `e164` | <Lang js="string" dart="String" py="str" code /> | 옵션과 관계없이 E.164로 쓴 같은 번호. `+81903718####`처럼 씁니다. |
 | `country` | `PhoneCountry` | 번호가 속한 나라. |
 | <Lang js="callingCode" dart="callingCode" py="calling_code" code /> | <Lang js="string" dart="String" py="str" code /> | `+`를 뺀 국가 번호. `'81'`처럼 씁니다. |
 | `type` | `PhoneType` | `mobile` 또는 `landline`. |

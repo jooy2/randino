@@ -133,7 +133,7 @@ Locations cover only countries that publish their divisions free of conditions, 
 | Genders        | `randGender`                 | `rand_gender`                | 여성, Female, Weiblich |
 | Organizations  | `randOrganization`           | `rand_organization`          | (주)새솔테크, Westbrook High School |
 | Dates          | `randDate`                   | `rand_date`                  | 2024-03-15T14:07:32.481Z, 37 |
-| Phone numbers  | `randPhone`                  | `rand_phone`                 | 010-4821-3967, (415) 726-0193 |
+| Phone numbers  | `randPhone`                  | `rand_phone`                 | 010-4821-####, (415) 726-#### |
 | Operating systems | `randOs`                  | `rand_os`                    | Windows 11, macOS Sonoma 14.5 |
 | Devices        | `randDevice`                 | `rand_device`                | Apple iPhone 15 Pro, Dell XPS 13 9310 |
 | Processors     | `randCpu`                    | `rand_cpu`                   | Intel Core i7-13700K, Apple M3 Pro |
@@ -148,7 +148,7 @@ Locations cover only countries that publish their divisions free of conditions, 
 | MIME types     | `randMimeType`               | `rand_mime_type`             | application/pdf, image/png |
 | Decorators     | `randSuffix`, `randPrefix`, `randModifier` | `rand_suffix`, `rand_prefix`, `rand_modifier` | MistyOwl_nVtRC, MistyOwl |
 
-Each generator returns strings, or a detail object per result with `output: 'detail'`. Dart has no way to change a return type by argument, so it has a second function instead, such as `randNameDetails`. The full option tables, the twenty-nine word themes and the romanization rules are on the [documentation site](https://randino.cdget.com).
+Each generator returns strings, or a detail object per result with `output: 'detail'`. Dart has no way to change a return type by argument, so it has a second function instead, such as `randNameDetails`. The phone numbers in the table have their last four digits written as `#`; the library returns every digit. The full option tables, the twenty-nine word themes and the romanization rules are on the [documentation site](https://randino.cdget.com).
 
 ## Repository layout
 

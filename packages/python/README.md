@@ -342,18 +342,18 @@ rand_date(output="detail")
 
 ## Phone numbers
 
-Phone numbers written the way their country writes them, for the United States, Korea, Japan, China, Vietnam, Spain, Italy, Germany and Russia. Each opens on a mobile block or a city's area code that the country really gives out, and the digits after it are random — so a number can by chance belong to somebody. Use them as sample data, and never call or text one.
+Phone numbers written the way their country writes them, for the United States, Korea, Japan, China, Vietnam, Spain, Italy, Germany and Russia. Each opens on a mobile block or a city's area code that the country really gives out, and the digits after it are random — so a number can by chance belong to somebody. Use them as sample data, and never call or text one. The examples below write the last four digits as `#`; a call returns every digit.
 
 ```python
 from randino import rand_phone
 
-rand_phone(country="KR", count=2)  # ['010-4821-3967', '010-7302-1958']
-rand_phone(country="US", type="landline")  # ['(212) 846-0147']
-rand_phone(country="KR", include_country_code=True)  # ['+82 10-4821-3967']
-rand_phone(country="KR", include_country_code=True, separator="")  # ['+821048213967']
+rand_phone(country="KR", count=2)  # ['010-4821-####', '010-7302-####']
+rand_phone(country="US", type="landline")  # ['(212) 846-####']
+rand_phone(country="KR", include_country_code=True)  # ['+82 10-4821-####']
+rand_phone(country="KR", include_country_code=True, separator="")  # ['+82104821####']
 
 rand_phone(country="JP", output="detail")
-# [PhoneDetail(phone='090-3718-2046', e164='+819037182046', country='JP',
+# [PhoneDetail(phone='090-3718-####', e164='+81903718####', country='JP',
 #              calling_code='81', type='mobile')]
 ```
 

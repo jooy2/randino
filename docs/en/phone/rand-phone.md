@@ -1,12 +1,14 @@
 # randPhone
 
-Generates phone numbers and returns `count` of them, written the way their country writes them: `010-4821-3967` in Korea, `(415) 726-0193` in the United States, `8 (912) 345-67-89` in Russia. Each number opens on a block the country's numbering plan gives out, so it reads as a real number, and the digits after it are random. [`includeCountryCode`](#formats) writes the international form, [`separator`](#formats) replaces the country's own punctuation, and [`output: 'detail'`](#the-detail-output) adds the E.164 form.
+Generates phone numbers and returns `count` of them, written the way their country writes them: `010-4821-####` in Korea, `(415) 726-####` in the United States, `8 (912) 345-##-##` in Russia. Each number opens on a block the country's numbering plan gives out, so it reads as a real number, and the digits after it are random. [`includeCountryCode`](#formats) writes the international form, [`separator`](#formats) replaces the country's own punctuation, and [`output: 'detail'`](#the-detail-output) adds the E.164 form.
 
 ::: warning A drawn number can be somebody's
 
 A number opens on a block that is really in use and ends on random digits, so it can be in service and belong to a real person or business. That is a coincidence of the draw and nothing more: randino knows no subscriber, holds no list of real numbers and checks none. Use the numbers as sample data, in a form, a fixture or a mockup, and **never to call, text or message anybody**, to sign anybody up for anything, or for anything else that could reach or harm whoever a number happens to belong to. Where a screen or a page has to show a number somebody might dial, ask for a [fictional one](#fictional-numbers), and see [using the numbers](#using-the-numbers).
 
 :::
+
+The examples on this page write the last four digits of every number as `#`, so that none of them is a number anybody could dial. The library returns every digit. [Fictional numbers](#fictional-numbers) are written whole, because nobody is given one.
 
 A number is written by its country rather than in a language, so `randPhone` takes a `country` and no `language`.
 
@@ -16,7 +18,7 @@ A number is written by its country rather than in a language, so `randPhone` tak
 import { randPhone } from 'randino';
 
 randPhone({ country: 'KR' });
-// ['010-4821-3967']
+// ['010-4821-####']
 ```
 
 :::
@@ -27,7 +29,7 @@ randPhone({ country: 'KR' });
 import 'package:randino/randino.dart';
 
 randPhone(country: PhoneCountry.kr);
-// [010-4821-3967]
+// [010-4821-####]
 ```
 
 :::
@@ -38,7 +40,7 @@ randPhone(country: PhoneCountry.kr);
 from randino import rand_phone
 
 rand_phone(country="KR")
-# ['010-4821-3967']
+# ['010-4821-####']
 ```
 
 :::
@@ -64,9 +66,9 @@ Mobile numbers are the default because they are what a sample person writes on a
 ::: lang js
 
 ```javascript
-randPhone({ country: 'US', count: 3 }); // ['(415) 726-0193', '(917) 384-5520', '(312) 940-2271']
-randPhone({ country: 'JP', type: 'landline', count: 2 }); // ['03-5412-7788', '045-321-6540']
-randPhone({ type: 'all', count: 3 }); // ['0151 23456789', '0755 2345 6789', '612 34 56 78']
+randPhone({ country: 'US', count: 3 }); // ['(415) 726-####', '(917) 384-####', '(312) 940-####']
+randPhone({ country: 'JP', type: 'landline', count: 2 }); // ['03-5412-####', '045-321-####']
+randPhone({ type: 'all', count: 3 }); // ['0151 2345####', '0755 2345 ####', '612 34 ## ##']
 ```
 
 :::
@@ -74,9 +76,9 @@ randPhone({ type: 'all', count: 3 }); // ['0151 23456789', '0755 2345 6789', '61
 ::: lang dart
 
 ```dart
-randPhone(country: PhoneCountry.us, count: 3); // [(415) 726-0193, (917) 384-5520, (312) 940-2271]
-randPhone(country: PhoneCountry.jp, type: PhoneType.landline, count: 2); // [03-5412-7788, 045-321-6540]
-randPhone(type: null, count: 3); // [0151 23456789, 0755 2345 6789, 612 34 56 78]
+randPhone(country: PhoneCountry.us, count: 3); // [(415) 726-####, (917) 384-####, (312) 940-####]
+randPhone(country: PhoneCountry.jp, type: PhoneType.landline, count: 2); // [03-5412-####, 045-321-####]
+randPhone(type: null, count: 3); // [0151 2345####, 0755 2345 ####, 612 34 ## ##]
 ```
 
 A null `type` is either type, the way a null enum is every one of them everywhere else in the package; `PhoneType.mobile` is what the parameter defaults to.
@@ -86,9 +88,9 @@ A null `type` is either type, the way a null enum is every one of them everywher
 ::: lang py
 
 ```python
-rand_phone(country="US", count=3)  # ['(415) 726-0193', '(917) 384-5520', '(312) 940-2271']
-rand_phone(country="JP", type="landline", count=2)  # ['03-5412-7788', '045-321-6540']
-rand_phone(type="all", count=3)  # ['0151 23456789', '0755 2345 6789', '612 34 56 78']
+rand_phone(country="US", count=3)  # ['(415) 726-####', '(917) 384-####', '(312) 940-####']
+rand_phone(country="JP", type="landline", count=2)  # ['03-5412-####', '045-321-####']
+rand_phone(type="all", count=3)  # ['0151 2345####', '0755 2345 ####', '612 34 ## ##']
 ```
 
 :::
@@ -117,15 +119,15 @@ The code is read regardless of case, so `"kr"` is `"KR"`.
 
 | Code | Country | Calling code | Mobile | Landline |
 | --- | --- | --- | --- | --- |
-| `US` | United States | `+1` | `(415) 726-0193` | `(212) 846-0147` |
-| `KR` | South Korea | `+82` | `010-4821-3967` | `02-3456-7890`, `031-234-5678` |
-| `JP` | Japan | `+81` | `090-3718-2046` | `03-5412-7788`, `045-321-6540` |
-| `CN` | China | `+86` | `138 2873 1496` | `010 6512 3456`, `0755 2345 6789` |
-| `VN` | Vietnam | `+84` | `091 234 5678` | `024 3826 1234`, `0236 382 1234` |
-| `ES` | Spain | `+34` | `612 34 56 78` | `912 34 56 78` |
-| `IT` | Italy | `+39` | `347 123 4567` | `06 4123 5678`, `011 523 4567` |
-| `DE` | Germany | `+49` | `0151 23456789`, `0171 2345678` | `030 23456789`, `0221 2345678` |
-| `RU` | Russia | `+7` | `8 (912) 345-67-89` | `8 (495) 323-45-67` |
+| `US` | United States | `+1` | `(415) 726-####` | `(212) 846-####` |
+| `KR` | South Korea | `+82` | `010-4821-####` | `02-3456-####`, `031-234-####` |
+| `JP` | Japan | `+81` | `090-3718-####` | `03-5412-####`, `045-321-####` |
+| `CN` | China | `+86` | `138 2873 ####` | `010 6512 ####`, `0755 2345 ####` |
+| `VN` | Vietnam | `+84` | `091 234 ####` | `024 3826 ####`, `0236 382 ####` |
+| `ES` | Spain | `+34` | `612 34 ## ##` | `912 34 ## ##` |
+| `IT` | Italy | `+39` | `347 123 ####` | `06 4123 ####`, `011 523 ####` |
+| `DE` | Germany | `+49` | `0151 2345####`, `0171 234####` | `030 2345####`, `0221 234####` |
+| `RU` | Russia | `+7` | `8 (912) 345-##-##` | `8 (495) 323-##-##` |
 
 A mobile number opens on a block the country gives its operators, and a landline on the area code of a real city: Seoul's `02` and the sixteen other area codes of Korea, Tokyo and Osaka, Beijing and Shenzhen, Rome and Milan. The lists are the country's numbering plan at the level of the blocks it gives out, and nothing finer, since a plan does not say which numbers inside a block are in service. In the United States the area codes are long-standing ones of the fifty states and DC, never Canada's or the Caribbean's, and the exchange is never a service code like `411` nor `555`.
 
@@ -137,19 +139,19 @@ Left as they are, the options write the number the way the country writes it at 
 
 | Options | Korea | United States | Russia |
 | --- | --- | --- | --- |
-| Neither | `010-4821-3967` | `(415) 726-0193` | `8 (912) 345-67-89` |
-| <Lang js="includeCountryCode" dart="includeCountryCode" py="include_country_code" code /> | `+82 10-4821-3967` | `+1 415-726-0193` | `+7 912 345-67-89` |
-| `separator: ''` | `01048213967` | `4157260193` | `89123456789` |
-| both, with `''` | `+821048213967` | `+14157260193` | `+79123456789` |
-| `separator: '.'` | `010.4821.3967` | `415.726.0193` | `8.912.345.67.89` |
+| Neither | `010-4821-####` | `(415) 726-####` | `8 (912) 345-##-##` |
+| <Lang js="includeCountryCode" dart="includeCountryCode" py="include_country_code" code /> | `+82 10-4821-####` | `+1 415-726-####` | `+7 912 345-##-##` |
+| `separator: ''` | `0104821####` | `415726####` | `8912345####` |
+| both, with `''` | `+82104821####` | `+1415726####` | `+7912345####` |
+| `separator: '.'` | `010.4821.####` | `415.726.####` | `8.912.345.##.##` |
 
 ::: lang js
 
 ```javascript
-randPhone({ country: 'KR', includeCountryCode: true }); // ['+82 10-4821-3967']
-randPhone({ country: 'KR', separator: '' }); // ['01048213967']
-randPhone({ country: 'KR', includeCountryCode: true, separator: '' }); // ['+821048213967']
-randPhone({ country: 'US', separator: '-' }); // ['415-726-0193']
+randPhone({ country: 'KR', includeCountryCode: true }); // ['+82 10-4821-####']
+randPhone({ country: 'KR', separator: '' }); // ['0104821####']
+randPhone({ country: 'KR', includeCountryCode: true, separator: '' }); // ['+82104821####']
+randPhone({ country: 'US', separator: '-' }); // ['415-726-####']
 ```
 
 :::
@@ -157,10 +159,10 @@ randPhone({ country: 'US', separator: '-' }); // ['415-726-0193']
 ::: lang dart
 
 ```dart
-randPhone(country: PhoneCountry.kr, includeCountryCode: true); // [+82 10-4821-3967]
-randPhone(country: PhoneCountry.kr, separator: ''); // [01048213967]
-randPhone(country: PhoneCountry.kr, includeCountryCode: true, separator: ''); // [+821048213967]
-randPhone(country: PhoneCountry.us, separator: '-'); // [415-726-0193]
+randPhone(country: PhoneCountry.kr, includeCountryCode: true); // [+82 10-4821-####]
+randPhone(country: PhoneCountry.kr, separator: ''); // [0104821####]
+randPhone(country: PhoneCountry.kr, includeCountryCode: true, separator: ''); // [+82104821####]
+randPhone(country: PhoneCountry.us, separator: '-'); // [415-726-####]
 ```
 
 :::
@@ -168,10 +170,10 @@ randPhone(country: PhoneCountry.us, separator: '-'); // [415-726-0193]
 ::: lang py
 
 ```python
-rand_phone(country="KR", include_country_code=True)  # ['+82 10-4821-3967']
-rand_phone(country="KR", separator="")  # ['01048213967']
-rand_phone(country="KR", include_country_code=True, separator="")  # ['+821048213967']
-rand_phone(country="US", separator="-")  # ['415-726-0193']
+rand_phone(country="KR", include_country_code=True)  # ['+82 10-4821-####']
+rand_phone(country="KR", separator="")  # ['0104821####']
+rand_phone(country="KR", include_country_code=True, separator="")  # ['+82104821####']
+rand_phone(country="US", separator="-")  # ['415-726-####']
 ```
 
 :::
@@ -231,8 +233,8 @@ Korea's film council sets aside a handful of numbers too, but it publishes them 
 ```javascript
 randPhone({ country: 'JP', output: 'detail' });
 // [{
-//   phone: '090-3718-2046',
-//   e164: '+819037182046',
+//   phone: '090-3718-####',
+//   e164: '+81903718####',
 //   country: 'JP',
 //   callingCode: '81',
 //   type: 'mobile'
@@ -245,7 +247,7 @@ randPhone({ country: 'JP', output: 'detail' });
 
 ```dart
 randPhoneDetails(country: PhoneCountry.jp).first;
-// PhoneDetail(090-3718-2046, +819037182046, JP, mobile)
+// PhoneDetail(090-3718-####, +81903718####, JP, mobile)
 ```
 
 Dart has neither overloads nor union types, so the detail form is its own function. It takes the same parameters as `randPhone`.
@@ -256,7 +258,7 @@ Dart has neither overloads nor union types, so the detail form is its own functi
 
 ```python
 rand_phone(country="JP", output="detail")
-# [PhoneDetail(phone='090-3718-2046', e164='+819037182046', country='JP',
+# [PhoneDetail(phone='090-3718-####', e164='+81903718####', country='JP',
 #              calling_code='81', type='mobile')]
 ```
 
@@ -265,7 +267,7 @@ rand_phone(country="JP", output="detail")
 | Field | Type | Description |
 | --- | --- | --- |
 | `phone` | <Lang js="string" dart="String" py="str" code /> | The number, written the way the options asked for. |
-| `e164` | <Lang js="string" dart="String" py="str" code /> | The same number in E.164, whatever the options: `+819037182046`. |
+| `e164` | <Lang js="string" dart="String" py="str" code /> | The same number in E.164, whatever the options: `+81903718####`. |
 | `country` | `PhoneCountry` | The country the number is for. |
 | <Lang js="callingCode" dart="callingCode" py="calling_code" code /> | <Lang js="string" dart="String" py="str" code /> | The calling code without the `+`: `'81'`. |
 | `type` | `PhoneType` | `mobile` or `landline`. |

@@ -160,8 +160,8 @@ const strings = {
 	demoPhones: { ko: '전화번호', en: 'Phone numbers' },
 	demoSystem: { ko: '시스템 값', en: 'System values' },
 	demoPhoneNote: {
-		ko: '뽑은 번호는 우연히 실제 누군가의 번호일 수 있습니다. 샘플 데이터로만 쓰고, 전화하거나 문자를 보내지 마세요. 화면에 보여 줄 번호라면 fictional을 켜세요.',
-		en: "A drawn number can by chance be somebody's. Use it as sample data, and never call or text it — or turn on fictional for a number that is safe to show."
+		ko: '뽑은 번호는 우연히 실제 누군가의 번호일 수 있으므로, 데모는 끝 네 자리를 #으로 가려 보여 줍니다. 라이브러리는 모든 숫자를 돌려줍니다. 샘플 데이터로만 쓰고 전화하거나 문자를 보내지 마세요. fictional을 켜면 누구에게도 배정되지 않는 번호를 그대로 보여 줍니다.',
+		en: "A drawn number can by chance be somebody's, so the demo hides its last four digits as #. The library returns every digit. Use it as sample data and never call or text it, or turn on fictional for numbers nobody is given, shown whole."
 	},
 	demoNoFiction: {
 		ko: '고른 나라는 창작물용 번호를 따로 정해 두지 않았습니다. fictional은 미국과 독일에서만 번호를 돌려줍니다.',

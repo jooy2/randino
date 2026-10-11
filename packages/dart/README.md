@@ -321,16 +321,16 @@ randDateDetails().first.year; // 1987
 
 ## Phone numbers
 
-Phone numbers written the way their country writes them, for the United States, Korea, Japan, China, Vietnam, Spain, Italy, Germany and Russia. Each opens on a mobile block or a city's area code that the country really gives out, and the digits after it are random — so a number can by chance belong to somebody. Use them as sample data, and never call or text one.
+Phone numbers written the way their country writes them, for the United States, Korea, Japan, China, Vietnam, Spain, Italy, Germany and Russia. Each opens on a mobile block or a city's area code that the country really gives out, and the digits after it are random — so a number can by chance belong to somebody. Use them as sample data, and never call or text one. The examples below write the last four digits as `#`; a call returns every digit.
 
 ```dart
-randPhone(country: PhoneCountry.kr, count: 2); // [010-4821-3967, 010-7302-1958]
-randPhone(country: PhoneCountry.us, type: PhoneType.landline); // [(212) 846-0147]
-randPhone(country: PhoneCountry.kr, includeCountryCode: true); // [+82 10-4821-3967]
-randPhone(country: PhoneCountry.kr, includeCountryCode: true, separator: ''); // [+821048213967]
+randPhone(country: PhoneCountry.kr, count: 2); // [010-4821-####, 010-7302-####]
+randPhone(country: PhoneCountry.us, type: PhoneType.landline); // [(212) 846-####]
+randPhone(country: PhoneCountry.kr, includeCountryCode: true); // [+82 10-4821-####]
+randPhone(country: PhoneCountry.kr, includeCountryCode: true, separator: ''); // [+82104821####]
 
 randPhoneDetails(country: PhoneCountry.jp).first;
-// PhoneDetail(090-3718-2046, +819037182046, JP, mobile)
+// PhoneDetail(090-3718-####, +81903718####, JP, mobile)
 ```
 
 | Parameter            | Type            | Default                    |
