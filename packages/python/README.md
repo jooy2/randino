@@ -388,17 +388,19 @@ from randino import rand_os
 
 rand_os(count=3)  # ['Windows 10', 'macOS Sonoma 14', 'Android 9 Pie']
 rand_os(platform="mobile")  # ['iOS 17']
+rand_os(family=("macos", "ubuntu"))  # ['Ubuntu 22.04 LTS']
 rand_os(include_build=True, include_edition=True)  # ['Windows 11 Pro 23H2 (Build 22631)']
 rand_os(platform="desktop", max_year=2010)  # ['Mac OS X Snow Leopard 10.6']
 
 rand_os(include_build=True, output="detail")
 # [OsDetail(os='Android 14 (API 34)', name='Android', version='14', build='(API 34)',
-#           edition=None, platform='mobile', year=2023)]
+#           edition=None, family='android', platform='mobile', year=2023)]
 ```
 
 | Argument          | Type                   | Default   |
 | ----------------- | ---------------------- | --------- |
 | `platform`        | `SystemPlatformOption` | `"all"`   |
+| `family`          | `OsFamilyOption`       | `"all"`   |
 | `min_year`        | `int \| None`          | `None`    |
 | `max_year`        | `int \| None`          | `None`    |
 | `include_version` | `bool`                 | `True`    |
@@ -408,7 +410,7 @@ rand_os(include_build=True, output="detail")
 | `unique`          | `bool`                 | `False`   |
 | `output`          | `"value" \| "detail"`  | `"value"` |
 
-A draw picks the line first — Windows is about two desktops in three, Android about three phones in five — and a release inside it second. `min_year` and `max_year` read the year a release came out, or with `include_build` the year of the build written, and a range nothing came out in returns nothing.
+A draw picks the line first — Windows is about two desktops in three, Android about three phones in five — and a release inside it second. `family` keeps to the lines named (`"windows"`, `"macos"`, `"ubuntu"`, `"fedora"`, `"debian"`, `"android"`, `"ios"`, `"ipados"`), still drawn by how common each is, and a line that does not run on the `platform` asked for returns nothing. `min_year` and `max_year` read the year a release came out, or with `include_build` the year of the build written, and a range nothing came out in returns nothing.
 
 ### Devices
 

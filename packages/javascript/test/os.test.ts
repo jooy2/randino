@@ -1,6 +1,6 @@
 import assert from 'assert';
 import { describe, it } from 'node:test';
-import { RAND_COUNT_MAX, SYSTEM_PLATFORMS, randOs } from '../dist/index.js';
+import { OS_FAMILY_CODES, RAND_COUNT_MAX, SYSTEM_PLATFORMS, randOs } from '../dist/index.js';
 import type { OsDetail } from '../dist/index.js';
 // Internal, but they are what a result is checked against.
 import { OS_FAMILIES, OS_RELEASES } from '../dist/os/data/index.js';
@@ -105,6 +105,7 @@ describe('Os', () => {
 			)!;
 
 			assert.ok(release, detail.os);
+			assert.strictEqual(detail.family, release.family);
 			assert.strictEqual(detail.platform, OS_FAMILIES[release.family].platform);
 
 			const build = release.builds.find((each) => each.text === detail.build) ?? null;
@@ -152,6 +153,60 @@ describe('Os', () => {
 		);
 
 		assert.strictEqual(both.size, SYSTEM_PLATFORMS.length);
+	});
+
+	it('family keeps to the lines named, and lists every line the catalog holds', () => {
+		assert.deepStrictEqual([...OS_FAMILY_CODES].sort(), Object.keys(OS_FAMILIES).sort());
+
+		for (const family of OS_FAMILY_CODES) {
+			assert.ok(
+				randOs({ family, count: SAMPLE, output: 'detail' }).every(
+					(detail) => detail.family === family
+				),
+				family
+			);
+		}
+
+		const two = randOs({ family: ['macos', 'ios'], count: SAMPLE * 3, output: 'detail' });
+
+		assert.deepStrictEqual([...new Set(two.map((detail) => detail.family))].sort(), [
+			'ios',
+			'macos'
+		]);
+		assert.ok(
+			randOs({ family: 'beos' as never, count: SAMPLE, output: 'detail' }).some(
+				(detail) => detail.family !== 'windows'
+			),
+			'an unknown line reads as all of them'
+		);
+	});
+
+	it('the lines named are still drawn by how common each is', () => {
+		const details = randOs({ family: ['windows', 'ubuntu'], count: LARGE, output: 'detail' });
+		const windows = details.filter((detail) => detail.family === 'windows').length;
+
+		// Sixty-four to seven: Windows is most of the draws, and Ubuntu still comes up.
+		assert.ok(windows / details.length > 0.8, `Windows ${windows / details.length}`);
+		assert.ok(windows < details.length, 'Ubuntu never came up');
+	});
+
+	it('a line that does not run on the platform asked for is answered with nothing', () => {
+		assert.deepStrictEqual(randOs({ family: 'ios', platform: 'desktop', count: 5 }), []);
+		assert.deepStrictEqual(
+			randOs({ family: ['windows', 'macos'], platform: 'mobile', count: 5 }),
+			[]
+		);
+		// A mix keeps to the lines that run on the platform.
+		assert.ok(
+			randOs({
+				family: ['windows', 'ios'],
+				platform: 'mobile',
+				count: SAMPLE,
+				output: 'detail'
+			}).every((detail) => detail.family === 'ios')
+		);
+		// And to the years: iPadOS came out in 2019.
+		assert.deepStrictEqual(randOs({ family: 'ipados', maxYear: 2018, count: 5 }), []);
 	});
 
 	it('a year range keeps to the releases out in it', () => {
@@ -230,12 +285,23 @@ describe('Os', () => {
 	});
 
 	it('unique never repeats a system, and stops when the systems run out', () => {
-		const names = randOs({ includeVersion: false, unique: true, count: 100 });
+		// A line at a time: across all of them Fedora Core is one draw in four
+		// hundred, which a run of draws that add nothing could stop short of.
+		for (const family of OS_FAMILY_CODES) {
+			const names = randOs({ family, includeVersion: false, unique: true, count: 100 });
 
-		assert.strictEqual(new Set(names).size, names.length);
-		assert.deepStrictEqual(
-			[...names].sort(),
-			[...new Set(OS_RELEASES.map((release) => release.name))].sort()
-		);
+			assert.strictEqual(new Set(names).size, names.length, family);
+			assert.deepStrictEqual(
+				[...names].sort(),
+				[
+					...new Set(
+						OS_RELEASES.filter((release) => release.family === family).map(
+							(release) => release.name
+						)
+					)
+				].sort(),
+				family
+			);
+		}
 	});
 });

@@ -3,7 +3,7 @@
 from collections.abc import Callable
 from typing import Literal, overload
 
-from randino._types import OsDetail, SystemPlatformOption
+from randino._types import OsDetail, OsFamilyOption, SystemPlatformOption
 from randino.os._generator import generate_os_details
 
 
@@ -11,6 +11,7 @@ from randino.os._generator import generate_os_details
 def rand_os(
     *,
     platform: SystemPlatformOption = ...,
+    family: OsFamilyOption = ...,
     min_year: int | None = ...,
     max_year: int | None = ...,
     include_version: bool = ...,
@@ -27,6 +28,7 @@ def rand_os(
 def rand_os(
     *,
     platform: SystemPlatformOption = ...,
+    family: OsFamilyOption = ...,
     min_year: int | None = ...,
     max_year: int | None = ...,
     include_version: bool = ...,
@@ -42,6 +44,7 @@ def rand_os(
 def rand_os(
     *,
     platform: SystemPlatformOption = "all",
+    family: OsFamilyOption = "all",
     min_year: int | None = None,
     max_year: int | None = None,
     include_version: bool = True,
@@ -59,6 +62,9 @@ def rand_os(
 
     Args:
         platform: `"desktop"`, `"mobile"`, or `"all"` for both.
+        family: Which lines: `"windows"`, a sequence such as `("macos", "ios")`, or `"all"`.
+            The lines left are still drawn by how common each is, and a line that does not
+            run on the platform asked for is answered with nothing.
         min_year: The earliest year a release may have come out in. With
             `include_build`, the year the build or point release came out in.
         max_year: The latest year a release may have come out in — `2015` is what was
@@ -77,23 +83,27 @@ def rand_os(
             nobody may predict, `Random(42).random` for one that has to come out the
             same every run.
         output: `"value"` for strings, `"detail"` for an `OsDetail` per system — its
-            name, the version, build and edition written, and the year it came out.
+            name, the version, build and edition written, its line, and the year it came
+            out.
 
     Returns:
         A `list[str]`, or a `list[OsDetail]` when `output="detail"` — the overloads
         carry that through, so a type checker knows which one it got. Empty when no
-        release came out inside the year range.
+        release of the lines named came out on the platform or inside the year range.
 
     Example:
         >>> rand_os()
         ['Windows 10']
         >>> rand_os(platform="mobile", count=3)
         ['Android 9 Pie', 'iOS 17', 'Android 13']
+        >>> rand_os(family=("macos", "ubuntu"), count=2)
+        ['macOS Ventura 13', 'Ubuntu 22.04 LTS']
         >>> rand_os(include_build=True, include_edition=True)
         ['Windows 11 Pro 23H2 (Build 22631)']
     """
     details = generate_os_details(
         platform=platform,
+        family=family,
         min_year=min_year,
         max_year=max_year,
         include_version=include_version,

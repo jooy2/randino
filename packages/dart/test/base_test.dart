@@ -74,6 +74,7 @@ void main() {
           'OrganizationIndustry',
           'OrganizationType',
           'OsDetail',
+          'OsFamily',
           'PhoneCountry',
           'PhoneDetail',
           'PhoneType',
@@ -119,6 +120,7 @@ void main() {
           'nameSupportsRoman',
           'organizationIndustries',
           'organizationTypes',
+          'osFamilyCodes',
           'phoneCountries',
           'phoneTypes',
           'ramUnits',
@@ -330,6 +332,8 @@ void main() {
       expect(systemPlatforms, <SystemPlatform>[SystemPlatform.desktop, SystemPlatform.mobile]);
       expect(randOs(), hasLength(1));
       expect(randOsDetails()[0], isA<OsDetail>());
+      expect(osFamilyCodes, hasLength(8));
+      expect(osFamilyCodes.toSet(), OsFamily.values.toSet());
       expect(randDevice(), hasLength(1));
       expect(randDeviceDetails()[0], isA<DeviceDetail>());
       expect(deviceTypes, DeviceType.values);

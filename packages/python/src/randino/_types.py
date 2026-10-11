@@ -729,6 +729,23 @@ SystemPlatform = Literal["desktop", "mobile"]
 SystemPlatformOption = Literal[SystemPlatform, "all"]
 """"all" draws from both."""
 
+OsFamily = Literal["windows", "macos", "ubuntu", "fedora", "debian", "android", "ios", "ipados"]
+"""A line of operating systems, by the key it keeps across renames.
+
+- `windows`: Microsoft Windows.
+- `macos`: macOS, and OS X and Mac OS X before it.
+- `ubuntu`, `fedora`, `debian`: the three Linux distributions, Fedora Core included under
+  `fedora`.
+- `android`: Google's Android.
+- `ios`: iOS, and iPhone OS before it.
+- `ipados`: iPadOS, apart from iOS since 2019.
+
+The first five run on `desktop` and the last three on `mobile`.
+"""
+
+OsFamilyOption = OsFamily | Sequence[OsFamily] | Literal["all"]
+"""One line, a sequence of them to draw from, or `"all"` of them."""
+
 
 @dataclass(frozen=True, slots=True)
 class OsDetail:
@@ -748,6 +765,9 @@ class OsDetail:
 
     edition: str | None
     """The edition written: `Pro`, `Server`."""
+
+    family: OsFamily
+    """The line it belongs to: `windows`, `macos`."""
 
     platform: SystemPlatform
     """The kind of machine the system runs on."""

@@ -30,11 +30,18 @@ String writeOs(OsRelease release, OsBuild? build, String? edition) {
 ///
 /// Worked out once per call: a year range is read against every release and
 /// every build, and a call of ten thousand would otherwise read them all ten
-/// thousand times. With [byBuild] the year that counts is the build's — the
-/// thing the result names — so a release none of whose builds is inside the
-/// range is left out, and one without builds is read by its own year.
+/// thousand times.
+///
+/// [named] and [platforms] both narrow the lines, so a line named that does not
+/// run on the platform asked for leaves nothing to draw, rather than either
+/// option giving way to the other.
+///
+/// With [byBuild] the year that counts is the build's — the thing the result
+/// names — so a release none of whose builds is inside the range is left out,
+/// and one without builds is read by its own year.
 Map<OsFamily, List<(OsRelease, List<OsBuild>)>> _candidates(
   List<SystemPlatform> platforms,
+  Set<OsFamily> named,
   (int, int) years,
   bool byBuild,
 ) {
@@ -43,6 +50,7 @@ Map<OsFamily, List<(OsRelease, List<OsBuild>)>> _candidates(
   final families = <OsFamily, List<(OsRelease, List<OsBuild>)>>{};
 
   for (final release in osReleases) {
+    if (!named.contains(release.family)) continue;
     if (!platforms.contains(osFamilies[release.family]!.platform)) continue;
 
     final builds =
@@ -61,6 +69,7 @@ Map<OsFamily, List<(OsRelease, List<OsBuild>)>> _candidates(
 /// What `randOs` and `randOsDetails` both do.
 List<OsDetail> generateOsDetails({
   SystemPlatform? platform,
+  Set<OsFamily>? family,
   int? minYear,
   int? maxYear,
   bool includeVersion = true,
@@ -72,6 +81,9 @@ List<OsDetail> generateOsDetails({
 }) {
   final families = _candidates(
     resolvePlatforms(platform),
+    // A null or empty set reads as every line, the way the npm package's
+    // `resolveMany` reads one.
+    family == null || family.isEmpty ? osFamilyCodes.toSet() : family,
     resolveYears(minYear, maxYear),
     includeVersion && includeBuild,
   );
@@ -84,8 +96,10 @@ List<OsDetail> generateOsDetails({
       unique: unique,
       startsWith: '',
       draw: () {
-        final family = pickWeighted(lines, (line) => osFamilies[line]!.weight);
-        final (release, builds) = pick(families[family]!);
+        // The line first, by how common it is among the lines left, and the
+        // release inside it second.
+        final line = pickWeighted(lines, (each) => osFamilies[each]!.weight);
+        final (release, builds) = pick(families[line]!);
         final build = builds.isEmpty ? null : pick(builds);
         final edition =
             includeVersion && includeEdition && release.editions.isNotEmpty
@@ -98,7 +112,8 @@ List<OsDetail> generateOsDetails({
           version: includeVersion ? release.version : null,
           build: build?.text,
           edition: edition,
-          platform: osFamilies[family]!.platform,
+          family: line,
+          platform: osFamilies[line]!.platform,
           year: build?.year ?? release.year,
         );
       },

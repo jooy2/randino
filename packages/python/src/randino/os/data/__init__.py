@@ -1,16 +1,26 @@
 """Every release of every operating system the catalog holds, and how it is written."""
 
 from dataclasses import dataclass
-from typing import Literal, NamedTuple
+from typing import NamedTuple
 
 from randino._internal.table import items, rows
-from randino._types import SystemPlatform
+from randino._types import OsFamily, SystemPlatform
 
-OsFamily = Literal["windows", "macos", "ubuntu", "fedora", "debian", "android", "ios", "ipados"]
-"""The lines of operating systems the catalog holds.
+OS_FAMILY_CODES: tuple[OsFamily, ...] = (
+    "windows",
+    "macos",
+    "ubuntu",
+    "fedora",
+    "debian",
+    "android",
+    "ios",
+    "ipados",
+)
+"""Every line of operating systems, desktop ones first, each in the order it is common in.
 
-A line keeps its key across renames, so `macos` holds Mac OS X and OS X as well, and
-`ios` holds iPhone OS.
+Named apart from `OS_FAMILIES`, the table of each line's platform and weight, which is keyed
+by these. A line keeps its key across renames, so `macos` holds Mac OS X and OS X as well,
+and `ios` holds iPhone OS.
 """
 
 

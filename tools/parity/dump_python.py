@@ -58,7 +58,7 @@ from randino.organization.data import (
     ORGANIZATION_TYPES,
 )
 from randino.organization.data._types import OrganizationLanguageData, PoolOrganizationSynthesis
-from randino.os.data import OS_FAMILIES, OS_RELEASES
+from randino.os.data import OS_FAMILIES, OS_FAMILY_CODES, OS_RELEASES
 from randino.phone.data import PHONE_COUNTRIES, PHONE_DATA, PHONE_TYPES
 from randino.phone.data._types import PhoneShape
 from randino.ram.data import RAM_SCALE
@@ -673,6 +673,7 @@ print(
             # holds and another does not is reported as itself. A build is `year text`, the
             # way the table groups them.
             "os": {
+                "familyCodes": list(OS_FAMILY_CODES),
                 "families": {
                     family: {"platform": data.platform, "weight": data.weight}
                     for family, data in OS_FAMILIES.items()

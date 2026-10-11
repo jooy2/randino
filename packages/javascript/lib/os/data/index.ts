@@ -1,12 +1,7 @@
 import { items, rows } from '../../_internal/parse.js';
-import type { SystemPlatform } from '../../_types/global.js';
+import type { OsFamily, SystemPlatform } from '../../_types/global.js';
 
-/**
- * The lines of operating systems the catalog holds. A line keeps its key across
- * renames, so `macos` holds Mac OS X and OS X as well, and `ios` holds iPhone OS.
- */
-export type OsFamily =
-	'windows' | 'macos' | 'ubuntu' | 'debian' | 'fedora' | 'android' | 'ios' | 'ipados';
+export { OS_FAMILY_CODES } from './constants.js';
 
 /**
  * Which platform each line runs on, and how often it comes up beside the other

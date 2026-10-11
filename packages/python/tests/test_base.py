@@ -86,12 +86,15 @@ def test_the_package_exports_exactly_its_public_api() -> None:
         "NicknameDetail",
         "ORGANIZATION_INDUSTRIES",
         "ORGANIZATION_TYPES",
+        "OS_FAMILY_CODES",
         "OrganizationDetail",
         "OrganizationIndustry",
         "OrganizationIndustryOption",
         "OrganizationType",
         "OrganizationTypeOption",
         "OsDetail",
+        "OsFamily",
+        "OsFamilyOption",
         "PHONE_COUNTRIES",
         "PHONE_TYPES",
         "PhoneCountry",
@@ -299,6 +302,7 @@ def test_the_functions_are_callable_and_the_constants_are_what_they_claim() -> N
     assert randino.SYSTEM_PLATFORMS == ("desktop", "mobile")
     assert isinstance(randino.rand_os()[0], str)
     assert isinstance(randino.rand_os(output="detail")[0].year, int)
+    assert len(randino.OS_FAMILY_CODES) == 8
     assert isinstance(randino.rand_device()[0], str)
     assert randino.DEVICE_TYPES == ("phone", "tablet", "laptop")
     assert re.fullmatch(r"\d+ (MB|GB)", randino.rand_ram()[0])
@@ -400,6 +404,8 @@ def test_an_option_the_types_rule_out_falls_back_rather_than_raising() -> None:
         lambda: loose.rand_phone(fictional="yes"),
         lambda: loose.rand_os(platform="tv", min_year=float("nan"), max_year="x"),
         lambda: loose.rand_os(include_build="yes", include_version=0),
+        lambda: loose.rand_os(family="beos"),
+        lambda: loose.rand_os(family=[None]),
         lambda: loose.rand_device(type="watch", min_year="x"),
         lambda: loose.rand_device(type=[None], include_vendor="no"),
         lambda: loose.rand_ram(unit="KB", min_size=float("nan"), max_size="x"),

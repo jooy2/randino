@@ -1175,6 +1175,24 @@ export type SystemPlatform = 'desktop' | 'mobile';
 export type SystemPlatformOption = SystemPlatform | 'all';
 
 /**
+ * A line of operating systems, by the key it keeps across renames:
+ * - `windows`: Microsoft Windows.
+ * - `macos`: macOS, and OS X and Mac OS X before it.
+ * - `ubuntu`, `fedora`, `debian`: the three Linux distributions, Fedora Core
+ *   included under `fedora`.
+ * - `android`: Google's Android.
+ * - `ios`: iOS, and iPhone OS before it.
+ * - `ipados`: iPadOS, apart from iOS since 2019.
+ *
+ * The first five run on `desktop` and the last three on `mobile`.
+ */
+export type OsFamily =
+	'windows' | 'macos' | 'ubuntu' | 'fedora' | 'debian' | 'android' | 'ios' | 'ipados';
+
+/** One line, several to draw from, or `'all'` of them. */
+export type OsFamilyOption = OsFamily | readonly OsFamily[] | 'all';
+
+/**
  * What `randOs` takes. An operating system is a real release with a real name,
  * so it has no language, no length and nothing to invent.
  */
@@ -1184,6 +1202,12 @@ export interface RandOsOptions extends Pick<
 > {
 	/** Desktop systems, mobile ones, or both. Default `'all'`. */
 	platform?: SystemPlatformOption;
+	/**
+	 * Which lines: `'windows'`, `['macos', 'ios']`. The lines left are still drawn
+	 * by how common each is, and a line that does not run on the platform asked
+	 * for is answered with nothing. Default `'all'`.
+	 */
+	family?: OsFamilyOption;
 	/**
 	 * The earliest year a release may have come out in. With `includeBuild`, the
 	 * year the build or point release came out in. Default none.
@@ -1227,6 +1251,8 @@ export interface OsDetail {
 	build: string | null;
 	/** The edition written: `Pro`, `Server`. */
 	edition: string | null;
+	/** The line it belongs to: `windows`, `macos`. */
+	family: OsFamily;
 	platform: SystemPlatform;
 	/** The year the release came out, or the build when one is written. */
 	year: number;

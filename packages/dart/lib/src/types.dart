@@ -1104,6 +1104,37 @@ enum SystemPlatform {
   mobile,
 }
 
+/// A line of operating systems, by the key it keeps across renames.
+///
+/// [macos] holds Mac OS X and OS X as well, and [ios] holds iPhone OS. The
+/// first five run on [SystemPlatform.desktop] and the last three on
+/// [SystemPlatform.mobile].
+enum OsFamily {
+  /// Microsoft Windows.
+  windows,
+
+  /// Apple macOS, OS X and Mac OS X.
+  macos,
+
+  /// Canonical Ubuntu.
+  ubuntu,
+
+  /// Fedora, and Fedora Core before it.
+  fedora,
+
+  /// Debian.
+  debian,
+
+  /// Google Android.
+  android,
+
+  /// Apple iOS, and iPhone OS before it.
+  ios,
+
+  /// Apple iPadOS, apart from iOS since 2019.
+  ipados,
+}
+
 /// A generated operating system with the pieces it was written from.
 class OsDetail {
   /// Creates a detail record. Returned by the generator; there is rarely a
@@ -1114,6 +1145,7 @@ class OsDetail {
     required this.version,
     required this.build,
     required this.edition,
+    required this.family,
     required this.platform,
     required this.year,
   });
@@ -1135,6 +1167,9 @@ class OsDetail {
   /// The edition written: `Pro`, `Server`.
   final String? edition;
 
+  /// The line it belongs to: [OsFamily.windows], [OsFamily.macos].
+  final OsFamily family;
+
   /// The kind of machine the system runs on.
   final SystemPlatform platform;
 
@@ -1142,7 +1177,7 @@ class OsDetail {
   final int year;
 
   @override
-  String toString() => 'OsDetail($os, ${platform.name}, $year)';
+  String toString() => 'OsDetail($os, ${family.name}, ${platform.name}, $year)';
 }
 
 /// What kind of device a model is.

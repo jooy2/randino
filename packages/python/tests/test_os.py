@@ -1,8 +1,9 @@
 """Operating systems: real releases, written at the level the caller asked for."""
 
 from random import Random
+from typing import Any
 
-from randino import RAND_COUNT_MAX, SYSTEM_PLATFORMS, OsDetail, rand_os
+from randino import OS_FAMILY_CODES, RAND_COUNT_MAX, SYSTEM_PLATFORMS, OsDetail, rand_os
 
 # Internal, but they are what a result is checked against.
 from randino.os._generator import write_os
@@ -93,6 +94,7 @@ def test_the_detail_is_what_the_value_was_written_from() -> None:
         )
         build = next((each for each in release.builds if each.text == detail.build), None)
 
+        assert detail.family == release.family
         assert detail.platform == OS_FAMILIES[release.family].platform
         assert (build is None) == (detail.build is None), detail.os
         # A release with builds always writes one when asked.
@@ -131,6 +133,49 @@ def test_platform_keeps_to_the_systems_of_one_kind_of_machine() -> None:
     both = {detail.platform for detail in rand_os(count=SAMPLE * 3, output="detail")}
 
     assert len(both) == len(SYSTEM_PLATFORMS)
+
+
+def test_family_keeps_to_the_lines_named_and_lists_every_line_the_catalog_holds() -> None:
+    assert sorted(OS_FAMILY_CODES) == sorted(OS_FAMILIES)
+
+    for family in OS_FAMILY_CODES:
+        details = rand_os(family=family, count=SAMPLE, output="detail")
+
+        assert all(detail.family == family for detail in details), family
+
+    two = rand_os(family=("macos", "ios"), count=SAMPLE * 3, output="detail")
+
+    assert {detail.family for detail in two} == {"ios", "macos"}
+
+    # An unknown line reads as all of them.
+    loose: Any = rand_os
+
+    assert any(
+        detail.family != "windows" for detail in loose(family="beos", count=SAMPLE, output="detail")
+    )
+
+
+def test_the_lines_named_are_still_drawn_by_how_common_each_is() -> None:
+    details = rand_os(family=("windows", "ubuntu"), count=LARGE, output="detail")
+    windows = sum(1 for detail in details if detail.family == "windows")
+
+    # Sixty-four to seven: Windows is most of the draws, and Ubuntu still comes up.
+    assert windows / len(details) > 0.8, f"Windows {windows / len(details)}"
+    assert windows < len(details), "Ubuntu never came up"
+
+
+def test_a_line_that_does_not_run_on_the_platform_asked_for_is_answered_with_nothing() -> None:
+    assert rand_os(family="ios", platform="desktop", count=5) == []
+    assert rand_os(family=("windows", "macos"), platform="mobile", count=5) == []
+    # A mix keeps to the lines that run on the platform.
+    assert all(
+        detail.family == "ios"
+        for detail in rand_os(
+            family=("windows", "ios"), platform="mobile", count=SAMPLE, output="detail"
+        )
+    )
+    # And to the years: iPadOS came out in 2019.
+    assert rand_os(family="ipados", max_year=2018, count=5) == []
 
 
 def test_a_year_range_keeps_to_the_releases_out_in_it() -> None:
@@ -194,7 +239,12 @@ def test_the_value_form_is_the_os_of_each_detail() -> None:
 
 
 def test_unique_never_repeats_a_system_and_stops_when_the_systems_run_out() -> None:
-    names = rand_os(include_version=False, unique=True, count=100)
+    # A line at a time: across all of them Fedora Core is one draw in four hundred, which a
+    # run of draws that add nothing could stop short of.
+    for family in OS_FAMILY_CODES:
+        names = rand_os(family=family, include_version=False, unique=True, count=100)
 
-    assert len(set(names)) == len(names)
-    assert set(names) == {release.name for release in OS_RELEASES}
+        assert len(set(names)) == len(names), family
+        assert set(names) == {
+            release.name for release in OS_RELEASES if release.family == family
+        }, family

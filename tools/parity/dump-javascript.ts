@@ -73,7 +73,11 @@ import {
 	ORGANIZATION_TYPE_WEIGHTS,
 	ORGANIZATION_TYPES
 } from '../../packages/javascript/lib/organization/data/index.js';
-import { OS_FAMILIES, OS_RELEASES } from '../../packages/javascript/lib/os/data/index.js';
+import {
+	OS_FAMILIES,
+	OS_FAMILY_CODES,
+	OS_RELEASES
+} from '../../packages/javascript/lib/os/data/index.js';
 import { RAM_SCALE } from '../../packages/javascript/lib/ram/data/index.js';
 import {
 	RESOLUTIONS,
@@ -427,6 +431,7 @@ console.log(
 		// package holds and another does not is reported as itself. A build is
 		// `year text`, the way the table groups them.
 		os: {
+			familyCodes: [...OS_FAMILY_CODES],
 			families: OS_FAMILIES,
 			releases: Object.fromEntries(
 				OS_RELEASES.map((release) => [

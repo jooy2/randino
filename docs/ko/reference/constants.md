@@ -341,6 +341,7 @@ import {
 	FILE_CATEGORIES,
 	GPU_VENDORS,
 	MIME_TOP_LEVELS,
+	OS_FAMILY_CODES,
 	SYSTEM_PLATFORMS,
 	VERSION_FORMATS
 } from 'randino';
@@ -349,6 +350,7 @@ import {
 | 이름 | 타입 | 값 |
 | --- | --- | --- |
 | `SYSTEM_PLATFORMS` | `SystemPlatform[]` | `['desktop', 'mobile']` |
+| `OS_FAMILY_CODES` | `OsFamily[]` | `['windows', 'macos', 'ubuntu', 'fedora', 'debian', 'android', 'ios', 'ipados']` |
 | `DEVICE_TYPES` | `DeviceType[]` | `['phone', 'tablet', 'laptop']` |
 | `RAM_UNITS` | `RamUnit[]` | `['MB', 'GB']` |
 | `DISK_TYPES` | `DiskType[]` | `['hdd', 'ssd', 'sshd', 'emmc', 'ufs']` |
@@ -371,6 +373,7 @@ import 'package:randino/randino.dart';
 | 이름              | 타입                   | 값                                              |
 | ----------------- | ---------------------- | ----------------------------------------------- |
 | `systemPlatforms` | `List<SystemPlatform>` | `desktop`, `mobile` 순                          |
+| `osFamilyCodes` | `List<OsFamily>` | `windows`, `macos`, … `ipados`, 모두 8개 |
 | `deviceTypes`     | `List<DeviceType>`     | `phone`, `tablet`, `laptop` 순                  |
 | `ramUnits`        | `List<RamUnit>`        | `mb`, `gb` 순                                   |
 | `diskTypes`       | `List<DiskType>`       | `hdd`, `ssd`, `sshd`, `emmc`, `ufs` 순          |
@@ -397,6 +400,7 @@ from randino import (
     FILE_CATEGORIES,
     GPU_VENDORS,
     MIME_TOP_LEVELS,
+    OS_FAMILY_CODES,
     SYSTEM_PLATFORMS,
     VERSION_FORMATS,
 )
@@ -405,6 +409,7 @@ from randino import (
 | 이름 | 타입 | 값 |
 | --- | --- | --- |
 | `SYSTEM_PLATFORMS` | `tuple[SystemPlatform, …]` | `('desktop', 'mobile')` |
+| `OS_FAMILY_CODES` | `tuple[OsFamily, …]` | `('windows', 'macos', 'ubuntu', 'fedora', 'debian', 'android', 'ios', 'ipados')` |
 | `DEVICE_TYPES` | `tuple[DeviceType, …]` | `('phone', 'tablet', 'laptop')` |
 | `RAM_UNITS` | `tuple[RamUnit, …]` | `('MB', 'GB')` |
 | `DISK_TYPES` | `tuple[DiskType, …]` | `('hdd', 'ssd', 'sshd', 'emmc', 'ufs')` |
@@ -597,6 +602,8 @@ import type {
 	OrganizationType,
 	OrganizationTypeOption,
 	OsDetail,
+	OsFamily,
+	OsFamilyOption,
 	PhoneCountry,
 	PhoneCountryOption,
 	PhoneDetail,
@@ -683,7 +690,7 @@ import 'package:randino/randino.dart';
 AgeGroup, AgeDistribution, DateUnit, DeviceType, DiskType, DiskUnit, FileCategory, GenderCode
 NameLanguage, NameGender, NameScript
 OrganizationType, OrganizationIndustry
-PhoneCountry, PhoneType
+OsFamily, PhoneCountry, PhoneType
 RamUnit, SystemPlatform, VersionFormat
 WordLanguage, WordTheme
 LocationLanguage, LocationLevel, MimeTopLevel
@@ -728,6 +735,8 @@ from randino import (
     OrganizationType,
     OrganizationTypeOption,
     OsDetail,
+    OsFamily,
+    OsFamilyOption,
     PhoneCountry,
     PhoneCountryOption,
     PhoneDetail,

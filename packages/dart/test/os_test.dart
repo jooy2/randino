@@ -86,6 +86,7 @@ void main() {
         final matches = release.builds.where((each) => each.text == detail.build);
         final build = matches.isEmpty ? null : matches.first;
 
+        expect(detail.family, release.family);
         expect(detail.platform, osFamilies[release.family]!.platform);
         expect(build == null, detail.build == null, reason: detail.os);
         // A release with builds always writes one when asked.
@@ -131,6 +132,67 @@ void main() {
       expect({
         for (final detail in randOsDetails(count: sample * 3)) detail.platform,
       }, hasLength(systemPlatforms.length));
+    });
+
+    test('family keeps to the lines named, and lists every line the catalog holds', () {
+      expect(osFamilyCodes.toSet(), osFamilies.keys.toSet());
+      expect(osFamilyCodes, hasLength(osFamilies.length));
+
+      for (final family in osFamilyCodes) {
+        expect(
+          randOsDetails(family: {family}, count: sample).every((detail) => detail.family == family),
+          isTrue,
+          reason: family.name,
+        );
+      }
+
+      expect(
+        {
+          for (final detail in randOsDetails(
+            family: {OsFamily.macos, OsFamily.ios},
+            count: sample * 3,
+          ))
+            detail.family,
+        },
+        {OsFamily.macos, OsFamily.ios},
+      );
+      expect(
+        randOsDetails(family: {}, count: sample).any((detail) => detail.family != OsFamily.windows),
+        isTrue,
+        reason: 'an empty set reads as every line',
+      );
+    });
+
+    test('the lines named are still drawn by how common each is', () {
+      final details = randOsDetails(family: {OsFamily.windows, OsFamily.ubuntu}, count: large);
+      final windows = details.where((detail) => detail.family == OsFamily.windows).length;
+
+      // Sixty-four to seven: Windows is most of the draws, and Ubuntu still comes up.
+      expect(windows / details.length, greaterThan(0.8));
+      expect(windows, lessThan(details.length), reason: 'Ubuntu never came up');
+    });
+
+    test('a line that does not run on the platform asked for is answered with nothing', () {
+      expect(randOs(family: {OsFamily.ios}, platform: SystemPlatform.desktop, count: 5), isEmpty);
+      expect(
+        randOs(
+          family: {OsFamily.windows, OsFamily.macos},
+          platform: SystemPlatform.mobile,
+          count: 5,
+        ),
+        isEmpty,
+      );
+      // A mix keeps to the lines that run on the platform.
+      expect(
+        randOsDetails(
+          family: {OsFamily.windows, OsFamily.ios},
+          platform: SystemPlatform.mobile,
+          count: sample,
+        ).every((detail) => detail.family == OsFamily.ios),
+        isTrue,
+      );
+      // And to the years: iPadOS came out in 2019.
+      expect(randOs(family: {OsFamily.ipados}, maxYear: 2018, count: 5), isEmpty);
     });
 
     test('a year range keeps to the releases out in it', () {
@@ -206,10 +268,17 @@ void main() {
     });
 
     test('unique never repeats a system, and stops when the systems run out', () {
-      final names = randOs(includeVersion: false, unique: true, count: 100);
+      // A line at a time: across all of them Fedora Core is one draw in four
+      // hundred, which a run of draws that add nothing could stop short of.
+      for (final family in osFamilyCodes) {
+        final names = randOs(family: {family}, includeVersion: false, unique: true, count: 100);
 
-      expect(names.toSet(), hasLength(names.length));
-      expect(names.toSet(), {for (final release in osReleases) release.name});
+        expect(names.toSet(), hasLength(names.length), reason: family.name);
+        expect(names.toSet(), {
+          for (final release in osReleases)
+            if (release.family == family) release.name,
+        }, reason: family.name);
+      }
     });
   });
 }

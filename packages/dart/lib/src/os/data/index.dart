@@ -1,35 +1,21 @@
 import 'package:randino/src/internal/parse.dart';
 import 'package:randino/src/types.dart';
 
-/// The lines of operating systems the catalog holds. Internal.
+/// Every line of operating systems, desktop ones first, each in the order it
+/// is common in.
 ///
-/// A line keeps its key across renames, so [macos] holds Mac OS X and OS X as
-/// well, and [ios] holds iPhone OS.
-enum OsFamily {
-  /// Microsoft Windows.
-  windows,
-
-  /// Apple macOS, OS X and Mac OS X.
-  macos,
-
-  /// Canonical Ubuntu.
-  ubuntu,
-
-  /// Fedora, and Fedora Core before it.
-  fedora,
-
-  /// Debian.
-  debian,
-
-  /// Google Android.
-  android,
-
-  /// Apple iOS, and iPhone OS before it.
-  ios,
-
-  /// Apple iPadOS.
-  ipados,
-}
+/// Named apart from `osFamilies`, the internal table of each line's platform
+/// and weight, which is keyed by these.
+const List<OsFamily> osFamilyCodes = <OsFamily>[
+  OsFamily.windows,
+  OsFamily.macos,
+  OsFamily.ubuntu,
+  OsFamily.fedora,
+  OsFamily.debian,
+  OsFamily.android,
+  OsFamily.ios,
+  OsFamily.ipados,
+];
 
 /// Which platform a line runs on, and how often it comes up. Internal.
 typedef OsFamilyData = ({SystemPlatform platform, int weight});

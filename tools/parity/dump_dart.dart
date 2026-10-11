@@ -731,6 +731,7 @@ void main() {
       // package holds and another does not is reported as itself. A build is
       // `year text`, the way the table groups them.
       'os': <String, Object?>{
+        'familyCodes': <String>[for (final family in osFamilyCodes) family.name],
         'families': <String, Object?>{
           for (final entry in osFamilies.entries)
             entry.key.name: <String, Object?>{

@@ -7,10 +7,10 @@ narrows what may be picked rather than shaping what is written afterwards.
 
 from collections.abc import Callable
 
-from randino._internal.generate import collect, resolve_platforms, resolve_years
+from randino._internal.generate import collect, resolve_many, resolve_platforms, resolve_years
 from randino._internal.utils import pick, pick_weighted, with_random
-from randino._types import OsDetail, SystemPlatform, SystemPlatformOption
-from randino.os.data import OS_FAMILIES, OS_RELEASES, OsBuild, OsFamily, OsRelease
+from randino._types import OsDetail, OsFamily, OsFamilyOption, SystemPlatform, SystemPlatformOption
+from randino.os.data import OS_FAMILIES, OS_FAMILY_CODES, OS_RELEASES, OsBuild, OsRelease
 
 
 def write_os(release: OsRelease, build: OsBuild | None, edition: str | None) -> str:
@@ -29,20 +29,27 @@ def write_os(release: OsRelease, build: OsBuild | None, edition: str | None) -> 
 
 
 def _candidates(
-    platforms: tuple[SystemPlatform, ...], years: tuple[int, int], by_build: bool
+    platforms: tuple[SystemPlatform, ...],
+    named: tuple[OsFamily, ...],
+    years: tuple[int, int],
+    by_build: bool,
 ) -> dict[OsFamily, list[tuple[OsRelease, tuple[OsBuild, ...]]]]:
     """The releases one call may land on, grouped by line, with the builds it may write.
 
     Worked out once per call: a year range is read against every release and every
     build, and a call of ten thousand would otherwise read them all ten thousand times.
-    With `by_build` the year that counts is the build's — the thing the result names — so
-    a release none of whose builds is inside the range is left out, and one without
-    builds is read by its own year.
+    `named` and `platforms` both narrow the lines, so a line named that does not run on the
+    platform asked for leaves nothing to draw, rather than either option giving way to the
+    other. With `by_build` the year that counts is the build's — the thing the result
+    names — so a release none of whose builds is inside the range is left out, and one
+    without builds is read by its own year.
     """
     min_year, max_year = years
     families: dict[OsFamily, list[tuple[OsRelease, tuple[OsBuild, ...]]]] = {}
 
     for release in OS_RELEASES:
+        if release.family not in named:
+            continue
         if OS_FAMILIES[release.family].platform not in platforms:
             continue
 
@@ -66,6 +73,7 @@ def _candidates(
 def generate_os_details(
     *,
     platform: SystemPlatformOption = "all",
+    family: OsFamilyOption = "all",
     min_year: int | None = None,
     max_year: int | None = None,
     include_version: bool = True,
@@ -81,6 +89,7 @@ def generate_os_details(
     with_version = include_version is not False
     families = _candidates(
         resolve_platforms(platform),
+        resolve_many(family, OS_FAMILY_CODES, OS_FAMILY_CODES),
         resolve_years(min_year, max_year),
         with_version and include_build is True,
     )
@@ -88,8 +97,10 @@ def generate_os_details(
     with_edition = with_version and include_edition is True
 
     def draw() -> OsDetail:
-        family = pick_weighted(lines, lambda line: OS_FAMILIES[line].weight)
-        release, builds = pick(families[family])
+        # The line first, by how common it is among the lines left, and the release inside
+        # it second.
+        line = pick_weighted(lines, lambda each: OS_FAMILIES[each].weight)
+        release, builds = pick(families[line])
         build = pick(builds) if builds else None
         edition = pick(release.editions) if with_edition and release.editions else None
 
@@ -99,7 +110,8 @@ def generate_os_details(
             version=release.version if with_version else None,
             build=build.text if build is not None else None,
             edition=edition,
-            platform=OS_FAMILIES[family].platform,
+            family=line,
+            platform=OS_FAMILIES[line].platform,
             year=build.year if build is not None else release.year,
         )
 

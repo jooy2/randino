@@ -1,6 +1,6 @@
 # randOs
 
-Generates real operating systems and returns `count` of them, each written the way its release is known: `Windows 11`, `macOS Sonoma 14`, `Android 9 Pie`. Nothing is invented: every result is a release that came out, and [`includeBuild`](#builds-and-editions) and [`includeEdition`](#builds-and-editions) add the build or the point release and the edition it shipped with. [`minYear` and `maxYear`](#years) keep to the releases out in those years, so a sample can be what was in use in 2012.
+Generates real operating systems and returns `count` of them, each written the way its release is known: `Windows 11`, `macOS Sonoma 14`, `Android 9 Pie`. Nothing is invented: every result is a release that came out. [`family`](#lines) keeps to the lines named, [`includeBuild`](#builds-and-editions) and [`includeEdition`](#builds-and-editions) add the build or the point release and the edition it shipped with. [`minYear` and `maxYear`](#years) keep to the releases out in those years, so a sample can be what was in use in 2012.
 
 An operating system is written by its own name in every language, so `randOs` takes no `language`.
 
@@ -44,6 +44,7 @@ Every option is optional, and the defaults are what the empty call above uses.
 | Option | Type | Default | Description |
 | --- | --- | --- | --- |
 | `platform` | <Lang js="SystemPlatformOption" dart="SystemPlatform?" py="SystemPlatformOption" code /> | <Lang js="'all'" dart="null" py="&quot;all&quot;" code /> | `desktop` for a PC, a laptop included, `mobile` for a phone or a tablet. <Lang js="'all'" dart="null" py="&quot;all&quot;" code /> draws from both. |
+| `family` | <Lang js="OsFamilyOption" dart="Set&lt;OsFamily&gt;?" py="OsFamilyOption" code /> | <Lang js="'all'" dart="null" py="&quot;all&quot;" code /> | Which lines: one, several, or every one of them. See [lines](#lines). |
 | <Lang js="minYear" dart="minYear" py="min_year" code /> | <Lang js="number" dart="int?" py="int &#124; None" code /> | <Lang js="—" dart="null" py="None" code /> | The earliest year a release may have come out in. See [years](#years). |
 | <Lang js="maxYear" dart="maxYear" py="max_year" code /> | <Lang js="number" dart="int?" py="int &#124; None" code /> | <Lang js="—" dart="null" py="None" code /> | The latest year a release may have come out in. See [years](#years). |
 | <Lang js="includeVersion" dart="includeVersion" py="include_version" code /> | <Lang js="boolean" dart="bool" py="bool" code /> | <Lang js="true" dart="true" py="True" code /> | Write the version after the name. Left off, the result is the name alone. |
@@ -104,6 +105,45 @@ A draw picks the line first, by the share in the table, and a release inside it 
 Each release is written the way it is known, which is not the same pattern for every line: the macOS releases carry the name Apple gave them before the number (`macOS Sonoma 14`), the Android releases up to 9 the dessert after it (`Android 4.4 KitKat`), and an Ubuntu long-term release its `LTS`.
 
 The names are the products' own, and they belong to their owners. randino is not affiliated with any of them.
+
+## Lines {#lines}
+
+`family` keeps to the lines named, by the key each one goes by: `windows`, `macos`, `ubuntu`, `fedora`, `debian`, `android`, `ios` and `ipados`, the order <Lang js="OS_FAMILY_CODES" dart="osFamilyCodes" py="OS_FAMILY_CODES" code /> lists them in. A line keeps its releases across a rename here too, so `macos` is Mac OS X as well. The lines named are still drawn by their shares in the [table above](#catalog) before a release inside one is, so Windows and Ubuntu together are Windows about nine draws in ten. A name the catalog does not hold is ignored, and a list of nothing but such names draws every line.
+
+`family` narrows alongside `platform` and the years, so a line that does not run on the platform asked for is answered with nothing rather than with a line of the other platform. Of several lines, the ones that run on it are kept.
+
+::: lang js
+
+```javascript
+randOs({ family: 'windows', count: 3 }); // ['Windows XP', 'Windows 11', 'Windows 7']
+randOs({ family: ['macos', 'ios'], count: 3 }); // ['iOS 17', 'macOS Sonoma 14', 'iOS 26']
+randOs({ family: ['windows', 'ios'], platform: 'mobile' }); // ['iOS 15']
+randOs({ family: 'ios', platform: 'desktop' }); // []
+```
+
+:::
+
+::: lang dart
+
+```dart
+randOs(family: {OsFamily.windows}, count: 3); // [Windows XP, Windows 11, Windows 7]
+randOs(family: {OsFamily.macos, OsFamily.ios}, count: 3); // [iOS 17, macOS Sonoma 14, iOS 26]
+randOs(family: {OsFamily.windows, OsFamily.ios}, platform: SystemPlatform.mobile); // [iOS 15]
+randOs(family: {OsFamily.ios}, platform: SystemPlatform.desktop); // []
+```
+
+:::
+
+::: lang py
+
+```python
+rand_os(family="windows", count=3)  # ['Windows XP', 'Windows 11', 'Windows 7']
+rand_os(family=("macos", "ios"), count=3)  # ['iOS 17', 'macOS Sonoma 14', 'iOS 26']
+rand_os(family=("windows", "ios"), platform="mobile")  # ['iOS 15']
+rand_os(family="ios", platform="desktop")  # []
+```
+
+:::
 
 ## Builds and editions {#builds-and-editions}
 
@@ -219,7 +259,7 @@ The detail carries each part of what was written, so a result can be stored as t
 ```javascript
 randOs({ includeBuild: true, output: 'detail' });
 // [{ os: 'macOS Sonoma 14.5', name: 'macOS', version: '14', build: '14.5',
-//    edition: null, platform: 'desktop', year: 2024 }]
+//    edition: null, family: 'macos', platform: 'desktop', year: 2024 }]
 ```
 
 :::
@@ -227,7 +267,7 @@ randOs({ includeBuild: true, output: 'detail' });
 ::: lang dart
 
 ```dart
-randOsDetails(includeBuild: true).first; // OsDetail(macOS Sonoma 14.5, desktop, 2024)
+randOsDetails(includeBuild: true).first; // OsDetail(macOS Sonoma 14.5, macos, desktop, 2024)
 ```
 
 Dart has neither overloads nor union types, so the detail form is its own function. It takes the same parameters as `randOs`.
@@ -239,7 +279,7 @@ Dart has neither overloads nor union types, so the detail form is its own functi
 ```python
 rand_os(include_build=True, output="detail")
 # [OsDetail(os='macOS Sonoma 14.5', name='macOS', version='14', build='14.5',
-#           edition=None, platform='desktop', year=2024)]
+#           edition=None, family='macos', platform='desktop', year=2024)]
 ```
 
 :::
@@ -251,6 +291,7 @@ rand_os(include_build=True, output="detail")
 | `version` | <Lang js="string &#124; null" dart="String?" py="str &#124; None" code /> | The release's version: `11`, `14`, `22.04`, `XP`. Empty with <Lang js="includeVersion: false" dart="includeVersion: false" py="include_version=False" code />. |
 | `build` | <Lang js="string &#124; null" dart="String?" py="str &#124; None" code /> | The build or point release written, as it is written: `23H2 (Build 22631)`, `14.5`, `(API 34)`. |
 | `edition` | <Lang js="string &#124; null" dart="String?" py="str &#124; None" code /> | The edition written: `Pro`, `Server`. |
+| `family` | `OsFamily` | The line it belongs to: `windows`, `macos`, `ios`. |
 | `platform` | `SystemPlatform` | `desktop` or `mobile`. |
 | `year` | <Lang js="number" dart="int" py="int" code /> | The year the release came out, or the build when one is written. |
 

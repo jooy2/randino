@@ -1,6 +1,6 @@
 # randOs
 
-실제로 나온 운영체제를 `count`개만큼 돌려줍니다. `Windows 11`, `macOS Sonoma 14`, `Android 9 Pie`처럼 릴리스마다 알려진 이름 그대로 씁니다. 지어낸 값은 없습니다. 결과는 모두 실제로 나온 릴리스이며, [`includeBuild`](#builds-and-editions)와 [`includeEdition`](#builds-and-editions)을 주면 그 릴리스의 빌드나 세부 버전, 에디션을 덧붙입니다. [`minYear`와 `maxYear`](#years)로 그 기간에 나온 릴리스만 고를 수 있으므로, 2012년에 쓰이던 운영체제만으로 샘플을 만들 수도 있습니다.
+실제로 나온 운영체제를 `count`개만큼 돌려줍니다. `Windows 11`, `macOS Sonoma 14`, `Android 9 Pie`처럼 릴리스마다 알려진 이름 그대로 씁니다. 지어낸 값은 없습니다. 결과는 모두 실제로 나온 릴리스입니다. [`family`](#lines)로 원하는 계열만 고를 수 있고, [`includeBuild`](#builds-and-editions)와 [`includeEdition`](#builds-and-editions)을 주면 그 릴리스의 빌드나 세부 버전, 에디션을 덧붙입니다. [`minYear`와 `maxYear`](#years)로 그 기간에 나온 릴리스만 고를 수 있으므로, 2012년에 쓰이던 운영체제만으로 샘플을 만들 수도 있습니다.
 
 운영체제 이름은 어느 언어에서나 제 이름으로 쓰므로 `randOs`는 `language`를 받지 않습니다.
 
@@ -44,6 +44,7 @@ rand_os()
 | 옵션 | 타입 | 기본값 | 설명 |
 | --- | --- | --- | --- |
 | `platform` | <Lang js="SystemPlatformOption" dart="SystemPlatform?" py="SystemPlatformOption" code /> | <Lang js="'all'" dart="null" py="&quot;all&quot;" code /> | `desktop`은 노트북을 포함한 PC, `mobile`은 휴대폰과 태블릿입니다. <Lang js="'all'" dart="null" py="&quot;all&quot;" code />이면 둘 다에서 뽑습니다. |
+| `family` | <Lang js="OsFamilyOption" dart="Set&lt;OsFamily&gt;?" py="OsFamilyOption" code /> | <Lang js="'all'" dart="null" py="&quot;all&quot;" code /> | 고를 계열. 하나, 여럿, 또는 전부. [계열](#lines)을 보세요. |
 | <Lang js="minYear" dart="minYear" py="min_year" code /> | <Lang js="number" dart="int?" py="int &#124; None" code /> | <Lang js="—" dart="null" py="None" code /> | 릴리스가 나온 가장 이른 해. [연도](#years)를 보세요. |
 | <Lang js="maxYear" dart="maxYear" py="max_year" code /> | <Lang js="number" dart="int?" py="int &#124; None" code /> | <Lang js="—" dart="null" py="None" code /> | 릴리스가 나온 가장 늦은 해. [연도](#years)를 보세요. |
 | <Lang js="includeVersion" dart="includeVersion" py="include_version" code /> | <Lang js="boolean" dart="bool" py="bool" code /> | <Lang js="true" dart="true" py="True" code /> | 이름 뒤에 버전을 씁니다. 끄면 이름만 돌려줍니다. |
@@ -104,6 +105,45 @@ rand_os(include_version=False, count=3)  # ['Windows', 'Android', 'macOS']
 릴리스는 알려진 이름 그대로 쓰므로 계열마다 쓰는 형식이 다릅니다. macOS 릴리스는 번호 앞에 애플이 붙인 이름을 쓰고(`macOS Sonoma 14`), Android 9까지는 번호 뒤에 디저트 이름을 쓰며(`Android 4.4 KitKat`), Ubuntu의 장기 지원 릴리스에는 `LTS`가 붙습니다.
 
 이름은 각 제품의 것이고, 그 권리는 소유자에게 있습니다. randino는 이들 중 어느 곳과도 관계가 없습니다.
+
+## 계열 {#lines}
+
+`family`는 고른 계열만 남깁니다. 계열은 `windows`, `macos`, `ubuntu`, `fedora`, `debian`, `android`, `ios`, `ipados`라는 키로 고르며, <Lang js="OS_FAMILY_CODES" dart="osFamilyCodes" py="OS_FAMILY_CODES" code />도 이 순서입니다. 여기서도 이름이 바뀐 릴리스는 같은 계열이라 `macos`에는 Mac OS X도 들어갑니다. 고른 계열 사이에서도 [위 표](#catalog)의 비중대로 계열을 먼저 뽑고 그 안에서 릴리스를 뽑으므로, Windows와 Ubuntu를 고르면 열에 아홉 정도는 Windows입니다. 카탈로그에 없는 이름은 무시하고, 그런 이름만 주면 모든 계열에서 뽑습니다.
+
+`family`는 `platform`, 연도와 함께 범위를 좁힙니다. 그래서 고른 계열이 요청한 플랫폼에서 돌지 않으면 다른 플랫폼의 계열로 바꾸지 않고 빈 결과를 돌려줍니다. 여러 계열을 고르면 그 플랫폼에서 도는 계열만 남깁니다.
+
+::: lang js
+
+```javascript
+randOs({ family: 'windows', count: 3 }); // ['Windows XP', 'Windows 11', 'Windows 7']
+randOs({ family: ['macos', 'ios'], count: 3 }); // ['iOS 17', 'macOS Sonoma 14', 'iOS 26']
+randOs({ family: ['windows', 'ios'], platform: 'mobile' }); // ['iOS 15']
+randOs({ family: 'ios', platform: 'desktop' }); // []
+```
+
+:::
+
+::: lang dart
+
+```dart
+randOs(family: {OsFamily.windows}, count: 3); // [Windows XP, Windows 11, Windows 7]
+randOs(family: {OsFamily.macos, OsFamily.ios}, count: 3); // [iOS 17, macOS Sonoma 14, iOS 26]
+randOs(family: {OsFamily.windows, OsFamily.ios}, platform: SystemPlatform.mobile); // [iOS 15]
+randOs(family: {OsFamily.ios}, platform: SystemPlatform.desktop); // []
+```
+
+:::
+
+::: lang py
+
+```python
+rand_os(family="windows", count=3)  # ['Windows XP', 'Windows 11', 'Windows 7']
+rand_os(family=("macos", "ios"), count=3)  # ['iOS 17', 'macOS Sonoma 14', 'iOS 26']
+rand_os(family=("windows", "ios"), platform="mobile")  # ['iOS 15']
+rand_os(family="ios", platform="desktop")  # []
+```
+
+:::
 
 ## 빌드와 에디션 {#builds-and-editions}
 
@@ -219,7 +259,7 @@ rand_os(min_year=2020, include_build=True, platform="desktop")  # ['Windows 10 2
 ```javascript
 randOs({ includeBuild: true, output: 'detail' });
 // [{ os: 'macOS Sonoma 14.5', name: 'macOS', version: '14', build: '14.5',
-//    edition: null, platform: 'desktop', year: 2024 }]
+//    edition: null, family: 'macos', platform: 'desktop', year: 2024 }]
 ```
 
 :::
@@ -227,7 +267,7 @@ randOs({ includeBuild: true, output: 'detail' });
 ::: lang dart
 
 ```dart
-randOsDetails(includeBuild: true).first; // OsDetail(macOS Sonoma 14.5, desktop, 2024)
+randOsDetails(includeBuild: true).first; // OsDetail(macOS Sonoma 14.5, macos, desktop, 2024)
 ```
 
 Dart에는 오버로드도 유니언 타입도 없어서, 상세 출력은 별도 함수입니다. `randOs`와 같은 매개변수를 받습니다.
@@ -239,7 +279,7 @@ Dart에는 오버로드도 유니언 타입도 없어서, 상세 출력은 별�
 ```python
 rand_os(include_build=True, output="detail")
 # [OsDetail(os='macOS Sonoma 14.5', name='macOS', version='14', build='14.5',
-#           edition=None, platform='desktop', year=2024)]
+#           edition=None, family='macos', platform='desktop', year=2024)]
 ```
 
 :::
@@ -251,6 +291,7 @@ rand_os(include_build=True, output="detail")
 | `version` | <Lang js="string &#124; null" dart="String?" py="str &#124; None" code /> | 릴리스의 버전: `11`, `14`, `22.04`, `XP`. <Lang js="includeVersion: false" dart="includeVersion: false" py="include_version=False" code />이면 비어 있습니다. |
 | `build` | <Lang js="string &#124; null" dart="String?" py="str &#124; None" code /> | 결과에 쓴 빌드나 세부 버전, 쓴 그대로: `23H2 (Build 22631)`, `14.5`, `(API 34)`. |
 | `edition` | <Lang js="string &#124; null" dart="String?" py="str &#124; None" code /> | 결과에 쓴 에디션: `Pro`, `Server`. |
+| `family` | `OsFamily` | 릴리스가 속한 계열: `windows`, `macos`, `ios`. |
 | `platform` | `SystemPlatform` | `desktop` 또는 `mobile`. |
 | `year` | <Lang js="number" dart="int" py="int" code /> | 릴리스가 나온 해. 빌드를 썼으면 그 빌드가 나온 해. |
 

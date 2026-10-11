@@ -6,20 +6,27 @@ import 'package:randino/src/types.dart';
 /// Generate real operating systems, written the way each release is known.
 ///
 /// Windows, macOS, Ubuntu, Debian and Fedora on the desktop, Android, iOS and
-/// iPadOS on mobile; a null [platform] draws from both. [includeBuild] writes
-/// the build or the point release, and [includeEdition] an edition where the
-/// release has one. [minYear] and [maxYear] keep to the releases out in those
-/// years, so `maxYear: 2015` is what was out by the end of 2015 — and with
-/// [includeBuild], the year that counts is the build's.
+/// iPadOS on mobile; a null [platform] draws from both. [family] keeps to the
+/// lines named, [includeBuild] writes the build or the point release, and
+/// [includeEdition] an edition where the release has one. [minYear] and
+/// [maxYear] keep to the releases out in those years, so `maxYear: 2015` is
+/// what was out by the end of 2015 — and with [includeBuild], the year that
+/// counts is the build's.
 ///
 /// ```dart
 /// randOs(); // [Windows 10]
 /// randOs(platform: SystemPlatform.mobile, count: 3); // [Android 9 Pie, iOS 17, Android 13]
+/// randOs(family: {OsFamily.macos, OsFamily.ubuntu}, count: 2); // [macOS Ventura 13, Ubuntu 22.04 LTS]
 /// randOs(includeBuild: true, includeEdition: true); // [Windows 11 Pro 23H2 (Build 22631)]
 /// randOs(platform: SystemPlatform.desktop, maxYear: 2010); // [Mac OS X Snow Leopard 10.6]
 /// ```
 List<String> randOs({
   SystemPlatform? platform,
+
+  /// Which lines: `{OsFamily.windows}`. The lines left are still drawn by how
+  /// common each is, and a line that does not run on [platform] is answered
+  /// with nothing. A null or empty set draws every line.
+  Set<OsFamily>? family,
   int? minYear,
   int? maxYear,
 
@@ -37,6 +44,7 @@ List<String> randOs({
 }) => [
   for (final detail in generateOsDetails(
     platform: platform,
+    family: family,
     minYear: minYear,
     maxYear: maxYear,
     includeVersion: includeVersion,

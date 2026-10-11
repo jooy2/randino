@@ -5,11 +5,17 @@
 // and every option narrows what may be picked rather than shaping what is
 // written afterwards.
 
-import { collect, resolvePlatforms, resolveRandom, resolveYears } from '../_internal/generate.js';
+import {
+	collect,
+	resolveMany,
+	resolvePlatforms,
+	resolveRandom,
+	resolveYears
+} from '../_internal/generate.js';
 import { pick, pickWeighted, withRandom } from '../_internal/utils.js';
-import type { OsDetail, RandOsOptions } from '../_types/global.js';
-import { OS_FAMILIES, OS_RELEASES } from './data/index.js';
-import type { OsBuild, OsFamily, OsRelease } from './data/index.js';
+import type { OsDetail, OsFamily, RandOsOptions } from '../_types/global.js';
+import { OS_FAMILIES, OS_FAMILY_CODES, OS_RELEASES } from './data/index.js';
+import type { OsBuild, OsRelease } from './data/index.js';
 
 /** A release a call may land on, with the builds of it the call may write. */
 type Candidate = { release: OsRelease; builds: readonly OsBuild[] };
@@ -31,18 +37,24 @@ export function writeOs(release: OsRelease, build: OsBuild | null, edition: stri
  * a year range is read against every release and every build, and a call of ten
  * thousand would otherwise read them all ten thousand times.
  *
+ * `family` and `platform` both narrow the lines, so a line named that does not
+ * run on the platform asked for leaves nothing to draw, rather than either
+ * option giving way to the other.
+ *
  * With `includeBuild` the year that counts is the build's — the thing the result
  * names — so a release none of whose builds is inside the range is left out, and
  * one without builds is read by its own year.
  */
 function candidatesFor(options: RandOsOptions): Map<OsFamily, Candidate[]> {
 	const platforms = resolvePlatforms(options.platform);
+	const named = resolveMany(options.family, OS_FAMILY_CODES, OS_FAMILY_CODES);
 	const [minYear, maxYear] = resolveYears(options.minYear, options.maxYear);
 	const byBuild = options.includeVersion !== false && options.includeBuild === true;
 	const inRange = (year: number) => year >= minYear && year <= maxYear;
 	const families = new Map<OsFamily, Candidate[]>();
 
 	for (const release of OS_RELEASES) {
+		if (!named.includes(release.family)) continue;
 		if (!platforms.includes(OS_FAMILIES[release.family].platform)) continue;
 
 		const builds =
@@ -73,6 +85,8 @@ export function generateOsDetails(options: RandOsOptions = {}): OsDetail[] {
 			// the types would otherwise filter releases by their first letter.
 			{ count: lines.length ? options.count : 0, unique: options.unique },
 			() => {
+				// The line first, by how common it is among the lines left, and the
+				// release inside it second.
 				const family = pickWeighted(lines, (line) => OS_FAMILIES[line].weight);
 				const { release, builds } = pick(families.get(family)!);
 				const build = builds.length ? pick(builds) : null;
@@ -84,6 +98,7 @@ export function generateOsDetails(options: RandOsOptions = {}): OsDetail[] {
 					version: includeVersion ? release.version : null,
 					build: build?.text ?? null,
 					edition,
+					family,
 					platform: OS_FAMILIES[family].platform,
 					year: build?.year ?? release.year
 				};

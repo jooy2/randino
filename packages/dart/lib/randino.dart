@@ -100,6 +100,7 @@ export 'src/nickname/rand_nickname_details.dart' show randNicknameDetails;
 export 'src/organization/data/index.dart' show organizationIndustries, organizationTypes;
 export 'src/organization/rand_organization.dart' show randOrganization;
 export 'src/organization/rand_organization_details.dart' show randOrganizationDetails;
+export 'src/os/data/index.dart' show osFamilyCodes;
 export 'src/os/rand_os.dart' show randOs;
 export 'src/os/rand_os_details.dart' show randOsDetails;
 export 'src/phone/data/index.dart' show phoneCountries, phoneTypes;
@@ -151,6 +152,7 @@ export 'src/types.dart'
         OrganizationIndustry,
         OrganizationType,
         OsDetail,
+        OsFamily,
         PhoneCountry,
         PhoneDetail,
         PhoneType,

@@ -361,24 +361,26 @@ Windows, macOS, Ubuntu, Debian and Fedora on the desktop, Android, iOS and iPadO
 ```dart
 randOs(count: 3); // [Windows 10, macOS Sonoma 14, Android 9 Pie]
 randOs(platform: SystemPlatform.mobile); // [iOS 17]
+randOs(family: {OsFamily.macos, OsFamily.ubuntu}, count: 2); // [macOS Ventura 13, Ubuntu 22.04 LTS]
 randOs(includeBuild: true, includeEdition: true); // [Windows 11 Pro 23H2 (Build 22631)]
 randOs(platform: SystemPlatform.desktop, maxYear: 2010); // [Mac OS X Snow Leopard 10.6]
 
-randOsDetails(includeBuild: true).first; // OsDetail(Android 14 (API 34), mobile, 2023)
+randOsDetails(includeBuild: true).first; // OsDetail(Android 14 (API 34), android, mobile, 2023)
 ```
 
-| Parameter        | Type              | Default        |
-| ---------------- | ----------------- | -------------- |
-| `platform`       | `SystemPlatform?` | `null` — both  |
-| `minYear`        | `int?`            | `null` — none  |
-| `maxYear`        | `int?`            | `null` — none  |
-| `includeVersion` | `bool`            | `true`         |
-| `includeBuild`   | `bool`            | `false`        |
-| `includeEdition` | `bool`            | `false`        |
-| `count`          | `int`             | `1`            |
-| `unique`         | `bool`            | `false`        |
+| Parameter        | Type              | Default             |
+| ---------------- | ----------------- | ------------------- |
+| `platform`       | `SystemPlatform?` | `null` — both       |
+| `family`         | `Set<OsFamily>?`  | `null` — every line |
+| `minYear`        | `int?`            | `null` — none       |
+| `maxYear`        | `int?`            | `null` — none       |
+| `includeVersion` | `bool`            | `true`              |
+| `includeBuild`   | `bool`            | `false`             |
+| `includeEdition` | `bool`            | `false`             |
+| `count`          | `int`             | `1`                 |
+| `unique`         | `bool`            | `false`             |
 
-A draw picks the line first — Windows is about two desktops in three, Android about three phones in five — and a release inside it second. `minYear` and `maxYear` read the year a release came out, or with `includeBuild` the year of the build written, and a range nothing came out in returns nothing.
+A draw picks the line first — Windows is about two desktops in three, Android about three phones in five — and a release inside it second. `family` keeps to the lines named, still drawn by how common each is, and a line that does not run on the platform asked for is answered with nothing: `randOs(family: {OsFamily.ios}, platform: SystemPlatform.desktop)` is `[]`. `osFamilyCodes` lists every line, and the detail's `family` is the one drawn. `minYear` and `maxYear` read the year a release came out, or with `includeBuild` the year of the build written, and a range nothing came out in returns nothing.
 
 ### Devices
 

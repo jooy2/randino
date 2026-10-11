@@ -74,6 +74,8 @@ from randino._types import (
     OrganizationType,
     OrganizationTypeOption,
     OsDetail,
+    OsFamily,
+    OsFamilyOption,
     PhoneCountry,
     PhoneCountryOption,
     PhoneDetail,
@@ -157,7 +159,7 @@ from randino.name import (
 )
 from randino.nickname import nickname_length_range, rand_nickname
 from randino.organization import ORGANIZATION_INDUSTRIES, ORGANIZATION_TYPES, rand_organization
-from randino.os import rand_os
+from randino.os import OS_FAMILY_CODES, rand_os
 from randino.phone import PHONE_COUNTRIES, PHONE_TYPES, rand_phone
 from randino.ram import RAM_UNITS, rand_ram
 from randino.resolution import rand_resolution
@@ -219,6 +221,7 @@ __all__ = [
     "NAME_LANGUAGES",
     "ORGANIZATION_INDUSTRIES",
     "ORGANIZATION_TYPES",
+    "OS_FAMILY_CODES",
     "PHONE_COUNTRIES",
     "PHONE_TYPES",
     "RAM_UNITS",
@@ -285,6 +288,8 @@ __all__ = [
     "OrganizationType",
     "OrganizationTypeOption",
     "OsDetail",
+    "OsFamily",
+    "OsFamilyOption",
     "PhoneCountry",
     "PhoneCountryOption",
     "PhoneDetail",

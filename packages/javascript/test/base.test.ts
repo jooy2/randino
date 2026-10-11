@@ -43,6 +43,7 @@ describe('base test', () => {
 			'NAME_LANGUAGES',
 			'ORGANIZATION_INDUSTRIES',
 			'ORGANIZATION_TYPES',
+			'OS_FAMILY_CODES',
 			'PHONE_COUNTRIES',
 			'PHONE_TYPES',
 			'RAM_UNITS',
@@ -229,6 +230,7 @@ describe('base test', () => {
 		assert.deepStrictEqual(randino.SYSTEM_PLATFORMS, ['desktop', 'mobile']);
 		assert.strictEqual(typeof randino.randOs()[0], 'string');
 		assert.strictEqual(typeof randino.randOs({ output: 'detail' })[0].year, 'number');
+		assert.strictEqual(randino.OS_FAMILY_CODES.length, 8);
 		assert.strictEqual(typeof randino.randDevice()[0], 'string');
 		assert.deepStrictEqual(randino.DEVICE_TYPES, ['phone', 'tablet', 'laptop']);
 		assert.match(randino.randRam()[0], /^\d+ (MB|GB)$/);
@@ -298,6 +300,8 @@ describe('base test', () => {
 			() => randino.randOrganization({ includeLegalForm: 'yes' as never, minLength: NaN }),
 			() => randino.randOs({ platform: 'tv' as never, minYear: NaN, maxYear: 'x' as never }),
 			() => randino.randOs({ includeBuild: 'yes' as never, includeVersion: 0 as never }),
+			() => randino.randOs({ family: 'beos' as never }),
+			() => randino.randOs({ family: [null] as never }),
 			() => randino.randDevice({ type: 'watch' as never, minYear: 'x' as never }),
 			() => randino.randDevice({ type: [null] as never, includeVendor: 'no' as never }),
 			() => randino.randRam({ unit: 'KB' as never, minSize: NaN, maxSize: 'x' as never }),
