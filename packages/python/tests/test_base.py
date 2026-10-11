@@ -28,6 +28,7 @@ def test_the_package_exports_exactly_its_public_api() -> None:
         "AFFIX_SEPARATOR_DEFAULT",
         "AGE_GROUPS",
         "ARCHITECTURES",
+        "ARCHITECTURE_NAMINGS",
         "AgeDetail",
         "AgeDistribution",
         "AgeGroup",
@@ -35,6 +36,7 @@ def test_the_package_exports_exactly_its_public_api() -> None:
         "AppStoreDetail",
         "Architecture",
         "ArchitectureDetail",
+        "ArchitectureNaming",
         "CPU_VENDORS",
         "CountryDetail",
         "CpuDetail",
@@ -317,6 +319,7 @@ def test_the_functions_are_callable_and_the_constants_are_what_they_claim() -> N
     assert isinstance(randino.rand_cpu()[0], str)
     assert isinstance(randino.rand_gpu()[0], str)
     assert randino.rand_architecture()[0] in randino.ARCHITECTURES
+    assert randino.ARCHITECTURE_NAMINGS == ("common", "debian", "go", "kernel")
     assert re.fullmatch(r"\d+x\d+", randino.rand_resolution()[0])
     assert re.fullmatch(r"\d+\.\d+\.\d+", randino.rand_version()[0])
     assert randino.VERSION_FORMATS == ("semver", "calver", "number")
@@ -422,6 +425,7 @@ def test_an_option_the_types_rule_out_falls_back_rather_than_raising() -> None:
         lambda: loose.rand_cpu(vendor="Nope"),
         lambda: loose.rand_gpu(vendor=[None]),
         lambda: loose.rand_architecture(include_rare="yes", count="x"),
+        lambda: loose.rand_architecture(platform="tv", naming="apple"),
         lambda: loose.rand_resolution(platform="tv", separator=None),
         lambda: loose.rand_app_store(platform="console", include_company="no"),
         lambda: loose.rand_file_extension(category="nope", include_dot="no"),

@@ -487,19 +487,31 @@ It takes `rand_cpu`'s arguments: `platform`, `min_year`, `max_year`, `vendor` an
 
 ### Architectures
 
-Processor architectures, by the names a download page most often lists them under: `x86_64` and `arm64` nearly every time, the 32-bit `x86` and `armv7` the rest. `include_rare` adds RISC-V, POWER, IBM Z, MIPS, LoongArch and SPARC, about one draw in twenty together.
+Processor architectures, by the names a download page most often lists them under: `x86_64` and `arm64` nearly every time, the 32-bit `x86` and `armv7` the rest. A desktop is mostly `x86_64` and a phone nearly always `arm64`. `include_rare` adds RISC-V, POWER, IBM Z, MIPS, LoongArch and SPARC, about one desktop draw in twenty together.
 
 ```python
 from randino import rand_architecture
 
 rand_architecture(count=3)  # ['x86_64', 'arm64', 'x86_64']
+rand_architecture(platform="mobile")  # ['arm64']
+rand_architecture(naming="debian", count=2)  # ['amd64', 'armhf']
 rand_architecture(include_rare=True, count=3)  # ['arm64', 'riscv64', 'x86_64']
 
 rand_architecture(output="detail")
-# [ArchitectureDetail(architecture='x86_64', aliases=('amd64', 'x64'), bits=64, family='x86', rare=False)]
+# [ArchitectureDetail(architecture='x86_64', code='x86_64', aliases=('amd64', 'x64'), bits=64,
+#                     family='x86', rare=False, platform='desktop')]
 ```
 
-The detail's `aliases` are the names Debian, Windows, Node and the kernel use instead.
+| Argument       | Type                   | Default    |
+| -------------- | ---------------------- | ---------- |
+| `platform`     | `SystemPlatformOption` | `"all"`    |
+| `include_rare` | `bool`                 | `False`    |
+| `naming`       | `ArchitectureNaming`   | `"common"` |
+| `count`        | `int`                  | `1`        |
+| `unique`       | `bool`                 | `False`    |
+| `output`       | `"value" \| "detail"`  | `"value"`  |
+
+`naming` writes Debian's package architectures (`amd64`, `armhf`), Go's `GOARCH` (`amd64`, `386`, `arm`) or the kernel's machine names (`aarch64`, `armv7l`) instead. The detail's `code` is the common name whatever the naming, and its `aliases` every other name, Windows' and Node's `x64` included.
 
 ### Memory
 

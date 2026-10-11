@@ -999,16 +999,32 @@ The first four are what nearly every machine runs; the rest come up only with
 `include_rare`.
 """
 
+ArchitectureNaming = Literal["common", "debian", "go", "kernel"]
+"""Whose names an architecture is written by.
+
+- `common`: the name a download page most often lists — `x86_64`, `arm64`.
+- `debian`: Debian's package architecture — `amd64`, `arm64`, `i386`, `armhf`.
+- `go`: Go's `GOARCH` — `amd64`, `arm64`, `386`, `arm`.
+- `kernel`: the machine name the kernel reports, as `uname -m` prints it — `x86_64`,
+  `aarch64`, `i686`, `armv7l`.
+"""
+
 
 @dataclass(frozen=True, slots=True)
 class ArchitectureDetail:
     """A generated processor architecture with what it is known by elsewhere."""
 
-    architecture: Architecture
-    """The architecture as the value form returns it: `x86_64`."""
+    architecture: str
+    """The architecture as the value form returns it, in the naming asked for: `x86_64`, `amd64`."""
+
+    code: Architecture
+    """The architecture by its common name, whatever the naming: `x86_64`."""
 
     aliases: tuple[str, ...]
-    """The other names it goes by: `amd64` in Debian and Go, `x64` in Windows and Node."""
+    """Every other name it goes by, the common one included when it is not the one written.
+
+    `amd64` in Debian and Go, `x64` in Windows and Node.
+    """
 
     bits: int
     """`32` or `64`."""
@@ -1018,6 +1034,9 @@ class ArchitectureDetail:
 
     rare: bool
     """Whether it is one of the architectures `include_rare` adds."""
+
+    platform: SystemPlatform
+    """The kind of machine it was drawn for."""
 
 
 @dataclass(frozen=True, slots=True)

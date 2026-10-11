@@ -10,7 +10,8 @@ import {
 import { APP_STORES } from '../../packages/javascript/lib/appstore/data/index.js';
 import {
 	ARCHITECTURES,
-	ARCHITECTURE_DATA
+	ARCHITECTURE_DATA,
+	ARCHITECTURE_NAMINGS
 } from '../../packages/javascript/lib/architecture/data/index.js';
 import {
 	RAND_AGE_MAX,
@@ -336,8 +337,11 @@ console.log(
 			weights: { ...GENDER_WEIGHTS },
 			labels: GENDER_LABELS
 		},
+		// Each architecture's weight per platform it runs on, a platform it does not
+		// left out, and the name each naming writes it by.
 		architecture: {
 			architectures: [...ARCHITECTURES],
+			namings: [...ARCHITECTURE_NAMINGS],
 			data: ARCHITECTURE_DATA
 		},
 		// One entry per screen size, keyed by its platform and the size itself.

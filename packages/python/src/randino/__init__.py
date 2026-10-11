@@ -30,6 +30,7 @@ from randino._types import (
     AppStoreDetail,
     Architecture,
     ArchitectureDetail,
+    ArchitectureNaming,
     CountryDetail,
     CpuDetail,
     CpuVendor,
@@ -115,7 +116,7 @@ from randino._types import (
 )
 from randino.age import AGE_GROUPS, rand_age
 from randino.appstore import rand_app_store
-from randino.architecture import ARCHITECTURES, rand_architecture
+from randino.architecture import ARCHITECTURE_NAMINGS, ARCHITECTURES, rand_architecture
 from randino.constants import (
     RAND_AGE_MAX,
     RAND_COUNT_MAX,
@@ -210,6 +211,7 @@ __all__ = [
     "AFFIX_SEPARATOR_DEFAULT",
     "AGE_GROUPS",
     "ARCHITECTURES",
+    "ARCHITECTURE_NAMINGS",
     "CPU_VENDORS",
     "DATE_UNITS",
     "DEVICE_TYPES",
@@ -247,6 +249,7 @@ __all__ = [
     "AppStoreDetail",
     "Architecture",
     "ArchitectureDetail",
+    "ArchitectureNaming",
     "CountryDetail",
     "CpuDetail",
     "CpuVendor",

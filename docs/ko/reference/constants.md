@@ -333,6 +333,7 @@ from randino import PHONE_COUNTRIES, PHONE_TYPES
 ```javascript
 import {
 	ARCHITECTURES,
+	ARCHITECTURE_NAMINGS,
 	CPU_VENDORS,
 	DEVICE_TYPES,
 	DEVICE_VENDORS,
@@ -358,6 +359,7 @@ import {
 | `DISK_TYPES` | `DiskType[]` | `['hdd', 'ssd', 'sshd', 'emmc', 'ufs']` |
 | `DISK_UNITS` | `DiskUnit[]` | `['MB', 'GB', 'TB']` |
 | `ARCHITECTURES` | `Architecture[]` | `['x86_64', 'arm64', 'x86', 'armv7', 'riscv64', …]` |
+| `ARCHITECTURE_NAMINGS` | `ArchitectureNaming[]` | `['common', 'debian', 'go', 'kernel']` |
 | `VERSION_FORMATS` | `VersionFormat[]` | `['semver', 'calver', 'number']` |
 | `FILE_CATEGORIES` | `FileCategory[]` | `['document', 'spreadsheet', …, 'model']` |
 | `MIME_TOP_LEVELS` | `MimeTopLevel[]` | `['application', 'audio', 'font', 'image', 'model', 'text', 'video']` |
@@ -372,21 +374,22 @@ import {
 import 'package:randino/randino.dart';
 ```
 
-| 이름              | 타입                   | 값                                              |
-| ----------------- | ---------------------- | ----------------------------------------------- |
-| `systemPlatforms` | `List<SystemPlatform>` | `desktop`, `mobile` 순                          |
+| 이름 | 타입 | 값 |
+| --- | --- | --- |
+| `systemPlatforms` | `List<SystemPlatform>` | `desktop`, `mobile` 순 |
 | `osFamilyCodes` | `List<OsFamily>` | `windows`, `macos`, … `ipados`, 모두 8개 |
-| `deviceTypes`     | `List<DeviceType>`     | `phone`, `tablet`, `laptop` 순                  |
+| `deviceTypes` | `List<DeviceType>` | `phone`, `tablet`, `laptop` 순 |
 | `deviceVendors` | `List<String>` | `Apple`, `Samsung`, … `Razer`, 모두 20개 |
-| `ramUnits`        | `List<RamUnit>`        | `mb`, `gb` 순                                   |
-| `diskTypes`       | `List<DiskType>`       | `hdd`, `ssd`, `sshd`, `emmc`, `ufs` 순          |
-| `diskUnits`       | `List<DiskUnit>`       | `mb`, `gb`, `tb` 순                             |
-| `architectures`   | `List<String>`         | 흔한 넷, 드문 여섯 순                           |
-| `versionFormats`  | `List<VersionFormat>`  | `semver`, `calver`, `number` 순                 |
-| `fileCategories`  | `List<FileCategory>`   | `document`, `spreadsheet`, … `model`, 모두 14개 |
-| `mimeTopLevels`   | `List<MimeTopLevel>`   | `application`, `audio`, … `video`, 모두 7개     |
-| `cpuVendors`      | `List<String>`         | `Intel`, `AMD`, … `HiSilicon`, 모두 8개         |
-| `gpuVendors`      | `List<String>`         | `NVIDIA`, `ATI`, … `Samsung`, 모두 7개          |
+| `ramUnits` | `List<RamUnit>` | `mb`, `gb` 순 |
+| `diskTypes` | `List<DiskType>` | `hdd`, `ssd`, `sshd`, `emmc`, `ufs` 순 |
+| `diskUnits` | `List<DiskUnit>` | `mb`, `gb`, `tb` 순 |
+| `architectures` | `List<String>` | 흔한 넷, 드문 여섯 순 |
+| `architectureNamings` | `List<ArchitectureNaming>` | `common`, `debian`, `go`, `kernel` 순 |
+| `versionFormats` | `List<VersionFormat>` | `semver`, `calver`, `number` 순 |
+| `fileCategories` | `List<FileCategory>` | `document`, `spreadsheet`, … `model`, 모두 14개 |
+| `mimeTopLevels` | `List<MimeTopLevel>` | `application`, `audio`, … `video`, 모두 7개 |
+| `cpuVendors` | `List<String>` | `Intel`, `AMD`, … `HiSilicon`, 모두 8개 |
+| `gpuVendors` | `List<String>` | `NVIDIA`, `ATI`, … `Samsung`, 모두 7개 |
 
 :::
 
@@ -395,6 +398,7 @@ import 'package:randino/randino.dart';
 ```python
 from randino import (
     ARCHITECTURES,
+    ARCHITECTURE_NAMINGS,
     CPU_VENDORS,
     DEVICE_TYPES,
     DEVICE_VENDORS,
@@ -420,6 +424,7 @@ from randino import (
 | `DISK_TYPES` | `tuple[DiskType, …]` | `('hdd', 'ssd', 'sshd', 'emmc', 'ufs')` |
 | `DISK_UNITS` | `tuple[DiskUnit, …]` | `('MB', 'GB', 'TB')` |
 | `ARCHITECTURES` | `tuple[Architecture, …]` | `('x86_64', 'arm64', 'x86', 'armv7', 'riscv64', …)` |
+| `ARCHITECTURE_NAMINGS` | `tuple[ArchitectureNaming, …]` | `('common', 'debian', 'go', 'kernel')` |
 | `VERSION_FORMATS` | `tuple[VersionFormat, …]` | `('semver', 'calver', 'number')` |
 | `FILE_CATEGORIES` | `tuple[FileCategory, …]` | `('document', 'spreadsheet', …, 'model')` |
 | `MIME_TOP_LEVELS` | `tuple[MimeTopLevel, …]` | `('application', 'audio', 'font', 'image', 'model', 'text', 'video')` |
@@ -589,6 +594,7 @@ import type {
 	AppStoreDetail,
 	Architecture,
 	ArchitectureDetail,
+	ArchitectureNaming,
 	GenderCode,
 	GenderDetail,
 	GpuDetail,
@@ -694,7 +700,7 @@ const options: RandNameOptions = { language: 'ko', count: 3 };
 import 'package:randino/randino.dart';
 
 // enum
-AgeGroup, AgeDistribution, DateUnit, DeviceType, DiskType, DiskUnit, FileCategory, GenderCode
+AgeGroup, AgeDistribution, ArchitectureNaming, DateUnit, DeviceType, DiskType, DiskUnit, FileCategory, GenderCode
 NameLanguage, NameGender, NameScript
 OrganizationType, OrganizationIndustry
 OsFamily, PhoneCountry, PhoneType
@@ -724,6 +730,7 @@ from randino import (
     AppStoreDetail,
     Architecture,
     ArchitectureDetail,
+    ArchitectureNaming,
     GenderCode,
     GenderDetail,
     GpuDetail,

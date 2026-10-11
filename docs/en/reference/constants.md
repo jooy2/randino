@@ -333,6 +333,7 @@ How each country writes its numbers is on the [`randPhone`](../phone/rand-phone#
 ```javascript
 import {
 	ARCHITECTURES,
+	ARCHITECTURE_NAMINGS,
 	CPU_VENDORS,
 	DEVICE_TYPES,
 	DEVICE_VENDORS,
@@ -358,6 +359,7 @@ import {
 | `DISK_TYPES` | `DiskType[]` | `['hdd', 'ssd', 'sshd', 'emmc', 'ufs']` |
 | `DISK_UNITS` | `DiskUnit[]` | `['MB', 'GB', 'TB']` |
 | `ARCHITECTURES` | `Architecture[]` | `['x86_64', 'arm64', 'x86', 'armv7', 'riscv64', …]` |
+| `ARCHITECTURE_NAMINGS` | `ArchitectureNaming[]` | `['common', 'debian', 'go', 'kernel']` |
 | `VERSION_FORMATS` | `VersionFormat[]` | `['semver', 'calver', 'number']` |
 | `FILE_CATEGORIES` | `FileCategory[]` | `['document', 'spreadsheet', …, 'model']` |
 | `MIME_TOP_LEVELS` | `MimeTopLevel[]` | `['application', 'audio', 'font', 'image', 'model', 'text', 'video']` |
@@ -382,6 +384,7 @@ import 'package:randino/randino.dart';
 | `diskTypes` | `List<DiskType>` | `hdd`, `ssd`, `sshd`, `emmc`, then `ufs` |
 | `diskUnits` | `List<DiskUnit>` | `mb`, `gb`, then `tb` |
 | `architectures` | `List<String>` | The four common ones first, then the rare six |
+| `architectureNamings` | `List<ArchitectureNaming>` | `common`, `debian`, `go`, then `kernel` |
 | `versionFormats` | `List<VersionFormat>` | `semver`, `calver`, then `number` |
 | `fileCategories` | `List<FileCategory>` | `document`, `spreadsheet`, … `model`, fourteen in all |
 | `mimeTopLevels` | `List<MimeTopLevel>` | `application`, `audio`, … `video`, seven in all |
@@ -395,6 +398,7 @@ import 'package:randino/randino.dart';
 ```python
 from randino import (
     ARCHITECTURES,
+    ARCHITECTURE_NAMINGS,
     CPU_VENDORS,
     DEVICE_TYPES,
     DEVICE_VENDORS,
@@ -420,6 +424,7 @@ from randino import (
 | `DISK_TYPES` | `tuple[DiskType, …]` | `('hdd', 'ssd', 'sshd', 'emmc', 'ufs')` |
 | `DISK_UNITS` | `tuple[DiskUnit, …]` | `('MB', 'GB', 'TB')` |
 | `ARCHITECTURES` | `tuple[Architecture, …]` | `('x86_64', 'arm64', 'x86', 'armv7', 'riscv64', …)` |
+| `ARCHITECTURE_NAMINGS` | `tuple[ArchitectureNaming, …]` | `('common', 'debian', 'go', 'kernel')` |
 | `VERSION_FORMATS` | `tuple[VersionFormat, …]` | `('semver', 'calver', 'number')` |
 | `FILE_CATEGORIES` | `tuple[FileCategory, …]` | `('document', 'spreadsheet', …, 'model')` |
 | `MIME_TOP_LEVELS` | `tuple[MimeTopLevel, …]` | `('application', 'audio', 'font', 'image', 'model', 'text', 'video')` |
@@ -589,6 +594,7 @@ import type {
 	AppStoreDetail,
 	Architecture,
 	ArchitectureDetail,
+	ArchitectureNaming,
 	GenderCode,
 	GenderDetail,
 	GpuDetail,
@@ -694,7 +700,7 @@ Every public type is exported alongside the functions:
 import 'package:randino/randino.dart';
 
 // Enums
-AgeGroup, AgeDistribution, DateUnit, DeviceType, DiskType, DiskUnit, FileCategory, GenderCode
+AgeGroup, AgeDistribution, ArchitectureNaming, DateUnit, DeviceType, DiskType, DiskUnit, FileCategory, GenderCode
 NameLanguage, NameGender, NameScript
 OrganizationType, OrganizationIndustry
 OsFamily, PhoneCountry, PhoneType
@@ -724,6 +730,7 @@ from randino import (
     AppStoreDetail,
     Architecture,
     ArchitectureDetail,
+    ArchitectureNaming,
     GenderCode,
     GenderDetail,
     GpuDetail,

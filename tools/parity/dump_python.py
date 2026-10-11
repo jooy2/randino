@@ -12,7 +12,7 @@ from typing import Any
 from randino._internal.parse import NameToken, outline
 from randino.age.data import AGE_BANDS, AGE_CURVE, AGE_GROUPS, AGE_MAX_DEFAULT
 from randino.appstore.data import APP_STORES
-from randino.architecture.data import ARCHITECTURE_DATA, ARCHITECTURES
+from randino.architecture.data import ARCHITECTURE_DATA, ARCHITECTURE_NAMINGS, ARCHITECTURES
 from randino.constants import (
     RAND_AGE_MAX,
     RAND_COUNT_MAX,
@@ -563,14 +563,18 @@ print(
                 "weights": dict(GENDER_WEIGHTS),
                 "labels": {language: dict(labels) for language, labels in GENDER_LABELS.items()},
             },
+            # Each architecture's weight per platform it runs on, a platform it does not
+            # left out, and the name each naming writes it by.
             "architecture": {
                 "architectures": list(ARCHITECTURES),
+                "namings": list(ARCHITECTURE_NAMINGS),
                 "data": {
                     code: {
                         "family": data.family,
                         "bits": data.bits,
-                        "weight": data.weight,
+                        "weights": dict(data.weights),
                         "rare": data.rare,
+                        "names": dict(data.names),
                         "aliases": list(data.aliases),
                     }
                     for code, data in ARCHITECTURE_DATA.items()

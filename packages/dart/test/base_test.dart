@@ -43,6 +43,7 @@ void main() {
           'AgeGroup',
           'AppStoreDetail',
           'ArchitectureDetail',
+          'ArchitectureNaming',
           'CountryDetail',
           'CpuDetail',
           'DateDetail',
@@ -103,6 +104,7 @@ void main() {
           'affixLengthMax',
           'affixSeparatorDefault',
           'ageGroups',
+          'architectureNamings',
           'architectures',
           'cpuVendors',
           'dateUnits',
@@ -354,6 +356,7 @@ void main() {
       expect(randGpuDetails()[0], isA<GpuDetail>());
       expect(architectures, contains(randArchitecture().single));
       expect(randArchitectureDetails()[0], isA<ArchitectureDetail>());
+      expect(architectureNamings, ArchitectureNaming.values);
       expect(randResolution().single, matches(RegExp(r'^\d+x\d+$')));
       expect(randResolutionDetails()[0], isA<ResolutionDetail>());
       expect(randVersion().single, matches(RegExp(r'^\d+\.\d+\.\d+$')));

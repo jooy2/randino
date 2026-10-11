@@ -605,15 +605,23 @@ void main() {
             },
         },
       },
+      // Each architecture's weight per platform it runs on, a platform it does
+      // not left out, and the name each naming writes it by.
       'architecture': <String, Object?>{
         'architectures': architectures,
+        'namings': <String>[for (final naming in architectureNamings) naming.name],
         'data': <String, Object?>{
           for (final entry in architectureData.entries)
             entry.key: <String, Object?>{
               'family': entry.value.family,
               'bits': entry.value.bits,
-              'weight': entry.value.weight,
+              'weights': <String, Object?>{
+                for (final weight in entry.value.weights.entries) weight.key.name: weight.value,
+              },
               'rare': entry.value.rare,
+              'names': <String, Object?>{
+                for (final name in entry.value.names.entries) name.key.name: name.value,
+              },
               'aliases': entry.value.aliases,
             },
         },

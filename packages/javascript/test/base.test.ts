@@ -30,6 +30,7 @@ describe('base test', () => {
 			'AFFIX_SEPARATOR_DEFAULT',
 			'AGE_GROUPS',
 			'ARCHITECTURES',
+			'ARCHITECTURE_NAMINGS',
 			'CPU_VENDORS',
 			'DATE_UNITS',
 			'DEVICE_TYPES',
@@ -243,6 +244,7 @@ describe('base test', () => {
 		assert.strictEqual(typeof randino.randCpu()[0], 'string');
 		assert.strictEqual(typeof randino.randGpu()[0], 'string');
 		assert.ok(randino.ARCHITECTURES.includes(randino.randArchitecture()[0] as never));
+		assert.deepStrictEqual(randino.ARCHITECTURE_NAMINGS, ['common', 'debian', 'go', 'kernel']);
 		assert.match(randino.randResolution()[0], /^\d+x\d+$/);
 		assert.match(randino.randVersion()[0], /^\d+\.\d+\.\d+$/);
 		assert.strictEqual(typeof randino.randAppStore()[0], 'string');

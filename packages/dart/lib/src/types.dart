@@ -1421,23 +1421,46 @@ class GpuDetail {
   String toString() => 'GpuDetail($gpu, ${platform.name}, $year)';
 }
 
+/// Whose names an architecture is written by.
+enum ArchitectureNaming {
+  /// The name a download page most often lists: `x86_64`, `arm64`.
+  common,
+
+  /// Debian's package architecture: `amd64`, `arm64`, `i386`, `armhf`.
+  debian,
+
+  /// Go's `GOARCH`: `amd64`, `arm64`, `386`, `arm`.
+  go,
+
+  /// The machine name the kernel reports, as `uname -m` prints it: `x86_64`,
+  /// `aarch64`, `i686`, `armv7l`.
+  kernel,
+}
+
 /// A generated processor architecture with what it is known by elsewhere.
 class ArchitectureDetail {
   /// Creates a detail record. Returned by the generator; there is rarely a
   /// reason to build one by hand outside a test.
   const ArchitectureDetail({
     required this.architecture,
+    required this.code,
     required this.aliases,
     required this.bits,
     required this.family,
     required this.rare,
+    required this.platform,
   });
 
-  /// The architecture as `randArchitecture` returns it: `x86_64`.
+  /// The architecture as `randArchitecture` returns it, in the naming asked
+  /// for: `x86_64`, `amd64`.
   final String architecture;
 
-  /// The other names it goes by: `amd64` in Debian and Go, `x64` in Windows
-  /// and Node.
+  /// The architecture by its common name, whatever the naming: `x86_64`. One
+  /// of `architectures`.
+  final String code;
+
+  /// Every other name it goes by, the common one included when it is not the
+  /// one written: `amd64` in Debian and Go, `x64` in Windows and Node.
   final List<String> aliases;
 
   /// `32` or `64`.
@@ -1450,8 +1473,11 @@ class ArchitectureDetail {
   /// Whether it is one of the architectures `includeRare` adds.
   final bool rare;
 
+  /// The kind of machine it was drawn for.
+  final SystemPlatform platform;
+
   @override
-  String toString() => 'ArchitectureDetail($architecture, $bits)';
+  String toString() => 'ArchitectureDetail($architecture, $code, $bits, ${platform.name})';
 }
 
 /// A generated screen resolution, as two numbers and as written.

@@ -1621,6 +1621,16 @@ export type Architecture =
 	| 'sparc64';
 
 /**
+ * Whose names an architecture is written by:
+ * - `common`: the name a download page most often lists — `x86_64`, `arm64`.
+ * - `debian`: Debian's package architecture — `amd64`, `arm64`, `i386`, `armhf`.
+ * - `go`: Go's `GOARCH` — `amd64`, `arm64`, `386`, `arm`.
+ * - `kernel`: the machine name the kernel reports, as `uname -m` prints it —
+ *   `x86_64`, `aarch64`, `i686`, `armv7l`.
+ */
+export type ArchitectureNaming = 'common' | 'debian' | 'go' | 'kernel';
+
+/**
  * What `randArchitecture` takes. An architecture is one of ten names, so it has
  * no language, no length and nothing to invent.
  */
@@ -1629,18 +1639,34 @@ export interface RandArchitectureOptions extends Pick<
 	'count' | 'unique' | 'output' | 'random'
 > {
 	/**
+	 * The architectures of desktops, laptops and servers, of phones and tablets,
+	 * or of both. A phone is nearly always `arm64`, and the rare architectures
+	 * are never a phone's. Default `'all'`.
+	 */
+	platform?: SystemPlatformOption;
+	/**
 	 * Draw the architectures few machines run now and then as well: RISC-V,
-	 * POWER, IBM Z, MIPS, LoongArch and SPARC, about one draw in twenty
+	 * POWER, IBM Z, MIPS, LoongArch and SPARC, about one desktop draw in twenty
 	 * together. Default `false`, which keeps to x86 and Arm.
 	 */
 	includeRare?: boolean;
+	/**
+	 * Whose names to write: `'debian'` writes `amd64` where `'common'` writes
+	 * `x86_64`, and `'kernel'` writes `aarch64` for `arm64`. Default `'common'`.
+	 */
+	naming?: ArchitectureNaming;
 }
 
 /** A generated architecture with what it is known by elsewhere. */
 export interface ArchitectureDetail {
-	/** The architecture as the value form returns it: `x86_64`. */
-	architecture: Architecture;
-	/** The other names it goes by: `amd64` in Debian and Go, `x64` in Windows and Node. */
+	/** The architecture as the value form returns it, in the naming asked for: `x86_64`, `amd64`. */
+	architecture: string;
+	/** The architecture by its common name, whatever the naming: `x86_64`. */
+	code: Architecture;
+	/**
+	 * Every other name it goes by, the common one included when it is not the one
+	 * written: `amd64` in Debian and Go, `x64` in Windows and Node.
+	 */
 	aliases: string[];
 	/** `32` or `64`. */
 	bits: number;
@@ -1648,6 +1674,8 @@ export interface ArchitectureDetail {
 	family: string;
 	/** Whether it is one of the architectures `includeRare` adds. */
 	rare: boolean;
+	/** The kind of machine it was drawn for. */
+	platform: SystemPlatform;
 }
 
 /**

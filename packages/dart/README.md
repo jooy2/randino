@@ -446,16 +446,26 @@ It takes `randCpu`'s parameters: `platform`, `minYear`, `maxYear`, `vendor` and 
 
 ### Architectures
 
-Processor architectures, by the names a download page most often lists them under: `x86_64` and `arm64` nearly every time, the 32-bit `x86` and `armv7` the rest. `includeRare` adds RISC-V, POWER, IBM Z, MIPS, LoongArch and SPARC, about one draw in twenty together.
+Processor architectures, by the names a download page most often lists them under: `x86_64` and `arm64` nearly every time, the 32-bit `x86` and `armv7` the rest. `includeRare` adds RISC-V, POWER, IBM Z, MIPS, LoongArch and SPARC, about one desktop draw in twenty together.
 
 ```dart
-randArchitecture(count: 3); // [x86_64, arm64, x86_64]
+randArchitecture(count: 3); // [x86_64, arm64, arm64]
+randArchitecture(platform: SystemPlatform.mobile); // [arm64]
+randArchitecture(naming: ArchitectureNaming.debian, count: 2); // [amd64, armhf]
 randArchitecture(includeRare: true, count: 3); // [arm64, riscv64, x86_64]
 
-randArchitectureDetails().first; // ArchitectureDetail(x86_64, 64)
+randArchitectureDetails().first; // ArchitectureDetail(x86_64, x86_64, 64, desktop)
 ```
 
-The detail's `aliases` are the names Debian, Windows, Node and the kernel use instead.
+| Parameter     | Type                 | Default                     |
+| ------------- | -------------------- | --------------------------- |
+| `platform`    | `SystemPlatform?`    | `null` — both               |
+| `includeRare` | `bool`               | `false`                     |
+| `naming`      | `ArchitectureNaming` | `ArchitectureNaming.common` |
+| `count`       | `int`                | `1`                         |
+| `unique`      | `bool`               | `false`                     |
+
+A draw picks the platform first, so a null one is half desktops and half phones. A phone is Arm nearly always and never one of the rare six. `naming` writes Debian's, Go's or the kernel's names instead of the common ones: `amd64` and `armhf` for `ArchitectureNaming.debian`, `386` and `arm` for `ArchitectureNaming.go`, `aarch64` and `armv7l` for `ArchitectureNaming.kernel`. The detail's `architecture` is the name written and `code` the common one whatever the naming; its `aliases` are every other name it goes by, Debian's, Windows', Node's and the kernel's, the common one included when it is not the one written.
 
 ### Memory
 
