@@ -399,6 +399,11 @@ sentence = {
             if data.place_heads is None
             else {head: listed(pool) for head, pool in data.place_heads.items()}
         ),
+        "placeTails": (
+            None
+            if data.place_tails is None
+            else {tail: listed(pool) for tail, pool in data.place_tails.items()}
+        ),
         "numeral": (
             None
             if data.numeral is None

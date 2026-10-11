@@ -894,6 +894,14 @@ class SentenceLanguageData:
     writes `in`. A place listed nowhere takes the frame's. None for a language whose one
     head is right for every place.
     """
+
+    place_tails: Mapping[str, WordPool] | None = None
+    """The particle a place writes after itself where it is not the frame's own, by particle.
+
+    Chinese `在火星上`, `在桥上` and `在路边` where every place frame writes `在…里`. `""` is
+    a place that takes none. A place listed nowhere takes the frame's. None for a language
+    whose one tail is right for every place.
+    """
     """Noun classes the language's written pronouns are wrong for.
 
     A sentence about one of them leaves the subject out where the language can, and

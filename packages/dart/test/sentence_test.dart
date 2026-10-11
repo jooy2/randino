@@ -1900,6 +1900,75 @@ void main() {
       }
     });
 
+    test('a place takes the particle it takes', () {
+      // Chinese writes every place `在…里`, and a planet, a bridge or a hill is
+      // `在…上`. The lists name places the pools actually hold.
+      var listed = 0;
+
+      for (final language in wordLanguages) {
+        final data = sentenceData[language]!;
+        final tails = data.placeTails ?? const <String, WordPool>{};
+        final lexicon = wordData[language]!;
+        final places = <String>{
+          for (final theme in wordThemes)
+            if (themeClass[theme] == NounClass.place)
+              for (final word in lexicon.nouns[theme]!) plain(language, word),
+        };
+
+        for (final entry in tails.entries) {
+          for (final noun in entry.value) {
+            expect(
+              places.contains(noun),
+              isTrue,
+              reason: "$language: '$noun' takes '${entry.key}' and is in no place pool",
+            );
+          }
+        }
+
+        if (tails.isEmpty) continue;
+
+        // The tail a place part carries in the frames, which a place listed nowhere keeps.
+        final own = <String>{
+          for (final frame in data.frames)
+            for (final part in frame.parts)
+              if (part.slot == SentenceSlot.place && (part.tail ?? '').isNotEmpty) part.tail!,
+        };
+
+        for (final detail in randSentenceDetails(
+          language: language,
+          slots: <SentenceSlot>{SentenceSlot.place},
+          count: sample,
+        )) {
+          final at = detail.slots.indexOf(SentenceSlot.place);
+
+          if (at < 0) continue;
+
+          final phrase = detail.phrases[at];
+          final named = <String>[
+            for (final noun in nounsIn(language, phrase))
+              for (final entry in tails.entries)
+                if (entry.value.contains(noun)) entry.key,
+          ];
+          final after = detail.sentence.substring(detail.sentence.indexOf(phrase) + phrase.length);
+
+          if (named.isNotEmpty) listed += 1;
+
+          expect(
+            named.isNotEmpty
+                ? named.any(
+                  (tail) => tail.isEmpty ? !own.any(after.startsWith) : after.startsWith(tail),
+                )
+                : own.any(after.startsWith),
+            isTrue,
+            reason:
+                "$language: '$phrase' takes ${named.isNotEmpty ? named : own} (${detail.sentence})",
+          );
+        }
+      }
+
+      expect(listed, greaterThan(0), reason: 'no listed place was ever written');
+    });
+
     test('a spell from `myth` is a subject like any other', () {
       // `myth` held spells and amulets beside dragons and elves, and a spell that
       // chooses a gouge is what the class alone allowed. The creatures are

@@ -501,6 +501,16 @@ function emitDart(code: string, data: SentenceLanguageData): string {
 		out.push('  },');
 	}
 
+	if (data.placeTails) {
+		out.push('  placeTails: <String, WordPool>{');
+
+		for (const [tail, pool] of Object.entries(data.placeTails)) {
+			out.push(`    ${dq(tail)}: ${dartWords(pool, '    ')},`);
+		}
+
+		out.push('  },');
+	}
+
 	if (data.numeral) {
 		const n = data.numeral;
 
@@ -913,6 +923,16 @@ function emitPython(code: string, data: SentenceLanguageData): string {
 
 		for (const [head, pool] of Object.entries(data.placeHeads)) {
 			out.push(`        ${pq(head)}: ${pyWords(pool, '        ')},`);
+		}
+
+		out.push('    },');
+	}
+
+	if (data.placeTails) {
+		out.push('    place_tails={');
+
+		for (const [tail, pool] of Object.entries(data.placeTails)) {
+			out.push(`        ${pq(tail)}: ${pyWords(pool, '        ')},`);
 		}
 
 		out.push('    },');

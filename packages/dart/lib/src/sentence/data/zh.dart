@@ -679,6 +679,16 @@ final SentenceLanguageData zh = SentenceLanguageData(
   listener: const SentenceSpeech(subject: '你'),
   homecomings: <SentenceStyle, WordPool>{SentenceStyle.casual: words(r'我回来了 到家了! 我到家了 回来啦')},
   degrees: words(r'非常 特别 真 有点 相当 十分 挺 极其 格外 稍微 蛮 分外'),
+  placeTails: <String, WordPool>{
+    '上': words(r'''
+      水星 金星 地球 火星 木星 土星 天王星 海王星 冥王星 谷神星 阋神星 妊神星 鸟神星 赛德娜 创神星 亡神星 共工星 灶神星 智神星 婚神星 健神星 灵神星 爱神星 毁神星 贝努
+      忒伊亚 祝融星 望舒 青鸾 月亮 月球 月面 星球 行星 小行星 矮行星 桥梁 吊桥 立交桥 天桥 栈桥 街道 马路 大道 公路 高速路 国道 林荫道 步行道 商业街 海滨路 人行道
+      斑马线 广场 操场 球场 跑道 码头 防波堤 堤坝 田埂 晒场 环岛 战场 工地 屋顶 天台 阳台 露台 楼梯 城墙 烽火台 瞭望塔 观景台 山顶 山峰 山坡 高山 悬崖 岩石 巨岩 礁石
+      暗礁 沙丘 沙洲 浅滩 冰川 冰山 冰原 雪山 雪原 草原 草甸 高原 台地 平原 海滩 海岸 河岸 岛屿 半岛 群岛 水面 大地
+    '''),
+    '下': words(r'山脚'),
+    '': words(r'路边 湖畔 路口 街角 十字路 渡口'),
+  },
   numeral: const SentenceNumeral(
     order: NumeralOrder.after,
     counters: <NounClass, String>{

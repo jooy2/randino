@@ -1903,6 +1903,16 @@ String? _placeHeadFor(SentenceLanguageData data, String noun) {
   return null;
 }
 
+/// The particle this place writes after itself, where the language lists one;
+/// null for the frame's own.
+String? _placeTailFor(SentenceLanguageData data, String noun) {
+  for (final entry in (data.placeTails ?? const <String, WordPool>{}).entries) {
+    if (entry.value.contains(noun)) return entry.key;
+  }
+
+  return null;
+}
+
 const List<NounTrait> _noTraits = <NounTrait>[];
 
 /// Every noun the language gives a trait to, as one lookup.
@@ -3048,6 +3058,8 @@ _Built _compose(
         past && pastHead != null && agreement != null && tensedHead != null
             ? _agreeBy(agreement, tensedHead, gender)
             : tensedHead;
+    // The particle a place writes after itself, where it is not the frame's.
+    String? placeTail;
     final headCost = (partHead == null ? 0 : partHead.length + space) + _copulaSpan(part, data).min;
     final overhead = gap + headCost + _tailMin(part);
     final high = _atLeast(1, max - used - overhead - restMin);
@@ -3146,6 +3158,10 @@ _Built _compose(
         }
       }
 
+      // And the particle after it: Chinese `在火星上`, never `在火星里`. The tail is
+      // counted where it is written, so nothing is paid here.
+      if (part.slot == SentenceSlot.place) placeTail = _placeTailFor(data, built.noun);
+
       if (part.slot == subjectSlot) {
         subject = built;
         gender = genderOf(lexicon, _asPool(lexicon, built.noun));
@@ -3225,7 +3241,8 @@ _Built _compose(
     ].join(data.space);
     final head = headText.isEmpty ? null : (opens ? _upper(headText) : headText);
     final text = opens && headText.isEmpty ? _upper(phrase) : phrase;
-    final tail = (part.copula == CopulaSide.tail ? copula : '') + _tailOf(part, text);
+    final tail =
+        (part.copula == CopulaSide.tail ? copula : '') + (placeTail ?? _tailOf(part, text));
 
     if (head != null) written.add(head);
 

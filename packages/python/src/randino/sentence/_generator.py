@@ -2114,6 +2114,15 @@ def _place_head_for(data: SentenceLanguageData, noun: str) -> str | None:
     return None
 
 
+def _place_tail_for(data: SentenceLanguageData, noun: str) -> str | None:
+    """The particle this place writes after itself, where the language lists one; None otherwise."""
+    for tail, pool in (data.place_tails or {}).items():
+        if noun in pool:
+            return tail
+
+    return None
+
+
 _TRAIT_CACHE: dict[int, dict[str, tuple[NounTrait, ...]]] = {}
 _NO_TRAITS: tuple[NounTrait, ...] = ()
 
@@ -3341,6 +3350,8 @@ def _compose(
             if past and past_head and data.past_agreement is not None and tensed_head
             else tensed_head
         )
+        # The particle a place writes after itself, where it is not the frame's.
+        place_tail: str | None = None
         head_cost = (len(part_head) + space if part_head else 0) + _copula_span(part, data)[0]
         overhead = gap + head_cost + _tail_min(part)
         part_high = max(1, high - used - overhead - rest_min)
@@ -3444,6 +3455,11 @@ def _compose(
                     used += len(place_head) - len(part_head)
                     part_head = place_head
 
+            # And the particle after it: Chinese `在火星上`, never `在火星里`. The tail is counted
+            # where it is written, so nothing is paid here.
+            if part.slot == "place":
+                place_tail = _place_tail_for(data, built.noun)
+
             if part.slot == subject_slot:
                 subject = built
                 gender = gender_of(lexicon, _as_pool(lexicon, built.noun))
@@ -3527,7 +3543,9 @@ def _compose(
         )
         head = (_upper(head_text) if opens else head_text) if head_text else ""
         text = _upper(phrase) if opens and not head_text else phrase
-        tail = (copula if part.copula == "tail" else "") + _tail_of(part, text)
+        tail = (copula if part.copula == "tail" else "") + (
+            place_tail if place_tail is not None else _tail_of(part, text)
+        )
 
         if head:
             written.append(head)

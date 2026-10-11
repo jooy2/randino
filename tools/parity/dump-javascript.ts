@@ -724,6 +724,11 @@ console.log(
 									Object.entries(data.placeHeads).map(([head, pool]) => [head, list(pool)])
 								)
 							: null,
+						placeTails: data.placeTails
+							? Object.fromEntries(
+									Object.entries(data.placeTails).map(([tail, pool]) => [tail, list(pool)])
+								)
+							: null,
 						numeral: data.numeral
 							? {
 									order: data.numeral.order,

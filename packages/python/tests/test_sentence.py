@@ -1647,6 +1647,65 @@ def test_a_sentence_happens_somewhere() -> None:
                     )
 
 
+def test_a_place_takes_the_particle_it_takes() -> None:
+    # Chinese writes every place `在…里`, and a planet, a bridge or a hill is `在…上`. The
+    # lists name places the pools actually hold.
+    listed = 0
+
+    for language in WORD_LANGUAGES:
+        data = SENTENCE_DATA[language]
+        tails = data.place_tails or {}
+        lexicon = WORD_DATA[language]
+        places = {
+            plain(language, word)
+            for theme in WORD_THEMES
+            if THEME_CLASS[theme] == "place"
+            for word in lexicon.nouns[theme]
+        }
+
+        for tail, pool in tails.items():
+            for noun in pool:
+                assert noun in places, (
+                    f"{language}: '{noun}' takes '{tail}' and is in no place pool"
+                )
+
+        if not tails:
+            continue
+
+        # The tail a place part carries in the frames, which a place listed nowhere keeps.
+        own = sorted(
+            {part.tail for frame in data.frames for part in frame.parts if part.slot == "place"}
+            - {""}
+        )
+
+        for detail in rand_sentence(
+            language=language, slots="place", count=SAMPLE, output="detail"
+        ):
+            if "place" not in detail.slots:
+                continue
+
+            phrase = detail.phrases[detail.slots.index("place")]
+            named = [
+                tail
+                for noun in nouns_in(language, phrase)
+                for tail, pool in tails.items()
+                if noun in pool
+            ]
+            after = detail.sentence[detail.sentence.index(phrase) + len(phrase) :]
+
+            listed += 1 if named else 0
+            assert (
+                any(
+                    after.startswith(tail) if tail else not any(after.startswith(o) for o in own)
+                    for tail in named
+                )
+                if named
+                else any(after.startswith(tail) for tail in own)
+            ), f"{language}: '{phrase}' takes {named or own} ({detail.sentence})"
+
+    assert listed > 0, "no listed place was ever written"
+
+
 def test_a_spell_from_myth_is_a_subject_like_any_other() -> None:
     # `myth` held spells and amulets beside dragons and elves, and a spell that chooses a
     # gouge is what the class alone allowed. The creatures are `monster` now and `myth` is

@@ -1781,6 +1781,71 @@ describe('Sentence', () => {
 		}
 	});
 
+	it('a place takes the particle it takes', () => {
+		// Chinese writes every place `在…里`, and a planet, a bridge or a hill is
+		// `在…上`. The lists name places the pools actually hold.
+		let listed = 0;
+
+		for (const language of WORD_LANGUAGES) {
+			const data = SENTENCE_DATA[language];
+			const tails = Object.entries(data.placeTails ?? {});
+			const wordData = WORD_DATA[language];
+			const places = new Set(
+				WORD_THEMES.filter((theme) => THEME_CLASS[theme] === 'place').flatMap((theme) =>
+					wordData.nouns[theme].map((word) => plain(language, word))
+				)
+			);
+
+			for (const [tail, pool] of tails) {
+				for (const noun of pool) {
+					assert.ok(
+						places.has(noun),
+						`${language}: '${noun}' takes '${tail}' and is in no place pool`
+					);
+				}
+			}
+
+			if (!tails.length) {
+				continue;
+			}
+
+			// The tail a place part carries in the frames, which a place listed nowhere keeps.
+			const own = [
+				...new Set(
+					data.frames.flatMap((frame) =>
+						frame.parts.flatMap((part) => (part.slot === 'place' && part.tail ? [part.tail] : []))
+					)
+				)
+			];
+
+			for (const detail of sentenceDetails({ language, slots: 'place', count: SAMPLE })) {
+				const at = detail.slots.indexOf('place');
+
+				if (at < 0) {
+					continue;
+				}
+
+				const phrase = detail.phrases[at];
+				const named = [...nounsIn(language, phrase)].flatMap((noun) =>
+					tails.filter(([, pool]) => pool.includes(noun)).map(([tail]) => tail)
+				);
+				const after = detail.sentence.slice(detail.sentence.indexOf(phrase) + phrase.length);
+
+				listed += named.length ? 1 : 0;
+				assert.ok(
+					named.length
+						? named.some((tail) =>
+								tail ? after.startsWith(tail) : !own.some((frame) => after.startsWith(frame))
+							)
+						: own.some((tail) => after.startsWith(tail)),
+					`${language}: '${phrase}' takes ${(named.length ? named : own).join('/') || 'nothing'} (${detail.sentence})`
+				);
+			}
+		}
+
+		assert.ok(listed > 0, 'no listed place was ever written');
+	});
+
 	it('a spell from `myth` is a subject like any other', () => {
 		// `myth` held spells and amulets beside dragons and elves, and a spell that
 		// chooses a gouge is what the class alone allowed. The creatures are `monster`

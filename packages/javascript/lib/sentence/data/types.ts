@@ -875,6 +875,13 @@ export type SentenceLanguageData = {
 	 */
 	placeHeads?: Record<string, WordPool>;
 	/**
+	 * The particle a place writes after itself where it is not the frame's own, by
+	 * particle: Chinese `在火星上`, `在桥上` and `在路边` where every place frame
+	 * writes `在…里`. `''` is a place that takes none. A place listed nowhere takes
+	 * the frame's. Left out by a language whose one tail is right for every place.
+	 */
+	placeTails?: Record<string, WordPool>;
+	/**
 	 * How the language writes a number. Left out by one that cannot, which then
 	 * declares no `quantity` and no `money` shape either.
 	 */

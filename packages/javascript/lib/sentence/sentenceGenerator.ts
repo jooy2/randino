@@ -1754,6 +1754,17 @@ function placeHeadFor(data: SentenceLanguageData, noun: string): string | null {
 	return null;
 }
 
+/** The particle this place writes after itself, where the language lists one; null for the frame's own. */
+function placeTailFor(data: SentenceLanguageData, noun: string): string | null {
+	for (const [tail, pool] of Object.entries(data.placeTails ?? {})) {
+		if (pool.includes(noun)) {
+			return tail;
+		}
+	}
+
+	return null;
+}
+
 const NO_TRAITS: readonly NounTrait[] = [];
 
 /**
@@ -3115,6 +3126,8 @@ function compose(
 			past && pastHead && data.pastAgreement
 				? agreeBy(data.pastAgreement, tensedHead!, gender)
 				: tensedHead;
+		// The particle a place writes after itself, where it is not the frame's.
+		let placeTail: string | null = null;
 		const headCost = (partHead ? partHead.length + space : 0) + copulaSpan(part, data)[0];
 		const tailCost = Math.min(
 			part.tail?.length ?? 0,
@@ -3229,6 +3242,12 @@ function compose(
 				}
 			}
 
+			// And the particle after it: Chinese `在火星上`, never `在火星里`. The tail is
+			// counted where it is written, so nothing is paid here.
+			if (part.slot === 'place') {
+				placeTail = placeTailFor(data, built.noun);
+			}
+
 			if (part.slot === subjectSlot) {
 				subject = built;
 				gender = genderOf(wordData, capitalizeAsPool(wordData, built.noun));
@@ -3324,7 +3343,7 @@ function compose(
 			.join(data.space);
 		const head = opens && opener ? upper(opener) : opener;
 		const text = opens && !opener ? upper(phrase) : phrase;
-		const tail = (part.copula === 'tail' ? copula : '') + tailOf(part, text);
+		const tail = (part.copula === 'tail' ? copula : '') + (placeTail ?? tailOf(part, text));
 
 		if (head) {
 			written.push(head);

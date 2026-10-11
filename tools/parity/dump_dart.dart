@@ -411,6 +411,11 @@ void main() {
             : <String, Object?>{
                 for (final h in entry.value.placeHeads!.entries) h.key: listed(h.value),
               },
+        'placeTails': entry.value.placeTails == null
+            ? null
+            : <String, Object?>{
+                for (final t in entry.value.placeTails!.entries) t.key: listed(t.value),
+              },
         'numeral': entry.value.numeral == null
             ? null
             : <String, Object?>{

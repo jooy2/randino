@@ -957,6 +957,7 @@ class SentenceLanguageData {
     this.homecomings,
     this.degrees,
     this.placeHeads,
+    this.placeTails,
     this.openers = const <SentenceType, String>{},
     this.numeral,
     this.calendar,
@@ -1127,6 +1128,12 @@ class SentenceLanguageData {
   /// where every place frame writes `in`. A place listed nowhere takes the
   /// frame's. Null for a language whose one head is right for every place.
   final Map<String, WordPool>? placeHeads;
+
+  /// The particle a place writes after itself where it is not the frame's own,
+  /// by particle: Chinese `在火星上`, `在桥上` and `在路边` where every place frame
+  /// writes `在…里`. `''` is a place that takes none. A place listed nowhere takes
+  /// the frame's. Null for a language whose one tail is right for every place.
+  final Map<String, WordPool>? placeTails;
 
   /// How the language writes a number.
   ///
