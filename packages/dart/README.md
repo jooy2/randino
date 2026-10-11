@@ -659,7 +659,7 @@ nicknameLengthRange(language: WordLanguage.ko); // LengthRange(1, 13)
 sentenceLengthRange(WordLanguage.ko); // LengthRange(5, 53)
 ```
 
-`nameLanguages`, `wordLanguages`, `wordThemes`, `locationLanguages`, `locationLevels`, `ageGroups`, `organizationTypes`, `organizationIndustries`, `dateUnits`, `phoneCountries`, `phoneTypes`, `systemPlatforms`, `deviceTypes`, `ramUnits`, `diskTypes`, `diskUnits` and `architectures` list what the generators accept; `randCountMax`, `randLengthMin` / `Max`, `randSentenceLengthMax`, `randLocationLengthMax`, `randAgeMax`, `randOrganizationLengthMax`, `affixLengthDefault` / `Max`, `affixSeparatorDefault` and `affixCharset` are the bounds and defaults every parameter is clamped to.
+`nameLanguages`, `wordLanguages`, `wordThemes`, `locationLanguages`, `locationLevels`, `ageGroups`, `organizationTypes`, `organizationIndustries`, `dateUnits`, `phoneCountries`, `phoneTypes`, `systemPlatforms`, `osFamilyCodes`, `deviceTypes`, `deviceVendors`, `ramUnits`, `ramTypes`, `diskTypes`, `diskUnits`, `architectures`, `architectureNamings`, `versionFormats`, `fileCategories`, `mimeTopLevels`, `cpuVendors` and `gpuVendors` list what the generators accept; `randCountMax`, `randLengthMin` / `Max`, `randSentenceLengthMax`, `randSentenceCountMax`, `randLocationLengthMax`, `randAgeMax`, `randOrganizationLengthMax`, `affixLengthDefault` / `Max`, `affixSeparatorDefault` and `affixCharset` are the bounds and defaults every parameter is clamped to.
 
 ## Differences from the npm package
 
