@@ -47,7 +47,6 @@ A fix to a generator added under `vNext` needs no changelog entry of its own, si
 
 ### B. Decided, being worked through
 
-- **B71. The docs deploy holds a write token in the job that runs `npm ci`.** Splitting build and deploy, or moving to `actions/deploy-pages`, needs the Pages settings changed. Decided: `actions/deploy-pages`, after the Pages source is switched to GitHub Actions.
 
 ### Found while working
 

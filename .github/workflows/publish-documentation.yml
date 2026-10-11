@@ -21,25 +21,30 @@ on:
   # own content had no reason to trigger.
   workflow_dispatch:
 
-defaults:
-  run:
-    working-directory: docs
-
-# A second push while a deploy is in flight would race it to `gh-pages`. Let the
-# newer one win, and do not cancel a deploy that has already started pushing.
+# A second push while a deploy is in flight would race it. Let the newer one
+# win, and do not cancel a deploy that has already started.
 concurrency:
   group: publish-documentation
   cancel-in-progress: false
 
-# The deploy goes through `secrets.ACCESS_TOKEN`, so the workflow's own token needs
-# nothing but the checkout.
+# Nothing but the checkout by default. The deploy job asks for what it needs on
+# its own, so the job that installs dependencies never holds a credential.
 permissions:
   contents: read
 
 jobs:
-  publish-documentation:
+  # Builds the site and hands it over as an artifact. This is the job that runs
+  # `npm ci`, and with it every install script of every dependency, so it holds
+  # no token that can write anywhere: a dependency gone bad could change what it
+  # builds, and nothing more.
+  build:
     runs-on: ubuntu-latest
-    name: Build and deploy the documentation site
+    name: Build the documentation site
+    outputs:
+      host: ${{ steps.site.outputs.host }}
+    defaults:
+      run:
+        working-directory: docs
 
     steps:
       - uses: actions/checkout@v5
@@ -66,25 +71,52 @@ jobs:
         run: npm run build
 
       # The site's URL lives in the npm package manifest — `config.ts` reads the
-      # same field for canonical links and the sitemap. The CNAME this deploy
-      # writes has to agree with it, and a hostname hard-coded here is one that
-      # can silently disagree.
+      # same field for canonical links and the sitemap. The deploy job checks the
+      # custom domain Pages is set to against it, so the two cannot drift apart.
       - name: Resolve the site hostname
         id: site
         run: |
-          echo "fqdn=$(node -p "new URL(require('../packages/javascript/package.json').homepage).hostname")" >> "$GITHUB_OUTPUT"
+          echo "host=$(node -p "new URL(require('../packages/javascript/package.json').homepage).hostname")" >> "$GITHUB_OUTPUT"
 
-      # Pinned to the commit `v4` resolved to, rather than to the tag. This step is
-      # the one that holds a token with write access to this repository, and a tag
-      # is a name its owner can move — pinning it is what makes an update to the
-      # action something that has to be committed here.
-      # @see https://github.com/crazy-max/ghaction-github-pages
-      - name: Deploy to GitHub Pages
-        uses: crazy-max/ghaction-github-pages@df5cc2bfa78282ded844b354faee141f06b41865 # v4.2.0
+      - name: Hand the site over
+        uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
         with:
-          target_branch: gh-pages
-          build_dir: docs-dist
-          jekyll: false
-          fqdn: ${{ steps.site.outputs.fqdn }}
+          path: docs-dist
+
+  # Deploys the artifact through GitHub Pages' own deployment, with a token
+  # GitHub signs for this job alone. No long-lived token is stored anywhere, and
+  # this job runs no code of the repository's dependencies. The Pages source has
+  # to be set to "GitHub Actions" in the repository's settings for it to work,
+  # and the custom domain is the one set there.
+  #
+  # Every action here is pinned to a commit rather than a tag, since a tag is a
+  # name its owner can move and this is the job that can publish.
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    name: Deploy the documentation site
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Read the Pages settings
+        id: pages
+        uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d # v6.0.0
+
+      - name: Check the custom domain against the manifest
         env:
-          GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+          CONFIGURED: ${{ steps.pages.outputs.host }}
+          EXPECTED: ${{ needs.build.outputs.host }}
+        run: |
+          if [ "$CONFIGURED" != "$EXPECTED" ]; then
+            echo "Pages serves $CONFIGURED, but the manifest's homepage is $EXPECTED." >&2
+            exit 1
+          fi
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346 # v5.0.1

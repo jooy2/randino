@@ -605,11 +605,11 @@ The repository's own `README.md` links the file by a relative path, which is wha
 
 ### Deployment
 
-`.github/workflows/publish-documentation.yml` builds the site and pushes `docs-dist/` to the `gh-pages` branch on every push to `main` that touches `docs/`, `packages/javascript/lib/**` (the demo bundles it from source), any package's manifest, or any package's `CHANGELOG.md`. Nothing else in `packages/` reaches the site, so nothing else triggers it. It is the only workflow that deploys the site, and it repeats `run-build-docs`' three checks — typecheck, format, build — because a commit landing on `main` directly never saw them.
+`.github/workflows/publish-documentation.yml` builds the site and deploys `docs-dist/` through GitHub Pages' own deployment on every push to `main` that touches `docs/`, `packages/javascript/lib/**` (the demo bundles it from source), any package's manifest, or any package's `CHANGELOG.md`. Nothing else in `packages/` reaches the site, so nothing else triggers it. It is the only workflow that deploys the site, and it repeats `run-build-docs`' three checks — typecheck, format, build — because a commit landing on `main` directly never saw them.
 
-Two things it does not hard-code. The custom domain is read out of the npm package's `homepage`, the same field `config.ts` derives the canonical links and the sitemap from, so the `CNAME` it writes cannot drift from the URL the pages claim. And `run-build-docs` is pull-request-only, so one commit never builds the site twice.
+It is two jobs, and the split is the point. `build` runs `npm ci`, and with it every install script of every dependency, so it holds nothing but a read of the repository and hands the site over as an artifact. `deploy` runs no dependency's code: it takes the artifact and deploys it with `actions/deploy-pages`, on a short-lived token GitHub signs for that job (`pages: write`, `id-token: write`), and every action it uses is pinned to a commit. No long-lived token is stored for the site any more; the `ACCESS_TOKEN` the old `gh-pages` push used is not read. The repository's Pages source has to be "GitHub Actions" for the deploy to land, and the custom domain is the one set in the Pages settings.
 
-The push needs `secrets.ACCESS_TOKEN`, a token with write access to this repository. It is a repository secret, so the workflow is the only thing that can deploy — a fork running it finds nothing and stops at that step.
+Two things it does not hard-code. The custom domain is read out of the npm package's `homepage`, the same field `config.ts` derives the canonical links and the sitemap from, and the deploy fails when the domain Pages is set to differs from it, so the two cannot drift apart. And `run-build-docs` is pull-request-only, so one commit never builds the site twice.
 
 ## Repository tooling (`tools/`)
 
