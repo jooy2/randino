@@ -258,7 +258,7 @@ function calendarSpan(
 /** What a counted phrase writes beside its noun, and what an amount writes. */
 function countText(data: SentenceLanguageData, theme: WordTheme): string {
 	const numeral = data.numeral!;
-	const counter = numeral.counters[THEME_CLASS[theme]] ?? '';
+	const counter = numeral.themeCounters?.[theme] ?? numeral.counters[THEME_CLASS[theme]] ?? '';
 	const [low, high] = numeral.count;
 	const number = grouped(randInt(low, high), numeral.group);
 
@@ -279,7 +279,10 @@ function countSpan(data: SentenceLanguageData): readonly [number, number] {
 		return [0, 0];
 	}
 
-	const counters = Object.values(numeral.counters);
+	const counters = [
+		...Object.values(numeral.counters),
+		...Object.values(numeral.themeCounters ?? {})
+	] as string[];
 	const width = (value: number) => grouped(value, numeral.group).length;
 	const counter = counters.length
 		? [

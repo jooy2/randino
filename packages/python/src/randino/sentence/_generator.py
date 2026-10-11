@@ -325,7 +325,7 @@ def _count_text(data: SentenceLanguageData, theme: WordTheme) -> str:
     if numeral is None:
         return ""
 
-    counter = numeral.counters.get(THEME_CLASS[theme])
+    counter = (numeral.theme_counters or {}).get(theme) or numeral.counters.get(THEME_CLASS[theme])
     number = _grouped(rand_int(numeral.count[0], numeral.count[1]), numeral.group)
 
     return number if counter is None else number + numeral.gap + counter
@@ -348,7 +348,7 @@ def _count_span(data: SentenceLanguageData) -> tuple[int, int]:
     if numeral is None:
         return (0, 0)
 
-    counters = list(numeral.counters.values())
+    counters = [*numeral.counters.values(), *(numeral.theme_counters or {}).values()]
     low = min((len(word) for word in counters), default=0)
     high = max((len(word) for word in counters), default=0)
     space = len(data.space)

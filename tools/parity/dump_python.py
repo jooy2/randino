@@ -405,6 +405,11 @@ sentence = {
             else {
                 "order": data.numeral.order,
                 "counters": dict(data.numeral.counters),
+                "themeCounters": (
+                    None
+                    if data.numeral.theme_counters is None
+                    else dict(data.numeral.theme_counters)
+                ),
                 "count": list(data.numeral.count),
                 "currency": data.numeral.currency,
                 "amounts": list(data.numeral.amounts),

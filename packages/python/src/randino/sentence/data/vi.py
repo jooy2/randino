@@ -1012,6 +1012,7 @@ VI = SentenceLanguageData(
             "idea": "điều",
             "body": "cái",
         },
+        theme_counters={"fruit": "quả", "drink": "ly", "ingredient": "loại"},
         count=(2, 12),
         currency="đồng",
         amounts=(10000, 50000, 100000, 200000, 500000, 1000000, 5000000),

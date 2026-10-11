@@ -771,6 +771,7 @@ ZH = SentenceLanguageData(
             "idea": "种",
             "body": "个",
         },
+        theme_counters={"drink": "杯", "ingredient": "种"},
         count=(2, 12),
         currency="元",
         amounts=(100, 500, 1000, 3000, 5000, 10000, 30000, 50000, 100000),

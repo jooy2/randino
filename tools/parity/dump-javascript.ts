@@ -728,6 +728,9 @@ console.log(
 							? {
 									order: data.numeral.order,
 									counters: map(data.numeral.counters),
+									themeCounters: data.numeral.themeCounters
+										? map(data.numeral.themeCounters)
+										: null,
 									count: [...data.numeral.count],
 									currency: data.numeral.currency,
 									amounts: [...data.numeral.amounts],

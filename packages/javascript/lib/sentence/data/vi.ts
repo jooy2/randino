@@ -903,6 +903,8 @@ export const VI: SentenceLanguageData = {
 			idea: 'điều',
 			body: 'cái'
 		},
+		// A fruit is `quả`, a drink a glass, and an ingredient counted by its kinds.
+		themeCounters: { fruit: 'quả', drink: 'ly', ingredient: 'loại' },
 		count: [2, 12],
 		currency: 'đồng',
 		amounts: [10000, 50000, 100000, 200000, 500000, 1000000, 5000000],

@@ -406,7 +406,7 @@ rand_sentence(language="en", slots="money", count=2)
 
 :::
 
-Four languages count, and they are the four with a classifier. The counter comes from the noun's class: `마리` for a creature, `대` for a vehicle, `그루` for a plant. Korean, Japanese and Chinese put the number behind the noun; Vietnamese puts it in front, classifier and all.
+Four languages count, and they are the four with a classifier. The counter comes from the noun's class: `마리` for a creature, `대` for a vehicle, `그루` for a plant. A theme the class's counter is wrong for has its own: a drink is counted in cups (`커피 3잔`, `コーヒー3杯`), and an ingredient nobody counts one by one by its kinds (`간장 3가지`, `醤油3種類`). Korean, Japanese and Chinese put the number behind the noun; Vietnamese puts it in front, classifier and all.
 
 | Language            | Counts | Names an amount |
 | ------------------- | ------ | --------------- |

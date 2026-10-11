@@ -1928,6 +1928,7 @@ final SentenceLanguageData ja = SentenceLanguageData(
       NounClass.idea: '種類',
       NounClass.body: '本',
     },
+    themeCounters: <WordTheme, String>{WordTheme.drink: '杯', WordTheme.ingredient: '種類'},
     count: LengthRange(2, 12),
     currency: '円',
     amounts: <int>[1000, 5000, 10000, 30000, 50000, 100000, 300000, 500000, 1000000],

@@ -998,7 +998,10 @@ def strip_count(language: WordLanguage, phrase: str) -> str:
 
     space = re.escape(data.space)
     gap = re.escape(numeral.gap)
-    counters = [re.escape(word) for word in numeral.counters.values()]
+    counters = [
+        re.escape(word)
+        for word in [*numeral.counters.values(), *(numeral.theme_counters or {}).values()]
+    ]
     number = rf"\d[\d{re.escape(numeral.group)}]*"
     group = f"{number}(?:{gap}(?:{'|'.join(counters)}))?" if counters else number
 
@@ -2689,7 +2692,7 @@ def test_slots_quantity_counts_a_noun_with_the_counter_its_kind_takes() -> None:
         data = SENTENCE_DATA[language]
         numeral = data.numeral
         assert numeral is not None
-        counters = set(numeral.counters.values())
+        counters = {*numeral.counters.values(), *(numeral.theme_counters or {}).values()}
 
         for detail in rand_sentence(
             type="statement",
@@ -3001,6 +3004,34 @@ def test_a_proper_noun_is_written_as_a_name_with_no_article_and_nothing_in_front
                     written += 1
 
     assert written > 0, "no sentence named a planet"
+
+
+def test_a_theme_with_a_counter_of_its_own_is_counted_with_it() -> None:
+    # A class is too wide for one counter the way it is for one verb: `간장 3개` counts what
+    # nobody counts one by one, and a coffee is a cup.
+    seen = 0
+
+    for language in WORD_LANGUAGES:
+        numeral = SENTENCE_DATA[language].numeral
+        counters = (numeral.theme_counters if numeral else None) or {}
+
+        for theme, counter in counters.items():
+            for detail in rand_sentence(
+                language=language, theme=theme, slots="quantity", count=40, output="detail"
+            ):
+                if "quantity" not in detail.slots:
+                    continue
+
+                phrase = detail.phrases[detail.slots.index("quantity")]
+                nouns = nouns_in(language, strip_count(language, phrase))
+
+                if not any(theme_of_noun(language, noun) == theme for noun in nouns):
+                    continue
+
+                seen += 1
+                assert counter in phrase, f"{language}: '{phrase}' is not counted in {counter}"
+
+    assert seen > 0, "no theme with a counter of its own was ever counted"
 
 
 def test_every_theme_has_a_modifier_to_put_in_front_of_its_nouns() -> None:

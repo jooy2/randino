@@ -204,7 +204,7 @@ LengthRange _calendarSpan(SentenceLanguageData data, SentenceSlot slot) {
 /// What a counted phrase writes beside its noun.
 String _countText(SentenceLanguageData data, WordTheme theme) {
   final numeral = data.numeral!;
-  final counter = numeral.counters[themeClass[theme]];
+  final counter = numeral.themeCounters?[theme] ?? numeral.counters[themeClass[theme]];
   final number = _grouped(randInt(numeral.count.min, numeral.count.max), numeral.group);
 
   return counter == null ? number : number + numeral.gap + counter;
@@ -223,7 +223,7 @@ LengthRange _countSpan(SentenceLanguageData data) {
 
   if (numeral == null) return const LengthRange(0, 0);
 
-  final counters = numeral.counters.values.toList(growable: false);
+  final counters = <String>[...numeral.counters.values, ...?numeral.themeCounters?.values];
   var low = 0;
   var high = 0;
 

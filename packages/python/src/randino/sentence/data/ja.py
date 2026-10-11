@@ -2168,6 +2168,7 @@ JA = SentenceLanguageData(
             "idea": "種類",
             "body": "本",
         },
+        theme_counters={"drink": "杯", "ingredient": "種類"},
         count=(2, 12),
         currency="円",
         amounts=(1000, 5000, 10000, 30000, 50000, 100000, 300000, 500000, 1000000),

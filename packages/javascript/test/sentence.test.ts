@@ -227,7 +227,10 @@ function stripCount(language: WordLanguage, phrase: string): string {
 
 	const space = escapeRe(data.space);
 	const gap = escapeRe(numeral.gap);
-	const counters = Object.values(numeral.counters).map(escapeRe);
+	const counters = [
+		...Object.values(numeral.counters),
+		...Object.values(numeral.themeCounters ?? {})
+	].map((word) => escapeRe(word!));
 	const number = `\\d[\\d${escapeRe(numeral.group)}]*`;
 	const group = counters.length ? `${number}(?:${gap}(?:${counters.join('|')}))?` : number;
 
@@ -3009,7 +3012,10 @@ describe('Sentence', () => {
 		for (const language of COUNTING) {
 			const data = SENTENCE_DATA[language];
 			const numeral = data.numeral!;
-			const counters = new Set(Object.values(numeral.counters));
+			const counters = new Set([
+				...Object.values(numeral.counters),
+				...Object.values(numeral.themeCounters ?? {})
+			]);
 
 			for (const detail of sentenceDetails({ language, slots: 'quantity', count: SAMPLE })) {
 				const at = detail.slots.indexOf('quantity');
@@ -4009,6 +4015,46 @@ describe('Sentence', () => {
 		}
 
 		assert.ok(written > 0, 'no sentence named a planet');
+	});
+
+	it('a theme with a counter of its own is counted with it', () => {
+		// A class is too wide for one counter the way it is for one verb: `간장 3개`
+		// counts what nobody counts one by one, and a coffee is a cup.
+		let seen = 0;
+
+		for (const language of WORD_LANGUAGES) {
+			const numeral = SENTENCE_DATA[language].numeral;
+
+			for (const [theme, counter] of Object.entries(numeral?.themeCounters ?? {})) {
+				for (const detail of sentenceDetails({
+					language,
+					theme: theme as WordTheme,
+					slots: 'quantity',
+					count: 40
+				})) {
+					const at = detail.slots.indexOf('quantity');
+
+					if (at < 0) {
+						continue;
+					}
+
+					const phrase = detail.phrases[at];
+					const nouns = [...nounsIn(language, stripCount(language, phrase))];
+
+					if (!nouns.some((noun) => themeOfNoun(language, noun) === theme)) {
+						continue;
+					}
+
+					seen += 1;
+					assert.ok(
+						phrase.includes(counter!),
+						`${language}: '${phrase}' is not counted in ${counter}`
+					);
+				}
+			}
+		}
+
+		assert.ok(seen > 0, 'no theme with a counter of its own was ever counted');
 	});
 
 	it('every theme has a modifier to put in front of its nouns', () => {

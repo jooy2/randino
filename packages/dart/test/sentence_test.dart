@@ -309,7 +309,10 @@ String stripCount(WordLanguage language, String phrase) {
 
   final space = escapeRe(data.space);
   final gap = escapeRe(numeral.gap);
-  final counters = numeral.counters.values.map(escapeRe).toList(growable: false);
+  final counters = <String>[
+    ...numeral.counters.values,
+    ...?numeral.themeCounters?.values,
+  ].map(escapeRe).toList(growable: false);
   final number = '\\d[\\d${escapeRe(numeral.group)}]*';
   final group = counters.isEmpty ? number : '$number(?:$gap(?:${counters.join('|')}))?';
 
@@ -3259,7 +3262,7 @@ void main() {
       for (final language in counting) {
         final data = sentenceData[language]!;
         final numeral = data.numeral!;
-        final counters = numeral.counters.values.toSet();
+        final counters = <String>{...numeral.counters.values, ...?numeral.themeCounters?.values};
 
         for (final detail in randSentenceDetails(
           type: statementOnly,
@@ -4432,6 +4435,45 @@ void main() {
       }
 
       expect(written, greaterThan(0), reason: 'no sentence named a planet');
+    });
+
+    test('a theme with a counter of its own is counted with it', () {
+      // A class is too wide for one counter the way it is for one verb: `간장 3개`
+      // counts what nobody counts one by one, and a coffee is a cup.
+      var seen = 0;
+
+      for (final language in wordLanguages) {
+        final counters = sentenceData[language]!.numeral?.themeCounters;
+
+        if (counters == null) continue;
+
+        for (final entry in counters.entries) {
+          for (final detail in randSentenceDetails(
+            language: language,
+            theme: entry.key,
+            slots: <SentenceSlot>{SentenceSlot.quantity},
+            count: 40,
+          )) {
+            final at = detail.slots.indexOf(SentenceSlot.quantity);
+
+            if (at < 0) continue;
+
+            final phrase = detail.phrases[at];
+            final nouns = nounsIn(language, stripCount(language, phrase));
+
+            if (!nouns.any((noun) => themeOfNoun(language, noun) == entry.key)) continue;
+
+            seen += 1;
+            expect(
+              phrase.contains(entry.value),
+              isTrue,
+              reason: "$language: '$phrase' is not counted in ${entry.value}",
+            );
+          }
+        }
+      }
+
+      expect(seen, greaterThan(0), reason: 'no theme with a counter of its own was ever counted');
     });
 
     test('every theme has a modifier to put in front of its nouns', () {

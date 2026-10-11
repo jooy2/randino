@@ -939,6 +939,8 @@ export const JA: SentenceLanguageData = {
 			idea: '種類',
 			body: '本'
 		},
+		// A cup of what is drunk, and the kinds of an ingredient that is not counted one by one.
+		themeCounters: { drink: '杯', ingredient: '種類' },
 		count: [2, 12],
 		currency: '円',
 		amounts: [1000, 5000, 10000, 30000, 50000, 100000, 300000, 500000, 1000000],

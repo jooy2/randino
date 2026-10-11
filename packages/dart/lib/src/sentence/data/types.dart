@@ -861,6 +861,7 @@ class SentenceNumeral {
   const SentenceNumeral({
     required this.order,
     required this.counters,
+    this.themeCounters,
     required this.count,
     required this.currency,
     required this.amounts,
@@ -881,6 +882,15 @@ class SentenceNumeral {
   /// of `sadness` is not a thing anyone writes; that is why they leave it empty
   /// and declare no counted shape.
   final Map<NounClass, String> counters;
+
+  /// The counter a theme takes where its class's is wrong for it.
+  ///
+  /// A class is too wide for one word here the way it is for a verb: an apple is
+  /// `사과 3개` and a soy sauce is not `간장 3개`, a coffee is a cup (`커피 3잔`,
+  /// `コーヒー3杯`), and an ingredient you cannot count one by one is counted by
+  /// its kinds (`간장 3가지`, `醤油3種類`). Null where every theme takes its
+  /// class's.
+  final Map<WordTheme, String>? themeCounters;
 
   /// How many of a counted thing, at the fewest and at the most.
   final LengthRange count;

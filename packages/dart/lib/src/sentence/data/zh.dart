@@ -693,6 +693,7 @@ final SentenceLanguageData zh = SentenceLanguageData(
       NounClass.idea: '种',
       NounClass.body: '个',
     },
+    themeCounters: <WordTheme, String>{WordTheme.drink: '杯', WordTheme.ingredient: '种'},
     count: LengthRange(2, 12),
     currency: '元',
     amounts: <int>[100, 500, 1000, 3000, 5000, 10000, 30000, 50000, 100000],

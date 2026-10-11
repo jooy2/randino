@@ -512,6 +512,16 @@ function emitDart(code: string, data: SentenceLanguageData): string {
 			out.push(`      NounClass.${cls}: ${dq(counter!)},`);
 
 		out.push('    },');
+
+		if (n.themeCounters) {
+			out.push('    themeCounters: <WordTheme, String>{');
+
+			for (const [theme, counter] of Object.entries(n.themeCounters))
+				out.push(`      WordTheme.${theme}: ${dq(counter!)},`);
+
+			out.push('    },');
+		}
+
 		out.push(`    count: LengthRange(${n.count[0]}, ${n.count[1]}),`);
 		out.push(`    currency: ${dq(n.currency)},`);
 		out.push(`    amounts: <int>[${n.amounts.join(', ')}],`);
@@ -918,6 +928,14 @@ function emitPython(code: string, data: SentenceLanguageData): string {
 				.map(([k, v]) => `${pq(k)}: ${pq(v!)}`)
 				.join(', ')}},`
 		);
+
+		if (n.themeCounters)
+			out.push(
+				`        theme_counters={${Object.entries(n.themeCounters)
+					.map(([k, v]) => `${pq(k)}: ${pq(v!)}`)
+					.join(', ')}},`
+			);
+
 		out.push(`        count=(${n.count[0]}, ${n.count[1]}),`);
 		out.push(`        currency=${pq(n.currency)},`);
 		out.push(`        amounts=(${n.amounts.join(', ')}),`);

@@ -419,6 +419,12 @@ void main() {
                   for (final c in entry.value.numeral!.counters.entries)
                     c.key.name: c.value,
                 },
+                'themeCounters': entry.value.numeral!.themeCounters == null
+                    ? null
+                    : <String, Object?>{
+                        for (final c in entry.value.numeral!.themeCounters!.entries)
+                          c.key.name: c.value,
+                      },
                 'count': <int>[
                   entry.value.numeral!.count.min,
                   entry.value.numeral!.count.max,

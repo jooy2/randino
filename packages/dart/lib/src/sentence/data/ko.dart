@@ -4027,6 +4027,7 @@ final SentenceLanguageData ko = SentenceLanguageData(
       NounClass.idea: '가지',
       NounClass.body: '개',
     },
+    themeCounters: <WordTheme, String>{WordTheme.drink: '잔', WordTheme.ingredient: '가지'},
     count: LengthRange(2, 12),
     currency: '원',
     amounts: <int>[1000, 5000, 10000, 30000, 50000, 100000, 300000, 500000, 1000000],

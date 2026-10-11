@@ -987,6 +987,11 @@ final SentenceLanguageData vi = SentenceLanguageData(
       NounClass.idea: 'điều',
       NounClass.body: 'cái',
     },
+    themeCounters: <WordTheme, String>{
+      WordTheme.fruit: 'quả',
+      WordTheme.drink: 'ly',
+      WordTheme.ingredient: 'loại',
+    },
     count: LengthRange(2, 12),
     currency: 'đồng',
     amounts: <int>[10000, 50000, 100000, 200000, 500000, 1000000, 5000000],

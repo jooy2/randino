@@ -795,6 +795,8 @@ export const ZH: SentenceLanguageData = {
 			idea: '种',
 			body: '个'
 		},
+		// A cup of what is drunk, and the kinds of an ingredient that is not counted one by one.
+		themeCounters: { drink: '杯', ingredient: '种' },
 		count: [2, 12],
 		currency: '元',
 		amounts: [100, 500, 1000, 3000, 5000, 10000, 30000, 50000, 100000],

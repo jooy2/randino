@@ -684,6 +684,14 @@ export type SentenceNumeral = {
 	 * that is why they declare `counters` empty and no counted shape.
 	 */
 	counters: Partial<Record<NounClass, string>>;
+	/**
+	 * The counter a theme takes where its class's is wrong for it. A class is too
+	 * wide for one word here the way it is for a verb: an apple is `사과 3개` and a
+	 * soy sauce is not `간장 3개`, a coffee is a cup (`커피 3잔`, `コーヒー3杯`),
+	 * and an ingredient you cannot count one by one is counted by its kinds
+	 * (`간장 3가지`, `醤油3種類`). Left out where every theme takes its class's.
+	 */
+	themeCounters?: Partial<Record<WordTheme, string>>;
 	/** How many of a counted thing, at the fewest and at the most. */
 	count: readonly [number, number];
 	/**
