@@ -1357,6 +1357,26 @@ export type RamUnit = 'MB' | 'GB';
 export type RamUnitOption = RamUnit | 'auto';
 
 /**
+ * The kind of memory a machine is sold with, by the JEDEC standard it is built
+ * to: `DDR` to `DDR5` in desktops and laptops, and the low-power `LPDDR` to
+ * `LPDDR5X` soldered into phones, tablets and thin laptops. `LPDDR` is the first
+ * of them, once called Mobile DDR.
+ */
+export type RamType =
+	| 'DDR'
+	| 'DDR2'
+	| 'DDR3'
+	| 'DDR4'
+	| 'DDR5'
+	| 'LPDDR'
+	| 'LPDDR2'
+	| 'LPDDR3'
+	| 'LPDDR4'
+	| 'LPDDR4X'
+	| 'LPDDR5'
+	| 'LPDDR5X';
+
+/**
  * What `randRam` takes. Memory is a size, so it has no language, no length and
  * no first character to ask for.
  */
@@ -1364,6 +1384,25 @@ export interface RandRamOptions extends Pick<
 	RandCommonOptions,
 	'count' | 'unique' | 'output' | 'random'
 > {
+	/**
+	 * The memory of desktops and laptops, of phones and tablets, or of both. A
+	 * phone's sizes stop at 24 GB, and only a desktop or a laptop is sold with
+	 * `DDR` memory. Default `'all'`.
+	 */
+	platform?: SystemPlatformOption;
+	/**
+	 * The earliest year a machine with the memory may have been sold in: only the
+	 * kinds of memory still sold by then, and the sizes they came in, are drawn.
+	 * Default none.
+	 */
+	minYear?: number;
+	/**
+	 * The latest year a machine with the memory may have been sold in — `2010` is
+	 * what was sold by the end of 2010. A range the wrong way round keeps
+	 * `maxYear`, and a range no kind of memory was sold in returns nothing.
+	 * Default none.
+	 */
+	maxYear?: number;
 	/**
 	 * The unit the sizes are written in. A named unit keeps to the sizes that are a
 	 * whole number of it, so `'GB'` never writes the 512 MB a phone once had as
@@ -1387,17 +1426,28 @@ export interface RandRamOptions extends Pick<
 	 * size is inside returns nothing. Default none.
 	 */
 	maxSize?: number;
+	/**
+	 * Write the kind of memory after the size: `16 GB DDR5` rather than `16 GB`.
+	 * With `includeUnit: false` it is left out, the way the unit is: a kind of
+	 * memory belongs to a size written as one, not to a bare number. The detail
+	 * carries it either way. Default `false`.
+	 */
+	includeType?: boolean;
 }
 
 /** A generated amount of memory, in the unit it was written in and in bytes. */
 export interface RamDetail {
-	/** The size as the value form returns it: `16 GB`. */
+	/** The size as the value form returns it: `16 GB`, or `16 GB DDR5` with `includeType`. */
 	ram: string;
 	/** The number written: `16`. */
 	value: number;
 	unit: RamUnit;
 	/** The same size in bytes, counted in powers of two: `17179869184`. */
 	bytes: number;
+	/** The kind of memory it is, one sold at that size on that platform: `DDR5`. */
+	type: RamType;
+	/** The kind of machine it was drawn for. */
+	platform: SystemPlatform;
 }
 
 /**
@@ -1410,6 +1460,9 @@ export interface RamDetail {
  * - `ufs`: Universal Flash Storage, what a phone or a tablet stores to now.
  */
 export type DiskType = 'hdd' | 'ssd' | 'sshd' | 'emmc' | 'ufs';
+
+/** One kind, several to draw from, or `'all'` of them. */
+export type DiskTypeOption = DiskType | readonly DiskType[] | 'all';
 
 /**
  * What `randDiskType` takes. A kind of storage is one of five labels, so it has
@@ -1458,6 +1511,18 @@ export interface RandDiskSizeOptions extends Pick<
 	'count' | 'unique' | 'output' | 'random'
 > {
 	/**
+	 * Which kinds of storage the sizes are for: `'emmc'`, `['ssd', 'hdd']`. Each
+	 * kind is sold in sizes of its own, so an eMMC chip stops at 128 GB and only a
+	 * hard disk reaches 24 TB. Default `'all'`.
+	 */
+	type?: DiskTypeOption;
+	/**
+	 * The storage of desktops and laptops, of phones and tablets, or of both. A
+	 * kind the platform does not use is answered with nothing: `type: 'hdd'` on
+	 * `'mobile'`. Default `'all'`.
+	 */
+	platform?: SystemPlatformOption;
+	/**
 	 * The unit the sizes are written in. A named unit keeps to the sizes that are a
 	 * whole number of it, so `'TB'` never writes a 500 GB drive as `0.5 TB`.
 	 * Default `'auto'`.
@@ -1491,6 +1556,10 @@ export interface DiskSizeDetail {
 	unit: DiskUnit;
 	/** The same size in bytes, counted in powers of ten: `1000000000000`. */
 	bytes: number;
+	/** The kind of storage it is a size of: `ssd`. */
+	type: DiskType;
+	/** The kind of machine it was drawn for. */
+	platform: SystemPlatform;
 }
 
 /** Who makes a processor, by the name it is sold under. */

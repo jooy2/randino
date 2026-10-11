@@ -48,6 +48,7 @@ describe('base test', () => {
 			'OS_FAMILY_CODES',
 			'PHONE_COUNTRIES',
 			'PHONE_TYPES',
+			'RAM_TYPES',
 			'RAM_UNITS',
 			'RAND_AGE_MAX',
 			'RAND_COUNT_MAX',
@@ -237,6 +238,7 @@ describe('base test', () => {
 		assert.deepStrictEqual(randino.DEVICE_TYPES, ['phone', 'tablet', 'laptop']);
 		assert.match(randino.randRam()[0], /^\d+ (MB|GB)$/);
 		assert.deepStrictEqual(randino.RAM_UNITS, ['MB', 'GB']);
+		assert.ok(randino.RAM_TYPES.includes(randino.randRam({ output: 'detail' })[0].type));
 		assert.strictEqual(typeof randino.randDiskType()[0], 'string');
 		assert.deepStrictEqual(randino.DISK_TYPES, ['hdd', 'ssd', 'sshd', 'emmc', 'ufs']);
 		assert.match(randino.randDiskSize()[0], /^\d+ (GB|TB)$/);
@@ -311,8 +313,14 @@ describe('base test', () => {
 			() => randino.randDevice({ vendor: [null] as never }),
 			() => randino.randRam({ unit: 'KB' as never, minSize: NaN, maxSize: 'x' as never }),
 			() => randino.randRam({ includeUnit: 'no' as never, count: NaN }),
+			() => randino.randRam({ platform: 'tv' as never, minYear: NaN, maxYear: 'x' as never }),
+			() => randino.randRam({ includeType: 'yes' as never }),
 			() => randino.randDiskType({ platform: 'server' as never, count: 'x' as never }),
 			() => randino.randDiskSize({ unit: 'PB' as never, minSize: NaN, includeUnit: 0 as never }),
+			() => randino.randDiskSize({ type: 'tape' as never, platform: 'server' as never }),
+			() => randino.randDiskSize({ type: [null] as never }),
+			() => randino.randArchitecture({ platform: 'tv' as never, naming: 'apple' as never }),
+			() => randino.randArchitecture({ includeRare: 'yes' as never }),
 			() =>
 				randino.randCpu({
 					platform: 'server' as never,

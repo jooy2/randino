@@ -4,26 +4,33 @@ import { generateDiskSizeDetails } from './diskSizeGenerator.js';
 /**
  * Generate capacities a drive is really sold with.
  *
- * 256 GB, 512 GB and 1 TB are the most common, the small flash of an old phone
- * and the largest hard disks the rarest. Each size is written in the largest
- * unit it is a whole number of, or in the `unit` named, and never with a decimal
- * point; a terabyte is 1000 gigabytes, the way a drive is sold. `minSize` and
- * `maxSize` bound the sizes, in `unit` or in gigabytes for `'auto'`.
+ * Sizes from 128 GB to 1 TB are the most common, the small flash of an old phone
+ * and the largest hard disks the rarest. Each size is one its kind of storage is
+ * sold in, so an eMMC chip is never 8 TB: `type` keeps to the kinds named and
+ * `platform` to the kinds a desktop or a phone uses. Each size is written in the
+ * largest unit it is a whole number of, or in the `unit` named, and never with a
+ * decimal point; a terabyte is 1000 gigabytes, the way a drive is sold.
+ * `minSize` and `maxSize` bound the sizes, in `unit` or in gigabytes for
+ * `'auto'`.
  *
  * @example
  * randDiskSize(); // ['512 GB']
  * randDiskSize({ count: 3 }); // ['1 TB', '256 GB', '2 TB']
  * randDiskSize({ unit: 'GB' }); // ['1000 GB']
  * randDiskSize({ minSize: 2000, unit: 'auto' }); // ['4 TB']
+ * randDiskSize({ type: 'emmc', count: 2 }); // ['64 GB', '32 GB']
  */
 export function randDiskSize(options?: RandDiskSizeOptions & { output?: 'value' }): string[];
 /**
- * Generate capacities along with the number, the unit and the bytes.
+ * Generate capacities along with the number, the unit, the bytes and the kind of
+ * storage.
  *
  * `output: 'detail'` returns a `DiskSizeDetail` per size instead of a string.
  *
  * @example
- * randDiskSize({ output: 'detail' }); // [{ size: '1 TB', value: 1, unit: 'TB', bytes: 1000000000000 }]
+ * randDiskSize({ output: 'detail' });
+ * // [{ size: '1 TB', value: 1, unit: 'TB', bytes: 1000000000000, type: 'ssd',
+ * //    platform: 'desktop' }]
  */
 export function randDiskSize(options: RandDiskSizeOptions & { output: 'detail' }): DiskSizeDetail[];
 export function randDiskSize(options: RandDiskSizeOptions = {}): string[] | DiskSizeDetail[] {

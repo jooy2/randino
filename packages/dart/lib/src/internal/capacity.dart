@@ -1,5 +1,5 @@
-// Sizes of memory and storage: a pool of real capacities, the units they are
-// written in, and the candidates `randRam` and `randDiskSize` both draw from.
+// Sizes of memory and storage: the units real capacities are written in, and
+// the candidates `randRam` and `randDiskSize` both draw from a pool of them.
 //
 // A size is always one a machine is really sold with, and it is only ever
 // written in a unit it is a whole number of: 512 MB of memory is never
@@ -9,7 +9,14 @@
 
 import 'dart:math';
 
-/// How one kind of size is measured: its units, and the pool it draws from.
+/// Sizes and how often each one comes up, in a scale's base unit, smallest
+/// first.
+///
+/// One kind of size has several: memory a pool per platform, storage a pool
+/// per kind of drive.
+typedef CapacityPool = List<(int, num)>;
+
+/// How one kind of size is measured: its units, and how many bytes they are.
 class CapacityScale<U extends Enum> {
   /// Creates a scale.
   const CapacityScale({
@@ -18,7 +25,6 @@ class CapacityScale<U extends Enum> {
     required this.base,
     required this.reference,
     required this.bytes,
-    required this.pool,
   });
 
   /// The units, smallest first, each [step] times the one before it.
@@ -27,7 +33,7 @@ class CapacityScale<U extends Enum> {
   /// How many of one unit make the next: `1024` for memory, `1000` for storage.
   final int step;
 
-  /// The unit [pool] is written in.
+  /// The unit a pool is written in.
   final U base;
 
   /// The unit `minSize` and `maxSize` are read in when the unit is left to fit.
@@ -35,9 +41,6 @@ class CapacityScale<U extends Enum> {
 
   /// How many bytes one [base] unit is.
   final int bytes;
-
-  /// Every size there is, in [base], with how often it comes up.
-  final List<(int, num)> pool;
 }
 
 /// A size a call may land on, with the unit it is written in.
@@ -80,7 +83,7 @@ U fitUnit<U extends Enum>(CapacityScale<U> scale, int size) {
   return scale.units[0];
 }
 
-/// The sizes one call may land on, each in the unit it is written in.
+/// The sizes of [pool] one call may land on, each in the unit it is written in.
 ///
 /// A named [unit] keeps to the sizes that are whole in it, and a null one fits
 /// each size. [minSize] and [maxSize] are read in [unit], or in the scale's
@@ -89,6 +92,7 @@ U fitUnit<U extends Enum>(CapacityScale<U> scale, int size) {
 /// answered with nothing.
 List<CapacityCandidate<U>> capacityCandidates<U extends Enum>(
   CapacityScale<U> scale,
+  CapacityPool pool,
   U? unit,
   num? minSize,
   num? maxSize,
@@ -103,7 +107,7 @@ List<CapacityCandidate<U>> capacityCandidates<U extends Enum>(
   final low = asked != null && high != null && asked > high ? high : asked;
   final candidates = <CapacityCandidate<U>>[];
 
-  for (final (size, weight) in scale.pool) {
+  for (final (size, weight) in pool) {
     final written = unit ?? fitUnit(scale, size);
     final value = inUnit(scale, size, written);
     final measured = inUnit(scale, size, bound);

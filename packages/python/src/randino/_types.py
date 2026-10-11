@@ -851,13 +851,34 @@ operating system reports it.
 RamUnitOption = Literal[RamUnit, "auto"]
 """"auto" writes each size in the largest unit it is a whole number of: `16 GB`, but `512 MB`."""
 
+RamType = Literal[
+    "DDR",
+    "DDR2",
+    "DDR3",
+    "DDR4",
+    "DDR5",
+    "LPDDR",
+    "LPDDR2",
+    "LPDDR3",
+    "LPDDR4",
+    "LPDDR4X",
+    "LPDDR5",
+    "LPDDR5X",
+]
+"""The kind of memory a machine is sold with, by the JEDEC standard it is built to.
+
+`DDR` to `DDR5` in desktops and laptops, and the low-power `LPDDR` to `LPDDR5X` soldered
+into phones, tablets and thin laptops. `LPDDR` is the first of them, once called Mobile
+DDR.
+"""
+
 
 @dataclass(frozen=True, slots=True)
 class RamDetail:
     """A generated amount of memory, in the unit it was written in and in bytes."""
 
     ram: str
-    """The size as the value form returns it: `16 GB`."""
+    """The size as the value form returns it: `16 GB`, or `16 GB DDR5` with `include_type`."""
 
     value: int
     """The number written: `16`."""
@@ -867,6 +888,12 @@ class RamDetail:
 
     bytes: int
     """The same size in bytes, counted in powers of two: `17179869184`."""
+
+    type: RamType
+    """The kind of memory it is, one sold at that size on that platform: `DDR5`."""
+
+    platform: SystemPlatform
+    """The kind of machine it was drawn for."""
 
 
 DiskType = Literal["hdd", "ssd", "sshd", "emmc", "ufs"]
@@ -879,6 +906,9 @@ DiskType = Literal["hdd", "ssd", "sshd", "emmc", "ufs"]
   tablets and laptops.
 - `ufs`: Universal Flash Storage, what a phone or a tablet stores to now.
 """
+
+DiskTypeOption = DiskType | Sequence[DiskType] | Literal["all"]
+"""One kind, a sequence of them to draw from, or `"all"` of them."""
 
 
 @dataclass(frozen=True, slots=True)
@@ -924,6 +954,12 @@ class DiskSizeDetail:
 
     bytes: int
     """The same size in bytes, counted in powers of ten: `1000000000000`."""
+
+    type: DiskType
+    """The kind of storage it is a size of: `ssd`."""
+
+    platform: SystemPlatform
+    """The kind of machine it was drawn for."""
 
 
 CpuVendor = Literal[

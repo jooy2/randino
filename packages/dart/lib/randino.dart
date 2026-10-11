@@ -106,7 +106,7 @@ export 'src/os/rand_os_details.dart' show randOsDetails;
 export 'src/phone/data/index.dart' show phoneCountries, phoneTypes;
 export 'src/phone/rand_phone.dart' show randPhone;
 export 'src/phone/rand_phone_details.dart' show randPhoneDetails;
-export 'src/ram/data/index.dart' show ramUnits;
+export 'src/ram/data/index.dart' show ramTypes, ramUnits;
 export 'src/ram/rand_ram.dart' show randRam;
 export 'src/ram/rand_ram_details.dart' show randRamDetails;
 export 'src/resolution/rand_resolution.dart' show randResolution;

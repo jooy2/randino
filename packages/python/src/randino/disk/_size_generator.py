@@ -1,18 +1,67 @@
-"""The disk size generator: a capacity a drive is really sold with, in a whole unit."""
+"""The disk size generator: a capacity a drive is really sold with, in a whole unit.
+
+Each size is one its kind of storage is sold in, for a platform that uses that kind.
+"""
 
 from collections.abc import Callable
 
-from randino._internal.capacity import capacity_candidates, write_capacity
-from randino._internal.generate import collect, resolve_option
-from randino._internal.utils import pick_weighted, with_random
-from randino._types import DiskSizeDetail, DiskUnitOption
-from randino.disk.data import DISK_SCALE, DISK_UNITS
+from randino._internal.capacity import CapacityCandidate, capacity_candidates, write_capacity
+from randino._internal.generate import collect, resolve_many, resolve_option, resolve_platforms
+from randino._internal.utils import pick, pick_weighted, with_random
+from randino._types import (
+    DiskSizeDetail,
+    DiskType,
+    DiskTypeOption,
+    DiskUnit,
+    DiskUnitOption,
+    SystemPlatform,
+    SystemPlatformOption,
+)
+from randino.disk.data import DISK_SCALE, DISK_SIZES, DISK_TYPE_WEIGHTS, DISK_TYPES, DISK_UNITS
 
 _DISK_UNIT_OPTIONS: tuple[DiskUnitOption, ...] = (*DISK_UNITS, "auto")
+
+_Kinds = list[tuple[DiskType, list[CapacityCandidate[DiskUnit]]]]
+"""The kinds of storage a platform may land on, each with the sizes of it a call may write."""
+
+
+def _candidates(
+    platforms: tuple[SystemPlatform, ...],
+    named: tuple[DiskType, ...],
+    unit: str,
+    min_size: object,
+    max_size: object,
+) -> list[tuple[SystemPlatform, _Kinds]]:
+    """The kinds of storage each platform may land on, each with its sizes.
+
+    Worked out once per call: a kind with no size left in the unit and the range asked for
+    is left out, and so is a platform with no kind left, so `"all"` never draws a platform
+    it then has nothing to write for.
+    """
+    candidates: list[tuple[SystemPlatform, _Kinds]] = []
+
+    for platform in platforms:
+        kinds: _Kinds = []
+
+        for kind in named:
+            if kind not in DISK_TYPE_WEIGHTS[platform]:
+                continue
+
+            sizes = capacity_candidates(DISK_SCALE, DISK_SIZES[kind], unit, min_size, max_size)
+
+            if sizes:
+                kinds.append((kind, sizes))
+
+        if kinds:
+            candidates.append((platform, kinds))
+
+    return candidates
 
 
 def generate_disk_size_details(
     *,
+    type: DiskTypeOption = "all",
+    platform: SystemPlatformOption = "all",
     unit: DiskUnitOption = "auto",
     include_unit: bool = True,
     min_size: float | None = None,
@@ -28,18 +77,28 @@ def generate_disk_size_details(
     # Without the unit there is nothing to tell `2` terabytes from `512` gigabytes, so a
     # size written bare is in one unit throughout.
     written = DISK_SCALE.reference if asked == "auto" and not with_unit else asked
-    # Worked out once per call: a couple of dozen sizes, each with its unit already
-    # decided.
-    candidates = capacity_candidates(DISK_SCALE, written, min_size, max_size)
+    candidates = _candidates(
+        resolve_platforms(platform),
+        resolve_many(type, DISK_TYPES, DISK_TYPES),
+        written,
+        min_size,
+        max_size,
+    )
 
     def draw() -> DiskSizeDetail:
-        candidate = pick_weighted(candidates, lambda each: each.weight)
+        # The platform first, so `"all"` is half desktops and half phones, then the kind of
+        # storage by how common it is there, then a size it is sold in.
+        drawn, kinds = pick(candidates)
+        kind, sizes = pick_weighted(kinds, lambda each: DISK_TYPE_WEIGHTS[drawn][each[0]])
+        candidate = pick_weighted(sizes, lambda each: each.weight)
 
         return DiskSizeDetail(
             size=write_capacity(candidate.value, candidate.unit, with_unit),
             value=candidate.value,
             unit=candidate.unit,
             bytes=candidate.size * DISK_SCALE.bytes,
+            type=kind,
+            platform=drawn,
         )
 
     with with_random(random):

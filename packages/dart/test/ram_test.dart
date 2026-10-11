@@ -9,7 +9,22 @@ import 'package:test/test.dart';
 const int sample = 60;
 const int large = 4000;
 const int megabyte = 1024 * 1024;
-final List<int> sizes = [for (final (size, _) in ramScale.pool) size];
+const int gigabyte = 1024;
+
+// Every size either platform is sold with.
+final Set<int> sizes = {
+  for (final platform in systemPlatforms)
+    for (final (size, _) in ramSizes[platform]!) size,
+};
+
+/// The entry [detail] says its memory is.
+RamTypeEntry? entryOf(RamDetail detail) {
+  for (final entry in ramTypeEntries) {
+    if (entry.type == detail.type && entry.platform == detail.platform) return entry;
+  }
+
+  return null;
+}
 
 void main() {
   group('Ram', () {
@@ -26,18 +41,99 @@ void main() {
       expect(randRam(count: randCountMax + 5), hasLength(randCountMax));
     });
 
-    test('the pool is every size once, smallest first, each a whole number of megabytes', () {
-      for (var i = 0; i < ramScale.pool.length; i += 1) {
-        final (size, weight) = ramScale.pool[i];
+    test('each pool is every size once, smallest first, each a whole number of megabytes', () {
+      for (final platform in systemPlatforms) {
+        final pool = ramSizes[platform]!;
 
-        expect(size, greaterThan(0));
-        expect(weight, greaterThan(0));
+        for (var i = 0; i < pool.length; i += 1) {
+          final (size, weight) = pool[i];
 
-        if (i > 0) {
-          expect(size, greaterThan(ramScale.pool[i - 1].$1), reason: '$size is out of order');
+          expect(size, greaterThan(0), reason: '${platform.name} $size');
+          expect(weight, greaterThan(0), reason: '${platform.name} $size');
+
+          if (i > 0) {
+            expect(
+              size,
+              greaterThan(pool[i - 1].$1),
+              reason: '${platform.name} $size is out of order',
+            );
+          }
         }
       }
+
+      // A phone's memory stops at 24 GB.
+      expect(ramSizes[SystemPlatform.mobile]!.last.$1, 24 * gigabyte);
     });
+
+    test(
+      'every kind of memory is described once per platform, at sizes its platform is sold with',
+      () {
+        final seen = <String>{};
+
+        for (final entry in ramTypeEntries) {
+          final key = '${entry.type} ${entry.platform.name}';
+          final pool = [for (final (size, _) in ramSizes[entry.platform]!) size];
+
+          expect(seen.add(key), isTrue, reason: '$key is listed twice');
+          expect(ramTypes, contains(entry.type), reason: key);
+          expect(entry.from, inInclusiveRange(2000, 2026), reason: key);
+          expect(
+            entry.to == null || (entry.to! >= entry.from && entry.to! <= 2026),
+            isTrue,
+            reason: key,
+          );
+          expect(entry.weight, greaterThan(0), reason: key);
+          expect(entry.sizes, isNotEmpty, reason: key);
+
+          for (var i = 0; i < entry.sizes.length; i += 1) {
+            final (:size, :from) = entry.sizes[i];
+
+            expect(pool, contains(size), reason: '$key at $size MB');
+            // A size comes no earlier than its kind, and inside the years it was sold.
+            expect(
+              from >= entry.from && from <= (entry.to ?? 2026),
+              isTrue,
+              reason: '$key at $size MB',
+            );
+
+            if (i > 0) {
+              expect(size, greaterThan(entry.sizes[i - 1].size), reason: '$key is out of order');
+            }
+          }
+        }
+
+        for (final type in ramTypes) {
+          expect(ramTypeEntries.any((entry) => entry.type == type), isTrue, reason: type);
+        }
+
+        for (final platform in systemPlatforms) {
+          final entries = ramTypeEntries.where((entry) => entry.platform == platform);
+
+          expect(
+            entries.fold<num>(0, (sum, entry) => sum + entry.weight),
+            100,
+            reason: platform.name,
+          );
+
+          // Every size a platform is sold with is one some kind of memory came in.
+          for (final (size, _) in ramSizes[platform]!) {
+            expect(
+              entries.any((entry) => entry.sizes.any((each) => each.size == size)),
+              isTrue,
+              reason: '${platform.name} $size MB',
+            );
+          }
+        }
+
+        // Only a desktop or a laptop is sold with DDR memory.
+        expect(
+          ramTypeEntries
+              .where((entry) => entry.platform == SystemPlatform.mobile)
+              .every((entry) => entry.type.startsWith('LPDDR')),
+          isTrue,
+        );
+      },
+    );
 
     test('a size is written in the largest unit it is a whole number of', () {
       expect(fitUnit(ramScale, 512), RamUnit.mb);
@@ -55,7 +151,11 @@ void main() {
         for (final detail in randRamDetails(unit: unit, count: sample * 5)) {
           final size = detail.bytes ~/ megabyte;
 
-          expect(sizes, contains(size));
+          expect(
+            ramSizes[detail.platform]!.any((each) => each.$1 == size),
+            isTrue,
+            reason: detail.ram,
+          );
           expect(detail.ram, '${detail.value} ${detail.unit.label}');
           expect(detail.value, inUnit(ramScale, size, detail.unit));
         }
@@ -135,6 +235,125 @@ void main() {
       expect(randRam(count: sample, random: Random(7)), <String>[
         for (final detail in randRamDetails(count: sample, random: Random(7))) detail.ram,
       ]);
+    });
+
+    test('the kind of memory is one sold at that size, on that platform', () {
+      for (final detail in randRamDetails(count: large)) {
+        final entry = entryOf(detail);
+
+        expect(entry, isNotNull, reason: '${detail.ram} ${detail.type} ${detail.platform.name}');
+        expect(
+          entry!.sizes.any((each) => each.size == detail.bytes ~/ megabyte),
+          isTrue,
+          reason: '${detail.ram} ${detail.type}',
+        );
+      }
+    });
+
+    test('platform keeps to the memory of one kind of machine', () {
+      final mobile = randRamDetails(platform: SystemPlatform.mobile, count: large);
+
+      expect(mobile.every((detail) => detail.platform == SystemPlatform.mobile), isTrue);
+      expect(mobile.every((detail) => detail.type.startsWith('LPDDR')), isTrue);
+      expect(mobile.every((detail) => detail.bytes <= 24 * gigabyte * megabyte), isTrue);
+
+      final desktop = randRamDetails(platform: SystemPlatform.desktop, count: sample * 3);
+
+      expect(desktop.every((detail) => detail.platform == SystemPlatform.desktop), isTrue);
+      expect({
+        for (final detail in randRamDetails(count: sample * 3)) detail.platform,
+      }, hasLength(systemPlatforms.length));
+    });
+
+    test('a year range keeps to the kinds of memory sold in it', () {
+      final old = randRamDetails(
+        platform: SystemPlatform.desktop,
+        maxYear: 2005,
+        count: sample * 5,
+      );
+
+      expect({for (final detail in old) detail.type}, {'DDR', 'DDR2'});
+      expect(old.every((detail) => detail.bytes <= 8 * gigabyte * megabyte), isTrue);
+
+      for (final detail in randRamDetails(minYear: 2024, count: large)) {
+        final entry = entryOf(detail)!;
+
+        expect(
+          entry.to == null || entry.to! >= 2024,
+          isTrue,
+          reason: '${detail.type} ${detail.platform.name}',
+        );
+      }
+
+      // No phone was sold with 512 MB before 2010, and nothing at all before 2000.
+      expect(randRam(platform: SystemPlatform.mobile, maxYear: 2009, count: 5), isEmpty);
+      expect(randRam(maxYear: 1990, count: 5), isEmpty);
+      // A range the wrong way round keeps maxYear.
+      expect(
+        randRamDetails(
+          minYear: 2024,
+          maxYear: 2003,
+          platform: SystemPlatform.desktop,
+          count: sample,
+        ).every((detail) => detail.type == 'DDR'),
+        isTrue,
+      );
+    });
+
+    test('a year range keeps to the sizes out by then, not only to the kinds', () {
+      for (final maxYear in [2005, 2010, 2015, 2020, 2022]) {
+        for (final detail in randRamDetails(maxYear: maxYear, count: large ~/ 4)) {
+          final size = entryOf(
+            detail,
+          )!.sizes.firstWhere((each) => each.size == detail.bytes ~/ megabyte);
+
+          expect(size.from, lessThanOrEqualTo(maxYear), reason: '${detail.ram} by $maxYear');
+        }
+      }
+
+      // The largest a desktop of 2010 came with was 32 GB of DDR3: the half a
+      // terabyte of a workstation came three years later.
+      expect(
+        randRamDetails(
+          platform: SystemPlatform.desktop,
+          maxYear: 2010,
+          count: large,
+        ).every((detail) => detail.bytes <= 32 * gigabyte * megabyte),
+        isTrue,
+      );
+    });
+
+    test('includeType writes the kind of memory after the size', () {
+      for (final detail in randRamDetails(includeType: true, count: sample * 3)) {
+        expect(detail.ram, '${detail.value} ${detail.unit.label} ${detail.type}');
+      }
+
+      // A bare number goes without the kind, the way it goes without the unit,
+      // and the detail still carries it.
+      for (final detail in randRamDetails(includeType: true, includeUnit: false, count: sample)) {
+        expect(detail.ram, matches(RegExp(r'^\d+$')));
+        expect(detail.type, isNotEmpty);
+      }
+
+      for (final detail in randRamDetails(count: sample)) {
+        expect(detail.ram, '${detail.value} ${detail.unit.label}');
+      }
+    });
+
+    test('DDR4 and DDR5 lead the desktops, and LPDDR4X and later the phones', () {
+      double share(List<RamDetail> details, bool Function(RamDetail detail) keep) =>
+          details.where(keep).length / details.length;
+      final desktop = randRamDetails(platform: SystemPlatform.desktop, count: large);
+      final mobile = randRamDetails(platform: SystemPlatform.mobile, count: large);
+
+      expect(
+        share(desktop, (each) => each.type == 'DDR4' || each.type == 'DDR5'),
+        greaterThan(0.5),
+      );
+      expect(
+        share(mobile, (each) => <String>['LPDDR4X', 'LPDDR5', 'LPDDR5X'].contains(each.type)),
+        greaterThan(0.6),
+      );
     });
 
     test('unique never repeats a size, and stops when the sizes run out', () {

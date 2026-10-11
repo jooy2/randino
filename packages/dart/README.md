@@ -469,27 +469,33 @@ A draw picks the platform first, so a null one is half desktops and half phones.
 
 ### Memory
 
-Amounts of memory a machine is really sold with, from 512 MB to a terabyte, drawn by how common each one is: 8 and 16 GB are most of a sample. A size is only written in a unit it is a whole number of, so nothing carries a decimal point; a gigabyte is 1024 megabytes, the way an operating system counts.
+Amounts of memory a machine is really sold with, from 512 MB to a terabyte, drawn by how common each one is: 8 and 16 GB are most of a sample. A size is only written in a unit it is a whole number of, so nothing carries a decimal point; a gigabyte is 1024 megabytes, the way an operating system counts. Each size comes with the kind of memory it was sold as: `DDR` to `DDR5` in a desktop or a laptop, `LPDDR` to `LPDDR5X` in a phone or a tablet and in the laptops built on a phone's memory.
 
 ```dart
 randRam(count: 3); // [8 GB, 16 GB, 4 GB]
 randRam(unit: RamUnit.mb); // [8192 MB]
 randRam(minSize: 16, maxSize: 64); // [32 GB]
 randRam(includeUnit: false); // [16]
+randRam(platform: SystemPlatform.mobile, includeType: true); // [12 GB LPDDR5X]
+randRam(platform: SystemPlatform.desktop, maxYear: 2010, includeType: true); // [4 GB DDR3]
 
-randRamDetails().first; // RamDetail(16 GB, 17179869184)
+randRamDetails().first; // RamDetail(16 GB, 17179869184, DDR5, desktop)
 ```
 
-| Parameter     | Type       | Default       |
-| ------------- | ---------- | ------------- |
-| `unit`        | `RamUnit?` | `null` — fits |
-| `includeUnit` | `bool`     | `true`        |
-| `minSize`     | `int?`     | `null` — none |
-| `maxSize`     | `int?`     | `null` — none |
-| `count`       | `int`      | `1`           |
-| `unique`      | `bool`     | `false`       |
+| Parameter     | Type              | Default       |
+| ------------- | ----------------- | ------------- |
+| `platform`    | `SystemPlatform?` | `null` — both |
+| `minYear`     | `int?`            | `null` — none |
+| `maxYear`     | `int?`            | `null` — none |
+| `unit`        | `RamUnit?`        | `null` — fits |
+| `includeUnit` | `bool`            | `true`        |
+| `minSize`     | `num?`            | `null` — none |
+| `maxSize`     | `num?`            | `null` — none |
+| `includeType` | `bool`            | `false`       |
+| `count`       | `int`             | `1`           |
+| `unique`      | `bool`            | `false`       |
 
-A null `unit` writes each size in the largest unit it is whole in; `RamUnit.gb` or `RamUnit.mb` keeps to the sizes whole in that unit. `minSize` and `maxSize` are in `unit`, or in gigabytes for a null one, and a range no real size is inside returns nothing.
+A draw picks the platform first, so a null one is half desktops and half phones, then a size, then a kind of memory sold at that size. A phone's memory stops at 24 GB. A null `unit` writes each size in the largest unit it is whole in; `RamUnit.gb` or `RamUnit.mb` keeps to the sizes whole in that unit. `minSize` and `maxSize` are in `unit`, or in gigabytes for a null one, and a range no real size is inside returns nothing. `minYear` and `maxYear` keep to the kinds of memory sold in those years and the sizes they came in, so `maxYear: 2005` keeps to DDR and DDR2, and a range no kind was sold in returns nothing. `includeType` writes the kind after the size, `16 GB DDR5`, and leaves it out of a bare number with `includeUnit: false`; the detail's `type` carries it either way, and `ramTypes` lists every kind.
 
 ### Storage
 
@@ -508,17 +514,29 @@ randDiskTypeDetails().first; // DiskTypeDetail(SSD, desktop)
 | `count`    | `int`             | `1`           |
 | `unique`   | `bool`            | `false`       |
 
-`randDiskSize` writes how much it holds, the way `randRam` writes memory: a size a drive is sold with, drawn by how common it is, in a unit it is whole in. A terabyte is 1000 gigabytes, the way the box counts.
+`randDiskSize` writes how much it holds, the way `randRam` writes memory: a size a drive is sold with, drawn by how common it is, in a unit it is whole in. A terabyte is 1000 gigabytes, the way the box counts. Each size is one its kind of storage is sold in, so an eMMC chip is never 8 TB and a hard disk never 128 GB.
 
 ```dart
 randDiskSize(count: 3); // [1 TB, 256 GB, 2 TB]
 randDiskSize(unit: DiskUnit.gb); // [1000 GB]
 randDiskSize(unit: DiskUnit.tb, minSize: 8); // [12 TB]
+randDiskSize(type: {DiskType.emmc}, count: 2); // [64 GB, 32 GB]
 
-randDiskSizeDetails().first; // DiskSizeDetail(1 TB, 1000000000000)
+randDiskSizeDetails().first; // DiskSizeDetail(1 TB, 1000000000000, ssd, desktop)
 ```
 
-It takes `randRam`'s parameters, with `unit` a `DiskUnit?`.
+| Parameter     | Type              | Default             |
+| ------------- | ----------------- | ------------------- |
+| `type`        | `Set<DiskType>?`  | `null` — every kind |
+| `platform`    | `SystemPlatform?` | `null` — both       |
+| `unit`        | `DiskUnit?`       | `null` — fits       |
+| `includeUnit` | `bool`            | `true`              |
+| `minSize`     | `num?`            | `null` — none       |
+| `maxSize`     | `num?`            | `null` — none       |
+| `count`       | `int`             | `1`                 |
+| `unique`      | `bool`            | `false`             |
+
+A draw picks the platform first, then the kind of storage by how common it is there, then one of its sizes. A kind the platform does not use is answered with nothing: `randDiskSize(type: {DiskType.hdd}, platform: SystemPlatform.mobile)` is `[]`. `unit`, `minSize` and `maxSize` work the way they do for `randRam`, with the sizes read in gigabytes for a null `unit`.
 
 ### Resolutions
 

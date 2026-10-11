@@ -126,6 +126,7 @@ void main() {
           'osFamilyCodes',
           'phoneCountries',
           'phoneTypes',
+          'ramTypes',
           'ramUnits',
           'wordLanguages',
           'nicknameLengthRange',
@@ -344,6 +345,7 @@ void main() {
       expect(randRam().single, matches(RegExp(r'^\d+ (MB|GB)$')));
       expect(randRamDetails()[0], isA<RamDetail>());
       expect(ramUnits, RamUnit.values);
+      expect(ramTypes, contains(randRamDetails()[0].type));
       expect(randDiskType(), hasLength(1));
       expect(randDiskTypeDetails()[0], isA<DiskTypeDetail>());
       expect(diskTypes, DiskType.values);

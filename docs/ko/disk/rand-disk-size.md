@@ -1,6 +1,6 @@
 # randDiskSize
 
-저장 장치 용량을 `count`개만큼 돌려줍니다. `512 GB`, `1 TB`, `4 TB`처럼 제품 상자나 사양표가 쓰는 방식 그대로 씁니다. 용량은 모두 드라이브나 휴대폰 저장 공간으로 실제로 팔리는 크기이며, [흔한 정도](#sizes)에 따라 뽑으므로 결과는 대부분 256 GB, 512 GB, 1 TB입니다. 용량은 정수로 떨어지는 [단위](#units)로만 쓰므로 결과에 소수점이 붙지 않습니다.
+저장 장치 용량을 `count`개만큼 돌려줍니다. `512 GB`, `1 TB`, `4 TB`처럼 제품 상자나 사양표가 쓰는 방식 그대로 씁니다. 용량은 모두 그 [저장 장치 종류](#sizes)로 실제로 팔리는 크기라서 8 TB짜리 eMMC 같은 결과는 나오지 않으며, 흔한 정도에 따라 뽑으므로 결과는 대부분 128 GB에서 1 TB 사이입니다. 용량은 정수로 떨어지는 [단위](#units)로만 쓰므로 결과에 소수점이 붙지 않습니다.
 
 용량에는 언어가 없으므로 `randDiskSize`는 언어를 받지 않습니다.
 
@@ -43,6 +43,8 @@ rand_disk_size()
 
 | 옵션 | 타입 | 기본값 | 설명 |
 | --- | --- | --- | --- |
+| `type` | <Lang js="DiskTypeOption" dart="Set&lt;DiskType&gt;?" py="DiskTypeOption" code /> | <Lang js="'all'" dart="null" py="&quot;all&quot;" code /> | 용량을 뽑을 저장 장치 종류: `hdd`, `ssd`, `sshd`, `emmc`, `ufs` 가운데 하나나 여럿. [종류별 용량](#sizes)을 보세요. |
+| `platform` | <Lang js="SystemPlatformOption" dart="SystemPlatform?" py="SystemPlatformOption" code /> | <Lang js="'all'" dart="null" py="&quot;all&quot;" code /> | `desktop`은 데스크톱과 노트북, `mobile`은 휴대폰과 태블릿입니다. <Lang js="'all'" dart="null" py="&quot;all&quot;" code />이면 둘 다에서 뽑습니다. [종류별 용량](#sizes)을 보세요. |
 | `unit` | <Lang js="DiskUnitOption" dart="DiskUnit?" py="DiskUnitOption" code /> | <Lang js="'auto'" dart="null" py="&quot;auto&quot;" code /> | `MB`, `GB`, `TB`, 또는 용량마다 정수로 떨어지는 가장 큰 단위를 고르는 <Lang js="'auto'" dart="null" py="&quot;auto&quot;" code />. [단위](#units)를 보세요. |
 | <Lang js="includeUnit" dart="includeUnit" py="include_unit" code /> | <Lang js="boolean" dart="bool" py="bool" code /> | <Lang js="true" dart="true" py="True" code /> | 숫자 뒤에 단위를 씁니다. |
 | <Lang js="minSize" dart="minSize" py="min_size" code /> | <Lang js="number" dart="num?" py="float &#124; None" code /> | <Lang js="—" dart="null" py="None" code /> | 돌려줄 가장 작은 용량. [범위](#bounds)를 보세요. |
@@ -52,24 +54,52 @@ rand_disk_size()
 | `output` | <Lang js="RandOutput" py="RandOutput" code /> | <Lang js="'value'" py="&quot;value&quot;" code /> | 문자열, 또는 용량마다 `DiskSizeDetail` 하나. Dart에는 이 매개변수가 없습니다. [상세 출력](#the-detail-output)을 보세요. |
 | `random` | <Lang js="() => number" dart="Random?" py="Callable[[], float] &#124; None" code /> | <Lang js="—" dart="null" py="None" code /> | 무작위성을 어디서 가져올지. [난수원 고르기](../guide/getting-started#choosing-the-source)를 보세요. 기본값은 각 언어의 일반 난수 생성기입니다. |
 
-## 용량별 비중 {#sizes}
+## 종류별 용량 {#sizes}
 
-초기 휴대폰의 16 GB부터 24 TB 하드 디스크까지, 드라이브와 휴대폰 저장 공간에 흔히 쓰이는 용량을 모두 담았고 흔한 정도에 비례해 뽑습니다. 비중은 용량이 흔한 순서대로 직접 정한 값이며, 특정 조사를 측정한 수치가 아닙니다.
+저장 장치는 종류마다 팔리는 용량이 다르므로 종류마다 용량 목록을 따로 둡니다. 8 TB를 넘는 것은 하드 디스크뿐이고, eMMC는 128 GB에서 끝나며, 초기 SATA SSD의 120, 240, 480 GB는 SSD에만 있습니다. 먼저 플랫폼을 고르므로 <Lang js="platform: 'all'" dart="platform을 null로" py="platform=&quot;all&quot;" code /> 두면 반씩 나옵니다. 그다음 그 플랫폼에서 흔한 정도에 따라 종류를 고르고([`randDiskType`](./rand-disk-type#kinds)과 같은 비중입니다), 마지막으로 그 종류에서 흔한 정도에 따라 용량을 뽑습니다. 비중은 용량이 흔한 순서대로 직접 정한 값이며, 특정 조사를 측정한 수치가 아닙니다.
 
-| 용량                                     |        비중 |
-| ---------------------------------------- | ----------: |
-| 512 GB, 1 TB                             |    각 15.8% |
-| 256 GB                                   |       14.1% |
-| 2 TB                                     |        8.8% |
-| 128 GB, 500 GB                           |     각 7.0% |
-| 4 TB                                     |        5.3% |
-| 64 GB                                    |        3.5% |
-| 240 GB, 250 GB, 480 GB, 8 TB             |     각 2.6% |
-| 32 GB, 120 GB, 3 TB, 6 TB                |     각 1.8% |
-| 16 GB, 10 TB, 12 TB                      |     각 0.9% |
-| 14 TB, 16 TB, 18 TB, 20 TB, 22 TB, 24 TB | 합쳐서 2.3% |
+| 종류   | 플랫폼              | 용량           | 가장 흔한 용량                   |
+| ------ | ------------------- | -------------- | -------------------------------- |
+| `ssd`  | `desktop`           | 32 GB – 8 TB   | 512 GB와 1 TB 각 22%, 256 GB 18% |
+| `hdd`  | `desktop`           | 120 GB – 24 TB | 1 TB 26%, 2 TB 17%, 500 GB 14%   |
+| `sshd` | `desktop`           | 250 GB – 4 TB  | 1 TB 43%, 500 GB와 2 TB 각 22%   |
+| `emmc` | `desktop`, `mobile` | 16 GB – 128 GB | 32 GB와 64 GB 각 33%             |
+| `ufs`  | `mobile`            | 32 GB – 1 TB   | 256 GB 37%, 128 GB 30%           |
 
-플래시와 하드 디스크가 팔리는 용량을 모두 넣었습니다. 플래시는 128, 256, 512 GB, 그 옆의 하드 디스크는 250, 500 GB이고, 초기 SATA SSD의 120, 240, 480 GB도 들어 있습니다. 기기에 어떤 종류의 드라이브가 들어 있는지는 [`randDiskType`](./rand-disk-type)이 정합니다.
+`type`은 고른 종류만, `platform`은 데스크톱이나 휴대폰이 쓰는 종류만 남깁니다. 둘은 함께 범위를 좁히므로, 그 플랫폼이 쓰지 않는 종류를 고르면 빈 결과를 돌려줍니다. 여기에는 하드 디스크를 단 휴대폰이 없습니다. 상세 출력에는 용량을 뽑은 종류와 플랫폼이 들어 있습니다.
+
+::: lang js
+
+```javascript
+randDiskSize({ type: 'emmc', count: 3 }); // ['64 GB', '32 GB', '128 GB']
+randDiskSize({ type: ['ssd', 'hdd'], unit: 'TB', minSize: 8 }); // ['16 TB']
+randDiskSize({ platform: 'mobile', count: 2 }); // ['256 GB', '128 GB']
+randDiskSize({ type: 'hdd', platform: 'mobile' }); // []
+```
+
+:::
+
+::: lang dart
+
+```dart
+randDiskSize(type: {DiskType.emmc}, count: 3); // [64 GB, 32 GB, 128 GB]
+randDiskSize(type: {DiskType.ssd, DiskType.hdd}, unit: DiskUnit.tb, minSize: 8); // [16 TB]
+randDiskSize(platform: SystemPlatform.mobile, count: 2); // [256 GB, 128 GB]
+randDiskSize(type: {DiskType.hdd}, platform: SystemPlatform.mobile); // []
+```
+
+:::
+
+::: lang py
+
+```python
+rand_disk_size(type="emmc", count=3)  # ['64 GB', '32 GB', '128 GB']
+rand_disk_size(type=("ssd", "hdd"), unit="TB", min_size=8)  # ['16 TB']
+rand_disk_size(platform="mobile", count=2)  # ['256 GB', '128 GB']
+rand_disk_size(type="hdd", platform="mobile")  # []
+```
+
+:::
 
 ## 단위 {#units}
 
@@ -154,7 +184,7 @@ rand_disk_size(min_size=600, max_size=900)  # []
 
 ```javascript
 randDiskSize({ output: 'detail' });
-// [{ size: '1 TB', value: 1, unit: 'TB', bytes: 1000000000000 }]
+// [{ size: '1 TB', value: 1, unit: 'TB', bytes: 1000000000000, type: 'ssd', platform: 'desktop' }]
 ```
 
 :::
@@ -162,7 +192,7 @@ randDiskSize({ output: 'detail' });
 ::: lang dart
 
 ```dart
-randDiskSizeDetails().first; // DiskSizeDetail(1 TB, 1000000000000)
+randDiskSizeDetails().first; // DiskSizeDetail(1 TB, 1000000000000, ssd, desktop)
 ```
 
 Dart에는 오버로드도 유니언 타입도 없어서, 상세 출력은 별도 함수입니다. `randDiskSize`와 같은 매개변수를 받습니다.
@@ -173,7 +203,7 @@ Dart에는 오버로드도 유니언 타입도 없어서, 상세 출력은 별�
 
 ```python
 rand_disk_size(output="detail")
-# [DiskSizeDetail(size='1 TB', value=1, unit='TB', bytes=1000000000000)]
+# [DiskSizeDetail(size='1 TB', value=1, unit='TB', bytes=1000000000000, type='ssd', platform='desktop')]
 ```
 
 :::
@@ -184,6 +214,8 @@ rand_disk_size(output="detail")
 | `value` | <Lang js="number" dart="int" py="int" code /> | 쓴 숫자: `1`. |
 | `unit` | `DiskUnit` | `MB`, `GB`, `TB` 중 하나. |
 | `bytes` | <Lang js="number" dart="int" py="int" code /> | 같은 용량을 10의 거듭제곱으로 센 바이트 수. 1 TB는 `1000000000000`입니다. |
+| `type` | `DiskType` | 그 용량이 속한 저장 장치 종류: `ssd`, `emmc`. |
+| `platform` | `SystemPlatform` | 뽑을 때 고른 기기 종류. |
 
 ## 함께 보기 {#see-also}
 

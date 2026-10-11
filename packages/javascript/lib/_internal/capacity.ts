@@ -1,5 +1,5 @@
-// Sizes of memory and storage: a pool of real capacities, the units they are
-// written in, and the candidates `randRam` and `randDiskSize` both draw from.
+// Sizes of memory and storage: the units real capacities are written in, and the
+// candidates `randRam` and `randDiskSize` both draw from a pool of them.
 //
 // A size is always one a machine is really sold with, and it is only ever
 // written in a unit it is a whole number of: 512 MB of memory is never `0.5 GB`,
@@ -8,20 +8,25 @@
 
 import { finite } from './generate.js';
 
-/** How one kind of size is measured: its units, and the pool it draws from. */
+/**
+ * Sizes and how often each one comes up, in a scale's base unit, smallest first.
+ * One kind of size has several: memory a pool per platform, storage a pool per
+ * kind of drive.
+ */
+export type CapacityPool = readonly (readonly [number, number])[];
+
+/** How one kind of size is measured: its units, and how many bytes they are. */
 export interface CapacityScale<U extends string> {
 	/** The units, smallest first, each `step` times the one before it. */
 	units: readonly U[];
 	/** How many of one unit make the next: `1024` for memory, `1000` for storage. */
 	step: number;
-	/** The unit `pool` is written in. */
+	/** The unit a pool is written in. */
 	base: U;
 	/** The unit `minSize` and `maxSize` are read in when the unit is `'auto'`. */
 	reference: U;
 	/** How many bytes one `base` unit is. */
 	bytes: number;
-	/** Every size there is, in `base`, with how often it comes up. */
-	pool: readonly (readonly [number, number])[];
 }
 
 /** A size a call may land on, with the unit it is written in. */
@@ -55,7 +60,7 @@ export function fitUnit<U extends string>(scale: CapacityScale<U>, size: number)
 }
 
 /**
- * The sizes one call may land on, each in the unit it is written in.
+ * The sizes of `pool` one call may land on, each in the unit it is written in.
  *
  * A named unit keeps to the sizes that are whole in it. `minSize` and `maxSize`
  * are read in that unit, or in the scale's reference unit for `'auto'`, and keep
@@ -64,6 +69,7 @@ export function fitUnit<U extends string>(scale: CapacityScale<U>, size: number)
  */
 export function capacityCandidates<U extends string>(
 	scale: CapacityScale<U>,
+	pool: CapacityPool,
 	unit: U | 'auto',
 	minSize: unknown,
 	maxSize: unknown
@@ -78,7 +84,7 @@ export function capacityCandidates<U extends string>(
 	const low = asked !== undefined && high !== undefined ? Math.min(asked, high) : asked;
 	const candidates: CapacityCandidate<U>[] = [];
 
-	for (const [size, weight] of scale.pool) {
+	for (const [size, weight] of pool) {
 		const written = unit === 'auto' ? fitUnit(scale, size) : unit;
 		const value = inUnit(scale, size, written);
 		const measured = inUnit(scale, size, bound);

@@ -46,6 +46,7 @@ from randino._types import (
     DiskSizeDetail,
     DiskType,
     DiskTypeDetail,
+    DiskTypeOption,
     DiskUnit,
     DiskUnitOption,
     FileCategory,
@@ -85,6 +86,7 @@ from randino._types import (
     PhoneType,
     PhoneTypeOption,
     RamDetail,
+    RamType,
     RamUnit,
     RamUnitOption,
     RandRealism,
@@ -164,7 +166,7 @@ from randino.nickname import nickname_length_range, rand_nickname
 from randino.organization import ORGANIZATION_INDUSTRIES, ORGANIZATION_TYPES, rand_organization
 from randino.os import OS_FAMILY_CODES, rand_os
 from randino.phone import PHONE_COUNTRIES, PHONE_TYPES, rand_phone
-from randino.ram import RAM_UNITS, rand_ram
+from randino.ram import RAM_TYPES, RAM_UNITS, rand_ram
 from randino.resolution import rand_resolution
 from randino.sentence import rand_sentence, sentence_length_range
 from randino.version import VERSION_FORMATS, rand_version
@@ -229,6 +231,7 @@ __all__ = [
     "OS_FAMILY_CODES",
     "PHONE_COUNTRIES",
     "PHONE_TYPES",
+    "RAM_TYPES",
     "RAM_UNITS",
     "RAND_AGE_MAX",
     "RAND_COUNT_MAX",
@@ -265,6 +268,7 @@ __all__ = [
     "DiskSizeDetail",
     "DiskType",
     "DiskTypeDetail",
+    "DiskTypeOption",
     "DiskUnit",
     "DiskUnitOption",
     "FileCategory",
@@ -304,6 +308,7 @@ __all__ = [
     "PhoneType",
     "PhoneTypeOption",
     "RamDetail",
+    "RamType",
     "RamUnit",
     "RamUnitOption",
     "RandRealism",

@@ -1,9 +1,10 @@
-"""Sizes of memory and storage: a pool of real capacities and the units they are written in.
+"""Sizes of memory and storage: the units real capacities are written in, and the candidates.
 
-`rand_ram` and `rand_disk_size` both draw from here. A size is always one a machine is
-really sold with, and it is only ever written in a unit it is a whole number of: 512 MB of
-memory is never `0.5 GB`, and a 500 GB drive is never `0.5 TB`. Asking for a unit leaves
-out the sizes that are not whole in it rather than rounding them into a size nobody sells.
+`rand_ram` and `rand_disk_size` both draw from a pool of them here. A size is always one a
+machine is really sold with, and it is only ever written in a unit it is a whole number of:
+512 MB of memory is never `0.5 GB`, and a 500 GB drive is never `0.5 TB`. Asking for a unit
+leaves out the sizes that are not whole in it rather than rounding them into a size nobody
+sells.
 """
 
 from dataclasses import dataclass
@@ -13,10 +14,16 @@ from randino._internal.generate import finite
 
 U = TypeVar("U", bound=str)
 
+CapacityPool = tuple[tuple[int, float], ...]
+"""Sizes and how often each one comes up, in a scale's base unit, smallest first.
+
+One kind of size has several: memory a pool per platform, storage a pool per kind of drive.
+"""
+
 
 @dataclass(frozen=True, slots=True)
 class CapacityScale(Generic[U]):
-    """How one kind of size is measured: its units, and the pool it draws from."""
+    """How one kind of size is measured: its units, and how many bytes they are."""
 
     units: tuple[U, ...]
     """The units, smallest first, each `step` times the one before it."""
@@ -25,16 +32,13 @@ class CapacityScale(Generic[U]):
     """How many of one unit make the next: `1024` for memory, `1000` for storage."""
 
     base: U
-    """The unit `pool` is written in."""
+    """The unit a pool is written in."""
 
     reference: U
     """The unit `min_size` and `max_size` are read in when the unit is `"auto"`."""
 
     bytes: int
     """How many bytes one `base` unit is."""
-
-    pool: tuple[tuple[int, float], ...]
-    """Every size there is, in `base`, with how often it comes up."""
 
 
 @dataclass(frozen=True, slots=True)
@@ -78,9 +82,9 @@ def fit_unit(scale: CapacityScale[U], size: int) -> U:
 
 
 def capacity_candidates(
-    scale: CapacityScale[U], unit: str, min_size: object, max_size: object
+    scale: CapacityScale[U], pool: CapacityPool, unit: str, min_size: object, max_size: object
 ) -> list[CapacityCandidate[U]]:
-    """The sizes one call may land on, each in the unit it is written in.
+    """The sizes of `pool` one call may land on, each in the unit it is written in.
 
     A named unit keeps to the sizes that are whole in it. `min_size` and `max_size` are
     read in that unit, or in the scale's reference unit for `"auto"`, and keep to the sizes
@@ -89,6 +93,7 @@ def capacity_candidates(
 
     Args:
         scale: The kind of size.
+        pool: The sizes to choose from, in the scale's base unit.
         unit: One of the scale's units, or `"auto"`.
         min_size: The smallest size, or None.
         max_size: The largest size, or None.
@@ -107,7 +112,7 @@ def capacity_candidates(
     low = min(asked, high) if asked is not None and high is not None else asked
     candidates: list[CapacityCandidate[U]] = []
 
-    for size, weight in scale.pool:
+    for size, weight in pool:
         written = named if named is not None else fit_unit(scale, size)
         value = in_unit(scale, size, written)
         measured = in_unit(scale, size, bound)

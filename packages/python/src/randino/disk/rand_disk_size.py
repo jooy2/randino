@@ -3,13 +3,15 @@
 from collections.abc import Callable
 from typing import Literal, overload
 
-from randino._types import DiskSizeDetail, DiskUnitOption
+from randino._types import DiskSizeDetail, DiskTypeOption, DiskUnitOption, SystemPlatformOption
 from randino.disk._size_generator import generate_disk_size_details
 
 
 @overload
 def rand_disk_size(
     *,
+    type: DiskTypeOption = ...,
+    platform: SystemPlatformOption = ...,
     unit: DiskUnitOption = ...,
     include_unit: bool = ...,
     min_size: float | None = ...,
@@ -24,6 +26,8 @@ def rand_disk_size(
 @overload
 def rand_disk_size(
     *,
+    type: DiskTypeOption = ...,
+    platform: SystemPlatformOption = ...,
     unit: DiskUnitOption = ...,
     include_unit: bool = ...,
     min_size: float | None = ...,
@@ -37,6 +41,8 @@ def rand_disk_size(
 
 def rand_disk_size(
     *,
+    type: DiskTypeOption = "all",
+    platform: SystemPlatformOption = "all",
     unit: DiskUnitOption = "auto",
     include_unit: bool = True,
     min_size: float | None = None,
@@ -48,11 +54,18 @@ def rand_disk_size(
 ) -> list[str] | list[DiskSizeDetail]:
     """Generate capacities a drive is really sold with.
 
-    256 GB, 512 GB and 1 TB are the most common, the small flash of an old phone and the
-    largest hard disks the rarest. No size is ever written with a decimal point, and a
-    terabyte is 1000 gigabytes, the way a drive is sold.
+    Sizes from 128 GB to 1 TB are the most common, the small flash of an old phone and the
+    largest hard disks the rarest. Each size is one its kind of storage is sold in, so an
+    eMMC chip is never 8 TB. No size is ever written with a decimal point, and a terabyte
+    is 1000 gigabytes, the way a drive is sold.
 
     Args:
+        type: Which kinds of storage the sizes are for: `"emmc"`, a sequence such as
+            `("ssd", "hdd")`, or `"all"`. Each kind is sold in sizes of its own, so an eMMC
+            chip stops at 128 GB and only a hard disk reaches 24 TB.
+        platform: `"desktop"` for desktops and laptops, `"mobile"` for phones and tablets,
+            or `"all"` for both. A kind the platform does not use is answered with nothing:
+            `type="hdd"` on `"mobile"`.
         unit: `"MB"`, `"GB"`, `"TB"`, or `"auto"` for the largest unit each size is a whole
             number of. A named unit keeps to the sizes that are whole in it.
         include_unit: Write the unit after the number: `1 TB` rather than `1`. Left off
@@ -70,7 +83,7 @@ def rand_disk_size(
             nobody may predict, `Random(42).random` for one that has to come out the
             same every run.
         output: `"value"` for strings, `"detail"` for a `DiskSizeDetail` per size — the
-            number, the unit and the bytes.
+            number, the unit, the bytes, the kind of storage and the platform.
 
     Returns:
         A `list[str]`, or a `list[DiskSizeDetail]` when `output="detail"` — the overloads
@@ -83,8 +96,12 @@ def rand_disk_size(
         ['1000 GB']
         >>> rand_disk_size(min_size=2000)
         ['4 TB']
+        >>> rand_disk_size(type="emmc", count=2)
+        ['64 GB', '32 GB']
     """
     details = generate_disk_size_details(
+        type=type,
+        platform=platform,
         unit=unit,
         include_unit=include_unit,
         min_size=min_size,

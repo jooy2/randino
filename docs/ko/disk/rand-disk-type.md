@@ -135,5 +135,5 @@ rand_disk_type(output="detail")
 ## 함께 보기 {#see-also}
 
 - [`randDevice`](../device/rand-device) — 이 저장 장치가 들어갈 휴대폰, 태블릿, 노트북.
-- [`randDiskSize`](./rand-disk-size) — 그 드라이브의 용량.
+- [`randDiskSize`](./rand-disk-size) — 그 드라이브의 용량. 상세 출력의 `code`를 `type`으로 넘기면 그 종류로 팔리는 용량만 나옵니다.
 - [`randRam`](../ram/rand-ram) — 함께 들어가는 메모리.

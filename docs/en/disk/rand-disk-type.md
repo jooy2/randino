@@ -135,5 +135,5 @@ rand_disk_type(output="detail")
 ## See also
 
 - [`randDevice`](../device/rand-device) — a phone, a tablet or a laptop to put the storage in.
-- [`randDiskSize`](./rand-disk-size) — how much the drive holds.
+- [`randDiskSize`](./rand-disk-size) — how much the drive holds, in a size its kind is sold in when the detail's `code` is passed as `type`.
 - [`randRam`](../ram/rand-ram) — the memory beside it.

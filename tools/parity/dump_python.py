@@ -40,7 +40,13 @@ from randino.decorate.data import (
     AFFIX_SEPARATOR_DEFAULT,
 )
 from randino.device.data import DEVICE_TYPES, DEVICE_VENDORS, DEVICES
-from randino.disk.data import DISK_SCALE, DISK_TYPE_LABELS, DISK_TYPE_WEIGHTS, DISK_TYPES
+from randino.disk.data import (
+    DISK_SCALE,
+    DISK_SIZES,
+    DISK_TYPE_LABELS,
+    DISK_TYPE_WEIGHTS,
+    DISK_TYPES,
+)
 from randino.file.data import FILE_CATEGORIES, FILE_EXTENSIONS, MIME_TOP_LEVELS
 from randino.gender.data import GENDER_CODES, GENDER_LABELS, GENDER_WEIGHTS
 from randino.gpu.data import GPU_VENDORS, GPUS
@@ -61,7 +67,7 @@ from randino.organization.data._types import OrganizationLanguageData, PoolOrgan
 from randino.os.data import OS_FAMILIES, OS_FAMILY_CODES, OS_RELEASES
 from randino.phone.data import PHONE_COUNTRIES, PHONE_DATA, PHONE_TYPES
 from randino.phone.data._types import PhoneShape
-from randino.ram.data import RAM_SCALE
+from randino.ram.data import RAM_SCALE, RAM_SIZES, RAM_TYPE_ENTRIES, RAM_TYPES
 from randino.resolution.data import RESOLUTION_SEPARATOR_DEFAULT, RESOLUTIONS
 from randino.version.data import (
     CALVER_SCHEMES,
@@ -664,18 +670,37 @@ print(
                     "base": DISK_SCALE.base,
                     "reference": DISK_SCALE.reference,
                     "bytes": DISK_SCALE.bytes,
-                    "pool": [[size, weight] for size, weight in DISK_SCALE.pool],
+                },
+                # Each kind's pool as written: every size with its weight, in gigabytes.
+                "sizes": {
+                    kind: [[size, weight] for size, weight in DISK_SIZES[kind]]
+                    for kind in DISK_TYPES
                 },
             },
-            # The scale and the pool as written: every size with its weight, in the unit the
-            # pool is kept in.
+            # The scale, each platform's pool as written — every size with its weight, in
+            # megabytes — and one entry per kind of memory and platform, its sizes in
+            # megabytes as the package parsed them.
             "ram": {
                 "units": list(RAM_SCALE.units),
                 "step": RAM_SCALE.step,
                 "base": RAM_SCALE.base,
                 "reference": RAM_SCALE.reference,
                 "bytes": RAM_SCALE.bytes,
-                "pool": [[size, weight] for size, weight in RAM_SCALE.pool],
+                "types": list(RAM_TYPES),
+                "sizes": {
+                    platform: [[size, weight] for size, weight in RAM_SIZES[platform]]
+                    for platform in ("desktop", "mobile")
+                },
+                "entries": {
+                    f"{entry.type} {entry.platform}": {
+                        "from": entry.first_year,
+                        "to": entry.last_year,
+                        "weight": entry.weight,
+                        # `[megabytes, first year]`, the year the size itself came in.
+                        "sizes": [[each.size, each.first_year] for each in entry.sizes],
+                    }
+                    for entry in RAM_TYPE_ENTRIES
+                },
             },
             # One entry per release, keyed by its line and version, so a release one package
             # holds and another does not is reported as itself. A build is `year text`, the

@@ -1249,9 +1249,12 @@ class RamDetail {
     required this.value,
     required this.unit,
     required this.bytes,
+    required this.type,
+    required this.platform,
   });
 
-  /// The size as `randRam` returns it: `16 GB`.
+  /// The size as `randRam` returns it: `16 GB`, or `16 GB DDR5` with
+  /// `includeType`.
   final String ram;
 
   /// The number written: `16`.
@@ -1263,8 +1266,16 @@ class RamDetail {
   /// The same size in bytes, counted in powers of two: `17179869184`.
   final int bytes;
 
+  /// The kind of memory it is, one sold at that size on that platform: `DDR5`,
+  /// `LPDDR5X`. A name rather than an enum, the way a maker is; `ramTypes`
+  /// lists every one of them.
+  final String type;
+
+  /// The kind of machine it was drawn for.
+  final SystemPlatform platform;
+
   @override
-  String toString() => 'RamDetail($ram, $bytes)';
+  String toString() => 'RamDetail($ram, $bytes, $type, ${platform.name})';
 }
 
 /// What kind of storage a machine has.
@@ -1341,6 +1352,8 @@ class DiskSizeDetail {
     required this.value,
     required this.unit,
     required this.bytes,
+    required this.type,
+    required this.platform,
   });
 
   /// The size as `randDiskSize` returns it: `1 TB`.
@@ -1355,8 +1368,14 @@ class DiskSizeDetail {
   /// The same size in bytes, counted in powers of ten: `1000000000000`.
   final int bytes;
 
+  /// The kind of storage it is a size of.
+  final DiskType type;
+
+  /// The kind of machine it was drawn for.
+  final SystemPlatform platform;
+
   @override
-  String toString() => 'DiskSizeDetail($size, $bytes)';
+  String toString() => 'DiskSizeDetail($size, $bytes, ${type.name}, ${platform.name})';
 }
 
 /// A generated processor with the pieces it was written from.

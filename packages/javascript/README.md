@@ -533,7 +533,7 @@ randArchitecture({ output: 'detail' });
 
 ### Memory
 
-Amounts of memory a machine is really sold with, from 512 MB to a terabyte, drawn by how common each one is: 8 and 16 GB are most of a sample. A size is only written in a unit it is a whole number of, so nothing carries a decimal point; a gigabyte is 1024 megabytes, the way an operating system counts.
+Amounts of memory a machine is really sold with, from 512 MB to a terabyte, drawn by how common each one is: 8 and 16 GB are most of a sample, and a phone's stop at 24 GB. A size is only written in a unit it is a whole number of, so nothing carries a decimal point; a gigabyte is 1024 megabytes, the way an operating system counts. Each size comes with the kind of memory it was sold as on its platform and in its years: `DDR` to `DDR5` in a desktop or a laptop, `LPDDR` to `LPDDR5X` in a phone or a tablet.
 
 ```javascript
 import { randRam } from 'randino';
@@ -542,21 +542,28 @@ randRam({ count: 3 }); // ['8 GB', '16 GB', '4 GB']
 randRam({ unit: 'MB' }); // ['8192 MB']
 randRam({ minSize: 16, maxSize: 64 }); // ['32 GB']
 randRam({ includeUnit: false }); // ['16']
+randRam({ platform: 'mobile', includeType: true }); // ['12 GB LPDDR5X']
+randRam({ platform: 'desktop', maxYear: 2010, includeType: true }); // ['4 GB DDR3']
 
-randRam({ output: 'detail' }); // [{ ram: '16 GB', value: 16, unit: 'GB', bytes: 17179869184 }]
+randRam({ output: 'detail' });
+// [{ ram: '16 GB', value: 16, unit: 'GB', bytes: 17179869184, type: 'DDR5', platform: 'desktop' }]
 ```
 
-| Option        | Type                  | Default   |
-| ------------- | --------------------- | --------- |
-| `unit`        | `RamUnitOption`       | `'auto'`  |
-| `includeUnit` | `boolean`             | `true`    |
-| `minSize`     | `number`              | —         |
-| `maxSize`     | `number`              | —         |
-| `count`       | `number`              | `1`       |
-| `unique`      | `boolean`             | `false`   |
-| `output`      | `'value' \| 'detail'` | `'value'` |
+| Option        | Type                   | Default   |
+| ------------- | ---------------------- | --------- |
+| `platform`    | `SystemPlatformOption` | `'all'`   |
+| `minYear`     | `number`               | —         |
+| `maxYear`     | `number`               | —         |
+| `unit`        | `RamUnitOption`        | `'auto'`  |
+| `includeUnit` | `boolean`              | `true`    |
+| `minSize`     | `number`               | —         |
+| `maxSize`     | `number`               | —         |
+| `includeType` | `boolean`              | `false`   |
+| `count`       | `number`               | `1`       |
+| `unique`      | `boolean`              | `false`   |
+| `output`      | `'value' \| 'detail'`  | `'value'` |
 
-`unit: 'auto'` writes each size in the largest unit it is whole in; `'GB'` or `'MB'` keeps to the sizes whole in that unit. `minSize` and `maxSize` are in `unit`, or in gigabytes for `'auto'`, and a range no real size is inside returns nothing.
+`unit: 'auto'` writes each size in the largest unit it is whole in; `'GB'` or `'MB'` keeps to the sizes whole in that unit. `minSize` and `maxSize` are in `unit`, or in gigabytes for `'auto'`, and a range no real size is inside returns nothing. `minYear` and `maxYear` keep to the kinds of memory machines were sold with in those years, and the sizes they came in; `includeType` writes the kind after the size, and leaves it out of a bare number with `includeUnit: false`.
 
 ### Storage
 
@@ -579,17 +586,19 @@ randDiskType({ output: 'detail' });
 | `unique`   | `boolean`              | `false`   |
 | `output`   | `'value' \| 'detail'`  | `'value'` |
 
-`randDiskSize` writes how much it holds, the way `randRam` writes memory: a size a drive is sold with, drawn by how common it is, in a unit it is whole in. A terabyte is 1000 gigabytes, the way the box counts.
+`randDiskSize` writes how much it holds, the way `randRam` writes memory: a size a drive is sold with, drawn by how common it is, in a unit it is whole in. A terabyte is 1000 gigabytes, the way the box counts. Each kind of storage is sold in sizes of its own, so an eMMC chip stops at 128 GB and only a hard disk goes past 8 TB.
 
 ```javascript
 randDiskSize({ count: 3 }); // ['1 TB', '256 GB', '2 TB']
 randDiskSize({ unit: 'GB' }); // ['1000 GB']
 randDiskSize({ unit: 'TB', minSize: 8 }); // ['12 TB']
+randDiskSize({ type: 'emmc' }); // ['64 GB']
 
-randDiskSize({ output: 'detail' }); // [{ size: '1 TB', value: 1, unit: 'TB', bytes: 1000000000000 }]
+randDiskSize({ output: 'detail' });
+// [{ size: '1 TB', value: 1, unit: 'TB', bytes: 1000000000000, type: 'ssd', platform: 'desktop' }]
 ```
 
-It takes `randRam`'s options, with `unit` a `DiskUnitOption`: `'MB'`, `'GB'`, `'TB'` or `'auto'`.
+It takes `randRam`'s `unit`, `includeUnit`, `minSize` and `maxSize`, with `unit` a `DiskUnitOption`: `'MB'`, `'GB'`, `'TB'` or `'auto'`. `type` keeps to the kinds named, one or an array of them, and `platform` to the kinds a desktop or a phone uses, a kind the platform does not use returning nothing.
 
 ### Resolutions
 

@@ -515,7 +515,7 @@ rand_architecture(output="detail")
 
 ### Memory
 
-Amounts of memory a machine is really sold with, from 512 MB to a terabyte, drawn by how common each one is: 8 and 16 GB are most of a sample. A size is only written in a unit it is a whole number of, so nothing carries a decimal point; a gigabyte is 1024 megabytes, the way an operating system counts.
+Amounts of memory a machine is really sold with, from 512 MB to a terabyte, drawn by how common each one is: 8 and 16 GB are most of a sample, and a phone's stop at 24 GB. A size is only written in a unit it is a whole number of, so nothing carries a decimal point; a gigabyte is 1024 megabytes, the way an operating system counts. Each size comes with the kind of memory it was sold as on its platform and in its years: `DDR` to `DDR5` in a desktop or a laptop, `LPDDR` to `LPDDR5X` in a phone or a tablet.
 
 ```python
 from randino import rand_ram
@@ -524,21 +524,28 @@ rand_ram(count=3)  # ['8 GB', '16 GB', '4 GB']
 rand_ram(unit="MB")  # ['8192 MB']
 rand_ram(min_size=16, max_size=64)  # ['32 GB']
 rand_ram(include_unit=False)  # ['16']
+rand_ram(platform="mobile", include_type=True)  # ['12 GB LPDDR5X']
+rand_ram(platform="desktop", max_year=2010, include_type=True)  # ['4 GB DDR3']
 
-rand_ram(output="detail")  # [RamDetail(ram='16 GB', value=16, unit='GB', bytes=17179869184)]
+rand_ram(output="detail")
+# [RamDetail(ram='16 GB', value=16, unit='GB', bytes=17179869184, type='DDR5', platform='desktop')]
 ```
 
-| Argument       | Type                  | Default   |
-| -------------- | --------------------- | --------- |
-| `unit`         | `RamUnitOption`       | `"auto"`  |
-| `include_unit` | `bool`                | `True`    |
-| `min_size`     | `int \| None`         | `None`    |
-| `max_size`     | `int \| None`         | `None`    |
-| `count`        | `int`                 | `1`       |
-| `unique`       | `bool`                | `False`   |
-| `output`       | `"value" \| "detail"` | `"value"` |
+| Argument       | Type                   | Default   |
+| -------------- | ---------------------- | --------- |
+| `platform`     | `SystemPlatformOption` | `"all"`   |
+| `min_year`     | `int \| None`          | `None`    |
+| `max_year`     | `int \| None`          | `None`    |
+| `unit`         | `RamUnitOption`        | `"auto"`  |
+| `include_unit` | `bool`                 | `True`    |
+| `min_size`     | `int \| None`          | `None`    |
+| `max_size`     | `int \| None`          | `None`    |
+| `include_type` | `bool`                 | `False`   |
+| `count`        | `int`                  | `1`       |
+| `unique`       | `bool`                 | `False`   |
+| `output`       | `"value" \| "detail"`  | `"value"` |
 
-`unit="auto"` writes each size in the largest unit it is whole in; `"GB"` or `"MB"` keeps to the sizes whole in that unit. `min_size` and `max_size` are in `unit`, or in gigabytes for `"auto"`, and a range no real size is inside returns nothing.
+`unit="auto"` writes each size in the largest unit it is whole in; `"GB"` or `"MB"` keeps to the sizes whole in that unit. `min_size` and `max_size` are in `unit`, or in gigabytes for `"auto"`, and a range no real size is inside returns nothing. `min_year` and `max_year` keep to the kinds of memory machines were sold with in those years, and the sizes they came in; `include_type` writes the kind after the size, and leaves it out of a bare number with `include_unit=False`.
 
 ### Storage
 
@@ -561,7 +568,7 @@ rand_disk_type(output="detail")
 | `unique`   | `bool`                 | `False`   |
 | `output`   | `"value" \| "detail"`  | `"value"` |
 
-`rand_disk_size` writes how much it holds, the way `rand_ram` writes memory: a size a drive is sold with, drawn by how common it is, in a unit it is whole in. A terabyte is 1000 gigabytes, the way the box counts.
+`rand_disk_size` writes how much it holds, the way `rand_ram` writes memory: a size a drive is sold with, drawn by how common it is, in a unit it is whole in. A terabyte is 1000 gigabytes, the way the box counts. Each kind of storage is sold in sizes of its own, so an eMMC chip stops at 128 GB and only a hard disk goes past 8 TB.
 
 ```python
 from randino import rand_disk_size
@@ -569,13 +576,13 @@ from randino import rand_disk_size
 rand_disk_size(count=3)  # ['1 TB', '256 GB', '2 TB']
 rand_disk_size(unit="GB")  # ['1000 GB']
 rand_disk_size(unit="TB", min_size=8)  # ['12 TB']
+rand_disk_size(type="emmc")  # ['64 GB']
 
-rand_disk_size(
-    output="detail"
-)  # [DiskSizeDetail(size='1 TB', value=1, unit='TB', bytes=1000000000000)]
+rand_disk_size(output="detail")
+# [DiskSizeDetail(size='1 TB', value=1, unit='TB', bytes=1000000000000, type='ssd', platform='desktop')]
 ```
 
-It takes `rand_ram`'s arguments, with `unit` a `DiskUnitOption`: `"MB"`, `"GB"`, `"TB"` or `"auto"`.
+It takes `rand_ram`'s `unit`, `include_unit`, `min_size` and `max_size`, with `unit` a `DiskUnitOption`: `"MB"`, `"GB"`, `"TB"` or `"auto"`. `type` keeps to the kinds named, one or a sequence of them, and `platform` to the kinds a desktop or a phone uses, a kind the platform does not use returning nothing.
 
 ### Resolutions
 

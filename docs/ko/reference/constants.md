@@ -339,6 +339,7 @@ import {
 	DEVICE_VENDORS,
 	DISK_TYPES,
 	DISK_UNITS,
+	RAM_TYPES,
 	RAM_UNITS,
 	FILE_CATEGORIES,
 	GPU_VENDORS,
@@ -356,6 +357,7 @@ import {
 | `DEVICE_TYPES` | `DeviceType[]` | `['phone', 'tablet', 'laptop']` |
 | `DEVICE_VENDORS` | `DeviceVendor[]` | `['Apple', 'Samsung', 'Google', …, 'Razer']` |
 | `RAM_UNITS` | `RamUnit[]` | `['MB', 'GB']` |
+| `RAM_TYPES` | `RamType[]` | `['DDR', 'DDR2', …, 'LPDDR5X']` |
 | `DISK_TYPES` | `DiskType[]` | `['hdd', 'ssd', 'sshd', 'emmc', 'ufs']` |
 | `DISK_UNITS` | `DiskUnit[]` | `['MB', 'GB', 'TB']` |
 | `ARCHITECTURES` | `Architecture[]` | `['x86_64', 'arm64', 'x86', 'armv7', 'riscv64', …]` |
@@ -381,6 +383,7 @@ import 'package:randino/randino.dart';
 | `deviceTypes` | `List<DeviceType>` | `phone`, `tablet`, `laptop` 순 |
 | `deviceVendors` | `List<String>` | `Apple`, `Samsung`, … `Razer`, 모두 20개 |
 | `ramUnits` | `List<RamUnit>` | `mb`, `gb` 순 |
+| `ramTypes` | `List<String>` | `DDR`, `DDR2`, … `LPDDR5X`, 모두 12개 |
 | `diskTypes` | `List<DiskType>` | `hdd`, `ssd`, `sshd`, `emmc`, `ufs` 순 |
 | `diskUnits` | `List<DiskUnit>` | `mb`, `gb`, `tb` 순 |
 | `architectures` | `List<String>` | 흔한 넷, 드문 여섯 순 |
@@ -404,6 +407,7 @@ from randino import (
     DEVICE_VENDORS,
     DISK_TYPES,
     DISK_UNITS,
+    RAM_TYPES,
     RAM_UNITS,
     FILE_CATEGORIES,
     GPU_VENDORS,
@@ -421,6 +425,7 @@ from randino import (
 | `DEVICE_TYPES` | `tuple[DeviceType, …]` | `('phone', 'tablet', 'laptop')` |
 | `DEVICE_VENDORS` | `tuple[DeviceVendor, …]` | `('Apple', 'Samsung', 'Google', …, 'Razer')` |
 | `RAM_UNITS` | `tuple[RamUnit, …]` | `('MB', 'GB')` |
+| `RAM_TYPES` | `tuple[RamType, …]` | `('DDR', 'DDR2', …, 'LPDDR5X')` |
 | `DISK_TYPES` | `tuple[DiskType, …]` | `('hdd', 'ssd', 'sshd', 'emmc', 'ufs')` |
 | `DISK_UNITS` | `tuple[DiskUnit, …]` | `('MB', 'GB', 'TB')` |
 | `ARCHITECTURES` | `tuple[Architecture, …]` | `('x86_64', 'arm64', 'x86', 'armv7', 'riscv64', …)` |
@@ -621,6 +626,7 @@ import type {
 	PhoneType,
 	PhoneTypeOption,
 	RamDetail,
+	RamType,
 	RamUnit,
 	RamUnitOption,
 	ResolutionDetail,
@@ -648,6 +654,7 @@ import type {
 	DiskSizeDetail,
 	DiskType,
 	DiskTypeDetail,
+	DiskTypeOption,
 	DiskUnit,
 	DiskUnitOption,
 	FileCategory,
@@ -757,6 +764,7 @@ from randino import (
     PhoneType,
     PhoneTypeOption,
     RamDetail,
+    RamType,
     RamUnit,
     RamUnitOption,
     ResolutionDetail,
@@ -784,6 +792,7 @@ from randino import (
     DiskSizeDetail,
     DiskType,
     DiskTypeDetail,
+    DiskTypeOption,
     DiskUnit,
     DiskUnitOption,
     FileCategory,

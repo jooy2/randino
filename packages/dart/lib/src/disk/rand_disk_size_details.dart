@@ -3,15 +3,18 @@ import 'dart:math';
 import 'package:randino/src/disk/disk_size_generator.dart';
 import 'package:randino/src/types.dart';
 
-/// [randDiskSize], along with the number, the unit and the bytes of each size.
+/// [randDiskSize], along with the number, the unit, the bytes and the kind of
+/// storage of each size.
 ///
 /// Dart has neither overloads nor union types, so the detail form is its own
 /// function rather than the `output` option the npm and PyPI packages take.
 ///
 /// ```dart
-/// randDiskSizeDetails().first; // DiskSizeDetail(1 TB, 1000000000000)
+/// randDiskSizeDetails().first; // DiskSizeDetail(1 TB, 1000000000000, ssd, desktop)
 /// ```
 List<DiskSizeDetail> randDiskSizeDetails({
+  Set<DiskType>? type,
+  SystemPlatform? platform,
   DiskUnit? unit,
   bool includeUnit = true,
   num? minSize,
@@ -23,6 +26,8 @@ List<DiskSizeDetail> randDiskSizeDetails({
   /// predict, `Random(42)` for one that has to come out the same every run.
   Random? random,
 }) => generateDiskSizeDetails(
+  type: type,
+  platform: platform,
   unit: unit,
   includeUnit: includeUnit,
   minSize: minSize,

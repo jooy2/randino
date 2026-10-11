@@ -2,6 +2,7 @@
 
 import re
 from random import Random
+from typing import Any
 
 from randino import (
     DISK_TYPES,
@@ -16,12 +17,13 @@ from randino import (
 
 # Internal, but they are what a result is checked against.
 from randino._internal.capacity import fit_unit, in_unit
-from randino.disk.data import DISK_SCALE, DISK_TYPE_LABELS, DISK_TYPE_WEIGHTS
+from randino.disk.data import DISK_SCALE, DISK_SIZES, DISK_TYPE_LABELS, DISK_TYPE_WEIGHTS
 
 SAMPLE = 60
 LARGE = 4000
 GIGABYTE = 1000**3
-SIZES = [size for size, _ in DISK_SCALE.pool]
+SIZES = {size for kind in DISK_TYPES for size, _ in DISK_SIZES[kind]}
+"""Every size any kind of storage is sold in."""
 
 
 def share(details: list[DiskTypeDetail], code: str) -> float:
@@ -110,13 +112,24 @@ def test_rand_disk_size_returns_exactly_count_sizes() -> None:
     assert len(rand_disk_size(count=RAND_COUNT_MAX + 5)) == RAND_COUNT_MAX
 
 
-def test_the_disk_pool_is_every_size_once_smallest_first() -> None:
-    for i, (size, weight) in enumerate(DISK_SCALE.pool):
-        assert size > 0
-        assert weight > 0
+def test_each_kinds_pool_is_every_size_once_smallest_first() -> None:
+    assert sorted(DISK_SIZES) == sorted(DISK_TYPES)
 
-        if i > 0:
-            assert size > DISK_SCALE.pool[i - 1][0], f"{size} is out of order"
+    for kind in DISK_TYPES:
+        pool = DISK_SIZES[kind]
+
+        assert pool, kind
+
+        for i, (size, weight) in enumerate(pool):
+            assert isinstance(size, int) and size > 0, f"{kind} {size}"
+            assert weight > 0, f"{kind} {size}"
+
+            if i > 0:
+                assert size > pool[i - 1][0], f"{kind} {size} is out of order"
+
+    # A hard disk is the only kind past 8 TB, and eMMC stops at 128 GB.
+    assert DISK_SIZES["emmc"][-1][0] == 128
+    assert all(kind == "hdd" or DISK_SIZES[kind][-1][0] <= 8000 for kind in DISK_TYPES)
 
 
 def test_a_disk_size_is_counted_in_powers_of_ten_in_the_largest_whole_unit() -> None:
@@ -137,7 +150,9 @@ def test_every_disk_size_is_one_the_pool_holds_and_the_detail_is_what_was_writte
         for detail in rand_disk_size(unit=unit, count=SAMPLE * 5, output="detail"):
             size = detail.bytes // GIGABYTE
 
-            assert size in SIZES, detail.size
+            assert any(each == size for each, _ in DISK_SIZES[detail.type]), (
+                f"{detail.size} {detail.type}"
+            )
             assert detail.size == f"{detail.value} {detail.unit}"
             assert detail.value == in_unit(DISK_SCALE, size, detail.unit)
 
@@ -196,6 +211,58 @@ def test_rand_disk_size_value_form_is_the_size_of_each_detail() -> None:
     details = rand_disk_size(count=SAMPLE, random=Random(7).random, output="detail")
 
     assert values == [detail.size for detail in details]
+
+
+def test_type_keeps_to_the_kinds_named_each_in_the_sizes_it_is_sold_in() -> None:
+    for kind in DISK_TYPES:
+        for detail in rand_disk_size(type=kind, count=SAMPLE * 3, output="detail"):
+            assert detail.type == kind
+            assert any(size * GIGABYTE == detail.bytes for size, _ in DISK_SIZES[kind]), (
+                f"{detail.size} {kind}"
+            )
+
+    # No eMMC is ever 8 TB.
+    assert all(
+        detail.bytes <= 128 * GIGABYTE
+        for detail in rand_disk_size(type="emmc", count=LARGE, output="detail")
+    )
+
+    two = rand_disk_size(type=("ssd", "hdd"), count=SAMPLE * 3, output="detail")
+
+    assert {detail.type for detail in two} == {"hdd", "ssd"}
+
+    # An unknown kind reads as all of them.
+    loose: Any = rand_disk_size
+
+    assert any(detail.type != "hdd" for detail in loose(type="tape", count=SAMPLE, output="detail"))
+
+
+def test_platform_keeps_to_the_kinds_of_storage_its_machines_use() -> None:
+    for platform in SYSTEM_PLATFORMS:
+        for detail in rand_disk_size(platform=platform, count=SAMPLE * 3, output="detail"):
+            assert detail.platform == platform
+            assert detail.type in DISK_TYPE_WEIGHTS[platform], detail.type
+
+    # A kind the platform does not use is answered with nothing.
+    assert rand_disk_size(type="hdd", platform="mobile", count=5) == []
+    assert rand_disk_size(type="ufs", platform="desktop", count=5) == []
+    # eMMC is both, and keeps to the platform asked for.
+    assert all(
+        detail.platform == "mobile"
+        for detail in rand_disk_size(type="emmc", platform="mobile", count=SAMPLE, output="detail")
+    )
+    # And a range none of the kinds is sold in, the same.
+    assert rand_disk_size(type="emmc", min_size=256, count=5) == []
+
+
+def test_the_kind_is_drawn_by_how_common_it_is_on_the_platform() -> None:
+    desktop = rand_disk_size(platform="desktop", count=LARGE, output="detail")
+
+    def count(kind: str) -> int:
+        return sum(1 for detail in desktop if detail.type == kind)
+
+    assert count("ssd") > count("hdd")
+    assert count("hdd") > count("sshd")
 
 
 def test_rand_disk_size_unique_stops_when_the_sizes_run_out() -> None:

@@ -722,18 +722,43 @@ void main() {
           'base': diskScale.base.label,
           'reference': diskScale.reference.label,
           'bytes': diskScale.bytes,
-          'pool': <Object?>[for (final (size, weight) in diskScale.pool) <num>[size, weight]],
+        },
+        // Each kind's pool as written: every size with its weight, in gigabytes.
+        'sizes': <String, Object?>{
+          for (final type in diskTypes)
+            type.name: <Object?>[
+              for (final (size, weight) in diskSizes[type]!) <num>[size, weight],
+            ],
         },
       },
-      // The scale and the pool as written: every size with its weight, in the
-      // unit the pool is kept in.
+      // The scale, each platform's pool as written — every size with its weight,
+      // in megabytes — and one entry per kind of memory and platform, its sizes
+      // in megabytes as the package parsed them.
       'ram': <String, Object?>{
         'units': <String>[for (final unit in ramScale.units) unit.label],
         'step': ramScale.step,
         'base': ramScale.base.label,
         'reference': ramScale.reference.label,
         'bytes': ramScale.bytes,
-        'pool': <Object?>[for (final (size, weight) in ramScale.pool) <num>[size, weight]],
+        'types': ramTypes,
+        'sizes': <String, Object?>{
+          for (final entry in ramSizes.entries)
+            entry.key.name: <Object?>[
+              for (final (size, weight) in entry.value) <num>[size, weight],
+            ],
+        },
+        'entries': <String, Object?>{
+          for (final entry in ramTypeEntries)
+            '${entry.type} ${entry.platform.name}': <String, Object?>{
+              'from': entry.from,
+              'to': entry.to,
+              'weight': entry.weight,
+              // `[megabytes, first year]`, the year the size itself came in.
+              'sizes': <Object?>[
+                for (final each in entry.sizes) <int>[each.size, each.from],
+              ],
+            },
+        },
       },
       // One entry per release, keyed by its line and version, so a release one
       // package holds and another does not is reported as itself. A build is

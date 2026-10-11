@@ -9,7 +9,11 @@ import 'package:test/test.dart';
 const int sample = 60;
 const int large = 4000;
 const int gigabyte = 1000 * 1000 * 1000;
-final List<int> sizes = [for (final (size, _) in diskScale.pool) size];
+// Every size any kind of storage is sold in.
+final Set<int> sizes = {
+  for (final type in diskTypes)
+    for (final (size, _) in diskSizes[type]!) size,
+};
 
 double share(List<DiskTypeDetail> details, DiskType code) =>
     details.where((detail) => detail.code == code).length / details.length;
@@ -102,17 +106,35 @@ void main() {
         expect(randDiskSize(count: randCountMax + 5), hasLength(randCountMax));
       });
 
-      test('the pool is every size once, smallest first', () {
-        for (var i = 0; i < diskScale.pool.length; i += 1) {
-          final (size, weight) = diskScale.pool[i];
+      test('each kind’s pool is every size once, smallest first', () {
+        expect(diskSizes.keys.toSet(), diskTypes.toSet());
 
-          expect(size, greaterThan(0));
-          expect(weight, greaterThan(0));
+        for (final type in diskTypes) {
+          final pool = diskSizes[type]!;
 
-          if (i > 0) {
-            expect(size, greaterThan(diskScale.pool[i - 1].$1), reason: '$size is out of order');
+          expect(pool, isNotEmpty, reason: type.name);
+
+          for (var i = 0; i < pool.length; i += 1) {
+            final (size, weight) = pool[i];
+
+            expect(size, greaterThan(0), reason: '${type.name} $size');
+            expect(weight, greaterThan(0), reason: '${type.name} $size');
+
+            if (i > 0) {
+              expect(
+                size,
+                greaterThan(pool[i - 1].$1),
+                reason: '${type.name} $size is out of order',
+              );
+            }
           }
         }
+
+        // A hard disk is the only kind past 8 TB, and eMMC stops at 128 GB.
+        int largest(DiskType type) => diskSizes[type]!.last.$1;
+
+        expect(largest(DiskType.emmc), 128);
+        expect(diskTypes.every((type) => type == DiskType.hdd || largest(type) <= 8000), isTrue);
       });
 
       test(
@@ -135,7 +157,11 @@ void main() {
           for (final detail in randDiskSizeDetails(unit: unit, count: sample * 5)) {
             final size = detail.bytes ~/ gigabyte;
 
-            expect(sizes, contains(size));
+            expect(
+              diskSizes[detail.type]!.any((each) => each.$1 == size),
+              isTrue,
+              reason: '${detail.size} ${detail.type.name}',
+            );
             expect(detail.size, '${detail.value} ${detail.unit.label}');
             expect(detail.value, inUnit(diskScale, size, detail.unit));
           }
@@ -208,6 +234,85 @@ void main() {
         expect(randDiskSize(count: sample, random: Random(7)), <String>[
           for (final detail in randDiskSizeDetails(count: sample, random: Random(7))) detail.size,
         ]);
+      });
+
+      test('type keeps to the kinds named, each in the sizes it is sold in', () {
+        for (final type in diskTypes) {
+          for (final detail in randDiskSizeDetails(type: {type}, count: sample * 3)) {
+            expect(detail.type, type);
+            expect(
+              diskSizes[type]!.any((each) => each.$1 * gigabyte == detail.bytes),
+              isTrue,
+              reason: '${detail.size} ${type.name}',
+            );
+          }
+        }
+
+        // No eMMC is ever 8 TB.
+        expect(
+          randDiskSizeDetails(
+            type: {DiskType.emmc},
+            count: large,
+          ).every((detail) => detail.bytes <= 128 * gigabyte),
+          isTrue,
+        );
+        expect(
+          {
+            for (final detail in randDiskSizeDetails(
+              type: {DiskType.ssd, DiskType.hdd},
+              count: sample * 3,
+            ))
+              detail.type,
+          },
+          {DiskType.hdd, DiskType.ssd},
+        );
+        expect(
+          randDiskSizeDetails(type: {}, count: sample).any((detail) => detail.type != DiskType.hdd),
+          isTrue,
+          reason: 'an empty set reads as every kind',
+        );
+      });
+
+      test('platform keeps to the kinds of storage its machines use', () {
+        for (final platform in systemPlatforms) {
+          for (final detail in randDiskSizeDetails(platform: platform, count: sample * 3)) {
+            expect(detail.platform, platform);
+            expect(
+              diskTypeWeights[platform]!.containsKey(detail.type),
+              isTrue,
+              reason: detail.type.name,
+            );
+          }
+        }
+
+        // A kind the platform does not use is answered with nothing.
+        expect(
+          randDiskSize(type: {DiskType.hdd}, platform: SystemPlatform.mobile, count: 5),
+          isEmpty,
+        );
+        expect(
+          randDiskSize(type: {DiskType.ufs}, platform: SystemPlatform.desktop, count: 5),
+          isEmpty,
+        );
+        // eMMC is both, and keeps to the platform asked for.
+        expect(
+          randDiskSizeDetails(
+            type: {DiskType.emmc},
+            platform: SystemPlatform.mobile,
+            count: sample,
+          ).every((detail) => detail.platform == SystemPlatform.mobile),
+          isTrue,
+        );
+        // And a range none of the kinds is sold in, the same.
+        expect(randDiskSize(type: {DiskType.emmc}, minSize: 256, count: 5), isEmpty);
+      });
+
+      test('the kind is drawn by how common it is on the platform', () {
+        final desktop = randDiskSizeDetails(platform: SystemPlatform.desktop, count: large);
+        int count(DiskType type) => desktop.where((detail) => detail.type == type).length;
+
+        expect(count(DiskType.ssd), greaterThan(count(DiskType.hdd)));
+        expect(count(DiskType.hdd), greaterThan(count(DiskType.sshd)));
       });
 
       test('unique never repeats a size, and stops when the sizes run out', () {

@@ -10,13 +10,19 @@ import {
 } from '../dist/index.js';
 import type { DiskTypeDetail } from '../dist/index.js';
 // Internal, but they are what a result is checked against.
-import { DISK_SCALE, DISK_TYPE_LABELS, DISK_TYPE_WEIGHTS } from '../dist/disk/data/index.js';
+import {
+	DISK_SCALE,
+	DISK_SIZES,
+	DISK_TYPE_LABELS,
+	DISK_TYPE_WEIGHTS
+} from '../dist/disk/data/index.js';
 import { fitUnit, inUnit } from '../dist/_internal/capacity.js';
 
 const SAMPLE = 60;
 const LARGE = 4000;
 const GIGABYTE = 1000 ** 3;
-const sizes = DISK_SCALE.pool.map(([size]) => size);
+// Every size any kind of storage is sold in.
+const sizes = [...new Set(DISK_TYPES.flatMap((type) => DISK_SIZES[type].map(([size]) => size)))];
 
 /** The share of `details` that carry `code`, as a fraction. */
 function share(details: DiskTypeDetail[], code: string): number {
@@ -144,17 +150,31 @@ describe('Disk', () => {
 			assert.strictEqual(randDiskSize({ count: RAND_COUNT_MAX + 5 }).length, RAND_COUNT_MAX);
 		});
 
-		it('the pool is every size once, smallest first', () => {
-			for (let i = 0; i < DISK_SCALE.pool.length; i += 1) {
-				const [size, weight] = DISK_SCALE.pool[i];
+		it('each kind’s pool is every size once, smallest first', () => {
+			assert.deepStrictEqual(Object.keys(DISK_SIZES).sort(), [...DISK_TYPES].sort());
 
-				assert.ok(Number.isInteger(size) && size > 0, String(size));
-				assert.ok(weight > 0, String(size));
+			for (const type of DISK_TYPES) {
+				const pool = DISK_SIZES[type];
 
-				if (i > 0) {
-					assert.ok(size > DISK_SCALE.pool[i - 1][0], `${size} is out of order`);
+				assert.ok(pool.length > 0, type);
+
+				for (let i = 0; i < pool.length; i += 1) {
+					const [size, weight] = pool[i];
+
+					assert.ok(Number.isInteger(size) && size > 0, `${type} ${size}`);
+					assert.ok(weight > 0, `${type} ${size}`);
+
+					if (i > 0) {
+						assert.ok(size > pool[i - 1][0], `${type} ${size} is out of order`);
+					}
 				}
 			}
+
+			// A hard disk is the only kind past 8 TB, and eMMC stops at 128 GB.
+			const largest = (type: keyof typeof DISK_SIZES) => DISK_SIZES[type].at(-1)![0];
+
+			assert.strictEqual(largest('emmc'), 128);
+			assert.ok(DISK_TYPES.every((type) => type === 'hdd' || largest(type) <= 8000));
 		});
 
 		it('a size is counted in powers of ten, and written in the largest unit it is whole in', () => {
@@ -174,7 +194,10 @@ describe('Disk', () => {
 				for (const detail of randDiskSize({ unit, count: SAMPLE * 5, output: 'detail' })) {
 					const size = detail.bytes / GIGABYTE;
 
-					assert.ok(sizes.includes(size), detail.size);
+					assert.ok(
+						DISK_SIZES[detail.type].some(([each]) => each === size),
+						`${detail.size} ${detail.type}`
+					);
 					assert.strictEqual(detail.size, `${detail.value} ${detail.unit}`);
 					assert.strictEqual(detail.value, inUnit(DISK_SCALE, size, detail.unit));
 					assert.ok(Number.isInteger(detail.value), detail.size);
@@ -271,6 +294,64 @@ describe('Disk', () => {
 				randDiskSize({ count: SAMPLE, random: seeded() }),
 				randDiskSize({ count: SAMPLE, random: seeded(), output: 'detail' }).map((each) => each.size)
 			);
+		});
+
+		it('type keeps to the kinds named, each in the sizes it is sold in', () => {
+			for (const type of DISK_TYPES) {
+				for (const detail of randDiskSize({ type, count: SAMPLE * 3, output: 'detail' })) {
+					assert.strictEqual(detail.type, type);
+					assert.ok(
+						DISK_SIZES[type].some(([size]) => size * GIGABYTE === detail.bytes),
+						`${detail.size} ${type}`
+					);
+				}
+			}
+
+			// No eMMC is ever 8 TB.
+			assert.ok(
+				randDiskSize({ type: 'emmc', count: LARGE, output: 'detail' }).every(
+					(detail) => detail.bytes <= 128 * GIGABYTE
+				)
+			);
+
+			const two = randDiskSize({ type: ['ssd', 'hdd'], count: SAMPLE * 3, output: 'detail' });
+
+			assert.deepStrictEqual([...new Set(two.map((detail) => detail.type))].sort(), ['hdd', 'ssd']);
+			assert.ok(
+				randDiskSize({ type: 'tape' as never, count: SAMPLE, output: 'detail' }).some(
+					(detail) => detail.type !== 'hdd'
+				),
+				'an unknown kind reads as all of them'
+			);
+		});
+
+		it('platform keeps to the kinds of storage its machines use', () => {
+			for (const platform of SYSTEM_PLATFORMS) {
+				for (const detail of randDiskSize({ platform, count: SAMPLE * 3, output: 'detail' })) {
+					assert.strictEqual(detail.platform, platform);
+					assert.ok(DISK_TYPE_WEIGHTS[platform][detail.type] !== undefined, detail.type);
+				}
+			}
+
+			// A kind the platform does not use is answered with nothing.
+			assert.deepStrictEqual(randDiskSize({ type: 'hdd', platform: 'mobile', count: 5 }), []);
+			assert.deepStrictEqual(randDiskSize({ type: 'ufs', platform: 'desktop', count: 5 }), []);
+			// eMMC is both, and keeps to the platform asked for.
+			assert.ok(
+				randDiskSize({ type: 'emmc', platform: 'mobile', count: SAMPLE, output: 'detail' }).every(
+					(detail) => detail.platform === 'mobile'
+				)
+			);
+			// And a range none of the kinds is sold in, the same.
+			assert.deepStrictEqual(randDiskSize({ type: 'emmc', minSize: 256, count: 5 }), []);
+		});
+
+		it('the kind is drawn by how common it is on the platform', () => {
+			const desktop = randDiskSize({ platform: 'desktop', count: LARGE, output: 'detail' });
+			const count = (type: string) => desktop.filter((detail) => detail.type === type).length;
+
+			assert.ok(count('ssd') > count('hdd'));
+			assert.ok(count('hdd') > count('sshd'));
 		});
 
 		it('unique never repeats a size, and stops when the sizes run out', () => {

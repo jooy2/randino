@@ -3,16 +3,38 @@
 import re
 from random import Random
 
-from randino import RAM_UNITS, RAND_COUNT_MAX, RamUnitOption, rand_ram
+from randino import (
+    RAM_TYPES,
+    RAM_UNITS,
+    RAND_COUNT_MAX,
+    SYSTEM_PLATFORMS,
+    RamDetail,
+    RamUnitOption,
+    rand_ram,
+)
 
 # Internal, but they are what a result is checked against.
 from randino._internal.capacity import fit_unit, in_unit
-from randino.ram.data import RAM_SCALE
+from randino.ram.data import RAM_SCALE, RAM_SIZES, RAM_TYPE_ENTRIES, RamTypeEntry
 
 SAMPLE = 60
 LARGE = 4000
 MEGABYTE = 1024 * 1024
-SIZES = [size for size, _ in RAM_SCALE.pool]
+GIGABYTE = 1024
+SIZES = {size for platform in SYSTEM_PLATFORMS for size, _ in RAM_SIZES[platform]}
+"""Every size either platform is sold with."""
+
+
+def entry_of(detail: RamDetail) -> RamTypeEntry | None:
+    """The entry `detail` says its memory is."""
+    return next(
+        (
+            entry
+            for entry in RAM_TYPE_ENTRIES
+            if entry.type == detail.type and entry.platform == detail.platform
+        ),
+        None,
+    )
 
 
 def test_rand_ram_returns_one_size_by_default() -> None:
@@ -30,13 +52,63 @@ def test_returns_exactly_count_sizes() -> None:
     assert len(rand_ram(count=RAND_COUNT_MAX + 5)) == RAND_COUNT_MAX
 
 
-def test_the_pool_is_every_size_once_smallest_first() -> None:
-    for i, (size, weight) in enumerate(RAM_SCALE.pool):
-        assert size > 0
-        assert weight > 0
+def test_each_pool_is_every_size_once_smallest_first() -> None:
+    for platform in SYSTEM_PLATFORMS:
+        pool = RAM_SIZES[platform]
 
-        if i > 0:
-            assert size > RAM_SCALE.pool[i - 1][0], f"{size} is out of order"
+        for i, (size, weight) in enumerate(pool):
+            assert isinstance(size, int) and size > 0, f"{platform} {size}"
+            assert weight > 0, f"{platform} {size}"
+
+            if i > 0:
+                assert size > pool[i - 1][0], f"{platform} {size} is out of order"
+
+    # A phone's memory stops at 24 GB.
+    assert RAM_SIZES["mobile"][-1][0] == 24 * GIGABYTE
+
+
+def test_every_kind_of_memory_is_described_once_per_platform_at_sizes_it_is_sold_with() -> None:
+    seen: set[str] = set()
+
+    for entry in RAM_TYPE_ENTRIES:
+        key = f"{entry.type} {entry.platform}"
+        pool = [size for size, _ in RAM_SIZES[entry.platform]]
+
+        assert key not in seen, f"{key} is listed twice"
+        seen.add(key)
+        assert entry.type in RAM_TYPES, key
+        assert 2000 <= entry.first_year <= 2026, key
+        assert entry.last_year is None or entry.first_year <= entry.last_year <= 2026, key
+        assert entry.weight > 0, key
+        assert entry.sizes, key
+
+        for i, each in enumerate(entry.sizes):
+            assert each.size in pool, f"{key} at {each.size} MB"
+            # A size comes no earlier than its kind, and inside the years it was sold.
+            last = 2026 if entry.last_year is None else entry.last_year
+            assert entry.first_year <= each.first_year <= last, f"{key} at {each.size} MB"
+
+            if i > 0:
+                assert each.size > entry.sizes[i - 1].size, f"{key} is out of order"
+
+    for kind in RAM_TYPES:
+        assert any(entry.type == kind for entry in RAM_TYPE_ENTRIES), kind
+
+    for platform in SYSTEM_PLATFORMS:
+        entries = [entry for entry in RAM_TYPE_ENTRIES if entry.platform == platform]
+
+        assert sum(entry.weight for entry in entries) == 100, platform
+
+        # Every size a platform is sold with is one some kind of memory came in.
+        for size, _ in RAM_SIZES[platform]:
+            assert any(each.size == size for entry in entries for each in entry.sizes), (
+                f"{platform} {size} MB"
+            )
+
+    # Only a desktop or a laptop is sold with DDR memory.
+    assert all(
+        entry.type.startswith("LPDDR") for entry in RAM_TYPE_ENTRIES if entry.platform == "mobile"
+    )
 
 
 def test_a_size_is_written_in_the_largest_unit_it_is_a_whole_number_of() -> None:
@@ -56,7 +128,7 @@ def test_every_size_is_one_the_pool_holds_and_the_detail_is_what_was_written() -
         for detail in rand_ram(unit=unit, count=SAMPLE * 5, output="detail"):
             size = detail.bytes // MEGABYTE
 
-            assert size in SIZES, detail.ram
+            assert any(each == size for each, _ in RAM_SIZES[detail.platform]), detail.ram
             assert detail.ram == f"{detail.value} {detail.unit}"
             assert detail.value == in_unit(RAM_SCALE, size, detail.unit)
 
@@ -121,6 +193,98 @@ def test_the_value_form_is_the_size_of_each_detail() -> None:
     details = rand_ram(count=SAMPLE, random=Random(7).random, output="detail")
 
     assert values == [detail.ram for detail in details]
+
+
+def test_the_kind_of_memory_is_one_sold_at_that_size_on_that_platform() -> None:
+    for detail in rand_ram(count=LARGE, output="detail"):
+        entry = entry_of(detail)
+
+        assert entry is not None, f"{detail.ram} {detail.type} {detail.platform}"
+        assert any(each.size == detail.bytes // MEGABYTE for each in entry.sizes), (
+            f"{detail.ram} {detail.type}"
+        )
+
+
+def test_platform_keeps_to_the_memory_of_one_kind_of_machine() -> None:
+    mobile = rand_ram(platform="mobile", count=LARGE, output="detail")
+
+    assert all(detail.platform == "mobile" for detail in mobile)
+    assert all(detail.type.startswith("LPDDR") for detail in mobile)
+    assert all(detail.bytes <= 24 * GIGABYTE * MEGABYTE for detail in mobile)
+
+    desktop = rand_ram(platform="desktop", count=SAMPLE * 3, output="detail")
+
+    assert all(detail.platform == "desktop" for detail in desktop)
+
+    both = {detail.platform for detail in rand_ram(count=SAMPLE * 3, output="detail")}
+
+    assert len(both) == len(SYSTEM_PLATFORMS)
+
+
+def test_a_year_range_keeps_to_the_kinds_of_memory_sold_in_it() -> None:
+    old = rand_ram(platform="desktop", max_year=2005, count=SAMPLE * 5, output="detail")
+
+    assert {detail.type for detail in old} == {"DDR", "DDR2"}
+    assert all(detail.bytes <= 8 * GIGABYTE * MEGABYTE for detail in old)
+
+    for detail in rand_ram(min_year=2024, count=LARGE, output="detail"):
+        entry = entry_of(detail)
+
+        assert entry is not None
+        assert entry.last_year is None or entry.last_year >= 2024, (
+            f"{detail.type} {detail.platform}"
+        )
+
+    # No phone was sold with 512 MB before 2010, and nothing at all before 2000.
+    assert rand_ram(platform="mobile", max_year=2009, count=5) == []
+    assert rand_ram(max_year=1990, count=5) == []
+    # A range the wrong way round keeps max_year.
+    assert all(
+        detail.type == "DDR"
+        for detail in rand_ram(
+            min_year=2024, max_year=2003, platform="desktop", count=SAMPLE, output="detail"
+        )
+    )
+
+
+def test_a_year_range_keeps_to_the_sizes_out_by_then_not_only_to_the_kinds() -> None:
+    for max_year in (2005, 2010, 2015, 2020, 2022):
+        for detail in rand_ram(max_year=max_year, count=LARGE // 4, output="detail"):
+            entry = entry_of(detail)
+
+            assert entry is not None, detail.ram
+            size = next(each for each in entry.sizes if each.size == detail.bytes // MEGABYTE)
+            assert size.first_year <= max_year, f"{detail.ram} {detail.type} by {max_year}"
+
+    # The largest a desktop of 2010 came with was 32 GB of DDR3: the half a terabyte of a
+    # workstation came three years later.
+    old = rand_ram(platform="desktop", max_year=2010, count=LARGE, output="detail")
+    assert all(detail.bytes <= 32 * GIGABYTE * MEGABYTE for detail in old)
+
+
+def test_include_type_writes_the_kind_of_memory_after_the_size() -> None:
+    for detail in rand_ram(include_type=True, count=SAMPLE * 3, output="detail"):
+        assert detail.ram == f"{detail.value} {detail.unit} {detail.type}"
+
+    # A bare number goes without the kind, the way it goes without the unit, and the
+    # detail still carries it.
+    for detail in rand_ram(include_type=True, include_unit=False, count=SAMPLE, output="detail"):
+        assert re.fullmatch(r"\d+", detail.ram), detail.ram
+        assert detail.type
+
+    for detail in rand_ram(count=SAMPLE, output="detail"):
+        assert detail.ram == f"{detail.value} {detail.unit}"
+
+
+def test_ddr4_and_ddr5_lead_the_desktops_and_lpddr4x_and_later_the_phones() -> None:
+    def share(details: list[RamDetail], kinds: tuple[str, ...]) -> float:
+        return sum(1 for detail in details if detail.type in kinds) / len(details)
+
+    desktop = rand_ram(platform="desktop", count=LARGE, output="detail")
+    mobile = rand_ram(platform="mobile", count=LARGE, output="detail")
+
+    assert share(desktop, ("DDR4", "DDR5")) > 0.5
+    assert share(mobile, ("LPDDR4X", "LPDDR5", "LPDDR5X")) > 0.6
 
 
 def test_unique_never_repeats_a_size_and_stops_when_the_sizes_run_out() -> None:

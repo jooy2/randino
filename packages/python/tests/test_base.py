@@ -58,6 +58,7 @@ def test_the_package_exports_exactly_its_public_api() -> None:
         "DiskSizeDetail",
         "DiskType",
         "DiskTypeDetail",
+        "DiskTypeOption",
         "DiskUnit",
         "DiskUnitOption",
         "FILE_CATEGORIES",
@@ -107,6 +108,7 @@ def test_the_package_exports_exactly_its_public_api() -> None:
         "PhoneDetail",
         "PhoneType",
         "PhoneTypeOption",
+        "RAM_TYPES",
         "RAM_UNITS",
         "RAND_AGE_MAX",
         "RAND_COUNT_MAX",
@@ -117,6 +119,7 @@ def test_the_package_exports_exactly_its_public_api() -> None:
         "RAND_SENTENCE_COUNT_MAX",
         "RAND_SENTENCE_LENGTH_MAX",
         "RamDetail",
+        "RamType",
         "RamUnit",
         "RamUnitOption",
         "RandRealism",
@@ -312,6 +315,7 @@ def test_the_functions_are_callable_and_the_constants_are_what_they_claim() -> N
     assert randino.DEVICE_TYPES == ("phone", "tablet", "laptop")
     assert re.fullmatch(r"\d+ (MB|GB)", randino.rand_ram()[0])
     assert randino.RAM_UNITS == ("MB", "GB")
+    assert randino.rand_ram(output="detail")[0].type in randino.RAM_TYPES
     assert isinstance(randino.rand_disk_type()[0], str)
     assert randino.DISK_TYPES == ("hdd", "ssd", "sshd", "emmc", "ufs")
     assert re.fullmatch(r"\d+ (GB|TB)", randino.rand_disk_size()[0])
@@ -418,8 +422,12 @@ def test_an_option_the_types_rule_out_falls_back_rather_than_raising() -> None:
         lambda: loose.rand_device(vendor=[None]),
         lambda: loose.rand_ram(unit="KB", min_size=float("nan"), max_size="x"),
         lambda: loose.rand_ram(include_unit="no", count=float("nan")),
+        lambda: loose.rand_ram(platform="tv", min_year=float("nan"), max_year="x"),
+        lambda: loose.rand_ram(include_type="yes"),
         lambda: loose.rand_disk_type(platform="server", count="x"),
         lambda: loose.rand_disk_size(unit="PB", min_size=float("nan"), include_unit=0),
+        lambda: loose.rand_disk_size(type="tape", platform="server"),
+        lambda: loose.rand_disk_size(type=[None]),
         lambda: loose.rand_cpu(platform="server", max_year=float("nan"), include_vendor="no"),
         lambda: loose.rand_gpu(platform="console", min_year="x", count=float("nan")),
         lambda: loose.rand_cpu(vendor="Nope"),

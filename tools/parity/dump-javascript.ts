@@ -52,6 +52,7 @@ import {
 } from '../../packages/javascript/lib/device/data/index.js';
 import {
 	DISK_SCALE,
+	DISK_SIZES,
 	DISK_TYPES,
 	DISK_TYPE_LABELS,
 	DISK_TYPE_WEIGHTS
@@ -83,7 +84,12 @@ import {
 	OS_FAMILY_CODES,
 	OS_RELEASES
 } from '../../packages/javascript/lib/os/data/index.js';
-import { RAM_SCALE } from '../../packages/javascript/lib/ram/data/index.js';
+import {
+	RAM_SCALE,
+	RAM_SIZES,
+	RAM_TYPES,
+	RAM_TYPE_ENTRIES
+} from '../../packages/javascript/lib/ram/data/index.js';
 import {
 	RESOLUTIONS,
 	RESOLUTION_SEPARATOR_DEFAULT
@@ -421,19 +427,39 @@ console.log(
 				step: DISK_SCALE.step,
 				base: DISK_SCALE.base,
 				reference: DISK_SCALE.reference,
-				bytes: DISK_SCALE.bytes,
-				pool: DISK_SCALE.pool.map(([size, weight]) => [size, weight])
-			}
+				bytes: DISK_SCALE.bytes
+			},
+			// Each kind's pool as written: every size with its weight, in gigabytes.
+			sizes: Object.fromEntries(
+				DISK_TYPES.map((type) => [type, DISK_SIZES[type].map(([size, weight]) => [size, weight])])
+			)
 		},
-		// The scale and the pool as written: every size with its weight, in the unit
-		// the pool is kept in.
+		// The scale, each platform's pool as written — every size with its weight,
+		// in megabytes — and one entry per kind of memory and platform, its sizes in
+		// megabytes as the package parsed them.
 		ram: {
 			units: [...RAM_SCALE.units],
 			step: RAM_SCALE.step,
 			base: RAM_SCALE.base,
 			reference: RAM_SCALE.reference,
 			bytes: RAM_SCALE.bytes,
-			pool: RAM_SCALE.pool.map(([size, weight]) => [size, weight])
+			types: [...RAM_TYPES],
+			sizes: {
+				desktop: RAM_SIZES.desktop.map(([size, weight]) => [size, weight]),
+				mobile: RAM_SIZES.mobile.map(([size, weight]) => [size, weight])
+			},
+			entries: Object.fromEntries(
+				RAM_TYPE_ENTRIES.map((entry) => [
+					`${entry.type} ${entry.platform}`,
+					{
+						from: entry.from,
+						to: entry.to,
+						weight: entry.weight,
+						// `[megabytes, first year]`, the year the size itself came in.
+						sizes: entry.sizes.map((each) => [each.size, each.from])
+					}
+				])
+			)
 		},
 		// One entry per release, keyed by its line and version, so a release one
 		// package holds and another does not is reported as itself. A build is
