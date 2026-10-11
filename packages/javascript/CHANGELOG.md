@@ -2,6 +2,7 @@
 
 ## vNext (2026--)
 
+- Spanish sentences write `el hada`, `el arpa` and `el alga` for the feminine nouns that open on a stressed `a`, where they wrote `la hada`.
 - **`randGender` can write a non-binary gender as an identity.** `nonbinaryIdentity: true` writes a `nonbinary` draw as the name a person calls themselves by — `Genderqueer`, `Genderfluid`, `Agender`, `Demigirl`, `Demiboy`, `Bigender` or `Non-binary` itself — instead of the option a form offers, in all nine languages: `젠더플루이드`, `Nichtbinär`, `Género fluido`. Each comes up as often as it was ticked in the Gender Census 2024. The `code` stays `nonbinary`, the option is ignored without `includeNonbinary`, and a call without it draws exactly what it drew before.
 - **`GenderDetail` reports the identity a label writes.** `identity` is one of the new `NonbinaryIdentity` codes — `'genderfluid'` for `Genderfluid` and `젠더플루이드` alike — so identities drawn in different languages can be counted together. It is `null` for every label `nonbinaryIdentity` did not write.
 
