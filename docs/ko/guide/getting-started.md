@@ -70,15 +70,16 @@ pip install randino
 | `randOrganization`                                         | 14 KB    |
 | `randCountry`                                              | 18 KB    |
 | `randName`                                                 | 24 KB    |
-| `randLocation`, `randCity`, `randDistrict`                 | 160 KB   |
-| `randWord`와 테마별 함수들, `randModifier`                 | 260 KB   |
-| `randNickname`                                             | 262 KB   |
-| `randSentence`                                             | 426 KB   |
-| 전체                                                       | 640 KB   |
+| `randModifier`                                             | 91 KB    |
+| `randLocation`, `randCity`, `randDistrict`                 | 156 KB   |
+| `randWord`와 테마별 함수들                                 | 254 KB   |
+| `randNickname`                                             | 255 KB   |
+| `randSentence`                                             | 417 KB   |
+| 전체                                                       | 627 KB   |
 
 가져올 함수 하나만 esbuild로 번들하고 minify한 뒤 gzip으로 잰 값입니다.
 
-단어 풀은 언어마다 객체 하나이므로 테마 하나만 써도 29개 전부와 같은 용량이 들고, `randSentence`는 그 위에 문법 데이터가 더해집니다. 의존성 없는 동기 API가 치르는 대가입니다. 아무것도 내려받지 않는 대신, 함수가 닿을 수 있는 모든 것이 함께 실립니다. 서버에서는 신경 쓸 일이 아니지만, 브라우저 번들이라면 `randName`이나 장식 함수만으로 충분한지 먼저 보고, `randSentence`는 별도 청크로 불러오는 편이 낫습니다.
+명사 풀은 언어마다 객체 하나이므로 테마 하나만 써도 29개 전부와 같은 용량이 들고, `randSentence`는 그 위에 문법 데이터가 더해집니다. `randModifier`는 수식어만 따로 싣고, 명사는 수식어가 명사의 성에 맞춰 바뀌는 네 언어의 것만 가져갑니다. 의존성 없는 동기 API가 치르는 대가입니다. 아무것도 내려받지 않는 대신, 함수가 닿을 수 있는 모든 것이 함께 실립니다. 서버에서는 신경 쓸 일이 아니지만, 브라우저 번들이라면 `randName`이나 장식 함수만으로 충분한지 먼저 보고, `randSentence`는 별도 청크로 불러오는 편이 낫습니다.
 
 :::
 

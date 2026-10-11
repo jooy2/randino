@@ -7,7 +7,8 @@ import {
 import { capitalizeFirst, withRandom } from '../_internal/utils.js';
 import { detectLanguage } from '../_internal/script.js';
 import type { RandModifierOptions, WordLanguage, WordLanguageOption } from '../_types/global.js';
-import { WORD_DATA, WORD_LANGUAGE_OPTIONS, WORD_LANGUAGES } from '../word/data/index.js';
+import { WORD_LANGUAGE_OPTIONS, WORD_LANGUAGES } from '../word/data/index.js';
+import { MODIFIER_DATA, NOUN_GENDERS } from '../word/data/modifiers/index.js';
 import {
 	agree,
 	drawWord,
@@ -45,7 +46,7 @@ function languageOf(value: string): WordLanguageOption {
 	}
 
 	for (const code of INFLECTING) {
-		const nouns = WORD_DATA[code].nounGender;
+		const nouns = NOUN_GENDERS[code];
 
 		if (nouns?.[value] || nouns?.[capitalizeFirst(value)]) {
 			return code;
@@ -69,7 +70,9 @@ function draw(
 	const named = resolveOptional(options.language, WORD_LANGUAGE_OPTIONS);
 	const requested = named ?? (value ? languageOf(value) : 'all');
 	const language = drawLanguage(requested, WORD_LANGUAGES);
-	const data = WORD_DATA[language];
+	// The modifiers alone, and the genders of the nouns where the modifier agrees with
+	// one: the rest of a language's nouns are no business of a decorator's.
+	const data = { ...MODIFIER_DATA[language], nounGender: NOUN_GENDERS[language] };
 	const pool = modifiersOf(data, options.kind ?? 'all');
 	const [min, max] = poolBounds(pool);
 	const { word } = drawWord(data, pool, resolveRealism(options.realism), min, max, '');

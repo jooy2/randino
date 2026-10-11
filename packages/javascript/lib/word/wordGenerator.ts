@@ -47,7 +47,10 @@ const FIT_ATTEMPTS = 12;
  * pool it is given, so holding this one would save nothing worth the
  * bookkeeping.
  */
-export function modifiersOf(data: WordLanguageData, kind: ModifierKind | 'all' = 'all'): WordPool {
+export function modifiersOf(
+	data: Pick<WordLanguageData, 'adjectives' | 'actions'>,
+	kind: ModifierKind | 'all' = 'all'
+): WordPool {
 	if (kind === 'adjective') {
 		return data.adjectives;
 	}
@@ -61,7 +64,7 @@ export function modifiersOf(data: WordLanguageData, kind: ModifierKind | 'all' =
  * write `파란 고양이`. Read from the frames rather than declared beside them, so
  * a language cannot state one order and compose in the other.
  */
-export function modifierFollows(data: WordLanguageData): boolean {
+export function modifierFollows(data: Pick<WordLanguageData, 'frames'>): boolean {
 	for (const frame of data.frames) {
 		const noun = frame.slots.indexOf('noun');
 		const modifier = frame.slots.indexOf('adjective');
@@ -81,7 +84,7 @@ export function modifierFollows(data: WordLanguageData): boolean {
  * way `modifierFollows` is, so the frames stay the one place a particle is
  * written.
  */
-export function modifierGlue(data: WordLanguageData, slot: ModifierKind): string {
+export function modifierGlue(data: Pick<WordLanguageData, 'frames'>, slot: ModifierKind): string {
 	for (const frame of data.frames) {
 		for (let i = 0; i + 1 < frame.slots.length; i += 1) {
 			const pair = [frame.slots[i], frame.slots[i + 1]];
@@ -104,7 +107,7 @@ export function modifierGlue(data: WordLanguageData, slot: ModifierKind): string
  * generator can call this without asking whether the language inflects.
  */
 export function agree(
-	data: WordLanguageData,
+	data: Pick<WordLanguageData, 'agreement'>,
 	word: string,
 	gender: WordGender | undefined
 ): string {
@@ -202,7 +205,10 @@ export function themesOf(theme: WordThemeOption): readonly WordTheme[] {
  * A made-up word has no true gender. What this buys is an article and an
  * adjective that agree with each other.
  */
-export function genderOf(data: WordLanguageData, word: string): WordGender | undefined {
+export function genderOf(
+	data: Pick<WordLanguageData, 'nounGender' | 'genderRules'>,
+	word: string
+): WordGender | undefined {
 	// A noun written in lower case is still the noun: `katze` is the `Katze` German
 	// capitalizes, and is no more masculine for being written small.
 	const known = data.nounGender?.[word] ?? data.nounGender?.[capitalizeFirst(word)];
@@ -493,7 +499,7 @@ export function poolCapitalizes(pool: WordPool): boolean {
 export type Drawn = { word: string; missed: boolean };
 
 export function drawWord(
-	data: WordLanguageData,
+	data: Pick<WordLanguageData, 'syn' | 'capitalize'>,
 	pool: WordPool,
 	invent: number,
 	min: number,

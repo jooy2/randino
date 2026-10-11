@@ -1162,7 +1162,7 @@ rand_sentence(language="en", theme="animal", include_name=True, count=2)
 
 ::: warning 쓰든 쓰지 않든 22 KB 남짓이 늡니다
 
-이 옵션은 사람 이름 풀에 손을 대는데, 동기 API에는 동적 import로 숨길 자리가 없습니다. 그래서 `randSentence`를 포함하는 번들은 이름 풀도 함께 포함합니다. gzip 기준으로 `randSentence` 번들 [426 KB](../guide/getting-started#bundle-size) 가운데 22 KB 남짓이 이름 풀이고, 나머지는 대부분 단어 풀입니다.
+이 옵션은 사람 이름 풀에 손을 대는데, 동기 API에는 동적 import로 숨길 자리가 없습니다. 그래서 `randSentence`를 포함하는 번들은 이름 풀도 함께 포함합니다. gzip 기준으로 `randSentence` 번들 [417 KB](../guide/getting-started#bundle-size) 가운데 22 KB 남짓이 이름 풀이고, 나머지는 대부분 단어 풀입니다.
 
 이름을 쓸 일이 없고 번들 크기가 중요하다면 `randSentence`를 가져오지 않는 것 외에 방법이 없습니다.
 

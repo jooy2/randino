@@ -1189,7 +1189,7 @@ rand_sentence(language="en", theme="animal", include_name=True, count=2)
 
 ::: warning It costs about 22 KB, whether you use it or not
 
-The option reaches the person-name pools, and a synchronous API has no dynamic import to hide behind, so a bundle that includes `randSentence` at all includes them: about 22 KB of the [426 KB](../guide/getting-started#bundle-size) it bundles to, gzipped. The word pools are most of the rest.
+The option reaches the person-name pools, and a synchronous API has no dynamic import to hide behind, so a bundle that includes `randSentence` at all includes them: about 22 KB of the [417 KB](../guide/getting-started#bundle-size) it bundles to, gzipped. The word pools are most of the rest.
 
 If you never write a name and the size matters, there is nothing to do about it in this version except not to import `randSentence`.
 

@@ -70,15 +70,16 @@ The package declares `sideEffects: false`, so a bundler drops the pools nothing 
 | `randOrganization`                                            | 14 KB    |
 | `randCountry`                                                 | 18 KB    |
 | `randName`                                                    | 24 KB    |
-| `randLocation`, `randCity`, `randDistrict`                    | 160 KB   |
-| `randWord`, `randAnimal` and the rest, `randModifier`         | 260 KB   |
-| `randNickname`                                                | 262 KB   |
-| `randSentence`                                                | 426 KB   |
-| Everything                                                    | 640 KB   |
+| `randModifier`                                                | 91 KB    |
+| `randLocation`, `randCity`, `randDistrict`                    | 156 KB   |
+| `randWord`, `randAnimal` and the rest                         | 254 KB   |
+| `randNickname`                                                | 255 KB   |
+| `randSentence`                                                | 417 KB   |
+| Everything                                                    | 627 KB   |
 
 Measured by bundling the one import with esbuild, minified, and gzipping the result.
 
-The word pools are one object per language, so one theme costs what twenty-nine do, and `randSentence` adds the grammar on top. That is the trade a synchronous API with no dependencies makes: nothing is fetched, so everything a function can reach ships with it. On a server it is nothing; in a browser bundle, reach for `randName` or the decorators if that is all you need, and load `randSentence` from a chunk of its own.
+The nouns are one object per language, so one theme costs what twenty-nine do, and `randSentence` adds the grammar on top. `randModifier` carries the modifiers apart from them, and the nouns of only the four languages whose modifiers agree with one. That is the trade a synchronous API with no dependencies makes: nothing is fetched, so everything a function can reach ships with it. On a server it is nothing; in a browser bundle, reach for `randName` or the decorators if that is all you need, and load `randSentence` from a chunk of its own.
 
 :::
 

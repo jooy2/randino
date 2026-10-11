@@ -139,3 +139,22 @@ export type WordLanguageData = {
 	frames: readonly WordFrame[];
 	syn: WordSynthesis;
 };
+
+/**
+ * What `randModifier` reads of a language, kept in `modifiers/<code>.ts` apart
+ * from the nouns: the modifiers themselves, how they agree, the shapes they sit
+ * in and the template an invented one is spelled from. Apart because a bundle
+ * that decorates a string has no use for twenty-nine themes of nouns, and they
+ * were most of what it carried.
+ */
+export type WordModifierData = Pick<
+	WordLanguageData,
+	| 'joiner'
+	| 'capitalize'
+	| 'adjectives'
+	| 'actions'
+	| 'genderRules'
+	| 'agreement'
+	| 'frames'
+	| 'syn'
+>;

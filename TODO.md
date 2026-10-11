@@ -47,7 +47,6 @@ A fix to a generator added under `vNext` needs no changelog entry of its own, si
 
 ### B. Decided, being worked through
 
-- **B65. Split the word data for bundling.** `randAnimal` alone is 260 KB, and `randModifier` uses about 87 KB of the 260 KB it pulls. Splitting modifiers and grammar from the nouns by theme touches three packages and `tools/parity`; an invented word is looked up in every theme, which limits what a themed function saves. Decided: split the modifiers and frames from the nouns, in the JavaScript package only.
 - **B70. `CLAUDE.md` is 163 KB.** Moving the per-generator behaviour notes next to each generator removes about 80 KB, and changes where the rules are found. Decided: move the per-generator notes to a `CLAUDE.md` beside each category, with an index at the root.
 - **B71. The docs deploy holds a write token in the job that runs `npm ci`.** Splitting build and deploy, or moving to `actions/deploy-pages`, needs the Pages settings changed. Decided: `actions/deploy-pages`, after the Pages source is switched to GitHub Actions.
 
