@@ -90,6 +90,7 @@ def test_the_package_exports_exactly_its_public_api() -> None:
         "NameLanguageOption",
         "NameScript",
         "NicknameDetail",
+        "NonbinaryIdentity",
         "ORGANIZATION_INDUSTRIES",
         "ORGANIZATION_TYPES",
         "OS_FAMILY_CODES",

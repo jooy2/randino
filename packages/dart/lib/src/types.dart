@@ -808,20 +808,54 @@ enum GenderCode {
   /// The same code `NameGender.female` is.
   female,
 
-  /// The third option a form offers beside the two.
+  /// The third option a form offers beside the two, and the code of every
+  /// identity `nonbinaryIdentity` writes for it.
   nonbinary,
 
   /// Not stated — what a record holds when nobody gave an answer.
   unknown,
 }
 
+/// A gender a non-binary person names themselves by, which
+/// `nonbinaryIdentity` writes in place of the form's `nonbinary` label. The
+/// same in every language.
+enum NonbinaryIdentity {
+  /// The umbrella term, which is also the identity named most often.
+  nonbinary,
+
+  /// A gender outside the two, or between them.
+  genderqueer,
+
+  /// A gender that moves between several.
+  genderfluid,
+
+  /// No gender at all.
+  agender,
+
+  /// Partly a girl or a woman.
+  demigirl,
+
+  /// Partly a boy or a man.
+  demiboy,
+
+  /// Two genders.
+  bigender,
+}
+
 /// A generated gender in its language, with the code behind it.
 class GenderDetail {
   /// Creates a detail record. Returned by the generator; there is rarely a
   /// reason to build one by hand outside a test.
-  const GenderDetail({required this.gender, required this.code, required this.language});
+  const GenderDetail({
+    required this.gender,
+    required this.code,
+    required this.language,
+    this.identity,
+  });
 
-  /// The label a form in [language] writes: `여성`, `Female`, `Weiblich`.
+  /// The label a form in [language] writes: `여성`, `Female`, `Weiblich`. With
+  /// `nonbinaryIdentity`, a `nonbinary` one is the identity instead
+  /// (`Genderfluid`).
   final String gender;
 
   /// The same gender as a code, which is the same whatever the language.
@@ -830,8 +864,13 @@ class GenderDetail {
   /// The language the label is written in.
   final WordLanguage language;
 
+  /// The identity [gender] writes, the same whatever the language, so
+  /// `Genderfluid` and `젠더플루이드` read as one. `null` unless the label is an
+  /// identity, which takes `nonbinaryIdentity` and [GenderCode.nonbinary].
+  final NonbinaryIdentity? identity;
+
   @override
-  String toString() => 'GenderDetail($gender, ${code.name}, ${language.name})';
+  String toString() => 'GenderDetail($gender, ${code.name}, ${language.name}, ${identity?.name})';
 }
 
 /// What kind of organization a name is for.

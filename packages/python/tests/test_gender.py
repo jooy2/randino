@@ -5,7 +5,14 @@ from random import Random
 from randino import RAND_COUNT_MAX, WORD_LANGUAGES, GenderCode, GenderDetail, rand_gender
 
 # Internal, but they are what a label is checked against.
-from randino.gender.data import GENDER_CODES, GENDER_LABELS, GENDER_WEIGHTS
+from randino.gender.data import (
+    GENDER_CODES,
+    GENDER_LABELS,
+    GENDER_WEIGHTS,
+    NONBINARY_IDENTITIES,
+    NONBINARY_LABELS,
+    NONBINARY_WEIGHTS,
+)
 
 SAMPLE = 60
 
@@ -115,3 +122,77 @@ def test_unique_never_repeats_a_label_and_stops_when_the_labels_run_out() -> Non
     genders = rand_gender(language="en", include_unknown=True, unique=True, count=10)
 
     assert sorted(genders) == ["Female", "Male", "Unknown"]
+
+
+def test_every_language_writes_every_identity_none_alike_and_none_a_form_label() -> None:
+    assert set(NONBINARY_LABELS) == set(WORD_LANGUAGES)
+
+    for language in WORD_LANGUAGES:
+        labels = [NONBINARY_LABELS[language][identity] for identity in NONBINARY_IDENTITIES]
+        others = [GENDER_LABELS[language][code] for code in ("male", "female", "unknown")]
+
+        assert all(label.strip() for label in labels), language
+        assert len(set(labels)) == len(labels), f"{language} repeats an identity"
+        assert not set(labels) & set(others), f"{language} writes an identity as another code's"
+
+
+def test_the_umbrella_term_is_the_most_common_identity_and_the_rest_follow_in_order() -> None:
+    weights = [NONBINARY_WEIGHTS[identity] for identity in NONBINARY_IDENTITIES]
+
+    assert NONBINARY_IDENTITIES[0] == "nonbinary"
+    assert all(weight > 0 for weight in weights)
+    assert weights == sorted(weights, reverse=True), weights
+
+
+def test_nonbinary_identity_writes_nonbinary_as_an_identity_and_leaves_the_rest_alone() -> None:
+    identities: set[str] = set()
+
+    for detail in rand_gender(
+        include_unknown=True,
+        include_nonbinary=True,
+        nonbinary_identity=True,
+        count=LARGE,
+        output="detail",
+    ):
+        if detail.code == "nonbinary":
+            assert detail.identity is not None, f"{detail.gender} ({detail.language})"
+            assert detail.gender == NONBINARY_LABELS[detail.language][detail.identity]
+            identities.add(detail.identity)
+        else:
+            assert detail.identity is None
+            assert detail.gender == GENDER_LABELS[detail.language][detail.code]
+
+    # About a hundred `nonbinary` draws, split over seven identities.
+    assert len(identities) > 2, identities
+    assert "nonbinary" in identities
+
+
+def test_german_writes_the_identity_not_the_option_its_forms_carry() -> None:
+    labels = {
+        detail.gender
+        for detail in rand_gender(
+            language="de",
+            include_nonbinary=True,
+            nonbinary_identity=True,
+            count=LARGE,
+            output="detail",
+        )
+        if detail.code == "nonbinary"
+    }
+
+    assert labels
+    assert "Divers" not in labels
+
+
+def test_the_identity_is_none_without_the_option() -> None:
+    details = rand_gender(
+        include_unknown=True, include_nonbinary=True, count=LARGE, output="detail"
+    )
+
+    assert {detail.identity for detail in details} == {None}
+
+
+def test_nonbinary_identity_changes_nothing_without_include_nonbinary() -> None:
+    assert rand_gender(
+        include_unknown=True, nonbinary_identity=True, count=SAMPLE, random=Random(7).random
+    ) == rand_gender(include_unknown=True, count=SAMPLE, random=Random(7).random)

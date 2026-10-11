@@ -27,6 +27,7 @@ Everything below runs in your browser. The controls are the options `randName`, 
 - Set `group` to `senior` and `maxAge` to `40`. No age is both, so the range wins and the ages come from 0 to 40 rather than nothing at all.
 - On the genders tab, turn on `includeUnknown` and `includeNonbinary` and set `count` to `50`. Unknown comes up four or five times; non-binary once or not at all, since it is about one draw in a hundred.
 - Set `language` to `de` with `includeNonbinary` on. German writes `Divers`, the third option its own forms carry.
+- Turn on `nonbinaryIdentity` as well and set `count` to `50`, then press Generate a few times. `Divers` gives way to `Nichtbinär`, `Genderqueer`, `Genderfluid` and the rest, which are what people call themselves rather than the box a form offers.
 - On the organizations tab, set `type` to `company` and switch `language` between `es` and `de`. Spanish puts the business in front of the name and German behind it: the order is the language's template, not the generator's.
 - Leave `type` on `all` and pick an `industry`. Only companies come back, because an industry is a company's.
 - Set `language` to `ko` and `minLength` to `12`. A Korean organization is usually shorter, so the long kinds are chosen, a company with its legal form or a 종합사회복지관, rather than a short name stretched.

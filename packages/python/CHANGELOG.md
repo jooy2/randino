@@ -2,6 +2,9 @@
 
 ## vNext (2026--)
 
+- **`rand_gender` can write a non-binary gender as an identity.** `nonbinary_identity=True` writes a `"nonbinary"` draw as the name a person calls themselves by — `Genderqueer`, `Genderfluid`, `Agender`, `Demigirl`, `Demiboy`, `Bigender` or `Non-binary` itself — instead of the option a form offers, in all nine languages: `젠더플루이드`, `Nichtbinär`, `Género fluido`. Each comes up as often as it was ticked in the Gender Census 2024. The `code` stays `"nonbinary"`, the argument is ignored without `include_nonbinary`, and a call without it draws exactly what it drew before.
+- **`GenderDetail` reports the identity a label writes.** `identity` is one of the new `NonbinaryIdentity` codes — `"genderfluid"` for `Genderfluid` and `젠더플루이드` alike — so identities drawn in different languages can be counted together. It is `None` for every label `nonbinary_identity` did not write, and it defaults to `None`, so a detail built by hand needs no change.
+
 ## 1.4.0 (2026-10-11)
 
 - **`rand_date` generates dates**, drawn evenly from a range and written out in UTC. `min_date` and `max_date` take an ISO 8601 string, a `datetime` or a `date`. A string names a span, so `max_date="2024-12-31"` reaches the last millisecond of that day, and one that carries an offset is read in it. The range defaults to the years 1900 to 2099, a bound left out moves out of the way of the one that was written, and every range is held inside the years 1 to 9999. `format` writes the date with `YYYY`, `MM`, `DD`, `HH`, `mm`, `ss`, `SSS` and the rest of the tokens, ISO 8601 by default, and `unit` returns one part of each date as an `int` instead: `unit="minute"` is `0` to `59`. `output="detail"` reports the timestamp and every part. `DATE_UNITS` is exported beside it.

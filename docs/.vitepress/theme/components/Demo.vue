@@ -242,6 +242,7 @@ const gender = reactive({
 	language: 'en',
 	includeUnknown: false,
 	includeNonbinary: false,
+	nonbinaryIdentity: false,
 	count: 8,
 	unique: false
 });
@@ -648,6 +649,7 @@ const options = computed(() => {
 		if (gender.language !== 'all') out.language = gender.language;
 		if (gender.includeUnknown) out.includeUnknown = true;
 		if (gender.includeNonbinary) out.includeNonbinary = true;
+		if (gender.includeNonbinary && gender.nonbinaryIdentity) out.nonbinaryIdentity = true;
 		if (gender.count !== 1) out.count = Number(gender.count);
 		if (gender.unique) out.unique = true;
 
@@ -921,7 +923,8 @@ function generate() {
 			items = drawn.map((detail) => detail.gender);
 			meta = drawn.map((detail) => [
 				['code', detail.code],
-				['language', detail.language]
+				['language', detail.language],
+				['identity', String(detail.identity)]
 			]);
 		} else {
 			items = randGender(config);
@@ -1449,6 +1452,15 @@ async function copy() {
 				<label class="randino-demo-check">
 					<input v-model="gender.includeNonbinary" type="checkbox" />
 					<code>includeNonbinary</code>
+				</label>
+
+				<label class="randino-demo-check" :class="{ 'is-off': !gender.includeNonbinary }">
+					<input
+						v-model="gender.nonbinaryIdentity"
+						type="checkbox"
+						:disabled="!gender.includeNonbinary"
+					/>
+					<code>nonbinaryIdentity</code>
 				</label>
 
 				<label class="randino-demo-check">

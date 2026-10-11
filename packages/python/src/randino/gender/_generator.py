@@ -1,11 +1,22 @@
-"""The gender generator: one of two codes, or of four, and the label a form writes for it."""
+"""The gender generator: one of two codes, or of four, and the label a form writes for it.
+
+With `nonbinary_identity` on, a `nonbinary` gender is written as the identity a person names
+themselves by instead.
+"""
 
 from collections.abc import Callable
 
 from randino._internal.generate import collect
 from randino._internal.utils import pick, pick_weighted, with_random
 from randino._types import GenderDetail, WordLanguage, WordLanguageOption
-from randino.gender.data import GENDER_CODES, GENDER_LABELS, GENDER_WEIGHTS
+from randino.gender.data import (
+    GENDER_CODES,
+    GENDER_LABELS,
+    GENDER_WEIGHTS,
+    NONBINARY_IDENTITIES,
+    NONBINARY_LABELS,
+    NONBINARY_WEIGHTS,
+)
 from randino.word.data import WORD_LANGUAGES, resolve_word_language
 
 
@@ -15,6 +26,7 @@ def generate_gender_details(
     count: int = 1,
     include_unknown: bool = False,
     include_nonbinary: bool = False,
+    nonbinary_identity: bool = False,
     unique: bool = False,
     random: Callable[[], float] | None = None,
 ) -> list[GenderDetail]:
@@ -30,10 +42,19 @@ def generate_gender_details(
         if (code != "unknown" or include_unknown is True)
         and (code != "nonbinary" or include_nonbinary is True)
     ]
+    identity = nonbinary_identity is True
 
     def draw() -> GenderDetail:
         code = pick_weighted(codes, lambda each: GENDER_WEIGHTS[each])
         drawn = pick(languages)
+        # Drawn after the language and only for `nonbinary`, so a call without the option
+        # makes the same draws it always made.
+        if code == "nonbinary" and identity:
+            named = pick_weighted(NONBINARY_IDENTITIES, lambda each: NONBINARY_WEIGHTS[each])
+
+            return GenderDetail(
+                gender=NONBINARY_LABELS[drawn][named], code=code, language=drawn, identity=named
+            )
 
         return GenderDetail(gender=GENDER_LABELS[drawn][code], code=code, language=drawn)
 

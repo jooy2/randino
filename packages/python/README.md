@@ -253,7 +253,7 @@ rand_age(output="detail")  # [AgeDetail(age=16, group='teen')]
 
 ## Genders
 
-Genders for sample people, written the way a form in the language labels them. Male and female split evenly; `include_unknown` adds a gender nobody stated, about one draw in eleven, and `include_nonbinary` a third gender, about one in a hundred.
+Genders for sample people, written the way a form in the language labels them. Male and female split evenly; `include_unknown` adds a gender nobody stated, about one draw in eleven, and `include_nonbinary` a third gender, about one in a hundred. `nonbinary_identity` writes that third gender as the identity a person names themselves by (`Genderqueer`, `Agender`) rather than as the option a form offers.
 
 ```python
 from randino import rand_gender
@@ -261,21 +261,23 @@ from randino import rand_gender
 rand_gender(language="ko", count=3)  # ['여성', '남성', '여성']
 rand_gender(language="en", include_unknown=True, count=3)  # ['Male', 'Unknown', 'Female']
 rand_gender(language="de", include_nonbinary=True)  # ['Divers']
+rand_gender(language="de", include_nonbinary=True, nonbinary_identity=True)  # ['Genderfluid']
 
 rand_gender(language="ko", output="detail")
-# [GenderDetail(gender='여성', code='female', language='ko')]
+# [GenderDetail(gender='여성', code='female', language='ko', identity=None)]
 ```
 
-| Argument            | Type                  | Default   |
-| ------------------- | --------------------- | --------- |
-| `language`          | `WordLanguageOption`  | `"all"`   |
-| `include_unknown`   | `bool`                | `False`   |
-| `include_nonbinary` | `bool`                | `False`   |
-| `count`             | `int`                 | `1`       |
-| `unique`            | `bool`                | `False`   |
-| `output`            | `"value" \| "detail"` | `"value"` |
+| Argument             | Type                  | Default   |
+| -------------------- | --------------------- | --------- |
+| `language`           | `WordLanguageOption`  | `"all"`   |
+| `include_unknown`    | `bool`                | `False`   |
+| `include_nonbinary`  | `bool`                | `False`   |
+| `nonbinary_identity` | `bool`                | `False`   |
+| `count`              | `int`                 | `1`       |
+| `unique`             | `bool`                | `False`   |
+| `output`             | `"value" \| "detail"` | `"value"` |
 
-The detail's `code` is `"male"`, `"female"`, `"nonbinary"` or `"unknown"` whatever the language, and the first two are the codes `rand_name`'s `gender` takes.
+The detail's `code` is `"male"`, `"female"`, `"nonbinary"` or `"unknown"` whatever the language, and the first two are the codes `rand_name`'s `gender` takes. Its `identity` names the identity `nonbinary_identity` wrote, the same in every language, and is `None` otherwise.
 
 ## Organizations
 

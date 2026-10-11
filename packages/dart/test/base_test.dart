@@ -71,6 +71,7 @@ void main() {
           'NameLanguage',
           'NameScript',
           'NicknameDetail',
+          'NonbinaryIdentity',
           'OrganizationDetail',
           'OrganizationIndustry',
           'OrganizationType',

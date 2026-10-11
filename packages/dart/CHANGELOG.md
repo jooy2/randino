@@ -2,6 +2,9 @@
 
 ## vNext (2026--)
 
+- **`randGender` can write a non-binary gender as an identity**, and so can `randGenderDetails`. `nonbinaryIdentity: true` writes a `nonbinary` draw as the name a person calls themselves by — `Genderqueer`, `Genderfluid`, `Agender`, `Demigirl`, `Demiboy`, `Bigender` or `Non-binary` itself — instead of the option a form offers, in all nine languages: `젠더플루이드`, `Nichtbinär`, `Género fluido`. Each comes up as often as it was ticked in the Gender Census 2024. The `code` stays `GenderCode.nonbinary`, the parameter is ignored without `includeNonbinary`, and a call without it draws exactly what it drew before.
+- **`GenderDetail` reports the identity a label writes.** `identity` is a value of the new `NonbinaryIdentity` enum — `NonbinaryIdentity.genderfluid` for `Genderfluid` and `젠더플루이드` alike — so identities drawn in different languages can be counted together. It is `null` for every label `nonbinaryIdentity` did not write, and the constructor's `identity` is optional, so a detail built by hand needs no change. `toString` writes it last: `GenderDetail(여성, female, ko, null)`.
+
 ## 1.4.0 (2026-10-11)
 
 - **`randDate` generates dates**, with `randDateUnit` and `randDateDetails` beside it, drawn evenly from a range and written out in UTC. `minDate` and `maxDate` take a `DateTime`, which is the instant it holds. The range defaults to the years 1900 to 2099, a bound left out moves out of the way of the one that was written, and every range is held inside the years 1 to 9999. `format` writes the date with `YYYY`, `MM`, `DD`, `HH`, `mm`, `ss`, `SSS` and the rest of the tokens, ISO 8601 by default. `randDateUnit` returns one part of each date as an `int` instead: `randDateUnit(DateUnit.minute)` is `0` to `59`. `randDateDetails` reports the timestamp and every part, and `dateUnits` is exported beside them.

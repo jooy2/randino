@@ -542,8 +542,24 @@ GenderCode = Literal["male", "female", "nonbinary", "unknown"]
 """A gender as a code, the same in every language.
 
 - `male` and `female`: the same two codes `NameGender` uses.
-- `nonbinary`: the third option a form offers beside them.
+- `nonbinary`: the third option a form offers beside them, and the code of every identity
+  `nonbinary_identity` writes for it.
 - `unknown`: not stated — what a record holds when nobody gave an answer.
+"""
+
+NonbinaryIdentity = Literal[
+    "nonbinary", "genderqueer", "genderfluid", "agender", "demigirl", "demiboy", "bigender"
+]
+"""A gender a non-binary person names themselves by, the same in every language.
+
+`nonbinary_identity` writes one in place of the form's `nonbinary` label.
+
+- `nonbinary`: the umbrella term, which is also the identity named most often.
+- `genderqueer`: a gender outside the two, or between them.
+- `genderfluid`: a gender that moves between several.
+- `agender`: no gender at all.
+- `demigirl` and `demiboy`: partly a girl or a woman, partly a boy or a man.
+- `bigender`: two genders.
 """
 
 
@@ -552,13 +568,23 @@ class GenderDetail:
     """A generated gender in its language, with the code behind it."""
 
     gender: str
-    """The label a form in the language writes: `여성`, `Female`, `Weiblich`."""
+    """The label a form in the language writes: `여성`, `Female`, `Weiblich`.
+
+    With `nonbinary_identity`, a `nonbinary` one is the identity instead (`Genderfluid`).
+    """
 
     code: GenderCode
     """The same gender as a code, which is the same whatever the language."""
 
     language: WordLanguage
     """The language the label is written in."""
+
+    identity: NonbinaryIdentity | None = None
+    """The identity `gender` writes, the same whatever the language.
+
+    So `Genderfluid` and `젠더플루이드` read as one. `None` unless the label is an identity,
+    which takes `nonbinary_identity` and the code `"nonbinary"`.
+    """
 
 
 OrganizationType = Literal["company", "nonprofit", "school", "government", "public"]

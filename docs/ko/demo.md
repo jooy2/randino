@@ -27,6 +27,7 @@
 - `group`을 `senior`로, `maxAge`를 `40`으로 두어 보세요. 둘을 모두 만족하는 나이가 없으므로 범위를 따라, 빈 결과 대신 0세에서 40세 사이가 나옵니다.
 - 성별 탭에서 `includeUnknown`과 `includeNonbinary`를 켜고 `count`를 `50`으로 두어 보세요. 미상은 네다섯 번 나오고, 논바이너리는 100번에 한 번꼴이라 한 번 나오거나 아예 나오지 않습니다.
 - `includeNonbinary`를 켠 채 `language`를 `de`로 바꿔 보세요. 독일어는 자국 양식에 있는 세 번째 선택지인 `Divers`를 씁니다.
+- 여기서 `nonbinaryIdentity`도 켜고 `count`를 `50`으로 둔 채 몇 번 생성해 보세요. `Divers` 대신 `Nichtbinär`, `Genderqueer`, `Genderfluid` 같은 명칭이 나옵니다. 양식의 칸이 아니라 사람들이 스스로를 부르는 이름입니다.
 - 회사·기관 탭에서 `type`을 `company`로 두고 `language`를 `es`와 `de`로 번갈아 바꿔 보세요. 스페인어는 업종을 이름 앞에, 독일어는 뒤에 둡니다. 어순은 생성기가 아니라 그 언어의 템플릿이 정합니다.
 - `type`을 `all`로 둔 채 `industry`를 골라 보세요. 업종은 회사에만 있으므로 회사만 나옵니다.
 - `language`를 `ko`, `minLength`를 `12`로 두어 보세요. 한국어 조직 이름은 대개 그보다 짧아서, 짧은 이름을 늘이지 않고 법인 형태가 붙은 회사나 종합사회복지관처럼 긴 종류를 고릅니다.

@@ -8,18 +8,28 @@ import 'package:randino/src/types.dart';
 ///
 /// Male and female, evenly, by default. [includeUnknown] adds a gender nobody
 /// stated, about one draw in eleven, and [includeNonbinary] adds a third
-/// gender, about one in a hundred. A null [language] mixes all nine.
+/// gender, about one in a hundred. [nonbinaryIdentity] writes that third
+/// gender as the identity a person names themselves by (`Genderfluid`,
+/// `Agender`) rather than as the option a form offers. A null [language]
+/// mixes all nine.
 ///
 /// ```dart
 /// randGender(language: WordLanguage.ko, count: 3); // [여성, 남성, 여성]
 /// randGender(language: WordLanguage.en, includeUnknown: true, count: 3); // [Male, Unknown, Female]
 /// randGender(language: WordLanguage.de, includeNonbinary: true); // [Divers]
+/// randGender(language: WordLanguage.en, includeNonbinary: true, nonbinaryIdentity: true); // [Genderqueer]
 /// ```
 List<String> randGender({
   WordLanguage? language,
   int count = 1,
   bool includeUnknown = false,
   bool includeNonbinary = false,
+
+  /// Write `nonbinary` as the identity a person names themselves by
+  /// (`Genderfluid`, `에이젠더`, `Nichtbinär`) rather than as the option a
+  /// form offers (`Non-binary`, `Divers`). Ignored unless [includeNonbinary]
+  /// is on.
+  bool nonbinaryIdentity = false,
   bool unique = false,
 
   /// Where the randomness comes from: `Random.secure()` for a value nobody may
@@ -31,6 +41,7 @@ List<String> randGender({
     count: count,
     includeUnknown: includeUnknown,
     includeNonbinary: includeNonbinary,
+    nonbinaryIdentity: nonbinaryIdentity,
     unique: unique,
     random: random,
   ))

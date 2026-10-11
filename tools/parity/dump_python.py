@@ -48,7 +48,14 @@ from randino.disk.data import (
     DISK_TYPES,
 )
 from randino.file.data import FILE_CATEGORIES, FILE_EXTENSIONS, MIME_TOP_LEVELS
-from randino.gender.data import GENDER_CODES, GENDER_LABELS, GENDER_WEIGHTS
+from randino.gender.data import (
+    GENDER_CODES,
+    GENDER_LABELS,
+    GENDER_WEIGHTS,
+    NONBINARY_IDENTITIES,
+    NONBINARY_LABELS,
+    NONBINARY_WEIGHTS,
+)
 from randino.gpu.data import GPU_VENDORS, GPUS
 from randino.location.data import LOCATION_DATA, LOCATION_LANGUAGES, LOCATION_LEVELS
 from randino.location.data.countries import COUNTRIES
@@ -569,6 +576,11 @@ print(
                 "codes": list(GENDER_CODES),
                 "weights": dict(GENDER_WEIGHTS),
                 "labels": {language: dict(labels) for language, labels in GENDER_LABELS.items()},
+                "identities": list(NONBINARY_IDENTITIES),
+                "identityWeights": dict(NONBINARY_WEIGHTS),
+                "identityLabels": {
+                    language: dict(labels) for language, labels in NONBINARY_LABELS.items()
+                },
             },
             # Each architecture's weight per platform it runs on, a platform it does not
             # left out, and the name each naming writes it by.

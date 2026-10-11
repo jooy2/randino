@@ -61,7 +61,10 @@ import { GPUS, GPU_VENDORS } from '../../packages/javascript/lib/gpu/data/index.
 import {
 	GENDER_CODES,
 	GENDER_LABELS,
-	GENDER_WEIGHTS
+	GENDER_WEIGHTS,
+	NONBINARY_IDENTITIES,
+	NONBINARY_LABELS,
+	NONBINARY_WEIGHTS
 } from '../../packages/javascript/lib/gender/data/index.js';
 import { COUNTRIES } from '../../packages/javascript/lib/location/data/countries.js';
 import { LOCATION_SHORT } from '../../packages/javascript/lib/location/data/short.js';
@@ -342,7 +345,10 @@ console.log(
 		gender: {
 			codes: [...GENDER_CODES],
 			weights: { ...GENDER_WEIGHTS },
-			labels: GENDER_LABELS
+			labels: GENDER_LABELS,
+			identities: [...NONBINARY_IDENTITIES],
+			identityWeights: { ...NONBINARY_WEIGHTS },
+			identityLabels: NONBINARY_LABELS
 		},
 		// Each architecture's weight per platform it runs on, a platform it does not
 		// left out, and the name each naming writes it by.

@@ -149,6 +149,7 @@ export 'src/types.dart'
         NameLanguage,
         NameScript,
         NicknameDetail,
+        NonbinaryIdentity,
         OrganizationDetail,
         OrganizationIndustry,
         OrganizationType,

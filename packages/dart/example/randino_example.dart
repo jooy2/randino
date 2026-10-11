@@ -134,8 +134,14 @@ void _people() {
   print(randAge(group: {AgeGroup.senior}, count: 3)); // [71, 66, 80]
   print(randAgeDetails().first); // AgeDetail(16, teen)
   print(randGender(language: WordLanguage.ko, count: 3)); // [여성, 남성, 여성]
-  print(randGenderDetails(language: WordLanguage.de, includeNonbinary: true).first);
-  // GenderDetail(Weiblich, female, de)
+  print(
+    randGenderDetails(
+      language: WordLanguage.de,
+      includeNonbinary: true,
+      nonbinaryIdentity: true,
+    ).first,
+  );
+  // GenderDetail(Weiblich, female, de, null)
 }
 
 /// Organizations that do not exist, written the way the language writes each kind.

@@ -605,6 +605,16 @@ void main() {
               for (final label in language.value.entries) label.key.name: label.value,
             },
         },
+        'identities': <String>[for (final identity in nonbinaryIdentities) identity.name],
+        'identityWeights': <String, Object?>{
+          for (final entry in nonbinaryWeights.entries) entry.key.name: entry.value,
+        },
+        'identityLabels': <String, Object?>{
+          for (final language in nonbinaryLabels.entries)
+            language.key.name: <String, Object?>{
+              for (final label in language.value.entries) label.key.name: label.value,
+            },
+        },
       },
       // Each architecture's weight per platform it runs on, a platform it does
       // not left out, and the name each naming writes it by.

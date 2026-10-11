@@ -129,5 +129,109 @@ void main() {
 
       expect(genders.toList()..sort(), <String>['Female', 'Male', 'Unknown']);
     });
+
+    test('every language writes every identity, none alike and none a form label', () {
+      expect(nonbinaryLabels.keys.toSet(), WordLanguage.values.toSet());
+
+      for (final language in WordLanguage.values) {
+        final labels = <String>[
+          for (final identity in nonbinaryIdentities) nonbinaryLabels[language]![identity]!,
+        ];
+        final others = <String>[
+          for (final code in <GenderCode>[GenderCode.male, GenderCode.female, GenderCode.unknown])
+            genderLabels[language]![code]!,
+        ];
+
+        expect(labels.every((label) => label.trim().isNotEmpty), isTrue, reason: language.name);
+        expect(
+          labels.toSet(),
+          hasLength(labels.length),
+          reason: '${language.name} repeats an identity',
+        );
+        expect(
+          labels.where(others.contains),
+          isEmpty,
+          reason: "${language.name} writes an identity as another code's label",
+        );
+      }
+    });
+
+    test('the umbrella term is the most common identity, and the rest follow in order', () {
+      final weights = <int>[
+        for (final identity in nonbinaryIdentities) nonbinaryWeights[identity]!,
+      ];
+
+      expect(nonbinaryIdentities.first, NonbinaryIdentity.nonbinary);
+
+      for (var index = 0; index < weights.length; index++) {
+        expect(weights[index], greaterThan(0));
+
+        if (index > 0) {
+          expect(weights[index], lessThanOrEqualTo(weights[index - 1]), reason: '$weights');
+        }
+      }
+    });
+
+    test('nonbinaryIdentity writes nonbinary as an identity, and leaves the other codes alone', () {
+      final identities = <NonbinaryIdentity>{};
+
+      for (final detail in randGenderDetails(
+        includeUnknown: true,
+        includeNonbinary: true,
+        nonbinaryIdentity: true,
+        count: large,
+      )) {
+        if (detail.code == GenderCode.nonbinary) {
+          final identity = detail.identity;
+
+          expect(identity, isNotNull, reason: '${detail.gender} (${detail.language.name})');
+          expect(detail.gender, nonbinaryLabels[detail.language]![identity]);
+          identities.add(identity!);
+        } else {
+          expect(detail.identity, isNull);
+          expect(detail.gender, genderLabels[detail.language]![detail.code]);
+        }
+      }
+
+      // About a hundred `nonbinary` draws, split over seven identities.
+      expect(identities.length, greaterThan(2), reason: '$identities');
+      expect(identities, contains(NonbinaryIdentity.nonbinary));
+    });
+
+    test('German writes the identity, not the option its forms carry', () {
+      final labels = <String>{
+        for (final detail in randGenderDetails(
+          language: WordLanguage.de,
+          includeNonbinary: true,
+          nonbinaryIdentity: true,
+          count: large,
+        ))
+          if (detail.code == GenderCode.nonbinary) detail.gender,
+      };
+
+      expect(labels, isNotEmpty);
+      expect(labels, isNot(contains('Divers')));
+    });
+
+    test('the identity is null without the option', () {
+      expect(
+        {
+          for (final detail in randGenderDetails(
+            includeUnknown: true,
+            includeNonbinary: true,
+            count: large,
+          ))
+            detail.identity,
+        },
+        <NonbinaryIdentity?>{null},
+      );
+    });
+
+    test('nonbinaryIdentity changes nothing without includeNonbinary', () {
+      expect(
+        randGender(includeUnknown: true, nonbinaryIdentity: true, count: sample, random: Random(7)),
+        randGender(includeUnknown: true, count: sample, random: Random(7)),
+      );
+    });
   });
 }

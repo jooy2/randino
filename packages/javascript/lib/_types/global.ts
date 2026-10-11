@@ -900,10 +900,24 @@ export interface AgeDetail {
 /**
  * A gender as a code, the same in every language:
  * - `male` and `female`, the same two codes `NameGender` uses.
- * - `nonbinary`: the third option a form offers beside them.
+ * - `nonbinary`: the third option a form offers beside them, and the code of
+ *   every identity `nonbinaryIdentity` writes for it.
  * - `unknown`: not stated — what a record holds when nobody gave an answer.
  */
 export type GenderCode = 'male' | 'female' | 'nonbinary' | 'unknown';
+
+/**
+ * A gender a non-binary person names themselves by, which `nonbinaryIdentity`
+ * writes in place of the form's `nonbinary` label. The same in every language:
+ * - `nonbinary`: the umbrella term, which is also the identity named most often.
+ * - `genderqueer`: a gender outside the two, or between them.
+ * - `genderfluid`: a gender that moves between several.
+ * - `agender`: no gender at all.
+ * - `demigirl` and `demiboy`: partly a girl or a woman, partly a boy or a man.
+ * - `bigender`: two genders.
+ */
+export type NonbinaryIdentity =
+	'nonbinary' | 'genderqueer' | 'genderfluid' | 'agender' | 'demigirl' | 'demiboy' | 'bigender';
 
 /**
  * What `randGender` takes. A gender is one of four labels, so it has no length,
@@ -925,15 +939,31 @@ export interface RandGenderOptions extends Pick<
 	 * way it comes up in a population. Default `false`.
 	 */
 	includeNonbinary?: boolean;
+	/**
+	 * Write `nonbinary` as the identity a person names themselves by
+	 * (`Genderfluid`, `에이젠더`, `Nichtbinär`) rather than as the option a form
+	 * offers (`Non-binary`, `Divers`). Ignored unless `includeNonbinary` is on.
+	 * Default `false`.
+	 */
+	nonbinaryIdentity?: boolean;
 }
 
 /** A generated gender in its language, with the code behind it. */
 export interface GenderDetail {
-	/** The label a form in the language writes: `여성`, `Female`, `Weiblich`. */
+	/**
+	 * The label a form in the language writes: `여성`, `Female`, `Weiblich`. With
+	 * `nonbinaryIdentity`, a `nonbinary` one is the identity instead (`Genderfluid`).
+	 */
 	gender: string;
 	/** The same gender as a code, which is the same whatever the language. */
 	code: GenderCode;
 	language: WordLanguage;
+	/**
+	 * The identity `gender` writes, the same whatever the language, so
+	 * `Genderfluid` and `젠더플루이드` read as one. `null` unless the label is an
+	 * identity, which takes `nonbinaryIdentity` and the code `nonbinary`.
+	 */
+	identity: NonbinaryIdentity | null;
 }
 
 /**

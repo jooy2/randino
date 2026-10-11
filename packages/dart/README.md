@@ -236,25 +236,27 @@ randAgeDetails().first; // AgeDetail(16, teen)
 
 ## Genders
 
-Genders for sample people, written the way a form in the language labels them. Male and female split evenly; `includeUnknown` adds a gender nobody stated, about one draw in eleven, and `includeNonbinary` a third gender, about one in a hundred.
+Genders for sample people, written the way a form in the language labels them. Male and female split evenly; `includeUnknown` adds a gender nobody stated, about one draw in eleven, and `includeNonbinary` a third gender, about one in a hundred. `nonbinaryIdentity` writes that third gender as the identity a person names themselves by (`Genderqueer`, `Agender`) rather than as the option a form offers.
 
 ```dart
 randGender(language: WordLanguage.ko, count: 3); // [여성, 남성, 여성]
 randGender(language: WordLanguage.en, includeUnknown: true, count: 3); // [Male, Unknown, Female]
 randGender(language: WordLanguage.de, includeNonbinary: true); // [Divers]
+randGender(language: WordLanguage.de, includeNonbinary: true, nonbinaryIdentity: true); // [Genderfluid]
 
-randGenderDetails(language: WordLanguage.ko).first; // GenderDetail(여성, female, ko)
+randGenderDetails(language: WordLanguage.ko).first; // GenderDetail(여성, female, ko, null)
 ```
 
-| Parameter          | Type            | Default            |
-| ------------------ | --------------- | ------------------ |
-| `language`         | `WordLanguage?` | `null` — every one |
-| `includeUnknown`   | `bool`          | `false`            |
-| `includeNonbinary` | `bool`          | `false`            |
-| `count`            | `int`           | `1`                |
-| `unique`           | `bool`          | `false`            |
+| Parameter           | Type            | Default            |
+| ------------------- | --------------- | ------------------ |
+| `language`          | `WordLanguage?` | `null` — every one |
+| `includeUnknown`    | `bool`          | `false`            |
+| `includeNonbinary`  | `bool`          | `false`            |
+| `nonbinaryIdentity` | `bool`          | `false`            |
+| `count`             | `int`           | `1`                |
+| `unique`            | `bool`          | `false`            |
 
-A `GenderDetail`'s `code` is a `GenderCode` whatever the language, and its `male` and `female` are the two `NameGender` holds.
+A `GenderDetail`'s `code` is a `GenderCode` whatever the language, and its `male` and `female` are the two `NameGender` holds. Its `identity` is the `NonbinaryIdentity` that `nonbinaryIdentity` wrote, the same in every language, and `null` otherwise.
 
 ## Organizations
 
