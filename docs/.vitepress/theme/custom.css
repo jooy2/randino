@@ -11,6 +11,16 @@
 	--vp-c-brand-2: #5b6cff;
 	--vp-c-brand-3: #6f7dff;
 	--vp-c-brand-soft: rgb(90 108 255 / 0.14);
+	/*
+	 * The hints and captions VitePress writes in its third text colour, and the
+	 * white text on a brand button, fell under the 4.5:1 a small text needs: the
+	 * hints were 2.9 to 3.4 to 1 and "Get started" 3.5 to 1. These hold 4.7 or
+	 * more against every background the site puts them on, in both themes.
+	 */
+	--vp-c-text-3: #67676c;
+	--vp-button-brand-bg: #4a5bef;
+	--vp-button-brand-hover-bg: #3f4fe0;
+	--vp-button-brand-active-bg: #3646d4;
 }
 
 .dark {
@@ -18,6 +28,10 @@
 	--vp-c-brand-2: #8593ff;
 	--vp-c-brand-3: #6f7dff;
 	--vp-c-brand-soft: rgb(122 137 255 / 0.16);
+	--vp-c-text-3: #98989f;
+	--vp-button-brand-bg: #4a5bef;
+	--vp-button-brand-hover-bg: #3f4fe0;
+	--vp-button-brand-active-bg: #3646d4;
 }
 
 /*
