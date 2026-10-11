@@ -36,21 +36,6 @@ The OS catalog runs to October 2026, and the device, processor and graphics cata
 - Update every place that says "the end of 2025": the `randCpu`, `randGpu` and `randDevice` pages in both locales (their catalog tables count the parts per maker and give the year span), the three package READMEs, the bullet in `CLAUDE.md` that names the cutoff, and the counts in the `CHANGELOG.md` entries that are still under `vNext`.
 - If a 2026 OS release came out after October 2026, add it the same way, confirmed against the publisher's release notes.
 
-## Audit of 2026-10-10
-
-Every public function, the docs site and the repository documents were reviewed for performance, security, bundle size, bugs, tests and docs. The findings were reproduced before they were listed. The `A` items need no decision and are worked through in batches of thirty, one commit each, with one push at the end of a batch; the `B` items change behaviour or need the maintainer's call, and wait until the `A` items are done. Anything found while working goes under "Found while working" with the next free number. Bundle sizes are esbuild `--bundle --minify` over `dist`, then `gzip -9`.
-
-A fix to a generator added under `vNext` needs no changelog entry of its own, since the version that has the bug has not shipped; correct its existing entry if the entry says something the fix makes untrue.
-
-### A. No decision needed
-
-
-### B. Decided, being worked through
-
-
-### Found while working
-
-
 ## Further ideas, not yet agreed
 
 These came up while the system generators were written and were never put to the maintainer. Ask before starting any of them.
