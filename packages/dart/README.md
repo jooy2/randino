@@ -694,6 +694,10 @@ dart analyze
 dart format .
 ```
 
+## Disclaimer
+
+randino draws its values at random, so some will match real things by chance: a person's name, a company, a phone number in service, a nickname already taken. Any such match is a coincidence, and no value refers to a real person or organization. Product names belong to their owners, and randino is not affiliated with any of them. Use the values as sample data, never to impersonate or deceive anyone or to contact a drawn phone number. The software and its output come without warranty, and nobody involved in randino is liable for any use of them. The [full disclaimer](https://randino.cdget.com/guide/disclaimer) has the details.
+
 ## License
 
 MIT © [CDGet](https://cdget.com)

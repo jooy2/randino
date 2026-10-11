@@ -181,6 +181,12 @@ Each package owns its own `README.md` and `CHANGELOG.md`, because npm, pub.dev a
 
 Anyone can contribute to the project by reporting new issues or submitting a pull request. For more information, please see [CONTRIBUTING.md](CONTRIBUTING.md).
 
+## Disclaimer
+
+randino draws its values at random, so some will match real things by chance: a person's name, a company, a phone number in service, a nickname already taken. Any such match is a coincidence, and no value refers to a real person or organization. The product names the system generators write belong to their owners, and randino is not affiliated with any of them.
+
+Use the values as sample data for development, testing, research and teaching. Do not use them to impersonate anyone, to deceive people or services, or to contact the holder of a drawn phone number. Putting them in a commercial product, or anywhere people may take them as real, is at your own risk. The software and its output come without warranty, and the copyright holder, the authors, the contributors and the maintainers are not liable for any use of them. None of this changes the MIT License. The [full disclaimer](https://randino.cdget.com/guide/disclaimer) has the details.
+
 ## License
 
 Please see the [LICENSE](LICENSE) file for more information about project owners, usage rights, and more.
