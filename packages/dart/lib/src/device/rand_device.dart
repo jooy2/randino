@@ -9,18 +9,26 @@ import 'package:randino/src/types.dart';
 /// Every model is one that came out, written with its generation or year where
 /// the line is told apart by one: `iPad (10th generation)`, `ThinkPad X1 Carbon
 /// Gen 11`, `MacBook Air (M2, 2022)`. A null or empty [type] draws every kind,
-/// and [minYear] and [maxYear] keep to the models released in those years.
+/// [vendor] keeps to the makers named, and [minYear] and [maxYear] to the
+/// models released in those years.
 ///
 /// ```dart
 /// randDevice(); // [Samsung Galaxy S24 Ultra]
 /// randDevice(type: {DeviceType.laptop}, count: 2); // [Lenovo ThinkPad T14 Gen 3, Apple MacBook Air (M2, 2022)]
 /// randDevice(type: {DeviceType.phone}, includeVendor: false); // [Pixel 8 Pro]
 /// randDevice(type: {DeviceType.phone, DeviceType.tablet}, maxYear: 2012); // [Apple iPad 2]
+/// randDevice(vendor: {'Samsung', 'Google'}, type: {DeviceType.phone}); // [Google Pixel 9]
 /// ```
 List<String> randDevice({
   Set<DeviceType>? type,
   int? minYear,
   int? maxYear,
+
+  /// Which makers, by the name each sells under: `{'Samsung'}`. A null or
+  /// empty set, or one naming no maker the catalog holds, draws every maker; a
+  /// maker with no device of the kinds or in the years asked for is answered
+  /// with nothing.
+  Set<String>? vendor,
 
   /// Write the maker in front of the model. A model whose name already opens
   /// on its maker's is written the same either way.
@@ -36,6 +44,7 @@ List<String> randDevice({
     type: type,
     minYear: minYear,
     maxYear: maxYear,
+    vendor: vendor,
     includeVendor: includeVendor,
     count: count,
     unique: unique,

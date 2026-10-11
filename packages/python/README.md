@@ -423,6 +423,7 @@ rand_device(count=2)  # ['Samsung Galaxy S24 Ultra', 'Apple iPad (10th generatio
 rand_device(type="laptop")  # ['Lenovo ThinkPad X1 Carbon Gen 11']
 rand_device(type=("phone", "tablet"), max_year=2012)  # ['Apple iPhone 4']
 rand_device(type="phone", include_vendor=False)  # ['Pixel 8 Pro']
+rand_device(vendor=("Samsung", "Google"))  # ['Samsung Galaxy Z Fold8']
 
 rand_device(output="detail")
 # [DeviceDetail(device='Google Pixel 8', vendor='Google', model='Pixel 8', type='phone', year=2023)]
@@ -433,12 +434,13 @@ rand_device(output="detail")
 | `type`           | `DeviceTypeOption`    | `"all"`   |
 | `min_year`       | `int \| None`         | `None`    |
 | `max_year`       | `int \| None`         | `None`    |
+| `vendor`         | `DeviceVendorOption`  | `"all"`   |
 | `include_vendor` | `bool`                | `True`    |
 | `count`          | `int`                 | `1`       |
 | `unique`         | `bool`                | `False`   |
 | `output`         | `"value" \| "detail"` | `"value"` |
 
-`type` is `"phone"`, `"tablet"` or `"laptop"`, or a sequence of them. A model is written the way its maker writes it, generation and all, and one whose name already opens on its maker's (`Xiaomi 14`) is never written with the maker twice.
+`type` is `"phone"`, `"tablet"` or `"laptop"`, or a sequence of them, and `vendor` one maker or several, named the way the catalog writes them (`DEVICE_VENDORS`). A model is written the way its maker writes it, generation and all, and one whose name already opens on its maker's (`Xiaomi 14`) is never written with the maker twice.
 
 ### Processors
 

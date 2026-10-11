@@ -3,7 +3,7 @@
 from collections.abc import Callable
 from typing import Literal, overload
 
-from randino._types import DeviceDetail, DeviceTypeOption
+from randino._types import DeviceDetail, DeviceTypeOption, DeviceVendorOption
 from randino.device._generator import generate_device_details
 
 
@@ -13,6 +13,7 @@ def rand_device(
     type: DeviceTypeOption = ...,
     min_year: int | None = ...,
     max_year: int | None = ...,
+    vendor: DeviceVendorOption = ...,
     include_vendor: bool = ...,
     count: int = ...,
     unique: bool = ...,
@@ -27,6 +28,7 @@ def rand_device(
     type: DeviceTypeOption = ...,
     min_year: int | None = ...,
     max_year: int | None = ...,
+    vendor: DeviceVendorOption = ...,
     include_vendor: bool = ...,
     count: int = ...,
     unique: bool = ...,
@@ -40,6 +42,7 @@ def rand_device(
     type: DeviceTypeOption = "all",
     min_year: int | None = None,
     max_year: int | None = None,
+    vendor: DeviceVendorOption = "all",
     include_vendor: bool = True,
     count: int = 1,
     unique: bool = False,
@@ -57,6 +60,9 @@ def rand_device(
         min_year: The earliest year a device may have been released in.
         max_year: The latest year a device may have been released in — `2015` is what was
             out by the end of 2015. A range the wrong way round keeps `max_year`.
+        vendor: Which makers, by the name each sells under: `"Samsung"`, or a sequence of
+            them. A maker with no device of the kinds or in the years asked for is answered
+            with nothing.
         include_vendor: Write the maker in front of the model: `Apple iPhone 15` rather
             than `iPhone 15`. A model whose name already opens on its maker's
             (`Xiaomi 14`) is written the same either way.
@@ -73,7 +79,7 @@ def rand_device(
     Returns:
         A `list[str]`, or a `list[DeviceDetail]` when `output="detail"` — the overloads
         carry that through, so a type checker knows which one it got. Empty when no
-        device was released inside the year range.
+        device of the kinds and makers asked for was released inside the year range.
 
     Example:
         >>> rand_device()
@@ -82,11 +88,14 @@ def rand_device(
         ['Lenovo ThinkPad T14 Gen 3', 'Apple MacBook Air (M2, 2022)']
         >>> rand_device(type="phone", include_vendor=False)
         ['Pixel 8 Pro']
+        >>> rand_device(vendor=("Samsung", "Google"), type="phone")
+        ['Google Pixel 9']
     """
     details = generate_device_details(
         type=type,
         min_year=min_year,
         max_year=max_year,
+        vendor=vendor,
         include_vendor=include_vendor,
         count=count,
         unique=unique,

@@ -39,7 +39,7 @@ from randino.decorate.data import (
     AFFIX_LENGTH_MAX,
     AFFIX_SEPARATOR_DEFAULT,
 )
-from randino.device.data import DEVICE_TYPES, DEVICES
+from randino.device.data import DEVICE_TYPES, DEVICE_VENDORS, DEVICES
 from randino.disk.data import DISK_SCALE, DISK_TYPE_LABELS, DISK_TYPE_WEIGHTS, DISK_TYPES
 from randino.file.data import FILE_CATEGORIES, FILE_EXTENSIONS, MIME_TOP_LEVELS
 from randino.gender.data import GENDER_CODES, GENDER_LABELS, GENDER_WEIGHTS
@@ -620,7 +620,11 @@ print(
                 },
             },
             # Every maker `vendor` accepts, in the order each catalog lists them.
-            "vendors": {"cpu": list(CPU_VENDORS), "gpu": list(GPU_VENDORS)},
+            "vendors": {
+                "cpu": list(CPU_VENDORS),
+                "gpu": list(GPU_VENDORS),
+                "device": list(DEVICE_VENDORS),
+            },
             # One entry per processor, keyed by its maker and model, the way the devices are.
             "cpu": {
                 f"{entry.vendor} {entry.model}": {"platform": entry.platform, "year": entry.year}

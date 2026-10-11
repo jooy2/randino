@@ -107,6 +107,7 @@ void main() {
           'cpuVendors',
           'dateUnits',
           'deviceTypes',
+          'deviceVendors',
           'diskTypes',
           'diskUnits',
           'fileCategories',
@@ -337,6 +338,7 @@ void main() {
       expect(randDevice(), hasLength(1));
       expect(randDeviceDetails()[0], isA<DeviceDetail>());
       expect(deviceTypes, DeviceType.values);
+      expect(deviceVendors, contains(randDeviceDetails()[0].vendor));
       expect(randRam().single, matches(RegExp(r'^\d+ (MB|GB)$')));
       expect(randRamDetails()[0], isA<RamDetail>());
       expect(ramUnits, RamUnit.values);

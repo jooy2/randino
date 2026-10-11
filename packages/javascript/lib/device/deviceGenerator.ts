@@ -7,7 +7,7 @@
 import { collect, resolveMany, resolveRandom, resolveYears } from '../_internal/generate.js';
 import { pick, withRandom } from '../_internal/utils.js';
 import type { DeviceDetail, RandDeviceOptions } from '../_types/global.js';
-import { DEVICES, DEVICE_TYPES } from './data/index.js';
+import { DEVICES, DEVICE_TYPES, DEVICE_VENDORS } from './data/index.js';
 import type { DeviceEntry } from './data/index.js';
 
 /**
@@ -22,12 +22,17 @@ export function writeDevice(entry: DeviceEntry, includeVendor: boolean): string 
 
 export function generateDeviceDetails(options: RandDeviceOptions = {}): DeviceDetail[] {
 	const types = resolveMany(options.type, DEVICE_TYPES, DEVICE_TYPES);
+	const vendors = resolveMany(options.vendor, DEVICE_VENDORS, DEVICE_VENDORS);
 	const [minYear, maxYear] = resolveYears(options.minYear, options.maxYear);
 	const includeVendor = options.includeVendor !== false;
 	// Worked out once per call rather than per draw: a call of ten thousand would
 	// otherwise filter the catalog ten thousand times.
 	const candidates = DEVICES.filter(
-		(entry) => types.includes(entry.type) && entry.year >= minYear && entry.year <= maxYear
+		(entry) =>
+			types.includes(entry.type) &&
+			vendors.includes(entry.vendor) &&
+			entry.year >= minYear &&
+			entry.year <= maxYear
 	);
 
 	return withRandom(resolveRandom(options.random), () =>

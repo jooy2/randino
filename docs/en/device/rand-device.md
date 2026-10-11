@@ -1,6 +1,6 @@
 # randDevice
 
-Generates real phones, tablets and laptops and returns `count` of them, each by the name its maker gave it: `Apple iPhone 15 Pro`, `Samsung Galaxy Tab S9`, `Lenovo ThinkPad X1 Carbon Gen 11`. Nothing is invented: every result is a model that came out, written with the generation or the year its line is told apart by. [`type`](#catalog) keeps to one kind of device, and [`minYear` and `maxYear`](#years) to the models released in those years.
+Generates real phones, tablets and laptops and returns `count` of them, each by the name its maker gave it: `Apple iPhone 15 Pro`, `Samsung Galaxy Tab S9`, `Lenovo ThinkPad X1 Carbon Gen 11`. Nothing is invented: every result is a model that came out, written with the generation or the year its line is told apart by. [`type`](#catalog) keeps to one kind of device, [`vendor`](#makers) to the makers named, and [`minYear` and `maxYear`](#years) to the models released in those years.
 
 A desktop PC is left out on purpose. It is mostly built from parts, so it has no model name of its own to write.
 
@@ -46,6 +46,7 @@ Every option is optional, and the defaults are what the empty call above uses.
 | `type` | <Lang js="DeviceTypeOption" dart="Set&lt;DeviceType&gt;?" py="DeviceTypeOption" code /> | <Lang js="'all'" dart="null" py="&quot;all&quot;" code /> | `phone`, `tablet` or `laptop`, or several of them. See [what it draws from](#catalog). |
 | <Lang js="minYear" dart="minYear" py="min_year" code /> | <Lang js="number" dart="int?" py="int &#124; None" code /> | <Lang js="—" dart="null" py="None" code /> | The earliest year a device may have been released in. See [years](#years). |
 | <Lang js="maxYear" dart="maxYear" py="max_year" code /> | <Lang js="number" dart="int?" py="int &#124; None" code /> | <Lang js="—" dart="null" py="None" code /> | The latest year a device may have been released in. See [years](#years). |
+| `vendor` | <Lang js="DeviceVendorOption" dart="Set&lt;String&gt;?" py="DeviceVendorOption" code /> | <Lang js="'all'" dart="null" py="&quot;all&quot;" code /> | Which makers, by the name each sells under: one, several, or every one of them. See [makers](#makers). |
 | <Lang js="includeVendor" dart="includeVendor" py="include_vendor" code /> | <Lang js="boolean" dart="bool" py="bool" code /> | <Lang js="true" dart="true" py="True" code /> | Write the maker in front of the model. See [makers and models](#vendor). |
 | `count` | <Lang js="number" dart="int" py="int" code /> | `1` | How many devices to return. Clamped to `0` … `10000`. |
 | `unique` | <Lang js="boolean" dart="bool" py="bool" code /> | <Lang js="false" dart="false" py="False" code /> | Never return the same device twice. Returns fewer than `count` once the catalog runs out. |
@@ -137,6 +138,42 @@ rand_device(type="phone", include_vendor=False, count=3)  # ['iPhone 13', 'Xiaom
 
 :::
 
+## Makers {#makers}
+
+`vendor` keeps to the makers named, written as the [catalog](#catalog) writes them, the order <Lang js="DEVICE_VENDORS" dart="deviceVendors" py="DEVICE_VENDORS" code /> lists them in: `Apple`, `Samsung`, `Google`, `Xiaomi`, `OnePlus`, `Sony`, `LG`, `Huawei`, `Motorola`, `Nothing`, `Nokia`, `HTC`, `BlackBerry`, `Microsoft`, `Amazon`, `Lenovo`, `Dell`, `HP`, `ASUS` and `Razer`. A name the catalog does not hold is ignored, and a list of nothing but such names draws every maker. It narrows alongside `type` and the years, so a maker with no device there is answered with nothing: Razer makes no phone here, and BlackBerry nothing after 2013.
+
+::: lang js
+
+```javascript
+randDevice({ vendor: 'Samsung', count: 2 }); // ['Samsung Galaxy S26 Ultra', 'Samsung Galaxy Tab S9']
+randDevice({ vendor: ['Apple', 'Google'], type: 'phone' }); // ['Google Pixel 11 Pro']
+randDevice({ vendor: 'Razer', type: 'phone' }); // []
+```
+
+:::
+
+::: lang dart
+
+```dart
+randDevice(vendor: {'Samsung'}, count: 2); // [Samsung Galaxy S26 Ultra, Samsung Galaxy Tab S9]
+randDevice(vendor: {'Apple', 'Google'}, type: {DeviceType.phone}); // [Google Pixel 11 Pro]
+randDevice(vendor: {'Razer'}, type: {DeviceType.phone}); // []
+```
+
+The makers are strings rather than an enum, because they are names: `{'Samsung'}`, matched exactly.
+
+:::
+
+::: lang py
+
+```python
+rand_device(vendor="Samsung", count=2)  # ['Samsung Galaxy S26 Ultra', 'Samsung Galaxy Tab S9']
+rand_device(vendor=("Apple", "Google"), type="phone")  # ['Google Pixel 11 Pro']
+rand_device(vendor="Razer", type="phone")  # []
+```
+
+:::
+
 ## Years {#years}
 
 <Lang js="minYear" dart="minYear" py="min_year" code /> and <Lang js="maxYear" dart="maxYear" py="max_year" code /> keep to the devices released in that range, both years included, so <Lang js="maxYear: 2012" dart="maxYear: 2012" py="max_year=2012" code /> is what was on sale by the end of 2012. A range nothing was released in is answered with nothing rather than with a device from outside it, and a range the wrong way round keeps <Lang js="maxYear" dart="maxYear" py="max_year" code />.
@@ -214,7 +251,7 @@ rand_device(output="detail")
 | Field | Type | Description |
 | --- | --- | --- |
 | `device` | <Lang js="string" dart="String" py="str" code /> | The device, as the value form returns it. |
-| `vendor` | <Lang js="string" dart="String" py="str" code /> | Who makes it: `Apple`, `Samsung`, `Lenovo`. |
+| `vendor` | <Lang js="DeviceVendor" dart="String" py="DeviceVendor" code /> | Who makes it: `Apple`, `Samsung`, `Lenovo`. |
 | `model` | <Lang js="string" dart="String" py="str" code /> | The model's own name: `Galaxy S24 Ultra`. |
 | `type` | `DeviceType` | `phone`, `tablet` or `laptop`. |
 | `year` | <Lang js="number" dart="int" py="int" code /> | The year the device was released. |

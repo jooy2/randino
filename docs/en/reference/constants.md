@@ -335,6 +335,7 @@ import {
 	ARCHITECTURES,
 	CPU_VENDORS,
 	DEVICE_TYPES,
+	DEVICE_VENDORS,
 	DISK_TYPES,
 	DISK_UNITS,
 	RAM_UNITS,
@@ -352,6 +353,7 @@ import {
 | `SYSTEM_PLATFORMS` | `SystemPlatform[]` | `['desktop', 'mobile']` |
 | `OS_FAMILY_CODES` | `OsFamily[]` | `['windows', 'macos', 'ubuntu', 'fedora', 'debian', 'android', 'ios', 'ipados']` |
 | `DEVICE_TYPES` | `DeviceType[]` | `['phone', 'tablet', 'laptop']` |
+| `DEVICE_VENDORS` | `DeviceVendor[]` | `['Apple', 'Samsung', 'Google', …, 'Razer']` |
 | `RAM_UNITS` | `RamUnit[]` | `['MB', 'GB']` |
 | `DISK_TYPES` | `DiskType[]` | `['hdd', 'ssd', 'sshd', 'emmc', 'ufs']` |
 | `DISK_UNITS` | `DiskUnit[]` | `['MB', 'GB', 'TB']` |
@@ -375,6 +377,7 @@ import 'package:randino/randino.dart';
 | `systemPlatforms` | `List<SystemPlatform>` | `desktop`, then `mobile` |
 | `osFamilyCodes` | `List<OsFamily>` | `windows`, `macos`, … `ipados`, eight in all |
 | `deviceTypes` | `List<DeviceType>` | `phone`, `tablet`, then `laptop` |
+| `deviceVendors` | `List<String>` | `Apple`, `Samsung`, … `Razer`, twenty in all |
 | `ramUnits` | `List<RamUnit>` | `mb`, then `gb` |
 | `diskTypes` | `List<DiskType>` | `hdd`, `ssd`, `sshd`, `emmc`, then `ufs` |
 | `diskUnits` | `List<DiskUnit>` | `mb`, `gb`, then `tb` |
@@ -394,6 +397,7 @@ from randino import (
     ARCHITECTURES,
     CPU_VENDORS,
     DEVICE_TYPES,
+    DEVICE_VENDORS,
     DISK_TYPES,
     DISK_UNITS,
     RAM_UNITS,
@@ -411,6 +415,7 @@ from randino import (
 | `SYSTEM_PLATFORMS` | `tuple[SystemPlatform, …]` | `('desktop', 'mobile')` |
 | `OS_FAMILY_CODES` | `tuple[OsFamily, …]` | `('windows', 'macos', 'ubuntu', 'fedora', 'debian', 'android', 'ios', 'ipados')` |
 | `DEVICE_TYPES` | `tuple[DeviceType, …]` | `('phone', 'tablet', 'laptop')` |
+| `DEVICE_VENDORS` | `tuple[DeviceVendor, …]` | `('Apple', 'Samsung', 'Google', …, 'Razer')` |
 | `RAM_UNITS` | `tuple[RamUnit, …]` | `('MB', 'GB')` |
 | `DISK_TYPES` | `tuple[DiskType, …]` | `('hdd', 'ssd', 'sshd', 'emmc', 'ufs')` |
 | `DISK_UNITS` | `tuple[DiskUnit, …]` | `('MB', 'GB', 'TB')` |
@@ -632,6 +637,8 @@ import type {
 	DeviceDetail,
 	DeviceType,
 	DeviceTypeOption,
+	DeviceVendor,
+	DeviceVendorOption,
 	DiskSizeDetail,
 	DiskType,
 	DiskTypeDetail,
@@ -765,6 +772,8 @@ from randino import (
     DeviceDetail,
     DeviceType,
     DeviceTypeOption,
+    DeviceVendor,
+    DeviceVendorOption,
     DiskSizeDetail,
     DiskType,
     DiskTypeDetail,

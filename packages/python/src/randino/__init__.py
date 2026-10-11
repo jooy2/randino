@@ -40,6 +40,8 @@ from randino._types import (
     DeviceDetail,
     DeviceType,
     DeviceTypeOption,
+    DeviceVendor,
+    DeviceVendorOption,
     DiskSizeDetail,
     DiskType,
     DiskTypeDetail,
@@ -136,7 +138,7 @@ from randino.decorate import (
     rand_prefix,
     rand_suffix,
 )
-from randino.device import DEVICE_TYPES, rand_device
+from randino.device import DEVICE_TYPES, DEVICE_VENDORS, rand_device
 from randino.disk import DISK_TYPES, DISK_UNITS, rand_disk_size, rand_disk_type
 from randino.file import FILE_CATEGORIES, MIME_TOP_LEVELS, rand_file_extension, rand_mime_type
 from randino.gender import rand_gender
@@ -211,6 +213,7 @@ __all__ = [
     "CPU_VENDORS",
     "DATE_UNITS",
     "DEVICE_TYPES",
+    "DEVICE_VENDORS",
     "DISK_TYPES",
     "DISK_UNITS",
     "FILE_CATEGORIES",
@@ -254,6 +257,8 @@ __all__ = [
     "DeviceDetail",
     "DeviceType",
     "DeviceTypeOption",
+    "DeviceVendor",
+    "DeviceVendorOption",
     "DiskSizeDetail",
     "DiskType",
     "DiskTypeDetail",

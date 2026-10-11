@@ -1,7 +1,7 @@
 import { rows } from '../../_internal/parse.js';
-import type { DeviceType } from '../../_types/global.js';
+import type { DeviceType, DeviceVendor } from '../../_types/global.js';
 
-export { DEVICE_TYPES } from './constants.js';
+export { DEVICE_TYPES, DEVICE_VENDORS } from './constants.js';
 
 /** One device the catalog holds. */
 export interface DeviceEntry {
@@ -9,7 +9,7 @@ export interface DeviceEntry {
 	/** The year the device was released. */
 	year: number;
 	/** Who makes it: `Apple`, `Samsung`, `Lenovo`. */
-	vendor: string;
+	vendor: DeviceVendor;
 	/**
 	 * The model's own name, as its maker writes it: `iPhone 15 Pro`, `Galaxy Z
 	 * Fold5`, `ThinkPad X1 Carbon Gen 11`. A model whose name already opens on its
@@ -516,6 +516,6 @@ export const DEVICES: readonly DeviceEntry[] = rows(`
 `).map(([type, year, vendor, model]) => ({
 	type: type as DeviceType,
 	year: Number(year),
-	vendor,
+	vendor: vendor as DeviceVendor,
 	model
 }));

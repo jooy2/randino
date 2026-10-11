@@ -793,6 +793,33 @@ A sequence is a set to draw from, so `("phone", "tablet")` is any mobile device,
 `"all"` is every one of them.
 """
 
+DeviceVendor = Literal[
+    "Apple",
+    "Samsung",
+    "Google",
+    "Xiaomi",
+    "OnePlus",
+    "Sony",
+    "LG",
+    "Huawei",
+    "Motorola",
+    "Nothing",
+    "Nokia",
+    "HTC",
+    "BlackBerry",
+    "Microsoft",
+    "Amazon",
+    "Lenovo",
+    "Dell",
+    "HP",
+    "ASUS",
+    "Razer",
+]
+"""Who makes a device, by the name it is sold under."""
+
+DeviceVendorOption = DeviceVendor | Sequence[DeviceVendor] | Literal["all"]
+"""One maker, a sequence of them to draw from, or `"all"` of them."""
+
 
 @dataclass(frozen=True, slots=True)
 class DeviceDetail:
@@ -801,7 +828,7 @@ class DeviceDetail:
     device: str
     """The device as the value form returns it: `Samsung Galaxy S24 Ultra`."""
 
-    vendor: str
+    vendor: DeviceVendor
     """Who makes it: `Samsung`."""
 
     model: str

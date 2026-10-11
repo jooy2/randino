@@ -116,7 +116,7 @@ lib/
     randDevice.ts           # public: string[], or DeviceDetail[] on `output: 'detail'`
     deviceGenerator.ts      # internal: the candidates per call, the maker written once
     data/index.ts           # DEVICES: every model, one row each
-    data/constants.ts       # DEVICE_TYPES
+    data/constants.ts       # DEVICE_TYPES, DEVICE_VENDORS
   disk/
     index.ts
     randDiskType.ts         # public: string[], or DiskTypeDetail[] on `output: 'detail'`

@@ -1,6 +1,6 @@
 import assert from 'assert';
 import { describe, it } from 'node:test';
-import { DEVICE_TYPES, RAND_COUNT_MAX, randDevice } from '../dist/index.js';
+import { DEVICE_TYPES, DEVICE_VENDORS, RAND_COUNT_MAX, randDevice } from '../dist/index.js';
 // Internal, but they are what a result is checked against.
 import { DEVICES } from '../dist/device/data/index.js';
 import { writeDevice } from '../dist/device/deviceGenerator.js';
@@ -168,6 +168,43 @@ describe('Device', () => {
 		assert.deepStrictEqual(
 			[...devices].sort(),
 			expected.map((entry) => writeDevice(entry, true)).sort()
+		);
+	});
+
+	it('vendor keeps to the makers named, and lists every maker the catalog holds', () => {
+		// In the order the catalog lists them, so a row with a new maker fails here
+		// until the list has it.
+		assert.deepStrictEqual([...new Set(DEVICES.map((entry) => entry.vendor))], [...DEVICE_VENDORS]);
+
+		for (const vendor of DEVICE_VENDORS) {
+			assert.ok(
+				randDevice({ vendor, count: SAMPLE, output: 'detail' }).every(
+					(detail) => detail.vendor === vendor
+				),
+				vendor
+			);
+		}
+
+		const two = randDevice({ vendor: ['Samsung', 'Google'], count: SAMPLE, output: 'detail' });
+
+		assert.ok(two.every((detail) => detail.vendor === 'Samsung' || detail.vendor === 'Google'));
+		assert.deepStrictEqual(new Set(two.map((detail) => detail.vendor)).size, 2);
+		assert.ok(
+			randDevice({ vendor: 'Nope' as never, count: SAMPLE, output: 'detail' }).some(
+				(detail) => detail.vendor !== 'Apple'
+			),
+			'an unknown maker reads as all of them'
+		);
+	});
+
+	it('a maker with no device of the kind or the years asked for is answered with nothing', () => {
+		// Razer makes laptops, and BlackBerry stopped before 2020.
+		assert.deepStrictEqual(randDevice({ vendor: 'Razer', type: 'phone', count: 5 }), []);
+		assert.deepStrictEqual(randDevice({ vendor: 'BlackBerry', minYear: 2020, count: 5 }), []);
+		assert.ok(
+			randDevice({ vendor: 'Apple', type: 'laptop', count: SAMPLE, output: 'detail' }).every(
+				(detail) => detail.vendor === 'Apple' && detail.type === 'laptop'
+			)
 		);
 	});
 });

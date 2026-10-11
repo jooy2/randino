@@ -7,14 +7,15 @@ import { generateDeviceDetails } from './deviceGenerator.js';
  *
  * Every model is one that came out, written with its generation or year where
  * the line is told apart by one: `iPad (10th generation)`, `ThinkPad X1 Carbon
- * Gen 11`, `MacBook Air (M2, 2022)`. `minYear` and `maxYear` keep to the models
- * released in those years.
+ * Gen 11`, `MacBook Air (M2, 2022)`. `vendor` keeps to the makers named, and
+ * `minYear` and `maxYear` to the models released in those years.
  *
  * @example
  * randDevice(); // ['Samsung Galaxy S24 Ultra']
  * randDevice({ type: 'laptop', count: 2 }); // ['Lenovo ThinkPad T14 Gen 3', 'Apple MacBook Air (M2, 2022)']
  * randDevice({ type: 'phone', includeVendor: false }); // ['Pixel 8 Pro']
  * randDevice({ type: ['phone', 'tablet'], maxYear: 2012 }); // ['Apple iPad 2']
+ * randDevice({ vendor: ['Samsung', 'Google'], type: 'phone' }); // ['Google Pixel 9']
  */
 export function randDevice(options?: RandDeviceOptions & { output?: 'value' }): string[];
 /**

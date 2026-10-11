@@ -1,6 +1,6 @@
 # randDevice
 
-실제로 나온 휴대폰, 태블릿, 노트북을 `count`개만큼 돌려줍니다. `Apple iPhone 15 Pro`, `Samsung Galaxy Tab S9`, `Lenovo ThinkPad X1 Carbon Gen 11`처럼 제조사가 붙인 이름 그대로 씁니다. 지어낸 값은 없습니다. 결과는 모두 실제로 나온 모델이며, 같은 이름의 제품을 세대나 연도로 구분하는 경우에는 그 표기까지 씁니다. [`type`](#catalog)으로 기기 종류를, [`minYear`와 `maxYear`](#years)로 출시 연도를 고를 수 있습니다.
+실제로 나온 휴대폰, 태블릿, 노트북을 `count`개만큼 돌려줍니다. `Apple iPhone 15 Pro`, `Samsung Galaxy Tab S9`, `Lenovo ThinkPad X1 Carbon Gen 11`처럼 제조사가 붙인 이름 그대로 씁니다. 지어낸 값은 없습니다. 결과는 모두 실제로 나온 모델이며, 같은 이름의 제품을 세대나 연도로 구분하는 경우에는 그 표기까지 씁니다. [`type`](#catalog)으로 기기 종류를, [`vendor`](#makers)로 제조사를, [`minYear`와 `maxYear`](#years)로 출시 연도를 고를 수 있습니다.
 
 데스크톱 PC는 일부러 뺐습니다. 대개 부품을 골라 조립하므로 따로 붙은 모델 이름이 없기 때문입니다.
 
@@ -46,6 +46,7 @@ rand_device()
 | `type` | <Lang js="DeviceTypeOption" dart="Set&lt;DeviceType&gt;?" py="DeviceTypeOption" code /> | <Lang js="'all'" dart="null" py="&quot;all&quot;" code /> | `phone`, `tablet`, `laptop` 중 하나, 또는 여럿. [뽑는 범위](#catalog)를 보세요. |
 | <Lang js="minYear" dart="minYear" py="min_year" code /> | <Lang js="number" dart="int?" py="int &#124; None" code /> | <Lang js="—" dart="null" py="None" code /> | 기기가 출시된 가장 이른 해. [연도](#years)를 보세요. |
 | <Lang js="maxYear" dart="maxYear" py="max_year" code /> | <Lang js="number" dart="int?" py="int &#124; None" code /> | <Lang js="—" dart="null" py="None" code /> | 기기가 출시된 가장 늦은 해. [연도](#years)를 보세요. |
+| `vendor` | <Lang js="DeviceVendorOption" dart="Set&lt;String&gt;?" py="DeviceVendorOption" code /> | <Lang js="'all'" dart="null" py="&quot;all&quot;" code /> | 고를 제조사. 판매에 쓰는 이름으로 하나, 여럿, 또는 전부. [제조사](#makers)를 보세요. |
 | <Lang js="includeVendor" dart="includeVendor" py="include_vendor" code /> | <Lang js="boolean" dart="bool" py="bool" code /> | <Lang js="true" dart="true" py="True" code /> | 모델 앞에 제조사를 씁니다. [제조사와 모델](#vendor)을 보세요. |
 | `count` | <Lang js="number" dart="int" py="int" code /> | `1` | 돌려줄 기기 개수. `0` … `10000`으로 제한됩니다. |
 | `unique` | <Lang js="boolean" dart="bool" py="bool" code /> | <Lang js="false" dart="false" py="False" code /> | 같은 결과를 두 번 돌려주지 않습니다. 카탈로그가 바닥나면 `count`보다 적게 돌아옵니다. |
@@ -137,6 +138,42 @@ rand_device(type="phone", include_vendor=False, count=3)  # ['iPhone 13', 'Xiaom
 
 :::
 
+## 제조사 {#makers}
+
+`vendor`는 [뽑는 범위](#catalog)에 적힌 이름 그대로 고른 제조사만 남깁니다. `Apple`, `Samsung`, `Google`, `Xiaomi`, `OnePlus`, `Sony`, `LG`, `Huawei`, `Motorola`, `Nothing`, `Nokia`, `HTC`, `BlackBerry`, `Microsoft`, `Amazon`, `Lenovo`, `Dell`, `HP`, `ASUS`, `Razer`이며, <Lang js="DEVICE_VENDORS" dart="deviceVendors" py="DEVICE_VENDORS" code />도 이 순서입니다. 카탈로그에 없는 이름은 무시하고, 그런 이름만 주면 모든 제조사에서 뽑습니다. `type`, 연도와 함께 범위를 좁히므로 그 안에 기기가 없는 제조사는 빈 결과를 돌려줍니다. 예를 들어 Razer의 휴대폰은 들어 있지 않고, BlackBerry는 2013년 이후 기기가 없습니다.
+
+::: lang js
+
+```javascript
+randDevice({ vendor: 'Samsung', count: 2 }); // ['Samsung Galaxy S26 Ultra', 'Samsung Galaxy Tab S9']
+randDevice({ vendor: ['Apple', 'Google'], type: 'phone' }); // ['Google Pixel 11 Pro']
+randDevice({ vendor: 'Razer', type: 'phone' }); // []
+```
+
+:::
+
+::: lang dart
+
+```dart
+randDevice(vendor: {'Samsung'}, count: 2); // [Samsung Galaxy S26 Ultra, Samsung Galaxy Tab S9]
+randDevice(vendor: {'Apple', 'Google'}, type: {DeviceType.phone}); // [Google Pixel 11 Pro]
+randDevice(vendor: {'Razer'}, type: {DeviceType.phone}); // []
+```
+
+제조사는 이름이므로 열거형이 아니라 문자열로 받으며, 정확히 같은 이름만 맞습니다.
+
+:::
+
+::: lang py
+
+```python
+rand_device(vendor="Samsung", count=2)  # ['Samsung Galaxy S26 Ultra', 'Samsung Galaxy Tab S9']
+rand_device(vendor=("Apple", "Google"), type="phone")  # ['Google Pixel 11 Pro']
+rand_device(vendor="Razer", type="phone")  # []
+```
+
+:::
+
 ## 연도 {#years}
 
 <Lang js="minYear" dart="minYear" py="min_year" code />와 <Lang js="maxYear" dart="maxYear" py="max_year" code />는 그 범위에 출시된 기기만 고르고, 두 해 모두 범위에 들어갑니다. 그래서 <Lang js="maxYear: 2012" dart="maxYear: 2012" py="max_year=2012" code />는 2012년 말까지 팔리던 기기입니다. 범위 안에 출시된 기기가 없으면 범위 밖의 기기로 채우지 않고 빈 결과를 돌려주며, 범위의 앞뒤가 바뀌면 <Lang js="maxYear" dart="maxYear" py="max_year" code />를 남깁니다.
@@ -214,7 +251,7 @@ rand_device(output="detail")
 | 필드 | 타입 | 설명 |
 | --- | --- | --- |
 | `device` | <Lang js="string" dart="String" py="str" code /> | 값 출력이 돌려주는 문자열. |
-| `vendor` | <Lang js="string" dart="String" py="str" code /> | 제조사: `Apple`, `Samsung`, `Lenovo`. |
+| `vendor` | <Lang js="DeviceVendor" dart="String" py="DeviceVendor" code /> | 제조사: `Apple`, `Samsung`, `Lenovo`. |
 | `model` | <Lang js="string" dart="String" py="str" code /> | 모델 이름: `Galaxy S24 Ultra`. |
 | `type` | `DeviceType` | `phone`, `tablet`, `laptop` 중 하나. |
 | `year` | <Lang js="number" dart="int" py="int" code /> | 기기가 출시된 해. |

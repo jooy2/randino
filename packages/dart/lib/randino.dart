@@ -59,7 +59,7 @@ export 'src/decorate/rand_prefix.dart' show randPrefix;
 export 'src/decorate/rand_prefix_all.dart' show randPrefixAll;
 export 'src/decorate/rand_suffix.dart' show randSuffix;
 export 'src/decorate/rand_suffix_all.dart' show randSuffixAll;
-export 'src/device/data/index.dart' show deviceTypes;
+export 'src/device/data/index.dart' show deviceTypes, deviceVendors;
 export 'src/device/rand_device.dart' show randDevice;
 export 'src/device/rand_device_details.dart' show randDeviceDetails;
 export 'src/disk/data/index.dart' show diskTypes, diskUnits;

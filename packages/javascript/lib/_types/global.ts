@@ -1274,6 +1274,32 @@ export type DeviceType = 'phone' | 'tablet' | 'laptop';
  */
 export type DeviceTypeOption = DeviceType | readonly DeviceType[] | 'all';
 
+/** Who makes a device, by the name it is sold under. */
+export type DeviceVendor =
+	| 'Apple'
+	| 'Samsung'
+	| 'Google'
+	| 'Xiaomi'
+	| 'OnePlus'
+	| 'Sony'
+	| 'LG'
+	| 'Huawei'
+	| 'Motorola'
+	| 'Nothing'
+	| 'Nokia'
+	| 'HTC'
+	| 'BlackBerry'
+	| 'Microsoft'
+	| 'Amazon'
+	| 'Lenovo'
+	| 'Dell'
+	| 'HP'
+	| 'ASUS'
+	| 'Razer';
+
+/** One maker, several, or `'all'` of them. */
+export type DeviceVendorOption = DeviceVendor | readonly DeviceVendor[] | 'all';
+
 /**
  * What `randDevice` takes. A device is a real model with a real name, so it has
  * no language, no length and nothing to invent.
@@ -1292,6 +1318,12 @@ export interface RandDeviceOptions extends Pick<
 	 */
 	maxYear?: number;
 	/**
+	 * Which makers, by the name each sells under: `'Samsung'`, `['Apple',
+	 * 'Google']`. A maker with no device of the kinds or in the years asked for is
+	 * answered with nothing. Default `'all'`.
+	 */
+	vendor?: DeviceVendorOption;
+	/**
 	 * Write the maker in front of the model: `Apple iPhone 15` rather than `iPhone
 	 * 15`. A model whose name already opens on its maker's (`Xiaomi 14`, `OnePlus
 	 * 12`) is written the same either way. Default `true`.
@@ -1304,7 +1336,7 @@ export interface DeviceDetail {
 	/** The device as the value form returns it: `Samsung Galaxy S24 Ultra`. */
 	device: string;
 	/** Who makes it: `Samsung`. */
-	vendor: string;
+	vendor: DeviceVendor;
 	/** The model's own name: `Galaxy S24 Ultra`. */
 	model: string;
 	type: DeviceType;

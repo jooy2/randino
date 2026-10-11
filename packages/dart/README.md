@@ -391,6 +391,7 @@ randDevice(count: 2); // [Samsung Galaxy S24 Ultra, Apple iPad (10th generation)
 randDevice(type: {DeviceType.laptop}); // [Lenovo ThinkPad X1 Carbon Gen 11]
 randDevice(type: {DeviceType.phone, DeviceType.tablet}, maxYear: 2012); // [Apple iPhone 4]
 randDevice(type: {DeviceType.phone}, includeVendor: false); // [Pixel 8 Pro]
+randDevice(vendor: {'Samsung', 'Google'}, type: {DeviceType.phone}); // [Google Pixel 9]
 
 randDeviceDetails().first; // DeviceDetail(Google Pixel 8, phone, 2023)
 ```
@@ -400,11 +401,12 @@ randDeviceDetails().first; // DeviceDetail(Google Pixel 8, phone, 2023)
 | `type`          | `Set<DeviceType>?` | `null` — every kind |
 | `minYear`       | `int?`             | `null` — none       |
 | `maxYear`       | `int?`             | `null` — none       |
+| `vendor`        | `Set<String>?`     | `null` — all        |
 | `includeVendor` | `bool`             | `true`              |
 | `count`         | `int`              | `1`                 |
 | `unique`        | `bool`             | `false`             |
 
-A model is written the way its maker writes it, generation and all, and one whose name already opens on its maker's (`Xiaomi 14`) is never written with the maker twice.
+A model is written the way its maker writes it, generation and all, and one whose name already opens on its maker's (`Xiaomi 14`) is never written with the maker twice. `vendor` keeps to the makers named, the way `randCpu` takes it, and `deviceVendors` lists every one; a maker with no device of the kinds or in the years asked for is answered with nothing.
 
 ### Processors
 

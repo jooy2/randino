@@ -1,8 +1,9 @@
 """Devices: real phones, tablets and laptops, by the names their makers gave them."""
 
 from random import Random
+from typing import Any
 
-from randino import DEVICE_TYPES, RAND_COUNT_MAX, rand_device
+from randino import DEVICE_TYPES, DEVICE_VENDORS, RAND_COUNT_MAX, rand_device
 
 # Internal, but they are what a result is checked against.
 from randino.device._generator import write_device
@@ -126,3 +127,38 @@ def test_unique_never_repeats_a_device_and_stops_when_the_devices_run_out() -> N
 
     assert len(set(found)) == len(found)
     assert set(found) == expected
+
+
+def test_vendor_keeps_to_the_makers_named_and_lists_every_maker_the_catalog_holds() -> None:
+    # In the order the catalog lists them, so a row with a new maker fails here until the
+    # list has it.
+    assert list(dict.fromkeys(entry.vendor for entry in DEVICES)) == list(DEVICE_VENDORS)
+
+    for vendor in DEVICE_VENDORS:
+        details = rand_device(vendor=vendor, count=SAMPLE, output="detail")
+
+        assert all(detail.vendor == vendor for detail in details), vendor
+
+    two = rand_device(vendor=("Samsung", "Google"), count=SAMPLE, output="detail")
+
+    assert all(detail.vendor in ("Samsung", "Google") for detail in two)
+    assert len({detail.vendor for detail in two}) == 2
+
+    # An unknown maker reads as all of them.
+    loose: Any = rand_device
+
+    assert any(
+        detail.vendor != "Apple" for detail in loose(vendor="Nope", count=SAMPLE, output="detail")
+    )
+
+
+def test_a_maker_with_no_device_of_the_kind_or_the_years_asked_for_is_answered_with_nothing() -> (
+    None
+):
+    # Razer makes laptops, and BlackBerry stopped before 2020.
+    assert rand_device(vendor="Razer", type="phone", count=5) == []
+    assert rand_device(vendor="BlackBerry", min_year=2020, count=5) == []
+    assert all(
+        detail.vendor == "Apple" and detail.type == "laptop"
+        for detail in rand_device(vendor="Apple", type="laptop", count=SAMPLE, output="detail")
+    )

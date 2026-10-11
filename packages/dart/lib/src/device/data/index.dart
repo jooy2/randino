@@ -8,6 +8,31 @@ const List<DeviceType> deviceTypes = <DeviceType>[
   DeviceType.laptop,
 ];
 
+/// Every maker the catalog holds a device of, in the order the catalog lists
+/// them.
+const List<String> deviceVendors = <String>[
+  'Apple',
+  'Samsung',
+  'Google',
+  'Xiaomi',
+  'OnePlus',
+  'Sony',
+  'LG',
+  'Huawei',
+  'Motorola',
+  'Nothing',
+  'Nokia',
+  'HTC',
+  'BlackBerry',
+  'Microsoft',
+  'Amazon',
+  'Lenovo',
+  'Dell',
+  'HP',
+  'ASUS',
+  'Razer',
+];
+
 /// One device the catalog holds. Internal.
 class DeviceEntry {
   /// Creates an entry.

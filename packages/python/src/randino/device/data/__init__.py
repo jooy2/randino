@@ -3,10 +3,34 @@
 from dataclasses import dataclass
 
 from randino._internal.table import rows
-from randino._types import DeviceType
+from randino._types import DeviceType, DeviceVendor
 
 DEVICE_TYPES: tuple[DeviceType, ...] = ("phone", "tablet", "laptop")
 """Every kind of device, in the order the catalog lists them."""
+
+DEVICE_VENDORS: tuple[DeviceVendor, ...] = (
+    "Apple",
+    "Samsung",
+    "Google",
+    "Xiaomi",
+    "OnePlus",
+    "Sony",
+    "LG",
+    "Huawei",
+    "Motorola",
+    "Nothing",
+    "Nokia",
+    "HTC",
+    "BlackBerry",
+    "Microsoft",
+    "Amazon",
+    "Lenovo",
+    "Dell",
+    "HP",
+    "ASUS",
+    "Razer",
+)
+"""Every maker the catalog holds a device of, in the order the catalog lists them."""
 
 
 @dataclass(frozen=True, slots=True)
@@ -19,7 +43,7 @@ class DeviceEntry:
     year: int
     """The year the device was released."""
 
-    vendor: str
+    vendor: DeviceVendor
     """Who makes it: `Apple`, `Samsung`, `Lenovo`."""
 
     model: str

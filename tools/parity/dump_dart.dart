@@ -666,7 +666,7 @@ void main() {
         },
       },
       // Every maker `vendor` accepts, in the order each catalog lists them.
-      'vendors': <String, Object?>{'cpu': cpuVendors, 'gpu': gpuVendors},
+      'vendors': <String, Object?>{'cpu': cpuVendors, 'gpu': gpuVendors, 'device': deviceVendors},
       // One entry per processor, keyed by its maker and model, the way the
       // devices are.
       'cpu': <String, Object?>{

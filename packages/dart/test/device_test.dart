@@ -143,5 +143,54 @@ void main() {
       expect(found.toSet(), hasLength(found.length));
       expect(found.toSet(), expected);
     });
+
+    test('vendor keeps to the makers named, and lists every maker the catalog holds', () {
+      // In the order the catalog lists them, so a row with a new maker fails here
+      // until the list has it.
+      expect(<String>[
+        ...{for (final entry in devices) entry.vendor},
+      ], deviceVendors);
+
+      for (final vendor in deviceVendors) {
+        expect(
+          randDeviceDetails(
+            vendor: {vendor},
+            count: sample,
+          ).every((detail) => detail.vendor == vendor),
+          isTrue,
+          reason: vendor,
+        );
+      }
+
+      final two = randDeviceDetails(vendor: {'Samsung', 'Google'}, count: sample);
+
+      expect(
+        two.every((detail) => detail.vendor == 'Samsung' || detail.vendor == 'Google'),
+        isTrue,
+      );
+      expect({for (final detail in two) detail.vendor}, hasLength(2));
+      expect(
+        randDeviceDetails(
+          vendor: {'Nope'},
+          count: sample,
+        ).any((detail) => detail.vendor != 'Apple'),
+        isTrue,
+        reason: 'an unknown maker reads as all of them',
+      );
+    });
+
+    test('a maker with no device of the kind or the years asked for is answered with nothing', () {
+      // Razer makes laptops, and BlackBerry stopped before 2020.
+      expect(randDevice(vendor: {'Razer'}, type: {DeviceType.phone}, count: 5), isEmpty);
+      expect(randDevice(vendor: {'BlackBerry'}, minYear: 2020, count: 5), isEmpty);
+      expect(
+        randDeviceDetails(
+          vendor: {'Apple'},
+          type: {DeviceType.laptop},
+          count: sample,
+        ).every((detail) => detail.vendor == 'Apple' && detail.type == DeviceType.laptop),
+        isTrue,
+      );
+    });
   });
 }
