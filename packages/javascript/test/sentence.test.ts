@@ -4039,9 +4039,10 @@ describe('Sentence', () => {
 					}
 
 					const phrase = detail.phrases[at];
-					const nouns = [...nounsIn(language, stripCount(language, phrase))];
+					// The longest parse: Vietnamese `sữa chua` is a yogurt, not a sour milk.
+					const noun = longest([...nounsIn(language, stripCount(language, phrase))]);
 
-					if (!nouns.some((noun) => themeOfNoun(language, noun) === theme)) {
+					if (!noun || themeOfNoun(language, noun) !== theme) {
 						continue;
 					}
 

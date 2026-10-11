@@ -3023,9 +3023,11 @@ def test_a_theme_with_a_counter_of_its_own_is_counted_with_it() -> None:
                     continue
 
                 phrase = detail.phrases[detail.slots.index("quantity")]
-                nouns = nouns_in(language, strip_count(language, phrase))
+                # The longest parse: Vietnamese `sữa chua` is a yogurt, not a sour milk.
+                found = nouns_in(language, strip_count(language, phrase))
+                noun = max(sorted(found), key=len) if found else None
 
-                if not any(theme_of_noun(language, noun) == theme for noun in nouns):
+                if noun is None or theme_of_noun(language, noun) != theme:
                     continue
 
                 seen += 1
