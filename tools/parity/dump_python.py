@@ -77,17 +77,6 @@ from randino.phone.data import PHONE_COUNTRIES, PHONE_DATA, PHONE_TYPES
 from randino.phone.data._types import PhoneShape
 from randino.ram.data import RAM_SCALE, RAM_SIZES, RAM_TYPE_ENTRIES, RAM_TYPES
 from randino.resolution.data import RESOLUTION_SEPARATOR_DEFAULT, RESOLUTIONS
-from randino.version.data import (
-    CALVER_SCHEMES,
-    VERSION_FORMATS,
-    VERSION_PARTS,
-    VERSION_PRERELEASE_CHANCE,
-    VERSION_PRERELEASES,
-    VERSION_YEAR_CEILING,
-    VERSION_YEAR_FLOOR,
-    VERSION_YEAR_MAX_DEFAULT,
-    VERSION_YEAR_MIN_DEFAULT,
-)
 from randino.sentence.data import (
     AGENT_CLASSES,
     FIELD_RULES,
@@ -99,6 +88,17 @@ from randino.sentence.data import (
     StoryStep,
 )
 from randino.sentence.data._types import ModifierGroup, PredicateTense, SentenceSpeech
+from randino.version.data import (
+    CALVER_SCHEMES,
+    VERSION_FORMATS,
+    VERSION_PARTS,
+    VERSION_PRERELEASE_CHANCE,
+    VERSION_PRERELEASES,
+    VERSION_YEAR_CEILING,
+    VERSION_YEAR_FLOOR,
+    VERSION_YEAR_MAX_DEFAULT,
+    VERSION_YEAR_MIN_DEFAULT,
+)
 from randino.word.data import LOOSE_THEMES, WORD_DATA, WORD_LANGUAGES, WORD_THEMES
 from randino.word.data._types import SyllableSynthesis, WordAgreement
 
