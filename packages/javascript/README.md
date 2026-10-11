@@ -6,28 +6,19 @@
 
 ### 📘 [**randino.cdget.com**](https://randino.cdget.com)
 
-Every option and every example, with **JavaScript** picked in the sidebar. This README is just the quick start.
+The full documentation, with **JavaScript** picked in the sidebar. This README is the quick start.
 
 ---
 
-**randino** generates random person names, nicknames, words, sentences, real locations, ages, genders, organizations, dates and phone numbers in the language you ask for, and real operating systems, devices, processors, graphics, architectures, memory, storage and screen resolutions for a sample machine, software version numbers, app stores, file extensions and MIME types.
+**randino** generates random sample data in nine languages: person names, nicknames, words, sentences, real places, ages, genders, organizations, dates and phone numbers, and the operating system, hardware and files of a sample machine.
 
-- **Person names** read like names people carry: Emma Clover, Jack Reeves, each with its English pronunciation. 9 languages.
-- **Nicknames** are handles for a game or a website: MistyOwl, CraneVoyage, RustyBoot. Built from everyday words across twenty-nine themes, and never from person names.
-- **Words** are those themes on their own: `randWord`, plus `randAnimal`, `randFood` and twenty-seven more.
-- **Sentences** are whole statements in the language's own grammar, from `randSentence`. The verb decides what can stand beside it, so the words of one sentence belong together.
-- **Locations** are real places down to a neighbourhood or a city, from `randLocation`: Korean and US divisions, as each country publishes them, and every country's name in all nine languages from `randCountry`.
-- **Ages** are whole numbers drawn along a curve shaped like a population, from `randAge`, so a sample of people is mostly adults.
-- **Genders** are the labels a form in the language writes, from `randGender`: 여성, Female, Weiblich. An unstated gender and a third gender are there when you ask for them.
-- **Organizations** are companies, schools, offices and associations that do not exist, from `randOrganization`: (주)새솔테크, Westbrook High School, Stadtwerke Bergtal.
-- **Dates** are drawn evenly from a range and written out in UTC by a format of your own, from `randDate`, or one part at a time.
-- **Phone numbers** are written the way their country writes them, from `randPhone`, in nine countries. They open on blocks the country really gives out, so one can by chance be real: sample data, never a number to call.
-- **System values** describe a sample machine with real products: an operating system from `randOs`, written the way its release is known, `Windows 11 Pro 23H2 (Build 22631)`, a phone, tablet or laptop from `randDevice`, `Apple iPhone 15 Pro`, its processor and graphics from `randCpu` and `randGpu`, `Intel Core i7-13700K`, `NVIDIA GeForce RTX 4090`, the architecture from `randArchitecture`, `x86_64`, its memory from `randRam`, `16 GB`, its storage from `randDiskType` and `randDiskSize`, `SSD`, `1 TB`, its screen from `randResolution`, `1920x1080`, a version number from `randVersion`, `2.14.3`, an app store from `randAppStore`, `Google Play Store`, a file extension from `randFileExtension`, `.pdf`, and a MIME type from `randMimeType`, `application/pdf`.
-- **Decorators** attach something to a string you already have: `randSuffix`, `randPrefix` and `randModifier`.
-- One options object per generator, every option optional: `randName()` on its own works.
+- **Written the way each language writes it.** Names, nicknames and sentences follow the language's own script, word order and grammar: 김민준, Emma Clover, 여우가 사과를 먹는다.
+- **Real only where it should be.** Places and system values are real, such as 서울특별시 종로구 and Apple iPhone 15 Pro. Organizations are invented, and nicknames are never built from person names.
+- **One options object per generator**, every option optional, so `randName()` on its own works.
+- **Seeded or secure.** Every generator and decorator takes a `random` source: a seeded one for a fixture that must repeat, a secure one for a token nobody may predict.
 - **No runtime dependencies.** ESM, typed, and it runs in Node and in the browser alike.
 
-This is the JavaScript package. The [Dart package](https://pub.dev/packages/randino) and the [Python package](https://pypi.org/project/randino/) are the other two, and all three generate from the same datasets under the same rules. They version independently, so the numbers on npm, pub.dev and PyPI will not always agree.
+This is the JavaScript package. The [Dart package](https://pub.dev/packages/randino) and the [Python package](https://pypi.org/project/randino/) generate from the same datasets under the same rules, and each versions independently.
 
 ## Install
 

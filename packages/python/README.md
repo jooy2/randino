@@ -6,29 +6,19 @@
 
 ### 📘 [**randino.cdget.com**](https://randino.cdget.com)
 
-Every option and every example, with **Python** picked in the sidebar. This README is just the quick start.
+The full documentation, with **Python** picked in the sidebar. This README is the quick start.
 
 ---
 
-**randino** generates random person names, nicknames, words, sentences, real locations, ages, genders, organizations, dates and phone numbers in the language you ask for, and real operating systems, devices, processors, graphics, architectures, memory, storage and screen resolutions for a sample machine, software version numbers, app stores, file extensions and MIME types.
+**randino** generates random sample data in nine languages: person names, nicknames, words, sentences, real places, ages, genders, organizations, dates and phone numbers, and the operating system, hardware and files of a sample machine.
 
-- **Person names** read like names people carry: Emma Clover, Jack Reeves, each with its English pronunciation. 9 languages.
-- **Nicknames** are handles for a game or a website: MistyOwl, CraneVoyage, RustyBoot. Built from everyday words across twenty-nine themes, and never from person names.
-- **Words** are those twenty-nine themes on their own: `rand_word`, plus `rand_animal`, `rand_food` and twenty-seven more.
-- **Sentences** are whole statements in the language's own grammar, from `rand_sentence`. The verb decides what can stand beside it, so the words of one sentence belong together.
-- **Locations** are real places down to a neighbourhood or a city, from `rand_location`: Korean and US divisions, as each country publishes them.
-- **Ages** are whole numbers drawn along a curve shaped like a population, from `rand_age`, so a sample of people is mostly adults.
-- **Genders** are the labels a form in the language writes, from `rand_gender`: 여성, Female, Weiblich. An unstated gender and a third gender are there when you ask for them.
-- **Organizations** are companies, schools, offices and associations that do not exist, from `rand_organization`: (주)새솔테크, Westbrook High School, Stadtwerke Bergtal.
-- **Dates** are drawn evenly from a range and written out in UTC by a format of your own, from `rand_date`, or one part at a time.
-- **Phone numbers** are written the way their country writes them, from `rand_phone`, in nine countries. They open on blocks the country really gives out, so one can by chance be real: sample data, never a number to call.
-- **System values** describe a sample machine with real products: an operating system from `rand_os`, written the way its release is known, `Windows 11 Pro 23H2 (Build 22631)`, a phone, tablet or laptop from `rand_device`, `Apple iPhone 15 Pro`, its processor and graphics from `rand_cpu` and `rand_gpu`, `Intel Core i7-13700K`, `NVIDIA GeForce RTX 4090`, the architecture from `rand_architecture`, `x86_64`, its memory from `rand_ram`, `16 GB`, its storage from `rand_disk_type` and `rand_disk_size`, `SSD`, `1 TB`, its screen from `rand_resolution`, `1920x1080`, a version number from `rand_version`, `2.14.3`, an app store from `rand_app_store`, `Google Play Store`, a file extension from `rand_file_extension`, `.pdf`, and a MIME type from `rand_mime_type`, `application/pdf`.
-- **Decorators** attach something to a string you already have: `rand_suffix`, `rand_prefix` and `rand_modifier`.
-- Every argument is keyword-only and optional, so `rand_name()` on its own works.
-- **Pure Python, no dependencies.** It imports nothing outside the standard library, and ships a `py.typed` marker so mypy and Pyright read the annotations.
-- **Every generator and decorator takes a `random`.** `SystemRandom().random` for a value nobody may predict, `Random(42).random` for one that has to come out the same every run.
+- **Written the way each language writes it.** Names, nicknames and sentences follow the language's own script, word order and grammar: 김민준, Emma Clover, 여우가 사과를 먹는다.
+- **Real only where it should be.** Places and system values are real, such as 서울특별시 종로구 and Apple iPhone 15 Pro. Organizations are invented, and nicknames are never built from person names.
+- **Keyword-only arguments**, every one optional, so `rand_name()` on its own works.
+- **Seeded or secure.** Every generator and decorator takes a `random`: `Random(42).random` for a fixture that must repeat, `SystemRandom().random` for a token nobody may predict.
+- **Pure Python, no dependencies.** It imports nothing outside the standard library and ships a `py.typed` marker, so mypy and Pyright read the annotations.
 
-This is the Python package. The [npm package](https://www.npmjs.com/package/randino) and the [pub.dev package](https://pub.dev/packages/randino) are the other two, and all three generate from the same datasets under the same rules. They version independently, so the numbers on PyPI, npm and pub.dev will not always agree.
+This is the Python package. The [npm package](https://www.npmjs.com/package/randino) and the [pub.dev package](https://pub.dev/packages/randino) generate from the same datasets under the same rules, and each versions independently.
 
 ## Install
 
