@@ -9,7 +9,7 @@ import { themedWord } from './wordGenerator.js';
  *
  * @example
  * randPlant({ language: 'ko', count: 3 }); // ['나무', '민들레', '꽃']
- * randPlant({ language: 'en', count: 3 }); // ['Treetop', 'Blossom', 'Fern']
+ * randPlant({ language: 'en', count: 3 }); // ['Leaf', 'Blossom', 'Fern']
  */
 export function randPlant(options?: RandThemedWordOptions & { output?: 'value' }): string[];
 /**

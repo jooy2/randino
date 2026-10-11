@@ -610,7 +610,7 @@ IT = SentenceLanguageData(
             field="cook",
             subject=("creature", "person"),
             object=("edible",),
-            object_themes=("food",),
+            object_themes=("food", "vegetable"),
             words=words("""
                 cuoce scalda cucina taglia arrostisce serve frigge bolle lessa salta_in_padella
                 condisce insaporisce sala mescola rimesta sbatte stufa brasa tosta gratina sbuccia
@@ -630,7 +630,7 @@ IT = SentenceLanguageData(
             field="eat",
             subject=("creature", "person"),
             object=("edible",),
-            object_themes=("food",),
+            object_themes=("food", "fruit", "vegetable"),
             words=words("""
                 mangia mastica assaggia rosicchia divora gusta degusta inghiotte ingoia trangugia
                 morde rode lecca sbocconcella dà_un_morso_a si_mangia finisce si_pappa spazzola
@@ -761,6 +761,7 @@ IT = SentenceLanguageData(
                 "tool",
                 "clothing",
                 "product",
+                "beauty",
                 "toy",
                 "furniture",
                 "gem",
@@ -905,6 +906,7 @@ IT = SentenceLanguageData(
         VerbGroup(
             field="change",
             subject=("edible",),
+            subject_themes=("food", "drink"),
             words=words("""
                 matura si_raffredda bolle si_scioglie si_guasta si_scalda si_intiepidisce fuma
                 emana_vapore profuma manda_un_buon_odore finisce si_esaurisce avanza resta si_riduce
@@ -955,6 +957,36 @@ IT = SentenceLanguageData(
                     frizzò spumeggiò fece_la_schiuma si_versò si_rovesciò schizzò sciabordò si_agitò
                     si_mescolò si_intorbidì si_schiarì si_depositò perse_il_gas evaporò traboccò
                     gocciolò colò si_annacquò si_concentrò si_ghiacciò
+                """),
+            ),
+        ),
+        VerbGroup(
+            field="change",
+            subject=("edible",),
+            subject_themes=("fruit", "vegetable"),
+            words=words("""
+                matura marcisce appassisce si_ammorbidisce si_secca si_ammacca va_a_male ammuffisce
+                si_conserva si_raggrinzisce annerisce
+            """),
+            past=PredicateTense(
+                words=words("""
+                    maturò marcì appassì si_ammorbidì si_seccò si_ammaccò andò_a_male ammuffì
+                    si_conservò si_raggrinzì annerì
+                """),
+            ),
+        ),
+        VerbGroup(
+            field="change",
+            subject=("edible",),
+            subject_themes=("ingredient",),
+            words=words("""
+                si_guasta si_scioglie si_indurisce si_ammorbidisce si_secca va_a_male si_esaurisce
+                finisce si_conserva irrancidisce
+            """),
+            past=PredicateTense(
+                words=words("""
+                    si_guastò si_sciolse si_indurì si_ammorbidì si_seccò andò_a_male si_esaurì finì
+                    si_conservò irrancidì
                 """),
             ),
         ),
@@ -1034,9 +1066,26 @@ IT = SentenceLanguageData(
         ),
         StateGroup(
             subject=("edible",),
+            subject_themes=("food", "drink"),
             words=words("""
                 dolce salato piccante aspro caldo freddo saporito amaro denso morbido tiepido
                 succoso croccante gustoso insipido
+            """),
+        ),
+        StateGroup(
+            subject=("edible",),
+            subject_themes=("fruit", "vegetable"),
+            words=words("""
+                dolce maturo acerbo fresco succoso croccante sodo morbido tenero delicato saporito
+                buono squisito
+            """),
+        ),
+        StateGroup(
+            subject=("edible",),
+            subject_themes=("ingredient",),
+            words=words("""
+                salato dolce fresco delicato amaro profumato saporito aromatico intenso genuino
+                buono squisito pregiato
             """),
         ),
         StateGroup(
@@ -1090,6 +1139,22 @@ IT = SentenceLanguageData(
                 dolce piccante tiepido fresco croccante saporito fragrante caldo salato morbido
                 maturo gustoso dorato affumicato cremoso tenero succoso sostanzioso fumante tostato
                 appiccicoso insipido speziato
+            """),
+        ),
+        ModifierGroup(
+            subject=("edible",),
+            themes=("fruit", "vegetable"),
+            words=words("""
+                fresco maturo acerbo dolce succoso croccante sodo tenero morbido verde selvatico
+                piccolo grosso profumato biologico nostrano buono squisito
+            """),
+        ),
+        ModifierGroup(
+            subject=("edible",),
+            themes=("ingredient",),
+            words=words("""
+                fresco dolce fine profumato saporito delicato aromatico genuino pregiato nostrano
+                artigianale biologico puro buono squisito ottimo costoso
             """),
         ),
         ModifierGroup(
@@ -1247,36 +1312,57 @@ IT = SentenceLanguageData(
             drago fenice fata pegaso grifone angelo valchiria merlo usignolo allodola quaglia
             fagiano pernice colibrì tucano fenicottero cicogna upupa cardellino gazza ghiandaia
             civetta poiana vespa tarma lucciola ippogrifo gabbiano coccinella cherubino viverna
-            gargolla
+            gargolla picchio pettirosso cinciallegra fringuello canarino storno piccione avvoltoio
+            condor albatro cormorano sparviero gheppio nibbio barbagianni beccaccia cuculo rondone
+            falena calabrone bombo arcangelo serafino arpia silfide strige
         """),
         "swimmer": words("""
             coccodrillo tartaruga rana rospo pesce balena delfino squalo polpo calamaro gambero
             granchio tricheco foca pinguino sirena kraken naiade anguilla sardina tonno merluzzo
             nasello trota salmone carpa razza medusa vongola cozza ostrica aragosta totano
-            salamandra tritone castoro ippopotamo ornitorinco orca
+            salamandra tritone castoro ippopotamo ornitorinco orca seppia sogliola orata branzino
+            acciuga sgombro pesce_spada luccio storione pesce_rosso piranha barracuda murena cernia
+            triglia aringa cavalluccio_marino scampo astice capodoglio narvalo beluga lamantino
+            otaria leone_marino alligatore caimano anaconda nutria leviatano serpente_marino ondina
+            nereide anguana rusalka
         """),
         "crawler": words("""
             coccodrillo serpente lucertola tartaruga lumaca formica ragno verme granchio basilisco
             iguana camaleonte salamandra tritone boa vipera cobra pitone scarabeo cavalletta grillo
-            pulce bruco millepiedi scorpione scarafaggio dinosauro lamia
+            pulce bruco millepiedi scorpione scarafaggio dinosauro lamia geco varano alligatore
+            caimano anaconda crotalo lombrico sanguisuga tarantola zecca pidocchio cimice termite
+            mantide stella_marina paguro riccio_di_mare slime anfisbena
         """),
-        "lifeless": words("""
-            incantesimo maledizione profezia amuleto talismano runa portale santuario idolo totem
-            augurio presagio bestiario sortilegio grimorio pentacolo reliquia calice graal bacchetta
-            bastone scettro corona paradiso inferno purgatorio olimpo aldilà limbo pozione elisir
-            malocchio maleficio scongiuro magia stregoneria alchimia calderone mandragola
+        "proper": words("""
+            Mercurio Venere Marte Giove Saturno Urano Nettuno Plutone Cerere Eris Haumea Makemake
+            Sedna Quaoar Gonggong Salacia Varuna Ixion Vesta Pallade Giunone Igea Psiche Eros Bennu
+            Ryugu Itokawa Apophis Arrokoth Theia Fetonte Dimidium Spe Orbitar Fortitudo Ægir Amateru
+            Dagon Meztli Smertrios Phobetor Tassili Madriu Yanyan Tondra Eburonia Yvaga Mastika
+            Bendida Nakanbé Awasis Wangshu Pipitea Asye Veles Boinayel Eyeke Cayahuanca Hämarik Abol
+            Bélisama Mintome Toge Santamasa Noifasui Chura Buru Staburags Baiduri Cuptor Xólotl
+            Hairu Laligurans Kereru Albmi Perwana Pollera Viculus Samagiya Ramajay Khomsa Barajeel
+            Cruinlagh Ibirapitá Madalitso Bambaruush Tahay Awohali Enaiposha Phailinsiam Levantes
+            Najsakopajk Qingluan Cuancoá Astrolábos Ahra Aumatex Ixbalanqué Surt Haik Mulchatna
+            Makombé Zembretta Bocaprins Agouto Sirio Vega Antares Betelgeuse Rigel Aldebaran Altair
+            Deneb Spica Canopo Orione Cassiopea Andromeda
         """),
         "placeless": words("""
             sabbia ciottolo terremoto masso geyser fumarola stalattite stalagmite eco brace stella
             cometa meteora aurora falce_lunare eclissi zenit satellite ammasso orbita gravità
             rotazione rivoluzione anno_luce astro eclittica meridiano plenilunio novilunio perigeo
-            vespro supernova quasar pulsar corrente marea onda schiuma frangente parallasse parsec
-            azimut perielio afelio ellisse quadrante nadir gravitazione alone bolide nana fango
-            polvere pietra ghiaia argilla vortice lava magma fuoco fiamma scintilla riflesso raggio
-            bagliore bolla goccia ghiaccio valanga frana eruzione maremoto alluvione incendio
-            ragnatela zodiaco radiazione traiettoria allunaggio decollo missione alieno apogeo
-            congiunzione propulsore etere astronomia astrologia nova magnetar brillamento
-            occultazione radiotelescopio cosmologia astrofisica
+            supernova quasar pulsar corrente marea onda schiuma frangente parallasse parsec azimut
+            perielio afelio ellisse quadrante nadir gravitazione alone bolide nana fango polvere
+            pietra ghiaia argilla vortice lava magma fuoco fiamma scintilla riflesso raggio bagliore
+            bolla goccia ghiaccio valanga frana eruzione maremoto alluvione incendio ragnatela
+            zodiaco radiazione traiettoria allunaggio decollo missione apogeo congiunzione
+            propulsore etere astronomia nova magnetar brillamento occultazione radiotelescopio
+            cosmologia astrofisica aria cenere fumo sasso melma vapore panorama erosione miraggio
+            torba sole Sirio Vega Antares Betelgeuse Rigel Aldebaran Altair Deneb Spica Canopo
+            Stella_Polare materia_oscura energia_oscura big_bang vento_solare macchia_solare
+            astronautica singolarità transito fotone muro parete pavimento soffitto tetto finestra
+            porta portone cancello scala scalinata gradino ringhiera davanzale comignolo grondaia
+            pilastro cupola piastrella altare statua obelisco Terra Orsa_Maggiore Orsa_Minore
+            Grande_Carro Croce_del_Sud Pleiadi
         """),
     },
     interjections=words("""
@@ -1317,6 +1403,20 @@ IT = SentenceLanguageData(
     degrees=words("""
         molto abbastanza un_po' davvero proprio piuttosto assai parecchio decisamente alquanto
     """),
+    place_heads={
+        "su": words("""
+            Mercurio Venere Marte Giove Saturno Urano Nettuno Plutone Cerere Eris Haumea Makemake
+            Sedna Quaoar Gonggong Salacia Varuna Ixion Vesta Pallade Giunone Igea Psiche Eros Bennu
+            Ryugu Itokawa Apophis Arrokoth Theia Fetonte Dimidium Spe Orbitar Fortitudo Ægir Amateru
+            Dagon Meztli Smertrios Phobetor Tassili Madriu Yanyan Tondra Eburonia Yvaga Mastika
+            Bendida Nakanbé Awasis Wangshu Pipitea Asye Veles Boinayel Eyeke Cayahuanca Hämarik Abol
+            Bélisama Mintome Toge Santamasa Noifasui Chura Buru Staburags Baiduri Cuptor Xólotl
+            Hairu Laligurans Kereru Albmi Perwana Pollera Viculus Samagiya Ramajay Khomsa Barajeel
+            Cruinlagh Ibirapitá Madalitso Bambaruush Tahay Awohali Enaiposha Phailinsiam Levantes
+            Najsakopajk Qingluan Cuancoá Astrolábos Ahra Aumatex Ixbalanqué Surt Haik Mulchatna
+            Makombé Zembretta Bocaprins Agouto
+        """),
+    },
     numeral=SentenceNumeral(
         order="before",
         counters={},

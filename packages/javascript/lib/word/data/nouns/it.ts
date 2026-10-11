@@ -25,16 +25,28 @@ export const IT_NOUNS = taggedNouns({
 		totano:m
 		gabbiano:m topo:m criceto:m gallo:m tacchino:m pulcino:m agnello:m coccinella:f scarafaggio:m lepre:f
 		marmotta:f pantera:f iena:f orca:f dinosauro:m
+		seppia:f camoscio:m ratto:m mulo:m bue:m vitello:m puledro:m cucciolo:m pony:m alpaca:m dromedario:m
+		yak:m giaguaro:m puma:m coyote:m sciacallo:m orangotango:m scimpanzé:m gibbone:m mandrillo:m
+		opossum:m ermellino:m visone:m faina:f martora:f mangusta:f nutria:f toporagno:m cavia:f daino:m
+		capriolo:m stambecco:m muflone:m montone:m facocero:m okapi:m formichiere:m pangolino:m
+		lombrico:m sanguisuga:f tarantola:f zecca:f pidocchio:m cimice:f falena:f calabrone:m bombo:m
+		termite:f mantide:f sogliola:f orata:f branzino:m acciuga:f sgombro:m pesce_spada:m luccio:m
+		storione:m pesce_rosso:m piranha:m barracuda:m murena:f cernia:f triglia:f aringa:f
+		cavalluccio_marino:m stella_marina:f riccio_di_mare:m paguro:m scampo:m astice:m capodoglio:m
+		narvalo:m beluga:m lamantino:m otaria:f leone_marino:m picchio:m pettirosso:m cinciallegra:f
+		fringuello:m canarino:m storno:m piccione:m avvoltoio:m condor:m albatro:m cormorano:m sparviero:m
+		gheppio:m nibbio:m barbagianni:m beccaccia:f cuculo:m rondone:m emù:m geco:m varano:m
+		alligatore:m caimano:m anaconda:m crotalo:m
 	`,
 	object: `
 		bottiglia:f matita:f gomma:f ombrello:m lampada:f lanterna:f specchio:m chiave:f
 		lucchetto:m borsa:f bottone:m ago:m filo:m pennello:m vernice:f carta:f quaderno:m
-		lettera:f cartolina:f francobollo:m mappa:f cannocchiale:m microscopio:m macchina:f
+		lettera:f cartolina:f francobollo:m mappa:f cannocchiale:m microscopio:m
 		pellicola:f radio:f
 		vela:f ancora:f tenda:f torcia:f fiammifero:m candela:f vaso:m teiera:f tazza:f
 		cucchiaio:m pentola:f ingranaggio:m molla:f magnete:m nastro:m busta:f
 		cesto:m scopa:f fischietto:m corda:f secchio:m ventaglio:m scudo:m rete:f canna:f brocca:f
-		pettine:m campanella:f imbuto:m vassoio:m scatola:f barile:m latta:f fiala:f
+		campanella:f imbuto:m vassoio:m scatola:f barile:m latta:f fiala:f
 		bussola:f portachiavi:m spillo:m ditale:m gomitolo:m spago:m fune:f gancio:m chiodo:m
 		vite:f rondella:f cerniera:f catenaccio:m chiavistello:m catena:f zip:f fibbia:f
 		spilla:f braccialetto:m anello:m valigetta:f zaino:m baule:m cassone:m tino:m orcio:m
@@ -42,46 +54,58 @@ export const IT_NOUNS = taggedNouns({
 		telescopio:m
 		forchetta:f coltello:m bicchiere:m mestolo:m coperchio:m tagliere:m teglia:f borraccia:f cannuccia:f tappo:m
 		penna:f pennarello:m temperino:m graffetta:f puntina:f colla:f foglio:m libro:m rivista:f giornale:m fumetto:m
-		album:m agenda:f calendario:m diario:m segnalibro:m biglietto:m fazzoletto:m sacchetto:m spugna:f straccio:m
+		agenda:f calendario:m diario:m segnalibro:m biglietto:m fazzoletto:m sacchetto:m spugna:f straccio:m
 		bidone:m bandiera:f cartello:m targa:f sigillo:m pergamena:f rotolo:m tela:f cavalletto:m tavolozza:f
 		lavagna:f binocolo:m clessidra:f pendolo:m sveglia:f caraffa:f elastico:m adesivo:m accendino:m
 		stuzzicadenti:m collana:f orecchino:m ciondolo:m pastello:m acquerello:m
+		bastone:m scettro:m corona:f pacco:m cartone:m medaglione:m gioiello:m diadema:m foto:f poster:m
+		regalo:m souvenir:m stemma:m distintivo:m tessera:f passaporto:m patente:f diploma:m dizionario:m
+		enciclopedia:f atlante:m globo:m meridiana:f pipa:f serratura:f maniglia:f forziere:m scrigno:m
+		anfora:f fiasco:m damigiana:f botte:f bacinella:f pattumiera:f astuccio:m evidenziatore:m scotch:m
+		inchiostro:m calamaio:m piuma:f parasole:m stampella:f prisma:m vetro:m porcellana:f ceramica:f
+		legno:m plastica:f sughero:m cera:f incenso:m conchiglia:f
 	`,
 	nature: `
 		mare:m fiume:m lago:m cascata:f valle:f montagna:f collina:f prato:m bosco:m grotta:f
 		deserto:m sabbia:f roccia:f ciottolo:m vulcano:m terremoto:m ghiacciaio:m scogliera:f
 		palude:f ruscello:m baia:f duna:f vetta:f brughiera:f steppa:f savana:f estuario:m delta:m
-		laguna:f atollo:m fiordo:m cala:f capo:m penisola:f istmo:m arcipelago:m isolotto:m
-		altopiano:m canyon:m rupe:f crepaccio:m morena:f ghiaione:m masso:m banco:m secca:f
+		laguna:f atollo:m fiordo:m cala:f capo:m penisola:f istmo:m arcipelago:m
+		altopiano:m canyon:m rupe:f crepaccio:m morena:f ghiaione:m masso:m secca:f
 		scoglio:m abisso:m geyser:m fumarola:f dolina:f stalattite:f stalagmite:f caverna:f
 		cengia:f pendio:m ombra:f eco:f brace:f sorgente:f riva:f litorale:m
-		selva:f pianura:f tundra:f acquitrino:m oasi:f pascolo:m gola:f torrente:m
+		selva:f pianura:f tundra:f acquitrino:m oasi:f torrente:m
 		ansa:f guado:m sponda:f spiaggia:f costa:f golfo:m insenatura:f stretto:m canale:m
 		corrente:f marea:f onda:f schiuma:f frangente:m falesia:f dirupo:m cima:f conca:f
 		burrone:m voragine:f antro:m
-		cielo:m terra:f fango:m polvere:f pietra:f ghiaia:f argilla:f foresta:f giungla:f radura:f campagna:f isola:f
+		terra:f fango:m polvere:f pietra:f ghiaia:f argilla:f foresta:f giungla:f radura:f campagna:f isola:f
 		oceano:m pozzanghera:f fossa:f cresta:f picco:m versante:m altura:f vortice:m fondale:m lava:f magma:m fuoco:m
 		fiamma:f scintilla:f buio:m riflesso:m raggio:m bagliore:m bolla:f goccia:f ghiaccio:m iceberg:m valanga:f
 		frana:f eruzione:f maremoto:m alluvione:f incendio:m paesaggio:m prateria:f foce:f affluente:m nido:m tana:f
 		alveare:m ragnatela:f sottobosco:m
+		aria:f cenere:f fumo:m natura:f ambiente:m promontorio:m taiga:f suolo:m sasso:m melma:f vapore:m
+		oscurità:f tenebre:fp panorama:m erosione:f argine:m greto:m banchisa:f miraggio:m pineta:f torba:f
 	`,
 	plant: `
 		albero:m foglia:f fiore:m radice:f seme:m frutto:m muschio:m felce:f bambù:m pino:m
 		acero:m ciliegio:m rosa:f loto:m crisantemo:m orchidea:f tarassaco:m girasole:m ninfea:f
 		erba:f ramo:m germoglio:m bocciolo:m petalo:m polline:m pigna:f ghianda:f ginkgo:m
 		salice:m betulla:f cedro:m abete:m quercia:f castagno:m noce:m alga:f
-		siepe:f mazzo:m cactus:m aloe:f basilico:m timo:m origano:m prezzemolo:m coriandolo:m
-		finocchio:m aneto:m salvia:f dragoncello:m menta:f camomilla:f lavanda:f edera:f palma:f
+		siepe:f mazzo:m cactus:m aloe:f
+		camomilla:f lavanda:f edera:f palma:f
 		fusto:m corteccia:f linfa:f spina:f rovo:m vischio:m agrifoglio:m alloro:m olivo:m
-		fico:m arancio:m melo:m mandorlo:m nocciolo:m pioppo:m frassino:m olmo:m tiglio:m
+		arancio:m melo:m mandorlo:m nocciolo:m pioppo:m frassino:m olmo:m tiglio:m
 		faggio:m larice:m sequoia:f eucalipto:m acacia:f magnolia:f camelia:f begonia:f
 		petunia:f geranio:m garofano:m margherita:f papavero:m giacinto:m narciso:m tulipano:m
 		giglio:m dalia:f peonia:f trifoglio:m giunco:m ortica:f cardo:m mughetto:m
 		glicine:m
 		cipresso:m platano:m leccio:m ippocastano:m pesco:m susino:m melograno:m gelso:m sambuco:m ginestra:f erica:f
 		bosso:m ciclamino:m primula:f mimosa:f gelsomino:m iris:m ortensia:f azalea:f oleandro:m bucaneve:m
-		fiordaliso:m ranuncolo:m anemone:m calendula:f rosmarino:m maggiorana:f cespuglio:m tronco:m stelo:m spiga:f
+		fiordaliso:m ranuncolo:m anemone:m calendula:f cespuglio:m tronco:m stelo:m spiga:f
 		chicco:m baccello:m ceppo:m tubero:m lichene:m spora:f gramigna:f fronda:f
+		pianta:f arbusto:m nontiscordardimé:m stella_alpina:f rododendro:m gardenia:f zagara:f papiro:m
+		baobab:m banano:m liana:f caprifoglio:m buganvillea:f ibisco:m fresia:f gladiolo:m lillà:m croco:m
+		calla:f pungitopo:m ginepro:m corbezzolo:m sorbo:m pero:m albicocco:m carrubo:m ontano:m carpino:m
+		sughera:f robinia:f agave:f fieno:m paglia:f canapa:f resina:f malerba:f clorofilla:f
 	`,
 	gem: `
 		oro:m argento:m rame:m ferro:m acciaio:m bronzo:m ottone:m stagno:m zinco:m platino:m
@@ -97,13 +121,15 @@ export const IT_NOUNS = taggedNouns({
 		diamante:m carbone:m metallo:m lega:f ghisa:f silicio:m silice:f carbonio:m magnesio:m sodio:m potassio:m
 		cadmio:m vanadio:m palladio:m molibdeno:m iridio:m citrino:m travertino:m porfido:m pomice:f marna:f breccia:f
 		geode:m fossile:m salgemma:m serpentino:m allume:m
+		tanzanite:f alessandrite:f labradorite:f pietra_di_luna:f calcedonio:m azzurrite:f fosforo:m iodio:m
+		plutonio:m rodio:m arsenico:m antimonio:m caolino:m
 	`,
 	concept: `
 		libertà:f pace:f giustizia:f verità:f saggezza:f memoria:f fantasia:f racconto:m poesia:f
 		schizzo:m grammatica:f logica:f fisica:f chimica:f biologia:f filosofia:f matematica:f
 		geometria:f algebra:f storia:f mito:m leggenda:f favola:f proverbio:m indovinello:m
 		segreto:m promessa:f viaggio:m avventura:f traversata:f scoperta:f esperimento:m domanda:f
-		risposta:f dibattito:m consiglio:m festa:f dimensione:f equilibrio:m armonia:f rito:m
+		risposta:f dibattito:m consiglio:m festa:f dimensione:f equilibrio:m rito:m
 		usanza:f cultura:f lingua:f alfabeto:m cifra:f archivio:m almanacco:m orizzonte:m
 		intuizione:f ragione:f giudizio:m dottrina:f teorema:m assioma:m ipotesi:f paradosso:m
 		dilemma:m paradigma:m premessa:f deduzione:f induzione:f analogia:f metafora:f simbolo:m
@@ -119,21 +145,47 @@ export const IT_NOUNS = taggedNouns({
 		diritto:m valore:m virtù:f talento:m esempio:m modello:m progetto:m piano:m obiettivo:m strategia:f
 		principio:m sonetto:m romanzo:m capitolo:m pagina:f titolo:m trama:f dialogo:m epilogo:m religione:f fede:f
 		politica:f economia:f geografia:f medicina:f letteratura:f
+		vita:f anima:f morte:f nascita:f mondo:m realtà:f sogno:m incubo:m ricordo:m esperienza:f bene:m male:m
+		bugia:f problema:m soluzione:f scelta:f decisione:f occasione:f possibilità:f rischio:m pericolo:m
+		sicurezza:f potere:m forza:f energia:f velocità:f distanza:f peso:m qualità:f differenza:f
+		cambiamento:m successo:m lavoro:m educazione:f lezione:f esame:m compito:m prova:f ricerca:f
+		informazione:f notizia:f messaggio:m segno:m fiaba:f articolo:m testo:m traduzione:f dialetto:m
+		calcolo:m formula:f psicologia:f architettura:f pittura:f scultura:f fotografia:f moda:f società:f
+		famiglia:f matrimonio:m salute:f malattia:f guerra:f battaglia:f democrazia:f governo:m patria:f
+		popolo:m dovere:m crimine:m mistero:m scherzo:m barzelletta:f abitudine:f stile:m bellezza:f
+		inizio:m fine:f scopo:m motivo:m risultato:m relazione:f onore:m gloria:f intelligenza:f follia:f
+		mente:f
 	`,
 	myth: `
+		incantesimo:m maledizione:f profezia:f oracolo:m amuleto:m talismano:m runa:f portale:m
+		idolo:m totem:m augurio:m presagio:m bestiario:m sortilegio:m grimorio:m pentacolo:m reliquia:f
+		calice:m graal:m bacchetta:f apparizione:f paradiso:m inferno:m purgatorio:m olimpo:m aldilà:m
+		limbo:m pozione:f elisir:m malocchio:m maleficio:m scongiuro:m magia:f stregoneria:f alchimia:f
+		calderone:m mandragola:f
+		mana:m aura:f evocazione:f invocazione:f teletrasporto:m levitazione:f trasmutazione:f
+		metamorfosi:f iettatura:f malia:f pietra_filosofale:f sfera_di_cristallo:f acquasanta:f
+		tappeto_volante:m oltretomba:m inferi:p eden:m astrologia:f oroscopo:m tarocchi:p cartomanzia:f
+		chiromanzia:f divinazione:f negromanzia:f miracolo:m prodigio:m benedizione:f anatema:m
+		esorcismo:m possessione:f sabba:m incanto:m panacea:f ambrosia:f manna:f portafortuna:m
+		acchiappasogni:m feticcio:m vudù:m cerchio_magico:m telepatia:f telecinesi:f chiaroveggenza:f
+		invisibilità:f immortalità:f reincarnazione:f auspicio:m vaticinio:m
+	`,
+	monster: `
 		drago:m fenice:f unicorno:m sirena:f fata:f folletto:m elfo:m nano:m troll:m orco:m
 		gigante:m chimera:f idra:f grifone:m centauro:m minotauro:m sfinge:f pegaso:m kraken:m
-		basilisco:m golem:m vampiro:m licantropo:m spettro:m fantasma:m anima:f spirito:m demone:m
-		angelo:m dea:f dio:m incantesimo:m maledizione:f profezia:f oracolo:m amuleto:m
-		talismano:m runa:f portale:m santuario:m idolo:m totem:m ninfa:f naiade:f driade:f
-		valchiria:f musa:f stregone:m strega:f negromante:m alchimista:m saggio:m augurio:m
-		presagio:m bestiario:m
+		basilisco:m golem:m vampiro:m lupo_mannaro:m spettro:m fantasma:m spirito:m demone:m
+		angelo:m dea:f dio:m ninfa:f naiade:f driade:f valchiria:f musa:f
 		satiro:m fauno:m arpia:f gorgone:f ciclope:m titano:m colosso:m leviatano:m gnomo:m
-		ondina:f silfide:f genio:m apparizione:f sortilegio:m grimorio:m pentacolo:m reliquia:f
-		calice:m graal:m bacchetta:f bastone:m scettro:m corona:f ippogrifo:m mantìcora:f
-		mostro:m mago:m mummia:f zombie:m goblin:m cerbero:m viverna:f gargolla:f befana:f diavolo:m cherubino:m
-		divinità:f yeti:m paradiso:m inferno:m purgatorio:m olimpo:m aldilà:m limbo:m pozione:f elisir:m malocchio:m
-		maleficio:m scongiuro:m magia:f stregoneria:f alchimia:f calderone:m veggente:m sibilla:f mandragola:f lamia:f
+		ondina:f silfide:f genio:m ippogrifo:m mantìcora:f
+		mostro:m mummia:f zombie:m goblin:m cerbero:m viverna:f gargolla:f befana:f diavolo:m cherubino:m
+		divinità:f yeti:m lamia:f alieno:m
+		arcangelo:m serafino:m semidio:m nume:m nereide:f oreade:f parca:f norna:f lare:m
+		creatura:f entità:f uomo_nero:m babau:m spauracchio:m poltergeist:m banshee:f coboldo:m
+		leprecauno:m elementale:m slime:m mimic:m lich:m ghoul:m non_morto:m wendigo:m chupacabra:m
+		bigfoot:m serpente_marino:m anfisbena:f coccatrice:f catoblepa:m behemoth:m tarasca:f succube:f
+		strige:f omuncolo:m mutaforma:m famiglio:m monaciello:m mazzamurello:m linchetto:m janara:f
+		anguana:f krampus:m rusalka:f yokai:m mutante:m androide:m cyborg:m gremlin:m ifrit:m oni:m empusa:f
+		penate:m
 	`,
 	job: `
 		cavaliere:m cacciatore:m ladro:m pirata:m marinaio:m capitano:m cuoco:m giardiniere:m
@@ -157,85 +209,216 @@ export const IT_NOUNS = taggedNouns({
 		pizzaiolo:m gelataio:m barista:m scienziato:m architetto:m fotografo:m dentista:m chirurgo:m sindaco:m
 		ministro:m presidente:m carabiniere:m vigile:m bagnino:m prestigiatore:m giocoliere:m giullare:m mugnaio:m
 		artigiano:m orafo:m pescivendolo:m fruttivendolo:m
+		mago:m strega:f stregone:m negromante:m alchimista:m saggio:m veggente:m sibilla:f direttore:m
+		scalpellino:m arrotino:m sciamano:m druido:m incantatore:m chiromante:m cartomante:m astrologo:m
+		esorcista:m paladino:m scudiero:m bardo:m menestrello:m cantastorie:m mercenario:m gladiatore:m
+		samurai:m ninja:m corsaro:m brigante:m bandito:m spia:f sentinella:f contrabbandiere:m erborista:m
+		suora:f frate:m prete:m vescovo:m papa:m cardinale:m parroco:m rabbino:m imam:m missionario:m
+		programmatore:m informatico:m tecnico:m commercialista:m consulente:m manager:m dirigente:m
+		amministratore:m receptionist:m venditore:m rappresentante:m agente:m economista:m analista:m
+		matematico:m fisico:m chimico:m geometra:m gommista:m carrozziere:m benzinaio:m camionista:m
+		ferroviere:m controllore:m assistente:m badante:m babysitter:f tata:f lavapiatti:m sommelier:m
+		custode:m guardiano:m bidello:m ostetrica:f psicologo:m psichiatra:m pediatra:m oculista:m
+		fisioterapista:m ottico:m soccorritore:m zoologo:m allevatore:m apicoltore:m mandriano:m cowboy:m
+		carpentiere:m imbianchino:m manovale:m facchino:m magazziniere:m corriere:m ammiraglio:m mozzo:m
+		comandante:m colonnello:m sergente:m tenente:m caporale:m ufficiale:m alpino:m investigatore:m
+		ispettore:m commissario:m magistrato:m diplomatico:m ambasciatore:m senatore:m deputato:m
+		politico:m funzionario:m preside:m ricercatore:m bibliotecario:m restauratore:m artista:m
+		illustratore:m grafico:m designer:m stilista:m modella:f comico:m compositore:m pianista:m
+		chitarrista:m violinista:m batterista:m presentatore:m editore:m romanziere:m drammaturgo:m
+		sceneggiatore:m interprete:m sviluppatore:m istruttore:m calciatore:m ciclista:m tennista:m
+		nuotatore:m pugile:m fantino:m torero:m alpinista:m sciatore:m estetista:m truccatore:m
+		massaggiatore:m tatuatore:m salumiere:m lattaio:m oste:m albergatore:m ceramista:m liutaio:m
+		tipografo:m maniscalco:m
 	`,
 	music: `
 		pianoforte:m chitarra:f tamburo:m campana:f arpa:f canzone:f danza:f ritmo:m melodia:f
-		accordo:m flauto:m tromba:f sassofono:m clarinetto:m oboe:m violoncello:m viola:f
+		accordo:m flauto:m tromba:f sassofono:m clarinetto:m oboe:m violoncello:m
 		violino:m batteria:f piatto:m tamburello:m xilofono:m organo:m armonica:f fisarmonica:f
-		liuto:m mandolino:m banjo:m spartito:m nota:f pausa:f scala:f coro:m assolo:m concerto:m
-		palco:m sinfonia:f sonata:f valzer:m jazz:m ballata:f ninnananna:f marcia:f preludio:m
-		interludio:m finale:m timbro:m orchestra:f movimento:m ouverture:f fuga:f studio:m
-		notturno:m serenata:f rapsodia:f inno:m requiem:m cantata:f aria:f duetto:m trio:m
-		quartetto:m quintetto:m direttore:m ottava:f semitono:m pentagramma:m metronomo:m pedale:m
+		liuto:m mandolino:m banjo:m spartito:m nota:f pausa:f coro:m assolo:m concerto:m
+		palco:m
+		interludio:m finale:m timbro:m orchestra:f movimento:m
+		duetto:m trio:m
+		quartetto:m quintetto:m ottava:f semitono:m pentagramma:m metronomo:m pedale:m
 		tasto:m bocchino:m
 		contrabbasso:m fagotto:m corno:m trombone:m tuba:f cornamusa:f zampogna:f ocarina:f
 		ciaramella:f cetra:f salterio:m maraca:f nacchera:f campanaccio:m gong:m
-		grancassa:f contrappunto:m cadenza:f arpeggio:m trillo:m glissando:m legato:m tempo:m
-		ritornello:m strofa:f stornello:m tarantella:f bolero:m tango:m rumba:f operetta:f
-		melodramma:m
-		musica:f canto:m strumento:m plettro:m archetto:m opera:f rock:m pop:m rap:m blues:m flamenco:m polka:f
-		mazurca:f madrigale:m minuetto:m romanza:f tenore:m soprano:m baritono:m ukulele:m clavicembalo:m carillon:m
+		grancassa:f contrappunto:m cadenza:f arpeggio:m trillo:m glissando:m legato:m
+		ritornello:m strofa:f
+		musica:f canto:m strumento:m plettro:m archetto:m
+		tenore:m soprano:m baritono:m ukulele:m clavicembalo:m carillon:m
 		bongo:m cornetta:f ottavino:m piffero:m zufolo:m sintetizzatore:m triangolo:m battuta:f tonalità:f bemolle:m
 		diesis:m crescendo:m vibrato:m solista:m
+		armonia:f album:m disco:m basso:m contralto:m mezzosoprano:m falsetto:m sitar:m armonium:m
+		vibrafono:m marimba:f rullante:m spinetta:f balalaika:f conga:f ghironda:f diapason:m ancia:f
+		amplificatore:m partitura:f croma:f semiminima:f minima:f semibreve:f biscroma:f legatura:f
+		staccato:m pizzicato:m diminuendo:m fortissimo:m pianissimo:m tremolo:m tono:m terzina:f
+		variazione:f accompagnamento:m intonazione:f accordatura:f improvvisazione:f virtuosismo:m
+		recital:m tournée:f festival:m bis:m ovazione:f banda:f band:f fanfara:f filarmonica:f duo:m
+		sestetto:m vinile:m singolo:m brano:m colonna_sonora:f jingle:m sigla:f playlist:f tormentone:m
+		cover:f remix:m videoclip:m intro:f inciso:m
+	`,
+	genre: `
+		sinfonia:f sonata:f valzer:m jazz:m ballata:f ninnananna:f marcia:f preludio:m notturno:m
+		ouverture:f fuga:f rapsodia:f serenata:f inno:m requiem:m cantata:f madrigale:m minuetto:m
+		mazurca:f polka:f tarantella:f bolero:m tango:m rumba:f operetta:f melodramma:m stornello:m
+		rock:m pop:m rap:m blues:m flamenco:m opera:f romanza:f
+		musical:m lirica:f oratorio:m toccata:f rondò:m suite:f barcarola:f elegia:f nenia:f cantilena:f
+		villanella:f mottetto:m salmo:m corale:m ciaccona:f passacaglia:f gavotta:f giga:f sarabanda:f
+		pavana:f gagliarda:f polacca:f intermezzo:m recitativo:m cavatina:f belcanto:m canto_gregoriano:m
+		opera_buffa:f musica_classica:f musica_da_camera:f musica_sacra:f musica_leggera:f barocco:m
+		cantautorato:m italo_disco:f habanera:f fandango:m pasodoble:m milonga:f samba:f bossa_nova:f
+		lambada:f merengue:m bachata:f cumbia:f mambo:m reggaeton:m reggae:m ska:m dancehall:f
+		calypso:m fado:m pizzica:f saltarello:m tammurriata:f quadriglia:f liscio:m swing:m bebop:m
+		ragtime:m dixieland:m boogie:m soul:m funk:m gospel:m spiritual:m country:m bluegrass:m folk:m
+		punk:m grunge:m metal:m heavy_metal:m hard_rock:m soft_rock:m rock_and_roll:m rockabilly:m
+		britpop:m indie:m emo:m shoegaze:m post_rock:m glam_rock:m folk_rock:m rock_progressivo:m
+		rock_psichedelico:m rock_alternativo:m death_metal:m black_metal:m thrash_metal:m doom_metal:m
+		power_metal:m metalcore:m nu_metal:m synth_pop:m electropop:m dream_pop:m indie_pop:m teen_pop:m
+		city_pop:m pop_latino:m dance:f house:f deep_house:f tech_house:f progressive_house:f
+		electro_house:f acid_house:f tropical_house:f techno:f trance:f psytrance:f dubstep:m
+		drum_and_bass:f jungle:f breakbeat:m grime:m trap:f future_bass:f hardstyle:f hardcore:m gabber:f
+		electro:f ambient:f chillout:m downtempo:m trip_hop:m synthwave:f vaporwave:f eurodance:f
+		eurobeat:f nu_disco:f big_room:f moombahton:m hip_hop:m drill:f rhythm_and_blues:m new_age:f
 	`,
 	place: `
-		mercato:m piazza:f città:f villaggio:m vicolo:m ponte:m giardino:m biblioteca:f museo:m
-		teatro:m scuola:f parco:m porto:m molo:m stazione:f aeroporto:m faro:m castello:m mura:f
-		palazzo:m tempio:m torre:f soffitta:f cantina:f terrazza:f cortile:m portico:m serra:f
-		fienile:m baita:f belvedere:m parco_giochi:m palestra:f piscina:f acquario:m galleria:f zoo:m
-		terme:f municipio:m posta:f ospedale:m farmacia:f libreria:f panetteria:f caffetteria:f
-		ristorante:m cucina:f camera:f salotto:m corridoio:m tunnel:m passerella:f incrocio:m
-		viale:m fortezza:f fattoria:f ranch:m frutteto:m abbazia:f chiostro:m bastione:m
-		torretta:f fossato:m cantiere:m accampamento:m villa:f dimora:f borgo:m
-		cattedrale:f eremo:m cappella:f monastero:m convento:m cimitero:m mausoleo:m cripta:f
-		moschea:f sinagoga:f pagoda:f locanda:f ostello:m osteria:f taverna:f enoteca:f fiera:f
+		mercato:m piazza:f città:f villaggio:m vicolo:m ponte:m giardino:m
+		parco:m porto:m molo:m
+		belvedere:m parco_giochi:m zoo:m
+		tunnel:m passerella:f incrocio:m
+		viale:m fattoria:f ranch:m frutteto:m
+		fossato:m cantiere:m accampamento:m borgo:m
+		cimitero:m
+		fiera:f
 		rione:m sobborgo:m periferia:f corso:m selciato:m sentiero:m scorciatoia:f crocevia:m
-		imbarcadero:m diga:f chiusa:f acquedotto:m mulino:m fucina:f officina:f magazzino:m silo:m
-		stalla:f recinto:m pagliaio:m
+		imbarcadero:m diga:f chiusa:f acquedotto:m
+		recinto:m pagliaio:m
+		parcheggio:m autostrada:f strada:f marciapiede:m fermata:f binario:m miniera:f
+		centro:m paese:m labirinto:m luna_park:m pozzo:m fontana:f
+		monumento:m
+		pascolo:m campo:m quartiere:m via:f piazzale:m mulattiera:f carreggiata:f corsia:f rotonda:f
+		cavalcavia:m sottopassaggio:m viadotto:m svincolo:m tangenziale:f lungomare:m passeggiata:f
+		banchina:f darsena:f marina:f frangiflutti:m scalo:m metropoli:f capoluogo:m comune:m contrada:f
+		località:f provincia:f regione:f regno:m orto:m vigna:f uliveto:m aia:f aiuola:f podere:m
+		tenuta:f riserva:f campeggio:m necropoli:f rovine:fp scavo:m acropoli:f obelisco:m
+		statua:f cava:f discarica:f bivio:m calle:f naviglio:m ferrovia:f capolinea:m lido:m confine:m
+		zona:f distretto:m ghetto:m borgata:f isolato:m tomba:f bazar:m
+	`,
+	building: `
+		biblioteca:f museo:m teatro:m scuola:f stazione:f aeroporto:m faro:m castello:m mura:fp
+		palazzo:m tempio:m torre:f soffitta:f cantina:f terrazza:f cortile:m portico:m serra:f
+		fienile:m baita:f palestra:f piscina:f acquario:m galleria:f
+		terme:fp municipio:m posta:f ospedale:m farmacia:f libreria:f panetteria:f caffetteria:f
+		ristorante:m cucina:f camera:f salotto:m corridoio:m
+		fortezza:f abbazia:f chiostro:m bastione:m villa:f dimora:f
+		cattedrale:f eremo:m cappella:f monastero:m convento:m mausoleo:m cripta:f
+		moschea:f sinagoga:f pagoda:f locanda:f ostello:m osteria:f taverna:f enoteca:f
+		mulino:m fucina:f officina:f magazzino:m silo:m stalla:f
 		casa:f appartamento:m bagno:m garage:m balcone:m ingresso:m aula:f ufficio:m negozio:m supermercato:m bar:m
 		pizzeria:f gelateria:f pasticceria:f edicola:f banca:f chiesa:f cinema:m campanile:m prigione:f tribunale:m
-		università:f asilo:m parcheggio:m autostrada:f strada:f marciapiede:m fermata:f binario:m fabbrica:f miniera:f
-		rifugio:m capanna:f grattacielo:m centro:m paese:m labirinto:m arena:f circo:m luna_park:m pozzo:m fontana:f
-		monumento:m camino:m
+		università:f asilo:m fabbrica:f rifugio:m capanna:f grattacielo:m arena:f circo:m camino:m
+		studio:m santuario:m osservatorio:m planetario:m stadio:m spogliatoio:m dispensa:f scala:f porta:f
+		edificio:m palazzina:f condominio:m immobile:m immobiliare:f attico:m mansarda:f seminterrato:m
+		monolocale:m bilocale:m trilocale:m loft:m casale:m cascina:f masseria:f chalet:m bungalow:m
+		palafitta:f igloo:m catapecchia:f baracca:f reggia:f maniero:m portone:m cancello:m finestra:f
+		vetrata:f muro:m parete:f pavimento:m soffitto:m tetto:m scalinata:f gradino:m ascensore:m
+		pianerottolo:m ringhiera:f davanzale:m veranda:f loggia:f atrio:m androne:m anticamera:f sala:f
+		stanza:f ripostiglio:m lavanderia:f comignolo:m grondaia:f pilastro:m cupola:f navata:f altare:m
+		sagrestia:f battistero:m basilica:f parrocchia:f certosa:f porcile:m pollaio:m ovile:m scuderia:f
+		canile:m granaio:m frantoio:m caseificio:m birrificio:m bottega:f laboratorio:m atelier:m
+		stabilimento:m centrale:f raffineria:f capannone:m hangar:m boutique:f emporio:m drogheria:f
+		salumeria:f macelleria:f pescheria:f rosticceria:f trattoria:f birreria:f pub:m mensa:f
+		cartoleria:f tabaccheria:f erboristeria:f profumeria:f ferramenta:f sartoria:f gioielleria:f
+		ippodromo:m circolo:m discoteca:f anfiteatro:m pinacoteca:f liceo:m istituto:m accademia:f
+		collegio:m conservatorio:m dormitorio:m albergo:m motel:m agriturismo:m clinica:f ambulatorio:m
+		orfanotrofio:m manicomio:m questura:f caserma:f commissariato:m ambasciata:f ministero:m
+		parlamento:m autostazione:f biglietteria:f dogana:f piramide:f piastrella:f
 	`,
 	food: `
-		riso:m pane:m pasta:f zuppa:f stufato:m insalata:f sale:m zucchero:m pepe:m aglio:m
-		cipolla:f patata:f carota:f cetriolo:m zucca:f cavolo:m lattuga:f spinacio:m fungo:m
-		tofu:m uovo:m formaggio:m burro:m yogurt:m mela:f fragola:f uva:f anguria:f pesca:f
-		arancia:f limone:m banana:f mango:m ciliegia:f ananas:m cioccolato:m caramella:f
+		pane:m pasta:f zuppa:f stufato:m insalata:f
+		yogurt:m
+		cioccolato:m caramella:f
 		biscotto:m torta:f budino:m ciambella:f cialda:f frittella:f hamburger:m pizza:f curry:m
 		frittata:f risotto:m lasagna:f gnocco:m raviolo:m tortellino:m polenta:f focaccia:f
-		grissino:m panino:m salsiccia:f prosciutto:m pancetta:f salame:m mortadella:f polpetta:f
-		bistecca:f costoletta:f marmellata:f miele:m tiramisù:m cannolo:m
-		segale:f orzo:m avena:f mais:m lenticchia:f cece:m fagiolo:m pisello:m fava:f soia:f
-		pomodoro:m peperone:m melanzana:f zucchina:f broccolo:m cavolfiore:m carciofo:m
-		asparago:m porro:m ravanello:m barbabietola:f rapa:f sedano:m pera:f prugna:f
-		melagrana:f cotogna:f nespola:f albicocca:f pompelmo:m mandarino:m kiwi:m pistacchio:m
-		arachide:f castagna:f pandoro:m panettone:m crostata:f frittura:f minestra:f ribollita:f
+		grissino:m panino:m salsiccia:f polpetta:f
+		bistecca:f costoletta:f tiramisù:m cannolo:m
+		pandoro:m panettone:m crostata:f frittura:f minestra:f ribollita:f
 		caponata:f
-		pollo:m manzo:m spaghetti:p tagliatelle:fp sugo:m ragù:m pesto:m salsa:f olio:m aceto:m farina:f cornetto:m
+		spaghetti:p tagliatelle:fp cornetto:m
 		brioche:f bruschetta:f piadina:f arancino:m torrone:m gelato:m panna_cotta:f meringa:f parmigiana:f arrosto:m
-		spezzatino:m polpettone:m minestrone:m brodo:m purè:m parmigiano:m mozzarella:f ricotta:f gorgonzola:m
-		rucola:f radicchio:m lampone:m mirtillo:m melone:m mandorla:f peperoncino:m vaniglia:f liquirizia:f
+		spezzatino:m polpettone:m minestrone:m purè:m
+		liquirizia:f
+		sorbetto:m affogato:m toast:m tramezzino:m calzone:m crocchetta:f supplì:m scaloppina:f
+		involtino:m saltimbocca:m ossobuco:m brasato:m bollito:m cacciucco:m vellutata:f fettuccine:fp
+		penne:fp maccheroni:p rigatoni:p fusilli:p linguine:fp orecchiette:fp pappardelle:fp cannelloni:p
+		carbonara:f amatriciana:f cassata:f sfogliatella:f babà:m zeppola:f bombolone:m strudel:m
+		zabaione:m semifreddo:m profiterole:m bignè:m cantuccio:m castagnaccio:m millefoglie:m merendina:f
+		crêpe:f muffin:m plumcake:m cheesecake:m ghiacciolo:m patatina:f popcorn:m cracker:m tarallo:m
+		crostino:m tartina:f antipasto:m contorno:m dessert:m spuntino:m kebab:m sushi:m ramen:m paella:f
+		hot_dog:m cotechino:m zampone:m porchetta:f wurstel:m spiedino:m grigliata:f fonduta:f gulasch:m
+		couscous:m hummus:m guacamole:m falafel:m pappa:f farinata:f panzanella:f macedonia:f sformato:m
+		timballo:m panzerotto:m crauti:p
+	`,
+	ingredient: `
+		riso:m sale:m zucchero:m pepe:m tofu:m uovo:m formaggio:m burro:m prosciutto:m pancetta:f
+		salame:m mortadella:f marmellata:f miele:m segale:f orzo:m avena:f lenticchia:f cece:m fagiolo:m
+		soia:f pistacchio:m arachide:f castagna:f pollo:m manzo:m sugo:m ragù:m pesto:m salsa:f olio:m
+		aceto:m farina:f brodo:m parmigiano:m mozzarella:f ricotta:f gorgonzola:m mandorla:f vaniglia:f
+		basilico:m timo:m origano:m prezzemolo:m coriandolo:m aneto:m salvia:f dragoncello:m menta:f
+		rosmarino:m maggiorana:f panna:f cacao:m sciroppo:m anice:m nocciola:f cannella:f noce_moscata:f
+		paprika:f zafferano:m grano:m senape:f caramello:m carne:f guanciale:m
+		filetto:m lombata:f fesa:f macinato:m trippa:f speck:m bresaola:f capocollo:m lardo:m strutto:m
+		nduja:f baccalà:m stoccafisso:m bottarga:f caviale:m pecorino:m grana:m mascarpone:m stracchino:m
+		fontina:f provolone:m taleggio:m scamorza:f burrata:f caciocavallo:m feta:f margarina:f tuorlo:m
+		albume:m farro:m semola:f crusca:f amido:m fecola:f lievito:m pangrattato:m quinoa:f lupino:m
+		pinolo:m anacardo:m sesamo:m ketchup:m maionese:f besciamella:f wasabi:m chutney:m zenzero:m
+		curcuma:f cumino:m cardamomo:m cappero:m erba_cipollina:f glassa:f candito:m uvetta:f melassa:f
+		dolcificante:m nori:f kombu:f bicarbonato:m gelatina:f impasto:m sfoglia:f legume:m spezia:f
+		condimento:m
+	`,
+	vegetable: `
+		aglio:m cipolla:f patata:f carota:f cetriolo:m zucca:f cavolo:m lattuga:f spinacio:m fungo:m
+		mais:m pisello:m fava:f pomodoro:m peperone:m melanzana:f zucchina:f broccolo:m cavolfiore:m
+		carciofo:m asparago:m porro:m ravanello:m barbabietola:f rapa:f sedano:m rucola:f radicchio:m
+		peperoncino:m finocchio:m
+		fagiolino:m verza:f bietola:f cicoria:f scarola:f indivia:f valeriana:f crescione:m borragine:f
+		scalogno:m topinambur:m batata:f manioca:f pastinaca:f rafano:m friggitello:m porcino:m
+		champignon:m chiodino:m finferlo:m ovolo:m shiitake:m tartufo:m gombo:m rabarbaro:m verdura:f
+		catalogna:f puntarelle:fp agretti:p friarielli:p taccola:f cime_di_rapa:fp misticanza:f portulaca:f
+		igname:m scorzonera:f spugnola:f mazza_di_tamburo:f cardoncello:m pioppino:m
+	`,
+	fruit: `
+		mela:f fragola:f uva:f anguria:f pesca:f arancia:f limone:m banana:f mango:m ciliegia:f
+		ananas:m pera:f prugna:f melagrana:f cotogna:f nespola:f albicocca:f pompelmo:m mandarino:m
+		kiwi:m lampone:m mirtillo:m melone:m fico:m oliva:f cachi:m mora:f
+		frutta:f agrume:m bacca:f cocco:m avocado:m papaya:f maracuja:m litchi:m dattero:m ribes:m
+		lime:m bergamotto:m clementina:f kumquat:m amarena:f nettarina:f giuggiola:f carruba:f carambola:f
+		uva_spina:f ficodindia:m marasca:f sorba:f corbezzola:f guava:f alchechengi:m
 	`,
 	sport: `
 		calcio:m baseball:m pallavolo:f tennis:m badminton:m golf:m bowling:m biliardo:m nuoto:m
 		atletica:f maratona:f ginnastica:f karate:m judo:m scherma:f lotta:f pugilato:m tiro:m
 		equitazione:f canottaggio:m surf:m sci:m hockey:m rugby:m cricket:m ciclismo:m
-		arrampicata:f racchetta:f porta:f medaglia:f trofeo:m campione:m
+		arrampicata:f racchetta:f medaglia:f trofeo:m campione:m
 		eliminatoria:f allenamento:m polo:m pattinaggio:m tuffo:m freccetta:f
-		ostacolo:m giavellotto:m disco:m staffetta:f tabellone:m casco:m fallo:m dorso:m
+		ostacolo:m giavellotto:m staffetta:f tabellone:m casco:m fallo:m dorso:m
 		sollevamento:m slitta:f servizio:m rimbalzo:m salto:m corsa:f traguardo:m
-		podio:m spogliatoio:m tribuna:f tifoseria:f
+		podio:m tribuna:f tifoseria:f
 		canoismo:m regata:f triathlon:m pentathlon:m decathlon:m lancio:m asta:f trampolino:m
 		materassino:m anelli:p tatami:m attaccante:m difensore:m
-		allenatore:m tifoso:m stadio:m campo:m pista:f rigore:m angolo:m cartellino:m
+		allenatore:m tifoso:m pista:f rigore:m angolo:m cartellino:m
 		punteggio:m pareggio:m vittoria:f sconfitta:f record:m torneo:m campionato:m coppa:f
 		pallacanestro:f pallamano:f pallanuoto:f taekwondo:m sumo:m pallone:m canestro:m guantone:m cronometro:m
 		bocce:fp motociclismo:m immersione:f apnea:f paracadutismo:m alpinismo:m escursione:f mezzofondo:m gara:f
 		partita:f incontro:m semifinale:f girone:m classifica:f giocatore:m punizione:f gol:m parata:f passaggio:m
 		contropiede:m fuorigioco:m espulsione:f ammonizione:f olimpiade:f mondiale:m scudetto:m bilanciere:m pinne:fp
 		boccaglio:m sostituzione:f
+		squadra:f automobilismo:m motocross:m rally:m windsurf:m snowboard:m bob:m curling:m biathlon:m
+		sprint:m jogging:m fitness:m yoga:m pilates:m aerobica:f kickboxing:m kung_fu:m aikido:m ippica:f
+		ping_pong:m squash:m padel:m beach_volley:m rafting:m trekking:m autogol:m dribbling:m
+		formazione:f centrocampista:m fuoriclasse:m squalifica:f doping:m stretching:m esercizio:m
+		ginocchiera:f parastinchi:m stecca:f volano:m palo:m traversa:f manubrio:m pedana:f ring:m
+		round:m set:m schiacciata:f assist:m tattica:f partenza:f giro:m derby:m
 	`,
 	vehicle: `
 		bicicletta:f treno:m barca:f automobile:f autobus:m taxi:m camion:m moto:f monopattino:m
@@ -245,7 +428,7 @@ export const IT_NOUNS = taggedNouns({
 		triciclo:m furgone:m limousine:f spazzaneve:m monorotaia:f catamarano:m petroliera:f
 		chiatta:f peschereccio:m biplano:m idrovolante:m sonda:f navetta:f monociclo:m gondola:f
 		vagone:m
-		calesse:m diligenza:f berlina:f cabriolet:m carretto:m camioncino:m ribaltabile:m
+		calesse:m diligenza:f berlina:f cabriolet:m carretto:m ribaltabile:m
 		betoniera:f rullo:m mietitrice:f pattino:m skateboard:m ciclomotore:m sidecar:m
 		traghetto:m crociera:f galea:f galeone:m fregata:f corvetta:f brigantino:m goletta:f
 		piroga:f scialuppa:f lancia:f aliante:m ultraleggero:m caccia:m bombardiere:m rimorchio:m
@@ -254,40 +437,61 @@ export const IT_NOUNS = taggedNouns({
 		battello:m rimorchiatore:m rompighiaccio:m transatlantico:m jet:m deltaplano:m parapendio:m capsula:f
 		autobotte:f camper:m roulotte:f carro_attrezzi:m ruspa:f muletto:m biga:f tandem:m carro_armato:m
 		fuoristrada:m pulmino:m
+		macchina:f utilitaria:f suv:m coupé:f scooter:m quad:m motoslitta:f autogru:f tir:m funicolare:f
+		cabinovia:f skilift:m ufo:m caravella:f trireme:f drakkar:m giunca:f blindato:m
 	`,
 	product: `
 		computer:m tastiera:f mouse:m schermo:m stampante:f altoparlante:m auricolare:m
 		microfono:m drone:m tablet:m telefono:m caricatore:m pila:f telecomando:m frigorifero:m
 		lavatrice:f ventilatore:m stufa:f depuratore:m cuociriso:m microonde:m forno:m
-		frullatore:m rasoio:m spazzolino:m dentifricio:m sapone:m shampoo:m profumo:m orologio:m
-		proiettore:m router:m scanner:m asciugatrice:f lozione:f crema_solare:f pantofola:f
-		sandalo:m campanello:m termometro:m estintore:m calcolatrice:f lampadina:f
-		presa:f ciabatta:f federa:f asciugamano:m catino:m detersivo:m ammorbidente:m
+		frullatore:m spazzolino:m dentifricio:m sapone:m orologio:m
+		proiettore:m router:m scanner:m asciugatrice:f
+		campanello:m termometro:m estintore:m calcolatrice:f lampadina:f
+		presa:f asciugamano:m catino:m detersivo:m ammorbidente:m
 		padella:f caffettiera:f frusta:f pelapatate:m cavatappi:m thermos:m gruccia:f
 		televisore:m console:f bilancia:f tostapane:m friggitrice:f spremiagrumi:m
 		bollitore:m radiatore:m termostato:m
 		posateria:f stoviglia:f cristalleria:f tovaglia:f tovagliolo:m scolapiatti:m
-		lavandino:m rubinetto:m doccia:f vasca:f lavabo:m lente:f piastra:f
+		lavandino:m rubinetto:m doccia:f vasca:f lavabo:m lente:f
 		portatile:m fotocamera:f videocamera:f giradischi:m cavo:m adattatore:m prolunga:f interruttore:m faretto:m
 		aspirapolvere:m lavastoviglie:f ferro_da_stiro:m asse_da_stiro:f condizionatore:m umidificatore:m
 		scaldabagno:m caldaia:f fornello:m cappa:f macinacaffè:m tritatutto:m affettatrice:f gelatiera:f moka:f
-		spazzola:f phon:m deodorante:m balsamo:m bagnoschiuma:m cerotto:m garza:f pillola:f carta_igienica:f
+		deodorante:m bagnoschiuma:m cerotto:m garza:f pillola:f carta_igienica:f
 		barattolo:m lattina:f valigia:f borsone:m chiavetta:f scheda:f candeggina:f pannolino:m biberon:m ciuccio:m
 		water:m bidè:m sigaretta:f barometro:m
+		cellulare:m smartphone:m monitor:m webcam:f stereo:m congelatore:m sbattitore:m planetaria:f
+		timer:m colapasta:m griglia:f stagnola:f presina:f strofinaccio:m sgrassatore:m anticalcare:m
+		collutorio:m assorbente:m salvietta:f benda:f farmaco:m decoder:m fotocopiatrice:f fax:m
+		joystick:m treppiede:m navigatore:m deumidificatore:m posacenere:m insetticida:m trolley:m
+		sigaro:m citofono:m
+	`,
+	beauty: `
+		rasoio:m shampoo:m profumo:m lozione:f crema_solare:f spazzola:f phon:m balsamo:m piastra:f
+		pettine:m cipria:f crema:f pinzetta:f
+		rossetto:m lucidalabbra:m burrocacao:m mascara:m eyeliner:m ombretto:m fondotinta:m correttore:m
+		fard:m illuminante:m primer:m smalto:m acetone:m tonico:m struccante:m detergente:m esfoliante:m
+		peeling:m abbronzante:m doposole:m trucco:m cosmetico:m gel:m ceretta:f lacca:f tinta:f
+		mèches:fp permanente:f piega:f chignon:m treccia:f parrucca:f bigodino:m arricciacapelli:m
+		piegaciglia:m lametta:f dopobarba:m tagliaunghie:m limetta:f manicure:f pedicure:f trattamento:m
+		massaggio:m epilazione:f abbronzatura:f nécessaire:m kajal:m tatuaggio:m piercing:m
+		antirughe:m botox:m lifting:m rasatura:f pettinatura:f caschetto:m henné:m
+		decolorante:m cerone:m frangia:f extension:f toupet:m solarium:m sauna:f idromassaggio:m spugnetta:f
+		batuffolo:m dischetto:m filler:m idratante:m semipermanente:m acqua_micellare:f
 	`,
 	color: `
 		cremisi:m scarlatto:m vermiglio:m magenta:m fucsia:m rosato:m arancione:m ambrato:m ocra:f
-		seppia:f senape:f smeraldino:m turchese:m ciano:m celeste:m
+		smeraldino:m turchese:m ciano:m celeste:m
 		indaco:m lilla:m violetto:m porpora:f bordeaux:m ruggine:f terracotta:f
-		crema:f beige:m cachi:m peltro:m ebano:m giaietto:m ceruleo:m zafferano:m acquamarina:f
-		verderame:m celadon:m madreperla:f ramato:m argenteo:m bronzeo:m cenere:f fumo:m
-		vinaccia:f grano:m cannella:f noce_moscata:f paprika:f
-		amaranto:m corallo:m carminio:m bordò:m glauco:m rossiccio:m mogano:m antracite:f malva:f
-		verdeazzurro:m azzurrino:m grigiastro:m violaceo:m
-		giallino:m brunito:m dorato:m nerastro:m biancastro:m rosaceo:m incarnato:m
+		beige:m peltro:m ebano:m giaietto:m ceruleo:m acquamarina:f
+		verderame:m celadon:m madreperla:f ramato:m argenteo:m bronzeo:m
+		vinaccia:f
+		amaranto:m corallo:m carminio:m glauco:m mogano:m antracite:f malva:f
+		verdeazzurro:m
+		brunito:m dorato:m incarnato:m
 		rosso:m verde:m giallo:m nero:m bianco:m azzurro:m grigio:m blu:m marrone:m castano:m biondo:m bruno:m
-		tortora:m nocciola:m mattone:m tabacco:m caramello:m pervinca:m oltremare:m oliva:m petrolio:m cipria:m
+		tortora:m mattone:m tabacco:m pervinca:m oltremare:m petrolio:m
 		ottanio:m turchino:m granata:m verdeacqua:m
+		viola:m colore:m sfumatura:f paglierino:m écru:m corvino:m bluette:m wengé:m
 	`,
 	finance: `
 		fattura:f ricevuta:f obbligazione:f azione:f dividendo:m interesse:m prestito:m mutuo:m
@@ -302,16 +506,21 @@ export const IT_NOUNS = taggedNouns({
 		donazione:f sussidio:m spesa:f sconto:m rata:f
 		cassa:f contratto:m scrittura:f cambiale:f tratta:f giroconto:m
 		aliquota:f quota:f canone:m tributo:m imposta:f gravame:m ritenuta:f esenzione:f
-		multa:f mora:f usura:f cauzione:f apporto:m dote:f successione:f rendita:f affitto:m
+		multa:f usura:f cauzione:f apporto:m dote:f successione:f rendita:f affitto:m
 		pedaggio:m decima:f bottino:m tesoro:m ricchezza:f povertà:f cedola:f pegno:m ipoteca:f
 		soldi:p denaro:m banconota:f spiccioli:p contanti:p resto:m mancia:f prezzo:m costo:m tassa:f bolletta:f
 		scontrino:m bancomat:m carta_di_credito:f bonifico:m prelievo:m investimento:m fondo:m patrimonio:m tariffa:f
 		offerta:f vendita:f acquisto:m commercio:m affare:m perdita:f fatturato:m incasso:m salvadanaio:m cambio:m
 		euro:m dollaro:m sterlina:f centesimo:m lira:f borsellino:m finanziamento:m caparra:f
+		azionista:m investitore:m pagamento:m versamento:m spread:m budget:m preventivo:m listino:m
+		svendita:f lotteria:f scommessa:f vincita:f testamento:m assicurazione:f polizza:f risarcimento:m
+		indennità:f acconto:m fisco:m contributo:m tredicesima:f reddito:m entrata:f profitto:m crisi:f
+		bancarotta:f yen:m franco:m rublo:m bitcoin:m criptovaluta:f incentivo:m vaglia:m commissione:f
+		abbonamento:m sportello:m contabilità:f finanza:f concorrenza:f monopolio:m
 	`,
 	tech: `
 		server:m cache:f buffer:m pixel:m codec:m pacchetto:m protocollo:m coda:f
-		cumulo:m puntatore:m compilatore:m firmware:m registro:m latenza:f gateway:m firewall:m
+		puntatore:m compilatore:m firmware:m registro:m latenza:f gateway:m firewall:m
 		sottorete:f host:m carico_utile:m checksum:m schema:m cursore:m backup:m cluster:m
 		frammento:m replica:f istantanea:f contenitore:m pipeline:f repository:m debugger:m
 		macro:f matrice:f intero:m sintassi:f analizzatore:m assemblatore:m istruzione:f
@@ -329,12 +538,17 @@ export const IT_NOUNS = taggedNouns({
 		errore:m virus:m database:m dato:m linguaggio:m variabile:f funzione:f classe:f interfaccia:f pulsante:m
 		icona:f risoluzione:f aggiornamento:m installazione:f video:m audio:m immagine:f robot:m sensore:m terminale:m
 		comando:m ricorsione:f
+		elettronica:f internet:m web:m wifi:m bluetooth:m email:f chat:f browser:m account:m login:m
+		avatar:m post:m hashtag:m schermata:f menu:m desktop:m download:m streaming:m podcast:m cloud:m
+		informatica:f tecnologia:f programmazione:f bug:m malware:m spam:m antivirus:m token:m
+		transistor:m robotica:f frequenza:f fibra:f blog:m forum:m grafica:f animazione:f simulazione:f
+		licenza:f script:m notifica:f allegato:m elettricità:f laser:m radar:m sonar:m ologramma:m
 	`,
 	weather: `
 		nuvola:f vento:m pioggia:f neve:f brina:f nebbia:f rugiada:f arcobaleno:m tramonto:m
-		fulmine:m tuono:m acquazzone:m monsone:m tifone:m turbine:m bufera:f pioggerella:f
+		fulmine:m tuono:m acquazzone:m monsone:m tifone:m turbine:m bufera:f
 		grandine:f nevischio:m burrasca:f raffica:f ciclone:m tempesta:f temporale:m diluvio:m
-		foschia:f caligine:f umidità:f previsione:f nuvolone:m sole:m gelata:f disgelo:m
+		foschia:f caligine:f umidità:f previsione:f gelata:f disgelo:m
 		mulinello:m brezza:f zefiro:m libeccio:m scirocco:m maestrale:m tramontana:f anticiclone:m
 		clima:m temperatura:f pressione:f nubifragio:m lampo:m saetta:f sereno:m schiarita:f afa:f
 		galaverna:f
@@ -345,21 +559,41 @@ export const IT_NOUNS = taggedNouns({
 		caldo:m freddo:m fresco:m tepore:m frescura:f arsura:f vampa:f smog:m ventata:f folata:f bora:f
 		perturbazione:f tormenta:f fiocco:m meteo:m bollettino:m maltempo:m intemperie:fp favonio:m acquata:f
 		piovasco:m ondata:f nube:f cirro:m nembo:m
+		cumulo:m gelicidio:m mareggiata:f refolo:m spiffero:m
 	`,
 	space: `
 		stella:f luna:f galassia:f cometa:f meteora:f aurora:f falce_lunare:f
 		eclissi:f zenit:m universo:m pianeta:m satellite:m asteroide:m nebulosa:f ammasso:m
 		orbita:f gravità:f rotazione:f rivoluzione:f cratere:m anno_luce:m astro:m firmamento:m
 		eclittica:f meridiano:m stratosfera:f atmosfera:f vuoto:m plenilunio:m novilunio:m
-		perigeo:m vespro:m marte:m venere:f giove:m saturno:m urano:m nettuno:m plutone:m
+		perigeo:m
 		supernova:f buco_nero:m quasar:m pulsar:f via_lattea:f cosmo:m
 		quadrante:m parallasse:f parsec:m nadir:m azimut:m ellisse:f perielio:m afelio:m
 		fotosfera:f cromosfera:f magnetosfera:f ionosfera:f esosfera:f mesosfera:f troposfera:f
-		eliosfera:f osservatorio:m
+		eliosfera:f
 		gravitazione:f alone:m nana:f bolide:m luce:f
-		spazio:m costellazione:f zodiaco:m radiazione:f traiettoria:f allunaggio:m decollo:m missione:f alieno:m
-		apogeo:m congiunzione:f propulsore:m etere:m astronomia:f astrologia:f planetario:m nova:f magnetar:f
+		spazio:m costellazione:f zodiaco:m radiazione:f traiettoria:f allunaggio:m decollo:m missione:f
+		apogeo:m congiunzione:f propulsore:m etere:m astronomia:f nova:f magnetar:f
 		brillamento:m occultazione:f radiotelescopio:m cosmologia:f astrofisica:f
+		sole:m cielo:m esopianeta:m pianeta_nano:m materia_oscura:f energia_oscura:f big_bang:m
+		vento_solare:m macchia_solare:f astronautica:f singolarità:f transito:m fotone:m Stella_Polare:f
+		Sirio:m Vega:f Antares:m Betelgeuse:f Rigel:m Aldebaran:m Altair:m Deneb:m Spica:f Canopo:m
+		Orione:m Cassiopea:f Andromeda:f Orsa_Maggiore:f Orsa_Minore:f Grande_Carro:m Croce_del_Sud:f
+		Pleiadi:fp
+	`,
+	planet: `
+		Mercurio:m Venere:f Terra:f Marte:m Giove:m Saturno:m Urano:m Nettuno:m
+		Plutone:m Cerere:f Eris:f Haumea:f Makemake:m Sedna:f Quaoar:m Gonggong:m Salacia:f Varuna:f
+		Ixion:m Vesta:f Pallade:f Giunone:f Igea:f Psiche:f Eros:m Bennu:m Ryugu:m Itokawa:f Apophis:m
+		Arrokoth:m Theia:f Fetonte:m
+		Dimidium:m Spe:m Orbitar:m Fortitudo:m Ægir:m Amateru:m Dagon:m Meztli:m Smertrios:m Phobetor:m
+		Tassili:m Madriu:m Yanyan:m Tondra:f Eburonia:f Yvaga:f Mastika:f Bendida:f Nakanbé:m Awasis:m
+		Wangshu:m Pipitea:f Asye:m Veles:m Boinayel:m Eyeke:m Cayahuanca:f Hämarik:m Abol:m Bélisama:f
+		Mintome:m Toge:m Santamasa:f Noifasui:m Chura:f Buru:m Staburags:m Baiduri:m Cuptor:m Xólotl:m
+		Hairu:m Laligurans:m Kereru:m Albmi:m Perwana:f Pollera:f Viculus:m Samagiya:f Ramajay:m
+		Khomsa:f Barajeel:m Cruinlagh:m Ibirapitá:m Madalitso:m Bambaruush:m Tahay:m Awohali:m
+		Enaiposha:f Phailinsiam:m Levantes:m Najsakopajk:m Qingluan:m Cuancoá:m Astrolábos:m Ahra:f
+		Aumatex:m Ixbalanqué:m Surt:m Haik:m Mulchatna:f Makombé:m Zembretta:f Bocaprins:m Agouto:m
 	`,
 	time: `
 		alba:f crepuscolo:m imbrunire:m solstizio:m equinozio:m
@@ -377,6 +611,10 @@ export const IT_NOUNS = taggedNouns({
 		appuntamento:m data:f medioevo:m rinascimento:m antichità:f preistoria:f compleanno:m capodanno:m carnevale:m
 		sosta:f veglia:f siesta:f pisolino:m pranzo:m cena:f colazione:f merenda:f adolescenza:f ventennio:m
 		fuso_orario:m posterità:f giubileo:m attimo:m
+		tempo:m vespro:m gennaio:m febbraio:m marzo:m aprile:m maggio:m giugno:m luglio:m agosto:m
+		settembre:m ottobre:m novembre:m dicembre:m lunedì:m martedì:m mercoledì:m giovedì:m venerdì:m
+		sabato:m domenica:f puntualità:f fretta:f riposo:m onomastico:m altroieri:m illuminismo:m
+		risorgimento:m dopoguerra:m generazione:f
 	`,
 	emotion: `
 		gioia:f tristezza:f rabbia:f paura:f sorpresa:f allegria:f giubilo:m felicità:f euforia:f
@@ -398,15 +636,19 @@ export const IT_NOUNS = taggedNouns({
 		vanità:f superbia:f arroganza:f pigrizia:f voglia:f timore:m commozione:f dolcezza:f perdono:m vendetta:f
 		indignazione:f irritazione:f impazienza:f confusione:f beatitudine:f letizia:f gaudio:m ilarità:f
 		divertimento:m infatuazione:f altruismo:m egoismo:m generosità:f avarizia:f accidia:f ira:f
+		stress:m tensione:f agitazione:f eccitazione:f sentimento:m sensazione:f piacere:m dispiacere:m
+		stanchezza:f sofferenza:f pena:f lutto:m pudore:m presunzione:f modestia:f risentimento:m fobia:f
+		apprensione:f tranquillità:f relax:m benessere:m attrazione:f ottimismo:m pessimismo:m stizza:f
+		rassegnazione:f shock:m smarrimento:m incertezza:f audacia:f misericordia:f
 	`,
 	body: `
 		testa:f fronte:f sopracciglio:m ciglio:m palpebra:f naso:m guancia:f mento:m mascella:f
 		labbro:m dente:m gengiva:f orecchio:m lobo:m collo:m nuca:f spalla:f
 		gomito:m polso:m palmo:m nocca:f dito:m pollice:m unghia:f pugno:m petto:m costola:f
-		pancia:f ombelico:m schiena:f vita:f anca:f coscia:f ginocchio:m stinco:m polpaccio:m
+		pancia:f ombelico:m schiena:f anca:f coscia:f ginocchio:m stinco:m polpaccio:m
 		caviglia:f tallone:m osso:m cranio:m muscolo:m tendine:m legamento:m cartilagine:f cuore:m
 		polmone:m fegato:m stomaco:m rene:m milza:f intestino:m vescica:f cervello:m nervo:m
-		vena:f arteria:f capillare:m sangue:m carne:f pelle:f poro:m capello:m barba:f lacrima:f
+		vena:f arteria:f capillare:m sangue:m pelle:f poro:m capello:m barba:f lacrima:f
 		sudore:m saliva:f respiro:m clavicola:f rotula:f zigomo:m timpano:m bulbo:m ruga:f
 		lentiggine:f fossetta:f cicatrice:f livido:m callo:m
 		tempia:f palato:m tonsilla:f laringe:f faringe:f trachea:f esofago:m diaframma:m sterno:m
@@ -417,43 +659,51 @@ export const IT_NOUNS = taggedNouns({
 		spina_dorsale:f midollo:m scheletro:m articolazione:f alluce:m mignolo:m anulare:m cuticola:f narice:f
 		neurone:m cellula:f globulo:m ormone:m gene:m cromosoma:m ghiandola:f tiroide:f pancreas:m cistifellea:f
 		appendice:f utero:m molare:m canino:m incisivo:m ugola:f bronco:m alveolo:m aorta:f battito:m
+		gola:f baffo:m ciuffo:m capezzolo:m sedere:m ulna:f bicipite:m neo:m brufolo:m verruca:f ferita:f
+		graffio:m bernoccolo:m mandibola:f sorriso:m grembo:m
 	`,
 	clothing: `
-		cappello:m scarpa:f guanto:m sciarpa:f occhiali:p cappotto:m giaccone:m giacca:f camicia:f
+		cappello:m scarpa:f guanto:m sciarpa:f occhiali:p cappotto:m giacca:f camicia:f
 		blusa:f tunica:f pantalone:m jeans:p calzoncino:m gonna:f abito:m gilet:m cardigan:m
 		maglione:m felpa:f calzino:m calza:f biancheria:f pigiama:m grembiule:m bandana:f
-		cravatta:f farfallino:m cintura:f fascia:f scarpetta:f mocassino:m stivale:m divisa:f
+		cravatta:f farfallino:m cintura:f fascia:f mocassino:m stivale:m divisa:f
 		costume:m vestaglia:f mantello:m poncho:m impermeabile:m giubbotto:m parka:m muta:f tuta:f
 		manica:f colletto:m polsino:m orlo:m risvolto:m fodera:f tessuto:m lino:m seta:f cotone:m
 		lana:f velluto:m fustagno:m flanella:f cuoio:m basco:m cuffia:f berretto:m elmetto:m
 		turbante:m velo:m scialle:m
 		marsina:f frac:m smoking:m casacca:f farsetto:m saio:m sottoveste:f corpetto:m ghetta:f
-		zoccolo:m espadrilla:f infradito:m babbuccia:f calzoncini:p mezzoguanto:m manopola:f
-		polsiera:f bretella:f busto:m crinolina:f mantiglia:f cuffietta:f tricorno:m elmo:m
-		cappuccio:m sciarpone:m
+		zoccolo:m espadrilla:f infradito:m babbuccia:f manopola:f
+		polsiera:f bretella:f busto:m crinolina:f mantiglia:f tricorno:m elmo:m
+		cappuccio:m
 		maglia:f maglietta:f vestito:m canottiera:f reggiseno:m mutande:fp collant:m calzamaglia:f salopette:f
 		piumino:m kimono:m scarpone:m tacco:m suola:f stringa:f paraorecchie:m passamontagna:m cerchietto:m
 		fermaglio:m forcina:f foulard:m tasca:f bavaglino:m camice:m tailleur:m completo:m pareo:m bikini:m
-		accappatoio:m pizzo:m raso:m tulle:m pelliccia:f poliestere:m feltro:m panno:m camoscio:m
+		accappatoio:m pizzo:m raso:m tulle:m pelliccia:f poliestere:m feltro:m panno:m
+		pantofola:f sandalo:m ciabatta:f armatura:f leggings:p bermuda:m dolcevita:m pullover:m top:m
+		blazer:m soprabito:m trench:m stola:f coppola:f bombetta:f visiera:f sari:m toga:f tonaca:f slip:m
+		boxer:m giarrettiera:f pochette:f marsupio:m nylon:m cachemire:m chiffon:m broccato:m damasco:m
 	`,
 	tool: `
 		ascia:f pala:f sega:f pinza:f scalpello:m incudine:f mantice:m lesina:f
 		morsetto:m morsa:f livella:f calibro:m goniometro:m righello:m forbice:f martello:m
-		mazzuolo:m trapano:m pialla:f piccone:m falce:f falcetto:m zappa:f aratro:m rastrello:m
+		trapano:m pialla:f piccone:m falce:f zappa:f aratro:m rastrello:m
 		cacciavite:m saldatore:m troncatrice:f metro:m compasso:m accetta:f leva:f cuneo:m
 		carrucola:f manovella:f mazza:f cazzuola:f cote:f lima:f grattugia:f setaccio:m vanga:f
 		erpice:m correggiato:m fuso:m spola:f rocchetto:m manico:m lama:f cassetta:f
-		rivettatrice:f chiodatrice:f seghetto:m tornio:m levigatrice:f motosega:f sgorbia:f
-		punteruolo:m squadra:f smusso:m
-		succhiello:m punta:f pialletto:m raspa:f scalpellino:m graffietto:m
+		rivettatrice:f chiodatrice:f tornio:m levigatrice:f motosega:f sgorbia:f
+		punteruolo:m smusso:m
+		succhiello:m punta:f raspa:f graffietto:m
 		piombino:m tenaglia:f cric:m graffatrice:f pistola:f cannello:m acciarino:m crogiolo:m
-		stampo:m fustella:f mola:f arrotino:m mandrino:m fresa:f roncola:f accettino:m
+		stampo:m fustella:f mola:f mandrino:m fresa:f roncola:f
 		subbio:m
 		chiave_inglese:f avvitatore:m smerigliatrice:f carta_vetrata:f bulino:m spada:f pugnale:m arco:m freccia:f
-		machete:m forcone:m annaffiatoio:m cesoie:fp tosaerba:m spatola:f frattazzo:m bisturi:m siringa:f pinzetta:f
+		machete:m forcone:m annaffiatoio:m cesoie:fp tosaerba:m spatola:f frattazzo:m bisturi:m siringa:f
 		uncinetto:m telaio:m arcolaio:m cesello:m pompa:f argano:m paranco:m maglio:m piccozza:f schiacciapatate:m
 		apriscatole:m schiaccianoci:m tritacarne:m mattarello:m mannaia:f raschietto:m bullone:m tassello:m
 		perforatrice:f taglierino:m
+		brugola:f tronchese:m decespugliatore:m tubo:m compressore:m saldatrice:f remo:m pagaia:f timone:m
+		amo:m lenza:f esca:f trappola:f tagliola:f stetoscopio:m apribottiglie:m pestello:m mocio:m
+		fucile:m cannone:m balestra:f alabarda:f scimitarra:f sciabola:f fioretto:m baionetta:f
 	`,
 	drink: `
 		caffè:m tè:m succo:m latte:m acqua:f gassosa:f limonata:f sidro:m orzata:f frullato:m
@@ -461,15 +711,17 @@ export const IT_NOUNS = taggedNouns({
 		decaffeinato:m birra:f bionda:f rossa:f vino:m
 		spumante:m prosecco:m champagne:m sherry:m vermut:m sangria:f liquore:m
 		grappa:f acquavite:f rum:m gin:m vodka:f whisky:m cognac:m brandy:m tequila:m sake:m
-		idromele:m cocktail:m punch:m nettare:m sciroppo:m bibita:f soda:f tonica:f granita:f
-		cacao:m kefir:m siero:m panna:f amaro:m anice:m sambuca:f mirto:m
-		limoncello:m chinotto:m spuma:f sorbetto:m aranciata:f cedrata:f moscato:m
+		idromele:m cocktail:m punch:m nettare:m bibita:f soda:f tonica:f granita:f
+		kefir:m siero:m amaro:m sambuca:f mirto:m
+		limoncello:m chinotto:m spuma:f aranciata:f cedrata:f moscato:m
 		lambrusco:m barbera:f chianti:m marsala:m passito:m vinsanto:m mosto:m rosolio:m
 		nocino:m ratafià:m centerbe:m
 		spremuta:f cola:f caffelatte:m ristretto:m marocchino:m karkadè:m frappè:m centrifugato:m aperitivo:m spritz:m
 		barolo:m brunello:m nebbiolo:m amarone:m trebbiano:m vermentino:m sangiovese:m aglianico:m falanghina:f
 		verdicchio:m pinot:m merlot:m bitter:m assenzio:m genepì:m amaretto:m maraschino:m alchermes:m latticello:m
-		tamarindo:m granatina:f shakerato:m affogato:m
+		tamarindo:m granatina:f shakerato:m
+		bevanda:f analcolico:m americano:m ginseng:m digestivo:m negroni:m mojito:m bourbon:m vin_brulé:m
+		seltz:m
 	`,
 	toy: `
 		palloncino:m aquilone:m trottola:f biglia:f dado:m puzzle:m scacchi:p domino:m giocattolo:m gioco:m palla:f
@@ -480,6 +732,8 @@ export const IT_NOUNS = taggedNouns({
 		nascondino:m acchiapparello:m mosca_cieca:f girotondo:m rubabandiera:m caccia_al_tesoro:f trampoli:p
 		coriandoli:p maschera:f gonfiabile:m braccioli:p flipper:m videogioco:m biliardino:m birilli:p figurina:f
 		pedina:f alfiere:m
+		mattoncino:m poker:m burraco:m ramino:m bingo:m mikado:m quiz:m formina:f frisbee:m boomerang:m
+		travestimento:m pedone:m jolly:m asso:m fante:m teatrino:m tris:m battaglia_navale:f morra:f
 	`,
 	sound: `
 		suono:m rumore:m voce:f grido:m urlo:m strillo:m sussurro:m sospiro:m risata:f pianto:m singhiozzo:m
@@ -491,6 +745,9 @@ export const IT_NOUNS = taggedNouns({
 		coccodè:m cip_cip:m etciù:m applauso:m urrà:m risonanza:f vibrazione:f richiamo:m allarme:m clacson:m
 		suoneria:f bip:m brontolio:m borbottio:m balbettio:m tintinnio:m stridore:m scalpiccio:m sciacquio:m
 		scroscio:m picchiettio:m rombo:m pigolio:m squittio:m sbuffo:m soffio:m rutto:m schiocco:m clic:m
+		vocio:m schiamazzo:m strepito:m fracasso:m bang:m crac:m barrito:m bramito:m gorgheggio:m guaito:m
+		mugolio:m fusa:fp evviva:m bisbiglio:m rantolo:m esplosione:f colpo:m scampanellata:f calpestio:m
+		sfrigolio:m gocciolio:m volume:m decibel:m acustica:f
 	`,
 	person: `
 		bambino:m neonato:m ragazzo:m adolescente:m adulto:m anziano:m nonno:m nonna:f bisnonno:m mamma:f papà:m
@@ -503,17 +760,30 @@ export const IT_NOUNS = taggedNouns({
 		topo_di_biblioteca:m secchione:m saputello:m chiacchierone:m pettegolo:m piagnucolone:m fifone:m codardo:m
 		spaccone:m sbruffone:m attaccabrighe:m guastafeste:m rompiscatole:m ficcanaso:m bonaccione:m simpaticone:m
 		brontolone:m musone:m ottimista:m pessimista:m pasticcione:m signore:m signora:f sonnambulo:m
+		uomo:m donna:f ragazza:f fidanzata:f persona:f individuo:m tizio:m pensionato:m giovanotto:m
+		signorina:f pronipote:m figliastro:m patrigno:m matrigna:f genero:m nuora:f padrino:m madrina:f
+		figlioccio:m fratellastro:m sorellastra:f primogenito:m sposo:m sposa:f single:m partner:m amante:m
+		coinquilino:m conoscente:m forestiero:m emigrante:m immigrato:m mendicante:m senzatetto:m cliente:m
+		spettatore:m lettore:m fan:m ammiratore:m discepolo:m mentore:m leader:m boss:m socio:m complice:m
+		traditore:m mascalzone:m teppista:m bullo:m delinquente:m criminale:m truffatore:m ipocrita:m
+		idealista:m egoista:m altruista:m avaro:m spendaccione:m goloso:m buongustaio:m fannullone:m
+		perfezionista:m imbranato:m credulone:m burlone:m festaiolo:m nottambulo:m escursionista:m
+		avventuriero:m collezionista:m dilettante:m principiante:m esperto:m veterano:m pivello:m volontario:m
+		benefattore:m perdente:m sopravvissuto:m malato:m paziente:m padrone:m proprietario:m inquilino:m
+		gentiluomo:m damigella:f fanciullo:m fanciulla:f marmocchio:m
 	`,
 	furniture: `
 		cuscino:m coperta:f materasso:m piumone:m armadio:m scaffale:m comodino:m tappeto:m veneziana:f lampadario:m
 		abatjour:m zerbino:m sedia:f tavolo:m tavolino:m scrivania:f letto:m culla:f divano:m poltrona:f sgabello:m
-		panca:f panchina:f mensola:f ripiano:m cassetto:m cassettiera:f credenza:f dispensa:f vetrina:f mobile:m
+		panca:f panchina:f mensola:f ripiano:m cassetto:m cassettiera:f credenza:f vetrina:f mobile:m
 		guardaroba:m attaccapanni:m portaombrelli:m specchiera:f cassapanca:f scarpiera:f comò:m pensile:m
-		seggiolone:m sdraio:f amaca:f dondolo:m pouf:m lenzuolo:m trapunta:f guanciale:m testiera:f baldacchino:m
+		seggiolone:m sdraio:f amaca:f dondolo:m pouf:m lenzuolo:m trapunta:f testiera:f baldacchino:m
 		zanzariera:f drappo:m moquette:f stuoia:f cornice:f quadro:m arazzo:m pendola:f piantana:f lume:m candelabro:m
 		paralume:m fioriera:f soprammobile:m statuetta:f portafoto:m paravento:m persiana:f tapparella:f bancone:m
 		cattedra:f leggio:m scrittoio:m portagioie:m cofanetto:m bacheca:f fasciatoio:m tappezzeria:f
 		carta_da_parati:f parquet:m
+		banco:m federa:f trono:m branda:f madia:f toeletta:f poggiapiedi:m plaid:m copriletto:m applique:f
+		portariviste:m
 	`
 });
 

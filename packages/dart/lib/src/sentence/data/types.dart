@@ -739,6 +739,10 @@ enum NounTrait {
   /// A word of the `place` class that is no place — a wave, a comet, a
   /// lightyear — which a sentence never happens in and nobody goes to.
   placeless,
+
+  /// A name the language writes with no article, with its capital letter and
+  /// with nothing in front of it: `Mars` and `Marte`, never `the mars`.
+  proper,
 }
 
 /// What a connective claims about the sentence before it.

@@ -1,4 +1,4 @@
-"""Things you buy — the manufactured end of the vocabulary."""
+"""Things you buy — the manufactured end of the vocabulary, short of make-up."""
 
 from collections.abc import Callable
 from typing import Literal, overload
@@ -58,7 +58,7 @@ def rand_product(
     random: Callable[[], float] | None = None,
     output: str = "value",
 ) -> list[str] | list[WordDetail]:
-    """Things you buy — the manufactured end of the vocabulary.
+    """Things you buy — the manufactured end of the vocabulary, short of make-up.
 
     `rand_word(theme="product")` with the theme already chosen; every other argument
     is the same, and they are documented on `rand_word`.

@@ -2354,10 +2354,14 @@ _Phrase _nounPhrase(
       forced ??
       _plain(lexicon, drawWord(lexicon, pool, invent, low < high ? low : high, high, prefix).word);
   final gender = genderOf(lexicon, _asPool(lexicon, drawn));
-  final parts = <String>[drawn];
+  // A name is written the way the pool writes it, with no article and nothing in
+  // front of it: `Mars glows`, never `the bright mars glows`.
+  final proper = _traitsOf(data, drawn).contains(NounTrait.proper);
+  final parts = <String>[proper ? _asPool(lexicon, drawn) : drawn];
   // The budget reserved room for a modifier, and a noun the result has already
-  // described gives it back rather than being described a second time.
-  final modified = modify && !settled.contains(drawn);
+  // described gives it back rather than being described a second time. A name
+  // gives it back too, unless the modifier is one the caller required.
+  final modified = modify && !settled.contains(drawn) && (!proper || forcedModifier != null);
 
   if (modified) {
     final room = max - overhead - drawn.length - space;
@@ -2395,7 +2399,7 @@ _Phrase _nounPhrase(
     }
   }
 
-  final written = bare ? '' : _articleFor(data, gender, parts[0]);
+  final written = bare || proper ? '' : _articleFor(data, gender, parts[0]);
   // An elided article carries its own boundary — `l'orso`, never `l' orso`.
   final text =
       written.endsWith("'")
@@ -2485,11 +2489,12 @@ int _modifyChanceFor(int distance, bool tooLong, bool storied) {
   return tooLong ? 0 : 100;
 }
 
-/// Where a subject can go, and where a story happens. `place` alone, and not
-/// the two other themes of its class: a hero can walk to the market and not to
-/// Pluto, and a sky is not somewhere a fox goes. A `place` part on its own
-/// still spans the class, because a fox can sleep under a sky.
-const List<WordTheme> _destinationThemes = <WordTheme>[WordTheme.place];
+/// Where a subject can go, and where a story happens. `place` and `building`,
+/// and not the other three themes of their class: a hero can walk to the market
+/// or the library and not to Pluto, and a sky is not somewhere a fox goes. A
+/// `place` part on its own still spans the class, because a fox can sleep under
+/// a sky.
+const List<WordTheme> _destinationThemes = <WordTheme>[WordTheme.place, WordTheme.building];
 
 /// The theme a phrase other than the subject draws from.
 WordTheme _themeForPart(

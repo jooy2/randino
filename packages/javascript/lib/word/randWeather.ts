@@ -8,8 +8,8 @@ import { themedWord } from './wordGenerator.js';
  * option is the same.
  *
  * @example
- * randWeather({ language: 'ko', count: 3 }); // ['소나기', '무지개', '된서리']
- * randWeather({ language: 'en', count: 3 }); // ['Drizzle', 'Rainbow', 'Hoarfrost']
+ * randWeather({ language: 'ko', count: 3 }); // ['소나기', '무지개', '서리']
+ * randWeather({ language: 'en', count: 3 }); // ['Drizzle', 'Rainbow', 'Frost']
  */
 export function randWeather(options?: RandThemedWordOptions & { output?: 'value' }): string[];
 /**

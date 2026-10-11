@@ -2,14 +2,15 @@ import type { RandThemedWordOptions, WordDetail } from '../_types/global.js';
 import { themedWord } from './wordGenerator.js';
 
 /**
- * Music: instruments, forms and the words around them.
+ * Music and how it is made: instruments, notation, performing and the parts of a
+ * song. The kinds of music are `randGenre`.
  *
  * `randWord({ theme: 'music' })` with the theme already chosen; every other
  * option is the same.
  *
  * @example
- * randMusic({ language: 'ko', count: 3 }); // ['피아노', '거문고', '교향곡']
- * randMusic({ language: 'en', count: 3 }); // ['Piano', 'Fiddle', 'Symphony']
+ * randMusic({ language: 'ko', count: 3 }); // ['피아노', '거문고', '악보']
+ * randMusic({ language: 'en', count: 3 }); // ['Piano', 'Fiddle', 'Melody']
  */
 export function randMusic(options?: RandThemedWordOptions & { output?: 'value' }): string[];
 /**

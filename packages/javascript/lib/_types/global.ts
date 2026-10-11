@@ -150,13 +150,17 @@ export type WordLanguageOption = WordLanguage | 'all';
 /**
  * What a word is about — animals (`사자`), everyday things (`물병`), nature
  * and its phenomena (`노을`), plants (`민들레`), stones and metals (`흑요석`),
- * ideas from the humanities and social world (`철학`), creatures out of myth
- * (`구미호`), the trades and roles people hold (`대장장이`), music (`교향곡`),
- * places (`광장`), food (`떡볶이`), sports (`양궁`), things that carry you
- * (`열기구`), things you buy (`이어폰`), colours (`주홍`), money and what is done
- * with it (`이자`), the vocabulary of computing (`캐시`), toys and games (`팽이`),
- * sounds (`속삭임`), people by age and kinship (`꼬마`), or furniture (`요람`).
- * Person names are never used.
+ * ideas from the humanities and social world (`철학`), magic and what myth is
+ * made of (`부적`), the creatures of myth and folklore (`구미호`), the trades
+ * and roles people hold (`대장장이`), music and how it is made (`첼로`), kinds
+ * of music (`재즈`), places (`광장`), buildings and the rooms in them (`도서관`),
+ * prepared food (`떡볶이`), what it is cooked from (`간장`), vegetables (`당근`),
+ * fruit (`복숭아`), sports (`양궁`), things that carry you (`열기구`), things you
+ * buy (`이어폰`), make-up and skin and hair care (`립스틱`), colours (`주홍`),
+ * money and what is done with it (`이자`), the vocabulary of computing
+ * (`캐시`), the sky and space (`혜성`), planets by name (`화성`), toys and
+ * games (`팽이`), sounds (`속삭임`), people by age and kinship (`꼬마`), or
+ * furniture (`요람`). Person names are never used.
  *
  * Each one is also a generator of its own — `animal` is `randAnimal`.
  */
@@ -168,18 +172,26 @@ export type WordTheme =
 	| 'gem'
 	| 'concept'
 	| 'myth'
+	| 'monster'
 	| 'job'
 	| 'music'
+	| 'genre'
 	| 'place'
+	| 'building'
 	| 'food'
+	| 'ingredient'
+	| 'vegetable'
+	| 'fruit'
 	| 'sport'
 	| 'vehicle'
 	| 'product'
+	| 'beauty'
 	| 'color'
 	| 'finance'
 	| 'tech'
 	| 'weather'
 	| 'space'
+	| 'planet'
 	| 'time'
 	| 'emotion'
 	| 'body'
@@ -204,7 +216,7 @@ export interface RandWordOptions extends RandCommonOptions {
 }
 
 /**
- * What the twenty-nine themed generators take — `RandWordOptions` without the
+ * What the thirty-seven themed generators take — `RandWordOptions` without the
  * option they answer. `randAnimal({ theme: 'food' })` would be a contradiction,
  * so it does not type-check.
  */

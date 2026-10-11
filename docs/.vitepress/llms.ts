@@ -106,7 +106,7 @@ const PREAMBLE = [
 	'**Person names** read like names a person actually carries (김민준, Emma Clover).',
 	'**Nicknames** are the handles someone would pick for a game or a website (멋진사자, MistyOwl),',
 	'built from everyday words and never from person names. **Words** are those everyday words on',
-	"their own, across twenty-nine themes. **Sentences** are whole statements in the language's own",
+	"their own, across thirty-seven themes. **Sentences** are whole statements in the language's own",
 	'grammar (여우가 사과를 먹는다). **Locations** are real places written out down to a Korean 읍·면·동',
 	'or a US city, in the two languages whose countries publish that list free of conditions, beside',
 	"every country's name in all nine. **Ages** are whole numbers drawn along a curve shaped like a",

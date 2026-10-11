@@ -160,7 +160,9 @@ class PredicateTense:
     """The other forms, index-aligned with `words`."""
 
 
-NounTrait = Literal["flier", "swimmer", "crawler", "lifeless", "liquid", "raw", "placeless"]
+NounTrait = Literal[
+    "flier", "swimmer", "crawler", "lifeless", "liquid", "raw", "placeless", "proper"
+]
 """What a noun can do that its theme does not say.
 
 A fish and a sparrow are both `animal`, and only one of them flies; a snake and a lion are
@@ -172,8 +174,10 @@ at all, because it neither does anything nor is anything a creature is. `"liquid
 `"raw"` are what a verb asks of its object: `sips` takes a liquid and `chews` takes none,
 `roasts` takes something raw. `"placeless"` is what a place part asks of its noun: a word
 of the `place` class that is no place — a wave, a comet, a lightyear — which a sentence never
-happens in and nobody goes to. A noun in none of the lists has no trait, so it takes any group
-that asks for none.
+happens in and nobody goes to. `"proper"` is how the noun is written rather than what it can
+do: a name the language writes with no article and with its capital letter, `Mars` and
+`Marte` rather than `the mars` and `el Marte`, which takes no modifier either. A noun in none of
+the lists has no trait, so it takes any group that asks for none.
 """
 
 

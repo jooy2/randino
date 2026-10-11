@@ -1,4 +1,4 @@
-"""Music: instruments, forms and the words around them."""
+"""Music and how it is made: instruments, notation and performing."""
 
 from collections.abc import Callable
 from typing import Literal, overload
@@ -58,7 +58,7 @@ def rand_music(
     random: Callable[[], float] | None = None,
     output: str = "value",
 ) -> list[str] | list[WordDetail]:
-    """Music: instruments, forms and the words around them.
+    """Music and how it is made: instruments, notation and performing.
 
     `rand_word(theme="music")` with the theme already chosen; every other argument
     is the same, and they are documented on `rand_word`.
@@ -68,9 +68,9 @@ def rand_music(
 
     Example:
         >>> rand_music(language="ko", count=3)
-        ['피아노', '거문고', '교향곡']
+        ['피아노', '거문고', '악보']
         >>> rand_music(language="en", count=3)
-        ['Piano', 'Fiddle', 'Symphony']
+        ['Piano', 'Fiddle', 'Melody']
     """
     theme: WordThemeOption = "music"
 

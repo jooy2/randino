@@ -1,6 +1,6 @@
 # randMusic
 
-Music: instruments, forms and the words around them.
+Music and how it is made: instruments, notation, performing and the parts of a song. The kinds of music are [`randGenre`](./rand-genre).
 
 [`randWord`](./rand-word) with `theme` fixed to <Lang js="'music'" dart="WordTheme.music" py="&quot;music&quot;" code />; every other option is the same one, and means the same thing.
 
@@ -9,7 +9,7 @@ Music: instruments, forms and the words around them.
 ```javascript
 import { randMusic } from 'randino';
 
-randMusic({ language: 'en', count: 3 }); // ['Piano', 'Fiddle', 'Symphony']
+randMusic({ language: 'en', count: 3 }); // ['Piano', 'Fiddle', 'Melody']
 randMusic({ language: 'en', output: 'detail' });
 // [{ word: 'Piano', language: 'en', theme: 'music' }]
 ```
@@ -21,10 +21,10 @@ randMusic({ language: 'en', output: 'detail' });
 ```dart
 import 'package:randino/randino.dart';
 
-randMusic(language: WordLanguage.en, count: 3); // [Piano, Fiddle, Symphony]
+randMusic(language: WordLanguage.en, count: 3); // [Piano, Fiddle, Melody]
 ```
 
-Returns `List<String>`. For the detail form, pass `WordTheme.music` to `randWordDetails`. Dart has no overloads, and a detail twin for each of the twenty-nine themes would be twenty-nine functions too many.
+Returns `List<String>`. For the detail form, pass `WordTheme.music` to `randWordDetails`. Dart has no overloads, and a detail twin beside every themed function would be one function too many for each theme.
 
 :::
 
@@ -33,7 +33,7 @@ Returns `List<String>`. For the detail form, pass `WordTheme.music` to `randWord
 ```python
 from randino import rand_music
 
-rand_music(language="en", count=3)  # ['Piano', 'Fiddle', 'Symphony']
+rand_music(language="en", count=3)  # ['Piano', 'Fiddle', 'Melody']
 rand_music(language="en", output="detail")
 # [WordDetail(word='Piano', language='en', theme='music')]
 ```
@@ -47,4 +47,4 @@ rand_music(language="en", output="detail")
 ## See also
 
 - [`randWord`](./rand-word) — the same generator with `theme` open, and what each option does in full.
-- [Themes](./themes) — the other twenty-four, and the words each one holds.
+- [Themes](./themes) — every other theme, and the words each one holds.

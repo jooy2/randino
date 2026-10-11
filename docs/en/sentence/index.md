@@ -8,26 +8,26 @@ What keeps the words of one sentence together is the verb. Every verb states whi
 
 So `여우가 사과를 먹는다` is a sentence the generator can build and `여우가 철학을 먹는다` is not: `먹는다` accepts something edible and nothing else.
 
-No noun carries a tag for this. The twenty-nine [themes](../word/themes) already say what a word is, so each theme maps to one **noun class**, the same way in every language:
+No noun carries a tag for this. The thirty-seven [themes](../word/themes) already say what a word is, so each theme maps to one **noun class**, the same way in every language:
 
-| Class      | Themes                                                                      |
-| ---------- | --------------------------------------------------------------------------- |
-| `creature` | `animal`, `myth`                                                            |
-| `person`   | `job`, `person`                                                             |
-| `plant`    | `plant`                                                                     |
-| `edible`   | `food`, `drink`                                                             |
-| `thing`    | `object`, `tool`, `clothing`, `product`, `gem`, `music`, `toy`, `furniture` |
-| `vehicle`  | `vehicle`                                                                   |
-| `place`    | `place`, `nature`, `space`                                                  |
-| `event`    | `weather`, `sport`, `time`, `sound`                                         |
-| `idea`     | `concept`, `emotion`, `finance`, `tech`, `color`                            |
-| `body`     | `body`                                                                      |
+| Class | Themes |
+| --- | --- |
+| `creature` | `animal`, `monster` |
+| `person` | `job`, `person` |
+| `plant` | `plant` |
+| `edible` | `food`, `ingredient`, `vegetable`, `fruit`, `drink` |
+| `thing` | `object`, `tool`, `clothing`, `product`, `beauty`, `gem`, `music`, `toy`, `furniture` |
+| `vehicle` | `vehicle` |
+| `place` | `place`, `building`, `nature`, `space`, `planet` |
+| `event` | `weather`, `sport`, `time`, `sound` |
+| `idea` | `concept`, `myth`, `genre`, `emotion`, `finance`, `tech`, `color` |
+| `body` | `body` |
 
 A verb that says `creature` and `person` can be done by a lion and by a locksmith, and by nothing else. That is the whole mechanism, and it is why the sentences read as sentences rather than as filled-in templates.
 
 Where a class is too wide, a group narrows it to themes on either side of the verb. `eat` takes `food` and `drink` takes `drink`, though both are `edible`; `익는다` is a thing `food` does and `울린다` a thing `music` does, though a soup and a song are both `edible` and `thing` to the classes. A theme narrowed out of one group is always accepted by another of the same field, so nothing loses its verbs — a song stopped swaying and started ringing.
 
-Below the theme, a noun may carry a **trait**: a language lists which of its nouns fly, swim or crawl, and a verb asks for one or rules one out. `날아오른다` takes a flier, `헤엄친다` a swimmer, and `달린다` takes anything that neither swims nor crawls — so a sparrow takes off, a mackerel swims, a snake crawls, and a lion, which is listed nowhere, runs. Every language lists its own: `the heron flew`, `der Basilisk kriecht`, `el sapo nada`. The lists name the exceptions and nothing else, and every noun keeps a verb in every field its kind has. One trait takes everything away: a word of a creature theme that is no creature — a spell, a rune, an amulet, `마력` — is `lifeless`, and a sentence about a myth is about the dragons and the elves, never `the charm chooses`. Another takes a noun out of the places: a word of the `place` class that is no place — a wave, a comet, a lightyear — is `placeless`, so a sentence happens in a forest or on a moon and never `in the lightyear`. A verb may ask the same of its object: in English `sips` takes a `liquid`, `chews` takes none, and `roasts` and `slices` take something `raw`, so a curry is simmered and a steak is grilled, and nobody chews a syrup.
+Below the theme, a noun may carry a **trait**: a language lists which of its nouns fly, swim or crawl, and a verb asks for one or rules one out. `날아오른다` takes a flier, `헤엄친다` a swimmer, and `달린다` takes anything that neither swims nor crawls — so a sparrow takes off, a mackerel swims, a snake crawls, and a lion, which is listed nowhere, runs. Every language lists its own: `the heron flew`, `der Basilisk kriecht`, `el sapo nada`. The lists name the exceptions and nothing else, and every noun keeps a verb in every field its kind has. One trait would take everything away: a word of a creature theme that is no creature is `lifeless`, and takes no verb and no state. No language lists one now that the creatures of myth are a theme of their own, `monster`, and `myth` is an `idea`: a curse fades and a prophecy lingers, and nobody writes `the charm chooses`. Another takes a noun out of the places: a word of the `place` class that is no place — a wave, a comet, a lightyear — is `placeless`, so a sentence happens in a forest or on a moon and never `in the lightyear`. And a name is written as a name: a word a language lists as `proper` — a planet, a named star, a realm of myth — takes no article, no modifier and keeps its capital letter, so English writes `Mars glows` and `on Sedna`, and Spanish `Marte`, where every other noun would have written `the mars`. A verb may ask the same of its object: in English `sips` takes a `liquid`, `chews` takes none, and `roasts` and `slices` take something `raw`, so a curry is simmered and a steak is grilled, and nobody chews a syrup.
 
 A place takes the preposition it takes. Every English place frame writes `in`, and a language may list where that is the wrong word: `on the balcony`, `at the market`, `under the sky`. A place listed nowhere keeps the frame's own.
 

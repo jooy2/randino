@@ -88,7 +88,7 @@ const packageLinks = [
  *
  * The sidebar's **Words** group, nested inside Generators beside **General**,
  * is the one left out — and it says so itself, with `sidebarOnly` on the group
- * rather than an omission here. Twenty-nine names for `randWord` with its argument
+ * rather than an omission here. Thirty-seven names for `randWord` with its argument
  * decided would double the menu and say nothing `randWord` does not; the
  * sidebar lists them, and the dropdown points at the function they all are.
  */

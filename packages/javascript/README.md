@@ -28,7 +28,7 @@ npm install randino
 
 Requires **Node.js 22 or newer**, or any browser. The package ships ESM with type declarations and pulls nothing in behind it.
 
-`sideEffects: false` is declared, so a bundler drops the pools nothing reaches — and the pools are nearly all of it. Minified and gzipped, `randSuffix` alone is 0.6 KB, `randName` 24 KB, `randModifier` 91 KB, `randLocation` 156 KB, `randWord` and `randNickname` 255 KB, and `randSentence` 417 KB; the [getting-started page](https://randino.cdget.com/guide/getting-started#bundle-size) lists the rest. In a browser bundle that is worth knowing: the word pools are one object per language, so one theme costs what twenty-nine do.
+`sideEffects: false` is declared, so a bundler drops the pools nothing reaches — and the pools are nearly all of it. Minified and gzipped, `randSuffix` alone is 0.6 KB, `randName` 24 KB, `randModifier` 122 KB, `randLocation` 156 KB, `randWord` and `randNickname` 345 KB, and `randSentence` 517 KB; the [getting-started page](https://randino.cdget.com/guide/getting-started#bundle-size) lists the rest. In a browser bundle that is worth knowing: the word pools are one object per language, so one theme costs what thirty-seven do.
 
 ## Person names
 
@@ -106,11 +106,11 @@ randNickname({ language: 'en', output: 'detail' });
 | `unique`                  | `boolean`                  | `false`    |
 | `output`                  | `'value' \| 'detail'`      | `'value'`  |
 
-Themes: `animal`, `object`, `nature`, `plant`, `gem`, `concept`, `myth`, `job`, `music`, `place`, `food`, `sport`, `vehicle`, `product`, `color`, `finance`, `tech`, `weather`, `space`, `time`, `emotion`, `body`, `clothing`, `tool`, `drink`, `toy`, `sound`, `person`, `furniture`.
+Themes: `animal`, `object`, `nature`, `plant`, `gem`, `concept`, `myth`, `monster`, `job`, `music`, `genre`, `place`, `building`, `food`, `ingredient`, `vegetable`, `fruit`, `sport`, `vehicle`, `product`, `beauty`, `color`, `finance`, `tech`, `weather`, `space`, `planet`, `time`, `emotion`, `body`, `clothing`, `tool`, `drink`, `toy`, `sound`, `person`, `furniture`.
 
 ## Words
 
-The pools the nicknames are built from, on their own. Twenty-nine themes, nine languages, and a function per theme.
+The pools the nicknames are built from, on their own. Thirty-seven themes, nine languages, and a function per theme.
 
 ```javascript
 import { randAnimal, randFood, randWord, wordLengthRange } from 'randino';
@@ -139,7 +139,7 @@ wordLengthRange('en'); // [3, 11]
 | `unique`                  | `boolean`                  | `false`   |
 | `output`                  | `'value' \| 'detail'`      | `'value'` |
 
-One function per theme: `randAnimal`, `randObject`, `randNature`, `randPlant`, `randGem`, `randConcept`, `randMyth`, `randJob`, `randMusic`, `randPlace`, `randFood`, `randSport`, `randVehicle`, `randProduct`, `randColor`, `randFinance`, `randTech`, `randWeather`, `randSpace`, `randTime`, `randEmotion`, `randBody`, `randClothing`, `randTool`, `randDrink`. Each is `randWord` with the theme already chosen.
+One function per theme: `randAnimal`, `randObject`, `randNature`, `randPlant`, `randGem`, `randConcept`, `randMyth`, `randMonster`, `randJob`, `randMusic`, `randGenre`, `randPlace`, `randBuilding`, `randFood`, `randIngredient`, `randVegetable`, `randFruit`, `randSport`, `randVehicle`, `randProduct`, `randBeauty`, `randColor`, `randFinance`, `randTech`, `randWeather`, `randSpace`, `randPlanet`, `randTime`, `randEmotion`, `randBody`, `randClothing`, `randTool`, `randDrink`, `randToy`, `randSound`, `randPerson`, `randFurniture`. Each is `randWord` with the theme already chosen.
 
 ## Sentences
 

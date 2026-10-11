@@ -597,7 +597,7 @@ final SentenceLanguageData it = SentenceLanguageData(
       field: VerbField.cook,
       subject: const <NounClass>[NounClass.creature, NounClass.person],
       object: const <NounClass>[NounClass.edible],
-      objectThemes: const <WordTheme>[WordTheme.food],
+      objectThemes: const <WordTheme>[WordTheme.food, WordTheme.vegetable],
       words: words(r'''
         cuoce scalda cucina taglia arrostisce serve frigge bolle lessa salta_in_padella condisce
         insaporisce sala mescola rimesta sbatte stufa brasa tosta gratina sbuccia trita affetta
@@ -615,7 +615,7 @@ final SentenceLanguageData it = SentenceLanguageData(
       field: VerbField.eat,
       subject: const <NounClass>[NounClass.creature, NounClass.person],
       object: const <NounClass>[NounClass.edible],
-      objectThemes: const <WordTheme>[WordTheme.food],
+      objectThemes: const <WordTheme>[WordTheme.food, WordTheme.fruit, WordTheme.vegetable],
       words: words(r'''
         mangia mastica assaggia rosicchia divora gusta degusta inghiotte ingoia trangugia morde rode
         lecca sbocconcella dà_un_morso_a si_mangia finisce si_pappa spazzola ingurgita pilucca
@@ -742,6 +742,7 @@ final SentenceLanguageData it = SentenceLanguageData(
         WordTheme.tool,
         WordTheme.clothing,
         WordTheme.product,
+        WordTheme.beauty,
         WordTheme.toy,
         WordTheme.furniture,
         WordTheme.gem,
@@ -879,6 +880,7 @@ final SentenceLanguageData it = SentenceLanguageData(
     VerbGroup(
       field: VerbField.change,
       subject: const <NounClass>[NounClass.edible],
+      subjectThemes: const <WordTheme>[WordTheme.food, WordTheme.drink],
       words: words(r'''
         matura si_raffredda bolle si_scioglie si_guasta si_scalda si_intiepidisce fuma emana_vapore
         profuma manda_un_buon_odore finisce si_esaurisce avanza resta si_riduce arriva_in_tavola
@@ -925,6 +927,36 @@ final SentenceLanguageData it = SentenceLanguageData(
           frizzò spumeggiò fece_la_schiuma si_versò si_rovesciò schizzò sciabordò si_agitò
           si_mescolò si_intorbidì si_schiarì si_depositò perse_il_gas evaporò traboccò gocciolò colò
           si_annacquò si_concentrò si_ghiacciò
+        '''),
+      ),
+    ),
+    VerbGroup(
+      field: VerbField.change,
+      subject: const <NounClass>[NounClass.edible],
+      subjectThemes: const <WordTheme>[WordTheme.fruit, WordTheme.vegetable],
+      words: words(r'''
+        matura marcisce appassisce si_ammorbidisce si_secca si_ammacca va_a_male ammuffisce
+        si_conserva si_raggrinzisce annerisce
+      '''),
+      past: PredicateTense(
+        words: words(r'''
+          maturò marcì appassì si_ammorbidì si_seccò si_ammaccò andò_a_male ammuffì si_conservò
+          si_raggrinzì annerì
+        '''),
+      ),
+    ),
+    VerbGroup(
+      field: VerbField.change,
+      subject: const <NounClass>[NounClass.edible],
+      subjectThemes: const <WordTheme>[WordTheme.ingredient],
+      words: words(r'''
+        si_guasta si_scioglie si_indurisce si_ammorbidisce si_secca va_a_male si_esaurisce finisce
+        si_conserva irrancidisce
+      '''),
+      past: PredicateTense(
+        words: words(r'''
+          si_guastò si_sciolse si_indurì si_ammorbidì si_seccò andò_a_male si_esaurì finì
+          si_conservò irrancidì
         '''),
       ),
     ),
@@ -1003,9 +1035,26 @@ final SentenceLanguageData it = SentenceLanguageData(
     ),
     StateGroup(
       subject: const <NounClass>[NounClass.edible],
+      subjectThemes: const <WordTheme>[WordTheme.food, WordTheme.drink],
       words: words(r'''
         dolce salato piccante aspro caldo freddo saporito amaro denso morbido tiepido succoso
         croccante gustoso insipido
+      '''),
+    ),
+    StateGroup(
+      subject: const <NounClass>[NounClass.edible],
+      subjectThemes: const <WordTheme>[WordTheme.fruit, WordTheme.vegetable],
+      words: words(r'''
+        dolce maturo acerbo fresco succoso croccante sodo morbido tenero delicato saporito buono
+        squisito
+      '''),
+    ),
+    StateGroup(
+      subject: const <NounClass>[NounClass.edible],
+      subjectThemes: const <WordTheme>[WordTheme.ingredient],
+      words: words(r'''
+        salato dolce fresco delicato amaro profumato saporito aromatico intenso genuino buono
+        squisito pregiato
       '''),
     ),
     StateGroup(
@@ -1058,6 +1107,22 @@ final SentenceLanguageData it = SentenceLanguageData(
         dolce piccante tiepido fresco croccante saporito fragrante caldo salato morbido maturo
         gustoso dorato affumicato cremoso tenero succoso sostanzioso fumante tostato appiccicoso
         insipido speziato
+      '''),
+    ),
+    ModifierGroup(
+      subject: const <NounClass>[NounClass.edible],
+      themes: const <WordTheme>[WordTheme.fruit, WordTheme.vegetable],
+      words: words(r'''
+        fresco maturo acerbo dolce succoso croccante sodo tenero morbido verde selvatico piccolo
+        grosso profumato biologico nostrano buono squisito
+      '''),
+    ),
+    ModifierGroup(
+      subject: const <NounClass>[NounClass.edible],
+      themes: const <WordTheme>[WordTheme.ingredient],
+      words: words(r'''
+        fresco dolce fine profumato saporito delicato aromatico genuino pregiato nostrano
+        artigianale biologico puro buono squisito ottimo costoso
       '''),
     ),
     ModifierGroup(
@@ -1220,35 +1285,56 @@ final SentenceLanguageData it = SentenceLanguageData(
       farfalla ape libellula cicala mosca zanzara pipistrello airone pellicano drago fenice fata
       pegaso grifone angelo valchiria merlo usignolo allodola quaglia fagiano pernice colibrì tucano
       fenicottero cicogna upupa cardellino gazza ghiandaia civetta poiana vespa tarma lucciola
-      ippogrifo gabbiano coccinella cherubino viverna gargolla
+      ippogrifo gabbiano coccinella cherubino viverna gargolla picchio pettirosso cinciallegra
+      fringuello canarino storno piccione avvoltoio condor albatro cormorano sparviero gheppio
+      nibbio barbagianni beccaccia cuculo rondone falena calabrone bombo arcangelo serafino arpia
+      silfide strige
     '''),
     NounTrait.swimmer: words(r'''
       coccodrillo tartaruga rana rospo pesce balena delfino squalo polpo calamaro gambero granchio
       tricheco foca pinguino sirena kraken naiade anguilla sardina tonno merluzzo nasello trota
       salmone carpa razza medusa vongola cozza ostrica aragosta totano salamandra tritone castoro
-      ippopotamo ornitorinco orca
+      ippopotamo ornitorinco orca seppia sogliola orata branzino acciuga sgombro pesce_spada luccio
+      storione pesce_rosso piranha barracuda murena cernia triglia aringa cavalluccio_marino scampo
+      astice capodoglio narvalo beluga lamantino otaria leone_marino alligatore caimano anaconda
+      nutria leviatano serpente_marino ondina nereide anguana rusalka
     '''),
     NounTrait.crawler: words(r'''
       coccodrillo serpente lucertola tartaruga lumaca formica ragno verme granchio basilisco iguana
       camaleonte salamandra tritone boa vipera cobra pitone scarabeo cavalletta grillo pulce bruco
-      millepiedi scorpione scarafaggio dinosauro lamia
+      millepiedi scorpione scarafaggio dinosauro lamia geco varano alligatore caimano anaconda
+      crotalo lombrico sanguisuga tarantola zecca pidocchio cimice termite mantide stella_marina
+      paguro riccio_di_mare slime anfisbena
     '''),
-    NounTrait.lifeless: words(r'''
-      incantesimo maledizione profezia amuleto talismano runa portale santuario idolo totem augurio
-      presagio bestiario sortilegio grimorio pentacolo reliquia calice graal bacchetta bastone
-      scettro corona paradiso inferno purgatorio olimpo aldilà limbo pozione elisir malocchio
-      maleficio scongiuro magia stregoneria alchimia calderone mandragola
+    NounTrait.proper: words(r'''
+      Mercurio Venere Marte Giove Saturno Urano Nettuno Plutone Cerere Eris Haumea Makemake Sedna
+      Quaoar Gonggong Salacia Varuna Ixion Vesta Pallade Giunone Igea Psiche Eros Bennu Ryugu
+      Itokawa Apophis Arrokoth Theia Fetonte Dimidium Spe Orbitar Fortitudo Ægir Amateru Dagon
+      Meztli Smertrios Phobetor Tassili Madriu Yanyan Tondra Eburonia Yvaga Mastika Bendida Nakanbé
+      Awasis Wangshu Pipitea Asye Veles Boinayel Eyeke Cayahuanca Hämarik Abol Bélisama Mintome Toge
+      Santamasa Noifasui Chura Buru Staburags Baiduri Cuptor Xólotl Hairu Laligurans Kereru Albmi
+      Perwana Pollera Viculus Samagiya Ramajay Khomsa Barajeel Cruinlagh Ibirapitá Madalitso
+      Bambaruush Tahay Awohali Enaiposha Phailinsiam Levantes Najsakopajk Qingluan Cuancoá
+      Astrolábos Ahra Aumatex Ixbalanqué Surt Haik Mulchatna Makombé Zembretta Bocaprins Agouto
+      Sirio Vega Antares Betelgeuse Rigel Aldebaran Altair Deneb Spica Canopo Orione Cassiopea
+      Andromeda
     '''),
     NounTrait.placeless: words(r'''
       sabbia ciottolo terremoto masso geyser fumarola stalattite stalagmite eco brace stella cometa
       meteora aurora falce_lunare eclissi zenit satellite ammasso orbita gravità rotazione
-      rivoluzione anno_luce astro eclittica meridiano plenilunio novilunio perigeo vespro supernova
-      quasar pulsar corrente marea onda schiuma frangente parallasse parsec azimut perielio afelio
-      ellisse quadrante nadir gravitazione alone bolide nana fango polvere pietra ghiaia argilla
-      vortice lava magma fuoco fiamma scintilla riflesso raggio bagliore bolla goccia ghiaccio
-      valanga frana eruzione maremoto alluvione incendio ragnatela zodiaco radiazione traiettoria
-      allunaggio decollo missione alieno apogeo congiunzione propulsore etere astronomia astrologia
-      nova magnetar brillamento occultazione radiotelescopio cosmologia astrofisica
+      rivoluzione anno_luce astro eclittica meridiano plenilunio novilunio perigeo supernova quasar
+      pulsar corrente marea onda schiuma frangente parallasse parsec azimut perielio afelio ellisse
+      quadrante nadir gravitazione alone bolide nana fango polvere pietra ghiaia argilla vortice
+      lava magma fuoco fiamma scintilla riflesso raggio bagliore bolla goccia ghiaccio valanga frana
+      eruzione maremoto alluvione incendio ragnatela zodiaco radiazione traiettoria allunaggio
+      decollo missione apogeo congiunzione propulsore etere astronomia nova magnetar brillamento
+      occultazione radiotelescopio cosmologia astrofisica aria cenere fumo sasso melma vapore
+      panorama erosione miraggio torba sole Sirio Vega Antares Betelgeuse Rigel Aldebaran Altair
+      Deneb Spica Canopo Stella_Polare materia_oscura energia_oscura big_bang vento_solare
+      macchia_solare astronautica singolarità transito fotone muro parete pavimento soffitto tetto
+      finestra porta portone cancello scala scalinata gradino ringhiera davanzale comignolo grondaia
+      pilastro cupola piastrella altare statua obelisco Terra Orsa_Maggiore Orsa_Minore Grande_Carro
+      Croce_del_Sud Pleiadi
     '''),
   },
   interjections: words(r'''
@@ -1297,6 +1383,19 @@ final SentenceLanguageData it = SentenceLanguageData(
   degrees: words(r"""
     molto abbastanza un_po' davvero proprio piuttosto assai parecchio decisamente alquanto
   """),
+  placeHeads: <String, WordPool>{
+    'su': words(r'''
+      Mercurio Venere Marte Giove Saturno Urano Nettuno Plutone Cerere Eris Haumea Makemake Sedna
+      Quaoar Gonggong Salacia Varuna Ixion Vesta Pallade Giunone Igea Psiche Eros Bennu Ryugu
+      Itokawa Apophis Arrokoth Theia Fetonte Dimidium Spe Orbitar Fortitudo Ægir Amateru Dagon
+      Meztli Smertrios Phobetor Tassili Madriu Yanyan Tondra Eburonia Yvaga Mastika Bendida Nakanbé
+      Awasis Wangshu Pipitea Asye Veles Boinayel Eyeke Cayahuanca Hämarik Abol Bélisama Mintome Toge
+      Santamasa Noifasui Chura Buru Staburags Baiduri Cuptor Xólotl Hairu Laligurans Kereru Albmi
+      Perwana Pollera Viculus Samagiya Ramajay Khomsa Barajeel Cruinlagh Ibirapitá Madalitso
+      Bambaruush Tahay Awohali Enaiposha Phailinsiam Levantes Najsakopajk Qingluan Cuancoá
+      Astrolábos Ahra Aumatex Ixbalanqué Surt Haik Mulchatna Makombé Zembretta Bocaprins Agouto
+    '''),
+  },
   numeral: const SentenceNumeral(
     order: NumeralOrder.before,
     counters: <NounClass, String>{},

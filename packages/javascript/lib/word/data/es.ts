@@ -72,7 +72,7 @@ export const ES: WordLanguageData = {
 			viento lluvia nieve niebla arcoíris rayo trueno llovizna granizo tormenta nublado ola_de_calor
 			brisa clima temperatura presión chaparrón relámpago huracán tornado nevada gota humedad sequía
 			estrella luna sol galaxia eclipse universo planeta satélite asteroide constelación órbita
-			gravedad cráter atmósfera vacío marte venus júpiter saturno urano neptuno plutón vía_láctea
+			gravedad cráter atmósfera vacío vía_láctea
 			amanecer momento futuro siglo década mañana mediodía tarde noche medianoche madrugada ayer hoy
 			semana mes trimestre año época edad primavera verano otoño invierno ahora infancia aniversario
 			temporada atardecer minuto segundo hora pausa espera turno pasado presente alegría tristeza miedo
@@ -122,6 +122,24 @@ export const ES: WordLanguageData = {
 			frustración decepción respeto curiosidad cansancio susto garganta esqueleto bigote flequillo melena trenza
 			herida meñique oído tripa tacón chándal cazadora cordón suela navaja cortacésped regadera manguera rodillo
 			brocha chupito trago
+			dinosaurio cordero cachorro yegua mula poni canario buitre lagartija mariquita piojo lombriz llama
+			caballito_de_mar estrella_de_mar pez_espada babosa tarántula regalo bandera diario cenicero buzón espada
+			flecha cartón diccionario cómic sacapuntas rotulador clip naturaleza suelo continente planta metal
+			cemento vida muerte mundo mentira realidad fantasía éxito peligro moda salud examen tarea chiste broma
+			noticia dibujo nombre tamaño peso velocidad fuerza energía paraíso infierno poción horóscopo hombre_lobo
+			extraterrestre trabajador obrero empleado presidente político artista pianista futbolista camionero
+			técnico informático música instrumento bajo festival flamenco reguetón hip_hop reggae música_clásica
+			villancico electrónica pueblo país zona centro esquina rotonda parada lugar finca aparcamiento frontera
+			ruta paseo edificio apartamento piso colegio instituto guardería clínica centro_comercial quiosco
+			comisaría peluquería discoteca comedor techo sala helado postre comida desayuno almuerzo cena merienda
+			tostada magdalena perrito_caliente patatas_fritas levadura kétchup especia pipas verdura champiñón fruta
+			aceituna deporte partido balonmano yoga resultado club selección lesión vehículo electrodoméstico
+			medicamento aspirina alarma peluca tatuaje masaje peinado manicura cera gomina bronceador rojo azul
+			verde amarillo negro blanco gris color rubio moreno plateado cambio crisis tarifa documento vídeo página
+			menú tecnología informática meme emoji frío astronomía Mercurio Venus Tierra Marte Júpiter Saturno Urano
+			Neptuno Plutón tiempo vez curso nacimiento asco sentimiento diversión perdón colmillo coleta moño moco
+			respiración ropa biquini talla herramienta trampa jeringa bebida futbolín figura atracción disparo
+			volumen persona gente familia chica esposa cliente paciente turista pasajero dueño
 		`),
 		rare: words(`
 			ñu suricata ornitorrinco lémur babuino tapir alondra abubilla jilguero arrendajo tritón dedal
@@ -132,7 +150,7 @@ export const ES: WordLanguageData = {
 			manganeso lapislázuli cornalina jaspe ónice berilo espinela peridoto alabastro arenisca esquisto
 			gneis cuarcita toba dolomita apatito barita corindón feldespato moscovita siderita limonita
 			bauxita almanaque axioma paradigma linaje retórica dialéctica semántica basilisco gólem
-			licántropo náyade dríade valquiria nigromante bestiario sátiro gorgona leviatán behemot trasgo
+			náyade dríade valquiria nigromante bestiario sátiro gorgona leviatán behemot trasgo
 			ondina silfo sílfide sortilegio grimorio pentáculo hipogrifo mantícora erudito perfumista
 			curtidor vidriero botánico archivero interludio rapsodia cantata semitono fagot corno zampoña
 			ocarina caramillo dulzaina bandurria cítara salterio güiro contrapunto arpegio trino glisando
@@ -143,8 +161,8 @@ export const ES: WordLanguageData = {
 			corinto cárdeno garzo ambarino níveo superávit regalía acreedor fiador liquidez solvencia
 			estipendio arqueo pagaré gravamen exención usura portazgo diezmo búfer códec subred carga_útil
 			clúster depurador ensamblador tasa_de_bits descifrado sombreador octeto enrutamiento conmutación
-			datagrama reversión grafo solana cellisca céfiro galerna escampada resolana canícula siroco
-			tramontana cierzo ábrego alisio tolvanera rociada orvallo calabobos sirimiri nevisca tormentón
+			datagrama reversión grafo solana cellisca céfiro galerna escampada canícula siroco
+			tramontana cierzo ábrego alisio tolvanera rociada orvallo calabobos sirimiri
 			relente estiaje eclíptica plenilunio novilunio perigeo cuásar púlsar paralaje parsec nadir acimut
 			perihelio afelio coronal fotosfera cromosfera magnetosfera ionosfera exosfera mesosfera
 			heliosfera solano trienio bienio efeméride alborada jornal vespertino hogaño albor añada decenio
@@ -152,10 +170,10 @@ export const ES: WordLanguageData = {
 			congoja aflicción desconsuelo desaliento abatimiento arrobo clemencia indulgencia benevolencia
 			alborozo regocijo desazón zozobra pasmo esternón húmero cúbito falange metatarso corva
 			esclerótica frenillo gabán levita chaqué casaca jubón sayo camisola enagua polaina babucha
-			escarpín mitón miriñaque bicornio cofia lezna amoladora hachuela almádena laya mayal remachadora
+			escarpín mitón miriñaque bicornio cofia lezna amoladora almádena laya mayal remachadora
 			clavadora caladora gubia bisel berbiquí barrena formón garlopa escofina escoplo gramil plomada
-			cric yesquero troquel esmeril mandril macheta azuela hidromiel atole pulque tepache bíter
-			licorcillo aguamiel rompope clarete amontillado
+			cric yesquero troquel esmeril mandril azuela hidromiel atole pulque tepache bíter
+			aguamiel rompope clarete amontillado
 			rayuela diábolo bumerán papiroflexia tirachinas tirolina cubilete caleidoscopio trabalenguas gorjeo
 			borboteo tañido redoble retumbo estruendo traqueteo zapateo abucheo runrún algarabía griterío clamor
 			cuchicheo parloteo tartamudeo balbuceo arrullo carraspeo bufido resonancia acústica chinchín nómada
@@ -176,7 +194,7 @@ export const ES: WordLanguageData = {
 			montacargas telesilla funicular gramófono vinilo casete vitrocerámica sandwichera rizador humidificador
 			bidé módem acondicionador ultramar grana azulete perlado ahumado tornasol témpera hollín tabaco accionista
 			banca devaluación cotización calderilla embargo desahucio fichero bucle transistor autómata compresión
-			excepción vector ancho_de_banda tromba frescor carámbano pedrisco mistral cirro nimbo ventarrón terral
+			excepción vector ancho_de_banda tromba frescor carámbano pedrisco mistral cirro nimbo terral
 			celaje arrebol ventolera viento_solar llamarada materia_oscura nova alunizaje magnetar singularidad
 			cuerpo_celeste hemisferio vendimia antigüedad prehistoria milisegundo lujuria soberbia vanidad desgana
 			indiferencia remordimiento fascinación médula neurona glándula páncreas apéndice útero aorta bíceps glúteo
@@ -184,6 +202,24 @@ export const ES: WordLanguageData = {
 			hábito desbrozadora pulverizador sembradora podadora andamio cartabón transportador llana rascador
 			fresadora prensa caballete pelacables multímetro carraca pie_de_cabra cepillo_de_carpintero moscatel
 			absenta pisco cachaza grappa moca sifón agua_de_coco consomé
+			pinzón cormorán narval cayo cenote altiplano glicinia enebro ceiba alhelí jara geoda nigromancia
+			transmutación chamanismo clarividencia telequinesis arcano éter cornucopia Valhalla oréade erinia lamia
+			cocatriz guiverno homúnculo necrófago nahual cadejo chaneque ciguapa imbunche lobisón pishtaco muki
+			cuélebre xana ojáncano anjana sacamantecas basajaun síncopa vihuela clavecín balalaica bebop ragtime
+			lied motete scherzo rondó tocata poema_sinfónico farruca petenera tonadilla huayno candombe dembow
+			guaracha shoegaze vaporwave synthwave grime breakbeat downtempo city_pop dream_pop nu_metal doom_metal
+			power_metal metalcore alcazaba velódromo minarete parador aserradero bungaló barraca pozole pupusa kombu
+			wakame seitán melaza topinambur rebozuelo verdolaga jícama borraja grelo feijoa acerola lúcuma mamey
+			zapote bergamota cidra balandro velocípedo portacontenedores navío colutorio prebase borla cetrino
+			cencellada cumulonimbo Aldebarán Antares cosmología magnitud tiroides buril zarzaparrilla champurrado
+			guarapo tereré mistela tute brisca corro charada berrea gorgoteo escabel velador secreter otomana
+			quiromancia ectoplasma Sedna Quaoar Gonggong Salacia Varuna Ixión Higía Psique Bennu Ryugu Apofis
+			Arrokoth Tea Vulcano Dimidium Spe Orbitar Fortitudo Ægir Amateru Dagon Meztli Smertrios Phobetor Tassili
+			Madriu Yanyan Tondra Eburonia Yvaga Mastika Bendida Nakanbé Awasis Wangshu Pipitea Asye Veles Boinayel
+			Eyeke Cayahuanca Hämarik Abol Bélisama Mintome Toge Santamasa Noifasui Chura Buru Staburags Baiduri
+			Cuptor Xólotl Hairu Laligurans Kereru Albmi Perwana Viculus Samagiya Ramajay Khomsa Barajeel Cruinlagh
+			Ibirapitá Madalitso Bambaruush Tahay Awohali Enaiposha Phailinsiam Najsakopajk Qingluan Cuancoá
+			Astrolábos Ahra Aumatex Ixbalanqué Surt Haik Mulchatna Makombé Zembretta Bocaprins Agouto
 		`)
 	}
 };

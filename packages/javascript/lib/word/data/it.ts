@@ -73,7 +73,7 @@ export const IT: WordLanguageData = {
 			pista rigore angolo cartellino punteggio pareggio vittoria sconfitta record torneo campionato
 			coppa bicicletta treno barca automobile autobus taxi camion moto monopattino aereo elicottero
 			astronave razzo sottomarino yacht zattera carro carrozza carriola trattore ambulanza funivia tram
-			locomotiva canoa mongolfiera paracadute triciclo furgone gondola vagone camioncino skateboard
+			locomotiva canoa mongolfiera paracadute triciclo furgone gondola vagone skateboard
 			traghetto crociera rimorchio computer tastiera mouse schermo stampante altoparlante auricolare
 			microfono drone tablet telefono caricatore pila telecomando frigorifero lavatrice ventilatore
 			stufa microonde forno frullatore rasoio spazzolino dentifricio sapone shampoo profumo orologio
@@ -82,18 +82,18 @@ export const IT: WordLanguageData = {
 			ammorbidente padella caffettiera cavatappi thermos zerbino gruccia armadio scaffale comodino
 			televisore console bilancia tostapane friggitrice bollitore radiatore tappeto lampadario tovaglia
 			tovagliolo lavandino rubinetto doccia vasca lente piastra fucsia arancione turchese celeste lilla
-			bordeaux crema beige fumo grano cannella corallo bordò dorato fattura ricevuta interesse prestito
+			bordeaux crema beige fumo grano cannella corallo dorato fattura ricevuta interesse prestito
 			mutuo risparmio conto guadagno debito credito assegno moneta portafoglio rimborso premio pensione
 			busta_paga stipendio bonus buono coupon cassaforte inflazione donazione spesa sconto rata cassa
 			contratto quota imposta multa affitto pedaggio bottino tesoro ricchezza povertà server pixel
 			pacchetto coda schema cursore backup contenitore istruzione interruzione cartella collegamento
 			processo sessione indice tabella vista colonna riga lista insieme modulo etichetta versione
 			traccia profilo evento argomento nuvola vento pioggia neve nebbia arcobaleno tramonto fulmine
-			tuono acquazzone bufera pioggerella grandine raffica ciclone tempesta temporale diluvio umidità
-			previsione nuvolone sole brezza scirocco tramontana anticiclone clima temperatura pressione lampo
+			tuono acquazzone bufera grandine raffica ciclone tempesta temporale diluvio umidità
+			previsione sole brezza scirocco tramontana anticiclone clima temperatura pressione lampo
 			sereno afa uragano tornado spruzzo nevicata grandinata siccità gelo stella luna galassia cometa
 			eclissi universo pianeta satellite asteroide orbita gravità rotazione cratere atmosfera vuoto
-			marte venere giove saturno urano nettuno plutone buco_nero via_lattea osservatorio luce alba
+			buco_nero via_lattea osservatorio luce alba
 			stagione momento eternità futuro istante secolo decennio mattino mezzogiorno pomeriggio sera
 			notte mezzanotte vigilia ieri oggi giornata settimana mese trimestre semestre anno epoca età
 			primavera estate autunno inverno infanzia gioventù maturità vecchiaia scadenza intervallo durata
@@ -108,13 +108,13 @@ export const IT: WordLanguageData = {
 			caviglia tallone osso cranio muscolo cuore polmone fegato stomaco rene intestino vescica cervello
 			nervo vena arteria sangue carne pelle capello barba lacrima sudore saliva respiro ruga lentiggine
 			cicatrice livido callo tonsilla ascella pupilla cappello scarpa guanto sciarpa occhiali cappotto
-			giaccone giacca camicia pantalone jeans gonna abito gilet cardigan maglione felpa calzino calza
+			giacca camicia pantalone jeans gonna abito gilet cardigan maglione felpa calzino calza
 			biancheria pigiama grembiule cravatta cintura fascia mocassino stivale divisa costume vestaglia
 			mantello impermeabile giubbotto tuta manica colletto orlo fodera tessuto lino seta cotone lana
-			velluto cuffia berretto elmetto velo smoking zoccolo infradito calzoncini bretella cappuccio
+			velluto cuffia berretto elmetto velo smoking zoccolo infradito bretella cappuccio
 			ascia pala sega pinza scalpello goniometro righello forbice martello trapano piccone falce zappa
 			aratro rastrello cacciavite metro compasso leva mazza lima grattugia setaccio vanga manico lama
-			cassetta seghetto motosega squadra punta tenaglia cric pistola stampo caffè tè succo latte acqua
+			cassetta motosega squadra punta tenaglia cric pistola stampo caffè tè succo latte acqua
 			gassosa limonata frullato tisana cioccolata macchiato cappuccino espresso decaffeinato birra
 			bionda rossa vino spumante prosecco champagne sangria liquore grappa rum gin vodka whisky tequila
 			cocktail sciroppo bibita granita cacao panna amaro sambuca limoncello chinotto sorbetto aranciata
@@ -161,6 +161,47 @@ export const IT: WordLanguageData = {
 			piumino scarpone tacco suola stringa cerchietto forcina tasca bavaglino camice bikini accappatoio pizzo
 			pelliccia chiave_inglese spada arco freccia annaffiatoio tosaerba siringa pinzetta pompa apriscatole
 			schiaccianoci mattarello bullone spremuta cola caffelatte ristretto aperitivo spritz amaretto
+			cucciolo vitello piccione canarino pettirosso acciuga orata sogliola stella_marina pesce_rosso zecca
+			pidocchio scimpanzé giaguaro puma bue mulo pony ratto pacco cartone regalo foto poster souvenir
+			tessera passaporto patente diploma dizionario globo maniglia serratura astuccio evidenziatore scotch
+			inchiostro piuma vetro legno plastica conchiglia aria natura ambiente sasso vapore panorama pianta
+			arbusto paglia fieno morte nascita mondo realtà sogno ricordo esperienza bugia problema soluzione
+			scelta decisione occasione rischio pericolo sicurezza forza energia velocità distanza peso
+			differenza cambiamento successo lavoro lezione esame compito prova notizia messaggio fiaba testo
+			dialetto moda famiglia matrimonio salute malattia guerra governo scherzo barzelletta abitudine stile
+			inizio fine motivo risultato mente incubo bellezza miracolo oroscopo portafortuna benedizione
+			lupo_mannaro creatura programmatore tecnico manager dirigente venditore agente commercialista
+			consulente badante babysitter tata custode psicologo pediatra oculista ottico allevatore carpentiere
+			imbianchino facchino corriere comandante colonnello sergente ufficiale investigatore commissario
+			politico deputato preside ricercatore bibliotecario artista stilista modella comico pianista
+			chitarrista presentatore calciatore ciclista tennista pugile estetista suora frate prete vescovo
+			papa spia basso brano singolo band banda festival vinile colonna_sonora playlist bis musical hip_hop
+			reggae metal punk dance techno house folk country soul lirica musica_classica quartiere via piazzale
+			rotonda passeggiata lungomare comune regione provincia orto vigna campeggio statua confine zona
+			ferrovia bivio edificio palazzina condominio finestra muro parete pavimento soffitto tetto gradino
+			ascensore stanza sala ripostiglio lavanderia albergo ambulatorio clinica caserma tabaccheria
+			cartoleria macelleria pescheria trattoria discoteca liceo mensa monolocale attico cancello portone
+			toast tramezzino calzone crocchetta supplì involtino bollito fettuccine penne maccheroni rigatoni
+			fusilli linguine orecchiette carbonara cassata babà bombolone strudel zabaione semifreddo merendina
+			crêpe muffin ghiacciolo patatina popcorn crostino antipasto contorno dessert spuntino kebab sushi
+			hot_dog wurstel spiedino grigliata macedonia filetto macinato pecorino mascarpone provolone tuorlo
+			lievito pinolo ketchup maionese zenzero spezia condimento fagiolino verza bietola cicoria tartufo
+			porcino champignon verdura frutta cocco avocado dattero mora lime clementina amarena yoga fitness
+			jogging snowboard autogol esercizio giro partenza derby palo traversa scooter suv cellulare
+			smartphone monitor congelatore colapasta griglia stagnola salvietta assorbente farmaco benda
+			posacenere trolley citofono rossetto mascara smalto trucco gel lacca tinta parrucca treccia manicure
+			massaggio abbronzatura tatuaggio ombretto fondotinta viola colore pagamento versamento lotteria
+			scommessa vincita assicurazione reddito entrata crisi abbonamento sportello finanza profitto
+			internet web wifi email chat account login menu desktop download streaming informatica tecnologia
+			elettricità laser Mercurio Venere Terra Marte Giove Saturno Urano Nettuno Plutone gennaio febbraio
+			marzo aprile maggio giugno luglio agosto settembre ottobre novembre dicembre lunedì martedì
+			mercoledì giovedì venerdì sabato domenica fretta riposo stress sentimento sensazione piacere
+			dispiacere stanchezza tranquillità benessere baffo sedere neo brufolo ferita graffio sorriso
+			leggings bermuda top slip boxer marsupio tubo remo amo esca trappola fucile cannone mattoncino poker
+			bingo quiz frisbee jolly asso tris esplosione colpo volume trono plaid copriletto federa uomo donna
+			ragazza fidanzata persona tizio pensionato signorina sposo sposa cliente spettatore lettore fan
+			socio padrone proprietario inquilino malato paziente principiante esperto volontario bullo
+			coinquilino partner
 		`),
 		rare: words(`
 			donnola gnu suricato armadillo istrice ornitorinco lemure tapiro allodola pernice upupa
@@ -182,7 +223,7 @@ export const IT: WordLanguageData = {
 			imbarcadero chiusa fucina silo cotogna canoismo pentathlon decathlon tatami corazzata portantina
 			monorotaia chiatta biplano idrovolante calesse diligenza ribaltabile mietitrice galea galeone
 			fregata corvetta brigantino goletta piroga lancia ultraleggero cuociriso cristalleria vermiglio
-			peltro giaietto ceruleo verderame celadon vinaccia carminio glauco verdeazzurro brunito rosaceo
+			peltro giaietto ceruleo verderame celadon vinaccia carminio glauco verdeazzurro brunito
 			incarnato disavanzo royalty tesoreria rimessa arbitraggio prestatore solvibilità cambiale tratta
 			giroconto gravame apporto decima cedola buffer codec cumulo puntatore compilatore firmware
 			latenza gateway sottorete host carico_utile checksum cluster pipeline repository debugger macro
@@ -194,10 +235,10 @@ export const IT: WordLanguageData = {
 			magnetosfera ionosfera esosfera mesosfera troposfera eliosfera nana imbrunire lustro albeggiare
 			lasso indugio albore quadriennio sessennio giubilo struggimento temperanza riverenza fervore
 			ardore disdegno tedio afflizione clemenza tripudio trepidazione soprassalto stupefazione brama
-			bulbo perone omero metatarso frenulo fustagno marsina farsetto saio ghetta mezzoguanto polsiera
-			crinolina mantiglia tricorno mantice lesina mazzuolo troncatrice cote erpice correggiato spola
-			rivettatrice chiodatrice sgorbia smusso succhiello pialletto scalpellino graffietto graffatrice
-			acciarino crogiolo fustella mandrino roncola accettino subbio idromele rosolio nocino ratafià
+			bulbo perone omero metatarso frenulo fustagno marsina farsetto saio ghetta polsiera
+			crinolina mantiglia tricorno mantice lesina troncatrice cote erpice correggiato spola
+			rivettatrice chiodatrice sgorbia smusso succhiello scalpellino graffietto graffatrice
+			acciarino crogiolo fustella mandrino roncola subbio idromele rosolio nocino ratafià
 			centerbe
 			tressette cerbottana caleidoscopio trampoli acchiapparello alfiere pedina gracidio sciabordio scampanio
 			scalpiccio sciacquio picchiettio balbettio stridore raglio crepitio risonanza scoppiettio viandante nomade
@@ -224,6 +265,50 @@ export const IT: WordLanguageData = {
 			arcolaio cesello argano paranco maglio piccozza mannaia tassello perforatrice karkadè centrifugato
 			nebbiolo trebbiano vermentino sangiovese aglianico falanghina verdicchio assenzio genepì maraschino
 			alchermes latticello granatina shakerato
+			okapi facocero pangolino opossum toporagno mandrillo gibbone nibbio gheppio sparviero beccaccia
+			crotalo varano narvalo lamantino otaria murena cernia triglia storione paguro formichiere muflone
+			martora faina diadema medaglione calamaio meridiana anfora damigiana prisma taiga melma greto
+			banchisa torba rododendro zagara papiro caprifoglio buganvillea croco calla pungitopo corbezzolo
+			sorbo carrubo ontano carpino sughera robinia canapa clorofilla tanzanite alessandrite labradorite
+			calcedonio azzurrite rodio antimonio caolino malia iettatura anatema sabba vaticinio auspicio
+			chiromanzia negromanzia telecinesi chiaroveggenza feticcio vudù panacea ambrosia manna mana coboldo
+			leprecauno elementale mimic lich ghoul wendigo chupacabra anfisbena coccatrice catoblepa behemoth
+			tarasca succube strige omuncolo mutaforma famiglio monaciello mazzamurello linchetto janara anguana
+			krampus nume nereide oreade parca norna lare penate rusalka yokai ifrit oni empusa gremlin serafino
+			druido incantatore scudiero menestrello cantastorie erborista rabbino imam mozzo maniscalco
+			tipografo liutaio ceramista lattaio salumiere sitar armonium vibrafono marimba spinetta balalaika
+			conga ghironda diapason ancia croma semiminima minima semibreve biscroma legatura terzina tremolo
+			pizzicato diminuendo fanfara filarmonica sestetto inciso villanella mottetto ciaccona passacaglia
+			gavotta giga sarabanda pavana gagliarda cavatina recitativo barcarola tammurriata quadriglia
+			dixieland ragtime bluegrass shoegaze post_rock doom_metal thrash_metal power_metal metalcore
+			nu_metal teen_pop city_pop psytrance gabber hardstyle future_bass big_room moombahton nu_disco
+			eurobeat vaporwave synthwave downtempo breakbeat grime drill habanera fandango milonga merengue
+			calypso mulattiera carreggiata frangiflutti darsena contrada podere necropoli acropoli calle
+			naviglio aia palafitta maniero sagrestia battistero certosa scuderia granaio frantoio caseificio
+			birrificio atelier raffineria emporio drogheria erboristeria pinacoteca conservatorio dormitorio
+			orfanotrofio manicomio commissariato cacciucco timballo panzerotto farinata panzanella fonduta
+			gulasch castagnaccio cantuccio fesa lombata nduja bottarga stracchino taleggio caciocavallo farro
+			semola crusca fecola quinoa lupino anacardo wasabi chutney cardamomo melassa nori kombu bicarbonato
+			topinambur pastinaca rafano scorzonera portulaca igname gombo crescione borragine catalogna
+			puntarelle agretti taccola spugnola mazza_di_tamburo cardoncello pioppino shiitake manioca batata
+			litchi maracuja kumquat giuggiola carruba carambola nettarina marasca sorba corbezzola guava
+			alchechengi uva_spina aikido squash biathlon curling bob ippica volano stecca pedana trireme drakkar
+			giunca sbattitore planetaria presina sgrassatore anticalcare decoder fotocopiatrice fax joystick
+			treppiede deumidificatore insetticida primer kajal illuminante cerone semipermanente filler toupet
+			nécessaire decolorante écru corvino bluette wengé paglierino spread vaglia bancarotta criptovaluta
+			token transistor sonar ologramma malware gelicidio refolo transito singolarità fotone Betelgeuse
+			Rigel Aldebaran Altair Deneb Spica Canopo Antares Cassiopea Croce_del_Sud Pleiadi Quaoar Gonggong
+			Salacia Varuna Ixion Bennu Ryugu Itokawa Apophis Arrokoth Theia Fetonte Dimidium Spe Orbitar
+			Fortitudo Ægir Amateru Dagon Meztli Smertrios Phobetor Tassili Madriu Yanyan Tondra Eburonia Yvaga
+			Mastika Bendida Nakanbé Awasis Wangshu Pipitea Asye Veles Boinayel Eyeke Cayahuanca Hämarik Abol
+			Bélisama Mintome Toge Santamasa Noifasui Chura Buru Staburags Baiduri Cuptor Xólotl Hairu Laligurans
+			Kereru Albmi Perwana Pollera Viculus Samagiya Ramajay Khomsa Barajeel Cruinlagh Ibirapitá Madalitso
+			Bambaruush Tahay Awohali Enaiposha Phailinsiam Levantes Najsakopajk Qingluan Cuancoá Astrolábos Ahra
+			Aumatex Ixbalanqué Surt Haik Mulchatna Makombé Zembretta Bocaprins Agouto stizza pudore apprensione
+			misericordia ulna giarrettiera tonaca toga sari broccato damasco chiffon stola coppola bombetta
+			alabarda scimitarra baionetta tagliola pagaia burraco ramino mikado morra rantolo barrito bramito
+			gorgheggio mugolio decibel marmocchio damigella fanciullo fanciulla gentiluomo madia toeletta branda
+			applique portariviste
 		`)
 	}
 };

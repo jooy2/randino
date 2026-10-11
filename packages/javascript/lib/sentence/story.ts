@@ -478,8 +478,8 @@ function walkFrom(
  * All three are decided by the language's own verbs and the story's own steps,
  * so none of them changes between one telling and the next — and every telling
  * asks them again, `itemThemesFor` once per theme of the item's classes. Walking
- * a story's required steps twenty-nine times over was a quarter of what a
- * paragraph took.
+ * a story's required steps once per theme was a quarter of what a paragraph
+ * took.
  *
  * A telling is random and this is not: `settle` picks which condition a state
  * step says, but whether the step can be settled at all is the language's

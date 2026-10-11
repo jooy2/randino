@@ -100,11 +100,11 @@ rand_nickname(language="en", output="detail")[0]
 
 `output="detail"` returns a `NicknameDetail` for each nickname instead of a string, carrying `nickname`, `words`, `slots`, `language` and `theme`.
 
-Themes: `animal`, `object`, `nature`, `plant`, `gem`, `concept`, `myth`, `job`, `music`, `place`, `food`, `sport`, `vehicle`, `product`, `color`, `finance`, `tech`, `weather`, `space`, `time`, `emotion`, `body`, `clothing`, `tool`, `drink`, `toy`, `sound`, `person`, `furniture`.
+Themes: `animal`, `object`, `nature`, `plant`, `gem`, `concept`, `myth`, `monster`, `job`, `music`, `genre`, `place`, `building`, `food`, `ingredient`, `vegetable`, `fruit`, `sport`, `vehicle`, `product`, `beauty`, `color`, `finance`, `tech`, `weather`, `space`, `planet`, `time`, `emotion`, `body`, `clothing`, `tool`, `drink`, `toy`, `sound`, `person`, `furniture`.
 
 ## Words
 
-The pools the nicknames are built from, on their own. Twenty-nine themes, nine languages, and a function per theme.
+The pools the nicknames are built from, on their own. Thirty-seven themes, nine languages, and a function per theme.
 
 ```python
 from randino import rand_animal, rand_food, rand_word, word_length_range
@@ -133,7 +133,7 @@ word_length_range("en")  # (3, 11)
 | `unique`                    | `bool`                           | `False`   |
 | `output`                    | `RandOutput`                     | `"value"` |
 
-One function per theme: `rand_animal`, `rand_object`, `rand_nature`, `rand_plant`, `rand_gem`, `rand_concept`, `rand_myth`, `rand_job`, `rand_music`, `rand_place`, `rand_food`, `rand_sport`, `rand_vehicle`, `rand_product`, `rand_color`, `rand_finance`, `rand_tech`, `rand_weather`, `rand_space`, `rand_time`, `rand_emotion`, `rand_body`, `rand_clothing`, `rand_tool`, `rand_drink`. Each is `rand_word` with the theme already chosen.
+One function per theme: `rand_animal`, `rand_object`, `rand_nature`, `rand_plant`, `rand_gem`, `rand_concept`, `rand_myth`, `rand_monster`, `rand_job`, `rand_music`, `rand_genre`, `rand_place`, `rand_building`, `rand_food`, `rand_ingredient`, `rand_vegetable`, `rand_fruit`, `rand_sport`, `rand_vehicle`, `rand_product`, `rand_beauty`, `rand_color`, `rand_finance`, `rand_tech`, `rand_weather`, `rand_space`, `rand_planet`, `rand_time`, `rand_emotion`, `rand_body`, `rand_clothing`, `rand_tool`, `rand_drink`, `rand_toy`, `rand_sound`, `rand_person`, `rand_furniture`. Each is `rand_word` with the theme already chosen.
 
 ## Sentences
 

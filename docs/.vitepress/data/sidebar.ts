@@ -21,7 +21,7 @@
  * **Generators** is the one that goes a level deeper, into **General** — one
  * function per kind of value — **System**, the values a sample machine is
  * described by, and two groups of the same function with one
- * argument decided: **Words**, the twenty-nine themed forms of `randWord`, and
+ * argument decided: **Words**, the thirty-seven themed forms of `randWord`, and
  * **Locations**, the four level forms of `randLocation`. Thirty-eight entries in
  * one list would bury the rest, so the forms sit beside them rather than among
  * them.
@@ -58,7 +58,7 @@ export interface SidebarGroup {
 	/**
 	 * Kept out of the navbar's dropdown, pages and all. For a group that is long
 	 * enough to be a wall in a menu while still being worth a place in the
-	 * sidebar — **Words**, the twenty-nine themed forms of one function, is why this
+	 * sidebar — **Words**, the thirty-seven themed forms of one function, is why this
 	 * exists.
 	 */
 	sidebarOnly?: boolean;
@@ -161,18 +161,26 @@ export const SIDEBAR: SidebarGroup[] = [
 							{ path: 'word/rand-gem', en: 'randGem', ko: 'randGem' },
 							{ path: 'word/rand-concept', en: 'randConcept', ko: 'randConcept' },
 							{ path: 'word/rand-myth', en: 'randMyth', ko: 'randMyth' },
+							{ path: 'word/rand-monster', en: 'randMonster', ko: 'randMonster' },
 							{ path: 'word/rand-job', en: 'randJob', ko: 'randJob' },
 							{ path: 'word/rand-music', en: 'randMusic', ko: 'randMusic' },
+							{ path: 'word/rand-genre', en: 'randGenre', ko: 'randGenre' },
 							{ path: 'word/rand-place', en: 'randPlace', ko: 'randPlace' },
+							{ path: 'word/rand-building', en: 'randBuilding', ko: 'randBuilding' },
 							{ path: 'word/rand-food', en: 'randFood', ko: 'randFood' },
+							{ path: 'word/rand-ingredient', en: 'randIngredient', ko: 'randIngredient' },
+							{ path: 'word/rand-vegetable', en: 'randVegetable', ko: 'randVegetable' },
+							{ path: 'word/rand-fruit', en: 'randFruit', ko: 'randFruit' },
 							{ path: 'word/rand-sport', en: 'randSport', ko: 'randSport' },
 							{ path: 'word/rand-vehicle', en: 'randVehicle', ko: 'randVehicle' },
 							{ path: 'word/rand-product', en: 'randProduct', ko: 'randProduct' },
+							{ path: 'word/rand-beauty', en: 'randBeauty', ko: 'randBeauty' },
 							{ path: 'word/rand-color', en: 'randColor', ko: 'randColor' },
 							{ path: 'word/rand-finance', en: 'randFinance', ko: 'randFinance' },
 							{ path: 'word/rand-tech', en: 'randTech', ko: 'randTech' },
 							{ path: 'word/rand-weather', en: 'randWeather', ko: 'randWeather' },
 							{ path: 'word/rand-space', en: 'randSpace', ko: 'randSpace' },
+							{ path: 'word/rand-planet', en: 'randPlanet', ko: 'randPlanet' },
 							{ path: 'word/rand-time', en: 'randTime', ko: 'randTime' },
 							{ path: 'word/rand-emotion', en: 'randEmotion', ko: 'randEmotion' },
 							{ path: 'word/rand-body', en: 'randBody', ko: 'randBody' },

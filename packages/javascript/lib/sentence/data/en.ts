@@ -413,7 +413,7 @@ export const EN: SentenceLanguageData = {
 			field: 'cook',
 			subject: ['creature', 'person'],
 			object: ['edible'],
-			objectThemes: ['food'],
+			objectThemes: ['food', 'vegetable', 'ingredient'],
 			// What goes in the oven or under the knife: a potato, a steak, never a curry.
 			objectTraits: ['raw'],
 			...tensed(
@@ -426,7 +426,7 @@ export const EN: SentenceLanguageData = {
 			field: 'cook',
 			subject: ['creature', 'person'],
 			object: ['edible'],
-			objectThemes: ['food'],
+			objectThemes: ['food', 'ingredient'],
 			// What goes in the pot.
 			objectTraits: ['liquid'],
 			...tensed(
@@ -439,7 +439,7 @@ export const EN: SentenceLanguageData = {
 			field: 'eat',
 			subject: ['creature', 'person'],
 			object: ['edible'],
-			objectThemes: ['food'],
+			objectThemes: ['food', 'fruit', 'vegetable'],
 			...tensed(
 				`eats tastes swallows devours finishes gobbles wolfs_down scoffs polishes_off bolts tucks_into samples savors digs_into feasts_on snacks_on picks_at gulps_down downs`,
 				`eat taste swallow devour finish gobble wolf_down scoff polish_off bolt tuck_into sample savor dig_into feast_on snack_on pick_at gulp_down down`,
@@ -450,7 +450,7 @@ export const EN: SentenceLanguageData = {
 			field: 'eat',
 			subject: ['creature', 'person'],
 			object: ['edible'],
-			objectThemes: ['food'],
+			objectThemes: ['food', 'fruit', 'vegetable'],
 			// Nobody chews a syrup.
 			objectWithout: ['liquid'],
 			...tensed(
@@ -544,6 +544,7 @@ export const EN: SentenceLanguageData = {
 				'tool',
 				'clothing',
 				'product',
+				'beauty',
 				'toy',
 				'furniture',
 				'gem',
@@ -616,10 +617,33 @@ export const EN: SentenceLanguageData = {
 		{
 			field: 'change',
 			subject: ['edible'],
+			subjectThemes: ['food', 'drink'],
 			...tensed(
 				`ripens cools boils melts spoils remains warms steams cools_down goes_cold turns goes_off runs_out sits waits smells_good`,
 				`ripen cool boil melt spoil remain warm steam cool_down go_cold turn go_off run_out sit wait smell_good`,
 				`ripened cooled boiled melted spoiled remained warmed steamed cooled_down went_cold turned went_off ran_out sat waited smelled_good`
+			)
+		},
+		{
+			field: 'change',
+			subject: ['edible'],
+			// What fruit and vegetables do on their own: they ripen and wilt, and nothing boils.
+			subjectThemes: ['fruit', 'vegetable'],
+			...tensed(
+				`ripens spoils rots wilts withers softens dries_out bruises sprouts remains goes_off`,
+				`ripen spoil rot wilt wither soften dry_out bruise sprout remain go_off`,
+				`ripened spoiled rotted wilted withered softened dried_out bruised sprouted remained went_off`
+			)
+		},
+		{
+			field: 'change',
+			subject: ['edible'],
+			// What an ingredient does in the cupboard: it hardens, sets, runs out.
+			subjectThemes: ['ingredient'],
+			...tensed(
+				`spoils melts hardens softens dries_out goes_off runs_out remains thickens sets`,
+				`spoil melt harden soften dry_out go_off run_out remain thicken set`,
+				`spoiled melted hardened softened dried_out went_off ran_out remained thickened set`
 			)
 		},
 		{
@@ -719,9 +743,24 @@ export const EN: SentenceLanguageData = {
 		},
 		{
 			subject: ['edible'],
+			subjectThemes: ['food', 'drink'],
 			words: words(`
 				sweet salty spicy sour hot cold nutty mild
 				bitter rich creamy crisp tender juicy fresh stale bland tangy smoky
+			`)
+		},
+		{
+			subject: ['edible'],
+			subjectThemes: ['fruit', 'vegetable'],
+			words: words(`
+				sweet sour ripe fresh juicy crisp firm soft mild bitter tart tender green plump
+			`)
+		},
+		{
+			subject: ['edible'],
+			subjectThemes: ['ingredient'],
+			words: words(`
+				salty sweet fresh spicy fine coarse dry rich mild bitter fragrant pungent creamy
 			`)
 		},
 		{
@@ -773,6 +812,22 @@ export const EN: SentenceLanguageData = {
 				sweet spicy warm fresh crisp savory fragrant hot salty soft ripe tasty
 				buttery smoky tangy creamy crunchy tender juicy hearty golden steaming toasted rich sticky
 				flaky peppery bland
+			`)
+		},
+		{
+			subject: ['edible'],
+			themes: ['fruit', 'vegetable'],
+			words: words(`
+				fresh ripe sweet sour juicy crisp crunchy plump tart firm soft raw round small big green
+				red yellow wild shiny bruised
+			`)
+		},
+		{
+			subject: ['edible'],
+			themes: ['ingredient'],
+			words: words(`
+				fresh dried salty sweet fine coarse raw smoked aged ground whole golden fragrant spicy rich
+				creamy tangy pungent mild
 			`)
 		},
 		{
@@ -969,25 +1024,25 @@ export const EN: SentenceLanguageData = {
 		dragon wyvern phoenix griffin harpy pegasus hippogriff roc simurgh thunderbird fairy pixie sprite
 		sylph angel seraph valkyrie imp gargoyle drake peryton
 		crow pigeon mosquito
+		bird seagull dove hawk robin jay lark quail pheasant hummingbird wasp hornet fly locust
+		firebird cherub
 		`),
 		swimmer: words(`
 		whale dolphin shark turtle seal penguin frog octopus squid seahorse starfish crab shrimp carp
 		salmon mackerel walrus narwhal jellyfish tadpole
-		siren mermaid kraken leviathan naiad undine selkie kelpie
+		mermaid kraken leviathan naiad undine selkie kelpie
 		crocodile lobster
+		fish orca eel trout tuna cod sardine herring anchovy catfish goldfish stingray swordfish piranha
+		porpoise manatee axolotl cuttlefish alligator
+		nixie nereid
 		`),
 		crawler: words(`
-		turtle lizard chameleon snake snail ant spider crab earthworm centipede scorpion gecko iguana
+		turtle lizard chameleon snake snail ant spider crab worm centipede scorpion gecko iguana
 		cobra python newt mantis
 		basilisk wyrm naga amphisbaena lindworm
 		crocodile lobster
-		`),
-		// A word of a creature theme that is no creature: it takes no verb and no state.
-		lifeless: words(`
-			spell curse hex rune amulet talisman grimoire potion prophecy sorcery enchantment sigil glyph omen portent blessing
-			incantation invocation summoning banishment divination scrying portal ley sanctum reliquary effigy idol totem phylactery
-			charm warding runestone nightmare
-			wand elixir magic jinx
+		caterpillar slug leech cockroach tortoise alligator viper rattlesnake anaconda salamander
+		slime
 		`),
 		// What a verb asks of its object: `sips` takes a liquid and `chews` takes
 		// none, `roasts` takes something raw.
@@ -995,21 +1050,47 @@ export const EN: SentenceLanguageData = {
 			porridge stew chowder curry bisque consomme goulash congee pho ramen udon soba pudding custard yogurt honey syrup
 			salsa chutney relish marmalade hummus guacamole
 			soup broth sauce
+			gravy marinade molasses gumbo borscht minestrone gazpacho
 		`),
 		raw: words(`
 			potato carrot cabbage spinach broccoli pumpkin garlic mushroom steak fillet drumstick brisket ribeye sirloin
 			tenderloin sausage bacon meatball cutlet schnitzel kebab skewer tofu
 			onion tomato bean beef pork dough
+			radish turnip beet parsnip yam celery asparagus artichoke eggplant zucchini corn okra kale leek
+			shallot cauliflower cassava taro daikon shiitake ham veal mutton venison meat
 		`),
 		// A word of the place class that is no place: nothing happens in a wave or on a comet.
 		placeless: words(`
 			wave tide boulder pebble ember cinder earthquake echo avalanche driftwood fumarole stalactite stalagmite geyser
-			star comet meteor corona zenith eclipse satellite orbit gravity sunspot lightyear stardust supernova quasar pulsar
-			moonrise solarflare perihelion aphelion apogee perigee nadir azimuth parallax redshift starlore cosmology astronomy
-			telescopy gravitas lunation sidereal ecliptic meridian solarsail starburst skyline
+			star comet meteor corona zenith eclipse satellite orbit gravity sunspot lightyear supernova quasar pulsar
+			moonrise solarflare perihelion aphelion apogee perigee nadir azimuth parallax redshift cosmology astronomy
+			lunation ecliptic meridian solarsail skyline
 			mud soil dust current foam surf whirlpool lava magma flame fire spark glow wildfire flood landslide
 			tsunami eruption tremor ripple sun zodiac spacewalk liftoff probe orbiter supergiant magnetar photon
-			radiation moonrock moondust moonwalk solarwind starchart astrology protostar
+			radiation moonwalk solarwind
+			seashell erosion undertow riptide terrain
+			orion cassiopeia draco lyra cygnus scorpius sagittarius aquarius gemini taurus virgo libra aries pisces
+			centaurus crux sirius polaris vega rigel betelgeuse antares arcturus aldebaran deneb altair spica
+			canopus procyon capella castor pollux regulus plasma antimatter singularity spacetime rotation transit
+			conjunction magnitude luminosity fireball
+			listing chimney pillar column gable rafter ceiling
+		`),
+		// A name English writes with no article and with its capital letter: planets,
+		// named stars and constellations, and the realms of myth.
+		proper: words(`
+			mercury venus earth mars jupiter saturn uranus neptune pluto ceres eris haumea makemake sedna
+			quaoar orcus gonggong salacia varuna ixion vesta pallas hygiea psyche eros bennu ryugu itokawa
+			apophis arrokoth theia vulcan phaeton dimidium spe orbitar fortitudo aegir amateru dagon meztli
+			smertrios phobetor tassili madriu yanyan tondra eburonia yvaga mastika bendida nakanbe awasis
+			wangshu pipitea asye veles boinayel eyeke cayahuanca hamarik abol belisama mintome toge
+			santamasa noifasui chura buru staburags baiduri cuptor xolotl hairu laligurans kereru albmi
+			perwana pollera viculus samagiya ramajay khomsa barajeel cruinlagh ibirapita madalitso
+			bambaruush tahay awohali enaiposha phailinsiam levantes najsakopajk qingluan cuancoa astrolabos
+			ahra aumatex ixbalanque surt haik mulchatna makombe zembretta bocaprins agouto orion cassiopeia
+			andromeda draco lyra cygnus scorpius sagittarius aquarius gemini taurus virgo libra aries pisces
+			centaurus crux sirius polaris vega rigel betelgeuse antares arcturus aldebaran deneb
+			altair spica canopus procyon capella castor pollux regulus valhalla olympus avalon atlantis eden
+			asgard tartarus elysium
 		`)
 	},
 	interjections: words(`
@@ -1061,14 +1142,25 @@ export const EN: SentenceLanguageData = {
 			boulevard esplanade rampart drawbridge causeway embankment levee viaduct bandstand portico hillside mountain
 			sandbank glacier reef prairie plateau steppe savanna sandbar shoal seabed bedrock crag spire pinnacle headland
 			peninsula islet mesa butte moraine scree talus overhang moon planet asteroid moonscape exoplanet
+			road avenue path trail highway sidewalk crosswalk runway railway lawn driveway frontier breakwater dam
+			roof porch patio floor wall mezzanine escalator ground land ice permafrost ledge outcrop bluff
+			foothill moor heath floodplain planetoid
+			mercury venus earth mars jupiter saturn uranus neptune pluto ceres eris haumea makemake sedna quaoar
+			orcus gonggong salacia varuna ixion vesta pallas hygiea psyche eros bennu ryugu itokawa apophis arrokoth
+			theia vulcan phaeton dimidium spe orbitar fortitudo aegir amateru dagon meztli smertrios phobetor tassili
+			madriu yanyan tondra eburonia yvaga mastika bendida nakanbe awasis wangshu pipitea asye veles boinayel
+			eyeke cayahuanca hamarik abol belisama mintome toge santamasa noifasui chura buru staburags baiduri
+			cuptor xolotl hairu laligurans kereru albmi perwana pollera viculus samagiya ramajay khomsa barajeel
+			cruinlagh ibirapita madalitso bambaruush tahay awohali enaiposha phailinsiam levantes najsakopajk
+			qingluan cuancoa astrolabos ahra aumatex ixbalanque surt haik mulchatna makombe zembretta bocaprins agouto
 		`),
 		at: words(`
-			market station airport harbor lighthouse crossroads roundabout waypoint bazaar marketplace depot terminal
-			campsite forum agora harborside gatehouse weir equator
+			market station airport harbor lighthouse crossroads roundabout waypoint bazaar depot terminal
+			campsite forum agora gatehouse weir equator
+			port dock fountain statue monument memorial landmark obelisk cenotaph junction border outpost
+			fairground skatepark door gate window doorway fireplace hearth
 		`),
-		under: words(
-			`sky starlight moonbeam firmament starfield fullmoon newmoon halfmoon crescent overpass aqueduct`
-		)
+		under: words(`sky firmament crescent overpass aqueduct arch`)
 	},
 	// English cannot drop a subject, so a sentence about a person names it again —
 	// unless that person has a name, which is the one thing that says whether `he`

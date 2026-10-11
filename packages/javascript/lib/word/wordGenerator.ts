@@ -281,7 +281,7 @@ export function levelledNouns(
  * Built once per language rather than walked per question. The themes are
  * disjoint, so a word has at most one — and an invented word has to be looked up
  * against every one of them, because it can spell a real word by accident, which
- * is twenty-nine pools and some three and a half thousand comparisons for a word
+ * is every pool of the language and some thousands of comparisons for a word
  * that is usually in none of them.
  */
 const themeCache = new WeakMap<WordLanguageData, Map<string, WordTheme>>();

@@ -2,14 +2,15 @@ import type { RandThemedWordOptions, WordDetail } from '../_types/global.js';
 import { themedWord } from './wordGenerator.js';
 
 /**
- * Creatures and figures out of myth and folklore.
+ * Magic and what myth is made of: spells, curses, prophecies, relics, potions
+ * and the realms of myth. The creatures are `randMonster`.
  *
  * `randWord({ theme: 'myth' })` with the theme already chosen; every other
  * option is the same.
  *
  * @example
- * randMyth({ language: 'ko', count: 3 }); // ['용', '봉황', '구미호']
- * randMyth({ language: 'en', count: 3 }); // ['Dragon', 'Phoenix', 'Griffin']
+ * randMyth({ language: 'ko', count: 3 }); // ['저주', '부적', '용궁']
+ * randMyth({ language: 'en', count: 3 }); // ['Curse', 'Amulet', 'Elixir']
  */
 export function randMyth(options?: RandThemedWordOptions & { output?: 'value' }): string[];
 /**
@@ -17,7 +18,7 @@ export function randMyth(options?: RandThemedWordOptions & { output?: 'value' })
  *
  * @example
  * randMyth({ language: 'ko', output: 'detail' });
- * // [{ word: '용', language: 'ko', theme: 'myth' }]
+ * // [{ word: '저주', language: 'ko', theme: 'myth' }]
  */
 export function randMyth(options: RandThemedWordOptions & { output: 'detail' }): WordDetail[];
 export function randMyth(options: RandThemedWordOptions = {}): string[] | WordDetail[] {

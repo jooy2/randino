@@ -1,9 +1,11 @@
 import 'dart:math';
 
 import 'package:randino/src/types.dart';
+import 'package:randino/src/word/rand_planet.dart';
 import 'package:randino/src/word/rand_word.dart';
 
-/// What is beyond the sky, from the moon to a galaxy.
+/// What is beyond the sky, from the moon to a galaxy. Planets by name are
+/// [randPlanet].
 ///
 /// [randWord] with the theme already chosen; every other parameter is the same.
 /// For the detail form, pass [WordTheme.space] to `randWordDetails` — Dart has

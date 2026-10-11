@@ -1,4 +1,4 @@
-"""Places — where people gather, live and pass through."""
+"""Places — where people gather, live and pass through, short of a building."""
 
 from collections.abc import Callable
 from typing import Literal, overload
@@ -58,7 +58,7 @@ def rand_place(
     random: Callable[[], float] | None = None,
     output: str = "value",
 ) -> list[str] | list[WordDetail]:
-    """Places — where people gather, live and pass through.
+    """Places — where people gather, live and pass through, short of a building.
 
     `rand_word(theme="place")` with the theme already chosen; every other argument
     is the same, and they are documented on `rand_word`.

@@ -19,7 +19,7 @@ final Map<WordLanguage, RegExp> script = <WordLanguage, RegExp>{
   WordLanguage.ru: RegExp(r'^[\u0400-\u04FF]+(?: [\u0400-\u04FF]+)*$'),
 };
 
-/// The themed generator for each theme, which is what the twenty-nine of them are.
+/// The themed generator for each theme, which is what the thirty-seven of them are.
 final Map<WordTheme, List<String> Function({WordLanguage? language, int count})>
 themed = <WordTheme, List<String> Function({WordLanguage? language, int count})>{
   WordTheme.animal:
@@ -36,20 +36,34 @@ themed = <WordTheme, List<String> Function({WordLanguage? language, int count})>
       ({WordLanguage? language, int count = 1}) => randConcept(language: language, count: count),
   WordTheme.myth:
       ({WordLanguage? language, int count = 1}) => randMyth(language: language, count: count),
+  WordTheme.monster:
+      ({WordLanguage? language, int count = 1}) => randMonster(language: language, count: count),
   WordTheme.job:
       ({WordLanguage? language, int count = 1}) => randJob(language: language, count: count),
   WordTheme.music:
       ({WordLanguage? language, int count = 1}) => randMusic(language: language, count: count),
+  WordTheme.genre:
+      ({WordLanguage? language, int count = 1}) => randGenre(language: language, count: count),
   WordTheme.place:
       ({WordLanguage? language, int count = 1}) => randPlace(language: language, count: count),
+  WordTheme.building:
+      ({WordLanguage? language, int count = 1}) => randBuilding(language: language, count: count),
   WordTheme.food:
       ({WordLanguage? language, int count = 1}) => randFood(language: language, count: count),
+  WordTheme.ingredient:
+      ({WordLanguage? language, int count = 1}) => randIngredient(language: language, count: count),
+  WordTheme.vegetable:
+      ({WordLanguage? language, int count = 1}) => randVegetable(language: language, count: count),
+  WordTheme.fruit:
+      ({WordLanguage? language, int count = 1}) => randFruit(language: language, count: count),
   WordTheme.sport:
       ({WordLanguage? language, int count = 1}) => randSport(language: language, count: count),
   WordTheme.vehicle:
       ({WordLanguage? language, int count = 1}) => randVehicle(language: language, count: count),
   WordTheme.product:
       ({WordLanguage? language, int count = 1}) => randProduct(language: language, count: count),
+  WordTheme.beauty:
+      ({WordLanguage? language, int count = 1}) => randBeauty(language: language, count: count),
   WordTheme.color:
       ({WordLanguage? language, int count = 1}) => randColor(language: language, count: count),
   WordTheme.finance:
@@ -60,6 +74,8 @@ themed = <WordTheme, List<String> Function({WordLanguage? language, int count})>
       ({WordLanguage? language, int count = 1}) => randWeather(language: language, count: count),
   WordTheme.space:
       ({WordLanguage? language, int count = 1}) => randSpace(language: language, count: count),
+  WordTheme.planet:
+      ({WordLanguage? language, int count = 1}) => randPlanet(language: language, count: count),
   WordTheme.time:
       ({WordLanguage? language, int count = 1}) => randTime(language: language, count: count),
   WordTheme.emotion:

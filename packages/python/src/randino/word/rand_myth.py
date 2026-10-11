@@ -1,4 +1,4 @@
-"""Creatures and figures out of myth and folklore."""
+"""Magic and what myth is made of: spells, curses, relics and realms."""
 
 from collections.abc import Callable
 from typing import Literal, overload
@@ -58,7 +58,7 @@ def rand_myth(
     random: Callable[[], float] | None = None,
     output: str = "value",
 ) -> list[str] | list[WordDetail]:
-    """Creatures and figures out of myth and folklore.
+    """Magic and what myth is made of: spells, curses, relics and realms.
 
     `rand_word(theme="myth")` with the theme already chosen; every other argument
     is the same, and they are documented on `rand_word`.
@@ -68,9 +68,9 @@ def rand_myth(
 
     Example:
         >>> rand_myth(language="ko", count=3)
-        ['용', '봉황', '구미호']
+        ['저주', '부적', '용궁']
         >>> rand_myth(language="en", count=3)
-        ['Dragon', 'Phoenix', 'Griffin']
+        ['Curse', 'Amulet', 'Elixir']
     """
     theme: WordThemeOption = "myth"
 

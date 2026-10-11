@@ -88,18 +88,26 @@ WordTheme = Literal[
     "gem",
     "concept",
     "myth",
+    "monster",
     "job",
     "music",
+    "genre",
     "place",
+    "building",
     "food",
+    "ingredient",
+    "vegetable",
+    "fruit",
     "sport",
     "vehicle",
     "product",
+    "beauty",
     "color",
     "finance",
     "tech",
     "weather",
     "space",
+    "planet",
     "time",
     "emotion",
     "body",
@@ -115,11 +123,14 @@ WordTheme = Literal[
 
 Animals (`사자`), everyday things (`물병`), nature and its phenomena (`노을`), plants
 (`민들레`), stones and metals (`흑요석`), ideas from the humanities and social world
-(`철학`), creatures out of myth (`구미호`), the trades and roles people hold
-(`대장장이`), music (`교향곡`), places (`광장`), food (`떡볶이`), sports (`양궁`),
-things that carry you (`열기구`), things you buy (`이어폰`), toys and games (`팽이`),
-sounds (`속삭임`), people by age and kinship (`꼬마`), or furniture (`요람`). Person
-names are never used.
+(`철학`), magic and what myth is made of (`부적`), the creatures of myth and folklore
+(`구미호`), the trades and roles people hold (`대장장이`), music and how it is made
+(`첼로`), kinds of music (`재즈`), places (`광장`), buildings and the rooms in them
+(`도서관`), prepared food (`떡볶이`), what it is cooked from (`간장`), vegetables
+(`당근`), fruit (`복숭아`), sports (`양궁`), things that carry you (`열기구`), things
+you buy (`이어폰`), make-up and skin and hair care (`립스틱`), the sky and space
+(`혜성`), planets by name (`화성`), toys and games (`팽이`), sounds (`속삭임`), people
+by age and kinship (`꼬마`), or furniture (`요람`). Person names are never used.
 
 Each one is also a generator of its own — `"animal"` is `rand_animal`.
 """

@@ -378,7 +378,7 @@ export const ES: SentenceLanguageData = {
 			field: 'cook',
 			subject: ['creature', 'person'],
 			object: ['edible'],
-			objectThemes: ['food'],
+			objectThemes: ['food', 'vegetable'],
 			...tensed(
 				`hornea calienta cocina corta asa sirve guisa fríe hierve cuece saltea sazona adereza condimenta sala remueve mezcla bate rehoga estofa tuesta gratina pela pica trocea ralla lamina recalienta aliña prepara emplata adoba marina escalfa`,
 				`horneó calentó cocinó cortó asó sirvió guisó frió hirvió coció salteó sazonó aderezó condimentó saló removió mezcló batió rehogó estofó tostó gratinó peló picó troceó ralló laminó recalentó aliñó preparó emplató adobó marinó escalfó`
@@ -388,7 +388,7 @@ export const ES: SentenceLanguageData = {
 			field: 'eat',
 			subject: ['creature', 'person'],
 			object: ['edible'],
-			objectThemes: ['food'],
+			objectThemes: ['food', 'fruit', 'vegetable'],
 			...tensed(
 				`come mastica prueba mordisquea devora saborea degusta traga engulle zampa muerde roe lame picotea da_un_bocado_a se_zampa se_come termina se_traga se_come_entero da_cuenta_de merienda cena almuerza desayuna`,
 				`comió masticó probó mordisqueó devoró saboreó degustó tragó engulló zampó mordió royó lamió picoteó dio_un_bocado_a se_zampó se_comió terminó se_tragó se_comió_entero dio_cuenta_de merendó cenó almorzó desayunó`
@@ -459,6 +459,7 @@ export const ES: SentenceLanguageData = {
 				'tool',
 				'clothing',
 				'product',
+				'beauty',
 				'toy',
 				'furniture',
 				'gem',
@@ -524,9 +525,30 @@ export const ES: SentenceLanguageData = {
 		{
 			field: 'change',
 			subject: ['edible'],
+			subjectThemes: ['food', 'drink'],
 			...tensed(
 				`madura se_enfría hierve se_derrite se_estropea se_calienta se_entibia se_templa humea echa_vapor huele_bien desprende_aroma se_acaba se_termina se_agota sobra queda se_reduce llega_a_la_mesa se_sirve se_cuaja se_endurece se_ablanda se_pudre se_echa_a_perder fermenta se_congela se_espesa se_aclara se_asienta reposa se_enfría_del_todo`,
 				`maduró se_enfrió hirvió se_derritió se_estropeó se_calentó se_entibió se_templó humeó echó_vapor olió_bien desprendió_aroma se_acabó se_terminó se_agotó sobró quedó se_redujo llegó_a_la_mesa se_sirvió se_cuajó se_endureció se_ablandó se_pudrió se_echó_a_perder fermentó se_congeló se_espesó se_aclaró se_asentó reposó se_enfrió_del_todo`
+			)
+		},
+		{
+			field: 'change',
+			subject: ['edible'],
+			// What fruit and vegetables do on their own: they ripen and wilt, and nothing boils.
+			subjectThemes: ['fruit', 'vegetable'],
+			...tensed(
+				`madura se_estropea se_pudre se_marchita se_seca se_ablanda se_arruga se_magulla se_enmohece se_echa_a_perder queda sobra`,
+				`maduró se_estropeó se_pudrió se_marchitó se_secó se_ablandó se_arrugó se_magulló se_enmoheció se_echó_a_perder quedó sobró`
+			)
+		},
+		{
+			field: 'change',
+			subject: ['edible'],
+			// What an ingredient does in the cupboard: it dries out, hardens, runs out.
+			subjectThemes: ['ingredient'],
+			...tensed(
+				`se_estropea se_echa_a_perder se_seca se_endurece se_ablanda se_acaba se_agota se_termina queda sobra`,
+				`se_estropeó se_echó_a_perder se_secó se_endureció se_ablandó se_acabó se_agotó se_terminó quedó sobró`
 			)
 		},
 		{
@@ -636,8 +658,29 @@ export const ES: SentenceLanguageData = {
 		},
 		{
 			subject: ['edible'],
+			subjectThemes: ['food', 'drink'],
 			words: words(
 				`dulce salado picante ácido caliente frío sabroso amargo espeso suave tibio jugoso crujiente rico soso`
+			)
+		},
+		{
+			subject: ['edible'],
+			subjectThemes: ['fruit', 'vegetable'],
+			words: words(`dulce ácido amargo jugoso crujiente suave sabroso firme tierno carnoso`)
+		},
+		{
+			// How ripe a piece of fruit is just now takes `estar`: `la pera está madura`.
+			subject: ['edible'],
+			subjectThemes: ['fruit', 'vegetable'],
+			head: 'está',
+			pastHead: 'estaba',
+			words: words(`maduro verde fresco blando duro pasado arrugado podrido`)
+		},
+		{
+			subject: ['edible'],
+			subjectThemes: ['ingredient'],
+			words: words(
+				`salado dulce fresco picante fino grueso seco sabroso suave amargo aromático fuerte`
 			)
 		},
 		{
@@ -683,6 +726,24 @@ export const ES: SentenceLanguageData = {
 			words: words(`
 				dulce picante tibio fresco crujiente sabroso fragante caliente salado blando maduro rico
 				dorado ahumado cremoso tierno jugoso sustancioso humeante tostado pegajoso soso especiado
+			`)
+		},
+		{
+			// Fruit and vegetables as they come from the market, not from the stove.
+			subject: ['edible'],
+			themes: ['fruit', 'vegetable'],
+			words: words(`
+				fresco maduro dulce jugoso crujiente firme blando tierno crudo verde silvestre pequeño
+				grande sabroso ecológico
+			`)
+		},
+		{
+			// What goes into a dish, as the shelf or the butcher sells it.
+			subject: ['edible'],
+			themes: ['ingredient'],
+			words: words(`
+				fresco seco salado dulce fino grueso aromático picante suave sabroso casero natural
+				ecológico artesano importado entero
 			`)
 		},
 		{
@@ -831,9 +892,11 @@ export const ES: SentenceLanguageData = {
 		pájaro golondrina gorrión cuervo halcón águila pavo_real loro búho paloma grulla cisne pato ganso
 		mariposa abeja libélula cigarra mosca mosquito murciélago garza pelícano
 		dragón fénix hada pegaso grifo ángel valquiria
-		mirlo ruiseñor alondra codorniz faisán perdiz colibrí tucán flamenco cigüeña abubilla jilguero
+		mirlo ruiseñor alondra codorniz faisán perdiz colibrí tucán cigüeña abubilla jilguero
 		urraca arrendajo avispa polilla luciérnaga hipogrifo
 		gaviota lechuza querubín serafín
+		buitre cóndor gavilán petirrojo canario periquito cotorra guacamayo pájaro_carpintero tórtola pinzón
+		albatros cormorán mariquita abejorro arpía gárgola guiverno silfo sílfide
 		`),
 		swimmer: words(`
 		cocodrilo tortuga rana sapo pez ballena delfín tiburón pulpo calamar gamba cangrejo morsa foca
@@ -842,6 +905,8 @@ export const ES: SentenceLanguageData = {
 		anguila sardina atún bacalao merluza trucha salmón carpa raya medusa almeja mejillón ostra
 		salamandra tritón castor hipopótamo ornitorrinco
 		langosta orca nereida
+		nutria león_marino manatí narval cachalote beluga lubina lenguado boquerón caballa pez_espada piraña
+		caballito_de_mar bogavante ajolote renacuajo caimán anaconda serpiente_marina ondina leviatán
 		`),
 		crawler: words(`
 		cocodrilo serpiente lagarto tortuga caracol hormiga araña gusano cangrejo
@@ -849,14 +914,7 @@ export const ES: SentenceLanguageData = {
 		iguana camaleón salamandra tritón boa víbora cobra pitón escarabajo
 		saltamontes grillo pulga oruga ciempiés escorpión
 		cucaracha
-		`),
-		// A word of a creature theme that is no creature: it takes no verb and no state.
-		lifeless: words(`
-			hechizo maldición profecía amuleto talismán runa portal santuario ídolo tótem augurio presagio bestiario
-			conjuro sortilegio grimorio pentáculo reliquia cáliz grial varita báculo cetro corona
-			poción elixir bendición magia alquimia brujería caldero bola_de_cristal tridente piedra_filosofal
-			vellocino ambrosía inframundo paraíso infierno limbo purgatorio ofrenda invocación exorcismo aura
-			inmortalidad reencarnación
+		lagartija caimán anaconda babosa lombriz sanguijuela tarántula garrapata termita piojo estrella_de_mar
 		`),
 		// A word of the place class that is no place.
 		placeless: words(`
@@ -868,8 +926,24 @@ export const ES: SentenceLanguageData = {
 			halo bólido enana coma
 			piedra polvo barro hielo fuego chispa ola luz oscuridad aire lava magma erupción avalancha inundación
 			incendio hoguera reflejo huella surco fósil concha grava arcilla témpano burbuja espejismo agujero_negro
-			radiación viento_solar llamarada materia_oscura nova zodíaco extraterrestre ovni alunizaje despegue eje
-			magnetar singularidad cuerpo_celeste marciano
+			radiación viento_solar llamarada materia_oscura nova zodíaco ovni alunizaje despegue eje
+			magnetar singularidad cuerpo_celeste
+			tsunami vapor marejada viga columna tabique claraboya obelisco menhir cometa Osa_Mayor Osa_Menor
+			Orión Casiopea Pléyades Sirio Estrella_Polar Betelgeuse Aldebarán Antares agujero_de_gusano big_bang
+			antimateria astronomía astrofísica cosmología magnitud
+		`),
+		// A name Spanish writes bare and capitalised: `Marte brilla`, never `el Marte`.
+		// `la Tierra`, `la Osa Mayor` and `la Estrella Polar` take their article.
+		proper: words(`
+			Mercurio Venus Marte Júpiter Saturno Urano Neptuno Plutón Ceres Eris Haumea Makemake Sedna Quaoar
+			Gonggong Salacia Varuna Ixión Vesta Palas Juno Higía Psique Eros Bennu Ryugu Apofis Arrokoth Tea
+			Vulcano Dimidium Spe Orbitar Fortitudo Ægir Amateru Dagon Meztli Smertrios Phobetor Tassili Madriu
+			Yanyan Tondra Eburonia Yvaga Mastika Bendida Nakanbé Awasis Wangshu Pipitea Asye Veles Boinayel
+			Eyeke Cayahuanca Hämarik Abol Bélisama Mintome Toge Santamasa Noifasui Chura Buru Staburags Baiduri
+			Cuptor Xólotl Hairu Laligurans Kereru Albmi Perwana Viculus Samagiya Ramajay Khomsa Barajeel
+			Cruinlagh Ibirapitá Madalitso Bambaruush Tahay Awohali Enaiposha Phailinsiam Najsakopajk Qingluan
+			Cuancoá Astrolábos Ahra Aumatex Ixbalanqué Surt Haik Mulchatna Makombé Zembretta Bocaprins Agouto
+			Orión Casiopea Sirio Betelgeuse Aldebarán Antares
 		`)
 	},
 	interjections: words(`

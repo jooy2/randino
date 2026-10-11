@@ -524,7 +524,7 @@ def _repeatable(step: StoryStep) -> bool:
 # All three are decided by the language's own verbs and the story's own steps, so none
 # of them changes between one telling and the next — and every telling asks them again,
 # `item_themes_for` once per theme of the item's classes. Walking a story's required
-# steps twenty-nine times over was a quarter of what a paragraph took.
+# steps once per theme was a quarter of what a paragraph took.
 #
 # A telling is random and this is not: `_settle` picks which condition a state step
 # says, but whether the step can be settled at all is the language's business, and that

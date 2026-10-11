@@ -407,11 +407,15 @@ export const KO: SentenceLanguageData = {
 				'tool',
 				'clothing',
 				'product',
+				'beauty',
 				'toy',
 				'furniture',
 				'gem',
 				'plant',
 				'food',
+				'ingredient',
+				'vegetable',
+				'fruit',
 				'drink'
 			],
 			...koVerbs(
@@ -439,11 +443,15 @@ export const KO: SentenceLanguageData = {
 				'tool',
 				'clothing',
 				'product',
+				'beauty',
 				'toy',
 				'furniture',
 				'gem',
 				'plant',
 				'food',
+				'ingredient',
+				'vegetable',
+				'fruit',
 				'drink'
 			],
 			...koVerbs(
@@ -463,11 +471,15 @@ export const KO: SentenceLanguageData = {
 				'tool',
 				'clothing',
 				'product',
+				'beauty',
 				'toy',
 				'furniture',
 				'gem',
 				'plant',
 				'food',
+				'ingredient',
+				'vegetable',
+				'fruit',
 				'drink'
 			],
 			...koVerbs(
@@ -484,11 +496,15 @@ export const KO: SentenceLanguageData = {
 				'tool',
 				'clothing',
 				'product',
+				'beauty',
 				'toy',
 				'furniture',
 				'gem',
 				'plant',
 				'food',
+				'ingredient',
+				'vegetable',
+				'fruit',
 				'drink'
 			],
 			...koVerbs(
@@ -505,11 +521,15 @@ export const KO: SentenceLanguageData = {
 				'tool',
 				'clothing',
 				'product',
+				'beauty',
 				'toy',
 				'furniture',
 				'gem',
 				'plant',
 				'food',
+				'ingredient',
+				'vegetable',
+				'fruit',
 				'drink'
 			],
 			...koVerbs(
@@ -526,11 +546,15 @@ export const KO: SentenceLanguageData = {
 				'tool',
 				'clothing',
 				'product',
+				'beauty',
 				'toy',
 				'furniture',
 				'gem',
 				'plant',
 				'food',
+				'ingredient',
+				'vegetable',
+				'fruit',
 				'drink'
 			],
 			...koVerbs(
@@ -586,7 +610,17 @@ export const KO: SentenceLanguageData = {
 			subject: ['person'],
 			object: ['thing', 'vehicle'],
 			// What one can hold: an instrument is, and a song is not.
-			objectThemes: ['object', 'tool', 'clothing', 'product', 'toy', 'furniture', 'gem', 'vehicle'],
+			objectThemes: [
+				'object',
+				'tool',
+				'clothing',
+				'product',
+				'beauty',
+				'toy',
+				'furniture',
+				'gem',
+				'vehicle'
+			],
 			...koVerbs(
 				`팔:팔아 넘기:넘겨 건네:건네 내놓:내놓아 판매하:판매해 처분하:처분해 팔아치우:팔아치워 내다팔:내다팔아 팔아넘기:팔아넘겨 넘겨주:넘겨줘 건네주:건네줘 거래하:거래해 진열하:진열해 늘어놓:늘어놓아 값을매기:값을매겨`
 			)
@@ -601,11 +635,15 @@ export const KO: SentenceLanguageData = {
 				'tool',
 				'clothing',
 				'product',
+				'beauty',
 				'toy',
 				'furniture',
 				'gem',
 				'vehicle',
 				'food',
+				'ingredient',
+				'vegetable',
+				'fruit',
 				'drink'
 			],
 			...koVerbs(
@@ -616,7 +654,7 @@ export const KO: SentenceLanguageData = {
 			field: 'cook',
 			subject: ['creature', 'person'],
 			object: ['edible'],
-			objectThemes: ['food'],
+			objectThemes: ['food', 'vegetable', 'ingredient'],
 			...koVerbs(
 				`굽:구워:서 데우:데워:서 끓이:끓여:서 요리하:요리해:서 썰:썰어:서 담:담아:서 볶:볶아:서 삶:삶아:서 찌:쪄:서 튀기:튀겨:서 조리하:조리해:서 익히:익혀:서 데치:데쳐:서 졸이:졸여:서 다지:다져:서 버무리:버무려:서 양념하:양념해:서 간을맞추:간을맞춰:서 차리:차려:서 젓:저어:서 뒤집:뒤집어:서 푸:퍼:서 덜:덜어:서`
 			)
@@ -625,7 +663,7 @@ export const KO: SentenceLanguageData = {
 			field: 'eat',
 			subject: ['creature', 'person'],
 			object: ['edible'],
-			objectThemes: ['food'],
+			objectThemes: ['food', 'fruit', 'vegetable'],
 			...koVerbs(
 				`먹:먹어 씹:씹어 삼키:삼켜 맛보:맛봐 베어먹:베어먹어 먹어치우:먹어치워 먹어보:먹어봐 깨물:깨물어 갉아먹:갉아먹어 뜯어먹:뜯어먹어 집어먹:집어먹어 주워먹:주워먹어 우물거리:우물거려 오물거리:오물거려 핥:핥아 야금야금먹:야금야금먹어 허겁지겁먹:허겁지겁먹어 꿀꺽삼키:꿀꺽삼켜 해치우:해치워 씹어삼키:씹어삼켜 비우:비워`
 			)
@@ -703,6 +741,7 @@ export const KO: SentenceLanguageData = {
 				'tool',
 				'clothing',
 				'product',
+				'beauty',
 				'toy',
 				'furniture',
 				'gem',
@@ -760,6 +799,8 @@ export const KO: SentenceLanguageData = {
 		{
 			field: 'change',
 			subject: ['edible'],
+			// What a dish or a drink does once it is served: an apple neither boils nor steams.
+			subjectThemes: ['food', 'drink'],
 			...koVerbs(
 				`식:식어 끓:끓어 상하:상해 남:남아 데워지:데워져 따뜻해지:따뜻해져 차가워지:차가워져 시원해지:시원해져 뜨거워지:뜨거워져 미지근해지:미지근해져 김이나:김이나 향을풍기:향을풍겨 냄새를풍기:냄새를풍겨 줄어들:줄어들어 바닥나:바닥나 동나:동나 남아돌:남아돌아 차려지:차려져 나오:나와`
 			)
@@ -780,6 +821,24 @@ export const KO: SentenceLanguageData = {
 			subjectThemes: ['drink'],
 			...koVerbs(
 				`넘치:넘쳐 쏟아지:쏟아져 흘러넘치:흘러넘쳐 김이오르:김이올라 거품이일:거품이일어 출렁이:출렁여 찰랑이:찰랑여 얼:얼어 식어가:식어가`
+			)
+		},
+		{
+			field: 'change',
+			subject: ['edible'],
+			// What fruit and vegetables do on their own: they ripen, bruise, go soft and rot.
+			subjectThemes: ['fruit', 'vegetable'],
+			...koVerbs(
+				`익:익어 상하:상해 썩:썩어 시들:시들어 무르:물러 마르:말라 쭈글쭈글해지:쭈글쭈글해져 멍들:멍들어 남:남아 변하:변해`
+			)
+		},
+		{
+			field: 'change',
+			subject: ['edible'],
+			// What happens in the cupboard: butter melts, sugar hardens, the salt runs out.
+			subjectThemes: ['ingredient'],
+			...koVerbs(
+				`상하:상해 변하:변해 녹:녹아 굳:굳어 마르:말라 눅눅해지:눅눅해져 딱딱해지:딱딱해져 숙성되:숙성돼 바닥나:바닥나 동나:동나 남:남아 줄어들:줄어들어`
 			)
 		}
 	],
@@ -889,6 +948,7 @@ export const KO: SentenceLanguageData = {
 				'tool',
 				'clothing',
 				'product',
+				'beauty',
 				'toy',
 				'furniture',
 				'gem',
@@ -910,6 +970,8 @@ export const KO: SentenceLanguageData = {
 		},
 		{
 			subject: ['edible'],
+			// Hot and cold are a dish's or a drink's; what produce is like comes below.
+			subjectThemes: ['food', 'drink'],
 			...koStates(
 				`달:달아:단 시:셔:신 뜨겁:뜨거워:뜨거운 차갑:차가워:차가운 미지근하:미지근해:미지근한 진하:진해:진한 연하:연해:연한 시원하:시원해:시원한 향긋하:향긋해:향긋한`
 			)
@@ -921,6 +983,25 @@ export const KO: SentenceLanguageData = {
 			...koStates(`
 				짜:짜:짠 맵:매워:매운 고소하:고소해:고소한 담백하:담백해:담백한
 				짭짤하:짭짤해:짭짤한 매콤하:매콤해:매콤한 쫄깃하:쫄깃해:쫄깃한 바삭하:바삭해:바삭한 부드럽:부드러워:부드러운 느끼하:느끼해:느끼한 싱겁:싱거워:싱거운
+			`)
+		},
+		{
+			subject: ['edible'],
+			// What fruit and vegetables are like: sweet or sour, crisp or soft, fresh or ripe.
+			subjectThemes: ['fruit', 'vegetable'],
+			...koStates(`
+				달:달아:단 시:셔:신 싱싱하:싱싱해:싱싱한 신선하:신선해:신선한 아삭하:아삭해:아삭한 단단하:단단해:단단한 무르:물러:무른
+				쓰:써:쓴 새콤하:새콤해:새콤한 상큼하:상큼해:상큼한 탐스럽:탐스러워:탐스러운 먹음직스럽:먹음직스러워:먹음직스러운
+				큼직하:큼직해:큼직한 촉촉하:촉촉해:촉촉한 푸르:푸르러:푸른
+			`)
+		},
+		{
+			subject: ['edible'],
+			// What an ingredient tastes or feels like: salty, nutty, fine or coarse.
+			subjectThemes: ['ingredient'],
+			...koStates(`
+				짜:짜:짠 달:달아:단 맵:매워:매운 고소하:고소해:고소한 신선하:신선해:신선한 향긋하:향긋해:향긋한 쓰:써:쓴
+				알싸하:알싸해:알싸한 곱:고와:고운 굵:굵어:굵은 눅눅하:눅눅해:눅눅한 순하:순해:순한 담백하:담백해:담백한
 			`)
 		},
 		{
@@ -991,6 +1072,24 @@ export const KO: SentenceLanguageData = {
 			words: words(`
 				달콤한 매콤한 따뜻한 신선한 바삭한 고소한 향긋한 뜨거운 짭짤한 말랑한 촉촉한 새콤한 먹음직한 담백한
 				부드러운 쫄깃한 폭신한 노릇한 진한 알싸한 시큼한 달달한 구수한 큼직한 갓구운 잘익은 푸짐한 소박한 정갈한 따끈한 눅진한 바삭바삭한 말끔한
+			`)
+		},
+		{
+			subject: ['edible'],
+			// Fruit and vegetables as they come from the field: a plum and a carrot alike.
+			themes: ['fruit', 'vegetable'],
+			words: words(`
+				신선한 싱싱한 탐스러운 큼직한 자그마한 향긋한 먹음직한 못생긴 갓딴
+				촉촉한 매끈한 알찬 통통한 무른 시든 빛깔좋은 윤기나는 묵직한 달큰한
+			`)
+		},
+		{
+			subject: ['edible'],
+			// What sits in the cupboard: kept, aged, dried, plentiful or dear.
+			themes: ['ingredient'],
+			words: words(`
+				신선한 귀한 묵은 질좋은 오래된 남은 비싼 값싼 넉넉한 아껴둔
+				흔한 소중한 향긋한 고소한 숙성된 진한
 			`)
 		},
 		{
@@ -1194,35 +1293,39 @@ export const KO: SentenceLanguageData = {
 		flier: words(`
 			부엉이 올빼미 참새 까치 제비 독수리 매 학 백조 오리 기러기 딱따구리 앵무새 공작 나비 벌 잠자리 무당벌레 박쥐
 			갈매기 까마귀 비둘기 꾀꼬리 반딧불이 매미 하루살이 풍뎅이 사슴벌레 파리 모기 나방
-			용 봉황 마룡 비룡 흑룡 백룡 청룡 주작 삼족오 하피 드래곤 와이번 불사조 그리핀 페가수스 천마 천사 선녀 요정 정령 픽시
+			용 봉황 비룡 청룡 주작 삼족오 하피 드래곤 와이번 불사조 그리핀 페가수스 천마 천사 선녀 요정 정령 픽시
 			임프 가고일 발키리
 			거위
+			새 말벌 하늘소 꿩 메추라기 펠리컨 홍학 황새 왜가리 물총새 뻐꾸기 종달새 벌새 솔개 콘도르
+			텐구 서큐버스 가루다 인면조 실프
 		`),
 		swimmer: words(`
 			고래 돌고래 상어 거북 물개 펭귄 개구리 문어 오징어 해마 불가사리 새우 잉어 연어 고등어 올챙이 악어 붕어 메기 가물치
-			쏘가리 송사리 미꾸라지 장어 뱀장어 갈치 삼치 꽁치 멸치 조기 명태 대구 광어 도미 우럭 볼락 방어 참치 가오리 홍어 복어
+			쏘가리 송사리 미꾸라지 장어 갈치 삼치 꽁치 멸치 조기 명태 대구 광어 도미 우럭 볼락 방어 참치 가오리 홍어 복어
 			인어 세이렌 크라켄 물귀신 나이아드
 			금붕어 해파리
+			물고기 범고래 바다표범 바다사자 해달 듀공 낙지 주꾸미 자라 아귀 정어리 청어 송어 숭어 농어 민어 가자미 전갱이 날치
+			피라미 은어 빙어 구피 물방개
+			갓파 켈피 셀키 운디네 레비아탄
 		`),
 		crawler: words(`
 			거북 도마뱀 카멜레온 뱀 달팽이 개미 거미 소라 게 지렁이 지네 노래기 전갈 진드기 벼룩 누에 번데기 애벌레 도롱뇽 사마귀
 			악어 구렁이 살모사 독사 코브라 방울뱀 비단뱀 이구아나
 			바퀴벌레
-		`),
-		// A word of a creature theme that is no creature: it takes no verb and no state.
-		lifeless: words(`
-			마법 마력 주문 저주 예언 신탁 결계 성배 마검 부적 룬 봉인 환영 마술 도술 술법 마법진 명계 장승 호신부 호부 룬문자 인장술 문양술 저주술
-			축복술 징조 전조 예언서 신화집 전설집
-			물약 불로초 여의주 천국 지옥 용궁
+			벌레 조개 전복 홍합 바지락 꼬막 성게 해삼 멍게 말미잘 가재 랍스터 자라 진딧물 빈대 거머리 민달팽이 삼엽충
+			슬라임 이무기
 		`),
 		// A word of the place class that is no place.
 		placeless: words(`
-			얼음 파도 물결 모래 조약돌 지진 밀물 썰물 그림자 메아리 향기 불꽃 잿불 산호 물보라 빙퇴석 너덜 바윗돌 암반 간헐천 분기공 종유석 석순 해일
-			지평 수평
-			별 태양 별자리 유성 오로라 초승달 보름달 별똥별 일식 월식 코로나 극광 별무리 천정 위성 혜성 성단 북극성 샛별 궤도 중력 자전 공전 흑점 태양풍
-			광년 천체 성간 항성 성좌 천구 황도 초신성 유성우 우주먼지 그믐달 반달 하현달 상현달 만월 신월 월광 성광
-			흙 돌 불 공기 물방울 거품 진흙 자갈 먼지 연기 빛 어둠 재 화석 눈사태 산사태 홍수 용암 마그마 지층 해류 소용돌이 물살 급류 지하수 우주인 외계인 인공위성 북두칠성 남십자성 견우성
+			얼음 파도 물결 모래 조약돌 지진 밀물 썰물 그림자 메아리 향기 불꽃 잿불 산호 물보라 빙퇴석 너덜 암반 간헐천 분기공 종유석 석순 해일
+			수평선 지형 암석 지각 맨틀 물줄기
+			별 태양 별자리 유성 오로라 초승달 보름달 별똥별 일식 월식 코로나 천정 위성 혜성 성단 북극성 샛별 궤도 중력 자전 공전 흑점 태양풍
+			광년 천체 성간 항성 천구 황도 초신성 유성우 우주먼지 그믐달 반달 하현달 상현달
+			흙 돌 불 공기 물방울 거품 진흙 자갈 먼지 연기 빛 어둠 재 화석 눈사태 산사태 홍수 용암 마그마 지층 해류 소용돌이 물살 급류 지하수 인공위성 북두칠성 남십자성 견우성
 			직녀성 백색왜성 적색거성 중성자별 펄서 퀘이사 웜홀 암흑물질 빅뱅 슈퍼문 광속 천문단위 파섹 쌍성 변광성 적색편이 자기장 플레어 자전축 우주여행 유성체 월령
+			갈색왜성 중력파 홍염 시리우스 리겔 안타레스 카노푸스 알데바란 스피카 데네브 레굴루스 폴룩스 프로키온 묘성 오리온
+			큰곰자리 백조자리 양자리 황소자리 게자리 사자자리 처녀자리 천칭자리 전갈자리 사수자리 염소자리 물병자리
+			매물 기와 기둥 벽 굴뚝 창문 처마
 		`)
 	},
 	interjections: words(`

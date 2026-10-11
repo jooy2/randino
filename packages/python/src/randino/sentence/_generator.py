@@ -2477,10 +2477,14 @@ def _noun_phrase(
         draw_word(lexicon, pool, invent, min(noun_low, noun_high), noun_high, prefix).word,
     )
     gender = gender_of(lexicon, _as_pool(lexicon, drawn))
-    parts = [drawn]
+    # A name is written the way the pool writes it, with no article and nothing in front
+    # of it: `Mars glows`, never `the bright mars glows`.
+    proper = "proper" in _traits_of(data, drawn)
+    parts = [_as_pool(lexicon, drawn) if proper else drawn]
     # The budget reserved room for a modifier, and a noun the result has already
-    # described gives it back rather than being described a second time.
-    modified = modify and drawn not in settled
+    # described gives it back rather than being described a second time. A name
+    # gives it back too, unless the modifier is one the caller required.
+    modified = modify and drawn not in settled and (not proper or bool(forced_modifier))
 
     if modified:
         room = high - overhead - len(drawn) - space
@@ -2510,7 +2514,7 @@ def _noun_phrase(
         else:
             parts.append(count)
 
-    article = "" if bare else _article_for(data, gender, parts[0])
+    article = "" if bare or proper else _article_for(data, gender, parts[0])
     # An elided article carries its own boundary — `l'orso`, never `l' orso`.
     text = (
         article + data.space.join(parts)
@@ -2613,12 +2617,12 @@ def _modify_chance_for(distance: int, too_long: bool, storied: bool) -> int:
     return 0 if too_long else 100
 
 
-DESTINATION_THEMES: tuple[WordTheme, ...] = ("place",)
+DESTINATION_THEMES: tuple[WordTheme, ...] = ("place", "building")
 """Where a subject can go, and where a story happens.
 
-`place` alone, and not the two other themes of its class: a hero can walk to the market
-and not to Pluto, and a sky is not somewhere a fox goes. A `place` part on its own still
-spans the class, because a fox can sleep under a sky.
+`place` and `building`, and not the other three themes of their class: a hero can walk
+to the market or the library and not to Pluto, and a sky is not somewhere a fox goes. A
+`place` part on its own still spans the class, because a fox can sleep under a sky.
 """
 
 

@@ -70,16 +70,16 @@ The package declares `sideEffects: false`, so a bundler drops the pools nothing 
 | `randOrganization`                                            | 14 KB    |
 | `randCountry`                                                 | 18 KB    |
 | `randName`                                                    | 24 KB    |
-| `randModifier`                                                | 91 KB    |
+| `randModifier`                                                | 122 KB   |
 | `randLocation`, `randCity`, `randDistrict`                    | 156 KB   |
-| `randWord`, `randAnimal` and the rest                         | 254 KB   |
-| `randNickname`                                                | 255 KB   |
-| `randSentence`                                                | 417 KB   |
-| Everything                                                    | 627 KB   |
+| `randWord`, `randAnimal` and the rest                         | 344 KB   |
+| `randNickname`                                                | 346 KB   |
+| `randSentence`                                                | 517 KB   |
+| Everything                                                    | 727 KB   |
 
 Measured by bundling the one import with esbuild, minified, and gzipping the result.
 
-The nouns are one object per language, so one theme costs what twenty-nine do, and `randSentence` adds the grammar on top. `randModifier` carries the modifiers apart from them, and the nouns of only the four languages whose modifiers agree with one. That is the trade a synchronous API with no dependencies makes: nothing is fetched, so everything a function can reach ships with it. On a server it is nothing; in a browser bundle, reach for `randName` or the decorators if that is all you need, and load `randSentence` from a chunk of its own.
+The nouns are one object per language, so one theme costs what thirty-seven do, and `randSentence` adds the grammar on top. `randModifier` carries the modifiers apart from them, and the nouns of only the four languages whose modifiers agree with one. That is the trade a synchronous API with no dependencies makes: nothing is fetched, so everything a function can reach ships with it. On a server it is nothing; in a browser bundle, reach for `randName` or the decorators if that is all you need, and load `randSentence` from a chunk of its own.
 
 :::
 
@@ -334,6 +334,6 @@ A seeded result is reproducible for one version of the package and not across ve
 - [**Supported languages**](./languages) — what the nine codes cover, and where they differ from one another.
 - [**Person names**](../name/) — every option, and what it does to the output.
 - [**Nicknames**](../nickname/) — every option, and how the shapes are chosen.
-- [**`randWord`**](../word/rand-word) — the twenty-nine themes on their own, one function each.
+- [**`randWord`**](../word/rand-word) — the thirty-seven themes on their own, one function each.
 - [**`randSentence`**](../sentence/rand-sentence) — whole statements, in the language's own grammar.
 - [**`randModifier`**](../decorate/rand-modifier) — a modifier in front of any string, the way `randSuffix` puts a token behind one.

@@ -87,9 +87,9 @@ def rand_weather(
 
     Example:
         >>> rand_weather(language="ko", count=3)
-        ['소나기', '무지개', '된서리']
+        ['소나기', '무지개', '서리']
         >>> rand_weather(language="en", count=3)
-        ['Drizzle', 'Rainbow', 'Hoarfrost']
+        ['Drizzle', 'Rainbow', 'Frost']
     """
     theme: WordThemeOption = "weather"
 

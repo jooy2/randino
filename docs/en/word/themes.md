@@ -1,8 +1,8 @@
 # Themes
 
-A theme is a slice of everyday vocabulary that a modifier can sit in front of. There are twenty-nine of them, every language fills every one, and **a word belongs to exactly one**, which is what makes the theme a word reports unambiguous.
+A theme is a slice of everyday vocabulary that a modifier can sit in front of. There are thirty-seven of them, every language fills every one, and **a word belongs to exactly one**, which is what makes the theme a word reports unambiguous.
 
-Each theme is also a generator of its own. `randWord` takes the theme as an option; the twenty-nine functions in the third column are the same generator with the theme already chosen, and `randNickname` builds on the same pools.
+Each theme is also a generator of its own. `randWord` takes the theme as an option; the thirty-seven functions in the third column are the same generator with the theme already chosen, and `randNickname` builds on the same pools.
 
 | Theme | Function | What it holds | Korean | English |
 | --- | --- | --- | --- | --- |
@@ -12,20 +12,28 @@ Each theme is also a generator of its own. `randWord` takes the theme as an opti
 | `plant` | [`randPlant`](./rand-plant) | plants, and their parts | 민들레, 솔방울 | Dandelion, Acorn |
 | `gem` | [`randGem`](./rand-gem) | stones, metals and gems | 흑요석, 청동 | Obsidian, Bronze |
 | `concept` | [`randConcept`](./rand-concept) | terms, and ideas from the humanities | 철학, 자유 | Philosophy, Truth |
-| `myth` | [`randMyth`](./rand-myth) | creatures and things out of myth | 구미호, 불사조 | Phoenix, Rune |
+| `myth` | [`randMyth`](./rand-myth) | magic, and what myth is made of | 부적, 저주 | Rune, Elixir |
+| `monster` | [`randMonster`](./rand-monster) | creatures of myth, folklore and fantasy | 구미호, 도깨비 | Dragon, Golem |
 | `job` | [`randJob`](./rand-job) | the trades and roles people hold | 대장장이, 항해사 | Blacksmith, Archer |
-| `music` | [`randMusic`](./rand-music) | instruments, forms and terms | 교향곡, 거문고 | Cello, Sonata |
-| `place` | [`randPlace`](./rand-place) | places you can walk into or up to | 광장, 골목 | Lighthouse, Plaza |
-| `food` | [`randFood`](./rand-food) | things to eat | 떡볶이, 김밥 | Dumpling, Pancake |
+| `music` | [`randMusic`](./rand-music) | instruments, notation and performing | 거문고, 악보 | Cello, Melody |
+| `genre` | [`randGenre`](./rand-genre) | kinds of music, and kinds of piece | 재즈, 교향곡 | Techno, Sonata |
+| `place` | [`randPlace`](./rand-place) | places that are not buildings | 광장, 골목 | Harbor, Plaza |
+| `building` | [`randBuilding`](./rand-building) | buildings, their rooms, and kinds of property | 도서관, 오피스텔 | Lighthouse, Library |
+| `food` | [`randFood`](./rand-food) | prepared food | 떡볶이, 김밥 | Dumpling, Pancake |
+| `ingredient` | [`randIngredient`](./rand-ingredient) | what food is cooked from | 간장, 밀가루 | Cinnamon, Butter |
+| `vegetable` | [`randVegetable`](./rand-vegetable) | vegetables | 당근, 시금치 | Carrot, Spinach |
+| `fruit` | [`randFruit`](./rand-fruit) | fruit | 복숭아, 수박 | Apple, Peach |
 | `sport` | [`randSport`](./rand-sport) | sports, and what they are played for | 양궁, 트로피 | Archery, Trophy |
-| `vehicle` | [`randVehicle`](./rand-vehicle) | things that carry you | 열기구, 전차 | Airship, Tramcar |
+| `vehicle` | [`randVehicle`](./rand-vehicle) | things that carry you | 열기구, 전차 | Airship, Streetcar |
 | `product` | [`randProduct`](./rand-product) | things you buy | 이어폰, 냉장고 | Earbuds, Toaster |
+| `beauty` | [`randBeauty`](./rand-beauty) | make-up, and skin, hair and nail care | 립스틱, 로션 | Lipstick, Mascara |
 | `color` | [`randColor`](./rand-color) | colours, plain and storied | 주홍, 쪽빛 | Crimson, Ocher |
 | `finance` | [`randFinance`](./rand-finance) | money, and what is done with it | 이자, 환율 | Ledger, Yield |
 | `tech` | [`randTech`](./rand-tech) | computers, and the networks between them | 서버, 캐시 | Server, Subnet |
 | `weather` | [`randWeather`](./rand-weather) | what the sky is doing | 소나기, 무지개 | Drizzle, Gale |
 | `space` | [`randSpace`](./rand-space) | what is beyond the sky | 은하, 혜성 | Galaxy, Nebula |
-| `time` | [`randTime`](./rand-time) | when something happens | 새벽, 한여름 | Twilight, Epoch |
+| `planet` | [`randPlanet`](./rand-planet) | planets by name | 화성, 세드나 | Jupiter, Sedna |
+| `time` | [`randTime`](./rand-time) | when something happens | 새벽, 정오 | Twilight, Epoch |
 | `emotion` | [`randEmotion`](./rand-emotion) | what someone feels | 그리움, 설렘 | Longing, Relief |
 | `body` | [`randBody`](./rand-body) | the parts of a body | 손목, 심장 | Wrist, Sinew |
 | `clothing` | [`randClothing`](./rand-clothing) | what people wear | 두루마기, 양말 | Cardigan, Linen |
@@ -42,10 +50,11 @@ Each theme is also a generator of its own. `randWord` takes the theme as an opti
 import { WORD_THEMES, randFood, randWord } from 'randino';
 
 WORD_THEMES;
-// ['animal', 'object', 'nature', 'plant', 'gem', 'concept', 'myth', 'job',
-//  'music', 'place', 'food', 'sport', 'vehicle', 'product', 'color', 'finance',
-//  'tech', 'weather', 'space', 'time', 'emotion', 'body', 'clothing', 'tool',
-//  'drink', 'toy', 'sound', 'person', 'furniture']
+// ['animal', 'object', 'nature', 'plant', 'gem', 'concept', 'myth', 'monster',
+//  'job', 'music', 'genre', 'place', 'building', 'food', 'ingredient',
+//  'vegetable', 'fruit', 'sport', 'vehicle', 'product', 'beauty', 'color',
+//  'finance', 'tech', 'weather', 'space', 'planet', 'time', 'emotion', 'body',
+//  'clothing', 'tool', 'drink', 'toy', 'sound', 'person', 'furniture']
 
 randWord({ theme: 'food', language: 'en', count: 3 });
 // ['Dumpling', 'Pretzel', 'Pancake']
@@ -76,10 +85,11 @@ randFood(language: WordLanguage.en, count: 3); // the same thing
 from randino import WORD_THEMES, rand_food, rand_word
 
 WORD_THEMES
-# ('animal', 'object', 'nature', 'plant', 'gem', 'concept', 'myth', 'job',
-#  'music', 'place', 'food', 'sport', 'vehicle', 'product', 'color', 'finance',
-#  'tech', 'weather', 'space', 'time', 'emotion', 'body', 'clothing', 'tool',
-#  'drink', 'toy', 'sound', 'person', 'furniture')
+# ('animal', 'object', 'nature', 'plant', 'gem', 'concept', 'myth', 'monster',
+#  'job', 'music', 'genre', 'place', 'building', 'food', 'ingredient',
+#  'vegetable', 'fruit', 'sport', 'vehicle', 'product', 'beauty', 'color',
+#  'finance', 'tech', 'weather', 'space', 'planet', 'time', 'emotion', 'body',
+#  'clothing', 'tool', 'drink', 'toy', 'sound', 'person', 'furniture')
 
 rand_word(theme="food", language="en", count=3)
 # ['Dumpling', 'Pretzel', 'Pancake']
@@ -89,17 +99,17 @@ rand_food(language="en", count=3)  # the same thing
 
 :::
 
-Leave the theme out and each result draws from one theme picked at random, so a batch spreads across all twenty-nine.
+Leave the theme out and each result draws from one theme picked at random, so a batch spreads across all thirty-seven.
 
-`randNickname` is the exception: at the default `realism` it spans twenty-six of them, leaving out `color`, `finance` and `tech`, because a word in front of a colour or a loan reads as a joke rather than a handle. Loosening `realism` puts them back, and naming one of them works at any realism. See [How a nickname behaves](../nickname/#realism-invents-words-rather-than-drawing-them).
+`randNickname` is the exception: at the default `realism` it spans thirty-four of them, leaving out `color`, `finance` and `tech`, because a word in front of a colour or a loan reads as a joke rather than a handle. Loosening `realism` puts them back, and naming one of them works at any realism. See [How a nickname behaves](../nickname/#realism-invents-words-rather-than-drawing-them).
 
 ## The rules a theme follows
 
-**Themes are disjoint.** A word in two of them would make the reported theme ambiguous, and would make the detail output name a theme the caller never asked about. When a new theme claims a word an older one already held, the word **moves** rather than being copied: `place` took the twelve places that were sitting in `concept`, `vehicle` took the bicycle and the train out of `object`, `plant` took the flowers and the trees out of `nature`, `music` took the instruments out of `object`, `toy` took the tops and the dice out of it, and `furniture` took the wardrobe and the bookshelf out of `product`. Where the two senses are genuinely different words, the word is renamed instead: the English toy became `Marbles` so that `gem` could keep `Marble`.
+**Themes are disjoint.** A word in two of them would make the reported theme ambiguous, and would make the detail output name a theme the caller never asked about. When a new theme claims a word an older one already held, the word **moves** rather than being copied: `place` took the twelve places that were sitting in `concept`, `vehicle` took the bicycle and the train out of `object`, `plant` took the flowers and the trees out of `nature`, `music` took the instruments out of `object`, `toy` took the tops and the dice out of it, `furniture` took the wardrobe and the bookshelf out of `product`, `monster` took every creature out of `myth`, `genre` took the kinds of music out of `music`, `building` took the buildings and their rooms out of `place`, `ingredient`, `vegetable` and `fruit` took what is not a prepared dish out of `food`, `beauty` took the make-up out of `product`, and `planet` took the planets' names out of `space`. Where the two senses are genuinely different words, the word is renamed instead: the English toy became `Marbles` so that `gem` could keep `Marble`.
 
 **No person names, and no word that is only a name.** For English this is enforced against the person-name pools automatically, which is why `job` has no `Knight`, `Baker` or `Hunter` and `plant` no `Rose` or `Ivy`. Korean and Japanese cannot be held to the same check, because 하늘, 별 and 森 are everyday nouns that happen also to be names. A modifier in front of one is still nobody's name.
 
-**Pool sizes are uneven on purpose.** Most themes hold a hundred or more nouns per language, and the thinnest sit in the sixties. Some of these slices of vocabulary hold fewer words to begin with, and padding a pool with near-synonyms reads worse than a shorter pool.
+**Pool sizes are uneven on purpose.** Most themes hold a hundred or more nouns per language, and a few sit well below that. Some of these slices of vocabulary hold fewer words to begin with — `planet` can only hold the planets there are names for — and padding a pool with near-synonyms reads worse than a shorter pool.
 
 ## The theme a word reports {#where-a-theme-comes-from}
 
@@ -112,6 +122,6 @@ That last row is a real coincidence rather than a bug: the syllable templates sp
 
 ## See also
 
-- [`randWord`](./rand-word) — the generator the theme belongs to, and the twenty-nine functions beside it.
+- [`randWord`](./rand-word) — the generator the theme belongs to, and the thirty-seven functions beside it.
 - [`randNickname`](../nickname/rand-nickname) — the same pools, put together.
 - [Constants](../reference/constants) — the theme list at runtime.

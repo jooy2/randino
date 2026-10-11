@@ -70,16 +70,16 @@ pip install randino
 | `randOrganization`                                         | 14 KB    |
 | `randCountry`                                              | 18 KB    |
 | `randName`                                                 | 24 KB    |
-| `randModifier`                                             | 91 KB    |
+| `randModifier`                                             | 122 KB   |
 | `randLocation`, `randCity`, `randDistrict`                 | 156 KB   |
-| `randWord`와 테마별 함수들                                 | 254 KB   |
-| `randNickname`                                             | 255 KB   |
-| `randSentence`                                             | 417 KB   |
-| 전체                                                       | 627 KB   |
+| `randWord`와 테마별 함수들                                 | 344 KB   |
+| `randNickname`                                             | 346 KB   |
+| `randSentence`                                             | 517 KB   |
+| 전체                                                       | 727 KB   |
 
 가져올 함수 하나만 esbuild로 번들하고 minify한 뒤 gzip으로 잰 값입니다.
 
-명사 풀은 언어마다 객체 하나이므로 테마 하나만 써도 29개 전부와 같은 용량이 들고, `randSentence`는 그 위에 문법 데이터가 더해집니다. `randModifier`는 수식어만 따로 싣고, 명사는 수식어가 명사의 성에 맞춰 바뀌는 네 언어의 것만 가져갑니다. 의존성 없는 동기 API가 치르는 대가입니다. 아무것도 내려받지 않는 대신, 함수가 닿을 수 있는 모든 것이 함께 실립니다. 서버에서는 신경 쓸 일이 아니지만, 브라우저 번들이라면 `randName`이나 장식 함수만으로 충분한지 먼저 보고, `randSentence`는 별도 청크로 불러오는 편이 낫습니다.
+명사 풀은 언어마다 객체 하나이므로 테마 하나만 써도 37개 전부와 같은 용량이 들고, `randSentence`는 그 위에 문법 데이터가 더해집니다. `randModifier`는 수식어만 따로 싣고, 명사는 수식어가 명사의 성에 맞춰 바뀌는 네 언어의 것만 가져갑니다. 의존성 없는 동기 API가 치르는 대가입니다. 아무것도 내려받지 않는 대신, 함수가 닿을 수 있는 모든 것이 함께 실립니다. 서버에서는 신경 쓸 일이 아니지만, 브라우저 번들이라면 `randName`이나 장식 함수만으로 충분한지 먼저 보고, `randSentence`는 별도 청크로 불러오는 편이 낫습니다.
 
 :::
 
@@ -334,6 +334,6 @@ rand_name(language="en", count=3, random=Random(42).random)
 - [**지원 언어**](./languages) — 9개 언어 코드가 무엇을 다루는지, 그리고 언어마다 무엇이 다른지.
 - [**사람 이름**](../name/) — 모든 옵션과 각 옵션이 출력에 미치는 영향.
 - [**닉네임**](../nickname/) — 모든 옵션과 형태를 고르는 방식.
-- [**`randWord`**](../word/rand-word) — 29개 테마의 단어와 테마마다 하나씩 있는 함수.
+- [**`randWord`**](../word/rand-word) — 37개 테마의 단어와 테마마다 하나씩 있는 함수.
 - [**`randSentence`**](../sentence/rand-sentence) — 그 언어의 문법으로 쓴 완결된 문장.
 - [**`randModifier`**](../decorate/rand-modifier) — 어떤 문자열 앞에든 수식어를 붙이는 함수.

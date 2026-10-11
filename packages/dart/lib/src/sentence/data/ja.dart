@@ -896,7 +896,7 @@ final SentenceLanguageData ja = SentenceLanguageData(
       field: VerbField.eat,
       subject: const <NounClass>[NounClass.creature, NounClass.person],
       object: const <NounClass>[NounClass.edible],
-      objectThemes: const <WordTheme>[WordTheme.food],
+      objectThemes: const <WordTheme>[WordTheme.food, WordTheme.fruit, WordTheme.vegetable],
       words: words(r'''
         食べる 噛む 味わう かじる 平らげる 頬張る かじりつく 食べ尽くす つまむ 口に運ぶ 舐める 飲み込む むしゃむしゃ食べる ぱくつく 一口食べる 貪る 噛みしめる 食べてみる
       '''),
@@ -1087,6 +1087,7 @@ final SentenceLanguageData ja = SentenceLanguageData(
         WordTheme.tool,
         WordTheme.clothing,
         WordTheme.product,
+        WordTheme.beauty,
         WordTheme.toy,
         WordTheme.furniture,
         WordTheme.gem,
@@ -1300,6 +1301,7 @@ final SentenceLanguageData ja = SentenceLanguageData(
     VerbGroup(
       field: VerbField.change,
       subject: const <NounClass>[NounClass.edible],
+      subjectThemes: const <WordTheme>[WordTheme.food, WordTheme.drink],
       words: words(r'''
         熟れる 冷める 煮える 溶ける 傷む 温まる 湯気を立てる 冷たくなる 温かくなる ぬるくなる 減る 尽きる 残る 香る 匂う 用意される 出てくる 並ぶ 固まる 腐る 変わる
       '''),
@@ -1367,6 +1369,50 @@ final SentenceLanguageData ja = SentenceLanguageData(
         forms: <PredicateForm, WordPool>{
           PredicateForm.polite: words(r'''
             泡立ちました こぼれました あふれました 揺れました 波打ちました 凍りました 冷めていきました 湯気を上げました 気が抜けました 濁りました 澄みました 泡が消えました
+          '''),
+        },
+      ),
+    ),
+    VerbGroup(
+      field: VerbField.change,
+      subject: const <NounClass>[NounClass.edible],
+      subjectThemes: const <WordTheme>[WordTheme.fruit, WordTheme.vegetable],
+      words: words(r'傷む 腐る しなびる 干からびる 黒ずむ 変色する かびる 柔らかくなる 冷える 残る 余る 届く 並ぶ'),
+      forms: <PredicateForm, WordPool>{
+        PredicateForm.polite: words(r'''
+          傷みます 腐ります しなびます 干からびます 黒ずみます 変色します かびます 柔らかくなります 冷えます 残ります 余ります 届きます 並びます
+        '''),
+        PredicateForm.linking: words(
+          r'傷んで 腐って しなびて 干からびて 黒ずんで 変色して かびて 柔らかくなって 冷えて 残って 余って 届いて 並んで',
+        ),
+      },
+      past: PredicateTense(
+        words: words(r'傷んだ 腐った しなびた 干からびた 黒ずんだ 変色した かびた 柔らかくなった 冷えた 残った 余った 届いた 並んだ'),
+        forms: <PredicateForm, WordPool>{
+          PredicateForm.polite: words(r'''
+            傷みました 腐りました しなびました 干からびました 黒ずみました 変色しました かびました 柔らかくなりました 冷えました 残りました 余りました 届きました 並びました
+          '''),
+        },
+      ),
+    ),
+    VerbGroup(
+      field: VerbField.change,
+      subject: const <NounClass>[NounClass.edible],
+      subjectThemes: const <WordTheme>[WordTheme.ingredient],
+      words: words(r'減る 切れる なくなる 足りなくなる 残る 余る 古くなる 届く 並ぶ 混ざる 用意される 見つかる'),
+      forms: <PredicateForm, WordPool>{
+        PredicateForm.polite: words(r'''
+          減ります 切れます なくなります 足りなくなります 残ります 余ります 古くなります 届きます 並びます 混ざります 用意されます 見つかります
+        '''),
+        PredicateForm.linking: words(
+          r'減って 切れて なくなって 足りなくなって 残って 余って 古くなって 届いて 並んで 混ざって 用意されて 見つかって',
+        ),
+      },
+      past: PredicateTense(
+        words: words(r'減った 切れた なくなった 足りなくなった 残った 余った 古くなった 届いた 並んだ 混ざった 用意された 見つかった'),
+        forms: <PredicateForm, WordPool>{
+          PredicateForm.polite: words(r'''
+            減りました 切れました なくなりました 足りなくなりました 残りました 余りました 古くなりました 届きました 並びました 混ざりました 用意されました 見つかりました
           '''),
         },
       ),
@@ -1541,6 +1587,7 @@ final SentenceLanguageData ja = SentenceLanguageData(
     ),
     StateGroup(
       subject: const <NounClass>[NounClass.edible],
+      subjectThemes: const <WordTheme>[WordTheme.food, WordTheme.drink],
       words: words(r'甘い しょっぱい 辛い 酸っぱい 熱い 冷たい 香ばしい 苦い ぬるい 濃い まろやかだ 柔らかい 新鮮だ'),
       forms: <PredicateForm, WordPool>{
         PredicateForm.polite: words(r'''
@@ -1555,6 +1602,45 @@ final SentenceLanguageData ja = SentenceLanguageData(
           PredicateForm.polite: words(r'''
             甘かったです しょっぱかったです 辛かったです 酸っぱかったです 熱かったです 冷たかったです 香ばしかったです 苦かったです ぬるかったです 濃かったです まろやかでした
             柔らかかったです 新鮮でした
+          '''),
+        },
+      ),
+    ),
+    StateGroup(
+      subject: const <NounClass>[NounClass.edible],
+      subjectThemes: const <WordTheme>[WordTheme.fruit, WordTheme.vegetable],
+      words: words(r'新鮮だ みずみずしい おいしい 柔らかい 硬い 大きい 小さい 冷たい 安い 高い 旬だ 食べ頃だ'),
+      forms: <PredicateForm, WordPool>{
+        PredicateForm.polite: words(
+          r'新鮮です みずみずしいです おいしいです 柔らかいです 硬いです 大きいです 小さいです 冷たいです 安いです 高いです 旬です 食べ頃です',
+        ),
+      },
+      past: PredicateTense(
+        words: words(r'''
+          新鮮だった みずみずしかった おいしかった 柔らかかった 硬かった 大きかった 小さかった 冷たかった 安かった 高かった 旬だった 食べ頃だった
+        '''),
+        forms: <PredicateForm, WordPool>{
+          PredicateForm.polite: words(r'''
+            新鮮でした みずみずしかったです おいしかったです 柔らかかったです 硬かったです 大きかったです 小さかったです 冷たかったです 安かったです 高かったです 旬でした
+            食べ頃でした
+          '''),
+        },
+      ),
+    ),
+    StateGroup(
+      subject: const <NounClass>[NounClass.edible],
+      subjectThemes: const <WordTheme>[WordTheme.ingredient],
+      words: words(r'高い 安い 手頃だ 高級だ 上質だ 貴重だ 必要だ 十分だ 少ない 多い 足りない 古い'),
+      forms: <PredicateForm, WordPool>{
+        PredicateForm.polite: words(
+          r'高いです 安いです 手頃です 高級です 上質です 貴重です 必要です 十分です 少ないです 多いです 足りないです 古いです',
+        ),
+      },
+      past: PredicateTense(
+        words: words(r'高かった 安かった 手頃だった 高級だった 上質だった 貴重だった 必要だった 十分だった 少なかった 多かった 足りなかった 古かった'),
+        forms: <PredicateForm, WordPool>{
+          PredicateForm.polite: words(r'''
+            高かったです 安かったです 手頃でした 高級でした 上質でした 貴重でした 必要でした 十分でした 少なかったです 多かったです 足りなかったです 古かったです
           '''),
         },
       ),
@@ -1629,6 +1715,20 @@ final SentenceLanguageData ja = SentenceLanguageData(
       words: words(r'''
         甘い 辛い 温かい 新鮮な 香ばしい 熱い しょっぱい 柔らかい みずみずしい 熟れた おいしそうな こんがりした もちもちの さくさくの こってりした あっさりした 濃厚な 香り高い
         焼きたての 湯気の立つ 素朴な 彩り豊かな ぴりっとした 冷めた
+      '''),
+    ),
+    ModifierGroup(
+      subject: const <NounClass>[NounClass.edible],
+      themes: const <WordTheme>[WordTheme.fruit, WordTheme.vegetable],
+      words: words(r'''
+        新鮮な みずみずしい 採れたての 旬の 生の 大きな 小さな 立派な 冷えた 傷んだ しなびた 国産の 地元の 安い 珍しい 形のよい おいしそうな 山盛りの
+      '''),
+    ),
+    ModifierGroup(
+      subject: const <NounClass>[NounClass.edible],
+      themes: const <WordTheme>[WordTheme.ingredient],
+      words: words(r'''
+        高級な 上質な 国産の 外国産の 地元の 本場の 特製の 定番の 少量の たっぷりの 大量の 残りの 使いかけの 買い置きの 業務用の 新しい 古い 安い 珍しい
       '''),
     ),
     ModifierGroup(
@@ -1743,24 +1843,26 @@ final SentenceLanguageData ja = SentenceLanguageData(
   traits: <NounTrait, WordPool>{
     NounTrait.flier: words(r'''
       フクロウ スズメ カササギ ツバメ ワシ ハヤブサ ツル ハクチョウ カモ キツツキ インコ クジャク チョウ ガ ハチ トンボ テントウムシ コウモリ サギ ペリカン カラス ウグイス
-      カワセミ カブトムシ ホタル 犬鷲 蝉 蜉蝣 黄金虫 鍬形虫 蛍火 蠅 蚊 蛾 竜 鳳凰 天狗 妖精 精霊 天使 ドラゴン グリフォン 不死鳥 黒竜 白竜 青竜 朱雀 八咫烏 蛟竜 鳥女
-      天馬 小悪魔 小妖精 戦乙女 石像鬼 ハト カモメ 天女 鵺
+      カワセミ カブトムシ ホタル イヌワシ セミ カゲロウ コガネムシ クワガタ ハエ 蚊 竜 鳳凰 天狗 妖精 精霊 天使 ドラゴン グリフォン 不死鳥 青竜 朱雀 八咫烏 ハーピー
+      ペガサス インプ ピクシー ワルキューレ ガーゴイル ハト カモメ 天女 鵺 キジ ハゲワシ コンドル タカ トビ ミミズク オウム フラミンゴ カッコウ ヒバリ メジロ ムクドリ
+      ヒヨドリ シジュウカラ コマドリ ツグミ オシドリ トキ コウノトリ ハチドリ アホウドリ ライチョウ バッタ アブ カミキリムシ ミツバチ ワイバーン 堕天使 一反木綿 シルフ
     '''),
     NounTrait.swimmer: words(r'''
-      クジラ イルカ サメ カメ アザラシ ペンギン カエル タコ イカ ヒトデ カニ エビ コイ サケ ワニ クラゲ 御玉杓子 蟇 雨蛙 鰐 鮒 鯰 雷魚 桂魚 目高 泥鰌 鰻 穴子 太刀魚
-      鰆 秋刀魚 片口鰯 石持 介党鱈 人魚 海妖 巨烏賊 海獣王 河童 マグロ タイ サバ イワシ 金魚 ラッコ
+      クジラ イルカ サメ カメ アザラシ ペンギン カエル タコ イカ ヒトデ カニ エビ コイ サケ ワニ クラゲ オタマジャクシ ヒキガエル アマガエル フナ ナマズ ライギョ メダカ
+      ドジョウ ウナギ アナゴ タチウオ サワラ サンマ タラ 人魚 河童 クラーケン リヴァイアサン マグロ タイ サバ イワシ 金魚 ラッコ アジ ブリ カツオ ヒラメ カレイ フグ アユ
+      マス エイ タツノオトシゴ クマノミ アンコウ ウツボ トビウオ カジキ ピラニア シャチ セイウチ アシカ オットセイ ジュゴン マナティー スッポン イモリ ゲンゴロウ アメンボ
+      ザリガニ 海坊主 ウンディーネ
     '''),
     NounTrait.crawler: words(r'''
-      カメ トカゲ カメレオン ヘビ カタツムリ アリ クモ カニ ワニ 蟷螂 蚯蚓 百足 馬陸 蠍 壁蝨 蚤 蚕 蛹 芋虫 山椒魚 青大将 蝮 毒蛇 眼鏡蛇 響尾蛇 錦蛇 鰐 鬣蜥 蛇王
-    '''),
-    NounTrait.lifeless: words(r'''
-      魔法 魔力 呪文 呪い 予言 神託 結界 護符 封印 幻影 女神像 土偶 傀儡 御守 呪詛 加護 前兆 予兆 予言書 神話集 伝説集 奇譚集 鬼火 妖術 魔法陣 秘薬 聖杯 魔剣
+      カメ トカゲ カメレオン ヘビ カタツムリ アリ クモ カニ ワニ カマキリ ミミズ ムカデ ヤスデ サソリ ダニ ノミ カイコ イモムシ サンショウウオ アオダイショウ マムシ コブラ
+      ガラガラヘビ ニシキヘビ イグアナ バジリスク ナメクジ ダンゴムシ ケムシ ヒル ヤモリ ハブ ザリガニ ヤドカリ ナマコ スライム 大蛇 ツチノコ
     '''),
     NounTrait.placeless: words(r'''
-      氷 波 潮 砂 小石 地震 残り火 珊瑚 木霊 影 氷堆石 岩屑 岩盤 間欠泉 噴気孔 鍾乳石 石筍 地平 水平 星 太陽 彗星 流星 極光 三日月 星屑 日食 月食 天頂 星明 衛星
-      星団 星座 軌道 重力 自転 公転 黒点 太陽風 光年 天体 恒星 天球 黄道 超新星 流星群 宇宙塵 満月 新月 半月 上弦 下弦 月光 北極星 星霜 星影 月影 日輪 月輪 土 泥
-      砂利 埃 空気 光 闇 化石 渦 泡 しぶき さざ波 海流 満潮 干潮 津波 雪崩 洪水 溶岩 地層 断層 ブラックホール 北斗七星 南十字星 明星 一番星 人工衛星 準惑星 赤色巨星
-      白色矮星 中性子星 クエーサー 銀河団 暗黒物質 宇宙線 連星 光速 コロナ 磁気嵐 宇宙ゴミ
+      氷 波 潮 砂 小石 地震 珊瑚 影 岩盤 間欠泉 噴気孔 鍾乳石 石筍 地平線 水平線 星 太陽 彗星 流星 オーロラ 三日月 星屑 日食 月食 天頂 衛星 星団 星座 軌道 重力 自転
+      公転 黒点 太陽風 光年 天体 恒星 天球 黄道 超新星 流星群 満月 新月 半月 上弦 下弦 北極星 土 泥 砂利 埃 空気 光 闇 化石 渦 泡 しぶき さざ波 海流 満潮 干潮 津波
+      雪崩 洪水 溶岩 地層 断層 ブラックホール 北斗七星 南十字星 明星 一番星 人工衛星 準惑星 赤色巨星 白色矮星 中性子星 クエーサー 銀河団 暗黒物質 宇宙線 連星 光速 コロナ
+      磁気嵐 宇宙ゴミ 噴火 山火事 地滑り 渦潮 パルサー ビッグバン フレア 火球 新星 変光星 重力波 星図 シリウス ベガ アルタイル デネブ ベテルギウス アンタレス スピカ リゲル
+      オリオン座 カシオペヤ座 昴 不動産 物件 間取り 屋根 壁 柱 窓 ドア 戸 天井 煙突 軒 雨戸 瓦 梁 塀 尖塔
     '''),
   },
   interjections: words(r'''

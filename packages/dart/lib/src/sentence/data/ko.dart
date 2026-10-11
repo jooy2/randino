@@ -1144,11 +1144,15 @@ final SentenceLanguageData ko = SentenceLanguageData(
         WordTheme.tool,
         WordTheme.clothing,
         WordTheme.product,
+        WordTheme.beauty,
         WordTheme.toy,
         WordTheme.furniture,
         WordTheme.gem,
         WordTheme.plant,
         WordTheme.food,
+        WordTheme.ingredient,
+        WordTheme.vegetable,
+        WordTheme.fruit,
         WordTheme.drink,
       ],
       words: words(r'''
@@ -1277,11 +1281,15 @@ final SentenceLanguageData ko = SentenceLanguageData(
         WordTheme.tool,
         WordTheme.clothing,
         WordTheme.product,
+        WordTheme.beauty,
         WordTheme.toy,
         WordTheme.furniture,
         WordTheme.gem,
         WordTheme.plant,
         WordTheme.food,
+        WordTheme.ingredient,
+        WordTheme.vegetable,
+        WordTheme.fruit,
         WordTheme.drink,
       ],
       words: words(r'찾는다 발견한다 줍는다 찾아낸다 건진다 집어든다 알아본다 캐낸다 손에넣는다 주워든다 되찾는다 알아챈다 캔다 골라낸다 주워담는다'),
@@ -1334,11 +1342,15 @@ final SentenceLanguageData ko = SentenceLanguageData(
         WordTheme.tool,
         WordTheme.clothing,
         WordTheme.product,
+        WordTheme.beauty,
         WordTheme.toy,
         WordTheme.furniture,
         WordTheme.gem,
         WordTheme.plant,
         WordTheme.food,
+        WordTheme.ingredient,
+        WordTheme.vegetable,
+        WordTheme.fruit,
         WordTheme.drink,
       ],
       words: words(r'''
@@ -1401,11 +1413,15 @@ final SentenceLanguageData ko = SentenceLanguageData(
         WordTheme.tool,
         WordTheme.clothing,
         WordTheme.product,
+        WordTheme.beauty,
         WordTheme.toy,
         WordTheme.furniture,
         WordTheme.gem,
         WordTheme.plant,
         WordTheme.food,
+        WordTheme.ingredient,
+        WordTheme.vegetable,
+        WordTheme.fruit,
         WordTheme.drink,
       ],
       words: words(r'''
@@ -1465,11 +1481,15 @@ final SentenceLanguageData ko = SentenceLanguageData(
         WordTheme.tool,
         WordTheme.clothing,
         WordTheme.product,
+        WordTheme.beauty,
         WordTheme.toy,
         WordTheme.furniture,
         WordTheme.gem,
         WordTheme.plant,
         WordTheme.food,
+        WordTheme.ingredient,
+        WordTheme.vegetable,
+        WordTheme.fruit,
         WordTheme.drink,
       ],
       words: words(r'''
@@ -1536,11 +1556,15 @@ final SentenceLanguageData ko = SentenceLanguageData(
         WordTheme.tool,
         WordTheme.clothing,
         WordTheme.product,
+        WordTheme.beauty,
         WordTheme.toy,
         WordTheme.furniture,
         WordTheme.gem,
         WordTheme.plant,
         WordTheme.food,
+        WordTheme.ingredient,
+        WordTheme.vegetable,
+        WordTheme.fruit,
         WordTheme.drink,
       ],
       words: words(r'잃어버린다 떨어뜨린다 놓친다 잃는다 흘린다 빠뜨린다 두고온다 놓고온다 분실한다 떨군다 놓아버린다 흘려버린다'),
@@ -1807,6 +1831,7 @@ final SentenceLanguageData ko = SentenceLanguageData(
         WordTheme.tool,
         WordTheme.clothing,
         WordTheme.product,
+        WordTheme.beauty,
         WordTheme.toy,
         WordTheme.furniture,
         WordTheme.gem,
@@ -1866,11 +1891,15 @@ final SentenceLanguageData ko = SentenceLanguageData(
         WordTheme.tool,
         WordTheme.clothing,
         WordTheme.product,
+        WordTheme.beauty,
         WordTheme.toy,
         WordTheme.furniture,
         WordTheme.gem,
         WordTheme.vehicle,
         WordTheme.food,
+        WordTheme.ingredient,
+        WordTheme.vegetable,
+        WordTheme.fruit,
         WordTheme.drink,
       ],
       words: words(r'산다 사온다 구한다 장만한다 사들인다 구입한다 구매한다 주문한다 골라산다 값을치른다 마련한다 사가지고온다 흥정한다 사둔다 사모은다'),
@@ -1919,7 +1948,7 @@ final SentenceLanguageData ko = SentenceLanguageData(
       field: VerbField.cook,
       subject: const <NounClass>[NounClass.creature, NounClass.person],
       object: const <NounClass>[NounClass.edible],
-      objectThemes: const <WordTheme>[WordTheme.food],
+      objectThemes: const <WordTheme>[WordTheme.food, WordTheme.vegetable, WordTheme.ingredient],
       words: words(r'''
         굽는다 데운다 끓인다 요리한다 썬다 담는다 볶는다 삶는다 찐다 튀긴다 조리한다 익힌다 데친다 졸인다 다진다 버무린다 양념한다 간을맞춘다 차린다 젓는다 뒤집는다 푼다
         던다
@@ -1979,7 +2008,7 @@ final SentenceLanguageData ko = SentenceLanguageData(
       field: VerbField.eat,
       subject: const <NounClass>[NounClass.creature, NounClass.person],
       object: const <NounClass>[NounClass.edible],
-      objectThemes: const <WordTheme>[WordTheme.food],
+      objectThemes: const <WordTheme>[WordTheme.food, WordTheme.fruit, WordTheme.vegetable],
       words: words(r'''
         먹는다 씹는다 삼킨다 맛본다 베어먹는다 먹어치운다 먹어본다 깨문다 갉아먹는다 뜯어먹는다 집어먹는다 주워먹는다 우물거린다 오물거린다 핥는다 야금야금먹는다 허겁지겁먹는다
         꿀꺽삼킨다 해치운다 씹어삼킨다 비운다
@@ -2328,6 +2357,7 @@ final SentenceLanguageData ko = SentenceLanguageData(
         WordTheme.tool,
         WordTheme.clothing,
         WordTheme.product,
+        WordTheme.beauty,
         WordTheme.toy,
         WordTheme.furniture,
         WordTheme.gem,
@@ -2722,6 +2752,7 @@ final SentenceLanguageData ko = SentenceLanguageData(
     VerbGroup(
       field: VerbField.change,
       subject: const <NounClass>[NounClass.edible],
+      subjectThemes: const <WordTheme>[WordTheme.food, WordTheme.drink],
       words: words(r'''
         식는다 끓는다 상한다 남는다 데워진다 따뜻해진다 차가워진다 시원해진다 뜨거워진다 미지근해진다 김이난다 향을풍긴다 냄새를풍긴다 줄어든다 바닥난다 동난다 남아돈다
         차려진다 나온다
@@ -2849,6 +2880,79 @@ final SentenceLanguageData ko = SentenceLanguageData(
       },
       past: conjugate(
         r'넘쳤 쏟아졌 흘러넘쳤 김이올랐 거품이일었 출렁였 찰랑였 얼었 식어갔',
+        statement: '다',
+        endings: _pastEndings,
+      ),
+    ),
+    VerbGroup(
+      field: VerbField.change,
+      subject: const <NounClass>[NounClass.edible],
+      subjectThemes: const <WordTheme>[WordTheme.fruit, WordTheme.vegetable],
+      words: words(r'익는다 상한다 썩는다 시든다 무른다 마른다 쭈글쭈글해진다 멍든다 남는다 변한다'),
+      forms: <PredicateForm, WordPool>{
+        PredicateForm.question: words(r'''
+          익니|익나|익는가 상하니|상하나|상하는가 썩니|썩나|썩는가 시드니|시드나|시드는가 무르니|무르나|무르는가 마르니|마르나|마르는가
+          쭈글쭈글해지니|쭈글쭈글해지나|쭈글쭈글해지는가 멍드니|멍드나|멍드는가 남니|남나|남는가 변하니|변하나|변하는가
+        '''),
+        PredicateForm.exclamation: words(r'''
+          익는구나|익네|익는군 상하는구나|상하네|상하는군 썩는구나|썩네|썩는군 시드는구나|시드네|시드는군 무르는구나|무르네|무르는군 마르는구나|마르네|마르는군
+          쭈글쭈글해지는구나|쭈글쭈글해지네|쭈글쭈글해지는군 멍드는구나|멍드네|멍드는군 남는구나|남네|남는군 변하는구나|변하네|변하는군
+        '''),
+        PredicateForm.casual: words(r'익어 상해 썩어 시들어 물러 말라 쭈글쭈글해져 멍들어 남아 변해'),
+        PredicateForm.casualQuestion: words(r'''
+          익어|익지 상해|상하지 썩어|썩지 시들어|시들지 물러|무르지 말라|마르지 쭈글쭈글해져|쭈글쭈글해지지 멍들어|멍들지 남아|남지 변해|변하지
+        '''),
+        PredicateForm.polite: words(r'익어요 상해요 썩어요 시들어요 물러요 말라요 쭈글쭈글해져요 멍들어요 남아요 변해요'),
+        PredicateForm.politeQuestion: words(r'''
+          익어요|익죠 상해요|상하죠 썩어요|썩죠 시들어요|시들죠 물러요|무르죠 말라요|마르죠 쭈글쭈글해져요|쭈글쭈글해지죠 멍들어요|멍들죠 남아요|남죠 변해요|변하죠
+        '''),
+        PredicateForm.formal: words(r'익습니다 상합니다 썩습니다 시듭니다 무릅니다 마릅니다 쭈글쭈글해집니다 멍듭니다 남습니다 변합니다'),
+        PredicateForm.formalQuestion: words(
+          r'익습니까 상합니까 썩습니까 시듭니까 무릅니까 마릅니까 쭈글쭈글해집니까 멍듭니까 남습니까 변합니까',
+        ),
+        PredicateForm.linking: words(r'익고 상하고 썩고 시들고 무르고 마르고 쭈글쭈글해지고 멍들고 남고 변하고'),
+      },
+      past: conjugate(
+        r'익었 상했 썩었 시들었 물렀 말랐 쭈글쭈글해졌 멍들었 남았 변했',
+        statement: '다',
+        endings: _pastEndings,
+      ),
+    ),
+    VerbGroup(
+      field: VerbField.change,
+      subject: const <NounClass>[NounClass.edible],
+      subjectThemes: const <WordTheme>[WordTheme.ingredient],
+      words: words(r'상한다 변한다 녹는다 굳는다 마른다 눅눅해진다 딱딱해진다 숙성된다 바닥난다 동난다 남는다 줄어든다'),
+      forms: <PredicateForm, WordPool>{
+        PredicateForm.question: words(r'''
+          상하니|상하나|상하는가 변하니|변하나|변하는가 녹니|녹나|녹는가 굳니|굳나|굳는가 마르니|마르나|마르는가 눅눅해지니|눅눅해지나|눅눅해지는가
+          딱딱해지니|딱딱해지나|딱딱해지는가 숙성되니|숙성되나|숙성되는가 바닥나니|바닥나나|바닥나는가 동나니|동나나|동나는가 남니|남나|남는가 줄어드니|줄어드나|줄어드는가
+        '''),
+        PredicateForm.exclamation: words(r'''
+          상하는구나|상하네|상하는군 변하는구나|변하네|변하는군 녹는구나|녹네|녹는군 굳는구나|굳네|굳는군 마르는구나|마르네|마르는군 눅눅해지는구나|눅눅해지네|눅눅해지는군
+          딱딱해지는구나|딱딱해지네|딱딱해지는군 숙성되는구나|숙성되네|숙성되는군 바닥나는구나|바닥나네|바닥나는군 동나는구나|동나네|동나는군 남는구나|남네|남는군
+          줄어드는구나|줄어드네|줄어드는군
+        '''),
+        PredicateForm.casual: words(r'상해 변해 녹아 굳어 말라 눅눅해져 딱딱해져 숙성돼 바닥나 동나 남아 줄어들어'),
+        PredicateForm.casualQuestion: words(r'''
+          상해|상하지 변해|변하지 녹아|녹지 굳어|굳지 말라|마르지 눅눅해져|눅눅해지지 딱딱해져|딱딱해지지 숙성돼|숙성되지 바닥나|바닥나지 동나|동나지 남아|남지
+          줄어들어|줄어들지
+        '''),
+        PredicateForm.polite: words(r'상해요 변해요 녹아요 굳어요 말라요 눅눅해져요 딱딱해져요 숙성돼요 바닥나요 동나요 남아요 줄어들어요'),
+        PredicateForm.politeQuestion: words(r'''
+          상해요|상하죠 변해요|변하죠 녹아요|녹죠 굳어요|굳죠 말라요|마르죠 눅눅해져요|눅눅해지죠 딱딱해져요|딱딱해지죠 숙성돼요|숙성되죠 바닥나요|바닥나죠 동나요|동나죠
+          남아요|남죠 줄어들어요|줄어들죠
+        '''),
+        PredicateForm.formal: words(
+          r'상합니다 변합니다 녹습니다 굳습니다 마릅니다 눅눅해집니다 딱딱해집니다 숙성됩니다 바닥납니다 동납니다 남습니다 줄어듭니다',
+        ),
+        PredicateForm.formalQuestion: words(
+          r'상합니까 변합니까 녹습니까 굳습니까 마릅니까 눅눅해집니까 딱딱해집니까 숙성됩니까 바닥납니까 동납니까 남습니까 줄어듭니까',
+        ),
+        PredicateForm.linking: words(r'상하고 변하고 녹고 굳고 마르고 눅눅해지고 딱딱해지고 숙성되고 바닥나고 동나고 남고 줄어들고'),
+      },
+      past: conjugate(
+        r'상했 변했 녹았 굳었 말랐 눅눅해졌 딱딱해졌 숙성됐 바닥났 동났 남았 줄어들었',
         statement: '다',
         endings: _pastEndings,
       ),
@@ -3213,6 +3317,7 @@ final SentenceLanguageData ko = SentenceLanguageData(
         WordTheme.tool,
         WordTheme.clothing,
         WordTheme.product,
+        WordTheme.beauty,
         WordTheme.toy,
         WordTheme.furniture,
         WordTheme.gem,
@@ -3300,6 +3405,7 @@ final SentenceLanguageData ko = SentenceLanguageData(
     ),
     StateGroup(
       subject: const <NounClass>[NounClass.edible],
+      subjectThemes: const <WordTheme>[WordTheme.food, WordTheme.drink],
       words: words(r'달다 시다 뜨겁다 차갑다 미지근하다 진하다 연하다 시원하다 향긋하다'),
       forms: <PredicateForm, WordPool>{
         PredicateForm.question: words(r'''
@@ -3354,6 +3460,81 @@ final SentenceLanguageData ko = SentenceLanguageData(
       },
       past: conjugate(
         r'짰 매웠 고소했 담백했 짭짤했 매콤했 쫄깃했 바삭했 부드러웠 느끼했 싱거웠',
+        statement: '다',
+        endings: _pastEndings,
+      ),
+    ),
+    StateGroup(
+      subject: const <NounClass>[NounClass.edible],
+      subjectThemes: const <WordTheme>[WordTheme.fruit, WordTheme.vegetable],
+      words: words(r'달다 시다 싱싱하다 신선하다 아삭하다 단단하다 무르다 쓰다 새콤하다 상큼하다 탐스럽다 먹음직스럽다 큼직하다 촉촉하다 푸르다'),
+      forms: <PredicateForm, WordPool>{
+        PredicateForm.question: words(r'''
+          다니|단가 시니|신가 싱싱하니|싱싱한가 신선하니|신선한가 아삭하니|아삭한가 단단하니|단단한가 무르니|무른가 쓰니|쓴가 새콤하니|새콤한가 상큼하니|상큼한가
+          탐스럽니|탐스러운가 먹음직스럽니|먹음직스러운가 큼직하니|큼직한가 촉촉하니|촉촉한가 푸르니|푸른가
+        '''),
+        PredicateForm.exclamation: words(r'''
+          달구나|다네|달군 시구나|시네|시군 싱싱하구나|싱싱하네|싱싱하군 신선하구나|신선하네|신선하군 아삭하구나|아삭하네|아삭하군 단단하구나|단단하네|단단하군
+          무르구나|무르네|무르군 쓰구나|쓰네|쓰군 새콤하구나|새콤하네|새콤하군 상큼하구나|상큼하네|상큼하군 탐스럽구나|탐스럽네|탐스럽군
+          먹음직스럽구나|먹음직스럽네|먹음직스럽군 큼직하구나|큼직하네|큼직하군 촉촉하구나|촉촉하네|촉촉하군 푸르구나|푸르네|푸르군
+        '''),
+        PredicateForm.casual: words(r'달아 셔 싱싱해 신선해 아삭해 단단해 물러 써 새콤해 상큼해 탐스러워 먹음직스러워 큼직해 촉촉해 푸르러'),
+        PredicateForm.casualQuestion: words(r'''
+          달아|달지 셔|시지 싱싱해|싱싱하지 신선해|신선하지 아삭해|아삭하지 단단해|단단하지 물러|무르지 써|쓰지 새콤해|새콤하지 상큼해|상큼하지 탐스러워|탐스럽지
+          먹음직스러워|먹음직스럽지 큼직해|큼직하지 촉촉해|촉촉하지 푸르러|푸르지
+        '''),
+        PredicateForm.polite: words(r'''
+          달아요 셔요 싱싱해요 신선해요 아삭해요 단단해요 물러요 써요 새콤해요 상큼해요 탐스러워요 먹음직스러워요 큼직해요 촉촉해요 푸르러요
+        '''),
+        PredicateForm.politeQuestion: words(r'''
+          달아요|달죠 셔요|시죠 싱싱해요|싱싱하죠 신선해요|신선하죠 아삭해요|아삭하죠 단단해요|단단하죠 물러요|무르죠 써요|쓰죠 새콤해요|새콤하죠 상큼해요|상큼하죠
+          탐스러워요|탐스럽죠 먹음직스러워요|먹음직스럽죠 큼직해요|큼직하죠 촉촉해요|촉촉하죠 푸르러요|푸르죠
+        '''),
+        PredicateForm.formal: words(r'''
+          답니다 십니다 싱싱합니다 신선합니다 아삭합니다 단단합니다 무릅니다 씁니다 새콤합니다 상큼합니다 탐스럽습니다 먹음직스럽습니다 큼직합니다 촉촉합니다 푸릅니다
+        '''),
+        PredicateForm.formalQuestion: words(r'''
+          답니까 십니까 싱싱합니까 신선합니까 아삭합니까 단단합니까 무릅니까 씁니까 새콤합니까 상큼합니까 탐스럽습니까 먹음직스럽습니까 큼직합니까 촉촉합니까 푸릅니까
+        '''),
+      },
+      past: conjugate(
+        r'달았 셨 싱싱했 신선했 아삭했 단단했 물렀 썼 새콤했 상큼했 탐스러웠 먹음직스러웠 큼직했 촉촉했 푸르렀',
+        statement: '다',
+        endings: _pastEndings,
+      ),
+    ),
+    StateGroup(
+      subject: const <NounClass>[NounClass.edible],
+      subjectThemes: const <WordTheme>[WordTheme.ingredient],
+      words: words(r'짜다 달다 맵다 고소하다 신선하다 향긋하다 쓰다 알싸하다 곱다 굵다 눅눅하다 순하다 담백하다'),
+      forms: <PredicateForm, WordPool>{
+        PredicateForm.question: words(r'''
+          짜니|짠가 다니|단가 맵니|매운가 고소하니|고소한가 신선하니|신선한가 향긋하니|향긋한가 쓰니|쓴가 알싸하니|알싸한가 곱니|고운가 굵니|굵은가 눅눅하니|눅눅한가
+          순하니|순한가 담백하니|담백한가
+        '''),
+        PredicateForm.exclamation: words(r'''
+          짜구나|짜네|짜군 달구나|다네|달군 맵구나|맵네|맵군 고소하구나|고소하네|고소하군 신선하구나|신선하네|신선하군 향긋하구나|향긋하네|향긋하군 쓰구나|쓰네|쓰군
+          알싸하구나|알싸하네|알싸하군 곱구나|곱네|곱군 굵구나|굵네|굵군 눅눅하구나|눅눅하네|눅눅하군 순하구나|순하네|순하군 담백하구나|담백하네|담백하군
+        '''),
+        PredicateForm.casual: words(r'짜 달아 매워 고소해 신선해 향긋해 써 알싸해 고와 굵어 눅눅해 순해 담백해'),
+        PredicateForm.casualQuestion: words(r'''
+          짜|짜지 달아|달지 매워|맵지 고소해|고소하지 신선해|신선하지 향긋해|향긋하지 써|쓰지 알싸해|알싸하지 고와|곱지 굵어|굵지 눅눅해|눅눅하지 순해|순하지
+          담백해|담백하지
+        '''),
+        PredicateForm.polite: words(r'짜요 달아요 매워요 고소해요 신선해요 향긋해요 써요 알싸해요 고와요 굵어요 눅눅해요 순해요 담백해요'),
+        PredicateForm.politeQuestion: words(r'''
+          짜요|짜죠 달아요|달죠 매워요|맵죠 고소해요|고소하죠 신선해요|신선하죠 향긋해요|향긋하죠 써요|쓰죠 알싸해요|알싸하죠 고와요|곱죠 굵어요|굵죠 눅눅해요|눅눅하죠
+          순해요|순하죠 담백해요|담백하죠
+        '''),
+        PredicateForm.formal: words(
+          r'짭니다 답니다 맵습니다 고소합니다 신선합니다 향긋합니다 씁니다 알싸합니다 곱습니다 굵습니다 눅눅합니다 순합니다 담백합니다',
+        ),
+        PredicateForm.formalQuestion: words(
+          r'짭니까 답니까 맵습니까 고소합니까 신선합니까 향긋합니까 씁니까 알싸합니까 곱습니까 굵습니까 눅눅합니까 순합니까 담백합니까',
+        ),
+      },
+      past: conjugate(
+        r'짰 달았 매웠 고소했 신선했 향긋했 썼 알싸했 고왔 굵었 눅눅했 순했 담백했',
         statement: '다',
         endings: _pastEndings,
       ),
@@ -3535,6 +3716,18 @@ final SentenceLanguageData ko = SentenceLanguageData(
         달콤한 매콤한 따뜻한 신선한 바삭한 고소한 향긋한 뜨거운 짭짤한 말랑한 촉촉한 새콤한 먹음직한 담백한 부드러운 쫄깃한 폭신한 노릇한 진한 알싸한 시큼한 달달한 구수한
         큼직한 갓구운 잘익은 푸짐한 소박한 정갈한 따끈한 눅진한 바삭바삭한 말끔한
       '''),
+    ),
+    ModifierGroup(
+      subject: const <NounClass>[NounClass.edible],
+      themes: const <WordTheme>[WordTheme.fruit, WordTheme.vegetable],
+      words: words(r'''
+        신선한 싱싱한 탐스러운 큼직한 자그마한 향긋한 먹음직한 못생긴 갓딴 촉촉한 매끈한 알찬 통통한 무른 시든 빛깔좋은 윤기나는 묵직한 달큰한
+      '''),
+    ),
+    ModifierGroup(
+      subject: const <NounClass>[NounClass.edible],
+      themes: const <WordTheme>[WordTheme.ingredient],
+      words: words(r'신선한 귀한 묵은 질좋은 오래된 남은 비싼 값싼 넉넉한 아껴둔 흔한 소중한 향긋한 고소한 숙성된 진한'),
     ),
     ModifierGroup(
       subject: const <NounClass>[NounClass.edible],
@@ -3740,27 +3933,25 @@ final SentenceLanguageData ko = SentenceLanguageData(
   traits: <NounTrait, WordPool>{
     NounTrait.flier: words(r'''
       부엉이 올빼미 참새 까치 제비 독수리 매 학 백조 오리 기러기 딱따구리 앵무새 공작 나비 벌 잠자리 무당벌레 박쥐 갈매기 까마귀 비둘기 꾀꼬리 반딧불이 매미 하루살이
-      풍뎅이 사슴벌레 파리 모기 나방 용 봉황 마룡 비룡 흑룡 백룡 청룡 주작 삼족오 하피 드래곤 와이번 불사조 그리핀 페가수스 천마 천사 선녀 요정 정령 픽시 임프 가고일
-      발키리 거위
+      풍뎅이 사슴벌레 파리 모기 나방 용 봉황 비룡 청룡 주작 삼족오 하피 드래곤 와이번 불사조 그리핀 페가수스 천마 천사 선녀 요정 정령 픽시 임프 가고일 발키리 거위 새
+      말벌 하늘소 꿩 메추라기 펠리컨 홍학 황새 왜가리 물총새 뻐꾸기 종달새 벌새 솔개 콘도르 텐구 서큐버스 가루다 인면조 실프
     '''),
     NounTrait.swimmer: words(r'''
-      고래 돌고래 상어 거북 물개 펭귄 개구리 문어 오징어 해마 불가사리 새우 잉어 연어 고등어 올챙이 악어 붕어 메기 가물치 쏘가리 송사리 미꾸라지 장어 뱀장어 갈치 삼치
-      꽁치 멸치 조기 명태 대구 광어 도미 우럭 볼락 방어 참치 가오리 홍어 복어 인어 세이렌 크라켄 물귀신 나이아드 금붕어 해파리
+      고래 돌고래 상어 거북 물개 펭귄 개구리 문어 오징어 해마 불가사리 새우 잉어 연어 고등어 올챙이 악어 붕어 메기 가물치 쏘가리 송사리 미꾸라지 장어 갈치 삼치 꽁치
+      멸치 조기 명태 대구 광어 도미 우럭 볼락 방어 참치 가오리 홍어 복어 인어 세이렌 크라켄 물귀신 나이아드 금붕어 해파리 물고기 범고래 바다표범 바다사자 해달 듀공 낙지
+      주꾸미 자라 아귀 정어리 청어 송어 숭어 농어 민어 가자미 전갱이 날치 피라미 은어 빙어 구피 물방개 갓파 켈피 셀키 운디네 레비아탄
     '''),
     NounTrait.crawler: words(r'''
       거북 도마뱀 카멜레온 뱀 달팽이 개미 거미 소라 게 지렁이 지네 노래기 전갈 진드기 벼룩 누에 번데기 애벌레 도롱뇽 사마귀 악어 구렁이 살모사 독사 코브라 방울뱀 비단뱀
-      이구아나 바퀴벌레
-    '''),
-    NounTrait.lifeless: words(r'''
-      마법 마력 주문 저주 예언 신탁 결계 성배 마검 부적 룬 봉인 환영 마술 도술 술법 마법진 명계 장승 호신부 호부 룬문자 인장술 문양술 저주술 축복술 징조 전조 예언서
-      신화집 전설집 물약 불로초 여의주 천국 지옥 용궁
+      이구아나 바퀴벌레 벌레 조개 전복 홍합 바지락 꼬막 성게 해삼 멍게 말미잘 가재 랍스터 자라 진딧물 빈대 거머리 민달팽이 삼엽충 슬라임 이무기
     '''),
     NounTrait.placeless: words(r'''
-      얼음 파도 물결 모래 조약돌 지진 밀물 썰물 그림자 메아리 향기 불꽃 잿불 산호 물보라 빙퇴석 너덜 바윗돌 암반 간헐천 분기공 종유석 석순 해일 지평 수평 별 태양
-      별자리 유성 오로라 초승달 보름달 별똥별 일식 월식 코로나 극광 별무리 천정 위성 혜성 성단 북극성 샛별 궤도 중력 자전 공전 흑점 태양풍 광년 천체 성간 항성 성좌
-      천구 황도 초신성 유성우 우주먼지 그믐달 반달 하현달 상현달 만월 신월 월광 성광 흙 돌 불 공기 물방울 거품 진흙 자갈 먼지 연기 빛 어둠 재 화석 눈사태 산사태 홍수
-      용암 마그마 지층 해류 소용돌이 물살 급류 지하수 우주인 외계인 인공위성 북두칠성 남십자성 견우성 직녀성 백색왜성 적색거성 중성자별 펄서 퀘이사 웜홀 암흑물질 빅뱅
-      슈퍼문 광속 천문단위 파섹 쌍성 변광성 적색편이 자기장 플레어 자전축 우주여행 유성체 월령
+      얼음 파도 물결 모래 조약돌 지진 밀물 썰물 그림자 메아리 향기 불꽃 잿불 산호 물보라 빙퇴석 너덜 암반 간헐천 분기공 종유석 석순 해일 수평선 지형 암석 지각 맨틀
+      물줄기 별 태양 별자리 유성 오로라 초승달 보름달 별똥별 일식 월식 코로나 천정 위성 혜성 성단 북극성 샛별 궤도 중력 자전 공전 흑점 태양풍 광년 천체 성간 항성 천구
+      황도 초신성 유성우 우주먼지 그믐달 반달 하현달 상현달 흙 돌 불 공기 물방울 거품 진흙 자갈 먼지 연기 빛 어둠 재 화석 눈사태 산사태 홍수 용암 마그마 지층 해류
+      소용돌이 물살 급류 지하수 인공위성 북두칠성 남십자성 견우성 직녀성 백색왜성 적색거성 중성자별 펄서 퀘이사 웜홀 암흑물질 빅뱅 슈퍼문 광속 천문단위 파섹 쌍성 변광성
+      적색편이 자기장 플레어 자전축 우주여행 유성체 월령 갈색왜성 중력파 홍염 시리우스 리겔 안타레스 카노푸스 알데바란 스피카 데네브 레굴루스 폴룩스 프로키온 묘성 오리온
+      큰곰자리 백조자리 양자리 황소자리 게자리 사자자리 처녀자리 천칭자리 전갈자리 사수자리 염소자리 물병자리 매물 기와 기둥 벽 굴뚝 창문 처마
     '''),
   },
   interjections: words(r'''

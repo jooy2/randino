@@ -1,13 +1,15 @@
 import 'dart:math';
 
 import 'package:randino/src/types.dart';
+import 'package:randino/src/word/rand_building.dart';
 import 'package:randino/src/word/rand_word.dart';
 
-/// Places — where people gather, live and pass through.
+/// Places — where people gather, live and pass through, short of a building:
+/// streets, squares, parks, harbours and towns. Buildings are [randBuilding].
 ///
 /// [randWord] with the theme already chosen; every other parameter is the same.
 /// For the detail form, pass [WordTheme.place] to `randWordDetails` — Dart has
-/// no overloads, and twenty-four more functions for it would be twenty-four too many.
+/// no overloads, and a second function per theme would be a second wall of them.
 ///
 /// ```dart
 /// randPlace(language: WordLanguage.ko, count: 3); // [시장, 광장, 마을]

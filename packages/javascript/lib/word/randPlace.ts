@@ -2,7 +2,8 @@ import type { RandThemedWordOptions, WordDetail } from '../_types/global.js';
 import { themedWord } from './wordGenerator.js';
 
 /**
- * Places — where people gather, live and pass through.
+ * Places — where people gather, live and pass through, short of a building:
+ * streets, squares, parks, harbours and towns. Buildings are `randBuilding`.
  *
  * `randWord({ theme: 'place' })` with the theme already chosen; every other
  * option is the same.

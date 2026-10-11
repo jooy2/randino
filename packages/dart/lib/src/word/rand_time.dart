@@ -10,7 +10,7 @@ import 'package:randino/src/word/rand_word.dart';
 /// no overloads, and a second function per theme would be a second wall of them.
 ///
 /// ```dart
-/// randTime(language: WordLanguage.ko, count: 3); // [새벽, 한여름, 찰나]
+/// randTime(language: WordLanguage.ko, count: 3); // [새벽, 정오, 찰나]
 /// randTime(language: WordLanguage.en, count: 3); // [Twilight, Solstice, Eternity]
 /// ```
 List<String> randTime({

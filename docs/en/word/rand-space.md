@@ -1,6 +1,6 @@
 # randSpace
 
-What is beyond the sky, from the moon to a galaxy.
+What is beyond the sky, from the moon to a galaxy. Planets by name are [`randPlanet`](./rand-planet).
 
 [`randWord`](./rand-word) with `theme` fixed to <Lang js="'space'" dart="WordTheme.space" py="&quot;space&quot;" code />; every other option is the same one, and means the same thing.
 
@@ -24,7 +24,7 @@ import 'package:randino/randino.dart';
 randSpace(language: WordLanguage.en, count: 3); // [Galaxy, Comet, Nebula]
 ```
 
-Returns `List<String>`. For the detail form, pass `WordTheme.space` to `randWordDetails`. Dart has no overloads, and a detail twin for each of the twenty-nine themes would be twenty-nine functions too many.
+Returns `List<String>`. For the detail form, pass `WordTheme.space` to `randWordDetails`. Dart has no overloads, and a detail twin beside every themed function would be one function too many for each theme.
 
 :::
 
@@ -47,4 +47,4 @@ rand_space(language="en", output="detail")
 ## See also
 
 - [`randWord`](./rand-word) — the same generator with `theme` open, and what each option does in full.
-- [Themes](./themes) — the other twenty-four, and the words each one holds.
+- [Themes](./themes) — every other theme, and the words each one holds.

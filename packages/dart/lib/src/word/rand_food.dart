@@ -1,17 +1,20 @@
 import 'dart:math';
 
 import 'package:randino/src/types.dart';
+import 'package:randino/src/word/rand_ingredient.dart';
 import 'package:randino/src/word/rand_word.dart';
 
-/// Food and drink, the everyday kind.
+/// Prepared food: dishes, soups, noodles, bread, desserts and snacks — what is
+/// eaten as it is served. What it is cooked from is [randIngredient], and
+/// vegetables and fruit have their own.
 ///
 /// [randWord] with the theme already chosen; every other parameter is the same.
 /// For the detail form, pass [WordTheme.food] to `randWordDetails` — Dart has
-/// no overloads, and twenty-four more functions for it would be twenty-four too many.
+/// no overloads, and a second function per theme would be a second wall of them.
 ///
 /// ```dart
 /// randFood(language: WordLanguage.ko, count: 3); // [밥, 떡볶이, 빵]
-/// randFood(language: WordLanguage.en, count: 3); // [Rice, Noodle, Dumpling]
+/// randFood(language: WordLanguage.en, count: 3); // [Pizza, Noodle, Dumpling]
 /// ```
 List<String> randFood({
   WordLanguage? language,

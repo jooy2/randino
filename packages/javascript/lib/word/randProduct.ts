@@ -2,7 +2,8 @@ import type { RandThemedWordOptions, WordDetail } from '../_types/global.js';
 import { themedWord } from './wordGenerator.js';
 
 /**
- * Things you buy — the manufactured end of the vocabulary.
+ * Things you buy — the manufactured end of the vocabulary. Make-up, skin and
+ * hair care are `randBeauty`.
  *
  * `randWord({ theme: 'product' })` with the theme already chosen; every other
  * option is the same.

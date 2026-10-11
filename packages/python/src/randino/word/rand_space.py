@@ -1,4 +1,4 @@
-"""What is beyond the sky, from the moon to a galaxy."""
+"""What is beyond the sky, from the moon to a galaxy, short of a planet's name."""
 
 from collections.abc import Callable
 from typing import Literal, overload
@@ -58,7 +58,7 @@ def rand_space(
     random: Callable[[], float] | None = None,
     output: str = "value",
 ) -> list[str] | list[WordDetail]:
-    """What is beyond the sky, from the moon to a galaxy.
+    """What is beyond the sky, from the moon to a galaxy, short of a planet's name.
 
     `rand_word(theme="space")` with the theme already chosen; every other argument
     is the same.

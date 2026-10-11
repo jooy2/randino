@@ -2,7 +2,8 @@ import type { RandThemedWordOptions, WordDetail } from '../_types/global.js';
 import { themedWord } from './wordGenerator.js';
 
 /**
- * What is beyond the sky, from the moon to a galaxy.
+ * What is beyond the sky, from the moon to a galaxy. Planets by name are
+ * `randPlanet`.
  *
  * `randWord({ theme: 'space' })` with the theme already chosen; every other
  * option is the same.

@@ -383,6 +383,7 @@ DE = SentenceLanguageData(
                 "tool",
                 "clothing",
                 "product",
+                "beauty",
                 "toy",
                 "furniture",
                 "gem",
@@ -500,6 +501,7 @@ DE = SentenceLanguageData(
         VerbGroup(
             field="change",
             subject=("edible",),
+            subject_themes=("food", "drink"),
             words=words("""
                 reift kühlt kocht schmilzt verdirbt erkaltet dampft riecht schmeckt gerinnt
                 verdunstet gefriert verdickt_sich klärt_sich köchelt siedet zischt
@@ -508,6 +510,34 @@ DE = SentenceLanguageData(
                 words=words("""
                     reifte kühlte kochte schmolz verdarb erkaltete dampfte roch schmeckte gerann
                     verdunstete gefror verdickte_sich klärte_sich köchelte siedete zischte
+                """),
+            ),
+        ),
+        VerbGroup(
+            field="change",
+            subject=("edible",),
+            subject_themes=("fruit", "vegetable"),
+            words=words("""
+                reift verdirbt fault welkt verschrumpelt vertrocknet schimmelt lagert liegt
+                verfärbt_sich
+            """),
+            past=PredicateTense(
+                words=words("""
+                    reifte verdarb faulte welkte verschrumpelte vertrocknete schimmelte lagerte lag
+                    verfärbte_sich
+                """),
+            ),
+        ),
+        VerbGroup(
+            field="change",
+            subject=("edible",),
+            subject_themes=("ingredient",),
+            words=words("""
+                verdirbt verfällt lagert reicht bleibt schwindet riecht trocknet erwärmt_sich
+            """),
+            past=PredicateTense(
+                words=words("""
+                    verdarb verfiel lagerte reichte blieb schwand roch trocknete erwärmte_sich
                 """),
             ),
         ),
@@ -615,9 +645,25 @@ DE = SentenceLanguageData(
         ),
         StateGroup(
             subject=("edible",),
+            subject_themes=("food", "drink"),
             words=words("""
                 süß salzig scharf sauer heiß kalt herzhaft bitter dickflüssig weich lauwarm saftig
                 knusprig lecker fade
+            """),
+        ),
+        StateGroup(
+            subject=("edible",),
+            subject_themes=("fruit", "vegetable"),
+            words=words("""
+                süß sauer reif unreif frisch saftig knackig fest weich mild bitter herb grün zart
+                lecker
+            """),
+        ),
+        StateGroup(
+            subject=("edible",),
+            subject_themes=("ingredient",),
+            words=words("""
+                salzig süß frisch scharf trocken mild bitter würzig aromatisch kräftig cremig fettig
             """),
         ),
         StateGroup(
@@ -666,6 +712,22 @@ DE = SentenceLanguageData(
                 süß scharf warm frisch knusprig würzig duftend heiß salzig weich reif lecker
                 goldbraun geräuchert sahnig zart saftig deftig dampfend geröstet klebrig fade
                 gewürzt
+            """),
+        ),
+        ModifierGroup(
+            subject=("edible",),
+            themes=("fruit", "vegetable"),
+            words=words("""
+                frisch reif unreif süß saftig knackig fest weich grün klein groß zart glänzend
+                aromatisch heimisch regional faul
+            """),
+        ),
+        ModifierGroup(
+            subject=("edible",),
+            themes=("ingredient",),
+            words=words("""
+                frisch rein hochwertig billig hausgemacht regional edel salzig süß scharf mild
+                würzig aromatisch kräftig fein roh geräuchert gereift getrocknet cremig
             """),
         ),
         ModifierGroup(
@@ -805,25 +867,23 @@ DE = SentenceLanguageData(
             Biene Libelle Zikade Fliege Mücke Fledermaus Reiher Pelikan Drache Phönix Fee Greif
             Pegasus Engel Walküre Amsel Nachtigall Lerche Wachtel Fasan Rebhuhn Kolibri Tukan
             Flamingo Storch Wiedehopf Distelfink Elster Häher Kauz Bussard Möwe Specht Zaunkönig
-            Wespe Motte Leuchtkäfer Hummel Marienkäfer Hippogreif Krähe Schmetterling
+            Wespe Motte Glühwürmchen Hummel Marienkäfer Hippogreif Krähe Schmetterling Geier Uhu
+            Habicht Rotkehlchen Meise Kuckuck Kormoran Albatros Wellensittich Kanarienvogel Kakadu
+            Harpyie Cherub Seraph Wyvern Gargoyle Feuervogel Mantikor Sylphe
         """),
         "swimmer": words("""
             Krokodil Schildkröte Frosch Kröte Fisch Wal Delfin Hai Krake Tintenfisch Garnele Krabbe
             Walross Robbe Pinguin Meerjungfrau Najade Aal Sardine Thunfisch Dorsch Seehecht Forelle
             Karpfen Rochen Qualle Muschel Auster Hummer Seestern Salamander Molch Biber Nilpferd
-            Schnabeltier Meerforelle Hering Hecht Wassermann Seeschlange Sirene
+            Schnabeltier Hering Hecht Wassermann Seeschlange Lachs Barsch Zander Wels Makrele
+            Scholle Goldfisch Seepferdchen Schwertfisch Piranha Orca Seelöwe Seehund Narwal Krebs
+            Axolotl Alligator Otter Nixe Undine Leviathan
         """),
         "crawler": words("""
             Krokodil Schlange Eidechse Schildkröte Schnecke Ameise Spinne Wurm Krabbe Basilisk
             Leguan Chamäleon Salamander Molch Boa Viper Kobra Python Käfer Heuschrecke Grille Floh
-            Raupe Tausendfüßer Skorpion
-        """),
-        "lifeless": words("""
-            Zauber Fluch Weissagung Amulett Talisman Rune Pforte Heiligtum Götze Totem Vorzeichen
-            Omen Bestiarium Zauberbuch Pentagramm Reliquie Kelch Gral Zauberstab Stab Zepter Krone
-            Beschwörung Zauberspruch Zaubertrank Elixier Kristallkugel Bann Segen Alraune Hölle
-            Paradies Unterwelt Jenseits Tarnkappe Schriftrolle Wunder Altar Verwandlung Horoskop
-            Tarot Wünschelrute Geisterschiff Spuk Jungbrunnen
+            Raupe Tausendfüßer Skorpion Gecko Waran Alligator Natter Blindschleiche Nacktschnecke
+            Kakerlake Termite Zecke Laus Wanze Assel Egel Krebs Lindwurm Tatzelwurm
         """),
     },
     interjections=words("""

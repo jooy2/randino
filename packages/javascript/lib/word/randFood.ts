@@ -2,14 +2,16 @@ import type { RandThemedWordOptions, WordDetail } from '../_types/global.js';
 import { themedWord } from './wordGenerator.js';
 
 /**
- * Food and drink, the everyday kind.
+ * Prepared food: dishes, soups, noodles, bread, desserts and snacks — what is
+ * eaten as it is served. What it is cooked from is `randIngredient`, and
+ * vegetables and fruit have their own.
  *
  * `randWord({ theme: 'food' })` with the theme already chosen; every other
  * option is the same.
  *
  * @example
  * randFood({ language: 'ko', count: 3 }); // ['밥', '떡볶이', '빵']
- * randFood({ language: 'en', count: 3 }); // ['Rice', 'Noodle', 'Dumpling']
+ * randFood({ language: 'en', count: 3 }); // ['Pizza', 'Noodle', 'Dumpling']
  */
 export function randFood(options?: RandThemedWordOptions & { output?: 'value' }): string[];
 /**

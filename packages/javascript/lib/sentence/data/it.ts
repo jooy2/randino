@@ -389,7 +389,7 @@ export const IT: SentenceLanguageData = {
 			field: 'cook',
 			subject: ['creature', 'person'],
 			object: ['edible'],
-			objectThemes: ['food'],
+			objectThemes: ['food', 'vegetable'],
 			...tensed(
 				`cuoce scalda cucina taglia arrostisce serve frigge bolle lessa salta_in_padella condisce insaporisce sala mescola rimesta sbatte stufa brasa tosta gratina sbuccia trita affetta grattugia riscalda prepara impiatta marina griglia inforna spezzetta pela`,
 				`cosse scaldò cucinò tagliò arrostì servì frisse bollì lessò saltò_in_padella condì insaporì salò mescolò rimestò sbatté stufò brasò tostò gratinò sbucciò tritò affettò grattugiò riscaldò preparò impiattò marinò grigliò infornò spezzettò pelò`
@@ -399,7 +399,7 @@ export const IT: SentenceLanguageData = {
 			field: 'eat',
 			subject: ['creature', 'person'],
 			object: ['edible'],
-			objectThemes: ['food'],
+			objectThemes: ['food', 'fruit', 'vegetable'],
 			...tensed(
 				`mangia mastica assaggia rosicchia divora gusta degusta inghiotte ingoia trangugia morde rode lecca sbocconcella dà_un_morso_a si_mangia finisce si_pappa spazzola ingurgita pilucca si_gode fa_fuori consuma`,
 				`mangiò masticò assaggiò rosicchiò divorò gustò degustò inghiottì ingoiò trangugiò morse rose leccò sbocconcellò diede_un_morso_a si_mangiò finì si_pappò spazzolò ingurgitò piluccò si_godette fece_fuori consumò`
@@ -470,6 +470,7 @@ export const IT: SentenceLanguageData = {
 				'tool',
 				'clothing',
 				'product',
+				'beauty',
 				'toy',
 				'furniture',
 				'gem',
@@ -535,6 +536,8 @@ export const IT: SentenceLanguageData = {
 		{
 			field: 'change',
 			subject: ['edible'],
+			// What a dish and a drink both do: they cool, boil, steam, spoil.
+			subjectThemes: ['food', 'drink'],
 			...tensed(
 				`matura si_raffredda bolle si_scioglie si_guasta si_scalda si_intiepidisce fuma emana_vapore profuma manda_un_buon_odore finisce si_esaurisce avanza resta si_riduce arriva_in_tavola viene_servito si_rapprende si_indurisce si_ammorbidisce marcisce va_a_male fermenta si_congela si_addensa si_schiarisce si_deposita riposa si_raffredda_del_tutto`,
 				`maturò si_raffreddò bollì si_sciolse si_guastò si_scaldò si_intiepidì fumò emanò_vapore profumò mandò_un_buon_odore finì si_esaurì avanzò restò si_ridusse arrivò_in_tavola venne_servito si_rapprese si_indurì si_ammorbidì marcì andò_a_male fermentò si_congelò si_addensò si_schiarì si_depositò riposò si_raffreddò_del_tutto`
@@ -558,6 +561,26 @@ export const IT: SentenceLanguageData = {
 			...tensed(
 				`frizza spumeggia fa_la_schiuma si_versa si_rovescia schizza sciaborda si_agita si_mescola si_intorbida si_schiarisce si_deposita perde_il_gas evapora trabocca gocciola cola si_annacqua si_concentra si_ghiaccia`,
 				`frizzò spumeggiò fece_la_schiuma si_versò si_rovesciò schizzò sciabordò si_agitò si_mescolò si_intorbidì si_schiarì si_depositò perse_il_gas evaporò traboccò gocciolò colò si_annacquò si_concentrò si_ghiacciò`
+			)
+		},
+		{
+			field: 'change',
+			subject: ['edible'],
+			// What fruit and vegetables do on the shelf: they ripen, wilt, bruise, rot.
+			subjectThemes: ['fruit', 'vegetable'],
+			...tensed(
+				`matura marcisce appassisce si_ammorbidisce si_secca si_ammacca va_a_male ammuffisce si_conserva si_raggrinzisce annerisce`,
+				`maturò marcì appassì si_ammorbidì si_seccò si_ammaccò andò_a_male ammuffì si_conservò si_raggrinzì annerì`
+			)
+		},
+		{
+			field: 'change',
+			subject: ['edible'],
+			// What an ingredient does in the cupboard: it melts, hardens, goes rancid, runs out.
+			subjectThemes: ['ingredient'],
+			...tensed(
+				`si_guasta si_scioglie si_indurisce si_ammorbidisce si_secca va_a_male si_esaurisce finisce si_conserva irrancidisce`,
+				`si_guastò si_sciolse si_indurì si_ammorbidì si_seccò andò_a_male si_esaurì finì si_conservò irrancidì`
 			)
 		}
 	],
@@ -631,9 +654,27 @@ export const IT: SentenceLanguageData = {
 			`)
 		},
 		{
+			// What a dish and a drink are: hot or cold, salty, spicy, tasteless.
 			subject: ['edible'],
+			subjectThemes: ['food', 'drink'],
 			words: words(
 				`dolce salato piccante aspro caldo freddo saporito amaro denso morbido tiepido succoso croccante gustoso insipido`
+			)
+		},
+		{
+			// What fruit and vegetables are: ripe or green, sweet, crisp or soft.
+			subject: ['edible'],
+			subjectThemes: ['fruit', 'vegetable'],
+			words: words(
+				`dolce maturo acerbo fresco succoso croccante sodo morbido tenero delicato saporito buono squisito`
+			)
+		},
+		{
+			// What an ingredient is: salty or sweet, fresh, fragrant, good.
+			subject: ['edible'],
+			subjectThemes: ['ingredient'],
+			words: words(
+				`salato dolce fresco delicato amaro profumato saporito aromatico intenso genuino buono squisito pregiato`
 			)
 		},
 		{
@@ -681,6 +722,24 @@ export const IT: SentenceLanguageData = {
 			words: words(`
 				dolce piccante tiepido fresco croccante saporito fragrante caldo salato morbido maturo gustoso
 				dorato affumicato cremoso tenero succoso sostanzioso fumante tostato appiccicoso insipido speziato
+			`)
+		},
+		{
+			// What fruit and vegetables are at the market: ripe or green, firm or soft.
+			subject: ['edible'],
+			themes: ['fruit', 'vegetable'],
+			words: words(`
+				fresco maturo acerbo dolce succoso croccante sodo tenero morbido verde selvatico piccolo
+				grosso profumato biologico nostrano buono squisito
+			`)
+		},
+		{
+			// What goes into a dish: fresh, fragrant, fine, home-made.
+			subject: ['edible'],
+			themes: ['ingredient'],
+			words: words(`
+				fresco dolce fine profumato saporito delicato aromatico genuino pregiato nostrano artigianale
+				biologico puro buono squisito ottimo costoso
 			`)
 		},
 		{
@@ -831,6 +890,9 @@ export const IT: SentenceLanguageData = {
 		merlo usignolo allodola quaglia fagiano pernice colibrì tucano fenicottero cicogna upupa
 		cardellino gazza ghiandaia civetta poiana vespa tarma lucciola ippogrifo
 		gabbiano coccinella cherubino viverna gargolla
+		picchio pettirosso cinciallegra fringuello canarino storno piccione avvoltoio condor albatro
+		cormorano sparviero gheppio nibbio barbagianni beccaccia cuculo rondone falena calabrone bombo
+		arcangelo serafino arpia silfide strige
 		`),
 		swimmer: words(`
 		coccodrillo tartaruga rana rospo pesce balena delfino squalo polpo calamaro gambero granchio
@@ -839,6 +901,10 @@ export const IT: SentenceLanguageData = {
 		anguilla sardina tonno merluzzo nasello trota salmone carpa razza medusa vongola cozza
 		ostrica aragosta totano salamandra tritone castoro ippopotamo ornitorinco
 		orca
+		seppia sogliola orata branzino acciuga sgombro pesce_spada luccio storione pesce_rosso piranha
+		barracuda murena cernia triglia aringa cavalluccio_marino scampo astice capodoglio narvalo beluga
+		lamantino otaria leone_marino alligatore caimano anaconda nutria
+		leviatano serpente_marino ondina nereide anguana rusalka
 		`),
 		crawler: words(`
 		coccodrillo serpente lucertola tartaruga lumaca formica ragno verme granchio
@@ -846,25 +912,43 @@ export const IT: SentenceLanguageData = {
 		iguana camaleonte salamandra tritone boa vipera cobra pitone scarabeo
 		cavalletta grillo pulce bruco millepiedi scorpione
 		scarafaggio dinosauro lamia
+		geco varano alligatore caimano anaconda crotalo lombrico sanguisuga tarantola zecca pidocchio
+		cimice termite mantide stella_marina paguro riccio_di_mare
+		slime anfisbena
 		`),
-		// A word of a creature theme that is no creature: it takes no verb and no state.
-		lifeless: words(`
-			incantesimo maledizione profezia amuleto talismano runa portale santuario idolo totem augurio presagio bestiario
-			sortilegio grimorio pentacolo reliquia calice graal bacchetta bastone scettro corona
-			paradiso inferno purgatorio olimpo aldilà limbo pozione elisir malocchio maleficio scongiuro magia
-			stregoneria alchimia calderone mandragola
+		// A name written bare and with its capital: `Marte`, never `il Marte`. `la Terra`,
+		// `la Stella Polare` and `l'Orsa Maggiore` take their article, so they are not here.
+		proper: words(`
+			Mercurio Venere Marte Giove Saturno Urano Nettuno Plutone Cerere Eris Haumea Makemake Sedna Quaoar
+			Gonggong Salacia Varuna Ixion Vesta Pallade Giunone Igea Psiche Eros Bennu Ryugu Itokawa Apophis
+			Arrokoth Theia Fetonte
+			Dimidium Spe Orbitar Fortitudo Ægir Amateru Dagon Meztli Smertrios Phobetor Tassili Madriu Yanyan
+			Tondra Eburonia Yvaga Mastika Bendida Nakanbé Awasis Wangshu Pipitea Asye Veles Boinayel Eyeke
+			Cayahuanca Hämarik Abol Bélisama Mintome Toge Santamasa Noifasui Chura Buru Staburags Baiduri Cuptor
+			Xólotl Hairu Laligurans Kereru Albmi Perwana Pollera Viculus Samagiya Ramajay Khomsa Barajeel
+			Cruinlagh Ibirapitá Madalitso Bambaruush Tahay Awohali Enaiposha Phailinsiam Levantes Najsakopajk
+			Qingluan Cuancoá Astrolábos Ahra Aumatex Ixbalanqué Surt Haik Mulchatna Makombé Zembretta Bocaprins
+			Agouto
+			Sirio Vega Antares Betelgeuse Rigel Aldebaran Altair Deneb Spica Canopo Orione Cassiopea Andromeda
 		`),
 		// A word of the place class that is no place.
 		placeless: words(`
 			sabbia ciottolo terremoto masso geyser fumarola stalattite stalagmite eco brace
 			stella cometa meteora aurora falce_lunare eclissi zenit satellite ammasso orbita gravità rotazione rivoluzione
-			anno_luce astro eclittica meridiano plenilunio novilunio perigeo vespro supernova quasar pulsar
+			anno_luce astro eclittica meridiano plenilunio novilunio perigeo supernova quasar pulsar
 			corrente marea onda schiuma frangente parallasse parsec azimut perielio afelio ellisse quadrante nadir
 			gravitazione alone bolide nana
 			fango polvere pietra ghiaia argilla vortice lava magma fuoco fiamma scintilla riflesso raggio bagliore
 			bolla goccia ghiaccio valanga frana eruzione maremoto alluvione incendio ragnatela zodiaco radiazione
-			traiettoria allunaggio decollo missione alieno apogeo congiunzione propulsore etere astronomia astrologia
+			traiettoria allunaggio decollo missione apogeo congiunzione propulsore etere astronomia
 			nova magnetar brillamento occultazione radiotelescopio cosmologia astrofisica
+			aria cenere fumo sasso melma vapore panorama erosione miraggio torba
+			sole Sirio Vega Antares Betelgeuse Rigel Aldebaran Altair Deneb Spica Canopo Stella_Polare
+			materia_oscura energia_oscura big_bang vento_solare macchia_solare astronautica singolarità transito fotone
+			muro parete pavimento soffitto tetto finestra porta portone cancello scala scalinata gradino ringhiera
+			davanzale comignolo grondaia pilastro cupola piastrella altare
+			statua obelisco
+			Terra Orsa_Maggiore Orsa_Minore Grande_Carro Croce_del_Sud Pleiadi
 		`)
 	},
 	interjections: words(`
@@ -903,6 +987,20 @@ export const IT: SentenceLanguageData = {
 		casual: words(`sono_a_casa eccomi_a_casa finalmente_a_casa! sono_di_ritorno eccomi_qui`)
 	},
 	// How much a state holds, in front of it: `è molto stanco`.
+	// Where `in` is the wrong word: a planet is `su Marte`, never `in Marte`.
+	placeHeads: {
+		su: words(`
+			Mercurio Venere Marte Giove Saturno Urano Nettuno Plutone Cerere Eris Haumea Makemake Sedna
+			Quaoar Gonggong Salacia Varuna Ixion Vesta Pallade Giunone Igea Psiche Eros Bennu Ryugu Itokawa
+			Apophis Arrokoth Theia Fetonte Dimidium Spe Orbitar Fortitudo Ægir Amateru Dagon Meztli
+			Smertrios Phobetor Tassili Madriu Yanyan Tondra Eburonia Yvaga Mastika Bendida Nakanbé Awasis
+			Wangshu Pipitea Asye Veles Boinayel Eyeke Cayahuanca Hämarik Abol Bélisama Mintome Toge
+			Santamasa Noifasui Chura Buru Staburags Baiduri Cuptor Xólotl Hairu Laligurans Kereru Albmi
+			Perwana Pollera Viculus Samagiya Ramajay Khomsa Barajeel Cruinlagh Ibirapitá Madalitso
+			Bambaruush Tahay Awohali Enaiposha Phailinsiam Levantes Najsakopajk Qingluan Cuancoá Astrolábos
+			Ahra Aumatex Ixbalanqué Surt Haik Mulchatna Makombé Zembretta Bocaprins Agouto
+		`)
+	},
 	degrees: words(
 		`molto abbastanza un_po' davvero proprio piuttosto assai parecchio decisamente alquanto`
 	),

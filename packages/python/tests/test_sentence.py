@@ -271,6 +271,20 @@ def articles_for(language: WordLanguage) -> list[str]:
     return [article for rules in articles.values() for _, article in rules]
 
 
+def names_of(language: WordLanguage) -> dict[str, str]:
+    """The names a language lists as `proper`, as a sentence writes them, mapped to the pools.
+
+    A sentence writes a name with the capital letter the pool gives it, and the pools are
+    compared in the plain form.
+    """
+    lexicon = WORD_DATA[language]
+
+    return {
+        (noun[0].upper() + noun[1:] if lexicon.capitalize else noun): noun
+        for noun in (SENTENCE_DATA[language].traits or {}).get("proper") or ()
+    }
+
+
 def explains(language: WordLanguage, phrase: str) -> bool:
     """Whether a noun phrase is exactly what the generator is allowed to build.
 
@@ -290,7 +304,7 @@ def explains(language: WordLanguage, phrase: str) -> bool:
             rest = rest[len(opening) :]
             break
 
-    if rest in nouns:
+    if rest in nouns or rest in names_of(language):
         return True
 
     for at in range(1, len(rest)):
@@ -373,7 +387,10 @@ def test_a_language_with_articles_writes_one_invented_word_or_not() -> None:
                     for article in written
                 )
 
-                assert carries, f"{language} {realism}: {sentence}"
+                # A name takes no article, so a sentence about Mars alone carries none.
+                named = any(name in sentence for name in names_of(language))
+
+                assert carries or named, f"{language} {realism}: {sentence}"
 
 
 def test_a_language_that_capitalizes_opens_its_sentences_on_a_capital() -> None:
@@ -445,9 +462,11 @@ def test_every_phrase_is_written_out_of_the_languages_own_pools() -> None:
 
                 # A counted phrase is a noun phrase with a number on it, so the number
                 # comes off before the pools are asked about the rest.
-                assert explains(language, strip_count(language, written)), (
-                    f"{language}: {phrase} is not a {slot} the pools can build ({detail.sentence})"
-                )
+                # A pool may hold a word with a capital of its own (`Фаэтон`), which the
+                # opening phrase keeps.
+                assert explains(language, strip_count(language, written)) or explains(
+                    language, strip_count(language, phrase)
+                ), f"{language}: {phrase} is not a {slot} the pools can build ({detail.sentence})"
 
 
 def test_the_phrases_appear_in_the_sentence_in_order() -> None:
@@ -1082,6 +1101,12 @@ def nouns_in(language: WordLanguage, phrase: str) -> set[str]:
     if rest in nouns:
         found.add(rest)
 
+    # A name is written as the pool writes it, with no article and nothing in front.
+    named = names_of(language).get(rest)
+
+    if named:
+        found.add(named)
+
     for at in range(1, len(rest)):
         if space and rest[at : at + len(space)] != space:
             continue
@@ -1558,6 +1583,13 @@ def test_a_place_takes_the_preposition_it_takes() -> None:
         if not heads:
             continue
 
+        # The head a place part carries in the frames, which is what a place listed nowhere
+        # keeps: `in` in English and Italian, `trong` in Vietnamese.
+        own = sorted(
+            {part.head for frame in data.frames for part in frame.parts if part.slot == "place"}
+            - {""}
+        )
+
         for detail in rand_sentence(
             type="statement",
             include_name=False,
@@ -1571,10 +1603,11 @@ def test_a_place_takes_the_preposition_it_takes() -> None:
                 continue
 
             phrase = detail.phrases[detail.slots.index("place")]
-            expected = [
-                next((head for head, pool in heads.items() if noun in pool), "in")
-                for noun in nouns_in(language, phrase)
-            ]
+            expected: list[str] = []
+
+            for noun in nouns_in(language, phrase):
+                listed = next((head for head, pool in heads.items() if noun in pool), None)
+                expected.extend([listed] if listed else own)
 
             assert any(
                 f"{head} {phrase}" in detail.sentence
@@ -1614,16 +1647,20 @@ def test_a_sentence_happens_somewhere() -> None:
                     )
 
 
-def test_a_lifeless_word_of_a_creature_theme_never_does_anything() -> None:
-    # `myth` holds spells and amulets beside dragons and elves, and a spell that chooses a
-    # gouge is what the class alone allowed. A language lists them as `lifeless`, and a
-    # sentence about a myth is about the creatures.
+def test_a_lifeless_word_never_does_anything_and_a_spell_is_no_longer_one() -> None:
+    # `lifeless` marks a word of a creature theme that is no creature. `myth` held spells
+    # and amulets beside dragons and elves and needed it; since the creatures moved to
+    # `monster`, `myth` is an idea, and a curse that fades is a sentence like any other.
+    # A word a language does list still never acts.
+    assert THEME_CLASS["myth"] == "idea"
+    assert THEME_CLASS["monster"] == "creature"
+
     for language in WORD_LANGUAGES:
         data = SENTENCE_DATA[language]
         lifeless = set((data.traits or {}).get("lifeless") or ())
         pronouns = pronouns_of(language)
-
-        assert lifeless, f"{language} lists nothing lifeless"
+        myth = {plain(language, word) for word in WORD_DATA[language].nouns["myth"]}
+        spells = 0
 
         for detail in rand_sentence(
             type="statement",
@@ -1643,6 +1680,10 @@ def test_a_lifeless_word_of_a_creature_theme_never_does_anything() -> None:
                 assert not found or any(noun not in lifeless for noun in found), (
                     f"{language}: '{phrase}' is lifeless ({detail.sentence})"
                 )
+
+                spells += sum(1 for noun in found if noun in myth)
+
+        assert spells > 0, f"{language}: no sentence about a myth had one for its subject"
 
 
 def test_a_person_in_a_story_sometimes_speaks_and_nobody_else_does() -> None:
@@ -2950,6 +2991,53 @@ def test_every_noun_class_the_frames_can_ask_for_has_a_predicate_to_go_with_it()
             assert noun in described, f"{language}: no state describes a {noun}"
 
 
+def test_a_proper_noun_is_written_as_a_name_with_no_article_and_nothing_in_front() -> None:
+    # `the mars glows` is what a planet came out as while every English noun took `the` and
+    # lost its capital letter. A language lists its names as `proper`.
+    written = 0
+
+    for language in WORD_LANGUAGES:
+        proper = (SENTENCE_DATA[language].traits or {}).get("proper") or ()
+        lexicon = WORD_DATA[language]
+
+        for detail in rand_sentence(
+            language=language, theme="planet", count=SAMPLE, output="detail"
+        ):
+            for phrase in detail.phrases:
+                for noun in proper:
+                    lower, tail = phrase.lower(), noun.lower()
+
+                    # The name as a whole word: `vía láctea` ends on `tea` and is no Theia.
+                    if lower != tail and not lower.endswith(f" {tail}"):
+                        continue
+
+                    name = noun[0].upper() + noun[1:] if lexicon.capitalize else noun
+
+                    assert phrase == name, f"{language}: {detail.sentence}"
+                    written += 1
+
+    assert written > 0, "no sentence named a planet"
+
+
+def test_every_theme_has_a_modifier_to_put_in_front_of_its_nouns() -> None:
+    # A noun phrase picks its modifier out of the groups the noun's class and its theme
+    # select. A theme no group selects has an empty pool, and the sentence came out with
+    # nothing between two spaces: ` вишня была кислая.`
+    for language in WORD_LANGUAGES:
+        data = SENTENCE_DATA[language]
+
+        for theme in WORD_THEMES:
+            noun = THEME_CLASS[theme]
+            words = [
+                word
+                for group in data.modifiers
+                if noun in group.subject and (group.themes is None or theme in group.themes)
+                for word in group.words
+            ]
+
+            assert words, f"{language}: no modifier goes in front of a {theme} noun"
+
+
 def test_tense_decides_when_it_happened_and_a_result_keeps_one_tense() -> None:
     for language in WORD_LANGUAGES:
         data = SENTENCE_DATA[language]
@@ -3353,11 +3441,11 @@ def test_a_destination_follows_only_a_verb_that_goes_somewhere() -> None:
                 f"{language}: '{phrase}' goes nowhere, and has a destination ({detail.sentence})"
             )
 
-            # And it goes somewhere one can go: a market, never Pluto or a sky.
+            # And it goes somewhere one can go: a market or a library, never Pluto or a sky.
             where_to = detail.phrases[detail.slots.index("destination")]
             where = {theme_of_noun(language, noun) for noun in nouns_in(language, where_to)}
 
-            assert not where or "place" in where, (
+            assert not where or "place" in where or "building" in where, (
                 f"{language}: '{where_to}' is nowhere to go ({detail.sentence})"
             )
 

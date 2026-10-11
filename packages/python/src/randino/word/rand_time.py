@@ -87,7 +87,7 @@ def rand_time(
 
     Example:
         >>> rand_time(language="ko", count=3)
-        ['새벽', '한여름', '찰나']
+        ['새벽', '정오', '찰나']
         >>> rand_time(language="en", count=3)
         ['Twilight', 'Solstice', 'Eternity']
     """

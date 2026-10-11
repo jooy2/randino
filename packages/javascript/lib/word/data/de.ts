@@ -59,12 +59,12 @@ export const DE: WordLanguageData = {
 			Floß Panzer Kutsche Schubkarre Traktor Bagger Krankenwagen Seilbahn Straßenbahn Lokomotive
 			Fallschirm Dreirad Lieferwagen Fähre Waggon Cabrio Kran Schlittschuh Reisebus Rechner Tastatur
 			Maus Bildschirm Drucker Lautsprecher Kopfhörer Mikrofon Tablet Handy Ladegerät Batterie
-			Kühlschrank Staubsauger Ventilator Ofen Mikrowelle Backofen Mixer Rasierer Zahnbürste Zahnpasta
-			Seife Shampoo Parfüm Armbanduhr Trockner Föhn Sonnencreme Hausschuh Sandale Matratze Vorhang
+			Kühlschrank Staubsauger Ventilator Ofen Mikrowelle Mixer Rasierer Zahnbürste Zahnpasta
+			Seife Shampoo Parfüm Armbanduhr Trockner Föhn Sonnencreme Sandale Matratze Vorhang
 			Türklingel Thermometer Glühbirne Steckdose Bettdecke Handtuch Waschbecken Waschmittel Pfanne
 			Kleiderbügel Schrank Regal Nachttisch Fernseher Waage Bügeleisen Toaster Wasserkocher Teppich
 			Besteck Geschirr Tischdecke Serviette Wasserhahn Dusche Wanne Rosa Türkis Himmelblau Weinrot
-			Creme Beige Goldgelb Schneeweiß Rotbraun Dunkelgrün Hellblau Tiefschwarz Zitronengelb Rechnung
+			Creme Beige Goldgelb Rotbraun Dunkelgrün Hellblau Zitronengelb Rechnung
 			Quittung Aktie Zins Konto Haushalt Gewinn Schuld Kredit Münze Währung Rente Gehalt Lohn Bonus
 			Rettung Sicherheit Gutschein Tresor Überweisung Kontoauszug Sparbuch Inflation Spende Ausgabe
 			Rabatt Kasse Steuer Bußgeld Kaution Miete Beute Schatz Reichtum Armut Pfand Server Paket
@@ -73,10 +73,10 @@ export const DE: WordLanguageData = {
 			Profil Ereignis Signal Thema Wolke Wind Regen Schnee Nebel Tau Regenbogen Blitz Donner Schauer
 			Schneesturm Nieselregen Hagel Sturm Gewitter Unwetter Vorhersage Sonnenschein Hitzewelle Frost
 			Klima Temperatur Wetter Orkan Tornado Schneefall Dürre Kälte Hitze Stern Mond Sonne Galaxie Komet
-			Milchstraße Weltall Planet Sternbild Umlaufbahn Schwerkraft Krater Lichtjahr Vollmond Halbmond
+			Milchstraße Weltall Planet Sternbild Umlaufbahn Schwerkraft Krater Lichtjahr
 			Mars Venus Jupiter Saturn Merkur Uranus Neptun Pluto Weltraum Dämmerung Jahreszeit Augenblick
 			Ewigkeit Zukunft Jahrhundert Jahrzehnt Morgen Mittag Nachmittag Abend Nacht Mitternacht Gestern
-			Heute Woche Monat Halbjahr Jahr Frühling Sommer Herbst Winter Jetzt Kindheit Jugend Alter Dauer
+			Heute Woche Monat Jahr Frühling Sommer Herbst Winter Jetzt Kindheit Jugend Alter Dauer
 			Saison Minute Sekunde Stunde Weile Wartezeit Schicht Runde Phase Abschnitt Vormittag Frühjahr
 			Wochenende Feiertag Werktag Freude Trauer Überraschung Glück Hoffnung Verzweiflung Einsamkeit
 			Sehnsucht Wärme Mitleid Dankbarkeit Geduld Ruhe Stille Vertrauen Zweifel Verdacht Sorge Angst
@@ -90,9 +90,9 @@ export const DE: WordLanguageData = {
 			Pantoffel Uniform Kostüm Regenmantel Badeanzug Ärmel Kragen Stoff Seide Baumwolle Wolle Leder
 			Mütze Kappe Tuch Kapuze Axt Schaufel Säge Leiter Zange Lineal Schere Hammer Bohrer Hacke Pflug
 			Rechen Maßband Zirkel Hebel Feile Reibe Sieb Spaten Griff Klinge Kettensäge Winkel Wagenheber
-			Tacker Kaffee Tee Milch Wasser Limonade Kakao Kamillentee Cappuccino Espresso Bier Pils
-			Weizenbier Wein Rotwein Weißwein Sekt Champagner Schnaps Rum Wodka Whisky Cocktail Sirup Sprudel
-			Eistee Buttermilch Smoothie Milchshake Radler Schorle Glühwein Apfelsaft Fruchtsaft
+			Tacker Kaffee Tee Milch Wasser Limonade Kakao Cappuccino Espresso Bier Pils
+			Wein Rotwein Weißwein Sekt Champagner Schnaps Rum Wodka Whisky Cocktail Sirup Sprudel
+			Buttermilch Smoothie Milchshake Radler Schorle Glühwein
 			Puppe Teddybär Kuscheltier Bauklotz Spielkarte Kartenspiel Brettspiel Springseil Hüpfburg Schaukel Rutsche
 			Wippe Karussell Sandburg Schneemann Schneeball Seifenblase Wasserpistole Spielzeugauto Puppenhaus Frisbee
 			Flummi Kicker Videospiel Spielfigur Knete Malbuch Verstecken Fangen Sackhüpfen Schnitzeljagd Schatzsuche
@@ -102,7 +102,7 @@ export const DE: WordLanguageData = {
 			Schuss Explosion Klick Plumps Kikeriki Tatütata Schritt Kind Baby Zwilling Großmutter Großvater Oma Opa
 			Mutter Vater Mama Papa Eltern Geschwister Bruder Schwester Sohn Tochter Enkel Neffe Nichte Onkel Tante
 			Cousin Mann Frau Braut Witwe Nachbar Gast Held Freund Freundin Kumpel Feind Kollege Teenager Senior
-			Rentner Junge Mädchen Kleinkind Familie Mensch Zuschauer Besucher Dame Herr Kerl Genie Optimist Tourist
+			Rentner Junge Mädchen Familie Mensch Zuschauer Besucher Dame Herr Kerl Genie Optimist Tourist
 			Anfänger Paar Liebling Streber Träumer Angsthase Glückspilz Pechvogel Spaßvogel Faulpelz Stuhl Tisch Bett
 			Sofa Sessel Hocker Bank Schreibtisch Kommode Schublade Wiege Hängematte Laken Bettwäsche Gardine Rollo
 			Lampenschirm Kronleuchter Stehlampe Kerzenständer Vase Bilderrahmen Garderobe Kleiderständer Schaukelstuhl
@@ -123,12 +123,12 @@ export const DE: WordLanguageData = {
 			Kneipe Zirkus Brunnen Schuppen Labor Sauna Esszimmer Weizen Mehl Teig Öl Essig Senf Soße Pommes Chips
 			Eiscreme Müsli Toast Sandwich Döner Gulasch Spätzle Spiegelei Lasagne Spaghetti Muffin Croissant Baguette
 			Gummibärchen Kaugummi Marzipan Vanille Zimt Olive Kokosnuss Haselnuss Rosine Himbeere Heidelbeere Hähnchen
-			Steak Hackfleisch Nachtisch Handball Eishockey Leichtathletik Weitsprung Hochsprung Sprint Segeln Wandern
+			Steak Nachtisch Handball Eishockey Leichtathletik Weitsprung Hochsprung Sprint Segeln Wandern
 			Joggen Yoga Snowboarden Rodeln Bowling Minigolf Rennen Mannschaft Gegner Torwart Ball Halbzeit Olympiade
 			Weltmeisterschaft Sieger Läufer Schwimmer Reiter Turner Boxer Meisterschaft Trampolin Schiff Dampfer Wagen
 			Wohnwagen Wohnmobil Geländewagen Kombi Sportwagen Rennwagen Oldtimer Tretboot Rollstuhl Kinderwagen
 			Bollerwagen Rollschuh Rennrad Mountainbike Heißluftballon Jet Aufzug Rolltreppe Müllwagen Feuerwehrauto
-			Schlauchboot Fernbedienung Laptop Kabel Stecker Festplatte Plattenspieler Schallplatte Kassette
+			Fernbedienung Laptop Kabel Stecker Festplatte Plattenspieler Schallplatte Kassette
 			Taschenrechner Nähmaschine Waschmaschine Spülmaschine Herd Gefrierschrank Kaffeemaschine Grill Klimaanlage
 			Rauchmelder Pinzette Lippenstift Nagellack Deo Zahnseide Duschgel Taschentuch Toilettenpapier Mülleimer
 			Spülmittel Bügelbrett Zeitschrift Comic Windel Schnuller Rasenmäher Pflaster Verband Tablette Wärmflasche
@@ -148,18 +148,50 @@ export const DE: WordLanguageData = {
 			Körper Skelett Wirbelsäule Po Sohle Nasenloch Kehle Locke Zopf Glatze Fingerabdruck Brustkorb
 			Schlüsselbein Schulterblatt Organ Galle Blinddarm Zelle Wunde Pickel Sommersprosse Muttermal Warze Fett
 			Shirt Sweatshirt Shorts Leggings Strumpfhose Bikini Badehose Bademantel Nachthemd Latzhose Anzug Sakko
-			Blazer Dirndl Lederhose Kimono Stirnband Haarspange Reißverschluss Schnürsenkel Absatz Gummistiefel Pumps
+			Blazer Dirndl Lederhose Kimono Stirnband Haarspange Reißverschluss Schnürsenkel Absatz Pumps
 			Trikot Trainingsanzug Badekappe Sonnenbrille Zylinder Perücke Maske Rüstung Pelz Schraubenzieher
 			Schraubenschlüssel Bohrmaschine Akkuschrauber Spachtel Gerüst Gießkanne Gartenschlauch Heckenschere Dübel
 			Zollstock Stricknadel Nudelholz Pfannenwender Kochlöffel Dosenöffner Flaschenöffner Nussknacker Schrubber
-			Kehrblech Handfeger Geodreieck Spritze Falle Peitsche Orangensaft Cola Energydrink Mineralwasser Spezi
-			Grüntee Schwarztee Prosecco Bowle Sangria Kölsch Eiskaffee Pfefferminztee Zitronensaft Kokosmilch
+			Kehrblech Handfeger Geodreieck Spritze Falle Peitsche Cola Energydrink Spezi
+			Grüntee Schwarztee Prosecco Bowle Sangria Kölsch Kokosmilch
+			Lachs Welpe Kalb Lamm Küken Ferkel Hahn Ochse Pony Goldfisch Krebs Kakerlake Seehund Meise Truthahn
+			Kugelschreiber Buntstift Schlüsselbund Karton Fahne Briefkasten Wörterbuch Tafel Schmuck Natur Umwelt
+			Ozean Dschungel Hochwasser Pflanze Veilchen Flieder Porzellan Leben Tod Welt Wissenschaft Politik Erfolg
+			Problem Lösung Beispiel Grund Unterschied Möglichkeit Nachricht Krieg Streit Freundschaft Schönheit
+			Energie Macht Wahl Information Magie Glücksbringer Horoskop Amulett Altar Segen Heiligenschein Ungeheuer
+			Außerirdischer Schutzengel Bestie Sekretär Manager Chef Beamter Handwerker Arbeiter Angestellter Autor
+			Schriftsteller Erzieher Babysitter Politiker Präsident Minister Kanzler Wissenschaftler Techniker Räuber
+			Papst Ninja Musik Instrument Album Hit Festival Beat Pop Rockmusik Hiphop Techno Volksmusik Klassik
+			Blues Walzer Wiegenlied Kinderlied Weihnachtslied Hymne Ballade Disco Punk Reggae Country Soul Salsa
+			Samba Sinfonie Metal Marsch Folk House Volkslied Hauptstadt Ort Land Heimat Gegend Zentrum Bürgersteig
+			Zebrastreifen Sportplatz Campingplatz Statue Grab Baustelle Gleis Bahnsteig Freibad Fußgängerzone
+			Kreisverkehr Gebäude Fenster Tür Wand Toilette Kinderzimmer Stockwerk Eingang Halle Saal Geschäft Kiosk
+			Imbiss Bar Pizzeria Eisdiele Metzgerei Klinik Gymnasium Kita Mensa Einkaufszentrum Baumarkt Parkhaus
+			Feuerwache Polizeiwache Altersheim Ferienwohnung Wolkenkratzer Iglu Baumhaus Pension Immobilie
+			Grundstück Essen Mahlzeit Frühstück Snack Hotdog Püree Brei Milchreis Popcorn Lutscher Rührei
+			Fischstäbchen Gyros Kompott Tiramisu Ketchup Mayonnaise Hefe Gewürz Geflügel Pute Kotelett Filet
+			Mozzarella Parmesan Margarine Grieß Gemüse Kopfsalat Champignon Süßkartoffel Rosenkohl Rettich
+			Frühlingszwiebel Peperoni Obst Wassermelone Johannisbeere Limette Sport Spiel Fitness Angeln Verein
+			Ergebnis Gymnastik Halbfinale Unentschieden Verlierer Fahrzeug Moped Einkaufswagen Ufo Computer Akku
+			Waschlappen Wattestäbchen Medikament Küchenrolle Alufolie Wäscheklammer Müllbeutel Geschirrtuch Schminke
+			Haarbürste Mascara Frisur Haarschnitt Haarspray Haarfarbe Puder Massage Kosmetik Lidschatten Lipgloss
+			Haargel Rasierschaum Spülung Maniküre Babyblau Neongelb Euro Cent Dollar Zahlung Guthaben Budget Gebühr
+			Schnäppchen Kleingeld Verkauf Auktion Jackpot WLAN Mail Benutzer Login Emoji Hashtag Blog Video Taste
+			Screenshot Display Bug Upload KI Firewall Pixel Nässe Glätte Hagelkorn Universum Teleskop Kosmos
+			Atmosphäre Hochzeit Halloween Valentinstag Muttertag Pfingsten Heiligabend Stundenplan Fahrplan
+			Ruhestand Spannung Ungeduld Humor Verliebtheit Gemütlichkeit Kratzer Beule Schnurrbart Gänsehaut Bizeps
+			Kleidung BH Werkzeug Taschenmesser Pumpe Getränk Latte_Macchiato Mojito Spielzeug Schach Sticker
+			Luftmatratze Schwimmflügel Malkasten Fingerfarbe Tauziehen Völkerball Puppenwagen Krach Sirene
+			Klingelton Lautstärke Leute Person Erwachsener Jugendlicher Partner Kunde Bürger Fan Star Opfer Zeuge
+			Typ Mitbewohner Gastgeber Lügner Angeber Profi Experte Möbel Couchtisch Kleiderschrank Bücherregal
+			Esstisch Bürostuhl Etagenbett Sitzbank
+			Rotkohl Bundesland Staat Alm Haarschaum Duschhaube
 		`),
 		rare: words(`
 			Zikade Gnu Gürteltier Schnabeltier Lemur Tapir Iltis Rebhuhn Wiedehopf Distelfink Häher Zaunkönig
-			Seehecht Leuchtkäfer Tausendfüßer Leguan Molch Boa Viper Meerforelle Bottich Mörser Öse Zwirn
+			Seehecht Tausendfüßer Leguan Molch Boa Viper Bottich Mörser Öse Zwirn
 			Zwinge Atoll Landzunge Landenge Eiland Moräne Findling Untiefe Doline Tropfstein Sims Aue Furt
-			Meerbusen Zinne Kluft Karst Geröllhalde Salzwiese Meeresarm Föhre Estragon Stechpalme Ölbaum Ulme
+			Meerbusen Zinne Kluft Karst Salzwiese Meeresarm Föhre Estragon Stechpalme Ölbaum Ulme
 			Kamelie Begonie Petunie Binse Glyzinie Achat Obsidian Glimmer Flussspat Kalzit Malachit Olivin
 			Turmalin Zirkon Pyrit Magnetit Hämatit Zinnober Bleiglanz Talk Wismut Mangan Lapislazuli Karneol
 			Jaspis Onyx Beryll Spinell Peridot Alabaster Gneis Quarzit Tuff Dolomit Apatit Baryt Korund
@@ -172,40 +204,60 @@ export const DE: WordLanguageData = {
 			Halbton Notenlinie Fagott Okarina Zither Psalter Kastagnette Kontrapunkt Kadenz Arpeggio Triller
 			Glissando Legato Choral Motette Präludium Dreiklang Leier Schalmei Badehaus Abtei Kreuzgang
 			Bastion Warte Weiler Mausoleum Schenke Steig Wehr Pferch Zollhaus Mispel Kanusport Regatta
-			Fünfkampf Ringe Sänfte Katamaran Lastkahn Pistenraupe Kalesche Karosse Rollbrett Kreuzfahrer
-			Galeere Galeone Fregatte Korvette Brigg Schoner Einbaum Schaluppe Barkasse Trittroller
+			Fünfkampf Ringe Sänfte Katamaran Lastkahn Pistenraupe Kalesche Karosse Rollbrett
+			Galeere Galeone Fregatte Korvette Brigg Schoner Einbaum Schaluppe Barkasse
 			Abtropfsieb Rasierpinsel Karmesin Scharlach Zinnoberrot Siena Limone Zyan Malve Zinngrau
 			Safrangelb Grünspan Bronzeton Sandton Weizengelb Zimtbraun Muskatbraun Paprikarot Amarant Karmin
-			Pfirsichton Nebelgrau Lindgrün Beinweiß Schuldposten Fehlbetrag Lohnliste Lizenzgebühr Franchise
+			Pfirsichton Nebelgrau Lindgrün Beinweiß Fehlbetrag Lohnliste Lizenzgebühr Franchise
 			Staatskasse Arbitrage Verwahrung Verleiher Liquidität Umlage Verzug Wucher Mitgift Wegezoll Zehnt
-			Kupon Bilanzbuch Notgroschen Nachprüfung Bildpunkt Codec Halde Latenz Gateway Brandmauer Teilnetz
-			Rechnername Nutzlast Prüfsumme Fehlersucher Makro Parser Assembler Bitrate Durchsatz Namensraum
-			Streuwert Shader Oktett Wegewahl Rundruf Datagramm Bootloader Prüfpunkt Rollback Zeitstempel
-			Suchbaum Nebenzweig Zyklon Schwaden Feuchte Zephir Passat Fallwind Hundstage Bise Sprühregen
-			Hagelschlag Fallböe Trabant Kleinplanet Sternhaufen Gestirn Firmament Ekliptik Meridian Lufthülle
+			Kupon Bilanzbuch Notgroschen Nachprüfung Codec Halde Latenz Gateway Teilnetz
+			Rechnername Nutzlast Prüfsumme Makro Parser Assembler Bitrate Durchsatz Namensraum
+			Shader Oktett Wegewahl Rundruf Datagramm Bootloader Prüfpunkt Rollback Zeitstempel
+			Suchbaum Nebenzweig Zyklon Schwaden Feuchte Zephir Passat Fallwind Hundstage Bise
+			Trabant Kleinplanet Sternhaufen Gestirn Firmament Ekliptik Meridian Lufthülle
 			Quadrant Parallaxe Parsec Nadir Azimut Perihel Aphel Fotosphäre Chromosphäre Ionosphäre Exosphäre
-			Mesosphäre Troposphäre Halo Zwergstern Feuerkugel Sternenmeer Weltenraum Morgenröte Nu Tageslauf
-			Vorzeit Morgenluft Jahrfünft Folgejahr Frohsinn Verzückung Schwermut Einfühlung Mäßigung
+			Mesosphäre Troposphäre Halo Feuerkugel Morgenröte Nu Tageslauf
+			Vorzeit Jahrfünft Frohsinn Verzückung Schwermut Einfühlung Mäßigung
 			Redlichkeit Verdruss Inbrunst Überdruss Beklemmung Betrübnis Andacht Frohlocken Bangen Wonne
 			Sehnen Wehklage Jochbein Schwiele Brustbein Wadenbein Fingerglied Fußwurzel Spann Zäpfchen
 			Rachenmandel Barett Gehrock Wams Mieder Gamasche Espadrille Armstulpe Reifrock Mantilla Dreispitz
 			Stulpe Litze Borte Sturzhelm Blasebalg Ahle Messschieber Schmirgel Wetzstein Egge Dreschflegel
-			Spindel Bandsäge Drehbank Hohleisen Reißnadel Fase Handbohrer Stemmeisen Streichmaß Senklot
-			Lötlampe Feuerstahl Gussform Stanze Bohrfutter Fräse Hippe Handbeil Zugmesser Anreißnadel
-			Ösenzange Wermut Enzian Rübensaft Sauermilch Dickmilch
+			Spindel Bandsäge Drehbank Hohleisen Reißnadel Fase Stemmeisen Streichmaß Senklot
+			Lötlampe Feuerstahl Gussform Stanze Bohrfutter Fräse Hippe Zugmesser
+			Ösenzange Wermut Enzian
 			Halma Mikado Tangram Zinnsoldat Steckenpferd Kaleidoskop Seifenkiste Hall Schall Nesthäkchen Nachkomme
 			Paravent Anrichte Wandteppich Schemel
 			Rinnsal Grat Gischt Stromschnelle Treibholz Flechte Hagebutte Ginster Platane Gladiole Setzling Tang
 			Medaillon Mondstein Tigerauge Legierung Radium Plutonium Palladium Arsen Thallium Strass Speckstein
 			Silizium Kalium Epos Parabel Alraune Klabautermann Wünschelrute Ghul Gestaltwandler Halbgott Irrlicht
 			Schamane Druide Barde Knappe Nachtwächter Gaukler Narr Cembalo Sitar Menuett Taktstock Dschunke Kogge
-			Umbra Ultramarin Taubenblau Kanariengelb Stahlblau Pechschwarz Tilgung Dauerauftrag Fonds Wertpapier
+			Umbra Ultramarin Taubenblau Kanariengelb Stahlblau Tilgung Dauerauftrag Fonds Wertpapier
 			Transistor Schaltkreis Platine Compiler Terminal Skript Schnittstelle Mistral Schirokko Kugelblitz
 			Wetterleuchten Eisblume Aufheiterung Altweibersommer Gasriese Pulsar Quasar Neutronenstern Korona Nova
 			Weltraumschrott Zwergplanet Geisterstunde Genugtuung Argwohn Behagen Seligkeit Tatendrang Hochmut
 			Barmherzigkeit Lymphe Steißbein Bauchspeicheldrüse Monokel Tiara Diadem Brokat Tüll Toga Tunika Sari
 			Kettenhemd Seitenschneider Körner Stößel Sextant Joch Multimeter Winkelschleifer Töpferscheibe Webstuhl
-			Spinnrad Brennofen Harpune Mate Lassi Grog Most Eiswein Reiswein
+			Spinnrad Brennofen Harpune Mate Lassi Grog Most
+			Gibbon Axolotl Egel Waran Kormoran Hermelin Taiga Böschung Citrin Nekromantie Elysium Asgard Avalon
+			Bannkreis Wyvern Behemoth Homunkulus Norne Drude Alb Nachtmahr Tatzelwurm Wolpertinger Sukkubus Inkubus
+			Cherub Seraph Wiedergänger Halbling Herold Sattler Söldner Paladin Visagist Abt Fermate Synkope Plektrum
+			Coda Didgeridoo Gregorianik Minnesang Madrigal Toccata Gabber Grime Shoegaze Darkwave Psytrance Ländler
+			Habanera Merengue Cumbia Bachata Metalcore Nu_Metal Thrash_Metal Doom_Metal Power_Metal Trip_Hop
+			Synthwave Dream_Pop Acid_House Hardstyle Scherzo Rondo Oratorium Mole Maisonette Zitadelle Atrium
+			Schrein Nori Topinambur Schwarzwurzel Romanesco Sauerampfer Maniok Okra Kumquat Schlehe Maulbeere Guave
+			Primer Bronzer Highlighter Concealer Epilierer Pomade Flakon Schiefergrau Jadegrün Saphirblau Tintenblau
+			Deflation Konjunktur Almosen Subvention Debugger Bora Jetstream Wega Beteigeuze Rigel Aldebaran Antares
+			Arktur Deneb Altair Spica Kuipergürtel Kassiopeia Ereignishorizont Haumea Makemake Sedna Quaoar Orcus
+			Gonggong Salacia Varuna Ixion Hygiea Bennu Ryugu Itokawa Apophis Arrokoth Theia Phaethon Dimidium Spe
+			Orbitar Fortitudo Ægir Amateru Dagon Meztli Smertrios Phobetor Tassili Madriu Yanyan Tondra Eburonia
+			Yvaga Mastika Bendida Nakanbé Awasis Wangshu Pipitea Asye Veles Boinayel Eyeke Cayahuanca Hämarik Abol
+			Bélisama Mintome Toge Santamasa Noifasui Chura Buru Staburags Baiduri Cuptor Xólotl Hairu Laligurans
+			Kereru Albmi Perwana Pollera Viculus Samagiya Ramajay Khomsa Barajeel Cruinlagh Ibirapitá Madalitso
+			Bambaruush Tahay Awohali Enaiposha Phailinsiam Levantes Najsakopajk Qingluan Cuancoá Astrolábos Ahra
+			Aumatex Ixbalanqué Surt Haik Mulchatna Makombé Zembretta Bocaprins Agouto Gram Kaftan Kescher Winde Soju
+			Rooibos Raki Raunen Ottomane Chaiselongue Diwan
+			Mangostane Rambutan Aronia Taro Yamswurzel Wendigo Chupacabra Naga Ifrit Perchte Lich Kwass Slibowitz
+			Pisco Aquavit Oolong Aquädukt
 		`)
 	}
 };

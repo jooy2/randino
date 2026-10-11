@@ -10,8 +10,8 @@ import 'package:randino/src/word/rand_word.dart';
 /// no overloads, and a second function per theme would be a second wall of them.
 ///
 /// ```dart
-/// randWeather(language: WordLanguage.ko, count: 3); // [소나기, 무지개, 된서리]
-/// randWeather(language: WordLanguage.en, count: 3); // [Drizzle, Rainbow, Hoarfrost]
+/// randWeather(language: WordLanguage.ko, count: 3); // [소나기, 무지개, 서리]
+/// randWeather(language: WordLanguage.en, count: 3); // [Drizzle, Rainbow, Frost]
 /// ```
 List<String> randWeather({
   WordLanguage? language,

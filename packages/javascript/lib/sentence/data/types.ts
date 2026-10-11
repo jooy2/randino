@@ -459,11 +459,14 @@ export type ConnectiveKind = 'additive' | 'temporal' | 'contrastive' | 'causal';
  * asks of its object: `sips` takes a liquid and `chews` takes none, `roasts`
  * takes something raw. `placeless` is what a place part asks of its noun: a
  * word of the `place` class that is no place — a wave, a comet, a lightyear —
- * which a sentence never happens in and nobody goes to. A noun in none of the
+ * which a sentence never happens in and nobody goes to. `proper` is how the noun
+ * is written rather than what it can do: a name the language writes with no
+ * article and with its capital letter, `Mars` and `Marte` rather than `the
+ * mars` and `el Marte`, which takes no modifier either. A noun in none of the
  * lists has no trait, so it takes any group that asks for none.
  */
 export type NounTrait =
-	'flier' | 'swimmer' | 'crawler' | 'lifeless' | 'liquid' | 'raw' | 'placeless';
+	'flier' | 'swimmer' | 'crawler' | 'lifeless' | 'liquid' | 'raw' | 'placeless' | 'proper';
 
 /** The nouns that carry each trait, written the way the word pools write them. */
 export type SentenceTraits = {

@@ -1,4 +1,4 @@
-"""The word generators: `rand_word` and the twenty-nine themed ones."""
+"""The word generators: `rand_word` and the thirty-seven themed ones."""
 
 import re
 import time
@@ -13,7 +13,9 @@ from randino import (
     WordLanguage,
     WordTheme,
     rand_animal,
+    rand_beauty,
     rand_body,
+    rand_building,
     rand_clothing,
     rand_color,
     rand_concept,
@@ -21,15 +23,20 @@ from randino import (
     rand_emotion,
     rand_finance,
     rand_food,
+    rand_fruit,
     rand_furniture,
     rand_gem,
+    rand_genre,
+    rand_ingredient,
     rand_job,
+    rand_monster,
     rand_music,
     rand_myth,
     rand_nature,
     rand_object,
     rand_person,
     rand_place,
+    rand_planet,
     rand_plant,
     rand_product,
     rand_sound,
@@ -39,6 +46,7 @@ from randino import (
     rand_time,
     rand_tool,
     rand_toy,
+    rand_vegetable,
     rand_vehicle,
     rand_weather,
     rand_word,
@@ -72,18 +80,26 @@ THEMED = {
     "gem": rand_gem,
     "concept": rand_concept,
     "myth": rand_myth,
+    "monster": rand_monster,
     "job": rand_job,
     "music": rand_music,
+    "genre": rand_genre,
     "place": rand_place,
+    "building": rand_building,
     "food": rand_food,
+    "ingredient": rand_ingredient,
+    "vegetable": rand_vegetable,
+    "fruit": rand_fruit,
     "sport": rand_sport,
     "vehicle": rand_vehicle,
     "product": rand_product,
+    "beauty": rand_beauty,
     "color": rand_color,
     "finance": rand_finance,
     "tech": rand_tech,
     "weather": rand_weather,
     "space": rand_space,
+    "planet": rand_planet,
     "time": rand_time,
     "emotion": rand_emotion,
     "body": rand_body,
@@ -95,7 +111,7 @@ THEMED = {
     "person": rand_person,
     "furniture": rand_furniture,
 }
-"""The themed generator for each theme, which is what the twenty-nine of them are."""
+"""The themed generator for each theme, which is what the thirty-seven of them are."""
 
 
 def pool_of(language: WordLanguage, theme: WordTheme | None = None) -> tuple[str, ...]:

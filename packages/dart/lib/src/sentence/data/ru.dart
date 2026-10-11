@@ -383,6 +383,7 @@ final SentenceLanguageData ru = SentenceLanguageData(
         WordTheme.tool,
         WordTheme.clothing,
         WordTheme.product,
+        WordTheme.beauty,
         WordTheme.toy,
         WordTheme.furniture,
         WordTheme.gem,
@@ -502,6 +503,7 @@ final SentenceLanguageData ru = SentenceLanguageData(
     VerbGroup(
       field: VerbField.change,
       subject: const <NounClass>[NounClass.edible],
+      subjectThemes: const <WordTheme>[WordTheme.food, WordTheme.drink],
       words: words(r'''
         зреет остывает кипит тает портится греется стынет дымится парит кончается убывает застывает
         густеет затвердевает размягчается прокисает скисает замерзает отстаивается настаивается
@@ -510,6 +512,36 @@ final SentenceLanguageData ru = SentenceLanguageData(
         words: words(r'''
           зрел остыл кипел растаял испортился грелся стыл дымился парил кончился убывал застыл
           густел затвердел размягчился прокисал скисал замерзал отстоялся настоялся
+        '''),
+      ),
+    ),
+    VerbGroup(
+      field: VerbField.change,
+      subject: const <NounClass>[NounClass.edible],
+      subjectThemes: const <WordTheme>[WordTheme.fruit, WordTheme.vegetable],
+      words: words(r'''
+        зреет дозревает перезревает портится гниёт вянет сморщивается размягчается подсыхает
+        засыхает темнеет плесневеет пропадает остаётся лежит
+      '''),
+      past: PredicateTense(
+        words: words(r'''
+          зрел дозревал перезревал портился гнил вял сморщивался размягчался подсыхал засыхал темнел
+          плесневел пропадал оставался лежал
+        '''),
+      ),
+    ),
+    VerbGroup(
+      field: VerbField.change,
+      subject: const <NounClass>[NounClass.edible],
+      subjectThemes: const <WordTheme>[WordTheme.ingredient],
+      words: words(r'''
+        портится кончается остаётся хранится убывает расходуется пропадает залёживается дорожает
+        дешевеет
+      '''),
+      past: PredicateTense(
+        words: words(r'''
+          портился кончался оставался хранился убывал расходовался пропадал залёживался дорожал
+          дешевел
         '''),
       ),
     ),
@@ -622,9 +654,25 @@ final SentenceLanguageData ru = SentenceLanguageData(
     ),
     StateGroup(
       subject: const <NounClass>[NounClass.edible],
+      subjectThemes: const <WordTheme>[WordTheme.food, WordTheme.drink],
       words: words(r'''
         сладкий солёный острый кислый горячий холодный горький густой мягкий тёплый сочный хрустящий
         вкусный пресный
+      '''),
+    ),
+    StateGroup(
+      subject: const <NounClass>[NounClass.edible],
+      subjectThemes: const <WordTheme>[WordTheme.fruit, WordTheme.vegetable],
+      words: words(r'''
+        сладкий кислый спелый неспелый зелёный свежий сочный твёрдый мягкий вкусный вялый горький
+        крупный мелкий
+      '''),
+    ),
+    StateGroup(
+      subject: const <NounClass>[NounClass.edible],
+      subjectThemes: const <WordTheme>[WordTheme.ingredient],
+      words: words(r'''
+        солёный острый пряный горький кислый свежий душистый жирный натуральный дорогой дешёвый
       '''),
     ),
     StateGroup(
@@ -677,6 +725,22 @@ final SentenceLanguageData ru = SentenceLanguageData(
       words: words(r'''
         сладкий острый тёплый свежий хрустящий вкусный душистый горячий солёный мягкий спелый сытный
         золотистый копчёный сливочный нежный сочный дымящийся поджаристый липкий пресный пряный
+      '''),
+    ),
+    ModifierGroup(
+      subject: const <NounClass>[NounClass.edible],
+      themes: const <WordTheme>[WordTheme.fruit, WordTheme.vegetable],
+      words: words(r'''
+        свежий спелый неспелый переспелый сочный сладкий кислый твёрдый мягкий зелёный дикий мелкий
+        крупный отборный домашний вкусный вялый мытый мороженый сушёный
+      '''),
+    ),
+    ModifierGroup(
+      subject: const <NounClass>[NounClass.edible],
+      themes: const <WordTheme>[WordTheme.ingredient],
+      words: words(r'''
+        свежий натуральный домашний фермерский отборный качественный импортный дешёвый дорогой
+        душистый пряный острый солёный сушёный копчёный молотый
       '''),
     ),
     ModifierGroup(
@@ -833,23 +897,24 @@ final SentenceLanguageData ru = SentenceLanguageData(
       бабочка пчела стрекоза цикада муха комар летучая_мышь цапля пеликан дракон феникс фея грифон
       пегас ангел валькирия дрозд соловей жаворонок перепел фазан куропатка колибри тукан фламинго
       аист удод щегол сорока сойка сыч канюк чайка дятел скворец крапивник оса моль светляк шмель
-      коровка снегирь синица виверна херувим
+      божья_коровка снегирь синица виверна херувим кукушка грач галка зяблик чиж иволга глухарь
+      тетерев рябчик филин ястреб коршун гриф стервятник альбатрос баклан зимородок стриж трясогузка
+      малиновка какаду канарейка шершень овод слепень мотылёк саранча гарпия гиппогриф серафим
+      архангел горгулья змей пикси купидон
     '''),
     NounTrait.swimmer: words(r'''
       крокодил черепаха лягушка жаба рыба кит дельфин акула осьминог кальмар креветка краб морж
       тюлень пингвин русалка кракен наяда угорь сардина тунец треска хек форель лосось карп скат
       медуза мидия устрица омар окунь щука саламандра тритон бобр бегемот утконос морской_конёк рак
-      водяной сирена
+      водяной косатка кашалот белуха нерпа ондатра нутрия сом судак лещ плотва карась ёрш налим
+      осётр белуга стерлядь скумбрия камбала палтус минтай мойва килька сельдь пиранья гуппи
+      золотая_рыбка каракатица аллигатор левиафан морской_змей нереида ундина океанида
     '''),
     NounTrait.crawler: words(r'''
       крокодил змея ящерица черепаха улитка муравей паук червь краб василиск игуана хамелеон
       саламандра тритон удав гадюка кобра питон жук кузнечик сверчок блоха гусеница сколопендра
-      скорпион таракан рак
-    '''),
-    NounTrait.lifeless: words(r'''
-      заклинание проклятие пророчество амулет талисман руна портал святилище идол тотем примета
-      бестиарий ворожба гримуар пентакль реликвия грааль посох жезл скипетр венец зелье эликсир
-      магия волшебство чары чудо волшебная_палочка
+      скорпион таракан рак варан геккон аллигатор анаконда уж клоп вошь клещ тля термит многоножка
+      мокрица слизень пиявка тарантул
     '''),
   },
   interjections: words(r'''

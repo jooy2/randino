@@ -249,6 +249,18 @@ List<String> articlesFor(WordLanguage language) {
 /// Split by hand rather than on whitespace, because a pool entry can hold a
 /// space of its own — Vietnamese `hơi thở` is one word — and Japanese and
 /// Chinese write no space at all.
+/// The names a language lists as `proper`, in the form a sentence writes them —
+/// with the capital letter the pool gives them — mapped to the plain form the
+/// pools are compared in.
+Map<String, String> namesOf(WordLanguage language) {
+  final lexicon = wordData[language]!;
+
+  return <String, String>{
+    for (final noun in sentenceData[language]!.traits?[NounTrait.proper] ?? const <String>[])
+      (lexicon.capitalize ? noun[0].toUpperCase() + noun.substring(1) : noun): noun,
+  };
+}
+
 bool explains(WordLanguage language, String phrase) {
   final space = sentenceData[language]!.space;
   final nouns = poolFor(language, SentenceSlot.subject);
@@ -264,7 +276,7 @@ bool explains(WordLanguage language, String phrase) {
     }
   }
 
-  if (nouns.contains(rest)) return true;
+  if (nouns.contains(rest) || namesOf(language).containsKey(rest)) return true;
 
   for (var at = 1; at < rest.length; at += 1) {
     if (space.isNotEmpty &&
@@ -437,6 +449,11 @@ Set<String> nounsIn(WordLanguage language, String phrase) {
 
   if (nouns.contains(rest)) found.add(rest);
 
+  // A name is written as the pool writes it, with no article and nothing in front.
+  final named = namesOf(language)[rest];
+
+  if (named != null) found.add(named);
+
   for (var at = 1; at < rest.length; at += 1) {
     if (space.isNotEmpty &&
         (at + space.length > rest.length || rest.substring(at, at + space.length) != space)) {
@@ -547,7 +564,10 @@ void main() {
                       : RegExp('(^|\\s)$article\\s', caseSensitive: false).hasMatch(sentence),
             );
 
-            expect(carries, isTrue, reason: '$language $realism: $sentence');
+            // A name takes no article, so a sentence about Mars alone carries none.
+            final named = namesOf(language).keys.any(sentence.contains);
+
+            expect(carries || named, isTrue, reason: '$language $realism: $sentence');
           }
         }
       }
@@ -641,8 +661,11 @@ void main() {
 
             // A counted phrase is a noun phrase with a number on it, so the
             // number comes off before the pools are asked about the rest.
+            // A pool may hold a word with a capital of its own (`Фаэтон`), which
+            // the opening phrase keeps.
             expect(
-              explains(language, stripCount(language, written)),
+              explains(language, stripCount(language, written)) ||
+                  explains(language, stripCount(language, phrase)),
               isTrue,
               reason:
                   '$language: $phrase is not a ${slot.name} the pools can build '
@@ -1832,6 +1855,14 @@ void main() {
 
         if (heads.isEmpty) continue;
 
+        // The head a place part carries in the frames, which is what a place listed
+        // nowhere keeps: `in` in English and Italian, `trong` in Vietnamese.
+        final own = <String>{
+          for (final frame in data.frames)
+            for (final part in frame.parts)
+              if (part.slot == SentenceSlot.place && part.head != null) part.head!,
+        };
+
         for (final detail in randSentenceDetails(
           language: language,
           type: statementOnly,
@@ -1847,11 +1878,13 @@ void main() {
           final phrase = detail.phrases[at];
           final expected = <String>[
             for (final noun in nounsIn(language, phrase))
-              heads.entries
-                      .where((entry) => entry.value.contains(noun))
-                      .map((entry) => entry.key)
-                      .firstOrNull ??
-                  'in',
+              ...switch (heads.entries
+                  .where((entry) => entry.value.contains(noun))
+                  .map((entry) => entry.key)
+                  .firstOrNull) {
+                final String listed => <String>[listed],
+                null => own,
+              },
           ];
 
           expect(
@@ -1867,16 +1900,21 @@ void main() {
       }
     });
 
-    test('a lifeless word of a creature theme never does anything', () {
-      // `myth` holds spells and amulets beside dragons and elves, and a spell that
-      // chooses a gouge is what the class alone allowed. A language lists them as
-      // `lifeless`, and a sentence about a myth is about the creatures.
+    test('a lifeless word never does anything, and a spell is no longer one', () {
+      // `lifeless` marks a word of a creature theme that is no creature. `myth` held
+      // spells and amulets beside dragons and elves and needed it; since the
+      // creatures moved to `monster`, `myth` is an idea, and a curse that fades is
+      // a sentence like any other. A word a language does list still never acts.
+      expect(themeClass[WordTheme.myth], NounClass.idea);
+      expect(themeClass[WordTheme.monster], NounClass.creature);
+
       for (final language in wordLanguages) {
         final data = sentenceData[language]!;
         final lifeless = (data.traits?[NounTrait.lifeless] ?? const <String>[]).toSet();
         final pronouns = pronounsOf(language);
-
-        expect(lifeless, isNotEmpty, reason: '$language lists nothing lifeless');
+        final myth =
+            wordData[language]!.nouns[WordTheme.myth]!.map((word) => plain(language, word)).toSet();
+        var spells = 0;
 
         for (final detail in randSentenceDetails(
           language: language,
@@ -1898,8 +1936,16 @@ void main() {
               isTrue,
               reason: "$language: '$phrase' is lifeless (${detail.sentence})",
             );
+
+            spells += found.where(myth.contains).length;
           }
         }
+
+        expect(
+          spells,
+          greaterThan(0),
+          reason: '$language: no sentence about a myth had one for its subject',
+        );
       }
     });
 
@@ -3974,14 +4020,15 @@ void main() {
             reason: '$language: "$phrase" goes nowhere, and has a destination (${detail.sentence})',
           );
 
-          // And it goes somewhere one can go: a market, never Pluto or a sky.
+          // And it goes somewhere one can go: a market or a library, never Pluto or
+          // a sky.
           final where = nounsIn(
             language,
             detail.phrases[at],
           ).map((noun) => themeOfNoun(language, noun));
 
           expect(
-            where.isEmpty || where.contains(WordTheme.place),
+            where.isEmpty || where.contains(WordTheme.place) || where.contains(WordTheme.building),
             isTrue,
             reason: '$language: "${detail.phrases[at]}" is nowhere to go (${detail.sentence})',
           );
@@ -4365,6 +4412,64 @@ void main() {
 
           expect(subjects, contains(noun), reason: '$language: no verb takes a $noun subject');
           expect(described, contains(noun), reason: '$language: no state describes a $noun');
+        }
+      }
+    });
+
+    test('a proper noun is written as a name, with no article and nothing in front', () {
+      // `the mars glows` is what a planet came out as while every English noun took
+      // `the` and lost its capital letter. A language lists its names as `proper`.
+      var written = 0;
+
+      for (final language in wordLanguages) {
+        final proper = sentenceData[language]!.traits?[NounTrait.proper] ?? const <String>[];
+        final lexicon = wordData[language]!;
+
+        for (final detail in randSentenceDetails(
+          language: language,
+          theme: WordTheme.planet,
+          count: sample,
+        )) {
+          for (final phrase in detail.phrases) {
+            for (final noun in proper) {
+              final lower = phrase.toLowerCase();
+              final tail = noun.toLowerCase();
+
+              // The name as a whole word: `vía láctea` ends on `tea` and is no Theia.
+              if (lower != tail && !lower.endsWith(' $tail')) continue;
+
+              final name = lexicon.capitalize ? noun[0].toUpperCase() + noun.substring(1) : noun;
+
+              expect(phrase, name, reason: '$language: ${detail.sentence}');
+              written += 1;
+            }
+          }
+        }
+      }
+
+      expect(written, greaterThan(0), reason: 'no sentence named a planet');
+    });
+
+    test('every theme has a modifier to put in front of its nouns', () {
+      // A noun phrase picks its modifier out of the groups the noun's class and its
+      // theme select. A theme no group selects has an empty pool, and the sentence
+      // came out with nothing between two spaces: ` вишня была кислая.`
+      for (final language in wordLanguages) {
+        final data = sentenceData[language]!;
+
+        for (final theme in wordThemes) {
+          final noun = themeClass[theme];
+          final words = [
+            for (final group in data.modifiers)
+              if (group.subject.contains(noun) && (group.themes?.contains(theme) ?? true))
+                ...group.words,
+          ];
+
+          expect(
+            words,
+            isNotEmpty,
+            reason: '$language: no modifier goes in front of a $theme noun',
+          );
         }
       }
     });

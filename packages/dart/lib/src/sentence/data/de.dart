@@ -367,6 +367,7 @@ final SentenceLanguageData de = SentenceLanguageData(
         WordTheme.tool,
         WordTheme.clothing,
         WordTheme.product,
+        WordTheme.beauty,
         WordTheme.toy,
         WordTheme.furniture,
         WordTheme.gem,
@@ -481,6 +482,7 @@ final SentenceLanguageData de = SentenceLanguageData(
     VerbGroup(
       field: VerbField.change,
       subject: const <NounClass>[NounClass.edible],
+      subjectThemes: const <WordTheme>[WordTheme.food, WordTheme.drink],
       words: words(r'''
         reift kühlt kocht schmilzt verdirbt erkaltet dampft riecht schmeckt gerinnt verdunstet
         gefriert verdickt_sich klärt_sich köchelt siedet zischt
@@ -489,6 +491,33 @@ final SentenceLanguageData de = SentenceLanguageData(
         words: words(r'''
           reifte kühlte kochte schmolz verdarb erkaltete dampfte roch schmeckte gerann verdunstete
           gefror verdickte_sich klärte_sich köchelte siedete zischte
+        '''),
+      ),
+    ),
+    VerbGroup(
+      field: VerbField.change,
+      subject: const <NounClass>[NounClass.edible],
+      subjectThemes: const <WordTheme>[WordTheme.fruit, WordTheme.vegetable],
+      words: words(r'''
+        reift verdirbt fault welkt verschrumpelt vertrocknet schimmelt lagert liegt verfärbt_sich
+      '''),
+      past: PredicateTense(
+        words: words(r'''
+          reifte verdarb faulte welkte verschrumpelte vertrocknete schimmelte lagerte lag
+          verfärbte_sich
+        '''),
+      ),
+    ),
+    VerbGroup(
+      field: VerbField.change,
+      subject: const <NounClass>[NounClass.edible],
+      subjectThemes: const <WordTheme>[WordTheme.ingredient],
+      words: words(r'''
+        verdirbt verfällt lagert reicht bleibt schwindet riecht trocknet erwärmt_sich
+      '''),
+      past: PredicateTense(
+        words: words(r'''
+          verdarb verfiel lagerte reichte blieb schwand roch trocknete erwärmte_sich
         '''),
       ),
     ),
@@ -594,9 +623,24 @@ final SentenceLanguageData de = SentenceLanguageData(
     ),
     StateGroup(
       subject: const <NounClass>[NounClass.edible],
+      subjectThemes: const <WordTheme>[WordTheme.food, WordTheme.drink],
       words: words(r'''
         süß salzig scharf sauer heiß kalt herzhaft bitter dickflüssig weich lauwarm saftig knusprig
         lecker fade
+      '''),
+    ),
+    StateGroup(
+      subject: const <NounClass>[NounClass.edible],
+      subjectThemes: const <WordTheme>[WordTheme.fruit, WordTheme.vegetable],
+      words: words(r'''
+        süß sauer reif unreif frisch saftig knackig fest weich mild bitter herb grün zart lecker
+      '''),
+    ),
+    StateGroup(
+      subject: const <NounClass>[NounClass.edible],
+      subjectThemes: const <WordTheme>[WordTheme.ingredient],
+      words: words(r'''
+        salzig süß frisch scharf trocken mild bitter würzig aromatisch kräftig cremig fettig
       '''),
     ),
     StateGroup(
@@ -644,6 +688,22 @@ final SentenceLanguageData de = SentenceLanguageData(
       words: words(r'''
         süß scharf warm frisch knusprig würzig duftend heiß salzig weich reif lecker goldbraun
         geräuchert sahnig zart saftig deftig dampfend geröstet klebrig fade gewürzt
+      '''),
+    ),
+    ModifierGroup(
+      subject: const <NounClass>[NounClass.edible],
+      themes: const <WordTheme>[WordTheme.fruit, WordTheme.vegetable],
+      words: words(r'''
+        frisch reif unreif süß saftig knackig fest weich grün klein groß zart glänzend aromatisch
+        heimisch regional faul
+      '''),
+    ),
+    ModifierGroup(
+      subject: const <NounClass>[NounClass.edible],
+      themes: const <WordTheme>[WordTheme.ingredient],
+      words: words(r'''
+        frisch rein hochwertig billig hausgemacht regional edel salzig süß scharf mild würzig
+        aromatisch kräftig fein roh geräuchert gereift getrocknet cremig
       '''),
     ),
     ModifierGroup(
@@ -786,26 +846,24 @@ final SentenceLanguageData de = SentenceLanguageData(
       Vogel Schwalbe Spatz Rabe Falke Adler Pfau Papagei Eule Taube Kranich Schwan Ente Gans Biene
       Libelle Zikade Fliege Mücke Fledermaus Reiher Pelikan Drache Phönix Fee Greif Pegasus Engel
       Walküre Amsel Nachtigall Lerche Wachtel Fasan Rebhuhn Kolibri Tukan Flamingo Storch Wiedehopf
-      Distelfink Elster Häher Kauz Bussard Möwe Specht Zaunkönig Wespe Motte Leuchtkäfer Hummel
-      Marienkäfer Hippogreif Krähe Schmetterling
+      Distelfink Elster Häher Kauz Bussard Möwe Specht Zaunkönig Wespe Motte Glühwürmchen Hummel
+      Marienkäfer Hippogreif Krähe Schmetterling Geier Uhu Habicht Rotkehlchen Meise Kuckuck
+      Kormoran Albatros Wellensittich Kanarienvogel Kakadu Harpyie Cherub Seraph Wyvern Gargoyle
+      Feuervogel Mantikor Sylphe
     '''),
     NounTrait.swimmer: words(r'''
       Krokodil Schildkröte Frosch Kröte Fisch Wal Delfin Hai Krake Tintenfisch Garnele Krabbe
       Walross Robbe Pinguin Meerjungfrau Najade Aal Sardine Thunfisch Dorsch Seehecht Forelle
       Karpfen Rochen Qualle Muschel Auster Hummer Seestern Salamander Molch Biber Nilpferd
-      Schnabeltier Meerforelle Hering Hecht Wassermann Seeschlange Sirene
+      Schnabeltier Hering Hecht Wassermann Seeschlange Lachs Barsch Zander Wels Makrele Scholle
+      Goldfisch Seepferdchen Schwertfisch Piranha Orca Seelöwe Seehund Narwal Krebs Axolotl
+      Alligator Otter Nixe Undine Leviathan
     '''),
     NounTrait.crawler: words(r'''
       Krokodil Schlange Eidechse Schildkröte Schnecke Ameise Spinne Wurm Krabbe Basilisk Leguan
       Chamäleon Salamander Molch Boa Viper Kobra Python Käfer Heuschrecke Grille Floh Raupe
-      Tausendfüßer Skorpion
-    '''),
-    NounTrait.lifeless: words(r'''
-      Zauber Fluch Weissagung Amulett Talisman Rune Pforte Heiligtum Götze Totem Vorzeichen Omen
-      Bestiarium Zauberbuch Pentagramm Reliquie Kelch Gral Zauberstab Stab Zepter Krone Beschwörung
-      Zauberspruch Zaubertrank Elixier Kristallkugel Bann Segen Alraune Hölle Paradies Unterwelt
-      Jenseits Tarnkappe Schriftrolle Wunder Altar Verwandlung Horoskop Tarot Wünschelrute
-      Geisterschiff Spuk Jungbrunnen
+      Tausendfüßer Skorpion Gecko Waran Alligator Natter Blindschleiche Nacktschnecke Kakerlake
+      Termite Zecke Laus Wanze Assel Egel Krebs Lindwurm Tatzelwurm
     '''),
   },
   interjections: words(r'''

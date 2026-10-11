@@ -298,12 +298,38 @@ export const VI: SentenceLanguageData = {
 			)
 		},
 		{
+			field: 'cook',
+			subject: ['creature', 'person'],
+			object: ['edible'],
+			// What a vegetable and a spoon of salt both take: nothing is roasted or ladled.
+			objectThemes: ['vegetable', 'ingredient'],
+			words: words(`chuẩn_bị thêm cho_thêm trộn trộn_đều`)
+		},
+		{
+			field: 'cook',
+			subject: ['creature', 'person'],
+			object: ['edible'],
+			// What every vegetable takes before it is cooked, and salt does not.
+			objectThemes: ['vegetable'],
+			words: words(`rửa rửa_sạch sơ_chế`)
+		},
+		{
 			field: 'eat',
 			subject: ['creature', 'person'],
 			object: ['edible'],
 			objectThemes: ['food'],
 			words: words(
 				`ăn nhai nếm gặm ăn_hết ăn_sạch ăn_xong nếm_thử ăn_thử cắn cắn_một_miếng nhai_ngấu_nghiến ngấu_nghiến nuốt nuốt_chửng liếm gặm_nhấm nhấm_nháp thưởng_thức ăn_ngon_lành ăn_từ_từ ăn_no ăn_lấy_ăn_để ăn_vội xơi chén đớp tọng ăn_ngon xực nhồm_nhoàm húp`
+			)
+		},
+		{
+			field: 'eat',
+			subject: ['creature', 'person'],
+			object: ['edible'],
+			// Fruit and vegetables are eaten and chewed, and never slurped.
+			objectThemes: ['fruit', 'vegetable'],
+			words: words(
+				`ăn nhai nếm nếm_thử ăn_thử ăn_hết ăn_sạch ăn_xong thưởng_thức ăn_từ_từ ăn_vội xơi`
 			)
 		},
 		{
@@ -393,6 +419,15 @@ export const VI: SentenceLanguageData = {
 			)
 		},
 		{
+			field: 'change',
+			subject: ['thing'],
+			// What a lipstick, a comb and a perm all do: they come into fashion and go out.
+			subjectThemes: ['beauty'],
+			words: words(
+				`thịnh_hành lên_ngôi lỗi_mốt hết_mốt lên_giá xuống_giá tăng_giá giảm_giá được_ưa_chuộng thay_đổi trở_lại`
+			)
+		},
+		{
 			field: 'move',
 			subject: ['vehicle'],
 			words: words(
@@ -423,6 +458,7 @@ export const VI: SentenceLanguageData = {
 		{
 			field: 'change',
 			subject: ['edible'],
+			subjectThemes: ['food', 'drink'],
 			words: words(
 				`chín nguội sôi tan hỏng nguội_đi nguội_dần lạnh_đi ấm_lên nóng_lên ấm_dần nóng_dần bốc_khói bốc_hơi tỏa_khói tỏa_hương thơm_lừng dậy_mùi vơi_đi vơi_dần cạn hết còn_lại còn_dư dư_ra đầy_thêm được_dọn_ra được_bày_ra sẵn_sàng chín_tới đông_lại đặc_lại cứng_lại mềm_ra ôi thiu ôi_thiu lên_men đóng_băng sánh_lại loãng_ra lắng_xuống nổi_váng`
 			)
@@ -444,6 +480,20 @@ export const VI: SentenceLanguageData = {
 			words: words(
 				`sủi_bọt sủi nổi_bọt sủi_tăm nổi_bong_bóng tràn tràn_ra đổ_ra sánh sóng_sánh sánh_ra lắc_lư đục đục_đi trong_lại lắng_cặn nhạt_đi đậm_lên bay_hơi hết_ga xì_hơi nguội_ngắt loãng_đi ấm_nóng lạnh_ngắt`
 			)
+		},
+		{
+			field: 'change',
+			subject: ['edible'],
+			// What fruit and vegetables do on their own: they wilt and rot, and nothing boils.
+			subjectThemes: ['fruit', 'vegetable'],
+			words: words(`hỏng thối héo héo_úa khô_héo teo_lại úng nhũn thâm dập dập_nát mềm_ra mốc hết`)
+		},
+		{
+			field: 'change',
+			subject: ['edible'],
+			// What a store of salt, meat or oil does: it lasts, runs low, runs out.
+			subjectThemes: ['ingredient'],
+			words: words(`dư_ra hết hết_sạch vơi_đi vơi_dần hết_hạn thiếu biến_mất`)
 		}
 	],
 	states: [
@@ -520,9 +570,20 @@ export const VI: SentenceLanguageData = {
 		},
 		{
 			subject: ['edible'],
+			subjectThemes: ['food', 'drink'],
 			words: words(
 				`ngọt mặn cay chua nóng lạnh bùi đắng đậm nhạt âm_ấm ngon giòn mềm béo thanh_mát`
 			)
+		},
+		{
+			subject: ['edible'],
+			subjectThemes: ['fruit', 'vegetable'],
+			words: words(`tươi tươi_rói ngon non sạch rẻ đắt héo dập hỏng mềm to nhỏ`)
+		},
+		{
+			subject: ['edible'],
+			subjectThemes: ['ingredient'],
+			words: words(`ngon sạch rẻ đắt đủ thiếu mới an_toàn hết_hạn còn_hạn`)
 		},
 		{
 			subject: ['idea'],
@@ -570,6 +631,24 @@ export const VI: SentenceLanguageData = {
 			words: words(`
 				ngọt cay ấm tươi giòn thơm nóng mặn mềm chín ngon_lành
 				vàng_ruộm thơm_lừng dẻo_thơm đậm_đà thanh_đạm mới_ra_lò nghi_ngút chua_ngọt béo_ngậy mộc_mạc
+			`)
+		},
+		// Produce as it comes from the garden or the market, never steaming.
+		{
+			subject: ['edible'],
+			themes: ['fruit', 'vegetable'],
+			words: words(`
+				tươi tươi_rói tươi_ngon non sạch hữu_cơ nhỏ to nhỏ_xíu to_tướng
+				nhập_khẩu tự_trồng ngon đầu_mùa trái_mùa dại rẻ
+			`)
+		},
+		// What is kept in a kitchen, by its grade and where it came from.
+		{
+			subject: ['edible'],
+			themes: ['ingredient'],
+			words: words(`
+				ngon sạch hữu_cơ nhập_khẩu hảo_hạng thượng_hạng loại_một rẻ đắt_tiền
+				mới dự_trữ đóng_gói tốt chất_lượng an_toàn hết_hạn mới_mua
 			`)
 		},
 		{
@@ -705,41 +784,65 @@ export const VI: SentenceLanguageData = {
 		flier: words(`
 		chim én sẻ quạ chim_ưng đại_bàng công vẹt cú bồ_câu hạc thiên_nga vịt ngỗng bướm ong chuồn_chuồn ve muỗi
 		ruồi dơi
-		rồng phượng_hoàng tiên thiên_thần hắc_long bạch_long thanh_long chu_tước chim_lửa thiên_mã thần_điểu tinh_linh
+		rồng phượng_hoàng tiên thiên_thần hắc_long bạch_long chu_tước chim_lửa thiên_mã thần_điểu tinh_linh
 		sơn_ca chim_cút gà_lôi đa_đa chim_ruồi hồng_hạc cò chim_gõ_kiến chim_sáo chim_chích chim_cắt hải_âu bồ_nông
 		ong_bắp_cày bướm_đêm đom_đóm ong_nghệ bọ_rùa
 		gà_tây diều_hâu
+		ngan kền_kền sếu diệc vạc chim_cốc chim_bói_cá chim_yến cu_gáy chào_mào họa_mi vành_khuyên chim_khướu
+		cào_cào cà_cuống griffin thần_tình_yêu tổng_lãnh_thiên_thần
 		`),
 		swimmer: words(`
 		cá_sấu rùa ếch cóc cá cá_voi cá_heo cá_mập mực bạch_tuộc tôm cua sứa hải_cẩu cá_chép lươn
-		người_cá mỹ_nhân_ngư hải_quái
+		người_cá hải_quái
 		cá_trích cá_ngừ cá_tuyết cá_hồi cá_trê cá_rô cá_thu cá_đuối hàu trai vẹm tôm_hùm sao_biển
 		cá_kiếm cá_ngựa kỳ_giông hải_ly thú_mỏ_vịt
 		chim_cánh_cụt hải_mã cá_vàng cá_lóc ba_ba thuồng_luồng
+		rái_cá sư_tử_biển cá_cơm cá_mòi cá_basa cá_tra cá_rô_phi cá_chim cá_bống cá_trắm cá_mè cá_nóc cá_hề cá_mú
+		cá_bơn ghẹ hến nghêu sò_điệp bào_ngư nhím_biển hải_sâm nhái nòng_nọc cà_cuống đỉa
+		thủy_quái giao_long ma_da ngư_tinh kraken
 		`),
 		crawler: words(`
 		cá_sấu rắn thằn_lằn rùa ốc kiến nhện giun sâu tằm cua bọ_ngựa
 		kỳ_nhông tắc_kè kỳ_giông trăn rắn_hổ_mang rắn_lục
 		bọ_cánh_cứng châu_chấu dế bọ_chét rết bọ_cạp
 		ốc_sên gián mối
-		`),
-		// A word of a creature theme that is no creature: it takes no verb and no state.
-		lifeless: words(`
-			phép_thuật ma_lực thần_chú lời_nguyền tiên_tri sấm_truyền kết_giới bùa_hộ_mệnh phong_ấn ảo_giác ma_thuật hình_nhân
-			sách_phép chén_thánh gậy_phép trượng vương_trượng
-			bùa_yêu thần_dược thuốc_tiên đũa_thần thảm_bay đèn_thần gương_thần ngọc_ước điềm_báo phép_lạ thiên_đường
-			địa_ngục âm_phủ long_cung
+		kỳ_đà sâu_bướm đỉa bọ_xít bọ_que bọ_hung rệp chấy mãng_xà basilisk
 		`),
 		// A word of the place class that is no place.
 		placeless: words(`
 			cát đá sỏi động_đất san_hô mạch_nước măng_đá nhũ_đá bóng âm_vang hương lửa than_hồng dòng_chảy
 			sao mặt_trời sao_chổi sao_băng cực_quang bụi_sao nhật_thực nguyệt_thực thiên_đỉnh vệ_tinh cụm_sao chòm_sao quỹ_đạo
 			trọng_lực tự_quay nhật_hoa vết_đen gió_mặt_trời năm_ánh_sáng thiên_thể liên_sao định_tinh thiên_cầu hoàng_đạo
-			mưa_sao_băng bụi_vũ_trụ trăng_khuyết trăng_tròn trăng_non ánh_trăng ánh_sao sao_bắc_cực sao_hôm sao_mai
-			dòng_nước thủy_triều sóng bọt sóng_vỗ thị_sai parsec phương_vị cận_nhật viễn_nhật trọng_trường sao_lùn
+			mưa_sao_băng bụi_vũ_trụ trăng_khuyết trăng_tròn trăng_non sao_bắc_cực
+			thủy_triều sóng bọt thị_sai parsec phương_vị cận_nhật viễn_nhật trọng_trường sao_lùn
 			đất_sét phù_sa bụi tro khói hơi_nước bóng_tối ánh_sáng hóa_thạch dung_nham sạt_lở sóng_thần sao_neutron
 			sao_thiên_lang sao_xung chuẩn_tinh tinh_tú tinh_cầu vụ_nổ_lớn vật_chất_tối bão_mặt_trời bắc_đẩu trục
-			không_trọng_lực tia_vũ_trụ bức_xạ người_ngoài_hành_tinh kính_thiên_văn trăng_máu siêu_trăng sao_thần_nông
+			không_trọng_lực tia_vũ_trụ bức_xạ kính_thiên_văn trăng_máu siêu_trăng sao_thần_nông
+			năng_lượng_tối phản_vật_chất sóng_hấp_dẫn rác_vũ_trụ sao_ngưu_lang sao_chức_nữ sao_tua_rua sao_biến_quang
+			từ_quyển nhật_quyển xích_vĩ xích_kinh vũ_trụ_học điểm_kỳ_dị cụm_thiên_hà đá_ngầm bất_động_sản thổ_cư
+			tường cửa cửa_sổ trần_nhà sàn_nhà xà_nhà lan_can móng_nhà bậc_thềm thang_cuốn
+		`)
+	},
+	// A place one stands on rather than in takes trên: `trên sao Hỏa`, `trên cầu`,
+	// where every place frame writes trong.
+	placeHeads: {
+		trên: words(`
+			sao_Thủy sao_Kim Trái_Đất sao_Hỏa sao_Mộc sao_Thổ sao_Thiên_Vương sao_Hải_Vương sao_Diêm_Vương
+			Ceres Eris Haumea Makemake Sedna Quaoar Orcus Gonggong Salacia Varuna Ixion Vesta Pallas Juno Hygiea
+			Psyche Eros Bennu Ryugu Itokawa Apophis Arrokoth Theia Vulcan Phaeton Dimidium Spe Orbitar Fortitudo
+			Ægir Amateru Dagon Meztli Smertrios Phobetor Tassili Madriu Yanyan Tondra Eburonia Yvaga Mastika
+			Bendida Nakanbé Awasis Wangshu Pipitea Asye Veles Boinayel Eyeke Cayahuanca Hämarik Abol Bélisama
+			Mintome Toge Santamasa Noifasui Chura Buru Staburags Baiduri Cuptor Xólotl Hairu Laligurans Kererū
+			Albmi Perwana Pollera Viculus Samagiya Ramajay Khomsa Barajeel Cruinlagh Ibirapitá Madalitso
+			Bambaruush Tahay Awohali Enaiposha Phailinsiam Levantes Najsakopajk Qingluan Cuancoá Astrolábos Ahra
+			Aumatex Ixbalanqué Surt Haik Mulchatna Makombé Zembretta Bocaprins Agouto
+			mặt_trăng hành_tinh tiểu_hành_tinh hành_tinh_lùn ngoại_hành_tinh
+			cầu cầu_vượt cầu_tàu cầu_khỉ con_đường phố đại_lộ quốc_lộ tỉnh_lộ đường_cao_tốc vỉa_hè phố_đi_bộ
+			đường_băng đường_ray đường_mòn lối_đi làn_đường đê đê_chắn_sóng bờ_kè sân_golf
+			sân_thượng mái_nhà ban_công hiên sân_khấu khán_đài tầng gác_mái gác_xép cầu_thang sân_ga
+			đồi núi đỉnh_núi sườn_núi đèo cao_nguyên đảo bán_đảo quần_đảo bãi_biển bãi_cát bãi_đá cồn_cát
+			vách_đá mỏm_đá đồng_cỏ thảo_nguyên cánh_đồng bầu_trời mặt_đất đất đất_liền lục_địa sông_băng
+			núi_băng băng gò bờ_biển bờ_sông
 		`)
 	},
 	interjections: words(`

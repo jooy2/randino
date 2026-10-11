@@ -9,9 +9,9 @@ Plants: trees, flowers, leaves and what grows on them.
 ```javascript
 import { randPlant } from 'randino';
 
-randPlant({ language: 'en', count: 3 }); // ['Treetop', 'Blossom', 'Fern']
+randPlant({ language: 'en', count: 3 }); // ['Leaf', 'Blossom', 'Fern']
 randPlant({ language: 'en', output: 'detail' });
-// [{ word: 'Treetop', language: 'en', theme: 'plant' }]
+// [{ word: 'Leaf', language: 'en', theme: 'plant' }]
 ```
 
 :::
@@ -21,10 +21,10 @@ randPlant({ language: 'en', output: 'detail' });
 ```dart
 import 'package:randino/randino.dart';
 
-randPlant(language: WordLanguage.en, count: 3); // [Treetop, Blossom, Fern]
+randPlant(language: WordLanguage.en, count: 3); // [Leaf, Blossom, Fern]
 ```
 
-Returns `List<String>`. For the detail form, pass `WordTheme.plant` to `randWordDetails`. Dart has no overloads, and a detail twin for each of the twenty-nine themes would be twenty-nine functions too many.
+Returns `List<String>`. For the detail form, pass `WordTheme.plant` to `randWordDetails`. Dart has no overloads, and a detail twin beside every themed function would be one function too many for each theme.
 
 :::
 
@@ -33,9 +33,9 @@ Returns `List<String>`. For the detail form, pass `WordTheme.plant` to `randWord
 ```python
 from randino import rand_plant
 
-rand_plant(language="en", count=3)  # ['Treetop', 'Blossom', 'Fern']
+rand_plant(language="en", count=3)  # ['Leaf', 'Blossom', 'Fern']
 rand_plant(language="en", output="detail")
-# [WordDetail(word='Treetop', language='en', theme='plant')]
+# [WordDetail(word='Leaf', language='en', theme='plant')]
 ```
 
 :::
@@ -47,4 +47,4 @@ rand_plant(language="en", output="detail")
 ## See also
 
 - [`randWord`](./rand-word) — the same generator with `theme` open, and what each option does in full.
-- [Themes](./themes) — the other twenty-four, and the words each one holds.
+- [Themes](./themes) — every other theme, and the words each one holds.

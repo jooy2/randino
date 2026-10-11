@@ -8,7 +8,7 @@ import { themedWord } from './wordGenerator.js';
  * option is the same.
  *
  * @example
- * randTime({ language: 'ko', count: 3 }); // ['새벽', '한여름', '찰나']
+ * randTime({ language: 'ko', count: 3 }); // ['새벽', '정오', '찰나']
  * randTime({ language: 'en', count: 3 }); // ['Twilight', 'Solstice', 'Eternity']
  */
 export function randTime(options?: RandThemedWordOptions & { output?: 'value' }): string[];

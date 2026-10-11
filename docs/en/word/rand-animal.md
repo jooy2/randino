@@ -24,7 +24,7 @@ import 'package:randino/randino.dart';
 randAnimal(language: WordLanguage.en, count: 3); // [Otter, Falcon, Lynx]
 ```
 
-Returns `List<String>`. For the detail form, pass `WordTheme.animal` to `randWordDetails`. Dart has no overloads, and a detail twin for each of the twenty-nine themes would be twenty-nine functions too many.
+Returns `List<String>`. For the detail form, pass `WordTheme.animal` to `randWordDetails`. Dart has no overloads, and a detail twin beside every themed function would be one function too many for each theme.
 
 :::
 
@@ -47,4 +47,4 @@ rand_animal(language="en", output="detail")
 ## See also
 
 - [`randWord`](./rand-word) — the same generator with `theme` open, and what each option does in full.
-- [Themes](./themes) — the other twenty-four, and the words each one holds.
+- [Themes](./themes) — every other theme, and the words each one holds.

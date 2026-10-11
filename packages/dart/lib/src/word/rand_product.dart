@@ -1,13 +1,15 @@
 import 'dart:math';
 
 import 'package:randino/src/types.dart';
+import 'package:randino/src/word/rand_beauty.dart';
 import 'package:randino/src/word/rand_word.dart';
 
-/// Things you buy — the manufactured end of the vocabulary.
+/// Things you buy — the manufactured end of the vocabulary. Make-up, skin and
+/// hair care are [randBeauty].
 ///
 /// [randWord] with the theme already chosen; every other parameter is the same.
 /// For the detail form, pass [WordTheme.product] to `randWordDetails` — Dart has
-/// no overloads, and twenty-four more functions for it would be twenty-four too many.
+/// no overloads, and a second function per theme would be a second wall of them.
 ///
 /// ```dart
 /// randProduct(language: WordLanguage.ko, count: 3); // [노트북, 키보드, 이어폰]

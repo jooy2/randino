@@ -161,20 +161,38 @@ enum WordTheme {
   /// Ideas from the humanities and the social world: 철학, Freedom.
   concept,
 
-  /// Creatures and things out of myth: 구미호, Phoenix.
+  /// Magic and what myth is made of: 부적, Elixir.
   myth,
+
+  /// Creatures of myth, folklore and fantasy: 구미호, Phoenix.
+  monster,
 
   /// The trades and roles people hold: 대장장이, Archer.
   job,
 
-  /// Instruments, forms and terms: 교향곡, Sonata.
+  /// Instruments, notation and performing: 첼로, Melody.
   music,
 
-  /// Places you can walk into or up to: 광장, Lighthouse.
+  /// Kinds of music: 재즈, Techno.
+  genre,
+
+  /// Places that are not buildings: 광장, Harbor.
   place,
 
-  /// Food and drink: 떡볶이, Cocoa.
+  /// Buildings and the rooms in them: 도서관, Lighthouse.
+  building,
+
+  /// Prepared food: 떡볶이, Pancake.
   food,
+
+  /// What food is cooked from: 간장, Cinnamon.
+  ingredient,
+
+  /// Vegetables: 당근, Spinach.
+  vegetable,
+
+  /// Fruit: 복숭아, Apple.
+  fruit,
 
   /// Sports, and what they are played for: 양궁, Trophy.
   sport,
@@ -184,6 +202,9 @@ enum WordTheme {
 
   /// Things you buy: 이어폰, Toaster.
   product,
+
+  /// Make-up, skin and hair care: 립스틱, Lotion.
+  beauty,
 
   /// Colours: 주홍, Crimson.
   color,
@@ -199,6 +220,9 @@ enum WordTheme {
 
   /// Beyond the sky: 은하, Comet.
   space,
+
+  /// Planets by name: 화성, Jupiter.
+  planet,
 
   /// When something happens: 새벽, Twilight.
   time,

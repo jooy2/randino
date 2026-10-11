@@ -2,7 +2,9 @@
 
 from randino.word.data import WORD_LANGUAGES, WORD_THEMES
 from randino.word.rand_animal import rand_animal
+from randino.word.rand_beauty import rand_beauty
 from randino.word.rand_body import rand_body
+from randino.word.rand_building import rand_building
 from randino.word.rand_clothing import rand_clothing
 from randino.word.rand_color import rand_color
 from randino.word.rand_concept import rand_concept
@@ -10,15 +12,20 @@ from randino.word.rand_drink import rand_drink
 from randino.word.rand_emotion import rand_emotion
 from randino.word.rand_finance import rand_finance
 from randino.word.rand_food import rand_food
+from randino.word.rand_fruit import rand_fruit
 from randino.word.rand_furniture import rand_furniture
 from randino.word.rand_gem import rand_gem
+from randino.word.rand_genre import rand_genre
+from randino.word.rand_ingredient import rand_ingredient
 from randino.word.rand_job import rand_job
+from randino.word.rand_monster import rand_monster
 from randino.word.rand_music import rand_music
 from randino.word.rand_myth import rand_myth
 from randino.word.rand_nature import rand_nature
 from randino.word.rand_object import rand_object
 from randino.word.rand_person import rand_person
 from randino.word.rand_place import rand_place
+from randino.word.rand_planet import rand_planet
 from randino.word.rand_plant import rand_plant
 from randino.word.rand_product import rand_product
 from randino.word.rand_sound import rand_sound
@@ -28,6 +35,7 @@ from randino.word.rand_tech import rand_tech
 from randino.word.rand_time import rand_time
 from randino.word.rand_tool import rand_tool
 from randino.word.rand_toy import rand_toy
+from randino.word.rand_vegetable import rand_vegetable
 from randino.word.rand_vehicle import rand_vehicle
 from randino.word.rand_weather import rand_weather
 from randino.word.rand_word import rand_word
@@ -37,7 +45,9 @@ __all__ = [
     "WORD_LANGUAGES",
     "WORD_THEMES",
     "rand_animal",
+    "rand_beauty",
     "rand_body",
+    "rand_building",
     "rand_clothing",
     "rand_color",
     "rand_concept",
@@ -45,15 +55,20 @@ __all__ = [
     "rand_emotion",
     "rand_finance",
     "rand_food",
+    "rand_fruit",
     "rand_furniture",
     "rand_gem",
+    "rand_genre",
+    "rand_ingredient",
     "rand_job",
+    "rand_monster",
     "rand_music",
     "rand_myth",
     "rand_nature",
     "rand_object",
     "rand_person",
     "rand_place",
+    "rand_planet",
     "rand_plant",
     "rand_product",
     "rand_sound",
@@ -63,6 +78,7 @@ __all__ = [
     "rand_time",
     "rand_tool",
     "rand_toy",
+    "rand_vegetable",
     "rand_vehicle",
     "rand_weather",
     "rand_word",

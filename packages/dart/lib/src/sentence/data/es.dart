@@ -550,7 +550,7 @@ final SentenceLanguageData es = SentenceLanguageData(
       field: VerbField.cook,
       subject: const <NounClass>[NounClass.creature, NounClass.person],
       object: const <NounClass>[NounClass.edible],
-      objectThemes: const <WordTheme>[WordTheme.food],
+      objectThemes: const <WordTheme>[WordTheme.food, WordTheme.vegetable],
       words: words(r'''
         hornea calienta cocina corta asa sirve guisa fríe hierve cuece saltea sazona adereza
         condimenta sala remueve mezcla bate rehoga estofa tuesta gratina pela pica trocea ralla
@@ -568,7 +568,7 @@ final SentenceLanguageData es = SentenceLanguageData(
       field: VerbField.eat,
       subject: const <NounClass>[NounClass.creature, NounClass.person],
       object: const <NounClass>[NounClass.edible],
-      objectThemes: const <WordTheme>[WordTheme.food],
+      objectThemes: const <WordTheme>[WordTheme.food, WordTheme.fruit, WordTheme.vegetable],
       words: words(r'''
         come mastica prueba mordisquea devora saborea degusta traga engulle zampa muerde roe lame
         picotea da_un_bocado_a se_zampa se_come termina se_traga se_come_entero da_cuenta_de
@@ -694,6 +694,7 @@ final SentenceLanguageData es = SentenceLanguageData(
         WordTheme.tool,
         WordTheme.clothing,
         WordTheme.product,
+        WordTheme.beauty,
         WordTheme.toy,
         WordTheme.furniture,
         WordTheme.gem,
@@ -833,6 +834,7 @@ final SentenceLanguageData es = SentenceLanguageData(
     VerbGroup(
       field: VerbField.change,
       subject: const <NounClass>[NounClass.edible],
+      subjectThemes: const <WordTheme>[WordTheme.food, WordTheme.drink],
       words: words(r'''
         madura se_enfría hierve se_derrite se_estropea se_calienta se_entibia se_templa humea
         echa_vapor huele_bien desprende_aroma se_acaba se_termina se_agota sobra queda se_reduce
@@ -845,6 +847,36 @@ final SentenceLanguageData es = SentenceLanguageData(
           echó_vapor olió_bien desprendió_aroma se_acabó se_terminó se_agotó sobró quedó se_redujo
           llegó_a_la_mesa se_sirvió se_cuajó se_endureció se_ablandó se_pudrió se_echó_a_perder
           fermentó se_congeló se_espesó se_aclaró se_asentó reposó se_enfrió_del_todo
+        '''),
+      ),
+    ),
+    VerbGroup(
+      field: VerbField.change,
+      subject: const <NounClass>[NounClass.edible],
+      subjectThemes: const <WordTheme>[WordTheme.fruit, WordTheme.vegetable],
+      words: words(r'''
+        madura se_estropea se_pudre se_marchita se_seca se_ablanda se_arruga se_magulla se_enmohece
+        se_echa_a_perder queda sobra
+      '''),
+      past: PredicateTense(
+        words: words(r'''
+          maduró se_estropeó se_pudrió se_marchitó se_secó se_ablandó se_arrugó se_magulló
+          se_enmoheció se_echó_a_perder quedó sobró
+        '''),
+      ),
+    ),
+    VerbGroup(
+      field: VerbField.change,
+      subject: const <NounClass>[NounClass.edible],
+      subjectThemes: const <WordTheme>[WordTheme.ingredient],
+      words: words(r'''
+        se_estropea se_echa_a_perder se_seca se_endurece se_ablanda se_acaba se_agota se_termina
+        queda sobra
+      '''),
+      past: PredicateTense(
+        words: words(r'''
+          se_estropeó se_echó_a_perder se_secó se_endureció se_ablandó se_acabó se_agotó se_terminó
+          quedó sobró
         '''),
       ),
     ),
@@ -969,9 +1001,29 @@ final SentenceLanguageData es = SentenceLanguageData(
     ),
     StateGroup(
       subject: const <NounClass>[NounClass.edible],
+      subjectThemes: const <WordTheme>[WordTheme.food, WordTheme.drink],
       words: words(r'''
         dulce salado picante ácido caliente frío sabroso amargo espeso suave tibio jugoso crujiente
         rico soso
+      '''),
+    ),
+    StateGroup(
+      subject: const <NounClass>[NounClass.edible],
+      subjectThemes: const <WordTheme>[WordTheme.fruit, WordTheme.vegetable],
+      words: words(r'dulce ácido amargo jugoso crujiente suave sabroso firme tierno carnoso'),
+    ),
+    StateGroup(
+      subject: const <NounClass>[NounClass.edible],
+      subjectThemes: const <WordTheme>[WordTheme.fruit, WordTheme.vegetable],
+      head: 'está',
+      pastHead: 'estaba',
+      words: words(r'maduro verde fresco blando duro pasado arrugado podrido'),
+    ),
+    StateGroup(
+      subject: const <NounClass>[NounClass.edible],
+      subjectThemes: const <WordTheme>[WordTheme.ingredient],
+      words: words(r'''
+        salado dulce fresco picante fino grueso seco sabroso suave amargo aromático fuerte
       '''),
     ),
     StateGroup(
@@ -1021,6 +1073,22 @@ final SentenceLanguageData es = SentenceLanguageData(
       words: words(r'''
         dulce picante tibio fresco crujiente sabroso fragante caliente salado blando maduro rico
         dorado ahumado cremoso tierno jugoso sustancioso humeante tostado pegajoso soso especiado
+      '''),
+    ),
+    ModifierGroup(
+      subject: const <NounClass>[NounClass.edible],
+      themes: const <WordTheme>[WordTheme.fruit, WordTheme.vegetable],
+      words: words(r'''
+        fresco maduro dulce jugoso crujiente firme blando tierno crudo verde silvestre pequeño
+        grande sabroso ecológico
+      '''),
+    ),
+    ModifierGroup(
+      subject: const <NounClass>[NounClass.edible],
+      themes: const <WordTheme>[WordTheme.ingredient],
+      words: words(r'''
+        fresco seco salado dulce fino grueso aromático picante suave sabroso casero natural
+        ecológico artesano importado entero
       '''),
     ),
     ModifierGroup(
@@ -1180,26 +1248,24 @@ final SentenceLanguageData es = SentenceLanguageData(
       pájaro golondrina gorrión cuervo halcón águila pavo_real loro búho paloma grulla cisne pato
       ganso mariposa abeja libélula cigarra mosca mosquito murciélago garza pelícano dragón fénix
       hada pegaso grifo ángel valquiria mirlo ruiseñor alondra codorniz faisán perdiz colibrí tucán
-      flamenco cigüeña abubilla jilguero urraca arrendajo avispa polilla luciérnaga hipogrifo
-      gaviota lechuza querubín serafín
+      cigüeña abubilla jilguero urraca arrendajo avispa polilla luciérnaga hipogrifo gaviota lechuza
+      querubín serafín buitre cóndor gavilán petirrojo canario periquito cotorra guacamayo
+      pájaro_carpintero tórtola pinzón albatros cormorán mariquita abejorro arpía gárgola guiverno
+      silfo sílfide
     '''),
     NounTrait.swimmer: words(r'''
       cocodrilo tortuga rana sapo pez ballena delfín tiburón pulpo calamar gamba cangrejo morsa foca
       pingüino sirena kraken náyade anguila sardina atún bacalao merluza trucha salmón carpa raya
       medusa almeja mejillón ostra salamandra tritón castor hipopótamo ornitorrinco langosta orca
-      nereida
+      nereida nutria león_marino manatí narval cachalote beluga lubina lenguado boquerón caballa
+      pez_espada piraña caballito_de_mar bogavante ajolote renacuajo caimán anaconda
+      serpiente_marina ondina leviatán
     '''),
     NounTrait.crawler: words(r'''
       cocodrilo serpiente lagarto tortuga caracol hormiga araña gusano cangrejo basilisco iguana
       camaleón salamandra tritón boa víbora cobra pitón escarabajo saltamontes grillo pulga oruga
-      ciempiés escorpión cucaracha
-    '''),
-    NounTrait.lifeless: words(r'''
-      hechizo maldición profecía amuleto talismán runa portal santuario ídolo tótem augurio presagio
-      bestiario conjuro sortilegio grimorio pentáculo reliquia cáliz grial varita báculo cetro
-      corona poción elixir bendición magia alquimia brujería caldero bola_de_cristal tridente
-      piedra_filosofal vellocino ambrosía inframundo paraíso infierno limbo purgatorio ofrenda
-      invocación exorcismo aura inmortalidad reencarnación
+      ciempiés escorpión cucaracha lagartija caimán anaconda babosa lombriz sanguijuela tarántula
+      garrapata termita piojo estrella_de_mar
     '''),
     NounTrait.placeless: words(r'''
       arena guijarro terremoto géiser fumarola estalactita estalagmita eco brasa estrella sol
@@ -1210,8 +1276,22 @@ final SentenceLanguageData es = SentenceLanguageData(
       bólido enana coma piedra polvo barro hielo fuego chispa ola luz oscuridad aire lava magma
       erupción avalancha inundación incendio hoguera reflejo huella surco fósil concha grava arcilla
       témpano burbuja espejismo agujero_negro radiación viento_solar llamarada materia_oscura nova
-      zodíaco extraterrestre ovni alunizaje despegue eje magnetar singularidad cuerpo_celeste
-      marciano
+      zodíaco ovni alunizaje despegue eje magnetar singularidad cuerpo_celeste tsunami vapor
+      marejada viga columna tabique claraboya obelisco menhir cometa Osa_Mayor Osa_Menor Orión
+      Casiopea Pléyades Sirio Estrella_Polar Betelgeuse Aldebarán Antares agujero_de_gusano big_bang
+      antimateria astronomía astrofísica cosmología magnitud
+    '''),
+    NounTrait.proper: words(r'''
+      Mercurio Venus Marte Júpiter Saturno Urano Neptuno Plutón Ceres Eris Haumea Makemake Sedna
+      Quaoar Gonggong Salacia Varuna Ixión Vesta Palas Juno Higía Psique Eros Bennu Ryugu Apofis
+      Arrokoth Tea Vulcano Dimidium Spe Orbitar Fortitudo Ægir Amateru Dagon Meztli Smertrios
+      Phobetor Tassili Madriu Yanyan Tondra Eburonia Yvaga Mastika Bendida Nakanbé Awasis Wangshu
+      Pipitea Asye Veles Boinayel Eyeke Cayahuanca Hämarik Abol Bélisama Mintome Toge Santamasa
+      Noifasui Chura Buru Staburags Baiduri Cuptor Xólotl Hairu Laligurans Kereru Albmi Perwana
+      Viculus Samagiya Ramajay Khomsa Barajeel Cruinlagh Ibirapitá Madalitso Bambaruush Tahay
+      Awohali Enaiposha Phailinsiam Najsakopajk Qingluan Cuancoá Astrolábos Ahra Aumatex Ixbalanqué
+      Surt Haik Mulchatna Makombé Zembretta Bocaprins Agouto Orión Casiopea Sirio Betelgeuse
+      Aldebarán Antares
     '''),
   },
   interjections: words(r'''

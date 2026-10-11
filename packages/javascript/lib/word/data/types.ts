@@ -2,7 +2,7 @@
 // consumers only ever see the options types and the two details.
 //
 // One dataset per language rather than one per generator: `randWord` and its
-// twenty-nine themed forms draw from `nouns`, `randModifier` draws from
+// thirty-seven themed forms draw from `nouns`, `randModifier` draws from
 // `adjectives` and `actions`, and `randNickname` puts them together in the
 // shapes `frames` allows. The pools are the same words either way, so they are
 // written once.
@@ -144,7 +144,7 @@ export type WordLanguageData = {
  * What `randModifier` reads of a language, kept in `modifiers/<code>.ts` apart
  * from the nouns: the modifiers themselves, how they agree, the shapes they sit
  * in and the template an invented one is spelled from. Apart because a bundle
- * that decorates a string has no use for twenty-nine themes of nouns, and they
+ * that decorates a string has no use for thirty-seven themes of nouns, and they
  * were most of what it carried.
  */
 export type WordModifierData = Pick<

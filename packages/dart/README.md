@@ -97,11 +97,11 @@ randNicknameDetails(language: WordLanguage.en).first;
 | `startsWith`              | `String?`           | `null`                 |
 | `unique`                  | `bool`              | `false`                |
 
-Themes: `animal`, `object`, `nature`, `plant`, `gem`, `concept`, `myth`, `job`, `music`, `place`, `food`, `sport`, `vehicle`, `product`, `color`, `finance`, `tech`, `weather`, `space`, `time`, `emotion`, `body`, `clothing`, `tool`, `drink`, `toy`, `sound`, `person`, `furniture`.
+Themes: `animal`, `object`, `nature`, `plant`, `gem`, `concept`, `myth`, `monster`, `job`, `music`, `genre`, `place`, `building`, `food`, `ingredient`, `vegetable`, `fruit`, `sport`, `vehicle`, `product`, `beauty`, `color`, `finance`, `tech`, `weather`, `space`, `planet`, `time`, `emotion`, `body`, `clothing`, `tool`, `drink`, `toy`, `sound`, `person`, `furniture`.
 
 ## Words
 
-The pools the nicknames are built from, on their own. Twenty-nine themes, nine languages, and a function per theme.
+The pools the nicknames are built from, on their own. Thirty-seven themes, nine languages, and a function per theme.
 
 ```dart
 randWord(language: WordLanguage.en, theme: WordTheme.animal, count: 3);
@@ -127,7 +127,7 @@ wordLengthRange(language: WordLanguage.en); // LengthRange(3, 11)
 | `startsWith`              | `String?`       | `null`             |
 | `unique`                  | `bool`          | `false`            |
 
-One function per theme: `randAnimal`, `randObject`, `randNature`, `randPlant`, `randGem`, `randConcept`, `randMyth`, `randJob`, `randMusic`, `randPlace`, `randFood`, `randSport`, `randVehicle`, `randProduct`, `randColor`, `randFinance`, `randTech`, `randWeather`, `randSpace`, `randTime`, `randEmotion`, `randBody`, `randClothing`, `randTool`, `randDrink`, `randToy`, `randSound`, `randPerson`, `randFurniture`. They return `List<String>`; for the detail form, pass the theme to `randWordDetails`.
+One function per theme: `randAnimal`, `randObject`, `randNature`, `randPlant`, `randGem`, `randConcept`, `randMyth`, `randMonster`, `randJob`, `randMusic`, `randGenre`, `randPlace`, `randBuilding`, `randFood`, `randIngredient`, `randVegetable`, `randFruit`, `randSport`, `randVehicle`, `randProduct`, `randBeauty`, `randColor`, `randFinance`, `randTech`, `randWeather`, `randSpace`, `randPlanet`, `randTime`, `randEmotion`, `randBody`, `randClothing`, `randTool`, `randDrink`, `randToy`, `randSound`, `randPerson`, `randFurniture`. They return `List<String>`; for the detail form, pass the theme to `randWordDetails`.
 
 ## Sentences
 

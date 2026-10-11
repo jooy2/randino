@@ -1,6 +1,6 @@
 # randFood
 
-음식과 음료. 일상적으로 먹고 마시는 것들입니다.
+완성된 음식입니다. 요리와 국, 면, 빵, 디저트와 간식처럼 차려서 먹는 것을 담습니다. 요리의 재료는 [`randIngredient`](./rand-ingredient)에, 채소와 과일은 [`randVegetable`](./rand-vegetable)과 [`randFruit`](./rand-fruit)에 따로 있습니다.
 
 `theme`을 <Lang js="'food'" dart="WordTheme.food" py="&quot;food&quot;" code />로 고정한 [`randWord`](./rand-word)입니다. 나머지 옵션은 모두 같고, 뜻하는 바도 같습니다.
 
@@ -9,9 +9,9 @@
 ```javascript
 import { randFood } from 'randino';
 
-randFood({ language: 'en', count: 3 }); // ['Rice', 'Noodle', 'Dumpling']
+randFood({ language: 'en', count: 3 }); // ['Pizza', 'Noodle', 'Dumpling']
 randFood({ language: 'en', output: 'detail' });
-// [{ word: 'Rice', language: 'en', theme: 'food' }]
+// [{ word: 'Pizza', language: 'en', theme: 'food' }]
 ```
 
 :::
@@ -21,10 +21,10 @@ randFood({ language: 'en', output: 'detail' });
 ```dart
 import 'package:randino/randino.dart';
 
-randFood(language: WordLanguage.en, count: 3); // [Rice, Noodle, Dumpling]
+randFood(language: WordLanguage.en, count: 3); // [Pizza, Noodle, Dumpling]
 ```
 
-`List<String>`을 돌려줍니다. 상세 출력이 필요하면 `randWordDetails`에 `WordTheme.food`를 넘기세요. Dart에는 오버로드가 없어서, 이것만을 위해 함수를 스물아홉 개 더 두는 것은 과합니다.
+`List<String>`을 돌려줍니다. 상세 출력이 필요하면 `randWordDetails`에 `WordTheme.food`를 넘기세요. Dart에는 오버로드가 없어서, 테마마다 상세 출력용 함수를 하나씩 더 두는 것은 과합니다.
 
 :::
 
@@ -33,9 +33,9 @@ randFood(language: WordLanguage.en, count: 3); // [Rice, Noodle, Dumpling]
 ```python
 from randino import rand_food
 
-rand_food(language="en", count=3)  # ['Rice', 'Noodle', 'Dumpling']
+rand_food(language="en", count=3)  # ['Pizza', 'Noodle', 'Dumpling']
 rand_food(language="en", output="detail")
-# [WordDetail(word='Rice', language='en', theme='food')]
+# [WordDetail(word='Pizza', language='en', theme='food')]
 ```
 
 :::
@@ -47,4 +47,4 @@ rand_food(language="en", output="detail")
 ## 함께 보기 {#see-also}
 
 - [`randWord`](./rand-word) — `theme`이 열려 있는 같은 생성 함수, 그리고 각 옵션의 전체 설명.
-- [테마](./themes) — 나머지 스물네 개와 각 테마가 담은 단어들.
+- [테마](./themes) — 나머지 테마와 각 테마가 담은 단어들.

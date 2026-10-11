@@ -100,6 +100,22 @@ function longest(words: readonly string[]): string | null {
 	return [...words].sort((a, b) => b.length - a.length || (a < b ? -1 : 1))[0] ?? null;
 }
 
+/**
+ * The names a language lists as `proper`, in the form a sentence writes them —
+ * with the capital letter the pool gives them — mapped to the plain form the
+ * pools are compared in.
+ */
+function namesOf(language: WordLanguage): Map<string, string> {
+	const wordData = WORD_DATA[language];
+
+	return new Map(
+		(SENTENCE_DATA[language].traits?.proper ?? []).map((noun) => [
+			wordData.capitalize ? noun.charAt(0).toUpperCase() + noun.slice(1) : noun,
+			noun
+		])
+	);
+}
+
 function nounsIn(language: WordLanguage, phrase: string): Set<string> {
 	const space = SENTENCE_DATA[language].space;
 	const nouns = poolFor(language, 'subject');
@@ -118,6 +134,13 @@ function nounsIn(language: WordLanguage, phrase: string): Set<string> {
 
 	if (nouns.has(rest)) {
 		found.add(rest);
+	}
+
+	// A name is written as the pool writes it, with no article and nothing in front.
+	const named = namesOf(language).get(rest);
+
+	if (named) {
+		found.add(named);
 	}
 
 	for (let at = 1; at < rest.length; at += 1) {
@@ -528,7 +551,7 @@ function explains(language: WordLanguage, phrase: string): boolean {
 		}
 	}
 
-	if (nouns.has(rest)) {
+	if (nouns.has(rest) || namesOf(language).has(rest)) {
 		return true;
 	}
 
@@ -622,7 +645,10 @@ describe('Sentence', () => {
 							: new RegExp(`(^|\\s)${article}\\s`, 'i').test(sentence)
 					);
 
-					assert.ok(carries, `${language} ${realism}: ${sentence}`);
+					// A name takes no article, so a sentence about Mars alone carries none.
+					const named = [...namesOf(language).keys()].some((name) => sentence.includes(name));
+
+					assert.ok(carries || named, `${language} ${realism}: ${sentence}`);
 				}
 			}
 		}
@@ -702,8 +728,11 @@ describe('Sentence', () => {
 
 					// A counted phrase is a noun phrase with a number on it, so the
 					// number comes off before the pools are asked about the rest.
+					// A pool may hold a word with a capital of its own (`Фаэтон`), which
+					// the opening phrase keeps.
 					assert.ok(
-						explains(language, stripCount(language, written)),
+						explains(language, stripCount(language, written)) ||
+							explains(language, stripCount(language, phrase)),
 						`${language}: '${phrase}' is not a ${slot} the pools can build (${detail.sentence})`
 					);
 				}
@@ -1717,6 +1746,16 @@ describe('Sentence', () => {
 				continue;
 			}
 
+			// The head a place part carries in the frames, which is what a place listed
+			// nowhere keeps: `in` in English and Italian, `trong` in Vietnamese.
+			const own = [
+				...new Set(
+					data.frames.flatMap((frame) =>
+						frame.parts.flatMap((part) => (part.slot === 'place' && part.head ? [part.head] : []))
+					)
+				)
+			];
+
 			for (const detail of sentenceDetails({ language, slots: 'place', count: SAMPLE })) {
 				const at = detail.slots.indexOf('place');
 
@@ -1725,9 +1764,11 @@ describe('Sentence', () => {
 				}
 
 				const phrase = detail.phrases[at];
-				const expected = [...nounsIn(language, phrase)].map(
-					(noun) => heads.find(([, pool]) => pool.includes(noun))?.[0] ?? 'in'
-				);
+				const expected = [...nounsIn(language, phrase)].flatMap((noun) => {
+					const listed = heads.find(([, pool]) => pool.includes(noun))?.[0];
+
+					return listed ? [listed] : own;
+				});
 
 				assert.ok(
 					expected.some(
@@ -1741,16 +1782,20 @@ describe('Sentence', () => {
 		}
 	});
 
-	it('a lifeless word of a creature theme never does anything', () => {
-		// `myth` holds spells and amulets beside dragons and elves, and a spell that
-		// chooses a gouge is what the class alone allowed. A language lists them as
-		// `lifeless`, and a sentence about a myth is about the creatures.
+	it('a lifeless word never does anything, and a spell is no longer one', () => {
+		// `lifeless` marks a word of a creature theme that is no creature. `myth` held
+		// spells and amulets beside dragons and elves and needed it; since the
+		// creatures moved to `monster`, `myth` is an idea, and a curse that fades is
+		// a sentence like any other. A word a language does list still never acts.
+		assert.strictEqual(THEME_CLASS.myth, 'idea');
+		assert.strictEqual(THEME_CLASS.monster, 'creature');
+
 		for (const language of WORD_LANGUAGES) {
 			const data = SENTENCE_DATA[language];
 			const lifeless = new Set(data.traits?.lifeless ?? []);
 			const pronouns = pronounsOf(language);
-
-			assert.ok(lifeless.size > 0, `${language} lists nothing lifeless`);
+			const myth = new Set(WORD_DATA[language].nouns.myth.map((word) => plain(language, word)));
+			let spells = 0;
 
 			for (const detail of sentenceDetails({ language, theme: 'myth', count: SAMPLE })) {
 				detail.phrases.forEach((phrase, i) => {
@@ -1764,8 +1809,12 @@ describe('Sentence', () => {
 						found.length === 0 || found.some((noun) => !lifeless.has(noun)),
 						`${language}: '${phrase}' is lifeless (${detail.sentence})`
 					);
+
+					spells += found.filter((noun) => myth.has(noun)).length;
 				});
 			}
+
+			assert.ok(spells > 0, `${language}: no sentence about a myth had one for its subject`);
 		}
 	});
 
@@ -3611,13 +3660,14 @@ describe('Sentence', () => {
 					`${language}: '${phrase}' goes nowhere, and has a destination (${detail.sentence})`
 				);
 
-				// And it goes somewhere one can go: a market, never Pluto or a sky.
+				// And it goes somewhere one can go: a market or a library, never Pluto or a
+				// sky.
 				const where = [...nounsIn(language, detail.phrases[at])].map((noun) =>
 					themeOfNoun(language, noun)
 				);
 
 				assert.ok(
-					where.length === 0 || where.includes('place'),
+					where.length === 0 || where.includes('place') || where.includes('building'),
 					`${language}: '${detail.phrases[at]}' is nowhere to go (${detail.sentence})`
 				);
 			}
@@ -3944,6 +3994,59 @@ describe('Sentence', () => {
 
 				assert.ok(subjects.has(noun), `${language}: no verb takes a ${noun} subject`);
 				assert.ok(described.has(noun), `${language}: no state describes a ${noun}`);
+			}
+		}
+	});
+
+	it('a proper noun is written as a name, with no article and nothing in front', () => {
+		// `the mars glows` is what a planet came out as while every English noun took
+		// `the` and lost its capital letter. A language lists its names as `proper`.
+		let written = 0;
+
+		for (const language of WORD_LANGUAGES) {
+			const proper = SENTENCE_DATA[language].traits?.proper ?? [];
+			const wordData = WORD_DATA[language];
+
+			for (const detail of sentenceDetails({ language, theme: 'planet', count: SAMPLE })) {
+				for (const phrase of detail.phrases) {
+					for (const noun of proper) {
+						const lower = phrase.toLowerCase();
+						const tail = noun.toLowerCase();
+
+						// The name as a whole word: `vía láctea` ends on `tea` and is no Theia.
+						if (lower !== tail && !lower.endsWith(` ${tail}`)) {
+							continue;
+						}
+
+						const name = wordData.capitalize ? noun.charAt(0).toUpperCase() + noun.slice(1) : noun;
+
+						assert.strictEqual(phrase, name, `${language}: ${detail.sentence}`);
+						written += 1;
+					}
+				}
+			}
+		}
+
+		assert.ok(written > 0, 'no sentence named a planet');
+	});
+
+	it('every theme has a modifier to put in front of its nouns', () => {
+		// A noun phrase picks its modifier out of the groups the noun's class and its
+		// theme select. A theme no group selects has an empty pool, and the sentence
+		// came out with nothing between two spaces: ` вишня была кислая.`
+		for (const language of WORD_LANGUAGES) {
+			const data = SENTENCE_DATA[language];
+
+			for (const theme of WORD_THEMES) {
+				const noun = THEME_CLASS[theme];
+				const words = data.modifiers
+					.filter(
+						(group) =>
+							group.subject.includes(noun) && (!group.themes || group.themes.includes(theme))
+					)
+					.flatMap((group) => [...group.words]);
+
+				assert.ok(words.length > 0, `${language}: no modifier goes in front of a ${theme} noun`);
 			}
 		}
 	});

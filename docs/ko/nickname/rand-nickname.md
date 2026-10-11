@@ -121,7 +121,7 @@ rand_nickname(language="en", output="detail")
 
 ### `theme`이 보고하는 값 {#about-theme}
 
-`theme`은 결과를 설명하는 값이지 요청을 되돌려 주는 값이 아닙니다. 테마에서 뽑은 단어는 그 테마를 보고합니다. 만들어낸 단어는 우연히 실제 단어와 같아질 수 있으므로 29개 테마 전체에서 찾아본 뒤, 어디에도 없으면 null을 보고합니다.
+`theme`은 결과를 설명하는 값이지 요청을 되돌려 주는 값이 아닙니다. 테마에서 뽑은 단어는 그 테마를 보고합니다. 만들어낸 단어는 우연히 실제 단어와 같아질 수 있으므로 37개 테마 전체에서 찾아본 뒤, 어디에도 없으면 null을 보고합니다.
 
 여기서 두 가지 우연이 따라옵니다. 버그가 아니라 예상해야 할 동작입니다. 하나는 같은 단어가 수식어이면서 명사일 수 있다는 것입니다(`Marble`이 그렇습니다). 다른 하나는 만들어낸 단어가 우연히 실제 단어를 이룰 수 있다는 것입니다. 음절 템플릿이 이따금 `Snake`를 만들어내므로, `realism: 'invented'`로 만든 닉네임이 `theme`을 `animal`로 보고하기도 합니다.
 
@@ -221,7 +221,7 @@ rand_nickname(language="en", theme="gem", count=3)
 
 :::
 
-29개 테마와 각 테마가 담고 있는 것은 [테마](../word/themes)에 있습니다.
+37개 테마와 각 테마가 담고 있는 것은 [테마](../word/themes)에 있습니다.
 
 ### 형태 고르기 {#picking-the-shape}
 
@@ -563,5 +563,5 @@ for detail in rand_nickname(language="en", count=100, output="detail"):
 ## 함께 보기
 
 - [`randSuffix`](../decorate/rand-suffix) — 닉네임이 겹치면 안 될 때 붙이는 무작위 토큰.
-- [테마](../word/themes) — 닉네임을 만드는 29개 어휘 묶음.
+- [테마](../word/themes) — 닉네임을 만드는 37개 어휘 묶음.
 - [`nicknameLengthRange`](./nickname-length-range) — 각 언어가 만들 수 있는 모든 길이.

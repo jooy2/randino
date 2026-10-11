@@ -143,7 +143,9 @@ void main() {
           'randAppStoreDetails',
           'randArchitecture',
           'randArchitectureDetails',
+          'randBeauty',
           'randBody',
+          'randBuilding',
           'randCity',
           'randCityDetails',
           'randClothing',
@@ -171,11 +173,14 @@ void main() {
           'randFileExtensionDetails',
           'randFinance',
           'randFood',
+          'randFruit',
           'randFurniture',
           'randGender',
           'randGenderDetails',
+          'randGenre',
           'randGpu',
           'randGpuDetails',
+          'randIngredient',
           'randGem',
           'randJob',
           'randLengthMax',
@@ -188,6 +193,7 @@ void main() {
           'randSentenceCountMax',
           'randSentenceLengthMax',
           'randModifier',
+          'randMonster',
           'randModifierAll',
           'randMusic',
           'randMyth',
@@ -206,6 +212,7 @@ void main() {
           'randPhone',
           'randPhoneDetails',
           'randPlace',
+          'randPlanet',
           'randPlant',
           'randPrefix',
           'randPrefixAll',
@@ -227,6 +234,7 @@ void main() {
           'randTime',
           'randTool',
           'randToy',
+          'randVegetable',
           'randVehicle',
           'randVersion',
           'randVersionDetails',
@@ -384,7 +392,7 @@ void main() {
       expect(randCountMax, 10000);
 
       expect(wordLanguages, hasLength(9));
-      expect(wordThemes, hasLength(29));
+      expect(wordThemes, hasLength(37));
 
       expect(affixLengthDefault, 5);
       expect(affixLengthMax, 32);
@@ -515,8 +523,12 @@ void main() {
         'randArchitectureDetails':
             ({required int count, Random? random}) =>
                 randArchitectureDetails(count: count, random: random),
+        'randBeauty':
+            ({required int count, Random? random}) => randBeauty(count: count, random: random),
         'randBody':
             ({required int count, Random? random}) => randBody(count: count, random: random),
+        'randBuilding':
+            ({required int count, Random? random}) => randBuilding(count: count, random: random),
         'randCity':
             ({required int count, Random? random}) => randCity(count: count, random: random),
         'randCityDetails':
@@ -573,6 +585,8 @@ void main() {
             ({required int count, Random? random}) => randFinance(count: count, random: random),
         'randFood':
             ({required int count, Random? random}) => randFood(count: count, random: random),
+        'randFruit':
+            ({required int count, Random? random}) => randFruit(count: count, random: random),
         'randFurniture':
             ({required int count, Random? random}) => randFurniture(count: count, random: random),
         'randGem': ({required int count, Random? random}) => randGem(count: count, random: random),
@@ -581,9 +595,13 @@ void main() {
         'randGenderDetails':
             ({required int count, Random? random}) =>
                 randGenderDetails(count: count, random: random),
+        'randGenre':
+            ({required int count, Random? random}) => randGenre(count: count, random: random),
         'randGpu': ({required int count, Random? random}) => randGpu(count: count, random: random),
         'randGpuDetails':
             ({required int count, Random? random}) => randGpuDetails(count: count, random: random),
+        'randIngredient':
+            ({required int count, Random? random}) => randIngredient(count: count, random: random),
         'randJob': ({required int count, Random? random}) => randJob(count: count, random: random),
         'randLocation':
             ({required int count, Random? random}) => randLocation(count: count, random: random),
@@ -595,6 +613,8 @@ void main() {
         'randMimeTypeDetails':
             ({required int count, Random? random}) =>
                 randMimeTypeDetails(count: count, random: random),
+        'randMonster':
+            ({required int count, Random? random}) => randMonster(count: count, random: random),
         'randMusic':
             ({required int count, Random? random}) => randMusic(count: count, random: random),
         'randMyth':
@@ -630,6 +650,8 @@ void main() {
                 randPhoneDetails(count: count, random: random),
         'randPlace':
             ({required int count, Random? random}) => randPlace(count: count, random: random),
+        'randPlanet':
+            ({required int count, Random? random}) => randPlanet(count: count, random: random),
         'randPlant':
             ({required int count, Random? random}) => randPlant(count: count, random: random),
         'randProduct':
@@ -665,6 +687,8 @@ void main() {
         'randTool':
             ({required int count, Random? random}) => randTool(count: count, random: random),
         'randToy': ({required int count, Random? random}) => randToy(count: count, random: random),
+        'randVegetable':
+            ({required int count, Random? random}) => randVegetable(count: count, random: random),
         'randVehicle':
             ({required int count, Random? random}) => randVehicle(count: count, random: random),
         'randVersion':

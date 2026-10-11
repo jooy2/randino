@@ -70,7 +70,7 @@ def rand_plant(
         >>> rand_plant(language="ko", count=3)
         ['나무', '민들레', '꽃']
         >>> rand_plant(language="en", count=3)
-        ['Treetop', 'Blossom', 'Fern']
+        ['Leaf', 'Blossom', 'Fern']
     """
     theme: WordThemeOption = "plant"
 

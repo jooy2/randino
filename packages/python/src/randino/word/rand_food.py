@@ -1,4 +1,4 @@
-"""Food and drink, the everyday kind."""
+"""Prepared food: what is eaten as it is served."""
 
 from collections.abc import Callable
 from typing import Literal, overload
@@ -58,7 +58,7 @@ def rand_food(
     random: Callable[[], float] | None = None,
     output: str = "value",
 ) -> list[str] | list[WordDetail]:
-    """Food and drink, the everyday kind.
+    """Prepared food: what is eaten as it is served.
 
     `rand_word(theme="food")` with the theme already chosen; every other argument
     is the same, and they are documented on `rand_word`.
@@ -70,7 +70,7 @@ def rand_food(
         >>> rand_food(language="ko", count=3)
         ['밥', '떡볶이', '빵']
         >>> rand_food(language="en", count=3)
-        ['Rice', 'Noodle', 'Dumpling']
+        ['Pizza', 'Noodle', 'Dumpling']
     """
     theme: WordThemeOption = "food"
 

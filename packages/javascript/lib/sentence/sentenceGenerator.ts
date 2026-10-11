@@ -2216,10 +2216,14 @@ function nounPhrase(
 		forced ??
 		plain(wordData, drawWord(wordData, pool, invent, Math.min(low, high), high, prefix).word);
 	const gender = genderOf(wordData, capitalizeAsPool(wordData, drawn));
-	const parts = [drawn];
+	// A name is written the way the pool writes it, with no article and nothing in
+	// front of it: `Mars glows`, never `the bright mars glows`.
+	const proper = traitsOf(data, drawn).includes('proper');
+	const parts = [proper ? capitalizeAsPool(wordData, drawn) : drawn];
 	// The budget reserved room for a modifier, and a noun the result has already
-	// described gives it back rather than being described a second time.
-	const modified = modify && !settled.has(drawn);
+	// described gives it back rather than being described a second time. A name
+	// gives it back too, unless the modifier is one the caller required.
+	const modified = modify && !settled.has(drawn) && (!proper || forcedModifier !== undefined);
 
 	if (modified) {
 		const room = max - overhead - drawn.length - space;
@@ -2255,7 +2259,7 @@ function nounPhrase(
 		}
 	}
 
-	const article = bare ? '' : articleFor(data, gender, parts[0]);
+	const article = bare || proper ? '' : articleFor(data, gender, parts[0]);
 	// An elided article carries its own boundary — `l'orso`, never `l' orso`.
 	const written = article.endsWith("'")
 		? article + parts.join(data.space)
@@ -3683,11 +3687,11 @@ function headedFallback(
 	);
 }
 
-// Where a subject can go, and where a story happens. `place` alone, and not the
-// two other themes of its class: a hero can walk to the market and not to Pluto,
-// and a sky is not somewhere a fox goes. A `place` part on its own still spans
-// the class, because a fox can sleep under a sky.
-const DESTINATION_THEMES: readonly WordTheme[] = ['place'];
+// Where a subject can go, and where a story happens. `place` and `building`, and
+// not the other three themes of their class: a hero can walk to the market or the
+// library and not to Pluto, and a sky is not somewhere a fox goes. A `place` part
+// on its own still spans the class, because a fox can sleep under a sky.
+const DESTINATION_THEMES: readonly WordTheme[] = ['place', 'building'];
 
 /** The theme a phrase other than the subject draws from. */
 function themeForPart(

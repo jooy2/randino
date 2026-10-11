@@ -9,7 +9,7 @@ What the sky is doing, from a breeze to a blizzard.
 ```javascript
 import { randWeather } from 'randino';
 
-randWeather({ language: 'en', count: 3 }); // ['Drizzle', 'Rainbow', 'Hoarfrost']
+randWeather({ language: 'en', count: 3 }); // ['Drizzle', 'Rainbow', 'Frost']
 randWeather({ language: 'en', output: 'detail' });
 // [{ word: 'Drizzle', language: 'en', theme: 'weather' }]
 ```
@@ -21,10 +21,10 @@ randWeather({ language: 'en', output: 'detail' });
 ```dart
 import 'package:randino/randino.dart';
 
-randWeather(language: WordLanguage.en, count: 3); // [Drizzle, Rainbow, Hoarfrost]
+randWeather(language: WordLanguage.en, count: 3); // [Drizzle, Rainbow, Frost]
 ```
 
-Returns `List<String>`. For the detail form, pass `WordTheme.weather` to `randWordDetails`. Dart has no overloads, and a detail twin for each of the twenty-nine themes would be twenty-nine functions too many.
+Returns `List<String>`. For the detail form, pass `WordTheme.weather` to `randWordDetails`. Dart has no overloads, and a detail twin beside every themed function would be one function too many for each theme.
 
 :::
 
@@ -33,7 +33,7 @@ Returns `List<String>`. For the detail form, pass `WordTheme.weather` to `randWo
 ```python
 from randino import rand_weather
 
-rand_weather(language="en", count=3)  # ['Drizzle', 'Rainbow', 'Hoarfrost']
+rand_weather(language="en", count=3)  # ['Drizzle', 'Rainbow', 'Frost']
 rand_weather(language="en", output="detail")
 # [WordDetail(word='Drizzle', language='en', theme='weather')]
 ```
@@ -47,4 +47,4 @@ rand_weather(language="en", output="detail")
 ## See also
 
 - [`randWord`](./rand-word) — the same generator with `theme` open, and what each option does in full.
-- [Themes](./themes) — the other twenty-four, and the words each one holds.
+- [Themes](./themes) — every other theme, and the words each one holds.
