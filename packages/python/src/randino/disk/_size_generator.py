@@ -6,7 +6,14 @@ Each size is one its kind of storage is sold in, for a platform that uses that k
 from collections.abc import Callable
 
 from randino._internal.capacity import CapacityCandidate, capacity_candidates, write_capacity
-from randino._internal.generate import collect_from, resolve_many, resolve_option, resolve_platforms
+from randino._internal.generate import (
+    collect_from,
+    finite,
+    kept_outcomes,
+    resolve_many,
+    resolve_option,
+    resolve_platforms,
+)
 from randino._internal.utils import shares, with_random
 from randino._types import (
     DiskSizeDetail,
@@ -58,6 +65,12 @@ def _candidates(
     return candidates
 
 
+_KEPT: dict[
+    str, list[tuple[tuple[SystemPlatform, DiskType, CapacityCandidate[DiskUnit]], float]]
+] = {}
+"""The sizes each set of options leaves, kept so a call does not work them out again."""
+
+
 def generate_disk_size_details(
     *,
     type: DiskTypeOption = "all",
@@ -77,26 +90,40 @@ def generate_disk_size_details(
     # Without the unit there is nothing to tell `2` terabytes from `512` gigabytes, so a
     # size written bare is in one unit throughout.
     written = DISK_SCALE.reference if asked == "auto" and not with_unit else asked
-    candidates = _candidates(
-        resolve_platforms(platform),
-        resolve_many(type, DISK_TYPES, DISK_TYPES),
-        written,
-        min_size,
-        max_size,
+    platforms = resolve_platforms(platform)
+    kinds_asked = resolve_many(type, DISK_TYPES, DISK_TYPES)
+
+    def listed() -> list[
+        tuple[tuple[SystemPlatform, DiskType, CapacityCandidate[DiskUnit]], float]
+    ]:
+        candidates = _candidates(platforms, kinds_asked, written, min_size, max_size)
+        outcomes: list[
+            tuple[tuple[SystemPlatform, DiskType, CapacityCandidate[DiskUnit]], float]
+        ] = []
+
+        # The platform first, so `"all"` is half desktops and half phones, then the kind of
+        # storage by how common it is there, then a size it is sold in.
+        for each, kinds in candidates:
+            kind_shares = shares([DISK_TYPE_WEIGHTS[each][kind] for kind, _ in kinds], float)
+
+            for (kind, sizes), kind_share in zip(kinds, kind_shares, strict=True):
+                for candidate, share in zip(
+                    sizes, shares(sizes, lambda size: size.weight), strict=True
+                ):
+                    outcomes.append(((each, kind, candidate), kind_share * share / len(candidates)))
+
+        return outcomes
+
+    key = "|".join(
+        (
+            ",".join(platforms),
+            ",".join(kinds_asked),
+            written,
+            str(finite(min_size)),
+            str(finite(max_size)),
+        )
     )
-
-    # The platform first, so `"all"` is half desktops and half phones, then the kind of
-    # storage by how common it is there, then a size it is sold in.
-    outcomes: list[tuple[tuple[SystemPlatform, DiskType, CapacityCandidate[DiskUnit]], float]] = []
-
-    for each, kinds in candidates:
-        kind_shares = shares([DISK_TYPE_WEIGHTS[each][kind] for kind, _ in kinds], float)
-
-        for (kind, sizes), kind_share in zip(kinds, kind_shares, strict=True):
-            for candidate, share in zip(
-                sizes, shares(sizes, lambda size: size.weight), strict=True
-            ):
-                outcomes.append(((each, kind, candidate), kind_share * share / len(candidates)))
+    outcomes = kept_outcomes(_KEPT, key, listed)
 
     def build(
         entry: tuple[SystemPlatform, DiskType, CapacityCandidate[DiskUnit]],

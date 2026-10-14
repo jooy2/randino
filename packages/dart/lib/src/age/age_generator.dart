@@ -67,6 +67,9 @@ List<(int, double)> _candidates({
   return <(int, double)>[for (final age in ages) (age, uniform ? 1.0 : curveWeight(age))];
 }
 
+// The ages each set of options allows, kept so a call does not work them out again.
+final Map<String, List<Outcome<int>>> _kept = {};
+
 /// What `randAge` and `randAgeDetails` both do.
 List<AgeDetail> generateAgeDetails({
   int count = 1,
@@ -77,11 +80,18 @@ List<AgeDetail> generateAgeDetails({
   bool unique = false,
   Random? random,
 }) {
-  final candidates = _candidates(
-    minAge: minAge,
-    maxAge: maxAge,
-    group: group,
-    distribution: distribution,
+  final outcomes = keptOutcomes<int>(
+    _kept,
+    '$minAge|$maxAge|${group?.map((each) => each.name).join(',')}|${distribution.name}',
+    () => [
+      for (final (age, weight) in _candidates(
+        minAge: minAge,
+        maxAge: maxAge,
+        group: group,
+        distribution: distribution,
+      ))
+        (entry: age, weight: weight.toDouble()),
+    ],
   );
 
   return withRandom(
@@ -90,7 +100,7 @@ List<AgeDetail> generateAgeDetails({
       count: count,
       unique: unique,
       startsWith: '',
-      outcomes: [for (final (age, weight) in candidates) (entry: age, weight: weight.toDouble())],
+      outcomes: outcomes,
       keyOf: (age) => '$age',
       build: (age) => AgeDetail(age: age, group: groupOf(age)),
     ),

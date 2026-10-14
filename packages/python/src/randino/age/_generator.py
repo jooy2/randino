@@ -8,7 +8,7 @@ groups allow.
 from collections.abc import Callable
 from itertools import pairwise
 
-from randino._internal.generate import collect_from, resolve_whole
+from randino._internal.generate import collect_from, kept_outcomes, resolve_whole
 from randino._internal.utils import with_random
 from randino._types import AgeDetail, AgeDistribution, AgeGroup, AgeGroupOption
 from randino.age.data import (
@@ -36,17 +36,16 @@ def group_of(age: int) -> AgeGroup:
     return next((group for group in AGE_GROUPS if age <= AGE_BANDS[group][1]), "senior")
 
 
-def _candidates(
+def _asked(
     min_age: int | None,
     max_age: int | None,
     group: object,
     distribution: AgeDistribution,
-) -> list[tuple[int, float]]:
-    """The ages one call may land on, each with how likely it is.
+) -> tuple[int, int, tuple[AgeGroup, ...], bool]:
+    """What a call asks for, with every default applied.
 
-    Worked out once per call rather than per draw: it is at most a hundred and twenty-one
-    entries, and a call of ten thousand would otherwise read the curve a million times
-    over.
+    Returns:
+        The lowest and the highest age, the groups, and whether the ages are even.
     """
     asked = resolve_whole(min_age, 0, 0, RAND_AGE_MAX)
     # Left out, `max_age` is 100 — unless `min_age` is already past it, which asks for the
@@ -57,16 +56,31 @@ def _candidates(
     # A range the wrong way round keeps `max_age`, the same way a length range keeps
     # `max_length`: it is the bound a caller is usually holding to.
     low = min(asked, high)
-    groups = resolve_age_groups(group)
+
+    return (
+        low,
+        high,
+        tuple(resolve_age_groups(group)),
+        resolve_distribution(distribution) == "uniform",
+    )
+
+
+def _candidates(
+    low: int, high: int, groups: tuple[AgeGroup, ...], uniform: bool
+) -> list[tuple[int, float]]:
+    """The ages one call may land on, each with how likely it is."""
     in_range = list(range(low, high + 1))
     grouped = [age for age in in_range if group_of(age) in groups]
     # A group the range has no age of cannot be answered inside it, and the range is the
     # harder ask: it is a number the caller wrote, where a group is a name for one. So the
     # range wins, as though no group had been named.
     ages = grouped or in_range
-    uniform = resolve_distribution(distribution) == "uniform"
 
     return [(age, 1.0 if uniform else curve_weight(age)) for age in ages]
+
+
+_KEPT: dict[str, list[tuple[int, float]]] = {}
+"""The ages each set of options allows, kept so a call does not read the curve again."""
 
 
 def generate_age_details(
@@ -80,13 +94,19 @@ def generate_age_details(
     random: Callable[[], float] | None = None,
 ) -> list[AgeDetail]:
     """Generate `count` ages, applied to every option."""
-    candidates = _candidates(min_age, max_age, group, distribution)
+    low, high, groups, uniform = _asked(min_age, max_age, group, distribution)
+    outcomes = kept_outcomes(
+        _KEPT,
+        f"{low}|{high}|{','.join(groups)}|{uniform}",
+        lambda: _candidates(low, high, groups, uniform),
+    )
+
     with with_random(random):
         return collect_from(
             count=count,
             unique=unique,
             starts_with="",
-            outcomes=candidates,
+            outcomes=outcomes,
             key_of=str,
             build=lambda age: AgeDetail(age=age, group=group_of(age)),
         )

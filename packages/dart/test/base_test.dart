@@ -865,5 +865,147 @@ void main() {
 
       expect(first, inExclusiveRange(2800, 3200));
     });
+
+    test('a catalog keeps one list for each set of options, and never hands one to another', () {
+      // Each pair differs by one option its list depends on, asked one after the
+      // other and back again, so a list kept under a key that leaves the option
+      // out would be handed to the call after it.
+      void holds<T>(String reason, List<T> Function() call, bool Function(T detail) fits) {
+        final details = call();
+
+        expect(details, isNotEmpty, reason: reason);
+
+        for (final detail in details) {
+          expect(fits(detail), isTrue, reason: '$reason: $detail');
+        }
+      }
+
+      void alternate<T>(
+        String name,
+        List<T> Function() first,
+        bool Function(T detail) fits,
+        List<T> Function() second,
+        bool Function(T detail) fitsSecond,
+      ) {
+        holds<T>('$name, first', first, fits);
+        holds<T>('$name, second', second, fitsSecond);
+        holds<T>('$name, first again', first, fits);
+      }
+
+      const n = 60;
+
+      alternate<OsDetail>(
+        'randOs platform',
+        () => randOsDetails(platform: SystemPlatform.mobile, count: n),
+        (d) => d.platform == SystemPlatform.mobile,
+        () => randOsDetails(platform: SystemPlatform.desktop, count: n),
+        (d) => d.platform == SystemPlatform.desktop,
+      );
+      alternate<OsDetail>(
+        'randOs years',
+        () => randOsDetails(minYear: 2024, count: n),
+        (d) => d.year >= 2024,
+        () => randOsDetails(maxYear: 2005, count: n),
+        (d) => d.year <= 2005,
+      );
+      alternate<OsDetail>(
+        'randOs builds',
+        () => randOsDetails(includeBuild: true, includeEdition: true, count: n),
+        (d) => true,
+        () => randOsDetails(count: n),
+        (d) => d.build == null && d.edition == null,
+      );
+      alternate<CpuDetail>(
+        'randCpu vendor',
+        () => randCpuDetails(vendor: {'AMD'}, count: n),
+        (d) => d.vendor == 'AMD',
+        () => randCpuDetails(vendor: {'Intel'}, count: n),
+        (d) => d.vendor == 'Intel',
+      );
+      alternate<GpuDetail>(
+        'randGpu years',
+        () => randGpuDetails(minYear: 2024, count: n),
+        (d) => d.year >= 2024,
+        () => randGpuDetails(maxYear: 2010, count: n),
+        (d) => d.year <= 2010,
+      );
+      alternate<DeviceDetail>(
+        'randDevice type',
+        () => randDeviceDetails(type: {DeviceType.phone}, count: n),
+        (d) => d.type == DeviceType.phone,
+        () => randDeviceDetails(type: {DeviceType.laptop}, count: n),
+        (d) => d.type == DeviceType.laptop,
+      );
+      alternate<ArchitectureDetail>(
+        'randArchitecture rare',
+        () => randArchitectureDetails(includeRare: true, count: n),
+        (d) => true,
+        () => randArchitectureDetails(count: n),
+        (d) => !d.rare,
+      );
+      alternate<DiskSizeDetail>(
+        'randDiskSize type',
+        () => randDiskSizeDetails(type: {DiskType.hdd}, count: n),
+        (d) => d.type == DiskType.hdd,
+        () => randDiskSizeDetails(type: {DiskType.emmc}, count: n),
+        (d) => d.type == DiskType.emmc,
+      );
+      alternate<DiskTypeDetail>(
+        'randDiskType platform',
+        () => randDiskTypeDetails(platform: SystemPlatform.desktop, count: n),
+        (d) => d.platform == SystemPlatform.desktop,
+        () => randDiskTypeDetails(platform: SystemPlatform.mobile, count: n),
+        (d) => d.platform == SystemPlatform.mobile,
+      );
+      alternate<RamDetail>(
+        'randRam size',
+        () => randRamDetails(minSize: 16, count: n),
+        (d) => d.bytes >= 16 * 1024 * 1024 * 1024,
+        () => randRamDetails(maxSize: 4, count: n),
+        (d) => d.bytes <= 4 * 1024 * 1024 * 1024,
+      );
+      alternate<ResolutionDetail>(
+        'randResolution platform',
+        () => randResolutionDetails(platform: SystemPlatform.desktop, count: n),
+        (d) => d.platform == SystemPlatform.desktop,
+        () => randResolutionDetails(platform: SystemPlatform.mobile, count: n),
+        (d) => d.platform == SystemPlatform.mobile,
+      );
+      alternate<AppStoreDetail>(
+        'randAppStore platform',
+        () => randAppStoreDetails(platform: SystemPlatform.desktop, count: n),
+        (d) => d.platform == SystemPlatform.desktop,
+        () => randAppStoreDetails(platform: SystemPlatform.mobile, count: n),
+        (d) => d.platform == SystemPlatform.mobile,
+      );
+      alternate<FileExtensionDetail>(
+        'randFileExtension category',
+        () => randFileExtensionDetails(category: {FileCategory.image}, count: n),
+        (d) => d.category == FileCategory.image,
+        () => randFileExtensionDetails(category: {FileCategory.audio}, count: n),
+        (d) => d.category == FileCategory.audio,
+      );
+      alternate<MimeTypeDetail>(
+        'randMimeType type',
+        () => randMimeTypeDetails(type: {MimeTopLevel.image}, count: n),
+        (d) => d.type == MimeTopLevel.image,
+        () => randMimeTypeDetails(type: {MimeTopLevel.text}, count: n),
+        (d) => d.type == MimeTopLevel.text,
+      );
+      alternate<GenderDetail>(
+        'randGender unknown',
+        () => randGenderDetails(includeUnknown: true, count: 200),
+        (d) => true,
+        () => randGenderDetails(count: 200),
+        (d) => d.code != GenderCode.unknown,
+      );
+      alternate<AgeDetail>(
+        'randAge range',
+        () => randAgeDetails(minAge: 60, count: n),
+        (d) => d.age >= 60,
+        () => randAgeDetails(maxAge: 10, count: n),
+        (d) => d.age <= 10,
+      );
+    });
   });
 }

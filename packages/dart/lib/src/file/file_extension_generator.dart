@@ -8,6 +8,10 @@ import 'package:randino/src/internal/generate.dart';
 import 'package:randino/src/internal/utils.dart';
 import 'package:randino/src/types.dart';
 
+// The extensions each set of options leaves, kept so a call does not filter the
+// table again.
+final Map<String, List<Outcome<FileExtensionEntry>>> _kept = {};
+
 /// What `randFileExtension` and `randFileExtensionDetails` both do.
 List<FileExtensionDetail> generateFileExtensionDetails({
   Set<FileCategory>? category,
@@ -18,11 +22,14 @@ List<FileExtensionDetail> generateFileExtensionDetails({
 }) {
   final categories = category == null || category.isEmpty ? fileCategories : category;
   final dot = includeDot ? '.' : '';
-  // Worked out once per call rather than per draw.
-  final candidates = [
-    for (final entry in fileExtensions)
-      if (categories.contains(entry.category)) entry,
-  ];
+  final outcomes = keptOutcomes<FileExtensionEntry>(
+    _kept,
+    categories.map((each) => each.name).join(','),
+    () => [
+      for (final entry in fileExtensions)
+        if (categories.contains(entry.category)) (entry: entry, weight: entry.weight.toDouble()),
+    ],
+  );
 
   return withRandom(
     random,
@@ -30,7 +37,7 @@ List<FileExtensionDetail> generateFileExtensionDetails({
       count: count,
       unique: unique,
       startsWith: '',
-      outcomes: [for (final entry in candidates) (entry: entry, weight: entry.weight.toDouble())],
+      outcomes: outcomes,
       keyOf: (entry) => '$dot${entry.name}',
       build:
           (entry) => FileExtensionDetail(

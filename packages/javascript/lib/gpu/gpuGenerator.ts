@@ -5,15 +5,20 @@
 
 import {
 	collectFrom,
+	keptOutcomes,
 	resolveMany,
 	resolvePlatforms,
 	resolveRandom,
 	resolveYears
 } from '../_internal/generate.js';
+import type { Outcome } from '../_internal/generate.js';
 import { withRandom } from '../_internal/utils.js';
 import type { GpuDetail, RandGpuOptions } from '../_types/global.js';
 import { GPUS, GPU_VENDORS } from './data/index.js';
 import type { GpuEntry } from './data/index.js';
+
+// The parts each set of options leaves, kept so a call does not filter the catalog again.
+const kept = new Map<string, readonly Outcome<GpuEntry>[]>();
 
 /** `entry` with its maker in front, or alone. */
 export function writeGpu(entry: GpuEntry, includeVendor: boolean): string {
@@ -25,14 +30,14 @@ export function generateGpuDetails(options: RandGpuOptions = {}): GpuDetail[] {
 	const [minYear, maxYear] = resolveYears(options.minYear, options.maxYear);
 	const includeVendor = options.includeVendor !== false;
 	const vendors = resolveMany(options.vendor, GPU_VENDORS, GPU_VENDORS);
-	// Worked out once per call rather than per draw: a call of ten thousand would
-	// otherwise filter the catalog ten thousand times.
-	const candidates = GPUS.filter(
-		(entry) =>
-			platforms.includes(entry.platform) &&
-			vendors.includes(entry.vendor) &&
-			entry.year >= minYear &&
-			entry.year <= maxYear
+	const outcomes = keptOutcomes(kept, `${platforms}|${vendors}|${minYear}|${maxYear}`, () =>
+		GPUS.filter(
+			(entry) =>
+				platforms.includes(entry.platform) &&
+				vendors.includes(entry.vendor) &&
+				entry.year >= minYear &&
+				entry.year <= maxYear
+		).map((entry) => ({ entry, weight: 1 }))
 	);
 
 	return withRandom(resolveRandom(options.random), () =>
@@ -40,7 +45,7 @@ export function generateGpuDetails(options: RandGpuOptions = {}): GpuDetail[] {
 			// Only the options a graphics processor has: a `startsWith` slipped past
 			// the types would otherwise filter parts by their first letter.
 			{ count: options.count, unique: options.unique },
-			candidates.map((entry) => ({ entry, weight: 1 })),
+			outcomes,
 			(entry) => writeGpu(entry, includeVendor),
 			(entry) => ({
 				gpu: writeGpu(entry, includeVendor),

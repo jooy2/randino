@@ -2,10 +2,13 @@
 
 from collections.abc import Callable
 
-from randino._internal.generate import collect_from, resolve_many
+from randino._internal.generate import collect_from, kept_outcomes, resolve_many
 from randino._internal.utils import with_random
 from randino._types import FileExtensionDetail
-from randino.file.data import FILE_CATEGORIES, FILE_EXTENSIONS
+from randino.file.data import FILE_CATEGORIES, FILE_EXTENSIONS, FileExtensionEntry
+
+_KEPT: dict[str, list[tuple[FileExtensionEntry, float]]] = {}
+"""The extensions each set of categories leaves, kept so a call does not work them out again."""
 
 
 def generate_file_extension_details(
@@ -20,15 +23,20 @@ def generate_file_extension_details(
     categories = resolve_many(category, FILE_CATEGORIES, FILE_CATEGORIES)
     # `is False` rather than truthiness, the way the npm package reads it.
     dot = "" if include_dot is False else "."
-    # Worked out once per call rather than per draw.
-    candidates = [entry for entry in FILE_EXTENSIONS if entry.category in categories]
+    outcomes = kept_outcomes(
+        _KEPT,
+        ",".join(categories),
+        lambda: [
+            (entry, entry.weight) for entry in FILE_EXTENSIONS if entry.category in categories
+        ],
+    )
 
     with with_random(random):
         return collect_from(
             count=count,
             unique=unique,
             starts_with="",
-            outcomes=[(entry, entry.weight) for entry in candidates],
+            outcomes=outcomes,
             key_of=lambda entry: dot + entry.name,
             build=lambda entry: FileExtensionDetail(
                 extension=dot + entry.name,

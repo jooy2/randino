@@ -802,3 +802,124 @@ def test_a_catalog_draws_each_result_by_its_weight_and_a_unique_call_ends_with_e
     first = sum(unique_from(shared, count=2)[0] == "b" for _ in range(4000))
 
     assert 2800 < first < 3200, first
+
+
+def test_a_catalog_keeps_one_list_for_each_set_of_options_and_never_hands_one_to_another() -> None:
+    # Each pair differs by one option its list depends on, asked one after the other and
+    # back again, so a list kept under a key that leaves the option out would be handed to
+    # the call after it.
+    n = 60
+    pairs: list[
+        tuple[
+            Callable[[], list[Any]],
+            Callable[[Any], bool],
+            Callable[[], list[Any]],
+            Callable[[Any], bool],
+        ]
+    ] = [
+        (
+            lambda: randino.rand_os(platform="mobile", count=n, output="detail"),
+            lambda d: d.platform == "mobile",
+            lambda: randino.rand_os(platform="desktop", count=n, output="detail"),
+            lambda d: d.platform == "desktop",
+        ),
+        (
+            lambda: randino.rand_os(min_year=2024, count=n, output="detail"),
+            lambda d: d.year >= 2024,
+            lambda: randino.rand_os(max_year=2005, count=n, output="detail"),
+            lambda d: d.year <= 2005,
+        ),
+        (
+            lambda: randino.rand_os(
+                include_build=True, include_edition=True, count=n, output="detail"
+            ),
+            lambda d: True,
+            lambda: randino.rand_os(count=n, output="detail"),
+            lambda d: d.build is None and d.edition is None,
+        ),
+        (
+            lambda: randino.rand_cpu(vendor="AMD", count=n, output="detail"),
+            lambda d: d.vendor == "AMD",
+            lambda: randino.rand_cpu(vendor="Intel", count=n, output="detail"),
+            lambda d: d.vendor == "Intel",
+        ),
+        (
+            lambda: randino.rand_gpu(min_year=2024, count=n, output="detail"),
+            lambda d: d.year >= 2024,
+            lambda: randino.rand_gpu(max_year=2010, count=n, output="detail"),
+            lambda d: d.year <= 2010,
+        ),
+        (
+            lambda: randino.rand_device(type="phone", count=n, output="detail"),
+            lambda d: d.type == "phone",
+            lambda: randino.rand_device(type="laptop", count=n, output="detail"),
+            lambda d: d.type == "laptop",
+        ),
+        (
+            lambda: randino.rand_architecture(include_rare=True, count=n, output="detail"),
+            lambda d: True,
+            lambda: randino.rand_architecture(count=n, output="detail"),
+            lambda d: not d.rare,
+        ),
+        (
+            lambda: randino.rand_disk_size(type="hdd", count=n, output="detail"),
+            lambda d: d.type == "hdd",
+            lambda: randino.rand_disk_size(type="emmc", count=n, output="detail"),
+            lambda d: d.type == "emmc",
+        ),
+        (
+            lambda: randino.rand_disk_type(platform="desktop", count=n, output="detail"),
+            lambda d: d.platform == "desktop",
+            lambda: randino.rand_disk_type(platform="mobile", count=n, output="detail"),
+            lambda d: d.platform == "mobile",
+        ),
+        (
+            lambda: randino.rand_ram(min_size=16, count=n, output="detail"),
+            lambda d: d.bytes >= 16 * 1024**3,
+            lambda: randino.rand_ram(max_size=4, count=n, output="detail"),
+            lambda d: d.bytes <= 4 * 1024**3,
+        ),
+        (
+            lambda: randino.rand_resolution(platform="desktop", count=n, output="detail"),
+            lambda d: d.platform == "desktop",
+            lambda: randino.rand_resolution(platform="mobile", count=n, output="detail"),
+            lambda d: d.platform == "mobile",
+        ),
+        (
+            lambda: randino.rand_app_store(platform="desktop", count=n, output="detail"),
+            lambda d: d.platform == "desktop",
+            lambda: randino.rand_app_store(platform="mobile", count=n, output="detail"),
+            lambda d: d.platform == "mobile",
+        ),
+        (
+            lambda: randino.rand_file_extension(category="image", count=n, output="detail"),
+            lambda d: d.category == "image",
+            lambda: randino.rand_file_extension(category="audio", count=n, output="detail"),
+            lambda d: d.category == "audio",
+        ),
+        (
+            lambda: randino.rand_mime_type(type="image", count=n, output="detail"),
+            lambda d: d.type == "image",
+            lambda: randino.rand_mime_type(type="text", count=n, output="detail"),
+            lambda d: d.type == "text",
+        ),
+        (
+            lambda: randino.rand_gender(include_unknown=True, count=200, output="detail"),
+            lambda d: True,
+            lambda: randino.rand_gender(count=200, output="detail"),
+            lambda d: d.code != "unknown",
+        ),
+        (
+            lambda: randino.rand_age(min_age=60, count=n, output="detail"),
+            lambda d: d.age >= 60,
+            lambda: randino.rand_age(max_age=10, count=n, output="detail"),
+            lambda d: d.age <= 10,
+        ),
+    ]
+
+    for first, fits, second, fits_second in pairs:
+        for call, check in ((first, fits), (second, fits_second), (first, fits)):
+            details = call()
+
+            assert details
+            assert all(check(detail) for detail in details), details

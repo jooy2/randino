@@ -51,6 +51,9 @@ List<({SystemPlatform platform, List<_Kind> kinds})> _candidates(
   ].where((each) => each.kinds.isNotEmpty).toList(growable: false);
 }
 
+// The sizes each set of options leaves, kept so a call does not work them out again.
+final Map<String, List<Outcome<_Drawn>>> _kept = {};
+
 /// What `randDiskSize` and `randDiskSizeDetails` both do.
 List<DiskSizeDetail> generateDiskSizeDetails({
   Set<DiskType>? type,
@@ -66,24 +69,36 @@ List<DiskSizeDetail> generateDiskSizeDetails({
   // Without the unit there is nothing to tell `2` terabytes from `512`
   // gigabytes, so a size written bare is in one unit throughout.
   final written = unit ?? (includeUnit ? null : diskScale.reference);
-  final candidates = _candidates(type, platform, written, minSize, maxSize);
+  final key = [
+    resolvePlatforms(platform).map((each) => each.name).join(','),
+    type == null || type.isEmpty
+        ? ''
+        : diskTypes.where(type.contains).map((each) => each.name).join(','),
+    written?.name ?? 'auto',
+    '$minSize',
+    '$maxSize',
+  ].join('|');
+  final outcomes = keptOutcomes<_Drawn>(_kept, key, () {
+    final candidates = _candidates(type, platform, written, minSize, maxSize);
+    final listed = <Outcome<_Drawn>>[];
 
-  // The platform first, so a null one is half desktops and half phones, then
-  // the kind of storage by how common it is there, then a size it is sold in.
-  final outcomes = <Outcome<_Drawn>>[];
+    // The platform first, so a null one is half desktops and half phones, then
+    // the kind of storage by how common it is there, then a size it is sold in.
+    for (final (platform: each, :kinds) in candidates) {
+      final kindShares = shares(kinds, (kind) => diskTypeWeights[each]![kind.type]!);
 
-  for (final (platform: each, :kinds) in candidates) {
-    final kindShares = shares(kinds, (kind) => diskTypeWeights[each]![kind.type]!);
-
-    for (final (at, kind) in kinds.indexed) {
-      for (final (index, share) in shares(kind.sizes, (size) => size.weight).indexed) {
-        outcomes.add((
-          entry: (platform: each, type: kind.type, candidate: kind.sizes[index]),
-          weight: kindShares[at] * share / candidates.length,
-        ));
+      for (final (at, kind) in kinds.indexed) {
+        for (final (index, share) in shares(kind.sizes, (size) => size.weight).indexed) {
+          listed.add((
+            entry: (platform: each, type: kind.type, candidate: kind.sizes[index]),
+            weight: kindShares[at] * share / candidates.length,
+          ));
+        }
       }
     }
-  }
+
+    return listed;
+  });
 
   return withRandom(
     random,

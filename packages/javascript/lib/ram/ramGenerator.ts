@@ -5,6 +5,8 @@ import { capacityCandidates, writeCapacity } from '../_internal/capacity.js';
 import type { CapacityCandidate } from '../_internal/capacity.js';
 import {
 	collectFrom,
+	finite,
+	keptOutcomes,
 	resolveOption,
 	resolvePlatforms,
 	resolveRandom,
@@ -30,6 +32,9 @@ type Candidate = CapacityCandidate<RamUnit> & { types: readonly RamTypeEntry[] }
 
 /** One result a call may land on: a size on a platform, and the kind of memory it was sold as. */
 type Drawn = { platform: SystemPlatform; candidate: Candidate; type: RamType };
+
+// The sizes each set of options leaves, kept so a call does not read the pools again.
+const kept = new Map<string, readonly Outcome<Drawn>[]>();
 
 /** `capacity` with the kind of memory after it where the call asked for it. */
 export function writeRam(capacity: string, type: string, includeType: boolean): string {
@@ -85,19 +90,28 @@ export function generateRamDetails(options: RandRamOptions = {}): RamDetail[] {
 	// Without the unit there is nothing to tell `512` megabytes from `16`
 	// gigabytes, so a size written bare is in one unit throughout.
 	const unit = asked === 'auto' && !includeUnit ? RAM_SCALE.reference : asked;
-	const candidates = candidatesFor(options, unit);
+	const key = [
+		resolvePlatforms(options.platform),
+		resolveYears(options.minYear, options.maxYear),
+		unit,
+		finite(options.minSize),
+		finite(options.maxSize)
+	].join('|');
+	const outcomes = keptOutcomes(kept, key, () => {
+		const candidates = candidatesFor(options, unit);
 
-	// The platform first, so `'all'` is half desktops and half phones, then the
-	// size, then the kind of memory that size was sold as.
-	const outcomes = candidates.flatMap(({ platform, sizes }): Outcome<Drawn>[] => {
-		const sizeShares = shares(sizes, (candidate) => candidate.weight);
+		// The platform first, so `'all'` is half desktops and half phones, then the
+		// size, then the kind of memory that size was sold as.
+		return candidates.flatMap(({ platform, sizes }): Outcome<Drawn>[] => {
+			const sizeShares = shares(sizes, (candidate) => candidate.weight);
 
-		return sizes.flatMap((candidate, size) =>
-			shares(candidate.types, (entry) => entry.weight).map((share, index) => ({
-				entry: { platform, candidate, type: candidate.types[index].type },
-				weight: (sizeShares[size] * share) / candidates.length
-			}))
-		);
+			return sizes.flatMap((candidate, size) =>
+				shares(candidate.types, (entry) => entry.weight).map((share, index) => ({
+					entry: { platform, candidate, type: candidate.types[index].type },
+					weight: (sizeShares[size] * share) / candidates.length
+				}))
+			);
+		});
 	});
 	const write = ({ candidate, type }: Drawn) =>
 		writeRam(writeCapacity(candidate.value, candidate.unit, includeUnit), type, includeType);

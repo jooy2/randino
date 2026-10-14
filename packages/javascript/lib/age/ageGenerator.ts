@@ -5,7 +5,8 @@
 // likely each of them is. Nothing is fitted afterwards, so an age is always one
 // the caller's range and groups allow.
 
-import { collectFrom, resolveRandom, resolveWhole } from '../_internal/generate.js';
+import { collectFrom, keptOutcomes, resolveRandom, resolveWhole } from '../_internal/generate.js';
+import type { Outcome } from '../_internal/generate.js';
 import { withRandom } from '../_internal/utils.js';
 import { RAND_AGE_MAX } from '../constants.js';
 import type { AgeDetail, AgeGroup, RandAgeOptions } from '../_types/global.js';
@@ -39,14 +40,11 @@ export function groupOf(age: number): AgeGroup {
 
 type Candidate = { age: number; weight: number };
 
-/**
- * The ages one call may land on, each with how likely it is.
- *
- * Worked out once per call rather than per draw: it is at most a hundred and
- * twenty-one entries, and a call of ten thousand would otherwise read the curve
- * a million times over.
- */
-function candidatesFor(options: RandAgeOptions): Candidate[] {
+/** The options that decide which ages a call may land on, read once. */
+type Asked = { minAge: number; maxAge: number; groups: readonly AgeGroup[]; uniform: boolean };
+
+/** What `options` asks for, with every default applied. */
+function askedOf(options: RandAgeOptions): Asked {
 	const asked = resolveWhole(options.minAge, 0, 0, RAND_AGE_MAX);
 	// Left out, `maxAge` is 100 — unless `minAge` is already past it, which asks
 	// for the oldest ages there are rather than contradicting a bound nobody wrote.
@@ -56,11 +54,25 @@ function candidatesFor(options: RandAgeOptions): Candidate[] {
 		0,
 		RAND_AGE_MAX
 	);
-	// A range the wrong way round keeps `maxAge`, the same way a length range
-	// keeps `maxLength`: it is the bound a caller is usually holding to.
-	const minAge = Math.min(asked, maxAge);
-	const groups = resolveAgeGroups(options.group);
-	const uniform = resolveDistribution(options.distribution) === 'uniform';
+
+	return {
+		// A range the wrong way round keeps `maxAge`, the same way a length range
+		// keeps `maxLength`: it is the bound a caller is usually holding to.
+		minAge: Math.min(asked, maxAge),
+		maxAge,
+		groups: resolveAgeGroups(options.group),
+		uniform: resolveDistribution(options.distribution) === 'uniform'
+	};
+}
+
+/**
+ * The ages one call may land on, each with how likely it is.
+ *
+ * Worked out once per call rather than per draw: it is at most a hundred and
+ * twenty-one entries, and a call of ten thousand would otherwise read the curve
+ * a million times over.
+ */
+function candidatesFor({ minAge, maxAge, groups, uniform }: Asked): Candidate[] {
 	const inRange: number[] = [];
 
 	for (let age = minAge; age <= maxAge; age += 1) {
@@ -76,13 +88,23 @@ function candidatesFor(options: RandAgeOptions): Candidate[] {
 	return ages.map((age) => ({ age, weight: uniform ? 1 : curveWeight(age) }));
 }
 
+// The ages each set of options allows, kept so a call does not read the curve again.
+const kept = new Map<string, readonly Outcome<number>[]>();
+
 export function generateAgeDetails(options: RandAgeOptions = {}): AgeDetail[] {
+	const asked = askedOf(options);
+	const outcomes = keptOutcomes(
+		kept,
+		`${asked.minAge}|${asked.maxAge}|${asked.groups}|${asked.uniform}`,
+		() => candidatesFor(asked).map(({ age, weight }) => ({ entry: age, weight }))
+	);
+
 	return withRandom(resolveRandom(options.random), () =>
 		collectFrom(
 			// Only the two options an age has: a `startsWith` slipped past the types
 			// would otherwise filter ages by their first digit.
 			{ count: options.count, unique: options.unique },
-			candidatesFor(options).map(({ age, weight }) => ({ entry: age, weight })),
+			outcomes,
 			(age) => String(age),
 			(age) => ({ age, group: groupOf(age) })
 		)

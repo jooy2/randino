@@ -15,6 +15,10 @@ import 'package:randino/src/types.dart';
 String writeGpu(GpuEntry entry, bool includeVendor) =>
     includeVendor ? '${entry.vendor} ${entry.model}' : entry.model;
 
+// The parts each set of options leaves, kept so a call does not filter the
+// catalog again.
+final Map<String, List<Outcome<GpuEntry>>> _kept = {};
+
 /// What `randGpu` and `randGpuDetails` both do.
 List<GpuDetail> generateGpuDetails({
   SystemPlatform? platform,
@@ -35,16 +39,18 @@ List<GpuDetail> generateGpuDetails({
       if (vendor?.contains(each) ?? false) each,
   };
   final vendors = named.isEmpty ? gpuVendors.toSet() : named;
-  // Worked out once per call rather than per draw: a call of ten thousand would
-  // otherwise filter the catalog ten thousand times.
-  final candidates = <GpuEntry>[
-    for (final entry in gpus)
-      if (platforms.contains(entry.platform) &&
-          vendors.contains(entry.vendor) &&
-          entry.year >= low &&
-          entry.year <= high)
-        entry,
-  ];
+  final outcomes = keptOutcomes<GpuEntry>(
+    _kept,
+    '${platforms.map((each) => each.name).join(',')}|${vendors.join(',')}|$low|$high',
+    () => [
+      for (final entry in gpus)
+        if (platforms.contains(entry.platform) &&
+            vendors.contains(entry.vendor) &&
+            entry.year >= low &&
+            entry.year <= high)
+          (entry: entry, weight: 1.0),
+    ],
+  );
 
   return withRandom(
     random,
@@ -52,7 +58,7 @@ List<GpuDetail> generateGpuDetails({
       count: count,
       unique: unique,
       startsWith: '',
-      outcomes: [for (final entry in candidates) (entry: entry, weight: 1.0)],
+      outcomes: outcomes,
       keyOf: (entry) => writeGpu(entry, includeVendor),
       build:
           (entry) => GpuDetail(

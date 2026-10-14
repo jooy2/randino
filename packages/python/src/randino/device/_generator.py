@@ -6,7 +6,7 @@ land on, and every model left is as likely as the next.
 
 from collections.abc import Callable
 
-from randino._internal.generate import collect_from, resolve_many, resolve_years
+from randino._internal.generate import collect_from, kept_outcomes, resolve_many, resolve_years
 from randino._internal.utils import with_random
 from randino._types import DeviceDetail, DeviceTypeOption
 from randino.device.data import DEVICE_TYPES, DEVICE_VENDORS, DEVICES, DeviceEntry
@@ -21,6 +21,10 @@ def write_device(entry: DeviceEntry, include_vendor: bool) -> str:
         return f"{entry.vendor} {entry.model}"
 
     return entry.model
+
+
+_KEPT: dict[str, list[tuple[DeviceEntry, float]]] = {}
+"""The models each set of options leaves, kept so a call does not work them out again."""
 
 
 def generate_device_details(
@@ -41,20 +45,22 @@ def generate_device_details(
     # `is not False` rather than truthiness, the way the npm package reads it: a value
     # the type rules out does not switch the maker off.
     with_vendor = include_vendor is not False
-    # Worked out once per call rather than per draw: a call of ten thousand would
-    # otherwise filter the catalog ten thousand times.
-    candidates = [
-        entry
-        for entry in DEVICES
-        if entry.type in types and entry.vendor in vendors and low <= entry.year <= high
-    ]
+    outcomes = kept_outcomes(
+        _KEPT,
+        f"{','.join(types)}|{','.join(vendors)}|{low}|{high}",
+        lambda: [
+            (entry, 1.0)
+            for entry in DEVICES
+            if entry.type in types and entry.vendor in vendors and low <= entry.year <= high
+        ],
+    )
 
     with with_random(random):
         return collect_from(
             count=count,
             unique=unique,
             starts_with="",
-            outcomes=[(entry, 1.0) for entry in candidates],
+            outcomes=outcomes,
             key_of=lambda entry: write_device(entry, with_vendor),
             build=lambda entry: DeviceDetail(
                 device=write_device(entry, with_vendor),

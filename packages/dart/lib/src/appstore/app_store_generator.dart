@@ -8,6 +8,10 @@ import 'package:randino/src/internal/generate.dart';
 import 'package:randino/src/internal/utils.dart';
 import 'package:randino/src/types.dart';
 
+// The stores each set of platforms leaves, kept so a call does not work them
+// out again.
+final Map<String, List<Outcome<AppStoreEntry>>> _kept = {};
+
 /// What `randAppStore` and `randAppStoreDetails` both do.
 List<AppStoreDetail> generateAppStoreDetails({
   SystemPlatform? platform,
@@ -16,22 +20,28 @@ List<AppStoreDetail> generateAppStoreDetails({
   bool unique = false,
   Random? random,
 }) {
-  // One list per platform, worked out once per call rather than per draw.
-  final pools = <List<AppStoreEntry>>[
-    for (final each in resolvePlatforms(platform))
-      [
-        for (final entry in appStores)
-          if (entry.platform == each) entry,
-      ],
-  ];
-
+  final platforms = resolvePlatforms(platform);
   // The platform first, so a null one is half stores of each kind rather than
   // whichever kind the table happens to list more stores for.
-  final outcomes = <Outcome<AppStoreEntry>>[
-    for (final pool in pools)
-      for (final (index, share) in shares(pool, (each) => each.weight).indexed)
-        (entry: pool[index], weight: share / pools.length),
-  ];
+  final outcomes = keptOutcomes<AppStoreEntry>(
+    _kept,
+    platforms.map((each) => each.name).join(','),
+    () {
+      final pools = <List<AppStoreEntry>>[
+        for (final each in platforms)
+          [
+            for (final entry in appStores)
+              if (entry.platform == each) entry,
+          ],
+      ];
+
+      return [
+        for (final pool in pools)
+          for (final (index, share) in shares(pool, (each) => each.weight).indexed)
+            (entry: pool[index], weight: share / pools.length),
+      ];
+    },
+  );
 
   return withRandom(
     random,

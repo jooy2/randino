@@ -28,6 +28,9 @@ List<String> aliasesOf(String architecture, String written) => List<String>.unmo
 /// for.
 typedef _Drawn = ({SystemPlatform platform, String architecture});
 
+// The architectures each set of options leaves, kept so a call does not work them out again.
+final Map<String, List<Outcome<_Drawn>>> _kept = {};
+
 /// What `randArchitecture` and `randArchitectureDetails` both do.
 List<ArchitectureDetail> generateArchitectureDetails({
   SystemPlatform? platform,
@@ -37,32 +40,39 @@ List<ArchitectureDetail> generateArchitectureDetails({
   bool unique = false,
   Random? random,
 }) {
-  // The architectures each platform may land on, worked out once per call. A
-  // platform none of them runs on is left out, so a null platform never draws
-  // one it then has nothing to write for.
-  final candidates = [
-    for (final each in resolvePlatforms(platform))
-      (
-        platform: each,
-        architectures: <String>[
-          for (final architecture in architectures)
-            if (architectureData[architecture]!.weights.containsKey(each) &&
-                (includeRare || !architectureData[architecture]!.rare))
-              architecture,
-        ],
-      ),
-  ].where((each) => each.architectures.isNotEmpty).toList(growable: false);
+  final platforms = resolvePlatforms(platform);
+  final outcomes = keptOutcomes<_Drawn>(
+    _kept,
+    '${platforms.map((each) => each.name).join(',')}|$includeRare',
+    () {
+      // The architectures each platform may land on. A platform none of them
+      // runs on is left out, so a null platform never draws one it then has
+      // nothing to write for.
+      final candidates = [
+        for (final each in platforms)
+          (
+            platform: each,
+            architectures: <String>[
+              for (final architecture in architectures)
+                if (architectureData[architecture]!.weights.containsKey(each) &&
+                    (includeRare || !architectureData[architecture]!.rare))
+                  architecture,
+            ],
+          ),
+      ].where((each) => each.architectures.isNotEmpty).toList(growable: false);
 
-  // The platform first, so a null one is half desktops and half phones.
-  final outcomes = <Outcome<_Drawn>>[
-    for (final (platform: each, :architectures) in candidates)
-      for (final (index, share)
-          in shares(architectures, (one) => architectureData[one]!.weights[each]!).indexed)
-        (
-          entry: (platform: each, architecture: architectures[index]),
-          weight: share / candidates.length,
-        ),
-  ];
+      // The platform first, so a null one is half desktops and half phones.
+      return [
+        for (final (platform: each, :architectures) in candidates)
+          for (final (index, share)
+              in shares(architectures, (one) => architectureData[one]!.weights[each]!).indexed)
+            (
+              entry: (platform: each, architecture: architectures[index]),
+              weight: share / candidates.length,
+            ),
+      ];
+    },
+  );
 
   return withRandom(
     random,

@@ -8,6 +8,10 @@ import 'package:randino/src/internal/generate.dart';
 import 'package:randino/src/internal/utils.dart';
 import 'package:randino/src/types.dart';
 
+// The types each set of options leaves, kept so a call does not filter the
+// table again.
+final Map<String, List<Outcome<MimeTypeEntry>>> _kept = {};
+
 /// What `randMimeType` and `randMimeTypeDetails` both do.
 List<MimeTypeDetail> generateMimeTypeDetails({
   Set<MimeTopLevel>? type,
@@ -16,11 +20,14 @@ List<MimeTypeDetail> generateMimeTypeDetails({
   Random? random,
 }) {
   final types = type == null || type.isEmpty ? mimeTopLevels : type;
-  // Worked out once per call rather than per draw.
-  final candidates = [
-    for (final entry in mimeTypeEntries)
-      if (types.contains(entry.type)) entry,
-  ];
+  final outcomes = keptOutcomes<MimeTypeEntry>(
+    _kept,
+    types.map((each) => each.name).join(','),
+    () => [
+      for (final entry in mimeTypeEntries)
+        if (types.contains(entry.type)) (entry: entry, weight: entry.weight.toDouble()),
+    ],
+  );
 
   return withRandom(
     random,
@@ -28,7 +35,7 @@ List<MimeTypeDetail> generateMimeTypeDetails({
       count: count,
       unique: unique,
       startsWith: '',
-      outcomes: [for (final entry in candidates) (entry: entry, weight: entry.weight.toDouble())],
+      outcomes: outcomes,
       keyOf: (entry) => entry.mimeType,
       build:
           (entry) => MimeTypeDetail(

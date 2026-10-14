@@ -10,8 +10,9 @@ it can list every result it may return.
 import math
 from bisect import bisect_right
 from collections.abc import Callable, Sequence
+from dataclasses import dataclass
 from itertools import accumulate
-from typing import TypeVar
+from typing import Any, Generic, TypeVar
 
 from randino._internal.script import writes_script
 from randino._internal.utils import clamp, pick, random
@@ -392,6 +393,46 @@ def collect(
     return results
 
 
+_OUTCOMES_KEPT = 64
+"""How many sets of options a catalog keeps the outcomes of.
+
+A caller asks with a handful; one who moves a year range call by call would otherwise keep
+a list for every range, so the lists are let go at this many and listed again.
+"""
+
+
+def kept_outcomes(
+    kept: dict[str, list[tuple[E, float]]],
+    key: str,
+    listed: Callable[[], list[tuple[E, float]]],
+) -> list[tuple[E, float]]:
+    """The outcomes a catalog lists for one set of options, kept for the calls after.
+
+    Without it a call of one result listed the whole catalog to draw it, which made
+    `rand_os()` slower than the draw it replaced. `key` has to name every option the list
+    depends on, and nothing a result is only written by — a maker in front of a model is
+    `key_of`'s business, not the list's.
+
+    Args:
+        kept: The catalog's own table of lists, by key.
+        key: Every option the list depends on, written out.
+        listed: Lists the outcomes, the first time a call asks with `key`.
+
+    Returns:
+        The outcomes, listed now or by an earlier call.
+    """
+    outcomes = kept.get(key)
+
+    if outcomes is None:
+        if len(kept) >= _OUTCOMES_KEPT:
+            kept.clear()
+
+        outcomes = listed()
+        kept[key] = outcomes
+
+    return outcomes
+
+
 def collect_from(
     *,
     count: int,
@@ -430,7 +471,7 @@ def collect_from(
 
     if prefix:
         fitting = [outcome for outcome in outcomes if key_of(outcome[0]).lower().startswith(prefix)]
-        dealt = _deal_from(fitting, wanted, unique, key_of, build)
+        dealt = _deal_from(_prepare(fitting), wanted, unique, key_of, build)
         assert dealt is not None
         return dealt
 
@@ -438,18 +479,81 @@ def collect_from(
     # rather than the whole catalog's. A result whose key is empty is never returned, so an
     # entry written as nothing sends the call back to deal from the entries that are
     # written as something.
-    dealt = _deal_from(outcomes, wanted, unique, lambda entry: key_of(entry) or None, build)
+    dealt = _deal_from(
+        _prepare(outcomes), wanted, unique, lambda entry: key_of(entry) or None, build
+    )
 
     if dealt is None:
         written = [outcome for outcome in outcomes if key_of(outcome[0])]
-        dealt = _deal_from(written, wanted, unique, key_of, build)
+        dealt = _deal_from(_prepare(written), wanted, unique, key_of, build)
         assert dealt is not None
 
     return dealt
 
 
+@dataclass(frozen=True, slots=True)
+class _Prepared(Generic[E]):
+    """A list of outcomes made ready to draw from."""
+
+    pool: Sequence[tuple[E, float]]
+    """The outcomes that can come up."""
+
+    totals: list[float] | None
+    """The running total of their weights, so a draw is a search rather than a walk down
+    the list — or None when every weight is the same, and a draw is an index."""
+
+
+_prepared: dict[int, tuple[Sequence[tuple[Any, float]], _Prepared[Any]]] = {}
+"""Each list made ready, keyed on the list's identity and held with it, the way
+`word._generator._prefixed` holds a pool, so the identity stays its own. A list put
+together for one call is held too, so the table is emptied once it reaches
+`_PREPARED_KEPT` rather than growing with every call."""
+
+_PREPARED_KEPT = 1024
+
+
+def _prepare(outcomes: Sequence[tuple[E, float]]) -> _Prepared[E]:
+    """`outcomes` made ready to draw from, once for each list."""
+    held = _prepared.get(id(outcomes))
+
+    if held is not None and held[0] is outcomes:
+        return held[1]
+
+    # An outcome of no weight never comes up, unless none has any, when each is as likely
+    # as the next — the way `pick_weighted` reads a table of zeros.
+    weighted = [outcome for outcome in outcomes if outcome[1] > 0]
+    pool = weighted or [(entry, 1.0) for entry, _ in outcomes]
+    even = all(weight == pool[0][1] for _, weight in pool) if pool else True
+    made = _Prepared(pool, None if even else list(accumulate(weight for _, weight in pool)))
+
+    if len(_prepared) >= _PREPARED_KEPT:
+        _prepared.clear()
+
+    _prepared[id(outcomes)] = (outcomes, made)
+
+    return made
+
+
+def _draw_index(prepared: _Prepared[E]) -> int:
+    """One index of a prepared pool, drawn by its weight."""
+    if prepared.totals is None:
+        return int(random() * len(prepared.pool))
+
+    return min(
+        bisect_right(prepared.totals, random() * prepared.totals[-1]), len(prepared.pool) - 1
+    )
+
+
+_UNIQUE_REPEATS = 16
+"""How many repeats in a row a unique call draws through before it deals out what is left.
+
+Drawing again is cheaper while most of the list is still to come, and dealing is cheaper
+once nearly every draw is a repeat.
+"""
+
+
 def _deal_from(
-    outcomes: Sequence[tuple[E, float]],
+    prepared: _Prepared[E],
     wanted: int,
     unique: bool,
     keyed: Callable[[E], str | None],
@@ -458,7 +562,7 @@ def _deal_from(
     """Draw from outcomes `collect_from` may return.
 
     Args:
-        outcomes: The entries to draw from, each with its weight.
+        prepared: The outcomes, made ready to draw from.
         wanted: How many results to draw, already clamped.
         unique: Whether a result already drawn may come up again.
         keyed: The key of an entry, or None for one that has no key.
@@ -468,64 +572,79 @@ def _deal_from(
         The results, or None when one of the entries turns out to have no key, which
         only a list whose every key was not read can hold.
     """
-    # An outcome of no weight never comes up, unless none has any, when each is as likely
-    # as the next — the way `pick_weighted` reads a table of zeros.
-    weighted = (
-        outcomes
-        if all(weight > 0 for _, weight in outcomes)
-        else [outcome for outcome in outcomes if outcome[1] > 0]
-    )
-    pool = weighted or [(entry, 1.0) for entry, _ in outcomes]
+    pool = prepared.pool
     results: list[T] = []
 
     if not pool:
         return results
 
+    # Each entry's key, read the first time it comes up.
+    keys: dict[int, str | None] = {}
+
+    def key_at(index: int) -> str | None:
+        if index not in keys:
+            keys[index] = keyed(pool[index][0])
+
+        return keys[index]
+
     if not unique:
-        # The running total of the weights, so a draw is a search rather than a walk down
-        # the list: a call of ten thousand would otherwise read it ten thousand times.
-        totals = list(accumulate(weight for _, weight in pool))
-        last = len(pool) - 1
-        # Whether each entry has a key, read the first time it comes up.
-        checked = [False] * len(pool)
-
         while len(results) < wanted:
-            index = min(bisect_right(totals, random() * totals[-1]), last)
-            entry = pool[index][0]
+            index = _draw_index(prepared)
 
-            if not checked[index]:
-                if keyed(entry) is None:
-                    return None
+            if key_at(index) is None:
+                return None
 
-                checked[index] = True
-
-            results.append(build(entry))
+            results.append(build(pool[index][0]))
 
         return results
 
-    # Each outcome waits a time drawn at the rate of its weight, and they come up in the
-    # order a draw that skips repeats would find them: the first is each one's by its share
-    # of the weight, and so is every next one among those left. An outcome whose key came
-    # up before it is the repeat that draw would skip, and ties keep the list's order.
-    order = sorted(
-        (-math.log(1 - random()) / weight, index) for index, (_, weight) in enumerate(pool)
-    )
     seen: set[str] = set()
+    repeats = 0
 
-    for _, index in order:
-        if len(results) >= wanted:
-            break
-
-        entry = pool[index][0]
-        key = keyed(entry)
+    while len(results) < wanted and repeats < _UNIQUE_REPEATS:
+        index = _draw_index(prepared)
+        key = key_at(index)
 
         if key is None:
             return None
 
         if key in seen:
+            repeats += 1
             continue
 
         seen.add(key)
-        results.append(build(entry))
+        results.append(build(pool[index][0]))
+        repeats = 0
+
+    if len(results) >= wanted:
+        return results
+
+    # The rest is dealt out of what is left. Each entry waits a time drawn at the rate of
+    # its weight, and they come up in the order a draw that skips repeats would find them:
+    # the next is each one's by its share of the weight left, the way it was for every draw
+    # before. That holds from here as it did from the start, since a wait drawn this way
+    # does not remember how long it has run. Ties keep the list's order.
+    left: list[tuple[float, int, str]] = []
+
+    for index, (_, weight) in enumerate(pool):
+        key = key_at(index)
+
+        if key is None:
+            return None
+
+        if key not in seen:
+            left.append((-math.log(1 - random()) / weight, index, key))
+
+    left.sort()
+
+    for _, index, key in left:
+        if len(results) >= wanted:
+            break
+
+        if key in seen:
+            continue
+
+        seen.add(key)
+        results.append(build(pool[index][0]))
 
     return results

@@ -5,15 +5,20 @@
 
 import {
 	collectFrom,
+	keptOutcomes,
 	resolveMany,
 	resolvePlatforms,
 	resolveRandom,
 	resolveYears
 } from '../_internal/generate.js';
+import type { Outcome } from '../_internal/generate.js';
 import { withRandom } from '../_internal/utils.js';
 import type { CpuDetail, RandCpuOptions } from '../_types/global.js';
 import { CPUS, CPU_VENDORS } from './data/index.js';
 import type { CpuEntry } from './data/index.js';
+
+// The parts each set of options leaves, kept so a call does not filter the catalog again.
+const kept = new Map<string, readonly Outcome<CpuEntry>[]>();
 
 /** `entry` with its maker in front, or alone. */
 export function writeCpu(entry: CpuEntry, includeVendor: boolean): string {
@@ -25,14 +30,14 @@ export function generateCpuDetails(options: RandCpuOptions = {}): CpuDetail[] {
 	const [minYear, maxYear] = resolveYears(options.minYear, options.maxYear);
 	const includeVendor = options.includeVendor !== false;
 	const vendors = resolveMany(options.vendor, CPU_VENDORS, CPU_VENDORS);
-	// Worked out once per call rather than per draw: a call of ten thousand would
-	// otherwise filter the catalog ten thousand times.
-	const candidates = CPUS.filter(
-		(entry) =>
-			platforms.includes(entry.platform) &&
-			vendors.includes(entry.vendor) &&
-			entry.year >= minYear &&
-			entry.year <= maxYear
+	const outcomes = keptOutcomes(kept, `${platforms}|${vendors}|${minYear}|${maxYear}`, () =>
+		CPUS.filter(
+			(entry) =>
+				platforms.includes(entry.platform) &&
+				vendors.includes(entry.vendor) &&
+				entry.year >= minYear &&
+				entry.year <= maxYear
+		).map((entry) => ({ entry, weight: 1 }))
 	);
 
 	return withRandom(resolveRandom(options.random), () =>
@@ -40,7 +45,7 @@ export function generateCpuDetails(options: RandCpuOptions = {}): CpuDetail[] {
 			// Only the options a processor has: a `startsWith` slipped past the types
 			// would otherwise filter parts by their first letter.
 			{ count: options.count, unique: options.unique },
-			candidates.map((entry) => ({ entry, weight: 1 })),
+			outcomes,
 			(entry) => writeCpu(entry, includeVendor),
 			(entry) => ({
 				cpu: writeCpu(entry, includeVendor),

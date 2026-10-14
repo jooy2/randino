@@ -58,6 +58,9 @@ List<_Candidate> _sizesFor(
   ].where((candidate) => candidate.types.isNotEmpty).toList(growable: false);
 }
 
+// The sizes each set of options leaves, kept so a call does not work them out again.
+final Map<String, List<Outcome<_Drawn>>> _kept = {};
+
 /// What `randRam` and `randRamDetails` both do.
 List<RamDetail> generateRamDetails({
   SystemPlatform? platform,
@@ -76,30 +79,40 @@ List<RamDetail> generateRamDetails({
   // gigabytes, so a size written bare is in one unit throughout.
   final written = unit ?? (includeUnit ? null : ramScale.reference);
   final years = resolveYears(minYear, maxYear);
-  // The sizes each platform may land on, worked out once per call. A platform
-  // left with no size is left out, so a null platform never draws one it then
-  // has nothing to write for.
-  final candidates = [
-    for (final each in resolvePlatforms(platform))
-      (platform: each, sizes: _sizesFor(each, years, written, minSize, maxSize)),
-  ].where((each) => each.sizes.isNotEmpty).toList(growable: false);
+  final platforms = resolvePlatforms(platform);
+  final key = [
+    platforms.map((each) => each.name).join(','),
+    '${years.$1},${years.$2}',
+    written?.name ?? 'auto',
+    '$minSize',
+    '$maxSize',
+  ].join('|');
+  final outcomes = keptOutcomes<_Drawn>(_kept, key, () {
+    // The sizes each platform may land on. A platform left with no size is left
+    // out, so a null platform never draws one it then has nothing to write for.
+    final candidates = [
+      for (final each in platforms)
+        (platform: each, sizes: _sizesFor(each, years, written, minSize, maxSize)),
+    ].where((each) => each.sizes.isNotEmpty).toList(growable: false);
+    final listed = <Outcome<_Drawn>>[];
 
-  // The platform first, so a null one is half desktops and half phones, then
-  // the size, then the kind of memory that size was sold as.
-  final outcomes = <Outcome<_Drawn>>[];
+    // The platform first, so a null one is half desktops and half phones, then
+    // the size, then the kind of memory that size was sold as.
+    for (final (platform: each, :sizes) in candidates) {
+      final sizeShares = shares(sizes, (candidate) => candidate.size.weight);
 
-  for (final (platform: each, :sizes) in candidates) {
-    final sizeShares = shares(sizes, (candidate) => candidate.size.weight);
-
-    for (final (at, candidate) in sizes.indexed) {
-      for (final (index, share) in shares(candidate.types, (entry) => entry.weight).indexed) {
-        outcomes.add((
-          entry: (platform: each, size: candidate.size, type: candidate.types[index].type),
-          weight: sizeShares[at] * share / candidates.length,
-        ));
+      for (final (at, candidate) in sizes.indexed) {
+        for (final (index, share) in shares(candidate.types, (entry) => entry.weight).indexed) {
+          listed.add((
+            entry: (platform: each, size: candidate.size, type: candidate.types[index].type),
+            weight: sizeShares[at] * share / candidates.length,
+          ));
+        }
       }
     }
-  }
+
+    return listed;
+  });
 
   // A kind of memory belongs to a size written as a size, so a bare number goes
   // without it, the way `randOs` drops the build along with the version.

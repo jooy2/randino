@@ -3,16 +3,19 @@
 
 import {
 	collectFrom,
+	keptOutcomes,
 	resolveOption,
 	resolvePlatforms,
 	resolveRandom
 } from '../_internal/generate.js';
+import type { Outcome } from '../_internal/generate.js';
 import { shares, withRandom } from '../_internal/utils.js';
 import type {
 	Architecture,
 	ArchitectureDetail,
 	ArchitectureNaming,
-	RandArchitectureOptions
+	RandArchitectureOptions,
+	SystemPlatform
 } from '../_types/global.js';
 import { ARCHITECTURES, ARCHITECTURE_DATA, ARCHITECTURE_NAMINGS } from './data/index.js';
 
@@ -32,34 +35,43 @@ export function aliasesOf(architecture: Architecture, written: string): string[]
 	);
 }
 
+// The architectures each set of options leaves, kept so a call does not work them out again.
+const kept = new Map<
+	string,
+	readonly Outcome<{ platform: SystemPlatform; architecture: Architecture }>[]
+>();
+
 export function generateArchitectureDetails(
 	options: RandArchitectureOptions = {}
 ): ArchitectureDetail[] {
 	const includeRare = options.includeRare === true;
 	const naming = resolveOption(options.naming, ARCHITECTURE_NAMINGS, 'common');
-	// The architectures each platform may land on, worked out once per call. A
-	// platform none of them runs on is left out, so `'all'` never draws a platform
-	// it then has nothing to write for.
-	const candidates = resolvePlatforms(options.platform)
-		.map((platform) => ({
-			platform,
-			architectures: ARCHITECTURES.filter((architecture) => {
-				const data = ARCHITECTURE_DATA[architecture];
+	const platforms = resolvePlatforms(options.platform);
+	const outcomes = keptOutcomes(kept, `${platforms}|${includeRare}`, () => {
+		// The architectures each platform may land on. A platform none of them runs
+		// on is left out, so `'all'` never draws a platform it then has nothing to
+		// write for.
+		const candidates = platforms
+			.map((platform) => ({
+				platform,
+				architectures: ARCHITECTURES.filter((architecture) => {
+					const data = ARCHITECTURE_DATA[architecture];
 
-				return data.weights[platform] !== undefined && (includeRare || !data.rare);
-			})
-		}))
-		.filter((each) => each.architectures.length > 0);
+					return data.weights[platform] !== undefined && (includeRare || !data.rare);
+				})
+			}))
+			.filter((each) => each.architectures.length > 0);
 
-	// The platform first, so `'all'` is half desktops and half phones.
-	const outcomes = candidates.flatMap(({ platform, architectures }) =>
-		shares(architectures, (each) => ARCHITECTURE_DATA[each].weights[platform]!).map(
-			(share, index) => ({
-				entry: { platform, architecture: architectures[index] },
-				weight: share / candidates.length
-			})
-		)
-	);
+		// The platform first, so `'all'` is half desktops and half phones.
+		return candidates.flatMap(({ platform, architectures }) =>
+			shares(architectures, (each) => ARCHITECTURE_DATA[each].weights[platform]!).map(
+				(share, index) => ({
+					entry: { platform, architecture: architectures[index] },
+					weight: share / candidates.length
+				})
+			)
+		);
+	});
 
 	return withRandom(resolveRandom(options.random), () =>
 		collectFrom(

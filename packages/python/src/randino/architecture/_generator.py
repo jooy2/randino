@@ -2,7 +2,12 @@
 
 from collections.abc import Callable
 
-from randino._internal.generate import collect_from, resolve_option, resolve_platforms
+from randino._internal.generate import (
+    collect_from,
+    kept_outcomes,
+    resolve_option,
+    resolve_platforms,
+)
 from randino._internal.utils import shares, with_random
 from randino._types import (
     Architecture,
@@ -30,6 +35,10 @@ def aliases_of(architecture: Architecture, written: str) -> tuple[str, ...]:
     )
 
 
+_KEPT: dict[str, list[tuple[tuple[SystemPlatform, Architecture], float]]] = {}
+"""The architectures each set of options leaves, kept so a call does not work them out again."""
+
+
 def generate_architecture_details(
     *,
     platform: SystemPlatformOption = "all",
@@ -43,30 +52,36 @@ def generate_architecture_details(
     # `is True` rather than truthiness, the way the npm package reads it.
     with_rare = include_rare is True
     written_by = resolve_option(naming, ARCHITECTURE_NAMINGS, "common")
-    # The architectures each platform may land on, worked out once per call. A platform
-    # none of them runs on is left out, so `"all"` never draws a platform it then has
-    # nothing to write for.
-    candidates: list[tuple[SystemPlatform, list[Architecture]]] = []
+    platforms = resolve_platforms(platform)
 
-    for each in resolve_platforms(platform):
-        architectures = [
-            architecture
-            for architecture in ARCHITECTURES
-            if each in ARCHITECTURE_DATA[architecture].weights
-            and (with_rare or not ARCHITECTURE_DATA[architecture].rare)
-        ]
+    def listed() -> list[tuple[tuple[SystemPlatform, Architecture], float]]:
+        # The architectures each platform may land on. A platform none of them runs on is
+        # left out, so `"all"` never draws a platform it then has nothing to write for.
+        candidates: list[tuple[SystemPlatform, list[Architecture]]] = []
 
-        if architectures:
-            candidates.append((each, architectures))
+        for each in platforms:
+            architectures = [
+                architecture
+                for architecture in ARCHITECTURES
+                if each in ARCHITECTURE_DATA[architecture].weights
+                and (with_rare or not ARCHITECTURE_DATA[architecture].rare)
+            ]
 
-    # The platform first, so `"all"` is half desktops and half phones.
-    outcomes: list[tuple[tuple[SystemPlatform, Architecture], float]] = []
+            if architectures:
+                candidates.append((each, architectures))
 
-    for each, architectures in candidates:
-        weights = [ARCHITECTURE_DATA[architecture].weights[each] for architecture in architectures]
+        # The platform first, so `"all"` is half desktops and half phones.
+        outcomes: list[tuple[tuple[SystemPlatform, Architecture], float]] = []
 
-        for architecture, share in zip(architectures, shares(weights, float), strict=True):
-            outcomes.append(((each, architecture), share / len(candidates)))
+        for each, architectures in candidates:
+            weights = [ARCHITECTURE_DATA[one].weights[each] for one in architectures]
+
+            for architecture, share in zip(architectures, shares(weights, float), strict=True):
+                outcomes.append(((each, architecture), share / len(candidates)))
+
+        return outcomes
+
+    outcomes = kept_outcomes(_KEPT, f"{','.join(platforms)}|{with_rare}", listed)
 
     def build(entry: tuple[SystemPlatform, Architecture]) -> ArchitectureDetail:
         drawn, architecture = entry

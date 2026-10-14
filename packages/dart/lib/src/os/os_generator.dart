@@ -70,6 +70,9 @@ Map<OsFamily, List<(OsRelease, List<OsBuild>)>> _candidates(
   return families;
 }
 
+// The results each set of options leaves, kept so a call does not work them out again.
+final Map<String, List<Outcome<_Drawn>>> _kept = {};
+
 /// What `randOs` and `randOsDetails` both do.
 List<OsDetail> generateOsDetails({
   SystemPlatform? platform,
@@ -83,41 +86,51 @@ List<OsDetail> generateOsDetails({
   bool unique = false,
   Random? random,
 }) {
-  final families = _candidates(
-    resolvePlatforms(platform),
-    // A null or empty set reads as every line, the way the npm package's
-    // `resolveMany` reads one.
-    family == null || family.isEmpty ? osFamilyCodes.toSet() : family,
-    resolveYears(minYear, maxYear),
-    includeVersion && includeBuild,
-  );
-  final lines = families.keys.toList(growable: false);
+  final platforms = resolvePlatforms(platform);
+  // A null or empty set reads as every line, the way the npm package's
+  // `resolveMany` reads one.
+  final named = family == null || family.isEmpty ? osFamilyCodes.toSet() : family;
+  final years = resolveYears(minYear, maxYear);
+  final byBuild = includeVersion && includeBuild;
   final withEdition = includeVersion && includeEdition;
-  final outcomes = <Outcome<_Drawn>>[];
+  final key = [
+    platforms.map((each) => each.name).join(','),
+    osFamilyCodes.where(named.contains).map((each) => each.name).join(','),
+    '${years.$1},${years.$2}',
+    '$byBuild',
+    '$withEdition',
+  ].join('|');
+  final outcomes = keptOutcomes<_Drawn>(_kept, key, () {
+    final families = _candidates(platforms, named, years, byBuild);
+    final lines = families.keys.toList(growable: false);
+    final listed = <Outcome<_Drawn>>[];
 
-  // The line first, by how common it is among the lines left, and the release
-  // inside it second, each as likely as the next; then a build and an edition
-  // of it where the call asked for them.
-  for (final (index, share) in shares(lines, (each) => osFamilies[each]!.weight).indexed) {
-    final line = lines[index];
-    final releases = families[line]!;
+    // The line first, by how common it is among the lines left, and the release
+    // inside it second, each as likely as the next; then a build and an edition
+    // of it where the call asked for them.
+    for (final (index, share) in shares(lines, (each) => osFamilies[each]!.weight).indexed) {
+      final line = lines[index];
+      final releases = families[line]!;
 
-    for (final (release, builds) in releases) {
-      final written = builds.isEmpty ? <OsBuild?>[null] : builds;
-      final editions =
-          withEdition && release.editions.isNotEmpty ? release.editions : <String?>[null];
-      final weight = share / releases.length / written.length / editions.length;
+      for (final (release, builds) in releases) {
+        final written = builds.isEmpty ? <OsBuild?>[null] : builds;
+        final editions =
+            withEdition && release.editions.isNotEmpty ? release.editions : <String?>[null];
+        final weight = share / releases.length / written.length / editions.length;
 
-      for (final build in written) {
-        for (final edition in editions) {
-          outcomes.add((
-            entry: (family: line, release: release, build: build, edition: edition),
-            weight: weight,
-          ));
+        for (final build in written) {
+          for (final edition in editions) {
+            listed.add((
+              entry: (family: line, release: release, build: build, edition: edition),
+              weight: weight,
+            ));
+          }
         }
       }
     }
-  }
+
+    return listed;
+  });
 
   String write(_Drawn drawn) =>
       includeVersion ? writeOs(drawn.release, drawn.build, drawn.edition) : drawn.release.name;

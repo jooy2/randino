@@ -356,6 +356,38 @@ export function collect<T>(
 /** What a catalog builds one result from, and how likely that result is against the others. */
 export type Outcome<E> = { entry: E; weight: number };
 
+// How many sets of options a catalog keeps the outcomes of. A caller asks with a
+// handful; one who moves a year range call by call would otherwise keep a list
+// for every range, so the lists are let go at this many and listed again.
+const OUTCOMES_KEPT = 64;
+
+/**
+ * The outcomes a catalog lists for one set of options: listed the first time a
+ * call asks with it, and kept for the calls after. Without it a call of one
+ * result listed the whole catalog to draw it, which made `randOs()` twice as
+ * slow as the draw it replaced. `key` has to name every option the list depends
+ * on, and nothing a result is only written by — a maker in front of a model is
+ * `keyOf`'s business, not the list's.
+ */
+export function keptOutcomes<E>(
+	kept: Map<string, readonly Outcome<E>[]>,
+	key: string,
+	list: () => Outcome<E>[]
+): readonly Outcome<E>[] {
+	let outcomes = kept.get(key);
+
+	if (outcomes === undefined) {
+		if (kept.size >= OUTCOMES_KEPT) {
+			kept.clear();
+		}
+
+		outcomes = list();
+		kept.set(key, outcomes);
+	}
+
+	return outcomes;
+}
+
 /**
  * `collect` for a generator that can list every result it may return — a
  * catalog, where a draw only picks. Each result comes up as often as its weight
@@ -382,7 +414,7 @@ export function collectFrom<E, T>(
 	if (prefix) {
 		const fitting = outcomes.filter(({ entry }) => keyOf(entry).toLowerCase().startsWith(prefix));
 
-		return dealFrom(fitting, count, unique, keyOf, build)!;
+		return dealFrom(prepare(fitting), count, unique, keyOf, build)!;
 	}
 
 	// Without a `startsWith` a key is read only for what comes up — one for a call of
@@ -392,9 +424,9 @@ export function collectFrom<E, T>(
 	const keyed = (entry: E) => keyOf(entry) || null;
 
 	return (
-		dealFrom(outcomes, count, unique, keyed, build) ??
+		dealFrom(prepare(outcomes), count, unique, keyed, build) ??
 		dealFrom(
-			outcomes.filter(({ entry }) => keyOf(entry) !== ''),
+			prepare(outcomes.filter(({ entry }) => keyOf(entry) !== '')),
 			count,
 			unique,
 			keyOf,
@@ -404,91 +436,149 @@ export function collectFrom<E, T>(
 }
 
 /**
+ * A list of outcomes made ready to draw from: the ones that can come up, and the
+ * running total of their weights, so a draw is a search rather than a walk down
+ * the list. `totals` is `null` when every weight is the same, and a draw is then
+ * an index.
+ */
+type Prepared<E> = { pool: readonly Outcome<E>[]; totals: readonly number[] | null };
+
+// Kept with the list itself, so a list a catalog keeps is made ready once and one
+// put together for a single call goes when the call does.
+const preparedLists = new WeakMap<readonly Outcome<unknown>[], Prepared<unknown>>();
+
+function prepare<E>(outcomes: readonly Outcome<E>[]): Prepared<E> {
+	const cached = preparedLists.get(outcomes);
+
+	if (cached) {
+		return cached as Prepared<E>;
+	}
+
+	// An outcome of no weight never comes up, unless none has any, when each is as
+	// likely as the next — the way `pickWeighted` reads a table of zeros.
+	const weighted = outcomes.filter(({ weight }) => weight > 0);
+	const pool = weighted.length ? weighted : outcomes.map(({ entry }) => ({ entry, weight: 1 }));
+	let total = 0;
+	const totals = pool.every(({ weight }) => weight === pool[0].weight)
+		? null
+		: pool.map(({ weight }) => (total += weight));
+	const made: Prepared<E> = { pool, totals };
+
+	preparedLists.set(outcomes, made);
+
+	return made;
+}
+
+/** One index of a prepared pool, drawn by its weight. */
+function drawIndex<E>({ pool, totals }: Prepared<E>): number {
+	if (totals === null) {
+		return Math.floor(random() * pool.length);
+	}
+
+	const roll = random() * totals[totals.length - 1];
+	let low = 0;
+	let high = totals.length - 1;
+
+	while (low < high) {
+		const middle = (low + high) >> 1;
+
+		if (totals[middle] > roll) {
+			high = middle;
+		} else {
+			low = middle + 1;
+		}
+	}
+
+	return low;
+}
+
+// How many repeats in a row a unique call draws through before it deals out what
+// is left. Drawing again is cheaper while most of the list is still to come, and
+// dealing is cheaper once nearly every draw is a repeat.
+const UNIQUE_REPEATS = 16;
+
+/**
  * The draw `collectFrom` makes once the outcomes are the ones it may return:
  * `null` when one of them turns out to have no key, which only a list it has not
  * read every key of can hold.
  */
 function dealFrom<E, T>(
-	outcomes: readonly Outcome<E>[],
+	prepared: Prepared<E>,
 	count: number,
 	unique: boolean,
 	keyed: (entry: E) => string | null,
 	build: (entry: E) => T
 ): T[] | null {
-	// An outcome of no weight never comes up, unless none has any, when each is as
-	// likely as the next — the way `pickWeighted` reads a table of zeros.
-	const weighted = outcomes.every(({ weight }) => weight > 0)
-		? outcomes
-		: outcomes.filter(({ weight }) => weight > 0);
-	const pool = weighted.length ? weighted : outcomes.map(({ entry }) => ({ entry, weight: 1 }));
+	const { pool } = prepared;
 	const results: T[] = [];
 
 	if (!pool.length) {
 		return results;
 	}
 
+	// Each entry's key, read the first time it comes up.
+	const keys: (string | null | undefined)[] = [];
+	const keyAt = (index: number) => (keys[index] ??= keyed(pool[index].entry));
+
 	if (!unique) {
-		// The running total of the weights, so a draw is a search rather than a walk
-		// down the list: a call of ten thousand would otherwise read it ten thousand
-		// times.
-		const totals: number[] = [];
-		// Whether each entry has a key, read the first time it comes up.
-		const checked: boolean[] = [];
-		let total = 0;
-
-		for (const { weight } of pool) {
-			total += weight;
-			totals.push(total);
-		}
-
 		while (results.length < count) {
-			const roll = random() * total;
-			let low = 0;
-			let high = totals.length - 1;
+			const index = drawIndex(prepared);
 
-			while (low < high) {
-				const middle = (low + high) >> 1;
+			if (keyAt(index) === null) return null;
 
-				if (totals[middle] > roll) {
-					high = middle;
-				} else {
-					low = middle + 1;
-				}
-			}
-
-			const { entry } = pool[low];
-
-			if (!checked[low]) {
-				if (keyed(entry) === null) return null;
-
-				checked[low] = true;
-			}
-
-			results.push(build(entry));
+			results.push(build(pool[index].entry));
 		}
 
 		return results;
 	}
 
-	// Each outcome waits a time drawn at the rate of its weight, and they come up in
-	// the order a draw that skips repeats would find them: the first is each one's
-	// by its share of the weight, and so is every next one among those left. An
-	// outcome whose key came up before it is the repeat that draw would skip.
-	const order = pool
-		.map(({ entry, weight }) => ({ entry, at: -Math.log(1 - random()) / weight }))
-		.sort((a, b) => a.at - b.at);
 	const seen = new Set<string>();
+	let repeats = 0;
 
-	for (const { entry } of order) {
-		if (results.length >= count) break;
+	while (results.length < count && repeats < UNIQUE_REPEATS) {
+		const index = drawIndex(prepared);
+		const key = keyAt(index);
 
-		const key = keyed(entry);
+		if (key === null) return null;
+
+		if (seen.has(key)) {
+			repeats += 1;
+			continue;
+		}
+
+		seen.add(key);
+		results.push(build(pool[index].entry));
+		repeats = 0;
+	}
+
+	if (results.length >= count) {
+		return results;
+	}
+
+	// The rest is dealt out of what is left. Each entry waits a time drawn at the
+	// rate of its weight, and they come up in the order a draw that skips repeats
+	// would find them: the next is each one's by its share of the weight left, the
+	// way it was for every draw before. That holds from here as it did from the
+	// start, since a wait drawn this way does not remember how long it has run.
+	const left: { index: number; key: string; at: number }[] = [];
+
+	for (let index = 0; index < pool.length; index += 1) {
+		const key = keyAt(index);
 
 		if (key === null) return null;
 		if (seen.has(key)) continue;
 
+		left.push({ index, key, at: -Math.log(1 - random()) / pool[index].weight });
+	}
+
+	left.sort((a, b) => a.at - b.at);
+
+	for (const { index, key } of left) {
+		if (results.length >= count) break;
+		if (seen.has(key)) continue;
+
 		seen.add(key);
-		results.push(build(entry));
+		results.push(build(pool[index].entry));
 	}
 
 	return results;

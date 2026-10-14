@@ -208,6 +208,36 @@ List<T> collect<T>({
 /// against the others.
 typedef Outcome<E> = ({E entry, double weight});
 
+// How many sets of options a catalog keeps the outcomes of. A caller asks with a
+// handful; one who moves a year range call by call would otherwise keep a list
+// for every range, so the lists are let go at this many and listed again.
+const int _outcomesKept = 64;
+
+/// The outcomes a catalog lists for one set of options: listed the first time a
+/// call asks with it, and kept for the calls after.
+///
+/// Without it a call of one result listed the whole catalog to draw it, which
+/// made `randOs()` twice as slow as the draw it replaced. [key] has to name
+/// every option the list depends on, and nothing a result is only written by —
+/// a maker in front of a model is `keyOf`'s business, not the list's.
+List<Outcome<E>> keptOutcomes<E>(
+  Map<String, List<Outcome<E>>> kept,
+  String key,
+  List<Outcome<E>> Function() list,
+) {
+  final cached = kept[key];
+
+  if (cached != null) {
+    return cached;
+  }
+
+  if (kept.length >= _outcomesKept) {
+    kept.clear();
+  }
+
+  return kept[key] = list();
+}
+
 /// [collect] for a generator that can list every result it may return — a
 /// catalog, where a draw only picks.
 ///
@@ -234,12 +264,12 @@ List<T> collectFrom<E, T>({
   final prefix = startsWith.toLowerCase();
 
   if (prefix.isNotEmpty) {
-    final fitting = [
+    final fitting = <Outcome<E>>[
       for (final outcome in outcomes)
         if (keyOf(outcome.entry).toLowerCase().startsWith(prefix)) outcome,
     ];
 
-    return _dealFrom(fitting, wanted, unique, keyOf, build)!;
+    return _dealFrom<E, T>(_prepare<E>(fitting), wanted, unique, keyOf, build)!;
   }
 
   // Without a `startsWith` a key is read only for what comes up — one for a call
@@ -252,12 +282,12 @@ List<T> collectFrom<E, T>({
     return key.isEmpty ? null : key;
   }
 
-  return _dealFrom(outcomes, wanted, unique, keyed, build) ??
-      _dealFrom(
-        [
+  return _dealFrom<E, T>(_prepare<E>(outcomes), wanted, unique, keyed, build) ??
+      _dealFrom<E, T>(
+        _prepare<E>(<Outcome<E>>[
           for (final outcome in outcomes)
             if (keyOf(outcome.entry).isNotEmpty) outcome,
-        ],
+        ]),
         wanted,
         unique,
         keyOf,
@@ -265,100 +295,174 @@ List<T> collectFrom<E, T>({
       )!;
 }
 
+/// A list of outcomes made ready to draw from: the ones that can come up, and
+/// the running total of their weights, so a draw is a search rather than a walk
+/// down the list. [totals] is null when every weight is the same, and a draw is
+/// then an index.
+final class _Prepared<E> {
+  const _Prepared(this.pool, this.totals);
+
+  final List<Outcome<E>> pool;
+
+  final List<double>? totals;
+}
+
+// Kept with the list itself, so a list a catalog keeps is made ready once and
+// one put together for a single call goes when the call does.
+final Expando<Object> _preparedLists = Expando<Object>('prepared');
+
+_Prepared<E> _prepare<E>(List<Outcome<E>> outcomes) {
+  final cached = _preparedLists[outcomes];
+
+  if (cached != null) {
+    return cached as _Prepared<E>;
+  }
+
+  // An outcome of no weight never comes up, unless none has any, when each is
+  // as likely as the next — the way [pickWeighted] reads a table of zeros.
+  final weighted = <Outcome<E>>[
+    for (final outcome in outcomes)
+      if (outcome.weight > 0) outcome,
+  ];
+  final pool =
+      weighted.isNotEmpty
+          ? weighted
+          : <Outcome<E>>[for (final outcome in outcomes) (entry: outcome.entry, weight: 1.0)];
+  List<double>? totals;
+
+  if (pool.any((outcome) => outcome.weight != pool.first.weight)) {
+    var total = 0.0;
+
+    totals = [for (final outcome in pool) total += outcome.weight];
+  }
+
+  final made = _Prepared<E>(pool, totals);
+
+  _preparedLists[outcomes] = made;
+
+  return made;
+}
+
+/// One index of a prepared pool, drawn by its weight.
+int _drawIndex<E>(_Prepared<E> prepared) {
+  final totals = prepared.totals;
+
+  if (totals == null) {
+    return randInt(0, prepared.pool.length - 1);
+  }
+
+  final roll = randDouble() * totals.last;
+  var low = 0;
+  var high = totals.length - 1;
+
+  while (low < high) {
+    final middle = (low + high) >> 1;
+
+    if (totals[middle] > roll) {
+      high = middle;
+    } else {
+      low = middle + 1;
+    }
+  }
+
+  return low;
+}
+
+// How many repeats in a row a unique call draws through before it deals out
+// what is left. Drawing again is cheaper while most of the list is still to
+// come, and dealing is cheaper once nearly every draw is a repeat.
+const int _uniqueRepeats = 16;
+
 /// The draw [collectFrom] makes once the outcomes are the ones it may return:
 /// null when one of them turns out to have no key, which only a list it has not
 /// read every key of can hold.
 List<T>? _dealFrom<E, T>(
-  List<Outcome<E>> outcomes,
+  _Prepared<E> prepared,
   int wanted,
   bool unique,
   String? Function(E entry) keyed,
   T Function(E entry) build,
 ) {
-  // An outcome of no weight never comes up, unless none has any, when each is
-  // as likely as the next — the way [pickWeighted] reads a table of zeros.
-  final weighted =
-      outcomes.every((outcome) => outcome.weight > 0)
-          ? outcomes
-          : [
-            for (final outcome in outcomes)
-              if (outcome.weight > 0) outcome,
-          ];
-  final pool =
-      weighted.isNotEmpty
-          ? weighted
-          : [for (final outcome in outcomes) (entry: outcome.entry, weight: 1.0)];
+  final pool = prepared.pool;
   final results = <T>[];
 
   if (pool.isEmpty) {
     return results;
   }
 
-  if (!unique) {
-    // The running total of the weights, so a draw is a search rather than a
-    // walk down the list: a call of ten thousand would otherwise read it ten
-    // thousand times.
-    final totals = <double>[];
-    // Whether each entry has a key, read the first time it comes up.
-    final checked = List<bool>.filled(pool.length, false);
-    var total = 0.0;
+  // Each entry's key, read the first time it comes up.
+  final keys = List<String?>.filled(pool.length, null);
+  final read = List<bool>.filled(pool.length, false);
 
-    for (final outcome in pool) {
-      total += outcome.weight;
-      totals.add(total);
+  String? keyAt(int index) {
+    if (!read[index]) {
+      keys[index] = keyed(pool[index].entry);
+      read[index] = true;
     }
 
+    return keys[index];
+  }
+
+  if (!unique) {
     while (results.length < wanted) {
-      final roll = randDouble() * total;
-      var low = 0;
-      var high = totals.length - 1;
+      final index = _drawIndex<E>(prepared);
 
-      while (low < high) {
-        final middle = (low + high) >> 1;
+      if (keyAt(index) == null) return null;
 
-        if (totals[middle] > roll) {
-          high = middle;
-        } else {
-          low = middle + 1;
-        }
-      }
-
-      final entry = pool[low].entry;
-
-      if (!checked[low]) {
-        if (keyed(entry) == null) return null;
-
-        checked[low] = true;
-      }
-
-      results.add(build(entry));
+      results.add(build(pool[index].entry));
     }
 
     return results;
   }
 
-  // Each outcome waits a time drawn at the rate of its weight, and they come up
-  // in the order a draw that skips repeats would find them: the first is each
-  // one's by its share of the weight, and so is every next one among those
-  // left. An outcome whose key came up before it is the repeat that draw would
-  // skip. Ties keep the list's order, which `List.sort` does not promise.
-  final order = [
-    for (var index = 0; index < pool.length; index += 1)
-      (index: index, at: -log(1 - randDouble()) / pool[index].weight),
-  ]..sort((a, b) => a.at != b.at ? a.at.compareTo(b.at) : a.index.compareTo(b.index));
   final seen = <String>{};
+  var repeats = 0;
 
-  for (final (:index, at: _) in order) {
-    if (results.length >= wanted) break;
+  while (results.length < wanted && repeats < _uniqueRepeats) {
+    final index = _drawIndex<E>(prepared);
+    final key = keyAt(index);
 
-    final entry = pool[index].entry;
-    final key = keyed(entry);
+    if (key == null) return null;
+
+    if (seen.contains(key)) {
+      repeats += 1;
+      continue;
+    }
+
+    seen.add(key);
+    results.add(build(pool[index].entry));
+    repeats = 0;
+  }
+
+  if (results.length >= wanted) {
+    return results;
+  }
+
+  // The rest is dealt out of what is left. Each entry waits a time drawn at the
+  // rate of its weight, and they come up in the order a draw that skips repeats
+  // would find them: the next is each one's by its share of the weight left,
+  // the way it was for every draw before. That holds from here as it did from
+  // the start, since a wait drawn this way does not remember how long it has
+  // run. Ties keep the list's order, which `List.sort` does not promise.
+  final left = <({int index, String key, double at})>[];
+
+  for (var index = 0; index < pool.length; index += 1) {
+    final key = keyAt(index);
 
     if (key == null) return null;
     if (seen.contains(key)) continue;
 
+    left.add((index: index, key: key, at: -log(1 - randDouble()) / pool[index].weight));
+  }
+
+  left.sort((a, b) => a.at != b.at ? a.at.compareTo(b.at) : a.index.compareTo(b.index));
+
+  for (final (:index, :key, at: _) in left) {
+    if (results.length >= wanted) break;
+    if (seen.contains(key)) continue;
+
     seen.add(key);
-    results.add(build(entry));
+    results.add(build(pool[index].entry));
   }
 
   return results;

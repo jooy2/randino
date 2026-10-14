@@ -7,7 +7,13 @@ narrows what may be picked rather than shaping what is written afterwards.
 
 from collections.abc import Callable
 
-from randino._internal.generate import collect_from, resolve_many, resolve_platforms, resolve_years
+from randino._internal.generate import (
+    collect_from,
+    kept_outcomes,
+    resolve_many,
+    resolve_platforms,
+    resolve_years,
+)
 from randino._internal.utils import shares, with_random
 from randino._types import OsDetail, OsFamily, OsFamilyOption, SystemPlatform, SystemPlatformOption
 from randino.os.data import OS_FAMILIES, OS_FAMILY_CODES, OS_RELEASES, OsBuild, OsRelease
@@ -70,6 +76,10 @@ def _candidates(
     return families
 
 
+_KEPT: dict[str, list[tuple[tuple[OsFamily, OsRelease, OsBuild | None, str | None], float]]] = {}
+"""The results each set of options leaves, kept so a call does not work them out again."""
+
+
 def generate_os_details(
     *,
     platform: SystemPlatformOption = "all",
@@ -87,35 +97,48 @@ def generate_os_details(
     # `is not False` and `is True` rather than truthiness, the way the npm package
     # reads them: a value the type rules out does not switch a part on or off.
     with_version = include_version is not False
-    families = _candidates(
-        resolve_platforms(platform),
-        resolve_many(family, OS_FAMILY_CODES, OS_FAMILY_CODES),
-        resolve_years(min_year, max_year),
-        with_version and include_build is True,
-    )
-    lines = list(families)
+    platforms = resolve_platforms(platform)
+    named = resolve_many(family, OS_FAMILY_CODES, OS_FAMILY_CODES)
+    years = resolve_years(min_year, max_year)
+    by_build = with_version and include_build is True
     with_edition = with_version and include_edition is True
 
-    outcomes: list[tuple[tuple[OsFamily, OsRelease, OsBuild | None, str | None], float]] = []
+    def listed() -> list[tuple[tuple[OsFamily, OsRelease, OsBuild | None, str | None], float]]:
+        families = _candidates(platforms, named, years, by_build)
+        lines = list(families)
+        outcomes: list[tuple[tuple[OsFamily, OsRelease, OsBuild | None, str | None], float]] = []
 
-    # The line first, by how common it is among the lines left, and the release inside it
-    # second, each as likely as the next; then a build and an edition of it where the call
-    # asked for them.
-    for line, share in zip(
-        lines, shares(lines, lambda each: OS_FAMILIES[each].weight), strict=True
-    ):
-        releases = families[line]
+        # The line first, by how common it is among the lines left, and the release inside
+        # it second, each as likely as the next; then a build and an edition of it where the
+        # call asked for them.
+        for line, share in zip(
+            lines, shares(lines, lambda each: OS_FAMILIES[each].weight), strict=True
+        ):
+            releases = families[line]
 
-        for release, builds in releases:
-            written: list[OsBuild | None] = list(builds) if builds else [None]
-            editions: list[str | None] = (
-                list(release.editions) if with_edition and release.editions else [None]
-            )
-            weight = share / len(releases) / len(written) / len(editions)
+            for release, builds in releases:
+                written: list[OsBuild | None] = list(builds) if builds else [None]
+                editions: list[str | None] = (
+                    list(release.editions) if with_edition and release.editions else [None]
+                )
+                weight = share / len(releases) / len(written) / len(editions)
 
-            for build in written:
-                for edition in editions:
-                    outcomes.append(((line, release, build, edition), weight))
+                for build in written:
+                    for edition in editions:
+                        outcomes.append(((line, release, build, edition), weight))
+
+        return outcomes
+
+    key = "|".join(
+        (
+            ",".join(platforms),
+            ",".join(named),
+            f"{years[0]},{years[1]}",
+            str(by_build),
+            str(with_edition),
+        )
+    )
+    outcomes = kept_outcomes(_KEPT, key, listed)
 
     def write(entry: tuple[OsFamily, OsRelease, OsBuild | None, str | None]) -> str:
         _, release, build, edition = entry

@@ -8,6 +8,8 @@ from collections.abc import Callable
 from randino._internal.capacity import CapacityCandidate, capacity_candidates, write_capacity
 from randino._internal.generate import (
     collect_from,
+    finite,
+    kept_outcomes,
     resolve_option,
     resolve_platforms,
     resolve_years,
@@ -83,6 +85,12 @@ def _candidates(
     return candidates
 
 
+_KEPT: dict[
+    str, list[tuple[tuple[SystemPlatform, CapacityCandidate[RamUnit], RamType], float]]
+] = {}
+"""The sizes each set of options leaves, kept so a call does not work them out again."""
+
+
 def generate_ram_details(
     *,
     platform: SystemPlatformOption = "all",
@@ -108,26 +116,38 @@ def generate_ram_details(
     # Without the unit there is nothing to tell `512` megabytes from `16` gigabytes, so a
     # size written bare is in one unit throughout.
     written = RAM_SCALE.reference if asked == "auto" and not with_unit else asked
-    candidates = _candidates(
-        resolve_platforms(platform),
-        resolve_years(min_year, max_year),
-        written,
-        min_size,
-        max_size,
+    platforms = resolve_platforms(platform)
+    years = resolve_years(min_year, max_year)
+
+    def listed() -> list[tuple[tuple[SystemPlatform, CapacityCandidate[RamUnit], RamType], float]]:
+        candidates = _candidates(platforms, years, written, min_size, max_size)
+        outcomes: list[
+            tuple[tuple[SystemPlatform, CapacityCandidate[RamUnit], RamType], float]
+        ] = []
+
+        # The platform first, so `"all"` is half desktops and half phones, then the size,
+        # then the kind of memory that size was sold as.
+        for each, sizes in candidates:
+            size_shares = shares(sizes, lambda size: size[0].weight)
+
+            for (candidate, types), size_share in zip(sizes, size_shares, strict=True):
+                for entry, share in zip(types, shares(types, lambda one: one.weight), strict=True):
+                    outcomes.append(
+                        ((each, candidate, entry.type), size_share * share / len(candidates))
+                    )
+
+        return outcomes
+
+    key = "|".join(
+        (
+            ",".join(platforms),
+            f"{years[0]},{years[1]}",
+            written,
+            str(finite(min_size)),
+            str(finite(max_size)),
+        )
     )
-
-    # The platform first, so `"all"` is half desktops and half phones, then the size, then
-    # the kind of memory that size was sold as.
-    outcomes: list[tuple[tuple[SystemPlatform, CapacityCandidate[RamUnit], RamType], float]] = []
-
-    for each, sizes in candidates:
-        size_shares = shares(sizes, lambda size: size[0].weight)
-
-        for (candidate, types), size_share in zip(sizes, size_shares, strict=True):
-            for entry, share in zip(types, shares(types, lambda one: one.weight), strict=True):
-                outcomes.append(
-                    ((each, candidate, entry.type), size_share * share / len(candidates))
-                )
+    outcomes = kept_outcomes(_KEPT, key, listed)
 
     def write(entry: tuple[SystemPlatform, CapacityCandidate[RamUnit], RamType]) -> str:
         _, candidate, kind = entry

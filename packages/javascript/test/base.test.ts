@@ -672,4 +672,195 @@ describe('base test', () => {
 
 		assert.ok(first > 2800 && first < 3200, String(first));
 	});
+
+	it('a catalog keeps one list for each set of options, and never hands one to another', () => {
+		// Each pair differs by one option its list depends on, asked one after the
+		// other and back again, so a list kept under a key that leaves the option out
+		// would be handed to the call after it.
+		type Check = [() => readonly unknown[], (detail: never) => boolean];
+		const pairs: [Check, Check][] = [
+			[
+				[
+					() => randino.randOs({ platform: 'mobile', count: 60, output: 'detail' }),
+					(d: { platform: string }) => d.platform === 'mobile'
+				],
+				[
+					() => randino.randOs({ platform: 'desktop', count: 60, output: 'detail' }),
+					(d: { platform: string }) => d.platform === 'desktop'
+				]
+			],
+			[
+				[
+					() => randino.randOs({ minYear: 2024, count: 60, output: 'detail' }),
+					(d: { year: number }) => d.year >= 2024
+				],
+				[
+					() => randino.randOs({ maxYear: 2005, count: 60, output: 'detail' }),
+					(d: { year: number }) => d.year <= 2005
+				]
+			],
+			[
+				[
+					() =>
+						randino.randOs({
+							includeBuild: true,
+							includeEdition: true,
+							count: 60,
+							output: 'detail'
+						}),
+					() => true
+				],
+				[
+					() => randino.randOs({ count: 60, output: 'detail' }),
+					(d: { build: unknown; edition: unknown }) => d.build === null && d.edition === null
+				]
+			],
+			[
+				[
+					() => randino.randCpu({ vendor: 'AMD', count: 60, output: 'detail' }),
+					(d: { vendor: string }) => d.vendor === 'AMD'
+				],
+				[
+					() => randino.randCpu({ vendor: 'Intel', count: 60, output: 'detail' }),
+					(d: { vendor: string }) => d.vendor === 'Intel'
+				]
+			],
+			[
+				[
+					() => randino.randGpu({ minYear: 2024, count: 60, output: 'detail' }),
+					(d: { year: number }) => d.year >= 2024
+				],
+				[
+					() => randino.randGpu({ maxYear: 2010, count: 60, output: 'detail' }),
+					(d: { year: number }) => d.year <= 2010
+				]
+			],
+			[
+				[
+					() => randino.randDevice({ type: 'phone', count: 60, output: 'detail' }),
+					(d: { type: string }) => d.type === 'phone'
+				],
+				[
+					() => randino.randDevice({ type: 'laptop', count: 60, output: 'detail' }),
+					(d: { type: string }) => d.type === 'laptop'
+				]
+			],
+			[
+				[
+					() => randino.randArchitecture({ includeRare: true, count: 60, output: 'detail' }),
+					() => true
+				],
+				[
+					() => randino.randArchitecture({ count: 60, output: 'detail' }),
+					(d: { rare: boolean }) => !d.rare
+				]
+			],
+			[
+				[
+					() => randino.randDiskSize({ type: 'hdd', count: 60, output: 'detail' }),
+					(d: { type: string }) => d.type === 'hdd'
+				],
+				[
+					() => randino.randDiskSize({ type: 'emmc', count: 60, output: 'detail' }),
+					(d: { type: string }) => d.type === 'emmc'
+				]
+			],
+			[
+				[
+					() => randino.randDiskType({ platform: 'desktop', count: 60, output: 'detail' }),
+					(d: { platform: string }) => d.platform === 'desktop'
+				],
+				[
+					() => randino.randDiskType({ platform: 'mobile', count: 60, output: 'detail' }),
+					(d: { platform: string }) => d.platform === 'mobile'
+				]
+			],
+			[
+				[
+					() => randino.randRam({ minSize: 16, count: 60, output: 'detail' }),
+					(d: { bytes: number }) => d.bytes >= 16 * 1024 ** 3
+				],
+				[
+					() => randino.randRam({ maxSize: 4, count: 60, output: 'detail' }),
+					(d: { bytes: number }) => d.bytes <= 4 * 1024 ** 3
+				]
+			],
+			[
+				[
+					() => randino.randResolution({ platform: 'desktop', count: 60, output: 'detail' }),
+					(d: { platform: string }) => d.platform === 'desktop'
+				],
+				[
+					() => randino.randResolution({ platform: 'mobile', count: 60, output: 'detail' }),
+					(d: { platform: string }) => d.platform === 'mobile'
+				]
+			],
+			[
+				[
+					() => randino.randAppStore({ platform: 'desktop', count: 60, output: 'detail' }),
+					(d: { platform: string }) => d.platform === 'desktop'
+				],
+				[
+					() => randino.randAppStore({ platform: 'mobile', count: 60, output: 'detail' }),
+					(d: { platform: string }) => d.platform === 'mobile'
+				]
+			],
+			[
+				[
+					() => randino.randFileExtension({ category: 'image', count: 60, output: 'detail' }),
+					(d: { category: string }) => d.category === 'image'
+				],
+				[
+					() => randino.randFileExtension({ category: 'audio', count: 60, output: 'detail' }),
+					(d: { category: string }) => d.category === 'audio'
+				]
+			],
+			[
+				[
+					() => randino.randMimeType({ type: 'image', count: 60, output: 'detail' }),
+					(d: { type: string }) => d.type === 'image'
+				],
+				[
+					() => randino.randMimeType({ type: 'text', count: 60, output: 'detail' }),
+					(d: { type: string }) => d.type === 'text'
+				]
+			],
+			[
+				[
+					() => randino.randGender({ includeUnknown: true, count: 200, output: 'detail' }),
+					() => true
+				],
+				[
+					() => randino.randGender({ count: 200, output: 'detail' }),
+					(d: { code: string }) => d.code !== 'unknown'
+				]
+			],
+			[
+				[
+					() => randino.randAge({ minAge: 60, count: 60, output: 'detail' }),
+					(d: { age: number }) => d.age >= 60
+				],
+				[
+					() => randino.randAge({ maxAge: 10, count: 60, output: 'detail' }),
+					(d: { age: number }) => d.age <= 10
+				]
+			]
+		];
+
+		for (const [[first, fits], [second, fitsSecond]] of pairs) {
+			for (const [call, check] of [
+				[first, fits],
+				[second, fitsSecond],
+				[first, fits]
+			] as const) {
+				const details = call();
+
+				assert.ok(details.length > 0, call.toString());
+
+				for (const detail of details) {
+					assert.ok(check(detail as never), `${call.toString()}: ${JSON.stringify(detail)}`);
+				}
+			}
+		}
+	});
 });

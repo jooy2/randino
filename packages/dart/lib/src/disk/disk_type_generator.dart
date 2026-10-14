@@ -12,6 +12,9 @@ import 'package:randino/src/types.dart';
 /// drawn for.
 typedef _Drawn = ({SystemPlatform platform, DiskType code});
 
+// The kinds each set of platforms uses, kept so a call does not work them out again.
+final Map<String, List<Outcome<_Drawn>>> _kept = {};
+
 /// What `randDiskType` and `randDiskTypeDetails` both do.
 List<DiskTypeDetail> generateDiskTypeDetails({
   SystemPlatform? platform,
@@ -23,19 +26,23 @@ List<DiskTypeDetail> generateDiskTypeDetails({
 
   // The platform first, so a null one is half desktops and half phones, and
   // eMMC — which both use — is drawn by the platform it came up for.
-  final outcomes = <Outcome<_Drawn>>[];
+  final outcomes = keptOutcomes<_Drawn>(_kept, platforms.map((each) => each.name).join(','), () {
+    final listed = <Outcome<_Drawn>>[];
 
-  for (final each in platforms) {
-    final weights = diskTypeWeights[each]!;
-    final codes = <DiskType>[
-      for (final type in diskTypes)
-        if (weights.containsKey(type)) type,
-    ];
+    for (final each in platforms) {
+      final weights = diskTypeWeights[each]!;
+      final codes = <DiskType>[
+        for (final type in diskTypes)
+          if (weights.containsKey(type)) type,
+      ];
 
-    for (final (index, share) in shares(codes, (type) => weights[type]!).indexed) {
-      outcomes.add((entry: (platform: each, code: codes[index]), weight: share / platforms.length));
+      for (final (index, share) in shares(codes, (type) => weights[type]!).indexed) {
+        listed.add((entry: (platform: each, code: codes[index]), weight: share / platforms.length));
+      }
     }
-  }
+
+    return listed;
+  });
 
   return withRandom(
     random,

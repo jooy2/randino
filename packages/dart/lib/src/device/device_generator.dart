@@ -19,6 +19,10 @@ String writeDevice(DeviceEntry entry, bool includeVendor) =>
         ? '${entry.vendor} ${entry.model}'
         : entry.model;
 
+// The models each set of options leaves, kept so a call does not filter the
+// table again.
+final Map<String, List<Outcome<DeviceEntry>>> _kept = {};
+
 /// What `randDevice` and `randDeviceDetails` both do.
 List<DeviceDetail> generateDeviceDetails({
   Set<DeviceType>? type,
@@ -39,16 +43,18 @@ List<DeviceDetail> generateDeviceDetails({
       if (vendor?.contains(each) ?? false) each,
   };
   final vendors = named.isEmpty ? deviceVendors.toSet() : named;
-  // Worked out once per call rather than per draw: a call of ten thousand would
-  // otherwise filter the catalog ten thousand times.
-  final candidates = <DeviceEntry>[
-    for (final entry in devices)
-      if (types.contains(entry.type) &&
-          vendors.contains(entry.vendor) &&
-          entry.year >= low &&
-          entry.year <= high)
-        entry,
-  ];
+  final outcomes = keptOutcomes<DeviceEntry>(
+    _kept,
+    '${types.map((each) => each.name).join(',')}|${vendors.join(',')}|$low|$high',
+    () => [
+      for (final entry in devices)
+        if (types.contains(entry.type) &&
+            vendors.contains(entry.vendor) &&
+            entry.year >= low &&
+            entry.year <= high)
+          (entry: entry, weight: 1.0),
+    ],
+  );
 
   return withRandom(
     random,
@@ -56,7 +62,7 @@ List<DeviceDetail> generateDeviceDetails({
       count: count,
       unique: unique,
       startsWith: '',
-      outcomes: [for (final entry in candidates) (entry: entry, weight: 1.0)],
+      outcomes: outcomes,
       keyOf: (entry) => writeDevice(entry, includeVendor),
       build:
           (entry) => DeviceDetail(

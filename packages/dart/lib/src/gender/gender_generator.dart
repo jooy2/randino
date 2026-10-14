@@ -14,6 +14,9 @@ import 'package:randino/src/word/data/index.dart';
 /// its identity.
 typedef _Drawn = ({GenderCode code, WordLanguage language, NonbinaryIdentity? identity});
 
+// The labels each set of options allows, kept so a call does not work them out again.
+final Map<String, List<Outcome<_Drawn>>> _kept = {};
+
 /// What `randGender` and `randGenderDetails` both do.
 List<GenderDetail> generateGenderDetails({
   WordLanguage? language,
@@ -33,30 +36,39 @@ List<GenderDetail> generateGenderDetails({
         code,
   ];
 
+  final key = [
+    languages.map((each) => each.name).join(','),
+    codes.map((each) => each.name).join(','),
+    '$nonbinaryIdentity',
+  ].join('|');
   // The code by its weight, the language evenly, and for `nonbinary` with the
   // option on, the identity by its own weight.
-  final identityShares = shares(nonbinaryIdentities, (each) => nonbinaryWeights[each]!);
-  final outcomes = <Outcome<_Drawn>>[];
+  final outcomes = keptOutcomes<_Drawn>(_kept, key, () {
+    final identityShares = shares(nonbinaryIdentities, (each) => nonbinaryWeights[each]!);
+    final listed = <Outcome<_Drawn>>[];
 
-  for (final (index, share) in shares(codes, (each) => genderWeights[each]!).indexed) {
-    final code = codes[index];
-    final forms = <({NonbinaryIdentity? identity, double share})>[
-      if (code == GenderCode.nonbinary && nonbinaryIdentity)
-        for (final (at, identity) in nonbinaryIdentities.indexed)
-          (identity: identity, share: identityShares[at])
-      else
-        (identity: null, share: 1.0),
-    ];
+    for (final (index, share) in shares(codes, (each) => genderWeights[each]!).indexed) {
+      final code = codes[index];
+      final forms = <({NonbinaryIdentity? identity, double share})>[
+        if (code == GenderCode.nonbinary && nonbinaryIdentity)
+          for (final (at, identity) in nonbinaryIdentities.indexed)
+            (identity: identity, share: identityShares[at])
+        else
+          (identity: null, share: 1.0),
+      ];
 
-    for (final drawn in languages) {
-      for (final form in forms) {
-        outcomes.add((
-          entry: (code: code, language: drawn, identity: form.identity),
-          weight: share * form.share / languages.length,
-        ));
+      for (final drawn in languages) {
+        for (final form in forms) {
+          listed.add((
+            entry: (code: code, language: drawn, identity: form.identity),
+            weight: share * form.share / languages.length,
+          ));
+        }
       }
     }
-  }
+
+    return listed;
+  });
 
   String label(_Drawn drawn) =>
       drawn.identity == null

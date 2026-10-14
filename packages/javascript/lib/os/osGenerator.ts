@@ -7,6 +7,7 @@
 
 import {
 	collectFrom,
+	keptOutcomes,
 	resolveMany,
 	resolvePlatforms,
 	resolveRandom,
@@ -14,12 +15,22 @@ import {
 } from '../_internal/generate.js';
 import type { Outcome } from '../_internal/generate.js';
 import { shares, withRandom } from '../_internal/utils.js';
-import type { OsDetail, OsFamily, RandOsOptions } from '../_types/global.js';
+import type { OsDetail, OsFamily, RandOsOptions, SystemPlatform } from '../_types/global.js';
 import { OS_FAMILIES, OS_FAMILY_CODES, OS_RELEASES } from './data/index.js';
 import type { OsBuild, OsRelease } from './data/index.js';
 
 /** A release a call may land on, with the builds of it the call may write. */
 type Candidate = { release: OsRelease; builds: readonly OsBuild[] };
+
+/** The options that decide which releases a call may land on, read once. */
+type Asked = {
+	platforms: readonly SystemPlatform[];
+	named: readonly OsFamily[];
+	minYear: number;
+	maxYear: number;
+	byBuild: boolean;
+	byEdition: boolean;
+};
 
 /** One result a call may land on: a release of a line, and its build and edition where asked for. */
 type Drawn = {
@@ -46,19 +57,21 @@ export function writeOs(release: OsRelease, build: OsBuild | null, edition: stri
  * a year range is read against every release and every build, and a call of ten
  * thousand would otherwise read them all ten thousand times.
  *
- * `family` and `platform` both narrow the lines, so a line named that does not
+ * `named` and `platforms` both narrow the lines, so a line named that does not
  * run on the platform asked for leaves nothing to draw, rather than either
  * option giving way to the other.
  *
- * With `includeBuild` the year that counts is the build's — the thing the result
+ * With `byBuild` the year that counts is the build's — the thing the result
  * names — so a release none of whose builds is inside the range is left out, and
  * one without builds is read by its own year.
  */
-function candidatesFor(options: RandOsOptions): Map<OsFamily, Candidate[]> {
-	const platforms = resolvePlatforms(options.platform);
-	const named = resolveMany(options.family, OS_FAMILY_CODES, OS_FAMILY_CODES);
-	const [minYear, maxYear] = resolveYears(options.minYear, options.maxYear);
-	const byBuild = options.includeVersion !== false && options.includeBuild === true;
+function candidatesFor({
+	platforms,
+	named,
+	minYear,
+	maxYear,
+	byBuild
+}: Asked): Map<OsFamily, Candidate[]> {
 	const inRange = (year: number) => year >= minYear && year <= maxYear;
 	const families = new Map<OsFamily, Candidate[]>();
 
@@ -82,23 +95,23 @@ function candidatesFor(options: RandOsOptions): Map<OsFamily, Candidate[]> {
 	return families;
 }
 
-export function generateOsDetails(options: RandOsOptions = {}): OsDetail[] {
-	const families = candidatesFor(options);
+/**
+ * Every result `asked` may land on. The line first, by how common it is among
+ * the lines left, and the release inside it second, each as likely as the next;
+ * then a build and an edition of it where the call asked for them.
+ */
+function outcomesFor(asked: Asked): Outcome<Drawn>[] {
+	const families = candidatesFor(asked);
 	const lines = [...families.keys()];
-	const includeVersion = options.includeVersion !== false;
-	const includeEdition = includeVersion && options.includeEdition === true;
 	const outcomes: Outcome<Drawn>[] = [];
 
-	// The line first, by how common it is among the lines left, and the release
-	// inside it second, each as likely as the next; then a build and an edition of
-	// it where the call asked for them.
 	shares(lines, (line) => OS_FAMILIES[line].weight).forEach((share, index) => {
 		const family = lines[index];
 		const releases = families.get(family)!;
 
 		for (const { release, builds } of releases) {
 			const written = builds.length ? builds : [null];
-			const editions = includeEdition && release.editions.length ? release.editions : [null];
+			const editions = asked.byEdition && release.editions.length ? release.editions : [null];
 			const weight = share / releases.length / written.length / editions.length;
 
 			for (const build of written) {
@@ -108,6 +121,30 @@ export function generateOsDetails(options: RandOsOptions = {}): OsDetail[] {
 			}
 		}
 	});
+
+	return outcomes;
+}
+
+// The results each set of options leaves, kept so a call does not read the
+// catalog and its builds again.
+const kept = new Map<string, readonly Outcome<Drawn>[]>();
+
+export function generateOsDetails(options: RandOsOptions = {}): OsDetail[] {
+	const includeVersion = options.includeVersion !== false;
+	const [minYear, maxYear] = resolveYears(options.minYear, options.maxYear);
+	const asked: Asked = {
+		platforms: resolvePlatforms(options.platform),
+		named: resolveMany(options.family, OS_FAMILY_CODES, OS_FAMILY_CODES),
+		minYear,
+		maxYear,
+		byBuild: includeVersion && options.includeBuild === true,
+		byEdition: includeVersion && options.includeEdition === true
+	};
+	const outcomes = keptOutcomes(
+		kept,
+		`${asked.platforms}|${asked.named}|${minYear}|${maxYear}|${asked.byBuild}|${asked.byEdition}`,
+		() => outcomesFor(asked)
+	);
 
 	const writeDrawn = ({ release, build, edition }: Drawn) =>
 		includeVersion ? writeOs(release, build, edition) : release.name;

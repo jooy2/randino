@@ -2,7 +2,7 @@
 // the label a form in the language writes for it, or for `nonbinary` with
 // `nonbinaryIdentity` on, the identity a person names themselves by.
 
-import { collectFrom, resolveRandom } from '../_internal/generate.js';
+import { collectFrom, keptOutcomes, resolveRandom } from '../_internal/generate.js';
 import type { Outcome } from '../_internal/generate.js';
 import { shares, withRandom } from '../_internal/utils.js';
 import type {
@@ -25,6 +25,9 @@ import {
 /** One result a call may land on: a code, the language it is written in, and its identity. */
 type Drawn = { code: GenderCode; language: WordLanguage; identity: NonbinaryIdentity | null };
 
+// The labels each set of options allows, kept so a call does not work them out again.
+const kept = new Map<string, readonly Outcome<Drawn>[]>();
+
 /** The codes a call may answer with: the two that are always on, and whichever of the others it asked for. */
 function codesFor(options: RandGenderOptions): readonly GenderCode[] {
 	return GENDER_CODES.filter(
@@ -42,20 +45,23 @@ export function generateGenderDetails(options: RandGenderOptions = {}): GenderDe
 
 	// The code by its weight, the language evenly, and for `nonbinary` with the
 	// option on, the identity by its own weight.
-	const identityShares = shares(NONBINARY_IDENTITIES, (each) => NONBINARY_WEIGHTS[each]);
-	const outcomes = shares(codes, (each) => GENDER_WEIGHTS[each]).flatMap((share, index) => {
-		const code = codes[index];
-		const forms: { identity: NonbinaryIdentity | null; share: number }[] =
-			code === 'nonbinary' && identity
-				? NONBINARY_IDENTITIES.map((each, at) => ({ identity: each, share: identityShares[at] }))
-				: [{ identity: null, share: 1 }];
+	const outcomes = keptOutcomes(kept, `${languages}|${codes}|${identity}`, () => {
+		const identityShares = shares(NONBINARY_IDENTITIES, (each) => NONBINARY_WEIGHTS[each]);
 
-		return languages.flatMap((language): Outcome<Drawn>[] =>
-			forms.map((each) => ({
-				entry: { code, language, identity: each.identity },
-				weight: (share * each.share) / languages.length
-			}))
-		);
+		return shares(codes, (each) => GENDER_WEIGHTS[each]).flatMap((share, index) => {
+			const code = codes[index];
+			const forms: { identity: NonbinaryIdentity | null; share: number }[] =
+				code === 'nonbinary' && identity
+					? NONBINARY_IDENTITIES.map((each, at) => ({ identity: each, share: identityShares[at] }))
+					: [{ identity: null, share: 1 }];
+
+			return languages.flatMap((language): Outcome<Drawn>[] =>
+				forms.map((each) => ({
+					entry: { code, language, identity: each.identity },
+					weight: (share * each.share) / languages.length
+				}))
+			);
+		});
 	});
 	const label = ({ code, language, identity: named }: Drawn) =>
 		named === null ? GENDER_LABELS[language][code] : NONBINARY_LABELS[language][named];

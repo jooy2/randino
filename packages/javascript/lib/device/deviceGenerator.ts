@@ -4,11 +4,21 @@
 // Nothing is invented and nothing is weighted. Every option narrows the models
 // a draw may land on, and every model left is as likely as the next.
 
-import { collectFrom, resolveMany, resolveRandom, resolveYears } from '../_internal/generate.js';
+import {
+	collectFrom,
+	keptOutcomes,
+	resolveMany,
+	resolveRandom,
+	resolveYears
+} from '../_internal/generate.js';
+import type { Outcome } from '../_internal/generate.js';
 import { withRandom } from '../_internal/utils.js';
 import type { DeviceDetail, RandDeviceOptions } from '../_types/global.js';
 import { DEVICES, DEVICE_TYPES, DEVICE_VENDORS } from './data/index.js';
 import type { DeviceEntry } from './data/index.js';
+
+// The models each set of options leaves, kept so a call does not filter the catalog again.
+const kept = new Map<string, readonly Outcome<DeviceEntry>[]>();
 
 /**
  * `entry` with its maker in front, unless the model already opens on the maker's
@@ -25,14 +35,14 @@ export function generateDeviceDetails(options: RandDeviceOptions = {}): DeviceDe
 	const vendors = resolveMany(options.vendor, DEVICE_VENDORS, DEVICE_VENDORS);
 	const [minYear, maxYear] = resolveYears(options.minYear, options.maxYear);
 	const includeVendor = options.includeVendor !== false;
-	// Worked out once per call rather than per draw: a call of ten thousand would
-	// otherwise filter the catalog ten thousand times.
-	const candidates = DEVICES.filter(
-		(entry) =>
-			types.includes(entry.type) &&
-			vendors.includes(entry.vendor) &&
-			entry.year >= minYear &&
-			entry.year <= maxYear
+	const outcomes = keptOutcomes(kept, `${types}|${vendors}|${minYear}|${maxYear}`, () =>
+		DEVICES.filter(
+			(entry) =>
+				types.includes(entry.type) &&
+				vendors.includes(entry.vendor) &&
+				entry.year >= minYear &&
+				entry.year <= maxYear
+		).map((entry) => ({ entry, weight: 1 }))
 	);
 
 	return withRandom(resolveRandom(options.random), () =>
@@ -40,7 +50,7 @@ export function generateDeviceDetails(options: RandDeviceOptions = {}): DeviceDe
 			// Only the options a device has: a `startsWith` slipped past the types
 			// would otherwise filter models by their first letter.
 			{ count: options.count, unique: options.unique },
-			candidates.map((entry) => ({ entry, weight: 1 })),
+			outcomes,
 			(entry) => writeDevice(entry, includeVendor),
 			(entry) => ({
 				device: writeDevice(entry, includeVendor),

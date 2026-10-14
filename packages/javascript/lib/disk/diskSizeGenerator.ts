@@ -5,11 +5,14 @@ import { capacityCandidates, writeCapacity } from '../_internal/capacity.js';
 import type { CapacityCandidate } from '../_internal/capacity.js';
 import {
 	collectFrom,
+	finite,
+	keptOutcomes,
 	resolveMany,
 	resolveOption,
 	resolvePlatforms,
 	resolveRandom
 } from '../_internal/generate.js';
+import type { Outcome } from '../_internal/generate.js';
 import { shares, withRandom } from '../_internal/utils.js';
 import type {
 	DiskSizeDetail,
@@ -58,25 +61,40 @@ function candidatesFor(
 		.filter((each) => each.kinds.length > 0);
 }
 
+/** One result a call may land on: a size of a kind of storage, on a platform. */
+type Drawn = { platform: SystemPlatform; type: DiskType; candidate: CapacityCandidate<DiskUnit> };
+
+// The sizes each set of options leaves, kept so a call does not read the pools again.
+const kept = new Map<string, readonly Outcome<Drawn>[]>();
+
 export function generateDiskSizeDetails(options: RandDiskSizeOptions = {}): DiskSizeDetail[] {
 	const includeUnit = options.includeUnit !== false;
 	const asked = resolveOption(options.unit, DISK_UNIT_OPTIONS, 'auto');
 	// Without the unit there is nothing to tell `2` terabytes from `512`
 	// gigabytes, so a size written bare is in one unit throughout.
 	const unit = asked === 'auto' && !includeUnit ? DISK_SCALE.reference : asked;
-	const candidates = candidatesFor(options, unit);
+	const key = [
+		resolvePlatforms(options.platform),
+		resolveMany(options.type, DISK_TYPES, DISK_TYPES),
+		unit,
+		finite(options.minSize),
+		finite(options.maxSize)
+	].join('|');
+	const outcomes = keptOutcomes(kept, key, () => {
+		const candidates = candidatesFor(options, unit);
 
-	// The platform first, so `'all'` is half desktops and half phones, then the
-	// kind of storage by how common it is there, then a size it is sold in.
-	const outcomes = candidates.flatMap(({ platform, kinds }) => {
-		const kindShares = shares(kinds, (kind) => DISK_TYPE_WEIGHTS[platform][kind.type]!);
+		// The platform first, so `'all'` is half desktops and half phones, then the
+		// kind of storage by how common it is there, then a size it is sold in.
+		return candidates.flatMap(({ platform, kinds }) => {
+			const kindShares = shares(kinds, (kind) => DISK_TYPE_WEIGHTS[platform][kind.type]!);
 
-		return kinds.flatMap(({ type, sizes }, kind) =>
-			shares(sizes, (candidate) => candidate.weight).map((share, index) => ({
-				entry: { platform, type, candidate: sizes[index] },
-				weight: (kindShares[kind] * share) / candidates.length
-			}))
-		);
+			return kinds.flatMap(({ type, sizes }, kind) =>
+				shares(sizes, (candidate) => candidate.weight).map((share, index) => ({
+					entry: { platform, type, candidate: sizes[index] },
+					weight: (kindShares[kind] * share) / candidates.length
+				}))
+			);
+		});
 	});
 
 	return withRandom(resolveRandom(options.random), () =>
