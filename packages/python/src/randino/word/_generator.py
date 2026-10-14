@@ -133,14 +133,36 @@ def _piece_span(pool: Sequence[str]) -> tuple[int, int]:
     if not pool:
         return 0, 0
 
-    return min(len(entry) for entry in pool), max(len(entry) for entry in pool)
+    return min(map(len, pool)), max(map(len, pool))
+
+
+# Keyed on `id()` for the same reason `_THEME_CACHE` is: every template is part of
+# `WORD_DATA`, which lives as long as the process, so no id is recycled under it.
+_PIECE_SPANS: dict[int, tuple[tuple[int, int], tuple[int, int], tuple[int, int]]] = {}
+
+
+def _piece_spans(
+    syn: SyllableSynthesis,
+) -> tuple[tuple[int, int], tuple[int, int], tuple[int, int]]:
+    """The spans of a template's onsets, vowels and codas, read once per template.
+
+    An invented word asks them for every syllable count it might have and for every piece
+    it is spelled out of, and a `starts_with` no real word meets invents one for every
+    theme it tries: reading the pools each time was most of what `rand_word(language="vi",
+    starts_with="ư")` cost.
+    """
+    cached = _PIECE_SPANS.get(id(syn))
+
+    if cached is None:
+        cached = (_piece_span(syn.onset), _piece_span(syn.vowel), _piece_span(syn.coda))
+        _PIECE_SPANS[id(syn)] = cached
+
+    return cached
 
 
 def _syllable_span(syn: SyllableSynthesis, count: int) -> tuple[int, int]:
     """What a word of `count` syllables can be, at its shortest and at its longest."""
-    onset_low, onset_high = _piece_span(syn.onset)
-    vowel_low, vowel_high = _piece_span(syn.vowel)
-    coda_low, coda_high = _piece_span(syn.coda)
+    (onset_low, onset_high), (vowel_low, vowel_high), (coda_low, coda_high) = _piece_spans(syn)
 
     return (
         count * (onset_low + vowel_low) + coda_low,
@@ -197,12 +219,34 @@ def _fitting_piece(pool: Sequence[str], low: int, high: int) -> str:
     return pick(closest) if closest else ""
 
 
+_BOUNDS: dict[int, tuple[WordPool, tuple[int, int]]] = {}
+"""The bounds of each pool asked about, keyed on the pool's identity.
+
+A word draws a theme and measures its pool on every attempt, and a word on a first
+character no theme holds makes a dozen of them. Held with the pool, the way `_prefixed`
+holds one, so the identity stays its own, and emptied at `_PREFIXED_MAX` because a
+sentence measures lists it puts together for one call.
+"""
+
+
 def pool_bounds(pool: WordPool) -> tuple[int, int]:
     """Shortest and longest word in a pool."""
     if not pool:
         return 1, 1
 
-    return min(len(word) for word in pool), max(len(word) for word in pool)
+    held = _BOUNDS.get(id(pool))
+
+    if held is not None and held[0] is pool:
+        return held[1]
+
+    bounds = min(map(len, pool)), max(map(len, pool))
+
+    if len(_BOUNDS) >= _PREFIXED_MAX:
+        _BOUNDS.clear()
+
+    _BOUNDS[id(pool)] = (pool, bounds)
+
+    return bounds
 
 
 def themes_of(theme: WordThemeOption) -> tuple[WordTheme, ...]:
@@ -484,18 +528,30 @@ def synth_word(syn: WordSynthesis, low: int, high: int, prefix: str) -> str:
     counts = [
         count
         for count in range(syn.min_syllables, syn.max_syllables + 1)
-        if _syllable_span(syn, count)[1] >= low and _syllable_span(syn, count)[0] <= high
+        for shortest, longest in (_syllable_span(syn, count),)
+        if longest >= low and shortest <= high
     ]
     syllables = pick(counts) if counts else rand_int(syn.min_syllables, syn.max_syllables)
     # The pieces the word is spelled out of, in order. A requested first character stands
     # in for the opening onset, which is what makes `starts_with` work.
+    onset_span, vowel_span, coda_span = _piece_spans(syn)
     pieces: list[Sequence[str]] = []
+    spans: list[tuple[int, int]] = []
 
     for index in range(syllables):
-        pieces.append([prefix.lower()] if index == 0 and prefix else syn.onset)
+        if index == 0 and prefix:
+            opening = prefix.lower()
+            pieces.append([opening])
+            spans.append((len(opening), len(opening)))
+        else:
+            pieces.append(syn.onset)
+            spans.append(onset_span)
+
         pieces.append(syn.vowel)
+        spans.append(vowel_span)
 
     pieces.append(syn.coda)
+    spans.append(coda_span)
 
     # What the pieces after each one can still add, so a piece is only chosen from the
     # lengths that leave the rest of the word able to land in the range.
@@ -503,7 +559,7 @@ def synth_word(syn: WordSynthesis, low: int, high: int, prefix: str) -> str:
     rest_high = [0] * (len(pieces) + 1)
 
     for index in range(len(pieces) - 1, -1, -1):
-        piece_low, piece_high = _piece_span(pieces[index])
+        piece_low, piece_high = spans[index]
         rest_low[index] = piece_low + rest_low[index + 1]
         rest_high[index] = piece_high + rest_high[index + 1]
 
