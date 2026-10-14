@@ -10,10 +10,14 @@ from collections.abc import Mapping
 from typing import TYPE_CHECKING, NamedTuple, cast
 
 from randino._types import WordTheme
-from randino.word.data._types import WordGender, WordPool
 
+# The word and sentence types are named in annotations alone. Imported for real, the word
+# types run the word package's `__init__`, which reads every word pool — and the pools are
+# written with the helpers below, so whichever module reached here first found this one
+# half read.
 if TYPE_CHECKING:
     from randino.sentence.data._types import PredicateTense
+    from randino.word.data._types import WordGender, WordPool
 
 
 class NameToken(NamedTuple):
@@ -60,7 +64,7 @@ def roman_map(source: str) -> dict[str, str]:
 
 def tagged_nouns(
     source: Mapping[WordTheme, str],
-) -> tuple[dict[WordTheme, WordPool], dict[str, WordGender]]:
+) -> "tuple[dict[WordTheme, WordPool], dict[str, WordGender]]":
     """Split a `theme -> "gato:m luna:f"` map into the pools and the gender lookup.
 
     One pass over one source, so a language that inflects still writes each noun
@@ -75,7 +79,7 @@ def tagged_nouns(
         for tagged in words(pool):
             word, _, tag = tagged.rpartition(":")
 
-            gender[word] = cast(WordGender, tag)
+            gender[word] = cast("WordGender", tag)
             entries.append(word)
 
         pools[theme] = tuple(entries)

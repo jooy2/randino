@@ -4,6 +4,7 @@ import ast
 import inspect
 import pathlib
 import re
+import subprocess
 import sys
 import threading
 from collections.abc import Callable
@@ -923,3 +924,41 @@ def test_a_catalog_keeps_one_list_for_each_set_of_options_and_never_hands_one_to
 
             assert details
             assert all(check(detail) for detail in details), details
+
+
+def test_importing_the_package_reads_no_generator_until_one_is_asked_for() -> None:
+    # Reading every pool up front took a seventh of a second whichever generator a caller
+    # came for, so `import randino` reads nothing, and each name reads its own module the
+    # first time it is asked for. Asked in a fresh interpreter, because this one has
+    # already read them all.
+    loaded = subprocess.run(
+        [
+            sys.executable,
+            "-c",
+            "import sys, randino; "
+            "print(sorted(m for m in sys.modules if m.startswith('randino.')))",
+        ],
+        capture_output=True,
+        text=True,
+        check=True,
+    ).stdout.strip()
+
+    assert loaded == "[]", loaded
+
+
+def test_any_module_of_the_package_can_be_the_first_one_asked_for() -> None:
+    # The eager imports read the modules in one order, and that order hid a cycle: the
+    # name data reached the parse helpers, which reached the word package, which read its
+    # pools through the half-read helpers. One name of each module, each the first a fresh
+    # interpreter asks for.
+    homes = vars(randino)["_HOMES"]
+    firsts = {module: name for name, module in sorted(homes.items())}
+
+    for module, name in firsts.items():
+        result = subprocess.run(
+            [sys.executable, "-c", f"import randino; randino.{name}"],
+            capture_output=True,
+            text=True,
+        )
+
+        assert result.returncode == 0, f"{module}: {result.stderr.strip().splitlines()[-1:]}"

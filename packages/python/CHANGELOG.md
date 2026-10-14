@@ -10,6 +10,7 @@
 - `rand_modifier` takes a tenth of the time it did, `rand_word` and the themed word functions half or less and `rand_name` between a half and a quarter, because a draw no longer copies, measures or filters its pool again.
 - Every draw is cheaper. The standard generator's numbers were checked on the way out the way a caller's own source is, which cost fifteen times the draw; with no `random` passed they are handed on as they are, and `rand_suffix` and `rand_phone` take half to two thirds of the time they did.
 - `rand_date` takes a fifth of the time it did: a format is read once and kept, and each token is worked out on its own rather than beside every other token.
+- `import randino` reads nothing until a function is asked for, where it read every pool of every generator and took a seventh of a second. Each module is read the first time one of its names is used, so a call to `rand_name` reads the name data and nothing else.
 
 ## 1.5.0 (2026-10-11)
 
