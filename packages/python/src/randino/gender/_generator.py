@@ -6,9 +6,15 @@ themselves by instead.
 
 from collections.abc import Callable
 
-from randino._internal.generate import collect
-from randino._internal.utils import pick, pick_weighted, with_random
-from randino._types import GenderDetail, WordLanguage, WordLanguageOption
+from randino._internal.generate import collect_from
+from randino._internal.utils import shares, with_random
+from randino._types import (
+    GenderCode,
+    GenderDetail,
+    NonbinaryIdentity,
+    WordLanguage,
+    WordLanguageOption,
+)
 from randino.gender.data import (
     GENDER_CODES,
     GENDER_LABELS,
@@ -44,25 +50,35 @@ def generate_gender_details(
     ]
     identity = nonbinary_identity is True
 
-    def draw() -> GenderDetail:
-        code = pick_weighted(codes, lambda each: GENDER_WEIGHTS[each])
-        drawn = pick(languages)
-        # Drawn after the language and only for `nonbinary`, so a call without the option
-        # makes the same draws it always made.
-        if code == "nonbinary" and identity:
-            named = pick_weighted(NONBINARY_IDENTITIES, lambda each: NONBINARY_WEIGHTS[each])
+    # The code by its weight, the language evenly, and for `nonbinary` with the option on,
+    # the identity by its own weight.
+    identity_shares = shares(NONBINARY_IDENTITIES, lambda each: NONBINARY_WEIGHTS[each])
+    outcomes: list[tuple[tuple[GenderCode, WordLanguage, NonbinaryIdentity | None], float]] = []
 
-            return GenderDetail(
-                gender=NONBINARY_LABELS[drawn][named], code=code, language=drawn, identity=named
-            )
+    for code, share in zip(codes, shares(codes, lambda each: GENDER_WEIGHTS[each]), strict=True):
+        forms: list[tuple[NonbinaryIdentity | None, float]] = (
+            list(zip(NONBINARY_IDENTITIES, identity_shares, strict=True))
+            if code == "nonbinary" and identity
+            else [(None, 1.0)]
+        )
 
-        return GenderDetail(gender=GENDER_LABELS[drawn][code], code=code, language=drawn)
+        for drawn in languages:
+            for named, form_share in forms:
+                outcomes.append(((code, drawn, named), share * form_share / len(languages)))
+
+    def label(entry: tuple[GenderCode, WordLanguage, NonbinaryIdentity | None]) -> str:
+        code, drawn, named = entry
+
+        return GENDER_LABELS[drawn][code] if named is None else NONBINARY_LABELS[drawn][named]
 
     with with_random(random):
-        return collect(
+        return collect_from(
             count=count,
             unique=unique,
             starts_with="",
-            draw=draw,
-            key_of=lambda detail: detail.gender,
+            outcomes=outcomes,
+            key_of=label,
+            build=lambda entry: GenderDetail(
+                gender=label(entry), code=entry[0], language=entry[1], identity=entry[2]
+            ),
         )

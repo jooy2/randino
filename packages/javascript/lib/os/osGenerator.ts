@@ -6,19 +6,28 @@
 // written afterwards.
 
 import {
-	collect,
+	collectFrom,
 	resolveMany,
 	resolvePlatforms,
 	resolveRandom,
 	resolveYears
 } from '../_internal/generate.js';
-import { pick, pickWeighted, withRandom } from '../_internal/utils.js';
+import type { Outcome } from '../_internal/generate.js';
+import { shares, withRandom } from '../_internal/utils.js';
 import type { OsDetail, OsFamily, RandOsOptions } from '../_types/global.js';
 import { OS_FAMILIES, OS_FAMILY_CODES, OS_RELEASES } from './data/index.js';
 import type { OsBuild, OsRelease } from './data/index.js';
 
 /** A release a call may land on, with the builds of it the call may write. */
 type Candidate = { release: OsRelease; builds: readonly OsBuild[] };
+
+/** One result a call may land on: a release of a line, and its build and edition where asked for. */
+type Drawn = {
+	family: OsFamily;
+	release: OsRelease;
+	build: OsBuild | null;
+	edition: string | null;
+};
 
 /** `release` written out, with `build` and `edition` where the call asked for them. */
 export function writeOs(release: OsRelease, build: OsBuild | null, edition: string | null): string {
@@ -78,32 +87,48 @@ export function generateOsDetails(options: RandOsOptions = {}): OsDetail[] {
 	const lines = [...families.keys()];
 	const includeVersion = options.includeVersion !== false;
 	const includeEdition = includeVersion && options.includeEdition === true;
+	const outcomes: Outcome<Drawn>[] = [];
+
+	// The line first, by how common it is among the lines left, and the release
+	// inside it second, each as likely as the next; then a build and an edition of
+	// it where the call asked for them.
+	shares(lines, (line) => OS_FAMILIES[line].weight).forEach((share, index) => {
+		const family = lines[index];
+		const releases = families.get(family)!;
+
+		for (const { release, builds } of releases) {
+			const written = builds.length ? builds : [null];
+			const editions = includeEdition && release.editions.length ? release.editions : [null];
+			const weight = share / releases.length / written.length / editions.length;
+
+			for (const build of written) {
+				for (const edition of editions) {
+					outcomes.push({ entry: { family, release, build, edition }, weight });
+				}
+			}
+		}
+	});
+
+	const writeDrawn = ({ release, build, edition }: Drawn) =>
+		includeVersion ? writeOs(release, build, edition) : release.name;
 
 	return withRandom(resolveRandom(options.random), () =>
-		collect(
-			// Only the options an operating system has: a `startsWith` slipped past
-			// the types would otherwise filter releases by their first letter.
-			{ count: lines.length ? options.count : 0, unique: options.unique },
-			() => {
-				// The line first, by how common it is among the lines left, and the
-				// release inside it second.
-				const family = pickWeighted(lines, (line) => OS_FAMILIES[line].weight);
-				const { release, builds } = pick(families.get(family)!);
-				const build = builds.length ? pick(builds) : null;
-				const edition = includeEdition && release.editions.length ? pick(release.editions) : null;
-
-				return {
-					os: includeVersion ? writeOs(release, build, edition) : release.name,
-					name: release.name,
-					version: includeVersion ? release.version : null,
-					build: build?.text ?? null,
-					edition,
-					family,
-					platform: OS_FAMILIES[family].platform,
-					year: build?.year ?? release.year
-				};
-			},
-			(detail) => detail.os
+		collectFrom(
+			// Only the options an operating system has: a `startsWith` slipped past the
+			// types would otherwise filter releases by their first letter.
+			{ count: options.count, unique: options.unique },
+			outcomes,
+			writeDrawn,
+			(drawn) => ({
+				os: writeDrawn(drawn),
+				name: drawn.release.name,
+				version: includeVersion ? drawn.release.version : null,
+				build: drawn.build?.text ?? null,
+				edition: drawn.edition,
+				family: drawn.family,
+				platform: OS_FAMILIES[drawn.family].platform,
+				year: drawn.build?.year ?? drawn.release.year
+			})
 		)
 	);
 }

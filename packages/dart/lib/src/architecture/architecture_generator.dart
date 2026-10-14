@@ -49,30 +49,39 @@ List<ArchitectureDetail> generateArchitectureDetails({
       ),
   ].where((each) => each.architectures.isNotEmpty).toList(growable: false);
 
+  // The platform first, so a null one is half desktops and half phones.
+  final outcomes = <Outcome<({SystemPlatform platform, String architecture})>>[
+    for (final (platform: each, :architectures) in candidates)
+      for (final (index, share)
+          in shares(architectures, (one) => architectureData[one]!.weights[each]!).indexed)
+        (
+          entry: (platform: each, architecture: architectures[index]),
+          weight: share / candidates.length,
+        ),
+  ];
+
   return withRandom(
     random,
-    () => collect<ArchitectureDetail>(
-      count: candidates.isEmpty ? 0 : count,
+    () => collectFrom(
+      count: count,
       unique: unique,
       startsWith: '',
-      draw: () {
-        // The platform first, so a null one is half desktops and half phones.
-        final (platform: drawn, architectures: pool) = pick(candidates);
-        final architecture = pickWeighted(pool, (each) => architectureData[each]!.weights[drawn]!);
-        final data = architectureData[architecture]!;
-        final written = writeArchitecture(architecture, naming);
+      outcomes: outcomes,
+      keyOf: (entry) => writeArchitecture(entry.architecture, naming),
+      build: (entry) {
+        final data = architectureData[entry.architecture]!;
+        final written = writeArchitecture(entry.architecture, naming);
 
         return ArchitectureDetail(
           architecture: written,
-          code: architecture,
-          aliases: aliasesOf(architecture, written),
+          code: entry.architecture,
+          aliases: aliasesOf(entry.architecture, written),
           bits: data.bits,
           family: data.family,
           rare: data.rare,
-          platform: drawn,
+          platform: entry.platform,
         );
       },
-      keyOf: (detail) => detail.architecture,
     ),
   );
 }

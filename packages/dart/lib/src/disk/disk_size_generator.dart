@@ -13,6 +13,9 @@ import 'package:randino/src/types.dart';
 /// write.
 typedef _Kind = ({DiskType type, List<CapacityCandidate<DiskUnit>> sizes});
 
+/// One result a call may land on: a size of a kind of storage, on a platform.
+typedef _Drawn = ({SystemPlatform platform, DiskType type, CapacityCandidate<DiskUnit> candidate});
+
 /// The kinds of storage each platform may land on, each with its sizes.
 ///
 /// Worked out once per call: a kind with no size left in the unit and the
@@ -65,30 +68,41 @@ List<DiskSizeDetail> generateDiskSizeDetails({
   final written = unit ?? (includeUnit ? null : diskScale.reference);
   final candidates = _candidates(type, platform, written, minSize, maxSize);
 
+  // The platform first, so a null one is half desktops and half phones, then
+  // the kind of storage by how common it is there, then a size it is sold in.
+  final outcomes = <Outcome<_Drawn>>[];
+
+  for (final (platform: each, :kinds) in candidates) {
+    final kindShares = shares(kinds, (kind) => diskTypeWeights[each]![kind.type]!);
+
+    for (final (at, kind) in kinds.indexed) {
+      for (final (index, share) in shares(kind.sizes, (size) => size.weight).indexed) {
+        outcomes.add((
+          entry: (platform: each, type: kind.type, candidate: kind.sizes[index]),
+          weight: kindShares[at] * share / candidates.length,
+        ));
+      }
+    }
+  }
+
   return withRandom(
     random,
-    () => collect<DiskSizeDetail>(
-      count: candidates.isEmpty ? 0 : count,
+    () => collectFrom(
+      count: count,
       unique: unique,
       startsWith: '',
-      draw: () {
-        // The platform first, so a null one is half desktops and half phones,
-        // then the kind of storage by how common it is there, then a size it is
-        // sold in.
-        final (platform: drawn, :kinds) = pick(candidates);
-        final kind = pickWeighted(kinds, (each) => diskTypeWeights[drawn]![each.type]!);
-        final candidate = pickWeighted(kind.sizes, (each) => each.weight);
-
-        return DiskSizeDetail(
-          size: writeCapacity(candidate.value, candidate.unit.label, includeUnit),
-          value: candidate.value,
-          unit: candidate.unit,
-          bytes: candidate.size * diskScale.bytes,
-          type: kind.type,
-          platform: drawn,
-        );
-      },
-      keyOf: (detail) => detail.size,
+      outcomes: outcomes,
+      keyOf:
+          (entry) => writeCapacity(entry.candidate.value, entry.candidate.unit.label, includeUnit),
+      build:
+          (entry) => DiskSizeDetail(
+            size: writeCapacity(entry.candidate.value, entry.candidate.unit.label, includeUnit),
+            value: entry.candidate.value,
+            unit: entry.candidate.unit,
+            bytes: entry.candidate.size * diskScale.bytes,
+            type: entry.type,
+            platform: entry.platform,
+          ),
     ),
   );
 }

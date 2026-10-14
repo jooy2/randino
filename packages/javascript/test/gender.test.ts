@@ -147,6 +147,26 @@ describe('Gender', () => {
 		const genders = randGender({ language: 'en', includeUnknown: true, unique: true, count: 10 });
 
 		assert.deepStrictEqual([...genders].sort(), ['Female', 'Male', 'Unknown']);
+
+		// Every identity too, though the rarest of them is a draw in a few thousand.
+		const every = randGender({
+			language: 'en',
+			includeUnknown: true,
+			includeNonbinary: true,
+			nonbinaryIdentity: true,
+			unique: true,
+			count: 100
+		});
+
+		assert.deepStrictEqual(
+			[...every].sort(),
+			[
+				GENDER_LABELS.en.female,
+				GENDER_LABELS.en.male,
+				GENDER_LABELS.en.unknown,
+				...NONBINARY_IDENTITIES.map((identity) => NONBINARY_LABELS.en[identity])
+			].sort()
+		);
 	});
 
 	it('every language writes every identity, none alike and none a form label', () => {

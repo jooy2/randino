@@ -1,6 +1,7 @@
 import 'package:randino/randino.dart';
 // Internal, but they are what an age is checked against: the bands say which
 // group an age is in, and the curve is what the draw follows.
+import 'package:randino/src/age/age_generator.dart';
 import 'package:randino/src/age/data/index.dart';
 import 'package:test/test.dart';
 
@@ -153,6 +154,15 @@ void main() {
       final many = randAge(count: 50, unique: true);
 
       expect(many.toSet(), hasLength(many.length));
+
+      // Every age the curve reaches, though the oldest of them are rarer than one
+      // in ten thousand.
+      final every = randAge(maxAge: randAgeMax, count: 200, unique: true);
+
+      expect(every.toList()..sort(), <int>[
+        for (var age = 0; age <= randAgeMax; age += 1)
+          if (curveWeight(age) > 0) age,
+      ]);
     });
   });
 }

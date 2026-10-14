@@ -6,8 +6,8 @@ on, and every part left is as likely as the next.
 
 from collections.abc import Callable
 
-from randino._internal.generate import collect, resolve_many, resolve_platforms, resolve_years
-from randino._internal.utils import pick, with_random
+from randino._internal.generate import collect_from, resolve_many, resolve_platforms, resolve_years
+from randino._internal.utils import with_random
 from randino._types import GpuDetail, SystemPlatformOption
 from randino.gpu.data import GPU_VENDORS, GPUS, GpuEntry
 
@@ -42,22 +42,18 @@ def generate_gpu_details(
         if entry.platform in platforms and entry.vendor in vendors and low <= entry.year <= high
     ]
 
-    def draw() -> GpuDetail:
-        entry = pick(candidates)
-
-        return GpuDetail(
-            gpu=write_gpu(entry, with_vendor),
-            vendor=entry.vendor,
-            model=entry.model,
-            platform=entry.platform,
-            year=entry.year,
-        )
-
     with with_random(random):
-        return collect(
-            count=count if candidates else 0,
+        return collect_from(
+            count=count,
             unique=unique,
             starts_with="",
-            draw=draw,
-            key_of=lambda detail: detail.gpu,
+            outcomes=[(entry, 1.0) for entry in candidates],
+            key_of=lambda entry: write_gpu(entry, with_vendor),
+            build=lambda entry: GpuDetail(
+                gpu=write_gpu(entry, with_vendor),
+                vendor=entry.vendor,
+                model=entry.model,
+                platform=entry.platform,
+                year=entry.year,
+            ),
         )

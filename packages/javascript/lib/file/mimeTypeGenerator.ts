@@ -1,8 +1,8 @@
 // The MIME type generator: a type files are really served as, drawn by how
 // common its most common extension is.
 
-import { collect, resolveMany, resolveRandom } from '../_internal/generate.js';
-import { pickWeighted, withRandom } from '../_internal/utils.js';
+import { collectFrom, resolveMany, resolveRandom } from '../_internal/generate.js';
+import { withRandom } from '../_internal/utils.js';
 import type { MimeTypeDetail, RandMimeTypeOptions } from '../_types/global.js';
 import { MIME_TOP_LEVELS, mimeTypeEntries } from './data/index.js';
 
@@ -12,19 +12,16 @@ export function generateMimeTypeDetails(options: RandMimeTypeOptions = {}): Mime
 	const candidates = mimeTypeEntries().filter((entry) => types.includes(entry.type));
 
 	return withRandom(resolveRandom(options.random), () =>
-		collect(
+		collectFrom(
 			{ count: options.count, unique: options.unique },
-			() => {
-				const entry = pickWeighted(candidates, (each) => each.weight);
-
-				return {
-					mimeType: entry.mimeType,
-					type: entry.type,
-					subtype: entry.subtype,
-					extensions: [...entry.extensions]
-				};
-			},
-			(detail) => detail.mimeType
+			candidates.map((entry) => ({ entry, weight: entry.weight })),
+			(entry) => entry.mimeType,
+			(entry) => ({
+				mimeType: entry.mimeType,
+				type: entry.type,
+				subtype: entry.subtype,
+				extensions: [...entry.extensions]
+			})
 		)
 	);
 }

@@ -113,9 +113,9 @@ describe('File extension', () => {
 
 	it('unique never repeats an extension', () => {
 		const found = randFileExtension({ category: 'image', unique: true, count: 100 });
-		const images = FILE_EXTENSIONS.filter((entry) => entry.category === 'image').length;
+		const images = FILE_EXTENSIONS.filter((entry) => entry.category === 'image');
 
 		assert.strictEqual(new Set(found).size, found.length);
-		assert.ok(found.length > 8 && found.length <= images);
+		assert.deepStrictEqual([...found].sort(), images.map((entry) => `.${entry.name}`).sort());
 	});
 });

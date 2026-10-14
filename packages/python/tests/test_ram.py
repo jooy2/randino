@@ -288,9 +288,13 @@ def test_ddr4_and_ddr5_lead_the_desktops_and_lpddr4x_and_later_the_phones() -> N
 
 
 def test_unique_never_repeats_a_size_and_stops_when_the_sizes_run_out() -> None:
-    # Kept to the common sizes, so every one of them is reached long before the draws
-    # run out: the rarest of the whole pool is a draw in a thousand.
     ram = rand_ram(min_size=4, max_size=16, unique=True, count=100)
 
     assert len(set(ram)) == len(ram)
     assert set(ram) == {"4 GB", "6 GB", "8 GB", "12 GB", "16 GB"}
+
+    # The whole pool too, though its rarest size is a draw in a thousand.
+    every = rand_ram(unique=True, count=100, output="detail")
+
+    assert len({detail.ram for detail in every}) == len(every)
+    assert {detail.bytes // MEGABYTE for detail in every} == SIZES

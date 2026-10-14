@@ -85,4 +85,4 @@ def test_unique_never_repeats_a_store() -> None:
     found = rand_app_store(unique=True, count=100)
 
     assert len(set(found)) == len(found)
-    assert 10 < len(found) <= len(APP_STORES)
+    assert set(found) == {entry.full for entry in APP_STORES}

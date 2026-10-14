@@ -85,7 +85,10 @@ void main() {
       final found = randMimeType(type: {MimeTopLevel.image}, unique: true, count: 100);
 
       expect(found.toSet(), hasLength(found.length));
-      expect(found.length, greaterThan(5));
+      expect(found.toSet(), {
+        for (final entry in mimeTypeEntries)
+          if (entry.type == MimeTopLevel.image) entry.mimeType,
+      });
     });
   });
 }

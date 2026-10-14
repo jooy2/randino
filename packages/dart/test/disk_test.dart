@@ -320,6 +320,12 @@ void main() {
 
         expect(drives.toSet(), hasLength(drives.length));
         expect(drives.toSet(), {'256 GB', '480 GB', '500 GB', '512 GB', '1 TB', '2 TB'});
+
+        // The whole pool too, every kind of drive and every size it is sold in.
+        final every = randDiskSizeDetails(unique: true, count: 100);
+
+        expect({for (final detail in every) detail.size}, hasLength(every.length));
+        expect({for (final detail in every) detail.bytes ~/ diskScale.bytes}, sizes);
       });
     });
   });

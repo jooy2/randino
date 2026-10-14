@@ -4,13 +4,13 @@
 import { capacityCandidates, writeCapacity } from '../_internal/capacity.js';
 import type { CapacityCandidate } from '../_internal/capacity.js';
 import {
-	collect,
+	collectFrom,
 	resolveMany,
 	resolveOption,
 	resolvePlatforms,
 	resolveRandom
 } from '../_internal/generate.js';
-import { pick, pickWeighted, withRandom } from '../_internal/utils.js';
+import { shares, withRandom } from '../_internal/utils.js';
 import type {
 	DiskSizeDetail,
 	DiskType,
@@ -66,29 +66,32 @@ export function generateDiskSizeDetails(options: RandDiskSizeOptions = {}): Disk
 	const unit = asked === 'auto' && !includeUnit ? DISK_SCALE.reference : asked;
 	const candidates = candidatesFor(options, unit);
 
-	return withRandom(resolveRandom(options.random), () =>
-		collect(
-			{ count: candidates.length ? options.count : 0, unique: options.unique },
-			() => {
-				// The platform first, so `'all'` is half desktops and half phones, then
-				// the kind of storage by how common it is there, then a size it is sold in.
-				const { platform, kinds } = pick(candidates);
-				const { type, sizes } = pickWeighted(
-					kinds,
-					(kind) => DISK_TYPE_WEIGHTS[platform][kind.type]!
-				);
-				const { size, unit: written, value } = pickWeighted(sizes, (candidate) => candidate.weight);
+	// The platform first, so `'all'` is half desktops and half phones, then the
+	// kind of storage by how common it is there, then a size it is sold in.
+	const outcomes = candidates.flatMap(({ platform, kinds }) => {
+		const kindShares = shares(kinds, (kind) => DISK_TYPE_WEIGHTS[platform][kind.type]!);
 
-				return {
-					size: writeCapacity(value, written, includeUnit),
-					value,
-					unit: written,
-					bytes: size * DISK_SCALE.bytes,
-					type,
-					platform
-				};
-			},
-			(detail) => detail.size
+		return kinds.flatMap(({ type, sizes }, kind) =>
+			shares(sizes, (candidate) => candidate.weight).map((share, index) => ({
+				entry: { platform, type, candidate: sizes[index] },
+				weight: (kindShares[kind] * share) / candidates.length
+			}))
+		);
+	});
+
+	return withRandom(resolveRandom(options.random), () =>
+		collectFrom(
+			{ count: options.count, unique: options.unique },
+			outcomes,
+			({ candidate }) => writeCapacity(candidate.value, candidate.unit, includeUnit),
+			({ platform, type, candidate }) => ({
+				size: writeCapacity(candidate.value, candidate.unit, includeUnit),
+				value: candidate.value,
+				unit: candidate.unit,
+				bytes: candidate.size * DISK_SCALE.bytes,
+				type,
+				platform
+			})
 		)
 	);
 }

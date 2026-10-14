@@ -68,6 +68,16 @@ T pickWeighted<T>(List<T> items, num Function(T item) weightOf) {
   return items[items.length - 1];
 }
 
+/// The chance [pickWeighted] gives each of [items], in order: its weight over
+/// the total, or an even share when every weight is zero. A catalog multiplies
+/// these down its levels to weigh each result it lists.
+List<double> shares<T>(List<T> items, num Function(T item) weightOf) {
+  final weights = [for (final item in items) max(0, weightOf(item)).toDouble()];
+  final total = weights.fold(0.0, (sum, weight) => sum + weight);
+
+  return [for (final weight in weights) total > 0 ? weight / total : 1 / items.length];
+}
+
 /// Random integer between [min] and [max], both inclusive.
 int randInt(int min, int max) => max <= min ? min : min + _source.nextInt(max - min + 1);
 

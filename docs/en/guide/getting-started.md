@@ -63,7 +63,7 @@ The package declares `sideEffects: false`, so a bundler drops the pools nothing 
 | Import                                                        | gzipped  |
 | ------------------------------------------------------------- | -------- |
 | `randSuffix`, `randPrefix`, the `nameLengthRange` helpers     | 0.5 KB   |
-| `randAge`, `randGender`, `randArchitecture`, `randRam`        | 1–1.5 KB |
+| `randAge`, `randGender`, `randArchitecture`, `randRam`        | 1–2.5 KB |
 | `randRegion`                                                  | 2 KB     |
 | `randOs`, `randDevice`, `randCpu` and the other system values | 1–5 KB   |
 | `randDate`, `randPhone`                                       | 3–4 KB   |

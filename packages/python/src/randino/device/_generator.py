@@ -6,8 +6,8 @@ land on, and every model left is as likely as the next.
 
 from collections.abc import Callable
 
-from randino._internal.generate import collect, resolve_many, resolve_years
-from randino._internal.utils import pick, with_random
+from randino._internal.generate import collect_from, resolve_many, resolve_years
+from randino._internal.utils import with_random
 from randino._types import DeviceDetail, DeviceTypeOption
 from randino.device.data import DEVICE_TYPES, DEVICE_VENDORS, DEVICES, DeviceEntry
 
@@ -49,22 +49,18 @@ def generate_device_details(
         if entry.type in types and entry.vendor in vendors and low <= entry.year <= high
     ]
 
-    def draw() -> DeviceDetail:
-        entry = pick(candidates)
-
-        return DeviceDetail(
-            device=write_device(entry, with_vendor),
-            vendor=entry.vendor,
-            model=entry.model,
-            type=entry.type,
-            year=entry.year,
-        )
-
     with with_random(random):
-        return collect(
-            count=count if candidates else 0,
+        return collect_from(
+            count=count,
             unique=unique,
             starts_with="",
-            draw=draw,
-            key_of=lambda detail: detail.device,
+            outcomes=[(entry, 1.0) for entry in candidates],
+            key_of=lambda entry: write_device(entry, with_vendor),
+            build=lambda entry: DeviceDetail(
+                device=write_device(entry, with_vendor),
+                vendor=entry.vendor,
+                model=entry.model,
+                type=entry.type,
+                year=entry.year,
+            ),
         )

@@ -2,8 +2,8 @@
 
 from collections.abc import Callable
 
-from randino._internal.generate import collect, resolve_option, resolve_platforms
-from randino._internal.utils import pick, pick_weighted, with_random
+from randino._internal.generate import collect_from, resolve_option, resolve_platforms
+from randino._internal.utils import shares, with_random
 from randino._types import (
     Architecture,
     ArchitectureDetail,
@@ -59,12 +59,17 @@ def generate_architecture_details(
         if architectures:
             candidates.append((each, architectures))
 
-    def draw() -> ArchitectureDetail:
-        # The platform first, so `"all"` is half desktops and half phones.
-        drawn, architectures = pick(candidates)
-        architecture = pick_weighted(
-            architectures, lambda each: ARCHITECTURE_DATA[each].weights[drawn]
-        )
+    # The platform first, so `"all"` is half desktops and half phones.
+    outcomes: list[tuple[tuple[SystemPlatform, Architecture], float]] = []
+
+    for each, architectures in candidates:
+        weights = [ARCHITECTURE_DATA[architecture].weights[each] for architecture in architectures]
+
+        for architecture, share in zip(architectures, shares(weights, float), strict=True):
+            outcomes.append(((each, architecture), share / len(candidates)))
+
+    def build(entry: tuple[SystemPlatform, Architecture]) -> ArchitectureDetail:
+        drawn, architecture = entry
         data = ARCHITECTURE_DATA[architecture]
         written = write_architecture(architecture, written_by)
 
@@ -79,10 +84,11 @@ def generate_architecture_details(
         )
 
     with with_random(random):
-        return collect(
-            count=count if candidates else 0,
+        return collect_from(
+            count=count,
             unique=unique,
             starts_with="",
-            draw=draw,
-            key_of=lambda detail: detail.architecture,
+            outcomes=outcomes,
+            key_of=lambda entry: write_architecture(entry[1], written_by),
+            build=build,
         )

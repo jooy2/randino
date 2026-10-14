@@ -5,6 +5,7 @@ import type { AgeGroup } from '../dist/index.js';
 // Internal, but they are what an age is checked against: the bands say which
 // group an age is in, and the curve is what the draw follows.
 import { AGE_BANDS, AGE_CURVE } from '../dist/age/data/index.js';
+import { curveWeight } from '../dist/age/ageGenerator.js';
 
 const SAMPLE = 60;
 // Large enough that a share is within a point or two of the curve's, so the
@@ -168,5 +169,17 @@ describe('Age', () => {
 		const many = randAge({ count: 50, unique: true });
 
 		assert.strictEqual(new Set(many).size, many.length);
+
+		// Every age the curve reaches, though the oldest of them are rarer than one
+		// in ten thousand.
+		const every = randAge({ maxAge: RAND_AGE_MAX, count: 200, unique: true });
+		const reached = Array.from({ length: RAND_AGE_MAX + 1 }, (_, age) => age).filter(
+			(age) => curveWeight(age) > 0
+		);
+
+		assert.deepStrictEqual(
+			[...every].sort((a, b) => a - b),
+			reached
+		);
 	});
 });

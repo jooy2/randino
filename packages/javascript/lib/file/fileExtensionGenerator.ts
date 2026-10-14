@@ -1,8 +1,8 @@
 // The file extension generator: an extension files are really saved with, the
 // common ones most often.
 
-import { collect, resolveMany, resolveRandom } from '../_internal/generate.js';
-import { pickWeighted, withRandom } from '../_internal/utils.js';
+import { collectFrom, resolveMany, resolveRandom } from '../_internal/generate.js';
+import { withRandom } from '../_internal/utils.js';
 import type { FileExtensionDetail, RandFileExtensionOptions } from '../_types/global.js';
 import { FILE_CATEGORIES, FILE_EXTENSIONS } from './data/index.js';
 
@@ -15,19 +15,16 @@ export function generateFileExtensionDetails(
 	const candidates = FILE_EXTENSIONS.filter((entry) => categories.includes(entry.category));
 
 	return withRandom(resolveRandom(options.random), () =>
-		collect(
+		collectFrom(
 			{ count: options.count, unique: options.unique },
-			() => {
-				const entry = pickWeighted(candidates, (each) => each.weight);
-
-				return {
-					extension: dot + entry.name,
-					name: entry.name,
-					category: entry.category,
-					mimeType: entry.mimeType
-				};
-			},
-			(detail) => detail.extension
+			candidates.map((entry) => ({ entry, weight: entry.weight })),
+			(entry) => dot + entry.name,
+			(entry) => ({
+				extension: dot + entry.name,
+				name: entry.name,
+				category: entry.category,
+				mimeType: entry.mimeType
+			})
 		)
 	);
 }

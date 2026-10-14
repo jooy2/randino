@@ -6,8 +6,8 @@ on, and every part left is as likely as the next.
 
 from collections.abc import Callable
 
-from randino._internal.generate import collect, resolve_many, resolve_platforms, resolve_years
-from randino._internal.utils import pick, with_random
+from randino._internal.generate import collect_from, resolve_many, resolve_platforms, resolve_years
+from randino._internal.utils import with_random
 from randino._types import CpuDetail, SystemPlatformOption
 from randino.cpu.data import CPU_VENDORS, CPUS, CpuEntry
 
@@ -42,22 +42,18 @@ def generate_cpu_details(
         if entry.platform in platforms and entry.vendor in vendors and low <= entry.year <= high
     ]
 
-    def draw() -> CpuDetail:
-        entry = pick(candidates)
-
-        return CpuDetail(
-            cpu=write_cpu(entry, with_vendor),
-            vendor=entry.vendor,
-            model=entry.model,
-            platform=entry.platform,
-            year=entry.year,
-        )
-
     with with_random(random):
-        return collect(
-            count=count if candidates else 0,
+        return collect_from(
+            count=count,
             unique=unique,
             starts_with="",
-            draw=draw,
-            key_of=lambda detail: detail.cpu,
+            outcomes=[(entry, 1.0) for entry in candidates],
+            key_of=lambda entry: write_cpu(entry, with_vendor),
+            build=lambda entry: CpuDetail(
+                cpu=write_cpu(entry, with_vendor),
+                vendor=entry.vendor,
+                model=entry.model,
+                platform=entry.platform,
+                year=entry.year,
+            ),
         )

@@ -99,6 +99,9 @@ describe('App store', () => {
 		const found = randAppStore({ unique: true, count: 100 });
 
 		assert.strictEqual(new Set(found).size, found.length);
-		assert.ok(found.length > 10 && found.length <= APP_STORES.length);
+		assert.deepStrictEqual(
+			[...found].sort(),
+			[...new Set(APP_STORES.map((entry) => entry.full))].sort()
+		);
 	});
 });

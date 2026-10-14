@@ -4,8 +4,8 @@
 // Nothing is invented and nothing is weighted. Every option narrows the models
 // a draw may land on, and every model left is as likely as the next.
 
-import { collect, resolveMany, resolveRandom, resolveYears } from '../_internal/generate.js';
-import { pick, withRandom } from '../_internal/utils.js';
+import { collectFrom, resolveMany, resolveRandom, resolveYears } from '../_internal/generate.js';
+import { withRandom } from '../_internal/utils.js';
 import type { DeviceDetail, RandDeviceOptions } from '../_types/global.js';
 import { DEVICES, DEVICE_TYPES, DEVICE_VENDORS } from './data/index.js';
 import type { DeviceEntry } from './data/index.js';
@@ -36,22 +36,19 @@ export function generateDeviceDetails(options: RandDeviceOptions = {}): DeviceDe
 	);
 
 	return withRandom(resolveRandom(options.random), () =>
-		collect(
+		collectFrom(
 			// Only the options a device has: a `startsWith` slipped past the types
 			// would otherwise filter models by their first letter.
-			{ count: candidates.length ? options.count : 0, unique: options.unique },
-			() => {
-				const entry = pick(candidates);
-
-				return {
-					device: writeDevice(entry, includeVendor),
-					vendor: entry.vendor,
-					model: entry.model,
-					type: entry.type,
-					year: entry.year
-				};
-			},
-			(detail) => detail.device
+			{ count: options.count, unique: options.unique },
+			candidates.map((entry) => ({ entry, weight: 1 })),
+			(entry) => writeDevice(entry, includeVendor),
+			(entry) => ({
+				device: writeDevice(entry, includeVendor),
+				vendor: entry.vendor,
+				model: entry.model,
+				type: entry.type,
+				year: entry.year
+			})
 		)
 	);
 }

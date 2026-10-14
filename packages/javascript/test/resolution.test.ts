@@ -137,6 +137,15 @@ describe('Resolution', () => {
 		const resolutions = randResolution({ platform: 'desktop', unique: true, count: 100 });
 
 		assert.strictEqual(new Set(resolutions).size, resolutions.length);
-		assert.ok(resolutions.length > 15, String(resolutions.length));
+		assert.deepStrictEqual(
+			[...resolutions].sort(),
+			[
+				...new Set(
+					RESOLUTIONS.filter((entry) => entry.platform === 'desktop').map(
+						(entry) => `${entry.width}x${entry.height}`
+					)
+				)
+			].sort()
+		);
 	});
 });

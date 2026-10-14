@@ -1,8 +1,8 @@
 // The resolution generator: a screen size people really have, drawn by how
 // common it is on the platform it is drawn for.
 
-import { collect, resolvePlatforms, resolveRandom } from '../_internal/generate.js';
-import { pick, pickWeighted, withRandom } from '../_internal/utils.js';
+import { collectFrom, resolvePlatforms, resolveRandom } from '../_internal/generate.js';
+import { shares, withRandom } from '../_internal/utils.js';
 import type { RandResolutionOptions, ResolutionDetail } from '../_types/global.js';
 import { RESOLUTIONS, RESOLUTION_SEPARATOR_DEFAULT } from './data/index.js';
 
@@ -14,17 +14,26 @@ export function generateResolutionDetails(options: RandResolutionOptions = {}): 
 		RESOLUTIONS.filter((entry) => entry.platform === platform)
 	);
 
-	return withRandom(resolveRandom(options.random), () =>
-		collect(
-			{ count: options.count, unique: options.unique },
-			() => {
-				// The platform first, so `'all'` is half screens of each kind rather than
-				// whichever kind the table happens to list more sizes for.
-				const { width, height, platform } = pickWeighted(pick(pools), (entry) => entry.weight);
+	// The platform first, so `'all'` is half screens of each kind rather than
+	// whichever kind the table happens to list more sizes for.
+	const outcomes = pools.flatMap((pool) =>
+		shares(pool, (entry) => entry.weight).map((share, index) => ({
+			entry: pool[index],
+			weight: share / pools.length
+		}))
+	);
 
-				return { resolution: `${width}${separator}${height}`, width, height, platform };
-			},
-			(detail) => detail.resolution
+	return withRandom(resolveRandom(options.random), () =>
+		collectFrom(
+			{ count: options.count, unique: options.unique },
+			outcomes,
+			({ width, height }) => `${width}${separator}${height}`,
+			({ width, height, platform }) => ({
+				resolution: `${width}${separator}${height}`,
+				width,
+				height,
+				platform
+			})
 		)
 	);
 }

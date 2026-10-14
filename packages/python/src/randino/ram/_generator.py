@@ -6,9 +6,21 @@ Each size comes with the kind of memory it was sold as on the platform it was dr
 from collections.abc import Callable
 
 from randino._internal.capacity import CapacityCandidate, capacity_candidates, write_capacity
-from randino._internal.generate import collect, resolve_option, resolve_platforms, resolve_years
-from randino._internal.utils import pick, pick_weighted, with_random
-from randino._types import RamDetail, RamUnit, RamUnitOption, SystemPlatform, SystemPlatformOption
+from randino._internal.generate import (
+    collect_from,
+    resolve_option,
+    resolve_platforms,
+    resolve_years,
+)
+from randino._internal.utils import shares, with_random
+from randino._types import (
+    RamDetail,
+    RamType,
+    RamUnit,
+    RamUnitOption,
+    SystemPlatform,
+    SystemPlatformOption,
+)
 from randino.ram.data import RAM_SCALE, RAM_SIZES, RAM_TYPE_ENTRIES, RAM_UNITS, RamTypeEntry
 
 _RAM_UNIT_OPTIONS: tuple[RamUnitOption, ...] = (*RAM_UNITS, "auto")
@@ -104,29 +116,44 @@ def generate_ram_details(
         max_size,
     )
 
-    def draw() -> RamDetail:
-        # The platform first, so `"all"` is half desktops and half phones, then the size,
-        # then the kind of memory that size was sold as.
-        drawn, sizes = pick(candidates)
-        candidate, types = pick_weighted(sizes, lambda each: each[0].weight)
-        entry = pick_weighted(types, lambda each: each.weight)
+    # The platform first, so `"all"` is half desktops and half phones, then the size, then
+    # the kind of memory that size was sold as.
+    outcomes: list[tuple[tuple[SystemPlatform, CapacityCandidate[RamUnit], RamType], float]] = []
+
+    for each, sizes in candidates:
+        size_shares = shares(sizes, lambda size: size[0].weight)
+
+        for (candidate, types), size_share in zip(sizes, size_shares, strict=True):
+            for entry, share in zip(types, shares(types, lambda one: one.weight), strict=True):
+                outcomes.append(
+                    ((each, candidate, entry.type), size_share * share / len(candidates))
+                )
+
+    def write(entry: tuple[SystemPlatform, CapacityCandidate[RamUnit], RamType]) -> str:
+        _, candidate, kind = entry
+
+        return write_ram(
+            write_capacity(candidate.value, candidate.unit, with_unit), kind, with_type
+        )
+
+    def build(entry: tuple[SystemPlatform, CapacityCandidate[RamUnit], RamType]) -> RamDetail:
+        drawn, candidate, kind = entry
 
         return RamDetail(
-            ram=write_ram(
-                write_capacity(candidate.value, candidate.unit, with_unit), entry.type, with_type
-            ),
+            ram=write(entry),
             value=candidate.value,
             unit=candidate.unit,
             bytes=candidate.size * RAM_SCALE.bytes,
-            type=entry.type,
+            type=kind,
             platform=drawn,
         )
 
     with with_random(random):
-        return collect(
-            count=count if candidates else 0,
+        return collect_from(
+            count=count,
             unique=unique,
             starts_with="",
-            draw=draw,
-            key_of=lambda detail: detail.ram,
+            outcomes=outcomes,
+            key_of=write,
+            build=build,
         )

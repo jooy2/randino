@@ -12,6 +12,10 @@ import 'package:randino/src/types.dart';
 /// A size one call may land on, with the kinds of memory it was sold as.
 typedef _Candidate = ({CapacityCandidate<RamUnit> size, List<RamTypeEntry> types});
 
+/// One result a call may land on: a size on a platform, and the kind of memory
+/// it was sold as.
+typedef _Drawn = ({SystemPlatform platform, CapacityCandidate<RamUnit> size, String type});
+
 /// [capacity] with the kind of memory after it where the call asked for it.
 String writeRam(String capacity, String type, bool includeType) =>
     includeType ? '$capacity $type' : capacity;
@@ -80,36 +84,48 @@ List<RamDetail> generateRamDetails({
       (platform: each, sizes: _sizesFor(each, years, written, minSize, maxSize)),
   ].where((each) => each.sizes.isNotEmpty).toList(growable: false);
 
+  // The platform first, so a null one is half desktops and half phones, then
+  // the size, then the kind of memory that size was sold as.
+  final outcomes = <Outcome<_Drawn>>[];
+
+  for (final (platform: each, :sizes) in candidates) {
+    final sizeShares = shares(sizes, (candidate) => candidate.size.weight);
+
+    for (final (at, candidate) in sizes.indexed) {
+      for (final (index, share) in shares(candidate.types, (entry) => entry.weight).indexed) {
+        outcomes.add((
+          entry: (platform: each, size: candidate.size, type: candidate.types[index].type),
+          weight: sizeShares[at] * share / candidates.length,
+        ));
+      }
+    }
+  }
+
+  // A kind of memory belongs to a size written as a size, so a bare number goes
+  // without it, the way `randOs` drops the build along with the version.
+  String write(_Drawn drawn) => writeRam(
+    writeCapacity(drawn.size.value, drawn.size.unit.label, includeUnit),
+    drawn.type,
+    includeUnit && includeType,
+  );
+
   return withRandom(
     random,
-    () => collect<RamDetail>(
-      count: candidates.isEmpty ? 0 : count,
+    () => collectFrom(
+      count: count,
       unique: unique,
       startsWith: '',
-      draw: () {
-        // The platform first, so a null one is half desktops and half phones,
-        // then the size, then the kind of memory that size was sold as.
-        final (platform: drawn, :sizes) = pick(candidates);
-        final (:size, :types) = pickWeighted(sizes, (each) => each.size.weight);
-        final type = pickWeighted(types, (entry) => entry.weight).type;
-
-        return RamDetail(
-          ram: writeRam(
-            writeCapacity(size.value, size.unit.label, includeUnit),
-            type,
-            // A kind of memory belongs to a size written as a size, so a bare
-            // number goes without it, the way `randOs` drops the build along
-            // with the version.
-            includeUnit && includeType,
+      outcomes: outcomes,
+      keyOf: write,
+      build:
+          (drawn) => RamDetail(
+            ram: write(drawn),
+            value: drawn.size.value,
+            unit: drawn.size.unit,
+            bytes: drawn.size.size * ramScale.bytes,
+            type: drawn.type,
+            platform: drawn.platform,
           ),
-          value: size.value,
-          unit: size.unit,
-          bytes: size.size * ramScale.bytes,
-          type: type,
-          platform: drawn,
-        );
-      },
-      keyOf: (detail) => detail.ram,
     ),
   );
 }

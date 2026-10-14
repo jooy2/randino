@@ -52,22 +52,20 @@ List<DeviceDetail> generateDeviceDetails({
 
   return withRandom(
     random,
-    () => collect<DeviceDetail>(
-      count: candidates.isEmpty ? 0 : count,
+    () => collectFrom(
+      count: count,
       unique: unique,
       startsWith: '',
-      draw: () {
-        final entry = pick(candidates);
-
-        return DeviceDetail(
-          device: writeDevice(entry, includeVendor),
-          vendor: entry.vendor,
-          model: entry.model,
-          type: entry.type,
-          year: entry.year,
-        );
-      },
-      keyOf: (detail) => detail.device,
+      outcomes: [for (final entry in candidates) (entry: entry, weight: 1.0)],
+      keyOf: (entry) => writeDevice(entry, includeVendor),
+      build:
+          (entry) => DeviceDetail(
+            device: writeDevice(entry, includeVendor),
+            vendor: entry.vendor,
+            model: entry.model,
+            type: entry.type,
+            year: entry.year,
+          ),
     ),
   );
 }

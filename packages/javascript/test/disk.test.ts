@@ -366,6 +366,15 @@ describe('Disk', () => {
 				'500 GB',
 				'512 GB'
 			]);
+
+			// The whole pool too, every kind of drive and every size it is sold in.
+			const every = randDiskSize({ unique: true, count: 100, output: 'detail' });
+
+			assert.strictEqual(new Set(every.map((detail) => detail.size)).size, every.length);
+			assert.deepStrictEqual(
+				every.map((detail) => detail.bytes / DISK_SCALE.bytes).sort((a, b) => a - b),
+				[...sizes].sort((a, b) => a - b)
+			);
 		});
 	});
 });

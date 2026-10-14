@@ -85,10 +85,10 @@ void main() {
 
     test('unique never repeats an extension', () {
       final found = randFileExtension(category: {FileCategory.image}, unique: true, count: 100);
-      final images = fileExtensions.where((entry) => entry.category == FileCategory.image).length;
+      final images = fileExtensions.where((entry) => entry.category == FileCategory.image);
 
       expect(found.toSet(), hasLength(found.length));
-      expect(found.length, inInclusiveRange(9, images));
+      expect(found.toSet(), {for (final entry in images) '.${entry.name}'});
     });
   });
 }

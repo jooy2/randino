@@ -12,6 +12,10 @@ import 'package:randino/src/internal/utils.dart';
 import 'package:randino/src/os/data/index.dart';
 import 'package:randino/src/types.dart';
 
+/// One result a call may land on: a release of a line, and its build and
+/// edition where asked for.
+typedef _Drawn = ({OsFamily family, OsRelease release, OsBuild? build, String? edition});
+
 /// [release] written out, with [build] and [edition] where the call asked for
 /// them.
 String writeOs(OsRelease release, OsBuild? build, String? edition) {
@@ -88,36 +92,55 @@ List<OsDetail> generateOsDetails({
     includeVersion && includeBuild,
   );
   final lines = families.keys.toList(growable: false);
+  final withEdition = includeVersion && includeEdition;
+  final outcomes = <Outcome<_Drawn>>[];
+
+  // The line first, by how common it is among the lines left, and the release
+  // inside it second, each as likely as the next; then a build and an edition
+  // of it where the call asked for them.
+  for (final (index, share) in shares(lines, (each) => osFamilies[each]!.weight).indexed) {
+    final line = lines[index];
+    final releases = families[line]!;
+
+    for (final (release, builds) in releases) {
+      final written = builds.isEmpty ? <OsBuild?>[null] : builds;
+      final editions =
+          withEdition && release.editions.isNotEmpty ? release.editions : <String?>[null];
+      final weight = share / releases.length / written.length / editions.length;
+
+      for (final build in written) {
+        for (final edition in editions) {
+          outcomes.add((
+            entry: (family: line, release: release, build: build, edition: edition),
+            weight: weight,
+          ));
+        }
+      }
+    }
+  }
+
+  String write(_Drawn drawn) =>
+      includeVersion ? writeOs(drawn.release, drawn.build, drawn.edition) : drawn.release.name;
 
   return withRandom(
     random,
-    () => collect<OsDetail>(
-      count: lines.isEmpty ? 0 : count,
+    () => collectFrom(
+      count: count,
       unique: unique,
       startsWith: '',
-      draw: () {
-        // The line first, by how common it is among the lines left, and the
-        // release inside it second.
-        final line = pickWeighted(lines, (each) => osFamilies[each]!.weight);
-        final (release, builds) = pick(families[line]!);
-        final build = builds.isEmpty ? null : pick(builds);
-        final edition =
-            includeVersion && includeEdition && release.editions.isNotEmpty
-                ? pick(release.editions)
-                : null;
-
-        return OsDetail(
-          os: includeVersion ? writeOs(release, build, edition) : release.name,
-          name: release.name,
-          version: includeVersion ? release.version : null,
-          build: build?.text,
-          edition: edition,
-          family: line,
-          platform: osFamilies[line]!.platform,
-          year: build?.year ?? release.year,
-        );
-      },
-      keyOf: (detail) => detail.os,
+      outcomes: outcomes,
+      keyOf: write,
+      build:
+          (drawn) => OsDetail(
+            os: write(drawn),
+            name: drawn.release.name,
+            version: includeVersion ? drawn.release.version : null,
+            build: drawn.build?.text,
+            edition: drawn.edition,
+            family: drawn.family,
+            platform: osFamilies[drawn.family]!.platform,
+            year: drawn.build?.year ?? drawn.release.year,
+          ),
     ),
   );
 }

@@ -101,4 +101,6 @@ def test_unique_never_repeats_a_resolution() -> None:
     found = rand_resolution(platform="desktop", unique=True, count=100)
 
     assert len(set(found)) == len(found)
-    assert len(found) > 15
+    assert set(found) == {
+        f"{entry.width}x{entry.height}" for entry in RESOLUTIONS if entry.platform == "desktop"
+    }

@@ -270,3 +270,9 @@ def test_rand_disk_size_unique_stops_when_the_sizes_run_out() -> None:
 
     assert len(set(drives)) == len(drives)
     assert set(drives) == {"256 GB", "480 GB", "500 GB", "512 GB", "1 TB", "2 TB"}
+
+    # The whole pool too, every kind of drive and every size it is sold in.
+    every = rand_disk_size(unique=True, count=100, output="detail")
+
+    assert len({detail.size for detail in every}) == len(every)
+    assert {detail.bytes // DISK_SCALE.bytes for detail in every} == SIZES

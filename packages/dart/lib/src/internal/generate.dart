@@ -4,7 +4,8 @@
 // `randName`, `randNickname` and `randWord` differ in what one draw produces
 // and in nothing else about this — the same clamping, the same `startsWith`
 // filter, the same `unique` bookkeeping and the same attempt budget. Written
-// once here, a new generator gets all of it by calling [collect].
+// once here, a new generator gets all of it by calling [collect], or
+// [collectFrom] when it can list every result it may return.
 
 import 'dart:math';
 
@@ -137,7 +138,8 @@ List<T> languagesFitting<T>(
 // gives the same odds to a result one draw in a hundred finds. Only a call of
 // more than thirty results ever reaches the floor, since a smaller one runs out
 // of attempts first. A pool drawn by weight can still stop short of a result
-// far rarer than the rest, such as the rarest releases `randOs` draws.
+// far rarer than the rest, which is why a catalog draws through [collectFrom]
+// instead.
 const int _collectStall = 2000;
 const int _collectStallPerResult = 20;
 
@@ -197,6 +199,166 @@ List<T> collect<T>({
 
     results.add(item);
     missed = 0;
+  }
+
+  return results;
+}
+
+/// What a catalog builds one result from, and how likely that result is
+/// against the others.
+typedef Outcome<E> = ({E entry, double weight});
+
+/// [collect] for a generator that can list every result it may return — a
+/// catalog, where a draw only picks.
+///
+/// Each result comes up as often as its weight says, and two outcomes with the
+/// same [keyOf] are one result, as likely as the two of them together. [build]
+/// writes the result out of the entry it came up on, once for each time it
+/// comes up, so no two results are the same object.
+///
+/// A [unique] call takes each result out as it comes up, which deals the same
+/// odds as drawing again on a repeat and stops exactly when the list runs out.
+/// [collect] can only guess that from a run of draws that found nothing new,
+/// and a list drawn by weight beat the guess: `randOs` asked for every release
+/// came back short one call in six, even once the run grew with what had been
+/// found.
+List<T> collectFrom<E, T>({
+  required int count,
+  required bool unique,
+  required String startsWith,
+  required List<Outcome<E>> outcomes,
+  required String Function(E entry) keyOf,
+  required T Function(E entry) build,
+}) {
+  final wanted = resolveCount(count);
+  final prefix = startsWith.toLowerCase();
+
+  if (prefix.isNotEmpty) {
+    final fitting = [
+      for (final outcome in outcomes)
+        if (keyOf(outcome.entry).toLowerCase().startsWith(prefix)) outcome,
+    ];
+
+    return _dealFrom(fitting, wanted, unique, keyOf, build)!;
+  }
+
+  // Without a `startsWith` a key is read only for what comes up — one for a call
+  // of one, rather than the whole catalog's. A result whose key is empty is never
+  // returned, so an entry written as nothing sends the call back to deal from the
+  // entries that are written as something.
+  String? keyed(E entry) {
+    final key = keyOf(entry);
+
+    return key.isEmpty ? null : key;
+  }
+
+  return _dealFrom(outcomes, wanted, unique, keyed, build) ??
+      _dealFrom(
+        [
+          for (final outcome in outcomes)
+            if (keyOf(outcome.entry).isNotEmpty) outcome,
+        ],
+        wanted,
+        unique,
+        keyOf,
+        build,
+      )!;
+}
+
+/// The draw [collectFrom] makes once the outcomes are the ones it may return:
+/// null when one of them turns out to have no key, which only a list it has not
+/// read every key of can hold.
+List<T>? _dealFrom<E, T>(
+  List<Outcome<E>> outcomes,
+  int wanted,
+  bool unique,
+  String? Function(E entry) keyed,
+  T Function(E entry) build,
+) {
+  // An outcome of no weight never comes up, unless none has any, when each is
+  // as likely as the next — the way [pickWeighted] reads a table of zeros.
+  final weighted =
+      outcomes.every((outcome) => outcome.weight > 0)
+          ? outcomes
+          : [
+            for (final outcome in outcomes)
+              if (outcome.weight > 0) outcome,
+          ];
+  final pool =
+      weighted.isNotEmpty
+          ? weighted
+          : [for (final outcome in outcomes) (entry: outcome.entry, weight: 1.0)];
+  final results = <T>[];
+
+  if (pool.isEmpty) {
+    return results;
+  }
+
+  if (!unique) {
+    // The running total of the weights, so a draw is a search rather than a
+    // walk down the list: a call of ten thousand would otherwise read it ten
+    // thousand times.
+    final totals = <double>[];
+    // Whether each entry has a key, read the first time it comes up.
+    final checked = List<bool>.filled(pool.length, false);
+    var total = 0.0;
+
+    for (final outcome in pool) {
+      total += outcome.weight;
+      totals.add(total);
+    }
+
+    while (results.length < wanted) {
+      final roll = randDouble() * total;
+      var low = 0;
+      var high = totals.length - 1;
+
+      while (low < high) {
+        final middle = (low + high) >> 1;
+
+        if (totals[middle] > roll) {
+          high = middle;
+        } else {
+          low = middle + 1;
+        }
+      }
+
+      final entry = pool[low].entry;
+
+      if (!checked[low]) {
+        if (keyed(entry) == null) return null;
+
+        checked[low] = true;
+      }
+
+      results.add(build(entry));
+    }
+
+    return results;
+  }
+
+  // Each outcome waits a time drawn at the rate of its weight, and they come up
+  // in the order a draw that skips repeats would find them: the first is each
+  // one's by its share of the weight, and so is every next one among those
+  // left. An outcome whose key came up before it is the repeat that draw would
+  // skip. Ties keep the list's order, which `List.sort` does not promise.
+  final order = [
+    for (var index = 0; index < pool.length; index += 1)
+      (index: index, at: -log(1 - randDouble()) / pool[index].weight),
+  ]..sort((a, b) => a.at != b.at ? a.at.compareTo(b.at) : a.index.compareTo(b.index));
+  final seen = <String>{};
+
+  for (final (:index, at: _) in order) {
+    if (results.length >= wanted) break;
+
+    final entry = pool[index].entry;
+    final key = keyed(entry);
+
+    if (key == null) return null;
+    if (seen.contains(key)) continue;
+
+    seen.add(key);
+    results.add(build(entry));
   }
 
   return results;

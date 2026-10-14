@@ -97,6 +97,12 @@ describe('MIME type', () => {
 		const found = randMimeType({ type: 'image', unique: true, count: 100 });
 
 		assert.strictEqual(new Set(found).size, found.length);
-		assert.ok(found.length > 5);
+		assert.deepStrictEqual(
+			[...found].sort(),
+			mimeTypeEntries()
+				.filter((entry) => entry.type === 'image')
+				.map((entry) => entry.mimeType)
+				.sort()
+		);
 	});
 });

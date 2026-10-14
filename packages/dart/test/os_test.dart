@@ -268,17 +268,28 @@ void main() {
     });
 
     test('unique never repeats a system, and stops when the systems run out', () {
-      // A line at a time: across all of them Fedora Core is one draw in four
-      // hundred, which a run of draws that add nothing could stop short of.
-      for (final family in osFamilyCodes) {
-        final names = randOs(family: {family}, includeVersion: false, unique: true, count: 100);
+      // Every line at once: Fedora Core is one draw in four hundred, and a call
+      // that takes each release out as it comes up still ends with all of them.
+      final names = randOs(includeVersion: false, unique: true, count: randCountMax);
 
-        expect(names.toSet(), hasLength(names.length), reason: family.name);
-        expect(names.toSet(), {
-          for (final release in osReleases)
-            if (release.family == family) release.name,
-        }, reason: family.name);
-      }
+      expect(names.toSet(), hasLength(names.length));
+      expect(names.toSet(), {for (final release in osReleases) release.name});
+
+      // And every build and edition of every release, each one rarer still.
+      final written = randOs(
+        includeBuild: true,
+        includeEdition: true,
+        unique: true,
+        count: randCountMax,
+      );
+
+      expect(written.toSet(), hasLength(written.length));
+      expect(written.toSet(), {
+        for (final release in osReleases)
+          for (final build in release.builds.isEmpty ? <OsBuild?>[null] : release.builds)
+            for (final edition in release.editions.isEmpty ? <String?>[null] : release.editions)
+              writeOs(release, build, edition),
+      });
     });
   });
 }

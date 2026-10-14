@@ -285,23 +285,35 @@ describe('Os', () => {
 	});
 
 	it('unique never repeats a system, and stops when the systems run out', () => {
-		// A line at a time: across all of them Fedora Core is one draw in four
-		// hundred, which a run of draws that add nothing could stop short of.
-		for (const family of OS_FAMILY_CODES) {
-			const names = randOs({ family, includeVersion: false, unique: true, count: 100 });
+		// Every line at once: Fedora Core is one draw in four hundred, and a call
+		// that takes each release out as it comes up still ends with all of them.
+		const names = randOs({ includeVersion: false, unique: true, count: RAND_COUNT_MAX });
 
-			assert.strictEqual(new Set(names).size, names.length, family);
-			assert.deepStrictEqual(
-				[...names].sort(),
-				[
-					...new Set(
-						OS_RELEASES.filter((release) => release.family === family).map(
-							(release) => release.name
-						)
-					)
-				].sort(),
-				family
-			);
+		assert.strictEqual(new Set(names).size, names.length);
+		assert.deepStrictEqual(
+			[...names].sort(),
+			[...new Set(OS_RELEASES.map((release) => release.name))].sort()
+		);
+
+		// And every build and edition of every release, each one rarer still.
+		const expected = new Set<string>();
+
+		for (const release of OS_RELEASES) {
+			for (const build of release.builds.length ? release.builds : [null]) {
+				for (const edition of release.editions.length ? release.editions : [null]) {
+					expected.add(writeOs(release, build, edition));
+				}
+			}
 		}
+
+		const written = randOs({
+			includeBuild: true,
+			includeEdition: true,
+			unique: true,
+			count: RAND_COUNT_MAX
+		});
+
+		assert.strictEqual(new Set(written).size, written.length);
+		assert.deepStrictEqual([...written].sort(), [...expected].sort());
 	});
 });

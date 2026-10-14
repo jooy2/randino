@@ -357,12 +357,16 @@ void main() {
     });
 
     test('unique never repeats a size, and stops when the sizes run out', () {
-      // Kept to the common sizes, so every one of them is reached long before the
-      // draws run out: the rarest of the whole pool is a draw in a thousand.
       final ram = randRam(minSize: 4, maxSize: 16, unique: true, count: 100);
 
       expect(ram.toSet(), hasLength(ram.length));
       expect(ram.toSet(), {'4 GB', '6 GB', '8 GB', '12 GB', '16 GB'});
+
+      // The whole pool too, though its rarest size is a draw in a thousand.
+      final every = randRamDetails(unique: true, count: 100);
+
+      expect({for (final detail in every) detail.ram}, hasLength(every.length));
+      expect({for (final detail in every) detail.bytes ~/ megabyte}, sizes);
     });
   });
 }

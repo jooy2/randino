@@ -5,8 +5,8 @@
 // likely each of them is. Nothing is fitted afterwards, so an age is always one
 // the caller's range and groups allow.
 
-import { collect, resolveCount, resolveRandom, resolveWhole } from '../_internal/generate.js';
-import { pickWeighted, withRandom } from '../_internal/utils.js';
+import { collectFrom, resolveRandom, resolveWhole } from '../_internal/generate.js';
+import { withRandom } from '../_internal/utils.js';
 import { RAND_AGE_MAX } from '../constants.js';
 import type { AgeDetail, AgeGroup, RandAgeOptions } from '../_types/global.js';
 import {
@@ -77,31 +77,14 @@ function candidatesFor(options: RandAgeOptions): Candidate[] {
 }
 
 export function generateAgeDetails(options: RandAgeOptions = {}): AgeDetail[] {
-	const candidates = candidatesFor(options);
-	const unique = options.unique ?? false;
-	// A unique call takes each age out once it is drawn, which deals the same odds
-	// as drawing again on a repeat and stops when the ages run out, rather than
-	// spending the whole attempt budget on repeats. An age the curve gives no weight
-	// is left out of it, since a repeat would never have reached that age either.
-	const weighted = candidates.filter((candidate) => candidate.weight > 0);
-	const left = unique ? (weighted.length ? weighted : [...candidates]) : candidates;
-	const count = unique ? Math.min(resolveCount(options.count), left.length) : options.count;
-
 	return withRandom(resolveRandom(options.random), () =>
-		collect(
+		collectFrom(
 			// Only the two options an age has: a `startsWith` slipped past the types
 			// would otherwise filter ages by their first digit.
-			{ count, unique },
-			() => {
-				const drawn = pickWeighted(left, (candidate) => candidate.weight);
-
-				if (unique) {
-					left.splice(left.indexOf(drawn), 1);
-				}
-
-				return { age: drawn.age, group: groupOf(drawn.age) };
-			},
-			(detail) => String(detail.age)
+			{ count: options.count, unique: options.unique },
+			candidatesFor(options).map(({ age, weight }) => ({ entry: age, weight })),
+			(age) => String(age),
+			(age) => ({ age, group: groupOf(age) })
 		)
 	);
 }

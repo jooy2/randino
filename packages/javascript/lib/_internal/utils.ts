@@ -86,6 +86,18 @@ export function pickWeighted<T>(items: readonly T[], weightOf: (item: T) => numb
 	return items[items.length - 1];
 }
 
+/**
+ * The chance `pickWeighted` gives each of `items`, in order: its weight over the
+ * total, or an even share when every weight is zero. A catalog multiplies these
+ * down its levels to weigh each result it lists.
+ */
+export function shares<T>(items: readonly T[], weightOf: (item: T) => number): number[] {
+	const weights = items.map((item) => Math.max(0, weightOf(item)));
+	const total = weights.reduce((sum, weight) => sum + weight, 0);
+
+	return weights.map((weight) => (total > 0 ? weight / total : 1 / items.length));
+}
+
 /** Random integer between `min` and `max`, both inclusive. */
 export function randInt(min: number, max: number): number {
 	return min + Math.floor(random() * (max - min + 1));

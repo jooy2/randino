@@ -77,7 +77,7 @@ def test_the_common_extensions_come_up_most_often() -> None:
 
 def test_unique_never_repeats_an_extension() -> None:
     found = rand_file_extension(category="image", unique=True, count=100)
-    images = sum(entry.category == "image" for entry in FILE_EXTENSIONS)
+    images = {f".{entry.name}" for entry in FILE_EXTENSIONS if entry.category == "image"}
 
     assert len(set(found)) == len(found)
-    assert 8 < len(found) <= images
+    assert set(found) == images

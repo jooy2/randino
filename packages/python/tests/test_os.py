@@ -239,12 +239,25 @@ def test_the_value_form_is_the_os_of_each_detail() -> None:
 
 
 def test_unique_never_repeats_a_system_and_stops_when_the_systems_run_out() -> None:
-    # A line at a time: across all of them Fedora Core is one draw in four hundred, which a
-    # run of draws that add nothing could stop short of.
-    for family in OS_FAMILY_CODES:
-        names = rand_os(family=family, include_version=False, unique=True, count=100)
+    # Every line at once: Fedora Core is one draw in four hundred, and a call that takes
+    # each release out as it comes up still ends with all of them.
+    names = rand_os(include_version=False, unique=True, count=RAND_COUNT_MAX)
 
-        assert len(set(names)) == len(names), family
-        assert set(names) == {
-            release.name for release in OS_RELEASES if release.family == family
-        }, family
+    assert len(set(names)) == len(names)
+    assert set(names) == {release.name for release in OS_RELEASES}
+
+    # And every build and edition of every release, each one rarer still.
+    written = rand_os(include_build=True, include_edition=True, unique=True, count=RAND_COUNT_MAX)
+    builds: list[OsBuild | None]
+    editions: list[str | None]
+    expected: set[str] = set()
+
+    for release in OS_RELEASES:
+        builds = list(release.builds) if release.builds else [None]
+        editions = list(release.editions) if release.editions else [None]
+        expected.update(
+            write_os(release, build, edition) for build in builds for edition in editions
+        )
+
+    assert len(set(written)) == len(written)
+    assert set(written) == expected

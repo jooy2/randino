@@ -796,5 +796,74 @@ void main() {
 
       expect(drawn, hasLength(size));
     });
+
+    test('a catalog draws each result by its weight, and a unique call ends with every one', () {
+      // `collectFrom` deals a unique call out of the list itself, so a result a
+      // million times rarer than the rest is still among what it returns. Two
+      // outcomes written alike are one result, and one of no weight never comes
+      // up.
+      final outcomes = <Outcome<String>>[
+        (entry: 'common', weight: 1000000),
+        (entry: 'rare', weight: 1),
+        (entry: 'never', weight: 0),
+        (entry: 'twice', weight: 1),
+        (entry: 'twice', weight: 1),
+      ];
+      List<String> from(List<Outcome<String>> list, {String startsWith = '', int count = 10}) =>
+          collectFrom(
+            count: count,
+            unique: true,
+            startsWith: startsWith,
+            outcomes: list,
+            keyOf: (entry) => entry,
+            build: (entry) => entry,
+          );
+
+      expect(from(outcomes).toList()..sort(), <String>['common', 'rare', 'twice']);
+      expect(from(outcomes, startsWith: 'r'), <String>['rare']);
+
+      // A table of zeros is drawn evenly, the way `pickWeighted` reads one.
+      expect(from([(entry: 'x', weight: 0), (entry: 'y', weight: 0)]), hasLength(2));
+
+      // An entry written as nothing is never returned, however likely it is.
+      final blank = <Outcome<String>>[(entry: '', weight: 1000000), (entry: 'a', weight: 1)];
+
+      expect(from(blank), <String>['a']);
+      expect(
+        collectFrom(
+          count: 3,
+          unique: false,
+          startsWith: '',
+          outcomes: blank,
+          keyOf: (entry) => entry,
+          build: (entry) => entry,
+        ),
+        <String>['a', 'a', 'a'],
+      );
+
+      // Each result is built for itself, so two that came up on one entry are
+      // two objects, the way two draws were.
+      final built = collectFrom(
+        count: 2,
+        unique: false,
+        startsWith: '',
+        outcomes: [(entry: 'a', weight: 1.0)],
+        keyOf: (entry) => entry,
+        build: (entry) => <String>[entry],
+      );
+
+      expect(identical(built[0], built[1]), isFalse);
+
+      // The first of a unique call is each result's by its share of the weight:
+      // three in four here, and 4,000 calls hold it within seven deviations.
+      final shared = <Outcome<String>>[(entry: 'a', weight: 1), (entry: 'b', weight: 3)];
+      var first = 0;
+
+      for (var i = 0; i < 4000; i += 1) {
+        if (from(shared, count: 2).first == 'b') first += 1;
+      }
+
+      expect(first, inExclusiveRange(2800, 3200));
+    });
   });
 }

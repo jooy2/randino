@@ -6,8 +6,8 @@ Each size is one its kind of storage is sold in, for a platform that uses that k
 from collections.abc import Callable
 
 from randino._internal.capacity import CapacityCandidate, capacity_candidates, write_capacity
-from randino._internal.generate import collect, resolve_many, resolve_option, resolve_platforms
-from randino._internal.utils import pick, pick_weighted, with_random
+from randino._internal.generate import collect_from, resolve_many, resolve_option, resolve_platforms
+from randino._internal.utils import shares, with_random
 from randino._types import (
     DiskSizeDetail,
     DiskType,
@@ -85,12 +85,23 @@ def generate_disk_size_details(
         max_size,
     )
 
-    def draw() -> DiskSizeDetail:
-        # The platform first, so `"all"` is half desktops and half phones, then the kind of
-        # storage by how common it is there, then a size it is sold in.
-        drawn, kinds = pick(candidates)
-        kind, sizes = pick_weighted(kinds, lambda each: DISK_TYPE_WEIGHTS[drawn][each[0]])
-        candidate = pick_weighted(sizes, lambda each: each.weight)
+    # The platform first, so `"all"` is half desktops and half phones, then the kind of
+    # storage by how common it is there, then a size it is sold in.
+    outcomes: list[tuple[tuple[SystemPlatform, DiskType, CapacityCandidate[DiskUnit]], float]] = []
+
+    for each, kinds in candidates:
+        kind_shares = shares([DISK_TYPE_WEIGHTS[each][kind] for kind, _ in kinds], float)
+
+        for (kind, sizes), kind_share in zip(kinds, kind_shares, strict=True):
+            for candidate, share in zip(
+                sizes, shares(sizes, lambda size: size.weight), strict=True
+            ):
+                outcomes.append(((each, kind, candidate), kind_share * share / len(candidates)))
+
+    def build(
+        entry: tuple[SystemPlatform, DiskType, CapacityCandidate[DiskUnit]],
+    ) -> DiskSizeDetail:
+        drawn, kind, candidate = entry
 
         return DiskSizeDetail(
             size=write_capacity(candidate.value, candidate.unit, with_unit),
@@ -102,10 +113,11 @@ def generate_disk_size_details(
         )
 
     with with_random(random):
-        return collect(
-            count=count if candidates else 0,
+        return collect_from(
+            count=count,
             unique=unique,
             starts_with="",
-            draw=draw,
-            key_of=lambda detail: detail.size,
+            outcomes=outcomes,
+            key_of=lambda entry: write_capacity(entry[2].value, entry[2].unit, with_unit),
+            build=build,
         )

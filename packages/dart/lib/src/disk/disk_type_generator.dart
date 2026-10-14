@@ -17,30 +17,37 @@ List<DiskTypeDetail> generateDiskTypeDetails({
 }) {
   final platforms = resolvePlatforms(platform);
 
+  // The platform first, so a null one is half desktops and half phones, and
+  // eMMC — which both use — is drawn by the platform it came up for.
+  final outcomes = <Outcome<({SystemPlatform platform, DiskType code})>>[];
+
+  for (final each in platforms) {
+    final weights = diskTypeWeights[each]!;
+    final codes = <DiskType>[
+      for (final type in diskTypes)
+        if (weights.containsKey(type)) type,
+    ];
+
+    for (final (index, share) in shares(codes, (type) => weights[type]!).indexed) {
+      outcomes.add((entry: (platform: each, code: codes[index]), weight: share / platforms.length));
+    }
+  }
+
   return withRandom(
     random,
-    () => collect<DiskTypeDetail>(
+    () => collectFrom(
       count: count,
       unique: unique,
       startsWith: '',
-      draw: () {
-        // The platform first, so a null one is half desktops and half phones,
-        // and eMMC — which both use — is drawn by the platform it came up for.
-        final drawn = pick(platforms);
-        final weights = diskTypeWeights[drawn]!;
-        final code = pickWeighted(<DiskType>[
-          for (final type in diskTypes)
-            if (weights.containsKey(type)) type,
-        ], (type) => weights[type]!);
-
-        return DiskTypeDetail(
-          diskType: diskTypeLabels[code]!.label,
-          code: code,
-          name: diskTypeLabels[code]!.name,
-          platform: drawn,
-        );
-      },
-      keyOf: (detail) => detail.diskType,
+      outcomes: outcomes,
+      keyOf: (entry) => diskTypeLabels[entry.code]!.label,
+      build:
+          (entry) => DiskTypeDetail(
+            diskType: diskTypeLabels[entry.code]!.label,
+            code: entry.code,
+            name: diskTypeLabels[entry.code]!.name,
+            platform: entry.platform,
+          ),
     ),
   );
 }

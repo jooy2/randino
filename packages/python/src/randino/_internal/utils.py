@@ -116,6 +116,18 @@ def pick_weighted(items: Sequence[T], weight_of: Callable[[T], float]) -> T:
     return items[-1]
 
 
+def shares(items: Sequence[T], weight_of: Callable[[T], float]) -> list[float]:
+    """Return the chance `pick_weighted` gives each of `items`, in order.
+
+    Its weight over the total, or an even share when every weight is zero. A catalog
+    multiplies these down its levels to weigh each result it lists.
+    """
+    weights = [max(0.0, weight_of(item)) for item in items]
+    total = sum(weights)
+
+    return [weight / total if total > 0 else 1 / len(items) for weight in weights]
+
+
 def rand_int(low: int, high: int) -> int:
     """Return a random integer between `low` and `high`, both inclusive."""
     return low + int(random() * (high - low + 1))

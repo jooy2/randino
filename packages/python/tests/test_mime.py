@@ -83,4 +83,4 @@ def test_unique_never_repeats_a_type() -> None:
     found = rand_mime_type(type="image", unique=True, count=100)
 
     assert len(set(found)) == len(found)
-    assert len(found) > 5
+    assert set(found) == {entry.mime_type for entry in MIME_TYPE_ENTRIES if entry.type == "image"}

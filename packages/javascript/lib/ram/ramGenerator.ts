@@ -4,15 +4,17 @@
 import { capacityCandidates, writeCapacity } from '../_internal/capacity.js';
 import type { CapacityCandidate } from '../_internal/capacity.js';
 import {
-	collect,
+	collectFrom,
 	resolveOption,
 	resolvePlatforms,
 	resolveRandom,
 	resolveYears
 } from '../_internal/generate.js';
-import { pick, pickWeighted, withRandom } from '../_internal/utils.js';
+import type { Outcome } from '../_internal/generate.js';
+import { shares, withRandom } from '../_internal/utils.js';
 import type {
 	RamDetail,
+	RamType,
 	RamUnit,
 	RamUnitOption,
 	RandRamOptions,
@@ -25,6 +27,9 @@ const RAM_UNIT_OPTIONS: readonly RamUnitOption[] = [...RAM_UNITS, 'auto'];
 
 /** A size one call may land on, with the kinds of memory it was sold as. */
 type Candidate = CapacityCandidate<RamUnit> & { types: readonly RamTypeEntry[] };
+
+/** One result a call may land on: a size on a platform, and the kind of memory it was sold as. */
+type Drawn = { platform: SystemPlatform; candidate: Candidate; type: RamType };
 
 /** `capacity` with the kind of memory after it where the call asked for it. */
 export function writeRam(capacity: string, type: string, includeType: boolean): string {
@@ -82,31 +87,29 @@ export function generateRamDetails(options: RandRamOptions = {}): RamDetail[] {
 	const unit = asked === 'auto' && !includeUnit ? RAM_SCALE.reference : asked;
 	const candidates = candidatesFor(options, unit);
 
-	return withRandom(resolveRandom(options.random), () =>
-		collect(
-			{ count: candidates.length ? options.count : 0, unique: options.unique },
-			() => {
-				// The platform first, so `'all'` is half desktops and half phones, then
-				// the size, then the kind of memory that size was sold as.
-				const { platform, sizes } = pick(candidates);
-				const {
-					size,
-					unit: written,
-					value,
-					types
-				} = pickWeighted(sizes, (candidate) => candidate.weight);
-				const { type } = pickWeighted(types, (entry) => entry.weight);
+	// The platform first, so `'all'` is half desktops and half phones, then the
+	// size, then the kind of memory that size was sold as.
+	const outcomes = candidates.flatMap(({ platform, sizes }): Outcome<Drawn>[] => {
+		const sizeShares = shares(sizes, (candidate) => candidate.weight);
 
-				return {
-					ram: writeRam(writeCapacity(value, written, includeUnit), type, includeType),
-					value,
-					unit: written,
-					bytes: size * RAM_SCALE.bytes,
-					type,
-					platform
-				};
-			},
-			(detail) => detail.ram
-		)
+		return sizes.flatMap((candidate, size) =>
+			shares(candidate.types, (entry) => entry.weight).map((share, index) => ({
+				entry: { platform, candidate, type: candidate.types[index].type },
+				weight: (sizeShares[size] * share) / candidates.length
+			}))
+		);
+	});
+	const write = ({ candidate, type }: Drawn) =>
+		writeRam(writeCapacity(candidate.value, candidate.unit, includeUnit), type, includeType);
+
+	return withRandom(resolveRandom(options.random), () =>
+		collectFrom({ count: options.count, unique: options.unique }, outcomes, write, (drawn) => ({
+			ram: write(drawn),
+			value: drawn.candidate.value,
+			unit: drawn.candidate.unit,
+			bytes: drawn.candidate.size * RAM_SCALE.bytes,
+			type: drawn.type,
+			platform: drawn.platform
+		}))
 	);
 }

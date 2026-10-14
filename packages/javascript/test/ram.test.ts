@@ -360,11 +360,18 @@ describe('Ram', () => {
 	});
 
 	it('unique never repeats a size, and stops when the sizes run out', () => {
-		// Kept to the common sizes, so every one of them is reached long before the
-		// draws run out: the rarest of the whole pool is a draw in a thousand.
 		const ram = randRam({ minSize: 4, maxSize: 16, unique: true, count: 100 });
 
 		assert.strictEqual(new Set(ram).size, ram.length);
 		assert.deepStrictEqual([...ram].sort(), ['12 GB', '16 GB', '4 GB', '6 GB', '8 GB']);
+
+		// The whole pool too, though its rarest size is a draw in a thousand.
+		const every = randRam({ unique: true, count: 100, output: 'detail' });
+
+		assert.strictEqual(new Set(every.map((detail) => detail.ram)).size, every.length);
+		assert.deepStrictEqual(
+			every.map((detail) => detail.bytes / MEGABYTE).sort((a, b) => a - b),
+			[...sizes].sort((a, b) => a - b)
+		);
 	});
 });

@@ -2,8 +2,8 @@
 
 from collections.abc import Callable
 
-from randino._internal.generate import collect, resolve_many
-from randino._internal.utils import pick_weighted, with_random
+from randino._internal.generate import collect_from, resolve_many
+from randino._internal.utils import with_random
 from randino._types import FileExtensionDetail
 from randino.file.data import FILE_CATEGORIES, FILE_EXTENSIONS
 
@@ -23,21 +23,17 @@ def generate_file_extension_details(
     # Worked out once per call rather than per draw.
     candidates = [entry for entry in FILE_EXTENSIONS if entry.category in categories]
 
-    def draw() -> FileExtensionDetail:
-        entry = pick_weighted(candidates, lambda each: each.weight)
-
-        return FileExtensionDetail(
-            extension=dot + entry.name,
-            name=entry.name,
-            category=entry.category,
-            mime_type=entry.mime_type,
-        )
-
     with with_random(random):
-        return collect(
+        return collect_from(
             count=count,
             unique=unique,
             starts_with="",
-            draw=draw,
-            key_of=lambda detail: detail.extension,
+            outcomes=[(entry, entry.weight) for entry in candidates],
+            key_of=lambda entry: dot + entry.name,
+            build=lambda entry: FileExtensionDetail(
+                extension=dot + entry.name,
+                name=entry.name,
+                category=entry.category,
+                mime_type=entry.mime_type,
+            ),
         )

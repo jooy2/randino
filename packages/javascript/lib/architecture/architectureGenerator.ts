@@ -1,8 +1,13 @@
 // The architecture generator: what a machine's processor runs, by the name a
 // toolchain writes it, mostly x86 and Arm.
 
-import { collect, resolveOption, resolvePlatforms, resolveRandom } from '../_internal/generate.js';
-import { pick, pickWeighted, withRandom } from '../_internal/utils.js';
+import {
+	collectFrom,
+	resolveOption,
+	resolvePlatforms,
+	resolveRandom
+} from '../_internal/generate.js';
+import { shares, withRandom } from '../_internal/utils.js';
 import type {
 	Architecture,
 	ArchitectureDetail,
@@ -46,16 +51,22 @@ export function generateArchitectureDetails(
 		}))
 		.filter((each) => each.architectures.length > 0);
 
+	// The platform first, so `'all'` is half desktops and half phones.
+	const outcomes = candidates.flatMap(({ platform, architectures }) =>
+		shares(architectures, (each) => ARCHITECTURE_DATA[each].weights[platform]!).map(
+			(share, index) => ({
+				entry: { platform, architecture: architectures[index] },
+				weight: share / candidates.length
+			})
+		)
+	);
+
 	return withRandom(resolveRandom(options.random), () =>
-		collect(
-			{ count: candidates.length ? options.count : 0, unique: options.unique },
-			() => {
-				// The platform first, so `'all'` is half desktops and half phones.
-				const { platform, architectures } = pick(candidates);
-				const architecture = pickWeighted(
-					architectures,
-					(each) => ARCHITECTURE_DATA[each].weights[platform]!
-				);
+		collectFrom(
+			{ count: options.count, unique: options.unique },
+			outcomes,
+			({ architecture }) => writeArchitecture(architecture, naming),
+			({ platform, architecture }) => {
 				const { bits, family, rare } = ARCHITECTURE_DATA[architecture];
 				const written = writeArchitecture(architecture, naming);
 
@@ -68,8 +79,7 @@ export function generateArchitectureDetails(
 					rare,
 					platform
 				};
-			},
-			(detail) => detail.architecture
+			}
 		)
 	);
 }

@@ -13,7 +13,7 @@ from typing import Any
 import randino
 
 # Internal, but every generator's length options and draws go through them.
-from randino._internal.generate import collect, length_bounds
+from randino._internal.generate import collect, collect_from, length_bounds
 
 SOURCE = pathlib.Path(randino.__file__).parent
 
@@ -743,3 +743,62 @@ def test_a_unique_call_that_asks_for_a_whole_pool_gets_all_of_it() -> None:
     )
 
     assert len(drawn) == size
+
+
+def test_a_catalog_draws_each_result_by_its_weight_and_a_unique_call_ends_with_every_one() -> None:
+    # `collect_from` deals a unique call out of the list itself, so a result a million times
+    # rarer than the rest is still among what it returns. Two outcomes written alike are one
+    # result, and one of no weight never comes up.
+    outcomes = [
+        ("common", 1_000_000.0),
+        ("rare", 1.0),
+        ("never", 0.0),
+        ("twice", 1.0),
+        ("twice", 1.0),
+    ]
+
+    def unique_from(
+        listed: list[tuple[str, float]], *, starts_with: str = "", count: int = 10
+    ) -> list[str]:
+        return collect_from(
+            count=count,
+            unique=True,
+            starts_with=starts_with,
+            outcomes=listed,
+            key_of=str,
+            build=str,
+        )
+
+    assert sorted(unique_from(outcomes)) == ["common", "rare", "twice"]
+    assert unique_from(outcomes, starts_with="r") == ["rare"]
+
+    # A table of zeros is drawn evenly, the way `pick_weighted` reads one.
+    assert len(unique_from([("x", 0.0), ("y", 0.0)])) == 2
+
+    # An entry written as nothing is never returned, however likely it is.
+    blank = [("", 1_000_000.0), ("a", 1.0)]
+
+    assert unique_from(blank) == ["a"]
+    assert collect_from(
+        count=3, unique=False, starts_with="", outcomes=blank, key_of=str, build=str
+    ) == ["a", "a", "a"]
+
+    # Each result is built for itself, so two that came up on one entry are two objects,
+    # the way two draws were.
+    built = collect_from(
+        count=2,
+        unique=False,
+        starts_with="",
+        outcomes=[("a", 1.0)],
+        key_of=str,
+        build=lambda entry: [entry],
+    )
+
+    assert built[0] is not built[1]
+
+    # The first of a unique call is each result's by its share of the weight: three in four
+    # here, and 4,000 calls hold it within seven deviations.
+    shared = [("a", 1.0), ("b", 3.0)]
+    first = sum(unique_from(shared, count=2)[0] == "b" for _ in range(4000))
+
+    assert 2800 < first < 3200, first

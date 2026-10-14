@@ -2,9 +2,16 @@
 // the label a form in the language writes for it, or for `nonbinary` with
 // `nonbinaryIdentity` on, the identity a person names themselves by.
 
-import { collect, resolveRandom } from '../_internal/generate.js';
-import { pick, pickWeighted, withRandom } from '../_internal/utils.js';
-import type { GenderCode, GenderDetail, RandGenderOptions } from '../_types/global.js';
+import { collectFrom, resolveRandom } from '../_internal/generate.js';
+import type { Outcome } from '../_internal/generate.js';
+import { shares, withRandom } from '../_internal/utils.js';
+import type {
+	GenderCode,
+	GenderDetail,
+	NonbinaryIdentity,
+	RandGenderOptions,
+	WordLanguage
+} from '../_types/global.js';
 import { WORD_LANGUAGES, resolveWordLanguage } from '../word/data/index.js';
 import {
 	GENDER_CODES,
@@ -14,6 +21,9 @@ import {
 	NONBINARY_LABELS,
 	NONBINARY_WEIGHTS
 } from './data/index.js';
+
+/** One result a call may land on: a code, the language it is written in, and its identity. */
+type Drawn = { code: GenderCode; language: WordLanguage; identity: NonbinaryIdentity | null };
 
 /** The codes a call may answer with: the two that are always on, and whichever of the others it asked for. */
 function codesFor(options: RandGenderOptions): readonly GenderCode[] {
@@ -30,27 +40,32 @@ export function generateGenderDetails(options: RandGenderOptions = {}): GenderDe
 	const codes = codesFor(options);
 	const identity = options.nonbinaryIdentity === true;
 
-	return withRandom(resolveRandom(options.random), () =>
-		collect(
-			{ count: options.count, unique: options.unique },
-			() => {
-				const code = pickWeighted(codes, (each) => GENDER_WEIGHTS[each]);
-				const drawn = pick(languages);
-				// Drawn after the language and only for `nonbinary`, so a call without
-				// the option makes the same draws it always made.
-				const named =
-					code === 'nonbinary' && identity
-						? pickWeighted(NONBINARY_IDENTITIES, (each) => NONBINARY_WEIGHTS[each])
-						: null;
+	// The code by its weight, the language evenly, and for `nonbinary` with the
+	// option on, the identity by its own weight.
+	const identityShares = shares(NONBINARY_IDENTITIES, (each) => NONBINARY_WEIGHTS[each]);
+	const outcomes = shares(codes, (each) => GENDER_WEIGHTS[each]).flatMap((share, index) => {
+		const code = codes[index];
+		const forms: { identity: NonbinaryIdentity | null; share: number }[] =
+			code === 'nonbinary' && identity
+				? NONBINARY_IDENTITIES.map((each, at) => ({ identity: each, share: identityShares[at] }))
+				: [{ identity: null, share: 1 }];
 
-				return {
-					gender: named === null ? GENDER_LABELS[drawn][code] : NONBINARY_LABELS[drawn][named],
-					code,
-					language: drawn,
-					identity: named
-				};
-			},
-			(detail) => detail.gender
-		)
+		return languages.flatMap((language): Outcome<Drawn>[] =>
+			forms.map((each) => ({
+				entry: { code, language, identity: each.identity },
+				weight: (share * each.share) / languages.length
+			}))
+		);
+	});
+	const label = ({ code, language, identity: named }: Drawn) =>
+		named === null ? GENDER_LABELS[language][code] : NONBINARY_LABELS[language][named];
+
+	return withRandom(resolveRandom(options.random), () =>
+		collectFrom({ count: options.count, unique: options.unique }, outcomes, label, (drawn) => ({
+			gender: label(drawn),
+			code: drawn.code,
+			language: drawn.language,
+			identity: drawn.identity
+		}))
 	);
 }

@@ -4,7 +4,8 @@
 // `randName`, `randNickname` and `randWord` differ in what one draw produces and
 // in nothing else about this — the same clamping, the same `startsWith` filter,
 // the same `unique` bookkeeping and the same attempt budget. Written once here,
-// a new generator gets all of it by calling `collect`.
+// a new generator gets all of it by calling `collect`, or `collectFrom` when it
+// can list every result it may return.
 
 import {
 	RAND_COUNT_MAX,
@@ -19,7 +20,7 @@ import type {
 	SystemPlatform
 } from '../_types/global.js';
 import { writesScript } from './script.js';
-import { clamp, pick } from './utils.js';
+import { clamp, pick, random } from './utils.js';
 
 /**
  * A whole number, or `undefined` for anything that is not one.
@@ -287,7 +288,7 @@ export function languagesFitting<T extends string>(
 // same odds to a result one draw in a hundred finds. Only a call of more than
 // thirty results ever reaches the floor, since a smaller one runs out of attempts
 // first. A pool drawn by weight can still stop short of a result far rarer than
-// the rest, such as the rarest releases `randOs` draws.
+// the rest, which is why a catalog draws through `collectFrom` instead.
 const COLLECT_STALL = 2000;
 const COLLECT_STALL_PER_RESULT = 20;
 
@@ -347,6 +348,147 @@ export function collect<T>(
 
 		results.push(item);
 		missed = 0;
+	}
+
+	return results;
+}
+
+/** What a catalog builds one result from, and how likely that result is against the others. */
+export type Outcome<E> = { entry: E; weight: number };
+
+/**
+ * `collect` for a generator that can list every result it may return — a
+ * catalog, where a draw only picks. Each result comes up as often as its weight
+ * says, and two outcomes with the same `keyOf` are one result, as likely as the
+ * two of them together. `build` writes the result out of the entry it came up
+ * on, once for each time it comes up, so no two results are the same object.
+ *
+ * A `unique` call takes each result out as it comes up, which deals the same
+ * odds as drawing again on a repeat and stops exactly when the list runs out.
+ * `collect` can only guess that from a run of draws that found nothing new, and
+ * a list drawn by weight beat the guess: `randOs` asked for every release came
+ * back short one call in six, even once the run grew with what had been found.
+ */
+export function collectFrom<E, T>(
+	options: RandCommonOptions,
+	outcomes: readonly Outcome<E>[],
+	keyOf: (entry: E) => string,
+	build: (entry: E) => T
+): T[] {
+	const count = resolveCount(options.count);
+	const prefix = resolvePrefix(options.startsWith).toLowerCase();
+	const unique = options.unique ?? false;
+
+	if (prefix) {
+		const fitting = outcomes.filter(({ entry }) => keyOf(entry).toLowerCase().startsWith(prefix));
+
+		return dealFrom(fitting, count, unique, keyOf, build)!;
+	}
+
+	// Without a `startsWith` a key is read only for what comes up — one for a call of
+	// one, rather than the whole catalog's. A result whose key is empty is never
+	// returned, so an entry written as nothing sends the call back to deal from the
+	// entries that are written as something.
+	const keyed = (entry: E) => keyOf(entry) || null;
+
+	return (
+		dealFrom(outcomes, count, unique, keyed, build) ??
+		dealFrom(
+			outcomes.filter(({ entry }) => keyOf(entry) !== ''),
+			count,
+			unique,
+			keyOf,
+			build
+		)!
+	);
+}
+
+/**
+ * The draw `collectFrom` makes once the outcomes are the ones it may return:
+ * `null` when one of them turns out to have no key, which only a list it has not
+ * read every key of can hold.
+ */
+function dealFrom<E, T>(
+	outcomes: readonly Outcome<E>[],
+	count: number,
+	unique: boolean,
+	keyed: (entry: E) => string | null,
+	build: (entry: E) => T
+): T[] | null {
+	// An outcome of no weight never comes up, unless none has any, when each is as
+	// likely as the next — the way `pickWeighted` reads a table of zeros.
+	const weighted = outcomes.every(({ weight }) => weight > 0)
+		? outcomes
+		: outcomes.filter(({ weight }) => weight > 0);
+	const pool = weighted.length ? weighted : outcomes.map(({ entry }) => ({ entry, weight: 1 }));
+	const results: T[] = [];
+
+	if (!pool.length) {
+		return results;
+	}
+
+	if (!unique) {
+		// The running total of the weights, so a draw is a search rather than a walk
+		// down the list: a call of ten thousand would otherwise read it ten thousand
+		// times.
+		const totals: number[] = [];
+		// Whether each entry has a key, read the first time it comes up.
+		const checked: boolean[] = [];
+		let total = 0;
+
+		for (const { weight } of pool) {
+			total += weight;
+			totals.push(total);
+		}
+
+		while (results.length < count) {
+			const roll = random() * total;
+			let low = 0;
+			let high = totals.length - 1;
+
+			while (low < high) {
+				const middle = (low + high) >> 1;
+
+				if (totals[middle] > roll) {
+					high = middle;
+				} else {
+					low = middle + 1;
+				}
+			}
+
+			const { entry } = pool[low];
+
+			if (!checked[low]) {
+				if (keyed(entry) === null) return null;
+
+				checked[low] = true;
+			}
+
+			results.push(build(entry));
+		}
+
+		return results;
+	}
+
+	// Each outcome waits a time drawn at the rate of its weight, and they come up in
+	// the order a draw that skips repeats would find them: the first is each one's
+	// by its share of the weight, and so is every next one among those left. An
+	// outcome whose key came up before it is the repeat that draw would skip.
+	const order = pool
+		.map(({ entry, weight }) => ({ entry, at: -Math.log(1 - random()) / weight }))
+		.sort((a, b) => a.at - b.at);
+	const seen = new Set<string>();
+
+	for (const { entry } of order) {
+		if (results.length >= count) break;
+
+		const key = keyed(entry);
+
+		if (key === null) return null;
+		if (seen.has(key)) continue;
+
+		seen.add(key);
+		results.push(build(entry));
 	}
 
 	return results;

@@ -128,6 +128,23 @@ void main() {
       );
 
       expect(genders.toList()..sort(), <String>['Female', 'Male', 'Unknown']);
+
+      // Every identity too, though the rarest of them is a draw in a few thousand.
+      final every = randGender(
+        language: WordLanguage.en,
+        includeUnknown: true,
+        includeNonbinary: true,
+        nonbinaryIdentity: true,
+        unique: true,
+        count: 100,
+      );
+
+      expect(every.toSet(), {
+        for (final code in <GenderCode>[GenderCode.female, GenderCode.male, GenderCode.unknown])
+          genderLabels[WordLanguage.en]![code]!,
+        for (final identity in nonbinaryIdentities) nonbinaryLabels[WordLanguage.en]![identity]!,
+      });
+      expect(every.toSet(), hasLength(every.length));
     });
 
     test('every language writes every identity, none alike and none a form label', () {

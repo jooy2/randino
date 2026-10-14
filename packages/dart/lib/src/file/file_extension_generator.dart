@@ -26,21 +26,19 @@ List<FileExtensionDetail> generateFileExtensionDetails({
 
   return withRandom(
     random,
-    () => collect<FileExtensionDetail>(
+    () => collectFrom(
       count: count,
       unique: unique,
       startsWith: '',
-      draw: () {
-        final entry = pickWeighted(candidates, (each) => each.weight);
-
-        return FileExtensionDetail(
-          extension: '$dot${entry.name}',
-          name: entry.name,
-          category: entry.category,
-          mimeType: entry.mimeType,
-        );
-      },
-      keyOf: (detail) => detail.extension,
+      outcomes: [for (final entry in candidates) (entry: entry, weight: entry.weight.toDouble())],
+      keyOf: (entry) => '$dot${entry.name}',
+      build:
+          (entry) => FileExtensionDetail(
+            extension: '$dot${entry.name}',
+            name: entry.name,
+            category: entry.category,
+            mimeType: entry.mimeType,
+          ),
     ),
   );
 }

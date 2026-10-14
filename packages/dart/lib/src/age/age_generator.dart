@@ -83,31 +83,16 @@ List<AgeDetail> generateAgeDetails({
     group: group,
     distribution: distribution,
   );
-  // A unique call takes each age out once it is drawn, which deals the same odds
-  // as drawing again on a repeat and stops when the ages run out, rather than
-  // spending the whole attempt budget on repeats. An age the curve gives no
-  // weight is left out of it, since a repeat would never have reached that age
-  // either.
-  final weighted = candidates.where((candidate) => candidate.$2 > 0).toList();
-  final left = unique ? (weighted.isNotEmpty ? weighted : candidates.toList()) : candidates;
-  final wanted = unique ? min(resolveCount(count), left.length) : count;
 
   return withRandom(
     random,
-    () => collect<AgeDetail>(
-      count: wanted,
+    () => collectFrom(
+      count: count,
       unique: unique,
       startsWith: '',
-      draw: () {
-        final drawn = pickWeighted(left, (candidate) => candidate.$2);
-
-        if (unique) {
-          left.remove(drawn);
-        }
-
-        return AgeDetail(age: drawn.$1, group: groupOf(drawn.$1));
-      },
-      keyOf: (detail) => '${detail.age}',
+      outcomes: [for (final (age, weight) in candidates) (entry: age, weight: weight.toDouble())],
+      keyOf: (age) => '$age',
+      build: (age) => AgeDetail(age: age, group: groupOf(age)),
     ),
   );
 }

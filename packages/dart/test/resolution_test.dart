@@ -125,7 +125,10 @@ void main() {
       final found = randResolution(platform: SystemPlatform.desktop, unique: true, count: 100);
 
       expect(found.toSet(), hasLength(found.length));
-      expect(found.length, greaterThan(15));
+      expect(found.toSet(), {
+        for (final entry in resolutions)
+          if (entry.platform == SystemPlatform.desktop) '${entry.width}x${entry.height}',
+      });
     });
   });
 }

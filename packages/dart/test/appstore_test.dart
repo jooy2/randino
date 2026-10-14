@@ -100,7 +100,7 @@ void main() {
       final found = randAppStore(unique: true, count: 100);
 
       expect(found.toSet(), hasLength(found.length));
-      expect(found.length, inInclusiveRange(11, appStores.length));
+      expect(found.toSet(), {for (final entry in appStores) entry.full});
     });
   });
 }

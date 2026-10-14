@@ -4,13 +4,13 @@
 // draw may land on, and every part left is as likely as the next.
 
 import {
-	collect,
+	collectFrom,
 	resolveMany,
 	resolvePlatforms,
 	resolveRandom,
 	resolveYears
 } from '../_internal/generate.js';
-import { pick, withRandom } from '../_internal/utils.js';
+import { withRandom } from '../_internal/utils.js';
 import type { CpuDetail, RandCpuOptions } from '../_types/global.js';
 import { CPUS, CPU_VENDORS } from './data/index.js';
 import type { CpuEntry } from './data/index.js';
@@ -36,22 +36,19 @@ export function generateCpuDetails(options: RandCpuOptions = {}): CpuDetail[] {
 	);
 
 	return withRandom(resolveRandom(options.random), () =>
-		collect(
+		collectFrom(
 			// Only the options a processor has: a `startsWith` slipped past the types
 			// would otherwise filter parts by their first letter.
-			{ count: candidates.length ? options.count : 0, unique: options.unique },
-			() => {
-				const entry = pick(candidates);
-
-				return {
-					cpu: writeCpu(entry, includeVendor),
-					vendor: entry.vendor,
-					model: entry.model,
-					platform: entry.platform,
-					year: entry.year
-				};
-			},
-			(detail) => detail.cpu
+			{ count: options.count, unique: options.unique },
+			candidates.map((entry) => ({ entry, weight: 1 })),
+			(entry) => writeCpu(entry, includeVendor),
+			(entry) => ({
+				cpu: writeCpu(entry, includeVendor),
+				vendor: entry.vendor,
+				model: entry.model,
+				platform: entry.platform,
+				year: entry.year
+			})
 		)
 	);
 }

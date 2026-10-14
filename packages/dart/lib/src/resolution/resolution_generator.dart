@@ -25,25 +25,29 @@ List<ResolutionDetail> generateResolutionDetails({
       ],
   ];
 
+  // The platform first, so a null one is half screens of each kind rather than
+  // whichever kind the table happens to list more sizes for.
+  final outcomes = <Outcome<ResolutionEntry>>[
+    for (final pool in pools)
+      for (final (index, share) in shares(pool, (each) => each.weight).indexed)
+        (entry: pool[index], weight: share / pools.length),
+  ];
+
   return withRandom(
     random,
-    () => collect<ResolutionDetail>(
+    () => collectFrom(
       count: count,
       unique: unique,
       startsWith: '',
-      draw: () {
-        // The platform first, so a null one is half screens of each kind rather
-        // than whichever kind the table happens to list more sizes for.
-        final entry = pickWeighted(pick(pools), (each) => each.weight);
-
-        return ResolutionDetail(
-          resolution: '${entry.width}$separator${entry.height}',
-          width: entry.width,
-          height: entry.height,
-          platform: entry.platform,
-        );
-      },
-      keyOf: (detail) => detail.resolution,
+      outcomes: outcomes,
+      keyOf: (entry) => '${entry.width}$separator${entry.height}',
+      build:
+          (entry) => ResolutionDetail(
+            resolution: '${entry.width}$separator${entry.height}',
+            width: entry.width,
+            height: entry.height,
+            platform: entry.platform,
+          ),
     ),
   );
 }

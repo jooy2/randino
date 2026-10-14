@@ -25,25 +25,29 @@ List<AppStoreDetail> generateAppStoreDetails({
       ],
   ];
 
+  // The platform first, so a null one is half stores of each kind rather than
+  // whichever kind the table happens to list more stores for.
+  final outcomes = <Outcome<AppStoreEntry>>[
+    for (final pool in pools)
+      for (final (index, share) in shares(pool, (each) => each.weight).indexed)
+        (entry: pool[index], weight: share / pools.length),
+  ];
+
   return withRandom(
     random,
-    () => collect<AppStoreDetail>(
+    () => collectFrom(
       count: count,
       unique: unique,
       startsWith: '',
-      draw: () {
-        // The platform first, so a null one is half stores of each kind rather
-        // than whichever kind the table happens to list more stores for.
-        final entry = pickWeighted(pick(pools), (each) => each.weight);
-
-        return AppStoreDetail(
-          store: includeCompany ? entry.full : entry.name,
-          name: entry.name,
-          company: entry.company,
-          platform: entry.platform,
-        );
-      },
-      keyOf: (detail) => detail.store,
+      outcomes: outcomes,
+      keyOf: (entry) => includeCompany ? entry.full : entry.name,
+      build:
+          (entry) => AppStoreDetail(
+            store: includeCompany ? entry.full : entry.name,
+            name: entry.name,
+            company: entry.company,
+            platform: entry.platform,
+          ),
     ),
   );
 }

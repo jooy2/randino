@@ -7,8 +7,8 @@ narrows what may be picked rather than shaping what is written afterwards.
 
 from collections.abc import Callable
 
-from randino._internal.generate import collect, resolve_many, resolve_platforms, resolve_years
-from randino._internal.utils import pick, pick_weighted, with_random
+from randino._internal.generate import collect_from, resolve_many, resolve_platforms, resolve_years
+from randino._internal.utils import shares, with_random
 from randino._types import OsDetail, OsFamily, OsFamilyOption, SystemPlatform, SystemPlatformOption
 from randino.os.data import OS_FAMILIES, OS_FAMILY_CODES, OS_RELEASES, OsBuild, OsRelease
 
@@ -96,30 +96,52 @@ def generate_os_details(
     lines = list(families)
     with_edition = with_version and include_edition is True
 
-    def draw() -> OsDetail:
-        # The line first, by how common it is among the lines left, and the release inside
-        # it second.
-        line = pick_weighted(lines, lambda each: OS_FAMILIES[each].weight)
-        release, builds = pick(families[line])
-        build = pick(builds) if builds else None
-        edition = pick(release.editions) if with_edition and release.editions else None
+    outcomes: list[tuple[tuple[OsFamily, OsRelease, OsBuild | None, str | None], float]] = []
+
+    # The line first, by how common it is among the lines left, and the release inside it
+    # second, each as likely as the next; then a build and an edition of it where the call
+    # asked for them.
+    for line, share in zip(
+        lines, shares(lines, lambda each: OS_FAMILIES[each].weight), strict=True
+    ):
+        releases = families[line]
+
+        for release, builds in releases:
+            written: list[OsBuild | None] = list(builds) if builds else [None]
+            editions: list[str | None] = (
+                list(release.editions) if with_edition and release.editions else [None]
+            )
+            weight = share / len(releases) / len(written) / len(editions)
+
+            for build in written:
+                for edition in editions:
+                    outcomes.append(((line, release, build, edition), weight))
+
+    def write(entry: tuple[OsFamily, OsRelease, OsBuild | None, str | None]) -> str:
+        _, release, build, edition = entry
+
+        return write_os(release, build, edition) if with_version else release.name
+
+    def detail_of(entry: tuple[OsFamily, OsRelease, OsBuild | None, str | None]) -> OsDetail:
+        line, release, drawn, edition = entry
 
         return OsDetail(
-            os=write_os(release, build, edition) if with_version else release.name,
+            os=write(entry),
             name=release.name,
             version=release.version if with_version else None,
-            build=build.text if build is not None else None,
+            build=drawn.text if drawn is not None else None,
             edition=edition,
             family=line,
             platform=OS_FAMILIES[line].platform,
-            year=build.year if build is not None else release.year,
+            year=drawn.year if drawn is not None else release.year,
         )
 
     with with_random(random):
-        return collect(
-            count=count if lines else 0,
+        return collect_from(
+            count=count,
             unique=unique,
             starts_with="",
-            draw=draw,
-            key_of=lambda detail: detail.os,
+            outcomes=outcomes,
+            key_of=write,
+            build=detail_of,
         )

@@ -2,7 +2,7 @@
 
 ## vNext (2026--)
 
-- A `unique` call that asks for a whole pool gets all of it. `randCountry({ language: 'en', unique: true, count: 300 })` returned 248 countries about once in three thousand calls, and `randWord({ language: 'en', unique: true, count: 10000 })` came back several words short nearly every time, because a call gave up after two thousand draws in a row found nothing new. It now waits twenty draws for each result it has found, so a call that has run out takes longer to give up. A catalog drawn by weight can still miss its rarest entries: `randOs` asked for every release comes back short about one call in six.
+- A `unique` call that asks for a whole pool gets all of it. `randCountry({ language: 'en', unique: true, count: 300 })` returned 248 countries about once in three thousand calls, `randWord({ language: 'en', unique: true, count: 10000 })` came back several words short nearly every time, and `randOs` asked for every release missed one about half the time, because a call gave up after two thousand draws in a row found nothing new. A catalog — `randOs` and every other system value but `randVersion`, and `randGender` and `randAge` — now takes each result out of its list as it comes up, so it stops exactly when the list runs out, and gets there faster than drawing again on every repeat did. Every other generator waits twenty draws for each result it has found, so a call that has run out takes longer to give up. A seeded call to a catalog returns other values than it did, each as likely as before.
 
 ## 1.5.0 (2026-10-11)
 

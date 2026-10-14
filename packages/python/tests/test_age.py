@@ -6,6 +6,7 @@ from randino import AGE_GROUPS, RAND_AGE_MAX, RAND_COUNT_MAX, AgeGroup, rand_age
 
 # Internal, but they are what an age is checked against: the bands say which group an
 # age is in, and the curve is what the draw follows.
+from randino.age._generator import curve_weight
 from randino.age.data import AGE_BANDS, AGE_CURVE
 
 SAMPLE = 60
@@ -141,3 +142,9 @@ def test_unique_never_repeats_an_age_and_stops_when_the_range_runs_out() -> None
     many = rand_age(count=50, unique=True)
 
     assert len(set(many)) == len(many)
+
+    # Every age the curve reaches, though the oldest of them are rarer than one in ten
+    # thousand.
+    every = rand_age(max_age=RAND_AGE_MAX, count=200, unique=True)
+
+    assert sorted(every) == [age for age in range(RAND_AGE_MAX + 1) if curve_weight(age) > 0]

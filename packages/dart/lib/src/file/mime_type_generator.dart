@@ -24,21 +24,19 @@ List<MimeTypeDetail> generateMimeTypeDetails({
 
   return withRandom(
     random,
-    () => collect<MimeTypeDetail>(
+    () => collectFrom(
       count: count,
       unique: unique,
       startsWith: '',
-      draw: () {
-        final entry = pickWeighted(candidates, (each) => each.weight);
-
-        return MimeTypeDetail(
-          mimeType: entry.mimeType,
-          type: entry.type,
-          subtype: entry.subtype,
-          extensions: entry.extensions,
-        );
-      },
-      keyOf: (detail) => detail.mimeType,
+      outcomes: [for (final entry in candidates) (entry: entry, weight: entry.weight.toDouble())],
+      keyOf: (entry) => entry.mimeType,
+      build:
+          (entry) => MimeTypeDetail(
+            mimeType: entry.mimeType,
+            type: entry.type,
+            subtype: entry.subtype,
+            extensions: entry.extensions,
+          ),
     ),
   );
 }

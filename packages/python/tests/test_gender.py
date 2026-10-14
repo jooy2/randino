@@ -123,6 +123,22 @@ def test_unique_never_repeats_a_label_and_stops_when_the_labels_run_out() -> Non
 
     assert sorted(genders) == ["Female", "Male", "Unknown"]
 
+    # Every identity too, though the rarest of them is a draw in a few thousand.
+    every = rand_gender(
+        language="en",
+        include_unknown=True,
+        include_nonbinary=True,
+        nonbinary_identity=True,
+        unique=True,
+        count=100,
+    )
+
+    assert len(set(every)) == len(every)
+    assert set(every) == {
+        *(GENDER_LABELS["en"][code] for code in ("female", "male", "unknown")),
+        *(NONBINARY_LABELS["en"][identity] for identity in NONBINARY_IDENTITIES),
+    }
+
 
 def test_every_language_writes_every_identity_none_alike_and_none_a_form_label() -> None:
     assert set(NONBINARY_LABELS) == set(WORD_LANGUAGES)

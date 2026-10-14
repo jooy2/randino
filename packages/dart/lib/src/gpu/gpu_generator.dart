@@ -48,22 +48,20 @@ List<GpuDetail> generateGpuDetails({
 
   return withRandom(
     random,
-    () => collect<GpuDetail>(
-      count: candidates.isEmpty ? 0 : count,
+    () => collectFrom(
+      count: count,
       unique: unique,
       startsWith: '',
-      draw: () {
-        final entry = pick(candidates);
-
-        return GpuDetail(
-          gpu: writeGpu(entry, includeVendor),
-          vendor: entry.vendor,
-          model: entry.model,
-          platform: entry.platform,
-          year: entry.year,
-        );
-      },
-      keyOf: (detail) => detail.gpu,
+      outcomes: [for (final entry in candidates) (entry: entry, weight: 1.0)],
+      keyOf: (entry) => writeGpu(entry, includeVendor),
+      build:
+          (entry) => GpuDetail(
+            gpu: writeGpu(entry, includeVendor),
+            vendor: entry.vendor,
+            model: entry.model,
+            platform: entry.platform,
+            year: entry.year,
+          ),
     ),
   );
 }

@@ -10,6 +10,10 @@ import 'package:randino/src/internal/utils.dart';
 import 'package:randino/src/types.dart';
 import 'package:randino/src/word/data/index.dart';
 
+/// One result a call may land on: a code, the language it is written in, and
+/// its identity.
+typedef _Drawn = ({GenderCode code, WordLanguage language, NonbinaryIdentity? identity});
+
 /// What `randGender` and `randGenderDetails` both do.
 List<GenderDetail> generateGenderDetails({
   WordLanguage? language,
@@ -29,30 +33,51 @@ List<GenderDetail> generateGenderDetails({
         code,
   ];
 
+  // The code by its weight, the language evenly, and for `nonbinary` with the
+  // option on, the identity by its own weight.
+  final identityShares = shares(nonbinaryIdentities, (each) => nonbinaryWeights[each]!);
+  final outcomes = <Outcome<_Drawn>>[];
+
+  for (final (index, share) in shares(codes, (each) => genderWeights[each]!).indexed) {
+    final code = codes[index];
+    final forms = <({NonbinaryIdentity? identity, double share})>[
+      if (code == GenderCode.nonbinary && nonbinaryIdentity)
+        for (final (at, identity) in nonbinaryIdentities.indexed)
+          (identity: identity, share: identityShares[at])
+      else
+        (identity: null, share: 1.0),
+    ];
+
+    for (final drawn in languages) {
+      for (final form in forms) {
+        outcomes.add((
+          entry: (code: code, language: drawn, identity: form.identity),
+          weight: share * form.share / languages.length,
+        ));
+      }
+    }
+  }
+
+  String label(_Drawn drawn) =>
+      drawn.identity == null
+          ? genderLabels[drawn.language]![drawn.code]!
+          : nonbinaryLabels[drawn.language]![drawn.identity]!;
+
   return withRandom(
     random,
-    () => collect<GenderDetail>(
+    () => collectFrom(
       count: count,
       unique: unique,
       startsWith: '',
-      draw: () {
-        final code = pickWeighted(codes, (each) => genderWeights[each]!);
-        final drawn = pick(languages);
-        // Drawn after the language and only for `nonbinary`, so a call without
-        // the option makes the same draws it always made.
-        final named =
-            code == GenderCode.nonbinary && nonbinaryIdentity
-                ? pickWeighted(nonbinaryIdentities, (each) => nonbinaryWeights[each]!)
-                : null;
-
-        return GenderDetail(
-          gender: named == null ? genderLabels[drawn]![code]! : nonbinaryLabels[drawn]![named]!,
-          code: code,
-          language: drawn,
-          identity: named,
-        );
-      },
-      keyOf: (detail) => detail.gender,
+      outcomes: outcomes,
+      keyOf: label,
+      build:
+          (drawn) => GenderDetail(
+            gender: label(drawn),
+            code: drawn.code,
+            language: drawn.language,
+            identity: drawn.identity,
+          ),
     ),
   );
 }

@@ -47,22 +47,20 @@ List<CpuDetail> generateCpuDetails({
 
   return withRandom(
     random,
-    () => collect<CpuDetail>(
-      count: candidates.isEmpty ? 0 : count,
+    () => collectFrom(
+      count: count,
       unique: unique,
       startsWith: '',
-      draw: () {
-        final entry = pick(candidates);
-
-        return CpuDetail(
-          cpu: writeCpu(entry, includeVendor),
-          vendor: entry.vendor,
-          model: entry.model,
-          platform: entry.platform,
-          year: entry.year,
-        );
-      },
-      keyOf: (detail) => detail.cpu,
+      outcomes: [for (final entry in candidates) (entry: entry, weight: 1.0)],
+      keyOf: (entry) => writeCpu(entry, includeVendor),
+      build:
+          (entry) => CpuDetail(
+            cpu: writeCpu(entry, includeVendor),
+            vendor: entry.vendor,
+            model: entry.model,
+            platform: entry.platform,
+            year: entry.year,
+          ),
     ),
   );
 }

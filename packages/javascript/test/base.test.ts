@@ -2,7 +2,7 @@ import assert from 'assert';
 import { describe, it } from 'node:test';
 import * as randino from '../dist/index.js';
 // Internal, but every generator's length options and draws go through them.
-import { collect, lengthBounds } from '../dist/_internal/generate.js';
+import { collect, collectFrom, lengthBounds } from '../dist/_internal/generate.js';
 
 /** A small seeded source, so a test can ask for the same draws twice. */
 function seeded(seed: number): () => number {
@@ -610,5 +610,66 @@ describe('base test', () => {
 		);
 
 		assert.strictEqual(drawn.length, size);
+	});
+
+	it('a catalog draws each result by its weight, and a unique call ends with every one', () => {
+		// `collectFrom` deals a unique call out of the list itself, so a result a
+		// million times rarer than the rest is still among what it returns. Two
+		// outcomes written alike are one result, and one of no weight never comes up.
+		const outcomes = [
+			{ entry: 'common', weight: 1_000_000 },
+			{ entry: 'rare', weight: 1 },
+			{ entry: 'never', weight: 0 },
+			{ entry: 'twice', weight: 1 },
+			{ entry: 'twice', weight: 1 }
+		];
+		const every = collectFrom({ count: 10, unique: true }, outcomes, String, String);
+
+		assert.deepStrictEqual([...every].sort(), ['common', 'rare', 'twice']);
+		assert.deepStrictEqual(
+			collectFrom({ count: 10, unique: true, startsWith: 'r' }, outcomes, String, String),
+			['rare']
+		);
+
+		// A table of zeros is drawn evenly, the way `pickWeighted` reads one.
+		const zeros = [
+			{ entry: 'x', weight: 0 },
+			{ entry: 'y', weight: 0 }
+		];
+
+		assert.strictEqual(collectFrom({ count: 10, unique: true }, zeros, String, String).length, 2);
+
+		// An entry written as nothing is never returned, however likely it is.
+		const blank = [
+			{ entry: '', weight: 1_000_000 },
+			{ entry: 'a', weight: 1 }
+		];
+
+		assert.deepStrictEqual(collectFrom({ count: 10, unique: true }, blank, String, String), ['a']);
+		assert.deepStrictEqual(collectFrom({ count: 3 }, blank, String, String), ['a', 'a', 'a']);
+
+		// Each result is built for itself, so two that came up on one entry are two
+		// objects, the way two draws were.
+		const built = collectFrom({ count: 2 }, [{ entry: 'a', weight: 1 }], String, (entry) => ({
+			entry
+		}));
+
+		assert.notStrictEqual(built[0], built[1]);
+
+		// The first of a unique call is each result's by its share of the weight:
+		// three in four here, and 4,000 calls hold it within seven deviations.
+		const shared = [
+			{ entry: 'a', weight: 1 },
+			{ entry: 'b', weight: 3 }
+		];
+		let first = 0;
+
+		for (let i = 0; i < 4000; i += 1) {
+			if (collectFrom({ count: 2, unique: true }, shared, String, String)[0] === 'b') {
+				first += 1;
+			}
+		}
+
+		assert.ok(first > 2800 && first < 3200, String(first));
 	});
 });
