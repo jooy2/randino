@@ -374,18 +374,28 @@ export function keptOutcomes<E>(
 	key: string,
 	list: () => Outcome<E>[]
 ): readonly Outcome<E>[] {
-	let outcomes = kept.get(key);
+	return keep(kept, key, list);
+}
 
-	if (outcomes === undefined) {
+/**
+ * What `make` works out for one set of options, kept for the calls after under
+ * `key`, which has to name every option the value depends on. A table is let go
+ * at `OUTCOMES_KEPT` keys and filled again, so a caller who moves an option call
+ * by call does not keep a value for every one of them.
+ */
+export function keep<V>(kept: Map<string, V>, key: string, make: () => V): V {
+	let value = kept.get(key);
+
+	if (value === undefined) {
 		if (kept.size >= OUTCOMES_KEPT) {
 			kept.clear();
 		}
 
-		outcomes = list();
-		kept.set(key, outcomes);
+		value = make();
+		kept.set(key, value);
 	}
 
-	return outcomes;
+	return value;
 }
 
 /**

@@ -367,6 +367,10 @@ class _Plan {
   final bool fits;
 }
 
+// The plans each language and set of settings made, kept so a call of one name
+// does not read every template of nine languages to draw it.
+final Map<String, _Plan> _keptPlans = {};
+
 _Plan _planFor(WordLanguage language, _Settings settings) {
   final data = organizationData[language]!;
   final shapes = <OrganizationType, List<_Shape>>{};
@@ -647,10 +651,19 @@ List<OrganizationDetail> generateOrganizationDetails({
   );
   // A language that does not write the requested character, and one with no
   // shape of the requested kinds that can lead with it, are out before a draw.
+  // Every field of `settings` is resolved, so it names the plan whole.
+  final named = [
+    settings.types.map((each) => each.name).join(','),
+    settings.industry?.name,
+    settings.legalForm,
+    settings.invent,
+    settings.prefix,
+    settings.bounds,
+  ].join('|');
   final able =
       [
         for (final code in languagesWriting(language, wordLanguages, settings.prefix))
-          _planFor(code, settings),
+          keep<_Plan>(_keptPlans, '${code.name}|$named', () => _planFor(code, settings)),
       ].where((plan) => plan.types.isNotEmpty).toList();
   // And a language with no shape inside the length range, while another has
   // one: asked for eight characters, every language answered, and the ones whose

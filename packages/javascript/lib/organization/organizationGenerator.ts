@@ -16,6 +16,7 @@
 
 import {
 	collect,
+	keep,
 	languagesWriting,
 	lengthBounds,
 	resolveLength,
@@ -447,6 +448,10 @@ type Plan = {
 	fits: boolean;
 };
 
+// The plans each language and set of settings made, kept so a call of one name
+// does not read every template of nine languages to draw it.
+const keptPlans = new Map<string, Plan>();
+
 function planFor(language: WordLanguage, settings: Settings): Plan {
 	const data = ORGANIZATION_DATA[language];
 	const shapes: Partial<Record<OrganizationType, readonly Shape[]>> = {};
@@ -729,8 +734,17 @@ export function generateOrganizationDetails(
 	};
 	// A language that does not write the requested character, and one with no
 	// shape of the requested kinds that can lead with it, are out before a draw.
+	// Every field of `settings` is resolved, so it names the plan whole.
+	const named = [
+		settings.types,
+		settings.industry,
+		settings.legalForm,
+		settings.invent,
+		settings.prefix,
+		settings.bounds
+	].join('|');
 	const able = languagesWriting(language, WORD_LANGUAGES, settings.prefix)
-		.map((code) => planFor(code, settings))
+		.map((code) => keep(keptPlans, `${code}|${named}`, () => planFor(code, settings)))
 		.filter((plan) => plan.types.length > 0);
 	// And a language with no shape inside the length range, while another has one:
 	// asked for eight characters, every language answered, and the ones whose

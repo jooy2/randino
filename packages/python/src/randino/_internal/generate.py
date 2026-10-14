@@ -9,7 +9,7 @@ it can list every result it may return.
 
 import math
 from bisect import bisect_right
-from collections.abc import Callable, Sequence
+from collections.abc import Callable, Hashable, Sequence
 from dataclasses import dataclass
 from itertools import accumulate
 from typing import Any, Generic, TypeVar
@@ -421,16 +421,37 @@ def kept_outcomes(
     Returns:
         The outcomes, listed now or by an earlier call.
     """
-    outcomes = kept.get(key)
+    return keep(kept, key, listed)
 
-    if outcomes is None:
+
+K = TypeVar("K", bound=Hashable)
+V = TypeVar("V")
+
+
+def keep(kept: dict[K, V], key: K, make: Callable[[], V]) -> V:
+    """What `make` works out for one set of options, kept for the calls after.
+
+    A table is let go at `_OUTCOMES_KEPT` keys and filled again, so a caller who moves an
+    option call by call does not keep a value for every one of them.
+
+    Args:
+        kept: The caller's own table of values, by key.
+        key: Every option the value depends on.
+        make: Works the value out, the first time a call asks with `key`.
+
+    Returns:
+        The value, worked out now or by an earlier call.
+    """
+    value = kept.get(key)
+
+    if value is None:
         if len(kept) >= _OUTCOMES_KEPT:
             kept.clear()
 
-        outcomes = listed()
-        kept[key] = outcomes
+        value = make()
+        kept[key] = value
 
-    return outcomes
+    return value
 
 
 def collect_from(

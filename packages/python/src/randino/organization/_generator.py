@@ -15,6 +15,7 @@ from dataclasses import dataclass
 
 from randino._internal.generate import (
     collect,
+    keep,
     languages_writing,
     length_bounds,
     resolve_length,
@@ -412,6 +413,11 @@ class _Plan:
     """Whether some shape of the language can land inside the length range."""
 
 
+_KEPT_PLANS: dict[tuple[WordLanguage, _Settings], _Plan] = {}
+"""The plans each language and set of settings made, kept so a call of one name does not
+read every template of nine languages to draw it."""
+
+
 def _plan_for(language: WordLanguage, settings: _Settings) -> _Plan:
     data = ORGANIZATION_DATA[language]
     shapes: dict[OrganizationType, tuple[_Shape, ...]] = {}
@@ -650,12 +656,17 @@ def generate_organization_details(
             low, high, 1, RAND_ORGANIZATION_LENGTH_MAX, RAND_ORGANIZATION_LENGTH_MAX
         ),
     )
+
     # A language that does not write the requested character, and one with no shape of
     # the requested kinds that can lead with it, are out before a draw.
+    # `settings` is resolved and frozen, so it names the plan whole.
+    def plan_of(code: WordLanguage) -> _Plan:
+        return keep(_KEPT_PLANS, (code, settings), lambda: _plan_for(code, settings))
+
     able = [
         plan
         for plan in (
-            _plan_for(code, settings)
+            plan_of(code)
             for code in languages_writing(
                 resolve_word_language(language), WORD_LANGUAGES, settings.prefix
             )

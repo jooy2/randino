@@ -224,7 +224,14 @@ List<Outcome<E>> keptOutcomes<E>(
   Map<String, List<Outcome<E>>> kept,
   String key,
   List<Outcome<E>> Function() list,
-) {
+) => keep<List<Outcome<E>>>(kept, key, list);
+
+/// What [make] works out for one set of options, kept for the calls after
+/// under [key], which has to name every option the value depends on.
+///
+/// A table is let go at `_outcomesKept` keys and filled again, so a caller who
+/// moves an option call by call does not keep a value for every one of them.
+V keep<V extends Object>(Map<String, V> kept, String key, V Function() make) {
   final cached = kept[key];
 
   if (cached != null) {
@@ -235,7 +242,7 @@ List<Outcome<E>> keptOutcomes<E>(
     kept.clear();
   }
 
-  return kept[key] = list();
+  return kept[key] = make();
 }
 
 /// [collect] for a generator that can list every result it may return — a
