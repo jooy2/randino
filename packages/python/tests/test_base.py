@@ -12,8 +12,8 @@ from typing import Any
 
 import randino
 
-# Internal, but every generator's length options go through it.
-from randino._internal.generate import length_bounds
+# Internal, but every generator's length options and draws go through them.
+from randino._internal.generate import collect, length_bounds
 
 SOURCE = pathlib.Path(randino.__file__).parent
 
@@ -725,3 +725,21 @@ def test_every_language_that_cannot_meet_a_length_range_is_left_out_of_a_mixed_d
     # A range no language can meet keeps every one of them, each answering with its
     # closest.
     assert len(randino.rand_word(min_length=40, count=60)) == 60
+
+
+def test_a_unique_call_that_asks_for_a_whole_pool_gets_all_of_it() -> None:
+    # `collect` gives up after a run of draws that adds nothing. A fixed run of two
+    # thousand left a pool this size short nearly every time, and one of the 249
+    # countries out about once in three thousand calls. Twenty draws for each result
+    # found leaves a pool drawn evenly short about twice in a billion.
+    size = randino.RAND_COUNT_MAX
+    source = Random()
+    drawn = collect(
+        count=size,
+        unique=True,
+        starts_with="",
+        draw=lambda: source.randrange(size),
+        key_of=str,
+    )
+
+    assert len(drawn) == size

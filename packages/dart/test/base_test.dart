@@ -3,7 +3,7 @@ import 'dart:io';
 import 'dart:math';
 
 import 'package:randino/randino.dart';
-// Internal, but every generator's length options go through it.
+// Internal, but every generator's length options and draws go through them.
 import 'package:randino/src/internal/generate.dart';
 import 'package:test/test.dart';
 
@@ -776,6 +776,25 @@ void main() {
       // A range no language can meet keeps every one of them, each answering
       // with its closest.
       expect(randWord(minLength: 40, count: 60), hasLength(60));
+    });
+
+    test('a unique call that asks for a whole pool gets all of it', () {
+      // `collect` gives up after a run of draws that adds nothing. A fixed run
+      // of two thousand left a pool this size short nearly every time, and one
+      // of the 249 countries out about once in three thousand calls. Twenty
+      // draws for each result found leaves a pool drawn evenly short about
+      // twice in a billion.
+      const size = randCountMax;
+      final source = Random();
+      final drawn = collect(
+        count: size,
+        unique: true,
+        startsWith: '',
+        draw: () => source.nextInt(size),
+        keyOf: (item) => '$item',
+      );
+
+      expect(drawn, hasLength(size));
     });
   });
 }

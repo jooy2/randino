@@ -2,6 +2,8 @@
 
 ## vNext (2026--)
 
+- A `unique` call that asks for a whole pool gets all of it. `rand_country(language="en", unique=True, count=300)` returned 248 countries about once in three thousand calls, and `rand_word(language="en", unique=True, count=10000)` came back several words short nearly every time, because a call gave up after two thousand draws in a row found nothing new. It now waits twenty draws for each result it has found, so a call that has run out takes longer to give up. A catalog drawn by weight can still miss its rarest entries: `rand_os` asked for every release comes back short about one call in six.
+
 ## 1.5.0 (2026-10-11)
 
 - **Breaking:** six themes hold less than they did, because each gave words to a new theme. `myth` keeps magic, spells, curses, prophecies, relics, potions and the realms of myth, and every creature it held moved to `monster`, so a dragon is `rand_monster` now. `food` keeps prepared dishes, bread, sweets and snacks, and its ingredients, vegetables and fruit moved to `ingredient`, `vegetable` and `fruit`. `music` keeps instruments, notation and performing, and its genres and kinds of piece moved to `genre`. `place` keeps the places that are not buildings, and its buildings and rooms moved to `building`. `space` gave its planets to `planet`, `product` its make-up and hair care to `beauty`, and `plant` its vegetables, fruit and cooking herbs. Ask the new theme for what the old one used to return.

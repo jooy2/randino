@@ -1,8 +1,8 @@
 import assert from 'assert';
 import { describe, it } from 'node:test';
 import * as randino from '../dist/index.js';
-// Internal, but every generator's length options go through it.
-import { lengthBounds } from '../dist/_internal/generate.js';
+// Internal, but every generator's length options and draws go through them.
+import { collect, lengthBounds } from '../dist/_internal/generate.js';
 
 /** A small seeded source, so a test can ask for the same draws twice. */
 function seeded(seed: number): () => number {
@@ -595,5 +595,20 @@ describe('base test', () => {
 		// A range no language can meet keeps every one of them, each answering with
 		// its closest.
 		assert.strictEqual(randino.randWord({ minLength: 40, count: 60 }).length, 60);
+	});
+
+	it('a unique call that asks for a whole pool gets all of it', () => {
+		// `collect` gives up after a run of draws that adds nothing. A fixed run of
+		// two thousand left a pool this size short nearly every time, and one of the
+		// 249 countries out about once in three thousand calls. Twenty draws for each
+		// result found leaves a pool drawn evenly short about twice in a billion.
+		const size = randino.RAND_COUNT_MAX;
+		const drawn = collect(
+			{ count: size, unique: true },
+			() => Math.floor(Math.random() * size),
+			String
+		);
+
+		assert.strictEqual(drawn.length, size);
 	});
 });

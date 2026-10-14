@@ -302,12 +302,19 @@ def languages_writing(option: str, languages: Sequence[L], prefix: str) -> tuple
 
 
 _COLLECT_STALL = 2000
-"""How many draws in a row may add nothing before `collect` stops.
+"""How many draws in a row may add nothing before `collect` stops, at the least.
 
-Only a call of more than thirty results ever reaches it, since a smaller one runs out of
-attempts first; a result one draw in a hundred finds is missed this way about twice in a
-billion.
+The run is twenty draws for each result found so far, when that comes to more. With k
+results found, a pool drawn evenly that holds one more gives it one draw in k + 1, and
+twenty times k draws in a row miss it about twice in a billion; the floor gives the same
+odds to a result one draw in a hundred finds. Only a call of more than thirty results ever
+reaches the floor, since a smaller one runs out of attempts first. A pool drawn by weight
+can still stop short of a result far rarer than the rest, such as the rarest releases
+`rand_os` draws.
 """
+
+_COLLECT_STALL_PER_RESULT = 20
+"""How many draws in a row `collect` waits through for each result found so far."""
 
 
 def collect(
@@ -348,9 +355,14 @@ def collect(
     # A run of draws that adds nothing is a pool with nothing new left in it, and the
     # budget above was spent all the same: `rand_word(language="vi", starts_with="ư",
     # unique=True, count=2000)` found its 270 words and went on for a hundred thousand
-    # draws. A result still to be found is missed only when it fails to come up
-    # `_COLLECT_STALL` draws in a row.
-    while len(results) < wanted and attempts < max_attempts and missed < _COLLECT_STALL:
+    # draws. A result still to be found is missed only when it fails to come up that many
+    # draws in a row, and the run grows with what has been found: a fixed two thousand
+    # left one of the 249 countries out about once in three thousand calls.
+    while (
+        len(results) < wanted
+        and attempts < max_attempts
+        and missed < max(_COLLECT_STALL, _COLLECT_STALL_PER_RESULT * len(results))
+    ):
         attempts += 1
         missed += 1
 

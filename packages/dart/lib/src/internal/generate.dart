@@ -6,6 +6,8 @@
 // filter, the same `unique` bookkeeping and the same attempt budget. Written
 // once here, a new generator gets all of it by calling [collect].
 
+import 'dart:math';
+
 import 'package:randino/src/constants.dart';
 import 'package:randino/src/internal/script.dart';
 import 'package:randino/src/internal/utils.dart';
@@ -128,11 +130,16 @@ List<T> languagesFitting<T>(
   return fitting.isNotEmpty ? fitting : languages;
 }
 
-// How many draws in a row may add nothing before `collect` stops. Only a call
-// of more than thirty results ever reaches it, since a smaller one runs out of
-// attempts first; a result one draw in a hundred finds is missed this way about
-// twice in a billion.
+// How many draws in a row may add nothing before `collect` stops: twenty for
+// each result found so far, and never fewer than two thousand. With k results
+// found, a pool drawn evenly that holds one more gives it one draw in k + 1,
+// and twenty times k draws in a row miss it about twice in a billion; the floor
+// gives the same odds to a result one draw in a hundred finds. Only a call of
+// more than thirty results ever reaches the floor, since a smaller one runs out
+// of attempts first. A pool drawn by weight can still stop short of a result
+// far rarer than the rest, such as the rarest releases `randOs` draws.
 const int _collectStall = 2000;
+const int _collectStallPerResult = 20;
 
 /// Draw until there are [count] results, discarding what the filters reject.
 ///
@@ -165,8 +172,12 @@ List<T> collect<T>({
   // the budget above was spent all the same: `randWord(language:
   // WordLanguage.vi, startsWith: 'ư', unique: true, count: 2000)` found its 270
   // words and went on for a hundred thousand draws. A result still to be found
-  // is missed only when it fails to come up [_collectStall] draws in a row.
-  while (results.length < wanted && attempts < maxAttempts && missed < _collectStall) {
+  // is missed only when it fails to come up that many draws in a row, and the
+  // run grows with what has been found: a fixed two thousand left one of the
+  // 249 countries out about once in three thousand calls.
+  while (results.length < wanted &&
+      attempts < maxAttempts &&
+      missed < max(_collectStall, _collectStallPerResult * results.length)) {
     attempts += 1;
     missed += 1;
 
